@@ -60,6 +60,36 @@ flowchart LR
 
 agent 写一个 diff。检查器读 diff、允许的 glob、禁止的 glob，以及一份跑过的验收命令清单。每个违规都是一条带标签的发现，验证关卡可以拒绝它。
 
+### 范围的两个层级：功能清单与任务契约
+
+范围契约约束一个任务，不约束整个项目。一个 agent 可以完美地待在登录修复的契约里，却在下一轮决定这项目还需要一个设置页、一个 dark mode 开关、外加把路由重写一遍。契约从没被问过项目层面哪些工作在范围内，只被问过任务层面哪些文件在范围内。
+
+第二个层级需要它自己的原语：一个 agent 在会话开始时读取的 `feature_list.json`。它是项目的待办清单（backlog），以机器可读、有序的文件形式存在。agent 恰好挑一个 `status` 为 `todo` 的功能项，把它的 `id` 写进当前的范围契约，并被禁止在同一会话里开第二个功能项。「一次只做一个功能」不再是 prompt 里一行 agent 能自圆其说绕过去的话，而成了它从磁盘上读到的一个值、关卡强制执行的一道检查。
+
+```json
+{
+  "project": "knowledge-base",
+  "active": "import-pdf",
+  "features": [
+    { "id": "import-pdf",   "status": "in_progress", "goal": "import a PDF into the library",        "done_when": "pytest tests/test_import.py && a sample PDF appears in the library view" },
+    { "id": "full-text-search", "status": "todo",     "goal": "search document text and rank hits",   "done_when": "query returns ranked results with snippets" },
+    { "id": "cite-answers", "status": "todo",         "goal": "answers carry source citations",        "done_when": "every answer renders at least one clickable citation" }
+  ]
+}
+```
+
+| 字段 | 用途 |
+|-------|---------|
+| `active` | 当前会话唯一可碰的功能项；为空就挑一个并设上 |
+| `features[].id` | 范围契约的 `task_id` 指向的稳定 slug |
+| `features[].status` | `todo`、`in_progress`、`done`、`blocked`；同时只能有一个 `in_progress` |
+| `features[].goal` | 一句审查者能验证的话 |
+| `features[].done_when` | 把 `in_progress` 翻成 `done` 的验收行 |
+
+两条规则让这份清单承重，而不是当摆设。第一，「至多一个 `in_progress`」这条不变式本身就是一道启动检查（Phase 14 · 33）：如果清单里出现两个，会话拒绝启动，直到人来解决。第二，功能清单是一个文件，不是一条聊天消息，因为聊天会滚出上下文，而文件跨会话、跨 agent 地留存。交接（Phase 14 · 40）把完成的功能项状态写回 `done`，于是下个会话打开时看到的是一块准确的看板，而不用重新推导还剩什么。
+
+契约与清单按最小权限组合，和下面描述的那次合并一样：任务契约的 `allowed_files` 必须坐落在当前功能项所碰范围之内，绝不在它之外。
+
 ## 动手构建
 
 `code/main.py` 实现：
