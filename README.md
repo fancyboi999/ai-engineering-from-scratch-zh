@@ -67,7 +67,7 @@ agent 挂了个函数，却说不出调用它的那个模型内部，attention �
 往前跳；但别跳过去之后，又回头纳闷上层为什么塌了。
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'12px'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff'}}}%%
 flowchart TB
   P0["阶段 0 · 配置与工具链"] --> P1["阶段 1 · 数学基础"]
   P1 --> P2["阶段 2 · 机器学习基础"]
@@ -113,7 +113,7 @@ phases/<NN>-<phase-name>/<NN>-<lesson-name>/
 版本你自己写过。
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'13px'}}}%%
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff'}}}%%
 flowchart LR
   M["主旨<br/><sub>一句话核心理念</sub>"] --> Pr["问题背景<br/><sub>具体的痛点</sub>"]
   Pr --> C["核心概念<br/><sub>图解与直觉</sub>"]
