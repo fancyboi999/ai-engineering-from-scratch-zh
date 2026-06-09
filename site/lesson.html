@@ -2649,8 +2649,12 @@
       function fixMermaidClusterLabels(root) {
         if (!root) return;
         root.querySelectorAll('.cluster foreignObject').forEach(function (fo) {
-          var div = fo.firstElementChild || fo;
-          var need = Math.ceil(Math.max(div.scrollWidth, div.getBoundingClientRect().width)) + 8;
+          fo.style.overflow = 'visible'; // 兜底：万一加宽仍差几 px，也让末字显示而非裁掉
+          var need = 0; // 测真实文字宽：div 是 display:table-cell，须遍历到内层 p/span 才准
+          fo.querySelectorAll('*').forEach(function (el) {
+            need = Math.max(need, el.scrollWidth, el.getBoundingClientRect().width);
+          });
+          need = Math.ceil(need) + 6;
           var cur = parseFloat(fo.getAttribute('width')) || 0;
           if (need > cur) {
             var x = parseFloat(fo.getAttribute('x')) || 0;
@@ -2678,7 +2682,7 @@
           window._mermaidReady.render('mermaid-' + idx + '-svg', def).then(function (result) {
             if (target._mermaidRenderToken !== token) return;
             target.innerHTML = result.svg;
-            requestAnimationFrame(function () { fixMermaidClusterLabels(target); });
+            (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () { requestAnimationFrame(function () { fixMermaidClusterLabels(target); }); });
           }).catch(function () {
             if (target._mermaidRenderToken !== token) return;
             target.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">图表无法渲染。</p>';
@@ -2791,7 +2795,7 @@
         window._mermaidReady.render('mermaid-modal-svg', def).then(function (result) {
           if (center._mermaidRenderToken !== token) return;
           center.innerHTML = result.svg;
-          requestAnimationFrame(function () { fixMermaidClusterLabels(center); });
+          (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () { requestAnimationFrame(function () { fixMermaidClusterLabels(center); }); });
         }).catch(function () {
           if (center._mermaidRenderToken !== token) return;
           center.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">图表无法渲染。</p>';
