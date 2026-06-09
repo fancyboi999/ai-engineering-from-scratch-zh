@@ -115,11 +115,11 @@ phases/<NN>-<phase-name>/<NN>-<lesson-name>/
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff'}}}%%
 flowchart LR
-  M["主旨<br/><sub>一句话核心理念</sub>"] --> Pr["问题背景<br/><sub>具体的痛点</sub>"]
-  Pr --> C["核心概念<br/><sub>图解与直觉</sub>"]
-  C --> B["动手构建<br/><sub>纯数学，不用框架</sub>"]
-  B --> U["实际使用<br/><sub>同样的事用 PyTorch / sklearn 跑一遍</sub>"]
-  U --> S["拿去用<br/><sub>提示词 · 技能 · agent · MCP</sub>"]
+  M["主旨<br/>一句话核心理念"] --> Pr["问题背景<br/>具体的痛点"]
+  Pr --> C["核心概念<br/>图解与直觉"]
+  C --> B["动手构建<br/>纯数学，不用框架"]
+  B --> U["实际使用<br/>同样的事用 PyTorch / sklearn 跑一遍"]
+  U --> S["拿去用<br/>提示词 · 技能 · agent · MCP"]
 ```
 
 ## 快速开始
