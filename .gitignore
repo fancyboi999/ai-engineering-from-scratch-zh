@@ -61,3 +61,7 @@ mlruns/
 # 以免漂移或丢 URL。每次从 PHASES 重新生成。
 site/sitemap.xml
 site/llms.txt
+
+# 上游 scripts/build_catalog.py 的产物（上游也 gitignore 它）。本仓不用那套
+# （它认 docs/en.md），课数校验改用 site/build.js --check——忽略以防误提交。
+catalog.json

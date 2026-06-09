@@ -553,19 +553,21 @@ function syncCounts(lessons, outputs) {
 // 中文文案，不碰上游 Python 脚本。真相 = 文件系统课程目录数。
 function countLessonDirs() {
   const phasesDir = path.join(REPO_ROOT, 'phases');
-  if (!fs.existsSync(phasesDir)) return 0;
   const DIR_RE = /^[0-9]{2}-[a-z0-9][a-z0-9-]*[a-z0-9]$/;  // NN-slug，与 audit_lessons.py 一致
-  let n = 0;
+  const result = { count: 0, skipped: [] };  // skipped：不符 NN-slug 的目录，fail-loud 暴露
+  if (!fs.existsSync(phasesDir)) return result;
   for (const phaseDir of fs.readdirSync(phasesDir).sort()) {
-    if (!DIR_RE.test(phaseDir)) continue;
     const pDir = path.join(phasesDir, phaseDir);
     if (!fs.statSync(pDir).isDirectory()) continue;
+    if (!DIR_RE.test(phaseDir)) { result.skipped.push(`${phaseDir}/ (phase 目录名不规范)`); continue; }
     for (const lessonDir of fs.readdirSync(pDir)) {
-      if (!DIR_RE.test(lessonDir)) continue;
-      if (fs.statSync(path.join(pDir, lessonDir)).isDirectory()) n++;
+      const full = path.join(pDir, lessonDir);
+      if (!fs.statSync(full).isDirectory()) continue;
+      if (!DIR_RE.test(lessonDir)) { result.skipped.push(`${phaseDir}/${lessonDir}`); continue; }
+      result.count++;
     }
   }
-  return n;
+  return result;
 }
 
 function verifyCurriculum() {
@@ -573,7 +575,8 @@ function verifyCurriculum() {
   const roadmap = fs.readFileSync(ROADMAP_PATH, 'utf8');
   const phases = parseReadme(readme, parseRoadmap(roadmap));
   const tableLessons = phases.reduce((s, p) => s + p.lessons.length, 0);
-  const fsLessons = countLessonDirs();
+  const fsResult = countLessonDirs();
+  const fsLessons = fsResult.count;
   const phaseCount = phases.length;
 
   const errors = [];
@@ -603,14 +606,37 @@ function verifyCurriculum() {
   check('ROADMAP 总计课数',           grab(roadmap, /\*\*总计：\d+ 个阶段，(\d+) 节课/), fsLessons);
   check('ROADMAP 总计阶段数',         grab(roadmap, /\*\*总计：(\d+) 个阶段/),           phaseCount);
 
+  // ⑤ 每个 phase 标题声称的课数 == 该 phase 表格行数（防单 phase 标题漂移——
+  //    syncCounts 故意不碰这些单 phase 数，所以它们最容易在补课时漏改）。
+  //    标题两种格式：### Phase 0: ... `12 lessons` ／ <summary>…<code>22 lessons</code>
+  const declaredByPhase = {};
+  for (const line of readme.split(/\r?\n/)) {
+    const m = line.match(/Phase\s+(\d+)[:\s—-].*?`(\d+)\s+lessons?`/)
+           || line.match(/Phase\s+(\d+)\b.*?<code>(\d+)\s+(?:lessons?|projects?)<\/code>/);
+    if (m && declaredByPhase[parseInt(m[1])] === undefined) declaredByPhase[parseInt(m[1])] = parseInt(m[2]);
+  }
+  for (const p of phases) {
+    const declared = declaredByPhase[p.id];
+    if (declared === undefined)
+      errors.push(`Phase ${p.id} 标题课数: 没在 README 标题里匹配到声称课数（标题格式可能变了）`);
+    else if (declared !== p.lessons.length)
+      errors.push(`Phase ${p.id} 标题课数: 标题写 ${declared}，该 phase 表格实际 ${p.lessons.length} 课`);
+  }
+
+  // skipped 目录 fail-loud：不符 NN-slug、未计入课数的目录，提示出来（不直接判错）
+  if (fsResult.skipped.length) {
+    console.warn(`⚠️  phases/ 下有 ${fsResult.skipped.length} 个不符 NN-slug 的目录被跳过、未计入课数：`);
+    fsResult.skipped.forEach(s => console.warn('   - ' + s));
+  }
+
   if (errors.length) {
     console.error(`\n❌ 课程数一致性校验失败（真相：文件系统 ${fsLessons} 课 / ${phaseCount} 阶段）\n`);
     errors.forEach(e => console.error('  ✗ ' + e));
-    console.error(`\n修法：把上述文案改成与文件系统一致；新课记得在 README + ROADMAP 表格补行。`);
+    console.error(`\n修法：把上述文案改成与文件系统一致；新课记得在 README + ROADMAP 表格补行、并更新该 phase 标题的课数。`);
     console.error(`（站点模板里的课数由 build 时 syncCounts 自动同步，无需手改；README/ROADMAP 是手动维护、本校验把守。）`);
     process.exit(1);
   }
-  console.log(`✅ 课程数一致性校验通过：${fsLessons} 课 / ${phaseCount} 阶段（文件系统 = README 表格 = badge/散文 = ROADMAP 总计）`);
+  console.log(`✅ 课程数一致性校验通过：${fsLessons} 课 / ${phaseCount} 阶段（文件系统 = README 表格 = badge/散文 = ROADMAP 总计 = 各 phase 标题课数）`);
 }
 
 if (process.argv.includes('--check')) {

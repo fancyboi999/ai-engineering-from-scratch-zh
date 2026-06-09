@@ -435,7 +435,7 @@ the agent went wrong and explain why...
 </details>
 
 <details id="phase-7">
-<summary><b>Phase 7 — Transformer 深入剖析</b> &nbsp;<code>14 lessons</code>&nbsp; <em>那个改变了一切的架构。</em></summary>
+<summary><b>Phase 7 — Transformer 深入剖析</b> &nbsp;<code>16 lessons</code>&nbsp; <em>那个改变了一切的架构。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -460,7 +460,7 @@ the agent went wrong and explain why...
 </details>
 
 <details id="phase-8">
-<summary><b>Phase 8 — 生成式 AI</b> &nbsp;<code>14 lessons</code>&nbsp; <em>生成图像、视频、音频、3D，等等。</em></summary>
+<summary><b>Phase 8 — 生成式 AI</b> &nbsp;<code>15 lessons</code>&nbsp; <em>生成图像、视频、音频、3D，等等。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -505,7 +505,7 @@ the agent went wrong and explain why...
 </details>
 
 <details id="phase-10">
-<summary><b>Phase 10 — 从零实现 LLM</b> &nbsp;<code>22 lessons</code>&nbsp; <em>构建、训练并真正理解大语言模型。</em></summary>
+<summary><b>Phase 10 — 从零实现 LLM</b> &nbsp;<code>24 lessons</code>&nbsp; <em>构建、训练并真正理解大语言模型。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -996,24 +996,25 @@ python3 scripts/scaffold_workbench.py path/to/your-repo --force    # 覆盖
 编辑 `AGENTS.md`、运行 `scripts/init_agent.py`，把契约交给你的 agent。包的源码在
 `phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/`。
 
-### 把整套课程当 JSON 来浏览
+### 课程数据与课数校验
 
-`scripts/build_catalog.py` 会遍历磁盘上的每个阶段、每节课、每件产物，
-在仓库根目录写出 `catalog.json`。一个文件，囊括课程的全部真相。
+`site/build.js` 解析 README、ROADMAP 和每节课的 `docs/zh.md`，在 `site/data.js`
+里生成站点用的课程数据（阶段、课程、术语表、产物）。计数以**文件系统**为真相。
 
 ```bash
-python3 scripts/build_catalog.py               # 写到 <repo>/catalog.json
-python3 scripts/build_catalog.py --stdout      # 输出到 stdout，不动仓库
-python3 scripts/build_catalog.py --out path/to/file.json
+node site/build.js            # 生成 site/data.js（+ sitemap.xml / llms.txt）
+node site/build.js --check    # 只校验课程数一致性，不写文件
 ```
 
-这份目录是从文件系统派生的，不是从 README 派生的，所以计数永远和磁盘上的实际内容一致。
-可以用它做站点构建、下游工具，或核对 README 的计数有没有漂移。Schema 在脚本顶部有说明。
+`--check` 以磁盘上的课程目录数为准，核对 README 表格、badge、散文、各 phase 标题
+和 ROADMAP 总计是否都对得上，任一漂移就 exit 1。一个 GitHub Action
+（`.github/workflows/build.yml`）在每个 PR 上跑构建 + 这道校验，挡住课数漂移
+（曾踩 435、498 vs 503）。新增课程时在 README + ROADMAP 表格补行、并更新该 phase
+标题的课数即可；站点模板里散落的计数由 build 时 `syncCounts` 自动同步。
 
-一个 GitHub Action（`.github/workflows/curriculum.yml`）会在每个 PR 上重建
-`catalog.json`，如果提交的文件过期就让构建失败。改完任意课程后，跑一遍
-`python3 scripts/build_catalog.py` 并提交结果，否则 CI 会拒掉 PR。同一个工作流还会以
-warn-only 模式运行 `audit_lessons.py`（这样已有的漂移不会卡住贡献者）。
+> 注：上游用 `scripts/build_catalog.py` + `catalog.json` + `.github/workflows/curriculum.yml`
+> 做同样的事，但那套脚本硬编码 `docs/en.md` + 英文 README 正则，对本中文翻译仓不兼容，
+> 故改用上面这套等价的、认 `zh.md` 的校验。
 
 ### 给每节课的 Python 代码做冒烟检查
 
