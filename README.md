@@ -12,7 +12,7 @@
   <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-503-3553ff?style=flat-square&labelColor=fafaf5" alt="503 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
-  <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff" alt="GitHub stars"></a>
+  <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff&cacheSeconds=21600" alt="GitHub stars"></a>
 </p>
 
 ```
@@ -69,25 +69,25 @@ agent 挂了个函数，却说不出调用它的那个模型内部，attention �
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'12px'}}}%%
 flowchart TB
-  P0["Phase 0 — Setup &amp; Tooling"] --> P1["Phase 1 — Math Foundations"]
-  P1 --> P2["Phase 2 — ML Fundamentals"]
-  P2 --> P3["Phase 3 — Deep Learning Core"]
-  P3 --> P4["Phase 4 — Vision"]
-  P3 --> P5["Phase 5 — NLP"]
-  P3 --> P6["Phase 6 — Speech &amp; Audio"]
-  P3 --> P9["Phase 9 — RL"]
-  P5 --> P7["Phase 7 — Transformers"]
-  P7 --> P8["Phase 8 — GenAI"]
-  P7 --> P10["Phase 10 — LLMs from Scratch"]
-  P10 --> P11["Phase 11 — LLM Engineering"]
-  P10 --> P12["Phase 12 — Multimodal"]
-  P11 --> P13["Phase 13 — Tools &amp; Protocols"]
-  P13 --> P14["Phase 14 — Agent Engineering"]
-  P14 --> P15["Phase 15 — Autonomous Systems"]
-  P15 --> P16["Phase 16 — Multi-Agent &amp; Swarms"]
-  P14 --> P17["Phase 17 — Infrastructure &amp; Production"]
-  P15 --> P18["Phase 18 — Ethics &amp; Alignment"]
-  P16 --> P19["Phase 19 — Capstone Projects"]
+  P0["阶段 0 · 配置与工具链"] --> P1["阶段 1 · 数学基础"]
+  P1 --> P2["阶段 2 · 机器学习基础"]
+  P2 --> P3["阶段 3 · 深度学习核心"]
+  P3 --> P4["阶段 4 · 计算机视觉"]
+  P3 --> P5["阶段 5 · NLP"]
+  P3 --> P6["阶段 6 · 语音与音频"]
+  P3 --> P9["阶段 9 · 强化学习"]
+  P5 --> P7["阶段 7 · Transformer"]
+  P7 --> P8["阶段 8 · 生成式 AI"]
+  P7 --> P10["阶段 10 · 从零实现 LLM"]
+  P10 --> P11["阶段 11 · LLM 工程"]
+  P10 --> P12["阶段 12 · 多模态 AI"]
+  P11 --> P13["阶段 13 · 工具与协议"]
+  P13 --> P14["阶段 14 · Agent 工程"]
+  P14 --> P15["阶段 15 · 自主系统"]
+  P15 --> P16["阶段 16 · 多 agent 与集群"]
+  P14 --> P17["阶段 17 · 基础设施与生产"]
+  P15 --> P18["阶段 18 · 伦理、安全与对齐"]
+  P16 --> P19["阶段 19 · 综合项目"]
   P17 --> P19
   P18 --> P19
 ```
@@ -115,11 +115,11 @@ phases/<NN>-<phase-name>/<NN>-<lesson-name>/
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'13px'}}}%%
 flowchart LR
-  M["MOTTO<br/><sub>one-line core idea</sub>"] --> Pr["PROBLEM<br/><sub>concrete pain</sub>"]
-  Pr --> C["CONCEPT<br/><sub>diagrams &amp; intuition</sub>"]
-  C --> B["BUILD IT<br/><sub>raw math, no frameworks</sub>"]
-  B --> U["USE IT<br/><sub>same thing in PyTorch / sklearn</sub>"]
-  U --> S["SHIP IT<br/><sub>prompt · skill · agent · MCP</sub>"]
+  M["主旨<br/><sub>一句话核心理念</sub>"] --> Pr["问题背景<br/><sub>具体的痛点</sub>"]
+  Pr --> C["核心概念<br/><sub>图解与直觉</sub>"]
+  C --> B["动手构建<br/><sub>纯数学，不用框架</sub>"]
+  B --> U["实际使用<br/><sub>同样的事用 PyTorch / sklearn 跑一遍</sub>"]
+  U --> S["拿去用<br/><sub>提示词 · 技能 · agent · MCP</sub>"]
 ```
 
 ## 快速开始
