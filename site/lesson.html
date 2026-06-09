@@ -924,16 +924,28 @@
       .mermaid-modal-body foreignObject p,
       .mermaid-modal-body foreignObject span
     ) {
-      font-family: var(--font-mono);
+      font-family: "JetBrains Mono", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
       font-size: 13px;
-      line-height: 1.4;
-      letter-spacing: 0.02em;
+      line-height: 1.5;
+      letter-spacing: normal;
       text-align: center;
       text-transform: none;
       margin: 0;
       hyphens: none;
       -webkit-hyphens: none;
       color: var(--ink);
+    }
+
+    /* 课程图里所有 SVG text（subgraph 标题 / stateDiagram note / 连线标签）
+       与 htmlLabels 用同一中文字体栈，保证宽度测量=显示一致，中文不再走丑的
+       系统等宽 fallback，也避免 CJK 测量偏差导致的截断。 */
+    .lesson-article .mermaid-render svg text,
+    .lesson-article .mermaid-render svg .nodeLabel,
+    .lesson-article .mermaid-render svg .edgeLabel,
+    .mermaid-modal-body svg text,
+    .mermaid-modal-body svg .nodeLabel,
+    .mermaid-modal-body svg .edgeLabel {
+      font-family: "JetBrains Mono", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
     }
 
     .lesson-nav-bottom {
@@ -2631,6 +2643,23 @@
         rerenderMermaidModal();
       }
 
+      // mermaid subgraph 标题（cluster label）中文截断 workaround：上游已知 bug——
+      // 测量标题宽度用 SVG、渲染用 HTML，二者对中文宽度对不上，foreignObject(overflow hidden)
+      // 把超出的末字裁掉。渲染后把每个 cluster 标题的 foreignObject 加宽到容纳文字 + 居中。
+      function fixMermaidClusterLabels(root) {
+        if (!root) return;
+        root.querySelectorAll('.cluster foreignObject').forEach(function (fo) {
+          var div = fo.firstElementChild || fo;
+          var need = Math.ceil(Math.max(div.scrollWidth, div.getBoundingClientRect().width)) + 8;
+          var cur = parseFloat(fo.getAttribute('width')) || 0;
+          if (need > cur) {
+            var x = parseFloat(fo.getAttribute('x')) || 0;
+            fo.setAttribute('width', need);
+            fo.setAttribute('x', x - (need - cur) / 2);
+          }
+        });
+      }
+
       function rerenderMermaidBlocks() {
         if (!window._mermaidReady) return;
         var sources = document.querySelectorAll('pre.mermaid.mermaid-source');
@@ -2649,6 +2678,7 @@
           window._mermaidReady.render('mermaid-' + idx + '-svg', def).then(function (result) {
             if (target._mermaidRenderToken !== token) return;
             target.innerHTML = result.svg;
+            requestAnimationFrame(function () { fixMermaidClusterLabels(target); });
           }).catch(function () {
             if (target._mermaidRenderToken !== token) return;
             target.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">图表无法渲染。</p>';
@@ -2761,6 +2791,7 @@
         window._mermaidReady.render('mermaid-modal-svg', def).then(function (result) {
           if (center._mermaidRenderToken !== token) return;
           center.innerHTML = result.svg;
+          requestAnimationFrame(function () { fixMermaidClusterLabels(center); });
         }).catch(function () {
           if (center._mermaidRenderToken !== token) return;
           center.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">图表无法渲染。</p>';
