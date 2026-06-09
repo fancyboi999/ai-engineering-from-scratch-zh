@@ -2648,8 +2648,13 @@
       // 把超出的末字裁掉。渲染后把每个 cluster 标题的 foreignObject 加宽到容纳文字 + 居中。
       function fixMermaidClusterLabels(root) {
         if (!root) return;
+        // 非节点的 foreignObject（cluster 标题 / edge label 连线标签 / note）overflow 兜底：
+        // 中文测量偏窄导致框算小时，让超出文字显示而非被裁。节点不动（字体修复已够，且加宽会破坏布局）。
+        root.querySelectorAll('foreignObject').forEach(function (fo) {
+          if (!fo.closest('.node')) fo.style.overflow = 'visible';
+        });
+        // cluster 标题额外加宽 + 居中（让背景框也容纳，比单纯溢出更美观）
         root.querySelectorAll('.cluster foreignObject').forEach(function (fo) {
-          fo.style.overflow = 'visible'; // 兜底：万一加宽仍差几 px，也让末字显示而非裁掉
           var need = 0; // 测真实文字宽：div 是 display:table-cell，须遍历到内层 p/span 才准
           fo.querySelectorAll('*').forEach(function (el) {
             need = Math.max(need, el.scrollWidth, el.getBoundingClientRect().width);
