@@ -1,7 +1,13 @@
 name: build
 
-# 中文翻译版的轻量 CI：只验证站点能正常构建（node site/build.js 生成 data.js）。
-# 不做原仓库那套课程审计 / catalog auto-regen（那是上游维护用的，会干扰翻译版推送）。
+# 中文翻译版的轻量 CI：
+#   1. 验证站点能正常构建（node site/build.js 生成 data.js）
+#   2. 课程数一致性校验（node site/build.js --check）——防 README/ROADMAP 课数漂移
+#      （曾踩 435 / 498 vs 503）。真相 = 文件系统课程目录数，校验 README 表格/badge/散文
+#      + ROADMAP 总计是否都对得上。
+# 不照搬上游 scripts/audit_lessons.py + check_readme_counts.py（它们硬编码 docs/en.md
+# + 英文 README 正则，对中文仓全不兼容，且是 B 类 1:1 同步资产，改了会与上游冲突）——
+# 改用 build.js 自带的 --check 做等价校验，认 zh.md、匹配中文文案，不碰上游 Python 脚本。
 
 on:
   push:
@@ -31,3 +37,5 @@ jobs:
           test -f site/data.js || { echo "data.js 未生成"; exit 1; }
           grep -q "const PHASES" site/data.js || { echo "PHASES 缺失"; exit 1; }
           echo "✅ 站点构建成功，data.js 已生成"
+      - name: 课程数一致性校验（防 README/ROADMAP 课数漂移）
+        run: node site/build.js --check

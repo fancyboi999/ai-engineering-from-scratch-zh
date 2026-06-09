@@ -545,4 +545,76 @@ function syncCounts(lessons, outputs) {
   }
 }
 
-build();
+// ─── 课程数一致性校验（node site/build.js --check）──────────────────
+// 防 README/ROADMAP 课数漂移（曾踩 435 / 498 vs 503）。CI 跑，不一致就 fail。
+// 设计取舍：上游有 scripts/audit_lessons.py + check_readme_counts.py，但它们
+// 硬编码 docs/en.md + 英文 README 正则，对中文仓全不兼容（且是 B 类 1:1 同步资产，
+// 改了会和上游冲突）。所以这里用 build.js 自己的解析做等价校验——认 zh.md、匹配
+// 中文文案，不碰上游 Python 脚本。真相 = 文件系统课程目录数。
+function countLessonDirs() {
+  const phasesDir = path.join(REPO_ROOT, 'phases');
+  if (!fs.existsSync(phasesDir)) return 0;
+  const DIR_RE = /^[0-9]{2}-[a-z0-9][a-z0-9-]*[a-z0-9]$/;  // NN-slug，与 audit_lessons.py 一致
+  let n = 0;
+  for (const phaseDir of fs.readdirSync(phasesDir).sort()) {
+    if (!DIR_RE.test(phaseDir)) continue;
+    const pDir = path.join(phasesDir, phaseDir);
+    if (!fs.statSync(pDir).isDirectory()) continue;
+    for (const lessonDir of fs.readdirSync(pDir)) {
+      if (!DIR_RE.test(lessonDir)) continue;
+      if (fs.statSync(path.join(pDir, lessonDir)).isDirectory()) n++;
+    }
+  }
+  return n;
+}
+
+function verifyCurriculum() {
+  const readme = fs.readFileSync(README_PATH, 'utf8');
+  const roadmap = fs.readFileSync(ROADMAP_PATH, 'utf8');
+  const phases = parseReadme(readme, parseRoadmap(roadmap));
+  const tableLessons = phases.reduce((s, p) => s + p.lessons.length, 0);
+  const fsLessons = countLessonDirs();
+  const phaseCount = phases.length;
+
+  const errors = [];
+  const grab = (text, re) => { const m = text.match(re); return m ? parseInt(m[1]) : null; };
+  const check = (label, found, expected) => {
+    if (found === null) errors.push(`${label}: 文案没匹配到 —— README/ROADMAP 结构可能变了，需同步更新 verifyCurriculum 的正则`);
+    else if (found !== expected) errors.push(`${label}: 文案写 ${found}，实际应为 ${expected}`);
+  };
+
+  // ① README 表格解析数 == 文件系统课程目录数（防漏登记/多登记，498 vs 503 那类）
+  if (tableLessons !== fsLessons)
+    errors.push(`README 表格课数 ${tableLessons} ≠ 文件系统课程目录数 ${fsLessons}（README 漏登记或多登记了课程行）`);
+
+  // ② README lessons badge + 散文 == 文件系统数
+  check('README lessons badge URL',  grab(readme, /lessons-(\d+)-3553ff/),     fsLessons);
+  check('README lessons badge alt',  grab(readme, /alt="(\d+) lessons"/),       fsLessons);
+  check('README hero 散文课数',       grab(readme, /^> (\d+) 节课，/m),          fsLessons);
+  check('README spine 散文课数',      grab(readme, /个阶段，(\d+) 节课，/),       fsLessons);
+
+  // ③ README phases badge + 散文 == 实际 phase 数
+  check('README phases badge URL',   grab(readme, /phases-(\d+)-3553ff/),       phaseCount);
+  check('README phases badge alt',   grab(readme, /alt="(\d+) phases"/),         phaseCount);
+  check('README hero 阶段数',         grab(readme, /^> \d+ 节课，(\d+) 个阶段/m), phaseCount);
+  check('README spine 阶段数',        grab(readme, /(\d+) 个阶段，\d+ 节课，/),    phaseCount);
+
+  // ④ ROADMAP 总计 == 文件系统数 / phase 数
+  check('ROADMAP 总计课数',           grab(roadmap, /\*\*总计：\d+ 个阶段，(\d+) 节课/), fsLessons);
+  check('ROADMAP 总计阶段数',         grab(roadmap, /\*\*总计：(\d+) 个阶段/),           phaseCount);
+
+  if (errors.length) {
+    console.error(`\n❌ 课程数一致性校验失败（真相：文件系统 ${fsLessons} 课 / ${phaseCount} 阶段）\n`);
+    errors.forEach(e => console.error('  ✗ ' + e));
+    console.error(`\n修法：把上述文案改成与文件系统一致；新课记得在 README + ROADMAP 表格补行。`);
+    console.error(`（站点模板里的课数由 build 时 syncCounts 自动同步，无需手改；README/ROADMAP 是手动维护、本校验把守。）`);
+    process.exit(1);
+  }
+  console.log(`✅ 课程数一致性校验通过：${fsLessons} 课 / ${phaseCount} 阶段（文件系统 = README 表格 = badge/散文 = ROADMAP 总计）`);
+}
+
+if (process.argv.includes('--check')) {
+  verifyCurriculum();
+} else {
+  build();
+}
