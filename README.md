@@ -1,13 +1,18 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="AI Engineering from Scratch — reference manual banner" width="100%">
+  <img src="assets/banner.svg" alt="AI Engineering from Scratch · 简体中文版" width="100%">
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
+  <b>从零开始，亲手实现每一个 AI 算法</b><br/>
+  <sub>503 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
+</p>
+
+<p align="center">
+  <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/在线阅读-aieng--zh.cn-3553ff?style=flat-square&labelColor=fafaf5" alt="在线阅读 aieng-zh.cn"></a>
   <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-503-3553ff?style=flat-square&labelColor=fafaf5" alt="503 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
   <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff" alt="GitHub stars"></a>
-  <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/website-live-3553ff?style=flat-square&labelColor=fafaf5" alt="Website"></a>
 </p>
 
 ```
@@ -22,9 +27,24 @@
 >
 > 你不只是学 AI，你亲手把它造出来。从头到尾，全手写。
 
-> 本项目是 [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch) 的简体中文翻译版。感谢原作者 [Rohit Ghumare](https://github.com/rohitg00) 创作并开源了这套课程。
+> 本项目是 [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch)（作者 [Rohit Ghumare](https://github.com/rohitg00)，MIT 协议）的**简体中文衍生版**。衷心感谢原作者创作并开源了这套课程。
 
-## How this works
+### 这个中文版做了什么
+
+不是机器翻译堆出来的镜像。在忠实翻译之上，我们做了一套面向中文读者的本地化：
+
+| | |
+|---|---|
+| 🇨🇳 **全站简体中文** | 503 节课正文、83 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
+| 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
+| 🔍 **为 AI 检索优化** | 构建时自动生成 `sitemap.xml` / `llms.txt` / 结构化数据，方便被搜索引擎和 AI 助手引用 |
+| ✅ **课数一致性护栏** | CI 自动校验课程数（`node site/build.js --check`），防止课程列表与磁盘上的实际内容漂移 |
+
+> 翻译怎么翻见 [TRANSLATION.md](TRANSLATION.md)。课程结构、代码与上游保持一致，译文持续跟进上游更新。
+
+**目录** · [怎么运作](#怎么运作) · [课程结构](#课程的结构) · [一节课的样子](#一节课的样子) · [快速开始](#快速开始) · [每节课都有产出](#每节课都有产出) · [课程目录](#contents) · [工具箱](#工具箱) · [参与贡献](#参与贡献)
+
+## 怎么运作
 
 大多数 AI 教材都是碎片化教学。这儿一篇论文，那儿一篇微调心得，别处再来个炫酷的 agent
 demo。这些碎片很少能拼到一起。你做出了一个聊天机器人，却讲不清它的 loss 曲线；你给
@@ -41,7 +61,7 @@ agent 挂了个函数，却说不出调用它的那个模型内部，attention �
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
 ```
 
-## The shape of the curriculum
+## 课程的结构
 
 二十个阶段层层叠起来。数学是地基，agent 和生产部署是屋顶。下层的东西你已经会了，就尽管
 往前跳；但别跳过去之后，又回头纳闷上层为什么塌了。
@@ -76,7 +96,7 @@ flowchart TB
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
 ```
 
-## The shape of a lesson
+## 一节课的样子
 
 每节课都待在自己的文件夹里，整套课程结构统一：
 
@@ -102,7 +122,7 @@ flowchart LR
   U --> S["SHIP IT<br/><sub>prompt · skill · agent · MCP</sub>"]
 ```
 
-## Getting started
+## 快速开始
 
 三种入门方式。挑一个。
 
@@ -149,7 +169,7 @@ ls phases/03-deep-learning-core/05-loss-functions/outputs/
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
 ```
 
-## Every lesson ships something
+## 每节课都有产出
 
 别的课程结尾是一句 *"恭喜，你学会了 X。"* 这里每节课的结尾，是一件你能直接装上、
 或粘进日常工作流的 **可复用工具**。
@@ -170,7 +190,7 @@ ls phases/03-deep-learning-core/05-loss-functions/outputs/
 </table>
 
 > 用 `python3 scripts/install_skills.py` 一次性全部安装。是真家伙，不是课后作业。
-> 学完整套课程，你会攒下 435 件作品——你是真懂它们，因为它们都是你亲手造的。
+> 学完整套课程，你会攒下近 500 件产物——你是真懂它们，因为它们都是你亲手造的。
 
 ### FIG_002 · 一个实例
 
@@ -230,7 +250,7 @@ the agent went wrong and explain why...
 
 <a id="contents"></a>
 
-## Contents
+## 课程目录
 
 二十个阶段。点开任意阶段即可展开它的课程列表。
 
@@ -936,7 +956,7 @@ outputs/
 
 ### 把所有课程技能装进你的 agent
 
-仓库在 `phases/**/outputs/` 下交付了 378 个技能和 99 个提示词。
+仓库在 `phases/**/outputs/` 下交付了 388 个技能和 99 个提示词。
 
 **推荐：通过 [skills.sh](https://skills.sh) 安装。** 不用 clone，不用 Python，
 自动识别你 agent 的技能目录：
@@ -973,7 +993,7 @@ python3 scripts/install_skills.py <target> --force                         # 覆
 用 `--dry-run` 预览冲突，或用 `--force` 覆盖。每次非 dry-run 的运行都会在目标里
 写一份 `manifest.json`，按类型和阶段分组列出完整清单。挑你 agent 读取的那种布局：
 
-| `--layout`  | Path written |
+| `--layout`  | 写入路径 |
 |---|---|
 | `skills`    | `<target>/<name>/SKILL.md`（嵌套约定，Claude / Cursor / Codex / OpenClaw / Hermes 都支持） |
 | `by-phase`  | `<target>/phase-NN/<name>.md` |
@@ -1040,13 +1060,13 @@ python3 scripts/lesson_run.py --execute        # 真正运行，每节课 10 秒
 
 ## 从哪里开始
 
-| Background | Start at | Estimated time |
+| 你的背景 | 从哪开始 | 预计时间 |
 |---|---|---|
-| 编程和 AI 都是新手 | Phase 0 — 配置 | ~306 hours |
-| 会 Python，刚接触 ML | Phase 1 — 数学基础 | ~270 hours |
-| 懂 ML，刚接触深度学习 | Phase 3 — 深度学习核心 | ~200 hours |
-| 懂深度学习，想学 LLM 和 agent | Phase 10 — 从零实现 LLM | ~100 hours |
-| 资深工程师，只想要 agent 工程 | Phase 14 — Agent 工程 | ~60 hours |
+| 编程和 AI 都是新手 | 阶段 0 — 配置与工具链 | ~306 小时 |
+| 会 Python，刚接触 ML | 阶段 1 — 数学基础 | ~270 小时 |
+| 懂 ML，刚接触深度学习 | 阶段 3 — 深度学习核心 | ~200 小时 |
+| 懂深度学习，想学 LLM 和 agent | 阶段 10 — 从零实现 LLM | ~100 小时 |
+| 资深工程师，只想要 agent 工程 | 阶段 14 — Agent 工程 | ~60 小时 |
 
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
