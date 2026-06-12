@@ -1948,6 +1948,7 @@
       function updateLessonSeo(title, md) {
         var ORIGIN = 'https://aieng-zh.cn';
         var path = new URLSearchParams(location.search).get('path') || '';
+        if (!path) return;  // 防御：空 path 会生成 /lessons// 这种坏 canonical
         // canonical 指向预渲染静态页（SEO 主体）；旧 ?path= URL 仅作兼容入口
         var url = ORIGIN + lessonHref(path);
         var desc = lessonDescription(md);

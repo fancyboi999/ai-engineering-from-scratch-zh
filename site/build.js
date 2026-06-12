@@ -603,19 +603,31 @@ function writeLessonPages(phases) {
     '          <div class="lesson-loading-text">课程加载中...</div>\n' +
     '        </div>\n' +
     '      </div>';
-  if (absolutized.indexOf(LOADING_BLOCK) === -1) {
-    console.error('❌ writeLessonPages：lesson.html 的加载占位块没匹配到（模板结构变了？），预渲染中止');
+  // __PRERENDERED__ 注入锚点。注入丢失的后果不是降级而是更糟：boot 读不到
+  // path 会 showError 把烤好的正文覆盖成错误页——所以锚点必须 fail-fast。
+  const SCRIPT_ANCHOR = '  <script src="/md-render.js';
+  // 模板锚点前置校验：任何一个没命中都中止构建，绝不静默生成坏页（审查发现：
+  // string.replace 匹配不到时原样返回不报错，503 页会齐刷刷坏掉且无感知）
+  const anchorErrors = [];
+  if (absolutized.indexOf(LOADING_BLOCK) === -1) anchorErrors.push('加载占位块（lessonContent/spinner）');
+  if (absolutized.indexOf(SCRIPT_ANCHOR) === -1) anchorErrors.push('md-render.js script 标签（__PRERENDERED__ 注入点）');
+  if (absolutized.split('</head>').length - 1 !== 1) anchorErrors.push('</head> 不是恰好 1 处（JSON-LD 注入点）');
+  if (anchorErrors.length) {
+    console.error('❌ writeLessonPages：lesson.html 模板锚点失配（模板结构变了？），预渲染中止：');
+    anchorErrors.forEach(e => console.error('   - ' + e));
     process.exit(1);
   }
 
   // 与 lesson.html 客户端 flatLessons 同序的扁平课表（prev/next 导航用）。
-  // isReadable 比客户端多一道 !!rel 约束：没有 url 的课生成不了静态页，
-  // 导航指过去只会 404，不如直接跳过。
+  // isReadable 比客户端（status complete || url）更严：只认「zh.md 真实存在 =
+  // 静态页真的会生成」的课。登记了 README 但还没翻译的课如果进了导航，
+  // 烤出来的链接就是 /lessons/ 404（审查发现）。
   const flat = [];
   for (const phase of phases) {
     for (const l of phase.lessons) {
       const rel = lessonPath(l.url);
-      flat.push({ name: l.name, rel, isReadable: !!rel && (l.status === 'complete' || !!l.url) });
+      const hasDoc = !!rel && fs.existsSync(path.join(REPO_ROOT, rel, 'docs', 'zh.md'));
+      flat.push({ name: l.name, rel, isReadable: hasDoc });
     }
   }
 
@@ -667,9 +679,14 @@ function writeLessonPages(phases) {
     page = page.replace(LOADING_BLOCK, () => article);
     // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz
     page = page.replace(
-      '  <script src="/md-render.js',
-      '  <script>window.__PRERENDERED__ = {path: ' + JSON.stringify(f.rel) + '};</script>\n  <script src="/md-render.js'
+      SCRIPT_ANCHOR,
+      '  <script>window.__PRERENDERED__ = {path: ' + JSON.stringify(f.rel) + '};</script>\n' + SCRIPT_ANCHOR
     );
+    // 注意：不能只查 '__PRERENDERED__'——内联 boot 脚本本身就含这个标识符
+    if (page.indexOf('<script>window.__PRERENDERED__ = {path:') === -1) {
+      console.error('❌ writeLessonPages：' + f.rel + ' 的 __PRERENDERED__ 注入失败，中止');
+      process.exit(1);
+    }
 
     const outDir = path.join(lessonsRoot, f.rel.replace(/^phases\//, ''));
     fs.mkdirSync(outDir, { recursive: true });

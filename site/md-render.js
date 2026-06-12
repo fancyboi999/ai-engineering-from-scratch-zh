@@ -135,7 +135,9 @@
               inCodeBlock = false;
               var raw = codeLines.join('\n');
               if (codeLang === 'figure') {
-                out += '<div class="lesson-figure" data-figure="' + escapeHtml(raw.trim()) + '"></div>';
+                // escapeAttr 而非 escapeHtml：写入 HTML 属性，含 " 会截断属性值
+                // （lesson.html 旧实现的潜在 bug，抽取时顺带修正——审查发现）
+                out += '<div class="lesson-figure" data-figure="' + escapeAttr(raw.trim()) + '"></div>';
               } else if (codeLang === 'mermaid') {
                 mermaidBlocks++;
                 out += '<div class="mermaid-container">';
