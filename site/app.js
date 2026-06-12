@@ -249,7 +249,7 @@
 
       var actionHtml = '';
       if ((l.status === 'complete' || userComplete) && lessonPath) {
-        actionHtml = '<a href="lesson.html?path=' + lessonPath + '" class="modal-lesson-read">' + (userComplete ? '回顾' : '阅读') + '</a>';
+        actionHtml = '<a href="/lessons/' + lessonPath.replace(/^phases\//, '') + '/" class="modal-lesson-read">' + (userComplete ? '回顾' : '阅读') + '</a>';
       }
       var toggleHtml = '';
       if (hasProgress && lessonPath) {

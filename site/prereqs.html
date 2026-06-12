@@ -983,7 +983,7 @@
         if (!lesson.url) continue;
         var pm = lesson.url.match(/(phases\/[^/]+\/[^/]+)\/?$/);
         if (pm) {
-          readLink = 'lesson.html?path=' + encodeURI(pm[1]);
+          readLink = '/lessons/' + pm[1].replace(/^phases\//, '') + '/';
           break;
         }
       }

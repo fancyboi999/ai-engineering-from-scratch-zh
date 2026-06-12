@@ -20,11 +20,19 @@ const OUTPUT_PATH = path.join(__dirname, 'data.js');
 const GITHUB_BASE = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/';
 const SITE_ORIGIN = 'https://aieng-zh.cn';
 
+// 与浏览器端同一份渲染器（从 lesson.html 抽出）；预渲染产物 = 运行时渲染产物
+const mdRender = require('./md-render.js');
+
 // GITHUB_BASE lesson url -> site path "phases/<phase>/<lesson>"
 function lessonPath(url) {
   if (!url) return null;
   const m = url.match(/(phases\/[^/]+\/[^/]+)\/?$/);
   return m ? m[1] : null;
+}
+
+// 预渲染静态课程页的站内路径（与 lesson.html 的 lessonHref 同构，两边要一起改）
+function lessonStaticHref(relPath) {
+  return '/lessons/' + relPath.replace(/^phases\//, '') + '/';
 }
 
 // ─── Parse ROADMAP.md for lesson statuses ────────────────────────────
@@ -463,6 +471,7 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   syncCounts(totalLessons, artifacts.length);
   writeSitemap(phases, glossaryTerms.length);
   writeLlms(phases, glossaryTerms.length, artifacts.length);
+  writeLessonPages(phases);  // 必须在 syncCounts 之后：模板里的课数文案要先对齐
 }
 
 // ─── sitemap.xml：从站点渲染的同一份 PHASES 生成 ─────────────────────
@@ -478,7 +487,7 @@ function writeSitemap(phases, glossaryCount) {
   for (const phase of phases) {
     for (const l of phase.lessons) {
       const p = lessonPath(l.url);
-      if (p) urls.push({ loc: '/lesson.html?path=' + p, priority: '0.6', freq: 'monthly' });
+      if (p) urls.push({ loc: lessonStaticHref(p), priority: '0.6', freq: 'monthly' });
     }
   }
   const body = urls.map(u =>
@@ -509,7 +518,7 @@ function writeLlms(phases, glossaryCount, artifactCount) {
       const p = lessonPath(l.url);
       if (!p) continue;
       const note = l.summary ? ` — ${l.summary}` : '';
-      out += `- [${l.name}](${SITE_ORIGIN}/lesson.html?path=${p})${note}\n`;
+      out += `- [${l.name}](${SITE_ORIGIN}${lessonStaticHref(p)})${note}\n`;
     }
     out += `\n`;
   }
@@ -519,6 +528,160 @@ function writeLlms(phases, glossaryCount, artifactCount) {
   if (glossaryCount > 0) out += `- [术语表](${SITE_ORIGIN}/glossary.html) — ${glossaryCount} 个术语的通俗定义\n`;
   fs.writeFileSync(path.join(__dirname, 'llms.txt'), out, 'utf8');
   console.log(`   wrote llms.txt`);
+}
+
+// ─── 预渲染静态课程页：site/lessons/<phase>/<lesson>/index.html ──────
+// 旧 lesson.html?path= 入口的正文靠浏览器运行时 fetch 渲染，爬虫拿到的是
+// 503 个字节级相同的空壳（百度不执行跨域 fetch，Google 渲染预算对新站极少）。
+// 这里用与浏览器同一份渲染器（md-render.js）在构建时把正文烤进 HTML：
+// 每课独立 URL + 独立 title/description/canonical/JSON-LD。产物 gitignore，
+// 与 sitemap/llms 同款策略——Vercel buildCommand 部署时生成。
+// 旧 ?path= URL 保持可用（兼容外部旧链接），其 canonical 指向这些静态页。
+function bottomNavHtml(flat, idx) {
+  // 与 lesson.html 客户端 addBottomNav 同构：跳过不可读课程找前后邻居
+  let prev = null, next = null;
+  for (let pi = idx - 1; pi >= 0; pi--) {
+    if (flat[pi].isReadable) { prev = flat[pi]; break; }
+  }
+  for (let ni = idx + 1; ni < flat.length; ni++) {
+    if (flat[ni].isReadable) { next = flat[ni]; break; }
+  }
+  let nav = '<div class="lesson-nav-bottom">';
+  if (prev) {
+    nav += '<a class="lesson-nav-btn prev" href="' + lessonStaticHref(prev.rel) + '">';
+    nav += '<span class="nav-label">&larr; 上一节</span>';
+    nav += '<span class="nav-title">' + mdRender.escapeHtml(prev.name) + '</span>';
+    nav += '</a>';
+  } else {
+    nav += '<div></div>';
+  }
+  if (next) {
+    nav += '<a class="lesson-nav-btn next" href="' + lessonStaticHref(next.rel) + '">';
+    nav += '<span class="nav-label">下一节 &rarr;</span>';
+    nav += '<span class="nav-title">' + mdRender.escapeHtml(next.name) + '</span>';
+    nav += '</a>';
+  }
+  nav += '</div>';
+  return nav;
+}
+
+function lessonJsonLd(title, desc, url) {
+  // 与 lesson.html 客户端 updateLessonSeo 的 JSON-LD 同构
+  const ld = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'LearningResource', name: title, description: desc, url: url,
+        inLanguage: 'zh-CN', isAccessibleForFree: true,
+        isPartOf: { '@type': 'Course', name: 'AI Engineering from Scratch 简体中文版', url: SITE_ORIGIN } },
+      { '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '首页', item: SITE_ORIGIN },
+        { '@type': 'ListItem', position: 2, name: '课程表', item: SITE_ORIGIN + '/catalog.html' },
+        { '@type': 'ListItem', position: 3, name: title, item: url }
+      ] }
+    ]
+  };
+  // < 防止 title/desc 含 </script> 提前闭合标签
+  return JSON.stringify(ld).replace(/</g, '\\u003c');
+}
+
+function writeLessonPages(phases) {
+  const template = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  const lessonsRoot = path.join(__dirname, 'lessons');
+  fs.rmSync(lessonsRoot, { recursive: true, force: true });  // 清掉改名课程的孤儿页
+
+  // 模板相对路径 → 根绝对路径（生成页在两级子目录下，相对引用会断）。
+  // 只改写以字母/数字开头的相对地址；协议地址、/、#、data: 和 JS 拼接串不动。
+  const absolutized = template.replace(
+    /\b(href|src)="(?!(?:[a-z][a-z0-9+.-]*:|\/\/|\/|#))([A-Za-z0-9_][^"]*)"/g,
+    '$1="/$2"'
+  );
+
+  const LOADING_BLOCK =
+    '      <div class="lesson-content" id="lessonContent">\n' +
+    '        <div class="lesson-loading" id="lessonLoading">\n' +
+    '          <div class="spinner"></div>\n' +
+    '          <div class="lesson-loading-text">课程加载中...</div>\n' +
+    '        </div>\n' +
+    '      </div>';
+  if (absolutized.indexOf(LOADING_BLOCK) === -1) {
+    console.error('❌ writeLessonPages：lesson.html 的加载占位块没匹配到（模板结构变了？），预渲染中止');
+    process.exit(1);
+  }
+
+  // 与 lesson.html 客户端 flatLessons 同序的扁平课表（prev/next 导航用）。
+  // isReadable 比客户端多一道 !!rel 约束：没有 url 的课生成不了静态页，
+  // 导航指过去只会 404，不如直接跳过。
+  const flat = [];
+  for (const phase of phases) {
+    for (const l of phase.lessons) {
+      const rel = lessonPath(l.url);
+      flat.push({ name: l.name, rel, isReadable: !!rel && (l.status === 'complete' || !!l.url) });
+    }
+  }
+
+  let written = 0;
+  const skipped = [];
+  for (let i = 0; i < flat.length; i++) {
+    const f = flat[i];
+    if (!f.rel) continue;
+    let md;
+    try {
+      md = fs.readFileSync(path.join(REPO_ROOT, f.rel, 'docs', 'zh.md'), 'utf8');
+    } catch (_) {
+      skipped.push(f.rel);  // 登记了 README 但还没有 zh.md 的课
+      continue;
+    }
+
+    const title = mdRender.extractTitle(md);
+    const desc = mdRender.lessonDescription(md);
+    const url = SITE_ORIGIN + lessonStaticHref(f.rel);
+    const docTitle = title + ' - AI Engineering from Scratch';
+    const ogTitle = title + ' · AI Engineering from Scratch 简体中文版';
+
+    // 正文结构与客户端 renderLesson 完全同构：parseMd + AI 面板占位 + 上下课导航
+    let body = mdRender.parseMd(md);
+    body += '<div class="ai-panels" id="aiPanels"></div>';
+    body += bottomNavHtml(flat, i);
+    const article =
+      '      <div class="lesson-content" id="lessonContent"><article class="lesson-article">' +
+      body + '</article></div>';
+
+    let page = absolutized;
+    page = page.replace('<html lang="en"', '<html lang="zh-CN"');
+    page = page.replace(/<title>[^<]*<\/title>/, () => '<title>' + mdRender.escapeHtml(docTitle) + '</title>');
+    const setMeta = (attr, name, value) => {
+      const re = new RegExp('(<meta ' + attr + '="' + name + '" content=")[^"]*(")');
+      page = page.replace(re, (m, p1, p2) => p1 + mdRender.escapeAttr(value) + p2);
+    };
+    setMeta('name', 'description', desc);
+    setMeta('property', 'og:title', ogTitle);
+    setMeta('property', 'og:description', desc);
+    setMeta('name', 'twitter:title', ogTitle);
+    setMeta('name', 'twitter:description', desc);
+    page = page.replace(
+      /<link rel="canonical" href="[^"]*">/,
+      () => '<link rel="canonical" href="' + url + '">\n  <meta property="og:url" content="' + url + '">'
+    );
+    page = page.replace('</head>', () =>
+      '  <script type="application/ld+json" id="lessonJsonLd">' + lessonJsonLd(title, desc, url) + '</script>\n</head>');
+    page = page.replace(LOADING_BLOCK, () => article);
+    // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz
+    page = page.replace(
+      '  <script src="/md-render.js',
+      '  <script>window.__PRERENDERED__ = {path: ' + JSON.stringify(f.rel) + '};</script>\n  <script src="/md-render.js'
+    );
+
+    const outDir = path.join(lessonsRoot, f.rel.replace(/^phases\//, ''));
+    fs.mkdirSync(outDir, { recursive: true });
+    fs.writeFileSync(path.join(outDir, 'index.html'), page, 'utf8');
+    written++;
+  }
+
+  console.log(`   wrote ${written} prerendered lesson pages under site/lessons/`);
+  if (skipped.length) {
+    console.warn(`⚠️  ${skipped.length} 课登记了但没有 docs/zh.md，未生成静态页：`);
+    skipped.forEach(s => console.warn('   - ' + s));
+  }
 }
 
 // ─── 自动同步站点文案里的课程数 / 产出数（单一真相 = 本次构建）─────

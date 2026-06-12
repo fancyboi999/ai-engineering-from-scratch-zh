@@ -379,13 +379,13 @@
       if (r.kind === 'lesson') {
         // Prefer the in-site reader; fall back to GitHub URL
         dest = r.lessonPath
-          ? 'lesson.html?path=' + encodeURIComponent(r.lessonPath)
+          ? '/lessons/' + r.lessonPath.replace(/^phases\//, '') + '/'
           : r.url;
         chip = '阶段 ' + String(r.phaseId).padStart(2, '0');
       } else if (r.kind === 'artifact') {
         // Jump to the lesson that produced this artifact
         dest = r.lessonPath
-          ? 'lesson.html?path=' + encodeURIComponent(r.lessonPath)
+          ? '/lessons/' + r.lessonPath.replace(/^phases\//, '') + '/'
           : ('https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/' + r.file);
         var ak = (r.artKind || 'artifact');
         chip = artifactKindLabel(ak);
