@@ -10,6 +10,24 @@ Allow: /
 User-agent: DuckDuckBot
 Allow: /
 
+# --- Allowed: 中文搜索引擎（目标读者在国内，显式放行）---
+# Bytespider 同时喂头条/抖音搜索和豆包，接受其抓取训练的代价换国内分发入口；
+# PetalBot 是华为花瓣搜索（上游模板把它当 SEO scraper 封了，对中文站是误伤）。
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Sogou web spider
+Allow: /
+
+User-agent: 360Spider
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: PetalBot
+Allow: /
+
 # --- Allowed: agent browsers (user-initiated, send AI users) ---
 User-agent: ChatGPT-User
 Allow: /
@@ -63,9 +81,6 @@ Disallow: /
 User-agent: Applebot-Extended
 Disallow: /
 
-User-agent: Bytespider
-Disallow: /
-
 User-agent: Amazonbot
 Disallow: /
 
@@ -110,9 +125,6 @@ User-agent: MJ12bot
 Disallow: /
 
 User-agent: DotBot
-Disallow: /
-
-User-agent: PetalBot
 Disallow: /
 
 User-agent: BLEXBot
