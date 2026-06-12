@@ -146,6 +146,10 @@ graph LR
 
 神经网络是可组合的。你可以把它们叠起来、串起来、并行跑。一个 Whisper 模型用一个编码器网络处理音频，再用一个独立的解码器网络生成文本。现代 LLM 是仅解码器（decoder-only）的。BERT 是仅编码器（encoder-only）的。T5 是编码器-解码器的。架构的选择决定了模型能做什么。
 
+```figure
+mlp-forward
+```
+
 ## 动手构建
 
 纯 Python，不用 numpy。每个矩阵运算都从零手写。

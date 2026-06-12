@@ -241,6 +241,10 @@ graph LR
 | 谱聚类 | 无监督节点分组 |
 | PageRank | 节点重要性、网页搜索 |
 
+```figure
+graph-degree-distribution
+```
+
 ## 动手构建
 
 ### 第 1 步：从零写图类

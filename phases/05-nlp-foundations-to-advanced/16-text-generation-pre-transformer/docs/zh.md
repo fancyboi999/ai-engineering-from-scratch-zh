@@ -44,6 +44,10 @@ Kneser-Ney 的洞见很深。"San Francisco" 是个常见二元组。一元组 "
 perplexity = exp(- (1/N) * Σ log P(w_i | context_i))
 ```
 
+```figure
+ngram-backoff
+```
+
 ## 动手构建
 
 ### 第 1 步：三元组计数

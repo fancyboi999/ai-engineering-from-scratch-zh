@@ -187,6 +187,10 @@ flowchart TD
     Light --> WD0["权重衰减 1e-4"]
 ```
 
+```figure
+l2-regularization
+```
+
 ## 动手构建
 
 ### 第 1 步：Dropout（训练模式和评估模式）

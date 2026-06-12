@@ -275,6 +275,10 @@ Example:
 
 真正的频率分辨率只取决于观测时间 T = N / fs。要分辨相隔 delta_f 的两个频率，你至少需要 T = 1 / delta_f 秒的数据。再多补零也改变不了这个根本极限。
 
+```figure
+fourier-synthesis
+```
+
 ## 动手构建
 
 ### 第 1 步：从零写 DFT

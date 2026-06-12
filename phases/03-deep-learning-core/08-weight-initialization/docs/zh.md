@@ -161,6 +161,10 @@ flowchart TD
     GPT --> Check
 ```
 
+```figure
+weight-init-variance
+```
+
 ## 动手构建
 
 ### 第 1 步：初始化策略

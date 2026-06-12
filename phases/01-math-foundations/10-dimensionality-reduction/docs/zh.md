@@ -190,6 +190,10 @@ explained_ratio_k = eigenvalue_k / sum(all eigenvalues)
 
 重构误差不止用来选 k。你可以用它做异常检测：重构误差高的样本是不符合学到的子空间的离群点。这是生产系统里基于 PCA 的异常检测的基础。
 
+```figure
+pca-axes
+```
+
 ## 动手构建
 
 ### 第 1 步：从零写 PCA

@@ -70,6 +70,10 @@ LangGraph 早先发布了一个 `langgraph-supervisor` 库，带一个高层的 
 - **简单查询。** 单 agent 处理它们更快更省。在派生 worker 之前先用 lead 的「匹配投入」检查。
 - **严格确定性。** supervisor 用的是 LLM 选择式的分派。当审计/回放比适应性更重要时，静态图更好。
 
+```figure
+supervisor-hierarchy
+```
+
 ## 动手构建
 
 `code/main.py` 用 `threading` 实现了一个管三个并行 worker 的 supervisor。lead 把一个查询拆成子问题，worker 各自对一个子问题并发运行，lead 做综合。没有真实 LLM——worker 是脚本化的，用来模拟「抓取并总结」。

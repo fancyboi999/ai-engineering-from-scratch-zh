@@ -187,6 +187,10 @@ graph LR
     CL_S -->|"最适合"| Emb2["表示学习"]
 ```
 
+```figure
+cross-entropy-loss
+```
+
 ## 动手构建
 
 ### 第 1 步：MSE 及其梯度

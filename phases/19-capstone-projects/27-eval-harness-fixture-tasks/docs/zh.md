@@ -52,6 +52,10 @@ flowchart LR
 
 harness 对每个 task 跑 `k` 次。pass@k 可以表示成 `1 - (1 - p)^k`，其中 `p` 是经验通过率；同时 harness 也会把原始通过次数一起报出来，让你看到方差。latency 按 sample 的 wall-clock 统计。cost 则吃 agent 自报的 token、USD 或二者之一，然后给出逐 task 与总量聚合。
 
+```figure
+pass-at-k
+```
+
 ## 架构
 
 ```mermaid

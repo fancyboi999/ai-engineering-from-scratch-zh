@@ -282,6 +282,10 @@ for inputs, targets in loader:
 | 学习曲线 | 你亲手造的 | 中等 | 陡（函数式范式） |
 | 生产使用 | 玩具问题 | Meta、OpenAI、Anthropic、HF | Google DeepMind、Midjourney |
 
+```figure
+dropout-mask
+```
+
 ## 动手构建
 
 一个只用 PyTorch 原语在 MNIST 上训练的 3 层 MLP。没有高层封装。不用 `torchvision.datasets`。我们自己下载并解析原始数据。

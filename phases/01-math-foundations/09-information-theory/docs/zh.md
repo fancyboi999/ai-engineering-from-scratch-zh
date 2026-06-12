@@ -273,6 +273,10 @@ Perplexity = e^H(P,Q)   (if using nats)
 
 GPT-2 在常见基准上达到约 30 的困惑度。现代模型在表示充分的领域里能做到个位数。
 
+```figure
+entropy-kl
+```
+
 ## 动手构建
 
 ### 第 1 步：信息量和熵

@@ -111,6 +111,10 @@ server 声明它能发 `tools/list_changed` notification，并支持 `resources/
 
 JSON-RPC 2.0（2010）是一个轻量的双向协议。REST 是 client 发起的。MCP 需要 server 发起的消息（sampling、notification），所以带对称 request/response 形状的 JSON-RPC 是自然的契合。JSON-RPC 还能干净地组合在 stdio 和 WebSocket/Streamable HTTP 之上，不必重新发明 HTTP 的请求形状。
 
+```figure
+mcp-tool-call
+```
+
 ## 实际使用
 
 `code/main.py` 交付一个极简 JSON-RPC 2.0 解析器和发射器，然后手动走一遍 `initialize` → `tools/list` → `tools/call` → `shutdown` 序列，打印每条消息。没有真实传输；只有消息形状。和延伸阅读里链接的规范对照，逐个核实每个外壳。

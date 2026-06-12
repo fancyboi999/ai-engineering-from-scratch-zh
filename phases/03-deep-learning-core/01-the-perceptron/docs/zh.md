@@ -112,6 +112,10 @@ AND (separable):        XOR (not separable):
 
 解法：把感知机叠成多层。一个多层感知机可以把两个线性决策组合成一个非线性决策，从而解决 XOR。
 
+```figure
+perceptron-boundary
+```
+
 ## 动手构建
 
 ### 第 1 步：Perceptron 类

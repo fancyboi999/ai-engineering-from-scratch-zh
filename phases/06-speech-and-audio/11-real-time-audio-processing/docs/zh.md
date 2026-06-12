@@ -48,6 +48,10 @@ Moshi（Kyutai，2024）跑出 200 ms 全双工。GPT-4o-realtime（2024）约 3
 - **TTS 预热。** 即便是 Kokoro 这样的快 TTS，首次请求也有 100–200 ms 的热身。缓存模型，并在第一个真实轮次前用一次空跑预热它。
 - **回声消除。** 没有 AEC，TTS 输出会重新进麦克风，触发 ASR 去识别机器人自己的声音。WebRTC AEC3 是开源默认。
 
+```figure
+nyquist-aliasing
+```
+
 ## 动手构建
 
 ### 第 1 步：环形缓冲

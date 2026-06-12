@@ -95,6 +95,10 @@ V2 还移除了 V1 用来稳定相减的 per-head RMSNorm。在 70B 级别的预
 | FlashAttention | V2 兼容（V1 不兼容） |
 | 推测解码 | 兼容（注意力改动对 spec-decode 循环不可见） |
 
+```figure
+differential-attention
+```
+
 ## 动手构建
 
 `code/main.py` 用纯 Python 实现差分注意力。一个有已知信号加噪声结构的玩具 query 让你直接测量噪声抵消比。

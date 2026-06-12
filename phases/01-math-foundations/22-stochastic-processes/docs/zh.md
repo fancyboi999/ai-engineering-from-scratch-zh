@@ -228,6 +228,10 @@ graph LR
 | 马尔可夫决策过程 | 强化学习 |
 | Metropolis-Hastings | 贝叶斯推断、后验采样 |
 
+```figure
+random-walk-diffusion
+```
+
 ## 动手构建
 
 ### 第 1 步：随机游走模拟器

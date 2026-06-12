@@ -218,6 +218,10 @@ graph TD
     style Done fill:#0f3460,stroke:#16213e,color:#fff
 ```
 
+```figure
+lora-params
+```
+
 ## 动手构建
 
 我们用纯 PyTorch 从零实现 LoRA。不用库，不耍魔法。你会构建 LoRA 层，把它注入一个模型，训练它，再把权重合并回去。

@@ -147,6 +147,10 @@ Cost = MSE + lambda * sum(w_i^2)
 
 惩罚项抑制大权重。超参数 lambda 控制这个权衡：lambda 越大，权重越小、正则化越强。这会在后面的课里深入讲。现在你只需知道它存在，以及它为什么有用。
 
+```figure
+linear-regression-fit
+```
+
 ## 动手构建
 
 ### 第 1 步：生成示例数据

@@ -232,6 +232,10 @@ det = -1:  area preserved but orientation flipped (reflection)
 | det(Reflection) | = -1     (orientation flipped)
 ```
 
+```figure
+matrix-transform
+```
+
 ## 动手构建
 
 ### 第 1 步：从零写变换矩阵（Python）

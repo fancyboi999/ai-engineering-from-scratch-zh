@@ -93,6 +93,10 @@ while True:
 
 `code/main.py` 就是用标准库 Python 写的这个循环，带假的 token 计数和假的 forward 延迟。跑一下能看到 chunked prefill 怎么在一次长 prefill 期间让 decode 序列保持存活。
 
+```figure
+tensor-parallel
+```
+
 ## 实际使用
 
 `code/main.py` 模拟一个 vLLM 风格的调度器，特性可开关。跑一下能看到：

@@ -180,6 +180,10 @@ L 个堆叠的 K x K 卷积（stride 1）之后的 RF = 1 + L * (K - 1)
 
 "一路 3x3 到底"（VGG、ResNet、ConvNeXt）能成立的全部原因是：两个 3x3 卷积看到的输入面积和一个 5x5 卷积相同，但参数更少，而且中间多了一个非线性。
 
+```figure
+convolution-kernel
+```
+
 ## 动手构建
 
 ### 第 1 步：给数组做 padding

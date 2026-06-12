@@ -148,6 +148,10 @@ tiktoken（OpenAI）用 Rust 写成，带 Python 绑定。HuggingFace tokenizers
 
 你用 Python 来构建是为了理解算法。在生产里，你会用一个编译后的实现，只碰那层 Python 封装。
 
+```figure
+weight-tying
+```
+
 ## 动手构建
 
 ### 第 1 步：字节级编码

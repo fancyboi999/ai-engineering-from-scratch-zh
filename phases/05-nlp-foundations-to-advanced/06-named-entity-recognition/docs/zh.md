@@ -44,6 +44,10 @@ US       B-GPE
 - **BiLSTM-CRF。** 用神经特征代替手工特征。LSTM 双向读句子，顶上加 CRF 层强制标签序列一致。
 - **基于 transformer。** 用 token 分类头微调 BERT。准确率最好，算力最贵。
 
+```figure
+ner-bio-tagging
+```
+
 ## 动手构建
 
 ### 第 1 步：BIO 标注辅助函数

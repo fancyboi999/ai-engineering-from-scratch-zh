@@ -56,6 +56,10 @@ Bahdanau、Cho 和 Bengio 在 2014 年发表了一个三行修法。别只给解
 
 **一个值得点名的 Bahdanau / Luong 坑。** Bahdanau 用 `s_{t-1}`（生成当前词*之前*的解码器状态）。Luong 用 `s_t`（*之后*的状态）。把它们搞混会产出微妙错误的梯度，极难调试。挑一篇论文，守住它的约定。
 
+```figure
+attention-heatmap
+```
+
 ## 动手构建
 
 ### 第 1 步：加性（Bahdanau）注意力

@@ -360,6 +360,10 @@ It is faster and more numerically stable.
 
 这意味着你在第 10 课学的关于降维的一切，引擎盖下都是 SVD。PCA 是 SVD 在机器学习里最常见的应用。
 
+```figure
+svd-rank-reconstruction
+```
+
 ## 动手构建
 
 ### 第 1 步：用幂迭代从零写 SVD

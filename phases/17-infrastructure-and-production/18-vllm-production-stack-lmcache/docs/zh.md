@@ -82,6 +82,10 @@ vLLM 0.11.0（2026 年 1 月）加了一条异步 offload 路径 —— offload 
 - 16 块 H100 基准：KV 占用超过 HBM 时 LMCache 有帮助。
 - HBM 压力小：3-5% 开销而无收益。
 
+```figure
+zero-sharding
+```
+
 ## 实际使用
 
 `code/main.py` 模拟一个带和不带 LMCache 的抢占重工作负载。报告避免的重 prefill 次数、吞吐增益和盈亏平衡的 HBM 利用率。

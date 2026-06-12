@@ -118,6 +118,10 @@ Flash 4 发布时只有前向通过。训练仍用 Flash 3。Flash 4 的 GQA 和
 
 vLLM 的招牌功能。KV 缓存按 16 token 的块分配；一张页表把逻辑位置映射到物理块。让你能跨并行样本共享 KV（beam search、并行采样）、为 prompt 缓存热插拔前缀、整理内存碎片。相比朴素连续分配，吞吐提升 4 倍。
 
+```figure
+flash-attention-memory
+```
+
 ## 动手构建
 
 见 `code/main.py`。我们实现：

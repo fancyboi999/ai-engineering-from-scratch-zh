@@ -84,6 +84,10 @@ scaling laws 仍然有效，但是：
 
 Muon 优化器（Kimi Moonlight，2024）在同等数据下展示出相比 AdamW 约 2× 的有效算力增益。2026 年一些训练任务默认用 Muon。它改变 scaling law 里的绝对常数，不改它的形状。
 
+```figure
+scaling-laws
+```
+
 ## 动手构建
 
 见 `code/main.py`。我们实现 Chinchilla 损失方程，并在几个算力预算下分别解出算力最优的 `(N, D)`。

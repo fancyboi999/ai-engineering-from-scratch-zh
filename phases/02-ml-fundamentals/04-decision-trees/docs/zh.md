@@ -189,6 +189,10 @@ importance(feature_j) = sum over all nodes where feature_j is used:
 
 当数据有空间或序列结构（图像、文本、音频）时，神经网络才赢。对于平铺的特征表格，树是默认选择。
 
+```figure
+decision-tree-depth
+```
+
 ## 动手构建
 
 ### 第 1 步：Gini 不纯度和熵

@@ -75,6 +75,10 @@ Reflexion 帮不上忙，当：
 
 2026 年的坑：记忆腐烂。反思越攒越多；有些已经过时或错误；随着情景缓冲区增长，重试变慢。缓解办法：周期性压实（第 06 课）、给反思加 TTL，或一个独立的 sleep-time 清理 agent（Letta）。
 
+```figure
+react-trace
+```
+
 ## 动手构建
 
 `code/main.py` 在一个玩具谜题上实现 Reflexion：产出一个和为目标值的 3 元素列表。Actor 吐出候选列表；Evaluator 检查和；Self-Reflector 写一行说明哪里出错了。这段反思进入情景记忆供下一次试验用。

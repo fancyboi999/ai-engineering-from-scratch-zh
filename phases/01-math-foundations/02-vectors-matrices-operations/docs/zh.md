@@ -113,6 +113,10 @@ Broadcasting stretches the vector across rows:
 
 每个现代框架都会自动做这件事。理解它能让你在形状看起来不对、代码却照跑不误时不犯迷糊。
 
+```figure
+vector-projection
+```
+
 ## 动手构建
 
 ### 第 1 步：Vector 类

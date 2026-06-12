@@ -243,6 +243,10 @@ Memory roof:  peak bandwidth * ops:byte ratio
 
 A100 上的交叉点大约在 ops:byte = 156（312 TFLOPS / 2 TB/s）。低于 156，你内存受限。高于 156，你计算受限。连续批处理通过每次迭代塞更多 token，把 decode 推向这个交叉点。
 
+```figure
+context-window-slide
+```
+
 ## 动手构建
 
 ### 第 1 步：从零实现 KV Cache

@@ -35,6 +35,10 @@
 - **针对 GPT 词表做快速推理：** tiktoken（cl100k_base、o200k_base）。
 - **两者都要：** HF Tokenizers —— 一个库，训练 + 服务。
 
+```figure
+bpe-merge
+```
+
 ## 动手构建
 
 ### 第 1 步：从零实现 BPE

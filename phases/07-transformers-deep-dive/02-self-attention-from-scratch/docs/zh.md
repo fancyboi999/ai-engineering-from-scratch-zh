@@ -163,6 +163,10 @@ flowchart LR
 Attention(Q, K, V) = softmax( Q @ K^T / sqrt(dk) ) @ V
 ```
 
+```figure
+softmax-attention-scaling
+```
+
 ## 动手构建
 
 ### 第 1 步：从零写 softmax

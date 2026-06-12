@@ -68,6 +68,10 @@ eval:
 - 护栏：Llama Guard 4 输入/输出分类器、NeMo Guardrails v0.12 策略、Presidio PII 擦洗
 - 合规：chunk 上基于角色的访问标签；为 GDPR/HIPAA 打的司法辖区标签
 
+```figure
+canary-rollout
+```
+
 ## 动手构建
 
 1. **摄入。** 用 Unstructured 或 docling 解析你的语料（认真做的话 1000-10000 份文档）。扫描 / 视觉为主的页面走 ColPali。产出带摘要、角色标签、司法辖区标签的 chunk。

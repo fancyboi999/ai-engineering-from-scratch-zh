@@ -215,6 +215,10 @@ OpenAI 的 text-embedding-3-small 和 text-embedding-3-large 通过 `dimensions`
 
 准确率损失在检索 recall 上约 5-10%。常见模式是：用二值量化在数百万向量上做第一轮搜索，然后用全精度向量给 top-1000 重新打分。这能让你以 32 倍更少的内存，拿到全精度 95%+ 的准确率。
 
+```figure
+cosine-similarity
+```
+
 ## 动手构建
 
 我们从零构建一个语义搜索引擎。没有向量数据库，没有外部 embedding API。纯 Python，数学部分用 numpy。

@@ -239,6 +239,10 @@ graph TD
     style N1 fill:#1a1a2e,stroke:#e94560,color:#fff
 ```
 
+```figure
+paged-kv-cache
+```
+
 ## 动手构建
 
 ### 第 1 步：模拟数据并行

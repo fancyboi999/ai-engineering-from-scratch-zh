@@ -464,6 +464,10 @@ def generate(model, prompt_tokens, max_new_tokens=100, temperature=0.8):
 
 `tokens[-seq_len:]` 这个窗口是必要的，因为模型有最大 context 长度（GPT-2 是 1024）。一旦超过它，你必须丢掉最旧的 token。这就是大家挂在嘴边的 "context window"。
 
+```figure
+sampling-decoder
+```
+
 ## 实际使用
 
 ### 完整的训练和生成演示

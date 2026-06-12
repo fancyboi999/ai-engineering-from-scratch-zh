@@ -211,6 +211,10 @@ flowchart TD
     M -->|是| O[交付]
 ```
 
+```figure
+class-imbalance
+```
+
 ## 动手构建
 
 ### 第 1 步：生成一个不平衡数据集

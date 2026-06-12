@@ -82,6 +82,10 @@ NSA 的核为现代 GPU 内存层级而设计。核按 GQA 组加载 query（外
 
 MoBA（Moonshot，arXiv:2502.13189）同期发表，采取类似的 "三个比一个好" 的方法，把 MoE 原则应用到注意力块上。NSA 和 MoBA 是 2026 年长 context 预训练要知道的两个架构。
 
+```figure
+sliding-window-attention
+```
+
 ## 动手构建
 
 `code/main.py` 在一个短合成序列上实现三条分支，并展示：

@@ -381,6 +381,10 @@ Replace x_i^T x_j with K(x_i, x_j) to get the kernel trick.
 | Adam | O(n) | O(n) | 深度学习默认 |
 | K-FAC | O(n) | 每层 O(n) | 研究、大批量训练 |
 
+```figure
+convex-vs-nonconvex
+```
+
 ## 动手构建
 
 ### 第 1 步：凸性检查器

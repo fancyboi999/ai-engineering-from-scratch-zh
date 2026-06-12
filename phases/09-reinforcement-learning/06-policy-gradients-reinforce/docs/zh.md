@@ -52,6 +52,10 @@ REINFORCE 定理（Williams 1992）告诉你这个梯度是可计算的：`∇J(
 
 **连续动作的高斯策略。** `π_θ(a | s) = N(μ_θ(s), σ_θ(s))`。`∇ log N(a; μ, σ)` 有闭式解。Phase 9 · 07 的 SAC 要的全部就是这个。
 
+```figure
+policy-gradient-landscape
+```
+
 ## 动手构建
 
 ### 第 1 步：softmax 策略网络

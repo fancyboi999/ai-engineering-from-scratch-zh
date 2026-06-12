@@ -164,6 +164,10 @@ flowchart TD
     Type -->|"还不确定"| Default["先用 AdamW<br/>lr=3e-4, wd=0.01"]
 ```
 
+```figure
+optimizer-trajectory
+```
+
 ## 动手构建
 
 ### 第 1 步：普通 SGD

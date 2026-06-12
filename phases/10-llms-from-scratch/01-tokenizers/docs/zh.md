@@ -202,6 +202,10 @@ graph LR
 
 这就是为什么 Llama 3 把词表从 32K 翻了四倍到 128K。给非英语文字分配更多 token，意味着跨语言的压缩更公平。
 
+```figure
+tokenizer-tradeoff
+```
+
 ## 动手构建
 
 ### 第 1 步：字符级 tokenizer

@@ -114,6 +114,10 @@ EAGLE-3（Li et al. 2025，"EAGLE-3: Scaling up Inference Acceleration of Large 
 
 生产团队通常报告聊天上 2-3 倍墙钟加速、代码生成上 3-5 倍、创意写作上近乎零。
 
+```figure
+speculative-decoding
+```
+
 ## 动手构建
 
 `code/main.py`：

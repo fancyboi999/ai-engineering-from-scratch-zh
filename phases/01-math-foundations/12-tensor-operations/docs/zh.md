@@ -101,6 +101,10 @@ graph LR
 
 关键模式：`i,i->`（点积）、`i,j->ij`（外积）、`ii->`（迹）、`ij->ji`（转置）、`bij,bjk->bik`（批量矩阵乘法）、`bhtd,bhsd->bhts`（注意力分数）。
 
+```figure
+tensor-broadcast
+```
+
 ## 动手构建
 
 代码在 `code/tensors.py` 里。每一步都引用那里的实现。

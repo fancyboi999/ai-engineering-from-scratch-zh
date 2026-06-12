@@ -68,6 +68,10 @@ Claude Agent SDK、OpenAI Agents SDK、LangGraph、AutoGen v0.4 AgentChat、Crew
 - **级联失败。** 一个不存在的 SKU，四个下游 API 调用，一次多系统宕机。agent 分不清「我失败了」和「这任务根本做不到」，还经常在 400 错误上幻觉出成功。见第 26 课。
 - **循环长度爆炸。** 2026 年大多数 agent 跑 40–400 步。要调试第 38 步那个错误决策，需要可观测性（第 23 课）和评估轨迹（第 30 课）。
 
+```figure
+agent-loop
+```
+
 ## 动手构建
 
 `code/main.py` 仅用标准库端到端实现了这个循环。组件：

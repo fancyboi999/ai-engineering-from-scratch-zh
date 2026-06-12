@@ -73,6 +73,10 @@ target: the  quick brown fox jumps  over  the lazy dog
 | 零样本蕴含（NLI） | 编码器之上加分类头 |
 | RAG 的重排器 | 交叉编码器打分，比 LLM 重排器快 10 倍 |
 
+```figure
+transformer-residual
+```
+
 ## 动手构建
 
 ### 第 1 步：掩码逻辑

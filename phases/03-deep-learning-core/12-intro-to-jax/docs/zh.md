@@ -237,6 +237,10 @@ w = jax.random.normal(key1, shape=(784, 256))
 
 一开始很烦。但它保证了跨设备和跨编译的可复现性——这是 PyTorch 的 `torch.manual_seed` 在多 GPU 场景下保证不了的属性。
 
+```figure
+batchnorm-effect
+```
+
 ## 动手构建
 
 我们要用 JAX 和 Optax 在 MNIST 上训练一个 3 层 MLP。784 个输入，两个隐藏层分别 256 和 128 个神经元，10 个输出类。

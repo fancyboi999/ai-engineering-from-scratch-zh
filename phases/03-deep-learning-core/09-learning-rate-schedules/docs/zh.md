@@ -152,6 +152,10 @@ graph TD
     end
 ```
 
+```figure
+lr-schedule
+```
+
 ## 动手构建
 
 ### 第 1 步：调度函数

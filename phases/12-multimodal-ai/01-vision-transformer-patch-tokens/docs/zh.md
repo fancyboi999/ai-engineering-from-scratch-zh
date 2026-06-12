@@ -100,6 +100,10 @@ total       ≈ 86M
 
 这套配置里的每个决定，都能追溯到一篇你读得到的论文。
 
+```figure
+image-patch-tokens
+```
+
 ## 实际使用
 
 `code/main.py` 是一个 patch 分词器加几何计算器。它接收 (图像 H, W, patch P, 隐藏维度 D, 深度 L)，报告：

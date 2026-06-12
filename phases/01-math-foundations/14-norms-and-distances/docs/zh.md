@@ -423,6 +423,10 @@ Product quant.    Compress vectors, search       FAISS (memory-constrained)
 
 HNSW（分层可导航小世界）是现代向量数据库里占主导的算法。它构建一个多层图，每个节点连到它的近似最近邻。搜索从顶层（稀疏、长跳）开始，下降到底层（密集、短跳）。
 
+```figure
+norm-unit-balls
+```
+
 ## 动手构建
 
 ### 第 1 步：所有范数和距离函数

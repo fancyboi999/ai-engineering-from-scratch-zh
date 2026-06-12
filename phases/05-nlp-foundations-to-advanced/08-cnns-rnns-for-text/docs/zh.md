@@ -31,6 +31,10 @@ TF-IDF 和 Word2Vec 产出的是忽略词序的扁平向量。建在它们之上
 
 **双向 RNN** 一个 RNN 正向跑、另一个反向跑，拼接隐藏状态。每个 token 的表示都同时看到左右上下文。对标注任务至关重要。
 
+```figure
+rnn-unroll
+```
+
 ## 动手构建
 
 ### 第 1 步：PyTorch 里的 TextCNN

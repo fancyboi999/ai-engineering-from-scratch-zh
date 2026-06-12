@@ -388,6 +388,10 @@ LayerNorm(x) = (x - mean(x)) / (std(x) + epsilon) * gamma + beta
 原因：float16 表示不了低于 6e-8 的梯度幅度或高于 65,504 的激活值。
 修复：用带损失缩放的混合精度（AMP），或改用 bfloat16。
 
+```figure
+logsumexp-stability
+```
+
 ## 动手构建
 
 ### 第 1 步：演示浮点精度极限

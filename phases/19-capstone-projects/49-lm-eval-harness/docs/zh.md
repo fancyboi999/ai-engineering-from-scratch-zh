@@ -103,6 +103,10 @@ flowchart LR
   avg --> over[总分 = 各任务分数的均值]
 ```
 
+```figure
+eval-harness-matrix
+```
+
 ## 动手构建
 
 `code/main.py` 是可运行的产物。

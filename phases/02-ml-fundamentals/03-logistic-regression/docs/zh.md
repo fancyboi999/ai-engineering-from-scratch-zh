@@ -169,6 +169,10 @@ F1 = 2 * (Precision * Recall) / (Precision + Recall)
 - **召回率**：当假负例代价高时（癌症筛查，你不想漏掉肿瘤）
 - **F1**：当你需要一个平衡的单一指标时
 
+```figure
+logistic-sigmoid
+```
+
 ## 动手构建
 
 ### 第 1 步：sigmoid 函数和数据生成

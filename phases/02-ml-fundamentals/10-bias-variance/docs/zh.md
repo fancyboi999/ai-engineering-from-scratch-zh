@@ -254,6 +254,10 @@ flowchart TD
     G --> H[试更复杂的模型]
 ```
 
+```figure
+bias-variance
+```
+
 ## 动手构建
 
 `code/bias_variance.py` 里的代码运行完整的偏差-方差分解实验。下面是逐步的做法。

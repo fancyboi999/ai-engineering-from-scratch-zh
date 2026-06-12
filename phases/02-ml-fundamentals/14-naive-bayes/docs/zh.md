@@ -225,6 +225,10 @@ flowchart LR
 log P(class | features) = log P(class) + sum_i log P(feature_i | class)
 ```
 
+```figure
+naive-bayes
+```
+
 ## 动手构建
 
 `code/naive_bayes.py` 里的代码从零实现了 MultinomialNB 和 GaussianNB。

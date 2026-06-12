@@ -44,6 +44,10 @@
 
 在温和条件下（每个对被无限次访问，`α` 满足 Robbins-Monro），以概率 1 收敛到 `Q*` 和 `π*`。
 
+```figure
+epsilon-greedy
+```
+
 ## 动手构建
 
 ### 第 1 步：rollout → (s, a, r) 列表

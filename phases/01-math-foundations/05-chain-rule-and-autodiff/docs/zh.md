@@ -163,6 +163,10 @@ PyTorch 内部：
 
 这个图是动态的（define-by-run）。每次前向传播都会构建一个新图。这就是为什么 PyTorch 支持在模型里写控制流（if/else、循环）。
 
+```figure
+chain-rule
+```
+
 ## 动手构建
 
 ### 第 1 步：Value 类

@@ -219,6 +219,10 @@ Input ──▶ Split ├──▶ Agent B ──├──▶ Merge ──▶ Ou
 
 经验法则：如果一个任务工具调用少于 20 次、能装进 100k token，就保持单 agent。
 
+```figure
+swarm-messages
+```
+
 ## 动手构建
 
 ### 第 1 步：过载的单 agent

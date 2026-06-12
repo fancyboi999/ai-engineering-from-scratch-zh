@@ -147,6 +147,10 @@ classDiagram
     Sequential *-- Module
 ```
 
+```figure
+gradient-clipping
+```
+
 ## 动手构建
 
 ### 第 1 步：Module 基类

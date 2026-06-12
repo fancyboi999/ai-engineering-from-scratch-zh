@@ -220,6 +220,10 @@ kv_cache = 2 * num_layers * num_kv_heads * head_dim * max_seq_len * bytes_per_el
 - **长 context 需求**：Llama 3（用 RoPE 缩放到 128k）、DeepSeek（MLA 优势）。
 - **低延迟服务**：Gemma 2 9B（滑动窗口削减长 context 计算）。
 
+```figure
+rmsnorm-vs-layernorm
+```
+
 ## 动手构建
 
 本节课的代码是个计算器。给定任意 config.json，它按组件打印参数量、最大 context 下的 KV cache、SwiGLU MLP 比率，以及对架构的简短判定（稠密 / GQA / MLA / MoE）。

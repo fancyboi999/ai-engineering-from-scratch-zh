@@ -36,6 +36,10 @@ one-hot(center) ── W ──▶ hidden (d-dim) ── W' ──▶ softmax(vo
 
 诀窍在这里：对 10 万个词做 softmax 贵得离谱。Word2Vec 用**负采样**把它变成一个二分类任务——预测"这个上下文词是否出现在这个中心词附近，是还是否"。每个训练对采样少量负（不共现）词，而不是在整个词表上算 softmax。
 
+```figure
+word-vector-arithmetic
+```
+
 ## 动手构建
 
 ### 第 1 步：从语料生成训练对

@@ -72,6 +72,10 @@ TRT-LLM 是 C++ + CUDA + 闭源 kernel。模型需要为特定 GPU SKU 编译。
 
 TRT-LLM 的分离式服务（分开的 prefill 和 decode 池）在阶段 17 · 20 里深入讲。在 Blackwell 上，乘数叠加：FP4 权重 × MTP 加速 × 分离式放置 × 缓存感知路由。那个 7 倍数字假设的就是这整套栈。
 
+```figure
+pipeline-parallel
+```
+
 ## 实际使用
 
 `code/main.py` 跨三套栈为一个模型算 HBM 占用、decode 吞吐（内存受限制度）和 $/M-token：H100 + BF16 + vLLM、H100 + FP8 + vLLM、B200 + NVFP4/FP8 + TRT-LLM。跑一下，看看叠加效应，以及每项改动贡献了差距的多少份。

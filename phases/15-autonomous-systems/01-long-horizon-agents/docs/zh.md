@@ -59,6 +59,10 @@ METR（前身是 ARC Evals）把任务成功概率对专家完成时间的对数
 
 每一行都成了本阶段的一课。
 
+```figure
+task-decomposition
+```
+
 ## 实际使用
 
 运行 `code/main.py`。它模拟 METR 时间跨度曲线，展示：

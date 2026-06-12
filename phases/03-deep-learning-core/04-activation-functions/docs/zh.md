@@ -216,6 +216,10 @@ flowchart TD
     Task -->|"回归"| Linear["用线性（无激活）"]
 ```
 
+```figure
+softmax-temperature
+```
+
 ## 动手构建
 
 ### 第 1 步：实现所有激活函数及其导数
