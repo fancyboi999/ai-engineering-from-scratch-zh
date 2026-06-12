@@ -664,6 +664,37 @@
     'trace-spans': '分布式 trace 是摆在时间线上的 span 树。根 span 罩住整个请求；每次 LLM 调用、检索、工具调用的子 span 按开始时间和时长嵌在里面。读这张甘特图就能看出延迟到底去了哪——这是每次线上事故的第一问。'
   };
 
+  // 重建型条目的模式匹配：部分 widget（gpu-memory-breakdown、zero-sharding、
+  // speculative-decoding 等 9 个）在 _render() 里重建 ctrl 行且 label 含可变数字，
+  // 精确表罩不住，由这些正则兜底。
+  var P = [
+    [/^activations \(batch (\d+)\)$/, '激活值（batch $1）'],
+    [/^parameters \(fp16\)( ÷ \d+)?$/, '参数（fp16）$1'],
+    [/^gradients \(fp16\)( ÷ \d+)?$/, '梯度（fp16）$1'],
+    [/^optimizer states \(Adam\)( ÷ \d+)?$/, '优化器状态（Adam）$1'],
+    [/^draft (\d+)$/, '草稿 $1'],
+    [/^doc(\d+)( {2}tf=\d+)$/, '文档$1$2']
+  ];
+
+  function zhCtrl(t) {
+    var key = t.trim();
+    if (C[key]) return C[key];
+    for (var i = 0; i < P.length; i++) {
+      if (P[i][0].test(key)) return key.replace(P[i][0], P[i][1]);
+    }
+    return null;
+  }
+
+  function translateCtrls(host) {
+    host.querySelectorAll('.lf-ctrl label').forEach(function (l) {
+      var t = l.firstChild;
+      if (t && t.nodeType === 3) {
+        var zh = zhCtrl(t.nodeValue);
+        if (zh) t.nodeValue = zh;
+      }
+    });
+  }
+
   function applyFigureI18n(root) {
     (root || document).querySelectorAll('.lesson-figure[data-figure]').forEach(function (host) {
       if (host.dataset.lfI18n || !host.dataset.lfMounted) return;
@@ -675,15 +706,13 @@
         var hint = head.children[head.children.length - 1];
         if (H[hint.textContent]) hint.textContent = H[hint.textContent];
       }
-      host.querySelectorAll('.lf-ctrl label').forEach(function (l) {
-        var t = l.firstChild;
-        if (t && t.nodeType === 3) {
-          var zh = C[t.nodeValue.trim()];
-          if (zh) t.nodeValue = zh;
-        }
-      });
+      translateCtrls(host);
       var cap = host.querySelector('.lf-cap');
       if (cap && CAP[name]) cap.textContent = CAP[name];
+      // 重建型 widget：交互后 _render 会重建 ctrl 行（冒泡晚于渲染），重跑替换
+      function retranslate() { try { translateCtrls(host); } catch (e) {} }
+      host.addEventListener('input', retranslate);
+      host.addEventListener('change', retranslate);
       host.dataset.lfI18n = '1';
     });
   }
