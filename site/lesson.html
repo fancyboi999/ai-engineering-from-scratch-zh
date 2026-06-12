@@ -2495,14 +2495,17 @@
       function looksLikeMath(s) {
         if (/[一-鿿]/.test(s)) return false;
         if (s.indexOf('&quot;') !== -1 || s.indexOf('$') !== -1) return false;
+        // 字面 &lt; 只可能来自 em/strong 注入残留（真实 < 已是 &amp;lt;），整 span 拒绝
+        if (s.indexOf('&lt;') !== -1) return false;
         // 单引号：开引号（前面不是标识符/右括号）按字符串字面量排除；prime 记法如 V(s') 放行
         if (/(^|[^a-zA-Z0-9)\]])&#39;/.test(s)) return false;
         if (s.indexOf('*') !== -1) return false;
         if (/_[a-z]{4,}/.test(s)) return false;
         if (/--|::|=&gt;|-&gt;|\/\//.test(s)) return false;
+        // ^ 上标要求前面有底数字符（拒正则锚点如 ^Bearer）；| 别漏，双范数 ||q||^2 靠它
         return /[_^]\{/.test(s) ||
           /[½⅓¼·≈≠≤≥±×÷√∇∂∑Σ∏∫πθμσεαβγλδηρτφψωΩΔ∈∉∞∝∀∃²³ᵀ]/.test(s) ||
-          /\^[0-9a-zA-Z(]/.test(s);
+          /[0-9a-zA-Z)\]}|]\^[0-9a-zA-Z(]/.test(s);
       }
 
       function inlineFormat(text) {
@@ -2535,7 +2538,8 @@
         s = s.replace(/([A-Za-zα-ωΑ-Ω])̂/g, '\\hat{$1}');
         s = s.replace(/ŵ/g, '\\hat{w}').replace(/â/g, '\\hat{a}');
         s = s.replace(/√/g, '\\sqrt ');
-        s = s.replace(/([_^])([a-zA-Z0-9]{2,}(?:\.[0-9]+)?)/g, '$1{$2}');
+        s = s.replace(/~/g, '\\sim ');
+        s = s.replace(/([_^])([a-zA-Z0-9]+(?:\.[0-9]+)?)/g, '$1{$2}');
         s = s.replace(/\b(softmax|argmax|argmin|log10|log|exp|sin|cos|tanh|max|min|KL|Tr|Var|sqrt)\b(\s*\()/g, '\\operatorname{$1}$2');
         return s;
       }
