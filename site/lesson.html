@@ -425,6 +425,10 @@
       color: var(--blueprint);
     }
 
+    .lesson-article .math-inline .katex {
+      font-size: 1.04em;
+    }
+
     .lesson-article pre {
       position: relative;
       margin: 20px 0;
@@ -1971,6 +1975,7 @@
 
         initCodeCopy();
         renderMermaidBlocks();
+        renderMathSpans();
         if (window.mountLessonFigures) window.mountLessonFigures(el);
         renderAIPanels();
         buildTOC();
@@ -2484,12 +2489,31 @@
         return cells.map(function (c) { return c.trim(); });
       }
 
+      // zh 特化：上游课程把数学公式写成 inline code（如 `h_t = f(h_{t-1}, x_t)`），
+      // 命中强数学信号且无代码特征的 span 改走 KaTeX 渲染，其余保持 code 原样。
+      // 输入是 HTML 转义后的文本；判定必须保守——漏判只是维持现状，误判会把代码渲染成数学。
+      function looksLikeMath(s) {
+        if (/[一-鿿]/.test(s)) return false;
+        if (s.indexOf('&quot;') !== -1 || s.indexOf('$') !== -1) return false;
+        // 单引号：开引号（前面不是标识符/右括号）按字符串字面量排除；prime 记法如 V(s') 放行
+        if (/(^|[^a-zA-Z0-9)\]])&#39;/.test(s)) return false;
+        if (s.indexOf('*') !== -1) return false;
+        if (/_[a-z]{4,}/.test(s)) return false;
+        if (/--|::|=&gt;|-&gt;|\/\//.test(s)) return false;
+        return /[_^]\{/.test(s) ||
+          /[½⅓¼·≈≠≤≥±×÷√∇∂∑Σ∏∫πθμσεαβγλδηρτφψωΩΔ∈∉∞∝∀∃²³ᵀ]/.test(s) ||
+          /\^[0-9a-zA-Z(]/.test(s);
+      }
+
       function inlineFormat(text) {
         text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
         text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-        text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+        text = text.replace(/`([^`]+)`/g, function (m, c) {
+          if (looksLikeMath(c)) return '<code class="math-tex" data-tex="' + c + '">' + c + '</code>';
+          return '<code>' + c + '</code>';
+        });
         text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (m, label, href) {
           if (/^https?:\/\/|^mailto:/i.test(href)) {
             return '<a href="' + href + '" target="_blank" rel="noopener">' + label + '</a>';
@@ -2501,6 +2525,46 @@
 
       function slugify(text) {
         return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      }
+
+      // 把课程里的伪 LaTeX 记法整理成 KaTeX 能吃的形式。
+      // getAttribute 已还原 HTML 实体，这里拿到的是原始文本。
+      function texPreprocess(s) {
+        s = s.replace(/²/g, '^2').replace(/³/g, '^3').replace(/ᵀ/g, '^T');
+        s = s.replace(/([A-Za-zα-ωΑ-Ω])̅/g, '\\bar{$1}');
+        s = s.replace(/([A-Za-zα-ωΑ-Ω])̂/g, '\\hat{$1}');
+        s = s.replace(/ŵ/g, '\\hat{w}').replace(/â/g, '\\hat{a}');
+        s = s.replace(/√/g, '\\sqrt ');
+        s = s.replace(/([_^])([a-zA-Z0-9]{2,}(?:\.[0-9]+)?)/g, '$1{$2}');
+        s = s.replace(/\b(softmax|argmax|argmin|log10|log|exp|sin|cos|tanh|max|min|KL|Tr|Var|sqrt)\b(\s*\()/g, '\\operatorname{$1}$2');
+        return s;
+      }
+
+      // 按需加载 KaTeX 并渲染 math-tex span；任何一步失败都回退原 code 样式。
+      function renderMathSpans() {
+        var spans = document.querySelectorAll('code.math-tex');
+        if (!spans.length) return;
+        var KATEX = 'https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min';
+        if (!document.getElementById('katex-css')) {
+          var link = document.createElement('link');
+          link.id = 'katex-css'; link.rel = 'stylesheet'; link.href = KATEX + '.css';
+          document.head.appendChild(link);
+        }
+        function renderAll() {
+          spans.forEach(function (el) {
+            try {
+              var span = document.createElement('span');
+              span.className = 'math-inline';
+              window.katex.render(texPreprocess(el.getAttribute('data-tex')), span, { throwOnError: true, strict: false });
+              el.replaceWith(span);
+            } catch (e) { el.classList.remove('math-tex'); }
+          });
+        }
+        if (window.katex) { renderAll(); return; }
+        var script = document.createElement('script');
+        script.src = KATEX + '.js';
+        script.onload = renderAll;
+        document.head.appendChild(script);
       }
 
       function renderCodeBlock(code, lang) {
