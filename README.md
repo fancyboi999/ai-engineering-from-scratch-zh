@@ -15,6 +15,10 @@
   <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff&cacheSeconds=21600" alt="GitHub stars"></a>
 </p>
 
+<p align="center">
+  <a href="https://trendshift.io/developers/12312" target="_blank"><img src="https://trendshift.io/api/badge/developers/12312" alt="fancyboi999 | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</p>
+
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
 ```
