@@ -182,6 +182,115 @@
       word-wrap: break-word;
     }
 
+    /* ── 视频讲解播放器 banner ─────────────────────────────── */
+    .lesson-video-banner {
+      margin-bottom: 32px;
+      border: 1px solid var(--rule-soft);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .lesson-video-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg-surface);
+      transition: background 0.15s;
+    }
+
+    .lesson-video-header:hover {
+      background: var(--bg-surface-hover);
+    }
+
+    .lesson-video-icon {
+      font-size: 0.9rem;
+      color: var(--blueprint);
+      flex-shrink: 0;
+    }
+
+    .lesson-video-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .lesson-video-sources {
+      display: flex;
+      gap: 8px;
+      margin-right: 8px;
+    }
+
+    .lesson-video-src-btn {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--rule-soft);
+      background: transparent;
+      color: var(--ink-mute);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .lesson-video-src-btn:hover,
+    .lesson-video-src-btn.active {
+      border-color: var(--blueprint);
+      color: var(--blueprint);
+    }
+
+    .lesson-video-toggle {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--rule-soft);
+      background: transparent;
+      color: var(--ink-mute);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .lesson-video-toggle:hover {
+      border-color: var(--blueprint);
+      color: var(--blueprint);
+    }
+
+    .lesson-video-body {
+      background: #000;
+      display: none;
+    }
+
+    .lesson-video-body.open {
+      display: block;
+    }
+
+    .lesson-video-body video {
+      display: block;
+      width: 100%;
+      max-height: 56.25vw; /* 16:9 */
+    }
+
+    .lesson-video-body iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+    }
+
+    @media (max-width: 640px) {
+      .lesson-video-header { padding: 10px 12px; }
+    }
+    /* ────────────────────────────────────────────────────────── */
+
     .lesson-loading {
       display: flex;
       flex-direction: column;
@@ -2017,6 +2126,7 @@
         renderMathSpans();
         if (window.mountLessonFigures) window.mountLessonFigures(el);
         renderAIPanels();
+        mountVideoPlayer(lessonPath);
         buildTOC();
 
         document.querySelectorAll('a[href^="#"]').forEach(function (link) {
@@ -2030,6 +2140,98 @@
           });
         });
       }
+
+      // ── 视频播放器 ─────────────────────────────────────────────
+      var _videoManifest = null; // 缓存，避免重复 fetch
+
+      function mountVideoPlayer(path) {
+        if (!path) return;
+        var article = document.querySelector('.lesson-article');
+        if (!article) return;
+
+        function inject(manifest) {
+          var entry = manifest[path];
+          if (!entry || !entry.r2) return; // 该课暂无视频
+
+          var hasBili = !!(entry.bilibili);
+
+          var banner = document.createElement('div');
+          banner.className = 'lesson-video-banner';
+          banner.innerHTML =
+            '<div class="lesson-video-header" id="lvHeader" role="button" tabindex="0" aria-expanded="false">' +
+              '<span class="lesson-video-icon">▶</span>' +
+              '<span class="lesson-video-label">视频讲解</span>' +
+              (hasBili
+                ? '<span class="lesson-video-sources">' +
+                    '<button class="lesson-video-src-btn active" data-src="r2">高清</button>' +
+                    '<button class="lesson-video-src-btn" data-src="bili">Bilibili</button>' +
+                  '</span>'
+                : '') +
+              '<button class="lesson-video-toggle" id="lvToggle">展开</button>' +
+            '</div>' +
+            '<div class="lesson-video-body" id="lvBody">' +
+              '<video id="lvVideo" controls preload="none" playsinline></video>' +
+            '</div>';
+
+          article.parentNode.insertBefore(banner, article);
+
+          var header  = banner.querySelector('#lvHeader');
+          var body    = banner.querySelector('#lvBody');
+          var toggle  = banner.querySelector('#lvToggle');
+          var video   = banner.querySelector('#lvVideo');
+          var srcBtns = banner.querySelectorAll('.lesson-video-src-btn');
+          var currentSrc = 'r2';
+
+          function setSource(src) {
+            currentSrc = src;
+            srcBtns.forEach(function (b) {
+              b.classList.toggle('active', b.dataset.src === src);
+            });
+            if (src === 'r2') {
+              body.innerHTML = '<video id="lvVideo" controls preload="none" playsinline></video>';
+              body.querySelector('#lvVideo').src = entry.r2;
+            } else {
+              body.innerHTML = '<iframe src="' + entry.bilibili + '" allowfullscreen loading="lazy"></iframe>';
+            }
+          }
+
+          function openPlayer() {
+            body.classList.add('open');
+            toggle.textContent = '收起';
+            header.setAttribute('aria-expanded', 'true');
+            if (currentSrc === 'r2' && video && !video.src) {
+              video.src = entry.r2;
+            }
+          }
+
+          function closePlayer() {
+            body.classList.remove('open');
+            toggle.textContent = '展开';
+            header.setAttribute('aria-expanded', 'false');
+          }
+
+          header.addEventListener('click', function (e) {
+            if (e.target.closest('.lesson-video-src-btn')) return;
+            body.classList.contains('open') ? closePlayer() : openPlayer();
+          });
+          header.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              body.classList.contains('open') ? closePlayer() : openPlayer();
+            }
+          });
+          srcBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () { setSource(btn.dataset.src); });
+          });
+        }
+
+        if (_videoManifest) { inject(_videoManifest); return; }
+        fetch('/videos.json?v=1')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (data) { if (data) { _videoManifest = data; inject(data); } })
+          .catch(function () {}); // 静默失败，不影响课程正文
+      }
+      // ──────────────────────────────────────────────────────────
 
       function buildTOC() {
         var sidebar = document.getElementById('tocSidebar');
