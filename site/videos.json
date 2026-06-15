@@ -108,5 +108,95 @@
     "r2": "https://videos.aieng-zh.cn/lessons/01-22-stochastic-processes.mp4",
     "bilibili": null,
     "slug": "01-22-stochastic-processes"
+  },
+  "phases/02-ml-fundamentals/01-what-is-machine-learning": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-01-what-is-machine-learning.mp4",
+    "bilibili": null,
+    "slug": "02-01-what-is-machine-learning"
+  },
+  "phases/02-ml-fundamentals/02-linear-regression": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-02-linear-regression.mp4",
+    "bilibili": null,
+    "slug": "02-02-linear-regression"
+  },
+  "phases/02-ml-fundamentals/03-logistic-regression": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-03-logistic-regression.mp4",
+    "bilibili": null,
+    "slug": "02-03-logistic-regression"
+  },
+  "phases/02-ml-fundamentals/04-decision-trees": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-04-decision-trees.mp4",
+    "bilibili": null,
+    "slug": "02-04-decision-trees"
+  },
+  "phases/02-ml-fundamentals/05-support-vector-machines": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-05-support-vector-machines.mp4",
+    "bilibili": null,
+    "slug": "02-05-support-vector-machines"
+  },
+  "phases/02-ml-fundamentals/06-knn-and-distances": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-06-knn-and-distances.mp4",
+    "bilibili": null,
+    "slug": "02-06-knn-and-distances"
+  },
+  "phases/02-ml-fundamentals/07-unsupervised-learning": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-07-unsupervised-learning.mp4",
+    "bilibili": null,
+    "slug": "02-07-unsupervised-learning"
+  },
+  "phases/02-ml-fundamentals/08-feature-engineering": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-08-feature-engineering.mp4",
+    "bilibili": null,
+    "slug": "02-08-feature-engineering"
+  },
+  "phases/02-ml-fundamentals/09-model-evaluation": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-09-model-evaluation.mp4",
+    "bilibili": null,
+    "slug": "02-09-model-evaluation"
+  },
+  "phases/02-ml-fundamentals/10-bias-variance": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-10-bias-variance.mp4",
+    "bilibili": null,
+    "slug": "02-10-bias-variance"
+  },
+  "phases/02-ml-fundamentals/11-ensemble-methods": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-11-ensemble-methods.mp4",
+    "bilibili": null,
+    "slug": "02-11-ensemble-methods"
+  },
+  "phases/02-ml-fundamentals/12-hyperparameter-tuning": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-12-hyperparameter-tuning.mp4",
+    "bilibili": null,
+    "slug": "02-12-hyperparameter-tuning"
+  },
+  "phases/02-ml-fundamentals/13-ml-pipelines": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-13-ml-pipelines.mp4",
+    "bilibili": null,
+    "slug": "02-13-ml-pipelines"
+  },
+  "phases/02-ml-fundamentals/14-naive-bayes": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-14-naive-bayes.mp4",
+    "bilibili": null,
+    "slug": "02-14-naive-bayes"
+  },
+  "phases/02-ml-fundamentals/15-time-series": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-15-time-series.mp4",
+    "bilibili": null,
+    "slug": "02-15-time-series"
+  },
+  "phases/02-ml-fundamentals/16-anomaly-detection": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-16-anomaly-detection.mp4",
+    "bilibili": null,
+    "slug": "02-16-anomaly-detection"
+  },
+  "phases/02-ml-fundamentals/17-imbalanced-data": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-17-imbalanced-data.mp4",
+    "bilibili": null,
+    "slug": "02-17-imbalanced-data"
+  },
+  "phases/02-ml-fundamentals/18-feature-selection": {
+    "r2": "https://videos.aieng-zh.cn/lessons/02-18-feature-selection.mp4",
+    "bilibili": null,
+    "slug": "02-18-feature-selection"
   }
 }
