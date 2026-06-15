@@ -1,111 +1,111 @@
 {
   "phases/01-math-foundations/10-dimensionality-reduction": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-10-dimensionality-reduction.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-10-dimensionality-reduction.mp4",
     "bilibili": null,
     "slug": "01-10-dimensionality-reduction"
   },
   "phases/01-math-foundations/11-singular-value-decomposition": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-11-svd.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-11-svd.mp4",
     "bilibili": null,
     "slug": "01-11-svd"
   },
   "phases/01-math-foundations/14-norms-and-distances": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-14-norms-and-distances.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-14-norms-and-distances.mp4",
     "bilibili": null,
     "slug": "01-14-norms-and-distances"
   },
   "phases/01-math-foundations/03-matrix-transformations": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-03-matrix-transformations.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-03-matrix-transformations.mp4",
     "bilibili": null,
     "slug": "01-03-matrix-transformations"
   },
   "phases/01-math-foundations/01-linear-algebra-intuition": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-01-linear-algebra.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-01-linear-algebra.mp4",
     "bilibili": null,
     "slug": "01-01-linear-algebra"
   },
   "phases/01-math-foundations/02-vectors-matrices-operations": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-02-vectors-matrices.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-02-vectors-matrices.mp4",
     "bilibili": null,
     "slug": "01-02-vectors-matrices"
   },
   "phases/01-math-foundations/04-calculus-for-ml": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-04-calculus.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-04-calculus.mp4",
     "bilibili": null,
     "slug": "01-04-calculus"
   },
   "phases/01-math-foundations/05-chain-rule-and-autodiff": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-05-chain-rule-autodiff.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-05-chain-rule-autodiff.mp4",
     "bilibili": null,
     "slug": "01-05-chain-rule-autodiff"
   },
   "phases/01-math-foundations/06-probability-and-distributions": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-06-probability.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-06-probability.mp4",
     "bilibili": null,
     "slug": "01-06-probability"
   },
   "phases/01-math-foundations/08-optimization": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-08-optimization.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-08-optimization.mp4",
     "bilibili": null,
     "slug": "01-08-optimization"
   },
   "phases/01-math-foundations/12-tensor-operations": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-12-tensors.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-12-tensors.mp4",
     "bilibili": null,
     "slug": "01-12-tensors"
   },
   "phases/01-math-foundations/17-linear-systems": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-17-linear-systems.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-17-linear-systems.mp4",
     "bilibili": null,
     "slug": "01-17-linear-systems"
   },
   "phases/01-math-foundations/07-bayes-theorem": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-07-bayes-theorem.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-07-bayes-theorem.mp4",
     "bilibili": null,
     "slug": "01-07-bayes-theorem"
   },
   "phases/01-math-foundations/09-information-theory": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-09-information-theory.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-09-information-theory.mp4",
     "bilibili": null,
     "slug": "01-09-information-theory"
   },
   "phases/01-math-foundations/13-numerical-stability": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-13-numerical-stability.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-13-numerical-stability.mp4",
     "bilibili": null,
     "slug": "01-13-numerical-stability"
   },
   "phases/01-math-foundations/15-statistics-for-ml": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-15-statistics.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-15-statistics.mp4",
     "bilibili": null,
     "slug": "01-15-statistics"
   },
   "phases/01-math-foundations/16-sampling-methods": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-16-sampling.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-16-sampling.mp4",
     "bilibili": null,
     "slug": "01-16-sampling"
   },
   "phases/01-math-foundations/18-convex-optimization": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-18-convex-optimization.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-18-convex-optimization.mp4",
     "bilibili": null,
     "slug": "01-18-convex-optimization"
   },
   "phases/01-math-foundations/20-fourier-transform": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-20-fourier.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-20-fourier.mp4",
     "bilibili": null,
     "slug": "01-20-fourier"
   },
   "phases/01-math-foundations/19-complex-numbers": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-19-complex-numbers.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-19-complex-numbers.mp4",
     "bilibili": null,
     "slug": "01-19-complex-numbers"
   },
   "phases/01-math-foundations/21-graph-theory": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-21-graph-theory.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-21-graph-theory.mp4",
     "bilibili": null,
     "slug": "01-21-graph-theory"
   },
   "phases/01-math-foundations/22-stochastic-processes": {
-    "r2": "https://pub-e80e3f5557334e5eb1e9d78394c9918a.r2.dev/lessons/01-22-stochastic-processes.mp4",
+    "r2": "https://videos.aieng-zh.cn/lessons/01-22-stochastic-processes.mp4",
     "bilibili": null,
     "slug": "01-22-stochastic-processes"
   }
