@@ -1653,6 +1653,7 @@
   </div>
 
   <script src="md-render.js?v=20260612a"></script>
+  <script src="build-meta.js"></script>
   <script src="data.js?v=20260525a"></script>
   <script src="progress.js?v=20260525a"></script>
   <script src="header.js?v=20260525a" defer></script>
@@ -1905,7 +1906,8 @@
 
       // quiz 始终运行时获取（预渲染页与 ?path= 入口共用）
       function fetchQuiz(path) {
-        var quizUrl = 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/' + path + '/quiz.json';
+        var ref = (typeof window !== 'undefined' && window.__AIFS_REF) ? window.__AIFS_REF : 'main';
+        var quizUrl = 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + ref + '/' + path + '/quiz.json';
         fetch(quizUrl)
           .then(function (res) { return res.ok ? res.json() : null; })
           .catch(function () { return null; })
@@ -1917,7 +1919,10 @@
       }
 
       function fetchLesson(path) {
-        var rawUrl = 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/' + path + '/docs/zh.md';
+        // 从本次部署所基于的分支拉取 docs（build.js 经 build-meta.js 写入 __AIFS_REF），
+        // 使 PR preview 部署渲染自己分支的课程改动，而非永远拉 main；缺省回退 main。
+        var ref = (typeof window !== 'undefined' && window.__AIFS_REF) ? window.__AIFS_REF : 'main';
+        var rawUrl = 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + ref + '/' + path + '/docs/zh.md';
 
         fetch(rawUrl)
           .then(function (res) {
