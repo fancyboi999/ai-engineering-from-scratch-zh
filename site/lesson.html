@@ -2193,7 +2193,11 @@
               body.innerHTML = '<video id="lvVideo" controls preload="none" playsinline></video>';
               body.querySelector('#lvVideo').src = entry.r2;
             } else {
-              body.innerHTML = '<iframe src="' + entry.bilibili + '" allowfullscreen loading="lazy"></iframe>';
+              // entry.bilibili 是裸 BV 号（投稿脚本回填的就是 bvid），需拼成 B 站播放器嵌入 URL，
+              // 否则裸 BV 当 iframe src 会被当相对路径解析成 404。
+              body.innerHTML = '<iframe src="//player.bilibili.com/player.html?bvid=' +
+                encodeURIComponent(entry.bilibili) + '&page=1&autoplay=0&high_quality=1" ' +
+                'scrolling="no" frameborder="no" allowfullscreen loading="lazy"></iframe>';
             }
           }
 
