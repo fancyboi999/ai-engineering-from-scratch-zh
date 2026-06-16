@@ -2223,6 +2223,8 @@
           srcBtns.forEach(function (btn) {
             btn.addEventListener('click', function () { setSource(btn.dataset.src); });
           });
+
+          openPlayer(); // 默认展开（preload="none" 仅显示外壳，不预下载，无带宽代价）
         }
 
         if (_videoManifest) { inject(_videoManifest); return; }
