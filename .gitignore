@@ -56,6 +56,8 @@ mlruns/
 
 .link-cache.json
 .claude/
+# impeccable 工具的本地缓存/配置（config.json、hook.cache.json），任意层级，不入库
+.impeccable/
 
 # 由 site/build.js 在每次 Vercel 部署时生成（buildCommand）——不提交，
 # 以免漂移或丢 URL。每次从 PHASES 重新生成。
