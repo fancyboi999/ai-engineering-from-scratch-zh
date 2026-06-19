@@ -716,137 +716,137 @@
   },
   "phases/08-generative-ai/01-generative-models-taxonomy-history": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-01-generative-models-taxonomy-history.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Dqjz6MEd3",
     "slug": "08-01-generative-models-taxonomy-history"
   },
   "phases/08-generative-ai/02-autoencoders-vae": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-02-autoencoders-vae.mp4",
-    "bilibili": null,
+    "bilibili": "BV1CSjz6FEJB",
     "slug": "08-02-autoencoders-vae"
   },
   "phases/08-generative-ai/03-gans-generator-discriminator": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-03-gans-generator-discriminator.mp4",
-    "bilibili": null,
+    "bilibili": "BV1pvjk6TEZC",
     "slug": "08-03-gans-generator-discriminator"
   },
   "phases/08-generative-ai/04-conditional-gans-pix2pix": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-04-conditional-gans-pix2pix.mp4",
-    "bilibili": null,
+    "bilibili": "BV1E2jk6fER6",
     "slug": "08-04-conditional-gans-pix2pix"
   },
   "phases/08-generative-ai/05-stylegan": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-05-stylegan.mp4",
-    "bilibili": null,
+    "bilibili": "BV1E2jk6fEaF",
     "slug": "08-05-stylegan"
   },
   "phases/08-generative-ai/06-diffusion-ddpm-from-scratch": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-06-diffusion-ddpm-from-scratch.mp4",
-    "bilibili": null,
+    "bilibili": "BV1z1jk68E6C",
     "slug": "08-06-diffusion-ddpm-from-scratch"
   },
   "phases/08-generative-ai/07-latent-diffusion-stable-diffusion": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-07-latent-diffusion-stable-diffusion.mp4",
-    "bilibili": null,
+    "bilibili": "BV1J1jk68Eak",
     "slug": "08-07-latent-diffusion-stable-diffusion"
   },
   "phases/08-generative-ai/08-controlnet-lora-conditioning": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-08-controlnet-lora-conditioning.mp4",
-    "bilibili": null,
+    "bilibili": "BV1CBjk6NEj2",
     "slug": "08-08-controlnet-lora-conditioning"
   },
   "phases/08-generative-ai/09-inpainting-outpainting-editing": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-09-inpainting-outpainting-editing.mp4",
-    "bilibili": null,
+    "bilibili": "BV1HBjk6NEMY",
     "slug": "08-09-inpainting-outpainting-editing"
   },
   "phases/08-generative-ai/10-video-generation": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-10-video-generation.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Wijk6iEeL",
     "slug": "08-10-video-generation"
   },
   "phases/08-generative-ai/11-audio-generation": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-11-audio-generation.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Wijk6iEDn",
     "slug": "08-11-audio-generation"
   },
   "phases/08-generative-ai/12-3d-generation": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-12-3d-generation.mp4",
-    "bilibili": null,
+    "bilibili": "BV16Fjk6cEUV",
     "slug": "08-12-3d-generation"
   },
   "phases/08-generative-ai/13-flow-matching-rectified-flows": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-13-flow-matching-rectified-flows.mp4",
-    "bilibili": null,
+    "bilibili": "BV1zPjk6tEv1",
     "slug": "08-13-flow-matching-rectified-flows"
   },
   "phases/08-generative-ai/14-evaluation-fid-clip-score": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-14-evaluation-fid-clip-score.mp4",
-    "bilibili": null,
+    "bilibili": "BV1zPjk6tEjn",
     "slug": "08-14-evaluation-fid-clip-score"
   },
   "phases/08-generative-ai/19-visual-autoregressive-var": {
     "r2": "https://videos.aieng-zh.cn/lessons/08-19-visual-autoregressive-var.mp4",
-    "bilibili": null,
+    "bilibili": "BV1zwjk6fE54",
     "slug": "08-19-visual-autoregressive-var"
   },
   "phases/09-reinforcement-learning/01-mdps-states-actions-rewards": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-01-mdps-states-actions-rewards.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Y5jk6DEN5",
     "slug": "09-01-mdps-states-actions-rewards"
   },
   "phases/09-reinforcement-learning/02-dynamic-programming": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-02-dynamic-programming.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Syjr63ELR",
     "slug": "09-02-dynamic-programming"
   },
   "phases/09-reinforcement-learning/03-monte-carlo-methods": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-03-monte-carlo-methods.mp4",
-    "bilibili": null,
+    "bilibili": "BV11Qjr6iEhH",
     "slug": "09-03-monte-carlo-methods"
   },
   "phases/09-reinforcement-learning/04-q-learning-sarsa": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-04-q-learning-sarsa.mp4",
-    "bilibili": null,
+    "bilibili": "BV1XYjr6UEBt",
     "slug": "09-04-q-learning-sarsa"
   },
   "phases/09-reinforcement-learning/05-dqn": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-05-dqn.mp4",
-    "bilibili": null,
+    "bilibili": "BV1qMjy6YErr",
     "slug": "09-05-dqn"
   },
   "phases/09-reinforcement-learning/06-policy-gradients-reinforce": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-06-policy-gradients-reinforce.mp4",
-    "bilibili": null,
+    "bilibili": "BV1vVjy6FEZj",
     "slug": "09-06-policy-gradients-reinforce"
   },
   "phases/09-reinforcement-learning/07-actor-critic-a2c-a3c": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-07-actor-critic-a2c-a3c.mp4",
-    "bilibili": null,
+    "bilibili": "BV1iVjy6FEuT",
     "slug": "09-07-actor-critic-a2c-a3c"
   },
   "phases/09-reinforcement-learning/08-ppo": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-08-ppo.mp4",
-    "bilibili": null,
+    "bilibili": "BV1q3jy6hE6F",
     "slug": "09-08-ppo"
   },
   "phases/09-reinforcement-learning/09-reward-modeling-rlhf": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-09-reward-modeling-rlhf.mp4",
-    "bilibili": null,
+    "bilibili": "BV1rwjy6qEdN",
     "slug": "09-09-reward-modeling-rlhf"
   },
   "phases/09-reinforcement-learning/10-multi-agent-rl": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-10-multi-agent-rl.mp4",
-    "bilibili": null,
+    "bilibili": "BV16Pjy6KEiG",
     "slug": "09-10-multi-agent-rl"
   },
   "phases/09-reinforcement-learning/11-sim-to-real-transfer": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-11-sim-to-real-transfer.mp4",
-    "bilibili": null,
+    "bilibili": "BV1rwjy6qEZk",
     "slug": "09-11-sim-to-real-transfer"
   },
   "phases/09-reinforcement-learning/12-rl-for-games": {
     "r2": "https://videos.aieng-zh.cn/lessons/09-12-rl-for-games.mp4",
-    "bilibili": null,
+    "bilibili": "BV1cwjy6BEaG",
     "slug": "09-12-rl-for-games"
   }
 }
