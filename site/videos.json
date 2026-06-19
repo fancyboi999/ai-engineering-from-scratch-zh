@@ -406,297 +406,297 @@
   },
   "phases/05-nlp-foundations-to-advanced/01-text-processing": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-01-text-processing.mp4",
-    "bilibili": null,
+    "bilibili": "BV1WNL96YEJv",
     "slug": "05-01-text-processing"
   },
   "phases/05-nlp-foundations-to-advanced/02-bag-of-words-tfidf": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-02-bag-of-words-tfidf.mp4",
-    "bilibili": null,
+    "bilibili": "BV1kTL96wErm",
     "slug": "05-02-bag-of-words-tfidf"
   },
   "phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-03-word-embeddings-word2vec.mp4",
-    "bilibili": null,
+    "bilibili": "BV1pTL96wEeP",
     "slug": "05-03-word-embeddings-word2vec"
   },
   "phases/05-nlp-foundations-to-advanced/04-glove-fasttext-subword": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-04-glove-fasttext-subword.mp4",
-    "bilibili": null,
+    "bilibili": "BV12fLX6qEau",
     "slug": "05-04-glove-fasttext-subword"
   },
   "phases/05-nlp-foundations-to-advanced/05-sentiment-analysis": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-05-sentiment-analysis.mp4",
-    "bilibili": null,
+    "bilibili": "BV14fLX6qErV",
     "slug": "05-05-sentiment-analysis"
   },
   "phases/05-nlp-foundations-to-advanced/06-named-entity-recognition": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-06-named-entity-recognition.mp4",
-    "bilibili": null,
+    "bilibili": "BV1UZLX6MEHa",
     "slug": "05-06-named-entity-recognition"
   },
   "phases/05-nlp-foundations-to-advanced/07-pos-tagging-parsing": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-07-pos-tagging-parsing.mp4",
-    "bilibili": null,
+    "bilibili": "BV1xwL96vEEj",
     "slug": "05-07-pos-tagging-parsing"
   },
   "phases/05-nlp-foundations-to-advanced/08-cnns-rnns-for-text": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-08-cnns-rnns-for-text.mp4",
-    "bilibili": null,
+    "bilibili": "BV1swL96vEC2",
     "slug": "05-08-cnns-rnns-for-text"
   },
   "phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-09-sequence-to-sequence.mp4",
-    "bilibili": null,
+    "bilibili": "BV1ywL96vE9Y",
     "slug": "05-09-sequence-to-sequence"
   },
   "phases/05-nlp-foundations-to-advanced/10-attention-mechanism": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-10-attention-mechanism.mp4",
-    "bilibili": null,
+    "bilibili": "BV14cL96KE6R",
     "slug": "05-10-attention-mechanism"
   },
   "phases/05-nlp-foundations-to-advanced/11-machine-translation": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-11-machine-translation.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Z7L96sEeL",
     "slug": "05-11-machine-translation"
   },
   "phases/05-nlp-foundations-to-advanced/12-text-summarization": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-12-text-summarization.mp4",
-    "bilibili": null,
+    "bilibili": "BV1E7L96sEDv",
     "slug": "05-12-text-summarization"
   },
   "phases/05-nlp-foundations-to-advanced/13-question-answering": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-13-question-answering.mp4",
-    "bilibili": null,
+    "bilibili": "BV16LL96dEMC",
     "slug": "05-13-question-answering"
   },
   "phases/05-nlp-foundations-to-advanced/14-information-retrieval-search": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-14-information-retrieval-search.mp4",
-    "bilibili": null,
+    "bilibili": "BV1ELL96dEmj",
     "slug": "05-14-information-retrieval-search"
   },
   "phases/05-nlp-foundations-to-advanced/15-topic-modeling": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-15-topic-modeling.mp4",
-    "bilibili": null,
+    "bilibili": "BV1LnL96pEC3",
     "slug": "05-15-topic-modeling"
   },
   "phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-16-text-generation-pre-transformer.mp4",
-    "bilibili": null,
+    "bilibili": "BV1EEL969E5N",
     "slug": "05-16-text-generation-pre-transformer"
   },
   "phases/05-nlp-foundations-to-advanced/17-chatbots-rule-to-neural": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-17-chatbots-rule-to-neural.mp4",
-    "bilibili": null,
+    "bilibili": "BV1n3L96bErm",
     "slug": "05-17-chatbots-rule-to-neural"
   },
   "phases/05-nlp-foundations-to-advanced/18-multilingual-nlp": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-18-multilingual-nlp.mp4",
-    "bilibili": null,
+    "bilibili": "BV1n3L96bExX",
     "slug": "05-18-multilingual-nlp"
   },
   "phases/05-nlp-foundations-to-advanced/19-subword-tokenization": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-19-subword-tokenization.mp4",
-    "bilibili": null,
+    "bilibili": "BV1pgL96FEsW",
     "slug": "05-19-subword-tokenization"
   },
   "phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-20-structured-outputs-constrained-decoding.mp4",
-    "bilibili": null,
+    "bilibili": "BV1wgL96cEqY",
     "slug": "05-20-structured-outputs-constrained-decoding"
   },
   "phases/05-nlp-foundations-to-advanced/21-nli-textual-entailment": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-21-nli-textual-entailment.mp4",
-    "bilibili": null,
+    "bilibili": "BV1c5L96tEnS",
     "slug": "05-21-nli-textual-entailment"
   },
   "phases/05-nlp-foundations-to-advanced/22-embedding-models-deep-dive": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-22-embedding-models-deep-dive.mp4",
-    "bilibili": null,
+    "bilibili": "BV1nGL96ZEj6",
     "slug": "05-22-embedding-models-deep-dive"
   },
   "phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-23-chunking-strategies-rag.mp4",
-    "bilibili": null,
+    "bilibili": "BV1JGL96ZECD",
     "slug": "05-23-chunking-strategies-rag"
   },
   "phases/05-nlp-foundations-to-advanced/24-coreference-resolution": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-24-coreference-resolution.mp4",
-    "bilibili": null,
+    "bilibili": "BV1j6LX6DEcy",
     "slug": "05-24-coreference-resolution"
   },
   "phases/05-nlp-foundations-to-advanced/25-entity-linking": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-25-entity-linking.mp4",
-    "bilibili": null,
+    "bilibili": "BV1i6LX6SEnk",
     "slug": "05-25-entity-linking"
   },
   "phases/05-nlp-foundations-to-advanced/26-relation-extraction-kg": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-26-relation-extraction-kg.mp4",
-    "bilibili": null,
+    "bilibili": "BV1d6LX6SEJo",
     "slug": "05-26-relation-extraction-kg"
   },
   "phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-27-llm-evaluation-frameworks.mp4",
-    "bilibili": null,
+    "bilibili": "BV1dzLX6nESm",
     "slug": "05-27-llm-evaluation-frameworks"
   },
   "phases/05-nlp-foundations-to-advanced/28-long-context-evaluation": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-28-long-context-evaluation.mp4",
-    "bilibili": null,
+    "bilibili": "BV1iCLX6UEMF",
     "slug": "05-28-long-context-evaluation"
   },
   "phases/05-nlp-foundations-to-advanced/29-dialogue-state-tracking": {
     "r2": "https://videos.aieng-zh.cn/lessons/05-29-dialogue-state-tracking.mp4",
-    "bilibili": null,
+    "bilibili": "BV19CLX6mErT",
     "slug": "05-29-dialogue-state-tracking"
   },
   "phases/06-speech-and-audio/01-audio-fundamentals": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-01-audio-fundamentals.mp4",
-    "bilibili": null,
+    "bilibili": "BV1dCLX6mEey",
     "slug": "06-01-audio-fundamentals"
   },
   "phases/06-speech-and-audio/02-spectrograms-mel-features": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-02-spectrograms-mel-features.mp4",
-    "bilibili": null,
+    "bilibili": "BV1okLX6EEPU",
     "slug": "06-02-spectrograms-mel-features"
   },
   "phases/06-speech-and-audio/03-audio-classification": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-03-audio-classification.mp4",
-    "bilibili": null,
+    "bilibili": "BV1zeLX69Ef9",
     "slug": "06-03-audio-classification"
   },
   "phases/06-speech-and-audio/04-speech-recognition-asr": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-04-speech-recognition-asr.mp4",
-    "bilibili": null,
+    "bilibili": "BV16eLX69EEv",
     "slug": "06-04-speech-recognition-asr"
   },
   "phases/06-speech-and-audio/05-whisper-architecture-finetuning": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-05-whisper-architecture-finetuning.mp4",
-    "bilibili": null,
+    "bilibili": "BV16YLX6sEEz",
     "slug": "06-05-whisper-architecture-finetuning"
   },
   "phases/06-speech-and-audio/06-speaker-recognition-verification": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-06-speaker-recognition-verification.mp4",
-    "bilibili": null,
+    "bilibili": "BV1fYLX6sEt5",
     "slug": "06-06-speaker-recognition-verification"
   },
   "phases/06-speech-and-audio/07-text-to-speech": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-07-text-to-speech.mp4",
-    "bilibili": null,
+    "bilibili": "BV1fqLX6QE5R",
     "slug": "06-07-text-to-speech"
   },
   "phases/06-speech-and-audio/08-voice-cloning-conversion": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-08-voice-cloning-conversion.mp4",
-    "bilibili": null,
+    "bilibili": "BV1fiLX6pESq",
     "slug": "06-08-voice-cloning-conversion"
   },
   "phases/06-speech-and-audio/09-music-generation": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-09-music-generation.mp4",
-    "bilibili": null,
+    "bilibili": "BV1ziLX6pE5L",
     "slug": "06-09-music-generation"
   },
   "phases/06-speech-and-audio/10-audio-language-models": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-10-audio-language-models.mp4",
-    "bilibili": null,
+    "bilibili": "BV1hXLX6rEpC",
     "slug": "06-10-audio-language-models"
   },
   "phases/06-speech-and-audio/11-real-time-audio-processing": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-11-real-time-audio-processing.mp4",
-    "bilibili": null,
+    "bilibili": "BV1hXLX6rEkF",
     "slug": "06-11-real-time-audio-processing"
   },
   "phases/06-speech-and-audio/12-voice-assistant-pipeline": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-12-voice-assistant-pipeline.mp4",
-    "bilibili": null,
+    "bilibili": "BV1hQLX6GEnc",
     "slug": "06-12-voice-assistant-pipeline"
   },
   "phases/06-speech-and-audio/13-neural-audio-codecs": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-13-neural-audio-codecs.mp4",
-    "bilibili": null,
+    "bilibili": "BV1aQLX6GE47",
     "slug": "06-13-neural-audio-codecs"
   },
   "phases/06-speech-and-audio/14-voice-activity-detection-turn-taking": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-14-voice-activity-detection-turn-taking.mp4",
-    "bilibili": null,
+    "bilibili": "BV1tdLX6zEBz",
     "slug": "06-14-voice-activity-detection-turn-taking"
   },
   "phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-15-streaming-speech-to-speech-moshi-hibiki.mp4",
-    "bilibili": null,
+    "bilibili": "BV1bdLX6zEZu",
     "slug": "06-15-streaming-speech-to-speech-moshi-hibiki"
   },
   "phases/06-speech-and-audio/16-anti-spoofing-audio-watermarking": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-16-anti-spoofing-audio-watermarking.mp4",
-    "bilibili": null,
+    "bilibili": "BV1bRLX6gEed",
     "slug": "06-16-anti-spoofing-audio-watermarking"
   },
   "phases/06-speech-and-audio/17-audio-evaluation-metrics": {
     "r2": "https://videos.aieng-zh.cn/lessons/06-17-audio-evaluation-metrics.mp4",
-    "bilibili": null,
+    "bilibili": "BV1bRLX6gEuQ",
     "slug": "06-17-audio-evaluation-metrics"
   },
   "phases/07-transformers-deep-dive/01-why-transformers": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-01-why-transformers.mp4",
-    "bilibili": null,
+    "bilibili": "BV1X2LX61E5i",
     "slug": "07-01-why-transformers"
   },
   "phases/07-transformers-deep-dive/02-self-attention-from-scratch": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-02-self-attention.mp4",
-    "bilibili": null,
+    "bilibili": "BV1e1LX6jEz2",
     "slug": "07-02-self-attention"
   },
   "phases/07-transformers-deep-dive/03-multi-head-attention": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-03-multi-head-attention.mp4",
-    "bilibili": null,
+    "bilibili": "BV191LX6jEJs",
     "slug": "07-03-multi-head-attention"
   },
   "phases/07-transformers-deep-dive/04-positional-encoding": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-04-positional-encoding.mp4",
-    "bilibili": null,
+    "bilibili": "BV1GSLX6yEDc",
     "slug": "07-04-positional-encoding"
   },
   "phases/07-transformers-deep-dive/05-full-transformer": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-05-full-transformer.mp4",
-    "bilibili": null,
+    "bilibili": "BV1aULX65EqZ",
     "slug": "07-05-full-transformer"
   },
   "phases/07-transformers-deep-dive/06-bert-masked-language-modeling": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-06-bert-masked-language-modeling.mp4",
-    "bilibili": null,
+    "bilibili": "BV1VULX6LERX",
     "slug": "07-06-bert-masked-language-modeling"
   },
   "phases/07-transformers-deep-dive/07-gpt-causal-language-modeling": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-07-gpt-causal-language-modeling.mp4",
-    "bilibili": null,
+    "bilibili": "BV1ujLX6TEYJ",
     "slug": "07-07-gpt-causal-language-modeling"
   },
   "phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-08-t5-bart-encoder-decoder.mp4",
-    "bilibili": null,
+    "bilibili": "BV1mjLX6KEjq",
     "slug": "07-08-t5-bart-encoder-decoder"
   },
   "phases/07-transformers-deep-dive/09-vision-transformers": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-09-vision-transformers.mp4",
-    "bilibili": null,
+    "bilibili": "BV1TjLX6TE43",
     "slug": "07-09-vision-transformers"
   },
   "phases/07-transformers-deep-dive/10-audio-transformers-whisper": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-10-audio-transformers-whisper.mp4",
-    "bilibili": null,
+    "bilibili": "BV1M5LX6BEHw",
     "slug": "07-10-audio-transformers-whisper"
   },
   "phases/07-transformers-deep-dive/11-mixture-of-experts": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-11-mixture-of-experts.mp4",
-    "bilibili": null,
+    "bilibili": "BV11JLX6PE86",
     "slug": "07-11-mixture-of-experts"
   },
   "phases/07-transformers-deep-dive/12-kv-cache-flash-attention": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-12-kv-cache-flash-attention.mp4",
-    "bilibili": null,
+    "bilibili": "BV1TJLX6NECa",
     "slug": "07-12-kv-cache-flash-attention"
   },
   "phases/07-transformers-deep-dive/13-scaling-laws": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-13-scaling-laws.mp4",
-    "bilibili": null,
+    "bilibili": "BV1TJLX6NEE5",
     "slug": "07-13-scaling-laws"
   },
   "phases/07-transformers-deep-dive/14-build-a-transformer-capstone": {
