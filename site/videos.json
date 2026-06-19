@@ -701,17 +701,17 @@
   },
   "phases/07-transformers-deep-dive/14-build-a-transformer-capstone": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-14-build-a-transformer-capstone.mp4",
-    "bilibili": null,
+    "bilibili": "BV1wgjz6oEhS",
     "slug": "07-14-build-a-transformer-capstone"
   },
   "phases/07-transformers-deep-dive/15-attention-variants": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-15-attention-variants.mp4",
-    "bilibili": null,
+    "bilibili": "BV19tjz65Eq9",
     "slug": "07-15-attention-variants"
   },
   "phases/07-transformers-deep-dive/16-speculative-decoding": {
     "r2": "https://videos.aieng-zh.cn/lessons/07-16-speculative-decoding.mp4",
-    "bilibili": null,
+    "bilibili": "BV1Ltjz6LEGk",
     "slug": "07-16-speculative-decoding"
   },
   "phases/08-generative-ai/01-generative-models-taxonomy-history": {
