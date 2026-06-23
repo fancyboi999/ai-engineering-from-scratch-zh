@@ -848,5 +848,125 @@
     "r2": "https://videos.aieng-zh.cn/lessons/09-12-rl-for-games.mp4",
     "bilibili": "BV1cwjy6BEaG",
     "slug": "09-12-rl-for-games"
+  },
+  "phases/10-llms-from-scratch/01-tokenizers": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-01-tokenizers.mp4",
+    "bilibili": null,
+    "slug": "10-01-tokenizers"
+  },
+  "phases/10-llms-from-scratch/02-building-a-tokenizer": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-02-building-a-tokenizer.mp4",
+    "bilibili": null,
+    "slug": "10-02-building-a-tokenizer"
+  },
+  "phases/10-llms-from-scratch/03-data-pipelines": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-03-data-pipelines.mp4",
+    "bilibili": null,
+    "slug": "10-03-data-pipelines"
+  },
+  "phases/10-llms-from-scratch/04-pre-training-mini-gpt": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-04-pre-training-mini-gpt.mp4",
+    "bilibili": null,
+    "slug": "10-04-pre-training-mini-gpt"
+  },
+  "phases/10-llms-from-scratch/05-scaling-distributed": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-05-scaling-distributed.mp4",
+    "bilibili": null,
+    "slug": "10-05-scaling-distributed"
+  },
+  "phases/10-llms-from-scratch/06-instruction-tuning-sft": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-06-instruction-tuning-sft.mp4",
+    "bilibili": null,
+    "slug": "10-06-instruction-tuning-sft"
+  },
+  "phases/10-llms-from-scratch/07-rlhf": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-07-rlhf.mp4",
+    "bilibili": null,
+    "slug": "10-07-rlhf"
+  },
+  "phases/10-llms-from-scratch/08-dpo": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-08-dpo.mp4",
+    "bilibili": null,
+    "slug": "10-08-dpo"
+  },
+  "phases/10-llms-from-scratch/09-constitutional-ai-self-improvement": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-09-constitutional-ai-self-improvement.mp4",
+    "bilibili": null,
+    "slug": "10-09-constitutional-ai-self-improvement"
+  },
+  "phases/10-llms-from-scratch/10-evaluation": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-10-evaluation.mp4",
+    "bilibili": null,
+    "slug": "10-10-evaluation"
+  },
+  "phases/10-llms-from-scratch/11-quantization": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-11-quantization.mp4",
+    "bilibili": null,
+    "slug": "10-11-quantization"
+  },
+  "phases/10-llms-from-scratch/12-inference-optimization": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-12-inference-optimization.mp4",
+    "bilibili": null,
+    "slug": "10-12-inference-optimization"
+  },
+  "phases/10-llms-from-scratch/13-building-complete-llm-pipeline": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-13-building-complete-llm-pipeline.mp4",
+    "bilibili": null,
+    "slug": "10-13-building-complete-llm-pipeline"
+  },
+  "phases/10-llms-from-scratch/14-open-models-architecture-walkthroughs": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-14-open-models-architecture-walkthroughs.mp4",
+    "bilibili": null,
+    "slug": "10-14-open-models-architecture-walkthroughs"
+  },
+  "phases/10-llms-from-scratch/15-speculative-decoding-eagle3": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-15-speculative-decoding-eagle3.mp4",
+    "bilibili": null,
+    "slug": "10-15-speculative-decoding-eagle3"
+  },
+  "phases/10-llms-from-scratch/16-differential-attention-v2": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-16-differential-attention-v2.mp4",
+    "bilibili": null,
+    "slug": "10-16-differential-attention-v2"
+  },
+  "phases/10-llms-from-scratch/17-native-sparse-attention": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-17-native-sparse-attention.mp4",
+    "bilibili": null,
+    "slug": "10-17-native-sparse-attention"
+  },
+  "phases/10-llms-from-scratch/18-multi-token-prediction": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-18-multi-token-prediction.mp4",
+    "bilibili": null,
+    "slug": "10-18-multi-token-prediction"
+  },
+  "phases/10-llms-from-scratch/19-dualpipe-parallelism": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-19-dualpipe-parallelism.mp4",
+    "bilibili": null,
+    "slug": "10-19-dualpipe-parallelism"
+  },
+  "phases/10-llms-from-scratch/20-deepseek-v3-walkthrough": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-20-deepseek-v3-walkthrough.mp4",
+    "bilibili": null,
+    "slug": "10-20-deepseek-v3-walkthrough"
+  },
+  "phases/10-llms-from-scratch/21-jamba-hybrid-ssm-transformer": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-21-jamba-hybrid-ssm-transformer.mp4",
+    "bilibili": null,
+    "slug": "10-21-jamba-hybrid-ssm-transformer"
+  },
+  "phases/10-llms-from-scratch/22-async-hogwild-inference": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-22-async-hogwild-inference.mp4",
+    "bilibili": null,
+    "slug": "10-22-async-hogwild-inference"
+  },
+  "phases/10-llms-from-scratch/25-speculative-decoding": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-25-speculative-decoding.mp4",
+    "bilibili": null,
+    "slug": "10-25-speculative-decoding"
+  },
+  "phases/10-llms-from-scratch/34-gradient-checkpointing": {
+    "r2": "https://videos.aieng-zh.cn/lessons/10-34-gradient-checkpointing.mp4",
+    "bilibili": null,
+    "slug": "10-34-gradient-checkpointing"
   }
 }
