@@ -6,46 +6,46 @@
       "stage": "pre",
       "question": "相比 Word2Vec，GloVe 贡献了什么？",
       "options": [
-        "用带权重的损失直接分解词-词共现矩阵",
+        "子词 n-gram 嵌入",
         "字节级分词",
         "更深的神经网络",
-        "子词 n-gram 嵌入"
+        "用带权重的损失直接分解词-词共现矩阵"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "GloVe 用经过精心加权的对数损失来分解全局共现矩阵。"
     },
     {
       "stage": "pre",
       "question": "FastText 解决了 Word2Vec 和 GloVe 没有解决的什么问题？",
       "options": [
-        "降低训练成本",
         "多语言迁移",
         "通过组合字符 n-gram 来为未见过的词生成向量",
-        "一词多义消歧"
+        "一词多义消歧",
+        "降低训练成本"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "FastText 从一个词的子词 n-gram 组合出词向量，因此 OOV（未登录）词仍能得到一个合理的向量。"
     },
     {
       "stage": "check",
       "question": "在 GloVe 中，加权函数 f(x) = (x/x_max)^alpha 起什么作用？",
       "options": [
-        "对极高频的词对降权，使其不会主导损失",
+        "把向量归一化为单位长度",
         "选择负样本",
-        "随机初始化权重",
-        "把向量归一化为单位长度"
+        "对极高频的词对降权，使其不会主导损失",
+        "随机初始化权重"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "加权防止像 (the, and) 这样无处不在的共现主导训练。"
     },
     {
       "stage": "check",
       "question": "BPE 的合并步骤如何挑选接下来要合并的词对？",
       "options": [
-        "一个随机的词对",
+        "IDF 最高的词对",
         "按字典序排在最前面的词对",
         "全语料中频率最高的相邻 token 对",
-        "IDF 最高的词对"
+        "一个随机的词对"
       ],
       "correct": 2,
       "explanation": "BPE 迭代地合并频率最高的相邻词对。"
@@ -54,24 +54,24 @@
       "stage": "check",
       "question": "为什么 GPT-2 使用字节级 BPE？",
       "options": [
-        "字节 BPE 跳过了合并训练",
-        "256 个字节的基础词汇表覆盖任意输入，彻底消除了未登录词",
+        "字节隐式保留大小写",
         "字节比字符训练更快",
-        "字节隐式保留大小写"
+        "字节 BPE 跳过了合并训练",
+        "256 个字节的基础词汇表覆盖任意输入，彻底消除了未登录词"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "从 256 个字节出发意味着任何 UTF-8 字符串都能被分词；不存在 OOV。"
     },
     {
       "stage": "post",
       "question": "在微调预训练 transformer 时，你应该用哪个 tokenizer？",
       "options": [
-        "永远用 SentencePiece",
         "与模型一同发布的那个确切 tokenizer；不匹配会破坏嵌入",
-        "词汇表最大的那个",
-        "永远用字节级 BPE"
+        "永远用字节级 BPE",
+        "永远用 SentencePiece",
+        "词汇表最大的那个"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "tokenizer 与模型不匹配会悄悄损坏输入；始终把配套发布的 tokenizer 与其模型搭配使用。"
     },
     {

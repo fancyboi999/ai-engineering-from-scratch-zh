@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "按本课所述，使移动端 LLM 推理慢于数据中心的核心约束是什么？",
       "options": [
-        "Wi-Fi 延迟",
-        "计算吞吐量",
         "内存带宽（移动 DRAM 为 50-90 GB/s，对比 HBM3 的 2-3 TB/s）",
-        "存储容量"
+        "计算吞吐量",
+        "存储容量",
+        "Wi-Fi 延迟"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么 Apple 的 Neural Engine 能避免 CPU-NPU 的拷贝开销？",
       "options": [
-        "它使用 PCIe 5.0",
+        "Apple Silicon 采用统一内存（unified memory）—— CPU 和 ANE 共享同一个内存池",
         "Core ML 禁用了 KV 缓存",
-        "它在拷贝前把权重转码为 FP4",
-        "Apple Silicon 采用统一内存（unified memory）—— CPU 和 ANE 共享同一个内存池"
+        "它使用 PCIe 5.0",
+        "它在拷贝前把权重转码为 FP4"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -31,11 +31,11 @@
       "question": "本课为浏览器中的 WebGPU + WebLLM 推荐哪种量化格式？",
       "options": [
         "NVFP4",
+        "GGUF Q4_K_M",
         "FP8",
-        "通过 mlc_llm convert_weight 编译的 Q4 MLC（q4f16_1）",
-        "GGUF Q4_K_M"
+        "通过 mlc_llm convert_weight 编译的 Q4 MLC（q4f16_1）"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -43,11 +43,11 @@
       "question": "本课报告 2026 年 WebGPU 在移动端的覆盖率大约是多少？",
       "options": [
         "在所有浏览器上达到 100%",
+        "约 70-75%，其中 Firefox Android 仍在追赶",
         "仅 iOS Safari",
-        "不到 10%",
-        "约 70-75%，其中 Firefox Android 仍在追赶"
+        "不到 10%"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -55,23 +55,23 @@
       "question": "为什么在一台典型手机上保持 128K 上下文不切实际？",
       "options": [
         "Tokenizer 在超过 8K 时会失败",
-        "模型权重加上 32K token 的 KV 缓存再加上操作系统开销，很容易超出 8 GB 内存预算",
         "WebGPU 将上下文上限设为 4K",
-        "iOS 禁止长上下文"
+        "iOS 禁止长上下文",
+        "模型权重加上 32K token 的 KV 缓存再加上操作系统开销，很容易超出 8 GB 内存预算"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么语音被强调为边缘推理的杀手级应用？",
       "options": [
-        "语音 agent 对延迟敏感（首 token < 500 ms），而本地推理能完全消除网络延迟",
-        "语音模型不需要 KV 缓存",
         "语音模型总能塞进 50 MB",
-        "语音只在 WebAssembly 中运行"
+        "语音只在 WebAssembly 中运行",
+        "语音模型不需要 KV 缓存",
+        "语音 agent 对延迟敏感（首 token < 500 ms），而本地推理能完全消除网络延迟"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     }
   ]

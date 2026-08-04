@@ -7,11 +7,11 @@
       "question": "知识图谱的原子单元是什么？",
       "options": [
         "一个词性标签",
-        "一个（主语，关系，宾语）三元组",
+        "一个句子",
         "一个 token",
-        "一个句子"
+        "一个（主语，关系，宾语）三元组"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "知识图谱以（s, r, o）三元组存储信息；聚合的三元组构成图谱。"
     },
     {
@@ -19,8 +19,8 @@
       "question": "在 2026 年的关系抽取中，AEVS 代表什么？",
       "options": [
         "Anchor-Extraction-Verification-Supplement（锚定-抽取-验证-补充）：锚定跨度，抽取三元组，对照源文验证，补充覆盖",
-        "Auto-Encoder Vector Search",
         "Async Entity Validation Service",
+        "Auto-Encoder Vector Search",
         "Aggregated Entity-Value Schema"
       ],
       "correct": 0,
@@ -31,9 +31,9 @@
       "question": "为什么每个三元组都必须携带来源出处（doc id + 跨度）？",
       "options": [
         "出处让你能审计三元组，并拒绝那些跨度与源文不匹配的幻觉",
-        "它加速抽取",
         "出处改变本体",
-        "SPARQL 要求出处"
+        "SPARQL 要求出处",
+        "它加速抽取"
       ],
       "correct": 0,
       "explanation": "出处使审计成为可能，是 AEVS 式幻觉检测的核心。"
@@ -42,24 +42,24 @@
       "stage": "check",
       "question": "关系的规范化（canonicalization）做什么？",
       "options": [
-        "把表面动词短语（例如 'was born in'、'is a native of'）映射到一个固定的属性 id，使图谱可查询",
-        "移除三元组",
         "添加嵌入",
-        "翻译文档"
+        "移除三元组",
+        "翻译文档",
+        "把表面动词短语（例如 'was born in'、'is a native of'）映射到一个固定的属性 id，使图谱可查询"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "规范化把各种同义改写归并为规范的知识图谱属性 id。"
     },
     {
       "stage": "check",
       "question": "为什么关系抽取通常需要先做共指消解？",
       "options": [
-        "像 'he founded Apple' 中的代词，必须在三元组抽取前消解为一个命名实体",
-        "共指添加嵌入",
         "共指提供位置",
-        "共指规范化大小写"
+        "像 'he founded Apple' 中的代词，必须在三元组抽取前消解为一个命名实体",
+        "共指规范化大小写",
+        "共指添加嵌入"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "没有共指，关系抽取会把关系挂到代词上，而非其背后的命名实体。"
     },
     {
@@ -68,22 +68,22 @@
       "options": [
         "跳过 NER",
         "随机采样三元组",
-        "仅嵌入的图谱",
-        "在并入知识图谱前，把 open-IE 关系映射到一个封闭本体（例如 Wikidata 属性）"
+        "在并入知识图谱前，把 open-IE 关系映射到一个封闭本体（例如 Wikidata 属性）",
+        "仅嵌入的图谱"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "封闭本体使图谱可查询；规范化步骤在下游能回本。"
     },
     {
       "stage": "post",
       "question": "为什么许多生产知识图谱使用时间限定符（起始/结束时间）？",
       "options": [
+        "许多关系是有时间界限的（雇主、配偶、职位）；限定符防止那些会过期的“永远为真”的论断",
         "更快的 SPARQL",
         "RDF 所要求",
-        "许多关系是有时间界限的（雇主、配偶、职位）；限定符防止那些会过期的“永远为真”的论断",
         "为了移除 NIL 实体"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "有时间界限的关系需要限定符（例如 Wikidata 的 P580/P582），否则事实会悄悄过期。"
     },
     {
@@ -91,11 +91,11 @@
       "question": "REBEL 是什么？",
       "options": [
         "一个向量数据库",
+        "一个共指模型",
         "一个 seq2seq 关系抽取器，输出的三元组已经采用 Wikidata 属性 id",
-        "一个 tokenizer",
-        "一个共指模型"
+        "一个 tokenizer"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "REBEL（Babelscape）是一个在远程监督的 Wikidata 三元组上训练的 seq2seq 关系抽取模型。"
     }
   ]

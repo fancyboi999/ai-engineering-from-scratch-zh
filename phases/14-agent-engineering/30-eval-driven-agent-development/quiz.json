@@ -20,8 +20,8 @@
       "options": [
         "从多 agent 辩论开始",
         "从简单的 prompt 开始，用全面的评估来优化它们，只在需要时再加入多步 agent 系统",
-        "从层级式编排开始",
-        "只从一个前沿模型开始"
+        "只从一个前沿模型开始",
+        "从层级式编排开始"
       ],
       "correct": 1,
       "explanation": "Anthropic 明确说评估是驱动其他每个选择的外层循环。"
@@ -32,8 +32,8 @@
       "options": [
         "训练、评估、部署",
         "提议者生成输出，评估器评判，refine 直到评估器通过（Self-Refine 的泛化）",
-        "Sample、sort、deduplicate",
-        "Cache、retry、fail"
+        "Cache、retry、fail",
+        "Sample、sort、deduplicate"
       ],
       "correct": 1,
       "explanation": "它是 Self-Refine 的泛化：任何流程都可以包装成「提议-评判-refine」。"
@@ -42,24 +42,24 @@
       "stage": "check",
       "question": "关于评估应放在哪里，2026 年的最佳实践是什么？",
       "options": [
+        "完全由 QA 团队拥有",
         "只在一个单独的厂商仪表盘里",
         "放在代码旁边，在每个 PR 的 CI 中运行，用评估分数把控合并",
-        "只每季度运行一次",
-        "完全由 QA 团队拥有"
+        "只每季度运行一次"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "与代码同处、CI 把控、回归追踪是标准做法。"
     },
     {
       "stage": "check",
       "question": "为什么本课告诫不要使用无接地的 LLM 评判者？",
       "options": [
-        "它太慢",
         "评判者也会产生幻觉；与 CRITIC 模式配对，使评判基于外部工具接地",
+        "它只在 GPU 上有效",
         "它违反 Apache 2.0",
-        "它只在 GPU 上有效"
+        "它太慢"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "CRITIC（第 5 课）适用：基于工具的核实让评判者保持诚实。"
     },
     {
@@ -78,12 +78,12 @@
       "stage": "post",
       "question": "为什么不稳定的评估（flaky evals）会造成问题？",
       "options": [
-        "它们使推理成本翻倍",
-        "非确定性用例会产生误报；固定种子并对状态做快照",
         "它们无法连到数据库",
-        "它们超出上下文窗口"
+        "它们超出上下文窗口",
+        "非确定性用例会产生误报；固定种子并对状态做快照",
+        "它们使推理成本翻倍"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "不稳定让回归无法读懂；需要确定性（种子、状态快照）。"
     }
   ]

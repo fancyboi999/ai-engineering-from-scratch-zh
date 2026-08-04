@@ -6,48 +6,48 @@
       "stage": "pre",
       "question": "为什么评估器用配对 t 检验而不是直接比较两个单一数值？",
       "options": [
-        "因为 numpy 要求配对数组",
-        "因为按相同种子配对可以消除随机初始化噪声，隔离出配置变更带来的差异",
         "因为 runner 无法输出单个数值",
-        "因为 IRB 总是要求 t 检验"
+        "因为 IRB 总是要求 t 检验",
+        "因为 numpy 要求配对数组",
+        "因为按相同种子配对可以消除随机初始化噪声，隔离出配置变更带来的差异"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "按种子配对消除了随机初始化的影响。剩余的差异可以归因于配置变更，这正是检验要测量的。"
     },
     {
       "stage": "pre",
       "question": "为什么评估器给每个指标都带一个 direction 字段？",
       "options": [
-        "因为 accuracy 和 loss 方向相反；改进的正负号取决于被比较指标的哪个方向更好",
         "因为 runner 要求它",
         "因为 numpy 计算方差需要方向",
+        "因为 accuracy 和 loss 方向相反；改进的正负号取决于被比较指标的哪个方向更好",
         "因为解析器期望有这个字段"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "越高越好的指标上升才是改进；越低越好的指标下降才是改进。direction 字段告诉改进函数应用哪种符号约定。"
     },
     {
       "stage": "check",
       "question": "当改进幅度的绝对值低于阈值、即使 p 值是显著的，判定路径返回什么？",
       "options": [
-        "improved",
-        "regressed",
         "noise",
-        "failed"
+        "regressed",
+        "failed",
+        "improved"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "统计上显著但太小而不值得行动的变化，在循环看来仍然是噪声。阈值门先于显著性门检查。"
     },
     {
       "stage": "check",
       "question": "为什么评估器在计算改进前要对 log 尺度指标做变换？",
       "options": [
-        "因为 numpy 的 log 运算更快",
-        "因为 perplexity 等指标随 loss 呈指数增长；变换到 log 空间后，百分之二这样的阈值在线性和 log 指标之间才有可比性",
         "因为 p 值依赖于它",
-        "因为 runner 只输出 log 尺度指标"
+        "因为 runner 只输出 log 尺度指标",
+        "因为 perplexity 等指标随 loss 呈指数增长；变换到 log 空间后，百分之二这样的阈值在线性和 log 指标之间才有可比性",
+        "因为 numpy 的 log 运算更快"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Perplexity 是 exp(loss)。一个很小的 loss 变化对应很大的 perplexity 变化。取 log 让相对改进在同一个阈值下与线性指标可比。"
     },
     {
@@ -66,12 +66,12 @@
       "stage": "check",
       "question": "如果哪怕一个候选结果的终态标签不是 ok，会怎样？",
       "options": [
-        "评估器丢弃该种子然后继续",
-        "评估器返回 failed 判定，并在理由中记录有问题的终态",
         "评估器重新运行",
-        "评估器退回到单侧检验"
+        "评估器退回到单侧检验",
+        "评估器返回 failed 判定，并在理由中记录有问题的终态",
+        "评估器丢弃该种子然后继续"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "失败的运行使整个候选集无效。评估器在判定路径中短路，返回 failed 并列出有问题的终态，这样编排器就不会从一次崩溃的运行中得出结论。"
     }
   ]

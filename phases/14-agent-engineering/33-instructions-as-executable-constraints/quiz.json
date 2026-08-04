@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "愿景性规则（aspirational rule）和操作性规则（operational rule）之间的区别是什么？",
       "options": [
-        "愿景性规则收费；操作性规则免费",
         "愿景性规则没有检查（「小心点」）；操作性规则携带一个工作台可运行的机器可校验函数",
         "操作性规则更长",
+        "愿景性规则收费；操作性规则免费",
         "愿景性规则需要一个经理"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "操作性规则是可测试的；愿景性规则只是愿望。"
     },
     {
       "stage": "pre",
       "question": "本课用哪五个类别覆盖了大多数规则？",
       "options": [
-        "启动、禁止、完成定义、不确定性、审批",
+        "低、中、高、严重、致命",
         "Read、write、exec、fork、exit",
-        "Plan、act、reflect、refine、ship",
-        "低、中、高、严重、致命"
+        "启动、禁止、完成定义、不确定性、审批",
+        "Plan、act、reflect、refine、ship"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "启动、禁止、完成定义（definition of done）、不确定性处理、审批边界是这五类。"
     },
     {
@@ -31,9 +31,9 @@
       "question": "哪个严重级标签会停止执行并要求操作员覆盖（override）？",
       "options": [
         "info",
-        "warn",
+        "soft",
         "block",
-        "soft"
+        "warn"
       ],
       "correct": 2,
       "explanation": "block 是硬失败；warn 是标注；info 是报告。"
@@ -42,10 +42,10 @@
       "stage": "check",
       "question": "为什么本课建议在写入时就标注严重级？",
       "options": [
-        "它在 markdown 里更好看",
-        "团队早期会高估严重级，并在截止压力下削弱它；在前面就写好严重级能强制完成校准",
         "linter 要求它",
-        "它省 token"
+        "团队早期会高估严重级，并在截止压力下削弱它；在前面就写好严重级能强制完成校准",
+        "它省 token",
+        "它在 markdown 里更好看"
       ],
       "correct": 1,
       "explanation": "严重级校准必须是有意为之的，而不是在压力下事后补的。"
@@ -55,35 +55,35 @@
       "question": "「markdown 为源、JSON 为缓存」的模式做什么？",
       "options": [
         "替换 markdown",
-        "agent-rules.md 是编写的文件；agent-rules.lock.json 是由 pre-commit hook 重新生成的热路径缓存（与 package.json + lock 形态相同）",
         "加密规则",
+        "agent-rules.md 是编写的文件；agent-rules.lock.json 是由 pre-commit hook 重新生成的热路径缓存（与 package.json + lock 形态相同）",
         "禁用审查"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "markdown 保持可审查；JSON 解析留在热路径之外。"
     },
     {
       "stage": "post",
       "question": "规则过期（rule expiry）作为一种强制机制是什么？",
       "options": [
+        "规则自动过期；无需审查",
         "超过 24 小时的规则会 fail closed",
         "每条规则携带一个 expires_at（默认 90 天）；从未触发的规则会触发一次季度审查，要为它辩护、削弱或删除",
-        "缓存满时规则过期",
-        "规则自动过期；无需审查"
+        "缓存满时规则过期"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Cloudflare 的数据显示带过期的规则集保持在 30 条以下；不带过期的则增长到 80+ 条未使用规则。"
     },
     {
       "stage": "post",
       "question": "规则与框架护栏（guardrails）有什么关系？",
       "options": [
-        "规则替换护栏",
-        "护栏在运行时强制执行规则；规则集是这些护栏所实现的、人类可读的契约",
+        "两者只需其一",
         "护栏是规则的替代品",
-        "两者只需其一"
+        "护栏在运行时强制执行规则；规则集是这些护栏所实现的、人类可读的契约",
+        "规则替换护栏"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "两者都需要：运行时捕获违规；规则集证明运行时在做正确的事。"
     }
   ]

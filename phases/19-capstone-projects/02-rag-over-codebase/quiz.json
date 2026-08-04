@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "为什么对原始 chunk 做朴素的余弦搜索不足以胜任跨仓库代码检索？",
       "options": [
-        "它会因生成代码、monorepo 重复和很少被导入的符号而污染结果",
-        "余弦相似度在代码嵌入上没有定义",
         "向量索引无法存储超过 1KB 的载荷",
-        "嵌入模型看不到代码作为 token"
+        "嵌入模型看不到代码作为 token",
+        "它会因生成代码、monorepo 重复和很少被导入的符号而污染结果",
+        "余弦相似度在代码嵌入上没有定义"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -20,34 +20,34 @@
       "options": [
         "在存储前用 gzip 压缩 chunk",
         "在嵌入前丢弃注释和空白",
-        "在 tree-sitter 节点边界处切分，例如函数和类的范围",
-        "把代码切成固定的 256-token 窗口"
+        "把代码切成固定的 256-token 窗口",
+        "在 tree-sitter 节点边界处切分，例如函数和类的范围"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在这条流水线中，每个 chunk 获得哪三种可检索模态？",
       "options": [
-        "Token ID、语法树和调用图",
+        "稠密嵌入、BM25 词项和一段自然语言摘要",
         "AST、IR 和字节码",
-        "原始文本、gzip 和哈希",
-        "稠密嵌入、BM25 词项和一段自然语言摘要"
+        "Token ID、语法树和调用图",
+        "原始文本、gzip 和哈希"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在混合检索步骤之后，cross-encoder 重排器的作用是什么？",
       "options": [
-        "它重写 chunk 以移除生成代码",
-        "它用不同的模型重新嵌入查询",
         "它在发送给综合器之前压缩 chunk",
-        "它把每个「查询-候选」对放在一起打分，从而获得比仅用余弦更高的准确率"
+        "它把每个「查询-候选」对放在一起打分，从而获得比仅用余弦更高的准确率",
+        "它重写 chunk 以移除生成代码",
+        "它用不同的模型重新嵌入查询"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "为了在 50 个文件的推送上把增量重建索引控制在 60 秒以内，需要什么？",
       "options": [
-        "只重新嵌入文本发生变化的 chunk，并重算受影响的符号边",
         "在每次提交时重新嵌入完整的 200 万行代码语料",
+        "丢掉 BM25 索引并从头重建",
         "完全丢弃符号图",
-        "丢掉 BM25 索引并从头重建"
+        "只重新嵌入文本发生变化的 chunk，并重算受影响的符号边"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "哪个指标衡量检索到的论断是否可在源代码中得到验证？",
       "options": [
-        "MRR@10",
         "引用忠实性（citation faithfulness）",
-        "nDCG@10",
-        "p95 查询延迟"
+        "p95 查询延迟",
+        "MRR@10",
+        "nDCG@10"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

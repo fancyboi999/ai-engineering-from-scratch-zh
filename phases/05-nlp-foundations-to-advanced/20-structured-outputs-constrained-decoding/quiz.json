@@ -7,23 +7,23 @@
       "question": "为什么仅靠 prompt 让模型“返回 JSON”对生产环境不够？",
       "options": [
         "JSON 太冗长",
+        "prompt 无法描述 schema",
         "prompt 太长",
-        "前沿模型大多数时候会遵从但并非总是；那一小部分格式错误的输出会破坏下游解析器",
-        "prompt 无法描述 schema"
+        "前沿模型大多数时候会遵从但并非总是；那一小部分格式错误的输出会破坏下游解析器"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "仅靠 prompt 约束在前沿模型上约 80% 的时候有效；生产需要更硬的保证。"
     },
     {
       "stage": "pre",
       "question": "受约束解码在每个生成步修改什么？",
       "options": [
-        "KV cache",
-        "tokenizer",
+        "logit 向量，屏蔽掉会使目标语法失效的 token，使得只能采样合法的后续 token",
         "训练损失",
-        "logit 向量，屏蔽掉会使目标语法失效的 token，使得只能采样合法的后续 token"
+        "tokenizer",
+        "KV cache"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "一个 logit 处理器把非法 token 设为 -inf，使 softmax 无法采样它们。"
     },
     {
@@ -32,8 +32,8 @@
       "options": [
         "模型更小",
         "强制的脚手架 token（例如 '{\"name\": \"'）可以直接发出而无需采样，且合法 token 的搜索空间缩小",
-        "它完全避免了 softmax",
-        "它跳过反向传播"
+        "它跳过反向传播",
+        "它完全避免了 softmax"
       ],
       "correct": 1,
       "explanation": "已确定的 token 跳过采样，缩小的合法 token 集降低了解码成本。"
@@ -42,10 +42,10 @@
       "stage": "check",
       "question": "哪种 schema 设计选择能防止模型过早做出认定？",
       "options": [
-        "把 'answer' 放在最前面",
+        "使用 snake_case",
         "使用更短的键名",
         "把推理字段放在答案/决策字段之前，让模型先思考再认定",
-        "使用 snake_case"
+        "把 'answer' 放在最前面"
       ],
       "correct": 2,
       "explanation": "字段顺序即逻辑：把推理放在前面，让模型在锁定答案之前先思考。"
@@ -54,10 +54,10 @@
       "stage": "check",
       "question": "像 Outlines 这样基于有限状态机（FSM）的受约束解码工具有什么局限？",
       "options": [
+        "它们只支持枚举",
         "它们不是确定性的",
-        "它们把你锁定到 OpenAI",
         "递归 schema 必须被展平；真正递归的结构需要基于 CFG 的引擎，如 XGrammar",
-        "它们只支持枚举"
+        "它们把你锁定到 OpenAI"
       ],
       "correct": 2,
       "explanation": "FSM 无法表示无界递归；CFG 引擎能处理它。"
@@ -67,9 +67,9 @@
       "question": "为什么说 Instructor 不修改 logit？",
       "options": [
         "Instructor 把 schema 格式化进 prompt 并对输出做解析/重试；logit 屏蔽发生在服务端或根本不发生",
-        "它使用梯度更新",
         "Anthropic 所要求",
-        "它编辑 prompt"
+        "它编辑 prompt",
+        "它使用梯度更新"
       ],
       "correct": 0,
       "explanation": "Instructor 使用提供方侧的结构化输出加上客户端校验和重试，而非 logit 屏蔽。"
@@ -78,10 +78,10 @@
       "stage": "post",
       "question": "像 date='YYYY-MM-DD' 这样严格的正则会引入什么问题？",
       "options": [
-        "它需要 CFG 支持",
+        "正则很慢",
         "它移除了未知值的任何退路，于是模型会捏造一个日期，而非返回 null/哨兵值",
         "它破坏 JSON 解析",
-        "正则很慢"
+        "它需要 CFG 支持"
       ],
       "correct": 1,
       "explanation": "过严的语法迫使模型臆造值；对未知值始终允许 null/哨兵值。"
@@ -91,11 +91,11 @@
       "question": "什么时候应该选用 vLLM 引导解码而非厂商的结构化输出 API？",
       "options": [
         "总是用厂商",
-        "仅对极小的 schema",
         "仅配合字节级 BPE",
-        "自托管推理，你掌控模型并希望在不重试的情况下获得 logit 级别的保证"
+        "自托管推理，你掌控模型并希望在不重试的情况下获得 logit 级别的保证",
+        "仅对极小的 schema"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "vLLM 引导解码适合带 logit 级约束的自托管服务；厂商 API 会把你锁定到其技术栈。"
     }
   ]

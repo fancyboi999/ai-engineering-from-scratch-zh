@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "对于一条 prompt，detector 返回的是什么？",
       "options": [
-        "只返回一个布尔的拦截决策",
+        "模型完整的 system prompt",
         "返回 rulebase 里的全部规则列表",
         "一个分类，外加一个落在 [0, 1] 区间的置信度",
-        "模型完整的 system prompt"
+        "只返回一个布尔的拦截决策"
       ],
       "correct": 2,
       "explanation": ""
@@ -19,35 +19,35 @@
       "question": "为什么 normalize 要在 substring 和 regex 规则之前先跑？",
       "options": [
         "因为 regex 比 substring 慢",
+        "因为标准库禁止在原始文本上跑规则",
         "因为 normalize 能减小磁盘上的文件体积",
-        "因为 normalize 会把 base64、rot13、zero-width 插入这类隐藏 token 暴露出来，交给下游规则处理",
-        "因为标准库禁止在原始文本上跑规则"
+        "因为 normalize 会把 base64、rot13、zero-width 插入这类隐藏 token 暴露出来，交给下游规则处理"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "对于分类 C，true positives = 6，false positives = 2，precision 是多少？",
       "options": [
+        "0.86",
         "0.50",
         "0.60",
-        "0.75",
-        "0.86"
+        "0.75"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么 benign prompt 语料也是评估的一部分？",
       "options": [
-        "为了把准确率数字做得好看一点",
-        "为了在安全文本上测出 false-positive 率，抓出那些过于宽泛的规则",
         "为了预训练这些规则",
-        "为了算出攻击上的 recall"
+        "为了算出攻击上的 recall",
+        "为了把准确率数字做得好看一点",
+        "为了在安全文本上测出 false-positive 率，抓出那些过于宽泛的规则"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -55,8 +55,8 @@
       "question": "当没有任何规则命中时，analyze 方法会怎么做？",
       "options": [
         "返回分类 benign，置信度为 0.0",
-        "抛出异常",
         "返回最近一次尝试的那条规则的分类",
+        "抛出异常",
         "返回一个随机分类"
       ],
       "correct": 0,
@@ -67,11 +67,11 @@
       "question": "为什么本课主张 detector 并不等于 safety gate？",
       "options": [
         "因为 detector 是用 Python 实现的",
+        "因为这些规则是以数据形式存储的",
         "因为 detector 只是 gate 将要组合的众多信号之一，而每个信号在 precision 和 recall 之间的取舍各不相同",
-        "因为 detector 跑得太快，没什么用",
-        "因为这些规则是以数据形式存储的"
+        "因为 detector 跑得太快，没什么用"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     }
   ]

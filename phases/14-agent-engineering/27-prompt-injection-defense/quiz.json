@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "什么是间接 prompt 注入（indirect prompt injection）？",
       "options": [
+        "模型误点击",
         "用户直接输入「忽略所有规则」",
         "嵌入在 agent 检索到的数据（页面、PDF、邮件、记忆笔记）中的指令，在摄入时覆盖开发者 prompt",
-        "模型误点击",
         "system prompt 里的一个笔误"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Greshake 等人提出了间接 prompt 注入：攻击者可控的被检索内容携带指令。"
     },
     {
       "stage": "pre",
       "question": "本课说处理被检索来的 prompt 等同于什么？",
       "options": [
-        "言论自由",
-        "在 agent 的工具使用面上执行任意代码",
+        "一次纯函数调用",
         "一次静态分析",
-        "一次纯函数调用"
+        "言论自由",
+        "在 agent 的工具使用面上执行任意代码"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Greshake 的框架：被检索来的指令能触达 agent 有权访问的任何工具。"
     },
     {
@@ -31,47 +31,47 @@
       "question": "下列哪一个不是被演示的五种利用类别之一？",
       "options": [
         "数据窃取（Data theft）",
-        "蠕虫传播（Worming）",
+        "缓存失效（Cache invalidation）",
         "持久记忆投毒（Persistent memory poisoning）",
-        "缓存失效（Cache invalidation）"
+        "蠕虫传播（Worming）"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": "这五种是数据窃取、蠕虫传播、持久记忆投毒、生态污染、任意工具使用。"
     },
     {
       "stage": "check",
       "question": "PVE 代表什么？",
       "options": [
-        "Prompt-Validator-Executor：在昂贵的主模型提交之前，对每次工具调用运行一个廉价快速的校验器",
         "Provider-Verifier-Encoder",
-        "Plan-Verify-Execute，一种 HTN 方言",
-        "Pre-Vectorize-Embed"
+        "Prompt-Validator-Executor：在昂贵的主模型提交之前，对每次工具调用运行一个廉价快速的校验器",
+        "Pre-Vectorize-Embed",
+        "Plan-Verify-Execute，一种 HTN 方言"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "PVE 在主模型提交之前，用一个廉价校验器包裹每次工具调用。"
     },
     {
       "stage": "check",
       "question": "为什么「system prompt 说要忽略不可信指令」是不够的？",
       "options": [
+        "它被加密了",
         "它太短",
-        "那是指令遵循，不是强制执行；模型仍可能被足够有说服力的注入内容覆盖",
         "提供商会剥离它",
-        "它被加密了"
+        "那是指令遵循，不是强制执行；模型仍可能被足够有说服力的注入内容覆盖"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "真正的防御需要来源标记、允许列表、每步安全和 PVE 式校验，而不只是 prompt。"
     },
     {
       "stage": "post",
       "question": "什么是对被检索记忆的过度信任（overtrust of retrieved memory）？",
       "options": [
-        "缓存太激进",
         "昨天的 agent 写了一条被投毒的记忆笔记；今天的 agent 读到它并重新执行了那个注入",
+        "缓存太激进",
         "加载了错误的模型",
         "忘了清理索引"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "持久记忆投毒意味着：如果记忆被当作可信，注入就会跨会话存活。"
     },
     {
@@ -80,8 +80,8 @@
       "options": [
         "一个加密密钥",
         "一个来源标记：user_message vs tool_output vs retrieved；校验器拒绝被检索内容中的指令",
-        "只一个时间戳",
-        "一个 token 计数"
+        "一个 token 计数",
+        "只一个时间戳"
       ],
       "correct": 1,
       "explanation": "来源标记（provenance tagging）让校验器按内容的信任级别来对待它。"

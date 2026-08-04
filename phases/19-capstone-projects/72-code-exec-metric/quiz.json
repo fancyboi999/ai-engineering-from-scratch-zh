@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "为什么 runner 要为每个候选起一个全新的 Python 子进程，而不是内联调用 exec？",
       "options": [
-        "它比 exec 更快",
         "它避免污染 builtins",
+        "exec 在现代 Python 里已经废弃了",
         "它把超时、输出溢出和危险的 import 与宿主 eval 进程隔离开",
-        "exec 在现代 Python 里已经废弃了"
+        "它比 exec 更快"
       ],
       "correct": 2,
       "explanation": "候选代码里的死循环或失控的内存分配只会拖垮子进程。宿主 eval 仍然能继续推进。"
@@ -18,46 +18,46 @@
       "stage": "pre",
       "question": "一个任务有三条断言，两条通过、一条失败，分数是多少？",
       "options": [
-        "1.0",
-        "0.667",
+        "0.5",
         "0.0",
-        "0.5"
+        "0.667",
+        "1.0"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "分数等于通过数除以总数。三分之二是 0.667。退出码为 assertion_fail。"
     },
     {
       "stage": "check",
       "question": "当候选代码无法解析时，runner 返回哪个退出码？",
       "options": [
-        "error",
         "assertion_fail",
         "timeout",
-        "syntax_error"
+        "syntax_error",
+        "error"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "compile() 在 runner 内部抛出 SyntaxError，内层脚本捕获它并写入 exit_code=syntax_error。"
     },
     {
       "stage": "check",
       "question": "为什么挂钟超时（wall-clock timeout）才是真正承重的控制手段，而不是 import 黑名单？",
       "options": [
-        "Python 里没法禁掉 import",
         "大多数失败都是死循环，而且铁了心的攻击者能绕过任何进程内黑名单",
         "subprocess.run 不支持黑名单",
-        "挂钟在编译时就检查了"
+        "挂钟在编译时就检查了",
+        "Python 里没法禁掉 import"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "黑名单只能拦住偷懒的代码，超时才能拦死循环。黑名单是兜底，超时才是底线。"
     },
     {
       "stage": "check",
       "question": "当 n - c < k 时，pass_at_k(n, c, k) 返回什么？",
       "options": [
-        "零，因为这个采样没有定义",
+        "抛出 ValueError",
         "一，因为采样里必然至少包含一个通过的解",
-        "c / n，经验通过率",
-        "抛出 ValueError"
+        "零，因为这个采样没有定义",
+        "c / n，经验通过率"
       ],
       "correct": 1,
       "explanation": "如果失败数比采样规模还少，那么任何大小为 k 的采样都必然至少含一个通过项，所以概率为 1。"
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "runner 如何暴露输出溢出，又为什么上限是 256 KB？",
       "options": [
-        "子进程的 stdout 是流式读取的；一旦累计运行量越过 256 KB，子进程就被杀掉，任务记为 exit_code=error，detail 为「output overflow」",
+        "分数值，用两位小数的百分比表示",
         "只看 stderr；大小与操作系统管道默认值一致",
-        "候选源码大小，设上限好让生成代码保持精简",
-        "分数值，用两位小数的百分比表示"
+        "子进程的 stdout 是流式读取的；一旦累计运行量越过 256 KB，子进程就被杀掉，任务记为 exit_code=error，detail 为「output overflow」",
+        "候选源码大小，设上限好让生成代码保持精简"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "这个上限是为了保护宿主。狂刷 stdout 的候选代码会被中途杀掉；runner 把结果归一化为 exit_code=error、detail 为「output overflow」，而不是新造一个退出码。"
     }
   ]

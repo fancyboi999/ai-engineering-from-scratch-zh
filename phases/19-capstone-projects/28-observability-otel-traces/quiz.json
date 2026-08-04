@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "在阅读本课之前：按照 OTel GenAI 属性规范来写驱动层的 span，实际好处是什么？",
       "options": [
-        "OTel span 在磁盘上压缩率更高。",
+        "HIPAA 合规要求。",
         "所有兼容 OTel 的后端都能直接读取，不需要自定义解析器。",
-        "OTel 是 Python 专属标准，所以驱动层能获得类型提示。",
-        "HIPAA 合规要求。"
+        "OTel span 在磁盘上压缩率更高。",
+        "OTel 是 Python 专属标准，所以驱动层能获得类型提示。"
       ],
       "correct": 1,
       "explanation": "这些约定是与更广泛生态的契约。Honeycomb、Grafana Tempo、Jaeger 和 Datadog 都能开箱即用地解析 gen_ai.* 属性。"
@@ -18,12 +18,12 @@
       "stage": "check",
       "question": "在 SpanBuilder.span() 上下文中抛出异常时，本课的 builder 会记录什么？",
       "options": [
-        "该 span 被丢弃以避免污染 trace。",
-        "status=ERROR，status_message 包含异常类型和消息，并追加一个 'exception' event。",
         "status 保持 UNSET，异常被静默吞掉。",
-        "该 span 被重命名为 'error'。"
+        "该 span 被重命名为 'error'。",
+        "该 span 被丢弃以避免污染 trace。",
+        "status=ERROR，status_message 包含异常类型和消息，并追加一个 'exception' event。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "status ERROR 加 exception event 符合 OTel 规范。异常被重新抛出，调用方代码可以做相应处理。"
     },
     {
@@ -31,8 +31,8 @@
       "question": "Prometheus 直方图的导出包含 _bucket、_sum 和 _count 行。为什么 bucket 计数是累积的（每个 le bucket 包含所有更小的 bucket）？",
       "options": [
         "累积计数让采集器通过减法就能算出每个 bucket 的计数，无需存储所有观测值。",
-        "累积计数是 Grafana 唯一支持的格式。",
         "它们不是累积的；本课的导出是非标准的。",
+        "累积计数是 Grafana 唯一支持的格式。",
         "累积计数减少浮点误差。"
       ],
       "correct": 0,
@@ -55,21 +55,21 @@
       "question": "你想查询「read_file 调用的 p95 延迟」。应该查哪个产物？",
       "options": [
         "traces.jsonl 中每个 span 的 duration_ms，用脚本解析。",
-        "通过一个时间窗口采集的 Prometheus 直方图 tool_latency_ms{tool=\"read_file\"}。",
         "计数器 tools_called_total 除以时间窗口。",
-        "span 的 status_message 字段。"
+        "span 的 status_message 字段。",
+        "通过一个时间窗口采集的 Prometheus 直方图 tool_latency_ms{tool=\"read_file\"}。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "直方图才是算百分位的正确工具。计数器只计数；trace 包含原始 span 但没有预聚合。"
     },
     {
       "stage": "post",
       "question": "审阅者问为什么本课手写实现而不是直接导入 opentelemetry-sdk。正确答案是？",
       "options": [
-        "SDK 不支持 GenAI 约定。",
-        "手写是为了教线路格式；后续可以换入 SDK 并沿用相同的属性 key。",
         "手写在运行时更快。",
-        "SDK 在 import 时就需要网络连接。"
+        "手写是为了教线路格式；后续可以换入 SDK 并沿用相同的属性 key。",
+        "SDK 在 import 时就需要网络连接。",
+        "SDK 不支持 GenAI 约定。"
       ],
       "correct": 1,
       "explanation": "约定在不同实现间保持稳定。手写版本是为了清晰度；生产环境接入 SDK 并复用同样的 gen_ai.* key。"

@@ -6,72 +6,72 @@
       "stage": "pre",
       "question": "经典的静态批处理在处理长度不一的请求时，主要问题是什么？",
       "options": [
-        "它只能用于 FP4",
+        "为了对齐最长的 prompt 和最长的输出而进行填充（padding）会浪费显存，并让整个批次卡在最慢的那条序列上",
         "它要求每对 GPU 之间都有 NVLink",
         "它根本无法使用 GPU",
-        "为了对齐最长的 prompt 和最长的输出而进行填充（padding）会浪费显存，并让整个批次卡在最慢的那条序列上"
+        "它只能用于 FP4"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "PagedAttention 是如何把 KV 缓存碎片化从 60-80% 降到 4% 以下的？",
       "options": [
+        "通过把完整 prompt 保存在 CPU 内存中",
         "通过完全禁用 KV 缓存",
         "通过把权重压缩到 INT4",
-        "通过以固定大小的块（默认 16 个 token）分配 KV 缓存，并经由每条序列的块表（block table）来引用",
-        "通过把完整 prompt 保存在 CPU 内存中"
+        "通过以固定大小的块（默认 16 个 token）分配 KV 缓存，并经由每条序列的块表（block table）来引用"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在 vLLM 的 V1 调度器中，定义连续批处理（continuous batching）的不变量是什么？",
       "options": [
+        "调度器每个 decode 迭代运行一次，把已完成的序列移出、把等待中的序列移入",
         "调度器每个请求只运行一次，批次永不改变",
-        "每个请求获得自己专属的 GPU stream",
         "调度器等待 10 ms 的窗口来凑满一个批次后再运行",
-        "调度器每个 decode 迭代运行一次，把已完成的序列移出、把等待中的序列移入"
+        "每个请求获得自己专属的 GPU stream"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在混合负载下，分块预填充（chunked prefill）主要保护的是哪个延迟指标？",
       "options": [
-        "平均吞吐量",
-        "冷启动时间",
+        "P99 token 间延迟（ITL）",
         "网络 RTT",
-        "P99 token 间延迟（ITL）"
+        "平均吞吐量",
+        "冷启动时间"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "在 vLLM v0.18.0 中，哪种推测解码（speculative decoding）变体仍与 --enable-chunked-prefill 兼容？",
       "options": [
+        "没有任何推测解码兼容",
         "仅 EAGLE-1",
         "V1 调度器中的 N-gram GPU 推测解码",
-        "没有任何推测解码兼容",
         "draft 模型推测解码"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么分块预填充本身并不能提升平均吞吐量？",
       "options": [
-        "它运行在与 decode 不同的 GPU 上",
         "它底层使用了推测解码",
-        "它对权重进行了更激进的压缩",
-        "它只是减少了 decode 阶段的抖动；实践中的吞吐收益来自在长 prefill 期间让 decode 序列保持存活，而非改变实际完成的工作量"
+        "它运行在与 decode 不同的 GPU 上",
+        "它只是减少了 decode 阶段的抖动；实践中的吞吐收益来自在长 prefill 期间让 decode 序列保持存活，而非改变实际完成的工作量",
+        "它对权重进行了更激进的压缩"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     }
   ]

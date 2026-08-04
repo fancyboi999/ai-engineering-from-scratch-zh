@@ -6,21 +6,21 @@
       "stage": "pre",
       "question": "CrewAI 的四个原语是什么？",
       "options": [
-        "Agent、Task、Crew、Process",
         "Node、Edge、Reducer、Checkpointer",
-        "Actor、Message、Inbox、Runtime",
-        "Tool、Prompt、Model、Memory"
+        "Tool、Prompt、Model、Memory",
+        "Agent、Task、Crew、Process",
+        "Actor、Message、Inbox、Runtime"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Agent、Task、Crew 和 Process 是这四个原语。"
     },
     {
       "stage": "pre",
       "question": "按 CrewAI 文档，推荐的生产起点是什么？",
       "options": [
-        "Crew",
-        "Flow",
         "顺序式 process（sequential）",
+        "Flow",
+        "Crew",
         "层级式 process（hierarchical）"
       ],
       "correct": 1,
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "Crew 和 Flow 之间的区别是什么？",
       "options": [
-        "Crew 收费，Flow 免费",
         "Crew 是自主的、LLM 驱动的；Flow 是事件驱动、代码拥有、确定且可测试的",
-        "Crew 只跑在 GPU 上",
-        "Flow 没有 agent"
+        "Crew 收费，Flow 免费",
+        "Flow 没有 agent",
+        "Crew 只跑在 GPU 上"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Crew 以自主性为先；Flow 以确定性为先。"
     },
     {
@@ -44,22 +44,22 @@
       "options": [
         "短期（Short-term）",
         "长期（Long-term）",
-        "实体（Entity）",
-        "量化（Quantized）"
+        "量化（Quantized）",
+        "实体（Entity）"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "短期、长期、实体和情境（contextual）是这四种。量化记忆不是 CrewAI 的概念。"
     },
     {
       "stage": "check",
       "question": "什么是背景故事膨胀（backstory bloat），本课建议如何处理？",
       "options": [
+        "Bedrock 调用慢；换区域",
         "存了太多 crew；归档旧的",
         "2000 字的 agent 背景故事挤占了上下文预算；保持精简",
-        "工具太多；删一些",
-        "Bedrock 调用慢；换区域"
+        "工具太多；删一些"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "背景故事塑造语气和判断，但过长会吃掉上下文。"
     },
     {
@@ -68,8 +68,8 @@
       "options": [
         "总是",
         "当你有 4 个以上专家、需要一个 manager Agent 在它们之间路由时",
-        "当你只有一个任务时",
-        "当你没有任何工具时"
+        "当你没有任何工具时",
+        "当你只有一个任务时"
       ],
       "correct": 1,
       "explanation": "层级式增加了一个 manager Agent；只有当多个专家需要动态路由时才值得。"
@@ -78,12 +78,12 @@
       "stage": "post",
       "question": "为什么本课告诫不要在生产中使用自由形式的 Crew？",
       "options": [
-        "Crew 不受支持",
         "输出可变性高，没有 Flow 包装时调试很痛苦",
-        "Crew 比 Flow 贵",
-        "Crew 缺乏记忆"
+        "Crew 缺乏记忆",
+        "Crew 不受支持",
+        "Crew 比 Flow 贵"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Crew 的自主性让生产环境的重放和审计很痛苦；上线时用 Flow 包装它。"
     }
   ]

@@ -6,60 +6,60 @@
       "stage": "pre",
       "question": "在 2025 年 6 月把原先的商业模块开源后，Langfuse 以什么许可证发布？",
       "options": [
-        "GPLv3",
         "MIT",
-        "Elastic License 2.0",
-        "Apache 2.0"
+        "GPLv3",
+        "Apache 2.0",
+        "Elastic License 2.0"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "2025 年 6 月后，Langfuse 是 MIT，包括 LLM-as-a-judge、标注队列、prompt 实验和 Playground。"
     },
     {
       "stage": "pre",
       "question": "按本课所说，Arize Phoenix 最擅长什么？",
       "options": [
+        "自动化优化循环",
         "prompt 版本管理",
         "深度的、agent 专属的评估：trace 聚类、异常检测、RAG 检索相关性、OpenInference 自动 instrumentation",
-        "自动化优化循环",
         "代码的静态分析"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Phoenix 专注于行为漂移和 RAG 评估，配 OpenInference 自动 instrumentation。"
     },
     {
       "stage": "check",
       "question": "哪个平台把自动 prompt 优化与护栏（PII 脱敏、话题约束）以及 LLM 评判的幻觉检测配在一起？",
       "options": [
+        "Opik",
         "Langfuse",
         "Phoenix",
-        "Opik",
         "Jaeger"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "Opik 以「优化 + 护栏」循环为核心。"
     },
     {
       "stage": "check",
       "question": "本课为带 prompt 管理的一体化推荐哪个平台？",
       "options": [
-        "Langfuse",
-        "Phoenix",
+        "Datadog APM",
         "Opik",
-        "Datadog APM"
+        "Phoenix",
+        "Langfuse"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "Langfuse 端到端覆盖 tracing + prompt 管理 + 评估 + 会话回放。"
     },
     {
       "stage": "check",
       "question": "本课对厂商发布的平台基准怎么说？",
       "options": [
+        "只有 Opik 的可靠",
         "它们是权威的",
-        "把它们当作方向性参考；用你自己的语料来衡量",
         "它们被 OpenTelemetry 禁止",
-        "只有 Opik 的可靠"
+        "把它们当作方向性参考；用你自己的语料来衡量"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "即便是引用的 Opik 与 Langfuse 之间 14 倍的差距，决定前也应在你自己的数据上衡量。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "为什么有 tracing 而无评估被视为昂贵的日志记录？",
       "options": [
         "磁盘比 CPU 贵",
-        "你能看到运行但不给它们打分，因此回归不可见、二分定位不可能",
         "提供商对 span 收费",
-        "span 无法被重放"
+        "span 无法被重放",
+        "你能看到运行但不给它们打分，因此回归不可见、二分定位不可能"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "评估才是把 trace 转化为可付诸行动的质量信号的东西。"
     },
     {
@@ -80,8 +80,8 @@
       "options": [
         "它们被 Apache 2.0 禁止",
         "CRITIC 适用：评判者需要外部接地来做事实核实，否则就会盖橡皮图章",
-        "它们只在 TypeScript 中有效",
-        "它们必须在 GPU 上运行"
+        "它们必须在 GPU 上运行",
+        "它们只在 TypeScript 中有效"
       ],
       "correct": 1,
       "explanation": "没有基于外部工具的核实，LLM 评判者会漂向盖橡皮图章（CRITIC，第 5 课）。"

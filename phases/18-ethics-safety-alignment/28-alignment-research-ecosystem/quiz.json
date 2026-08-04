@@ -7,71 +7,71 @@
       "question": "MATS 做什么，其大致规模如何？",
       "options": [
         "一个奖励模型训练服务",
-        "ML Alignment & Theory Scholars：一个研究导师项目，自 2021 年起已有 527+ 名学者、180+ 篇论文，且 2025 年前的校友约 80% 从事安全/安保工作",
         "一个签发 AI 出口许可证的监管机构",
+        "ML Alignment & Theory Scholars：一个研究导师项目，自 2021 年起已有 527+ 名学者、180+ 篇论文，且 2025 年前的校友约 80% 从事安全/安保工作",
         "一个由欧盟拥有的前沿安全研究所"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Redwood Research 引入了哪个研究议程？",
       "options": [
-        "面向 LLM 的差分隐私",
         "AI 控制（第 10 课）：通过 U / T / H 协议在被颠覆的情况下仍保障安全",
-        "通过 SynthID 做水印",
-        "宪法式 AI"
+        "宪法式 AI",
+        "面向 LLM 的差分隐私",
+        "通过 SynthID 做水印"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "哪个组织撰写了情境内谋划论文以及《Towards Safety Cases for AI Scheming》框架？",
       "options": [
-        "METR",
         "MATS",
         "Eleos AI",
-        "Apollo Research"
+        "Apollo Research",
+        "METR"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "METR 在对齐生态中独特的方法论风格是什么？",
       "options": [
-        "对基础模型进行对抗训练",
-        "基于任务的能力评估、自主任务时间跨度（time-horizon）研究，以及框架综述（如《Common Elements of Frontier AI Safety Policies》）",
         "硬件证明的可验证推理",
-        "仅闭源红队"
+        "仅闭源红队",
+        "基于任务的能力评估、自主任务时间跨度（time-horizon）研究，以及框架综述（如《Common Elements of Frontier AI Safety Policies》）",
+        "对基础模型进行对抗训练"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么多组织共同署名对安全主张很重要？",
       "options": [
-        "它能增加引用数",
         "它能加快发表",
-        "它是欧盟 AI 法案的强制要求",
-        "评估自家模型的实验室存在结构性的利益冲突；外部评估者（Redwood、Apollo、METR、Eleos、英国 AISI）能提出并验证实验室可能少报的失败模式"
+        "评估自家模型的实验室存在结构性的利益冲突；外部评估者（Redwood、Apollo、METR、Eleos、英国 AISI）能提出并验证实验室可能少报的失败模式",
+        "它能增加引用数",
+        "它是欧盟 AI 法案的强制要求"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Eleos AI Research 对生态的主要贡献是什么？",
       "options": [
-        "AI 控制基准",
         "水印标准",
+        "部署前的模型福祉评估（第 19 课），包括 Claude Opus 4 系统卡中的外部福祉评估",
         "起草加州训练数据法律",
-        "部署前的模型福祉评估（第 19 课），包括 Claude Opus 4 系统卡中的外部福祉评估"
+        "AI 控制基准"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     }
   ]

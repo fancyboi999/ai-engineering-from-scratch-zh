@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "loader 为什么需要一张名字映射表？",
       "options": [
-        "预训练 tensor 和本地参数共享相同名字",
         "发布的 GPT-2 权重用的名字是 wte、wpe、h.N.attn.c_attn 这种；本地模型用的是 tok_embed、pos_embed、blocks.N.attn.qkv 这种；loader 负责把一套名字翻译成另一套",
         "safetensors 文件是加密的",
+        "预训练 tensor 和本地参数共享相同名字",
         "PyTorch 要求的"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "两套命名约定来自不同的历史；映射表就是一个按层展开的字典。"
     },
     {
       "stage": "check",
       "question": "conv1d transpose 是什么，哪些 tensor 需要它？",
       "options": [
-        "所有 weight tensor",
-        "发布的 GPT-2 把 c_attn、c_proj 和 c_fc 的权重存成 TensorFlow conv1d layout，与 nn.Linear.weight 期望的布局互为转置；loader 在赋值时对它们调用 .t()",
+        "只有 LayerNorm 的 scale",
         "只有 embedding",
-        "只有 LayerNorm 的 scale"
+        "所有 weight tensor",
+        "发布的 GPT-2 把 c_attn、c_proj 和 c_fc 的权重存成 TensorFlow conv1d layout，与 nn.Linear.weight 期望的布局互为转置；loader 在赋值时对它们调用 .t()"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "三种后缀需要转置；bias 和 LayerNorm 的 shape 本来就是对的。"
     },
     {
@@ -42,24 +42,24 @@
       "stage": "check",
       "question": "loader 在 shape 不匹配时怎么处理？",
       "options": [
+        "截断较大的 tensor",
         "对较小的 tensor 做 padding",
         "把不匹配的信息记录到 LoadReport.shape_mismatch 中，拒绝赋值，保持本地参数不变",
-        "让进程崩溃",
-        "截断较大的 tensor"
+        "让进程崩溃"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "加载到一半的模型是无声的失败机器；拒绝赋值才能让报告保持诚实。"
     },
     {
       "stage": "post",
       "question": "为什么 demo 用的 stub fixture 不是真正的 GPT-2 下载文件？",
       "options": [
-        "真实文件不是 safetensors 格式",
-        "demo 必须能离线快速运行；stub 用了和预训练完全一致的命名约定，所以 loader 走的代码路径完全相同，换成真实文件对 loader 没有任何影响",
         "真实权重是加密的",
-        "safetensors 无法存储大 tensor"
+        "safetensors 无法存储大 tensor",
+        "demo 必须能离线快速运行；stub 用了和预训练完全一致的命名约定，所以 loader 走的代码路径完全相同，换成真实文件对 loader 没有任何影响",
+        "真实文件不是 safetensors 格式"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "相同的代码路径，更小的 payload；loader 在两种文件上都一样工作。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "为什么在加载前后各生成一次样本？",
       "options": [
         "测量推理速度",
-        "如果加载后的样本和加载前一模一样，说明加载没有改变模型，意味着映射静默地漏掉了每一个 tensor",
         "预热 GPU 缓存",
-        "设置随机种子"
+        "设置随机种子",
+        "如果加载后的样本和加载前一模一样，说明加载没有改变模型，意味着映射静默地漏掉了每一个 tensor"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "sanity generation 是最便宜的验证门：如果样本指纹没有变化，就能暴露出一次失败的加载——而这种失败光看 LoadReport 的摘要是抓不到的。"
     }
   ]

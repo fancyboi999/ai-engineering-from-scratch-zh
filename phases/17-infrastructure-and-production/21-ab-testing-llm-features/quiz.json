@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "本课中，评测（evals）与 A/B 测试的精确区别是什么？",
       "options": [
-        "评测在带标注的数据集上回答「模型能否胜任这项工作？」；A/B 测试用线上随机化流量回答「用户是否在意？」",
-        "只需要 A/B 测试",
         "评测面向用户；A/B 测试在离线进行",
-        "它们可以互换"
+        "它们可以互换",
+        "只需要 A/B 测试",
+        "评测在带标注的数据集上回答「模型能否胜任这项工作？」；A/B 测试用线上随机化流量回答「用户是否在意？」"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "CUPED 为一项实验做了什么？",
       "options": [
+        "通过招募更多用户来增大样本量",
         "禁用多重比较校正",
         "完全替代序贯检验",
-        "在比较实验后期之前，先回归剔除实验前期的方差，通常能把方差降低 30-70% 并提升有效样本量",
-        "通过招募更多用户来增大样本量"
+        "在比较实验后期之前，先回归剔除实验前期的方差，通常能把方差降低 30-70% 并提升有效样本量"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -31,21 +31,21 @@
       "question": "为什么在跑很多 A/B 测试时需要多重比较校正（Bonferroni 或 Benjamini-Hochberg）？",
       "options": [
         "它们是 GDPR 的要求",
-        "它们只在序贯检验时才需要",
         "在 95% 置信度下跑 20 个测试，会因偶然产生一个假阳性；校正可控制族系误差率（family-wise error）或错误发现率（false discovery rate）",
+        "它们只在序贯检验时才需要",
         "它们能加快实验"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "SRM（样本比例失配，sample ratio mismatch）能检测什么？",
       "options": [
-        "Tokenizer 性能缓慢",
-        "分配哈希的 bug 导致实际投放的切分偏离了预期（例如目标 50/50 却出现 47/53）",
         "实验平台的内存泄漏",
-        "PII 泄露"
+        "分配哈希的 bug 导致实际投放的切分偏离了预期（例如目标 50/50 却出现 47/53）",
+        "PII 泄露",
+        "Tokenizer 性能缓慢"
       ],
       "correct": 1,
       "explanation": ""
@@ -54,21 +54,21 @@
       "stage": "post",
       "question": "为什么 LLM 的非确定性需要为样本量预留缓冲？",
       "options": [
-        "它违反了 IID 假设；有效样本量下降，因此要把所需样本量乘以约 1.3-1.5 倍作为安全裕度",
-        "它与功效（power）计算无关",
         "非确定性会减少所需样本量",
-        "它只在离线时才重要"
+        "它只在离线时才重要",
+        "它与功效（power）计算无关",
+        "它违反了 IID 假设；有效样本量下降，因此要把所需样本量乘以约 1.3-1.5 倍作为安全裕度"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本课如何对比 Statsig 和 GrowthBook？",
       "options": [
-        "功能集完全相同",
-        "Statsig 仅支持数仓原生（warehouse-native）",
         "GrowthBook 是闭源的",
+        "Statsig 仅支持数仓原生（warehouse-native）",
+        "功能集完全相同",
         "Statsig 是一体化 SaaS（2025 年 9 月被 OpenAI 以 11 亿美元收购）；GrowthBook 是 MIT 开源、数仓原生，具备贝叶斯/频率派/序贯引擎以及 CUPED/SRM/BH"
       ],
       "correct": 3,

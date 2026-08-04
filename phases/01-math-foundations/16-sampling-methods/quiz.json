@@ -4,12 +4,12 @@
       "stage": "pre",
       "question": "temperature < 1.0 对语言模型的输出分布有什么影响？",
       "options": [
-        "使分布更均匀（更随机）",
         "使分布更尖锐，让概率最高的 token 更有可能被选中",
         "移除除最高项之外的所有 token",
+        "使分布更均匀（更随机）",
         "对输出没有影响"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "temperature < 1.0 会把 logits 除以一个小于 1 的数，从而放大 logits 之间的差异。经过 softmax 后，概率最高的 token 占据更大的份额。temperature 趋近于 0 时即为贪心（argmax）解码。"
     },
     {
@@ -17,33 +17,33 @@
       "question": "top-k 与 top-p（核）采样之间的关键区别是什么？",
       "options": [
         "top-k 比 top-p 更快",
+        "top-k 作用于 logits，而 top-p 作用于概率",
         "top-k 保留固定数量的 token；top-p 根据累积概率保留可变数量的 token",
-        "top-p 只在 temperature = 1.0 时有效",
-        "top-k 作用于 logits，而 top-p 作用于概率"
+        "top-p 只在 temperature = 1.0 时有效"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "无论概率分布如何，top-k 总是恰好保留 k 个 token。top-p 自适应地保留累积概率超过 p 的最小 token 集合。当模型有信心时，top-p 保留很少的 token；当不确定时，则保留很多。"
     },
     {
       "stage": "post",
       "question": "为什么无法对标准采样操作 z ~ N(mu, sigma^2) 进行反向传播？",
       "options": [
-        "正态分布没有梯度",
         "采样操作是非确定性的，对 mu 和 sigma 没有良定义的导数",
-        "PyTorch 不支持正态分布",
-        "梯度始终恰好为零"
+        "梯度始终恰好为零",
+        "正态分布没有梯度",
+        "PyTorch 不支持正态分布"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "采样引入了一个随机不连续性——你无法为一次随机抽样计算 d(样本)/d(mu)。重参数化技巧通过把它写成 z = mu + sigma * epsilon（其中 epsilon ~ N(0,1)）来解决这一问题，使 z 成为 mu 和 sigma 的确定性、可微函数。"
     },
     {
       "stage": "post",
       "question": "在 Metropolis-Hastings MCMC 中，如果提议分布的标准差设得过大会发生什么？",
       "options": [
-        "链收敛更快，因为它迈出更大的步子",
-        "大多数提议落在低概率区域而被拒绝，因此链几乎不动",
         "平稳分布变为均匀分布",
-        "预热期变为零"
+        "大多数提议落在低概率区域而被拒绝，因此链几乎不动",
+        "预热期变为零",
+        "链收敛更快，因为它迈出更大的步子"
       ],
       "correct": 1,
       "explanation": "当提议标准差很大时，提议的点远离当前位置，很可能落在低概率区域。这些提议会被拒绝，导致链卡在当前点不动。对于高维高斯提议，最优接受率约为 23%。"
@@ -52,12 +52,12 @@
       "stage": "post",
       "question": "在拒绝采样中，随着目标分布维度的增加，接受率会怎样？",
       "options": [
-        "无论维度如何，它保持恒定",
-        "它增大，因为有更多维度可供接受",
+        "在所有情况下它都趋近于 50%",
         "它指数级下降，因为大部分提议体积都被拒绝",
-        "在所有情况下它都趋近于 50%"
+        "它增大，因为有更多维度可供接受",
+        "无论维度如何，它保持恒定"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "在高维中，提议分布与目标分布重叠的体积呈指数级缩小。上界 M 增大，接受率（1/M）呈指数级下降。这就是拒绝采样面临的维度灾难。"
     }
   ]

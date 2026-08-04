@@ -8,56 +8,56 @@
       "options": [
         "一个用于思维链的推理脚手架",
         "一个用于 RLHF 的奖励模型",
-        "一个 tokenizer 的替代品",
-        "一个横跨 MLCommons 危害类别的输入和/或输出安全分类器，放置在 LLM 之前和之后"
+        "一个横跨 MLCommons 危害类别的输入和/或输出安全分类器，放置在 LLM 之前和之后",
+        "一个 tokenizer 的替代品"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Llama Guard 3 大约覆盖多少个 MLCommons 危害类别？",
       "options": [
-        "7",
+        "14",
         "3",
-        "40",
-        "14"
+        "7",
+        "40"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Garak 的架构是如何组织的？",
       "options": [
-        "工具、资源、prompt",
-        "嵌入、检索器、重排器",
+        "Probes（攻击生成器）、Detectors（输出打分器）、Harnesses（活动管理器）",
         "路由器、agent、队列",
-        "Probes（攻击生成器）、Detectors（输出打分器）、Harnesses（活动管理器）"
+        "工具、资源、prompt",
+        "嵌入、检索器、重排器"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "PyRIT 主要为什么而设计，它与 Garak 有何不同？",
       "options": [
-        "它们在范围和受众上完全相同",
-        "PyRIT 是奖励模型训练器；Garak 是 tokenizer",
         "PyRIT 运行深度的多轮活动（转换器链、像 Crescendo 和 TAP 这样的编排器、打分），而 Garak 运行数千个单轮探针",
+        "PyRIT 是奖励模型训练器；Garak 是 tokenizer",
+        "它们在范围和受众上完全相同",
         "PyRIT 是 Llama Guard 的变体；Garak 是 Prompt-Guard 的变体"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "2026 年推荐的默认红队技术栈配置是什么？",
       "options": [
-        "用纯人工审查替代 LLM 评估",
+        "只在上线时跑一次 Garak",
         "用 PAIR 取代任何工具链",
         "在模型两侧都放置 Llama Guard，每晚跑 Garak 做回归，发布前跑 PyRIT 做活动",
-        "只在上线时跑一次 Garak"
+        "用纯人工审查替代 LLM 评估"
       ],
       "correct": 2,
       "explanation": ""
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "Llama Guard、Garak 和 PyRIT 共有的评估陷阱是什么？",
       "options": [
-        "上报的攻击/防御率取决于裁判身份和探针的陈旧程度；你必须指明裁判，并随着模型被打补丁而刷新探针",
         "它们只对英语有效",
-        "它们需要白盒访问",
-        "它们无法在 GPU 上运行"
+        "它们无法在 GPU 上运行",
+        "上报的攻击/防御率取决于裁判身份和探针的陈旧程度；你必须指明裁判，并随着模型被打补丁而刷新探针",
+        "它们需要白盒访问"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     }
   ]

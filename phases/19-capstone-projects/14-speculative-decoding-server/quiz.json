@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "推测解码背后的两层机制是什么？",
       "options": [
-        "两个目标模型逐 token 交替",
         "一个嵌入模型和一个综合器",
-        "一个检索缓存和一个重排器",
-        "draft 模型提议 k 个候选 token；目标模型一次性验证它们"
+        "draft 模型提议 k 个候选 token；目标模型一次性验证它们",
+        "两个目标模型逐 token 交替",
+        "一个检索缓存和一个重排器"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "EAGLE-3 做了 ngram draft 所没有做的什么事？",
       "options": [
-        "它替换目标模型",
         "它在目标模型的隐藏状态上训练 draft head，以获得更高的接受率",
         "它完全避免分词",
-        "它只在 CPU 上运行"
+        "它只在 CPU 上运行",
+        "它替换目标模型"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -42,32 +42,32 @@
       "stage": "check",
       "question": "为什么当流量分布变化时接受率会漂移？",
       "options": [
-        "vLLM 每小时轮换模型",
-        "draft 的对齐取决于输入分布：ShareGPT、代码和领域数据会激发不同的模式",
         "操作系统调度器重新洗牌 GPU 显存",
-        "量化在运行时发生变化"
+        "量化在运行时发生变化",
+        "draft 的对齐取决于输入分布：ShareGPT、代码和领域数据会激发不同的模式",
+        "vLLM 每小时轮换模型"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "该部署基于哪个 Kubernetes HPA 信号进行扩缩？",
       "options": [
-        "集群自动扩缩节点",
         "CPU 利用率",
-        "磁盘 IOPS",
-        "推理请求的队列等待时间（queue-wait time）"
+        "推理请求的队列等待时间（queue-wait time）",
+        "集群自动扩缩节点",
+        "磁盘 IOPS"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "相比串行 EAGLE-3，P-EAGLE 增加了什么？",
       "options": [
-        "量化到 FP4 权重",
         "移除目标模型",
+        "量化到 FP4 权重",
         "跨 draft 分支树的并行推测，在一次目标趟中验证",
         "自动数据集策展"
       ],
@@ -78,12 +78,12 @@
       "stage": "post",
       "question": "相对非推测基线，细则要求达到哪个吞吐目标？",
       "options": [
-        "在两个模型上、质量匹配时至少 2.5 倍",
         "任何高于基线的提升",
+        "任何质量下都恰好 10 倍吞吐",
         "质量匹配时约 1.1 倍",
-        "任何质量下都恰好 10 倍吞吐"
+        "在两个模型上、质量匹配时至少 2.5 倍"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     }
   ]

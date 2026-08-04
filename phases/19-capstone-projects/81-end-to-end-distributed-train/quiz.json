@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "既然每节课都已经有自己的测试，为什么还需要一个顶点项目？",
       "options": [
-        "装饰",
-        "组合是一项独立的性质：各部件可以都通过单元测试，但集成起来却死锁、loss 发散，或者一起跑时内存增长",
+        "更好评分",
         "更慢",
-        "更好评分"
+        "装饰",
+        "组合是一项独立的性质：各部件可以都通过单元测试，但集成起来却死锁、loss 发散，或者一起跑时内存增长"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "端到端测试能抓住任何单独部件测不出的接线 bug：rendezvous、barrier 顺序、gather 契约。"
     },
     {
       "stage": "pre",
       "question": "这个 demo 校验哪四条不变量？",
       "options": [
+        "硬件",
         "速度",
-        "(a) loss 跑到第 20 步无 NaN，(b) 每个 rank 的参数范数一致，(c) 每个 rank 的 optimizer 内存符合 ZeRO-1 公式，(d) 第 10 步的 checkpoint 重新加载后字节相等",
         "每秒 token 数",
-        "硬件"
+        "(a) loss 跑到第 20 步无 NaN，(b) 每个 rank 的参数范数一致，(c) 每个 rank 的 optimizer 内存符合 ZeRO-1 公式，(d) 第 10 步的 checkpoint 重新加载后字节相等"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "每条不变量抓一类不同的组合 bug：NaN 抓发散，范数一致抓同步漂移，内存抓分片 bug，checkpoint 抓写入原子性。"
     },
     {
@@ -31,21 +31,21 @@
       "question": "为什么模型用一个微型 GPT 而不是 MLP？",
       "options": [
         "显得高级",
-        "GPT 引入了 LayerNorm 的运行统计量、embedding 梯度形状，以及 softmax+cross-entropy 的边界情况，这些是 MLP 会掩盖掉的",
         "更快",
-        "必需"
+        "必需",
+        "GPT 引入了 LayerNorm 的运行统计量、embedding 梯度形状，以及 softmax+cross-entropy 的边界情况，这些是 MLP 会掩盖掉的"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "MLP 的梯度同步在第 77 课已经验证过了；顶点项目需要一个边界情况更多的模型，来证明组合在真实算子下成立。"
     },
     {
       "stage": "check",
       "question": "在这个语境里「自终止」是什么意思？",
       "options": [
-        "进程把自己杀掉",
+        "手动",
         "固定步数（20）、完成后 exit 0、无人值守；如果任何部件死锁，demo 永不返回，CI 就能抓到",
-        "崩溃恢复",
-        "手动"
+        "进程把自己杀掉",
+        "崩溃恢复"
       ],
       "correct": 1,
       "explanation": "一个有界、以 exit 0 结束的运行让测试装置能断言终止；while-True 循环会掩盖死锁。"
@@ -54,12 +54,12 @@
       "stage": "check",
       "question": "这个 demo 是怎么把 DDP 和 ZeRO 结合起来的？",
       "options": [
-        "两者同时",
         "用 DDP 风格的 init 时 broadcast 做参数同步，用 ZeRO-1 的 reduce-scatter+all-gather 替换 optimizer.step；DDP 的梯度 all-reduce 被吸收进 ZeRO 的 reduce-scatter",
         "只用 DDP",
+        "两者同时",
         "只用 ZeRO"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "ZeRO-1 通过 reduce-scatter 掌管梯度同步，所以 DDP 单独的 all-reduce 就不需要了；init 时的 broadcast 是唯一存活下来的 DDP 专属调用。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "为什么生产环境用挂钟（wall-clock）的 checkpoint 节奏，而不是步数？",
       "options": [
         "看着更干净",
+        "NCCL 要求",
         "步耗时会随序列长度和 microbatch 数量变化；10 分钟一次的节奏不论模型大小都对应相同的算力",
-        "更快",
-        "NCCL 要求"
+        "更快"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "本课为了清晰用基于步数的方式；生产运行通常每 5-15 分钟挂钟时间保存一次。"
     }
   ]

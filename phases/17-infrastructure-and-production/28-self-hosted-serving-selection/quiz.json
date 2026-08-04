@@ -6,9 +6,9 @@
       "stage": "pre",
       "question": "本课把哪个引擎选为开发笔记本上「一条命令」的默认选择？",
       "options": [
-        "TGI",
-        "Ollama",
         "vLLM",
+        "Ollama",
+        "TGI",
         "llama.cpp"
       ],
       "correct": 1,
@@ -18,12 +18,12 @@
       "stage": "check",
       "question": "2025 年的哪个事件使新项目不再默认选用 TGI？",
       "options": [
-        "TGI 被 Anthropic 收购",
-        "TGI 涨价了",
         "TGI 放弃了 CUDA 支持",
-        "TGI 于 2025 年 12 月 11 日进入维护模式 —— 此后只做 bug 修复"
+        "TGI 于 2025 年 12 月 11 日进入维护模式 —— 此后只做 bug 修复",
+        "TGI 被 Anthropic 收购",
+        "TGI 涨价了"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -42,36 +42,36 @@
       "stage": "check",
       "question": "得益于 RadixAttention，本课把哪个引擎定位为面向 agentic 多轮和前缀密集型工作负载？",
       "options": [
-        "Ollama",
-        "llama.cpp",
         "SGLang",
+        "llama.cpp",
+        "Ollama",
         "TGI"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本课推荐在相同的 GGUF 或 HF 权重上采用什么样的「开发到生产」流水线？",
       "options": [
-        "从头到尾只用 TRT-LLM",
-        "开发用 Ollama，生产也用 Ollama",
         "开发用 Ollama，预发用 llama.cpp，生产用 vLLM（前缀密集型则用 SGLang）",
-        "处处都用 TGI"
+        "从头到尾只用 TRT-LLM",
+        "处处都用 TGI",
+        "开发用 Ollama，生产也用 Ollama"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么不建议在共享的生产环境中使用 Ollama？",
       "options": [
-        "它是闭源的",
         "它只能在 Windows 上运行",
-        "Go 的 HTTP 序列化带来额外开销，并发管理比 vLLM 更简陋，且 OpenTelemetry 支持滞后",
-        "它无法加载 GGUF"
+        "它无法加载 GGUF",
+        "它是闭源的",
+        "Go 的 HTTP 序列化带来额外开销，并发管理比 vLLM 更简陋，且 OpenTelemetry 支持滞后"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     }
   ]

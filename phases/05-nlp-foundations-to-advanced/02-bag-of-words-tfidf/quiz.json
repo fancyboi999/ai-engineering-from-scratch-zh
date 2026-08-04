@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "词袋模型（Bag of Words）丢弃了什么？",
       "options": [
-        "token 顺序",
-        "词汇表大小",
         "文档长度",
-        "标点符号"
+        "token 顺序",
+        "标点符号",
+        "词汇表大小"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "BoW 统计每篇文档中各 token 的出现次数，但丢弃了它们的顺序。"
     },
     {
       "stage": "pre",
       "question": "为什么要用 IDF 因子来缩放 TF？",
       "options": [
-        "在每篇文档都出现的词几乎不带区分性信号，应该被降权",
         "为了归一化文档长度",
         "为了加速训练",
-        "为了去除标点符号"
+        "为了去除标点符号",
+        "在每篇文档都出现的词几乎不带区分性信号，应该被降权"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "IDF 惩罚无处不在的词，提升稀有词的权重。"
     },
     {
@@ -31,11 +31,11 @@
       "question": "在平滑的 IDF 公式 log((N+1)/(df+1)) + 1 中，末尾的 +1 保证了什么？",
       "options": [
         "计算更快",
-        "在每篇文档都出现的词其 IDF 仍为 1 而不是 0",
+        "大 N 时的数值稳定性",
         "与原始计数兼容",
-        "大 N 时的数值稳定性"
+        "在每篇文档都出现的词其 IDF 仍为 1 而不是 0"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "+1 让无处不在的词保持在 IDF=1，使其不会被归零，这与 scikit-learn 的默认行为一致。"
     },
     {
@@ -43,33 +43,33 @@
       "question": "为什么在做余弦相似度之前要对 TF-IDF 行做 L2 归一化？",
       "options": [
         "把稀疏向量转换为稠密向量",
-        "压缩词汇表",
+        "否则较长的文档会主导相似度得分；归一化把所有文档放到单位超球面上",
         "移除零项",
-        "否则较长的文档会主导相似度得分；归一化把所有文档放到单位超球面上"
+        "压缩词汇表"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": "L2 归一化消除了文档长度偏差，并把余弦相似度变成了点积。"
     },
     {
       "stage": "check",
       "question": "在做情感分析时，启用 TfidfVectorizer 的哪个设置是有风险的？",
       "options": [
-        "stop_words='english'",
-        "ngram_range=(1, 2)",
+        "sublinear_tf=True",
         "min_df=2",
-        "sublinear_tf=True"
+        "stop_words='english'",
+        "ngram_range=(1, 2)"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "英语停用词表会去掉像 'not' 这样的否定词，而它们携带着情感信号。"
     },
     {
       "stage": "post",
       "question": "到 2026 年，TF-IDF 在哪类任务上仍然占优？",
       "options": [
-        "开放式对话",
+        "图像描述生成",
         "机器翻译",
         "垃圾邮件检测、日志异常标记，以及低延迟的窄域分类",
-        "图像描述生成"
+        "开放式对话"
       ],
       "correct": 2,
       "explanation": "当信号来自词是否出现、且看重可解释性或速度时，TF-IDF 胜过 embedding。"
@@ -78,9 +78,9 @@
       "stage": "post",
       "question": "为什么 TF-IDF 在 'The movie was not good' 与 'The movie was excellent' 这一对句子上会失败？",
       "options": [
+        "embedding 的重叠度太高",
         "TF-IDF 无法处理停用词",
         "TF-IDF 需要 bigram 才能工作",
-        "embedding 的重叠度太高",
         "两篇文档共享了大部分 token；词袋模型没有否定或词序的概念"
       ],
       "correct": 3,
@@ -90,12 +90,12 @@
       "stage": "post",
       "question": "什么是 TF-IDF 加权 embedding 的混合方法？",
       "options": [
-        "在求平均之前，用 TF-IDF 权重作为对各 token embedding 的池化权重",
         "对 TF-IDF 做 PCA 后再重新 embedding",
         "把 BoW 和稠密 embedding 拼接起来",
-        "在 TF-IDF 特征上训练 BERT"
+        "在 TF-IDF 特征上训练 BERT",
+        "在求平均之前，用 TF-IDF 权重作为对各 token embedding 的池化权重"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "该混合方法用每个 token 的 TF-IDF 分数加权其 embedding 后求平均，把语义能力与稀有词强调结合在一起。"
     }
   ]

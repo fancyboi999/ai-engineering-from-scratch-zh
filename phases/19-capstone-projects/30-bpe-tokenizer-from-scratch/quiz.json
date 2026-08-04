@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "byte-level BPE tokenizer 为什么要从 256 个符号的字母表开始？",
       "options": [
-        "这样能保证任何 UTF-8 输入都可以被表示，不需要先学任何 merge 规则",
         "这是支持英语的最小字母表",
         "它恰好和大多数加速器上的 GPU warp 大小对齐",
-        "这样就不用存 merge table 了"
+        "这样就不用存 merge table 了",
+        "这样能保证任何 UTF-8 输入都可以被表示，不需要先学任何 merge 规则"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "256 个原始 byte id 能覆盖所有可能的 UTF-8 输入。因为任何输入都可以表示为 byte 序列，所以永远不需要 unknown token。"
     },
     {
       "stage": "check",
       "question": "BPE 训练的每一步做了什么？",
       "options": [
-        "随机拆分一个词并给它分配新 id",
-        "统计语料中所有相邻 symbol pair 的频率，然后合并频率最高的那个",
         "删除频率最低的 id 来缩小词表",
-        "训练一个小型神经网络来给 subword 打分"
+        "随机拆分一个词并给它分配新 id",
+        "训练一个小型神经网络来给 subword 打分",
+        "统计语料中所有相邻 symbol pair 的频率，然后合并频率最高的那个"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "每一步在整个语料中找到出现频率最高的相邻 pair，把它合并成一个新 symbol，并记录这条 merge 规则。"
     },
     {
@@ -31,23 +31,23 @@
       "question": "编码新文本时，merge 按什么顺序应用？",
       "options": [
         "随机顺序，直到没有 merge 可以应用",
-        "按输入中的位置从左到右，忽略训练时的排名",
         "按训练时获得的 rank，rank 最小的先应用",
+        "按输入中的位置从左到右，忽略训练时的排名",
         "按 pair 的字节值字母序排列"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "推理时按照 merge 被学到的顺序来应用。当多条 merge 都可以匹配时，merge table 中最靠前的那条优先。"
     },
     {
       "stage": "check",
       "question": "当 allow_special 为 False 时，encoder 对 special token 字符串的行为是什么？",
       "options": [
-        "抛出错误",
-        "把字符串映射到它的保留 id",
+        "静默跳过该字符串",
         "把字符串当成原始字节进行编码",
-        "静默跳过该字符串"
+        "把字符串映射到它的保留 id",
+        "抛出错误"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "关闭 allow_special 时，像 <|endoftext|> 这样的字符串会被当作原始字节处理，跟其他任何输入一样走 merge 循环。"
     },
     {
@@ -55,9 +55,9 @@
       "question": "为什么 decoder 永远不需要 unknown-token id？",
       "options": [
         "每个学到的 token 都是两个已知 token 的拼接，递归到底就是单个 byte",
-        "encoder 在解码之前会剥离 unknown token",
+        "decoder 对 unknown id 总是返回空字符串",
         "模型在采样时会拒绝 unknown id",
-        "decoder 对 unknown id 总是返回空字符串"
+        "encoder 在解码之前会剥离 unknown token"
       ],
       "correct": 0,
       "explanation": "每个 id 要么对应一个原始 byte，要么由两个先前已知的 id 组成。递归展开最终一定终止于 byte，byte 可以解码成 UTF-8。"
@@ -66,8 +66,8 @@
       "stage": "post",
       "question": "当目标词表大小增大时，同一句话的编码长度会怎样变化？",
       "options": [
-        "随词表大小线性增长",
         "保持不变，因为每个 id 编码一个 byte",
+        "随词表大小线性增长",
         "趋于减少，因为更大的词表能覆盖更多 subword",
         "随机波动，因为 BPE 是非确定性的"
       ],

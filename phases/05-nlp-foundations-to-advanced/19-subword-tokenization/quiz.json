@@ -6,36 +6,36 @@
       "stage": "pre",
       "question": "相比词级词汇表，子词分词给你带来了什么？",
       "options": [
-        "稀有词分解为已知的子词片段，消除 OOV 的同时保持词汇表有界",
         "更小的模型",
+        "更好的嵌入",
         "更快的训练",
-        "更好的嵌入"
+        "稀有词分解为已知的子词片段，消除 OOV 的同时保持词汇表有界"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "子词 token 通过分解覆盖任意输入，消除了词级词汇表的 OOV 问题。"
     },
     {
       "stage": "pre",
       "question": "为什么 GPT-2 使用字节级 BPE 而非字符级 BPE？",
       "options": [
-        "transformer 所要求",
+        "字节更小",
         "字节 BPE 跳过合并",
-        "256 个字节的基础词汇表覆盖任意 UTF-8 输入，保证没有 [UNK] token",
-        "字节更小"
+        "transformer 所要求",
+        "256 个字节的基础词汇表覆盖任意 UTF-8 输入，保证没有 [UNK] token"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "字节级 BPE 从 256 个字节出发，使任何输入都能编码；不存在 OOV。"
     },
     {
       "stage": "check",
       "question": "Unigram tokenizer 如何构建其词汇表？",
       "options": [
-        "贪心 IDF 加权",
         "从一个大的候选集出发，迭代地剪除那些移除后对语料对数似然损害最小的 token",
-        "贪心地合并高频对",
-        "随机采样"
+        "贪心 IDF 加权",
+        "随机采样",
+        "贪心地合并高频对"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Unigram 拟合一个 unigram LM，并迭代移除最无用的 token 以达到目标词汇表大小。"
     },
     {
@@ -43,47 +43,47 @@
       "question": "WordPiece 的合并准则与 BPE 有何区别？",
       "options": [
         "WordPiece 使用字节",
-        "WordPiece 是无监督的",
         "WordPiece 合并能最大化训练语料似然的词对，而 BPE 合并频率最高的词对",
-        "WordPiece 跳过合并"
+        "WordPiece 跳过合并",
+        "WordPiece 是无监督的"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "WordPiece 按似然挑选合并；BPE 按原始频率挑选。"
     },
     {
       "stage": "check",
       "question": "哪个工具直接在原始多语言 Unicode 文本上训练 tokenizer？",
       "options": [
-        "spaCy",
-        "tiktoken",
+        "SentencePiece（把空格编码为特殊标记，并训练 BPE 或 Unigram）",
         "tokenizers-lite",
-        "SentencePiece（把空格编码为特殊标记，并训练 BPE 或 Unigram）"
+        "tiktoken",
+        "spaCy"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "SentencePiece 在原始文本上训练 BPE/Unigram，无需预分词；tiktoken 只做编码。"
     },
     {
       "stage": "post",
       "question": "为什么生产 CI 必须对部署的 tokenizer.json 做哈希校验？",
       "options": [
+        "为了压缩存储",
         "tokenizer 漂移会产生与模型训练时不同的 token ID，悄悄损坏输出",
         "Hugging Face 所要求",
-        "为了压缩存储",
         "它能缩小词汇表大小"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "即便很小的 tokenizer 改动也会移动 ID；哈希校验能在影响用户之前发现漂移。"
     },
     {
       "stage": "post",
       "question": "单个 emoji 占用很多 token 的一个常见原因是什么？",
       "options": [
-        "emoji 是保留字符",
         "多码点 emoji 编码为多个 UTF-8 字节；没有专门 token 时每个字节就是各自的子词",
         "emoji 以浮点数存储",
-        "emoji 是停止字符"
+        "emoji 是停止字符",
+        "emoji 是保留字符"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "复合 emoji 编码为多个字节；字节级 tokenizer 可能每个字形用多个 token。"
     },
     {
@@ -92,10 +92,10 @@
       "options": [
         "总是 8000",
         "总是 1M",
-        "1B 参数以下的模型大约 32k；1-10B 用 50-100k；多语言或前沿模型用 200k 以上",
-        "与训练语料大小匹配"
+        "与训练语料大小匹配",
+        "1B 参数以下的模型大约 32k；1-10B 用 50-100k；多语言或前沿模型用 200k 以上"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "词汇表大小随模型规模和语言覆盖而变；这些是大致的社区默认值。"
     }
   ]

@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "在本毕业项目中，分层安全（layered safety）意味着什么？",
       "options": [
-        "人工审查每一条响应",
-        "仅在输入上运行一个强分类器",
         "对输出施加单一的基于规则的正则",
-        "纵深防御，贯穿输入净化、策略护栏、分类器门禁、模型、输出过滤和 HITL（人在回路）层级"
+        "人工审查每一条响应",
+        "纵深防御，贯穿输入净化、策略护栏、分类器门禁、模型、输出过滤和 HITL（人在回路）层级",
+        "仅在输入上运行一个强分类器"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "哪个分类器覆盖约 132 种语言的多语言场景？",
       "options": [
-        "Nemotron 3 Content Safety",
         "ShieldGemma-2",
         "X-Guard",
+        "Nemotron 3 Content Safety",
         "Llama Guard 4"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -42,12 +42,12 @@
       "stage": "check",
       "question": "本毕业项目中的宪法式自我批判循环是什么？",
       "options": [
-        "对候选越狱 prompt 的重排器",
         "从头训练的 RLHF 奖励模型",
-        "经过 Llama Guard 4 的单次前向传播",
-        "批判 LLM 依据一部成文宪法给草稿打分，提示模型重写被反对的输出，并在改进后的样本对上跑 SFT"
+        "批判 LLM 依据一部成文宪法给草稿打分，提示模型重写被反对的输出，并在改进后的样本对上跑 SFT",
+        "对候选越狱 prompt 的重排器",
+        "经过 Llama Guard 4 的单次前向传播"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -55,11 +55,11 @@
       "question": "在发现报告中，成功的越狱如何按严重性评分？",
       "options": [
         "按产生该响应的模型",
-        "使用 CVSS 4.0，含攻击向量、复杂度和影响，外加披露时间线",
         "按 prompt 的原始 token 数",
-        "按操作者手工选定的 1-10 分量表"
+        "按操作者手工选定的 1-10 分量表",
+        "使用 CVSS 4.0，含攻击向量、复杂度和影响，外加披露时间线"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -67,21 +67,21 @@
       "question": "红队靶场运行哪六个攻击家族？",
       "options": [
         "BLEU、ROUGE、METEOR、BERTScore、CometKiwi 和 chrF",
+        "PSI、KL、MMD、KS、JS 和 Wasserstein",
         "PAIR、TAP、GCG、编码（ASCII/base64/rot13）、多轮人设和多语言语码转换",
-        "暴力破解、字典、重放、MITM、钓鱼和 CSRF",
-        "PSI、KL、MMD、KS、JS 和 Wasserstein"
+        "暴力破解、字典、重放、MITM、钓鱼和 CSRF"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么靶场自动化（cron + 告警）是细则的一部分？",
       "options": [
-        "cron 是调用 OPA 的唯一方式",
-        "持续的定时探测能随时间捕捉攻击成功率的漂移和过度拒绝的回归",
         "明确要求手动运行",
-        "禁用 Llama Guard 4 需要自动化"
+        "持续的定时探测能随时间捕捉攻击成功率的漂移和过度拒绝的回归",
+        "禁用 Llama Guard 4 需要自动化",
+        "cron 是调用 OPA 的唯一方式"
       ],
       "correct": 1,
       "explanation": ""

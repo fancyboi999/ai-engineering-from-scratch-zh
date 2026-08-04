@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "异步云端编码 agent 在生产中如何被触发？",
       "options": [
-        "进入虚拟机的长连接 SSH 会话",
-        "由 issue 标签或 PR 评论触发的 GitHub webhook，分派给一个沙箱 worker",
         "定时 cron 任务命中仓库",
-        "手动上传文件"
+        "手动上传文件",
+        "由 issue 标签或 PR 评论触发的 GitHub webhook，分派给一个沙箱 worker",
+        "进入虚拟机的长连接 SSH 会话"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -19,11 +19,11 @@
       "question": "为什么 agent 必须使用短期的 GitHub App 安装令牌，而非个人访问令牌（PAT）？",
       "options": [
         "App 能完全规避 GitHub 限流",
+        "App 比 PAT 需要更少的代码",
         "App 令牌授予细粒度、有作用域、短期的凭证，适合按任务的 worker",
-        "个人访问令牌无法开 PR",
-        "App 比 PAT 需要更少的代码"
+        "个人访问令牌无法开 PR"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -32,8 +32,8 @@
       "options": [
         "每次推送都要求验证码",
         "分支保护强制禁止直接推送或强制推送到 main，且该 App 不在绕过名单中",
-        "克隆前加密仓库",
-        "在 worker 上禁用 git"
+        "在 worker 上禁用 git",
+        "克隆前加密仓库"
       ],
       "correct": 1,
       "explanation": ""
@@ -42,22 +42,22 @@
       "stage": "check",
       "question": "为什么对 .github/workflows 的路径作用域保护要在 worker 上强制执行，而非作为 GitHub App 权限？",
       "options": [
-        "工作流存储在仓库之外",
         "任何形式的路径作用域都不可能实现",
         "GitHub App 权限不支持按路径设作用域，因此 worker 对所提议 diff 的允许列表检查才是恰当的执行点",
+        "工作流存储在仓库之外",
         ".github/workflows 是一个虚拟路径"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在 agent 循环结束后、开 PR 之前发生什么门禁？",
       "options": [
-        "评审者模型重写 diff",
+        "仓库被强制推送到 main",
         "在沙箱中跑完整 CI；计算覆盖率增量；回归超过阈值的 PR 被打上 needs-review 标签",
         "PR 不经任何检查立即开启",
-        "仓库被强制推送到 main"
+        "评审者模型重写 diff"
       ],
       "correct": 1,
       "explanation": ""
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "分派器对每个仓库每天强制哪些预算旋钮？",
       "options": [
+        "仅一个轮次上限",
         "仅一个挂钟时间上限",
         "无限 PR 和无限成本",
-        "每个 PR 的美元上限，加上每个仓库每天的最大 PR 数",
-        "仅一个轮次上限"
+        "每个 PR 的美元上限，加上每个仓库每天的最大 PR 数"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "agent 发布的 PR 正文里包含什么？",
       "options": [
-        "仅 diff",
         "理由、diff 摘要、trace URL、成本和轮次数，以便评审者审计和跟进",
-        "仅一份生成的变更日志",
-        "什么都没有；PR 正文为空"
+        "仅 diff",
+        "什么都没有；PR 正文为空",
+        "仅一份生成的变更日志"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

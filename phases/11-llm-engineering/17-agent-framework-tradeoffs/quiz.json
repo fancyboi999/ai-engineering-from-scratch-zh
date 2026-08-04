@@ -5,36 +5,36 @@
       "stage": "post",
       "question": "对于一个必须在崩溃后恢复、在运行中途接受人工审批、并向三个检索器并行扇出的工作流，正确的首选框架是哪个？",
       "options": [
-        "CrewAI",
         "AutoGen",
-        "LangGraph",
-        "Agno"
+        "CrewAI",
+        "Agno",
+        "LangGraph"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么由 LLM 选择的路由比显式路由每轮花费更多 token？",
       "options": [
-        "它并行预取下一个节点以对冲延迟。",
         "每一轮都有一次 planner LLM 调用来挑选下一步，为每个决策增加 prompt 和 completion token。",
-        "它为 crew 中的每个 agent 复制工具列表。",
-        "它把整个对话历史发给一个验证模型。"
+        "它把整个对话历史发给一个验证模型。",
+        "它并行预取下一个节点以对冲延迟。",
+        "它为 crew 中的每个 agent 复制工具列表。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "代码审查中的提议者-批评者（proposer-critic）对话，天然地映射到哪个框架的核心抽象？",
       "options": [
-        "CrewAI 的顺序式 Crew",
-        "LangGraph 的 StateGraph",
         "AutoGen 的 GroupChat / ConversableAgent 配对",
-        "Agno 的带工具的单个 Agent"
+        "Agno 的带工具的单个 Agent",
+        "CrewAI 的顺序式 Crew",
+        "LangGraph 的 StateGraph"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -53,12 +53,12 @@
       "stage": "post",
       "question": "你有一个两次调用的摘要器：取文本、做摘要。哪个选项是正确的框架选择？",
       "options": [
-        "LangGraph StateGraph —— 为了可靠性总是用框架。",
         "带 researcher + summarizer 角色的 CrewAI —— 角色让它更清晰。",
         "纯 Python 加提供商 SDK —— 对于微型流水线，不用框架就是最快的框架。",
-        "AutoGen GroupChat —— 两个 agent 可以争论哪个摘要最好。"
+        "AutoGen GroupChat —— 两个 agent 可以争论哪个摘要最好。",
+        "LangGraph StateGraph —— 为了可靠性总是用框架。"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     }
   ]

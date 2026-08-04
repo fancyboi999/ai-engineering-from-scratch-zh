@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "为什么 2026 年的 MCP 修订版在生产服务器上偏好 StreamableHTTP？",
       "options": [
-        "它消除了对认证的需求",
+        "它默认无状态，因此负载均衡器之后的单一端点可以水平扩展",
         "它是唯一支持工具调用的传输方式",
         "它会自动加密载荷",
-        "它默认无状态，因此负载均衡器之后的单一端点可以水平扩展"
+        "它消除了对认证的需求"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "在本毕业项目中，哪种授权模型对工具调用设门禁？",
       "options": [
-        "携带每工具作用域（scope）的 OAuth 2.1 令牌，在工具调用时校验",
         "一个共享的管理员密码",
         "按 IP 地址分配的 API key",
+        "携带每工具作用域（scope）的 OAuth 2.1 令牌，在工具调用时校验",
         "无作用域的双向 TLS"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -31,47 +31,47 @@
       "question": ".well-known/mcp-capabilities 文档的作用是什么？",
       "options": [
         "为服务器存储审计日志",
-        "列出出站 IP 范围",
+        "暴露工具清单、传输 URL 和认证要求，以便注册中心能验证并索引该服务器",
         "持有 OPA 策略包",
-        "暴露工具清单、传输 URL 和认证要求，以便注册中心能验证并索引该服务器"
+        "列出出站 IP 范围"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在此设计中，为什么破坏性工具驻留在一个单独的 MCP 服务器上？",
       "options": [
-        "它们无法通过 StreamableHTTP 暴露",
-        "它们运行在更慢的硬件上",
         "它们被门控在一个批准令牌之后，该令牌在短时间窗口内经由 Slack 卡片提权",
-        "它们需要不同的编程语言"
+        "它们运行在更慢的硬件上",
+        "它们需要不同的编程语言",
+        "它们无法通过 StreamableHTTP 暴露"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "OPA / Rego 在每次工具调用上决定什么？",
       "options": [
-        "调用哪个模型",
-        "把审计日志写到哪里",
         "服务器应如何重排响应",
-        "调用方的作用域是否允许此次调用，外加 PII 脱敏和载荷上限"
+        "调用方的作用域是否允许此次调用，外加 PII 脱敏和载荷上限",
+        "把审计日志写到哪里",
+        "调用哪个模型"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "在负载测试中，哪个证据展示了 StreamableHTTP 的水平扩展？",
       "options": [
-        "把并发降到一个客户端",
+        "添加第二个副本，并展示负载均衡器在无会话粘性的情况下重新分配负载",
         "切换到 stdio 传输",
         "把一切都放在单个进程中运行",
-        "添加第二个副本，并展示负载均衡器在无会话粘性的情况下重新分配负载"
+        "把并发降到一个客户端"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -80,8 +80,8 @@
       "options": [
         "为了让日志更短",
         "为了满足企业安全要求，同时保持每次调用的血缘可查询",
-        "Presidio 能减少 ClickHouse 的写放大",
-        "PII 能提升搜索性能"
+        "PII 能提升搜索性能",
+        "Presidio 能减少 ClickHouse 的写放大"
       ],
       "correct": 1,
       "explanation": ""

@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "什么是分布假设（distributional hypothesis）？",
       "options": [
-        "观其伴而知其义（通过一个词的伴随上下文来了解它）",
-        "词在各文档中均匀分布",
+        "高频词携带最多的含义",
         "所有词都能嵌入到 300 维中",
-        "高频词携带最多的含义"
+        "观其伴而知其义（通过一个词的伴随上下文来了解它）",
+        "词在各文档中均匀分布"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Firth（1957）的分布假设：相似的上下文意味着相似的含义。"
     },
     {
@@ -30,36 +30,36 @@
       "stage": "check",
       "question": "skip-gram 和 CBOW 有什么区别？",
       "options": [
-        "skip-gram 用 bigram；CBOW 用 unigram",
         "skip-gram 由中心词预测上下文词；CBOW 由上下文预测中心词",
+        "skip-gram 用 bigram；CBOW 用 unigram",
         "skip-gram 由上下文预测中心词；CBOW 则相反",
         "skip-gram 训练深层网络；CBOW 是浅层的"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "skip-gram：中心词 -> 上下文。CBOW：上下文 -> 中心词。"
     },
     {
       "stage": "check",
       "question": "在负采样中，对正样本对（中心词，上下文）的目标是什么？",
       "options": [
-        "最大化 sigmoid(W[center] dot W'[context])，使其接近 1",
         "强制它们正交",
+        "去相关这些向量",
         "最小化它们的点积",
-        "去相关这些向量"
+        "最大化 sigmoid(W[center] dot W'[context])，使其接近 1"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "正样本对训练 sigmoid 接近 1；采样的负样本训练 sigmoid 接近 0。"
     },
     {
       "stage": "check",
       "question": "训练完 Word2Vec 后，哪个权重矩阵成为词嵌入？",
       "options": [
-        "一个独立的训练后投影",
         "输入到隐藏层的 W 矩阵（中心词查找表）",
-        "两者相乘",
-        "隐藏层到输出的 W' 矩阵"
+        "一个独立的训练后投影",
+        "隐藏层到输出的 W' 矩阵",
+        "两者相乘"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "中心词查找表 W 是标准的嵌入输出；W' 通常被丢弃或被平均进去。"
     },
     {
@@ -78,24 +78,24 @@
       "stage": "post",
       "question": "在 2026 年，什么情况下你仍会选用 Word2Vec 而非 transformer？",
       "options": [
-        "轻量、设备端、领域特定的检索，其中单行查找就是全部的延迟预算",
-        "当你需要上下文消歧时",
+        "当对话质量重要时",
         "当输入非常长时",
-        "当对话质量重要时"
+        "当你需要上下文消歧时",
+        "轻量、设备端、领域特定的检索，其中单行查找就是全部的延迟预算"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "在极小的延迟预算、设备端推理或快速领域特定训练上，Word2Vec 占优。"
     },
     {
       "stage": "post",
       "question": "是什么让著名的类比 'king - man + woman ~ queen' 成为可能？",
       "options": [
-        "模型把“皇室”编码为一个标志位",
-        "skip-gram 在皇室词汇上训练",
+        "余弦相似度对性别不变",
         "向量算术捕捉到了像“皇室”这样可跨性别迁移的线性方向",
-        "余弦相似度对性别不变"
+        "skip-gram 在皇室词汇上训练",
+        "模型把“皇室”编码为一个标志位"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "嵌入空间中的方向编码了关系特征，因此加减会带来系统性的位移。"
     }
   ]

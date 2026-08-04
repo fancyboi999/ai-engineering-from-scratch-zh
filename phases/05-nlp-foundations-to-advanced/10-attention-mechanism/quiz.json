@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "Bahdanau 注意力解决了 seq2seq 中的什么问题？",
       "options": [
-        "分词不匹配",
+        "beam search 延迟",
         "固定大小上下文向量的瓶颈，即解码器只能看到编码器的最终状态",
         "编码器中的梯度消失",
-        "beam search 延迟"
+        "分词不匹配"
       ],
       "correct": 1,
       "explanation": "注意力让解码器能查询每一个编码器状态，而不只是最后一个。"
@@ -18,24 +18,24 @@
       "stage": "pre",
       "question": "解码器第 t 步的注意力上下文向量是什么？",
       "options": [
-        "解码器的输入嵌入",
-        "编码器隐藏状态的加权平均，权重来自 query-key 评分",
+        "一个随机投影",
         "编码器的最终隐藏状态",
-        "一个随机投影"
+        "编码器隐藏状态的加权平均，权重来自 query-key 评分",
+        "解码器的输入嵌入"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "上下文 = sum of alpha_i * h_i，是编码器状态的、随步骤变化的加权平均。"
     },
     {
       "stage": "check",
       "question": "在 Bahdanau（加性）注意力中，向量 v_a 起什么作用？",
       "options": [
-        "它控制 dropout",
         "它是把注意力维度的隐藏组合转换为每个编码器位置一个标量分数的那个投影",
+        "它给 softmax 加偏置",
         "它编码位置",
-        "它给 softmax 加偏置"
+        "它控制 dropout"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "v_a 与 tanh(W_a s + U_a h) 做点积，把一个 d_attn 向量坍缩成一个标量分数。"
     },
     {
@@ -43,9 +43,9 @@
       "question": "在 Luong 的 'dot' 注意力变体中，必须满足什么约束？",
       "options": [
         "解码器状态和编码器状态必须共享相同的维度（d_s == d_h）",
-        "编码器必须是双向的",
+        "需要 beam search",
         "softmax 必须在对数空间",
-        "需要 beam search"
+        "编码器必须是双向的"
       ],
       "correct": 0,
       "explanation": "dot 使用 s^T h 而无投影，所以维度必须完全匹配。"
@@ -56,22 +56,22 @@
       "options": [
         "Q、K、V 是源序列的三个独立学习投影",
         "Q 是随机的，K 和 V 是学习的",
-        "Q 来自编码器，K 和 V 来自解码器",
-        "Q = 解码器状态；K 和 V = 编码器状态（同一个张量）"
+        "Q = 解码器状态；K 和 V = 编码器状态（同一个张量）",
+        "Q 来自编码器，K 和 V 来自解码器"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "在经典注意力中，键和值都是编码器状态；transformer 通过学习投影把 K 和 V 分开。"
     },
     {
       "stage": "post",
       "question": "为什么把原始注意力权重当作“解释”来报告被认为是脆弱的？",
       "options": [
-        "注意力权重会泄露标签",
         "它们太小无法绘图",
         "研究（例如 Jain and Wallace, 2019）表明，在某些任务上注意力分布可以被打乱而不改变预测",
+        "注意力权重会泄露标签",
         "注意力权重不可微"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "注意力权重与预测相关，但若不做消融/反事实检验，它们并非忠实的解释。"
     },
     {
@@ -90,10 +90,10 @@
       "stage": "post",
       "question": "注意力中的 masking 有什么实际用例？",
       "options": [
-        "替代 dropout",
+        "缩小模型规模",
         "把 padding token 的注意力权重设为零，使它们不贡献到上下文向量",
-        "编码位置",
-        "缩小模型规模"
+        "替代 dropout",
+        "编码位置"
       ],
       "correct": 1,
       "explanation": "对 padding（或解码器中的未来 token）做 masking，防止 softmax 把权重分散到无效位置上。"

@@ -7,8 +7,8 @@
       "question": "词性标注的目标是什么？",
       "options": [
         "检测情感",
-        "翻译句子",
         "抽取命名实体",
+        "翻译句子",
         "为每个 token 分配一个语法类别（名词、动词等）"
       ],
       "correct": 3,
@@ -18,24 +18,24 @@
       "stage": "pre",
       "question": "跨语言工作的默认标签集是哪个？",
       "options": [
-        "Penn Treebank",
-        "Stanford Dependencies",
+        "CoNLL-2003",
         "Universal Dependencies",
-        "CoNLL-2003"
+        "Penn Treebank",
+        "Stanford Dependencies"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "Universal Dependencies 提供一套更粗粒度、与语言无关的 17 个标签的集合。"
     },
     {
       "stage": "check",
       "question": "bigram HMM 词性标注器建模的是什么？",
       "options": [
-        "仅 P(tags)",
-        "依存句法分析",
         "嵌入相似度",
-        "P(tag | previous tag) 转移加上 P(word | tag) 发射，用 Viterbi 解码"
+        "依存句法分析",
+        "P(tag | previous tag) 转移加上 P(word | tag) 发射，用 Viterbi 解码",
+        "仅 P(tags)"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "bigram HMM 使用标签转移和词发射；Viterbi 找出概率最高的序列。"
     },
     {
@@ -43,9 +43,9 @@
       "question": "对于 HMM 标注器，Viterbi 算法计算的是什么？",
       "options": [
         "通过在标签格（lattice）上做动态规划，得到唯一一条概率最高的标签序列",
+        "仅前向概率",
         "转移矩阵",
-        "每个标签的边缘概率",
-        "仅前向概率"
+        "每个标签的边缘概率"
       ],
       "correct": 0,
       "explanation": "Viterbi 用 O(n * |T|^2) 的动态规划找出 argmax 序列。"
@@ -54,36 +54,36 @@
       "stage": "check",
       "question": "依存句法分析产出什么？",
       "options": [
-        "一棵树，其中每个词有一个中心词（head）和一个带标签的语法关系",
         "一个扁平的 BIO 序列",
         "一棵带 NP/VP/PP 标签的成分句法树",
+        "一棵树，其中每个词有一个中心词（head）和一个带标签的语法关系",
         "一条共指链"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "依存句法分析给出逐词的（中心词，关系）边；成分句法分析给出嵌套的短语结构。"
     },
     {
       "stage": "post",
       "question": "为什么 PTB 词性标注的准确率上限在 97-98% 左右？",
       "options": [
-        "模型在任何任务上都无法超过 98%",
         "Universal Dependencies 封顶在 98%",
-        "人类标注员只有约 97% 的时候意见一致，所以超过约 98% 的模型可能是在过拟合测试数据",
-        "硬件限制"
+        "硬件限制",
+        "模型在任何任务上都无法超过 98%",
+        "人类标注员只有约 97% 的时候意见一致，所以超过约 98% 的模型可能是在过拟合测试数据"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "标注员的意见分歧限定了可达到的准确率；非常高的数字往往意味着过拟合。"
     },
     {
       "stage": "post",
       "question": "为什么在 2026 年的 LLM 流水线中词性标注仍然重要？",
       "options": [
-        "没有它 LLM 就无法运行",
         "词形还原、基于方面的情感分析、查询分解、结构化输出校验以及跨语言迁移，全都仍在消费词性或依存句法分析结果",
         "分词所必需",
+        "没有它 LLM 就无法运行",
         "替代 transformer"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "即便由 LLM 生成正文，词性和依存句法分析仍为许多结构化的下游任务提供输入。"
     },
     {
@@ -91,11 +91,11 @@
       "question": "在大多数生产级词性/句法分析任务中，你应该选用哪个库？",
       "options": [
         "scikit-learn",
-        "NumPy",
         "spaCy（追求顶尖准确率或更广语言覆盖时用 stanza/trankit）",
+        "NumPy",
         "自己手写一个 parser"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "spaCy 提供快速的生产级词性 + 依存句法分析器；stanza/trankit 覆盖更广的语言。"
     }
   ]

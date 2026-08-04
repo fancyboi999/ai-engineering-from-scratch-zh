@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "在阅读本课之前：一个好的 agent 评估验证器最需要具备什么特性？",
       "options": [
-        "毫秒级的执行速度。",
-        "跨运行的确定性。",
+        "对候选代码的每一行都有覆盖。",
         "对判定结果的自然语言解释。",
-        "对候选代码的每一行都有覆盖。"
+        "跨运行的确定性。",
+        "毫秒级的执行速度。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "确定性是让回归可检测的前提。一个非确定性的验证器会让每个红灯变成掷硬币。"
     },
     {
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "为什么报告中同时包含 pass@1 和 pass@k？",
       "options": [
-        "pass@1 是面板上给用户看的值；pass@k 供内部调试使用。",
-        "pass@k 可能掩盖一个只在多次采样中偶尔答对的模型，所以 pass@1 用首次尝试质量来锚定结果。",
+        "pass@1 是验证器注册中心支持的版本；pass@k 留给未来的验证器使用。",
         "当 k > 1 时 pass@k 和 pass@1 在数学上完全相同。",
-        "pass@1 是验证器注册中心支持的版本；pass@k 留给未来的验证器使用。"
+        "pass@1 是面板上给用户看的值；pass@k 供内部调试使用。",
+        "pass@k 可能掩盖一个只在多次采样中偶尔答对的模型，所以 pass@1 用首次尝试质量来锚定结果。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "pass@k 会让那些多次中碰巧答对一次的模型看起来很强；pass@1 是首次尝试的下限。两者都报告可以防止过度宣称。"
     },
     {
@@ -44,8 +44,8 @@
       "options": [
         "避免共享临时目录上的竞态条件。",
         "确保每个 sample 从有 bug 的初始状态开始，而不是前一个 sample 的输出。",
-        "这纯粹是性能优化。",
-        "只和 shell 验证器有关。"
+        "只和 shell 验证器有关。",
+        "这纯粹是性能优化。"
       ],
       "correct": 1,
       "explanation": "如果不重置 scratch，第 N+1 个 sample 会从第 N 个 sample 的输出开始。驱动层测的就变成了「第二次尝试收尾」而不是首次尝试成功率。"
@@ -55,11 +55,11 @@
       "question": "你想新增一个 'pytest_passes' 验证器，在 scratch 目录里跑 pytest。应该基于哪个现有验证器来实现？",
       "options": [
         "file_equals，因为 pytest 会写结果文件。",
-        "regex_match，因为 pytest 输出里有 'passed' 这个词。",
         "shell_exit_zero，因为 pytest 用退出码 0 表示通过。",
+        "regex_match，因为 pytest 输出里有 'passed' 这个词。",
         "没法把 pytest 表达为验证器。"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "pytest 通过时退出码为 0，失败时非零。shell_exit_zero 是正确的原语。生产环境中会通过第 26 课的沙箱来路由这个调用。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "审阅者问：「这个回归是模型的问题还是驱动层的问题？」哪个产物能回答这个问题？",
       "options": [
         "Agent 的思维链记录。",
-        "逐任务、逐 sample 的 SampleResult 加验证器详情消息。",
+        "Fixture JSON 文件。",
         "验证器注册中心的源码。",
-        "Fixture JSON 文件。"
+        "逐任务、逐 sample 的 SampleResult 加验证器详情消息。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "每个 sample 的延迟、验证器详情和通过/失败结果让你能分诊：同样的 fixture、不同的判定说明模型变了；同样的判定但延迟不同，说明其他东西在动。"
     }
   ]

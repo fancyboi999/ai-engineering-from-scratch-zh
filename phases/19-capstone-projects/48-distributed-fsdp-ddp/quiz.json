@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "从零实现 DDP wrapper 的核心是哪两个 collective op？",
       "options": [
+        "仅 reduce_scatter。",
         "send 和 recv。",
         "构造时 broadcast 让每个 rank 从相同参数起步，backward 后 all_reduce 让每个 rank 拿到平均梯度。",
-        "仅 reduce_scatter。",
         "barrier 和 barrier。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "初始化时 broadcast 保证 step 0 各 rank 同步。之后每步 backward 后 all_reduce 保持同步。"
     },
     {
@@ -20,8 +20,8 @@
       "options": [
         "它只是个 stub。",
         "torch.distributed 自带 gloo 后端，通过普通 socket 跑 collective，所以 CPU 上的 torch.multiprocessing worker 就能组成真正的 process group；在 GPU 机器上只需换设备标签。",
-        "它用的是模拟 tensor。",
-        "它根本没用 torch.distributed。"
+        "它根本没用 torch.distributed。",
+        "它用的是模拟 tensor。"
       ],
       "correct": 1,
       "explanation": "Gloo 是 CPU collective 后端。同样的调用在 GPU 上用 nccl，API 表面完全一样。"
@@ -32,8 +32,8 @@
       "options": [
         "什么都没证明。",
         "把各 rank 梯度求和再除以 world_size，能在浮点噪声内恢复出单进程在拼接输入上计算的梯度。",
-        "优化器收敛了。",
-        "CUDA 不是必需的。"
+        "CUDA 不是必需的。",
+        "优化器收敛了。"
       ],
       "correct": 1,
       "explanation": "全 batch 上的 cross entropy mean reduction 等于各 rank mean 的平均。Sum-and-divide 是正确操作；这个测试把它可视化了。"
@@ -42,24 +42,24 @@
       "stage": "check",
       "question": "这节课的 FSDP 草案在每次前向传播时对每个参数做了什么？",
       "options": [
-        "什么都没做。",
         "把扁平参数 pad 到 world_size 的整数倍、切片、在每个 rank 上 all_gather 切片、去掉 pad、并验证重建结果与原始一致。",
+        "什么都没做。",
         "重新初始化参数。",
         "计算哈希。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "每个 rank 持有每个参数的 1/world_size。Gather 重建完整 tensor 用于计算；生产级 FSDP 会把 gather 和前一层的计算做 overlap。"
     },
     {
       "stage": "check",
       "question": "为什么 gloo 的 all_gather 需要 world_size 个等大小的 shard，即使参数长度不能被 world_size 整除？",
       "options": [
-        "Gloo 的 all_gather 要求每个 rank 的输出 tensor 大小相同，所以扁平参数会右 pad 到 world_size 的整数倍再切片，gather 后再裁掉 padding。",
+        "随意选择。",
         "这是个 bug。",
-        "加快网络速度。",
-        "随意选择。"
+        "Gloo 的 all_gather 要求每个 rank 的输出 tensor 大小相同，所以扁平参数会右 pad 到 world_size 的整数倍再切片，gather 后再裁掉 padding。",
+        "加快网络速度。"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Gloo（和 nccl）的 all_gather 要求等大小输出。Padding 是最低成本的修复；草案在 gather 后把结果裁回原始长度。"
     },
     {

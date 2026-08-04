@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "本课如何划分 2026 年的 LLM 可观测性市场？",
       "options": [
-        "开发平台（捆绑了评测/prompt/会话）与 网关/遥测工具",
+        "Python 与 TypeScript",
         "本地部署 与 云",
-        "厂商 与 开源",
-        "Python 与 TypeScript"
+        "开发平台（捆绑了评测/prompt/会话）与 网关/遥测工具",
+        "厂商 与 开源"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -19,11 +19,11 @@
       "question": "本课把哪个工具定位为：核心采用 MIT 许可证、自托管能力出色、且提供每月 5 万事件的免费云套餐？",
       "options": [
         "LangSmith",
-        "Phoenix",
         "Arize AX",
-        "Langfuse"
+        "Langfuse",
+        "Phoenix"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -32,8 +32,8 @@
       "options": [
         "总是更贵",
         "通过零拷贝的 Iceberg/Parquet 集成，在规模化场景下大约便宜 100 倍",
-        "在每天 100 万事件以内免费",
-        "便宜 10%"
+        "便宜 10%",
+        "在每天 100 万事件以内免费"
       ],
       "correct": 1,
       "explanation": ""
@@ -42,36 +42,36 @@
       "stage": "check",
       "question": "本课认为为了可移植性，哪一层是错误的埋点层？",
       "options": [
+        "使用 OpenTelemetry GenAI 语义约定",
         "在你的 agent 框架内部埋点，因为这会把你与该框架耦合在一起",
         "在成功请求上按 5% 采样",
-        "使用 OpenTelemetry GenAI 语义约定",
         "在 HTTP/OpenAI-SDK 层埋点"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本课把哪一套 OpenTelemetry 约定认定为 2026 年各可观测性工具之间的互操作层？",
       "options": [
-        "OTel 消息（messaging）语义约定",
-        "OTel 数据库语义约定",
         "GenAI 语义约定（gen_ai.system、gen_ai.request.model、gen_ai.usage.input_tokens）",
-        "OTel HTTP 语义约定"
+        "OTel HTTP 语义约定",
+        "OTel 数据库语义约定",
+        "OTel 消息（messaging）语义约定"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么本课主张全量 trace 保留无法在超过每天 100 万请求时扩展？",
       "options": [
-        "保留所需的存储成本超过了 LLM 调用本身；团队必须采样（例如 100% 错误、100% 高成本、5% 成功）",
-        "OpenTelemetry 对 trace 总量设有上限",
         "厂商会阻止它",
-        "Phoenix 只支持 100 万条 trace"
+        "保留所需的存储成本超过了 LLM 调用本身；团队必须采样（例如 100% 错误、100% 高成本、5% 成功）",
+        "Phoenix 只支持 100 万条 trace",
+        "OpenTelemetry 对 trace 总量设有上限"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     }
   ]

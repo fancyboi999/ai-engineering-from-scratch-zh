@@ -6,60 +6,60 @@
       "stage": "pre",
       "question": "以下哪一项最能描述 EchoLeak（CVE-2025-32711）？",
       "options": [
-        "一种通过长上下文样本填塞的越狱",
-        "一次针对 PyPI 的供应链攻击",
         "NPU 中的一个硬件漏洞",
-        "Microsoft 365 Copilot 中的一个零点击 AI 命令注入缺陷（CVE-2025-32711，CVSS 9.3），导致未授权的网络信息泄露，并经由 CSP 白名单/可信的 Microsoft 域名外泄"
+        "Microsoft 365 Copilot 中的一个零点击 AI 命令注入缺陷（CVE-2025-32711，CVSS 9.3），导致未授权的网络信息泄露，并经由 CSP 白名单/可信的 Microsoft 域名外泄",
+        "一种通过长上下文样本填塞的越狱",
+        "一次针对 PyPI 的供应链攻击"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "是什么让 EchoLeak 成为「零点击」？",
       "options": [
-        "受害者无需打开邮件；Copilot 会在日常查询中把它作为 RAG 上下文检索进来，注入的指令随即执行",
-        "它要求用户点击 Teams 聊天中的一个链接",
         "它运行在操作系统内核中",
-        "它需要点击三次但无需输入"
+        "受害者无需打开邮件；Copilot 会在日常查询中把它作为 RAG 上下文检索进来，注入的指令随即执行",
+        "它需要点击三次但无需输入",
+        "它要求用户点击 Teams 聊天中的一个链接"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Aim Labs 把 EchoLeak 归类为「LLM 作用域越界（LLM Scope Violation）」。哪三个边界必须各自独立加以控制？",
       "options": [
-        "检索（retrieval）、作用域（scope）、输出（output）",
-        "网络、磁盘、内存",
         "输入、模型、GPU",
-        "prompt、响应、日志"
+        "检索（retrieval）、作用域（scope）、输出（output）",
+        "prompt、响应、日志",
+        "网络、磁盘、内存"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Microsoft/GitHub 如何修复 CamoLeak（CVSS 9.6，GitHub Copilot Chat）？",
       "options": [
-        "添加了一个 XPIA prompt 注入过滤器",
         "在 Copilot Chat 中完全禁用图像渲染（代价：可用性），因为另一条攻击面无法被界定",
-        "把模型切换为 Llama Guard",
-        "增大上下文尺寸"
+        "增大上下文尺寸",
+        "添加了一个 XPIA prompt 注入过滤器",
+        "把模型切换为 Llama Guard"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "EchoLeak 的披露揭示了严重性评级校准方面的什么模式？",
       "options": [
-        "厂商高估了初始的 CVSS 分数",
-        "厂商最初把 EchoLeak 评为低危（信息泄露）；Aim Labs 的 MFA 验证码外泄概念验证把评级升级到 9.3 —— 防御方必须推动为 AI 专属漏洞提供全面的 PoC",
         "所有 AI CVE 都自动被评为 10.0",
-        "严重性评级仅由 OWASP 决定"
+        "厂商高估了初始的 CVSS 分数",
+        "严重性评级仅由 OWASP 决定",
+        "厂商最初把 EchoLeak 评为低危（信息泄露）；Aim Labs 的 MFA 验证码外泄概念验证把评级升级到 9.3 —— 防御方必须推动为 AI 专属漏洞提供全面的 PoC"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -67,9 +67,9 @@
       "question": "截至 2024/2025 年，NIST 和 OWASP 如何给 prompt 注入排位？",
       "options": [
         "NIST AI SPD 2024 把 prompt 注入定性为生成式 AI 的一项重大信息安全风险；OWASP 2025 把它排为 LLM01（应用层首要威胁）",
+        "两者都仅称其为二级（Tier-2）风险",
         "NIST：超出范围；OWASP：未列入",
-        "NIST：轻微；OWASP：列表垫底",
-        "两者都仅称其为二级（Tier-2）风险"
+        "NIST：轻微；OWASP：列表垫底"
       ],
       "correct": 0,
       "explanation": ""

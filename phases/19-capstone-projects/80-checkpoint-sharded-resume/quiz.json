@@ -7,23 +7,23 @@
       "question": "为什么「先汇集再写出」在大规模下是错误的 checkpoint 模式？",
       "options": [
         "它看起来丑",
-        "所有状态都过 rank 0；写带宽是最慢的那条单链路、而非聚合带宽，所以 TB 级的写入要花几个小时",
         "它占用太多 CPU",
+        "所有状态都过 rank 0；写带宽是最慢的那条单链路、而非聚合带宽，所以 TB 级的写入要花几个小时",
         "它需要特殊硬件"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "分片写入随集群规模扩展：64 个 rank 并行写，完成时间是单 rank 写汇集状态的 1/64。"
     },
     {
       "stage": "pre",
       "question": "清单（manifest）记录了哪些 shard 文件本身记不下的信息？",
       "options": [
+        "主机名",
         "随机数",
         "world_size、schema 版本、每个 shard 的 sha256，以及 shard 归属；给加载器一份契约，让它在触碰状态前先校验",
-        "文件系统名",
-        "主机名"
+        "文件系统名"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "没有清单，加载器只能猜哪个 shard 属于哪个 rank，并盲信文件数量是对的。"
     },
     {
@@ -31,11 +31,11 @@
       "question": "为什么要写到 <name>.tmp 再 rename，而不是直接写？",
       "options": [
         "更快",
-        "同一文件系统内的 POSIX rename 是原子的：写到一半崩溃也不会动到前一个文件。直接写可能留下写了一半的 checkpoint，毒害下一次恢复",
         "torch 要求如此",
+        "同一文件系统内的 POSIX rename 是原子的：写到一半崩溃也不会动到前一个文件。直接写可能留下写了一半的 checkpoint，毒害下一次恢复",
         "省内存"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "没有原子写，一次写了一半的保存加上一份指向它的更新清单，会在下次加载时损坏状态。"
     },
     {
@@ -43,35 +43,35 @@
       "question": "每个 shard 的 sha256 防的是什么？",
       "options": [
         "网络攻击",
-        "写了一部分或被损坏的写入；加载时校验哈希能在截断的 shard 触碰模型状态之前抓住它",
         "性能变慢",
-        "内存泄漏"
+        "内存泄漏",
+        "写了一部分或被损坏的写入；加载时校验哈希能在截断的 shard 触碰模型状态之前抓住它"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "没有 sha256 校验，一个被截断的 shard 会悄悄加载并损坏 optimizer，之后以 NaN loss 的形式暴露出来。"
     },
     {
       "stage": "check",
       "question": "为什么加载路径要对 world_size 不匹配大声报错？",
       "options": [
-        "纯装饰",
         "在 8 个 rank 上恢复 4-rank 的 shard 布局会悄悄错配 shard；大声拒绝逼操作者改用跨 world size 的再平衡路径",
-        "更好写代码",
-        "硬件需要"
+        "纯装饰",
+        "硬件需要",
+        "更好写代码"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "跨 world size 的再平衡是一个独立操作；悄悄拼接尺寸不对的 shard 会损坏状态。"
     },
     {
       "stage": "post",
       "question": "为什么生产环境要轮转 checkpoint（只保留最近 K 个）？",
       "options": [
+        "其实并不需要",
         "美观",
-        "不轮转的话磁盘会在运行中途写满、下一个 checkpoint 就失败；轮转在写新的之前删掉最旧的，把磁盘占用约束住",
         "压缩",
-        "其实并不需要"
+        "不轮转的话磁盘会在运行中途写满、下一个 checkpoint 就失败；轮转在写新的之前删掉最旧的，把磁盘占用约束住"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "真实运行通常保留 3-5 个近期 checkpoint；每次新保存前丢掉最旧的，磁盘预算就固定了。"
     }
   ]

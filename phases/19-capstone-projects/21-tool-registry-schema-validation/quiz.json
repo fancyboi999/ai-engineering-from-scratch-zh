@@ -7,11 +7,11 @@
       "question": "为什么要把工具的 schema 和 handler 分开注册？",
       "options": [
         "因为 schema 必须写在 YAML 里",
+        "因为 schema 必须经过编译",
         "这样 validator 可以保持为纯数据操作，handler 则保持为不透明代码",
-        "因为 handler 不能返回 JSON",
-        "因为 schema 必须经过编译"
+        "因为 handler 不能返回 JSON"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "把 schema 保持为数据、handler 保持为代码，validator 就能作为一个纯函数在 schema 树上递归执行。"
     },
     {
@@ -19,9 +19,9 @@
       "question": "本课实现的子集故意不包含哪些关键字？",
       "options": [
         "type、properties、required",
-        "minLength、maxLength、pattern",
+        "items、enum",
         "oneOf、anyOf、$ref、allOf",
-        "items、enum"
+        "minLength、maxLength、pattern"
       ],
       "correct": 2,
       "explanation": "被省略的关键字会引入循环和引用解析。我们保持子集为线性的，这样 validator 只需一次递归遍历就能完成。"
@@ -30,48 +30,48 @@
       "stage": "check",
       "question": "为什么 register() 默认拒绝重复注册？",
       "options": [
-        "因为注册中心每个名称只能存一条记录",
-        "静默覆写是生产环境工具目录漂移的根源",
         "因为 schema 不能被重新校验",
-        "因为 handler 不能被替换"
+        "因为 handler 不能被替换",
+        "因为注册中心每个名称只能存一条记录",
+        "静默覆写是生产环境工具目录漂移的根源"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "强制使用 override=True 能暴露出代码中两个不同模块试图拥有同一个工具名的情况。"
     },
     {
       "stage": "check",
       "question": "当 schema 指定 type 为 integer 但收到值 True 时，validator 会怎么做？",
       "options": [
-        "当作 1 处理并通过",
         "返回类型错误，因为在这个 validator 中 bool 不是 integer",
-        "抛出未处理异常",
-        "静默强制转换为 integer"
+        "当作 1 处理并通过",
+        "静默强制转换为 integer",
+        "抛出未处理异常"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Python 的 bool 是 int 的子类，但 validator 在 integer 检查中过滤掉了 bool。JSON 中的布尔值和整数是两种不同类型。"
     },
     {
       "stage": "post",
       "question": "输入对象是 {'user': {'email': 0}}，schema 要求 user.email 为 string 类型，此时错误路径是什么？",
       "options": [
-        "/",
         "/user",
-        "/user/email",
-        "user.email"
+        "/",
+        "user.email",
+        "/user/email"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "JSON Pointer 把经过 user 再到 email 的下钻路径编码为 /user/email。"
     },
     {
       "stage": "post",
       "question": "为什么注册中心不是安全边界？",
       "options": [
-        "因为即使校验通过，handler 仍然可能行为不当",
+        "因为注册中心在进程内运行",
         "因为 handler 是异步的",
-        "因为 schema 是 JSON 格式的",
-        "因为注册中心在进程内运行"
+        "因为即使校验通过，handler 仍然可能行为不当",
+        "因为 schema 是 JSON 格式的"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "注册中心只检查形状。行为、超时和隔离是 dispatcher 和沙箱的职责。"
     }
   ]

@@ -3,15 +3,15 @@
     {
       "stage": "pre",
       "question": "MCP（Model Context Protocol）为 AI agent 解决了什么问题？",
-      "options": ["它为训练数据提供了一种标准格式", "它让 agent 有了一种标准方式去发现并使用外部服务器暴露的工具，而无需把工具实现写死在代码里", "它对 agent 之间的通信进行加密", "它压缩大上下文窗口以便塞进更小的模型"],
-      "correct": 1,
+      "options": ["它压缩大上下文窗口以便塞进更小的模型", "它对 agent 之间的通信进行加密", "它为训练数据提供了一种标准格式", "它让 agent 有了一种标准方式去发现并使用外部服务器暴露的工具，而无需把工具实现写死在代码里"],
+      "correct": 3,
       "explanation": "MCP 把工具访问标准化了：服务器用 JSON schema 暴露工具，任何兼容 MCP 的 agent 都能发现并调用它们。这把工具实现与 agent 代码解耦开来。"
     },
     {
       "stage": "pre",
       "question": "MCP 和 A2A 有什么区别？",
-      "options": ["MCP 用于 Python agent，A2A 用于 JavaScript agent", "MCP 把 agent 连接到工具（agent-to-tool），而 A2A 把 agent 连接到其他 agent（agent-to-agent）以进行任务委派", "MCP 是同步的，A2A 是异步的", "MCP 是开源的，A2A 是私有的"],
-      "correct": 1,
+      "options": ["MCP 是同步的，A2A 是异步的", "MCP 是开源的，A2A 是私有的", "MCP 用于 Python agent，A2A 用于 JavaScript agent", "MCP 把 agent 连接到工具（agent-to-tool），而 A2A 把 agent 连接到其他 agent（agent-to-agent）以进行任务委派"],
+      "correct": 3,
       "explanation": "MCP 是用于工具访问的协议（一个 agent 调用一个工具）。A2A 是用于 agent 协作的协议（一个 agent 把任务委派给另一个 agent）。它们解决的是通信问题的不同层面。"
     },
     {
@@ -24,15 +24,15 @@
     {
       "stage": "post",
       "question": "为什么多 agent 系统需要结构化的通信协议，而不能仅仅在 agent 之间传递字符串？",
-      "options": ["字符串太大，无法通过 HTTP 发送", "结构化协议提供类型安全、可发现性、错误处理，以及由不同团队用不同框架构建的 agent 之间的互操作性", "对 LLM 而言，字符串解析的计算开销很大", "所有云服务商都强制要求使用结构化协议"],
-      "correct": 1,
+      "options": ["对 LLM 而言，字符串解析的计算开销很大", "所有云服务商都强制要求使用结构化协议", "字符串太大，无法通过 HTTP 发送", "结构化协议提供类型安全、可发现性、错误处理，以及由不同团队用不同框架构建的 agent 之间的互操作性"],
+      "correct": 3,
       "explanation": "没有结构化的契约，来自不同团队的 agent 会误解彼此的输出，错误处理变得临时拼凑，也无从得知另一个 agent 能做什么。协议提供了让多 agent 系统可靠运转的共同语言。"
     },
     {
       "stage": "post",
       "question": "在设计目标上，ACP（Agent Communication Protocol）与 A2A 有何不同？",
-      "options": ["在实时应用中，ACP 比 A2A 更快", "ACP 侧重企业级的可审计性，提供完整的消息历史与合规追踪，而 A2A 侧重轻量级的任务委派", "ACP 只能在单个组织内部工作，而 A2A 可跨组织工作", "ACP 使用 WebSocket，A2A 使用 HTTP"],
-      "correct": 1,
+      "options": ["在实时应用中，ACP 比 A2A 更快", "ACP 只能在单个组织内部工作，而 A2A 可跨组织工作", "ACP 侧重企业级的可审计性，提供完整的消息历史与合规追踪，而 A2A 侧重轻量级的任务委派", "ACP 使用 WebSocket，A2A 使用 HTTP"],
+      "correct": 2,
       "explanation": "ACP 是为企业环境设计的，在这种环境中每一次 agent 交互都必须可审计、可追溯、合规。A2A 更简单，专注于把任务做完。ACP 增加了受监管行业所需要的治理层。"
     }
   ]

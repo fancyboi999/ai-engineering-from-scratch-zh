@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "为什么 tokenizer 是在 metric 层选定，而不是在 runner 层？",
       "options": [
-        "无论选哪个 tokenizer，metric 实现都是 O(n)",
-        "tokenizer 定义了什么才算 token 匹配；换一个就会改变 benchmark",
+        "tokenizer 是模型相关的，而 runner 看不到模型",
         "Numpy 在 import 时就需要一个 tokenizer",
-        "tokenizer 是模型相关的，而 runner 看不到模型"
+        "tokenizer 定义了什么才算 token 匹配；换一个就会改变 benchmark",
+        "无论选哪个 tokenizer，metric 实现都是 O(n)"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "BLEU 和 F1 对分词很敏感。把 tokenizer 绑定到 metric 上能让分数可复现，也让你能指着规则说清楚。"
     },
     {
@@ -19,59 +19,59 @@
       "question": "修正后的 n-gram 精度比朴素 n-gram 精度多做了什么？",
       "options": [
         "它用了不同的对数底",
-        "它把每个候选 n-gram 的计数，按任一参考中出现的最大计数进行截断（clip）",
         "它比朴素精度跑得更快",
+        "它把每个候选 n-gram 的计数，按任一参考中出现的最大计数进行截断（clip）",
         "它返回 0 到 100 的值而不是 0 到 1"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "按参考的上限截断，能防止候选靠反复重复某个高精度词来虚高分数。"
     },
     {
       "stage": "check",
       "question": "BLEU 为什么要用简短惩罚（brevity penalty）？",
       "options": [
-        "不加的话，一个只匹配上几个词的极短候选会拿到很高的精度，进而拿到不公平的高 BLEU",
         "长候选会让几何平均在数值上不稳定",
         "简短惩罚替代了 n-gram 计数上限",
+        "不加的话，一个只匹配上几个词的极短候选会拿到很高的精度，进而拿到不公平的高 BLEU",
         "它用来补偿加一平滑（additive-one smoothing）"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "光看精度会奖励短输出。BP 用 exp(1 - r/c) 对比参考更短的候选做降权。"
     },
     {
       "stage": "check",
       "question": "ROUGE-L 比较的是什么？",
       "options": [
-        "4-gram 精度，对照任一参考的 4-gram",
         "候选与参考 token 序列的最长公共子序列（LCS）",
-        "候选串与参考串之间的 Levenshtein 距离",
-        "字符级的 Jaccard 系数"
+        "字符级的 Jaccard 系数",
+        "4-gram 精度，对照任一参考的 4-gram",
+        "候选串与参考串之间的 Levenshtein 距离"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "ROUGE-L 用 LCS 长度，再算精度（LCS/候选长度）和召回（LCS/参考长度），结合 F-beta。"
     },
     {
       "stage": "check",
       "question": "token 级 F1 在哪种情况下返回 1.0？",
       "options": [
-        "预测为空、目标非空时",
         "预测和目标都为空时",
+        "预测为空、目标非空时",
         "预测是目标的超集、还带了额外噪声时",
         "预测和目标恰好共享一个 token 时"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "按惯例，空对空算完美匹配。任何非空目标搭配空预测都是 0.0。"
     },
     {
       "stage": "post",
       "question": "在打分函数里，为什么要按 metric_name 分派而不是按 category？",
       "options": [
-        "这样同一个 category 在不同任务里能用不同的 metric，并让分派器对 metric 无感知",
-        "category 比 metric_name 更难校验",
         "metric_name 比 category 更短",
-        "runner 访问不到 category 字段"
+        "category 比 metric_name 更难校验",
+        "runner 访问不到 category 字段",
+        "这样同一个 category 在不同任务里能用不同的 metric，并让分派器对 metric 无感知"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "metric_name 才是契约。一个 summary 任务可以在某条记录上用 rouge_l、在另一条上用 bleu_4；分派器根本不用操心。"
     }
   ]

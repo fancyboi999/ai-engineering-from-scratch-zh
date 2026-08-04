@@ -6,60 +6,60 @@
       "stage": "pre",
       "question": "以下哪一项最能描述 Mitchell 等人（2019）最初提出的模型卡（Model Card）？",
       "options": [
-        "一份 OpenAPI 规范",
         "ML 模型的「营养成分标签」：训练数据、预期用途、影响因素、指标、评估数据、按子群拆分的定量分析、伦理考量、注意事项",
-        "仅一份模型 checkpoint 清单",
-        "一份监管性的法律合同"
+        "一份 OpenAPI 规范",
+        "一份监管性的法律合同",
+        "仅一份模型 checkpoint 清单"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Oreamuno 等人（2023）关于 Hugging Face 模型卡中「伦理考量」采纳情况有何发现？",
       "options": [
-        "大约 0.3% 记录了伦理考量",
-        "大约 80% 记录了伦理考量",
         "没有任何模型卡含有任何文字",
-        "所有模型卡都记录了它们"
+        "大约 80% 记录了伦理考量",
+        "所有模型卡都记录了它们",
+        "大约 0.3% 记录了伦理考量"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Pushkarna 等人（Google 2022）的数据卡（Data Cards）所采用的望远镜式 / 潜望镜式 / 显微镜式分层提供了什么？",
       "options": [
+        "一个以望远镜为主题的可视化库",
         "一种边界对象（boundary-object）框架：同一份文档通过三个细节缩放层级，服务于不同读者（非专家、ML 从业者、审计员）",
         "一份 RLHF 前审计清单",
-        "一个以望远镜为主题的可视化库",
         "一个保护隐私的查询接口"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "系统卡（System Card）覆盖了模型卡所没有的什么范围？",
       "options": [
+        "仅 prompt 模板",
         "端到端 AI 系统：模型 + 安全技术栈 + 部署情境，包括安全能力、prompt 注入防护、数据外泄检测、对齐和事件响应",
         "仅数据集",
-        "仅 prompt 模板",
         "仅 tokenizer"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Liang 等人（2024）关于模型卡详尽程度与 Hugging Face 下载率有何报告？",
       "options": [
-        "详尽的模型卡使 HF 上实验组相对对照组的每周下载量提升 +29.0%（双重差分）；采纳压力如今由市场驱动，而不仅是合规驱动",
         "只有伦理考量部分影响了下载量",
+        "详尽的模型卡使 HF 上实验组相对对照组的每周下载量提升 +29.0%（双重差分）；采纳压力如今由市场驱动，而不仅是合规驱动",
         "详尽程度对下载量没有影响",
         "详尽程度降低了下载率"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -67,11 +67,11 @@
       "question": "Laminator（Duddu 等人 2024）为文档贡献了什么？",
       "options": [
         "一个自动化基准测试框架",
+        "一个基于 LLM 的摘要生成器",
         "通过硬件 TEE / 密码学签名提供可验证的证明（attestation），使卡片能携带「主张的证明」而不仅仅是一个主张",
-        "Datasheets 标准的替代品",
-        "一个基于 LLM 的摘要生成器"
+        "Datasheets 标准的替代品"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     }
   ]

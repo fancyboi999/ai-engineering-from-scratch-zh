@@ -6,22 +6,22 @@
       "stage": "pre",
       "question": "为什么要在编写打分代码之前先冻结任务记录的 schema？",
       "options": [
-        "这样 JSON 解析器跑得更快",
         "它锁死了契约，让 metric、runner 和后处理器对字段名达成一致",
+        "这样 JSON 解析器跑得更快",
         "它省掉了写校验器的必要",
         "它允许随意新增 metric 名字而不用再改任何东西"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "schema 就是每个下游消费者读取的契约。把它锁死后，你就能独立改动各个组件而不会破坏其余部分。"
     },
     {
       "stage": "pre",
       "question": "metric_name 字段接受的封闭词表是什么？",
       "options": [
-        "runner 被配置成能识别的任何值",
+        "只有 exact_match 和 f1",
         "exact_match、f1、bleu_4、rouge_l、accuracy、code_exec",
         "任务作者随便挑的任意字符串",
-        "只有 exact_match 和 f1"
+        "runner 被配置成能识别的任何值"
       ],
       "correct": 1,
       "explanation": "本课把 metric 词表钉死为六个名字。要加一个就得开一节新课，并在校验器里新增一条条目。"
@@ -30,24 +30,24 @@
       "stage": "check",
       "question": "当校验器在一条记录上看到未知的顶层字段时，它会怎么做？",
       "options": [
-        "把它剥掉然后继续",
-        "记一条 warning 但接受这条记录",
         "返回校验错误并拒绝这条记录",
-        "把它重命名为 metadata.unknown"
+        "把它重命名为 metadata.unknown",
+        "把它剥掉然后继续",
+        "记一条 warning 但接受这条记录"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "未知字段是前向兼容的隐患。校验器直接拒绝它们，好让 schema 始终是唯一的事实来源。"
     },
     {
       "stage": "check",
       "question": "为什么 few-shot 示例是附在任务记录上，而不是由 runner 计算出来？",
       "options": [
-        "runner 没有文件 I/O",
         "作者意图是 eval 的一部分；把示例绑定到任务上，就消除了不同模型在构造 prompt 时的差异",
         "这样能省磁盘空间",
+        "runner 没有文件 I/O",
         "few-shot 只在 fine-tuning 时才用"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "few-shot 的组织方式属于 eval 定义，而不属于模型接口。把它放进任务里，每个模型看到的 prompt 就完全一样。"
     },
     {
@@ -55,11 +55,11 @@
       "question": "在校验器看来，哪一对「类别-metric」组合是非法的？",
       "options": [
         "summary + rouge_l",
+        "code_exec + code_exec",
         "arithmetic + exact_match",
-        "mcq + bleu_4",
-        "code_exec + code_exec"
+        "mcq + bleu_4"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "对单个字母算 BLEU 毫无意义。校验器强制要求 mcq 任务只能用 exact_match 或 accuracy。"
     },
     {
@@ -68,8 +68,8 @@
       "options": [
         "原封不动的整个字符串",
         "C",
-        "Answer",
-        "空字符串"
+        "空字符串",
+        "Answer"
       ],
       "correct": 1,
       "explanation": "extract_letter 返回生成结果中第一个匹配 [A-E] 的字符。这个字符串在正文开头就是 C。"

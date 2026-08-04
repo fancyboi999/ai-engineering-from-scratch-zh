@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "为什么 chunking 的选择是 retrieval 质量的上限，而不只是一个普通的超参数？",
       "options": [
+        "因为 BM25 在现代 RAG 里没有任何作用",
         "因为 LLM 从来不读 chunk",
-        "因为 embedding 模型在训练时就固定了",
         "因为一旦答案片段被切成不连贯的碎片，下游的 embedding、reranker 或 LLM 都没法把它恢复回来",
-        "因为 BM25 在现代 RAG 里没有任何作用"
+        "因为 embedding 模型在训练时就固定了"
       ],
       "correct": 2,
       "explanation": "如果承载答案片段的 chunk 不连贯，它的 embedding 就会落到错误的聚类里，而下游组件无法修复这个损伤。"
@@ -18,10 +18,10 @@
       "stage": "pre",
       "question": "在你对语料一无所知时，哪种单一策略是最强的默认选择？",
       "options": [
-        "固定窗口（fixed-window）",
         "句子打包（sentence packer）",
+        "结构化 markdown 切分",
         "递归切分（recursive split）",
-        "结构化 markdown 切分"
+        "固定窗口（fixed-window）"
       ],
       "correct": 2,
       "explanation": "递归切分会先尝试最强的分隔符，再逐级回退，从而按区域自适应，因此即便结构不一致也能扛得住。"
@@ -30,48 +30,48 @@
       "stage": "check",
       "question": "本课里 recall@k 衡量的是什么？",
       "options": [
-        "top-k 的 chunk 里是否包含 query 的原文字符串",
         "top-k 的 chunk 里是否有任意一个与标准答案片段（gold span）重叠",
         "query 与 top-k chunk 之间的 cosine 相似度",
-        "top-k 里有多少个不同的文档"
+        "top-k 里有多少个不同的文档",
+        "top-k 的 chunk 里是否包含 query 的原文字符串"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "每个 query 都带有标准答案的偏移区间；只要 top-k 中任意一个 chunk 与 gold span 重叠，recall@k 就记为 1，否则为 0，再对所有 query 求平均。"
     },
     {
       "stage": "check",
       "question": "为什么固定窗口 chunking 在代码或 YAML 语料上表现极差？",
       "options": [
-        "它会丢失 Unicode 字符",
-        "它会把标识符和键值对从中间切断，产出的 chunk 只能 embed 成噪声",
+        "它无法并行化",
         "它产出的 chunk 比 embedding 模型的上下文窗口还大",
-        "它无法并行化"
+        "它会丢失 Unicode 字符",
+        "它会把标识符和键值对从中间切断，产出的 chunk 只能 embed 成噪声"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "在一个符号内部按字符切断，会摧毁 embedding 模型本该捕捉的语义。"
     },
     {
       "stage": "check",
       "question": "语义 chunking 里的质心漂移（centroid drift）终止条件是什么？",
       "options": [
+        "chunker 已经用尽了 embedding 预算",
         "当前累计均值向量与下一句之间的 cosine 相似度跌破阈值",
         "字符数超过上限",
-        "句子数超过一个硬编码的上限",
-        "chunker 已经用尽了 embedding 预算"
+        "句子数超过一个硬编码的上限"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "语义 chunking 在累计质心按设定的相似度阈值不再匹配下一句时切分。"
     },
     {
       "stage": "post",
       "question": "语义 chunking 引入了哪种另外四种策略都不会有的 embedding 失效模式？",
       "options": [
-        "chunk 太小，装不进 embedding 的上下文",
         "只要你换掉用于切分的模型，chunk 边界就会变，必须做一次协调一致的重建",
-        "chunk 不再能被 BM25 索引",
-        "chunk 丢失了起止偏移"
+        "chunk 丢失了起止偏移",
+        "chunk 太小，装不进 embedding 的上下文",
+        "chunk 不再能被 BM25 索引"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "语义聚类依赖某个 embedding 模型；换模型就会改变边界，因此切分用的模型必须单独锁定，或者与 retrieval 模型一起重建。"
     }
   ]

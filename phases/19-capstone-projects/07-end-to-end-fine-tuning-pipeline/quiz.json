@@ -6,60 +6,60 @@
       "stage": "pre",
       "question": "在数据准备阶段，污染检查（contamination check）防范的是什么？",
       "options": [
-        "SFT 与 DPO 阶段之间的 tokenizer 漂移",
-        "训练与部署之间的 GPU 驱动不匹配",
+        "MMLU-Pro、MT-Bench-v2 等公开基准的测试集泄漏进训练数据",
         "跨 llama.cpp 构建的 GGUF 版本偏差",
-        "MMLU-Pro、MT-Bench-v2 等公开基准的测试集泄漏进训练数据"
+        "训练与部署之间的 GPU 驱动不匹配",
+        "SFT 与 DPO 阶段之间的 tokenizer 漂移"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "为什么流水线要先 SFT 再 DPO（或 GRPO），而不是仅用 DPO？",
       "options": [
-        "Axolotl 没有实现 DPO",
         "SFT 在带标注的补全上建立领域行为，而 DPO 或 GRPO 则依据偏好对或可验证奖励来对齐模型",
-        "DPO 需要一个单独的基础模型架构",
-        "DPO 无法在量化权重上运行"
-      ],
-      "correct": 1,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "EAGLE-3 为 vLLM 服务阶段贡献了什么？",
-      "options": [
-        "一个新的 prompt 缓存层",
-        "一个用于工具调用的 OPA 策略",
-        "一个自动的数据去重步骤",
-        "提前预测 N 个 token 的 draft head；目标模型一次性验证，带来 2-3 倍吞吐"
-      ],
-      "correct": 3,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "哪个指标报告推测解码的 draft 与目标模型的对齐程度？",
-      "options": [
-        "接受率（acceptance rate）",
-        "覆盖率增量（coverage delta）",
-        "PSI",
-        "困惑度"
+        "DPO 无法在量化权重上运行",
+        "Axolotl 没有实现 DPO",
+        "DPO 需要一个单独的基础模型架构"
       ],
       "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
-      "question": "为了部署灵活性，流水线交付哪三种量化格式？",
+      "question": "EAGLE-3 为 vLLM 服务阶段贡献了什么？",
       "options": [
-        "ONNX、CoreML、TFLite",
-        "GPTQ-INT4-Marlin、AWQ-INT4 和 GGUF-Q4_K_M",
-        "三种运行时上仅 INT8",
-        "FP32、FP16、BF16"
+        "一个用于工具调用的 OPA 策略",
+        "提前预测 N 个 token 的 draft head；目标模型一次性验证，带来 2-3 倍吞吐",
+        "一个自动的数据去重步骤",
+        "一个新的 prompt 缓存层"
       ],
       "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "哪个指标报告推测解码的 draft 与目标模型的对齐程度？",
+      "options": [
+        "PSI",
+        "接受率（acceptance rate）",
+        "覆盖率增量（coverage delta）",
+        "困惑度"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "为了部署灵活性，流水线交付哪三种量化格式？",
+      "options": [
+        "FP32、FP16、BF16",
+        "三种运行时上仅 INT8",
+        "ONNX、CoreML、TFLite",
+        "GPTQ-INT4-Marlin、AWQ-INT4 和 GGUF-Q4_K_M"
+      ],
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -67,23 +67,23 @@
       "question": "本毕业项目中的 2026 年模型卡遵循哪个框架约定？",
       "options": [
         "Datasheets for Datasets",
-        "Model Openness Framework（MOF）2026 模板，涵盖数据、训练、评测、安全、许可证和可复现性",
         "仅 HuggingFace 的 YAML 前置元数据",
+        "Model Openness Framework（MOF）2026 模板，涵盖数据、训练、评测、安全、许可证和可复现性",
         "OpenAI 的模型卡格式"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "用哪个 HPA 指标对服务副本进行自动扩缩？",
       "options": [
-        "队列等待时间（queue-wait time）",
-        "CPU 利用率",
+        "网络出站字节数",
         "GPU 温度",
-        "网络出站字节数"
+        "队列等待时间（queue-wait time）",
+        "CPU 利用率"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     }
   ]

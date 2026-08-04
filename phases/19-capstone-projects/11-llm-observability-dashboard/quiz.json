@@ -6,57 +6,57 @@
       "stage": "pre",
       "question": "Langfuse、Phoenix 和 OpenLLMetry 趋同到哪种摄入 schema？",
       "options": [
-        "各厂商专有的 JSON",
-        "Prometheus 暴露格式",
         "基于 OTLP HTTP 的 OpenTelemetry GenAI 语义约定",
-        "纯 CSV 日志文件"
+        "纯 CSV 日志文件",
+        "各厂商专有的 JSON",
+        "Prometheus 暴露格式"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "为什么在存储层中分开使用 ClickHouse 和 Postgres？",
       "options": [
-        "它们可以互换，随机选一个",
-        "Postgres 在 span 摄入上更快",
         "ClickHouse 无法存储字符串",
-        "ClickHouse 处理对 span 的列式分析，而 Postgres 保存用户、会话和应用元数据"
+        "它们可以互换，随机选一个",
+        "ClickHouse 处理对 span 的列式分析，而 Postgres 保存用户、会话和应用元数据",
+        "Postgres 在 span 摄入上更快"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "OpenTelemetry Collector 中的尾采样（tail-sampling）处理器做什么？",
       "options": [
-        "在一条 trace 完成后再决定是否保留它，使用「保留错误加采样成功」这类规则",
         "把旧 trace 回放进 Postgres",
         "无条件流式传输每一个字节",
+        "在一条 trace 完成后再决定是否保留它，使用「保留错误加采样成功」这类规则",
         "截断低于 100ms 的 span"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "仪表盘如何检测跨周的漂移？",
       "options": [
+        "读取最近的部署时间戳",
         "在汇集的 prompt 嵌入上计算 PSI 或 KL 散度，并观察评测分数趋势",
         "靠肉眼盯仪表盘",
-        "读取最近的部署时间戳",
         "统计唯一 trace ID 的数量"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "交付物在一次注入的 PII 泄露回归上的 MTTR 目标是多少？",
       "options": [
-        "1 小时以内",
-        "24 小时以内",
         "在下一个值班班次之内",
+        "24 小时以内",
+        "1 小时以内",
         "从 bug 部署到 Slack 告警 5 分钟以内"
       ],
       "correct": 3,
@@ -67,11 +67,11 @@
       "question": "要满足 trace 覆盖率细则，哪些 SDK 系列必须产生规范的 GenAI span？",
       "options": [
         "仅 vLLM",
-        "至少六个：OpenAI、Anthropic、Google GenAI、LangChain、LlamaIndex 和 vLLM",
         "任意一个 SDK 就够了",
+        "至少六个：OpenAI、Anthropic、Google GenAI、LangChain、LlamaIndex 和 vLLM",
         "仅 OpenAI 和 Anthropic"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -80,10 +80,10 @@
       "options": [
         "以每晚邮件发送的 CSV 形式",
         "仅以 Slack 消息形式",
-        "作为一张没有 trace ID 的独立 Postgres 表",
-        "以评测 span 的形式，作为父 trace 的子节点写入 ClickHouse"
+        "以评测 span 的形式，作为父 trace 的子节点写入 ClickHouse",
+        "作为一张没有 trace ID 的独立 Postgres 表"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     }
   ]

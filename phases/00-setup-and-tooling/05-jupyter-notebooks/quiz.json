@@ -4,33 +4,33 @@
       "stage": "pre",
       "question": "什么是 Jupyter notebook？",
       "options": [
-        "一个用于编写 Python 脚本的文本编辑器",
-        "一种交互式文档，将可执行的代码单元格与 markdown 文本和内联输出混合在一起",
+        "一个用于 Python 库的包管理器",
         "一个用于数据科学项目的版本控制系统",
-        "一个用于 Python 库的包管理器"
+        "一个用于编写 Python 脚本的文本编辑器",
+        "一种交互式文档，将可执行的代码单元格与 markdown 文本和内联输出混合在一起"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Jupyter notebook（.ipynb）是一个交互式环境，你可以在单元格中编写并执行代码、内联查看输出，并将代码与带格式的文字说明混合在一起。"
     },
     {
       "stage": "pre",
       "question": "Jupyter 内核（kernel）的作用是什么？",
       "options": [
-        "将 markdown 单元格格式化为 HTML",
-        "运行单元格中的代码，并在多次执行之间将变量保留在内存中",
         "管理 notebook 的文件存储",
-        "将 notebook 连接到 GitHub 进行版本控制"
+        "将 notebook 连接到 GitHub 进行版本控制",
+        "将 markdown 单元格格式化为 HTML",
+        "运行单元格中的代码，并在多次执行之间将变量保留在内存中"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "内核是一个独立的 Python 进程，负责执行单元格代码并在内存中维护状态（变量、导入）。一个 notebook 中的所有单元格共享同一个内核。"
     },
     {
       "stage": "post",
       "question": "%timeit 和 %%time 这两个魔法命令有什么区别？",
       "options": [
-        "%timeit 测量墙钟时间，%%time 测量 CPU 时间",
-        "%timeit 多次运行代码并取平均，%%time 只运行一次",
         "%timeit 作用于单行，%%time 作用于整个 notebook",
+        "%timeit 多次运行代码并取平均，%%time 只运行一次",
+        "%timeit 测量墙钟时间，%%time 测量 CPU 时间",
         "没有区别，它们是别名"
       ],
       "correct": 1,
@@ -41,21 +41,21 @@
       "question": "notebook 在你机器上能用、但别人从头到尾运行时却失败，最常见的原因是什么？",
       "options": [
         "使用了不同的 Python 版本",
-        "乱序执行单元格，造成对执行顺序的隐藏依赖",
         "缺少 %matplotlib inline 魔法命令",
-        "使用了太多 markdown 单元格"
+        "使用了太多 markdown 单元格",
+        "乱序执行单元格，造成对执行顺序的隐藏依赖"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "乱序运行单元格会造成隐藏的状态依赖。某个变量之所以存在，可能是因为你在运行第 2 个单元格之前先运行了第 5 个。用 Kernel > Restart & Run All 可以验证线性执行。"
     },
     {
       "stage": "post",
       "question": "什么时候应该把代码从 notebook 迁移到 .py 脚本中？",
       "options": [
-        "一旦你写了超过 10 行代码就该迁移",
+        "只有在需要在 GPU 上运行时",
         "当代码是可复用的工具、训练流水线或生产代码时",
-        "永远不需要——对 AI 工作而言 notebook 总是更好",
-        "只有在需要在 GPU 上运行时"
+        "一旦你写了超过 10 行代码就该迁移",
+        "永远不需要——对 AI 工作而言 notebook 总是更好"
       ],
       "correct": 1,
       "explanation": "原则是“在 notebook 里探索，在脚本里交付”。可复用的工具、训练流水线以及任何在生产环境运行的东西都应该是 .py 文件。notebook 用于探索和原型设计。"

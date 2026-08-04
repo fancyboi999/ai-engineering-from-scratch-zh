@@ -7,21 +7,21 @@
       "question": "抽取式与生成式摘要在行为上的关键区别是什么？",
       "options": [
         "抽取式用 TF-IDF；生成式用 Word2Vec",
-        "抽取式从源文逐字返回句子；生成式生成新文本并可能产生幻觉",
         "抽取式只能多语言",
-        "抽取式比生成式慢"
+        "抽取式比生成式慢",
+        "抽取式从源文逐字返回句子；生成式生成新文本并可能产生幻觉"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "抽取式逐字摘取句子；生成式则重写，并有幻觉风险。"
     },
     {
       "stage": "pre",
       "question": "ROUGE 衡量什么？",
       "options": [
-        "嵌入相似度",
+        "token 级困惑度",
         "系统摘要与参考摘要之间的 n-gram 及最长公共子序列重叠",
         "阅读时长",
-        "token 级困惑度"
+        "嵌入相似度"
       ],
       "correct": 1,
       "explanation": "ROUGE-1/2/L 衡量与参考摘要的 unigram、bigram 和 LCS 重叠。"
@@ -30,24 +30,24 @@
       "stage": "check",
       "question": "在抽取式摘要中，TextRank 如何给句子打分？",
       "options": [
-        "按原始词数",
         "通过与参考摘要比较",
-        "在以句子相似度为边权的图上运行 PageRank 风格的迭代",
-        "通过与问题的嵌入余弦"
+        "按原始词数",
+        "通过与问题的嵌入余弦",
+        "在以句子相似度为边权的图上运行 PageRank 风格的迭代"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "TextRank 在句子相似度图上使用 PageRank；连接度高的句子得分最高。"
     },
     {
       "stage": "check",
       "question": "为什么在计算 ROUGE 时启用词干提取？",
       "options": [
-        "不做词干提取，'running' 和 'run' 会被算作不同 token，ROUGE 会低估真实重叠",
-        "为了加速 ROUGE",
         "词干提取规范化大小写",
-        "rouge-score 包要求做词干提取"
+        "rouge-score 包要求做词干提取",
+        "不做词干提取，'running' 和 'run' 会被算作不同 token，ROUGE 会低估真实重叠",
+        "为了加速 ROUGE"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "词干提取合并形态变体，让 ROUGE 给予语义等价形式以信用。"
     },
     {
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "为什么对涉及合规的内容更偏好抽取式摘要？",
       "options": [
-        "输出逐字摘自源文，消除了生成式那一类幻觉",
         "它更快",
-        "抽取式支持更长的输出",
-        "ROUGE 分数更高"
+        "ROUGE 分数更高",
+        "输出逐字摘自源文，消除了生成式那一类幻觉",
+        "抽取式支持更长的输出"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "逐字抽取无法捏造内容，这在事实性受监管的场景中很重要。"
     },
     {
@@ -79,8 +79,8 @@
       "question": "以下哪个是需要监控的生成式幻觉类型？",
       "options": [
         "标点漂移",
-        "停用词去除",
         "长句子",
+        "停用词去除",
         "实体调换（例如把 'John Smith' 写成 'John Brown'）、数字漂移、极性翻转或捏造事实"
       ],
       "correct": 3,
@@ -91,11 +91,11 @@
       "question": "什么时候你会选用 Pegasus 检查点而非 BART-large-CNN？",
       "options": [
         "评估 BLEU 时",
-        "输入很短时",
+        "在像科学论文摘要这样的领域，Pegasus 的 gap-sentence 预训练目标更契合",
         "需要抽取式输出时",
-        "在像科学论文摘要这样的领域，Pegasus 的 gap-sentence 预训练目标更契合"
+        "输入很短时"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": "Pegasus 的 gap-sentence 目标在长篇领域摘要（例如 pubmed）上表现出色。"
     }
   ]

@@ -1,36 +1,36 @@
 [
   {
     "question": "为什么 AI 创业公司常常因成本问题而非模型质量而失败？",
-    "options": ["模型总是足够好", "按次调用的成本会迅速累积：1 万用户每天调用 10 次，在赚到一分钱之前就要每天花 250 美元的 token 费", "成本优化很容易", "API 提供商提供无限免费额度"],
-    "correct": 1,
+    "options": ["API 提供商提供无限免费额度", "成本优化很容易", "模型总是足够好", "按次调用的成本会迅速累积：1 万用户每天调用 10 次，在赚到一分钱之前就要每天花 250 美元的 token 费"],
+    "correct": 3,
     "explanation": "LLM API 成本随用量线性增长。一个每次调用 0.003 美元的功能看起来便宜，直到它每天被调用 10 万次（每天 300 美元、每月 9000 美元）。没有成本优化，许多 AI 产品在规模化时都无法盈利。",
     "stage": "pre"
   },
   {
     "question": "什么是面向 LLM 应用的语义缓存（semantic caching）？",
-    "options": ["缓存模型权重", "存储先前查询的回复，当新查询在语义上相似（而不只是完全匹配）时提供缓存回复", "只缓存 embedding", "预先生成所有可能的回复"],
-    "correct": 1,
+    "options": ["预先生成所有可能的回复", "缓存模型权重", "只缓存 embedding", "存储先前查询的回复，当新查询在语义上相似（而不只是完全匹配）时提供缓存回复"],
+    "correct": 3,
     "explanation": "精确匹配缓存只对完全相同的查询有用。语义缓存对查询做 embedding，当余弦相似度超过阈值时提供缓存回复。「纽约天气怎么样？」可以匹配「今天纽约天气？」。",
     "stage": "pre"
   },
   {
     "question": "作为一种成本优化策略，模型路由（model routing）是什么？",
-    "options": ["跨服务器做负载均衡", "基于查询分类，把简单查询发给便宜/快速的模型，把复杂查询发给昂贵/强大的模型", "在不同 API 提供商之间路由", "缓存来自多个模型的回复"],
-    "correct": 1,
+    "options": ["缓存来自多个模型的回复", "跨服务器做负载均衡", "在不同 API 提供商之间路由", "基于查询分类，把简单查询发给便宜/快速的模型，把复杂查询发给昂贵/强大的模型"],
+    "correct": 3,
     "explanation": "不是每个查询都需要 GPT-4。一个分类器把简单问题（FAQ、问候）路由到便宜的模型（GPT-3.5、Haiku），把复杂问题（推理、分析）路由到昂贵的模型。这可以削减 50-80% 的成本。",
     "stage": "post"
   },
   {
     "question": "什么是 prompt 压缩（prompt compression），它如何降低成本？",
-    "options": ["通过删词让 prompt 更短", "移除冗余 token、对长上下文做摘要、消除样板文字，在保留关键信息的同时减少输入 token 数", "用 gzip 压缩 prompt", "使用更短的变量名"],
-    "correct": 1,
+    "options": ["使用更短的变量名", "用 gzip 压缩 prompt", "移除冗余 token、对长上下文做摘要、消除样板文字，在保留关键信息的同时减少输入 token 数", "通过删词让 prompt 更短"],
+    "correct": 2,
     "explanation": "在 RAG 应用中，输入 token 主导成本（大段检索上下文）。prompt 压缩移除填充词、对冗长段落做摘要、裁掉低相关性的块，在不丢失关键信息的前提下减少 token 数。",
     "stage": "post"
   },
   {
     "question": "什么是前缀缓存（prefix caching），哪个提供商功能支持它？",
-    "options": ["缓存每个回复的第一个词", "复用共享 prompt 前缀（system prompt + 工具定义）的 KV-cache 计算，为重复模式降低延迟和成本", "缓存 DNS 查询", "浏览器对 API 响应的缓存"],
-    "correct": 1,
+    "options": ["缓存每个回复的第一个词", "缓存 DNS 查询", "浏览器对 API 响应的缓存", "复用共享 prompt 前缀（system prompt + 工具定义）的 KV-cache 计算，为重复模式降低延迟和成本"],
+    "correct": 3,
     "explanation": "如果你的 system prompt + 工具定义有 5000 个 token，且在各请求间完全相同，前缀缓存就只计算一次 KV-cache 并复用它。Anthropic 的 prompt caching 和 OpenAI 的 cached tokens 都支持这一点。",
     "stage": "post"
   }

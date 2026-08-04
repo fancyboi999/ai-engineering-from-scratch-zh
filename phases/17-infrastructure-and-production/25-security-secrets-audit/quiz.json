@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "2026 年 LLM 服务凭证的标准模式是什么？",
       "options": [
-        "把密钥存放在 Slack 频道里",
         "集中式 vault，由 AI 网关在运行时通过 IAM role 拉取；在 vault 中轮换，所有应用在数分钟内自动生效",
+        "为了图快，把 API key 硬编码在配置文件里",
         "把密钥邮件发给每个工程师",
-        "为了图快，把 API key 硬编码在配置文件里"
+        "把密钥存放在 Slack 频道里"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "本课为 API key、vault 根令牌和 CI/CD 凭证推荐什么轮换节奏？",
       "options": [
+        "仅在泄露时",
         "90 天以内，尽可能自动化，手动时则记录并追踪",
         "每 5 年",
-        "仅在泄露时",
         "永不轮换"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -42,12 +42,12 @@
       "stage": "check",
       "question": "本课为 LLM 服务子网推荐什么样的出站（egress）姿态？",
       "options": [
-        "把一小组域名加白名单（api.openai.com、api.anthropic.com、向量数据库、vault）并丢弃其余一切，配合仅允许白名单的 DNS 解析器",
         "阻断所有出站，包括供应商",
-        "允许 DNS 但阻断 HTTP",
-        "允许所有出站流量"
+        "允许所有出站流量",
+        "把一小组域名加白名单（api.openai.com、api.anthropic.com、向量数据库、vault）并丢弃其余一切，配合仅允许白名单的 DNS 解析器",
+        "允许 DNS 但阻断 HTTP"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -67,9 +67,9 @@
       "question": "本课建议为每次 LLM 调用保留哪些审计日志字段？",
       "options": [
         "只存原始 prompt",
-        "只存响应",
+        "只存成本",
         "时间戳、用户/租户、prompt 哈希（而非原文）、模型 + 版本、token 计数、成本、响应哈希、任何触发的护栏",
-        "只存成本"
+        "只存响应"
       ],
       "correct": 2,
       "explanation": ""

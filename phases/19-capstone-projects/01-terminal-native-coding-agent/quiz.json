@@ -6,48 +6,48 @@
       "stage": "pre",
       "question": "2026 年的终端编码 agent 共享哪种循环形态？",
       "options": [
-        "规划、行动、观察、恢复（plan, act, observe, recover）",
-        "编码、解码、采样、流式输出",
         "训练、评估、部署、监控",
+        "编码、解码、采样、流式输出",
+        "规划、行动、观察、恢复（plan, act, observe, recover）",
         "拉取、嵌入、排序、综合"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "为什么 harness 要在 E2B 或 Daytona 沙箱中运行每个任务？",
       "options": [
-        "为了把文件系统和工具执行与宿主机隔离，以便在完成时可以销毁该 worktree",
+        "为了让 agent 循环能访问 GPU",
         "为了绕过模型供应商的限流",
         "为了在冷缓存上对 token 吞吐量做基准测试",
-        "为了让 agent 循环能访问 GPU"
+        "为了把文件系统和工具执行与宿主机隔离，以便在完成时可以销毁该 worktree"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "哪个内置 hook 是在破坏性 shell 命令执行前拦截它们的天然位置？",
       "options": [
-        "PreToolUse",
         "SessionStart",
+        "PreToolUse",
         "Stop",
         "PostToolUse"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "本毕业项目把每个工具结果上限设为约 4k token。这主要防止哪种失败模式？",
       "options": [
+        "跨恢复会话的陈旧计划状态",
         "通过恶意 shell 元字符发生的沙箱逃逸",
         "当工具返回大段转储时的上下文投毒和成本失控",
-        "跨恢复会话的陈旧计划状态",
         "模型对工具调用轨迹的过拟合"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -55,35 +55,35 @@
       "question": "在 150k token 处，PreCompact hook 做什么？",
       "options": [
         "取消运行并退还用户预算",
-        "把较早的轮次摘要为一个先前状态（prior-state）块，使计划和新观察仍能装下",
         "强制推送当前分支以备份进度",
-        "把后端模型切换为更小的 draft 模型"
+        "把后端模型切换为更小的 draft 模型",
+        "把较早的轮次摘要为一个先前状态（prior-state）块，使计划和新观察仍能装下"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本毕业项目在一个 30 个 issue 的 SWE-bench Pro 子集上，把它的 harness 与哪个基线对比？",
       "options": [
+        "Aider",
         "OpenCode",
-        "mini-swe-agent",
         "Live-SWE-agent",
-        "Aider"
+        "mini-swe-agent"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "交付物对照哪一组指标进行衡量？",
       "options": [
+        "MRR@10 和 nDCG@10",
         "WER、MOS 和首段音频输出时间",
         "困惑度、BLEU 和 ROUGE",
-        "pass@1、每任务轮次数和每任务成本（美元）",
-        "MRR@10 和 nDCG@10"
+        "pass@1、每任务轮次数和每任务成本（美元）"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     }
   ]

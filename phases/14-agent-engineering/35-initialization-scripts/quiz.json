@@ -7,20 +7,20 @@
       "question": "一个 init 脚本消除了什么？",
       "options": [
         "推理带来的延迟",
-        "每会话的设置税：探测运行时、列出 repo、在每个新会话重复同样的检查",
+        "认证 token",
         "提供商限流",
-        "认证 token"
+        "每会话的设置税：探测运行时、列出 repo、在每个新会话重复同样的检查"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "脚本只交一次税，并把答案写进 agent 会读取的 init_report.json。"
     },
     {
       "stage": "pre",
       "question": "init 脚本的失败模式契约是什么？",
       "options": [
-        "软失败并继续",
-        "大声失败、快速失败、在一处失败；当工作台坏掉时拒绝启动",
         "总是成功",
+        "大声失败、快速失败、在一处失败；当工作台坏掉时拒绝启动",
+        "软失败并继续",
         "永远重试"
       ],
       "correct": 1,
@@ -30,24 +30,24 @@
       "stage": "check",
       "question": "下列哪一个不是本课列出的探测项之一？",
       "options": [
-        "运行时版本",
-        "依赖可用性",
         "测试命令可解析性",
-        "逐 token 采样温度"
+        "逐 token 采样温度",
+        "运行时版本",
+        "依赖可用性"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": "探测项包括运行时版本、依赖、测试命令、路径、环境变量、状态新鲜度、最近已知良好提交（LKG）。"
     },
     {
       "stage": "check",
       "question": "为什么本课说 init 必须是幂等的？",
       "options": [
-        "它满足 SOC 2",
-        "运行两次除了新时间戳外应是无操作，这样它就能被接入 CI、hook 或一个任务前的 slash 命令",
+        "这是 JSON Schema 要求的",
         "幂等性省钱",
-        "这是 JSON Schema 要求的"
+        "运行两次除了新时间戳外应是无操作，这样它就能被接入 CI、hook 或一个任务前的 slash 命令",
+        "它满足 SOC 2"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "幂等性让 init 能安全地从多个入口（hook、CI、slash 命令）调用。"
     },
     {
@@ -55,21 +55,21 @@
       "question": "什么是最近已知良好提交锚定（last-known-good commit anchoring）？",
       "options": [
         "团队负责人最近的提交",
-        "把当前提交与一个 LKG 文件对照探测；若 diff 在未经人工批准下超过预算就拒绝启动",
         "repo 中最早的提交",
-        "HEAD 与 main 的合并基"
+        "HEAD 与 main 的合并基",
+        "把当前提交与一个 LKG 文件对照探测；若 diff 在未经人工批准下超过预算就拒绝启动"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Cloudflare 的 AI Code Review 用 LKG 来界定审查者范围，防止漂移跨会话累积。"
     },
     {
       "stage": "post",
       "question": "带 TTL 的锁文件模式做什么？",
       "options": [
-        "把 repo 锁住禁止编辑",
+        "禁用 CI",
         "在一次成功探测通过后写入 prereqs.lock；后续运行在 24 小时内信任该锁，若清单哈希匹配就跳过昂贵的探测",
-        "把所有写入封锁 24 小时",
-        "禁用 CI"
+        "把 repo 锁住禁止编辑",
+        "把所有写入封锁 24 小时"
       ],
       "correct": 1,
       "explanation": "与 Docker 层缓存形态相同：幂等探测 + 内容哈希 = 跳过。"
@@ -78,9 +78,9 @@
       "stage": "post",
       "question": "什么绝不应出现在 init 的热路径中？",
       "options": [
-        "本地文件系统读取",
-        "网络调用、LLM 调用、外部许可证检查；探测是三秒内的确定性管道",
         "读取环境变量",
+        "网络调用、LLM 调用、外部许可证检查；探测是三秒内的确定性管道",
+        "本地文件系统读取",
         "读取锁文件"
       ],
       "correct": 1,

@@ -8,8 +8,8 @@
       "options": [
         "HDF5 的 logo 更小。",
         "HDF5 提供分块、纯整数、内存映射读取和 O(1) 随机访问；JSONL 每次热路径读取都要走解析器。",
-        "JSONL 已弃用。",
-        "随机原因。"
+        "随机原因。",
+        "JSONL 已弃用。"
       ],
       "correct": 1,
       "explanation": "Dataloader 需要一个扁平 token 流和可寻址的切片；HDF5 原生支持。"
@@ -18,12 +18,12 @@
       "stage": "check",
       "question": "HDF5 chunk 大小相对于 trainer 的 window_size 应该怎么选？",
       "options": [
-        "始终选 chunk=1。",
-        "把 chunk 设为 window_size 的整数倍，这样每个样本落在一到两个 chunk 内，读取保持页缓存对齐。",
         "把 chunk 设成文档长度。",
-        "选能放进内存的最大 chunk。"
+        "选能放进内存的最大 chunk。",
+        "始终选 chunk=1。",
+        "把 chunk 设为 window_size 的整数倍，这样每个样本落在一到两个 chunk 内，读取保持页缓存对齐。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Chunk 和 window_size 不对齐会让吞吐量减半，因为每个样本都会跨两个 chunk。"
     },
     {
@@ -32,8 +32,8 @@
       "options": [
         "Attribute 比较好看。",
         "尾部 chunk 可能没填满；没有这个显式 attribute，reader 会读过真实末尾、进入零填充的 token 区域，导致模型学会预测零。",
-        "读取 shape 很慢。",
-        "Attribute 是必需的。"
+        "Attribute 是必需的。",
+        "读取 shape 很慢。"
       ],
       "correct": 1,
       "explanation": "分块布局有时会留下尾部空位；attribute 才是 ground truth。"
@@ -42,36 +42,36 @@
       "stage": "check",
       "question": "Writer 把 token 缓冲到 chunk_size 再做一次 resize，这实现了什么？",
       "options": [
-        "省几个 CPU 周期。",
         "写入是连续且 chunk 对齐的，避免了逐 token resize 带来的碎片化。",
         "减小词表大小。",
+        "省几个 CPU 周期。",
         "加快 sha256 计算。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "按 chunk 大小缓冲再扩展，是保持 HDF5 chunk 在磁盘上连续的唯一方式。"
     },
     {
       "stage": "post",
       "question": "为什么 swmr=True 是在 reader 端打开，而不是 writer 端？",
       "options": [
+        "性能考虑。",
         "随意偏好。",
         "Single-Writer-Multiple-Reader 模式让 dataloader worker 能安全共享文件；writer 不需要特殊模式，因为它是每个进程写一个分片。",
-        "性能考虑。",
         "安全考虑。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "把两种模式搞混是 'file is locked' 报错最常见的原因。"
     },
     {
       "stage": "post",
       "question": "Boundary token id 的存在是为了显式化什么？",
       "options": [
-        "词表大小限制。",
         "Packed window 内的文档边界，防止模型被静默地训练在跨文档拼接上。",
+        "随机数据。",
         "压缩。",
-        "随机数据。"
+        "词表大小限制。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "没有显式边界标记，trainer 会把边界当噪声学；有了它，边界就变成可用的分隔符。"
     }
   ]

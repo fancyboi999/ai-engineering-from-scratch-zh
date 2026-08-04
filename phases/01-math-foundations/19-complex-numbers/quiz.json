@@ -4,10 +4,10 @@
       "stage": "pre",
       "question": "虚数单位 i 由什么定义？",
       "options": [
-        "i = sqrt(2)",
+        "i^2 = 1",
         "i^2 = -1",
-        "i = -1",
-        "i^2 = 1"
+        "i = sqrt(2)",
+        "i = -1"
       ],
       "correct": 1,
       "explanation": "虚数单位 i 由性质 i^2 = -1 定义。它把实数轴扩展为一个二维平面。在几何上，乘以 i 是一次 90 度旋转——两次相乘（i^2）就是 180 度旋转，即 -1。"
@@ -16,10 +16,10 @@
       "stage": "pre",
       "question": "欧拉公式 e^(i*theta) 等于什么？",
       "options": [
-        "theta + i",
+        "i^theta",
         "cos(theta) + i*sin(theta)",
         "sin(theta) + cos(theta)",
-        "i^theta"
+        "theta + i"
       ],
       "correct": 1,
       "explanation": "欧拉公式表明 e^(i*theta) = cos(theta) + i*sin(theta)。这把复指数与三角函数联系起来，并表明当 theta 变化时 e^(i*theta) 描绘出单位圆。"
@@ -28,12 +28,12 @@
       "stage": "post",
       "question": "(3 + 2i)(1 + 4i) 的结果是多少？",
       "options": [
-        "3 + 8i",
+        "5 + 14i",
         "4 + 6i",
-        "-5 + 14i",
-        "5 + 14i"
+        "3 + 8i",
+        "-5 + 14i"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "使用 FOIL 展开：(3)(1) + (3)(4i) + (2i)(1) + (2i)(4i) = 3 + 12i + 2i + 8i^2 = 3 + 14i + 8(-1) = 3 + 14i - 8 = -5 + 14i。"
     },
     {
@@ -41,11 +41,11 @@
       "question": "为什么 transformer 的旋转位置编码（RoPE）要使用复数？",
       "options": [
         "复数压缩位置编码以使用更少内存",
+        "RoPE 使用虚数来处理负位置",
         "将 query/key 向量乘以复数旋转，可以把相对位置编码为一个旋转角度",
-        "attention 的 softmax 函数要求使用复数",
-        "RoPE 使用虚数来处理负位置"
+        "attention 的 softmax 函数要求使用复数"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "RoPE 把 query 和 key 向量乘以复数旋转矩阵 e^(i*m*theta)，其中 m 是位置。两个 token 之间的相对位置变成了一个旋转角度，通过复数乘法，attention 自然地对相对位置（而非绝对位置）变得敏感。"
     },
     {
@@ -53,11 +53,11 @@
       "question": "N 次单位根是单位圆上 N 个等间距的点。它们的和是多少？",
       "options": [
         "N",
+        "N/2",
         "1",
-        "0",
-        "N/2"
+        "0"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "N 个单位根是 e^(2*pi*i*k/N)，其中 k = 0, ..., N-1。它们对称地分布在单位圆周围，因此其向量和相互抵消为零。正是这种对称性使得 DFT 可逆。"
     }
   ]

@@ -6,20 +6,20 @@
       "stage": "pre",
       "question": "在基于规则的聊天机器人中，槽填充（slot-filling）状态机做什么？",
       "options": [
+        "跟踪哪些必需参数（日期、目的地、金额）仍然缺失，并依次询问它们",
         "检测讽刺",
-        "挑选最通顺的回复",
         "嵌入用户消息",
-        "跟踪哪些必需参数（日期、目的地、金额）仍然缺失，并依次询问它们"
+        "挑选最通顺的回复"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "槽填充迭代地收集任务处理器所需的结构化参数。"
     },
     {
       "stage": "pre",
       "question": "为什么基于检索的对话能抵抗幻觉？",
       "options": [
-        "它使用嵌入",
         "它拒绝所有查询",
+        "它使用嵌入",
         "它从一个精心整理的集合中返回预设回复，而不是生成新文本",
         "它使用 BM25"
       ],
@@ -30,69 +30,69 @@
       "stage": "check",
       "question": "LLM agent 循环与单次 LLM 调用的区别是什么？",
       "options": [
-        "使用贪心解码",
-        "使用 softmax",
+        "更大的上下文窗口",
         "一个控制器把 LLM 调用与工具调用交错执行，直到模型返回最终答案或步数预算耗尽",
-        "更大的上下文窗口"
+        "使用 softmax",
+        "使用贪心解码"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "agent 增加了一个“规划-行动-观察”的循环，带工具调用和终止条件。"
     },
     {
       "stage": "check",
       "question": "为什么混合路由（规则 + 检索 + LLM agent）是 2026 年的生产默认方案？",
       "options": [
-        "它维护成本更低",
-        "它免除了评估的需要",
+        "它避免使用嵌入",
         "没有单一架构能很好处理所有请求；规则覆盖破坏性操作，检索覆盖 FAQ，agent 处理模糊的开放式查询",
-        "它避免使用嵌入"
+        "它免除了评估的需要",
+        "它维护成本更低"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "混合系统对高风险操作使用确定性规则，把 LLM agent 留给开放式查询。"
     },
     {
       "stage": "check",
       "question": "什么是 prompt 注入（prompt injection）？",
       "options": [
-        "仅是 SQL 注入的一种变体",
         "一种 tokenizer 攻击",
-        "把 token 注入到嵌入中",
-        "用户提供（直接）或文档提供（间接）的文本，试图覆盖系统 prompt 或劫持 agent 行为"
+        "仅是 SQL 注入的一种变体",
+        "用户提供（直接）或文档提供（间接）的文本，试图覆盖系统 prompt 或劫持 agent 行为",
+        "把 token 注入到嵌入中"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "prompt 注入通过用户输入或工具输出中的不可信文本来改写 agent 的行为。"
     },
     {
       "stage": "post",
       "question": "OWASP Top 10（LLM Apps 2025）中排在 LLM01 的风险是哪个？",
       "options": [
-        "prompt 注入（直接与间接）",
         "不安全的反序列化",
+        "SQL 注入",
         "失效的访问控制",
-        "SQL 注入"
+        "prompt 注入（直接与间接）"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "prompt 注入在 OWASP LLM Apps Top 10（2025）中是 LLM01。"
     },
     {
       "stage": "post",
       "question": "哪种缓解模式通过把规划与执行分离来减少间接 prompt 注入？",
       "options": [
-        "更短的上下文",
         "Plan-Verify-Execute（规划-验证-执行）：agent 先规划，对照计划验证每个动作，再执行——防止工具输出注入新的、计划外的动作",
+        "更短的上下文",
         "更大的模型",
         "更低的 temperature"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "PVE 对照已商定的计划检查每一步，因此来自工具输出的注入指令会被拒绝。"
     },
     {
       "stage": "post",
       "question": "为什么即使在 LLM-agent 系统中，破坏性操作（支付、删除）也必须经由结构化流程？",
       "options": [
-        "LLM 很慢",
-        "beam search 不安全",
         "工具无法被调用",
+        "beam search 不安全",
+        "LLM 很慢",
         "自信的捏造、prompt 注入和范围蔓延意味着 LLM 不能成为不可逆副作用的唯一权威"
       ],
       "correct": 3,

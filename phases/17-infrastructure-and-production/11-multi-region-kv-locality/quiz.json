@@ -6,72 +6,72 @@
       "stage": "pre",
       "question": "为什么轮询（round-robin）负载均衡对带缓存的 LLM 推理是有害的？",
       "options": [
+        "轮询只对有状态数据库有效",
         "一个请求若没有落到持有其前缀的节点上，就要付出完整的 prefill 成本，而不是命中缓存",
         "轮询需要粘性会话（sticky sessions）",
-        "轮询会破坏 TLS",
-        "轮询只对有状态数据库有效"
-      ],
-      "correct": 0,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "一个缓存感知路由器消费哪两类输入？",
-      "options": [
-        "随机洗牌和请求大小",
-        "仅 user_id 和 tenant_id",
-        "轮询计数器和 TLS 密钥",
-        "来自各副本的 KV 缓存事件，以及对传入请求计算的前缀哈希"
-      ],
-      "correct": 3,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "对于 Llama 3.3 70B FP8，在一个 2K token 的 prompt 上，缓存命中与冷 prefill 之间的 TTFT 差距大约是多少？",
-      "options": [
-        "完全相同",
-        "约 10 倍（约 80 ms 对比 约 800 ms）",
-        "约 1.1 倍",
-        "约 1000 倍"
+        "轮询会破坏 TLS"
       ],
       "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
+      "question": "一个缓存感知路由器消费哪两类输入？",
+      "options": [
+        "轮询计数器和 TLS 密钥",
+        "来自各副本的 KV 缓存事件，以及对传入请求计算的前缀哈希",
+        "仅 user_id 和 tenant_id",
+        "随机洗牌和请求大小"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
+      "question": "对于 Llama 3.3 70B FP8，在一个 2K token 的 prompt 上，缓存命中与冷 prefill 之间的 TTFT 差距大约是多少？",
+      "options": [
+        "约 10 倍（约 80 ms 对比 约 800 ms）",
+        "约 1000 倍",
+        "约 1.1 倍",
+        "完全相同"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
       "question": "为什么跨区域路由在缓存命中方面并不总是优于区域内路由？",
       "options": [
-        "跨区域无法实现缓存感知路由",
-        "GORGO 研究发现缓存命中对延迟没有帮助",
         "所有超大规模云厂商都禁止跨区域路由",
-        "节省下来的 prefill 可能被网络 RTT 远远盖过，例如 440 ms 的往返可能远超 800 到 80 ms 的 prefill 节省"
+        "跨区域无法实现缓存感知路由",
+        "节省下来的 prefill 可能被网络 RTT 远远盖过，例如 440 ms 的往返可能远超 800 到 80 ms 的 prefill 节省",
+        "GORGO 研究发现缓存命中对延迟没有帮助"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本课把什么列为占 32% 的 LLM 灾备（DR）失败诱因？",
       "options": [
-        "备份包含了权重，却漏掉了 tokenizer 文件或量化配置",
+        "未加密的备份",
         "区域配额耗尽",
-        "配置错误的负载均衡器",
-        "未加密的备份"
+        "备份包含了权重，却漏掉了 tokenizer 文件或量化配置",
+        "配置错误的负载均衡器"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "对于像 Bedrock CRI 这样的商用跨区域推理产品，本课怎么说？",
       "options": [
-        "它们是 KV 缓存感知的，可以替代应用层路由",
-        "它们只在 us-east-1 工作",
         "它们优化的是可用性而非 TTFT，并把推理视为黑盒 —— 你仍然需要一个应用层的缓存感知路由器",
-        "在 GDPR 下它们是被禁止的"
+        "它们是 KV 缓存感知的，可以替代应用层路由",
+        "在 GDPR 下它们是被禁止的",
+        "它们只在 us-east-1 工作"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     }
   ]

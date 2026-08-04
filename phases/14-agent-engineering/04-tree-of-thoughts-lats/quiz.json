@@ -6,32 +6,32 @@
       "stage": "pre",
       "question": "为什么思维链在 Game of 24 上表现挣扎？",
       "options": [
-        "模型无法做整数乘法",
-        "一次线性的推进在早期某步出错时无法回溯，于是后续步骤把错误层层放大",
         "prompt 太短",
-        "CoT 需要一个 GPT-4 缺少的计算器工具"
+        "CoT 需要一个 GPT-4 缺少的计算器工具",
+        "模型无法做整数乘法",
+        "一次线性的推进在早期某步出错时无法回溯，于是后续步骤把错误层层放大"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "没有分支，一个错误的早期子表达式会毒化后面的整条链；论文测得 CoT 只有 4%。"
     },
     {
       "stage": "pre",
       "question": "在 Tree of Thoughts 搜索中，一个节点是什么？",
       "options": [
+        "微调期间的一次权重更新",
         "模型产出的一个 token",
         "一个连贯的中间步骤或想法，可有 K 个子扩展",
-        "微调期间的一次权重更新",
         "向运行时注册的一个工具"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "ToT 把推理当作一棵树，每个节点是一个可以扩展出 K 个子节点的中间想法。"
     },
     {
       "stage": "check",
       "question": "下列三者中哪一个不是 LATS 赋予 LLM 的角色？",
       "options": [
-        "提出下一步行动的策略（policy）",
         "给部分轨迹打分的价值函数（value function）",
+        "提出下一步行动的策略（policy）",
         "在失败时写下反思的自反思器（self-reflector）",
         "在 rollout 之间更新模型权重的优化器（optimizer）"
       ],
@@ -42,21 +42,21 @@
       "stage": "check",
       "question": "说出本课列出的 MCTS 四个阶段。",
       "options": [
-        "Sample、Score、Sort、Submit",
-        "Select、Expand、Simulate、Backpropagate",
         "Plan、Execute、Reflect、Stop",
-        "Search、Synthesize、Synthesize-Again、Stop"
+        "Search、Synthesize、Synthesize-Again、Stop",
+        "Select、Expand、Simulate、Backpropagate",
+        "Sample、Score、Sort、Submit"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "MCTS 每次迭代按 select、expand、simulate、backpropagate 进行。"
     },
     {
       "stage": "check",
       "question": "在 UCT 中，探索常数 c 的作用是什么？",
       "options": [
-        "它缩放价值估计 Q",
-        "它在探索项 sqrt(ln N / n) 和利用项 Q 之间进行加权",
         "它设置最大树深度",
+        "它在探索项 sqrt(ln N / n) 和利用项 Q 之间进行加权",
+        "它缩放价值估计 Q",
         "它控制 rollout 的数量"
       ],
       "correct": 1,
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "相比单条轨迹，什么时候搜索是主动有害的？",
       "options": [
-        "当评估器有噪声且只有唯一正确答案时，搜索会收敛到一个得分不错的错误答案",
-        "当任务涉及多个正确答案时",
         "只要 token 便宜",
-        "当任务是代码生成时"
+        "当任务是代码生成时",
+        "当任务涉及多个正确答案时",
+        "当评估器有噪声且只有唯一正确答案时，搜索会收敛到一个得分不错的错误答案"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "有噪声的价值函数加上唯一正确答案，正是搜索过拟合到噪声的情形。"
     },
     {
       "stage": "post",
       "question": "在 Game of 24 上，相比 CoT，你大致应该为 ToT 预留多少倍的 token 用量？",
       "options": [
-        "约 2 倍",
-        "约 10 倍",
         "100 到 1000 倍",
-        "比 CoT 更少，因为有剪枝"
+        "约 2 倍",
+        "比 CoT 更少，因为有剪枝",
+        "约 10 倍"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "本课引用 ToT 在 Game of 24 上相比 CoT 有 100-1000 倍的 token 成本。"
     }
   ]

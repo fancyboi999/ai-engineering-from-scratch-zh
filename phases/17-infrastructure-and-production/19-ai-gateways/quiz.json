@@ -6,9 +6,9 @@
       "stage": "pre",
       "question": "本课中 AI 网关的核心角色是什么？",
       "options": [
-        "一个模型微调服务",
-        "一个用于检索的向量数据库",
         "一个仅做日志的 sidecar",
+        "一个用于检索的向量数据库",
+        "一个模型微调服务",
         "一个位于应用与模型供应商之间的进程，把路由、回退、重试、限流、密钥引用、可观测性和护栏整合到同一个 API 之后"
       ],
       "correct": 3,
@@ -18,60 +18,60 @@
       "stage": "check",
       "question": "Kong 的基准测试报告 LiteLLM 的规模天花板是多少？",
       "options": [
+        "LiteLLM 无法被基准测试",
         "它在 50 RPS 时见顶",
-        "它在约 2000 RPS 附近崩溃，占用 8 GB 内存，并在持续负载下出现级联故障",
         "它在超过 10k RPS 后仍线性扩展",
-        "LiteLLM 无法被基准测试"
+        "它在约 2000 RPS 附近崩溃，占用 8 GB 内存，并在持续负载下出现级联故障"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "按 Kong 在同等 CPU 上的基准测试，Kong AI Gateway 比 Portkey 和 LiteLLM 快多少？",
       "options": [
-        "比 Portkey 快 228%，比 LiteLLM 快 859%",
         "大约快 10% 和 20%",
-        "完全相同",
-        "比两者都慢"
+        "比两者都慢",
+        "比 Portkey 快 228%，比 LiteLLM 快 859%",
+        "完全相同"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "本课把哪个网关定位为延迟开销 20-40 ms、聚焦护栏 / PII 脱敏 / 越狱检测？",
       "options": [
+        "Portkey",
         "Kong AI Gateway",
-        "LiteLLM",
         "Cloudflare AI Gateway",
-        "Portkey"
+        "LiteLLM"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本课认为自托管与托管网关之间做决策的决定性因素（forcing function）是什么？",
       "options": [
-        "网关是否开源",
-        "支持的供应商数量",
         "每请求成本",
-        "数据驻留（data residency）要求"
+        "支持的供应商数量",
+        "数据驻留（data residency）要求",
+        "网关是否开源"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "当 SLA 为 TTFT P99 < 100 ms 时，哪些网关能保持在预算之内？",
       "options": [
-        "任何网关",
-        "仅 Portkey",
         "仅 LiteLLM",
-        "Kong（约 3-8 ms）或 Cloudflare/Vercel 边缘网关（约 1-3 ms）；Portkey 在 20-40 ms 太重了"
+        "仅 Portkey",
+        "Kong（约 3-8 ms）或 Cloudflare/Vercel 边缘网关（约 1-3 ms）；Portkey 在 20-40 ms 太重了",
+        "任何网关"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     }
   ]

@@ -6,9 +6,9 @@
       "stage": "pre",
       "question": "开始之前：你给一个原始 base model 输入 prompt 'What is the capital of France?'，它输出 'And what about Italy and Spain too?'。最准确的诊断是什么？",
       "options": [
-        "模型缺少关于巴黎的知识。",
-        "模型有语言模型的续写能力，但没有 instruction-following 的格式契约。",
         "模型需要更大的词表。",
+        "模型有语言模型的续写能力，但没有 instruction-following 的格式契约。",
+        "模型缺少关于巴黎的知识。",
         "base model 必须重置并重新预训练。"
       ],
       "correct": 1,
@@ -18,24 +18,24 @@
       "stage": "check",
       "question": "collate 函数在 instruction 位置和 padding 位置上设 labels[i] = -100。为什么 PyTorch 的 cross-entropy 能正确处理这些位置？",
       "options": [
-        "cross-entropy 会静默丢弃任何负 target。",
-        "F.cross_entropy 会尊重 ignore_index=-100：这些位置贡献零 loss、零梯度。",
+        "PyTorch 按序列长度归一化，所以被 mask 的位置会抵消掉。",
         "模型在这些位置的输出被自动设为 NaN。",
-        "PyTorch 按序列长度归一化，所以被 mask 的位置会抵消掉。"
+        "cross-entropy 会静默丢弃任何负 target。",
+        "F.cross_entropy 会尊重 ignore_index=-100：这些位置贡献零 loss、零梯度。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "ignore_index 是 F.cross_entropy 的文档化参数。target 等于该值的位置对 loss 和梯度的贡献都为零。-100 是约定俗成的默认值。"
     },
     {
       "stage": "check",
       "question": "`shifted_loss` 为什么切 `logits[:, :-1, :]` 和 `labels[:, 1:]` 而不是在同一位置上用？",
       "options": [
-        "为了让 tensor 在 collate 之后大小一致。",
-        "因为模型在位置 i 预测的是位置 i+1 的 token，这是因果 next-token 目标决定的。",
         "为了自动排除末尾的 padding 位置。",
-        "这只是一个可选优化；用同一位置的 labels 也行。"
+        "这只是一个可选优化；用同一位置的 labels 也行。",
+        "为了让 tensor 在 collate 之后大小一致。",
+        "因为模型在位置 i 预测的是位置 i+1 的 token，这是因果 next-token 目标决定的。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "因果 LM 训练的是让位置 i 预测 token i+1。切片把位置 i 的预测和位置 i+1 的 gold label 对齐，这就是标准的 next-token 目标。"
     },
     {
@@ -43,33 +43,33 @@
       "question": "你不做 mask 就训练：labels 等于 input_ids，没有 -100。模型能训，但 response 上的 exact-match 不如有 mask 时。最可能的原因？",
       "options": [
         "优化器在 response token 上过拟合了。",
-        "大部分梯度信号花在预测 instruction 上了（那些本来被 mask 掉的最大区域现在放了出来）。",
         "cross-entropy 在 loss 包含 special token 时不稳定。",
-        "没有 mask 模型就学不到 boundary token。"
+        "没有 mask 模型就学不到 boundary token。",
+        "大部分梯度信号花在预测 instruction 上了（那些本来被 mask 掉的最大区域现在放了出来）。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "当 instruction 位置也计入 loss 时，它们会主导梯度，因为 instruction 通常比 response 占的 token 更多。你真正关心的那部分（response）的有效学习率就下降了，模型把能力花在了重建用户必然会提供的输入上。"
     },
     {
       "stage": "post",
       "question": "held-out 集上 exact-match 为 0.85。一个 reviewer 指出模型会改写正确答案，exact-match 抓不到这些。你该加哪个指标来捕获这种情况？",
       "options": [
-        "held-out 集上的 loss。",
-        "token-level F1：与 reference 对比，即使不完全相同也能给 overlap 打分。",
+        "reference 在模型下的 cross-entropy。",
         "平均序列长度。",
-        "reference 在模型下的 cross-entropy。"
+        "held-out 集上的 loss。",
+        "token-level F1：与 reference 对比，即使不完全相同也能给 overlap 打分。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "token-level F1（对预测和 reference token 做归一化后计数）即使表面形式不同，也能给答对了大部分内容的模型计分。这是第 41 课的工作。"
     },
     {
       "stage": "post",
       "question": "你想把 SFT 模型用在支持多轮对话的 chatbot 中。对数据和 mask 的最小改动是什么？",
       "options": [
-        "不需要改动：SFT 模型天然支持多轮对话。",
-        "每轮加 USER 和 ASSISTANT 标记，把各轮拼接起来，mask 掉除当前要训练的 assistant 轮之外的所有内容。",
         "把 loss 改成均方误差。",
-        "扩大词表。"
+        "每轮加 USER 和 ASSISTANT 标记，把各轮拼接起来，mask 掉除当前要训练的 assistant 轮之外的所有内容。",
+        "扩大词表。",
+        "不需要改动：SFT 模型天然支持多轮对话。"
       ],
       "correct": 1,
       "explanation": "多轮 SFT 是单轮模板的推广。每轮加一个角色标记。mask 是所有非 assistant 位置加 padding 的并集。训练目标不变。"

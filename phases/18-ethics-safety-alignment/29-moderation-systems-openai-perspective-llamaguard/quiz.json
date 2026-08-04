@@ -6,9 +6,9 @@
       "stage": "pre",
       "question": "OpenAI 的 omni-moderation-latest（2024）是什么？",
       "options": [
-        "一个 RLHF 奖励模型",
-        "一个专注推理的前沿模型",
         "一个 C2PA 水印端点",
+        "一个专注推理的前沿模型",
+        "一个 RLHF 奖励模型",
         "一个基于 GPT-4o 的审核分类器，可在一次调用中同时处理文本和图像，返回 13 类响应 schema（骚扰、仇恨、自残、性、暴力、违法，及其子类别），对大多数开发者免费"
       ],
       "correct": 3,
@@ -19,59 +19,59 @@
       "question": "以下哪一项不是 OpenAI Moderation 的主要顶层类别之一？",
       "options": [
         "violence（暴力）",
+        "harassment（骚扰）",
         "election-interference（干预选举）",
-        "self-harm（自残）",
-        "harassment（骚扰）"
+        "self-harm（自残）"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "2026 年标准审核模式的三层是什么？",
       "options": [
-        "Probe / detector / harness",
         "Tokenizer / 模型 / detokenizer",
-        "望远镜式 / 潜望镜式 / 显微镜式",
-        "输入审核（生成前）、输出审核（生成后）、自定义审核（领域规则）"
+        "Probe / detector / harness",
+        "输入审核（生成前）、输出审核（生成后）、自定义审核（领域规则）",
+        "望远镜式 / 潜望镜式 / 显微镜式"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Perspective API（Google Jigsaw）主要被设计用来对什么打分？",
       "options": [
-        "水印强度",
-        "毒性（toxicity，带有严重毒性、侮辱、脏话、威胁、身份攻击等子维度），作为 LLM 时代之前的内容审核基线",
+        "用户满意度奖励",
         "推理质量",
-        "用户满意度奖励"
+        "毒性（toxicity，带有严重毒性、侮辱、脏话、威胁、身份攻击等子维度），作为 LLM 时代之前的内容审核基线",
+        "水印强度"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "仅做输入审核的一种失败模式是什么？",
       "options": [
+        "它消除了对输出分类器的需求",
         "它无法在 GPU 上运行",
-        "它无法捕捉模型输出的失败或幻觉；编码攻击（第 12-14 课）可以完全绕过输入分类器",
         "它总是拦截合法内容",
-        "它消除了对输出分类器的需求"
+        "它无法捕捉模型输出的失败或幻觉；编码攻击（第 12-14 课）可以完全绕过输入分类器"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Azure Content Moderator 的弃用情况和迁移目标是什么？",
       "options": [
-        "于 2024 年 2 月弃用，2027 年 3 月 15 日停服；迁移目标是 Azure AI Content Safety（基于 LLM，与 Azure OpenAI 集成）",
-        "被 Perspective API 取代",
         "并入 Llama Guard 4",
-        "立即弃用且无替代品"
+        "于 2024 年 2 月弃用，2027 年 3 月 15 日停服；迁移目标是 Azure AI Content Safety（基于 LLM，与 Azure OpenAI 集成）",
+        "立即弃用且无替代品",
+        "被 Perspective API 取代"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     }
   ]

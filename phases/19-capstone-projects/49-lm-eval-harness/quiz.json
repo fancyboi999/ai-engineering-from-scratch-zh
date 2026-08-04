@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "在评测框架的 JSONL 格式中，定义一个 task example 的四个字段是什么？",
       "options": [
+        "input 和 output",
         "name, score, payload, vendor",
         "id, prompt, targets, metric，以及一个可选的 extras 字典用于放指标需要的附加数据。",
-        "input 和 output",
         "weights 和 bias"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "JSONL 行就是契约。extras 字段让 code_exec 指标可以传 io_pairs 而不污染 prompt。"
     },
     {
       "stage": "pre",
       "question": "为什么 metric 函数签名是 (prediction, targets, extras) -> float？",
       "options": [
+        "它返回的是整数。",
         "随意选择。",
         "这是能同时处理单 target 字符串匹配、多 reference rouge-l 和带附加数据的 code_exec 的最小签名，同时保持分数在可比较的 [0.0, 1.0] 范围内。",
-        "它返回的是整数。",
         "它需要 model 对象。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "[0,1] 范围内的浮点数意味着 per-task 和 overall 分数都是可解释的平均值。extras 槽位是 code_exec 获取 io_pairs 的方式。"
     },
     {
       "stage": "check",
       "question": "code_exec 指标如何防御恶意预测？",
       "options": [
-        "它没有防御。",
+        "它拒绝任何包含 def 的内容。",
         "它在一个剥离了 __builtins__ 的命名空间里运行预测，只暴露少数安全名称；import 语句会失败因为 importer 不在作用域内。",
         "它使用沙箱容器。",
-        "它拒绝任何包含 def 的内容。"
+        "它没有防御。"
       ],
       "correct": 1,
       "explanation": "这节课的安全命名空间把 builtins 削减到少数几个名称。测试断言 import os 返回分数 0.0 而不是被执行。"
@@ -43,23 +43,23 @@
       "question": "Model adapter 抽象带来了什么好处？",
       "options": [
         "没有好处。",
-        "它是框架中唯一与模型相关的代码；换一个 adapter 指向新的供应商，task、metric、runner 和排行榜格式全都不用动。",
+        "torch 要求它。",
         "它让模型更快。",
-        "torch 要求它。"
+        "它是框架中唯一与模型相关的代码；换一个 adapter 指向新的供应商，task、metric、runner 和排行榜格式全都不用动。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "课程里的 ToyAdapter 是一个确定性的模式匹配器。一个面向真实供应商的 HttpAdapter 有同样的 generate(prompts) -> list[str] 接口。"
     },
     {
       "stage": "check",
       "question": "为什么排行榜 JSON 带一个类似 leaderboard.v1 的 schema 字符串？",
       "options": [
-        "为了 SEO。",
-        "这样未来格式变更时升级版本号，下游 dashboard 可以据此分发处理逻辑而不是静默出错。",
         "随意的。",
-        "压缩文件用。"
+        "为了 SEO。",
+        "压缩文件用。",
+        "这样未来格式变更时升级版本号，下游 dashboard 可以据此分发处理逻辑而不是静默出错。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "跟第 47 课 checkpoint payload 一样的套路。Schema 字段就是迁移钩子。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "看排行榜，overall_score 怎么算的？比较两次 run 时要注意什么？",
       "options": [
         "正确数求和。",
-        "Per-task 分数（各在 [0,1]）取平均；比较时还要 diff 分数变动的 task 的 per-example 预测，因为光看分数会掩盖到底哪些样例退步了。",
+        "随机采样。",
         "取最好的 task 分数。",
-        "随机采样。"
+        "Per-task 分数（各在 [0,1]）取平均；比较时还要 diff 分数变动的 task 的 per-example 预测，因为光看分数会掩盖到底哪些样例退步了。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Per-task mean 的 mean 让每个 task 权重相等。用 --include-per-example 把预测级别的证据放在分数旁边，这样退步就看得到了。"
     }
   ]

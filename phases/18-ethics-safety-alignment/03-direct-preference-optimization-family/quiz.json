@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "为什么 DPO 可以跳过训练一个显式的奖励模型？",
       "options": [
-        "DPO 在第二个优化循环中隐式地训练自己的奖励模型",
         "RLHF 的闭式最优解让你能把奖励表示为策略的对数比值，再代入 Bradley-Terry 损失",
-        "偏好数据不需要标量奖励",
-        "Bradley-Terry 偏好恰好对奖励函数不变"
+        "Bradley-Terry 偏好恰好对奖励函数不变",
+        "DPO 在第二个优化循环中隐式地训练自己的奖励模型",
+        "偏好数据不需要标量奖励"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "IPO（Azar 等人，2024）主要解决 DPO 中的哪种失败模式？",
       "options": [
-        "对成对数据的需求",
-        "对参考策略的依赖",
         "被选中响应的长度偏置",
-        "由极小的偏好概率导致的无界隐式奖励差距"
+        "对参考策略的依赖",
+        "由极小的偏好概率导致的无界隐式奖励差距",
+        "对成对数据的需求"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "什么时候你会选择 KTO 而非 DPO？",
       "options": [
-        "当你必须保证零隐式奖励漂移时",
+        "当你想完全移除 KL 惩罚时",
         "当你拥有未配对的单一标签（可取 / 不可取），并想使用损失厌恶（loss-aversion）效用时",
-        "当你只有具有强 margin 的成对数据时",
-        "当你想完全移除 KL 惩罚时"
+        "当你必须保证零隐式奖励漂移时",
+        "当你只有具有强 margin 的成对数据时"
       ],
       "correct": 1,
       "explanation": ""
@@ -43,9 +43,9 @@
       "question": "与 DPO 相比，SimPO 独有的特性是哪一项？",
       "options": [
         "它移除了参考策略，并按序列长度对对数似然进行归一化",
-        "它把 Bradley-Terry 的 log-sigmoid 换成了恒等映射",
         "它使用带 NLL 的赔率比（odds-ratio）损失",
-        "它保留参考策略并增加一个 margin"
+        "它保留参考策略并增加一个 margin",
+        "它把 Bradley-Terry 的 log-sigmoid 换成了恒等映射"
       ],
       "correct": 0,
       "explanation": ""
@@ -56,22 +56,22 @@
       "options": [
         "被选中响应不在参考策略的支撑集（support）中",
         "被选中响应在推理时以低概率被采样",
-        "只要被拒绝响应的对数概率下降得更快，DPO 就可能把被选中响应的绝对对数概率也压低",
-        "被选中响应变得比被拒绝响应更长"
+        "被选中响应变得比被拒绝响应更长",
+        "只要被拒绝响应的对数概率下降得更快，DPO 就可能把被选中响应的绝对对数概率也压低"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "Rafailov 等人（NeurIPS 2024）关于直接对齐算法（DAA）缩放律的研究表明：",
       "options": [
+        "当成对数据超过 10 万条样本时，过度优化就消失了",
         "在黄金奖励上，DAA 表现出与 Gao 等人相同的「先升后崩」的过度优化形态",
         "DAA 在设计上消除了古德哈特问题",
-        "当成对数据超过 10 万条样本时，过度优化就消失了",
         "DPO 会过度优化，但 IPO 和 SimPO 不会"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     }
   ]

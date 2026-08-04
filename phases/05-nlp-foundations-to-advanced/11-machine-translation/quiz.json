@@ -6,22 +6,22 @@
       "stage": "pre",
       "question": "BLEU 衡量的是什么？",
       "options": [
+        "嵌入余弦相似度",
         "语言识别准确率",
         "假设译文与参考译文之间的 n-gram 精确率（通常 1-4），并带一个简短惩罚（brevity penalty）",
-        "字符级 F 分数",
-        "嵌入余弦相似度"
+        "字符级 F 分数"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "BLEU 是对参考译文的 1-4 gram 精确率的几何平均，再加上简短惩罚。"
     },
     {
       "stage": "pre",
       "question": "为什么用 sacrebleu 而不是自己手写 BLEU？",
       "options": [
-        "它更准确",
+        "它支持流式处理",
         "它在 GPU 上运行",
         "它规范化了分词，使得分数在不同论文和不同运行之间可比",
-        "它支持流式处理"
+        "它更准确"
       ],
       "correct": 2,
       "explanation": "sacrebleu 固定了分词方式，消除了 BLEU 数字不可比的一个常见来源。"
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "NLLB 中哪个特定设置在解码时控制目标语言？",
       "options": [
-        "length_penalty",
         "forced_bos_token_id 设为目标语言代码对应的 token id",
         "num_beams",
+        "length_penalty",
         "src_lang"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "NLLB 通过 forced_bos_token_id 把第一个解码 token 强制为目标语言代码。"
     },
     {
@@ -43,23 +43,23 @@
       "question": "在有标注数据的场景下，2026 年生产级 MT 质量评估的默认指标家族是哪个？",
       "options": [
         "仅 BLEU",
-        "token 编辑距离",
         "在人类判断上训练的学习型指标，如 COMET（以及 BERTScore/BLEURT）",
+        "token 编辑距离",
         "延迟"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "像 COMET 这样的学习型指标，比单独使用 BLEU/chrF 与人类判断的相关性更强。"
     },
     {
       "stage": "check",
       "question": "什么时候 chrF 往往比 BLEU 更具信息量？",
       "options": [
-        "对于形态丰富的语言，字符级匹配能捕捉到 BLEU 漏掉的屈折变体",
-        "使用 beam search 时",
         "在非常短的句子上",
-        "只要存在参考译文"
+        "使用 beam search 时",
+        "只要存在参考译文",
+        "对于形态丰富的语言，字符级匹配能捕捉到 BLEU 漏掉的屈折变体"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "字符 F 分数能捕捉词级 BLEU 计算不足的部分形态匹配。"
     },
     {
@@ -68,34 +68,34 @@
       "options": [
         "丢掉命名实体的输出",
         "漏掉标点的输出",
-        "模型解码成了错误的目标语言（例如请求法语时 NLLB 输出了西班牙语）",
-        "太短的输出"
+        "太短的输出",
+        "模型解码成了错误的目标语言（例如请求法语时 NLLB 输出了西班牙语）"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "偏离目标语言生成在稀有语言对上很常见；翻译后做一次语言识别检查可以发现它。"
     },
     {
       "stage": "post",
       "question": "为什么在几千条高质量领域语言对上微调，常常胜过规模大得多的嘈杂网络数据？",
       "options": [
-        "更大的数据会撑爆 GPU 内存",
-        "更小的数据集训练更快",
+        "质量和领域匹配胜过数据量；嘈杂的平行数据会引入漂移和幻觉",
         "网络数据使用起来不合法",
-        "质量和领域匹配胜过数据量；嘈杂的平行数据会引入漂移和幻觉"
+        "更小的数据集训练更快",
+        "更大的数据会撑爆 GPU 内存"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "干净的、领域对齐的语言对是生产中最大的杠杆；嘈杂数据会降低适配效果。"
     },
     {
       "stage": "post",
       "question": "在 2026 年，什么情况下 LLM（例如 GPT-4）可能胜过专用 MT 模型？",
       "options": [
-        "最高吞吐量的批量翻译",
         "延迟敏感的浏览器翻译",
         "习语内容、长上下文、通过 prompt 做风格适配，或需要语气控制的内容",
+        "最高吞吐量的批量翻译",
         "拥有数百万平行句子的小语种语言对"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "LLM 在习语、长上下文或风格可控的翻译上占优；专用 MT 在吞吐量和延迟上占优。"
     }
   ]

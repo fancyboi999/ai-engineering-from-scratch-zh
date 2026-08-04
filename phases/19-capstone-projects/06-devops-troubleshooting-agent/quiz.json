@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "排障 agent 的 RBAC 权限默认姿态是什么？",
       "options": [
+        "cluster-admin，以便它能自愈",
         "默认只读，破坏性动词被门控在一个独立服务器之后并需人工批准",
         "仅在受影响的命名空间内拥有 namespace-admin",
-        "等同于值班工程师",
-        "cluster-admin，以便它能自愈"
+        "等同于值班工程师"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
@@ -19,9 +19,9 @@
       "question": "agent 在根因分析时遍历的知识图谱是什么？",
       "options": [
         "节点是 K8s 对象加上遥测来源；边编码归属、调度和观察关系",
+        "一张 GitHub 提交和 PR 评审的图",
         "一个最近重启 pod 的扁平列表",
-        "按团队组织的 Prometheus 指标名",
-        "一张 GitHub 提交和 PR 评审的图"
+        "按团队组织的 Prometheus 指标名"
       ],
       "correct": 0,
       "explanation": ""
@@ -42,34 +42,34 @@
       "stage": "check",
       "question": "为什么审计日志要既记录 agent 执行过的命令，也记录它考虑过的命令？",
       "options": [
-        "评审者可以捕捉到那些 agent 差点就运行破坏性命令的险些失误",
-        "ArgoCD 只接受被考虑过的命令",
         "Slack API 需要两者才能投递",
-        "重放攻击需要这两份列表"
+        "ArgoCD 只接受被考虑过的命令",
+        "重放攻击需要这两份列表",
+        "评审者可以捕捉到那些 agent 差点就运行破坏性命令的险些失误"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "哪种机制阻止 agent 在一次糟糕的部署上单方面回滚？",
       "options": [
-        "破坏性工具驻留在一个独立的 MCP 服务器上，受来自 Slack 卡片的批准令牌保护",
         "由第二个 LLM 裁判对回滚投票",
+        "PagerDuty 自动暂停部署",
         "GitOps 仓库上的分支保护",
-        "PagerDuty 自动暂停部署"
+        "破坏性工具驻留在一个独立的 MCP 服务器上，受来自 Slack 卡片的批准令牌保护"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "评分细则衡量的 p50「达成假设时间」目标是多少？",
       "options": [
-        "在下一个值班班次之内",
+        "30 秒以内",
         "1 小时以内",
         "从告警到 Slack 简报 5 分钟以内",
-        "30 秒以内"
+        "在下一个值班班次之内"
       ],
       "correct": 2,
       "explanation": ""
@@ -78,12 +78,12 @@
       "stage": "post",
       "question": "用于评分 RCA 准确率的合成事件套件有多大？",
       "options": [
-        "1 个脚本化的演示事件",
         "5 个场景",
-        "100 条随机采样的生产告警",
-        "20 个场景，覆盖 OOMKill、DNS 抖动、HPA 抖振、PVC 占满等"
+        "1 个脚本化的演示事件",
+        "20 个场景，覆盖 OOMKill、DNS 抖动、HPA 抖振、PVC 占满等",
+        "100 条随机采样的生产告警"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     }
   ]

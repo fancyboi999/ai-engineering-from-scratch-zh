@@ -4,60 +4,60 @@
       "stage": "pre",
       "question": "在 shell 命令中，管道操作符 '|' 的作用是什么？",
       "options": [
-        "并行运行两个命令",
-        "把一个命令的标准输出作为下一个命令的标准输入",
         "把一个命令的输出保存到文件",
-        "把两个文件合并成一个"
+        "把两个文件合并成一个",
+        "并行运行两个命令",
+        "把一个命令的标准输出作为下一个命令的标准输入"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "管道操作符把命令连成一条流水线。例如，'cat log.txt | grep error' 会把 log.txt 的内容作为输入传给 grep，由 grep 过滤出包含 'error' 的行。"
     },
     {
       "stage": "pre",
       "question": "当你关闭启动某个运行中进程的终端时，这个进程会怎样？",
       "options": [
-        "进程会继续在后台运行",
-        "进程会收到挂断信号（SIGHUP）并通常随之终止",
         "进程会暂停，直到你打开一个新终端",
-        "进程会自动迁移为一个系统服务"
+        "进程会自动迁移为一个系统服务",
+        "进程会收到挂断信号（SIGHUP）并通常随之终止",
+        "进程会继续在后台运行"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "关闭终端会向子进程发送 SIGHUP，默认情况下这会导致它们终止。tmux、nohup 或 screen 等工具可以防止这种情况。"
     },
     {
       "stage": "post",
       "question": "对于长时间运行的训练任务，tmux 相比 'nohup command &' 的关键优势是什么？",
       "options": [
-        "tmux 比 nohup 占用更少的 CPU",
-        "tmux 让你能够分离、重新接入会话，并通过多个窗格查看实时输出",
+        "tmux 会压缩进程输出以节省磁盘空间",
         "tmux 会自动重启失败的进程",
-        "tmux 会压缩进程输出以节省磁盘空间"
+        "tmux 让你能够分离、重新接入会话，并通过多个窗格查看实时输出",
+        "tmux 比 nohup 占用更少的 CPU"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "tmux 会创建持久会话，你可以随时分离并在之后重新接入，并在多个窗格中查看实时输出。nohup 只会把输出记录到文件，无法交互或重新接入。"
     },
     {
       "stage": "post",
       "question": "'python train.py > output.log 2>&1' 能做什么？",
       "options": [
-        "运行 train.py 并只把错误保存到 output.log",
         "运行 train.py 并把标准输出和标准错误都重定向到 output.log",
-        "运行 train.py 两次并记录第二次运行",
-        "以双倍内存分配运行 train.py"
+        "运行 train.py 并只把错误保存到 output.log",
+        "以双倍内存分配运行 train.py",
+        "运行 train.py 两次并记录第二次运行"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "'> output.log' 把标准输出重定向到文件。'2>&1' 把标准错误发送到与标准输出相同的地方。结果是正常输出和错误都被捕获到同一个文件中。"
     },
     {
       "stage": "post",
       "question": "哪个命令能让你从本地浏览器访问运行在 GPU 机器 8888 端口上的远程 Jupyter notebook？",
       "options": [
+        "ssh user@gpu-box --forward-port 8888",
         "scp -P 8888 user@gpu-box:~/notebook.ipynb",
         "ssh -L 8888:localhost:8888 user@gpu-box",
-        "rsync -avz user@gpu-box:8888 localhost:8888",
-        "ssh user@gpu-box --forward-port 8888"
+        "rsync -avz user@gpu-box:8888 localhost:8888"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "SSH 本地端口转发（-L）把远程端口映射到你的本地机器。执行这条命令后，在浏览器中打开 localhost:8888 即可访问远程的 Jupyter 服务器。"
     }
   ]

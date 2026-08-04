@@ -6,22 +6,22 @@
       "stage": "pre",
       "question": "本课列出哪六种运行时形态？",
       "options": [
-        "请求-响应、流式、持久化执行、基于队列、事件驱动、定时调度",
         "Read、write、exec、fork、exit、wait",
         "REST、gRPC、GraphQL、WebSocket、SSE、MQTT",
+        "请求-响应、流式、持久化执行、基于队列、事件驱动、定时调度",
         "Map、filter、reduce、fold、scan、group"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "这是六种运行时形态；先选形态再选框架。"
     },
     {
       "stage": "pre",
       "question": "什么时候请求-响应是糟糕的选择？",
       "options": [
-        "在一个 1 秒的分类上",
-        "当任务耗时超过约 30 秒、用户挂断而 worker 堆积时",
         "在 REST API 上",
-        "在内部服务上"
+        "当任务耗时超过约 30 秒、用户挂断而 worker 堆积时",
+        "在内部服务上",
+        "在一个 1 秒的分类上"
       ],
       "correct": 1,
       "explanation": "同步 HTTP 只对短任务可行；长任务需要队列/持久化/事件形态。"
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "持久化执行的核心属性是什么？",
       "options": [
-        "更快的推理",
-        "每一步之后对状态做检查点，使运行时在失败时能从上一个成功步骤恢复",
         "更低的 token 成本",
-        "原生语音支持"
+        "原生语音支持",
+        "每一步之后对状态做检查点，使运行时在失败时能从上一个成功步骤恢复",
+        "更快的推理"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "检查点-恢复是关键差异；LangGraph 是本课的参考。"
     },
     {
@@ -43,47 +43,47 @@
       "question": "Anthropic 的哪个观察为长程 agent 的基于队列运行时提供了正当理由？",
       "options": [
         "任务总在 5 秒内完成",
+        "cron 解决一切",
         "计算机使用的公告：每个任务数十到数百步是常态",
-        "任务必须同步运行",
-        "cron 解决一切"
+        "任务必须同步运行"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Anthropic 指出每个任务数十到数百步是常态；这种工作负载需要队列或持久化运行时。"
     },
     {
       "stage": "check",
       "question": "本课所说的「可观测性是承重的」是什么意思？",
       "options": [
-        "日志很漂亮",
         "没有 OTel GenAI span 和一个 Langfuse/Phoenix/Opik 后端，你无法调试一个在第 40 步失败的多步 agent",
+        "日志很漂亮",
         "磁盘满了",
         "提供商为计费而要求它"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "对多步 agent 而言，可观测性不是可选的；它决定了你是调试还是从头重放。"
     },
     {
       "stage": "post",
       "question": "为什么队列 worker 必须有死信队列（DLQ）？",
       "options": [
-        "没有 DLQ，失败的任务会静默消失",
-        "DLQ 是 AWS 要求的",
         "DLQ 让任务更快",
-        "DLQ 是加密的"
+        "没有 DLQ，失败的任务会静默消失",
+        "DLQ 是加密的",
+        "DLQ 是 AWS 要求的"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "没有 DLQ 的失败任务会消失；DLQ 是失败任务的停车场。"
     },
     {
       "stage": "post",
       "question": "本课建议把 cron 形态的 agent 与什么配对？",
       "options": [
-        "GPU 自动扩缩器",
         "持久化执行，使一次失败的夜间运行能在下一个时刻恢复",
-        "流式 SSE",
-        "WebRTC"
+        "GPU 自动扩缩器",
+        "WebRTC",
+        "流式 SSE"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "cron + 持久化执行能从失败的定时运行中干净地恢复。"
     }
   ]

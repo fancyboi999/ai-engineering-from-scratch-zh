@@ -6,48 +6,48 @@
       "stage": "pre",
       "question": "Letta 的三个记忆层级是什么？",
       "options": [
+        "RAM、swap、disk",
         "Cache、KV、archival",
         "Core、recall、archival",
-        "RAM、swap、disk",
         "Working、episodic、semantic"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Letta 使用 core（始终可见）、recall（对话历史）和 archival（外部）三个层级。"
     },
     {
       "stage": "pre",
       "question": "睡眠时计算（sleep-time compute）针对哪个生产问题？",
       "options": [
+        "更快的 JSON 解析",
         "在关键路径上做记忆整合所导致的尾部延迟",
-        "数学问题上更高的准确率",
         "更低的 embedding 成本",
-        "更快的 JSON 解析"
+        "数学问题上更高的准确率"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "睡眠时计算把剪枝/摘要/对账从面向用户的路径上挪走，使主响应保持快速。"
     },
     {
       "stage": "check",
       "question": "下列哪个属性不是 Letta 中记忆块的字段？",
       "options": [
-        "label",
-        "value",
         "limit",
-        "embedding_model_version"
+        "embedding_model_version",
+        "label",
+        "value"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": "记忆块携带 id、label、value、limit、description；embedding 模型版本不是记忆块 schema 的一部分。"
     },
     {
       "stage": "check",
       "question": "为什么睡眠时 agent 能运行比主 agent 更强的模型？",
       "options": [
+        "记忆操作只花一半的 token",
         "它收到一个私有 API key",
         "它不在关键路径上，因此不受延迟约束",
-        "它豁免于限流",
-        "记忆操作只花一半的 token"
+        "它豁免于限流"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "由于它不阻塞用户响应，睡眠时 agent 可以更慢、更贵。"
     },
     {
@@ -55,35 +55,35 @@
       "question": "Human 块和 Persona 块泛化成了什么模式？",
       "options": [
         "向量 embedding",
-        "任意用户定义的、带类型的可编辑块（Task、Project、Safety……）",
+        "操作系统进程",
         "JSON-RPC 通道",
-        "操作系统进程"
+        "任意用户定义的、带类型的可编辑块（Task、Project、Safety……）"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Letta 把 MemGPT 的两个块泛化为任何带 id、label、value、limit、description 的用户定义块。"
     },
     {
       "stage": "post",
       "question": "在此模式中，静默漂移（silent drift）是什么？",
       "options": [
-        "主 agent 从未察觉睡眠时 agent 在它脚下重写了某个块；用版本化和可见的 diff 修复",
         "磁盘写入缓慢",
-        "embedding 模型升级",
-        "限流抖动"
+        "主 agent 从未察觉睡眠时 agent 在它脚下重写了某个块；用版本化和可见的 diff 修复",
+        "限流抖动",
+        "embedding 模型升级"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "对块做版本化、并在 trace 中呈现 diff，能让睡眠时的重写对主循环可见。"
     },
     {
       "stage": "post",
       "question": "在 Letta V1 中，什么替换了内联的 `Thought:` token 以及 send_message/heartbeat 模式？",
       "options": [
-        "在单独通道上发出、并贯穿各轮传递的原生推理",
         "一个专门负责思考的第二个 LLM",
         "一个更大的 system prompt",
+        "在单独通道上发出、并贯穿各轮传递的原生推理",
         "用户手动输入的想法"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Letta V1（letta_v1_agent）使用提供商层面的原生推理，而非 prompt 形态的 thought。"
     }
   ]

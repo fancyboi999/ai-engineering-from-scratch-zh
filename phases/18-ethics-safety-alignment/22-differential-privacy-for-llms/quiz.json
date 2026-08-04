@@ -6,36 +6,36 @@
       "stage": "pre",
       "question": "(epsilon, delta) 差分隐私为一个随机算法 M 保证了什么？",
       "options": [
-        "M 永远不会记住任何训练数据",
-        "M 在噪声范围内是确定性的",
+        "M 被证明等价于一个非隐私算法",
         "对于任意相差一个样本的两个数据集和任意事件 S，P(M(D) in S) <= e^epsilon * P(M(D') in S) + delta，因此无法可靠地推断出任何单个个体的贡献",
-        "M 被证明等价于一个非隐私算法"
+        "M 在噪声范围内是确定性的",
+        "M 永远不会记住任何训练数据"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "以下哪一项不是 Abadi 等人 2016 所述 DP-SGD 的步骤？",
       "options": [
+        "在步骤之间重新随机化模型的 tokenizer",
         "采样一个小批次并计算逐样本梯度",
         "把每个逐样本梯度裁剪到阈值 C",
-        "在步骤之间重新随机化模型的 tokenizer",
         "对裁剪后的梯度求和，并加入按 sigma * C 缩放的高斯噪声"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么 LoRA + DP-SGD 是常见的 2025 年配置？",
       "options": [
-        "对前沿模型做完整 DP-SGD 代价高得令人却步；LoRA 把梯度更新限制在一个小适配器上，减少逐样本梯度存储，同时仍能为该适配器提供 DP 保证",
         "它把 LoRA 用作 tokenizer",
         "LoRA 在设计上会增大 epsilon",
+        "对前沿模型做完整 DP-SGD 代价高得令人却步；LoRA 把梯度更新限制在一个小适配器上，减少逐样本梯度存储，同时仍能为该适配器提供 DP 保证",
         "LoRA 消除了对 accountant 的需求"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -44,34 +44,34 @@
       "options": [
         "它完全消除了对金丝雀的需求",
         "它证明 DP-SGD 没有必要",
-        "它表明两者测量同一种属性",
-        "它表明两者测量的是不同的东西：对插入金丝雀做 MIA 会低估记忆程度，因为金丝雀并非那些「最易被提取、对隐私真正重要」的样本"
-      ],
-      "correct": 3,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "PMixED（arXiv:2403.15638）提供了什么作为 DP 训练的替代方案？",
-      "options": [
-        "一个更快的 DP-SGD 变体",
-        "一个用于 Renyi DP 的新 accountant",
-        "推理时差分隐私：在 next-token 分布上用专家混合（mixture of experts）加聚合噪声；完全避免 DP 训练",
-        "一种仅凭 epsilon-delta 核算就能计算 epsilon 的方法"
+        "它表明两者测量的是不同的东西：对插入金丝雀做 MIA 会低估记忆程度，因为金丝雀并非那些「最易被提取、对隐私真正重要」的样本",
+        "它表明两者测量同一种属性"
       ],
       "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
-      "question": "「通过 LLM 反馈进行差分隐私逆转」攻击是什么？",
+      "question": "PMixED（arXiv:2403.15638）提供了什么作为 DP 训练的替代方案？",
       "options": [
-        "把一个 DP 训练模型的置信度分数当作 oracle 来重新识别个体，即便输出本身并不直接泄露",
-        "一种针对 tokenizer 熵的攻击",
-        "一种把 epsilon 重置为零的方法",
-        "一种针对金丝雀插入的对策"
+        "推理时差分隐私：在 next-token 分布上用专家混合（mixture of experts）加聚合噪声；完全避免 DP 训练",
+        "一种仅凭 epsilon-delta 核算就能计算 epsilon 的方法",
+        "一个用于 Renyi DP 的新 accountant",
+        "一个更快的 DP-SGD 变体"
       ],
       "correct": 0,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "「通过 LLM 反馈进行差分隐私逆转」攻击是什么？",
+      "options": [
+        "一种把 epsilon 重置为零的方法",
+        "一种针对 tokenizer 熵的攻击",
+        "一种针对金丝雀插入的对策",
+        "把一个 DP 训练模型的置信度分数当作 oracle 来重新识别个体，即便输出本身并不直接泄露"
+      ],
+      "correct": 3,
       "explanation": ""
     }
   ]

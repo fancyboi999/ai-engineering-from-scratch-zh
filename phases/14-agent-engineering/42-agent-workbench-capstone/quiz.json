@@ -7,11 +7,11 @@
       "question": "这个毕业项目产出什么？",
       "options": [
         "一篇研究论文",
+        "一个监控仪表盘",
         "一个带版本的、可直接放入的目录（agent-workbench-pack/），含七个面，外加一个能幂等铺设它们的 bin/install.sh",
-        "一个新的 LLM",
-        "一个监控仪表盘"
+        "一个新的 LLM"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "这个包是配方；每次安装是一份上桌的菜。"
     },
     {
@@ -19,11 +19,11 @@
       "question": "下列哪一个不是这个包的布局之一？",
       "options": [
         "AGENTS.md + docs/",
-        "schemas/",
         "scripts/",
-        "vendor_proprietary_weights/"
+        "vendor_proprietary_weights/",
+        "schemas/"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "包布局是 AGENTS.md、docs/、schemas/、scripts/、bin/、README.md。这个包与框架和厂商无关。"
     },
     {
@@ -31,11 +31,11 @@
       "question": "为什么这个包携带一个 VERSION 文件？",
       "options": [
         "为了 SEO",
-        "需要迁移的 schema/脚本变更升主版本；新增升次版本；仅文档升补丁版本；目标 repo 记录它是对照哪个版本安装的",
         "为了追踪 agent 智商",
+        "需要迁移的 schema/脚本变更升主版本；新增升次版本；仅文档升补丁版本；目标 repo 记录它是对照哪个版本安装的",
         "为了在 Hacker News 上打广告"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "与 npm、Cargo、pyproject.toml 形态相同；VERSION 是契约，不是营销。"
     },
     {
@@ -43,21 +43,21 @@
       "question": "在这个包里，跨工具分发长什么样？",
       "options": [
         "硬编码每个工具的路径",
-        "一个源文件加符号链接（ln -s AGENTS.md CLAUDE.md、.cursor/rules/、.github/copilot-instructions.md），使同一来源扇出到每个编码 agent",
         "为每个工具手动复制",
+        "一个源文件加符号链接（ln -s AGENTS.md CLAUDE.md、.cursor/rules/、.github/copilot-instructions.md），使同一来源扇出到每个编码 agent",
         "每个工具一处厂商锁定"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Nx 的 nx ai-setup 是参考；这个包的安装器用符号链接做同样的事。"
     },
     {
       "stage": "check",
       "question": "本课建议卸载器（uninstaller）如何行为？",
       "options": [
-        "删除一切，包括状态",
+        "禁用 git",
         "遇到非平凡状态就拒绝；绝不删除用户的 agent_state.json、task_board.json 或 outputs/；只移除 schemas、scripts、docs 和 AGENTS.md（可选退出）",
         "只删 docs",
-        "禁用 git"
+        "删除一切，包括状态"
       ],
       "correct": 1,
       "explanation": "状态属于用户；这个包不拥有它。"
@@ -67,23 +67,23 @@
       "question": "什么东西被排除在这个包之外？",
       "options": [
         "Schemas",
-        "项目特定的任务、厂商 SDK 调用、团队入职文字——这个包与框架无关，应与入职材料并列、而非嵌入其中",
         "Scripts",
-        "安装器"
+        "安装器",
+        "项目特定的任务、厂商 SDK 调用、团队入职文字——这个包与框架无关，应与入职材料并列、而非嵌入其中"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "任务属于目标 repo 的任务板，而非这个包；厂商 SDK 调用会把包锁死到一个框架上。"
     },
     {
       "stage": "post",
       "question": "这个包通过什么渠道一次性发布到众多编码 agent？",
       "options": [
-        "手动复制",
-        "SkillKit 式分发（skillkit install agent-workbench-pack）从单一来源把它铺设到 32 个 AI agent 上",
         "邮件附件",
-        "只有 GitHub release notes"
+        "只有 GitHub release notes",
+        "SkillKit 式分发（skillkit install agent-workbench-pack）从单一来源把它铺设到 32 个 AI agent 上",
+        "手动复制"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "包仓库是真相来源；SkillKit 是分发渠道；厂商锁定随之瓦解。"
     }
   ]

@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "HPA 默认通常基于哪个信号进行扩缩，而本课认为该信号对 vLLM 式的服务是失效的？",
       "options": [
-        "队列深度（queue depth）",
         "P99 TTFT",
-        "KV 缓存利用率",
-        "DCGM_FI_DEV_GPU_UTIL 占空比（duty cycle）"
+        "DCGM_FI_DEV_GPU_UTIL 占空比（duty cycle）",
+        "队列深度（queue depth）",
+        "KV 缓存利用率"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "KAI Scheduler 中的 gang scheduling 主要防止什么问题？",
       "options": [
+        "部分分配陷阱：8 块 GPU 中有 7 块空转等待第 8 块",
         "GPU 显存碎片化",
         "Tokenizer 的 GIL 争用",
-        "部分分配陷阱：8 块 GPU 中有 7 块空转等待第 8 块",
         "冷启动延迟"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -31,9 +31,9 @@
       "question": "为什么 Karpenter 默认的 consolidationPolicy: WhenEmptyOrUnderutilized 对推理 GPU 池是危险的？",
       "options": [
         "它在突发流量下拒绝扩容",
-        "它只合并 spot 实例",
+        "它会阻止 Karpenter 配置新节点",
         "它会终止正在运行的 GPU 节点以迁移 pod，从而驱逐正在处理的请求并重新加载权重",
-        "它会阻止 Karpenter 配置新节点"
+        "它只合并 spot 实例"
       ],
       "correct": 2,
       "explanation": ""
@@ -42,24 +42,24 @@
       "stage": "check",
       "question": "与 Cluster Autoscaler 相比，Karpenter 配置一个 GPU 节点大约快多少？",
       "options": [
-        "大约快 40%（约 45-60 秒 对比 约 90-120 秒）",
-        "大约慢 10 倍",
         "一样快",
-        "大约快 5%"
+        "大约快 5%",
+        "大约快 40%（约 45-60 秒 对比 约 90-120 秒）",
+        "大约慢 10 倍"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "对于 prefill / decode 分离的 pod（Phase 17 · 17），本课推荐使用哪些扩缩信号？",
       "options": [
+        "prefill pod 用队列深度，decode pod 用 KV 缓存压力，分别作为按角色独立的 HPA",
         "仅手动扩缩",
         "用单个基于占空比的 HPA 覆盖两类 pod",
-        "prefill pod 用队列深度，decode pod 用 KV 缓存压力，分别作为按角色独立的 HPA",
         "两者都用 Cluster Autoscaler"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -67,11 +67,11 @@
       "question": "为避免驱逐正在运行的作业，本课为推理 GPU 池推荐哪种 Karpenter 中断（disruption）设置？",
       "options": [
         "consolidationPolicy: WhenEmptyOrUnderutilized 配合 consolidateAfter: 0s",
-        "consolidationPolicy: WhenEmpty 配合 consolidateAfter: 1h",
+        "完全禁用 Karpenter",
         "始终使用 spot 实例且不进行合并",
-        "完全禁用 Karpenter"
+        "consolidationPolicy: WhenEmpty 配合 consolidateAfter: 1h"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     }
   ]

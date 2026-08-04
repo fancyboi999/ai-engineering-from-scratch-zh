@@ -7,44 +7,44 @@
       "question": "为什么 ReAct 的 prompt 随深度二次方增长？",
       "options": [
         "模型在每一步都对自身重新分词",
-        "每一步都携带完整的先前上下文，包括之前的每个 thought 和 observation",
+        "提供商按字节而非按 token 计费",
         "工具 schema 在每次调用时被复制",
-        "提供商按字节而非按 token 计费"
+        "每一步都携带完整的先前上下文，包括之前的每个 thought 和 observation"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "ReAct 在每一步重新纳入先前的 thought 和 observation，使总 prompt 长度随深度的平方增长。"
     },
     {
       "stage": "pre",
       "question": "定义 ReWOO 的三角色拆分是什么？",
       "options": [
-        "Reader、Writer、Reviewer",
         "Planner、Workers、Solver",
-        "Actor、Evaluator、Reflector",
-        "Generator、Critic、Optimizer"
+        "Reader、Writer、Reviewer",
+        "Generator、Critic、Optimizer",
+        "Actor、Evaluator、Reflector"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "ReWOO 分离出发出 DAG 的 Planner、获取证据的 Workers，以及组合最终答案的 Solver。"
     },
     {
       "stage": "check",
       "question": "论文在 HotpotQA 上为 ReWOO 对比 ReAct 报告了哪些标志性数字？",
       "options": [
-        "token 减少约 5 倍，准确率绝对值提升 +4",
         "token 多约 2 倍，准确率 +10",
-        "token 相同，准确率 +1",
-        "token 减少 10 倍，准确率 -2"
+        "token 减少 10 倍，准确率 -2",
+        "token 减少约 5 倍，准确率绝对值提升 +4",
+        "token 相同，准确率 +1"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "相比 ReAct，ReWOO 在 HotpotQA 上报告了约 5 倍的 token 削减和 +4 的绝对准确率提升。"
     },
     {
       "stage": "check",
       "question": "ReWOO 计划节点中像 #E1 这样的占位符意味着什么？",
       "options": [
-        "worker 1 返回的错误码",
-        "一个在派发时被替换为某个更早 worker 节点输出的引用",
         "证据获取的重试计数器",
+        "一个在派发时被替换为某个更早 worker 节点输出的引用",
+        "worker 1 返回的错误码",
         "planner 版本标识符"
       ],
       "correct": 1,
@@ -54,9 +54,9 @@
       "stage": "check",
       "question": "为什么 ReWOO 比 ReAct 更能定位失败？",
       "options": [
-        "worker 在任何错误时都会让整个运行崩溃",
-        "worker 中的错误变成 Solver 与原始计划一起看到的字符串，因此降级是按节点而非按步骤的",
         "ReWOO 对每次失败的调用最多重试十次",
+        "worker 中的错误变成 Solver 与原始计划一起看到的字符串，因此降级是按节点而非按步骤的",
+        "worker 在任何错误时都会让整个运行崩溃",
         "Planner 在每次错误后重新发出一份全新的 DAG"
       ],
       "correct": 1,
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "哪种任务形态比起朴素的 ReWOO 更适合 Plan-and-Act？",
       "options": [
-        "一个两步的事实查找",
         "一条 40 步的 web 或移动端导航轨迹",
+        "一个纯算术问题",
         "单轮分类",
-        "一个纯算术问题"
+        "一个两步的事实查找"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Plan-and-Act 是为长程（超过 30 步）的 web 和移动端 agent 而建的，单条 ReAct 轨迹在这种情况下会失去连贯性。"
     },
     {
       "stage": "post",
       "question": "ReWOO 的 planner 蒸馏结果对生产级 agent 意味着什么？",
       "options": [
-        "每一步都必须使用前沿模型",
         "一个小 planner（约 7B）可以匹敌大教师模型，因为 planner 从不看 observation",
+        "蒸馏需要基于梯度的 RL 数据",
         "规划质量在 7B 参数以下会下降",
-        "蒸馏需要基于梯度的 RL 数据"
+        "每一步都必须使用前沿模型"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "由于 planner 不看 observation，来自大教师模型的计划轨迹能干净地迁移到一个小的微调 planner 上。"
     }
   ]

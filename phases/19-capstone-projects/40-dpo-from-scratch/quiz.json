@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "阅读前思考：在 Bradley-Terry 偏好模型下，人类偏好补全 y_w 优于 y_l（给定 prompt x）的概率为 sigmoid(r(x, y_w) - r(x, y_l))。这意味着什么？",
       "options": [
-        "你必须在训练 policy 之前先拟合 r。",
-        "只有 reward 的差值有意义；任何同时加到 r(x, y_w) 和 r(x, y_l) 上的函数都会被消掉。",
         "Bradley-Terry 需要一个不可消去的归一化常数 Z(x)。",
-        "Sigmoid 与最大似然不兼容。"
+        "只有 reward 的差值有意义；任何同时加到 r(x, y_w) 和 r(x, y_l) 上的函数都会被消掉。",
+        "Sigmoid 与最大似然不兼容。",
+        "你必须在训练 policy 之前先拟合 r。"
       ],
       "correct": 1,
       "explanation": "Bradley-Terry 偏好只取决于 reward 差值，两个补全共有的部分会互相抵消。这就是 DPO 能绕过显式 reward model 的结构性原因：最优策略公式中那个只跟 prompt 有关的项被消掉了。"
@@ -18,9 +18,9 @@
       "stage": "check",
       "question": "DPO 对单个三元组的 loss 是 -log sigmoid( beta * ( (logp_w_pol - logp_w_ref) - (logp_l_pol - logp_l_ref) ) )。如果 logp_w_pol = logp_w_ref 且 logp_l_pol = logp_l_ref，这个 loss 等于？",
       "options": [
-        "0。",
-        "log(2)。",
         "beta。",
+        "log(2)。",
+        "0。",
         "-1。"
       ],
       "correct": 1,
@@ -30,24 +30,24 @@
       "stage": "check",
       "question": "DPO 训练过程中，chosen 在 reference model 下的 log-probability 会随 epoch 变化，因为 policy 逐渐偏离 reference。对还是错？",
       "options": [
-        "对：reference 会随 policy 更新而漂移。",
         "错：reference 是冻结的；reference log-probs 只计算一次并复用。",
         "只在 beta 不为零时才对。",
-        "错，除非用 no_grad 显式禁用梯度。"
+        "错，除非用 no_grad 显式禁用梯度。",
+        "对：reference 会随 policy 更新而漂移。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Reference 在整个 DPO 训练期间是冻结的，它的参数从不更新。实现上要么一次性快照 reference log-probs，要么在 no_grad 下跑 reference 的 forward pass 并把参数设为 requires_grad=False。"
     },
     {
       "stage": "check",
       "question": "对 logp_w_pol（policy 对 chosen 补全的 log-probability）求 L_DPO 的梯度，符号是？",
       "options": [
+        "不确定（取决于 reference）。",
         "正（chosen log-prob 增大时 loss 增大）。",
         "负（chosen log-prob 增大时 loss 减小）。",
-        "零（loss 与 policy log-probs 无关）。",
-        "不确定（取决于 reference）。"
+        "零（loss 与 policy log-probs 无关）。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "梯度为 -beta * (1 - sigmoid(z))，非正。增大 chosen log-probability 会减小 loss，这正是我们想要的训练信号。"
     },
     {
@@ -55,23 +55,23 @@
       "question": "在你的测试数据上 DPO loss 下降了，但 policy 开始全面偏好更短的补全，即使短的更差。最可能的原因？",
       "options": [
         "beta 太低。",
-        "长度偏差：更长的序列会累积更多的 log-probability 项（每项都是负数），因此 log-prob 求和在结构上惩罚长度。",
+        "优化器用了错误的学习率。",
         "Reference 没有被正确冻结。",
-        "优化器用了错误的学习率。"
+        "长度偏差：更长的序列会累积更多的 log-probability 项（每项都是负数），因此 log-prob 求和在结构上惩罚长度。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "log-probability 求和对短序列有结构性偏差，因为每多一个 token 就多一个负的 log-probability 项。标准修复方式是在训练和评估时按补全长度归一化 log-probs。"
     },
     {
       "stage": "post",
       "question": "你想用 IPO 变体 (z - 1)^2 替换 sigmoid + log loss。这对训练动态有什么实际影响？",
       "options": [
-        "它不会像 sigmoid loss 那样饱和，在偏好标签有噪声时表现更稳。",
-        "它在所有点上都与 sigmoid loss 数学等价。",
         "它完全不需要 reference model。",
-        "它不需要 beta 参数。"
+        "它不需要 beta 参数。",
+        "它在所有点上都与 sigmoid loss 数学等价。",
+        "它不会像 sigmoid loss 那样饱和，在偏好标签有噪声时表现更稳。"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "IPO 的平方 loss 不会像 sigmoid 那样饱和，在偏好标签有噪声或部分三元组标注错误时很有帮助。实验上它能减少在小型偏好数据集上的过度优化。"
     }
   ]

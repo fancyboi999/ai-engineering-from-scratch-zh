@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "哪三个文件构成了最小可用的工作台？",
       "options": [
-        "AGENTS.md（路由）、agent_state.json（状态）、task_board.json（队列）",
+        "Dockerfile、Makefile、.gitignore",
         "README.md、CHANGELOG.md、LICENSE",
         "model.py、prompts.py、tools.py",
-        "Dockerfile、Makefile、.gitignore"
+        "AGENTS.md（路由）、agent_state.json（状态）、task_board.json（队列）"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "一份简短的路由、持久状态和一个任务队列是底线。"
     },
     {
       "stage": "pre",
       "question": "本课对 AGENTS.md 的定位是什么？",
       "options": [
-        "一份 3000 行的入职手册",
-        "一份简短的路由，指向更深的文档以及状态和任务板",
         "一个纯粹的 prompt 缓存键",
-        "一个不放进 repo 的秘密"
+        "一个不放进 repo 的秘密",
+        "一份 3000 行的入职手册",
+        "一份简短的路由，指向更深的文档以及状态和任务板"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "AGENTS.md 是路由，不是手册；长手册会被忽略。"
     },
     {
       "stage": "check",
       "question": "Augment Code 的数据关于一份好的 AGENTS.md 说了什么？",
       "options": [
-        "它没有可衡量的效果",
+        "只有 Claude 会读它",
         "一份好的 AGENTS.md 带来的质量跃升等同于从 Haiku 升级到 Opus；一份糟糕的则比没有这个文件还差",
-        "长度总是有帮助",
-        "只有 Claude 会读它"
+        "它没有可衡量的效果",
+        "长度总是有帮助"
       ],
       "correct": 1,
       "explanation": "Augment Code 的测量：最好的文件是模型升级形态的，最差的比什么都没有还糟。"
@@ -42,36 +42,36 @@
       "stage": "check",
       "question": "为什么本课建议用文件支撑的状态而非聊天历史状态？",
       "options": [
-        "磁盘更便宜",
         "聊天历史是易失的；文件能在会话死亡、对话裁剪和工具重置中存活",
         "文件更小",
+        "磁盘更便宜",
         "这是 SOC 2 要求的"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "会话会死、聊天会被裁剪；文件是持久的记录系统。"
     },
     {
       "stage": "check",
       "question": "本课说当互相冲突的指令出现在 AGENTS.md 中时会发生什么？",
       "options": [
-        "延迟下降",
         "冲突指令会悄悄把 agent 从交互模式降到贪心模式（AMBIG-SWE：解决率从 48.8% 降到 28%）",
+        "什么都不会",
         "成本略升",
-        "什么都不会"
+        "延迟下降"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "AMBIG-SWE 测得出现矛盾时解决率大幅下降；改为给优先级编号。"
     },
     {
       "stage": "post",
       "question": "为什么本课建议用像 CLAUDE.md -> AGENTS.md 这样的跨工具符号链接？",
       "options": [
-        "为了省字节",
         "这样单一的真相来源能扇出到每个编码 agent 而无需分叉",
         "为了通过审计",
+        "为了省字节",
         "为了满足 MIT"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "符号链接（或 Nx 风格的生成器）让 Claude Code、Codex、Cursor、Copilot 等共用一个规范来源。"
     },
     {
@@ -80,8 +80,8 @@
       "options": [
         "只读取根文件",
         "从工作文件向 repo 根走，把沿途找到的每个 AGENTS.md 拼接起来（最近的优先；子目录扩展根）",
-        "随机选择",
-        "按字母顺序合并"
+        "按字母顺序合并",
+        "随机选择"
       ],
       "correct": 1,
       "explanation": "OpenAI 在其主仓库里放了 88 个 AGENTS.md 文件；工具按从最近到上层的顺序拼接。"

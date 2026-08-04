@@ -6,58 +6,58 @@
       "stage": "pre",
       "question": "OpenAI Agents SDK 的五个原语是什么？",
       "options": [
-        "Agent、Handoff、Guardrail、Session、Tracing",
+        "Tool、Prompt、Model、Memory、Trace",
         "Node、Edge、Reducer、Checkpointer、Subgraph",
         "Plan、Worker、Solver、Evaluator、Reflector",
-        "Tool、Prompt、Model、Memory、Trace"
+        "Agent、Handoff、Guardrail、Session、Tracing"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "SDK 提供这五个原语。"
     },
     {
       "stage": "pre",
       "question": "模型如何看到一次 handoff？",
       "options": [
+        "作为一个特殊 token",
         "作为一个自定义 HTTP 端点",
         "作为一个名为 transfer_to_<agent_name> 的工具",
-        "作为一条 system 消息",
-        "作为一个特殊 token"
+        "作为一条 system 消息"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "handoff 以工具形式暴露，名字形态为 transfer_to_<agent>。"
     },
     {
       "stage": "check",
       "question": "SDK 提供哪三种 guardrail 类型？",
       "options": [
-        "输入、输出和工具 guardrail",
         "前置、后置和内联 guardrail",
+        "输入、输出和工具 guardrail",
         "硬、软和尽力而为 guardrail",
         "静态、动态和联邦 guardrail"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "输入（首个 agent）、输出（最后一个 agent）和工具（每个函数工具）guardrail。"
     },
     {
       "stage": "check",
       "question": "并行 guardrail 和阻塞 guardrail 之间的区别是什么？",
       "options": [
-        "并行与主 LLM 并排运行（延迟更低，触发时浪费 token）；阻塞先运行（触发时不浪费 token）",
-        "阻塞是异步的；并行是同步的",
         "并行总是更贵",
+        "阻塞是异步的；并行是同步的",
+        "并行与主 LLM 并排运行（延迟更低，触发时浪费 token）；阻塞先运行（触发时不浪费 token）",
         "阻塞只对输出有效"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "并行以触发时浪费 token 为代价优化延迟；阻塞节省 token 但增加延迟。"
     },
     {
       "stage": "check",
       "question": "SDK 中如何启用 tracing？",
       "options": [
-        "默认关闭；按 agent 启用",
+        "只在托管仪表盘上",
         "默认开启；OPENAI_AGENTS_DISABLE_TRACING=1 可退出",
         "只能通过 OpenTelemetry collector",
-        "只在托管仪表盘上"
+        "默认关闭；按 agent 启用"
       ],
       "correct": 1,
       "explanation": "LLM、工具、handoff 和 guardrail 的 span 默认发出；一个环境变量可禁用它们。"
@@ -67,23 +67,23 @@
       "question": "什么是 handoff 漂移（handoff drift），本课建议如何缓解？",
       "options": [
         "tracing 落后；减少 span 量",
+        "guardrail 失同步；重训练",
         "agent A 交给 B，B 又交回 A，形成循环；加一个跳数计数器（hop counter）",
-        "Session 溢出；归档旧的",
-        "guardrail 失同步；重训练"
+        "Session 溢出；归档旧的"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "跳数计数器在转交链无限循环之前对其设上限。"
     },
     {
       "stage": "post",
       "question": "为什么内置工具是一个 guardrail 缺口？",
       "options": [
-        "它们比函数工具慢",
         "工具 guardrail 只对函数工具触发；内置工具（文件读取器、网页抓取）需要单独的策略",
+        "它们不支持 handoff",
         "它们无法被 tracing",
-        "它们不支持 handoff"
+        "它们比函数工具慢"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "每工具 guardrail 覆盖函数工具；内置工具需要一个单独的策略层。"
     }
   ]

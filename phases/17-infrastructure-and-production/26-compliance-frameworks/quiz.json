@@ -8,8 +8,8 @@
       "options": [
         "2025 年 2 月 2 日",
         "2026 年 8 月 2 日",
-        "2024 年就已全面执行",
-        "2030 年 1 月 1 日"
+        "2030 年 1 月 1 日",
+        "2024 年就已全面执行"
       ],
       "correct": 1,
       "explanation": ""
@@ -18,32 +18,32 @@
       "stage": "check",
       "question": "欧盟 AI 法案定义了哪种两级罚款上限？",
       "options": [
-        "任何违规一律最高 100 万欧元固定罚款",
         "任何违规最高 10 万欧元",
         "对高风险系统义务最高 1500 万欧元或全球年营业额的 3%（第 99(4) 条）；对被禁止的 AI 行为最高 3500 万欧元或 7%（第 99(3) 条）",
-        "没有经济处罚，只有下架令"
+        "没有经济处罚，只有下架令",
+        "任何违规一律最高 100 万欧元固定罚款"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么事后清理 PII 不是一种站得住脚的 GDPR 姿态？",
       "options": [
-        "它在规模化时太慢",
-        "GDPR 完全禁止脱敏",
         "事后处理与实时处理完全相同",
-        "模型已经看过了数据，因此实时的推理层脱敏（在 LLM 调用之前）才是站得住脚的 2026 年标准"
+        "模型已经看过了数据，因此实时的推理层脱敏（在 LLM 调用之前）才是站得住脚的 2026 年标准",
+        "GDPR 完全禁止脱敏",
+        "它在规模化时太慢"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "SOC 2 Type I 和 Type II 的实际区别是什么？",
       "options": [
-        "Type I 需要 HIPAA BAA",
         "Type I 比 Type II 更严格",
+        "Type I 需要 HIPAA BAA",
         "Type I 证明控制措施已设计并记录在案；Type II 证明控制措施在 6-12 个月内有效运行",
         "Type II 仅适用于初创公司"
       ],
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "本课对 HIPAA + LLM 工作负载有何建议？",
       "options": [
-        "HIPAA 不适用于 LLM",
         "未签署 BAA 绝不要把 PHI 发给外部 AI 服务；三家超大规模云厂商和主要 LLM API 供应商都提供 BAA",
         "只用本地模型，绝不用托管的",
-        "把 PHI 发给任意供应商；BAA 是可选的"
+        "把 PHI 发给任意供应商；BAA 是可选的",
+        "HIPAA 不适用于 LLM"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

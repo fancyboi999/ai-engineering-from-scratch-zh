@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "为什么 Vision Transformer 用 patch，而不是每个像素喂一个 token？",
       "options": [
+        "patch 能提升图像质量",
         "patch 是 PyTorch 强制要求的",
         "每像素一个 token 会让 attention 计算量按平方爆炸，在常见分辨率下根本算不动",
-        "patch 能提升图像质量",
         "这样可以不用 tokenizer"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "一张 224x224 的图有 150528 个像素 token。attention 的计算量随序列长度呈平方增长，所以用 16x16 的 patch 把序列压到 196 个 token，模型才算得动。"
     },
     {
       "stage": "pre",
       "question": "kernel = stride = patch_size 的 Conv2d，跟先 flatten 再线性投影，二者是什么关系？",
       "options": [
-        "它们产生不同的输出",
         "Conv2d 只是对每个 patch 做同一个线性 projection 的一种更快的写法",
+        "它们产生不同的输出",
         "Conv2d 引入了非线性",
         "先 flatten 再线性投影根本做不到"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Conv2d 每个输出位置都是 patch 像素和一个 filter 做点积，这跟先 flatten 再线性投影完全等价。"
     },
     {
@@ -42,10 +42,10 @@
       "stage": "check",
       "question": "一张 224x224 的图，patch_size=16，再加一个 CLS token，输出序列长度是多少？",
       "options": [
-        "196",
+        "256",
         "197",
-        "224",
-        "256"
+        "196",
+        "224"
       ],
       "correct": 1,
       "explanation": "224/16 = 14，所以是 14x14 = 196 个 patch，再加一个 CLS token，总共 197 个 token。"
@@ -55,11 +55,11 @@
       "question": "为什么重建（先 unfold 再 unflatten）是检验 patch 前端的好办法？",
       "options": [
         "它能提升准确率",
-        "不带 projection 时，像素经过 patch-flatten 再还原必须等于输入；对不上就说明 unfold 的数学写错了",
         "ONNX 强制要求这么做",
+        "不带 projection 时，像素经过 patch-flatten 再还原必须等于输入；对不上就说明 unfold 的数学写错了",
         "它能加快推理"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "不带 projection 时 patch 这一步是可逆的。如果来回一趟对不上，说明 unfold 逻辑有 bug，后面整个编码器都不靠谱。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "本课里把学出来的位置 embedding 换成 2D 正弦版本，会有什么变化？",
       "options": [
         "什么都不变",
-        "学出来的位置能在固定分辨率上拟合得稍好一点；正弦位置则能直接迁移到新分辨率，不用重训",
         "正弦位置参数量更大",
+        "学出来的位置能在固定分辨率上拟合得稍好一点；正弦位置则能直接迁移到新分辨率，不用重训",
         "正弦位置每一步都是随机的"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "学出来的位置在某一个分辨率上更灵活。正弦位置零参数，还能扛得住分辨率变化。"
     }
   ]

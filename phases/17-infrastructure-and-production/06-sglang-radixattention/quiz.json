@@ -18,12 +18,12 @@
       "stage": "check",
       "question": "为什么 FCFS 调度对 SGLang 上的前缀密集型流量是错误的？",
       "options": [
-        "FCFS 只在 AMD GPU 上工作",
-        "FCFS 是 SGLang 推荐的策略",
+        "FCFS 可能在下一个长前缀请求到来之前就把热门前缀分支驱逐掉，从而破坏基数树的复用",
         "FCFS 与 PagedAttention 不兼容",
-        "FCFS 可能在下一个长前缀请求到来之前就把热门前缀分支驱逐掉，从而破坏基数树的复用"
+        "FCFS 只在 AMD GPU 上工作",
+        "FCFS 是 SGLang 推荐的策略"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -31,11 +31,11 @@
       "question": "SGLang 的缓存感知调度器使用什么粒度的驱逐来匹配基数树的形状？",
       "options": [
         "仅按请求",
+        "随机驱逐",
         "整条分支，从最短被使用的叶子节点开始",
-        "单个 token",
-        "随机驱逐"
+        "单个 token"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -43,35 +43,35 @@
       "question": "对工程师而言，保持基数树共享前缀可被发现的最直接手段是什么？",
       "options": [
         "调低 GPU 显存利用率旋钮",
-        "固定 prompt 模板的顺序，让不可变内容（system、tools、schema）始终排在最前面",
         "始终使用静态批处理",
-        "禁用连续批处理"
-      ],
-      "correct": 1,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "本课认为 RadixAttention 在哪种负载模式下不会带来优势？",
-      "options": [
-        "共享工具 schema 的 agent",
-        "带有重复开场白的语音负载",
-        "带有共享检索前言的 RAG",
-        "使用独特 prompt、没有共享 system prompt 的单次生成"
+        "禁用连续批处理",
+        "固定 prompt 模板的顺序，让不可变内容（system、tools、schema）始终排在最前面"
       ],
       "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
-      "question": "ProjectDiscovery 的部署通过做了什么，把前缀缓存命中率从 7% 提升到 74%？",
+      "question": "本课认为 RadixAttention 在哪种负载模式下不会带来优势？",
       "options": [
-        "把动态内容移出可缓存的前缀之外",
-        "把 GPU 数量从 8 增加到 16",
-        "在不改动任何 prompt 的情况下从 vLLM 切换到 SGLang",
-        "禁用连续批处理"
+        "使用独特 prompt、没有共享 system prompt 的单次生成",
+        "带有共享检索前言的 RAG",
+        "共享工具 schema 的 agent",
+        "带有重复开场白的语音负载"
       ],
       "correct": 0,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "ProjectDiscovery 的部署通过做了什么，把前缀缓存命中率从 7% 提升到 74%？",
+      "options": [
+        "禁用连续批处理",
+        "把动态内容移出可缓存的前缀之外",
+        "在不改动任何 prompt 的情况下从 vLLM 切换到 SGLang",
+        "把 GPU 数量从 8 增加到 16"
+      ],
+      "correct": 1,
       "explanation": ""
     }
   ]

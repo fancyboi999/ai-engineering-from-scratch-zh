@@ -6,36 +6,36 @@
       "stage": "pre",
       "question": "阅读前思考：同事说他的模型在 held-out 集上 perplexity 为 4.2，问模型是不是好的。最站得住脚的回答是？",
       "options": [
-        "是的：perplexity 低于 5 就说明模型好。",
         "Perplexity 只反映模型对语言分布的拟合程度，不能说明模型是否能遵循指令或给出正确答案。",
         "没有显式 prompt 的话 perplexity 没有意义。",
+        "是的：perplexity 低于 5 就说明模型好。",
         "只有 judge 模型才能回答这个问题。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Perplexity 只是一个维度。模型可以 perplexity 很低但事实类任务答错，也可以 perplexity 还行但生成质量很差。你需要多个 eval，各测一个维度。"
     },
     {
       "stage": "check",
       "question": "Perplexity eval 对所有非 pad 位置的 per-token negative log-likelihood 求和，再除以非 pad token 总数。为什么不直接对 per-batch perplexity 取平均？",
       "options": [
-        "对 per-batch perplexity 取平均在数学上是等价的。",
         "对 per-batch perplexity 取平均会低估短序列的权重（它们的 per-batch ppl 方差更大），产生有偏的汇总结果。",
-        "Batch 里有 pad token，必须始终取平均。",
-        "Perplexity 对批量数据未定义。"
+        "Perplexity 对批量数据未定义。",
+        "对 per-batch perplexity 取平均在数学上是等价的。",
+        "Batch 里有 pad token，必须始终取平均。"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Per-token 汇总是教科书定义，能避免 batch size 和序列长度引入的偏差。Per-batch 平均是个常见 bug，在序列长度不一的数据上会算出不同的结果。"
     },
     {
       "stage": "check",
       "question": "Token F1 在预测和参考都为空时返回 1.0。还有哪种情况必须返回特定值？",
       "options": [
-        "预测为空但参考非空时，F1 必须是 1.0。",
         "预测非空但参考为空时，F1 必须未定义。",
         "只要预测和参考有一方为空，F1 必须是 0.0。",
+        "预测为空但参考非空时，F1 必须是 1.0。",
         "预测恰好有一个匹配 token 时，F1 必须是 0.5。"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "两边都空是空匹配。一边空一边非空是明确的未命中：一侧有内容，另一侧什么都没有。SQuAD 的惯例是此时 F1 = 0。"
     },
     {
@@ -43,9 +43,9 @@
       "question": "聚合器用 `1 / (1 + log(max(ppl, 1.0)))` 对 perplexity 做归一化。这保证了归一化分数的什么性质？",
       "options": [
         "始终在 [0, 1] 范围内，且随原始 perplexity 增大单调递减。",
-        "始终在 [0, 1] 范围内，且随原始 perplexity 增大单调递增。",
         "无上界。",
-        "只返回 0 或 1（二值）。"
+        "只返回 0 或 1（二值）。",
+        "始终在 [0, 1] 范围内，且随原始 perplexity 增大单调递增。"
       ],
       "correct": 0,
       "explanation": "Perplexity 1（理论下限）映射为 1.0，无穷大映射为 0。分数在 [0, 1] 内，perplexity 越低越好，与其他归一化指标方向一致。"
@@ -54,10 +54,10 @@
       "stage": "post",
       "question": "你把 mock judge 换成了真正的前沿模型 judge。流水线最少需要改什么？",
       "options": [
-        "重写聚合器以接受不同的分数范围。",
+        "把整个 eval 套件迁移到异步 I/O。",
         "把传给 `judge_eval` 的 `judge_fn` 参数替换为一个同签名的函数：(instruction, prediction, reference) -> JudgeVerdict。",
         "在 DEFAULT_WEIGHTS 中新增一项。",
-        "把整个 eval 套件迁移到异步 I/O。"
+        "重写聚合器以接受不同的分数范围。"
       ],
       "correct": 1,
       "explanation": "Judge 接口是 `(instruction, prediction, reference) -> JudgeVerdict`。任何符合该签名的函数都能直接替换。流水线通过这个边界与 judge 实现解耦，这正是设计的要点。"
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "你的 aggregate score 为 0.72，但 exact-match 是 0.40，judge 是 4.5/5。模型在做什么取舍？",
       "options": [
+        "Aggregate 算错了。",
         "模型精确命中 gold string 的频率较低，但 judge 认为开放式回答质量不错。",
         "模型在 LM 语料上过拟合了。",
-        "Aggregate 算错了。",
         "Judge 和 exact-match 定义上就是对不齐的。"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "EM 低但 judge 高说明模型在做释义：答案实质上是对的，但跟 gold 不是逐字符匹配的。这正是 EM 漏掉而 judge 捕捉到的维度。这种取舍是有信息量的，不是 bug。"
     }
   ]

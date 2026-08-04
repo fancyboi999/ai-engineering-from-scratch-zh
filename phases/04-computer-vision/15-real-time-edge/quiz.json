@@ -4,36 +4,36 @@
       "stage": "pre",
       "question": "你对一个模型做基准测试，报告“在 4090 上平均每张图像 12 毫秒”。缺了什么？",
       "options": [
-        "什么都不缺；这是一个完整的基准",
-        "百分位（p50/p95/p99）、预热规范，以及 CUDA 同步；仅有均值会掩盖尾部延迟，而且可能测量的是内核分发而非内核执行",
         "模型大小",
-        "数据集名称"
+        "数据集名称",
+        "什么都不缺；这是一个完整的基准",
+        "百分位（p50/p95/p99）、预热规范，以及 CUDA 同步；仅有均值会掩盖尾部延迟，而且可能测量的是内核分发而非内核执行"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "生产环境的延迟用百分位来衡量，因为实时系统是在尾部而非平均值上失败的。没有预热，JIT 编译会抬高最初几次测量。没有 torch.cuda.synchronize，GPU 内核启动会在内核完成前就返回，于是你测量的是分发而非执行。这三点都必须正确，数字才有意义。"
     },
     {
       "stage": "pre",
       "question": "FLOPs 与设备上的延迟并不完全相关。为什么？",
       "options": [
-        "FLOPs 计数器有问题",
         "不同的运算对硬件的友好度不同；深度卷积的 FLOPs 可能更低，但在 GPU 上是内存受限的，而稠密卷积能高效利用 Tensor Core。内存带宽、内核启动开销和缓存行为也在原始 FLOPs 之外塑造了延迟",
+        "PyTorch 计算 FLOPs 不正确",
         "FLOPs 忽略了批大小",
-        "PyTorch 计算 FLOPs 不正确"
+        "FLOPs 计数器有问题"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "FLOPs 是一个廉价的代理指标。墙钟延迟取决于一个运算与硬件强项的匹配程度：稠密矩阵乘法把 Tensor Core 跑满；深度卷积卡在内存带宽上；注意力卡在序列长度平方的内存读取上。做架构搜索时 FLOPs 有用；做部署决策时要在目标设备上实测。"
     },
     {
       "stage": "post",
       "question": "训练后静态 INT8 量化在 ImageNet 级别的视觉模型上通常损失多少准确率？",
       "options": [
-        "5-10 个百分点",
         "在校准得当时是 0.1-1 个百分点；融合了批归一化的卷积模型在 INT8 下表现尤其良好",
         "总是 0；它是无损的",
-        "20 个点以上；无法使用"
+        "20 个点以上；无法使用",
+        "5-10 个百分点"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "在校准良好的视觉模型上，静态 PTQ 损失从零点几个点到约 1 个点。更大的损失来源是：(a) 校准数据不足，(b) 对带有极端异常值的激活做量化（用逐通道量化或裁剪修复），(c) 未融合的 BatchNorm 层。处理好这些后，INT8 基本上是免费的。"
     },
     {
@@ -41,23 +41,23 @@
       "question": "你的移动应用需要一个小于 10MB、延迟低于 10 毫秒的视觉模型。你会选择哪个主干？",
       "options": [
         "ResNet-50",
-        "量化到 INT8 的 MobileNetV3-Small 或 EfficientNet-Lite-B0；两者都瞄准这个预算，并能干净地编译到 TFLite / Core ML",
         "ViT-Base",
+        "量化到 INT8 的 MobileNetV3-Small 或 EfficientNet-Lite-B0；两者都瞄准这个预算，并能干净地编译到 TFLite / Core ML",
         "ConvNeXt-Large"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "2026 年上线的移动视觉仍以 MobileNetV3 和 EfficientNet-Lite 变体为主导，因为它们正是为这个预算设计的：深度卷积、h-swish、squeeze-excite，从一开始就考虑量化。ResNet-50 和 ViT-Base 在 FP32 下超过 100MB、在 INT8 下超过 25MB，还没测延迟就已经超出体积预算。"
     },
     {
       "stage": "post",
       "question": "你用 opset 17 把一个 PyTorch 模型导出为 ONNX，失败并提示 'Unsupported operator'。最可能的原因有哪些？",
       "options": [
-        "ONNX 库过时了",
         "(1) 一个没有 ONNX 映射的自定义算子；(2) 一条 tracing 无法捕获的非确定性控制流路径；(3) 一个在 Python 中隐式存在但没有 ONNX 等价物的张量-标量交互。修复办法：替换该算子、对控制流使用 `torch.jit.script`，或升级 opset",
         "模型的参数太多",
-        "输入形状错了"
+        "输入形状错了",
+        "ONNX 库过时了"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "ONNX 导出默认采用 tracing，因此任何 tracing 无法捕获的东西——运行时控制流、Python 层级的分支、自定义 CUDA 算子——都会失败。大多数失败是某个没有 ONNX 等价物的单个节点（通常是一个小型自定义算子或对 torch.special.* 的调用）。修复办法是替换该算子、改用 `torch.jit.script`，或迁移到一个存在该算子的更新 opset。"
     }
   ]

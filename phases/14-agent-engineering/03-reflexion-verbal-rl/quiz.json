@@ -18,36 +18,36 @@
       "stage": "pre",
       "question": "哪三个组件定义了一个 Reflexion 系统？",
       "options": [
-        "Planner、Worker、Solver",
         "Actor、Evaluator、Self-Reflector",
         "Generator、Critic、Optimizer",
+        "Planner、Worker、Solver",
         "Selector、Expander、Backpropagator"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Reflexion 把 agent 拆成运行轨迹的 Actor、给轨迹打分的 Evaluator，以及写下经验教训的 Self-Reflector。"
     },
     {
       "stage": "check",
       "question": "哪种评估器类型使用像单元测试或已知正确答案这样的外部二元信号？",
       "options": [
-        "启发式（Heuristic）",
-        "标量（Scalar）",
         "自评估（Self-evaluated）",
-        "基于投票（Vote-based）"
+        "基于投票（Vote-based）",
+        "标量（Scalar）",
+        "启发式（Heuristic）"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "标量评估器从标准答案读取通过/失败信号（ALFWorld 成功、HumanEval 测试）。"
     },
     {
       "stage": "check",
       "question": "为什么自评估比标量反馈是更弱的信号？",
       "options": [
-        "它计算起来更慢",
         "模型评判自己时没有外部基准，所以它可能给自己的答案盖橡皮图章式通过",
+        "它计算起来更慢",
         "它总是需要更大的模型",
         "它无法在工具上运行"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "自评估缺乏外部检查，所以一个自信的幻觉也能得高分；要把它和基于工具的核实配对。"
     },
     {
@@ -55,23 +55,23 @@
       "question": "本课把哪种情况列为 Reflexion 帮不上忙的地方？",
       "options": [
         "测试可以打分的代码生成",
-        "外部瞬时故障，比如网络中断",
         "ALFWorld 导航任务",
-        "HotpotQA 多跳问题"
+        "HotpotQA 多跳问题",
+        "外部瞬时故障，比如网络中断"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "对一次瞬时的外部中断做反思，产生的反思对未来的运行毫无帮助。"
     },
     {
       "stage": "post",
       "question": "Reflexion 模式中的记忆腐烂（memory rot）是什么？",
       "options": [
-        "进程重启时丢失反思",
         "情景缓冲区被过时或错误的反思填满，拖慢或带偏未来的试验",
         "反思被提供商加密了",
-        "反思 prompt 超出了上下文窗口"
+        "反思 prompt 超出了上下文窗口",
+        "进程重启时丢失反思"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "累积的陈旧或错误反思会降低行为质量；用压实（compaction）或 TTL 来缓解。"
     },
     {
@@ -79,11 +79,11 @@
       "question": "哪种生产模式是本课对 Reflexion 最清晰的对应？",
       "options": [
         "Cursor 的 apply-edits 流程",
+        "Anthropic 的 prompt caching",
         "Claude Code 把 CLAUDE.md 中的经验教训前置到未来会话",
-        "OpenAI 的 batch API",
-        "Anthropic 的 prompt caching"
+        "OpenAI 的 batch API"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "CLAUDE.md 的经验教训、pro-workflow 的 learn-rule，以及 Letta 的 sleep-time compute，都把情景反思缓冲区外置了。"
     }
   ]

@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "交接包（handoff packet）中承重的字段是哪一个？",
       "options": [
-        "summary",
         "next_action（没有它，这份文档就是状态报告，而不是交接）",
+        "verdict_pointer",
         "commands_run",
-        "verdict_pointer"
+        "summary"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "除了 next_action 什么都有的交接，是一份状态报告；下一个具体步骤才是让下一个会话高效的东西。"
     },
     {
       "stage": "pre",
       "question": "为什么交接是被生成的，而不是被手写的？",
       "options": [
-        "生成器更快",
-        "手写的交接在难熬的一天会被跳过；生成器读取工作台产物并发出交接包，于是 agent 只需把工作台留在生成器能总结的状态",
         "生成器加密更好",
-        "Apache 2.0 要求它"
+        "Apache 2.0 要求它",
+        "生成器更快",
+        "手写的交接在难熬的一天会被跳过；生成器读取工作台产物并发出交接包，于是 agent 只需把工作台留在生成器能总结的状态"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "自动化弥合了意图与一致性之间的鸿沟。"
     },
     {
       "stage": "check",
       "question": "交接包以哪两种形式发布？",
       "options": [
-        "PDF 和 PNG",
+        "YAML 和 TOML",
         "handoff.md（人类可读）和 handoff.json（机器可读，二者来自同一来源产物；分歧时 JSON 胜出）",
         "邮件和 Slack",
-        "YAML 和 TOML"
+        "PDF 和 PNG"
       ],
       "correct": 1,
       "explanation": "markdown 给人，JSON 给下一个 agent；二者都来自同一个生成器。"
@@ -42,22 +42,22 @@
       "stage": "check",
       "question": "本课如何区分压实（compaction）和交接（handoff）？",
       "options": [
-        "它们是一回事",
-        "压实延长一个会话；交接干净地结束一个并在全新上下文中开始下一个。交接包就是让这个转换变廉价的东西",
         "压实收费，交接免费",
-        "交接需要 GPU"
+        "交接需要 GPU",
+        "它们是一回事",
+        "压实延长一个会话；交接干净地结束一个并在全新上下文中开始下一个。交接包就是让这个转换变廉价的东西"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Hermes Issue 20372 的框架：在原地压缩降低质量之前写一份紧凑的交接，然后在全新会话中恢复。"
     },
     {
       "stage": "check",
       "question": "本课关于何时收尾一个会话有何建议？",
       "options": [
-        "在 100% 上下文时，然后慌乱",
+        "只在合并之后",
         "在 50-75% 上下文预算之前、趁上下文完好时；在压缩产物污染状态之前写很便宜",
         "只在午夜",
-        "只在合并之后"
+        "在 100% 上下文时，然后慌乱"
       ],
       "correct": 1,
       "explanation": "提早收尾能让生成器的输入保持干净。"
@@ -67,11 +67,11 @@
       "question": "本课建议在交接包中把反馈日志裁剪成什么？",
       "options": [
         "只取前 K 条",
+        "只取最近一条",
         "最后 K 条加上每一条非零退出的记录，使交接包保持小而失败历史得以存活",
-        "随机 N 条",
-        "只取最近一条"
+        "随机 N 条"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "非对称裁剪：失败必须存活；尾部的琐碎内容留着也便宜。"
     },
     {

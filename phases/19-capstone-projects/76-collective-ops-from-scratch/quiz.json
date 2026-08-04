@@ -6,72 +6,72 @@
       "stage": "pre",
       "question": "在 N 个 rank 上，对一个 T 字节的张量做 ring all-reduce，每个 rank 的带宽开销是多少？",
       "options": [
-        "T 字节",
-        "N * T 字节",
         "2T(N-1)/N 字节",
-        "T log2(N) 字节"
+        "T 字节",
+        "T log2(N) 字节",
+        "N * T 字节"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "ring all-reduce 把 N-1 个大小为 T/N 的 chunk 搬运两遍（先 reduce-scatter 再 all-gather）；每个 rank 的总量是 2T(N-1)/N，与集群规模无关。"
     },
     {
       "stage": "pre",
       "question": "为什么本课的队列网格（queue mesh）是真实集群上 NCCL 的一个诚实替身？",
       "options": [
-        "它跑在 CUDA core 上",
         "它用硬件卸载来做 reduce",
         "它实现了相同的线缆模式（沿 ring 有序点对点发送），只是介质不同",
-        "它压缩消息"
+        "它压缩消息",
+        "它跑在 CUDA core 上"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "算法正确性取决于线缆模式而非介质；队列 ring 暴露出的竞态形态和 chunk 调度与 NCCL ring all-reduce 完全一样。"
     },
     {
       "stage": "check",
       "question": "ring all-reduce 的 reduce-scatter 这一半结束后，rank r 手里拿着什么？",
       "options": [
-        "什么都没有",
-        "未归约的完整张量",
         "某一个 chunk 的归约和（张量的 1/N）",
-        "两个 chunk 的归约和"
+        "两个 chunk 的归约和",
+        "什么都没有",
+        "未归约的完整张量"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "reduce-scatter 把某个 chunk 的和停放在某个 rank 上；接着 all-gather 那一半把这些已完成的 chunk 沿 ring 轮转开来。"
     },
     {
       "stage": "check",
       "question": "为什么用树形 broadcast，而不是从源头发 N-1 次直连发送？",
       "options": [
+        "直连发送会丢包",
         "树用更少内存",
-        "树每一轮把持有者集合翻倍；深度是 log2(N)，所以延迟按 log 而非 N 增长",
         "PyTorch 里树是强制的",
-        "直连发送会丢包"
+        "树每一轮把持有者集合翻倍；深度是 log2(N)，所以延迟按 log 而非 N 增长"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "当每跳延迟是瓶颈时，log2(N) 跳数占主导；N-1 次串行发送要把这个延迟底线付上 N 遍。"
     },
     {
       "stage": "check",
       "question": "为什么要在相同输入上对照 torch.distributed 的 gloo 做校验？",
       "options": [
-        "gloo 更快",
         "gloo 是集合通信语义的合法参照；字节相等的输出能在真上集群之前证明你的算法符合规范",
+        "gloo 不用任何 setup",
         "gloo 会自动写 JSONL",
-        "gloo 不用任何 setup"
+        "gloo 更快"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "没有参照，这个原语看起来一直对，直到真实训练的第 10000 步才出岔子；gloo 在 CPU 上给出字节相等的事实基准。"
     },
     {
       "stage": "post",
       "question": "树形 all-reduce 在什么情况下胜过 ring all-reduce？",
       "options": [
-        "总是",
         "消息很大时",
-        "小消息或高延迟链路时；在交叉点以下，log2(N) 的跳数会击败带宽项 2T(N-1)/N",
-        "永远不会"
+        "总是",
+        "永远不会",
+        "小消息或高延迟链路时；在交叉点以下，log2(N) 的跳数会击败带宽项 2T(N-1)/N"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "NCCL 在约 1 MB 以上选 ring、以下选树；交叉点取决于给定集群拓扑上的带宽与延迟之争。"
     }
   ]

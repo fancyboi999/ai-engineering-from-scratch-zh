@@ -6,8 +6,8 @@
       "stage": "post",
       "question": "相比基础输入费率，Anthropic 对缓存读取（cache read）给予多少折扣？",
       "options": [
-        "打 7.5 折（便宜 25%）",
         "打 5 折（便宜 50%）",
+        "打 7.5 折（便宜 25%）",
         "打 2.5 折（便宜 75%）",
         "打 1 折（便宜 90%）"
       ],
@@ -20,8 +20,8 @@
       "options": [
         "缓存只在前缀逐字节相同时才命中；一个变化的时间戳会破坏它之后所有内容的匹配",
         "时间戳会让 tokenizer 困惑",
-        "它们比静态文本花费更多 token",
-        "Anthropic 明确拒绝缓存块中的时间戳"
+        "Anthropic 明确拒绝缓存块中的时间戳",
+        "它们比静态文本花费更多 token"
       ],
       "correct": 0,
       "explanation": ""
@@ -30,36 +30,36 @@
       "stage": "post",
       "question": "OpenAI 的 prompt 缓存是如何配置的？",
       "options": [
-        "显式的 cache_control 标记",
         "你创建并引用的 CachedContent API",
         "无需配置的自动前缀匹配",
-        "你为每个项目切换的系统级开关"
+        "你为每个项目切换的系统级开关",
+        "显式的 cache_control 标记"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "对 Anthropic 而言，相比 5 分钟的默认值，1 小时的延长 TTL 会带来多少写入溢价（write premium）？",
       "options": [
-        "相同",
-        "2 倍写入溢价（比基线高 50%）",
+        "无写入溢价",
         "4 倍写入溢价",
-        "无写入溢价"
+        "相同",
+        "2 倍写入溢价（比基线高 50%）"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "要在 Anthropic 的 25% 写入溢价上达到收支平衡，需要多少次复用？",
       "options": [
-        "1 次",
-        "2 次",
+        "10 次",
         "5 次",
-        "10 次"
+        "2 次",
+        "1 次"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     }
   ]

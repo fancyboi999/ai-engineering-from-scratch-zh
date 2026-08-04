@@ -6,33 +6,33 @@
       "stage": "pre",
       "question": "under-refusal（拒绝不足）衡量的是什么？",
       "options": [
-        "模型回答被标为 unsafe 的 prompt 的频率",
         "模型拒绝被标为 safe 的 prompt 的频率",
-        "模型每条回复输出多少 token",
-        "每条 prompt 一次 API 调用的成本"
+        "模型回答被标为 unsafe 的 prompt 的频率",
+        "每条 prompt 一次 API 调用的成本",
+        "模型每条回复输出多少 token"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "本课为什么用 mock LLM 而不是真实模型？",
       "options": [
-        "因为顶点课里不允许用真实模型",
-        "因为同样的输入在多次运行中能得到同样的输出，让代码改动能归因到已知原因",
+        "因为本课需要 GPU 硬件",
         "因为 mock LLM 比真实模型更准",
-        "因为本课需要 GPU 硬件"
+        "因为同样的输入在多次运行中能得到同样的输出，让代码改动能归因到已知原因",
+        "因为顶点课里不允许用真实模型"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "已知 safe prompt 数 = 30，被拒绝的 safe prompt 数 = 5，over-refusal（过度拒绝）率是多少？",
       "options": [
-        "0.50",
-        "0.17",
         "0.30",
+        "0.17",
+        "0.50",
         "0.05"
       ],
       "correct": 1,
@@ -43,35 +43,35 @@
       "question": "这里的 Expected Calibration Error（ECE，期望校准误差）衡量的是什么？",
       "options": [
         "在 unsafe prompt 上拒绝的比例",
-        "模型声称的置信度与它实际观测到的准确率之间的差距，按置信度区间分桶统计",
         "所有回复加起来的总 token 数",
+        "模型声称的置信度与它实际观测到的准确率之间的差距，按置信度区间分桶统计",
         "命中的 regex 规则数量"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么这套框架要把 unsafe prompt 跟第 82 课的 taxonomy 做关联（join）？",
       "options": [
-        "为了重新跑一遍第 82 课的语料加载器",
-        "为了按攻击分类报告 under-refusal，让团队看清模型在哪条边界上漏掉了",
         "为了把每条 prompt 的 severity 都加一",
-        "为了去重"
+        "为了去重",
+        "为了重新跑一遍第 82 课的语料加载器",
+        "为了按攻击分类报告 under-refusal，让团队看清模型在哪条边界上漏掉了"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么这套框架要同时返回 under-refusal 和 over-refusal，而不是给一个单一的安全分？",
       "options": [
+        "因为 over-refusal 是另一个团队算的",
         "因为 Python dataclass 更喜欢多个字段",
         "因为它们是两种相反的错误，一个单一数字会把某个 build 上更严重的那种藏起来",
-        "因为 under-refusal 只在 CI 里用",
-        "因为 over-refusal 是另一个团队算的"
+        "因为 under-refusal 只在 CI 里用"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     }
   ]

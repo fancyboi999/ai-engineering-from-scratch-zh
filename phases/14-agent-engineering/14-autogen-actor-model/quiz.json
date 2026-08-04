@@ -6,46 +6,46 @@
       "stage": "pre",
       "question": "在 AutoGen v0.4 中，actor 交互的唯一合法方式是什么？",
       "options": [
+        "互相修改对方的 prompt",
         "直接访问一个共享 dict",
         "通过收件箱交换异步消息；没有共享内存",
-        "共享 SQL 事务",
-        "互相修改对方的 prompt"
+        "共享 SQL 事务"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "actor 拥有私有状态和一个收件箱；消息是唯一的交互方式。"
     },
     {
       "stage": "pre",
       "question": "AutoGen v0.4 的三个 API 层是什么？",
       "options": [
-        "Core、AgentChat、Extensions",
-        "Frontend、Backend、Database",
+        "Plan、Act、Reflect",
         "Tools、Models、Memory",
-        "Plan、Act、Reflect"
+        "Core、AgentChat、Extensions",
+        "Frontend、Backend、Database"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Core 是底层的 actor 框架，AgentChat 是任务驱动的高层 API，Extensions 是各种集成。"
     },
     {
       "stage": "check",
       "question": "为什么把投递（delivery）与处理（handling）解耦能带来故障隔离？",
       "options": [
-        "运行时在 B 中捕获处理器失败而不让 A 崩溃；A 的 send() 立即返回，从不阻塞",
-        "每个 actor 跑在单独的机器上",
         "运行时在失败时重启操作系统",
-        "处理器是纯函数"
+        "处理器是纯函数",
+        "每个 actor 跑在单独的机器上",
+        "运行时在 B 中捕获处理器失败而不让 A 崩溃；A 的 send() 立即返回，从不阻塞"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "send() 把消息放进接收方的收件箱然后返回；处理器崩溃是该 actor 局部的事情。"
     },
     {
       "stage": "check",
       "question": "哪种 AgentChat 拓扑按固定顺序轮转 agent？",
       "options": [
-        "SelectorGroupChat",
+        "Supervisor",
         "RoundRobinGroupChat",
         "Magentic-One",
-        "Supervisor"
+        "SelectorGroupChat"
       ],
       "correct": 1,
       "explanation": "RoundRobinGroupChat 是固定轮转；SelectorGroupChat 用一个选择器来挑下一个。"
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "本课所述 AutoGen v0.4 在 2026 年初的状态是什么？",
       "options": [
+        "被 LangGraph 取代",
         "已弃用并移除",
         "稳定但处于维护模式；Microsoft Agent Framework 是向前的路径",
-        "刚刚发布",
-        "被 LangGraph 取代"
+        "刚刚发布"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "AutoGen v0.7.x 对研究是稳定的；活跃开发已转向 Microsoft Agent Framework。"
     },
     {
       "stage": "post",
       "question": "AutoGen v0.4 默认发出哪种可观测性标准？",
       "options": [
+        "StatsD",
         "仅 Prometheus 指标",
         "带 gen_ai.* 属性的 OpenTelemetry span，遵循 OTel GenAI 语义约定",
-        "StatsD",
         "Datadog APM"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "每条消息都发出一个 span；工具调用按 OTel GenAI 约定携带 gen_ai.* 属性。"
     }
   ]

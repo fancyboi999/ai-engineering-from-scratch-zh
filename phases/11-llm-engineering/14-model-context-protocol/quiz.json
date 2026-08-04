@@ -6,12 +6,12 @@
       "stage": "post",
       "question": "一个 MCP server 暴露哪三种原语（primitive）？",
       "options": [
-        "函数、类型、类",
         "工具（tools）、资源（resources）、prompts",
-        "端点、webhook、队列",
-        "agent、技能、工作流"
+        "函数、类型、类",
+        "agent、技能、工作流",
+        "端点、webhook、队列"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -19,47 +19,47 @@
       "question": "MCP 使用什么传输格式（wire format）？",
       "options": [
         "基于 HTTP 的 GraphQL",
+        "带 OpenAPI 的 REST",
         "使用 protobuf 的 gRPC",
-        "JSON-RPC 2.0",
-        "带 OpenAPI 的 REST"
+        "JSON-RPC 2.0"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "哪个元数据字段表示一个工具会改变状态、应当要求人工审批？",
       "options": [
+        "destructiveHint: true",
         "readonly: false",
         "mutating: true",
-        "destructiveHint: true",
         "requiresAuth: true"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "2025-06-18 版中取代早先仅 SSE 远程传输的传输方式是什么？",
       "options": [
-        "WebTransport",
         "Streamable HTTP",
         "仅 WebSocket",
-        "gRPC 双向流"
+        "gRPC 双向流",
+        "WebTransport"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "什么时候应该把一个工具拆分成它自己的 MCP server，而不是保持内联？",
       "options": [
-        "当它每天被调用少于 10 次时",
-        "当它被两个或更多 host 调用，且是只读/可缓存时",
+        "永远不该；MCP 只用于本地开发",
         "当它返回超过 1KB 的数据时",
-        "永远不该；MCP 只用于本地开发"
+        "当它每天被调用少于 10 次时",
+        "当它被两个或更多 host 调用，且是只读/可缓存时"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     }
   ]

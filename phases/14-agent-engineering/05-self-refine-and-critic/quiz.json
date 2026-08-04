@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "哪三个 prompt 组成一个 Self-Refine 循环？",
       "options": [
-        "plan、execute、solve",
+        "search、score、synthesize",
         "generate、feedback、refine",
-        "actor、evaluator、reflector",
-        "search、score、synthesize"
+        "plan、execute、solve",
+        "actor、evaluator、reflector"
       ],
       "correct": 1,
       "explanation": "Self-Refine 用一个模型扮演三个角色：generate、feedback、refine。"
@@ -18,36 +18,36 @@
       "stage": "pre",
       "question": "为什么 Self-Refine 在 refine 这一步需要历史？",
       "options": [
-        "提供商只对历史做缓存",
-        "没有先前的输出和批评，refine 这一步会重复早先的错误；消融实验显示质量急剧下降",
+        "它加快 token 生成",
         "计费需要历史",
-        "它加快 token 生成"
+        "提供商只对历史做缓存",
+        "没有先前的输出和批评，refine 这一步会重复早先的错误；消融实验显示质量急剧下降"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "refine 这个 prompt 以完整历史为条件，使模型不重复它早先的错误。"
     },
     {
       "stage": "check",
       "question": "相对于 Self-Refine，CRITIC 改变了什么？",
       "options": [
-        "它移除了 refine 这一步",
         "它把自反馈这一步替换成一个基于外部工具的核实器",
         "它用更大的模型来生成",
+        "它移除了 refine 这一步",
         "它并行运行反馈步骤"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "CRITIC 把自我批评换成一个经由搜索、代码解释器、计算器或领域核实器路由的 verify 步骤。"
     },
     {
       "stage": "check",
       "question": "用 Claude 友好的说法，哪种 Anthropic 工作流模式对应 Self-Refine 和 CRITIC？",
       "options": [
-        "Router（路由）",
-        "Prompt chain（prompt 链）",
         "Evaluator-Optimizer（评估器-优化器）",
-        "Parallel sampling（并行采样）"
+        "Router（路由）",
+        "Parallel sampling（并行采样）",
+        "Prompt chain（prompt 链）"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "Anthropic 把这种模式命名为 Evaluator-Optimizer：评估器打分，优化器修订，循环直到收敛。"
     },
     {
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "OpenAI Agents SDK 中哪个 SDK 特性是 CRITIC 形态的？",
       "options": [
-        "Handoffs",
-        "Sessions",
         "输出护栏（可以调用工具）",
+        "Sessions",
+        "Handoffs",
         "Tracing"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "输出护栏核实 agent 的最终输出，且可以调用工具，对应 CRITIC 的核实器角色。"
     },
     {
       "stage": "post",
       "question": "本课为 2026 年的 evaluator-optimizer 循环建议什么停止条件？",
       "options": [
-        "仅当核实器通过时停止",
-        "仅当模型说「行」时停止",
         "组合：核实器通过 或（模型说行 且 迭代数 >= 2）或 迭代数 >= max_iterations",
-        "永不停止；让 agent 无限自我改进"
+        "永不停止；让 agent 无限自我改进",
+        "仅当模型说「行」时停止",
+        "仅当核实器通过时停止"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "组合条件避免了单一条件的失败模式。"
     }
   ]

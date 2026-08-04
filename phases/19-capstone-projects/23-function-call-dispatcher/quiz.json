@@ -7,11 +7,11 @@
       "question": "为什么对非幂等工具，超时后默认不重试？",
       "options": [
         "因为分发器无法度量非幂等调用",
-        "因为工具可能已经部分提交了；重试会导致副作用重复",
         "因为非幂等 handler 执行更快",
+        "因为工具可能已经部分提交了；重试会导致副作用重复",
         "因为幂等 key 的生成很慢"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "一次在 4.9 秒超时的 db.write 被重试后可能产生第二次写入。除非 handler 告知该调用可以安全重复，否则分发器会拒绝重试。"
     },
     {
@@ -19,35 +19,35 @@
       "question": "幂等 key 去重保护的是什么场景？",
       "options": [
         "网络慢",
-        "重试触发时原始调用仍在进行中",
         "Schema 校验错误",
+        "重试触发时原始调用仍在进行中",
         "进程重启"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "没有去重的话，5 秒处触发的重试会和仍在等待的原始调用形成竞争。缓存把两者合并为一次 handler 调用。"
     },
     {
       "stage": "check",
       "question": "在这个分发器中，哪些错误类型可以被重试？",
       "options": [
-        "schema 和 not_found",
         "internal 和 budget_exceeded",
         "timeout（仅幂等时）和 transient",
-        "全部都可以"
+        "全部都可以",
+        "schema 和 not_found"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "schema 和 not_found 是确定性错误。internal 掩盖了未知的 handler bug。budget_exceeded 是一次 yield。只有幂等调用的 timeout 和显式的 TransientError 才会重试。"
     },
     {
       "stage": "check",
       "question": "_run_with_retries 外面的信号量保护的是什么？",
       "options": [
-        "handler 不和自己冲突",
-        "后端不被 gather() 扇出的大量并发调用压垮",
+        "重试计数器",
         "validator",
-        "重试计数器"
+        "后端不被 gather() 扇出的大量并发调用压垮",
+        "handler 不和自己冲突"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "四十个调用的 gather 如果没有限制就会同时打开四十个并发分发。信号量限制了并发波峰。"
     },
     {
@@ -55,11 +55,11 @@
       "question": "为什么幂等 key 由调用方派生，而不是由分发器生成？",
       "options": [
         "因为 Python 的 hash 不稳定",
+        "因为缓存不能存字符串",
         "因为仅凭参数派生会导致两个语义不同但参数相同的调用发生碰撞",
-        "因为注册中心拿不到 key",
-        "因为缓存不能存字符串"
+        "因为注册中心拿不到 key"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "调用方知道 step id、planner 意图、用户身份。仅靠参数无法提供足够的上下文来安全去重。"
     },
     {
@@ -67,23 +67,23 @@
       "question": "分发时 schema 校验失败会映射到哪个 JSON-RPC 错误码？",
       "options": [
         "-32601",
-        "-32602",
         "-32603",
-        "-32700"
+        "-32700",
+        "-32602"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "-32602 Invalid params。分发器在任何 handler 运行之前就返回这个错误。"
     },
     {
       "stage": "post",
       "question": "对幂等工具连续超时直到 max_attempts 用尽后，返回什么？",
       "options": [
-        "抛出异常",
-        "DispatchOk 但没有结果",
         "DispatchError，kind=timeout，attempts==max_attempts",
+        "DispatchOk 但没有结果",
+        "抛出异常",
         "DispatchError，kind=internal"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "分发器返回类型化的错误信封。kind 反映最后一次失败模式，attempts 反映总共尝试了多少次。"
     }
   ]

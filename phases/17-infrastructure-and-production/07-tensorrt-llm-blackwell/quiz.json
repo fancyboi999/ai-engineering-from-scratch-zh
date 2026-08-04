@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "在一个可比的 120B 级别工作负载上，本课报告的 Blackwell + TRT-LLM + Dynamo 与 H100 + vLLM 之间，每百万 token 的成本差距大约是多少？",
       "options": [
+        "约 1.1 倍",
         "约 100 倍",
-        "约 7 倍",
         "约 2 倍",
-        "约 1.1 倍"
+        "约 7 倍"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -19,9 +19,9 @@
       "question": "为什么本课建议在 Blackwell 上把 KV 缓存保持为 FP8 而非 NVFP4？",
       "options": [
         "目前还没有任何引擎支持 NVFP4 的 KV 缓存",
-        "FP8 是 NVLink 5 唯一支持的精度",
+        "FP8 比 FP4 占用更少的显存",
         "KV 缓存跨越很宽的动态范围；FP4 量化会导致 attention 分数出现灾难性的精度损失",
-        "FP8 比 FP4 占用更少的显存"
+        "FP8 是 NVLink 5 唯一支持的精度"
       ],
       "correct": 2,
       "explanation": ""
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "TRT-LLM 利用了 Blackwell 的哪个特性，使模型加载时无需经过训练后转换步骤？",
       "options": [
-        "模型提供方随发布即提供的 Day-0 FP4 权重",
         "通过 bitsandbytes 实现的 INT2 权重",
         "FP64 attention",
+        "模型提供方随发布即提供的 Day-0 FP4 权重",
         "BF16 KV 缓存"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -43,35 +43,35 @@
       "question": "按本课所述，选择 TRT-LLM 技术栈的主要权衡是什么？",
       "options": [
         "它无法服务 MoE 模型",
+        "它只能在小规模下工作",
         "它要求完全自主的修复",
-        "它把你锁定在 NVIDIA 硬件上 —— 不支持 AMD、不支持 Intel、不支持 ARM",
-        "它只能在小规模下工作"
+        "它把你锁定在 NVIDIA 硬件上 —— 不支持 AMD、不支持 Intel、不支持 ARM"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本课把哪种精度组合描述为典型的 Blackwell 配置？",
       "options": [
+        "权重 NVFP4，激活 NVFP4，KV 缓存 FP8，attention 累加器 FP32",
         "权重 FP4，KV 缓存 FP4，attention 用 INT8",
         "全部使用 BF16",
-        "权重 NVFP4，激活 NVFP4，KV 缓存 FP8，attention 累加器 FP32",
         "权重 INT8，激活 FP32，KV 缓存 INT4"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "对于推理密集型工作负载，若 NVFP4 权重转换会使 MATH 准确率下降几个点，本课建议怎么做？",
       "options": [
-        "切换到 AMD MI300X",
         "禁用推测解码",
         "针对每个模型在你自己的评测集上验证任务质量；团队通常使用 FP8 权重 + FP4 激活，或继续在 H200 上全程使用 FP8",
+        "切换到 AMD MI300X",
         "无论如何都上 NVFP4，因为成本优势压倒一切"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     }
   ]

@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "基于 Locust 的 LLM 负载测试中的 GIL 陷阱是什么？",
       "options": [
-        "Locust 只能在 Windows 上工作",
         "Locust 不支持 HTTP",
+        "Locust 需要 CUDA",
         "客户端侧的分词在 Python GIL 下运行，并排在请求生成之后排队，从而虚高了上报的 token 间延迟",
-        "Locust 需要 CUDA"
+        "Locust 只能在 Windows 上工作"
       ],
       "correct": 2,
       "explanation": ""
@@ -19,21 +19,21 @@
       "question": "prompt 同质化陷阱是什么？",
       "options": [
         "同质化的 prompt 总会拖慢服务器",
-        "从真实分布采样会低估长 prompt 的占比",
         "同质化的 prompt 需要流式传输",
-        "循环使用同一个 prompt 会让前缀缓存看起来像是满并发 decode，从而虚高了上报的吞吐量"
+        "循环使用同一个 prompt 会让前缀缓存看起来像是满并发 decode，从而虚高了上报的吞吐量",
+        "从真实分布采样会低估长 prompt 的占比"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "本课推荐哪四种负载模式？",
       "options": [
+        "仅突发（burst）",
         "连续 10 天恒定 1 RPS",
-        "手动点击测试",
         "稳态（steady-state）、爬坡（ramp）、尖峰（spike）、浸泡（soak）",
-        "仅突发（burst）"
+        "手动点击测试"
       ],
       "correct": 2,
       "explanation": ""
@@ -54,24 +54,24 @@
       "stage": "post",
       "question": "哪种 2026 年的工具组合被定位为最适合 CI/CD 的 SLA 门禁和 Kubernetes 原生的分布式运行？",
       "options": [
-        "k6 v2026.1.0 搭配 k6 Operator 1.0 GA（TestRun / PrivateLoadZone CRD）",
-        "仅 guidellm",
         "仅 Vegeta",
-        "原版 Locust 2.43.3"
+        "仅 guidellm",
+        "原版 Locust 2.43.3",
+        "k6 v2026.1.0 搭配 k6 Operator 1.0 GA（TestRun / PrivateLoadZone CRD）"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "浸泡（soak）负载模式能捕捉哪种失败模式？",
       "options": [
-        "数小时内的内存泄漏、连接池漂移以及可观测性溢出",
         "冷启动长尾",
+        "缓存驱逐风暴",
         "Tokenizer 的 GIL 争用",
-        "缓存驱逐风暴"
+        "数小时内的内存泄漏、连接池漂移以及可观测性溢出"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     }
   ]

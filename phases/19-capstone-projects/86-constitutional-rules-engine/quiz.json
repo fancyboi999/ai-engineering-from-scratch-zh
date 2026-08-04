@@ -7,11 +7,11 @@
       "question": "为什么要用声明式的 YAML constitution，而不是临时写在代码里的检查？",
       "options": [
         "因为 YAML 解析比 Python 快",
-        "因为 YAML 里的规则非工程师也能 review，能进版本控制，还能不改代码就替换",
         "因为标准库更偏好 YAML",
+        "因为 YAML 里的规则非工程师也能 review，能进版本控制，还能不改代码就替换",
         "因为 YAML 支持 anchor"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -20,34 +20,34 @@
       "options": [
         "name、regex、fix",
         "id、owner、timestamp",
-        "name、severity、must、explanation",
-        "predicate、severity、owner"
+        "predicate、severity、owner",
+        "name、severity、must、explanation"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "这个 engine 是怎么组合 predicate 的？",
       "options": [
-        "每条规则只能用单个 contains_regex",
         "通过 all_of、any_of 和 not_ 递归地包裹原子 predicate",
-        "靠把置信度分数相乘",
-        "靠一个神经网络 classifier"
+        "每条规则只能用单个 contains_regex",
+        "靠一个神经网络 classifier",
+        "靠把置信度分数相乘"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "applies_when 的作用是什么？",
       "options": [
-        "它永远求值为 true",
-        "它给 must predicate 加了道门：不适用的规则会被记为 not_applicable，而不是 violation",
         "它覆盖 severity",
-        "它挑选 fixer 操作"
+        "它永远求值为 true",
+        "它挑选 fixer 操作",
+        "它给 must predicate 加了道门：不适用的规则会被记为 not_applicable，而不是 violation"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -55,21 +55,21 @@
       "question": "Fixer 是做什么的？",
       "options": [
         "它重写规则文件",
+        "它调用一个远程模型来修复文本",
         "它应用每条规则上声明的 fix（append、prepend、replace_regex），产出一段修订后的文本",
-        "它从 fix 里算出 severity",
-        "它调用一个远程模型来修复文本"
+        "它从 fix 里算出 severity"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么 demo 在 fixer 之后要再跑一遍 engine？",
       "options": [
-        "为了把报告撑大",
+        "因为第一遍只是 dry run",
         "为了验证修订后的文本确实满足规则，并暴露出 fixer 在本地修不了的规则",
         "为了重新加载 constitution",
-        "因为第一遍只是 dry run"
+        "为了把报告撑大"
       ],
       "correct": 1,
       "explanation": ""

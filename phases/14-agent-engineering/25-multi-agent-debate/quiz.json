@@ -6,58 +6,58 @@
       "stage": "pre",
       "question": "Society of Minds 协议让 N 个模型实例做什么？",
       "options": [
-        "每个跑一个不同的基准",
         "各自独立提出答案，然后在 R 轮中阅读并批评彼此的提议，直到收敛",
         "在共享数据集上训练",
+        "每个跑一个不同的基准",
         "谈判价格"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "N 个提议者、R 轮、互相批评、收敛，这是 Du 等人经典辩论的形态。"
     },
     {
       "stage": "pre",
       "question": "为什么跨模型辩论（例如 ChatGPT + Bard）胜过单模型辩论？",
       "options": [
-        "不同厂商在谈判价格",
         "异质性减少了共有的盲点，使互相批评能抓住更多错误",
         "它更便宜",
-        "厂商共享权重"
+        "厂商共享权重",
+        "不同厂商在谈判价格"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "混合模型带来独立的错误分布，这抬高了辩论的上限。"
     },
     {
       "stage": "check",
       "question": "相比全网格（full mesh），稀疏拓扑在 token 成本上的主要收益是什么？",
       "options": [
+        "它移除了 LLM",
         "稀疏拓扑不需要模型",
         "每个辩论者只阅读一部分同伴，因此批评操作数下降而准确率常能持平",
-        "稀疏拓扑使轮数翻倍",
-        "它移除了 LLM"
+        "稀疏拓扑使轮数翻倍"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "稀疏（星形、环形、中心辐射）在许多任务上减少批评操作而不损失准确率。"
     },
     {
       "stage": "check",
       "question": "本课把哪种情况列为辩论有害的地方？",
       "options": [
+        "传记生成",
         "开放式推理",
-        "一个简单的事实查找，因为一次查找比五次辩论更便宜",
         "国际象棋走法的合法性",
-        "传记生成"
+        "一个简单的事实查找，因为一次查找比五次辩论更便宜"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "对延迟和成本敏感的琐碎查找，并不能从 N x R 的辩论中获益。"
     },
     {
       "stage": "check",
       "question": "什么是收敛坍缩（convergence collapse）？",
       "options": [
-        "网络中断",
-        "所有 agent 收敛到第一个错误答案上；用要求出现分歧的轮次来缓解",
         "进程崩溃",
-        "TLS 握手失败"
+        "所有 agent 收敛到第一个错误答案上；用要求出现分歧的轮次来缓解",
+        "TLS 握手失败",
+        "网络中断"
       ],
       "correct": 1,
       "explanation": "早早在一个错误答案上达成一致，可通过强制第 1 轮提出不同提议来缓解。"
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "为什么 prompt 同质化会削弱辩论？",
       "options": [
-        "它违反 Apache 2.0",
-        "相同的 prompt 产生几乎相同的答案，抹掉了互相批评的信号",
         "它用太多 token",
-        "它绕过了监督者"
+        "它绕过了监督者",
+        "它违反 Apache 2.0",
+        "相同的 prompt 产生几乎相同的答案，抹掉了互相批评的信号"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "多样化的 prompt（理想情况下还有多样化的模型）让提议分布保持宽广。"
     },
     {
       "stage": "post",
       "question": "按本课所说，哪种生产模式是辩论的一个变体？",
       "options": [
+        "向量索引",
         "带综合（synthesis）步骤的 Anthropic orchestrator-workers",
-        "纯粹的单次 RAG",
         "仅 cron 的调度",
-        "向量索引"
+        "纯粹的单次 RAG"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "带综合的 orchestrator-workers 在生产中是一种辩论形态的模式。"
     }
   ]

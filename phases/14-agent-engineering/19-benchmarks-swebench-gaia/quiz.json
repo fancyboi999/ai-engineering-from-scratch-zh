@@ -7,35 +7,35 @@
       "question": "SWE-bench 的评估器对一个候选补丁检查什么？",
       "options": [
         "对照参考修复的 BLEU 分数",
-        "之前失败的测试现在通过（FAIL_TO_PASS），且之前通过的测试仍通过（PASS_TO_PASS）",
+        "补丁通过一个单独的 LLM 评判",
         "补丁长度在 200 行以内",
-        "补丁通过一个单独的 LLM 评判"
+        "之前失败的测试现在通过（FAIL_TO_PASS），且之前通过的测试仍通过（PASS_TO_PASS）"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "评估框架以测试状态转移为门槛：暴露 bug 的测试必须翻转，而回归测试必须保持绿色。"
     },
     {
       "stage": "pre",
       "question": "SWE-bench Verified 为什么存在？",
       "options": [
-        "它运行更快",
         "OpenAI 的 500 个任务、人工筛选的子集，移除了模糊的 issue 和不可靠的测试",
         "它包含更多语言",
-        "它使用不同的补丁格式"
+        "它使用不同的补丁格式",
+        "它运行更快"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Verified 是用于可信报告的更干净子集。"
     },
     {
       "stage": "check",
       "question": "SWE-bench+ 关于成功补丁发现了什么？",
       "options": [
+        "补丁总是超过 1000 行",
         "32.67% 在 issue 中泄露了解答文本，31.08% 的测试覆盖弱得可疑",
-        "所有补丁都是被记住的",
         "不存在数据污染",
-        "补丁总是超过 1000 行"
+        "所有补丁都是被记住的"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "SWE-bench+ 在很大一部分成功补丁上标记出了解答泄露和弱覆盖。"
     },
     {
@@ -54,9 +54,9 @@
       "stage": "check",
       "question": "下列哪一个不是 AgentBench 的环境类别之一？",
       "options": [
-        "代码（Bash、DB、KG）",
         "游戏（Alfworld、LTP）",
         "Web（WebShop、Mind2Web）",
+        "代码（Bash、DB、KG）",
         "梯度（RL、IRL）"
       ],
       "correct": 3,
@@ -67,23 +67,23 @@
       "question": "本课指出报告 SWE-bench 数字的错误方式是什么？",
       "options": [
         "按 repo 拆分报告",
-        "只报一个聚合数字，而不提 Verified 或 SWE-bench+ 的背景",
         "报告步数",
+        "只报一个聚合数字，而不提 Verified 或 SWE-bench+ 的背景",
         "报告墙上时钟"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "执着于单一数字会掩盖数据污染和成本；总要报告 Verified 和按分布拆分的背景。"
     },
     {
       "stage": "post",
       "question": "这些基准没有衡量哪个维度？",
       "options": [
-        "真实世界的运维成本（token、墙上时钟）、对抗安全性，以及你自己的领域",
-        "测试状态转移",
         "每任务成功率",
-        "步数"
+        "步数",
+        "真实世界的运维成本（token、墙上时钟）、对抗安全性，以及你自己的领域",
+        "测试状态转移"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "基准做的是聚合；它们没有刻画成本、对抗鲁棒性或你自己的领域。"
     }
   ]

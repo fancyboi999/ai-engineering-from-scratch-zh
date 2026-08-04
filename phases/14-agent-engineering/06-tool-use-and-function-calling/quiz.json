@@ -6,45 +6,45 @@
       "stage": "pre",
       "question": "Toolformer 用什么信号来决定是否保留一个候选工具标注？",
       "options": [
-        "人类标注的一致性",
-        "纳入工具结果是否降低了周围文本上的下一个 token 损失",
         "工具是否在 100 毫秒内返回",
-        "工具是否发出有效的 JSON"
+        "人类标注的一致性",
+        "工具是否发出有效的 JSON",
+        "纳入工具结果是否降低了周围文本上的下一个 token 损失"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Toolformer 的自监督信号会保留那些其工具结果能降低下一个 token 损失的标注。"
     },
     {
       "stage": "pre",
       "question": "本课报告的 BFCL V4 的占比拆分是什么？",
       "options": [
-        "100% 单轮",
-        "40% agentic、30% multi-turn、10% live、10% non-live、10% hallucination",
         "50% live、50% synthetic",
-        "33% agentic、33% planning、33% reflection"
+        "33% agentic、33% planning、33% reflection",
+        "100% 单轮",
+        "40% agentic、30% multi-turn、10% live、10% non-live、10% hallucination"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "BFCL V4 的权重是 40 agentic / 30 multi-turn / 10 live / 10 non-live / 10 hallucination。"
     },
     {
       "stage": "check",
       "question": "为什么一个工具的描述（description）是承重的？",
       "options": [
-        "它是用户在 UI 中看到的东西",
         "模型靠读它来选对工具；糟糕的描述是选错工具失败的首要原因",
         "它控制计费分桶",
-        "JSON Schema 要求它"
+        "JSON Schema 要求它",
+        "它是用户在 UI 中看到的东西"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "工具描述是模型选择工具的主要信号；糟糕的描述会导致路由到错误的工具。"
     },
     {
       "stage": "check",
       "question": "在并行工具调用中，tool_use_id 起什么作用？",
       "options": [
-        "它压缩 JSON 负载",
-        "它把每个工具结果与其发起调用关联起来，使乱序返回的结果也能正确路由",
         "它用 API key 授权这次调用",
+        "它把每个工具结果与其发起调用关联起来，使乱序返回的结果也能正确路由",
+        "它压缩 JSON 负载",
         "它启用缓存"
       ],
       "correct": 1,
@@ -54,36 +54,36 @@
       "stage": "check",
       "question": "V3 基于状态的评估试图捕捉哪一类失败？",
       "options": [
+        "工具执行缓慢",
         "token 泄露",
         "通过 AST 匹配看起来正确、但让 API 处于错误状态的工具调用",
-        "工具执行缓慢",
         "schema 版本漂移"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "基于状态的评估检查最终的 API 状态（例如文件确实被创建了），而非语法上的调用匹配。"
     },
     {
       "stage": "post",
       "question": "本课没有把下列哪个 2026 年问题列为 function calling 的开放问题之一？",
       "options": [
-        "长程工具链接",
-        "跨众多工具的动态决策",
         "跨轮记忆",
-        "token 级解码速度"
+        "长程工具链接",
+        "token 级解码速度",
+        "跨众多工具的动态决策"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "开放问题是记忆、动态决策、长程链接和幻觉检测；解码速度不在列表中。"
     },
     {
       "stage": "post",
       "question": "为什么本课把一个通用的 run_shell(cmd) 工具称为危险信号？",
       "options": [
-        "它很慢",
-        "它扩大了沙箱边界；像 git_status() 这样的特定工具能限定读/写面和风险",
+        "提供商会拒绝它",
         "它无法并行调用",
-        "提供商会拒绝它"
+        "它扩大了沙箱边界；像 git_status() 这样的特定工具能限定读/写面和风险",
+        "它很慢"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "窄工具约束了沙箱面；一个通用的 shell 工具授予了主机的全部操作面。"
     }
   ]

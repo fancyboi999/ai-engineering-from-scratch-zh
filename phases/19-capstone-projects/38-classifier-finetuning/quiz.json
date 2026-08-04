@@ -6,72 +6,72 @@
       "stage": "pre",
       "question": "开始之前：一个预训练语言模型有一个 5M 参数的 body 和一个投影到 30K 词表的输出 head。你要做一个二分类器。最站得住脚的第一步是什么？",
       "options": [
-        "丢掉 body，在 800 条标注数据上从头训一个新 transformer。",
-        "只把 head 换成一个两类线性层，之后再决定要不要训 body。",
+        "冻结 head，只训 body。",
         "保留原 head，但 mask 掉除两个输出 logit 之外的所有值。",
-        "冻结 head，只训 body。"
+        "只把 head 换成一个两类线性层，之后再决定要不要训 body。",
+        "丢掉 body，在 800 条标注数据上从头训一个新 transformer。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "body 是昂贵的部分，已经从预训练中编码了有用的结构。先换 head。要不要冻结 body 是另一个决策，取决于数据量和领域偏移程度。"
     },
     {
       "stage": "check",
       "question": "为什么本课用带 attention mask 加权的 mean pooling，而不是在序列轴上做简单 mean？",
       "options": [
+        "简单 mean 忽略了 batch 维度。",
         "简单 mean 在 transformer 上数学上无定义。",
-        "padding 位置会产生无关的 hidden state，拉偏 pooled 向量。",
         "mean pooling 按惯例必须 mask，即使没有 pad。",
-        "简单 mean 忽略了 batch 维度。"
+        "padding 位置会产生无关的 hidden state，拉偏 pooled 向量。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "padding token 不携带信号，但 body 仍然会为它们产生 hidden state。不做 mask 的话，padding 位置会污染 pooled representation，在一个 batch 中短序列 pad 到最长样本时尤其明显。"
     },
     {
       "stage": "check",
       "question": "`train_classifier` 中优化器用 `[p for p in model.parameters() if p.requires_grad]` 构造。这个写法保证了什么？",
       "options": [
-        "当 body 被冻结时静默忽略 head。",
-        "告诉 PyTorch 对冻结参数也做 autograd。",
         "从只有可训练参数的子集构建 param group，这样 head-only 和 full-FT 两种情况共用同一条代码路径。",
-        "Adam 构造器要求这么写。"
+        "Adam 构造器要求这么写。",
+        "告诉 PyTorch 对冻结参数也做 autograd。",
+        "当 body 被冻结时静默忽略 head。"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "优化器只更新其 param list 里的参数。按 requires_grad 过滤后，同一个训练函数能同时适用于两种策略；切换靠的是 freeze 调用，不是循环本身。"
     },
     {
       "stage": "check",
       "question": "spam 类别的 precision 是 0.9，recall 是 0.6。F1 是多少？",
       "options": [
+        "0.30",
         "0.75",
         "0.72",
-        "0.50",
-        "0.30"
+        "0.50"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "F1 是 precision 和 recall 的调和平均值：2 × 0.9 × 0.6 / (0.9 + 0.6) = 1.08 / 1.5 = 0.72。"
     },
     {
       "stage": "post",
       "question": "你用与 head-only 相同的学习率做 full fine-tuning 重新训练。F1 从 0.90 跌到 0.55。最可能的原因是什么？",
       "options": [
-        "body 参数需要比 head 更小的学习率。",
         "Adam 和分类目标不兼容。",
-        "cross-entropy loss 对两类问题没有定义。",
-        "PyTorch 在 full fine-tuning 时会静默禁用梯度。"
+        "PyTorch 在 full fine-tuning 时会静默禁用梯度。",
+        "body 参数需要比 head 更小的学习率。",
+        "cross-entropy loss 对两类问题没有定义。"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "预训练好的 body 通常需要比新 head 更小的学习率。常见做法是用两个 param group：head 用高 LR，body 用低 LR。两者用相同 LR 会破坏预训练信号。"
     },
     {
       "stage": "post",
       "question": "团队要部署该分类器，想知道怎么记录是哪种训练策略产出了线上 checkpoint。哪个产物能可复现地回答这个问题？",
       "options": [
-        "最终 loss 值，因为 head-only 的 loss 总比 full-FT 高。",
-        "TrainReport 中的 trainable 计数，两种策略下差几个数量级。",
         "混淆矩阵，它能唯一识别训练策略。",
-        "precision-recall-F1 三元组。"
+        "precision-recall-F1 三元组。",
+        "TrainReport 中的 trainable 计数，两种策略下差几个数量级。",
+        "最终 loss 值，因为 head-only 的 loss 总比 full-FT 高。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "trainable 记录了训练期间接受梯度的参数数量。head-only 的量级是 hidden × num_classes；full FT 则是整个模型。这个数字就是审计线索。"
     }
   ]

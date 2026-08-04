@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "embedding 阶段把 (B, T) 的 ids 变成什么 shape？",
       "options": [
-        "(B, T)",
+        "(B, T, V)，其中 V 是词表大小",
         "(B, V)",
         "(B, T, D)，其中 D 是模型维度",
-        "(B, T, V)，其中 V 是词表大小"
+        "(B, T)"
       ],
       "correct": 2,
       "explanation": "每个 id 被映射到一个 D 维向量。batch 保留 B 和 T，多出一个特征维度 D。"
@@ -19,23 +19,23 @@
       "question": "本课中 token embedding 和 positional embedding 是怎么组合的？",
       "options": [
         "沿特征轴拼接",
-        "逐元素相加，position 向量在 batch 维度上广播",
         "额外加一层线性投影",
-        "取逐元素最大值"
+        "取逐元素最大值",
+        "逐元素相加，position 向量在 batch 维度上广播"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "shape 为 (B, T, D) 和 (T, D) 的两个 tensor 做加法。广播把 positional table 沿 batch 轴复制。"
     },
     {
       "stage": "check",
       "question": "SinusoidalPositionalEmbedding 贡献了多少可学习参数？",
       "options": [
+        "零",
         "max_context_length",
         "max_context_length * d_model",
-        "d_model",
-        "零"
+        "d_model"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "正弦表是根据公式计算出来并存为 buffer 的，不贡献任何可学习参数。"
     },
     {
@@ -43,11 +43,11 @@
       "question": "哪种 positional encoding 不能接受超过其构造上限的序列长度？",
       "options": [
         "Sinusoidal positional embedding",
-        "Learned positional embedding",
         "两者都是",
-        "两者都不是"
+        "两者都不是",
+        "Learned positional embedding"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "在本课的实现中，两个类都在 forward 时强制检查 max_context_length。Learned 本身受表大小限制；这里的 sinusoidal 也受限，因为它用的是预先构建好的表。"
     },
     {
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "为什么 embedding 的反向传播只更新 token table 中在本 batch 出现过的行？",
       "options": [
-        "PyTorch 只存储非零 entry 的梯度",
         "前向传播中没被碰到的行，根据链式法则对 loss 的梯度为零",
-        "优化器会跳过它没见过的行",
-        "token id 是用稀疏数据结构存储的"
+        "token id 是用稀疏数据结构存储的",
+        "PyTorch 只存储非零 entry 的梯度",
+        "优化器会跳过它没见过的行"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "一行如果没有参与任何输出的计算，它对 loss 的导数就是零，所以这一步它的梯度为零。"
     }
   ]

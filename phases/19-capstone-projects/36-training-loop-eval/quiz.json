@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "为什么 target tensor 必须是 input tensor 偏移一位？",
       "options": [
-        "cross entropy 需要两个一模一样的 tensor",
         "next-token prediction 就是训练目标：模型在每个位置预测下一个 token；忘了做偏移就等于训模型预测自己，什么有用的都学不到",
-        "加速优化器",
-        "AdamW 要求的"
+        "cross entropy 需要两个一模一样的 tensor",
+        "AdamW 要求的",
+        "加速优化器"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "input 是 token 0..T-1；target 是 token 1..T；loss 在 flatten 后的 (batch*seq, vocab) 和 (batch*seq,) shape 上计算。"
     },
     {
@@ -19,11 +19,11 @@
       "question": "evaluate_model 做了什么训练步没做的事？",
       "options": [
         "运行优化器",
+        "算两次梯度",
         "在 no_grad 且关闭 dropout 的条件下跑固定数量的验证 batch，返回可复现的平均 loss",
-        "修改模型权重",
-        "算两次梯度"
+        "修改模型权重"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "held-out 评估不需要梯度、不需要 dropout，且用固定的验证数据切片来保证跨次运行可复现。"
     },
     {
@@ -31,21 +31,21 @@
       "question": "AdamW 中哪些参数会接受 weight decay？",
       "options": [
         "所有参数一视同仁",
-        "矩阵形状的 tensor（linear weight、embedding table）接受 weight decay；scale、shift 和 bias tensor 的 decay 为零",
         "只有 LM head",
+        "矩阵形状的 tensor（linear weight、embedding table）接受 weight decay；scale、shift 和 bias tensor 的 decay 为零",
         "只有 LayerNorm 的 scale"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "如果对 LayerNorm 的 scale 施加 decay，scale 会被推向零从而破坏归一化；这种分组是标准的生产做法。"
     },
     {
       "stage": "check",
       "question": "warmup + cosine 学习率调度从 step 0 到最后一步画出什么形状？",
       "options": [
-        "常数",
+        "阶梯函数",
         "从零线性上升到最大值（warmup_steps 步），然后从最大值余弦衰减到 min_lr（剩余步数）",
         "指数增长",
-        "阶梯函数"
+        "常数"
       ],
       "correct": 1,
       "explanation": "warmup 阶段让优化器状态充分填充；cosine decay 逐渐缩小步长，让最后阶段对权重做精调。"
@@ -54,24 +54,24 @@
       "stage": "check",
       "question": "为什么在 optimizer.step() 之前做梯度范数裁剪？",
       "options": [
-        "加速 matmul",
-        "一个坏 batch 可能产生巨大梯度，瞬间毁掉几小时的训练；裁剪到 max_norm=1.0 把优化器限制在安全范围内，又不会扭曲正常的更新",
         "减少内存用量",
-        "去掉对 warmup 的需求"
+        "加速 matmul",
+        "去掉对 warmup 的需求",
+        "一个坏 batch 可能产生巨大梯度，瞬间毁掉几小时的训练；裁剪到 max_norm=1.0 把优化器限制在安全范围内，又不会扭曲正常的更新"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "梯度裁剪是防止发散的最低成本保险；1.0 是在大多数场景下都能用的默认值。"
     },
     {
       "stage": "post",
       "question": "为什么把每步记录以 JSONL 而不是 pickle 状态来保存？",
       "options": [
-        "JSONL 是优化器要求的",
         "JSONL 记录在重构后仍然有效、可以 grep、用三十行代码就能画图，而且能扛住 crash；pickle 状态则绑定在生成它的模块结构上",
+        "JSONL 占用更少 GPU 内存",
         "JSONL 训练更快",
-        "JSONL 占用更少 GPU 内存"
+        "JSONL 是优化器要求的"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "任何 crash 都会留下可读的产物；恢复时读最后一步就行；上面搭工具链极其简单。"
     }
   ]

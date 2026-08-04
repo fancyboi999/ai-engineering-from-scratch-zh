@@ -1,36 +1,36 @@
 [
   {
     "question": "RAG 代表什么，它解决了什么问题？",
-    "options": ["Random Augmented Generation——生成随机输出", "Retrieval-Augmented Generation（检索增强生成）——让 LLM 能访问它未被训练过的外部知识", "Recurrent Attention Generation——改进 attention 机制", "Reduced Architecture Generation——让模型变小"],
-    "correct": 1,
+    "options": ["Recurrent Attention Generation——改进 attention 机制", "Reduced Architecture Generation——让模型变小", "Random Augmented Generation——生成随机输出", "Retrieval-Augmented Generation（检索增强生成）——让 LLM 能访问它未被训练过的外部知识"],
+    "correct": 3,
     "explanation": "RAG 从外部知识库检索相关文档并把它们加入 prompt。这让 LLM 无需重新训练就能访问最新的、特定领域的信息。",
     "stage": "pre"
   },
   {
     "question": "对于大多数以知识为基础的应用，为什么 RAG 比微调更受青睐？",
-    "options": ["RAG 产生更好的模型", "RAG 更便宜、文档变化时可即时更新、并能提供来源溯源——而微调昂贵且会过时", "微调不起作用", "RAG 占用更少内存"],
+    "options": ["微调不起作用", "RAG 更便宜、文档变化时可即时更新、并能提供来源溯源——而微调昂贵且会过时", "RAG 产生更好的模型", "RAG 占用更少内存"],
     "correct": 1,
     "explanation": "微调花费数千美元，产出一个静态模型，文档变化时会过时，且无法溯源。RAG 即时更新（只需更新文档库），成本仅为 embedding + 存储，还能引用来源。",
     "stage": "pre"
   },
   {
     "question": "一个基础 RAG 流水线各步骤的正确顺序是什么？",
-    "options": ["生成、检索、embedding、分块", "对文档分块、对块做 embedding、存入向量数据库、对查询做 embedding、检索相似的块、结合上下文生成答案", "对查询做 embedding、生成答案、检索文档", "存储文档、查询 LLM、把文档加入回复"],
+    "options": ["存储文档、查询 LLM、把文档加入回复", "对文档分块、对块做 embedding、存入向量数据库、对查询做 embedding、检索相似的块、结合上下文生成答案", "对查询做 embedding、生成答案、检索文档", "生成、检索、embedding、分块"],
     "correct": 1,
     "explanation": "入库阶段：对文档分块 -> 对块做 embedding -> 存入向量数据库。查询阶段：对用户查询做 embedding -> 检索 top-K 相似块 -> 把块加入 prompt -> 基于检索上下文生成答案。",
     "stage": "post"
   },
   {
     "question": "基础 RAG 系统中常见的失败模式是什么？",
-    "options": ["LLM 拒绝回答", "检索到的块在语义上与查询相似，但并不包含真正的答案（例如问「第三季度营收数字」却返回「营收策略」）", "向量数据库崩溃", "embedding 太大"],
-    "correct": 1,
+    "options": ["检索到的块在语义上与查询相似，但并不包含真正的答案（例如问「第三季度营收数字」却返回「营收策略」）", "LLM 拒绝回答", "向量数据库崩溃", "embedding 太大"],
+    "correct": 0,
     "explanation": "语义搜索找到的是「听起来像」查询的文本，不一定是「回答」查询的文本。一个关于营收的查询可能检索到讨论营收策略的块，而不是包含实际数字的那一块。",
     "stage": "post"
   },
   {
     "question": "你如何评估 RAG 质量？",
-    "options": ["检查 LLM 是否产生了任何输出", "同时使用检索指标（我们有没有找到对的块？）和生成指标（答案是否忠实于检索到的上下文？）", "只测量响应时间", "数检索到的文档数量"],
-    "correct": 1,
+    "options": ["检查 LLM 是否产生了任何输出", "数检索到的文档数量", "只测量响应时间", "同时使用检索指标（我们有没有找到对的块？）和生成指标（答案是否忠实于检索到的上下文？）"],
+    "correct": 3,
     "explanation": "RAG 评估有两部分：检索质量（检索到的块相对于标准答案的精确率/召回率）和生成质量（对上下文的忠实度、与查询的相关性、不在检索信息之外产生幻觉）。",
     "stage": "post"
   }

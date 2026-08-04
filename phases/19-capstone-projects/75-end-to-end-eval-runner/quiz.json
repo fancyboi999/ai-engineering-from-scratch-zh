@@ -6,22 +6,22 @@
       "stage": "pre",
       "question": "ModelAdapter 接口最小可行的暴露面是什么？",
       "options": [
-        "generate(prompt, task)，返回文本外加可选的置信度和逐 token nll",
+        "load_weights、generate、save_weights",
         "complete、embed、classify、summarise",
-        "init、login、generate、close",
-        "load_weights、generate、save_weights"
+        "generate(prompt, task)，返回文本外加可选的置信度和逐 token nll",
+        "init、login、generate、close"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "一个方法就能覆盖任何适配器。其余都是可选的装饰。runner 并不需要更丰富的接口面。"
     },
     {
       "stage": "pre",
       "question": "为什么 runner 接受一个 parallel 标志，而不是一律并行运行？",
       "options": [
-        "在 CPython 里并行执行不安全",
-        "测试需要确定性的执行顺序；这个标志让它们能切回顺序执行",
         "并行执行需要 GPU",
-        "ThreadPoolExecutor 不在标准库里"
+        "测试需要确定性的执行顺序；这个标志让它们能切回顺序执行",
+        "ThreadPoolExecutor 不在标准库里",
+        "在 CPython 里并行执行不安全"
       ],
       "correct": 1,
       "explanation": "测试要可复现，生产要吞吐量。这个标志把这两个诉求拆开，而不用维护两条代码路径。"
@@ -30,34 +30,34 @@
       "stage": "check",
       "question": "runner 是怎么为校准缓冲区确定「正确」标志的？",
       "options": [
-        "它调用适配器两次并比较输出",
         "默认对 exact_match 风格的 metric 用阈值 1.0，对分级（graded）metric 用阈值 0.5",
         "它用平均 bin 置信度",
+        "它调用适配器两次并比较输出",
         "它用 Brier 分解"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "阈值是 metric 感知的：exact_match 风格的 metric 用接近 1.0 的截断，分级 metric 默认用 0.5。"
     },
     {
       "stage": "check",
       "question": "为什么 runner 要构建 EvalRun 记录再交给聚合器，而不是内联算出 leaderboard？",
       "options": [
-        "EvalRun 更省内存",
-        "这能让 runner 对聚合器无感知，并让 leaderboard 层独立演进而不用动 runner",
         "聚合器在 numpy 数组上比在 dataclass 上更快",
-        "JSON Schema 要求用 EvalRun"
+        "JSON Schema 要求用 EvalRun",
+        "EvalRun 更省内存",
+        "这能让 runner 对聚合器无感知，并让 leaderboard 层独立演进而不用动 runner"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "组合优于内联。runner 产出记录，聚合器掌管 leaderboard 的数学。每节课只负责一件事。"
     },
     {
       "stage": "check",
       "question": "最终 JSON 信封里那块 perplexity 的作用是什么？",
       "options": [
-        "它是 leaderboard 排名所必需的",
         "它是校准报告的输入",
+        "它是从 bootstrap CI 算出来的",
         "它承载每个模型在留出集上的语言建模数字，独立于任务打分",
-        "它是从 bootstrap CI 算出来的"
+        "它是 leaderboard 排名所必需的"
       ],
       "correct": 2,
       "explanation": "perplexity 是放在 leaderboard 旁边，而不是嵌在里面。它用的是适配器逐次调用返回的 token NLL 和 token 数。"
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "这个自终止 demo 的「干净跑完」退出标准是什么？",
       "options": [
-        "每个任务都校验、都打分，校准已聚合，并且基于规则的适配器在 leaderboard 上严格高于随机适配器",
-        "每个任务都打分高于 0.9",
+        "每一对的 bootstrap CI 都不含零",
         "每个模型的 ECE 都低于 0.05",
-        "每一对的 bootstrap CI 都不含零"
+        "每个任务都打分高于 0.9",
+        "每个任务都校验、都打分，校准已聚合，并且基于规则的适配器在 leaderboard 上严格高于随机适配器"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "这个 demo 端到端地强制契约：每一层都跑过了，而最准的适配器也据此排在前面。"
     }
   ]

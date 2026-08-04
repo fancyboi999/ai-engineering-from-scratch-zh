@@ -6,9 +6,9 @@
       "stage": "pre",
       "question": "为什么下载器要为每个分片维护一个单独的 .partial.json checkpoint？",
       "options": [
-        "为了让缓存目录看起来整齐。",
-        "这样恢复下载时可以对已验证字节做 sha256 前缀校验再追加，杜绝静默损坏。",
         "因为 urllib 要求这样做。",
+        "这样恢复下载时可以对已验证字节做 sha256 前缀校验再追加，杜绝静默损坏。",
+        "为了让缓存目录看起来整齐。",
         "为了存储 URL 以防分片文件迁移。"
       ],
       "correct": 1,
@@ -19,11 +19,11 @@
       "question": "LSH band 方案能做到而精确哈希去重做不到的是什么？",
       "options": [
         "常量内存占用。",
-        "亚线性查找，能在文档仅差几个 token 时仍以高 Jaccard 相似度标记近似重复。",
         "无损压缩。",
-        "更快的 sha256 计算。"
+        "更快的 sha256 计算。",
+        "亚线性查找，能在文档仅差几个 token 时仍以高 Jaccard 相似度标记近似重复。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "MinHash 加 LSH 能捕捉到精确哈希去重漏掉的释义和模板变体。"
     },
     {
@@ -31,11 +31,11 @@
       "question": "为什么 checkpoint 是在字节追加之前写入，而不是之后？",
       "options": [
         "这样比较方便。",
-        "如果进程在写入字节和更新 checkpoint 之间挂掉，下次恢复时会读到一个落后于实际字节的 checkpoint，导致静默重复追加、损坏文件。",
+        "这样节省磁盘空间。",
         "这样更快。",
-        "这样节省磁盘空间。"
+        "如果进程在写入字节和更新 checkpoint 之间挂掉，下次恢复时会读到一个落后于实际字节的 checkpoint，导致静默重复追加、损坏文件。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "先写 checkpoint 符合 write-ahead log 模式：崩溃后已验证偏移量要么等于要么落后于文件实际长度，绝不会超前。"
     },
     {
@@ -44,8 +44,8 @@
       "options": [
         "加快读取速度。",
         "下游阶段在 manifest 内容与锁定哈希不匹配时拒绝启动，封堵攻击者篡改单个文件的静默攻击面。",
-        "记录日期。",
-        "作为 manifest 的备份。"
+        "作为 manifest 的备份。",
+        "记录日期。"
       ],
       "correct": 1,
       "explanation": "锁定 manifest 哈希使代码和数据之间的关联成为内容寻址的契约。"
@@ -54,10 +54,10 @@
       "stage": "post",
       "question": "为什么去重放在 tokenization 上游而不是下游？",
       "options": [
-        "Tokenizer 不能读 JSONL。",
+        "Tokenizer 需要先有词表。",
         "Tokenization 开销很大；对同一篇文档跑两遍只会让成本翻倍，对 loss 曲线没有收益，所以先去重严格更省。",
-        "Tokenizer 会拒绝重复。",
-        "Tokenizer 需要先有词表。"
+        "Tokenizer 不能读 JSONL。",
+        "Tokenizer 会拒绝重复。"
       ],
       "correct": 1,
       "explanation": "去重是流水线第一步，每去掉一篇重复文档就给 tokenizer 省下一次处理。"
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "对被去掉的重复文档做 tombstone 标记，比直接静默删除多保留了什么？",
       "options": [
+        "Manifest sha256 的稳定性。",
         "磁盘空间。",
-        "重复文档与它碰撞的 keeper 之间的关联，以及一条在未来调整阈值时仍可追溯的审计记录。",
         "压缩比。",
-        "Manifest sha256 的稳定性。"
+        "重复文档与它碰撞的 keeper 之间的关联，以及一条在未来调整阈值时仍可追溯的审计记录。"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Tombstone 让未来的处理可以回溯去重阈值；直接删除则丢失了证据。"
     }
   ]

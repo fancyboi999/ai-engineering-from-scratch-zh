@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "把 InfoNCE 和 LM loss 结合起来，训出的是哪两种各不相同的能力？",
       "options": [
-        "速度和准确率",
+        "tokenization 和 detokenization",
         "排序（为一段 caption 找到对的图）和生成（为一张图写出 caption）",
         "压缩和解压",
-        "tokenization 和 detokenization"
+        "速度和准确率"
       ],
       "correct": 1,
       "explanation": "InfoNCE 负责排序；LM loss 负责生成。CoCa、BLIP 等都在一次训练里把两者结合起来。"
@@ -19,21 +19,21 @@
       "question": "InfoNCE 里，一个 batch 有 N 对配对时，会形成多少正样本对和负样本对？",
       "options": [
         "1 个正样本对，N 个负样本对",
-        "相似度矩阵对角线上 N 个正样本对，对角线外 N*(N-1) 个负样本对",
+        "N^2 个正样本对",
         "N 个正样本对，N 个负样本对",
-        "N^2 个正样本对"
+        "相似度矩阵对角线上 N 个正样本对，对角线外 N*(N-1) 个负样本对"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "N 对匹配落在对角线上；对角线之外的一切都是负样本。"
     },
     {
       "stage": "check",
       "question": "为什么对比学习的 temperature 通常是个学出来的参数？",
       "options": [
-        "PyTorch 要求这样",
-        "手动调很脆弱；让 tau 自己学，模型才能在训练中 embedding 尺度演变时找到合适的 softmax 尖锐度",
         "学出来的 tau 在 GPU 上更快",
-        "它能避免用 Adam"
+        "手动调很脆弱；让 tau 自己学，模型才能在训练中 embedding 尺度演变时找到合适的 softmax 尖锐度",
+        "它能避免用 Adam",
+        "PyTorch 要求这样"
       ],
       "correct": 1,
       "explanation": "CLIP 引入了可学习的 log-tau，让对比 softmax 在 embedding 范数增长时仍然停在有用的区间。"
@@ -42,36 +42,36 @@
       "stage": "check",
       "question": "哪个子模块只从 LM loss 拿到梯度，而拿不到对比 loss 的梯度？",
       "options": [
-        "视觉编码器",
         "cross-attention decoder",
         "MLP projector",
+        "视觉编码器",
         "文本侧编码器"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "对比 loss 碰不到 decoder；LM loss 碰不到文本侧的 mean-pool 编码器。"
     },
     {
       "stage": "check",
       "question": "在 LM cross-entropy 里 ignore_index=PAD_ID 起到什么作用？",
       "options": [
-        "加快 loss 计算",
-        "把 padding 位置从 loss 里屏蔽掉，这样模型不会因为预测 caption 结束之后的 token 而挨罚",
         "加密 pad token",
-        "给 token 重新排序"
+        "给 token 重新排序",
+        "把 padding 位置从 loss 里屏蔽掉，这样模型不会因为预测 caption 结束之后的 token 而挨罚",
+        "加快 loss 计算"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "padding 位置不带任何信号；忽略它们能阻止 loss 去学预测 pad。"
     },
     {
       "stage": "post",
       "question": "为什么在合成数据上跑 50 步的 demo 就能算这一课完成了？",
       "options": [
-        "模型在 50 步就达到 state of the art",
-        "这个 demo 证明梯度管路端到端通了；生产训练的形态完全一样，只是在真实数据上跑几百万步",
+        "真实数据会改变架构",
         "50 步是支持的上限",
-        "真实数据会改变架构"
+        "这个 demo 证明梯度管路端到端通了；生产训练的形态完全一样，只是在真实数据上跑几百万步",
+        "模型在 50 步就达到 state of the art"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "demo 演示出的动态（两个 loss 都下降、没有 NaN、tau 稳定）跟一次十亿级图像训练会呈现的动态是一样的，只是规模放大了。"
     }
   ]

@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "Anthropic Client SDK 和 Claude Agent SDK 之间的区别是什么？",
       "options": [
-        "Client SDK 是原始的 Messages API；Agent SDK 是 Claude Code 的 harness 形态，带内置工具、MCP、hook、子 agent 和会话存储",
-        "Client SDK 收费；Agent SDK 免费",
+        "没有区别",
         "Client SDK 只支持 Python",
-        "没有区别"
+        "Client SDK 是原始的 Messages API；Agent SDK 是 Claude Code 的 harness 形态，带内置工具、MCP、hook、子 agent 和会话存储",
+        "Client SDK 收费；Agent SDK 免费"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Client SDK 给你那个循环；Agent SDK 提供预先搭好的循环。"
     },
     {
@@ -19,9 +19,9 @@
       "question": "子 agent（subagent）有文档记载的两个用途是什么？",
       "options": [
         "并行化和上下文隔离",
-        "缓存和限流",
+        "认证和授权",
         "日志和指标",
-        "认证和授权"
+        "缓存和限流"
       ],
       "correct": 0,
       "explanation": "子 agent 并发运行独立工作，并通过隔离上下文来保住编排者的上下文预算。"
@@ -31,23 +31,23 @@
       "question": "下列哪个方法不属于会话存储的接口面？",
       "options": [
         "append",
-        "load",
         "list_subkeys",
-        "compile_prompt"
+        "compile_prompt",
+        "load"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "会话存储提供 append、load、list_sessions、delete、list_subkeys；compile_prompt 不是会话 API。"
     },
     {
       "stage": "check",
       "question": "下列哪一个不是 Claude Agent SDK 的生命周期 hook？",
       "options": [
-        "PreToolUse",
         "PostToolUse",
         "PreCompact",
-        "PreEmbedding"
+        "PreEmbedding",
+        "PreToolUse"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "hook 包括 PreToolUse、PostToolUse、SessionStart/End、UserPromptSubmit、PreCompact、Stop、Notification。PreEmbedding 不是 hook。"
     },
     {
@@ -67,8 +67,8 @@
       "question": "什么是子 agent 过度孵化（over-spawn），它何时发生？",
       "options": [
         "为 100 个微小任务孵化 100 个子 agent，开销占主导；应改为批处理",
-        "忘记关闭子 agent",
         "在 SessionStart 之前孵化",
+        "忘记关闭子 agent",
         "孵化的子 agent 数量超过 CPU 核数"
       ],
       "correct": 0,

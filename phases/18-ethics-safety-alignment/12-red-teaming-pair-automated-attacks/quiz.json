@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "为什么人工红队不足以评估前沿模型？",
       "options": [
-        "它无法扩展；针对一个随每次模型发布而移动的目标，攻击成功率需要一个统计样本",
-        "人工 prompt 总会被过滤器拦截",
         "人工测试产生太多假阳性",
+        "人工 prompt 总会被过滤器拦截",
+        "它无法扩展；针对一个随每次模型发布而移动的目标，攻击成功率需要一个统计样本",
         "人工测试者无法读取模型输出"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -19,9 +19,9 @@
       "question": "PAIR 代表什么，它做什么？",
       "options": [
         "Prompt Automatic Iterative Refinement（提示自动迭代精炼）；一个攻击者 LLM 迭代地为目标提出越狱方案，并把先前的尝试作为情境内反馈",
+        "Persuasive Adversarial Iterative Reward；用一个劝说者替换 RM",
         "Pairwise Adversarial Inference Routing；在多个模型间路由攻击",
-        "Pre-Action Inspection Reasoning；一种防御性脚手架",
-        "Persuasive Adversarial Iterative Reward；用一个劝说者替换 RM"
+        "Pre-Action Inspection Reasoning；一种防御性脚手架"
       ],
       "correct": 0,
       "explanation": ""
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "对于黑盒目标，为什么 PAIR 比 GCG 更高效？",
       "options": [
-        "PAIR 使用比 GCG 更大的攻击者模型",
-        "GCG 只攻击开源模型",
         "GCG 需要白盒梯度访问，并产生无法利用情境内反馈的不可读后缀；PAIR 是黑盒、自然语言，且具备情境内学习",
-        "PAIR 忽略目标的响应"
+        "PAIR 忽略目标的响应",
+        "GCG 只攻击开源模型",
+        "PAIR 使用比 GCG 更大的攻击者模型"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -43,9 +43,9 @@
       "question": "为什么攻击成功率（ASR）必须连同查询预算和裁判身份一起报告？",
       "options": [
         "因为裁判总是意见一致",
-        "因为预算只由 JailbreakBench 设定",
+        "因为 ASR 是出口管制法规的要求",
         "因为 ASR 会随允许攻击者发起的查询数量、以及由哪个 LLM 把某个响应判定为越狱而变化",
-        "因为 ASR 是出口管制法规的要求"
+        "因为预算只由 JailbreakBench 设定"
       ],
       "correct": 2,
       "explanation": ""
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "哪个标准化基准使用横跨 7 个类别的 510 种行为，并带有语义和功能层面的危害测试？",
       "options": [
-        "JailbreakBench",
         "HarmBench",
+        "JailbreakBench",
         "WMDP",
         "TruthfulQA"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

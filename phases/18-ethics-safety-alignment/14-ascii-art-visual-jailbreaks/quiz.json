@@ -6,8 +6,8 @@
       "stage": "pre",
       "question": "为什么 token 级和语义级的安全过滤器会漏掉 ArtPrompt 式攻击？",
       "options": [
-        "ArtPrompt 需要对模型进行微调",
         "ArtPrompt 只对多模态模型有效",
+        "ArtPrompt 需要对模型进行微调",
         "ArtPrompt 总是使用 base64 编码",
         "ArtPrompt 在视觉识别层面运作：过滤器看到的是无害的标点符号，而模型把渲染出的字母读作一个词"
       ],
@@ -19,35 +19,35 @@
       "question": "按 Jiang 等人（ACL 2024）所述，ArtPrompt 的两个步骤是什么？",
       "options": [
         "翻译成法语，再回译",
-        "识别出与安全相关的词（token），然后做 ASCII 艺术替换并生成伪装后的 prompt",
+        "Tokenizer 不匹配，再截断上下文",
         "随机搜索，再提升困惑度",
-        "Tokenizer 不匹配，再截断上下文"
-      ],
-      "correct": 1,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "为什么困惑度过滤（PPL）防御在 ArtPrompt 上失效？",
-      "options": [
-        "在伪装输入上困惑度总是等于零",
-        "在 ASCII 艺术上困惑度无法测量",
-        "困惑度过滤器默认被禁用",
-        "ASCII 艺术困惑度高，但任何合法的结构化输入也是如此；能拦住攻击的阈值同样会拦住合法内容"
+        "识别出与安全相关的词（token），然后做 ASCII 艺术替换并生成伪装后的 prompt"
       ],
       "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
+      "question": "为什么困惑度过滤（PPL）防御在 ArtPrompt 上失效？",
+      "options": [
+        "在 ASCII 艺术上困惑度无法测量",
+        "ASCII 艺术困惑度高，但任何合法的结构化输入也是如此；能拦住攻击的阈值同样会拦住合法内容",
+        "困惑度过滤器默认被禁用",
+        "在伪装输入上困惑度总是等于零"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
       "question": "ViTC 基准测量什么？",
       "options": [
-        "模型的工具调用准确率",
-        "模型训练数据的毒性",
         "模型读取非语义视觉 prompt（ASCII 艺术、wingdings、类似的编码文本）的能力",
-        "模型压缩视觉数据的能力"
+        "模型的工具调用准确率",
+        "模型压缩视觉数据的能力",
+        "模型训练数据的毒性"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -55,9 +55,9 @@
       "question": "StructuralSleight 把 ArtPrompt 泛化到了什么？",
       "options": [
         "不常见的文本编码结构（UTES）：树、图、嵌套 JSON、JSON 内嵌 CSV、diff 风格代码等",
-        "通过梯度搜索得到的对抗性 token 后缀",
+        "仅图像输入",
         "长上下文样本填塞",
-        "仅图像输入"
+        "通过梯度搜索得到的对抗性 token 后缀"
       ],
       "correct": 0,
       "explanation": ""
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "ViTC 结果所隐含的能力-安全权衡是什么？",
       "options": [
-        "更小的模型总是更安全",
-        "视觉识别与 ArtPrompt 的成功无关",
+        "更大的上下文窗口会降低 ArtPrompt 的成功率",
         "模型读取非语义视觉文本的能力越强，ArtPrompt 式攻击对它就越有效",
-        "更大的上下文窗口会降低 ArtPrompt 的成功率"
+        "更小的模型总是更安全",
+        "视觉识别与 ArtPrompt 的成功无关"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     }
   ]

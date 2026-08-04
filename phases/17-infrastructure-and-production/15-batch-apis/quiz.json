@@ -18,60 +18,60 @@
       "stage": "check",
       "question": "在本课的框架下，「24 小时交付」实际保证的是什么？",
       "options": [
-        "24 小时是缓存的 TTL",
+        "只有 1k 请求以下的批次才符合资格",
         "批处理总是耗时 24 小时",
-        "供应商承诺在 24 小时内返回，典型 P50 约为 2-6 小时",
-        "只有 1k 请求以下的批次才符合资格"
+        "24 小时是缓存的 TTL",
+        "供应商承诺在 24 小时内返回，典型 P50 约为 2-6 小时"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在一个共享系统提示的工作负载上，把 batch 与缓存输入叠加，相比同步无缓存会如何改变账单？",
       "options": [
-        "没有影响，因为缓存是自动的",
-        "只有当模型在 Vertex 上时才有帮助",
         "可降至同步无缓存基线的大约 10%",
-        "会让成本增加 50%"
+        "会让成本增加 50%",
+        "没有影响，因为缓存是自动的",
+        "只有当模型在 Vertex 上时才有帮助"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "对于内容流水线和离线标注，2026 年默认走哪条工作负载分流通道是错误的？",
       "options": [
+        "带异步队列的半交互式",
         "交互式，因为它听起来很紧急",
-        "批处理，因为用户看不到 24 小时的延迟",
         "批处理与缓存混合",
-        "带异步队列的半交互式"
+        "批处理，因为用户看不到 24 小时的延迟"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "跨供应商的输出 schema 陷阱是什么？",
       "options": [
-        "Anthropic 不支持 JSONL",
+        "各供应商的批处理文件格式各不相同（OpenAI JSONL、Anthropic JSONL、Vertex BigQuery/GCS），因此可移植的客户端需要为每家供应商提供适配器",
         "所有供应商都使用相同的 OpenAI JSONL 格式",
-        "Vertex 仅要求 Parquet",
-        "各供应商的批处理文件格式各不相同（OpenAI JSONL、Anthropic JSONL、Vertex BigQuery/GCS），因此可移植的客户端需要为每家供应商提供适配器"
+        "Anthropic 不支持 JSONL",
+        "Vertex 仅要求 Parquet"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "按本课所述，把工作负载分流到批处理的最简单决策规则是什么？",
       "options": [
-        "如果 prompt 不到 1k token，就走批处理",
         "如果它用到了工具，就走批处理",
         "只有当网关要求时才走批处理",
-        "如果用户不会察觉到 24 小时的交付延迟，就总是走批处理（并叠加缓存）"
+        "如果用户不会察觉到 24 小时的交付延迟，就总是走批处理（并叠加缓存）",
+        "如果 prompt 不到 1k token，就走批处理"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     }
   ]

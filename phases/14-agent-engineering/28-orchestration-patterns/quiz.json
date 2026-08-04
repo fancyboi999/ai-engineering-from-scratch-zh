@@ -6,36 +6,36 @@
       "stage": "pre",
       "question": "本课列出哪四种编排模式？",
       "options": [
+        "Push、pull、batch、stream",
         "Supervisor-worker、swarm/点对点、hierarchical、debate",
-        "Sequential、parallel、distributed、federated",
         "Plan、act、reflect、refine",
-        "Push、pull、batch、stream"
+        "Sequential、parallel、distributed、federated"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "Supervisor-worker、swarm、hierarchical 和 debate 在 2026 年的各框架中反复出现。"
     },
     {
       "stage": "pre",
       "question": "关于监督，2026 年 LangChain 的建议是什么？",
       "options": [
-        "总是用 create_supervisor",
         "为了更精细的上下文工程控制，优先使用直接工具调用而非 create_supervisor",
+        "在 GPU 上运行监督者",
         "完全避免监督",
-        "在 GPU 上运行监督者"
+        "总是用 create_supervisor"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "基于工具调用的监督让你精确控制每个专家看到什么。"
     },
     {
       "stage": "check",
       "question": "swarm 与 supervisor-worker 拓扑的区别在哪里？",
       "options": [
+        "swarm 是单 agent",
         "swarm 使用 GPU",
         "swarm 没有中央路由器；agent 通过一个共享工具面直接转交",
-        "swarm 是单 agent",
         "swarm 只在 cron 上运行"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "swarm 是点对点的；supervisor 通过一个 LLM 集中路由。"
     },
     {
@@ -43,33 +43,33 @@
       "question": "层级式编排什么时候有正当理由？",
       "options": [
         "总是；它免费扩展",
+        "永不；它是反模式",
         "当单个 supervisor 的上下文预算装不下所有专家的描述时",
-        "只在有 GPU 时",
-        "永不；它是反模式"
+        "只在有 GPU 时"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "嵌套 supervisor 适用于超过单个 supervisor 预算的大型专家群体。"
     },
     {
       "stage": "check",
       "question": "Anthropic 支持的推荐决策顺序是什么？",
       "options": [
-        "总是从层级式多 agent 开始",
-        "从单 agent 加工作流模式开始；只在需要时增加拓扑；supervisor 先于 swarm 先于 hierarchical；当准确率胜过成本时再用 debate",
         "从 debate 开始",
-        "从 swarm 开始向单 agent 收缩"
+        "总是从层级式多 agent 开始",
+        "从 swarm 开始向单 agent 收缩",
+        "从单 agent 加工作流模式开始；只在需要时增加拓扑；supervisor 先于 swarm 先于 hierarchical；当准确率胜过成本时再用 debate"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Anthropic 的指引是构建满足你需求的系统，而非最复杂的系统。"
     },
     {
       "stage": "post",
       "question": "本课中的假层级（fake hierarchy）是什么？",
       "options": [
-        "标错的 YAML",
+        "一个测试夹具",
         "因为「企业级」而设三层 supervisor，实际只有两个真实团队；把它压扁",
         "用 TypeScript 写的编排器",
-        "一个测试夹具"
+        "标错的 YAML"
       ],
       "correct": 1,
       "explanation": "不对应真实团队的层级只会增加运维复杂度而无回报。"
@@ -78,12 +78,12 @@
       "stage": "post",
       "question": "如何缓解 swarm 中的反复转交（A -> B -> A -> B）？",
       "options": [
-        "把温度固定到 0",
-        "加一个跳数计数器，在 N 次转交后拒绝",
         "禁用 tracing",
-        "降低限流"
+        "把温度固定到 0",
+        "降低限流",
+        "加一个跳数计数器，在 N 次转交后拒绝"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "跳数计数器在 swarm 循环无限往复之前对其设上限。"
     }
   ]

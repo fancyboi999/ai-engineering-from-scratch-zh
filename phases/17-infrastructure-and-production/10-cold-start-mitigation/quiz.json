@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "在没有任何缓解措施的情况下，一个 70B 模型在全新节点上的冷启动通常大约需要多久？",
       "options": [
+        "不到 10 秒",
         "超过 1 小时",
         "30-60 秒",
-        "3-8 分钟",
-        "不到 10 秒"
+        "3-8 分钟"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "本课推荐用 AWS 侧的哪个特性来预置容器镜像，从而消除「第 2 步：拉取镜像」？",
       "options": [
-        "从 EC2NodeClass 引用的 Bottlerocket 双卷架构",
+        "仅 EBS 卷快照",
         "ECS 任务定义",
-        "Spot 队列调度（fleet placement）",
-        "仅 EBS 卷快照"
+        "从 EC2NodeClass 引用的 Bottlerocket 双卷架构",
+        "Spot 队列调度（fleet placement）"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Modal 的哪个特性通过把加载后的状态直接反序列化到 HBM 中，最接近于「数秒内热启动 GPU」？",
       "options": [
-        "NVMe 到 DRAM 的分层加载",
+        "Run:ai Model Streamer",
         "在线迁移（live migration）",
         "GPU 显存快照（检查点）",
-        "Run:ai Model Streamer"
+        "NVMe 到 DRAM 的分层加载"
       ],
       "correct": 2,
       "explanation": ""
@@ -42,24 +42,24 @@
       "stage": "check",
       "question": "为什么在线迁移在节点之间传输输入 token，而不是 KV 缓存？",
       "options": [
-        "在线迁移是 GDPR 的强制要求",
         "输入 token 的熵更大",
-        "KV 缓存是加密的，无法移动",
-        "在目标节点上重算 KV 比通过网络传输数 GB 的 KV 缓存更便宜"
+        "在线迁移是 GDPR 的强制要求",
+        "在目标节点上重算 KV 比通过网络传输数 GB 的 KV 缓存更便宜",
+        "KV 缓存是加密的，无法移动"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "哪一层 serverless 方案通过保持至少一个副本存活，用直接的 GPU 成本换取可预测的就绪状态？",
       "options": [
-        "min_workers >= 1 的暖池（warm pool）",
-        "分层加载",
+        "在线迁移",
         "Bottlerocket 预置",
-        "在线迁移"
+        "min_workers >= 1 的暖池（warm pool）",
+        "分层加载"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -67,9 +67,9 @@
       "question": "为什么本课说冷启动缓解必须跨多层叠加，而不是只挑选单一工具？",
       "options": [
         "没有任何单一层能消除每一个步骤（节点配置、镜像拉取、权重加载、引擎初始化）；叠加多层才能压缩每一步",
+        "全部五层都打包在 vLLM 里",
         "这是监管要求",
-        "Modal 拥有整个技术栈",
-        "全部五层都打包在 vLLM 里"
+        "Modal 拥有整个技术栈"
       ],
       "correct": 0,
       "explanation": ""

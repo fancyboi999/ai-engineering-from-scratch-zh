@@ -1,35 +1,35 @@
 [
   {
     "question": "为什么从 LLM 获取结构化 JSON 输出很有挑战性？",
-    "options": ["LLM 无法生成 JSON", "LLM 逐 token 生成自由形式文本，可能在任何位置产生无效 JSON（缺括号、类型错误、多余文本）", "JSON 对 LLM 来说太复杂", "LLM 只能输出纯文本"],
+    "options": ["LLM 只能输出纯文本", "LLM 逐 token 生成自由形式文本，可能在任何位置产生无效 JSON（缺括号、类型错误、多余文本）", "JSON 对 LLM 来说太复杂", "LLM 无法生成 JSON"],
     "correct": 1,
     "explanation": "LLM 自回归地生成 token。它可能加上多余的逗号、忘记闭合括号、在 JSON 周围包含 markdown 格式，或臆造出多余字段。每个 token 都是独立的，因此结构的有效性无法保证。",
     "stage": "pre"
   },
   {
     "question": "什么是受约束解码（constrained decoding）？",
-    "options": ["限制模型的词表大小", "在每一步限制模型能生成哪些 token，以确保输出符合某个语法或 schema", "使用更小的模型", "压缩输出"],
-    "correct": 1,
+    "options": ["压缩输出", "限制模型的词表大小", "使用更小的模型", "在每一步限制模型能生成哪些 token，以确保输出符合某个语法或 schema"],
+    "correct": 3,
     "explanation": "受约束解码在每个生成步骤屏蔽掉无效 token。在一个左花括号之后，只允许有效的 JSON 键。在冒号之后，只允许有效的值 token。这在 token 层面保证了结构的有效性。",
     "stage": "pre"
   },
   {
     "question": "使用 Pydantic 模型来验证 LLM 输出有什么好处？",
-    "options": ["它让 API 调用更快", "它定义带类型的 schema，能自动验证、解析并以清晰的错误信息拒绝格式错误的 LLM 输出", "它减少 token 用量", "它提升模型准确率"],
-    "correct": 1,
+    "options": ["它定义带类型的 schema，能自动验证、解析并以清晰的错误信息拒绝格式错误的 LLM 输出", "它提升模型准确率", "它减少 token 用量", "它让 API 调用更快"],
+    "correct": 0,
     "explanation": "Pydantic 强制执行类型、必填字段、取值约束和嵌套结构。当 LLM 产生无效输出时，Pydantic 给出具体的错误信息，可以反馈给模型用于自我纠正。",
     "stage": "post"
   },
   {
     "question": "当 LLM 不顾指令仍返回无效 JSON 时，你应该怎么做？",
-    "options": ["换一个不同的模型", "实现一个重试循环，把验证错误作为上下文发回给模型，让它做出修正后的尝试", "手动修复 JSON", "提高温度"],
-    "correct": 1,
+    "options": ["提高温度", "换一个不同的模型", "实现一个重试循环，把验证错误作为上下文发回给模型，让它做出修正后的尝试", "手动修复 JSON"],
+    "correct": 2,
     "explanation": "带错误反馈的重试循环效果很好：解析输出、捕获验证错误、把错误信息作为上下文发回去（「你的输出有这个错误：…… 请修正它」）。大多数模型在第二次尝试时就能自我纠正。",
     "stage": "post"
   },
   {
     "question": "什么时候该用 API 原生的 JSON 模式，什么时候该用基于 prompt 的 JSON 抽取？",
-    "options": ["总是使用原生 JSON 模式", "需要保证结构时用原生模式；需要模型推理抽取什么的复杂抽取时用基于 prompt 的方式", "总是使用基于 prompt 的抽取", "它们产生完全相同的结果"],
+    "options": ["总是使用基于 prompt 的抽取", "需要保证结构时用原生模式；需要模型推理抽取什么的复杂抽取时用基于 prompt 的方式", "它们产生完全相同的结果", "总是使用原生 JSON 模式"],
     "correct": 1,
     "explanation": "原生 JSON 模式（OpenAI 的 response_format、Anthropic 的 tool_use）保证有效的 JSON 结构。基于 prompt 的抽取在「该填哪些字段」这类复杂推理上更灵活。当结构最重要时，用原生模式。",
     "stage": "post"

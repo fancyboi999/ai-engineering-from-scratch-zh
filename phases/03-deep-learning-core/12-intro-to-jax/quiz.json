@@ -2,36 +2,36 @@
   {
     "question": "PyTorch 和 JAX 之间根本的设计差异是什么？",
     "options": [
-      "PyTorch 更快",
       "PyTorch 即时地原地修改张量，而 JAX 编译没有副作用的纯函数",
       "JAX 不支持 GPU",
-      "PyTorch 不支持自动微分"
+      "PyTorch 不支持自动微分",
+      "PyTorch 更快"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "PyTorch 使用带可变状态的即时执行（例如 tensor.grad 被原地修改）。JAX 拥抱函数式编程：函数是纯的，状态是显式的，jit 编译会优化整个计算图。",
     "stage": "pre"
   },
   {
     "question": "jax.jit 做什么？",
     "options": [
-      "它添加 dropout 正则化",
       "它把一个 Python 函数编译为优化过的 XLA 代码，运行速度远快于被解释执行的 Python",
       "它初始化模型权重",
-      "它计算梯度"
+      "它计算梯度",
+      "它添加 dropout 正则化"
     ],
-    "correct": 1,
+    "correct": 0,
     "explanation": "jax.jit 跟踪一个函数并把它编译为 XLA（加速线性代数）机器码。第一次调用很慢（编译），但后续调用运行的是优化过的已编译版本。",
     "stage": "pre"
   },
   {
     "question": "jax.vmap 做什么？",
     "options": [
-      "把一个函数向量化，使其在批维度上运行，而无需编写显式循环",
-      "验证模型架构",
+      "计算二阶梯度",
       "管理 GPU 显存",
-      "计算二阶梯度"
+      "验证模型架构",
+      "把一个函数向量化，使其在批维度上运行，而无需编写显式循环"
     ],
-    "correct": 0,
+    "correct": 3,
     "explanation": "jax.vmap 自动把为单个样本编写的函数向量化，以处理整个批次。你只为一个样本编写代码，vmap 负责处理批量，通常比手动的批量循环更高效。",
     "stage": "post"
   },
@@ -39,11 +39,11 @@
     "question": "JAX 处理模型状态（权重）的方式与 PyTorch 有何不同？",
     "options": [
       "JAX 只把权重存储在 CPU 上",
-      "JAX 要求显式地传递状态——权重是函数参数，而不是可变的对象属性",
       "JAX 不支持可训练权重",
-      "JAX 和 PyTorch 处理状态的方式完全相同"
+      "JAX 和 PyTorch 处理状态的方式完全相同",
+      "JAX 要求显式地传递状态——权重是函数参数，而不是可变的对象属性"
     ],
-    "correct": 1,
+    "correct": 3,
     "explanation": "在 PyTorch 中，权重存在于 nn.Module 对象内部并被原地修改。在 JAX 中，权重作为函数参数显式传入并作为新值返回。没有原地修改，没有隐藏状态。",
     "stage": "post"
   },
@@ -51,11 +51,11 @@
     "question": "什么时候你会选择 JAX 而不是 PyTorch？",
     "options": [
       "用于快速搭建小模型原型时",
-      "当在 TPU pod 上进行超大规模训练时，编译和函数式变换能带来显著的提速",
       "当你需要最大的预训练模型生态时",
-      "用于部署到移动设备时"
+      "用于部署到移动设备时",
+      "当在 TPU pod 上进行超大规模训练时，编译和函数式变换能带来显著的提速"
     ],
-    "correct": 1,
+    "correct": 3,
     "explanation": "JAX 擅长大规模场景：jit 编译消除了 Python 开销，pmap 天然地处理多设备并行，而对整个计算图的 XLA 优化在 TPU 集群上带来显著提速。",
     "stage": "post"
   }

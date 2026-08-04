@@ -1,36 +1,36 @@
 [
   {
     "question": "为什么一个基础的 BPE tokenizer 在多语言或代码输入上会出问题？",
-    "options": ["BPE 本质上只能处理单一语言", "如果没有正确的 Unicode 处理、字节回退和预分词正则，它会产生错误或低效的 token 序列", "多语言文本无法被分词", "BPE 只能处理 ASCII"],
-    "correct": 1,
+    "options": ["如果没有正确的 Unicode 处理、字节回退和预分词正则，它会产生错误或低效的 token 序列", "BPE 只能处理 ASCII", "多语言文本无法被分词", "BPE 本质上只能处理单一语言"],
+    "correct": 0,
     "explanation": "一个朴素的 BPE 实现可能无法处理多字节 Unicode 字符，可能错误地跨单词边界合并，也可能没有针对训练词表之外字符的字节级回退。",
     "stage": "pre"
   },
   {
     "question": "预分词正则（pre-tokenization regex）在生产级 tokenizer 中起什么作用？",
-    "options": ["它移除标点符号", "它在 BPE 合并之前按单词边界拆分文本，防止跨空格和单词边界的合并", "它压缩空白字符", "它把文本转换成小写"],
+    "options": ["它把文本转换成小写", "它在 BPE 合并之前按单词边界拆分文本，防止跨空格和单词边界的合并", "它压缩空白字符", "它移除标点符号"],
     "correct": 1,
     "explanation": "预分词正则把文本拆成若干块（通常按单词边界、数字和标点），这样 BPE 合并只发生在块内部。没有它，BPE 可能会把 'end' 和下一个单词前面的空格合并在一起。",
     "stage": "pre"
   },
   {
     "question": "什么是特殊 token，为什么 tokenizer 要专门处理它们？",
-    "options": ["出现频率很高的 token", "像 <|endoftext|> 或 [PAD] 这样的保留 token，它们控制模型行为，必须被编码成单一、特定的 ID", "embedding 值最高的 token", "只在评估时使用的 token"],
-    "correct": 1,
+    "options": ["像 <|endoftext|> 或 [PAD] 这样的保留 token，它们控制模型行为，必须被编码成单一、特定的 ID", "出现频率很高的 token", "embedding 值最高的 token", "只在评估时使用的 token"],
+    "correct": 0,
     "explanation": "特殊 token 承担结构性用途：标记文档边界、填充序列、指示生成的开始/结束。它们必须被识别并编码成其确切的 ID，而不能被拆成子词。",
     "stage": "post"
   },
   {
     "question": "你如何评估一个自定义 tokenizer 是否优秀？",
-    "options": ["检查它能不能给你的名字分词", "在多样化的文本上测量压缩比（每个字符的 token 数），并与 tiktoken 等成熟 tokenizer 对比", "数一数词表大小", "只测量编码速度"],
-    "correct": 1,
+    "options": ["只测量编码速度", "检查它能不能给你的名字分词", "在多样化的文本上测量压缩比（每个字符的 token 数），并与 tiktoken 等成熟 tokenizer 对比", "数一数词表大小"],
+    "correct": 2,
     "explanation": "压缩比（每个 token 的字节数或每个单词的 token 数）衡量效率。好的 tokenizer 对同样的文本产生更少的 token，这意味着上下文窗口能装下更多内容。要跨语言、跨领域进行对比。",
     "stage": "post"
   },
   {
     "question": "为什么现代 LLM 偏好字节级 BPE 而非词级分词？",
-    "options": ["它更快", "它能在不产生未知 token 的情况下表示任何输入，同时仍然为常见模式学习高效的子词合并", "它产生更小的词表", "词级分词更准确"],
-    "correct": 1,
+    "options": ["它产生更小的词表", "它更快", "词级分词更准确", "它能在不产生未知 token 的情况下表示任何输入，同时仍然为常见模式学习高效的子词合并"],
+    "correct": 3,
     "explanation": "词级 tokenizer 无法处理未见过的单词（会产生 [UNK] token）。字节级 BPE 从原始字节开始（保证覆盖任何输入），并为常见序列学习合并，在覆盖率与效率之间取得平衡。",
     "stage": "post"
   }

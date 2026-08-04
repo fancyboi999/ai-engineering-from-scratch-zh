@@ -6,22 +6,22 @@
       "stage": "pre",
       "question": "反馈运行器（feedback runner）迫使 agent 做什么？",
       "options": [
-        "对想象中的输出做反应",
         "对事实做反应：在每条命令上把结构化的 stdout/stderr/exit/duration 记录捕获进循环",
-        "跳过验证",
-        "用不同的模型"
+        "对想象中的输出做反应",
+        "用不同的模型",
+        "跳过验证"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "运行器弥合了「测试通过了」（想象）与「测试确实运行了并以零退出」（记录在案）之间的鸿沟。"
     },
     {
       "stage": "pre",
       "question": "反馈与遥测（telemetry）有何不同？",
       "options": [
-        "遥测收费",
+        "它们是一回事",
         "反馈用于本次运行的下一轮；遥测用于运维人员跨时间审查多次运行（不同文件、不同保留期）",
-        "遥测用 OTel；反馈用 GraphQL",
-        "它们是一回事"
+        "遥测收费",
+        "遥测用 OTel；反馈用 GraphQL"
       ],
       "correct": 1,
       "explanation": "两者共享字段但存在不同文件、保留期不同；反馈是运行内的，遥测是跨运行的。"
@@ -31,20 +31,20 @@
       "question": "哪个字段必须出现在每条反馈记录中？",
       "options": [
         "model_id",
+        "prompt_cache_token",
         "exit_code（且 exit 为 null 时必须拒绝推进循环）",
-        "embedding_vector",
-        "prompt_cache_token"
+        "embedding_vector"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "exit_code 是无歧义的成功信号；null 退出意味着没有进展。"
     },
     {
       "stage": "check",
       "question": "运行器如何截断大输出？",
       "options": [
-        "随机采样",
-        "确定性的头 + 尾，加一个「截断了 N 行」标记，使同样的输出总产生同样的记录",
         "只取前 10 行",
+        "确定性的头 + 尾，加一个「截断了 N 行」标记，使同样的输出总产生同样的记录",
+        "随机采样",
         "用 gzip 压缩"
       ],
       "correct": 1,
@@ -66,22 +66,22 @@
       "stage": "post",
       "question": "parent_command_id 给工作台带来什么？",
       "options": [
-        "更便宜的推理",
-        "重试链接到它们的父尝试，使审查者和审计能看到失败链；没有它，重试看起来像独立的成功",
+        "更低的内存",
         "更快的文件 I/O",
-        "更低的内存"
+        "重试链接到它们的父尝试，使审查者和审计能看到失败链；没有它，重试看起来像独立的成功",
+        "更便宜的推理"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "父级链接让重试链对审查者（第 39 课）和验证门可见。"
     },
     {
       "stage": "post",
       "question": "为什么把 feedback_record.jsonl 限制在 1 MB 并带轮转？",
       "options": [
-        "JSON 处理不了更大的文件",
-        "agent 只读当前文件；轮转把运行时成本限定住，而 CI 产物捕获完整集合",
         "磁盘太慢",
-        "提供商按字节收费"
+        "agent 只读当前文件；轮转把运行时成本限定住，而 CI 产物捕获完整集合",
+        "提供商按字节收费",
+        "JSON 处理不了更大的文件"
       ],
       "correct": 1,
       "explanation": "有界的当前文件 + 轮转的历史是 logrotate 用的同一模式；在热循环里成本可预测。"

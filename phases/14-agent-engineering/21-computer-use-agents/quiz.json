@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "Claude 的计算机使用接收什么输入，发出什么？",
       "options": [
-        "输入无障碍树，输出键盘/鼠标命令",
         "输入截图（基于视觉），输出键盘/鼠标命令",
+        "输入 JSON，输出 SQL",
         "输入 DOM XML，输出 JavaScript",
-        "输入 JSON，输出 SQL"
+        "输入无障碍树，输出键盘/鼠标命令"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Claude 读取像素并发出键盘/鼠标动作；不使用操作系统的无障碍 API。"
     },
     {
@@ -20,8 +20,8 @@
       "options": [
         "一个每步安全服务，在执行前评估每个动作并拒绝不安全的",
         "硬编码的 WAF 规则",
-        "强制的验证码",
-        "默认只读模式"
+        "默认只读模式",
+        "强制的验证码"
       ],
       "correct": 0,
       "explanation": "Gemini 2.5 计算机使用以一个每步安全分类器作为标志性特性。"
@@ -30,32 +30,32 @@
       "stage": "check",
       "question": "本课把什么认定为这三个模型共同的不可信输入？",
       "options": [
+        "没有；一切都可信",
         "只有 HTTPS 响应",
         "截图、DOM 文本、工具输出、PDF 内容，任何被检索回来的东西",
-        "只有 PDF 内容",
-        "没有；一切都可信"
+        "只有 PDF 内容"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "只有直接的用户指令才算授权；其余一切都是不可信的。"
     },
     {
       "stage": "check",
       "question": "本课为 OpenAI CUA 发布时引用了哪些 OSWorld / WebArena 数字？",
       "options": [
+        "未报告数字",
         "OSWorld 38.1%、WebArena 58.1%、WebVoyager 87%",
-        "OSWorld 0%、WebArena 0%",
         "OSWorld 99%、WebArena 99%",
-        "未报告数字"
+        "OSWorld 0%、WebArena 0%"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "这些是引用的发布时数字。"
     },
     {
       "stage": "check",
       "question": "下列哪个防御模式不在 2026 年的收敛清单里？",
       "options": [
-        "每步安全分类器",
         "导航目标的允许列表/封禁列表",
+        "每步安全分类器",
         "对敏感动作的人在回路",
         "为省时间自动点掉对话框"
       ],
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "本课强调的针对计算机使用 agent 的主要攻击是什么？",
       "options": [
-        "网络中断",
         "一个恶意页面或 PDF 在被检索的内容里嵌入指令，模型把它当作用户意图",
-        "渲染缓慢",
-        "操作系统更新滞后"
+        "网络中断",
+        "操作系统更新滞后",
+        "渲染缓慢"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "把截图或 DOM 文本当作授权来信任，是经典的间接 prompt 注入失败。"
     },
     {
       "stage": "post",
       "question": "什么时候特别推荐人在回路确认？",
       "options": [
+        "永不",
         "在只读导航时",
-        "在登录、购买、删除文件这类敏感动作上",
         "只在模型主动询问时",
-        "永不"
+        "在登录、购买、删除文件这类敏感动作上"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "敏感动作（涉及金钱、数据暴露、新登录）需要显式的人工确认。"
     }
   ]

@@ -6,21 +6,21 @@
       "stage": "pre",
       "question": "为什么 ZeRO 先分片 optimizer state，而不是先分片参数？",
       "options": [
+        "DeepSpeed 强制要求",
         "optimizer 更重要",
-        "optimizer state 是最大的那块内存项，而且只在 step 时才被触碰，forward 和 backward 都用不到",
         "参数更好处理",
-        "DeepSpeed 强制要求"
+        "optimizer state 是最大的那块内存项，而且只在 step 时才被触碰，forward 和 backward 都用不到"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "在混合精度的 Adam 下，fp32 master 加两个动量，每个 rank 是 12P 字节，而 fp16 参数+梯度只有 4P。先分片最大的那一项，单位复杂度换来的内存收益最大。"
     },
     {
       "stage": "pre",
       "question": "ZeRO stage 1 每一步的线缆模式是什么？",
       "options": [
-        "一次 all-reduce",
-        "对梯度做一次 reduce-scatter，外加对更新后的参数做一次 all-gather",
         "一次 broadcast",
+        "对梯度做一次 reduce-scatter，外加对更新后的参数做一次 all-gather",
+        "一次 all-reduce",
         "什么都没有"
       ],
       "correct": 1,
@@ -30,10 +30,10 @@
       "stage": "check",
       "question": "为什么每一步的带宽和 DDP 一样？",
       "options": [
-        "魔法",
-        "在带宽上 all-reduce 等于 reduce-scatter 加 all-gather；ZeRO 只是把它拆成两半、作用在不同数据上",
         "ZeRO 用了压缩",
-        "其实并不一样"
+        "在带宽上 all-reduce 等于 reduce-scatter 加 all-gather；ZeRO 只是把它拆成两半、作用在不同数据上",
+        "其实并不一样",
+        "魔法"
       ],
       "correct": 1,
       "explanation": "ring all-reduce 本就是 reduce-scatter 再 all-gather 实现的。ZeRO 做的是同样两个操作，只是 all-gather 轮转的是更新后的参数，而不是求和后的梯度。"
@@ -43,20 +43,20 @@
       "question": "对一个 7B 模型、混合精度 Adam、8 个 rank，相比原版 DDP 内存下降多少？",
       "options": [
         "10%",
-        "约 65%（原版 16P 对比 ZeRO-1 的 4P + 12P/N = 5.5P）",
+        "0%",
         "99%",
-        "0%"
+        "约 65%（原版 16P 对比 ZeRO-1 的 4P + 12P/N = 5.5P）"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "原版：2P + 2P + 4P + 4P + 4P = 16P。ZeRO-1：2P + 2P + (4P+4P+4P)/8 = 5.5P。下降为 (16-5.5)/16 = 65.6%。"
     },
     {
       "stage": "check",
       "question": "相比 ZeRO-1，ZeRO-2 多做了什么？",
       "options": [
-        "什么都没多做",
-        "还会在 reduce-scatter 之后丢掉非本 shard 的梯度，释放每个 rank 的梯度内存；带宽保持不变",
         "把后端切到 NCCL",
+        "还会在 reduce-scatter 之后丢掉非本 shard 的梯度，释放每个 rank 的梯度内存；带宽保持不变",
+        "什么都没多做",
         "去掉了 optimizer"
       ],
       "correct": 1,
@@ -66,10 +66,10 @@
       "stage": "post",
       "question": "为什么 ZeRO 要求 optimizer state 的 checkpoint 记录哪个 rank 拥有哪个 shard？",
       "options": [
-        "纯装饰",
-        "没有逐 rank 的归属信息，保存的状态在重启时无法读取；在相同 world size 上恢复需要把对的 shard 放回对的 rank",
         "它并不需要",
-        "为了压缩"
+        "没有逐 rank 的归属信息，保存的状态在重启时无法读取；在相同 world size 上恢复需要把对的 shard 放回对的 rank",
+        "为了压缩",
+        "纯装饰"
       ],
       "correct": 1,
       "explanation": "第 80 课构建分片 checkpoint 清单（manifest），正是为了让 ZeRO 运行能在相同拓扑上恢复。"

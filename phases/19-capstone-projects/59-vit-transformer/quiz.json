@@ -8,8 +8,8 @@
       "options": [
         "post-LN 被专利保护了",
         "pre-LN 在深层时不用 learning-rate warm-up 也能稳定训练，而 post-LN 超过大约 6 层就会发散",
-        "pre-LN 跑得更快",
-        "post-LN 占更多内存"
+        "post-LN 占更多内存",
+        "pre-LN 跑得更快"
       ],
       "correct": 1,
       "explanation": "pre-LN 对每个子层的输入做归一化，让梯度范数随深度增长仍然有界。"
@@ -18,10 +18,10 @@
       "stage": "pre",
       "question": "在 hidden=768、heads=12 时，每个头的维度是多少，为什么重要？",
       "options": [
-        "12，这样每个头都能跑在小 GPU 上",
+        "96，由 ResNet-50 决定",
         "64，它决定了每张 attention 图的分辨率，让 12 个头能并行地各自独立 attend",
         "768，因为所有头共享 projection",
-        "96，由 ResNet-50 决定"
+        "12，这样每个头都能跑在小 GPU 上"
       ],
       "correct": 1,
       "explanation": "head_dim = hidden / heads = 64。每个头把 token 投影到自己的 64 维 q/k/v，算自己的 attention 图。"
@@ -30,12 +30,12 @@
       "stage": "check",
       "question": "ViT 编码器需要 causal attention mask 吗？",
       "options": [
-        "需要，跟 GPT decoder 一样",
-        "不需要：编码器是双向的，每个 token 都可以 attend 到同一序列里的任意其他 token",
         "只有 CLS 那一行需要",
-        "只在训练时需要"
+        "只在训练时需要",
+        "不需要：编码器是双向的，每个 token 都可以 attend 到同一序列里的任意其他 token",
+        "需要，跟 GPT decoder 一样"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "视觉编码器是双向的。causal masking 要等到后面文本 decoder 消费 cross-attention 输出时才出现。"
     },
     {
@@ -43,21 +43,21 @@
       "question": "过完全部 12 个 block 之后，CLS token 的最终隐状态代表什么？",
       "options": [
         "输入 embedding 的一份拷贝",
-        "整张图的一个学出来的向量摘要，下游 head 把它投影成类别 logits 或对比 embedding",
         "随机噪声",
+        "整张图的一个学出来的向量摘要，下游 head 把它投影成类别 logits 或对比 embedding",
         "只代表最后一个 patch"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "CLS token 一开始是空的，在 12 个 block 的 self-attention 里逐步从每个 patch 累积信息。"
     },
     {
       "stage": "check",
       "question": "为什么 feed-forward 层要扩展到 hidden 维度的 4 倍？",
       "options": [
-        "PyTorch 要求必须 4 倍",
+        "它能省去 attention",
         "从最初的 Transformer 至今的经验最优点；更小会欠拟合，更大在固定数据预算下会过拟合",
-        "它能把 FLOPs 减半",
-        "它能省去 attention"
+        "PyTorch 要求必须 4 倍",
+        "它能把 FLOPs 减半"
       ],
       "correct": 1,
       "explanation": "4 倍这个系数从 2017 年起在语言和视觉 transformer 里一直成立，每参数的容量在这里达到峰值。"
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "哪种家族扩展保持 block 数学不变，只是在前面加上学出来的 token？",
       "options": [
-        "causal masking",
-        "register token（DINOv2）：在 CLS 之后预置几个学出来的向量，用来捕捉全局统计、平滑 attention 图",
+        "RoPE 旋转",
         "Mixture-of-experts",
-        "RoPE 旋转"
+        "causal masking",
+        "register token（DINOv2）：在 CLS 之后预置几个学出来的向量，用来捕捉全局统计、平滑 attention 图"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "register token 在不改 block 数学的前提下稳定 attention，它们只是序列里多出来的几个槽位。"
     }
   ]

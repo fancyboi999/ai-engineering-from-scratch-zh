@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "输入侧已经检查过了，为什么还要跑输出侧的 classifier？",
       "options": [
-        "为了故意让系统变慢",
         "因为任何输入侧的绕过都会产生一个用户将会看到的输出，而输出是抓住它的最后一道关",
         "因为输入 classifier 已经废弃了",
-        "因为标准库要求两侧都得有"
+        "因为标准库要求两侧都得有",
+        "为了故意让系统变慢"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "本课接入了哪三个 classifier？",
       "options": [
+        "OCR、ASR、TTS",
         "情感、语言、长度",
         "toxicity、PII、instruction-leakage",
-        "OCR、ASR、TTS",
         "质量、事实性、引用"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -43,35 +43,35 @@
       "question": "为什么 PII classifier 内部要用 Luhn 校验？",
       "options": [
         "为了把数字转成字母",
+        "为了压缩 regex",
         "为了把形状像信用卡的数字串和任意数字序列区分开，且 false positive 很低",
-        "为了算出 SSN",
-        "为了压缩 regex"
+        "为了算出 SSN"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "instruction-leakage classifier 是怎么做判定的？",
       "options": [
-        "靠检测输出里的花括号",
-        "靠计算输出与已知 system prompt 之间的 trigram 余弦相似度，再配一个阈值",
         "靠调用另一个模型",
-        "靠数 token 数量"
+        "靠数 token 数量",
+        "靠计算输出与已知 system prompt 之间的 trigram 余弦相似度，再配一个阈值",
+        "靠检测输出里的花括号"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么 toxicity classifier 要在左侧一个小窗口里检查否定词（negation）？",
       "options": [
-        "为了拖慢 regex",
         "为了跳过像「you are not stupid」这种命中，免得 classifier 把常见的安慰话也过度 redact 掉",
         "为了提高 false-positive 率",
+        "为了拖慢 regex",
         "因为 Unicode 要求必须处理否定"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

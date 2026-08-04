@@ -18,24 +18,24 @@
       "stage": "pre",
       "question": "课程图（curriculum graph）编码了哪种结构？",
       "options": [
-        "一张带前置依赖边、并挂接 OER 内容的概念有向图",
+        "仅最近学习过的那个节点",
         "主题的随机洗牌",
         "一份互不相关的概念扁平列表",
-        "仅最近学习过的那个节点"
+        "一张带前置依赖边、并挂接 OER 内容的概念有向图"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "学习者模型在每次交互后更新什么？",
       "options": [
+        "通过贝叶斯知识追踪（Bayesian knowledge tracing）或类似变体得到的每概念掌握概率",
         "基础 LLM 的权重",
-        "COPPA 留存策略",
         "课程图 schema",
-        "通过贝叶斯知识追踪（Bayesian knowledge tracing）或类似变体得到的每概念掌握概率"
+        "COPPA 留存策略"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -54,8 +54,8 @@
       "stage": "check",
       "question": "哪种约束塑造了 K-12 学习者的记忆留存？",
       "options": [
-        "基于模型上下文长度的留存",
         "永久留存且不删除",
+        "基于模型上下文长度的留存",
         "仅 GDPR",
         "COPPA 感知的留存：在限定窗口后自动删除，并提供家长访问"
       ],

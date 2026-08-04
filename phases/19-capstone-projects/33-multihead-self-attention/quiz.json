@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "为什么高效的 self-attention block 用一个输出 3*D 特征的单线性层？",
       "options": [
-        "它强制 Q、K、V 之间共享权重",
         "它在数学上等价于三个 Linear(D, D) 层，但只跑一次 matmul",
         "它避免了使用 causal mask",
+        "它强制 Q、K、V 之间共享权重",
         "它减少了模型参数量"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "把三个 (D, D) 的投影矩阵叠成一个 (3D, D) 的矩阵，输出完全一致，但前向传播只需一次对加速器友好的 matmul。"
     },
     {
       "stage": "check",
       "question": "d_model、n_heads 和 d_head 之间是什么关系？",
       "options": [
-        "d_head = d_model * n_heads",
         "d_head = d_model + n_heads",
-        "d_head = d_model // n_heads，且 d_model 必须能被 n_heads 整除",
-        "d_head 与 d_model 无关"
+        "d_head 与 d_model 无关",
+        "d_head = d_model * n_heads",
+        "d_head = d_model // n_heads，且 d_model 必须能被 n_heads 整除"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "该 block 把 d_model 均匀分配给各个 head。d_model % n_heads == 0 这个约束在构造时强制检查。"
     },
     {
@@ -31,23 +31,23 @@
       "question": "scaled dot-product attention 的缩放因子用的是什么值？",
       "options": [
         "sqrt(d_model)",
-        "sqrt(d_head)",
         "sqrt(n_heads)",
+        "sqrt(d_head)",
         "sqrt(seq_len)"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "分数要除以 sqrt(d_head)，即 matmul 收缩的那个 head 维度。这样可以让分数的方差在 d_head 增大时保持有界。"
     },
     {
       "stage": "check",
       "question": "causal mask 如何保证位置 t 不能 attend 到位置 t+1？",
       "options": [
-        "将未来位置的 key 乘以零",
-        "在 softmax 之前将上三角的 score 设为负无穷",
+        "为未来位置使用不同的 attention head",
         "从输入中移除未来的 token",
-        "为未来位置使用不同的 attention head"
+        "将未来位置的 key 乘以零",
+        "在 softmax 之前将上三角的 score 设为负无穷"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "将未来 entry 设为 -inf，softmax 就会给它们分配零权重。过去和当前位置保留有效的权重分布。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "shape 为 (B, H, T, T) 的 attention weight 矩阵告诉你什么？",
       "options": [
         "每个 head 有多少参数",
+        "下一个 token 的输出 logits",
         "对于每个 batch 元素、每个 head，每个 query 位置 attend 到了哪些 key 位置",
-        "query 和 value 向量之间的余弦相似度",
-        "下一个 token 的输出 logits"
+        "query 和 value 向量之间的余弦相似度"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "per-head 矩阵中第 t 行是 query 位置 t 在 key 位置上的分布。检查它就能看到每个 head 在关注哪里。"
     }
   ]

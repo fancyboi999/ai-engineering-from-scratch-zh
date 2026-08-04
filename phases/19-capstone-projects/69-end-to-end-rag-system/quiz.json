@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "为什么集成测试才是给一条六组件 RAG pipeline 打分的唯一诚实方式？",
       "options": [
-        "chunker 是唯一重要的组件",
-        "每个阶段单独的指标都预测不了整个系统的指标，因为每个阶段都会与下一个阶段相互作用；唯一有效的评分方式是用同一份 qrels 把整条 pipeline 端到端跑一遍",
         "生产服务器无法运行单个阶段的测试",
-        "这些组件跑在不同的机器上"
+        "每个阶段单独的指标都预测不了整个系统的指标，因为每个阶段都会与下一个阶段相互作用；唯一有效的评分方式是用同一份 qrels 把整条 pipeline 端到端跑一遍",
+        "这些组件跑在不同的机器上",
+        "chunker 是唯一重要的组件"
       ],
       "correct": 1,
       "explanation": "各阶段的孤立胜利无法叠加成整体；pipeline 要看联合输出来打分。"
@@ -18,12 +18,12 @@
       "stage": "pre",
       "question": "答案生成器里「低置信度就拒答（refuse-on-low-confidence）」的作用是什么？",
       "options": [
+        "用另一个 chunker 触发一次重新检索",
         "把每一次拒答都写到磁盘里",
         "当 reranker 的 top-1 分数低于某个语料相关的阈值时，就返回「我不知道」，从而在召回的上下文没有切中 query 时避免产生臆造的答案",
-        "拦截超过 100 个 token 的 query",
-        "用另一个 chunker 触发一次重新检索"
+        "拦截超过 100 个 token 的 query"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "一个持续偏低的 rank-1 分数，是模型在告诉你语料里没有任何东西能回答这个 query；这时应当拒答，而不是去臆造。"
     },
     {
@@ -31,47 +31,47 @@
       "question": "为什么 rerank 的训练三元组要与评估 query 保持互不相交？",
       "options": [
         "为了省 GPU 显存",
-        "为了防止训练-测试泄漏；如果评估 query 与 rerank 训练集重叠，评估看起来会好得不真实，回归测试也就抓不到真实的漂移",
         "因为 cross-encoder 要求不同的词表",
+        "为了防止训练-测试泄漏；如果评估 query 与 rerank 训练集重叠，评估看起来会好得不真实，回归测试也就抓不到真实的漂移",
         "因为 RRF 无法融合相互重叠的列表"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "严格隔离是最基本的卫生准则；否则 rerank 指标预测不了生产中的真实表现。"
     },
     {
       "stage": "check",
       "question": "自终止 demo 的退出码（exit code）有什么用？",
       "options": [
-        "纯装饰",
         "它把「是否达标」编码进退出码：CI 冒烟测试可以把这个 demo 接入 pipeline，并以非零退出码来卡住合并",
-        "Python 强制要求",
-        "reranker 把它当作训练信号"
+        "reranker 把它当作训练信号",
+        "纯装饰",
+        "Python 强制要求"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "退出码 0 表示达到阈值；非零表示出现回归。这正是 CI 门禁所消费的契约。"
     },
     {
       "stage": "check",
       "question": "在这条 pipeline 里，引用锚点（citation anchor）长什么样？",
       "options": [
-        "[doc_id:chunk_index]",
         "带源 URL 的 Markdown 链接",
+        "embedding 向量本身",
         "JSON-RPC 信封",
-        "embedding 向量本身"
+        "[doc_id:chunk_index]"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "生成器把 (doc_id, chunk_index) 元组作为锚点输出，这样下游的 UI 或审计方就能把每一条主张映射回它的来源 chunk。"
     },
     {
       "stage": "post",
       "question": "哪种失效模式对 mock 生成器是不可见的，必须在上线前用真实 LLM 测试？",
       "options": [
+        "向量索引大小",
         "延迟",
-        "幻觉（hallucination）：mock 生成器只会从召回的 chunk 里输出文字、无法凭空造内容；而真实 LLM 可能会无视这些 chunk、生成无依据的答案",
         "tokenization",
-        "向量索引大小"
+        "幻觉（hallucination）：mock 生成器只会从召回的 chunk 里输出文字、无法凭空造内容；而真实 LLM 可能会无视这些 chunk、生成无依据的答案"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "mock 无法测试生成器在臆造内容面前的安全性；只有换上真实模型才能测。"
     }
   ]

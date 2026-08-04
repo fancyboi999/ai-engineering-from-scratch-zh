@@ -6,36 +6,36 @@
       "stage": "pre",
       "question": "MASFT 的核心主张是什么？",
       "options": [
-        "失败是随机噪声",
-        "多 agent 失败是根本性的设计缺陷，而非可以靠更好的基座模型修复的 LLM 局限",
+        "失败源于网络中断",
         "失败会随更大的模型消失",
-        "失败源于网络中断"
+        "多 agent 失败是根本性的设计缺陷，而非可以靠更好的基座模型修复的 LLM 局限",
+        "失败是随机噪声"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "伯克利的 MASFT 把失败归类为设计缺陷；它们不会因扩展基座模型而消失。"
     },
     {
       "stage": "pre",
       "question": "下列哪一个不是本课列出的五种反复出现的行业失败模式之一？",
       "options": [
-        "幻觉式动作（hallucinated actions）",
+        "embedding 版本管理",
         "范围蔓延（scope creep）",
         "级联错误（cascading errors）",
-        "embedding 版本管理"
+        "幻觉式动作（hallucinated actions）"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "这五种是幻觉式动作、范围蔓延、级联错误、上下文丢失、工具误用。"
     },
     {
       "stage": "check",
       "question": "本课中的级联错误（cascading error）是什么？",
       "options": [
-        "一次 LLM 限流级联",
-        "一次错误调用触发跨系统的下游影响（一个虚构 SKU 触发了四次下游 API 调用）",
+        "一个 YAML 解析器错误",
         "一次 cron 失败",
-        "一个 YAML 解析器错误"
+        "一次错误调用触发跨系统的下游影响（一个虚构 SKU 触发了四次下游 API 调用）",
+        "一次 LLM 限流级联"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "级联把单次错误调用放大成跨多系统的事故；当 agent 伪造成功时尤其严重。"
     },
     {
@@ -44,8 +44,8 @@
       "options": [
         "热 token 和冷 token",
         "指令遵循偏离（Instruction-following Deviation）和长程上下文误用（Long-range Contextual Misuse）",
-        "贪心搜索和束搜索",
-        "软 prompt 和硬 prompt"
+        "软 prompt 和硬 prompt",
+        "贪心搜索和束搜索"
       ],
       "correct": 1,
       "explanation": "幻觉表现为要么忽略 system prompt，要么忘记/误用更早轮次的上下文。"
@@ -54,24 +54,24 @@
       "stage": "check",
       "question": "成功幻觉（success hallucination）是什么意思？",
       "options": [
-        "模型在基准上过度自信",
-        "agent 返回成功消息，尽管目标状态并未改变（常发生在工具返回 400 时）",
         "用户以为成功了而其实没有",
-        "一个单元测试通过了"
+        "模型在基准上过度自信",
+        "一个单元测试通过了",
+        "agent 返回成功消息，尽管目标状态并未改变（常发生在工具返回 400 时）"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "要重新探测环境状态；当 agent 无法区分「我失败了」和「不可能」时，常会伪造完成。"
     },
     {
       "stage": "post",
       "question": "为什么只标记崩溃是不够的？",
       "options": [
-        "崩溃很慢",
         "大多数 agent 失败产生看起来有效、不会崩溃的输出；需要内容层面的检查",
+        "崩溃很慢",
         "崩溃泄露 PII",
         "日志记录收费"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "基于崩溃的监控会漏掉大部分 agent 失败，因为它们是内容形态的。"
     },
     {
@@ -80,8 +80,8 @@
       "options": [
         "加一个 sleep()",
         "对照环境状态核实事实接地的自动化验证门",
-        "禁用重试",
-        "只降低温度"
+        "只降低温度",
+        "禁用重试"
       ],
       "correct": 1,
       "explanation": "每步的门（安全分类器、参数校验、CRITIC、状态重探测）能在失败级联之前抓住它们。"

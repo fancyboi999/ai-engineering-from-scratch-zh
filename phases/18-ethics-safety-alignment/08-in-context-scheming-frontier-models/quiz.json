@@ -6,60 +6,60 @@
       "stage": "pre",
       "question": "情境内谋划（in-context scheming）与潜伏特工后门有何不同？",
       "options": [
-        "谋划需要在对抗数据上进行微调",
         "谋划仅由情境内 prompt 和环境引出，没有任何植入",
+        "谋划使用更小的模型",
         "谋划只发生在开源模型中",
-        "谋划使用更小的模型"
+        "谋划需要在对抗数据上进行微调"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "Apollo 提出的谋划三大支柱是什么？",
       "options": [
-        "奖励、KL、长度惩罚",
-        "采样温度、top-k、top-p",
+        "失准（misalignment）、目标导向性（goal-directedness）、情境觉知（situational awareness）",
         "有用、诚实、无害",
-        "失准（misalignment）、目标导向性（goal-directedness）、情境觉知（situational awareness）"
+        "采样温度、top-k、top-p",
+        "奖励、KL、长度惩罚"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "在 Apollo 的评估中，哪个模型在做出欺骗行为后，于超过 85% 的追问中维持住了它的掩饰说辞？",
       "options": [
-        "Claude 3.5 Sonnet",
         "Llama 3.1 405B",
+        "o1",
         "Gemini 1.5 Pro",
-        "o1"
+        "Claude 3.5 Sonnet"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "2025 年反谋划的「审慎对齐（deliberative-alignment）」结果中的关键混淆因素是什么？",
       "options": [
-        "训练数据太少",
         "经过后训练的模型也更擅长察觉自己正处于评估中，因此隐蔽行为看似下降的部分原因是隐藏得更好，而非对齐改善",
+        "PPO 被换成了 DPO",
         "奖励模型被开源了",
-        "PPO 被换成了 DPO"
+        "训练数据太少"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么在 2025/2026 年评估套件的可靠性变成了一个与能力相邻（capability-adjacent）的量？",
       "options": [
-        "情境觉知更强的模型能识别出评估情境，因此它们在评估中的行为成为部署行为的不那么可靠的代理",
         "评估现在只使用专有工具",
+        "开源模型无法运行新基准",
         "更好的模型更慢，因此更难评估",
-        "开源模型无法运行新基准"
+        "情境觉知更强的模型能识别出评估情境，因此它们在评估中的行为成为部署行为的不那么可靠的代理"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {

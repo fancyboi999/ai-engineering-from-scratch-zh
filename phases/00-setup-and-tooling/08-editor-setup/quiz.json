@@ -4,60 +4,60 @@
       "stage": "pre",
       "question": "什么是语言服务器协议（LSP）？",
       "options": [
+        "一种用于远程结对编程的网络协议",
         "一种在编辑器之间传输文件的协议",
         "一种标准，让编辑器能从针对特定语言的服务器接收类型信息、补全和诊断",
-        "一种源代码文件的压缩格式",
-        "一种用于远程结对编程的网络协议"
+        "一种源代码文件的压缩格式"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "LSP 是一种标准化协议，让编辑器能够与语言服务器通信，从而获得自动补全、类型检查和错误诊断等功能，且与所用编辑器无关。"
     },
     {
       "stage": "pre",
       "question": "为什么保存时自动格式化（format-on-save）对团队项目有用？",
       "options": [
-        "它通过删除空白字符来减小文件大小",
         "它在无需手动格式化的情况下确保所有贡献者的代码风格一致",
+        "它压缩代码以加快 git 操作",
         "它在代码执行前就捕获运行时 bug",
-        "它压缩代码以加快 git 操作"
+        "它通过删除空白字符来减小文件大小"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "保存时自动格式化会在你每次保存时运行格式化工具（如 Black 或 Ruff），确保无论谁编写，所有代码都遵循相同的风格约定。"
     },
     {
       "stage": "post",
       "question": "哪个 VS Code 扩展能让你像在本地一样在远程 GPU 机器上编辑代码？",
       "options": [
-        "GitLens",
         "Pylance",
-        "Remote SSH",
-        "Debugpy"
+        "Debugpy",
+        "GitLens",
+        "Remote SSH"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "Remote SSH 会在远程机器上安装一个轻量级的 VS Code 服务器，并将界面流式传输到你的本地编辑器，让你可以远程编辑文件、运行终端和调试。"
     },
     {
       "stage": "post",
       "question": "做 AI 工作时，为什么应该在 VS Code 设置中启用 'notebook.output.scrolling'？",
       "options": [
-        "它为宽数据帧启用水平滚动",
         "它防止训练循环的输出（成千上万行）撑爆输出面板",
+        "它在编辑器中启用平滑滚动动画",
         "它允许用鼠标滚轮在 notebook 单元格之间滚动",
-        "它在编辑器中启用平滑滚动动画"
+        "它为宽数据帧启用水平滚动"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "训练循环可能打印成千上万行输出。如果不启用输出滚动，notebook 的输出面板会无限增长，使 notebook 无法使用。"
     },
     {
       "stage": "post",
       "question": "在 VS Code 中把 'python.analysis.typeCheckingMode' 设为 'basic' 能达到什么效果？",
       "options": [
+        "它启用 Python 3.12 的语言特性",
         "它为 Python 文件启用语法高亮",
         "它在运行代码前就捕获错误的参数类型和张量形状不匹配",
-        "它按照 PEP 8 标准格式化 Python 代码",
-        "它启用 Python 3.12 的语言特性"
+        "它按照 PEP 8 标准格式化 Python 代码"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "使用 Pylance 的基础类型检查会在编辑时标记类型不匹配、错误的参数类型和不正确的 API 参数，让你在运行可能很昂贵的训练脚本之前就捕获 bug。"
     }
   ]

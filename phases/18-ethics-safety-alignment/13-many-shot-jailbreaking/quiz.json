@@ -7,69 +7,69 @@
       "question": "多样本越狱（MSJ）利用了上下文窗口的哪个特性？",
       "options": [
         "位置嵌入在超过 2048 个 token 后发生旋转",
-        "滑动窗口 attention 截断了系统提示",
         "超长上下文窗口能容纳数百轮伪造的「用户-助手」有害顺从对话，再接上目标查询",
-        "Unicode 字符上的 tokenizer 歧义"
-      ],
-      "correct": 2,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "在 MSJ 中，攻击成功率（ASR）如何随样本数量（shot count）变化？",
-      "options": [
-        "斜率为负的线性",
-        "随样本数呈幂律；不会平台化，持续攀升",
-        "在 100 个样本处的阶跃函数",
-        "逻辑斯蒂曲线，在 50% 处平台化"
+        "Unicode 字符上的 tokenizer 歧义",
+        "滑动窗口 attention 截断了系统提示"
       ],
       "correct": 1,
       "explanation": ""
     },
     {
       "stage": "check",
+      "question": "在 MSJ 中，攻击成功率（ASR）如何随样本数量（shot count）变化？",
+      "options": [
+        "逻辑斯蒂曲线，在 50% 处平台化",
+        "斜率为负的线性",
+        "在 100 个样本处的阶跃函数",
+        "随样本数呈幂律；不会平台化，持续攀升"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
       "question": "为什么 MSJ 与良性的情境内学习（ICL）共享同一机制？",
       "options": [
-        "两者都依赖模型从情境内示例中提取任务结构并在查询上执行它",
+        "两者都需要一个隐藏的 scratchpad",
         "两者都依赖 RLHF",
-        "两者都绕过分词",
-        "两者都需要一个隐藏的 scratchpad"
+        "两者都依赖模型从情境内示例中提取任务结构并在查询上执行它",
+        "两者都绕过分词"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "MSJ 的核心防御困境是什么？",
       "options": [
-        "防御必须在零采样温度下施加",
         "防御需要 GPU 集群",
         "抑制从长上下文中提取模式也会同时禁用良性的情境内学习；防御必须区分有害模式与良性模式",
-        "防御必须在响应的每个 token 上运行"
+        "防御必须在响应的每个 token 上运行",
+        "防御必须在零采样温度下施加"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "在受测设置上，Anthropic 基于分类器的 prompt 修改防御把 MSJ 的攻击成功率从多少降到了多少？",
       "options": [
-        "从 99% 降到 50%",
-        "从 30% 降到 25%",
+        "它反而提高了 ASR",
         "从 61% 降到 2%",
-        "它反而提高了 ASR"
+        "从 99% 降到 50%",
+        "从 30% 降到 25%"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "MSJ 如何与 PAIR（第 12 课）相互作用？",
       "options": [
-        "PAIR 能中和 MSJ",
         "PAIR 只对闭源模型有效",
+        "它们是互斥的",
         "MSJ 可与 PAIR 组合；用 PAIR 找到一个攻击结构，再用大量样本填充它，可达到比单独使用任一种更高的 ASR",
-        "它们是互斥的"
+        "PAIR 能中和 MSJ"
       ],
       "correct": 2,
       "explanation": ""

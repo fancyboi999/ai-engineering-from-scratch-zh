@@ -6,44 +6,44 @@
       "stage": "pre",
       "question": "梯度累积表达的 effective batch 等式是什么？",
       "options": [
-        "effective_batch = micro_batch / accum_steps",
         "effective_batch = micro_batch * accum_steps",
-        "effective_batch = micro_batch + accum_steps",
-        "effective_batch = world_size only"
+        "effective_batch = micro_batch / accum_steps",
+        "effective_batch = world_size only",
+        "effective_batch = micro_batch + accum_steps"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Micro batch 是显存能装下的大小；accumulation steps 是在一次 optimizer step 之前把梯度堆进同一个 buffer 的 forward + backward 次数。"
     },
     {
       "stage": "pre",
       "question": "为什么每个 micro batch backward 之前要把 loss 除以 accum_steps？",
       "options": [
-        "让 loss 曲线更好看。",
-        "PyTorch 默认把梯度累加到 param.grad 里，不除的话累积梯度会大 N 倍，optimizer step 也会激进 N 倍。",
         "为了避免 NaN。",
-        "只在混合精度下才需要。"
+        "只在混合精度下才需要。",
+        "PyTorch 默认把梯度累加到 param.grad 里，不除的话累积梯度会大 N 倍，optimizer step 也会激进 N 倍。",
+        "让 loss 曲线更好看。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "累积 buffer 是求和的。每个 micro batch 乘以 1/N，就把求和结果拉回到单次全 batch backward 产生的相同尺度。"
     },
     {
       "stage": "check",
       "question": "在累积循环里，optimizer step 什么时候执行？",
       "options": [
-        "每个 micro batch 之后。",
-        "只在累积窗口的最后一个 micro batch 之后。",
+        "永远不执行；optimizer 被替换了。",
         "每个窗口执行两次以确保安全。",
-        "永远不执行；optimizer 被替换了。"
+        "只在累积窗口的最后一个 micro batch 之后。",
+        "每个 micro batch 之后。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "在累积中途 step 会污染后续依赖的所有参数。Optimizer step 每个 effective batch 只触发一次。"
     },
     {
       "stage": "check",
       "question": "在真正的多 GPU run 上，no_sync context 包裹的是什么？",
       "options": [
-        "前向传播。",
         "Optimizer step。",
+        "前向传播。",
         "非最后一个 micro batch，这样 gradient all-reduce 只在最后一次 backward 之后触发，而不是触发 N 次。",
         "Data loader。"
       ],
@@ -54,12 +54,12 @@
       "stage": "check",
       "question": "main.py 中的 equivalence_check 函数断言了什么？",
       "options": [
-        "Loss 收敛了。",
-        "单次全 batch backward 和 accum_steps 次分块 backward（loss 除以 N）产生相同的梯度 buffer 和相同的 step 后参数，在一个小容差内。",
+        "梯度为零。",
         "吞吐量是常量。",
-        "梯度为零。"
+        "单次全 batch backward 和 accum_steps 次分块 backward（loss 除以 N）产生相同的梯度 buffer 和相同的 step 后参数，在一个小容差内。",
+        "Loss 收敛了。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "断言界限是 max-abs-diff 低于 1e-4。不做 loss 缩放时差值会爆炸；做了缩放后差值停留在浮点噪声水平。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "从吞吐量随 effective batch 的变化曲线上看，什么基本不变、什么在缩放？",
       "options": [
         "Samples per second 随更大的 effective batch 下降。",
+        "吞吐量会上升因为模型变快了。",
         "Samples per second 在硬件上限附近饱和，而每次 optimizer step 的 wall time 随 accum_steps 线性增长；真正下降的是 optimizer steps per second。",
-        "两个指标都随 accum 线性增长。",
-        "吞吐量会上升因为模型变快了。"
+        "两个指标都随 accum 线性增长。"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "每个 micro batch 的 forward + backward 开销不变。累积买到的是每次 optimizer step 的统计平滑，而非原始吞吐量；这条曲线是对流行说法的有效现实检验。"
     }
   ]

@@ -4,60 +4,60 @@
       "stage": "pre",
       "question": "调用 LLM 服务时，API 密钥用来做什么？",
       "options": [
+        "选择服务器使用哪种编程语言",
         "加密发送到服务器的数据",
         "验证你的身份并授权请求",
-        "压缩请求以减少带宽",
-        "选择服务器使用哪种编程语言"
+        "压缩请求以减少带宽"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "API 密钥是一串唯一字符串，用于标识你的账户、授权你的请求，并让服务商能够追踪用量和计费。"
     },
     {
       "stage": "pre",
       "question": "为什么绝不应该把 API 密钥直接硬编码在源代码里？",
       "options": [
-        "硬编码的密钥会让代码运行变慢",
-        "它们可能被意外提交到 git 并被公开泄露",
         "Python 无法读取超过 50 个字符的字符串字面量",
-        "API 服务商会封禁出现在源文件中的密钥"
+        "API 服务商会封禁出现在源文件中的密钥",
+        "它们可能被意外提交到 git 并被公开泄露",
+        "硬编码的密钥会让代码运行变慢"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "源代码中硬编码的密钥有被提交到版本控制并推送到公开仓库的风险，在那里它们可能被他人抓取和滥用。"
     },
     {
       "stage": "post",
       "question": "在本地开发时，推荐用哪种方式存储 API 密钥？",
       "options": [
+        "放在 requirements.txt 里与包版本写在一起",
         "放在脚本顶部的一个 Python 变量里",
-        "放在一个已列入 .gitignore 的 .env 文件里",
         "放在 README.md 里以便随手取用",
-        "放在 requirements.txt 里与包版本写在一起"
+        "放在一个已列入 .gitignore 的 .env 文件里"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ".env 文件以环境变量的形式存储密钥，并应加入 .gitignore，这样它永远不会被提交到版本控制。SDK 会自动从环境变量中读取密钥。"
     },
     {
       "stage": "post",
       "question": "在向 Anthropic 发起的原始 HTTP API 调用中，哪个请求头携带 API 密钥？",
       "options": [
+        "anthropic-version: 2023-06-01",
         "Authorization: Bearer sk-ant-...",
-        "x-api-key: sk-ant-...",
         "Content-Type: application/json",
-        "anthropic-version: 2023-06-01"
+        "x-api-key: sk-ant-..."
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Anthropic 的 API 使用 'x-api-key' 请求头进行认证，而不是更常见的 'Authorization: Bearer' 模式。这是其 API 设计的特有之处。"
     },
     {
       "stage": "post",
       "question": "当你超过某个 API 的速率限制时会发生什么？",
       "options": [
-        "你的 API 密钥被永久吊销",
         "服务器返回一个错误（通常是 HTTP 429），你必须等待后再重试",
         "你的请求会被排队，稍后自动处理",
-        "API 会静默丢弃你的请求且不返回任何响应"
+        "API 会静默丢弃你的请求且不返回任何响应",
+        "你的 API 密钥被永久吊销"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "速率限制会返回 HTTP 429（请求过多）。你需要等待后重试，通常采用指数退避。速率限制可防止滥用并确保公平使用。"
     }
   ]

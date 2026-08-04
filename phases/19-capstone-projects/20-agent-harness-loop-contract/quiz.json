@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "为什么要把驱动循环建模为显式状态机，而不是用 while 循环加标志位？",
       "options": [
-        "状态机可以在一处集中拦截非法转换，还能通过事件日志回放整个会话",
         "在 CPython 上跑得更快",
-        "这样就不需要写测试了",
-        "这是模型唯一能调用的形状"
+        "状态机可以在一处集中拦截非法转换，还能通过事件日志回放整个会话",
+        "这是模型唯一能调用的形状",
+        "这样就不需要写测试了"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "状态机把合法性规则全放在一个转换函数里。同样的输入序列一定产出同样的状态——这正是会话回放能成立的前提。"
     },
     {
       "stage": "pre",
       "question": "循环中的 pull point（拉取点）代表什么？",
       "options": [
-        "循环在此交出控制权并等待调用方提供输入的位置",
-        "模型调用后返回工具名称的地方",
         "一个每隔 N 秒触发的定时器",
+        "模型调用后返回工具名称的地方",
+        "循环在此交出控制权并等待调用方提供输入的位置",
         "一个会修改 payload 的 hook 订阅者"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Pull point 是 return，不是异常。调用方获取驱动层要求的东西，然后调用 resume()。"
     },
     {
@@ -42,12 +42,12 @@
       "stage": "check",
       "question": "当 hook 在 before_tool_call 中抛出 HookAbort 时会发生什么？",
       "options": [
-        "会话立即转换到 DONE",
-        "工具调用被跳过，on_error 触发，循环进入 REFLECTING",
         "该 hook 被注销",
-        "预算被重置"
+        "会话立即转换到 DONE",
+        "预算被重置",
+        "工具调用被跳过，on_error 触发，循环进入 REFLECTING"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "HookAbort 取消正在进行的工具分发，用中止原因触发 on_error，然后继续运行。"
     },
     {
@@ -55,35 +55,35 @@
       "question": "为什么 hook 和 event 要作为两个独立关注点来维护？",
       "options": [
         "因为事件类型是 bytes，而 hook 是字符串",
-        "Hook 是命令式的，能修改或中止操作；Event 是观测式的，只追加不修改",
+        "因为事件日志不能存 dict",
         "因为审计脚本不允许订阅者存在",
-        "因为事件日志不能存 dict"
+        "Hook 是命令式的，能修改或中止操作；Event 是观测式的，只追加不修改"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Hook 改变行为，Event 描述行为。把两者混在一起会导致策略和遥测耦合——这正是我们要避免的坑。"
     },
     {
       "stage": "post",
       "question": "当实际耗时超过预算时，下一个状态是什么？",
       "options": [
-        "DONE —— 会话终止",
         "EXECUTING —— 循环重试",
         "IDLE —— 返回一个带 budget_exceeded 原因的 pull point",
-        "PLANNING —— 起草新计划"
+        "PLANNING —— 起草新计划",
+        "DONE —— 会话终止"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "预算耗尽是一次 yield。驱动层转换到 IDLE，触发 on_budget_exceeded，并返回一个 PullRequest，让调用方决定是延长预算还是关闭会话。"
     },
     {
       "stage": "post",
       "question": "为什么本课用 stub 代替真实模型作为 planner？",
       "options": [
-        "因为在本地调用模型太慢",
         "为了在绑定任何模型之前就能对循环契约做确定性测试",
-        "因为模型无法返回工具调用",
-        "为了省 token"
+        "因为在本地调用模型太慢",
+        "为了省 token",
+        "因为模型无法返回工具调用"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "先把循环契约钉死，后续课程才能在不重新协商状态机的前提下换入真正的 planner、registry 和 dispatcher。"
     }
   ]

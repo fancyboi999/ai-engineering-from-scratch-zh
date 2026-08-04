@@ -7,9 +7,9 @@
       "question": "在 vLLM 部署中，LMCache 主要解决什么问题？",
       "options": [
         "HBM 中的 KV 缓存压力导致抢占，以及对相同前缀的重复 prefill",
+        "冷启动时的镜像拉取",
         "Tokenizer 的 GIL 争用",
-        "网络出站（egress）过滤",
-        "冷启动时的镜像拉取"
+        "网络出站（egress）过滤"
       ],
       "correct": 0,
       "explanation": ""
@@ -18,24 +18,24 @@
       "stage": "check",
       "question": "哪个 vLLM API 引入了可插拔的 KV 缓存后端？",
       "options": [
-        "前缀缓存开关",
-        "PagedAttention v2",
         "vLLM v0.9.0 中的 Connector API",
-        "ChunkedPrefill API"
+        "ChunkedPrefill API",
+        "前缀缓存开关",
+        "PagedAttention v2"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "vLLM 0.11.0（2026 年 1 月）版本为 KV 卸载路径增加了什么？",
       "options": [
-        "一条异步卸载路径，使引擎在常见情形下不会因卸载而阻塞",
-        "仅同步卸载",
+        "移除了对 LMCache 的支持",
         "强制使用 FP8 KV 缓存",
-        "移除了对 LMCache 的支持"
+        "仅同步卸载",
+        "一条异步卸载路径，使引擎在常见情形下不会因卸载而阻塞"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
@@ -43,8 +43,8 @@
       "question": "什么时候应该选择 LMCache 而非原生的 CPU 卸载？",
       "options": [
         "当多个引擎跨租户、跨 LoRA 变体或在重复的 RAG 上下文之间共享前缀时，跨引擎复用才划算",
-        "当你想完全禁用 KV 缓存时",
         "当单个引擎有 HBM 压力且没有前缀共享时",
+        "当你想完全禁用 KV 缓存时",
         "当你只在 CPU 上运行时"
       ],
       "correct": 0,
@@ -56,22 +56,22 @@
       "options": [
         "LMCache 会自动禁用",
         "它仍能把吞吐量翻倍",
-        "各配置与基线持平，伴随约 3-5% 的开销，且没有实际收益",
-        "引擎崩溃"
+        "引擎崩溃",
+        "各配置与基线持平，伴随约 3-5% 的开销，且没有实际收益"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么 LMCache 能与分离式服务（Phase 17 · 17）组合使用？",
       "options": [
-        "因为 LMCache 取代了 NIXL",
-        "从 prefill 传到 decode 的 KV 会落入 LMCache；后续查询可从 LMCache 拉取并跳过 prefill，因此缓存感知路由器可以挑选其本地缓存或 LMCache 共享缓存能匹配的引擎",
         "因为 LMCache 与引擎跑在同一块 GPU 上",
-        "并不能 —— 它们是互斥的"
+        "并不能 —— 它们是互斥的",
+        "从 prefill 传到 decode 的 KV 会落入 LMCache；后续查询可从 LMCache 拉取并跳过 prefill，因此缓存感知路由器可以挑选其本地缓存或 LMCache 共享缓存能匹配的引擎",
+        "因为 LMCache 取代了 NIXL"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     }
   ]

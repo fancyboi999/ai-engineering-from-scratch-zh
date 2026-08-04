@@ -7,83 +7,83 @@
       "question": "KV 存储最擅长处理哪类查询？",
       "options": [
         "对长对话的语义相似度",
-        "以（user, type, entity）为键的直接事实查找",
+        "「某时刻有效」的时间性查询",
         "共享某个计费实体的客户之间的可达性",
-        "「某时刻有效」的时间性查询"
+        "以（user, type, entity）为键的直接事实查找"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "KV 在精确键上是 O(1) 的；向量用于相似度，图用于关系。"
     },
     {
       "stage": "pre",
       "question": "Mem0 在每次 add() 时并行写入的三个存储是什么？",
       "options": [
-        "向量、KV、图",
         "Cache、queue、log",
-        "Postgres、Redis、ClickHouse",
-        "Embedding、attention、FFN"
+        "向量、KV、图",
+        "Embedding、attention、FFN",
+        "Postgres、Redis、ClickHouse"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "Mem0 把每次写入扇出到向量、KV 和图存储。"
     },
     {
       "stage": "check",
       "question": "哪三个维度喂给 Mem0 的融合分数（fusion score）？",
       "options": [
-        "相关性、重要性、新近性",
         "精确率、召回率、F1",
-        "延迟、吞吐量、成本",
-        "置信度、困惑度、BLEU"
+        "置信度、困惑度、BLEU",
+        "相关性、重要性、新近性",
+        "延迟、吞吐量、成本"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "分数是相关性、重要性和新近性的加权和；权重按产品调优。"
     },
     {
       "stage": "check",
       "question": "当一个新进来的事实与现有的边矛盾时，Mem0g 会怎么做？",
       "options": [
-        "删除这条边",
         "把现有的边标记为无效但不删除，使时间性查询仍能遍历",
+        "删除这条边",
         "抛出异常",
         "重写 user_id"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "软失效（soft invalidation）保留了历史，以便进行时间性（某时刻有效）查询。"
     },
     {
       "stage": "check",
       "question": "为什么本课建议按产品调优融合权重？",
       "options": [
-        "提供商要求这样",
-        "对聊天 agent 新近性占主导，对合规 agent 重要性占主导，对检索 agent 相关性占主导",
         "向量库拒绝相等的权重",
-        "Apache 2.0 要求这样"
+        "Apache 2.0 要求这样",
+        "对聊天 agent 新近性占主导，对合规 agent 重要性占主导，对检索 agent 相关性占主导",
+        "提供商要求这样"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "不同产品对相关性/重要性/新近性想要不同的偏置；一套权重并不适合所有情况。"
     },
     {
       "stage": "post",
       "question": "Mem0 使用的作用域分类（scope taxonomy）是什么？",
       "options": [
-        "Public、private、secret",
         "User、session、agent",
+        "Read、write、admin",
         "Local、regional、global",
-        "Read、write、admin"
+        "Public、private、secret"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "作用域为 user（跨会话）、session（单个线程）、agent（每实例状态）。"
     },
     {
       "stage": "post",
       "question": "在此模式中，embedding 漂移（embedding drift）是什么，本课建议如何缓解？",
       "options": [
-        "向量被加密；轮换密钥",
-        "随着语料增长，向量检索质量下降；定期对使用最多的 top-N 记录重新做 embedding",
+        "embedding API 更换了 URL；固定一个域名",
         "embedding 整数溢出；改用 float64",
-        "embedding API 更换了 URL；固定一个域名"
+        "向量被加密；轮换密钥",
+        "随着语料增长，向量检索质量下降；定期对使用最多的 top-N 记录重新做 embedding"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "定期对热记录重新做 embedding，能在语料增长时保持检索质量稳定。"
     }
   ]

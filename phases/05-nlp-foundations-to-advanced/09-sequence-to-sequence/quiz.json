@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "在 2014 年风格的 seq2seq 模型中，编码器的作用是什么？",
       "options": [
-        "计算注意力权重",
-        "执行 beam search",
         "读取源序列并产生一个固定大小的、概括它的上下文向量",
-        "生成目标 token"
+        "计算注意力权重",
+        "生成目标 token",
+        "执行 beam search"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "编码器 RNN 把源序列压缩成一个最终隐藏状态，供解码器使用。"
     },
     {
       "stage": "pre",
       "question": "seq2seq 训练中的 teacher forcing 是什么？",
       "options": [
-        "在推理时增加一个 teacher 网络",
-        "把 batch size 翻倍",
+        "手动标注每个解码步",
         "把真实的上一个 token（而非模型的预测）作为解码器输入喂入",
-        "手动标注每个解码步"
+        "在推理时增加一个 teacher 网络",
+        "把 batch size 翻倍"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "teacher forcing 通过使用真实的上一个 token 来稳定训练；没有它，早期错误会级联放大。"
     },
     {
       "stage": "check",
       "question": "为什么固定上下文向量的 seq2seq 准确率会随输入长度增长而下降？",
       "options": [
+        "词汇表变得太大",
         "padding token 累积",
-        "交叉熵发散",
         "关于源序列的全部信息都必须塞进单个固定大小的编码器隐藏状态，在长输入上会丢失细节",
-        "词汇表变得太大"
+        "交叉熵发散"
       ],
       "correct": 2,
       "explanation": "固定上下文向量的瓶颈意味着长输入无法被无损概括。"
@@ -42,9 +42,9 @@
       "stage": "check",
       "question": "什么是曝光偏差（exposure bias）？",
       "options": [
-        "来自类别不平衡的偏差",
         "编码器嵌入中的偏差",
         "标注员意见分歧",
+        "来自类别不平衡的偏差",
         "训练时用真实 token，推理时却从模型自身预测生成，由此产生的训练/推理差距"
       ],
       "correct": 3,
@@ -54,48 +54,48 @@
       "stage": "check",
       "question": "为什么对于生成任务，beam search 常常优于贪心解码？",
       "options": [
-        "beam search 在每一步保留 top-k 个部分序列存活，而不是不可逆地认定某一个 token",
+        "beam search 降低了损失",
         "beam search 避免了曝光偏差",
         "beam search 更快",
-        "beam search 降低了损失"
+        "beam search 在每一步保留 top-k 个部分序列存活，而不是不可逆地认定某一个 token"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "贪心每步即认定；beam search 探索多个假设，再挑出最优的完整序列。"
     },
     {
       "stage": "post",
       "question": "哪个架构家族取代了 RNN seq2seq 用于通用生成任务？",
       "options": [
-        "Transformer 编码器-解码器模型（BART、T5、mBART、NLLB）",
-        "图神经网络",
         "朴素贝叶斯",
-        "一维 CNN"
+        "一维 CNN",
+        "Transformer 编码器-解码器模型（BART、T5、mBART、NLLB）",
+        "图神经网络"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Transformer 编码器-解码器抛弃了循环结构，如今主导着生成任务。"
     },
     {
       "stage": "post",
       "question": "scheduled sampling 做什么？",
       "options": [
-        "在训练过程中逐步退火降低 teacher-forcing 比例，让模型学会从自己的预测中恢复",
-        "调度学习率衰减",
+        "给嵌入加入随机噪声",
         "对训练集重新排序",
-        "给嵌入加入随机噪声"
+        "调度学习率衰减",
+        "在训练过程中逐步退火降低 teacher-forcing 比例，让模型学会从自己的预测中恢复"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "scheduled sampling 逐渐混入模型预测，以弥合训练/推理的差距。"
     },
     {
       "stage": "post",
       "question": "为什么仅用贪心解码对面向用户的生成往往会失败？",
       "options": [
+        "贪心可能重复或陷入循环，且无法从一个局部好但全局差的 token 选择回溯",
         "它无法使用嵌入",
         "它总是先选 <EOS>",
-        "贪心可能重复或陷入循环，且无法从一个局部好但全局差的 token 选择回溯",
         "它需要更多内存"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "贪心解码每步不可逆的选择会导致循环和重复，除非配合 beam search 或采样。"
     }
   ]

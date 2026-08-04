@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "这节课里 demo 的职责是什么？",
       "options": [
+        "在每个分支上调用真实的语言模型",
         "用一个全新框架替换之前的课程",
         "通过普通的 Python import 把前面课程中的基元组合起来",
-        "拿调度器和一个 baseline 做基准测试",
-        "在每个分支上调用真实的语言模型"
+        "拿调度器和一个 baseline 做基准测试"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "demo 是一次组合测试。每个阶段存在于自己的课程中。demo 导入它们并组装报告。没有新框架，没有新抽象。"
     },
     {
       "stage": "pre",
       "question": "为什么这节课用 importlib 加载前面的课程，而不是普通的 package import？",
       "options": [
+        "因为 asyncio 要求 importlib",
         "因为 importlib 更快",
         "因为每节前置课程是独立的 code/ 文件夹，不是已安装的 package；importlib 按文件路径加载它们",
-        "因为 asyncio 要求 importlib",
         "因为各课程共享模块名会冲突"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "各课程不是已安装的 package。每节课在自己的 code/ 文件夹里有一个 main.py。importlib.util.spec_from_file_location 按路径加载它们，不会污染全局模块命名空间。"
     },
     {
       "stage": "check",
       "question": "当多个分支都触发了论文生成时，最佳结果选择器如何决定？",
       "options": [
-        "选运行实验最多的分支",
-        "选均值奖励最高的分支，平局时按 branch id 字母序打破",
         "随机选择以保证公平",
-        "选第一个触发的分支"
+        "选均值奖励最高的分支，平局时按 branch id 字母序打破",
+        "选第一个触发的分支",
+        "选运行实验最多的分支"
       ],
       "correct": 1,
       "explanation": "最高均值胜出。平局按 branch id 打破，保证 demo 的确定性。随机选择会破坏确定性测试。"
@@ -42,36 +42,36 @@
       "stage": "check",
       "question": "当调度器报告零次论文触发时，选择器抛出什么错误？",
       "options": [
-        "ValueError",
         "NoTriggerError，在 writer 运行之前就短路了 demo",
         "PaperValidationError",
+        "ValueError",
         "返回 None"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "NoTriggerError 是类型化的失败模式。返回 None 会让 writer 在畸形输入上运行，然后在后面以更难定位的错误失败。"
     },
     {
       "stage": "post",
       "question": "为什么 demo 在确定性测试中用相同种子运行两次？",
       "options": [
-        "为了执行两次 asyncio",
-        "为了断言两次运行中选中的分支、奖励和论文 section id 完全一致",
         "为了检测内存泄漏",
-        "为了证明调度器是公平的"
+        "为了证明调度器是公平的",
+        "为了断言两次运行中选中的分支、奖励和论文 section id 完全一致",
+        "为了执行两次 asyncio"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "确定性是契约的一部分。用相同种子的两次运行必须产出相同的产物。这个测试锁定了这一点。"
     },
     {
       "stage": "post",
       "question": "成功运行后，demo 报告包含什么？",
       "options": [
+        "仅实验数量和一个状态字符串",
         "仅最终 LaTeX 文件",
         "scheduler_report、best_branch、best_reward、critic_result、paper_manifest 和 stop_reason",
-        "仅实验数量和一个状态字符串",
         "模型 prompt 和 completion 日志"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "每个阶段的输出都保留了下来。报告是上游输出的组合，不是变换后的摘要。下游工具读 manifest；调试人员读 scheduler_report 里的 trace。"
     }
   ]

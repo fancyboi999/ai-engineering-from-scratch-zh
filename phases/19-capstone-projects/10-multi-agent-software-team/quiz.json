@@ -7,9 +7,9 @@
       "question": "为什么即便有 200k token 上下文，单 agent harness 在大型任务上仍会触及天花板？",
       "options": [
         "单个 agent 无法进行工具调用",
-        "沙箱拒绝托管一个以上的进程",
+        "模型缺乏对 git 的支持",
         "上下文无法同时容纳架构计划、四份并行的代码库切片、评审者评论和测试输出",
-        "模型缺乏对 git 的支持"
+        "沙箱拒绝托管一个以上的进程"
       ],
       "correct": 2,
       "explanation": ""
@@ -19,44 +19,44 @@
       "question": "在这种工厂形态中，架构师（architect）角色负责什么？",
       "options": [
         "审查合并后的 diff 是否有幻觉",
-        "阅读 issue 并产出一份带有显式接口的子任务计划",
         "在干净的沙箱中运行测试套件",
+        "阅读 issue 并产出一份带有显式接口的子任务计划",
         "当编码者意见不一致时强制合并分支"
-      ],
-      "correct": 1,
-      "explanation": ""
-    },
-    {
-      "stage": "check",
-      "question": "为什么每个编码者要在自己的 git worktree 加上一个 Daytona 沙箱中工作？",
-      "options": [
-        "worktree 比分支克隆更快",
-        "Daytona 是唯一支持 SSH 的沙箱",
-        "隔离的工作树让 N 个编码者并行实现子任务，而不会互相踩踏共享文件",
-        "架构师需要 worktree 的 ID"
       ],
       "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
+      "question": "为什么每个编码者要在自己的 git worktree 加上一个 Daytona 沙箱中工作？",
+      "options": [
+        "隔离的工作树让 N 个编码者并行实现子任务，而不会互相踩踏共享文件",
+        "Daytona 是唯一支持 SSH 的沙箱",
+        "worktree 比分支克隆更快",
+        "架构师需要 worktree 的 ID"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "stage": "check",
       "question": "为保持评审者诚实，对它施加了什么约束？",
       "options": [
-        "它只能在测试者签字之后运行",
         "它不能批准自己编写或提议的 diff",
-        "它必须批准它读到的每一个 diff",
-        "它必须与架构师是同一个模型"
+        "它只能在测试者签字之后运行",
+        "它必须与架构师是同一个模型",
+        "它必须批准它读到的每一个 diff"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么细则要把 token 效率与单 agent 基线作权衡？",
       "options": [
-        "多 agent 总是更便宜",
-        "角色边界增加了摘要和交接上下文，因此真正的问题是这个工厂是否按每美元胜出",
         "单 agent 没有可观测性方案",
+        "角色边界增加了摘要和交接上下文，因此真正的问题是这个工厂是否按每美元胜出",
+        "多 agent 总是更便宜",
         "token 成本与性能无关"
       ],
       "correct": 1,
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "复盘期间，从每个失败的 issue 中产出哪种产物？",
       "options": [
-        "一个新的架构师计划模板",
         "一份更新的 A2A 协议规范",
+        "一张交接失败直方图，指明是哪个角色边界出了问题（计划、合并、评审、测试）",
         "一份强制推送日志",
-        "一张交接失败直方图，指明是哪个角色边界出了问题（计划、合并、评审、测试）"
+        "一个新的架构师计划模板"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "本毕业项目用哪个评估集来对各角色评分 pass@1？",
       "options": [
-        "SWE-bench Pro 50 个 issue 的子集",
-        "HumanEval-Java",
         "MT-Bench-v2",
-        "MigrationBench"
+        "HumanEval-Java",
+        "MigrationBench",
+        "SWE-bench Pro 50 个 issue 的子集"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     }
   ]

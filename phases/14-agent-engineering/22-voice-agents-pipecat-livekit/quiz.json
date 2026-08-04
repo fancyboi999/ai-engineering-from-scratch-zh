@@ -6,46 +6,46 @@
       "stage": "pre",
       "question": "一条 Pipecat 流水线使用哪两个流动方向？",
       "options": [
+        "热和冷",
         "读和写",
         "DOWNSTREAM（源到汇）和 UPSTREAM（反馈、取消、插话打断）",
-        "入站和出站",
-        "热和冷"
+        "入站和出站"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "帧（frame）向下游从源流向汇，向上游用于控制和取消。"
     },
     {
       "stage": "pre",
       "question": "经典的 Pipecat 语音流水线是什么？",
       "options": [
-        "VAD -> STT -> LLM -> TTS -> 传输",
-        "TTS -> STT -> LLM -> VAD",
+        "音频 -> JSON -> SQL -> 响应",
         "LLM -> embed -> retrieve -> answer",
-        "音频 -> JSON -> SQL -> 响应"
+        "VAD -> STT -> LLM -> TTS -> 传输",
+        "TTS -> STT -> LLM -> VAD"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "VAD 检测语音活动，STT 转写，LLM 回复，TTS 朗读，传输层投递。"
     },
     {
       "stage": "check",
       "question": "LiveKit Agents 提供哪两类语音 agent？",
       "options": [
+        "LocalAgent 和 CloudAgent",
         "MultimodalAgent（直接音频）和 VoicePipelineAgent（STT/LLM/TTS 级联）",
         "BatchAgent 和 StreamAgent",
-        "TextAgent 和 SpeechAgent",
-        "LocalAgent 和 CloudAgent"
+        "TextAgent 和 SpeechAgent"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "MultimodalAgent 使用直接音频（Realtime 风格）；VoicePipelineAgent 使用 STT->LLM->TTS 以获得文本级控制。"
     },
     {
       "stage": "check",
       "question": "什么是插话打断（barge-in），它是如何处理的？",
       "options": [
-        "LLM 成本飙升；减少 token",
-        "用户在 agent 说话时打断；UPSTREAM 取消帧在话语中途停止 TTS",
         "提供商中断；换区域",
-        "验证码失败；重试"
+        "用户在 agent 说话时打断；UPSTREAM 取消帧在话语中途停止 TTS",
+        "验证码失败；重试",
+        "LLM 成本飙升；减少 token"
       ],
       "correct": 1,
       "explanation": "插话打断是用户打断；UPSTREAM 取消是 Pipecat 干净处理它的方式。"
@@ -54,36 +54,36 @@
       "stage": "check",
       "question": "本课把多少的端到端延迟描述为高端水平？",
       "options": [
-        "约 50 毫秒",
-        "约 450-600 毫秒",
         "约 1500 毫秒",
-        "约 5000 毫秒"
+        "约 5000 毫秒",
+        "约 450-600 毫秒",
+        "约 50 毫秒"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "高端技术栈落在约 450-600 毫秒；800-1200 毫秒很常见；超过 1500 毫秒会感觉坏掉了。"
     },
     {
       "stage": "post",
       "question": "如果忽略 STT 置信度会出什么问题？",
       "options": [
-        "延迟改善",
         "低置信度的转写被当作圣经一样喂给 LLM，产生错误答案；应按置信度设门槛或请求确认",
+        "通话变便宜",
         "TTS 变快",
-        "通话变便宜"
+        "延迟改善"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "把低置信度的 STT 当成真相，是语音 agent 的头号失败模式。"
     },
     {
       "stage": "post",
       "question": "为什么本课建议在上线前先把各组件延迟加起来？",
       "options": [
-        "提供商按延迟计费",
         "每个组件都增加 50-200 毫秒；总和决定了体验是否会感觉坏掉",
-        "它满足某项合规要求",
-        "WebRTC 要求延迟"
+        "提供商按延迟计费",
+        "WebRTC 要求延迟",
+        "它满足某项合规要求"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "上线前把整条链（VAD + STT + LLM + TTS + 传输）加起来；目标很紧。"
     }
   ]

@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "AI-Scientist 类 agent 用哪种搜索形态来探索实验？",
       "options": [
-        "在 token 输出上做束搜索（beam search）",
         "在实验节点上做最佳优先（best-first）树搜索，评分为「新颖性 × 质量 × 预算」",
-        "纯粹的人类反馈强化学习",
-        "带随机评分的广度优先扩展"
+        "在 token 输出上做束搜索（beam search）",
+        "带随机评分的广度优先扩展",
+        "纯粹的人类反馈强化学习"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -30,60 +30,60 @@
       "stage": "check",
       "question": "在写作循环中，视觉批判（vision critique）步骤的作用是什么？",
       "options": [
-        "把图表翻译成柱状图",
-        "把 LaTeX 草稿编译成 PDF，再让 VLM 批判排版、图表可读性以及论断与证据的一致性",
         "从截图中生成新的实验想法",
-        "在渲染时替换 matplotlib"
+        "把图表翻译成柱状图",
+        "在渲染时替换 matplotlib",
+        "把 LaTeX 草稿编译成 PDF，再让 VLM 批判排版、图表可读性以及论断与证据的一致性"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "评审者集成（reviewer ensemble）如何对流水线设门禁？",
       "options": [
-        "单一裁判按二元标志接受或拒绝",
-        "评审者匿名投票，多数获胜",
+        "五位裁判按 NeurIPS 式细则打分，加权汇总必须越过阈值，否则草稿循环回到写作环节",
         "评审只在发表后运行",
-        "五位裁判按 NeurIPS 式细则打分，加权汇总必须越过阈值，否则草稿循环回到写作环节"
+        "单一裁判按二元标志接受或拒绝",
+        "评审者匿名投票，多数获胜"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "本毕业项目对每篇论文执行哪种成本纪律？",
       "options": [
-        "30 美元的硬预算，通过 Langfuse 计数器和运行前估算来追踪",
         "只优化成本而不做质量检查",
         "无界算力，仅以挂钟时间为限",
-        "追踪 GPU 小时数但从不设上限"
+        "追踪 GPU 小时数但从不设上限",
+        "30 美元的硬预算，通过 Langfuse 计数器和运行前估算来追踪"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "哪个评分函数为树节点的进一步扩展排序？",
       "options": [
+        "输出长度和 token 数",
         "新颖性 × 质量 × 剩余预算",
         "相关论文的引用数",
-        "随机均匀优先级",
-        "输出长度和 token 数"
+        "随机均匀优先级"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "红队报告针对该系统演练什么？",
       "options": [
-        "系统提示上的缓存命中率",
-        "向量数据库中的多租户数据泄露",
         "丢包下的延迟长尾",
-        "沙箱逃逸尝试，如 fork 炸弹、网络外泄和文件系统逃逸"
+        "沙箱逃逸尝试，如 fork 炸弹、网络外泄和文件系统逃逸",
+        "系统提示上的缓存命中率",
+        "向量数据库中的多租户数据泄露"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     }
   ]

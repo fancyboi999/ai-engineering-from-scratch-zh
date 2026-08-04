@@ -6,34 +6,34 @@
       "stage": "pre",
       "question": "本课用哪三个市场细分来组织 2026 年的推理供应商？",
       "options": [
-        "免费、付费、企业版",
+        "开源、商业、混合",
         "单租户、多租户、本地部署（on-prem）",
-        "定制芯片、GPU 平台、API 优先的市场（marketplace）",
-        "开源、商业、混合"
+        "免费、付费、企业版",
+        "定制芯片、GPU 平台、API 优先的市场（marketplace）"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "大约在多高的持续 GPU 利用率下，按分钟计费（Baseten、Modal）开始优于按 token 计费（Fireworks、Together）？",
       "options": [
-        "60%",
+        "5%",
         "90%",
-        "30%",
-        "5%"
+        "60%",
+        "30%"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "哪个平台被描述为 Python 原生的 serverless，按秒计费，且预热后冷启动为 2-4 秒？",
       "options": [
-        "Baseten",
+        "Anyscale",
         "Modal",
-        "Fireworks",
-        "Anyscale"
+        "Baseten",
+        "Fireworks"
       ],
       "correct": 1,
       "explanation": ""
@@ -42,12 +42,12 @@
       "stage": "check",
       "question": "Fireworks 在 LoRA 定价上有什么显著的差异化优势？",
       "options": [
-        "用 LoRA 服务的请求比基础模型更贵",
-        "完全不支持 LoRA",
         "LoRA 请求需要单独的专用 GPU 合约",
-        "用 LoRA 服务的请求按基础模型的每 token 费率计费"
+        "用 LoRA 服务的请求比基础模型更贵",
+        "用 LoRA 服务的请求按基础模型的每 token 费率计费",
+        "完全不支持 LoRA"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -55,9 +55,9 @@
       "question": "对于一个受监管的医疗客户，需要 SOC 2 Type II、满足 HIPAA 要求的合规姿态以及专用 GPU，哪个平台最合适？",
       "options": [
         "Baseten",
+        "Replicate",
         "Together",
-        "Anyscale",
-        "Replicate"
+        "Anyscale"
       ],
       "correct": 0,
       "explanation": ""
@@ -66,12 +66,12 @@
       "stage": "post",
       "question": "为什么本课认为在平台这一层，「定制引擎」的宣称大多只是营销上的暗讽？",
       "options": [
-        "按 token 定价是唯一真正的差异化点",
         "vLLM 和 SGLang 大约占了生产环境开源推理的 80%，因此平台的差异化更多来自开发体验（DX）、成本归因和 SLA，而非引擎本身",
-        "所有定制引擎都是 TensorRT-LLM 的分支",
-        "定制引擎从来不会超越 vLLM"
+        "定制引擎从来不会超越 vLLM",
+        "按 token 定价是唯一真正的差异化点",
+        "所有定制引擎都是 TensorRT-LLM 的分支"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

@@ -7,11 +7,11 @@
       "question": "本课把哪种量化格式称为 CPU 和边缘服务的生产默认选择？",
       "options": [
         "FP8",
-        "GGUF Q4_K_M / Q5_K_M",
         "AWQ INT4",
+        "GGUF Q4_K_M / Q5_K_M",
         "NVFP4"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -30,36 +30,36 @@
       "stage": "check",
       "question": "AWQ 中「我的模型现在只有 4 GB 了」这个陷阱是什么？",
       "options": [
-        "AWQ 与 vLLM 不兼容",
-        "AWQ 需要 INT8 的 KV 缓存",
+        "AWQ 只缩小权重；KV 缓存和激活是独立的，在生产批次规模下可能额外增加 30-50 GB",
         "AWQ 实际上并不会缩小权重",
-        "AWQ 只缩小权重；KV 缓存和激活是独立的，在生产批次规模下可能额外增加 30-50 GB"
+        "AWQ 需要 INT8 的 KV 缓存",
+        "AWQ 与 vLLM 不兼容"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么用通用网页文本校准 AWQ 会损害领域模型？",
       "options": [
-        "它会禁用 Marlin 内核",
-        "算法在「该保护哪些权重」上做出了错误决策，从而拉低领域准确率（例如在 HumanEval 上掉几个 Pass@1 点）",
         "它只在 AMD GPU 上工作",
-        "它会增大模型尺寸"
+        "它会禁用 Marlin 内核",
+        "它会增大模型尺寸",
+        "算法在「该保护哪些权重」上做出了错误决策，从而拉低领域准确率（例如在 HumanEval 上掉几个 Pass@1 点）"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "对于一个质量不容妥协的推理密集型工作负载，本课默认推荐哪种精度？",
       "options": [
-        "GPTQ INT4",
-        "INT2 GGUF",
+        "FP8 权重",
         "NVFP4 权重",
-        "FP8 权重"
+        "INT2 GGUF",
+        "GPTQ INT4"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": ""
     },
     {
@@ -67,9 +67,9 @@
       "question": "本课指出 2026 年初 NVFP4 的哪个量化局限？",
       "options": [
         "尚不支持 LoRA",
+        "无法与 FP8 KV 缓存组合使用",
         "在 H100 上不受支持",
-        "只能在 CPU 上运行",
-        "无法与 FP8 KV 缓存组合使用"
+        "只能在 CPU 上运行"
       ],
       "correct": 0,
       "explanation": ""

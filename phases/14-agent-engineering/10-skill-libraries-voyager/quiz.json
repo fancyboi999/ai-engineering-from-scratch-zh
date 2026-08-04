@@ -6,12 +6,12 @@
       "stage": "pre",
       "question": "Voyager 把什么当作动作空间（action space）？",
       "options": [
-        "原始的 Minecraft 命令",
-        "可执行代码（JavaScript 函数），被存储、检索和组合",
         "仅文本 prompt",
-        "强化学习的 Q 值"
+        "强化学习的 Q 值",
+        "原始的 Minecraft 命令",
+        "可执行代码（JavaScript 函数），被存储、检索和组合"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Voyager 的贡献在于让代码成为动作：技能是程序，而非原始命令。"
     },
     {
@@ -19,32 +19,32 @@
       "question": "哪三个组件定义了一个 Voyager agent？",
       "options": [
         "Encoder、decoder、value head",
-        "自动课程（automatic curriculum）、技能库（skill library）、迭代式 prompting",
         "Planner、executor、judge",
-        "Retriever、generator、ranker"
+        "Retriever、generator、ranker",
+        "自动课程（automatic curriculum）、技能库（skill library）、迭代式 prompting"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Voyager 围绕课程、技能库和迭代式 prompting 来构建 agent。"
     },
     {
       "stage": "check",
       "question": "一次技能执行尝试可以返回哪三种信号？",
       "options": [
-        "Pass、fail、retry",
-        "成功、错误（带堆栈跟踪）、自核实失败",
         "绿、黄、红",
-        "Heartbeat、ack、nack"
+        "Heartbeat、ack、nack",
+        "成功、错误（带堆栈跟踪）、自核实失败",
+        "Pass、fail、retry"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Voyager 的迭代式 prompting 机制由这三种信号驱动，它们被折叠回下一个版本。"
     },
     {
       "stage": "check",
       "question": "自动课程如何挑选下一个任务？",
       "options": [
-        "在动作空间上随机均匀采样",
-        "略高于当前能力，基于环境状态和技能清单（探索的甜区）",
         "总是当前可用的最难任务",
+        "略高于当前能力，基于环境状态和技能清单（探索的甜区）",
+        "在动作空间上随机均匀采样",
         "仅用户提供的列表"
       ],
       "correct": 1,
@@ -54,21 +54,21 @@
       "stage": "check",
       "question": "哪个 2026 年的产品是本课对 Voyager 技能最清晰的对应？",
       "options": [
-        "OpenAI 微调",
-        "Claude Agent SDK skills：具名、可检索的代码加指令，按需加载",
+        "AWS Lambda 层",
         "Pinecone 索引",
-        "AWS Lambda 层"
+        "Claude Agent SDK skills：具名、可检索的代码加指令，按需加载",
+        "OpenAI 微调"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "Agent SDK skills 对应 Voyager 的具名-可检索-可组合的代码模式。"
     },
     {
       "stage": "post",
       "question": "为什么本课建议对技能库在写入时去重？",
       "options": [
-        "磁盘很贵",
-        "不去重的话，同一个技能会被反复添加多次、描述略有不同；检索应返回一个规范版本",
         "提供商拒绝重复项",
+        "不去重的话，同一个技能会被反复添加多次、描述略有不同；检索应返回一个规范版本",
+        "磁盘很贵",
         "Git 阻止重复项"
       ],
       "correct": 1,
@@ -78,10 +78,10 @@
       "stage": "post",
       "question": "组合技能漂移（composed-skill drift）描述的是什么问题？",
       "options": [
-        "Python 升级后某个技能不再编译",
-        "一个父技能悄悄用上了它从未测试过的、被改进的子版本；用固定技能版本来修复",
         "技能在存储中被加密",
-        "检索返回空"
+        "一个父技能悄悄用上了它从未测试过的、被改进的子版本；用固定技能版本来修复",
+        "检索返回空",
+        "Python 升级后某个技能不再编译"
       ],
       "correct": 1,
       "explanation": "没有版本固定，对子技能的一次改进会悄悄改变父技能的行为。"

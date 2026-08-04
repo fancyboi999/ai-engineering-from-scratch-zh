@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "因果语言模型训练 batch 的 shape 约定是什么？",
       "options": [
+        "(B, 2) input id 和 label 的配对",
         "(B, T) input ids 和 (B, T) target ids，其中 target 是 input 左移一位",
-        "(B, V) 词表上的 one-hot 向量",
         "(B, T, T) attention mask，input ids 放在对角线上",
-        "(B, 2) input id 和 label 的配对"
+        "(B, V) 词表上的 one-hot 向量"
       ],
-      "correct": 0,
+      "correct": 1,
       "explanation": "因果 LM 训练读入 (B, T) 的 input ids，预测同样 shape 的 target ids，其中 target[t] = input[t+1]。"
     },
     {
       "stage": "check",
       "question": "在长度为 N 的 id 流中，步长为 S 时，能放下多少个长度为 T+1 的 window？",
       "options": [
-        "N // (T + 1)",
-        "max(0, 1 + (N - (T + 1)) // S)",
         "(N - T) * S",
-        "N - T - S"
+        "N - T - S",
+        "N // (T + 1)",
+        "max(0, 1 + (N - (T + 1)) // S)"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "第一个 window 从 0 开始，后续 window 从 S 的倍数开始。最后一个 window 仍需完整覆盖 T+1 个 id。"
     },
     {
@@ -31,32 +31,32 @@
       "question": "把 stride 减半会对 dataset 产生什么影响？",
       "options": [
         "每个 epoch 的训练样本数减半",
-        "每个 epoch 的训练样本数大约翻倍",
         "没有影响，因为 window 从不重叠",
+        "每个 epoch 的训练样本数大约翻倍",
         "消除了相邻 window 之间的重叠"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "更小的 stride 产生更多重叠的 window，增加了样本数量和边界多样性，代价是每个 epoch 计算量更大。"
     },
     {
       "stage": "check",
       "question": "为什么要给 DataLoader 传一个显式的 torch.Generator？",
       "options": [
+        "让 shuffle 在相同 seed 下跨次运行可复现",
         "加快数据加载速度",
         "不需要 batch padding",
-        "让 shuffle 在相同 seed 下跨次运行可复现",
         "启用多 GPU 训练"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "设置了 seed 的 generator 能复现相同的 shuffle 顺序。相同 seed 多次运行看到的 batch 顺序一样，这对公平地做超参比较是必要的。"
     },
     {
       "stage": "post",
       "question": "为什么 dataset 从大小为 T+1 的每个 window 中返回 (input[:-1], input[1:])？",
       "options": [
-        "丢掉一个 id 来节省内存",
-        "实现了 shift-by-one 的 target，使 loss 衡量的是 next-token prediction",
         "从输入中移除一个 special token",
+        "实现了 shift-by-one 的 target，使 loss 衡量的是 next-token prediction",
+        "丢掉一个 id 来节省内存",
         "这只是 PyTorch tensor 索引的一个怪癖"
       ],
       "correct": 1,

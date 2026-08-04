@@ -6,72 +6,72 @@
       "stage": "pre",
       "question": "语言模型在测试语料上的 perplexity 为 1.0，意味着什么？",
       "options": [
-        "模型给每个真实 token 都赋了概率 1；它是个完美模型",
-        "模型在词表上是均匀分布的",
         "语料是空的",
-        "模型坏了"
+        "模型坏了",
+        "模型在词表上是均匀分布的",
+        "模型给每个真实 token 都赋了概率 1；它是个完美模型"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "perplexity 等于 exp(平均负对数似然)。当每个 token 都拿到概率 1 时，NLL 为零，exp(0) 就是 1。"
     },
     {
       "stage": "pre",
       "question": "为什么 harness 要求适配器返回的对数概率为非负？",
       "options": [
-        "perplexity 对负值没有定义",
         "负对数概率按定义就是非负的；收到负值意味着适配器送来的是 log p，而不是 -log p",
         "Numpy 遇到负值会崩",
-        "ECE 里的 bin 边界假定了正值"
+        "ECE 里的 bin 边界假定了正值",
+        "perplexity 对负值没有定义"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "一个概率的 -log p 是非负的。负值是对契约的违背，会悄悄给出 perplexity < 1，而这是不可能的。"
     },
     {
       "stage": "check",
       "question": "期望校准误差（ECE）衡量的是什么？",
       "options": [
-        "预测标签与真实标签之间的平均绝对距离",
-        "bin 级置信度与 bin 级准确率之间的平均差距，按 bin 大小加权",
+        "预测的交叉熵",
         "softmax 输出的方差",
-        "预测的交叉熵"
+        "预测标签与真实标签之间的平均绝对距离",
+        "bin 级置信度与 bin 级准确率之间的平均差距，按 bin 大小加权"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "ECE 按置信度把预测分到各个 bin，衡量每个 bin 里平均置信度与平均准确率的差距，再按 bin 大小加权。"
     },
     {
       "stage": "check",
       "question": "为什么实现里要在返回 ECE 值的同时还返回 populated_bins？",
       "options": [
-        "画可靠性图（reliability diagram）需要它",
         "当填充的 bin 太少、单个数字不可信时，它能给出信号",
-        "它是 Brier score 的分母",
-        "numpy 需要它"
+        "画可靠性图（reliability diagram）需要它",
+        "numpy 需要它",
+        "它是 Brier score 的分母"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "填充的 bin 一少，ECE 就被噪声主导。报告填充数能让 runner 拒绝发布一个有误导性的单一数字。"
     },
     {
       "stage": "check",
       "question": "Brier score 能捕捉到、而 ECE 捕捉不到的是什么？",
       "options": [
-        "它算起来更快",
         "它直接惩罚局部失准，因为它就是每条预测的平方误差",
-        "它不需要真实标签",
-        "它只对二元结果有效"
+        "它算起来更快",
+        "它只对二元结果有效",
+        "它不需要真实标签"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "ECE 只看每个 bin 的平均。Brier 对每条预测的误差取平方，所以能抓住那种平均上各 bin 相互抵消、但单条都失准的情况。"
     },
     {
       "stage": "post",
       "question": "为什么校准是按模型出报告，而不是按任务出指标？",
       "options": [
-        "任务没有概率",
         "单个任务的预测太少，估不出 bin 统计量；报告是跨整个 eval 聚合的",
-        "校准按任务算太慢",
-        "ECE 需要 runner 知道模型架构"
+        "任务没有概率",
+        "ECE 需要 runner 知道模型架构",
+        "校准按任务算太慢"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "按任务做校准会被噪声主导。runner 先把所有任务的（置信度，是否正确）对汇集起来，再算 ECE、Brier 和可靠性图。"
     }
   ]

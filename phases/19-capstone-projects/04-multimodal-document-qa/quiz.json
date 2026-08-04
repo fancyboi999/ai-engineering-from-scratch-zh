@@ -6,36 +6,36 @@
       "stage": "pre",
       "question": "为什么在金融 PDF 和科学论文上，2026 年的前沿做法更偏好视觉优先的延迟交互（late interaction），而非「先 OCR 再处理文本」？",
       "options": [
+        "OCR 无法在 GPU 上运行",
         "视觉模型每页更便宜",
-        "OCR 流水线会弄乱旋转的表格、密集的公式和图表图像，丢失一半信号",
         "OCR 比渲染更慢",
-        "OCR 无法在 GPU 上运行"
+        "OCR 流水线会弄乱旋转的表格、密集的公式和图表图像，丢失一半信号"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "pre",
       "question": "在 ColPali 式检索中，延迟交互（late interaction）是什么意思？",
       "options": [
-        "每个查询 token 都与每个 patch token 打分，再通过 MaxSim 把逐 token 的最大值相加",
         "嵌入被推迟到评测时才计算",
         "嵌入在用户点击某个结果后才计算",
+        "每个查询 token 都与每个 patch token 打分，再通过 MaxSim 把逐 token 的最大值相加",
         "重排器只在最终候选上运行"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "ColQwen 嵌入每页大约产生多少个 patch 向量，这造成了什么存储问题？",
       "options": [
-        "每页约 2048 个 patch 向量，相比单向量索引使原始存储急剧膨胀",
         "正好 128 个向量，能干净地装进任何向量数据库",
-        "每页 1 个向量，没有存储问题",
-        "16 个向量，存储开销可忽略"
+        "16 个向量，存储开销可忽略",
+        "每页约 2048 个 patch 向量，相比单向量索引使原始存储急剧膨胀",
+        "每页 1 个向量，没有存储问题"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -43,19 +43,19 @@
       "question": "DocPruner 在这条流水线中做什么？",
       "options": [
         "在摄入前移除重复的 PDF 页面",
-        "通过保留约 50% 的高信号 patch 来压缩多向量索引，且准确率损失可忽略",
+        "围绕证据区域裁剪边界框",
         "为更短的向量重写查询嵌入",
-        "围绕证据区域裁剪边界框"
+        "通过保留约 50% 的高信号 patch 来压缩多向量索引，且准确率损失可忽略"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "为什么仍要为某些页面拼接进一条 OCR 文本通道？",
       "options": [
-        "它能提升 PDF 渲染质量",
         "VLM 无法读取 180 DPI 的图像",
+        "它能提升 PDF 渲染质量",
         "OCR 是主要的检索模态",
         "公式密集和表格繁多的页面，在图像之外辅以文本回退会受益"
       ],
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "本毕业项目针对视觉优先检索评估，瞄准哪个基准？",
       "options": [
-        "RewardBench-2",
         "SWE-bench Pro",
         "ViDoRe v3",
-        "MMLU-Pro"
+        "MMLU-Pro",
+        "RewardBench-2"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "评分细则中所说的「证据区域接地（evidence-region grounding）」是什么意思？",
       "options": [
-        "DocPruner 达成的压缩比",
         "重排器在 p99 长尾处的延迟",
         "每次查询检索到的页面总数",
-        "被引用的边界框中实际包含答案片段的比例"
+        "被引用的边界框中实际包含答案片段的比例",
+        "DocPruner 达成的压缩比"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": ""
     }
   ]

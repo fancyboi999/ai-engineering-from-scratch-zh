@@ -6,10 +6,10 @@
       "stage": "pre",
       "question": "这三个检查点（checkpoint）分别落在请求生命周期的哪里？",
       "options": [
-        "三个都在模型跑完之后运行",
+        "只有 post-gen 会运行；pre-gen 和 during-gen 只是它的别名",
         "pre-gen 在模型之前对 prompt 运行，during-gen 对输出流做过滤，post-gen 对已完成的输出运行",
         "三个都在模型被调用之前运行",
-        "只有 post-gen 会运行；pre-gen 和 during-gen 只是它的别名"
+        "三个都在模型跑完之后运行"
       ],
       "correct": 1,
       "explanation": ""
@@ -18,24 +18,24 @@
       "stage": "pre",
       "question": "during-gen 过滤的目标是什么？",
       "options": [
-        "把输出翻译成另一种语言",
-        "缓冲输出块，一旦出现已知的有害续写就提前终止流，在用户看到之前拦下",
         "提升 token 吞吐量",
-        "用一段 refusal 替换 prompt"
+        "把输出翻译成另一种语言",
+        "用一段 refusal 替换 prompt",
+        "缓冲输出块，一旦出现已知的有害续写就提前终止流，在用户看到之前拦下"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "aggregator 是怎么决定最终动作的？",
       "options": [
-        "对每个信号的置信度取平均",
-        "在 detector、token-filter、classifier 和 rules 这几路信号里取最高 severity，再映射到 block、redact、warn 或 allow",
+        "只看 rules engine",
         "再调用一次模型",
-        "只看 rules engine"
+        "在 detector、token-filter、classifier 和 rules 这几路信号里取最高 severity，再映射到 block、redact、warn 或 allow",
+        "对每个信号的置信度取平均"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
@@ -43,35 +43,35 @@
       "question": "为什么 gate 要为每个请求产出一个结构化的 RequestTrace？",
       "options": [
         "为了拖慢系统",
+        "为了把 trace 复制进 prompt",
         "为了给 reviewer 一份按 checkpoint 分的审计轨迹，让任何一层的回归都能追溯到对应的模块",
-        "为了取代日志",
-        "为了把 trace 复制进 prompt"
+        "为了取代日志"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
       "question": "当 pre-gen 的置信度超过 block 阈值时，会发生什么？",
       "options": [
-        "为了完整性，模型仍然会被调用",
-        "gate 返回 policy refusal，完全跳过 during-gen 和 post-gen",
+        "gate 调低阈值后重试",
         "gate 抛出异常",
-        "gate 调低阈值后重试"
+        "为了完整性，模型仍然会被调用",
+        "gate 返回 policy refusal，完全跳过 during-gen 和 post-gen"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "post",
       "question": "为什么 demo 要故意放一些 encoding-trick 的 prompt 进入 during-gen？",
       "options": [
-        "因为 encoding trick 不是真正的攻击",
         "因为输入流水线不总能及时 normalize 它们；during-gen 过滤就是那道纵深防御，负责抓住漏出去的续写",
+        "因为 encoding trick 不是真正的攻击",
         "因为模型反正都会拒绝它们",
         "因为 encoding 由 rules engine 处理"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": ""
     }
   ]

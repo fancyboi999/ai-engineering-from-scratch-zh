@@ -6,92 +6,92 @@
       "stage": "pre",
       "question": "什么是 BIO 标注？",
       "options": [
-        "逐 token 的标签：B-TYPE 表示实体起始，I-TYPE 表示实体内部，O 表示实体外部",
-        "一种实体/非实体的二元方案",
         "一种分词风格",
-        "实体的树状表示"
+        "一种实体/非实体的二元方案",
+        "实体的树状表示",
+        "逐 token 的标签：B-TYPE 表示实体起始，I-TYPE 表示实体内部，O 表示实体外部"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "BIO 用 B/I/O 前缀把跨度抽取转化为 token 分类。"
     },
     {
       "stage": "pre",
       "question": "为什么基于规则的词典表（gazetteer）在生产 NER 中很脆弱？",
       "options": [
-        "它们需要 GPU",
-        "它们很慢",
         "它们对新实体毫无覆盖，且无法消歧（例如 Apple 是水果还是公司）",
+        "它们很慢",
+        "它们需要 GPU",
         "它们无法处理多 token 实体"
       ],
-      "correct": 2,
+      "correct": 0,
       "explanation": "词典表能匹配已知字符串，但无法消歧词义，也无法泛化到未见过的名称。"
     },
     {
       "stage": "check",
       "question": "对于 NER，CRF 相比 HMM 的关键优势是什么？",
       "options": [
-        "CRF 避免使用 Viterbi 算法",
+        "CRF 更快",
         "CRF 永远不需要训练数据",
-        "CRF 是判别式的，可以混合任意特征（词形、大小写、邻接词）",
-        "CRF 更快"
+        "CRF 避免使用 Viterbi 算法",
+        "CRF 是判别式的，可以混合任意特征（词形、大小写、邻接词）"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "CRF 是判别式的，让你能基于丰富的、相互重叠的特征做条件建模。"
     },
     {
       "stage": "check",
       "question": "在 BiLSTM-CRF 架构中，CRF 层起什么作用？",
       "options": [
+        "替代嵌入",
         "执行分词",
-        "通过在 LSTM 发射分数之上建模标签到标签的转移，强制生成合法的 BIO 标签序列",
         "预训练 LSTM",
-        "替代嵌入"
+        "通过在 LSTM 发射分数之上建模标签到标签的转移，强制生成合法的 BIO 标签序列"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "位于 LSTM 特征之上的 CRF 建模标签间依赖，并排除非法序列。"
     },
     {
       "stage": "check",
       "question": "为什么 NER 必须用实体级 F1 而非 token 级 F1 来评估？",
       "options": [
-        "实体级 F1 更容易计算",
         "预测跨度必须与真实跨度完全匹配；token 级 F1 因计入部分匹配而高估了准确率",
-        "token 级 F1 无法处理 BIO",
-        "HuggingFace 要求使用实体级 F1"
+        "实体级 F1 更容易计算",
+        "HuggingFace 要求使用实体级 F1",
+        "token 级 F1 无法处理 BIO"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "跨度精确匹配才是有意义的指标；token 级 F1 通过部分重叠虚高了分数。"
     },
     {
       "stage": "post",
       "question": "在 HuggingFace NER pipeline 中，aggregation_strategy='simple' 做什么？",
       "options": [
+        "只返回置信度最高的实体",
         "把输出转为小写",
         "跳过分词",
-        "把连续的 B-X 和 I-X token 合并成单个跨度",
-        "只返回置信度最高的实体"
+        "把连续的 B-X 和 I-X token 合并成单个跨度"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "它把同一类型的连续 BIO token 合并成跨度级别的实体。"
     },
     {
       "stage": "post",
       "question": "为什么标准 BIO 在嵌套实体上会失败？",
       "options": [
-        "BIO 需要一个 transformer",
-        "BIO 是扁平的逐 token 方案，无法表达两个不同类型、相互重叠的跨度",
         "BIO 无法表示多 token 实体",
-        "BIO 丢弃了类型标签"
+        "BIO 丢弃了类型标签",
+        "BIO 需要一个 transformer",
+        "BIO 是扁平的逐 token 方案，无法表达两个不同类型、相互重叠的跨度"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "BIO 给每个 token 分配一个标签；嵌套跨度需要多趟处理或基于跨度的模型。"
     },
     {
       "stage": "post",
       "question": "在 2026 年，经典 NER（CRF 或 BiLSTM-CRF）什么时候仍然胜过 LLM？",
       "options": [
-        "在嵌套实体上",
         "只要输入是英语",
+        "在嵌套实体上",
         "在开放域叙事文本上",
         "在严苛的延迟预算、标注数据充足、本体稳定，或非生成式的合规约束下"
       ],

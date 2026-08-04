@@ -6,24 +6,24 @@
       "stage": "pre",
       "question": "为什么单凭一个 LLM 的行为更像自动补全，而不像一个 agent？",
       "options": [
-        "它无法读取文件、运行查询，或对照外部世界核实主张",
-        "它的上下文窗口太小，装不下一个问题",
         "没有 system prompt 它就拒绝回答",
-        "它一次只能产出一个 token"
+        "它的上下文窗口太小，装不下一个问题",
+        "它一次只能产出一个 token",
+        "它无法读取文件、运行查询，或对照外部世界核实主张"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "一个没有循环、没有工具的 LLM 只能从它的权重里产出文本；它无法观察状态或对状态采取行动。"
     },
     {
       "stage": "pre",
       "question": "Yao 等人 2022 年那条经典的 ReAct trace 中出现了哪三个标签？",
       "options": [
-        "Prompt、Response、Reward",
-        "Thought、Action、Observation",
+        "System、User、Assistant",
         "Plan、Execute、Reflect",
-        "System、User、Assistant"
+        "Prompt、Response、Reward",
+        "Thought、Action、Observation"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "ReAct 在单一流中交替出现 Thought、Action 和 Observation 几行。"
     },
     {
@@ -31,59 +31,59 @@
       "question": "下列哪一项不是本课列出的 agent 循环五要素之一？",
       "options": [
         "消息缓冲区（message buffer）",
-        "工具注册表（tool registry）",
+        "梯度优化器（gradient optimizer）",
         "观察格式化器（observation formatter）",
-        "梯度优化器（gradient optimizer）"
+        "工具注册表（tool registry）"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": "五要素是消息缓冲区、工具注册表、停止条件、轮次预算和观察格式化器。梯度优化器属于训练，而非推理循环。"
     },
     {
       "stage": "check",
       "question": "轮次预算（turn budget）在循环中起什么作用？",
       "options": [
-        "它限制每次回复的 token 数",
         "它对循环迭代次数设硬上限，以防止失控的 agent",
-        "它控制注册表暴露多少个工具",
-        "它对 LLM 提供商限流"
+        "它对 LLM 提供商限流",
+        "它限制每次回复的 token 数",
+        "它控制注册表暴露多少个工具"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "轮次预算是对循环迭代次数的上限；2026 年的 agent 常运行 40-400 步，需要一个与任务相称的上限。"
     },
     {
       "stage": "check",
       "question": "相比基于 prompt 的 Thought token，2025-2026 的原生推理（native-reasoning）转变改变了什么？",
       "options": [
-        "循环控制流被替换成了 DAG",
         "Thought token 现在在一个单独的推理通道（reasoning channel）上发出，并贯穿各轮传递",
+        "循环控制流被替换成了 DAG",
         "模型不再使用工具调用，只依赖思维链",
         "Observation 被从 prompt 中完全移除"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "推理内容移到一个专用通道（在各提供商间通常是加密的），但「观察-思考-行动」的控制流不变。"
     },
     {
       "stage": "post",
       "question": "为什么本课说工具输出是不可信输入（untrusted input）？",
       "options": [
+        "工具结果总是大于模型的上下文窗口",
         "工具运行时又慢又不可靠",
         "检索到的内容可能携带隐藏指令（比如「删掉这个 repo」），而只有直接的用户输入才算授权",
-        "工具结果总是大于模型的上下文窗口",
         "提供商默认会剥离工具输出的字节"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "OpenAI CUA 文档明确指出，只有直接的用户指令才算授权；工具输出可能携带对抗性指令，必须被当作不可信对待。"
     },
     {
       "stage": "post",
       "question": "为什么本课声称 2026 年的每个框架底层仍在运行 ReAct？",
       "options": [
-        "因为提供商要求 prompt 里出现 ReAct 关键词",
         "因为「观察-思考-行动」的控制流是不变量；框架的差异在于围绕它的检查点、actor、角色模板和 tracing",
         "因为 Yao 等人拥有这个循环的专利",
-        "因为 LangGraph 强迫所有其他框架继承自它"
+        "因为 LangGraph 强迫所有其他框架继承自它",
+        "因为提供商要求 prompt 里出现 ReAct 关键词"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Claude Agent SDK、OpenAI Agents SDK、LangGraph、AutoGen、CrewAI、Agno 和 Mastra 之间的差异在于包裹循环的东西，而非循环本身。"
     }
   ]

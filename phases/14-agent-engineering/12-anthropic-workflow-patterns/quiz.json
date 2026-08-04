@@ -6,32 +6,32 @@
       "stage": "pre",
       "question": "Anthropic 如何区分工作流（workflow）和 agent？",
       "options": [
-        "工作流用 embedding；agent 用工具",
-        "工作流是工程师拥有的预定义图；agent 是模型拥有的动态工具调度",
         "工作流跑在 CPU 上；agent 需要 GPU",
-        "工作流是无状态的；agent 是有状态的"
+        "工作流是无状态的；agent 是有状态的",
+        "工作流是工程师拥有的预定义图；agent 是模型拥有的动态工具调度",
+        "工作流用 embedding；agent 用工具"
       ],
-      "correct": 1,
+      "correct": 2,
       "explanation": "工作流 = 工程师拥有的预定义代码路径；agent = 模型拥有那张图。"
     },
     {
       "stage": "pre",
       "question": "支撑全部五种模式的增强型 LLM 有哪三种能力？",
       "options": [
-        "搜索（检索）、工具（动作）、记忆（持久化）",
-        "Embedding、微调、RAG",
+        "Plan、execute、reflect",
         "向量、KV、图",
-        "Plan、execute、reflect"
+        "Embedding、微调、RAG",
+        "搜索（检索）、工具（动作）、记忆（持久化）"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "原子单元是一个接好了检索、工具和记忆的 LLM。"
     },
     {
       "stage": "check",
       "question": "下列哪一个不是 Anthropic 的五种工作流模式之一？",
       "options": [
-        "Prompt chaining（prompt 链）",
         "Routing（路由）",
+        "Prompt chaining（prompt 链）",
         "Evaluator-optimizer（评估器-优化器）",
         "Gradient distillation（梯度蒸馏）"
       ],
@@ -42,12 +42,12 @@
       "stage": "check",
       "question": "并行化（parallelization）有哪两种形态？",
       "options": [
-        "同步和异步",
         "分区（sectioning，不同的块）和投票（voting，对同一 prompt 调用 N 次再聚合）",
+        "有状态和无状态",
         "热和冷",
-        "有状态和无状态"
+        "同步和异步"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "并行化是分区或投票；两者都扇出 N 个调用并聚合。"
     },
     {
@@ -66,24 +66,24 @@
       "stage": "post",
       "question": "按本课所说，什么时候工作流胜过 agent？",
       "options": [
-        "总是",
         "在可预测、有成本边界或有合规边界的任务上，图可以被枚举和审计",
-        "只在聊天时",
-        "只在 GPU 上"
+        "总是",
+        "只在 GPU 上",
+        "只在聊天时"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "工作流更便宜、更易调试、可审计；当步骤可知时就选它。"
     },
     {
       "stage": "post",
       "question": "本课推荐的默认起点是什么？",
       "options": [
-        "一个多 agent 框架",
-        "直接 API 调用；只在持久状态、actor 并发或角色模板能值回其成本时才加框架",
+        "构建一个自定义 MCTS",
         "微调模型",
-        "构建一个自定义 MCTS"
+        "一个多 agent 框架",
+        "直接 API 调用；只在持久状态、actor 并发或角色模板能值回其成本时才加框架"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "Schluntz 和 Zhang：从简单开始；只在有正当理由时才增加框架复杂度。"
     }
   ]
