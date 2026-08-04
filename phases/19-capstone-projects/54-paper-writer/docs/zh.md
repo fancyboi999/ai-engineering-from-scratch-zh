@@ -15,6 +15,10 @@
 - 接入一个 mock prose generator，从结构化大纲填充每个 section，使 harness 无需模型即可测试。
 - 输出一个 `paper.tex` 加 `references.bib` 加 manifest，列出每个被引用的 figure 和每个被使用的 citation。
 
+```figure
+ch-paper-skeleton
+```
+
 ## 为什么先写 skeleton
 
 从正文开始写的草稿会积累结构债。Introduction 多出三段本该放在 Related Work 里的内容。Figure 在定义之前就被引用了。Bibliography 里同一篇论文出现了三个 key。等作者发现时，重写成本已经高于写作成本了。

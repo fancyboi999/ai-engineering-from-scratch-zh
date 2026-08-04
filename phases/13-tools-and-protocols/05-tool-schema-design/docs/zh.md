@@ -121,6 +121,10 @@ GOOD : Invalid input: 'city' is required. Example: {"city": "Bengaluru"}.
 
 三者都开源；一个完整评测循环在一套中等 GPU 配置上一小时内跑完。在你的 CI 里放一个（eval 驱动开发会在后续阶段讲）。
 
+```figure
+tp-schema-routing
+```
+
 ## 实际使用
 
 `code/main.py` 交付一个工具 schema linter，按上面的规则审计注册表。它会标出：

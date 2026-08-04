@@ -93,6 +93,10 @@ M[i, j] = 1 iff there exists b where offsets[b] <= i < offsets[b+1] and offsets[
 
 2026 年的生产法则：为每个任务挑一个最大像素上限，在该上限内以原生长宽比编码，打包 batch，跳过填充。Qwen2.5-VL 暴露了 `min_pixels` 和 `max_pixels`，正是这根旋钮。
 
+```figure
+mm-patch-n-pack
+```
+
 ## 实际使用
 
 `code/main.py` 为一个异质图像 batch（整数像素坐标）实现了 patch-n'-pack。它：

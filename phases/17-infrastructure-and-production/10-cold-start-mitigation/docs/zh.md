@@ -85,6 +85,10 @@ ServerlessLLM 把存储当成一个层级：NVMe（快但大）、DRAM（中但�
 - Run:ai Model Streamer：约 2 倍权重加载提速。
 - ServerlessLLM 分层加载：延迟降 10-200 倍（论文数字）。
 
+```figure
+cold-start-pipeline
+```
+
 ## 实际使用
 
 `code/main.py` 对带和不带每种缓解的冷启动路径建模。报告总冷启动时间、warm pool 成本，以及 warm pool 开始划算的盈亏平衡请求速率。

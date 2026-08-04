@@ -109,6 +109,10 @@ server -> notifications/tasks/updated {taskId, state, progress?}
 
 SEP-1686 在 2025-11-25 发布，但更宽的路线图点出三个开放问题：持久订阅基元、子任务（父子 task 关系），以及 result-TTL 标准化。预计规范在整个 2026 年演化。生产代码应只对常见情况把 Tasks 当稳定，并对子任务的未来 SDK 变更加守卫。
 
+```figure
+tp-task-lifecycle
+```
+
 ## 实际使用
 
 `code/main.py` 实现一个持久 task 存储（文件系统后端）和一个跑在后台线程的 `generate_report` 工具。client 调那个工具，立刻拿到一个 task id，在 worker 更新进度时轮询 `tasks/status`，完成时取 `tasks/result`。取消好使；崩溃恢复靠杀掉 worker 线程并重载状态来模拟。

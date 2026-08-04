@@ -69,6 +69,10 @@ seed idea + domain
 - 实验框架：物理实验用 PyTorch 2.5，日志用 W&B
 - 可观测性：agent trace 用 Langfuse，每篇论文 30 美元的硬预算
 
+```figure
+ce-experiment-tree
+```
+
 ## 动手构建
 
 1. **种子与领域圈定。** 拿一个种子想法（如“考察 10 亿参数以下 transformer 注意力图中的稀疏模式”）。定义搜索空间：模型、数据集、算力预算。

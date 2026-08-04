@@ -59,6 +59,10 @@
 
 「Effective context engineering for AI agents」（Anthropic 2025）形式化了相邻的这门学科：200k 窗口是个预算，不是个容器。包括什么、何时压实、何时让上下文增长。在阶段 14 关于上下文压缩的课里有详细讨论（在本课程重新编号前，那是更早的阶段 14 第 06 课）。
 
+```figure
+workflow-chain
+```
+
 ## 动手构建
 
 `code/main.py` 针对一个 `ScriptedLLM` 实现全部五种工作流模式：

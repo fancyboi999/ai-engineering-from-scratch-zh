@@ -52,6 +52,10 @@
 
 Schema 字段顺序是逻辑，不是格式。
 
+```figure
+constrained-decoder
+```
+
 ## 动手构建
 
 ### 第 1 步：从零做正则约束生成

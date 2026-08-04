@@ -101,6 +101,10 @@ name mapper 本质上就是一个 `str -> str` 的函数。shape check 只是一
 
 真实 GPT-2 权重大约 0.5 GB。本课不会下载它，而是在首次运行时生成一个小型 safetensors fixture：命名完全遵守 GPT-2 习惯，但层数和宽度会缩成便于本地验证的版本（比如 12 层、`d_model=192`）。这样 fixture 的结构足以打通 loader 的所有路径。换成真实文件时，loader 本身不用改。
 
+```figure
+cc-weight-remap
+```
+
 ## 动手构建
 
 `code/main.py` 会实现：

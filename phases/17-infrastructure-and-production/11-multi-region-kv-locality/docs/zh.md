@@ -87,6 +87,10 @@ AWS Bedrock cross-region inference 在算力压力下自动把请求路由到其
 - 灾备失败：32% 缺分词器/量化配置。
 - 摩根大通 us-east-1 故障转移 2024 年 11 月：22 分钟（30 分钟 SLA）。
 
+```figure
+cache-aware-router
+```
+
 ## 实际使用
 
 `code/main.py` 在一个多区域工作负载上模拟三种路由策略（轮询、缓存感知区域内、缓存感知全局）。报告缓存命中率、TTFT P50/P99 和跨区域账单。

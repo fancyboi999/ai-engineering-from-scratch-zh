@@ -103,6 +103,10 @@ LLM 服务放在专用子网：
 - Vercel 2026：CI/CD 凭证被攻陷 → 数千个客户 env var 泄露。
 - 审计日志保留：SOC 2 = 一年，HIPAA = 六年。
 
+```figure
+i4-vault-rotation
+```
+
 ## 实际使用
 
 `code/main.py` 实现一个带一致性 token 化的玩具级 PII 擦洗器和一个仅追加的审计日志。

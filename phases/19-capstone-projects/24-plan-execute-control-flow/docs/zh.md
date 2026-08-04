@@ -14,6 +14,10 @@
 - 每次 plan 修订都发出一份 diff，好让 tracer 或 UI 看清 plan 为什么变了。
 - 强制执行两种硬预算：step 上限和 replan 上限。
 
+```figure
+cg-plan-replan
+```
+
 ## Plan and Execute，不是 chain-of-thought
 
 chain-of-thought agent 只是一直吐 token，然后把“工具调用到底在哪结束”这件事丢给 loop 去猜。plan-and-execute agent 先吐一份结构化 plan，再由 harness 按确定性方式去执行。plan 是可以被 harness 直接审视的数据，执行则是 harness 把这些数据通过 dispatcher 跑起来。

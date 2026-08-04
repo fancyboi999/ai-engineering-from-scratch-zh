@@ -64,6 +64,10 @@ flowchart TD
 
 block 严重度的发现不能被 agent 覆盖。它们只能被人覆盖，带一个记录在案的 `override_reason` 和一个 `overridden_by` 用户 id。覆盖是一次签名变更，不是一个 agent 决定。
 
+```figure
+wb-gate-sequence
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

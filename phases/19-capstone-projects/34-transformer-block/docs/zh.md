@@ -72,6 +72,10 @@ position-wise MLP 会把同一个两层网络独立地应用到每个 token 上�
 
 它做了两件事。第一，它让梯度能沿着“加法路径”跨深度传递，保持 12 层堆叠下的梯度规模。第二，它让每个 block 学的是对当前表示的“增量更新”，而不是整块重写。也正因如此，block 才能扩到深层。
 
+```figure
+cc-transformer-block
+```
+
 ## 动手构建
 
 `code/main.py` 会实现：

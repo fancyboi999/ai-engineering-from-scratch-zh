@@ -92,6 +92,10 @@ VideoAgent 在 2 小时以上能追平或胜过原始上下文模型，因为只
 
 这把硬上上下文用于全局理解、检索用于局部细节结合起来。
 
+```figure
+mm-video-token-budget
+```
+
 ## 实际使用
 
 `code/main.py`：

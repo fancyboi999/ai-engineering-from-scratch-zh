@@ -32,6 +32,10 @@ graph TD
 
 Hugging Face 的 `datasets` 库是 AI 工作里加载数据的标准方式。它开箱就处理好下载、缓存、格式转换和流式读取。
 
+```figure
+s0-data-pipeline
+```
+
 ## 动手构建
 
 ### 第 1 步：安装 datasets 库

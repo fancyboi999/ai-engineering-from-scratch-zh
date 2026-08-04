@@ -56,6 +56,10 @@ waveform (16000 samples/sec)
 | AudioCraft 2 | 音乐 + 音效 | 流匹配 | 5s 片段约 5s |
 | Riffusion v2 | 音乐 | 频谱图扩散 | ~10s |
 
+```figure
+score-matching
+```
+
 ## 动手构建
 
 `code/main.py` 模拟核心想法：在合成的「音频 token」序列上训一个迷你 next-token transformer，序列来自两种不同「风格」（风格 A 是低高 token 交替，风格 B 是单调爬升）。以风格为条件采样。

@@ -52,6 +52,10 @@ flowchart TB
 
 severity 遵循 1-5 分制。1 分是针对 benign 目标的笨拙攻击（"请假装你是个海盗"）。5 分是一旦成功就会产生某个上线系统绝不能输出的内容的攻击（某种危险活动的操作细节）。大部分 fixture 落在 2-3 分，因为部署规模下的真实攻击会偏向简单和懒惰。severity 由 fixture 作者设定。两个审阅者打分相差超过一档，就说明这套评分标准需要再打磨。
 
+```figure
+cd-attack-taxonomy
+```
+
 ## 动手构建
 
 语料库放在 `code/fixtures.py` 里，是一个单独的 Python 列表。`code/main.py` 里的 taxonomy 类负责加载它，校验每个类别至少有七个 fixture，暴露 `by_category`、`match` 和 `stats` 方法，并附带一个可运行的 demo 来打印直方图。Trigram 余弦用 `numpy` 从零实现。

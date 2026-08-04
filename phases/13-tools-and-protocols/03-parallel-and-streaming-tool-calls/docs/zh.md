@@ -110,6 +110,10 @@ call_C: 中等的 API，第三个返回
 
 如果模型本身流式输出，你可以在某个调用的参数一完整就开始执行它，而不必等所有调用都敲定。这是 OpenAI 有文档的一项优化，但不是所有 SDK 都暴露它。本课的脚手架做了：模拟流一产出完整参数对象，宿主就启动那个调用。
 
+```figure
+tp-parallel-fanout
+```
+
 ## 实际使用
 
 `code/main.py` 有两半。第一半用 `concurrent.futures.ThreadPoolExecutor` 把三个模拟天气调用串行和并行各跑一遍，并打印墙钟时间。第二半重放一个假的流式响应——三个并行调用的 `arguments` 分块在一股流上交错——并用 `StreamAccumulator` 按 id 把它们重组。没有 LLM、没有网络，只有重组逻辑。

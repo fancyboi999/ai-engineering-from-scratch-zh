@@ -68,6 +68,10 @@ flowchart TD
 
 通过 `O_APPEND` 并发写一个文件，在 POSIX 上对字节对齐的写入是可行的，但实际中一个 shard 内的 offset 跨越 MB 级区域，锁就成了主导。每 rank 一个文件没有争用，且当底层文件系统是并行的（Lustre、GPFS）时能受益于条带化。正因如此，生产栈（DeepSpeed、FSDP、NeMo）全都用每 rank 一个文件。
 
+```figure
+ci-sharded-checkpoint
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

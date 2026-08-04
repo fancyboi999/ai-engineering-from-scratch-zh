@@ -101,6 +101,10 @@ agent-C ──pub────▶ │                  │ ──▶ agent-F (sub
 
 没有这种隔离，verifier 的输出就成了池子里的新条目，于是一个被毒的池子会毒到 verifier，进而毒到它的验证。
 
+```figure
+swarm-blackboard
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库 Python 实现了两种拓扑，外加一次玩具投毒攻击和三种缓解手段。

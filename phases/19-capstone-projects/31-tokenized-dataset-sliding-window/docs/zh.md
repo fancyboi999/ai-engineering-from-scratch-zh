@@ -14,6 +14,10 @@
 - 再用带每轮固定随机种子的 DataLoader 包住它。
 - 理解 stride、冗余和有效数据集大小之间的权衡。
 
+```figure
+cap-sliding-window
+```
+
 ## 框架
 
 预训练每次读一批 token ids，更新一次模型。每个 batch 的形状早被训练契约钉死。对 causal LM 来说，batch 包含 `(B, T)` 的 input ids 和 `(B, T)` 的 target ids，其中 target 只是 input 左移一位。数据管线的职责，就是从可能数 GB 的原始文本中，稳定、可复现地按需产出这种形状。

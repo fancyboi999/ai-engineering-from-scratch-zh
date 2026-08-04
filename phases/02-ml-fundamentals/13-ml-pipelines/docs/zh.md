@@ -258,6 +258,10 @@ flowchart TD
 | 没有数据校验 | 坏数据上悄无声息地预测错 | 预测前加 schema 检查 |
 | 训练/服务偏差 | 模型在生产里看到不同的特征 | 训练和服务共用一个 Pipeline 对象 |
 
+```figure
+f3-pipeline-flow
+```
+
 ## 动手构建
 
 `code/pipeline.py` 里的代码从零构建一条完整的 ML 流水线：

@@ -64,6 +64,10 @@ schema 覆盖：
 
 当 schema 变化时，在 schema 升级旁边发一个迁移脚本。状态文件带一个 `schema_version` 字段；管理器拒绝加载一个它迁移不了的版本的文件。
 
+```figure
+wb-state-persist
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

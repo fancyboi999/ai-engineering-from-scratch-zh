@@ -35,6 +35,10 @@ graph TD
 
 三样东西同时跑。一个终端。你可以分离（detach）、回家、再 SSH 回来、重新接上（reattach）。训练一直在跑。
 
+```figure
+s0-shell-pipeline
+```
+
 ## 动手构建
 
 ### 第 1 步：了解你的 shell

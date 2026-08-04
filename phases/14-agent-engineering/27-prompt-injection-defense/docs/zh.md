@@ -65,6 +65,10 @@ LLM 没法可靠地区分来自用户的指令和来自被检索内容的指令�
 - **只靠指令遵循。** 「system prompt 说忽略不可信指令」不是强制。
 - **过度信任被检索的记忆。** 昨天的 agent 写了一条被投毒的记忆笔记；今天的 agent 读了它。
 
+```figure
+injection-hijack
+```
+
 ## 动手构建
 
 `code/main.py` 实现 PVE：

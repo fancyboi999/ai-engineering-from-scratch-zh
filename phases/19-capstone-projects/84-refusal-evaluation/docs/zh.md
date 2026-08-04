@@ -38,6 +38,10 @@ under-refusal：在标签集合标为 `unsafe` 的 prompt 上模型回答了（�
 
 按类别拆分把已标注的 prompt 与第 82 课的 taxonomy 产物 join 起来。每条 unsafe prompt 都带一个类别标签（六类之一）。框架报告每个类别的 under-refusal 率，这样团队就能看到，比如说，模型把 `instruction-override` 处理得很好，但在 `multi-turn-ramp` 上掉链子。
 
+```figure
+ci-refusal-quadrant
+```
+
 ## 动手构建
 
 `code/mock_llm.py` 定义三个 policy。每个 policy 是一个把 prompt 映射成响应字符串的可调用对象。响应里把模型的置信度嵌成 `[conf=0.X]`。`code/prompts.py` 是一份已标注语料库：25 条 unsafe prompt（按 id 从第 82 课的 taxonomy 里取），外加 30 条 safe prompt（日常 benign 的请求，与第 83 课的 benign 集合不重叠，这样两次评估保持独立）。

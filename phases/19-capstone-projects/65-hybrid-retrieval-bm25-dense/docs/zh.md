@@ -62,6 +62,10 @@ BM25 分数无上界，且依赖 corpus。余弦相似度被限定在 -1 到 1 �
 
 这跟你在 Vespa 和 Weaviate 文档里听到的关于 RankFusion vs RRF 的说法是同一套论证。它们得出了同一个结论：除非你有非常强的证据要去插值分数，否则就老老实实留在 rank 这一边。
 
+```figure
+rrf-fusion
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

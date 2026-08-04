@@ -94,6 +94,10 @@
 - Kong 定价：$100/模型/月，Plus 档最多 5 个。
 - Cloudflare/Vercel：边缘上 1-3 ms 开销。
 
+```figure
+mx-gateway-fallback
+```
+
 ## 实际使用
 
 `code/main.py` 在注入 429/5xx 的情况下，跨 3 家供应商模拟带回退的网关路由。报告延迟、重试率和回退命中率。

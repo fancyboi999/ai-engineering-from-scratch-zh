@@ -97,6 +97,10 @@ Sibyl 框架（在 Minsky-LLM 文献里被引用）把「陪审团」形式化�
 - 轮数无界。从众每次都赢。
 - 任务简单。一个带 N=5 自洽性的单 agent 更便宜、且一样准。
 
+```figure
+sw-debate-topology
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

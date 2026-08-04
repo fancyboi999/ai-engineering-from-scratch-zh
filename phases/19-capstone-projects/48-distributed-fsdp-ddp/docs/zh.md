@@ -74,6 +74,10 @@ flowchart LR
 
 CUDA 是生产目标，但同样的代码路径在 CPU 上也存在。`gloo` 是 CPU collective 后端。它比 GPU 上的 `nccl` 慢几个数量级，但 API 面完全一样。本课的 process group 用 `backend="gloo"` 初始化，rank 用 `torch.multiprocessing` 而非 `torchrun` 启动；两者最终调的都是相同的 `torch.distributed` 接口。在多 GPU 节点上，唯一的变化是 `backend="nccl"`、tensor 放到设备上，以及用 `torchrun` 来启动。
 
+```figure
+cg-allreduce-ring
+```
+
 ## 动手构建
 
 `code/main.py` 是可运行的产物。

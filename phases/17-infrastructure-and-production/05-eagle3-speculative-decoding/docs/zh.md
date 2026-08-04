@@ -70,6 +70,10 @@ Google 在 2025 年把 speculative decoding 部署进了 AI Overviews（质量�
 - 没有领域训练草稿头的专门领域。Alpha 太低。
 - vLLM v0.18.0 加草稿模型 spec decode 加 `--enable-chunked-prefill`。这个组合编译不过。有文档的例外是 V1 里的 N-gram GPU spec decode。
 
+```figure
+mx-speculative-tree
+```
+
 ## 实际使用
 
 `code/main.py` 在一段 alpha 值和草稿长度 K 的范围上，模拟带和不带 speculative decoding 的 decode 循环。它打印盈亏平衡 alpha、实测加速比和尾部行为。在几个 (alpha, K) 组合上跑它，看看 speculative decoding 到底在哪里不再划算。

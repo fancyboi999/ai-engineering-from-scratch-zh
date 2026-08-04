@@ -42,6 +42,10 @@ Hypothesis
 
 `baseline_ref` 可选但推荐。第53课的 evaluator 需要一个 baseline 来做对比。如果假设省略了，evaluator 会退回到相同指标上的上一次 run。
 
+```figure
+cg-novelty-ramp
+```
+
 ## 架构
 
 ```mermaid

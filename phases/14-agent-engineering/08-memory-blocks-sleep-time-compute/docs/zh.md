@@ -74,6 +74,10 @@ Letta V1（`letta_v1_agent`，2026）废弃了 `send_message`/heartbeat 和内�
 - **静默漂移。** sleep-time agent 重写了一个块，主 agent 却毫不知情。给块加版本，在轨迹里暴露 diff。
 - **被投毒的整合。** sleep-time agent 把攻击者可触达的内容加工进了 core。第 27 课同样适用于 sleep-time 接触面。
 
+```figure
+memory-blocks
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

@@ -111,6 +111,10 @@ Orchestrator = ({state, last_speaker}) -> next_agent
 
 全部都能在原语之上实现。它们都不是新的原语。
 
+```figure
+a5-primitive-radar
+```
+
 ## 动手构建
 
 `code/main.py` 用约 150 行标准库 Python 实现了这四个原语。没有真实 LLM——每个 agent 都是一段脚本化策略，好让焦点停留在协调结构上。

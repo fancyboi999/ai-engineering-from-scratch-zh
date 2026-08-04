@@ -114,6 +114,10 @@ Tool(
 
 生产团队把这个翻译器包进 `AbstractToolset`（Pydantic AI）、`UniversalToolNode`（LangGraph）或 `BaseTool`（LlamaIndex）。阶段 13 · 17 交付一个网关，在三者之中任意一个前面暴露一套 OpenAI 形状的 API。
 
+```figure
+function-call-args
+```
+
 ## 实际使用
 
 `code/main.py` 定义一个规范化的 `Tool` dataclass 和三个翻译器，分别吐出 OpenAI、Anthropic、Gemini 的声明 JSON。它接着把每种形状一份手工编造的 provider 响应解析成同一个规范化的调用对象，证明它们皮下的语义是一致的。跑一跑，把三份声明并排 diff。

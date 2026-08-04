@@ -67,6 +67,10 @@ LangGraph 用嵌套的 `create_supervisor` 调用。内层 supervisor 有自己�
 
 参考：https://reference.langchain.com/python/langgraph-supervisor。
 
+```figure
+swarm-hierarchy-token
+```
+
 ## 动手构建
 
 `code/main.py` 跑一个 3 层的层级：

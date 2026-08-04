@@ -116,6 +116,10 @@ Anthropic 的多 agent 研究系统用「彩虹部署」：多个版本的 agent
 - 有状态负载的彩虹/canary 部署。
 - 可观测性：每 agent 轨迹、super-step 审计、重试计数器。
 
+```figure
+sw-checkpoint-replay
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

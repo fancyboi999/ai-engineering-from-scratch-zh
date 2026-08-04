@@ -49,6 +49,10 @@ Massive Text Embedding Benchmark——发布时（2022）8 种任务类型下的
 
 大多数生产栈三种都用。
 
+```figure
+gx-matryoshka
+```
+
 ## 动手构建
 
 ### 第 1 步：基线——用 Sentence-BERT 做稠密嵌入

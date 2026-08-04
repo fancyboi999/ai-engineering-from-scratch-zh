@@ -89,6 +89,10 @@ Large-v3-turbo（2024）把解码器从 32 层砍到 4 层。解码快 8 倍，W
 | TTS | Piper、XTTS-v2、Kokoro | 编码器-解码器模式，但是 Whisper 形状 |
 | 音频 + 语言 | AudioLM、SeamlessM4T | 文本 token + 音频 token 在一个 transformer 里 |
 
+```figure
+n5-mel-decode
+```
+
 ## 动手构建
 
 见 `code/main.py`。我们不训练 Whisper——我们搭 log-mel 频谱图流水线 + 任务 token prompt 格式器。这些才是你在生产里真正会碰的部分。

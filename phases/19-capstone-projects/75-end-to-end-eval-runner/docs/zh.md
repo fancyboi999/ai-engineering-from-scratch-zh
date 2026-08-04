@@ -15,6 +15,10 @@
 - 发出逐模型的 `EvalRun` 记录，直接喂进 leaderboard 聚合器。
 - 同时输出一份 JSON 报告和一张 markdown 表；干净跑通时以退出码零自终止，校验或运行失败时非零。
 
+```figure
+eval-grid
+```
+
 ## 这条 pipeline
 
 ```mermaid

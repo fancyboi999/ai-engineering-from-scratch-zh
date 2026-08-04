@@ -59,6 +59,10 @@ LSH 把 `k` 个分量分成 `b` 个 band，每个 band 有 `r` 个 row，其中 
 
 下载器唯一的持久化输出就是 manifest。Manifest 里每个分片记录：URL、解压后字节数、文档数、去重后的唯一文档数，以及最终分片文件的 sha256。下游 tokenization 读 manifest，不是读目录列表。如果某个分片缺失或 sha256 不对，manifest 会告诉下一个阶段拒绝启动。Manifest 就是"数据下载完了"和"数据下载完了且可验证"之间的分界线。
 
+```figure
+cap-corpus-downloader
+```
+
 ## 构建
 
 `code/main.py` 实现：

@@ -82,6 +82,10 @@ Locust 用 Python，在 GIL 下客户端跑分词。高并发下分词器排在�
 - 典型 CI 闸门：每 PR 30-50 次迭代。
 - 四种模式：稳态、爬坡、尖峰、浸泡。
 
+```figure
+load-pattern-waves
+```
+
 ## 实际使用
 
 `code/main.py` 用真实 prompt 分布模拟一次压测，测量有效 TPOT，并演示一致性 prompt 陷阱。

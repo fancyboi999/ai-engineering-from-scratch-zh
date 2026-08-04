@@ -66,6 +66,10 @@ OpenHands 的作者和 Epoch AI 都指出，SWE-bench Verified 有一条简单�
 
 选 agent 的含义是：在你自己的 bug 待办里跑一个类 Pro 的子集。要紧的分数，是在那些代表你实际交付内容的任务上的分数。
 
+```figure
+a5-scaffold-delta
+```
+
 ## 实际使用
 
 `code/main.py` 在一个固定的迷你任务分布上对比两个玩具 agent 脚手架：

@@ -54,6 +54,10 @@ NCCL 跑在 PCIe 和 NVLink 上，归约由硬件 offload。在 CPU 上你没这
 
 每个原语落地时都带一个单元测试，把它的输出和用 gloo backend 初始化、跑在同样 world size 同一张张量上的 `torch.distributed` 做对比。如果你的 ring allreduce 和 gloo 的偏差超过 float32 epsilon，测试就失败。拿参考实现来验证这件事没得商量；没有它，原语会一直看起来正确，直到真实训练跑到第 10000 步才露馅。
 
+```figure
+ci-ring-allreduce
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

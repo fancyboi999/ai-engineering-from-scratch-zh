@@ -66,6 +66,10 @@ model card (2026 MOF) + safety eval (Llama Guard 4)
 - 基础设施：Kubernetes + NVIDIA device plugin，按 queue-wait 指标做 HPA
 - 可观测性：训练用 W&B，推理用 Langfuse
 
+```figure
+ce-finetune-stages
+```
+
 ## 动手构建
 
 1. **数据流水线。** 在原始语料上跑 Datatrove 去重。施加 Nemotron-CC 风格的质量分类器。Presidio 擦洗 PII。用明确的随机种子写出 train/val 切分。

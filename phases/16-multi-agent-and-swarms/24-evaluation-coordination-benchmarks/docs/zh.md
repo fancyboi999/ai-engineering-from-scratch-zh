@@ -86,6 +86,10 @@ AAAI 2026 Bridge Program —— 多 agent 协调研讨会（Workshop on Multi-Ag
 
 为你真正在意的那条轴构建自己的内部基准，往往才是正确的做法。
 
+```figure
+a5-bench-gap
+```
+
 ## 动手构建
 
 `code/main.py` 是一个非交互的演练：

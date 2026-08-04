@@ -66,6 +66,10 @@ LibriTTS test-clean 上的 2026 年数字：
 | Kokoro v0.19 | 3.87 | 1.8% | 82M |
 | Parler-TTS Large | 3.76 | 2.8% | 2.3B |
 
+```figure
+sp-tts-stack
+```
+
 ## 动手构建
 
 ### 第 1 步：把输入转成音素

@@ -45,6 +45,10 @@ agent 的 policy 是个状态机，一共 5 个状态：
 
 fixture bug 是 `fizz.py` 里的一个 off-by-one。确定性 policy 通过正则解析测试失败信息，构造修复后的文件内容。以后换成 LLM，也只是把“谁来决定修什么”换掉，harness 契约完全不变。
 
+```figure
+cg-harness-weave
+```
+
 ## 架构
 
 ```mermaid

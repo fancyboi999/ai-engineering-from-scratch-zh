@@ -70,6 +70,10 @@ Large-v3 有 15.5 亿参数。Turbo 用 4 层解码器（从 32 层砍下来）�
 
 社区结果：在 20 小时医疗口述上微调 Medium，医疗词汇上的 WER 从 12% 降到 4.5%。在 4 小时冰岛语上微调 Turbo，WER 从 18% 降到 6%。
 
+```figure
+sp-asr-attention
+```
+
 ## 动手构建
 
 ### 第 1 步：开箱即用跑 Whisper

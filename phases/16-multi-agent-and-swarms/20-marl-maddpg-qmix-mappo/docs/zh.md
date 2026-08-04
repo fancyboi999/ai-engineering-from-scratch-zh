@@ -97,6 +97,10 @@ QMIX 为何在 SMAC 上赢：合作式星际微操有同质 agent、本地观测
 
 训练真实网络是 Phase 09 的话题。本课构建脚本化策略版本，在不做梯度更新的情况下演示 CTDE、价值分解、集中价值这三个模式。目标是在你拿起一个完整 MARL 库（PyMARL、MARLlib、RLlib multi-agent）之前先把模式内化。
 
+```figure
+sw-ctde
+```
+
 ## 动手构建
 
 `code/main.py` 实现三个模式演示，都在一个微小的 2-agent 合作网格世界上：

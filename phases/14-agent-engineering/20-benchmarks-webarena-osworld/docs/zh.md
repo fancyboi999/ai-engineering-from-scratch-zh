@@ -61,6 +61,10 @@ Claude computer use、OpenAI CUA、Gemini 2.5 Computer Use（第 21 课）全都
 - **忽略轨迹长度。** 只给成功率打分会错过 OSWorld-Human 揭示的 1.4-2.7 倍步数低效。
 - **过时的自托管应用。** WebArena 的应用钉死了特定版本；更新而不重新策划会破坏可比性。
 
+```figure
+ae-agent-human-gap
+```
+
 ## 动手构建
 
 `code/main.py` 实现一个玩具网页 agent harness：

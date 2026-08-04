@@ -46,6 +46,10 @@ router 取各 classifier 中的最大 severity，并应用对应的动作。bloc
 
 toxicity classifier 故意做成基于规则的：一份精挑的骚扰关键词列表，配以以空白为边界的匹配，外加一个小小的否定窗口检查，这样 "you are not a slur" 不会触发规则。这份列表故意做得很短（本课讲的是管道铺设，不是词库建设）。PII classifier 对常见形状用标准正则。instruction-leakage classifier 在构造时接收一个 `system_prompt` 参数，并把它与输出做 trigram 重叠度对比；高重叠就是泄露信号。
 
+```figure
+cd-output-router
+```
+
 ## 动手构建
 
 `code/classifiers.py` 定义全部三个 classifier。每个都有一个 `classify(text) -> ClassifierVerdict` 方法和一个 `redact(text) -> str` 方法。`code/main.py` 定义 `Router` 类，含 `decide(text, verdicts) -> Action` 和一个 `run(text) -> Action` 快捷方法。demo 把三个 classifier 接在一个 router 后面，并跑一份精心构造的小语料库，逐一触发每个 severity。

@@ -14,6 +14,10 @@
 - 预留并保护特殊 token（`<|endoftext|>`、`<|pad|>`），保证它们在训练和解码中不会被破坏。
 - 解释为什么对通用 tokenizer 来说，byte-level alphabet 是正确的下限。
 
+```figure
+cap-bpe-merge
+```
+
 ## 框架
 
 语言模型从来没见过文本，它只见过整数。把字符串映射到整数列表，再从整数列表映回字符串的那一层，就是 tokenizer。这里一旦做错，后面所有 loss curve 测到的都是错东西。

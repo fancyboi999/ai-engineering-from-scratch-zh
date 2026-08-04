@@ -15,6 +15,10 @@
 - 对那些会从一个模型采样多份生成的任务，计算 pass-at-k。
 - 把 sandbox 崩溃、语法错误、超时都当成一等公民式的失败模式，配上各自不同的、runner 能记录的退出码。
 
+```figure
+sandbox-runner
+```
+
 ## 为什么要用隔离子进程
 
 内联 `exec` 是安全和稳定性上的隐患。一段生成出来的 `while True: pass` 会把 eval 永远卡死。一段生成出来的 `import shutil; shutil.rmtree('/')`，灾难程度跟字面意思一模一样。修复办法是：每个候选都新起一个全新的 Python 解释器，从 stdin 把代码传进去，把断言结果写到 stdout，超时就杀掉进程。宿主 eval 进程照常运行。

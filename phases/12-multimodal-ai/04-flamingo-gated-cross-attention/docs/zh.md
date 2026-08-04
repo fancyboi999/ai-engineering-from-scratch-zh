@@ -108,6 +108,10 @@ Otter（2023）在 OpenFlamingo 基础上用 MIMIC-IT（一个多模态指令数
 
 预算有限做单图 VQA 选 BLIP-2。做交错、少样本或多图推理选 Flamingo/Idefics2。
 
+```figure
+cross-attention-fusion
+```
+
 ## 实际使用
 
 `code/main.py` 演示：

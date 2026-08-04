@@ -27,6 +27,10 @@
 
 用 **ROUGE**（Recall-Oriented Understudy for Gisting Evaluation）评估。ROUGE-1 和 ROUGE-2 给一元组和二元组重叠打分。ROUGE-L 给最长公共子序列打分。越高越好，但 40 ROUGE-L 是"不错"，50 是"卓越"。每篇论文三个都报。用 `rouge-score` 包。
 
+```figure
+summarize-collapse
+```
+
 ## 动手构建
 
 ### 第 1 步：TextRank（抽取式）

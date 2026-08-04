@@ -73,6 +73,10 @@ E[accepted] = (1 - α^(N+1)) / (1 - α)
 
 2026 年生产里：vLLM 和 SGLang 在可用时默认 EAGLE-3，否则 EAGLE-2。TensorRT-LLM 对 Meta 和 NVIDIA 公开模型有最快的 Medusa 路径。llama.cpp 为 CPU 部署装原版 draft。
 
+```figure
+l5-spec-decode-eagle
+```
+
 ## 动手构建
 
 见 `code/main.py`。这是完整的 Leviathan 推测循环，带所有部件：起草 N 个、验证器并行传播、按位置拒绝、残差采样、bonus token、KV 回滚，以及对输出分布匹配直接从 `q` 采样的经验验证。

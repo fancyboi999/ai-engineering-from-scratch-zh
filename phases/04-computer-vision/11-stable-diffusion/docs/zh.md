@@ -104,6 +104,10 @@ LoRA 就是几乎每个社区微调的分发方式。CivitAI 和 Hugging Face �
 
 换调度器在 `diffusers` 里是一行改动，有时不用任何重训就能修好样本问题。
 
+```figure
+cv3-latent-compression
+```
+
 ## 动手构建
 
 这一课端到端用 `diffusers`，而不是从零重建 Stable Diffusion。你要重建的部件（VAE、文本编码器、U-Net、调度器）各自是单独课程的主题；这里的目标是熟练掌握生产 API。

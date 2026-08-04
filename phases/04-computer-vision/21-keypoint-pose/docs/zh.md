@@ -87,6 +87,10 @@ OpenPose 用于自底向上关联的诀窍。对每一对相连的关键点（�
   - 从图像直接回归 3D（PyMAF、MHFormer）。
   - 多视角设置（CMU Panoptic）拿真值。
 
+```figure
+cv3-pose-heatmap
+```
+
 ## 动手构建
 
 ### 第 1 步：高斯热图目标

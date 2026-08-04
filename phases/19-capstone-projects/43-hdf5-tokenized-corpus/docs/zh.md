@@ -56,6 +56,10 @@ Token dataset 创建时用 `maxshape=(None,)` 和固定的 `chunks=(chunk_size,)
 
 Dataloader 是唯一知道训练序列长度的阶段。它在全局 token 流中随机选一个起始索引，读取 `window_size + 1` 个 token，返回 `(input, target) = (tokens[:-1], tokens[1:])`。不强制文档边界：一个窗口可能跨越两个文档，中间用显式的 `boundary_token_id` 分隔，让模型学会使用分隔符。这是标准 packing 规则；也是初学者最容易忘的规则——结果语料有 8% 是训练边界 token，92% 才是自然文本。
 
+```figure
+cc-hdf5-corpus
+```
+
 ## 构建
 
 `code/main.py` 实现：

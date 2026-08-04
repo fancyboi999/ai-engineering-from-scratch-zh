@@ -113,6 +113,10 @@ DPO 的实现必须小心处理 reference model。Reference 就是冻结住的 S
 - Reference 的每个参数都设 `requires_grad=False`。
 - 在 reference 构建完成后，通过 `policy.load_state_dict(reference.state_dict())` 构造 policy。
 
+```figure
+cap-dpo-preference
+```
+
 ## 架构
 
 ```mermaid

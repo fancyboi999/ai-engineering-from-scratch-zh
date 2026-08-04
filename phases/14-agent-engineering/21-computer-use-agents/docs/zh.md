@@ -75,6 +75,10 @@
 - **敏感动作上没有确认。** 登录、购买、删文件没有 human-in-the-loop 是个责任风险。
 - **长跨度没有可观测性。** 一次 200 次点击的运行在第 180 次点击失败，没有逐步 trace 就没法调试。
 
+```figure
+computer-use-cursor
+```
+
 ## 动手构建
 
 `code/main.py` 模拟视觉 agent 循环：

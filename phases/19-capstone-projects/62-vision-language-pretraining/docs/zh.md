@@ -66,6 +66,10 @@ decoder 通过 cross-attention 消费 image memory token，在每个位置预测
 
 mock 语料是一个合成的 200 对集合，图像是随机的，caption id 也是随机的。batch size 16 跑 50 步 SGD 之后，两个 loss 都明显下降，即便其绝对值仍高于真实数据模型能达到的水平。demo 的意义是确认梯度管路端到端打通，以及加上 LM loss 不会让对比目标失稳。
 
+```figure
+ch-infonce-diagonal
+```
+
 ## 动手实现
 
 `code/main.py` 实现了：

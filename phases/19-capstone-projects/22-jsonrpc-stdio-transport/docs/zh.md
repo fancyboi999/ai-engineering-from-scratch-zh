@@ -14,6 +14,10 @@
 - 每一行最多吞掉一个 parse error，不能把后续整条流一起毒死。
 - 用 `io.BytesIO` 做一个可自终止 demo，让这节课不用起子进程也能跑。
 
+```figure
+cf-jsonrpc-frames
+```
+
 ## 为什么 JSON-RPC 还在当通用语
 
 2026 年，一个 coding agent 在一场 session 里会同时跟十来个 tool server 说话。每个 server 要么是单独的进程，要么是远端 endpoint。线上的线协议其实十多年都没怎么变：JSON-RPC 2.0 还是那套。它能活到现在，不是因为完美，而是因为它两页纸、足够对称，而且不强迫你在 streaming、batching、transport coupling 里三选一。

@@ -78,6 +78,10 @@ class DecoderBlock:
       return text_tokens
 ```
 
+```figure
+ch-crossattn-fan
+```
+
 ## 动手实现
 
 `code/main.py` 实现了：

@@ -171,6 +171,10 @@ MCP 是 Anthropic 关于工具互操作的开放标准。不再是每个应用�
 
 MCP 之于 function calling，就像 HTTP 之于网络。它标准化了传输层，让工具变得可移植。
 
+```figure
+mx-tool-call-loop
+```
+
 ## 动手构建
 
 ### 第 1 步：定义工具注册表

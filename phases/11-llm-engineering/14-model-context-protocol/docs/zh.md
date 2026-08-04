@@ -41,6 +41,10 @@ Model Context Protocol 把那个矩阵压平。一套基于 JSON-RPC 的规范�
 - 不是 agent 框架。MCP 是管道；LangGraph、PydanticAI、OpenAI Agents SDK 这类框架坐在它之上。
 - 不绑定 Anthropic。规范和参考实现在 `modelcontextprotocol` 组织下开源。
 
+```figure
+mcp-nxm-collapse
+```
+
 ## 动手构建
 
 ### 第 1 步：一个最小的 MCP server

@@ -46,6 +46,10 @@ Improvement 是带符号的。higher_is_better 的 metric 上 improvement 为负
 
 一个固定阈值（`improvement_threshold=0.02`，即 2%）决定变化是否大到值得宣布。低于这个阈值，verdict 就是 "noise"，不管 p 值如何——循环对用户无法感知的变化不感兴趣。
 
+```figure
+cg-paired-verdict
+```
+
 ## 架构
 
 ```mermaid

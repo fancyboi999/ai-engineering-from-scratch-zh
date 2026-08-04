@@ -66,6 +66,10 @@ HITL 的默认 UI（"Approve" / "Reject" 按钮）产出没有真正审查的飞
 
 第 14 条强制要求欧盟高风险 AI 系统有有效的人类监督。"有效"不是装饰。监管措辞明确排除了橡皮图章模式。带挑战-应答的先提议后提交，正是在 Microsoft Agent Governance Toolkit 合规文档里能扛过第 14 条审视的那个形态。
 
+```figure
+mx-propose-then-commit
+```
+
 ## 实际使用
 
 `code/main.py` 用标准库 Python 实现了一个先提议后提交的状态机。持久存储是一个 JSON 文件。幂等键是 (thread_id, action_signature) 的哈希。驱动程序模拟三个案例：一个干净的批准流程、一次瞬时失败后的重试（必须不重复执行），以及一个橡皮图章默认 对比 一个挑战-应答流程。

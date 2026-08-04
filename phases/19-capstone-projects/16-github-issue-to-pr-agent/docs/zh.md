@@ -65,6 +65,10 @@ GitHub issue labeled `@agent fix` or PR comment
 - 可观测性：Langfuse，每 PR 一份 trace 归档，从 PR 正文链过去
 - 预算：每仓库每天的美元上限；每仓库每天最大 PR 数
 
+```figure
+cf-issue-to-pr
+```
+
 ## 动手构建
 
 1. **GitHub App。** 细粒度安装 token：issues 读+写、pull_requests 写、contents 读+写、workflows 读。分支保护（唯一能干这事的面）强制“不直接推 `main`”和“不许 force-push”；app 不在 bypass 列表里。worker 把“不写 `.github/workflows` 下的文件”作为对提议 diff 的白名单检查来强制，因为 GitHub App 权限不是路径级的。

@@ -322,6 +322,10 @@ graph LR
 
 选对技术取决于三个因素：准确率要求、延迟预算和成本容忍度。对大多数生产系统来说，few-shot CoT 配上 3 采样的 self-consistency 兜底，能覆盖 90% 的用例。
 
+```figure
+few-shot-curve
+```
+
 ## 动手构建
 
 我们要构建一个数学解题器，把 few-shot prompting、思维链推理和 self-consistency 表决合进单条流水线。然后再为难题加上 tree-of-thought。

@@ -227,6 +227,10 @@ flowchart LR
 
 这条流水线永远不会"完工"。数据分布漂移、新异常类型出现、阈值需要调整。把异常检测当作一个活的系统，而不是一次性模型。
 
+```figure
+f3-anomaly-fence
+```
+
 ## 动手构建
 
 `code/anomaly_detection.py` 里的代码从零实现 Z-score、IQR 和孤立森林。

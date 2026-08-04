@@ -69,6 +69,10 @@ PwC 报告（CrewAI 部署，2025）称，加上一个结构化校验循环把�
 - **AutoGen** —— 在 GroupChat 里用单词命名的角色专属 ConversableAgent。
 - **OpenAI Agents SDK** —— 角色专精 Agent 之间的 handoff 工具。
 
+```figure
+swarm-roles
+```
+
 ## 动手构建
 
 `code/main.py` 实现了一条 4 角色流水线，构建一个简单的 Python 函数：

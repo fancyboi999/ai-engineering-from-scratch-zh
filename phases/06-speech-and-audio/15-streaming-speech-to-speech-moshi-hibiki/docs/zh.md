@@ -72,6 +72,10 @@ Sesame CSM（2025）用了类似的想法——一个 Llama-3 骨干配 Mimi 编
 | GPT-4o Realtime | ~300 ms | 闭源，OpenAI API | 商用 |
 | Gemini 2.5 Live | ~350 ms | 闭源，Google API | 商用 |
 
+```figure
+sp-fullduplex
+```
+
 ## 动手构建
 
 ### 第 1 步：接口

@@ -50,6 +50,10 @@
 - 中文、日语等语言里的零回指。
 - 前指（代词在指称之前）："When **she** walked in, Mary smiled."
 
+```figure
+coref-links
+```
+
 ## 动手构建
 
 ### 第 1 步：预训练的神经共指（AllenNLP / spaCy-experimental）

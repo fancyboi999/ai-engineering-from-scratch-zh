@@ -56,6 +56,10 @@ flowchart TD
 
 Schedule 是训练健康的一半。Gradient norm 是另一半。训练循环每步都记录两者。发散的训练在 gradient norm spike 时就会暴露，比 loss 更早；调得好的 warmup 会让 norm 随学习率线性上升；peak 太激进会表现为 warmup 结束后 norm 居高不下。磁盘上的数据集是 `step, lr, grad_l2_norm, loss`。CSV 是唯一的持久记录。
 
+```figure
+cap-cosine-warmup
+```
+
 ## 构建
 
 `code/main.py` 实现：

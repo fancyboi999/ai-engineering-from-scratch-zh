@@ -65,6 +65,10 @@ Self-Refine（第 05 课）是一个模型批判自己 —— 有群体思维的
 - **hub 失效。** 在星形拓扑里，一个坏 hub 污染所有人。轮换或用多个 hub。
 - **prompt 同质化。** 所有 agent 用同样的 prompt；它们产出同样的答案。用多样的 prompt 和/或模型。
 
+```figure
+debate-converge
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库实现辩论：

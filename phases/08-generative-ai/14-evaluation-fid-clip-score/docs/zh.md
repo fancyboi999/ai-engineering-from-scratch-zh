@@ -79,6 +79,10 @@ CMMD（Jayasumana et al., 2024）修了其中一些：用 CLIP 特征而非 Ince
 
 任何单个指标都是个谎。三个互相印证的指标 + 定性审阅才是一个主张。
 
+```figure
+gx-fid-distributions
+```
+
 ## 动手构建
 
 `code/main.py` 在合成的「特征向量」上实现 FID、类 CLIP 分数和 Elo 聚合（我们用 4 维向量代替 Inception 特征）。你看到：

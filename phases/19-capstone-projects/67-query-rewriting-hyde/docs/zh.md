@@ -99,6 +99,10 @@ Question: {user_query}
 
 要紧的是这个 mock 的形状，不是它的数据。生产里你把 mock 换成一次真实模型调用。retriever 不变。
 
+```figure
+cd-hyde-vector
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

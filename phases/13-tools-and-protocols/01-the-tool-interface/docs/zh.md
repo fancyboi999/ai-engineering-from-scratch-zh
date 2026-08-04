@@ -102,6 +102,10 @@ Meta 在 2026 年提出的 agent 安全 "Rule of Two"（二选二规则）说：
 
 剩下的每一课都是这个四步循环的细化。把它当作不变量记在心里。
 
+```figure
+tp-tool-loop
+```
+
 ## 实际使用
 
 `code/main.py` 不调 LLM 就跑通这个四步循环。一个假的 "decider" 函数靠对用户消息做模式匹配来模拟模型；而执行器、schema 校验器、observe 步骤的脚手架都是真的。跑一跑，看完整的请求/响应编排，中间状态可打印；之后某一课里再把假 decider 换成任意一家真实 provider。

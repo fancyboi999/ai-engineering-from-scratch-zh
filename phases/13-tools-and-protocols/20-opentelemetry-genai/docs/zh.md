@@ -109,6 +109,10 @@ OTel span 导出到：
 
 AgentOps（2024 年创立）专注于 GenAI 可观测性。它包住流行框架（LangGraph、Pydantic AI、CrewAI），自动发出 OTel span。如果你的栈用一个受支持框架就有用；否则用手动埋点。
 
+```figure
+t3-span-waterfall
+```
+
 ## 实际使用
 
 `code/main.py` 为一个调用一个 LLM、分发两个工具、做一次 MCP 来回的 agent，往 stdout 发出 OTel 形状的 span（以类 OTLP-JSON 的格式）。没有真实 exporter——本课聚焦于 span 形状和属性集。把输出粘进一个 OTLP 兼容查看器，或者就直接读它。

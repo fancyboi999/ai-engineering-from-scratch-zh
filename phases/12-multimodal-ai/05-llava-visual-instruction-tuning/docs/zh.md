@@ -126,6 +126,10 @@ LLaVA-1.5-7B 拆解：
 
 阶段 2 训练成本：8xA100 上约 20 小时。这是关键数字——一天、一个节点、可复现。这就是 LLaVA 扩散开来的原因。
 
+```figure
+mm-llava-projector
+```
+
 ## 实际使用
 
 `code/main.py` 实现了：

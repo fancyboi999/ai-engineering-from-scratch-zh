@@ -98,6 +98,10 @@ Faithfulness 抓的是 generator 那种凭空发明内容的失败模式。哪�
 
 生产里你来标注这些。本课随附一个手工搭的 fixture，让评测开箱即跑。
 
+```figure
+ci-rag-metric-ladder
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

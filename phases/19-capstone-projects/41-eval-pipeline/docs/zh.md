@@ -103,6 +103,10 @@ flowchart LR
 
 权重可配。默认权重是 perplexity 0.2、exact-match 0.3、token F1 0.3、judge 0.2。权重怎么选是产品决策；本课把旋钮暴露出来，方便你试。
 
+```figure
+cg-eval-quadrant
+```
+
 ## 架构
 
 ```mermaid

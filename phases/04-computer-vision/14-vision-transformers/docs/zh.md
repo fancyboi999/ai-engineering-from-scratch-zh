@@ -125,6 +125,10 @@ patch 越大 = token 越少 = 越快但空间细节越少。SwinV2 在层级窗�
 
 MAE 让 ViT 仅靠 ImageNet-1k 就可训练、达到 SOTA，是当前默认的自监督配方。
 
+```figure
+batchnorm-inference
+```
+
 ## 动手构建
 
 ### 第 1 步：Patch 嵌入

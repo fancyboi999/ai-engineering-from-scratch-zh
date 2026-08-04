@@ -59,6 +59,10 @@ query ----+----> retrieve top-k pages (MaxSim)
 - 评测：ViDoRe v3 基准、多页推理用 M3DocVQA
 - 查看器 UI：Next.js 15，用 canvas 叠加证据区域
 
+```figure
+ce-late-interaction
+```
+
 ## 动手构建
 
 1. **摄入。** 遍历一份横跨 10-K、科学论文、扫描文档的 1 万页 PDF 语料。把每页渲染成 1536x2048 的 PNG。持久化 `{doc_id, page_num, image_path}`。

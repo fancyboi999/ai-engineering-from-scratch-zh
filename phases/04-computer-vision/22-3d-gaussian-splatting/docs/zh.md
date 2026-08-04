@@ -120,6 +120,10 @@ c_i = eval_SH(SH_i, view_direction)    随视角的颜色
 - **生成式 splat** —— 文本到 splat 的模型（World Labs 的 Marble），幻想出整个场景。
 - **3D Gaussian Unscented Transform** —— NVIDIA NuRec 用于自动驾驶仿真的变体。
 
+```figure
+cv3-gaussian-splat
+```
+
 ## 动手构建
 
 ### 第 1 步：一个 2D 高斯

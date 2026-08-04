@@ -15,6 +15,10 @@
 - 计算每个模型平均分、以及两两差值的 bootstrap 置信区间。
 - 把 leaderboard 输出成一份 JSON 报告、以及一张第 75 课 runner 能贴进 CI 评论的 markdown 表。
 
+```figure
+ci-leaderboard-ci
+```
+
 ## 输入的形状
 
 聚合器消费一个 `EvalRun` 记录的列表：

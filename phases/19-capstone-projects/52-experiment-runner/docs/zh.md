@@ -36,6 +36,10 @@ ExperimentSpec
 
 脚本存在磁盘上；runner 把 config 写到一个临时文件路径，脚本从那里读取。脚本应在 stdout 上打印一行 JSON，其 key 是 `metric_keys` 的超集。stdout 上的其他内容会被捕获，但 metrics 解析器会忽略它们。
 
+```figure
+cg-runner-limits
+```
+
 ## 架构
 
 ```mermaid

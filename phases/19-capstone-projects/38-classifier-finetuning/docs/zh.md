@@ -94,6 +94,10 @@ flowchart LR
 
 此外还会打印一个 2x2 confusion matrix。demo 会为两种训练 regime 都打这张表。
 
+```figure
+cap-classifier-head-swap
+```
+
 ## 架构
 
 ```mermaid

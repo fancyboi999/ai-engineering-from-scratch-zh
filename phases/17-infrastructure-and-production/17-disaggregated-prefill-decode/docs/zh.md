@@ -105,6 +105,10 @@ GB300 NVL72 + Dynamo 显示相比 Hopper 基线 50x 的 MoE 吞吐。MoE 专家�
 - 分离阈值：prompt >512 token + 输出 >200 token。
 - 经 NIXL 的 KV 传输：70B FP8 上 4K prompt 的 KV 为 20-80 ms。
 
+```figure
+prefill-decode-split
+```
+
 ## 实际使用
 
 `code/main.py` 模拟同机 vs 分离式服务。报告吞吐、单请求成本和 prompt 长度的交叉点。

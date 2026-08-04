@@ -135,6 +135,10 @@ L = lambda_coord * L_box(pred, target, 在 obj=1 处)
 
 四个都报。一个 mAP@0.5 强但 mAP@0.5:0.95 弱的检测器，定位是大致对、不够紧；用更好的框回归损失修。一个高精确率、低召回率的检测器太保守了；降低置信度阈值或提高 objectness 权重。
 
+```figure
+object-detection-nms
+```
+
 ## 动手构建
 
 ### 第 1 步：IoU

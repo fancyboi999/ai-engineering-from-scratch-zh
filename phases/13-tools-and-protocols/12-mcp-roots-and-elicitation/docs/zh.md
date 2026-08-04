@@ -122,6 +122,10 @@ client 在浏览器里打开 URL，等待完成，用户回来时返回。对 OA
 
 Elicitation 加 sampling 一起，让 MCP 的"人在回路"模型成为可能。一个 server 的 agent 循环可以为用户输入（elicitation）或模型推理（sampling）而暂停。阶段 13 · 11 讲了 sampling；本课讲 elicitation。把它们放一起做完整的循环中途控制。
 
+```figure
+t3-roots-boundary
+```
+
 ## 实际使用
 
 `code/main.py` 在 notes server 上扩展出：

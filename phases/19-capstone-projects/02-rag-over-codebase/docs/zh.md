@@ -62,6 +62,10 @@ git push --> webhook --> ingest worker (LlamaIndex Workflow)
 - 符号图：Neo4j（托管）或 kuzu（嵌入式），存 import 和调用边
 - 可观测性：每个检索 + 合成步骤一个 Langfuse span
 
+```figure
+ce-hybrid-retrieval
+```
+
 ## 动手构建
 
 1. **摄入遍历器。** 在每个 push hook 上遍历 git 历史。收集变更的文件。对每个文件，用 tree-sitter 解析，连同完整源码区间抽出函数和类节点。产出 chunk 记录 `{repo, path, start_line, end_line, symbol, body}`。

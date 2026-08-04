@@ -80,6 +80,10 @@ while True:
 - *长视野完全信息游戏*（围棋、国际象棋）：仍然有搜索。AlphaZero / MuZero 占主导。
 - *LLM 推理*：生产里还没有 MCTS；在完整 rollout 上跑 GRPO，推理时用 best-of-N。过程奖励模型（PRM）暗示着步级搜索正在被加回来。
 
+```figure
+f3-selfplay-ladder
+```
+
 ## 动手构建
 
 `code/main.py` 里的代码实现了**微缩版 GRPO**——一个带多组样本的赌博机。算法和在 LLM 上的一样；只是策略和环境更简单。它教的是 2025 年的创新所在：那个*损失*和*组相对优势*。

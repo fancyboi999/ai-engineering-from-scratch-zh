@@ -76,6 +76,10 @@ GAIA 是你用来衡量「通才能力」的东西。别和代码专用基准混
 - **被污染的声称。** 报 SWE-bench 却不提 Verified 或 SWE-bench+ 是误导。
 - **把基准当开发目标。** 为基准优化会偏离生产有用性。
 
+```figure
+ae-swebench-gate
+```
+
 ## 动手构建
 
 `code/main.py` 实现一个玩具版类 SWE-bench harness：

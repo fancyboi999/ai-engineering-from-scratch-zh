@@ -75,6 +75,10 @@ flowchart TD
 
 没有免费午餐。`accum_steps` 翻倍，每次 optimizer step 的挂钟时间也翻倍。变化的是梯度估计的方差：在同样的时间预算下，optimizer step 更少，但每一步平均了更多样本。文献把大 batch 和小 batch 当作不同的优化问题来讨论；本课只关心机械层面，不涉及统计层面。
 
+```figure
+cc-grad-accumulation
+```
+
 ## 动手构建
 
 `code/main.py` 是可运行的产物。它做三件事。

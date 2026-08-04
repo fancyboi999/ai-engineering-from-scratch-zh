@@ -122,6 +122,10 @@ server 从不碰 LLM API。client 的用户用自己的凭证为这些补全付�
 - **经由 sampling 的资源窃取。** server 让 client 摘要攻击者的载荷，由用户买单。
 - **循环炸弹。** server 在一个紧循环里调 sampling。client 必须强制每会话限流。
 
+```figure
+t3-sampling-flip
+```
+
 ## 实际使用
 
 `code/main.py` 交付一个假的 server 到 client 的 sampling 脚手架。一个模拟的 "summarize_repo" 工具调用两轮 sampling（挑文件，然后摘要），假 client 返回预制响应。脚手架展示：

@@ -63,6 +63,10 @@ file under failure class + attach repro
 - 可观测性：Langfuse + 每仓库一份带每个 diff 块的 trace 包
 - 看板：失败分类法看板，带每类别计数和示例 diff
 
+```figure
+ce-migration-funnel
+```
+
 ## 动手构建
 
 1. **recipe 遍历。** 先跑 OpenRewrite（Java）或 libcst（Python）recipe。吃掉 70-80% 机械性的迁移。提交为一个 “recipe” commit。

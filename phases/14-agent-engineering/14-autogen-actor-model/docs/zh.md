@@ -62,6 +62,10 @@ AutoGen v0.4 把接口分成三层：
 
 2026 年初：AutoGen v0.7.x 对研究和原型来说是稳定的。微软已把活跃开发转向生产继任者 Microsoft Agent Framework（2025 年 10 月 1 日公开预览；1.0 GA 当时目标定在 2026 年 Q1 末）。AutoGen 模式能干净地向前移植，actor 模型才是那个持久的想法。
 
+```figure
+actor-mailbox
+```
+
 ## 动手构建
 
 `code/main.py` 实现一个标准库 actor 运行时：

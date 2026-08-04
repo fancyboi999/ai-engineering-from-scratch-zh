@@ -61,6 +61,10 @@
 - 可观测性：带 `gen_ai.*` 语义约定的 OpenTelemetry SDK → 自托管 Langfuse
 - PR 发布：用细粒度 token 的 GitHub App，作用域只限定在目标仓库
 
+```figure
+ce-agent-loop
+```
+
 ## 动手构建
 
 1. **TUI 与命令循环。** 用 Ink 搭一个 Bun 项目。接收 `agent run <repo> "<task>"`。打印一个分屏视图：计划面板（上）、工具调用流（中）、token 预算（下）。加上 Ctrl-C 取消，退出前先触发 `SessionEnd` hook。

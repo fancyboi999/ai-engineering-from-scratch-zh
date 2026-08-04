@@ -63,6 +63,10 @@ production apps:
 - UI：Next.js 15 App Router + Recharts + server actions
 - 开箱支持的 SDK：OpenAI、Anthropic、Google GenAI、LangChain、LlamaIndex、vLLM
 
+```figure
+ce-otel-drift
+```
+
 ## 动手构建
 
 1. **收集器配置。** OpenTelemetry Collector，带 OTLP HTTP receiver、一个保留 100% 出错 trace 和 10% 成功 trace 的 tail-sampler，以及到 ClickHouse 和 S3 的 exporter。

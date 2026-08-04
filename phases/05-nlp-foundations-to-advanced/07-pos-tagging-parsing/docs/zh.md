@@ -40,6 +40,14 @@ at is prep of running
 3pm is pobj of at
 ```
 
+```figure
+pos-tagger
+```
+
+```figure
+dependency-arcs
+```
+
 ## 动手构建
 
 ### 第 1 步：最频繁标签基线

@@ -62,6 +62,10 @@ answer + (start, end) timestamps + frame thumbs + citations
 - 评测：ActivityNet-QA、NeXT-GQA、自定义 100 问手工标注集
 - 幻觉基准：带手工标签的计数和动作类子集
 
+```figure
+cf-scene-index
+```
+
 ## 动手构建
 
 1. **摄入遍历器。** 接收 YouTube URL 或本地 MP4。必要时降采样到 720p。持久化 `{video_id, file_path}`。

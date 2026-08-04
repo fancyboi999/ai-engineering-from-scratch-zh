@@ -288,6 +288,10 @@ flowchart TD
     J -->|"没有标签"| M["无监督或自监督"]
 ```
 
+```figure
+f3-learning-boundary
+```
+
 ## 动手构建
 
 `code/ml_intro.py` 里的代码从零实现了一个最近质心分类器，这是最简单的 ML 算法。它演示了核心思想：从数据学习，再对新数据预测。

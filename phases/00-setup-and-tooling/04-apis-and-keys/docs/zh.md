@@ -34,6 +34,10 @@ sequenceDiagram
 3. 一个请求体（你想要什么）
 4. 一个响应体（你拿回什么）
 
+```figure
+s0-secret-inject
+```
+
 ## 动手构建
 
 ### 第 1 步：安全存放 API 密钥

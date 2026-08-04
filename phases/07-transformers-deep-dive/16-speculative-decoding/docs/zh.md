@@ -80,6 +80,10 @@ EAGLE-3（2025）加了对候选续写的树搜索。vLLM 和 SGLang 把 EAGLE-2
 
 生产实现（vLLM 的 `--speculative-model`、TensorRT-LLM 的 LookaheadDecoder）用临时 KV 缓冲处理这点。先写，接受时提交。概念上不难，但很琐碎。
 
+```figure
+draft-verify-tokens
+```
+
 ## 动手构建
 
 见 `code/main.py`。我们实现核心的投机采样算法（拒绝步 + 残差分布），含：

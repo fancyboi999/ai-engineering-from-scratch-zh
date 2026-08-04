@@ -66,6 +66,10 @@ Postgres    S3 listing  Jira       Linear     Datadog
 - 部署：AWS ECS Fargate 或 Fly.io，每租户一个服务器，或共享并带租户圈定
 - 审计：逐租户桶的结构化 JSONL，带逐调用血缘
 
+```figure
+cf-mcp-gate
+```
+
 ## 动手构建
 
 1. **工具面。** 暴露 10 个内部工具：Postgres 只读查询、S3 列对象、Jira 搜索/取、Linear 搜索/取、Datadog 指标查询、PagerDuty 值班查询、GitHub 只读、Notion 搜索、Slack 搜索、Salesforce 读。每个工具有一个带类型的 schema 和一个 scope 标签。

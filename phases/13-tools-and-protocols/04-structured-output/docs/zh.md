@@ -101,6 +101,10 @@ Zod（`z.object({customer: z.string(), ...})`）是 TS 里的对应物。OpenAI 
 
 受约束解码在小模型上也好使。一个带语法强制的 3B 参数开源模型，在结构化任务上胜过一个用裸 prompt 的 70B 参数模型。这是结构化输出对生产之所以重要的主要原因：它把可靠性和模型大小解耦。
 
+```figure
+constrained-decoding
+```
+
 ## 实际使用
 
 `code/main.py` 用标准库交付一个极简 JSON Schema 2020-12 校验器（types、required、enum、min/max、pattern、items、additionalProperties）。它包一份 `Invoice` schema，让一份假 LLM 输出过一遍校验器，演示解析错误、schema 违反和拒绝三条路径。生产里把假输出换成任意 provider 的真实响应。

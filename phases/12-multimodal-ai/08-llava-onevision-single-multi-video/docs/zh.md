@@ -82,6 +82,10 @@ token 预算需要池化。OneVision 在二维 patch 网格上用双线性插值
 
 Qwen2.5-VL（第 12.09 课）做了不同选择。它用 M-RoPE 和动态 FPS，而非固定池化。它的预算随输入伸缩——一段 1 分钟视频比一段 5 秒视频用更多 token。LLaVA-OneVision 固定预算、伸缩池化。两者都有效；它们在可配置性和可预测性之间做了不同取舍。
 
+```figure
+l5-onevision-budget
+```
+
 ## 实际使用
 
 `code/main.py` 是一个面向 OneVision 式 VLM 的课程与预算规划器。给定每样本的 token 预算和一个目标场景配比（比如 40% 单图、30% 多图、30% 视频），它：

@@ -102,6 +102,10 @@ NeurIPS 2024（https://proceedings.neurips.cc/paper_files/paper/2024/file/984dd3
 
 如果报价需要是一个数字（价格、ETA、数量），就从谈判状态确定性地生成它，让 LLM 产出框定。如果报价需要是一个提案结构（任务拆解、角色分配），让 LLM 起草它，但发出前对照 schema 校验、做约束检查。
 
+```figure
+a5-og-narrator
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

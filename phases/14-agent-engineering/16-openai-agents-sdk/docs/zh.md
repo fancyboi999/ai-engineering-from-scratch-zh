@@ -67,6 +67,10 @@
 - **guardrail 绕过。** 工具 guardrail 只在函数工具上触发；内置工具（文件读取器、网页抓取）需要单独的策略。
 - **过度 tracing。** span 里有敏感内容。配 OTel GenAI 的内容捕获规则（第 23 课）—— 外部存储，按 ID 引用。
 
+```figure
+ae-agent-handoff
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库实现 SDK 的形态：

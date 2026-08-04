@@ -60,6 +60,10 @@ LangGraph 是这层抽象的参考实现。它不是 LangChain 那种意义上�
 
 一个编译好的图能成为另一张图里的一个节点。外层图看到的是单个节点；内层图有它自己的状态和自己的 checkpoint。这就是团队如何构建 supervisor-worker agent：supervisor 图把用户意图路由给一个按领域划分的 worker 子图。
 
+```figure
+l5-state-graph-ledger
+```
+
 ## 动手构建
 
 ### 第 1 步：状态与节点

@@ -80,6 +80,10 @@ handoff 原语活了下来；生产工效在它周围被加了上去。
 
 Swarm 是「agent 决定下一步是什么」；GroupChat 是「manager 决定下一步是什么」。Swarm 的决策住在活跃 agent 的工具调用里；GroupChat 的住在 `GroupChatManager` 里。
 
+```figure
+sw-handoff-routing
+```
+
 ## 动手构建
 
 `code/main.py` 从零实现 Swarm：一个 Agent dataclass、一个 handoff 机制（工具返回 Agent）、以及一个检测 agent 切换的运行循环。

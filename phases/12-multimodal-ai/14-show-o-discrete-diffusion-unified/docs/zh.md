@@ -90,6 +90,10 @@ Show-o2（2025 续作，arXiv 2506.15564）缩放 Show-o：更大的 LLM 基座�
 
 按任务挑：想在一个开放模型里以合理速度要 T2I + 修复 + VQA 时选 Show-o；质量至上且你负担得起双损失管路时选 Transfusion。
 
+```figure
+masked-diffusion-unmask
+```
+
 ## 实际使用
 
 `code/main.py` 模拟 Show-o 采样：

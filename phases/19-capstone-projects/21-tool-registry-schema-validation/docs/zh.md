@@ -14,6 +14,10 @@
 - 默认拒绝重复注册，除非显式 override；静默覆盖就是线上 tool catalog 漂移的起点。
 - 保持 validator 纯净（无 I/O、无时间、无全局），这样 replay log 时能重跑。
 
+```figure
+cf-registry-validate
+```
+
 ## 为什么 registry 要先于 tool
 
 2026 年的 coding agent，注册进系统的 tool 往往比模型一次上下文窗口装得下的还多。一个稍像样的 harness 会注册 200 个 tool，而单个 turn 真正暴露给模型的只有 10-40 个。registry 就是三件事的真值源：

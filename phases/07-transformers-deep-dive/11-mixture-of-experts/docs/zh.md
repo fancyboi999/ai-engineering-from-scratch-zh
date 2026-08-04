@@ -78,6 +78,10 @@ DeepSeek-V3 在几乎每个基准上打败 Llama 3 70B（稠密），同时**每
 
 不管哪些专家点火，所有专家都活在 GPU 上。一个 671B 模型的 fp16 权重需要约 1.3 TB 显存。前沿 MoE 部署需要专家并行——把专家分片到多个 GPU，让 token 跨网络路由。延迟由全对全通信主导，不是 matmul。
 
+```figure
+expert-routing
+```
+
 ## 动手构建
 
 见 `code/main.py`。一个紧凑的纯标准库 MoE 层，含：

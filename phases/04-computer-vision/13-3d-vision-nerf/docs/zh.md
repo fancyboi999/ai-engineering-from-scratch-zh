@@ -124,6 +124,10 @@ delta_i = t_{i+1} - t_i
 - **NeRF Synthetic** / **Blended MVS** —— 带位姿的图像数据集，用于视角合成。
 - **Mip-NeRF 360** 数据集 —— 无界真实场景。
 
+```figure
+nerf-rays
+```
+
 ## 动手构建
 
 ### 第 1 步：PointNet 分类器

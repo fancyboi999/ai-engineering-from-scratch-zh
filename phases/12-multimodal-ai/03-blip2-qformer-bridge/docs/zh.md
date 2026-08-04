@@ -87,6 +87,10 @@ Flamingo（第 12.04 课）早于 BLIP-2，用的是同样的交叉注意力想�
 
 四种都成立。决定性的问题是：你受限于 token 预算，还是受限于单 token 的质量。
 
+```figure
+modality-projection
+```
+
 ## 实际使用
 
 `code/main.py` 用标准库搭了一个 Q-Former 式的交叉注意力：

@@ -56,6 +56,10 @@ Zhuge 等人（《Mindstorms in Natural Language-Based Societies of Mind》，ar
 - **话题漂移。** 多轮辩论会偏离最初的问题。缓解：每一轮都重新注入问题。
 - **算力爆炸。** N 个 agent × R 轮 = N·R 次 LLM 调用，每次的上下文都在增长。一场 5 agent、5 轮的辩论就是 25 次调用、上下文不断变大。每个问题的成本可能超过单次 CoT 调用的 10 倍。
 
+```figure
+multi-agent-debate
+```
+
 ## 动手构建
 
 `code/main.py` 在一道数学题上跑一场 3 agent × 3 轮的辩论，每个 agent 一开始持有一个不同（可能错误）的答案。agent 是脚本化的——每个 agent 通过对邻居答案按脚本化置信度加权平均来「更新」。收敛过程在逐轮日志里看得见。

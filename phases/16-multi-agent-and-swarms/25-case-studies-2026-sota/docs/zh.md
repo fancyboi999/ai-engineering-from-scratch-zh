@@ -119,6 +119,10 @@ MacNet（arXiv:2406.07155）把 ChatDev 扩展到 **通过 DAG 实现 >1000 agen
 - **成本是核心工程约束。** 每任务 token 成本、每交互墙钟时间、彩虹部署开销。多 agent 在准确率上赢、在成本上输——而这笔交易就是那个商业决策。
 - **监管是近期输入，不是背景顾虑。** 各司法辖区动得比单个部署周期还快。
 
+```figure
+a5-orchestrator-scale
+```
+
 ## 实际使用
 
 `outputs/skill-case-study-mapper.md` 是一个 skill，它读取一份拟议的多 agent 系统设计，把它映射到最接近的案例研究，浮现出那个案例研究已经验证过的设计决策。

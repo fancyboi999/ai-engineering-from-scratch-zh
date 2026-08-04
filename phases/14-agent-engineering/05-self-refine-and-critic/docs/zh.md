@@ -83,6 +83,10 @@ OpenAI Agents SDK 把这个模式作为「输出 guardrail」提供。一个 gua
 - **过度精修。** 每一遍精修都增加延迟和 token。预算 1-3 遍；超出后升级到人工审查。
 - **在琐碎任务上用 CRITIC。** 如果没有外部验证器，CRITIC 退化成 Self-Refine；别为一个桩验证器付延迟。
 
+```figure
+self-refine
+```
+
 ## 动手构建
 
 `code/main.py` 在一个玩具任务上实现 Self-Refine 和 CRITIC：给定一个主题，产出一个简短的项目符号列表。验证器检查格式（3 个项目符号，每个不超过 60 字符）。CRITIC 加了一个外部「事实验证器」，惩罚已知的幻觉。

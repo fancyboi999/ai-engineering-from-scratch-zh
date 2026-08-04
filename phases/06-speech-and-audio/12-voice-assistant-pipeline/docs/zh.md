@@ -51,6 +51,10 @@
 | Vapi / Retell（托管） | 300-500 ms | 商用 | 上线最快；定制有限 |
 | Whisper.cpp + llama.cpp + Kokoro-ONNX | 离线 | 开源 | 隐私 / 边缘端 |
 
+```figure
+v4-voice-latency
+```
+
 ## 动手构建
 
 ### 第 1 步：带分块的麦克风捕获（伪代码）

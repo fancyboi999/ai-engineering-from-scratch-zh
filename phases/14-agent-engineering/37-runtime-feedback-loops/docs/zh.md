@@ -56,6 +56,10 @@ flowchart LR
 
 如果运行器在捕获退出之前出错，记录就带 `exit_code: null` 和 `error: <reason>`。agent 循环必须拒绝在 `null` 退出上声称成功。没有退出，就没有进展。
 
+```figure
+wb-feedback-loop
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

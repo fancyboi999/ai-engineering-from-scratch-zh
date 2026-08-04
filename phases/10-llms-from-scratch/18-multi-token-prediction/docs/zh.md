@@ -105,6 +105,10 @@ EAGLE 在预训练 *之后* 单独训练一个小 draft 模型。MTP 把 draft �
 | 接受率 | 0.88-0.92 | 深度 1 处 0.80+ |
 | 加速之外的收益 | 仅推测解码 | 更密的训练信号 + 加速 |
 
+```figure
+multi-token-predict
+```
+
 ## 动手构建
 
 `code/main.py` 端到端构建单个 MTP 模块：共享 embedding、投影、transformer 块、共享输出头。然后它在一个短合成序列上计算按深度的交叉熵损失，并按组件打印参数量。一个 32 token 的玩具词表让数字可读。

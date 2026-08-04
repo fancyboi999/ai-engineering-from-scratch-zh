@@ -90,6 +90,10 @@ Runbook 从 Confluence 页面进化成带结构化章节（症状、假设、验
 - 安全自动修复集合：重启 pod、还原部署、边界内扩缩。
 - 对抗式评估：两个模型独立；一致 = 置信。
 
+```figure
+i4-incident-agents
+```
+
 ## 实际使用
 
 `code/main.py` 模拟一次多 agent 分诊：日志 agent 找到错误，指标 agent 找到 CPU 尖峰，runbook agent 匹配到已知问题。Supervisor 给假设排序。

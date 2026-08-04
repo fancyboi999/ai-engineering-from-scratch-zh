@@ -46,6 +46,10 @@
 
 **通过 NLI 做 zero-shot。** 给定文档和候选标签，把每个标签变成一个假设（"This text is about sports"）。算每个的蕴含概率。取最大的。这就是 Hugging Face 的 `zero-shot-classification` 流水线背后的机制。
 
+```figure
+nli-router
+```
+
 ## 动手构建
 
 ### 第 1 步：跑一个预训练 NLI 模型

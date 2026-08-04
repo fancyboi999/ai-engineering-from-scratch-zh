@@ -77,6 +77,10 @@ hook 就是 pro-workflow（阶段 14 课程参考）和类似系统添加横切�
 - **hook 蔓延。** 每个团队都加 hook；启动时间膨胀。每季度审查 hook。
 - **会话膨胀。** 会话越攒越多；体积增长。用 `list_sessions` + 过期策略。
 
+```figure
+ae-subagent-isolation
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库实现 SDK 的形态：

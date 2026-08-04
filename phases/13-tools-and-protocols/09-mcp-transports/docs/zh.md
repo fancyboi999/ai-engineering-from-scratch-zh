@@ -94,6 +94,10 @@ SSE 连接会掉。client 靠用同一个 `Mcp-Session-Id` 重新 GET 来重建�
 
 有些企业在自己的网络内把 MCP server 部署在 gRPC 或消息队列传输之后。这是非标的——MCP 规范没正式定义这些。网关可以对 MCP client 暴露一个 Streamable HTTP 表面，内部用 gRPC。外部表面保持规范合规；网关拥有那道翻译。
 
+```figure
+tp-transport-handshake
+```
+
 ## 实际使用
 
 `code/main.py` 用 `http.server`（标准库）实现一个极简 Streamable HTTP 端点。它在 `/mcp` 上处理 POST、GET、DELETE，在第一个响应上设 `Mcp-Session-Id`，校验 `Origin`，并拒绝非白名单源的请求。处理器复用第 07 课 notes server 的分发逻辑。

@@ -63,6 +63,10 @@ Stage 1 是最便宜的赢面，因为 optimizer state 在预算里占大头。S
 
 Allreduce 给每个 rank 完整的求和梯度。如果你只需要 shard r，那被归约的梯度里有 (N-1)/N 在 rank r 上是白算的。Reduce_scatter 精确地投递每个 rank 拥有的那份 shard；每 rank 字节数和 allreduce 一样（因为 allreduce 就是 reduce_scatter + allgather），但后半段被换成了之后的参数 shard allgather。净线路流量和 DDP 完全相同，内存被除以了 N。
 
+```figure
+cd-zero-shard
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

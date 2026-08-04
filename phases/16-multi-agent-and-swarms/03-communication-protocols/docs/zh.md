@@ -599,6 +599,10 @@ graph TB
 - **ACP** 用轨迹元数据包住响应，实现可审计
 - **ANP** 为你掌控不了的 agent 提供身份验证
 
+```figure
+swarm-message-bus
+```
+
 ## 动手构建
 
 ### 第 1 步：核心消息类型

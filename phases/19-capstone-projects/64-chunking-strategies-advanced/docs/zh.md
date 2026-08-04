@@ -67,6 +67,10 @@ flowchart LR
 
 一个 gold 标注的 query 携带着答案 span 在源文档里精确的字符偏移量。chunking 之后，你问一句：retriever 返回的 top-k chunk 里，有没有任何一个跟 gold span 有重叠？有，那这条 query 的 recall@k 就是 1；没有，就是 0。在整个 query 集上取平均。对每种策略跑同一套评测，这个分布差就告诉你：哪种边界策略能在你手上的这个 corpus 上活下来。
 
+```figure
+ci-chunk-boundaries
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

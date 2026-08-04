@@ -59,6 +59,10 @@ HPA on queue-wait metric
 - 评测：ShareGPT、MT-Bench-v2、GSM8K、HumanEval，用于跨领域分布的接受率测量
 - 参考：TensorRT-LLM 推测解码作为厂商基线
 
+```figure
+cf-spec-decode
+```
+
 ## 动手构建
 
 1. **目标模型准备。** 选 Llama 3.3 70B。经 Marlin 量化到 FP8。在 vLLM 0.7 下部署到 1 卡 H100（或 2 卡张量并行）。

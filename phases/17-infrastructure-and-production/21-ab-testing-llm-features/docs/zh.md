@@ -90,6 +90,10 @@ Controlled-experiments Using Pre-Experiment Data（用实验前数据的受控�
 - CUPED 方差削减：30-70%。
 - LLM 非确定性 → +30-50% 样本量缓冲。
 
+```figure
+mx-sequential-test
+```
+
 ## 实际使用
 
 `code/main.py` 用固定边界和序贯边界模拟一个序贯 A/B 测试。展示序贯如何让你提早停止。

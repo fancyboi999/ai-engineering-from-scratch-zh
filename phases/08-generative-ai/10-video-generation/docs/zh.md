@@ -60,6 +60,10 @@
 
 开源权重追赶差距的速度比图像领域快：到 2026 年中，HunyuanVideo + WAN 2.2 的 LoRA 已经驱动了大多数开源工作流。
 
+```figure
+video-diffusion-denoise
+```
+
 ## 动手构建
 
 `code/main.py` 模拟时空 DiT 的核心想法：把一段小的合成视频切 patch，加上逐 patch 的位置嵌入，用一个 transformer 风格的、跨 patch 的注意力给整个序列去噪。不用 numpy；纯 Python。我们表明即便在一维下，当相邻帧的 patch 共享一个去噪器和位置嵌入时，时间连贯性也会涌现。

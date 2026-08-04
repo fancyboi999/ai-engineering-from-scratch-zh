@@ -71,6 +71,10 @@ Datadog v1.37+ 把 GenAI 属性原生映射进它的 LLM Observability schema。
 - **没有父链接的 span。** 孤儿工具 span。永远传播 context。
 - **没设稳定性 opt-in。** 你的属性可能在后端升级时被重命名。
 
+```figure
+ae-genai-span-tree
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库实现一个匹配 GenAI 约定的 span 发射器：

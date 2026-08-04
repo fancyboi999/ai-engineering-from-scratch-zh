@@ -82,6 +82,10 @@ BP = 1                如果生成长度 > 参考长度
 
 对于合成数据上 50 步的训练运行，指标不指望很高；它们应该高于随机 baseline，这正是 demo 检查的东西。
 
+```figure
+ch-recall-window
+```
+
 ## 动手实现
 
 `code/main.py` 实现了：

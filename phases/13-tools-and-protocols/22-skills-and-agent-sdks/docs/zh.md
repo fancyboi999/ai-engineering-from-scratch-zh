@@ -132,6 +132,10 @@ SkillKit 这类工具和类似的跨 agent 分发层，把单个 SKILL.md 翻译
 
 三者都组合得起来：agent 在会话开始时读 AGENTS.md，用户触发一个 skill，skill 的指令含 MCP 工具调用，agent 经由一个 MCP client 分发。
 
+```figure
+t3-skill-layers
+```
+
 ## 实际使用
 
 `code/main.py` 交付一个标准库 SKILL.md 解析器和加载器。它在 `./skills/` 下发现 skill，解析 YAML frontmatter 加 markdown 正文，产出一个按 skill 名作键的 dict。它接着模拟一个按名字触发 `release-notes-writer` 的 agent 循环。

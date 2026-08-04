@@ -130,6 +130,10 @@ exact-match 是最严的文本指标。预测回复会先做标准化：小写�
 
 真实 SFT pipeline 通常会补 token-level F1（第 41 课）和 judge model。但 exact-match 依旧有价值，因为它没有解释空间：如果它说 0.7，那就真的是 70% 的测试指令被一字不差地答对了。
 
+```figure
+cc-sft-loss-mask
+```
+
 ## 你要构建什么
 
 实现形式是一份 `main.py` 加测试：

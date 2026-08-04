@@ -87,6 +87,10 @@ AlphaEvolve（arXiv:2506.13131，DeepMind，2025 年 6 月）是另一种东西�
 - **没有真评估器的 AlphaEvolve。** 「问 LLM 代码是不是更好了」不是适应度函数。评估器必须确定且快。
 - **过度工程。** 大多数 agent 任务两个都不需要。先上 ReAct 或 ReWOO。
 
+```figure
+htn-tree-expand
+```
+
 ## 动手构建
 
 `code/main.py` 实现两个玩具：

@@ -75,6 +75,10 @@ Vision Transformer 是 encoder-only 且双向的：token `i` 可以关注任意�
 
 CLS token 一开始是一个可学习参数，本身没有任何 patch 内容，它通过每个 block 里的 attention 一层层积累信息。到最后一层，CLS 那一行就是整张图的向量摘要；下游的 head 把这个单一向量投影成类别 logits、对比 embedding，或者作为给文本 decoder 的 cross-attention key。
 
+```figure
+ch-cls-funnel
+```
+
 ## 动手实现
 
 `code/main.py` 实现了：

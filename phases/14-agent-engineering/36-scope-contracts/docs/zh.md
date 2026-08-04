@@ -90,6 +90,10 @@ agent 写一个 diff。检查器读 diff、允许的 glob、禁止的 glob，以
 
 契约与清单按最小权限组合，和下面描述的那次合并一样：任务契约的 `allowed_files` 必须坐落在当前功能项所碰范围之内，绝不在它之外。
 
+```figure
+wb-scope-bounce
+```
+
 ## 动手构建
 
 `code/main.py` 实现：

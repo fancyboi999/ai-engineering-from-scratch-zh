@@ -162,6 +162,10 @@ MCP Apps 于 2026 年 1 月 26 日发布。截至 2026 年 4 月的 client 支�
 
 生产里的 server：仪表盘、地图可视化、数据表、图表构建器、沙箱 IDE 预览。
 
+```figure
+t3-ui-sandbox
+```
+
 ## 实际使用
 
 `code/main.py` 在 notes server 上扩展出一个 `visualize_timeline` 工具，返回一个 `ui://notes/timeline` 资源，外加一个对该 URI 的 `resources/read` 处理器，它返回一个小而完整、带 SVG 时间线的 HTML 包。HTML 用标准库模板化——没有构建系统。postMessage 在 JS 注释里勾画，因为标准库驱动不了浏览器。

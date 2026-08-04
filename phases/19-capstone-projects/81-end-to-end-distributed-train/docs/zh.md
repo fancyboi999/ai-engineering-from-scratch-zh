@@ -55,6 +55,10 @@ flowchart TB
 
 循环跑固定的 20 步然后退出。没有 `while True`，没有人工干预，不从外部状态恢复。一个你可以放着不管、跑完回来发现一份完整日志的 capstone，才是证明系统接对了的 capstone。如果某个零件死锁，demo 就永不返回，测试装置会抓住它。
 
+```figure
+ci-distributed-assembly
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

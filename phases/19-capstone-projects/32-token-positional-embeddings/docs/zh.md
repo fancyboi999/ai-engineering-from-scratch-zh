@@ -14,6 +14,10 @@
 - 把 token embedding 和 positional embedding 组合成 transformer block 的单一输入。
 - 对比 learned 与 sinusoidal 两种 positional embedding 在长度泛化和参数量上的差异。
 
+```figure
+cc-embedding-lookup
+```
+
 ## 框架
 
 模型第一次接触 token id，是在 token embedding 矩阵上做一次行查找。这个矩阵每个词表 id 对应一行，每列对应模型维度。查出来的向量，就是后续网络临时视为“这个 id 含义”的东西。反向传播只更新本次前向真正用到的那些行。训练久了，这些行的几何结构就会在不同方向上编码相似性。

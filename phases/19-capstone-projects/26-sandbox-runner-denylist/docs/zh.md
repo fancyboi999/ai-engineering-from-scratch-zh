@@ -46,6 +46,10 @@ sandbox 有 4 个拒绝轴：命令名、argv、路径、结构。四者都先�
 
 `SandboxResult` 的 exit code 约定如下：0 表示成功，非零表示进程失败，外加三个 sentinel 语义：拒绝是 `-100`，timeout 是 `-101`，截断则保留真实 exit code，但把 `truncated` flag 置上。后续课程不再去 parse stderr，而是直接读这个结构化结果。
 
+```figure
+cg-path-jail
+```
+
 ## 架构
 
 ```mermaid

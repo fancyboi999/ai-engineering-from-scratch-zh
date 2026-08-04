@@ -118,6 +118,10 @@ FLUX.1-schnell 是 2026 年的开源默认。Z-Image 是效率领先者。FLUX.2
 
 DDPM + U-Net 行。DiT + rectified flow **更好、更快、缩放更干净**。这个过渡和 NLP 里从 RNN 到 transformer 的那个平行：两种架构解了同一个问题，但 transformer 缩放上去、现在占主导。2026 年每篇关于图像、视频或 3D 生成的论文都用 DiT 形状的去噪器，通常还用 rectified flow 目标。U-Net DDPM 如今主要是教学用的（第 10 课）。
 
+```figure
+cv3-rectified-flow
+```
+
 ## 动手构建
 
 ### 第 1 步：一个带 AdaLN 的 DiT 块

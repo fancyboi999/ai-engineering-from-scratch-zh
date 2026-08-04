@@ -64,6 +64,10 @@ flowchart LR
 
 从评测曲线加上 latency 预算挑 N。Cross-encoder 没法把 recall 抬到超过 bi-encoder 在 N 处的 recall，所以一个偏低的 N 卡住的不只是 latency，还有质量。
 
+```figure
+rerank-funnel
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

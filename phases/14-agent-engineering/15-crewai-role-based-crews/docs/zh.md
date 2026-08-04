@@ -133,6 +133,10 @@ CrewAI 开箱提供四种记忆类型。它们可组合：一个 Crew 可以一�
 - **脆弱的交接。** task N 的 `expected_output` 是「一份大纲」。task N+1 把它当 `context` 读，试图解析三个 section。LLM 产出了四个。下游 Agent 即兴发挥。用 task N 上的 `output_pydantic` 修，这样 task N+1 读的是一个带类型对象，而非自由文本。
 - **Crew 当生产。** 自由形式的 Crew 没套 Flow 包装就上了生产。输出波动很大；重放不可能；值班的人没法把一次坏运行和一次好运行做 diff。用 Flow 包起来。
 
+```figure
+ae-crew-vs-flow
+```
+
 ## 动手构建
 
 `code/main.py` 实现两种形态的标准库版本，外加一个三 agent crew。

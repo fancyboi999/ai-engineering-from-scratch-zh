@@ -68,6 +68,10 @@ LangGraph 2025 文档明确把「Swarm 架构」描述为多 agent 模式之一�
 
 swarm 天然能和基于内容的路由（第 22 课）搭配。不用一条通用队列，而是每种消息类型一条队列。专精 worker 只订阅自己的类型。这是能扩展到数千 agent 的消息总线架构的基础。
 
+```figure
+sw-work-stealing
+```
+
 ## 动手构建
 
 `code/main.py` 实现了一个 4 worker 线程的 swarm，从一个共享的 `queue.Queue` 里领活儿。任务时长不定（有快有慢）。演示做三种对比：

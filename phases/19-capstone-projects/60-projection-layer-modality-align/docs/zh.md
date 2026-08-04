@@ -59,6 +59,10 @@ flowchart LR
 
 视觉 encoder 有 86M 个参数。text 表又有几百万个。从一个 mock 语料把它们全部从头训练，根本不现实。把两者都冻结，意味着 projection 的 1.3M 个参数是唯一在变的东西，在合成对上跑几百步就足以把 loss 压下去。这正是每个基于 adapter 的 VLM 的操作形态：重的部分保持冻结，轻的桥梁去训练。
 
+```figure
+ch-projection-bridge
+```
+
 ## 动手实现
 
 `code/main.py` 实现了：

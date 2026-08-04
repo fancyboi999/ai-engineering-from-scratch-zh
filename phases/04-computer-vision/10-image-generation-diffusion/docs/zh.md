@@ -120,6 +120,10 @@ feature_map += MLP(t_embedding)
 
 没有时间条件化，网络就得从图像本身猜噪声水平，这能行，但样本效率低得多。
 
+```figure
+cv-diffusion-image
+```
+
 ## 动手构建
 
 ### 第 1 步：噪声调度

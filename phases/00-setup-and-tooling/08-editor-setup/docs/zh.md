@@ -33,6 +33,10 @@ graph TD
     L1["1. 基础编辑器<br/>VS Code —— 免费、可扩展、通用"]
 ```
 
+```figure
+s0-lsp-roundtrip
+```
+
 ## 动手构建
 
 ### 第 1 步：安装 VS Code

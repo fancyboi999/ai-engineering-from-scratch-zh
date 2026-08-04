@@ -93,6 +93,10 @@ Qwen2.5-Omni 默认支持半双工，靠静音阈值轮流。全双工需要应�
 
 这就是为什么存在小型专用 Talker 模型，而不是"直接用主模型"。
 
+```figure
+l5-thinker-talker
+```
+
 ## 实际使用
 
 `code/main.py`：

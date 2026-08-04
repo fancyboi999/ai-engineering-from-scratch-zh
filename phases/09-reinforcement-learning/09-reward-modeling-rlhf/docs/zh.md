@@ -54,6 +54,10 @@ RLHF（Christiano 等人 2017；Ouyang 等人 2022）把偏好转成一个奖励
 - **过程奖励模型（PRM）：** 给部分解（每个推理步）打分，在 RLHF 和推理用的 GRPO 变体里都有用。
 - **Constitutional AI / RLAIF：** 用一个对齐 LLM 而非人类来生成偏好。扩展偏好预算。
 
+```figure
+reward-model
+```
+
 ## 动手构建
 
 这一课用极小的合成"prompt"和"回复"，表示成字符串。RM 是一个在 bag-of-tokens 表示上的线性打分器。没有真 LLM——重要的是流水线的*形状*，不是规模。见 `code/main.py`。

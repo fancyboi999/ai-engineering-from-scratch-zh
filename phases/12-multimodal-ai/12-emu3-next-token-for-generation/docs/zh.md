@@ -85,6 +85,10 @@ Emu3 的深层贡献是概念性的。如果下一 token 预测能扩展到在�
 
 Show-o、Janus-Pro 和 InternVL-U 都建立在这个论点之上或对其发起挑战。一直到 2025 年，中国实验室（BAAI、DeepSeek）在这个方向上比美国实验室发表得更激进。
 
+```figure
+l5-emu3-next-token
+```
+
 ## 实际使用
 
 `code/main.py` 搭了两个玩具件：

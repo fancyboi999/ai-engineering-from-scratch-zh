@@ -87,6 +87,10 @@ Claude Desktop 用按 server 加前缀。Cursor 用冲突拒绝并给清晰错�
 
 Streamable HTTP 用一个 `Mcp-Session-Id` 头。stdio 没有会话 id——进程身份本身就是会话。keepalive ping 是可选的；stdio 管道不会因不活跃而断。
 
+```figure
+tp-client-merge
+```
+
 ## 实际使用
 
 `code/main.py` 把三个模拟 MCP server 当子进程启动，逐个握手，合并它们的工具列表，并把工具调用路由到正确的那个。这些"server"实际是跑玩具应答器的其他 Python 进程（没有真实 LLM）。跑一跑看：

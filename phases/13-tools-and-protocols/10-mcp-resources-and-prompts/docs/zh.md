@@ -97,6 +97,10 @@ MCP Apps（第 14 课）：在一个 `ui://` URI 里用 `text/html;profile=mcp-a
 
 MCP 里的 prompts 不是 system prompt。宿主的 system prompt（它自己的操作指令）和 MCP prompts（server 提供、由用户触发的模板）并排共存。一个守规矩的 client 永不让 server prompt 覆盖它自己的 system prompt；它把它们分层叠加。
 
+```figure
+t3-primitive-sort
+```
+
 ## 实际使用
 
 `code/main.py` 在第 07 课的 notes server 上扩展出：

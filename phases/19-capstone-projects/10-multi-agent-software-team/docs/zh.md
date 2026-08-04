@@ -64,6 +64,10 @@ Coder A          Coder B          Coder C          Coder D          (4 parallel)
 - 可观测性：带角色标签 span 的 Langfuse、逐 agent 的 token 计账
 - 部署：K8s，每个角色一个独立 Deployment + 按积压做 HPA
 
+```figure
+ce-team-handoff
+```
+
 ## 动手构建
 
 1. **任务板。** 文件支撑的 JSONL，带类型消息：`plan_request`、`subtask`、`diff_ready`、`review_needed`、`test_needed`、`approved`、`rejected`、`replan_needed`。agent 按标签订阅。

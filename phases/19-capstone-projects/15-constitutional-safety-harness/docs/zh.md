@@ -73,6 +73,10 @@ output: CVSS-scored findings + disclosure timeline + before/after harmlessness d
 - PII 擦洗：Presidio
 - 目标：一个 8B 指令微调模型，或其他顶点项目里的某个 RAG 聊天机器人
 
+```figure
+cf-safety-stack
+```
+
 ## 动手构建
 
 1. **目标搭建。** 在 vLLM 上立起一个 8B 指令微调模型（或复用另一个顶点项目的 RAG 聊天机器人）。这就是被测应用。

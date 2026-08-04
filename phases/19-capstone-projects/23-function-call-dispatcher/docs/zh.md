@@ -14,6 +14,10 @@
 - 把 handler 异常和 transport 故障统一映射到 harness 已经看得懂的错误信封里。
 - 给并行 dispatch 加并发上限，防止一次 fan-out 40 个 tool call 把 event loop 打爆。
 
+```figure
+cf-dispatch-retry
+```
+
 ## Dispatcher 在哪一层
 
 它夹在 harness loop（第 20 课）和 tool registry（第 21 课）中间。transport（第 22 课）把输入喂进 loop；loop 把 tool call 交给 dispatcher；dispatcher 找 registry、校验参数、跑 handler，最后返回结果或者一个 JSON-RPC 风格的错误信封。

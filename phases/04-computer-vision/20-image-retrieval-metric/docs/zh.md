@@ -102,6 +102,10 @@ Facebook AI Similarity Search。最近邻搜索事实上的库。三种索引选
 
 挑模型前永远先问你在解哪一个。
 
+```figure
+metric-embedding
+```
+
 ## 动手构建
 
 ### 第 1 步：三元组损失

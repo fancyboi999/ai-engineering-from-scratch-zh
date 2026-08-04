@@ -80,6 +80,10 @@ flowchart LR
 
 如果 resume 只能跳到下一个 epoch 开头，浪费几分钟到一整天不等。解决办法是 `(epoch, batch_in_epoch)` 加上 RNG 状态。加载后，训练循环把随机数生成器快进到当前 epoch 中已消费的 batch 之后，从 `batch_in_epoch` 继续。课程代码就是这么做的；断言是 resume 后的 loss 轨迹与未中断 baseline 的差异在 1e-4 以内。
 
+```figure
+cc-atomic-checkpoint
+```
+
 ## 动手构建
 
 `code/main.py` 提供四个原语和一个 demo 驱动。

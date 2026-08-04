@@ -87,6 +87,10 @@ Llama 3.1 的 128K 上下文是个数据中心特性。在一台 8 GB RAM 的手
 - 数据中心与边缘的带宽差距：30-50 倍。
 - WebGPU 移动端覆盖：约 70-75%（Firefox Android 落后）。
 
+```figure
+edge-bandwidth-pipe
+```
+
 ## 实际使用
 
 `code/main.py` 跨边缘目标用带宽受限数学算出理论 decode 吞吐天花板。和观测到的基准对比，并指出哪里是带宽（而非算力）成为瓶颈。

@@ -161,6 +161,10 @@ graph LR
 
 大多数 2026 年前沿流水线四者都跑。CAI 做安全层。GRPO 做推理后训练那一遍。DPO 做偏好打磨。小规模 RLHF 遍处理其他方法搞不定的残留行为。
 
+```figure
+self-critique-loop
+```
+
 ## 动手构建
 
 代码用纯 Python + numpy 实现三样东西。一个 Constitutional AI 自我批判循环。一个针对简单算术的基于规则的奖励检查器。一个跑在第 04 课微型语言模型上的极简 GRPO 训练器。

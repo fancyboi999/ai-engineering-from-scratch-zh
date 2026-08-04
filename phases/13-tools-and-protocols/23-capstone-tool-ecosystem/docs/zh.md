@@ -106,6 +106,10 @@ research-system/
 | 20 | LLM 层的路由网关 |
 | 21 | SKILL.md + AGENTS.md 打包 |
 
+```figure
+t3-capstone-chain
+```
+
 ## 实际使用
 
 `code/main.py` 把前几课的模式缝成一个可运行的 demo。全标准库、全进程内，让你能端到端地读它。它跑研究并出报告场景的完整流程：和网关握手、OAuth 2.1 模拟、tools/list 合并、generate_report 作为一个 task、对 writer 的 A2A 调用、返回 ui:// 资源、发出 OTel span。

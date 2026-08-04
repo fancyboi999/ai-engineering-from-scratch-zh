@@ -69,6 +69,10 @@ browser / Twilio PSTN
 - 可观测性：OpenTelemetry 语音 span，带音频回放的 Langfuse 语音 trace
 - 部署：自托管 Whisper + Orpheus 用单台 g5.xlarge（24GB 显存）；要最低延迟就用托管 API
 
+```figure
+ce-voice-latency
+```
+
 ## 动手构建
 
 1. **WebRTC 会话。** 立起一个 LiveKit room 和一个流式推送麦克风音频的 web 客户端。服务端挂一个加入这个 room 的 agent worker。

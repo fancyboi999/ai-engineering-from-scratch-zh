@@ -91,6 +91,10 @@
 - 节奏：每周 canary、每月 game day、每季度审计。
 - 五个 LLM 实验：内存、网络、供应商、畸形 prompt、KV 风暴。
 
+```figure
+i4-chaos-guard
+```
+
 ## 实际使用
 
 `code/main.py` 用安全面闸门模拟三个混沌实验。报告哪些实验会触发燃尽率中止。

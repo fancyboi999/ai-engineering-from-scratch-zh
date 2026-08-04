@@ -120,6 +120,10 @@ def notes_search(query: str, limit: int = 10) -> list[dict]:
 
 TypeScript SDK 有一个等价的形状。准备好时毕业路径是直接替换；概念（能力、分发、内容 block）是一样的。
 
+```figure
+t3-dispatch-loop
+```
+
 ## 实际使用
 
 `code/main.py` 是一个完整的、跑在 stdio 上、纯标准库的 notes MCP server。它处理 `initialize`、三个工具（`notes_list`、`notes_search`、`notes_create`）的 `tools/list` 和 `tools/call`、每条笔记的 `resources/list` 和 `resources/read`，以及一个 `review_note` prompt。你可以靠管入 JSON-RPC 消息来驱动它：

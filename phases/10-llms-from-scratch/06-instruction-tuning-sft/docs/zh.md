@@ -189,6 +189,10 @@ graph TD
     style C3 fill:#1a1a2e,stroke:#51cf66,color:#fff
 ```
 
+```figure
+loss-masking
+```
+
 ## 动手构建
 
 ### 第 1 步：指令数据集

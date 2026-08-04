@@ -37,6 +37,10 @@ Paper
 
 references 和 citations 字段构成有向引用图。两个 mock API 返回的字段有重叠但不完全一样，所以语料加载器按 `id` 做合并。
 
+```figure
+cg-citation-hops
+```
+
 ## 架构
 
 ```mermaid

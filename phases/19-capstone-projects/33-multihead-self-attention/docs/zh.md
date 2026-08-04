@@ -14,6 +14,10 @@
 - 对固定输入检查每个 head 的 attention weight，并解释不同 head 在看什么。
 - 在 toy task 上训练一个小 attention block，观察 loss 下降以及 head 的分工。
 
+```figure
+cap-multihead-attention
+```
+
 ## 框架
 
 attention 的作用，是让一个 token 的表示从同一序列里的其他 token 那里拉信息。self-attention 的意思是：query、key、value 都来自同一份输入。multi-head 的意思是：同一次 projection 会被拆成 H 个并行 attention 子问题，最后再把它们拼回去。

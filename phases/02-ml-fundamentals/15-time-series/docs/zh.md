@@ -234,6 +234,10 @@ ARIMA(p, d, q) 把三者结合。你根据 ACF/PACF 分析或自动搜索（auto
 | 滞后特征太多 | "历史越多越好" | 用 ACF 决定相关的滞后 |
 | 不差分 | "模型会自己搞定" | 树模型能处理趋势；线性模型需要平稳 |
 
+```figure
+f3-series-decompose
+```
+
 ## 动手构建
 
 `code/time_series.py` 里的代码从零实现核心构件。

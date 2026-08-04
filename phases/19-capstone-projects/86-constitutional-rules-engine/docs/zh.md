@@ -51,6 +51,10 @@ fixer 是一列声明式操作：`append_if_missing`、`prepend_if_missing`、`r
 
 diff 是拿原始版和修订版算出来的。它是一列 `Change` 记录，含 `op`（add、remove、edit）和相关文本。下游的安全防护可以把 diff 记下来，这样人类审阅者可以长期审计 fixer 的行为。
 
+```figure
+cd-constitution-loop
+```
+
 ## 动手构建
 
 `code/rules.yml` 存放这部 constitution。`code/main.py` 里的加载器既接受 YAML 文件（当 PyYAML 可用时），也接受 JSON 文件（内置）。本课附带的 `rules.yml` 会被课程测试用两条代码路径都解析一遍。`code/main.py` 定义 `Engine` 和 `Fixer` 类，以及一个 `diff` 函数。组合用递归评估，并在 `any_of` 上短路。

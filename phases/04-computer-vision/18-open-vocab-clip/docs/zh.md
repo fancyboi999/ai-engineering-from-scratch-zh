@@ -88,6 +88,10 @@ Prompt engineering 要紧。OpenAI 为 ImageNet 发布了 80 个 prompt 模板�
 
 一旦你有了一个共享嵌入空间，每个视觉+语言任务都变成了一次距离计算。
 
+```figure
+clip-contrastive
+```
+
 ## 动手构建
 
 ### 第 1 步：一个微型双塔模型

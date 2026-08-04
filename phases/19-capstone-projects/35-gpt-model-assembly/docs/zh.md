@@ -83,6 +83,10 @@ flowchart LR
 
 它们组合出来的生成行为差很多。下一课的训练环节会把生成样本当作定性评估信号。
 
+```figure
+cc-gpt-assembly
+```
+
 ## 动手构建
 
 `code/main.py` 会实现：

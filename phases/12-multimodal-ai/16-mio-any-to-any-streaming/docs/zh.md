@@ -111,6 +111,10 @@ MIO 最接近纯 token 的任意到任意。AnyGPT 是它的概念祖先。
 
 这些是开放的研究问题。Qwen3-Omni（第 12.20 课）是 2025 年最先进的开放尝试。
 
+```figure
+any-to-any-stream
+```
+
 ## 实际使用
 
 `code/main.py`：

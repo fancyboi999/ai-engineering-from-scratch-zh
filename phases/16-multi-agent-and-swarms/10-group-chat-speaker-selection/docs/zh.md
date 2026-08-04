@@ -90,6 +90,10 @@ manager = GroupChatManager(groupchat=chat, llm_config={...})
 
 两者都用第 04 课的四个原语。群聊默认用 LLM 选择式 orchestration 和全池共享状态。
 
+```figure
+swarm-speaker
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库从零实现了一个 GroupChat。三个 agent（coder、reviewer、manager），轮询和 LLM 选择两种变体，以及一个基于 `TERMINATE` token 的终止。

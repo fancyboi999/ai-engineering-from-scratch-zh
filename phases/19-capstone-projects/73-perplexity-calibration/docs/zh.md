@@ -15,6 +15,10 @@
 - 构建画置信度-准确率曲线所需的 reliability diagram 数据。
 - 把这三者接进 eval harness，让 runner 能把 `perplexity`、`ece`、`brier` 几个数字挂到模型报告上。
 
+```figure
+cd-reliability-diagram
+```
+
 ## perplexity 告诉你什么
 
 perplexity 是每 token 平均负对数似然取指数。越低越好。perplexity 为一，意味着模型给每个真实 token 都赋了概率一。perplexity 等于词表大小，意味着模型是均匀分布、什么都没学到。真实数字落在两者之间：一个强的 2026 base 模型在 WikiText-103 上大约在八到十二，一个差的在同一段文本上则在五十以上。

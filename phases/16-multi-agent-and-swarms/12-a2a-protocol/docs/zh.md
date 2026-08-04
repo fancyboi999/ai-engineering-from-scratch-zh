@@ -98,6 +98,10 @@ A2A 支持三种常见模式：
 
 截至 2026 年 4 月，A2A 是采用最广的对等协议。对比见 arXiv:2505.02279（Liu 等人，《A Survey of Agent Interoperability Protocols》）。
 
+```figure
+sw-agent-card-discovery
+```
+
 ## 动手构建
 
 `code/main.py` 用 `http.server` 和 JSON 实现一个 A2A 最小服务器和客户端。服务器：

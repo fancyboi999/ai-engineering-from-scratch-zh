@@ -100,6 +100,10 @@
 | 带 reducer 的成千上万个并行扇出 | LangGraph + `Send` | 唯一一个有一等并行派发原语的。 |
 | 快速原型，不绑定框架 | 朴素 Python + provider SDK | 没有框架就是最快的框架。 |
 
+```figure
+l5-framework-fit
+```
+
 ## 练习
 
 1. **简单。** 拿同一个任务——"研究 Anthropic 的总部、写一份 200 词简报、引用来源"——在 LangGraph（四个节点：plan、search、write、cite）和 CrewAI（三个角色：researcher、writer、editor）里各实现一遍。报告每次运行的 token 成本和代码行数。

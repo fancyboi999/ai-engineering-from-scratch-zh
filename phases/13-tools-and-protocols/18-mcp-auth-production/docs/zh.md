@@ -255,6 +255,10 @@ Server B 的校验器：
 - **注册 token 失窃。** 一个泄漏的 `registration_access_token` 让攻击者能改写 redirect URI。把它们静态哈希存储；要求 client 在每次更新时呈递明文；有怀疑就轮换。
 - **`iss` 未钉定。** 一个接受任意 `iss` 的校验器，让攻击者能立起自己的 authorization server、为目标受众注册一个 client、再签发 token。protected-resource 元数据里的 `authorization_servers` 列表就是 allow-list；强制执行它。
 
+```figure
+t3-jwks-rotate
+```
+
 ## 实际使用
 
 `code/main.py` 用标准库 Python 和三个角色——`AuthorizationServer`、`ResourceServer`、`Client`——走完整个生产流程。流程如下：

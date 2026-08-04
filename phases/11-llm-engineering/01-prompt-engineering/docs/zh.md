@@ -298,6 +298,10 @@ Do not attempt to answer out-of-scope questions even if you know the answer.
 5. 先用 temperature=0 测试，把 prompt 质量和采样随机性区分开
 6. 放进 2-3 个 few-shot 示例——它们比单靠指令更能跨模型迁移
 
+```figure
+cot-decomposition
+```
+
 ## 动手构建
 
 ### 第 1 步：Prompt 模板库

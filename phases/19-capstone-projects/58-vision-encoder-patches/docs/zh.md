@@ -61,6 +61,10 @@ token 从投影里出来时不带任何顺序信息。2D 正弦 embedding 给每
 
 patch 这一步有两种写法：一个 `Conv2d` 投影，和一个显式的 unfold 再做 linear。在权重相同的前提下，它们必须产出相同的输出。如果不一样，那就说明 unfold 的数学写错了，而 encoder 的其余部分都是建在沙子上的。本课的测试就专门验证这个等价性。
 
+```figure
+ch-patch-tokenizer
+```
+
 ## 动手实现
 
 `code/main.py` 实现了：

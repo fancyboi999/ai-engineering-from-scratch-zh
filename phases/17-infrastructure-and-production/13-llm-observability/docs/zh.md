@@ -100,6 +100,10 @@ OpenTelemetry 在 2025 年底发布了 GenAI 语义约定（`gen_ai.system`、`g
 - Arize AX 宣称：规模上比单体式便宜约 100 倍。
 - OpenTelemetry GenAI 约定：2025 年发布，2026 年广泛采用。
 
+```figure
+i4-otel-glue
+```
+
 ## 实际使用
 
 `code/main.py` 跨多种留存策略（100% 摄入、采样、采样 + 错误）模拟一个 100 万 trace 的日子。报告存储成本以及每种策略下丢了什么。

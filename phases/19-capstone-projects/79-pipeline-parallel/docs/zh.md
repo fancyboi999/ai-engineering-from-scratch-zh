@@ -48,6 +48,10 @@ flowchart LR
 
 一条 pipeline 跑 M 个大小为 B 的 microbatch。有效 batch size 是 M*B。Pipeline 一步结束时的梯度，就是在合起来的 M*B 个样本上的梯度。Bubble 比例取决于 M；optimizer 看到的是 M*B。调 M 就是在 bubble（M 高则更低）和每 microbatch 内存（在 GPipe 下 M 高则激活内存更高）之间权衡。
 
+```figure
+cd-pipeline-bubble
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

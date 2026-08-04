@@ -43,6 +43,10 @@ flowchart LR
 
 detector 不是安全防护本身。它只是安全防护会去组合的众多信号之一。按设计，它在 encoding-trick 和 instruction-override 上偏向 recall，并接受在 role-play 上只有中等 precision，因为 role-play 攻击会和正当的创意写作请求混在一起，而对于这些边界情况，安全防护会动用其他信号（规则引擎、classifier）。
 
+```figure
+injection-gate
+```
+
 ## 动手构建
 
 语料库加载器读取第 82 课的 `outputs/taxonomy.json`。规则放在 `code/rules.py` 里，是数据而非代码。每条规则是一个字典，含 `name`、`category`、`score`，以及 `substring` 或 `regex` 之一。detector 类只编译它们一次。

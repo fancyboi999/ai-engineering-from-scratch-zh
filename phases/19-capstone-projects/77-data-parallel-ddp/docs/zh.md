@@ -59,6 +59,10 @@ Allreduce-SUM 再除以 world_size 得到平均梯度。平均对 world_size 不
 
 每个 rank 必须用 `torch.manual_seed(seed + rank)` 来做 shuffle，但用 `torch.manual_seed(seed)` 来做参数初始化。共用一个 seed 意味着每个 rank 看到的 batch 顺序相同（数据并行就白搞了）；给参数用 rank 相关的 seed，则会让初始参数差一个 float epsilon，gradient sync 也就再也无法让副本完全一致。Seed 的套路弄对，否则参数等价的测试在第 1 步就挂。
 
+```figure
+ci-ddp-grad-sync
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

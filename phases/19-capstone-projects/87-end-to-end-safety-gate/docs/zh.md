@@ -47,6 +47,10 @@ during-gen 过滤器是一个流式抽象。mock LLM 产出 chunk（默认每块
 
 mock LLM 有两种行为，按 prompt 区分：它拒绝可识别的攻击（返回 `I cannot ...`），并回答 benign prompt（返回一个通用的有用字符串）。对于一小部分攻击（尤其是输入流水线没抓到的 encoding trick），它会产生一段部分有害的续写，正好让 during-gen 过滤器去抓。这是故意的。gate 的价值在于分层防御；demo 展示各层之间正确地相互作用。
 
+```figure
+safety-checkpoints
+```
+
 ## 动手构建
 
 `code/safety_gate.py` 定义 `SafetyGate` 类。它通过相对文件路径，从前几课导入 detector、classifier router 和规则引擎。`code/mock_llm_stream.py` 定义一个流式 mock LLM，带三个脚本化人设（clean、attacker-honest、attacker-lazy）。`code/main.py` 把第 82 课的语料库端到端跑过 gate，并写出 `outputs/gate_trace.json`。

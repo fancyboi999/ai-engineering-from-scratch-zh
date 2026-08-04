@@ -40,6 +40,10 @@ Pix2Pix 需要成对的 `(x, y)` 数据。CycleGAN（Zhu et al., 2017）以多�
 
 到 2026 年，无配对图到图大多用扩散（ControlNet、IP-Adapter）来做，而不是 CycleGAN，但循环一致性这个想法在几乎每篇无配对域适应论文里都活着。
 
+```figure
+gx-patchgan
+```
+
 ## 动手构建
 
 `code/main.py` 在一维数据上实现一个迷你条件 GAN。条件 `c` 是一个类别标签（0 或 1）。任务：为给定类别从其条件分布里产出一个样本。

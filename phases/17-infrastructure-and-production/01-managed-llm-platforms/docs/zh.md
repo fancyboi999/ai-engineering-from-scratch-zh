@@ -78,6 +78,10 @@ Vertex：HIPAA、GDPR、按区域的数据驻留；Google Cloud 的合规栈。
 - Azure PTU 盈亏平衡：~40-60% 的持续利用率。
 - 高利用率下 PTU 相比按需的节省：最多 70%。
 
+```figure
+i4-platform-lanes
+```
+
 ## 实际使用
 
 `code/main.py` 在一个合成工作负载上对比三个平台 —— 它对按需 vs PTU 的经济账、TTFT 方差和成本归因的精确度建模。跑一下，看看 PTU 在哪里划算，以及市场型的模型广度在哪里盖过 TTFT 的差距。

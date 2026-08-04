@@ -112,6 +112,10 @@ L = L_rpn_cls + L_rpn_box + L_box_cls + L_box_reg + L_mask
 
 掩码已经是整图分辨率。28x28 的头部输出在内部被上采样过了。
 
+```figure
+cv3-roialign-sampling
+```
+
 ## 动手构建
 
 ### 第 1 步：从零实现 RoIAlign

@@ -73,6 +73,10 @@ graph TD
   生产环境里跑在负载均衡器后面。
 ```
 
+```figure
+s0-image-layers
+```
+
 ## 动手构建
 
 ### 第 1 步：安装 Docker

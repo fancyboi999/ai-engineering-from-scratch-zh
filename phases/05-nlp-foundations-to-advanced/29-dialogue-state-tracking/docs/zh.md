@@ -50,6 +50,10 @@
 - **纠正。** "Actually make it 7 pm." 必须更新时间而不清掉其他槽位。
 - **对前一句系统话语的共指。** "Yes, that one." 哪个 "that"？
 
+```figure
+n5-slot-tracker
+```
+
 ## 动手构建
 
 ### 第 1 步：基于规则的槽位抽取器

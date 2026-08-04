@@ -109,6 +109,10 @@ Qwen2.5-VL 的 agent 训练明确瞄准结构化工具调用：
 
 解析是确定性的：对模型输出做 JSON.parse。对比自由形式的"click at (1024, 512)"，那种需要正则和歧义处理。这一转变正是 Qwen2.5-VL 的 ScreenSpot 分数从 Qwen2-VL 的 55% 跳到 84% 的原因。
 
+```figure
+mm-mrope-axes
+```
+
 ## 实际使用
 
 `code/main.py` 实现了：

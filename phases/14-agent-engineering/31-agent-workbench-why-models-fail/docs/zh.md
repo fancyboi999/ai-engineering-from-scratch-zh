@@ -134,6 +134,10 @@ agent 循环本身是一个 worker，它消费事件（用户消息、工具结�
 
 所以当你在别处听到「harness 工程」，把它翻译成原语。prompt 和规则是策略和函数。脚手架是运行时。guardrail 是授权 + 验证。hook 是触发器。记忆是会话持久化。Ralph Loop 是重新入队。子 agent 是 worker。sandbox 是计算平面。词汇变了；工程没变。工作台是面向 agent 的 UX；而 harness —— 在能挺过下一次厂商重新框定的那个意义上 —— 是函数、worker、触发器、运行时、队列、持久化和策略正确接在一起。
 
+```figure
+wb-seven-surfaces
+```
+
 ## 动手构建
 
 `code/main.py` 把一个小仓库任务跑两遍。先仅用 prompt，然后接好七个接触面。同一个模型，同一个任务。脚本统计失败那次运行缺了哪些接触面，并打印一份失败模式报告。

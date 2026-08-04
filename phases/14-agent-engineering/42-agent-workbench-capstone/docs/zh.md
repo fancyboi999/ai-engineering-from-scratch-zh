@@ -83,6 +83,10 @@ outputs/agent-workbench-pack/
 
 包带一个 `VERSION` 文件。需要迁移的 schema 升级和脚本变更升主版本号。仅文档的变更升补丁号。目标仓库的 `agent_state.json` 记录它是对着哪个包版本初始化的。
 
+```figure
+wb-pack-install
+```
+
 ## 动手构建
 
 `code/main.py` 把包组装进课旁边的 `outputs/agent-workbench-pack/`，用这个小专题之前各课的 schema 和脚本以及你已经写好的文档播种。

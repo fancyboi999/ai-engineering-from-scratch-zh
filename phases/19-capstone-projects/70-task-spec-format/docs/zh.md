@@ -15,6 +15,10 @@
 - 实现一个严格的 validator，把格式错误的记录在进入 runner 之前就拦下来。
 - 交付一组 10 个任务的 fixture，把规格的每个分支都跑一遍，让 validator 有真东西可以咀嚼。
 
+```figure
+ci-task-spec-gate
+```
+
 ## 为什么要冻结规格
 
 一个研究型代码库积累 eval 脚本的速度，永远快过它积累测试的速度。半年下来，每个 notebook 都有自己的一套 JSON 形状，每个 metric 都被重写了两遍，没有任何东西能跨 run 对比。修复方法很无聊：选一份 schema，写一个 validator，其余一律拒收。这节课做的就是这件事。

@@ -127,6 +127,10 @@ OCR 流水线仍在以下方面取胜：
 - 全 arXiv 摄入：数学用 Nougat，图用 VLM。
 - 监管场景：OCR 流水线 + VLM 验证器交叉核对。
 
+```figure
+mm-doc-layout
+```
+
 ## 实际使用
 
 `code/main.py`：

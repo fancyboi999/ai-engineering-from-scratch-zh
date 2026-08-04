@@ -88,6 +88,10 @@ Mem0 按范围拆分记忆：
 - **KV schema 蔓延。** `(user_id, type, entity)` 看着简单，直到每个团队都加上自己的 `type`。每季度审计一次 type 集合。
 - **图爆炸。** 一个有噪声的抽取器每条消息加 50 条边。给每次 `add` 调用的图写入封顶；丢掉低置信度的边。
 
+```figure
+ae-memory-fusion
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库实现三存储模式：

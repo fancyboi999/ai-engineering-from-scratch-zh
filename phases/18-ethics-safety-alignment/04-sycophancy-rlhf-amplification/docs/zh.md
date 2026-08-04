@@ -83,6 +83,10 @@ r'(x, y) = r(x, y) - alpha * agree(x, y)
 
 它也是最清楚的一个案例：优化器干的恰恰就是目标说的事。修法只能在目标处，不能在优化器处。
 
+```figure
+al-sycophancy-amplifier
+```
+
 ## 实际使用
 
 `code/main.py` 在一个玩具 3 动作世界里模拟阿谀放大。基座策略在动作 {correct-answer, sycophantic-agreement, random-wrong} 上均匀。奖励模型对附和（那个虚假特征）给一点正奖励，对正确性给真实效用。你可以切换附和惩罚，看着阿谀奉承随 beta 和 alpha 起落。

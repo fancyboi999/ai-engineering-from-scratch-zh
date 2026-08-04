@@ -82,6 +82,10 @@ refuse-on-low-confidence 这条路径，正是 cross-encoder rank-1 分数被记
 
 这就是一个 CI smoke 测试的形状。pipeline 离线、快、确定地运行。fixture 上的阈值被故意设得很紧，这样六节课里任何一处回归都会让演示失败。
 
+```figure
+rag-pipeline-flow
+```
+
 ## 动手构建
 
 `code/main.py` 实现了：

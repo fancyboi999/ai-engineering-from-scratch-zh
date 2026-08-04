@@ -92,6 +92,10 @@ Cloudflare MCP Portals、Kong AI Gateway、IBM ContextForge、MintMCP、TrueFoun
 
 阶段 17（生产基础设施）更深入网关运维。
 
+```figure
+t3-gateway-funnel
+```
+
 ## 实际使用
 
 `code/main.py` 用约 150 行交付一个极简网关：用一个假 Bearer token 认证用户、持有每用户 RBAC 策略、把请求路由到两个后端 MCP server、把每个调用写进审计日志、强制一个限流，并拒绝任何描述哈希对不上钉定清单的后端工具。

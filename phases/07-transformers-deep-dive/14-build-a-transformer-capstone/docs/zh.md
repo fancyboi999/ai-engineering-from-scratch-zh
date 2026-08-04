@@ -75,6 +75,10 @@ shift-by-one cross-entropy            ◀── 第 07 课
 - 采样输出看着像莎士比亚的样子：古风词、换行、像 "ROMEO:" 这样的专名涌现出来。
 - 验证损失（留出的最后 10% 文本）和训练损失贴得很近；在这个规模/预算下不过拟合。
 
+```figure
+n5-block-stack
+```
+
 ## 动手构建
 
 这节课用 PyTorch。装 `torch`（CPU 版就行）。见 `code/main.py`。脚本负责：

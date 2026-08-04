@@ -41,6 +41,10 @@
    适合：正经训练、大模型
 ```
 
+```figure
+s0-gpu-dispatch
+```
+
 ## 动手构建
 
 ### 选项 1：本地 NVIDIA GPU

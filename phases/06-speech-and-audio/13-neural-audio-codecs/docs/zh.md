@@ -74,6 +74,10 @@ frame_t → [semantic_token_t, acoustic_token_0_t, acoustic_token_1_t, ..., acou
 
 像 Opus 这样的传统编解码在每比特感知质量上仍然胜出。神经编解码胜在**离散 token**（Opus 不产出这个）和**生成模型质量**（LM 拿这些 token 能干什么）。
 
+```figure
+rvq-codec-cascade
+```
+
 ## 动手构建
 
 ### 第 1 步：用 EnCodec 编码

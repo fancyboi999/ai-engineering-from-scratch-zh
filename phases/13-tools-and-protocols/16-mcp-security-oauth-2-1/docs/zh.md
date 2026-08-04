@@ -113,6 +113,10 @@ token 绑到 `aud`。client 绑到 `client_id`。每个请求都对两者校验�
 
 阶段 13 · 17 展示一个企业网关如何处理 OAuth：网关持有上游 server 的凭证，给 client 的 token 是网关签发的，上游 token 永不离开网关。这翻转了信任模型——用户跟网关认证一次；网关处理 N 个 server 授权。
 
+```figure
+t3-scope-stepup
+```
+
 ## 实际使用
 
 `code/main.py` 把完整的 OAuth 2.1 step-up 流程模拟为一个状态机。它实现：

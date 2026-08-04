@@ -63,6 +63,10 @@ OTel GenAI（第 23 课）给你 schema。你仍然需要那个摄入 span、跑
 - **没有锚定的自搓 LLM 裁判。** CRITIC 模式（第 05 课）适用 —— 裁判做事实验证需要外部工具。
 - **prompt 版本没绑到 trace。** 当生产回归时，你没法二分定位到引发它的那个 prompt。
 
+```figure
+wb-trace-ingest
+```
+
 ## 动手构建
 
 `code/main.py` 用标准库实现一个 trace 收集器 + LLM 裁判评估器：

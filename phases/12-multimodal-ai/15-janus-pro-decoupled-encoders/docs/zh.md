@@ -89,6 +89,10 @@ InternVL-U 把 Janus-Pro 的架构选择纳入一个更大的框架。解耦编�
 
 对两者都需要的产品，Janus-Pro 如今是参考性的开放架构。
 
+```figure
+l5-janus-decouple
+```
+
 ## 实际使用
 
 `code/main.py` 模拟 Janus-Pro 路由：

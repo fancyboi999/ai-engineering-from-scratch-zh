@@ -66,6 +66,10 @@ Plan-and-Act 把这个模式扩展到长跨度的网页和移动端 agent。关�
 
 Anthropic 2024 年 12 月的建议：从最简单的开始。如果任务就是一次工具调用加一段汇总，别去搭 ReWOO。如果任务是一个 40 步的研究作业，别光用 ReAct。
 
+```figure
+rewoo-plan
+```
+
 ## 动手构建
 
 `code/main.py` 实现了一个玩具版 ReWOO：

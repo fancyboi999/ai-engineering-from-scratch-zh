@@ -113,6 +113,10 @@ trace_id: abc123
 - 单位指标：每解决查询的成本，不是 $/M token。
 - 叠加优化：可能做到基线的约 5-10%。
 
+```figure
+i4-spend-ladder
+```
+
 ## 实际使用
 
 `code/main.py` 用三档执行阶梯模拟一个多租户 LLM 服务。注入一个滥用租户并演示 kill switch 触发。

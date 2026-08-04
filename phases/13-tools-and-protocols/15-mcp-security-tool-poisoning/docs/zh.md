@@ -93,6 +93,10 @@ Server A 用调用 Server B 工具的指令调 sampling。在两个 server 的�
 - **清洗描述文本。** 创意表述太多，抓不全。
 - **限描述长度。** 注入 200 字符就装得下。
 
+```figure
+tp-tool-poisoning
+```
+
 ## 实际使用
 
 `code/main.py` 交付一个工具投毒检测器，含两个组件：

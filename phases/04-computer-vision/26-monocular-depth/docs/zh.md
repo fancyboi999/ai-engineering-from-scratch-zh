@@ -101,6 +101,10 @@ Z = d
 
 对相对深度（Depth Anything V3、MiDaS），评估用两个指标的尺度-平移不变版本。
 
+```figure
+depth-sweep
+```
+
 ## 动手构建
 
 ### 第 1 步：深度指标

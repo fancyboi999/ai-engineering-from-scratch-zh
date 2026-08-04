@@ -73,6 +73,10 @@ flowchart TD
 | `handoff_quality` | 下个会话为它付出代价或从中受益 |
 | `reviewer_total` | 在关卡之上的定性判断 |
 
+```figure
+wb-ab-runs
+```
+
 ## 动手构建
 
 `code/main.py` 在同一个示例应用 fixture 上编排两条流水线。两条流水线都是脚本化的（循环里没有 LLM），所以度量可复现。脚本把对比写进 `before-after-report.md` 和 `comparison.json`。

@@ -111,6 +111,10 @@
 | MMAU 音乐子集 | 音乐 LALM | （在 MMAU 内） |
 | HEAR benchmark | 自监督音频 | `hearbenchmark.com` |
 
+```figure
+sp-wer-align
+```
+
 ## 动手构建
 
 ### 第 1 步：带归一化的 WER

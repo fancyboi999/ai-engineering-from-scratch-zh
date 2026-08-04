@@ -56,6 +56,10 @@ flowchart TD
 
 规则（阶段 14 · 33）描述行动前什么必须为真。init 是建立「那些规则能被检查」的脚本。没有 init 的规则变成「小心点」。没有规则的 init 变成一次精致的失败。
 
+```figure
+wb-init-probes
+```
+
 ## 动手构建
 
 `code/main.py` 实现 `init_agent.py`：

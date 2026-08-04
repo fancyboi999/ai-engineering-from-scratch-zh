@@ -72,6 +72,10 @@ learner device
 - 安全：Llama Guard 4 + 自定义适龄过滤器
 - 评测：Bloom 层级题目生成、前/后测外壳、成效研究工具
 
+```figure
+cf-tutor-loop
+```
+
 ## 动手构建
 
 1. **课程图。** 建一个 50-150 个概念节点的 Neo4j（如 K-12 代数从“数轴”到“求根公式”），带前置依赖边。每个节点挂上 OER 内容（Open Textbook、OpenStax）。

@@ -99,6 +99,10 @@ Janus-Pro（第 12.15 课）通过把理解和生成的视觉编码器解耦—�
 
 2026 年那些能吐图像的生产 VLM——Gemini 3 Pro、GPT-5、Claude Opus 4.7 的图像生成路径——几乎肯定用了这个家族的某个后代。细节是专有的。
 
+```figure
+cfg-guidance-scale
+```
+
 ## 实际使用
 
 `code/main.py` 在一个微型 MNIST 式问题上搭了一个玩具 Transfusion：

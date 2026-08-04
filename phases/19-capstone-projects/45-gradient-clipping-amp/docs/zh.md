@@ -58,6 +58,10 @@ flowchart TD
 
 Scaling factor 是 GradScaler 的内部状态。每步本课都读 `scaler.get_scale()` 并和学习率、gradient norm 一起记录。健康的训练会看到 factor 按 2 的幂往上爬直到 `2^17` 或 `2^18` 附近饱和。不健康的训练会看到 factor 在高低之间振荡——这就是模型梯度有时在范围内有时不在的信号。不记日志的话这个诊断信息是隐形的。
 
+```figure
+grad-clip-monitor
+```
+
 ## 构建
 
 `code/main.py` 实现：

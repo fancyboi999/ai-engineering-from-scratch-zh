@@ -50,6 +50,10 @@ gate 就是任何实现了 `evaluate(call, ctx) -> GateDecision` 的东西。cha
 
 Observation ledger 负责账本。每次成功 tool call 都写一行：tool name、turn、输出 token 数、累计 token 数。它至少能回答两个问题：模型总共看了多少，以及在某个 tool 上看了多少。budget gate 用第一个答案；你在练习里会写一个 per-tool budget gate，用第二个。
 
+```figure
+cg-gate-chain
+```
+
 ## 架构
 
 ```mermaid

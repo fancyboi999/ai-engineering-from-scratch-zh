@@ -39,6 +39,10 @@ LDA 的关键输出：
 
 输出是每篇文档一个主题（外加一个 -1 离群标签）。可选地，通过 HDBSCAN 的概率向量给出软成员归属。
 
+```figure
+topic-drift
+```
+
 ## 动手构建
 
 ### 第 1 步：用 scikit-learn 做 LDA
