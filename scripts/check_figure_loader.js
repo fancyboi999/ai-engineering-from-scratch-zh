@@ -7,7 +7,6 @@
  */
 
 const assert = require('node:assert/strict');
-const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
@@ -147,17 +146,17 @@ async function main() {
   const names = Object.keys(mapping);
   assert.ok(names.length > 0, 'manifest must map at least one figure');
 
-  // The authoritative lazy set comes from Git, not from the manifest itself.
-  const lazyModules = execFileSync('git', [
-    'diff', '--name-only', '--diff-filter=A', 'origin/main...HEAD', '--', 'site/figures-*.js',
-  ], { cwd: root, encoding: 'utf8' })
-    .trim().split('\n').filter(Boolean)
+  // Derive the lazy set from repository state so this audit remains valid on
+  // main and in later PRs, where the renderer files are no longer Git additions.
+  const staticEntries = staticRegistry();
+  const staticModules = new Set(staticEntries.map(function (entry) { return entry[0]; }));
+  const lazyModules = fs.readdirSync(site)
+    .filter(function (file) { return /^figures-.*\.js$/.test(file); })
     .filter(function (file) {
-      // The manifest and i18n layer share the figures-* naming convention but
-      // are not renderer modules. Registration is the authoritative signal.
-      return fs.readFileSync(path.join(root, file), 'utf8').includes('LF.register({');
+      return !staticModules.has(file) &&
+        fs.readFileSync(path.join(site, file), 'utf8').includes('LF.register({');
     })
-    .map(function (file) { return path.basename(file); });
+    .sort();
   assert.equal(lazyModules.length, 41, 'all new renderer modules must be lazy');
 
   const lazyEntries = lazyModules.map(function (source) {
@@ -190,9 +189,9 @@ async function main() {
   assert.ok((lesson.match(/enhanceLesson\(\);/g) || []).length >= 2,
     'both prerender and runtime paths must retain the shared enhancement hook');
 
-  const legacyRegistry = assertUnique(staticRegistry(), 'legacy registry');
+  const legacyRegistry = assertUnique(staticEntries, 'legacy registry');
   const completeRegistry = assertUnique([
-    ...staticRegistry(),
+    ...staticEntries,
     ...lazyEntries,
   ], 'complete registry');
   const fenceNames = figureFences(allZhDocs(path.join(root, 'phases')));

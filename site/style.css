@@ -1508,3 +1508,303 @@ body[data-palette-open] {
   flex-shrink: 0;
 }
 
+/* ============================================================
+   READ ALOUD (SpeechSynthesis)
+   ============================================================ */
+
+.tts-toggle .tts-wave-1,
+.tts-toggle .tts-wave-2 {
+  opacity: 0.55;
+}
+
+.tts-toggle.is-active {
+  border-color: var(--blueprint);
+  color: var(--blueprint);
+}
+
+.tts-toggle.is-active .tts-wave-1 {
+  animation: tts-wave 1.4s ease-in-out infinite;
+}
+
+.tts-toggle.is-active .tts-wave-2 {
+  animation: tts-wave 1.4s ease-in-out 0.25s infinite;
+}
+
+@keyframes tts-wave {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+.tts-reading {
+  background: var(--blueprint-tint);
+  box-shadow: -10px 0 0 var(--blueprint-tint), inset 3px 0 0 var(--blueprint);
+  border-radius: 1px;
+  transition: background 0.2s;
+}
+
+.tts-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%) translateY(8px);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  max-width: calc(100vw - 24px);
+  flex-wrap: wrap;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--ink);
+  box-shadow: var(--shadow-hard);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.tts-bar.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* display:flex would override the UA [hidden] rule, leaving the controls
+   focusable and the live region announced while the bar is invisible. */
+.tts-bar[hidden] {
+  display: none;
+}
+
+.tts-btn {
+  background: transparent;
+  border: 1px solid var(--rule-soft);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 6px 9px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.tts-btn:hover {
+  border-color: var(--blueprint);
+  color: var(--blueprint);
+}
+
+.tts-btn-main {
+  min-width: 38px;
+  border-color: var(--ink);
+}
+
+.tts-btn-stop {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  padding: 7px 10px;
+}
+
+.tts-status {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 9ch;
+}
+
+.tts-field {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tts-select {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--rule-soft);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  max-width: 150px;
+  cursor: pointer;
+}
+
+.tts-select:focus-visible,
+.tts-btn:focus-visible {
+  outline: 2px solid var(--blueprint);
+  outline-offset: 1px;
+}
+
+@media (max-width: 720px) {
+  .tts-bar {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    transform: none;
+    max-width: none;
+    gap: 8px;
+  }
+
+  .tts-bar.is-visible {
+    transform: none;
+  }
+
+  .tts-field-voice {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tts-toggle.is-active .tts-wave-1,
+  .tts-toggle.is-active .tts-wave-2 {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.quiz-option.tts-reading {
+  box-shadow: inset 3px 0 0 var(--blueprint);
+}
+
+.tts-from-here {
+  position: absolute;
+  z-index: 950;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--blueprint);
+  white-space: nowrap;
+}
+
+.tts-from-here:hover {
+  background: var(--blueprint);
+  border-color: var(--blueprint);
+  color: #fff;
+}
+
+.tts-from-here[hidden] {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .tts-from-here {
+    font-size: 0.66rem;
+    padding: 7px 10px;
+  }
+}
+
+/* --- floating: drag anywhere over the article --- */
+
+.tts-bar {
+  cursor: grab;
+  touch-action: none;
+}
+
+.tts-bar.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  transition: none;
+}
+
+/* Once dragged, the bar is pinned to explicit coordinates instead of the
+   default bottom-centre anchoring. */
+.tts-bar.is-placed,
+.tts-bar.is-placed.is-visible {
+  bottom: auto;
+  transform: none;
+}
+
+.tts-bar .tts-btn,
+.tts-bar .tts-select {
+  cursor: pointer;
+}
+
+.tts-btn-collapse {
+  border-color: var(--rule-soft);
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 6px 8px;
+}
+
+/* --- collapsed: a single speaker puck --- */
+
+.tts-bar.is-collapsed {
+  padding: 0;
+  gap: 0;
+  flex-wrap: nowrap;
+}
+
+.tts-bar.is-collapsed > *:not(.tts-btn-collapse) {
+  display: none;
+}
+
+.tts-bar.is-collapsed .tts-btn-collapse {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tts-bar.is-collapsed .tts-btn-collapse:hover {
+  color: var(--blueprint);
+}
+
+.tts-bar.is-reading .tts-btn-collapse .tts-wave-1 {
+  animation: tts-wave 1.4s ease-in-out infinite;
+}
+
+.tts-bar.is-reading .tts-btn-collapse .tts-wave-2 {
+  animation: tts-wave 1.4s ease-in-out 0.25s infinite;
+}
+
+@media (max-width: 720px) {
+  /* The mobile rules stretch the bar edge to edge; a puck must not stretch. */
+  .tts-bar.is-collapsed {
+    left: auto;
+    right: 12px;
+    width: 42px;
+  }
+
+  .tts-bar.is-placed.is-collapsed {
+    right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tts-bar.is-reading .tts-btn-collapse .tts-wave-1,
+  .tts-bar.is-reading .tts-btn-collapse .tts-wave-2 {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Header uses the existing Chinese site's search + theme controls. */
+@media (max-width: 600px) {
+  .tts-toggle {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  .search-toggle {
+    flex-shrink: 0;
+  }
+}
+

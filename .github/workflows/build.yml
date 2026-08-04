@@ -6,6 +6,7 @@ name: build
 #      （曾踩 435 / 498 vs 503）。真相 = 文件系统课程目录数，校验 README 表格/badge/散文
 #      + ROADMAP 总计是否都对得上。
 #   3. 测验答案位置去偏校验，避免新题重新集中到某一个选项槽位。
+#   4. 交互图表按需加载清单与浏览器朗读状态机回归。
 # 不照搬上游 scripts/audit_lessons.py + check_readme_counts.py（它们硬编码 docs/en.md
 # + 英文 README 正则，对中文仓全不兼容，且是 B 类 1:1 同步资产，改了会与上游冲突）——
 # 改用 build.js 自带的 --check 做等价校验，认 zh.md、匹配中文文案，不碰上游 Python 脚本。
@@ -21,6 +22,8 @@ on:
       - "phases/**"
       - "scripts/debias_quizzes.py"
       - "scripts/test_debias_quizzes.py"
+      - "scripts/check_figure_loader.js"
+      - "scripts/test_tts.js"
   pull_request:
     branches: [main]
 
@@ -57,3 +60,7 @@ jobs:
         run: python3 phases/01-math-foundations/15-statistics-for-ml/code/test_statistics.py
       - name: 去偏锚点回归校验
         run: python3 scripts/test_debias_quizzes.py
+      - name: 交互图表按需加载校验
+        run: node scripts/check_figure_loader.js
+      - name: 浏览器朗读回归校验
+        run: node scripts/test_tts.js
