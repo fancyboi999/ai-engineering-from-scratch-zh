@@ -148,6 +148,40 @@ def load_json(audit: Audit, path: Path) -> Any | None:
         return None
 
 
+def path_has_symlink_component(path: Path, base: Path) -> bool:
+    try:
+        relative = path.relative_to(base)
+    except ValueError:
+        return True
+    current = base
+    for part in relative.parts:
+        current = current / part
+        if current.is_symlink():
+            return True
+    return False
+
+
+def resolve_assessment_source(
+    audit: Audit,
+    assessment_path: str,
+    declaration_path: Path,
+    location: str,
+    *,
+    root: Path = ROOT,
+    cert_root: Path = CERT_ROOT,
+) -> Path | None:
+    declared = root / assessment_path
+    if path_has_symlink_component(declared, root):
+        audit.add("C001", declared, "assessment source must not contain symlink path components")
+        return None
+    resolved = declared.resolve()
+    assessment_root = (cert_root / "assessments").resolve()
+    if not resolved.is_relative_to(assessment_root):
+        audit.add("C060", declaration_path, f"{location}.path escapes certifications/claude/assessments")
+        return None
+    return declared
+
+
 def require_string(audit: Audit, path: Path, value: Any, field: str) -> str | None:
     if not isinstance(value, str) or not value.strip():
         audit.add("C003", path, f"{field} must be a non-empty string")
@@ -556,10 +590,74 @@ def check_assessment(audit: Audit, path: Path, declaration: dict[str, Any], trac
     check_answer_quality(audit, path, questions)
 
 
+def check_study_plans(audit: Audit, path: Path, track: dict[str, Any]) -> None:
+    plans = track.get("studyPlans")
+    if not isinstance(plans, list) or not plans:
+        audit.add("C074", path, "studyPlans must be a non-empty array")
+        return
+
+    seen_ids: set[str] = set()
+    for index, plan in enumerate(plans):
+        location = f"studyPlans[{index}]"
+        if not isinstance(plan, dict):
+            audit.add("C074", path, f"{location} must be an object")
+            continue
+        plan_id = check_id(audit, path, plan.get("id"), f"{location}.id")
+        if plan_id:
+            if plan_id in seen_ids:
+                audit.add("C074", path, f"duplicate study plan id {plan_id!r}")
+            seen_ids.add(plan_id)
+        require_string(audit, path, plan.get("label"), f"{location}.label")
+        duration = plan.get("durationDays")
+        if not isinstance(duration, int) or isinstance(duration, bool) or duration < 1:
+            audit.add("C074", path, f"{location}.durationDays must be a positive integer")
+            duration = None
+        hours = plan.get("hoursPerWeek")
+        if not isinstance(hours, (int, float)) or isinstance(hours, bool) or not 0 < hours <= 168:
+            audit.add("C074", path, f"{location}.hoursPerWeek must be between 0 and 168")
+        milestones = plan.get("milestones")
+        if not isinstance(milestones, list) or not milestones or not all(isinstance(item, str) and item.strip() for item in milestones):
+            audit.add("C074", path, f"{location}.milestones must be a non-empty string array")
+            continue
+        if duration is None:
+            continue
+
+        day_ranges: list[tuple[int, int]] = []
+        week_numbers: list[int] = []
+        for milestone in milestones:
+            day_match = re.match(r"^第\s*(\d+)(?:[–-](\d+))?\s*天[：:]", milestone)
+            week_match = re.match(r"^第\s*(\d+)\s*周[：:]", milestone)
+            if day_match:
+                start = int(day_match.group(1))
+                end = int(day_match.group(2) or start)
+                day_ranges.append((start, end))
+            elif week_match:
+                week_numbers.append(int(week_match.group(1)))
+            else:
+                audit.add("C074", path, f"{location} milestone lacks a day or week range: {milestone!r}")
+
+        if day_ranges and week_numbers:
+            audit.add("C074", path, f"{location} cannot mix day and week milestone ranges")
+        elif day_ranges:
+            expected_start = 1
+            for start, end in day_ranges:
+                if start != expected_start or end < start:
+                    audit.add("C074", path, f"{location} day milestones must be contiguous; found {start}–{end} after day {expected_start - 1}")
+                    break
+                expected_start = end + 1
+            if expected_start - 1 != duration:
+                audit.add("C074", path, f"{location} milestones end on day {expected_start - 1}, expected day {duration}")
+        elif week_numbers:
+            expected_weeks = list(range(1, duration // 7 + 1)) if duration % 7 == 0 else []
+            if not expected_weeks or week_numbers != expected_weeks:
+                audit.add("C074", path, f"{location} weekly milestones {week_numbers} do not cover {duration} days")
+
+
 def check_track(audit: Audit, path: Path, track: Any, global_ids: set[str]) -> tuple[dict[str, Any] | None, set[str]]:
     if not isinstance(track, dict):
         audit.add("C010", path, "track must be a JSON object")
         return None, set()
+    check_study_plans(audit, path, track)
     track_id = check_id(audit, path, track.get("id"), "id")
     if track_id:
         if track_id in global_ids:
@@ -660,15 +758,18 @@ def check_track(audit: Audit, path: Path, track: Any, global_ids: set[str]) -> t
                 assessment_ids.add(assessment_id)
             assessment_path = require_string(audit, path, declaration.get("path"), f"assessment[{index}].path")
             if assessment_path:
-                assessment_root = (CERT_ROOT / "assessments").resolve()
-                resolved_assessment = (ROOT / assessment_path).resolve()
-                if not resolved_assessment.is_relative_to(assessment_root):
-                    audit.add("C060", path, f"assessment[{index}].path escapes certifications/claude/assessments")
+                declared_assessment = resolve_assessment_source(
+                    audit,
+                    assessment_path,
+                    path,
+                    f"assessment[{index}]",
+                )
+                if declared_assessment is None:
                     continue
-                check_assessment(audit, resolved_assessment, declaration, track)
-                if resolved_assessment.is_file():
+                check_assessment(audit, declared_assessment, declaration, track)
+                if declared_assessment.is_file():
                     try:
-                        assessment_data = json.loads(resolved_assessment.read_text(encoding="utf-8"))
+                        assessment_data = json.loads(declared_assessment.read_text(encoding="utf-8"))
                     except (json.JSONDecodeError, UnicodeDecodeError):
                         assessment_data = {}
                     for question in assessment_data.get("questions", []):

@@ -11,7 +11,7 @@
     "width": 600,
     "height": 600
   },
-  "summary": "负责安全、可观测、生产级 Claude 系统从发现到迭代的完整生命周期。",
+  "summary": "负责安全、可观测的生产级 Claude 系统，覆盖从发现到迭代的完整生命周期。",
   "audience": "负责端到端生产系统和跨职能决策的中高级解决方案架构师、AI 工程师、技术负责人和高级软件工程师。",
   "recommendedExperience": [
     "三年或以上系统架构或平台工程经验",
@@ -35,9 +35,9 @@
   "domains": [
     {"id": "solution-design-architecture", "name": "解决方案设计与架构", "weight": 17, "objectives": ["将业务问题转化为 Claude 解决方案", "设计输入、处理、输出和反馈循环", "选择工作流、agent 或增强 LLM 模式", "设计多 agent 编排", "分解复杂问题", "使设计与价值、成本、性能和 SLA 对齐"]},
     {"id": "models-prompting-context", "name": "Claude 模型、Prompt 与上下文工程", "weight": 13, "objectives": ["根据明确权衡选择模型", "设计 prompt、模板和护栏", "应用 zero-shot、few-shot 和推理技术", "管理上下文窗口和 token 使用", "使用缓存、模块化 prompt 和 Skills 复用稳定 prompt"]},
-    {"id": "integration", "name": "集成", "weight": 19, "objectives": ["减少能力膨胀", "发现认证和授权缺口", "平衡准确性和延迟", "选择可扩展的可观测性", "设计 RAG 分块和索引", "让检索匹配数据形态和查询模式", "选择 MCP、API、CLI 或 agent-to-agent 集成", "在适合时使用渐进式发现而不是整体上下文"]},
-    {"id": "evaluation-testing-optimization", "name": "评估、测试与优化", "weight": 16, "objectives": ["定义准确性、延迟、成本、安全和安保指标", "构建代表性数据集和混合方法测试框架", "运行 A/B 测试和迭代改进", "诊断 prompt、幻觉、检索和模型故障", "优化 token、延迟和成本性能", "使用日志、追踪和可观测性监控"]},
-    {"id": "governance-safety-risk", "name": "治理、安全与风险管理", "weight": 14, "objectives": ["分层设置护栏和安全控制", "识别 LLM 故障模式", "设计人在回路验证", "考虑 GDPR、HIPAA、FedRAMP 和适用法规", "处理偏见、公平性和透明度"]},
+    {"id": "integration", "name": "集成", "weight": 19, "objectives": ["减少能力膨胀", "发现认证和授权缺口", "平衡准确性和延迟", "设计可扩展的可观测体系", "设计 RAG 分块和索引", "让检索匹配数据形态和查询模式", "选择 MCP、API、CLI 或 agent-to-agent 集成", "适合时使用渐进式发现，避免把全部内容塞进上下文"]},
+    {"id": "evaluation-testing-optimization", "name": "评估、测试与优化", "weight": 16, "objectives": ["定义准确性、延迟、成本、安全和安保指标", "构建代表性数据集和混合方法测试框架", "运行 A/B 测试并持续改进", "诊断 prompt、幻觉、检索和模型故障", "优化 token 用量、延迟和成本", "使用日志、追踪和可观测性监控"]},
+    {"id": "governance-safety-risk", "name": "治理、安全与风险管理", "weight": 14, "objectives": ["分层设置护栏和安全控制", "识别 LLM 故障模式", "设计人在回路（HITL）验证", "考虑 GDPR、HIPAA、FedRAMP 和适用法规", "处理偏见、公平性和透明度"]},
     {"id": "stakeholder-lifecycle", "name": "利益相关方沟通与生命周期管理", "weight": 14, "objectives": ["进行结构化发现", "沟通决策和权衡", "管理反馈、预期和 SLA", "记录架构和实施指引", "支持发现、设计、移交、监控和迭代"]},
     {"id": "developer-productivity-operations", "name": "开发者生产力与运维赋能", "weight": 7, "objectives": ["配置 Claude 工具和团队环境", "用 AI 辅助工具改进工程工作流", "支持调试和运维事故解决"]}
   ],
@@ -83,6 +83,6 @@
   ],
   "studyPlans": [
     {"id": "ccar-p-35-day", "label": "35 天专业冲刺", "durationDays": 35, "hoursPerWeek": 14, "milestones": ["第 1–5 天：发现、需求、产品选择和价值权衡", "第 6–10 天：模型、prompt、上下文、验证和治理基础", "第 11–15 天：Messages API、结构化输出、工具循环和 MCP", "第 16–20 天：Agent SDK、安全、评估、Claude Code 和编排", "第 21–25 天：工具契约、RAG、身份、可观测性和成本", "第 26–30 天：企业治理、利益相关方生命周期和运维", "第 31–35 天：综合项目答辩、完整模拟和补强"]},
-    {"id": "ccar-p-63-day", "label": "63 天生产计划", "durationDays": 63, "hoursPerWeek": 8, "milestones": ["第 1 周：发现、价值和产品格局", "第 2 周：模型、prompt、上下文和验证基础", "第 3 周：API 生命周期和结构化输出", "第 4 周：工具循环、MCP、Agent SDK 和安全", "第 5 周：评估、Claude Code、编排和工具契约", "第 6 周：RAG、身份和集成", "第 7 周：可观测性、延迟、成本和治理", "第 8 周：利益相关方生命周期和运维所有权", "第 9 周：综合项目、完整模拟和补强"]}
+    {"id": "ccar-p-63-day", "label": "63 天生产计划", "durationDays": 63, "hoursPerWeek": 8, "milestones": ["第 1 周：发现、价值和产品版图", "第 2 周：模型、prompt、上下文和验证基础", "第 3 周：API 生命周期和结构化输出", "第 4 周：工具循环、MCP、Agent SDK 和安全", "第 5 周：评估、Claude Code、编排和工具契约", "第 6 周：RAG、身份和集成", "第 7 周：可观测性、延迟、成本和治理", "第 8 周：利益相关方生命周期和运维所有权", "第 9 周：综合项目、完整模拟和补强"]}
   ]
 }

@@ -1,6 +1,6 @@
 {
   "lesson": "29-associate-workflow-capstone",
-  "title": "交付一周的工作，而不是完美的 prompt",
+  "title": "交付一周的完整工作流，别只打磨 prompt",
   "questions": [
     {
       "stage": "pre",
@@ -12,7 +12,7 @@
         "一套包含来源、验证、权限、移交和恢复的受治理决策工作流"
       ],
       "correct": 3,
-      "explanation": "综合项目围绕一套可观察、可审核的工作流，整合完整的 Associate 技能集。"
+      "explanation": "综合项目以可观察、可审核的工作流为主线，覆盖 Associate 路线要求的各项能力。"
     },
     {
       "stage": "check",
@@ -60,7 +60,7 @@
         "把故障加入评估集，并修复来源、prompt 或覆盖控制"
       ],
       "correct": 3,
-      "explanation": "保留该案例并修复系统，才能闭合学习反馈环并防止复发。"
+      "explanation": "应保留该案例并修复系统，把它纳入反馈闭环，防止同类问题再次发生。"
     },
     {
       "stage": "post",

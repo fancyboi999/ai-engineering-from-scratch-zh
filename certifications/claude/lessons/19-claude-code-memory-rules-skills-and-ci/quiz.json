@@ -6,8 +6,8 @@
       "stage": "pre",
       "question": "根 CLAUDE.md 有数百行只适用于数据库迁移。最可靠的改进是什么？",
       "options": [
-        "将迁移指引移至有作用域的 Rule 或 Skill，并让根文件保持精简路由",
-        "把指引留在根文件，增加摘要和更强的优先级标签，并要求每项任务完整加载",
+        "把迁移指引放进作用域 Rule 或 Skill，根文件只保留精简路由",
+        "把指引留在根文件，增加摘要和更强的优先级标签",
         "将每条项目指令移入独立 Skill，让根文件不再承担共享上下文或路由职责",
         "只有开发者记得相关时，才把迁移部分复制进任务 prompt"
       ],
@@ -40,12 +40,12 @@
     },
     {
       "stage": "check",
-      "question": "团队该怎样配置在证据缺失时必须干净停止的 migration-auditor subagent？",
+      "question": "团队该怎样配置一个在证据缺失时必须明确停止的 migration-auditor subagent？",
       "options": [
-        "在 worktree 中使用 bypassPermissions，并在访问被拒绝时自动提升权限后继续审计",
+        "在 worktree 中使用 bypassPermissions，避免权限不足中断审计",
         "把完整流程放进根 CLAUDE.md，让每个 session 都看到同一 prompt",
         "给它继承的 tool，并要求持续尝试直到能报告成功",
-        "通过 /agents 配置 read-only tool、maxTurns 与结构化 blocked 结果"
+        "用 /agents 设置只读 tool、maxTurns 和 blocked 结构化结果"
       ],
       "correct": 3,
       "explanation": "tool 和回合边界限制任务，结构化 blocked 结果则保留障碍。worktree 隔离文件，但不能成为扩大权限的理由。"
@@ -54,9 +54,9 @@
       "stage": "post",
       "question": "一条路径特定 Rule 看起来从未影响任务。团队首先应验证什么？",
       "options": [
-        "它的 glob 是否匹配 fixture 路径，以及文件是否位于文档化的配置作用域",
+        "检查 glob 是否匹配 fixture 路径，文件是否在配置作用域内",
         "更低的采样方差是否会让 Rule 的效果更容易观察",
-        "选定模型在相同 fixture 路径上是否比旧版本更可靠地遵循有范围 Rule，再将失败归因于模型而非 glob 匹配范围",
+        "选定模型在相同 fixture 路径上是否比旧版本更可靠地遵循作用域 Rule",
         "是否有 plugin 指令层覆盖路径特定指引"
       ],
       "correct": 0,
@@ -67,9 +67,9 @@
       "question": "多个仓库需要同一套经过审查的 Skill、agent 和 hook。最可靠的分发设计是什么？",
       "options": [
         "从每个项目的根 CLAUDE.md import 整个共享仓库",
-        "使用版本化 plugin、经过审查的 marketplace 和受管来源限制",
+        "使用版本化 plugin、已审 marketplace 和受管来源限制",
         "将每个文件复制进每个用户的 home 配置，依赖手动更新",
-        "启用所有 marketplace 的自动更新，并让每个项目自行接受或忽略来源限制"
+        "启用所有 marketplace 的自动更新，让每个仓库始终保持最新"
       ],
       "correct": 1,
       "explanation": "plugin 提供一个版本化 bundle，marketplace 用于分发，managed settings 可强制组织来源 policy。仅属于项目的流程应直接留在该仓库。"

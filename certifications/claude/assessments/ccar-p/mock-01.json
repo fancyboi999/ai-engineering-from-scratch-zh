@@ -45,7 +45,7 @@
         2,
         3
       ],
-      "explanation": "质量、性能、规模和操作权限会直接约束设计。模型层级是要针对这些要求进行验证的实现选择，而非独立的业务需求。",
+      "explanation": "质量、性能、规模和操作权限会直接约束设计。模型档位属于需要按这些要求验证的实现选择，本身不是业务需求。",
       "references": [
         "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf",
         "https://platform.claude.com/docs/en/about-claude/models/overview",
@@ -89,7 +89,7 @@
       "correct": [
         1
       ],
-      "explanation": "审核人员的纠正只有进入受控的学习和评估循环才会产生价值。系统需要溯源、标签、所有权和发布标准，而不是一个无结构的评论库。",
+      "explanation": "审核人员的纠正需要进入受控的学习和评估循环，才能改进系统。这要求有溯源、标签、负责人和发布标准；无结构的评论库做不到。",
       "references": [
         "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf",
         "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
@@ -225,7 +225,7 @@
       "correct": [
         1
       ],
-      "explanation": "数据驻留和恢复要求会影响存储、检索、提供商选择与故障转移。设计必须记录获批准的区域并证明能够恢复，不能因为模型调用是临时的，就假定数据义务随之消失。",
+      "explanation": "数据驻留和恢复要求会影响存储、检索、提供商选择与故障转移。设计必须记录获批区域，并通过验证证明系统能够恢复。模型调用是临时的，不代表数据义务也会消失。",
       "references": [
         "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf",
         "https://trust.anthropic.com/",
@@ -305,7 +305,7 @@
       "domain": "models-prompting-context",
       "objective": "设计 prompt、模板和护栏",
       "type": "single",
-      "prompt": "一个生产 prompt 已膨胀到 9,000 个 token，其中包含重复的政策、示例和任务专用规则。最有力的重构方案是什么？",
+      "prompt": "一个生产 prompt 已膨胀到 9,000 个 token，其中包含重复的政策、示例和任务专用规则。怎样重构最有效？",
       "options": [
         "分离始终需要的政策、可复用的任务模块、限定范围的示例和确定性控制措施，再评估每一项改动",
         "删除所有约束，依赖模型升级",
@@ -359,7 +359,7 @@
       "correct": [
         2
       ],
-      "explanation": "上下文应承载当前决策所需的证据，而非默认携带整个语料库。检索和持久状态能减少膨胀，溯源信息则保留可验证性。",
+      "explanation": "上下文只需承载当前决策所需的证据，不应默认带上整个语料库。检索和持久状态可以减少膨胀，溯源信息则让结果仍可核验。",
       "references": [
         "https://platform.claude.com/docs/en/build-with-claude/context-windows",
         "https://www.anthropic.com/news/contextual-retrieval",
@@ -418,12 +418,12 @@
       "domain": "models-prompting-context",
       "objective": "应用 zero-shot、few-shot 和推理技术",
       "type": "single",
-      "prompt": "Extended thinking 提升了一项架构规划 eval 的表现，却使交互式服务未达到延迟目标。最有力的应对方式是什么？",
+      "prompt": "Extended thinking 提升了一项架构规划 eval 的表现，却使交互式服务未达到延迟目标。怎样处理最合适？",
       "options": [
         "在同步路径上保留 Extended thinking，并向用户流式输出生成的进度说明，因为感知响应性可能抵消已测得的延迟不达标",
         "永久禁用所有推理功能",
         "忽略延迟目标",
-        "仅在服务目标能够承受的异步或高复杂度路径中使用已测得的收益"
+        "只在延迟目标允许的异步或高复杂度路径中启用这项经过实测的配置"
       ],
       "correct": [
         3
@@ -519,7 +519,7 @@
       "correct": [
         1
       ],
-      "explanation": "这是检索治理失效。明确的权威性和时间元数据让检索器选择现行来源，并使新鲜度能够在测试和运维中被观察到。",
+      "explanation": "这是检索治理失效。明确记录权威性和时间元数据，检索器才能选择现行来源，测试和运维也能检查资料是否足够新。",
       "references": [
         "https://www.anthropic.com/news/contextual-retrieval",
         "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
@@ -553,7 +553,7 @@
     {
       "id": "ccar-p-m1-025",
       "domain": "integration",
-      "objective": "在适合时使用渐进式发现而不是整体上下文",
+      "objective": "适合时使用渐进式发现，避免把全部内容塞进上下文",
       "type": "multiple",
       "prompt": "一个大型内部平台有数百个 API。哪种渐进式发现设计最强？请选择所有适用项。",
       "options": [
@@ -621,7 +621,7 @@
     {
       "id": "ccar-p-m1-028",
       "domain": "integration",
-      "objective": "选择可扩展的可观测性",
+      "objective": "设计可扩展的可观测体系",
       "type": "multiple",
       "prompt": "一项请求跨越 API 网关、Claude 调用、MCP 服务器和数据库。要实现大规模诊断，需要哪些遥测数据？请选择所有适用项。",
       "options": [
@@ -751,7 +751,7 @@
         2,
         3
       ],
-      "explanation": "代表性切片和值得信赖的标签让评估集真正有用，留出分区则能限制过拟合。反复针对发布用例调优，会把它们变成开发数据。",
+      "explanation": "评估集需要有代表性的切片和可信标签，留出分区则用于限制过拟合。反复针对发布用例调优，会把它们变成开发数据。",
       "references": [
         "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
         "https://www.nist.gov/itl/ai-risk-management-framework",
@@ -806,7 +806,7 @@
     {
       "id": "ccar-p-m1-036",
       "domain": "evaluation-testing-optimization",
-      "objective": "运行 A/B 测试和迭代改进",
+      "objective": "运行 A/B 测试并持续改进",
       "type": "single",
       "prompt": "变体 B 将离线回答质量提高了 3 分，却增加了线上放弃率。应由什么决定是否发布？",
       "options": [
@@ -872,7 +872,7 @@
     {
       "id": "ccar-p-m1-039",
       "domain": "evaluation-testing-optimization",
-      "objective": "优化 token、延迟和成本性能",
+      "objective": "优化 token 用量、延迟和成本",
       "type": "single",
       "prompt": "Prompt 缓存将输入成本降低了 35%，但过期的政策前缀导致了错误决策。正确的优化应对是什么？",
       "options": [
@@ -894,7 +894,7 @@
     {
       "id": "ccar-p-m1-040",
       "domain": "evaluation-testing-optimization",
-      "objective": "运行 A/B 测试和迭代改进",
+      "objective": "运行 A/B 测试并持续改进",
       "type": "multiple",
       "prompt": "哪些发布门禁能防止平均指标的误导性提升？请选择所有适用项。",
       "options": [
@@ -932,7 +932,7 @@
         2,
         3
       ],
-      "explanation": "带版本且可关联的决策事件支持复现和事故分析。敏感载荷和凭证应尽量少收集、脱敏并妥善保护，而非复制到通用遥测系统中。",
+      "explanation": "带版本且可关联的决策事件有助于复现和事故分析。敏感载荷和凭证应尽量少收集，并做好脱敏与保护，不能直接复制到通用遥测系统。",
       "references": [
         "https://opentelemetry.io/docs/specs/otel/",
         "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
@@ -967,9 +967,9 @@
     {
       "id": "ccar-p-m1-043",
       "domain": "governance-safety-risk",
-      "objective": "设计人在回路验证",
+      "objective": "设计人在回路（HITL）验证",
       "type": "multiple",
-      "prompt": "哪些特性使人工审核步骤真正有意义？请选择所有适用项。",
+      "prompt": "人工审核步骤需要具备哪些特性才能发挥实际作用？请选择所有适用项。",
       "options": [
         "具备证据和授权的合格审核者",
         "基于影响、不确定性或政策的明确触发条件",
@@ -1017,7 +1017,7 @@
       "domain": "governance-safety-risk",
       "objective": "考虑 GDPR、HIPAA、FedRAMP 和适用法规",
       "type": "single",
-      "prompt": "某医疗保健工作流将通过 Claude 发送受保护健康信息。架构师首先最有力的治理行动是什么？",
+      "prompt": "某医疗保健工作流将通过 Claude 发送受保护健康信息。架构师首先应采取哪项治理措施？",
       "options": [
         "假定仅靠加密就能让工作流合规",
         "要求 Claude 证明合规",
@@ -1049,7 +1049,7 @@
       "correct": [
         0
       ],
-      "explanation": "授权适用于特定服务和控制边界，而不是孤立的模型名称。架构师必须验证获批的服务，并梳理继承控制和客户负责运营的控制措施。",
+      "explanation": "授权针对的是特定服务和控制边界，不能只看模型名称。架构师必须核验获批服务，并梳理由平台继承的控制措施和客户自行运营的控制措施。",
       "references": [
         "https://www.fedramp.gov/",
         "https://trust.anthropic.com/",
@@ -1232,7 +1232,7 @@
         1,
         3
       ],
-      "explanation": "决策记录应保留某一方案为何符合证据，以及将如何验证或撤销。图表本身只展示结构，不能说明理由或运行后果。",
+      "explanation": "决策记录应写明某一方案为何符合证据，以及之后如何验证或撤销。图表只能表示结构，无法说明决策理由和运行后果。",
       "references": [
         "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf",
         "certifications/claude/lessons/22-business-discovery-requirements-and-slas"
@@ -1394,7 +1394,7 @@
         2,
         3
       ],
-      "explanation": "无头自动化缺少交互式监督，因此其能力和身份必须更受限。发现的问题应进入常规审核和受保护的合并路径，而不是绕过这些流程。",
+      "explanation": "无头自动化缺少交互式监督，因此必须进一步限制其能力和身份。发现的问题应进入常规审核和受保护的合并路径，不能绕过这些流程。",
       "references": [
         "https://code.claude.com/docs/en/headless",
         "https://code.claude.com/docs/en/security",

@@ -1,6 +1,6 @@
 # Messages API 是一台状态机
 
-> API 不会记住对话。记住对话的是你的应用，而一个放错位置的内容块就能破坏整个循环。
+> 对话状态由应用维护。一个放错位置的内容块就能破坏整个循环。
 
 **类型：** Build
 **语言：** Python
@@ -77,7 +77,7 @@ stateDiagram-v2
 | 官方 SDK | 语言受支持，而且你需要类型化请求与响应模型、类型化错误、请求头管理、默认重试、分页和流式累积辅助工具 | 应用状态、`stop_reason` 政策、重试安全、工具授权、日志和最终验证 |
 | 原始 REST | runtime 没有受支持的 SDK、受限环境不允许添加依赖，或需要定制 HTTP transport 或协议级 fixture | 身份验证与版本请求头、JSON 类型、SSE framing、超时、重试、错误映射、向前兼容和连接清理 |
 
-对于受支持的生产语言，SDK 是更安全的默认选择，因为它消除了协议样板，而不是因为它接管了应用生命周期。只有额外控制值得额外测试负担时，才应使用原始 REST。[Python SDK 指南](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/python)记录了同步与异步客户端、类型化模型、流式辅助工具、默认重试和原始响应访问方式。[API 概览](https://platform.claude.com/docs/en/api/overview)则是直接 HTTP 合约。
+对于受支持的生产语言，SDK 消除了协议样板，因此是更安全的默认选择；应用生命周期仍由你负责。只有额外控制值得额外测试负担时，才应使用原始 REST。[Python SDK 指南](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/python)记录了同步与异步客户端、类型化模型、流式辅助工具、默认重试和原始响应访问方式。[API 概览](https://platform.claude.com/docs/en/api/overview)则是直接 HTTP 合约。
 
 然后选择一个或多个结果如何返回：
 
@@ -206,7 +206,7 @@ Messages API 服务不会保留隐藏聊天对象。每次调用接收由你选�
 
 图片可以使用 `base64`、`url` 或 Files API `file` 来源。PDF 可以在 `document` 块中使用 URL、base64 或 Files API 来源。块顺序是 prompt 的一部分：应把指令和信任上下文放在它所约束的资产附近。在[视觉](https://platform.claude.com/docs/en/build-with-claude/vision)和 [PDF 支持](https://platform.claude.com/docs/en/build-with-claude/pdf-support)中核验当前媒体与模型限制。
 
-Files API 改变的是复用和保留方式，不是内容块的含义。上传一次，获得不透明 `file_id`，在后续 Messages 请求中引用它，而不是重复发送字节。这适合跨多次请求复用的政策 PDF 或图片。
+Files API 只改变复用和保留方式，内容块的含义不变。上传一次，获得不透明 `file_id`，在后续 Messages 请求中引用它，省去重复发送字节。这适合跨多次请求复用的政策 PDF 或图片。
 
 产品说明，核验于 2026-08-09：[Files API](https://platform.claude.com/docs/en/build-with-claude/files) 处于 beta 阶段，目前在 Message 引用文件时使用 `files-api-2025-04-14` beta 请求头。文件以 workspace 为范围，上传后不可修改，并持续保留到删除为止。该 workspace 中的任何 API key 都可以引用它们。当前请求头、平台可用性、限制和下载规则都属于易变信息，实现前要核对指南。
 
@@ -218,7 +218,7 @@ Files API 改变的是复用和保留方式，不是内容块的含义。上传�
 
 `file_id` 不能证明当前租户有权使用该文件。将它绑定到包含租户、workspace、媒体类型、敏感度、内容哈希、上传时间和删除截止时间的应用记录。绝不要接受任意模型或用户提供的 ID 并直接转发。不要把原始图片字节、PDF 文本、签名 URL 和不透明文件 ID 写入普通 trace；只记录内容哈希和政策决策。
 
-## 流式传输改变交付，不改变含义
+## 流式传输只改变交付方式
 
 流式传输让用户在完整消息到达前看到输出，但并未免除组装和验证最终响应的责任。
 
@@ -290,7 +290,7 @@ python3 -m unittest discover tests -v
 
 ## 实践实验
 
-运行脚本化生命周期，然后移除 assistant 的 `tool_use` 消息、改变关联 ID，或让流在没有 `message_stop` 时结束。接着把可复用文件 ID 改成自有 allowlist 之外的值、破坏图片 base64，或要求访问选择器同时提供批处理和渐进式 token。每次失败都应映射到有名称的协议或数据边界错误，而不是重试 prompt。
+运行脚本化生命周期，然后移除 assistant 的 `tool_use` 消息、改变关联 ID，或让流在没有 `message_stop` 时结束。接着把可复用文件 ID 改成自有 allowlist 之外的值、破坏图片 base64，或要求访问选择器同时提供批处理和渐进式 token。每次失败都应映射到有名称的协议或数据边界错误，不能用重试 prompt 来掩盖。
 
 ## 交付产物
 
@@ -310,7 +310,7 @@ python3 -m unittest discover tests -v
 
 ## 超越单轮的应用生命周期
 
-生产 Claude 应用的状态不只“请求”和“响应”。
+生产 Claude 应用的状态包含更多环节，不能只用“请求”和“响应”表示。
 
 ```mermaid
 flowchart LR
@@ -326,7 +326,7 @@ flowchart LR
     Improve --> Intake
 ```
 
-模型错误只是一种失败。还会遇到 transport 超时、速率限制、应用状态畸形、schema 不匹配、授权拒绝、工具失败、缓存过时、用户取消和部署回归。应分别标记。对超时有效的重试，可能让授权失败变得更糟。
+模型错误只是其中一种失败。还会遇到 transport 超时、速率限制、应用状态畸形、schema 不匹配、授权拒绝、工具失败、缓存过时、用户取消和部署回归。应分别标记。对超时有效的重试，可能让授权失败变得更糟。
 
 在每条 trace 中记录 system 指令、模型选择、工具目录、输出 schema 和应用代码的版本。没有这些标识符，就无法复现回归，也无法公平比较评估运行。
 

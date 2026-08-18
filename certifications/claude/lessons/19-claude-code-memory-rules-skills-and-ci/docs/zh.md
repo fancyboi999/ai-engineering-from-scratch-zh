@@ -4,7 +4,7 @@
 
 **类型：** Reference
 **语言：** Python
-**前置要求：** [Claude Code 通过共享约束扩展到团队](../../15-claude-code-for-development-teams/)、[Agent SDK Session、Subagent 与上下文](../../17-agent-sdk-sessions-subagents-and-context/)
+**前置要求：** [Claude Code 靠共享约束支持规模化协作](../../15-claude-code-for-development-teams/)、[Agent SDK Session、Subagent 与上下文](../../17-agent-sdk-sessions-subagents-and-context/)
 **预计时间：** 约 210 分钟
 
 ## 学习目标
@@ -22,7 +22,7 @@
 
 开发者再加私有覆盖项，CI 又有另一套配置。一条 command 假定自己有写权限；一个宽泛 hook 重格式化了无关文件。指令写着“始终跑全部测试”，于是一次小文档编辑触发 40 分钟测试套件。agent 忽略安全规则时，团队只会再加更多粗体字。
 
-问题不在于指令不足，而在于作用域、优先级、渐进披露，以及把指引和强制机制混为一谈。
+根因是作用域和优先级混乱、没有渐进式披露，还把指引与强制机制混在了一起。
 
 ## 核心概念
 
@@ -63,7 +63,7 @@
 - secret 值
 - 只适用于一个目录的指令
 
-把它当作上手路由，而不是知识倾倒处。
+把它写成上手路由，别往里倾倒知识。
 
 ### 在最窄的真实作用域放置指令
 
@@ -96,7 +96,7 @@ flowchart TD
 
 memory 检查命令可帮助发现哪些指令处于激活状态。用它们调试配置，不要存放不可恢复的项目状态。
 
-### 用 Skill 实现渐进披露
+### 用 Skill 实现渐进式披露
 
 Skill 将可重复的方法、参考资料、脚本和产物打包。它的 description 帮助 agent 判断何时适用；完整正文只在被选中时加载，为无关工作保留上下文。
 
@@ -169,7 +169,7 @@ Return JSON with status, evidence, blockers, and next_step.
 Never replace missing evidence with an assumption.
 ```
 
-回合或时间 box 是停止条件，不是完成证据。parent session 校验结果并负责集成。要求结构化障碍报告：无法访问文件的 subagent 必须返回 `status: blocked`、准确障碍、已尝试的证据和狭窄的 `next_step`，而不是静默扩大 tool 或范围。
+回合或时间 box 只定义停止点，不构成完成证据。parent session 校验结果并负责集成。要求结构化障碍报告：无法访问文件的 subagent 必须返回 `status: blocked`、准确障碍、已尝试的证据和狭窄的 `next_step`，不得静默扩大 tool 或范围。
 
 只有 subagent 编辑时才使用 worktree 隔离；只读 researcher 通常只需要独立上下文。worktree 隔离文件和分支，不隔离网络、凭证、共享 Git metadata 或外部系统。
 
@@ -180,7 +180,7 @@ Never replace missing evidence with an assumption.
 - 单一仓库提交 `.claude/skills/` 与 `.claude/agents/`。
 - 多个仓库需要同一版本 bundle 时，把 Skill、agent、hook 与 MCP 定义放进 plugin。
 - 通过经过审查的 marketplace 发布 plugin，并固定 release 或 commit。
-- 用 managed settings 保存组织 policy 与 marketplace 限制，而非堆入每个团队的流程。
+- 用 managed settings 保存组织 policy 与 marketplace 限制，避免把它们堆入每个团队的流程。
 
 项目可在 `.claude/settings.json` 中声明 marketplace 并启用已审查 plugin：
 
@@ -213,7 +213,7 @@ Never replace missing evidence with an assumption.
 
 ### 区分规划、探索与执行
 
-范围或策略需要在变更前获批时，使用 plan mode。否则会使主任务膨胀的只读代码库问题，交给探索型 subagent。改动已受限且下一个安全操作显而易见时，直接执行。
+范围或策略需要在变更前获批时，使用 plan mode。否则会使主任务膨胀的只读代码库问题，交给探索型 subagent。改动已受限且下一个安全操作已经明确时，直接执行。
 
 需求缺失时，访谈模式很有用。提出会实质改变实现的问题，记录决定，再构建。
 
@@ -369,7 +369,7 @@ quiz 会测试机制选择和 CI 修复流程。
 
 ## 考试决策模式
 
-指令过大或只适用于部分文件时，将其移到有范围的 Rule 或 Skill。条件绝不能违反时，使用确定性的 settings、权限、hook 或 CI，而不是加强 prompt 措辞。
+指令过大或只适用于部分文件时，将其移到有范围的 Rule 或 Skill。无法容忍违反的条件必须由确定性的 settings、权限、hook 或 CI 强制执行，强化 prompt 措辞不解决问题。
 
 优先选择以下方案：
 
@@ -400,7 +400,7 @@ quiz 会测试机制选择和 CI 修复流程。
 
 ### AI 审查是唯一 Gate
 
-模型 finding 只支持判断，确定性测试、schema、安全 policy 和批准才会强制 invariant。
+模型 finding 供人判断；确定性测试、schema、安全 policy 和批准负责强制 invariant。
 
 ## 练习
 

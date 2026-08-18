@@ -1,6 +1,6 @@
-# Agent SDK 是运行框架，不是权限
+# Agent SDK 提供运行框架，权限另行控制
 
-> 只有把循环、tool、上下文、hook 与终止策略都定义得足够明确，让人能够检查和约束，agent 才会可靠。
+> 可靠的 agent 需要定义清楚循环、tool、上下文、hook 与终止策略，供人检查和约束。
 
 **类型：** Learn
 **语言：** Python
@@ -24,7 +24,7 @@
 
 SDK 正常工作，架构却失败了。
 
-agent SDK 提供的是能力强大的运行框架。哪些来源可信、哪些命令允许执行、何时必须由人批准、怎样才算成功、agent 最多可以消耗多少资源，SDK 都不会替你决定。这些仍是应用自身的责任。
+Agent SDK 提供运行框架。哪些来源可信、哪些命令允许执行、何时必须由人批准、怎样才算成功、agent 最多可以消耗多少资源，SDK 都不会替你决定。这些仍是应用自身的责任。
 
 ## 模型加运行框架
 
@@ -53,7 +53,7 @@ Agent SDK 把 Claude Code 使用的循环封装成面向应用的接口。依据
 
 产品说明（核验于 2026-08-08）：package 名称、初始化选项、事件类型与功能可用性的变化速度快于底层模式。编码前，请查阅当前 [Claude Agent SDK 概览](https://platform.claude.com/docs/en/agent-sdk/overview)与对应版本的参考文档，确认具体实现细节。
 
-稳定的问题不是“哪个选项可以开启自主能力”，而是“哪些运行框架组件能让任务可观察、受约束且可恢复”。
+更稳定的提问方式是：“哪些运行框架组件能让任务可观察、受约束且可恢复？”
 
 ## 不要把四级运行框架都叫作“SDK”
 
@@ -74,7 +74,7 @@ Agent SDK 把 Claude Code 使用的循环封装成面向应用的接口。依据
 
 只有同时满足以下四个条件，才应使用 agent：
 
-1. 任务价值足以抵偿模型与 tool 成本。
+1. 任务价值足以覆盖模型与 tool 成本。
 2. 无法预先完整枚举执行路径。
 3. 所需信息与操作都能通过受控 tool 获得。
 4. 错误能够被检测、恢复或升级处理。
@@ -89,7 +89,7 @@ Agent SDK 把 Claude Code 使用的循环封装成面向应用的接口。依据
 | 固定检查后转账 | 需要人工批准的 workflow |
 | 迁移大型代码库，并设置审查 checkpoint | 长时间运行的 agent 加独立 evaluator |
 
-SDK 应服从架构决策，而不是反过来决定架构。
+先做架构决策，再据此选择 SDK。
 
 ## 给 Agent 一个它能理解的环境
 
@@ -108,7 +108,7 @@ tool 接口或环境行为含糊不清时，agent 就容易失败。要从 agent
 
 ## Computer Use 是截图与动作的验证循环
 
-Computer Use 是遵循 Anthropic schema 的客户端 tool。Claude 提出截图、鼠标与键盘操作，由你的应用执行。它不是服务商一侧的远程桌面，更不代表获得了操作权限。
+Computer Use 是遵循 Anthropic schema 的客户端 tool。Claude 提出截图、鼠标与键盘操作，由你的应用执行。服务商不会替你提供远程桌面，也不会授予操作权限。
 
 ```mermaid
 stateDiagram-v2
@@ -247,7 +247,7 @@ parent 应校验返回的合约。不能因为 subagent 散文来自另一次模
 
 ## Skill 封装可复用流程
 
-Skill 保存某类任务需要、但并非每一轮都需要的指令、参考资料、脚本或资源。渐进披露让完整材料只在相关时进入上下文。
+Skill 保存某类任务需要、但并非每一轮都需要的指令、参考资料、脚本或资源。渐进式披露只在相关时把完整材料加载进上下文。
 
 可以这样拆分：
 
@@ -260,7 +260,7 @@ Skill 保存某类任务需要、但并非每一轮都需要的指令、参考�
 
 如果 system prompt 已经变成一本手册，移动内容前先建立 eval 基线。把一套完整流程提取到 Skill，重新运行 eval，再比较正确性、轮数、延迟与 token 用量。未经评估的拆分只是在猜。
 
-## Session 提供连续性，不提供事实
+## Session 延续上下文，事实仍需持久化
 
 agent session 可以保存对话状态并支持恢复，让进程重启或人工暂停后的工作更连贯，但不能取代持久化应用状态。
 
@@ -291,7 +291,7 @@ compaction 让 agent 能在上下文压力下继续运行，却不保证它数�
 - 回滚点或恢复点。
 - 独立审查结论。
 
-planner 提出下一个 sprint，generator 执行，evaluator 检查产物而非 generator 的自述。通过后，workflow 才能推进。
+规划者提出下一个 sprint，执行者完成工作，评估者检查产物，不采信执行者的自述。检查通过后，workflow 才能推进。
 
 代码工作用版本控制建立持久恢复点；数据迁移使用 checkpoint 与幂等批次；研究工作则保存来源台账与主张到来源的映射。
 
@@ -307,11 +307,11 @@ Agent SDK 除了最终文本，还能提供生命周期事件。至少要记录�
 - 循环为什么停止？
 - 哪个最终状态经过独立验证？
 
-对 tool 输入与输出脱敏，使用 correlation ID。只有政策允许且调试价值足以抵偿风险时，才保留原始 prompt。
+对 tool 输入与输出脱敏，并使用 correlation ID。只有政策允许，且调试价值值得承担相应风险时，才保留原始 prompt。
 
-可观察性不是 eval。trace 告诉你发生了什么；eval 根据定义好的预期判断结果好不好。两者都需要。
+可观察性负责记录，eval 负责判断。trace 告诉你发生了什么，eval 再根据预先定义的预期判断结果是否合格。两者都需要。
 
-## Managed Session 不只为答案而暂停，也会为操作暂停
+## Managed Session 会等待答案，也会等待操作
 
 managed agent 通过事件通信。持久化事件是恢复记录，SSE delta 只是可选的实时预览。用明确的状态机消费事件：
 
@@ -383,7 +383,7 @@ python3 main.py
 python3 -m unittest discover tests -v
 ```
 
-validator 会拒绝以下情况：变更操作无需批准；危险能力缺少 pre-tool hook 与沙箱；轮数不受限；reviewer subagent 可写；持久状态不完整；Computer Use 策略不安全；事件恢复规则不完整；仅凭最终散文判定成功。事件 consumer 与 Computer Use guard 完全基于提交到仓库的 fixture 运行，不会启动 SDK、浏览器、网络请求或模型调用。
+验证器会拒绝以下情况：变更操作无需批准；危险能力缺少 pre-tool hook 与沙箱；轮数不受限；reviewer subagent 可写；持久状态不完整；Computer Use 策略不安全；事件恢复规则不完整；仅凭最终散文判定成功。事件 consumer 与 Computer Use guard 完全基于提交到仓库的 fixture 运行，不会启动 SDK、浏览器、网络请求或模型调用。
 
 ## 综合项目关联
 

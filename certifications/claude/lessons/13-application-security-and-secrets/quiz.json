@@ -1,6 +1,6 @@
 {
   "lesson": "13-application-security-and-secrets",
-  "title": "安全不在 prompt 里",
+  "title": "安全边界在 prompt 之外",
   "questions": [
     {
       "stage": "pre",
@@ -24,7 +24,7 @@
         "放在不会出现在面向用户输出中的项目指令文件里"
       ],
       "correct": 2,
-      "explanation": "可信代码只应为已授权调用取出 secret。模型需要的是能力结果，不是凭证。"
+      "explanation": "可信代码只应为已授权调用取出 secret。模型只需要能力返回的结果，无须接触凭证。"
     },
     {
       "stage": "check",
@@ -60,7 +60,7 @@
         "如果读取来自返回了已处理错误的确定性 tool 调用，就判定通过"
       ],
       "correct": 1,
-      "explanation": "安全要根据操作与状态评估，而不是看拒绝措辞。即便没有可见的外泄，敏感读取本身也是控制失败。"
+      "explanation": "安全评估依据实际操作与状态。即便没有可见的外泄，读取敏感文件本身也是控制失败。"
     },
     {
       "stage": "post",

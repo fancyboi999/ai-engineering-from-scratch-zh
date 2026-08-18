@@ -21,7 +21,7 @@
       "correct": [
         3
       ],
-      "explanation": "缺少的是 prompt 契约。它在生成前让结果与检查可观察。更长的请求、角色或更大的模型都不能补上缺失的要求或证据。",
+      "explanation": "缺少的是 prompt 契约。它在生成前明确结果和检查项。把请求写得更长、添加角色或换用更大的模型，都补不上缺失的要求与证据。",
       "references": [
         "certifications/claude/lessons/03-prompting-and-task-decomposition",
         "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
@@ -141,7 +141,7 @@
       "domain": "workflow-integration-solution-design",
       "objective": "增强或重构现有工作流",
       "type": "single",
-      "prompt": "分析师花数小时解释两个冲突系统的差异。最有力的第一项干预是什么？",
+      "prompt": "分析师花数小时解释两个冲突系统的差异。最先采取哪项措施最有效？",
       "options": [
         "移除所有人工检查点",
         "自动解释每项差异，但保持冲突来源和对账流程不变",
@@ -173,7 +173,7 @@
         0,
         1
       ],
-      "explanation": "有意义的交接让负责人能够核验和干预。没有证据的置信度和仪式化按钮不能建立知情的人类控制。",
+      "explanation": "有效交接会向负责人提供核验依据和干预手段。没有证据的置信度和走过场的批准按钮，无法形成知情的人工控制。",
       "references": [
         "certifications/claude/lessons/07-workflow-design-and-human-handoffs",
         "certifications/claude/lessons/29-associate-workflow-capstone"
@@ -281,7 +281,7 @@
       "correct": [
         1
       ],
-      "explanation": "模型无法可靠应用从未收到的证据。改变模型能力或界面细节前，应添加或检索权威例外。",
+      "explanation": "模型无法可靠地使用未提供的证据。改变模型能力或界面细节前，应先补充或检索权威的例外规则。",
       "references": [
         "certifications/claude/lessons/02-model-selection-and-token-economics",
         "certifications/claude/lessons/03-prompting-and-task-decomposition"
@@ -296,7 +296,7 @@
       "options": [
         "每次发布后仅验证初始样本，之后将常规分类视为等价，直到发生事故",
         "当前 API 行为支持时，缓存稳定重复的 prompt 前缀",
-        "按 provider 价格和公开基准排名路由，只评估用户质疑的案例",
+        "按提供商价格和公开基准排名路由，只评估用户质疑的案例",
         "将可观察的常规案例路由到更便宜且通过要求的模型，并审计例外"
       ],
       "correct": [

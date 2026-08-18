@@ -7,7 +7,7 @@
       "question": "在 MCP 中，哪个组件负责用户体验、模型交互以及一个或多个协议 client？",
       "options": [
         "负责解析 URI 上下文并维护对话历史的 resource 提供方",
-        "协调模型、用户交互与 server client 的 host 应用",
+        "协调模型、用户交互，并通过 client 连接 server 的 host 应用",
         "负责选择模型并为每次调用打开 client 的 tool 处理函数",
         "负责公开能力并决定 UI 如何呈现能力的 server 进程"
       ],
@@ -72,7 +72,7 @@
         "负载均衡器可以从 JSON-RPC 方法名推断出全部 tool 授权"
       ],
       "correct": 2,
-      "explanation": "2026-07-28 核心协议让每个请求都携带协议 metadata，因此任意健康实例都能处理。应用状态与副作用仍需要显式 handle、存储和重试策略。"
+      "explanation": "2026-07-28 核心协议让每个请求都携带协议 metadata，因此任意健康实例都能处理。应用状态与副作用仍需通过显式 handle、存储和重试策略管理。"
     }
   ]
 }

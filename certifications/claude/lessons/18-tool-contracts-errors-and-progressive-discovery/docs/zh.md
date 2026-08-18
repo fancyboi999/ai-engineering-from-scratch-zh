@@ -4,7 +4,7 @@
 
 **类型：** Reference
 **语言：** Python
-**前置要求：** [工具循环是受控委派](../../10-tool-use-and-agentic-loops/)、[MCP 将能力与宿主分离](../../11-mcp-server-design-and-integration/)；阶段 13 第 05 课
+**前置要求：** [工具循环是受控委派](../../10-tool-use-and-agentic-loops/)、[MCP 将能力与宿主解耦](../../11-mcp-server-design-and-integration/)；阶段 13 第 05 课
 **预计时间：** 约 120 分钟
 
 ## 学习目标
@@ -27,7 +27,7 @@
 
 模型的选择变得不一致。一次公开 research 查询了私有数据；一个 policy 问题却去搜了网页。tool 返回“失败”时，agent 不断重试，直到耗尽 budget。
 
-模型并没有不理解 tool use。接口抹掉了它安全选择所需的区别。
+问题出在接口：它抹掉了模型安全选择所需的区别。
 
 ## 核心概念
 
@@ -57,7 +57,7 @@
 }
 ```
 
-与：
+再看：
 
 ```json
 {
@@ -191,7 +191,7 @@ MCP server 可以暴露 tool、resource 与 prompt。根据控制方向选择原
 18-tool-discovery-contract
 ```
 
-使用 discovery-contract 图，对比重叠 tool、渐进加载的 tool 与执行授权。改变错误类别，观察何时只有重试、变更输入、批准或升级才是安全的继续方式。
+使用 discovery-contract 图，对比重叠 tool、渐进加载的 tool 与执行授权。改变错误类别，观察不同故障分别该重试、变更输入、请求批准还是升级处理。
 
 ## 实践实验
 

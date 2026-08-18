@@ -2,18 +2,18 @@
   "id": "claude-ccdv-f", "slug": "ccdv-f", "examCode": "CCDV-F", "credential": "Claude 认证开发者 - 基础级", "shortName": "开发者基础", "level": "技术基础级", "accent": "blue",
   "badge": {"imageUrl": "https://images.credly.com/images/f101c6ac-8a2d-4220-b381-70e3e6c364e3/blob", "width": 601, "height": 601},
   "summary": "构建、集成、保护、测试并交付 Claude 应用、agent、工作流、工具和 MCP 服务器。",
-  "audience": "具备 Python 或 TypeScript 经验，并了解 REST API 和命令行工具的软件工程师、AI 工程师和技术构建者。",
+  "audience": "具备 Python 或 TypeScript 经验，并了解 REST API 和命令行工具的软件工程师、AI 工程师及技术开发者。",
   "recommendedExperience": ["一至五年的软件工程经验", "至少六个月 Claude 或同类 LLM 系统经验", "熟悉 REST API、JSON、异步代码和 CLI 工具", "了解 agent、上下文管理和 MCP"],
   "exam": {"items": 53, "timeLimitMinutes": 120, "feeUsd": 125, "passingScaledScore": 720, "scoreScale": "100-1000", "validityMonths": 12, "format": "单选与多选", "delivery": "线上监考或考试中心", "guideVersion": "1.0", "effective": "July 2026", "officialGuideUrl": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542875%2FClaude+Certified+Developer+%E2%80%93+Foundations+Exam+Guide.pdf"},
   "domains": [
-    {"id":"agents-workflows","name":"Agent 与工作流","weight":14.7,"objectives":["根据任务约束选择工作流或 agent","设计管理者与 subagent 层级","使用 Claude Agent SDK、自定义循环、托管 agent 和 hook 构建","应用工具循环、记忆、上下文和框架模式"]},
+    {"id":"agents-workflows","name":"Agent 与工作流","weight":14.7,"objectives":["根据任务约束选择工作流或 agent","设计协调者与 subagent 层级","使用 Claude Agent SDK、自定义循环、托管 agent 和 hook 构建系统","应用工具循环、记忆、上下文和框架模式"]},
     {"id":"applications-integration","name":"应用与集成","weight":33.1,"objectives":["将业务需求转化为功能和基础设施需求","应用系统生命周期实践","使用消息、工具、流式传输、视觉、思考、缓存、批处理和第三方 provider","应用 REST、JSON、异步、版本控制、审核和重构实践","设计指令、schema、会话、内容边界和插件行为","管理 CLAUDE.md、设置、模型、prompt 和插件版本"]},
-    {"id":"claude-code","name":"Claude Code","weight":3.1,"objectives":["操作 Rules、Skills、Commands、Agents、记忆、会话、无头模式、流式模式、自动模式、CLAUDE.md、初始化和设置"]},
-    {"id":"eval-testing-debugging","name":"评估、测试与调试","weight":2.6,"objectives":["对错误分类、选择恢复、分析追踪，并区分集成故障与模型故障"]},
-    {"id":"model-selection-optimization","name":"模型选择与优化","weight":16.8,"objectives":["解释 token、采样、上下文、非确定性、思考、努力程度和 prompting 模式","集成 SDK 与传输基础知识","平衡模型质量、延迟、成本、能力和版本变化","规划 token 预算并使用 prompt 缓存"]},
-    {"id":"prompt-context-engineering","name":"Prompt 与上下文工程","weight":11.0,"objectives":["通过裁剪、压缩和隔离防止上下文漂移与膨胀","放置清晰的指令、示例和约束","清洗输入并迭代 prompt","验证并防御性地消费结构化输出"]},
-    {"id":"security-safety","name":"安全与安保","weight":8.1,"objectives":["缓解 prompt 注入、越狱、数据泄露和不安全输入","以最小权限分层设置护栏","使用 hook 实施确定性安全控制","保护身份、机密、密钥和访问批准"]},
-    {"id":"tools-mcps","name":"工具与 MCP","weight":10.6,"objectives":["设计描述、schema、错误、批准和工具集","跨传输编写和部署 MCP 工具、资源与 prompt","在内置工具、自定义工具、Skills 和 MCP 间选择"]}
+    {"id":"claude-code","name":"Claude Code","weight":3.1,"objectives":["使用 Rules、Skills、Commands、Agents、记忆、会话、无头模式、流式模式、自动模式、CLAUDE.md、初始化和设置"]},
+    {"id":"eval-testing-debugging","name":"评估、测试与调试","weight":2.6,"objectives":["给错误分类、选择恢复策略、分析追踪，并区分集成故障与模型故障"]},
+    {"id":"model-selection-optimization","name":"模型选择与优化","weight":16.8,"objectives":["解释 token、采样、上下文、非确定性、思考、推理强度和 prompting 模式","掌握 SDK 集成和传输基础","平衡模型质量、延迟、成本、能力和版本变化","规划 token 预算并使用 prompt 缓存"]},
+    {"id":"prompt-context-engineering","name":"Prompt 与上下文工程","weight":11.0,"objectives":["通过裁剪、压缩和隔离防止上下文漂移与膨胀","放置清晰的指令、示例和约束","清洗输入并迭代 prompt","验证结构化输出，并以防御性方式处理结果"]},
+    {"id":"security-safety","name":"安全与安保","weight":8.1,"objectives":["缓解 prompt 注入、越狱、数据泄露和不安全输入","以最小权限分层设置护栏","使用 hook 实施确定性安全控制","保护身份、机密、密钥和访问审批"]},
+    {"id":"tools-mcps","name":"工具与 MCP","weight":10.6,"objectives":["设计描述、schema、错误、审批和工具集","通过不同传输方式编写和部署 MCP 工具、资源与 prompt","在内置工具、自定义工具、Skills 和 MCP 之间选择"]}
   ],
   "lessons": [
     {"path":"certifications/claude/lessons/00-certification-strategy","domains":["applications-integration"],"role":"导览","required":true},

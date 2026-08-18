@@ -1,6 +1,6 @@
 {
   "lesson": "12-claude-agent-sdk-and-hooks",
-  "title": "Agent SDK 是运行框架，不是权限",
+  "title": "Agent SDK 提供运行框架，权限另行控制",
   "questions": [
     {
       "stage": "pre",
@@ -36,7 +36,7 @@
         "独立 reviewer 需要隔离上下文与只读 tool 时"
       ],
       "correct": 3,
-      "explanation": "subagent 只有通过隔离、精简权限、独立评估或真正并行且有边界的工作，才足以抵偿成本。"
+      "explanation": "subagent 适合需要隔离、精简权限、独立评估，或真正并行且有边界的工作；这些收益要能覆盖额外成本。"
     },
     {
       "stage": "check",
@@ -48,7 +48,7 @@
         "重复最近一次 tool 调用，因为没有终止事件说明它未曾执行"
       ],
       "correct": 0,
-      "explanation": "stream delta 与连接状态不是持久化完成证据。应持久化 event ID 和 cursor，对重放事件去重，并使用 session 的持久化状态机。"
+      "explanation": "stream delta 与连接状态无法证明任务已经持久化完成。应持久化 event ID 和 cursor，对重放事件去重，并使用 session 的持久化状态机。"
     },
     {
       "stage": "post",
@@ -72,7 +72,7 @@
         "不同 subagent 分别完成每个 sprint，并对最终状态达成一致"
       ],
       "correct": 2,
-      "explanation": "长期一致性来自有边界的合约与外部验证，而不是自我报告、compaction 或 agent 数量。"
+      "explanation": "有边界的合约与外部验证才能支撑长期一致性；自我报告、compaction 或增加 agent 数量都不够。"
     }
   ]
 }

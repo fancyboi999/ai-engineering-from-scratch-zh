@@ -4,8 +4,8 @@
 
 **类型：** Build
 **语言：** Python
-**前置要求：** [Messages API 是一个状态机](../../08-messages-api-and-application-lifecycle/)、[结构化输出是不可信的契约](../../09-structured-output-and-defensive-parsing/)
-**预计时间：** ~130 分钟
+**前置要求：** [Messages API 是一台状态机](../../08-messages-api-and-application-lifecycle/)、[结构化输出是不可信的契约](../../09-structured-output-and-defensive-parsing/)
+**预计时间：** 约 130 分钟
 
 ## 学习目标
 
@@ -20,7 +20,7 @@
 
 一个账单助手收到“退还重复扣款”。Claude 请求 `issue_refund`，应用执行它。最终文本到达前响应连接中断，应用重试整个回合，Claude 再次请求该工具，客户收到了两次退款。
 
-问题不在于模型使用了工具，而在于应用把语言生成与事务控制混为一谈。
+应用把语言生成与事务控制混为一谈，最终造成重复付款。
 
 可靠的工具循环有两份契约：
 
@@ -82,7 +82,7 @@ Claude 可能返回：
 }
 ```
 
-匹配 ID 不是装饰，它将一个结果关联到一个请求。根据协议预期的对话历史，assistant 消息必须紧挨在结果序列之前。
+匹配 ID 用来把结果关联到具体请求。根据协议预期的对话历史，assistant 消息必须紧挨在结果序列之前。
 
 请参阅[实现客户端工具](https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use)，了解当前 SDK 与 API 形态。
 
@@ -129,7 +129,7 @@ Claude 根据工具接口选择工具。人不读处理程序也应能判断每�
 
 ### 写选择描述，不写内部文档
 
-有用的描述说明工具做什么、何时用、何时不用以及结果意味着什么，而不是粘贴整本 API 手册。
+有用的描述会说明工具做什么、何时用、何时不用以及结果意味着什么。粘贴整本 API 手册没有帮助。
 
 差：
 
@@ -168,7 +168,7 @@ schema 引导生成，处理程序仍要校验。绝不能因为模型输入由 
 - 是否应让单独的 subagent 获得这个工具，而非主 agent？
 - 标准化 MCP server 是否能让多个 host 安全共享它？
 
-工具数量不是架构评分。正确选择与受控执行才是。
+评估架构时要看工具选择和执行控制，工具数量没有意义。
 
 ## 授权发生在校验之后
 
@@ -176,7 +176,7 @@ schema 引导生成，处理程序仍要校验。绝不能因为模型输入由 
 
 1. 通过 allowlist 解析工具名称。
 2. 校验输入类型和边界。
-3. 从应用绑定已认证身份与租户上下文，而不是从参数取得。
+3. 从应用绑定已认证身份与租户上下文，不能从模型参数取得。
 4. 检查能力范围和资源所有权。
 5. 对后果重大的动作要求审批。
 6. 应用幂等、超时、速率和大小限制。
@@ -237,7 +237,7 @@ agent 循环除 `end_turn` 外还需要终止条件：
 - 必需的人工审批。
 - 已验证的最终状态谓词。
 
-最终状态谓词比询问响应是否听起来完成更强。部署 agent 在预期版本健康时才成功，而不是在它说“已部署”时；研究 agent 在必需主张有可解析来源时成功，而非在它输出长报告时。
+最终状态谓词比判断响应是否“听起来完成”更可靠。部署 agent 只有在预期版本健康时才算成功；研究 agent 只有在必需主张都有可解析来源时才算成功。它们的自述和报告长度都不能证明任务完成。
 
 记录轨迹：prompt 版本、模型、停止原因、工具名、规范化参数指纹、决策、延迟、结果类别和状态变化。对敏感值脱敏。
 
@@ -271,7 +271,7 @@ agent 循环除 `end_turn` 外还需要终止条件：
 
 托管 agent 集成是事件消费者，不是最终文本调用。应用发送用户事件，消费持久化的 session 与 agent 事件，并跟踪状态。自定义工具调用或需权限的工具会使 session 以 `requires_action` 暂停；应用用结果或确认决策解析被引用的事件 ID。断开的 SSE 连接并不代表成功。应对账持久化事件与终止状态。第 12 课用离线事件 fixture 实现该边界；当前来源见[Session event stream](https://platform.claude.com/docs/en/managed-agents/events-and-streaming)。
 
-## 第一方不代表只有一个执行边界
+## 第一方能力也有多种执行边界
 
 按代码和数据在哪里执行、谁授权以及如何发现来分类能力。
 
@@ -282,15 +282,15 @@ agent 循环除 `end_turn` 外还需要终止条件：
 | Managed-agent built-in | 配置的托管或自托管 agent environment 执行其工具集 | 符合该 runtime sandbox 与权限策略的仓库和 web 工作 | 启用工具集会授予业务权限或免去确认工作 |
 | Custom client tool | 应用校验并执行你的 JSON Schema 契约 | 私有业务操作、狭窄领域 API 与精确应用策略 | schema 合法输入就是身份、授权或幂等证据 |
 | Skill | 支持的 runtime 加载可复用指令、参考、脚本或资产 | 仅在相关时披露的流程 | Skill 本身是执行或授权边界 |
-| MCP | MCP client 或 connector 调用标准化外部 server | 由显式 server、身份与传输边界在兼容 host 间共享的能力或上下文 | server 发现会让每个返回工具都安全或相关 |
+| MCP | MCP client 或连接器调用标准化外部 server | 由显式 server、身份与传输边界在兼容 host 间共享的能力或上下文 | server 发现会让每个返回工具都安全或相关 |
 
-Skill 和工具往往互补，而非替代。退款审核 Skill 可以传授流程，custom client tool 则暴露获批操作；当多个 host 需要同一标准接口时，MCP 可以承载该操作。只有网络、保留和结果语义符合数据要求时，才选 provider 执行的 server tool。只有 sandbox 与动作校验器已准备好执行时，才选 Anthropic-schema client tool。
+Skill 和工具往往互补。退款审核 Skill 可以传授流程，custom client tool 则暴露获批操作；当多个 host 需要同一标准接口时，MCP 可以承载该操作。只有网络、保留和结果语义符合数据要求时，才选 provider 执行的 server tool。只有 sandbox 与动作校验器已准备好执行时，才选 Anthropic-schema client tool。
 
 当前执行分类记录于[工具使用的工作方式](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)，托管 harness 另有[工具配置](https://platform.claude.com/docs/en/managed-agents/tools)。版本与模型兼容性会变化，因此在 trace 中持久化所选工具类型和版本。
 
 ## 构建循环
 
-`code/main.py` 实现工具注册表和原始循环，支持多调用、schema 检查、变更工具审批、处理程序错误、未知工具、关联 ID 和回合预算。离线决策实验根据显式需求分别选择工作流、手写循环、SDK Tool Runner 或 managed agents；它还可选配 Skill 来组合执行 surface，而非假装 Skill 就是工具。
+`code/main.py` 实现工具注册表和原始循环，支持多调用、schema 检查、变更工具审批、处理程序错误、未知工具、关联 ID 和回合预算。离线决策实验根据显式需求分别选择工作流、手写循环、SDK Tool Runner 或 managed agents；它还可选配 Skill 来组合执行 surface，Skill 本身不充当工具。
 
 ```bash
 cd certifications/claude/lessons/10-tool-use-and-agentic-loops/code
@@ -343,12 +343,12 @@ python3 -m unittest discover tests -v
 - 将托管 session 视为事件状态机；按事件 ID 解析 `requires_action`，绝不根据断开的流推断成功。
 - 按执行地点区分 server-executed tools、Anthropic-schema client tools、managed built-ins 和 custom client tools。
 - 将 Skills 视为流程、MCP 视为连接边界；二者都不授予授权。
-- 评估工具轨迹与最终状态，不只评估最终散文。
+- 同时评估工具轨迹与最终状态。
 
 ## 练习
 
 1. 添加必须含审批 token 的 `issue_refund`。证明对话文本无法替代该 token。
-2. 在一个响应中添加两个只读调用并并发执行，保留确定性结果关联。
+2. 在一个响应中添加两个只读调用并发执行，保留确定性结果关联。
 3. 让一个工具在发生副作用后超时。重试前添加幂等键和对账检查。
 4. 添加重复调用检测器，在同一规范化工具请求出现两次后停止。
 5. 将一个私有 custom tool 改为由两个 host 共享的 MCP 能力。确定认证、同意、结果过滤和可用性责任哪些移到 server 边界，哪些仍留在各 host。

@@ -18,13 +18,13 @@
 
 ## 本不该存在的集成矩阵
 
-团队有三个数据系统和四个 AI host，却要为每一组 host 与系统单独开发 connector。十二套集成里的身份验证、schema、重试、日志和 tool 描述逐渐各不相同。
+团队有三个数据系统和四个 AI host，却要为每一组 host 与系统单独开发连接器。十二套集成里的身份验证、schema、重试、日志和 tool 描述逐渐各不相同。
 
-随后数据库改了一个字段。一半 connector 完成了更新，另一个却悄悄继续返回旧字段。明明是集成层行为不一致，最后背锅的却是模型。
+随后数据库改了一个字段。一半连接器完成了更新，还有一个却悄悄继续返回旧字段。明明是集成层行为不一致，最后背锅的却是模型。
 
 Model Context Protocol 用共享协议取代了大量 host 到能力之间的专用适配器。server 声明 tool、resource 与 prompt；client 协商能力并发起调用；host 再把这些能力接入模型和用户体验。
 
-MCP 并没有消除集成工程，而是为它划出了一条清晰可见的边界。
+集成工程依然存在，但 MCP 把它的边界明确画了出来。
 
 ## Host、Client 与 Server
 
@@ -77,7 +77,7 @@ MCP 消息遵循 JSON-RPC 2.0 语义。请求包含方法、可选参数和 ID�
 }
 ```
 
-多个请求同时在途时，关联关系十分关键。绝不能只按响应到达顺序配对。
+多个请求同时在途时，必须按 ID 关联。绝不能只按响应到达顺序配对。
 
 协议错误带有机器可读的错误码。无效请求、未知方法和无效参数是三类不同故障。tool 领域内的失败通常仍放在成功的 JSON-RPC 响应里，以带错误标记的 tool 内容返回。这样，client 才能区分传输或协议失败与能力执行失败。
 
@@ -348,7 +348,7 @@ python3 -m unittest discover tests -v
 
 ## 交付产物
 
-`outputs/mcp-capability-snapshot.json` 是由本地模拟器生成的一份完整兼容配置 transcript。它包含客户端回调、进度与日志通知，以及两种 HTTP 部署方案。运行 `python3 main.py` 即可复现。产物测试会将它与 `demo()` 对比，其他聚焦测试则覆盖能力协商、回调拒绝、通知结构、路由取舍、resource、prompt、关联关系、无效参数与初始化前拒绝。
+`outputs/mcp-capability-snapshot.json` 是本地模拟器生成的一份完整兼容配置交互记录。它包含客户端回调、进度与日志通知，以及两种 HTTP 部署方案。运行 `python3 main.py` 即可复现。产物测试会将它与 `demo()` 对比，其他聚焦测试则覆盖能力协商、回调拒绝、通知结构、路由取舍、resource、prompt、关联关系、无效参数与初始化前拒绝。
 
 ## 验证
 
@@ -375,7 +375,7 @@ python3 -m unittest discover tests -v
 | 独立审查者需要隔离的上下文 | Subagent |
 | 成熟 CLI 已提供安全操作 | 沙箱化 CLI tool |
 
-MCP 提供了发现、生命周期、传输与治理价值，也引入了额外的协议边界、更多上下文和一台需要运维的 server。不要把它当成一枚勋章。
+MCP 提供发现、生命周期、传输与治理能力，也会增加协议边界、上下文占用，以及一个需要运维的 server。不要把它当成一枚勋章。
 
 ## 考试决策规则
 
@@ -389,7 +389,7 @@ MCP 提供了发现、生命周期、传输与治理价值，也引入了额外�
 - 把 HTTP+SSE 与协议会话视为兼容路径，并制定明确的退役计划。
 - 身份验证回答“是谁”，授权决定“能做什么”。
 - 将 server 描述、resource 与结果视为不可信输入。
-- 只有共享发现与互操作性足以抵偿运维成本时，才使用 MCP。
+- 共享发现与互操作性带来的收益足以覆盖运维成本时，再使用 MCP。
 
 ## 练习
 
@@ -410,5 +410,5 @@ MCP 提供了发现、生命周期、传输与治理价值，也引入了额外�
 - [MCP 已弃用功能](https://modelcontextprotocol.io/specification/2026-07-28/deprecated)
 - [构建 MCP server](https://modelcontextprotocol.io/docs/develop/build-server)
 - [MCP 安全最佳实践](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices)
-- [Anthropic MCP connector](https://platform.claude.com/docs/en/agents-and-tools/mcp-connector)
+- [Anthropic MCP 连接器](https://platform.claude.com/docs/en/agents-and-tools/mcp-connector)
 - [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)

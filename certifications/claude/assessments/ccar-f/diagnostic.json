@@ -56,7 +56,7 @@
     {
       "id": "ccar-f-d-003",
       "domain": "agentic-architecture-orchestration",
-      "objective": "从停止原因到工具结果实现工具使用生命周期",
+      "objective": "实现从停止原因到工具结果的完整工具调用生命周期",
       "type": "single",
       "prompt": "Claude 返回带有两次调用的 tool_use 停止原因。在请求 Claude 继续之前，运行时封装层必须做什么？",
       "options": [
@@ -99,9 +99,9 @@
     {
       "id": "ccar-f-d-005",
       "domain": "tool-design-mcp-integration",
-      "objective": "编写精确的工具描述和边界",
+      "objective": "编写精确的工具描述并划清边界",
       "type": "single",
-      "prompt": "一名 agent 拥有名为 search、find 和 lookup 的工具，三者都被描述为“查找信息”。最有力的修复是什么？",
+      "prompt": "一名 agent 拥有名为 search、find 和 lookup 的工具，三者都被描述为“查找信息”。怎样修复最有效？",
       "options": [
         "保留重叠的名称，但补充每个工具的数据来源、预期延迟和典型示例查询",
         "按操作、来源、适用场景、不适用场景、范围和副作用重命名并描述工具",
@@ -121,9 +121,9 @@
     {
       "id": "ccar-f-d-006",
       "domain": "tool-design-mcp-integration",
-      "objective": "返回结构化且考虑重试的 MCP 错误",
+      "objective": "返回结构化 MCP 错误，并标明是否可重试",
       "type": "multiple",
-      "prompt": "某个源搜索在返回所请求的 20 条记录中的 12 条后超时。哪两个错误字段对安全恢复至关重要？选两项。",
+      "prompt": "某个来源搜索在返回所请求的 20 条记录中的 12 条后超时。安全恢复必须依赖哪两个错误字段？选两项。",
       "options": [
         "可重试类别和受影响范围",
         "失败状态和原始查询参数，让客户端自行推断已返回的记录是否仍然有效，以及重试是否安全",
@@ -166,7 +166,7 @@
       "domain": "claude-code-configuration-workflows",
       "objective": "设计 CLAUDE.md 层级、导入、规则和记忆",
       "type": "single",
-      "prompt": "根 CLAUDE.md 包含数百行只适用于数据库迁移的内容。最有力的重构是什么？",
+      "prompt": "根 CLAUDE.md 包含数百行只适用于数据库迁移的内容。怎样重构最合适？",
       "options": [
         "删除所有迁移规则",
         "在根目录保留完整迁移指南，增加目录，并告知 Claude 忽略当前编辑文件不涉及的段落",
@@ -210,9 +210,9 @@
       "domain": "claude-code-configuration-workflows",
       "objective": "通过结构化输出和独立审核运行无头 CI",
       "type": "single",
-      "prompt": "对于无头 Claude Code pull request 审核，最有力的起始状态是什么？",
+      "prompt": "对于无头 Claude Code pull request 审核，哪种起始状态最稳妥？",
       "options": [
-        "一个干净的 commit，配有已声明的配置、范围受限的只读工具、结构化 finding 和确定性 gate",
+        "一个干净的 commit，配有已声明的配置、范围受限的只读工具、结构化发现项和确定性 gate",
         "一台带有未文档化用户 hook 的工作站",
         "生产部署凭据",
         "一个恢复的交互式会话，其上下文已包含 pull request 讨论、此前的工具结果和实现者的本地配置"
@@ -231,7 +231,7 @@
       "domain": "prompt-engineering-structured-output",
       "objective": "以工具使用和工具选择强制 schema",
       "type": "single",
-      "prompt": "某个应用需要类型化的提取记录，但不得执行任何外部操作。最有力的设计是什么？",
+      "prompt": "某个应用需要类型化的提取记录，但不得执行任何外部操作。哪种设计最合适？",
       "options": [
         "允许静默编造缺失字段",
         "使用无副作用的提取工具或结构化输出机制，再校验结果",
@@ -274,17 +274,17 @@
       "domain": "prompt-engineering-structured-output",
       "objective": "分离生成器和独立审核人阶段",
       "type": "single",
-      "prompt": "哪种输入能对生成的 finding 形成最有力的独立审核？",
+      "prompt": "哪种输入最适合用来独立审核生成的发现项？",
       "options": [
         "一项改善写作风格的请求",
         "产物、来源和 rubric，以及生成器的完整决策轨迹与自评，让审核人理解原始理由",
-        "在全新上下文中提供产物、来源证据、评估 rubric 和必需的 finding schema",
+        "在全新上下文中提供产物、来源证据、评估 rubric 和必需的发现项 schema",
         "仅提供最终置信度百分比"
       ],
       "correct": [
         2
       ],
-      "explanation": "全新的审核人应根据证据和标准检查产物，不继承生成器的叙述。结构化 finding 还会保留哪项主张失败及其原因。",
+      "explanation": "全新的审核人应根据证据和标准检查产物，不继承生成器的叙述。结构化发现项还会保留哪项主张失败及其原因。",
       "references": [
         "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
         "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation"
@@ -293,12 +293,12 @@
     {
       "id": "ccar-f-d-014",
       "domain": "context-management-reliability",
-      "objective": "放置事实以减少中间遗忘故障",
+      "objective": "调整事实在上下文中的位置，减少中段遗忘",
       "type": "single",
-      "prompt": "一项 policy 事实埋没在巨大的上下文中，且反复被遗漏。哪种设计最有力？",
+      "prompt": "一项 policy 事实埋没在巨大的上下文中，且反复被遗漏。哪种设计最有效？",
       "options": [
         "将完整语料重复数次",
-        "将完整语料放入名义上下文窗口，并把 policy 问题移到开头，相信容量加任务显著性能保留被埋没的事实",
+        "将完整语料塞进标称上下文窗口，并把 policy 问题移到开头，相信大容量加上任务显著性足以保留被埋没的事实",
         "移除来源 metadata",
         "清晰放置任务和不变量，检索带有来源信息的聚焦 policy 片段，并在生成前重述决策问题"
       ],
@@ -315,7 +315,7 @@
     {
       "id": "ccar-f-d-015",
       "domain": "context-management-reliability",
-      "objective": "校准置信度和人工审核",
+      "objective": "校准置信度并安排人工审核",
       "type": "multiple",
       "prompt": "以下哪两种信号比未经校准的自报置信度百分比更有力？选两项。",
       "options": [
@@ -328,7 +328,7 @@
         1,
         2
       ],
-      "explanation": "可观察的证据、覆盖率、分歧、新颖性和实证错误可支持经过校准的路由。数值精确度和冗长程度不能证明置信度是否符合真实正确性。",
+      "explanation": "证据、覆盖率、分歧、新颖性和实测错误都可以作为校准路由的信号。数字看起来精确、回答写得很长，都不能证明置信度与实际正确率相符。",
       "references": [
         "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
         "certifications/claude/lessons/14-evals-testing-debugging-and-observability"

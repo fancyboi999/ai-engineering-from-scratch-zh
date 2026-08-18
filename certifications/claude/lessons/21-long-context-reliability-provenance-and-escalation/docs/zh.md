@@ -1,4 +1,4 @@
-# 让大上下文可观测
+# 让长上下文可观测
 
 > 大上下文窗口能容纳更多证据，却无法告诉你哪些证据被注意到、仍然最新、具有权威性，或可以安全执行。
 
@@ -22,9 +22,9 @@
 
 最终计划却仍违反安全 Rule。该 Rule 只在一份很长的架构文档中间出现一次。含有失败集成测试的 tool 结果被压成“测试大多通过”。一名 subagent 审了 24 个文件中的 18 个后超时，但它的散文摘要看起来完整。Markdown 表格在提取时丢失列关系，于是已废弃依赖看起来仍受支持。
 
-没有任何内容超过名义 token 上限。系统失败是因为重要事实放置不佳、metadata 消失、partial 工作看起来像 complete，而且没人定义升级 Rule。
+没有任何内容超过名义 token 上限。故障来自不合理的信息位置、丢失的 metadata、看似 complete 的 partial 工作，以及缺失的升级 Rule。
 
-上下文可靠性不是容纳更多文本的能力，而是保存正确状态、暴露不确定性，并在证据不足时路由决策的能力。
+可靠的上下文需要保存正确状态、暴露不确定性，并在证据不足时把决策交给合适的处理方。单纯容纳更多文本远远不够。
 
 ## 核心概念
 
@@ -40,7 +40,7 @@
 4. 只在最终请求附近重复少数关键约束。
 5. 为当前决策检索窄证据，不要携带整个归档。
 
-不要在两端重复每条 Rule。重复会消耗上下文并放大陈旧指令；只提升遗漏会造成实质失败的 invariant。
+不要在两端重复每条 Rule。重复会消耗上下文并放大陈旧指令；只突出那些一旦遗漏就会造成实质失败的 invariant。
 
 ```text
 goal and hard constraints
@@ -50,7 +50,7 @@ decision-specific question
 required result and escalation schema
 ```
 
-证据能可靠选择时，检索通常比一个巨型 prompt 更可靠。大上下文窗口是留给仍然困难场景的容量，不是跳过信息架构的许可。
+证据能可靠选择时，检索通常比一个巨型 prompt 更可靠。大上下文窗口只是为剩余难题提供容量，不能用来跳过信息架构。
 
 ### 证据需要信封
 
@@ -84,7 +84,7 @@ required result and escalation schema
 
 ### 按决策价值压缩 Tool 输出
 
-tool 输出会主导上下文；压缩应移除重复，而不是状态。
+tool 输出会主导上下文；压缩应移除重复，同时保留状态。
 
 应保留：
 
@@ -136,7 +136,7 @@ tool 输出会主导上下文；压缩应移除重复，而不是状态。
 - **Partial：** 存在有效工作，但具名范围或证据缺失。
 - **Blocked：** 安全推进需要新的权限、policy、数据或外部状态。
 
-partial 既不是失败，也不是 complete。coordinator 可以保留有效 finding、只重试合格缺口，并阻止 synthesis 将缺失工作解释为没有问题。
+partial 是包含有效结果和明确缺口的独立状态。coordinator 可以保留有效 finding、只重试合格缺口，并阻止 synthesis 将缺失工作解释为没有问题。
 
 ```mermaid
 flowchart TD
@@ -150,9 +150,9 @@ flowchart TD
     G -->|"no"| E
 ```
 
-错误需要类别、可重试性、安全消息、受影响范围、partial result 引用和建议的安全下一步。timeout 可能可重试；authorization 拒绝无法靠重试修复；含糊 policy 需要 owner，不是更多 token。
+错误需要类别、可重试性、安全消息、受影响范围、partial result 引用和建议的安全下一步。timeout 可能允许重试；authorization 拒绝要先解决权限；含糊 policy 要交给 owner 处理，增加 token 没有帮助。
 
-### 升级原因，而非焦虑
+### 升级时说明具体原因
 
 升级应指出缺失的决定：
 
@@ -169,7 +169,7 @@ flowchart TD
 
 ### 大型代码库需要四种不同的 memory 工具
 
-这些机制相关，却不能互换。
+这些机制相关，但各自解决不同问题。
 
 #### Manifest
 
@@ -235,7 +235,7 @@ Disposition: human review required before production rollout
 
 random sample 可发现未知失败类别。只审查被标记 case 时，损坏的 flagger 可能永远不可见。
 
-跟踪 reviewer 分歧和纠正，用它们更新评估 case 与路由阈值，而不是只计算虚荣的接受率。
+跟踪 reviewer 分歧和纠正，用它们更新评估 case 与路由阈值。别只计算没有决策价值的接受率。
 
 ### 内容类型改变含义
 
@@ -259,7 +259,7 @@ random sample 可发现未知失败类别。只审查被标记 case 时，损坏
 21-provenance-escalation
 ```
 
-使用 provenance 与 escalation 模拟器，在观察覆盖率和任务状态变化时埋藏、压缩、制造冲突或移除证据。交互会让 `partial` 和 `blocked` 可观测，而非让平滑摘要隐藏缺失工作。
+使用 provenance 与 escalation 模拟器，在观察覆盖率和任务状态变化时埋藏、压缩、制造冲突或移除证据。交互会让 `partial` 和 `blocked` 可观测，避免平滑摘要隐藏缺失工作。
 
 ## 实践实验
 
@@ -267,7 +267,7 @@ random sample 可发现未知失败类别。只审查被标记 case 时，损坏
 
 ## 交付产物
 
-填写完整的 [`outputs/reliability-packet.md`](../outputs/reliability-packet.md) 记录一次 24 文件审查，包含一个冲突、显式覆盖率、来源 metadata 和绑定 owner 的 escalation。
+填写后的 [`outputs/reliability-packet.md`](../outputs/reliability-packet.md) 记录一次 24 文件审查，包含一个冲突、显式覆盖率、来源 metadata，以及指定 owner 的升级事项。
 
 ## 验证
 

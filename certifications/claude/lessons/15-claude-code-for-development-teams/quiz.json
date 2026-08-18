@@ -1,6 +1,6 @@
 {
   "lesson": "15-claude-code-for-development-teams",
-  "title": "Claude Code 通过共享约束扩展到团队",
+  "title": "Claude Code 靠共享约束支持规模化协作",
   "questions": [
     {
       "stage": "pre",
@@ -12,7 +12,7 @@
         "保存完整 API 参考，让每个 session 无需打开其他文件就能工作"
       ],
       "correct": 1,
-      "explanation": "精简的项目指南提供反复需要的仓库事实，并指向更深入的来源，不会让每个 session 都背负一本手册。"
+      "explanation": "精简的项目指南提供反复需要的仓库事实，并指向更深入的来源，避免每个 session 都背负整本手册。"
     },
     {
       "stage": "check",
@@ -36,7 +36,7 @@
         "它们可以改变权限、tool、执行行为与信任边界"
       ],
       "correct": 3,
-      "explanation": "配置可以授予 shell、文件系统、网络、MCP 与生命周期行为。文件能被解析，不代表它产生的实际行为安全。"
+      "explanation": "配置可以开放 shell、文件系统、网络和 MCP 能力，也能改变生命周期行为。文件能被解析，不代表它产生的实际行为安全。"
     },
     {
       "stage": "check",

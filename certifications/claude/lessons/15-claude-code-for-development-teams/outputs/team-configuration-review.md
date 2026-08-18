@@ -32,7 +32,7 @@ operator 使用 `/context` 检查上下文占用，并通过指定明确 focus �
 
 ## Scheduled Execution（调度执行）
 
-session 内 `/loop` 用于短期轮询。cloud routine 被视为自主身份进行审查，只能访问必需仓库与 connector。GitHub Actions 负责由仓库治理的 cron job，并使用最小 workflow 权限。
+session 内 `/loop` 用于短期轮询。cloud routine 被视为自主身份进行审查，只能访问必需仓库与连接器。GitHub Actions 负责由仓库治理的 cron job，并使用最小 workflow 权限。
 
 ## Review Automation（审查自动化）
 

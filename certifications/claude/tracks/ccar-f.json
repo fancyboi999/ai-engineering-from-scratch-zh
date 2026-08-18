@@ -1,13 +1,13 @@
 {
 "id":"claude-ccar-f","slug":"ccar-f","examCode":"CCAR-F","credential":"Claude 认证架构师 - 基础级","shortName":"架构师基础","level":"架构基础级","accent":"violet","badge":{"imageUrl":"https://images.credly.com/images/f2040db3-3904-4240-8966-e87b1510bea0/blob","width":604,"height":604},
-"summary":"在 Claude Code、Claude Agent SDK、Claude API 和 MCP 间作出合理的生产权衡。","audience":"设计生产 Claude 系统，并能推理含糊、基于场景的架构决策的开发者和架构师。","recommendedExperience":["使用 Claude 构建六个月或以上","亲手使用 Claude API 和工具调用","了解 Claude Code、Claude Agent SDK 和 MCP","有在约束下选择架构备选方案的经验"],
+"summary":"在 Claude Code、Claude Agent SDK、Claude API 和 MCP 之间作出合理的生产取舍。","audience":"面向设计生产级 Claude 系统、需要在含糊场景中作出架构决策的开发者和架构师。","recommendedExperience":["使用 Claude 构建六个月或以上","亲手使用 Claude API 和工具调用","了解 Claude Code、Claude Agent SDK 和 MCP","有在约束下选择架构备选方案的经验"],
 "exam":{"items":60,"timeLimitMinutes":120,"feeUsd":125,"passingScaledScore":720,"scoreScale":"100-1000","validityMonths":12,"format":"基于场景的单选与多选；从六种场景中抽取四种","delivery":"线上监考或考试中心","guideVersion":"1.0","effective":"July 2026","officialGuideUrl":"https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542750%2FClaude+Certified+Architect+%E2%80%93+Foundations+Exam+Guide.pdf"},
 "domains":[
-{"id":"agentic-architecture-orchestration","name":"Agent 架构与编排","weight":27,"objectives":["从停止原因到工具结果实现工具使用生命周期","选择协调者和 subagent 拓扑","使用 Task、allowedTools、隔离上下文、并行和分叉会话","强制前置条件、分解关注点并组织移交","使用 hook 实施确定性控制和规范化","选择顺序或自适应分解","恢复或分叉而不携带过期上下文"]},
-{"id":"tool-design-mcp-integration","name":"工具设计与 MCP 集成","weight":18,"objectives":["编写精确的工具描述和边界","返回结构化且考虑重试的 MCP 错误","管理工具分发和工具选择","限定 MCP 配置和资源范围","安全选择 Claude Code 文件、shell 和搜索工具"]},
+{"id":"agentic-architecture-orchestration","name":"Agent 架构与编排","weight":27,"objectives":["实现从停止原因到工具结果的完整工具调用生命周期","选择协调者和 subagent 拓扑","使用 Task、allowedTools、隔离上下文、并行和分叉会话","强制前置条件、分解关注点并组织移交","使用 hook 实施确定性控制和规范化","选择顺序或自适应分解","恢复或分叉而不携带过期上下文"]},
+{"id":"tool-design-mcp-integration","name":"工具设计与 MCP 集成","weight":18,"objectives":["编写精确的工具描述并划清边界","返回结构化 MCP 错误，并标明是否可重试","管理工具调度和工具选择","限定 MCP 配置和资源范围","安全选择 Claude Code 文件、shell 和搜索工具"]},
 {"id":"claude-code-configuration-workflows","name":"Claude Code 配置与工作流","weight":20,"objectives":["设计 CLAUDE.md 层级、导入、规则和记忆","创建项目与用户命令和 Skills","应用路径特定规则","选择计划模式、直接执行或 Explore","使用示例、测试驱动迭代和访谈","通过结构化输出和独立审核运行无头 CI"]},
 {"id":"prompt-engineering-structured-output","name":"Prompt 工程与结构化输出","weight":20,"objectives":["陈述明确评估标准","使用 few-shot 示例实现一致判断","以工具使用和工具选择强制 schema","验证、重试并反馈语义错误","为适合的工作负载使用批处理","分离生成器和独立审核人阶段"]},
-{"id":"context-management-reliability","name":"上下文管理与可靠性","weight":15,"objectives":["放置事实以减少中间遗忘故障","升级处理歧义和政策缺口","传播结构化错误和部分结果","为大型代码库使用草稿本、subagent、清单和压缩","校准置信度和人工审核","跟踪来源、冲突、日期和内容类型"]}],
+{"id":"context-management-reliability","name":"上下文管理与可靠性","weight":15,"objectives":["调整事实在上下文中的位置，减少中段遗忘","遇到歧义和政策缺口时升级处理","传播结构化错误和部分结果","为大型代码库使用草稿本、subagent、清单和压缩","校准置信度并安排人工审核","跟踪来源、冲突、日期和内容类型"]}],
 "scenarioPool":["客户支持解决 agent","使用 Claude Code 的代码生成","多 agent 研究","使用 Claude 提升开发者生产力","用于 CI/CD 的 Claude Code","结构化数据提取"],
 "lessons":[
 {"path":"certifications/claude/lessons/00-certification-strategy","domains":["agentic-architecture-orchestration"],"role":"导览","required":true},

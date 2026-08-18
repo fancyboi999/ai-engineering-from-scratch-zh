@@ -1,10 +1,10 @@
-# Claude Code 通过共享约束扩展到团队
+# Claude Code 靠共享约束支持规模化协作
 
-> 团队不需要一份巨型 prompt，而需要精简的项目合约、可复用流程、确定性检查与版本化配置。
+> 团队协作应依靠精简的项目合约、可复用流程、确定性检查与版本化配置，别把所有内容塞进一份巨型 prompt。
 
 **类型：** Learn
 **语言：** Python
-**前置要求：** [Agent SDK 是运行框架，不是权限](../../12-claude-agent-sdk-and-hooks/)、[Eval 将 Agent 行为变成工程证据](../../14-evals-testing-debugging-and-observability/)
+**前置要求：** [Agent SDK 提供运行框架，权限另行控制](../../12-claude-agent-sdk-and-hooks/)、[Eval 将 Agent 行为变成工程证据](../../14-evals-testing-debugging-and-observability/)
 **预计时间：** 约 170 分钟
 
 ## 学习目标
@@ -22,7 +22,7 @@
 
 Claude 每个 session 都要读取它。重要命令与过时散文争夺上下文。文件太大，开发者不再审查改动。某一行旧指令要求使用已淘汰的测试命令，agent 于是反复运行错误测试套件，再报告成功。
 
-团队创造的不是 memory，而是上下文债务。
+这份文件最终成了上下文债务。
 
 `CLAUDE.md` 应当像一份准确的上手脚本：这个仓库是什么，怎样浏览、构建和测试，有哪些不直观的约束，更深入的文档又在哪里。
 
@@ -111,7 +111,7 @@ Skill 封装可复用流程、参考资料、脚本和资源。它的简短描�
 
 数据库迁移审查、release note 生成、安全威胁建模或内部文档风格都适合用 Skill。核心 session prompt 要保持精简。Skill 应随仓库或获批的分发机制一起做版本管理。
 
-渐进披露才是收益。始终加载、包含整本手册的 Skill，只是另一个 system prompt。
+渐进式披露的价值在于按需加载。如果一个 Skill 始终加载整本手册，它就退化成了另一份 system prompt。
 
 ### Command
 
@@ -127,7 +127,7 @@ command 参数是不可信输入。command 不会绕过 tool 授权或批准。
 
 产品说明（核验于 2026-08-09）：具体文件系统位置、frontmatter 字段、command 行为与 agent 配置都在演进。请使用当前 [Claude Code 文档](https://code.claude.com/docs/en/overview)，并为仓库示例标注它所针对的版本。
 
-## Settings 就是代码
+## 按代码标准审查 Settings
 
 团队 settings 控制权限、环境、hook、模型行为、MCP server、plugin 与其他产品能力。要像审查生产代码一样审查它们。
 
@@ -166,7 +166,7 @@ permission mode 决定 Claude 提出 tool 调用时会发生什么。它不会�
 | `dontAsk` | 凡是需要询问的操作一律拒绝，只执行预先批准的工作 | 锁定的 CI 与脚本 |
 | `bypassPermissions` | 绕过内置权限检查；已配置的 deny、ask 与用户交互控制仍生效 | 不含有价值凭证的隔离容器或虚拟机 |
 
-在支持时，可为 session 使用 `--permission-mode <mode>`，或设置 `permissions.defaultMode`。permission rule 再通过 `deny`、`ask` 与 `allow` pattern 缩小调用范围。显式 deny 与 ask 规则、组织 connector 控制和必需的用户交互在所有 mode 中都会评估，包括 `bypassPermissions`。硬边界应放在 deny rule、沙箱、凭证 scope、分支保护或 hook 中，而不是一条可能被 auto mode transcript 后续 compact 掉的句子里。
+在支持时，可为 session 使用 `--permission-mode <mode>`，或设置 `permissions.defaultMode`。permission rule 再通过 `deny`、`ask` 与 `allow` pattern 缩小调用范围。显式 deny 与 ask 规则、组织级连接器控制和必需的用户交互在所有 mode 中都会评估，包括 `bypassPermissions`。硬边界应放在 deny rule、沙箱、凭证 scope、分支保护或 hook 中。写在对话里的句子，可能在 auto mode transcript 后续 compact 时丢失。
 
 `acceptEdits` 的含义仅仅是编辑时少一道手续，并不会自动接受发布、部署、任意 shell 命令或消息。`auto` 是 research preview，不是安全证明。普通笔记本上不应使用 `bypassPermissions`，仅仅因为 session 位于 Git worktree 也不足以成为理由。
 
@@ -271,7 +271,7 @@ Claude Code session 帮助开发者恢复工作、fork 调查并保留本地上�
 
 compaction 可能丢失普通 transcript 指令。项目根 `CLAUDE.md` 与自动 memory 会重新加载，路径作用域 rule 则在再次读取匹配文件时重载。持久约束应放进版本化配置，并在 compaction 后重申当前验收边界。
 
-rewind 只是便利层，不是版本控制。它会追踪 Claude Code 直接进行的文件编辑，但不会追踪 shell 命令、外部系统或大多数 subagent 产生的变更。以 `context: fork` 运行的前台 Skill 是例外，其直接编辑会被追踪。重试操作前，要检查 Git 与外部状态。
+rewind 提供便捷恢复，但不能替代版本控制。它会追踪 Claude Code 直接进行的文件编辑，但不会追踪 shell 命令、外部系统或大多数 subagent 产生的变更。以 `context: fork` 运行的前台 Skill 是例外，其直接编辑会被追踪。重试操作前，要检查 Git 与外部状态。
 
 ## 自主操作有不同的停止条件
 
@@ -293,7 +293,7 @@ rewind 只是便利层，不是版本控制。它会追踪 Claude Code 直接进
 
 选择合适的持久化 scheduler：
 
-- cloud Routine：用于已保存 prompt、指定仓库、connector 与 schedule、API 或 GitHub trigger。Routine 是 research preview，会在没有批准 prompt 的情况下自主运行，因此要移除所有不需要的 connector，并缩小分支权限。
+- cloud Routine：用于已保存 prompt、指定仓库、连接器与 schedule、API 或 GitHub trigger。Routine 是 research preview，会在没有批准 prompt 的情况下自主运行，因此要移除所有不需要的连接器，并缩小分支权限。
 - Desktop scheduled task：机器与本地未提交文件属于预期边界时使用。
 - GitHub Actions：trigger 与权限应放在经过审查的仓库 workflow 配置中时使用。
 
@@ -343,7 +343,7 @@ jobs:
 
 ## 在 CI 中以 Headless 方式运行 Claude Code
 
-headless execution 可以在自动化中分析代码、生成结构化输出或提出 patch，也移除了通常会发现危险请求的交互式人员。
+headless execution 可以在自动化中分析代码、生成结构化输出或提出 patch，同时也失去了通常能发现危险请求的交互式监督。
 
 把 CI 用例设计成受约束 job：
 
@@ -402,7 +402,7 @@ flowchart LR
 
 其中任一项变化时，运行有代表性的 workflow eval。比较正确性、安全性、轮数、延迟与成本。模型升级可能改善整体推理，却改变某个关键 workflow 的 tool 选择。
 
-永远固定版本不是答案，受控升级才是。使用兼容窗口、canary 仓库、回归测试套件与回滚路径。
+采用受控升级，避免长期锁死版本。准备兼容窗口、canary 仓库、回归测试套件与回滚路径。
 
 ## 团队配置审查
 

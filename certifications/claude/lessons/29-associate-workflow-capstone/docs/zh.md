@@ -1,10 +1,10 @@
-# 交付一周的工作，而不是完美的 prompt
+# 交付一周的完整工作流，别只打磨 prompt
 
-> 你的综合项目是一套受治理的决策工作流：输入来源、核验主张、保留人工权限，并移交状态。
+> 这个综合项目要交付一套受治理的决策工作流：接收有来源的输入、核验主张、保留人工决策权，并把完整状态交给下一位负责人。
 
 **类型：** 构建
 **语言：** Python
-**前置要求：** [选择足以承载工作的最小能力面](../../01-claude-product-and-model-landscape/)、[把需求转化为可测试契约](../../03-prompting-and-task-decomposition/)、[把每项事实放入正确的上下文](../../04-context-knowledge-memory-and-caching/)、[验证主张，而不是置信度](../../05-output-evaluation-and-validation/)、[为能力设置权限边界](../../06-governance-safety-and-responsible-use/)、[在自动化之前设计移交](../../07-workflow-design-and-human-handoffs/)
+**前置要求：** [选择足以承载工作的最小能力面](../../01-claude-product-and-model-landscape/)、[把需求转化为可测试契约](../../03-prompting-and-task-decomposition/)、[把每项事实放入正确的上下文](../../04-context-knowledge-memory-and-caching/)、[验证主张，而非置信度](../../05-output-evaluation-and-validation/)、[为能力设置权限边界](../../06-governance-safety-and-responsible-use/)、[在自动化之前设计移交](../../07-workflow-design-and-human-handoffs/)
 **预计时间：** 在一个模拟工作周内完成，约 4 小时
 
 ## 学习目标
@@ -13,7 +13,7 @@
 - 构建有来源支撑、带明确 checkpoint 的每周简报工作流。
 - 使用 Python 实现确定性校验器，检查来源、主张、治理和移交就绪情况。
 - 在建议发布之前运行正常和故障案例。
-- 提供就绪证据，而不是声称工作流很安全。
+- 用就绪证据说明工作流是否安全。
 
 ## 问题所在
 
@@ -55,7 +55,7 @@ flowchart LR
 
 ### Python 校验器有意保持有限
 
-综合项目代码不会调用 Claude。它展示了一道关键架构边界：精确的工作流属性应该交给确定性代码。
+综合项目代码不会调用 Claude。它明确划分了一项职责：精确的工作流属性应该交给确定性代码。
 
 校验器检查：
 
@@ -88,9 +88,8 @@ flowchart LR
 
 ## 交付产物
 
-交付的清单和填写完成的
-[`outputs/demo-readiness-report.json`](../outputs/demo-readiness-report.json)
-就是实操作业产物。
+最终交付包括填写完成的清单和
+[`outputs/demo-readiness-report.json`](../outputs/demo-readiness-report.json)。
 
 ## 验证
 
@@ -122,7 +121,7 @@ flowchart LR
 现行条款、套餐控制和数据处理方式获批，它可能适合协作式重复工作。需要程序化摄取、验证和审计
 集成时，API 可能更合适。Research 适合获取当前外部事实，不能取代已获批准的内部政策。
 
-记录决策，而不只是产品名称：
+除了产品名称，还要记录这些决策：
 
 ```text
 产品形态：
@@ -235,7 +234,7 @@ python3 -m unittest discover -s code/tests -v
 回退方案：发布人工模板，或附带通知延后发布。
 ```
 
-主管批准的是决策，而不是“AI”。记录谁基于哪个快照批准了什么。如果来源在审批后变化，使发布
+主管批准具体决策。记录谁基于哪个快照批准了什么。如果来源在审批后变化，使发布
 门禁失效并审核差异。
 
 模拟发布后，进行一次简短复盘：
@@ -302,7 +301,7 @@ python3 -m unittest discover -s code/tests -v
 - **发布等级：** 根据后果划分的阻塞、修订或质量状态。
 - **决策负责人：** 对最终选择拥有权限并承担责任的人。
 - **差异审核：** 重新验证早期审批后引入的变化。
-- **就绪证据：** 测试结果、故障案例、审批和回退证明，而不是泛泛保证。
+- **就绪证据：** 用测试结果、故障案例、审批和回退证明系统已就绪。
 
 ## 延伸阅读
 

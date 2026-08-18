@@ -21,7 +21,7 @@
       "correct": [
         0
       ],
-      "explanation": "修改后的 prompt 将主观形容词变为带可观察输入和输出的任务契约。角色、字数目标或不可能的保证都不能定义有效发布计划必须包含什么。",
+      "explanation": "修改后的 prompt 把主观形容词改成输入和输出均可检查的任务契约。角色设定、字数目标和无法兑现的保证，都不能定义有效发布计划必须包含什么。",
       "references": [
         "certifications/claude/lessons/03-prompting-and-task-decomposition",
         "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
@@ -75,7 +75,7 @@
       "domain": "prompting-task-execution",
       "objective": "将复杂请求分解为可管理的工作",
       "type": "single",
-      "prompt": "一份研究简报在一个请求中混合了来源检索、事实提取、解读、写作和验证。最有力的重构方式是什么？",
+      "prompt": "一份研究简报在一个请求中混合了来源检索、事实提取、解读、写作和验证。怎样重构最有效？",
       "options": [
         "在寻找来源之前先写结论",
         "将所有阶段保留在一次生成中，补充详细的风格标准，并要求 Claude 根据自己对来源的解读验证最终简报",
@@ -250,7 +250,7 @@
       "options": [
         "模式失败",
         "缺少标题",
-        "connector 授权",
+        "连接器授权",
         "过度推断"
       ],
       "correct": [
@@ -267,7 +267,7 @@
       "domain": "output-evaluation-validation",
       "objective": "改进并比较输出",
       "type": "single",
-      "prompt": "两个 prompt 变体生成了不同的报告。哪种比较方法能提供最有力的证据？",
+      "prompt": "两个 prompt 变体生成了不同的报告。哪种比较方法能提供最可靠的证据？",
       "options": [
         "对输出进行盲化和随机排序，使用相同案例按各维度评分，并检查审核者间的分歧",
         "选择偏好模型品牌生成的报告",
@@ -352,7 +352,7 @@
       "domain": "output-evaluation-validation",
       "objective": "选择合适的内联、产物和结构化格式",
       "type": "single",
-      "prompt": "一个下游系统必须恰好接收五个字段，并拒绝所有其他数据形状。哪种输出方式最有力？",
+      "prompt": "一个下游系统必须恰好接收五个字段，并拒绝所有其他数据形状。哪种输出方式最合适？",
       "options": [
         "表格图片",
         "包含五个带标签段落的自由文本，由操作员在快速目视审查后复制到下游字段",
@@ -544,7 +544,7 @@
       "domain": "product-model-selection",
       "objective": "区分 Haiku、Sonnet 和 Opus 的角色",
       "type": "single",
-      "prompt": "一个团队把每个简单分类和复杂例外都发送给能力最强的模型。成本和延迟都过高。最有力的策略是什么？",
+      "prompt": "一个团队把每个简单分类和复杂例外都发送给能力最强的模型。成本和延迟都过高。哪种策略最有效？",
       "options": [
         "所有情况都保留一个高能力模型，因为统一部署更容易运营，即使常规情况已能由其他模型通过",
         "使用经度量的路由：让常规情况转至成本最低且能通过的选项，并将可观测的困难情况升级处理",
@@ -641,7 +641,7 @@
         2,
         3
       ],
-      "explanation": "可观测的检查和可逆性能够限制伤害并支持恢复。授权不明确和访问范围过大都会增加风险，因而更应重构、提供辅助，或拒绝自动化。",
+      "explanation": "可检查的门槛和可逆性能够限制伤害并支持恢复。授权不明确、访问范围过大都会增加风险，此时应考虑重构、仅提供辅助或拒绝自动化。",
       "references": [
         "certifications/claude/lessons/07-workflow-design-and-human-handoffs",
         "https://www.anthropic.com/research/building-effective-agents"
@@ -789,7 +789,7 @@
       "correct": [
         1
       ],
-      "explanation": "影子模式在保护实时结果的同时，将质量、例外和操作行为与当前流程并列呈现。它是收集证据，而非提供保证。",
+      "explanation": "影子模式不会影响线上结果，又能把新旧流程的质量、例外和操作行为并列比较。它用于收集证据，不能保证正式发布后一定成功。",
       "references": [
         "certifications/claude/lessons/07-workflow-design-and-human-handoffs",
         "certifications/claude/lessons/29-associate-workflow-capstone"
@@ -811,7 +811,7 @@
         1,
         3
       ],
-      "explanation": "检查点保留已验证状态，真正的回退方案让服务仍可继续。盲目重试会重复不可逆影响，而短暂的模型状态很脆弱。",
+      "explanation": "检查点保留已验证状态，经过演练的回退方案让服务仍可继续。盲目重试可能重复不可逆操作，短暂的模型状态也经不起故障。",
       "references": [
         "certifications/claude/lessons/07-workflow-design-and-human-handoffs",
         "certifications/claude/lessons/29-associate-workflow-capstone"
@@ -843,7 +843,7 @@
       "domain": "configuration-knowledge-management",
       "objective": "长期维护配置和来源",
       "type": "single",
-      "prompt": "一项已批准的政策被替换，但两个版本都可检索且没有元数据。最有力的修复措施是什么？",
+      "prompt": "一项已批准的政策被替换，但两个版本都可检索且没有元数据。怎样修复最有效？",
       "options": [
         "保留两个活跃版本，但指示 Claude 优先选择文件名最新、表述最完整的那份文档",
         "让 Claude 选择较长的文件",
@@ -862,14 +862,14 @@
     {
       "id": "ccao-m1-041",
       "domain": "configuration-knowledge-management",
-      "objective": "管理上传内容和 connectors",
+      "objective": "管理上传内容和连接器",
       "type": "multiple",
-      "prompt": "一个 connector 返回了一份与已批准政策冲突的当前草稿。以下哪两项说法正确？选两项。",
+      "prompt": "一个连接器返回了一份与已批准政策冲突的当前草稿。以下哪两项说法正确？选两项。",
       "options": [
         "工作流应应用其来源层级并暴露冲突",
         "最新连接的文件总是优先",
-        "connector 权限授予执行决策的权威性",
-        "能够访问 connector 不等于来源具有权威性"
+        "连接器权限授予执行决策的权威性",
+        "能够访问连接器不等于来源具有权威性"
       ],
       "correct": [
         0,
@@ -884,7 +884,7 @@
     {
       "id": "ccao-m1-042",
       "domain": "configuration-knowledge-management",
-      "objective": "管理上传内容和 connectors",
+      "objective": "管理上传内容和连接器",
       "type": "single",
       "prompt": "检索系统返回了一个主题相关的摘录。它尚未证明什么？",
       "options": [
@@ -917,7 +917,7 @@
       "correct": [
         1
       ],
-      "explanation": "记忆用于维持对话连续性和稳定偏好，而不是提供当前的运营事实。支出限额可能变化，并会影响重要采购，因此工作流应以获批准的当前记录来源核实它。",
+      "explanation": "记忆用于延续对话和保存稳定偏好，不能充当当前运营事实的来源。支出限额可能变化，也会影响重要采购，因此工作流应以当前获批的记录来源核实。",
       "references": [
         "certifications/claude/lessons/04-context-knowledge-memory-and-caching",
         "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context"
@@ -971,7 +971,7 @@
       "domain": "governance-risk-responsible-use",
       "objective": "区分适当与不适当的用例",
       "type": "single",
-      "prompt": "一个团队希望让 Claude 总结内部事件记录，然后自动处分其中点名的员工。最有力的初始决策是什么？",
+      "prompt": "一个团队希望让 Claude 总结内部事件记录，然后自动处分其中点名的员工。首先怎样处理最稳妥？",
       "options": [
         "因为记录属于内部材料，所以自动化两件事",
         "仅在最终输出中隐藏员工姓名",
@@ -1056,7 +1056,7 @@
       "domain": "governance-risk-responsible-use",
       "objective": "识别伦理影响并升级风险",
       "type": "multiple",
-      "prompt": "哪两项条件能使人工批准关卡具有实质意义，而非只是走过场？选两项。",
+      "prompt": "哪两项条件能让人工审批门槛具备实际作用？选两项。",
       "options": [
         "审查者可看到拟议行动、经校准的置信区间和简短的模型理由，却无法检查底层证据",
         "当审查服务级别到期时，工作流自动批准低价值案件，同时保留审查者分配和审计记录",
@@ -1250,7 +1250,7 @@
       "domain": "troubleshooting-optimization",
       "objective": "依据反馈和结果调整方法",
       "type": "single",
-      "prompt": "下游解析器偶尔拒绝输出，即使内容是正确的。最有力的修复是什么？",
+      "prompt": "下游解析器偶尔拒绝内容正确的输出。怎样修复最有效？",
       "options": [
         "使用明确的结构化输出契约，验证它，并定义重试或回退行为",
         "保留自由格式响应，再用第二次模型调用重写被拒绝的输出，直到解析器接受，且不设置有界回退",

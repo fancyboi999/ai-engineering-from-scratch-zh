@@ -24,6 +24,7 @@ on:
       - "certifications/**"
       - "skills/claude-certification/**"
       - "scripts/audit_certifications.py"
+      - "scripts/test_audit_certifications.py"
       - "scripts/backfill_certification_references.py"
       - "scripts/debias_certification_questions.py"
       - "scripts/debias_quizzes.py"
@@ -55,6 +56,8 @@ jobs:
         run: node site/build.js --check
       - name: Claude 认证课程合约校验
         run: python3 scripts/audit_certifications.py
+      - name: 认证学习计划调度回归
+        run: python3 scripts/test_audit_certifications.py
       - name: 认证补强引用完整性
         run: python3 scripts/backfill_certification_references.py --check
       # 不运行上游 debias_certification_questions.py --check：它以英文题干文本作随机种子，

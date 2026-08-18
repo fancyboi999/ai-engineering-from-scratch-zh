@@ -163,7 +163,7 @@
     {
       "id": "ccar-p-diag-008",
       "domain": "evaluation-testing-optimization",
-      "objective": "运行 A/B 测试和迭代改进",
+      "objective": "运行 A/B 测试并持续改进",
       "type": "multiple",
       "prompt": "哪两项做法能让架构 A/B 测试更安全、信息更充分？选两项。",
       "options": [
@@ -187,7 +187,7 @@
       "domain": "governance-safety-risk",
       "objective": "考虑 GDPR、HIPAA、FedRAMP 和适用法规",
       "type": "single",
-      "prompt": "一份拟上传用于分析的数据包含趋势分析并不需要的客户姓名和账户标识符。最有力的首要控制措施是什么？",
+      "prompt": "一份拟上传用于分析的数据包含趋势分析并不需要的客户姓名和账户标识符。首先采取哪项控制措施最有效？",
       "options": [
         "增加一段更长的系统 prompt",
         "数据进入工作流前，移除或假名化不必要的标识符",
@@ -207,7 +207,7 @@
     {
       "id": "ccar-p-diag-010",
       "domain": "governance-safety-risk",
-      "objective": "设计人在回路验证",
+      "objective": "设计人在回路（HITL）验证",
       "type": "multiple",
       "prompt": "要让人工审核成为有意义的高风险控制措施，必须具备哪两项特征？选两项。",
       "options": [
@@ -220,7 +220,7 @@
         2,
         3
       ],
-      "explanation": "只有合适的人员能够审查证据、作出获授权的决定，并在既定流程中操作时，审核才有效。无上限负载和自动化偏见都会削弱这项控制。",
+      "explanation": "有效审核需要合适的人员查看证据、作出获授权的决定，并按既定流程操作。没有上限的审核负载和自动化偏见都会削弱这项控制。",
       "references": [
         "certifications/claude/lessons/27-enterprise-governance-compliance-and-hitl"
       ]
@@ -262,7 +262,7 @@
         0,
         2
       ],
-      "explanation": "移交意味着接手团队已具备获认可的运行能力并承担责任。演练加上经验证的就绪产物，证明团队能够发现、控制、恢复、评估和变更系统。",
+      "explanation": "完成移交，意味着接手团队具备经过确认的运行能力，并正式承担责任。演练和经过验证的就绪产物，可以证明团队有能力发现问题、控制影响、恢复服务、开展评估和变更系统。",
       "references": [
         "certifications/claude/lessons/28-stakeholder-communication-adrs-and-lifecycle"
       ]
@@ -272,7 +272,7 @@
       "domain": "developer-productivity-operations",
       "objective": "配置 Claude 工具和团队环境",
       "type": "single",
-      "prompt": "团队中每位开发者都维护私有指令和命令，导致 Claude Code 行为不一致。最有力的改进措施是什么？",
+      "prompt": "团队中每位开发者都维护私有指令和命令，导致 Claude Code 行为不一致。哪项改进最有效？",
       "options": [
         "统一使用在仓库外分发、由中央管理的用户级配置，让项目历史只聚焦产品代码",
         "授予不受限制的权限",

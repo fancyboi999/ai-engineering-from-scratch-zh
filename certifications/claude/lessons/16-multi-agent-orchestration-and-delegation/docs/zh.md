@@ -1,6 +1,6 @@
 # 多 Agent 编排与委派
 
-> 委派的是一个有边界的问题，而不是你全部的不确定性。
+> 委派范围应是一个边界清楚的问题，别把全部不确定性一起甩出去。
 
 **类型：** Reference
 **语言：** Python
@@ -72,7 +72,7 @@ coordinator 根据当前缺口选择并委派工作。无法在开始时完整�
 
 #### Generator 与独立 Reviewer
 
-一个上下文负责生成，另一个只接收产物、证据与 rubric，不接收 generator 有说服力的内部叙述。关键是独立，而不是在同一对话中再问一次。
+一个上下文负责生成，另一个只接收产物、证据与 rubric，不接收 generator 有说服力的内部叙述。独立性来自上下文隔离，在同一对话里再问一次没有作用。
 
 ### 编写委派合约
 
@@ -89,7 +89,7 @@ Completion: observable conditions for done, partial, or blocked
 Handoff: what the coordinator should do with each state
 ```
 
-“彻底研究这个主题”没有定义完成。“最多返回五项有依据的主张，每项附带来源 ID、日期、引用片段位置、置信度类别、冲突列表和未解决问题”才定义了完成。
+“彻底研究这个主题”没有定义完成。可以改成：“最多返回五项有依据的主张，每项附带来源 ID、日期、引用片段位置、置信度类别、冲突列表和未解决问题。”
 
 ### 把确定性顺序放在模型之外
 
@@ -110,7 +110,7 @@ Claude 判断哪些缺失主张需要继续研究等语义问题；代码决定�
 - coordinator 始终负责全局约束与最终状态
 - 探索替代方案不能改变原路径时，fork session
 
-隔离可以防止上下文膨胀。如果所有 agent 接收相同的错误证据或 rubric，它却无法保证事实独立。
+隔离可以防止上下文膨胀，但无法保证事实独立。如果所有 agent 都接收相同的错误证据或 rubric，结果仍会一起偏离。
 
 ### 保留三种结果状态
 
@@ -151,7 +151,7 @@ reducer 需要稳定 key。代码审查使用文件与 finding ID；研究使用
 - reviewer 保持独立
 - 最终状态完整
 
-用合成 tool 故障和 partial 结果测试。happy path 是最没有说服力的证明。
+用合成 tool 故障和 partial 结果测试。只测 happy path 远远不够。
 
 ## 动手构建
 
@@ -169,7 +169,7 @@ reducer 需要稳定 key。代码审查使用文件与 finding ID；研究使用
 
 ## 交付产物
 
-填写完整的 [`outputs/orchestration-contract.md`](../outputs/orchestration-contract.md) 是一份具体 research pipeline 交接，而不是空白 worksheet。
+填写后的 [`outputs/orchestration-contract.md`](../outputs/orchestration-contract.md) 应成为一份具体的 research pipeline 交接，不能只是空白 worksheet。
 
 ## 验证
 

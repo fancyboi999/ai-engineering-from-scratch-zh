@@ -4,7 +4,7 @@
 
 **类型：** Build
 **语言：** Python
-**前置要求：** [Messages API 是状态机](../../08-messages-api-and-application-lifecycle/)、[工具循环是受控委派](../../10-tool-use-and-agentic-loops/)、[安全不在 prompt 里](../../13-application-security-and-secrets/)
+**前置要求：** [Messages API 是状态机](../../08-messages-api-and-application-lifecycle/)、[工具循环是受控委派](../../10-tool-use-and-agentic-loops/)、[安全边界在 prompt 之外](../../13-application-security-and-secrets/)
 **预计时间：** 约 120 分钟
 
 ## 学习目标
@@ -22,7 +22,7 @@
 
 trace 里没有发货 tool 调用，订单数据库也没有换货记录。agent 凭空捏造了一次成功操作。
 
-输出 grader 通过了，应用失败了。
+文本评分通过了，应用仍然失败。
 
 AI 评估不能止步于散文。一条生产 case 可以同时包含多项相互独立的预期：
 
@@ -65,7 +65,7 @@ flowchart TB
 
 ## 从决策与失败中构建 Case
 
-先从 20 到 50 条 case 开始，而不是直接生成 5,000 条合成 prompt。第一批 case 要足够真实，让你审查每条 trace 时都有所收获。
+先从 20 到 50 条 case 开始。别急着生成 5,000 条合成 prompt。第一批 case 要足够真实，让你审查每条 trace 时都有所收获。
 
 来源包括：
 
@@ -94,7 +94,7 @@ flowchart TB
 }
 ```
 
-预期答案不是唯一的一句话，而是一组与产品行为绑定的属性。
+预期答案应写成一组与产品行为绑定的属性，无须限定为唯一一句话。
 
 把 case 分成开发集与保留集。反复针对所有 case 调优会让系统过拟合 eval。单独保留一套发布数据集，并用新故障持续更新。
 
@@ -125,7 +125,7 @@ workflow 的 trajectory 预期可以严格匹配，agent 则可以更灵活。�
 
 查询 system of record。工单是否转到预期队列？文件是否包含必需改动？测试是否通过？部署是否健康？拒绝 case 中是否确实没有发送邮件？
 
-最终状态断言通常是最强的 agent eval，因为它独立于模型叙述。
+最终状态断言直接检查模型叙述之外的事实，因此通常最可靠。
 
 ### 安全
 
@@ -139,7 +139,7 @@ workflow 的 trajectory 预期可以严格匹配，agent 则可以更灵活。�
 
 为防止失控设置硬上限，为发布比较设置更宽松的回归 threshold。
 
-## Grader 要组成组合，而非单一方案
+## 组合使用 Grader
 
 没有一种 grader 适合所有标准。
 
@@ -170,7 +170,7 @@ Score each dimension 0, 1, or 2 and cite the evidence span.
 
 ## 非确定性需要重复测量
 
-一次运行通过，只能证明这一次通过。
+单次运行通过，只能记录这一次样本的结果。
 
 sampling、服务商基础设施、tool 延迟、检索内容与模型更新都会改变结果。对于高方差 case，应在配置受控的情况下运行多次。记录模型版本、参数、prompt 版本、tool 版本、fixture 版本，以及适用时的运行 seed。
 
@@ -185,7 +185,7 @@ sampling、服务商基础设施、tool 延迟、检索内容与模型更新都�
 
 平均得分提高 1 个百分点，可能掩盖一项新的数据泄露故障。优化平均值之前，先定义不可妥协的安全与正确性 gate。
 
-尽可能使用配对比较：让新旧配置在同一组 case 上运行，再比较逐 case 变化。审查每一项回归，不只看总分。
+尽可能使用配对比较：让新旧配置在同一组 case 上运行，再比较逐 case 变化。每项回归都要审查，不能只看总分。
 
 ## Trace 必须能重建决策路径
 

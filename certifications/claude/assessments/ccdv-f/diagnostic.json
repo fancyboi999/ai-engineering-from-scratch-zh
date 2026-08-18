@@ -11,7 +11,7 @@
       "domain": "agents-workflows",
       "objective": "根据任务约束选择工作流或 agent",
       "type": "single",
-      "prompt": "工单系统必须分类一个请求、验证固定 schema，并路由到四个队列之一。步骤永远不变。哪种架构是最强的默认选择？",
+      "prompt": "工单系统必须分类一个请求、验证固定 schema，并路由到四个队列之一。步骤永远不变。哪种架构最适合作为默认方案？",
       "options": [
         "拥有全部支持工具的无边界自主 agent",
         "将路由策略编码在 agent prompt 而非固定分支中的管理者、队列专家和验证 subagent 层级",
@@ -21,7 +21,7 @@
       "correct": [
         3
       ],
-      "explanation": "顺序和分支集合已知，因此确定性工作流更容易测试、保护和运维。只有观察决定未知路径时，agent 规划才值得其复杂度；流程已经明确时并不需要。",
+      "explanation": "顺序和分支集合已经确定，使用确定性工作流更容易测试、保障安全和运维。只有执行中的观察结果会决定未知路径时，引入 agent 规划的复杂度才有价值；这里的流程已经明确。",
       "references": [
         "https://www.anthropic.com/research/building-effective-agents",
         "certifications/claude/lessons/10-tool-use-and-agentic-loops",
@@ -31,7 +31,7 @@
     {
       "id": "ccdv-d-002",
       "domain": "agents-workflows",
-      "objective": "使用 Claude Agent SDK、自定义循环、托管 agent 和 hook 构建",
+      "objective": "使用 Claude Agent SDK、自定义循环、托管 agent 和 hook 构建系统",
       "type": "multiple",
       "prompt": "仓库 agent 绝不能读取机密文件，并且必须格式化每个编辑过的 Python 文件。哪些控制应属于运行框架？请选择所有适用项。",
       "options": [
@@ -143,7 +143,7 @@
     {
       "id": "ccdv-d-007",
       "domain": "claude-code",
-      "objective": "操作 Rules、Skills、Commands、Agents、记忆、会话、无头模式、流式模式、自动模式、CLAUDE.md、初始化和设置",
+      "objective": "使用 Rules、Skills、Commands、Agents、记忆、会话、无头模式、流式模式、自动模式、CLAUDE.md、初始化和设置",
       "type": "single",
       "prompt": "哪类内容最应该写入项目的 CLAUDE.md？",
       "options": [
@@ -164,7 +164,7 @@
     {
       "id": "ccdv-d-008",
       "domain": "eval-testing-debugging",
-      "objective": "对错误分类、选择恢复、分析追踪，并区分集成故障与模型故障",
+      "objective": "给错误分类、选择恢复策略、分析追踪，并区分集成故障与模型故障",
       "type": "single",
       "prompt": "线上服务商响应中包含某个字段，但 SDK 反序列化后应用始终看不到它。应从哪里开始调试？",
       "options": [
@@ -176,7 +176,7 @@
       "correct": [
         0
       ],
-      "explanation": "证据指向集成边界，而非模型行为。检查每种数据表示能找出字段在哪一步被丢弃，也避免进行无关的 prompt 修改。",
+      "explanation": "证据表明问题出在集成边界。逐一检查各层的数据表示，可以找到字段在哪一步丢失，也能避免无关的 prompt 修改。",
       "references": [
         "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
         "certifications/claude/lessons/05-output-evaluation-and-validation",
@@ -231,7 +231,7 @@
     {
       "id": "ccdv-d-011",
       "domain": "model-selection-optimization",
-      "objective": "解释 token、采样、上下文、非确定性、思考、努力程度和 prompting 模式",
+      "objective": "解释 token、采样、上下文、非确定性、思考、推理强度和 prompting 模式",
       "type": "single",
       "prompt": "一个简单的 schema 提取不用 extended thinking 就已通过 99.8% 的案例。最佳默认配置是什么？",
       "options": [
@@ -259,14 +259,14 @@
         "产物路径、哈希和验证结果",
         "批准记录和外部操作标识符",
         "验收标准及未完成的任务承诺",
-        "每次压缩交流的完整记录，好让下一会话能重建此前的推理，而不是使用带类型的检查点"
+        "每次压缩交流的完整记录，让下一会话重建此前的推理，不使用带类型的检查点"
       ],
       "correct": [
         0,
         1,
         2
       ],
-      "explanation": "关键信息必须在概率性摘要之外留存。持久记录保存必须保持精确的信息，不相关的对话可以裁剪。",
+      "explanation": "概率性摘要之外还要保留关键状态。需要精确保留的信息应写入持久记录，不相关的对话可以裁剪。",
       "references": [
         "https://platform.claude.com/docs/en/agent-sdk/overview",
         "certifications/claude/lessons/03-prompting-and-task-decomposition",
@@ -277,7 +277,7 @@
     {
       "id": "ccdv-d-013",
       "domain": "prompt-context-engineering",
-      "objective": "验证并防御性地消费结构化输出",
+      "objective": "验证结构化输出，并以防御性方式处理结果",
       "type": "single",
       "prompt": "某个响应是有效 JSON 且通过了声明的 schema，但其中的 invoice_id 属于另一个租户。哪项检查失效了？",
       "options": [
@@ -322,7 +322,7 @@
     {
       "id": "ccdv-d-015",
       "domain": "tools-mcps",
-      "objective": "跨传输编写和部署 MCP 工具、资源与 prompt",
+      "objective": "通过不同传输方式编写和部署 MCP 工具、资源与 prompt",
       "type": "single",
       "prompt": "某个 MCP 服务器必须公开一份可寻址的只读政策文档，标识为 policy://refunds/current。最适合用哪种原语？",
       "options": [
@@ -344,9 +344,9 @@
     {
       "id": "ccdv-d-016",
       "domain": "tools-mcps",
-      "objective": "在内置工具、自定义工具、Skills 和 MCP 间选择",
+      "objective": "在内置工具、自定义工具、Skills 和 MCP 之间选择",
       "type": "multiple",
-      "prompt": "MCP 在什么时候最能体现其额外协议与部署成本的价值？请选择所有适用项。",
+      "prompt": "哪些场景值得承担 MCP 额外的协议和部署成本？请选择所有适用项。",
       "options": [
         "多个已获批准的宿主需要共享能力发现机制",
         "一个进程内函数需要类型化 schema，未来或许会复用，但当前没有宿主或部署边界需要协议发现",
@@ -358,7 +358,7 @@
         2,
         3
       ],
-      "explanation": "当需要跨宿主互操作、共享能力发现，以及受治理的客户端—服务器能力边界时，MCP 的额外成本才值得承担。单个本地函数通常直接做成进程内工具更简单，也更容易维护。",
+      "explanation": "需要跨宿主互操作、共享能力发现，或受治理的客户端—服务器能力边界时，MCP 带来的价值足以抵消额外成本。单个本地函数通常直接做成进程内工具更简单，也更容易维护。",
       "references": [
         "https://modelcontextprotocol.io/docs/getting-started/intro",
         "certifications/claude/lessons/10-tool-use-and-agentic-loops"
