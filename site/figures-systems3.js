@@ -4,7 +4,7 @@
    shared LF toolkit, registers via LF.register. These are SMIL-animated SVGs:
    <animate>/<animateTransform>/<animateMotion>/stroke-dashoffset drive the
    motion, no JS render loop. No deps, ES5 only, theme via CSS vars. Authoring
-   is the same fenced ```figure block in docs/en.md. */
+   is the same fenced ```figure block in docs/zh.md. */
 (function () {
   'use strict';
   var LF = window.LF;

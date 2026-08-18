@@ -1,7 +1,7 @@
 /* figures-speech2.js — animated lesson figures for Phase 6 (speech & audio).
    Loads after lesson-figures.js and registers widgets through window.LF.
    Vanilla ES5, no deps, theme via CSS vars. SMIL-animated SVG, no JS loops.
-   Authoring is the same fenced block in docs/en.md:
+   Authoring is the same fenced block in docs/zh.md:
        ```figure
        sp-ctc-alignment
        ``` */

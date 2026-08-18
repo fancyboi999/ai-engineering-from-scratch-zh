@@ -1,0 +1,141 @@
+{
+  "id": "claude-ccao-f",
+  "slug": "ccao-f",
+  "examCode": "CCAO-F",
+  "credential": "Claude 认证助理 - 基础级",
+  "shortName": "助理基础级",
+  "level": "基础级",
+  "accent": "orange",
+  "badge": {
+    "imageUrl": "https://images.credly.com/images/a6387cbd-5ac1-4894-833a-da2cbc28587e/blob",
+    "width": 600,
+    "height": 600
+  },
+  "summary": "在业务、研究、分析和生产力工作流中安全而有效地使用 Claude。",
+  "audience": "运营、项目、销售、营销、财务、支持、研究及其他知识工作专业人士。无需软件开发经验。",
+  "recommendedExperience": [
+    "在真实工作中使用 Claude 或同类 AI 助手三到六个月",
+    "在分享前审核 AI 输出的经验",
+    "对幻觉、上下文限制和数据敏感性的实用理解"
+  ],
+  "exam": {
+    "items": 60,
+    "timeLimitMinutes": 120,
+    "feeUsd": 99,
+    "passingScaledScore": 720,
+    "scoreScale": "100-1000",
+    "validityMonths": 12,
+    "format": "单项选择和多项选择",
+    "delivery": "在线监考或考点考试",
+    "guideVersion": "1.0",
+    "effective": "July 2026",
+    "officialGuideUrl": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542847%2FClaude+Certified+Associate+%E2%80%93+Foundations+Exam+Guide.pdf"
+  },
+  "domains": [
+    {
+      "id": "prompting-task-execution",
+      "name": "Prompting 与任务执行",
+      "weight": 14,
+      "objectives": [
+        "为业务和技术任务创建有效 prompt",
+        "将复杂请求分解为可管理的工作",
+        "根据观察到的输出质量迭代 prompt",
+        "针对分析、研究、起草和头脑风暴调整 prompting"
+      ]
+    },
+    {
+      "id": "output-evaluation-validation",
+      "name": "输出评估与验证",
+      "weight": 21,
+      "objectives": [
+        "评估准确性、完整性和受众适配性",
+        "识别幻觉、不一致和偏见",
+        "根据权威证据核查事实",
+        "判断何时需要人工审核或额外验证",
+        "改进并比较输出",
+        "选择合适的内联、产物和结构化格式"
+      ]
+    },
+    {
+      "id": "product-model-selection",
+      "name": "产品与模型选择",
+      "weight": 12,
+      "objectives": [
+        "在 Projects、研究、聊天和产物间选择",
+        "区分 Haiku、Sonnet 和 Opus 的角色",
+        "平衡质量、速度和成本",
+        "通过重启、总结或持久化管理上下文和记忆"
+      ]
+    },
+    {
+      "id": "workflow-integration-solution-design",
+      "name": "工作流集成与解决方案设计",
+      "weight": 16,
+      "objectives": [
+        "分析需求和候选用例",
+        "将 Claude 用于研究、规划和流程改进",
+        "支持解决方案设计和迭代",
+        "增强或重构现有工作流",
+        "向利益相关者沟通价值与局限"
+      ]
+    },
+    {
+      "id": "configuration-knowledge-management",
+      "name": "配置与知识管理",
+      "weight": 12,
+      "objectives": [
+        "用指令和知识配置 Projects",
+        "管理上传内容和 connectors",
+        "编写有效的持久指令",
+        "长期维护配置和来源"
+      ]
+    },
+    {
+      "id": "governance-risk-responsible-use",
+      "name": "治理、风险与负责任使用",
+      "weight": 15,
+      "objectives": [
+        "区分适当与不适当的用例",
+        "应用隐私、数据敏感性和监管约束",
+        "遵循组织 AI 政策",
+        "识别伦理影响并升级风险"
+      ]
+    },
+    {
+      "id": "troubleshooting-optimization",
+      "name": "排障与优化",
+      "weight": 10,
+      "objectives": [
+        "诊断表现不佳的 prompt 和输出",
+        "依据反馈和结果调整方法",
+        "优化工作流的效率和有效性"
+      ]
+    }
+  ],
+  "lessons": [
+    {"path": "certifications/claude/lessons/00-certification-strategy", "domains": ["prompting-task-execution"], "role": "导览", "required": true},
+    {"path": "certifications/claude/lessons/01-claude-product-and-model-landscape", "domains": ["product-model-selection"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/02-model-selection-and-token-economics", "domains": ["product-model-selection", "troubleshooting-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/03-prompting-and-task-decomposition", "domains": ["prompting-task-execution", "troubleshooting-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/04-context-knowledge-memory-and-caching", "domains": ["configuration-knowledge-management", "product-model-selection"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/05-output-evaluation-and-validation", "domains": ["output-evaluation-validation", "troubleshooting-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/06-governance-safety-and-responsible-use", "domains": ["governance-risk-responsible-use"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/07-workflow-design-and-human-handoffs", "domains": ["workflow-integration-solution-design", "output-evaluation-validation"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/29-associate-workflow-capstone", "domains": ["prompting-task-execution", "output-evaluation-validation", "product-model-selection", "workflow-integration-solution-design", "configuration-knowledge-management", "governance-risk-responsible-use", "troubleshooting-optimization"], "role": "综合项目", "required": true}
+  ],
+  "deepDives": [
+    {"path": "phases/11-llm-engineering/01-prompt-engineering", "label": "Prompt 工程", "reason": "从第一性原理构建 prompt 结构和迭代"},
+    {"path": "phases/11-llm-engineering/05-context-engineering", "label": "上下文工程", "reason": "理解上下文限制并有意识地组装上下文"},
+    {"path": "phases/11-llm-engineering/10-evaluation", "label": "LLM 评估", "reason": "将质量判断转化为可重复测试"},
+    {"path": "phases/11-llm-engineering/12-guardrails", "label": "护栏", "reason": "在模型行为周围分层设置负责任使用控制"},
+    {"path": "phases/18-ethics-safety-alignment/20-bias-representational-harm", "label": "偏见与表征伤害", "reason": "识别并评估有害输出模式"}
+  ],
+  "assessments": [
+    {"id": "claude-ccao-f-diagnostic", "path": "certifications/claude/assessments/ccao-f/diagnostic.json", "kind": "diagnostic", "title": "助理基础级诊断测试", "timeLimitMinutes": 25},
+    {"id": "claude-ccao-f-mock-01", "path": "certifications/claude/assessments/ccao-f/mock-01.json", "kind": "mock", "title": "助理基础级完整模拟测试", "timeLimitMinutes": 120}
+  ],
+  "studyPlans": [
+    {"id": "ccao-f-14-day", "label": "14 天聚焦计划", "durationDays": 14, "hoursPerWeek": 7, "milestones": ["第 1–2 天：诊断并了解产品地图", "第 3–6 天：prompting、上下文和验证", "第 7–10 天：工作流、治理和排障", "第 11–12 天：完成综合项目", "第 13–14 天：完整模拟测验和针对性复习"]},
+    {"id": "ccao-f-28-day", "label": "28 天稳步计划", "durationDays": 28, "hoursPerWeek": 4, "milestones": ["第 1 周：产品选择与 prompting", "第 2 周：上下文、知识和验证", "第 3 周：工作流设计与负责任使用", "第 4 周：综合项目、模拟测验和薄弱领域复习"]}
+  ]
+}

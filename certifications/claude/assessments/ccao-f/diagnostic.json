@@ -1,0 +1,313 @@
+{
+  "id": "claude-ccao-f-diagnostic",
+  "version": 2,
+  "track": "claude-ccao-f",
+  "kind": "diagnostic",
+  "title": "Associate Foundations 诊断测验",
+  "timeLimitMinutes": 25,
+  "questions": [
+    {
+      "id": "ccao-d-001",
+      "domain": "prompting-task-execution",
+      "objective": "为业务和技术任务创建有效 prompt",
+      "type": "single",
+      "prompt": "一位总监要求 Claude 产出全面的月度报告，却没有给出受众、来源或成功标准。操作人员首先该做什么？",
+      "options": [
+        "添加一个角色，说明 Claude 是资深总监",
+        "选择当前能力最强的模型，保留原始请求",
+        "选择最强模型，并让它自行推断高管受众、可能来源和完整结构",
+        "定义决策、受众、权威来源、约束、输出形态和通过标准"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "缺少的是 prompt 契约。它在生成前让结果与检查可观察。更长的请求、角色或更大的模型都不能补上缺失的要求或证据。",
+      "references": [
+        "certifications/claude/lessons/03-prompting-and-task-decomposition",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
+      ]
+    },
+    {
+      "id": "ccao-d-002",
+      "domain": "prompting-task-execution",
+      "objective": "将复杂请求分解为可管理的工作",
+      "type": "multiple",
+      "prompt": "团队正在制作有来源支撑的政策简报。哪两个阶段边界最能改善验证？选两个。",
+      "options": [
+        "让不同对话独立发现来源并起草章节，完整简报拼好后才核对引用",
+        "在明确、可核验的来源清单基础上，再提取其中主张",
+        "提取过程中起草建议，之后再检查",
+        "解释模式前验证已提取主张"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "来源批准和主张提取是有意义的验证边界。随意拆段会增加协调成本，而证据未验证就建议会把缺陷推向下游。",
+      "references": [
+        "certifications/claude/lessons/03-prompting-and-task-decomposition",
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "id": "ccao-d-003",
+      "domain": "output-evaluation-validation",
+      "objective": "根据权威证据核查事实",
+      "type": "single",
+      "prompt": "一个响应在“所有退款都需要总监批准”的主张旁引用了真实政策页，但页面只说部分退款需要批准。主要缺陷是什么？",
+      "options": [
+        "该主张超出了引用证据的范围",
+        "响应需要更友好的语气",
+        "引用可以接受，因为链接页讨论同一退款政策，因此支持更强的摘要",
+        "上下文窗口必然已满"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "有引用不等于得到证明。全称主张强于来源，主张与证据之间的蕴含失败。语气和上下文容量无法修复事实越界。",
+      "references": [
+        "certifications/claude/lessons/05-output-evaluation-and-validation",
+        "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"
+      ]
+    },
+    {
+      "id": "ccao-d-004",
+      "domain": "output-evaluation-validation",
+      "objective": "判断何时需要人工审核或额外验证",
+      "type": "multiple",
+      "prompt": "哪两项检查应先由确定性代码处理，而不是主观模型判断？选两个。",
+      "options": [
+        "JSON 是否能按所需 schema 解析",
+        "高管是否会认为该建议有说服力",
+        "政策权衡是否合乎伦理",
+        "各地区小计是否等于声明的总计"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "schema 有效性和算术对账有精确、可重复的答案。伦理可接受性和受众说服力需要上下文标准，通常还需合格人员判断。",
+      "references": [
+        "certifications/claude/lessons/05-output-evaluation-and-validation",
+        "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests"
+      ]
+    },
+    {
+      "id": "ccao-d-005",
+      "domain": "product-model-selection",
+      "objective": "在 Projects、研究、聊天和产物间选择",
+      "type": "single",
+      "prompt": "团队每周用维护中的指令和批准的参考集重复同一内部规划工作流。哪个起始界面最合适？",
+      "options": [
+        "任意界面，因为治理相同",
+        "Claude Project，前提是其当前计划和数据控制已获批准",
+        "每周新开一次聊天，手动粘贴参考资料和上次指令",
+        "将公开 web 研究作为内部政策来源"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Projects 为带持久指令和知识的重复工作而设计。组织仍须核验当前可用性、计划控制和数据处理。研究不能替代内部记录来源。",
+      "references": [
+        "certifications/claude/lessons/01-claude-product-and-model-landscape",
+        "https://support.claude.com/en/articles/9517075-what-are-projects"
+      ]
+    },
+    {
+      "id": "ccao-d-006",
+      "domain": "product-model-selection",
+      "objective": "平衡质量、速度和成本",
+      "type": "multiple",
+      "prompt": "哪两种做法能让模型选择建议经得起变化？选两个。",
+      "options": [
+        "记住一份永久的模型名称排名",
+        "记录会变化的价格、限制和功能可用性，并附核验日期",
+        "针对明确的质量和延迟门槛测试代表性风险案例",
+        "忽略审核和返工成本"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "经得起变化的选择以证据为基础，并为可能漂移的事实标注日期。模型标签和价目表会变，总工作流成本还包括纠正和失败。",
+      "references": [
+        "certifications/claude/lessons/02-model-selection-and-token-economics",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/pricing"
+      ]
+    },
+    {
+      "id": "ccao-d-007",
+      "domain": "workflow-integration-solution-design",
+      "objective": "增强或重构现有工作流",
+      "type": "single",
+      "prompt": "分析师花数小时解释两个冲突系统的差异。最有力的第一项干预是什么？",
+      "options": [
+        "移除所有人工检查点",
+        "自动解释每项差异，但保持冲突来源和对账流程不变",
+        "在自动化症状前重构来源和对账流程",
+        "使用有写入权限的开放式 agent"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "根源浪费是来源状态不一致。更快生成解释会保留失败。工作流发现应在自动化前识别重构机会。",
+      "references": [
+        "certifications/claude/lessons/07-workflow-design-and-human-handoffs",
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "id": "ccao-d-008",
+      "domain": "workflow-integration-solution-design",
+      "objective": "向利益相关者沟通价值与局限",
+      "type": "multiple",
+      "prompt": "向必须批准高影响建议的人交接时，应包含哪两项？选两个。",
+      "options": [
+        "已知不确定性及明确的批准、修改、拒绝或升级选项",
+        "提供支持与冲突证据，并列出已经失败的核验检查",
+        "简洁模型理由和校准置信区间，不含冲突来源或失败检查细节",
+        "建议决策、置信分数和单一批准或升级选项，证据仅可另行请求"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "有意义的交接让负责人能够核验和干预。没有证据的置信度和仪式化按钮不能建立知情的人类控制。",
+      "references": [
+        "certifications/claude/lessons/07-workflow-design-and-human-handoffs",
+        "certifications/claude/lessons/29-associate-workflow-capstone"
+      ]
+    },
+    {
+      "id": "ccao-d-009",
+      "domain": "configuration-knowledge-management",
+      "objective": "用指令和知识配置 Projects",
+      "type": "single",
+      "prompt": "揭示政策来源间冲突这类重复行为规则，主要应放在哪里？",
+      "options": [
+        "放在无关的历史文件中",
+        "只放在记住的用户偏好中",
+        "放在缓存响应中",
+        "放在维护中的 Project 指令中"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "持久的行为指引应放在维护中的指令里。政策证据本身应放在受治理的知识中。记忆和缓存各有不同用途。",
+      "references": [
+        "certifications/claude/lessons/04-context-knowledge-memory-and-caching",
+        "https://support.claude.com/en/articles/9517075-what-are-projects"
+      ]
+    },
+    {
+      "id": "ccao-d-010",
+      "domain": "configuration-knowledge-management",
+      "objective": "长期维护配置和来源",
+      "type": "multiple",
+      "prompt": "哪两个元数据字段最直接有助于防止过期或被替代的知识继续生效？选两个。",
+      "options": [
+        "上次使用该来源且未产生验证失败的模型和 prompt 版本",
+        "来源所有者姓名，以及最近一次成功回答使用的模型版本",
+        "记录该来源的最近审核日期和复核状态",
+        "标明该来源替代哪些旧来源的明确关系"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "审核日期创建新鲜度触发器，替代关系识别应退役的旧来源。呈现方式和模型标签不管理来源生命周期。",
+      "references": [
+        "certifications/claude/lessons/04-context-knowledge-memory-and-caching",
+        "https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities"
+      ]
+    },
+    {
+      "id": "ccao-d-011",
+      "domain": "governance-risk-responsible-use",
+      "objective": "应用隐私、数据敏感性和监管约束",
+      "type": "single",
+      "prompt": "员工想把机密客户转录内容粘贴到未经批准的个人 Claude 账户。正确的第一反应是什么？",
+      "options": [
+        "停止操作，并采用组织的数据政策和获批界面审核",
+        "在个人账户中继续，但添加一条不保留或泄露转录内容的 prompt 指令",
+        "只删除转录标题",
+        "要求更短的摘要"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "prompt 文本不能批准界面，也不能强制执行合同数据处理。目的、分类、产品条款和组织控制厘清前，必须停止使用。",
+      "references": [
+        "certifications/claude/lessons/06-governance-safety-and-responsible-use",
+        "https://platform.claude.com/docs/en/manage-claude/api-and-data-retention",
+        "https://privacy.anthropic.com/"
+      ]
+    },
+    {
+      "id": "ccao-d-012",
+      "domain": "governance-risk-responsible-use",
+      "objective": "识别伦理影响并升级风险",
+      "type": "multiple",
+      "prompt": "一个工作流提出会实质影响人的资格决定。哪两项控制必不可少？选两个。",
+      "options": [
+        "分群公平性评估，以及纠正或申诉路径",
+        "通过严格输出 schema 和置信阈值的决定自动执行，之后定期人工审计",
+        "有证据且有权拒绝的获授权人工关卡",
+        "中立性指令加总量准确率监控，但没有预定义受影响群体切片或申诉处理"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "高影响决定需要有意义的权力、证据、公平性分析和补救。模糊指令或机器可读格式不能控制伦理或组织风险。",
+      "references": [
+        "certifications/claude/lessons/06-governance-safety-and-responsible-use",
+        "https://trust.anthropic.com/"
+      ]
+    },
+    {
+      "id": "ccao-d-013",
+      "domain": "troubleshooting-optimization",
+      "objective": "诊断表现不佳的 prompt 和输出",
+      "type": "single",
+      "prompt": "一份报告反复遗漏所有提供来源中都没有的例外。首先应修复什么？",
+      "options": [
+        "在检查是否提供了治理来源前，先修复输出 token 配额和报告结构",
+        "补齐并治理来源层中的权威资料",
+        "仅修复输出 token 限制",
+        "写作语气"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "模型无法可靠应用从未收到的证据。改变模型能力或界面细节前，应添加或检索权威例外。",
+      "references": [
+        "certifications/claude/lessons/02-model-selection-and-token-economics",
+        "certifications/claude/lessons/03-prompting-and-task-decomposition"
+      ]
+    },
+    {
+      "id": "ccao-d-014",
+      "domain": "troubleshooting-optimization",
+      "objective": "优化工作流的效率和有效性",
+      "type": "multiple",
+      "prompt": "一个重复 API 工作流准确但成本过高。哪两项改变能保留基于证据的质量门槛？选两个。",
+      "options": [
+        "每次发布后仅验证初始样本，之后将常规分类视为等价，直到发生事故",
+        "当前 API 行为支持时，缓存稳定重复的 prompt 前缀",
+        "按 provider 价格和公开基准排名路由，只评估用户质疑的案例",
+        "将可观察的常规案例路由到更便宜且通过要求的模型，并审计例外"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "路由和缓存是独立的效率杠杆；经过度量和监控时可保持质量。取消验证或只按价格选择会忽略失败和返工成本。",
+      "references": [
+        "certifications/claude/lessons/02-model-selection-and-token-economics",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+      ]
+    }
+  ]
+}

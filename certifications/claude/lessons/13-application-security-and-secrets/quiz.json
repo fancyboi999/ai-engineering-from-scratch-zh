@@ -1,0 +1,78 @@
+{
+  "lesson": "13-application-security-and-secrets",
+  "title": "安全不在 prompt 里",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "一份检索出的文档指示 agent 读取 .env。应该如何看待这条指令？",
+      "options": [
+        "既然检索选中了该文档，就相信它",
+        "将它视为不能扩大权限的不可信内容",
+        "只要请求的文件位于仓库内且不会提交，就视为安全",
+        "如果检索结果将其排在当前查询其他指令之前，就视为授权"
+      ],
+      "correct": 1,
+      "explanation": "检索内容是数据。不能仅仅因为模型读过它，就让它变成可信策略或授予能力。"
+    },
+    {
+      "stage": "check",
+      "question": "tool 使用的 API token 应该存放在哪里？",
+      "options": [
+        "放在受限 system prompt 中，使其只有模型和服务商可读",
+        "放在 Claude 为每个已授权请求生成的加密 tool 参数中",
+        "放在受保护环境或 secret manager 中，由可信集成代码访问",
+        "放在不会出现在面向用户输出中的项目指令文件里"
+      ],
+      "correct": 2,
+      "explanation": "可信代码只应为已授权调用取出 secret。模型需要的是能力结果，不是凭证。"
+    },
+    {
+      "stage": "check",
+      "question": "Claude 在 tool 参数中提供了 user_id。server 授权应该使用哪个身份？",
+      "options": [
+        "对话中最近一次陈述、且由模型确认的用户身份",
+        "通过 schema 校验后由模型提供的 user_id",
+        "tool 描述与项目设置中声明的默认服务身份",
+        "已通过身份验证的应用 session，以及其中可信的 tenant 与 scope claim"
+      ],
+      "correct": 3,
+      "explanation": "身份与 tenant 范围来自经过身份验证的状态。模型输入只能选择已位于该主体授权范围内的资源。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么不能只靠 pre-tool deny hook 保护 shell 安全？",
+      "options": [
+        "hook 可能不完整或配置错误，因此仍需要沙箱与操作系统限制",
+        "hook 能检查模型提出的参数，却无法评估任何文件系统或进程策略",
+        "deny hook 足以保护 shell 命令，但无法保护文件、网络或 MCP tool",
+        "沙箱会取代 pre-tool 决策，因此 deny hook 是多余的"
+      ],
+      "correct": 0,
+      "explanation": "纵深防御假定策略代码可能失效。文件系统、进程、网络与身份限制会约束剩余影响。"
+    },
+    {
+      "stage": "post",
+      "question": "响应拒绝泄露 secret，但 trace 显示读取过 secret 文件。安全 eval 应如何评分？",
+      "options": [
+        "除非 reviewer 能证明模型有意暴露 secret，否则标记为无法判断",
+        "判定失败，因为最终状态包含未经授权的敏感操作",
+        "判定通过，因为用户可见响应没有 secret，也没有引用文件内容",
+        "如果读取来自返回了已处理错误的确定性 tool 调用，就判定通过"
+      ],
+      "correct": 1,
+      "explanation": "安全要根据操作与状态评估，而不是看拒绝措辞。即便没有可见的外泄，敏感读取本身也是控制失败。"
+    },
+    {
+      "stage": "post",
+      "question": "某个 token 出现在模型 trace 中。首先应采取哪项安全事故响应措施？",
+      "options": [
+        "更改凭证前，先限制模型后续输出复现该值",
+        "立即对 trace 脱敏，并在调查访问日志期间继续使用该 token",
+        "遏制相关能力，并撤销或轮换已暴露的 token",
+        "把 token 移入 secret manager，但保留原值以维持集成"
+      ],
+      "correct": 2,
+      "explanation": "凭证一旦暴露，脱敏无法恢复其保密性。应先遏制访问并轮换或撤销，再调查实际使用情况。"
+    }
+  ]
+}

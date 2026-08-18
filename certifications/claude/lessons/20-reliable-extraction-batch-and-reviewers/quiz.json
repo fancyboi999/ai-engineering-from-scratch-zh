@@ -1,0 +1,78 @@
+{
+  "lesson": "20-reliable-extraction-batch-and-reviewers",
+  "title": "可靠提取、Batch 与独立 Reviewer",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "提取 pipeline 总是返回 schema 有效的 JSON，却编造缺失日期。主要缺口是什么？",
+      "options": [
+        "nullable 缺失状态，加上语义和证据验证",
+        "让模型访问日期规范化 tool 的发现步骤",
+        "用于无效日期格式的更严格 parser",
+        "从周围文档上下文推断可能日期的更大提取模型，即使来源没有明确日期"
+      ],
+      "correct": 0,
+      "explanation": "schema 强制一个值且只检查形状。显式表示 unknown，并根据来源证据验证主张，才能防止格式有效的编造。"
+    },
+    {
+      "stage": "check",
+      "question": "哪种 few-shot 示例最能减少义务误报？",
+      "options": [
+        "另一条措辞不同但边界同样直接的清晰义务",
+        "标为非义务、解释边界和未触发条件的近似背景陈述",
+        "包含多项义务、但没有已标注负例的较长合约摘录",
+        "来自另一类别、但没有边界说明或不构成义务理由的风格相近提取示例"
+      ],
+      "correct": 1,
+      "explanation": "边界示例能教会模型区分看似合理的近似项与目标类别。重复简单正例几乎不增加信息。"
+    },
+    {
+      "stage": "check",
+      "question": "歧义来源反复语义验证失败后，应发生什么？",
+      "options": [
+        "放宽该记录的语义验证，同时保留 schema 和证据检查",
+        "提高推理 budget，再做一次有边界的重试",
+        "返回明确的未解决状态、保留失败证据，并升级给合格审查",
+        "从有边界重试中选择最常见候选，并标记为低置信度"
+      ],
+      "correct": 2,
+      "explanation": "有边界的重试避免成本和延迟循环把歧义变成自信的编造。来源需要审查或更多证据。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么在 batch 处理中使用稳定 custom ID？",
+      "options": [
+        "它们将已认证用户的 tool 权限带入每个异步请求",
+        "它们确保每个请求获得相同价格和完成截止时间",
+        "它们让模型关联相近请求，从而提高 batch 内的一致性",
+        "结果可能以不同于提交顺序的次序完成，因此需要可靠的 stable ID 对账"
+      ],
+      "correct": 3,
+      "explanation": "无论完成顺序、重试或 job 部分失败如何，稳定 ID 都能将每个结果关联到来源、版本和预期输出。"
+    },
+    {
+      "stage": "post",
+      "question": "实时处理何时比 batch 更合适？",
+      "options": [
+        "模型必须调用并观察外部 tool 后才能继续的交互任务",
+        "可在次日之前对账结果的夜间重新分类",
+        "没有即时用户或下游依赖的静态提取归档",
+        "带稳定 custom ID、且缺乏实时用户反馈约束的独立请求大规模评估回填"
+      ],
+      "correct": 0,
+      "explanation": "自适应的请求中 tool 循环需要立即观察和继续。服务窗口可接受时，batch 适合异步、tool 独立工作。"
+    },
+    {
+      "stage": "post",
+      "question": "独立提取 reviewer 应接收什么？",
+      "options": [
+        "为避免锚定，只接收最终类别、置信度和解释，不接收来源文本",
+        "在全新上下文中接收来源、候选记录、证据和明确 rubric",
+        "接收来源和最终记录但不接收 rubric，让独立标准自行形成",
+        "接收 generator 完整推理 transcript，以判断它的意图"
+      ],
+      "correct": 1,
+      "explanation": "受控输入和全新上下文帮助 reviewer 检验证据支持与标准，而不会继承 generator 的 framing。"
+    }
+  ]
+}

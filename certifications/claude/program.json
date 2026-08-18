@@ -1,0 +1,49 @@
+{
+  "id": "claude-certifications",
+  "name": "Claude 认证课程",
+  "provider": "Anthropic",
+  "publisher": "AI Engineering from Scratch 简体中文版",
+  "version": "1.0.0-local-preview",
+  "lastVerified": "2026-08-18",
+  "guideVersion": "1.0",
+  "guideEffective": "2026 年 7 月",
+  "summary": "一条免费、开源的学习路线，从第一个 Claude 工作流程一直到生产架构，对齐四份公开的 Claude 认证考试蓝图。",
+  "promise": "通过构建考试所描述的系统，学会答案背后的判断。",
+  "accessNotice": "截至 2026 年 8 月 18 日，官方考试报名仅向 Claude Partner Network 组织的成员开放，并需要使用已被认可的合作伙伴公司邮箱。官方考试和备考内容目前只提供英文，Pearson 监考平台不允许使用浏览器翻译工具。这套开源中文课程任何人都可以学习，但它不改变官方考试的语言和资格要求。访问规则可能变动，付费或预约前请重新核对最新资格。",
+  "disclaimer": "这是独立的社区课程，不隶属于 Anthropic，也未获得其背书、赞助或授权。课程不包含真实考题。官方考试指南和当前项目政策始终具有最高优先级。",
+  "scoringNotice": "本课程的练习百分比是原始分。它不等同于 Anthropic 100 至 1,000 的量表分数，也无法预测官方考试结果。",
+  "sourcePolicy": "所有考试事实都映射到公开考试指南。课程和题目均为原创。平台变化很快，因此产品细节必须对照 Anthropic 官方文档并记录核对日期。",
+  "prerequisitesPath": "certifications/claude/prerequisites.json",
+  "officialLinks": [
+    {
+      "label": "Claude 认证考试备考课程",
+      "url": "https://anthropic-partners.skilljar.com/page/claude-certification-exam-prep-courses"
+    },
+    {
+      "label": "Claude 认证项目 FAQ",
+      "url": "https://anthropic-partners.skilljar.com/page/faq-certifications"
+    },
+    {
+      "label": "Anthropic Academy 课程目录",
+      "url": "https://anthropic.skilljar.com/"
+    },
+    {
+      "label": "Claude Platform 文档",
+      "url": "https://platform.claude.com/docs/en/home"
+    },
+    {
+      "label": "Claude Code 文档",
+      "url": "https://code.claude.com/docs/en/overview"
+    },
+    {
+      "label": "Model Context Protocol 文档",
+      "url": "https://modelcontextprotocol.io/docs/getting-started/intro"
+    }
+  ],
+  "tracks": [
+    "claude-ccao-f",
+    "claude-ccdv-f",
+    "claude-ccar-f",
+    "claude-ccar-p"
+  ]
+}

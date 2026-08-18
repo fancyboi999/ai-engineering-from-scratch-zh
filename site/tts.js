@@ -14,12 +14,13 @@
  */
 (function () {
   if (typeof window === 'undefined') return;
+  window.__AIFS_TTS_VERSION = '20260818b';
   var synth = window.speechSynthesis;
   if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') return;
 
   var RATE_KEY = 'tts:rate';
   var VOICE_KEY = 'tts:voice';
-  var MAX_CHUNK = 220;
+  var MAX_CHUNK = 160;
   var PAGE_LANG = (document.documentElement.lang || 'zh-CN').replace('_', '-');
 
   // Regions that are chrome, not content — nothing inside is ever read.
@@ -65,6 +66,18 @@
     '.quiz-score-number',
     '.quiz-score-label',
     '.quiz-deeper',
+    // Claude 认证路线、测评与交互实验。
+    '.cert-lede',
+    '.cert-track-summary',
+    '.cert-notice p',
+    '.cert-question-prompt',
+    '.cert-question-kicker',
+    '.cert-option span',
+    '.cert-review-explanation p',
+    '.cert-results-head',
+    '.cf-head',
+    '.cf-status',
+    '.cf-caption',
     // Interactive lesson figures: title + caption carry the explanation.
     '.lf-label',
     '.lf-cap',
@@ -138,7 +151,12 @@
     // Speech started after a navigation can be rejected until the next user
     // activation. Keep the queue and resume flag intact while waiting for it.
     awaitingGesture: false,
-    keepAlive: null,
+    // 强引用防止 Chromium 回收正在播放的 utterance；其余字段用于检测语音引擎静默掉音。
+    spoken: [],
+    stalls: 0,
+    idleTicks: 0,
+    forcedLocal: null,
+    watchdog: null,
   };
 
   var els = {};
@@ -349,6 +367,7 @@
   }
 
   function selectedVoice() {
+    if (state.forcedLocal) return state.forcedLocal;
     var wanted = lsGet(VOICE_KEY);
     var all = synth.getVoices() || [];
     if (wanted) {
@@ -468,7 +487,7 @@
       if (!state.playing || state.paused || !state.awaitingGesture) return;
       state.awaitingGesture = false;
       setResume(true);
-      startKeepAlive();
+      startWatchdog();
       render();
       speakCurrent();
     };
@@ -489,7 +508,7 @@
   function waitForUserGesture() {
     if (!state.playing || state.paused) return;
     state.awaitingGesture = true;
-    stopKeepAlive();
+    stopWatchdog();
     armGestureFallback();
     render();
   }
@@ -513,8 +532,9 @@
       if (!isCurrentUtterance(u, generation) || !state.playing || state.paused) return;
       state.utterance = null;
       state.index++;
+      state.stalls = 0;
       render();
-      speakCurrent();
+      deferSpeak();
     };
     u.onerror = function (e) {
       if (!isCurrentUtterance(u, generation)) return;
@@ -527,10 +547,13 @@
         return;
       }
       state.index++;
-      if (state.index < state.chunks.length) speakCurrent();
+      state.stalls = 0;
+      if (state.index < state.chunks.length) deferSpeak();
       else stop();
     };
     state.utterance = u;
+    state.spoken.push(u);
+    if (state.spoken.length > 8) state.spoken.shift();
     highlight(chunk.el);
     try {
       synth.speak(u);
@@ -590,7 +613,7 @@
     hideSelectionButton();
     var sel = window.getSelection && window.getSelection();
     if (sel && sel.removeAllRanges) sel.removeAllRanges();
-    startKeepAlive();
+    startWatchdog();
     return start(false, block);
   }
 
@@ -607,8 +630,9 @@
     state.playing = true;
     state.paused = false;
     state.waiting = false;
+    state.stalls = 0;
     setResume(true);
-    startKeepAlive();
+    startWatchdog();
     render();
     speakCurrent();
     return true;
@@ -629,7 +653,7 @@
     state.paused = false;
     setResume(true);
     if (!state.utterance) {
-      startKeepAlive();
+      startWatchdog();
       speakCurrent();
     } else {
       synth.resume();
@@ -646,7 +670,7 @@
     state.index = 0;
     state.waiting = false;
     setResume(false);
-    stopKeepAlive();
+    stopWatchdog();
     cancelUtterance();
     highlight(null);
     hideSelectionButton();
@@ -711,28 +735,67 @@
     speakCurrent();
   }
 
-  /**
-   * Chromium drops long-running synthesis after ~15s of wall time. Chunking
-   * already avoids most of it; this watchdog covers the rest — but only on
-   * Chromium, since pause()/resume() is flaky elsewhere and would risk
-   * glitching playback that was working fine.
-   */
-  var isChromium = /Chrom(e|ium)|Edg\//.test(navigator.userAgent || '');
-
-  function startKeepAlive() {
-    stopKeepAlive();
-    if (!isChromium) return;
-    state.keepAlive = setInterval(function () {
-      if (!state.playing || state.paused) return;
-      if (!synth.speaking) return;
-      synth.pause();
-      synth.resume();
-    }, 10000);
+  // 在新任务中接续下一段，避免在 onend 回调里同步 speak 导致部分 Chromium 卡住。
+  function deferSpeak() {
+    var expectedGeneration = state.utteranceGeneration;
+    setTimeout(function () {
+      if (!state.playing || state.paused || state.awaitingGesture) return;
+      if (state.utteranceGeneration !== expectedGeneration) return;
+      speakCurrent();
+    }, 0);
   }
 
-  function stopKeepAlive() {
-    if (state.keepAlive) clearInterval(state.keepAlive);
-    state.keepAlive = null;
+  // 网络语音可能不触发 onend/onerror 就静默停播。连续两次观测到引擎既不 speaking 也不 pending 才判定掉音。
+  function startWatchdog() {
+    stopWatchdog();
+    state.idleTicks = 0;
+    state.watchdog = setInterval(function () {
+      if (!state.playing || state.paused || state.waiting || state.awaitingGesture) return;
+      if (synth.speaking || synth.pending) {
+        state.idleTicks = 0;
+        return;
+      }
+      if (++state.idleTicks < 2) return;
+      state.idleTicks = 0;
+      recoverFromStall();
+    }, 400);
+  }
+
+  function stopWatchdog() {
+    if (state.watchdog) clearInterval(state.watchdog);
+    state.watchdog = null;
+  }
+
+  function localVoice() {
+    var all = voices();
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].localService) return all[i];
+    }
+    return null;
+  }
+
+  function recoverFromStall() {
+    state.stalls++;
+    if (state.stalls >= 4) {
+      flash('语音引擎已停止响应');
+      stop();
+      return;
+    }
+
+    var local = state.stalls >= 2 && !state.forcedLocal ? localVoice() : null;
+    if (local) {
+      state.forcedLocal = local;
+      flash('已切换到 ' + local.name + '：之前的语音不断掉音');
+    } else if (state.stalls >= 3) {
+      state.index++;
+      if (state.index >= state.chunks.length) {
+        stop();
+        return;
+      }
+      render();
+    }
+    cancelUtterance();
+    deferSpeak();
   }
 
   /* ------------------------------------------------------------------ ui */
@@ -1002,6 +1065,8 @@
 
     els.voice.addEventListener('change', function () {
       lsSet(VOICE_KEY, els.voice.value);
+      // 用户手动选择时，覆盖掉音后的自动本地语音回退。
+      state.forcedLocal = null;
       if (state.playing) {
         state.paused = false;
         state.awaitingGesture = false;
@@ -1116,6 +1181,12 @@
       if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'r' || e.key === 'R')) {
         if (selectedBlock() && readFromSelection()) e.preventDefault();
       }
+    });
+    document.addEventListener('click', function (e) {
+      var trigger = e.target && e.target.closest ? e.target.closest('[data-tts-start]') : null;
+      if (!trigger) return;
+      var section = trigger.closest('[data-tts-section]');
+      if (section) start(false, section);
     });
 
     autoResume();

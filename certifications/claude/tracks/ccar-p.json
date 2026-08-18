@@ -1,0 +1,88 @@
+{
+  "id": "claude-ccar-p",
+  "slug": "ccar-p",
+  "examCode": "CCAR-P",
+  "credential": "Claude 认证架构师 - 专业级",
+  "shortName": "架构师专业级",
+  "level": "专业架构级",
+  "accent": "green",
+  "badge": {
+    "imageUrl": "https://images.credly.com/images/7583afbc-4aab-4c7d-8af4-d9af72786ab3/blob",
+    "width": 600,
+    "height": 600
+  },
+  "summary": "负责安全、可观测、生产级 Claude 系统从发现到迭代的完整生命周期。",
+  "audience": "负责端到端生产系统和跨职能决策的中高级解决方案架构师、AI 工程师、技术负责人和高级软件工程师。",
+  "recommendedExperience": [
+    "三年或以上系统架构或平台工程经验",
+    "在生产环境运行 Claude 或同类 LLM 系统六个月或以上",
+    "具备从发现到部署和运维交付系统的经验",
+    "能够论证成本、延迟、质量、安全和可维护性的权衡"
+  ],
+  "exam": {
+    "items": 63,
+    "timeLimitMinutes": 120,
+    "feeUsd": 175,
+    "passingScaledScore": 720,
+    "scoreScale": "100-1000",
+    "validityMonths": 12,
+    "format": "单选与多选",
+    "delivery": "线上监考或考试中心",
+    "guideVersion": "1.0",
+    "effective": "July 2026",
+    "officialGuideUrl": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542810%2FClaude+Certified+Architect+%E2%80%93+Professional+Exam+Guide.pdf"
+  },
+  "domains": [
+    {"id": "solution-design-architecture", "name": "解决方案设计与架构", "weight": 17, "objectives": ["将业务问题转化为 Claude 解决方案", "设计输入、处理、输出和反馈循环", "选择工作流、agent 或增强 LLM 模式", "设计多 agent 编排", "分解复杂问题", "使设计与价值、成本、性能和 SLA 对齐"]},
+    {"id": "models-prompting-context", "name": "Claude 模型、Prompt 与上下文工程", "weight": 13, "objectives": ["根据明确权衡选择模型", "设计 prompt、模板和护栏", "应用 zero-shot、few-shot 和推理技术", "管理上下文窗口和 token 使用", "使用缓存、模块化 prompt 和 Skills 复用稳定 prompt"]},
+    {"id": "integration", "name": "集成", "weight": 19, "objectives": ["减少能力膨胀", "发现认证和授权缺口", "平衡准确性和延迟", "选择可扩展的可观测性", "设计 RAG 分块和索引", "让检索匹配数据形态和查询模式", "选择 MCP、API、CLI 或 agent-to-agent 集成", "在适合时使用渐进式发现而不是整体上下文"]},
+    {"id": "evaluation-testing-optimization", "name": "评估、测试与优化", "weight": 16, "objectives": ["定义准确性、延迟、成本、安全和安保指标", "构建代表性数据集和混合方法测试框架", "运行 A/B 测试和迭代改进", "诊断 prompt、幻觉、检索和模型故障", "优化 token、延迟和成本性能", "使用日志、追踪和可观测性监控"]},
+    {"id": "governance-safety-risk", "name": "治理、安全与风险管理", "weight": 14, "objectives": ["分层设置护栏和安全控制", "识别 LLM 故障模式", "设计人在回路验证", "考虑 GDPR、HIPAA、FedRAMP 和适用法规", "处理偏见、公平性和透明度"]},
+    {"id": "stakeholder-lifecycle", "name": "利益相关方沟通与生命周期管理", "weight": 14, "objectives": ["进行结构化发现", "沟通决策和权衡", "管理反馈、预期和 SLA", "记录架构和实施指引", "支持发现、设计、移交、监控和迭代"]},
+    {"id": "developer-productivity-operations", "name": "开发者生产力与运维赋能", "weight": 7, "objectives": ["配置 Claude 工具和团队环境", "用 AI 辅助工具改进工程工作流", "支持调试和运维事故解决"]}
+  ],
+  "lessons": [
+    {"path": "certifications/claude/lessons/00-certification-strategy", "domains": ["stakeholder-lifecycle"], "role": "导览", "required": true},
+    {"path": "certifications/claude/lessons/22-business-discovery-requirements-and-slas", "domains": ["solution-design-architecture", "stakeholder-lifecycle"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/23-end-to-end-architecture-and-value-tradeoffs", "domains": ["solution-design-architecture"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/01-claude-product-and-model-landscape", "domains": ["models-prompting-context", "solution-design-architecture"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/02-model-selection-and-token-economics", "domains": ["models-prompting-context", "evaluation-testing-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/03-prompting-and-task-decomposition", "domains": ["models-prompting-context"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/04-context-knowledge-memory-and-caching", "domains": ["models-prompting-context", "integration"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/05-output-evaluation-and-validation", "domains": ["evaluation-testing-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/06-governance-safety-and-responsible-use", "domains": ["governance-safety-risk"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/08-messages-api-and-application-lifecycle", "domains": ["integration", "models-prompting-context"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/09-structured-output-and-defensive-parsing", "domains": ["models-prompting-context", "evaluation-testing-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/10-tool-use-and-agentic-loops", "domains": ["solution-design-architecture", "integration"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/11-mcp-server-design-and-integration", "domains": ["integration"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/12-claude-agent-sdk-and-hooks", "domains": ["solution-design-architecture", "developer-productivity-operations"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/13-application-security-and-secrets", "domains": ["governance-safety-risk", "integration"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/14-evals-testing-debugging-and-observability", "domains": ["evaluation-testing-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/15-claude-code-for-development-teams", "domains": ["developer-productivity-operations"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation", "domains": ["solution-design-architecture"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery", "domains": ["integration"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/24-rag-retrieval-and-data-pipelines", "domains": ["integration", "evaluation-testing-optimization"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/25-integration-protocols-identity-and-least-privilege", "domains": ["integration", "governance-safety-risk"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/26-production-observability-latency-and-cost", "domains": ["integration", "evaluation-testing-optimization", "developer-productivity-operations"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/27-enterprise-governance-compliance-and-hitl", "domains": ["governance-safety-risk", "stakeholder-lifecycle"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/28-stakeholder-communication-adrs-and-lifecycle", "domains": ["stakeholder-lifecycle"], "role": "核心", "required": true},
+    {"path": "certifications/claude/lessons/32-architect-professional-system-capstone", "domains": ["solution-design-architecture", "models-prompting-context", "integration", "evaluation-testing-optimization", "governance-safety-risk", "stakeholder-lifecycle", "developer-productivity-operations"], "role": "综合项目", "required": true}
+  ],
+  "deepDives": [
+    {"path": "phases/11-llm-engineering/13-production-app", "label": "生产 LLM 应用", "reason": "将模型调用连接到服务边界"},
+    {"path": "phases/11-llm-engineering/07-advanced-rag", "label": "高级 RAG", "reason": "深入检索和重排"},
+    {"path": "phases/17-infrastructure-and-production/13-llm-observability", "label": "LLM 可观测性", "reason": "为生产轨迹添加埋点"},
+    {"path": "phases/17-infrastructure-and-production/21-ab-testing-llm-features", "label": "LLM 功能 A/B 测试", "reason": "用 live 证据比较变体"},
+    {"path": "phases/17-infrastructure-and-production/23-sre-for-ai", "label": "AI SRE", "reason": "负责事故、SLO 和恢复"},
+    {"path": "phases/17-infrastructure-and-production/26-compliance-frameworks", "label": "合规框架", "reason": "将义务映射到系统控制"},
+    {"path": "phases/17-infrastructure-and-production/27-finops-llms", "label": "LLM FinOps", "reason": "管理每个有用结果的成本"}
+  ],
+  "assessments": [
+    {"id": "claude-ccar-p-diagnostic", "path": "certifications/claude/assessments/ccar-p/diagnostic.json", "kind": "diagnostic", "title": "架构师专业级诊断", "timeLimitMinutes": 30},
+    {"id": "claude-ccar-p-mock-01", "path": "certifications/claude/assessments/ccar-p/mock-01.json", "kind": "mock", "title": "架构师专业级完整模拟", "timeLimitMinutes": 120}
+  ],
+  "studyPlans": [
+    {"id": "ccar-p-35-day", "label": "35 天专业冲刺", "durationDays": 35, "hoursPerWeek": 14, "milestones": ["第 1–5 天：发现、需求、产品选择和价值权衡", "第 6–10 天：模型、prompt、上下文、验证和治理基础", "第 11–15 天：Messages API、结构化输出、工具循环和 MCP", "第 16–20 天：Agent SDK、安全、评估、Claude Code 和编排", "第 21–25 天：工具契约、RAG、身份、可观测性和成本", "第 26–30 天：企业治理、利益相关方生命周期和运维", "第 31–35 天：综合项目答辩、完整模拟和补强"]},
+    {"id": "ccar-p-63-day", "label": "63 天生产计划", "durationDays": 63, "hoursPerWeek": 8, "milestones": ["第 1 周：发现、价值和产品格局", "第 2 周：模型、prompt、上下文和验证基础", "第 3 周：API 生命周期和结构化输出", "第 4 周：工具循环、MCP、Agent SDK 和安全", "第 5 周：评估、Claude Code、编排和工具契约", "第 6 周：RAG、身份和集成", "第 7 周：可观测性、延迟、成本和治理", "第 8 周：利益相关方生命周期和运维所有权", "第 9 周：综合项目、完整模拟和补强"]}
+  ]
+}

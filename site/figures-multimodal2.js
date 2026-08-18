@@ -2,7 +2,7 @@
    second set. Loads after lesson-figures.js, uses the shared LF toolkit, and
    registers via LF.register. No deps, ES5 only, theme via CSS vars. Each figure
    is a self-running SMIL animation (no JS loops, no real compute). Authoring is
-   the same fenced ```figure block in docs/en.md. */
+   the same fenced ```figure block in docs/zh.md. */
 (function () {
   'use strict';
   var LF = window.LF;

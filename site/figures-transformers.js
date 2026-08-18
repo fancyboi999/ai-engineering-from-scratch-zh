@@ -1,7 +1,7 @@
 /* figures-transformers.js — interactive lesson figures for Phase 5 (NLP) and
    Phase 7 (transformers deep dive). Loads after lesson-figures.js, uses the
    shared LF toolkit, registers via LF.register. No deps, ES5 only, theme via
-   CSS vars. Authoring is the same fenced ```figure block in docs/en.md. */
+   CSS vars. Authoring is the same fenced ```figure block in docs/zh.md. */
 (function () {
   'use strict';
   var LF = window.LF;

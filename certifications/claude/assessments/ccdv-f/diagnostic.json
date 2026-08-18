@@ -1,0 +1,368 @@
+{
+  "id": "claude-ccdv-f-diagnostic",
+  "version": 2,
+  "track": "claude-ccdv-f",
+  "kind": "diagnostic",
+  "title": "开发者基础诊断",
+  "timeLimitMinutes": 30,
+  "questions": [
+    {
+      "id": "ccdv-d-001",
+      "domain": "agents-workflows",
+      "objective": "根据任务约束选择工作流或 agent",
+      "type": "single",
+      "prompt": "工单系统必须分类一个请求、验证固定 schema，并路由到四个队列之一。步骤永远不变。哪种架构是最强的默认选择？",
+      "options": [
+        "拥有全部支持工具的无边界自主 agent",
+        "将路由策略编码在 agent prompt 而非固定分支中的管理者、队列专家和验证 subagent 层级",
+        "允许模型发明新队列的远程 MCP 服务器",
+        "包含一个模型分类步骤的确定性工作流"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "顺序和分支集合已知，因此确定性工作流更容易测试、保护和运维。只有观察决定未知路径时，agent 规划才值得其复杂度；流程已经明确时并不需要。",
+      "references": [
+        "https://www.anthropic.com/research/building-effective-agents",
+        "certifications/claude/lessons/10-tool-use-and-agentic-loops",
+        "certifications/claude/lessons/30-developer-application-capstone"
+      ]
+    },
+    {
+      "id": "ccdv-d-002",
+      "domain": "agents-workflows",
+      "objective": "使用 Claude Agent SDK、自定义循环、托管 agent 和 hook 构建",
+      "type": "multiple",
+      "prompt": "仓库 agent 绝不能读取机密文件，并且必须格式化每个编辑过的 Python 文件。哪些控制应属于运行框架？请选择所有适用项。",
+      "options": [
+        "编辑后运行格式化工具的后置工具 hook",
+        "排除凭证位置的文件系统沙箱",
+        "使用模型策略审核批准每条文件系统路径",
+        "拒绝已配置机密路径的前置工具策略 hook"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "前置工具策略在访问前阻止，后置工具自动化格式化完成的编辑，沙箱会在 hook 不完整时限制影响。prompt 指引仍有用，但不是确定性隔离。",
+      "references": [
+        "https://code.claude.com/docs/en/hooks-guide",
+        "https://code.claude.com/docs/en/sandboxing",
+        "certifications/claude/lessons/10-tool-use-and-agentic-loops"
+      ]
+    },
+    {
+      "id": "ccdv-d-003",
+      "domain": "applications-integration",
+      "objective": "使用消息、工具、流式传输、视觉、思考、缓存、批处理和第三方 provider",
+      "type": "multiple",
+      "prompt": "Claude 返回 ID 为 toolu_9 的 tool_use 块。客户端在下一次 Messages API 请求中必须保留哪些元素？请选择所有适用项。",
+      "options": [
+        "任务仍需要的先前对话上下文",
+        "在独立 user 角色消息中发送结果文本",
+        "包含原始 tool_use 块的 assistant 消息",
+        "tool_use_id 为 toolu_9 的 user 角色 tool_result"
+      ],
+      "correct": [
+        0,
+        2,
+        3
+      ],
+      "explanation": "客户端拥有状态：它重新发送必需历史、保留 assistant 工具请求，并追加关联的 user 工具结果。只发送结果会丢失协议上下文。",
+      "references": [
+        "https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape",
+        "certifications/claude/lessons/00-certification-strategy",
+        "certifications/claude/lessons/08-messages-api-and-application-lifecycle"
+      ]
+    },
+    {
+      "id": "ccdv-d-004",
+      "domain": "applications-integration",
+      "objective": "使用消息、工具、流式传输、视觉、思考、缓存、批处理和第三方 provider",
+      "type": "single",
+      "prompt": "流式结构化响应当前包含 {\"status\":\"read。在更新订单记录前，应用应做什么？",
+      "options": [
+        "缓冲至内容块和消息完成，再解析、验证和授权",
+        "每收到一个新字符就重试请求",
+        "自行补齐缺失的 JSON 字符",
+        "将语法上看似合理的前缀当作暂定 JSON，补齐预期结尾字符后再验证并更新记录"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "流前缀尚未完成，不是有效应用契约。不可逆状态变更必须等到完整终止事件后，再进行 schema、语义和策略验证。",
+      "references": [
+        "https://platform.claude.com/docs/en/build-with-claude/streaming",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape"
+      ]
+    },
+    {
+      "id": "ccdv-d-005",
+      "domain": "applications-integration",
+      "objective": "使用消息、工具、流式传输、视觉、思考、缓存、批处理和第三方 provider",
+      "type": "single",
+      "prompt": "团队必须在明天前对 80,000 张归档工单分类。没有用户在等待某一条工单的即时响应。哪种 API 模式最合适？",
+      "options": [
+        "一个长时间运行的 agent 会话，按顺序处理工单 ID，并在每次分类后检查点保存已累积的上下文",
+        "使用稳定自定义请求标识符的 Message Batches",
+        "一个交互式流式会话",
+        "每个 token 启动一个新的 Claude Code 会话"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "批处理适合大量彼此独立的异步请求：吞吐量比即时延迟更重要。自定义 ID 让应用能关联每一条结果和失败记录。",
+      "references": [
+        "https://platform.claude.com/docs/en/build-with-claude/message-batches",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape"
+      ]
+    },
+    {
+      "id": "ccdv-d-006",
+      "domain": "applications-integration",
+      "objective": "应用 REST、JSON、异步、版本控制、审核和重构实践",
+      "type": "single",
+      "prompt": "支付服务商可能已经接受扣款，但支付工具随后超时。最安全的下一步是什么？",
+      "options": [
+        "删除追踪记录并启动新会话",
+        "用相同参数重试一次，让 Claude 比较两次响应后再决定哪个外部支付状态才是权威状态",
+        "在任何重试前，先用稳定的操作 ID 与支付系统核对状态",
+        "立即以更高的 token 限制重试"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "交易边界处的结果仍不明确。幂等键和权威系统的状态核对才能确认重试是否安全；模型推理无法确定外部状态。",
+      "references": [
+        "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape"
+      ]
+    },
+    {
+      "id": "ccdv-d-007",
+      "domain": "claude-code",
+      "objective": "操作 Rules、Skills、Commands、Agents、记忆、会话、无头模式、流式模式、自动模式、CLAUDE.md、初始化和设置",
+      "type": "single",
+      "prompt": "哪类内容最应该写入项目的 CLAUDE.md？",
+      "options": [
+        "每个部署环境所需生产凭证名称及其当前密钥库位置的清单",
+        "团队主要框架参考文档的完整副本，让 Claude 从这一份维护中的资料推导构建、测试和仓库规则",
+        "开发者当前工单的临时状态",
+        "权威的构建和测试命令，以及不显而易见的仓库约束"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "CLAUDE.md 最适合作为精简的项目上手契约。大型参考资料应以链接形式提供，临时状态应放在别处，机密绝不能写进模型可读的说明中。",
+      "references": [
+        "https://code.claude.com/docs/en/memory",
+        "certifications/claude/lessons/15-claude-code-for-development-teams"
+      ]
+    },
+    {
+      "id": "ccdv-d-008",
+      "domain": "eval-testing-debugging",
+      "objective": "对错误分类、选择恢复、分析追踪，并区分集成故障与模型故障",
+      "type": "single",
+      "prompt": "线上服务商响应中包含某个字段，但 SDK 反序列化后应用始终看不到它。应从哪里开始调试？",
+      "options": [
+        "比较线上传输响应、SDK 对象和应用的每一道序列化边界",
+        "提高模型温度",
+        "添加一个独立的模型审查者，将应用可见对象与 prompt 要求比较并建议修改 prompt",
+        "重写系统 prompt"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "证据指向集成边界，而非模型行为。检查每种数据表示能找出字段在哪一步被丢弃，也避免进行无关的 prompt 修改。",
+      "references": [
+        "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+        "certifications/claude/lessons/05-output-evaluation-and-validation",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccdv-d-009",
+      "domain": "model-selection-optimization",
+      "objective": "平衡模型质量、延迟、成本、能力和版本变化",
+      "type": "single",
+      "prompt": "两个当前模型均通过了所需的准确性和安全门槛。Model A 在代表性工作负载上更快、更便宜。团队应该选择哪个？",
+      "options": [
+        "Model B，因为它额外的能力可能减少当前验收数据集或安全门槛没有涵盖的罕见错误",
+        "Model A，同时保留迁移和回归监控",
+        "在输出变得确定性之前，两者都不选",
+        "无论成本如何，每个请求都使用两者"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "根据实测需求选择能力恰好够用的模型。质量和安全都达标后，Model A 胜出；但行为会变化，仍需版本化评估和监控。",
+      "references": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape",
+        "certifications/claude/lessons/02-model-selection-and-token-economics"
+      ]
+    },
+    {
+      "id": "ccdv-d-010",
+      "domain": "model-selection-optimization",
+      "objective": "规划 token 预算并使用 prompt 缓存",
+      "type": "multiple",
+      "prompt": "哪些改动通常会提高 prompt 缓存复用率？请选择所有适用项。",
+      "options": [
+        "在每个 prompt 开头附近插入随机请求 ID",
+        "不要假设命中，而应测量缓存创建和读取用量",
+        "在可行的地方，让可复用前缀保持字节级稳定",
+        "将稳定的系统指令和工具定义置于易变的用户内容之前"
+      ],
+      "correct": [
+        1,
+        2,
+        3
+      ],
+      "explanation": "缓存依赖稳定的共享前缀，也需要显式测量。开头附近的易变数据会让后续内容无法复用。",
+      "references": [
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape"
+      ]
+    },
+    {
+      "id": "ccdv-d-011",
+      "domain": "model-selection-optimization",
+      "objective": "解释 token、采样、上下文、非确定性、思考、努力程度和 prompting 模式",
+      "type": "single",
+      "prompt": "一个简单的 schema 提取不用 extended thinking 就已通过 99.8% 的案例。最佳默认配置是什么？",
+      "options": [
+        "只在生产环境启用 thinking，使模型能补偿评估数据集未覆盖的输入",
+        "启用最高强度的 thinking，为每次提取增加第二条推理路径；再保留 schema 验证作为下游安全检查",
+        "保持较简单的配置，除非评估显示 thinking 值得付出延迟和成本",
+        "用 thinking 替代 schema 验证"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "推理预算是优化取舍。若更简单的配置满足实测需求，额外的 thinking 没有证据显示其价值，却会增加运营成本。",
+      "references": [
+        "https://platform.claude.com/docs/en/build-with-claude/extended-thinking",
+        "certifications/claude/lessons/01-claude-product-and-model-landscape"
+      ]
+    },
+    {
+      "id": "ccdv-d-012",
+      "domain": "prompt-context-engineering",
+      "objective": "通过裁剪、压缩和隔离防止上下文漂移与膨胀",
+      "type": "multiple",
+      "prompt": "一个长期运行的编程 agent 正在压缩上下文。还有哪些信息应该保存在持久状态中？请选择所有适用项。",
+      "options": [
+        "产物路径、哈希和验证结果",
+        "批准记录和外部操作标识符",
+        "验收标准及未完成的任务承诺",
+        "每次压缩交流的完整记录，好让下一会话能重建此前的推理，而不是使用带类型的检查点"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "关键信息必须在概率性摘要之外留存。持久记录保存必须保持精确的信息，不相关的对话可以裁剪。",
+      "references": [
+        "https://platform.claude.com/docs/en/agent-sdk/overview",
+        "certifications/claude/lessons/03-prompting-and-task-decomposition",
+        "certifications/claude/lessons/04-context-knowledge-memory-and-caching",
+        "certifications/claude/lessons/09-structured-output-and-defensive-parsing"
+      ]
+    },
+    {
+      "id": "ccdv-d-013",
+      "domain": "prompt-context-engineering",
+      "objective": "验证并防御性地消费结构化输出",
+      "type": "single",
+      "prompt": "某个响应是有效 JSON 且通过了声明的 schema，但其中的 invoice_id 属于另一个租户。哪项检查失效了？",
+      "options": [
+        "Prompt 缓存和会话验证，因为缓存的结构化响应可能会携带上一次已认证请求中的资源标识符",
+        "Schema 形状",
+        "JSON 语法",
+        "针对可信应用状态进行语义与授权验证"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Schema 只能证明结构，不证明归属。应用必须绑定已认证的租户身份，并根据其系统记录验证资源访问权限。",
+      "references": [
+        "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+        "certifications/claude/lessons/03-prompting-and-task-decomposition"
+      ]
+    },
+    {
+      "id": "ccdv-d-014",
+      "domain": "security-safety",
+      "objective": "缓解 prompt 注入、越狱、数据泄露和不安全输入",
+      "type": "multiple",
+      "prompt": "一个检索到的网页要求 agent 上传其环境变量。以下哪些响应是恰当的？请选择所有适用项。",
+      "options": [
+        "将网页视为不可信数据，而不是更高优先级的指令",
+        "在工具边界拒绝访问密钥路径和环境变量",
+        "若资源来自已批准的连接器，且页面元数据将某人标识为组织管理员，就遵从该指令",
+        "限制网络目标并对追踪记录脱敏"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "来源可信度、能力拒绝、网络控制和安全处理机密的遥测共同构成分层防御。无论措辞如何，内容都无法仅靠自称有权威来证明自身已经过认证。",
+      "references": [
+        "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+        "certifications/claude/lessons/12-claude-agent-sdk-and-hooks",
+        "certifications/claude/lessons/13-application-security-and-secrets"
+      ]
+    },
+    {
+      "id": "ccdv-d-015",
+      "domain": "tools-mcps",
+      "objective": "跨传输编写和部署 MCP 工具、资源与 prompt",
+      "type": "single",
+      "prompt": "某个 MCP 服务器必须公开一份可寻址的只读政策文档，标识为 policy://refunds/current。最适合用哪种原语？",
+      "options": [
+        "资源",
+        "工具",
+        "子 agent",
+        "Prompt"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "资源提供以 URI 为地址的上下文。工具执行由模型选择的操作，而 prompt 为兼容 MCP 的宿主提供可复用、由用户调用的消息模板，用于重复的工作流。",
+      "references": [
+        "https://modelcontextprotocol.io/docs/learn/server-concepts",
+        "certifications/claude/lessons/10-tool-use-and-agentic-loops",
+        "certifications/claude/lessons/11-mcp-server-design-and-integration"
+      ]
+    },
+    {
+      "id": "ccdv-d-016",
+      "domain": "tools-mcps",
+      "objective": "在内置工具、自定义工具、Skills 和 MCP 间选择",
+      "type": "multiple",
+      "prompt": "MCP 在什么时候最能体现其额外协议与部署成本的价值？请选择所有适用项。",
+      "options": [
+        "多个已获批准的宿主需要共享能力发现机制",
+        "一个进程内函数需要类型化 schema，未来或许会复用，但当前没有宿主或部署边界需要协议发现",
+        "该集成需要具备版本控制的远程认证与治理",
+        "工具、资源或 prompt 应通过标准客户端—服务器边界暴露"
+      ],
+      "correct": [
+        0,
+        2,
+        3
+      ],
+      "explanation": "当需要跨宿主互操作、共享能力发现，以及受治理的客户端—服务器能力边界时，MCP 的额外成本才值得承担。单个本地函数通常直接做成进程内工具更简单，也更容易维护。",
+      "references": [
+        "https://modelcontextprotocol.io/docs/getting-started/intro",
+        "certifications/claude/lessons/10-tool-use-and-agentic-loops"
+      ]
+    }
+  ]
+}

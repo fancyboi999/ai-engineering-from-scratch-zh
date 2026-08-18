@@ -3,7 +3,7 @@
    Loads after lesson-figures.js and registers widgets through window.LF.
    Every figure is a self-running SMIL animation of one concept: no JS timers,
    no compute loops. Vanilla ES5, no deps, theme via CSS vars.
-   Authoring is the same fenced block in docs/en.md:
+   Authoring is the same fenced block in docs/zh.md:
        ```figure
        v4-video-temporal
        ``` */

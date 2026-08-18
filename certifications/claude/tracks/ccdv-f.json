@@ -1,0 +1,51 @@
+{
+  "id": "claude-ccdv-f", "slug": "ccdv-f", "examCode": "CCDV-F", "credential": "Claude 认证开发者 - 基础级", "shortName": "开发者基础", "level": "技术基础级", "accent": "blue",
+  "badge": {"imageUrl": "https://images.credly.com/images/f101c6ac-8a2d-4220-b381-70e3e6c364e3/blob", "width": 601, "height": 601},
+  "summary": "构建、集成、保护、测试并交付 Claude 应用、agent、工作流、工具和 MCP 服务器。",
+  "audience": "具备 Python 或 TypeScript 经验，并了解 REST API 和命令行工具的软件工程师、AI 工程师和技术构建者。",
+  "recommendedExperience": ["一至五年的软件工程经验", "至少六个月 Claude 或同类 LLM 系统经验", "熟悉 REST API、JSON、异步代码和 CLI 工具", "了解 agent、上下文管理和 MCP"],
+  "exam": {"items": 53, "timeLimitMinutes": 120, "feeUsd": 125, "passingScaledScore": 720, "scoreScale": "100-1000", "validityMonths": 12, "format": "单选与多选", "delivery": "线上监考或考试中心", "guideVersion": "1.0", "effective": "July 2026", "officialGuideUrl": "https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F6nizmqk8tpzpfjvt6qmmav7rh%2Fpublic%2F1783542875%2FClaude+Certified+Developer+%E2%80%93+Foundations+Exam+Guide.pdf"},
+  "domains": [
+    {"id":"agents-workflows","name":"Agent 与工作流","weight":14.7,"objectives":["根据任务约束选择工作流或 agent","设计管理者与 subagent 层级","使用 Claude Agent SDK、自定义循环、托管 agent 和 hook 构建","应用工具循环、记忆、上下文和框架模式"]},
+    {"id":"applications-integration","name":"应用与集成","weight":33.1,"objectives":["将业务需求转化为功能和基础设施需求","应用系统生命周期实践","使用消息、工具、流式传输、视觉、思考、缓存、批处理和第三方 provider","应用 REST、JSON、异步、版本控制、审核和重构实践","设计指令、schema、会话、内容边界和插件行为","管理 CLAUDE.md、设置、模型、prompt 和插件版本"]},
+    {"id":"claude-code","name":"Claude Code","weight":3.1,"objectives":["操作 Rules、Skills、Commands、Agents、记忆、会话、无头模式、流式模式、自动模式、CLAUDE.md、初始化和设置"]},
+    {"id":"eval-testing-debugging","name":"评估、测试与调试","weight":2.6,"objectives":["对错误分类、选择恢复、分析追踪，并区分集成故障与模型故障"]},
+    {"id":"model-selection-optimization","name":"模型选择与优化","weight":16.8,"objectives":["解释 token、采样、上下文、非确定性、思考、努力程度和 prompting 模式","集成 SDK 与传输基础知识","平衡模型质量、延迟、成本、能力和版本变化","规划 token 预算并使用 prompt 缓存"]},
+    {"id":"prompt-context-engineering","name":"Prompt 与上下文工程","weight":11.0,"objectives":["通过裁剪、压缩和隔离防止上下文漂移与膨胀","放置清晰的指令、示例和约束","清洗输入并迭代 prompt","验证并防御性地消费结构化输出"]},
+    {"id":"security-safety","name":"安全与安保","weight":8.1,"objectives":["缓解 prompt 注入、越狱、数据泄露和不安全输入","以最小权限分层设置护栏","使用 hook 实施确定性安全控制","保护身份、机密、密钥和访问批准"]},
+    {"id":"tools-mcps","name":"工具与 MCP","weight":10.6,"objectives":["设计描述、schema、错误、批准和工具集","跨传输编写和部署 MCP 工具、资源与 prompt","在内置工具、自定义工具、Skills 和 MCP 间选择"]}
+  ],
+  "lessons": [
+    {"path":"certifications/claude/lessons/00-certification-strategy","domains":["applications-integration"],"role":"导览","required":true},
+    {"path":"certifications/claude/lessons/01-claude-product-and-model-landscape","domains":["model-selection-optimization","applications-integration"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/02-model-selection-and-token-economics","domains":["model-selection-optimization"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/03-prompting-and-task-decomposition","domains":["prompt-context-engineering"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/04-context-knowledge-memory-and-caching","domains":["prompt-context-engineering","model-selection-optimization"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/05-output-evaluation-and-validation","domains":["prompt-context-engineering","eval-testing-debugging"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/08-messages-api-and-application-lifecycle","domains":["applications-integration","model-selection-optimization"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/09-structured-output-and-defensive-parsing","domains":["prompt-context-engineering","applications-integration"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/10-tool-use-and-agentic-loops","domains":["tools-mcps","agents-workflows"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/11-mcp-server-design-and-integration","domains":["tools-mcps","applications-integration"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/12-claude-agent-sdk-and-hooks","domains":["agents-workflows","security-safety"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/13-application-security-and-secrets","domains":["security-safety","applications-integration"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/14-evals-testing-debugging-and-observability","domains":["eval-testing-debugging","applications-integration","model-selection-optimization"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/15-claude-code-for-development-teams","domains":["claude-code","applications-integration"],"role":"核心","required":true},
+    {"path":"certifications/claude/lessons/30-developer-application-capstone","domains":["agents-workflows","applications-integration","claude-code","eval-testing-debugging","model-selection-optimization","prompt-context-engineering","security-safety","tools-mcps"],"role":"综合项目","required":true}
+  ],
+  "deepDives": [
+    {"path":"phases/14-agent-engineering/01-the-agent-loop","label":"Agent 循环","reason":"使用 SDK 前先构建循环"},
+    {"path":"phases/14-agent-engineering/17-claude-agent-sdk","label":"Claude Agent SDK","reason":"深入了解生产 SDK 能力面"},
+    {"path":"phases/13-tools-and-protocols/05-tool-schema-design","label":"工具 Schema 设计","reason":"设计清晰、可测试的工具契约"},
+    {"path":"phases/13-tools-and-protocols/07-building-an-mcp-server","label":"构建 MCP 服务器","reason":"端到端实现服务器边界"},
+    {"path":"phases/14-agent-engineering/27-prompt-injection-defense","label":"Prompt 注入防御","reason":"为不可信指令建立威胁模型"},
+    {"path":"phases/14-agent-engineering/30-eval-driven-agent-development","label":"评估驱动的 Agent 开发","reason":"将轨迹和最终状态用作发布证据"}
+  ],
+  "assessments": [
+    {"id":"claude-ccdv-f-diagnostic","path":"certifications/claude/assessments/ccdv-f/diagnostic.json","kind":"diagnostic","title":"开发者基础诊断","timeLimitMinutes":30},
+    {"id":"claude-ccdv-f-mock-01","path":"certifications/claude/assessments/ccdv-f/mock-01.json","kind":"mock","title":"开发者基础完整模拟","timeLimitMinutes":120}
+  ],
+  "studyPlans": [
+    {"id":"ccdv-f-21-day","label":"21 天强化计划","durationDays":21,"hoursPerWeek":12,"milestones":["第 1–4 天：模型、prompt、上下文和 API 机制","第 5–9 天：输出、工具、MCP 和 agent 循环","第 10–14 天：SDK、安全、评估和 Claude Code","第 15–18 天：构建并论证综合项目","第 19–21 天：完整模拟与领域补强"]},
+    {"id":"ccdv-f-42-day","label":"42 天构建计划","durationDays":42,"hoursPerWeek":7,"milestones":["第 1 周：模型和 API 基础","第 2 周：prompt、上下文和输出契约","第 3 周：工具和 MCP","第 4 周：agent 和安全","第 5 周：评估、调试和 Claude Code","第 6 周：综合项目和模拟"]}
+  ]
+}

@@ -1,7 +1,7 @@
 /* figures-vision-speech.js — interactive lesson figures for Phase 4 (computer
    vision) and Phase 6 (speech & audio). Loads after lesson-figures.js and
    registers widgets through window.LF. Vanilla ES5, no deps, theme via CSS
-   vars. Authoring is the same fenced block in docs/en.md:
+   vars. Authoring is the same fenced block in docs/zh.md:
        ```figure
        convolution-kernel
        ``` */

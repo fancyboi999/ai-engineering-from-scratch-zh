@@ -125,7 +125,7 @@
       var statusClass = p.status.replace(/ /g, '-');
       var roman = toRoman(p.id);
       var num = String(p.id).padStart(2, '0');
-      html += '<div class="toc-row" data-phase="' + i + '">';
+      html += '<div class="toc-row" data-phase="' + i + '" role="button" tabindex="0" aria-haspopup="dialog" aria-label="打开阶段 ' + num + '：' + escapeHtml(p.name) + '">';
       html += '<span class="toc-num">' + roman + '.</span>';
       html += '<div><span class="toc-status ' + statusClass + '"></span><span class="toc-name">' + escapeHtml(p.name) + '</span></div>';
       html += '<span class="toc-meta">' + done + ' / ' + total + '</span>';
@@ -173,23 +173,54 @@
 
   function initModal() {
     var overlay = document.getElementById('modalOverlay');
+    var modal = document.getElementById('modal');
     var closeBtn = document.getElementById('modalClose');
-    if (!overlay || !closeBtn) return;
+    if (!overlay || !modal || !closeBtn) return;
+
+    overlay.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'modalTitle');
+    modal.setAttribute('aria-describedby', 'modalDesc');
+    closeBtn.setAttribute('aria-label', '关闭阶段详情');
 
     document.addEventListener('click', function (e) {
       var row = e.target.closest('.toc-row, .phase-card');
       if (row) {
         var idx = parseInt(row.getAttribute('data-phase'), 10);
-        if (!isNaN(idx)) openModal(idx);
+        if (!isNaN(idx)) openModal(idx, false);
       }
     });
 
-    closeBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      var row = e.target.closest && e.target.closest('.toc-row, .phase-card');
+      if (!row || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      var idx = parseInt(row.getAttribute('data-phase'), 10);
+      if (!isNaN(idx)) openModal(idx, true);
+    });
+
+    closeBtn.addEventListener('click', function () { closeModal(false); });
     overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) closeModal();
+      if (e.target === overlay) closeModal(false);
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') {
+        closeModal(true);
+        return;
+      }
+      if (e.key !== 'Tab' || !overlay.classList.contains('open')) return;
+      var focusable = modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
 
     var resetBtn = document.getElementById('modalReset');
@@ -246,11 +277,13 @@
   }
 
   var currentPhaseIdx = -1;
+  var modalReturnFocus = null;
 
-  function openModal(idx) {
+  function openModal(idx, fromKeyboard) {
     var p = PHASES[idx];
     if (!p) return;
     currentPhaseIdx = idx;
+    modalReturnFocus = document.activeElement;
 
     document.getElementById('modalPhaseNum').textContent = 'PHASE ' + String(p.id).padStart(2, '0');
     document.getElementById('modalTitle').textContent = p.name;
@@ -258,8 +291,16 @@
 
     renderModalLessons(p);
 
-    document.getElementById('modalOverlay').classList.add('open');
+    var overlay = document.getElementById('modalOverlay');
+    overlay.classList.toggle('no-motion', !!fromKeyboard);
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function () {
+      var close = document.getElementById('modalClose');
+      if (close) close.focus();
+      overlay.classList.remove('no-motion');
+    });
   }
 
   function renderModalLessons(p) {
@@ -277,32 +318,28 @@
       var userComplete = hasProgress && lessonPath && window.AIFSProgress.isLessonComplete(lessonPath);
       if (userComplete) userDone++;
 
-      var statusClass = l.status.replace(/ /g, '-');
-      if (userComplete) statusClass = 'complete';
+      var canOpen = (l.status === 'complete' || userComplete) && lessonPath;
+      // 中文站的 SEO 主入口是预渲染静态页，不能回退到上游的 lesson.html?path=。
+      var lessonUrl = canOpen ? '/lessons/' + lessonPath.replace(/^phases\//, '') + '/' : '';
+      var lessonLabel = escapeHtml(l.name);
+      var lessonMeta = '<span class="modal-lesson-meta"><span class="modal-lesson-type" data-type="' + escapeHtml(l.type) + '"' + (l.combines ? ' title="合并自：' + escapeHtml(l.combines) + '"' : '') + '>' + escapeHtml(typeLabel(l.type)) + '</span><span aria-hidden="true">·</span><span class="modal-lesson-lang">' + escapeHtml(l.lang) + '</span></span>';
 
       html += '<div class="modal-lesson' + (userComplete ? ' user-done' : '') + '">';
-      html += '<span class="modal-lesson-status ' + statusClass + '"' + (userComplete ? ' title="你已完成本节课"' : '') + '></span>';
-      var siteUrl = lessonPath ? '/lessons/' + lessonPath.replace(/^phases\//, '') + '/' : '';
-      if (siteUrl) {
-        html += '<a href="' + siteUrl + '">' + escapeHtml(l.name) + '</a>';   // 课名进站内阅读页
-      } else if (l.url) {
-        html += '<a href="' + l.url + '" target="_blank" rel="noopener">' + escapeHtml(l.name) + '</a>';
+      if (canOpen) {
+        html += '<a href="' + lessonUrl + '" class="modal-lesson-open" aria-label="打开课程：' + lessonLabel + '">';
+        html += '<span class="modal-lesson-copy"><span class="modal-lesson-name">' + lessonLabel + '</span>' + lessonMeta + '</span>';
+        html += '<span class="modal-lesson-cta">' + (userComplete ? '复习' : '阅读课程') + '<span aria-hidden="true">→</span></span></a>';
       } else {
-        html += '<a>' + escapeHtml(l.name) + '</a>';
+        html += '<span class="modal-lesson-open is-unavailable" aria-disabled="true">';
+        html += '<span class="modal-lesson-copy"><span class="modal-lesson-name">' + lessonLabel + '</span>' + lessonMeta + '</span>';
+        html += '<span class="modal-lesson-cta">即将推出</span></span>';
       }
-      html += '<span class="modal-lesson-type" data-type="' + escapeHtml(l.type) + '"' + (l.combines ? ' title="合并自：' + escapeHtml(l.combines) + '"' : '') + '>' + escapeHtml(typeLabel(l.type)) + '</span>';
-      html += '<span class="modal-lesson-lang">' + escapeHtml(l.lang) + '</span>';
 
-      // 列5:GitHub 源码小图标(课名已进站内阅读,这里降为次要源码入口)
-      var actionHtml = '';
-      if (l.url) {
-        actionHtml = '<a href="' + l.url + '" target="_blank" rel="noopener" class="modal-lesson-src" title="在 GitHub 查看源码" aria-label="GitHub 源码">↗</a>';
-      }
       var toggleHtml = '';
-      if (hasProgress && lessonPath) {
-        toggleHtml = '<button type="button" class="modal-lesson-toggle' + (userComplete ? ' done' : '') + '" data-path="' + lessonPath + '" title="' + (userComplete ? '标记为未完成' : '标记为已完成') + '" aria-label="' + (userComplete ? '标记为未完成' : '标记为已完成') + '">' + (userComplete ? '✓' : '+') + '</button>';
+      if (hasProgress && canOpen) {
+        toggleHtml = '<button type="button" class="modal-lesson-toggle' + (userComplete ? ' done' : '') + '" data-path="' + lessonPath + '" title="' + (userComplete ? '标记为未完成' : '标记为已完成') + '" aria-label="' + (userComplete ? '标记为未完成' : '标记为已完成') + '"><span class="modal-lesson-check" aria-hidden="true">' + (userComplete ? '✓' : '') + '</span><span class="modal-lesson-toggle-label">' + (userComplete ? '已完成' : '标记完成') + '</span></button>';
       }
-      html += (actionHtml || '<span class="modal-lesson-read-placeholder" aria-hidden="true"></span>') + toggleHtml;
+      html += toggleHtml;
       html += '</div>';
     }
 
@@ -330,11 +367,16 @@
       var pct = Math.round((userDone / p.lessons.length) * 100);
       if (progEl) {
         progEl.style.display = '';
-        progEl.innerHTML = '<span class="modal-progress-count">' + userDone + ' / ' + p.lessons.length + '</span> <span class="modal-progress-label">已完成</span> <span class="modal-progress-pct">' + pct + '%</span>';
+        progEl.innerHTML = '<span><strong class="modal-progress-count">' + userDone + '</strong> / ' + p.lessons.length + ' 节课程已完成</span><span class="modal-progress-pct">' + pct + '%</span>';
       }
       if (barEl && barFill) {
         barEl.style.display = '';
-        barFill.style.width = pct + '%';
+        barEl.setAttribute('role', 'progressbar');
+        barEl.setAttribute('aria-label', p.name + ' 的学习进度');
+        barEl.setAttribute('aria-valuemin', '0');
+        barEl.setAttribute('aria-valuemax', '100');
+        barEl.setAttribute('aria-valuenow', String(pct));
+        barFill.style.transform = 'scaleX(' + (pct / 100) + ')';
       }
     } else {
       if (progEl) progEl.style.display = 'none';
@@ -354,24 +396,100 @@
 
 
 
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
+  function closeModal(fromKeyboard) {
+    var overlay = document.getElementById('modalOverlay');
+    if (!overlay || !overlay.classList.contains('open')) return;
+    overlay.classList.toggle('no-motion', !!fromKeyboard);
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    if (modalReturnFocus && modalReturnFocus.isConnected && typeof modalReturnFocus.focus === 'function') {
+      modalReturnFocus.focus();
+    }
+    modalReturnFocus = null;
+    requestAnimationFrame(function () {
+      overlay.classList.remove('no-motion');
+    });
+  }
+
+  // 一个复制实现：异步剪贴板不可用时回退到 execCommand，并给出可感知的成功或失败状态。
+  function wireCopyButton(btn, label, getText) {
+    if (!btn || !label) return;
+    var revertTimer = null;
+    var defaultLabel = label.textContent || '复制';
+    var defaultAriaLabel = btn.getAttribute('aria-label') || '复制命令';
+    function resetCopyState() {
+      label.textContent = defaultLabel;
+      btn.classList.remove('copied');
+      btn.setAttribute('aria-label', defaultAriaLabel);
+    }
+    function scheduleReset() {
+      if (revertTimer) clearTimeout(revertTimer);
+      revertTimer = setTimeout(resetCopyState, 1500);
+    }
+    function confirmCopied() {
+      label.textContent = '已复制';
+      btn.classList.add('copied');
+      btn.setAttribute('aria-label', '命令已复制');
+      scheduleReset();
+    }
+    function reportCopyFailure() {
+      label.textContent = '重试';
+      btn.classList.remove('copied');
+      btn.setAttribute('aria-label', '复制失败，请重试');
+      scheduleReset();
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
+      ta.style.width = '1px';
+      ta.style.height = '1px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var copied = false;
+      try { copied = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      if (copied) confirmCopied();
+      else reportCopyFailure();
+    }
+    btn.addEventListener('click', function () {
+      var text = getText();
+      if (!text) {
+        reportCopyFailure();
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(confirmCopied).catch(function () { fallbackCopy(text); });
+      } else {
+        fallbackCopy(text);
+      }
+    });
   }
 
   function initCopyButton() {
-    var btn = document.getElementById('copyBtn');
     var code = document.getElementById('cloneCmd');
-    if (!btn || !code) return;
-    var originalLabel = btn.textContent;
-    var revertTimer = null;
-    btn.addEventListener('click', function () {
-      navigator.clipboard.writeText(code.textContent).then(function () {
-        btn.textContent = '✓';
-        if (revertTimer) clearTimeout(revertTimer);
-        revertTimer = setTimeout(function () { btn.textContent = originalLabel; }, 1500);
-      });
-    });
+    if (code) {
+      wireCopyButton(
+        document.getElementById('copyBtn'),
+        document.getElementById('copyBtnLabel') || document.getElementById('copyBtn'),
+        function () { return code.textContent; }
+      );
+    }
+    var installBtn = document.getElementById('installCopy');
+    if (installBtn) {
+      wireCopyButton(
+        installBtn,
+        document.getElementById('installCopyLabel'),
+        function () { return installBtn.getAttribute('data-cmd'); }
+      );
+    }
   }
 
   function initSmoothScroll() {

@@ -64,7 +64,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260709a">
+  <link rel="stylesheet" href="style.css?v=20260818b">
   <style>
     .manual-masthead {
       padding: 96px 0 24px;
@@ -661,6 +661,35 @@
       color: var(--ink-soft);
       line-height: 1.5;
     }
+
+    .cert-spotlight { padding: 8px 0 48px; }
+    .cert-spotlight-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 28px;
+      align-items: center;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--rule-soft);
+      border-left: 3px solid var(--blueprint);
+      background: var(--code-bg);
+    }
+    .cert-spotlight-eyebrow {
+      margin-bottom: 8px;
+      font: 0.68rem/1.4 var(--font-mono);
+      letter-spacing: 0.14em;
+      color: var(--blueprint);
+    }
+    .cert-spotlight h2 { margin: 0; font: 400 clamp(1.9rem, 4vw, 3rem)/1 var(--font-display); }
+    .cert-spotlight p { max-width: 68ch; margin: 14px 0 0; color: var(--ink-soft); line-height: 1.65; }
+    .cert-spotlight-proof { display: flex; flex-wrap: wrap; gap: 8px 22px; font: 0.7rem/1.4 var(--font-mono); color: var(--ink-mute); }
+    .cert-spotlight-proof strong { color: var(--blueprint); }
+    .cert-spotlight-actions { display: grid; gap: 10px; min-width: 190px; }
+    .cert-spotlight-actions a { justify-content: center; text-align: center; }
+    @media (max-width: 720px) {
+      .cert-spotlight-card { grid-template-columns: 1fr; }
+      .cert-spotlight-actions { grid-template-columns: 1fr 1fr; min-width: 0; }
+    }
+    @media (max-width: 440px) { .cert-spotlight-actions { grid-template-columns: 1fr; } }
   </style>
   <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
   <script defer src="/_vercel/insights/script.js"></script>
@@ -735,6 +764,22 @@
           <p>大多数 AI 教材都是碎片化教学。这儿一篇论文，那儿一篇微调心得，别处再来个炫酷的 agent demo。这些碎片很少能拼到一起。你做出了一个聊天机器人，却讲不清它的 loss 曲线；你给 agent 挂了个函数，却说不出调用它的那个模型内部，attention 到底在干什么。</p>
           <p>这套课程就是那根脊椎。20 个阶段，503 节课，四种语言：Python、TypeScript、Rust、Julia。一头是线性代数，另一头是自主 agent 集群。每个算法都先从最原始的数学手写出来。反向传播、分词器、注意力、agent 循环——等 PyTorch 登场时，你已经知道它底层在做什么了。</p>
           <p>每节课都跑同一个循环：读懂问题、推导数学、写代码、跑测试、留下产物。没有五分钟速成视频，没有复制粘贴式部署，没有手把手喂饭。免费，开源，在你自己的笔记本上就能跑。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cert-spotlight container" id="certifications" aria-labelledby="certSpotlightTitle">
+      <div class="cert-spotlight-card reveal">
+        <div>
+          <div class="cert-spotlight-eyebrow">CLAUDE 认证 · 独立备考</div>
+          <h2 id="certSpotlightTitle">用真实系统训练认证决策</h2>
+          <p>四条 Claude 认证路线，仍然是这套课程的学法：逐步理解、运行实验、交付可检查产物，再用诊断和限时模拟题找出薄弱决策。</p>
+          <p class="cert-spotlight-proof" aria-label="认证课程覆盖"><span><strong>4</strong> 条路线</span><span><strong>33</strong> 节认证课</span><span><strong>295</strong> 道原创评估题</span></p>
+          <p><small>不隶属于 Anthropic，不颁发证书，也不保证通过。</small></p>
+        </div>
+        <div class="cert-spotlight-actions">
+          <a class="masthead-btn masthead-btn--primary" href="certifications.html">查看认证路线</a>
+          <a class="masthead-btn" href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/certifications/claude/GETTING_STARTED.md" target="_blank" rel="noopener">使用 GitHub 导师</a>
         </div>
       </div>
     </section>
@@ -825,6 +870,7 @@
       <p>© 2026 · 开源 · 永久免费</p>
       <div class="footer-links">
         <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a>
+        <a href="certifications.html">认证</a>
         <a href="catalog.html">课程表</a>
         <a href="glossary.html">术语表</a>
         <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new/choose" target="_blank" rel="noopener">反馈</a>
@@ -832,12 +878,12 @@
     </div>
   </footer>
 
-  <script src="data.js?v=20260525a"></script>
+  <script src="data.js?v=20260818b"></script>
   <script src="progress.js?v=20260709a"></script>
   <script src="reminder.js?v=20260709a"></script>
-  <script src="header.js?v=20260525a" defer></script>
-  <script src="cmdpalette.js?v=20260525a" defer></script>
-  <script src="app.js?v=20260709a"></script>
+  <script src="header.js?v=20260818b" defer></script>
+  <script src="cmdpalette.js?v=20260818b" defer></script>
+  <script src="app.js?v=20260818b"></script>
   <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
 </body>
 </html>

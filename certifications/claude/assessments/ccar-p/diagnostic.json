@@ -1,0 +1,314 @@
+{
+  "id": "claude-ccar-p-diagnostic",
+  "version": 2,
+  "track": "claude-ccar-p",
+  "kind": "diagnostic",
+  "title": "架构师专业诊断",
+  "timeLimitMinutes": 30,
+  "questions": [
+    {
+      "id": "ccar-p-diag-001",
+      "domain": "solution-design-architecture",
+      "objective": "将业务问题转化为 Claude 解决方案",
+      "type": "single",
+      "prompt": "一位总监要求构建完全自主的理赔 agent，却没有提供基线、权限上限或错误成本信息。架构师首先该做什么？",
+      "options": [
+        "围绕现有理赔流程构建受限试点，采用能力最强的模型，并将权限和错误成本的决策延后到利益相关方看到输出之后",
+        "开展结构化发现，明确结果、工作流、约束、权限、衡量指标和非目标",
+        "选择能力最强的模型",
+        "创建五个专业 agent"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "在业务结果、当前流程、权限、风险和可衡量约束明确之前，无法评估架构。先于发现阶段选择技术，只是在优化未经验证的假设。",
+      "references": [
+        "certifications/claude/lessons/22-business-discovery-requirements-and-slas",
+        "certifications/claude/lessons/10-tool-use-and-agentic-loops",
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/32-architect-professional-system-capstone"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-002",
+      "domain": "solution-design-architecture",
+      "objective": "选择工作流、agent 或增强 LLM 模式",
+      "type": "multiple",
+      "prompt": "一个流程步骤稳定、审计要求严格，且只有一个分类步骤存在歧义。哪两项设计选择最合理？选两项。",
+      "options": [
+        "对整个稳定序列使用自适应 agent",
+        "只让 Claude 处理边界明确的分类判断",
+        "以只读凭据暴露完整的已批准业务工具目录，再用 prompt 约束 Claude 遵循已知序列",
+        "对已知序列使用确定性编排"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "已知的状态转换应写入代码，Claude 则处理边界明确的语义判断。这样既保留有价值的判断，又能把可变性、权限暴露面、延迟和测试负担降到最低。",
+      "references": [
+        "certifications/claude/lessons/23-end-to-end-architecture-and-value-tradeoffs"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-003",
+      "domain": "models-prompting-context",
+      "objective": "使用缓存、模块化 prompt 和 Skills 复用稳定 prompt",
+      "type": "single",
+      "prompt": "某应用会在简短且不断变化的用户请求前，发送相同的长篇政策和系统指令。质量可以接受，但成本和首 token 延迟很高。最直接的首项优化是什么？",
+      "options": [
+        "删去大部分政策内容",
+        "提高 temperature",
+        "将稳定内容放入可复用前缀，并应用当前的 prompt 缓存指引",
+        "先让较小模型为每个请求摘要重复的政策内容，再将该摘要和变化的用户内容交给生产模型"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "稳定且重复的前缀正是适合缓存的形态，无须移除必要政策就能减少重复处理。团队仍须核实当前缓存行为并衡量命中率。",
+      "references": [
+        "certifications/claude/lessons/04-context-knowledge-memory-and-caching",
+        "certifications/claude/lessons/02-model-selection-and-token-economics",
+        "certifications/claude/lessons/03-prompting-and-task-decomposition",
+        "certifications/claude/lessons/09-structured-output-and-defensive-parsing"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-004",
+      "domain": "models-prompting-context",
+      "objective": "根据明确权衡选择模型",
+      "type": "multiple",
+      "prompt": "要比较更快的模型与能力更强的模型用于生产路由，哪两项度量必不可少？选两项。",
+      "options": [
+        "代表性类别和风险分层上的任务质量",
+        "非代表性合成请求的公开每 token 价格和首 token 延迟中位数",
+        "每个模型在提供商基准测试中的排名",
+        "端到端延迟以及每个被接受结果的成本"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "模型选择取决于真实分布下观测到的任务质量、延迟和完整结果成本。型号名称和没有依据的规模说法都不能证明其适合生产环境。",
+      "references": [
+        "certifications/claude/lessons/02-model-selection-and-token-economics",
+        "certifications/claude/lessons/26-production-observability-latency-and-cost"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-005",
+      "domain": "integration",
+      "objective": "设计 RAG 分块和索引",
+      "type": "single",
+      "prompt": "一次政策刷新后，RAG 助手立刻开始自信地给出错误答案。模型版本和延迟均未变化。架构师首先应检查什么？",
+      "options": [
+        "agent 的数量",
+        "答案生成 prompt 和模型采样设置，同时因刷新作业已成功完成而将活跃检索索引视为正确",
+        "prompt temperature、回答风格和推理力度，因为刷新可能改变了同一模型概括政策语言时的自信程度",
+        "摄取流程、活跃索引版本、元数据过滤条件和检索到的分块"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "时间点将最可能的变更定位在数据管道。若解析、版本激活、过滤或排序提供了过时证据，模型就无法使用当前生效的政策。",
+      "references": [
+        "certifications/claude/lessons/24-rag-retrieval-and-data-pipelines",
+        "certifications/claude/lessons/08-messages-api-and-application-lifecycle",
+        "certifications/claude/lessons/11-mcp-server-design-and-integration",
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-006",
+      "domain": "integration",
+      "objective": "发现认证和授权缺口",
+      "type": "multiple",
+      "prompt": "一个支持回复起草 agent 不需要退款或删除能力。哪两项变更能建立最强的最小权限边界？选两项。",
+      "options": [
+        "让所有工具都可被发现，并在 prompt 中禁止调用",
+        "从执行凭据中移除相应 scope，并逐次授权调用",
+        "让该角色无法发现这些工具",
+        "允许使用现有凭据调用，并要求每次选择任一能力时记录完整审计事件和自动触发事件告警"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "收窄可发现范围可减少暴露面和选择错误，而执行时的 scope 强制可阻止直接调用或陈旧的未授权调用。仅有 prompt 警告和审计仍会保留该能力。",
+      "references": [
+        "certifications/claude/lessons/25-integration-protocols-identity-and-least-privilege"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-007",
+      "domain": "evaluation-testing-optimization",
+      "objective": "构建代表性数据集和混合方法测试框架",
+      "type": "single",
+      "prompt": "一次有据回答评估失败了。哪项度量最直接决定所需来源是否曾进入生成阶段？",
+      "options": [
+        "检索 Recall@K",
+        "HTTP 成功率",
+        "最终答案长度",
+        "针对检索器返回的任意段落评估最终答案的有据性得分，但不单独进行带标注的检索召回率度量"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Recall@K 衡量带标注的相关证据是否出现在候选集中。它能将检索失败与生成失败或引用支撑失败区分开来。",
+      "references": [
+        "certifications/claude/lessons/24-rag-retrieval-and-data-pipelines",
+        "certifications/claude/lessons/05-output-evaluation-and-validation"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-008",
+      "domain": "evaluation-testing-optimization",
+      "objective": "运行 A/B 测试和迭代改进",
+      "type": "multiple",
+      "prompt": "哪两项做法能让架构 A/B 测试更安全、信息更充分？选两项。",
+      "options": [
+        "以质量、安全、延迟和单次成功成本作为发布门槛",
+        "按任务和风险类别分层分析结果",
+        "离线门槛通过后，立即随机向全部符合条件的用户发布，同时设置终止开关并持续监控汇总指标",
+        "只用汇总任务成功率作为发布指标"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "分层分析能避免汇总指标的改善掩盖高风险类别的回归。多维门槛和渐进式发布既限制损害，也能衡量完整的生产权衡。",
+      "references": [
+        "certifications/claude/lessons/26-production-observability-latency-and-cost",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-009",
+      "domain": "governance-safety-risk",
+      "objective": "考虑 GDPR、HIPAA、FedRAMP 和适用法规",
+      "type": "single",
+      "prompt": "一份拟上传用于分析的数据包含趋势分析并不需要的客户姓名和账户标识符。最有力的首要控制措施是什么？",
+      "options": [
+        "增加一段更长的系统 prompt",
+        "数据进入工作流前，移除或假名化不必要的标识符",
+        "将完整记录上传至获批的受限工作区，对输出做脱敏，并按标准审计周期保留原始输入",
+        "上传后要求 Claude 不要记住"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "数据最小化会从整个处理和留存范围中移除不必要的敏感字段。prompt 文本无法控制提供商或应用的存储边界。",
+      "references": [
+        "certifications/claude/lessons/27-enterprise-governance-compliance-and-hitl",
+        "certifications/claude/lessons/06-governance-safety-and-responsible-use",
+        "certifications/claude/lessons/13-application-security-and-secrets"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-010",
+      "domain": "governance-safety-risk",
+      "objective": "设计人在回路验证",
+      "type": "multiple",
+      "prompt": "要让人工审核成为有意义的高风险控制措施，必须具备哪两项特征？选两项。",
+      "options": [
+        "不设容量上限地接收所有触发案例的审核队列，依靠优先级排序和加班升级来维持覆盖范围",
+        "附带引文、置信度和建议决策的精致建议，使审核者能在服务级别时限内处理队列",
+        "具备相应资质、拥有决策权限且掌握充分证据的审核者",
+        "明确的触发条件、服务级别、兜底方案和审计记录"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "只有合适的人员能够审查证据、作出获授权的决定，并在既定流程中操作时，审核才有效。无上限负载和自动化偏见都会削弱这项控制。",
+      "references": [
+        "certifications/claude/lessons/27-enterprise-governance-compliance-and-hitl"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-011",
+      "domain": "stakeholder-lifecycle",
+      "objective": "沟通决策和权衡",
+      "type": "single",
+      "prompt": "高管架构评审应当先呈现什么？",
+      "options": [
+        "完整的 SDK 方法清单",
+        "模型调用次数",
+        "业务决策、备选方案、预期价值、投入、剩余风险、证据计划和负责人",
+        "在说明投资决策前，先给出完整的目标状态时序图，包括延迟估算、模型调用、集成边界和运行假设"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "高管负责价值、投入和风险决策。技术组件是为这项选择提供支撑，但叙述首先要明确决策本身及其后果。",
+      "references": [
+        "certifications/claude/lessons/28-stakeholder-communication-adrs-and-lifecycle",
+        "certifications/claude/lessons/00-certification-strategy"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-012",
+      "domain": "stakeholder-lifecycle",
+      "objective": "支持发现、设计、移交、监控和迭代",
+      "type": "multiple",
+      "prompt": "哪两项证据最能证明运维移交已经完成？选两项。",
+      "options": [
+        "接手团队成功完成了一次事故处置和回滚演练",
+        "仓库包含已审核的设置、部署、排障和回滚文档，但接手团队尚未实际演练",
+        "负责人、告警、运行手册、评估、访问和变更流程均满足验收标准",
+        "架构师向接手团队展示已获批准的运维材料，其中涵盖系统组件、告警、负责人和恢复路径"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "移交意味着接手团队已具备获认可的运行能力并承担责任。演练加上经验证的就绪产物，证明团队能够发现、控制、恢复、评估和变更系统。",
+      "references": [
+        "certifications/claude/lessons/28-stakeholder-communication-adrs-and-lifecycle"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-013",
+      "domain": "developer-productivity-operations",
+      "objective": "配置 Claude 工具和团队环境",
+      "type": "single",
+      "prompt": "团队中每位开发者都维护私有指令和命令，导致 Claude Code 行为不一致。最有力的改进措施是什么？",
+      "options": [
+        "统一使用在仓库外分发、由中央管理的用户级配置，让项目历史只聚焦产品代码",
+        "授予不受限制的权限",
+        "发布一份标准设置 prompt，供开发者粘贴到每个新会话中；再通过定期审查输出而非版本化配置来审计遵循情况",
+        "使用共享、受版本控制的项目配置，其中包含简明指令、范围明确的规则、可复用的 Skills 或命令，以及测试"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "受版本控制的项目配置让行为可审查、可复现且易维护。范围明确的规则和经过测试的可复用资产能减少漂移，而无需扩大权限。",
+      "references": [
+        "certifications/claude/lessons/15-claude-code-for-development-teams",
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci"
+      ]
+    },
+    {
+      "id": "ccar-p-diag-014",
+      "domain": "developer-productivity-operations",
+      "objective": "支持调试和运维事故解决",
+      "type": "multiple",
+      "prompt": "一个无界面的 Claude Code 工作流偶尔会修改预期范围外的文件。哪两项控制最能提升运维安全性和问题诊断能力？选两项。",
+      "options": [
+        "仅在所有模型编辑完成后才运行的最终全仓库测试套件，且不记录后来被回滚的越界写入尝试",
+        "记录已尝试和已接受变更的结构化追踪与验证门槛",
+        "列出允许目录的简明范围说明，并要求 Claude 在写入前自行报告任何请求的例外",
+        "能阻止范围外写入的路径范围权限或钩子"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "确定性的范围强制机制会阻止不安全操作，结构化证据和验证则说明发生了什么、为何发生。只靠遵守 prompt 是概率性的，并非安全边界。",
+      "references": [
+        "certifications/claude/lessons/15-claude-code-for-development-teams",
+        "certifications/claude/lessons/26-production-observability-latency-and-cost"
+      ]
+    }
+  ]
+}

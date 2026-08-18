@@ -1,0 +1,78 @@
+{
+  "lesson": "12-claude-agent-sdk-and-hooks",
+  "title": "Agent SDK 是运行框架，不是权限",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "以下哪项正确区分了 agent 运行框架的主要层级？",
+      "options": [
+        "Agent SDK 是原始 REST 的类型化名称，而 Tool Runner 只能在 Managed Agents 内使用",
+        "Tool Runner 处理 Messages tool 循环，Agent SDK 提供更完整的运行框架，Managed Agents 则增加远程事件驱动服务",
+        "Managed Agents 把业务授权与最终状态校验移交给已配置的 agent",
+        "Tool Runner、Agent SDK 与 Managed Agents 的主要区别只是模型质量和名称；三者负责相同的循环、tool 与 session 边界"
+      ],
+      "correct": 1,
+      "explanation": "这些接口对状态、tool、session 与托管的自动化程度不同，但都不会接管业务授权、tenant 策略或结果验证。"
+    },
+    {
+      "stage": "check",
+      "question": "哪项控制应在危险命令执行前拒绝它？",
+      "options": [
+        "执行后的最终状态 evaluator",
+        "要求 agent 在使用前解释危险命令的 session 指令",
+        "由沙箱兜底的 pre-tool 策略 hook",
+        "在命令结果到达模型前进行脱敏的 post-tool hook"
+      ],
+      "correct": 2,
+      "explanation": "pre-tool hook 能在产生副作用前阻止操作；策略代码失效时，沙箱会限制损害。post-tool 检查发生得太晚，无法阻止执行。"
+    },
+    {
+      "stage": "check",
+      "question": "什么情况最有理由使用 subagent？",
+      "options": [
+        "任务完成状态与批准信息应留在单个模型的私有上下文中时",
+        "确定性工作需要单独上下文时",
+        "多个 agent 需要同时不受限制地写入同一批文件时",
+        "独立 reviewer 需要隔离上下文与只读 tool 时"
+      ],
+      "correct": 3,
+      "explanation": "subagent 只有通过隔离、精简权限、独立评估或真正并行且有边界的工作，才足以抵偿成本。"
+    },
+    {
+      "stage": "check",
+      "question": "managed agent 的 SSE 连接在 session.status_running 事件后断开，且没有观察到持久化的 end_turn 事件。应用应该怎么做？",
+      "options": [
+        "从已存储 cursor 重新连接或列出持久化事件，并核对 session 状态",
+        "将 session 标记为完成，因为 SSE 关闭是 end_turn 的传输形式",
+        "启动替代 session，只把预览文本复制进去",
+        "重复最近一次 tool 调用，因为没有终止事件说明它未曾执行"
+      ],
+      "correct": 0,
+      "explanation": "stream delta 与连接状态不是持久化完成证据。应持久化 event ID 和 cursor，对重放事件去重，并使用 session 的持久化状态机。"
+    },
+    {
+      "stage": "post",
+      "question": "Claude 根据截图提议点击购买按钮。哪套控制顺序最稳妥？",
+      "options": [
+        "因为坐标类型正确，就在沙箱内执行范围内点击；出现购买结果后再请用户确认",
+        "校验最新截图与目标，要求绑定到该操作的人工批准，在沙箱中执行，再验证新截图",
+        "使用 managed agent，让内置沙箱自动授权金融操作",
+        "只要服务商的 prompt injection 分类器没有要求确认，就相信模型给出的风险标签"
+      ],
+      "correct": 1,
+      "explanation": "Computer Use 仍由 client 执行。最新视觉状态、类型明确的动作校验、沙箱、有后果操作的人工批准和操作后证据共同构成控制边界。"
+    },
+    {
+      "stage": "post",
+      "question": "哪项证据最能验证一项跨三个 sprint 的长时间 agent 任务？",
+      "options": [
+        "agent 摘要记录了每个 sprint 的完成状态，且最终输出连贯",
+        "同一 session 每次 compaction 后都能成功恢复，任务列表也没有丢失",
+        "每个 sprint 都有持久化产物、验收测试、trace 与独立 evaluator 结论",
+        "不同 subagent 分别完成每个 sprint，并对最终状态达成一致"
+      ],
+      "correct": 2,
+      "explanation": "长期一致性来自有边界的合约与外部验证，而不是自我报告、compaction 或 agent 数量。"
+    }
+  ]
+}

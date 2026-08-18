@@ -40,10 +40,31 @@
 | `## Further Reading` | `## 延伸阅读` |
 | `## Pitfalls` | `## 常见坑` |
 | `## Connections` | `## 关联` |
+| `## Interactive Lab` | `## 交互实验` |
+| `## Practice Lab` | `## 实践实验` |
+| `## Shipped Artifact` | `## 交付产物` |
+| `## Verify It` | `## 验证` |
+| `## Capstone Connection` | `## 综合项目关联` |
 | `**Type:**` | `**类型：**` |
 | `**Languages:**` | `**语言：**` |
 | `**Prerequisites:**` | `**前置要求：**` |
 | `**Time:**` | `**预计时间：**` |
+
+### 术语表字段
+
+| 英文 | 中文 |
+|---|---|
+| `Category` | `分类` |
+| `What people say` | `常见说法` |
+| `What it actually means` | `实际含义` |
+| `Why it matters` | `为什么重要` |
+| `In practice` | `实际使用` |
+| `Common confusion` | `常见混淆` |
+| `Aliases` | `别名` |
+| `Related terms` | `相关术语` |
+| `Learn it` | `学习课程` |
+| `Sources` | `来源` |
+| `Why it's called that` | `名称由来` |
 
 ### 专业术语
 

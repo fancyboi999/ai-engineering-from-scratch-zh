@@ -1,5 +1,5 @@
 /* lesson-figures.js — interactive, theme-aware figures embedded in lessons.
-   Authoring: a fenced block in docs/en.md
+   Authoring: a fenced block in docs/zh.md
        ```figure
        kv-cache
        ```

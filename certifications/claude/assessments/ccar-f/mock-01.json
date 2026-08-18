@@ -1,0 +1,1293 @@
+{
+  "id": "claude-ccar-f-mock-01",
+  "version": 2,
+  "track": "claude-ccar-f",
+  "kind": "mock",
+  "title": "架构师基础级情景模拟题",
+  "timeLimitMinutes": 120,
+  "questions": [
+    {
+      "id": "ccar-f-m1-001",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "从停止原因到工具结果实现工具使用生命周期",
+      "type": "single",
+      "prompt": "资料包 1，HelioDesk：一个支持助手在一次响应中请求 `read_case` 和 `read_active_policy`。两项调用均已获授权且彼此独立。编排执行器下一步应怎么做？",
+      "options": [
+        "执行两项调用并追加一条不含原始调用 ID 的合并自然语言观察；由于调用共享支持工单目标，随后继续执行",
+        "将两项调用转换为一个非结构化搜索查询",
+        "执行两项调用，保留每个调用 ID，在助手回合之后追加结构化工具结果，然后继续 Claude 循环",
+        "返回一条空用户消息，并等待另一个请求"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "执行器负责工具协议。彼此独立且已获授权的调用可以并发运行，但每项结果都必须与其原始调用 ID 保持关联，并在继续前按有效的对话顺序出现。",
+      "references": [
+        "certifications/claude/lessons/10-tool-use-and-agentic-loops",
+        "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-002",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "选择协调者和 subagent 拓扑",
+      "type": "single",
+      "prompt": "资料包 1，HelioDesk：工单分析很短，只使用两个读取工具，并且能轻松容纳在一个上下文中。团队因多智能体听起来更稳健而提议使用四个 subagent。最合适的初始架构是什么？",
+      "options": [
+        "使用四个具有相同工单上下文和读取权限的专业 agent，然后选择多数意见的解决方案，以在尚未衡量单个循环前提升稳健性",
+        "为解决方案中的每个句子创建一个 subagent",
+        "使用一个没有任何任务契约的协调者",
+        "使用一个有边界的 agent 循环，只有在经测量确认需要上下文容量、并行性、专业化或审阅者独立性时才增加 subagent"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "单 agent 基线更容易检查和评估。额外上下文应由具体收益证明合理性，而非功能数量；大范围重复的 agent 会造成合并和权限问题。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-003",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "使用 Task、allowedTools、隔离上下文、并行和分叉会话",
+      "type": "multiple",
+      "prompt": "资料包 1，HelioDesk：完成受理后，政策专家和工单证据专家可以独立工作。以下哪两项设计选择最合适？请选择两项。",
+      "options": [
+        "向两位专家都提供一个受保护的退款试运行工具",
+        "在第一位专家汇报后先形成暂定最终决定，仅当第二位返回直接矛盾时才修订",
+        "在隔离上下文中运行两位专家，并且只向他们提供所需的读取工具",
+        "在每位专家返回完整状态或明确的部分状态后，按主张和来源 ID 合并结果"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "隔离可保护注意力和权限边界，而结构化标识支持安全的并行归并。执行权限和过早决策并非必要，并可能把缺失证据转化为行动。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-004",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "使用 hook 实施确定性控制和规范化",
+      "type": "single",
+      "prompt": "资料包 1，HelioDesk：没有新鲜的值班经理批准令牌时，绝不能执行退款。应在哪里强制执行这一不变式？",
+      "options": [
+        "在确定性的操作前授权和服务端校验中强制执行，并由提示词说明工作流行为",
+        "在最终写作风格评分标准中",
+        "通过要求 agent 自行报告置信度",
+        "在系统提示词中定义新鲜令牌要求，并要求 agent 在选择退款工具前核验令牌时间戳和批准人身份"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "硬性授权不能依赖模型记忆或措辞。即使面对长上下文、注入、重试或模型错误，确定性门控和服务端仍可强制执行这一不变式。",
+      "references": [
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context",
+        "certifications/claude/lessons/06-governance-safety-and-responsible-use"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-005",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "强制前置条件、分解关注点并组织移交",
+      "type": "multiple",
+      "prompt": "资料包 1，HelioDesk：政策搜索返回了有效的英国证据，但在返回欧盟证据前超时。工单所在区域为欧盟。协调者的哪两项行为是正确的？请选择两项。",
+      "options": [
+        "将有效的英国结果保留为部分产物，并记录其适用范围和来源",
+        "当产品条款看似已协调统一时，将有效的英国政策作为欧盟处理的临时替代，同时标注区域假设",
+        "阻止给出欧盟建议，并重试指定缺口或依照错误契约升级处理",
+        "将研究标记为完成并注明欧盟证据缺口，允许综合环节在不重试或升级的情况下选择保守的不退款行动"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "部分工作应保持可用，但不能被误认为已覆盖全部范围。由于缺失的范围决定实际工单的处理，综合环节必须停止，直到安全重试或权威升级解决问题。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-006",
+      "domain": "tool-design-mcp-integration",
+      "objective": "编写精确的工具描述和边界",
+      "type": "single",
+      "prompt": "资料包 1，HelioDesk：`search`、`lookup` 和 `find` 都接受字符串，但分别查询公开页面、客户工单和现行政策。最合适的重设计是什么？",
+      "options": [
+        "在未改变的工具目录之上增加一个轻量路由提示词；每当第一组结果为空或不相关时，用下一个工具重试",
+        "按来源和操作重命名每个工具，添加适用与不适用的使用指引，约束 schema，并测试易混淆工具对",
+        "将它们合并到一个单独的发现工具之后，该工具通过必填的来源枚举选择公开页面、客户工单或现行政策，同时保留通用的 search 名称",
+        "保留这些名称，并添加一条应妥善选择的通用提醒"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "选择质量依赖清晰可见的接口边界。明确的来源、目的、schema 和不适用指引为模型提供决策界面，并使工具目录评估成为可能。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-007",
+      "domain": "tool-design-mcp-integration",
+      "objective": "返回结构化且考虑重试的 MCP 错误",
+      "type": "multiple",
+      "prompt": "资料包 1，HelioDesk：政策 MCP 服务器报告版本冲突。哪两个字段应指导恢复？请选择两项。",
+      "options": [
+        "一个通用的可重试冲突，以及服务器最新政策版本标识符；由客户端丢弃本地状态并重新开始",
+        "冲突双方的来源版本以及安全的下一步操作",
+        "经认证的服务器身份和请求追踪，因为受信任服务器可在下一次尝试时在内部解决版本冲突",
+        "一个冲突类别，并将可重试性标记为 false，直至状态被刷新或协调"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "冲突不是可以盲目进行的瞬态重试。客户端需要类别、来源状态和协调路径，同时受保护的内部信息与凭证必须留在结果之外。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "https://modelcontextprotocol.io/specification/latest"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-008",
+      "domain": "tool-design-mcp-integration",
+      "objective": "限定 MCP 配置和资源范围",
+      "type": "single",
+      "prompt": "资料包 1，HelioDesk：现行政策文本是带有稳定标识符且不执行操作的只读上下文。哪种 MCP 原语最适合表示它？",
+      "options": [
+        "隐藏凭证",
+        "退款执行工具",
+        "资源",
+        "提示词"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "资源表示宿主或模型可读取的上下文数据。将静态政策包装为操作工具会增加误导性语义，并可能模糊权限边界。",
+      "references": [
+        "certifications/claude/lessons/11-mcp-server-design-and-integration",
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-009",
+      "domain": "tool-design-mcp-integration",
+      "objective": "管理工具分发和工具选择",
+      "type": "multiple",
+      "prompt": "第 1 组，HelioDesk：独立执行器可在获批后发起退款。哪两项控制措施是必要的？选择两项。",
+      "options": [
+        "仅将写入工具分发给执行器角色",
+        "向协调员和研究角色暴露受保护的退款工具，并依靠审批令牌 schema 阻止任何未经授权的调用",
+        "在有限延迟后使用新的操作 ID 重试同一笔已批准退款，因为超时并不包含成功响应",
+        "要求新的授权、幂等键，并对结果未知的情况进行对账"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "最小权限分发可减少意外选择。结果丢失或发生重试时，新的审批和幂等对账可防止重复或未经授权的副作用。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-010",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "以工具使用和工具选择强制 schema",
+      "type": "single",
+      "prompt": "第 1 组，HelioDesk：某个解决方案候选项需要 `policy_section`、`case_fact_ids`、`action` 以及可为 null 的 `refund_amount`，但不得执行任何操作。最稳健的输出设计是什么？",
+      "options": [
+        "要求有说服力的散文文本，再在之后解析",
+        "将每个字段都设为必填且不可为 null 的字符串",
+        "在真实退款工具上强制使用 dry-run 模式，使其生产 schema 在不提交外部状态变更的情况下返回带类型的候选项",
+        "使用无副作用的结构化候选项 schema，在适当时强制使用它，然后验证每个字段"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "带类型的建议不应继承执行操作的权限。可为 null 的未知值可防止编造金额，而语义和来源验证决定结构有效的候选项是否获得支持。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-011",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "验证、重试并反馈语义错误",
+      "type": "multiple",
+      "prompt": "第 1 组，HelioDesk：候选项符合其 schema，但引用的政策章节并未授权所提议的操作。哪两种响应最稳健？选择两项。",
+      "options": [
+        "用政策文档标识符替换无支持的引用；只要案件事实在其他方面符合候选项 schema，就保留该操作",
+        "返回来源错误，并指明该操作及不受支持的来源",
+        "允许基于原始证据进行有限次数的修复；若不存在受支持的操作，则升级处理",
+        "当候选项通过其 schema 且引用章节属于当前政策版本时接受它，并记录支持不匹配以供审计"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Schema 有效并不能证明获得政策支持。针对性反馈可促成有支持依据的修正，而有限次数的尝试可确保政策缺口会触发升级，而不是反复编造。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/05-output-evaluation-and-validation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-012",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "分离生成器和独立审核人阶段",
+      "type": "single",
+      "prompt": "第 1 组，HelioDesk：哪种审核人输入最能保护独立判断？",
+      "options": [
+        "在隔离上下文中提供解决方案候选项、现行政策证据、案件事实、评分标准和发现项 schema",
+        "提供相同的产物、证据、事实和评分标准，但先给出生成器的完整推理过程，以便审核人专注于有争议的假设",
+        "要求同意协调员的结论",
+        "仅提供拟议的退款金额"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "审核人需要产物和证据，但不需要生成器具有说服性的推理轨迹。隔离和发现项契约可减少相关假设，并保留可执行的缺陷。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-013",
+      "domain": "context-management-reliability",
+      "objective": "放置事实以减少中间遗忘故障",
+      "type": "single",
+      "prompt": "第 1 组，HelioDesk：区域例外规则埋在数百条案件消息之间，且经常被遗漏。最稳健的上下文设计是什么？",
+      "options": [
+        "移除日期和章节 ID",
+        "将任务和硬约束置于最前，检索带来源的区域例外规则，并将决策问题放在聚焦证据之后",
+        "将所有消息重复两遍",
+        "将整个案件和政策语料保留在一个上下文中，把决策问题放在两端，并依靠标称容量加重复来实现回忆"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "聚焦检索和有意放置能在保留可验证性的同时突出关键证据。仅靠上下文容量无法保证一条埋藏的规则会主导答案。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/long-context-tips"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-014",
+      "domain": "context-management-reliability",
+      "objective": "校准置信度和人工审核",
+      "type": "multiple",
+      "prompt": "第 1 组，HelioDesk：即使常规自动化路径准确，哪两类案件也应接受强制人工审核？选择两项。",
+      "options": [
+        "高影响退款建议",
+        "信息不完整、相互冲突、新颖或证据不足的案件",
+        "低于固定自报置信度阈值的输出；该阈值基于汇总案件校准，但未按影响、新颖性或证据状态分层",
+        "输入记录异常长的案件"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "后果和可观察的证据风险应驱动审核。自报百分比不是经校准的阈值，输入长度也无法可靠预测正确性或伤害。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/06-governance-safety-and-responsible-use"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-015",
+      "domain": "context-management-reliability",
+      "objective": "跟踪来源、冲突、日期和内容类型",
+      "type": "single",
+      "prompt": "第 1 组，HelioDesk：两项已批准的政策资源包含相互冲突的生效日期，且没有优先级规则。综合处理应怎么做？",
+      "options": [
+        "选择更长的文档",
+        "选择可见生效日期最新的来源，并将另一项记录为支持性背景；假定除非受到质疑，否则新近程度决定优先级",
+        "保留两个来源版本，阻止受政策约束的操作，并将确切冲突升级给政策所有者",
+        "将日期取平均值"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "未定义的冲突是政策缺口，不是模型推理问题。在获授权的所有者解决管辖来源期间，来源信息必须保持可见。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/04-context-knowledge-memory-and-caching"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-016",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "选择协调者和 subagent 拓扑",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：一次 monorepo 迁移涉及四个彼此独立的服务适配器以及一个共享协议。哪种拓扑最稳妥？",
+      "options": [
+        "在检查适配器之前进行跨服务审查",
+        "为每条确定性测试命令分配一个 subagent",
+        "让四名适配器专家访问整个仓库并共享写权限，然后在运行协议测试前请协调者解决重叠的编辑",
+        "建立清单，并行执行有边界的适配器审查；本地结果通过验证后，再进行一次跨服务协议检查"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "每个适配器的工作受益于隔离的并行上下文，而共享协议需要后续的全局检查。清单可确保覆盖完整，并避免重复归属。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-017",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "强制前置条件、分解关注点并组织移交",
+      "type": "multiple",
+      "prompt": "资料包 2，Ridgeway：编排器应在结构上强制执行哪两项前置条件？请选择两项。",
+      "options": [
+        "协调者应在契约测试前批准整合后的设计说明，因为这样便可依据预期行为解释测试失败",
+        "所有适配器专家都应在执行期间更新同一份共享清单，以便跨服务综合始终能看到最新发现",
+        "审核人提出合并建议前，确定性的契约测试必须通过",
+        "在跨服务综合前，每个范围内的适配器都必须完成审查，或有明确命名的部分审查"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "覆盖状态和测试门槛有明确答案，应属于编排代码。风格偏好和未版本控制的共享笔记不能替代已验证的前置条件。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-018",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "恢复或分叉而不携带过期上下文",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：在一次长期迁移期间，目标依赖发布了破坏性版本，且分支发生了变化。继续前应做什么？",
+      "options": [
+        "根据清单核对文件和依赖状态，标记过期假设；若偏差重大，则以修订后的计划重新开始或分叉",
+        "从压缩后的计划恢复，仅重新运行上一次失败的命令，并将新的分支或依赖差异视为在编辑期间吸收的实现细节",
+        "恢复并重复上一次写入操作",
+        "删除所有测试证据"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "对话连续性不是权威的外部状态。核对可防止重复写入和过时规划，而新的推理分支能保护此前有效的工作。",
+      "references": [
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context",
+        "https://platform.claude.com/docs/en/agent-sdk/sessions"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-019",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "使用 hook 实施确定性控制和规范化",
+      "type": "multiple",
+      "prompt": "资料包 2，Ridgeway：哪两种 hook 用法是合适的？请选择两项。",
+      "options": [
+        "编辑后的文件发生变更后，运行有针对性的格式化或契约测试",
+        "运行一个 shell hook，将变更后的架构与仓库示例比较；当启发式相似度分数过低时阻止写入",
+        "在写入前阻止对已声明迁移范围之外的编辑",
+        "在 hook 输出中记录凭证标识符和解析后的密钥存储路径，以便在不暴露原始值的情况下复现失败的 CI 操作"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "范围门控和针对性验证是确定性、可观测的 hook 职责。语义设计判断应由经过审查的推理承担，密钥绝不能进入配置或日志。",
+      "references": [
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context",
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-020",
+      "domain": "tool-design-mcp-integration",
+      "objective": "安全选择 Claude Code 文件、shell 和搜索工具",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：agent 知道确切文件，且需要修改一个现有函数。哪种工具序列最稳妥？",
+      "options": [
+        "在整个仓库中使用宽泛的 shell 替换",
+        "读取已知文件，进行有边界的编辑，然后运行最小相关测试命令",
+        "在整个仓库中搜索类似函数，将最常见的实现复制到已知文件中，并依赖完整测试套件暴露局部差异",
+        "搜索公共网络而非仓库"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "针对特定文件的工具能表达意图，并使 diff 保持可审查。shell 仍适合运行测试，但宽泛的文本变更会带来不必要的范围和转义风险。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-021",
+      "domain": "tool-design-mcp-integration",
+      "objective": "返回结构化且考虑重试的 MCP 错误",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：一个测试运行器超时，但持久化报告显示超时前有 84 个测试通过、1 个测试失败。工具应返回什么？",
+      "options": [
+        "一条失败记录，包含运行器环境、完整命令输出和单一重试建议，但省略其中哪些 84 项结果仍然有效",
+        "成功，因为大多数测试通过",
+        "包含计数、失败测试标识、重试策略、追踪信息和完整报告引用的部分超时结果",
+        "没有任何产物的通用错误"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "结果必须同时保留有效证据和不完整的覆盖范围。结构化的部分状态让编排可以安全重试，而不会抹去已观察到的失败或暴露无关的环境数据。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-022",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "设计 CLAUDE.md 层级、导入、规则和记忆",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：根目录的 CLAUDE.md 包含一个适配器目录和单体仓库中全部六种语言的详细规则。最佳重构方案是什么？",
+      "options": [
+        "在根目录保留简洁的共享边界，并将适配器或语言规则移入每位维护者的用户记忆，以便只有相关专家加载它们",
+        "继续增加全局细节",
+        "完全删除仓库指引",
+        "在根目录保留简洁的共享边界，并将适配器或语言指引移入版本控制的导入文件和路径特定规则"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "最窄的真实作用域可在保留团队审查的同时减少上下文膨胀和冲突指令。私有配置不能充当可复现的项目策略。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "https://docs.anthropic.com/en/docs/claude-code/memory"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-023",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "应用路径特定规则",
+      "type": "multiple",
+      "prompt": "资料包 2，Ridgeway：迁移文件只能追加，而适配器代码需要契约测试。哪两项配置最稳妥？请选择两项。",
+      "options": [
+        "一条全局的只能追加规则",
+        "一条经过测试的迁移路径规则，用于只能追加和回滚要求",
+        "一个团队 shell 别名，根据变更路径选择迁移或适配器检查，但在版本控制之外分发",
+        "一条经过测试的适配器路径规则，要求运行相关契约套件"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "独立的路径规则可编码不同的局部策略，而无需在各处加载它们。fixture 路径应证明 glob 能匹配，因为未激活的规则会造成虚假的信心。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-024",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "创建项目与用户命令和 Skills",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：团队有一种可复用的迁移审查方法，包含参考资料、脚本、证据规则和停止条件。哪种 Claude Code 机制最适合将其打包？",
+      "options": [
+        "在工作流相关时加载的一个 Skill",
+        "一个内联包含完整流程的项目命令；每次命令运行时，都将脚本和参考资料复制到其提示词中",
+        "一个隐藏的写入后副作用",
+        "CLAUDE.md 中的一个密钥值"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Skill 支持对可复用方法及其资产进行渐进式披露。它应定义输入和输出，但本身不会授予工具权限或授权。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "https://docs.anthropic.com/en/docs/claude-code/memory"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-025",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "选择计划模式、直接执行或 Explore",
+      "type": "multiple",
+      "prompt": "资料包 2，Ridgeway：迁移范围尚不明确，团队不知道哪些服务依赖该解析器。实施前应先采取哪两项行动？请选择两项。",
+      "options": [
+        "使用只读探索来梳理依赖关系和测试",
+        "提供对生产元数据的只读访问，以便实施者在仓库探索或计划获批前推断运行时依赖关系",
+        "先进行一次有代表性的解析器修改以暴露隐藏依赖关系，再利用由此产生的测试失败来界定迁移范围",
+        "准备一份包含范围、风险和验证方案的计划，供审批"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "探索用于回答有边界的代码库问题，而规划让跨服务变更能在修改前被审查。大范围修改和部署权限都为时过早。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-026",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "通过结构化输出和独立审核运行无头 CI",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：哪种无头审查设计最稳健？",
+      "options": [
+        "恢复实施者的交互式会话并允许写入",
+        "使用干净的检出、版本化设置、只读工具、有界运行时间、结构化发现，以及独立的确定性测试",
+        "使用干净的检出和只读工具，但依赖标准维护者镜像中未文档化的 hook 来提供审查和安全策略",
+        "返回没有发现标识的散文"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "新鲜状态和稳定的发现 schema 让 CI 可复现，并支持修复验证。写入权限和隐藏的本地状态会削弱审查者的独立性和可审计性。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "https://docs.anthropic.com/en/docs/claude-code/sdk/sdk-headless"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-027",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "使用示例、测试驱动迭代和访谈",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：后续一次 CI 运行要验证修复。应向它提供什么输入，以将其与原始审查关联起来？",
+      "options": [
+        "仅提供已变更文件的数量",
+        "一份“修复这些问题”的模糊摘要",
+        "稳定的发现 ID、原始证据和验收规则、当前 diff，以及相关测试结果",
+        "实施者的完整对话和最新提交哈希，让审查者自行推断原本打算修复哪些发现"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "结构化发现可在新的运行之间保留正在审查的确切主张。完整记录并非必要，还可能带入过时的框架；数量则无法展示修复情况。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-028",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "陈述明确评估标准",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：CI 审查者会返回有效发现，但标记了无害的风格差异，并漏掉了协议破坏。最先应改变什么？",
+      "options": [
+        "允许审查者自行应用修复，并把得到的干净 diff 当作每项报告的风格或协议发现都有效的证据",
+        "移除确定性测试",
+        "增加输出长度",
+        "围绕行为契约定义严重程度和证据标准，再评估有代表性的 diff"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "审查者缺少正确的判断契约。明确的、以行为为中心的标准和有代表性的示例能改善优先级判断，而测试仍是精确属性的权威依据。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-029",
+      "domain": "context-management-reliability",
+      "objective": "传播结构化错误和部分结果",
+      "type": "single",
+      "prompt": "资料包 2，Ridgeway：一份 20,000 行的构建日志必须进入协调者上下文。哪种适配器输出最稳健？",
+      "options": [
+        "状态、失败目标和断言、覆盖率计数、错误类别、受影响范围、时间戳，以及完整工件引用",
+        "不提供日志信息",
+        "将完整压缩日志嵌入协调者上下文，前置命令状态和最后一个失败断言，以免丢失任何诊断细节",
+        "构建大部分成功"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "与决策相关的结构会保留失败和覆盖信息，同时把重复内容外置。任意截断可能删掉唯一的失败断言，并使部分状态看起来像完整状态。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-030",
+      "domain": "context-management-reliability",
+      "objective": "为大型代码库使用草稿本、subagent、清单和压缩",
+      "type": "multiple",
+      "prompt": "资料包 2，Ridgeway：下列哪两项陈述正确区分了大型代码库的记忆机制？请选择两项。",
+      "options": [
+        "草稿本是已完成写入的权威执行账本，而清单只存储初始范围和最终覆盖情况",
+        "清单存储持久的范围、版本、覆盖情况、发现和缺口",
+        "压缩会重建更小的工作上下文，而证据仍以外部记录为权威",
+        "每个 subagent 都应接收完整仓库历史，以便本地决策保留跨服务上下文，并各自独立应用压缩"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "清单和压缩分别解决持久状态与上下文大小问题。草稿本是临时的，而 subagent 隔离只有在输入保持有界且相关时才有效。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-031",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "选择顺序或自适应分解",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：迁移研究项目可能会根据证据发现新问题。哪种编排方法最稳健？",
+      "options": [
+        "一个拥有完整企业目录且不受限制的 agent；每当出现证据缺口，就通过提示词让它创建内部专家角色",
+        "一名协调者在确定性预算和结果契约约束下，针对已识别的缺口委派有边界的专家",
+        "为每个可想象的问题设置一个固定 agent",
+        "按来源类别固定扇出并生成自由格式报告，然后由协调者用文本相似度协调重复主张"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "自适应分解适合未知的研究前沿，但协调者仍需要结构化预算、最小化工具和类型化结果。预先分配推测性的 agent 会产生重复且无关的工作。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "https://www.anthropic.com/research/building-effective-agents"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-032",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "选择协调者和 subagent 拓扑",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：在增加专家前，团队尚未衡量单 agent 工作流。应采取什么行动？",
+      "options": [
+        "增加十名专家以最大化覆盖范围",
+        "在建立单 agent 基线之前，让多个专家处理相同的已批准来源并比较其覆盖范围，将一致性作为质量信号",
+        "为质量、重复工作、上下文增长、延迟和成本建立单 agent 基线",
+        "移除评估集"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "基线能够揭示隔离或并行是否解决了真实故障，并提供比较依据。没有基线，多 agent 复杂性就没有经过衡量的合理性。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-033",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "使用 Task、allowedTools、隔离上下文、并行和分叉会话",
+      "type": "multiple",
+      "prompt": "资料包 3，Atlas：专家分别研究安全性、成本和迁移工作量。委派契约中哪两个字段不可或缺？请选择两项。",
+      "options": [
+        "不重叠的范围和最小化的允许工具",
+        "包含来源 ID、冲突、缺口和完成状态的结构化主张结果",
+        "允许每名专家直接编辑最终报告中属于自己的部分，并用文件所有权避免合并时冲突",
+        "一条用于最大化覆盖、直到来源开始重复的宽泛指令，由每位专家自行推断合理的工具和 token 预算"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "有界的职责边界和类型化证据让并行合并不会产生重复。宽泛变更权限和未定义的完成条件会使协调者无法衡量覆盖情况或控制成本。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-034",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "强制前置条件、分解关注点并组织移交",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：独立审核人收到生成器的完整讨论内容，并复述了其中未经支持的假设。最有力的修复措施是什么？",
+      "options": [
+        "移除来源证据",
+        "保留完整讨论，但要求审核人质疑生成器的每一项假设、引用矛盾证据，并在论证具有说服力时降低置信度",
+        "让生成器审核自身",
+        "为审核人提供一个全新的上下文，其中包含报告、证据、评分标准和发现 schema，但不包含生成器带有说服力的推理轨迹"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "独立性是一种架构层面的上下文隔离，而不是角色标签。审核人仍需要完整的证据和标准，但不应继承正被质疑的推理路径。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-035",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "恢复或分叉而不携带过期上下文",
+      "type": "multiple",
+      "prompt": "资料包 3，Atlas：架构师希望比较两项彼此不兼容的迁移假设，同时不污染原始分支。哪两项做法最稳健？请选择两项。",
+      "options": [
+        "合并获得更多分支输出支持的结论，只保留胜出的理由，以便下游审核人收到一份连贯建议",
+        "将两个分叉都视为对共同证据状态的独立验证，即使该起始状态尚未核验权威性或时效性",
+        "从经过验证的共同证据状态分叉",
+        "未经协调，禁止任一分支修改共享的外部状态"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "分叉保留了供替代推理使用的分支点，而变更控制保护共享状态。它不会验证继承的证据，综合结果也必须保留实质性冲突。",
+      "references": [
+        "certifications/claude/lessons/17-agent-sdk-sessions-subagents-and-context",
+        "https://platform.claude.com/docs/en/agent-sdk/sessions"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-036",
+      "domain": "tool-design-mcp-integration",
+      "objective": "管理工具分发和工具选择",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：企业工具目录有 900 项能力，但一名安全研究员只需要公开搜索和一项内部咨询资源。最有力的方法是什么？",
+      "options": [
+        "使用有范围的渐进式发现，仅加载获授权且相关的定义",
+        "加载全部 900 个只读定义，让 Claude 能发现跨域证据，同时由服务端授权阻止研究员不该使用的工具",
+        "在工具描述里隐藏授权规则",
+        "向研究员提供写权限以提高召回率"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "有范围的发现保护上下文、选择质量和安全审查面。它必须按身份筛选，且不能暴露或授权无关能力。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "https://modelcontextprotocol.io/specification/latest"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-037",
+      "domain": "tool-design-mcp-integration",
+      "objective": "限定 MCP 配置和资源范围",
+      "type": "multiple",
+      "prompt": "资料包 3，Atlas：哪两项原语选择是恰当的？请选择两项。",
+      "options": [
+        "将有边界的来源查询操作作为工具公开，并提供结构化的部分错误",
+        "在仅验证模式中使用生产写工具以强制其 JSON 主张 schema，依靠模式标志避免外部变更",
+        "将获批准的研究语料库作为带有稳定来源溯源的信息资源公开",
+        "通过可复用 prompt 暴露凭据引用，让获批用户可以将其复制到当前 host 所选的任意研究工具中"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "资源表示上下文数据，工具表示请求的操作。凭据必须置于协议内容之外，结构化生成不应借用非必要的操作权限。",
+      "references": [
+        "certifications/claude/lessons/11-mcp-server-design-and-integration",
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-038",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "创建项目与用户命令和 Skills",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：研究人员反复使用同一套来源质量评分标准、查询序列、证据 schema 和冲突处理程序。团队应如何将其打包给 Claude Code 使用？",
+      "options": [
+        "作为一个不受限制的部署命令",
+        "作为一个带引用、输出和停止条件的版本化研究 Skill",
+        "作为根指导文件中的机密内容",
+        "作为一个项目 hook，将评分标准和查询序列插入每个研究 prompt，并在每次研究命令完成时写入自由格式报告"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Skill 提供可复用的指导和渐进式披露，同时仍可供团队进行版本控制。隐藏副作用和机密内容都不是工作流指令。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "https://docs.anthropic.com/en/docs/claude-code/memory"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-039",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "陈述明确评估标准",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：专家返回看似可信的主张，但他们对什么构成权威证据意见不一。首先该定义什么？",
+      "options": [
+        "一项共识规则：在综合前要求两名专家支持每项主张，并由协调者的置信度评分解决来源分歧",
+        "一条单一模型置信度阈值",
+        "来源权威性、时效性、主张支持、覆盖、冲突和弃权标准",
+        "更长的报告模板"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "共享评估契约能让专家和审核人围绕可观察证据达成一致。强迫一致会掩盖真正冲突，置信度本身也不能定义权威性或支持程度。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/05-output-evaluation-and-validation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-040",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "使用 few-shot 示例实现一致判断",
+      "type": "multiple",
+      "prompt": "资料包 3，Atlas：哪两类示例最能提升主张分类？选两项。",
+      "options": [
+        "一组能代表常见、已获支持主张的示例，文风多样，但不含处于边界的蕴含、冲突或证据不足情形",
+        "讨论某主题但不能蕴含该主张的来源",
+        "一个由专家标注的边缘案例，其分类与现有书面规则不一致，且事先未更新规则或解释例外",
+        "两个相互冲突、需要明确标注冲突状态的权威来源"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "边界和冲突示例能教会最容易产生分歧的判断。重复的简单案例信息增益很小；标签不一致则会破坏判断契约。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/03-prompting-and-task-decomposition"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-041",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "以工具使用和工具选择强制 schema",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：每位专家都必须返回包含来源 ID、版本、支持类别、冲突与未解决问题的主张。最强的契约是什么？",
+      "options": [
+        "一个可写入生产数据库的工具",
+        "一份省略空字段的摘要",
+        "一个按来源、版本、支持、冲突和待解决问题分节标注的详细报告模板，随后由能容忍缺失段落的解析器处理",
+        "要求使用无副作用的结构化结果 schema，并加以验证"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "类型化契约使合并和覆盖度判断具有确定性，却不授予写入权限。未知项和空状态应显式保留，避免证据缺失在综合时被吞掉。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-042",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "为适合的工作负载使用批处理",
+      "type": "multiple",
+      "prompt": "资料包 3，Atlas：在确认当前支持和限制后，哪两类工作负载适合批处理？选两项。",
+      "options": [
+        "对 40,000 份彼此独立的归档报告做离线提取",
+        "一个实时审批工作流：将请求攒至临近响应截止时间再批量提交，并随每批结果返回流式交付已完成的审批",
+        "低延迟的交互式工具循环",
+        "对已生成的主张记录做独立证据审查"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "大量相互独立的异步项目和离线审核轮次适合采用批处理，成本也更合算。自适应工具循环和实时审批需要实时续接，或重新设计成分阶段工作流。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "https://platform.claude.com/docs/en/build-with-claude/message-batches"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-043",
+      "domain": "context-management-reliability",
+      "objective": "跟踪来源、冲突、日期和内容类型",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：归约器收到两项文本相同、但来源版本和日期不同的主张。它该如何处理？",
+      "options": [
+        "按稳定的主张标识合并，同时保留两条来源记录，并应用明确的新鲜度或权威性规则",
+        "选择最先到达的一项",
+        "按规范化主张文本去重，仅保留最新来源记录，并假设它的日期无需另设权威性规则即可化解来源冲突",
+        "对来源日期取平均值"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "文本相同不能证明证据等价。版本和权威性可能改变主张的有效性，因此归约后仍须保留来源及冲突。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-044",
+      "domain": "context-management-reliability",
+      "objective": "跟踪来源、冲突、日期和内容类型",
+      "type": "multiple",
+      "prompt": "资料包 3，Atlas：一个来源是包含大量表格和脚注的 PDF。哪两项摄取实践最稳妥？选两项。",
+      "options": [
+        "按阅读顺序提取纯文本，保留文档和页码 ID，并在 OCR 成功后丢弃表格单元格与脚注间的关系",
+        "保留页面、表格、单元格关系、脚注、内容类型和提取器元数据",
+        "根据渲染后的页面或原始文件核验重要主张",
+        "把 OCR 置信度阈值当作版式和脚注关联已保留的证明，只核验低于阈值的页面"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "版式和脚注可能改变含义。结构元数据和渲染检查能确保引文可定位，并暴露纯文本或 OCR 置信度可能掩盖的提取风险。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "https://platform.claude.com/docs/en/build-with-claude/citations"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-045",
+      "domain": "context-management-reliability",
+      "objective": "校准置信度和人工审核",
+      "type": "single",
+      "prompt": "资料包 3，Atlas：系统只审核其标记为低置信度的主张。增加哪类审核最能发现失效的置信度路由？",
+      "options": [
+        "跨来源类型对低置信度主张做分层抽样，因为置信度路由已识别出模型最可能出错的地方",
+        "随机抽样普通的、已通过的主张",
+        "上线后不再进行人工审核",
+        "只审核来自一名专家的主张"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "风险触发审核能捕捉已知危险；随机抽样则用于衡量这些触发条件以外的漏判。没有它，失准的标记器可能始终不被发现。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-046",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "选择顺序或自适应分解",
+      "type": "single",
+      "prompt": "资料包 4，Harbor：CI 必须提取变更记录、运行确定性检查、生成发现、独立审核这些发现，并发布产物。哪种编排最稳妥？",
+      "options": [
+        "让一个有界 agent 根据仓库上下文决定提取、测试、审核和发布顺序，最终关卡只检查产物是否存在",
+        "在验证前发布",
+        "带有结构性关卡的固定流水线，仅在受限的生成和审核阶段使用模型推理",
+        "为每个 schema 字段使用一个新的 subagent"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "阶段顺序已知，应由代码强制执行。模型推理仍适合语义发现，但确定性测试和发布前提应置于其外。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-047",
+      "domain": "agentic-architecture-orchestration",
+      "objective": "强制前置条件、分解关注点并组织移交",
+      "type": "multiple",
+      "prompt": "资料包 4，Harbor：哪两项交接字段能让下游发布负责人安全地采取行动？选两项。",
+      "options": [
+        "部分完成或受阻范围、残余风险、所需决策和回退方案",
+        "稳定的发现和产物 ID，以及精确的检查状态",
+        "生成器的 transcript 和工具日志，使发布负责人需要时能重建产物标识、失败检查和回退决策",
+        "润色后的就绪摘要，含汇总通过数和负责人，把各个受阻范围和残余风险留在源系统中"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "发布负责人需要可核验状态、未解决范围和明确选项。漂亮的文字或原始过程轨迹都会迫使其重新发现信息，也可能掩盖阻塞性失败。",
+      "references": [
+        "certifications/claude/lessons/16-multi-agent-orchestration-and-delegation",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-048",
+      "domain": "tool-design-mcp-integration",
+      "objective": "限定 MCP 配置和资源范围",
+      "type": "single",
+      "prompt": "数据包 4，Harbor：仓库应共享一项 MCP 测试服务声明，但 CI 和开发者使用各自配置的 token。哪种配置最合理？",
+      "options": [
+        "将项目声明纳入版本控制，但在 CI 和本地环境中使用同一个集中共享的开发者 token，以保持配置行为一致",
+        "将 token 写入 CLAUDE.md",
+        "为实现可复现性提交所有 token",
+        "将安全的项目声明纳入版本控制，并引用由获准 CI 或用户密钥存储注入的凭据"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "共享的服务器行为应属于项目范围，而凭据值必须保留在外部，并与身份绑定。这样既能保留可复现性，也不会暴露密钥或混淆不同环境。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-049",
+      "domain": "tool-design-mcp-integration",
+      "objective": "管理工具分发和工具选择",
+      "type": "single",
+      "prompt": "数据包 4，Harbor：CI 需要一份带类型的变更记录，但不应发布或部署。哪种工具选择设计最合理？",
+      "options": [
+        "强制使用无副作用的提取契约，并且不向 CI 分发发布工具",
+        "要求输出散文并跳过解析",
+        "向审核者提供所有生产写入工具",
+        "强制以文档说明的仅验证模式运行部署工具，并依赖其带类型的响应，尽管生产能力仍被分发给 CI"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "对带类型输出的要求不能成为授予操作权限的理由。工具分发和选择应强制结构化生成，而部署仍应置于独立的获批阶段之后。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-050",
+      "domain": "tool-design-mcp-integration",
+      "objective": "返回结构化且考虑重试的 MCP 错误",
+      "type": "multiple",
+      "prompt": "数据包 4，Harbor：一个测试服务在完成五个独立测试套件中的两个后返回了限流错误。哪两种响应最合理？请选择两项。",
+      "options": [
+        "在指定延迟后重试全部五个套件",
+        "将通过的两个套件作为依据，有条件地标记该阶段完成，并将剩余三个安排为发布后验证",
+        "保留已完成套件的结果、身份信息和来源记录",
+        "返回可重试的限流类别，并附上剩余范围和安全重试时间"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "结构化的部分状态可以避免重复工作，并保留已经观察到的失败。重试元数据让编排系统能在服务策略约束下，仅继续处理尚未解决的套件。",
+      "references": [
+        "certifications/claude/lessons/18-tool-contracts-errors-and-progressive-discovery",
+        "https://modelcontextprotocol.io/specification/latest"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-051",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "设计 CLAUDE.md 层级、导入、规则和记忆",
+      "type": "single",
+      "prompt": "数据包 4，Harbor：CI 的行为依赖于仅存储在一名维护者用户记忆中的审核规则。最合理的修复是什么？",
+      "options": [
+        "移除配置审计",
+        "将共享审核策略移入受版本控制的项目指南或作用域规则，并测试 CI 是否加载它",
+        "将策略保留在维护者记忆中，并在仓库中添加若干合规示例，让无头 CI 能从先例推断出相同的审核行为",
+        "审核后将它复制到模型输出中"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "团队和 CI 行为必须来自可审核的项目状态。用户记忆适用于个人偏好，不适合存放必需的共享策略或可复现的关卡。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "https://docs.anthropic.com/en/docs/claude-code/memory"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-052",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "应用路径特定规则",
+      "type": "multiple",
+      "prompt": "数据包 4，Harbor：发布清单需要 schema 测试，而文档变更需要链接检查。哪两种配置最合理？请选择两项。",
+      "options": [
+        "用夹具文件证明每条规则只会在预期的位置生效",
+        "针对 glob 语法审核两条路径规则，但不在无头环境中用正反夹具文件实际运行它们",
+        "为清单和文档 glob 分别设置经过测试的路径规则",
+        "一个全局 hook 在运行时检测文件类型并调用 schema 或链接检查；它维护在 CI 镜像中，而非受版本控制的路径规则中"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "范围精确且经过测试的 glob 会加载相关策略，并暴露匹配错误。宽泛而不透明的 hook 会增加意外行为，而未经测试的规则可能悄然失去保护作用。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-053",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "通过结构化输出和独立审核运行无头 CI",
+      "type": "single",
+      "prompt": "数据包 4，Harbor：一个无头审核者目前输出无法在多次运行之间对齐的散文。哪种输出最合理？",
+      "options": [
+        "一条自动合并命令",
+        "一份受版本控制的散文报告，包含文件路径、引用证据和严重性标题，并依赖问题顺序和措辞来对齐多次运行的发现",
+        "包含稳定 ID、文件、证据、严重性、规则和处置结果的结构化发现",
+        "仅提供一个总体质量分数"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "稳定的结构化发现支持去重、修复验证和审计。分数无法指出失败的断言，而且审核应与修改或合并权限保持分离。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-054",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "使用示例、测试驱动迭代和访谈",
+      "type": "single",
+      "prompt": "数据包 4，Harbor：一项生成的流水线变更应当保持原有行为。哪种实现循环最合理？",
+      "options": [
+        "大范围编辑，然后询问它看起来是否正确",
+        "使用只覆盖顺利路径的示例",
+        "先进行有边界的变更，再请独立审核者从 diff 推断行为是否保持；仅当其报告不确定性时才运行确定性测试",
+        "先建立一个失败测试或特征测试，再进行有边界的变更，运行聚焦且与风险相称的关卡，最后检查真实产物"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "测试定义可观察行为，并能定位回归。独立审核是对确定性验证的补充而非替代；检查产物可以捕捉打包或渲染边界的问题。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-055",
+      "domain": "claude-code-configuration-workflows",
+      "objective": "通过结构化输出和独立审核运行无头 CI",
+      "type": "multiple",
+      "prompt": "数据包 4，Harbor：哪两项控制措施可以提高模型辅助 CI 发现的可复现性？请选择两项。",
+      "options": [
+        "使用固定在 CI 镜像中但未在项目配置中声明的集中安装审核命令，因为镜像本身已受版本控制",
+        "设置有界的时间、轮次、成本和允许使用的工具",
+        "恢复实现者最近的会话，以保留审核意图和先前的工具证据，同时记录当前提交和确定性测试结果",
+        "记录提交、模型或运行时配置、设置、prompt 或 Skill 版本以及输入产物"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "已声明的版本和执行边界使运行结果可比较，并限制故障范围。交互式会话和隐藏命令会引入其他运行无法复现的未跟踪状态。",
+      "references": [
+        "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
+        "https://docs.anthropic.com/en/docs/claude-code/sdk/sdk-headless"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-056",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "以工具使用和工具选择强制 schema",
+      "type": "single",
+      "prompt": "资料包 4，Harbor：某些变更通知没有生效日期。schema 应如何表示？",
+      "options": [
+        "将字段设为必填，但允许携带审核元数据的显式 null 或 unknown 状态",
+        "要求 ISO 日期，并让模型根据附近的发布上下文推断；若来源遗漏此值，则为审核者记录低置信度",
+        "静默丢弃日期缺失的记录",
+        "使用不受约束的自由格式字符串"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "字段既必填又可为空，会迫使系统给出有来源支持的明确值或已知缺失状态。这样既能防止静默遗漏，也能降低杜撰看似合理日期的压力。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "https://platform.claude.com/docs/en/build-with-claude/structured-outputs"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-057",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "验证、重试并反馈语义错误",
+      "type": "multiple",
+      "prompt": "资料包 4，Harbor：记录的结束日期早于开始日期，并且其引用片段没有结束日期。哪两个校验器应该拒绝它？请选择两项。",
+      "options": [
+        "针对不可能日期关系的语义校验",
+        "schema 校验：要求两个字段都包含 ISO 格式日期，但不比较它们的关系，也不验证来源支持",
+        "让模型审核从提取记录中标记不一致日期，但不给它访问引用的来源片段",
+        "针对缺乏来源支持的提取值的来源校验"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "载荷可能已能解析并匹配 schema，却仍在内部无效且缺乏来源支持。语义校验和证据校验分别处理这两类不同的失败。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/09-structured-output-and-defensive-parsing"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-058",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "分离生成器和独立审核人阶段",
+      "type": "single",
+      "prompt": "资料包 4，Harbor：生成器在审核过程中悄悄更正自己的记录，因此 CI 无法分辨哪些字段最初失败。最有力的重构是什么？",
+      "options": [
+        "允许原地更正，但要求生成器在审核后添加变更摘要字段，并把该自述摘要作为审计轨迹",
+        "要求独立审核人先输出发现 ID 和证据，再进行受控的更正阶段",
+        "在不记录错误的情况下增加重试上限",
+        "删除源版本"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "发现必须独立于更正而保留，才能支持审计、评估和修复检查。静默重写会掩盖缺陷，也阻碍从失败中学习。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "certifications/claude/lessons/14-evals-testing-debugging-and-observability"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-059",
+      "domain": "prompt-engineering-structured-output",
+      "objective": "为适合的工作负载使用批处理",
+      "type": "multiple",
+      "prompt": "资料包 4，Harbor：异步提取作业乱序返回结果，且 3% 的项目会过期。哪两项控制措施是必要的？请选择两项。",
+      "options": [
+        "按时间戳排序请求和响应后，按数组位置关联，假设服务会始终如一地完成同优先级项目",
+        "按稳定 custom ID 关联结果，而不是数组位置",
+        "持久保存来源、schema 和 prompt 的版本，并且只重试符合条件的失败项目",
+        "首次失败结果在重试成功后予以替换，使下游用户只看到最新输出，同时保留聚合重试指标"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "稳定身份和版本化输入使异步结果能够对账。选择性重试会保留有效工作，并防止来源变化在不被察觉的情况下改写历史决策。",
+      "references": [
+        "certifications/claude/lessons/20-reliable-extraction-batch-and-reviewers",
+        "https://platform.claude.com/docs/en/build-with-claude/message-batches"
+      ]
+    },
+    {
+      "id": "ccar-f-m1-060",
+      "domain": "context-management-reliability",
+      "objective": "跟踪来源、冲突、日期和内容类型",
+      "type": "single",
+      "prompt": "资料包 4，Harbor：一条发布记录结合了 Markdown 变更通知、JSON 清单、测试日志和渲染后的仪表板。哪种可靠性资料包最强？",
+      "options": [
+        "仅保留仪表板截图",
+        "仅保留模型置信度百分比",
+        "一份清单：保留每种内容类型、版本、日期、位置、提取方法、结构化的部分错误、冲突以及完整产物引用",
+        "一条规范化 JSON 记录：把每种内容类型都转换为文本，嵌入最重要的摘录，并在验证后省略原始产物位置"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "不同格式承载不同的结构性含义。来源信息丰富的清单让审核者能够追溯主张、发现渲染损失、保留部分状态，并安全地解决冲突。",
+      "references": [
+        "certifications/claude/lessons/21-long-context-reliability-provenance-and-escalation",
+        "certifications/claude/lessons/31-architect-foundations-scenario-capstone"
+      ]
+    }
+  ]
+}

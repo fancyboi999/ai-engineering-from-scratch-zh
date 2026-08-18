@@ -1,0 +1,78 @@
+{
+  "lesson": "15-claude-code-for-development-teams",
+  "title": "Claude Code 通过共享约束扩展到团队",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "项目 CLAUDE.md 最重要的用途是什么？",
+      "options": [
+        "记录项目环境值，包括常用开发命令需要的 secret",
+        "作为精简的上手合约，包含命令、布局与不直观的约束",
+        "用更强的自然语言仓库规则取代确定性测试与 hook",
+        "保存完整 API 参考，让每个 session 无需打开其他文件就能工作"
+      ],
+      "correct": 1,
+      "explanation": "精简的项目指南提供反复需要的仓库事实，并指向更深入的来源，不会让每个 session 都背负一本手册。"
+    },
+    {
+      "stage": "check",
+      "question": "开发者希望 Claude Code 无需询问即可编辑文件，但其他终端命令仍需批准。哪种 permission mode 符合该边界？",
+      "options": [
+        "default",
+        "bypassPermissions",
+        "acceptEdits",
+        "dontAsk"
+      ],
+      "correct": 2,
+      "explanation": "acceptEdits 取消逐次编辑批准，同时保留其他命令的权限检查。它不会授权发布、部署或任意 shell 操作。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么团队 settings 与 hook 必须像代码一样接受审查？",
+      "options": [
+        "它们会影响本地开发者行为，却无法改变 headless 或自动化执行",
+        "只有可执行 hook 才能改变权限或信任边界",
+        "纳入版本管理后便是安全的，因为仓库历史会自动提供回滚",
+        "它们可以改变权限、tool、执行行为与信任边界"
+      ],
+      "correct": 3,
+      "explanation": "配置可以授予 shell、文件系统、网络、MCP 与生命周期行为。文件能被解析，不代表它产生的实际行为安全。"
+    },
+    {
+      "stage": "check",
+      "question": "command hook 应如何返回结构化的 PermissionRequest 拒绝？",
+      "options": [
+        "以退出码 0 退出，并在 hookSpecificOutput 中返回 PermissionRequest JSON decision",
+        "以退出码 1 退出，并向 stderr 打印 JSON decision，让普通 Unix 失败语义阻止请求",
+        "以退出码 0 退出并向 stdout 打印纯文本，依赖文本覆盖命中的 permission deny rule",
+        "以退出码 2 退出并向 stdout 打印 JSON decision，让 Claude Code 解析并执行两种信号"
+      ],
+      "correct": 0,
+      "explanation": "结构化控制要求退出码为 0，stdout 只输出 JSON。退出码 2 是使用 stderr 的另一条阻止路径，同时打印的 JSON 会被忽略。"
+    },
+    {
+      "stage": "post",
+      "question": "哪种 CI 设计最适合安全地自动审查 pull request？",
+      "options": [
+        "固定 review plugin，并在主工作目录中启用所有可用 tool",
+        "最小权限、隔离 checkout、有界运行、结构化产物与人工审查",
+        "只读仓库访问，加上用于 fork 变更集成测试的生产 secret",
+        "写 token、开放网络，并在检查通过后直接 merge"
+      ],
+      "correct": 1,
+      "explanation": "headless execution 移除了交互监督，因此能力、时间、token、网络与公开操作边界必须更加严格。"
+    },
+    {
+      "stage": "post",
+      "question": "Anthropic managed Code Review 与官方 Claude Code GitHub Action 有什么区别？",
+      "options": [
+        "Managed Code Review 可以读取仓库指导，而 Action 无法加载 CLAUDE.md 或 Skill",
+        "Managed Code Review 会自动成为必需的 GitHub check，而 Action 只能留下可选 comment",
+        "Managed Code Review 是托管服务；Action 在仓库自己的 workflow 中运行",
+        "Managed Code Review 仅适用于私有仓库，而 Action 仅限公开仓库"
+      ],
+      "correct": 2,
+      "explanation": "Managed Code Review 在 Anthropic 基础设施上运行，只报告 finding，不会批准或阻止。官方 Action 在团队 workflow 中运行，由团队配置仓库权限、trigger、tool 与 secret。"
+    }
+  ]
+}

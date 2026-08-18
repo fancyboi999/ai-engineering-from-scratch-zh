@@ -95,6 +95,24 @@ function objectFigures(source, declaration) {
   });
 }
 
+function certificationFigures(source, filename) {
+  let registered = null;
+  const LF = {
+    el() { return {}; },
+    slider() { return {}; },
+    select() { return {}; },
+    clamp(value, min, max) { return Math.max(min, Math.min(max, value)); },
+    register(figures) { registered = figures; },
+  };
+  vm.runInNewContext(source, {
+    window: { LF },
+    document: {},
+    console,
+  }, { filename });
+  assert.ok(registered && typeof registered === 'object', 'certification renderer must register a figure map');
+  return Object.keys(registered);
+}
+
 function allZhDocs(dir) {
   const files = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -124,7 +142,10 @@ function staticRegistry() {
   for (const match of lesson.matchAll(/<script src="(figures-[^"]+\.js\?[^" ]+)"/g)) {
     const source = match[1].split('?')[0];
     if (source === 'figures-manifest.js') continue;
-    entries.push([source, registeredFigures(fs.readFileSync(path.join(site, source), 'utf8'))]);
+    const sourceText = fs.readFileSync(path.join(site, source), 'utf8');
+    entries.push([source, source === 'figures-claude-certifications.js'
+      ? certificationFigures(sourceText, path.join(site, source))
+      : registeredFigures(sourceText)]);
   }
   return entries;
 }
@@ -199,6 +220,11 @@ async function main() {
   assert.equal(new Set(fenceNames).size, 509, 'figure fence names must be unique');
   const missing = fenceNames.filter(function (name) { return !completeRegistry.has(name); });
   assert.deepEqual(missing, [], 'every zh figure fence must have a renderer');
+  const certFenceNames = figureFences(allZhDocs(path.join(root, 'certifications', 'claude', 'lessons')));
+  assert.equal(certFenceNames.length, 33, 'all certification figure fences must be counted');
+  assert.equal(new Set(certFenceNames).size, 33, 'certification figure fence names must be unique');
+  const missingCert = certFenceNames.filter(function (name) { return !completeRegistry.has(name); });
+  assert.deepEqual(missingCert, [], 'every certification figure fence must have a renderer');
   assert.ok(legacyRegistry.size > 0, 'legacy static renderers must remain registered');
 
   const noFigure = createLoader();
@@ -256,7 +282,7 @@ async function main() {
   assert.equal(retry.mounts.length, 2);
 
   console.log('figure loader audit passed: ' + names.length + ' lazy figures across ' + byModule.size +
-    ' modules; 509/509 fences covered with no duplicate registrations');
+    ' modules; 509/509 core fences and 33/33 certification fences covered with no duplicate registrations');
 }
 
 main().catch(function (error) {

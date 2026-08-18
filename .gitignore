@@ -55,7 +55,13 @@ mlruns/
 .gstack/
 
 .link-cache.json
+# 本地 Claude 设置仍忽略；只发布认证导师 wrapper，让新 clone 能自动发现。
 .claude/
+!.claude/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/claude-certification/
 # impeccable 工具的本地缓存/配置（config.json、hook.cache.json），任意层级，不入库
 .impeccable/
 
@@ -65,6 +71,8 @@ site/sitemap.xml
 site/llms.txt
 # 由 build.js 每次部署写入，记录本次部署的 git 分支（供 lesson.html 按分支拉取 docs）
 site/build-meta.js
+# 认证课程数据也由 build.js 在部署时生成，不提交。
+site/certification-data.js
 # 预渲染静态课程页（writeLessonPages 生成，503 个 index.html）——同款策略不提交
 site/lessons/
 

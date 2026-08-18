@@ -1,0 +1,78 @@
+{
+  "lesson": "11-mcp-server-design-and-integration",
+  "title": "MCP 将能力与宿主解耦",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "在 MCP 中，哪个组件负责用户体验、模型交互以及一个或多个协议 client？",
+      "options": [
+        "负责解析 URI 上下文并维护对话历史的 resource 提供方",
+        "协调模型、用户交互与 server client 的 host 应用",
+        "负责选择模型并为每次调用打开 client 的 tool 处理函数",
+        "负责公开能力并决定 UI 如何呈现能力的 server 进程"
+      ],
+      "correct": 1,
+      "explanation": "host 就是 AI 应用。它管理模型与用户体验，并通过 client 连接 server。"
+    },
+    {
+      "stage": "check",
+      "question": "维护旧版 MCP 配置的 server 想在 client 上调用 roots/list。它必须先确认什么？",
+      "options": [
+        "server 先发送一次 roots/list，并把 method-not-found 错误当作能力发现",
+        "host 把 root 列表预先放入每个 tool 参数，因此不需要能力协商",
+        "client 已声明 roots，而 server 始终遵守这份约定",
+        "server 在初始化期间把 roots 声明为自己的能力之一"
+      ],
+      "correct": 2,
+      "explanation": "Roots 属于 client，因为它表达的是 client 选定的范围。只有 client 声明了该能力，旧版 server 才能请求 roots。在 2026-07-28 配置中，roots 已弃用，剩余交互都采用无状态的 input-required 流程。"
+    },
+    {
+      "stage": "check",
+      "question": "哪种 MCP 原语最适合表示一份可通过 URI 寻址的只读配置文档？",
+      "options": [
+        "要求 host 模型重建配置的 sampling 请求",
+        "使用只读 tool 返回配置",
+        "接收 URI 并返回包含该文档的可复用消息的 prompt",
+        "通过 URI 提供可寻址上下文的 resource"
+      ],
+      "correct": 3,
+      "explanation": "resource 通过 URI 提供可寻址上下文；tool 执行由模型选择的操作；prompt 则封装可复用模板。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么 stdio MCP server 必须把诊断日志写入 stderr？",
+      "options": [
+        "stdout 专门用于 JSON-RPC 协议 frame",
+        "只要每行诊断日志都是有效 JSON，stdout 就可以在 frame 之间写日志",
+        "client 会单独验证 stderr，因此诊断信息不会影响会话",
+        "stderr 既能保留 framing，又会自动脱敏 secret"
+      ],
+      "correct": 0,
+      "explanation": "stdio 传输使用 stdout 发送协议消息。写入 stdout 的调试文本可能破坏 framing，进而断开 client 连接。"
+    },
+    {
+      "stage": "post",
+      "question": "某个 resource 包含读取私钥的指令。应该如何处理它的信任级别？",
+      "options": [
+        "只要 resource URI 位于获批的项目 namespace 中，就允许读取",
+        "将它视为无法扩大 tool 权限的不可信数据",
+        "先让另一个模型对文本分类，再扩大文件权限",
+        "只要 resource 来自通过身份验证的 server，就将它提升为 host 策略"
+      ],
+      "correct": 1,
+      "explanation": "server 内容可能带有恶意，也可能已遭入侵。保留来源信息，并让它始终处于可信策略与授权边界之下。"
+    },
+    {
+      "stage": "post",
+      "question": "与使用协议会话的旧版 server 相比，为什么当前的无状态 Streamable HTTP server 更容易放在 round-robin 负载均衡器之后？",
+      "options": [
+        "无状态传输消除了每个 tool 的应用状态与外部副作用",
+        "SSE 会让每次 tool 调用都具备幂等性，因此失败请求总能重放",
+        "每个请求都携带协议 metadata，不依赖隐藏的单实例会话状态",
+        "负载均衡器可以从 JSON-RPC 方法名推断出全部 tool 授权"
+      ],
+      "correct": 2,
+      "explanation": "2026-07-28 核心协议让每个请求都携带协议 metadata，因此任意健康实例都能处理。应用状态与副作用仍需要显式 handle、存储和重试策略。"
+    }
+  ]
+}

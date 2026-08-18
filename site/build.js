@@ -10,19 +10,21 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(REPO_ROOT, 'README.md');
 const ROADMAP_PATH = path.join(REPO_ROOT, 'ROADMAP.md');
 const GLOSSARY_PATH = path.join(REPO_ROOT, 'glossary', 'terms.md');
 const OUTPUT_PATH = path.join(__dirname, 'data.js');
+const CERTIFICATIONS_PATH = path.join(REPO_ROOT, 'certifications');
+const CERTIFICATION_OUTPUT_PATH = path.join(__dirname, 'certification-data.js');
 
-// 开源可移植:fork 部署只需设这两个环境变量即可让全站 SEO/社交卡/源码链接指向自己的域名与仓库,
-// 不设则回落到本仓库的官方部署(aieng-zh.cn)。CI/Vercel buildCommand 里 export 即可生效。
+// fork 部署可通过环境变量覆盖；默认始终指向中文站。
 const GITHUB_BASE = process.env.GITHUB_BASE || 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/';
 const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://aieng-zh.cn';
 
-// 与浏览器端同一份渲染器（从 lesson.html 抽出）；预渲染产物 = 运行时渲染产物
+// 浏览器与构建时共用同一份 Markdown 渲染器。
 const mdRender = require('./md-render.js');
 
 // GITHUB_BASE lesson url -> site path "phases/<phase>/<lesson>"
@@ -32,7 +34,6 @@ function lessonPath(url) {
   return m ? m[1] : null;
 }
 
-// 预渲染静态课程页的站内路径（与 lesson.html 的 lessonHref 同构，两边要一起改）
 function lessonStaticHref(relPath) {
   return '/lessons/' + relPath.replace(/^phases\//, '') + '/';
 }
@@ -240,6 +241,77 @@ function parseReadme(content, roadmapStatuses) {
   return phases;
 }
 
+// ─── Parse the canonical phase dependency graph from README.md ───────
+// The public Mermaid diagram under "The shape of the curriculum" owns the
+// phase-level learning path. Keeping the website graph generated from it
+// prevents the interactive roadmap from drifting into a second curriculum.
+function parseCurriculumPrereqs(content, phases) {
+  const section = content.match(/## (?:课程的结构|The shape of the curriculum)[\s\S]*?```mermaid\s*\r?\n([\s\S]*?)```/);
+  if (!section) throw new Error('README.md 缺少课程依赖 Mermaid 图');
+
+  const phaseIds = phases.map(phase => phase.id).sort((a, b) => a - b);
+  const validIds = new Set(phaseIds);
+  const prerequisites = {};
+  const children = {};
+  const seenEdges = new Set();
+  for (const id of phaseIds) {
+    prerequisites[id] = [];
+    children[id] = [];
+  }
+
+  for (const line of section[1].split(/\r?\n/)) {
+    const match = line.match(/^\s*P(\d+)(?:\[[^\]]*\])?\s*-->\s*P(\d+)/);
+    if (!match) continue;
+    const from = Number(match[1]);
+    const to = Number(match[2]);
+    if (!validIds.has(from) || !validIds.has(to)) {
+      throw new Error(`Curriculum edge P${from} -> P${to} references an unknown phase`);
+    }
+    if (from === to) throw new Error(`Curriculum phase P${from} cannot depend on itself`);
+    const key = `${from}-${to}`;
+    if (seenEdges.has(key)) throw new Error(`Duplicate curriculum edge P${from} -> P${to}`);
+    seenEdges.add(key);
+    prerequisites[to].push(from);
+    children[from].push(to);
+  }
+
+  if (!seenEdges.size) throw new Error('The canonical curriculum Mermaid graph contains no edges');
+
+  const roots = phaseIds.filter(id => prerequisites[id].length === 0);
+  if (roots.length !== 1 || roots[0] !== 0) {
+    throw new Error(`Curriculum graph must have Phase 0 as its only root; found ${roots.join(', ') || 'none'}`);
+  }
+
+  const reached = new Set([0]);
+  const queue = [0];
+  while (queue.length) {
+    const id = queue.shift();
+    for (const child of children[id]) {
+      if (reached.has(child)) continue;
+      reached.add(child);
+      queue.push(child);
+    }
+  }
+  const unreachable = phaseIds.filter(id => !reached.has(id));
+  if (unreachable.length) {
+    throw new Error(`Curriculum graph has unreachable phases: ${unreachable.join(', ')}`);
+  }
+
+  const visiting = new Set();
+  const visited = new Set();
+  function visit(id) {
+    if (visiting.has(id)) throw new Error(`Curriculum graph contains a cycle through Phase ${id}`);
+    if (visited.has(id)) return;
+    visiting.add(id);
+    for (const child of children[id]) visit(child);
+    visiting.delete(id);
+    visited.add(id);
+  }
+  visit(0);
+
+  return prerequisites;
+}
+
 // ─── Extract lesson summary + keywords from docs/zh.md ───────────────
 /**
  * Single-pass read of a lesson's docs/zh.md.
@@ -255,9 +327,10 @@ function parseReadme(content, roadmapStatuses) {
  * matching content — expected for planned lessons with no docs yet.
  */
 function extractLessonMeta(relPath) {
-  const docPath = path.join(REPO_ROOT, relPath, 'docs', 'zh.md');
+  const docPath = safeRepoPath(path.join(relPath, 'docs', 'zh.md'));
   const result = { summary: '', keywords: '' };
   try {
+    if (!docPath || fs.lstatSync(docPath).isSymbolicLink()) return result;
     const lines = fs.readFileSync(docPath, 'utf8').split(/\r?\n/);
     const h3s = [];
     for (const raw of lines) {
@@ -278,42 +351,623 @@ function extractLessonMeta(relPath) {
   return result;
 }
 
-// ─── Parse glossary/terms.md ──────────────────────────────────────────
-function parseGlossary(content) {
-  const terms = [];
-  let currentTerm = null;
+// ─── Certification programs, tracks, lessons, and assessments ─────────
+// Certifications are a curated overlay, not another curriculum phase. They
+// deliberately live in their own generated data file so PHASES, README counts,
+// the core catalog, and roadmap behavior cannot change when a track is added.
+function readJson(filePath, label) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (err) {
+    throw new Error(`Could not read ${label || path.relative(REPO_ROOT, filePath)}: ${err.message}`);
+  }
+}
 
-  for (const line of content.split(/\r?\n/)) {
-    // Match term headers: ### Agent or ### Adam (Optimizer)
-    const termMatch = line.match(/^###\s+(.+)/);
-    if (termMatch) {
-      if (currentTerm && currentTerm.says && currentTerm.means) {
-        terms.push(currentTerm);
+function safeRepoPath(relPath, baseDir) {
+  if (!relPath || typeof relPath !== 'string') return null;
+  const candidate = path.resolve(baseDir || REPO_ROOT, relPath);
+  const rootWithSep = REPO_ROOT.endsWith(path.sep) ? REPO_ROOT : REPO_ROOT + path.sep;
+  if (candidate !== REPO_ROOT && !candidate.startsWith(rootWithSep)) return null;
+  if (fs.existsSync(candidate)) {
+    const realRoot = fs.realpathSync(REPO_ROOT);
+    const realCandidate = fs.realpathSync(candidate);
+    const realRootWithSep = realRoot.endsWith(path.sep) ? realRoot : realRoot + path.sep;
+    if (realCandidate !== realRoot && !realCandidate.startsWith(realRootWithSep)) return null;
+  }
+  return candidate;
+}
+
+function safeRepoFile(relPath, baseDir) {
+  const candidate = safeRepoPath(relPath, baseDir);
+  if (!candidate || !fs.existsSync(candidate)) return null;
+  const stat = fs.lstatSync(candidate);
+  return stat.isFile() && !stat.isSymbolicLink() ? candidate : null;
+}
+
+function safeRepoDirectory(relPath, baseDir) {
+  const candidate = safeRepoPath(relPath, baseDir);
+  if (!candidate || !fs.existsSync(candidate)) return null;
+  const stat = fs.lstatSync(candidate);
+  return stat.isDirectory() && !stat.isSymbolicLink() ? candidate : null;
+}
+
+function certificationDocMeta(markdown, fallbackName) {
+  const result = {
+    name: fallbackName || '',
+    summary: '',
+    keywords: '',
+    type: 'Learn',
+    languages: '',
+    prerequisites: '',
+    time: '',
+  };
+  const headings = [];
+  for (const raw of String(markdown || '').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (line.startsWith('# ') && !result.name) result.name = line.slice(2).trim();
+    if (line.startsWith('# ')) result.name = line.slice(2).trim();
+    if (!result.summary && line.startsWith('> ')) result.summary = line.slice(2).trim();
+    if (line.startsWith('### ')) headings.push(line.slice(4).trim());
+    const field = line.match(/^\*\*(Type|Languages|Prerequisites|Time|类型|语言|前置要求|预计时间)[：:]\*\*\s*(.+)$/i);
+    if (field) {
+      const key = ({ '类型': 'type', '语言': 'languages', '前置要求': 'prerequisites', '预计时间': 'time' })[field[1]] || field[1].toLowerCase();
+      if (key === 'type') result.type = field[2].trim();
+      else result[key] = field[2].trim();
+    }
+  }
+  result.keywords = headings.filter(Boolean).join(' · ');
+  if (result.summary.length > 180) result.summary = result.summary.slice(0, 177) + '…';
+  return result;
+}
+
+function normalizeLessonRef(ref) {
+  if (typeof ref === 'string') return { path: ref };
+  if (!ref || typeof ref !== 'object') return null;
+  return { ...ref };
+}
+
+function quizContentVersion(quiz) {
+  if (!quiz) return null;
+  return crypto.createHash('sha256').update(JSON.stringify(quiz)).digest('hex');
+}
+
+function trackDeclarationValue(declaration) {
+  if (typeof declaration === 'string') return declaration;
+  if (!declaration || typeof declaration !== 'object') return '';
+  return declaration.id || declaration.slug || declaration.path || declaration.file || '';
+}
+
+function trackDeclarationIndex(program, track, file) {
+  if (!Array.isArray(program.tracks)) return -1;
+  return program.tracks.findIndex(declaration => {
+    const value = trackDeclarationValue(declaration);
+    if (!value) return false;
+    const declaredFile = path.basename(value);
+    const declaredSlug = path.basename(value, path.extname(value));
+    return value === track.id ||
+      value === track.slug ||
+      declaredFile === file ||
+      declaredSlug === track.slug;
+  });
+}
+
+function assertCertificationTrackOrder(program, tracks) {
+  const declaredTrackIds = Array.isArray(program.tracks) ? program.tracks : [];
+  const emittedTrackIds = tracks.map(track => track.id);
+  const matches = declaredTrackIds.length === emittedTrackIds.length &&
+    declaredTrackIds.every((id, index) => id === emittedTrackIds[index]);
+  if (!matches) {
+    throw new Error(
+      'Certification track order mismatch: program.json declares ' +
+      JSON.stringify(declaredTrackIds) + ' but track manifests emit ' +
+      JSON.stringify(emittedTrackIds)
+    );
+  }
+}
+
+function resolveAssessmentFile(programDir, assessmentPath) {
+  if (!assessmentPath) return null;
+  const fromRoot = safeRepoPath(assessmentPath, REPO_ROOT);
+  if (fromRoot && fs.existsSync(fromRoot)) return fromRoot;
+  const fromProgram = safeRepoPath(assessmentPath, programDir);
+  if (fromProgram && fs.existsSync(fromProgram)) return fromProgram;
+  return fromRoot || fromProgram;
+}
+
+function certificationLessonFiles(lessonDir, lessonRelPath, folderName) {
+  const folderPath = safeRepoDirectory(folderName, lessonDir);
+  if (!folderPath) return [];
+
+  const files = [];
+  function collectFiles(currentDir, relativeDir) {
+    const entries = fs.readdirSync(currentDir, { withFileTypes: true })
+      .sort((a, b) => a.name.localeCompare(b.name));
+    for (const entry of entries) {
+      const relativePath = relativeDir ? `${relativeDir}/${entry.name}` : entry.name;
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory() && folderName === 'outputs') {
+        collectFiles(fullPath, relativePath);
+      } else if (entry.isFile()) {
+        files.push({ fullPath, relativePath });
       }
-      currentTerm = { term: termMatch[1].trim(), says: '', means: '' };
-      continue;
     }
+  }
+  collectFiles(folderPath, '');
 
-    if (!currentTerm) continue;
-
-    // Match "What people say" line
-    const saysMatch = line.match(/\*\*What people say:\*\*\s*"?(.+?)"?\s*$/);
-    if (saysMatch) {
-      currentTerm.says = saysMatch[1].replace(/^"/, '').replace(/"$/, '').trim();
-      continue;
+  return files.map(file => {
+    const { fullPath, relativePath } = file;
+    let description = '';
+    if (folderName === 'outputs' && relativePath.endsWith('.md')) {
+      try {
+        const content = fs.readFileSync(fullPath, 'utf8');
+        const meta = parseFrontmatter(content) || {};
+        description = String(meta.description || '').trim();
+        if (!description) {
+          description = content.split(/\r?\n/)
+            .map(line => line.trim())
+            .find(line => line && !line.startsWith('#') && line !== '---') || '';
+        }
+      } catch (_) {}
     }
+    return {
+      name: relativePath,
+      path: `${lessonRelPath}/${folderName}/${relativePath}`,
+      size: fs.statSync(fullPath).size,
+      description,
+    };
+  });
+}
 
-    // Match "What it actually means" line
-    const meansMatch = line.match(/\*\*What it actually means:\*\*\s*(.+)/);
-    if (meansMatch) {
-      currentTerm.means = meansMatch[1].trim();
-      continue;
+function parseCertifications() {
+  const empty = { program: null, tracks: [], lessonsByPath: {}, assessmentsById: {} };
+  if (!fs.existsSync(CERTIFICATIONS_PATH)) return empty;
+
+  const programDirs = fs.readdirSync(CERTIFICATIONS_PATH, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => path.join(CERTIFICATIONS_PATH, entry.name))
+    .filter(dir => fs.existsSync(path.join(dir, 'program.json')))
+    .sort();
+  if (!programDirs.length) return empty;
+
+  // The site currently presents one certification program. Keep the generated
+  // shape program-oriented so another provider can be added without touching
+  // PHASES or changing reader behavior.
+  const programDir = programDirs[0];
+  const programPath = safeRepoFile('program.json', programDir);
+  if (!programPath) throw new Error('Unsafe certification program path');
+  const program = readJson(programPath, 'certification program');
+  const programSlug = program.slug || program.id || path.basename(programDir);
+  const tracksDir = safeRepoDirectory('tracks', programDir);
+  const trackFiles = tracksDir
+    ? fs.readdirSync(tracksDir).filter(file => file.endsWith('.json') && safeRepoFile(file, tracksDir)).sort()
+    : [];
+  const trackEntries = trackFiles.map(file => {
+    const track = readJson(safeRepoFile(file, tracksDir), `certification track ${file}`);
+    track.id = track.id || `${programSlug}-${track.slug || path.basename(file, '.json')}`;
+    track.slug = track.slug || path.basename(file, '.json');
+    track.lessons = Array.isArray(track.lessons)
+      ? track.lessons.map(normalizeLessonRef).filter(Boolean)
+      : [];
+    track.assessments = Array.isArray(track.assessments) ? track.assessments : [];
+    return { file, track };
+  });
+  trackEntries.sort((a, b) => {
+    const aIndex = trackDeclarationIndex(program, a.track, a.file);
+    const bIndex = trackDeclarationIndex(program, b.track, b.file);
+    if (aIndex !== -1 || bIndex !== -1) {
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      if (aIndex !== bIndex) return aIndex - bIndex;
+    }
+    return a.file.localeCompare(b.file);
+  });
+  const tracks = trackEntries.map(entry => entry.track);
+  assertCertificationTrackOrder(program, tracks);
+
+  const lessonsByPath = {};
+  const lessonsDir = safeRepoDirectory('lessons', programDir);
+  if (lessonsDir) {
+    for (const entry of fs.readdirSync(lessonsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!entry.isDirectory()) continue;
+      const relPath = path.relative(REPO_ROOT, path.join(lessonsDir, entry.name)).split(path.sep).join('/');
+      const lessonDir = path.join(lessonsDir, entry.name);
+      const docPath = safeRepoFile('docs/zh.md', lessonDir);
+      if (!docPath) continue;
+      const markdown = fs.readFileSync(docPath, 'utf8');
+      const declaredQuizPath = path.join(lessonDir, 'quiz.json');
+      const quizPath = safeRepoFile('quiz.json', lessonDir);
+      if (!quizPath && fs.existsSync(declaredQuizPath)) {
+        throw new Error(`Unsafe certification quiz path: ${relPath}/quiz.json`);
+      }
+      const quiz = quizPath ? readJson(quizPath, `${relPath}/quiz.json`) : null;
+      const meta = certificationDocMeta(markdown, entry.name.replace(/^\d+-/, '').replace(/-/g, ' '));
+      lessonsByPath[relPath] = {
+        path: relPath,
+        slug: entry.name,
+        name: meta.name,
+        summary: meta.summary,
+        keywords: meta.keywords,
+        type: meta.type,
+        languages: meta.languages,
+        prerequisites: meta.prerequisites,
+        time: meta.time,
+        markdown,
+        quiz,
+        quizVersion: quizContentVersion(quiz),
+        files: {
+          code: certificationLessonFiles(lessonDir, relPath, 'code'),
+          outputs: certificationLessonFiles(lessonDir, relPath, 'outputs'),
+        },
+        trackIds: [],
+        domainsByTrack: {},
+        rolesByTrack: {},
+      };
     }
   }
 
-  // Push the last term
-  if (currentTerm && currentTerm.says && currentTerm.means) {
-    terms.push(currentTerm);
+  for (const track of tracks) {
+    for (const ref of track.lessons) {
+      const lesson = lessonsByPath[ref.path];
+      if (!lesson) continue;
+      if (!lesson.trackIds.includes(track.id)) lesson.trackIds.push(track.id);
+      lesson.domainsByTrack[track.id] = Array.isArray(ref.domains) ? ref.domains : [];
+      lesson.rolesByTrack[track.id] = ref.role || '';
+    }
+  }
+
+  const assessmentsById = {};
+  for (const track of tracks) {
+    track.assessments = track.assessments.map((meta, index) => {
+      const normalized = typeof meta === 'string' ? { path: meta } : { ...(meta || {}) };
+      const assessmentLabel = normalized.id || normalized.title || `assessment ${index + 1}`;
+      if (!normalized.path) {
+        throw new Error(`Certification assessment "${assessmentLabel}" in track "${track.id}" must declare a source path`);
+      }
+      const resolvedAssessmentFile = resolveAssessmentFile(programDir, normalized.path);
+      const assessmentFile = resolvedAssessmentFile
+        ? safeRepoFile(path.relative(REPO_ROOT, resolvedAssessmentFile), REPO_ROOT)
+        : null;
+      if (!assessmentFile) {
+        throw new Error(`Missing certification assessment source for "${assessmentLabel}" in track "${track.id}": ${normalized.path}`);
+      }
+      const data = readJson(assessmentFile, normalized.path);
+      const id = normalized.id || data.id || `${track.id}-${normalized.kind || data.kind || `assessment-${index + 1}`}`;
+      const merged = {
+        ...data,
+        ...normalized,
+        id,
+        track: normalized.track || data.track || track.id,
+        kind: normalized.kind || data.kind || 'practice',
+        title: normalized.title || data.title || 'Practice assessment',
+        timeLimitMinutes: Number(normalized.timeLimitMinutes || data.timeLimitMinutes || 0),
+      };
+      assessmentsById[id] = merged;
+      return {
+        id,
+        path: normalized.path || '',
+        kind: merged.kind,
+        title: merged.title,
+        timeLimitMinutes: merged.timeLimitMinutes,
+        questionCount: Array.isArray(merged.questions) ? merged.questions.length : 0,
+      };
+    });
+  }
+
+  return { program, tracks, lessonsByPath, assessmentsById };
+}
+
+function writeCertificationData(certifications) {
+  const output = `// Auto-generated by build.js from certifications/ — do not edit manually.\n` +
+    `// Last built: ${new Date().toISOString()}\n\n` +
+    `const CERTIFICATIONS = ${JSON.stringify(certifications, null, 2)};\n`;
+  fs.writeFileSync(CERTIFICATION_OUTPUT_PATH, output, 'utf8');
+  console.log(`   wrote certification-data.js (${certifications.tracks.length} tracks)`);
+}
+
+// ─── Parse glossary/terms.md ──────────────────────────────────────────
+const GLOSSARY_CATEGORY_ORDER = [
+  '数学与训练',
+  '模型与推理',
+  '数据与表示',
+  '检索与生成',
+  'Prompt 与上下文',
+  'Agent 与工具',
+  '评估与安全',
+  'AI-native 开发',
+  '基础设施与服务',
+  '可靠性与运维',
+  '安全与治理',
+  '多模态系统',
+];
+
+const GLOSSARY_CATEGORIES = new Set(GLOSSARY_CATEGORY_ORDER);
+
+const GLOSSARY_CATEGORY_ALIASES = new Map([
+  ['Math & training', '数学与训练'],
+  ['Models & inference', '模型与推理'],
+  ['Data & representations', '数据与表示'],
+  ['Retrieval & generation', '检索与生成'],
+  ['Prompting & context', 'Prompt 与上下文'],
+  ['Agents & tools', 'Agent 与工具'],
+  ['Evaluation & safety', '评估与安全'],
+  ['AI-native development', 'AI-native 开发'],
+  ['Infrastructure & serving', '基础设施与服务'],
+  ['Reliability & operations', '可靠性与运维'],
+  ['Security & governance', '安全与治理'],
+  ['Multimodal systems', '多模态系统'],
+]);
+
+const GLOSSARY_FIELD_KEYS = new Map([
+  ['Category', 'category'],
+  ['分类', 'category'],
+  ['What people say', 'says'],
+  ['常见说法', 'says'],
+  ['What it actually means', 'means'],
+  ['实际含义', 'means'],
+  ['Why it matters', 'whyItMatters'],
+  ['为什么重要', 'whyItMatters'],
+  ['In practice', 'example'],
+  ['实际使用', 'example'],
+  ['Common confusion', 'confusion'],
+  ['常见混淆', 'confusion'],
+  ['Aliases', 'aliases'],
+  ['别名', 'aliases'],
+  ['Related terms', 'related'],
+  ['相关术语', 'related'],
+  ['Learn it', 'lessons'],
+  ['学习课程', 'lessons'],
+  ['Sources', 'sources'],
+  ['来源', 'sources'],
+  ["Why it's called that", 'whyCalled'],
+  ['名称由来', 'whyCalled'],
+]);
+
+function glossaryError(lineNumber, term, message) {
+  const context = term ? ` (term "${term}")` : '';
+  throw new Error(`glossary/terms.md:${lineNumber}${context}: ${message}`);
+}
+
+function glossarySlug(term) {
+  return term
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function glossaryLookupKey(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('en-US')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function glossaryList(value) {
+  return value.split(/[,;]/).map(item => item.trim()).filter(Boolean);
+}
+
+function glossaryLinks(value, fieldLabel, lineNumber, term) {
+  const links = [];
+  let cursor = 0;
+
+  while (cursor < value.length) {
+    while (cursor < value.length && /[\s,;]/.test(value[cursor])) cursor++;
+    if (cursor >= value.length) break;
+
+    if (value[cursor] === '[') {
+      const closeLabel = value.indexOf(']', cursor + 1);
+      if (closeLabel === -1 || value[closeLabel + 1] !== '(') {
+        glossaryError(lineNumber, term, `${fieldLabel} contains a malformed Markdown link`);
+      }
+      const label = value.slice(cursor + 1, closeLabel).trim();
+      let depth = 1;
+      let closeUrl = closeLabel + 2;
+      for (; closeUrl < value.length && depth > 0; closeUrl++) {
+        if (value[closeUrl] === '\\') {
+          closeUrl++;
+          continue;
+        }
+        if (value[closeUrl] === '(') depth++;
+        if (value[closeUrl] === ')') depth--;
+      }
+      if (depth !== 0) {
+        glossaryError(lineNumber, term, `${fieldLabel} contains a malformed Markdown link`);
+      }
+      const url = value.slice(closeLabel + 2, closeUrl - 1).trim();
+      if (!label || !url) {
+        glossaryError(lineNumber, term, `${fieldLabel} links need both a label and a URL`);
+      }
+      links.push({ label, url });
+      cursor = closeUrl;
+    } else {
+      const nextSeparator = value.slice(cursor).search(/[,;]/);
+      const end = nextSeparator === -1 ? value.length : cursor + nextSeparator;
+      const item = value.slice(cursor, end).trim();
+      if (/[\[\]]/.test(item)) {
+        glossaryError(lineNumber, term, `${fieldLabel} contains a malformed Markdown link`);
+      }
+      if (item) {
+        const isUrl = /^(?:https?:\/\/|\/|\.\.?\/)/.test(item);
+        links.push({ label: item, url: isUrl ? item : '' });
+      }
+      cursor = end;
+    }
+
+    while (cursor < value.length && /\s/.test(value[cursor])) cursor++;
+    if (cursor < value.length && value[cursor] !== ',' && value[cursor] !== ';') {
+      glossaryError(lineNumber, term, `${fieldLabel} items must be separated by a comma or semicolon`);
+    }
+  }
+
+  return links;
+}
+
+function parseGlossary(content) {
+  const terms = [];
+  let currentTerm = null;
+  const seenTerms = new Map();
+  const seenSlugs = new Map();
+  const lines = content.split(/\r?\n/);
+
+  function finishEntry() {
+    if (!currentTerm) return;
+    if (!currentTerm.category) {
+      glossaryError(currentTerm.headerLine, currentTerm.term, 'missing required field "Category"');
+    }
+    if (!currentTerm.means) {
+      glossaryError(currentTerm.headerLine, currentTerm.term, 'missing required field "What it actually means"');
+    }
+    const { headerLine, fields, ...entry } = currentTerm;
+    terms.push(entry);
+    currentTerm = null;
+  }
+
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const lineNumber = index + 1;
+    if (/^###\s*$/.test(line)) glossaryError(lineNumber, '', 'term heading cannot be empty');
+    const termMatch = line.match(/^###\s+(.+?)\s*$/);
+    if (termMatch) {
+      finishEntry();
+      const term = termMatch[1].trim();
+      const normalizedTerm = term.toLocaleLowerCase('en-US');
+      if (seenTerms.has(normalizedTerm)) {
+        glossaryError(lineNumber, term, `duplicate term; first declared on line ${seenTerms.get(normalizedTerm)}`);
+      }
+      const slug = glossarySlug(term);
+      if (!slug) glossaryError(lineNumber, term, 'term must contain at least one letter or number');
+      if (seenSlugs.has(slug)) {
+        const first = seenSlugs.get(slug);
+        glossaryError(lineNumber, term, `duplicate slug "${slug}"; first used by "${first.term}" on line ${first.line}`);
+      }
+      seenTerms.set(normalizedTerm, lineNumber);
+      seenSlugs.set(slug, { term, line: lineNumber });
+      const firstCharacter = term.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').match(/[a-z0-9]/i);
+      currentTerm = {
+        term,
+        slug,
+        letter: firstCharacter ? firstCharacter[0].toUpperCase() : '#',
+        category: '',
+        says: '',
+        means: '',
+        whyItMatters: '',
+        example: '',
+        confusion: '',
+        aliases: [],
+        related: [],
+        lessons: [],
+        sources: [],
+        whyCalled: '',
+        headerLine: lineNumber,
+        fields: new Set(),
+      };
+      continue;
+    }
+
+    // Alphabet headings end the previous entry but are not glossary terms.
+    if (/^#{1,2}\s+/.test(line)) {
+      finishEntry();
+      continue;
+    }
+
+    const fieldMatch = line.match(/^\s*-\s+\*\*([^*]+):\*\*\s*(.*?)\s*$/);
+    if (!currentTerm) {
+      if (fieldMatch) glossaryError(lineNumber, '', `field "${fieldMatch[1].trim()}" appears before a term heading`);
+      continue;
+    }
+
+    if (fieldMatch) {
+      const label = fieldMatch[1].trim();
+      const value = fieldMatch[2].trim();
+      const key = GLOSSARY_FIELD_KEYS.get(label);
+      if (!key) glossaryError(lineNumber, currentTerm.term, `unknown field "${label}"`);
+      if (currentTerm.fields.has(label)) glossaryError(lineNumber, currentTerm.term, `duplicate field "${label}"`);
+      if (!value) glossaryError(lineNumber, currentTerm.term, `field "${label}" cannot be empty`);
+      currentTerm.fields.add(label);
+
+      if (key === 'category') {
+        const category = GLOSSARY_CATEGORY_ALIASES.get(value) || value;
+        if (!GLOSSARY_CATEGORIES.has(category)) {
+          glossaryError(lineNumber, currentTerm.term, `unknown category "${value}"`);
+        }
+        currentTerm.category = category;
+      } else if (key === 'aliases' || key === 'related') {
+        const items = glossaryList(value);
+        if (!items.length) glossaryError(lineNumber, currentTerm.term, `field "${label}" needs at least one item`);
+        currentTerm[key] = items;
+      } else if (key === 'lessons' || key === 'sources') {
+        const links = glossaryLinks(value, label, lineNumber, currentTerm.term);
+        if (!links.length) glossaryError(lineNumber, currentTerm.term, `field "${label}" needs at least one item`);
+        if (links.some(link => !link.url)) {
+          glossaryError(lineNumber, currentTerm.term, `field "${label}" requires a URL for every item`);
+        }
+        currentTerm[key] = links;
+      } else if (key === 'says') {
+        currentTerm.says = value.replace(/^"/, '').replace(/"$/, '').trim();
+      } else {
+        currentTerm[key] = value;
+      }
+      continue;
+    }
+
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('<!--')) {
+      glossaryError(lineNumber, currentTerm.term, 'expected a canonical bullet field or the next term heading');
+    }
+  }
+
+  finishEntry();
+
+  const lookupOwners = new Map();
+  for (const entry of terms) {
+    const key = glossaryLookupKey(entry.term);
+    const existing = lookupOwners.get(key);
+    if (existing) {
+      const entryLine = seenTerms.get(entry.term.toLocaleLowerCase('en-US')) || 1;
+      glossaryError(
+        entryLine,
+        entry.term,
+        `normalized term collides with canonical term "${existing.label}" on term "${existing.entry.term}"`
+      );
+    }
+    lookupOwners.set(key, { entry, label: entry.term, kind: 'term' });
+  }
+  for (const entry of terms) {
+    const entryLine = seenTerms.get(entry.term.toLocaleLowerCase('en-US')) || 1;
+    for (const alias of entry.aliases) {
+      const key = glossaryLookupKey(alias);
+      const existing = lookupOwners.get(key);
+      if (existing) {
+        const ownership = existing.entry === entry
+          ? `duplicates its ${existing.kind} "${existing.label}"`
+          : `collides with ${existing.kind} "${existing.label}" on term "${existing.entry.term}"`;
+        glossaryError(entryLine, entry.term, `alias "${alias}" ${ownership}`);
+      }
+      lookupOwners.set(key, { entry, label: alias, kind: 'alias' });
+    }
+  }
+  for (const entry of terms) {
+    const entryLine = seenTerms.get(entry.term.toLocaleLowerCase('en-US')) || 1;
+    for (const related of entry.related) {
+      if (!lookupOwners.has(glossaryLookupKey(related))) {
+        glossaryError(entryLine, entry.term, `related term "${related}" does not resolve to a glossary entry or alias`);
+      }
+    }
+    for (const lesson of entry.lessons) {
+      if (/^https?:\/\//i.test(lesson.url)) continue;
+      const localPath = path.resolve(path.dirname(GLOSSARY_PATH), lesson.url.split(/[?#]/)[0]);
+      const rootWithSep = REPO_ROOT.endsWith(path.sep) ? REPO_ROOT : REPO_ROOT + path.sep;
+      if (!localPath.startsWith(rootWithSep) || !fs.existsSync(localPath)) {
+        glossaryError(entryLine, entry.term, `Learn it target "${lesson.url}" does not exist in the repository`);
+      }
+      const stats = fs.statSync(localPath);
+      if (stats.isDirectory() && !fs.existsSync(path.join(localPath, 'docs', 'zh.md'))) {
+        glossaryError(entryLine, entry.term, `Learn it target "${lesson.url}" is not a lesson with docs/zh.md`);
+      }
+    }
   }
 
   return terms;
@@ -408,9 +1062,9 @@ function discoverArtifacts() {
 }
 
 // ─── Main build ──────────────────────────────────────────────────────
-// 写入本次部署所基于的 git 分支，供 lesson.html 按该分支拉取 docs
-// （PR preview 部署渲染自己的改动，而非永远拉 main）。
-function writeBuildMeta() {
+// Write the git ref this deploy was built from, so lesson.html fetches docs
+// from the right branch (PR previews render their own edits, not main).
+function resolveRef() {
   let ref = process.env.VERCEL_GIT_COMMIT_REF || '';
   if (!ref) {
     try {
@@ -420,6 +1074,11 @@ function writeBuildMeta() {
     } catch (e) { ref = ''; }
   }
   if (!ref || ref === 'HEAD') ref = 'main';
+  return ref;
+}
+
+function writeBuildMeta() {
+  const ref = resolveRef();
   const js = '// Auto-generated by build.js on each deploy — do not edit.\n'
     + 'window.__AIFS_REF = ' + JSON.stringify(ref) + ';\n';
   fs.writeFileSync(path.join(__dirname, 'build-meta.js'), js, 'utf8');
@@ -439,12 +1098,17 @@ function build() {
 
   console.log('🔍 Parsing README.md...');
   const phases = parseReadme(readme, roadmapStatuses);
+  const roadmapPrereqs = parseCurriculumPrereqs(readme, phases);
 
   console.log('🔍 Parsing glossary/terms.md...');
   const glossaryTerms = parseGlossary(glossary);
 
   console.log('🔍 Discovering outputs + Phase 14 missions...');
   const artifacts = discoverArtifacts();
+
+  console.log('🎓 Parsing certification programs...');
+  const certifications = parseCertifications();
+  writeCertificationData(certifications);
 
   console.log('📚 Extracting lesson summaries + keywords from docs/zh.md...');
   let summarized = 0, withKeywords = 0;
@@ -474,12 +1138,20 @@ function build() {
   console.log(`   Summaries: ${summarized}, Keywords: ${withKeywords}`);
   console.log(`   Glossary terms: ${glossaryTerms.length}`);
   console.log(`   Artifacts: ${artifacts.length}`);
+  console.log(`   Curriculum edges: ${Object.values(roadmapPrereqs).reduce((sum, ids) => sum + ids.length, 0)}`);
+  console.log(`   Certification tracks: ${certifications.tracks.length}`);
+  console.log(`   Certification lessons: ${Object.keys(certifications.lessonsByPath).length}`);
+  console.log(`   Practice assessments: ${Object.keys(certifications.assessmentsById).length}`);
 
   // Generate data.js
-  const output = `// Auto-generated by build.js — do not edit manually.
+const output = `// Auto-generated by build.js — do not edit manually.
 // Last built: ${new Date().toISOString()}
 
+const ROADMAP_PREREQS = ${JSON.stringify(roadmapPrereqs, null, 2)};
+
 const PHASES = ${JSON.stringify(phases, null, 2)};
+
+const GLOSSARY_CATEGORY_ORDER = ${JSON.stringify(GLOSSARY_CATEGORY_ORDER, null, 2)};
 
 const GLOSSARY = ${JSON.stringify(glossaryTerms, null, 2)};
 
@@ -490,13 +1162,13 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   console.log(`\n✅ Generated ${OUTPUT_PATH}`);
 
   syncCounts(totalLessons, artifacts.length);
-  writeSitemap(phases, glossaryTerms.length);
-  writeLlms(phases, glossaryTerms.length, artifacts.length);
-  writeLessonPages(phases);  // 必须在 syncCounts 之后：模板里的课数文案要先对齐
+  writeSitemap(phases, glossaryTerms.length, certifications);
+  writeLlms(phases, glossaryTerms.length, artifacts.length, certifications);
+  writeLessonPages(phases);
 }
 
-// ─── sitemap.xml：从站点渲染的同一份 PHASES 生成 ─────────────────────
-function writeSitemap(phases, glossaryCount) {
+// ─── sitemap.xml from the same PHASES the site renders ───────────────────
+function writeSitemap(phases, glossaryCount, certifications) {
   const today = new Date().toISOString().slice(0, 10);
   const urls = [
     { loc: '/', priority: '1.0', freq: 'weekly' },
@@ -505,6 +1177,18 @@ function writeSitemap(phases, glossaryCount) {
     { loc: '/about.html', priority: '0.5', freq: 'monthly' },
   ];
   if (glossaryCount > 0) urls.push({ loc: '/glossary.html', priority: '0.6', freq: 'monthly' });
+  if (certifications && certifications.program) {
+    urls.push({ loc: '/certifications.html', priority: '0.9', freq: 'weekly' });
+    for (const track of certifications.tracks) {
+      urls.push({ loc: '/certification.html?id=' + encodeURIComponent(track.id), priority: '0.8', freq: 'monthly' });
+    }
+    for (const lesson of Object.values(certifications.lessonsByPath)) {
+      const track = lesson.trackIds && lesson.trackIds[0];
+      let loc = '/lesson.html?path=' + encodeURIComponent(lesson.path);
+      if (track) loc += '&track=' + encodeURIComponent(track);
+      urls.push({ loc, priority: '0.7', freq: 'monthly' });
+    }
+  }
   for (const phase of phases) {
     for (const l of phase.lessons) {
       const p = lessonPath(l.url);
@@ -512,7 +1196,7 @@ function writeSitemap(phases, glossaryCount) {
     }
   }
   const body = urls.map(u =>
-    `  <url>\n    <loc>${SITE_ORIGIN}${u.loc}</loc>\n` +
+    `  <url>\n    <loc>${SITE_ORIGIN}${u.loc.replace(/&/g, '&amp;')}</loc>\n` +
     `    <lastmod>${today}</lastmod>\n    <changefreq>${u.freq}</changefreq>\n` +
     `    <priority>${u.priority}</priority>\n  </url>`).join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
@@ -521,16 +1205,18 @@ function writeSitemap(phases, glossaryCount) {
   console.log(`   wrote sitemap.xml (${urls.length} URLs)`);
 }
 
-// ─── llms.txt：给 AI agent 的课程地图（链接丰富）─────────────────────
-function writeLlms(phases, glossaryCount, artifactCount) {
+// ─── llms.txt: a link-rich map of the curriculum for AI agents ───────────
+function writeLlms(phases, glossaryCount, artifactCount, certifications) {
+  const rawOrigin = 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + resolveRef();
   let total = 0;
   phases.forEach(p => { total += p.lessons.filter(l => lessonPath(l.url)).length; });
   let out = `# AI Engineering from Scratch · 简体中文版\n\n`;
-  out += `> 一套免费、开源的 AI 工程课程，从零亲手实现每一个核心算法——${total} 节课，横跨 ${phases.length} 个阶段，从线性代数到自主 agent。Python、TypeScript、Rust、Julia。本站为简体中文翻译版。\n\n`;
+  out += `> 一套免费、开源的 AI 工程课程，从零亲手实现核心算法——${total} 节课，横跨 ${phases.length} 个阶段，从线性代数到自主 agent。Python、TypeScript、Rust、Julia。\n\n`;
   out += `Canonical site: ${SITE_ORIGIN}\n`;
   out += `Source: https://github.com/fancyboi999/ai-engineering-from-scratch-zh\n`;
   out += `Upstream: https://github.com/rohitg00/ai-engineering-from-scratch\n`;
   out += `Glossary terms: ${glossaryCount} · Reusable outputs (prompts/skills/agents): ${artifactCount}\n\n`;
+  out += `主课程页面在构建时预渲染；课程目录还可能包含可运行的 code/ 和 quiz.json。\n\n`;
   for (const phase of phases) {
     out += `## 阶段 ${phase.id}：${phase.name}\n`;
     if (phase.desc) out += `${phase.desc}\n`;
@@ -539,7 +1225,7 @@ function writeLlms(phases, glossaryCount, artifactCount) {
       const p = lessonPath(l.url);
       if (!p) continue;
       const note = l.summary ? ` — ${l.summary}` : '';
-      out += `- [${l.name}](${SITE_ORIGIN}${lessonStaticHref(p)})${note}\n`;
+      out += `- [${l.name}](${SITE_ORIGIN}${lessonStaticHref(p)}) · [raw](${rawOrigin}/${p}/docs/zh.md)${note}\n`;
     }
     out += `\n`;
   }
@@ -547,6 +1233,23 @@ function writeLlms(phases, glossaryCount, artifactCount) {
   out += `- [课程表](${SITE_ORIGIN}/catalog.html) — 可搜索的完整课程索引\n`;
   out += `- [路线图](${SITE_ORIGIN}/prereqs.html) — 跨阶段的前置依赖顺序\n`;
   if (glossaryCount > 0) out += `- [术语表](${SITE_ORIGIN}/glossary.html) — ${glossaryCount} 个术语的通俗定义\n`;
+  if (certifications && certifications.program) {
+    out += `\n## Claude 认证备考\n`;
+    out += `这是独立、开源的练习材料，不隶属于 Anthropic，练习得分不是官方考试分数，完成课程也不保证通过认证。\n\n`;
+    out += `- [Claude 认证学习指南](${rawOrigin}/certifications/claude/GETTING_STARTED.md)\n`;
+    out += `- [Claude 认证导师契约](${rawOrigin}/skills/claude-certification/SKILL.md)\n`;
+    out += `- [认证课程表](${SITE_ORIGIN}/certifications.html)\n`;
+    for (const track of certifications.tracks) {
+      out += `- [${track.credential || track.shortName || track.id}](${SITE_ORIGIN}/certification.html?id=${encodeURIComponent(track.id)})`;
+      if (track.summary) out += ` — ${track.summary}`;
+      out += `\n`;
+    }
+    for (const lesson of Object.values(certifications.lessonsByPath)) {
+      out += `- [${lesson.name}](${SITE_ORIGIN}/lesson.html?path=${encodeURIComponent(lesson.path)}) · [raw](${rawOrigin}/${lesson.path}/docs/zh.md)`;
+      if (lesson.summary) out += ` — ${lesson.summary}`;
+      out += `\n`;
+    }
+  }
   fs.writeFileSync(path.join(__dirname, 'llms.txt'), out, 'utf8');
   console.log(`   wrote llms.txt`);
 }
@@ -650,7 +1353,7 @@ function writeLessonPages(phases) {
   for (const phase of phases) {
     for (const l of phase.lessons) {
       const rel = lessonPath(l.url);
-      const hasDoc = !!rel && fs.existsSync(path.join(REPO_ROOT, rel, 'docs', 'zh.md'));
+      const hasDoc = !!rel && !!safeRepoFile(path.join(rel, 'docs', 'zh.md'), REPO_ROOT);
       flat.push({ name: l.name, rel, isReadable: hasDoc });
     }
   }
@@ -661,8 +1364,15 @@ function writeLessonPages(phases) {
     const f = flat[i];
     if (!f.rel) continue;
     let md;
+    let quiz = null;
     try {
-      md = fs.readFileSync(path.join(REPO_ROOT, f.rel, 'docs', 'zh.md'), 'utf8');
+      const docPath = safeRepoFile(path.join(f.rel, 'docs', 'zh.md'), REPO_ROOT);
+      if (!docPath) throw new Error('unsafe lesson document path');
+      md = fs.readFileSync(docPath, 'utf8');
+      const quizPath = safeRepoFile(path.join(f.rel, 'quiz.json'), REPO_ROOT);
+      if (quizPath) {
+        quiz = readJson(quizPath, `${f.rel}/quiz.json`);
+      }
     } catch (_) {
       skipped.push(f.rel);  // 登记了 README 但还没有 zh.md 的课
       continue;
@@ -705,12 +1415,13 @@ function writeLessonPages(phases) {
       '  <script type="application/ld+json" id="lessonJsonLd">' + lessonJsonLd(title, desc, url) + '</script>\n</head>');
     page = page.replace(LOADING_BLOCK, () => article);
     // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz
+    const prerenderedPayload = { path: f.rel, quiz };
     page = page.replace(
       SCRIPT_ANCHOR,
-      '  <script>window.__PRERENDERED__ = {path: ' + JSON.stringify(f.rel) + '};</script>\n' + SCRIPT_ANCHOR
+      '  <script>window.__PRERENDERED__ = ' + JSON.stringify(prerenderedPayload).replace(/</g, '\\u003c') + ';</script>\n' + SCRIPT_ANCHOR
     );
     // 注意：不能只查 '__PRERENDERED__'——内联 boot 脚本本身就含这个标识符
-    if (page.indexOf('<script>window.__PRERENDERED__ = {path:') === -1) {
+    if (page.indexOf('<script>window.__PRERENDERED__ = ') === -1) {
       console.error('❌ writeLessonPages：' + f.rel + ' 的 __PRERENDERED__ 注入失败，中止');
       process.exit(1);
     }
@@ -728,11 +1439,7 @@ function writeLessonPages(phases) {
   }
 }
 
-// ─── 自动同步站点文案里的课程数 / 产出数（单一真相 = 本次构建）─────
-// 每次同步新课只需在 README 表格补行 + 跑 build，站点这些散落的数字
-// 会自动对齐，不必手动逐个改（435 漂了好几个月、489 项产出过时都因此）。
-// 只处理站点模板文件，不碰 README——README 每个 phase 标题有
-// `<code>N lessons</code>` 单 phase 课数，全局替换会误伤成全局总数。
+// ─── 自动同步站点文案里的课程数 / 产出数 ─────
 function syncCounts(lessons, outputs) {
   const targets = ['index.html', 'catalog.html', 'prereqs.html', 'lesson.html', 'cmdpalette.js'];
   for (const f of targets) {
@@ -740,10 +1447,10 @@ function syncCounts(lessons, outputs) {
     if (!fs.existsSync(p)) continue;
     const before = fs.readFileSync(p, 'utf8');
     const after = before
-      .replace(/\d+( 节课程)/g, lessons + '$1')        // 节课程 先于 节课，避免误伤
-      .replace(/\d+ 节课(?!程)/g, lessons + ' 节课')   // 节课（后面不是「程」）
+      .replace(/\d+( 节课程)/g, lessons + '$1')
+      .replace(/\d+ 节课(?!程)/g, lessons + ' 节课')
       .replace(/\d+( 节 AI 工程)/g, lessons + '$1')
-      .replace(/\d+( lessons)\b/g, lessons + '$1')      // 英文 og/meta
+      .replace(/\d+( lessons)\b/g, lessons + '$1')
       .replace(/\d+( 项产出)/g, outputs + '$1');
     if (after !== before) {
       fs.writeFileSync(p, after, 'utf8');
@@ -751,11 +1458,10 @@ function syncCounts(lessons, outputs) {
     }
   }
 }
-
 // ─── 课程数一致性校验（node site/build.js --check）──────────────────
 // 防 README/ROADMAP 课数漂移（曾踩 435 / 498 vs 503）。CI 跑，不一致就 fail。
 // 设计取舍：上游有 scripts/audit_lessons.py + check_readme_counts.py，但它们
-// 硬编码 docs/en.md + 英文 README 正则，对中文仓全不兼容（且是 B 类 1:1 同步资产，
+// 硬编码 docs/zh.md + 英文 README 正则，对中文仓全不兼容（且是 B 类 1:1 同步资产，
 // 改了会和上游冲突）。所以这里用 build.js 自己的解析做等价校验——认 zh.md、匹配
 // 中文文案，不碰上游 Python 脚本。真相 = 文件系统课程目录数。
 function countLessonDirs() {

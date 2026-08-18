@@ -1,0 +1,4 @@
+interface:
+  display_name: "Claude 认证导师"
+  short_description: "AI 原生认证路线、实验与复习"
+  default_prompt: "使用 claude-certification 选择 Claude 认证路线，并教我下一步。"

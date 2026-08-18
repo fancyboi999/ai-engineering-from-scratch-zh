@@ -1,0 +1,78 @@
+{
+  "lesson": "10-tool-use-and-agentic-loops",
+  "title": "工具循环是受控委托",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Claude 的 tool_use 块代表什么？",
+      "options": [
+        "只要参数符合声明的 JSON schema，就是安全操作",
+        "已获客户端授权、且已分派给具名服务的操作",
+        "参数通过服务器输入 schema 的已提交事务",
+        "模型提出的工具调用方案，必须由客户端校验并执行"
+      ],
+      "correct": 3,
+      "explanation": "Claude 提出工具和参数。确定性客户端代码仍需校验、授权、执行并记录该操作。"
+    },
+    {
+      "stage": "check",
+      "question": "可使用受支持 SDK，自定义工具在应用既有 sandbox 中执行，且不需要远程持久 session 或自定义线协议控制。哪种循环是最佳默认选择？",
+      "options": [
+        "带应用授权、预算和最终状态校验的 SDK Tool Runner",
+        "手写 REST 循环，因为 SDK 管理消息顺序会移除策略控制",
+        "确定性工作流，尽管下一个工具取决于观察结果",
+        "Claude Managed Agents，因为所有开放式任务都需要远程托管 session"
+      ],
+      "correct": 0,
+      "explanation": "Tool Runner 去除了重复的客户端循环样板，而应用保留执行、审批、sandbox、预算和验证。托管或手写基础设施需要具体需求。"
+    },
+    {
+      "stage": "check",
+      "question": "一个工具超时，此前服务器可能已经发送付款。重试前应做什么？",
+      "options": [
+        "延长超时，仅在 trace 缺少成功事件时重发",
+        "先用幂等键查询，并核对服务器已确认的最终状态",
+        "用相同参数重试一次，因为确定性输入能防止重复",
+        "让 Claude 将错误与对话比较，并推断结果"
+      ],
+      "correct": 1,
+      "explanation": "事务边界上的结果不明确。只有幂等和权威对账能确定重试是否安全。"
+    },
+    {
+      "stage": "check",
+      "question": "退款审核流程应仅在相关情形加载，而获批退款动作必须在私有应用服务内运行。哪种组合合适？",
+      "options": [
+        "无需应用策略、点击退款按钮的 Anthropic-schema computer tool",
+        "包含私有退款凭证的 server-executed built-in tool",
+        "用于流程的 Skill，加上用于授权操作的 custom client tool",
+        "只用 MCP server，因为可复用指令和可执行权限属于同一层"
+      ],
+      "correct": 2,
+      "explanation": "Skill 封装可复用流程。custom client tool 保留私有执行、身份、审批和幂等边界。"
+    },
+    {
+      "stage": "post",
+      "question": "对于部署 agent，哪项成功检查最强？",
+      "options": [
+        "agent 循环在报告部署后检查通过后正常结束",
+        "最终响应写明部署版本，并引用成功的工具结果",
+        "trace 显示每个计划部署工具均无错误返回",
+        "用独立终态检查确认部署版本已经生效且健康"
+      ],
+      "correct": 3,
+      "explanation": "协议完成和自信的散文不能证明环境已正确变化。应核验可从外部观察的最终状态。"
+    },
+    {
+      "stage": "post",
+      "question": "一项任务总是提取字段、校验字段并写入获批记录。更好的默认架构是什么？",
+      "options": [
+        "采用确定性工作流，只在明确步骤中调用模型",
+        "一个模型调用，提取并校验后再调用写入工具",
+        "由独立提取、校验和写入 subagent 构成的协调器",
+        "在提取、校验和写入工具间选择的受限 agent"
+      ],
+      "correct": 0,
+      "explanation": "路径已知，因此工作流提供更清晰的控制和测试。观察决定未知路径时，agent 选择才有用。"
+    }
+  ]
+}

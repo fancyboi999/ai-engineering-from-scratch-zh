@@ -1,0 +1,78 @@
+{
+  "lesson": "14-evals-testing-debugging-and-observability",
+  "title": "Eval 将 Agent 行为变成工程证据",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "agent 声称订单已经发货，但没有 tool 调用，也没有数据库变更。哪个评估维度能发现这一关键失败？",
+      "options": [
+        "用语义 grader 比较该主张与用户要求的结果",
+        "审查声称执行发货操作的 trajectory",
+        "根据权威订单系统中的实际记录和状态变更验证最终结果",
+        "通过协议校验确认响应未使用 tool 且正常结束"
+      ],
+      "correct": 2,
+      "explanation": "权威系统状态能证明操作是否真实发生。流畅的输出无法取代外部状态检查。"
+    },
+    {
+      "stage": "check",
+      "question": "哪项属性应该用确定性方式测试，而不是交给 LLM judge？",
+      "options": [
+        "两份细腻的摘要是否保留了等价的含义与重点",
+        "文字是否能让读者感受到共情",
+        "解释是否向新手清楚传达了核心思想",
+        "JSON 是否包含必需字段和有效 enum"
+      ],
+      "correct": 3,
+      "explanation": "schema 有效性具有精确规则。确定性 validator 比模型 grader 更便宜、可复现，也更可靠。"
+    },
+    {
+      "stage": "check",
+      "question": "应该如何验证基于模型的 grader？",
+      "options": [
+        "使用独立人工标注样本校准，并审查意见不一致的 case",
+        "选择能力更强的 grader 模型，并为详细推理提供足够 token",
+        "重复每次判断，在多个样本结果一致时接受该标签",
+        "提供 generator 的完整推理，让 grader 重建其意图"
+      ],
+      "correct": 0,
+      "explanation": "人工标注 case 能暴露假阳性、假阴性、rubric 歧义与 grader 偏差。仅靠自洽性无法证明有效。"
+    },
+    {
+      "stage": "check",
+      "question": "服务商响应有效，但 SDK client 在序列化期间丢失了一个响应字段。调试时应该检查什么？",
+      "options": [
+        "最终应用 prompt 与模型设置",
+        "捕获真实线上报文响应，并逐一检查它经过的每个序列化边界",
+        "SDK 的公开类型声明，但不捕获服务商原始响应",
+        "最终映射对象与下游 consumer，但不检查更早的边界"
+      ],
+      "correct": 1,
+      "explanation": "先比较线上报文数据、SDK 类型与应用映射，就能确定字段在哪里丢失，不必先修改模型行为。"
+    },
+    {
+      "stage": "post",
+      "question": "为什么发布 gate 除了平均分，还应检查 slice 与严重故障？",
+      "options": [
+        "只要严重故障对总分的影响低于 gate，就可以接受",
+        "只有每个 slice 的流量频率相同时，平均分才足够",
+        "平均分可能掩盖某个领域或安全 case 新出现的严重回归",
+        "slice 能让基于模型的评估足够确定，从而取代严重 case 审查"
+      ],
+      "correct": 2,
+      "explanation": "总体小幅提升可能掩盖数据泄露、跨 tenant 访问，或某个重要场景组的大幅下降。"
+    },
+    {
+      "stage": "post",
+      "question": "请求因 tool result 顺序无效而失败。哪种恢复方式最合适？",
+      "options": [
+        "保留相同 client 历史，换用更大的模型重试格式错误的消息",
+        "让模型 grader 判断预期 tool 序列在语义上是否合理",
+        "增加 tool 超时，因为延迟的结果可能造成无效 content block 顺序",
+        "先修复 client 的协议状态，再为该消息顺序和恢复路径补上合约测试"
+      ],
+      "correct": 3,
+      "explanation": "这是确定性的协议缺陷。修改 prompt 或模型无法修复格式错误的应用状态。"
+    }
+  ]
+}

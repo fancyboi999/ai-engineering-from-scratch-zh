@@ -264,6 +264,9 @@ class Utterance {
 
 function boot() {
   const document = new Document();
+  const timers = [];
+  const intervals = new Map();
+  let timerId = 0;
   const voice = { name: 'Test Chinese Voice', lang: 'zh-CN', voiceURI: 'test-zh', default: true };
   const synth = {
     spoken: [],
@@ -304,10 +307,21 @@ function boot() {
     SpeechSynthesisUtterance: Utterance,
     Node: { DOCUMENT_POSITION_FOLLOWING: 4 },
     console,
-    setInterval: () => 1,
-    clearInterval: () => {},
-    setTimeout: () => 1,
-    clearTimeout: () => {},
+    setInterval(callback) {
+      const id = ++timerId;
+      intervals.set(id, callback);
+      return id;
+    },
+    clearInterval(id) { intervals.delete(id); },
+    setTimeout(callback) {
+      const id = ++timerId;
+      timers.push({ id, callback });
+      return id;
+    },
+    clearTimeout(id) {
+      const index = timers.findIndex((timer) => timer.id === id);
+      if (index !== -1) timers.splice(index, 1);
+    },
   };
   const sourcePath = path.join(__dirname, '..', 'site', 'tts.js');
   const source = fs.readFileSync(sourcePath, 'utf8').replace(
@@ -317,7 +331,19 @@ function boot() {
   assert.notStrictEqual(source.indexOf('window.__ttsTestApi'), -1, 'test hook insertion failed');
   vm.runInNewContext(source, context, { filename: sourcePath });
   document.dispatch('DOMContentLoaded', { type: 'DOMContentLoaded', target: document });
-  return { api: window.__ttsTestApi, document, sessionStorage: context.sessionStorage, synth, voice };
+  return {
+    api: window.__ttsTestApi,
+    document,
+    sessionStorage: context.sessionStorage,
+    synth,
+    voice,
+    flushTimers() {
+      while (timers.length) timers.shift().callback();
+    },
+    tickIntervals() {
+      Array.from(intervals.values()).forEach((callback) => callback());
+    },
+  };
 }
 
 function start(env) {
@@ -372,6 +398,7 @@ function testLateCallbacksCannotAdvanceReplacement() {
   assert.strictEqual(env.api.state.index, 1);
 
   second.onend();
+  env.flushTimers();
   assert.strictEqual(env.synth.spoken.length, 3);
   assert.strictEqual(env.synth.spoken[2].text, '第三段用于朗读。');
 }
@@ -380,12 +407,32 @@ function testNormalEndAndErrorAdvanceOnce() {
   const env = boot();
   const first = start(env);
   first.onend();
+  env.flushTimers();
   const second = env.synth.spoken[1];
   second.onerror({ error: 'synthesis-failed' });
+  env.flushTimers();
   const third = env.synth.spoken[2];
   third.onend();
+  env.flushTimers();
 
   assert.strictEqual(env.synth.spoken.length, 3);
+  assert.strictEqual(env.api.state.playing, false);
+  assert.strictEqual(env.sessionStorage.getItem('tts:resume'), null);
+}
+
+function testSilentEngineStopsAfterFourAttempts() {
+  const env = boot();
+  start(env);
+
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    env.synth.speaking = false;
+    env.synth.pending = false;
+    env.tickIntervals();
+    env.tickIntervals();
+    env.flushTimers();
+  }
+
+  assert.strictEqual(env.synth.spoken.length, 4, 'watchdog must stop on the fourth ignored attempt');
   assert.strictEqual(env.api.state.playing, false);
   assert.strictEqual(env.sessionStorage.getItem('tts:resume'), null);
 }
@@ -424,4 +471,5 @@ testControlGestureDoesNotReverseIntoStop();
 testLateCallbacksCannotAdvanceReplacement();
 testNormalEndAndErrorAdvanceOnce();
 testStopJumpRateAndVoiceInvalidateOldUtterances();
+testSilentEngineStopsAfterFourAttempts();
 console.log('tts regression tests passed');

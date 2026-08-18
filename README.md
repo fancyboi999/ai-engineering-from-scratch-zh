@@ -159,10 +159,26 @@ ls phases/03-deep-learning-core/05-loss-functions/outputs/
 - 你会写代码（任何语言都行，会 Python 更好）。
 - 你想搞懂 AI **到底是怎么运作的**，而不只是调调 API。
 
+### 准备 Claude 认证
+
+[Claude 认证学院](certifications/claude/README.md) 是一套免费、开源的备考体系，
+覆盖 Associate Foundations、Developer Foundations、Architect Foundations 和
+Architect Professional 四条公开认证路线。每条路线都有对齐公开考试蓝图的课程、
+可运行实验、诊断测验、综合项目和原创全真模拟题。
+
+参照 [AI-native GitHub 入门指南](certifications/claude/GETTING_STARTED.md)，可以在 Claude Code、
+Codex、ChatGPT、Cursor 或其他 agent 中运行 `/claude-certification`：选择路线、
+把进度保存到 `CLAUDE-CERTIFICATION.md`，逐课学习、运行真实实验并接受基于产物的反馈。
+同一套课程也会发布到 [中文认证站点](https://aieng-zh.cn/certifications.html)。
+
+这是基于公开考试目标编写的独立学习材料，不隶属于 Anthropic，不包含真实考题，
+也不保证通过认证。资格、费用、评分和项目政策可能变动，付费或预约前必须以官方最新说明为准。
+
 ### 内置 agent 技能（Claude、Cursor、Codex、OpenClaw、Hermes）
 
 | 技能 | 作用 |
 |---|---|
+| [`/claude-certification`](skills/claude-certification/SKILL.md) | Claude 认证导师。选择 CCAO-F、CCDV-F、CCAR-F 或 CCAR-P，逐课教学、运行实验、评审产物、组织诊断与模拟测验并保存进度。 |
 | [`/find-your-level`](.claude/skills/find-your-level/SKILL.md) | 十道题的定级测验。把你的知识映射到一个起始阶段，生成带课时估算的个性化路径。 |
 | [`/check-understanding <phase>`](.claude/skills/check-understanding/SKILL.md) | 按阶段测验，八道题，附反馈和需要复习的具体课程。 |
 
