@@ -1153,10 +1153,10 @@ python3 scripts/audit_lessons.py --json    # 适合 CI 的输出
 
 ## Star 历史
 
-<a href="https://star-history.com/#fancyboi999/ai-engineering-from-scratch-zh&Date">
+<a href="https://star-history.dera.page/#fancyboi999/ai-engineering-from-scratch-zh&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=fancyboi999/ai-engineering-from-scratch-zh&type=Date&theme=dark">
-    <img alt="Star history" src="https://api.star-history.com/svg?repos=fancyboi999/ai-engineering-from-scratch-zh&type=Date" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=fancyboi999/ai-engineering-from-scratch-zh&type=Date&theme=dark">
+    <img alt="Star history" src="https://star-history.dera.page/svg?repos=fancyboi999/ai-engineering-from-scratch-zh&type=Date" width="100%">
   </picture>
 </a>
 
