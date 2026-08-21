@@ -30,6 +30,7 @@ on:
       - "scripts/debias_quizzes.py"
       - "scripts/test_debias_quizzes.py"
       - "scripts/check_figure_loader.js"
+      - "scripts/test_lesson_mobile_css.js"
       - "scripts/test_tts.js"
   pull_request:
     branches: [main]
@@ -69,6 +70,8 @@ jobs:
         run: find certifications/claude/lessons -path '*/code/main.py' -print0 | xargs -0 -r -n1 python3
       - name: 站点 JavaScript 语法校验
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
+      - name: 课程页移动端布局合约
+        run: node scripts/test_lesson_mobile_css.js
       - name: 测验答案位置去偏校验
         run: python3 scripts/debias_quizzes.py --check
       - name: 测验重排语义校验

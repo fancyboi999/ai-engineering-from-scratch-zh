@@ -789,6 +789,14 @@
       width: 100%;
     }
 
+    .quiz-question-text,
+    .quiz-option,
+    .quiz-option-text,
+    .quiz-explanation {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
     .quiz-option:hover:not(.selected):not(.disabled) {
       border-color: var(--blueprint);
       background: var(--blueprint-tint);
@@ -1312,6 +1320,7 @@
     .output-install-hint.visible { display: block; }
 
     .code-card {
+      min-width: 0;
       background: var(--code-bg);
       border: 1px solid var(--rule-soft);
       padding: 18px;
