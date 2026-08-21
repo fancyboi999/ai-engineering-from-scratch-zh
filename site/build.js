@@ -1483,6 +1483,69 @@ function countLessonDirs() {
   return result;
 }
 
+function verifySiteCss() {
+  const cssFiles = fs.readdirSync(__dirname)
+    .filter(file => file.endsWith('.css'))
+    .sort();
+  const errors = [];
+
+  for (const file of cssFiles) {
+    const source = fs.readFileSync(path.join(__dirname, file), 'utf8');
+    let depth = 0;
+    let line = 1;
+    let quote = '';
+    let inComment = false;
+    let escaped = false;
+
+    for (let i = 0; i < source.length; i++) {
+      const char = source[i];
+      const next = source[i + 1];
+      if (char === '\n') line++;
+
+      if (inComment) {
+        if (char === '*' && next === '/') {
+          inComment = false;
+          i++;
+        }
+        continue;
+      }
+
+      if (quote) {
+        if (escaped) escaped = false;
+        else if (char === '\\') escaped = true;
+        else if (char === quote) quote = '';
+        continue;
+      }
+
+      if (char === '/' && next === '*') {
+        inComment = true;
+        i++;
+      } else if (char === '"' || char === "'") {
+        quote = char;
+      } else if (char === '{') {
+        depth++;
+      } else if (char === '}') {
+        depth--;
+        if (depth < 0) {
+          errors.push(`${file}:${line}: 多余的 }`);
+          depth = 0;
+        }
+      }
+    }
+
+    if (inComment) errors.push(`${file}:${line}: 注释未闭合`);
+    if (quote) errors.push(`${file}:${line}: 字符串未闭合`);
+    if (depth > 0) errors.push(`${file}: 缺少 ${depth} 个 }`);
+  }
+
+  if (errors.length) {
+    console.error('\n❌ 站点 CSS 结构校验失败\n');
+    errors.forEach(error => console.error('  ✗ ' + error));
+    process.exit(1);
+  }
+  console.log(`✅ 站点 CSS 结构校验通过：${cssFiles.length} 个文件的括号、注释和字符串均已闭合`);
+}
+
 function verifyCurriculum() {
   const readme = fs.readFileSync(README_PATH, 'utf8');
   const roadmap = fs.readFileSync(ROADMAP_PATH, 'utf8');
@@ -1551,6 +1614,8 @@ function verifyCurriculum() {
   }
   console.log(`✅ 课程数一致性校验通过：${fsLessons} 课 / ${phaseCount} 阶段（文件系统 = README 表格 = badge/散文 = ROADMAP 总计 = 各 phase 标题课数）`);
 }
+
+verifySiteCss();
 
 if (process.argv.includes('--check')) {
   verifyCurriculum();

@@ -302,7 +302,7 @@ p.dropcap::first-letter {
   align-items: center;
 }
 
-.header-nav a {
+.header-nav a:not(.header-github) {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 500;
@@ -312,7 +312,7 @@ p.dropcap::first-letter {
   border-bottom: none;
 }
 
-.header-nav a:hover {
+.header-nav a:not(.header-github):hover {
   color: var(--blueprint);
   border-bottom: none;
 }
@@ -836,6 +836,8 @@ p.dropcap::first-letter {
   display: inline-block;
   width: 64px;
   height: 1px;
+}
+
 .modal-lesson-open.is-unavailable .modal-lesson-cta {
   color: var(--ink-mute);
 }
@@ -2240,4 +2242,3 @@ body[data-palette-open] {
     flex-shrink: 0;
   }
 }
-
