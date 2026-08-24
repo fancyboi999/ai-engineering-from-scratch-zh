@@ -1093,5 +1093,20 @@
     "r2": "https://videos.aieng-zh.cn/lessons/11-13-production-app.mp4",
     "bilibili": "BV1RBhP6DEvc",
     "slug": "11-13-production-app"
+  },
+  "phases/11-llm-engineering/14-model-context-protocol": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-14-model-context-protocol.mp4",
+    "bilibili": "BV1eFhP6mEF7",
+    "slug": "11-14-model-context-protocol"
+  },
+  "phases/11-llm-engineering/15-prompt-caching": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-15-prompt-caching.mp4",
+    "bilibili": "BV1GNhP65Eyy",
+    "slug": "11-15-prompt-caching"
+  },
+  "phases/11-llm-engineering/16-langgraph-state-machines": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-16-langgraph-state-machines.mp4",
+    "bilibili": "BV1GNhP65Ewz",
+    "slug": "11-16-langgraph-state-machines"
   }
 }
