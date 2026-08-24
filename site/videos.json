@@ -1063,5 +1063,20 @@
     "r2": "https://videos.aieng-zh.cn/lessons/11-07-advanced-rag.mp4",
     "bilibili": "BV1UDhP6kEkn",
     "slug": "11-07-advanced-rag"
+  },
+  "phases/11-llm-engineering/08-fine-tuning-lora": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-08-fine-tuning-lora.mp4",
+    "bilibili": "BV1fhhP6xEiL",
+    "slug": "11-08-fine-tuning-lora"
+  },
+  "phases/11-llm-engineering/09-function-calling": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-09-function-calling.mp4",
+    "bilibili": "BV1zhhP64EtY",
+    "slug": "11-09-function-calling"
+  },
+  "phases/11-llm-engineering/10-evaluation": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-10-evaluation.mp4",
+    "bilibili": "BV1ovhP6XEW9",
+    "slug": "11-10-evaluation"
   }
 }
