@@ -968,5 +968,65 @@
     "r2": "https://videos.aieng-zh.cn/lessons/10-34-gradient-checkpointing.mp4",
     "bilibili": "BV1rSj26VEPE",
     "slug": "10-34-gradient-checkpointing"
+  },
+  "phases/00-setup-and-tooling/01-dev-environment": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-01-dev-environment.mp4",
+    "bilibili": null,
+    "slug": "00-01-dev-environment"
+  },
+  "phases/00-setup-and-tooling/02-git-and-collaboration": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-02-git-collaboration.mp4",
+    "bilibili": null,
+    "slug": "00-02-git-collaboration"
+  },
+  "phases/00-setup-and-tooling/03-gpu-setup-and-cloud": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-03-gpu-setup-and-cloud.mp4",
+    "bilibili": null,
+    "slug": "00-03-gpu-setup-and-cloud"
+  },
+  "phases/00-setup-and-tooling/04-apis-and-keys": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-04-apis-and-keys.mp4",
+    "bilibili": null,
+    "slug": "00-04-apis-and-keys"
+  },
+  "phases/00-setup-and-tooling/05-jupyter-notebooks": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-05-jupyter-notebooks.mp4",
+    "bilibili": null,
+    "slug": "00-05-jupyter-notebooks"
+  },
+  "phases/00-setup-and-tooling/06-python-environments": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-06-python-environments.mp4",
+    "bilibili": null,
+    "slug": "00-06-python-environments"
+  },
+  "phases/00-setup-and-tooling/07-docker-for-ai": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-07-docker-for-ai.mp4",
+    "bilibili": null,
+    "slug": "00-07-docker-for-ai"
+  },
+  "phases/00-setup-and-tooling/08-editor-setup": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-08-editor-setup.mp4",
+    "bilibili": null,
+    "slug": "00-08-editor-setup"
+  },
+  "phases/00-setup-and-tooling/09-data-management": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-09-data-management.mp4",
+    "bilibili": null,
+    "slug": "00-09-data-management"
+  },
+  "phases/00-setup-and-tooling/10-terminal-and-shell": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-10-terminal-and-shell.mp4",
+    "bilibili": null,
+    "slug": "00-10-terminal-and-shell"
+  },
+  "phases/00-setup-and-tooling/11-linux-for-ai": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-11-linux-for-ai.mp4",
+    "bilibili": null,
+    "slug": "00-11-linux-for-ai"
+  },
+  "phases/00-setup-and-tooling/12-debugging-and-profiling": {
+    "r2": "https://videos.aieng-zh.cn/lessons/00-12-debugging-and-profiling.mp4",
+    "bilibili": null,
+    "slug": "00-12-debugging-and-profiling"
   }
 }
