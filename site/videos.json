@@ -1078,5 +1078,20 @@
     "r2": "https://videos.aieng-zh.cn/lessons/11-10-evaluation.mp4",
     "bilibili": "BV1ovhP6XEW9",
     "slug": "11-10-evaluation"
+  },
+  "phases/11-llm-engineering/11-caching-cost": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-11-caching-cost.mp4",
+    "bilibili": "BV1G2hP6jE1c",
+    "slug": "11-11-caching-cost"
+  },
+  "phases/11-llm-engineering/12-guardrails": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-12-guardrails.mp4",
+    "bilibili": "BV1oBhP6DEnV",
+    "slug": "11-12-guardrails"
+  },
+  "phases/11-llm-engineering/13-production-app": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-13-production-app.mp4",
+    "bilibili": "BV1RBhP6DEvc",
+    "slug": "11-13-production-app"
   }
 }
