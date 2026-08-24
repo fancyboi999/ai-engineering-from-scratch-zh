@@ -1033,5 +1033,20 @@
     "r2": "https://videos.aieng-zh.cn/lessons/11-01-prompt-engineering.mp4",
     "bilibili": "BV19U8e6aEu5",
     "slug": "11-01-prompt-engineering"
+  },
+  "phases/11-llm-engineering/02-few-shot-cot": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-02-few-shot-cot.mp4",
+    "bilibili": "BV1Cg8v67EPn",
+    "slug": "11-02-few-shot-cot"
+  },
+  "phases/11-llm-engineering/03-structured-outputs": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-03-structured-outputs.mp4",
+    "bilibili": "BV1AM8v6SEkT",
+    "slug": "11-03-structured-outputs"
+  },
+  "phases/11-llm-engineering/04-embeddings": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-04-embeddings.mp4",
+    "bilibili": "BV1PM8v6SEx6",
+    "slug": "11-04-embeddings"
   }
 }
