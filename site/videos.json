@@ -1028,5 +1028,10 @@
     "r2": "https://videos.aieng-zh.cn/lessons/00-12-debugging-and-profiling.mp4",
     "bilibili": "BV1R88v6eEn1",
     "slug": "00-12-debugging-and-profiling"
+  },
+  "phases/11-llm-engineering/01-prompt-engineering": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-01-prompt-engineering.mp4",
+    "bilibili": "BV19U8e6aEu5",
+    "slug": "11-01-prompt-engineering"
   }
 }
