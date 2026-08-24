@@ -1048,5 +1048,20 @@
     "r2": "https://videos.aieng-zh.cn/lessons/11-04-embeddings.mp4",
     "bilibili": "BV1PM8v6SEx6",
     "slug": "11-04-embeddings"
+  },
+  "phases/11-llm-engineering/05-context-engineering": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-05-context-engineering.mp4",
+    "bilibili": "BV11fhP6TE5W",
+    "slug": "11-05-context-engineering"
+  },
+  "phases/11-llm-engineering/06-rag": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-06-rag.mp4",
+    "bilibili": "BV1tfhP6MEVo",
+    "slug": "11-06-rag"
+  },
+  "phases/11-llm-engineering/07-advanced-rag": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-07-advanced-rag.mp4",
+    "bilibili": "BV1UDhP6kEkn",
+    "slug": "11-07-advanced-rag"
   }
 }
