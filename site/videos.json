@@ -1108,5 +1108,10 @@
     "r2": "https://videos.aieng-zh.cn/lessons/11-16-langgraph-state-machines.mp4",
     "bilibili": "BV1GNhP65Ewz",
     "slug": "11-16-langgraph-state-machines"
+  },
+  "phases/11-llm-engineering/17-agent-framework-tradeoffs": {
+    "r2": "https://videos.aieng-zh.cn/lessons/11-17-agent-framework-tradeoffs.mp4",
+    "bilibili": "BV1MLhP6qETQ",
+    "slug": "11-17-agent-framework-tradeoffs"
   }
 }
