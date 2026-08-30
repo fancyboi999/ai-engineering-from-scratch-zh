@@ -1,0 +1,78 @@
+{
+  "lesson": "31-mcp-conformance-versioning-and-operations",
+  "title": "MCP 一致性工程：版本、证据与运维",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "为什么一次成功的 SDK tools/list 调用不足以证明一致性？",
+      "options": [
+        "归一化后的值可能隐藏线上字段、版本行为、代理变更和无效响应",
+        "SDK 无法调用 MCP tools",
+        "一次成功调用总会选择遗留时代",
+        "一致性只适用于 Registry publishers"
+      ],
+      "correct": 0,
+      "explanation": "一致性必须检查原始请求和响应、选定的版本时代、中间层以及 SDK 转换。"
+    },
+    {
+      "stage": "check",
+      "question": "现代探测返回 JSON-RPC error -32021。支持回退的 client 应怎么做？",
+      "options": [
+        "立即为遗留时代发送 initialize",
+        "将 peer 视为离线",
+        "保持在现代时代，并修正或报告缺失的 capability 声明",
+        "忽略 error 并在没有 capabilities 的情况下重试"
+      ],
+      "correct": 2,
+      "explanation": "已识别的现代 error 证明现代行为。它是修正证据，而不是降级许可。"
+    },
+    {
+      "stage": "check",
+      "question": "现代 client 应如何处理 resultType 为 complete 且带有陌生可加字段的结果？",
+      "options": [
+        "将 resultType 改为 input_required",
+        "拒绝包含未知 key 的每个结果",
+        "接受已知 result type，并按字段角色保留或有意忽略该可加字段",
+        "将陌生字段视为遗留握手"
+      ],
+      "correct": 2,
+      "explanation": "可加字段支持前向兼容性。它们不同于未知的 lifecycle discriminator。"
+    },
+    {
+      "stage": "check",
+      "question": "对于没有 id 的 notification，要求的 JSON-RPC 响应是什么？",
+      "options": [
+        "一个 server/discover result",
+        "不产生 JSON-RPC 响应",
+        "带 null content 的 complete result",
+        "id 为 null 的 error"
+      ],
+      "correct": 1,
+      "explanation": "Notifications 是单向的。最终 transport serializer 不得输出 JSON-RPC success 或 error。"
+    },
+    {
+      "stage": "post",
+      "question": "哪种证据最能证明 proxy 保留了 origin protocol error？",
+      "options": [
+        "带稳定 digests 的、经脱敏的 ingress、origin 和 egress status 及 body 证据",
+        "gateway dashboard 的截图",
+        "仅 SDK exception class",
+        "proxy process uptime"
+      ],
+      "correct": 0,
+      "explanation": "三边界证据能揭示 status 折叠、body 重写，以及行为改变的精确 hop。"
+    },
+    {
+      "stage": "post",
+      "question": "一个 candidate 未通过负向转录记录，且先前版本没有准入或健康度证据。release gate 应怎么做？",
+      "options": [
+        "选择最新的 Registry version",
+        "因为 golden 转录记录通过而提升",
+        "回滚到标记为 latest 的 package",
+        "暂停发布，直至证明合格的 rollback target 或已修正的 candidate"
+      ],
+      "correct": 3,
+      "explanation": "没有精确准入和健康度证据的 rollback 是另一次未经验证的发布，因此安全动作是暂停。"
+    }
+  ]
+}
