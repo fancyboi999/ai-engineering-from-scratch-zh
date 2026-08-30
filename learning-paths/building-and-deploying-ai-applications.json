@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "building-and-deploying-ai-applications",
+  "title": "构建与部署 AI 应用",
+  "summary": "构建一项 AI 功能，覆盖从 prompt 与结构化输出，到检索、评估、生产服务、可观测性和发布的完整过程。",
+  "estimatedMinutes": 780,
+  "lessons": [
+    {"order": 1, "path": "phases/11-llm-engineering/01-prompt-engineering", "minutes": 60, "required": true},
+    {"order": 2, "path": "phases/11-llm-engineering/03-structured-outputs", "minutes": 60, "required": true},
+    {"order": 3, "path": "phases/11-llm-engineering/04-embeddings", "minutes": 60, "required": true},
+    {"order": 4, "path": "phases/11-llm-engineering/05-context-engineering", "minutes": 60, "required": true},
+    {"order": 5, "path": "phases/11-llm-engineering/06-rag", "minutes": 75, "required": true},
+    {"order": 6, "path": "phases/11-llm-engineering/10-evaluation", "minutes": 75, "required": true},
+    {"order": 7, "path": "phases/11-llm-engineering/11-caching-cost", "minutes": 60, "required": true},
+    {"order": 8, "path": "phases/11-llm-engineering/12-guardrails", "minutes": 60, "required": true},
+    {"order": 9, "path": "phases/11-llm-engineering/13-production-app", "minutes": 90, "required": true},
+    {"order": 10, "path": "phases/17-infrastructure-and-production/13-llm-observability", "minutes": 60, "required": true},
+    {"order": 11, "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive", "minutes": 60, "required": true},
+    {"order": 12, "path": "phases/17-infrastructure-and-production/23-sre-for-ai", "minutes": 60, "required": true}
+  ]
+}
