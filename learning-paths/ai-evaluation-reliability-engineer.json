@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "career-route",
+  "id": "ai-evaluation-reliability-engineer",
+  "title": "AI 评估与可靠性",
+  "workFamily": "AI 评估与可靠性",
+  "commonTitles": ["AI 评估工程师", "AI 可靠性工程师", "机器学习站点可靠性工程师"],
+  "summary": "衡量模型和 agent 行为，暴露失败模式，为运行时埋点，并围绕证据构建发布与事故控制措施。",
+  "keywords": "ai evaluation reliability engineer evals testing observability metrics load canary chaos sre",
+  "decisionPrompt": "你是否想将模型和系统的不确定性转化为评估、可观测性、发布和恢复证据？",
+  "mission": "在共同基础之上，定义可信行为、暴露失败，并通过可衡量的可靠性控制来运营 AI 发布。",
+  "responsibilities": [
+    "围绕真实失败风险设计模型、LLM 和 agent 评估。",
+    "用有价值的遥测数据为推理行为和系统健康状况埋点。",
+    "在发布前测试负载、实验、canary 和回滚条件。",
+    "利用事故和混沌测试改进可靠性控制。"
+  ],
+  "goodFitIf": [
+    "比起自信的完成声明，你更偏好可衡量的证据。",
+    "你喜欢发现边界情况、回归和系统失败路径。",
+    "你希望评估和运维共用同一套发布证据。"
+  ],
+  "baseline": [
+    "完成共同的软件工程和 AI 基础课程，或能证明具备同等实践知识。",
+    "理解模型指标、测试、API 和基础生产遥测。",
+    "能够复现失败，并比较受控运行中的行为。"
+  ],
+  "boundary": "这是一条建立在共同基础之上的专业路线，结合了相邻的评估和可靠性工作。它不代表存在一个通用职位名称，也不能替代线上事故与值班经验。",
+  "timeNote": "估时仅包含课程时间。作品集项目和练习需要额外时间。",
+  "portfolioProof": {
+    "title": "回归与可靠性门禁",
+    "description": "构建一个证据门禁，将行为评估、运行时遥测、负载、发布和恢复决策连接起来。",
+    "evidence": [
+      "评估集、评分标准和回归阈值",
+      "追踪 schema 和可观测性视图",
+      "SLO 和负载测试报告",
+      "canary 与回滚决策记录",
+      "包含纠正措施的混沌测试或事故分析"
+    ]
+  },
+  "readinessCriteria": [
+    "能选择与所测行为和失败风险匹配的指标。",
+    "能构建可复现的模型、LLM 和 agent 回归检查。",
+    "能关联追踪、推理指标和用户可见结果。",
+    "能定义负载、SLO、canary 和回滚阈值。",
+    "能将一次失败演练转化为经过测试的可靠性改进。"
+  ],
+  "coverage": {
+    "strong": ["模型、LLM 和 agent 评估", "失败分类法和可观测性", "推理指标和负载测试", "实验、发布、混沌和 SRE 控制"],
+    "partial": ["人工标注运营", "事故领导力", "大型分布式基础设施"],
+    "outsideCourse": ["生产值班的所有权", "合规签核权", "大规模基准实验室运营"]
+  },
+  "completionClaim": "完成本路线表明你能够构建基于证据的评估与可靠性门禁，但不保证获得相关职位，也不能证明你有负责线上生产事故的经验。",
+  "sourceBasis": {
+    "reviewedAt": "2026-08-29",
+    "method": "综合当前 AI 领域、产品、平台、数据、开发者和评估团队的主要职位描述得出。"
+  },
+  "estimatedMinutes": 750,
+  "stages": [
+    {
+      "id": "common-core",
+      "title": "共同核心",
+      "outcome": "定义行为、评估层次、失败模式和追踪语义。",
+      "lessonPaths": [
+        "phases/02-ml-fundamentals/09-model-evaluation",
+        "phases/11-llm-engineering/10-evaluation",
+        "phases/14-agent-engineering/30-eval-driven-agent-development",
+        "phases/14-agent-engineering/26-failure-modes-agentic",
+        "phases/14-agent-engineering/23-otel-genai-conventions"
+      ],
+      "artifact": "一份分层评估计划，包含失败分类法、追踪 schema 和回归阈值。"
+    },
+    {
+      "id": "role-practice",
+      "title": "角色实践",
+      "outcome": "衡量推理健康状况、生产行为、实验和容量上限。",
+      "lessonPaths": [
+        "phases/17-infrastructure-and-production/08-inference-metrics-goodput",
+        "phases/17-infrastructure-and-production/13-llm-observability",
+        "phases/17-infrastructure-and-production/21-ab-testing-llm-features",
+        "phases/17-infrastructure-and-production/22-load-testing-llm-apis"
+      ],
+      "artifact": "一份可观测性与负载报告，将服务指标与行为和用户结果关联起来。"
+    },
+    {
+      "id": "proof-project",
+      "title": "验证项目",
+      "outcome": "在受控失败下验证发布与恢复行为。",
+      "lessonPaths": [
+        "phases/17-infrastructure-and-production/20-shadow-canary-progressive",
+        "phases/17-infrastructure-and-production/24-chaos-engineering-llm"
+      ],
+      "artifact": "一个回归与可靠性门禁，包含 canary 阈值、回滚证据和混沌测试结果。"
+    },
+    {
+      "id": "interview-readiness-evidence",
+      "title": "面试与就绪度证据",
+      "outcome": "展示目标、事故和纠正措施如何构成可靠性的操作系统。",
+      "lessonPaths": ["phases/17-infrastructure-and-production/23-sre-for-ai"],
+      "artifact": "一份可靠性案例研究，包含 SLO、失败证据、响应决策和已验证的纠正措施。"
+    }
+  ],
+  "lessons": [
+    {"order": 1, "path": "phases/02-ml-fundamentals/09-model-evaluation", "minutes": 90, "required": true},
+    {"order": 2, "path": "phases/11-llm-engineering/10-evaluation", "minutes": 45, "required": true},
+    {"order": 3, "path": "phases/14-agent-engineering/30-eval-driven-agent-development", "minutes": 60, "required": true},
+    {"order": 4, "path": "phases/14-agent-engineering/26-failure-modes-agentic", "minutes": 60, "required": true},
+    {"order": 5, "path": "phases/14-agent-engineering/23-otel-genai-conventions", "minutes": 60, "required": true},
+    {"order": 6, "path": "phases/17-infrastructure-and-production/08-inference-metrics-goodput", "minutes": 60, "required": true},
+    {"order": 7, "path": "phases/17-infrastructure-and-production/13-llm-observability", "minutes": 60, "required": true},
+    {"order": 8, "path": "phases/17-infrastructure-and-production/21-ab-testing-llm-features", "minutes": 60, "required": true},
+    {"order": 9, "path": "phases/17-infrastructure-and-production/22-load-testing-llm-apis", "minutes": 75, "required": true},
+    {"order": 10, "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive", "minutes": 60, "required": true},
+    {"order": 11, "path": "phases/17-infrastructure-and-production/24-chaos-engineering-llm", "minutes": 60, "required": true},
+    {"order": 12, "path": "phases/17-infrastructure-and-production/23-sre-for-ai", "minutes": 60, "required": true}
+  ]
+}
