@@ -1,16 +1,43 @@
 ---
 name: elicitation-form-designer
-description: 为无状态 MCP 2026-07-28 elicitation 设计显式资源范围、授权、安全表单和签名 retry state。
+description: Design explicit resource scope and stateless MCP 2026-07-28 elicitation with authorization, safe forms, and signed retry state.
 version: 2.0.0
 phase: 13
 lesson: 12
 tags: [mcp, elicitation, mrtr, scope, authorization]
 ---
 
-为 MCP `2026-07-28` 操作设计用户输入步骤。把 workspace、目录或 resource URI 放在可见 tool 参数或 server 配置中，并说明哪个已认证 principal 可用；定义 URI 归一化、path-component containment、symbolic-link policy 和 OS sandbox。
+为面向协议 revision `2026-07-28` 的 MCP operation 设计一个 user-input step。
 
-说明必须询问用户的精确歧义、确认或外部交互。discovery 返回精确版本、capabilities、`ttlMs`、`cacheScope`；若有 tools，`tools/list` 必须稳定、`inputSchema` 为 object 且有 identity/cache hints。`elicitation: {}` 或 `elicitation.form` 表示支持表单；缺失或仅 URL 支持时返回 `-32021` 与 `data.requiredCapabilities.elicitation.form`，版本不支持用 `-32022`。
+产出：
 
-MRTR 以 `resultType: "input_required"`、稳定 `inputRequests` key 和 `elicitation/create` 返回。form 使用简单 message 与受限扁平 schema；URL 显示 HTTPS 目的地与 out-of-band 完成规则。重试带新 id、原 method/args、当前 `inputResponses`、本轮 `_meta` 和原样 `requestState`；无 id notification 只返回 HTTP 202。区分 accept、decline、cancel；以 HMAC/认证加密把 principal、参数摘要、候选、phase、过期与一次性 nonce 绑定，并在最终 mutation 前重检授权、实时状态和 containment。
+1. Scope 契约。将 workspace、directory 或 resource URI 放入可见 tool arguments 或 server configuration。说明哪些 authenticated principals 可以使用它。
+2. Boundary checks。定义 URI normalization、path-component containment、symbolic-link policy 和 operating-system sandbox。
+3. Trigger condition。说明需要用户 input 的精确 ambiguity、confirmation 或 external interaction。
+4. Discovery 与 capability gate。从 `server/discover` 返回精确的 `supportedVersions`、capabilities、`ttlMs` 和 `cacheScope`。如果声明 tools，包含必需的确定性 `tools/list` descriptors，且有有效 object `inputSchema`、server identity metadata 和 cache hints。将 `elicitation: {}` 和显式 `elicitation.form` 视为 form support。以 `-32021` 和 `data.requiredCapabilities.elicitation.form` 拒绝缺失或仅 URL support；对于不支持 version，以精确 `supported` 与 `requested` data 使用 `-32022`。
+5. MRTR result。返回带稳定 `inputRequests` key 和 `elicitation/create` request 的 `resultType: "input_required"`。
+6. Interaction design。对 form mode 提供纯文本 message 和受限 flat schema；对 URL mode 展示 HTTPS destination 与 out-of-band completion rule。
+7. Retry 契约。要求新的 JSON-RPC id、原始 method 与 arguments、当前 `inputResponses`、逐请求 `_meta` 和精确 `requestState` echo。无 id notification 绝不接收 JSON-RPC result 或 error；已接受 Streamable HTTP notification 返回无 body 的 `202`。
+8. Branch handling。将 `accept`、`decline` 和 `cancel` 映射到不同安全 outcomes。
+9. State protection。将 HMAC 或 authenticated encryption 绑定到 authenticated principal、原始 argument digest、candidate set、operation phase、expiry 与 one-time nonce。在由所有 handler instances 共享的有界、TTL-pruned replay store 中原子消费 nonce。
+10. Final revalidation。在 mutation 前立即重新检查 authorization、live record state 与 containment。
 
-拒绝把已弃用 Roots 当授权/containment/sandbox、用 roots/list 或反向 elicitation request、在 form 收集 password/API key/token/payment 信息、未经能力声明使用输入模式、把 clientInfo 当身份、未经确认就执行破坏性操作及未签名权限状态。拒绝显式 decline 后反复提示，最后输出风险和最小修正。
+硬拒绝：
+
+- 将已弃用 Roots 视为 authorization、containment 或 sandboxing。
+- 在新的 2026-07-28 design 中使用 `roots/list` 或 `notifications/roots/list_changed`。
+- 发送反向 `elicitation/create` request，而非通过 MRTR 返回它。
+- 在 form mode 中收集 passwords、API keys、access tokens 或 payment credentials。
+- 发送当前逐请求 capabilities 中缺少的 elicitation mode。
+- 将 `clientInfo` 视为 authenticated user identity。
+- 在 validated acceptance 与最终 authorization checks 前执行破坏性 action。
+- 使用携带 candidates 或 permission-relevant data 的未签名 `requestState`。
+
+拒绝规则：
+
+- 在明确 decline 后拒绝重复 prompts。
+- 对 server 可以不借助用户就能派生或校验的 value，拒绝 elicitation。
+- 拒绝包含 credentials、user secrets 或 pre-authenticated bearer value 的 URL。
+- 拒绝使用隐藏协议-session state、`initialize` 或 `Mcp-Session-Id` 的 request。
+
+输出一页设计，包含 scope、authorization、containment、interaction mode、schema 或 URL、MRTR wire shape、state fields、response branches、replay policy 与最终 revalidation checklist。
