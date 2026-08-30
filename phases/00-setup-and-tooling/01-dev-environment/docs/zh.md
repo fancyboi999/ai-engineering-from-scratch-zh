@@ -16,7 +16,7 @@
 
 ## 问题背景
 
-你即将用 Python、TypeScript、Rust 和 Julia 学习 200+ 节 AI 工程课程。如果你的环境是坏的，那么每一节课都会变成和工具链的搏斗，而不是学习本身。
+你即将用 Python、TypeScript、Rust 和 Julia 学习 500+ 节 AI 工程课程。如果你的环境是坏的，那么每一节课都会变成和工具链的搏斗，而不是学习本身。
 
 大多数人跳过环境搭建。然后他们花上好几个小时去调试 import 错误、版本冲突和缺失的 CUDA 驱动。我们要把这件事一次性做好、做对。
 
@@ -154,17 +154,41 @@ if torch.cuda.is_available():
 
 没有 GPU？没问题。大多数课程在 CPU 上就能跑。对于训练密集型课程，可以用 Google Colab 或云端 GPU。
 
-### 第 7 步：验证一切
+### 第 7 步：验证你准备开始的路线
 
-运行验证脚本：
+本课中的命令都要从仓库根目录执行，也就是同时包含 `README.md` 和 `phases/` 的目录。预检只检查你准备开始的路线；默认跳过后面课程才会用到的工具，避免刚入门时被一墙 warning 淹没。
+
+要从完整的新手序列开始：
 
 ```bash
-python phases/00-setup-and-tooling/01-dev-environment/code/verify.py
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner
+```
+
+也可以只检查你要走的路线：
+
+```bash
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route ml-foundations
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route llm-engineering
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route agents
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route mcp
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route agent-skills
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route certification
+```
+
+想在同一份预检中查看后续课程的可选工具与依赖时，加上 `--show-later`。少了后续工具不会阻止你开始已选路线。
+
+每个未通过的必需检查都会给出探测到的路径或 import 错误，以及准确的修复命令。Agent Skills 和认证路线还会提示人工检查：Python 脚本无法证明 AI host 已发现某个 skill，也不能证明你选定的 skill 目录可写。
+
+新手路线预检通过后，会直接打印第一节可运行的课：
+
+```text
+Ready to start Beginner course.
+Next: python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py
 ```
 
 ## 实际使用
 
-你的环境现在已经为本课程的每一节课准备就绪。下面是各部分的用途：
+你的环境已经能启动所检查的路线。后续课程需要工具时再安装，不要为了尚未开始的整套技术栈卡住第一课。下面是各部分在课程中的用途：
 
 | 语言 | 用于 | 包管理器 |
 |----------|---------|-----------------|

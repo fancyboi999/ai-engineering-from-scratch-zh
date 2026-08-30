@@ -12,7 +12,7 @@
 - 说清楚连续场景是怎么被离散成像素的，以及为什么采样/量化的决策给下游每个模型定下了天花板
 - 把图像当作 NumPy 数组来读取、切片、检查，并能在 HWC 和 CHW 布局之间自如切换
 - 在 RGB、灰度、HSV、YCbCr 之间互相转换，并讲清楚每种色彩空间存在的理由
-- 严格按 torchvision 的预期做像素级预处理（归一化、标准化、resize、通道前置）
+- 严格按预训练 PyTorch 视觉模型的预期做像素级预处理（归一化、标准化、resize、通道前置）
 
 ## 问题背景
 
@@ -200,13 +200,12 @@ conv-output-size
 
 ## 动手构建
 
-### 第 1 步：加载一张图像并检查它的 shape
+### 第 1 步：构造图像张量并检查它的 shape
 
-用 Pillow 加载任意 JPEG 或 PNG，转成 NumPy，打印你拿到的东西。想要一个确定性、能离线运行的例子，就合成一张。
+先从确定性的合成图像开始，让第一个实验只依赖 NumPy、可离线运行。文件解码是另一条边界：JPEG 或 PNG 解码器一旦给出 RGB 字节，下面的张量操作完全相同。
 
 ```python
 import numpy as np
-from PIL import Image
 
 def synthetic_rgb(h=128, w=192, seed=0):
     rng = np.random.default_rng(seed)
@@ -218,8 +217,6 @@ def synthetic_rgb(h=128, w=192, seed=0):
     return np.clip(rgb, 0, 255).astype(np.uint8)
 
 arr = synthetic_rgb()
-# 或者从磁盘加载：
-# arr = np.asarray(Image.open("your_image.jpg").convert("RGB"))
 
 print(f"type:   {type(arr).__name__}")
 print(f"dtype:  {arr.dtype}")
@@ -229,7 +226,7 @@ print(f"max:    {arr.max()}")
 print(f"pixel at (0, 0): {arr[0, 0]}")
 ```
 
-预期输出：`shape: (H, W, 3)`、`dtype: uint8`、范围 `[0, 255]`。这就是规范的磁盘表示，不管字节来自相机、JPEG 解码器还是合成生成器。
+预期输出：`shape: (H, W, 3)`、`dtype: uint8`、范围 `[0, 255]`。这就是规范的已解码表示，不管字节来自相机、图像解码器还是这个合成生成器。
 
 ### 第 2 步：拆分通道并重排布局
 
@@ -268,15 +265,16 @@ def rgb_to_hsv(rgb):
 
     h = np.zeros_like(cmax)
     mask = delta > 0
-    rmax = mask & (cmax == r)
-    gmax = mask & (cmax == g)
-    bmax = mask & (cmax == b)
+    argmax = np.argmax(rgb_f, axis=-1)
+    rmax = mask & (argmax == 0)
+    gmax = mask & (argmax == 1)
+    bmax = mask & (argmax == 2)
     h[rmax] = ((g[rmax] - b[rmax]) / delta[rmax]) % 6
     h[gmax] = ((b[gmax] - r[gmax]) / delta[gmax]) + 2
     h[bmax] = ((r[bmax] - g[bmax]) / delta[bmax]) + 4
     h = h * 60.0
 
-    s = np.where(cmax > 0, delta / cmax, 0)
+    s = np.divide(delta, cmax, out=np.zeros_like(delta), where=cmax > 0)
     v = cmax
     return np.stack([h, s, v], axis=-1)
 
@@ -322,60 +320,95 @@ max_diff = np.abs(roundtrip.astype(int) - arr.astype(int)).max()
 print(f"roundtrip max pixel diff: {max_diff}    # 应该是 0 或 1")
 ```
 
-每个通道的均值应该接近零，标准差接近一。这对 preprocess/deprocess 函数，正是每次 torchvision `transforms.Normalize` 调用在底层做的事。
+每个通道的均值应该接近零，标准差接近一。这对 preprocess/deprocess 函数，正是预训练视觉模型的标准化过程在底层做的事。
 
-### 第 5 步：用三种插值方法 resize
+### 第 5 步：从零实现 resize
 
-在放大上对比最近邻、双线性、双三次，让差异看得见。
+最近邻把每个输出坐标取整到一个源像素。双线性找到周围四个像素，按距离混合。下面两种实现都采用端点对齐坐标，因此第一个和最后一个源像素保持不动。
 
 ```python
-target = (arr.shape[0] * 3, arr.shape[1] * 3)
+def resize_coordinates(source_length, target_length):
+    if target_length == 1:
+        return np.zeros(1, dtype=np.float32)
+    return np.linspace(0, source_length - 1, target_length, dtype=np.float32)
 
-nearest = np.asarray(Image.fromarray(arr).resize(target[::-1], Image.NEAREST))
-bilinear = np.asarray(Image.fromarray(arr).resize(target[::-1], Image.BILINEAR))
-bicubic = np.asarray(Image.fromarray(arr).resize(target[::-1], Image.BICUBIC))
+def nearest_resize(image, target_height, target_width):
+    y = np.rint(resize_coordinates(image.shape[0], target_height)).astype(int)
+    x = np.rint(resize_coordinates(image.shape[1], target_width)).astype(int)
+    return image[y[:, None], x[None, :]]
+
+def bilinear_resize(image, target_height, target_width):
+    y = resize_coordinates(image.shape[0], target_height)
+    x = resize_coordinates(image.shape[1], target_width)
+    y0 = np.floor(y).astype(int)
+    x0 = np.floor(x).astype(int)
+    y1 = np.minimum(y0 + 1, image.shape[0] - 1)
+    x1 = np.minimum(x0 + 1, image.shape[1] - 1)
+    wy = (y - y0)[:, None, None]
+    wx = (x - x0)[None, :, None]
+
+    source = image.astype(np.float32)
+    top = source[y0[:, None], x0[None, :]] * (1 - wx)
+    top += source[y0[:, None], x1[None, :]] * wx
+    bottom = source[y1[:, None], x0[None, :]] * (1 - wx)
+    bottom += source[y1[:, None], x1[None, :]] * wx
+    result = top * (1 - wy) + bottom * wy
+    return np.clip(np.rint(result), 0, 255).astype(image.dtype)
+
+target_height = arr.shape[0] * 3
+target_width = arr.shape[1] * 3
+nearest = nearest_resize(arr, target_height, target_width)
+bilinear = bilinear_resize(arr, target_height, target_width)
 
 def local_roughness(x):
     gy = np.diff(x.astype(float), axis=0)
     gx = np.diff(x.astype(float), axis=1)
     return float(np.abs(gy).mean() + np.abs(gx).mean())
 
-for name, out in [("nearest", nearest), ("bilinear", bilinear), ("bicubic", bicubic)]:
+for name, out in [("nearest", nearest), ("bilinear", bilinear)]:
     print(f"{name:>8}  shape={out.shape}  roughness={local_roughness(out):6.2f}")
 ```
 
-最近邻在粗糙度上得分最高，因为它保留了硬边缘。双线性最平滑。双三次居中，在不引入阶梯状伪影的前提下保住了感知上的锐度。
+最近邻在粗糙度上得分最高，因为它保留了硬边缘。双线性更平滑，因为每个新像素都沿两条轴混合相邻位置。配套的可运行代码把同样的可分离思路扩展为每轴四个邻居的 Catmull-Rom 三次核，并在不用图像库的情况下打印三种结果。
 
 ## 实际使用
 
-`torchvision.transforms` 把上面这一切打包成一条可组合的流水线。下面的代码精确复现了 `preprocess_imagenet` 做的事，外加 resize 和裁剪。
+PyTorch 会在有 batch、可放到设备上的张量上执行相同操作。下面的代码缩放短边、中心裁剪、逐通道标准化，产出预训练模型期望的 NCHW 张量。
 
 ```python
 import torch
-from torchvision import transforms
-from PIL import Image
+import torch.nn.functional as F
 
-img = Image.fromarray(synthetic_rgb(256, 256))
+image_hwc = torch.from_numpy(synthetic_rgb(256, 320))
+batch = image_hwc.permute(2, 0, 1).unsqueeze(0).float() / 255.0
 
-pipeline = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
+height, width = batch.shape[-2:]
+scale = 256 / min(height, width)
+resized_height = round(height * scale)
+resized_width = round(width * scale)
+batch = F.interpolate(
+    batch,
+    size=(resized_height, resized_width),
+    mode="bilinear",
+    align_corners=False,
+    antialias=True,
+)
 
-x = pipeline(img)
-print(f"tensor type:  {type(x).__name__}")
-print(f"tensor dtype: {x.dtype}")
-print(f"tensor shape: {tuple(x.shape)}      # (C, H, W)")
-print(f"per-channel mean: {x.mean(dim=(1, 2)).tolist()}")
-print(f"per-channel std:  {x.std(dim=(1, 2)).tolist()}")
+top = (resized_height - 224) // 2
+left = (resized_width - 224) // 2
+batch = batch[:, :, top:top + 224, left:left + 224]
 
-batch = x.unsqueeze(0)
-print(f"\nbatched shape: {tuple(batch.shape)}   # (N, C, H, W) —— 可以喂给模型了")
+mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
+std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
+batch = (batch - mean) / std
+
+print(f"tensor dtype: {batch.dtype}")
+print(f"batched shape: {tuple(batch.shape)}")
+print(f"per-channel mean: {batch.mean(dim=(0, 2, 3)).tolist()}")
+print(f"per-channel std:  {batch.std(dim=(0, 2, 3)).tolist()}")
 ```
 
-四步，严格按这个顺序：`Resize(256)` 把短边缩放到 256；`CenterCrop(224)` 从中间取一块 224x224 的 patch；`ToTensor()` 除以 255 并把 HWC 换成 CHW；`Normalize` 减去 ImageNet 均值再除以标准差。把这个顺序颠倒过来，会悄无声息地改变最终到达模型的东西。
+四步，严格按这个顺序：把字节转成浮点并由 HWC 换成 NCHW；把短边缩放到 256；从中间取一块 224x224 的 patch；再减去 ImageNet 均值、除以标准差。把这个顺序颠倒过来，会悄无声息地改变最终到达模型的东西。
 
 ## 拿去用
 
@@ -386,7 +419,7 @@ print(f"\nbatched shape: {tuple(batch.shape)}   # (N, C, H, W) —— 可以喂�
 
 ## 练习
 
-1. **（简单）** 用 OpenCV（`cv2.imread`）和 Pillow 各加载一张 JPEG。打印两者的 shape 和 `(0, 0)` 处的像素。解释通道顺序的差异，然后写一行转换，让 OpenCV 数组和 Pillow 的完全一致。
+1. **（简单）** 创建一个含四种不同颜色的 2x2 RGB `uint8` 数组。把 HWC 转成 CHW 再转回来，打印两种 shape，并证明往返保留每一个值。
 2. **（中等）** 写 `standardize(img, mean, std)` 及其逆函数，让它们对任意 uint8 图像合起来能通过 `roundtrip_max_diff <= 1` 的测试。你的函数必须用同一种调用方式，既能处理 HWC 的单张图像，也能处理 NCHW 的一个 batch。
 3. **（困难）** 拿一个 3 通道、经过 ImageNet 标准化的张量，让它通过一个 1x1 卷积，这个卷积学着把 RGB 加权混合成单个灰度通道。把权重初始化为 `[0.299, 0.587, 0.114]`，冻结它们，验证输出在浮点误差范围内和你手写的 `rgb_to_grayscale` 吻合。还有哪些经典的色彩空间变换可以写成 1x1 卷积？
 

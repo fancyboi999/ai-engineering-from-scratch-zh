@@ -107,7 +107,7 @@ Liu 等人 2025 年的综述（《A Survey of Agent Interoperability Protocols: 
 - 与每种现代工具兼容的 JSON 原生载荷。
 - LLM 无需手写本体就能解读的自然语言内容。
 - web 技术栈传输（HTTP、SSE、WebSocket）。
-- 通过自描述文档实现的能力发现（MCP `listTools`、A2A Agent Card）。
+- 通过实时 MCP `server/discover` 与 A2A Agent Card 实现的能力发现。
 
 用更松的意图语义换更容易的实现。这就是那笔交易。
 
@@ -207,5 +207,5 @@ python3 code/main.py
 - [Liu et al. — A Survey of Agent Interoperability Protocols: MCP, ACP, A2A, ANP](https://arxiv.org/html/2505.02279v1) —— 把现代规范连回 FIPA 遗产的标志性 2025 综述
 - [FIPA ACL Message Structure Specification (fipa00037)](http://www.fipa.org/specs/fipa00037/) —— 2000 年批准的信封格式
 - [FIPA Communicative Act Library Specification (fipa00037)](http://www.fipa.org/specs/fipa00037/) —— 完整的 performative 目录
-- [MCP specification 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25) —— `request`/`query-ref` 的现代工具调用等价物
+- [MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) —— 当前无状态的 `request`/`query-ref` 现代工具调用等价物
 - [A2A specification](https://a2a-protocol.org/latest/specification/) —— contract-net 和 subscribe-notify 的现代 agent 对等等价物

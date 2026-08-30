@@ -152,5 +152,5 @@ tp-tool-loop
 - [OpenAI — Function calling guide](https://platform.openai.com/docs/guides/function-calling) — OpenAI 风格工具声明与调用形状的权威参考
 - [Anthropic — Tool use overview](https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview) — Claude 的 `tool_use` / `tool_result` block 格式
 - [Google — Gemini function calling](https://ai.google.dev/gemini-api/docs/function-calling) — Gemini 里的 `functionDeclarations` 与并行调用语义
-- [Model Context Protocol — Specification 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25) — 工具接口的 provider 无关一般化
+- [Model Context Protocol — Specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) — 当前无状态、provider 无关的工具接口一般化
 - [JSON Schema — 2020-12 release notes](https://json-schema.org/draft/2020-12/release-notes) — 每个现代工具 API 都在说的 schema 方言

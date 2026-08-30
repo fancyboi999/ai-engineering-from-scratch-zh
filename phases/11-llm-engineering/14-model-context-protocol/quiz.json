@@ -1,66 +1,7 @@
-{
-  "lesson": "14-model-context-protocol",
-  "title": "模型上下文协议（Model Context Protocol）",
-  "questions": [
-    {
-      "stage": "post",
-      "question": "一个 MCP server 暴露哪三种原语（primitive）？",
-      "options": [
-        "工具（tools）、资源（resources）、prompts",
-        "函数、类型、类",
-        "agent、技能、工作流",
-        "端点、webhook、队列"
-      ],
-      "correct": 0,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "MCP 使用什么传输格式（wire format）？",
-      "options": [
-        "基于 HTTP 的 GraphQL",
-        "带 OpenAPI 的 REST",
-        "使用 protobuf 的 gRPC",
-        "JSON-RPC 2.0"
-      ],
-      "correct": 3,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "哪个元数据字段表示一个工具会改变状态、应当要求人工审批？",
-      "options": [
-        "destructiveHint: true",
-        "readonly: false",
-        "mutating: true",
-        "requiresAuth: true"
-      ],
-      "correct": 0,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "2025-06-18 版中取代早先仅 SSE 远程传输的传输方式是什么？",
-      "options": [
-        "Streamable HTTP",
-        "仅 WebSocket",
-        "gRPC 双向流",
-        "WebTransport"
-      ],
-      "correct": 0,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "什么时候应该把一个工具拆分成它自己的 MCP server，而不是保持内联？",
-      "options": [
-        "永远不该；MCP 只用于本地开发",
-        "当它返回超过 1KB 的数据时",
-        "当它每天被调用少于 10 次时",
-        "当它被两个或更多 host 调用，且是只读/可缓存时"
-      ],
-      "correct": 3,
-      "explanation": ""
-    }
-  ]
-}
+{"lesson":"14-model-context-protocol","title":"Model Context Protocol","questions":[
+{"stage":"pre","question":"在 MCP 2026-07-28 中，client 把协议版本和能力放在哪里？","options":["只放在 HTTP cookie 中","只放在 initialize 请求中","每个请求的 params._meta 中","放在 server 端 session 记录中"],"correct":2,"explanation":"现代 MCP 是无状态的；每个请求都会在 params._meta 中携带协议版本和 client 能力。"},
+{"stage":"check","question":"每个现代 MCP server 都必须实现哪个方法，用于预先发现版本和能力？","options":["server/discover","sessions/create","logging/setLevel","initialize"],"correct":0,"explanation":"server/discover 会声明支持的版本、server 能力与 server 身份。"},
+{"stage":"check","question":"MCP 2026-07-28 当前的 Streamable HTTP 形状是什么？","options":["每次工具调用后发送 DELETE","由 Mcp-Session-Id 标识的 WebSocket session","每条 JSON-RPC 消息一个 POST；请求 POST 收到 JSON 或该请求范围内的 SSE","一个 GET 流外加独立的 POST endpoint"],"correct":2,"explanation":"当前传输只有一个 POST endpoint。请求 POST 收到 JSON 或请求范围内的 SSE；已接收 notification 的 POST 返回无 body 的 HTTP 202。"},
+{"stage":"check","question":"server 怎样区分缺少协议版本元数据与格式正确但不受支持的版本？","options":["两种情况都返回 -32022","缺版本返回 HTTP 301，不支持版本时签发 Mcp-Session-Id","缺失或非字符串元数据返回 -32602；不受支持的字符串版本返回携带 supported/requested 的 -32022","接受缺失版本，不支持版本返回 -32601"],"correct":2,"explanation":"缺失或类型错误的必填字段属于格式错误的 JSON-RPC params；只有已提供但未实现的版本字符串才是 UnsupportedProtocolVersionError。"},
+{"stage":"post","question":"一个多步骤 tool 需要跨调用连续性，现代 MCP 应如何设计？","options":["把可变状态放进 clientInfo","只为这个 tool 恢复 Mcp-Session-Id","签发不透明 handle，并要求后续 tool 参数携带它","把状态存到 TCP connection 后面"],"correct":2,"explanation":"跨调用状态是显式的应用状态。server 签发的 handle 作为普通且经过授权的参数传递。"},
+{"stage":"post","question":"在一次 tool 操作中，现代 server 如何索取用户、模型或 root 输入？","options":["把问题写到 stderr","打开第二条 SSE connection","返回 input_required，client 带 inputResponses 重试","发起独立的 server 到 client JSON-RPC 请求"],"correct":2,"explanation":"多轮往返请求（MRTR）把 inputRequests 放进 input_required 结果，随后重试原操作。"}]}
