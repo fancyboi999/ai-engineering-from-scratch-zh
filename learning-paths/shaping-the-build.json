@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "shaping-the-build",
+  "title": "产品判断与交付",
+  "summary": "将证据转化为结果、假设、可测试切片、可执行规格说明、衡量计划和有明确负责人的反馈循环。",
+  "estimatedMinutes": 550,
+  "lessons": [
+    {"order": 1, "path": "phases/14-agent-engineering/47-outcomes-before-output", "minutes": 60, "required": true},
+    {"order": 2, "path": "phases/14-agent-engineering/48-discover-the-real-workflow", "minutes": 70, "required": true},
+    {"order": 3, "path": "phases/14-agent-engineering/49-map-assumptions-and-risk", "minutes": 65, "required": true},
+    {"order": 4, "path": "phases/14-agent-engineering/50-choose-the-smallest-testable-slice", "minutes": 65, "required": true},
+    {"order": 5, "path": "phases/14-agent-engineering/51-write-specifications-that-preserve-judgment", "minutes": 75, "required": true},
+    {"order": 6, "path": "phases/14-agent-engineering/52-design-success-metrics", "minutes": 70, "required": true},
+    {"order": 7, "path": "phases/14-agent-engineering/53-prototype-pilot-or-production", "minutes": 70, "required": true},
+    {"order": 8, "path": "phases/14-agent-engineering/54-build-the-feedback-ratchet", "minutes": 75, "required": true}
+  ]
+}
