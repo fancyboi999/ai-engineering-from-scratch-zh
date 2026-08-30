@@ -1,7 +1,48 @@
-{"lesson":"07-building-an-mcp-server","title":"构建 MCP Server：无状态 Python 与 TypeScript","questions":[
-{"stage":"pre","question":"现代 MCP server 从哪里读取 client capabilities？","options":["Mcp-Session-Id","第一次 initialize call","每一个当前 request","process environment"],"correct":2,"explanation":"MCP 2026-07-28 在每个 request 的 params._meta 中携带 client capabilities。"},
-{"stage":"check","question":"现代 server 必须实现哪个 method？","options":["initialize","server/discover","resources/subscribe","shutdown"],"correct":1,"explanation":"server/discover 是现代 server 的强制实现，尽管 client 也可先调用其他 method。"},
-{"stage":"check","question":"tools/list 成功结果必须有哪些字段？","options":["protocolVersion 和 tools","resultType、ttlMs、cacheScope、tools","initialized 和 tools","sessionId 和 tools"],"correct":1,"explanation":"现代 list result 既有类型，又可缓存。"},
-{"stage":"check","question":"server 为什么要对 tools 做确定性排序？","options":["稳定 cache 与模型 context","创建 session","协商协议","替代授权"],"correct":0,"explanation":"稳定排序能使等价 registry 得到等价 response。"},
-{"stage":"post","question":"一个有效 tool call 已运行，但领域操作失败，应采用什么形状？","options":["notifications/initialized","HTTP DELETE","带 isError true 的 complete tool result","新的 server request"],"correct":2,"explanation":"tool 级失败应通过 content 与 isError 对模型保持可见。"},
-{"stage":"post","question":"什么应结束 stdio server 的 transport 生命周期？","options":["stdin 上的 EOF","GET request","强制 shutdown RPC","Mcp-Session-Id 过期"],"correct":0,"explanation":"EOF 是可移植的 stdio shutdown signal，它并不关闭现代协议 session。"}]}
+{
+  "lesson": "07-building-an-mcp-server",
+  "title": "构建 MCP Server：无状态 Python 与 TypeScript",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "现代 MCP server 从哪里读取 client capabilities？",
+      "options": ["从 Mcp-Session-Id", "从第一条 initialize 调用", "从每条当前请求", "从进程环境"],
+      "correct": 2,
+      "explanation": "MCP 2026-07-28 在每条请求的 params._meta 中携带 client capabilities。"
+    },
+    {
+      "stage": "check",
+      "question": "现代 server 必须实现哪个 method？",
+      "options": ["initialize", "server/discover", "resources/subscribe", "shutdown"],
+      "correct": 1,
+      "explanation": "现代 server 必须提供 server/discover，尽管 client 可以先调用其他 method。"
+    },
+    {
+      "stage": "check",
+      "question": "tools/list 的成功结果需要哪些字段？",
+      "options": ["protocolVersion 和 tools", "resultType、ttlMs、cacheScope、tools", "initialized 和 tools", "sessionId 和 tools"],
+      "correct": 1,
+      "explanation": "现代列表结果带有类型，且可缓存。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么 server 应以确定性方式排序 tools？",
+      "options": ["稳定 caches 和模型上下文", "创建 session", "协商协议", "替代授权"],
+      "correct": 0,
+      "explanation": "稳定排序让等价 registry 产生等价响应。"
+    },
+    {
+      "stage": "post",
+      "question": "一次有效 tool call 已运行，但领域操作失败。哪种结果形状合适？",
+      "options": ["notifications/initialized", "HTTP DELETE", "带 isError true 的完整 tool 结果", "一条新的 server 请求"],
+      "correct": 2,
+      "explanation": "通过 content 和 isError，让模型能够看到 tool 层失败。"
+    },
+    {
+      "stage": "post",
+      "question": "什么应结束 stdio server 的 transport 生命周期？",
+      "options": ["stdin 上的 EOF", "一条 GET 请求", "一条必需的 shutdown RPC", "Mcp-Session-Id 过期"],
+      "correct": 0,
+      "explanation": "EOF 是可移植的 stdio shutdown signal。它不会关闭现代协议 session。"
+    }
+  ]
+}

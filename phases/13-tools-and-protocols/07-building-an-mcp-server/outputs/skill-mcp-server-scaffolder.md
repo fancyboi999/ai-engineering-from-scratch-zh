@@ -1,16 +1,37 @@
 ---
 name: mcp-server-scaffolder
-description: 设计带 discovery、request 校验和确定性基元的无状态 MCP 2026-07-28 server。
+description: Design a stateless MCP 2026-07-28 server with discovery, request validation, and deterministic primitives.
 version: 2.0.0
 phase: 13
 lesson: 07
 tags: [mcp, server, stateless, discovery, scaffold]
 ---
 
-给定领域，产出现代 MCP server 方案。应用状态必须显式，协议行为必须无状态。划分原子 tools、URI resources 和有用 prompts；没有真实用途就省略该基元。
+给定一个领域，产出一个现代 MCP server 计划。保持应用状态显式，并让协议行为保持无状态。
 
-提供含 `supportedVersions`、capabilities、`resultType: "complete"`、cache hints 与 result `_meta` server identity 的 discovery。每个 `params._meta` 都校验版本与 client capabilities；版本不符返回 requested/supported 的 `-32022`。所有成功结果加 `resultType` 与 server identity；discover、列表、模板和资源读取加 `ttlMs`、`cacheScope`，并规定稳定排序键。
+产出：
 
-持久状态放数据库，或作为普通 tool 参数返回显式不透明 handle，绝不藏入协议 session。若必须兼容 `2025-11-25`，隔离 initialize adapter，只对 legacy 流量选择并分别测试。
+1. 基元划分。定义原子的 tools、以 URI 寻址的 resources 和有用的 prompts。当某个领域没有诚实的使用场景时，省略该基元。
+2. 发现结果。提供 `supportedVersions`、server capabilities、可选 instructions、`resultType: "complete"`、cache hints，以及结果 `_meta` 中的 server identity。
+3. 请求校验器。要求每个 `params._meta` 中都有协议版本和 client capabilities。若建议提供的 client identity 存在，则校验它。版本不匹配时，返回带请求版本和支持版本的 `-32022`。
+4. 结果 wrapper。为每个成功结果加入 `resultType: "complete"` 和 server identity。为发现、列表、templates 与 resource reads 加入 `ttlMs` 和 `cacheScope`。
+5. 排序策略。为每条列表响应定义稳定的 sort key。
+6. 状态策略。将持久状态放入 database，或将显式、不透明的 handle 作为普通 tool argument 返回。绝不要把状态隐藏在协议 session 中。
+7. 兼容性边界。如果需要支持旧版，隔离一个 `2025-11-25` initialize adapter。仅为旧版流量选择它，并分别测试两个时代。
 
-拒绝现代 server 首个有效 method 必须是 `initialize`、复用前一 request 的能力/身份/版本、在现代 HTTP 回 `Mcp-Session-Id`、缺少 cache hints 的列表/资源读取、把 annotations 当授权、或 server 主动发 JSON-RPC request。资源会泄露 secret 时要求 access policy；没有只读数据或可复用模板时不虚构 resources/prompts。输出一页架构、method 表、校验伪代码、结果样例、排序规则与至少六项 conformance tests，最后区分应用状态和协议状态。
+硬拒绝：
+
+- 第一条有效 method 必须是 `initialize` 的现代 server。
+- 复用此前请求中的 capabilities、identity 或版本。
+- 在现代 HTTP 流量中返回 `Mcp-Session-Id`。
+- 返回没有 cache hints 的列表或 resource-read 结果。
+- 将 annotations 视为授权控制。
+- 从 server 发送一条独立的 JSON-RPC 请求。
+
+拒绝规则：
+
+- 如果所请求的 resource 会在未经授权时暴露 secrets，停止并要求提供 access policy。
+- 如果领域中没有只读数据，省略 resources，不要凭空创造。
+- 如果领域中没有可复用模板，省略 prompts，不要交付填充内容。
+
+输出一页架构、method 表、校验伪代码、结果示例、确定性排序规则，以及至少六个 conformance tests。最后说明应用状态与协议状态之间的边界。
