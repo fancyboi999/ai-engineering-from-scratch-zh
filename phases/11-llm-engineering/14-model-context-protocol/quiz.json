@@ -1,7 +1,78 @@
-{"lesson":"14-model-context-protocol","title":"Model Context Protocol","questions":[
-{"stage":"pre","question":"在 MCP 2026-07-28 中，client 把协议版本和能力放在哪里？","options":["只放在 HTTP cookie 中","只放在 initialize 请求中","每个请求的 params._meta 中","放在 server 端 session 记录中"],"correct":2,"explanation":"现代 MCP 是无状态的；每个请求都会在 params._meta 中携带协议版本和 client 能力。"},
-{"stage":"check","question":"每个现代 MCP server 都必须实现哪个方法，用于预先发现版本和能力？","options":["server/discover","sessions/create","logging/setLevel","initialize"],"correct":0,"explanation":"server/discover 会声明支持的版本、server 能力与 server 身份。"},
-{"stage":"check","question":"MCP 2026-07-28 当前的 Streamable HTTP 形状是什么？","options":["每次工具调用后发送 DELETE","由 Mcp-Session-Id 标识的 WebSocket session","每条 JSON-RPC 消息一个 POST；请求 POST 收到 JSON 或该请求范围内的 SSE","一个 GET 流外加独立的 POST endpoint"],"correct":2,"explanation":"当前传输只有一个 POST endpoint。请求 POST 收到 JSON 或请求范围内的 SSE；已接收 notification 的 POST 返回无 body 的 HTTP 202。"},
-{"stage":"check","question":"server 怎样区分缺少协议版本元数据与格式正确但不受支持的版本？","options":["两种情况都返回 -32022","缺版本返回 HTTP 301，不支持版本时签发 Mcp-Session-Id","缺失或非字符串元数据返回 -32602；不受支持的字符串版本返回携带 supported/requested 的 -32022","接受缺失版本，不支持版本返回 -32601"],"correct":2,"explanation":"缺失或类型错误的必填字段属于格式错误的 JSON-RPC params；只有已提供但未实现的版本字符串才是 UnsupportedProtocolVersionError。"},
-{"stage":"post","question":"一个多步骤 tool 需要跨调用连续性，现代 MCP 应如何设计？","options":["把可变状态放进 clientInfo","只为这个 tool 恢复 Mcp-Session-Id","签发不透明 handle，并要求后续 tool 参数携带它","把状态存到 TCP connection 后面"],"correct":2,"explanation":"跨调用状态是显式的应用状态。server 签发的 handle 作为普通且经过授权的参数传递。"},
-{"stage":"post","question":"在一次 tool 操作中，现代 server 如何索取用户、模型或 root 输入？","options":["把问题写到 stderr","打开第二条 SSE connection","返回 input_required，client 带 inputResponses 重试","发起独立的 server 到 client JSON-RPC 请求"],"correct":2,"explanation":"多轮往返请求（MRTR）把 inputRequests 放进 input_required 结果，随后重试原操作。"}]}
+{
+  "lesson": "14-model-context-protocol",
+  "title": "Model Context Protocol",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "在 MCP 2026-07-28 中，client 在哪里发送协议版本和能力？",
+      "options": [
+        "只在 HTTP cookie 中发送",
+        "只在 initialize 请求中发送",
+        "在每个请求的 params._meta 中发送",
+        "在 server 端的 session 记录中发送"
+      ],
+      "correct": 2,
+      "explanation": "现代 MCP 是无状态的。每个请求都会在 params._meta 中携带协议版本和 client 能力。"
+    },
+    {
+      "stage": "check",
+      "question": "每个现代 MCP server 都必须实现什么，用于预先发现版本和能力？",
+      "options": [
+        "server/discover",
+        "sessions/create",
+        "logging/setLevel",
+        "initialize"
+      ],
+      "correct": 0,
+      "explanation": "server/discover 会公布支持的版本、server 能力和 server 身份。"
+    },
+    {
+      "stage": "check",
+      "question": "MCP 2026-07-28 当前的 Streamable HTTP 形式是什么？",
+      "options": [
+        "每次 tool call 后发送一个 DELETE 请求",
+        "由 Mcp-Session-Id 标识的 WebSocket session",
+        "每条 JSON-RPC 消息一个 POST；请求 POST 收到 JSON 或请求范围内的 SSE",
+        "一个 GET 流加上单独的 POST endpoint"
+      ],
+      "correct": 2,
+      "explanation": "当前传输有一个 POST endpoint。请求 POST 收到 JSON 或请求范围内的 SSE；已接受的 notification POST 返回没有 body 的 HTTP 202。"
+    },
+    {
+      "stage": "check",
+      "question": "server 应如何区分缺少协议版本元数据和格式正确但不受支持的版本？",
+      "options": [
+        "两种情况都返回 -32022",
+        "缺少版本时返回 HTTP 301，不受支持时签发 Mcp-Session-Id",
+        "缺少或非字符串元数据返回 -32602；不受支持的字符串版本返回带 supported/requested 的 -32022",
+        "接受缺少的版本，并为不受支持版本返回 -32601"
+      ],
+      "correct": 2,
+      "explanation": "缺少或类型不正确的必填字段属于格式错误的 JSON-RPC params。只有已提供但未实现的版本字符串才适用 UnsupportedProtocolVersionError。"
+    },
+    {
+      "stage": "post",
+      "question": "一个多步骤 tool 需要跨调用连续性。现代 MCP 应如何设计？",
+      "options": [
+        "将可变状态放进 clientInfo",
+        "只为这个 tool 恢复 Mcp-Session-Id",
+        "签发一个不透明 handle，并要求后续调用把它作为 tool 参数传入",
+        "将状态存放在 TCP connection 后面"
+      ],
+      "correct": 2,
+      "explanation": "跨调用状态是显式的应用状态。由 server 签发的 handle 作为普通且经过授权的参数传递。"
+    },
+    {
+      "stage": "post",
+      "question": "现代 server 如何在一次 tool 操作中请求用户、模型或 root 输入？",
+      "options": [
+        "把问题写到 stderr",
+        "打开第二条 SSE connection",
+        "返回 input_required，随后 client 携带 inputResponses 重试",
+        "发送独立的 server-to-client JSON-RPC 请求"
+      ],
+      "correct": 2,
+      "explanation": "Multi Round-Trip Requests 模式会把 inputRequests 嵌入 input_required 结果中，并重试原操作。"
+    }
+  ]
+}
