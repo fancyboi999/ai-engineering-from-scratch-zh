@@ -1,7 +1,78 @@
-{"lesson":"13-mcp-server-with-registry","title":"Capstone 13：带 Registry 和治理的无状态 MCP Server","questions":[
-{"stage":"pre","question":"本 capstone 为什么同时使用 server.json 和 server/discover？","options":["server.json 存 session，server/discover 删除 session","Registry 要求两个文件的版本日期完全相同","它们是同一个工具清单的两个名称","server.json 发布安装和 endpoint 元数据，server/discover 报告实时协议能力"],"correct":3,"explanation":"Registry 记录帮助 client 定位和配置 server；实时 RPC 报告运行中进程所支持的内容。两者 schema 与版本域独立，但发布的身份必须使用已认证 namespace 并与实时 serverInfo 一致。"},
-{"stage":"check","question":"MCP 2026-07-28 用什么替代 initialize 握手？","options":["Mcp-Session-Id 加 notifications/initialized","每个请求携带协议版本与 client 能力，client 可调用强制的 server/discover","打开永久 server 流的 GET 请求","每个 TCP connection 只发一次的 session cookie"],"correct":1,"explanation":"协议是无状态的。版本与能力是请求元数据，server/discover 则在不创建 session 的情况下提供实时版本和能力发现。"},
-{"stage":"check","question":"tools/list 哪种行为支持安全且高效的发现？","options":["无限期缓存且没有 scope 的响应","每个 replica 都随机排序","initialize 时创建的 connection-local 列表","确定性排序，配合 ttlMs 与正确的 public 或 private cacheScope"],"correct":3,"explanation":"稳定顺序提升可复现性和 prompt cache 效率；ttlMs 说明新鲜度，cacheScope 防止用户相关结果通过共享 cache 泄漏。"},
-{"stage":"check","question":"哪种 Streamable HTTP 设计符合当前无状态传输？","options":["所有 client 都需要 load balancer 粘性路由","POST 建 session、GET 恢复、DELETE 关闭","独立 GET 流使用 Last-Event-ID replay","每条 JSON-RPC 消息各自使用 POST；请求返回 JSON 或请求范围内 SSE"],"correct":3,"explanation":"当前 Streamable HTTP 对 MCP 消息只使用 POST，没有协议 session、独立 GET 流、session DELETE 或 Last-Event-ID 恢复。"},
-{"stage":"post","question":"生产 server 在 policy 允许的 tool handler 运行前必须校验什么？","options":["只校验 server.json 是否列了 remote URL","只校验 tool 的 destructiveHint 标注","只校验有人发过批准消息","协议元数据、token issuer、audience 或 resource、过期时间、scope，以及精确 action 的批准（如需要）"],"correct":3,"explanation":"传输元数据、token 校验和 policy 是互相独立的 gate；标注和发布元数据不会授予权限。"},
-{"stage":"post","question":"哪种证据最能支持 server 无协议 session、可以扩展的主张？","options":["server.json 有 remote 字段","跨两个可互换 replica 的线上并发运行，证明无需 affinity","构造一个 response dict 的 unit test","画出带 load balancer 的图"],"correct":1,"explanation":"必须实际验证传输与部署边界；请求在 replica 间交替才能证明正确性没有藏在一个进程或粘性 session 里。"}]}
+{
+  "lesson": "13-mcp-server-with-registry",
+  "title": "顶点项目 13：带 Registry 和治理的无状态 MCP 服务器",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "为什么本顶点项目同时使用 server.json 和 server/discover？",
+      "options": [
+        "server.json 存储 sessions，而 server/discover 删除它们",
+        "Registry 要求两个文件包含完全相同的版本日期",
+        "它们是同一份工具清单的两个名称",
+        "server.json 发布安装和 endpoint 元数据，而 server/discover 报告实时协议 capabilities"
+      ],
+      "correct": 3,
+      "explanation": "Registry 记录帮助 clients 定位和配置服务器。实时 RPC 报告运行中进程支持什么。它们的 schema 和版本域彼此独立，但发布的身份必须使用已认证的命名空间并与实时 serverInfo 匹配。"
+    },
+    {
+      "stage": "check",
+      "question": "在 MCP 修订版 2026-07-28 中，什么取代了 initialize 握手？",
+      "options": [
+        "Mcp-Session-Id 加 notifications/initialized",
+        "每个请求携带协议版本和 client capabilities，且 clients 可以调用强制的 server/discover",
+        "一个打开永久服务器流的 GET 请求",
+        "每个 TCP 连接只发送一次的 session cookie"
+      ],
+      "correct": 1,
+      "explanation": "协议是无状态的。版本和 capabilities 是请求元数据，而 server/discover 在不创建 session 的情况下提供实时版本和 capability 发现。"
+    },
+    {
+      "stage": "check",
+      "question": "哪种 tools/list 行为支持安全且高效的发现？",
+      "options": [
+        "一份没有 scope、永久缓存的响应",
+        "每个副本上随机的工具顺序",
+        "在 initialize 期间创建的连接本地列表",
+        "确定性顺序，加上 ttlMs 和正确的 public 或 private cacheScope"
+      ],
+      "correct": 3,
+      "explanation": "稳定排序提升可复现性和 prompt caching。ttlMs 传达新鲜度，cacheScope 则防止按用户变化的结果经共享缓存泄露。"
+    },
+    {
+      "stage": "check",
+      "question": "哪种 Streamable HTTP 设计符合当前的无状态 transport？",
+      "options": [
+        "所有 clients 都要求负载均衡器 sticky routing",
+        "POST 创建 session，GET 恢复它，DELETE 关闭它",
+        "独立的 GET 流使用 Last-Event-ID replay",
+        "每条 JSON-RPC 消息各用一个 POST；请求使用 JSON 或请求范围的 SSE"
+      ],
+      "correct": 3,
+      "explanation": "当前 Streamable HTTP 对 MCP 消息只使用 POST，没有协议 session、独立 GET 流、session DELETE 或 Last-Event-ID 可恢复性。"
+    },
+    {
+      "stage": "post",
+      "question": "在策略已批准的工具 handler 运行前，生产服务器必须校验什么？",
+      "options": [
+        "只校验 server.json 是否列出 remote URL",
+        "只校验工具的 destructiveHint 注释",
+        "只校验是否有人发布了一条审批消息",
+        "协议元数据，以及 token issuer、audience 或 resource、expiry、scope 和任何精确动作审批"
+      ],
+      "correct": 3,
+      "explanation": "传输元数据、token 校验和策略是相互独立的 gates。注释与发布元数据不会授予权限。"
+    },
+    {
+      "stage": "post",
+      "question": "哪种证据最能支持“服务器无需协议 sessions 即可扩展”的主张？",
+      "options": [
+        "一条 server.json remote 条目",
+        "跨两个可互换副本的 wire-level 并发运行，且没有 affinity 依赖",
+        "一个构造单个响应字典的 unit test",
+        "一张展示负载均衡器的图"
+      ],
+      "correct": 1,
+      "explanation": "必须演练真实 transport 与部署边界。让请求在副本间交替，才能证明正确性没有隐藏在一个进程或 sticky session 中。"
+    }
+  ]
+}
