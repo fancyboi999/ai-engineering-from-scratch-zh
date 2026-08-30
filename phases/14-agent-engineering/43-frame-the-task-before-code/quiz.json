@@ -1,0 +1,12 @@
+{
+  "lesson": "43-frame-the-task-before-code",
+  "title": "写代码前先框定任务",
+  "questions": [
+    {"stage":"pre","question":"可靠的编码 agent 工作首先应是什么？","options":["由仓库证据支撑的任务框架","一次模型调用","一次编辑","一个拉取请求"],"correct":0,"explanation":"任务框架会在实现前建立事实、边界、未知项和证明。"},
+    {"stage":"check","question":"下列哪一项是仓库事实？","options":["重复响应测试在 tests/test_accounts.py:44 期望 409","API 大概使用 409","409 感觉很符合惯例","API 应该使用 409"],"correct":0,"explanation":"事实带有可以检查的具体凭据。"},
+    {"stage":"check","question":"为什么要写出禁止路径？","options":["为了选择模型","为了定义改动的负空间","为了让 prompt 更长","为了避免运行测试"],"correct":1,"explanation":"只写允许路径，无法说明哪些诱人的相邻工作必须保持不动。"},
+    {"stage":"check","question":"人工未知项何时应让 agent 暂停？","options":["遇到任何陌生文件时","每条命令之前","只在部署后","当它会改变产品行为、风险、权限或不可逆成本时"],"correct":3,"explanation":"高后果的选择在被埋进代码前需要明确检查点。"},
+    {"stage":"post","question":"什么让验收证据有力？","options":["它在编码后写下","它使用许多工具","它写明精确命令或观察以及所证明的主张","它说测试通过"],"correct":2,"explanation":"具体的证明让其他会话能够复现任务闭合。"},
+    {"stage":"post","question":"何时算完成足够的侦察？","options":["上下文窗口满了时","每个计划决定都有证据、已委托权限或明确未知项时","搜索一次后","读完每个文件后"],"correct":1,"explanation":"当决定已有依据或明显尚未解决时，侦察就该停止。"}
+  ]
+}
