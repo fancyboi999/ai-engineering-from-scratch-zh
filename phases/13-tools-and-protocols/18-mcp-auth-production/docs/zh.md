@@ -1,34 +1,50 @@
-# 生产环境的 MCP Auth——入册、JWKS 刷新、受众钉定的 token
+# 生产环境中的 MCP Auth：与 issuer 绑定的入册与 token
 
-> 第 16 课在内存里立起了 OAuth 2.1 状态机。到 2026 年，你交付给真实组织的每个 MCP server 都坐在生产鉴权之后：要支撑无上限增长的 client 群体的 client 入册（首选 Client ID Metadata Documents，dynamic client registration 作为向后兼容的兜底）、authorization-server 元数据 discovery（RFC 8414 *或* OpenID Connect Discovery）、不会在凌晨三点把 token 校验搞崩的 JWKS 缓存刷新，以及拒绝跨 resource 重放的受众钉定 token。本课用三个角色把整个表面建模出来——一个 authorization server、一个 resource server（也就是 MCP server）、一个 client——这样你就能追踪从 discovery 到一次校验通过的工具调用之间的每一跳。
+> 第 16 课构建了 OAuth 2.1 状态机。本课为 MCP 2026-07-28 加固生产边界：优先使用 Client ID Metadata Document，已废弃的动态注册只保留兼容用途，校验授权响应 issuer，按 issuer 存储 client 凭据，刷新 JWKS，并在每次无状态请求中使用受众钉定的 token。
 >
-> **规范说明（2025-11-25）：** 2025 年 11 月的 MCP 授权规范把 Dynamic Client Registration 从 `SHOULD` 降级到了 `MAY`，并把 **Client ID Metadata Documents（CIMD）** 确立为推荐的默认入册机制。本课两种都讲，按规范的优先级顺序来；代码里仍保留 DCR 作演示，因为它在单个进程里完全自洽。
+> **规范说明（2026-07-28）：** Dynamic Client Registration 已由 Client ID Metadata Document 取代而废弃。DCR 保留为兼容机制。使用它时，client 必须声明正确的 `application_type`。client 会校验存在的 RFC 9207 `iss` 值，且绝不跨 authorization-server issuer 复用凭据。
 
 **类型：** Build
-**语言：** Python（标准库）
-**前置要求：** 阶段 13 · 16（OAuth 2.1 状态机）、阶段 13 · 17（网关）
-**预计时间：** ~90 分钟
+**语言：** Python (stdlib)
+**前置要求：** Phase 13 · 16（OAuth 2.1 状态机），Phase 13 · 17（网关）
+**预计时间：** 约 90 分钟
 
 ## 学习目标
 
-- 经由 RFC 8414 元数据 discovery 一个 authorization server，并核实契约。
-- 实现 RFC 7591 dynamic client registration，让 MCP client 无需管理员介入就能入册。
-- 按计划缓存并刷新 JWKS 密钥，让签名校验挺过密钥轮转。
+- 通过 RFC 8414 元数据发现 authorization server，并验证其契约。
+- 通过 Client ID Metadata Document 入册，并将已废弃的 DCR 隔离为兜底方案。
+- 校验 RFC 9207 `iss`，按 authorization-server issuer 存储注册信息，并按 issuer 加 resource 存储与资源绑定的 token。
+- 定期缓存和刷新 JWKS 密钥，让签名验证能够跨越密钥轮换。
 - 用 RFC 8707 resource indicator 把 token 钉到单个 MCP resource 上，拒绝 confused-deputy 复用。
-- 把三个角色干净地分开——authorization server、resource server、client——让每个角色只执行属于自己的那些检查。
-- 读一份 IdP 能力矩阵，当 IdP 满足不了 MCP 的鉴权 profile 时拒绝部署。
+- 在 JWT 校验和 token introspection 之间做选择，定义撤销时效，并在身份依赖不可用时安全失败。
+- 分离 authorization server、resource server 和 client，使每一方只执行自己负责的检查。
+- 按部署检查清单审计 authorization server，并拒绝不安全的入册或 token 重用。
 
-## 问题背景
+## 问题所在
 
 第 16 课的模拟器在内存里跑 OAuth 2.1。生产有三个纯内存模拟器看不到的运维缺口。
 
-第一个缺口是入册。一个真实组织跑着几百个 MCP server 和几千个 MCP client。运维不会把每个 Cursor 用户都手动注册成 OAuth client。2025-11-25 规范给了 client 一个解决这件事的优先级顺序：如果你有一个预注册好的 `client_id` 就用它，否则用 **Client ID Metadata Document**（client 用一个它自己掌控的 HTTPS URL 来标识自己，由 authorization server *主动拉取* 元数据），再否则退回到 **RFC 7591 dynamic client registration**（client *主动推送* 一个 `POST /register`，当场拿到一个 `client_id`），最后再退回到提示用户。CIMD 是推荐的默认做法，因为它在保留一套以 DNS 为根的信任模型的同时，彻底去掉了逐 server 的注册；DCR 则为向后兼容而保留。两者都从 authorization server 的元数据里发现自己的入口：CIMD 看 `client_id_metadata_document_supported`，DCR 看 `registration_endpoint`。
+第一个缺口是入册与凭据隔离。真实组织可能运行数百个 MCP server 和数千个 MCP client。2026-07-28 修订版优先采用 **Client ID Metadata Document**：client 使用自己控制的、带路径的 HTTPS URL 作为标识符，authorization server 拉取元数据。RFC 7591 动态注册只保留为已废弃的兼容路径。DCR 无法避免时，请求必须声明正确的 `application_type`。client 将注册信息存于 authorization-server issuer 下，将 access token 存于 `(issuer, resource)` 键下。issuer 变化意味着需要重新入册；resource 不同则需要单独获取受众绑定的 token。
 
 第二个缺口是密钥轮换。JWT 校验依赖 authorization server 的签名密钥，以一个 JSON Web Key Set（JWKS）发布。authorization server 按计划轮换它们（常常每小时，事件响应时有时更快）。一个在启动时取一次 JWKS 的 MCP server，在轮换窗口之前都校验正常——然后每个请求都失败，直到重启。生产把 JWKS 串成一个带缓存的值，配一个刷新作业，在上一批密钥过期前覆盖缓存，外加一个缓存未命中时的兜底拉取，应对一个由比缓存更新的密钥签名的 token 到来的情况。
 
 第三个缺口是受众绑定。第 16 课引入了 RFC 8707 resource indicator。在生产里，那个 indicator 变成每个请求上的一道硬性 claim 检查。MCP server 把 `token.aud` 和自己的规范 resource URL 对比，不匹配就用 HTTP 401 拒绝。这是唯一一道防御，挡住一个上游 MCP server（或一个持有本属于某 server 的 token 的恶意 client）把那个 token 重放给同一信任网格里另一个 server。
 
 本课把这每一个缺口都映射到表面的一块具体东西上。元数据文档是一个 HTTP 端点。JWKS 缓存刷新是一个计划作业加一个键值缓存。JWT 校验是 resource server 在分发任何工具之前跑的一个例程。把三个角色分开，每个角色就只执行属于它的那些检查：authorization server 签发并轮换密钥，resource server 缓存并校验，client 做 discovery 和入册。
+
+## 范围：第 16 课之后的生产强制执行
+
+[第 16 课：使用 OAuth 2.1 保护 MCP](../../16-mcp-security-oauth-2-1/docs/en.md) 负责 authorization-code 状态机、PKCE、protected-resource discovery、resource indicator 和 scope 决策。本课不定义第二条 OAuth flow。它从这些契约已具备之后开始，讨论已部署的 resource server 如何在密钥轮换、opaque-token 校验、撤销、依赖失败、发布和事故响应期间持续执行这些契约。
+
+生产边界更窄，也更偏运行：
+
+- JWT 路径在每个请求上验证被钉定的 issuer、算法、签名密钥、受众、时间 claim 和 scope，同时安全地刷新 JWKS。
+- opaque-token 路径调用 issuer 的已认证 introspection endpoint，并校验返回的 active 状态、受众或 resource、过期时间、主体和 scope。
+- 撤销策略定义凭据必须在多快时间内停止工作，以及哪个缓存可能延后这一事实。
+- 失败策略决定 discovery、JWKS、introspection 或撤销基础设施不可用时的行为。
+- 证据记录驱动结果的 issuer 元数据、密钥集或 introspection 响应、token claim、策略版本和拒绝原因，但不存储 token。
+
+这种区分让课程可组合。第 16 课证明 flow 正确。本课证明 token 到达真实 MCP 请求路径后仍可信，或者会被拒绝。
 
 ## 核心概念
 
@@ -42,7 +58,9 @@
   "authorization_endpoint": "https://auth.example.com/authorize",
   "token_endpoint": "https://auth.example.com/token",
   "jwks_uri": "https://auth.example.com/.well-known/jwks.json",
+  "client_id_metadata_document_supported": true,
   "registration_endpoint": "https://auth.example.com/register",
+  "authorization_response_iss_parameter_supported": true,
   "response_types_supported": ["code"],
   "grant_types_supported": ["authorization_code", "refresh_token"],
   "code_challenge_methods_supported": ["S256"],
@@ -53,11 +71,14 @@
 
 拿到一个 MCP resource URL 的 client 会把 discovery 串起来：RFC 9728 里的 `oauth-protected-resource`（resource server 的文档）给出 issuer，然后 `oauth-authorization-server`（也就是本 RFC）给出每一个端点。client 从不硬编码 authorization URL。
 
+对于带路径的 resource identifier，应在该路径之前插入 well-known 段。例如，`https://mcp.example.com/team/server` 的 protected-resource metadata 位于 `https://mcp.example.com/.well-known/oauth-protected-resource/team/server`。在 resource path 之后追加 `/.well-known/...` 是错误的。
+
 在信任某个 IdP 跑 MCP 之前，你要核实的契约：
 
 - `code_challenge_methods_supported` 里包含 `S256`（即 RFC 7636 的 PKCE）。规范说得很明确：如果这个字段 **缺失**，authorization server 就不支持 PKCE，client **必须** 拒绝继续。
 - `grant_types_supported` 里包含 `authorization_code`，并且拒绝 `password` 和 `implicit`。
-- 至少广告了一条入册路径：`client_id_metadata_document_supported: true`（CIMD，首选）**或** `registration_endpoint`（RFC 7591 DCR，兜底）。任一满足契约即可；你不再硬性要求 DCR。
+- 至少存在一条入册路径：`client_id_metadata_document_supported: true`（首选 CIMD）、预注册 client，或 `registration_endpoint`（已废弃的 RFC 7591 兼容方案）。
+- 如果 `authorization_response_iss_parameter_supported` 为 true，client 要求返回 RFC 9207 `iss`，并将其与重定向前记录的 issuer 精确比较。
 - 对 OAuth 2.1 来说，`response_types_supported` 恰好是 `["code"]`。
 
 如果 `S256` 缺失，MCP server 就拒绝在这个 IdP 上部署——PKCE 没有降级模式。如果 *两条* 入册路径都没广告，而你又没有预注册的 `client_id`，那你也没法入册；这时是部署清单写错了，不是代码错了。
@@ -87,6 +108,7 @@ client 托管的元数据文档：
   "client_id": "https://app.example.com/oauth/client.json",
   "client_name": "Example MCP Client",
   "client_uri": "https://app.example.com",
+  "application_type": "native",
   "redirect_uris": ["http://127.0.0.1:7333/callback", "http://localhost:7333/callback"],
   "grant_types": ["authorization_code", "refresh_token"],
   "response_types": ["code"],
@@ -96,6 +118,8 @@ client 托管的元数据文档：
 
 文档里的 `client_id` 值 **必须** 等于它被提供出来的那个 URL（authorization server 会校验这点；不匹配就拒绝）。authorization server 在它的 RFC 8414 元数据里用 `client_id_metadata_document_supported: true` 来广告支持。
 
+当前 CIMD 契约要求 `client_id`、`client_name` 和非空的 `redirect_uris` 数组。client identifier 是带路径的绝对 HTTPS URL。可以包含 `application_type`，但它不是 CIMD 的必填字段。不要将 DCR 对 `application_type` 的要求照搬到首选 CIMD 路径。
+
 规范对两个安全事实直言不讳：
 
 - **SSRF。** authorization server 会去拉取一个攻击者提供的 URL。它必须防御 server-side request forgery（不要拉取内部/管理端点）。
@@ -103,15 +127,18 @@ client 托管的元数据文档：
 
 因为 CIMD 不需要 server 端状态，所以没有像 DCR 那样要立起来的注册器。client 端是只读的：从一个静态 HTTPS 端点提供你的元数据文档，让 authorization server 来拉取就行。
 
-### RFC 7591——Dynamic Client Registration（兜底 / 向后兼容）
+如果 authorization server operator 已经预配了 client identifier，应先使用这个按 issuer 范围划分的注册信息，再尝试自动入册。否则优先使用 CIMD。只有 issuer 既不能预注册也不能使用 CIMD 时，才使用已废弃的 DCR。
 
-DCR 现在是个 `MAY`，为向后兼容 2025-11-25 之前的部署、以及还不支持 CIMD 的 IdP 而保留。没有它（也没有 CIMD 或预注册）的话，每个 MCP client（Cursor、Claude Desktop、一个自研 agent）都需要和 IdP 管理员做一次带外交换。有了 DCR，client 这样 post：
+### RFC 7591：已废弃的兼容入册方案
+
+DCR 已在 2026-07-28 修订版中废弃。仅为不能消费 CIMD 且预注册不现实的 authorization server 保留它。兼容 client 会发送：
 
 ```json
 POST /register
 Content-Type: application/json
 
 {
+  "application_type": "native",
   "redirect_uris": ["http://127.0.0.1:7333/callback"],
   "grant_types": ["authorization_code", "refresh_token"],
   "response_types": ["code"],
@@ -136,7 +163,7 @@ server 回应一个 `client_id` 和一个供后续更新用的 `registration_acc
 }
 ```
 
-对运行在用户设备上的 MCP client 来说，`token_endpoint_auth_method: none` 是正确的默认值。它们只拿到一个 `client_id`——没有 `client_secret` 可被窃取。PKCE 提供了 public client 所需的 proof-of-possession。
+`application_type` 不是装饰字段。loopback desktop client 声明 `native`；由 server 托管的 client 声明 `web` 并使用 HTTPS redirect URI。`token_endpoint_auth_method: none` 是 public native client 的正确默认值。它只有 `client_id`，由 PKCE 提供 proof-of-possession。
 
 三个生产坑：
 
@@ -152,9 +179,9 @@ server 回应一个 `client_id` 和一个供后续更新用的 `registration_acc
 
 PKCE 在 OAuth 2.1 里是强制的。本课的 authorization-code 流程总是带着 `code_challenge` 和 `code_verifier`。server 拒绝任何没有 verifier、或 verifier 哈希后对不上所存 challenge 的 token 请求。
 
-### MCP Spec 2025-11-25 鉴权 Profile
+### MCP 2026-07-28 authorization profile
 
-MCP 规范（2025-11-25）对一个 MCP server 的授权层必须做什么讲得很精确：
+当前 MCP 修订版保留 OAuth resource-server 边界，同时让 MCP transport 变为无状态。不存在可以缓存身份决策的 protocol session。因此 authorization layer 必须独立校验每个请求：
 
 - 实现 RFC 9728 protected-resource 元数据，并通过 401 上的 `WWW-Authenticate: Bearer resource_metadata="..."` 头 **或** well-known URI `/.well-known/oauth-protected-resource` 提供它的位置（SEP-985 把这个头改成了可选，配一个 well-known 兜底）。元数据的 `authorization_servers` 字段 **必须** 至少给出一个 server。
 - 只通过 **每个** 请求上的 `Authorization: Bearer ...` 接受 token——绝不放在 query string 里，绝不只在 session 开始时校验。
@@ -162,24 +189,26 @@ MCP 规范（2025-11-25）对一个 MCP server 的授权层必须做什么讲得
 - 在 401/403 时，返回带 `error=...` 的 `WWW-Authenticate: Bearer`、`resource_metadata="<PRM-URL>"` 参数（元数据文档的 URL，*而不是* 裸 resource），以及在 `insufficient_scope`（403）时带上 `scope="..."`。注意：参数是 `resource_metadata`，一个 discovery 指针——challenge 里没有 `resource` 参数。
 - authorization-server discovery **既** 接受 RFC 8414 OAuth 元数据 **也** 接受 OpenID Connect Discovery 1.0；client 必须按优先级顺序把两个 well-known 后缀都试一遍。
 - 防御 **mix-up 攻击** 的是 client（不是 server）：它在重定向之前记下预期的 `issuer`，并在兑换 code 之前校验 `iss` 授权响应参数（RFC 9207）。单凭 PKCE 拦不住 mix-up，因为 client 会把自己的 `code_verifier` 交给被引导去的那个 token 端点。
+- 一个 client 凭据属于一个 authorization-server issuer。如果 discovery 解析出不同 issuer，client 会重新入册，而不是出示旧的 `client_id`、registration token 或 access token。
+- CIMD 是首选入册机制。DCR 已废弃；兼容 DCR 请求仍要声明正确的 `application_type`。
 
 OAuth 2.1 草案是底料；RFC 8414/7591/8707/9728/9207 + RFC 7636 + CIMD 是表面；MCP 规范是 profile。
 
-### IdP 能力矩阵
+### 部署能力检查清单
 
-并非每个 IdP 都支持完整的 MCP profile。下面的矩阵记录的是截至 2025-11-25 规范的客观能力陈述。它是一道 *部署门禁*，不是推荐。
+厂商功能表很快会过时。应检查你实际将部署的 authorization server 返回的 metadata。这个 gate 是机械的：
 
-CIMD 在 2025-11-25 规范里才落地，而底层的 OAuth 草案直到 2025 年 10 月才被采纳，所以厂商支持还在陆续到来——把下面的 "CIMD" 当成"它今天的现状，请在你自己的 tenant 里核实"，而不是一个永久陈述。
+| 检查项 | 所需决策 |
+|---|---|
+| 发现的 issuer | 策略预期的精确 HTTPS issuer |
+| PKCE | 发布 `S256`；否则停止 |
+| 入册 | 首选 CIMD，接受预注册，DCR 仅作为已废弃兼容方案 |
+| 授权响应 | 在存在或声明支持时校验 RFC 9207 `iss` |
+| resource 绑定 | token 请求携带 `resource`；resource server 要求匹配的 `aud` |
+| 凭据存储 | client ID 和注册凭据按 issuer 存储；access token 按 issuer 加 resource 存储 |
+| DCR 兼容性 | 声明 `native` 或 `web`；拒绝与声明 application type 不匹配的 redirect URI |
 
-| IdP 类别 | AS 元数据（8414/OIDC） | CIMD | RFC 7591 DCR | RFC 8707 resource | RFC 7636 S256 PKCE | 说明 |
-|---|---|---|---|---|---|---|
-| 自托管（Keycloak） | 支持 | 正在出现 | 支持 | 支持（24.x 起） | 支持 | 本课中 MCP profile 的参考 IdP；DCR 路径全程端到端打通，CIMD 跟进新规范。 |
-| 企业 SSO（Microsoft Entra ID） | 支持 | 正在出现 | 支持（高级套餐） | 支持 | 支持 | DCR 可用性因 tenant 套餐而异；部署前在目标 tenant 里核实。 |
-| 企业 SSO（Okta） | 支持 | 正在出现 | 支持（Okta CIC / Auth0） | 支持 | 支持 | DCR 在 Auth0（现为 Okta CIC）上可用；经典 Okta 组织需要管理员预注册。 |
-| 社交登录 IdP（通用） | 视情况而定 | 不支持 | 罕见 | 罕见 | 支持 | 大多数社交 IdP 把 client 当成静态合作伙伴；没有自助入册。仅作身份来源用，在其上叠一层你自己的、懂 MCP 的 authorization server。 |
-| 自定义 / 自研 | 取决于实现 | 取决于实现 | 取决于实现 | 取决于实现 | 取决于实现 | 如果你自己交付，就交付完整 profile 并优先用 CIMD。跳过 PKCE 或受众绑定会破坏 MCP 鉴权契约。 |
-
-部署清单的拒绝规则：如果所选 IdP 的 `code_challenge_methods_supported` 里没列 `S256`，MCP server 拒绝启动——PKCE 没有降级模式。入册是道更软的门禁：你需要 *一条* 能用的路径（一个预注册的 `client_id`、`client_id_metadata_document_supported: true`，或一个 `registration_endpoint`）。单单缺 DCR 不再是触发拒绝的理由，因为 CIMD 或预注册可以顶上。
+不要从产品名称或定价层级推断支持能力。将发现的文档作为部署证据留存，并在必填字段缺失时 fail closed。
 
 ### JWKS 刷新模式（在 AS 处轮换，在 resource server 处刷新）
 
@@ -220,6 +249,37 @@ if not result["valid"]:
 
 `validate` 解码 JWT，从 JWKS 缓存里解析出签名密钥（未命中时刷新一次），校验签名，然后对照 allow-list 检查 `iss`、对照本 server 的规范 resource 检查 `aud`、检查 `exp` 和所需 scope——在第一个失败处返回一个 `WWW-Authenticate` challenge。把它做成 resource server 上的单一例程，意味着每个入口（每次工具调用、每条 transport）都走同一套检查；没有一条路径能在不先校验的情况下到达工具。
 
+### opaque token 使用 introspection，不靠猜测
+
+并非每个 access token 都是 JWT。若 issuer 记录的是 opaque token，resource server 无法将其解码为可信 claim。它会通过已认证的 backchannel 将 token 发给 issuer 的 RFC 7662 introspection endpoint，并要求 `active: true`、预期 issuer context、精确的 MCP 受众或 resource、未过期的时间 claim，以及具体工具所需的 scope。
+
+按 issuer、单向 token digest 和 MCP resource 缓存 introspection。绝不将明文 token 用作日志或缓存标签。正向缓存项的时间上限取 token expiry、issuer cache guidance 和部署的撤销时效目标三者中最早的一个。负向缓存应足够短，避免新签发 token 持续被错误视为 inactive。即使 opaque token 字符串相同，一个 resource 的结果也不能授权另一个 resource。
+
+不要由攻击者可控的 token 内容选择校验模式。将 JWT 与 introspection 行为钉定到已验证的 issuer metadata 和部署配置。在 JWT 路径上，钉定可接受的算法和受信任的 `jwks_uri`；绝不只跟随 token header 选择的 key URL 或算法。
+
+### 撤销是一份时效契约
+
+RFC 7009 允许 client 请求 authorization server 撤销 token。该请求不会抹除每台 resource server 已缓存的副本。定义可接受的最长撤销延迟，并让每个缓存遵守它。
+
+opaque-token 部署可以通过在每次高风险调用时 introspection，或使用很短的正向缓存，实现更紧的撤销时效。self-contained JWT 部署通常结合短 access-token 生命周期、refresh-token 撤销、针对 issuer 范围事故的密钥退役，以及可选的 subject、session 或 token-id denylist，用于紧急本地拒绝。已签名 JWT 在过期前仍保持密码学有效，除非 resource server 拥有当前的外部撤销证据。
+
+登出、账户停用、撤回同意和事故响应是不同触发因素，但必须收敛为同一个可衡量的声明：在声明的撤销窗口后，每个 replica 都会拒绝该凭据。请通过 load balancer 测试这项声明，而不是只针对一个预热进程。
+
+### 依赖失败需要预先声明决策
+
+绝不要在 exception handler 中临时编造可用性策略。
+
+| 失败情形 | 安全的生产行为 |
+|---|---|
+| 计划 JWKS 刷新失败，但已知 `kid` 仍在有界且有效的缓存中 | 仅在声明的 stale-on-error 窗口内继续，并输出降级健康证据 |
+| token 有未知 `kid`，且允许的一次刷新失败 | 拒绝；绝不接受不可验证的签名 |
+| introspection 不可用 | 对受保护调用 fail closed；不要把网络故障转成 `active: true` |
+| protected-resource 或 issuer metadata 意外变化 | 停止新入册和 token 获取；仅在有界事故策略下保留被明确钉定且未过期的配置 |
+| 撤销 endpoint 不可用 | 将登出或撤销报告为未完成；尽可能在本地将凭据保留为不可用；不要声称全局撤销成功 |
+| 时钟来源或 claim 类型无效 | 拒绝，而非扩大时间偏差直到 token 通过 |
+
+将依赖故障与无效凭据分开分类。依赖中断是带有健康和重试策略的运行错误。签名、issuer、受众、过期时间或 scope 错误则是授权拒绝。两者都不能到达 tool handler，也都不该将 token 内容泄露进审计证据。
+
 ### 受众重放演练（access-token 权限收窄）
 
 Server A（`notes.example.com`）和 Server B（`tasks.example.com`）都向同一个 authorization server 注册。Server A 被攻陷了。攻击者拿走一个用户的 notes token，把它重放给 Server B。
@@ -254,19 +314,30 @@ Server B 的校验器：
 - **scope 升级竞态。** 同一个用户的两个并发 step-up 流程可能都成功，产生两个 scope 不同的 access token。校验器必须用请求上呈递的那个 token，而不是去查"用户当前的 scope"——那会制造一个 TOCTOU 窗口。
 - **注册 token 失窃。** 一个泄漏的 `registration_access_token` 让攻击者能改写 redirect URI。把它们静态哈希存储；要求 client 在每次更新时呈递明文；有怀疑就轮换。
 - **`iss` 未钉定。** 一个接受任意 `iss` 的校验器，让攻击者能立起自己的 authorization server、为目标受众注册一个 client、再签发 token。protected-resource 元数据里的 `authorization_servers` 列表就是 allow-list；强制执行它。
+- **凭据或 token 缓存碰撞。** 仅按 resource 存储注册信息的 client 可能向另一台 authorization server 出示某台 server 的身份。仅按 issuer 存储 access token 的 client 可能将 token 重放到错误受众。按已验证 issuer 存储注册信息，按 `(issuer, resource)` 存储 access token，并在 issuer 改变时重新入册。
 
 ```figure
 t3-jwks-rotate
 ```
 
-## 实际使用
+## 上手使用
 
 `code/main.py` 用标准库 Python 和三个角色——`AuthorizationServer`、`ResourceServer`、`Client`——走完整个生产流程。流程如下：
 
+从仓库根目录运行：
+
+```bash
+cd phases/13-tools-and-protocols/18-mcp-auth-production
+python3 code/main.py
+python3 -m unittest discover -s code/tests -v
+```
+
+第一条命令输出与 issuer 绑定的入册和 token 校验 transcript。第二条报告十八项通过的检查。两条命令都不会打开 network listener，也不会写入凭据。
+
 1. authorization server 在 `/.well-known/oauth-authorization-server` 发布 RFC 8414 元数据。
 2. MCP client 调元数据端点，检查它的入册选项（CIMD 看 `client_id_metadata_document_supported`，DCR 看 `registration_endpoint`）和 `S256` PKCE 支持。
-3. 演练走 DCR 兜底路径：client 向 `/register`（RFC 7591）post，拿到一个 `client_id`。（一个 CIMD client 会改为呈递它自己的 HTTPS `client_id` URL，跳过这一步。）
-4. MCP client 跑带 `resource` indicator（RFC 8707）的、受 PKCE 保护的 authorization code 流程（RFC 7636）。
+3. client 检查是否存在按 issuer 范围划分的预注册；否则使用自己的 HTTPS Client ID Metadata Document 入册。已废弃 DCR 仍是可单独测试的兼容机制。
+4. client 记录已验证 issuer，创建 S256 challenge，收到一次性 authorization code 和 `iss`，校验返回 issuer，并以原始 verifier 与 RFC 8707 `resource` indicator 兑换 code。
 5. MCP client 用 `Authorization: Bearer ...` 在 MCP server 上调一个工具。
 6. MCP server 跑 `validate`，从 JWKS 缓存里解析出签名密钥。
 7. IdP 轮换一个密钥；计划刷新把 JWKS 重新拉进缓存。
@@ -275,7 +346,7 @@ t3-jwks-rotate
 
 这里的 JWT 用 HS256 加一个共享 secret（这样本课只靠标准库就能跑）。生产用 RS256 或 EdDSA 配上面那个 JWKS 模式；除此之外校验逻辑完全一样。因为 IdP 和 resource server 活在同一个进程里，`refresh_jwks` 直接读 authorization server 的密钥列表；放到线上它是一次对 `jwks_uri` 的 HTTP `GET`。
 
-## 拿去用
+## 交付
 
 本课产出 `outputs/skill-mcp-auth.md`。给定一个 MCP server 配置和一组 IdP 能力，这个 skill 输出要立起来的鉴权表面——protected-resource 元数据、要用的入册路径（CIMD、预注册，或 DCR 兜底）、JWKS 刷新计划、scope 映射，以及当 IdP 不支持完整 RFC profile 时要施加的拒绝规则。
 
@@ -289,21 +360,21 @@ t3-jwks-rotate
 
 4. 读 RFC 7591，找出本课的 `/register` 处理器没校验的两个字段。把校验加上。（提示：`software_statement` 和 `redirect_uris` 的 URI scheme。）
 
-5. 加一条 Client ID Metadata Document 路径。提供一个 `client.json`，它的 `client_id` 等于它自己的 URL，并让 authorization server 拉取并校验它（如果 `client_id` ≠ URL 就拒绝）。确认一个 CIMD client 在不调 `register_client` 的情况下入册。
+5. 添加第二台 authorization server。确认 client 存储独立的、按 issuer 键控的入册信息，并拒绝重用第一台 issuer 的 token 或 `client_id`。
 
 6. 证明那个 DoS 修复。给校验器发一个带随机 `kid` 的 token，确认 `refresh_jwks` 最多跑一次、且 authorization server 的密钥数不增长。然后故意把兜底重接成一个"轮换并铸新"，看着密钥数随每个伪造 token 往上爬——之后把重新拉取恢复回去。
 
-7. 实现 mix-up 章节里那个 client 端的 RFC 9207 `iss` 检查：在 authorization 请求之前记下预期的 issuer，然后拒绝一个 `iss` 对不上的 authorization 响应。
+7. 使用 `native` 和 `web` client 分别演练已废弃 DCR。确认带 HTTP redirect URI 的 web client，以及没有精确 loopback redirect 的 native client 都会被拒绝。
 
 ## 关键术语
 
-| 术语 | 大家怎么说 | 它实际是什么 |
+| 术语 | 常见说法 | 实际含义 |
 |------|----------------|------------------------|
 | ASM | "OAuth 元数据文档" | RFC 8414 `/.well-known/oauth-authorization-server` JSON |
-| CIMD | "client 元数据 URL" | Client ID Metadata Document——一个被用作 `client_id` 的 HTTPS URL；AS 拉取那份 JSON。自 2025-11-25 起是推荐的默认做法 |
-| DCR | "自助 client 注册" | RFC 7591 `POST /register` 流程；在 2025-11-25 被降级为一个 `MAY` 兜底 |
+| CIMD | “Client metadata URL” | Client ID Metadata Document：用作 `client_id` 的 HTTPS URL；AS 拉取其中 JSON。MCP 2026-07-28 的首选入册方式 |
+| DCR | “自助 client 注册” | RFC 7591 `POST /register`；对当前 MCP 已废弃，仅为兼容保留 |
 | JWKS | "用于 JWT 校验的公钥" | JSON Web Key Set，从 `jwks_uri` 拉取，按 `kid` 索引 |
-| Rotate vs refresh | "更新密钥" | *Rotate* = AS 铸/退役签名密钥；*refresh* = resource server 重新拉取已发布的密钥集。resource server 只会 refresh |
+| 轮换与刷新 | “更新密钥” | *轮换* = AS 创建/退役签名密钥；*刷新* = resource server 重新拉取已发布集合。resource server 只会刷新 |
 | Resource indicator | "受众参数" | RFC 8707 `resource` 参数，把 token 钉到一个 server |
 | `aud` claim | "受众" | 校验器拿来和规范 resource URL 对比的 JWT claim |
 | Audience replay | "token 重放" | 为 Server A 签发的 token 被呈递给 Server B；靠受众校验防御（规范：access-token 权限收窄） |
@@ -316,9 +387,8 @@ t3-jwks-rotate
 
 ## 延伸阅读
 
-- [MCP——Authorization spec（2025-11-25）](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization)——本课实现的 MCP 鉴权 profile
-- [MCP 博客——One Year of MCP: November 2025 Spec Release](https://blog.modelcontextprotocol.io/posts/2025-11-25-first-mcp-anniversary/)——2025-11-25 里变了什么（CIMD、XAA、DCR 降级）
-- [Aaron Parecki——Client Registration in the November 2025 MCP Authorization Spec](https://aaronparecki.com/2025/11/25/1/mcp-authorization-spec-update)——CIMD 优先于 DCR 的理由
+- [MCP authorization specification (2026-07-28)](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization) - 当前 MCP authorization profile
+- [MCP 2026-07-28 changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog) - CIMD、issuer 校验、DCR 废弃和以 issuer 为键的凭据变更
 - [OAuth Client ID Metadata Document（draft-ietf-oauth-client-id-metadata-document-00）](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00)——CIMD
 - [RFC 8414——OAuth 2.0 Authorization Server Metadata](https://datatracker.ietf.org/doc/html/rfc8414)——discovery 契约
 - [RFC 7591——OAuth 2.0 Dynamic Client Registration Protocol](https://datatracker.ietf.org/doc/html/rfc7591)——DCR（兜底路径）
@@ -326,4 +396,5 @@ t3-jwks-rotate
 - [RFC 8707——Resource Indicators for OAuth 2.0](https://datatracker.ietf.org/doc/html/rfc8707)——受众钉定
 - [RFC 9728——OAuth 2.0 Protected Resource Metadata](https://datatracker.ietf.org/doc/html/rfc9728)——resource server discovery
 - [RFC 9207——OAuth 2.0 Authorization Server Issuer Identification](https://datatracker.ietf.org/doc/html/rfc9207)——防御 mix-up 攻击的那个 `iss` 参数
-- [OAuth 2.1 draft](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1)——整合后的 OAuth 底料
+- [RFC 7662: OAuth 2.0 Token Introspection](https://datatracker.ietf.org/doc/html/rfc7662)
+- [RFC 7009: OAuth 2.0 Token Revocation](https://datatracker.ietf.org/doc/html/rfc7009)
