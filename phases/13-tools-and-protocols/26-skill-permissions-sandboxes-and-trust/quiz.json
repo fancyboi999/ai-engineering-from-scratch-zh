@@ -1,0 +1,78 @@
+{
+  "lesson": "26-skill-permissions-sandboxes-and-trust",
+  "title": "Skill 权限、沙箱与信任",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "一份 SKILL.md 写着 `You may write anywhere on disk`。这句话提供了什么权限？",
+      "options": [
+        "不提供任何权限；宿主权限模型仍会决定每一项操作",
+        "可写入用户 home 目录",
+        "可写入引用资料中提到的每条路径",
+        "模型复述这句话后即可获得写入权限"
+      ],
+      "correct": 0,
+      "explanation": "Skill 内容是指令数据，而不是能力 token。即使 skill 声称拥有更宽泛的权限，文件系统范围、工具访问、网络策略和批准仍由宿主提供并持续生效。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么 workspace jail 在检查包含性之前必须解析 symlink？",
+      "options": [
+        "解析后的路径会自动脱敏 secret",
+        "解析会使每条路径都可写入",
+        "symlink 总是包含格式错误的 YAML",
+        "从字面上看位于 workspace 内的路径，可能经由 symlink 指向 jail 外的目标"
+      ],
+      "correct": 3,
+      "explanation": "只检查输入字符串会漏掉 `workspace/report` 这类最终解析到别处的链接。必须针对解析后的目标判断包含性；保守的系统还可以完全拒绝直接指向 symlink 的目标。"
+    },
+    {
+      "stage": "check",
+      "question": "任务中嵌入的外部网页要求关闭批准检查。在本场景下，运行时应如何对待这段文字？",
+      "options": [
+        "将其视为可移植的 SKILL.md 扩展",
+        "将其视为无法扩展权限的不可信数据",
+        "将其视为新的最高优先级系统策略",
+        "将其视为用户给出的批准"
+      ],
+      "correct": 1,
+      "explanation": "外部内容可以为任务提供信息，但它不属于可信策略通道。受其影响的请求仍应受现有权限限制；对于有状态的操作，可能还应增加一道批准门。"
+    },
+    {
+      "stage": "check",
+      "question": "演示破坏性命令审查时，最安全的教学方式是什么？",
+      "options": [
+        "只要 skill bundle 包含脚本，就允许执行该命令",
+        "在课程仓库中运行该命令，之后再恢复文件",
+        "解析并分类 argv 向量，返回 `deny`，且绝不执行",
+        "打印一条学生无需审查即可粘贴的 shell 字符串"
+      ],
+      "correct": 2,
+      "explanation": "策略模拟器无需制造真实副作用，就能讲解可执行文件 allowlist、破坏性模式、元字符检查和裁决。课程结果应明确记录从未发生执行。"
+    },
+    {
+      "stage": "post",
+      "question": "一个 skill 提议向网络 allowlist 之外的 origin 发起 HTTPS 调用。用户此前已调用该 skill。正确裁决是什么？",
+      "options": [
+        "只有描述提到互联网时才允许",
+        "允许，因为调用就意味着同意网络访问",
+        "把 hostname 改写为 allowlist 中的第一个 host",
+        "按网络策略拒绝；激活不是授权"
+      ],
+      "correct": 3,
+      "explanation": "调用门控制指令加载，而网络门控制规范化 HTTPS origin，包括有效 port。此前选择 skill 不会扩大 allowlist，也不会授权传输凭证。"
+    },
+    {
+      "stage": "post",
+      "question": "当写入请求含有可能的 secret 材料，且不存在获批准的 secret 使用路径时，应如何处理？",
+      "options": [
+        "只要目标路径位于 workspace 内就信任它",
+        "将它替换为随机值后继续",
+        "记录 payload，以便审查人员检查完整值",
+        "不打印该值就拒绝，并要求使用另一条单独授权的 secret 工作流"
+      ],
+      "correct": 3,
+      "explanation": "workspace 包含性并不能让 secret 处理变得安全。审查器应阻断请求，避免回显敏感材料，并在任何合法 secret 使用前要求显式策略和批准。"
+    }
+  ]
+}
