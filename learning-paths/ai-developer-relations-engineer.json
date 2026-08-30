@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "kind": "career-route",
+  "id": "ai-developer-relations-engineer",
+  "title": "开发者体验与教育",
+  "workFamily": "开发者体验与教育",
+  "commonTitles": ["AI 开发者关系工程师", "AI 开发者倡导者", "开发者体验工程师"],
+  "summary": "构建可信的集成、示例和可复用的 agent 包，再将开发者遇到的阻力转化为更清晰的工具和教学内容。",
+  "keywords": "ai developer relations devrel developer education technical content integrations examples sdk mcp skills",
+  "decisionPrompt": "你是否想让开发者更容易理解、采纳并正确使用 AI 能力？",
+  "mission": "在共同基础之上，将技术能力转化为可信的接口、可运行示例和可复用的学习资产。",
+  "responsibilities": [
+    "设计清晰的 API、工具和协议契约，供开发者使用。",
+    "构建可运行示例和可复用的 agent 包。",
+    "准确讲解运行时行为、权衡和失败模式。",
+    "将开发者遇到的阻力与反馈转化为产品和文档改进。"
+  ],
+  "goodFitIf": [
+    "你喜欢构建软件，也喜欢解释它为何能工作。",
+    "你关心首次运行是否成功、示例、文档和开发者信任。",
+    "你希望开发者反馈能够塑造产品。"
+  ],
+  "baseline": [
+    "完成共同的软件工程和 AI 基础课程，或能证明具备同等实践知识。",
+    "能够阅读 API 契约，并从源码运行本地示例。",
+    "能够站在新开发者的角度测试使用说明。"
+  ],
+  "boundary": "这是一条建立在共同基础之上的专业路线。它最擅长技术集成和可复用的教学资产；社区项目、活动和内容分发则需要额外实践。",
+  "timeNote": "估时仅包含课程时间。作品集项目和练习需要额外时间。",
+  "portfolioProof": {
+    "title": "开发者采纳工具包",
+    "description": "将一项 AI 能力打包为可发现的集成，供其他开发者运行、检查和验证。",
+    "evidence": [
+      "一个可运行的 API 或工具集成",
+      "一份简明的快速入门指南和可用示例",
+      "一个已验证的 skill 或可复用 agent 包",
+      "一份评估与可移植性报告",
+      "一项基于开发者反馈并已记录的改进"
+    ]
+  },
+  "readinessCriteria": [
+    "能解释指令包与可执行工具的区别。",
+    "能设计小而明确的接口，并提供有用的失败提示。",
+    "能创建从干净环境即可运行的示例。",
+    "能验证发现、调用、打包和可移植性。",
+    "能将观察到的开发者阻力转化为具体的产品或教学改进。"
+  ],
+  "coverage": {
+    "strong": ["API 和工具契约", "MCP 实现", "Skill 发现与打包", "可运行的技术示例"],
+    "partial": ["技术写作与快速入门指南", "开发者反馈研究", "社区教育"],
+    "outsideCourse": ["活动和社区项目的所有权", "内容分发策略", "多年面向公众的开发者工作经验"]
+  },
+  "completionClaim": "完成本路线表明你能够构建并讲解可验证的开发者集成，但不保证获得相关职位，也不能替代与开发者社区长期协作的经验。",
+  "sourceBasis": {
+    "reviewedAt": "2026-08-29",
+    "method": "综合当前 AI 领域、产品、平台、数据、开发者和评估团队的主要职位描述得出。"
+  },
+  "estimatedMinutes": 905,
+  "stages": [
+    {
+      "id": "common-core",
+      "title": "共同核心",
+      "outcome": "从凭证出发，经由工具和协议契约构建健全的能力接口。",
+      "lessonPaths": [
+        "phases/00-setup-and-tooling/04-apis-and-keys",
+        "phases/13-tools-and-protocols/01-the-tool-interface",
+        "phases/13-tools-and-protocols/05-tool-schema-design",
+        "phases/13-tools-and-protocols/06-mcp-fundamentals",
+        "phases/13-tools-and-protocols/07-building-an-mcp-server"
+      ],
+      "artifact": "一个可运行的集成，包含清晰契约、配置路径和可观测的错误行为。"
+    },
+    {
+      "id": "role-practice",
+      "title": "角色实践",
+      "outcome": "让可复用的 agent 知识可发现、可调用，并按需渐进式披露。",
+      "lessonPaths": [
+        "phases/13-tools-and-protocols/22-skills-and-agent-sdks",
+        "phases/13-tools-and-protocols/24-skill-discovery-and-progressive-disclosure",
+        "phases/13-tools-and-protocols/25-skill-invocation-and-routing"
+      ],
+      "artifact": "一个 skill 包，包含简明元数据、分层参考资料和明确的调用示例。"
+    },
+    {
+      "id": "proof-project",
+      "title": "验证项目",
+      "outcome": "证明该包及其周边工具生态能在受支持的上下文中运行。",
+      "lessonPaths": [
+        "phases/13-tools-and-protocols/27-skill-evals-packaging-and-portability",
+        "phases/13-tools-and-protocols/23-capstone-tool-ecosystem"
+      ],
+      "artifact": "一个开发者采纳工具包，包含验证结果、可移植性说明和可用的端到端示例。"
+    },
+    {
+      "id": "interview-readiness-evidence",
+      "title": "面试与就绪度证据",
+      "outcome": "展示开发者反馈如何改变集成或其教学路径。",
+      "lessonPaths": ["phases/14-agent-engineering/54-build-the-feedback-ratchet"],
+      "artifact": "一份简短的采纳案例研究，包含阻力证据、所做改动和衡量结果。"
+    }
+  ],
+  "lessons": [
+    {"order": 1, "path": "phases/00-setup-and-tooling/04-apis-and-keys", "minutes": 30, "required": true},
+    {"order": 2, "path": "phases/13-tools-and-protocols/01-the-tool-interface", "minutes": 45, "required": true},
+    {"order": 3, "path": "phases/13-tools-and-protocols/05-tool-schema-design", "minutes": 45, "required": true},
+    {"order": 4, "path": "phases/13-tools-and-protocols/06-mcp-fundamentals", "minutes": 55, "required": true},
+    {"order": 5, "path": "phases/13-tools-and-protocols/07-building-an-mcp-server", "minutes": 85, "required": true},
+    {"order": 6, "path": "phases/13-tools-and-protocols/22-skills-and-agent-sdks", "minutes": 90, "required": true},
+    {"order": 7, "path": "phases/13-tools-and-protocols/24-skill-discovery-and-progressive-disclosure", "minutes": 105, "required": true},
+    {"order": 8, "path": "phases/13-tools-and-protocols/25-skill-invocation-and-routing", "minutes": 105, "required": true},
+    {"order": 9, "path": "phases/13-tools-and-protocols/27-skill-evals-packaging-and-portability", "minutes": 150, "required": true},
+    {"order": 10, "path": "phases/13-tools-and-protocols/23-capstone-tool-ecosystem", "minutes": 120, "required": true},
+    {"order": 11, "path": "phases/14-agent-engineering/54-build-the-feedback-ratchet", "minutes": 75, "required": true}
+  ]
+}
