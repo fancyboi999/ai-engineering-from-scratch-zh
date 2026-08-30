@@ -1,6 +1,6 @@
-# MCP Resources 与 Prompts——工具之外的上下文暴露
+# MCP Resources 与 Prompts——无状态的上下文暴露
 
-> 工具拿走了 MCP 90% 的注意力。另外两个 server 基元解决的是不同的问题。Resources 暴露数据供读取；prompts 把可复用的模板暴露为 slash-command。许多 server 该用 resources 而不是把读操作包进工具，该用 prompts 而不是在 client prompt 里硬编码工作流。本课点名那条决策规则，并走一遍 `resources/*` 和 `prompts/*` 消息。
+> resource 是可按 URI 读取的 context，prompt 是用户选择的消息模板；二者都需要明确授权、确定性列表和可审计的 cache contract。
 
 **类型：** Build
 **语言：** Python（标准库，resource + prompt 处理器）
@@ -10,11 +10,17 @@
 ## 学习目标
 
 - 为给定领域，在把一个能力暴露为 tool、resource 还是 prompt 之间做决定。
-- 实现 `resources/list`、`resources/read`、`resources/subscribe`，并处理 `notifications/resources/updated`。
+- 实现 `resources/list`、`resources/read` 与 `subscriptions/listen`。
 - 用参数模板实现 `prompts/list` 和 `prompts/get`。
-- 认出宿主何时把 prompts 呈现为 slash-command，何时作为自动注入的上下文。
+- 为 resource 与 prompt 列表设计稳定排序和 cache policy。
 
-## 问题背景
+## 当前 primitive 合同
+
+模型选择的操作是 tool；host/user 按 URI 获取的内容是 resource；用户启动的消息工作流是 prompt。每个 server 必须实现 `server/discover`，即使 client 可以直接调用其他 method。`resources/read` 的未知或无效 URI 返回 `-32602`；URI 在解析、授权与 boundary check 后才可读取，resource text 永远是 untrusted input，不能扩张 tool permission。
+
+`resources/list`、`prompts/list` 必须在相同 request input 下具有稳定 membership 与排序。discover、list 与资源读取的 cacheable result 都有 `ttlMs` 和正确的 `cacheScope`；用户数据通常是 private。需要更新时，client POST `subscriptions/listen`，listen id 成为 subscription metadata；subscription 不是 session，notification 也不替代后续 read authorization。旧 `resources/subscribe` 不属于新设计。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 一个笔记应用的天真 MCP server 把一切都暴露为工具：`notes_read`、`notes_list`、`notes_search`。这把每次数据访问都包进一个模型驱动的工具调用里。后果：
 

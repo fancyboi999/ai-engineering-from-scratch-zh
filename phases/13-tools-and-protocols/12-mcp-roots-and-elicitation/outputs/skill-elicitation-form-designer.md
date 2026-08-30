@@ -1,30 +1,16 @@
 ---
 name: elicitation-form-designer
-description: Design the elicitation form schema and message template for a tool that needs mid-call user confirmation or disambiguation.
-version: 1.0.0
+description: 为无状态 MCP 2026-07-28 elicitation 设计显式资源范围、授权、安全表单和签名 retry state。
+version: 2.0.0
 phase: 13
 lesson: 12
-tags: [mcp, elicitation, user-input, forms]
+tags: [mcp, elicitation, mrtr, scope, authorization]
 ---
 
-Given a tool whose behavior may require mid-call user input, design the elicitation schema and message.
+为 MCP `2026-07-28` 操作设计用户输入步骤。把 workspace、目录或 resource URI 放在可见 tool 参数或 server 配置中，并说明哪个已认证 principal 可用；定义 URI 归一化、path-component containment、symbolic-link policy 和 OS sandbox。
 
-Produce:
+说明必须询问用户的精确歧义、确认或外部交互。discovery 返回精确版本、capabilities、`ttlMs`、`cacheScope`；若有 tools，`tools/list` 必须稳定、`inputSchema` 为 object 且有 identity/cache hints。`elicitation: {}` 或 `elicitation.form` 表示支持表单；缺失或仅 URL 支持时返回 `-32021` 与 `data.requiredCapabilities.elicitation.form`，版本不支持用 `-32022`。
 
-1. Trigger condition. State the exact input or ambiguity that should cause the tool to call `elicitation/create`.
-2. Message template. One sentence the host shows the user. Plain, specific, free of jargon.
-3. Schema. Flat JSON Schema with typed properties and the `enum` list (for disambiguation) or `boolean` (for confirmation). Do not nest.
-4. Branch handling. Map `accept` / `decline` / `cancel` to tool behaviors.
-5. Rate-limit rule. Cap elicitations per tool invocation; never elicit inside a loop.
+MRTR 以 `resultType: "input_required"`、稳定 `inputRequests` key 和 `elicitation/create` 返回。form 使用简单 message 与受限扁平 schema；URL 显示 HTTPS 目的地与 out-of-band 完成规则。重试带新 id、原 method/args、当前 `inputResponses`、本轮 `_meta` 和原样 `requestState`；无 id notification 只返回 HTTP 202。区分 accept、decline、cancel；以 HMAC/认证加密把 principal、参数摘要、候选、phase、过期与一次性 nonce 绑定，并在最终 mutation 前重检授权、实时状态和 containment。
 
-Hard rejects:
-- Any schema that nests objects. Elicitation v1 is flat.
-- Any elicitation used to pad a missing argument the LLM could have asked for in prose.
-- Any high-frequency elicitation (more than once per tool call).
-
-Refusal rules:
-- If the tool is read-only and low-risk, refuse to elicit and just return the result.
-- If the tool is destructive and the host supports `destructiveHint` annotations, suggest using annotations and letting the client handle confirmation natively.
-- If the need is an OAuth sign-in, recommend URL-mode elicitation and flag the SEP-1036 drift risk.
-
-Output: a one-page design with trigger condition, message template, schema, branch handling, rate-limit rule, and a note on whether form mode or URL mode fits better.
+拒绝把已弃用 Roots 当授权/containment/sandbox、用 roots/list 或反向 elicitation request、在 form 收集 password/API key/token/payment 信息、未经能力声明使用输入模式、把 clientInfo 当身份、未经确认就执行破坏性操作及未签名权限状态。拒绝显式 decline 后反复提示，最后输出风险和最小修正。

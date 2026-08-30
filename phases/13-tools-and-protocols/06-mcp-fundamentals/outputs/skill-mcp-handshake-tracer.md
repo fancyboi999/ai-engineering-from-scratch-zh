@@ -1,29 +1,22 @@
 ---
-name: mcp-handshake-tracer
-description: Given a pcap-style transcript of an MCP client-server conversation, annotate every message with its primitive, lifecycle phase, and capability dependency.
-version: 1.0.0
+name: mcp-request-tracer
+description: 按消息审计现代无状态 MCP 与显式 legacy 协议时代的 MCP transcript。
+version: 2.0.0
 phase: 13
 lesson: 06
-tags: [mcp, json-rpc, lifecycle, capabilities]
+tags: [mcp, json-rpc, stateless, metadata, compatibility]
 ---
 
-Given a sequence of JSON-RPC 2.0 envelopes captured from an MCP session, produce a walk-through that names each message's primitive, lifecycle phase, and underlying capability flag.
+给定一串 MCP JSON-RPC envelope，逐条按 MCP `2026-07-28` 独立审计。识别 legacy 流量，但绝不假定存在握手或协议 session。
 
-Produce:
+输出每条消息的方向、JSON-RPC 类型、method、基元、request id 和年代；检查每个 request 的 `params._meta.io.modelcontextprotocol/protocolVersion` 与 `clientCapabilities`，并记录建议提供的 `clientInfo`。现代成功结果必须含指定的 `resultType` 与建议的 server identity。检查 `server/discover`、`-32022` 的 `requested`/`supported`，以及 discover、列表和 `resources/read` 的 `ttlMs`、`cacheScope` 与稳定排序。
 
-1. Per-message annotation. For each `{request, response, notification}`, state: direction (client-to-server or server-to-client), primitive (tools / resources / prompts / roots / sampling / elicitation / lifecycle), lifecycle phase, and the capability flag that had to be negotiated for this message to be valid.
-2. Capability check. Reconstruct the `initialize` exchange from the transcript and list all negotiated capabilities. Flag any message that would violate an absent capability.
-3. Error diagnostics. For every JSON-RPC error, name the code and the most likely cause given the surrounding context.
-4. Completeness audit. Flag a transcript that is missing one of: `initialize`, `initialized` notification, at least one `tools/list` or equivalent, graceful shutdown.
-5. Spec compliance. Check each request's params against the 2025-11-25 spec's minimum field set. Flag omissions.
+拒绝把 stdio 进程、HTTP connection 或 `Mcp-Session-Id` 当现代协议状态；不得从前一个 request 推断能力；已识别现代错误 `-32020`、`-32021`、`-32022` 后不得降级；没有 `resultType` 的现代成功无效。`initialize` 和 `notifications/initialized` 仅标记为 legacy。
 
-Hard rejects:
-- Any message that uses a method outside the spec's allowed set without an `x-` prefix.
-- Any `sampling/createMessage` message when the client did not declare the `sampling` capability.
-- Any invocation before `notifications/initialized` arrived.
+若 transcript 不是 JSON-RPC 2.0，立即说明 envelope 不兼容；若要求悄悄改写证据，拒绝并保留原 transcript，另给修正样例。按到达顺序逐行输出，例如：
 
-Refusal rules:
-- If asked to audit a transcript from a non-MCP protocol, refuse and point at the A2A spec (Phase 13 · 19) as the alternative.
-- If asked to "fix" the transcript, refuse. This skill annotates; it does not rewrite. Route corrections through the implementing SDK.
+```text
+[request/modern/tools] id=7 tools/list metadata=valid
+```
 
-Output: one annotated line per message in arrival order: `[phase/primitive/capability] <method or result shape>`. End with a three-line summary naming any capability violations and any missing lifecycle steps.
+最后给出现代、legacy、无效和歧义消息计数，以及第一项修正措施。

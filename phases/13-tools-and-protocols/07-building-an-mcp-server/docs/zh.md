@@ -1,6 +1,6 @@
-# 构建一个 MCP Server——Python + TypeScript SDK
+# 构建 MCP Server——无状态 Python 与 TypeScript
 
-> 多数 MCP 教程只演示 stdio 的 hello-world。一个真实的 server 暴露 tools 加 resources 加 prompts，处理能力协商，发射结构化错误，并跨 SDK 表现一致。本课端到端构建一个 notes server：标准库 stdio 传输、JSON-RPC 分发、三个 server 基元，以及一种纯函数风格——等你毕业时，它能直接塞进 Python SDK 的 FastMCP 或 TypeScript SDK。
+> 一个现代 MCP server 的 contract 能被发现、缓存、调用并横向扩展；它不把版本或 capabilities 藏在 connection-bound handshake 里。
 
 **类型：** Build
 **语言：** Python（标准库，stdio MCP server）
@@ -9,12 +9,19 @@
 
 ## 学习目标
 
-- 实现 `initialize`、`tools/list`、`tools/call`、`resources/list`、`resources/read`、`prompts/list`、`prompts/get` 方法。
+- 实现 `server/discover`、`tools/list`、`tools/call`、`resources/list`、`resources/read`、`prompts/list`、`prompts/get`。
 - 写一个分发循环，从 stdin 读 JSON-RPC 消息，往 stdout 写响应。
 - 按 JSON-RPC 2.0 规范和 MCP 的附加错误码发射结构化错误响应。
-- 把一个标准库实现毕业到 FastMCP（Python SDK）或 TypeScript SDK，无需重写工具逻辑。
+- 让每个 request 独立校验 metadata，每个 list 可确定性缓存。
+- 把标准库实现迁移到 SDK 时仍保持同一协议 contract。
 
-## 问题背景
+## 当前实现规则
+
+在 `params._meta` 校验协议版本与 client capabilities；推荐的 clientInfo 仅供诊断，不能授权。`server/discover` 返回 `supportedVersions`、capabilities、`resultType: "complete"`、`ttlMs`、`cacheScope` 与 result `_meta` 的 serverInfo。任何成功 result 都携带 `resultType` 与 server identity；list、template、resource read 使用明确 cache hints 和稳定 sort key。
+
+持久应用状态应位于数据库，或经普通 tool 参数传回不透明 handle。stdio EOF 只结束 transport，不创建或销毁现代协议 session。tool-domain failure 仍是 complete result 中的 `isError: true`，不要和 JSON-RPC protocol error 混为一谈。若必须支持 `2025-11-25`，把 initialize adapter 隔离，只对已识别的 legacy 流量启用。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 在你能用远程传输（阶段 13 · 09）或一个鉴权层（阶段 13 · 16）之前，你需要一个干净的本地 server。本地意味着 stdio：server 被 client 当子进程启动，消息以换行分隔在 stdin/stdout 上流动。
 

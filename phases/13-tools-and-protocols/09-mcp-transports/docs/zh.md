@@ -1,6 +1,6 @@
-# MCP 传输——stdio vs Streamable HTTP vs SSE 迁移
+# MCP Transport——stdio 与无状态 Streamable HTTP
 
-> stdio 在本地好使，别处都不行。Streamable HTTP（2025-03-26）是远程标准。旧的 HTTP+SSE 传输已弃用，正在 2026 年中被移除。选错传输要付出一次迁移的代价；选对了，你就买到一个可远程托管、带会话连续性和 DNS-rebinding 防护的 MCP server。
+> stdio 仍适合本地子进程；网络 MCP 则以无状态、仅 POST 的 Streamable HTTP 为当前 contract，而不是带协议 session 的长连接。
 
 **类型：** Learn
 **语言：** Python（标准库，Streamable HTTP 端点骨架）
@@ -10,11 +10,19 @@
 ## 学习目标
 
 - 基于部署形状（本地 vs 远程、单进程 vs 集群）在 stdio 和 Streamable HTTP 之间做选择。
-- 实现 Streamable HTTP 的单端点模式：POST 发请求，GET 开会话流。
-- 强制 `Origin` 校验和会话 id 语义，挫败 DNS-rebinding。
+- 实现 Streamable HTTP 单 endpoint：每个 JSON-RPC message 各自 POST。
+- 校验 Origin、body metadata 和与 body 镜像的 headers。
 - 在 2026 年中的移除截止期前，把一个遗留的 HTTP+SSE server 迁移到 Streamable HTTP。
 
-## 问题背景
+## 当前 transport 合同
+
+现代 endpoint 只接收 POST。request POST 返回一个 JSON result，或返回该 request 范围的 SSE（相关 notification 后带最终 result）；接收的 id-less notification 是 HTTP 202、无 body。GET 和 DELETE 返回 `405`。`Mcp-Session-Id`、`Last-Event-ID` 已被移除：不签发、不回显、不撤销、不恢复。
+
+body `_meta` 需协议版本和 client capabilities；headers `MCP-Protocol-Version`、`Mcp-Method` 以及 tools/call、resources/read、prompts/get 的 `Mcp-Name` 必须与 body 一致，失配返回 `-32020`。不支持但格式正确的版本返回有 `supported`、`requested` 的 `-32022`。变更流由 POST `subscriptions/listen` 打开，其 ack、event 与 final result 用 listen id 标记 `io.modelcontextprotocol/subscriptionId`。
+
+网络 server 必须验证 Origin、认证 remote client 并为每次调用授权；需要跨调用状态时用与 authenticated principal 绑定的显式 handle。legacy endpoint 与现代 endpoint 隔离，检查现代错误后不得以 redirect 或自动降级替代正确处理。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 第一个 MCP 远程传输（2024-11）是 HTTP+SSE：两个端点，一个收 client 的 POST，一个 Server-Sent-Events 通道走 server 到 client 的流。它能行。它也笨拙：每会话两个端点、某些 CDN 前面缓存出问题，以及对长连 SSE 连接的硬依赖——而有些 WAF 会激进地把这种连接掐断。
 

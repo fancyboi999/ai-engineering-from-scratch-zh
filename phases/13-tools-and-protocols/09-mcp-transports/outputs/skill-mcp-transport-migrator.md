@@ -1,30 +1,16 @@
 ---
 name: mcp-transport-migrator
-description: Produce a migration plan from legacy HTTP+SSE to Streamable HTTP with session id continuity and Origin validation.
-version: 1.0.0
+description: 把 legacy MCP HTTP transport 迁移至无状态、仅 POST 的 2026-07-28 契约。
+version: 2.0.0
 phase: 13
 lesson: 09
-tags: [mcp, streamable-http, sse-migration, session-id, origin]
+tags: [mcp, streamable-http, stateless, migration, headers]
 ---
 
-Given an existing HTTP+SSE (legacy) MCP server, produce a migration plan to single-endpoint Streamable HTTP.
+给定 session 式 Streamable HTTP 或 HTTP+SSE server，产出 MCP `2026-07-28` 迁移 runbook：一个只接收 POST 的 MCP endpoint；每个 JSON-RPC request/notification 都是新 POST；单一结果用 `application/json`，相关 notification 后接最终结果时用请求范围 `text/event-stream`。
 
-Produce:
+现代 GET/DELETE 返回 `405`，忽略且绝不签发、回显、撤销或恢复 `Mcp-Session-Id`、`Last-Event-ID`。body `_meta` 要求版本与 client capabilities，建议带 identity；验证 `MCP-Protocol-Version`、`Mcp-Method` 和条件性 `Mcp-Name` 与 body 一致，不符返回 `-32020`，不支持的匹配版本返回含 `supported`、`requested` 的 `-32022`。
 
-1. Endpoint rewrite. Merge `/messages` and `/sse` into one `/mcp`. Map POST to request handling, GET to SSE stream, DELETE to session termination.
-2. Session continuity. Generate new `Mcp-Session-Id` on first POST. Reject client-supplied ids. Retain bridging logic if the client first sends a legacy session cookie.
-3. Origin validation. Allowlist explicit production origins (`https://app.company.com`, `https://claude.ai`, localhost variants). Reject all others with 403.
-4. Last-event-id replay. Keep a ring buffer of recent events per session so reconnects can resume.
-5. Deprecation window. Document the cut-over date and a 60-day grace period where the legacy endpoints 301 to the new one with a warning header.
+用 POST `subscriptions/listen` 取代独立 GET 与 resources subscribe/unsubscribe；ack、每个 notification 和最终结果均以 listen request id 作为 `io.modelcontextprotocol/subscriptionId`。用绑定已认证 principal 的显式不透明应用 handle 取代 connection affinity。legacy endpoint 必须隔离且有去除日期；检查现代 POST 错误后才允许考虑降级，绝不以 `301`/`302` 重定向 JSON-RPC POST。
 
-Hard rejects:
-- Any plan that keeps both endpoints alive indefinitely. Legacy SSE is being removed in 2026.
-- Any plan where session ids are client-generated. Breaks the cryptographic-randomness requirement.
-- Any plan without Origin validation. DNS-rebinding vulnerability.
-
-Refusal rules:
-- If the server is local-only (stdio), refuse to migrate to HTTP; stdio is correct for local.
-- If the server does not yet ship OAuth, complete Phase 13 · 16 before exposing it publicly.
-- If the hosting target does not support long-lived HTTP (e.g. Vercel free tier), refuse and recommend Cloudflare Workers.
-
-Output: a migration runbook with the endpoint changes, Origin allowlist, session-id plan, deprecation schedule, and a test checklist covering initialize, tools/list, streaming notifications, reconnect with last-event-id, and explicit DELETE.
+拒绝把 session id、独立 GET、DELETE 或 replay 当现代行为，拒绝隐藏 sticky routing、server 反向 request、`Last-Event-ID` 恢复和非幂等自动重试。输出改造前后 endpoint 表、分阶段发布、rollback 边界与可执行 conformance checklist。

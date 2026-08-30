@@ -1,30 +1,16 @@
 ---
 name: sampling-loop-designer
-description: Design a server-hosted agent loop using MCP sampling with the right modelPreferences, rate limits, and safety confirmations.
-version: 1.0.0
+description: 将模型辅助 MCP tool 迁移为直接推理，或带受限兼容 Sampling 的无状态 2026-07-28 MRTR。
+version: 2.0.0
 phase: 13
 lesson: 11
-tags: [mcp, sampling, agent-loop, model-preferences]
+tags: [mcp, mrtr, sampling, stateless, migration]
 ---
 
-Given a server-side algorithm that needs LLM reasoning (research, summarization, planning, triage), design an MCP sampling-based implementation.
+为 MCP `2026-07-28` server 设计模型辅助行为。先判断能否直接接入模型 provider：新设计默认直接推理；只有必须使用 client 模型与凭证的明确产品需求才保留已弃用的 Sampling。
 
-Produce:
+输出架构选择及理由；带精确 `supportedVersions`、capabilities、`ttlMs`、`cacheScope` 的 discovery；若发布 tools，要有确定性 `tools/list`、有效 object `inputSchema`、`resultType: "complete"`、server identity 与 cache hints。所有 request 的 `_meta` 带版本/能力；缺失或非字符串版本用 `-32602`，版本不支持用 `-32022` 和精确数据，Sampling 缺失用带 `requiredCapabilities` object 的 `-32021`。client identity 仅供信息；无 id notification 不得有 JSON-RPC response。
 
-1. Loop structure. Number each sampling round, state the prompt shape, and the expected output type.
-2. `modelPreferences` per round. Weight cost / speed / intelligence (sum 1.0) per round. A "pick files" round leans cost; a "synthesize" round leans intelligence.
-3. Rate limit. Set `max_samples_per_tool` per invocation; justify the number.
-4. Safety hooks. State where the client should show a confirmation dialog and what the refusal path does.
-5. SEP-1577 inclusion. Decide whether to use tools inside sampling; if yes, flag drift risk and specify the tool list.
+为每一轮 MRTR 指出 `inputRequests` key、嵌入 method、response schema、校验和预算；重试必须使用原 method/args、新 id、当前轮 `inputResponses` 和逐字节相同的 `requestState`。用 HMAC 或认证加密把 principal、method、参数摘要、phase 与短过期绑定；定义 approval、轮数/token/字节上限、校验、日志与拒绝策略，并给出 Sampling 的移除日期。
 
-Hard rejects:
-- Any loop without a rate limit. Loop bombs and resource theft risk.
-- Any loop that sets `includeContext: "allServers"`. Cross-server leakage.
-- Any loop where the server asks the client to generate content that is then fed back as a tool input without user confirmation. Confused-deputy vector.
-
-Refusal rules:
-- If the server has its own LLM credentials, ask whether sampling is actually needed; direct calls may be simpler.
-- If the use case is a single one-shot tool call, refuse to design a sampling loop; sampling is for multi-round reasoning.
-- If the user asks for a sampling loop that hides its intent from the end user, refuse categorically (covert sampling).
-
-Output: a one-page design with the loop steps, modelPreferences per round, rate limit, and safety checklist. End with a note flagging any SEP-1577 (tools-in-sampling) drift risk relevant to the design.
+拒绝新设计无理由采用 Sampling、发送反向 `sampling/createMessage`、使用 initialize/session 状态、未签名安全状态、复用 id/修改原 args、无能力检查和硬轮数的模型循环、隐式跨 server context。结论只能是 `direct inference`、`temporary MRTR compatibility` 或 `no model required`。

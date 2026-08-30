@@ -1,6 +1,6 @@
-# MCP 基础——基元、生命周期、JSON-RPC 底座
+# MCP 基础——无状态请求与 JSON-RPC
 
-> MCP 之前的每一次集成都是一次性的。Model Context Protocol 由 Anthropic 在 2024 年 11 月首次发布，如今由 Linux Foundation 的 Agentic AI Foundation 托管，它把发现和调用标准化，让任何 client 都能跟任何 server 对话。2025-11-25 规范点名了六个基元（三个 server、三个 client）、一套三阶段生命周期，和一种 JSON-RPC 2.0 线上格式。学会这些，本阶段 MCP 章节余下的内容就成了顺手翻翻的读物。
+> 现代 MCP 没有握手，也没有协议 session。每个 request 都要带足够 metadata，使 server 能独立理解、授权、路由与重试它。
 
 **类型：** Learn
 **语言：** Python（标准库，JSON-RPC 解析器）
@@ -9,12 +9,21 @@
 
 ## 学习目标
 
-- 点名全部六个 MCP 基元（server 端的 tools、resources、prompts；client 端的 roots、sampling、elicitation），各给一个用例。
-- 走一遍三阶段生命周期（initialize、operation、shutdown），说清每个阶段谁发哪条消息。
-- 解析并发射 JSON-RPC 2.0 的 request、response、notification 外壳。
-- 解释 `initialize` 时的能力协商是什么，以及没有它会崩掉什么。
+- 区分 MCP server 基元和 client-side features。
+- 为 MCP `2026-07-28` 构造有效 JSON-RPC request/response。
+- 在每个 request 中附加协议版本、client capabilities 与建议的 client identity。
+- 使用 `server/discover`，并区分 `-32602`、`-32021`、`-32022`。
+- 追踪一个独立 request 从 validation 到 complete result 的过程。
 
-## 问题背景
+## 当前协议基线
+
+`2026-07-28` 的核心是无状态的：server 只能依据当前 request 决定处理方式，不能从同一 connection 的较早消息推断协议版本、能力、身份、task、thread 或 conversation。transport 不等于 conversation memory；若应用需要延续状态，签发显式 handle，要求 client 在后续参数中带回，并把持久状态放在 handle 后的存储中。
+
+每个 request 的 `params._meta` 必须有 `io.modelcontextprotocol/protocolVersion` 和 `io.modelcontextprotocol/clientCapabilities`，建议有 `clientInfo`；缺失或类型不符返回 `-32602`。现代 server 必须实现 `server/discover`，成功 result 有 `resultType`，discover、列表与读取等 cacheable result 给出 `ttlMs`、`cacheScope`。未支持版本返回带 `supported`/`requested` 的 `-32022`。现代流量不得有 server 发起的 JSON-RPC request。
+
+Tools 是模型选择的操作，resources 是 host 读取的 URI 内容，prompts 是用户选择的消息模板。roots、sampling、elicitation 的旧 callback 形状不再是新设计的默认；需要输入时，仅 `tools/call`、`resources/read`、`prompts/get` 可返回 `input_required`，client 收集 input 后用新 id、原 method/arguments、`inputResponses` 与原样 `requestState` 重试。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 MCP 之前，每个用工具的 agent 都有自己的协议。Cursor 有一套 MCP 形状但不兼容的工具系统。Claude Desktop 出厂带着另一套。VS Code 的 Copilot 扩展又是第三套。一个做了"Postgres 查询"工具的团队，把同一个工具写了三遍，每遍对接一个不同宿主的 API。复用它得靠拷代码。
 

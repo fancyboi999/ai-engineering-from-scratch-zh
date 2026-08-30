@@ -1,30 +1,14 @@
 ---
 name: primitive-splitter
-description: Categorize each capability in an MCP server draft as tool, resource, or prompt with rationale.
-version: 1.0.0
+description: 按 2026-07-28 契约审查 MCP server，拆分 tools、resources、prompts、cache 与 subscriptions。
+version: 2.0.0
 phase: 13
 lesson: 10
-tags: [mcp, primitives, resources, prompts]
+tags: [mcp, resources, prompts, subscriptions, caching]
 ---
 
-Given a proposed MCP server's capabilities (as plain English or a draft tool list), categorize each one as tool, resource, or prompt with a one-sentence rationale.
+从 consumer 视角审查 MCP server。输出 revision `2026-07-28` 的 `server/discover`、含 name/chooser/primitive/reason 的表、稳定 resource URI scheme 与有界模板、prompt 参数、每种 list 的确定性规则、每项 cacheable result 的 `ttlMs`/`cacheScope`，以及资源或列表变更的 `subscriptions/listen` filter。
 
-Produce:
+决策规则：模型选择的操作是 tool；host 读取的 URI 内容是 resource；用户选择的消息流程是 prompt；更新流由 client 通过 `subscriptions/listen` 打开，listen request id 成为 `io.modelcontextprotocol/subscriptionId`，ack 必须先于事件。notification 不会绕过之后读取的授权；即使 client 可直接调用别的方法，`server/discover` 仍是强制实现。
 
-1. Per-capability categorization. For each item, return `{name, primitive: tool | resource | prompt, rationale}`.
-2. Resource URI scheme. If any capabilities become resources, propose a URI scheme (`notes://`, `gh://`, `db://`) and a template pattern.
-3. Prompt argument skeletons. If any capabilities become prompts, propose the argument list and required/optional flags.
-4. Subscription candidates. Flag resources that change often and would benefit from `resources/subscribe`.
-5. Anti-pattern flags. Call out cases where an old design wrapped a read in a tool (e.g. `notes_read(id)`) when a resource would serve better.
-
-Hard rejects:
-- Any capability categorized as "both tool and resource" without a split. Pick one or scaffold a pair.
-- Any prompt without required arguments identified. Surfacing in slash-command UIs needs argument schemas.
-- Any resource URI scheme not addressable (free-form strings, not URIs).
-
-Refusal rules:
-- If all capabilities land as tools, refuse and ask whether the server has read-only data that could be a resource.
-- If no capability fits prompts, that is fine; prompts are optional. Do not invent them.
-- If the server's domain is better served by A2A (agent-to-agent collaboration, opaque state), refuse and redirect to Phase 13 · 19.
-
-Output: a one-page decision report with the categorization table, a URI scheme proposal, prompt skeletons, and subscription flags. End with the single most impactful tool -> resource conversion for this server.
+无效 resource 返回 `-32602`；不支持版本返回含 `supported`/`requested` 的 `-32022`。拒绝依 connection history 变化的列表、把 private 放 public cache、未解析/授权/边界检查的 URI、`resources/subscribe`、把 subscription 当协议 session，以及让 prompt 覆盖可信 host instructions。最后给出最高风险误用与最小修正。

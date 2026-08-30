@@ -1,6 +1,6 @@
-# MCP Sampling——server 请求的 LLM 补全与 agent 循环
+# MCP 模型输入——Sampling 迁移与无状态 MRTR
 
-> 多数 MCP server 是傻执行器：取参数、跑代码、返回内容。Sampling 让 server 反转方向：它请求 client 的 LLM 来做一个决策。这让 server 托管的 agent 循环成为可能，而 server 不必拥有任何模型凭证。SEP-1577 在 2025-11-25 合入，给 sampling 请求里加了工具，让循环能纳入更深的推理。漂移风险提示：SEP-1577 的 sampling-内带工具形状在整个 2026 年第一季度仍是实验性的，在 SDK API 里还在沉淀。
+> 新 MCP server 要模型推理时，默认直接接入模型 provider；只有明确需要 client 模型与凭证时才采用受限的 MRTR compatibility Sampling。
 
 **类型：** Build
 **语言：** Python（标准库，sampling 脚手架）
@@ -9,12 +9,17 @@
 
 ## 学习目标
 
-- 解释 `sampling/createMessage` 解决了什么（无 server 端 API key 的 server 托管循环）。
-- 实现一个 server，让它请求 client 在一个多轮 prompt 上采样，并返回补全。
-- 用 `modelPreferences`（成本 / 速度 / 智能优先级）来引导 client 的模型选择。
-- 构建一个 `summarize_repo` 工具，让它内部经由 sampling 迭代，而非硬编码行为。
+- 比较 direct inference 与已弃用 Sampling 的架构边界。
+- 以 MRTR 的 `input_required` 而不是反向 request 请求兼容输入。
+- 对多轮 retry 施加能力、预算、approval 与 state-integrity 约束。
 
-## 问题背景
+## 当前模型输入合同
+
+Sampling 对新设计已弃用。若产品必须由 client 提供模型与 credential，server 只能在当前 request 明确声明 Sampling capability 后，返回 `resultType: "input_required"`，并把 `sampling/createMessage` 放在 `inputRequests` 中；不得在 connection 上反向发 JSON-RPC request。未声明能力时用 `-32021` 和 `requiredCapabilities` object，或选用非 Sampling 路径。
+
+每一轮 retry 都是新 JSON-RPC request：原 method 与 arguments 不变，新 id，带当前轮 `inputResponses`、本轮 `_meta` 和逐字节相同的 `requestState`。`requestState` 会经过不可信 client，任何会影响授权、资源访问或业务逻辑的状态都要用 HMAC/认证加密绑定 principal、参数摘要、phase 与短过期。定义最大轮数、token/byte budget、response validation、approval、日志与退出条件；不要把模型 output 当作身份、授权或 consent 证据。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 一个对代码摘要工作流有用的 MCP server 需要：遍历文件树、挑选读哪些文件、合成一份摘要、返回。LLM 推理在哪儿发生？
 

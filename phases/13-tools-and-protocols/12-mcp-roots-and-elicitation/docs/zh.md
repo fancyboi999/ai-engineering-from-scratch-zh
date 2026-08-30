@@ -1,6 +1,6 @@
-# Roots 与 Elicitation——范围限定与中途用户输入
+# 显式 Scope 与无状态 Elicitation
 
-> 用户一打开另一个项目，硬编码路径就崩。用户说得不够具体时，预填的工具参数就崩。Roots 把 server 的范围限定到一组用户控制的 URI；elicitation 在工具调用中途暂停，经由表单或 URL 向用户要结构化输入。两个 client 基元，两个修复常见 MCP 失败模式的招。SEP-1036（URL 模式 elicitation，2025-11-25）在 2026 上半年仍是实验性的——依赖它前先查 SDK 版本。
+> workspace scope 必须是可见、可授权的输入；需要用户选择或确认时，以无状态 MRTR 交付 elicitation，而不是依赖 Roots 或 connection state。
 
 **类型：** Build
 **语言：** Python（标准库，roots + elicitation demo）
@@ -9,12 +9,19 @@
 
 ## 学习目标
 
-- 声明 `roots` 并响应 `notifications/roots/list_changed`。
-- 把 server 文件操作限制在声明的 root 集合内的 URI 上。
-- 用 `elicitation/create` 在工具调用中途向用户要一个确认或结构化输入。
-- 在表单模式和 URL 模式 elicitation 之间做选择（后者是实验性的；已注明漂移风险）。
+- 用显式 workspace URI、授权、containment 和 sandbox 约束文件操作。
+- 以 `input_required`/`elicitation/create` 请求确认或结构化输入。
+- 验证 form capability、签名 retry state，并在 mutation 前重新校验。
 
-## 问题背景
+## 当前 scope 与 elicitation 合同
+
+Roots 只曾是信息性的 workspace 指引，不能作为授权、containment 或 sandbox，并且在 `2026-07-28` 已弃用。把 workspace/directory/resource URI 放在可见 tool argument 或 server config 中；按 authenticated principal 授权，做 URI normalization、path-component containment、symbolic-link policy 与 OS sandbox。
+
+form-mode elicitation 要当前 request 声明 `elicitation: {}` 或 `elicitation.form`。若无 form support（包括 URL-only），返回 `-32021` 和 `data.requiredCapabilities.elicitation.form`。server 返回 `resultType: "input_required"`，在稳定 `inputRequests` key 中嵌入 `elicitation/create`；client 以新 id、原 method/args、`inputResponses` 和原样 `requestState` 重试。表单只能收受限、非敏感的扁平 input，绝不收 password、API key、token 或 payment credential；URL mode 要显示 HTTPS 目标与 out-of-band completion rule。
+
+requestState 必须绑定 principal、参数摘要、候选、phase、过期和一次性 nonce，并以共享 TTL-pruned replay store 原子消费 nonce。分别处理 accept、decline、cancel；decline 不得被转成同意或重复提示。任何 mutation 前重检授权、实时目标状态与 containment。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 一个 notes MCP server 在生产里撞上的两个具体失败。
 

@@ -1,6 +1,6 @@
-# 构建一个 MCP Client——发现、调用、会话管理
+# 构建 MCP Client——发现、路由与双时代 fallback
 
-> 多数 MCP 内容交付的是 server 教程，对 client 一笔带过。难啃的编排都住在 client 代码里：进程启动、能力协商、跨多个 server 合并工具列表、sampling 回调、重连，以及命名空间冲突的解决。本课构建一个多 server client，把三个不同的 MCP server 提升进一个扁平的工具命名空间，供模型使用。
+> client 的难点是编排：安全地识别 peer 的协议时代、合并多个确定性 tool surface，并在不捏造 connection 状态的前提下恢复。
 
 **类型：** Build
 **语言：** Python（标准库，多 server MCP client）
@@ -9,12 +9,18 @@
 
 ## 学习目标
 
-- 把一个 MCP server 当子进程启动，完成 `initialize`，并发一条 `notifications/initialized`。
-- 维护每 server 的会话状态（能力、工具列表、上次见到的 notification id）。
+- 为每个现代 request 写入当前 `_meta`，优先 `server/discover`。
+- 仅在明确 allowlist 时探测 legacy `initialize`，并 fail closed。
 - 把跨多个 server 的工具列表合并进一个命名空间，并处理冲突。
-- 把一个工具调用路由到拥有它的 server，并重组响应。
+- 合并 tool namespace、路由调用并在断连后重新发现。
 
-## 问题背景
+## 当前 client 合同
+
+每个 peer 配置固定 command 或 endpoint、环境白名单、授权上下文与默认 false 的 `allow_legacy`。stdio 先发送 `server/discover`：有效结果或 `-32022` 是现代证据；前者选择版本，后者在共同现代版本重试。`-32020`/`-32021` 也必须留在现代处理路径。timeout、断连、空 response、未知 error 或 malformed result 都不能证明 legacy。
+
+只有 allowlist peer 才可有一次 deadline-bound `initialize` probe，且仅在得到关联 JSON-RPC 成功、配置 legacy revision、object capabilities 和非空 server identity 后选择 legacy。合并时排序 peer/tool，对同名项 prefix 或拒绝；绝不静默覆盖。cache 遵守 `ttlMs`/`cacheScope`；授权上下文不同不能共享 private cache。断连后重新启动或连接、重新 discover/list、重开 subscription，只重试安全操作并使用新 request id。
+
+## 旧版兼容性背景（仅用于识别，不作为新实现规范）
 
 一个真实的 agent 宿主（Claude Desktop、Cursor、Goose、Gemini CLI）一次加载多个 MCP server。一个用户可能同时跑着一个文件系统 server、一个 Postgres server 和一个 GitHub server。client 的活儿：
 
