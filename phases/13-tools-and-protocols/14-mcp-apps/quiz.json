@@ -1,0 +1,78 @@
+{
+  "lesson": "14-mcp-apps",
+  "title": "无状态协议上的 MCP Apps",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "现代 MCP App 应在何处将其 UI 资源绑定到工具？",
+      "options": [
+        "只在最终文本结果中",
+        "在独立的 HTTP GET 流中",
+        "在 MCP 会话 cookie 中",
+        "在 tools/list 返回的工具定义中"
+      ],
+      "correct": 3,
+      "explanation": "工具定义上嵌套的 _meta.ui.resourceUri 让宿主能在调用前预加载并审查 UI。"
+    },
+    {
+      "stage": "check",
+      "question": "2026-07-28 client 如何声明对 MCP Apps 的支持？",
+      "options": [
+        "使用 notifications/initialized",
+        "使用 Mcp-Session-Id",
+        "在每个请求的 io.modelcontextprotocol/clientCapabilities.extensions 中声明",
+        "接受所有 ui:// 资源"
+      ],
+      "correct": 2,
+      "explanation": "扩展通过每个请求的 client 能力映射选择加入。"
+    },
+    {
+      "stage": "check",
+      "question": "ui/initialize 初始化的是什么？",
+      "options": [
+        "协议级 server 会话",
+        "OAuth client 注册",
+        "iframe 与宿主之间的 Apps postMessage 桥接",
+        "Streamable HTTP GET 通道"
+      ],
+      "correct": 2,
+      "explanation": "ui/initialize 属于 Apps 桥接方言，与已移除的 MCP 核心握手分离。"
+    },
+    {
+      "stage": "check",
+      "question": "对一个与用户无关的打包 App，哪种资源响应最安全？",
+      "options": [
+        "没有 resultType，也没有缓存策略",
+        "resultType 为 complete、ttlMs 有上限、cacheScope 为 public，且 CSP 默认拒绝",
+        "在 HTML 中嵌入会话 token",
+        "ttlMs 无上限且 CSP 域名通配"
+      ],
+      "correct": 1,
+      "explanation": "完整结果、显式缓存提示和收窄的 CSP 让传输与浏览器策略都可审查。"
+    },
+    {
+      "stage": "post",
+      "question": "宿主收到一个读取某 URI 的 resources/read body，但 Mcp-Name 请求头指向不同 URI。应如何处理？",
+      "options": [
+        "打开两个资源",
+        "优先使用请求头",
+        "优先使用 body",
+        "返回 HTTP 400 和 JSON-RPC 错误 -32020"
+      ],
+      "correct": 3,
+      "explanation": "应在评估版本支持或功能策略前匹配路由请求头与 body；传输返回 HTTP 400 和 JSON-RPC 错误 -32020。"
+    },
+    {
+      "stage": "post",
+      "question": "未支持 MCP Apps 的宿主应使用什么正确回退？",
+      "options": [
+        "将 HTML 作为受信任的宿主 chrome 返回",
+        "让工具通过普通文本或结构化输出继续可用，并省略 UI 绑定",
+        "创建隐藏会话后重试",
+        "自动授予扩展"
+      ],
+      "correct": 1,
+      "explanation": "可选扩展不能让底层工具对未协商该扩展的 client 失效。"
+    }
+  ]
+}
