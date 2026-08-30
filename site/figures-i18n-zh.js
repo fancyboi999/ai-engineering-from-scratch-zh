@@ -3,8 +3,9 @@
    （每日同步一把梭照搬），因此文案不改源码，由本文件在 widget 挂载后查表替换
    静态文案：标题(.lf-label)、操作提示(.lf-head 末位 span)、控件 label(.lf-ctrl)、
    说明散文(.lf-cap，按 widget 名索引)。
-   不在本层范围：动态拼接文案（lf-meta / lf-num / lf-formula，拖动时由各渲染器
-   实时重写）保持英文；figures.js 旧大动画（tokenizer-bpe 等 10 个，非 LF 结构）。
+   不在本层范围：figures.js 旧大动画（tokenizer-bpe 等 10 个，非 LF 结构）。
+   figures-agent-skills.js 与 figures-mcp.js 的动态场景由 PROVIDER_TEXT 精确映射，
+   每次交互重渲染后重新应用；未知文本安全保留英文，绝不猜测或改写协议字面量。
    figures-history.js 的三个稳定 SVG 文本是例外，也在本层按 widget 名查表替换。
    查表未命中 → 保持英文。上游新增 widget 自动安全降级，翻译表事后补即可。
    词向量 / n-gram widget 的英文词样本（cat、the…）是演示数据，刻意不翻。 */
@@ -806,6 +807,125 @@
     [/^doc(\d+)( {2}tf=\d+)$/, '文档$1$2']
   ];
 
+  // 新增 provider 的逐字 UI 映射。键是上游渲染器产出的完整人读文案；JSON-RPC
+  // method、MCP capability、URI、header 名和代码 evidence 不在表中，因而会原样保留。
+  // 把这张表放在中文层，而不是 provider 内，才能维持 provider 与 upstream byte 一致。
+  var PROVIDER_FIGURES = {
+    'skill-package-anatomy': 1, 'skill-runtime-lifecycle': 1, 'skill-tool-orthogonality': 1,
+    'skill-validation-order': 1, 'skill-discovery-pipeline': 1, 'skill-disclosure-levels': 1,
+    'skill-reference-map': 1, 'skill-resource-containment': 1, 'skill-invocation-stages': 1,
+    'skill-routing-abstention': 1, 'skill-argument-boundaries': 1, 'skill-host-adapter': 1,
+    'skill-authority-chain': 1, 'skill-trust-surface': 1, 'skill-approval-decision': 1,
+    'skill-workflow-extraction': 1, 'skill-eval-layers': 1, 'skill-package-install': 1,
+    'skill-authoring-loop': 1,
+    'mcp-tool-call': 1, 't3-dispatch-loop': 1, 'tp-client-merge': 1,
+    'tp-transport-handshake': 1, 't3-primitive-sort': 1, 't3-sampling-flip': 1,
+    't3-roots-boundary': 1, 'tp-task-lifecycle': 1, 't3-ui-sandbox': 1,
+    'tp-tool-poisoning': 1, 't3-scope-stepup': 1, 't3-gateway-funnel': 1,
+    't3-jwks-rotate': 1, 'mcp-contract-pipeline': 1, 'mcp-reliability-race': 1,
+    'mcp-registry-admission': 1, 'mcp-conformance-operations': 1
+  };
+
+  var PROVIDER_TEXT = {
+    'Skill package anatomy': '技能包结构',
+    'open the complete deployable unit': '展开完整的可部署单元',
+    'Package integrity includes every file the workflow names. Validate the tree before publishing the catalog entry.': '包完整性包含工作流引用的每个文件。发布目录条目之前先校验文件树。',
+    'Skill runtime lifecycle': '技能运行时生命周期', 'follow identity into verified work': '跟随身份进入已验证的工作',
+    'Diagnose failures by lifecycle stage. Discovered, selected, activated, executed, and verified are different states.': '按生命周期阶段定位失败。已发现、已选择、已激活、已执行和已验证是不同状态。',
+    'Skill procedure and tool capability': '技能流程与工具能力', 'separate how from what can run': '区分怎么做与能运行什么',
+    'A skill answers how to approach work. A tool answers which operation the host can perform.': '技能回答如何开展工作；工具回答宿主能执行哪项操作。',
+    'Skill validation order': '技能校验顺序', 'fail on the first broken invariant': '在第一个破坏的不变量处失败',
+    'Cheap structural checks should fail before secondary content errors can hide the first broken invariant.': '低成本的结构检查应先失败，别让次要内容错误掩盖第一个破坏的不变量。',
+    'Discovery compiler pipeline': '发现编译流水线', 'compile filesystem candidates into a catalog': '把文件系统候选项编译为目录',
+    'Discovery is a deterministic compilation process. Preserve rejected and shadowed candidates in diagnostics.': '发现是确定性的编译过程。诊断信息中要保留被拒绝和被遮蔽的候选项。',
+    'Three disclosure levels': '三层渐进披露', 'admit context only when the task earns it': '仅在任务需要时纳入上下文',
+    'Progressive disclosure is staged context admission, not permission escalation.': '渐进披露是分阶段纳入上下文，不是逐级提升权限。',
+    'One-hop reference map': '一步可达的引用图', 'make every branch directly reachable': '让每个分支都能直接到达',
+    'A direct decision map beats a topic dump. Every supporting file should have a stated load condition.': '直接的决策图胜过主题堆砌。每个支撑文件都应说明加载条件。',
+    'Resource containment gate': '资源包含边界', 'resolve the real target before reading': '读取前先解析真实目标',
+    'Resolved containment protects the package boundary. It does not prove the in-package content is trustworthy.': '已解析的包含关系保护包边界，但不能证明包内内容可信。',
+    'Five invocation stages': '五个调用阶段', 'name the exact boundary that failed': '指出失败的准确边界',
+    'A single skill_used flag hides the boundary where routing, policy, capability, or verification failed.': '单个 skill_used 标记会掩盖路由、策略、能力或验证失败的边界。',
+    'Routing with abstention': '带弃权的路由', 'filter policy before comparing relevance': '比较相关性前先过滤策略',
+    'The router ranks only eligible skills and keeps an explicit abstain path.': '路由器只对符合条件的技能排序，并保留明确的弃权路径。',
+    'Argument boundary transformations': '参数边界转换', 'preserve intent without executing text': '保留意图，不执行文本',
+    'Every representation boundary should validate values without treating user-controlled text as code.': '每个表示层边界都应校验值，不能把用户控制的文本当代码执行。',
+    'Portable core and host adapter': '可移植核心与宿主适配器', 'keep extensions outside the core contract': '把扩展留在核心契约之外',
+    'Do not promote one host field into a fake universal standard. Test the adapter that gives it meaning.': '不要把某个宿主字段提升为虚假的通用标准；测试赋予它语义的适配器。',
+    'Authority and execution chain': '授权与执行链', 'activation proposes, the host authorizes': '激活提出请求，宿主做出授权',
+    'Capability, permission, approval, sandbox, and verification protect different properties. Keep every layer visible.': '能力、权限、审批、沙箱和验证保护的是不同属性，每一层都要可见。',
+    'Complete skill trust surface': '完整的技能信任面', 'mark who controls every edge': '标出每条边由谁控制',
+    'Trust is a chain of claims across package source, content, runtime, capability, isolation, credentials, and evidence.': '信任由包来源、内容、运行时、能力、隔离、凭证和证据等主张连成一条链。',
+    'Approval follows consequence': '按后果决定审批', 'decide from reversibility, scope, and impact': '按可逆性、范围与影响决策',
+    'Approval should show the exact target and consequence. It never disables isolation or authorizes later targets.': '审批应展示准确目标与后果，绝不关闭隔离，也不授权后续目标。',
+    'Judgment and deterministic work': '判断与确定性工作', 'put each behavior where it can be tested': '把每种行为放进可测试的位置',
+    'Use model judgment for classification and synthesis. Use code for repeatable computation and invariants.': '用模型判断完成分类与综合；用代码处理可重复计算和不变量。',
+    'Six-layer skill release gate': '六层技能发布门', 'do not average away a hard failure': '不要用平均值掩盖硬失败',
+    'Each eval layer answers a different question. Passing one never substitutes for another.': '每层评测回答不同问题，通过一层绝不能替代另一层。',
+    'Clean install integrity path': '干净安装完整性路径', 'test the installed tree, not only the source': '测试安装后的文件树，不只测源码',
+    'Package tests should exercise the installed copy. Source-tree tests miss installer and upgrade failures.': '包测试应运行安装后的副本；源码树测试会漏掉安装器和升级失败。',
+    'Skill authoring repair loop': '技能编写修复循环', 'change the layer responsible for the failure': '修改真正导致失败的层',
+    'Repair the layer responsible for the failure, then repeat the gate. Never let an average hide a hard safety regression.': '修复导致失败的层，再重复闸门检查。绝不让平均值掩盖硬性的安全回归。',
+    'STATELESS REQUEST EXPLORER': '无状态请求探索器', 'one request, any replica': '一次请求，任意副本',
+    'Select a wire case. The validator compares mirrored metadata, checks the revision, dispatches one envelope, and derives the only legal response shape.': '选择一个线上报文案例。校验器会比较镜像元数据、检查版本、分发一个信封，并推导唯一合法的响应形态。',
+    'STATELESS STREAMABLE HTTP WIRE LAB': '无状态可流式 HTTP 报文实验', 'choose the response mode': '选择响应模式',
+    'Change the HTTP case and inspect which response body or stream is legal. Every modern JSON-RPC message enters through POST /mcp.': '更改 HTTP 案例，检查哪种响应体或流合法。每条现代 JSON-RPC 消息都通过 POST /mcp 进入。',
+    'MCP PRIMITIVE CLASSIFIER': 'MCP 原语分类器', 'classify by consumer intent': '按消费者意图分类',
+    'Choose a project-tracker capability, then classify it as a Tool, Resource, or Prompt. The lab reveals the native wire only after deriving the expected primitive.': '选择一个项目跟踪能力，再将其归类为工具、资源或 prompt。实验会在推导出期望原语后才展示原生报文。',
+    'MRTR RETRY-STATE INSPECTOR': 'MRTR 重试状态检查器', 'mutate one invariant': '改变一个不变量',
+    'Change one retry property and inspect where the multi-round exchange stops. Valid state is echoed, never parsed or edited by the client.': '更改一项重试属性，检查多轮交换在哪停止。有效状态只会回显，客户端绝不解析或编辑它。',
+    'REGISTRY VERSUS LIVE DISCOVERY': '注册表与实时发现', 'publication is not admission': '发布不等于准入',
+    'Select a release condition. The gateway compares Registry metadata with a current server/discover result and its approved canonical descriptor digest.': '选择发布条件。网关会比较注册表元数据、当前 server/discover 结果及获批的规范描述符摘要。',
+    'MCP CONTRACT PIPELINE': 'MCP 契约流水线', 'definition to validated output': '从定义到已验证输出',
+    'Switch one contract boundary and inspect whether the consumer receives a valid result, a tool error, a protocol error, or a redaction failure.': '切换一个契约边界，检查消费者收到的是有效结果、工具错误、协议错误还是脱敏失败。',
+    'MCP RELIABILITY RACE WORKBENCH': 'MCP 可靠性竞态工作台', 'transport lifetime is not task lifetime': '传输生命周期不等于任务生命周期',
+    'Choose a deterministic race, then choose whether to observe, close the in-flight request, or send tasks/cancel. The ledger exposes the resulting durable state.': '选择一个确定性竞态，再选择观察、关闭进行中的请求，或发送 tasks/cancel。账本会展示产生的持久状态。',
+    'MCP REGISTRY ADMISSION LEDGER': 'MCP 注册表准入账本', 'discover, verify, admit': '发现、验证、准入',
+    'Change one supply-chain fact, then run admission. The result is derived from publisher proof, artifact provenance, Registry state, revocation, live discovery, and descriptor pins.': '更改一项供应链事实，再运行准入。结果由发布者证明、产物来源、注册表状态、吊销、实时发现和描述符固定值推导。',
+    'MCP CONFORMANCE OPERATIONS MATRIX': 'MCP 一致性操作矩阵', 'normalize before comparing': '比较前先规范化',
+    'Select a fixture and a runner. The workbench normalizes the transcript, compares it with the contract oracle, and produces a release decision.': '选择夹具与运行器。工作台会规范化记录，与契约预言机比较，并产出发布决策。',
+    'JSON-RPC DISPATCH WORKBENCH': 'JSON-RPC 分发工作台', 'protect the stdio wire': '保护 stdio 报文',
+    'Select one input frame. The parser and dispatcher compute whether stdout receives a matched result, a matched error, or a corrupted stream.': '选择一个输入帧。解析器和分发器会计算 stdout 收到匹配结果、匹配错误还是被污染的流。',
+    'CLIENT NAMESPACE AND ROUTER': '客户端命名空间与路由器', 'canonical name to owning peer': '规范名称到所属对等端',
+    'Introduce a catalog collision, choose a policy, and inspect the route table before any tools/call is serialized.': '引入一个目录冲突，选择策略，并在序列化任何 tools/call 之前检查路由表。',
+    'RESOURCE SCOPE AND ELICITATION GATE': '资源范围与征询闸门', 'authorize, contain, negotiate': '授权、包含、协商',
+    'Select a path or capability case. The server stops at the first boundary that cannot prove the requested operation is valid.': '选择路径或能力案例。服务器会在第一个无法证明请求操作有效的边界停止。',
+    'DURABLE TASK TRANSITION WORKBENCH': '持久任务迁移工作台', 'RPC result outside, task state inside': '外部是 RPC 结果，内部是任务状态',
+    'Select a task method or transition. The outer RPC completes independently from the working, input_required, completed, failed, or cancelled task snapshot.': '选择任务方法或迁移。外层 RPC 独立于 working、input_required、completed、failed 或 cancelled 的任务快照完成。',
+    'MCP APPS BRIDGE LIFECYCLE': 'MCP Apps 桥接生命周期', 'pre-call binding, sandboxed action': '调用前绑定，沙箱内操作',
+    'Select a lifecycle or authority case. The evidence keeps MCP core requests, the ui:// resource, and the iframe postMessage bridge as separate contracts.': '选择生命周期或授权案例。证据会将 MCP 核心请求、ui:// 资源和 iframe postMessage 桥保持为独立契约。',
+    'DESCRIPTOR DIFF AND AUTHORITY LAB': '描述符差异与授权实验', 'pin the complete contract': '固定完整契约',
+    'Change a discovered descriptor or call argument, then choose an approval policy. The authority gate computes execution, review, quarantine, or refusal.': '更改已发现的描述符或调用参数，再选择审批策略。授权闸门会推导执行、审查、隔离或拒绝。',
+    'OAUTH TOKEN BOUNDARY RESOLVER': 'OAuth token 边界解析器', 'stop at the first invalid binding': '在第一个无效绑定处停止',
+    'Change one issuer, resource, redirect, token, or scope fact. Validation runs in a fixed order and shows when a fresh authorization flow is required.': '更改一个发行者、资源、重定向、token 或 scope 事实。校验按固定顺序运行，并展示何时需要新的授权流程。',
+    'TOKEN AND JWKS VALIDATION TIMELINE': 'token 与 JWKS 校验时间线', 'refresh keys, never rotate them here': '刷新密钥，绝不在此轮换',
+    'Select a token or cache event. The resource server follows one bounded validation path for cached keys, refresh, introspection, revocation, algorithms, time, and outages.': '选择 token 或缓存事件。资源服务器会沿一条有界校验路径处理缓存密钥、刷新、内省、吊销、算法、时间和故障。',
+    'Request case': '请求案例', 'Transport case': '传输案例', 'Capability': '能力', 'Your classification': '你的分类',
+    'Retry mutation': '重试变更', 'Release condition': '发布条件', 'Contract case': '契约案例',
+    'Reliability case': '可靠性案例', 'Operation': '操作', 'Supply-chain condition': '供应链条件',
+    'Fixture': '夹具', 'Runner': '运行器', 'Input frame': '输入帧', 'Catalog and call case': '目录与调用案例',
+    'Collision policy': '冲突策略', 'Boundary case': '边界案例', 'Task operation': '任务操作',
+    'Apps case': 'Apps 案例', 'Live condition': '实时条件', 'Approval policy': '审批策略',
+    'OAuth condition': 'OAuth 条件', 'Production event': '生产事件',
+    'Validate request again': '再次校验请求', 'Inspect wire again': '再次检查报文', 'Check classification again': '再次检查分类',
+    'Validate retry again': '再次校验重试', 'Compare sources again': '再次比较来源', 'Run validation again': '再次运行校验',
+    'Run race again': '再次运行竞态', 'Run Admit': '运行准入', 'Run fixture again': '再次运行夹具',
+    'Dispatch again': '再次分发', 'Merge and route again': '再次合并并路由', 'Resolve boundary again': '再次解析边界',
+    'Apply transition again': '再次应用迁移', 'Evaluate bridge again': '再次评估桥接', 'Evaluate authority again': '再次评估授权',
+    'Validate token again': '再次校验 token',
+    'HTTP and JSON-RPC transcript': 'HTTP 与 JSON-RPC 记录', 'Request and response': '请求与响应',
+    'Derived native wire': '推导出的原生报文', 'Multi-round transcript': '多轮记录', 'Publication, discovery, and pins': '发布、发现与固定值',
+    'Definition, wire, and validator': '定义、报文与校验器', 'Requests and durable ledger': '请求与持久账本',
+    'Admission inputs and decision': '准入输入与决策', 'Normalized transcript diff': '规范化记录差异',
+    'stdin, stdout, and error policy': 'stdin、stdout 与错误策略', 'Catalogs, route table, and call': '目录、路由表与调用',
+    'Request, normalized scope, and result': '请求、规范化范围与结果', 'Task request and durable snapshots': '任务请求与持久快照',
+    'Tool metadata, resource, and bridge': '工具元数据、资源与桥接', 'Descriptor diff, call, and audit': '描述符差异、调用与审计',
+    'Discovery, token, and ordered checks': '发现、token 与有序检查', 'Token, cache, actions, and decision': 'token、缓存、操作与决策',
+    'PASS': '通过', 'FAIL': '失败', 'WARN': '警告', 'READY': '就绪', 'DENIED': '已拒绝', 'ACCEPTED': '已接受',
+    'Scenario': '场景', 'Choice': '选择', 'Action': '操作', 'Evidence': '证据', 'Result': '结果', 'Step': '步骤',
+    'Discover': '发现'
+  };
+
   function zhCtrl(t) {
     var key = t.trim();
     if (C[key]) return C[key];
@@ -813,6 +933,34 @@
       if (P[i][0].test(key)) return key.replace(P[i][0], P[i][1]);
     }
     return null;
+  }
+
+  function providerText(text) {
+    var key = String(text || '').trim();
+    return PROVIDER_TEXT[key] || null;
+  }
+
+  function translateProviderTree(host) {
+    var name = (host.dataset.figure || '').trim().split(/\s+/)[0];
+    if (!PROVIDER_FIGURES[name] || !host.querySelectorAll) return;
+    var nodes = host.querySelectorAll('*');
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      var tag = (node.tagName || '').toLowerCase();
+      // evidence 的 JSON/HTTP 原文是协议字面量，翻译会破坏教学与可复制性。
+      if (tag === 'pre' || tag === 'code' || tag === 'script' || tag === 'style') continue;
+      for (var j = 0; j < node.childNodes.length; j++) {
+        var child = node.childNodes[j];
+        if (child.nodeType !== 3) continue;
+        var translated = providerText(child.nodeValue);
+        if (translated) child.nodeValue = translated;
+      }
+      if (node.getAttribute && node.setAttribute) {
+        var aria = node.getAttribute('aria-label');
+        var ariaZh = providerText(aria);
+        if (ariaZh) node.setAttribute('aria-label', ariaZh);
+      }
+    }
   }
 
   function translateCtrls(host) {
@@ -835,7 +983,7 @@
 
   function applyFigureI18n(root) {
     (root || document).querySelectorAll('.lesson-figure[data-figure]').forEach(function (host) {
-      if (host.dataset.lfI18n || !host.dataset.lfMounted) return;
+      if (!host.dataset.lfMounted) return;
       var name = (host.dataset.figure || '').trim().split(/\s+/)[0];
       var lab = host.querySelector('.lf-label');
       if (lab && L[lab.textContent]) lab.textContent = L[lab.textContent];
@@ -846,12 +994,22 @@
       }
       translateCtrls(host);
       translateSvgText(host, name);
+      translateProviderTree(host);
       var cap = host.querySelector('.lf-cap');
       if (cap && CAP[name]) cap.textContent = CAP[name];
-      // 重建型 widget：交互后 _render 会重建 ctrl 行（冒泡晚于渲染），重跑替换
-      function retranslate() { try { translateCtrls(host); } catch (e) {} }
+      if (host.dataset.lfI18n) return;
+      // _render 在 input/change/click 的目标处理器中先重建 DOM；冒泡到 host 后再
+      // 精确重翻译，因此既覆盖首次挂载，也覆盖 MCP/Skill 的每次场景切换。
+      function retranslate() {
+        try {
+          translateCtrls(host);
+          translateSvgText(host, name);
+          translateProviderTree(host);
+        } catch (e) {}
+      }
       host.addEventListener('input', retranslate);
       host.addEventListener('change', retranslate);
+      host.addEventListener('click', retranslate);
       host.dataset.lfI18n = '1';
     });
   }
