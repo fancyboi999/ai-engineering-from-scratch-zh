@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "kind": "career-route",
+  "id": "forward-deployed-ai-engineer",
+  "title": "客户 AI 部署",
+  "workFamily": "客户 AI 部署",
+  "commonTitles": ["前置部署 AI 工程师", "现场 AI 工程师", "AI 解决方案工程师"],
+  "summary": "发现客户工作流，降低其中风险最大的假设，并让有用的 AI 系统经历衡量与发布。",
+  "keywords": "forward deployed field engineering customer workflow discovery scoping prototype pilot production",
+  "decisionPrompt": "你是否想发现客户工作流，验证一个范围收窄的解决方案，并将其带入可衡量的发布？",
+  "mission": "在共同基础之上，将观察到的客户工作流转化为范围明确、经过评估且可运营的 AI 部署。",
+  "responsibilities": [
+    "观察真实工作流，并与用户共同定义结果。",
+    "梳理假设、约束、依赖关系和失败风险。",
+    "构建能够测试核心主张的最小纵向切片。",
+    "定义成功指标、发布控制和反馈循环。"
+  ],
+  "goodFitIf": [
+    "你希望贴近用户和模糊的运营环境开展工作。",
+    "你喜欢在发现、实现、评估和发布之间切换。",
+    "你能向技术和运营利益相关者解释权衡。"
+  ],
+  "baseline": [
+    "完成共同的软件工程和 AI 基础课程，或能证明具备同等实践知识。",
+    "能够构建和评估由 API 支撑的 AI 应用。",
+    "能在提出解决方案前收集工作流证据。"
+  ],
+  "boundary": "这是一条建立在共同基础之上的专业路线，不是客户支持或泛咨询。它让你能够展示部署工作流，但不能替代真实客户或生产环境经验。",
+  "timeNote": "估时仅包含课程时间。作品集项目和练习需要额外时间。",
+  "portfolioProof": {
+    "title": "可衡量的客户试点",
+    "description": "将已有文档记录的工作流转化为范围收窄的试点，具备明确证据、发布控制和反馈计划。",
+    "evidence": [
+      "工作流证据和假设图谱",
+      "最小可测试切片的可执行规格说明",
+      "一个可用且带有评估结果的纵向切片",
+      "成功指标和分阶段发布计划",
+      "推动下一次决策的反馈记录"
+    ]
+  },
+  "readinessCriteria": [
+    "能区分被请求的输出与背后的运营结果。",
+    "能按不确定性和后果为假设排序。",
+    "能构建一个端到端测试某项有价值工作流的纵向切片。",
+    "能在发布前定义评估、成功、回滚和反馈标准。",
+    "能解释哪些证据支持从原型进入试点或生产环境。"
+  ],
+  "coverage": {
+    "strong": ["工作流发现与范围界定", "证据驱动的原型设计", "评估与成功指标", "分阶段发布与反馈"],
+    "partial": ["利益相关者协调", "企业集成与安全", "真实流量下的生产运营"],
+    "outsideCourse": ["商业客户关系的所有权", "采购与法务谈判", "多年客户部署经验"]
+  },
+  "completionClaim": "完成本路线表明你能够为范围明确的客户 AI 试点产出证据，但不保证获得相关职位，也不能证明具备生产环境经验。",
+  "sourceBasis": {
+    "reviewedAt": "2026-08-29",
+    "method": "综合当前 AI 领域、产品、平台、数据、开发者和评估团队的主要职位描述得出。"
+  },
+  "estimatedMinutes": 865,
+  "stages": [
+    {
+      "id": "common-core",
+      "title": "共同核心",
+      "outcome": "界定客户结果、工作流、假设和最小可用测试。",
+      "lessonPaths": [
+        "phases/14-agent-engineering/47-outcomes-before-output",
+        "phases/14-agent-engineering/48-discover-the-real-workflow",
+        "phases/14-agent-engineering/49-map-assumptions-and-risk",
+        "phases/14-agent-engineering/50-choose-the-smallest-testable-slice",
+        "phases/14-agent-engineering/51-write-specifications-that-preserve-judgment"
+      ],
+      "artifact": "一份工作流简报，包含结果、证据、假设、风险和可执行的切片规格说明。"
+    },
+    {
+      "id": "role-practice",
+      "title": "角色实践",
+      "outcome": "根据明确的成功标准构建并评估范围收窄的 AI 系统。",
+      "lessonPaths": [
+        "phases/11-llm-engineering/06-rag",
+        "phases/11-llm-engineering/10-evaluation",
+        "phases/11-llm-engineering/13-production-app",
+        "phases/14-agent-engineering/52-design-success-metrics"
+      ],
+      "artifact": "一个可用的纵向切片，包含评估集、基线和成功记分卡。"
+    },
+    {
+      "id": "proof-project",
+      "title": "验证项目",
+      "outcome": "选择合适的发布阶段，并让试点通过受控暴露逐步推进。",
+      "lessonPaths": [
+        "phases/14-agent-engineering/53-prototype-pilot-or-production",
+        "phases/17-infrastructure-and-production/20-shadow-canary-progressive"
+      ],
+      "artifact": "一个可衡量的试点，包含发布门禁、回滚条件和已记录的结果。"
+    },
+    {
+      "id": "interview-readiness-evidence",
+      "title": "面试与就绪度证据",
+      "outcome": "展示证据和用户反馈如何决定下一次迭代。",
+      "lessonPaths": ["phases/14-agent-engineering/54-build-the-feedback-ratchet"],
+      "artifact": "一份简明案例研究，关联用户证据、系统结果、权衡和下一次决策。"
+    }
+  ],
+  "lessons": [
+    {"order": 1, "path": "phases/14-agent-engineering/47-outcomes-before-output", "minutes": 60, "required": true},
+    {"order": 2, "path": "phases/14-agent-engineering/48-discover-the-real-workflow", "minutes": 70, "required": true},
+    {"order": 3, "path": "phases/14-agent-engineering/49-map-assumptions-and-risk", "minutes": 65, "required": true},
+    {"order": 4, "path": "phases/14-agent-engineering/50-choose-the-smallest-testable-slice", "minutes": 65, "required": true},
+    {"order": 5, "path": "phases/14-agent-engineering/51-write-specifications-that-preserve-judgment", "minutes": 75, "required": true},
+    {"order": 6, "path": "phases/11-llm-engineering/06-rag", "minutes": 90, "required": true},
+    {"order": 7, "path": "phases/11-llm-engineering/10-evaluation", "minutes": 45, "required": true},
+    {"order": 8, "path": "phases/11-llm-engineering/13-production-app", "minutes": 120, "required": true},
+    {"order": 9, "path": "phases/14-agent-engineering/52-design-success-metrics", "minutes": 70, "required": true},
+    {"order": 10, "path": "phases/14-agent-engineering/53-prototype-pilot-or-production", "minutes": 70, "required": true},
+    {"order": 11, "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive", "minutes": 60, "required": true},
+    {"order": 12, "path": "phases/14-agent-engineering/54-build-the-feedback-ratchet", "minutes": 75, "required": true}
+  ]
+}
