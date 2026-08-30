@@ -4,75 +4,75 @@
   "questions": [
     {
       "stage": "pre",
-      "question": "在 MCP 中，哪个组件负责用户体验、模型交互以及一个或多个协议 client？",
+      "question": "在 MCP 中，哪个组件负责用户体验、模型交互、同意策略以及一个或多个协议 client？",
       "options": [
-        "负责解析 URI 上下文并维护对话历史的 resource 提供方",
-        "协调模型、用户交互，并通过 client 连接 server 的 host 应用",
-        "负责选择模型并为每次调用打开 client 的 tool 处理函数",
-        "负责公开能力并决定 UI 如何呈现能力的 server 进程"
+        "执行能力并决定 host 如何呈现它们的 server",
+        "协调模型、用户和 server client 的 host 应用",
+        "解析 URI 并存储对话状态的 resource provider",
+        "每次调用时选择模型的 tool handler"
       ],
       "correct": 1,
-      "explanation": "host 就是 AI 应用。它管理模型与用户体验，并通过 client 连接 server。"
+      "explanation": "host 负责 AI 应用的体验和策略。一个 client 与一个 server 通信，而 server 执行其已声明的能力。"
     },
     {
       "stage": "check",
-      "question": "维护旧版 MCP 配置的 server 想在 client 上调用 roots/list。它必须先确认什么？",
+      "question": "当前 MCP `2026-07-28` client 必须在每个请求中包含哪些 metadata？",
       "options": [
-        "server 先发送一次 roots/list，并把 method-not-found 错误当作能力发现",
-        "host 把 root 列表预先放入每个 tool 参数，因此不需要能力协商",
-        "client 已声明 roots，而 server 始终遵守这份约定",
-        "server 在初始化期间把 roots 声明为自己的能力之一"
+        "仅包含 clientInfo，因为 server 会从既有连接隐式推断版本和能力，无需请求范围的 _meta",
+        "一个 initialized 标记和 Last-Event-ID header",
+        "params._meta 中同时携带的协议版本和 client capabilities",
+        "协议会话 ID，以及 initialize 期间协商出的 server 能力"
       ],
       "correct": 2,
-      "explanation": "Roots 属于 client，因为它表达的是 client 选定的范围。只有 client 声明了该能力，旧版 server 才能请求 roots。在 2026-07-28 配置中，roots 已弃用，剩余交互都采用无状态的 input-required 流程。"
+      "explanation": "每个请求都携带 io.modelcontextprotocol/protocolVersion 和 io.modelcontextprotocol/clientCapabilities。也应发送 clientInfo，但它是可选的自报信息。"
     },
     {
       "stage": "check",
-      "question": "哪种 MCP 原语最适合表示一份可通过 URI 寻址的只读配置文档？",
+      "question": "某个 tools/call 需要 roots、sampling 和 elicitation 输入。当前报文模式是什么？",
       "options": [
-        "要求 host 模型重建配置的 sampling 请求",
-        "使用只读 tool 返回配置",
-        "接收 URI 并返回包含该文档的可复用消息的 prompt",
-        "通过 URI 提供可寻址上下文的 resource"
+        "server 创建 MCP 会话，保存待处理 callback，并等待 notifications/initialized",
+        "client 在每个初始 tool 参数中预加载所有可能的 root、批准答案和模型输出",
+        "server 在开放连接上发送三条独立的 JSON-RPC 请求",
+        "返回 input_required，然后用 inputResponses、原样的 requestState 和新 ID 重试原 method"
       ],
       "correct": 3,
-      "explanation": "resource 通过 URI 提供可寻址上下文；tool 执行由模型选择的操作；prompt 则封装可复用模板。"
+      "explanation": "MRTR 在 input_required 结果中嵌入请求的 client 输入。client 收集响应后，用新 ID、inputResponses 和原样的 requestState 重试原请求。"
     },
     {
       "stage": "check",
-      "question": "为什么 stdio MCP server 必须把诊断日志写入 stderr？",
+      "question": "server/discover 响应必须包含什么，才能描述当前协议支持？",
       "options": [
-        "stdout 专门用于 JSON-RPC 协议 frame",
-        "只要每行诊断日志都是有效 JSON，stdout 就可以在 frame 之间写日志",
-        "client 会单独验证 stderr，因此诊断信息不会影响会话",
-        "stderr 既能保留 framing，又会自动脱敏 secret"
+        "resultType、精确的 supportedVersions 字段，以及已声明的能力",
+        "negotiatedVersion 字段和协议会话过期时间",
+        "server 发起的 roots/list 请求，随后是绑定该连接的能力响应",
+        "仅一个 tools 数组，因为 client 会自行推断版本、身份和缓存策略"
       ],
       "correct": 0,
-      "explanation": "stdio 传输使用 stdout 发送协议消息。写入 stdout 的调试文本可能破坏 framing，进而断开 client 连接。"
+      "explanation": "当前 server 必须实现 server/discover。其 complete 结果报告 supportedVersions 和 capabilities，并且应包含 serverInfo。"
     },
     {
       "stage": "post",
-      "question": "某个 resource 包含读取私钥的指令。应该如何处理它的信任级别？",
+      "question": "为什么不能仅因 server 最初创建了 MCP MRTR requestState 值，就信任它？",
       "options": [
-        "只要 resource URI 位于获批的项目 namespace 中，就允许读取",
-        "将它视为无法扩大 tool 权限的不可信数据",
-        "先让另一个模型对文本分类，再扩大文件权限",
-        "只要 resource 来自通过身份验证的 server，就将它提升为 host 策略"
+        "JSON-RPC 总会将 opaque 字符串转换为可执行指令",
+        "它穿过不受 server 控制的 client 边界，返回时可能已经被篡改",
+        "协议要求 client 在每次重试前解码、规范化和编辑 requestState",
+        "每个负载均衡器都会用自己的会话 cookie 替换 requestState"
       ],
       "correct": 1,
-      "explanation": "server 内容可能带有恶意，也可能已遭入侵。保留来源信息，并让它始终处于可信策略与授权边界之下。"
+      "explanation": "requestState 经由 client 返回，因此受攻击者控制。用 HMAC 或 AEAD 保护安全敏感状态，并将其绑定到身份、过期时间、method 和重要参数。"
     },
     {
       "stage": "post",
-      "question": "与使用协议会话的旧版 server 相比，为什么当前的无状态 Streamable HTTP server 更容易放在 round-robin 负载均衡器之后？",
+      "question": "哪种部署描述符合当前 MCP `2026-07-28` Streamable HTTP？",
       "options": [
-        "无状态传输消除了每个 tool 的应用状态与外部副作用",
-        "SSE 会让每次 tool 调用都具备幂等性，因此失败请求总能重放",
-        "每个请求都携带协议 metadata，不依赖隐藏的单实例会话状态",
-        "负载均衡器可以从 JSON-RPC 方法名推断出全部 tool 授权"
+        "一个 initialize POST，返回 Mcp-Session-Id，并要求在关闭时 DELETE",
+        "一个由 server 持有、承载直接 sampling 请求的 WebSocket 会话",
+        "一个 POST endpoint、逐请求返回 JSON 或 SSE 响应，并且没有协议会话",
+        "一个接收请求的 POST endpoint，以及由 Last-Event-ID 恢复的永久 GET 流"
       ],
       "correct": 2,
-      "explanation": "2026-07-28 核心协议让每个请求都携带协议 metadata，因此任意健康实例都能处理。应用状态与副作用仍需通过显式 handle、存储和重试策略管理。"
+      "explanation": "当前 Streamable HTTP 使用单个 POST endpoint 和自描述请求。它取消了 GET 流、协议会话、会话删除和 Last-Event-ID 恢复。"
     }
   ]
 }
