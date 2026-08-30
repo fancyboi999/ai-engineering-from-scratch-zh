@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "kind": "career-route",
+  "id": "agentic-ai-engineer",
+  "title": "Agent 系统工程",
+  "workFamily": "Agent 系统工程",
+  "commonTitles": ["Agent 系统工程师", "Agentic AI 工程师", "AI Agent 工程师"],
+  "summary": "构建使用工具的 agent 循环，并让上下文、记忆、编排、安全、评估和生产控制都明确可见。",
+  "keywords": "agentic ai engineer agents tools mcp memory orchestration safety evaluation runtime observability",
+  "decisionPrompt": "你是否想构建一类使用工具的系统，让它的状态、决策、失败和控制措施始终可观测？",
+  "mission": "在共同基础之上，构建具有明确工具契约、状态、安全边界、评估与运行时证据的 agent 系统。",
+  "responsibilities": [
+    "设计工具契约，闭合思考、行动与观察循环。",
+    "控制上下文、记忆、状态转换和编排。",
+    "建模失败，并守住工具与指令的边界。",
+    "评估行为，并依据追踪和控制手段运行系统。"
+  ],
+  "goodFitIf": [
+    "你喜欢推理有状态系统、控制流和失败恢复。",
+    "你希望自主性受到明确契约和证据的约束。",
+    "比起黑箱 agent 演示，你更偏好可测试的编排。"
+  ],
+  "baseline": [
+    "完成共同的软件工程和 AI 基础课程，或能证明具备同等实践知识。",
+    "能够构建由 API 支撑的 LLM 应用，并读取结构化追踪数据。",
+    "理解基础测试、状态管理和安全边界。"
+  ],
+  "boundary": "这是一条建立在共同基础之上的专业路线。MCP 只是其中一种集成方式，不是 agent 系统工程的定义；本路线也不能替代分布式系统或线上运维经验。",
+  "timeNote": "估时仅包含课程时间。作品集项目和练习需要额外时间。",
+  "portfolioProof": {
+    "title": "可观测的 Agent 系统",
+    "description": "构建一个边界明确的 agent 工作流，其工具、状态、记忆、失败行为和发布证据均可检查。",
+    "evidence": [
+      "类型化的工具注册表和 agent 循环",
+      "明确的状态和记忆行为",
+      "失败和 prompt 注入测试",
+      "一套 agent 评估测试集",
+      "包含停止、重试和升级处理证据的运行时追踪"
+    ]
+  },
+  "readinessCriteria": [
+    "能区分工具能力与 agent 决策策略。",
+    "能解释哪些信息进入上下文、哪些会持久化、哪些会过期。",
+    "能建模状态转换和编排失败路径。",
+    "能测试 prompt 注入、工具误用、循环和虚假完成声明。",
+    "能从轨迹中评估行为，并根据追踪来运行系统。"
+  ],
+  "coverage": {
+    "strong": ["工具契约和 agent 循环", "上下文、记忆和状态", "编排和失败模式", "Agent 安全、评估和可观测性"],
+    "partial": ["分布式 agent 系统", "人工审批实践", "长运行工作流的持久性"],
+    "outsideCourse": ["生产环境集群的所有权", "服务提供商内部的模型控制", "多年线上值班经验"]
+  },
+  "completionClaim": "完成本路线表明你能够构建和评估可观测的 agent 系统，但不保证获得相关职位，也不能证明你有运行生产环境 agent 集群的经验。",
+  "sourceBasis": {
+    "reviewedAt": "2026-08-29",
+    "method": "综合当前 AI 领域、产品、平台、数据、开发者和评估团队的主要职位描述得出。"
+  },
+  "estimatedMinutes": 865,
+  "stages": [
+    {
+      "id": "common-core",
+      "title": "共同核心",
+      "outcome": "构建类型化的工具接口和边界明确的 agent 循环。",
+      "lessonPaths": [
+        "phases/13-tools-and-protocols/01-the-tool-interface",
+        "phases/13-tools-and-protocols/05-tool-schema-design",
+        "phases/13-tools-and-protocols/06-mcp-fundamentals",
+        "phases/14-agent-engineering/01-the-agent-loop",
+        "phases/14-agent-engineering/06-tool-use-and-function-calling"
+      ],
+      "artifact": "一个确定性的 agent 循环，包含类型化工具、验证、停止条件和执行记录。"
+    },
+    {
+      "id": "role-practice",
+      "title": "角色实践",
+      "outcome": "让上下文、记忆、状态和编排明确且可测试。",
+      "lessonPaths": [
+        "phases/11-llm-engineering/05-context-engineering",
+        "phases/14-agent-engineering/07-memory-virtual-context-memgpt",
+        "phases/14-agent-engineering/13-langgraph-stateful-graphs",
+        "phases/14-agent-engineering/28-orchestration-patterns"
+      ],
+      "artifact": "一个有状态的工作流，包含上下文预算、记忆策略、检查点和恢复路径。"
+    },
+    {
+      "id": "proof-project",
+      "title": "验证项目",
+      "outcome": "在发布前用真实的失败情况和不安全输入对系统施压测试。",
+      "lessonPaths": [
+        "phases/14-agent-engineering/26-failure-modes-agentic",
+        "phases/14-agent-engineering/27-prompt-injection-defense",
+        "phases/14-agent-engineering/30-eval-driven-agent-development"
+      ],
+      "artifact": "一个可观测的 agent 系统，包含对抗性测试、轨迹评估和明确的发布门禁。"
+    },
+    {
+      "id": "interview-readiness-evidence",
+      "title": "面试与就绪度证据",
+      "outcome": "展示如何依据控制手段和追踪证据来运行系统。",
+      "lessonPaths": [
+        "phases/14-agent-engineering/29-production-runtimes",
+        "phases/14-agent-engineering/24-agent-observability-platforms"
+      ],
+      "artifact": "一份案例研究，包含架构、失败证据、运行时控制、追踪数据和有据可依的权衡。"
+    }
+  ],
+  "lessons": [
+    {"order": 1, "path": "phases/13-tools-and-protocols/01-the-tool-interface", "minutes": 45, "required": true},
+    {"order": 2, "path": "phases/13-tools-and-protocols/05-tool-schema-design", "minutes": 45, "required": true},
+    {"order": 3, "path": "phases/13-tools-and-protocols/06-mcp-fundamentals", "minutes": 55, "required": true},
+    {"order": 4, "path": "phases/14-agent-engineering/01-the-agent-loop", "minutes": 60, "required": true},
+    {"order": 5, "path": "phases/14-agent-engineering/06-tool-use-and-function-calling", "minutes": 60, "required": true},
+    {"order": 6, "path": "phases/11-llm-engineering/05-context-engineering", "minutes": 90, "required": true},
+    {"order": 7, "path": "phases/14-agent-engineering/07-memory-virtual-context-memgpt", "minutes": 75, "required": true},
+    {"order": 8, "path": "phases/14-agent-engineering/13-langgraph-stateful-graphs", "minutes": 75, "required": true},
+    {"order": 9, "path": "phases/14-agent-engineering/28-orchestration-patterns", "minutes": 60, "required": true},
+    {"order": 10, "path": "phases/14-agent-engineering/26-failure-modes-agentic", "minutes": 60, "required": true},
+    {"order": 11, "path": "phases/14-agent-engineering/27-prompt-injection-defense", "minutes": 75, "required": true},
+    {"order": 12, "path": "phases/14-agent-engineering/30-eval-driven-agent-development", "minutes": 60, "required": true},
+    {"order": 13, "path": "phases/14-agent-engineering/29-production-runtimes", "minutes": 60, "required": true},
+    {"order": 14, "path": "phases/14-agent-engineering/24-agent-observability-platforms", "minutes": 45, "required": true}
+  ]
+}
