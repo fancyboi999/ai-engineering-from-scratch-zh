@@ -1,16 +1,40 @@
 ---
 name: mcp-client-harness
-description: 构建带现代 metadata、安全年代协商、确定性合并和路由的多 server MCP client。
+description: Scaffold a multi-server MCP client with modern metadata, safe era negotiation, deterministic merge, and routing.
 version: 2.1.0
 phase: 13
 lesson: 08
 tags: [mcp, client, stateless, compatibility, routing]
 ---
 
-给定 MCP server transports，产出优先 MCP `2026-07-28` 并隔离 legacy 兼容层的 client harness。每个稳定 server 名绑定固定 command/endpoint、args、环境白名单、授权上下文、传输类型及默认 false 的 `allow_legacy`。序列化前把版本、当前能力和建议的 client identity 写入每个 `_meta`。
+给定一组 MCP server transports，产出一个优先使用 MCP `2026-07-28` 且隔离旧版兼容性的 client harness。
 
-stdio 先发 `server/discover`；有效 DiscoverResult 接受，`-32022` 在共同现代版本重试，`-32020`/`-32021` 都是可修正的现代证据。只有明确 `allow_legacy` 的 peer 才能在 deadline 内做一次 `initialize` probe；只在获得带配置 legacy revision、object capabilities 和非空 server identity 的关联 JSON-RPC 成功后选择 legacy，否则 fail closed。timeout、断连、空响应、未知错误或 malformed result 都不是 legacy 证据。
+产出：
 
-遵守 `ttlMs`/`cacheScope`，legacy 缺少 `resultType` 视为 `complete`。peer 和 tools 排序，冲突必须 prefix 或拒绝。路由把 canonical tool 映到 peer/本地名，使用新 request id 并校验 response id。断连后重新 discover/list、重开 subscriptions，只重试安全操作。
+1. Peer configuration。将稳定 server name 映射到固定的 command 或 endpoint、arguments、environment allowlist、authorization context、transport kind 和默认 false 的显式 `allow_legacy` flag。
+2. 现代请求构建器。在序列化前，立即在每个 `params._meta` 中盖上协议版本、当前 client capabilities 和建议提供的 client identity。
+3. stdio era probe。先发送 `server/discover`。接受有效 DiscoverResult；在双方支持的现代版本上重试 `-32022`；并将 `-32020` 与 `-32021` 视为可纠正的现代 errors。
+4. 旧版兼容性 probe。将未识别 error、timeout、connection close 或空响应视为歧义。只有该确切 peer 设有 `allow_legacy: true` 时才发送一次受 deadline 约束的 `initialize`。仅在收到含配置旧版 revision、object capabilities 和非空 server identity 的可关联 JSON-RPC success 后选择旧版；否则 fail closed。
+5. Tool cache。在协商的 authorization context 中遵守 `ttlMs` 和 `cacheScope`。将缺失的旧版 `resultType` 视为 `"complete"`。
+6. 命名空间合并。对 peers 和 tools 排序。加前缀或拒绝冲突。禁止静默覆盖。
+7. Router。将 canonical tool names 映射到 peer 和 local name，创建新的请求 id，发送符合 era 的请求，并校验 response id。
+8. Recovery。transport 丢失时，使 in-flight work 失败，重启或重连，重复 discovery 和 lists，重新打开 subscriptions，并仅重试安全 policy 允许的操作。
 
-拒绝无 `_meta` 的现代 request、在已识别现代错误后初始化、未 allowlist peer 初始化、跨授权上下文共享 private cache、静默覆盖重复工具、以及无 `resultType` 的现代成功。拒绝启动白名单外 command、歧义 owner 的 tool 与无幂等键/用户决定的非幂等自动重试。输出完整 Python harness、六项以上测试和启动报告。
+硬拒绝：
+
+- 发送没有当前 `_meta` 的现代请求。
+- 在已识别的现代 error 后回退到初始化。
+- 向未明确 allowlisted 用于旧版兼容性的 peer 发送 `initialize`。
+- 将 timeout、connection close、空响应、未识别 error、格式错误 result 或不受支持 revision 视作旧版行为的证明。
+- 将 process、connection 或 `Mcp-Session-Id` 视为现代协议状态。
+- 跨授权上下文共享私有缓存列表。
+- 静默覆盖重复 tool name。
+- 接受缺少 `resultType` 的现代 success。
+
+拒绝规则：
+
+- 拒绝启动固定 allowlist 之外的 command。
+- 当 owner 有歧义时，拒绝路由 tool。
+- 没有应用 idempotency key 或用户决定时，拒绝自动重试非幂等 call。
+
+输出一个完整 Python harness、至少六个 conformance tests，以及一份启动报告，列出 peer、选定 era、选定版本、cache scope 和 canonical tool names。

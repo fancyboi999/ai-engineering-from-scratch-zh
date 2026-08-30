@@ -1,7 +1,48 @@
-{"lesson":"08-building-an-mcp-client","title":"构建 MCP Client：发现、路由与双时代 fallback","questions":[
-{"stage":"pre","question":"双时代 stdio client 应先发送什么？","options":["Mcp-Session-Id","server/discover","initialize","HTTP GET"],"correct":1,"explanation":"discovery probe 清晰分开现代逐 request metadata 与 legacy initialization。"},
-{"stage":"check","question":"discovery probe 返回带共同支持版本的 -32022，client 应做什么？","options":["在支持版本重试现代 discovery","发送 initialize","打开 HTTP GET","忽略 server"],"correct":0,"explanation":"-32022 是已识别的现代证据，因此 client 保持现代模式并重试。"},
-{"stage":"check","question":"选择 legacy era 的充分条件是什么？","options":["任意 -32601 error","peer 在 legacy allowlist","peer 被 allowlist 且受限 initialize probe 返回有效的受支持 legacy result","仅 discovery timeout"],"correct":2,"explanation":"allowlist 只准许 probe；只有结构有效、针对配置 legacy revision 的肯定 initialize 结果才能证明 legacy era。"},
-{"stage":"check","question":"client 应如何处理两个都叫 search 的 tool？","options":["静默覆盖一个","相信启动顺序","按声明 policy 加前缀或拒绝","创建协议 session"],"correct":2,"explanation":"显式前缀或拒绝才能保持路由可见且确定。"},
-{"stage":"post","question":"协商为 legacy 后，legacy result 缺少 resultType 如何解释？","options":["input_required","complete","transport error","server/discover"],"correct":1,"explanation":"client 将早期版本缺少 resultType 的结果视为 complete。"},
-{"stage":"post","question":"现代 transport 断开后，恢复路由前必须做什么？","options":["重连、重新 discover 并重新列举","用 Last-Event-ID 恢复","回显 Mcp-Session-Id","复用旧 connection metadata"],"correct":0,"explanation":"client 重建 peer bookkeeping，且只用新 request id 重试安全操作。"}]}
+{
+  "lesson": "08-building-an-mcp-client",
+  "title": "构建 MCP Client：发现、路由与双时代回退",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "双时代 stdio client 应首先发送什么？",
+      "options": ["Mcp-Session-Id", "server/discover", "initialize", "HTTP GET"],
+      "correct": 1,
+      "explanation": "发现 probe 在现代逐请求元数据与旧版初始化之间建立了清晰边界。"
+    },
+    {
+      "stage": "check",
+      "question": "发现 probe 返回带有双方支持版本的 -32022。client 应如何做？",
+      "options": ["以受支持版本重试现代发现", "发送 initialize", "打开 HTTP GET", "忽略该 server"],
+      "correct": 0,
+      "explanation": "-32022 是已识别的现代证据，因此 client 保持现代方式并重试。"
+    },
+    {
+      "stage": "check",
+      "question": "选择旧版 era 的充分条件是什么？",
+      "options": ["任意 -32601 error", "peer 位于旧版 allowlist", "peer 已 allowlisted，且有限 initialize probe 返回有效、受支持的旧版结果", "仅仅一次发现 timeout"],
+      "correct": 2,
+      "explanation": "allowlist 允许探测，但只有为配置旧版 revision 得到结构上有效的正向 initialize 结果，才能证明旧版 era。"
+    },
+    {
+      "stage": "check",
+      "question": "client 应如何处理两个都叫 search 的 tools？",
+      "options": ["静默覆盖其中一个", "相信启动顺序", "按声明 policy 加前缀或拒绝", "创建协议 session"],
+      "correct": 2,
+      "explanation": "显式加前缀或拒绝，能让路由可见且保持确定性。"
+    },
+    {
+      "stage": "post",
+      "question": "client 协商旧版 era 后，某个旧版结果缺少 resultType。应如何解释？",
+      "options": ["解释为 input_required", "解释为 complete", "解释为 transport error", "解释为 server/discover"],
+      "correct": 1,
+      "explanation": "client 将较早协议版本中缺失的 resultType 视作 complete。"
+    },
+    {
+      "stage": "post",
+      "question": "现代 transport 丢失后，在恢复路由前必须做什么？",
+      "options": ["重连、重新发现并重新列出", "用 Last-Event-ID 恢复", "回显 Mcp-Session-Id", "复用旧 connection metadata"],
+      "correct": 0,
+      "explanation": "client 重建 peer bookkeeping，并只以新的请求 ids 重试安全操作。"
+    }
+  ]
+}
