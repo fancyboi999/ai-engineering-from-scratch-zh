@@ -459,6 +459,7 @@ function writeMarkdown(file, { name, description, version }) {
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260831a';
+  const appRelease = '20260831b';
   const styleRelease = '20260831a';
   const navigationRelease = '20260831b';
   const narrationRelease = '20260831a';
@@ -488,7 +489,7 @@ test('shared site asset families use the expected cache keys on every page', () 
     assert.equal(versionFor(source, 'header.js'), navigationRelease, `${page} has stale header.js`);
   }
 
-  assert.equal(versionFor(sourceFor('index.html'), 'app.js'), release);
+  assert.equal(versionFor(sourceFor('index.html'), 'app.js'), appRelease);
   assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.css'), release);
   assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.js'), release);
   assert.match(
@@ -1534,6 +1535,7 @@ test('website motion contracts keep interaction state stable and compositor-frie
   assert.doesNotMatch(homepageStatBar[0], /transition:\s*width/);
   assert.match(appSource, /barFill\.style\.transform = 'scaleX\('/);
   assert.doesNotMatch(appSource, /barFill\.style\.width\s*=/);
+  assert.doesNotMatch(appSource, /initScrollExplode\s*\(/);
 
   const agentLoop = agentSource.match(/function agentLoop\(host\) \{[\s\S]*?\n  \}\n\n  \/\/ .* react-trace/);
   assert.ok(agentLoop, 'persistent Agent Loop renderer is missing');
@@ -1664,6 +1666,9 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   assert.match(lessonHtml, /feedbackTarget\.scrollIntoView/);
   assert.match(lessonHtml, /feedbackTarget\.focus\(\)/);
   assert.match(lessonHtml, /var nextLocked = learningPathMode && learningPathEntryLocked\(next\)/);
+  assert.match(lessonHtml, /var SOURCE_OWNER = [^;]+\? SOURCE_CONFIG\.owner : 'fancyboi999'/);
+  assert.match(lessonHtml, /var SOURCE_REPO = [^;]+\? SOURCE_CONFIG\.repo : 'ai-engineering-from-scratch-zh'/);
+  assert.doesNotMatch(lessonHtml, /url \+= '&(?:fromTrack|track)='/);
   assert.match(
     lessonHtml,
     /data-learning-path-gate-label>'\s*\+\s*\(nextLocked\s*\?\s*'尚未解锁'\s*:\s*'下一节 &rarr;'\)/

@@ -20,7 +20,6 @@
     initCopyButton();
     initMastheadFigure();
     initFadeObserver();
-    initScrollExplode();
     bindProgressActions('statExport', 'statImport', 'statImportFile');
   });
 

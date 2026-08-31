@@ -2725,6 +2725,9 @@
       var flatLessons = [];
       var lessonQuizPromise = null;
       var ACTIVE_REF = window.__AIFS_REF || 'main';
+      var SOURCE_CONFIG = window.__AIFS_SOURCE || {};
+      var SOURCE_OWNER = /^[A-Za-z0-9-]+$/.test(SOURCE_CONFIG.owner || '') ? SOURCE_CONFIG.owner : 'fancyboi999';
+      var SOURCE_REPO = /^[A-Za-z0-9_.-]+$/.test(SOURCE_CONFIG.repo || '') ? SOURCE_CONFIG.repo : 'ai-engineering-from-scratch-zh';
       var REPO_TREE = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/' + encodeURIComponent(ACTIVE_REF) + '/';
       var certificationTrack = null;
       var certificationOriginTrack = null;
@@ -3496,15 +3499,6 @@
         // canonical 指向预渲染静态页（SEO 主体）；旧 ?path= URL 仅作兼容入口
         var url = ORIGIN + lessonHref(path);
         var contextTrack = certificationContextTrack();
-        if (certificationLesson) {
-          if (originatingTrackId && certificationOriginTrack) {
-            url += '&fromTrack=' + encodeURIComponent(certificationOriginTrack.id);
-          } else if (certificationMode) {
-            url += '&track=' + encodeURIComponent(certificationTrack.id);
-          } else if (requestedTrackId && certificationOriginTrack) {
-            url += '&track=' + encodeURIComponent(certificationOriginTrack.id);
-          }
-        }
         var desc = lessonDescription(md);
         var courseName = certificationLesson
           ? (contextTrack && (contextTrack.credential || contextTrack.title || contextTrack.shortName) || 'Claude 认证备考')
