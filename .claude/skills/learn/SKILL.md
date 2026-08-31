@@ -28,10 +28,10 @@ skill 名称可移植，但调用语法属于宿主。每次建议下一步时�
 仓库已克隆时优先使用本地文件（当前目录或父目录有 `phases/`）；否则从以下位置获取：
 
 ```text
-https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/<path>
+https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/<path>
 ```
 
-- 课程文本：`phases/<phase-dir>/<lesson-dir>/docs/en.md`
+- 课程文本：`phases/<phase-dir>/<lesson-dir>/docs/zh.md`
 - 课程测验：`phases/<phase-dir>/<lesson-dir>/quiz.json`
 - 某阶段课程列表：`README.md` 的 Contents 部分（每阶段表格列出每课目录路径和标题）
 

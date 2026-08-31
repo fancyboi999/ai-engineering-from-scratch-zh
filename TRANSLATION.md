@@ -30,11 +30,11 @@
 | 英文 | 中文 |
 |---|---|
 | `## Learning Objectives` | `## 学习目标` |
-| `## The Problem` | `## 问题所在` |
+| `## The Problem` | `## 问题背景` |
 | `## The Concept` | `## 核心概念` |
 | `## Build It` | `## 动手构建` |
-| `## Use It` | `## 上手使用` |
-| `## Ship It` | `## 交付` |
+| `## Use It` | `## 实际使用` |
+| `## Ship It` | `## 拿去用` |
 | `## Exercises` | `## 练习` |
 | `## Key Terms` | `## 关键术语` |
 | `## Further Reading` | `## 延伸阅读` |
@@ -81,7 +81,7 @@
 | Phase | 阶段 |
 | Lesson | 课（如 "第 1 课"） |
 | Artifact | 产物 |
-| Build It / Use It | 动手构建 / 上手使用 |
+| Build It / Use It | 动手构建 / 实际使用 |
 
 ### 保留英文，不翻
 

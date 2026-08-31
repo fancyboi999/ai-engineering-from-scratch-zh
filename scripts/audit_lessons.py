@@ -78,7 +78,7 @@ def iter_lesson_dirs(phase_filter: int | None) -> Iterable[Path]:
             if phase_num != phase_filter:
                 continue
         for lesson in sorted(phase.iterdir()):
-            if lesson.is_dir():
+            if lesson.is_dir() and not lesson.name.startswith('.'):
                 yield lesson
 
 
@@ -94,25 +94,25 @@ def check_lesson_dir_pattern(audit: Audit, lesson: Path) -> bool:
     return True
 
 
-def check_docs_en_md(audit: Audit, lesson: Path) -> str | None:
-    doc = lesson / "docs" / "en.md"
+def check_docs_zh_md(audit: Audit, lesson: Path) -> str | None:
+    doc = lesson / "docs" / "zh.md"
     if not doc.is_file():
-        audit.add("L002", lesson, doc, "missing docs/en.md")
+        audit.add("L002", lesson, doc, "missing docs/zh.md")
         return None
     try:
         text = doc.read_text(encoding="utf-8")
     except UnicodeDecodeError:
-        audit.add("L002", lesson, doc, "docs/en.md is not valid UTF-8")
+        audit.add("L002", lesson, doc, "docs/zh.md is not valid UTF-8")
         return None
     if len(text.encode("utf-8")) < MIN_DOC_BYTES:
         audit.add(
             "L003",
             lesson,
             doc,
-            f"docs/en.md shorter than {MIN_DOC_BYTES} bytes (got {len(text)})",
+            f"docs/zh.md shorter than {MIN_DOC_BYTES} bytes (got {len(text)})",
         )
     if not H1_RE.search(text):
-        audit.add("L004", lesson, doc, "docs/en.md missing top-level H1")
+        audit.add("L004", lesson, doc, "docs/zh.md missing top-level H1")
     return text
 
 
@@ -194,7 +194,7 @@ def check_quiz(audit: Audit, lesson: Path) -> None:
 
 
 def check_internal_links(audit: Audit, lesson: Path, text: str) -> None:
-    doc = lesson / "docs" / "en.md"
+    doc = lesson / "docs" / "zh.md"
     seen: set[str] = set()
     for match in MD_LINK_RE.finditer(text):
         href = match.group(1).strip()
@@ -215,7 +215,7 @@ def audit_lesson(audit: Audit, lesson: Path) -> None:
     audit.lessons_checked += 1
     if not check_lesson_dir_pattern(audit, lesson):
         return
-    text = check_docs_en_md(audit, lesson)
+    text = check_docs_zh_md(audit, lesson)
     check_code_main(audit, lesson)
     check_quiz(audit, lesson)
     if text is not None:

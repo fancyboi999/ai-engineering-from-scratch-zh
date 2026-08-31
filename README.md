@@ -4,12 +4,12 @@
 
 <p align="center">
   <b>从零开始，亲手实现每一个 AI 算法</b><br/>
-  <sub>503 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
+  <sub>523 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
 </p>
 
 <p align="center">
   <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/在线阅读-aieng--zh.cn-3553ff?style=flat-square&labelColor=fafaf5" alt="在线阅读 aieng-zh.cn"></a>
-  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-503-3553ff?style=flat-square&labelColor=fafaf5" alt="503 lessons"></a>
+  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-523-3553ff?style=flat-square&labelColor=fafaf5" alt="523 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
   <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff&cacheSeconds=21600" alt="GitHub stars"></a>
@@ -22,7 +22,7 @@
 > **84% 的学生已经在用 AI 工具，可只有 18% 觉得自己能在专业场景里用好它们。**
 > 这套课程要填的就是这道沟。
 >
-> 503 节课，20 个阶段，约 320 小时。Python、TypeScript、Rust、Julia。每节课都交付一件
+> 523 节课，20 个阶段，约 348 小时。Python、TypeScript、Rust、Julia。每节课都交付一件
 > 能复用的东西：一个提示词、一个技能、一个 agent、一个 MCP server。免费，开源，MIT。
 >
 > 你不只是学 AI，你亲手把它造出来。从头到尾，全手写。
@@ -35,15 +35,15 @@
 
 | | |
 |---|---|
-| 🇨🇳 **全站简体中文** | 503 节课正文、83 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
-| 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
+| 🇨🇳 **全站简体中文** | 523 节课正文、83 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
+| 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、[AI 工程学习路径](https://aieng-zh.cn/learning-paths.html)、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
 | 🎬 **配套动画讲解视频** | 3Blue1Brown 风格的无真人动画讲解，把每节课的数学推导与核心直觉做成可视化短片，中文配音、在课程页内嵌播放。Phase 1（数学基础 22 节）已上线，其余阶段陆续制作中——它是对动手推导的补充，不是替你跳过思考的速成视频 |
 | 🔍 **为 AI 检索优化** | 构建时自动生成 `sitemap.xml` / `llms.txt` / 结构化数据，方便被搜索引擎和 AI 助手引用 |
 | ✅ **课数一致性护栏** | CI 自动校验课程数（`node site/build.js --check`），防止课程列表与磁盘上的实际内容漂移 |
 
 > 翻译怎么翻见 [TRANSLATION.md](TRANSLATION.md)。课程结构、代码与上游保持一致，译文持续跟进上游更新。
 
-**目录** · [怎么运作](#怎么运作) · [课程结构](#课程的结构) · [一节课的样子](#一节课的样子) · [快速开始](#快速开始) · [每节课都有产出](#每节课都有产出) · [课程目录](#contents) · [工具箱](#工具箱) · [参与贡献](#参与贡献)
+**目录** · [怎么运作](#怎么运作) · [课程结构](#课程的结构) · [学习路径](https://aieng-zh.cn/learning-paths.html) · [一节课的样子](#一节课的样子) · [快速开始](#快速开始) · [每节课都有产出](#每节课都有产出) · [课程目录](#contents) · [工具箱](#工具箱) · [参与贡献](#参与贡献)
 
 ## 怎么运作
 
@@ -51,7 +51,7 @@
 demo。这些碎片很少能拼到一起。你做出了一个聊天机器人，却讲不清它的 loss 曲线；你给
 agent 挂了个函数，却说不出调用它的那个模型内部，attention 到底在干什么。
 
-这套课程就是那根脊椎。20 个阶段，503 节课，四种语言：Python、TypeScript、Rust、Julia。
+这套课程就是那根脊椎。20 个阶段，523 节课，四种语言：Python、TypeScript、Rust、Julia。
 一头是线性代数，另一头是自主 agent 集群。每个算法都先从最原始的数学手写出来。反向传播、
 分词器、注意力、agent 循环——等 PyTorch 登场时，你已经知道它底层在做什么了。
 
@@ -635,7 +635,7 @@ the agent went wrong and explain why...
 </details>
 
 <details id="phase-13">
-<summary><b>Phase 13 — 工具与协议</b> &nbsp;<code>23 lessons</code>&nbsp; <em>AI 与真实世界之间的接口。</em></summary>
+<summary><b>Phase 13 — 工具与协议</b> &nbsp;<code>31 lessons</code>&nbsp; <em>AI 与真实世界之间的接口，包括 Agent Skills 与无状态 MCP 的生产契约。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -663,11 +663,19 @@ the agent went wrong and explain why...
 | 21 | [LLM 路由层](phases/13-tools-and-protocols/21-llm-routing-layer/) | Learn | Python |
 | 22 | [Skills 与 Agent SDK](phases/13-tools-and-protocols/22-skills-and-agent-sdks/) | Learn | Python |
 | 23 | [综合项目——工具生态](phases/13-tools-and-protocols/23-capstone-tool-ecosystem/) | Build | Python |
+| 24 | [Skill 发现与渐进式披露](phases/13-tools-and-protocols/24-skill-discovery-and-progressive-disclosure/) | Build | Python |
+| 25 | [Skill 调用与路由](phases/13-tools-and-protocols/25-skill-invocation-and-routing/) | Build | Python |
+| 26 | [Skill 权限、沙箱与信任](phases/13-tools-and-protocols/26-skill-permissions-sandboxes-and-trust/) | Build | Python |
+| 27 | [Skill 评测、打包与可移植性](phases/13-tools-and-protocols/27-skill-evals-packaging-and-portability/) | Build | Python |
+| 28 | [MCP 工具契约与内容](phases/13-tools-and-protocols/28-mcp-tool-contracts-and-content/) | Build | Python |
+| 29 | [MCP 可靠性、取消与流量控制](phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/) | Build | Python |
+| 30 | [MCP Registry 供应链：准入、漂移与回滚](phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/) | Build | Python |
+| 31 | [MCP 一致性工程：版本、证据与运维](phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/) | Build | Python |
 
 </details>
 
 <details id="phase-14">
-<summary><b>Phase 14 — Agent 工程</b> &nbsp;<code>42 lessons</code>&nbsp; <em>从第一性原理构建 agent——循环、记忆、规划、框架、基准、生产、工作台。</em></summary>
+<summary><b>Phase 14 — Agent 工程</b> &nbsp;<code>54 lessons</code>&nbsp; <em>从第一性原理构建 agent，可靠使用 coding agent，并在实现前把工作定义清楚。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -714,6 +722,18 @@ the agent went wrong and explain why...
 | 40 | [多会话交接](phases/14-agent-engineering/40-multi-session-handoff/) | Build | Python |
 | 41 | [在真实仓库上跑工作台](phases/14-agent-engineering/41-workbench-for-real-repos/) | Build | Python |
 | 42 | [综合项目：交付一套可复用的 agent 工作台包](phases/14-agent-engineering/42-agent-workbench-capstone/) | Build | Python |
+| 43 | [在 agent 写代码前框定任务](phases/14-agent-engineering/43-frame-the-task-before-code/) | Build | Python |
+| 44 | [制定由证据支撑的执行计划](phases/14-agent-engineering/44-plan-from-evidence/) | Build | Python |
+| 45 | [通过隔离与合并契约委派 agent 工作](phases/14-agent-engineering/45-delegate-with-isolation/) | Build | Python |
+| 46 | [把每次 agent 纠正变成系统改进](phases/14-agent-engineering/46-turn-feedback-into-system/) | Build | Python |
+| 47 | [在选择产出前定义结果](phases/14-agent-engineering/47-outcomes-before-output/) | Build | Python |
+| 48 | [发现人们实际执行的工作流](phases/14-agent-engineering/48-discover-the-real-workflow/) | Build | Python |
+| 49 | [绘制假设地图，先化解风险最高的一项](phases/14-agent-engineering/49-map-assumptions-and-risk/) | Build | Python |
+| 50 | [选择能改变决定的最小可测试切片](phases/14-agent-engineering/50-choose-the-smallest-testable-slice/) | Build | Python |
+| 51 | [编写保留判断空间的规格说明](phases/14-agent-engineering/51-write-specifications-that-preserve-judgment/) | Build | Python |
+| 52 | [在结果出现前设计成功指标](phases/14-agent-engineering/52-design-success-metrics/) | Build | Python |
+| 53 | [有意识地选择原型、试点或生产](phases/14-agent-engineering/53-prototype-pilot-or-production/) | Build | Python |
+| 54 | [构建带所有权与淘汰机制的反馈棘轮](phases/14-agent-engineering/54-build-the-feedback-ratchet/) | Build | Python |
 
 阶段 14 里每节工作台课程（31-42）都附带一份 `mission.md`，在 agent 打开完整课程文档前先给它做简报。
 

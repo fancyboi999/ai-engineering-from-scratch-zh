@@ -2,7 +2,7 @@
 
 每个阶段、每节课的状态追踪表。本文件里的状态符号会喂给网站（`site/build.js` 会把它们解析进 `site/data.js`），别改它们的形状。
 
-总预计时长：约 314 小时，按自己的节奏来。
+总预计时长：约 342 小时，按自己的节奏来。
 
 **图例：** ✅ 已完成 &nbsp;·&nbsp; 🚧 进行中 &nbsp;·&nbsp; ⬚ 计划中
 
@@ -317,7 +317,7 @@
 | 24 | [多模态 RAG 与跨模态检索](phases/12-multimodal-ai/24-multimodal-rag-cross-modal) | ✅ | ~180 min |
 | 25 | [多模态智能体与计算机操作 (总结项目)](phases/12-multimodal-ai/25-multimodal-agents-computer-use) | ✅ | ~240 min |
 
-## Phase 13: 工具与协议 — ✅ (~24.5 hours)
+## Phase 13: 工具与协议 — ✅ (~40 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -344,8 +344,16 @@
 | 21 | [LLM 路由层](phases/13-tools-and-protocols/21-llm-routing-layer/) | ✅ | ~45 min |
 | 22 | [Skill 与 Agent SDK](phases/13-tools-and-protocols/22-skills-and-agent-sdks/) | ✅ | ~45 min |
 | 23 | [总结项目 — 工具生态系统](phases/13-tools-and-protocols/23-capstone-tool-ecosystem/) | ✅ | ~120 min |
+| 24 | [Skill 发现与渐进式披露](phases/13-tools-and-protocols/24-skill-discovery-and-progressive-disclosure/) | ✅ | ~105 min |
+| 25 | [Skill 调用与路由](phases/13-tools-and-protocols/25-skill-invocation-and-routing/) | ✅ | ~105 min |
+| 26 | [Skill 权限、沙箱与信任](phases/13-tools-and-protocols/26-skill-permissions-sandboxes-and-trust/) | ✅ | ~120 min |
+| 27 | [Skill 评测、打包与可移植性](phases/13-tools-and-protocols/27-skill-evals-packaging-and-portability/) | ✅ | ~150 min |
+| 28 | [MCP 工具契约与内容](phases/13-tools-and-protocols/28-mcp-tool-contracts-and-content/) | ✅ | ~120 min |
+| 29 | [MCP 可靠性、取消与流量控制](phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/) | ✅ | ~120 min |
+| 30 | [MCP Registry 供应链：准入、漂移与回滚](phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/) | ✅ | ~90 min |
+| 31 | [MCP 一致性工程：版本、证据与运维](phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/) | ✅ | ~100 min |
 
-## Phase 14: 智能体工程 — ✅ (~42 hours)
+## Phase 14: 智能体工程 — ✅ (~55 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -391,6 +399,18 @@
 | 40 | 多会话交接 | ✅ | ~50 min |
 | 41 | 在真实仓库上跑工作台 | ✅ | ~60 min |
 | 42 | 总结项目：交付一个可复用的智能体工作台包 | ✅ | ~75 min |
+| 43 | 在 agent 写代码前框定任务 | ✅ | ~60 min |
+| 44 | 制定由证据支撑的执行计划 | ✅ | ~65 min |
+| 45 | 通过隔离与合并契约委派 agent 工作 | ✅ | ~70 min |
+| 46 | 把每次 agent 纠正变成系统改进 | ✅ | ~65 min |
+| 47 | 在选择产出前定义结果 | ✅ | ~60 min |
+| 48 | 发现人们实际执行的工作流 | ✅ | ~70 min |
+| 49 | 绘制假设地图，先化解风险最高的一项 | ✅ | ~65 min |
+| 50 | 选择能改变决定的最小可测试切片 | ✅ | ~65 min |
+| 51 | 编写保留判断空间的规格说明 | ✅ | ~75 min |
+| 52 | 在结果出现前设计成功指标 | ✅ | ~70 min |
+| 53 | 有意识地选择原型、试点或生产 | ✅ | ~70 min |
+| 54 | 构建带所有权与淘汰机制的反馈棘轮 | ✅ | ~75 min |
 
 ## Phase 15: 自主系统 — ✅ (~20 hours)
 
@@ -609,6 +629,6 @@
 
 ---
 
-**总计：20 个阶段，503 节课 | 503 已完成 | 预计约 1100 小时**
+**总计：20 个阶段，523 节课 | 523 已完成 | 预计约 1128 小时**
 
 想出一份力？挑任意一节 ⬚ 课提交 PR。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。

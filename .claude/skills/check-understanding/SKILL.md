@@ -58,7 +58,7 @@ description: AI Engineering from Scratch 的阶段测验。用于“给我测验
 
 ### 第 2 步：读取阶段内容
 
-如果仓库已克隆（当前目录或其父目录存在 `phases/`），找出 `phases/<phase-dir>/` 下全部课程目录并读取每课的 `docs/en.md`。如果未克隆，从 README 的 Contents 部分获取该阶段课程列表（获取 `https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/README.md`），再从同一 raw base URL 获取每课的 `docs/en.md`。这些文档就是出题依据。
+如果仓库已克隆（当前目录或其父目录存在 `phases/`），找出 `phases/<phase-dir>/` 下全部课程目录并读取每课的 `docs/zh.md`。如果未克隆，从 README 的 Contents 部分获取该阶段课程列表（获取 `https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/README.md`），再从同一 raw base URL 获取每课的 `docs/zh.md`。这些文档就是出题依据。
 
 读取足够多的课程文档，以覆盖该阶段的完整广度。阶段课程很多（15+）时，优先读取具有代表性的分布：开头几课、中段几课和最后几课。
 
@@ -140,7 +140,7 @@ D) 变换后矩阵的秩
 你的答案：B
 正确答案：C —— [正确选项文本]
 原因：[用 1-2 句解释 C 为什么正确]
-复习：第 NN 课 —— [课程名称] (phases/<phase-dir>/NN-<lesson-slug>/docs/en.md)
+复习：第 NN 课 —— [课程名称] (phases/<phase-dir>/NN-<lesson-slug>/docs/zh.md)
 ```
 
 ### 第 8 步：下一步做什么？

@@ -10,7 +10,7 @@ Examples:
   scripts/scaffold-lesson.sh 05-nlp-foundations-to-advanced 03-tokenizers "Tokenizers from Scratch"
 
 Creates phases/<phase-dir>/<lesson-slug>/ with code/, notebook/, docs/, outputs/
-and a docs/en.md skeleton prefilled from LESSON_TEMPLATE.md.
+and a docs/zh.md skeleton prefilled from LESSON_TEMPLATE.md.
 USAGE
   exit 2
 fi
@@ -54,7 +54,7 @@ fi
 PHASE_NUM="${PHASE%%-*}"
 LESSON_NUM="${LESSON%%-*}"
 
-cat >"$LESSON_DIR/docs/en.md" <<EOF
+cat >"$LESSON_DIR/docs/zh.md" <<EOF
 # $PRETTY_TITLE
 
 > [One-line motto. The core idea that sticks.]
@@ -130,7 +130,7 @@ touch "$LESSON_DIR/outputs/.gitkeep"
 echo "created phases/$PHASE/$LESSON/"
 echo ""
 echo "next:"
-echo "  1. edit phases/$PHASE/$LESSON/docs/en.md"
+echo "  1. edit phases/$PHASE/$LESSON/docs/zh.md"
 echo "  2. write phases/$PHASE/$LESSON/code/main.py"
 echo "  3. add a markdown-link row to ROADMAP.md under Phase $PHASE_NUM:"
 echo "     | $LESSON_NUM | [$PRETTY_TITLE](phases/$PHASE/$LESSON) | ✅ | ~75 min |"

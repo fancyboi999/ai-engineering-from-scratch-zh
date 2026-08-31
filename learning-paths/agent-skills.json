@@ -51,12 +51,12 @@
     "claudeCode": "/learn-agent-skills",
     "portableFallback": "使用 learn-agent-skills 开始或继续 Agent Skills 工程学习路径。"
   },
-  "conceptualFallback": "手动阅读网站或每课的 docs/en.md。待 Node.js、npx、Python 3、兼容宿主和可写安装范围可用后，再补充真实宿主发现、调用、脚本、更新和卸载证据。",
+  "conceptualFallback": "手动阅读网站或每课的 docs/zh.md。待 Node.js、npx、Python 3、兼容宿主和可写安装范围可用后，再补充真实宿主发现、调用、脚本、更新和卸载证据。",
   "quickStart": {
     "estimatedMinutes": 10,
     "lessonPath": "phases/13-tools-and-protocols/22-skills-and-agent-sdks",
     "goal": "创建一个小型 skill，将完整的 reviewer bundle 安装到真实宿主，显式调用它，验证输出，并将其干净卸载。",
-    "installCommand": "npx skills add rohitg00/ai-engineering-from-scratch --skill skill-contract-reviewer --full-depth",
+    "installCommand": "npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill skill-contract-reviewer --full-depth",
     "workingDirectory": "一个空的学习者工作区。安装前将其绝对路径保存为 TARGET_ROOT。",
     "expectedEvidence": [
       "安装器报告所选宿主和目标位置。",

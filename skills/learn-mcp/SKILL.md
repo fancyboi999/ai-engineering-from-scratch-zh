@@ -28,12 +28,12 @@ description: >
 唯一事实来源是 `learning-paths/model-context-protocol.json`。仓库可用时优先本地文件；否则从以下地址获取所需文件：
 
 ```text
-https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/<path>
+https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/<path>
 ```
 
 按 manifest 的 `lessons` 数组及其 `order` 进行。必修顺序为 06、07、08、09、10、11、12、13、14、15、16、18、17、28、29、30、31。第 16 课后，数字上的下一课不再是此路线的下一课。
 
-对选中课程，完整读取 `docs/en.md` 和 `quiz.json`。只在当前教学步骤需要时读取或运行 `code/` 与 `outputs/`。采用课程声明的 protocol era。绝不把 legacy handshake 规则混进现代无状态 trace。
+对选中课程，完整读取 `docs/zh.md` 和 `quiz.json`。只在当前教学步骤需要时读取或运行 `code/` 与 `outputs/`。采用课程声明的 protocol era。绝不把 legacy handshake 规则混进现代无状态 trace。
 
 第 23 课是唯一可选 capstone。只能在所有必修行完成且 manifest `prerequisitePaths` 中第 19、20 课均完成后提供。绝不悄悄向此路径添加其他课程。
 

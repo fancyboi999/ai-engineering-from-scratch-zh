@@ -27,12 +27,12 @@ description: >
 路线的唯一事实来源是 `learning-paths/agent-skills.json`。仓库已克隆时优先使用本地文件；否则从此地址获取每个文件：
 
 ```text
-https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/<path>
+https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/<path>
 ```
 
 选择课程前先读取 manifest。按 `lessons` 的 `order` 进行，不要按第 13 阶段的数字序列。必修路径是 22、24、25、26、27。第 23 课是可选课，遵循 manifest 的进入规则。
 
-对每节选中课程，读取它的 `docs/en.md` 和 `quiz.json`。只在当前 lab 需要时读取或运行 `code/` 与 `outputs/` 下的文件。阅读并不要求克隆仓库。可运行 lab 需要仓库文件但它们不可用时，说明这一事实，并提供克隆到学习者选择目录的选项。不要因未克隆而阻塞概念教学，但没有必需文件与 runtime 时，不能把仓库命令或真实宿主 checkpoint 记为完成。
+对每节选中课程，读取它的 `docs/zh.md` 和 `quiz.json`。只在当前 lab 需要时读取或运行 `code/` 与 `outputs/` 下的文件。阅读并不要求克隆仓库。可运行 lab 需要仓库文件但它们不可用时，说明这一事实，并提供克隆到学习者选择目录的选项。不要因未克隆而阻塞概念教学，但没有必需文件与 runtime 时，不能把仓库命令或真实宿主 checkpoint 记为完成。
 
 ## 真实 lab 预检
 
@@ -43,7 +43,7 @@ https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/<pat
 3. 学习者已选择可写入的 project 或 user install scope。
 4. 学习者理解哪个工作目录会成为 `TARGET_ROOT`。
 
-任何项目不可用时，给出网站或手动 `docs/en.md` 路径，并继续概念教学。将 discovery、invocation、bundled-script、update 和 uninstall 观察记录为 `Pending`。绝不把这种回退描述成真实宿主通过。
+任何项目不可用时，给出网站或手动 `docs/zh.md` 路径，并继续概念教学。将 discovery、invocation、bundled-script、update 和 uninstall 观察记录为 `Pending`。绝不把这种回退描述成真实宿主通过。
 
 ## 查找或创建进度
 

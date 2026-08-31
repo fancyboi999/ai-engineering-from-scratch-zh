@@ -98,7 +98,7 @@ tags: [assessment, onboarding, curriculum, ai-engineering]
 
 **Q8.** 使用 LoRA（Low-Rank Adaptation）微调大型语言模型的主要益处是什么？
 
-- A) 从全新初始化开始重新训练每个基础模型参数
+- A) 从全新随机初始化开始，重新训练基础模型中的每一个参数
 - B) 冻结基础模型权重，只训练低秩 adapters
 - C) 无需带标签的示例或任务专属训练数据
 - D) 复制模型层以提高适应容量
@@ -159,7 +159,7 @@ NLP 与 Transformer：   X/2
 - 应用 AI（1/2） -> 将阶段 14 标为 `Review`
 
 从 ROADMAP.md 读取时间估算（规范唯一事实来源）。每个阶段标题都以 `(~N hours)` 格式包含预计小时数。解析这些值，不能使用硬编码数字，以便学习路径始终随路线图估算更新。仓库未在本地克隆时，从下面地址获取：
-`https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/ROADMAP.md`。
+`https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/ROADMAP.md`。
 
 ## 输出格式
 

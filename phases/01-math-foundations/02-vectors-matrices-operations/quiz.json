@@ -1,7 +1,48 @@
-{"lesson":"02-vectors-matrices-operations","title":"向量与矩阵运算","questions":[
-{"stage":"pre","question":"对矩阵乘法 (m x n) @ (n x p)，维度必须满足什么条件？","options":["第一个矩阵的行数等于第二个矩阵的列数","外层维度 m 和 p 必须相同","第一个矩阵的列数等于第二个矩阵的行数","m、n、p 三个维度都必须相同"],"correct":2,"explanation":"矩阵乘法要求第一个矩阵的列数 n 等于第二个矩阵的行数 n，结果 shape 为 (m x p)。"},
-{"stage":"check","question":"单位矩阵如何定义？","options":["与兼容矩阵相乘后保持该矩阵不变的方阵","所有元素都等于一的方阵","行列互换后的转置矩阵","对角线元素都不同的方阵"],"correct":0,"explanation":"单位矩阵 I 的对角线为一，其他位置为零；任意矩阵乘 I 都保持不变，就像数乘以 1。"},
-{"stage":"check","question":"逐元素乘法与矩阵乘法的关键区别是什么？","options":["逐元素乘法只用于向量，矩阵乘法只用于矩阵","逐元素乘法按对应位置相乘；矩阵乘法计算行与列的点积","逐元素乘法要求内层维度，矩阵乘法要求 shape 完全相同","逐元素乘法会改变 shape，矩阵乘法总会保持 shape"],"correct":1,"explanation":"逐元素（Hadamard）积相乘的是对应元素，要求 shape 相同；矩阵乘法计算行列点积，遵循 (m,n)@(n,p)=(m,p)。"},
-{"stage":"check","question":"表达式 output = relu(W @ x + b) 中，broadcasting 起什么作用？","options":["把计算分发到可用设备","把 W 和 x 转换为同一数值 dtype","分别对输出的每个位置应用 ReLU","在相加前把 b 扩展到兼容的 batch 维度"],"correct":3,"explanation":"单个输入时 W @ x 与 b 的输出 shape 必须一致。若列式 batch 的 shape 是 (features, batch)，使用 b[:, None] 使 bias 成为 (outputs, 1)，它便会沿列 broadcast；一维 b 按尾部维度对齐，不能可靠地沿 batch 轴扩展。"},
-{"stage":"post","question":"行列式为零能推出什么性质？","options":["矩阵奇异，不能有逆矩阵","矩阵会保持长度并旋转输入","矩阵是不缩放的恒等变换","矩阵的每行每列都包含零"],"correct":0,"explanation":"零行列式说明变换至少压扁了一个维度，例如把二维映到一条线；矩阵没有逆，线性系统要么无解，要么有无穷多个解。"},
-{"stage":"post","question":"转置运算怎样改变一个矩阵？","options":["把每个非对角元素替换成零","交换矩阵的行与列","保证矩阵有逆","保持每个向量的角度与长度"],"correct":1,"explanation":"转置会交换行和列：第 i 行第 j 列的元素移到第 j 行第 i 列。"}]}
+{
+  "lesson": "02-vectors-matrices-operations",
+  "title": "向量与矩阵运算",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "对矩阵乘法 (m x n) @ (n x p)，维度必须满足什么条件？",
+      "options": ["m、n、p 三个维度都必须相同", "第一个矩阵的列数等于第二个矩阵的行数", "外层维度 m 和 p 必须相同", "第一个矩阵的行数等于第二个矩阵的列数"],
+      "correct": 1,
+      "explanation": "矩阵乘法要求第一个矩阵的列数 n 等于第二个矩阵的行数 n，结果 shape 为 (m x p)。"
+    },
+    {
+      "stage": "check",
+      "question": "单位矩阵如何定义？",
+      "options": ["交换行列后得到的转置方阵", "所有元素都等于一的同阶方阵", "与兼容矩阵相乘后保持该矩阵不变的方阵", "对角线元素都不同的方阵"],
+      "correct": 2,
+      "explanation": "单位矩阵 I 的对角线为一，其他位置为零；任意矩阵乘 I 都保持不变，就像数乘以 1。"
+    },
+    {
+      "stage": "check",
+      "question": "逐元素乘法与矩阵乘法的关键区别是什么？",
+      "options": ["逐元素乘法只用于向量，矩阵乘法只用于矩阵", "逐元素乘法会改变 shape，矩阵乘法总会保持 shape", "逐元素乘法要求内层维度，矩阵乘法要求 shape 完全相同", "逐元素乘法按对应位置相乘；矩阵乘法计算行与列的点积"],
+      "correct": 3,
+      "explanation": "逐元素（Hadamard）积相乘的是对应元素，要求 shape 相同；矩阵乘法计算行列点积，遵循 (m,n)@(n,p)=(m,p)。"
+    },
+    {
+      "stage": "check",
+      "question": "表达式 output = relu(W @ x + b) 中，broadcasting 起什么作用？",
+      "options": ["把 W 和 x 转换为同一数值 dtype", "分别对输出的每个位置应用 ReLU", "把计算分发到可用设备", "在相加前把 b 扩展到兼容的 batch 维度"],
+      "correct": 3,
+      "explanation": "单个输入时 W @ x 与 b 的输出 shape 必须一致。若列式 batch 的 shape 是 (features, batch)，使用 b[:, None] 使 bias 成为 (outputs, 1)，它便会沿列 broadcast；一维 b 按尾部维度对齐，不能可靠地沿 batch 轴扩展。"
+    },
+    {
+      "stage": "post",
+      "question": "行列式为零能推出什么性质？",
+      "options": ["矩阵会保持长度并旋转输入", "矩阵是不缩放的恒等变换", "矩阵奇异，不能有逆矩阵", "矩阵的每行每列都包含零"],
+      "correct": 2,
+      "explanation": "零行列式说明变换至少压扁了一个维度，例如把二维映到一条线；矩阵没有逆，线性系统要么无解，要么有无穷多个解。"
+    },
+    {
+      "stage": "post",
+      "question": "转置运算怎样改变一个矩阵？",
+      "options": ["把每个非对角元素替换成零", "交换矩阵的行与列", "保证矩阵有逆", "保持每个向量的角度与长度"],
+      "correct": 1,
+      "explanation": "转置会交换行和列：第 i 行第 j 列的元素移到第 j 行第 i 列。"
+    }
+  ]
+}

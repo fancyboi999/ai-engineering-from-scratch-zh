@@ -38,7 +38,7 @@
     "claudeCode": "/learn-mcp",
     "portableFallback": "使用 learn-mcp 开始或继续模型上下文协议（MCP）学习路径。"
   },
-  "conceptualFallback": "阅读网站或每课的 docs/en.md，并手动追踪指定的请求与响应对。在仓库和 Python 3 可用前，将检查点标记为概念学习，并将运行时、传输、授权和部署证据保留为待补充。",
+  "conceptualFallback": "阅读网站或每课的 docs/zh.md，并手动追踪指定的请求与响应对。在仓库和 Python 3 可用前，将检查点标记为概念学习，并将运行时、传输、授权和部署证据保留为待补充。",
   "quickStart": {
     "estimatedMinutes": 10,
     "lessonPath": "phases/13-tools-and-protocols/06-mcp-fundamentals",

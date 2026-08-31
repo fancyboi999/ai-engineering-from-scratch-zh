@@ -20,7 +20,7 @@ NN-lesson-name/
     └── skill-*.md          (本节课产出的技能)
 ```
 
-## 文档格式（docs/en.md）
+## 文档格式（docs/zh.md）
 
 ```markdown
 # [Lesson Title]

@@ -31,7 +31,7 @@ skill 名称可移植，但调用语法属于宿主。每次推荐下一步操�
 课程唯一事实来源是仓库 README 的 Contents 部分：每个阶段都有表格，列出每课的编号、标题、类型（Build/Learn）、语言和目录路径。仓库已克隆时读取本地 `README.md`；否则获取：
 
 ```text
-https://raw.githubusercontent.com/rohitg00/ai-engineering-from-scratch/main/README.md
+https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/main/README.md
 ```
 
 术语定义在 `glossary/terms.md`（遵循相同规则：本地优先，raw 兜底）。
@@ -52,10 +52,10 @@ Agent Skills 也有独立的专门路线。对于 Agent Skills、`SKILL.md`、sk
    - *Model Context Protocol (MCP)*（“教我 MCP”“构建生产级 MCP server”）→ 直接路由至 `learn-mcp`。不要把学习者放进通用阶段序列；使用其 manifest 中有序的 17 节课。
    - *Agent Skills*（“教我 skills”“skill 如何在 sandbox 中运行”）→ 直接路由至 `learn-agent-skills`。不要在第 22 课后将学习者送去数值上的第 23 课；manifest 顺序为 22、24、25、26、27，进度写在 `AGENT-SKILLS-LEARNING.md`。
 
-2. **扫描 Contents 表格**，按标题和阶段主题寻找匹配课程。优先精确：推荐 1-3 节课，而不是整阶段倾倒。针对*困难*，标题不是充分证据：获取每个候选课的 `docs/en.md`（本地优先，raw 兜底），确认它确实覆盖失败概念后再推荐。专门的 Model Context Protocol (MCP) 和 Agent Skills 路线跳过此扫描，改用各自 manifest。
+2. **扫描 Contents 表格**，按标题和阶段主题寻找匹配课程。优先精确：推荐 1-3 节课，而不是整阶段倾倒。针对*困难*，标题不是充分证据：获取每个候选课的 `docs/zh.md`（本地优先，raw 兜底），确认它确实覆盖失败概念后再推荐。专门的 Model Context Protocol (MCP) 和 Agent Skills 路线跳过此扫描，改用各自 manifest。
 
 3. **按此形态回答**，并控制在约 12 行：
-   - 1-3 节课：阶段、编号、标题、说明为何是这节课的一行文字，以及直链 `https://aiengineeringfromscratch.com/lesson?path=phases/<phase-dir>/<lesson-dir>`。
+   - 1-3 节课：阶段、编号、标题、说明为何是这节课的一行文字，以及直链 `https://aieng-zh.cn/lessons/<phase-dir>/<lesson-dir>/`。
    - 仅在确有必要时给前置要求（“这假定你能手算梯度；如果已经能做，可跳过 backprop 课程”）。
    - 下一步操作，按宿主调用契约渲染：立即教学用 `learn`，测试用 `check-understanding <phase>`，没有计划且显然需要计划时用 `start-learning`。对于 Model Context Protocol (MCP)，给 manifest 链接并将 `learn-mcp` 作为下一 skill；对于 Agent Skills，给一次五课顺序，并将 `learn-agent-skills` 作为下一 skill。
 
