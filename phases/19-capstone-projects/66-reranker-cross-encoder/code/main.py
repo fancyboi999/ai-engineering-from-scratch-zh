@@ -4,7 +4,7 @@ A tiny torch module shows the architectural shape. The two-stage pipeline
 demonstrates the latency-vs-quality trade-off on a fixture corpus.
 
 References:
-- ./docs/en.md
+- ./docs/zh.md
 - Phase 19 lesson 65 (bi-encoder hybrid retriever)
 - Phase 19 lesson 68 (eval harness measuring the rerank lift)
 - Phase 19 lesson 69 (end-to-end system that uses this reranker)

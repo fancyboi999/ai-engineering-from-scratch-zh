@@ -1,7 +1,7 @@
 """End-to-end eval runner: tasks -> adapter -> metric -> calibration -> leaderboard.
 
 Conceptual references:
-- ./docs/en.md (this lesson)
+- ./docs/zh.md (this lesson)
 - lesson 70 (task spec), 71 (metrics), 72 (code exec), 73 (calibration), 74 (leaderboard)
 
 Stdlib + numpy. Run: python3 code/main.py

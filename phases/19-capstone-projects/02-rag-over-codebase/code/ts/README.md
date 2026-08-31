@@ -1,7 +1,7 @@
 # Capstone 19/02 — RAG over Codebase (TypeScript)
 
 Multi-file TypeScript code-search API for the hybrid retrieval pipeline
-described in `../docs/en.md`. Offline, deterministic, six-chunk sample corpus,
+described in `../docs/zh.md`. Offline, deterministic, six-chunk sample corpus,
 node:http behind a hono fetch handler.
 
 ## Layout

@@ -23,6 +23,6 @@ Lay down the three-file minimum workbench (router, state, task board) into a fre
 - Long monolithic `AGENTS.md`. The router stays short on purpose.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-minimal-workbench.md` - extracted skill

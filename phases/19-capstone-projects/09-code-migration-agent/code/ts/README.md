@@ -35,5 +35,5 @@ npm test
 
 ## Spec references
 
-- Source lesson: `phases/19-capstone-projects/09-code-migration-agent/docs/en.md`
+- Source lesson: `phases/19-capstone-projects/09-code-migration-agent/docs/zh.md`
 - Recipes: [OpenRewrite](https://docs.openrewrite.org), libcst.

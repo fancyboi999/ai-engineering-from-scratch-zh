@@ -36,5 +36,5 @@ npm test
 
 ## Spec references
 
-- Source lesson: `phases/19-capstone-projects/11-llm-observability-dashboard/docs/en.md`
+- Source lesson: `phases/19-capstone-projects/11-llm-observability-dashboard/docs/zh.md`
 - [OpenTelemetry GenAI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/)

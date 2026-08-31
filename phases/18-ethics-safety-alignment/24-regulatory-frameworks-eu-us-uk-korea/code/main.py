@@ -3,7 +3,7 @@
 Prints a unified timeline of the EU AI Act, GPAI Code of Practice, Transparency
 Code, UK AISI rebrand, US CAISI rebrand, and Korean AI Framework Act milestones.
 
-Reference-only; primary sources cited in docs/en.md.
+Reference-only; primary sources cited in docs/zh.md.
 
 Usage: python3 code/main.py
 """

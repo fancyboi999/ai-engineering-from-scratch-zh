@@ -22,6 +22,6 @@ Build `init_agent.py` that probes runtime, dependencies, test command, env vars,
 - Calling an LLM from a probe. Probes stay deterministic plumbing.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-init-script.md` - extracted skill

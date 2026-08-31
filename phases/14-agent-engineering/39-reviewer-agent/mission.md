@@ -22,6 +22,6 @@ Build a reviewer loop that reads the builder's artifacts read-only and emits a `
 - Editing the diff. The reviewer reads, scores, and reports. Patches are the builder's job next turn.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-reviewer-agent.md` - extracted skill

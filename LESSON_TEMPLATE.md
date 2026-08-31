@@ -27,10 +27,10 @@ NN-lesson-name/
 
 > [一句话主旨——最值得记住的核心观点]
 
-**Type:** Build | Learn
-**Languages:** Python, TypeScript, Rust, Julia（只列实际使用的语言）
-**Prerequisites:** [所需的前置课程]
-**Time:** ~[预计时长] minutes
+**类型：** Build | Learn
+**语言：** Python, TypeScript, Rust, Julia（只列实际使用的语言）
+**前置要求：** [所需的前置课程]
+**预计时间：** ~[预计时长] 分钟
 
 ## 问题背景
 

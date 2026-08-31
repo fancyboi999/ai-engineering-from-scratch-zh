@@ -22,6 +22,6 @@ Assemble the eleven prior lessons into a versioned `outputs/agent-workbench-pack
 - Vendor SDK calls. The pack is framework-agnostic by design.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-workbench-pack.md` - extracted skill

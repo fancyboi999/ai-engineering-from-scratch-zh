@@ -36,5 +36,5 @@ npm test
 
 ## Spec references
 
-- Source lesson: `phases/19-capstone-projects/10-multi-agent-software-team/docs/en.md`
+- Source lesson: `phases/19-capstone-projects/10-multi-agent-software-team/docs/zh.md`
 - [MetaGPT](https://github.com/FoundationAgents/MetaGPT) role-based multi-agent framework.

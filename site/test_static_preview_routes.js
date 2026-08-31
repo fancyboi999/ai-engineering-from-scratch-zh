@@ -128,6 +128,13 @@ test('shared adapter covers dynamically inserted links, click races, and command
   runtime.mutate({ type: 'attributes', target: inserted, addedNodes: [] });
   assert.equal(inserted.value(), 'certification.html?id=claude-ccar-f');
 
+  const absoluteLesson = testLink('/lesson?path=certifications%2Fclaude%2Flessons%2F00-certification-strategy');
+  runtime.mutate({ type: 'childList', addedNodes: [absoluteLesson] });
+  assert.equal(
+    absoluteLesson.value(),
+    'lesson.html?path=certifications%2Fclaude%2Flessons%2F00-certification-strategy'
+  );
+
   const immediate = testLink('lesson?path=phases%2F14-agent-engineering%2F47-outcomes-before-output');
   runtime.click(immediate);
   assert.equal(immediate.value(), 'lesson.html?path=phases%2F14-agent-engineering%2F47-outcomes-before-output');
@@ -147,6 +154,10 @@ test('deployed contextual routes stay extensionless while zh canonicals keep sta
   assert.equal(
     production.api.adaptHref('certification?id=claude-ccar-f'),
     'certification?id=claude-ccar-f'
+  );
+  assert.equal(
+    production.api.adaptHref('/lesson?path=certifications%2Fclaude%2Flessons%2F00-certification-strategy'),
+    '/lesson?path=certifications%2Fclaude%2Flessons%2F00-certification-strategy'
   );
 
   const lesson = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');

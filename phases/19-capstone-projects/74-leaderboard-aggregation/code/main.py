@@ -1,7 +1,7 @@
 """Leaderboard aggregation: pivot, mean, win-rate, bootstrap CI, markdown.
 
 Conceptual references:
-- ./docs/en.md (this lesson)
+- ./docs/zh.md (this lesson)
 - lesson 71 (classical metrics) for per-task score shape
 - lesson 73 (calibration) for the multi-model report pattern
 

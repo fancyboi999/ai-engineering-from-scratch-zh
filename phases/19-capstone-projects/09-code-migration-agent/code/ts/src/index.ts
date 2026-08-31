@@ -1,12 +1,12 @@
 /**
  * Code Migration Agent: dashboard skeleton entry point (TypeScript).
  *
- * Mirrors the dashboard layer from docs/en.md: agent runs in a sandbox; this
+ * Mirrors the dashboard layer from docs/zh.md: agent runs in a sandbox; this
  * server renders progress for the operator. Hono routes serve HTML root,
  * /migrations, and /migrations/:id. State machine in migrations.ts; budget
  * + cost in cost.ts; types in types.ts.
  *
- * Source: phases/19-capstone-projects/09-code-migration-agent/docs/en.md
+ * Source: phases/19-capstone-projects/09-code-migration-agent/docs/zh.md
  * Recipe specs: https://docs.openrewrite.org and the libcst Python parser.
  */
 

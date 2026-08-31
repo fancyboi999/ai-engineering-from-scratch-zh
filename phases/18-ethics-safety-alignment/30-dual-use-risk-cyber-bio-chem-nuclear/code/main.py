@@ -1,7 +1,7 @@
 """Dual-use triage table — stdlib Python.
 
 Prints the 2024-2025 cross-domain dual-use picture as a table.
-Reference-only; primary sources cited in docs/en.md.
+Reference-only; primary sources cited in docs/zh.md.
 
 Usage: python3 code/main.py
 """

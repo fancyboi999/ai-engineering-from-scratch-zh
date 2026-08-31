@@ -1,7 +1,7 @@
 // Video understanding pipeline: TypeScript UI half of the lesson stack.
 // Python side ships the multi-vector index + temporal grounding; this TS
 // project exposes /jobs and /job/:id over the four pipeline stages.
-// Refs: docs/en.md (this lesson),
+// Refs: docs/zh.md (this lesson),
 //   VideoDB CRUD-for-video API: https://videodb.io
 //   TransNetV2 scene segmentation: https://github.com/soCzech/TransNetV2
 

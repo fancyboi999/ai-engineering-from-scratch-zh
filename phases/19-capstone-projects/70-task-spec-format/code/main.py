@@ -1,7 +1,7 @@
 """Task spec format: JSONL schema, validator, post-process, fixture loader.
 
 Conceptual references:
-- ./docs/en.md (this lesson)
+- ./docs/zh.md (this lesson)
 - Phase 19 Track B foundations
 
 Stdlib only. Run: python3 code/main.py

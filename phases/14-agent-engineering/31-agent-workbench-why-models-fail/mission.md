@@ -22,6 +22,6 @@ Run the same small repo task twice, once prompt-only and once with the seven wor
 - Building any one surface in depth. That is what the next eleven lessons are for.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-workbench-audit.md` - extracted skill

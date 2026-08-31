@@ -39,6 +39,7 @@ test('returns 406 when supported types and the wildcard are explicitly q=0', () 
   for (const accept of [
     'text/html;q=0, text/markdown;q=0',
     'application/json, */*;q=0',
+    'text/html;q=0, text/markdown;q=0, */*;q=1',
   ]) {
     const result = request(accept);
     assert.equal(result.res.statusCode, 406);

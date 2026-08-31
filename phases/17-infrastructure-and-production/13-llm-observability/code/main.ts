@@ -9,7 +9,7 @@
  *   2. The same 1M-trace day retention simulator as main.py, with the five
  *      sampling strategies and 2026 price approximations.
  *
- * Citations: see docs/en.md for OpenTelemetry GenAI conventions, Arize AX zero-copy
+ * Citations: see docs/zh.md for OpenTelemetry GenAI conventions, Arize AX zero-copy
  * pricing claim, Langfuse/Helicone tier comparison.
  *
  * Runs on Node 20+ stdlib. No npm deps.

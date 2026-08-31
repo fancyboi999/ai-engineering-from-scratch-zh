@@ -3,7 +3,7 @@
 Five strategies, one recall@k harness, no third-party retrieval libs.
 
 References (lesson-internal):
-- ./docs/en.md
+- ./docs/zh.md
 - Phase 11 lesson 06 (RAG fundamentals)
 - Phase 19 lesson 65 (hybrid retrieval that ranks these chunks)
 - Phase 19 lesson 68 (eval harness that scores the chunker)

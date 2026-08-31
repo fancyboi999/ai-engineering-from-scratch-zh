@@ -22,6 +22,6 @@ Implement `verify(task_id, artifacts)` as a pure deterministic function over sco
 - Signed override audit logs. The exercise prompts extend the gate that way.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-verification-gate.md` - extracted skill

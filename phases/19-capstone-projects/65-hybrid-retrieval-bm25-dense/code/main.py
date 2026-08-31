@@ -4,7 +4,7 @@ Pure-Python implementation. BM25 from the Robertson/Sparck Jones paper.
 RRF from the 2009 Cormack/Clarke/Buettcher SIGIR paper.
 
 References:
-- ./docs/en.md
+- ./docs/zh.md
 - Phase 19 lesson 64 (chunkers feeding this retriever)
 - Phase 19 lesson 66 (reranker consuming the fused top-k)
 - Phase 19 lesson 68 (eval harness over this retriever)

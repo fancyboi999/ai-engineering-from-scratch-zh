@@ -1,13 +1,13 @@
 /**
  * LLM Observability Dashboard: capstone skeleton entry point (TypeScript).
  *
- * Implements the ingest plane from docs/en.md: a Hono server accepts OTel
+ * Implements the ingest plane from docs/zh.md: a Hono server accepts OTel
  * GenAI-shaped spans on /trace, holds them in a 10k ring buffer, and renders
  * /dashboard plus /dashboard.json with p50/p95/p99 latency and cost per model.
  * Stands in for a real Langfuse/Phoenix backend, with the same span schema
  * so a real OTLP exporter could be pointed at it.
  *
- * Source: phases/19-capstone-projects/11-llm-observability-dashboard/docs/en.md
+ * Source: phases/19-capstone-projects/11-llm-observability-dashboard/docs/zh.md
  * Schema: OpenTelemetry GenAI semantic conventions
  *   https://opentelemetry.io/docs/specs/semconv/gen-ai/
  */

@@ -59,10 +59,10 @@ cat >"$LESSON_DIR/docs/zh.md" <<EOF
 
 > [一句话主旨——最值得记住的核心观点。]
 
-**Type:** Build
-**Languages:** Python
-**Prerequisites:** [前置课程]
-**Time:** ~75 minutes
+**类型：** Build
+**语言：** Python
+**前置要求：** [前置课程]
+**预计时间：** ~75 分钟
 
 ## 问题背景
 

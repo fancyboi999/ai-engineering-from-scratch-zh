@@ -1,7 +1,7 @@
 /**
  * AI gateway skeleton — TypeScript port.
  *
- * Implements the four core gateway primitives from docs/en.md:
+ * Implements the four core gateway primitives from docs/zh.md:
  *   1. Auth: API-key check with constant-time comparison + per-tenant resolution.
  *   2. Rate limit: token-bucket per tenant; LiteLLM-style.
  *   3. Retry: exponential backoff with jitter on transient 429/5xx; bounded.

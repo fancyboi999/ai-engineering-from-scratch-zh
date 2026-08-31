@@ -1,5 +1,5 @@
 // Capstone 08 entrypoint: production RAG chatbot SSE chat UI.
-// Source: ../../docs/en.md (citation-anchored response streamed via SSE).
+// Source: ../../docs/zh.md (citation-anchored response streamed via SSE).
 // References:
 //   Server-Sent Events (WHATWG)  https://html.spec.whatwg.org/multipage/server-sent-events.html
 //   text/event-stream (MDN)      https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events

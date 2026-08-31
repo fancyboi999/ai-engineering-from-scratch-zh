@@ -1,7 +1,7 @@
 """Perplexity and calibration: ECE, Brier, reliability diagram.
 
 Conceptual references:
-- ./docs/en.md (this lesson)
+- ./docs/zh.md (this lesson)
 - lesson 70 (task spec format)
 - lesson 71 (classical metrics) for the scalar dispatch pattern
 

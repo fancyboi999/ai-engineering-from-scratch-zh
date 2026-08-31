@@ -4,7 +4,7 @@ Self-terminating demo: ingests fixture corpus, runs queries, runs eval,
 prints results, exits 0 on success or non-zero on threshold failure.
 
 References:
-- ./docs/en.md
+- ./docs/zh.md
 - Phase 19 lesson 64 (chunker)
 - Phase 19 lesson 65 (hybrid retriever)
 - Phase 19 lesson 66 (cross-encoder reranker)

@@ -1,7 +1,7 @@
 // GitHub Issue-to-PR Agent: TypeScript webhook receiver.
 // Python side ships the agent loop; YAML side ships the Actions workflow.
 // This project verifies HMAC, routes on event type, dispatches a stub agent.
-// Refs: docs/en.md (this lesson),
+// Refs: docs/zh.md (this lesson),
 //   GitHub webhook signature: https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries
 //   GitHub App docs: https://docs.github.com/en/apps
 

@@ -63,7 +63,7 @@ module.exports = (req, res) => {
     return;
   }
 
-  if (!markdownQ && !htmlQ && accepted.length && !accepted.some((entry) => entry.type === '*/*' && entry.q > 0)) {
+  if (!markdownQ && !htmlQ) {
     res.statusCode = 406;
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.end('Not Acceptable / 无法接受该内容类型\n\n可用表示：text/html、text/markdown\n');

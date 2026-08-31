@@ -1,7 +1,7 @@
 // Personal AI Tutor: TypeScript web-app half of the capstone stack.
 // Python side ships the learner model and tutor policy; this project exposes
 // /lesson/next (topo-walk over curriculum DAG) and /lesson/:id/submit.
-// Refs: docs/en.md (this lesson),
+// Refs: docs/zh.md (this lesson),
 //   Bayesian Knowledge Tracing: https://en.wikipedia.org/wiki/Bayesian_knowledge_tracing
 //   FSRS spaced-repetition: https://github.com/open-spaced-repetition/fsrs4anki
 

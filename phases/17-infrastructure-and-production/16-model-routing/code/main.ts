@@ -5,7 +5,7 @@
  *   1. ModelRouter: rule-based picker over (model catalog, request signals).
  *      Each rule scores candidates by capability fit, then weighs latency vs
  *      cost vs capability per a caller-supplied policy. Matches the four
- *      signals in docs/en.md (task class, prompt length, similarity to
+ *      signals in docs/zh.md (task class, prompt length, similarity to
  *      hard set, self-confidence).
  *   2. Cost/quality simulator matching main.py: NO_ROUTE / PRE_ROUTE /
  *      CASCADE patterns on a mixed-difficulty workload.

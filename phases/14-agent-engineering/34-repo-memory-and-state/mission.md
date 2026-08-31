@@ -22,6 +22,6 @@ Author JSON Schemas for `agent_state.json` and `task_board.json`, build a `State
 - LangGraph checkpointers, Letta memory blocks. Same idea, different storage; out of scope here.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-state-schema.md` - extracted skill

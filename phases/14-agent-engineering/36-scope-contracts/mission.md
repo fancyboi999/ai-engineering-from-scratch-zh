@@ -23,6 +23,6 @@ Write a per-task `scope_contract.json` and a glob-aware checker that compares th
 - Wiring into a runtime interrupt. The lesson exits at the report.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-scope-contract.md` - extracted skill

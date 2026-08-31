@@ -2,7 +2,7 @@
 
 Takes a problem descriptor and recommends LangGraph, CrewAI, AutoGen, Agno, or
 "no framework" with a one-sentence justification. The tree encodes the tradeoffs
-described in docs/en.md.
+described in docs/zh.md.
 
 Run:
     python main.py           # runs the bundled test suite

@@ -1,7 +1,7 @@
 # Capstone 19/01 — Terminal-Native Coding Agent (TypeScript)
 
 Multi-file TypeScript harness for the plan/act/observe loop described in
-`../docs/en.md`. Offline, deterministic, zero network calls.
+`../docs/zh.md`. Offline, deterministic, zero network calls.
 
 ## Layout
 

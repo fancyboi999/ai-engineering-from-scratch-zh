@@ -18,7 +18,7 @@
  *     https://argo-rollouts.readthedocs.io/
  *   - Flagger (progressive delivery operator)
  *     https://docs.flagger.app/
- *   - Non-determinism ~15% run-to-run cited in docs/en.md (GPU FP
+ *   - Non-determinism ~15% run-to-run cited in docs/zh.md (GPU FP
  *     non-associativity + batch-size variance + sampling).
  *
  * Runs on Node 20+ stdlib. No npm deps.
@@ -43,7 +43,7 @@ const BASELINE: Metrics = {
 };
 
 // Multipliers above baseline that constitute a breach. Set high enough to
-// stay above the LLM non-determinism noise floor (~15% per docs/en.md).
+// stay above the LLM non-determinism noise floor (~15% per docs/zh.md).
 const GATES: Record<keyof Metrics, number> = {
   latencyP99Ms: 1.5,
   costPerReq: 1.2,
@@ -91,7 +91,7 @@ const NO_REGRESSION: Regression = {
 
 function measureStage(_stage: number, reg: Regression, seed: number): Metrics {
   const rng = makeRng(seed);
-  // Noise floor is the non-determinism docs/en.md describes: ~±8% per measurement.
+  // Noise floor is the non-determinism docs/zh.md describes: ~±8% per measurement.
   const noise = (v: number): number => v * (0.92 + rng() * 0.16);
   return {
     latencyP99Ms: noise(BASELINE.latencyP99Ms * reg.latencyMult),

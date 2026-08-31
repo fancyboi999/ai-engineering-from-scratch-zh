@@ -1,6 +1,6 @@
 """Toy ReAct agent loop — stdlib only.
 
-Implements the five ingredients from docs/en.md:
+Implements the five ingredients from docs/zh.md:
   1. message buffer
   2. tool registry
   3. stop condition

@@ -22,6 +22,6 @@ Run the same `/signup` validation task through a prompt-only pipeline and a work
 - Tuning the model. The comparison holds the model constant by construction.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-workbench-benchmark.md` - extracted skill

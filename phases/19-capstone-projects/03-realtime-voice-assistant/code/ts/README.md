@@ -1,7 +1,7 @@
 # Capstone 19/03 — Realtime Voice Assistant (TypeScript)
 
 Multi-file TypeScript web-client harness for the streaming voice pipeline
-described in `../docs/en.md`. Offline state-machine simulation plus a live
+described in `../docs/zh.md`. Offline state-machine simulation plus a live
 WebSocket server backed by the `ws` package.
 
 ## Layout

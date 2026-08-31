@@ -1,12 +1,12 @@
 /**
  * Multi-Agent Software Team: capstone skeleton entry point (TypeScript).
  *
- * Mirrors the role split from docs/en.md (planner / coder / reviewer plus a
+ * Mirrors the role split from docs/zh.md (planner / coder / reviewer plus a
  * coordinator that rotates them round-robin) and the worktree-launch step
  * (Daytona sandbox per branch in production; here an execFile stub that
  * refuses denylisted shell commands). Shared workspace is in-memory.
  *
- * Source: phases/19-capstone-projects/10-multi-agent-software-team/docs/en.md
+ * Source: phases/19-capstone-projects/10-multi-agent-software-team/docs/zh.md
  * Stack references: SWE-AF factory, MetaGPT roles, AutoGen 0.4 actor graph.
  */
 

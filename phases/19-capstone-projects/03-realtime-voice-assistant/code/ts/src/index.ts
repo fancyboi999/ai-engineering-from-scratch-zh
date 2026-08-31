@@ -1,7 +1,7 @@
 // Capstone 19/03: realtime voice web client (multi-file TypeScript).
 //
 // Sources:
-//   This lesson's docs/en.md (WebRTC client + VAD + barge-in client UX)
+//   This lesson's docs/zh.md (WebRTC client + VAD + barge-in client UX)
 //   RFC 6455 WebSocket protocol  https://datatracker.ietf.org/doc/html/rfc6455
 //   ws (Node WebSocket library)  https://github.com/websockets/ws
 //   Silero VAD v5 model card     https://github.com/snakers4/silero-vad

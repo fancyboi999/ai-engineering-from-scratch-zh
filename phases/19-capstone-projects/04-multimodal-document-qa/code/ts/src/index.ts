@@ -1,5 +1,5 @@
 // Capstone 04 entrypoint: multimodal document QA viewer.
-// Source: ../../docs/en.md (viewer UI with canvas overlay for evidence regions).
+// Source: ../../docs/zh.md (viewer UI with canvas overlay for evidence regions).
 // References:
 //   ColPali late-interaction retrieval https://arxiv.org/abs/2407.01449
 //   Qwen3-VL bounding-box output spec  https://qwenlm.github.io/blog/qwen3-vl/

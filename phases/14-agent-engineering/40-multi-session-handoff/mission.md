@@ -23,6 +23,6 @@ Generate `handoff.md` and `handoff.json` from workbench artifacts at session end
 - PR templating. The markdown is reusable as a PR body but the lesson stops at the file.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-handoff-generator.md` - extracted skill

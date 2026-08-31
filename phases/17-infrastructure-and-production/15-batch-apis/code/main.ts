@@ -8,7 +8,7 @@
  *      future" pattern is what your code does at the call site — you fire and
  *      forget, the promise hands you the answer hours later.
  *   2. Cost simulator matching main.py: SYNC, SYNC+CACHE, BATCH, BATCH+CACHE
- *      across three workloads. Pricing constants 2026-04 per docs/en.md.
+ *      across three workloads. Pricing constants 2026-04 per docs/zh.md.
  *
  * Citations:
  *   - OpenAI Batch API: platform.openai.com/docs/guides/batch

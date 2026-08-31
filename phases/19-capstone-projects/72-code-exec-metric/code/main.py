@@ -1,7 +1,7 @@
 """Code execution metric: extract, sandbox subprocess, pass-at-k.
 
 Conceptual references:
-- ./docs/en.md (this lesson)
+- ./docs/zh.md (this lesson)
 - lesson 70 (task spec format) for code_exec task shape
 - lesson 71 (classical metrics) for the dispatcher pattern
 

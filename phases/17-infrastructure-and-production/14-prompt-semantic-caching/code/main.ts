@@ -11,7 +11,7 @@
  *      anti-pattern with 5-min vs 1-hour TTL premiums.
  *
  * Pricing snapshot: 2026-04, captured from docs.anthropic.com / platform.openai.com
- * via docs/en.md. Verify rate cards before quoting.
+ * via docs/zh.md. Verify rate cards before quoting.
  *
  * Citations:
  *   - Anthropic prompt-caching: docs.anthropic.com/en/docs/build-with-claude/prompt-caching

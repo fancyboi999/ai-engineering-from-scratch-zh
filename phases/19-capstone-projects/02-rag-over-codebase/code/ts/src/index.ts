@@ -1,7 +1,7 @@
 // Capstone 19/02: code RAG query API (multi-file TypeScript).
 //
 // Sources:
-//   This lesson's docs/en.md (hybrid retrieval + cited answer API)
+//   This lesson's docs/zh.md (hybrid retrieval + cited answer API)
 //   Hono web framework           https://hono.dev/docs/
 //   BM25 (Robertson + Zaragoza) https://en.wikipedia.org/wiki/Okapi_BM25
 //   Reciprocal Rank Fusion       https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf

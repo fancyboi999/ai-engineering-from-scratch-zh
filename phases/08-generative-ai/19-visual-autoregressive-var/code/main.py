@@ -1,7 +1,7 @@
 """Toy Visual Autoregressive (VAR) model: next-scale prediction over a pyramid.
 
 A minimal numpy implementation of the VAR mechanism described in
-docs/en.md. Three pieces:
+docs/zh.md. Three pieces:
 
 1. A multi-scale residual VQ tokenizer over tiny 8x8 "images" (a small
    library of patterns: solid, gradient, ring, checker, cross). Tokens at

@@ -3,7 +3,7 @@
 Pure-Python. Mock LLM-as-judge so the eval runs offline.
 
 References:
-- ./docs/en.md
+- ./docs/zh.md
 - Phase 19 lessons 64-67 (components measured by these metrics)
 - Phase 19 lesson 69 (end-to-end system this eval grades)
 

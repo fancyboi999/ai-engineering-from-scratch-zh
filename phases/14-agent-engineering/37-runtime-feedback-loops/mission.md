@@ -22,6 +22,6 @@ Build `run_with_feedback` that wraps `subprocess.run`, captures stdout, stderr, 
 - Redaction passes and rotation policy. Lesson exercise prompts cover those.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-feedback-runner.md` - extracted skill

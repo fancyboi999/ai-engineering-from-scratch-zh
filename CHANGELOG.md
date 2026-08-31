@@ -7,7 +7,7 @@
 ## [未发布]
 
 ### 新增
-- `scripts/scaffold-lesson.sh` —— 脚手架脚本，创建 `phases/NN-phase/NN-lesson/` 的完整目录结构，并生成一份从 `LESSON_TEMPLATE.md` 预填的 `docs/en.md` 骨架。
+- `scripts/scaffold-lesson.sh` —— 脚手架脚本，创建 `phases/NN-phase/NN-lesson/` 的完整目录结构，并生成一份从 `LESSON_TEMPLATE.md` 预填的 `docs/zh.md` 骨架。
 - `.github/PULL_REQUEST_TEMPLATE.md` —— 贡献者检查清单（代码能跑、代码无注释、先从零实现、每课原子化提交、ROADMAP 行用 markdown 链接）。
 - `.github/ISSUE_TEMPLATE/bug_report.md` 和 `new_lesson_proposal.md` —— 缺陷报告和课程设想的结构化收集表单。
 - 这份 `CHANGELOG.md`。

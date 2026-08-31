@@ -4,7 +4,7 @@ Implements three rewriters on top of a shared hybrid retriever. Uses a
 deterministic mock LLM so the loop runs offline.
 
 References:
-- ./docs/en.md
+- ./docs/zh.md
 - Phase 19 lesson 65 (hybrid retriever consumed below)
 - Phase 19 lesson 66 (reranker on the rewriter's output in production)
 - Phase 19 lesson 69 (end-to-end pipeline composing rewriter + retriever + reranker)

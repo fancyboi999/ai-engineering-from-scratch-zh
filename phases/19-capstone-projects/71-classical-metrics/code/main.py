@@ -1,7 +1,7 @@
 """Classical metrics: exact_match, F1, BLEU-4, ROUGE-L, accuracy.
 
 Conceptual references:
-- ./docs/en.md (this lesson)
+- ./docs/zh.md (this lesson)
 - lesson 70 (task spec format) for the metric_name field
 
 Stdlib + numpy. Run: python3 code/main.py

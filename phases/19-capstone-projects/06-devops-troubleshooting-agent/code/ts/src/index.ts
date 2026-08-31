@@ -1,5 +1,5 @@
 // Capstone 06 entrypoint: DevOps troubleshooting agent Slack integration.
-// Source: ../../docs/en.md (Slack brief + approval buttons, gated MCP behind approval).
+// Source: ../../docs/zh.md (Slack brief + approval buttons, gated MCP behind approval).
 // References:
 //   Slack request signing v0 https://api.slack.com/authentication/verifying-requests-from-slack
 //   Slack Block Kit          https://api.slack.com/reference/block-kit/blocks

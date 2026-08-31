@@ -109,7 +109,7 @@ def main():
 
     print()
     print("note: this code uses a toy 'fake-dense' ranker for teaching.")
-    print("real dense retrieval needs a sentence-transformer encoder; see docs/en.md.")
+    print("real dense retrieval needs a sentence-transformer encoder; see docs/zh.md.")
 
 
 if __name__ == "__main__":

@@ -22,6 +22,6 @@ Turn prose instructions into machine-checkable rules across five categories and 
 - Framework guardrails (OpenAI SDK, LangGraph interrupts). The rule set is the human-readable contract those implement.
 
 ## References
-- `docs/en.md` - full lesson
+- `docs/zh.md` - full lesson
 - `code/main.py` - reference implementation
 - `outputs/skill-rule-set-builder.md` - extracted skill

@@ -36,6 +36,9 @@
         return href;
       }
     }
+    if (/^\/(lesson|certification)(?=[?#]|$)/.test(href)) {
+      return href.replace(/^\/(lesson|certification)(?=[?#]|$)/, '$1.html');
+    }
     return href.replace(/(^|\/)(lesson|certification)(?=[?#]|$)/, '$1$2.html');
   }
 
