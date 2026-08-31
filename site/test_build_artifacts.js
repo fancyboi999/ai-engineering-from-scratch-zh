@@ -499,6 +499,7 @@ test('shared site asset families use the expected cache keys on every page', () 
 });
 
 test('every public HTML page shares the real favicon assets', () => {
+  const faviconRelease = '20260831a';
   const pages = fs.readdirSync(__dirname)
     .filter(name => name.endsWith('.html') && !/^google[a-z0-9]+\.html$/i.test(name))
     .sort();
@@ -514,12 +515,12 @@ test('every public HTML page shares the real favicon assets', () => {
   for (const page of pages) {
     const source = fs.readFileSync(path.join(__dirname, page), 'utf8');
     assert.equal(
-      (source.match(/<link rel="icon" href="\/favicon\.ico" sizes="32x32">/g) || []).length,
+      (source.match(new RegExp(`<link rel="icon" href="/favicon\\.ico\\?v=${faviconRelease}" sizes="32x32">`, 'g')) || []).length,
       1,
       `${page} must reference /favicon.ico exactly once`
     );
     assert.equal(
-      (source.match(/<link rel="icon" href="\/favicon\.svg" type="image\/svg\+xml">/g) || []).length,
+      (source.match(new RegExp(`<link rel="icon" href="/favicon\\.svg\\?v=${faviconRelease}" type="image/svg\\+xml">`, 'g')) || []).length,
       1,
       `${page} must reference /favicon.svg exactly once`
     );
