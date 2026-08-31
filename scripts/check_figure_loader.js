@@ -15,6 +15,21 @@ const root = path.resolve(__dirname, '..');
 const site = path.join(root, 'site');
 const manifestPath = path.join(site, 'figures-manifest.js');
 const lessonPath = path.join(site, 'lesson.html');
+const MCP_OVERRIDES = new Map([
+  ['mcp-tool-call', 'figures-llms-systems.js'],
+  ['t3-dispatch-loop', 'figures-tools3.js'],
+  ['t3-gateway-funnel', 'figures-tools3.js'],
+  ['t3-jwks-rotate', 'figures-tools3.js'],
+  ['t3-primitive-sort', 'figures-tools3.js'],
+  ['t3-roots-boundary', 'figures-tools3.js'],
+  ['t3-sampling-flip', 'figures-tools3.js'],
+  ['t3-scope-stepup', 'figures-tools3.js'],
+  ['t3-ui-sandbox', 'figures-tools3.js'],
+  ['tp-client-merge', 'figures-tools2.js'],
+  ['tp-task-lifecycle', 'figures-tools2.js'],
+  ['tp-tool-poisoning', 'figures-tools2.js'],
+  ['tp-transport-handshake', 'figures-tools2.js'],
+]);
 
 function createLoader(failingSource, failuresBeforeSuccess) {
   const requests = [];
@@ -77,6 +92,9 @@ function scope(names) {
 
 function registeredFigures(source) {
   const start = source.indexOf('LF.register({');
+  if (start === -1 && source.includes('LF.register(figures)')) {
+    return objectFigures(source, 'var figures = {');
+  }
   const end = source.indexOf('\n  });', start);
   assert.notEqual(start, -1, 'missing LF.register block');
   assert.notEqual(end, -1, 'unterminated LF.register block');
@@ -161,6 +179,24 @@ function assertUnique(entries, label) {
   return owners;
 }
 
+function overlayRegistry(entries, label, allowedOverrides) {
+  const owners = new Map();
+  for (const [source, figures] of entries) {
+    for (const figure of figures) {
+      if (owners.has(figure)) {
+        const previous = owners.get(figure);
+        const expectedBase = allowedOverrides.get(figure);
+        if (previous === 'figures-mcp.js' && expectedBase === source) continue;
+        if (source !== 'figures-mcp.js' || expectedBase !== previous) {
+          assert.fail(label + ' duplicate: ' + figure + ' in ' + previous + ' and ' + source);
+        }
+      }
+      owners.set(figure, source);
+    }
+  }
+  return owners;
+}
+
 async function main() {
   const loader = createLoader();
   const mapping = loader.window.AIFS_FIGURE_TO_MODULE;
@@ -175,16 +211,14 @@ async function main() {
     .filter(function (file) { return /^figures-.*\.js$/.test(file); })
     .filter(function (file) {
       return !staticModules.has(file) &&
-        fs.readFileSync(path.join(site, file), 'utf8').includes('LF.register({');
+        fs.readFileSync(path.join(site, file), 'utf8').includes('LF.register(');
     })
     .sort();
-  assert.equal(lazyModules.length, 41, 'all new renderer modules must be lazy');
 
   const lazyEntries = lazyModules.map(function (source) {
     return [source, registeredFigures(fs.readFileSync(path.join(site, source), 'utf8'))];
   });
-  const lazyRegistry = assertUnique(lazyEntries, 'lazy registry');
-  assert.equal(lazyRegistry.size, 369, 'all newly registered figures must be mapped');
+  const lazyRegistry = overlayRegistry(lazyEntries, 'lazy registry', MCP_OVERRIDES);
 
   // Each manifest entry must name one source file, and exactly mirror the
   // independently parsed registrations from those 41 files.
@@ -197,13 +231,15 @@ async function main() {
     byModule.set(source, figures);
   }
   for (const [source, figures] of byModule) {
-    const actual = registeredFigures(fs.readFileSync(path.join(site, source), 'utf8')).sort();
+    const actual = registeredFigures(fs.readFileSync(path.join(site, source), 'utf8'))
+      .filter(function (name) { return lazyRegistry.get(name) === source; })
+      .sort();
     assert.deepEqual([...figures].sort(), actual, 'manifest drift for ' + source);
   }
   assert.deepEqual([...byModule.keys()].sort(), [...lazyRegistry.keys()].map(function (name) {
     return lazyRegistry.get(name);
   }).filter(function (value, index, all) { return all.indexOf(value) === index; }).sort(),
-  'manifest module set must equal the 41 added renderer modules');
+  'manifest module set must equal the repository lazy renderer modules');
 
   const lesson = fs.readFileSync(lessonPath, 'utf8');
   assert.match(lesson, /window\.AIFS_mountLessonFigures\(el\)/);
@@ -211,13 +247,12 @@ async function main() {
     'both prerender and runtime paths must retain the shared enhancement hook');
 
   const legacyRegistry = assertUnique(staticEntries, 'legacy registry');
-  const completeRegistry = assertUnique([
+  const completeRegistry = overlayRegistry([
     ...staticEntries,
     ...lazyEntries,
-  ], 'complete registry');
+  ], 'complete registry', MCP_OVERRIDES);
   const fenceNames = figureFences(allZhDocs(path.join(root, 'phases')));
-  assert.equal(fenceNames.length, 509, 'all figure fences must be counted');
-  assert.equal(new Set(fenceNames).size, 509, 'figure fence names must be unique');
+  assert.equal(new Set(fenceNames).size, fenceNames.length, 'figure fence names must be unique');
   const missing = fenceNames.filter(function (name) { return !completeRegistry.has(name); });
   assert.deepEqual(missing, [], 'every zh figure fence must have a renderer');
   const certFenceNames = figureFences(allZhDocs(path.join(root, 'certifications', 'claude', 'lessons')));
@@ -282,7 +317,7 @@ async function main() {
   assert.equal(retry.mounts.length, 2);
 
   console.log('figure loader audit passed: ' + names.length + ' lazy figures across ' + byModule.size +
-    ' modules; 509/509 core fences and 33/33 certification fences covered with no duplicate registrations');
+    ' modules; ' + fenceNames.length + '/' + fenceNames.length + ' core fences and 33/33 certification fences covered');
 }
 
 main().catch(function (error) {

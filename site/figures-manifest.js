@@ -586,6 +586,52 @@
       "wb-ab-runs",
       "wb-pack-install"
     ]
+  },
+  {
+    "src": "figures-agent-skills.js?v=20260830a",
+    "figures": [
+      "skill-package-anatomy",
+      "skill-runtime-lifecycle",
+      "skill-tool-orthogonality",
+      "skill-validation-order",
+      "skill-discovery-pipeline",
+      "skill-disclosure-levels",
+      "skill-reference-map",
+      "skill-resource-containment",
+      "skill-invocation-stages",
+      "skill-routing-abstention",
+      "skill-argument-boundaries",
+      "skill-host-adapter",
+      "skill-authority-chain",
+      "skill-trust-surface",
+      "skill-approval-decision",
+      "skill-workflow-extraction",
+      "skill-eval-layers",
+      "skill-package-install",
+      "skill-authoring-loop"
+    ]
+  },
+  {
+    "src": "figures-mcp.js?v=20260830a",
+    "figures": [
+      "mcp-tool-call",
+      "t3-dispatch-loop",
+      "tp-client-merge",
+      "tp-transport-handshake",
+      "t3-primitive-sort",
+      "t3-sampling-flip",
+      "t3-roots-boundary",
+      "tp-task-lifecycle",
+      "t3-ui-sandbox",
+      "tp-tool-poisoning",
+      "t3-scope-stepup",
+      "t3-gateway-funnel",
+      "t3-jwks-rotate",
+      "mcp-contract-pipeline",
+      "mcp-reliability-race",
+      "mcp-registry-admission",
+      "mcp-conformance-operations"
+    ]
   }
 ];
 
