@@ -57,62 +57,62 @@ LESSON_NUM="${LESSON%%-*}"
 cat >"$LESSON_DIR/docs/zh.md" <<EOF
 # $PRETTY_TITLE
 
-> [One-line motto. The core idea that sticks.]
+> [一句话主旨——最值得记住的核心观点。]
 
 **Type:** Build
 **Languages:** Python
-**Prerequisites:** [prior lessons]
+**Prerequisites:** [前置课程]
 **Time:** ~75 minutes
 
-## The Problem
+## 问题背景
 
-[2-3 paragraphs. What can't a learner do without this? Make it concrete.]
+[用 2–3 段说明缺少这项能力时做不到什么，并给出具体场景。]
 
-## The Concept
+## 核心概念
 
-[Intuition first. Diagrams, tables, mental models. No code yet.]
+[先用图、表和直觉建立心智模型，暂不写代码。]
 
-## Build It
+## 动手构建
 
-### Step 1: [name]
+### 第 1 步：[名称]
 
-[explanation]
-
-\`\`\`python
-# code here
-\`\`\`
-
-### Step 2: [name]
-
-[explanation]
+[说明]
 
 \`\`\`python
-# code here
+# 在这里写代码
 \`\`\`
 
-## Use It
+### 第 2 步：[名称]
 
-[How a real framework solves the same thing. Compare your version.]
+[说明]
 
-## Ship It
+\`\`\`python
+# 在这里写代码
+\`\`\`
 
-[The reusable artifact this lesson produces. Save in outputs/.]
+## 实际使用
 
-## Exercises
+[展示生产框架如何解决同一问题，并与手写版本比较。]
 
-1. [Easy — reinforce core concept]
-2. [Medium — apply to a different problem]
-3. [Hard — extend or combine with prior lessons]
+## 拿去用
 
-## Key Terms
+[说明本课产出的可复用产物，并保存到 outputs/。]
 
-| Term | What people say | What it actually means |
+## 练习
+
+1. [简单——巩固核心概念]
+2. [中等——应用到不同问题]
+3. [困难——扩展实现或结合前置课程]
+
+## 关键术语
+
+| 术语 | 常见说法 | 实际含义 |
 |------|----------------|----------------------|
 |      |                |                      |
 
-## Further Reading
+## 延伸阅读
 
-- []() — []
+- [资料](url) — [推荐理由]
 EOF
 
 cat >"$LESSON_DIR/code/main.py" <<'EOF'

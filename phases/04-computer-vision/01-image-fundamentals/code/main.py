@@ -1,7 +1,7 @@
 """Runnable companion for the Image Fundamentals lesson.
 Builds a deterministic RGB image and transforms it as a NumPy tensor.
 Implements nearest, bilinear, and bicubic resizing from scratch.
-See ../docs/en.md for the derivations and production-library comparison.
+See ../docs/zh.md for the derivations and production-library comparison.
 """
 
 import numpy as np

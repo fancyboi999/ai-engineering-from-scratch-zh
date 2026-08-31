@@ -1069,9 +1069,8 @@ node site/build.js --check    # 只校验课程数一致性，不写文件
 （曾踩 435、498 vs 503）。新增课程时在 README + ROADMAP 表格补行、并更新该 phase
 标题的课数即可；站点模板里散落的计数由 build 时 `syncCounts` 自动同步。
 
-> 注：上游用 `scripts/build_catalog.py` + `catalog.json` + `.github/workflows/curriculum.yml`
-> 做同样的事，但那套脚本硬编码 `docs/en.md` + 英文 README 正则，对本中文翻译仓不兼容，
-> 故改用上面这套等价的、认 `zh.md` 的校验。
+> 注：`scripts/build_catalog.py` 也已支持 `docs/zh.md`，但 `catalog.json` 只是可再生的辅助产物；
+> 中文站发布与课程计数仍以 `site/build.js`、`scripts/audit_lessons.py` 和 README / ROADMAP 为准。
 
 ### 给每节课的 Python 代码做冒烟检查
 

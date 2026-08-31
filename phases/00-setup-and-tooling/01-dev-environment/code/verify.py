@@ -1,6 +1,6 @@
 """Route-aware environment preflight for AI Engineering from Scratch.
 
-Lesson: phases/00-setup-and-tooling/01-dev-environment/docs/en.md
+Lesson: phases/00-setup-and-tooling/01-dev-environment/docs/zh.md
 Run this file from the repository root before starting a learning route.
 """
 

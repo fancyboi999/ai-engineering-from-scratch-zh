@@ -81,11 +81,11 @@ site/figure-manifest.js
 site/lesson-seo.json
 site/certification-seo.json
 site/langs.js
-# 预渲染静态课程页（writeLessonPages 生成，503 个 index.html）——同款策略不提交
+# 预渲染静态课程页（writeLessonPages 生成，523 个 index.html）——同款策略不提交
 site/lessons/
 
-# 上游 scripts/build_catalog.py 的产物（上游也 gitignore 它）。本仓不用那套
-# （它认 docs/en.md），课数校验改用 site/build.js --check——忽略以防误提交。
+# scripts/build_catalog.py 的可再生产物；中文仓的发布与课数真相仍由
+# site/build.js 管理，因此忽略 catalog.json，避免误提交生成文件。
 catalog.json
 book/_build/
 i18n/*/phases/

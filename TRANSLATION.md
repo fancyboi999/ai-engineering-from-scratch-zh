@@ -20,7 +20,7 @@
 - 文件路径、URL、命令（如 `phases/00-.../verify.py`、`https://...`）
 - 工具名 / 产品名：`uv`、`pnpm`、`cargo`、`PyTorch`、`NumPy`、`Claude`、`Cursor`、`Codex`、`MCP`
 - Markdown 结构：代码围栏 ``` 、表格分隔行、HTML 标签、`<br>`、`\n`
-- mermaid / sequenceDiagram：**语法和节点显示文字都暂时保留英文原样**（连 `Working Directory`、`# My Experiment` 这类节点文案也不翻），保证全站一致，全部翻完后统一中文化处理
+- mermaid / sequenceDiagram：语法、节点 ID、边和时序拓扑保持原样；面向读者的节点、边与消息文案译成中文，协议名、代码标识和命令字面量保留英文
 - frontmatter（`---` 之间的 `name:`/`description:` 等字段名不翻，值按情况）
 
 ## 固定术语表（强制统一，保证全站一致）

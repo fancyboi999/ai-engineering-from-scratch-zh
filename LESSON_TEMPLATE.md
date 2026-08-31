@@ -14,7 +14,7 @@ NN-lesson-name/
 ├── notebook/
 │   └── lesson.ipynb       (用于实验的 Jupyter notebook)
 ├── docs/
-│   └── en.md              (课程文档)
+│   └── zh.md              (中文课程文档)
 └── outputs/
     ├── prompt-*.md         (本节课产出的提示词)
     └── skill-*.md          (本节课产出的技能)
@@ -23,74 +23,65 @@ NN-lesson-name/
 ## 文档格式（docs/zh.md）
 
 ```markdown
-# [Lesson Title]
+# [课程标题]
 
-> [One-line motto — the core idea that sticks]
+> [一句话主旨——最值得记住的核心观点]
 
 **Type:** Build | Learn
-**Languages:** Python, TypeScript, Rust, Julia (list what's used)
-**Prerequisites:** [List prior lessons needed]
-**Time:** ~[estimated time] minutes
+**Languages:** Python, TypeScript, Rust, Julia（只列实际使用的语言）
+**Prerequisites:** [所需的前置课程]
+**Time:** ~[预计时长] minutes
 
-## The Problem
+## 问题背景
 
-[2-3 paragraphs. What can't you do without this? Why should you care?
-Make it concrete — show a scenario where not knowing this hurts.]
+[用 2–3 段说明缺少这项能力时做不到什么、为什么值得学，并给出具体失败场景。]
 
-## The Concept
+## 核心概念
 
-[Explain with diagrams and intuition. No code yet.
-Use ASCII diagrams, tables, or link to visuals in the web app.
-Build mental models before implementation.]
+[先用图、表和直觉建立心智模型，暂不写代码。]
 
-## Build It
+## 动手构建
 
-[Step-by-step implementation from scratch.
-Start with the simplest version, then add complexity.
-Every code block should be runnable on its own.]
+[从最小实现开始逐步增加复杂度；每个代码块都应能独立运行。]
 
-### Step 1: [Name]
+### 第 1 步：[名称]
 
-[Explanation]
+[说明]
 
     [code block]
 
-### Step 2: [Name]
+### 第 2 步：[名称]
 
-[Explanation]
+[说明]
 
     [code block]
 
-[...continue...]
+[继续补充步骤]
 
-## Use It
+## 实际使用
 
-[Now show how frameworks/libraries do the same thing.
-Compare your from-scratch version to the library version.
-This proves the concept and introduces practical tools.]
+[展示生产框架如何解决同一问题，并与手写版本比较。]
 
-## Ship It
+## 拿去用
 
-[What reusable artifact does this lesson produce?
-Could be a prompt, a skill, an agent, an MCP server, or a tool.
-Include it here and save it in the outputs/ folder.]
+[说明本课产出的可复用提示词、技能、agent、MCP server 或工具，并保存到 outputs/。]
 
-## Exercises
+## 练习
 
-1. [Easy — reinforce the core concept]
-2. [Medium — apply it to a different problem]
-3. [Hard — extend or combine with prior lessons]
+1. [简单——巩固核心概念]
+2. [中等——应用到不同问题]
+3. [困难——扩展实现或结合前置课程]
 
-## Key Terms
+## 关键术语
 
-| Term | What people say | What it actually means |
+| 术语 | 常见说法 | 实际含义 |
 |------|----------------|----------------------|
-| [term] | [common misconception] | [actual definition] |
+| [术语] | [常见误解] | [准确定义] |
 
-## Further Reading
+## 延伸阅读
 
-- [Resource 1](url) — [why it's worth reading]
-- [Resource 2](url) — [why it's worth reading]
+- [资料 1](url) — [推荐理由]
+- [资料 2](url) — [推荐理由]
 ```
 
 ## 代码文件规范
