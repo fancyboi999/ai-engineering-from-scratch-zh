@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- AIFS:LESSON-SEO:START -->
   <title>课程 - AI Engineering from Scratch</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23fafaf5'/><rect x='2' y='2' width='28' height='28' fill='none' stroke='%233553ff' stroke-width='1.2'/><text x='6' y='22' font-size='14' font-family='monospace' fill='%233553ff'>AI</text></svg>">
-  <meta name="description" content="AI Engineering from Scratch 课程中的一节。503 节课、20 个阶段、四种语言，每个算法都从最原始的数学手写出来。">
+  <meta name="description" content="AI Engineering from Scratch 课程中的一节。523 节课、20 个阶段、四种语言，每个算法都从最原始的数学手写出来。">
   <meta property="og:title" content="AI Engineering from Scratch · 课程">
-  <meta property="og:description" content="503 节课，20 个阶段。亲手写出反向传播、分词器、注意力机制和 agent 循环。">
+  <meta property="og:description" content="523 节课，20 个阶段。亲手写出反向传播、分词器、注意力机制和 agent 循环。">
   <meta property="og:image" content="https://aieng-zh.cn/og-image.png?v=2">
   <!-- og:url omitted intentionally: lesson.html is a static template that loads the lesson body client-side via ?path=. Static hosting cannot template the URL, so we let crawlers fall back to the request URL (which is the lesson-specific share link). -->
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AI Engineering from Scratch">
-  <meta name="twitter:description" content="503 节课，20 个阶段。从原始数学开始亲手构建。">
+  <meta name="twitter:description" content="523 节课，20 个阶段。从原始数学开始亲手构建。">
   <meta name="twitter:image" content="https://aieng-zh.cn/og-image.png?v=2">
   <link rel="canonical" href="https://aieng-zh.cn/lesson.html">
+  <!-- AIFS:LESSON-SEO:END -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260821a">
+  <link rel="stylesheet" href="style.css?v=20260831a">
   <link rel="stylesheet" href="certifications.css?v=20260818b">
   <style>
     .scroll-progress {
@@ -397,9 +399,9 @@
       line-height: 1.7;
       color: var(--ink);
       margin-bottom: 18px;
-      text-align: justify;
-      hyphens: auto;
-      -webkit-hyphens: auto;
+      text-align: left;
+      hyphens: none;
+      -webkit-hyphens: none;
     }
 
     .lesson-article > p:first-of-type::first-letter,
@@ -549,6 +551,7 @@
     .lesson-article pre {
       position: relative;
       margin: 20px 0;
+      padding-top: 44px;
       overflow: hidden;
       border: 1px solid var(--rule-soft);
       background: var(--code-bg);
@@ -569,12 +572,19 @@
       position: absolute;
       top: 0;
       left: 0;
+      max-width: calc(100% - 88px);
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       font-family: var(--font-mono);
       font-size: 0.66rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.16em;
-      padding: 4px 10px;
+      padding: 0 12px;
       background: var(--blueprint);
       color: var(--bg);
       z-index: 2;
@@ -582,11 +592,13 @@
 
     .code-copy {
       position: absolute;
-      top: 6px;
-      right: 8px;
+      top: 0;
+      right: 0;
+      min-width: 88px;
+      min-height: 44px;
       background: transparent;
       border: 1px solid var(--rule-soft);
-      padding: 3px 10px;
+      padding: 8px 12px;
       font-family: var(--font-mono);
       font-size: 0.66rem;
       letter-spacing: 0.12em;
@@ -715,6 +727,238 @@
       border-color: var(--blueprint);
       color: var(--blueprint);
       background: var(--blueprint-tint);
+    }
+
+    .lesson-action-panel {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      margin: 24px 0 34px;
+      border: 1px solid var(--blueprint);
+      background: var(--blueprint-tint);
+      overflow: hidden;
+    }
+
+    .lesson-action-head {
+      min-width: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--blueprint);
+    }
+
+    .lesson-action-head > *,
+    .lesson-action-body > *,
+    .lesson-action-command-row > * {
+      min-width: 0;
+    }
+
+    .lesson-action-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--blueprint);
+    }
+
+    .lesson-action-intro {
+      max-width: 450px;
+      margin: 7px 0 0;
+      font-family: var(--font-body);
+      font-size: 0.94rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+      text-align: left;
+    }
+
+    .lesson-action-status {
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .lesson-action-loop {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .lesson-action-step {
+      min-width: 0;
+      min-height: 112px;
+      padding: 14px 12px;
+      border: 0;
+      border-right: 1px solid var(--rule-soft);
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      transition:
+        color var(--motion-feedback) var(--ease-out),
+        background-color var(--motion-feedback) var(--ease-out),
+        opacity var(--motion-feedback) var(--ease-out);
+    }
+
+    .lesson-action-step:last-child { border-right: 0; }
+
+    .lesson-action-step:hover,
+    .lesson-action-step:focus-visible {
+      color: var(--blueprint);
+      background: var(--bg-surface);
+    }
+
+    .lesson-action-step.is-done {
+      background: var(--blueprint);
+      color: var(--bg);
+    }
+
+    .lesson-action-step-num,
+    .lesson-action-step-title,
+    .lesson-action-step-copy {
+      display: block;
+    }
+
+    .lesson-action-step-num {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.12em;
+      opacity: 0.72;
+    }
+
+    .lesson-action-step-title {
+      margin-top: 7px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .lesson-action-step-copy {
+      margin-top: 6px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: inherit;
+      opacity: 0.82;
+    }
+
+    .lesson-action-body {
+      min-width: 0;
+      display: grid;
+      gap: 14px;
+      padding: 18px 20px 20px;
+    }
+
+    .lesson-action-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .lesson-action-tag {
+      padding: 3px 8px;
+      border: 1px solid var(--rule-soft);
+      background: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .lesson-action-run,
+    .lesson-action-path {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      border: 1px solid var(--rule-soft);
+      background: var(--bg);
+      padding: 14px 16px;
+    }
+
+    .lesson-action-label {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blueprint);
+    }
+
+    .lesson-action-command-row {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 9px;
+    }
+
+    .lesson-action-command {
+      min-width: 0;
+      max-width: 100%;
+      flex: 1;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      padding: 9px 10px;
+      background: var(--code-bg);
+      border: 1px solid var(--rule-soft);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.45;
+      color: var(--blueprint);
+      white-space: pre-wrap;
+    }
+
+    .lesson-action-copy {
+      min-height: 44px;
+      padding: 7px 10px;
+      border: 1px solid var(--rule-soft);
+      background: transparent;
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .lesson-action-copy:hover,
+    .lesson-action-copy:focus-visible {
+      border-color: var(--blueprint);
+      color: var(--blueprint);
+    }
+
+    .lesson-action-note,
+    .lesson-action-path p,
+    .lesson-action-path li {
+      margin: 7px 0 0;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      text-align: left;
+    }
+
+    .lesson-action-path ul {
+      margin: 7px 0 0;
+      padding-left: 18px;
+    }
+
+    .lesson-action-path code {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--blueprint);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .quiz-section,
@@ -1108,30 +1352,51 @@
     }
 
     .lesson-nav-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: stretch;
-      gap: 16px;
-      margin-top: 64px;
-      padding-top: 32px;
-      border-top: 1px solid var(--rule-soft);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      margin-top: 32px;
+      border: 1px solid var(--rule-soft);
+      background: var(--bg);
     }
 
     .lesson-nav-btn {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      padding: 16px 20px;
+      justify-content: center;
+      gap: 6px;
+      min-width: 0;
+      min-height: 88px;
+      padding: 16px 18px;
       background: transparent;
-      border: 1px solid var(--rule-soft);
+      border: 0;
       text-decoration: none;
       transition: border-color 0.15s, background 0.15s;
       max-width: 48%;
     }
 
+    .lesson-nav-btn + .lesson-nav-btn { border-left: 1px solid var(--rule-soft); }
+
+    .lesson-nav-btn:only-child { grid-column: 1 / -1; }
+
     .lesson-nav-btn:hover {
-      border-color: var(--blueprint);
       background: var(--blueprint-tint);
+    }
+
+    .lesson-nav-btn:focus-visible,
+    .timeline-item:focus-visible,
+    .output-btn:focus-visible,
+    .code-card-btn:focus-visible {
+      outline: 2px solid var(--blueprint);
+      outline-offset: -2px;
+    }
+
+    .lesson-nav-btn:active,
+    .output-btn:active,
+    .code-card-btn:active,
+    .code-copy:active,
+    .mermaid-btn:active {
+      transform: scale(0.97);
     }
 
     .lesson-nav-btn .nav-label {
@@ -1145,20 +1410,23 @@
     .lesson-nav-btn .nav-title {
       font-family: var(--font-body);
       font-size: 0.98rem;
+      line-height: 1.35;
       color: var(--ink);
       font-weight: 500;
     }
 
     .lesson-nav-btn.next {
       text-align: right;
-      margin-left: auto;
+      margin-left: 0;
     }
 
+    .lesson-nav-btn.next:only-child { text-align: left; }
+
     .ai-panels {
-      margin-top: 64px;
+      margin-top: 48px;
       display: flex;
       flex-direction: column;
-      gap: 40px;
+      gap: 28px;
     }
 
     .ai-panel {
@@ -1216,46 +1484,64 @@
       margin-bottom: 18px;
     }
 
+    .ai-panel--compact,
+    .ai-panel--path,
+    .ai-panel--continue {
+      padding: 20px;
+    }
+
+    .ai-panel--compact .ai-panel-header,
+    .ai-panel--path .ai-panel-header,
+    .ai-panel--continue .ai-panel-header {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+    }
+
+    .ai-panel--compact .ai-panel-subtitle,
+    .ai-panel--continue .ai-panel-subtitle {
+      margin: 0 0 14px;
+    }
+
     .output-cards,
     .code-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
       gap: 14px;
     }
 
     .output-card {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
       border: 1px solid var(--rule-soft);
       padding: 18px;
-      background: var(--bg);
-      transition: border-color 0.15s, background 0.15s;
-    }
-
-    .output-card:hover {
-      border-color: var(--blueprint);
-      background: var(--blueprint-tint);
+      background: var(--bg-surface);
     }
 
     .output-card-name {
       font-family: var(--font-mono);
       font-size: 0.84rem;
       color: var(--ink);
-      word-break: break-all;
-      margin-bottom: 10px;
+      overflow-wrap: anywhere;
+      word-break: normal;
       text-transform: none;
     }
 
     .output-badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-family: var(--font-mono);
       font-size: 0.62rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       padding: 2px 8px;
-      margin-bottom: 10px;
       border: 1px solid var(--blueprint);
       color: var(--blueprint);
       background: var(--blueprint-tint);
+      white-space: nowrap;
     }
 
     .output-badge.prompt,
@@ -1271,17 +1557,32 @@
       font-size: 0.96rem;
       color: var(--ink-soft);
       line-height: 1.5;
-      margin-bottom: 12px;
+      margin-top: 10px;
       text-transform: none;
       letter-spacing: 0;
       font-variant: normal;
       text-align: left;
     }
 
+    .output-card-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .output-card-heading {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+    }
+
     .output-actions {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      align-items: stretch;
+      margin-top: 14px;
     }
 
     .output-btn,
@@ -1319,8 +1620,48 @@
 
     .output-install-hint.visible { display: block; }
 
+    .output-cards.single,
+    .code-cards.single {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .output-cards.single .output-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px 16px;
+      padding: 14px 16px;
+    }
+
+    .output-cards.single .output-actions {
+      grid-column: 2;
+      grid-row: 1;
+      justify-content: flex-end;
+      margin-top: 0;
+    }
+
+    .output-cards.single .output-card--stacked-actions {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .output-cards.single .output-card--stacked-actions .output-actions {
+      grid-column: 1;
+      grid-row: auto;
+      justify-content: flex-start;
+    }
+
+    .output-cards.single .output-install-hint {
+      grid-column: 1 / -1;
+      margin-top: 0;
+    }
+
     .code-card {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
       min-width: 0;
+      max-width: 100%;
+      height: 100%;
       background: var(--code-bg);
       border: 1px solid var(--rule-soft);
       padding: 18px;
@@ -1336,6 +1677,7 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 12px;
+      min-width: 0;
     }
 
     .code-lang-icon {
@@ -1361,10 +1703,14 @@
       font-family: var(--font-mono);
       font-size: 0.7rem;
       color: var(--ink-mute);
-      margin-bottom: 12px;
+      margin-bottom: 0;
+      margin-left: auto;
+      white-space: nowrap;
     }
 
     .code-card-run {
+      min-width: 0;
+      max-width: 100%;
       font-family: var(--font-mono);
       font-size: 0.78rem;
       color: var(--blueprint);
@@ -1374,66 +1720,96 @@
       border: 1px solid var(--blueprint);
       text-transform: none;
       line-height: 1.4;
-      white-space: nowrap;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--rule-soft) transparent;
-    }
-
-    .code-card-run::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .code-card-run::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .code-card-run::-webkit-scrollbar-thumb {
-      background: var(--rule-soft);
-      border-radius: 3px;
-    }
-
-    .code-card-run::-webkit-scrollbar-thumb:hover {
-      background: var(--ink-mute);
+      text-align: left;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .code-card-actions {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
 
-    .learning-timeline {
-      display: flex;
+    .output-cards:not(.single) .output-card:last-child:nth-child(odd),
+    .code-cards:not(.single) .code-card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+
+    .code-cards.single .code-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
+      gap: 12px 16px;
+      padding: 16px 18px;
+    }
+
+    .code-cards.single .code-card-header,
+    .code-cards.single .code-card-run {
+      margin-bottom: 0;
+    }
+
+    .code-cards.single .code-card-run { grid-column: 1 / -1; }
+
+    .code-cards.single .code-card-actions {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .learning-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(132px, 100%), 1fr));
       gap: 0;
-      overflow-x: auto;
-      padding: 24px 0;
+      overflow: hidden;
+      margin: 14px 0 0;
+      border: 1px solid var(--rule-soft);
       position: relative;
     }
 
     .timeline-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      min-width: 92px;
-      flex-shrink: 0;
+      display: block;
+      min-width: 0;
+      padding: 12px;
       position: relative;
       text-decoration: none;
+      background: var(--bg);
+      transition:
+        background-color var(--motion-feedback) var(--ease-out),
+        box-shadow var(--motion-feedback) var(--ease-out);
+    }
+
+    .timeline-item + .timeline-item,
+    .timeline-ellipsis + .timeline-item,
+    .timeline-item + .timeline-ellipsis {
+      border-left: 1px solid var(--rule-soft);
+    }
+
+    .timeline-item:hover { background: var(--blueprint-tint); }
+
+    .timeline-item.current {
+      background: var(--blueprint-tint);
+      box-shadow: inset 0 3px 0 var(--blueprint);
+    }
+
+    .timeline-step-meta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 16px;
+      margin-bottom: 7px;
     }
 
     .timeline-dot {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       background: transparent;
       border: 1px solid var(--ink-mute);
-      z-index: 2;
+      flex: 0 0 auto;
       transition: transform 0.15s, background 0.15s, border-color 0.15s;
     }
 
     .timeline-item.current .timeline-dot {
-      width: 18px;
-      height: 18px;
       background: var(--blueprint);
       border-color: var(--blueprint);
     }
@@ -1445,10 +1821,7 @@
     }
 
     .timeline-line {
-      width: 36px;
-      height: 1px;
-      background: var(--rule-soft);
-      flex-shrink: 0;
+      display: none;
     }
 
     .timeline-line.done,
@@ -1458,13 +1831,17 @@
 
     .timeline-label {
       font-family: var(--font-body);
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       letter-spacing: 0;
       text-transform: none;
       color: var(--ink-mute);
-      text-align: center;
-      max-width: 120px;
+      text-align: left;
+      max-width: none;
       line-height: 1.35;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
     }
 
     .timeline-item.current .timeline-label {
@@ -1472,22 +1849,58 @@
       font-weight: 500;
     }
 
-    .timeline-ellipsis {
+    .timeline-index {
       font-family: var(--font-mono);
-      font-size: 0.78rem;
+      font-size: 0.66rem;
       color: var(--ink-mute);
-      letter-spacing: 0.04em;
-      padding: 0 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .timeline-item.current .timeline-index,
+    .timeline-item.done .timeline-index { color: var(--blueprint); }
+
+    .timeline-ellipsis {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-mute);
+      letter-spacing: 0.08em;
+      padding: 12px;
+      white-space: nowrap;
+      background: var(--code-bg);
+    }
+
+    .path-panel-context {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .path-panel-context .ai-panel-subtitle {
+      margin: 0;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .path-position {
+      flex: 0 0 auto;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-mute);
       white-space: nowrap;
     }
 
 
     .phase-progress-bar {
       width: 100%;
-      height: 4px;
+      height: 3px;
       background: var(--rule-soft);
       overflow: hidden;
-      margin: 14px 0 8px;
+      margin: 12px 0 7px;
     }
 
     .phase-progress-fill {
@@ -1504,7 +1917,107 @@
       text-align: left;
     }
 
+    .path-completion-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--rule-soft);
+    }
+
+    .path-completion-actions a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--blueprint);
+      text-decoration: none;
+    }
+
+    .path-completion-actions a:hover { text-decoration: underline; }
+
+    .learning-path-preflights {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 2px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule-soft);
+    }
+
+    .learning-path-preflight {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px 18px;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1px solid var(--rule-soft);
+      background: var(--code-bg);
+    }
+
+    .learning-path-preflight-copy { min-width: 0; }
+
+    .learning-path-preflight-label,
+    .learning-path-preflight-status {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .learning-path-preflight-label {
+      color: var(--blueprint);
+      margin-bottom: 5px;
+    }
+
+    .learning-path-preflight-title {
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .learning-path-preflight-description {
+      color: var(--ink-soft);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      line-height: 1.45;
+      margin-top: 4px;
+    }
+
+    .learning-path-preflight-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .learning-path-preflight-status { color: var(--ink-mute); }
+    .learning-path-preflight.confirmed { border-color: var(--blueprint); }
+    .learning-path-preflight.confirmed .learning-path-preflight-status { color: var(--blueprint); }
+
+    .learning-path-confirm[disabled] {
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    .learning-path-locked {
+      cursor: not-allowed;
+      opacity: 0.48;
+    }
+
+    .learning-path-locked:hover {
+      color: var(--ink-mute);
+      border-color: transparent;
+    }
+
+    .prerequisite-callout:focus {
+      outline: 2px solid var(--blueprint);
+      outline-offset: 3px;
+    }
+
     .phase-complete-callout {
+      position: relative;
+      overflow: hidden;
       font-family: var(--font-mono);
       font-size: 0.85rem;
       letter-spacing: 0.12em;
@@ -1518,7 +2031,42 @@
       display: none;
     }
 
-    .phase-complete-callout.visible { display: block; }
+    .phase-complete-callout.visible {
+      display: block;
+      opacity: 1;
+      transform: none;
+    }
+
+    .phase-complete-callout.visible::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--blueprint);
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+
+    .phase-complete-callout.visible.is-entering {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .phase-complete-callout.visible.is-entering::before {
+      transform: scaleX(0);
+    }
+
+    .phase-complete-callout.visible.is-entered {
+      transition:
+        opacity var(--motion-enter) var(--ease-out),
+        transform var(--motion-enter) var(--ease-out);
+    }
+
+    .phase-complete-callout.visible.is-entered::before {
+      transition: transform var(--motion-drawer) var(--ease-out);
+    }
 
     .continue-panel {
       display: flex;
@@ -1590,6 +2138,59 @@
       border-bottom: 1px solid var(--blueprint);
       font-family: var(--font-body);
       font-size: 0.95rem;
+    }
+
+    .lesson-cert-notice {
+      margin: 0 0 28px;
+    }
+
+    .lesson-cert-breadcrumb {
+      margin: 0 0 18px;
+      flex-wrap: wrap;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .spinner {
+        animation: none;
+        border-color: var(--rule-soft);
+        border-top-color: var(--blueprint);
+      }
+
+      .lesson-sidebar,
+      .phase-progress-fill {
+        transition: none;
+      }
+
+      .phase-complete-callout.visible,
+      .phase-complete-callout.visible.is-entering,
+      .phase-complete-callout.visible.is-entered {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+
+      .phase-complete-callout.visible::before,
+      .phase-complete-callout.visible.is-entering::before,
+      .phase-complete-callout.visible.is-entered::before {
+        transform: scaleX(1);
+        transition: none;
+      }
+
+      .quiz-explanation.visible,
+      .quiz-score.visible {
+        animation: lesson-feedback-fade var(--motion-feedback) ease both;
+      }
+
+      .lesson-sidebar-toggle:active,
+      .quiz-option:active:not(.disabled),
+      .quiz-retry:active,
+      .lesson-nav-btn:active,
+      .output-btn:active,
+      .code-card-btn:active,
+      .code-copy:active,
+      .mermaid-btn:active {
+        transform: none;
+      }
     }
 
     .toc-sidebar {
@@ -1704,6 +2305,16 @@
 
     @media (max-width: 768px) {
       .lesson-main { padding: 56px 16px 60px; }
+      .lesson-action-head { grid-template-columns: minmax(0, 1fr); }
+      .lesson-action-loop { grid-template-columns: minmax(0, 1fr); }
+      .lesson-action-step {
+        border-right: 0;
+        border-bottom: 1px solid var(--rule-soft);
+      }
+      .lesson-action-step:last-child { border-bottom: 0; }
+      .lesson-action-body { padding: 16px; }
+      .lesson-action-command-row { flex-direction: column; }
+      .lesson-action-copy { width: 100%; }
       .lesson-article { max-width: 100%; }
       .lesson-article p,
       .lesson-article ul li,
@@ -1718,17 +2329,93 @@
       .ai-panel { padding: 22px 16px; }
       .output-cards,
       .code-cards { grid-template-columns: 1fr; }
-      .lesson-nav-bottom { flex-direction: column; gap: 12px; }
-      .lesson-nav-btn { max-width: 100%; }
+      .output-cards.single .output-card,
+      .code-cards.single .code-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .output-cards.single .output-card > *,
+      .code-cards.single .code-card > * {
+        grid-column: 1;
+        grid-row: auto;
+      }
+      .output-cards.single .output-actions {
+        justify-content: flex-start;
+      }
+      .learning-timeline { grid-template-columns: minmax(0, 1fr); }
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+      }
+      .timeline-step-meta { margin-bottom: 0; }
+      .timeline-item + .timeline-item,
+      .timeline-ellipsis + .timeline-item,
+      .timeline-item + .timeline-ellipsis {
+        border-left: 0;
+        border-top: 1px solid var(--rule-soft);
+      }
+      .timeline-label { -webkit-line-clamp: 2; }
+      .timeline-ellipsis {
+        justify-content: flex-start;
+        border-left: 0;
+        border-top: 1px solid var(--rule-soft);
+      }
+      .path-panel-context {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .lesson-nav-bottom { grid-template-columns: minmax(0, 1fr); }
+      .lesson-nav-btn + .lesson-nav-btn {
+        border-left: 0;
+        border-top: 1px solid var(--rule-soft);
+      }
+      .lesson-nav-btn { max-width: 100%; min-height: 78px; }
       .lesson-nav-btn.next { text-align: left; }
     }
 
     @media (max-width: 480px) {
+      .lesson-main { padding: 36px 12px 56px; }
+      .lesson-sidebar-toggle {
+        right: 12px;
+        bottom: 14px;
+        height: 44px;
+        padding: 0 12px;
+      }
       .lesson-article p,
       .lesson-article ul li,
       .lesson-article ol li { font-size: 0.96rem; }
+      .lesson-article h1 { font-size: clamp(1.9rem, 12vw, 2.55rem); }
       .lesson-article > p:first-of-type::first-letter { font-size: 2.6rem; }
+      .lesson-article ul { padding-left: 18px; }
+      .lesson-article ol { padding-left: 24px; }
+      .learning-objectives,
+      .quiz-section,
+      .quiz-container { padding: 16px 12px; }
+      .learning-objectives-title,
+      .quiz-title {
+        align-items: flex-start;
+        font-size: 0.66rem;
+        line-height: 1.35;
+      }
+      .quiz-option { gap: 10px; padding: 10px 12px; }
       .ai-panel { padding: 18px 12px; }
+      .code-card,
+      .output-card { padding: 14px; }
+      .code-card-actions,
+      .output-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      .code-card-btn,
+      .output-btn {
+        text-align: center;
+        min-height: 44px;
+      }
+      .learning-path-preflight { grid-template-columns: 1fr; }
+      .learning-path-preflight-actions { align-items: stretch; }
       .timeline-item { min-width: 70px; }
       .timeline-line { width: 20px; }
     }
@@ -1792,10 +2479,12 @@
     <aside class="lesson-sidebar" id="lessonSidebar"></aside>
     <main class="lesson-main" id="main">
       <div class="lesson-content" id="lessonContent">
+        <!-- AIFS:LESSON-FALLBACK:START -->
         <div class="lesson-loading" id="lessonLoading">
           <div class="spinner"></div>
           <div class="lesson-loading-text">课程加载中...</div>
         </div>
+        <!-- AIFS:LESSON-FALLBACK:END -->
       </div>
     </main>
     <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
@@ -1803,7 +2492,7 @@
 
   <script src="md-render.js?v=20260612a"></script>
   <script src="build-meta.js"></script>
-  <script src="data.js?v=20260818b"></script>
+  <script src="data.js?v=20260831a"></script>
   <script>
     (function () {
       var path = '';
@@ -1817,37 +2506,116 @@
 
       window.__AIFS_CERTIFICATION_DATA_READY = new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = 'certification-data.js?v=20260818b';
+        script.src = 'certification-data.js?v=20260831a';
         script.onload = resolve;
         script.onerror = function () { reject(new Error('certification-data.js 加载失败')); };
         document.head.appendChild(script);
       });
     }());
   </script>
-  <script src="content-source.js?v=20260818b"></script>
-  <script src="progress.js?v=20260709a"></script>
-  <script src="certification-progress.js?v=20260818b"></script>
+  <script src="content-source.js?v=20260831a"></script>
+  <script src="progress.js?v=20260831a"></script>
+  <script id="learningPathProgressRuntime">
+    (function (root) {
+      'use strict';
+
+      var STORAGE_KEY = 'aifs:learning-path-progress:v1';
+
+      function emptyState() {
+        return { version: 1, paths: {} };
+      }
+
+      function createStore(storage) {
+        var memoryState = emptyState();
+
+        function read() {
+          try {
+            var raw = storage && storage.getItem(STORAGE_KEY);
+            var parsed = raw ? JSON.parse(raw) : null;
+            if (parsed && parsed.version === 1 && parsed.paths && typeof parsed.paths === 'object') {
+              memoryState = parsed;
+            }
+          } catch (_) {}
+          return memoryState;
+        }
+
+        function write(state) {
+          memoryState = state;
+          try {
+            if (storage) storage.setItem(STORAGE_KEY, JSON.stringify(state));
+          } catch (_) {}
+          return true;
+        }
+
+        function checkIds(entry) {
+          if (!entry || !Array.isArray(entry.prerequisiteChecks)) return [];
+          return entry.prerequisiteChecks.filter(function (id) {
+            return typeof id === 'string' && id.length > 0;
+          });
+        }
+
+        function prerequisitePaths(entry) {
+          if (!entry || !Array.isArray(entry.prerequisitePaths)) return [];
+          return entry.prerequisitePaths.filter(function (lessonPath) {
+            return typeof lessonPath === 'string' && lessonPath.length > 0;
+          });
+        }
+
+        function isConfirmed(pathId, checkId) {
+          var state = read();
+          return !!(state.paths[pathId] && state.paths[pathId].checks && state.paths[pathId].checks[checkId]);
+        }
+
+        function confirm(pathId, checkId) {
+          if (typeof pathId !== 'string' || !pathId || typeof checkId !== 'string' || !checkId) return false;
+          var state = read();
+          if (!state.paths[pathId] || typeof state.paths[pathId] !== 'object') state.paths[pathId] = {};
+          if (!state.paths[pathId].checks || typeof state.paths[pathId].checks !== 'object') state.paths[pathId].checks = {};
+          state.paths[pathId].checks[checkId] = true;
+          return write(state);
+        }
+
+        function unmetChecks(path, entry) {
+          if (!path || typeof path.id !== 'string') return [];
+          var prerequisites = Array.isArray(path.prerequisites) ? path.prerequisites : [];
+          return checkIds(entry).filter(function (checkId) {
+            return !isConfirmed(path.id, checkId);
+          }).map(function (checkId) {
+            return prerequisites.find(function (candidate) {
+              return candidate && candidate.id === checkId;
+            });
+          }).filter(Boolean);
+        }
+
+        function unmetPaths(entry, isLessonComplete) {
+          return prerequisitePaths(entry).filter(function (lessonPath) {
+            return typeof isLessonComplete !== 'function' || !isLessonComplete(lessonPath);
+          });
+        }
+
+        return {
+          storageKey: STORAGE_KEY,
+          isConfirmed: isConfirmed,
+          confirm: confirm,
+          unmetChecks: unmetChecks,
+          unmetPaths: unmetPaths,
+          firstUnmetCheckId: function (path, entry) {
+            var first = unmetChecks(path, entry)[0];
+            return first ? first.id : '';
+          },
+          canEnter: function (path, entry, isLessonComplete) {
+            return unmetChecks(path, entry).length === 0 &&
+              unmetPaths(entry, isLessonComplete).length === 0;
+          },
+          createForStorage: createStore
+        };
+      }
+
+      root.AIFSLearningPathProgress = createStore(root.localStorage);
+    }(window));
+  </script>
+  <script src="certification-progress.js?v=20260831a"></script>
   <script src="reminder.js?v=20260709a"></script>
-  <script src="header.js?v=20260818b" defer></script>
-  <script src="cmdpalette.js?v=20260818b" defer></script>
-  <script src="figures.js?v=20260610e"></script>
-  <script src="lesson-figures.js?v=20260610e"></script>
-  <script src="figures-history.js?v=20260727a"></script>
-  <script src="figures-math.js?v=20260610e"></script>
-  <script src="figures-ml.js?v=20260610e"></script>
-  <script src="figures-dl.js?v=20260610e"></script>
-  <script src="figures-vision-speech.js?v=20260610e"></script>
-  <script src="figures-transformers.js?v=20260610e"></script>
-  <script src="figures-genai-rl.js?v=20260610e"></script>
-  <script src="figures-llms-systems.js?v=20260610e"></script>
-  <script src="figures-agents-alignment.js?v=20260610e"></script>
-  <script src="figures-math2.js?v=20260610e"></script>
-  <script src="figures-nlp2.js?v=20260610e"></script>
-  <script src="figures-llms2.js?v=20260610e"></script>
-  <script src="figures-infra.js?v=20260610e"></script>
-  <script src="figures-frontier.js?v=20260610e"></script>
-  <script src="figures-claude-certifications.js?v=20260818b"></script>
-  <script src="figures-manifest.js?v=20260804a"></script>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     mermaid.initialize({
@@ -1867,6 +2635,11 @@
     });
     window._mermaidReady = mermaid;
   </script>
+  <script src="header.js?v=20260831a" defer></script>
+  <script src="cmdpalette.js?v=20260831a" defer></script>
+  <script src="lesson-figures.js?v=b88d7b13ddfa"></script>
+  <script src="figure-manifest.js?v=f83e9aabe9ff"></script>
+  <script src="figures-manifest.js?v=20260831b"></script>
   <script>
     (function () {
       // 渲染器（parseMd 等纯函数）已抽至 md-render.js，与 build.js 预渲染共用。
@@ -1922,6 +2695,16 @@
       var lessonPath = prerendered ? prerendered.path : params.get('path');
       var requestedTrackId = params.get('track') || '';
       var originatingTrackId = params.get('fromTrack') || '';
+      var LEARNING_PATH_ID_ALIASES = { 'mcp-engineering': 'model-context-protocol' };
+      var incomingLearningPathId = params.get('learningPath') || '';
+      var requestedLearningPathId = LEARNING_PATH_ID_ALIASES[incomingLearningPathId] || incomingLearningPathId;
+      function replaceLearningPathInUrl(pathId) {
+        if (!pathId || !window.history || !window.history.replaceState) return;
+        var canonicalLearningPathUrl = new URL(window.location.href);
+        canonicalLearningPathUrl.searchParams.set('learningPath', pathId);
+        window.history.replaceState(null, '', canonicalLearningPathUrl.pathname + canonicalLearningPathUrl.search + canonicalLearningPathUrl.hash);
+      }
+      if (incomingLearningPathId && incomingLearningPathId !== requestedLearningPathId) replaceLearningPathInUrl(requestedLearningPathId);
 
       if (!lessonPath) {
         showError('未指定课程路径', '请在 URL 中添加 ?path=phases/01-math-foundations/01-linear-algebra-intuition。');
@@ -1948,7 +2731,9 @@
       var certificationLesson = null;
       var certificationMode = false;
       var certificationSupplementalMode = false;
-      var PROGRESS_STORAGE_KEY = 'aifs:progress:v1';
+      var learningPath = null;
+      var learningPathMode = false;
+      var PROGRESS_STORAGE_KEY = 'aifs:progress:v2';
 
       function certificationData() {
         return typeof CERTIFICATIONS !== 'undefined' && CERTIFICATIONS ? CERTIFICATIONS : null;
@@ -1994,14 +2779,261 @@
         return null;
       }
 
+      function learningPathEntryPath(entry) {
+        return typeof entry === 'string' ? entry : entry && entry.path ? entry.path : '';
+      }
+
+      function findLearningPath(id) {
+        if (!id || typeof LEARNING_PATHS === 'undefined' || !Array.isArray(LEARNING_PATHS)) return null;
+        return LEARNING_PATHS.find(function (path) { return path && path.id === id; }) || null;
+      }
+
+      function inferLearningPath(target) {
+        if (!target || typeof LEARNING_PATHS === 'undefined' || !Array.isArray(LEARNING_PATHS)) return null;
+        var preferredIds = ['agent-skills', 'model-context-protocol'];
+        for (var i = 0; i < preferredIds.length; i++) {
+          var preferred = findLearningPath(preferredIds[i]);
+          if (preferred && learningPathContains(preferred, target)) return preferred;
+        }
+        return LEARNING_PATHS.find(function (path) { return learningPathContains(path, target); }) || null;
+      }
+
+      function learningPathEntries(path, includeOptional) {
+        if (!path) return [];
+        var required = Array.isArray(path.lessons) ? path.lessons : [];
+        var optional = includeOptional && Array.isArray(path.optionalLessons) ? path.optionalLessons : [];
+        return required.concat(optional);
+      }
+
+      function learningPathContains(path, target) {
+        return learningPathEntries(path, true).some(function (entry) {
+          return learningPathEntryPath(entry) === target;
+        });
+      }
+
+      function learningPathLessonHref(path) {
+        var href = lessonHref(path);
+        return href + (href.indexOf('?') >= 0 ? '&' : '?') +
+          'learningPath=' + encodeURIComponent(learningPath.id);
+      }
+
+      function learningPathPrerequisiteLabel(path) {
+        var core = phaseLessonForPath(path);
+        if (!core) return path;
+        return '阶段 ' + String(core.phase.id).padStart(2, '0') + ' · ' + core.lesson.name;
+      }
+
+      function unmetLearningPathPrerequisites(entry) {
+        var prerequisites = entry && Array.isArray(entry.prerequisitePaths)
+          ? entry.prerequisitePaths
+          : [];
+        return prerequisites.filter(function (prerequisitePath) {
+          return !(window.AIFSProgress && window.AIFSProgress.isLessonComplete(prerequisitePath));
+        });
+      }
+
+      function learningPathPrerequisiteChecks(entry) {
+        if (!learningPathMode || !window.AIFSLearningPathProgress) return [];
+        return window.AIFSLearningPathProgress.unmetChecks(learningPath, entry);
+      }
+
+      function learningPathCheckIds(entry) {
+        return entry && Array.isArray(entry.prerequisiteChecks)
+          ? entry.prerequisiteChecks.filter(function (id) { return typeof id === 'string' && id.length > 0; })
+          : [];
+      }
+
+      function learningPathPrerequisitePaths(entry) {
+        return entry && Array.isArray(entry.prerequisitePaths)
+          ? entry.prerequisitePaths.filter(function (path) { return typeof path === 'string' && path.length > 0; })
+          : [];
+      }
+
+      function learningPathEntryLocked(entry) {
+        return unmetLearningPathPrerequisites(entry).length > 0 ||
+          learningPathPrerequisiteChecks(entry).length > 0;
+      }
+
+      function learningPathGateClass(entry) {
+        return learningPathEntryLocked(entry) ? ' learning-path-locked' : '';
+      }
+
+      function learningPathGateAttributes(entry) {
+        var ids = learningPathCheckIds(entry);
+        var paths = learningPathPrerequisitePaths(entry);
+        if (!ids.length && !paths.length) return '';
+        var locked = learningPathEntryLocked(entry);
+        return ' data-learning-path-id="' + escapeAttr(learningPath.id) + '"' +
+          ' data-learning-path-gate="true"' +
+          ' data-prerequisite-checks="' + escapeAttr(ids.join(' ')) + '"' +
+          ' data-prerequisite-paths="' + escapeAttr(paths.join(' ')) + '"' +
+          (locked ? ' aria-disabled="true"' : '');
+      }
+
+      function learningPathPreflightDefinitions() {
+        if (!learningPathMode) return [];
+        var referenced = {};
+        for (var lessonIndex = 0; lessonIndex < flatLessons.length; lessonIndex++) {
+          var ids = learningPathCheckIds(flatLessons[lessonIndex]);
+          for (var checkIndex = 0; checkIndex < ids.length; checkIndex++) referenced[ids[checkIndex]] = true;
+        }
+        var definitions = Array.isArray(learningPath.prerequisites) ? learningPath.prerequisites : [];
+        return Object.keys(referenced).map(function (id) {
+          return definitions.find(function (entry) { return entry && entry.id === id; });
+        }).filter(Boolean);
+      }
+
+      function learningPathPreflightHtml() {
+        var checks = learningPathPreflightDefinitions();
+        if (!checks.length) return '';
+        var html = '<div class="learning-path-preflights" aria-label="知识前置检查">';
+        for (var index = 0; index < checks.length; index++) {
+          var check = checks[index];
+          var confirmed = window.AIFSLearningPathProgress && window.AIFSLearningPathProgress.isConfirmed(learningPath.id, check.id);
+          html += '<div class="learning-path-preflight' + (confirmed ? ' confirmed' : '') + '" data-learning-path-preflight="' + escapeAttr(check.id) + '">';
+          html += '<div class="learning-path-preflight-copy"><div class="learning-path-preflight-label">必需的知识前置检查</div>';
+          html += '<div class="learning-path-preflight-title">' + escapeHtml(check.title || check.id) + '</div>';
+          if (check.description) html += '<div class="learning-path-preflight-description">' + escapeHtml(check.description) + '</div>';
+          html += '</div><div class="learning-path-preflight-actions">';
+          html += '<div class="learning-path-preflight-status" role="status" aria-live="polite">' + (confirmed ? '已确认' : '需要确认') + '</div>';
+          html += '<button type="button" class="output-btn learning-path-confirm" data-learning-path-check-id="' + escapeAttr(check.id) + '" aria-pressed="' + (confirmed ? 'true' : 'false') + '" onclick="confirmLearningPathCheck(this)"' + (confirmed ? ' disabled' : '') + '>' + (confirmed ? '已确认' : '确认前置条件') + '</button>';
+          html += '</div></div>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function learningPathPrerequisiteCallout(entry, heading) {
+        var unmet = unmetLearningPathPrerequisites(entry);
+        var unmetChecks = learningPathPrerequisiteChecks(entry);
+        if (!unmet.length && !unmetChecks.length) return '';
+        var html = '<div class="continue-callout prerequisite-callout" role="status" tabindex="-1" data-learning-path-prerequisite-callout="true"' +
+          ' data-prerequisite-paths="' + escapeAttr(unmet.join(' ')) + '"' +
+          ' data-prerequisite-checks="' + escapeAttr(unmetChecks.map(function (check) { return check.id; }).join(' ')) + '"><strong>' +
+          escapeHtml(heading || '前置条件检查') + '</strong><br>';
+        for (var index = 0; index < unmet.length; index++) {
+          var prerequisitePath = unmet[index];
+          var label = learningPathPrerequisiteLabel(prerequisitePath);
+          if (prerequisitePath === lessonPath) {
+            html += '<span>先完成本课：' + escapeHtml(label) + '。</span>';
+          } else {
+            var insideFocusedPath = learningPathContains(learningPath, prerequisitePath);
+            var href = insideFocusedPath
+              ? learningPathLessonHref(prerequisitePath)
+              : 'lesson?path=' + encodeURIComponent(prerequisitePath);
+            html += '<a href="' + href + '"' + (insideFocusedPath ? '' : ' target="_blank" rel="noopener"') + '>先补这一课：' + escapeHtml(label) + '</a>';
+          }
+          if (index < unmet.length - 1) html += '<br>';
+        }
+        if (unmet.some(function (prerequisitePath) { return !learningPathContains(learningPath, prerequisitePath); })) {
+          html += '<br><span>外部前置课程会在新标签页打开，不会打断当前学习路线。</span>';
+        }
+        for (var checkIndex = 0; checkIndex < unmetChecks.length; checkIndex++) {
+          var check = unmetChecks[checkIndex];
+          if (unmet.length || checkIndex > 0) html += '<br>';
+          html += '<span>知识前置检查：' + escapeHtml(check.title || check.id) + '。</span>';
+          html += '<button type="button" class="output-btn learning-path-confirm" data-learning-path-check-id="' + escapeAttr(check.id) + '" aria-pressed="false" onclick="confirmLearningPathCheck(this)">确认前置条件</button>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function linkUnmetLearningPathCheckIds(link) {
+        if (!learningPathMode || !link || !window.AIFSLearningPathProgress) return [];
+        var ids = (link.getAttribute('data-prerequisite-checks') || '').split(/\s+/).filter(Boolean);
+        return ids.filter(function (id) {
+          return !window.AIFSLearningPathProgress.isConfirmed(learningPath.id, id);
+        });
+      }
+
+      function linkUnmetLearningPathPrerequisitePaths(link) {
+        if (!learningPathMode || !link) return [];
+        var paths = (link.getAttribute('data-prerequisite-paths') || '').split(/\s+/).filter(Boolean);
+        return paths.filter(function (path) {
+          return !(window.AIFSProgress && window.AIFSProgress.isLessonComplete(path));
+        });
+      }
+
+      function linkHasUnmetLearningPathPrerequisite(link) {
+        if (!learningPathMode || !link) return false;
+        return linkUnmetLearningPathPrerequisitePaths(link).length > 0 ||
+          linkUnmetLearningPathCheckIds(link).length > 0;
+      }
+
+      function syncLearningPathGateLinks() {
+        var links = document.querySelectorAll('a[data-learning-path-gate]');
+        for (var index = 0; index < links.length; index++) {
+          var locked = linkHasUnmetLearningPathPrerequisite(links[index]);
+          links[index].classList.toggle('learning-path-locked', locked);
+          if (locked) links[index].setAttribute('aria-disabled', 'true');
+          else links[index].removeAttribute('aria-disabled');
+          var label = links[index].querySelector('[data-learning-path-gate-label]');
+          if (label) label.textContent = locked ? '未解锁' : '下一节 \u2192';
+        }
+      }
+
+      function findLearningPathConfirmButton(checkId) {
+        var buttons = document.querySelectorAll('[data-learning-path-check-id]');
+        for (var index = 0; index < buttons.length; index++) {
+          if (buttons[index].getAttribute('data-learning-path-check-id') === checkId && !buttons[index].disabled) return buttons[index];
+        }
+        return null;
+      }
+
+      function findLearningPathPrerequisiteCallout(paths) {
+        if (!paths.length) return null;
+        var callouts = document.querySelectorAll('[data-learning-path-prerequisite-callout]');
+        for (var index = 0; index < callouts.length; index++) {
+          var describedPaths = (callouts[index].getAttribute('data-prerequisite-paths') || '').split(/\s+/).filter(Boolean);
+          if (paths.some(function (path) { return describedPaths.indexOf(path) >= 0; })) return callouts[index];
+        }
+        return null;
+      }
+
+      function ensureLearningPathPrerequisiteCallout(link) {
+        var paths = linkUnmetLearningPathPrerequisitePaths(link);
+        var callout = findLearningPathPrerequisiteCallout(paths);
+        if (callout || !paths.length) return callout;
+        var panel = document.getElementById('continuePathPanel') || document.getElementById('learningPathPanel');
+        if (!panel) return null;
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = learningPathPrerequisiteCallout({ prerequisitePaths: paths }, '学习本课前需要完成');
+        callout = wrapper.firstElementChild;
+        if (!callout) return null;
+        var body = panel.querySelector('.continue-panel') || panel;
+        body.appendChild(callout);
+        return callout;
+      }
+
+      function initLearningPathGateNavigation() {
+        document.addEventListener('click', function (event) {
+          var link = event.target && event.target.closest ? event.target.closest('a[data-learning-path-gate]') : null;
+          if (!link || !linkHasUnmetLearningPathPrerequisite(link)) return;
+          event.preventDefault();
+          var firstId = linkUnmetLearningPathCheckIds(link)[0] || '';
+          var button = findLearningPathConfirmButton(firstId);
+          var pathCallout = button ? null : ensureLearningPathPrerequisiteCallout(link);
+          var feedbackTarget = button || pathCallout;
+          if (feedbackTarget) {
+            feedbackTarget.scrollIntoView({ behavior: preferredScrollBehavior(), block: 'center' });
+            feedbackTarget.focus();
+          }
+        });
+      }
+
+      window.confirmLearningPathCheck = function (button) {
+        if (!learningPathMode || !button || !window.AIFSLearningPathProgress) return false;
+        var checkId = button.getAttribute('data-learning-path-check-id') || '';
+        if (!window.AIFSLearningPathProgress.confirm(learningPath.id, checkId)) return false;
+        refreshProgressUi();
+        return true;
+      };
+
       function lessonProgressClass(path, readable) {
         if (!readable) return 'planned';
         if (!window.AIFSProgress || !path) return '';
         if (window.AIFSProgress.isLessonComplete(path)) return 'complete';
-        var progress = window.AIFSProgress.getLessonProgress(path);
-        if (progress && (progress.visitedAt || (progress.answers && Object.keys(progress.answers).length))) {
-          return 'in-progress';
-        }
+        if (window.AIFSProgress.hasLessonActivity(path)) return 'in-progress';
         return '';
       }
 
@@ -2016,11 +3048,11 @@
         if (!lessonPath || typeof mutator !== 'function') return false;
         try {
           var raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
-          var state = raw ? JSON.parse(raw) : { lessons: {}, updatedAt: 0 };
+            var state = raw ? JSON.parse(raw) : { schemaVersion: 2, lessons: {}, updatedAt: 0 };
           if (!state || typeof state !== 'object' || !state.lessons || typeof state.lessons !== 'object') return false;
           var lesson = state.lessons[lessonPath];
           if (!lesson || typeof lesson !== 'object') {
-            lesson = { answers: {}, completedAt: null, visitedAt: Date.now() };
+            lesson = { answers: {}, quizPassedAt: null, checkpoints: {}, completedAt: null, completionSource: '', visitedAt: Date.now() };
             state.lessons[lessonPath] = lesson;
           }
           if (!mutator(lesson)) return false;
@@ -2039,7 +3071,7 @@
           var storedVersion = lesson.quizVersion === undefined || lesson.quizVersion === null ? '' : String(lesson.quizVersion);
           if (storedVersion === currentVersion) return false;
           lesson.answers = {};
-          lesson.completedAt = null;
+          lesson.quizPassedAt = null;
           lesson.quizVersion = currentVersion;
           return true;
         });
@@ -2055,7 +3087,7 @@
         var changed = mutateLessonProgress(function (lesson) {
           if (!lesson.answers || typeof lesson.answers !== 'object') lesson.answers = {};
           for (var i = 0; i < questionIds.length; i++) delete lesson.answers[questionIds[i]];
-          lesson.completedAt = null;
+          lesson.quizPassedAt = null;
           if (currentVersion) lesson.quizVersion = currentVersion;
           return true;
         });
@@ -2087,6 +3119,12 @@
         }
         certificationMode = !!(certificationTrack && certificationTrackContains(certificationTrack, lessonPath));
         certificationSupplementalMode = !!(certificationOriginTrack && !certificationMode);
+        learningPath = !certificationMode && !certificationSupplementalMode
+          ? (requestedLearningPathId ? findLearningPath(requestedLearningPathId) : inferLearningPath(lessonPath))
+          : null;
+        learningPathMode = !!(learningPath && learningPathContains(learningPath, lessonPath));
+        if (learningPathMode && !incomingLearningPathId) replaceLearningPathInUrl(learningPath.id);
+
         syncCertificationQuizProgressVersion();
 
         if (certificationLesson) {
@@ -2116,6 +3154,54 @@
               required: certRef.required !== false
             });
             if (certPath === lessonPath) currentLessonIndex = flatLessons.length - 1;
+          }
+          return;
+        }
+
+        if (learningPathMode) {
+          var requiredCount = Array.isArray(learningPath.lessons) ? learningPath.lessons.length : 0;
+          var pathEntries = learningPathEntries(learningPath, true);
+          for (var lp = 0; lp < pathEntries.length; lp++) {
+            var pathEntry = pathEntries[lp];
+            var pathValue = learningPathEntryPath(pathEntry);
+            var coreLesson = phaseLessonForPath(pathValue);
+            if (!coreLesson) continue;
+            var corePhaseSlug = extractPhaseSlug(coreLesson.phase, coreLesson.phaseIndex);
+            var coreLessonSlug = extractLessonSlug(coreLesson.lesson, coreLesson.lessonIndex);
+            flatLessons.push({
+              phaseIndex: coreLesson.phaseIndex,
+              lessonIndex: coreLesson.lessonIndex,
+              phaseName: coreLesson.phase.name,
+              phaseId: coreLesson.phase.id,
+              phaseSlug: corePhaseSlug,
+              lessonName: pathEntry && typeof pathEntry === 'object' && pathEntry.title
+                ? String(pathEntry.title)
+                : coreLesson.lesson.name,
+              lessonSlug: coreLessonSlug,
+              status: coreLesson.lesson.status,
+              type: coreLesson.lesson.type,
+              lang: coreLesson.lesson.lang,
+              url: coreLesson.lesson.url,
+              path: pathValue,
+              isReadable: true,
+              required: lp < requiredCount && (!pathEntry || typeof pathEntry === 'string' || pathEntry.required !== false),
+              minutes: pathEntry && typeof pathEntry === 'object' ? Number(pathEntry.minutes || 0) : 0,
+              group: pathEntry && typeof pathEntry === 'object' ? String(pathEntry.group || '') : '',
+              checkpoint: pathEntry && typeof pathEntry === 'object' ? String(pathEntry.checkpoint || '') : '',
+              checkpointEvidence: pathEntry && typeof pathEntry === 'object' && Array.isArray(pathEntry.checkpointEvidence)
+                ? pathEntry.checkpointEvidence.slice()
+                : [],
+              prerequisitePaths: pathEntry && typeof pathEntry === 'object' && Array.isArray(pathEntry.prerequisitePaths)
+                ? pathEntry.prerequisitePaths.slice()
+                : [],
+              prerequisiteChecks: pathEntry && typeof pathEntry === 'object' && Array.isArray(pathEntry.prerequisiteChecks)
+                ? pathEntry.prerequisiteChecks.slice()
+                : []
+            });
+            if (pathValue === lessonPath) {
+              currentPhaseIndex = coreLesson.phaseIndex;
+              currentLessonIndex = flatLessons.length - 1;
+            }
           }
           return;
         }
@@ -2195,11 +3281,43 @@
             var certLesson = flatLessons[ci];
             var certActive = certLesson.path === lessonPath;
             var certProgress = lessonProgressClass(certLesson.path, true);
-            certHtml += '<a class="sidebar-lesson-link' + (certActive ? ' active' : '') + '" href="lesson.html?path=' + encodeURIComponent(certLesson.path) + '&track=' + encodeURIComponent(certificationTrack.id) + '">';
+            certHtml += '<a class="sidebar-lesson-link' + (certActive ? ' active' : '') + '" href="lesson?path=' + encodeURIComponent(certLesson.path) + '&track=' + encodeURIComponent(certificationTrack.id) + '">';
             certHtml += '<span class="sidebar-lesson-dot ' + certProgress + '"></span>';
             certHtml += escapeHtml(certLesson.lessonName) + '</a>';
           }
           sidebar.innerHTML = certHtml;
+          return;
+        }
+
+        if (learningPathMode) {
+          var pathReturnHref = 'catalog.html';
+          var pathReturnLabel = '完整课程目录';
+          if (learningPath.kind === 'career-route') {
+            pathReturnHref = 'learning-paths.html#career-route-' + encodeURIComponent(learningPath.id);
+            pathReturnLabel = '返回职业路线';
+          }
+          var pathHtml = '<div class="sidebar-phase-nav"><a href="' + pathReturnHref + '">&larr; ' + pathReturnLabel + '</a></div>';
+          var requiredPathLessons = flatLessons.filter(function (item) { return item.required !== false; });
+          var optionalPathLessons = flatLessons.filter(function (item) { return item.required === false; });
+          pathHtml += '<div class="sidebar-phase-header">' + escapeHtml(learningPath.title || learningPath.id) + ' · ' + requiredPathLessons.length + ' 节课</div>';
+          for (var lpi = 0; lpi < requiredPathLessons.length; lpi++) {
+            var pathLesson = requiredPathLessons[lpi];
+            var pathActive = pathLesson.path === lessonPath;
+            pathHtml += '<a class="sidebar-lesson-link' + (pathActive ? ' active' : '') + learningPathGateClass(pathLesson) + '" href="' + learningPathLessonHref(pathLesson.path) + '"' + learningPathGateAttributes(pathLesson) + '>';
+            pathHtml += '<span class="sidebar-lesson-dot ' + lessonProgressClass(pathLesson.path, true) + '"></span>';
+            pathHtml += escapeHtml(pathLesson.lessonName) + '</a>';
+          }
+          if (optionalPathLessons.length) {
+            pathHtml += '<div class="sidebar-phase-header">可选综合项目</div>';
+            for (var lpo = 0; lpo < optionalPathLessons.length; lpo++) {
+              var optionalLesson = optionalPathLessons[lpo];
+              var optionalActive = optionalLesson.path === lessonPath;
+              pathHtml += '<a class="sidebar-lesson-link' + (optionalActive ? ' active' : '') + learningPathGateClass(optionalLesson) + '" href="' + learningPathLessonHref(optionalLesson.path) + '"' + learningPathGateAttributes(optionalLesson) + '>';
+              pathHtml += '<span class="sidebar-lesson-dot ' + lessonProgressClass(optionalLesson.path, true) + '"></span>';
+              pathHtml += escapeHtml(optionalLesson.lessonName) + '</a>';
+            }
+          }
+          sidebar.innerHTML = pathHtml;
           return;
         }
 
@@ -2292,10 +3410,13 @@
           lessonQuizPromise = Promise.resolve(certificationLesson.quiz || null);
           return lessonQuizPromise;
         }
-        var quizUrl = window.AIFSContentSource
-          ? window.AIFSContentSource.repoUrl(path + '/quiz.json')
+        var source = window.AIFSContentSource;
+        var localPreview = !!(source && typeof source.isLocal === 'function' && source.isLocal());
+        var fetchOptions = localPreview ? { cache: 'no-store' } : undefined;
+        var quizUrl = source
+          ? source.repoUrl(path + '/quiz.json')
           : 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + ACTIVE_REF + '/' + path + '/quiz.json';
-        lessonQuizPromise = fetch(quizUrl)
+        lessonQuizPromise = fetch(quizUrl, fetchOptions)
           .then(function (res) { return res.ok ? res.json() : null; })
           .catch(function () { return null; });
         return lessonQuizPromise;
@@ -2325,12 +3446,15 @@
 
         // 从本次部署所基于的分支拉取 docs（build.js 经 build-meta.js 写入 __AIFS_REF），
         // 使 PR preview 部署渲染自己分支的课程改动，而非永远拉 main；缺省回退 main。
-        var rawUrl = window.AIFSContentSource
-          ? window.AIFSContentSource.repoUrl(path + '/docs/zh.md')
+        var source = window.AIFSContentSource;
+        var localPreview = !!(source && typeof source.isLocal === 'function' && source.isLocal());
+        var fetchOptions = localPreview ? { cache: 'no-store' } : undefined;
+        var rawUrl = source
+          ? source.repoUrl(path + '/docs/zh.md')
           : 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + ACTIVE_REF + '/' + path + '/docs/zh.md';
         startQuizFetch(path, !!retried);
 
-        fetch(rawUrl)
+        fetch(rawUrl, fetchOptions)
           .then(function (res) {
             if (!res.ok) throw new Error('fetch-failed');
             return res.text();
@@ -2357,6 +3481,7 @@
 
       function showError(title, msg) {
         var el = document.getElementById('lessonContent');
+        disposeRenderedLesson(el);
         var contextTrack = certificationContextTrack();
         var backHref = contextTrack ? 'certification.html?id=' + encodeURIComponent(contextTrack.id) : 'index.html';
         var backText = contextTrack ? '返回认证路线' : '返回首页';
@@ -2409,7 +3534,7 @@
             { '@type': 'ListItem', position: 2, name: '认证', item: ORIGIN + '/certifications.html' }
           ];
           if (contextTrack) {
-            breadcrumbs.push({ '@type': 'ListItem', position: 3, name: courseName, item: ORIGIN + '/certification.html?id=' + encodeURIComponent(contextTrack.id) });
+            breadcrumbs.push({ '@type': 'ListItem', position: 3, name: courseName, item: ORIGIN + '/certification?id=' + encodeURIComponent(contextTrack.id) });
           }
           breadcrumbs.push({ '@type': 'ListItem', position: breadcrumbs.length + 1, name: title, item: url });
         } else {
@@ -2435,8 +3560,48 @@
         document.head.appendChild(s);
       }
 
+      var headingHashRestoreFrame = 0;
+      var mermaidRenderSeq = 0;
+      var mermaidPromise = null;
+
+      function disposeTocRuntime() {
+        var sidebar = document.getElementById('tocSidebar');
+        if (!sidebar) return;
+        if (sidebar._tocObserver && sidebar._tocObserver.disconnect) sidebar._tocObserver.disconnect();
+        if (sidebar._tocScrollHandler) window.removeEventListener('scroll', sidebar._tocScrollHandler);
+        if (sidebar._tocResizeHandler) window.removeEventListener('resize', sidebar._tocResizeHandler);
+        sidebar._tocObserver = null;
+        sidebar._tocScrollHandler = null;
+        sidebar._tocResizeHandler = null;
+      }
+
+      function disposeRenderedLesson(root) {
+        if (window.AIFSFigureRuntime && root) window.AIFSFigureRuntime.disposeRoot(root);
+        disposeTocRuntime();
+        mermaidRenderSeq++;
+        if (headingHashRestoreFrame) {
+          window.cancelAnimationFrame(headingHashRestoreFrame);
+          headingHashRestoreFrame = 0;
+        }
+        closeMermaidModal();
+      }
+
+      function restoreHeadingHash() {
+        if (!window.location.hash || window.location.hash.length < 2) return;
+        var id = window.location.hash.slice(1);
+        try { id = decodeURIComponent(id); } catch (_) {}
+        var target = document.getElementById(id);
+        if (!target) return;
+        if (headingHashRestoreFrame) window.cancelAnimationFrame(headingHashRestoreFrame);
+        headingHashRestoreFrame = window.requestAnimationFrame(function () {
+          headingHashRestoreFrame = 0;
+          target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        });
+      }
+
       function renderLesson(md) {
         var el = document.getElementById('lessonContent');
+        disposeRenderedLesson(el);
         var html = parseMd(md);
         html += '<div class="ai-panels" id="aiPanels"></div>';
         html = addBottomNav(html);
@@ -2448,7 +3613,177 @@
           : ' - AI Engineering from Scratch');
         updateLessonSeo(extractTitle(md), md);
 
+        renderLessonActionPanel(el.querySelector('.lesson-article'));
         enhanceLesson();
+      }
+
+      function currentFocusedPathEntry() {
+        if (!learningPathMode || currentLessonIndex < 0) return null;
+        return flatLessons[currentLessonIndex] && flatLessons[currentLessonIndex].path === lessonPath
+          ? flatLessons[currentLessonIndex]
+          : flatLessons.find(function (item) { return item.path === lessonPath; }) || null;
+      }
+
+      function lessonActionPathHtml() {
+        if (!learningPathMode || !learningPath) return '';
+        var entry = currentFocusedPathEntry();
+        var quickStart = learningPath.quickStart || null;
+        var html = '<div class="lesson-action-path"><div class="lesson-action-label">学习路线上下文</div>';
+        if (entry && entry.checkpointEvidence && entry.checkpointEvidence.length) {
+          html += '<p>请保留下列检查点证据：</p><ul>';
+          for (var i = 0; i < entry.checkpointEvidence.length; i++) {
+            html += '<li>' + escapeHtml(String(entry.checkpointEvidence[i])) + '</li>';
+          }
+          html += '</ul>';
+        } else if (entry && entry.checkpoint) {
+          html += '<p><strong>检查点：</strong> ' + escapeHtml(entry.checkpoint) + '</p>';
+        }
+        if (quickStart && quickStart.lessonPath === lessonPath) {
+          html += '<p><strong>快速开始：</strong> ' + escapeHtml(quickStart.goal || '完成第一个可执行检查点。') + '</p>';
+          if (quickStart.estimatedMinutes) html += '<p>首次运行预计需要约 ' + escapeHtml(String(quickStart.estimatedMinutes)) + ' 分钟。</p>';
+          var quickStartCommand = quickStart.command || quickStart.installCommand || '';
+          if (quickStartCommand) html += '<p><strong>快速开始命令：</strong> <code>' + escapeHtml(quickStartCommand) + '</code></p>';
+          if (quickStart.expectedEvidence && quickStart.expectedEvidence.length) {
+            html += '<p>快速开始应留下的证据：</p><ul>';
+            for (var q = 0; q < quickStart.expectedEvidence.length; q++) {
+              html += '<li>' + escapeHtml(String(quickStart.expectedEvidence[q])) + '</li>';
+            }
+            html += '</ul>';
+          }
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function lessonActionRunFile(files) {
+        if (!Array.isArray(files)) return null;
+        var supported = /\.(py|ts|js|rs|jl|sh)$/i;
+        for (var i = 0; i < files.length; i++) {
+          var name = files[i] && String(files[i].name || '').trim();
+          if (/^main\.(py|ts|js|rs|jl|sh)$/i.test(name)) return files[i];
+        }
+        for (var j = 0; j < files.length; j++) {
+          var fallbackName = files[j] && String(files[j].name || '').trim();
+          if (files.length === 1 && supported.test(fallbackName)) return files[j];
+        }
+        return null;
+      }
+
+      function setLessonActionRun(panel, files) {
+        if (!panel || !panel.isConnected) return;
+        var commandEl = panel.querySelector('.lesson-action-command');
+        var copyBtn = panel.querySelector('.lesson-action-copy');
+        var note = panel.querySelector('.lesson-action-note');
+        var file = lessonActionRunFile(files);
+        if (!file) {
+          panel._lessonRunCommand = '';
+          if (commandEl) commandEl.textContent = '未检测到独立的 main 入口文件';
+          if (copyBtn) copyBtn.hidden = true;
+          if (note) note.textContent = '请参考正文示例。只有实际执行了合适的示例或练习后，才标记“运行”；代码围栏不自动等于可运行程序。';
+          return;
+        }
+        var filePath = file.path || file.file || (lessonPath + '/code/' + file.name);
+        var command = repoRootCommand(file.name, filePath);
+        panel._lessonRunCommand = command;
+        if (commandEl) commandEl.textContent = command;
+        if (copyBtn) copyBtn.hidden = false;
+        if (note) note.textContent = '请从包含 README.md 的仓库根目录运行。';
+      }
+
+      function resolveLessonActionRun(panel) {
+        if (certificationLesson && certificationLesson.files) {
+          setLessonActionRun(panel, certificationLesson.files.code || []);
+          return;
+        }
+        repositoryDirectoryFetch(lessonPath + '/code', function (err, files) {
+          setLessonActionRun(panel, err ? [] : files);
+        });
+      }
+
+      function renderLessonActionPanel(article) {
+        if (!article || !window.AIFSProgress) return;
+        var entry = currentFocusedPathEntry();
+        var panel = document.createElement('aside');
+        panel.id = 'lessonActionPanel';
+        panel.className = 'lesson-action-panel';
+        panel.setAttribute('aria-labelledby', 'lessonActionTitle');
+        var tags = '<span class="lesson-action-tag">本地进度</span>';
+        if (learningPathMode && learningPath) {
+          tags += '<span class="lesson-action-tag">' + escapeHtml(learningPath.title || learningPath.id) + '</span>';
+          if (learningPath.estimatedMinutes) tags += '<span class="lesson-action-tag">路线 ' + escapeHtml(String(learningPath.estimatedMinutes)) + ' 分钟</span>';
+          if (entry && entry.minutes) tags += '<span class="lesson-action-tag">本课 ' + escapeHtml(String(entry.minutes)) + ' 分钟</span>';
+          if (entry && entry.group) tags += '<span class="lesson-action-tag">分组 ' + escapeHtml(entry.group) + '</span>';
+        }
+        panel.innerHTML =
+          '<div class="lesson-action-head"><div><h2 class="lesson-action-title" id="lessonActionTitle">把这节课落实成行动</h2>' +
+          '<p class="lesson-action-intro">用这组步骤把阅读转成可核查的证据。每个检查点独立记录，不等同于测验正确率。</p></div>' +
+          '<div class="lesson-action-status" role="status" aria-live="polite">已完成 0/5 个检查点</div></div>' +
+          '<div class="lesson-action-loop" aria-label="课程工作流检查点">' +
+          '<button class="lesson-action-step" type="button" data-checkpoint="read"><span class="lesson-action-step-num">01</span><span class="lesson-action-step-title">阅读</span><span class="lesson-action-step-copy">理解主张与约束。</span></button>' +
+          '<button class="lesson-action-step" type="button" data-checkpoint="built"><span class="lesson-action-step-num">02</span><span class="lesson-action-step-title">构建</span><span class="lesson-action-step-copy">创建或修改课程产出。</span></button>' +
+          '<button class="lesson-action-step" type="button" data-checkpoint="ran"><span class="lesson-action-step-num">03</span><span class="lesson-action-step-title">运行</span><span class="lesson-action-step-copy">执行对应程序或练习。</span></button>' +
+          '<button class="lesson-action-step" type="button" data-checkpoint="evidence"><span class="lesson-action-step-num">04</span><span class="lesson-action-step-title">举证</span><span class="lesson-action-step-copy">保存能支撑结论的输出。</span></button>' +
+          '<button class="lesson-action-step" type="button" data-lesson-complete="true"><span class="lesson-action-step-num">05</span><span class="lesson-action-step-title">继续</span><span class="lesson-action-step-copy">准备好后标记本课完成。</span></button>' +
+          '</div><div class="lesson-action-body"><div class="lesson-action-tags">' + tags + '</div>' +
+          '<div class="lesson-action-run"><div class="lesson-action-label">从仓库运行</div>' +
+          '<div class="lesson-action-command-row"><code class="lesson-action-command">正在查找独立的可运行文件</code><button class="lesson-action-copy" type="button" hidden>复制命令</button></div>' +
+          '<p class="lesson-action-note">页面正在检查本课的 code 目录是否有独立入口。</p></div>' +
+          lessonActionPathHtml() + '</div>';
+
+        var metaTags = article.querySelectorAll('.lesson-meta-tag');
+        var anchor = metaTags.length ? metaTags[metaTags.length - 1] : article.querySelector('.learning-objectives, .motto, h1');
+        if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(panel, anchor.nextSibling);
+        else article.insertBefore(panel, article.firstChild);
+
+        panel.querySelectorAll('[data-checkpoint]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            window.AIFSProgress.toggleCheckpoint(lessonPath, button.getAttribute('data-checkpoint'));
+          });
+        });
+        var completeButton = panel.querySelector('[data-lesson-complete]');
+        if (completeButton) {
+          completeButton.addEventListener('click', function () {
+            if (window.AIFSProgress.isLessonComplete(lessonPath)) window.AIFSProgress.unmarkLessonComplete(lessonPath);
+            else window.AIFSProgress.markLessonComplete(lessonPath, 'learner');
+          });
+        }
+        var copyButton = panel.querySelector('.lesson-action-copy');
+        if (copyButton) {
+          copyButton.addEventListener('click', function () {
+            if (!panel._lessonRunCommand || !navigator.clipboard) return;
+            navigator.clipboard.writeText(panel._lessonRunCommand).then(function () {
+              copyButton.textContent = '已复制';
+              window.setTimeout(function () {
+                if (copyButton.isConnected) copyButton.textContent = '复制命令';
+              }, 1200);
+            });
+          });
+        }
+        syncLessonActionProgress();
+        resolveLessonActionRun(panel);
+      }
+
+      function syncLessonActionProgress() {
+        var panel = document.getElementById('lessonActionPanel');
+        if (!panel || !window.AIFSProgress || !lessonPath) return;
+        var progress = window.AIFSProgress.getLessonProgress(lessonPath);
+        var checkpoints = progress && progress.checkpoints ? progress.checkpoints : {};
+        var doneCount = 0;
+        panel.querySelectorAll('[data-checkpoint]').forEach(function (button) {
+          var done = !!checkpoints[button.getAttribute('data-checkpoint') + 'At'];
+          button.classList.toggle('is-done', done);
+          button.setAttribute('aria-pressed', done ? 'true' : 'false');
+          if (done) doneCount++;
+        });
+        var completeButton = panel.querySelector('[data-lesson-complete]');
+        var complete = !!(progress && progress.completedAt);
+        if (completeButton) {
+          completeButton.classList.toggle('is-done', complete);
+          completeButton.setAttribute('aria-pressed', complete ? 'true' : 'false');
+        }
+        if (complete) doneCount++;
+        var status = panel.querySelector('.lesson-action-status');
+        if (status) status.textContent = '已完成 ' + doneCount + '/5 个检查点 · 测验' + (progress && progress.quizPassedAt ? '已通过' : '尚未通过');
       }
 
       function certificationDisclaimerHtml() {
@@ -2471,6 +3806,8 @@
       // （正文已在 HTML 里，boot 直接调用）。前提：#lessonContent 内已有正文。
       function enhanceLesson() {
         var el = document.getElementById('lessonContent');
+        var article = el && el.querySelector('.lesson-article');
+        if (article && !article.querySelector('#lessonActionPanel')) renderLessonActionPanel(article);
 
         initCodeCopy();
         renderMermaidBlocks();
@@ -2827,7 +4164,34 @@
         });
       }
 
-      function renderMermaidBlocks() {
+      function initializeMermaid(mermaid) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: mermaidTheme(),
+          fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+          themeVariables: { fontSize: '13px' },
+          flowchart: { useMaxWidth: true, htmlLabels: true, nodeSpacing: 40, rankSpacing: 50, padding: 12 }
+        });
+        window._mermaidReady = mermaid;
+        return mermaid;
+      }
+
+      function loadMermaid() {
+        if (window._mermaidReady) return Promise.resolve(window._mermaidReady);
+        if (!mermaidPromise) {
+          mermaidPromise = import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')
+            .then(function (module) { return initializeMermaid(module.default || module); })
+            .catch(function (error) {
+              mermaidPromise = null;
+              throw error;
+            });
+        }
+        return mermaidPromise;
+      }
+
+      function renderMermaidBlocks(root) {
+        var sources = (root || document).querySelectorAll('pre.mermaid.mermaid-source');
+        if (!sources.length) return Promise.resolve();
         var fontsReady = (document.fonts && document.fonts.load)
           ? Promise.all([
               document.fonts.load('400 13px "JetBrains Mono"'),
@@ -2835,16 +4199,20 @@
               document.fonts.load('700 13px "JetBrains Mono"')
             ]).catch(function () {})
           : Promise.resolve();
-        var check = setInterval(function () {
-          if (!window._mermaidReady) return;
-          clearInterval(check);
-          fontsReady.then(function () {
+        return loadMermaid().then(function () {
+          return fontsReady.then(function () {
+            if (root && !root.isConnected) return;
             rerenderMermaidBlocks();
             bindMermaidToolbar();
             initMermaidModal();
           });
-        }, 100);
-        setTimeout(function () { clearInterval(check); }, 10000);
+        }).catch(function () {
+          sources.forEach(function (source) {
+            var block = source.closest('.mermaid-block');
+            var target = block && block.querySelector('.mermaid-render');
+            if (target) target.innerHTML = '<p>图表无法渲染。</p>';
+          });
+        });
       }
 
       function mermaidTheme() {
@@ -3028,8 +4396,6 @@
 
       var lastMermaidTrigger = null;
       var openMermaidIndex = null;
-      var mermaidRenderSeq = 0;
-
       function getMermaidModalFocusables() {
         var modal = document.querySelector('#mermaidModalOverlay .mermaid-modal');
         if (!modal) return [];
@@ -3104,6 +4470,7 @@
       function renderQuiz(data) {
         var questions = data.questions || data;
         if (!questions || !questions.length) return;
+        lessonQuizCorrectAnswers = Object.create(null);
 
         var article = document.querySelector('.lesson-article');
         if (!article) return;
@@ -3180,7 +4547,8 @@
           var questionLabelId = qid + '-label';
           var explanationId = qid + '-exp';
           var hasExplanation = !!q.explanation || !!certificationLesson;
-          html += '<div class="quiz-question" data-correct="' + q.correct + '" id="' + qid + '">';
+          lessonQuizCorrectAnswers[qid] = q.correct;
+          html += '<div class="quiz-question" id="' + qid + '">';
           html += '<div class="quiz-question-text" id="' + questionLabelId + '">' + (qi + 1) + '. ' + escapeHtml(q.question) + '</div>';
           html += '<div class="quiz-options" role="group" aria-labelledby="' + questionLabelId + '">';
           for (var oi = 0; oi < q.options.length; oi++) {
@@ -3208,9 +4576,9 @@
 
       function applyQuizAnswer(questionDiv, chosen, persist) {
         if (!questionDiv || isNaN(chosen)) return;
-        var correct = parseInt(questionDiv.getAttribute('data-correct'));
+        var correct = lessonQuizCorrectAnswers[questionDiv.id];
         var options = questionDiv.querySelectorAll('.quiz-option');
-        if (chosen < 0 || chosen >= options.length || isNaN(correct)) return;
+        if (chosen < 0 || chosen >= options.length || !Number.isInteger(correct)) return;
         questionDiv.classList.add('answered');
 
         for (var i = 0; i < options.length; i++) {
@@ -3295,7 +4663,7 @@
           if (sections[s].querySelector('.quiz-option.incorrect')) return;
         }
         if (certificationLesson) syncCertificationQuizProgressVersion();
-        window.AIFSProgress.markLessonComplete(lessonPath);
+        window.AIFSProgress.markQuizPassed(lessonPath);
       }
 
       function resetLessonQuizSection(trigger) {
@@ -3356,30 +4724,33 @@
 
         var prev = null;
         for (var pi = currentLessonIndex - 1; pi >= 0; pi--) {
+          if (learningPathMode && flatLessons[pi].required === false) continue;
           if (flatLessons[pi].isReadable) { prev = flatLessons[pi]; break; }
         }
         var next = null;
         for (var ni = currentLessonIndex + 1; ni < flatLessons.length; ni++) {
+          if (learningPathMode && flatLessons[ni].required === false) continue;
           if (flatLessons[ni].isReadable) { next = flatLessons[ni]; break; }
         }
 
-        var nav = '<div class="lesson-nav-bottom">';
-        var trackSuffix = certificationMode ? '&track=' + encodeURIComponent(certificationTrack.id) : '';
+        var nav = '<nav class="lesson-nav-bottom" aria-label="课程导航">';
+        var trackSuffix = certificationMode
+          ? '&track=' + encodeURIComponent(certificationTrack.id)
+          : learningPathMode ? '&learningPath=' + encodeURIComponent(learningPath.id) : '';
         if (prev) {
           nav += '<a class="lesson-nav-btn prev" href="' + lessonHref(prev.path) + trackSuffix + '">';
           nav += '<span class="nav-label">&larr; 上一节</span>';
           nav += '<span class="nav-title">' + escapeHtml(prev.lessonName) + '</span>';
           nav += '</a>';
-        } else {
-          nav += '<div></div>';
         }
         if (next) {
-          nav += '<a class="lesson-nav-btn next" href="' + lessonHref(next.path) + trackSuffix + '">';
-          nav += '<span class="nav-label">下一节 &rarr;</span>';
+          var nextLocked = learningPathMode && learningPathEntryLocked(next);
+          nav += '<a class="lesson-nav-btn next' + (learningPathMode ? learningPathGateClass(next) : '') + '" href="' + lessonHref(next.path) + trackSuffix + '"' + (learningPathMode ? learningPathGateAttributes(next) : '') + '>';
+          nav += '<span class="nav-label" data-learning-path-gate-label>' + (nextLocked ? '尚未解锁' : '下一节 &rarr;') + '</span>';
           nav += '<span class="nav-title">' + escapeHtml(next.lessonName) + '</span>';
           nav += '</a>';
         }
-        nav += '</div>';
+        nav += '</nav>';
         return html + nav;
       }
 
@@ -3394,25 +4765,30 @@
         renderContinuePanel(container);
       }
 
-      var ghApiCache = {};
+      var repositoryDirectoryCache = {};
 
-      function ghApiFetch(apiPath, cb) {
-        if (ghApiCache[apiPath]) {
-          cb(null, ghApiCache[apiPath]);
+      function githubDirectoryFetch(apiPath) {
+        return fetch('https://api.github.com/repos/' + SOURCE_OWNER + '/' + SOURCE_REPO + '/contents/' + apiPath + '?ref=' + encodeURIComponent(ACTIVE_REF), {
+          headers: { 'Accept': 'application/vnd.github.v3+json' }
+        }).then(function (res) {
+          if (!res.ok) throw new Error(res.status);
+          return res.json();
+        });
+      }
+
+      function repositoryDirectoryFetch(apiPath, cb) {
+        if (repositoryDirectoryCache[apiPath]) {
+          cb(null, repositoryDirectoryCache[apiPath]);
           return;
         }
+
         var source = window.AIFSContentSource;
         var request = source && typeof source.isLocal === 'function' && source.isLocal() && typeof source.localDirectoryFiles === 'function'
-          ? source.localDirectoryFiles(apiPath).catch(function () {
-              return fetch('https://api.github.com/repos/fancyboi999/ai-engineering-from-scratch-zh/contents/' + apiPath + '?ref=' + encodeURIComponent(ACTIVE_REF), {
-                headers: { 'Accept': 'application/vnd.github.v3+json' }
-              }).then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); });
-            })
-          : fetch('https://api.github.com/repos/fancyboi999/ai-engineering-from-scratch-zh/contents/' + apiPath + '?ref=' + encodeURIComponent(ACTIVE_REF), {
-              headers: { 'Accept': 'application/vnd.github.v3+json' }
-            }).then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); });
+          ? source.localDirectoryFiles(apiPath).catch(function () { return githubDirectoryFetch(apiPath); })
+          : githubDirectoryFetch(apiPath);
+
         request.then(function (data) {
-          ghApiCache[apiPath] = data;
+          repositoryDirectoryCache[apiPath] = data;
           cb(null, data);
         }).catch(function (err) {
           cb(err, null);
@@ -3420,10 +4796,39 @@
       }
 
       function classifyOutput(name) {
-        var lower = name.toLowerCase();
+        var lower = String(name || '').toLowerCase();
         if (lower.indexOf('prompt') >= 0) return 'prompt';
         if (lower.indexOf('skill') >= 0) return 'skill';
+        if (lower.indexOf('agent') >= 0) return 'agent';
         return 'other';
+      }
+
+      function outputFileName(file) {
+        return file && typeof file.name === 'string' ? file.name.trim() : '';
+      }
+
+      function isRenderableOutput(file) {
+        var name = outputFileName(file);
+        return !!name && name.charAt(0) !== '.' && (!file.type || file.type !== 'dir');
+      }
+
+      function isMarkdownOutput(file) {
+        return /\.md(?:own)?$/i.test(outputFileName(file));
+      }
+
+      function outputType(file) {
+        var declared = file && typeof file.kind === 'string' ? file.kind.toLowerCase() : '';
+        return ['prompt', 'skill', 'agent'].indexOf(declared) >= 0
+          ? declared
+          : classifyOutput(outputFileName(file));
+      }
+
+      function outputBadgeLabel(type, filename) {
+        if (type === 'prompt') return '提示词';
+        if (type === 'skill') return '技能';
+        if (type === 'agent') return 'Agent';
+        var extension = String(filename || '').match(/\.([a-z0-9]+)$/i);
+        return extension ? extension[1].toUpperCase() + ' 产出' : '产出';
       }
 
       function langIcon(filename) {
@@ -3432,15 +4837,19 @@
         return map[ext] || '··';
       }
 
-      function langCommand(filename) {
+      function repoRootCommand(filename, path) {
         var ext = filename.split('.').pop().toLowerCase();
-        if (ext === 'py') return 'python';
-        if (ext === 'ts') return 'npx tsx';
-        if (ext === 'js') return 'node';
-        if (ext === 'rs') return 'cargo run --';
-        if (ext === 'jl') return 'julia';
-        if (ext === 'sh') return 'bash';
-        return 'run';
+        var relativePath = String(path).replace(/^\/+/, '');
+        var pathArg = /^[A-Za-z0-9_./-]+$/.test(relativePath)
+          ? relativePath
+          : "'" + relativePath.replace(/'/g, "'\\''") + "'";
+        if (ext === 'py') return 'python3 ' + pathArg;
+        if (ext === 'ts') return 'npx tsx ' + pathArg;
+        if (ext === 'js') return 'node ' + pathArg;
+        if (ext === 'rs') return 'rustc ' + pathArg + ' -o /tmp/aieng-zh-lesson-main && /tmp/aieng-zh-lesson-main';
+        if (ext === 'jl') return 'julia ' + pathArg;
+        if (ext === 'sh') return 'bash ' + pathArg;
+        return 'test -e ' + pathArg;
       }
 
       function formatSize(bytes) {
@@ -3448,83 +4857,142 @@
         return (bytes / 1024).toFixed(1) + ' KB';
       }
 
-      function extractFrontmatterDesc(content) {
+      function extractMarkdownDesc(content) {
         var match = content.match(/^---[\s\S]*?description:\s*(.+?)[\r\n]/m);
         if (match) return match[1].replace(/^["']|["']$/g, '').trim();
         var firstLine = content.split('\n').find(function (l) { return l.trim() && !l.match(/^[#-]/) && !l.match(/^---/); });
         return firstLine ? firstLine.trim().substring(0, 120) : '';
       }
 
-      function embeddedFileViewUrl(file) {
-        return REPO_TREE + (file && file.path ? file.path : lessonPath);
+      function lessonFileViewUrl(file) {
+        var filePath = file && (file.path || file.file);
+        if (file && file.html_url) return file.html_url;
+        return REPO_TREE + (filePath || lessonPath);
       }
 
-      function embeddedFileSourceUrl(file) {
-        if (!file || !file.path) return '';
-        return window.AIFSContentSource
-          ? window.AIFSContentSource.repoUrl(file.path)
-          : 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + ACTIVE_REF + '/' + file.path;
+      function lessonFileSourceUrl(file) {
+        var filePath = file && (file.path || file.file);
+        if (file && file.download_url) return file.download_url;
+        if (filePath && window.AIFSContentSource) return window.AIFSContentSource.repoUrl(filePath);
+        return '';
       }
 
-      function renderEmbeddedOutputFiles(outputsEl, data) {
-        if (!Array.isArray(data) || data.length === 0) {
-          outputsEl.innerHTML = '<div class="panel-fallback"><p>本课没有单独的交付文件，课程内容本身就是交付产物。</p></div>';
+      function renderPanelFallback(target, message, href, label) {
+        target.classList.remove('panel-loading');
+        target.textContent = '';
+        var fallback = document.createElement('div');
+        fallback.className = 'panel-fallback';
+        var copy = document.createElement('p');
+        copy.textContent = message;
+        fallback.appendChild(copy);
+        if (href) {
+          var link = document.createElement('a');
+          link.href = href;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = label || '打开源码';
+          fallback.appendChild(link);
+        }
+        target.appendChild(fallback);
+      }
+
+      function renderOutputFiles(outputsEl, data) {
+        outputsEl.classList.remove('panel-loading');
+        var visibleOutputs = Array.isArray(data) ? data.filter(isRenderableOutput) : [];
+        if (visibleOutputs.length === 0) {
+          renderPanelFallback(outputsEl, '本课没有单独的产出文件，课程内容本身就是交付物。', '', '');
           return;
         }
-        var html = '<div class="output-cards">';
-        data.forEach(function (file, idx) {
-          var type = classifyOutput(file.name);
-          var badgeText = type === 'prompt' ? '提示词' : type === 'skill' ? '技能' : '产出';
+
+        var descriptionRequests = [];
+        var html = '<div class="output-cards' + (visibleOutputs.length === 1 ? ' single' : '') + '">';
+        visibleOutputs.forEach(function (file, idx) {
+          var filename = outputFileName(file);
+          var type = outputType(file);
+          var badgeClass = type;
+          var badgeText = type === 'skill' && file.bundle ? '技能包' : outputBadgeLabel(type, filename);
           var installId = 'install-hint-' + idx;
           var installHint = '';
+          var installCommand = '';
+          var viewUrl = lessonFileViewUrl(file);
+          var viewLabel = file.bundle ? '打开 SKILL.md' : '打开文件';
+          var bundleUrl = '';
+          var bundleLabel = '';
+          if (file.bundle && file.bundlePath) {
+            bundleUrl = REPO_TREE + file.bundlePath;
+            bundleLabel = '浏览技能包（' + (Array.isArray(file.files) ? file.files.length : 0) + ' 个文件）';
+          }
           if (type === 'prompt') {
-            installHint = '粘贴到 Claude、Cursor、Codex、OpenClaw、Hermes，或任何能读取 prompt 的 agent 中';
+            installHint = '粘贴到 Claude、Cursor、Codex、OpenClaw、Hermes，或任何能读取提示词的 agent 中';
           } else if (type === 'skill') {
-            var skillName = file.name.replace(/\.md$/, '').replace(/^skill-/, '');
-            installHint = 'npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill ' + skillName;
+            var skillName = file.kind === 'skill'
+              ? file.name
+              : file.name.replace(/\.md$/, '').replace(/^skill-/, '');
+            installCommand = 'npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill ' + skillName + ' --full-depth';
+            installHint = installCommand;
           }
-          html += '<div class="output-card"><div class="output-badge ' + type + '">' + badgeText + '</div>';
-          html += '<div class="output-card-name">' + escapeHtml(file.name) + '</div>';
-          html += '<div class="output-desc" id="desc-' + idx + '">' + escapeHtml(file.description || file.name) + '</div>';
-          html += '<div class="output-actions"><a class="output-btn" href="' + escapeAttr(embeddedFileViewUrl(file)) + '" target="_blank" rel="noopener">查看文件</a>';
-          if (installHint) html += '<button class="output-btn" type="button" onclick="var h=document.getElementById(\'' + installId + '\');h.classList.toggle(\'visible\')">安装</button>';
-          html += '</div>';
-          if (installHint) html += '<div class="output-install-hint" id="' + installId + '">' + escapeHtml(installHint) + '</div>';
-          html += '</div>';
-          if (!file.description) {
-            var sourceUrl = embeddedFileSourceUrl(file);
-            if (sourceUrl) {
-              fetch(sourceUrl).then(function (res) { return res.text(); }).then(function (content) {
-                var descEl = document.getElementById('desc-' + idx);
-                if (descEl) descEl.textContent = extractFrontmatterDesc(content) || file.name;
-              }).catch(function () {});
-            }
-          }
-        });
-        outputsEl.innerHTML = html + '</div>';
-      }
 
-      function renderEmbeddedCodeFiles(codeEl, data) {
-        if (!Array.isArray(data) || data.length === 0) {
-          codeEl.innerHTML = '<div class="panel-fallback"><p>本课没有单独的可运行文件，请使用正文中的完整示例。</p></div>';
-          return;
-        }
-        var html = '<div class="code-cards">';
-        data.forEach(function (file) {
-          var icon = langIcon(file.name);
-          var filePath = file.path || (lessonPath + '/code/' + file.name);
-          var runCmd = langCommand(file.name) + ' ' + filePath;
-          html += '<div class="code-card"><div class="code-card-header"><span class="code-lang-icon">' + icon + '</span><span class="code-card-name">' + escapeHtml(file.name) + '</span></div>';
-          html += '<div class="code-card-size">' + formatSize(Number(file.size || 0)) + '</div><div class="code-card-run">' + escapeHtml(runCmd) + '</div>';
-          html += '<div class="code-card-actions"><a class="code-card-btn" href="' + escapeAttr(embeddedFileViewUrl(file)) + '" target="_blank" rel="noopener">查看文件</a>';
-          html += '<button class="code-card-btn code-card-copy" type="button" data-command="' + escapeAttr(runCmd) + '">复制命令</button></div></div>';
+          var actionCount = 1 + (bundleUrl ? 1 : 0) + (installHint ? 1 : 0) + (installCommand ? 1 : 0);
+          html += '<div class="output-card' + (actionCount > 2 ? ' output-card--stacked-actions' : '') + '">';
+          html += '<div class="output-card-main">';
+          html += '<div class="output-card-heading">';
+          html += '<span class="output-badge ' + badgeClass + '">' + badgeText + '</span>';
+          html += '<span class="output-card-name">' + escapeHtml(filename) + '</span>';
+          html += '</div>';
+          if (file.description) {
+            html += '<div class="output-desc" data-output-description="' + idx + '">' + escapeHtml(file.description) + '</div>';
+          } else if (isMarkdownOutput(file)) {
+            html += '<div class="output-desc" data-output-description="' + idx + '" hidden></div>';
+            descriptionRequests.push({ file: file, index: idx });
+          }
+          html += '</div>';
+          html += '<div class="output-actions">';
+          html += '<a class="output-btn" href="' + escapeAttr(viewUrl) + '" target="_blank" rel="noopener">' + viewLabel + '</a>';
+          if (bundleUrl) {
+            html += '<a class="output-btn" href="' + escapeAttr(bundleUrl) + '" target="_blank" rel="noopener">' + escapeHtml(bundleLabel) + '</a>';
+          }
+          if (installHint) {
+            html += '<button class="output-btn output-install-toggle" type="button" aria-expanded="false" aria-controls="' + installId + '">安装</button>';
+          }
+          if (installCommand) {
+            html += '<button class="output-btn output-install-copy" data-command="' + escapeAttr(installCommand) + '">复制安装命令</button>';
+          }
+          html += '</div>';
+          if (installHint) {
+            html += '<div class="output-install-hint" id="' + installId + '">' + escapeHtml(installHint) + '</div>';
+          }
+          html += '</div>';
         });
-        codeEl.innerHTML = html + '</div>';
-        codeEl.querySelectorAll('.code-card-copy').forEach(function (button) {
-          button.addEventListener('click', function () {
-            navigator.clipboard.writeText(button.getAttribute('data-command')).then(function () {
-              button.textContent = '已复制！';
-              setTimeout(function () { button.textContent = '复制命令'; }, 1500);
+        html += '</div>';
+        outputsEl.innerHTML = html;
+        descriptionRequests.forEach(function (request) {
+          var sourceUrl = lessonFileSourceUrl(request.file);
+          if (!sourceUrl) return;
+          fetch(sourceUrl).then(function (response) {
+            if (!response.ok) throw new Error('fetch-failed');
+            return response.text();
+          }).then(function (content) {
+            if (!outputsEl.isConnected) return;
+            var desc = extractMarkdownDesc(content);
+            var descEl = outputsEl.querySelector('[data-output-description="' + request.index + '"]');
+            if (!desc || !descEl) return;
+            descEl.textContent = desc;
+            descEl.hidden = false;
+          }).catch(function () {});
+        });
+        outputsEl.querySelectorAll('.output-install-toggle').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var hint = document.getElementById(btn.getAttribute('aria-controls'));
+            if (!hint) return;
+            var expanded = hint.classList.toggle('visible');
+            btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+          });
+        });
+        outputsEl.querySelectorAll('.output-install-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            navigator.clipboard.writeText(btn.getAttribute('data-command')).then(function () {
+              btn.textContent = '已复制！';
+              setTimeout(function () { btn.textContent = '复制安装命令'; }, 1500);
             });
           });
         });
@@ -3532,111 +5000,85 @@
 
       function renderOutputsPanel(container) {
         var panel = document.createElement('div');
-        panel.className = 'ai-panel';
+        panel.className = 'ai-panel ai-panel--compact ai-panel--outputs';
         panel.innerHTML = '<div class="ai-panel-header"><div class="ai-panel-icon">O</div><div class="ai-panel-title">本节课交付了什么</div></div><div class="ai-panel-subtitle">可以马上拿来用的提示词、技能和产出</div><div id="outputsContent" class="panel-loading">正在加载产出…</div>';
         container.appendChild(panel);
 
         var outputsEl = panel.querySelector('#outputsContent');
         if (certificationLesson && certificationLesson.files) {
-          renderEmbeddedOutputFiles(outputsEl, certificationLesson.files.outputs || []);
+          renderOutputFiles(outputsEl, certificationLesson.files.outputs || []);
           return;
         }
-        ghApiFetch(lessonPath + '/outputs', function (err, data) {
+
+        repositoryDirectoryFetch(lessonPath + '/outputs', function (err, data) {
           if (!outputsEl || !outputsEl.parentNode) return;
-          if (err || !data || !Array.isArray(data) || data.length === 0) {
-            outputsEl.innerHTML = '<div class="panel-fallback"><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/' + lessonPath + '" target="_blank" rel="noopener">在 GitHub 上查看本课</a></div>';
+          var source = window.AIFSContentSource;
+          var directoryEntries = Array.isArray(data) ? data : [];
+          var artifacts = typeof ARTIFACTS !== 'undefined' && Array.isArray(ARTIFACTS) ? ARTIFACTS : [];
+          var outputs = source && typeof source.mergeLessonOutputs === 'function'
+            ? source.mergeLessonOutputs(lessonPath, directoryEntries, artifacts)
+            : directoryEntries;
+          if (outputs.length === 0) {
+            renderPanelFallback(outputsEl, '本课没有找到单独的产出文件。', REPO_TREE + lessonPath, '查看课程源码');
             return;
           }
+          renderOutputFiles(outputsEl, outputs);
+        });
+      }
 
-          var html = '<div class="output-cards">';
-          data.forEach(function (file, idx) {
-            var type = classifyOutput(file.name);
-            var badgeClass = type;
-            var badgeText = type === 'prompt' ? '提示词' : type === 'skill' ? '技能' : '产出';
-            var installId = 'install-hint-' + idx;
-            var installHint = '';
-            if (type === 'prompt') {
-              installHint = '粘贴到 Claude、Cursor、Codex、OpenClaw、Hermes，或任何能读取提示词的智能体中';
-            } else if (type === 'skill') {
-              var skillName = file.name.replace(/\.md$/, '').replace(/^skill-/, '');
-              installHint = 'npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill ' + skillName;
-            }
+      function renderCodeFiles(codeEl, data) {
+        codeEl.classList.remove('panel-loading');
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          renderPanelFallback(codeEl, '本课没有单独的可运行文件，请使用正文中的完整示例。', '', '');
+          return;
+        }
 
-            html += '<div class="output-card">';
-            html += '<div class="output-badge ' + badgeClass + '">' + badgeText + '</div>';
-            html += '<div class="output-card-name">' + escapeHtml(file.name) + '</div>';
-            html += '<div class="output-desc" id="desc-' + idx + '">正在加载描述…</div>';
-            html += '<div class="output-actions">';
-            html += '<a class="output-btn" href="' + file.html_url + '" target="_blank" rel="noopener">在 GitHub 上查看</a>';
-            if (installHint) {
-              html += '<button class="output-btn" onclick="var h=document.getElementById(\'' + installId + '\');h.classList.toggle(\'visible\')">安装</button>';
-            }
-            html += '</div>';
-            if (installHint) {
-              html += '<div class="output-install-hint" id="' + installId + '">' + escapeHtml(installHint) + '</div>';
-            }
-            html += '</div>';
-
-            fetch(file.download_url).then(function (r) { return r.text(); }).then(function (content) {
-              var descEl = document.getElementById('desc-' + idx);
-              if (descEl) {
-                var desc = extractFrontmatterDesc(content);
-                descEl.textContent = desc || file.name;
-              }
-            }).catch(function () {
-              var descEl = document.getElementById('desc-' + idx);
-              if (descEl) descEl.textContent = file.name;
+        var html = '<div class="code-cards' + (data.length === 1 ? ' single' : '') + '">';
+        data.forEach(function (file) {
+          var icon = langIcon(file.name);
+          var filePath = file.path || (lessonPath + '/code/' + file.name);
+          var runCmd = repoRootCommand(file.name, filePath);
+          html += '<div class="code-card">';
+          html += '<div class="code-card-header"><span class="code-lang-icon">' + icon + '</span><span class="code-card-name">' + escapeHtml(file.name) + '</span><span class="code-card-size">' + formatSize(Number(file.size || 0)) + '</span></div>';
+          html += '<div class="code-card-run">' + escapeHtml(runCmd) + '</div>';
+          html += '<div class="code-card-actions">';
+          html += '<a class="code-card-btn" href="' + escapeAttr(lessonFileViewUrl(file)) + '" target="_blank" rel="noopener">打开文件</a>';
+          html += '<button class="code-card-btn code-card-copy" data-command="' + escapeAttr(runCmd) + '">复制命令</button>';
+          html += '</div>';
+          html += '</div>';
+        });
+        html += '</div>';
+        codeEl.innerHTML = html;
+        codeEl.querySelectorAll('.code-card-copy').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var command = btn.getAttribute('data-command');
+            navigator.clipboard.writeText(command).then(function () {
+              btn.textContent = '已复制！';
+              setTimeout(function () { btn.textContent = '复制命令'; }, 1500);
             });
           });
-          html += '</div>';
-          outputsEl.innerHTML = html;
         });
       }
 
       function renderCodePanel(container) {
         var panel = document.createElement('div');
-        panel.className = 'ai-panel';
-        panel.innerHTML = '<div class="ai-panel-header"><div class="ai-panel-icon">C</div><div class="ai-panel-title">运行代码</div></div><div class="ai-panel-subtitle">本节课中可执行的文件</div><div id="codeContent" class="panel-loading">正在加载代码文件…</div>';
+        panel.className = 'ai-panel ai-panel--compact ai-panel--code';
+        panel.innerHTML = '<div class="ai-panel-header"><div class="ai-panel-icon">C</div><div class="ai-panel-title">运行代码</div></div><div class="ai-panel-subtitle">需要先 clone 本仓库。复制的命令应在仓库根目录（包含 README.md 和 phases/ 的目录）运行。</div><div id="codeContent" class="panel-loading">正在加载代码文件…</div>';
         container.appendChild(panel);
 
         var codeEl = panel.querySelector('#codeContent');
         if (certificationLesson && certificationLesson.files) {
-          renderEmbeddedCodeFiles(codeEl, certificationLesson.files.code || []);
+          renderCodeFiles(codeEl, certificationLesson.files.code || []);
           return;
         }
-        ghApiFetch(lessonPath + '/code', function (err, data) {
+
+        repositoryDirectoryFetch(lessonPath + '/code', function (err, data) {
           if (!codeEl || !codeEl.parentNode) return;
           if (err || !data || !Array.isArray(data) || data.length === 0) {
-            codeEl.innerHTML = '<div class="panel-fallback"><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/' + lessonPath + '" target="_blank" rel="noopener">在 GitHub 上查看本课</a></div>';
+            renderPanelFallback(codeEl, '本课没有找到单独的可运行文件。', REPO_TREE + lessonPath, '查看课程源码');
             return;
           }
-
-          var html = '<div class="code-cards">';
-          data.forEach(function (file) {
-            var icon = langIcon(file.name);
-            var cmd = langCommand(file.name);
-            var runCmd = cmd + ' ' + lessonPath + '/code/' + file.name;
-            html += '<div class="code-card">';
-            html += '<div class="code-card-header"><span class="code-lang-icon">' + icon + '</span><span class="code-card-name">' + escapeHtml(file.name) + '</span></div>';
-            html += '<div class="code-card-size">' + formatSize(file.size) + '</div>';
-            html += '<div class="code-card-run">' + escapeHtml(runCmd) + '</div>';
-            html += '<div class="code-card-actions">';
-            html += '<a class="code-card-btn" href="' + file.html_url + '" target="_blank" rel="noopener">在 GitHub 上查看</a>';
-            html += '<button class="code-card-btn code-card-copy" data-command="' + escapeAttr(runCmd) + '">复制命令</button>';
-            html += '</div>';
-            html += '</div>';
-          });
-          html += '</div>';
-          codeEl.innerHTML = html;
-          codeEl.querySelectorAll('.code-card-copy').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-              var command = btn.getAttribute('data-command');
-              navigator.clipboard.writeText(command).then(function () {
-                btn.textContent = '已复制！';
-                setTimeout(function () { btn.textContent = '复制命令'; }, 1500);
-              });
-            });
-          });
+          renderCodeFiles(codeEl, data);
         });
       }
 
@@ -3831,13 +5273,127 @@
 
       function refreshProgressUi() {
         buildSidebar();
+        syncLessonActionProgress();
         var container = document.getElementById('aiPanels');
-        if (container) renderLearningPathPanel(container);
+        if (container) {
+          renderLearningPathPanel(container);
+          if (learningPathMode) renderContinuePanel(container);
+        }
+        syncLearningPathGateLinks();
       }
 
-      function mountLearningPathPanel(container, panel) {
+      function learningPanelReducedMotion() {
+        return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      }
+
+      function timelineItemKey(item, index) {
+        return item.getAttribute('data-path-step') || item.getAttribute('data-timeline-key') || item.tagName + ':' + index;
+      }
+
+      function copyOptionalAttribute(target, source, name) {
+        if (source.hasAttribute(name)) target.setAttribute(name, source.getAttribute(name));
+        else target.removeAttribute(name);
+      }
+
+      function syncLearningTimeline(currentTimeline, nextTimeline) {
+        if (!currentTimeline || !nextTimeline) return;
+        var currentItems = Array.prototype.slice.call(currentTimeline.children);
+        var nextItems = Array.prototype.slice.call(nextTimeline.children);
+        var compatible = currentItems.length === nextItems.length && currentItems.every(function (item, index) {
+          return item.tagName === nextItems[index].tagName && timelineItemKey(item, index) === timelineItemKey(nextItems[index], index);
+        });
+        if (!compatible) {
+          currentTimeline.replaceWith(nextTimeline.cloneNode(true));
+          return;
+        }
+        for (var i = 0; i < currentItems.length; i++) {
+          var currentItem = currentItems[i];
+          var nextItem = nextItems[i];
+          currentItem.className = nextItem.className;
+          copyOptionalAttribute(currentItem, nextItem, 'href');
+          copyOptionalAttribute(currentItem, nextItem, 'title');
+          copyOptionalAttribute(currentItem, nextItem, 'aria-label');
+          copyOptionalAttribute(currentItem, nextItem, 'aria-current');
+          var currentIndex = currentItem.querySelector('.timeline-index');
+          var nextIndex = nextItem.querySelector('.timeline-index');
+          if (currentIndex && nextIndex) currentIndex.textContent = nextIndex.textContent;
+          var currentLabel = currentItem.querySelector('.timeline-label');
+          var nextLabel = nextItem.querySelector('.timeline-label');
+          if (currentLabel && nextLabel) currentLabel.textContent = nextLabel.textContent;
+          if (!currentLabel && !nextLabel) currentItem.textContent = nextItem.textContent;
+        }
+      }
+
+      function revealPhaseCompletion(panel, animate) {
+        var callout = panel && panel.querySelector('.phase-complete-callout.visible');
+        if (!callout) return;
+        callout.classList.remove('is-entering', 'is-entered');
+        if (!animate || learningPanelReducedMotion()) {
+          callout.classList.add('is-entered');
+          return;
+        }
+        callout.classList.add('is-entering');
+        window.requestAnimationFrame(function () {
+          if (!callout.isConnected) return;
+          callout.classList.remove('is-entering');
+          callout.classList.add('is-entered');
+        });
+      }
+
+      function syncLearningPathPanel(currentPanel, nextPanel) {
+        currentPanel.className = nextPanel.className;
+        var currentTitle = currentPanel.querySelector('.ai-panel-title');
+        var nextTitle = nextPanel.querySelector('.ai-panel-title');
+        if (currentTitle && nextTitle) currentTitle.textContent = nextTitle.textContent;
+        var currentIcon = currentPanel.querySelector('.ai-panel-icon');
+        var nextIcon = nextPanel.querySelector('.ai-panel-icon');
+        if (currentIcon && nextIcon) currentIcon.textContent = nextIcon.textContent;
+        var currentSubtitle = currentPanel.querySelector('.path-panel-context .ai-panel-subtitle');
+        var nextSubtitle = nextPanel.querySelector('.path-panel-context .ai-panel-subtitle');
+        if (currentSubtitle && nextSubtitle) currentSubtitle.textContent = nextSubtitle.textContent;
+        var currentPosition = currentPanel.querySelector('.path-position');
+        var nextPosition = nextPanel.querySelector('.path-position');
+        if (currentPosition && nextPosition) currentPosition.textContent = nextPosition.textContent;
+
+        syncLearningTimeline(
+          currentPanel.querySelector('.learning-timeline'),
+          nextPanel.querySelector('.learning-timeline')
+        );
+
+        var currentFill = currentPanel.querySelector('.phase-progress-fill');
+        var nextFill = nextPanel.querySelector('.phase-progress-fill');
+        if (currentFill && nextFill) {
+          currentFill.style.setProperty('--lesson-progress', nextFill.style.getPropertyValue('--lesson-progress'));
+        }
+        var currentCounter = currentPanel.querySelector('.phase-progress-text');
+        var nextCounter = nextPanel.querySelector('.phase-progress-text');
+        if (currentCounter && nextCounter) currentCounter.textContent = nextCounter.textContent;
+
+        var currentTail = currentPanel.querySelector('.path-panel-tail');
+        var nextTail = nextPanel.querySelector('.path-panel-tail');
+        var hadCompletion = !!(currentTail && currentTail.querySelector('.phase-complete-callout.visible'));
+        if (currentTail && nextTail) currentTail.innerHTML = nextTail.innerHTML;
+        var hasCompletion = !!(currentTail && currentTail.querySelector('.phase-complete-callout.visible'));
+        if (hasCompletion) revealPhaseCompletion(currentPanel, !hadCompletion);
+      }
+
+      function mountLearningPathPanel(container, panel, pathKey) {
         panel.id = 'learningPathPanel';
+        panel.setAttribute('data-learning-path-key', pathKey);
         var existing = document.getElementById('learningPathPanel');
+        if (existing && existing.getAttribute('data-learning-path-key') === pathKey) {
+          syncLearningPathPanel(existing, panel);
+          return existing;
+        }
+        if (existing && existing.parentNode) existing.parentNode.replaceChild(panel, existing);
+        else container.appendChild(panel);
+        revealPhaseCompletion(panel, true);
+        return panel;
+      }
+
+      function mountContinuePanel(container, panel) {
+        panel.id = 'continuePathPanel';
+        var existing = document.getElementById('continuePathPanel');
         if (existing && existing.parentNode) existing.parentNode.replaceChild(panel, existing);
         else container.appendChild(panel);
       }
@@ -3846,16 +5402,16 @@
         if (certificationMode) {
           if (currentLessonIndex < 0) return;
           var certPanel = document.createElement('div');
-          certPanel.className = 'ai-panel';
+          certPanel.className = 'ai-panel ai-panel--path';
           var certTotal = flatLessons.length;
           var certDone = 0;
           for (var cp = 0; cp < certTotal; cp++) {
             if (window.AIFSProgress && window.AIFSProgress.isLessonComplete(flatLessons[cp].path)) certDone++;
           }
           var certPct = certTotal ? Math.round((certDone / certTotal) * 100) : 0;
-          var certStart = Math.max(0, currentLessonIndex - 2);
-          var certEnd = Math.min(certTotal, certStart + 5);
-          certStart = Math.max(0, certEnd - 5);
+          var certStart = Math.max(0, currentLessonIndex - 1);
+          var certEnd = Math.min(certTotal, certStart + 3);
+          certStart = Math.max(0, certEnd - 3);
           var certHtml = '<div class="ai-panel-header"><div class="ai-panel-icon">C</div><div class="ai-panel-title">认证学习路径</div></div>';
           certHtml += '<div class="ai-panel-subtitle">' + escapeHtml(certificationTrack.examCode || certificationTrack.shortName || '认证') + '：' + escapeHtml(certificationTrack.credential || certificationTrack.title || '备考路线') + '</div><div class="learning-timeline">';
           var certLessonDoneAt = function (index) {
@@ -3873,14 +5429,86 @@
           certHtml += '</div><div class="phase-progress-bar"><div class="phase-progress-fill" style="width:' + certPct + '%"></div></div>';
           certHtml += '<div class="phase-progress-text">本认证路线已完成 ' + certDone + '/' + certTotal + ' 节课</div>';
           certPanel.innerHTML = certHtml;
-          mountLearningPathPanel(container, certPanel);
+          mountLearningPathPanel(container, certPanel, 'certification:' + certificationTrack.id);
+          return;
+        }
+
+        if (learningPathMode) {
+          var focusedPanel = document.createElement('div');
+          focusedPanel.className = 'ai-panel ai-panel--path';
+          var focusedLessons = flatLessons.filter(function (item) { return item.required !== false; });
+          var focusedOptionalLessons = flatLessons.filter(function (item) { return item.required === false; });
+          var focusedIndex = focusedLessons.findIndex(function (item) { return item.path === lessonPath; });
+          var focusedEntry = flatLessons.find(function (item) { return item.path === lessonPath; }) || null;
+          var focusedDone = 0;
+          for (var fp = 0; fp < focusedLessons.length; fp++) {
+            if (window.AIFSProgress && window.AIFSProgress.isLessonComplete(focusedLessons[fp].path)) focusedDone++;
+          }
+          var focusedPct = focusedLessons.length ? Math.round((focusedDone / focusedLessons.length) * 100) : 0;
+          var focusedHtml = '<div class="ai-panel-header"><div class="ai-panel-icon">P</div><div class="ai-panel-title">专项学习路线</div></div>';
+          focusedHtml += '<div class="path-panel-context"><div class="ai-panel-subtitle">' + escapeHtml(learningPath.title || learningPath.id) + '</div><span class="path-position">';
+          focusedHtml += focusedIndex >= 0
+            ? '第 ' + (focusedIndex + 1) + '/' + focusedLessons.length + ' 课'
+            : '选修课';
+          focusedHtml += '</span></div>';
+          focusedHtml += learningPathPreflightHtml();
+          focusedHtml += '<div class="learning-timeline">';
+          var focusedWindowSize = 3;
+          var focusedStart = focusedIndex >= 0
+            ? Math.max(0, focusedIndex - 1)
+            : Math.max(0, focusedLessons.length - focusedWindowSize);
+          var focusedEnd = Math.min(focusedLessons.length, focusedStart + focusedWindowSize);
+          focusedStart = Math.max(0, focusedEnd - focusedWindowSize);
+          if (focusedStart > 0) focusedHtml += '<span class="timeline-ellipsis" data-timeline-key="before">前面还有 ' + focusedStart + ' 节</span>';
+          for (var fpi = focusedStart; fpi < focusedEnd; fpi++) {
+            var focusedLesson = focusedLessons[fpi];
+            var focusedLessonDone = !!(window.AIFSProgress && window.AIFSProgress.isLessonComplete(focusedLesson.path));
+            var focusedClass = focusedLesson.path === lessonPath ? 'current' : focusedLessonDone ? 'done' : '';
+            focusedHtml += '<a class="timeline-item ' + focusedClass + learningPathGateClass(focusedLesson) + '" data-path-step="' + escapeAttr(focusedLesson.path) + '" href="' + learningPathLessonHref(focusedLesson.path) + '" title="' + escapeAttr(focusedLesson.lessonName) + '"' + learningPathGateAttributes(focusedLesson) + ' aria-label="第 ' + (fpi + 1) + '/' + focusedLessons.length + ' 课：' + escapeAttr(focusedLesson.lessonName) + '"' + (focusedLesson.path === lessonPath ? ' aria-current="step"' : '') + '>';
+            focusedHtml += '<div class="timeline-step-meta"><div class="timeline-dot"></div><span class="timeline-index">' + String(fpi + 1).padStart(2, '0') + '</span></div><div class="timeline-label">' + escapeHtml(focusedLesson.lessonName) + '</div></a>';
+          }
+          if (focusedEnd < focusedLessons.length) focusedHtml += '<span class="timeline-ellipsis" data-timeline-key="after">后面还有 ' + (focusedLessons.length - focusedEnd) + ' 节</span>';
+          focusedHtml += '</div><div class="phase-progress-bar"><div class="phase-progress-fill" style="--lesson-progress:' + (focusedPct / 100) + '"></div></div>';
+          focusedHtml += '<div class="phase-progress-text">';
+          focusedHtml += focusedIndex >= 0
+            ? '本路线已完成 ' + focusedDone + '/' + focusedLessons.length + ' 节课。'
+            : '当前为选修课；必修课已完成 ' + focusedDone + '/' + focusedLessons.length + ' 节。';
+          var focusedChecks = learningPathPreflightDefinitions();
+          var focusedChecksDone = focusedChecks.filter(function (check) {
+            return window.AIFSLearningPathProgress && window.AIFSLearningPathProgress.isConfirmed(learningPath.id, check.id);
+          }).length;
+          if (focusedChecks.length) focusedHtml += ' 已确认 ' + focusedChecksDone + '/' + focusedChecks.length + ' 项知识前置检查。';
+          focusedHtml += '</div>';
+          focusedHtml += '<div class="path-panel-tail">';
+          if (focusedEntry) {
+            focusedHtml += learningPathPrerequisiteCallout(focusedEntry, '学习本课前需要完成');
+          }
+          var nextRequired = focusedIndex >= 0 && focusedIndex < focusedLessons.length - 1
+            ? focusedLessons[focusedIndex + 1]
+            : null;
+          if (nextRequired) {
+            focusedHtml += learningPathPrerequisiteCallout(nextRequired, '进入下一课前需要完成');
+          } else {
+            focusedHtml += '<div class="path-completion-actions">';
+            for (var focusedOptionalIndex = 0; focusedOptionalIndex < focusedOptionalLessons.length; focusedOptionalIndex++) {
+              var focusedOptionalLesson = focusedOptionalLessons[focusedOptionalIndex];
+              if (focusedOptionalLesson.path === lessonPath) continue;
+              var focusedOptionalLocked = learningPathEntryLocked(focusedOptionalLesson);
+              focusedHtml += '<a class="path-completion-link' + learningPathGateClass(focusedOptionalLesson) + '" href="' + learningPathLessonHref(focusedOptionalLesson.path) + '"' + learningPathGateAttributes(focusedOptionalLesson) + '>' + (focusedOptionalLocked ? '尚未解锁的选修综合项目：' : '选修综合项目：') + escapeHtml(focusedOptionalLesson.lessonName) + '</a>';
+            }
+            if (focusedLessons.length) focusedHtml += '<a href="' + learningPathLessonHref(focusedLessons[0].path) + '">重新开始本路线</a>';
+            focusedHtml += '<a href="catalog.html">完整课程表</a></div>';
+          }
+          focusedHtml += '</div>';
+          focusedPanel.innerHTML = focusedHtml;
+          mountLearningPathPanel(container, focusedPanel, 'learning-path:' + learningPath.id);
           return;
         }
 
         if (currentLessonIndex < 0 || typeof PHASES === 'undefined') return;
 
         var panel = document.createElement('div');
-        panel.className = 'ai-panel';
+        panel.className = 'ai-panel ai-panel--path';
 
         var current = flatLessons[currentLessonIndex];
         var phaseIdx = current.phaseIndex;
@@ -3898,9 +5526,9 @@
         var html = '<div class="ai-panel-header"><div class="ai-panel-icon">P</div><div class="ai-panel-title">学习路径</div></div>';
         html += '<div class="ai-panel-subtitle">阶段 ' + String(phase.id).padStart(2, '0') + '：' + escapeHtml(phase.name) + '</div>';
 
-        // Window: 2 before current + current + 2 after, cap at 5 visible.
-        var windowSize = 5;
-        var startIdx = Math.max(0, currentIdxInPhase - 2);
+        // Keep the route readable in the available column: one before, current, one after.
+        var windowSize = 3;
+        var startIdx = Math.max(0, currentIdxInPhase - 1);
         var endIdx = Math.min(lessonsInPhase.length, startIdx + windowSize);
         startIdx = Math.max(0, endIdx - windowSize);
         var visible = lessonsInPhase.slice(startIdx, endIdx);
@@ -3921,17 +5549,12 @@
           var isDone = coreLessonDoneAt(idx);
           var cls = (isCurrent ? 'current ' : '') + (isDone ? 'done' : '');
 
-          if (vIdx > 0) {
-            var lineCls = coreLessonDoneAt(idx - 1) && isDone ? 'done' : '';
-            html += '<div class="timeline-line ' + lineCls + '"></div>';
-          }
-
           if (item.flat.isReadable) {
             html += '<a class="timeline-item ' + cls + '" href="' + lessonHref(item.flat.path) + '" title="' + escapeAttr(item.flat.lessonName) + '">';
           } else {
-            html += '<span class="timeline-item ' + cls + ' disabled" title="' + escapeAttr(item.flat.lessonName) + '">';
+            html += '<span class="timeline-item ' + cls + ' disabled" data-path-step="' + escapeAttr(item.flat.path) + '" title="' + escapeAttr(item.flat.lessonName) + '">';
           }
-          html += '<div class="timeline-dot"></div>';
+          html += '<div class="timeline-step-meta"><div class="timeline-dot"></div><span class="timeline-index">' + String(idx + 1).padStart(2, '0') + '</span></div>';
           html += '<div class="timeline-label">' + escapeHtml(item.flat.lessonName) + '</div>';
           html += item.flat.isReadable ? '</a>' : '</span>';
         });
@@ -3951,13 +5574,15 @@
         html += '<div class="phase-progress-bar"><div class="phase-progress-fill" style="width:' + pct + '%"></div></div>';
         html += '<div class="phase-progress-text">本阶段你已完成 ' + totalCount + ' 节中的 ' + completedCount + ' 节</div>';
 
+        html += '<div class="path-panel-tail">';
         if (completedCount >= totalCount && phaseIdx < PHASES.length - 1) {
           var nextPhase = PHASES[phaseIdx + 1];
           html += '<div class="phase-complete-callout visible">已准备好进入阶段 ' + String(nextPhase.id).padStart(2, '0') + '：' + escapeHtml(nextPhase.name) + '</div>';
         }
+        html += '</div>';
 
         panel.innerHTML = html;
-        mountLearningPathPanel(container, panel);
+        mountLearningPathPanel(container, panel, 'phase:' + phase.id);
       }
 
       function renderContinuePanel(container) {
@@ -3965,7 +5590,7 @@
 
         if (certificationMode) {
           var certContinue = document.createElement('div');
-          certContinue.className = 'ai-panel';
+          certContinue.className = 'ai-panel ai-panel--continue';
           var certNext = null;
           for (var cn = currentLessonIndex + 1; cn < flatLessons.length; cn++) {
             if (flatLessons[cn].isReadable) { certNext = flatLessons[cn]; break; }
@@ -3982,8 +5607,14 @@
           return;
         }
 
+        if (learningPathMode) {
+          var staleFocusedContinue = document.getElementById('continuePathPanel');
+          if (staleFocusedContinue) staleFocusedContinue.remove();
+          return;
+        }
+
         var panel = document.createElement('div');
-        panel.className = 'ai-panel';
+        panel.className = 'ai-panel ai-panel--continue';
 
         var next = null;
         for (var ci = currentLessonIndex + 1; ci < flatLessons.length; ci++) {
@@ -4032,6 +5663,7 @@
         buildSidebar();
         initSidebarToggle();
         initScrollProgress();
+        initLearningPathGateNavigation();
         if (window.AIFSProgress) window.AIFSProgress.onChange(refreshProgressUi);
 
         if (prerendered) {

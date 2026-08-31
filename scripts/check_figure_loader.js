@@ -216,12 +216,15 @@ async function main() {
     .sort();
 
   const lazyEntries = lazyModules.map(function (source) {
-    return [source, registeredFigures(fs.readFileSync(path.join(site, source), 'utf8'))];
+    const sourceText = fs.readFileSync(path.join(site, source), 'utf8');
+    return [source, source === 'figures-claude-certifications.js'
+      ? certificationFigures(sourceText, path.join(site, source))
+      : registeredFigures(sourceText)];
   });
   const lazyRegistry = overlayRegistry(lazyEntries, 'lazy registry', MCP_OVERRIDES);
 
   // Each manifest entry must name one source file, and exactly mirror the
-  // independently parsed registrations from those 41 files.
+  // independently parsed registrations from every lazy provider file.
   const byModule = new Map();
   for (const name of names) {
     const source = mapping[name].split('?')[0];
@@ -236,13 +239,16 @@ async function main() {
       .sort();
     assert.deepEqual([...figures].sort(), actual, 'manifest drift for ' + source);
   }
-  assert.deepEqual([...byModule.keys()].sort(), [...lazyRegistry.keys()].map(function (name) {
-    return lazyRegistry.get(name);
-  }).filter(function (value, index, all) { return all.indexOf(value) === index; }).sort(),
-  'manifest module set must equal the repository lazy renderer modules');
+  // figures-manifest.js is the zh overlay and compatibility fallback. The
+  // generated figure-manifest.js + lesson-figures.js pair owns the complete
+  // provider graph, so the zh fallback may intentionally contain a subset.
+  assert.ok(byModule.size > 0, 'zh compatibility manifest must retain fallback modules');
 
   const lesson = fs.readFileSync(lessonPath, 'utf8');
   assert.match(lesson, /window\.AIFS_mountLessonFigures\(el\)/);
+  assert.match(fs.readFileSync(manifestPath, 'utf8'), /window\.AIFS_loadFigureProviders\(root\)/);
+  assert.match(lesson, /<script src="figure-manifest\.js\?v=/);
+  assert.match(lesson, /<script src="figures-manifest\.js\?v=/);
   assert.ok((lesson.match(/enhanceLesson\(\);/g) || []).length >= 2,
     'both prerender and runtime paths must retain the shared enhancement hook');
 
@@ -271,7 +277,7 @@ async function main() {
   assert.equal(await single.window.AIFS_mountLessonFigures(scope(['few-shot-curve'])), true);
   assert.deepEqual(single.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260804a',
+    'https://course.example/figures-i18n-zh.js?v=20260831b',
   ]);
   assert.equal(single.mounts.length, 1);
 
@@ -283,7 +289,7 @@ async function main() {
   assert.deepEqual(multi.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
     'https://course.example/figures-alignment3.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260804a',
+    'https://course.example/figures-i18n-zh.js?v=20260831b',
   ]);
   assert.equal(multi.mounts.length, 2, 'mount may be retried; renderer-level markers make it idempotent');
 
@@ -292,7 +298,7 @@ async function main() {
   await spa.window.AIFS_mountLessonFigures(scope(['al-instruct-pipeline']));
   assert.deepEqual(spa.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260804a',
+    'https://course.example/figures-i18n-zh.js?v=20260831b',
     'https://course.example/figures-alignment3.js?v=20260801a',
   ], 'a SPA remount loads only its new module; i18n stays loaded before each mount');
   assert.equal(spa.mounts.length, 2);
@@ -301,7 +307,7 @@ async function main() {
   assert.equal(await failed.window.AIFS_mountLessonFigures(scope(['few-shot-curve'])), true);
   assert.deepEqual(failed.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260804a',
+    'https://course.example/figures-i18n-zh.js?v=20260831b',
   ]);
   assert.equal(failed.mounts.length, 1, 'a failed module must not block mounting the lesson body');
   assert.equal(failed.warnings.length, 1);
@@ -311,7 +317,7 @@ async function main() {
   await retry.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
   assert.deepEqual(retry.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260804a',
+    'https://course.example/figures-i18n-zh.js?v=20260831b',
     'https://course.example/figures-llmeng.js?v=20260801a',
   ], 'a later mount must retry a previously failed module without reloading i18n');
   assert.equal(retry.mounts.length, 2);

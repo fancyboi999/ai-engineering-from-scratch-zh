@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 工程学习路径 - AI Engineering from Scratch 简体中文版</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23fafaf5'/><rect x='2' y='2' width='28' height='28' fill='none' stroke='%233553ff' stroke-width='1.2'/><text x='6' y='22' font-size='14' font-family='monospace' fill='%233553ff'>AI</text></svg>">
+  <meta name="description" content="探索四条 AI 工程核心学习路径和六条职业路线；每条都连接到可实践的课程。">
+  <link rel="canonical" href="https://aieng-zh.cn/learning-paths.html">
+  <meta property="og:title" content="AI 工程学习路径 · AI Engineering from Scratch 简体中文版">
+  <meta property="og:description" content="探索四条 AI 工程核心学习路径和六条职业路线；每条都连接到可实践的课程。">
+  <meta property="og:image" content="https://aieng-zh.cn/og-image.png?v=3">
+  <meta property="og:url" content="https://aieng-zh.cn/learning-paths.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI 工程学习路径 · AI Engineering from Scratch 简体中文版">
+  <meta name="twitter:description" content="四条 AI 工程核心学习路径和六条职业路线，延伸为可实践的课程。">
+  <meta name="twitter:image" content="https://aieng-zh.cn/og-image.png?v=3">
+  <script src="learning-paths.js?v=20260831a"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260831a">
+  <link rel="stylesheet" href="learning-paths.css?v=20260831a">
+</head>
+<body>
+  <a href="#main" class="skip-link">跳到正文</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
+      <nav class="header-nav">
+        <a href="index.html#contents">课程目录</a>
+        <a href="catalog.html">课程表</a>
+        <a href="prereqs.html">路线图</a>
+        <a href="glossary.html">术语表</a>
+        <a href="about.html">关于</a>
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          <svg class="star-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.896l-7.416 3.517 1.48-8.279L0 9.306l8.332-1.151z"/></svg>
+          <span class="star-count" data-loading="true" aria-label="GitHub Star 数">…</span>
+        </a>
+      </nav>
+      <button class="search-toggle" type="button" data-cmd-palette aria-label="搜索（⌘K）" title="搜索（⌘K）">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题"><span class="theme-icon" id="themeIcon">N</span></button>
+    </div>
+  </header>
+
+  <main class="learning-paths-page" id="main">
+    <section class="learning-paths-hero learning-paths-container" aria-labelledby="learningPathsTitle">
+      <div>
+        <span class="learning-paths-eyebrow">4 条核心路径 · 6 条职业路线</span>
+        <h1 id="learningPathsTitle">AI 工程学习路径</h1>
+      </div>
+      <div class="learning-paths-intro">
+        <p class="learning-paths-lede">按核心领域建立深度，或按你希望胜任的工作选择职业路线；两种方式使用的是同一组课程，只是编排不同。</p>
+        <nav class="learning-paths-entry-nav" aria-label="选择探索学习路径的方式">
+          <a href="#overview"><span>按知识探索</span><strong>浏览四条核心路径</strong></a>
+          <a href="#career-routes"><span>按目标探索</span><strong>选择一条职业路线</strong></a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="learning-paths-overview learning-paths-container" id="overview" aria-labelledby="learningPathsOverviewTitle">
+      <header class="learning-paths-overview-head">
+        <h2 id="learningPathsOverviewTitle">四条核心路径，一个工程学科。</h2>
+        <div class="learning-paths-overview-copy">
+          <p>每个领域都提供一条课程序列和它培养的能力；每项能力都链接到最相关的实践课。</p>
+          <a href="#career-routes">比较六条职业路线</a>
+        </div>
+      </header>
+      <nav class="learning-paths-domain-nav" aria-label="选择一个 AI 工程核心领域">
+        <div class="learning-paths-overview-root">AI 工程<span>理解系统、工作和构建过程</span></div>
+        <div class="learning-paths-domain-links">
+          <a class="learning-paths-domain-link" href="#building-and-deploying"><strong>构建与部署 AI 应用</strong><span>接口 · 依据 · 评估 · 生产</span></a>
+          <a class="learning-paths-domain-link" href="#software-fundamentals"><strong>软件工程基础</strong><span>全栈 · 数据 · 架构 · 可靠性 · 扩展</span></a>
+          <a class="learning-paths-domain-link" href="#coding-agents"><strong>Agent 辅助工程</strong><span>界定 · 规划 · 委派 · 验证 · 改进</span></a>
+          <a class="learning-paths-domain-link" href="#shaping-the-build"><strong>产品判断与交付</strong><span>结果 · 证据 · 风险 · 指标 · 反馈</span></a>
+        </div>
+      </nav>
+    </section>
+
+    <section class="career-routes learning-paths-container" id="career-routes" aria-labelledby="careerRoutesTitle">
+      <header class="career-routes-header">
+        <div>
+          <span class="learning-paths-domain-number">职业方向 · 共享课程</span>
+          <h2 id="careerRoutesTitle">按工作内容选，而不是按头衔选。</h2>
+        </div>
+        <p>不同团队的头衔并不相同。先从你希望负责的问题出发，再看职责、基础要求、证据和能力缺口，最后选择专项课程。</p>
+      </header>
+
+      <aside class="career-truth-note" aria-label="这些职业路线的含义">
+        <strong>先读这里</strong>
+        <p>这些路线是在共享基础之上的专项叠加。完成课程会积累实践证据，但不保证获得工作。页面显示的分钟数仅指课程引导时间，不含基础学习、独立项目和职业经验。</p>
+      </aside>
+
+      <ol class="career-foundation-strip" aria-label="专项学习前先打好基础">
+        <li>
+          <span>01</span>
+          <div><a href="#software-fundamentals">工程基础</a><p>全栈边界、数据、架构、可靠性、安全和生产运维。</p></div>
+        </li>
+        <li>
+          <span>02</span>
+          <div><a href="#building-and-deploying">AI 应用基础</a><p>模型接口、依据注入、评估、生产行为和运维。</p></div>
+        </li>
+        <li>
+          <span>03</span>
+          <div><a href="#career-chooser">专项实践</a><p>选择一类工作，补齐其基础缺口，并产出与岗位相符的证据。</p></div>
+        </li>
+      </ol>
+
+      <section class="career-chooser" id="career-chooser" aria-labelledby="careerChooserTitle">
+        <header>
+          <span class="learning-paths-domain-number">决策提示</span>
+          <h3 id="careerChooserTitle">你愿意每周重复做哪类工作？</h3>
+        </header>
+        <nav class="career-choice-grid" aria-label="选择要了解的工作类型">
+          <a href="#career-route-forward-deployed-ai-engineer" data-career-choice="forward-deployed-ai-engineer"><span>与用户并肩工作，把一个工作流带入生产环境？</span><strong>客户 AI 部署</strong></a>
+          <a href="#career-route-ai-developer-relations-engineer" data-career-choice="ai-developer-relations-engineer"><span>让 API、示例和技术学习对开发者更易上手？</span><strong>开发者体验与教育</strong></a>
+          <a href="#career-route-ai-data-engineer" data-career-choice="ai-data-engineer"><span>构建 AI 功能背后的数据、检索和质量系统？</span><strong>AI 数据系统</strong></a>
+          <a href="#career-route-agentic-ai-engineer" data-career-choice="agentic-ai-engineer"><span>设计工具调用循环、记忆、编排和运行时控制？</span><strong>Agent 系统工程</strong></a>
+          <a href="#career-route-applied-ai-engineer" data-career-choice="applied-ai-engineer"><span>把模型驱动的产品行为从接口交付到生产环境？</span><strong>LLM 产品工程</strong></a>
+          <a href="#career-route-ai-evaluation-reliability-engineer" data-career-choice="ai-evaluation-reliability-engineer"><span>衡量失败、把控发布，并可靠地运行 AI 系统？</span><strong>AI 评估与可靠性</strong></a>
+        </nav>
+      </section>
+
+      <div class="career-guides" aria-label="职业路线详解">
+        <details class="career-guide" id="career-route-forward-deployed-ai-engineer" data-career-guide="forward-deployed-ai-engineer" open>
+          <summary>
+            <span class="career-guide-number">01</span>
+            <span class="career-guide-heading"><span>工作类型</span><strong>客户 AI 部署</strong><small>前置部署 AI 工程师 · 现场 AI 工程师 · AI 解决方案工程师</small></span>
+            <span class="career-guide-disclosure" aria-hidden="true"><span>展开指南</span><span>收起指南</span></span>
+          </summary>
+          <div class="career-guide-body">
+            <div class="career-guide-overview">
+              <p class="career-guide-mission">把真实客户工作流转化为一个小而可衡量的 AI 系统，并在上线后持续跟进，了解它会在哪里失效。</p>
+              <dl><div><dt>引导路线</dt><dd>12 节专项课 · 865 分钟</dd></div><div><dt>基础要求</dt><dd>软件交付与 AI 应用基础</dd></div></dl>
+            </div>
+            <div class="career-guide-grid">
+              <section><h4>你要负责什么</h4><ul><li>观察工作流、用户、例外情况和隐性的交接环节。</li><li>把需求缩减为最小且有价值的端到端切片。</li><li>整合依据注入、评估和生产控制。</li><li>运行可衡量的试点，并将反馈转为下一次系统改动。</li></ul></section>
+              <section><h4>适配度与边界</h4><p><strong>适合你，如果：</strong>你喜欢模糊的用户问题、快速的技术迭代，以及上线后的共同负责。</p><p><strong>边界：</strong>这不是售前工程或泛咨询。证据是你能实际运行、并能衡量的系统。</p></section>
+              <section><h4>作品集证据</h4><p>交付一份工作流档案、一个有依据的原型、一组评估集和一份试点计划，构成完整证据包。</p><ul class="career-evidence-list"><li>明确列出的假设和风险最高的测试</li><li>已衡量的任务质量与失败案例</li><li>上线、回滚与反馈的责任归属</li></ul></section>
+              <section><h4>课程覆盖与缺口</h4><p>该路线涵盖发现、风险、RAG、评估、生产、指标、上线和反馈。</p><p><strong>仍需在其他地方获得：</strong>客户领域专业知识、利益相关者信任、采购约束，以及生产压力下的负责经验。</p></section>
+            </div>
+            <div class="career-guide-footer"><p>通过共享基础检查后再开始。把每节课的产出保留下来，作为最终证据包的一部分。</p><a class="career-guide-cta" href="/lessons/14-agent-engineering/47-outcomes-before-output/?learningPath=forward-deployed-ai-engineer">学习专项课程</a></div>
+          </div>
+        </details>
+
+        <details class="career-guide" id="career-route-ai-developer-relations-engineer" data-career-guide="ai-developer-relations-engineer">
+          <summary>
+            <span class="career-guide-number">02</span>
+            <span class="career-guide-heading"><span>工作类型</span><strong>开发者体验与教育</strong><small>AI 开发者关系工程师 · AI 开发者倡导者 · 开发者体验工程师</small></span>
+            <span class="career-guide-disclosure" aria-hidden="true"><span>展开指南</span><span>收起指南</span></span>
+          </summary>
+          <div class="career-guide-body">
+            <div class="career-guide-overview">
+              <p class="career-guide-mission">让开发者理解、运行并信任一项 AI 能力，再把他们遇到的阻碍反馈到产品中。</p>
+              <dl><div><dt>引导路线</dt><dd>11 节专项课 · 905 分钟</dd></div><div><dt>基础要求</dt><dd>软件基础、API 使用和清晰的技术写作</dd></div></dl>
+            </div>
+            <div class="career-guide-grid">
+              <section><h4>你要负责什么</h4><ul><li>构建能经受全新环境安装的集成和示例。</li><li>准确讲解 API、工具、协议和技能的契约。</li><li>复现开发者遇到的阻碍，而不是凭空猜测。</li><li>把支持信号转化为文档、工具和产品反馈。</li></ul></section>
+              <section><h4>适配度与边界</h4><p><strong>适合你，如果：</strong>你喜欢构建、教学、与其他开发者一起排错，并让复杂系统变得易懂。</p><p><strong>边界：</strong>这不是只写内容的营销。可信度来自可运行的技术工作和准确的解释。</p></section>
+              <section><h4>作品集证据</h4><p>发布一个开发者入门包，包含可用的集成、示例、可复用的 agent 包和一份阻碍报告。</p><ul class="career-evidence-list"><li>在全新环境中的配置证据</li><li>成功、负面与失败示例</li><li>关联到具体改进的反馈</li></ul></section>
+              <section><h4>课程覆盖与缺口</h4><p>该路线涵盖 API、工具契约、MCP、Agent Skills、打包、评估和反馈。</p><p><strong>仍需在其他地方获得：</strong>面对真实受众的实践、社群判断、采用分析、编辑深度和持续的开发者支持。</p></section>
+            </div>
+            <div class="career-guide-footer"><p>用这些课程做出一套连贯的入门体验，而不是一堆互不相干的演示。</p><a class="career-guide-cta" href="/lessons/00-setup-and-tooling/04-apis-and-keys/?learningPath=ai-developer-relations-engineer">学习专项课程</a></div>
+          </div>
+        </details>
+
+        <details class="career-guide" id="career-route-ai-data-engineer" data-career-guide="ai-data-engineer">
+          <summary>
+            <span class="career-guide-number">03</span>
+            <span class="career-guide-heading"><span>工作类型</span><strong>AI 数据系统</strong><small>AI 数据工程师 · 机器学习数据工程师 · 检索工程师</small></span>
+            <span class="career-guide-disclosure" aria-hidden="true"><span>展开指南</span><span>收起指南</span></span>
+          </summary>
+          <div class="career-guide-body">
+            <div class="career-guide-overview">
+              <p class="career-guide-mission">构建数据与检索管道，让训练、评估和生产中的 AI 行为能够使用可信证据。</p>
+              <dl><div><dt>引导路线</dt><dd>11 节专项课 · 915 分钟</dd></div><div><dt>基础要求</dt><dd>Python、数据结构、统计学和管道基础</dd></div></dl>
+            </div>
+            <div class="career-guide-grid">
+              <section><h4>你要负责什么</h4><ul><li>采集、转换、版本化和验证训练或检索数据。</li><li>构建嵌入、索引、检索和评估管道。</li><li>定义数据质量检查，并调查静默漂移。</li><li>呈现血缘、新鲜度、成本和运行时健康状况。</li></ul></section>
+              <section><h4>适配度与边界</h4><p><strong>适合你，如果：</strong>你喜欢管道、数据质量、可复现性，以及调试远离用户界面的系统故障。</p><p><strong>边界：</strong>这条路线专注于 AI 数据产品，不能替代数据工程中更广泛的数据仓库、数据库和平台深度。</p></section>
+              <section><h4>作品集证据</h4><p>交付一条经过版本管理的文档到检索管道，配套质量门、评估数据和运行报告。</p><ul class="career-evidence-list"><li>可复现的采集过程和数据血缘</li><li>检索质量与新鲜度度量</li><li>故障恢复与可观测性证据</li></ul></section>
+              <section><h4>课程覆盖与缺口</h4><p>该路线涵盖数据管理、特征、管道、嵌入、上下文、RAG、评估、生产和可观测性。</p><p><strong>仍需在其他地方获得：</strong>高级 SQL、数据仓库架构、治理、隐私运营和大规模分布式数据系统。</p></section>
+            </div>
+            <div class="career-guide-footer"><p>先补齐统计和数据工程基础，再把专项序列当作有序的工作来做。</p><a class="career-guide-cta" href="/lessons/00-setup-and-tooling/09-data-management/?learningPath=ai-data-engineer">学习专项课程</a></div>
+          </div>
+        </details>
+
+        <details class="career-guide" id="career-route-agentic-ai-engineer" data-career-guide="agentic-ai-engineer">
+          <summary>
+            <span class="career-guide-number">04</span>
+            <span class="career-guide-heading"><span>工作类型</span><strong>Agent 系统工程</strong><small>Agent 系统工程师 · Agentic AI 工程师 · AI Agent 工程师</small></span>
+            <span class="career-guide-disclosure" aria-hidden="true"><span>展开指南</span><span>收起指南</span></span>
+          </summary>
+          <div class="career-guide-body">
+            <div class="career-guide-overview">
+              <p class="career-guide-mission">围绕使用工具的模型设计运行时，让上下文、记忆、权限、编排、失败和证据始终清晰可见。</p>
+              <dl><div><dt>引导路线</dt><dd>14 节专项课 · 865 分钟</dd></div><div><dt>基础要求</dt><dd>LLM 应用基础和类型化工具接口</dd></div></dl>
+            </div>
+            <div class="career-guide-grid">
+              <section><h4>你要负责什么</h4><ul><li>设计工具契约和观察、决策、行动的循环。</li><li>控制上下文、记忆、状态和持久执行。</li><li>选择编排边界和终止策略。</li><li>对权限做威胁建模，并评估完整轨迹。</li><li>借助追踪与显式的失败控制运行该运行时。</li></ul></section>
+              <section><h4>适配度与边界</h4><p><strong>适合你，如果：</strong>你喜欢运行时设计、状态机、分布式协作、安全边界和困难的故障分析。</p><p><strong>边界：</strong>这是围绕模型行为的系统工程，不代表加上 agent 循环就能让产品自主运行。</p></section>
+              <section><h4>作品集证据</h4><p>交付一个有边界的工具调用运行时，包含记忆、编排、威胁模型、轨迹评估和故障运行手册。</p><ul class="career-evidence-list"><li>确定性的工具与状态追踪</li><li>权限、沙箱和注入控制</li><li>终止、恢复和评估证据</li></ul></section>
+              <section><h4>课程覆盖与缺口</h4><p>该路线涵盖工具、MCP、循环、上下文、记忆、图、编排、安全、评估、运行时和可观测性。</p><p><strong>仍需在其他地方获得：</strong>特定服务商的基础设施、高规模分布式运维、延迟工程，以及团队中的生产负责经验。</p></section>
+            </div>
+            <div class="career-guide-footer"><p>先完成 LLM 与工具接口基础，再把每一项 agent 主张都当作需要由运行时证明的事。</p><a class="career-guide-cta" href="/lessons/13-tools-and-protocols/01-the-tool-interface/?learningPath=agentic-ai-engineer">学习专项课程</a></div>
+          </div>
+        </details>
+
+        <details class="career-guide" id="career-route-applied-ai-engineer" data-career-guide="applied-ai-engineer">
+          <summary>
+            <span class="career-guide-number">05</span>
+            <span class="career-guide-heading"><span>工作类型</span><strong>LLM 产品工程</strong><small>应用 AI 工程师 · LLM 工程师 · AI 产品工程师</small></span>
+            <span class="career-guide-disclosure" aria-hidden="true"><span>展开指南</span><span>收起指南</span></span>
+          </summary>
+          <div class="career-guide-body">
+            <div class="career-guide-overview">
+              <p class="career-guide-mission">把模型能力转化为有用的产品行为：有依据、可评估、有防护、关注成本，并能在生产中恢复。</p>
+              <dl><div><dt>引导路线</dt><dd>12 节专项课 · 885 分钟</dd></div><div><dt>基础要求</dt><dd>软件工程与 LLM 基础</dd></div></dl>
+            </div>
+            <div class="career-guide-grid">
+              <section><h4>你要负责什么</h4><ul><li>设计面向模型的接口与结构化契约。</li><li>用上下文、检索和工具为行为提供依据。</li><li>在优化功能前构建任务评估。</li><li>控制安全、成本、延迟、缓存和降级方案。</li><li>交付行为可观测的完整功能。</li></ul></section>
+              <section><h4>适配度与边界</h4><p><strong>适合你，如果：</strong>你想把产品需求连接到模型行为，并负责模型周边的软件系统。</p><p><strong>边界：</strong>这不是基础模型研究或模型训练。工作始于模型能力遇到真实产品约束之处。</p></section>
+              <section><h4>作品集证据</h4><p>交付一项有依据的产品功能，包含结构化输出、工具、评估集、成本与延迟预算，以及有防护的发布。</p><ul class="career-evidence-list"><li>有代表性的成功与失败案例</li><li>质量、成本与延迟的权衡</li><li>降级、发布与回滚的证据</li></ul></section>
+              <section><h4>课程覆盖与缺口</h4><p>该路线涵盖 prompt、结构化输出、嵌入、上下文、RAG、工具、评估、成本、防护栏、生产、网关和发布。</p><p><strong>仍需在其他地方获得：</strong>产品发现、交互设计、真实用户研究、领域监管，以及在持续流量下运行功能的经验。</p></section>
+            </div>
+            <div class="career-guide-footer"><p>仅在通过 LLM 基础检查后再开始。作品集的证据是整合后的行为，而不是完成的十二页内容。</p><a class="career-guide-cta" href="/lessons/11-llm-engineering/01-prompt-engineering/?learningPath=applied-ai-engineer">学习专项课程</a></div>
+          </div>
+        </details>
+
+        <details class="career-guide" id="career-route-ai-evaluation-reliability-engineer" data-career-guide="ai-evaluation-reliability-engineer">
+          <summary>
+            <span class="career-guide-number">06</span>
+            <span class="career-guide-heading"><span>工作类型</span><strong>AI 评估与可靠性</strong><small>AI 评估工程师 · AI 可靠性工程师 · 机器学习站点可靠性工程师</small></span>
+            <span class="career-guide-disclosure" aria-hidden="true"><span>展开指南</span><span>收起指南</span></span>
+          </summary>
+          <div class="career-guide-body">
+            <div class="career-guide-overview">
+              <p class="career-guide-mission">让模型和 agent 行为可衡量，在发布前暴露失败，并为生产中仍会失败的部分建立运行控制。</p>
+              <dl><div><dt>引导路线</dt><dd>12 节专项课 · 750 分钟</dd></div><div><dt>基础要求</dt><dd>统计学、软件测试和生产系统</dd></div></dl>
+            </div>
+            <div class="career-guide-grid">
+              <section><h4>你要负责什么</h4><ul><li>定义评估集、指标、评分器和失败分类。</li><li>为模型、agent 和服务行为埋点。</li><li>构建发布门、实验和回归检测。</li><li>测试负载、降级、恢复和事件响应。</li><li>把证据连接到上线和运维决策。</li></ul></section>
+              <section><h4>适配度与边界</h4><p><strong>适合你，如果：</strong>你喜欢统计学、对抗测试、可观测性、发布判断，以及从事件中学习。</p><p><strong>边界：</strong>这比离线模型准确率更广。可靠性还包括应用、运行时、基础设施和响应过程。</p></section>
+              <section><h4>作品集证据</h4><p>交付一个连接到追踪的行为评估 harness、一个发布门、一次负载或故障实验，以及一份事件运行手册。</p><ul class="career-evidence-list"><li>已版本化的案例与指标依据</li><li>回归与上线决策</li><li>已观察到的恢复过程和残余风险</li></ul></section>
+              <section><h4>课程覆盖与缺口</h4><p>该路线涵盖模型、LLM 与 agent 评估、可观测性、服务指标、实验、负载、金丝雀发布、混沌工程和 SRE。</p><p><strong>仍需在其他地方获得：</strong>真实值班经验、组织特有的事件流程、生产流量、合规证据和跨团队发布权限。</p></section>
+            </div>
+            <div class="career-guide-footer"><p>先补齐统计和生产基础。把每一个发布门都当作有证据支持的决策。</p><a class="career-guide-cta" href="/lessons/02-ml-fundamentals/09-model-evaluation/?learningPath=ai-evaluation-reliability-engineer">学习专项课程</a></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="career-routes-footer">
+        <span>不确定哪个方向适合你？先比较职责和证据，再打好共享基础后进入专项学习。</span>
+        <a class="learning-paths-back" href="#overview">比较四个领域</a>
+      </div>
+    </section>
+
+    <section class="skills-domain learning-paths-container" id="building-and-deploying" aria-labelledby="buildingTitle">
+      <header class="skills-domain-header">
+        <div><span class="learning-paths-domain-number">领域 01 · 应用系统</span><h2 id="buildingTitle">构建与部署 AI 应用</h2></div>
+        <p>从第一个面向模型的接口，走到有依据的行为、评估、防护和生产运维。应用是模型周围的整个系统。</p>
+      </header>
+      <div class="skills-domain-tree">
+        <div class="skills-domain-root">
+          <div><strong>构建完整的 AI 应用</strong><span class="learning-paths-path-meta">12 节课路径 · 780 分钟</span></div>
+          <a class="skills-domain-root-link" href="/lessons/11-llm-engineering/01-prompt-engineering/?learningPath=building-and-deploying-ai-applications">打开完整路径</a>
+        </div>
+        <div class="skills-domain-scroller" aria-label="构建与部署 AI 应用的能力">
+          <div class="skills-domain-children" style="--child-count: 6;">
+            <a class="skills-node" href="/lessons/11-llm-engineering/01-prompt-engineering/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">01 · 接口</span><strong>模型交互契约</strong><p>把意图转化为有边界的请求，明确输入、输出和失败行为。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/11-llm-engineering/03-structured-outputs/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">02 · 契约</span><strong>结构化生成契约</strong><p>让生成的数据可解析、可验证，并能安全地传入应用代码。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/11-llm-engineering/04-embeddings/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">03 · 依据</span><strong>证据表征</strong><p>表征、检索并放置证据，让模型能够使用。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/11-llm-engineering/06-rag/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">04 · 检索</span><strong>检索与新鲜度</strong><p>围绕生成构建采集、搜索、排序、引用和新鲜度循环。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/11-llm-engineering/10-evaluation/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">05 · 证据</span><strong>行为评估门</strong><p>定义可接受的行为，收集案例，评估结果，并拦截回归。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/11-llm-engineering/13-production-app/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">06 · 运维</span><strong>服务与恢复</strong><p>在真实流量下提供服务、观测、发布、恢复并控制成本。</p><span class="skills-node-action">打开课程</span></a>
+          </div>
+        </div>
+        <div class="skills-domain-footer"><span>沿着每项关联能力继续学习。</span><a class="learning-paths-back" href="#overview">返回四个领域</a></div>
+      </div>
+    </section>
+
+    <section class="skills-domain learning-paths-container" id="software-fundamentals" aria-labelledby="softwareTitle">
+      <header class="skills-domain-header">
+        <div><span class="learning-paths-domain-number">领域 02 · 工程底座</span><h2 id="softwareTitle">软件工程基础</h2></div>
+        <p>编程 agent 减少的是输入代码的工作，不是工程判断。学习如何在应用栈、数据、架构、安全、可靠性和生产运维之间做权衡。</p>
+      </header>
+      <div class="skills-domain-tree">
+        <div class="skills-domain-root">
+          <div><strong>驾驭 AI 系统背后的软件权衡</strong><span class="learning-paths-path-meta">13 节课基础路径 · 730 分钟</span></div>
+          <a class="skills-domain-root-link" href="/lessons/00-setup-and-tooling/01-dev-environment/?learningPath=software-engineering-fundamentals">打开完整路径</a>
+        </div>
+        <div class="skills-domain-scroller" aria-label="软件工程基础能力">
+          <div class="skills-domain-children skills-domain-children--five" style="--child-count: 5;">
+            <a class="skills-node" href="/lessons/11-llm-engineering/13-production-app/?learningPath=building-and-deploying-ai-applications"><span class="learning-paths-node-index">01 · 应用</span><strong>端到端应用交付</strong><p>把请求处理、流式传输、持久化、降级、健康检查和部署连成一个可用系统。</p><span class="skills-node-action">打开代表性课程</span></a>
+            <a class="skills-node" href="/lessons/00-setup-and-tooling/09-data-management/?learningPath=software-engineering-fundamentals"><span class="learning-paths-node-index">02 · 数据</span><strong>数据生命周期与存储</strong><p>根据应用所需的访问模式，选择表征、验证、版本管理、保留和新鲜度方案。</p><span class="skills-node-action">打开代表性课程</span></a>
+            <a class="skills-node" href="/lessons/13-tools-and-protocols/01-the-tool-interface/?learningPath=software-engineering-fundamentals"><span class="learning-paths-node-index">03 · 架构</span><strong>系统架构与边界</strong><p>在能力进入更大系统前，先设计一个明确边界：输入、输出、错误、权限和状态。</p><span class="skills-node-action">打开代表性课程</span></a>
+            <a class="skills-node" href="/lessons/17-infrastructure-and-production/25-security-secrets-audit/?learningPath=software-engineering-fundamentals"><span class="learning-paths-node-index">04 · 保障</span><strong>安全且有韧性的系统</strong><p>进入生产前审计密钥、权限、依赖、数据处理和发布证据。</p><span class="skills-node-action">打开代表性课程</span></a>
+            <a class="skills-node" href="/lessons/17-infrastructure-and-production/23-sre-for-ai/?learningPath=software-engineering-fundamentals"><span class="learning-paths-node-index">05 · 运维</span><strong>生产规模与服务负责</strong><p>定义服务目标，关注健康信号，准备运行手册，并练习基于证据的事件响应。</p><span class="skills-node-action">打开代表性课程</span></a>
+          </div>
+        </div>
+        <div class="skills-domain-footer"><span>按基础路径顺序学习，或从符合当前所需能力的代表性分支进入。</span><a class="learning-paths-back" href="#overview">返回四个领域</a></div>
+      </div>
+    </section>
+
+    <section class="skills-domain learning-paths-container" id="coding-agents" aria-labelledby="agentsTitle">
+      <header class="skills-domain-header">
+        <div><span class="learning-paths-domain-number">领域 03 · Agent 辅助工程</span><h2 id="agentsTitle">Agent 辅助工程</h2></div>
+        <p>当任务、上下文、工具、反馈和停止条件组成可靠的 harness 时，编程 agent 才真正有用。学习围绕真实仓库工作来塑造这个系统。</p>
+      </header>
+      <div class="skills-domain-tree">
+        <div class="skills-domain-root">
+          <div><strong>把模型能力转化为可靠工作</strong><span class="learning-paths-path-meta">16 节课路径 · 900 分钟</span></div>
+          <a class="skills-domain-root-link" href="/lessons/14-agent-engineering/31-agent-workbench-why-models-fail/?learningPath=using-coding-agents">打开完整路径</a>
+        </div>
+        <div class="skills-domain-scroller" aria-label="Agent 辅助工程能力">
+          <div class="skills-domain-children" style="--child-count: 8;">
+            <a class="skills-node" href="/lessons/14-agent-engineering/43-frame-the-task-before-code/?learningPath=using-coding-agents"><span class="learning-paths-node-index">01 · 界定</span><strong>任务界定</strong><p>把请求转化为范围、约束、权限、证据和停止规则。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/44-plan-from-evidence/?learningPath=using-coding-agents"><span class="learning-paths-node-index">02 · 规划</span><strong>基于证据的规划</strong><p>在提出最小且连贯的改动前先检查仓库。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/32-minimal-agent-workbench/?learningPath=using-coding-agents"><span class="learning-paths-node-index">03 · harness</span><strong>Agent 工作台</strong><p>设计循环、上下文边界、工具、记录和终止策略。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/33-instructions-as-executable-constraints/?learningPath=using-coding-agents"><span class="learning-paths-node-index">04 · 上下文</span><strong>指令与记忆</strong><p>把持久化指导放在正确范围内，并保持运行时状态可观测。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/37-runtime-feedback-loops/?learningPath=using-coding-agents"><span class="learning-paths-node-index">05 · 反馈</span><strong>运行时反馈</strong><p>把编译器、测试、浏览器和网络证据带回下一次决策。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/38-verification-gates/?learningPath=using-coding-agents"><span class="learning-paths-node-index">06 · 验证</span><strong>验证与审查</strong><p>独立于 agent 自己的完成声明，证明请求的行为确实成立。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/45-delegate-with-isolation/?learningPath=using-coding-agents"><span class="learning-paths-node-index">07 · 委派</span><strong>隔离式委派</strong><p>在不共享模糊的所有权或状态的前提下，把有边界的工作分给多个 agent。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/46-turn-feedback-into-system/?learningPath=using-coding-agents"><span class="learning-paths-node-index">08 · 改进</span><strong>持久化改进</strong><p>把修正转化为测试、指令、工具和可复用约束。</p><span class="skills-node-action">打开课程</span></a>
+          </div>
+        </div>
+        <div class="skills-domain-footer"><span>沿着每项关联能力继续学习。</span><a class="learning-paths-back" href="#overview">返回四个领域</a></div>
+      </div>
+    </section>
+
+    <section class="skills-domain learning-paths-container" id="shaping-the-build" aria-labelledby="shapingTitle">
+      <header class="skills-domain-header">
+        <div><span class="learning-paths-domain-number">领域 04 · 产品判断</span><h2 id="shapingTitle">产品判断与交付</h2></div>
+        <p>实施之前，先决定什么结果重要、什么证据支持工作、什么风险值得关注，以及如何判断这次改动确有帮助。</p>
+      </header>
+      <div class="skills-domain-tree">
+        <div class="skills-domain-root">
+          <div><strong>在产出之前选择正确的构建方向</strong><span class="learning-paths-path-meta">8 节课路径 · 550 分钟</span></div>
+          <a class="skills-domain-root-link" href="/lessons/14-agent-engineering/47-outcomes-before-output/?learningPath=shaping-the-build">打开完整路径</a>
+        </div>
+        <div class="skills-domain-scroller" aria-label="产品判断与交付能力">
+          <div class="skills-domain-children" style="--child-count: 8;">
+            <a class="skills-node" href="/lessons/14-agent-engineering/47-outcomes-before-output/?learningPath=shaping-the-build"><span class="learning-paths-node-index">01 · 结果</span><strong>先看结果，再谈产出</strong><p>讨论功能或实现之前，先定义你希望改变的状态。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/48-discover-the-real-workflow/?learningPath=shaping-the-build"><span class="learning-paths-node-index">02 · 观察</span><strong>工作流发现</strong><p>研究工作当前如何发生，包括例外、交接和隐性劳动。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/49-map-assumptions-and-risk/?learningPath=shaping-the-build"><span class="learning-paths-node-index">03 · 风险</span><strong>假设与风险</strong><p>明确哪些前提必须为真，并测试可能让构建失效的不确定性。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/50-choose-the-smallest-testable-slice/?learningPath=shaping-the-build"><span class="learning-paths-node-index">04 · 切片</span><strong>可测试切片</strong><p>选择最小的端到端改动，产出足以支持决策的证据。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/51-write-specifications-that-preserve-judgment/?learningPath=shaping-the-build"><span class="learning-paths-node-index">05 · 规格</span><strong>可执行规格</strong><p>让约束和验收标准可观测，同时保留实现判断。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/52-design-success-metrics/?learningPath=shaping-the-build"><span class="learning-paths-node-index">06 · 度量</span><strong>成功指标</strong><p>把产品结果连接到领先指标、护栏指标和运维指标。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/53-prototype-pilot-or-production/?learningPath=shaping-the-build"><span class="learning-paths-node-index">07 · 阶段</span><strong>发布策略</strong><p>根据下一步所需证据，匹配原型、试点或生产投入。</p><span class="skills-node-action">打开课程</span></a>
+            <a class="skills-node" href="/lessons/14-agent-engineering/54-build-the-feedback-ratchet/?learningPath=shaping-the-build"><span class="learning-paths-node-index">08 · 负责</span><strong>反馈责任</strong><p>明确谁读取信号、做出决策并改变系统。</p><span class="skills-node-action">打开课程</span></a>
+          </div>
+        </div>
+        <div class="skills-domain-footer"><span>沿着每项关联能力继续学习。</span><a class="learning-paths-back" href="#overview">返回四个领域</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>AI Engineering from Scratch · 开源 · 永久免费。</p>
+      <div class="footer-links">
+        <a href="index.html">首页</a>
+        <a href="prereqs.html">课程路线图</a>
+        <a href="catalog.html">课程表</a>
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="header.js?v=20260831a" defer></script>
+  <script src="cmdpalette.js?v=20260831a" defer></script>
+  <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
+</body>
+</html>

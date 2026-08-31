@@ -107,32 +107,93 @@
     }
   }
 
-  // Prev/next lesson links are full page loads, so playback state has to
-  // survive navigation: the next page picks it back up on its own.
+  // 只有明确的课程续播链接可以把朗读带到下一页。保存目标 route key，避免
+  // 普通页面误继承音频状态。
   var RESUME_KEY = 'tts:resume';
 
-  function setResume(on) {
+  function routeKey(url) {
     try {
-      if (on) sessionStorage.setItem(RESUME_KEY, '1');
-      else sessionStorage.removeItem(RESUME_KEY);
+      var parsed = new URL(url, location.href);
+      if (parsed.origin !== location.origin) return '';
+      var pathname = parsed.pathname.replace(/\/lesson\.html$/, '/lesson');
+      var entries = Array.from(parsed.searchParams.entries()).sort(function (a, b) {
+        return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0;
+      });
+      var normalized = new URLSearchParams();
+      entries.forEach(function (entry) { normalized.append(entry[0], entry[1]); });
+      var search = normalized.toString();
+      return pathname + (search ? '?' + search : '');
     } catch (e) {
-      // sessionStorage may be disabled; playback just won't carry over.
+      return '';
     }
   }
 
-  function wantsResume() {
+  function setResumeTarget(url) {
+    var target = routeKey(url);
+    if (!target) return clearResumeTarget();
     try {
-      return sessionStorage.getItem(RESUME_KEY) === '1';
+      sessionStorage.setItem(RESUME_KEY, JSON.stringify({ target: target, createdAt: Date.now() }));
+    } catch (e) {}
+  }
+
+  function clearResumeTarget() {
+    try { sessionStorage.removeItem(RESUME_KEY); } catch (e) {}
+  }
+
+  function takeResumeTarget() {
+    var raw = null;
+    try {
+      raw = sessionStorage.getItem(RESUME_KEY);
+      sessionStorage.removeItem(RESUME_KEY);
+    } catch (e) {
+      return false;
+    }
+    if (!raw) return false;
+    try {
+      var intent = JSON.parse(raw);
+      return !!(intent && intent.target === routeKey(location.href) &&
+        typeof intent.createdAt === 'number' && Date.now() - intent.createdAt < 60000);
     } catch (e) {
       return false;
     }
   }
 
+  function setResume(on) {
+    if (!on) clearResumeTarget();
+  }
+
+  function wantsResume() {
+    return takeResumeTarget();
+  }
+
   var reducedMotion =
     window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reducedMotionListener = null;
 
   function prefersReducedMotion() {
     return !!(reducedMotion && reducedMotion.matches);
+  }
+
+  function bindReducedMotionPreference() {
+    if (!reducedMotion || reducedMotionListener) return;
+    reducedMotionListener = function (event) {
+      if (event.matches) commitDragInertiaForReducedMotion();
+    };
+    if (typeof reducedMotion.addEventListener === 'function') {
+      reducedMotion.addEventListener('change', reducedMotionListener);
+    } else if (typeof reducedMotion.addListener === 'function') {
+      reducedMotion.addListener(reducedMotionListener);
+    }
+  }
+
+  function disposeReducedMotionPreference() {
+    if (!reducedMotion || !reducedMotionListener) return;
+    if (typeof reducedMotion.removeEventListener === 'function') {
+      reducedMotion.removeEventListener('change', reducedMotionListener);
+    } else if (typeof reducedMotion.removeListener === 'function') {
+      reducedMotion.removeListener(reducedMotionListener);
+    }
+    reducedMotionListener = null;
   }
 
   var state = {
@@ -718,6 +779,35 @@
     }, 250);
   }
 
+  function isLessonContinuationLink(link) {
+    if (!link || !link.matches('.lesson-nav-btn,.continue-link')) return false;
+    try {
+      var url = new URL(link.href, location.href);
+      if (url.origin !== location.origin) return false;
+      if (/^\/lessons\/[^/]+\/[^/]+\/?$/.test(url.pathname)) return true;
+      return /\/lesson(?:\.html)?$/.test(url.pathname) && !!url.searchParams.get('path');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function bindNavigationResume() {
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest && event.target.closest('a[href]');
+      if (!link) return;
+      state.navigationTarget = '';
+      clearResumeTarget();
+      if (!isPlaying() || !isLessonContinuationLink(link)) return;
+      if (silentMode) {
+        var silentUrl = new URL(link.href, location.href);
+        silentUrl.searchParams.set('ttsTest', 'silent');
+        link.href = silentUrl.toString();
+      }
+      state.navigationTarget = routeKey(link.href);
+      setResumeTarget(link.href);
+    }, true);
+  }
+
   function jump(delta) {
     if (!state.playing) return;
     var next = state.index + delta;
@@ -813,6 +903,25 @@
     }, 2200);
   }
 
+  function updateBarReserve(active) {
+    if (!document.body) return;
+    document.body.classList.toggle('tts-active', active);
+    var rootStyle = document.documentElement && document.documentElement.style;
+    if (!rootStyle) return;
+    if (!active) {
+      rootStyle.removeProperty('--tts-bar-height');
+      return;
+    }
+    requestFrame(function () {
+      if (els.bar && !els.bar.hidden) {
+        rootStyle.setProperty(
+          '--tts-bar-height',
+          Math.ceil(els.bar.getBoundingClientRect().height) + 'px'
+        );
+      }
+    });
+  }
+
   function render() {
     var active = state.playing || state.waiting;
     if (els.toggle) {
@@ -825,8 +934,11 @@
       els.toggle.title = els.toggle.getAttribute('aria-label');
     }
     if (!els.bar) return;
+    updateBarReserve(active);
+    var wasHidden = els.bar.hidden;
     els.bar.hidden = !active;
     els.bar.classList.toggle('is-visible', active);
+    if (active && wasHidden && els.bar.classList.contains('is-placed')) schedulePlacementBoundsRefresh();
     // Collapsed, the puck's speaker icon is the only playback feedback left.
     els.bar.classList.toggle('is-reading', active && !state.paused && !state.awaitingGesture);
     if (!active) return;
@@ -885,6 +997,36 @@
   var COLLAPSED_KEY = 'tts:collapsed';
   var POS_KEY = 'tts:pos';
   var DRAG_SLOP = 4;
+  var dragInertiaFrame = 0;
+  var placementBoundsFrame = 0;
+  var placementTransitionFrame = 0;
+  var placementBounds = null;
+  var placedPosition = null;
+  var playerResizeObserver = null;
+  var requestFrame = typeof window.requestAnimationFrame === 'function'
+    ? window.requestAnimationFrame.bind(window)
+    : function (callback) { return setTimeout(callback, 16); };
+  var cancelFrame = typeof window.cancelAnimationFrame === 'function'
+    ? window.cancelAnimationFrame.bind(window)
+    : function (id) { clearTimeout(id); };
+
+  function stopDragInertia() {
+    if (dragInertiaFrame) cancelFrame(dragInertiaFrame);
+    dragInertiaFrame = 0;
+    if (els.bar) {
+      els.bar.classList.remove('is-gliding');
+      els.bar.style.removeProperty('transition');
+    }
+  }
+
+  function commitDragInertiaForReducedMotion() {
+    if (!els.bar || (!dragInertiaFrame && !els.bar.classList.contains('is-gliding'))) return;
+    stopDragInertia();
+    if (!els.bar.classList.contains('is-placed') || !placedPosition) return;
+    els.bar.style.transition = 'none';
+    place(placedPosition.x, placedPosition.y, true, placementBounds || refreshPlacementBounds());
+    restorePlacementTransition();
+  }
 
   /** Collapsed, the bar is just the speaker puck — click it to expand. */
   function setCollapsed(on, quiet) {
@@ -899,7 +1041,7 @@
       els.collapse.setAttribute('aria-label', label);
       els.collapse.title = label + '（可拖动）';
     }
-    clampToViewport();
+    schedulePlacementBoundsRefresh();
   }
 
   function savedPosition() {
@@ -915,24 +1057,103 @@
   }
 
   /** Pin the bar at viewport coordinates, replacing the default anchoring. */
-  function place(x, y, persist) {
-    if (!els.bar) return;
-    var w = els.bar.offsetWidth;
-    var h = els.bar.offsetHeight;
-    var maxX = Math.max(8, document.documentElement.clientWidth - w - 8);
-    var maxY = Math.max(8, window.innerHeight - h - 8);
-    var cx = Math.min(Math.max(8, x), maxX);
-    var cy = Math.min(Math.max(8, y), maxY);
+  function enterPlacedMode() {
+    if (!els.bar || els.bar.classList.contains('is-placed')) return;
     els.bar.classList.add('is-placed');
-    els.bar.style.left = cx + 'px';
-    els.bar.style.top = cy + 'px';
+    els.bar.style.left = '0px';
+    els.bar.style.top = '0px';
+  }
+
+  function place(x, y, persist, limits) {
+    if (!els.bar) return;
+    limits = limits || placementBounds || refreshPlacementBounds();
+    var cx = Math.min(Math.max(limits.minX, x), limits.maxX);
+    var cy = Math.min(Math.max(limits.minY, y), limits.maxY);
+    placedPosition = { x: cx, y: cy };
+    enterPlacedMode();
+    els.bar.style.transform = 'translate3d(' + cx + 'px,' + cy + 'px,0)';
+    if (els.resetPosition) els.resetPosition.hidden = false;
     if (persist) lsSet(POS_KEY, JSON.stringify({ x: cx, y: cy }));
+    return placedPosition;
+  }
+
+  function resetPosition() {
+    stopDragInertia();
+    lsSet(POS_KEY, '');
+    placedPosition = null;
+    if (!els.bar) return;
+    els.bar.classList.remove('is-placed', 'is-gliding');
+    els.bar.style.removeProperty('left');
+    els.bar.style.removeProperty('top');
+    els.bar.style.removeProperty('transform');
+    els.bar.style.removeProperty('transition');
+    if (els.resetPosition) els.resetPosition.hidden = true;
+    updateBarReserve(isActive());
+  }
+
+  function refreshPlacementBounds(rect) {
+    var measured = rect || (els.bar ? els.bar.getBoundingClientRect() : null);
+    var width = measured && measured.width ? measured.width : placementBounds ? placementBounds.width : 0;
+    var height = measured && measured.height ? measured.height : placementBounds ? placementBounds.height : 0;
+    placementBounds = {
+      minX: 8,
+      minY: 8,
+      maxX: Math.max(8, document.documentElement.clientWidth - width - 8),
+      maxY: Math.max(8, window.innerHeight - height - 8),
+      width: width,
+      height: height,
+    };
+    return placementBounds;
+  }
+
+  function schedulePlacementBoundsRefresh() {
+    if (placementBoundsFrame) return;
+    placementBoundsFrame = requestFrame(function () {
+      placementBoundsFrame = 0;
+      if (!els.bar) return;
+      if (els.bar.classList.contains('is-placed')) clampToViewport();
+      else refreshPlacementBounds();
+    });
+  }
+
+  function restorePlacementTransition() {
+    if (placementTransitionFrame) cancelFrame(placementTransitionFrame);
+    placementTransitionFrame = requestFrame(function () {
+      placementTransitionFrame = 0;
+      if (!els.bar || els.bar.classList.contains('is-dragging') || els.bar.classList.contains('is-gliding')) return;
+      els.bar.style.removeProperty('transition');
+    });
+  }
+
+  function resistEdge(value, min, max) {
+    if (value < min) {
+      var before = min - value;
+      return min - (before * 0.3) / (1 + before / 96);
+    }
+    if (value > max) {
+      var after = value - max;
+      return max + (after * 0.3) / (1 + after / 96);
+    }
+    return value;
+  }
+
+  function placeDuringDrag(x, y, limits) {
+    if (!els.bar) return;
+    var resistedX = resistEdge(x, limits.minX, limits.maxX);
+    var resistedY = resistEdge(y, limits.minY, limits.maxY);
+    enterPlacedMode();
+    els.bar.style.transform = 'translate3d(' + resistedX + 'px,' + resistedY + 'px,0)';
+    placedPosition = { x: resistedX, y: resistedY };
+    return placedPosition;
   }
 
   function clampToViewport() {
     if (!els.bar || !els.bar.classList.contains('is-placed')) return;
+    stopDragInertia();
     var rect = els.bar.getBoundingClientRect();
-    place(rect.left, rect.top, false);
+    var limits = refreshPlacementBounds(rect);
+    var current = placedPosition || { x: rect.left, y: rect.top };
+    place(current.x, current.y, false, limits);
   }
 
   /**
@@ -947,6 +1168,68 @@
     var startY = 0;
     var originX = 0;
     var originY = 0;
+    var lastX = 0;
+    var lastY = 0;
+    var lastTime = 0;
+    var velocityX = 0;
+    var velocityY = 0;
+    var currentX = 0;
+    var currentY = 0;
+    var dragLimits = null;
+
+    function beginInertia(initialVelocityX, initialVelocityY, initialX, initialY, limits) {
+      if (prefersReducedMotion()) {
+        bar.style.transition = 'none';
+        place(initialX, initialY, true, limits);
+        restorePlacementTransition();
+        return;
+      }
+
+      var x = initialX;
+      var y = initialY;
+      var vx = initialVelocityX;
+      var vy = initialVelocityY;
+      var previous = performance.now();
+      bar.classList.add('is-gliding');
+      bar.style.transition = 'none';
+
+      function settle() {
+        dragInertiaFrame = 0;
+        bar.classList.remove('is-gliding');
+        place(x, y, true, limits);
+        restorePlacementTransition();
+      }
+
+      function glide(now) {
+        var elapsed = Math.min(32, Math.max(1, now - previous));
+        previous = now;
+
+        x += vx * elapsed;
+        y += vy * elapsed;
+
+        if (x < limits.minX || x > limits.maxX) {
+          x = Math.min(Math.max(limits.minX, x), limits.maxX);
+          vx *= -0.24;
+        }
+        if (y < limits.minY || y > limits.maxY) {
+          y = Math.min(Math.max(limits.minY, y), limits.maxY);
+          vy *= -0.24;
+        }
+
+        var damping = Math.pow(0.9, elapsed / (1000 / 60));
+        vx *= damping;
+        vy *= damping;
+        place(x, y, false, limits);
+
+        if (Math.abs(vx) + Math.abs(vy) < 0.018) {
+          settle();
+          return;
+        }
+        dragInertiaFrame = requestFrame(glide);
+      }
+
+      dragInertiaFrame = requestFrame(glide);
+    }
 
     bar.addEventListener('pointerdown', function (e) {
       if (e.button != null && e.button !== 0) return;
@@ -954,12 +1237,21 @@
       // button, so it has to be draggable too.
       if (!state.collapsed && e.target.closest('select,input,option')) return;
       var rect = bar.getBoundingClientRect();
+      dragLimits = refreshPlacementBounds(rect);
       active = true;
       moved = false;
       startX = e.clientX;
       startY = e.clientY;
       originX = rect.left;
       originY = rect.top;
+      currentX = originX;
+      currentY = originY;
+      placedPosition = { x: originX, y: originY };
+      lastX = e.clientX;
+      lastY = e.clientY;
+      lastTime = e.timeStamp || performance.now();
+      velocityX = 0;
+      velocityY = 0;
     });
 
     bar.addEventListener('pointermove', function (e) {
@@ -998,7 +1290,12 @@
 
     bar.addEventListener('pointerup', end);
     bar.addEventListener('pointercancel', end);
-    window.addEventListener('resize', clampToViewport);
+    window.addEventListener('resize', schedulePlacementBoundsRefresh);
+    window.addEventListener('orientationchange', schedulePlacementBoundsRefresh);
+    if (typeof ResizeObserver === 'function') {
+      playerResizeObserver = new ResizeObserver(schedulePlacementBoundsRefresh);
+      playerResizeObserver.observe(bar);
+    }
   }
 
   function buildBar() {
@@ -1166,12 +1463,15 @@
     if (!btn) return;
     els.toggle = btn;
     buildBar();
+    bindReducedMotionPreference();
     bindSelection();
+    bindNavigationResume();
     render();
 
     // Leftover utterances would keep talking over the next page; the resume
     // flag (not the audio) is what carries playback across the navigation.
     window.addEventListener('pagehide', function () {
+      if (!state.navigationTarget) clearResumeTarget();
       cancelUtterance();
     });
     document.addEventListener('keydown', function (e) {

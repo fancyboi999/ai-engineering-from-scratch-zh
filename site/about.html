@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260821a">
+  <link rel="stylesheet" href="style.css?v=20260831a">
   <style>
     .about {
       max-width: 760px;
@@ -91,11 +91,11 @@
         <a href="about.html" aria-current="page">关于</a>
         <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-          <span class="star-count" data-loading="true" aria-label="GitHub stars">…</span>
+          <span class="star-count" data-loading="true" aria-label="GitHub 星标数">…</span>
         </a>
       </nav>
       <button class="search-toggle" type="button" data-cmd-palette
-        aria-label="Search (⌘K)" title="Search (⌘K)">
+        aria-label="搜索（⌘K）" title="搜索（⌘K）">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -103,7 +103,7 @@
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
       </button>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" type="button">
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">
         <span class="theme-icon" id="themeIcon">N</span>
       </button>
     </div>
@@ -114,7 +114,7 @@
       <div class="about-eyebrow">关于</div>
       <h1>关于本项目</h1>
 
-      <p class="lede">本站是 <strong>AI Engineering from Scratch</strong> 的简体中文翻译版。原项目是一套免费、开源的课程，把每个核心 AI 算法都从零手写一遍：20 个阶段、503 节课，从线性代数一路讲到自主 agent，覆盖 Python、TypeScript、Rust 和 Julia。本站负责把这些内容译成简体中文，让中文读者能直接学。</p>
+      <p class="lede">本站是 <strong>AI Engineering from Scratch</strong> 的简体中文翻译版。原项目是一套免费、开源的课程，把每个核心 AI 算法都从零手写一遍：20 个阶段、523 节课，从线性代数一路讲到自主 agent，覆盖 Python、TypeScript、Rust 和 Julia。本站负责把这些内容译成简体中文，让中文读者能直接学。</p>
 
       <h2>为什么存在</h2>
       <p>大多数 AI 教材都是碎片化教学。这儿一篇论文，那儿一篇微调心得，别处再来个框架 demo。你可以做出一个聊天机器人，却讲不清它的 loss 曲线；可以给 agent 挂上一个工具，却说不出调用它的那个模型内部，attention 到底在干什么。</p>
@@ -157,6 +157,8 @@
     "@type": "AboutPage",
     "url": "https://aieng-zh.cn/about.html",
     "name": "关于 AI Engineering from Scratch 简体中文版",
+    "isPartOf": { "@id": "https://aieng-zh.cn/#website" },
+    "about": { "@id": "https://aieng-zh.cn/#course" },
     "mainEntity": {
       "@type": "Organization",
       "name": "AI Engineering from Scratch 简体中文版",
@@ -166,10 +168,6 @@
     }
   }
   </script>
-  <script src="data.js?v=20260818b"></script>
-  <script src="progress.js?v=20260709a"></script>
-  <script src="header.js?v=20260818b" defer></script>
-  <script src="cmdpalette.js?v=20260818b" defer></script>
   <script>
     (function () {
       var root = document.documentElement;
@@ -193,6 +191,14 @@
       document.addEventListener('DOMContentLoaded', function () {
         updateIcon();
 
+        var lessonCount = document.getElementById('aboutLessonCount');
+        if (lessonCount && typeof PHASES !== 'undefined' && Array.isArray(PHASES)) {
+          var totalLessons = PHASES.reduce(function (total, phase) {
+            return total + (Array.isArray(phase.lessons) ? phase.lessons.length : 0);
+          }, 0);
+          if (totalLessons > 0) lessonCount.textContent = totalLessons + ' 节课';
+        }
+
         var btn = document.getElementById('themeToggle');
         if (btn) {
           btn.addEventListener('click', function () {
@@ -205,6 +211,10 @@
       });
     })();
   </script>
+  <script src="data.js?v=20260831a"></script>
+  <script src="progress.js?v=20260831a"></script>
+  <script src="header.js?v=20260831a" defer></script>
+  <script src="cmdpalette.js?v=20260831a" defer></script>
   <script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
 </body>
 </html>

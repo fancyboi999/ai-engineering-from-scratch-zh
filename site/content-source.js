@@ -26,20 +26,41 @@
     return value;
   }
 
+  function hasDotSegment(value) {
+    return String(value || '').split('/').some(function (segment) {
+      return segment === '.' || segment === '..';
+    });
+  }
+
   function rawRepoUrl(path) {
     var safe = clean(path);
-    var ref = window.__AIFS_REF || 'main';
-    return REPO_RAW + ref + '/' + safe;
+    var configured = window.__AIFS_SOURCE || {};
+    var owner = /^[A-Za-z0-9-]+$/.test(configured.owner || '') ? configured.owner : 'fancyboi999';
+    var repo = /^[A-Za-z0-9_.-]+$/.test(configured.repo || '') && !hasDotSegment(configured.repo)
+      ? configured.repo
+      : 'ai-engineering-from-scratch-zh';
+    var fallbackRevision = /^[A-Za-z0-9._/-]+$/.test(window.__AIFS_REF || '') && !hasDotSegment(window.__AIFS_REF)
+      ? window.__AIFS_REF
+      : 'main';
+    var revision = /^[A-Za-z0-9._/-]+$/.test(configured.revision || '') && !hasDotSegment(configured.revision)
+      ? configured.revision
+      : fallbackRevision;
+    return 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + revision + '/' + safe;
   }
 
   function repoUrl(path) {
     var safe = clean(path);
-    if (isLocal()) return '../' + safe;
+    var locationPath = window.location.pathname || new URL(window.location.href).pathname;
+    if (isLocal() && locationPath.indexOf('/lessons/') !== 0) return '../' + safe;
     return rawRepoUrl(safe);
   }
 
   function localDirectoryFiles(path) {
     if (!isLocal()) return Promise.reject(new Error('Local directory listing is unavailable'));
+    var locationPath = window.location.pathname || new URL(window.location.href).pathname;
+    if (locationPath.indexOf('/lessons/') === 0) {
+      return Promise.reject(new Error('Pre-rendered lessons use the repository fallback for directory listings'));
+    }
 
     var safe = clean(path).replace(/\/+$/, '');
     if (!safe || /\\/.test(safe)) return Promise.reject(new Error('Invalid local directory path'));
@@ -105,10 +126,53 @@
     });
   }
 
+  function mergeLessonOutputs(lessonPath, directoryEntries, artifacts) {
+    var lesson = clean(lessonPath).replace(/\/+$/, '');
+    var liveEntries = Array.isArray(directoryEntries) ? directoryEntries : [];
+    if (!lesson) return liveEntries.slice();
+
+    var prefix = lesson + '/outputs/';
+    var selected = (Array.isArray(artifacts) ? artifacts : []).filter(function (artifact) {
+      var artifactLesson = clean(artifact && artifact.lessonPath).replace(/\/+$/, '');
+      var artifactFile = clean(artifact && artifact.file).replace(/\/+$/, '');
+      return artifactLesson === lesson && artifactFile.indexOf(prefix) === 0;
+    });
+    var artifactByPath = Object.create(null);
+    selected.forEach(function (artifact, index) {
+      artifactByPath[clean(artifact.file).replace(/\/+$/, '')] = index;
+      if (artifact.bundlePath) {
+        artifactByPath[clean(artifact.bundlePath).replace(/\/+$/, '')] = index;
+      }
+    });
+
+    var seen = Object.create(null);
+    var merged = [];
+    liveEntries.forEach(function (entry) {
+      var entryPath = clean(entry && entry.path).replace(/\/+$/, '');
+      if (!entryPath && entry && entry.name) {
+        entryPath = prefix + clean(entry.name).replace(/\/+$/, '');
+      }
+      var index = Object.prototype.hasOwnProperty.call(artifactByPath, entryPath)
+        ? artifactByPath[entryPath]
+        : -1;
+      if (index < 0) {
+        merged.push(entry);
+      } else if (!seen[index]) {
+        merged.push(selected[index]);
+        seen[index] = true;
+      }
+    });
+    selected.forEach(function (artifact, index) {
+      if (!seen[index]) merged.push(artifact);
+    });
+    return merged;
+  }
+
   window.AIFSContentSource = {
     isLocal: isLocal,
     repoUrl: repoUrl,
     rawRepoUrl: rawRepoUrl,
     localDirectoryFiles: localDirectoryFiles,
+    mergeLessonOutputs: mergeLessonOutputs,
   };
 }());

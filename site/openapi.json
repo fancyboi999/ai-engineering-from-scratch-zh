@@ -1,0 +1,206 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AI Engineering from Scratch 中文版公开资源",
+    "version": "1.1.0",
+    "description": "AI Engineering from Scratch 中文课程的公开只读机器可读资源。课程源码仍以 GitHub 中文仓库为准。"
+  },
+  "servers": [
+    {
+      "url": "https://aieng-zh.cn"
+    }
+  ],
+  "paths": {
+    "/llms.txt": {
+      "get": {
+        "summary": "Read the agent-oriented curriculum map",
+        "operationId": "getAgentIndex",
+        "responses": {
+          "200": {
+            "description": "Markdown lesson and resource index",
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sitemap.xml": {
+      "get": {
+        "summary": "Read canonical public URLs",
+        "operationId": "getSitemap",
+        "responses": {
+          "200": {
+            "description": "XML sitemap",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lesson": {
+      "parameters": [
+        {
+          "name": "path",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^(phases|certifications)/"
+          },
+          "description": "Repository-relative lesson path, for example phases/01-math-foundations/01-linear-algebra-intuition"
+        }
+      ],
+      "get": {
+        "summary": "Open a crawlable rendered lesson",
+        "operationId": "getLesson",
+        "responses": {
+          "200": {
+            "description": "Rendered lesson page with lesson-specific metadata and visible content",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "308": {
+            "$ref": "#/components/responses/PermanentRedirect"
+          },
+          "404": {
+            "description": "Missing, invalid, or unknown lesson path",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed; use GET or HEAD"
+          },
+          "500": {
+            "description": "Lesson page could not be assembled"
+          }
+        }
+      },
+      "head": {
+        "summary": "Read lesson response metadata",
+        "operationId": "headLesson",
+        "responses": {
+          "200": {
+            "description": "Lesson exists"
+          },
+          "308": {
+            "$ref": "#/components/responses/PermanentRedirect"
+          },
+          "404": {
+            "description": "Missing, invalid, or unknown lesson path"
+          },
+          "405": {
+            "description": "Method not allowed; use GET or HEAD"
+          },
+          "500": {
+            "description": "Lesson page could not be assembled"
+          }
+        }
+      }
+    },
+    "/certification": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "description": "Certification track identifier, for example claude-ccao-f"
+        }
+      ],
+      "get": {
+        "summary": "Open a crawlable certification track",
+        "operationId": "getCertification",
+        "responses": {
+          "200": {
+            "description": "Rendered certification page with track-specific metadata and visible content",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "308": {
+            "$ref": "#/components/responses/PermanentRedirect"
+          },
+          "404": {
+            "description": "Missing, invalid, or unknown certification track ID",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed; use GET or HEAD"
+          },
+          "500": {
+            "description": "Certification page could not be assembled"
+          }
+        }
+      },
+      "head": {
+        "summary": "Read certification response metadata",
+        "operationId": "headCertification",
+        "responses": {
+          "200": {
+            "description": "Certification track exists"
+          },
+          "308": {
+            "$ref": "#/components/responses/PermanentRedirect"
+          },
+          "404": {
+            "description": "Missing, invalid, or unknown certification track ID"
+          },
+          "405": {
+            "description": "Method not allowed; use GET or HEAD"
+          },
+          "500": {
+            "description": "Certification page could not be assembled"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "PermanentRedirect": {
+        "description": "Permanent redirect to the canonical public URL",
+        "headers": {
+          "Location": {
+            "description": "Canonical destination URL",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

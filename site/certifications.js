@@ -131,7 +131,7 @@
   }
 
   function lessonReferenceHref(path, sourceTrack) {
-    var href = 'lesson.html?path=' + encodeURIComponent(path);
+    var href = 'lesson?path=' + encodeURIComponent(path);
     if (sourceTrack) {
       href += trackContainsLesson(sourceTrack, path)
         ? '&track=' + encodeURIComponent(sourceTrack.id)

@@ -359,7 +359,7 @@ function testGestureRecovery() {
   assert.strictEqual(env.synth.spoken.length, 1, 'not-allowed must not scan the queue');
   assert.strictEqual(env.api.state.index, 0);
   assert.strictEqual(env.api.state.awaitingGesture, true);
-  assert.strictEqual(env.sessionStorage.getItem('tts:resume'), '1');
+  assert.strictEqual(env.sessionStorage.getItem('tts:resume'), null, 'gesture recovery must not arm cross-page resume');
 
   env.document.dispatch('pointerdown', { type: 'pointerdown', target: env.document.body });
   assert.strictEqual(env.synth.spoken.length, 2, 'the first user gesture retries once');
@@ -383,7 +383,7 @@ function testControlGestureDoesNotReverseIntoStop() {
 
   assert.strictEqual(env.synth.spoken.length, 2, 'control pointerdown resumes exactly once');
   assert.strictEqual(env.api.state.playing, true, 'the following control click must not stop playback');
-  assert.strictEqual(env.sessionStorage.getItem('tts:resume'), '1');
+  assert.strictEqual(env.sessionStorage.getItem('tts:resume'), null, 'control recovery must not arm cross-page resume');
 }
 
 function testLateCallbacksCannotAdvanceReplacement() {

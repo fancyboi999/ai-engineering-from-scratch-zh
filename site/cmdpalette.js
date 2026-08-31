@@ -1,8 +1,8 @@
 /**
  * Command palette — global search triggered by Cmd/Ctrl+K or the search button.
  *
- * Searches lesson titles, summaries, phase names, languages, types, and
- * glossary terms entirely client-side from the data already loaded in data.js.
+ * Searches focused paths, lesson titles, summaries, phase names, languages,
+ * types, and glossary terms entirely client-side from data already loaded.
  * No network requests. No external dependencies.
  *
  * API (attached to window.CmdPalette):
@@ -24,6 +24,26 @@
   var _activeIdx  = -1;
   var _isOpen     = false;
   var _prevFocus  = null;
+
+  function learningPathEntryPath(entry) {
+    return typeof entry === 'string' ? entry : entry && entry.path ? entry.path : '';
+  }
+
+  function learningPathDestination(lessonPath, learningPathId) {
+    if (!lessonPath || !learningPathId) return '';
+    return '/lessons/' + lessonPath.replace(/^phases\//, '').replace(/\/+$/, '') +
+      '/?learningPath=' + encodeURIComponent(learningPathId);
+  }
+
+  function resultIndexForEnter(activeIndex, resultCount) {
+    if (activeIndex >= 0 && activeIndex < resultCount) return activeIndex;
+    return resultCount > 0 ? 0 : -1;
+  }
+
+  function navigationDestination(href, routeLinks) {
+    var routes = routeLinks || (typeof window !== 'undefined' ? window.AIFSRouteLinks : null);
+    return routes && typeof routes.adaptHref === 'function' ? routes.adaptHref(href) : href;
+  }
 
   // ── Search index ─────────────────────────────────────────────────────
   function certificationData() {
@@ -56,13 +76,40 @@
     if (_index !== null) return _index;
     _index = [];
 
+    if (typeof LEARNING_PATHS !== 'undefined' && Array.isArray(LEARNING_PATHS)) {
+      for (var lp = 0; lp < LEARNING_PATHS.length; lp++) {
+        var learningPath = LEARNING_PATHS[lp] || {};
+        var route = Array.isArray(learningPath.lessons) ? learningPath.lessons : [];
+        var firstLessonPath = route.length ? learningPathEntryPath(route[0]) : '';
+        var learningPathId = learningPath.id || String(lp);
+        if (!firstLessonPath) continue;
+        var checkpointKeywords = Array.isArray(learningPath.checkpoints)
+          ? learningPath.checkpoints.map(function (checkpoint) {
+              return typeof checkpoint === 'string'
+                ? checkpoint
+                : checkpoint && (checkpoint.title || checkpoint.name || checkpoint.goal) || '';
+            }).join(' ')
+          : '';
+        _index.push({
+          kind:        'learning-path',
+          id:          'lp:' + learningPathId,
+          name:        learningPath.title || learningPathId,
+          summary:     learningPath.summary || '',
+          keywords:    [learningPath.keywords || '', checkpointKeywords, 'focused course route'].filter(Boolean).join(' '),
+          lessonCount: route.length,
+          minutes:     Number(learningPath.estimatedMinutes || 0),
+          url:         learningPathDestination(firstLessonPath, learningPathId),
+        });
+      }
+    }
+
     if (typeof PHASES !== 'undefined' && Array.isArray(PHASES)) {
       for (var i = 0; i < PHASES.length; i++) {
         var phase = PHASES[i];
         for (var j = 0; j < phase.lessons.length; j++) {
           var lesson = phase.lessons[j];
 
-          // Extract the phases/…/… path used for lesson.html?path=
+          // Extract the phases/…/… path used for lesson?path=
           var lessonPath = '';
           if (lesson.url) {
             var m = lesson.url.match(/(phases\/[^/?#]+\/[^/?#]+)/);
@@ -148,7 +195,7 @@
           keywords: [track.shortName, track.examCode, track.level, track.audience, domainNames].filter(Boolean).join(' '),
           examCode: track.examCode || '',
           level:    track.level || '',
-          url:      'certification.html?id=' + encodeURIComponent(trackId),
+          url:      'certification?id=' + encodeURIComponent(trackId),
         });
       }
 
@@ -212,6 +259,7 @@
     // Substring matches in name (most important signal)
     if (name.startsWith(q))          s += 100;
     else if (name.indexOf(q) !== -1) s +=  70;
+    if (item.kind === 'learning-path' && name.startsWith(q)) s += 100;
 
     // Multi-word query: every word must appear somewhere in name
     var words = q.split(/\s+/).filter(Boolean);
@@ -467,6 +515,7 @@
       var inventory = buildIndex();
       var lessonCount = inventory.filter(function (item) { return item.kind === 'lesson'; }).length;
       var certificationLessonCount = inventory.filter(function (item) { return item.kind === 'certification-lesson'; }).length;
+      var learningPathCount = inventory.filter(function (item) { return item.kind === 'learning-path'; }).length;
       var artifactCount = inventory.filter(function (item) { return item.kind === 'artifact'; }).length;
       var glossaryCount = inventory.filter(function (item) { return item.kind === 'glossary'; }).length;
       var inventoryParts = [lessonCount + ' 节主课程'];
@@ -501,7 +550,11 @@
       var chip = '';
       var chipClass = 'cp-item-chip';
 
-      if (r.kind === 'lesson') {
+      if (r.kind === 'learning-path') {
+        dest = r.url;
+        chip = '学习路径';
+        chipClass += ' cp-item-chip--alt';
+      } else if (r.kind === 'lesson') {
         // Prefer the in-site reader; fall back to GitHub URL
         dest = r.lessonPath
           ? '/lessons/' + r.lessonPath.replace(/^phases\//, '') + '/'
@@ -605,9 +658,8 @@
 
       case 'Enter': {
         e.preventDefault();
-        const target = (_activeIdx >= 0 && items[_activeIdx])
-          ? items[_activeIdx]
-          : (count === 1 ? items[0] : null);
+        var targetIndex = resultIndexForEnter(_activeIdx, count);
+        var target = targetIndex >= 0 ? items[targetIndex] : null;
         if (target) _navigate(target);
         break;
       }
@@ -671,22 +723,24 @@
     var href = item.getAttribute('data-href');
     if (!href) return;
     close();
-    window.location.href = href;
+    window.location.href = navigationDestination(href);
   }
 
   // ── Global keyboard shortcut (Cmd/Ctrl+K) ────────────────────────────
-  document.addEventListener('keydown', function (e) {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault();
-      if (_isOpen) {
-        // Palette is already open — just refocus the input
-        var inp = _inputEl();
-        if (inp) inp.focus();
-      } else {
-        open();
+  if (typeof document !== 'undefined') {
+    document.addEventListener('keydown', function (e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (_isOpen) {
+          // Palette is already open — just refocus the input
+          var inp = _inputEl();
+          if (inp) inp.focus();
+        } else {
+          open();
+        }
       }
-    }
-  });
+    });
+  }
 
   // ── Init: wire trigger buttons + eagerly build index ─────────────────
   function _init() {
@@ -717,13 +771,26 @@
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _init);
-  } else {
-    _init();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _init);
+    } else {
+      _init();
+    }
   }
 
   // ── Public API ────────────────────────────────────────────────────────
-  window.CmdPalette = { open: open, close: close };
+  if (typeof window !== 'undefined') {
+    window.CmdPalette = { open: open, close: close };
+  }
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      rebuildIndex: rebuildIndex,
+      search: search,
+      learningPathDestination: learningPathDestination,
+      navigationDestination: navigationDestination,
+      resultIndexForEnter: resultIndexForEnter,
+    };
+  }
 
 }());

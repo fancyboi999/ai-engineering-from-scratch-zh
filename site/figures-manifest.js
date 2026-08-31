@@ -10,7 +10,7 @@
   var baseUrl = current && current.src
     ? current.src.replace(/[^/?#]+(?:[?#].*)?$/, '')
     : '/';
-  var i18nSrc = 'figures-i18n-zh.js?v=20260804a';
+  var i18nSrc = 'figures-i18n-zh.js?v=20260831b';
 
   var MODULES = [
   {
@@ -699,6 +699,16 @@
   function ensureModules(root) {
     var required = requiredModules(root);
     if (!required.hasFigures) return Promise.resolve(false);
+
+    // The generated upstream manifest owns the complete provider graph. Load
+    // through it first so legacy and newly added providers are all lazy; this
+    // zh manifest then adds the translation overlay and remains a fallback for
+    // static previews built before the generated loader existed.
+    if (typeof window.AIFS_loadFigureProviders === 'function') {
+      return window.AIFS_loadFigureProviders(root)
+        .then(function () { return loadScript(i18nSrc); })
+        .then(function () { return true; });
+    }
 
     var pending = [];
     for (var i = 0; i < required.sources.length; i++) {

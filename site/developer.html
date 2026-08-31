@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开发者资源 · AI Engineering from Scratch 中文版</title>
+  <meta name="description" content="AI Engineering from Scratch 中文版的机器可读资源、公开 URL、OpenAPI 描述、站点地图和 agent 集成说明。">
+  <link rel="canonical" href="https://aieng-zh.cn/developer.html">
+  <link rel="stylesheet" href="style.css?v=20260831a">
+  <style>
+    .trust-page { max-width: 780px; margin: 0 auto; padding: 100px 0 80px; }
+    .trust-page h1, .trust-page h2 { font-family: var(--font-display); color: var(--blueprint); text-transform: uppercase; }
+    .trust-page h1 { font-size: clamp(2.4rem, 6vw, 3.8rem); line-height: 1; }
+    .trust-page h2 { font-family: var(--font-mono); font-size: 1rem; letter-spacing: .12em; margin-top: 42px; }
+    .trust-page p, .trust-page li { font-family: var(--font-body); font-size: 1.05rem; line-height: 1.7; color: var(--ink); }
+    .trust-page a { color: var(--blueprint); }
+    .trust-page code { font-family: var(--font-mono); background: var(--bg-surface); border: 1px solid var(--rule-soft); padding: 1px 5px; }
+  </style>
+</head>
+<body>
+  <header class="site-header"><div class="header-inner">
+    <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
+    <nav class="header-nav"><a href="index.html#contents">课程</a><a href="catalog.html">目录</a><a href="prereqs.html">路线图</a><a href="glossary.html">术语表</a><a href="about.html">关于</a></nav>
+  </div></header>
+  <main class="container"><article class="trust-page">
+    <p class="about-eyebrow">AI Engineering from Scratch</p>
+    <h1>开发者资源</h1>
+    <p>这是 AI Engineering from Scratch 中文版的机器可读入口。项目是一套静态开源课程，不是托管应用 API。Agent 和开发工具应从 <a href="llms.txt">llms.txt</a> 开始；它把课程映射到 canonical 页面和原始 Markdown 来源。</p>
+    <h2>稳定资源</h2>
+    <ul>
+      <li><a href="llms.txt"><code>/llms.txt</code></a> 是面向 agent 的课程地图。</li>
+      <li><a href="sitemap.xml"><code>/sitemap.xml</code></a> 列出 canonical 公开 URL。</li>
+      <li><a href="openapi.json"><code>/openapi.json</code></a> 描述只读资源接口。</li>
+      <li><a href="catalog.html"><code>/catalog.html</code></a> 是面向学习者的可搜索目录。</li>
+      <li><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh"><code>GitHub</code></a> 是课程、代码、quiz 和可复用产物的事实来源。</li>
+    </ul>
+    <h2>Markdown 内容协商</h2>
+    <p>首页或主要导航路由收到带 <code>Accept: text/markdown</code> 的请求时，会返回 agent 地图，并设置 <code>Content-Type: text/markdown</code>。响应按 <code>Accept</code> 区分，避免缓存混用 HTML 和 Markdown 表示。</p>
+    <h2>MCP 状态</h2>
+    <p>本站目前不提供托管 MCP server 或需要认证的产品 API。课程会教你构建和运维 MCP server，相关课程产物保存在仓库中。若要提供远程 Streamable HTTP MCP endpoint，需要另行确定产品范围、认证策略和运维负责人。</p>
+  </article></main>
+  <footer class="site-footer"><div class="container footer-inner"><p>© 2026 · 开源 · 永久免费</p><div class="footer-links"><a href="about.html">关于</a><a href="contact.html">联系我们</a><a href="privacy.html">隐私</a><a href="llms.txt">Agents</a></div></div></footer>
+</body>
+</html>

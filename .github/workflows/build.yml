@@ -8,30 +8,38 @@ name: build
 #   3. 测验答案位置去偏校验，避免新题重新集中到某一个选项槽位。
 #   4. Claude 认证课程、评估、实验和答案位置合约。
 #   5. 交互图表按需加载清单与浏览器朗读状态机回归。
-# 不照搬上游 scripts/audit_lessons.py + check_readme_counts.py（它们硬编码 docs/en.md
-# + 英文 README 正则，对中文仓全不兼容，且是 B 类 1:1 同步资产，改了会与上游冲突）——
-# 改用 build.js 自带的 --check 做等价校验，认 zh.md、匹配中文文案，不碰上游 Python 脚本。
+# audit_lessons.py 已按中文仓契约读取 docs/zh.md；README/ROADMAP 计数仍由
+# build.js --check 校验，避免引入上游仅匹配英文 README 的正则。
 
 on:
   push:
     branches: [main]
     paths:
       - "site/**"
+      - "api/**"
+      - "learning-paths/**"
       - "README.md"
       - "ROADMAP.md"
       - "glossary/**"
       - "phases/**"
       - "certifications/**"
-      - "skills/claude-certification/**"
+      - "skills/**"
+      - ".claude/skills/**"
       - "scripts/audit_certifications.py"
+      - "scripts/audit_lessons.py"
       - "scripts/test_audit_certifications.py"
       - "scripts/backfill_certification_references.py"
       - "scripts/debias_certification_questions.py"
       - "scripts/debias_quizzes.py"
       - "scripts/test_debias_quizzes.py"
       - "scripts/check_figure_loader.js"
+      - "scripts/test_figures_i18n_zh.js"
       - "scripts/test_lesson_mobile_css.js"
       - "scripts/test_tts.js"
+      - "scripts/test_agent_negotiation.js"
+      - "scripts/test_agent_readiness.py"
+      - "scripts/test_seo_routes.js"
+      - "scripts/test_skill_artifact_bundles.py"
   pull_request:
     branches: [main]
 
@@ -55,6 +63,8 @@ jobs:
           echo "✅ 站点构建成功，data.js 已生成"
       - name: 课程数一致性校验（防 README/ROADMAP 课数漂移）
         run: node site/build.js --check
+      - name: 中文课程结构与站内链接校验
+        run: python3 scripts/audit_lessons.py --strict
       - name: Claude 认证课程合约校验
         run: python3 scripts/audit_certifications.py
       - name: 认证学习计划调度回归
@@ -70,6 +80,19 @@ jobs:
         run: find certifications/claude/lessons -path '*/code/main.py' -print0 | xargs -0 -r -n1 python3
       - name: 站点 JavaScript 语法校验
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
+      - name: Agent 内容协商回归
+        run: node scripts/test_agent_negotiation.js
+      - name: Agent 可读性与公开资源契约
+        run: python3 scripts/test_agent_readiness.py
+      - name: SEO 路由与服务端降级页
+        run: node scripts/test_seo_routes.js
+      - name: 站点构建产物与学习路径契约
+        run: |
+          node site/test_build_artifacts.js
+          node site/test_learning_paths.js
+          node site/test_static_preview_routes.js
+      - name: 课程导师 Skill Bundle 回归
+        run: python3 scripts/test_skill_artifact_bundles.py
       - name: 课程页移动端布局合约
         run: node scripts/test_lesson_mobile_css.js
       - name: 测验答案位置去偏校验
@@ -86,6 +109,8 @@ jobs:
       - name: 去偏锚点回归校验
         run: python3 scripts/test_debias_quizzes.py
       - name: 交互图表按需加载校验
-        run: node scripts/check_figure_loader.js
+        run: |
+          node scripts/check_figure_loader.js
+          node scripts/test_figures_i18n_zh.js
       - name: 浏览器朗读回归校验
         run: node scripts/test_tts.js
