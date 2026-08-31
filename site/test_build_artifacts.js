@@ -498,6 +498,43 @@ test('shared site asset families use the expected cache keys on every page', () 
   );
 });
 
+test('every public HTML page shares the real favicon assets', () => {
+  const pages = fs.readdirSync(__dirname)
+    .filter(name => name.endsWith('.html') && !/^google[a-z0-9]+\.html$/i.test(name))
+    .sort();
+  const svg = fs.readFileSync(path.join(__dirname, 'favicon.svg'), 'utf8');
+  const ico = fs.readFileSync(path.join(__dirname, 'favicon.ico'));
+
+  assert.ok(pages.length >= 14);
+  assert.match(svg, /viewBox="0 0 32 32"/);
+  assert.match(svg, />AI<\/text>/);
+  assert.deepEqual(Array.from(ico.subarray(0, 4)), [0, 0, 1, 0]);
+  assert.ok(ico.length > 100, 'favicon.ico is unexpectedly empty');
+
+  for (const page of pages) {
+    const source = fs.readFileSync(path.join(__dirname, page), 'utf8');
+    assert.equal(
+      (source.match(/<link rel="icon" href="\/favicon\.ico" sizes="32x32">/g) || []).length,
+      1,
+      `${page} must reference /favicon.ico exactly once`
+    );
+    assert.equal(
+      (source.match(/<link rel="icon" href="\/favicon\.svg" type="image\/svg\+xml">/g) || []).length,
+      1,
+      `${page} must reference /favicon.svg exactly once`
+    );
+    assert.doesNotMatch(source, /<link rel="icon"[^>]+data:image\//, `${page} still embeds a favicon data URI`);
+  }
+
+  for (const [page, marker] of [
+    ['lesson.html', 'AIFS:LESSON-SEO:START'],
+    ['certification.html', 'AIFS:CERTIFICATION-SEO:START'],
+  ]) {
+    const source = fs.readFileSync(path.join(__dirname, page), 'utf8');
+    assert.ok(source.indexOf('/favicon.ico') < source.indexOf(marker), `${page} favicon must survive SEO replacement`);
+  }
+});
+
 test('build-time SEO manifests cover every readable lesson and expose canonical no-JavaScript discovery links', () => {
   const root = path.resolve(__dirname, '..');
   const roadmap = parseRoadmap(fs.readFileSync(path.join(root, 'ROADMAP.md'), 'utf8'));
