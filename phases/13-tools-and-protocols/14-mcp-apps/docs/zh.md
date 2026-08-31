@@ -265,7 +265,7 @@ t3-ui-sandbox
 ```bash
 cd phases/13-tools-and-protocols/14-mcp-apps
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 检查输出中的五项：

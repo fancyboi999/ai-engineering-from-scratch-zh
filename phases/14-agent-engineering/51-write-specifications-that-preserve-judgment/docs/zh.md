@@ -74,7 +74,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 把生产写入决定从锁定改成委托。解释 schema 为何接受这个值而产品风险为何不接受。

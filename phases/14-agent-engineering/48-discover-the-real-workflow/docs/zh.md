@@ -82,7 +82,7 @@ AI 功能常在交接和例外处失败，因为只塑造了 happy path。
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 加入一条部署记录缺失的例外路径。保持主顺序不变，并记录分支从哪里开始。

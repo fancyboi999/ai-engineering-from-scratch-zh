@@ -69,7 +69,7 @@ function makeAssets() {
             learningPathIds: [],
             fromTrackIds: [],
             sourceUrl: 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/certifications/claude/lessons/01-models',
-            canonicalUrl: 'https://aieng-zh.cn/lesson.html?path=certifications%2Fclaude%2Flessons%2F01-models',
+            canonicalUrl: 'https://aieng-zh.cn/lesson?path=certifications%2Fclaude%2Flessons%2F01-models',
           },
         },
       },

@@ -82,7 +82,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 把期望结果替换为“使用事故助手”。验证器应标出拟议产出泄漏进了结果。

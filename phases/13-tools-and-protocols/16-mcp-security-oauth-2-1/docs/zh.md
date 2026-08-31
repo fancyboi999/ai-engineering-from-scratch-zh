@@ -252,7 +252,7 @@ t3-scope-stepup
 ```bash
 cd phases/13-tools-and-protocols/16-mcp-security-oauth-2-1
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 输出先展示 discovery，随后是 CIMD 注册、一次普通读取、两次独立的 scope 权限升级，以及按签发方分键的凭据存储。

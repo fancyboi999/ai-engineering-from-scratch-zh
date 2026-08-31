@@ -118,7 +118,7 @@ function canonicalForLesson(lessonPath) {
   if (lessonPath.startsWith('phases/')) {
     return `${ORIGIN}/lessons/${lessonPath.replace(/^phases\//, '')}/`;
   }
-  return `${ORIGIN}/lesson.html?path=${encodeURIComponent(lessonPath)}`;
+  return `${ORIGIN}/lesson?path=${encodeURIComponent(lessonPath)}`;
 }
 
 function replaceMarkedRegion(template, start, end, content) {

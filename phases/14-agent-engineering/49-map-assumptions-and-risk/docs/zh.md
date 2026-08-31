@@ -82,7 +82,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 改变最高风险假设的证据，观察下一个实验如何随之变化。

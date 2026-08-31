@@ -82,7 +82,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 将试点示例改为低后果且运营就绪。说明还需要什么证据才能进入生产。

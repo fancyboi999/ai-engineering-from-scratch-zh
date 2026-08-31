@@ -86,7 +86,7 @@ flowchart TD
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 把文档单元改为拥有 `app/`。该计划应被阻止，因为这个父路径与 API 单元重叠。

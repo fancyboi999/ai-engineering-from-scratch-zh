@@ -93,7 +93,7 @@ agent 应继续处理可发现和已委托的未知项。在某个选择被埋�
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 用四种方式破坏示例：移除目标、移除事实凭据、让允许路径和禁止路径重叠，以及移除验收命令。验证器应以不同理由拒绝每个框架。

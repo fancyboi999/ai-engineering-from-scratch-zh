@@ -248,7 +248,7 @@ tp-tool-poisoning
 ```bash
 cd phases/13-tools-and-protocols/15-mcp-security-tool-poisoning
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 示例会故意变异一个 descriptor。扫描器和 digest 比较会产生彼此独立的发现。随后导出会演示 `input_required` 响应和无状态重试。

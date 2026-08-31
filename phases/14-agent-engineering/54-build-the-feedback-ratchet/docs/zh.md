@@ -90,7 +90,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 加入一个运行时超时信号，确认它被路由到运行时，而不是通用待办列表。

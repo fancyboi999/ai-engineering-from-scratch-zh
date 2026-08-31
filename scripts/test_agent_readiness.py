@@ -131,7 +131,7 @@ def main() -> None:
         for lesson_path, entry in core_lessons.items()
     )
     assert all(
-        entry["canonicalUrl"].startswith("https://aieng-zh.cn/lesson.html?path=")
+        entry["canonicalUrl"].startswith("https://aieng-zh.cn/lesson?path=")
         for entry in certification_lessons.values()
     )
 
@@ -154,7 +154,7 @@ def main() -> None:
         for value in re.findall(r"https://aieng-zh\.cn/lessons/([^<]+)", sitemap)
     }
     assert sitemap_lessons == set(core_lessons)
-    assert sitemap.count("/lesson.html?path=") == len(certification_lessons)
+    assert sitemap.count("/lesson?path=") == len(certification_lessons)
     assert sitemap.count("/certification?id=") == len(tracks)
 
     templates_and_markers = (

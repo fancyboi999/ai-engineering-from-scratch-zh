@@ -131,7 +131,7 @@
   }
 
   function lessonReferenceHref(path, sourceTrack) {
-    var href = 'lesson?path=' + encodeURIComponent(path);
+    var href = '/lesson?path=' + encodeURIComponent(path);
     if (sourceTrack) {
       href += trackContainsLesson(sourceTrack, path)
         ? '&track=' + encodeURIComponent(sourceTrack.id)
@@ -411,7 +411,7 @@
         return metaChip(fact.label + ': ' + value);
       }).join('') + '</div>' +
       '<div class="cert-track-hero-actions">' +
-        (firstPath ? '<a class="cert-action" href="lesson.html?path=' + encodeURIComponent(firstPath) + '&track=' + encodeURIComponent(track.id) + '">' + (complete ? '继续学习' : '开始学习') + '</a>' : '') +
+        (firstPath ? '<a class="cert-action" href="/lesson?path=' + encodeURIComponent(firstPath) + '&track=' + encodeURIComponent(track.id) + '">' + (complete ? '继续学习' : '开始学习') + '</a>' : '') +
         '<a class="cert-action secondary" href="#trackAssessments">练习与评估</a>' +
         '<a class="cert-action secondary" href="' + attr(TUTOR_GUIDE_URL) + '" target="_blank" rel="noopener" aria-label="在 GitHub 上跟随 AI 导师学习（新标签页）">在 GitHub 上跟随 AI 导师学习 ↗</a>' +
         (track.exam && track.exam.officialGuideUrl ? '<a class="cert-action secondary" href="' + attr(track.exam.officialGuideUrl) + '" target="_blank" rel="noopener">官方考试指南</a>' : '') +
@@ -474,7 +474,7 @@
         '<div class="cert-lesson-num">' + String(index + 1).padStart(2, '0') + '</div>' +
         '<div class="cert-lesson-copy"><h3>' + esc(lesson.name) + '</h3><p>' + esc((done ? '已完成 · ' : '') + origin + (lesson.summary ? ' · ' + lesson.summary : '')) + '</p></div>' +
         '<div class="cert-domain-chips">' + domains.map(function (domain) { return '<span class="cert-domain-chip">' + esc(domain) + '</span>'; }).join('') + '</div>' +
-        '<a class="cert-lesson-open" href="lesson.html?path=' + encodeURIComponent(path) + '&track=' + encodeURIComponent(track.id) + '">' + (done ? '复习' : '打开') + ' →</a>' +
+        '<a class="cert-lesson-open" href="/lesson?path=' + encodeURIComponent(path) + '&track=' + encodeURIComponent(track.id) + '">' + (done ? '复习' : '打开') + ' →</a>' +
       '</article>';
     }).join('') : '<div class="cert-empty">这条路线暂未添加课程。</div>';
   }

@@ -326,7 +326,7 @@ t3-gateway-funnel
 ```bash
 cd phases/13-tools-and-protocols/17-mcp-gateways-and-registries
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 演示会打印外层请求 id 和全新的后端请求 id，让无状态跳转可见。

@@ -79,7 +79,7 @@ flowchart TD
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 添加一个只证明一项所需假设的更便宜候选项。即使数值分高，它仍应不合格。

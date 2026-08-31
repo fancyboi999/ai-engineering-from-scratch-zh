@@ -2653,7 +2653,7 @@
       // 预渲染静态课程页的规范 URL：/lessons/<phase>/<lesson>/
       function lessonHref(path) {
         if (String(path).indexOf('certifications/claude/lessons/') === 0) {
-          return '/lesson.html?path=' + encodeURIComponent(path);
+          return '/lesson?path=' + encodeURIComponent(path);
         }
         return '/lessons/' + String(path).replace(/^phases\//, '').replace(/\/+$/, '') + '/';
       }
@@ -5423,7 +5423,7 @@
             var certItemDone = certLessonDoneAt(cv);
             if (cv > certStart) certHtml += '<div class="timeline-line ' + (certLessonDoneAt(cv - 1) && certItemDone ? 'done' : '') + '"></div>';
             var certClass = (cv === currentLessonIndex ? 'current ' : '') + (certItemDone ? 'done' : '');
-            certHtml += '<a class="timeline-item ' + certClass + '" href="lesson.html?path=' + encodeURIComponent(certItem.path) + '&track=' + encodeURIComponent(certificationTrack.id) + '" title="' + escapeAttr(certItem.lessonName) + '"><div class="timeline-dot"></div><div class="timeline-label">' + escapeHtml(certItem.lessonName) + '</div></a>';
+            certHtml += '<a class="timeline-item ' + certClass + '" href="/lesson?path=' + encodeURIComponent(certItem.path) + '&track=' + encodeURIComponent(certificationTrack.id) + '" title="' + escapeAttr(certItem.lessonName) + '"><div class="timeline-dot"></div><div class="timeline-label">' + escapeHtml(certItem.lessonName) + '</div></a>';
           }
           if (certEnd < certTotal) certHtml += '<div class="timeline-line"></div><span class="timeline-ellipsis" title="后面还有 ' + (certTotal - certEnd) + ' 节课">' + (certTotal - certEnd) + ' &raquo;</span>';
           certHtml += '</div><div class="phase-progress-bar"><div class="phase-progress-fill" style="width:' + certPct + '%"></div></div>';
@@ -5598,7 +5598,7 @@
           var certContinueHtml = '<div class="ai-panel-header"><div class="ai-panel-icon">N</div><div class="ai-panel-title">继续认证备考</div></div><div class="continue-panel">';
           if (!certNext) certContinueHtml += '<div class="phase-finished">你已到达这条学习路线的末尾。</div>';
           certContinueHtml += '<div class="continue-links">';
-          if (certNext) certContinueHtml += '<a class="continue-link" href="lesson.html?path=' + encodeURIComponent(certNext.path) + '&track=' + encodeURIComponent(certificationTrack.id) + '">下一节：' + escapeHtml(certNext.lessonName) + '</a>';
+          if (certNext) certContinueHtml += '<a class="continue-link" href="/lesson?path=' + encodeURIComponent(certNext.path) + '&track=' + encodeURIComponent(certificationTrack.id) + '">下一节：' + escapeHtml(certNext.lessonName) + '</a>';
           certContinueHtml += '<a class="continue-link" href="certification.html?id=' + encodeURIComponent(certificationTrack.id) + '">路线概览与练习</a>';
           certContinueHtml += '<a class="continue-link" href="certifications.html">全部认证路线</a></div>';
           certContinueHtml += '<div class="continue-callout">练习结果是课程百分比，不是官方换算分数。请用它定位下一项需要补强的领域。</div></div>';

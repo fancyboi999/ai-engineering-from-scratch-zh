@@ -35,6 +35,17 @@ test('returns 406 when the client rejects both supported types', () => {
   assert.match(result.body, /Not Acceptable/);
 });
 
+test('returns 406 when supported types and the wildcard are explicitly q=0', () => {
+  for (const accept of [
+    'text/html;q=0, text/markdown;q=0',
+    'application/json, */*;q=0',
+  ]) {
+    const result = request(accept);
+    assert.equal(result.res.statusCode, 406);
+    assert.match(result.body, /Not Acceptable/);
+  }
+});
+
 test('returns an agent-readable 404 for an unknown negotiated route', () => {
   const result = request('text/markdown', '/does-not-exist');
   assert.equal(result.res.statusCode, 404);

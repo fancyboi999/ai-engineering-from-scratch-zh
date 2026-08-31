@@ -164,7 +164,7 @@ mcp-tool-call
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 在输出中关注三条不变量：

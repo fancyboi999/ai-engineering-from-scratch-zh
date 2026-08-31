@@ -892,12 +892,12 @@ function canonicalLessonUrl(lessonPathValue) {
   if (lessonPathValue.startsWith('phases/')) {
     return SITE_ORIGIN + lessonStaticHref(lessonPathValue);
   }
-  return `${SITE_ORIGIN}/lesson.html?path=${encodeURIComponent(lessonPathValue)}`;
+  return `${SITE_ORIGIN}/lesson?path=${encodeURIComponent(lessonPathValue)}`;
 }
 
 function lessonHref(lessonPathValue) {
   if (lessonPathValue.startsWith('phases/')) return lessonStaticHref(lessonPathValue);
-  return `lesson.html?path=${encodeURIComponent(lessonPathValue)}`;
+  return `/lesson?path=${encodeURIComponent(lessonPathValue)}`;
 }
 
 function canonicalCertificationUrl(trackId) {
@@ -2187,7 +2187,7 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths) {
     }
     for (const lesson of Object.values(certifications.lessonsByPath)) {
       const track = lesson.trackIds && lesson.trackIds[0];
-      let loc = '/lesson.html?path=' + encodeURIComponent(lesson.path);
+      let loc = '/lesson?path=' + encodeURIComponent(lesson.path);
       if (track) loc += '&track=' + encodeURIComponent(track);
       urls.push({ loc, priority: '0.7', freq: 'monthly' });
     }
@@ -2251,7 +2251,7 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
       out += `\n`;
     }
     for (const lesson of Object.values(certifications.lessonsByPath)) {
-      out += `- [${lesson.name}](${SITE_ORIGIN}/lesson.html?path=${encodeURIComponent(lesson.path)}) · [raw](${rawOrigin}/${lesson.path}/docs/zh.md)`;
+      out += `- [${lesson.name}](${SITE_ORIGIN}/lesson?path=${encodeURIComponent(lesson.path)}) · [raw](${rawOrigin}/${lesson.path}/docs/zh.md)`;
       if (lesson.summary) out += ` — ${lesson.summary}`;
       out += `\n`;
     }
@@ -2262,7 +2262,7 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
 
 // ─── 预渲染静态课程页：site/lessons/<phase>/<lesson>/index.html ──────
 // 旧 lesson.html?path= 入口的正文靠浏览器运行时 fetch 渲染，爬虫拿到的是
-// 503 个字节级相同的空壳（百度不执行跨域 fetch，Google 渲染预算对新站极少）。
+// 每课都是字节级相同的空壳（百度不执行跨域 fetch，Google 渲染预算对新站极少）。
 // 这里用与浏览器同一份渲染器（md-render.js）在构建时把正文烤进 HTML：
 // 每课独立 URL + 独立 title/description/canonical/JSON-LD。产物 gitignore，
 // 与 sitemap/llms 同款策略——Vercel buildCommand 部署时生成。

@@ -92,7 +92,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 示例会产生三个波次：先定义契约；实现和文档同时进行；最后是集成关卡。

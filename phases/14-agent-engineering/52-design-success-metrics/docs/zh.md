@@ -85,7 +85,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 移除护栏指标，观察即使结果指标还在，计划为何仍无效。

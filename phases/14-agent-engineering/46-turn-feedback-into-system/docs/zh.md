@@ -96,7 +96,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
-python3 -m unittest discover code/tests -v
+PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 
 添加两条措辞不同但原因相同的纠正。改进归一化，让它们合并为一个控制，同时不合并无关失败。
