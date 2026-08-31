@@ -477,13 +477,16 @@ test('certification route fails closed and reloads injected fixture assets', fun
   assert.equal(loadCount, 2);
 });
 
-test('deployment routes extensionless pages through handlers and redirects legacy HTML URLs', function () {
+test('deployment routes the root and extensionless pages through handlers without intercepting legacy HTML', function () {
   const repoRoot = path.join(__dirname, '..');
   const config = JSON.parse(fs.readFileSync(path.join(repoRoot, 'vercel.json'), 'utf8'));
   const rewrites = new Map(config.rewrites.map(function (rule) { return [rule.source, rule.destination]; }));
   const routes = new Map((config.routes || []).map(function (rule) { return [rule.src, rule]; }));
   assert.equal(rewrites.get('/lesson'), '/api/lesson');
   assert.equal(rewrites.get('/certification'), '/api/certification');
+  assert.equal(rewrites.has('/'), false);
+  assert.equal(routes.get('/').dest, '/api/markdown?path=/');
+  assert.deepEqual(routes.get('/').methods, ['GET', 'HEAD']);
   assert.equal(routes.has('/lesson\\.html'), false);
   assert.equal(routes.has('/certification\\.html'), false);
 
