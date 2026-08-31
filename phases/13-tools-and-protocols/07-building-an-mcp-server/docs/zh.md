@@ -15,7 +15,7 @@
 - 在正确的结果上返回 `resultType`、server identity 和 cache hints。
 - 在 Python 与 TypeScript 中，通过以换行分隔的 stdio 提供相同的无状态契约。
 
-## 问题所在
+## 问题背景
 
 在第一条消息后存储 client capabilities 的 server 很容易构建，却很难运维。同一进程可能依次服务多个 client。一条远程请求可能落到不同 worker。过期的 capability 声明可能越过授权边界泄漏行为。
 
@@ -153,7 +153,7 @@ def complete(payload):
 t3-dispatch-loop
 ```
 
-## 上手使用
+## 实际使用
 
 运行 Python server 的有限 demo 和测试：
 
@@ -171,7 +171,7 @@ npx tsx main.ts --demo
 
 demo 会发送 `server/discover`，列出每种基元，调用 tools，并展示不支持版本错误。每条现代请求都会重复元数据。每个成功结果都包含 server identity。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-mcp-server-scaffolder.md`。它会生成一个现代 server 计划，其中包含发现契约、逐请求校验、确定性的可缓存列表，以及可选且隔离的旧版 adapter。
 

@@ -5,7 +5,7 @@
 **类型：** 顶点项目
 **语言：** Python 和 TypeScript 参考模型；任意生产语言
 **前置要求：** 第 11、13、14、17 和 18 阶段
-**必修 MCP 深入课程：** [第 28 课：工具契约](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/en.md)、[第 29 课：可靠性](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/en.md)、[第 30 课：Registry 供应链](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) 和 [第 31 课：一致性运维](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md)
+**必修 MCP 深入课程：** [第 28 课：工具契约](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/zh.md)、[第 29 课：可靠性](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/zh.md)、[第 30 课：Registry 供应链](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/zh.md) 和 [第 31 课：一致性运维](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/zh.md)
 **协议目标：** MCP `2026-07-28`
 **预计时间：** 约 25 小时
 
@@ -22,14 +22,14 @@
 
 在将本顶点项目视作生产就绪之前，请按顺序完成链接的四节第 13 阶段课程：
 
-1. [第 28 课](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/en.md) 定义本服务器必须暴露的工具、schema、内容、分页、完成、路由和错误契约。
-2. [第 29 课](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/en.md) 定义取消竞争、截止时间、幂等性、背压、重试和重连行为。
-3. [第 30 课](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) 定义命名空间、溯源、准入 pin、Registry 状态、漂移、账本和回滚证据。
-4. [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) 定义 golden 与负向 transcript、严格版本时期、SDK 差异检查、代理证明、脱敏、健康检查和发布门禁。
+1. [第 28 课](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/zh.md) 定义本服务器必须暴露的工具、schema、内容、分页、完成、路由和错误契约。
+2. [第 29 课](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/zh.md) 定义取消竞争、截止时间、幂等性、背压、重试和重连行为。
+3. [第 30 课](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/zh.md) 定义命名空间、溯源、准入 pin、Registry 状态、漂移、账本和回滚证据。
+4. [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/zh.md) 定义 golden 与负向 transcript、严格版本时期、SDK 差异检查、代理证明、脱敏、健康检查和发布门禁。
 
 本顶点项目整合这些产物，不会用一次 happy-path SDK 测试替代它们。
 
-## 问题所在
+## 问题背景
 
 一个内部平台需要只读数据工具，以及少量会改变状态的工具。开发者必须能发现服务器、理解如何连接、检查它的实时能力，并且只能调用自己有权使用的操作。
 
@@ -239,11 +239,11 @@ Python 模型对带排序 key 的规范 JSON 做 hash，然后将该 digest 与 
 
 | 证据 | 最低证明 | 来源课程 |
 |---|---|---|
-| Wire | golden 和负向场景的脱敏原始 headers 与 JSON-RPC bodies，包括 metadata 类型失败、header 不匹配、不支持版本、缺失或未知 `resultType`、通知无响应以及响应 ID 匹配 | [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) |
-| 代理 | 同一稳定场景直接运行，并经部署的中介运行，附 ingress、origin 和 egress status 与 body digests；证明协议错误没有被折叠成通用 500 响应，且 streaming 未被缓冲 | [第 29 课](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/en.md) 和 [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) |
-| 准入 | 经验证的发布者命名空间、不可变 Registry 记录 digest、artifact 或 remote provenance、实时 `server/discover` identity 与 capability observation、descriptor pin、当前 Registry status 和 admission-ledger event | [第 30 课](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) |
-| 重试 | 取消与完成的竞争、明确 timeout、安全的 read retry、mutation idempotency key、重连后的重新获取，以及证明请求取消不会静默变成持久任务取消 | [第 29 课](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/en.md) |
-| 回滚 | 精确的前一版本、admission 与 artifact digests、descriptor pin、活跃 Registry status、当前健康窗口、路由恢复结果和脱敏决策证据 | [第 30 课](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) 和 [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) |
+| Wire | golden 和负向场景的脱敏原始 headers 与 JSON-RPC bodies，包括 metadata 类型失败、header 不匹配、不支持版本、缺失或未知 `resultType`、通知无响应以及响应 ID 匹配 | [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/zh.md) |
+| 代理 | 同一稳定场景直接运行，并经部署的中介运行，附 ingress、origin 和 egress status 与 body digests；证明协议错误没有被折叠成通用 500 响应，且 streaming 未被缓冲 | [第 29 课](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/zh.md) 和 [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/zh.md) |
+| 准入 | 经验证的发布者命名空间、不可变 Registry 记录 digest、artifact 或 remote provenance、实时 `server/discover` identity 与 capability observation、descriptor pin、当前 Registry status 和 admission-ledger event | [第 30 课](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/zh.md) |
+| 重试 | 取消与完成的竞争、明确 timeout、安全的 read retry、mutation idempotency key、重连后的重新获取，以及证明请求取消不会静默变成持久任务取消 | [第 29 课](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/zh.md) |
+| 回滚 | 精确的前一版本、admission 与 artifact digests、descriptor pin、活跃 Registry status、当前健康窗口、路由恢复结果和脱敏决策证据 | [第 30 课](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/zh.md) 和 [第 31 课](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/zh.md) |
 
 将脱敏证据包的 digest 与 release 一起存储。若缺少任何一类，请阻止发布。不要从进程内 dispatcher 推断代理行为、从 Registry 存在推断准入、从新的 JSON-RPC id 推断重试安全，或从“上一个部署版本”推断回滚就绪。
 
@@ -300,7 +300,7 @@ Authorization: Bearer REDACTED
 }
 ```
 
-## 交付
+## 拿去用
 
 交付一个包含以下内容的仓库：
 

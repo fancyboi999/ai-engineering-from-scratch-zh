@@ -15,7 +15,7 @@
 - 区分 Apps 的 `ui/initialize` 桥接消息与已移除的 MCP 核心握手。
 - 应用源验证、沙箱、CSP 和最小权限原则。
 
-## 问题所在
+## 问题背景
 
 文本结果可以描述一条时间线，却不能把一条可供用户筛选、检查或操作的时间线交给他们。
 
@@ -276,13 +276,13 @@ python3 -m unittest discover code/tests -v
 4. 每个结果都有 `resultType` 和 server 身份元数据。
 5. 不出现核心会话标识符。
 
-## 上手使用
+## 实际使用
 
 从 `server/discover` 开始。确认 `io.modelcontextprotocol/ui` 出现在 server 扩展映射中。然后调用两次 `tools/list`：一次带 Apps 能力，一次不带。第一个响应声明资源。第二个仍是可用的纯文本工具。
 
 读取 `ui://notes/timeline.html`。在 HTML 中搜索 `hostOrigin` 和 `event.origin` guard。这两行是桥接未使用通配符目标的最低限度可见证据。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-mcp-apps-spec.md`。在编写框架代码前，用它审查 App 契约。它要求作者说明当前核心信封、扩展协商、回退、UI 资源、缓存策略、CSP、权限、桥接方法和同意边界。
 

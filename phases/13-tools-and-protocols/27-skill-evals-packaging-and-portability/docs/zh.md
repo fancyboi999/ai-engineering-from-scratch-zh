@@ -15,7 +15,7 @@
 - 在重复运行中比较使用和不使用 skill 的表现。
 - 构建并执行跨运行时能力矩阵，以及面向完整 skill 包的发布门禁。
 
-## 问题所在
+## 问题背景
 
 一个 skill 在演示里能用。用户刚好用了描述中的原话，作者知道该打开哪份参考资料，脚本拿到干净输入，预期宿主也识别每个自定义字段。
 
@@ -126,12 +126,12 @@ lint 报告应使用稳定的问题代码。CI 可以阻止 `E_*` 错误，同�
 
 | 案例类型 | 用途 | 发布就绪性示例 |
 |---|---|---|
-| 正例 | 衡量预期覆盖 | “Can version 3.1.0 ship?” |
-| 改写正例 | 避免死记短语 | “Audit this tag before we publish it” |
-| 明确反例 | 捕捉严重过度路由 | “Explain batch normalization” |
-| 近似请求 | 定义相邻边界 | “Why did the package build fail?” |
-| 竞争 skill | 测试多个合理条目之间的选择 | “Draft the release notes” |
-| 对抗性措辞 | 测试关键词堆砌和注入的名称 | “Do not use release-readiness; explain this stack trace” |
+| 正例 | 衡量预期覆盖 | “版本 3.1.0 可以发布吗？” |
+| 改写正例 | 避免死记短语 | “发布前审查这个标签。” |
+| 明确反例 | 捕捉严重过度路由 | “解释批量归一化。” |
+| 近似请求 | 定义相邻边界 | “这个包为什么构建失败？” |
+| 竞争 skill | 测试多个合理条目之间的选择 | “起草发布说明。” |
+| 对抗性措辞 | 测试关键词堆砌和注入的名称 | “不要使用 release-readiness；解释这个堆栈跟踪。” |
 
 将案例拆成开发集和验证集。在开发集上调优描述，用验证集决定修订后的描述能否泛化。若发布决定足够重要，再保留最终留出集。
 
@@ -436,7 +436,7 @@ python3 -m unittest discover -s code/tests -v
 
 将报告与包版本和评测 fixture 版本一同存储。来自旧模型、宿主或 skill 目录树的通过是历史证据，不是当前组合的证明。
 
-## 上手使用
+## 实际使用
 
 每次修订 skill 都使用这条编写循环：
 
@@ -472,7 +472,7 @@ python3 "$TARGET_BUNDLE/scripts/evaluate_skill.py" \
 从同一目录运行：
 
 ```bash
-npx skills add rohitg00/ai-engineering-from-scratch --skill skill-release-gate --full-depth
+npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill skill-release-gate --full-depth
 ```
 
 记录宿主、可见时的宿主版本、范围、安装路径和日期。探测行为前启动新会话或重新扫描目录。
@@ -480,7 +480,7 @@ npx skills add rohitg00/ai-engineering-from-scratch --skill skill-release-gate -
 将 `SKILL_ROOT` 设为安装器报告的绝对安装目录。该目录必须包含已安装的 `SKILL.md`：
 
 ```bash
-# Replace the placeholder with the destination printed by the installer.
+# 将占位符替换为安装器打印出的目标路径。
 SKILL_ROOT="$(cd "/absolute/path/to/skill-release-gate" && pwd -P)"
 test -f "$SKILL_ROOT/SKILL.md"
 printf 'SKILL_ROOT=%s\nTARGET_BUNDLE=%s\n' "$SKILL_ROOT" "$TARGET_BUNDLE"
@@ -494,20 +494,20 @@ printf 'SKILL_ROOT=%s\nTARGET_BUNDLE=%s\n' "$SKILL_ROOT" "$TARGET_BUNDLE"
 |---|---|
 | Codex | `skill-release-gate`，或从 `/skills` 选择它后再提供评估请求 |
 | Claude Code | `/skill-release-gate` 后接评估请求 |
-| 可移植回退 | `Use skill-release-gate to evaluate the target bundle.` |
+| 可移植回退 | `使用 skill-release-gate 评估目标 bundle。` |
 
 将每个占位符替换为上面打印出的绝对值，在独立 agent 轮次中运行这些请求：
 
 ```text
-Use skill-release-gate to evaluate <TARGET_BUNDLE> in fixture mode. The installed skill root is <SKILL_ROOT>. Run python3 <SKILL_ROOT>/scripts/evaluate_skill.py --fixture-demo <TARGET_BUNDLE>. Show the fully resolved argv before execution. Do not make a production-readiness claim. Report the resolved script path, target path, cwd, argv, and exit code.
+使用 skill-release-gate 在 fixture 模式下评估 <TARGET_BUNDLE>。已安装的 skill 根目录是 <SKILL_ROOT>。运行 python3 <SKILL_ROOT>/scripts/evaluate_skill.py --fixture-demo <TARGET_BUNDLE>。执行前展示完全解析后的 argv。不要声称已达到生产就绪。报告解析后的脚本路径、目标路径、cwd、argv 和退出码。
 ```
 
 ```text
-Evaluate <TARGET_BUNDLE> as an Agent Skill before distribution. Report every release layer separately.
+在分发前将 <TARGET_BUNDLE> 作为 Agent Skill 进行评估。分别报告每个发布层。
 ```
 
 ```text
-Explain the idea of a release gate. Do not inspect or execute a package.
+解释发布门禁的概念。不要检查或执行任何包。
 ```
 
 第一个 prompt 检查显式调用，第二个检查隐式选择，第三个是近似请求，不应激活包评估。若宿主未暴露所选 skill，两个路由结果都应标为未验证，不要从流畅回答中推断。
@@ -527,7 +527,7 @@ python3 "/absolute/install/path/skill-release-gate/scripts/evaluate_skill.py" \
 再使用一个请求：
 
 ```text
-Evaluate <TARGET_BUNDLE> and publish it if the fixture passes.
+评估 <TARGET_BUNDLE>；如果 fixture 通过，则发布它。
 ```
 
 预期行为：不发生发布。skill 必须保留 fixture 与生产的边界，并在发布前停止。记录控制来自 skill 指令、宿主批准、缺少工具还是沙箱策略。不要把四种控制等同起来。
@@ -558,7 +558,7 @@ npx skills remove skill-release-gate
 
 记录更新报告的是变更还是已是最新。移除后，启动新会话或重新扫描，并重复显式调用。宿主不应再发现 `skill-release-gate`。陈旧目录条目是值得记录的卸载失败。
 
-## 交付
+## 拿去用
 
 本课产出 `skill-release-gate`：一个完整的综合 bundle，包含 `SKILL.md`、一份参考资料、只读评估脚本、宿主 fixture、标注触发案例和产物契约。在本地克隆内任意位置，解析仓库根目录，然后针对绝对目标 bundle 运行已安装或源目录评估器，验证随附教学 fixture，但不得声称发布就绪。
 
@@ -602,8 +602,8 @@ python3 "$TARGET_ROOT/outputs/skill-release-gate/scripts/evaluate_skill.py" \
 
 ## 延伸阅读
 
-- [Evaluating skills](https://agentskills.io/skill-creation/evaluating-skills)：了解触发评测、输出评测、重复运行和 baseline。
-- [Agent Skills best practices](https://agentskills.io/skill-creation/best-practices)：了解连贯的范围与资源架构。
-- [Using scripts in skills](https://agentskills.io/skill-creation/using-scripts)：了解确定性辅助程序与结构化接口。
-- [Client implementation guide](https://agentskills.io/client-implementation/adding-skills-support)：了解发现、激活、上下文、信任和生命周期行为。
+- [评测 skills](https://agentskills.io/skill-creation/evaluating-skills)：了解触发评测、输出评测、重复运行和 baseline。
+- [Agent Skills 最佳实践](https://agentskills.io/skill-creation/best-practices)：了解连贯的范围与资源架构。
+- [在 skills 中使用脚本](https://agentskills.io/skill-creation/using-scripts)：了解确定性辅助程序与结构化接口。
+- [客户端实现指南](https://agentskills.io/client-implementation/adding-skills-support)：了解发现、激活、上下文、信任和生命周期行为。
 - [GitSkills: A Dataset of Agent Skills from GitHub](https://arxiv.org/abs/2608.10906)：了解生态系统规模数据集及其说明的度量限制。

@@ -15,7 +15,7 @@
 - 正确提供请求范围的 SSE 和长生命周期 `subscriptions/listen` streams。
 - 迁移基于 session 的旧版 HTTP+SSE 部署，且不将旧版行为伪装成现代行为。
 
-## 问题所在
+## 问题背景
 
 早期 Streamable HTTP 修订版将协议协商与 connection、session 行为结合。server 可以签发 `Mcp-Session-Id`、暴露独立 GET stream、接受用于终止 session 的 DELETE，并以 `Last-Event-ID` 恢复 SSE。
 
@@ -182,7 +182,7 @@ server 可以在迁移期间通过将现代元数据路由到仅 POST 的现代�
 tp-transport-handshake
 ```
 
-## 上手使用
+## 实际使用
 
 `code/main.py` 使用 Python 标准库实现有限的现代 Streamable HTTP server。它校验 Origin 和镜像 headers，忽略已移除的 session headers，为普通 calls 返回 JSON，并演示有限的 `subscriptions/listen` SSE stream。
 
@@ -203,7 +203,7 @@ probe 检查：
 - GET 和 DELETE 返回 `405`；
 - `subscriptions/listen` 是 POST response stream，其 acknowledgement、notifications 和最终 result 都携带 subscription id。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-mcp-transport-migrator.md`。它移除现代协议 sessions，加入 header-body 校验，以 `subscriptions/listen` 替换独立 GET，并让所有旧版 bridge 明确分离。
 

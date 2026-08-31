@@ -1,6 +1,6 @@
 """Phase 13 Lesson 17: a stateless MCP gateway and admission catalog.
 
-Companion to ../docs/en.md. This in-process protocol model implements current
+Companion to ../docs/zh.md. This in-process protocol model implements current
 discovery, routing validation, deterministic tool aggregation, Registry
 server.json admission, RBAC, rate limits, descriptor pins, stateless backend
 forwarding, and a modeled subscriptions/listen response. Lesson 09 supplies

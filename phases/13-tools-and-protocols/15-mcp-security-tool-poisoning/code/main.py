@@ -1,5 +1,5 @@
 """Phase 13 Lesson 15: secure MCP 2026-07-28 tool dispatch.
-Lesson: phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/docs/en.md
+Lesson: phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/docs/zh.md
 Spec: https://modelcontextprotocol.io/specification/2026-07-28
 Scans metadata, pins descriptors, detects collisions, and validates routing.
 It also protects MRTR continuation state; Lesson 09 owns HTTP transport.

@@ -1,5 +1,5 @@
 # Certification lesson 11: stateless MCP server design simulator.
-# Lesson: certifications/claude/lessons/11-mcp-server-design-and-integration/docs/en.md
+# 课程：certifications/claude/lessons/11-mcp-server-design-and-integration/docs/zh.md
 # MCP: https://modelcontextprotocol.io/specification/2026-07-28
 # Also follows JSON-RPC 2.0, RFC 2104 HMAC, and RFC 4648 base64url.
 # Run: python3 main.py

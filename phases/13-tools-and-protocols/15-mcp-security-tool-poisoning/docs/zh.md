@@ -15,7 +15,7 @@
 - 防护 MRTR `requestState` 不被篡改，并将确认绑定到精确参数。
 - 将授权和限流应用于 principal，而不是已移除的协议 session。
 
-## 问题所在
+## 问题背景
 
 模型读取工具描述来决定调用什么。router 读取工具名来决定将请求发往哪里。用户读取标签来决定批准什么。一个恶意 descriptor 可以同时攻击这三方。
 
@@ -253,13 +253,13 @@ python3 -m unittest discover code/tests -v
 
 示例会故意变异一个 descriptor。扫描器和 digest 比较会产生彼此独立的发现。随后导出会演示 `input_required` 响应和无状态重试。
 
-## 上手使用
+## 实际使用
 
 用来自你自己的已批准 servers 的规范化快照替换 `SAFE_TOOLS`。不要在快照中保留凭据和秘密。更新 digest 前，审查每个新的或已变更的 descriptor。
 
 在 gateway 中，于发现阶段执行同样检查，并在 dispatch 前再次执行。缓存可以减少发现工作，但缓存的批准必须在 descriptor 变更时过期或失效。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-mcp-threat-model.md`。它会产出一份针对当前协议的威胁模型，覆盖元数据、路由、capability、授权、MRTR、缓存、注册表和兼容性边界。
 

@@ -7,11 +7,11 @@
       "question": "MCP client 为同一 resource 发现了不同的 authorization-server issuer。它该如何处理已有注册和 access token？",
       "options": [
         "仅在本地修改 access token 的受众后重用它",
-        "为新 issuer 入册，并按 issuer 隔离凭据",
         "由于 MCP resource URL 未变，因此重用两者",
-        "将两者都存到 tool name 下，而不是 issuer 下"
+        "将两者都存到 tool name 下，而不是 issuer 下",
+        "为新 issuer 入册，并按 issuer 隔离凭据"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "client identifier 和注册凭据属于创建它们的 authorization-server issuer。issuer 变化要求独立入册，而每个 access token 同时按该 issuer 和它的 resource audience 缓存。"
     },
     {
@@ -30,48 +30,48 @@
       "stage": "check",
       "question": "已废弃 DCR 请求描述一个 loopback desktop client。哪项 metadata 对正确分类至关重要？",
       "options": [
-        "Mcp-Session-Id",
+        "可复用 bearer token",
         "通配符 redirect URI",
-        "设为 native 的 application_type",
-        "可复用 bearer token"
+        "Mcp-Session-Id",
+        "设为 native 的 application_type"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "当前兼容指引要求正确的 application type。loopback desktop client 是 native；web client 使用 HTTPS redirect URI。"
     },
     {
       "stage": "check",
       "question": "client 为什么要在兑换 authorization code 前校验 RFC 9207 iss 值？",
       "options": [
-        "防止在错误的 token endpoint 兑换诚实 issuer 的 code",
-        "避免刷新 JWKS 缓存",
+        "从 server/discover 中选择一个 tool",
         "用 issuer discovery 取代 PKCE",
-        "从 server/discover 中选择一个 tool"
+        "防止在错误的 token endpoint 兑换诚实 issuer 的 code",
+        "避免刷新 JWKS 缓存"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "issuer 检查防御 authorization-server mix-up。它通过确认 response 来自 redirect 前记录的 issuer，与 PKCE 相互补充。"
     },
     {
       "stage": "post",
       "question": "在当前无状态 transport 中，MCP resource server 应将授权决定缓存在哪里？",
       "options": [
+        "不作为 protocol-session 决策缓存；每个请求都校验 bearer token",
         "存于 Mcp-Session-Id 下，直到 client 发送 DELETE",
         "放到 server/discover 结果中，供之后所有调用使用",
-        "放在 SSE connection 中，直到其重连",
-        "不作为 protocol-session 决策缓存；每个请求都校验 bearer token"
+        "放在 SSE connection 中，直到其重连"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "MCP 2026-07-28 移除了 protocol session。每个请求都独立跨越 authorization boundary，因此每次都检查身份、受众、过期时间和 scope。"
     },
     {
       "stage": "post",
       "question": "在信任 authorization server 前，哪项部署证据最有力？",
       "options": [
-        "对照 PKCE、issuer、入册和 resource-binding 要求检查目标 server 发现到的 metadata",
-        "从旧课程复制的 vendor category table",
+        "一次未检查 token audience 的成功登录",
         "声称支持 OAuth 的产品页面",
-        "一次未检查 token audience 的成功登录"
+        "对照 PKCE、issuer、入册和 resource-binding 要求检查目标 server 发现到的 metadata",
+        "从旧课程复制的 vendor category table"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "能力会随部署和版本变化。具体需要检查的是 live discovery document，之后还要做端到端 issuer 和 audience 校验。"
     }
   ]

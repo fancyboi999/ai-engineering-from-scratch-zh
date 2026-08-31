@@ -5,43 +5,43 @@
     {
       "stage": "pre",
       "question": "现代 MCP server 从哪里读取 client capabilities？",
-      "options": ["从 Mcp-Session-Id", "从第一条 initialize 调用", "从每条当前请求", "从进程环境"],
-      "correct": 2,
+      "options": ["从进程环境", "从每条当前请求", "从 Mcp-Session-Id", "从第一条 initialize 调用"],
+      "correct": 1,
       "explanation": "MCP 2026-07-28 在每条请求的 params._meta 中携带 client capabilities。"
     },
     {
       "stage": "check",
       "question": "现代 server 必须实现哪个 method？",
-      "options": ["initialize", "server/discover", "resources/subscribe", "shutdown"],
-      "correct": 1,
+      "options": ["resources/subscribe", "initialize", "shutdown", "server/discover"],
+      "correct": 3,
       "explanation": "现代 server 必须提供 server/discover，尽管 client 可以先调用其他 method。"
     },
     {
       "stage": "check",
       "question": "tools/list 的成功结果需要哪些字段？",
-      "options": ["protocolVersion 和 tools", "resultType、ttlMs、cacheScope、tools", "initialized 和 tools", "sessionId 和 tools"],
+      "options": ["protocolVersion 和 tools", "resultType、ttlMs、cacheScope、tools", "sessionId 和 tools", "initialized 和 tools"],
       "correct": 1,
       "explanation": "现代列表结果带有类型，且可缓存。"
     },
     {
       "stage": "check",
       "question": "为什么 server 应以确定性方式排序 tools？",
-      "options": ["稳定 caches 和模型上下文", "创建 session", "协商协议", "替代授权"],
-      "correct": 0,
+      "options": ["替代授权", "创建 session", "协商协议", "稳定 caches 和模型上下文"],
+      "correct": 3,
       "explanation": "稳定排序让等价 registry 产生等价响应。"
     },
     {
       "stage": "post",
       "question": "一次有效 tool call 已运行，但领域操作失败。哪种结果形状合适？",
-      "options": ["notifications/initialized", "HTTP DELETE", "带 isError true 的完整 tool 结果", "一条新的 server 请求"],
-      "correct": 2,
+      "options": ["带 isError true 的完整 tool 结果", "notifications/initialized", "HTTP DELETE", "一条新的 server 请求"],
+      "correct": 0,
       "explanation": "通过 content 和 isError，让模型能够看到 tool 层失败。"
     },
     {
       "stage": "post",
       "question": "什么应结束 stdio server 的 transport 生命周期？",
-      "options": ["stdin 上的 EOF", "一条 GET 请求", "一条必需的 shutdown RPC", "Mcp-Session-Id 过期"],
-      "correct": 0,
+      "options": ["一条必需的 shutdown RPC", "stdin 上的 EOF", "Mcp-Session-Id 过期", "一条 GET 请求"],
+      "correct": 1,
       "explanation": "EOF 是可移植的 stdio shutdown signal。它不会关闭现代协议 session。"
     }
   ]

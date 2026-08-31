@@ -1,5 +1,5 @@
 """Phase 13 Lesson 07: a stateless MCP server over stdio.
-Lesson: phases/13-tools-and-protocols/07-building-an-mcp-server/docs/en.md
+Lesson: phases/13-tools-and-protocols/07-building-an-mcp-server/docs/zh.md
 Specification: https://modelcontextprotocol.io/specification/2026-07-28/
 Implements discovery, three server primitives, and per-request validation.
 Run: python3 main.py --demo

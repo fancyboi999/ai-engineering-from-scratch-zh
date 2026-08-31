@@ -203,7 +203,7 @@ t3-sampling-flip
 
 fake host model 让示例保持确定性。连接真实 host 时只替换 `fake_host_model`；server-side state machine 应保持确定性且可测试。
 
-## 上手使用
+## 实际使用
 
 从 repository root：
 
@@ -224,7 +224,7 @@ python3 -m unittest discover tests -v
 - 最终 result 是 `complete`，并包含 selected files 与 summary。
 - 在 retry 中修改原始 arguments 会使 request-state check 失败。
 
-## 交付
+## 拿去用
 
 `outputs/skill-sampling-loop-designer.md` 现在是一份迁移 planner。它首先决定是否应移除 Sampling，改用 direct model integration。若需要兼容性，它会产出 MRTR rounds、state binding、capability gate、budget、validation 和 removal plan。
 

@@ -16,7 +16,7 @@
 - 说明现代无状态 MCP 如何与握手时代的 server 互操作。
 - 为 server 选择安全的状态、传输和审批边界。
 
-## 问题所在
+## 问题背景
 
 你的应用需要查询数据库、操作日历和读取文件。若没有共享协议，每个 AI host 都得为这些相同能力定制发现、调用、错误处理、传输和授权的胶水代码。
 
@@ -221,7 +221,7 @@ python3 -m unittest discover tests -v
 
 第一行应报告以协议 `2026-07-28` 发现 `demo-server`。接着检查 `MCPClient.request`：它会为每次调用重建 `_meta`。从某个请求中删去元数据，观察 server 拒绝它。
 
-## 交付
+## 拿去用
 
 `outputs/skill-mcp-server-designer.md` 会把一个领域转化成无状态 MCP 设计。它的验收门槛要求包含发现结果、按请求传递元数据的策略、确定且支持缓存的列表、显式状态 handle、传输 header、授权和审批规则。
 
@@ -229,10 +229,10 @@ python3 -m unittest discover tests -v
 
 本课给出协议模型。阶段 13 将四个生产边界拆成单独的构建与验证课程：
 
-1. [MCP Tool Contracts and Content](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/en.md) 讲解封闭输入 schema、结构化内容、路由元数据、不透明分页、完成授权，以及协议错误和 tool 领域错误的区别。
-2. [MCP Reliability, Cancellation, and Flow Control](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/en.md) 讲解请求取消、持久任务取消、截止时间、幂等性、背压、代理缓冲和重连行为。
-3. [MCP Registry Supply Chain, Admission, Drift, and Rollback](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/en.md) 讲解命名空间证明、产物溯源、不可变 pin、实时漂移、Registry 状态、准入证据和回滚。
-4. [MCP Conformance Engineering](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/en.md) 讲解 golden 和负向 wire transcript、严格版本时代、SDK 差分、代理证据、脱敏、健康门槛和发布回滚。
+1. [MCP Tool Contracts and Content](../../../13-tools-and-protocols/28-mcp-tool-contracts-and-content/docs/zh.md) 讲解封闭输入 schema、结构化内容、路由元数据、不透明分页、完成授权，以及协议错误和 tool 领域错误的区别。
+2. [MCP Reliability, Cancellation, and Flow Control](../../../13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/docs/zh.md) 讲解请求取消、持久任务取消、截止时间、幂等性、背压、代理缓冲和重连行为。
+3. [MCP Registry Supply Chain, Admission, Drift, and Rollback](../../../13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/docs/zh.md) 讲解命名空间证明、产物溯源、不可变 pin、实时漂移、Registry 状态、准入证据和回滚。
+4. [MCP Conformance Engineering](../../../13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/docs/zh.md) 讲解 golden 和负向 wire transcript、严格版本时代、SDK 差分、代理证据、脱敏、健康门槛和发布回滚。
 
 当 server 将跨越团队或信任边界时，请按顺序学习它们。它们共同把目标从“这个方法能用”推进到“这个契约在部署过程中仍然安全、可诊断”。
 

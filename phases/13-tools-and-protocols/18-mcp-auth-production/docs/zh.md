@@ -20,7 +20,7 @@
 - 分离 authorization server、resource server 和 client，使每一方只执行自己负责的检查。
 - 按部署检查清单审计 authorization server，并拒绝不安全的入册或 token 重用。
 
-## 问题所在
+## 问题背景
 
 第 16 课的模拟器在内存里跑 OAuth 2.1。生产有三个纯内存模拟器看不到的运维缺口。
 
@@ -34,7 +34,7 @@
 
 ## 范围：第 16 课之后的生产强制执行
 
-[第 16 课：使用 OAuth 2.1 保护 MCP](../../16-mcp-security-oauth-2-1/docs/en.md) 负责 authorization-code 状态机、PKCE、protected-resource discovery、resource indicator 和 scope 决策。本课不定义第二条 OAuth flow。它从这些契约已具备之后开始，讨论已部署的 resource server 如何在密钥轮换、opaque-token 校验、撤销、依赖失败、发布和事故响应期间持续执行这些契约。
+[第 16 课：使用 OAuth 2.1 保护 MCP](../../16-mcp-security-oauth-2-1/docs/zh.md) 负责 authorization-code 状态机、PKCE、protected-resource discovery、resource indicator 和 scope 决策。本课不定义第二条 OAuth flow。它从这些契约已具备之后开始，讨论已部署的 resource server 如何在密钥轮换、opaque-token 校验、撤销、依赖失败、发布和事故响应期间持续执行这些契约。
 
 生产边界更窄，也更偏运行：
 
@@ -320,7 +320,7 @@ Server B 的校验器：
 t3-jwks-rotate
 ```
 
-## 上手使用
+## 实际使用
 
 `code/main.py` 用标准库 Python 和三个角色——`AuthorizationServer`、`ResourceServer`、`Client`——走完整个生产流程。流程如下：
 
@@ -346,7 +346,7 @@ python3 -m unittest discover -s code/tests -v
 
 这里的 JWT 用 HS256 加一个共享 secret（这样本课只靠标准库就能跑）。生产用 RS256 或 EdDSA 配上面那个 JWKS 模式；除此之外校验逻辑完全一样。因为 IdP 和 resource server 活在同一个进程里，`refresh_jwks` 直接读 authorization server 的密钥列表；放到线上它是一次对 `jwks_uri` 的 HTTP `GET`。
 
-## 交付
+## 拿去用
 
 本课产出 `outputs/skill-mcp-auth.md`。给定一个 MCP server 配置和一组 IdP 能力，这个 skill 输出要立起来的鉴权表面——protected-resource 元数据、要用的入册路径（CIMD、预注册，或 DCR 兜底）、JWKS 刷新计划、scope 映射，以及当 IdP 不支持完整 RFC profile 时要施加的拒绝规则。
 

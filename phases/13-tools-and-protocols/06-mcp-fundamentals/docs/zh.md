@@ -15,7 +15,7 @@
 - 使用 `server/discover`，并在没有握手的情况下处理 `UnsupportedProtocolVersionError`。
 - 追踪一个独立请求从校验到完整结果的过程。
 
-## 问题所在
+## 问题背景
 
 一个 MCP server 可以在同一进程或 HTTP worker 上，连续收到来自不同 client、拥有不同 capabilities 的两条请求。如果 server 记住了上一条请求声明的内容，就可能套用错误的权限，或返回错误的线上格式。
 
@@ -158,7 +158,7 @@ client 选择一个双方都支持的现代版本，再以新的 JSON-RPC 请求
 mcp-tool-call
 ```
 
-## 上手使用
+## 实际使用
 
 `code/main.py` 不依赖框架，构建、校验、追踪和分发现代 MCP 消息。运行：
 
@@ -173,7 +173,7 @@ python3 -m unittest discover code/tests -v
 - 每个成功结果都是 `resultType: "complete"`，并包含 server identity。
 - 列表结果采用确定性排序，并有明确的 cache hints。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-mcp-handshake-tracer.md`。历史文件名保持稳定，但该产物现在是无状态请求追踪器。它独立审计每条消息，并且只有在旧版握手流量确实存在时，才将其标为 legacy。
 

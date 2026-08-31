@@ -17,7 +17,7 @@
 - 让 `AGENTS.md`、Agent Skill、运行时适配器、工具和安全策略各司其职。
 - 说明哪些结论可由本地输出验证，哪些仍需要实时集成测试。
 
-## 问题所在
+## 问题背景
 
 设计一个研究与报告系统。用户要求查找有关 agent 协议的论文。系统搜索论文目录、委派摘要任务、生成报告、返回 UI 资源，并记录请求穿过系统的路径。
 
@@ -40,16 +40,16 @@
 
 ```mermaid
 flowchart LR
-  U[User] --> C[Agent client]
-  C --> G[Authorization gateway]
-  G --> M[Research MCP server]
-  M --> T[Search and report tools]
-  M --> R[Resources and prompts]
-  M --> Q[Task store]
-  M --> A[A2A client]
-  A --> W[Writer agent]
-  M --> UI[MCP App resource]
-  C --> O[Telemetry exporter]
+  U[用户] --> C[Agent 客户端]
+  C --> G[授权网关]
+  G --> M[研究型 MCP 服务器]
+  M --> T[搜索和报告工具]
+  M --> R[资源和 prompt]
+  M --> Q[任务存储]
+  M --> A[A2A 客户端]
+  A --> W[写作 agent]
+  M --> UI[MCP App 资源]
+  C --> O[遥测导出器]
   G --> O
   M --> O
   A --> O
@@ -65,12 +65,12 @@ flowchart TD
   I --> L1[llm.chat]
   I --> S[tools/call: arxiv_search]
   I --> D[A2A SendMessage]
-  D --> X[Opaque writer-agent execution]
+  D --> X[不透明的写作 agent 执行过程]
   I --> G[tools/call: generate_report]
-  G --> K[tasks/get polling]
-  K --> V[completed Task with final result]
-  V --> UI[ui:// report resource]
-  I --> L2[llm.chat final synthesis]
+  G --> K[轮询 tasks/get]
+  K --> V[含最终结果的已完成 Task]
+  V --> UI[ui:// 报告资源]
+  I --> L2[llm.chat 最终综合]
 ```
 
 在真实实现中，每一跳都会传播追踪上下文。span 名称和属性必须遵循所选 instrumentation 版本支持的 OpenTelemetry 语义约定。仅共享一个 trace 标识符，并不能证明父子关系、导出或后端摄取正确。
@@ -135,12 +135,12 @@ Agent Skill 可以告诉运行时如何完成研究流程、应预期哪些工�
 
 ```mermaid
 flowchart TD
-  RI[Repository instructions] --> H[Host runtime]
-  SK[Agent Skill procedure] --> H
-  H --> P[Invocation and permission policy]
-  P --> MCP[MCP client adapter]
-  P --> A2A[A2A client adapter]
-  P --> EX[Sandboxed executor]
+  RI[仓库指令] --> H[宿主运行时]
+  SK[Agent Skill 流程] --> H
+  H --> P[调用与权限策略]
+  P --> MCP[MCP 客户端适配器]
+  P --> A2A[A2A 客户端适配器]
+  P --> EX[沙箱执行器]
 ```
 
 当流程引用伴随文件时，应交付完整的 skill 目录。这个较早综合项目中的扁平产物只是课程蓝图，并不能证明 host 会保留可移植 bundle。第 24 至 27 课会构建并测试完整 bundle 的生命周期。
@@ -216,7 +216,7 @@ python3 code/main.py
 
 脚本会运行两次，因此会产生两个根 trace。审计条目仅存在于进程内，并会在下一次运行时重置。
 
-## 上手使用
+## 实际使用
 
 一次只提升一层：
 
@@ -231,7 +231,7 @@ python3 code/main.py
 
 每次提升都需要一项跨越新边界的集成测试。连线成为真实实现后，也不要删除底层策略测试。
 
-## 交付
+## 拿去用
 
 本课产出 `outputs/skill-ecosystem-blueprint.md`，这是一个旧式单文件课程产物。它要求一份一页架构，覆盖基础构件、安全性、委派、遥测、打包方式及最棘手的运维风险。其顶层目录字段会由仓库真实的目录和安装器解析器处理。
 

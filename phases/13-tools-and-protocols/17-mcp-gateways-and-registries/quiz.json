@@ -2,11 +2,47 @@
   "lesson": "17-mcp-gateways-and-registries",
   "title": "无状态 MCP 网关与注册表准入",
   "questions": [
-    {"stage": "pre", "question": "当前 MCP 网关必须在普通 client 请求之间保留什么？", "options": ["每个后端一个 Mcp-Session-Id", "最后一个 HTTP 连接", "一个独立的 GET 事件流", "不保留协议会话；每个请求携带校验和路由所需的信息"], "correct": 3, "explanation": "MCP 2026-07-28 的普通请求是自包含的，可以抵达任意健康的网关实例。"},
-    {"stage": "check", "question": "按主体过滤的 tools/list 结果通常应使用哪种缓存范围？", "options": ["public", "global", "private", "session"], "correct": 2, "explanation": "用户专属的工具列表不得在不同授权上下文之间共享。"},
-    {"stage": "check", "question": "网关应如何将工具调用转发给当前协议后端？", "options": ["先打开一个 GET 流", "复制外层 bearer token 和 session id", "将外层 JSON-RPC id 复用为持久状态", "创建全新的自包含请求，携带网关 client 元数据和经调解的能力"], "correct": 3, "explanation": "网关是后端的 client，会创建独立有效的新请求。"},
-    {"stage": "check", "question": "网关在准入时应如何使用官方 Registry 的 server.json 记录？", "options": ["校验其发布形状，再关联独立的已验证发布者、溯源、策略和批准状态", "将发布行为视为已经完成的安全审查", "从任意记录字段复制验证声明", "相信任何名称看起来熟悉的记录"], "correct": 0, "explanation": "server.json 携带发布元数据。已验证的溯源和网关的批准决定仍是外部准入证据。"},
-    {"stage": "post", "question": "在现代 Streamable HTTP 中，如何打开长生命周期的列表变更通知？", "options": ["通过 POST 发送 subscriptions/listen 请求，其响应为 SSE", "通过 resources/subscribe", "通过携带 Last-Event-ID 的独立 GET", "通过 notifications/initialized"], "correct": 0, "explanation": "subscriptions/listen 取代了旧的非请求式 GET 和资源订阅模型。"},
-    {"stage": "post", "question": "哪个 Tasks 扩展路由规则是当前规则？", "options": ["使用 tasks/result 获取最终输出", "使用 tasks/list 恢复一个会话中的所有任务", "使用 taskId 作为 Mcp-Name 来路由 tasks/get、tasks/update 和 tasks/cancel", "将任务存入 Mcp-Session-Id"], "correct": 2, "explanation": "官方扩展使用 get、update 和 cancel；任务 id 在无需协议会话的情况下提供路由句柄。"}
+    {
+      "stage": "pre",
+      "question": "当前 MCP 网关必须在普通 client 请求之间保留什么？",
+      "options": ["不保留协议会话；每个请求携带校验和路由所需的信息", "最后一个 HTTP 连接", "每个后端一个 Mcp-Session-Id", "一个独立的 GET 事件流"],
+      "correct": 0,
+      "explanation": "MCP 2026-07-28 的普通请求是自包含的，可以抵达任意健康的网关实例。"
+    },
+    {
+      "stage": "check",
+      "question": "按主体过滤的 tools/list 结果通常应使用哪种缓存范围？",
+      "options": ["public", "private", "global", "session"],
+      "correct": 1,
+      "explanation": "用户专属的工具列表不得在不同授权上下文之间共享。"
+    },
+    {
+      "stage": "check",
+      "question": "网关应如何将工具调用转发给当前协议后端？",
+      "options": ["将外层 JSON-RPC id 复用为持久状态", "复制外层 bearer token 和 session id", "先打开一个 GET 流", "创建全新的自包含请求，携带网关 client 元数据和经调解的能力"],
+      "correct": 3,
+      "explanation": "网关是后端的 client，会创建独立有效的新请求。"
+    },
+    {
+      "stage": "check",
+      "question": "网关在准入时应如何使用官方 Registry 的 server.json 记录？",
+      "options": ["从任意记录字段复制验证声明", "相信任何名称看起来熟悉的记录", "将发布行为视为已经完成的安全审查", "校验其发布形状，再关联独立的已验证发布者、溯源、策略和批准状态"],
+      "correct": 3,
+      "explanation": "server.json 携带发布元数据。已验证的溯源和网关的批准决定仍是外部准入证据。"
+    },
+    {
+      "stage": "post",
+      "question": "在现代 Streamable HTTP 中，如何打开长生命周期的列表变更通知？",
+      "options": ["通过 resources/subscribe", "通过携带 Last-Event-ID 的独立 GET", "通过 notifications/initialized", "通过 POST 发送 subscriptions/listen 请求，其响应为 SSE"],
+      "correct": 3,
+      "explanation": "subscriptions/listen 取代了旧的非请求式 GET 和资源订阅模型。"
+    },
+    {
+      "stage": "post",
+      "question": "哪个 Tasks 扩展路由规则是当前规则？",
+      "options": ["使用 taskId 作为 Mcp-Name 来路由 tasks/get、tasks/update 和 tasks/cancel", "将任务存入 Mcp-Session-Id", "使用 tasks/list 恢复一个会话中的所有任务", "使用 tasks/result 获取最终输出"],
+      "correct": 0,
+      "explanation": "官方扩展使用 get、update 和 cancel；任务 id 在无需协议会话的情况下提供路由句柄。"
+    }
   ]
 }

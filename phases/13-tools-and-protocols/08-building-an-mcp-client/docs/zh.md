@@ -16,7 +16,7 @@
 - 合并确定性的 tool lists，且不悄悄覆盖冲突。
 - 将 calls 路由到拥有对应 tool 的 peer，而不虚构协议 sessions。
 
-## 问题所在
+## 问题背景
 
 一个 agent host 通常会与不止一个 MCP server 通信。它必须发现每个 server、合并 tool catalogs、解决重复名称、路由 calls，并从 transport failure 中恢复。
 
@@ -171,7 +171,7 @@ canonical tool name
 tp-client-merge
 ```
 
-## 上手使用
+## 实际使用
 
 `code/main.py` 使用进程内 peer functions，让协议决策保持可见。它连接两个现代 peers 和一个刻意 allowlisted 的旧版 peer，然后合并并路由它们的 tools。transport callable 接收 timeout budget，因此兼容性分支无法隐藏无界 probe。
 
@@ -191,7 +191,7 @@ python3 -m unittest discover tests -v
 - 格式错误和不受支持的旧版结果使 peer 保持不可用；
 - 成功选定的 era 会在 transport 生命周期内缓存。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-mcp-client-harness.md`。它搭建现代请求盖章、stdio era 协商、确定性命名空间合并、路由和 fail-closed 旧版兼容性分支。
 

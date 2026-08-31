@@ -16,7 +16,7 @@
 - 使用 PKCE、资源指示符、受众校验和渐进式 scope。
 - 在没有协议会话的情况下发送已授权的 MCP 2026-07-28 请求。
 
-## 问题所在
+## 问题背景
 
 远程 MCP server 可能读取私有记录、写入外部系统，或触发昂贵的任务。认证告诉它是谁提交了凭据；授权还必须回答：
 
@@ -257,7 +257,7 @@ python3 -m unittest discover code/tests -v
 
 输出先展示 discovery，随后是 CIMD 注册、一次普通读取、两次独立的 scope 权限升级，以及按签发方分键的凭据存储。
 
-## 上手使用
+## 实际使用
 
 将模拟器对象映射到生产组件：
 
@@ -267,7 +267,7 @@ python3 -m unittest discover code/tests -v
 - 由签发方生成的 client 凭据和 `tokens_by_issuer_resource` 对应加密记录。CIMD URL 可以继续移植，但其授权结果仍绑定到签发方。
 - `ResourceServer.handle` 对应在分派前校验当前 MCP headers、token 和 tool scope 的 middleware，同时让每个请求错误保持在匹配的 JSON-RPC envelope 中。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-oauth-scope-planner.md`。它现在可设计注册优先级、签发方绑定的凭据存储、应用类型、PKCE、资源指示符、scope challenge 以及当前无状态请求边界。
 

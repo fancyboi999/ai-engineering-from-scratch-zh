@@ -5,43 +5,43 @@
     {
       "stage": "pre",
       "question": "每条现代 Streamable HTTP 消息由哪种 HTTP method 承载？",
-      "options": ["PATCH", "DELETE", "GET", "POST"],
-      "correct": 3,
+      "options": ["GET", "PATCH", "POST", "DELETE"],
+      "correct": 2,
       "explanation": "每条现代 JSON-RPC request 或 notification 都是发送到一个 MCP endpoint 的新 POST。"
     },
     {
       "stage": "check",
       "question": "现代专用 MCP endpoint 应对 GET 和 DELETE 返回什么？",
-      "options": ["301", "200", "202", "405"],
-      "correct": 3,
+      "options": ["301", "200", "405", "202"],
+      "correct": 2,
       "explanation": "独立 GET 和 DELETE 不属于 Streamable HTTP 2026-07-28。"
     },
     {
       "stage": "check",
       "question": "每条现代请求中，哪些 headers 必须与 body 匹配？",
-      "options": ["Mcp-Session-Id 和 Last-Event-ID", "ETag 和 If-None-Match", "MCP-Protocol-Version 和 Mcp-Method", "Cookie 和 Host"],
-      "correct": 2,
+      "options": ["MCP-Protocol-Version 和 Mcp-Method", "Cookie 和 Host", "ETag 和 If-None-Match", "Mcp-Session-Id 和 Last-Event-ID"],
+      "correct": 0,
       "explanation": "Mcp-Name 对 tools/call、resources/read 和 prompts/get 也是必填项。"
     },
     {
       "stage": "check",
       "question": "client 如何请求长生命周期的 change notifications？",
-      "options": ["POST subscriptions/listen", "resources/subscribe", "Mcp-Session-Id", "GET /mcp"],
-      "correct": 0,
+      "options": ["GET /mcp", "Mcp-Session-Id", "POST subscriptions/listen", "resources/subscribe"],
+      "correct": 2,
       "explanation": "subscriptions/listen 打开 response stream。其 acknowledgement、notifications 和最终 result 都将 listen request id 作为 subscription metadata 携带。"
     },
     {
       "stage": "post",
       "question": "现代请求范围的 SSE stream 在最终 response 前断开。下一步是什么？",
-      "options": ["DELETE session", "复用同一 response stream", "用 Last-Event-ID 恢复", "以新的 JSON-RPC id 安全重试"],
-      "correct": 3,
+      "options": ["DELETE session", "以新的 JSON-RPC id 安全重试", "复用同一 response stream", "用 Last-Event-ID 恢复"],
+      "correct": 1,
       "explanation": "现代 SSE 不可恢复。安全重试是带新 id 的新请求。"
     },
     {
       "stage": "post",
       "question": "server 应如何处理 2026-07-28 请求中的 Mcp-Session-Id？",
-      "options": ["忽略它且不回显", "拒绝包含它的每条请求", "用它路由", "轮换它"],
-      "correct": 0,
+      "options": ["用它路由", "忽略它且不回显", "拒绝包含它的每条请求", "轮换它"],
+      "correct": 1,
       "explanation": "协议 sessions 和 session header 已从现代修订版移除。"
     }
   ]

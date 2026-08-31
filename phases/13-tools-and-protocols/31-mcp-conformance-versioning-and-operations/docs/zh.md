@@ -16,7 +16,7 @@
 - 通过真实代理边界证明 header 和 body 的完整性。
 - 以脱敏后的转录记录、健康度和回滚证据为发布设门。
 
-## 问题所在
+## 问题背景
 
 你的 client 通过 SDK 调用 `tools/list`，拿到了 tools。集成测试通过了。
 
@@ -297,7 +297,7 @@ python3 code/main.py
 8. `rollback_evidence_ready()` 验证精确的 pin fields 和可信 release attestation。
 9. `ReleaseGate.evaluate()` 汇合非空的一致性、SDK、proxy、health 和 rollback evidence。
 
-## 上手使用
+## 实际使用
 
 在四个时点运行 harness：
 

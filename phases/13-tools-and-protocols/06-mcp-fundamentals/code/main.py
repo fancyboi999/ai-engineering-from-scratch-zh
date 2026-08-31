@@ -1,5 +1,5 @@
 """Phase 13 Lesson 06: trace the stateless MCP request lifecycle.
-Lesson: phases/13-tools-and-protocols/06-mcp-fundamentals/docs/en.md
+Lesson: phases/13-tools-and-protocols/06-mcp-fundamentals/docs/zh.md
 Specification: https://modelcontextprotocol.io/specification/2026-07-28/
 Builds JSON-RPC requests, validates per-request metadata, and emits results.
 Run: python3 main.py

@@ -1,5 +1,5 @@
 """Phase 13 Lesson 08: a stateless multi-server MCP client.
-Lesson: phases/13-tools-and-protocols/08-building-an-mcp-client/docs/en.md
+Lesson: phases/13-tools-and-protocols/08-building-an-mcp-client/docs/zh.md
 Specification: https://modelcontextprotocol.io/specification/2026-07-28/
 Demonstrates discovery, fail-closed legacy probing, deterministic merge, and routing.
 Run: python3 main.py

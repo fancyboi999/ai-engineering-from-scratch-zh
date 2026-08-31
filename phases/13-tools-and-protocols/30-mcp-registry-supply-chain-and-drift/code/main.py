@@ -1,4 +1,4 @@
-"""Companion code for docs/en.md: admit, pin, monitor, and roll back MCP servers.
+"""Companion code for docs/zh.md: admit, pin, monitor, and roll back MCP servers.
 Protocol contract: https://modelcontextprotocol.io/specification/2026-07-28/server/discover
 Registry contract: https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/server-json/official-registry-requirements.md
 Run `python3 main.py` for the finite demo or `python3 -m unittest discover -s tests`.

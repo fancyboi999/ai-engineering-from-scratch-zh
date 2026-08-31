@@ -47,11 +47,11 @@ skill-discovery-pipeline
 
 没有这些证据，“模型没有用我的 skill”几乎无从诊断。
 
-### Scope 是运行时策略
+### 作用域是运行时策略
 
 可移植规范定义 skill 包的形状，不规定通用安装路径或优先级。由宿主决定搜索位置。
 
-| Scope | 示例根目录 | 预期所有者 |
+| 作用域 | 示例根目录 | 预期所有者 |
 |---|---|---|
 | 工作区 | `<repo>/.agents/skills/` | 项目维护者 |
 | 用户 | `<user-data>/skills/` | 单个开发者 |
@@ -99,7 +99,7 @@ skill-disclosure-levels
 模型只需能把该 skill 与相邻 skill 区分开的信息。规范估计每条目录项约 100 token，但实际序列化和分词由宿主决定。好的描述包含能力与触发边界两部分：
 
 ```yaml
-description: Validate a release candidate and produce a readiness report. Use when the user asks whether a version, tag, or package is ready to publish.
+description: 验证发布候选项并生成就绪度报告。当用户询问某个版本、标签或包是否已准备好发布时使用。
 ```
 
 第一句给出能力，第二句说明何时触发。第 25 课会用正例与近似负例评测这条边界。
@@ -137,12 +137,12 @@ description: Validate a release candidate and produce a readiness report. Use wh
 入口文件应写成决策地图：
 
 ```markdown
-## Choose the path
+## 选择路径
 
-- For a Python package, read `references/python-release.md`.
-- For a container image, read `references/container-release.md`.
-- For a documentation-only release, read `references/docs-release.md`.
-- If the release combines artifact types, read only the guides for those artifacts.
+- 对于 Python 包，阅读 `references/python-release.md`。
+- 对于容器镜像，阅读 `references/container-release.md`。
+- 对于仅含文档的发布，阅读 `references/docs-release.md`。
+- 如果发布组合了多种产物类型，只阅读这些产物对应的指南。
 ```
 
 这样每份引用都有可观测的加载条件；“阅读 `references/` 了解更多”则没有。
@@ -282,7 +282,7 @@ python3 -m unittest discover -s code/tests -v
 
 ## 延伸阅读
 
-- [Agent Skills specification](https://agentskills.io/specification)：包形状与渐进式披露层级。
-- [Optimizing skill descriptions](https://agentskills.io/skill-creation/optimizing-descriptions)：目录路由元数据。
-- [Agent Skills best practices](https://agentskills.io/skill-creation/best-practices)：直达引用与入口文件大小。
-- [OpenAI: Build skills](https://learn.chatgpt.com/docs/build-skills)：当前 Codex 发现 scope 和目录限制。
+- [Agent Skills 规范](https://agentskills.io/specification)：包形状与渐进式披露层级。
+- [优化 skill 描述](https://agentskills.io/skill-creation/optimizing-descriptions)：目录路由元数据。
+- [Agent Skills 最佳实践](https://agentskills.io/skill-creation/best-practices)：直达引用与入口文件大小。
+- [OpenAI：构建 skills](https://learn.chatgpt.com/docs/build-skills)：当前 Codex 的发现 scope 和目录限制。

@@ -1,4 +1,4 @@
-"""Companion code for docs/en.md: test MCP wire contracts and release evidence.
+"""Companion code for docs/zh.md: test MCP wire contracts and release evidence.
 Protocol contract: https://modelcontextprotocol.io/specification/2026-07-28/basic
 Transport contract: https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http
 Run `python3 main.py` for the finite demo or `python3 -m unittest discover -s tests`.

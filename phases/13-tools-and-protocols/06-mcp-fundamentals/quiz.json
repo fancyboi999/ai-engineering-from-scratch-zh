@@ -5,43 +5,43 @@
     {
       "stage": "pre",
       "question": "两条 MCP 2026-07-28 请求之间，什么会创建协议状态？",
-      "options": ["HTTP 连接", "协议核心中没有任何东西", "Mcp-Session-Id", "stdio 进程"],
+      "options": ["Mcp-Session-Id", "协议核心中没有任何东西", "HTTP 连接", "stdio 进程"],
       "correct": 1,
       "explanation": "现代协议核心是无状态的。每条请求都携带自己的版本和 capabilities。"
     },
     {
       "stage": "check",
       "question": "每条现代请求的 params._meta 中，哪两个字段是必填项？",
-      "options": ["clientInfo 和 cacheScope", "protocolVersion 和 clientCapabilities", "sessionId 和 capabilities", "serverInfo 和 ttlMs"],
-      "correct": 1,
+      "options": ["protocolVersion 和 clientCapabilities", "clientInfo 和 cacheScope", "serverInfo 和 ttlMs", "sessionId 和 capabilities"],
+      "correct": 0,
       "explanation": "协议版本和 client capabilities 是必填项。client identity 是建议项。"
     },
     {
       "stage": "check",
       "question": "每个现代 MCP server 都必须实现哪个 method 以供预先发现？",
-      "options": ["tools/list", "initialize", "server/discover", "notifications/initialized"],
+      "options": ["tools/list", "notifications/initialized", "server/discover", "initialize"],
       "correct": 2,
       "explanation": "server/discover 会声明支持的版本、capabilities、instructions 和 server identity。"
     },
     {
       "stage": "check",
       "question": "错误码 -32022 表示什么？",
-      "options": ["内部错误", "header 不匹配", "method 不存在", "不支持的协议版本"],
-      "correct": 3,
+      "options": ["不支持的协议版本", "method 不存在", "内部错误", "header 不匹配"],
+      "correct": 0,
       "explanation": "UnsupportedProtocolVersionError 包含请求的版本和 server 支持的版本。"
     },
     {
       "stage": "post",
       "question": "在 MCP 2026-07-28 中，哪种结果需要 ttlMs 和 cacheScope？",
-      "options": ["JSON-RPC error", "tools/list 结果", "tools/call 结果", "取消通知"],
+      "options": ["取消通知", "tools/list 结果", "JSON-RPC error", "tools/call 结果"],
       "correct": 1,
       "explanation": "列表结果和 resources/read 是带有必填 cache hints 的可缓存结果。"
     },
     {
       "stage": "post",
       "question": "server 应如何为当前请求选择 capabilities？",
-      "options": ["从 Mcp-Session-Id 读取", "从进程推断", "复用第一条请求的声明", "从当前请求元数据读取"],
-      "correct": 3,
+      "options": ["从 Mcp-Session-Id 读取", "从当前请求元数据读取", "复用第一条请求的声明", "从进程推断"],
+      "correct": 1,
       "explanation": "server 不得从连接或此前请求状态推断现代 capabilities。"
     }
   ]

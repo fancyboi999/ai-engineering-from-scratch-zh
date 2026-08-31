@@ -1,4 +1,4 @@
-"""Runnable companion to docs/en.md for MCP protocol version 2026-07-28.
+"""Runnable companion to docs/zh.md for MCP protocol version 2026-07-28.
 Official resources contract: https://modelcontextprotocol.io/specification/2026-07-28/server/resources
 Official prompts contract: https://modelcontextprotocol.io/specification/2026-07-28/server/prompts
 Official subscription contract: https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/subscriptions

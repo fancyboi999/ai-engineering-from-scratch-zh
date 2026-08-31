@@ -347,7 +347,7 @@ Mcp-Name: tsk_786512e29e0d
 
 不要用 `notifications/cancelled` 取消 task。该 notification 属于请求取消，而非持久 Tasks。
 
-这一区别在 routing boundary 很重要。请求取消针对一项 in-flight JSON-RPC operation 或它的 request-scoped HTTP response。若 `tools/call` 已返回 `resultType: "task"`，该请求已完成，关闭传输无法命名或停止持久 job。`tasks/cancel` 是一项新的已授权 RPC：它携带 `params.taskId`，在 `Mcp-Name` 中镜像 id，解析 task 的 owning backend，记录协作式取消意图并返回 acknowledgement，却不声称 worker 已停止。[第 29 课：MCP 可靠性、取消与流量控制](../../29-mcp-reliability-cancellation-and-flow-control/docs/en.md) 为两条路径构建 race、timeout、idempotency、backpressure 和 retry 规则。
+这一区别在 routing boundary 很重要。请求取消针对一项 in-flight JSON-RPC operation 或它的 request-scoped HTTP response。若 `tools/call` 已返回 `resultType: "task"`，该请求已完成，关闭传输无法命名或停止持久 job。`tasks/cancel` 是一项新的已授权 RPC：它携带 `params.taskId`，在 `Mcp-Name` 中镜像 id，解析 task 的 owning backend，记录协作式取消意图并返回 acknowledgement，却不声称 worker 已停止。[第 29 课：MCP 可靠性、取消与流量控制](../../29-mcp-reliability-cancellation-and-flow-control/docs/zh.md) 为两条路径构建 race、timeout、idempotency、backpressure 和 retry 规则。
 
 因此 gateway 必须在不同表中保存 request coordinator 与 task route。响应结束时 request table 可以消失；task route 必须留存到终态和 retention expiry。
 
@@ -406,7 +406,7 @@ tp-task-lifecycle
 
 worker 显式推进，而非在 background thread 中 sleep。这样每次状态转换都确定，也使协议示例与 queue mechanics 分离。
 
-## 上手使用
+## 实际使用
 
 从仓库根目录运行：
 
@@ -430,7 +430,7 @@ id=5 resultType=complete status=completed
 还应验证 `tasks/status`、`tasks/result` 和 `tasks/list` 在现代 service 中返回 method-not-found。
 验证 `tools/list` 是确定性的，并且每个当前 HTTP task 方法都通过 `Mcp-Name` 镜像 task id。
 
-## 交付
+## 拿去用
 
 `outputs/skill-task-store-designer.md` 现在生成感知扩展的设计：capability 协商、先持久化后返回的创建、当前方法、输入更新流、所有权、过期、取消、订阅，以及从已移除实验性方法迁移。
 

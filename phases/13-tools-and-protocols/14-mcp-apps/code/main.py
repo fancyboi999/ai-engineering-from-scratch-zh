@@ -1,5 +1,5 @@
 """Phase 13 Lesson 14: MCP Apps on the MCP 2026-07-28 wire.
-Lesson: phases/13-tools-and-protocols/14-mcp-apps/docs/en.md
+Lesson: phases/13-tools-and-protocols/14-mcp-apps/docs/zh.md
 Spec: https://modelcontextprotocol.io/specification/2026-07-28
 Models discovery, tools, resources, and a self-contained MCP Apps UI.
 Lesson 09 owns the HTTP adapter; the UI pins its postMessage origin.

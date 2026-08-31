@@ -1,6 +1,6 @@
 """Phase 13 Lesson 13: the stateless MCP Tasks extension.
 
-Lesson: ../docs/en.md
+Lesson: ../docs/zh.md
 Extension: https://tasks.extensions.modelcontextprotocol.io/specification/draft/tasks
 This example uses only Python's standard library.
 Run: python3 main.py

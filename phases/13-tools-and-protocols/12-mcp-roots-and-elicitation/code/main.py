@@ -1,6 +1,6 @@
 """Phase 13 Lesson 12: explicit scope and elicitation through MRTR.
 
-Lesson: ../docs/en.md
+Lesson: ../docs/zh.md
 Specification: https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr
 This example uses only Python's standard library.
 Run: python3 main.py

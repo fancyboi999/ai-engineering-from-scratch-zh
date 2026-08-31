@@ -240,7 +240,7 @@ t3-roots-boundary
 
 data store 在内存中，便于检查协议行为；使用 database 时 security rules 不变。
 
-## 上手使用
+## 实际使用
 
 从 repository root：
 
@@ -264,7 +264,7 @@ python3 -m unittest discover tests -v
 - 不支持 version failures 使用精确 `-32022` data shape。
 - 无 id notification 不产生 JSON-RPC response。
 
-## 交付
+## 拿去用
 
 `outputs/skill-elicitation-form-designer.md` 设计显式 scope、authorization checks、MRTR form、response branches 和 state binding。它拒绝将已弃用 Roots 当作 sandbox，或通过 form mode 收集 secrets。
 

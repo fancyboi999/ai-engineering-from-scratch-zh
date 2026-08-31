@@ -5,43 +5,43 @@
     {
       "stage": "pre",
       "question": "一个新的 MCP server 需要 model inference。在 2026-07-28 下默认架构是什么？",
-      "options": ["直接集成 model provider", "在每次 tool call 前发送 sampling/createMessage", "将 client model key 存在协议 session 中", "为 Sampling 打开永久 SSE stream"],
-      "correct": 0,
+      "options": ["将 client model key 存在协议 session 中", "直接集成 model provider", "在每次 tool call 前发送 sampling/createMessage", "为 Sampling 打开永久 SSE stream"],
+      "correct": 1,
       "explanation": "新设计中的 Sampling 已弃用。当 server 需要 model inference 时，推荐默认方案是直接集成 provider。"
     },
     {
       "stage": "check",
       "question": "2026-07-28 server 在 tools/call 期间如何请求兼容性 Sampling？",
-      "options": ["将 prompt 写入 server/discover", "将 prompt 放进 Mcp-Session-Id header", "返回 resultType input_required，并在 inputRequests 中放入 sampling/createMessage", "在同一 connection 上发送反向 JSON-RPC request"],
-      "correct": 2,
+      "options": ["返回 resultType input_required，并在 inputRequests 中放入 sampling/createMessage", "在同一 connection 上发送反向 JSON-RPC request", "将 prompt 写入 server/discover", "将 prompt 放进 Mcp-Session-Id header"],
+      "correct": 0,
       "explanation": "MRTR 在 input_required result 中承载 server-to-client requests，避免反向 request channel。已声明的 summarize_repo tool 必须先通过有有效 inputSchema 的确定性 tools/list 提供。"
     },
     {
       "stage": "check",
       "question": "哪项属性证明 MRTR retry 是独立 JSON-RPC request？",
-      "options": ["它省略逐请求 metadata", "它使用与原始 request 相同的 id", "它使用新的 id，同时重复原始 method 和 arguments", "它移除原始 tool arguments"],
-      "correct": 2,
+      "options": ["它省略逐请求 metadata", "它移除原始 tool arguments", "它使用与原始 request 相同的 id", "它使用新的 id，同时重复原始 method 和 arguments"],
+      "correct": 3,
       "explanation": "client 以新的 JSON-RPC id、当前 inputResponses 和回显的 requestState 重复原始 operation。"
     },
     {
       "stage": "check",
       "question": "当 requestState 影响 resource access 时，必须用什么保护它？",
-      "options": ["绑定到 principal、request 与 expiry 的 HMAC 或 authenticated encryption", "仅 Base64 encoding", "clientInfo name", "长生命周期 transport session"],
-      "correct": 0,
+      "options": ["clientInfo name", "仅 Base64 encoding", "绑定到 principal、request 与 expiry 的 HMAC 或 authenticated encryption", "长生命周期 transport session"],
+      "correct": 2,
       "explanation": "requestState 会经过不可信 client。完整性保护与绑定可防止篡改和跨请求 replay。"
     },
     {
       "stage": "post",
       "question": "client 没有在逐请求 capabilities 中声明 Sampling。server 应使用什么精确协议响应？",
-      "options": ["仍发送嵌入 sampling request", "返回带 data.requiredCapabilities 的 -32021，或选择非 Sampling 路径", "将 capability 加到 client metadata", "假定此前请求中有该 capability"],
-      "correct": 1,
+      "options": ["假定此前请求中有该 capability", "将 capability 加到 client metadata", "仍发送嵌入 sampling request", "返回带 data.requiredCapabilities 的 -32021，或选择非 Sampling 路径"],
+      "correct": 3,
       "explanation": "server 不得发出当前请求中 client 未声明支持的 input request。精确的缺少 capability code 是 -32021。"
     },
     {
       "stage": "post",
       "question": "哪种迁移可让两轮兼容性 loop 在协议层保持无状态？",
-      "options": ["每次新 retry 仅携带当前 round inputResponses 和已签名 phase state", "将 phase state 存在 Mcp-Session-Id 下", "在完成前重用原始 request id", "在隐藏 session 中累积所有 model responses"],
-      "correct": 0,
+      "options": ["将 phase state 存在 Mcp-Session-Id 下", "在隐藏 session 中累积所有 model responses", "在完成前重用原始 request id", "每次新 retry 仅携带当前 round inputResponses 和已签名 phase state"],
+      "correct": 3,
       "explanation": "每次 retry 都是自包含的。已签名 requestState 携带已校验 intermediate state，inputResponses 仅包含当前 round。"
     }
   ]

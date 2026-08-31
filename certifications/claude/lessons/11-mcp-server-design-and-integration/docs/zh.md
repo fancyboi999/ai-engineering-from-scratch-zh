@@ -36,14 +36,14 @@ MCP 不会消除集成工程，而是为这项工程划出一条可见边界。
 
 ```mermaid
 flowchart LR
-    User[User] --> Host[Host application]
+    User[用户] --> Host[宿主应用]
     Host --> Model[Claude]
-    Host --> ClientA[MCP client A]
-    Host --> ClientB[MCP client B]
-    ClientA --> ServerA[Local filesystem server]
-    ClientB --> ServerB[Remote commerce server]
-    ServerA --> Files[Allowed files]
-    ServerB --> API[Commerce API]
+    Host --> ClientA[MCP 客户端 A]
+    Host --> ClientB[MCP 客户端 B]
+    ClientA --> ServerA[本地文件系统服务器]
+    ClientB --> ServerB[远程商务服务器]
+    ServerA --> Files[获准访问的文件]
+    ServerB --> API[商务 API]
 ```
 
 一个 host 可以创建多个 client。host 决定哪些能力进入模型上下文，以及用户何时必须批准某项操作。server 仍须执行自身的授权；模型、host 或 client 都不能授予 server 本身没有的访问权。
@@ -202,14 +202,14 @@ prompt 是 host 呈现的可复用模板，适合评审或事故总结等可重�
 
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant A as Server instance A
-    participant B as Server instance B
-    C->>A: tools/call with per-request _meta, id 8
+    participant C as 客户端
+    participant A as 服务器实例 A
+    participant B as 服务器实例 B
+    C->>A: tools/call，携带逐请求 _meta，id 8
     A-->>C: input_required, inputRequests, requestState
-    C->>C: fulfill roots, sampling, elicitation requests
-    C->>B: retry original tools/call, id 9, inputResponses, exact requestState
-    B-->>C: complete result
+    C->>C: 满足 roots、sampling 和 elicitation 请求
+    C->>B: 重试原始 tools/call，id 9，携带 inputResponses 和原 requestState
+    B-->>C: 返回完整结果
 ```
 
 核心协议中，只有 `tools/call`、`resources/read` 和 `prompts/get` 可以返回 `input_required`。
@@ -352,10 +352,10 @@ server 应校验 `Origin`；对存在但不被允许的 origin 返回 HTTP 403�
 
 ```mermaid
 flowchart LR
-    C[Client] -->|POST request 1| A[Instance A]
-    C -->|POST request 2| B[Instance B]
-    C -->|MRTR retry with requestState| C2[Instance C]
-    A --> Store[(Explicit application store)]
+    C[客户端] -->|POST 请求 1| A[实例 A]
+    C -->|POST 请求 2| B[实例 B]
+    C -->|携带 requestState 的 MRTR 重试| C2[实例 C]
+    A --> Store[(显式应用存储)]
     B --> Store
     C2 --> Store
 ```

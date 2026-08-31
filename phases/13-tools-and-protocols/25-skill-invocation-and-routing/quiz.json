@@ -2,11 +2,47 @@
   "lesson": "25-skill-invocation-and-routing",
   "title": "Skill 调用与路由",
   "questions": [
-    {"stage":"pre","question":"从宿主角度看，哪项事件属于程序化 skill 激活？","options":["评测 harness 为计划场景选择一个具名 skill","用户在宿主 UI 选择具名 skill","模型从语义相关性推断一个 skill","目录在发现时读取描述"],"correct":0,"explanation":"程序化激活来自运行时或 harness 控制流，例如评测按精确名称选择 skill；用户选择和语义匹配属于其他通道。"},
-    {"stage":"check","question":"宿主识别 `user-invocable: false` 时，可移植性指南应如何描述该字段？","options":["文件系统权限位","skill 描述的替代品","由适配器解释的宿主专用调用扩展","每个 Agent Skill 必填字段"],"correct":2,"explanation":"特定宿主可赋予扩展字段含义，但这不使它成为通用语义。可移植工具应保留或显式适配。"},
-    {"stage":"check","question":"隐式模型路由器应如何处理低于激活阈值的近似查询？","options":["激活字母序最先的 skill","静默降低该请求阈值","转为人工 slash command","拒绝激活，继续无 skill 推理或请求澄清"],"correct":3,"explanation":"近似负例正是过度触发的表现。阈值必须被遵守，并允许正常推理或澄清继续。"},
-    {"stage":"check","question":"在人类/模型 2×2 中，`human=true, model=false` 是什么含义？","options":["skill 有无限制工具权限","人可显式调用，但模型不应隐式选择","只有评测 harness 可激活","模型只能在网络请求后激活"],"correct":1,"explanation":"两轴描述的是激活通道，不是权限。该象限允许有意的用户选择，同时压制自动模型路由。"},
-    {"stage":"post","question":"为什么评测 harness 通常按精确名称激活 skill？","options":["因此不再需要描述","精确名称授予沙箱逃逸权限","它把 skill 行为与路由波动隔离，使重复运行可比","它证明所有宿主共用命令语法"],"correct":2,"explanation":"harness 往往要测 skill 本身而不是发现模型；精确程序化选择去掉一种方差来源。"},
-    {"stage":"post","question":"哪种设计能正确分离调用与权限？","options":["只要 bundle 有 shell 脚本就允许模型激活","用户调用后批准它请求的每个动作","先经宿主策略路由激活，再按权限模型审查每个请求动作","让扩展元数据替代文件系统和网络策略"],"correct":2,"explanation":"激活决定指令是否进入上下文；权限审查决定读、写、命令或网络调用是否允许，二者必须分开。"}
+    {
+      "stage": "pre",
+      "question": "从宿主角度看，哪项事件属于程序化 skill 激活？",
+      "options": ["目录在发现时读取描述", "模型从语义相关性推断一个 skill", "用户在宿主 UI 选择具名 skill", "评测 harness 为计划场景选择一个具名 skill"],
+      "correct": 3,
+      "explanation": "程序化激活来自运行时或 harness 控制流，例如评测按精确名称选择 skill；用户选择和语义匹配属于其他通道。"
+    },
+    {
+      "stage": "check",
+      "question": "宿主识别 `user-invocable: false` 时，可移植性指南应如何描述该字段？",
+      "options": ["每个 Agent Skill 必填字段", "skill 描述的替代品", "文件系统权限位", "由适配器解释的宿主专用调用扩展"],
+      "correct": 3,
+      "explanation": "特定宿主可赋予扩展字段含义，但这不使它成为通用语义。可移植工具应保留或显式适配。"
+    },
+    {
+      "stage": "check",
+      "question": "隐式模型路由器应如何处理低于激活阈值的近似查询？",
+      "options": ["静默降低该请求阈值", "激活字母序最先的 skill", "转为人工 slash command", "拒绝激活，继续无 skill 推理或请求澄清"],
+      "correct": 3,
+      "explanation": "近似负例正是过度触发的表现。阈值必须被遵守，并允许正常推理或澄清继续。"
+    },
+    {
+      "stage": "check",
+      "question": "在人类/模型 2×2 中，`human=true, model=false` 是什么含义？",
+      "options": ["人可显式调用，但模型不应隐式选择", "只有评测 harness 可激活", "模型只能在网络请求后激活", "skill 有无限制工具权限"],
+      "correct": 0,
+      "explanation": "两轴描述的是激活通道，不是权限。该象限允许有意的用户选择，同时压制自动模型路由。"
+    },
+    {
+      "stage": "post",
+      "question": "为什么评测 harness 通常按精确名称激活 skill？",
+      "options": ["精确名称授予沙箱逃逸权限", "因此不再需要描述", "它把 skill 行为与路由波动隔离，使重复运行可比", "它证明所有宿主共用命令语法"],
+      "correct": 2,
+      "explanation": "harness 往往要测 skill 本身而不是发现模型；精确程序化选择去掉一种方差来源。"
+    },
+    {
+      "stage": "post",
+      "question": "哪种设计能正确分离调用与权限？",
+      "options": ["用户调用后批准它请求的每个动作", "让扩展元数据替代文件系统和网络策略", "先经宿主策略路由激活，再按权限模型审查每个请求动作", "只要 bundle 有 shell 脚本就允许模型激活"],
+      "correct": 2,
+      "explanation": "激活决定指令是否进入上下文；权限审查决定读、写、命令或网络调用是否允许，二者必须分开。"
+    }
   ]
 }

@@ -16,7 +16,7 @@
 - 正确路由请求范围内的 SSE、`subscriptions/listen`、MRTR 重试和 Tasks 扩展调用。
 - 将旧版握手与会话支持隔离在现代路径外。
 
-## 问题所在
+## 问题背景
 
 把一个 client 直接连到一个 server 很简单。规模更大的部署需要为这些更棘手的问题给出一致答案：
 
@@ -201,7 +201,7 @@ Registry 的 `server.json` 提供发布元数据。一个以 package 为后端�
 
 不要因 server 的展示名称像熟悉产品就接受它。不要把注册表中的存在当作运行时安全审查。私有 server 即使从未出现在公开注册表中，也可以通过同一证据 schema 获得准入。
 
-本课实现网关接缝：在后端可路由前，将发布证据关联到本地准入状态。[第 30 课：MCP Registry 供应链、准入、漂移与回滚](../../30-mcp-registry-supply-chain-and-drift/docs/en.md) 构建完整控制面，涵盖精确命名空间证明、制品溯源、不可变钉定、实时描述符漂移、Registry 状态协调、防篡改准入账本和基于证据的回滚。将这些供应链状态与上文按请求作出的运行时决定分离。
+本课实现网关接缝：在后端可路由前，将发布证据关联到本地准入状态。[第 30 课：MCP Registry 供应链、准入、漂移与回滚](../../30-mcp-registry-supply-chain-and-drift/docs/zh.md) 构建完整控制面，涵盖精确命名空间证明、制品溯源、不可变钉定、实时描述符漂移、Registry 状态协调、防篡改准入账本和基于证据的回滚。将这些供应链状态与上文按请求作出的运行时决定分离。
 
 ### 凭证调解
 
@@ -331,7 +331,7 @@ python3 -m unittest discover code/tests -v
 
 演示会打印外层请求 id 和全新的后端请求 id，让无状态跳转可见。
 
-## 上手使用
+## 实际使用
 
 用真实当前协议 client 替换进程内后端对象，仍保留相同接缝：
 
@@ -342,7 +342,7 @@ python3 -m unittest discover code/tests -v
 - 转发前的全新逐请求元数据。
 - 返回前的结果校验。
 
-## 交付
+## 拿去用
 
 本课交付 `outputs/skill-gateway-bootstrap.md`。它会生成现代网关设计，涵盖入口、发现、准入、命名空间、授权、缓存、流、订阅、MRTR、Tasks、可观测性和旧版隔离。
 

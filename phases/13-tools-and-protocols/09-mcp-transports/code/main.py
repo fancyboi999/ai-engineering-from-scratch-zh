@@ -1,5 +1,5 @@
 """Phase 13 Lesson 09: stateless MCP Streamable HTTP.
-Lesson: phases/13-tools-and-protocols/09-mcp-transports/docs/en.md
+Lesson: phases/13-tools-and-protocols/09-mcp-transports/docs/zh.md
 Specification: https://modelcontextprotocol.io/specification/2026-07-28/
 Implements POST-only transport, header validation, JSON, and finite SSE.
 Run: python3 main.py

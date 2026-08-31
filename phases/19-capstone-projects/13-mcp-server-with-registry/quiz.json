@@ -6,33 +6,33 @@
       "stage": "pre",
       "question": "为什么本顶点项目同时使用 server.json 和 server/discover？",
       "options": [
-        "server.json 存储 sessions，而 server/discover 删除它们",
+        "server.json 发布安装和 endpoint 元数据，而 server/discover 报告实时协议 capabilities",
         "Registry 要求两个文件包含完全相同的版本日期",
-        "它们是同一份工具清单的两个名称",
-        "server.json 发布安装和 endpoint 元数据，而 server/discover 报告实时协议 capabilities"
+        "server.json 存储 sessions，而 server/discover 删除它们",
+        "它们是同一份工具清单的两个名称"
       ],
-      "correct": 3,
+      "correct": 0,
       "explanation": "Registry 记录帮助 clients 定位和配置服务器。实时 RPC 报告运行中进程支持什么。它们的 schema 和版本域彼此独立，但发布的身份必须使用已认证的命名空间并与实时 serverInfo 匹配。"
     },
     {
       "stage": "check",
       "question": "在 MCP 修订版 2026-07-28 中，什么取代了 initialize 握手？",
       "options": [
-        "Mcp-Session-Id 加 notifications/initialized",
-        "每个请求携带协议版本和 client capabilities，且 clients 可以调用强制的 server/discover",
         "一个打开永久服务器流的 GET 请求",
-        "每个 TCP 连接只发送一次的 session cookie"
+        "每个 TCP 连接只发送一次的 session cookie",
+        "Mcp-Session-Id 加 notifications/initialized",
+        "每个请求携带协议版本和 client capabilities，且 clients 可以调用强制的 server/discover"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "协议是无状态的。版本和 capabilities 是请求元数据，而 server/discover 在不创建 session 的情况下提供实时版本和 capability 发现。"
     },
     {
       "stage": "check",
       "question": "哪种 tools/list 行为支持安全且高效的发现？",
       "options": [
-        "一份没有 scope、永久缓存的响应",
         "每个副本上随机的工具顺序",
         "在 initialize 期间创建的连接本地列表",
+        "一份没有 scope、永久缓存的响应",
         "确定性顺序，加上 ttlMs 和正确的 public 或 private cacheScope"
       ],
       "correct": 3,
@@ -43,8 +43,8 @@
       "question": "哪种 Streamable HTTP 设计符合当前的无状态 transport？",
       "options": [
         "所有 clients 都要求负载均衡器 sticky routing",
-        "POST 创建 session，GET 恢复它，DELETE 关闭它",
         "独立的 GET 流使用 Last-Event-ID replay",
+        "POST 创建 session，GET 恢复它，DELETE 关闭它",
         "每条 JSON-RPC 消息各用一个 POST；请求使用 JSON 或请求范围的 SSE"
       ],
       "correct": 3,
@@ -55,11 +55,11 @@
       "question": "在策略已批准的工具 handler 运行前，生产服务器必须校验什么？",
       "options": [
         "只校验 server.json 是否列出 remote URL",
-        "只校验工具的 destructiveHint 注释",
         "只校验是否有人发布了一条审批消息",
-        "协议元数据，以及 token issuer、audience 或 resource、expiry、scope 和任何精确动作审批"
+        "协议元数据，以及 token issuer、audience 或 resource、expiry、scope 和任何精确动作审批",
+        "只校验工具的 destructiveHint 注释"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "传输元数据、token 校验和策略是相互独立的 gates。注释与发布元数据不会授予权限。"
     },
     {
@@ -67,11 +67,11 @@
       "question": "哪种证据最能支持“服务器无需协议 sessions 即可扩展”的主张？",
       "options": [
         "一条 server.json remote 条目",
-        "跨两个可互换副本的 wire-level 并发运行，且没有 affinity 依赖",
+        "一张展示负载均衡器的图",
         "一个构造单个响应字典的 unit test",
-        "一张展示负载均衡器的图"
+        "跨两个可互换副本的 wire-level 并发运行，且没有 affinity 依赖"
       ],
-      "correct": 1,
+      "correct": 3,
       "explanation": "必须演练真实 transport 与部署边界。让请求在副本间交替，才能证明正确性没有隐藏在一个进程或 sticky session 中。"
     }
   ]

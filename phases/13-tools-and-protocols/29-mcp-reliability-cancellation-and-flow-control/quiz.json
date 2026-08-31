@@ -6,72 +6,72 @@
       "stage": "pre",
       "question": "一次变更的响应丢失，客户端使用新的 JSON-RPC ID 重试。什么让这次重试变得安全？",
       "options": [
-        "新的 JSON-RPC ID 会自动对该变更去重",
+        "重试使用同一个 HTTP 连接",
         "工具描述符包含 idempotentHint",
-        "复用带有完全相同参数的持久化应用幂等键",
-        "重试使用同一个 HTTP 连接"
+        "新的 JSON-RPC ID 会自动对该变更去重",
+        "复用带有完全相同参数的持久化应用幂等键"
       ],
-      "correct": 2,
+      "correct": 3,
       "explanation": "JSON-RPC ID 用于关联消息。业务幂等性需要持久化键、参数指纹和已存储的提交结果。"
     },
     {
       "stage": "check",
       "question": "在 MCP 2026-07-28 中，客户端如何通过 stdio 取消正在进行的请求？",
       "options": [
-        "为 JSON-RPC ID 调用 tasks/cancel",
         "发送带有活动请求 ID 的 notifications/cancelled",
         "关闭每请求一个的 SSE 流",
-        "向 MCP 端点发送 DELETE 请求"
+        "向 MCP 端点发送 DELETE 请求",
+        "为 JSON-RPC ID 调用 tasks/cancel"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "stdio 没有按请求划分的响应流，因此客户端发送即发即弃的 notifications/cancelled 通知。"
     },
     {
       "stage": "check",
       "question": "客户端如何取消正在进行的 Streamable HTTP 请求？",
       "options": [
-        "关闭该请求的 SSE 响应流",
-        "向 MCP 端点 POST notifications/cancelled",
+        "发送值为空的 Last-Event-ID",
         "等待服务器发送 notifications/cancelled",
-        "发送值为空的 Last-Event-ID"
+        "关闭该请求的 SSE 响应流",
+        "向 MCP 端点 POST notifications/cancelled"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "对于现代 Streamable HTTP，关闭该请求专属的响应流就是取消信号。"
     },
     {
       "stage": "check",
       "question": "每次空闲超时之前都持续有进度到达。哪一个截止时间仍必须终止失控的请求？",
       "options": [
-        "从请求开始算起的绝对最大超时",
-        "下一次分页游标过期时间",
         "代理保活间隔",
-        "Task 轮询间隔"
+        "Task 轮询间隔",
+        "下一次分页游标过期时间",
+        "从请求开始算起的绝对最大超时"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": "有效进度可以重置空闲时钟，但绝对最大截止时间必须继续生效。"
     },
     {
       "stage": "post",
       "question": "成功的 tasks/cancel 响应证明什么？",
       "options": [
-        "持久化结果已被删除",
-        "worker 已经停止",
+        "Task 最终一定会变为 cancelled",
         "服务器已确认取消意图",
-        "Task 最终一定会变为 cancelled"
+        "持久化结果已被删除",
+        "worker 已经停止"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "Task 取消是协作式的。Task 可能保持 working、先完成，或在 worker 检查点后变为 cancelled。"
     },
     {
       "stage": "post",
       "question": "一个订阅 SSE 流在数个进度事件后中断。哪种恢复计划符合 MCP 2026-07-28？",
       "options": [
-        "从 Last-Event-ID 恢复，并重放每个正在进行的变更",
-        "打开一个 GET 事件流并恢复 Mcp-Session-Id",
         "保留旧请求 ID，并假定没有丢失更新",
-        "打开新的 listen 请求，重新获取权威状态，并避免重放不安全的变更"
+        "从 Last-Event-ID 恢复，并重放每个正在进行的变更",
+        "打开新的 listen 请求，重新获取权威状态，并避免重放不安全的变更",
+        "打开一个 GET 事件流并恢复 Mcp-Session-Id"
       ],
-      "correct": 3,
+      "correct": 2,
       "explanation": "现代 MCP 流不能通过 Last-Event-ID 恢复。恢复使用新请求，加上权威重新获取和显式的重试安全性。"
     }
   ]

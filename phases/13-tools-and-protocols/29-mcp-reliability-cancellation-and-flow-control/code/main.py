@@ -1,5 +1,5 @@
 """Phase 13 Lesson 29: MCP reliability, cancellation, and flow control.
-Lesson: ../docs/en.md
+Lesson: ../docs/zh.md
 Cancellation: https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/cancellation
 Transport: https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http
 This deterministic simulator uses only Python's standard library.

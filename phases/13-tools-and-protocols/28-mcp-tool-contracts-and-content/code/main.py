@@ -1,5 +1,5 @@
 """Phase 13 Lesson 28: MCP tool contracts and content.
-Lesson: ../docs/en.md
+Lesson: ../docs/zh.md
 Specification: https://modelcontextprotocol.io/specification/2026-07-28/server/tools
 Utilities: completion and pagination in the MCP 2026-07-28 specification.
 This example uses only Python's standard library.

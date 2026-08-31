@@ -79,7 +79,7 @@ test -f my-first-skill/SKILL.md
 保持在 `agent-skills-first-run` 并运行：
 
 ```bash
-npx skills add rohitg00/ai-engineering-from-scratch --skill skill-contract-reviewer --full-depth
+npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill skill-contract-reviewer --full-depth
 ```
 
 选择所用的 agent host 与作用域。安装器应列出 `skill-contract-reviewer` 和写入目标。此课的 skill 是带 references、脚本和资源的嵌套 Bundle，所以需要 `--full-depth`。
@@ -148,7 +148,7 @@ npx skills remove skill-contract-reviewer
 
 选择与安装时相同的 host 和作用域。重新扫描或新开会话后，对 `skill-contract-reviewer` 的显式请求应报告它不可用。保留 `my-first-skill` 供后续课程使用，或在完成 track 后移除实验目录。
 
-## 问题所在
+## 问题背景
 
 假设团队有可靠的发布工作流：它查找已合并变更，检查迁移说明，更新 changelog，运行打包命令，并产出审查清单。
 
@@ -351,7 +351,7 @@ skill-validation-order
 
 该顺序可避免次要错误掩盖最先损坏的不变量。
 
-## 上手使用
+## 实际使用
 
 写 skill 前，填写此决策卡：
 
@@ -366,7 +366,7 @@ skill-validation-order
 
 许多生产工作流会使用不止一行。该卡可避免某个产物假装提供所有属性。
 
-## 交付
+## 拿去用
 
 本课在 `outputs/` 下产出 `skill-contract-reviewer` Bundle，包含：
 

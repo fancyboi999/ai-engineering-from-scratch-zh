@@ -1,6 +1,6 @@
 """Phase 13 Lesson 16: MCP 2026-07-28 authorization simulator.
 
-Companion to ../docs/en.md. Implements an in-process protocol model with
+Companion to ../docs/zh.md. Implements an in-process protocol model with
 protected-resource discovery, CIMD-first enrollment, deprecated DCR fallback,
 PKCE, issuer validation, resource-bound tokens, scope step-up, discovery, and
 tools/list. Lesson 09 supplies the complete Streamable HTTP adapter.

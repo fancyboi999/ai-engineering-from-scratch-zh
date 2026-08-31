@@ -5,43 +5,43 @@
     {
       "stage": "pre",
       "question": "双时代 stdio client 应首先发送什么？",
-      "options": ["Mcp-Session-Id", "server/discover", "initialize", "HTTP GET"],
-      "correct": 1,
+      "options": ["server/discover", "initialize", "Mcp-Session-Id", "HTTP GET"],
+      "correct": 0,
       "explanation": "发现 probe 在现代逐请求元数据与旧版初始化之间建立了清晰边界。"
     },
     {
       "stage": "check",
       "question": "发现 probe 返回带有双方支持版本的 -32022。client 应如何做？",
-      "options": ["以受支持版本重试现代发现", "发送 initialize", "打开 HTTP GET", "忽略该 server"],
-      "correct": 0,
+      "options": ["打开 HTTP GET", "以受支持版本重试现代发现", "发送 initialize", "忽略该 server"],
+      "correct": 1,
       "explanation": "-32022 是已识别的现代证据，因此 client 保持现代方式并重试。"
     },
     {
       "stage": "check",
       "question": "选择旧版 era 的充分条件是什么？",
-      "options": ["任意 -32601 error", "peer 位于旧版 allowlist", "peer 已 allowlisted，且有限 initialize probe 返回有效、受支持的旧版结果", "仅仅一次发现 timeout"],
-      "correct": 2,
+      "options": ["peer 位于旧版 allowlist", "仅仅一次发现 timeout", "任意 -32601 error", "peer 已 allowlisted，且有限 initialize probe 返回有效、受支持的旧版结果"],
+      "correct": 3,
       "explanation": "allowlist 允许探测，但只有为配置旧版 revision 得到结构上有效的正向 initialize 结果，才能证明旧版 era。"
     },
     {
       "stage": "check",
       "question": "client 应如何处理两个都叫 search 的 tools？",
-      "options": ["静默覆盖其中一个", "相信启动顺序", "按声明 policy 加前缀或拒绝", "创建协议 session"],
-      "correct": 2,
+      "options": ["创建协议 session", "静默覆盖其中一个", "相信启动顺序", "按声明 policy 加前缀或拒绝"],
+      "correct": 3,
       "explanation": "显式加前缀或拒绝，能让路由可见且保持确定性。"
     },
     {
       "stage": "post",
       "question": "client 协商旧版 era 后，某个旧版结果缺少 resultType。应如何解释？",
-      "options": ["解释为 input_required", "解释为 complete", "解释为 transport error", "解释为 server/discover"],
-      "correct": 1,
+      "options": ["解释为 server/discover", "解释为 input_required", "解释为 complete", "解释为 transport error"],
+      "correct": 2,
       "explanation": "client 将较早协议版本中缺失的 resultType 视作 complete。"
     },
     {
       "stage": "post",
       "question": "现代 transport 丢失后，在恢复路由前必须做什么？",
-      "options": ["重连、重新发现并重新列出", "用 Last-Event-ID 恢复", "回显 Mcp-Session-Id", "复用旧 connection metadata"],
-      "correct": 0,
+      "options": ["用 Last-Event-ID 恢复", "重连、重新发现并重新列出", "复用旧 connection metadata", "回显 Mcp-Session-Id"],
+      "correct": 1,
       "explanation": "client 重建 peer bookkeeping，并只以新的请求 ids 重试安全操作。"
     }
   ]

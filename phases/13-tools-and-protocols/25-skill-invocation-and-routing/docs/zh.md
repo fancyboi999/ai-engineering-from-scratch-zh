@@ -95,19 +95,19 @@ release-readiness check v2.4.0 without publishing
 过弱：
 
 ```yaml
-description: Helps with releases.
+description: 协助处理发布。
 ```
 
 过宽：
 
 ```yaml
-description: Use for release, version, package, build, deploy, publish, tag, changelog, GitHub, CI, or software tasks.
+description: 用于发布、版本、包、构建、部署、发布、标签、变更日志、GitHub、CI 或软件任务。
 ```
 
 有边界的版本：
 
 ```yaml
-description: Inspect an already prepared release candidate and produce a readiness report. Use when the user asks whether a version, tag, package, or image is ready to publish; do not use for ordinary build failures or feature development.
+description: 检查已准备好的发布候选项并生成就绪度报告。当用户询问某个版本、标签、包或镜像是否准备好发布时使用；不要用于普通构建失败或功能开发。
 ```
 
 这个有边界的版本包含：
@@ -201,7 +201,7 @@ skill-host-adapter
 
 即使由另一个兼容客户端打开，skill 也应当易于理解。
 
-### Skill-to-skill 调用是一条类似工具的边
+### skill 间调用是一条类似工具的边
 
 假设 `release-readiness` 在依赖文件发生变化时，请求 `security-change-review`。
 
@@ -233,9 +233,9 @@ skill-host-adapter
 不要编写依赖不可见生命周期假设的 skill。将持久输出放在文件或有类型的状态中，保证可安全重入，并说明中断后必须重新加载什么。
 
 ```markdown
-On resume, read `artifacts/release-readiness.json` if it exists.
-Revalidate the candidate commit before continuing.
-Do not repeat an external write whose idempotency key is already recorded.
+恢复时，如果存在 `artifacts/release-readiness.json`，请先读取它。
+继续前重新验证候选提交。
+不要重复执行其幂等键已被记录的外部写入。
 ```
 
 ## 动手构建
@@ -311,12 +311,12 @@ context:
 
 | 术语 | 常见说法 | 实际含义 |
 |---|---|---|
-| 显式调用 | “Slash command” | actor 直接提供 skill 身份，但仍受策略限制 |
+| 显式调用 | “斜杠命令” | 调用方直接提供 skill 身份，但仍受策略限制 |
 | 隐式调用 | “模型来选择” | 路由器根据任务上下文，从符合资格的目录元数据中选择 |
-| User-invocable | “人类可以使用它” | 宿主专用的菜单或直接调用属性，不是核心字段 |
-| Model-invocable | “agent 可以使用它” | 在宿主策略下，模型进行隐式选择的资格 |
-| 调用适配器 | “Frontmatter parser” | 将宿主的字段和 API 映射至已声明策略模型的代码 |
-| 近似负例 | “Hard negative” | 类似某个 skill 预期输入、但不应触发的请求 |
+| 用户可调用（User-invocable） | “人类可以使用它” | 宿主专用的菜单或直接调用属性，不是核心字段 |
+| 模型可调用（Model-invocable） | “agent 可以使用它” | 在宿主策略下，模型进行隐式选择的资格 |
+| 调用适配器 | “frontmatter 解析器” | 将宿主的字段和 API 映射至已声明策略模型的代码 |
+| 近似负例 | “困难负例” | 类似某个 skill 预期输入、但不应触发的请求 |
 | 弃权 | “未选中任何 skill” | 当证据缺失或存在歧义时，有意作出的路由结果 |
 
 ## 延伸阅读
