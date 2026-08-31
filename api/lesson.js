@@ -15,7 +15,10 @@ let productionAssets;
 
 function loadProductionAssets() {
   if (!productionAssets) {
-    const languageRegistry = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'languages.json'), 'utf8'));
+    const languageRegistryPath = path.join(__dirname, '..', 'languages.json');
+    const languageRegistry = fs.existsSync(languageRegistryPath)
+      ? JSON.parse(fs.readFileSync(languageRegistryPath, 'utf8'))
+      : { languages: [{ code: 'zh', source: true }] };
     const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'lesson-seo.json'), 'utf8'));
     productionAssets = {
       template: fs.readFileSync(path.join(__dirname, '..', 'site', 'lesson.html'), 'utf8'),

@@ -124,6 +124,19 @@ function invoke(handler, req) {
   return response;
 }
 
+test('production lesson handler loads the zh-only repository without languages.json', function () {
+  const response = invoke(lessonApi, {
+    method: 'GET',
+    url: '/lesson?path=phases%2F13-tools-and-protocols%2F06-mcp-fundamentals',
+    query: { path: 'phases/13-tools-and-protocols/06-mcp-fundamentals' },
+    headers: { host: 'aieng-zh.cn' },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /<html lang="zh-CN"/);
+  assert.match(response.body, /rel="canonical" href="https:\/\/aieng-zh\.cn\/lessons\/13-tools-and-protocols\/06-mcp-fundamentals\/"/);
+});
+
 test('lesson route renders unique crawlable HTML with a path-only canonical', function () {
   const assets = makeAssets();
   const handler = lessonApi.createHandler({ loadAssets: function () { return assets.lesson; } });
