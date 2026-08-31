@@ -1,5 +1,5 @@
 # Lesson program for evidence-based planning and dependency scheduling.
-# Read: phases/14-agent-engineering/44-plan-from-evidence/docs/en.md
+# Read: phases/14-agent-engineering/44-plan-from-evidence/docs/zh.md
 # Reference: PERT, U.S. Navy Special Projects Office, 1958.
 # Reference: CPM, Kelley and Walker, Eastern Joint Computer Conference, 1959.
 # Run this file to generate outputs/evidence-plan.json.

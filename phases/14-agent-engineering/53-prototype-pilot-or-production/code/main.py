@@ -1,5 +1,5 @@
 # Lesson program for selecting prototype, pilot, or production controls.
-# Read: phases/14-agent-engineering/53-prototype-pilot-or-production/docs/en.md
+# Read: phases/14-agent-engineering/53-prototype-pilot-or-production/docs/zh.md
 # Reference: Boehm, A Spiral Model of Software Development and Enhancement, 1988.
 # Reference: Fagerholm et al., Building Blocks for Continuous Experimentation, 2014.
 # Run this file to generate outputs/stage-decisions.json.

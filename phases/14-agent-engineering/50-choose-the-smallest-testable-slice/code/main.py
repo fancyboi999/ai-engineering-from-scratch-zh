@@ -1,5 +1,5 @@
 # Lesson program for selecting the smallest evidence-producing slice.
-# Read: phases/14-agent-engineering/50-choose-the-smallest-testable-slice/docs/en.md
+# Read: phases/14-agent-engineering/50-choose-the-smallest-testable-slice/docs/zh.md
 # Reference: Boehm, A Spiral Model of Software Development and Enhancement, 1988.
 # Reference: Lenarduzzi and Taibi, MVP Explained, 2016.
 # Run this file to generate outputs/slice-decision.json.

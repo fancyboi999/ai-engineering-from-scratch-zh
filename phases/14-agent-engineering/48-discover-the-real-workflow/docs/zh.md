@@ -46,13 +46,13 @@
 
 ```mermaid
 flowchart TD
-  T[Trigger] --> A1[Actor action]
-  A1 --> H[Handoff]
-  H --> A2[Next actor action]
-  A2 --> O[Outcome]
-  E1[Direct evidence] -.supports.-> A1
-  E2[Artifact] -.supports.-> H
-  E3[Reported behavior] -.supports.-> A2
+  T[触发条件] --> A1[参与者行动]
+  A1 --> H[交接]
+  H --> A2[下一位参与者行动]
+  A2 --> O[结果]
+  E1[直接证据] -.支持.-> A1
+  E2[产物] -.支持.-> H
+  E3[报告的行为] -.支持.-> A2
 ```
 
 ## 搜索四类事物

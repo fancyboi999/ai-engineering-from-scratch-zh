@@ -50,12 +50,12 @@
 
 ```mermaid
 flowchart LR
-  A[Assumptions] --> S[Score risk]
-  S --> H[Highest open risk]
-  H --> X[Cheapest decisive experiment]
-  X --> E{Evidence}
-  E -->|Supports| B[Bounded build]
-  E -->|Rejects| R[Reframe or stop]
+  A[假设] --> S[评估风险]
+  S --> H[最高的未决风险]
+  H --> X[成本最低的决定性实验]
+  X --> E{证据}
+  E -->|支持| B[有边界的构建]
+  E -->|否定| R[重新界定或停止]
 ```
 
 ## 设计实验，而非确认仪式

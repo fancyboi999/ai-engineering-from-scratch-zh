@@ -1,5 +1,5 @@
 # Lesson program: audits workflow evidence, ordering, confidence, and friction.
-# Lesson: phases/14-agent-engineering/48-discover-the-real-workflow/docs/en.md
+# Lesson: phases/14-agent-engineering/48-discover-the-real-workflow/docs/zh.md
 # Canonical source: Nuseibeh and Easterbrook, Requirements Engineering: A Roadmap.
 # Canonical source: Gotel and Finkelstein, ICRE 1994, DOI 10.1109/ICRE.1994.292398.
 from __future__ import annotations

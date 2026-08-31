@@ -41,12 +41,12 @@
 
 ```mermaid
 flowchart LR
-  S[Signal] --> O[Outcome or constraint]
-  O --> R[Root cause]
-  R --> D[Owning layer]
-  D --> C[Durable control]
-  C --> V[Verification]
-  V --> N[Next run]
+  S[信号] --> O[结果或约束]
+  O --> R[根因]
+  R --> D[负责层]
+  D --> C[持久控制措施]
+  C --> V[验证]
+  V --> N[下一轮]
   N --> S
 ```
 

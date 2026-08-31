@@ -1,5 +1,5 @@
 # Lesson program for deriving reproducible metrics from outcome goals.
-# Read: phases/14-agent-engineering/52-design-success-metrics/docs/en.md
+# Read: phases/14-agent-engineering/52-design-success-metrics/docs/zh.md
 # Reference: Basili, Software Modeling and Measurement: The GQM Paradigm, 1992.
 # Reference: Basili, Caldiera, and Rombach, The Goal Question Metric Approach.
 # Run this file to generate outputs/measurement-report.json.

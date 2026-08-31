@@ -1,1 +1,48 @@
-{"lesson":"46-turn-feedback-into-system","title":"将反馈转为系统","questions":[{"stage":"pre","question":"反复出现的 agent 纠正揭示什么？","options":["工作系统中缺失或薄弱的控制","跳过测试的理由","需要更多聊天历史","仅仅是模型薄弱"],"correct":0,"explanation":"纠正是对缺失测试、边界、示例、工具或决定的观察。"},{"stage":"check","question":"回归纠正应在哪一处变得持久？","options":["更长的 prompt","测试或评估","新模型","会议记录"],"correct":1,"explanation":"可执行的证明可防止相同错误结果悄悄重现。"},{"stage":"check","question":"为何在写规则前先找根因？","options":["这样不需要证据","规则需要引用","这样避免全部复杂性","症状可能来自不同的缺失控制"],"correct":3,"explanation":"只针对症状的规则会在同一原因换一种形式出现时失效。"},{"stage":"check","question":"一次性纠正何时值得永久控制？","options":["总是","从不","复发或后果足以支撑持久复杂度时","只在发布后"],"correct":2,"explanation":"棘轮应保留有意义的判断，而非累积每个偏好。"},{"stage":"post","question":"为何为提升后的控制生成指纹？","options":["隐藏所有权","用于视觉设计","替代验证","在不丢失不同原因的前提下合并重复经验"],"correct":3,"explanation":"稳定标识可防止反复加入同一控制。"},{"stage":"post","question":"为何每项控制都需要淘汰检查？","options":["控制可能过时、冲突或被取代","agent 不喜欢说明","测试无法持久","所有规则每天过期"],"correct":0,"explanation":"工作系统应保持最小且当前，而不是只累积策略。"}]}
+{
+  "lesson": "46-turn-feedback-into-system",
+  "title": "将反馈转为系统",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "反复出现的 agent 纠正揭示什么？",
+      "options": ["仅仅是模型薄弱", "跳过测试的理由", "需要更多聊天历史", "工作系统中缺失或薄弱的控制"],
+      "correct": 3,
+      "explanation": "纠正是对缺失测试、边界、示例、工具或决定的观察。"
+    },
+    {
+      "stage": "check",
+      "question": "回归纠正应在哪一处变得持久？",
+      "options": ["会议记录", "测试或评估", "更长的 prompt", "新模型"],
+      "correct": 1,
+      "explanation": "可执行的证明可防止相同错误结果悄悄重现。"
+    },
+    {
+      "stage": "check",
+      "question": "为何在写规则前先找根因？",
+      "options": ["这样避免全部复杂性", "症状可能来自不同的缺失控制", "规则需要引用", "这样不需要证据"],
+      "correct": 1,
+      "explanation": "只针对症状的规则会在同一原因换一种形式出现时失效。"
+    },
+    {
+      "stage": "check",
+      "question": "一次性纠正何时值得永久控制？",
+      "options": ["从不", "只在发布后", "复发或后果足以支撑持久复杂度时", "总是"],
+      "correct": 2,
+      "explanation": "棘轮应保留有意义的判断，而非累积每个偏好。"
+    },
+    {
+      "stage": "post",
+      "question": "为何为提升后的控制生成指纹？",
+      "options": ["在不丢失不同原因的前提下合并重复经验", "替代验证", "用于视觉设计", "隐藏所有权"],
+      "correct": 0,
+      "explanation": "稳定标识可防止反复加入同一控制。"
+    },
+    {
+      "stage": "post",
+      "question": "为何每项控制都需要淘汰检查？",
+      "options": ["所有规则每天过期", "测试无法持久", "agent 不喜欢说明", "控制可能过时、冲突或被取代"],
+      "correct": 3,
+      "explanation": "工作系统应保持最小且当前，而不是只累积策略。"
+    }
+  ]
+}

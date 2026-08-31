@@ -63,11 +63,11 @@
 
 ```mermaid
 flowchart LR
-  U[Unknown] --> R{Needs real users or data?}
-  R -->|No| P[Prototype]
-  R -->|Yes| C{Consequence bounded and operations ready?}
-  C -->|No| L[Pilot]
-  C -->|Yes| D[Production]
+  U[未知项] --> R{需要真实用户或数据吗？}
+  R -->|否| P[原型]
+  R -->|是| C{后果可控且运营就绪吗？}
+  C -->|否| L[试点]
+  C -->|是| D[生产环境]
 ```
 
 ## 阶段漂移

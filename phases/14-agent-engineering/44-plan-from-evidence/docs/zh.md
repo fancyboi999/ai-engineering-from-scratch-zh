@@ -40,9 +40,9 @@
 
 ```mermaid
 flowchart LR
-  C[Contract] --> I[Implementation]
-  C --> D[Documentation]
-  I --> G[Integration gate]
+  C[契约] --> I[实现]
+  C --> D[文档]
+  I --> G[集成门禁]
   D --> G
 ```
 

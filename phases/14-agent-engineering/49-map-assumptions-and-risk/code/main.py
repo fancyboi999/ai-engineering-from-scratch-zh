@@ -1,5 +1,5 @@
 # Lesson program: ranks assumptions and selects the next risk-reducing experiment.
-# Lesson: phases/14-agent-engineering/49-map-assumptions-and-risk/docs/en.md
+# Lesson: phases/14-agent-engineering/49-map-assumptions-and-risk/docs/zh.md
 # Canonical source: Boehm, Spiral Model, DOI 10.1145/12944.12948.
 # Canonical source: Dardenne et al., Goal-Directed Requirements Acquisition.
 from __future__ import annotations

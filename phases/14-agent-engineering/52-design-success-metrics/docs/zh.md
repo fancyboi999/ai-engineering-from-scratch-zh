@@ -31,11 +31,11 @@
 
 ```mermaid
 flowchart LR
-  G[Goal] --> Q1[Question about outcome]
-  G --> Q2[Question about risk]
-  Q1 --> M1[Outcome metric]
-  Q2 --> M2[Guardrail metric]
-  M1 --> D[Decision rule]
+  G[目标] --> Q1[关于结果的问题]
+  G --> Q2[关于风险的问题]
+  Q1 --> M1[结果指标]
+  Q2 --> M2[护栏指标]
+  M1 --> D[决策规则]
   M2 --> D
 ```
 

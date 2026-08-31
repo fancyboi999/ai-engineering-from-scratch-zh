@@ -1,5 +1,5 @@
 # Lesson program: validates and renders a repository-backed task frame.
-# Lesson: phases/14-agent-engineering/43-frame-the-task-before-code/docs/en.md
+# Lesson: phases/14-agent-engineering/43-frame-the-task-before-code/docs/zh.md
 # Canonical source: Nuseibeh and Easterbrook, Requirements Engineering: A Roadmap.
 # Canonical source: Yang et al., SWE-agent, arXiv:2405.15793.
 from __future__ import annotations

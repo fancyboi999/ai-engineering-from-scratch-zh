@@ -1,5 +1,5 @@
 # Lesson program for delegating work with isolated ownership boundaries.
-# Read: phases/14-agent-engineering/45-delegate-with-isolation/docs/en.md
+# Read: phases/14-agent-engineering/45-delegate-with-isolation/docs/zh.md
 # Reference: Git worktree documentation, git-scm.com/docs/git-worktree.
 # Reference: Lamport, Time, Clocks, and the Ordering of Events, 1978.
 # Run this file to generate outputs/delegation-plan.json.

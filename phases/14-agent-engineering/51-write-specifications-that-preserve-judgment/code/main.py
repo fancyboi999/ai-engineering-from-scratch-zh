@@ -1,5 +1,5 @@
 # Lesson program for compiling specifications into explicit decision boundaries.
-# Read: phases/14-agent-engineering/51-write-specifications-that-preserve-judgment/docs/en.md
+# Read: phases/14-agent-engineering/51-write-specifications-that-preserve-judgment/docs/zh.md
 # Reference: Zave and Jackson, Four Dark Corners of Requirements Engineering, 1997.
 # Reference: Gotel and Finkelstein, Requirements Traceability, IEEE ICRE 1994.
 # Run this file to generate outputs/executable-specification.json.

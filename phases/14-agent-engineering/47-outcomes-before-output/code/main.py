@@ -1,5 +1,5 @@
 # Lesson program for framing observable outcomes before choosing outputs.
-# Read: phases/14-agent-engineering/47-outcomes-before-output/docs/en.md
+# Read: phases/14-agent-engineering/47-outcomes-before-output/docs/zh.md
 # Reference: Nuseibeh and Easterbrook, Requirements Engineering: A Roadmap, 2000.
 # Reference: Dardenne, van Lamsweerde, and Fickas, Goal-Directed Requirements Acquisition, 1993.
 # Run this file to generate outputs/outcome-frame.json.

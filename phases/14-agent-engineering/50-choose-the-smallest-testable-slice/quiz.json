@@ -1,1 +1,48 @@
-{"lesson":"50-choose-the-smallest-testable-slice","title":"选择最小可测试切片","questions":[{"stage":"pre","question":"什么让一个小切片有用？","options":["代码很少","避开真实不确定性","它能改变一个重要决定","有精致 UI"],"correct":2,"explanation":"规模只有和决定性证据相关时才重要。"},{"stage":"check","question":"比较候选切片前必须定义什么？","options":["发布名","框架","最终架构","所需证明集合"],"correct":3,"explanation":"资格取决于是否覆盖需要证据的风险假设。"},{"stage":"check","question":"为什么廉价仪表盘 mockup 可能不是正确的最小值？","options":["它太可逆","它有用户","它可能从测试中移除了数据和运营不确定性","仪表盘总是不好"],"correct":2,"explanation":"避开高风险机制的切片无法回答决定。"},{"stage":"check","question":"高分却缺少所需证明的切片应如何处理？","options":["以不合格拒绝","提高分数","选择它","称为生产"],"correct":0,"explanation":"覆盖是优化之前的门槛。"},{"stage":"post","question":"为何增加停止规则？","options":["避免测量","说明什么证据会导致重新框定、修订或放弃","限制文档","让每个结果都支持想法"],"correct":1,"explanation":"实验必须有能力改变决定。"},{"stage":"post","question":"测试诊断时，通常哪种切片更安全？","options":["生产自动修复","针对代表性事故的只读回放","迁移","完整平台"],"correct":1,"explanation":"回放能以更低后果和高可逆性测试核心未知项。"}]}
+{
+  "lesson": "50-choose-the-smallest-testable-slice",
+  "title": "选择最小可测试切片",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "什么让一个小切片有用？",
+      "options": ["代码很少", "它能改变一个重要决定", "避开真实不确定性", "有精致 UI"],
+      "correct": 1,
+      "explanation": "规模只有和决定性证据相关时才重要。"
+    },
+    {
+      "stage": "check",
+      "question": "比较候选切片前必须定义什么？",
+      "options": ["框架", "所需证明集合", "发布名", "最终架构"],
+      "correct": 1,
+      "explanation": "资格取决于是否覆盖需要证据的风险假设。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么廉价仪表盘 mockup 可能不是正确的最小值？",
+      "options": ["它太可逆", "它可能从测试中移除了数据和运营不确定性", "它有用户", "仪表盘总是不好"],
+      "correct": 1,
+      "explanation": "避开高风险机制的切片无法回答决定。"
+    },
+    {
+      "stage": "check",
+      "question": "高分却缺少所需证明的切片应如何处理？",
+      "options": ["选择它", "提高分数", "称为生产", "以不合格拒绝"],
+      "correct": 3,
+      "explanation": "覆盖是优化之前的门槛。"
+    },
+    {
+      "stage": "post",
+      "question": "为何增加停止规则？",
+      "options": ["避免测量", "限制文档", "让每个结果都支持想法", "说明什么证据会导致重新框定、修订或放弃"],
+      "correct": 3,
+      "explanation": "实验必须有能力改变决定。"
+    },
+    {
+      "stage": "post",
+      "question": "测试诊断时，通常哪种切片更安全？",
+      "options": ["针对代表性事故的只读回放", "迁移", "完整平台", "生产自动修复"],
+      "correct": 0,
+      "explanation": "回放能以更低后果和高可逆性测试核心未知项。"
+    }
+  ]
+}

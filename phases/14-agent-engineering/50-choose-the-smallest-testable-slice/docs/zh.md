@@ -42,15 +42,15 @@
 
 ```mermaid
 flowchart TD
-  R[Required proof] --> C1[Candidate slice 1]
-  R --> C2[Candidate slice 2]
-  R --> C3[Candidate slice 3]
-  C1 --> G{Covers all proof?}
+  R[必需证据] --> C1[候选切片 1]
+  R --> C2[候选切片 2]
+  R --> C3[候选切片 3]
+  C1 --> G{覆盖全部证据吗？}
   C2 --> G
   C3 --> G
-  G -->|No| X[Reject]
-  G -->|Yes| S[Compare evidence per effort and risk]
-  S --> B[Build one slice]
+  G -->|否| X[淘汰]
+  G -->|是| S[比较单位投入与风险获得的证据]
+  S --> B[构建一个切片]
 ```
 
 ## 常见的假最小值

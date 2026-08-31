@@ -1,5 +1,5 @@
 # Lesson program for routing feedback into owned, verifiable system changes.
-# Read: phases/14-agent-engineering/54-build-the-feedback-ratchet/docs/en.md
+# Read: phases/14-agent-engineering/54-build-the-feedback-ratchet/docs/zh.md
 # Reference: Basili, Caldiera, and Rombach, The Goal Question Metric Approach.
 # Reference: Fagerholm et al., Building Blocks for Continuous Experimentation, 2014.
 # Run this file to generate outputs/feedback-backlog.json.

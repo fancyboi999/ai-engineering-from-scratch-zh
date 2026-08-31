@@ -37,13 +37,13 @@
 
 ```mermaid
 flowchart LR
-  D[Decision] --> C{Consequence and reversibility}
-  C -->|High consequence| L[Locked]
-  C -->|Known safe range| B[Bounded]
-  C -->|Cheap and reversible| A[Delegated]
-  L --> H[Human checkpoint]
-  B --> P[Agent proposes within limits]
-  A --> I[Agent implements and proves]
+  D[决策] --> C{后果与可逆性}
+  C -->|后果严重| L[锁定]
+  C -->|安全范围已知| B[限定边界]
+  C -->|成本低且可逆| A[委托]
+  L --> H[人工检查点]
+  B --> P[Agent 在边界内提出方案]
+  A --> I[Agent 实现并提供证据]
 ```
 
 ## 用示例规定行为

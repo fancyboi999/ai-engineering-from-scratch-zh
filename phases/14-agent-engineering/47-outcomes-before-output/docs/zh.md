@@ -37,11 +37,11 @@
 
 ```mermaid
 flowchart LR
-  U[User and situation] --> C[Current behavior]
-  C --> O[Desired outcome]
-  O --> K[Constraints]
-  K --> N[Non-goals]
-  N --> E[Evidence question]
+  U[用户与情境] --> C[当前行为]
+  C --> O[期望结果]
+  O --> K[约束]
+  K --> N[非目标]
+  N --> E[证据问题]
 ```
 
 ## 发现方案泄漏

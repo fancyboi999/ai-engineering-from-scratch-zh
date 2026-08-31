@@ -37,14 +37,14 @@
 
 ```mermaid
 flowchart LR
-  O[Observed correction] --> C[Find root cause]
-  C --> T{Earliest owner}
-  T --> E[Example or type]
-  T --> V[Test or evaluation]
-  T --> S[Scope or policy]
-  T --> A[Automation]
-  T --> H[Human decision]
-  E --> N[Next run starts stronger]
+  O[观察到的纠正] --> C[查明根因]
+  C --> T{最早负责层}
+  T --> E[示例或类型]
+  T --> V[测试或评估]
+  T --> S[范围或策略]
+  T --> A[自动化]
+  T --> H[人工决策]
+  E --> N[下一轮从更强起点开始]
   V --> N
   S --> N
   A --> N

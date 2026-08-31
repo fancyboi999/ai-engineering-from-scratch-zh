@@ -1,1 +1,48 @@
-{"lesson":"54-build-the-feedback-ratchet","title":"构建反馈棘轮","questions":[{"stage":"pre","question":"反馈何时成为基础设施？","options":["被总结时","出现在仪表盘时","被收集时","有通向负责的持久变更和验证的路径时"],"correct":3,"explanation":"提升和所有权把观察转成系统学习。"},{"stage":"check","question":"一次生产写入尝试应路由到哪里？","options":["只写文档","策略或权限边界","通用待办列表","视觉设计"],"correct":1,"explanation":"不安全权限由可执行的策略层拥有。"},{"stage":"check","question":"误报首先应改变什么？","options":["团队名称","部署区域","定价","评估或测试覆盖"],"correct":3,"explanation":"评估层应把失败保留为可复现案例。"},{"stage":"check","question":"为何负责人是控制的一部分？","options":["无人负责的改进不会可靠改变或保持当前","增加会议","隐藏信号","移除证明"],"correct":0,"explanation":"必须有人实现、验证、复审并淘汰行动。"},{"stage":"post","question":"控制何时应淘汰？","options":["从不","证据显示它被取代、已过时或制造的摩擦超过保护风险时","感觉旧了时","添加后立即"],"correct":1,"explanation":"与提升一样，淘汰也应由证据支撑。"},{"stage":"post","question":"塑造构建与编码 agent 反馈如何连接？","options":["只有 prompt 重要","只有指标重要","产品证据改变结果和范围，agent 纠正改变工作台；事故可能改变两者","它们不相连"],"correct":2,"explanation":"两条路径都用同一套从证据到持久系统变更的棘轮。"}]}
+{
+  "lesson": "54-build-the-feedback-ratchet",
+  "title": "构建反馈棘轮",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "反馈何时成为基础设施？",
+      "options": ["出现在仪表盘时", "被总结时", "有通向负责的持久变更和验证的路径时", "被收集时"],
+      "correct": 2,
+      "explanation": "提升和所有权把观察转成系统学习。"
+    },
+    {
+      "stage": "check",
+      "question": "一次生产写入尝试应路由到哪里？",
+      "options": ["策略或权限边界", "只写文档", "通用待办列表", "视觉设计"],
+      "correct": 0,
+      "explanation": "不安全权限由可执行的策略层拥有。"
+    },
+    {
+      "stage": "check",
+      "question": "误报首先应改变什么？",
+      "options": ["部署区域", "团队名称", "定价", "评估或测试覆盖"],
+      "correct": 3,
+      "explanation": "评估层应把失败保留为可复现案例。"
+    },
+    {
+      "stage": "check",
+      "question": "为何负责人是控制的一部分？",
+      "options": ["隐藏信号", "增加会议", "无人负责的改进不会可靠改变或保持当前", "移除证明"],
+      "correct": 2,
+      "explanation": "必须有人实现、验证、复审并淘汰行动。"
+    },
+    {
+      "stage": "post",
+      "question": "控制何时应淘汰？",
+      "options": ["添加后立即", "从不", "证据显示它被取代、已过时或制造的摩擦超过保护风险时", "感觉旧了时"],
+      "correct": 2,
+      "explanation": "与提升一样，淘汰也应由证据支撑。"
+    },
+    {
+      "stage": "post",
+      "question": "塑造构建与编码 agent 反馈如何连接？",
+      "options": ["它们不相连", "只有 prompt 重要", "只有指标重要", "产品证据改变结果和范围，agent 纠正改变工作台；事故可能改变两者"],
+      "correct": 3,
+      "explanation": "两条路径都用同一套从证据到持久系统变更的棘轮。"
+    }
+  ]
+}

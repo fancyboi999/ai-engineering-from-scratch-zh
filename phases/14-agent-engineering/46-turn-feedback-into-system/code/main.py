@@ -1,5 +1,5 @@
 # Lesson program for promoting corrections into durable controls.
-# Read: phases/14-agent-engineering/46-turn-feedback-into-system/docs/en.md
+# Read: phases/14-agent-engineering/46-turn-feedback-into-system/docs/zh.md
 # Reference: Basili, Caldiera, and Rombach, The Goal Question Metric Approach.
 # Reference: Shinn et al., Reflexion, arXiv:2303.11366.
 # Run this file to generate outputs/feedback-ratchet.json.

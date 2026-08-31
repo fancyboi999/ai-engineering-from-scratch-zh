@@ -50,13 +50,13 @@
 
 ```mermaid
 flowchart TD
-  P[Approved plan] --> A[API work unit]
-  P --> D[Docs work unit]
-  A --> H1[Proof and handoff]
-  D --> H2[Proof and handoff]
-  H1 --> R[Read-only integration review]
+  P[已批准的计划] --> A[API 工作单元]
+  P --> D[文档工作单元]
+  A --> H1[证据与交接]
+  D --> H2[证据与交接]
+  H1 --> R[只读集成审查]
   H2 --> R
-  R --> G[Full verification gate]
+  R --> G[完整验证门禁]
 ```
 
 ## 集成者不重做工作

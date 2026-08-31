@@ -39,12 +39,12 @@
 
 ```mermaid
 flowchart LR
-  R[Request] --> I[Inspect repository]
-  I --> F[Facts with evidence]
-  F --> B[Bounded task frame]
-  B --> D{Unknown blocks design?}
-  D -->|Yes| Q[Ask or investigate]
-  D -->|No| P[Plan the change]
+  R[请求] --> I[检查仓库]
+  I --> F[有证据支撑的事实]
+  F --> B[边界明确的任务框架]
+  B --> D{未知项会阻碍设计吗？}
+  D -->|会| Q[询问或调查]
+  D -->|不会| P[规划变更]
 ```
 
 ## 侦察是在寻找约束
