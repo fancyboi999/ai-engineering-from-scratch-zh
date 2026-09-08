@@ -443,7 +443,7 @@
 
     .masthead-cta {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.28fr) minmax(0, 1.12fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       margin-top: 20px;
     }
@@ -752,6 +752,13 @@
       .masthead-install,
       .masthead-install-caption {
         max-width: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .masthead-cta {
+        grid-template-columns: minmax(0, 1fr);
+        height: auto;
       }
     }
 

@@ -1475,7 +1475,7 @@ test('homepage preserves live GitHub CTAs and the motion-aware learner marquee',
   assert.match(wideMasthead[0], /"title figure"/);
   assert.match(wideMasthead[0], /"install figure"/);
   assert.match(wideMasthead[0], /\.masthead-figure\s*\{[\s\S]*?position: static;[\s\S]*?grid-area: figure/);
-  assert.match(homepage, /\.masthead-cta\s*\{\s*display: grid;\s*grid-template-columns: minmax\(0, 1fr\)/);
+  assert.match(homepage, /\.masthead-cta\s*\{\s*display: grid;\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
 
   assert.doesNotMatch(mastheadCta[0], /github\.com\/rohitg00/);
 });
@@ -1485,7 +1485,7 @@ test('homepage uses consistent responsive grids for controls, routes, and curric
 
   assert.match(
     homepage,
-    /\.masthead-cta\s*\{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\) minmax\(0, 1\.28fr\) minmax\(0, 1\.12fr\)/
+    /\.masthead-cta\s*\{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/
   );
   assert.match(homepage, /@media \(min-width: 761px\) \{[\s\S]*?\.masthead-cta\s*\{[\s\S]*?height: 44px;/);
   assert.match(

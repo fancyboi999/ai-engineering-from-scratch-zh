@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AI Engineering from Scratch 中文版公开资源",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "AI Engineering from Scratch 中文课程的公开只读机器可读资源。课程源码仍以 GitHub 中文仓库为准。"
   },
   "servers": [
@@ -186,6 +186,113 @@
           }
         }
       }
+    },
+    "/api/v1/markdown": {
+      "description": "Version 1 of the public navigation-page representation API. /api/markdown remains a compatible alias. Additive changes preserve v1; breaking representation changes require a new versioned path. Only GET and HEAD are supported. No per-client rate quota is advertised or enforced by this handler.",
+      "parameters": [
+        {
+          "name": "path",
+          "in": "query",
+          "description": "Navigation path: /, /about, /catalog, /glossary, /path, /roadmap, /developer, /docs, /contact, or /privacy. Unknown paths return 404. Send Accept: text/markdown to request the curriculum index; text/html selects the navigation page. Accept quality values are respected.",
+          "schema": {
+            "type": "string",
+            "default": "/"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Read a public navigation page as HTML or Markdown",
+        "operationId": "getPublicRepresentationV1",
+        "responses": {
+          "200": {
+            "description": "Selected representation; Markdown contains the curriculum index with the requested route context",
+            "headers": {
+              "X-API-Version": {
+                "$ref": "#/components/headers/ApiVersion"
+              },
+              "Vary": {
+                "schema": {
+                  "type": "string",
+                  "const": "Accept, Accept-Encoding"
+                }
+              }
+            },
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown path, with HTML or Markdown recovery links when accepted, otherwise RFC 9457 problem details. Errors are not cached.",
+            "headers": {
+              "X-API-Version": {
+                "$ref": "#/components/headers/ApiVersion"
+              }
+            },
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "405": {
+            "$ref": "#/components/responses/ReadOnlyMethod"
+          },
+          "406": {
+            "$ref": "#/components/responses/UnsupportedRepresentation"
+          }
+        }
+      },
+      "head": {
+        "summary": "Read representation metadata without a response body",
+        "operationId": "headPublicRepresentationV1",
+        "responses": {
+          "200": {
+            "description": "Same headers and status as GET, without a body",
+            "headers": {
+              "X-API-Version": {
+                "$ref": "#/components/headers/ApiVersion"
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown path, without a response body",
+            "headers": {
+              "X-API-Version": {
+                "$ref": "#/components/headers/ApiVersion"
+              }
+            }
+          },
+          "406": {
+            "description": "Neither HTML nor Markdown is acceptable, without a response body",
+            "headers": {
+              "X-API-Version": {
+                "$ref": "#/components/headers/ApiVersion"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -198,6 +305,89 @@
             "schema": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ReadOnlyMethod": {
+        "description": "Method not allowed; use GET or HEAD. Errors are not cached.",
+        "headers": {
+          "Allow": {
+            "schema": {
+              "type": "string",
+              "const": "GET, HEAD"
+            }
+          },
+          "X-API-Version": {
+            "$ref": "#/components/headers/ApiVersion"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "UnsupportedRepresentation": {
+        "description": "Request text/html or text/markdown. Errors are not cached.",
+        "headers": {
+          "X-API-Version": {
+            "$ref": "#/components/headers/ApiVersion"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "ApiVersion": {
+        "description": "Public representation API major version",
+        "schema": {
+          "type": "string",
+          "const": "1"
+        }
+      }
+    },
+    "schemas": {
+      "Problem": {
+        "type": "object",
+        "description": "RFC 9457 problem details with a stable code extension. The status matches the HTTP status; about:blank uses the standard HTTP reason phrase as its title.",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "detail"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "about:blank"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "resource_not_found",
+              "method_not_allowed",
+              "representation_not_supported"
+            ]
+          },
+          "detail": {
+            "type": "string"
           }
         }
       }

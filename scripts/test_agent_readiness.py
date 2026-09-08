@@ -108,6 +108,35 @@ def main() -> None:
     } <= set(paths)
     assert_public_html_route(paths, "/lesson", "path", "lesson")
     assert_public_html_route(paths, "/certification", "id", "certification")
+    representation = paths["/api/v1/markdown"]
+    assert representation["parameters"][0]["name"] == "path"
+    assert {"200", "404", "405", "406"} == set(representation["get"]["responses"])
+    for response in representation["head"]["responses"].values():
+        assert "content" not in response, "HEAD must not advertise a response body"
+    for status in ("200", "404"):
+        assert {"text/html", "text/markdown"} <= set(
+            representation["get"]["responses"][status]["content"]
+        )
+    problem = openapi["components"]["schemas"]["Problem"]
+    assert problem["properties"]["type"]["const"] == "about:blank"
+    assert set(problem["required"]) == {"type", "title", "status", "code", "detail"}
+    assert (ROOT / "api/v1/markdown.js").is_file()
+    assert "/api/v1/markdown" in (SITE / "developer.html").read_text()
+
+    def check_refs(value):
+        if isinstance(value, dict):
+            if "$ref" in value:
+                target = openapi
+                assert value["$ref"].startswith("#/"), "unexpected external schema ref"
+                for key in value["$ref"][2:].split("/"):
+                    target = target[key]
+            for child in value.values():
+                check_refs(child)
+        elif isinstance(value, list):
+            for child in value:
+                check_refs(child)
+
+    check_refs(openapi)
     redirect_response = openapi["components"]["responses"]["PermanentRedirect"]
     assert redirect_response["headers"]["Location"]["schema"]["type"] == "string"
 

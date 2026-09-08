@@ -27,17 +27,20 @@
   <main class="container"><article class="trust-page">
     <p class="about-eyebrow">AI Engineering from Scratch</p>
     <h1>开发者资源</h1>
-    <p>这是 AI Engineering from Scratch 中文版的机器可读入口。项目是一套静态开源课程，不是托管应用 API。Agent 和开发工具应从 <a href="llms.txt">llms.txt</a> 开始；它把课程映射到 canonical 页面和原始 Markdown 来源。</p>
+    <p>这是 AI Engineering from Scratch 中文版的机器可读入口。静态开源课程提供面向 agent 和开发工具的只读内容接口。请从 <a href="llms.txt">llms.txt</a> 开始；它把课程映射到 canonical 页面和原始 Markdown 来源。</p>
     <h2>稳定资源</h2>
     <ul>
       <li><a href="llms.txt"><code>/llms.txt</code></a> 是面向 agent 的课程地图。</li>
       <li><a href="sitemap.xml"><code>/sitemap.xml</code></a> 列出 canonical 公开 URL。</li>
       <li><a href="openapi.json"><code>/openapi.json</code></a> 描述只读资源接口。</li>
+      <li><a href="/api/v1/markdown"><code>/api/v1/markdown</code></a> 根据 <code>path</code> 查询参数，以 HTML 或 Markdown 返回公开导航页内容。</li>
       <li><a href="catalog.html"><code>/catalog.html</code></a> 是面向学习者的可搜索目录。</li>
       <li><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh"><code>GitHub</code></a> 是课程、代码、quiz 和可复用产物的事实来源。</li>
     </ul>
     <h2>Markdown 内容协商</h2>
     <p>首页或主要导航路由收到带 <code>Accept: text/markdown</code> 的请求时，会返回 agent 地图，并设置 <code>Content-Type: text/markdown</code>。响应按 <code>Accept</code> 区分，避免缓存混用 HTML 和 Markdown 表示。</p>
+    <p>内容接口支持 <code>GET</code> 和 <code>HEAD</code>，响应带有 <code>X-API-Version: 1</code>；HEAD 返回与 GET 相同的元数据，不含正文。不支持的内容类型和方法返回 <a href="https://www.rfc-editor.org/rfc/rfc9457.html">RFC 9457 错误详情</a>。找不到页面时，HTML 和 Markdown 响应提供恢复链接，其他 API 客户端收到结构化错误详情。</p>
+    <p><code>/api/markdown</code> 保留为兼容别名。向后兼容的新增能力沿用 <code>/api/v1/markdown</code>，破坏兼容性的变更使用新的版本路径。接口未实现按客户端限流，因此不提供配额响应头。</p>
     <h2>MCP 状态</h2>
     <p>本站目前不提供托管 MCP server 或需要认证的产品 API。课程会教你构建和运维 MCP server，相关课程产物保存在仓库中。若要提供远程 Streamable HTTP MCP endpoint，需要另行确定产品范围、认证策略和运维负责人。</p>
   </article></main>

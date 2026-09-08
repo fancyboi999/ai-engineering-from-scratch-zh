@@ -32,7 +32,8 @@ function parseAccept(header) {
 function qualityFor(accepted, mediaType) {
   const exact = accepted.find((entry) => entry.type === mediaType);
   if (exact) return exact.q;
-  const wildcard = accepted.find((entry) => entry.type === '*/*' || entry.type === `${mediaType.split('/')[0]}/*`);
+  const wildcard = accepted.find((entry) => entry.type === `${mediaType.split('/')[0]}/*`)
+    || accepted.find((entry) => entry.type === '*/*');
   return wildcard ? wildcard.q : 0;
 }
 
@@ -43,41 +44,55 @@ function markdownFor(requestPath) {
 }
 
 module.exports = (req, res) => {
+  const method = req.method || 'GET';
+  function send(status, contentType, body) {
+    res.statusCode = status;
+    res.setHeader('Content-Type', `${contentType}; charset=utf-8`);
+    res.end(method === 'HEAD' ? undefined : body);
+  }
+  function problem(status, title, code, detail) {
+    res.setHeader('Cache-Control', 'no-store');
+    send(status, 'application/problem+json', JSON.stringify({
+      type: 'about:blank', title, status, code, detail,
+    }) + '\n');
+  }
+
   const requestPath = String((req.query && req.query.path) || '/').split('?')[0] || '/';
   const accepted = parseAccept(req.headers.accept || '');
   const markdownQ = qualityFor(accepted, 'text/markdown');
   const htmlQ = qualityFor(accepted, 'text/html');
   res.setHeader('Vary', 'Accept, Accept-Encoding');
   res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800');
+  res.setHeader('X-API-Version', '1');
 
-  const file = HTML_BY_PATH[requestPath];
+  if (method !== 'GET' && method !== 'HEAD') {
+    res.setHeader('Allow', 'GET, HEAD');
+    problem(405, 'Method Not Allowed', 'method_not_allowed', '请使用 GET 或 HEAD 读取公开资源。');
+    return;
+  }
+
+  const file = Object.hasOwn(HTML_BY_PATH, requestPath) ? HTML_BY_PATH[requestPath] : null;
   if (!file) {
-    res.statusCode = 404;
+    res.setHeader('Cache-Control', 'no-store');
     if (markdownQ >= htmlQ && markdownQ > 0) {
-      res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-      res.end('# AI Engineering from Scratch · 简体中文版\n\n这个路径不存在。\n\n请查看 /llms.txt 或 /sitemap.xml。\n');
+      send(404, 'text/markdown', '# 页面不存在\n\n请查看[课程索引](/llms.txt)、[站点地图](/sitemap.xml)或[课程目录](/catalog.html)。\n');
+    } else if (htmlQ > 0) {
+      send(404, 'text/html', fs.readFileSync(path.join(SITE_ROOT, '404.html'), 'utf8'));
     } else {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.end(fs.readFileSync(path.join(SITE_ROOT, '404.html'), 'utf8'));
+      problem(404, 'Not Found', 'resource_not_found', '请通过 /llms.txt 或 /sitemap.xml 查找公开资源。');
     }
     return;
   }
 
   if (!markdownQ && !htmlQ) {
-    res.statusCode = 406;
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.end('Not Acceptable / 无法接受该内容类型\n\n可用表示：text/html、text/markdown\n');
+    problem(406, 'Not Acceptable', 'representation_not_supported', '请请求 text/html 或 text/markdown。');
     return;
   }
 
   if (markdownQ >= htmlQ && markdownQ > 0) {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-    res.end(markdownFor(requestPath));
+    send(200, 'text/markdown', markdownFor(requestPath));
     return;
   }
 
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.end(fs.readFileSync(path.join(SITE_ROOT, file), 'utf8'));
+  send(200, 'text/html', fs.readFileSync(path.join(SITE_ROOT, file), 'utf8'));
 };
