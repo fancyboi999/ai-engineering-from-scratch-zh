@@ -22,6 +22,7 @@ python3 phases/13-tools-and-protocols/01-the-tool-interface/code/main.py
 
 浏览[阶段 13 的完整课程列表](../../README.md#phase-13)或[跨阶段路线图](../../ROADMAP.md)。
 
+<a id="model-context-protocol-mcp-path"></a>
 ## Model Context Protocol（MCP）路径
 
 这条聚焦 MCP 路径有 17 课，约 23 小时 15 分钟。它遵循 MCP `2026-07-28`，从一个可自描述的 JSON-RPC 请求走到可运行的合规闸门。
@@ -61,6 +62,7 @@ python3 phases/13-tools-and-protocols/06-mcp-fundamentals/code/main.py
 
 [第 23 课](23-capstone-tool-ecosystem/)是唯一可选的 MCP 路径综合项目。在开始之前，完成 17 节必修课以及[第 19 课](19-a2a-protocol/)和[第 20 课](20-opentelemetry-genai/)。
 
+<a id="agent-skills-fast-path"></a>
 ## Agent Skills 快速路径
 
 这条聚焦路径有五课，约 9 小时 30 分钟：

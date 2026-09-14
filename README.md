@@ -22,7 +22,7 @@
 > **84% 的学生已经在用 AI 工具，可只有 18% 觉得自己能在专业场景里用好它们。**
 > 这套课程要填的就是这道沟。
 >
-> 523 节课，20 个阶段，约 348 小时。Python、TypeScript、Rust、Julia。每节课都交付一件
+> 523 节课，20 个阶段，约 342 小时。Python、TypeScript、Rust、Julia。每节课都交付一件
 > 能复用的东西：一个提示词、一个技能、一个 agent、一个 MCP server。免费，开源，MIT。
 >
 > 你不只是学 AI，你亲手把它造出来。从头到尾，全手写。
@@ -43,7 +43,60 @@
 
 > 翻译怎么翻见 [TRANSLATION.md](TRANSLATION.md)。课程结构、代码与上游保持一致，译文持续跟进上游更新。
 
-**目录** · [怎么运作](#怎么运作) · [课程结构](#课程的结构) · [学习路径](https://aieng-zh.cn/learning-paths.html) · [一节课的样子](#一节课的样子) · [快速开始](#快速开始) · [每节课都有产出](#每节课都有产出) · [课程目录](#contents) · [工具箱](#工具箱) · [参与贡献](#参与贡献)
+**目录** · [从这里开始](#从这里开始选择你想构建的内容) · [AI 导师](#30-秒添加-ai-导师) · [怎么运作](#怎么运作) · [课程结构](#课程的结构) · [学习路径](https://aieng-zh.cn/learning-paths.html) · [一节课的样子](#一节课的样子) · [快速开始](#快速开始) · [每节课都有产出](#每节课都有产出) · [课程目录](#contents) · [工具箱](#工具箱) · [参与贡献](#参与贡献)
+
+## 从这里开始：选择你想构建的内容
+
+开始前不需要先扫完 523 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
+
+| 你的目标 | 在 GitHub 上学习 | 在网站上学习 |
+|---|---|---|
+| 我是新手，想要完整地打牢基础 | [阶段 0 · 配置与工具链](phases/00-setup-and-tooling/) | [开发环境](https://aieng-zh.cn/lessons/00-setup-and-tooling/01-dev-environment/) |
+| 我懂 Python，想学数学与机器学习基础 | [阶段 1 · 数学基础](phases/01-math-foundations/) | [线性代数直觉](https://aieng-zh.cn/lessons/01-math-foundations/01-linear-algebra-intuition/) |
+| 我想构建生产级 LLM 应用 | [阶段 11 · LLM 工程](phases/11-llm-engineering/) | [提示词工程](https://aieng-zh.cn/lessons/11-llm-engineering/01-prompt-engineering/) |
+| 我想构建自主 agent | [阶段 14 · Agent 工程](phases/14-agent-engineering/) | [Agent 循环](https://aieng-zh.cn/lessons/14-agent-engineering/01-the-agent-loop/) |
+| 我想在真实代码仓库中使用 coding agent | [Agent 辅助工程路径](learning-paths/using-coding-agents.json) | [Agent 辅助工程](https://aieng-zh.cn/lessons/14-agent-engineering/31-agent-workbench-why-models-fail/?learningPath=using-coding-agents) |
+| 我想在编码实施前把产品方案想透定准 | [产品判断与交付路径](learning-paths/shaping-the-build.json) | [产品判断与交付](https://aieng-zh.cn/lessons/14-agent-engineering/47-outcomes-before-output/?learningPath=shaping-the-build) |
+| 我想基于模型上下文协议（MCP）构建系统 | [模型上下文协议（MCP）路线](phases/13-tools-and-protocols/README.md#model-context-protocol-mcp-path) | [模型上下文协议（MCP）路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/06-mcp-fundamentals/?learningPath=model-context-protocol) |
+| 我想编写并交付 Agent Skills | [Agent Skills 快速路线](phases/13-tools-and-protocols/README.md#agent-skills-fast-path) | [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills) |
+| 我想备考 Claude 官方认证 | [认证入门指南](certifications/claude/GETTING_STARTED.md) | [认证学院](https://aieng-zh.cn/certifications.html) |
+
+拿不准自己适合从哪开始？使用 [`start-learning` 定位导师](skills/start-learning/SKILL.md) 或查看 [网站前置要求指南](https://aieng-zh.cn/prereqs.html)。
+
+在 [AI 工程学习路径](https://aieng-zh.cn/learning-paths.html) 中对比四大核心领域与六大职业发展路线。
+
+## 30 秒添加 AI 导师
+
+```bash
+npx skills add fancyboi999/ai-engineering-from-scratch-zh
+```
+
+| 宿主 | 开始全课程 | 开始模型上下文协议（MCP） | 开始 Agent Skills | 运行阶段测验 |
+|---|---|---|---|---|
+| Codex | `start-learning`，或从 `/skills` 选择 | `learn-mcp`，或从 `/skills` 选择 | `learn-agent-skills`，或从 `/skills` 选择 | `check-understanding 13`，或从 `/skills` 选择 |
+| Claude Code | `/start-learning` | `/learn-mcp` | `/learn-agent-skills` | `/check-understanding 13` |
+| 其他兼容宿主 | `使用 start-learning 开始课程。` | `使用 learn-mcp 开始模型上下文协议（MCP）路径。` | `使用 learn-agent-skills 开始 Agent Skills 工程路径。` | `使用 check-understanding 测验阶段 13。` |
+
+运行你所在宿主的启动命令。导师会评估你当前的知识背景，把个性化学习计划保存到 `LEARNING.md`。从那里开始，`learn` 技能每次会话教学一节课：核心概念、数学直觉、编写代码、测验检验。它直接从本仓库流式读取课程，而 `course-guide` 技能可以在你卡住时精准跳转到对应课程。在 Codex 中，直接输入 `learn` 和 `course-guide`；在 Claude Code 中，输入 `/learn` 和 `/course-guide`；在其他兼容宿主中，按名称调用该技能即可。
+
+只想要模型上下文协议（MCP）？使用宿主对应的 MCP 启动命令。它会生成 `MCP-LEARNING.md`，按照 [模型上下文协议（MCP）清单](learning-paths/model-context-protocol.json) 的 17 节课程路线，带你逐课实践无状态握手、服务端、客户端、传输层、采样、工具契约、可靠性与网关。
+
+只想要 Agent Skills？使用宿主对应的 Agent Skills 启动命令。它会生成 `AGENT-SKILLS-LEARNING.md`，按照 [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills) 的 9 节课程路线，带你实践编写规范、发现机制、渐进式披露、安全沙箱与发布门禁。
+
+| 技能 | 作用 |
+|---|---|
+| [`start-learning`](skills/start-learning/SKILL.md) | 定位导师。评估你当前的背景、设定学习目标、选择切入点，并生成 `LEARNING.md`。 |
+| [`learn`](skills/learn/SKILL.md) | 动手教学导师。从仓库流式读取课程，带你推导概念、运行代码，并进行测验检验。 |
+| [`learn-mcp`](skills/learn-mcp/SKILL.md) | MCP 专项导师。创建 `MCP-LEARNING.md`，遵循 17 课路线，记录协议线路、安全性、可靠性与一致性证据。 |
+| [`learn-agent-skills`](skills/learn-agent-skills/SKILL.md) | Agent Skills 专项导师。创建 `AGENT-SKILLS-LEARNING.md`，遵循 9 课路线，记录技能契约、渐进式披露与真实 runner 测试证据。 |
+| [`claude-certification`](skills/claude-certification/SKILL.md) | Claude 认证导师。选择 CCAO-F、CCDV-F、CCAR-F 或 CCAR-P，逐课教学、运行实验、评审产物、组织诊断与模拟测验并保存进度。 |
+| [`find-your-level`](skills/find-your-level/SKILL.md) | 十道题的定级测验。把你的知识映射到一个起始阶段，生成带课时估算的个性化路径。 |
+| [`check-understanding <phase>`](skills/check-understanding/SKILL.md) | 按阶段测验，八道题，附反馈和需要复习的具体课程。 |
+| [`course-guide`](skills/course-guide/SKILL.md) | 课程导引与概念查询。把任何主题或疑问映射到讲解该知识点的具体课程。 |
+
+```
+░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
+```
 
 ## 怎么运作
 
@@ -136,16 +189,18 @@ flowchart LR
 ```bash
 git clone https://github.com/fancyboi999/ai-engineering-from-scratch-zh.git
 cd ai-engineering-from-scratch-zh
-python phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner
+python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py
 ```
 
-**方式 C —— 测一测你的水平 *(推荐)*。** 聪明地跳级。在 Claude、Cursor、Codex、OpenClaw、Hermes，或任何装了本课程技能的 agent 里：
+**方式 C —— 让 AI 导师带你学 *(推荐)*。** 在 Claude Code、Codex、Cursor、OpenClaw、Hermes，或任何装了本课程技能的 agent 里：
 
 ```bash
-/find-your-level
+/start-learning      # 评估背景、设定目标并生成个性化 LEARNING.md
+/find-your-level     # 十道题快速定级测验，映射起始阶段
 ```
 
-十道题。把你的知识映射到一个起始阶段，生成一条带课时估算的个性化路径。每学完一个阶段：
+按计划逐课学习，每学完一个阶段：
 
 ```bash
 /check-understanding 3        # 测验你对阶段 3 的掌握
@@ -174,13 +229,9 @@ Codex、ChatGPT、Cursor 或其他 agent 中运行 `/claude-certification`：选
 这是基于公开考试目标编写的独立学习材料，不隶属于 Anthropic，不包含真实考题，
 也不保证通过认证。资格、费用、评分和项目政策可能变动，付费或预约前必须以官方最新说明为准。
 
-### 内置 agent 技能（Claude、Cursor、Codex、OpenClaw、Hermes）
+### 内置 agent 技能
 
-| 技能 | 作用 |
-|---|---|
-| [`/claude-certification`](skills/claude-certification/SKILL.md) | Claude 认证导师。选择 CCAO-F、CCDV-F、CCAR-F 或 CCAR-P，逐课教学、运行实验、评审产物、组织诊断与模拟测验并保存进度。 |
-| [`/find-your-level`](.claude/skills/find-your-level/SKILL.md) | 十道题的定级测验。把你的知识映射到一个起始阶段，生成带课时估算的个性化路径。 |
-| [`/check-understanding <phase>`](.claude/skills/check-understanding/SKILL.md) | 按阶段测验，八道题，附反馈和需要复习的具体课程。 |
+全套课程内置了 8 个涵盖定位、教学、专项路径与测验的 AI 导师技能，详见上文 [30 秒添加 AI 导师](#30-秒添加-ai-导师)；所有技能定义均位于 [`skills/`](skills/) 目录下。
 
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
@@ -207,7 +258,7 @@ Codex、ChatGPT、Cursor 或其他 agent 中运行 `/claude-certification`：选
 </table>
 
 > 用 `python3 scripts/install_skills.py` 一次性全部安装。是真家伙，不是课后作业。
-> 学完整套课程，你会攒下近 500 件产物——你是真懂它们，因为它们都是你亲手造的。
+> 学完整套课程，你会攒下一套包含 523 件产物的作品集——你是真懂它们，因为它们都是你亲手造的。
 
 ### FIG_002 · 一个实例
 
@@ -672,6 +723,8 @@ the agent went wrong and explain why...
 | 30 | [MCP Registry 供应链：准入、漂移与回滚](phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/) | Build | Python |
 | 31 | [MCP 一致性工程：版本、证据与运维](phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/) | Build | Python |
 
+第 06-22 课组成 [模型上下文协议（MCP）路径](learning-paths/model-context-protocol.json)。其清单顺序涵盖从握手到生产网关的完整协议，并可通过上文宿主对应的 `learn-mcp` 进行实测。第 23 课为综合项目。第 24-27 课组成聚焦的 [Agent Skills 路径](learning-paths/agent-skills.json)。第 28-31 课通过工具契约、可靠性与一致性进一步扩展 MCP 路径。
+
 </details>
 
 <details id="phase-14">
@@ -735,7 +788,7 @@ the agent went wrong and explain why...
 | 53 | [有意识地选择原型、试点或生产](phases/14-agent-engineering/53-prototype-pilot-or-production/) | Build | Python |
 | 54 | [构建带所有权与淘汰机制的反馈棘轮](phases/14-agent-engineering/54-build-the-feedback-ratchet/) | Build | Python |
 
-阶段 14 里每节工作台课程（31-42）都附带一份 `mission.md`，在 agent 打开完整课程文档前先给它做简报。
+第 31-46 课组成 [Agent 辅助工程路径](learning-paths/using-coding-agents.json)。其清单顺序结合了工作台基础与任务框定、执行计划、隔离委派及长效反馈机制。第 47-54 课组成 [产品判断与交付路径](learning-paths/shaping-the-build.json)，涵盖从结果定义、事实证据、假设风险、切片选择、可执行规格说明到分阶段发布与反馈所有权的完整闭环。阶段 14 里每节工作台课程（31-42）都附带一份 `mission.md`，在 agent 打开完整课程文档前先给它做简报。
 
 </details>
 
@@ -991,9 +1044,9 @@ outputs/
 用 `npx skills add` 安装。把它们接进 Claude、Cursor、Codex、OpenClaw、Hermes，
 或任何能读 SKILL.md / AGENTS.md 目录的 agent。都是真家伙，不是课后作业。
 
-### 把所有课程技能装进你的 agent
+### 把课程产出技能装进你的 agent
 
-仓库在 `phases/**/outputs/` 下交付了 388 个技能和 99 个提示词。
+仓库在 `phases/**/outputs/` 下交付了 396 个技能和 99 个提示词。
 
 **推荐：通过 [skills.sh](https://skills.sh) 安装。** 不用 clone，不用 Python，
 自动识别你 agent 的技能目录：
@@ -1103,6 +1156,8 @@ python3 scripts/lesson_run.py --execute        # 真正运行，每节课 10 秒
 | 懂 ML，刚接触深度学习 | 阶段 3 — 深度学习核心 | ~200 小时 |
 | 懂深度学习，想学 LLM 和 agent | 阶段 10 — 从零实现 LLM | ~100 小时 |
 | 资深工程师，只想要 agent 工程 | 阶段 14 — Agent 工程 | ~60 小时 |
+| 只想构建生产级 MCP 系统 | [模型上下文协议（MCP）路径](learning-paths/model-context-protocol.json) | ~23 小时 15 分 |
+| 只想构建生产级 Agent Skills | [Agent Skills 工程路径](learning-paths/agent-skills.json) | ~9.5 小时 |
 
 ```
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
