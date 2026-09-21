@@ -1,157 +1,91 @@
 # 贡献指南
 
-课程、翻译、修复、产出物——都欢迎。一个 PR 只做一件事，评审更快，贡献者计数和署名也能正确归属。
+欢迎贡献中文课程、翻译修订、代码修复和可复用产物。每个 PR 围绕一个可审查的目标组织改动。
 
-## 重要：README 和 ROADMAP 喂给网站
+## 开始前
 
-`site/build.js` 会解析 `README.md`、`ROADMAP.md` 和 `glossary/terms.md` 来生成 `site/data.js`。任何动到这些文件的 PR，都必须保持下面两类格式完好：
+- 阅读 [AGENTS.md](AGENTS.md) 的仓库约束与验证要求。
+- 中文正文、章节标题和术语遵循 [TRANSLATION.md](TRANSLATION.md)。
+- 新课程以 [LESSON_TEMPLATE.md](LESSON_TEMPLATE.md) 为模板。
+- 原始英文课程来自 [rohitg00/ai-engineering-from-scratch](https://github.com/rohitg00/ai-engineering-from-scratch)；本仓库维护中文正文与中文站点。
 
-- 阶段标题，采用 `### Phase N: Name \`X lessons\`` 形式，或
-  `<details><summary><b>Phase N — Name</b> ... <code>X lessons</code> ... <em>Description</em></summary>` 形式。
-- 课程表格采用 `| # | Lesson | Type | Lang |` 的列结构（顶点项目表格则是
-  `| # | Project | Combines | Lang |`）。`Lang` 列可以是纯文本（`Python, TypeScript`），也可以是早期的 emoji 旗标
-  （`🐍 🟦 🦀 🟣 ⚛️`）；两者对解析器是等价的。
-- ROADMAP 的状态字符（`✅`、`🚧`、`⬚`）出现在阶段标题和课程行上。
-  不要把它们换成文字——解析器是按这几个确切字符来识别的。
+## 课程与翻译
 
-编辑这些文件后运行 `node site/build.js`；如果你的改动在结构上是安全的，`git diff site/data.js`
-应该只显示时间戳的变化。
+课程保存在 `phases/XX-phase-name/NN-lesson-name/`：
 
-## 贡献方式
-
-### 1. 新增一节课程
-
-每节课程位于 `phases/XX-phase-name/NN-lesson-name/`，结构如下：
-
-```
+```text
 NN-lesson-name/
-├── code/           至少一个可运行的实现
-├── notebook/       用于实验的 Jupyter notebook（可选）
+├── code/           实现、配置与测试
 ├── docs/
-│   └── en.md       课程文档（必需）
-└── outputs/        本节课产出的提示词、技能或智能体（如适用）
+│   └── zh.md       中文课程正文
+├── quiz.json       课前、课中与课后测验
+└── outputs/        可复用产物与项目参考文件
 ```
 
-**课程文档格式**（`en.md`）：
+可按课程需要添加 `notebook/`。正文包含标题、摘要、类型、语言、前置要求、预计时间和学习目标，
+章节名称使用翻译契约中的固定译法。依赖与代码入口应与实际文件一致。
 
-```markdown
-# Lesson Title
+同步英文课程时，将正文译为 `docs/zh.md`。保留代码、路径、URL 与机器读取的字段，翻译面向读者的说明。
+翻译完成后，中文仓库仅保留 `docs/zh.md` 作为课程正文。
 
-> One-line motto — the core idea in one sentence.
+课程测验包含 6 题：1 道 `pre`、3 道 `check`、2 道 `post`。题目使用
+`stage`、`question`、`options`、`correct`、`explanation` 字段；`correct` 为从 0 开始的选项索引。
+翻译时保持答案索引和对应选项语义一致。
 
-## The Problem
+Claude 认证课使用独立的目录、测验和实验契约，见 [AGENTS.md](AGENTS.md#claude-认证契约)。
 
-Why does this matter? What can't you do without this?
+## 课程目录与站点数据
 
-## The Concept
+`site/build.js` 读取 README、ROADMAP、课程正文、术语表和路径清单。更新课程时：
 
-Explain with diagrams, visuals, and intuition. Code comes later.
+1. 在 README 与 ROADMAP 对应阶段的表格中登记课程，并更新 README 阶段标题的课数。
+2. ROADMAP 课程名使用指向实际目录的 Markdown 链接；状态使用 `✅`、`🚧`、`⬚`。
+3. ROADMAP 的单课时长与正文一致，阶段小时数由该阶段各课时长汇总。专项路径按 `learning-paths/*.json` 维护必修顺序和估算。
+4. 运行 `node site/build.js`，检查并提交 `site/data.js` 及受影响的跟踪文件。
+5. 运行 `node site/build.js --check` 和 `python3 scripts/audit_lessons.py --strict`。
 
-## Build It
+构建器识别以下格式：
 
-Step-by-step implementation from scratch.
+- 阶段标题：`### Phase N: Name \`X lessons\``，或现有的 `<details>` / `<summary>` 形式。
+- 课程表格：`| # | Lesson | Type | Lang |`；综合项目表格：`| # | Project | Combines | Lang |`。
+- `Lang` 列接受语言名以及解析器支持的语言图标。
 
-## Use It
+构建产物的改动应与源文件相符。课程、时长、术语或路径更新都可能改变站点数据。
+`site/lessons/`、`site/sitemap.xml`、`site/llms.txt` 等忽略文件由部署构建生成。
 
-Now use a real framework or library to do the same thing.
+## 可复用产物
 
-## Ship It
+将产物放在对应课程的 `outputs/` 中：
 
-The prompt, skill, agent, or tool this lesson produces.
+- 提示词：`prompt-*.md`。
+- 单文件技能：`skill-*.md`。
+- 完整技能包：`<skill-name>/SKILL.md`，附带所需脚本和参考文件。
 
-## Exercises
+frontmatter 的 `name`、`description`、`phase`、`lesson` 应与用途及所在课程一致，
+技能还可提供 `version` 与 `tags`。格式示例见 [课程模板](LESSON_TEMPLATE.md#产出文件格式)。
+站点构建器与 `scripts/install_skills.py` 从各课目录发现产物。
 
-1. Exercise one
-2. Exercise two
-3. Challenge exercise
+课程导师技能以 `skills/` 为源；更新后同步 `.claude/skills/` 中的对应副本，
+并运行 `node site/test_build_artifacts.js` 验证分发契约。
+
+## 代码与写作
+
+- 按课程声明的依赖运行实现与测试，提供真实输出。
+- 代码清楚表达行为；必要注释说明不变量、边界和设计原因，教学推导放在正文。
+- 根据课程目标选择语言，从最小可运行实现逐步引入框架。
+- 用 Mermaid、SVG 或已注册的交互图表解释概念。
+- 写作使用准确、直接的中文；事实引用原始规范、论文或官方文档。
+
+## 提交 Pull Request
+
+1. 从最新 `main` 创建分支，完成一个明确目标的改动。
+2. 按 [AGENTS.md](AGENTS.md#本地验证) 运行受影响的检查。完整 CI 命令见 [build.yml](.github/workflows/build.yml)。
+3. 站点改动先构建，再按 [AGENTS.md 的预览方式](AGENTS.md#本地验证) 在浏览器中检查受影响页面和交互。
+4. 使用中文约定式提交标题，例如 `docs:`、`sync(zh):`、`fix(site):`。新增课程按课组织原子提交，批量同步按可审查批次组织。
+5. 向 `fancyboi999/ai-engineering-from-scratch-zh` 的 `main` 提交 PR，按模板记录改动、验证与边界。
+
+```bash
+gh pr create --repo fancyboi999/ai-engineering-from-scratch-zh --base main --head <branch>
 ```
 
-### 2. 新增一份翻译
-
-在任意课程的 `docs/` 文件夹里新建一个文件：
-
-```
-docs/
-├── en.md    （英文——始终必需）
-├── zh.md    （中文）
-├── ja.md    （日文）
-├── es.md    （西班牙文）
-├── hi.md    （印地文）
-└── ...
-```
-
-保持与英文版相同的结构。翻译内容，不要翻译代码。
-
-### 3. 新增一个产出物
-
-如果某节课程应该产出一个可复用的提示词、技能、智能体或 MCP 服务器：
-
-1. 在课程的 `outputs/` 文件夹里创建它
-2. 在顶层 `outputs/` 索引中加一条引用
-
-**提示词格式：**
-
-```markdown
----
-name: prompt-name
-description: What this prompt does
-phase: 14
-lesson: 01
----
-
-[System prompt or template here]
-```
-
-**技能格式：**
-
-```markdown
----
-name: skill-name
-description: What this skill teaches
-version: 1.0.0
-phase: 14
-lesson: 01
-tags: [agents, loops]
----
-
-[Skill content here]
-```
-
-### 4. 修复缺陷或改进现有课程
-
-- 修复跑不起来的代码
-- 改进讲解
-- 加上更好的图示
-- 更新过时的信息
-
-### 5. 新增练习或项目
-
-随时欢迎更多练习和项目，尤其是那些把多个阶段串联起来的。
-
-## 规范
-
-- **代码必须能跑。** 每个代码文件都应该用列出的依赖无报错地执行。
-- **代码里不写注释。** 代码应当自解释。讲解放到文档里。
-- **用最适合的语言。** 别在 TypeScript 或 Rust 更合适的地方硬塞 Python。
-- **先从零实现。** 在展示框架版本之前，总是先用第一性原理把概念实现一遍。
-- **保持实用。** 理论服务于实践，而不是反过来。
-- **拒绝 AI 流水线产物。** 像人一样写作。直接了当。砍掉废话。
-
-## 提交 Pull Request 的流程
-
-1. Fork 本仓库
-2. 创建一个特性分支（`git checkout -b add-lesson-phase3-gradient-descent`）
-3. 做你的改动
-4. 确保所有代码都能跑
-5. 提交一个带清晰描述的 pull request
-
-## 行为准则
-
-参见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。友善、乐于助人、建设性。
-
-## 风格
-
-- 直白的行文。砍掉废话。贴合本手册的语气，而不是营销文案。
-- 标题里不放装饰性 emoji。Lang 列的 emoji 旗标是唯一例外，而且只因为解析器会映射它们。
-- 代码按课程里列出的依赖原样可运行。
-- 先从零实现，框架其次。
+参与讨论请遵循 [行为准则](CODE_OF_CONDUCT.md)。分发时按 [MIT 许可](LICENSE) 保留版权声明和许可声明。

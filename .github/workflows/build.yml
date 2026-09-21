@@ -2,14 +2,13 @@ name: build
 
 # 中文翻译版的轻量 CI：
 #   1. 验证站点能正常构建（node site/build.js 生成 data.js）
-#   2. 课程数一致性校验（node site/build.js --check）——防 README/ROADMAP 课数漂移
-#      （曾踩 435 / 498 vs 503）。真相 = 文件系统课程目录数，校验 README 表格/badge/散文
-#      + ROADMAP 总计是否都对得上。
+#   2. 课程数一致性校验（node site/build.js --check），以文件系统课程目录数
+#      核对 README 表格、badge、散文、阶段标题和 ROADMAP 总计。
 #   3. 测验答案位置去偏校验，避免新题重新集中到某一个选项槽位。
 #   4. Claude 认证课程、评估、实验和答案位置合约。
 #   5. 交互图表按需加载清单与浏览器朗读状态机回归。
-# audit_lessons.py 已按中文仓契约读取 docs/zh.md；README/ROADMAP 计数仍由
-# build.js --check 校验，避免引入上游仅匹配英文 README 的正则。
+# audit_lessons.py 读取 docs/zh.md，校验课程结构、测验与相对链接。
+# build.js --check 负责 README/ROADMAP 的课数契约。
 
 on:
   push:
@@ -71,9 +70,8 @@ jobs:
         run: python3 scripts/test_audit_certifications.py
       - name: 认证补强引用完整性
         run: python3 scripts/backfill_certification_references.py --check
-      # 不运行上游 debias_certification_questions.py --check：它以英文题干文本作随机种子，
-      # 翻译后会把全部题目误判为需重排。audit_certifications.py 已独立校验答案位置、
-      # 长度可预测性和多选组合分布，不依赖可翻译文本的 hash。
+      # audit_certifications.py 校验答案位置、长度可预测性和多选组合分布，
+      # 以题目结构与答案分布作为中文认证题的校验依据。
       - name: 运行认证课程实验测试
         run: find certifications/claude/lessons -path '*/code/tests/test_*.py' -print0 | xargs -0 -r -n1 python3
       - name: 运行认证课程 demo

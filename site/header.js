@@ -226,7 +226,7 @@
     }
 
     var link = document.createElement('a');
-    link.href = filename;
+    link.href = HEADER_BASE + filename;
     link.className = className || '';
     link.textContent = label;
     var github = nav.querySelector('.header-github');

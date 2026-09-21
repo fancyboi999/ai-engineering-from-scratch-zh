@@ -6,11 +6,11 @@
 
 ## 定位
 
-核心课程包含 20 个阶段、503 节课。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
+核心课程包含 20 个阶段、523 节课。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
 你会亲手写出反向传播、分词器、注意力机制和 agent 循环，所以当 PyTorch 或其他库登场时，它们不再是黑盒。
 
 `certifications/claude/` 是独立的 Claude 认证备考层，包含 4 条路线、33 节认证课、诊断和原创模拟题。
-它不计入 503 节核心课程，也不进入 EPUB/PDF 图书流程。
+认证课程单独统计，使用独立的站点构建与学习路径。
 
 ## 仓库结构
 
@@ -72,7 +72,7 @@ scripts/                       # 审计和构建工具
 - <4–6 条以动词开头的目标>
 ```
 
-`**语言：**` 必须与 `code/` 中的 `main.*` 一致。中文正文完成后删除 `docs/zh.md`。
+`**语言：**` 必须与 `code/` 中的实际实现文件一致。中文正文保存在 `docs/zh.md`；翻译和章节标题遵循 `TRANSLATION.md`。
 
 ### `quiz.json`
 
@@ -119,18 +119,19 @@ node site/build.js
 node site/build.js --check
 python3 scripts/audit_certifications.py
 python3 scripts/backfill_certification_references.py --check
-python3 scripts/debias_certification_questions.py --check
-find certifications/claude/lessons -path '*/code/tests/test_*.py' -print0 | xargs -0 -r -n1 python3
-find certifications/claude/lessons -path '*/code/main.py' -print0 | xargs -0 -r -n1 python3
+find certifications/claude/lessons -path '*/code/tests/test_*.py' -print0 | xargs -0 -n1 python3
+find certifications/claude/lessons -path '*/code/main.py' -print0 | xargs -0 -n1 python3
 node scripts/check_figure_loader.js
 node scripts/test_tts.js
 ```
 
-完成声明前还必须：
+`.github/workflows/build.yml` 定义 CI 检查命令。`audit_certifications.py` 校验认证题的答案位置与分布。课程时长以各课 `docs/zh.md` 为源，ROADMAP 行与阶段汇总随正文更新；专项路径的必修范围和时长以 `learning-paths/*.json` 为源。
 
-1. 从仓库根目录启动 `python3 -m http.server`，在真实浏览器里检查主课程、认证路线、测评、figure、quiz 和移动端。
-2. 明确列出 skip、warning 和未验证路径。
-3. 通过 PR 合并，再验证 `https://aieng-zh.cn`。
+交付与验证：
+
+1. 按改动范围运行对应检查；站点改动先构建，再在真实浏览器里验证受影响页面、交互和移动端。预渲染页面用 `python3 -m http.server 8000 --directory site`，打开 `/lessons/<phase>/<lesson>/`。本地课程与认证源文件的联调从仓库根运行 `python3 -m http.server 8001`，打开 `/site/lesson.html?path=phases/...` 或 `/site/certifications.html`。
+2. 明确列出执行结果、warning 和验证边界。
+3. 通过 PR 合并，再验证 `https://aieng-zh.cn` 的受影响页面。
 
 ## 同步与冲突
 
@@ -141,4 +142,4 @@ node scripts/test_tts.js
 
 ---
 
-最后审校：2026-08-18。
+最后审校：2026-09-21。

@@ -2467,11 +2467,8 @@ function syncCounts(lessons, outputs) {
   }
 }
 // ─── 课程数一致性校验（node site/build.js --check）──────────────────
-// 防 README/ROADMAP 课数漂移（曾踩 435 / 498 vs 503）。CI 跑，不一致就 fail。
-// 设计取舍：上游有 scripts/audit_lessons.py + check_readme_counts.py，但它们
-// 硬编码 docs/zh.md + 英文 README 正则，对中文仓全不兼容（且是 B 类 1:1 同步资产，
-// 改了会和上游冲突）。所以这里用 build.js 自己的解析做等价校验——认 zh.md、匹配
-// 中文文案，不碰上游 Python 脚本。真相 = 文件系统课程目录数。
+// 以文件系统课程目录数核对 README/ROADMAP 的课数与中文文案。
+// scripts/audit_lessons.py 负责 docs/zh.md、课程结构、测验和相对链接。
 function countLessonDirs() {
   const phasesDir = path.join(REPO_ROOT, 'phases');
   const DIR_RE = /^[0-9]{2}-[a-z0-9][a-z0-9-]*[a-z0-9]$/;  // NN-slug，与 audit_lessons.py 一致

@@ -4,7 +4,7 @@
 
 ## 目录结构
 
-```
+```text
 NN-lesson-name/
 ├── code/
 │   ├── main.py            (主实现)
@@ -12,9 +12,10 @@ NN-lesson-name/
 │   ├── main.rs            (Rust 版本，如适用)
 │   └── main.jl            (Julia 版本，如适用)
 ├── notebook/
-│   └── lesson.ipynb       (用于实验的 Jupyter notebook)
+│   └── lesson.ipynb       (可选，用于实验的 Jupyter notebook)
 ├── docs/
 │   └── zh.md              (中文课程文档)
+├── quiz.json              (6 道分阶段测验)
 └── outputs/
     ├── prompt-*.md         (本节课产出的提示词)
     └── skill-*.md          (本节课产出的技能)
@@ -31,6 +32,10 @@ NN-lesson-name/
 **语言：** Python, TypeScript, Rust, Julia（只列实际使用的语言）
 **前置要求：** [所需的前置课程]
 **预计时间：** ~[预计时长] 分钟
+
+## 学习目标
+
+- [4–6 条以动词开头、可通过实验或产物验证的目标]
 
 ## 问题背景
 
@@ -87,11 +92,17 @@ NN-lesson-name/
 ## 代码文件规范
 
 - 代码必须无报错地运行
-- 不写注释——代码应当自解释
+- 代码清楚表达行为，必要注释说明不变量、边界与设计原因
 - 用最契合该主题的语言
 - 如果有依赖，附上 `requirements.txt` 或等价物
 - 由简入繁，逐步搭建复杂度
 - 每个函数和类都应有明确的用途
+
+## 测验与登记
+
+`quiz.json` 的字段与题目分布见 [AGENTS.md](AGENTS.md#quizjson)。新增课程后，
+按 [贡献指南](CONTRIBUTING.md#课程目录与站点数据) 更新 README、ROADMAP 和站点数据。
+正文中的预计时间与 ROADMAP 课程行保持一致。
 
 ## 产出文件格式
 

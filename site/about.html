@@ -117,16 +117,17 @@
 
       <p class="lede">本站是 <strong>AI Engineering from Scratch</strong> 的简体中文翻译版。原项目是一套免费、开源的课程，把每个核心 AI 算法都从零手写一遍：20 个阶段、523 节课，从线性代数一路讲到自主 agent，覆盖 Python、TypeScript、Rust 和 Julia。本站负责把这些内容译成简体中文，让中文读者能直接学。</p>
 
-      <h2>为什么存在</h2>
-      <p>大多数 AI 教材都是碎片化教学。这儿一篇论文，那儿一篇微调心得，别处再来个框架 demo。你可以做出一个聊天机器人，却讲不清它的 loss 曲线；可以给 agent 挂上一个工具，却说不出调用它的那个模型内部，attention 到底在干什么。</p>
-      <p>这套课程就是那根脊椎。每个算法都先从最原始的数学手写出来，然后再用生产级的库跑一遍，让你看清这个库到底在做什么。等 PyTorch 登场时，你已经知道它在计算什么了。每节课结尾都会留下一个可复用的产物：一段提示词、一个技能、一个 agent，或者一个 MCP 服务。</p>
+      <h2>如何学习</h2>
+      <p>从<a href="learning-paths.html">学习路径</a>选择目标，结合课程正文、概念推导、代码实验与测验学习。各课的“拿去用”章节提供产物说明，帮助你将学到的内容用于自己的项目。</p>
+      <p>333 节中文配音动画已上线，覆盖阶段 0–14 的全部课程，可在课程页内嵌播放，并提供直链与 B 站播放源。本站还提供 243 条<a href="glossary.html">术语解释</a>、交互图表、学习进度和 8 个 AI 导师技能。</p>
 
       <h2>如何构建</h2>
-      <p>课程内容在 AI 辅助下撰写，并由人对照一手资料逐节审校。课程中陈述事实的地方，会引用原始出处：一份 RFC、一份规范，或一篇研究论文，而不是二手摘要。欢迎指正，所有修订都在 GitHub 上公开追踪。</p>
-      <p>站点本身刻意保持朴素：手写的 HTML、CSS 和原生 JavaScript，不用任何框架。一个构建脚本（<code>site/build.js</code>）在每次部署时读取仓库里的课程 Markdown，生成课程表、搜索索引、站点地图和 <code>llms.txt</code>，因此发布出来的数字永远不会与源文件脱节。站点托管在 Vercel 上。</p>
+      <p>中文版依据上游课程翻译，章节标题和术语遵循仓库中的翻译契约。课程引用规范、论文和官方文档供读者核查；修订通过 GitHub Pull Request 评审和追踪。</p>
+      <p>学习站点使用 HTML、CSS 和原生 JavaScript。构建脚本 <code>site/build.js</code> 读取课程 Markdown 和路径清单，生成课程数据、预渲染课程页、站点地图和 <code>llms.txt</code>。CI 校验课程结构、课数及相关功能，站点托管在 Vercel 上。</p>
 
       <h2>由谁维护</h2>
-      <p>简体中文翻译版由 <a href="https://github.com/fancyboi999" target="_blank" rel="noopener">fancy</a> 维护。原项目 <strong>AI Engineering from Scratch</strong> 由 <a href="https://github.com/rohitg00" target="_blank" rel="noopener">Rohit Ghumare</a> 及贡献者创建并维护——没有原作者的工作就没有这套课程，特此致谢。项目采用 MIT 许可，永久免费：没有 token，没有付费课程，没有任何门槛内容。</p>
+      <p>简体中文翻译版由 <a href="https://github.com/fancyboi999" target="_blank" rel="noopener">fancy</a> 维护。原项目 <strong>AI Engineering from Scratch</strong> 由 <a href="https://github.com/rohitg00" target="_blank" rel="noopener">Rohit Ghumare</a> 及贡献者创建，感谢他们开源这套课程。项目采用 MIT 许可；分发副本或实质性部分时，须保留版权声明和许可声明。</p>
+      <p>课程正文与配套学习资源免费开放。实践所需的 GPU、云服务、模型 API 或 AI 导师宿主按相应服务商政策计费，资源要求见各课正文。</p>
 
       <h2>参与进来</h2>
       <ul>

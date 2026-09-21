@@ -1,97 +1,99 @@
 # 路线图
 
-每个阶段、每节课的状态追踪表。本文件里的状态符号会喂给网站（`site/build.js` 会把它们解析进 `site/data.js`），别改它们的形状。
+每个阶段、每节课的状态追踪表。`site/build.js` 将状态符号解析进 `site/data.js`。
 
-总预计时长：约 342 小时，按自己的节奏来。
+时长以各课 `docs/zh.md` 的预计时间为依据，覆盖课程阅读与配套实践；实际投入取决于基础、实验环境和项目深度。
+阶段 0–18 共 438 节课，合计约 542 小时。阶段 19 共 85 项综合项目与组件实践，全部完成约 627 小时，适合按目标选做。
+阶段标题按单课时长汇总并四舍五入到整数小时，专项路径按 `learning-paths/*.json` 的必修范围单独估算。
 
 **图例：** ✅ 已完成 &nbsp;·&nbsp; 🚧 进行中 &nbsp;·&nbsp; ⬚ 计划中
 
-## Phase 0: 配置与工具 — ✅ (~14 hours)
+## Phase 0: 配置与工具 — ✅ (~8 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | 开发环境 | ✅ | ~75 min |
-| 02 | Git 与协作 | ✅ | ~45 min |
-| 03 | GPU 配置与云端 | ✅ | ~75 min |
-| 04 | API 与密钥 | ✅ | ~75 min |
-| 05 | Jupyter Notebook | ✅ | ~75 min |
-| 06 | Python 环境 | ✅ | ~75 min |
-| 07 | 面向 AI 的 Docker | ✅ | ~75 min |
-| 08 | 编辑器配置 | ✅ | ~75 min |
-| 09 | 数据管理 | ✅ | ~75 min |
-| 10 | 终端与 Shell | ✅ | ~45 min |
-| 11 | 面向 AI 的 Linux | ✅ | ~45 min |
-| 12 | 调试与性能分析 | ✅ | ~75 min |
+| 01 | 开发环境 | ✅ | ~45 min |
+| 02 | Git 与协作 | ✅ | ~30 min |
+| 03 | GPU 配置与云端 | ✅ | ~45 min |
+| 04 | API 与密钥 | ✅ | ~30 min |
+| 05 | Jupyter Notebook | ✅ | ~30 min |
+| 06 | Python 环境 | ✅ | ~30 min |
+| 07 | 面向 AI 的 Docker | ✅ | ~60 min |
+| 08 | 编辑器配置 | ✅ | ~20 min |
+| 09 | 数据管理 | ✅ | ~45 min |
+| 10 | 终端与 Shell | ✅ | ~35 min |
+| 11 | 面向 AI 的 Linux | ✅ | ~30 min |
+| 12 | 调试与性能分析 | ✅ | ~60 min |
 
-## Phase 1: 数学基础 — ✅ (~23 hours)
+## Phase 1: 数学基础 — ✅ (~32 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | 线性代数直觉 | ✅ | ~45 min |
-| 02 | 向量、矩阵与运算 | ✅ | ~75 min |
+| 01 | 线性代数直觉 | ✅ | ~60 min |
+| 02 | 向量、矩阵与运算 | ✅ | ~60 min |
 | 03 | 矩阵变换与特征值 | ✅ | ~75 min |
-| 04 | 面向 ML 的微积分 — 导数与梯度 | ✅ | ~45 min |
-| 05 | 链式法则与自动微分 | ✅ | ~75 min |
-| 06 | 概率与分布 | ✅ | ~45 min |
+| 04 | 面向 ML 的微积分 — 导数与梯度 | ✅ | ~60 min |
+| 05 | 链式法则与自动微分 | ✅ | ~90 min |
+| 06 | 概率与分布 | ✅ | ~75 min |
 | 07 | 贝叶斯定理与统计思维 | ✅ | ~75 min |
 | 08 | 优化 — 梯度下降家族 | ✅ | ~75 min |
-| 09 | 信息论 — 熵、KL 散度 | ✅ | ~45 min |
-| 10 | 降维 — PCA、t-SNE、UMAP | ✅ | ~75 min |
-| 11 | 奇异值分解 | ✅ | ~75 min |
-| 12 | 张量运算 | ✅ | ~75 min |
-| 13 | 数值稳定性 | ✅ | ~45 min |
-| 14 | 范数与距离 | ✅ | ~45 min |
-| 15 | 面向 ML 的统计学 | ✅ | ~45 min |
-| 16 | 采样方法 | ✅ | ~75 min |
-| 17 | 线性方程组 | ✅ | ~75 min |
-| 18 | 凸优化 | ✅ | ~75 min |
-| 19 | 面向 AI 的复数 | ✅ | ~45 min |
-| 20 | 傅里叶变换 | ✅ | ~75 min |
-| 21 | 面向 ML 的图论 | ✅ | ~45 min |
-| 22 | 随机过程 | ✅ | ~45 min |
+| 09 | 信息论 — 熵、KL 散度 | ✅ | ~60 min |
+| 10 | 降维 — PCA、t-SNE、UMAP | ✅ | ~90 min |
+| 11 | 奇异值分解 | ✅ | ~120 min |
+| 12 | 张量运算 | ✅ | ~90 min |
+| 13 | 数值稳定性 | ✅ | ~120 min |
+| 14 | 范数与距离 | ✅ | ~90 min |
+| 15 | 面向 ML 的统计学 | ✅ | ~120 min |
+| 16 | 采样方法 | ✅ | ~120 min |
+| 17 | 线性方程组 | ✅ | ~120 min |
+| 18 | 凸优化 | ✅ | ~90 min |
+| 19 | 面向 AI 的复数 | ✅ | ~60 min |
+| 20 | 傅里叶变换 | ✅ | ~90 min |
+| 21 | 面向 ML 的图论 | ✅ | ~90 min |
+| 22 | 随机过程 | ✅ | ~75 min |
 
-## Phase 2: 机器学习基础 — ✅ (~21 hours)
+## Phase 2: 机器学习基础 — ✅ (~26 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
 | 01 | 什么是机器学习 — 类型与分类 | ✅ | ~45 min |
-| 02 | 从零实现线性回归 | ✅ | ~75 min |
-| 03 | 逻辑回归与分类 | ✅ | ~75 min |
-| 04 | 决策树与随机森林 | ✅ | ~75 min |
-| 05 | 支持向量机 | ✅ | ~75 min |
-| 06 | K 近邻与距离度量 | ✅ | ~75 min |
-| 07 | 无监督学习 — K-Means、DBSCAN | ✅ | ~75 min |
-| 08 | 特征工程与特征选择 | ✅ | ~75 min |
-| 09 | 模型评估 — 指标、交叉验证 | ✅ | ~75 min |
-| 10 | 偏差、方差与学习曲线 | ✅ | ~45 min |
-| 11 | 集成方法 — Boosting、Bagging、Stacking | ✅ | ~75 min |
-| 12 | 超参数调优与 AutoML | ✅ | ~75 min |
-| 13 | ML 流水线与实验追踪 | ✅ | ~75 min |
+| 02 | 从零实现线性回归 | ✅ | ~90 min |
+| 03 | 逻辑回归与分类 | ✅ | ~90 min |
+| 04 | 决策树与随机森林 | ✅ | ~90 min |
+| 05 | 支持向量机 | ✅ | ~90 min |
+| 06 | K 近邻与距离度量 | ✅ | ~90 min |
+| 07 | 无监督学习 — K-Means、DBSCAN | ✅ | ~90 min |
+| 08 | 特征工程与特征选择 | ✅ | ~90 min |
+| 09 | 模型评估 — 指标、交叉验证 | ✅ | ~90 min |
+| 10 | 偏差、方差与学习曲线 | ✅ | ~75 min |
+| 11 | 集成方法 — Boosting、Bagging、Stacking | ✅ | ~120 min |
+| 12 | 超参数调优与 AutoML | ✅ | ~90 min |
+| 13 | ML 流水线与实验追踪 | ✅ | ~120 min |
 | 14 | 朴素贝叶斯 — 多项式、高斯、伯努利 | ✅ | ~75 min |
-| 15 | 时间序列基础 | ✅ | ~45 min |
+| 15 | 时间序列基础 | ✅ | ~90 min |
 | 16 | 异常检测 | ✅ | ~75 min |
-| 17 | 处理不平衡数据 | ✅ | ~75 min |
+| 17 | 处理不平衡数据 | ✅ | ~90 min |
 | 18 | 特征选择 | ✅ | ~75 min |
 
-## Phase 3: 深度学习核心 — ✅ (~15 hours)
+## Phase 3: 深度学习核心 — ✅ (~19 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | 感知机 — 一切的起点 | ✅ | ~45 min |
-| 02 | 多层网络与前向传播 | ✅ | ~75 min |
-| 03 | 从零实现反向传播 | ✅ | ~75 min |
-| 04 | 激活函数 — ReLU、Sigmoid、GELU 及其原理 | ✅ | ~45 min |
-| 05 | 损失函数 — MSE、交叉熵、对比损失 | ✅ | ~45 min |
+| 01 | 感知机 — 一切的起点 | ✅ | ~60 min |
+| 02 | 多层网络与前向传播 | ✅ | ~90 min |
+| 03 | 从零实现反向传播 | ✅ | ~120 min |
+| 04 | 激活函数 — ReLU、Sigmoid、GELU 及其原理 | ✅ | ~75 min |
+| 05 | 损失函数 — MSE、交叉熵、对比损失 | ✅ | ~75 min |
 | 06 | 优化器 — SGD、Momentum、Adam、AdamW | ✅ | ~75 min |
 | 07 | 正则化 — Dropout、权重衰减、BatchNorm | ✅ | ~75 min |
-| 08 | 权重初始化与训练稳定性 | ✅ | ~45 min |
-| 09 | 学习率调度与预热 | ✅ | ~45 min |
+| 08 | 权重初始化与训练稳定性 | ✅ | ~90 min |
+| 09 | 学习率调度与预热 | ✅ | ~90 min |
 | 10 | 打造你自己的迷你框架 | ✅ | ~120 min |
 | 11 | PyTorch 入门 | ✅ | ~75 min |
-| 12 | JAX 入门 | ✅ | ~75 min |
-| 13 | 调试神经网络 | ✅ | ~75 min |
+| 12 | JAX 入门 | ✅ | ~90 min |
+| 13 | 调试神经网络 | ✅ | ~90 min |
 
-## Phase 4: 计算机视觉 — ✅ (~27 hours)
+## Phase 4: 计算机视觉 — ✅ (~31 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -124,7 +126,7 @@
 | 27 | 多目标跟踪与视频记忆 | ✅ | ~60 min |
 | 28 | 世界模型与视频扩散 | ✅ | ~75 min |
 
-## Phase 5: NLP — 从基础到进阶 — ✅ (~30 hours)
+## Phase 5: NLP — 从基础到进阶 — ✅ (~31 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -158,7 +160,7 @@
 | 28 | [长上下文评估 — NIAH、RULER、LongBench、MRCR](phases/05-nlp-foundations-to-advanced/28-long-context-evaluation) | ✅ | ~60 min |
 | 29 | [对话状态追踪](phases/05-nlp-foundations-to-advanced/29-dialogue-state-tracking) | ✅ | ~75 min |
 
-## Phase 6: 语音与音频 — ✅ (~18 hours)
+## Phase 6: 语音与音频 — ✅ (~19 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -180,12 +182,12 @@
 | 16 | [语音防伪与音频水印](phases/06-speech-and-audio/16-anti-spoofing-audio-watermarking) | ✅ | ~75 min |
 | 17 | [音频评估 — WER、MOS、MMAU、排行榜](phases/06-speech-and-audio/17-audio-evaluation-metrics) | ✅ | ~60 min |
 
-## Phase 7: Transformer 深入剖析 — ✅ (~14 hours)
+## Phase 7: Transformer 深入剖析 — ✅ (~17 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
 | 01 | [为什么需要 Transformer — RNN 的问题所在](phases/07-transformers-deep-dive/01-why-transformers) | ✅ | ~45 min |
-| 02 | [从零实现自注意力](phases/07-transformers-deep-dive/02-self-attention-from-scratch) | ✅ | ~75 min |
+| 02 | [从零实现自注意力](phases/07-transformers-deep-dive/02-self-attention-from-scratch) | ✅ | ~90 min |
 | 03 | [多头注意力](phases/07-transformers-deep-dive/03-multi-head-attention) | ✅ | ~75 min |
 | 04 | [位置编码 — 正弦、RoPE、ALiBi](phases/07-transformers-deep-dive/04-positional-encoding) | ✅ | ~45 min |
 | 05 | [完整的 Transformer — 编码器 + 解码器](phases/07-transformers-deep-dive/05-full-transformer) | ✅ | ~75 min |
@@ -198,10 +200,10 @@
 | 12 | [KV 缓存、Flash Attention 与推理优化](phases/07-transformers-deep-dive/12-kv-cache-flash-attention) | ✅ | ~75 min |
 | 13 | [缩放定律](phases/07-transformers-deep-dive/13-scaling-laws) | ✅ | ~45 min |
 | 14 | [从零实现一个 Transformer — 总结项目](phases/07-transformers-deep-dive/14-build-a-transformer-capstone) | ✅ | ~120 min |
-| 15 | [Attention 变体——滑动窗口、稀疏、差分](phases/07-transformers-deep-dive/15-attention-variants) | ✅ | ~90 min |
-| 16 | [投机解码——草稿、验证、重复](phases/07-transformers-deep-dive/16-speculative-decoding) | ✅ | ~90 min |
+| 15 | [Attention 变体——滑动窗口、稀疏、差分](phases/07-transformers-deep-dive/15-attention-variants) | ✅ | ~60 min |
+| 16 | [投机解码——草稿、验证、重复](phases/07-transformers-deep-dive/16-speculative-decoding) | ✅ | ~60 min |
 
-## Phase 8: 生成式 AI — ✅ (~14 hours)
+## Phase 8: 生成式 AI — ✅ (~16 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -221,7 +223,7 @@
 | 14 | [评估 — FID、CLIP Score、人类偏好](phases/08-generative-ai/14-evaluation-fid-clip-score/) | ✅ | ~45 min |
 | 19 | [视觉自回归建模（VAR）：下一尺度预测](phases/08-generative-ai/19-visual-autoregressive-var) | ✅ | ~90 min |
 
-## Phase 9: 强化学习 — ✅ (~13 hours)
+## Phase 9: 强化学习 — ✅ (~14 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -236,24 +238,24 @@
 | 09 | 奖励建模与 RLHF | ✅ | ~45 min |
 | 10 | 多智能体强化学习 | ✅ | ~45 min |
 | 11 | 从仿真到现实的迁移 | ✅ | ~45 min |
-| 12 | 游戏中的强化学习 | ✅ | ~75 min |
+| 12 | 游戏中的强化学习 | ✅ | ~120 min |
 
-## Phase 10: 从零实现 LLM — ✅ (~26 hours)
+## Phase 10: 从零实现 LLM — ✅ (~33 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | [分词器 — BPE、WordPiece、SentencePiece](phases/10-llms-from-scratch/01-tokenizers) | ✅ | ~45 min |
-| 02 | [从零实现一个分词器](phases/10-llms-from-scratch/02-building-a-tokenizer) | ✅ | ~75 min |
-| 03 | [预训练数据流水线](phases/10-llms-from-scratch/03-data-pipelines) | ✅ | ~75 min |
+| 01 | [分词器 — BPE、WordPiece、SentencePiece](phases/10-llms-from-scratch/01-tokenizers) | ✅ | ~90 min |
+| 02 | [从零实现一个分词器](phases/10-llms-from-scratch/02-building-a-tokenizer) | ✅ | ~90 min |
+| 03 | [预训练数据流水线](phases/10-llms-from-scratch/03-data-pipelines) | ✅ | ~90 min |
 | 04 | [预训练一个迷你 GPT (124M)](phases/10-llms-from-scratch/04-pre-training-mini-gpt) | ✅ | ~120 min |
-| 05 | [扩展 — 分布式训练、FSDP、DeepSpeed](phases/10-llms-from-scratch/05-scaling-distributed) | ✅ | ~75 min |
-| 06 | [指令微调 — SFT](phases/10-llms-from-scratch/06-instruction-tuning-sft) | ✅ | ~75 min |
-| 07 | [RLHF — 奖励模型 + PPO 训练](phases/10-llms-from-scratch/07-rlhf) | ✅ | ~75 min |
-| 08 | [DPO — 直接偏好优化](phases/10-llms-from-scratch/08-dpo) | ✅ | ~75 min |
+| 05 | [扩展 — 分布式训练、FSDP、DeepSpeed](phases/10-llms-from-scratch/05-scaling-distributed) | ✅ | ~120 min |
+| 06 | [指令微调 — SFT](phases/10-llms-from-scratch/06-instruction-tuning-sft) | ✅ | ~90 min |
+| 07 | [RLHF — 奖励模型 + PPO 训练](phases/10-llms-from-scratch/07-rlhf) | ✅ | ~90 min |
+| 08 | [DPO — 直接偏好优化](phases/10-llms-from-scratch/08-dpo) | ✅ | ~90 min |
 | 09 | [Constitutional AI 与自我改进](phases/10-llms-from-scratch/09-constitutional-ai-self-improvement) | ✅ | ~45 min |
-| 10 | [评估 — 基准、Eval、LM Harness](phases/10-llms-from-scratch/10-evaluation) | ✅ | ~75 min |
-| 11 | [量化 — INT8、GPTQ、AWQ、GGUF](phases/10-llms-from-scratch/11-quantization) | ✅ | ~75 min |
-| 12 | [推理优化](phases/10-llms-from-scratch/12-inference-optimization) | ✅ | ~75 min |
+| 10 | [评估 — 基准、Eval、LM Harness](phases/10-llms-from-scratch/10-evaluation) | ✅ | ~90 min |
+| 11 | [量化 — INT8、GPTQ、AWQ、GGUF](phases/10-llms-from-scratch/11-quantization) | ✅ | ~120 min |
+| 12 | [推理优化](phases/10-llms-from-scratch/12-inference-optimization) | ✅ | ~120 min |
 | 13 | [构建完整的 LLM 流水线](phases/10-llms-from-scratch/13-building-complete-llm-pipeline) | ✅ | ~120 min |
 | 14 | [开源模型 — 架构逐步剖析](phases/10-llms-from-scratch/14-open-models-architecture-walkthroughs) | ✅ | ~45 min |
 | 15 | [推测解码与 EAGLE-3](phases/10-llms-from-scratch/15-speculative-decoding-eagle3) | ✅ | ~75 min |
@@ -264,20 +266,20 @@
 | 20 | [DeepSeek-V3 架构逐步剖析](phases/10-llms-from-scratch/20-deepseek-v3-walkthrough) | ✅ | ~75 min |
 | 21 | [Jamba — 混合 SSM-Transformer](phases/10-llms-from-scratch/21-jamba-hybrid-ssm-transformer) | ✅ | ~60 min |
 | 22 | [异步与 Hogwild! 推理](phases/10-llms-from-scratch/22-async-hogwild-inference) | ✅ | ~60 min |
-| 25 | [推测解码与 EAGLE](phases/10-llms-from-scratch/25-speculative-decoding) | ✅ | ~90 min |
-| 34 | [梯度检查点与激活重算](phases/10-llms-from-scratch/34-gradient-checkpointing) | ✅ | ~90 min |
+| 25 | [推测解码与 EAGLE](phases/10-llms-from-scratch/25-speculative-decoding) | ✅ | ~75 min |
+| 34 | [梯度检查点与激活重算](phases/10-llms-from-scratch/34-gradient-checkpointing) | ✅ | ~70 min |
 
-## Phase 11: LLM 工程 — ✅ (~17 hours)
+## Phase 11: LLM 工程 — ✅ (~21 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | [提示工程 — 技巧与模式](phases/11-llm-engineering/01-prompt-engineering) | ✅ | ~45 min |
+| 01 | [提示工程 — 技巧与模式](phases/11-llm-engineering/01-prompt-engineering) | ✅ | ~90 min |
 | 02 | [少样本、思维链、思维树](phases/11-llm-engineering/02-few-shot-cot) | ✅ | ~45 min |
-| 03 | [结构化输出](phases/11-llm-engineering/03-structured-outputs) | ✅ | ~75 min |
+| 03 | [结构化输出](phases/11-llm-engineering/03-structured-outputs) | ✅ | ~90 min |
 | 04 | [嵌入与向量表示](phases/11-llm-engineering/04-embeddings) | ✅ | ~75 min |
-| 05 | [上下文工程](phases/11-llm-engineering/05-context-engineering) | ✅ | ~75 min |
-| 06 | [RAG — 检索增强生成](phases/11-llm-engineering/06-rag) | ✅ | ~75 min |
-| 07 | [进阶 RAG](phases/11-llm-engineering/07-advanced-rag) | ✅ | ~75 min |
+| 05 | [上下文工程](phases/11-llm-engineering/05-context-engineering) | ✅ | ~90 min |
+| 06 | [RAG — 检索增强生成](phases/11-llm-engineering/06-rag) | ✅ | ~90 min |
+| 07 | [进阶 RAG](phases/11-llm-engineering/07-advanced-rag) | ✅ | ~90 min |
 | 08 | [用 LoRA 与 QLoRA 微调](phases/11-llm-engineering/08-fine-tuning-lora) | ✅ | ~75 min |
 | 09 | [函数调用与工具使用](phases/11-llm-engineering/09-function-calling) | ✅ | ~75 min |
 | 10 | [评估与测试 LLM 应用](phases/11-llm-engineering/10-evaluation) | ✅ | ~45 min |
@@ -286,8 +288,10 @@
 | 13 | [构建生产级 LLM 应用](phases/11-llm-engineering/13-production-app) | ✅ | ~120 min |
 | 14 | [模型上下文协议 (MCP)](phases/11-llm-engineering/14-model-context-protocol) | ✅ | ~75 min |
 | 15 | [提示缓存与上下文缓存](phases/11-llm-engineering/15-prompt-caching) | ✅ | ~60 min |
+| 16 | [Agent 状态机：图、节点与检查点](phases/11-llm-engineering/16-langgraph-state-machines/) | ✅ | ~75 min |
+| 17 | [Agent 框架的取舍](phases/11-llm-engineering/17-agent-framework-tradeoffs/) | ✅ | ~45 min |
 
-## Phase 12: 多模态 AI — ✅ (~65 hours)
+## Phase 12: 多模态 AI — ✅ (~67 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -317,7 +321,7 @@
 | 24 | [多模态 RAG 与跨模态检索](phases/12-multimodal-ai/24-multimodal-rag-cross-modal) | ✅ | ~180 min |
 | 25 | [多模态智能体与计算机操作 (总结项目)](phases/12-multimodal-ai/25-multimodal-agents-computer-use) | ✅ | ~240 min |
 
-## Phase 13: 工具与协议 — ✅ (~40 hours)
+## Phase 13: 工具与协议 — ✅ (~43 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -326,23 +330,23 @@
 | 03 | [并行与流式工具调用](phases/13-tools-and-protocols/03-parallel-and-streaming-tool-calls/) | ✅ | ~75 min |
 | 04 | [结构化输出](phases/13-tools-and-protocols/04-structured-output/) | ✅ | ~75 min |
 | 05 | [工具 Schema 设计](phases/13-tools-and-protocols/05-tool-schema-design/) | ✅ | ~45 min |
-| 06 | [MCP 基础](phases/13-tools-and-protocols/06-mcp-fundamentals/) | ✅ | ~45 min |
-| 07 | [构建一个 MCP Server](phases/13-tools-and-protocols/07-building-an-mcp-server/) | ✅ | ~75 min |
-| 08 | [构建一个 MCP Client](phases/13-tools-and-protocols/08-building-an-mcp-client/) | ✅ | ~75 min |
-| 09 | [MCP 传输层](phases/13-tools-and-protocols/09-mcp-transports/) | ✅ | ~45 min |
-| 10 | [MCP 资源与 Prompt](phases/13-tools-and-protocols/10-mcp-resources-and-prompts/) | ✅ | ~45 min |
+| 06 | [MCP 基础](phases/13-tools-and-protocols/06-mcp-fundamentals/) | ✅ | ~55 min |
+| 07 | [构建一个 MCP Server](phases/13-tools-and-protocols/07-building-an-mcp-server/) | ✅ | ~85 min |
+| 08 | [构建一个 MCP Client](phases/13-tools-and-protocols/08-building-an-mcp-client/) | ✅ | ~85 min |
+| 09 | [MCP 传输层](phases/13-tools-and-protocols/09-mcp-transports/) | ✅ | ~65 min |
+| 10 | [MCP 资源与 Prompt](phases/13-tools-and-protocols/10-mcp-resources-and-prompts/) | ✅ | ~60 min |
 | 11 | [MCP Sampling](phases/13-tools-and-protocols/11-mcp-sampling/) | ✅ | ~75 min |
-| 12 | [MCP Roots 与 Elicitation](phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/) | ✅ | ~45 min |
-| 13 | [MCP 异步任务](phases/13-tools-and-protocols/13-mcp-async-tasks/) | ✅ | ~75 min |
+| 12 | [MCP Roots 与 Elicitation](phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/) | ✅ | ~60 min |
+| 13 | [MCP 异步任务](phases/13-tools-and-protocols/13-mcp-async-tasks/) | ✅ | ~90 min |
 | 14 | [MCP Apps](phases/13-tools-and-protocols/14-mcp-apps/) | ✅ | ~75 min |
-| 15 | [MCP 安全 I — 工具投毒](phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/) | ✅ | ~45 min |
-| 16 | [MCP 安全 II — OAuth 2.1](phases/13-tools-and-protocols/16-mcp-security-oauth-2-1/) | ✅ | ~75 min |
-| 17 | [MCP 网关与注册中心](phases/13-tools-and-protocols/17-mcp-gateways-and-registries/) | ✅ | ~45 min |
+| 15 | [MCP 安全 I — 工具投毒](phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/) | ✅ | ~60 min |
+| 16 | [MCP 安全 II — OAuth 2.1](phases/13-tools-and-protocols/16-mcp-security-oauth-2-1/) | ✅ | ~90 min |
+| 17 | [MCP 网关与注册中心](phases/13-tools-and-protocols/17-mcp-gateways-and-registries/) | ✅ | ~75 min |
 | 18 | [生产环境中的 MCP 认证 — iii 上的 DCR + JWKS](phases/13-tools-and-protocols/18-mcp-auth-production/) | ✅ | ~90 min |
 | 19 | [A2A 协议](phases/13-tools-and-protocols/19-a2a-protocol/) | ✅ | ~75 min |
 | 20 | [OpenTelemetry GenAI](phases/13-tools-and-protocols/20-opentelemetry-genai/) | ✅ | ~75 min |
 | 21 | [LLM 路由层](phases/13-tools-and-protocols/21-llm-routing-layer/) | ✅ | ~45 min |
-| 22 | [Skill 与 Agent SDK](phases/13-tools-and-protocols/22-skills-and-agent-sdks/) | ✅ | ~45 min |
+| 22 | [Skill 与 Agent SDK](phases/13-tools-and-protocols/22-skills-and-agent-sdks/) | ✅ | ~90 min |
 | 23 | [总结项目 — 工具生态系统](phases/13-tools-and-protocols/23-capstone-tool-ecosystem/) | ✅ | ~120 min |
 | 24 | [Skill 发现与渐进式披露](phases/13-tools-and-protocols/24-skill-discovery-and-progressive-disclosure/) | ✅ | ~105 min |
 | 25 | [Skill 调用与路由](phases/13-tools-and-protocols/25-skill-invocation-and-routing/) | ✅ | ~105 min |
@@ -353,7 +357,7 @@
 | 30 | [MCP Registry 供应链：准入、漂移与回滚](phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/) | ✅ | ~90 min |
 | 31 | [MCP 一致性工程：版本、证据与运维](phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/) | ✅ | ~100 min |
 
-## Phase 14: 智能体工程 — ✅ (~55 hours)
+## Phase 14: 智能体工程 — ✅ (~57 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -371,7 +375,7 @@
 | 12 | Anthropic 的工作流模式 | ✅ | ~60 min |
 | 13 | 有状态图编排 — 持久执行与检查点 | ✅ | ~75 min |
 | 14 | Agent 的 Actor 模型 — 异步消息与类型化运行时 | ✅ | ~75 min |
-| 15 | 基于角色的 Agent 团队 — 角色、任务与流程 | ✅ | ~60 min |
+| 15 | 基于角色的 Agent 团队 — 角色、任务与流程 | ✅ | ~75 min |
 | 16 | OpenAI Agents SDK — 移交、护栏、追踪 | ✅ | ~75 min |
 | 17 | Harness 即库 — 子 agent 与会话存储 | ✅ | ~75 min |
 | 18 | 生产级 Agent 运行时 — 快速实例化与类型化工作流 | ✅ | ~45 min |
@@ -439,19 +443,19 @@
 | 21 | METR 时间跨度与外部评估 | ✅ | ~60 min |
 | 22 | CAIS、CAISI 与社会尺度风险 | ✅ | ~45 min |
 
-## Phase 16: 多智能体与蜂群 — ✅ (~28 hours)
+## Phase 16: 多智能体与蜂群 — ✅ (~31 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
-| 01 | [为什么需要多智能体](phases/16-multi-agent-and-swarms/01-why-multi-agent/) | ✅ | ~45 min |
+| 01 | [为什么需要多智能体](phases/16-multi-agent-and-swarms/01-why-multi-agent/) | ✅ | ~60 min |
 | 02 | [FIPA-ACL 传承与言语行为](phases/16-multi-agent-and-swarms/02-fipa-acl-heritage/) | ✅ | ~60 min |
-| 03 | [通信协议](phases/16-multi-agent-and-swarms/03-communication-protocols/) | ✅ | ~45 min |
+| 03 | [通信协议](phases/16-multi-agent-and-swarms/03-communication-protocols/) | ✅ | ~120 min |
 | 04 | [多智能体原语模型](phases/16-multi-agent-and-swarms/04-primitive-model/) | ✅ | ~60 min |
 | 05 | [主管 / 编排器-工作者模式](phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/) | ✅ | ~75 min |
 | 06 | [分层架构与分解漂移](phases/16-multi-agent-and-swarms/06-hierarchical-architecture/) | ✅ | ~60 min |
-| 07 | [心智社会与多智能体辩论](phases/16-multi-agent-and-swarms/07-society-of-mind-debate/) | ✅ | ~75 min |
-| 08 | [角色专精 — 规划者 / 评论者 / 执行者 / 验证者](phases/16-multi-agent-and-swarms/08-role-specialization/) | ✅ | ~75 min |
-| 09 | [并行蜂群与网络化架构](phases/16-multi-agent-and-swarms/09-parallel-swarm-networks/) | ✅ | ~60 min |
+| 07 | [心智社会与多智能体辩论](phases/16-multi-agent-and-swarms/07-society-of-mind-debate/) | ✅ | ~60 min |
+| 08 | [角色专精 — 规划者 / 评论者 / 执行者 / 验证者](phases/16-multi-agent-and-swarms/08-role-specialization/) | ✅ | ~60 min |
+| 09 | [并行蜂群与网络化架构](phases/16-multi-agent-and-swarms/09-parallel-swarm-networks/) | ✅ | ~75 min |
 | 10 | [群聊与发言人选择](phases/16-multi-agent-and-swarms/10-group-chat-speaker-selection/) | ✅ | ~60 min |
 | 11 | [移交与例程 (无状态编排)](phases/16-multi-agent-and-swarms/11-handoffs-and-routines/) | ✅ | ~60 min |
 | 12 | [A2A — 智能体到智能体协议](phases/16-multi-agent-and-swarms/12-a2a-protocol/) | ✅ | ~75 min |
@@ -469,7 +473,7 @@
 | 24 | [评估与协调基准](phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks/) | ✅ | ~75 min |
 | 25 | [案例研究与 2026 年最新进展](phases/16-multi-agent-and-swarms/25-case-studies-2026-sota/) | ✅ | ~90 min |
 
-## Phase 17: 基础设施与生产 — ✅ (~32 hours)
+## Phase 17: 基础设施与生产 — ✅ (~29 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -478,7 +482,7 @@
 | 03 | Kubernetes 上的 GPU 自动扩缩 — Karpenter、KAI Scheduler | ✅ | ~75 min |
 | 04 | 推理服务引擎内部机制 — PagedAttention、连续批处理与分块预填充 | ✅ | ~75 min |
 | 05 | 生产环境中的 EAGLE-3 推测解码 | ✅ | ~60 min |
-| 06 | 前缀缓存推理服务 — RadixAttention 与 KV 复用 | ✅ | ~60 min |
+| 06 | 前缀缓存推理服务 — RadixAttention 与 KV 复用 | ✅ | ~75 min |
 | 07 | 硬件专用推理编译 — Blackwell 上的 FP8 与 NVFP4 | ✅ | ~75 min |
 | 08 | 推理指标 — TTFT、TPOT、ITL、Goodput、P99 | ✅ | ~60 min |
 | 09 | 生产级量化 — AWQ、GPTQ、GGUF、FP8、NVFP4 | ✅ | ~75 min |
@@ -508,8 +512,8 @@
 |---|--------|--------|------|
 | 01 | [指令遵循作为对齐信号](phases/18-ethics-safety-alignment/01-instruction-following-alignment-signal) | ✅ | ~45 min |
 | 02 | [奖励黑客与古德哈特定律](phases/18-ethics-safety-alignment/02-reward-hacking-goodhart) | ✅ | ~60 min |
-| 03 | [直接偏好优化家族](phases/18-ethics-safety-alignment/03-direct-preference-optimization-family) | ✅ | ~60 min |
-| 04 | [谄媚作为 RLHF 的放大效应](phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification) | ✅ | ~45 min |
+| 03 | [直接偏好优化家族](phases/18-ethics-safety-alignment/03-direct-preference-optimization-family) | ✅ | ~75 min |
+| 04 | [谄媚作为 RLHF 的放大效应](phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification) | ✅ | ~60 min |
 | 05 | [Constitutional AI 与 RLAIF](phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif) | ✅ | ~60 min |
 | 06 | [Mesa 优化与欺骗性对齐](phases/18-ethics-safety-alignment/06-mesa-optimization-deceptive-alignment) | ✅ | ~75 min |
 | 07 | [潜伏智能体 — 持久性欺骗](phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception) | ✅ | ~60 min |
@@ -537,7 +541,7 @@
 | 29 | [审核系统 — OpenAI、Perspective、Llama Guard](phases/18-ethics-safety-alignment/29-moderation-systems-openai-perspective-llamaguard) | ✅ | ~60 min |
 | 30 | [两用风险 — 网络、生物、化学、核](phases/18-ethics-safety-alignment/30-dual-use-risk-cyber-bio-chem-nuclear) | ✅ | ~75 min |
 
-## Phase 19: 总结项目 — ✅ (~800 hours)
+## Phase 19: 总结项目 — ✅ (~627 hours)
 
 | # | Project | Status | Est. |
 |---|---------|--------|------|
@@ -629,6 +633,6 @@
 
 ---
 
-**总计：20 个阶段，523 节课 | 523 已完成 | 预计约 1128 小时**
+**总计：20 个阶段，523 节课 | 523 已完成 | 全部课程与项目的估算合计约 1169 小时**
 
-想出一份力？挑任意一节 ⬚ 课提交 PR。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎修订现有课程、完善示例或贡献新课程。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。

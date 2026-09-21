@@ -75,12 +75,12 @@ https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/mai
 
 ## 第 2 步 —— 教授课程
 
-获取课程的 `en.md`。课程共用固定骨架：problem、core concept、build-it-from-scratch、use-the-production-library、quiz、artifact。按此顺序交互教学：
+获取课程的 `docs/zh.md`。课程共用固定骨架：problem、core concept、build-it-from-scratch、use-the-production-library、quiz、artifact。按此顺序交互教学：
 
 1. **建立问题背景**：用 2-3 句话，并在自然时关联 `LEARNING.md` 中学习者的 Mission。不要照读文件。
 2. **核心概念**：按学习者水平用自己的话解释，任何数学前先暂停并提出理解问题。逐步讲解方程；尽量要求预测下一步（“这里 x 为负数时，gradient 会怎样？”）。
 3. **动手构建**：将从零代码分为每段 5-15 行。对每段说明做什么、为何存在，并问一个预测问题。仓库已克隆且语言 runtime 可用时运行代码并展示真实输出；否则用微小具体输入手工跟踪。
-4. **上手使用**：展示 production-library 版本，要求学习者指出该库替他们处理了哪些从零实现中显式呈现的工作。
+4. **实际使用**：展示 production-library 版本，要求学习者指出该库替他们处理了哪些从零实现中显式呈现的工作。
 5. 每次暂停都必须真实交互：等待回答，针对其实际说法回应并调整深度。学习者说“我会这个，快一点”优先于脚本。
 
 ## 第 3 步 —— 测验

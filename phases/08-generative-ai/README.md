@@ -20,7 +20,7 @@ python3 phases/08-generative-ai/01-generative-models-taxonomy-history/code/main.
 
 浏览[阶段 8 的完整课程列表](../../README.md#phase-8)或[跨阶段路线图](../../ROADMAP.md)。
 
-共 15 课，约 15 小时。每节课都提供详细文档、可运行的 Python 演示、图表，以及供 agent 使用的具名 skill。
+共 15 课，按各课正文估算约 15 小时 30 分钟。每节课都提供详细文档、可运行的 Python 演示、图表，以及供 agent 使用的具名 skill。
 
 | # | 课程 | 时间 |
 |---|--------|------|
@@ -38,4 +38,4 @@ python3 phases/08-generative-ai/01-generative-models-taxonomy-history/code/main.
 | 12 | [3D 生成](12-3d-generation/) | 约 45 分钟 |
 | 13 | [流匹配与校正流](13-flow-matching-rectified-flows/) | 约 45 分钟 |
 | 14 | [评估：FID、CLIP Score 与人工偏好](14-evaluation-fid-clip-score/) | 约 45 分钟 |
-| 19 | [视觉自回归建模](19-visual-autoregressive-var/) | 约 60 分钟 |
+| 19 | [视觉自回归建模](19-visual-autoregressive-var/) | 约 90 分钟 |
