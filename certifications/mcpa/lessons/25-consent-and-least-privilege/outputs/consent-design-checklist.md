@@ -15,7 +15,7 @@
 - [ ] 若 server 在已有调用中仍需用户补充输入，可通过 Multi Round-Trip Request 传递：server 返回 `resultType: "input_required"`、method 为 `elicitation/create` 的 `inputRequests` 条目，通常还带 `requestState`。
 - [ ] client retry 使用全新的 JSON-RPC id，按 server 命名的 key 在 `inputResponses` 中携带答案，并精确回传 `requestState`。
 - [ ] 用户答案为三种 action 之一：`accept`（form mode 下带匹配的 `content`）、`decline` 或 `cancel`。只有 `accept` 构成同意；后两者都会阻止调用，但不是同一事件。
-- [ ] 将 `requestState` 视为攻击者可控输入。必要时进行签名、绑定到签发时的具体调用，并且只接受一次。
+- [ ] 将 `requestState` 视为攻击者可控输入。签名并绑定认证主体、具名工具和参数摘要，设置短有效期，且只接受一次。
 - [ ] 未取得或被拒绝的同意报告为 `isError: true` 的普通工具结果，绝不能使用 JSON-RPC error，也不能杜撰 error code。
 
 ## 如何限定同意范围

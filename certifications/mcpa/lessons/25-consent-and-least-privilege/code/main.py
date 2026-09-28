@@ -26,6 +26,7 @@ INVALID_PARAMS = -32602
 
 CLIENT_CAPABILITIES = {"elicitation": {"form": {}}}
 REQUEST_STATE_SECRET = b"mcpa-lesson-25-demo-secret-do-not-reuse"
+STATE_TTL_TICKS = 10
 MAX_STEP_UP_ATTEMPTS = 3
 
 
@@ -111,6 +112,10 @@ class Server:
     tools: dict[str, Tool] = field(default_factory=dict)
     consumed_states: set[str] = field(default_factory=set)
     filesystem: list[str] = field(default_factory=lambda: ["report.csv", "notes.txt"])
+    now: int = 0
+
+    def advance(self, ticks: int = 1) -> None:
+        self.now += ticks
 
     def add(self, tool: Tool) -> None:
         self.tools[tool.name] = tool
@@ -118,7 +123,7 @@ class Server:
     def _server_meta(self) -> dict[str, Any]:
         return {SERVER_INFO_KEY: {"name": self.name, "version": "1.0.0"}}
 
-    def handle(self, message: dict[str, Any], scopes: frozenset = frozenset()) -> dict[str, Any]:
+    def handle(self, message: dict[str, Any], scopes: frozenset = frozenset(), principal: str = "learner") -> dict[str, Any]:
         request_id = message.get("id")
         params = message.get("params") or {}
         meta = params.get("_meta") or {}
@@ -142,10 +147,10 @@ class Server:
             ]
             return make_result(request_id, tools=visible, ttlMs=60000, cacheScope="private", _meta=self._server_meta())
         if method == "tools/call":
-            return self._call(request_id, params, scopes)
+            return self._call(request_id, params, scopes, principal)
         return make_error(request_id, METHOD_NOT_FOUND, f"Method not found: {method}")
 
-    def _call(self, request_id: Any, params: dict[str, Any], scopes: frozenset) -> dict[str, Any]:
+    def _call(self, request_id: Any, params: dict[str, Any], scopes: frozenset, principal: str) -> dict[str, Any]:
         name = params.get("name")
         tool = self.tools.get(name)
         if tool is None:
@@ -165,12 +170,12 @@ class Server:
             input_responses = params.get("inputResponses")
             request_state = params.get("requestState")
             if isinstance(input_responses, dict) and "confirm" in input_responses:
-                return self._resolve_consent(request_id, tool, arguments, input_responses["confirm"], request_state)
-            return self._elicit_consent(request_id, tool, arguments)
+                return self._resolve_consent(request_id, tool, arguments, input_responses["confirm"], request_state, principal)
+            return self._elicit_consent(request_id, tool, arguments, principal)
         return self._run(request_id, tool, arguments)
 
-    def _elicit_consent(self, request_id: Any, tool: Tool, arguments: dict[str, Any]) -> dict[str, Any]:
-        state = _sign_request_state({"tool": tool.name, "argsDigest": _arguments_digest(arguments), "issuedFor": request_id})
+    def _elicit_consent(self, request_id: Any, tool: Tool, arguments: dict[str, Any], principal: str) -> dict[str, Any]:
+        state = _sign_request_state({"tool": tool.name, "argsDigest": _arguments_digest(arguments), "issuedFor": request_id, "principal": principal, "expiresAt": self.now + STATE_TTL_TICKS})
         return make_result(
             request_id,
             result_type="input_required",
@@ -192,9 +197,9 @@ class Server:
         )
 
     def _resolve_consent(self, request_id: Any, tool: Tool, arguments: dict[str, Any], confirm_response: dict[str, Any],
-                          request_state: Any) -> dict[str, Any]:
+                          request_state: Any, principal: str) -> dict[str, Any]:
         payload = _open_request_state(request_state)
-        if payload is None or payload.get("tool") != tool.name:
+        if payload is None or payload.get("tool") != tool.name or payload.get("principal") != principal or not isinstance(payload.get("expiresAt"), int) or self.now > payload["expiresAt"]:
             return make_result(
                 request_id,
                 content=[{"type": "text", "text": "This confirmation does not match a consent request this server issued. Call the tool again to request fresh consent."}],
@@ -253,9 +258,9 @@ class Client:
         self.next_id += 1
         return self.next_id
 
-    def send(self, method: str, params: dict | None = None, scopes: frozenset = frozenset()) -> dict[str, Any]:
+    def send(self, method: str, params: dict | None = None, scopes: frozenset = frozenset(), principal: str = "learner") -> dict[str, Any]:
         request = make_request(self._fresh_id(), method, params, capabilities=CLIENT_CAPABILITIES)
-        response = self.server.handle(request, scopes=scopes)
+        response = self.server.handle(request, scopes=scopes, principal=principal)
         self.log.extend([request, response])
         return response
 
@@ -271,7 +276,7 @@ class Client:
         )
 
     def call(self, name: str, arguments: dict[str, Any], scopes: frozenset = frozenset(), input_responses: dict | None = None,
-             request_state: Any = None, violation: str | None = None) -> dict[str, Any]:
+             request_state: Any = None, violation: str | None = None, principal: str = "learner") -> dict[str, Any]:
         if not self._host_approved(name, arguments):
             return {"hostDenied": "The host did not approve this invocation"}
         params: dict[str, Any] = {"name": name, "arguments": arguments}
@@ -280,7 +285,7 @@ class Client:
         if request_state is not None:
             params["requestState"] = request_state
         request = make_request(self._fresh_id(), "tools/call", params, capabilities=CLIENT_CAPABILITIES)
-        response = self.server.handle(request, scopes=scopes)
+        response = self.server.handle(request, scopes=scopes, principal=principal)
         if violation is not None:
             self.log.append({"violation": violation, "message": request})
         else:

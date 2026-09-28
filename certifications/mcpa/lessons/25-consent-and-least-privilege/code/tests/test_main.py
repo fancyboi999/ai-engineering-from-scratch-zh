@@ -105,6 +105,33 @@ class ConsentAndLeastPrivilegeTests(unittest.TestCase):
         self.assertFalse(legitimate["result"]["isError"])
         self.assertNotIn("notes.txt", self.server.filesystem)
 
+    def test_request_state_cannot_cross_principals(self) -> None:
+        prompt = self.client.call("delete_file", {"path": "notes.txt"}, principal="alice")
+        rejected = self.client.call(
+            "delete_file", {"path": "notes.txt"}, principal="bob",
+            input_responses={"confirm": {"action": "accept", "content": {"approved": True}}},
+            request_state=prompt["result"]["requestState"],
+        )
+        self.assertTrue(rejected["result"]["isError"])
+        self.assertIn("notes.txt", self.server.filesystem)
+        accepted = self.client.call(
+            "delete_file", {"path": "notes.txt"}, principal="alice",
+            input_responses={"confirm": {"action": "accept", "content": {"approved": True}}},
+            request_state=prompt["result"]["requestState"],
+        )
+        self.assertFalse(accepted["result"]["isError"])
+
+    def test_request_state_expires_before_late_approval(self) -> None:
+        prompt = self.client.call("delete_file", {"path": "notes.txt"})
+        self.server.advance(main.STATE_TTL_TICKS + 1)
+        rejected = self.client.call(
+            "delete_file", {"path": "notes.txt"},
+            input_responses={"confirm": {"action": "accept", "content": {"approved": True}}},
+            request_state=prompt["result"]["requestState"],
+        )
+        self.assertTrue(rejected["result"]["isError"])
+        self.assertIn("notes.txt", self.server.filesystem)
+
     def test_a_consumed_request_state_cannot_be_replayed(self) -> None:
         prompt = self.client.call("delete_file", {"path": "notes.txt"})
         state = prompt["result"]["requestState"]
