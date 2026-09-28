@@ -52,7 +52,7 @@ STREAM_NOTIFICATIONS = {
     "notifications/resources/list_changed",
     "notifications/resources/updated",
 }
-NAME_HEADER_METHODS = {"tools/call": "name", "prompts/get": "name", "resources/read": "uri"}
+NAME_HEADER_METHODS = {"tools/call": "name", "prompts/get": "name", "resources/read": "uri", "tasks/get": "taskId", "tasks/update": "taskId", "tasks/cancel": "taskId"}
 LEGACY_SOURCE_PATTERNS = [
     (re.compile(r"""["'](initialize|notifications/initialized|ping|logging/setLevel|resources/subscribe|resources/unsubscribe|tasks/result|tasks/list)["']"""), "legacy method literal"),
     (re.compile(r"Mcp-Session-Id", re.IGNORECASE), "Mcp-Session-Id header"),
@@ -248,6 +248,11 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                     discover_retries[message.get("id")] = version
                 else:
                     unsupported_requests[message.get("id")] = (where, index)
+            if message.get("method") == "subscriptions/listen" and isinstance(params.get("notifications"), dict) and params["notifications"].get("taskIds"):
+                capabilities = (params.get("_meta") or {}).get(CAPS_KEY, {})
+                extensions = capabilities.get("extensions", {}) if isinstance(capabilities, dict) else {}
+                if "io.modelcontextprotocol/tasks" not in extensions:
+                    report.add(where, "taskIds subscription requires the tasks extension capability")
             target = str(params.get("name") or params.get("uri") or "")
             key = (str(message.get("method")), target)
             if message.get("method") != "tasks/update" and ("inputResponses" in params or "requestState" in params):
@@ -273,11 +278,13 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                     pending.pop(request_id)
             if method in LEGACY_METHODS:
                 report.add(where, f"{method!r} does not exist in {PROTOCOL_VERSION}")
-            if method in STREAM_NOTIFICATIONS:
+            if method in STREAM_NOTIFICATIONS or method == "notifications/tasks":
                 params = message.get("params") if isinstance(message.get("params"), dict) else {}
                 meta = params.get("_meta") if isinstance(params.get("_meta"), dict) else {}
                 if SUB_KEY not in meta:
                     report.add(where, f"{method} on a subscriptions/listen stream must carry _meta[{SUB_KEY!r}]")
+                if method == "notifications/tasks" and (not isinstance(params.get("taskId"), str) or params.get("status") not in {"working", "input_required", "completed", "failed", "cancelled"}):
+                    report.add(where, "notifications/tasks must carry a taskId and current task status")
         elif kind == "result":
             request = pending.pop(message.get("id"), None)
             if request is None:

@@ -26,7 +26,7 @@
 
 ## 核心概念
 
-MCP 使用官方 extension `io.modelcontextprotocol/tasks`（SEP-2663）回答这个问题。支持它的服务器可以针对符合条件的请求返回 durable handle（即 task），而非最终答案；客户端则通过三个以该 handle 为目标的方法进行轮询、提供输入和取消。
+MCP 使用官方 extension `io.modelcontextprotocol/tasks`（SEP-2663）回答这个问题。支持它的服务器可以针对符合条件的请求返回 durable handle（即 task），而非最终答案；客户端通过三个以该 handle 为目标的方法查询状态、提供输入和取消；服务器还可向已订阅该 task 的客户端发送状态通知。
 
 协商按请求进行，与协议其他能力完全一样。客户端在当前请求的 `io.modelcontextprotocol/clientCapabilities.extensions` 中声明 extension，服务器则通过 `server/discover` 返回的 `capabilities.extensions` 宣告同一标识符。在一次调用中声明 extension 不会延续到下一次：没有 session 可以记住它。因此，客户端若希望之后的 `tasks/get` 也支持 task，必须在该请求上再次声明 extension。
 
@@ -69,7 +69,7 @@ MCP 使用官方 extension `io.modelcontextprotocol/tasks`（SEP-2663）回答�
 
 在服务器发出 handle 前，使用该 handle 的 `tasks/get` 必须已经能够解析成功。若存储系统是最终一致的，服务器就应等待写入可见后再回答；跳过这一步会给客户端一个立即报告不存在的 `taskId`，还不如多阻塞片刻。
 
-客户端使用 `tasks/get` 轮询，只发送收到的 `taskId`。该高熵 id 只负责定位，不能替代授权：服务器必须将 task 绑定到创建时的认证主体，并在每次 `tasks/get`、`tasks/update`、`tasks/cancel` 上检查调用方是否有权访问。考试喜欢考一个细节：`tasks/get` 本身是会完成的普通请求，所以它自身的 `resultType` 始终是 `"complete"`。底层 job 的状态——`working`、`input_required`、`completed`、`failed`、`cancelled`——位于同一 result 内另一个内嵌 `status` 字段，而不是 `resultType`。混淆两者看似无害，但客户端一看到 `resultType: "complete"` 就停止轮询时便会出错，因为无论 job 是否仍在运行，每次 poll 都是这个值。
+客户端可以使用 `tasks/get` 轮询，也可用声明 Tasks 扩展能力的 `subscriptions/listen` 请求在 `notifications.taskIds` 中订阅 task。服务器的 `notifications/tasks` 携带完整状态快照，客户端无需轮询也能读取终态。通过 Streamable HTTP 发送 `tasks/get`、`tasks/update` 或 `tasks/cancel` 时，`Mcp-Name` 标头必须等于 `params.taskId`，便于路由到保存状态的实例。轮询请求只发送收到的 `taskId`。该高熵 id 只负责定位，不能替代授权：服务器必须将 task 绑定到创建时的认证主体，并在每次 `tasks/get`、`tasks/update`、`tasks/cancel` 上检查调用方是否有权访问。考试喜欢考一个细节：`tasks/get` 本身是会完成的普通请求，所以它自身的 `resultType` 始终是 `"complete"`。底层 job 的状态——`working`、`input_required`、`completed`、`failed`、`cancelled`——位于同一 result 内另一个内嵌 `status` 字段，而不是 `resultType`。混淆两者看似无害，但客户端一看到 `resultType: "complete"` 就停止轮询时便会出错，因为无论 job 是否仍在运行，每次 poll 都是这个值。
 
 不存在 `tasks/result`。task 达到 `completed` 后，紧接着的 `tasks/get` 响应会在 `result` 下内联原始结果，其结构与同步请求原本返回的完全相同。task 达到 `failed` 时，同一响应会在 `error` 下携带 JSON-RPC 错误。以 `isError: true` 结束的工具调用仍属于 `completed`，因为调用在协议层正常成功；`failed` 只保留给执行期间的 JSON-RPC 错误，不能用于普通工具层失败。
 

@@ -34,6 +34,8 @@
 
 ## 轮询与状态规则
 
+- 客户端既可轮询，也可通过声明 Tasks 扩展能力的 `subscriptions/listen` 请求订阅 `notifications.taskIds`；`notifications/tasks` 提供完整状态快照。
+- 在 Streamable HTTP 上，`tasks/get`、`tasks/update`、`tasks/cancel` 的 `Mcp-Name` 标头必须等于 `params.taskId`。
 - `tasks/get` 自身始终完成，因此它自己的 `resultType` 为 `"complete"`。内嵌 `status` 字段才携带 `working`、`input_required`、`completed`、`failed` 或 `cancelled`。
 - 不存在 `tasks/result`。`completed` snapshot 在 `result` 下内联原始结果；`failed` snapshot 在 `error` 下内联 JSON-RPC 错误。
 - 不存在 `tasks/list`。无状态性删除了可安全约束列表 scope 的 session；若 task 历史是产品需求，应改为暴露经过授权和过滤的领域工具。

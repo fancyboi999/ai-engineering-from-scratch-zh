@@ -204,6 +204,15 @@ class StreamAndHeaderTests(unittest.TestCase):
         self.assertTrue(any("MCP-Protocol-Version" in item for item in messages))
         self.assertTrue(any("Mcp-Name" in item for item in messages))
 
+    def test_task_headers_and_subscription_capability(self):
+        call = request(1, "tasks/get", taskId="tsk_1")
+        wrapped = {"message": call, "http": {"headers": {"MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tasks/get", "Mcp-Name": "tsk_wrong"}}}
+        self.assertTrue(any("Mcp-Name" in item for item in findings([wrapped, result(1, resultType="complete", taskId="tsk_1", status="working")])))
+        listen = request(2, "subscriptions/listen", notifications={"taskIds": ["tsk_1"]})
+        self.assertTrue(any("tasks extension capability" in item for item in findings([listen, error(2, -32021, {"requiredCapabilities": {"extensions": {"io.modelcontextprotocol/tasks": {}}}})])))
+        notice = {"jsonrpc": "2.0", "method": "notifications/tasks", "params": {"taskId": "tsk_1", "status": "working"}}
+        self.assertTrue(any("subscriptionId" in item for item in findings([notice])))
+
     def test_http_auth_rejection_is_not_an_unanswered_json_rpc_request(self):
         rejected = {"http": {"status": 401, "headers": {"MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/call", "Mcp-Name": "x"}}, "message": request(1, "tools/call", name="x", arguments={})}
         self.assertEqual(findings([rejected]), [])
