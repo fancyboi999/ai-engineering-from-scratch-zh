@@ -22,7 +22,6 @@
     "能够阅读 MCP 服务端 manifest 及其能力定义"
   ],
   "exam": {
-    "items": 60,
     "timeLimitMinutes": 90,
     "feeUsd": 250,
     "validityMonths": 24,
@@ -471,7 +470,7 @@
       "id": "mcpa-f-mock-01",
       "path": "certifications/mcpa/assessments/mcpa-f/mock-01.json",
       "kind": "mock",
-      "title": "MCPA 全真模拟 1：运维场景",
+      "title": "MCPA 全真模拟题 1：运行场景",
       "timeLimitMinutes": 90
     },
     {
@@ -485,7 +484,7 @@
       "id": "mcpa-f-mock-03",
       "path": "certifications/mcpa/assessments/mcpa-f/mock-03.json",
       "kind": "mock",
-      "title": "MCPA 全真模拟 3：设计与安全权衡",
+      "title": "MCPA 全真模拟题 3：设计与安全权衡",
       "timeLimitMinutes": 90
     }
   ]
