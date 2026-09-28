@@ -1,0 +1,78 @@
+{
+  "lesson": "28-roles-and-adoption",
+  "title": "每个 MUST 都需要负责人",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "团队为同一台内部 MCP 服务器采用第二个 AI host。关于服务器代码，哪项说法正确？",
+      "options": [
+        "每增加一个 host，都必须重建一次服务器",
+        "注册表会为每个新 host 重新注册服务器",
+        "服务器必须为每个服务的 host 新增一条逻辑分支",
+        "服务器每次都会按相同能力契约响应各 host 的 client"
+      ],
+      "correct": 3,
+      "explanation": "服务器的能力契约由规范固定，不随 host 变化，因此增加 host 只产生 client 侧成本，不需要修改服务器。"
+    },
+    {
+      "stage": "check",
+      "question": "在前方没有网关的远程 Streamable HTTP 部署中，哪个角色负责实现 OAuth 2.0 Protected Resource Metadata？",
+      "options": [
+        "服务器作者，因为该 MUST 是针对服务器写的",
+        "终端用户，因为同意元数据描述了他们看到的内容",
+        "平台或网关运维方，因为它负责运行进程",
+        "注册表发布者，因为元数据与条目放在一起"
+      ],
+      "correct": 0,
+      "explanation": "规范把 Protected Resource Metadata 定义为服务器 MUST。前方没有网关时，必须由服务器作者自己的实现承担。"
+    },
+    {
+      "stage": "check",
+      "question": "现在同一台服务器前增加了网关。请求抵达服务器代码前，哪个角色开始负责验证 Origin 标头？",
+      "options": [
+        "安全与治理负责人，因为该角色编写策略",
+        "网关运维方，因为连接首先在网关终止",
+        "服务器作者，因为这里的每项传输检查仍全部归其负责",
+        "Host 与 client 开发者，因为该角色构建 OAuth client"
+      ],
+      "correct": 1,
+      "explanation": "网关终止连接后，它就是最先看到 Origin 标头的代码，因此平台或网关运维方会继承普通 HTTP 下由服务器作者独自承担的 MUST。"
+    },
+    {
+      "stage": "check",
+      "question": "stdio 部署调用内部 API 时需要凭据。按照规范的传输指导，该凭据应来自哪里？",
+      "options": [
+        "通过 stdio 通道本身协商得到的 OAuth access token",
+        "直接嵌入工具 input schema 的 bearer token",
+        "运维方在进程启动前配置的环境",
+        "服务器在连接第一次调用时分配的 session id"
+      ],
+      "correct": 2,
+      "explanation": "STDIO 实现 SHOULD NOT 执行 OAuth 授权流程，而应从环境获取凭据；配置该环境是平台或网关运维方的责任。"
+    },
+    {
+      "stage": "post",
+      "question": "精选要求目录中有一项 MUST，因为六种角色都无法清晰单独负责，所以有意未设置默认角色。由该目录构建的责任矩阵应如何处理？",
+      "options": [
+        "从矩阵中删除，因为 MUST NOT 不属于 MUST",
+        "默认分配给发布者，因为它在列表中排得最靠后",
+        "默认分配给终端用户，因为他们负责同意",
+        "报告为缺口，让团队显式指定负责人"
+      ],
+      "correct": 3,
+      "explanation": "责任矩阵应暴露无负责人 MUST 作为缺口，而不是猜测负责人，因为静默错配的要求与未分配的要求一样危险。"
+    },
+    {
+      "stage": "post",
+      "question": "Host 与 client 开发者需要一个能在规范发布前交付新协议功能，并在一周内解决严重 bug 的 SDK。哪个 SDK tier 承诺达到该标准？",
+      "options": [
+        "Tier 1，因为它承诺完全合规并快速修复",
+        "任何 tier，因为 tier 只描述文档质量，不描述速度",
+        "Tier 2，因为六个月对生产使用已经足够接近",
+        "Tier 3，因为实验性 SDK 在三者中迭代最快"
+      ],
+      "correct": 0,
+      "explanation": "只有 Tier 1 承诺在规范发布前或同时交付新功能，并在七天内修复严重 bug，正好满足该场景。"
+    }
+  ]
+}
