@@ -471,6 +471,18 @@ test('certification route renders a crawlable track with an id-only canonical', 
   assert.match(response.body, /path=phases%2F14-agent-engineering%2F01-the-agent-loop&amp;fromTrack=claude-example/);
 });
 
+test('certification route keeps the real track hero around its server-rendered fallback', function () {
+  const assets = makeAssets();
+  assets.certification.template = fs.readFileSync(path.join(__dirname, '..', 'site', 'certification.html'), 'utf8');
+  const handler = certificationApi.createHandler({ loadAssets: function () { return assets.certification; } });
+  const response = invoke(handler, { method: 'GET', url: '/certification?id=claude-example', query: { id: 'claude-example' } });
+  const main = response.body.split('<main id="main" class="cert-page">')[1].split('</main>')[0];
+  assert.equal(response.statusCode, 200);
+  assert.equal((main.match(/id="trackHero"/g) || []).length, 1);
+  assert.match(main, /<section class="cert-container cert-track-hero" id="trackHero"[^>]*>[\s\S]*?data-server-rendered="true"[\s\S]*?<\/section>/);
+  assert.equal((main.match(/<h1(?:\s|>)/g) || []).length, 1);
+});
+
 test('certification route renders tracks from a second certification program', function () {
   const assets = withSecondProgram(makeAssets());
   const handler = certificationApi.createHandler({ loadAssets: function () { return assets.certification; } });
