@@ -4,74 +4,74 @@
   "questions": [
     {
       "stage": "pre",
-      "question": "经典的静态批处理在处理长度不一的请求时，主要问题是什么？",
+      "question": "经典静态批处理在处理长度不一的请求时，主要问题是什么？",
       "options": [
-        "为了对齐最长的 prompt 和最长的输出而进行填充（padding）会浪费显存，并让整个批次卡在最慢的那条序列上",
-        "它要求每对 GPU 之间都有 NVLink",
-        "它根本无法使用 GPU",
-        "它只能用于 FP4"
+        "它只能用于 FP4",
+        "它完全无法使用 GPU",
+        "为最长 prompt 和最长输出做 padding 会浪费显存，并让整个批次卡在最慢的序列上",
+        "每对 GPU 之间都必须有 NVLink"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": ""
     },
     {
       "stage": "check",
-      "question": "PagedAttention 是如何把 KV 缓存碎片化从 60-80% 降到 4% 以下的？",
+      "question": "PagedAttention 如何把 KV cache 碎片率从 60–80% 降到 4% 以下？",
       "options": [
-        "通过把完整 prompt 保存在 CPU 内存中",
-        "通过完全禁用 KV 缓存",
-        "通过把权重压缩到 INT4",
-        "通过以固定大小的块（默认 16 个 token）分配 KV 缓存，并经由每条序列的块表（block table）来引用"
+        "完全禁用 KV cache",
+        "把完整 prompt 放在 CPU 内存里",
+        "把权重量化到 INT4",
+        "按固定大小的 block（默认 16 个 token）分配 KV cache，并通过每条序列的 block table 引用"
       ],
       "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
-      "question": "在 vLLM 的 V1 调度器中，定义连续批处理（continuous batching）的不变量是什么？",
+      "question": "vLLM V1 scheduler 中定义 continuous batching 的不变量是什么？",
       "options": [
-        "调度器每个 decode 迭代运行一次，把已完成的序列移出、把等待中的序列移入",
-        "调度器每个请求只运行一次，批次永不改变",
-        "调度器等待 10 ms 的窗口来凑满一个批次后再运行",
-        "每个请求获得自己专属的 GPU stream"
+        "每个请求使用独立 GPU stream",
+        "调度器等待 10 ms 窗口凑满批次",
+        "调度器每个请求只运行一次，批次永不变化",
+        "调度器每次 decode 迭代运行一次，移出完成序列并接纳等待序列"
       ],
-      "correct": 0,
+      "correct": 3,
       "explanation": ""
     },
     {
       "stage": "check",
-      "question": "在混合负载下，分块预填充（chunked prefill）主要保护的是哪个延迟指标？",
+      "question": "混合负载下，chunked prefill 主要保护哪个延迟指标？",
       "options": [
-        "P99 token 间延迟（ITL）",
+        "平均吞吐",
+        "冷启动时间",
         "网络 RTT",
-        "平均吞吐量",
-        "冷启动时间"
+        "P99 token 间延迟（ITL）"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "stage": "post",
+      "question": "vLLM v0.18.0 特性兼容性矩阵如何标记 speculative decoding 与 `--enable-chunked-prefill` 的组合？",
+      "options": [
+        "矩阵标记该组合兼容",
+        "任何配置下都不能组合",
+        "只有 EAGLE-1 草稿头兼容",
+        "只有草稿模型推测兼容"
       ],
       "correct": 0,
       "explanation": ""
     },
     {
       "stage": "post",
-      "question": "在 vLLM v0.18.0 中，哪种推测解码（speculative decoding）变体仍与 --enable-chunked-prefill 兼容？",
+      "question": "为什么 chunked prefill 单独看并不会提高平均吞吐？",
       "options": [
-        "没有任何推测解码兼容",
-        "仅 EAGLE-1",
-        "V1 调度器中的 N-gram GPU 推测解码",
-        "draft 模型推测解码"
+        "它更激进地压缩权重",
+        "它只减少 decode 抖动；实践中的吞吐收益来自长 prefill 期间仍让 decode 序列前进，而不是减少实际工作量",
+        "它与 decode 运行在不同 GPU 上",
+        "它底层使用 speculative decoding"
       ],
-      "correct": 2,
-      "explanation": ""
-    },
-    {
-      "stage": "post",
-      "question": "为什么分块预填充本身并不能提升平均吞吐量？",
-      "options": [
-        "它底层使用了推测解码",
-        "它运行在与 decode 不同的 GPU 上",
-        "它只是减少了 decode 阶段的抖动；实践中的吞吐收益来自在长 prefill 期间让 decode 序列保持存活，而非改变实际完成的工作量",
-        "它对权重进行了更激进的压缩"
-      ],
-      "correct": 2,
+      "correct": 1,
       "explanation": ""
     }
   ]

@@ -90,7 +90,7 @@ cc-atomic-checkpoint
 
 ### 第一步：捕获和恢复 RNG 状态
 
-`capture_rng_state` 返回一个 dict，包含 Python 的 `random.getstate`、NumPy 的 `np.random.get_state`，以及 PyTorch CPU 和 CUDA 的 RNG 字节。`restore_rng_state` 做反向操作。CPU tensor 是一个 uint8 字节 buffer，PyTorch 的 RNG 知道怎么消费它。
+`capture_rng_state` 返回一个 dict，包含 Python 的 `random.getstate`、NumPy 的 `np.random.get_state`，以及 PyTorch CPU 和 CUDA 的 RNG 字节。每一项都只用普通 Python 数字、tuple 和 list 保存（NumPy 的 key 数组先经过 `tolist()`），这样第三步的 loader 无需反序列化任意对象就能读取。`restore_rng_state` 做反向操作。CPU tensor 是一个 uint8 字节 buffer，PyTorch 的 RNG 知道怎么消费它。
 
 ### 第二步：原子保存
 
@@ -100,9 +100,11 @@ cc-atomic-checkpoint
 
 `save_checkpoint` 把 model、optimizer、scheduler、train state 和 RNG 打包成一个 dict。`load_checkpoint` 做反向操作并返回 `TrainState`。schema 字段是升级钩子：未来格式变更只需 bump 版本字符串，loader 按版本分发。
 
+`load_checkpoint` 使用 `torch.load(..., weights_only=True)`。`.pt` 文件本质上是 pickle；若对不可信文件使用 `weights_only=False`，会执行文件点名的任意代码。weights-only loader 只接受 tensor 和原始容器，这也是第一步把 RNG 状态保存成普通 list 的原因。完整性校验抛出 `ValueError`，而不是使用会被 `python -O` 删除的 `assert`。请使用 PyTorch 2.6 或更新版本：此前 `weights_only=True` 存在已知绕过（CVE-2025-32434），本课依赖的保证从 2.6 起才成立。
+
 ### 第四步：分片变体
 
-`save_sharded_checkpoint` 用 round-robin 把参数 key 分配到 N 个 shard，对每个 shard 做原子保存，写一个包含 optimizer、scheduler 和 train state 的 meta 文件，再写一个带 shard sha256 的 JSON 索引。`load_sharded_checkpoint` 在合并前校验每个 shard。
+`save_sharded_checkpoint` 用 round-robin 把参数 key 分配到 N 个 shard，对每个 shard 做原子保存，写一个包含 optimizer、scheduler 和 train state 的 meta 文件，再写一个带 shard sha256 的 JSON 索引。`load_sharded_checkpoint` 在合并前校验每个 shard，并拒绝解析后落到 checkpoint 目录之外的 shard 路径。
 
 ### 第五步：resume demo
 
@@ -120,7 +122,9 @@ python3 code/main.py
 
 生产训练栈把 checkpointing 作为 trainer 的一部分。形状一样：model + optimizer + scheduler + counters + RNG，原子写入，以 step 命名方便找最新的。分片布局让大模型可以并行读取；index.json 是让这一切运转的关键。
 
-三个需要坚持的模式：
+四个需要坚持的模式：
+
+- **使用 `weights_only=True` 加载。** 从共享盘或下载得到的 checkpoint 都属于不可信输入；weights-only loader 能阻止恶意文件在恢复训练的机器上执行代码。
 
 - **Schema 是 payload 里的一个字符串。** 迁移逻辑按它分发。没有它你就没法演进格式而不破坏旧 run。
 - **每个 shard 都做 sha256。** 静默截断的下载是最坏的 bug 类型；loader 要么早报错，要么就是太晚才发现。
@@ -151,7 +155,7 @@ python3 code/main.py
 ## 延伸阅读
 
 - POSIX `rename` 语义，`os.replace` 原子性声明的基础。
-- PyTorch `torch.save` 和 `torch.load` 文档，包括跨设备恢复的 `map_location`。
+- PyTorch `torch.save` 和 `torch.load` 文档，包括跨设备恢复的 `map_location`，以及加载不可信文件时的 `weights_only`。
 - 第19阶段第46课覆盖了本课的 checkpoint payload 需要跨越的梯度累积。
 - 第19阶段第48课覆盖了分布式 wrapper，本方案需要兼容其 state dict 格式。
 - Linux 内核 `fsync` 文档，原子 rename 背后的持久性保证。

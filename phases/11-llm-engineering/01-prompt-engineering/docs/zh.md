@@ -937,24 +937,24 @@ assistant prefill（`"{"`）逼着 Claude 接着产出 JSON、不带任何开场
 ### Google：带安全设置的 Gemini
 
 ```python
-# import google.generativeai as genai
+# from google import genai
+# from google.genai import types
 #
-# genai.configure(api_key="your-key")
+# client = genai.Client()
 #
-# model = genai.GenerativeModel(
-#     "gemini-1.5-pro",
-#     system_instruction="You are a technical analyst. Be precise and cite sources.",
-#     generation_config=genai.GenerationConfig(
+# response = client.models.generate_content(
+#     model="gemini-3.8-flash",
+#     contents="Compare PostgreSQL and MySQL for write-heavy workloads.",
+#     config=types.GenerateContentConfig(
+#         system_instruction="You are a technical analyst. Be precise and cite sources.",
 #         temperature=0.3,
 #         max_output_tokens=2048,
 #     ),
 # )
-#
-# response = model.generate_content("Compare PostgreSQL and MySQL for write-heavy workloads.")
 # print(response.text)
 ```
 
-Gemini 把 system 指令当成模型配置的一部分来处理，而不是一条消息。2M token 的上下文窗口意味着你可以塞进那些 GPT-4o 或 Claude 装不下的海量 few-shot 示例集。
+Gemini 把 system 指令当成模型配置的一部分来处理，而不是一条消息。1M token 的上下文窗口意味着你可以塞进 GPT-4o 的 128K 窗口装不下的海量 few-shot 示例集。
 
 ### 与 provider 无关的 prompt 模板
 

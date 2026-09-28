@@ -57,7 +57,7 @@ Alpha 随工作负载变。在 ShareGPT 式通用聊天上，用 ShareGPT 训练
 
 ### EAGLE-3 已经部署在哪
 
-Google 在 2025 年把 speculative decoding 部署进了 AI Overviews（质量相同，响应更快）。vLLM V1 把 `speculative_config` 作为有文档的接口发布；V1 里的 N-gram GPU speculative decoding 是与 chunked prefill 兼容的变体。SGLang 支持 EAGLE-3，把它作为 prefix 重的工作负载推荐的草稿路径。
+Google 在 2025 年把 speculative decoding 部署进了 AI Overviews（质量相同，响应更快）。vLLM V1 把 `speculative_config` 作为有文档的接口发布，其特性矩阵把 speculative decoding 标为兼容 chunked prefill。SGLang 支持 EAGLE-3，把它作为 prefix 重的工作负载推荐的草稿路径。
 
 ### 一行盈亏平衡数学
 
@@ -68,7 +68,7 @@ Google 在 2025 年把 speculative decoding 部署进了 AI Overviews（质量�
 - 延迟无所谓的 batch-1 离线生成。用朴素目标。
 - 极短输出（不到 50 token）。草稿开销和验证成本占主导。
 - 没有领域训练草稿头的专门领域。Alpha 太低。
-- vLLM v0.18.0 加草稿模型 spec decode 加 `--enable-chunked-prefill`。这个组合编译不过。有文档的例外是 V1 里的 N-gram GPU spec decode。
+- 假设所有特性都能两两组合。请检查当前 vLLM 版本的兼容性矩阵；v0.18.0 把 speculative decoding 标为兼容 chunked prefill。
 
 ```figure
 mx-speculative-tree
@@ -86,7 +86,7 @@ mx-speculative-tree
 
 1. 跑 `code/main.py`。K=5 时，要 2x 加速你需要多少 alpha？要 3x 呢？这对 verify_overhead 有多敏感？
 2. 设想生产流量 70% 通用聊天、30% 代码。通用聊天用 ShareGPT 训练的 EAGLE-3 命中 alpha 0.7；代码命中 alpha 0.4。混合 alpha 是多少，spec decode 是净正吗？
-3. 读 vLLM 的 `speculative_config` 文档。说出三种模式（草稿模型、EAGLE、N-gram），以及哪一个与 chunked prefill 兼容。
+3. 读 vLLM 的 `speculative_config` 文档。说出三种模式（草稿模型、EAGLE、N-gram），并检查你所用 vLLM 版本里各自能与哪些特性组合。
 4. 你看到启用 EAGLE-3 后均值 ITL 降了 25%，但 P99 ITL 涨了 15%。诊断并提出一个缓解方案。
 5. 算一算 Llama 3.3 70B 的 EAGLE-3 草稿头的内存开销。它和把 Llama 3.2 1B 当经典草稿来跑相比如何？
 

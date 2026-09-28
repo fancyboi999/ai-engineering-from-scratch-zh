@@ -12,7 +12,7 @@
 - 把 PagedAttention 解释成一个 KV cache 分配器：block、block table，以及为什么生产负载下碎片率维持在 4% 以下。
 - 在迭代层面画出 continuous batching：完成的序列怎么离开批次、新序列怎么不必排空就加入。
 - 用一句话描述 chunked prefill，并说出它保护的是哪个延迟指标（提示：是 TTFT 尾部，不是平均吞吐）。
-- 说出 2026 年 vLLM v0.18.0 那个坑 —— 一次把所有优化全打开的团队会被它咬到。
+- 在一次启用所有优化前，对照当前 vLLM 版本的兼容性矩阵检查特性组合。
 
 ## 问题背景
 
@@ -56,9 +56,9 @@ Chunked prefill 把 prefill 拆成固定大小的 chunk（默认 512 token），
 
 你不用知道每个 flag。你要知道调度器优化什么：在 KV block 预算下的 goodput，且受 chunked prefill 切片约束。
 
-### 2026 年 v0.18.0 那个坑
+### 检查兼容性矩阵
 
-在 vLLM v0.18.0 里，你不能把 `--enable-chunked-prefill` 和草稿模型 speculative decoding（`--speculative-model`）组合在一起。有文档记录的例外是 V1 scheduler 里的 N-gram GPU speculative decoding。不读 release notes 就把所有 flag 全打开的团队，在启动时拿到的是运行时错误，不是悄无声息的回退。如果你的 speculative 收益值得为它开 chunked prefill，重新想想这个选择 —— 2026 年正确的答案常常是用 EAGLE-3 而不开 chunked prefill，而不是一个编译不过的"草稿模型 + chunked prefill"。
+一次启用所有特性前，应按实际使用的 vLLM 版本检查兼容性矩阵，因为可组合关系会随版本变化。v0.18.0 的特性矩阵把 speculative decoding 标为兼容 chunked prefill 和 prefix caching；speculative decoding 页面列出的两个已知不兼容项是：截至 v0.15.0 不支持 pipeline parallelism，以及截至 v0.10.0 不支持草稿模型推测。对草稿方法本身，2026 年常见默认选择是 EAGLE-3（`"method": "eagle3"`），下一课会展开。
 
 ### 你该记住的数字
 
@@ -116,7 +116,7 @@ tensor-parallel
 
 1. 跑 `code/main.py`。在一个长短请求混合的工作负载上对比 `STATIC` 和 `CONTINUOUS`。吞吐差距从哪来 —— prefill 效率、decode 效率，还是尾延迟？
 2. 改造这个玩具调度器，加上 `--max-num-batched-tokens`。对一块跑 Llama 3.3 70B FP8 的 H100，正确的值是多少？（提示：它是 KV block 大小和空闲 block 数的函数，不是裸 HBM。）
-3. 重读 vLLM v0.18.0 的 release notes。哪些 flag 组合是互斥的？列出来。
+3. 阅读你所用 vLLM 版本的特性矩阵，列出当前不兼容的组合，并记录其版本边界。
 4. 对一条 1,000 个请求、平均 1,500 输出 token、标准差 600 token 的 trace，算出 KV cache 碎片浪费，分别在 (a) 按请求连续分配、最大 8192，(b) 16 token block 的 PagedAttention 下。
 5. 用一段话解释为什么 chunked prefill 孤立来看帮的是 P99 ITL 而不是吞吐。实践中吞吐的提升从哪来？
 
@@ -131,7 +131,7 @@ tensor-parallel
 | TTFT | "首 token 时间" | prefill + 队列 + 网络；长 prompt 下由 prefill 主导 |
 | ITL | "token 间延迟" | 相邻 decode token 之间的时间；由批大小主导 |
 | Goodput | "满足 SLO 的吞吐" | 每秒 token 数，且每个请求仍命中 TTFT 和 ITL 目标 |
-| V1 scheduler | "新调度器" | vLLM 的 2026 调度器；N-gram spec decode 是与 chunked prefill 兼容的路径 |
+| V1 scheduler | "新调度器" | vLLM 的 2026 调度器；以 chunked prefill 运行 continuous batching |
 | `--gpu-memory-utilization` | "内存旋钮" | 加载权重和激活后留给 KV block 的 HBM 比例 |
 
 ## 延伸阅读
