@@ -1,0 +1,78 @@
+{
+  "lesson": "33-mcpa-capstone-readiness",
+  "title": "端到端读懂一次 MCP 交互",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "沿 MCP 交互记录追踪事故前，应先检查哪项区别，以判断故障位于何处？",
+      "options": [
+        "调用是否只通过 stdio 发生，因为 Streamable HTTP 不可能产生这种特定故障",
+        "记录是否超过几条消息，因为仅凭长度就能预测故障实际属于哪个领域",
+        "连接是否保持已协商 session 打开，因为 session 丢失几乎能解释服务器报告的每种故障",
+        "消息是带错误码的 JSON-RPC error object，还是改为携带 isError true 的普通结果"
+      ],
+      "correct": 3,
+      "explanation": "协议错误是带数字错误码的 JSON-RPC error object，而工具执行错误是带 isError true 的普通结果；模型需要用不同方式修复两者。"
+    },
+    {
+      "stage": "check",
+      "question": "配置为 protocol version 2025-11-25 的客户端，对本课 incident-console 服务器调用 server/discover。在符合 2026-07-28 的交互中，接下来会发生什么？",
+      "options": [
+        "服务器返回 UnsupportedProtocolVersionError，客户端使用错误本身列出的版本重试",
+        "服务器把连接上的所有后续请求降级到客户端第一次要求的版本",
+        "服务器开启旧式 initialize 握手，让双方先协商共同版本",
+        "服务器静默使用自己的默认版本，并记录一条不保证有人看到的 warning"
+      ],
+      "correct": 0,
+      "explanation": "版本不匹配会返回错误码 -32022，data.supported 列出服务器接受的版本；客户端直接用受支持版本重试 server/discover，因为没有握手或 session 可供重新协商。"
+    },
+    {
+      "stage": "check",
+      "question": "bob-readonly 调用 restart_service，参数完整有效，但该请求没有声明 elicitation 能力。服务器返回什么？",
+      "options": [
+        "带 isError true 的普通结果，说明 bob 提供的 environment 参数不符合 schema",
+        "错误码 -32021、MissingRequiredClientCapability，并明确点名缺少 elicitation 能力",
+        "仍返回 resultType input_required，相信 bob 总能提供某个客户端回答 elicitation",
+        "错误码 -32602，因为缺少所需能力与调用未知工具等同处理"
+      ],
+      "correct": 1,
+      "explanation": "服务器绝不能假定请求未声明的能力，因此应返回 -32021、MissingRequiredClientCapability，并准确点名缺少的能力。"
+    },
+    {
+      "stage": "check",
+      "question": "alice 获接受的 restart_service 重试携带正确 requestState，但复用了原始请求的 JSON-RPC id。这个重试有什么问题？",
+      "options": [
+        "重试应完全省略 requestState，因为服务器已经记录原始参数",
+        "重试需要共享 session identifier，而不是 id，来证明属于同一连接",
+        "重试必须使用全新的 JSON-RPC id；复用原 id 违反 MRTR 规则",
+        "没有问题；服务器本就应该通过复用原 id 将重试与请求匹配"
+      ],
+      "correct": 2,
+      "explanation": "MRTR 重试必须使用新的 JSON-RPC id，同时精确回显 requestState；第 14 课分配给原始请求的 id 不能在回答它的重试中复用。"
+    },
+    {
+      "stage": "post",
+      "question": "run_full_diagnostics 使用相同参数发送两次，一次未声明 io.modelcontextprotocol/tasks，一次声明了它。为什么两次调用返回不同的 resultType？",
+      "options": [
+        "第一次调用静默失败，客户端随后自动使用不同 capabilities 重试",
+        "服务器随机在 task 与同步结果间切换，只为向客户端展示两条代码路径",
+        "客户端必须先轮询一次 tasks/get 表示关注，才能创建 task",
+        "Capabilities 逐请求声明，而不是整条连接声明，因此只有主动选择加入的请求会得到 task"
+      ],
+      "correct": 3,
+      "explanation": "MCP capabilities 逐请求声明，而不是为整条连接声明；只有当前请求声明 tasks extension，且服务器也公布支持时，服务器才返回 resultType task。"
+    },
+    {
+      "stage": "post",
+      "question": "完整运行后，就地修改审计日志早期 entry 的一个字段，再次调用 audit.verify()。它会报告什么？",
+      "options": [
+        "False，并点名被编辑 entry 的精确索引，因为其 hash 已与记录值不一致",
+        "True，因为 verify 只会重新计算最近写入的单个 entry hash",
+        "False，但会点名实际编辑 entry 之前那个 entry 的索引",
+        "True，因为被编辑字段恰好不在 hash function 的覆盖范围内"
+      ],
+      "correct": 0,
+      "explanation": "每个 entry 的 hash 覆盖前一个 entry，因此编辑一项会从其自身索引开始破坏重新计算的 hash；verify 会准确报告该索引，而不是前一项或笼统失败。"
+    }
+  ]
+}
