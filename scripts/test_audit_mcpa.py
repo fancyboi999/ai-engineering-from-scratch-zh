@@ -38,7 +38,7 @@ class McpaAuditTests(unittest.TestCase):
             (lesson / "code" / "tests").mkdir(parents=True)
             (lesson / "outputs").mkdir()
             headings = "\n".join(f"## {name}" for name in ("学习目标", "交互实验", "实践实验", "交付产物", "验证", "综合项目关联"))
-            (lesson / "docs" / "zh.md").write_text(f"# 课程\n{headings}\n```figure\nmcpa-figure\n```\n", encoding="utf-8")
+            (lesson / "docs" / "zh.md").write_text(f"# 课程\n**类型：** Reference\n{headings}\n```figure\nmcpa-figure\n```\n", encoding="utf-8")
             (lesson / "code" / "main.py").write_text("print('ok')\n", encoding="utf-8")
             (lesson / "code" / "tests" / "test_main.py").write_text("\n".join(f"def test_{n}(): pass" for n in range(5)), encoding="utf-8")
             (lesson / "outputs" / "output.md").write_text("# 产物\n", encoding="utf-8")
@@ -57,6 +57,11 @@ class McpaAuditTests(unittest.TestCase):
         document = self.lesson / "docs" / "zh.md"
         document.write_text("# 课程\n", encoding="utf-8")
         self.assertTrue(any("交互实验" in issue for issue in audit(self.root)))
+
+    def test_invalid_lesson_type_fails(self):
+        document = self.lesson / "docs" / "zh.md"
+        document.write_text(document.read_text(encoding="utf-8").replace("Reference", "Orientation"), encoding="utf-8")
+        self.assertTrue(any("类型必须" in issue for issue in audit(self.root)))
 
     def test_missing_test_methods_fails(self):
         (self.lesson / "code" / "tests" / "test_main.py").unlink()

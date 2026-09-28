@@ -78,6 +78,9 @@ def audit(root: Path = ROOT) -> list[str]:
         if (lesson / "docs" / "en.md").exists():
             problems.append(f"{lesson}: 不应保留 en.md")
         text = document.read_text(encoding="utf-8")
+        lesson_type = re.search(r"^\*\*类型：\*\*\s*(\S+)\s*$", text, re.MULTILINE)
+        if lesson_type is None or lesson_type.group(1) not in {"Learn", "Build", "Reference"}:
+            problems.append(f"{document}: 类型必须为 Learn、Build 或 Reference")
         for heading in REQUIRED_HEADINGS:
             if not re.search(rf"^## {re.escape(heading)}\s*$", text, re.MULTILINE):
                 problems.append(f"{document}: 缺少 ## {heading}")
