@@ -21,11 +21,11 @@ class TasksExtensionTests(unittest.TestCase):
             capabilities=capabilities,
         )
 
-    def test_without_the_extension_a_plain_result_returns(self) -> None:
+    def test_without_the_extension_deployment_is_rejected(self) -> None:
         response = self._create(with_tasks=False)
-        self.assertNotIn("error", response)
-        self.assertEqual(response["result"]["resultType"], "complete")
-        self.assertFalse(response["result"]["structuredContent"]["deployed"])
+        self.assertEqual(response["error"]["code"], main.MISSING_REQUIRED_CLIENT_CAPABILITY)
+        self.assertIn(main.TASKS_EXTENSION, response["error"]["data"]["requiredCapabilities"]["extensions"])
+        self.assertFalse(self.server.tasks)
 
     def test_with_the_extension_a_task_handle_returns(self) -> None:
         response = self._create(with_tasks=True)

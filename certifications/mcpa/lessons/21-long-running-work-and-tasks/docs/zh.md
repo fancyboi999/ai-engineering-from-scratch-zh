@@ -119,7 +119,7 @@ mcpa-21-task-states
 python3 code/main.py
 ```
 
-结合概念章节阅读输出交互。未声明 extension 的调用会同步完成，并报告 deploy 步骤需要该 extension 才能批准；声明 extension 的调用则立即得到 `resultType: "task"`。实验在 poll 之间显式推进 task，模拟真实 worker 在独立请求间推进，而不是让后台 thread sleep，因此 transcript 中每次状态转移都确定且可重复。沿一个 `taskId` 追踪：从第一次 `working` poll，到 `input_required`，再经过提供 `{"approved": true}` 的 `tasks/update`，最后到 `completed` poll；将其中内嵌的 `result` 与未声明 extension 时直接返回的内容比较。随后找到两个错误：对从未创建的 `taskId` 调用 `tasks/get` 返回 `-32602`；使用相同有效 `taskId`，但客户端本次 poll 未声明 extension，则返回 `-32021`。
+结合概念章节阅读输出交互。未声明 extension 的部署调用会返回 `-32021`，说明完成部署必须取得 task 能力和明确批准；声明 extension 的调用则立即得到 `resultType: "task"`。实验在 poll 之间显式推进 task，模拟真实 worker 在独立请求间推进，而不是让后台 thread sleep，因此 transcript 中每次状态转移都确定且可重复。沿一个 `taskId` 追踪：从第一次 `working` poll，到 `input_required`，再经过提供 `{"approved": true}` 的 `tasks/update`，最后到 `completed` poll；将其中内嵌的 `result` 与未声明 extension 时返回的能力错误比较。随后找到两个错误：对从未创建的 `taskId` 调用 `tasks/get` 返回 `-32602`；使用相同有效 `taskId`，但客户端本次 poll 未声明 extension，则返回 `-32021`。
 
 ## 交付产物
 
@@ -133,7 +133,7 @@ python3 code/main.py
 python3 -m unittest discover code/tests
 ```
 
-测试覆盖本课结论：没有 extension 的调用仍返回普通结果；声明后返回 task handle；轮询中的 status 确实从 `working` 进入 `input_required`；`input_required` snapshot 暴露结构正确的 `inputRequests`；`tasks/update` 使 task 恢复；`completed` snapshot 内联原始结果结构；`tasks/cancel` 将 working task 转为 `cancelled`；未知 `taskId` 属于协议错误；同一个 task 方法若未声明所需能力则返回 `-32021`。仓库 wire checker 也会按 2026-07-28 规则验证 transcript：
+测试覆盖本课结论：没有 extension 的部署调用返回 `-32021`；声明后返回 task handle；轮询中的 status 确实从 `working` 进入 `input_required`；`input_required` snapshot 暴露结构正确的 `inputRequests`；`tasks/update` 使 task 恢复；`completed` snapshot 内联原始结果结构；`tasks/cancel` 将 working task 转为 `cancelled`；未知 `taskId` 属于协议错误；同一个 task 方法若未声明所需能力则返回 `-32021`。仓库 wire checker 也会按 2026-07-28 规则验证 transcript：
 
 ```bash
 python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/21-long-running-work-and-tasks

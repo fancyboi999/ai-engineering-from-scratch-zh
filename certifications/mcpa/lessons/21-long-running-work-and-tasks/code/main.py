@@ -208,8 +208,12 @@ class Server:
                 pollIntervalMs=task.poll_interval_ms,
                 _meta=self._server_meta(),
             )
-        payload = self._pipeline_payload(project, environment, deployed=False)
-        return {"jsonrpc": "2.0", "id": request_id, "result": payload}
+        return make_error(
+            request_id,
+            MISSING_REQUIRED_CLIENT_CAPABILITY,
+            "Deployment requires a task and explicit approval",
+            {"requiredCapabilities": {"extensions": {TASKS_EXTENSION: {}}}},
+        )
 
     def _find_task(self, request_id: Any, params: dict, meta: dict) -> tuple[Task | None, dict | None]:
         if not (self._supports_tasks() and _client_declares_tasks(meta)):
