@@ -1,0 +1,78 @@
+{
+  "lesson": "06-hosts-clients-and-servers",
+  "title": "Host、客户端与服务端：MCP 的进程拓扑",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "一个 host 应用需要在同一会话中从三个不同的 MCP 服务端获取数据。为此，host 应创建多少个 MCP 客户端实例？",
+      "options": [
+        "两个客户端，因为一个客户端可以同时安全服务两个服务端",
+        "三个客户端，每个客户端与一个服务端保持专用连接",
+        "一个客户端，依次打开三条不同连接",
+        "零个，因为 host 进程不经过客户端层，直接与服务端通信"
+      ],
+      "correct": 1,
+      "explanation": "Host 为每条服务端连接嵌入一个客户端，因此连接三个服务端需要三个独立客户端实例，每个实例只绑定一个服务端。"
+    },
+    {
+      "stage": "check",
+      "question": "文件系统服务端作为本地子进程通过 stdio 启动，而计费服务端运行在另一家公司的基础设施上，通过 Streamable HTTP 访问。这一区别意味着什么？",
+      "options": [
+        "Streamable HTTP 服务端只能暴露 resources 和 prompts，不能暴露 tools",
+        "stdio 服务端必须使用 OAuth，而 HTTP 服务端从环境读取凭据",
+        "本地服务端跨越进程边界，远程服务端跨越网络边界",
+        "没有任何区别：无论使用哪种传输，MCP 消息形状都完全相同"
+      ],
+      "correct": 2,
+      "explanation": "本地 stdio 服务端是同一台机器上的独立进程，远程 Streamable HTTP 服务端则跨越网络边界；服务端的信任考量沿它实际跨越的边界划分。"
+    },
+    {
+      "stage": "check",
+      "question": "以下哪组对应关系正确匹配了 MCP 服务端原语及决定其何时使用的一方？",
+      "options": [
+        "Tools 由用户控制，resources 由模型控制，prompts 由应用驱动",
+        "Resources 由模型控制，prompts 由应用驱动，tools 由用户控制",
+        "三种原语都由服务端运营者在连接打开前选择",
+        "Tools 由模型控制，resources 由应用驱动，prompts 由用户控制"
+      ],
+      "correct": 3,
+      "explanation": "模型决定何时调用工具，host 应用决定哪些资源进入上下文，用户则明确选择要运行的 prompt。"
+    },
+    {
+      "stage": "check",
+      "question": "服务端希望通过客户端自身的模型访问能力按需执行语言模型补全，而不嵌入模型 SDK。哪个客户端功能用于此目的？它在 2026-07-28 中是什么状态？",
+      "options": [
+        "Sampling；已弃用，应迁移为直接调用 LLM 提供商 API",
+        "Elicitation；它是当前积极推荐用于此目的的机制",
+        "Logging；已弃用，应迁移到 stderr 或 OpenTelemetry",
+        "Roots；已弃用，应迁移为通过工具参数传递路径"
+      ],
+      "correct": 0,
+      "explanation": "Sampling 允许服务端请求客户端代为执行模型补全，但它在 2026-07-28 中已弃用，新实现应直接调用 LLM 提供商 API。"
+    },
+    {
+      "stage": "post",
+      "question": "两个独立开发的服务端在 server/discover 中都把 serverInfo.name 自报为“primary”，但聚合二者的 host 仍必须把工具调用路由到正确服务端。Host 应使用什么作为路由键？",
+      "options": [
+        "服务端在能力中声明的协议版本字符串",
+        "Host 建立连接时自行分配的连接标识",
+        "最先响应发现请求的服务端",
+        "服务端发现结果中自报的 serverInfo.name"
+      ],
+      "correct": 1,
+      "explanation": "serverInfo 由服务端自行报告，独立服务端之间不保证唯一，因此 host 必须按自己分配的连接标识路由，而不能使用服务端自称的名称。"
+    },
+    {
+      "stage": "post",
+      "question": "Host 连接了 files 服务端和 notes 服务端，两者都声明了一个名称恰好为 search 的工具。Host 构建聚合注册表后，应如何暴露第二个工具？",
+      "options": [
+        "把两者合并为一个同时查询两个服务端的 search 工具",
+        "静默覆盖第一个条目，只保留最新的 search",
+        "保留第一个 search 作为规范名称，并给第二个名称加服务端 id 前缀",
+        "完全丢弃第二个 search 工具，不让模型看到它"
+      ],
+      "correct": 2,
+      "explanation": "安全处理冲突的聚合器会保留第一个规范工具名，并将后续冲突项暴露为带服务端前缀的名称，例如 notes/search，让模型仍能通过不同名称访问两个工具。"
+    }
+  ]
+}
