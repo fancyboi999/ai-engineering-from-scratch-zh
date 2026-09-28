@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCPA 认证导师"
+  short_description: "AI 原生认证路线、实验与复习"
+  default_prompt: "使用 mcpa-certification 帮我备考 MCPA，并教我下一步。"
