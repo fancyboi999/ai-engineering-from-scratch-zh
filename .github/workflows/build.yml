@@ -27,6 +27,8 @@ on:
       - "scripts/audit_certifications.py"
       - "scripts/check_mcpa_wire.py"
       - "scripts/test_check_mcpa_wire.py"
+      - "scripts/audit_mcpa.py"
+      - "scripts/test_audit_mcpa.py"
       - "scripts/audit_lessons.py"
       - "scripts/test_audit_certifications.py"
       - "scripts/backfill_certification_references.py"
@@ -72,12 +74,17 @@ jobs:
         run: python3 scripts/test_audit_certifications.py
       - name: MCPA wire checker 回归
         run: python3 scripts/test_check_mcpa_wire.py
+      - name: MCPA 课程与认证题结构审计
+        run: |
+          if [ -f certifications/mcpa/program.json ]; then
+            python3 scripts/audit_mcpa.py
+          fi
+      - name: MCPA 审计回归
+        run: python3 scripts/test_audit_mcpa.py
       - name: MCPA 课程 transcript 协议校验
         run: |
-          if [ -d certifications/mcpa/lessons ]; then
+          if [ -f certifications/mcpa/program.json ]; then
             python3 scripts/check_mcpa_wire.py
-          else
-            echo "MCPA 课程源尚未合入，跳过 transcript 校验"
           fi
       - name: 认证补强引用完整性
         run: python3 scripts/backfill_certification_references.py --check
