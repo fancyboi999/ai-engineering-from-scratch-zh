@@ -1,0 +1,78 @@
+{
+  "lesson": "25-consent-and-least-privilege",
+  "title": "同意与最小权限",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "破坏性工具调用需要人工批准，server 才会运行。在 MCP 2026-07-28 中，server 如何请求批准？",
+      "options": [
+        "它通过仍保持打开的连接立即向 client 发送新的 server 发起请求",
+        "它返回携带 elicitation/create 请求的 input_required 结果，client 带答案重试",
+        "它以 JSON-RPC error 拒绝调用，直到用户执行独立批准步骤",
+        "它为此次批准创建全新的 Mcp-Session-Id，并在该 session 上等待"
+      ],
+      "correct": 1,
+      "explanation": "server 不会向 client push 请求；需要人工批准的 tools/call 返回 resultType input_required，其中包含 elicitation/create inputRequest，client 再使用 inputResponses 和新 id 重试来回答。"
+    },
+    {
+      "stage": "check",
+      "question": "client 首次为 MCP server 请求 access token，而 401 challenge 完全没有携带 scope 参数。client 应请求哪些 scope？",
+      "options": [
+        "由某位人工运营者完全手动为 client 选择一个管理员 scope",
+        "不请求任何 scope，等用户登录后由 server 分配默认工作集",
+        "若 WWW-Authenticate challenge 指定了 scope 就使用它，否则使用 scopes_supported 中的全部 scope",
+        "请求 authorization server 曾向任意 client 签发过的所有 scope，以节省一次往返"
+      ],
+      "correct": 2,
+      "explanation": "scope 选择策略是：challenge 提供 scope 时使用该值；省略时，回退到 scopes_supported 作为最小起始集合。"
+    },
+    {
+      "stage": "check",
+      "question": "client 已持有 scope 为 files:read 的 token。某工具调用收到 HTTP 403，error 为 insufficient_scope，scope 为 files:write。client 接下来应请求什么？",
+      "options": [
+        "只请求 files:write 并丢弃 files:read，因为 server 本次只要求新 scope",
+        "请求 server 定义过的所有 scope，避免未来再次触发 403",
+        "请求同一 session 中前一个工具调用碰巧已经使用的 scope",
+        "请求 files:read 与 files:write 的并集，避免重新授权时丢失原有授权"
+      ],
+      "correct": 3,
+      "explanation": "step-up authorization 计算先前获授 scope 与当前 challenge scope 的并集，因此针对单次操作的 scope challenge 不会悄悄丢失 client 已有权限。"
+    },
+    {
+      "stage": "check",
+      "question": "用户批准 server 上的 delete_file 工具。该次批准覆盖什么？",
+      "options": [
+        "只覆盖 delete_file 本身；同一 server 上的其他工具仍需分别批准",
+        "覆盖该工具的 destructiveHint 注解当前声称安全的任何操作，即使值之后变化",
+        "覆盖该 server 上的每个工具，因为用户从此已信任整个 server",
+        "覆盖未来所有 delete_file 调用，以及名称同样以 delete 开头的其他工具"
+      ],
+      "correct": 0,
+      "explanation": "同意限定到获授的精确工具名称，绝不扩大到 server、命名模式或分类。因此，第二个敏感工具始终需要独立明确批准。"
+    },
+    {
+      "stage": "post",
+      "question": "server 的 tools/call 返回 resultType input_required。client 对同一调用的下一次尝试必须如何构造？",
+      "options": [
+        "始终复用原 request id，让 server 匹配两次尝试",
+        "使用新 request id，包含 inputResponses，并逐字节原样回传 requestState",
+        "等待 server push 后续请求，而不是自行重试",
+        "与 server 建立全新连接，让 retry 从干净 session 开始"
+      ],
+      "correct": 1,
+      "explanation": "multi round-trip retry 始终使用新的 JSON-RPC id，把答案按 server 使用的相同 key 放入 inputResponses，并在 server 提供 requestState 时逐字节原样回传。"
+    },
+    {
+      "stage": "post",
+      "question": "调用方 token 只有 payments:read。server 还公开受 payments:write 门控的 send_payment 工具。tools/list 应向该调用方返回什么？",
+      "options": [
+        "error 结果，因为 client 未持有 server 定义的全部 scope 时绝不应调用 tools/list",
+        "完整工具列表，但将 send_payment 标为 isError，提醒模型不要调用",
+        "省略 send_payment 的工具列表，因为结果可随请求中的授权变化",
+        "包含 send_payment 的完整工具列表，因为 tools/list 绝不能因调用方不同而变化"
+      ],
+      "correct": 2,
+      "explanation": "最小权限同样适用于列表结果：tools/list 不能因无关请求的副作用而改变，但可以按所提交的授权变化，因此调用方只看到当前 scope 实际允许的工具。"
+    }
+  ]
+}
