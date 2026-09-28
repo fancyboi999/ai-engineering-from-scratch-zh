@@ -1,0 +1,78 @@
+{
+  "lesson": "07-discovery-and-capability-negotiation",
+  "title": "发现服务端并协商其能力",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "客户端希望在发送其他内容前，通过一次往返取得服务端身份、支持的协议版本和能力。哪个请求能同时提供这三项信息？",
+      "options": [
+        "resources/list，它返回服务端可读取的资源及其 URI",
+        "server/discover，它同时返回支持版本、能力和身份",
+        "prompts/list，它返回用户可选择的可复用模板",
+        "initialize 握手，每条连接都会在任何请求前完成它"
+      ],
+      "correct": 1,
+      "explanation": "server/discover 正是为此设计的单一请求：其 DiscoverResult 同时携带 supportedVersions、capabilities 和服务端自报身份；2026-07-28 已彻底移除 initialize 握手。"
+    },
+    {
+      "stage": "check",
+      "question": "关于 server/discover 必须何时实现、必须何时调用，哪项说法正确？",
+      "options": [
+        "双方都不必支持，因为它只是实验性工具",
+        "客户端必须在其他请求前调用，服务端则可不实现",
+        "服务端必须实现，客户端可以调用，也可以完全跳过",
+        "双方都必须实现，并在每条连接上恰好调用一次"
+      ],
+      "correct": 2,
+      "explanation": "规范要求每个服务端实现 server/discover，但客户端可以选择是否调用；客户端可直接发送任意请求，并在返回版本错误时处理。"
+    },
+    {
+      "stage": "check",
+      "question": "一条 tools/call 请求未在 clientCapabilities 中声明 elicitation，但被调用工具需要在执行途中提出后续问题。符合规范的服务端应怎么做？",
+      "options": [
+        "继续执行并静默跳过后续问题，以保持速度",
+        "返回 tools/call 错误 -32602，因为参数不符合输入 schema",
+        "将调用排队，等待客户端重新连接并启用 elicitation",
+        "返回错误码 -32021 的 MissingRequiredClientCapabilityError，明确指出请求缺少的能力"
+      ],
+      "correct": 3,
+      "explanation": "服务端绝不能依赖客户端未在当前请求中声明的能力，因此会返回 -32021，并在 data.requiredCapabilities 中明确指出客户端重试前需要声明的内容。"
+    },
+    {
+      "stage": "check",
+      "question": "客户端发送请求时指定了一个旧协议版本，但服务端的 supportedVersions 列表不包含它。客户端接下来应该怎么做？",
+      "options": [
+        "从错误 data 中选择一个版本，重试同一请求",
+        "把服务端视为不可达，并停止发送后续请求",
+        "回退到早期修订版的 initialize 握手",
+        "原样重发同一请求，因为服务端会自动重试"
+      ],
+      "correct": 0,
+      "explanation": "UnsupportedProtocolVersionError 会携带 data.supported 和 data.requested；客户端应使用新的 id 和 data.supported 中的版本重试，而不能假设服务端属于旧版或不可达。"
+    },
+    {
+      "stage": "post",
+      "question": "客户端发现某个服务端提供 tools 并支持 listChanged 通知，随后发送 tools/call 请求。服务端处理这次调用时可以依赖哪些能力？",
+      "options": [
+        "客户端至今声明过的所有 clientCapabilities 的并集",
+        "只依赖当前请求自身 _meta 中的 clientCapabilities，并重新检查",
+        "依赖服务端此前在自身 DiscoverResult 中公布的任何能力",
+        "依赖客户端第一次请求时声明的任何能力"
+      ],
+      "correct": 1,
+      "explanation": "即使请求来自同一条连接，服务端也绝不能从之前请求推断能力，因此只能依赖当前正在处理的请求 _meta 中声明的 clientCapabilities。"
+    },
+    {
+      "stage": "post",
+      "question": "DiscoverResult 的 _meta 通过 io.modelcontextprotocol/serverInfo 携带服务端自报的名称和版本。该字段适合用于什么？",
+      "options": [
+        "选择客户端要向授权服务端申请的 OAuth scope",
+        "决定是否向服务端授予更高工具权限",
+        "用于显示、日志和调试，绝不用于安全或授权决策",
+        "在客户端发送首个实际请求前验证服务端身份"
+      ],
+      "correct": 2,
+      "explanation": "serverInfo 由服务端自行报告，协议不会验证，因此规范要求它只能用于显示、日志和调试，绝不能用于安全或授权决策。"
+    }
+  ]
+}
