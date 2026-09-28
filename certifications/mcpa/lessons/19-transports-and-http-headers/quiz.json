@@ -1,0 +1,78 @@
+{
+  "lesson": "19-transports-and-http-headers",
+  "title": "传输方式与 HTTP Header 契约",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "团队在争论 Streamable HTTP 和 stdio 是否需要不同的 MCP 消息格式。2026-07-28 规范如何规定？",
+      "options": [
+        "只有 Streamable HTTP 请求携带协议版本和能力；stdio 请求不携带",
+        "Streamable HTTP 要求使用比 stdio 传输更新的 JSON-RPC 版本",
+        "每种传输 binding 都定义一套私有方法和结果类型",
+        "消息语义处处相同；只有 framing 和元数据传递方式不同"
+      ],
+      "correct": 3,
+      "explanation": "所有传输上的协议语义完全一致；stdio 与 Streamable HTTP 的区别只在消息如何 framing，以及协议版本、能力等元数据如何随消息传递。"
+    },
+    {
+      "stage": "check",
+      "question": "gateway 转发了一条 tools/call 请求，其中 MCP-Protocol-Version header 与请求体 _meta 携带的协议版本不一致。服务器必须怎么做？",
+      "options": [
+        "使用 HTTP 400 和 HeaderMismatch JSON-RPC 错误拒绝",
+        "为请求生成新的 Mcp-Session-Id 并继续正常处理",
+        "使用 UnsupportedProtocolVersionError 拒绝，并列出支持的版本",
+        "信任 header 值并继续正常处理请求"
+      ],
+      "correct": 0,
+      "explanation": "MCP-Protocol-Version header 必须等于请求体 _meta 中的协议版本；两者不一致时，服务器使用 HTTP 400 和 HeaderMismatch（-32020）JSON-RPC 错误拒绝请求。"
+    },
+    {
+      "stage": "check",
+      "question": "工具 inputSchema 将 region 参数的 x-mcp-header 设为 Region，而调用参数 region 是纯 ASCII 值 us-west1。Mcp-Param-Region header 必须包含什么？",
+      "options": [
+        "完全不包含值，因为 x-mcp-header 只适用于 Mcp-Name header",
+        "原样使用 us-west1，因为它无需 base64 sentinel 编码",
+        "使用 base64 编码后的值，因为每个镜像参数 header 都要编码",
+        "使用 URL 转义进行百分号编码，而不是 base64 sentinel 格式"
+      ],
+      "correct": 1,
+      "explanation": "只有不能安全表示为纯 ASCII 的 header 值才使用 base64 sentinel，例如非 ASCII 字符、控制字符、首尾空白或与 sentinel 模式相同的值；us-west1 这样的普通值原样镜像。"
+    },
+    {
+      "stage": "check",
+      "question": "Streamable HTTP 服务器收到一个 POST，其中 Origin header 不匹配任何允许的 origin。规范要求怎么处理？",
+      "options": [
+        "改为返回 401 Unauthorized，因为 Origin 被视为身份认证证明",
+        "记录不匹配，但照常处理请求",
+        "返回 403 Forbidden，因为此检查用于防御 DNS rebinding 攻击",
+        "只要请求还携带有效 bearer token 就接受"
+      ],
+      "correct": 2,
+      "explanation": "Streamable HTTP 服务器验证每条连接的 Origin header 以防 DNS rebinding；header 存在但不受允许时返回 403 Forbidden。Origin 验证是身份认证之外的防御，不是其替代品。"
+    },
+    {
+      "stage": "post",
+      "question": "客户端向 MCP endpoint 发送 HTTP GET，希望打开旧版独立 event stream。现代 2026-07-28 服务器如何响应？",
+      "options": [
+        "返回 404 Not Found，因为 GET 从未属于任何 MCP 传输",
+        "照旧打开 SSE stream 并发送 endpoint event",
+        "生成新的 Mcp-Session-Id 并据此启动新 session",
+        "返回 405 Method Not Allowed，因为现代 endpoint 只接受 POST"
+      ],
+      "correct": 3,
+      "explanation": "2026-07-28 Streamable HTTP 删除了独立 GET stream 和协议 session；现代服务器对 MCP endpoint 的 GET 或 DELETE 返回 405 Method Not Allowed，不会打开已弃用的 HTTP+SSE event stream。"
+    },
+    {
+      "stage": "post",
+      "question": "为什么接受 notification 的 POST 返回无响应体的 202 Accepted，而不是 JSON-RPC result？",
+      "options": [
+        "因为 notification 从不获得 JSON-RPC reply；传输层只确认已投递",
+        "因为 notification 总会验证失败，所以服务器没有有用内容可返回",
+        "因为 202 本身就携带 resultType 为 accepted 的 JSON-RPC result",
+        "因为客户端只靠 Mcp-Method header 就已得知结果"
+      ],
+      "correct": 0,
+      "explanation": "notification 没有 id，也从不接收 JSON-RPC response；传输层改用无响应体的 HTTP 202 Accepted 确认投递。这属于传输层结果，并非携带 resultType 的 JSON-RPC result。"
+    }
+  ]
+}
