@@ -190,6 +190,8 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
     pending: dict[Any, dict[str, Any]] = {}
     negative_example_ids: set[Any] = set()
     issued_state: dict[tuple[str, str], tuple[Any, Any]] = {}
+    negotiated_versions: set[str] = set()
+    unsupported_requests: dict[Any, tuple[str, int]] = {}
     for index, entry in enumerate(entries):
         message, wrapper = unwrap(entry)
         where = f"{lesson} transcript[{index}]"
@@ -219,6 +221,10 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                 report.add(where, f"request id {message.get('id')!r} reuses an id that is still awaiting a response")
             check_request(report, where, message, wrapper)
             params = message.get("params") if isinstance(message.get("params"), dict) else {}
+            version = (params.get("_meta") or {}).get(PV_KEY) if isinstance(params.get("_meta"), dict) else None
+            if version != PROTOCOL_VERSION and version not in negotiated_versions:
+                unsupported_requests[message.get("id")] = (where, index)
+            negotiated_versions.discard(version)
             target = str(params.get("name") or params.get("uri") or "")
             key = (str(message.get("method")), target)
             if message.get("method") != "tasks/update" and ("inputResponses" in params or "requestState" in params):
@@ -253,6 +259,8 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             request = pending.pop(message.get("id"), None)
             if request is None:
                 report.add(where, f"result id {message.get('id')!r} does not answer any pending request")
+            if message.get("id") in unsupported_requests:
+                report.add(unsupported_requests.pop(message["id"])[0], f"request protocol version must be {PROTOCOL_VERSION} or a previously negotiated supported version")
             check_result(report, where, message, request, allowed_types)
             result = message.get("result") if isinstance(message.get("result"), dict) else {}
             if request is not None and result.get("resultType") == "input_required":
@@ -260,9 +268,19 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                 target = str(params.get("name") or params.get("uri") or "")
                 issued_state[(str(request.get("method")), target)] = (request.get("id"), result.get("requestState"))
         elif kind == "error":
-            if message.get("id") is not None and pending.pop(message.get("id"), None) is None:
+            request = pending.pop(message.get("id"), None)
+            if message.get("id") is not None and request is None:
                 report.add(where, f"error id {message.get('id')!r} does not answer any pending request")
-            check_error(report, where, message.get("error"))
+            error = message.get("error")
+            if message.get("id") in unsupported_requests:
+                if not isinstance(error, dict) or error.get("code") != -32022:
+                    report.add(unsupported_requests[message["id"]][0], f"request protocol version must be {PROTOCOL_VERSION} or a previously negotiated supported version")
+                unsupported_requests.pop(message["id"])
+            if request and request.get("method") == "server/discover" and isinstance(error, dict) and error.get("code") == -32022:
+                data = error.get("data")
+                if isinstance(data, dict) and isinstance(data.get("supported"), list):
+                    negotiated_versions.update(version for version in data["supported"] if isinstance(version, str))
+            check_error(report, where, error)
     for request_id in pending:
         if request_id not in negative_example_ids:
             report.add(lesson, f"request id {request_id!r} has no response in transcript")

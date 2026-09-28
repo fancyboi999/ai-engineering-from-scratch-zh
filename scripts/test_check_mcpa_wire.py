@@ -56,6 +56,19 @@ class ModernExchangeTests(unittest.TestCase):
         entries = [{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}]
         self.assertTrue(any("_meta" in item for item in findings(entries)))
 
+    def test_wrong_protocol_version_is_rejected_with_or_without_matching_http_header(self):
+        bad = request(1, "tools/list")
+        bad["params"]["_meta"] = {**META, "io.modelcontextprotocol/protocolVersion": "2025-11-25"}
+        self.assertTrue(any("protocol version must be" in item for item in findings([bad, result(1, resultType="complete", tools=[], ttlMs=0, cacheScope="public")])))
+        wrapped = {"message": bad, "http": {"headers": {"MCP-Protocol-Version": "2025-11-25", "Mcp-Method": "tools/list"}}}
+        self.assertTrue(any("protocol version must be" in item for item in findings([wrapped, result(1, resultType="complete", tools=[], ttlMs=0, cacheScope="public")])))
+
+    def test_supported_version_after_server_discover_error_is_allowed(self):
+        retry = request(2, "server/discover")
+        retry["params"]["_meta"] = {**META, "io.modelcontextprotocol/protocolVersion": "2026-11-18"}
+        entries = [request(1, "server/discover"), error(1, -32022, {"supported": ["2026-11-18"], "requested": "2026-07-28"}), retry, result(2, resultType="complete", supportedVersions=["2026-11-18"], capabilities={}, ttlMs=0, cacheScope="public")]
+        self.assertEqual(findings(entries), [])
+
     def test_result_without_result_type_is_flagged(self):
         entries = [request(1, "tools/call", name="x", arguments={}), result(1, content=[])]
         self.assertTrue(any("resultType" in item for item in findings(entries)))
