@@ -213,7 +213,7 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             params = message.get("params") if isinstance(message.get("params"), dict) else {}
             target = str(params.get("name") or params.get("uri") or "")
             key = (str(message.get("method")), target)
-            if "inputResponses" in params or "requestState" in params:
+            if message.get("method") != "tasks/update" and ("inputResponses" in params or "requestState" in params):
                 prior = issued_state.get(key)
                 if prior is None:
                     report.add(where, "an MRTR retry requires a prior input_required result")
@@ -228,6 +228,12 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             pending[message.get("id")] = message
         elif kind == "notification":
             method = message.get("method")
+            if method == "notifications/cancelled":
+                params = message.get("params") if isinstance(message.get("params"), dict) else {}
+                request_id = params.get("requestId")
+                request = pending.get(request_id)
+                if request is not None and request.get("method") == "subscriptions/listen":
+                    pending.pop(request_id)
             if method in LEGACY_METHODS:
                 report.add(where, f"{method!r} does not exist in {PROTOCOL_VERSION}")
             if method in STREAM_NOTIFICATIONS:

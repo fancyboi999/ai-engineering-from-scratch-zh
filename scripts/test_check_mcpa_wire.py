@@ -129,6 +129,13 @@ class MultiRoundTripTests(unittest.TestCase):
                 entries = [request(1, "tools/call", name="deploy", arguments={}, **fields), result(1, resultType="complete", content=[])]
                 self.assertTrue(any("prior input_required" in item for item in findings(entries)))
 
+    def test_task_update_input_responses_are_not_mrtr_retries(self):
+        entries = [
+            request(1, "tasks/update", taskId="t-1", inputResponses={"approve": {"action": "accept"}}),
+            result(1, resultType="complete", status="working"),
+        ]
+        self.assertEqual(findings(entries), [])
+
     def test_input_required_only_on_supported_methods(self):
         entries = [request(1, "tools/list"), self.input_required(1)]
         self.assertTrue(any("may not return input_required" in item for item in findings(entries)))
@@ -154,6 +161,17 @@ class StreamAndHeaderTests(unittest.TestCase):
         messages = findings([bad, result(1, resultType="complete", content=[])])
         self.assertTrue(any("MCP-Protocol-Version" in item for item in messages))
         self.assertTrue(any("Mcp-Name" in item for item in messages))
+
+    def test_cancelled_subscription_may_end_without_final_result(self):
+        entries = [
+            request(2, "subscriptions/listen", notifications={"resourceSubscriptions": ["file:///x"]}),
+            {"jsonrpc": "2.0", "method": "notifications/cancelled", "params": {"requestId": 2}},
+        ]
+        self.assertEqual(findings(entries), [])
+        self.assertTrue(any("no response" in item for item in findings(entries[:1])))
+        self.assertTrue(any("no response" in item for item in findings([
+            request(2, "tools/call", name="x", arguments={}), entries[1]
+        ])))
 
     def test_unanswered_request_and_orphan_error_are_flagged(self):
         self.assertTrue(any("no response" in item for item in findings([request(1, "tools/call", name="x", arguments={})])))
