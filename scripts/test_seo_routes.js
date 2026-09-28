@@ -106,6 +106,49 @@ function makeAssets() {
   };
 }
 
+function withSecondProgram(assets) {
+  assets.lesson.manifest.certificationTrackIds.push('mcpa-example');
+  assets.lesson.manifest.lessons['certifications/mcpa/lessons/01-discovery'] = {
+    path: 'certifications/mcpa/lessons/01-discovery',
+    title: 'MCP 发现决策',
+    seoTitle: 'MCP 发现决策 - AI Engineering from Scratch',
+    description: '在每次请求中协商协议能力，而不是依赖一次性的会话初始化。',
+    excerpt: '一节讲解无状态发现与能力协商的认证课程。',
+    context: {
+      kind: 'certification',
+      programName: '独立 MCPA 认证备考',
+      trackIds: ['mcpa-example'],
+    },
+    previous: null,
+    next: null,
+    navigationByTrack: {
+      'mcpa-example': {
+        previous: null,
+        next: { path: 'certifications/mcpa/lessons/02-tools', title: 'Tool 合约' },
+      },
+    },
+    learningPathIds: [],
+    fromTrackIds: [],
+    sourceUrl: 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/certifications/mcpa/lessons/01-discovery',
+    canonicalUrl: 'https://aieng-zh.cn/lesson?path=certifications%2Fmcpa%2Flessons%2F01-discovery',
+  };
+  assets.certification.manifest.tracks['mcpa-example'] = {
+    id: 'mcpa-example',
+    slug: 'mcpa-example',
+    examCode: 'MCPA',
+    title: 'MCP 协议示例路线',
+    seoTitle: 'MCP 协议示例路线 - AI Engineering from Scratch',
+    description: '通过协议实现决策进行独立备考。',
+    excerpt: '从协议蓝图知识域走向可运行的 host、client 与 server。',
+    canonicalUrl: 'https://aieng-zh.cn/certification?id=mcpa-example',
+    lessons: [
+      { path: 'certifications/mcpa/lessons/01-discovery', title: 'MCP 发现决策' },
+      { path: 'phases/13-tools-and-protocols/06-mcp-fundamentals', title: 'MCP 基础' },
+    ],
+  };
+  return assets;
+}
+
 function invoke(handler, req) {
   const response = { statusCode: 200, headers: {}, body: undefined };
   const res = {
@@ -173,6 +216,20 @@ test('lesson route keeps certification navigation inside the selected track', fu
   assert.match(response.body, /path=certifications%2Fclaude%2Flessons%2F02-tools&amp;track=claude-example/);
   assert.doesNotMatch(response.body, /path=phases%2F14-agent-engineering%2F01-the-agent-loop/);
   assert.doesNotMatch(response.body, /canonical"[^>]+track=/);
+});
+
+test('lesson route serves every certification program and keeps its track navigation', function () {
+  const assets = withSecondProgram(makeAssets());
+  const handler = lessonApi.createHandler({ loadAssets: function () { return assets.lesson; } });
+  const response = invoke(handler, {
+    method: 'GET',
+    url: '/lesson?path=certifications%2Fmcpa%2Flessons%2F01-discovery&track=mcpa-example',
+    query: { path: 'certifications/mcpa/lessons/01-discovery', track: 'mcpa-example' },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /rel="canonical" href="https:\/\/aieng-zh\.cn\/lesson\?path=certifications%2Fmcpa%2Flessons%2F01-discovery"/);
+  assert.match(response.body, /path=certifications%2Fmcpa%2Flessons%2F02-tools&amp;track=mcpa-example/);
 });
 
 test('lesson route disambiguates duplicate H1 values across pages', function () {
@@ -412,6 +469,21 @@ test('certification route renders a crawlable track with an id-only canonical', 
   assert.match(response.body, /"@type":"CollectionPage"/);
   assert.match(response.body, /path=certifications%2Fclaude%2Flessons%2F01-models&amp;track=claude-example/);
   assert.match(response.body, /path=phases%2F14-agent-engineering%2F01-the-agent-loop&amp;fromTrack=claude-example/);
+});
+
+test('certification route renders tracks from a second certification program', function () {
+  const assets = withSecondProgram(makeAssets());
+  const handler = certificationApi.createHandler({ loadAssets: function () { return assets.certification; } });
+  const response = invoke(handler, {
+    method: 'GET',
+    url: '/certification?id=mcpa-example',
+    query: { id: 'mcpa-example' },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /rel="canonical" href="https:\/\/aieng-zh\.cn\/certification\?id=mcpa-example"/);
+  assert.match(response.body, /path=certifications%2Fmcpa%2Flessons%2F01-discovery&amp;track=mcpa-example/);
+  assert.match(response.body, /path=phases%2F13-tools-and-protocols%2F06-mcp-fundamentals&amp;fromTrack=mcpa-example/);
 });
 
 test('certification route strips unknown query parameters before serving cached HTML', function () {

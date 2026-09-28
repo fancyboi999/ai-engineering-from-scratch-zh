@@ -88,10 +88,12 @@ const FIGURE_PROVIDER_ORDER = [
   'figures-autoswarm5.js',
   'figures-infra4.js',
   'figures-claude-certifications.js',
+  'figures-mcpa-certifications.js',
 ];
 
 // fork 部署可通过环境变量覆盖；默认始终指向中文站。
 const GITHUB_BASE = process.env.GITHUB_BASE || 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/';
+const GITHUB_BLOB_BASE = process.env.GITHUB_BLOB_BASE || 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/';
 const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://aieng-zh.cn';
 
 // 浏览器与构建时共用同一份 Markdown 渲染器。
@@ -996,9 +998,11 @@ function buildSeoManifests(phases, certifications, learningPaths = []) {
     courseEntries[index].next = lessonLink(courseEntries[index + 1]);
   }
 
+  const programsById = new Map((certifications.programs || []).map(program => [program.id, program]));
   const certificationEntries = [];
   const certificationEntryByPath = new Map();
   for (const lesson of Object.values(certifications.lessonsByPath || {}).sort((a, b) => a.path.localeCompare(b.path))) {
+    const program = programsById.get(lesson.programId) || {};
     const docSeoResult = lessonDocumentSeo(lesson.markdown, lesson.name);
     const { sourceWordCount, descriptionSourceLength, ...docSeo } = docSeoResult;
     if (sourceWordCount >= 180 && wordCount(docSeo.excerpt) < 180) {
@@ -1012,8 +1016,8 @@ function buildSeoManifests(phases, certifications, learningPaths = []) {
       ...docSeo,
       context: {
         kind: 'certification',
-        programId: certifications.program && certifications.program.id || '',
-        programName: certifications.program && certifications.program.name || '',
+        programId: program.id || '',
+        programName: program.name || '',
         trackIds: Array.isArray(lesson.trackIds) ? lesson.trackIds.slice() : [],
         type: lesson.type || '',
         languages: lesson.languages || '',
@@ -1091,14 +1095,14 @@ function buildSeoManifests(phases, certifications, learningPaths = []) {
       description,
       excerpt,
       canonicalUrl: canonicalCertificationUrl(track.id),
-      sourceUrl: githubSourceUrl(`certifications/claude/tracks/${track.slug}.json`, 'blob'),
+      sourceUrl: githubSourceUrl(track.sourcePath, 'blob'),
       lessons: trackLessons,
     };
   }
   const certificationManifest = { version: SEO_MANIFEST_VERSION, tracks };
 
   const readableDocs = collectMarkdownFiles(path.join(REPO_ROOT, 'phases'), [])
-    .concat(collectMarkdownFiles(path.join(REPO_ROOT, 'certifications', 'claude', 'lessons'), []))
+    .concat(certificationProgramDirs().flatMap(dir => collectMarkdownFiles(path.join(dir, 'lessons'), [])))
     .filter(file => file.endsWith(`${path.sep}docs${path.sep}zh.md`))
     .map(file => path.relative(REPO_ROOT, path.dirname(path.dirname(file))).split(path.sep).join('/'))
     .sort();
@@ -1176,18 +1180,45 @@ function renderCatalogDiscovery(phases, lessonManifest) {
   return rows.join('\n');
 }
 
+function renderCertificationTrackDiscovery(track, certificationManifest) {
+  const seo = certificationManifest.tracks[track.id];
+  if (!seo) return '';
+  const links = seo.lessons.map(lesson =>
+    `                <li><a href="${htmlEscape(lessonHref(lesson.path))}">${htmlEscape(lesson.title)}</a></li>`
+  ).join('\n');
+  return `            <article class="cert-track-card" data-generated-discovery="certification">\n` +
+    `              <h3><a href="${htmlEscape(certificationHref(track.id))}">${htmlEscape(seo.title)}</a></h3>\n` +
+    `              <p>${htmlEscape(seo.description)}</p>\n` +
+    `              <ul aria-label="${htmlEscape(seo.title)}课程">\n${links}\n              </ul>\n` +
+    `            </article>`;
+}
+
+function renderCertificationProgramLinks(program) {
+  const label = program.shortName || program.name || program.id;
+  const links = [];
+  if (program.learnerGuidePath) {
+    links.push(`<a class="cert-action secondary" href="${htmlEscape(GITHUB_BLOB_BASE + program.learnerGuidePath)}" target="_blank" rel="noopener" aria-label="${htmlEscape(`在 GitHub 上跟随 ${label} AI 导师学习（新标签页）`)}">跟随 AI 导师学习</a>`);
+  }
+  if (program.tutorSkillPath) {
+    links.push(`<a class="cert-action secondary" href="${htmlEscape(GITHUB_BLOB_BASE + program.tutorSkillPath)}" target="_blank" rel="noopener" aria-label="${htmlEscape(`在 GitHub 上阅读 ${label} 导师 Skill（新标签页）`)}">阅读导师 Skill</a>`);
+  }
+  return links.length ? `          <div class="cert-track-hero-actions cert-program-actions">${links.join('')}</div>\n` : '';
+}
+
 function renderCertificationDiscovery(certifications, certificationManifest) {
-  return (certifications.tracks || []).map(track => {
-    const seo = certificationManifest.tracks[track.id];
-    if (!seo) return '';
-    const links = seo.lessons.map(lesson =>
-      `              <li><a href="${htmlEscape(lessonHref(lesson.path))}">${htmlEscape(lesson.title)}</a></li>`
-    ).join('\n');
-    return `        <article class="cert-track-card" data-generated-discovery="certification">\n` +
-      `          <h3><a href="${htmlEscape(certificationHref(track.id))}">${htmlEscape(seo.title)}</a></h3>\n` +
-      `          <p>${htmlEscape(seo.description)}</p>\n` +
-      `          <ul aria-label="${htmlEscape(seo.title)}课程">\n${links}\n          </ul>\n` +
-      `        </article>`;
+  return (certifications.programs || []).map(program => {
+    const cards = (certifications.tracks || [])
+      .filter(track => track.programId === program.id)
+      .map(track => renderCertificationTrackDiscovery(track, certificationManifest))
+      .filter(Boolean)
+      .join('\n');
+    if (!cards) return '';
+    const headingId = `certProgram-${program.id}`;
+    return `        <section class="cert-container cert-section cert-program-section" data-generated-discovery="certification-program" aria-labelledby="${htmlEscape(headingId)}">\n` +
+      `          <div class="cert-section-heading"><div><div class="cert-eyebrow">${htmlEscape(program.provider || '认证项目')}</div><h2 id="${htmlEscape(headingId)}">${htmlEscape(program.name || program.id)}</h2></div><p>${htmlEscape(program.summary || '')}</p></div>\n` +
+      renderCertificationProgramLinks(program) +
+      `          <div class="cert-track-grid">\n${cards}\n          </div>\n` +
+      `        </section>`;
   }).filter(Boolean).join('\n');
 }
 
@@ -1388,25 +1419,60 @@ function certificationLessonFiles(lessonDir, lessonRelPath, folderName) {
   });
 }
 
-function parseCertifications() {
-  const empty = { program: null, tracks: [], lessonsByPath: {}, assessmentsById: {} };
-  if (!fs.existsSync(CERTIFICATIONS_PATH)) return empty;
-
-  const programDirs = fs.readdirSync(CERTIFICATIONS_PATH, { withFileTypes: true })
+function certificationProgramDirs() {
+  if (!fs.existsSync(CERTIFICATIONS_PATH)) return [];
+  return fs.readdirSync(CERTIFICATIONS_PATH, { withFileTypes: true })
     .filter(entry => entry.isDirectory())
     .map(entry => path.join(CERTIFICATIONS_PATH, entry.name))
-    .filter(dir => fs.existsSync(path.join(dir, 'program.json')))
+    .filter(dir => safeRepoFile('program.json', dir))
     .sort();
-  if (!programDirs.length) return empty;
+}
 
-  // The site currently presents one certification program. Keep the generated
-  // shape program-oriented so another provider can be added without touching
-  // PHASES or changing reader behavior.
-  const programDir = programDirs[0];
+function repoRelativePath(filePath) {
+  return path.relative(REPO_ROOT, filePath).split(path.sep).join('/');
+}
+
+function existingRepoFile(relPath) {
+  return safeRepoFile(relPath, REPO_ROOT) ? relPath : '';
+}
+
+function parseCertifications() {
+  const merged = { programs: [], tracks: [], lessonsByPath: {}, assessmentsById: {} };
+  for (const programDir of certificationProgramDirs()) {
+    const parsed = parseCertificationProgram(programDir);
+    if (merged.programs.some(program => program.id === parsed.program.id)) {
+      throw new Error(`Duplicate certification program id: ${parsed.program.id}`);
+    }
+    for (const track of parsed.tracks) {
+      if (merged.tracks.some(existing => existing.id === track.id)) {
+        throw new Error(`Duplicate certification track id across programs: ${track.id}`);
+      }
+    }
+    for (const lessonPathValue of Object.keys(parsed.lessonsByPath)) {
+      if (merged.lessonsByPath[lessonPathValue]) {
+        throw new Error(`Duplicate certification lesson path across programs: ${lessonPathValue}`);
+      }
+    }
+    for (const id of Object.keys(parsed.assessmentsById)) {
+      if (merged.assessmentsById[id]) throw new Error(`Duplicate certification assessment id across programs: ${id}`);
+    }
+    merged.programs.push(parsed.program);
+    merged.tracks.push(...parsed.tracks);
+    Object.assign(merged.lessonsByPath, parsed.lessonsByPath);
+    Object.assign(merged.assessmentsById, parsed.assessmentsById);
+  }
+  return merged;
+}
+
+function parseCertificationProgram(programDir) {
   const programPath = safeRepoFile('program.json', programDir);
   if (!programPath) throw new Error('Unsafe certification program path');
   const program = readJson(programPath, 'certification program');
   const programSlug = program.slug || program.id || path.basename(programDir);
+  const programKey = path.basename(programDir);
+  program.directory = repoRelativePath(programDir);
+  program.learnerGuidePath = existingRepoFile(`${program.directory}/GETTING_STARTED.md`);
+  program.tutorSkillPath = existingRepoFile(`skills/${programKey}-certification/SKILL.md`);
   const tracksDir = safeRepoDirectory('tracks', programDir);
   const trackFiles = tracksDir
     ? fs.readdirSync(tracksDir).filter(file => file.endsWith('.json') && safeRepoFile(file, tracksDir)).sort()
@@ -1415,6 +1481,8 @@ function parseCertifications() {
     const track = readJson(safeRepoFile(file, tracksDir), `certification track ${file}`);
     track.id = track.id || `${programSlug}-${track.slug || path.basename(file, '.json')}`;
     track.slug = track.slug || path.basename(file, '.json');
+    track.programId = program.id;
+    track.sourcePath = repoRelativePath(path.join(tracksDir, file));
     track.lessons = Array.isArray(track.lessons)
       ? track.lessons.map(normalizeLessonRef).filter(Boolean)
       : [];
@@ -1454,6 +1522,7 @@ function parseCertifications() {
       lessonsByPath[relPath] = {
         path: relPath,
         slug: entry.name,
+        programId: program.id,
         name: meta.name,
         summary: meta.summary,
         keywords: meta.keywords,
@@ -1506,6 +1575,7 @@ function parseCertifications() {
         ...data,
         ...normalized,
         id,
+        programId: program.id,
         track: normalized.track || data.track || track.id,
         kind: normalized.kind || data.kind || 'practice',
         title: normalized.title || data.title || 'Practice assessment',
@@ -2180,7 +2250,7 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths) {
     { loc: '/openapi.json', priority: '0.3', freq: 'monthly' },
   ];
   if (glossaryCount > 0) urls.push({ loc: '/glossary.html', priority: '0.6', freq: 'monthly' });
-  if (certifications && certifications.program) {
+  if (certifications && certifications.programs && certifications.programs.length) {
     urls.push({ loc: '/certifications.html', priority: '0.9', freq: 'weekly' });
     for (const track of certifications.tracks) {
       urls.push({ loc: '/certification?id=' + encodeURIComponent(track.id), priority: '0.8', freq: 'monthly' });
@@ -2239,11 +2309,13 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
   if (glossaryCount > 0) out += `- [术语表](${SITE_ORIGIN}/glossary.html) — ${glossaryCount} 个术语的通俗定义\n`;
   out += `- [开发者资源](${SITE_ORIGIN}/developer.html) — 机器可读入口和内容协商说明\n`;
   out += `- [OpenAPI 描述](${SITE_ORIGIN}/openapi.json) — 公开只读资源接口\n`;
-  if (certifications && certifications.program) {
-    out += `\n## Claude 认证备考\n`;
-    out += `这是独立、开源的练习材料，不隶属于 Anthropic，练习得分不是官方考试分数，完成课程也不保证通过认证。\n\n`;
-    out += `- [Claude 认证学习指南](${rawOrigin}/certifications/claude/GETTING_STARTED.md)\n`;
-    out += `- [Claude 认证导师契约](${rawOrigin}/skills/claude-certification/SKILL.md)\n`;
+  if (certifications && certifications.programs && certifications.programs.length) {
+    out += `\n## 认证备考\n`;
+    out += `这是独立、开源的练习材料，不隶属于任何认证提供方，练习得分不是官方考试分数，完成课程也不保证通过认证。\n\n`;
+    for (const program of certifications.programs) {
+      if (program.learnerGuidePath) out += `- [${program.name} 学习指南](${rawOrigin}/${program.learnerGuidePath})\n`;
+      if (program.tutorSkillPath) out += `- [${program.name} 导师契约](${rawOrigin}/${program.tutorSkillPath})\n`;
+    }
     out += `- [认证课程表](${SITE_ORIGIN}/certifications.html)\n`;
     for (const track of certifications.tracks) {
       out += `- [${track.credential || track.shortName || track.id}](${SITE_ORIGIN}/certification?id=${encodeURIComponent(track.id)})`;

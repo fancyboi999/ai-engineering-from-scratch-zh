@@ -25,6 +25,8 @@ on:
       - "skills/**"
       - ".claude/skills/**"
       - "scripts/audit_certifications.py"
+      - "scripts/check_mcpa_wire.py"
+      - "scripts/test_check_mcpa_wire.py"
       - "scripts/audit_lessons.py"
       - "scripts/test_audit_certifications.py"
       - "scripts/backfill_certification_references.py"
@@ -68,14 +70,23 @@ jobs:
         run: python3 scripts/audit_certifications.py
       - name: 认证学习计划调度回归
         run: python3 scripts/test_audit_certifications.py
+      - name: MCPA wire checker 回归
+        run: python3 scripts/test_check_mcpa_wire.py
+      - name: MCPA 课程 transcript 协议校验
+        run: |
+          if [ -d certifications/mcpa/lessons ]; then
+            python3 scripts/check_mcpa_wire.py
+          else
+            echo "MCPA 课程源尚未合入，跳过 transcript 校验"
+          fi
       - name: 认证补强引用完整性
         run: python3 scripts/backfill_certification_references.py --check
       # audit_certifications.py 校验答案位置、长度可预测性和多选组合分布，
       # 以题目结构与答案分布作为中文认证题的校验依据。
       - name: 运行认证课程实验测试
-        run: find certifications/claude/lessons -path '*/code/tests/test_*.py' -print0 | xargs -0 -r -n1 python3
+        run: find certifications -path '*/lessons/*/code/tests/test_*.py' -print0 | xargs -0 -r -n1 python3
       - name: 运行认证课程 demo
-        run: find certifications/claude/lessons -path '*/code/main.py' -print0 | xargs -0 -r -n1 python3
+        run: find certifications -path '*/lessons/*/code/main.py' -print0 | xargs -0 -r -n1 python3
       - name: 站点 JavaScript 语法校验
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
       - name: Agent 内容协商回归
