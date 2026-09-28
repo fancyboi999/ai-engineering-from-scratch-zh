@@ -1,0 +1,78 @@
+{
+  "lesson": "01-reading-the-specification",
+  "title": "阅读 MCP 规范",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "根据规范概览，每个 MCP 实现都 MUST 支持哪三个组成部分？",
+      "options": [
+        "服务端功能、客户端功能和实用工具",
+        "资源、prompt、工具与 elicitation 的完整组合",
+        "基础协议、版本控制和消息模式",
+        "授权、扩展和 completion 实用工具"
+      ],
+      "correct": 2,
+      "explanation": "规范规定所有实现都 MUST 支持基础协议、版本控制和消息模式；服务端功能、客户端功能、授权与实用工具则 MAY 根据应用需要实现。"
+    },
+    {
+      "stage": "check",
+      "question": "一句话用小写写着客户端 must not 批处理请求。按照 BCP 14，它具有什么规范约束力？",
+      "options": [
+        "与大写 MUST NOT 相同的禁止效力",
+        "会使整段所在的规范页面失效",
+        "属于软性建议，与 SHOULD NOT 相同",
+        "没有规范约束力；只有大写关键字才算数"
+      ],
+      "correct": 3,
+      "explanation": "BCP 14 关键字只有全部大写时才具有定义的含义；相同单词写成小写只是普通叙述，没有规范约束力。"
+    },
+    {
+      "stage": "check",
+      "question": "下列哪项正确描述了规范仓库中 schema.ts 与 schema.json 的关系？",
+      "options": [
+        "schema.ts 是事实来源，schema.json 由它生成",
+        "schema.json 对 SDK 具有权威性，schema.ts 只是草案",
+        "先手写 schema.json，再由它生成 schema.ts",
+        "两个文件独立维护，可以相互冲突"
+      ],
+      "correct": 0,
+      "explanation": "规范明确 schema.ts 是所有协议消息和结构的事实来源；schema.json 只是为工具自动生成的版本。"
+    },
+    {
+      "stage": "check",
+      "question": "某项功能在 2026-07-28 发布的规范修订版中被标记为 Deprecated，窗口为十二个月。这个窗口从何时开始计算？",
+      "options": [
+        "从 Core Maintainer 在评审中批准 SEP 之日算起",
+        "从把它标记为 Deprecated 的规范修订版发布之日算起",
+        "从弃用该功能的 SEP 进入 Final 状态之日算起",
+        "从弃用 SEP 首次作为 pull request 创建之日算起"
+      ],
+      "correct": 1,
+      "explanation": "SEP-2596 规定，弃用窗口从首次把功能标记为 Deprecated 的修订版发布之日算起，而不是从相关 SEP 进入 Final 的时间算起。"
+    },
+    {
+      "stage": "post",
+      "question": "Roots、Sampling 和 Logging 有时被说成已在 2026-07-28 修订版中移除。规范对其真实状态是怎么说的？",
+      "options": [
+        "仍是 Active；该修订版未改变其状态",
+        "已经彻底 Removed；符合规范的服务端 MUST NOT 实现它们",
+        "是 Deprecated 而非 Removed；仍有完整规范且可正常工作",
+        "目前是 Experimental；只有 Tier 3 SDK 必须支持"
+      ],
+      "correct": 2,
+      "explanation": "SEP-2577 在 2026-07-28 修订版中弃用了 Roots、Sampling 和 Logging；它们仍有完整规范并可正常工作，最早也要到 2027-07-28 当天或之后发布的第一个修订版才具备移除资格。"
+    },
+    {
+      "stage": "post",
+      "question": "变更日志条目引用某个 SEP 编号作为重大协议变更的来源。谨慎的读者在转述前应该怎么做？",
+      "options": [
+        "假设该变更仍在评审，直到下一个修订版发布",
+        "只阅读 schema.json diff，因为 SEP 很少修改 schema",
+        "相信一行变更日志摘要，因为 SEP 被接受后就会关闭",
+        "打开 SEP 文件，核对其文本、设计理由和最终状态"
+      ],
+      "correct": 3,
+      "explanation": "变更日志条目会链接到产生该变更的 SEP；阅读 SEP 本身才能确认确切规范文本、设计理由，以及它是否真正进入 Final 状态。"
+    }
+  ]
+}
