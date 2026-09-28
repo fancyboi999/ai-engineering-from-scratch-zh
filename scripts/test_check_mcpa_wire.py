@@ -162,6 +162,12 @@ class StreamAndHeaderTests(unittest.TestCase):
         self.assertTrue(any("MCP-Protocol-Version" in item for item in messages))
         self.assertTrue(any("Mcp-Name" in item for item in messages))
 
+    def test_http_auth_rejection_is_not_an_unanswered_json_rpc_request(self):
+        rejected = {"http": {"status": 401, "headers": {"MCP-Protocol-Version": "2026-07-28", "Mcp-Method": "tools/call", "Mcp-Name": "x"}}, "message": request(1, "tools/call", name="x", arguments={})}
+        self.assertEqual(findings([rejected]), [])
+        missing_headers = {"http": {"status": 401, "headers": {"MCP-Protocol-Version": "2025-11-25"}}, "message": request(1, "tools/call", name="x", arguments={})}
+        self.assertTrue(any("MCP-Protocol-Version" in item for item in findings([missing_headers])))
+
     def test_cancelled_subscription_may_end_without_final_result(self):
         entries = [
             request(2, "subscriptions/listen", notifications={"resourceSubscriptions": ["file:///x"]}),

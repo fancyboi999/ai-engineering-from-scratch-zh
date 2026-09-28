@@ -199,6 +199,10 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             if not isinstance(message, dict):
                 report.add(where, "legacy/violation entry must wrap a JSON-RPC message object")
             elif "id" in message and "method" in message:
+                if message["method"] == "initialize" and index > 0:
+                    previous, previous_wrapper = unwrap(entries[index - 1])
+                    if not previous_wrapper and isinstance(previous, dict) and previous.get("method") == "server/discover" and previous.get("id") in pending:
+                        pending.pop(previous["id"])
                 pending[message["id"]] = message
                 negative_example_ids.add(message["id"])
             continue
@@ -207,6 +211,10 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             report.add(where, "entry is not a JSON-RPC 2.0 request, notification, result, or error")
             continue
         if kind == "request":
+            http = wrapper.get("http") if isinstance(wrapper.get("http"), dict) else {}
+            if http.get("status") in {401, 403} and isinstance(http.get("headers"), dict):
+                check_request(report, where, message, wrapper)
+                continue
             if message.get("id") in pending:
                 report.add(where, f"request id {message.get('id')!r} reuses an id that is still awaiting a response")
             check_request(report, where, message, wrapper)
