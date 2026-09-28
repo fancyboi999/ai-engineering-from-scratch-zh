@@ -298,7 +298,7 @@
       "domain": "interactions-and-execution",
       "objective": "梳理工具调用从发现、选择、调用、用户输入、进度、取消到结果的生命周期",
       "type": "single",
-      "prompt": "工具调用的 Streamable HTTP 响应流在结果到达前中断。正确的恢复方式是什么？",
+      "prompt": "一个已确认幂等的工具调用，其 Streamable HTTP 响应流在结果到达前中断。客户端确认重新调用不会产生额外副作用后，正确的恢复方式是什么？",
       "options": [
         "用新 id 重新发起同一调用",
         "把中断的流视为空结果且成功",
@@ -308,7 +308,7 @@
       "correct": [
         0
       ],
-      "explanation": "流一旦中断，进行中的响应就丢失了。MCP 已取消流恢复机制，正确做法是使用新 id 把调用作为全新请求重新发出。",
+      "explanation": "流一旦中断，进行中的响应就丢失了，不能依赖流恢复。只有在幂等性和重试安全已确认时，才用新 id 把调用作为全新请求重新发出；非幂等工具的结果不明时，应先确认副作用，不能盲目重放。",
       "references": [
         "certifications/mcpa/lessons/17-tool-invocation-lifecycle",
         "certifications/mcpa/lessons/11-the-tools-primitive"

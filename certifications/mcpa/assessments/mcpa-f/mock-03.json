@@ -480,10 +480,10 @@
     },
     {
       "id": "mcpa-f-m3-040", "domain": "security-and-governance", "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access", "type": "single",
-      "prompt": "host 在决定：破坏性调用前，是依赖工具 title 和 description 安抚用户，还是执行显式 MRTR elicitation 请求用户确认。考虑到 annotations 是不可信提示，哪种设计更站得住脚？",
-      "options": ["两者都不行，因为破坏性工具在任何情况下都绝不能安全调用", "显式 elicitation，因为它产生由 host 控制的真实用户决定，而不是信任服务器编写的文本", "只使用 description，但仅限工具名称中包含 safe 一词", "只使用 description，因为写得好的描述在功能上等同于询问用户"],
+      "prompt": "host 在决定：破坏性工具调用前，是仅依赖工具 title 和 description，还是通过 host 自己控制的确认界面征得用户同意。考虑到 annotations 是不可信提示，哪种设计更站得住脚？",
+      "options": ["两者都不行，因为破坏性工具在任何情况下都绝不能安全调用", "调用前由 host 显式展示操作并取得用户确认，而不是信任服务器编写的文本", "只使用 description，但仅限工具名称中包含 safe 一词", "只使用 description，因为写得好的描述在功能上等同于询问用户"],
       "correct": [1],
-      "explanation": "工具 title 和 description 由服务器编写；除非服务器本身可信，否则它们不能替代真实的同意决定。MRTR elicitation 往返能获得用户的明确回答，而不是根据服务器控制的文本自行假定用户同意。",
+      "explanation": "工具 title 和 description 由服务器编写，不能替代 host 在发出破坏性 tools/call 前取得的用户决定。host 应通过自己控制的确认界面展示具体操作、记录同意，再决定是否调用。MRTR 的 elicitation 是服务器在已有请求中返回 input_required 后发起的补充输入流程，不等于 host 的调用前授权关卡。",
       "references": ["certifications/mcpa/lessons/25-consent-and-least-privilege", "certifications/mcpa/lessons/09-reading-server-manifests"]
     },
     {

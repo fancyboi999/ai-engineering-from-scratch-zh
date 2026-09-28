@@ -52,7 +52,7 @@
 }
 ```
 
-用户答案必须是三种 action 之一，绝不是裸露的 yes 或 no：`accept`（form mode 下带符合 requested schema 的 `content`）、`decline`（用户明确拒绝）或 `cancel`（用户离开，没有决定）。三者都会阻止调用执行，但只有 `accept` 构成同意；client 若把 `cancel` 当成 `decline`，或悄悄重试其中任意一种，都是在猜测用户意图。这些情况都不是协议错误。server 因未取得同意而拒绝运行工具时，应像报告其他业务拒绝一样：返回普通 `tools/call` 结果，其中 `isError: true`，并附上模型可读的文本，而不是 JSON-RPC error，更不能杜撰 error code。2026-07-28 的 error 表中没有“需要同意”这一项，也不该有。
+用户答案必须是三种 action 之一，绝不是裸露的 yes 或 no：`accept`（form mode 下带符合 requested schema 的 `content`）、`decline`（用户明确拒绝）或 `cancel`（用户离开，没有决定）。`decline` 和 `cancel` 都会阻止调用执行；只有带有效 `content` 的 `accept` 构成同意并允许调用继续；client 若把 `cancel` 当成 `decline`，或悄悄重试其中任意一种，都是在猜测用户意图。这些情况都不是协议错误。server 因未取得同意而拒绝运行工具时，应像报告其他业务拒绝一样：返回普通 `tools/call` 结果，其中 `isError: true`，并附上模型可读的文本，而不是 JSON-RPC error，更不能杜撰 error code。2026-07-28 的 error 表中没有“需要同意”这一项，也不该有。
 
 `requestState` 需要像其他跨越信任边界、稍后又传回的值一样受到怀疑：一旦离开 server，它就是攻击者可控输入。如果它会影响实际运行内容，就应签名（大多数 server 使用 HMAC 或 AEAD 足够）、绑定到签发时的具体调用，并且只消费一次。retry 若提交某个调用的 `requestState`，却要求使用另一组参数执行，就不是合法 retry，而是在用户看过后篡改了请求；这种变化必须由 server 自己的签名检查捕获，而不是依赖线协议格式。
 
