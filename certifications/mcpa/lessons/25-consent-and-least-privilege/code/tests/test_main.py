@@ -56,7 +56,7 @@ class ConsentAndLeastPrivilegeTests(unittest.TestCase):
         self.assertTrue(response["result"]["isError"])
         self.assertIn("notes.txt", self.server.filesystem)
 
-    def test_accept_runs_the_tool_and_is_remembered_for_that_tool(self) -> None:
+    def test_accept_runs_only_the_approved_invocation(self) -> None:
         prompt = self.client.call("delete_file", {"path": "notes.txt"})
         response = self.client.call(
             "delete_file", {"path": "notes.txt"},
@@ -65,9 +65,9 @@ class ConsentAndLeastPrivilegeTests(unittest.TestCase):
         )
         self.assertFalse(response["result"]["isError"])
         self.assertNotIn("notes.txt", self.server.filesystem)
-        self.assertTrue(self.server.gate.has("delete_file"))
         second = self.client.call("delete_file", {"path": "report.csv"})
-        self.assertEqual(second["result"]["resultType"], "complete")
+        self.assertEqual(second["result"]["resultType"], "input_required")
+        self.assertIn("report.csv", self.server.filesystem)
 
     def test_tampered_retry_arguments_are_rejected_without_consuming_state(self) -> None:
         prompt = self.client.call("delete_file", {"path": "notes.txt"})
@@ -103,7 +103,6 @@ class ConsentAndLeastPrivilegeTests(unittest.TestCase):
         )
         self.assertTrue(replay["result"]["isError"])
         self.assertIn("notes.txt", self.server.filesystem)
-        self.assertFalse(self.server.gate.has("delete_file"))
 
     def test_approving_one_tool_does_not_approve_a_different_tool(self) -> None:
         prompt = self.client.call("delete_file", {"path": "notes.txt"})
@@ -112,7 +111,6 @@ class ConsentAndLeastPrivilegeTests(unittest.TestCase):
             input_responses={"confirm": {"action": "accept", "content": {"approved": True}}},
             request_state=prompt["result"]["requestState"],
         )
-        self.assertTrue(self.server.gate.has("delete_file"))
         other = self.client.call("send_payment", {"payee": "acme", "amountUsd": 10}, scopes=frozenset({"payments:write"}))
         self.assertEqual(other["result"]["resultType"], "input_required")
 

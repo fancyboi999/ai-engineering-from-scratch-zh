@@ -23,9 +23,9 @@
 
 ## 核心概念
 
-### 没有 session 时如何提问：通过 MRTR 进行 elicitation
+### 两道同意边界：host 调用前确认与 server 请求补充输入
 
-工具由模型控制：模型决定何时调用。规范不强制采用某种特定交互模型，但明确要求始终保留 human-in-the-loop，使人能够拒绝调用；应用还应展示公开了哪些工具、标明工具何时运行，并在敏感操作执行前确认。由于没有 server push，这项确认使用所有“server 需要更多信息”场景的同一机制传递：Multi Round-Trip Request。server 对 `tools/call` 的响应不是结果，而是 `resultType: "input_required"`，其中 `inputRequests` map 的条目为 `elicitation/create` 请求；如果答案要回到同一个调用，还会带上 `requestState` 字符串。client 收集答案后，以全新的 JSON-RPC id 重试完全相同的操作，把答案放在 `inputResponses` 下并使用 server 指定的相同 key，再逐字节原样回传 `requestState`。
+工具由模型控制：模型决定何时调用。规范不强制采用某种特定交互模型，但明确要求始终保留 human-in-the-loop，使人能够拒绝调用；应用还应展示公开了哪些工具、标明工具何时运行，并在敏感操作执行前确认。host 必须在发出敏感操作的 `tools/call` 前自行展示具体操作、取得用户批准；不能依赖不可信的 server 主动索要批准。下面的实验展示另一条边界：server 已收到调用、还需要用户补充输入时，可通过 Multi Round-Trip Request（MRTR）提问。它返回 `resultType: "input_required"`，其中 `inputRequests` map 的条目为 `elicitation/create` 请求；如果答案要回到同一个调用，还会带上 `requestState` 字符串。client 收集答案后，以全新的 JSON-RPC id 重试完全相同的操作，把答案放在 `inputResponses` 下并使用 server 指定的相同 key，再逐字节原样回传 `requestState`。
 
 ```json
 {
@@ -58,7 +58,7 @@
 
 ### 将同意限定到单个工具，而非整个 server
 
-用户授予的同意必须精确限定到获批工具。批准 `delete_file` 不代表批准 `send_payment`，即使二者位于同一个 server、同一段对话中，甚至只相隔片刻。“信任此 server”的授权会抹杀单独命名工具的意义：它把一次具体、知情的决定扩大成用户从未作过的笼统决定。工具 `annotations` 在这里很有价值，也立即暴露出边界。`readOnlyHint`、`destructiveHint` 和 `openWorldHint` 正是 client 判断何时需要 prompt 的信号：只读调用通常可以不确认，而写入、删除、发送或访问开放世界的调用通常不应如此。但注解是 server 对自身设置的提示，规范明确要求 client 将其视为不可信，除非 server 本身受信。一个谎称只读的工具，不会因为 `annotations` 这么写就变安全。无论 client 在注解之上构建什么策略，实际执行机制——记录用户究竟批准了哪个具名工具——都必须位于 client，而不是依赖 server 对自身工具的声明。默认值也很重要：`destructiveHint` 和 `openWorldHint` 默认为 true，`readOnlyHint` 默认为 false。完全没有注解的工具默认被视为具有破坏性且会访问开放世界，而不是默认安全。server 沉默时，协议有意采取保守立场。
+用户授予的同意必须限定到获批的具名工具、参数和这一次调用；批准 `delete_file` 的一次请求既不代表批准后续 `delete_file`，也不代表批准 `send_payment`，即使二者位于同一个 server、同一段对话中，甚至只相隔片刻。“信任此 server”的授权会抹杀单独命名工具的意义：它把一次具体、知情的决定扩大成用户从未作过的笼统决定。工具 `annotations` 在这里很有价值，也立即暴露出边界。`readOnlyHint`、`destructiveHint` 和 `openWorldHint` 正是 client 判断何时需要 prompt 的信号：只读调用通常可以不确认，而写入、删除、发送或访问开放世界的调用通常不应如此。但注解是 server 对自身设置的提示，规范明确要求 client 将其视为不可信，除非 server 本身受信。一个谎称只读的工具，不会因为 `annotations` 这么写就变安全。无论 client 在注解之上构建什么策略，实际执行机制——记录用户究竟批准了哪个具名工具——都必须位于 client，而不是依赖 server 对自身工具的声明。默认值也很重要：`destructiveHint` 和 `openWorldHint` 默认为 true，`readOnlyHint` 默认为 false。完全没有注解的工具默认被视为具有破坏性且会访问开放世界，而不是默认安全。server 沉默时，协议有意采取保守立场。
 
 ### Step-up authorization：位于下一层的另一道门
 
@@ -83,7 +83,7 @@ mcpa-25-consent-gates
 
 ## 交互实验
 
-图中跟踪一个 `tools/call` 在执行前可能遇到的两道门。首先跨越授权边界：若 token scope 不足，server 以 `403` 和必需 scope 将其弹回；client 把该 scope 与已持有 scope 取并集后重试。授权通过后，调用才抵达同意门控：若工具需要人工决定，却没有对该精确工具的同意记录，server 返回 `input_required`，不会执行任何操作；client 通过一次 `elicitation/create` 往返解决问题后再重试。注意两道门相互独立且有先后顺序：完全获授权的 client 仍可能被要求同意；没有同意问题的 client 也可能缺少 scope。工具可能位于任一道门、两道门之后，或者两者皆无。
+图中跟踪一个 `tools/call` 在执行前可能遇到的两道门。首先跨越授权边界：若 token scope 不足，server 以 `403` 和必需 scope 将其弹回；client 把该 scope 与已持有 scope 取并集后重试。授权通过后，调用才抵达同意门控：若 server 在收到调用后仍需补充输入，且本次调用尚未获得所需答案，server 返回 `input_required`，不会执行任何操作；client 通过一次 `elicitation/create` 往返解决问题后再重试。注意两道门相互独立且有先后顺序：完全获授权的 client 仍可能被要求同意；没有同意问题的 client 也可能缺少 scope。工具可能位于任一道门、两道门之后，或者两者皆无。
 
 ## 实践实验
 
@@ -115,7 +115,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/25-consent-and-le
 
 ## 综合项目关联
 
-综合项目系统中的每个有副作用工具，都需要限定到自身名称的同意决策；不能从同级工具继承，也不能依据 server 自己提供的注解推定。每个受 scope 门控的工具都需要 step-up 路径：取并集而不是替换，并限制重试时长。当综合项目要求你说明调用方能看到和执行什么时，应从本课两道门分别回答：用户明确批准了什么，手中 token 实际授权了什么，并能指出某次失败属于哪一道门。
+综合项目系统中的每次有副作用工具调用，都需要由 host 在发出请求前按具名工具及参数取得同意；server 端若仍需补充输入，也只能限定到本次调用，不能从先前调用或同级工具继承，也不能依据 server 自己提供的注解推定。每个受 scope 门控的工具都需要 step-up 路径：取并集而不是替换，并限制重试时长。当综合项目要求你说明调用方能看到和执行什么时，应从本课两道门分别回答：用户明确批准了什么，手中 token 实际授权了什么，并能指出某次失败属于哪一道门。
 
 ## 关键术语
 
@@ -123,7 +123,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/25-consent-and-le
 |------|---------|
 | Elicitation | server 通过 MRTR 请求用户输入，以 `inputRequests` 内的 `elicitation/create` 条目传递 |
 | requestState | server 签发、retry 必须原样回传的不透明字符串；按不可信输入处理，必要时签名并仅使用一次 |
-| 按工具限定同意 | 针对一个具名工具记录批准，绝不针对 server、分类或命名模式 |
+| 按调用限定同意 | host 针对一次具名工具与参数组合记录批准，绝不自动覆盖后续调用或整个 server |
 | 注解提示 | server 声明的属性，如 `destructiveHint`；用于辅助 client 的提示策略，但绝不是可信的执行保证 |
 | Step-up authorization | 收到 `403 insufficient_scope` 后，为已持有 scope 与新 challenge scope 的并集重新授权 |
 | Scope 并集 | client 先前 scope 与 challenge 所需 scope 的组合，避免重新授权时丢失已有授权 |

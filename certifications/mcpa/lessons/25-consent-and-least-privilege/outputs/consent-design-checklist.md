@@ -11,7 +11,8 @@
 
 ## 如何收集同意
 
-- [ ] 同意通过 Multi Round-Trip Request 传递：server 返回 `resultType: "input_required"`、method 为 `elicitation/create` 的 `inputRequests` 条目，通常还带 `requestState`。
+- [ ] host 在发出敏感 `tools/call` 前展示具名工具与具体参数，取得本次调用的人工批准；不能让不可信 server 的自述代替这道关卡。
+- [ ] 若 server 在已有调用中仍需用户补充输入，可通过 Multi Round-Trip Request 传递：server 返回 `resultType: "input_required"`、method 为 `elicitation/create` 的 `inputRequests` 条目，通常还带 `requestState`。
 - [ ] client retry 使用全新的 JSON-RPC id，按 server 命名的 key 在 `inputResponses` 中携带答案，并精确回传 `requestState`。
 - [ ] 用户答案为三种 action 之一：`accept`（form mode 下带匹配的 `content`）、`decline` 或 `cancel`。只有 `accept` 构成同意；后两者都会阻止调用，但不是同一事件。
 - [ ] 将 `requestState` 视为攻击者可控输入。必要时进行签名、绑定到签发时的具体调用，并且只接受一次。
@@ -19,9 +20,9 @@
 
 ## 如何限定同意范围
 
-- [ ] 针对一个具名工具记录授权，绝不针对 server、分类或命名模式。
+- [ ] 针对一次具名工具及其参数记录授权；后续即使调用同一工具也必须重新判断，绝不按 server、分类或命名模式永久放行。
 - [ ] 批准一个破坏性工具，绝不代表批准另一个，即使它们位于同一个 server，且调用只相隔片刻。
-- [ ] 工具的 `readOnlyHint`、`destructiveHint` 和 `openWorldHint` 可辅助决定何时提示，但它们由 server 声明，除非 server 本身受信，否则均不可信。实际执行边界的是 client 自己保存的人工批准记录，而非 server 对工具的声明。
+- [ ] 工具的 `readOnlyHint`、`destructiveHint` 和 `openWorldHint` 可辅助决定何时提示，但它们由 server 声明，除非 server 本身受信，否则均不可信。实际执行边界是 host 对本次调用的人工批准，而非 server 对工具的声明。
 
 ## Step-up authorization（独立的下层门控）
 
@@ -48,6 +49,6 @@
 
 ## 本领域考试要点
 
-- “安全与治理”占 MCPA blueprint 中最大的单项比重。
+- “安全与治理”占 MCPA blueprint 的 24%；“交互与执行”占 26%，是权重最大的单项领域。
 - 考试以 MCP specification 2026-07-28 为准：无状态协议，没有 `initialize` 握手，也没有 session。
 - 工具有两种错误通道：格式错误请求使用 JSON-RPC error；模型可以读取并采取行动的情况（包括未取得同意）使用 `isError: true` 的结果。

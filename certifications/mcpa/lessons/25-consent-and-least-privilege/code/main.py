@@ -106,21 +106,9 @@ class Tool:
 
 
 @dataclass
-class ConsentGate:
-    approved: set[str] = field(default_factory=set)
-
-    def grant(self, tool_name: str) -> None:
-        self.approved.add(tool_name)
-
-    def has(self, tool_name: str) -> bool:
-        return tool_name in self.approved
-
-
-@dataclass
 class Server:
     name: str
     tools: dict[str, Tool] = field(default_factory=dict)
-    gate: ConsentGate = field(default_factory=ConsentGate)
     consumed_states: set[str] = field(default_factory=set)
     filesystem: list[str] = field(default_factory=lambda: ["report.csv", "notes.txt"])
 
@@ -173,7 +161,7 @@ class Server:
             )
         if tool.required_scope is not None and tool.required_scope not in scopes:
             return {"scopeChallenge": [tool.required_scope]}
-        if tool.needs_consent() and not self.gate.has(name):
+        if tool.needs_consent():
             input_responses = params.get("inputResponses")
             request_state = params.get("requestState")
             if isinstance(input_responses, dict) and "confirm" in input_responses:
@@ -238,7 +226,6 @@ class Server:
                 isError=True,
                 _meta=self._server_meta(),
             )
-        self.gate.grant(tool.name)
         return self._run(request_id, tool, arguments)
 
     def _run(self, request_id: Any, tool: Tool, arguments: dict[str, Any]) -> dict[str, Any]:
@@ -446,7 +433,7 @@ def demo() -> None:
     print("decline ->", scenario["declined"]["result"]["content"][0]["text"])
     print("tampered retry (different arguments) ->", scenario["tampered"]["result"]["content"][0]["text"])
     print("accept after re-elicitation ->", scenario["approved"]["result"]["isError"], scenario["server"].filesystem)
-    print("send_payment prompt even though delete_file is approved ->", scenario["different_tool_prompt"]["result"]["resultType"])
+    print("send_payment requires its own approval ->", scenario["different_tool_prompt"]["result"]["resultType"])
     print("send_payment after step-up scopes ->", sorted(scenario["final_scopes"]))
     print("send_payment approved ->", scenario["payment_approved"]["result"]["content"][0]["text"])
     print("tools/list with payments:read only ->", [tool["name"] for tool in scenario["scoped_tools_before"]])
