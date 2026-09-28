@@ -59,6 +59,7 @@
 | 我想基于模型上下文协议（MCP）构建系统 | [模型上下文协议（MCP）路线](phases/13-tools-and-protocols/README.md#model-context-protocol-mcp-path) | [模型上下文协议（MCP）路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/06-mcp-fundamentals/?learningPath=model-context-protocol) |
 | 我想编写并交付 Agent Skills | [Agent Skills 快速路线](phases/13-tools-and-protocols/README.md#agent-skills-fast-path) | [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills) |
 | 我想备考 Claude 官方认证 | [认证入门指南](certifications/claude/GETTING_STARTED.md) | [认证学院](https://aieng-zh.cn/certifications.html) |
+| 我想备考 MCP Associate（MCPA） | [MCPA 入门指南](certifications/mcpa/GETTING_STARTED.md) | [MCPA 路线](https://aieng-zh.cn/certification?id=mcpa-f) |
 
 拿不准自己适合从哪开始？使用 [`start-learning` 定位导师](skills/start-learning/SKILL.md) 或查看 [网站前置要求指南](https://aieng-zh.cn/prereqs.html)。
 
@@ -89,6 +90,7 @@ npx skills add fancyboi999/ai-engineering-from-scratch-zh
 | [`learn-mcp`](skills/learn-mcp/SKILL.md) | MCP 专项导师。创建 `MCP-LEARNING.md`，遵循 17 课路线，记录协议线路、安全性、可靠性与一致性证据。 |
 | [`learn-agent-skills`](skills/learn-agent-skills/SKILL.md) | Agent Skills 专项导师。创建 `AGENT-SKILLS-LEARNING.md`，遵循 5 课路线，记录技能契约、渐进式披露与真实 runner 测试证据。 |
 | [`claude-certification`](skills/claude-certification/SKILL.md) | Claude 认证导师。选择 CCAO-F、CCDV-F、CCAR-F 或 CCAR-P，逐课教学、运行实验、评审产物、组织诊断与模拟测验并保存进度。 |
+| [`mcpa-certification`](skills/mcpa-certification/SKILL.md) | MCPA 认证导师。遵循 34 课路线，运行 MCP 实验和协议校验，组织诊断与模拟测验，并保存学习进度。 |
 | [`find-your-level`](skills/find-your-level/SKILL.md) | 十道题的定级测验。把你的知识映射到一个起始阶段，生成带课时估算的个性化路径。 |
 | [`check-understanding <phase>`](skills/check-understanding/SKILL.md) | 按阶段测验，八道题，附反馈和需要复习的具体课程。 |
 | [`course-guide`](skills/course-guide/SKILL.md) | 课程导引与概念查询。把任何主题或疑问映射到讲解该知识点的具体课程。 |
@@ -229,9 +231,15 @@ Codex、ChatGPT、Cursor 或其他 agent 中调用 `claude-certification`（Clau
 这是基于公开考试目标编写的独立学习材料，不隶属于 Anthropic，不包含真实考题，
 也不保证通过认证。资格、费用、评分和项目政策可能变动，付费或预约前必须以官方最新说明为准。
 
+### 准备 MCP Associate（MCPA）认证
+
+[MCPA 认证课程](certifications/mcpa/README.md) 提供 34 节中文课程、可运行的 MCP 协议实验和原创练习题。课程依据 2026-07-28 版规范组织五个知识域；从 [入门指南](certifications/mcpa/GETTING_STARTED.md) 开始，使用 `mcpa-certification` 导师逐课练习，或在 [中文认证站点](https://aieng-zh.cn/certification?id=mcpa-f) 学习。
+
+这套社区课程独立于 Agentic AI Foundation 和 Linux Foundation。正式考试政策以官方页面为准；模拟题成绩不等于正式考试分数。
+
 ### 内置 agent 技能
 
-全套课程内置了 8 个涵盖定位、教学、专项路径与测验的 AI 导师技能，详见上文 [30 秒添加 AI 导师](#30-秒添加-ai-导师)；所有技能定义均位于 [`skills/`](skills/) 目录下。
+全套课程内置了 9 个涵盖定位、教学、专项路径与测验的 AI 导师技能，详见上文 [30 秒添加 AI 导师](#30-秒添加-ai-导师)；所有技能定义均位于 [`skills/`](skills/) 目录下。
 
 ```text
 ░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
@@ -1003,7 +1011,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 
 仓库在 `phases/**/outputs/` 下交付了 396 个技能和 99 个提示词。
 
-**导师技能：通过 [skills.sh](https://skills.sh) 选择安装。** 默认发现 `skills/` 下的 8 个导师技能：
+**导师技能：通过 [skills.sh](https://skills.sh) 选择安装。** 默认发现 `skills/` 下的 9 个导师技能：
 
 ```bash
 npx skills add fancyboi999/ai-engineering-from-scratch-zh --list
