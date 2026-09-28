@@ -2503,7 +2503,7 @@
         path = lessonParams.get('path') || '';
         hasTrackContext = !!(lessonParams.get('track') || lessonParams.get('fromTrack'));
       } catch (_) {}
-      if (path.indexOf('certifications/claude/lessons/') !== 0 && !hasTrackContext) return;
+      if (!/^certifications\/[a-z0-9-]+\/lessons\/[a-z0-9-]+$/.test(path) && !hasTrackContext) return;
 
       window.__AIFS_CERTIFICATION_DATA_READY = new Promise(function (resolve, reject) {
         var script = document.createElement('script');
@@ -2653,7 +2653,7 @@
 
       // 预渲染静态课程页的规范 URL：/lessons/<phase>/<lesson>/
       function lessonHref(path) {
-        if (String(path).indexOf('certifications/claude/lessons/') === 0) {
+        if (/^certifications\/[a-z0-9-]+\/lessons\/[a-z0-9-]+$/.test(String(path))) {
           return '/lesson?path=' + encodeURIComponent(path);
         }
         return '/lessons/' + String(path).replace(/^phases\//, '').replace(/\/+$/, '') + '/';

@@ -188,6 +188,7 @@ def check_result(
 def check_transcript(report: Report, lesson: str, entries: list[Any], extra_result_types: set[str]) -> None:
     allowed_types = CORE_RESULT_TYPES | extra_result_types
     pending: dict[Any, dict[str, Any]] = {}
+    negative_example_ids: set[Any] = set()
     issued_state: dict[tuple[str, str], tuple[Any, Any]] = {}
     for index, entry in enumerate(entries):
         message, wrapper = unwrap(entry)
@@ -199,6 +200,7 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                 report.add(where, "legacy/violation entry must wrap a JSON-RPC message object")
             elif "id" in message and "method" in message:
                 pending[message["id"]] = message
+                negative_example_ids.add(message["id"])
             continue
         kind = classify(message)
         if kind == "invalid":
@@ -213,7 +215,9 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             key = (str(message.get("method")), target)
             if "inputResponses" in params or "requestState" in params:
                 prior = issued_state.get(key)
-                if prior is not None:
+                if prior is None:
+                    report.add(where, "an MRTR retry requires a prior input_required result")
+                else:
                     prior_id, prior_state = prior
                     if message.get("id") == prior_id:
                         report.add(where, "an MRTR retry must use a new JSON-RPC id")
@@ -242,9 +246,12 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                 target = str(params.get("name") or params.get("uri") or "")
                 issued_state[(str(request.get("method")), target)] = (request.get("id"), result.get("requestState"))
         elif kind == "error":
-            if "id" in message:
-                pending.pop(message.get("id"), None)
+            if message.get("id") is not None and pending.pop(message.get("id"), None) is None:
+                report.add(where, f"error id {message.get('id')!r} does not answer any pending request")
             check_error(report, where, message.get("error"))
+    for request_id in pending:
+        if request_id not in negative_example_ids:
+            report.add(lesson, f"request id {request_id!r} has no response in transcript")
 
 
 def load_module(lesson_dir: Path):

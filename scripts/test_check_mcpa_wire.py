@@ -123,6 +123,12 @@ class MultiRoundTripTests(unittest.TestCase):
         ]
         self.assertTrue(any("echo requestState" in item for item in findings(entries)))
 
+    def test_retry_cannot_invent_input_responses_or_state(self):
+        for fields in ({"requestState": "attacker-invented"}, {"inputResponses": {}}):
+            with self.subTest(fields=fields):
+                entries = [request(1, "tools/call", name="deploy", arguments={}, **fields), result(1, resultType="complete", content=[])]
+                self.assertTrue(any("prior input_required" in item for item in findings(entries)))
+
     def test_input_required_only_on_supported_methods(self):
         entries = [request(1, "tools/list"), self.input_required(1)]
         self.assertTrue(any("may not return input_required" in item for item in findings(entries)))
@@ -148,6 +154,10 @@ class StreamAndHeaderTests(unittest.TestCase):
         messages = findings([bad, result(1, resultType="complete", content=[])])
         self.assertTrue(any("MCP-Protocol-Version" in item for item in messages))
         self.assertTrue(any("Mcp-Name" in item for item in messages))
+
+    def test_unanswered_request_and_orphan_error_are_flagged(self):
+        self.assertTrue(any("no response" in item for item in findings([request(1, "tools/call", name="x", arguments={})])))
+        self.assertTrue(any("does not answer" in item for item in findings([error(99, -32602)])))
 
     def test_deliberate_violations_are_skipped(self):
         broken = {"jsonrpc": "2.0", "id": 9, "method": "tools/list", "params": {}}
