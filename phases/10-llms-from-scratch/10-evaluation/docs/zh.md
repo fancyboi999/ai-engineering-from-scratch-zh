@@ -259,6 +259,7 @@ class ELOTracker:
 用 token 概率计算困惑度。实践中你会从模型的 logits 得到这些。这里我们用一个概率分布模拟。
 
 ```python
+import hashlib
 import numpy as np
 
 def perplexity(log_probs):
@@ -268,7 +269,7 @@ def perplexity(log_probs):
     return float(np.exp(avg_neg_log_prob))
 
 def token_log_probs_simulated(text, model_quality=0.8):
-    np.random.seed(hash(text) % 2**31)
+    np.random.seed(int(hashlib.sha256(text.encode()).hexdigest()[:8], 16) % 2**31)
     tokens = text.split()
     log_probs = []
     for i, token in enumerate(tokens):
