@@ -207,6 +207,8 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
     expected_negative = json.loads(fixture_path.read_text(encoding="utf-8"))
     issued_state: dict[tuple[str, str], tuple[Any, Any]] = {}
     negotiated_versions: set[str] = set()
+    candidate_versions: set[str] = set()
+    discover_retries: dict[Any, str] = {}
     unsupported_requests: dict[Any, tuple[str, int]] = {}
     for index, entry in enumerate(entries):
         message, wrapper = unwrap(entry)
@@ -242,7 +244,10 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             params = message.get("params") if isinstance(message.get("params"), dict) else {}
             version = (params.get("_meta") or {}).get(PV_KEY) if isinstance(params.get("_meta"), dict) else None
             if version != PROTOCOL_VERSION and version not in negotiated_versions:
-                unsupported_requests[message.get("id")] = (where, index)
+                if message.get("method") == "server/discover" and version in candidate_versions:
+                    discover_retries[message.get("id")] = version
+                else:
+                    unsupported_requests[message.get("id")] = (where, index)
             target = str(params.get("name") or params.get("uri") or "")
             key = (str(message.get("method")), target)
             if message.get("method") != "tasks/update" and ("inputResponses" in params or "requestState" in params):
@@ -281,12 +286,19 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                 report.add(unsupported_requests.pop(message["id"])[0], f"request protocol version must be {PROTOCOL_VERSION} or a previously negotiated supported version")
             check_result(report, where, message, request, allowed_types)
             result = message.get("result") if isinstance(message.get("result"), dict) else {}
+            selected_version = discover_retries.pop(message.get("id"), None)
+            if selected_version is not None:
+                if result.get("resultType") == "complete" and selected_version in result.get("supportedVersions", []):
+                    negotiated_versions.add(selected_version)
+                else:
+                    report.add(where, "negotiated discover retry must confirm the requested supported version")
             if request is not None and result.get("resultType") == "input_required":
                 params = request.get("params") if isinstance(request.get("params"), dict) else {}
                 target = str(params.get("name") or params.get("uri") or "")
                 issued_state[(str(request.get("method")), target)] = (request.get("id"), result.get("requestState"))
         elif kind == "error":
             request = pending.pop(message.get("id"), None)
+            discover_retries.pop(message.get("id"), None)
             if message.get("id") is not None and request is None:
                 report.add(where, f"error id {message.get('id')!r} does not answer any pending request")
             error = message.get("error")
@@ -303,7 +315,7 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                     if not isinstance(data.get("supported"), list) or not all(isinstance(version, str) for version in data["supported"]):
                         report.add(where, "UnsupportedProtocolVersion data.supported must contain only version strings")
                     elif request.get("method") == "server/discover":
-                        negotiated_versions.update(data["supported"])
+                        candidate_versions.update(data["supported"])
             check_error(report, where, error)
     for request_id in pending:
         if request_id not in negative_example_ids:

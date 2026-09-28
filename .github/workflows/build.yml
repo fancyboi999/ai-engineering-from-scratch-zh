@@ -26,6 +26,7 @@ on:
       - ".claude/skills/**"
       - "scripts/audit_certifications.py"
       - "scripts/check_mcpa_wire.py"
+      - "scripts/mcpa_negative_fixtures.json"
       - "scripts/test_check_mcpa_wire.py"
       - "scripts/audit_mcpa.py"
       - "scripts/test_audit_mcpa.py"

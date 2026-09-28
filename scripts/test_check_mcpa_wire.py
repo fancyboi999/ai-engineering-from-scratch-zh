@@ -77,6 +77,21 @@ class ModernExchangeTests(unittest.TestCase):
         entries = [request(1, "server/discover"), error(1, -32022, {"supported": ["2026-11-18"], "requested": "2026-07-28"}), retry, result(2, resultType="complete", supportedVersions=["2026-11-18"], capabilities={}, ttlMs=0, cacheScope="public"), followup, result(3, resultType="complete", tools=[], ttlMs=0, cacheScope="public")]
         self.assertEqual(findings(entries), [])
 
+    def test_supported_version_requires_successful_discover_retry(self):
+        offered = error(1, -32022, {"supported": ["2026-11-18"], "requested": "2026-07-28"})
+        other = request(2, "tools/list")
+        other["params"]["_meta"] = {**META, "io.modelcontextprotocol/protocolVersion": "2026-11-18"}
+        self.assertTrue(any("protocol version must be" in item for item in findings([
+            request(1, "server/discover"), offered, other,
+            result(2, resultType="complete", tools=[], ttlMs=0, cacheScope="public"),
+        ])))
+        retry = request(2, "server/discover")
+        retry["params"]["_meta"] = other["params"]["_meta"]
+        self.assertTrue(any("must confirm" in item for item in findings([
+            request(1, "server/discover"), offered, retry,
+            result(2, resultType="complete", supportedVersions=["2026-07-28"], capabilities={}, ttlMs=0, cacheScope="public"),
+        ])))
+
     def test_result_without_result_type_is_flagged(self):
         entries = [request(1, "tools/call", name="x", arguments={}), result(1, content=[])]
         self.assertTrue(any("resultType" in item for item in findings(entries)))
