@@ -1,0 +1,78 @@
+{
+  "lesson": "29-operational-use-cases",
+  "title": "为任务选择合适的 MCP 形态",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "哪个因素最直接决定一项能力应暴露为 tool、resource 还是 prompt？",
+      "options": [
+        "transport 是 stdio 还是 Streamable HTTP，因为 primitive 从不依赖这一细节",
+        "谁应该控制它：模型、应用还是用户分别作出决定",
+        "响应包含多少字节，因为协议各部分都没有设置大小限制",
+        "服务器使用哪种语言编写，因为 MCP 对每种 runtime 的处理方式相同"
+      ],
+      "correct": 1,
+      "explanation": "MCP 把每种 primitive 的控制权交给特定一方：tool 由模型控制，resource 由应用驱动，prompt 由用户控制。用例的发起方应按这一划分作出决定。"
+    },
+    {
+      "stage": "check",
+      "question": "某工作流自动化用例会启动一条可能运行二十分钟的部署流水线。如此耗时的请求适合哪种结果形态？",
+      "options": [
+        "普通 complete 结果，因为 MCP 不限制单个响应可以耗时多久",
+        "resource read，把不断增长的输出作为一个持续扩大的文本块流式返回",
+        "tasks 扩展的 CreateTaskResult，返回 client 轮询直至完成的 taskId",
+        "input_required 结果，因为运行任何任务前 client 都必须提供参数"
+      ],
+      "correct": 2,
+      "explanation": "可能触发 transport 超时的工作适合 tasks 扩展。它返回持久化 taskId 和状态，而不是让连接在完整任务期间保持打开。"
+    },
+    {
+      "stage": "check",
+      "question": "夜间 CI 作业调用 MCP 服务器时，没有人在场批准。哪种授权路径适合该调用方？",
+      "options": [
+        "带 PKCE 的交互式 OAuth 2.1 code flow，与人类使用的路径相同",
+        "Dynamic Client Registration，由人在夜间作业首次运行前完成一次",
+        "从环境读取凭据，因为每种授权路径都假定使用本地 stdio transport",
+        "OAuth client credentials 扩展，在无用户在场时认证机器调用方"
+      ],
+      "correct": 3,
+      "explanation": "OAuth client credentials 授权扩展正是为无人值守的机器对机器调用方设计的，因为没有用户可以完成交互式重定向。"
+    },
+    {
+      "stage": "check",
+      "question": "某内部工单搜索工具的 tools/list 结果只在一个已认证组织内有意义。结果必须携带什么？该设置不能做什么？",
+      "options": [
+        "cacheScope private；它限制跨上下文共享，但本身不是访问控制",
+        "cacheScope private；服务器同时用它作为该列表的访问控制",
+        "不带缓存字段，因为结果受先前打开的 session 限制",
+        "cacheScope public，因为只有 server/discover 结果会携带缓存提示"
+      ],
+      "correct": 0,
+      "explanation": "tools/list 是六种可缓存操作之一，必须携带 cacheScope。private 只限制跨授权上下文共享，本身不执行访问控制；而且 2026-07-28 中不存在可用于限制范围的 session。"
+    },
+    {
+      "stage": "post",
+      "question": "某函数完全在单个应用进程内格式化货币字符串，不涉及外部系统、独立 host 或第二个消费者。该场景应采用什么？",
+      "options": [
+        "MCP resource，让应用把格式化字符串读作附加上下文",
+        "直接函数调用，因为没有外部系统或第二个消费者需要协议边界",
+        "MCP tool，让模型在每次出现数字时调用格式化器",
+        "MCP prompt，让用户从菜单选择格式化模板"
+      ],
+      "correct": 1,
+      "explanation": "MCP 的价值来自 host 与 server 之间的互操作。没有第二个消费者，也没有需要标准化访问的独立系统时，增加协议边界毫无收益。"
+    },
+    {
+      "stage": "post",
+      "question": "usage-dashboard 工具提供 MCP Apps UI resource。一个从未声明 io.modelcontextprotocol/ui 扩展的 client 调用它。规范的服务器应怎么做？",
+      "options": [
+        "直接拒绝调用，因为服务器提供的每个扩展都属于强制要求",
+        "无论 client 声明了哪些 capabilities，都返回同一个交互式 iframe",
+        "返回包含有意义文本的正常结果，作为不支持该扩展的 client 的回退路径",
+        "自动把扩展加入 client 声明的 capabilities，再继续调用"
+      ],
+      "correct": 2,
+      "explanation": "扩展默认禁用，绝不能擅自假定。提供 UI 增强工具的服务器仍应为未声明支持的 client 返回有意义的文本内容。"
+    }
+  ]
+}
