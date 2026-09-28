@@ -11,7 +11,7 @@ import main
 class ConsentAndLeastPrivilegeTests(unittest.TestCase):
     def setUp(self) -> None:
         self.server = main.build_files_server()
-        self.client = main.Client(self.server)
+        self.client = main.Client(self.server, approve_invocation=lambda name, arguments: True)
 
     def test_read_only_tool_proceeds_without_any_prompt(self) -> None:
         response = self.client.call("list_files", {})
@@ -55,6 +55,23 @@ class ConsentAndLeastPrivilegeTests(unittest.TestCase):
         )
         self.assertTrue(response["result"]["isError"])
         self.assertIn("notes.txt", self.server.filesystem)
+
+    def test_host_denial_sends_no_sensitive_request(self) -> None:
+        client = main.Client(self.server, approve_invocation=lambda name, arguments: False)
+        response = client.call("delete_file", {"path": "notes.txt"})
+        self.assertIn("hostDenied", response)
+        self.assertEqual(client.log, [])
+        self.assertIn("notes.txt", self.server.filesystem)
+
+    def test_host_approval_is_bound_to_each_invocation(self) -> None:
+        decisions = []
+        client = main.Client(self.server, approve_invocation=lambda name, arguments: decisions.append((name, arguments.copy())) or len(decisions) == 1)
+        first = client.call("delete_file", {"path": "notes.txt"})
+        second = client.call("delete_file", {"path": "report.csv"})
+        self.assertEqual(first["result"]["resultType"], "input_required")
+        self.assertIn("hostDenied", second)
+        self.assertEqual(len(client.log), 2)
+        self.assertEqual(decisions, [("delete_file", {"path": "notes.txt"}), ("delete_file", {"path": "report.csv"})])
 
     def test_accept_runs_only_the_approved_invocation(self) -> None:
         prompt = self.client.call("delete_file", {"path": "notes.txt"})

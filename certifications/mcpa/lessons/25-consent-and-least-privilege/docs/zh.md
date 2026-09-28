@@ -25,7 +25,7 @@
 
 ### 两道同意边界：host 调用前确认与 server 请求补充输入
 
-工具由模型控制：模型决定何时调用。规范不强制采用某种特定交互模型，但明确要求始终保留 human-in-the-loop，使人能够拒绝调用；应用还应展示公开了哪些工具、标明工具何时运行，并在敏感操作执行前确认。host 必须在发出敏感操作的 `tools/call` 前自行展示具体操作、取得用户批准；不能依赖不可信的 server 主动索要批准。下面的实验展示另一条边界：server 已收到调用、还需要用户补充输入时，可通过 Multi Round-Trip Request（MRTR）提问。它返回 `resultType: "input_required"`，其中 `inputRequests` map 的条目为 `elicitation/create` 请求；如果答案要回到同一个调用，还会带上 `requestState` 字符串。client 收集答案后，以全新的 JSON-RPC id 重试完全相同的操作，把答案放在 `inputResponses` 下并使用 server 指定的相同 key，再逐字节原样回传 `requestState`。
+工具由模型控制：模型决定何时调用。规范不强制采用某种特定交互模型，但明确要求始终保留 human-in-the-loop，使人能够拒绝调用；应用还应展示公开了哪些工具、标明工具何时运行，并在敏感操作执行前确认。host 必须在发出敏感操作的 `tools/call` 前自行展示具体操作、取得用户批准；不能依赖不可信的 server 主动索要批准。实验中的 host 使用 `approve_invocation` 在发请求前对具名工具及参数做决定；拒绝时不会产生 `tools/call`。这个教学回调默认只在演示场景放行，不代表生产授权。下面展示另一条边界：server 已收到调用、还需要用户补充输入时，可通过 Multi Round-Trip Request（MRTR）提问。它返回 `resultType: "input_required"`，其中 `inputRequests` map 的条目为 `elicitation/create` 请求；如果答案要回到同一个调用，还会带上 `requestState` 字符串。client 收集答案后，以全新的 JSON-RPC id 重试完全相同的操作，把答案放在 `inputResponses` 下并使用 server 指定的相同 key，再逐字节原样回传 `requestState`。
 
 ```json
 {
@@ -87,7 +87,7 @@ mcpa-25-consent-gates
 
 ## 实践实验
 
-打开 `code/main.py`。它构建一个包含四个工具的 server：`list_files`（只读、封闭世界，立即运行）、`search_web`（只读但面向开放世界，因为 openWorldHint 为 true，仍须同意门控）、`delete_file`（破坏性操作，须同意门控；背后有小型内存文件系统，可以观察 decline 后文件仍未改变）以及 `send_payment`（破坏性操作，并受 `payments:write` scope 门控，因此同时经过两道门）。
+打开 `code/main.py`。host 的 `approve_invocation` 会逐次决定能否发送敏感调用；它与 server 在调用中途请求补充输入的 MRTR 不是同一道门。代码构建一个包含四个工具的 server：`list_files`（只读、封闭世界，立即运行）、`search_web`（只读但面向开放世界，因为 openWorldHint 为 true，仍须同意门控）、`delete_file`（破坏性操作，须同意门控；背后有小型内存文件系统，可以观察 decline 后文件仍未改变）以及 `send_payment`（破坏性操作，并受 `payments:write` scope 门控，因此同时经过两道门）。
 
 ```bash
 python3 code/main.py
@@ -107,7 +107,7 @@ python3 code/main.py
 python3 -m unittest discover code/tests
 ```
 
-测试检查本课各项主张：只读工具无需 prompt 即可运行；破坏性工具会触发 elicitation；decline（以及 cancel）不会产生副作用；对一个工具的同意绝不覆盖另一个；篡改过的 retry 会被拒绝，却不会消耗合法的 `requestState`；已消费的 `requestState` 不能重放；step-up authorization 会计算 scope 并集并强制执行重试上限；`tools/list` 根据实际获授 scope 过滤。仓库的线协议检查器还会按 2026-07-28 规则验证本课 transcript：
+测试检查本课各项主张：host 拒绝时敏感请求不会发出，且批准只针对本次具名工具及参数；只读工具无需 prompt 即可运行；破坏性工具会触发 elicitation；decline（以及 cancel）不会产生副作用；对一个工具的同意绝不覆盖另一个；篡改过的 retry 会被拒绝，却不会消耗合法的 `requestState`；已消费的 `requestState` 不能重放；step-up authorization 会计算 scope 并集并强制执行重试上限；`tools/list` 根据实际获授 scope 过滤。仓库的线协议检查器还会按 2026-07-28 规则验证本课 transcript：
 
 ```bash
 python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/25-consent-and-least-privilege

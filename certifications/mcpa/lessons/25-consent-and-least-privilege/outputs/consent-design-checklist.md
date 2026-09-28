@@ -11,7 +11,7 @@
 
 ## 如何收集同意
 
-- [ ] host 在发出敏感 `tools/call` 前展示具名工具与具体参数，取得本次调用的人工批准；不能让不可信 server 的自述代替这道关卡。
+- [ ] host 在发出敏感 `tools/call` 前展示具名工具与具体参数，取得本次调用的人工批准；拒绝时不向 server 发送请求，不能让不可信 server 的自述代替这道关卡。
 - [ ] 若 server 在已有调用中仍需用户补充输入，可通过 Multi Round-Trip Request 传递：server 返回 `resultType: "input_required"`、method 为 `elicitation/create` 的 `inputRequests` 条目，通常还带 `requestState`。
 - [ ] client retry 使用全新的 JSON-RPC id，按 server 命名的 key 在 `inputResponses` 中携带答案，并精确回传 `requestState`。
 - [ ] 用户答案为三种 action 之一：`accept`（form mode 下带匹配的 `content`）、`decline` 或 `cancel`。只有 `accept` 构成同意；后两者都会阻止调用，但不是同一事件。

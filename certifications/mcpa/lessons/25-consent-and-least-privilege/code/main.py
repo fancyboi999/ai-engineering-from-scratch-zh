@@ -239,9 +239,13 @@ class Server:
         )
 
 
+HOST_GATED_TOOLS = frozenset({"search_web", "delete_file", "send_payment"})
+
+
 @dataclass
 class Client:
     server: Server
+    approve_invocation: Callable[[str, dict[str, Any]], bool] | None = None
     next_id: int = 0
     log: list[Any] = field(default_factory=list)
 
@@ -261,8 +265,15 @@ class Client:
     def list_tools(self, scopes: frozenset = frozenset()) -> list[dict]:
         return self.send("tools/list", scopes=scopes)["result"]["tools"]
 
+    def _host_approved(self, name: str, arguments: dict[str, Any]) -> bool:
+        return name not in HOST_GATED_TOOLS or (
+            self.approve_invocation is not None and self.approve_invocation(name, arguments) is True
+        )
+
     def call(self, name: str, arguments: dict[str, Any], scopes: frozenset = frozenset(), input_responses: dict | None = None,
              request_state: Any = None, violation: str | None = None) -> dict[str, Any]:
+        if not self._host_approved(name, arguments):
+            return {"hostDenied": "The host did not approve this invocation"}
         params: dict[str, Any] = {"name": name, "arguments": arguments}
         if input_responses is not None:
             params["inputResponses"] = input_responses
@@ -279,6 +290,8 @@ class Client:
 
     def call_with_step_up(self, name: str, arguments: dict[str, Any], scopes: Any,
                            authorize: Callable[[frozenset], frozenset]) -> tuple[dict[str, Any], frozenset]:
+        if not self._host_approved(name, arguments):
+            return {"hostDenied": "The host did not approve this invocation"}, frozenset(scopes)
         granted = frozenset(scopes)
         attempts = 0
         while True:
@@ -360,7 +373,7 @@ def build_files_server() -> Server:
 
 def run_scenario() -> dict[str, Any]:
     server = build_files_server()
-    client = Client(server)
+    client = Client(server, approve_invocation=lambda name, arguments: True)
 
     client.discover()
     client.list_tools()
@@ -440,7 +453,7 @@ def demo() -> None:
     print("tools/list with payments:read and payments:write ->", [tool["name"] for tool in scenario["scoped_tools_after"]])
     print("union of scopes ->", sorted(union_scopes({"payments:read"}, {"payments:write"})))
     stubborn_server = build_files_server()
-    stubborn_client = Client(stubborn_server)
+    stubborn_client = Client(stubborn_server, approve_invocation=lambda name, arguments: True)
     try:
         stubborn_client.call_with_step_up(
             "send_payment", {"payee": "mallory", "amountUsd": 999}, scopes=frozenset({"payments:read"}),
