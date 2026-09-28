@@ -1095,7 +1095,7 @@
       "domain": "use-cases-and-ecosystem",
       "objective": "分析客户端、服务端、SDK、扩展、网关和注册表之间的生态可移植性",
       "type": "single",
-      "prompt": "服务器的 server/discover 结果声明支持 io.modelcontextprotocol/tasks 扩展，但连接方客户端的 clientCapabilities.extensions 从未提及 tasks。客户端调用一个可以使用该扩展的工具时，应发生什么？",
+      "prompt": "服务器的 server/discover 结果声明支持 io.modelcontextprotocol/tasks 扩展，但客户端的 clientCapabilities.extensions 未声明 tasks。客户端调用的工具可以在当前请求内直接完成，tasks 只是可选扩展。服务器应如何响应？",
       "options": [
         "服务器退回核心协议行为，改为返回普通的 complete 结果",
         "客户端必须先声明服务器的每个扩展，才允许发送任何请求",
@@ -1105,7 +1105,7 @@
       "correct": [
         0
       ],
-      "explanation": "扩展按请求协商，只有双方都声明后才会启用。因此，只有服务器支持某扩展时，预期行为是退回核心协议，而不是把扩展强加给不知情的客户端。忽略客户端声明或直接使请求失败，都会破坏从未选择加入该扩展的客户端。",
+      "explanation": "扩展按请求协商，只有双方都声明后才会启用。本题的工具可直接完成、tasks 非必需，因此服务器返回核心协议的普通 complete 结果；若工具必须依赖未声明的扩展，则应返回 -32021 并说明所需能力，不能假装已完成。服务器不能把任务结果强加给未声明该扩展的客户端。",
       "references": [
         "certifications/mcpa/lessons/30-the-extensions-framework"
       ]
