@@ -6,6 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from audit_mcpa import audit
+from check_mcpa_wire import PROTOCOL_VERSION
 
 
 class McpaAuditTests(unittest.TestCase):
@@ -17,7 +18,7 @@ class McpaAuditTests(unittest.TestCase):
         (self.program / "tracks").mkdir(parents=True)
         paths = [f"certifications/mcpa/lessons/{number:02d}-lesson" for number in range(34)]
         objective = "协议版本与交互"
-        track = {"domains": [{"id": "protocol", "name": "协议", "weight": 20, "objectives": [objective]}] + [{"id": f"domain-{n}", "name": str(n), "weight": 20, "objectives": [objective]} for n in range(4)], "lessons": [{"path": path, "domains": ["protocol"]} for path in paths], "assessments": []}
+        track = {"exam": {"specVersion": PROTOCOL_VERSION}, "domains": [{"id": "protocol", "name": "协议", "weight": 20, "objectives": [objective]}] + [{"id": f"domain-{n}", "name": str(n), "weight": 20, "objectives": [objective]} for n in range(4)], "lessons": [{"path": path, "domains": ["protocol"]} for path in paths], "assessments": []}
         self.track_file = self.program / "tracks" / "mcpa-f.json"
         self.program_file = self.program / "program.json"
         self.prerequisite_file = self.program / "prerequisites.json"
@@ -29,7 +30,7 @@ class McpaAuditTests(unittest.TestCase):
             questions = [{"id": f"{name}-{n}", "domain": "protocol", "objective": objective, "type": "single", "prompt": "题目", "options": ["甲", "乙", "丙", "丁"], "correct": [0], "explanation": "答案说明", "references": [paths[0]]} for n in range(size)]
             (self.assessment_dir / f"{name}.json").write_text(json.dumps({**item, "track": "mcpa-f", "questions": questions}), encoding="utf-8")
         self.track_file.write_text(json.dumps(track), encoding="utf-8")
-        self.program_file.write_text(json.dumps({"id": "mcpa-certification", "tracks": ["mcpa-f"], "prerequisitesPath": "certifications/mcpa/prerequisites.json"}), encoding="utf-8")
+        self.program_file.write_text(json.dumps({"id": "mcpa-certification", "tracks": ["mcpa-f"], "prerequisitesPath": "certifications/mcpa/prerequisites.json", "specVersion": PROTOCOL_VERSION}), encoding="utf-8")
         self.prerequisite_file.write_text(json.dumps({"lessons": {path: paths[index - 1:index] for index, path in enumerate(paths)}}), encoding="utf-8")
         for path in paths:
             lesson = self.root / path
@@ -87,6 +88,15 @@ class McpaAuditTests(unittest.TestCase):
         issues = audit(self.root)
         self.assertTrue(any("program.json" in issue for issue in issues))
         self.assertTrue(any("合计 100" in issue for issue in issues))
+
+    def test_protocol_version_drift_fails(self):
+        program = json.loads(self.program_file.read_text(encoding="utf-8"))
+        program["specVersion"] = "1900-01-01"
+        self.program_file.write_text(json.dumps(program), encoding="utf-8")
+        track = json.loads(self.track_file.read_text(encoding="utf-8"))
+        track["exam"]["specVersion"] = "1900-01-01"
+        self.track_file.write_text(json.dumps(track), encoding="utf-8")
+        self.assertTrue(any("协议版本" in issue for issue in audit(self.root)))
 
     def test_unknown_objective_and_bad_prerequisite_fail(self):
         path = self.assessment_dir / "mock-01.json"

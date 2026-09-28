@@ -75,17 +75,11 @@ jobs:
       - name: MCPA wire checker 回归
         run: python3 scripts/test_check_mcpa_wire.py
       - name: MCPA 课程与认证题结构审计
-        run: |
-          if [ -f certifications/mcpa/program.json ]; then
-            python3 scripts/audit_mcpa.py
-          fi
+        run: python3 scripts/audit_mcpa.py
       - name: MCPA 审计回归
         run: python3 scripts/test_audit_mcpa.py
       - name: MCPA 课程 transcript 协议校验
-        run: |
-          if [ -f certifications/mcpa/program.json ]; then
-            python3 scripts/check_mcpa_wire.py
-          fi
+        run: python3 scripts/check_mcpa_wire.py
       - name: 认证补强引用完整性
         run: python3 scripts/backfill_certification_references.py --check
       # audit_certifications.py 校验答案位置、长度可预测性和多选组合分布，

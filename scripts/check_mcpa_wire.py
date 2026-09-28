@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
+import json
 import re
 import sys
 from dataclasses import dataclass, field
@@ -185,10 +187,24 @@ def check_result(
             report.add(where, "server/discover results must carry supportedVersions and capabilities")
 
 
+def negative_fixture_hash(entry: dict[str, Any]) -> str:
+    def stable(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {key: ("<volatile>" if key in {"requestState", "traceparent", "expiresAt", "issuedAt", "nonce"} else stable(item)) for key, item in value.items()}
+        if isinstance(value, list):
+            return [stable(item) for item in value]
+        return value
+
+    canonical = json.dumps(stable(entry), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def check_transcript(report: Report, lesson: str, entries: list[Any], extra_result_types: set[str]) -> None:
     allowed_types = CORE_RESULT_TYPES | extra_result_types
     pending: dict[Any, dict[str, Any]] = {}
     negative_example_ids: set[Any] = set()
+    fixture_path = Path(__file__).with_name("mcpa_negative_fixtures.json")
+    expected_negative = json.loads(fixture_path.read_text(encoding="utf-8"))
     issued_state: dict[tuple[str, str], tuple[Any, Any]] = {}
     negotiated_versions: set[str] = set()
     unsupported_requests: dict[Any, tuple[str, int]] = {}
@@ -196,6 +212,9 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
         message, wrapper = unwrap(entry)
         where = f"{lesson} transcript[{index}]"
         if wrapper.get("legacy") or wrapper.get("violation"):
+            expected_hash = expected_negative.get(lesson, {}).get(str(index))
+            if expected_hash is None or negative_fixture_hash(wrapper) != expected_hash:
+                report.add(where, "unregistered or changed negative example; update the reviewed fixture contract")
             if wrapper.get("violation") and not isinstance(wrapper.get("violation"), str):
                 report.add(where, "violation must be a string explaining the deliberate negative example")
             if not isinstance(message, dict):
@@ -224,7 +243,6 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
             version = (params.get("_meta") or {}).get(PV_KEY) if isinstance(params.get("_meta"), dict) else None
             if version != PROTOCOL_VERSION and version not in negotiated_versions:
                 unsupported_requests[message.get("id")] = (where, index)
-            negotiated_versions.discard(version)
             target = str(params.get("name") or params.get("uri") or "")
             key = (str(message.get("method")), target)
             if message.get("method") != "tasks/update" and ("inputResponses" in params or "requestState" in params):
@@ -276,10 +294,16 @@ def check_transcript(report: Report, lesson: str, entries: list[Any], extra_resu
                 if not isinstance(error, dict) or error.get("code") != -32022:
                     report.add(unsupported_requests[message["id"]][0], f"request protocol version must be {PROTOCOL_VERSION} or a previously negotiated supported version")
                 unsupported_requests.pop(message["id"])
-            if request and request.get("method") == "server/discover" and isinstance(error, dict) and error.get("code") == -32022:
+            if request and isinstance(error, dict) and error.get("code") == -32022:
                 data = error.get("data")
-                if isinstance(data, dict) and isinstance(data.get("supported"), list):
-                    negotiated_versions.update(version for version in data["supported"] if isinstance(version, str))
+                meta = request.get("params", {}).get("_meta", {}) if isinstance(request.get("params"), dict) else {}
+                if isinstance(data, dict):
+                    if data.get("requested") != meta.get(PV_KEY):
+                        report.add(where, "UnsupportedProtocolVersion data.requested must match the request protocol version")
+                    if not isinstance(data.get("supported"), list) or not all(isinstance(version, str) for version in data["supported"]):
+                        report.add(where, "UnsupportedProtocolVersion data.supported must contain only version strings")
+                    elif request.get("method") == "server/discover":
+                        negotiated_versions.update(data["supported"])
             check_error(report, where, error)
     for request_id in pending:
         if request_id not in negative_example_ids:

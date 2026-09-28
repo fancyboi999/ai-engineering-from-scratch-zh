@@ -1,0 +1,63 @@
+{
+  "01-reading-the-specification": {
+    "4": "2a6216c1aa601e1e1c6afc36485d0c2fece1e176bf5cb4d7c711e93e1662ae35"
+  },
+  "03-json-rpc-and-meta": {
+    "3": "ee54b4d6563a546d7f7842573a85a868a8fcdd3c36fe0b7170deeceb274486de",
+    "4": "33132753b3179e03937c86f77eb75e251444ee4b9dc4363ab5960753ac45ffa2",
+    "5": "505425f9fec38e16ccc986fcceb9db54037bd6aa9af8d451b78145414da3a3a4"
+  },
+  "05-protocol-eras-and-compatibility": {
+    "8": "f093fbcbfc46460a42746d36917d816d98d17ca157b4561afcc843bba71303f0",
+    "9": "23c82f865a102d10f67b48c18f991e8d753402ab693848ecdf8036c022868b47",
+    "11": "c286562aed83ca12b519c5e56ff23063f8cb4066c91518c4440421529d5abae7",
+    "12": "2a8be6e028654166eefc39867a59d7d7219fa44aae4301821e7b5862e37f570f",
+    "13": "70745ca31d912290e003bc94738342d6f5627d8b6b991fd89a84aa18d6af7683",
+    "14": "1e52369a67570d624163dd5b2ecb0cceb2300f733d7b518fe2f13c70249f1999"
+  },
+  "08-tool-schemas-and-structured-content": {
+    "18": "1dbfdbc95a8d66d80105dd63e50febf2ff976235e8745156a989fbdaf9bc060e"
+  },
+  "09-reading-server-manifests": {
+    "8": "40b844f886e0a7d9d5aa334d377017eed135e2872fcc0ebcd2c5a855073d5001"
+  },
+  "14-multi-round-trip-requests-and-elicitation": {
+    "12": "5349c9d188b4c6fe2006926fc3a1cb148a3c6e67498d9f1942289200b53bb92c",
+    "16": "91544182c019362613261f5da89715e75629f8b13ebd8cc506f6c961d8ac611e",
+    "22": "e92b3255acec3d0e4f625b9830c738e6cf37e9f7f94d1538f16a814d188a3ba1",
+    "24": "8b2444eb48b87e1542c926e8e41b022a9c42b29f1b11eb428919ed31ca50fb16"
+  },
+  "15-deprecated-client-features": {
+    "14": "069ccfc9d175c8f602dd6cce9512358928a13c6c1bb28bea5d51bd90dd2f3d57",
+    "15": "a2fff1a862b64fff8cd47590444a49a4f50c83ba5148df0a30e66e334003d408"
+  },
+  "16-notifications-and-subscriptions": {
+    "13": "476fa4849a738689601b99df8cabd36dfc8a02b037a884b0f8bc1b184fdb4ecc"
+  },
+  "17-tool-invocation-lifecycle": {
+    "35": "2247b5ba5a67443225281774ea673203dd5048d724152fab82f9f7be3c236e95"
+  },
+  "18-error-handling": {
+    "20": "c96837d517faf22f46fabe9f1b0922a4720e63402b34b1e1870cfb9064c4d1f6",
+    "23": "df19713d4150971a8159411c96bfadb760880ab8621b93badfdaadf28e5e0848",
+    "24": "261a648083171671100e9de9263b251fff7189ed8db3f0935a3e6bc378776f0b"
+  },
+  "19-transports-and-http-headers": {
+    "4": "bf30055429c0cadc64ceb72e778c1e3995b75851e197aa1866022e354eda2e2f"
+  },
+  "20-caching-and-pagination": {
+    "26": "cdafe94d15d6a7ee898c5c0c2cc0a33e5d519c548328fb69804b41585de4ad20"
+  },
+  "22-trust-boundaries": {
+    "12": "22a1c28823c891575f265cf145db4f491ef7b133d273a20436d0a052e2ca7f9e"
+  },
+  "25-consent-and-least-privilege": {
+    "12": "30ab98d098d2b72c95890f9284970f45ab9c168c800ac95deab52e3ca66de3df"
+  },
+  "32-registry-gateways-and-sdk-tiers": {
+    "12": "815a8cdc7d12f401de9fff132eebe74e7f8697c342afc2c6e6fccb2b5b70eca1"
+  },
+  "33-mcpa-capstone-readiness": {
+    "19": "149104f6f1383eae3208676ca3ad13bf01db2e9e5aae5d76d60d2faaacc88a2c"
+  }
+}

@@ -50,7 +50,7 @@ class ModernExchangeTests(unittest.TestCase):
     def test_initialize_is_rejected_unless_marked_legacy(self):
         legacy = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
         self.assertTrue(any("does not exist" in item for item in findings([legacy])))
-        self.assertEqual(findings([{"legacy": True, "message": legacy}]), [])
+        self.assertTrue(any("unregistered" in item for item in findings([{"legacy": True, "message": legacy}])))
 
     def test_request_without_meta_is_flagged(self):
         entries = [{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}]
@@ -67,6 +67,14 @@ class ModernExchangeTests(unittest.TestCase):
         retry = request(2, "server/discover")
         retry["params"]["_meta"] = {**META, "io.modelcontextprotocol/protocolVersion": "2026-11-18"}
         entries = [request(1, "server/discover"), error(1, -32022, {"supported": ["2026-11-18"], "requested": "2026-07-28"}), retry, result(2, resultType="complete", supportedVersions=["2026-11-18"], capabilities={}, ttlMs=0, cacheScope="public")]
+        self.assertEqual(findings(entries), [])
+
+    def test_negotiated_version_remains_usable_on_following_requests(self):
+        retry = request(2, "server/discover")
+        retry["params"]["_meta"] = {**META, "io.modelcontextprotocol/protocolVersion": "2026-11-18"}
+        followup = request(3, "tools/list")
+        followup["params"]["_meta"] = retry["params"]["_meta"]
+        entries = [request(1, "server/discover"), error(1, -32022, {"supported": ["2026-11-18"], "requested": "2026-07-28"}), retry, result(2, resultType="complete", supportedVersions=["2026-11-18"], capabilities={}, ttlMs=0, cacheScope="public"), followup, result(3, resultType="complete", tools=[], ttlMs=0, cacheScope="public")]
         self.assertEqual(findings(entries), [])
 
     def test_result_without_result_type_is_flagged(self):
@@ -93,10 +101,16 @@ class ErrorCodeTests(unittest.TestCase):
                 entries = [request(1, "tools/call", name="x", arguments={}), error(1, code)]
                 self.assertEqual(findings(entries), [])
 
+    def test_unsupported_version_data_must_match_request(self):
+        entries = [request(1, "server/discover"), error(1, -32022, {"supported": ["2026-07-28", 7], "requested": "1900-01-01"})]
+        messages = findings(entries)
+        self.assertTrue(any("data.requested" in item for item in messages))
+        self.assertTrue(any("data.supported" in item for item in messages))
+
     def test_unsupported_version_requires_data(self):
         entries = [request(1, "tools/list"), error(1, -32022)]
         self.assertTrue(any("-32022" in item for item in findings(entries)))
-        entries = [request(1, "tools/list"), error(1, -32022, {"supported": ["2026-07-28"], "requested": "1900-01-01"})]
+        entries = [request(1, "tools/list"), error(1, -32022, {"supported": ["2026-07-28"], "requested": "2026-07-28"})]
         self.assertEqual(findings(entries), [])
 
 
@@ -196,10 +210,14 @@ class StreamAndHeaderTests(unittest.TestCase):
         self.assertTrue(any("no response" in item for item in findings([request(1, "tools/call", name="x", arguments={})])))
         self.assertTrue(any("does not answer" in item for item in findings([error(99, -32602)])))
 
-    def test_deliberate_violations_are_skipped(self):
+    def test_unregistered_violations_cannot_bypass_wire_checks(self):
         broken = {"jsonrpc": "2.0", "id": 9, "method": "tools/list", "params": {}}
         entries = [{"violation": "shows the -32602 rejection of a request without _meta", "message": broken}, error(9, -32602)]
-        self.assertEqual(findings(entries), [])
+        self.assertTrue(any("unregistered" in item for item in findings(entries)))
+        arbitrary = {"violation": "not actually a violation", "message": result(3, nonsense=True)}
+        self.assertTrue(any("unregistered" in item for item in findings([arbitrary])))
+        valid = {"violation": "not actually a violation", "message": request(1, "tools/list")}
+        self.assertTrue(any("unregistered" in item for item in findings([valid])))
 
     def test_wrappers_around_a_non_object_message_are_flagged(self):
         for wrapper in ({"legacy": True, "message": None}, {"violation": "typo", "message": "initialize"}):

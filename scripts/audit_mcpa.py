@@ -19,6 +19,7 @@ STAGES = ("pre", "check", "check", "check", "post", "post")
 
 def audit(root: Path = ROOT) -> list[str]:
     program = root / "certifications" / "mcpa"
+    from check_mcpa_wire import PROTOCOL_VERSION
     track_file = program / "tracks" / "mcpa-f.json"
     problems: list[str] = []
     if not track_file.is_file():
@@ -32,6 +33,8 @@ def audit(root: Path = ROOT) -> list[str]:
         metadata = json.loads(program_file.read_text(encoding="utf-8"))
         if metadata.get("id") != "mcpa-certification" or metadata.get("tracks") != ["mcpa-f"] or metadata.get("prerequisitesPath") != "certifications/mcpa/prerequisites.json":
             problems.append(f"{program_file}: 项目标识、路线或前置要求路径不符")
+        if metadata.get("specVersion") != PROTOCOL_VERSION or track.get("exam", {}).get("specVersion") != PROTOCOL_VERSION:
+            problems.append(f"{program_file}: 项目和路线协议版本必须为 {PROTOCOL_VERSION}")
     except (OSError, ValueError, AttributeError) as exc:
         problems.append(f"{program_file}: {exc}")
     domains = track.get("domains", [])
