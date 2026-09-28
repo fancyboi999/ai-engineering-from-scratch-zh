@@ -1,0 +1,78 @@
+{
+  "lesson": "27-auditability-and-observability",
+  "title": "用一个 Trace ID 连接可审计性与可观测性",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "在 2026-07-28 的无状态模型下，服务器为什么不能只根据工具调用到达时使用的连接，把它与先前调用关联起来？",
+      "options": [
+        "服务器必须丢弃客户端最近请求运行的工具名称",
+        "JSON-RPC 禁止客户端在已打开的连接上发送第二个请求",
+        "每个请求都会打开全新的网络连接，因此任何两个请求都不共享传输路径",
+        "连接在请求之间不承载任何预设含义，所以关联信息必须显式放进各请求自己的元数据"
+      ],
+      "correct": 3,
+      "explanation": "协议是无状态的，服务器不得从共享连接推断信息。因此，trace id 等关联标识必须显式携带在请求自己的 _meta 中。"
+    },
+    {
+      "stage": "check",
+      "question": "某请求的 _meta 携带 traceparent：\"00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01\"。以连字符分隔的第三、第四段分别表示什么？",
+      "options": [
+        "标识当前 span 的 parent id，以及 trace 是否采样等 flags",
+        "服务器用来回忆该客户端先前请求中信息的 session 标识",
+        "服务器与 method 名称一同哈希、用于查找缓存结果的 cache key",
+        "客户端生成的签名，用于让服务器验证请求未被篡改"
+      ],
+      "correct": 0,
+      "explanation": "W3C traceparent 格式为 version-traceid-parentid-flags，因此第三段是当前 span 的 16 字符 parent id，第四段是 flags 字节，例如 sampled 位。"
+    },
+    {
+      "stage": "check",
+      "question": "ops-desk 必须调用 credential-vault 才能完成 reset_api_key。该出站调用的 traceparent 应包含什么？",
+      "options": [
+        "与 ops-desk 收到的 traceparent 完全相同，原样转发给 credential-vault",
+        "保留 ops-desk 收到的同一 trace id，并为这一新跳生成新的 parent id",
+        "完全不带 traceparent，因为 credential-vault 是另一台服务器，不能共享 ops-desk 的活动 trace",
+        "使用全新的 trace id，使 credential-vault 的日志永远不会与其他服务器记录混合"
+      ],
+      "correct": 1,
+      "explanation": "规范的一跳会保持 trace id 不变，使完整操作持续关联；但会生成自己的新 parent id，而不是复用收到的值。"
+    },
+    {
+      "stage": "check",
+      "question": "审计条目必须记录实际发起工具调用的人。哪个值应写入该字段？",
+      "options": [
+        "请求自行报告的 clientInfo 区块中的 name 字段，因为它已经在 _meta 中",
+        "服务器自己的 serverInfo 名称，因为审计条目由服务器写入",
+        "bearer token 等有效凭据在该请求中真正解析出的 principal",
+        "工具描述中碰巧为调用者建议的任意自由文本标签"
+      ],
+      "correct": 2,
+      "explanation": "clientInfo 和 serverInfo 都是自行报告的信息，绝不是安全信号。因此，审计记录中的“谁”必须是有效凭据真正解析出的已认证 principal。"
+    },
+    {
+      "stage": "post",
+      "question": "攻击者修改了 ops-desk 日志中条目 0 的参数，还重算条目 0 自身存储的哈希，使其与新内容匹配。随后运行 verify() 会怎样？",
+      "options": [
+        "验证会完全停止，因为修改一个条目的哈希会禁用其后的所有检查",
+        "无论攻击者实际完成了哪个条目的修改，验证都会立即在条目 0 失败",
+        "验证会干净通过，因为哈希链只能检测最后一个条目的损坏",
+        "验证仍会在条目 1 失败，因为其 prev_hash 不再匹配条目 0 的新哈希"
+      ],
+      "correct": 3,
+      "explanation": "修补条目 0 自身的哈希可以掩盖该条目处的变化，但条目 1 仍将原始哈希存为 prev_hash，该链接已经不再匹配，因此断裂会在下一条目暴露。"
+    },
+    {
+      "stage": "post",
+      "question": "ops-desk 和 credential-vault 各自维护独立的哈希链日志。审核者如何确认两份日志中的两个条目来自同一次终端用户操作？",
+      "options": [
+        "两个条目携带相同的 trace id，即使 request id 和哈希链不同",
+        "两个条目携带相同的 request id，因为一次操作的每一跳都会复用该 id",
+        "credential-vault 的日志会先静默复制 ops-desk 已写入的每个条目",
+        "审核者匹配两个条目的时间戳，因为两台服务器共享一个同步系统时钟"
+      ],
+      "correct": 0,
+      "explanation": "每一跳会生成自己的 request id，并维护自己的链。跨服务器关联只能依靠一次操作全程不变的 trace id。"
+    }
+  ]
+}
