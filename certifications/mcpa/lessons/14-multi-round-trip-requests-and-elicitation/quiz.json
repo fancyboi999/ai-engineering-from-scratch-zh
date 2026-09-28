@@ -1,0 +1,78 @@
+{
+  "lesson": "14-multi-round-trip-requests-and-elicitation",
+  "title": "多轮请求与信息征询",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "某次 tool 调用需要用户确认破坏性操作，无状态的 2026-07-28 服务器才能继续完成。此时会发生什么？",
+      "options": [
+        "服务器原地阻塞，直到后台 worker 代为完成确认",
+        "服务器把调用保存在内存中，等待独立确认端点最终被访问",
+        "服务器以 input_required 结果结束调用，客户端再以新请求重试",
+        "服务器打开一个流，在原调用保持打开时推送服务器发起请求"
+      ],
+      "correct": 2,
+      "explanation": "MRTR 取代服务器发起请求：服务器以 resultType 为 input_required 的结果结束原调用，客户端收集输入后再独立重试该请求。"
+    },
+    {
+      "stage": "check",
+      "question": "客户端收集完 inputRequests 中列出的答案并重试 tools/call 时，JSON-RPC id 必须满足什么条件？",
+      "options": [
+        "完全省略，因为重试会在原响应流上获得回答",
+        "复用 input_required 响应对应的 id，便于服务器匹配状态",
+        "由服务器选择，并在 requestState 内返回给客户端",
+        "使用全新的 id，因为重试完全属于独立请求"
+      ],
+      "correct": 3,
+      "explanation": "重试是完全独立的请求，因此其 JSON-RPC id 必须不同于收到 input_required 的原调用 id。"
+    },
+    {
+      "stage": "check",
+      "question": "客户端必须如何处理 input_required 结果携带的 requestState 字段？",
+      "options": [
+        "重试时原样回传，不检查也不修改其内容",
+        "把它合并进 clientInfo，让服务器从受信任字段中读回",
+        "与 tool 定义一起缓存，让未来调用复用同一个值",
+        "在本地解码，检查编码的过期时间戳是否已经到期"
+      ],
+      "correct": 0,
+      "explanation": "requestState 对客户端不透明；客户端必须在重试时原样回传，不得以任何方式解析、检查或修改。"
+    },
+    {
+      "stage": "check",
+      "question": "MRTR 允许服务器用 input_required 结果响应哪组客户端请求？",
+      "options": [
+        "仅限 _meta 块中已经带 progressToken 的请求",
+        "仅限 tools/call、prompts/get 和 resources/read，协议中的其他请求都不允许",
+        "任意客户端请求，因为 input_required 是通用暂停信号",
+        "仅限 server/discover，因为它被视为唯一协议入口"
+      ],
+      "correct": 1,
+      "explanation": "服务器只能对 tools/call、prompts/get 和 resources/read 返回 InputRequiredResult；其他所有客户端请求都必须以 resultType complete 结束。"
+    },
+    {
+      "stage": "post",
+      "question": "重试携带的 requestState 签名有效且尚未过期，但它是为另一名经过认证的 principal 签发的。服务器应怎么做？",
+      "options": [
+        "接受，因为完整的 HMAC 签名已经证明该 state 可信",
+        "先让模型以纯文本确认 principal，再决定是否接受",
+        "拒绝，因为 requestState 始终绑定到最初签发给的 principal",
+        "允许使用一次，再把不匹配情况留给日后人工审计"
+      ],
+      "correct": 2,
+      "explanation": "仅有完整性还不够：requestState 必须绑定到签发时经过认证的 principal，即使签名验证通过，principal 不匹配也必须拒绝。"
+    },
+    {
+      "stage": "post",
+      "question": "部署 tool 需要用户的支付卡号才能继续。在 2026-07-28 下应如何收集该值？",
+      "options": [
+        "跳过信息征询，让模型根据对话推断一个合理值",
+        "把请求放进 clientInfo，让客户端替模型预填",
+        "使用 form 模式 elicitation/create 请求，并为卡片字段提供 requestedSchema",
+        "使用 URL 模式信息征询，让交互完全发生在 MCP 客户端之外"
+      ],
+      "correct": 3,
+      "explanation": "服务器不得使用 form 模式收集支付凭据等敏感数据；URL 模式让交互在带外完成，使该值不会经过 MCP 客户端。"
+    }
+  ]
+}
