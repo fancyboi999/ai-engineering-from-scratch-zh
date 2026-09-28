@@ -84,6 +84,18 @@ class TasksExtensionTests(unittest.TestCase):
         response = self.client.send("tasks/get", {"taskId": task_id}, capabilities=main.TASKS_CAPS)
         self.assertEqual(response["result"]["status"], "cancelled")
 
+    def test_task_requests_are_authorized_for_each_principal(self) -> None:
+        task_id = self._create()["result"]["taskId"]
+        for method, params in (
+            ("tasks/get", {"taskId": task_id}),
+            ("tasks/update", {"taskId": task_id, "inputResponses": {}}),
+            ("tasks/cancel", {"taskId": task_id}),
+        ):
+            response = self.client.send(method, params, capabilities=main.TASKS_CAPS, principal="another-user")
+            self.assertEqual(response["error"]["code"], main.INVALID_PARAMS)
+        owner = self.client.send("tasks/get", {"taskId": task_id}, capabilities=main.TASKS_CAPS)
+        self.assertEqual(owner["result"]["status"], "working")
+
     def test_unknown_task_id_is_a_protocol_error(self) -> None:
         response = self.client.send("tasks/get", {"taskId": "tsk_does_not_exist"}, capabilities=main.TASKS_CAPS)
         self.assertNotIn("result", response)

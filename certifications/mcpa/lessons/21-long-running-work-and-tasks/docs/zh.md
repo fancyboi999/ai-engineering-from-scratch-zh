@@ -69,7 +69,7 @@ MCP 使用官方 extension `io.modelcontextprotocol/tasks`（SEP-2663）回答�
 
 在服务器发出 handle 前，使用该 handle 的 `tasks/get` 必须已经能够解析成功。若存储系统是最终一致的，服务器就应等待写入可见后再回答；跳过这一步会给客户端一个立即报告不存在的 `taskId`，还不如多阻塞片刻。
 
-客户端使用 `tasks/get` 轮询，只发送收到的 `taskId`。考试喜欢考一个细节：`tasks/get` 本身是会完成的普通请求，所以它自身的 `resultType` 始终是 `"complete"`。底层 job 的状态——`working`、`input_required`、`completed`、`failed`、`cancelled`——位于同一 result 内另一个内嵌 `status` 字段，而不是 `resultType`。混淆两者看似无害，但客户端一看到 `resultType: "complete"` 就停止轮询时便会出错，因为无论 job 是否仍在运行，每次 poll 都是这个值。
+客户端使用 `tasks/get` 轮询，只发送收到的 `taskId`。该高熵 id 只负责定位，不能替代授权：服务器必须将 task 绑定到创建时的认证主体，并在每次 `tasks/get`、`tasks/update`、`tasks/cancel` 上检查调用方是否有权访问。考试喜欢考一个细节：`tasks/get` 本身是会完成的普通请求，所以它自身的 `resultType` 始终是 `"complete"`。底层 job 的状态——`working`、`input_required`、`completed`、`failed`、`cancelled`——位于同一 result 内另一个内嵌 `status` 字段，而不是 `resultType`。混淆两者看似无害，但客户端一看到 `resultType: "complete"` 就停止轮询时便会出错，因为无论 job 是否仍在运行，每次 poll 都是这个值。
 
 不存在 `tasks/result`。task 达到 `completed` 后，紧接着的 `tasks/get` 响应会在 `result` 下内联原始结果，其结构与同步请求原本返回的完全相同。task 达到 `failed` 时，同一响应会在 `error` 下携带 JSON-RPC 错误。以 `isError: true` 结束的工具调用仍属于 `completed`，因为调用在协议层正常成功；`failed` 只保留给执行期间的 JSON-RPC 错误，不能用于普通工具层失败。
 
@@ -99,7 +99,7 @@ task 可在执行中暂停，请求创建时尚不需要的输入。其 status �
 
 取消的工作方式相同：`tasks/cancel` 只发送 `taskId`，返回空 acknowledgement。它是协作式请求，而非保证；服务器记录取消意图，但仍可能完成工作，因为中途停止未必安全或可行。这里不要使用 `notifications/cancelled`。该 notification 用于终止某条传输 stream 上仍未结束的请求，而 task 的初始请求在返回 `resultType: "task"` 时就已完成，根本没有未结束请求可以这样取消。durable job 一旦存在，`tasks/cancel` 是唯一取消入口。
 
-客户端若在具体 task 方法请求中没有声明 extension，会收到 `-32021` Missing Required Client Capability，并在 `data.requiredCapabilities` 中列出该 extension。未知或过期的 `taskId` 返回 `-32602`，与第 18 课中畸形请求的错误码相同，因为 `tasks/get`、`tasks/update`、`tasks/cancel` 都是普通 JSON-RPC request，受协议通用规则约束，包括逐请求元数据。
+客户端若在具体 task 方法请求中没有声明 extension，会收到 `-32021` Missing Required Client Capability，并在 `data.requiredCapabilities` 中列出该 extension。未知、过期或调用方无权访问的 `taskId` 在本实验中均返回 `-32602`，不向其他主体暴露 task 是否存在；高熵 `taskId` 与逐请求授权是两道独立控制。该错误码与第 18 课中畸形请求的错误码相同，因为 `tasks/get`、`tasks/update`、`tasks/cancel` 都是普通 JSON-RPC request，受协议通用规则约束，包括逐请求元数据。
 
 四种模式的选择取决于什么需要在当前请求之后继续存在。工作快速且确定时，普通调用足够。服务器只需一个简短答案就能完成当前请求时，MRTR 往返（第 14 课）足够。工作可能超过 timeout、执行中途可能暂停等待输入，或需要跨客户端重启与主动取消存活时，task 的额外复杂度才值得。服务器生成的 handle（第 04 课模式）解决的是完全不同的问题：它把购物车或打开的 session 等跨调用应用状态作为普通工具参数向前传递。`taskId` 恰好是这一思想的一个实例，专用于轮询单个延期工作单元，而不是无限期保持状态。
 

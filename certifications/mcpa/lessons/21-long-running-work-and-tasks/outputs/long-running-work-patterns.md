@@ -14,6 +14,7 @@
 - 客户端在每个可能需要该能力的请求上，通过 `io.modelcontextprotocol/clientCapabilities.extensions["io.modelcontextprotocol/tasks"]` 声明支持，而不是为整个 session 只声明一次；没有 session 可以记住它。
 - 服务器在 `server/discover` 的 `capabilities.extensions` 中声明同一 extension。
 - 服务器不得向未声明 extension 的请求返回 `CreateTaskResult`。若仍能在当前请求中完成工作，就返回普通结果；只有不使用 task 就无法处理时，才返回 `-32021`（Missing Required Client Capability），并携带 `data.requiredCapabilities`。客户端若未在当前请求声明 extension，其 `tasks/get`、`tasks/update`、`tasks/cancel` 也返回 `-32021`。
+- 服务器将 task 绑定到创建时的认证主体；每次 get、update 或 cancel 都重新做授权检查，高熵 `taskId` 不能作为 bearer 授权凭据。
 - 服务器逐请求决定是否创建 task。声明 extension 的客户端必须能为同一工具处理普通结果或 `resultType: "task"`。
 - 当前版本只有 `tools/call` 支持 task augmentation。
 

@@ -76,6 +76,7 @@ class Task:
     last_updated_at: str = field(default_factory=_timestamp)
     ttl_ms: int = 900000
     poll_interval_ms: int = 2000
+    owner: str = ""
     input_requests: dict = field(default_factory=dict)
     result: dict | None = None
 
@@ -114,7 +115,7 @@ class Server:
     def _supports_tasks(self) -> bool:
         return TASKS_EXTENSION in (self.capabilities.get("extensions") or {})
 
-    def handle(self, message: dict) -> dict:
+    def handle(self, message: dict, principal: str = "learner") -> dict:
         request_id = message.get("id")
         params = message.get("params") or {}
         meta = params.get("_meta") or {}
@@ -133,13 +134,13 @@ class Server:
         if method == "tools/list":
             return self._list_tools(request_id)
         if method == "tools/call":
-            return self._call_tool(request_id, params, meta)
+            return self._call_tool(request_id, params, meta, principal)
         if method == "tasks/get":
-            return self._task_get(request_id, params, meta)
+            return self._task_get(request_id, params, meta, principal)
         if method == "tasks/update":
-            return self._task_update(request_id, params, meta)
+            return self._task_update(request_id, params, meta, principal)
         if method == "tasks/cancel":
-            return self._task_cancel(request_id, params, meta)
+            return self._task_cancel(request_id, params, meta, principal)
         return make_error(request_id, METHOD_NOT_FOUND, f"Method not found: {method}")
 
     def _discover(self, request_id: Any) -> dict:
@@ -179,7 +180,7 @@ class Server:
             "_meta": self._server_meta(),
         }
 
-    def _call_tool(self, request_id: Any, params: dict, meta: dict) -> dict:
+    def _call_tool(self, request_id: Any, params: dict, meta: dict, principal: str) -> dict:
         if params.get("name") != TOOL_NAME:
             return make_error(request_id, INVALID_PARAMS, f"Unknown tool: {params.get('name')}")
         arguments = params.get("arguments") or {}
@@ -194,7 +195,7 @@ class Server:
             )
         project, environment = arguments["project"], arguments["environment"]
         if self._supports_tasks() and _client_declares_tasks(meta):
-            task = Task(task_id=f"tsk_{uuid.uuid4().hex[:12]}", project=project, environment=environment)
+            task = Task(task_id=f"tsk_{uuid.uuid4().hex[:12]}", project=project, environment=environment, owner=principal)
             self.tasks[task.task_id] = task
             return make_result(
                 request_id,
@@ -215,7 +216,7 @@ class Server:
             {"requiredCapabilities": {"extensions": {TASKS_EXTENSION: {}}}},
         )
 
-    def _find_task(self, request_id: Any, params: dict, meta: dict) -> tuple[Task | None, dict | None]:
+    def _find_task(self, request_id: Any, params: dict, meta: dict, principal: str) -> tuple[Task | None, dict | None]:
         if not (self._supports_tasks() and _client_declares_tasks(meta)):
             return None, make_error(
                 request_id,
@@ -224,18 +225,18 @@ class Server:
                 {"requiredCapabilities": {"extensions": {TASKS_EXTENSION: {}}}},
             )
         task = self.tasks.get(params.get("taskId"))
-        if task is None:
+        if task is None or task.owner != principal:
             return None, make_error(request_id, INVALID_PARAMS, "Failed to retrieve task: Task not found")
         return task, None
 
-    def _task_get(self, request_id: Any, params: dict, meta: dict) -> dict:
-        task, error = self._find_task(request_id, params, meta)
+    def _task_get(self, request_id: Any, params: dict, meta: dict, principal: str) -> dict:
+        task, error = self._find_task(request_id, params, meta, principal)
         if error is not None:
             return error
         return task.snapshot(request_id)
 
-    def _task_update(self, request_id: Any, params: dict, meta: dict) -> dict:
-        task, error = self._find_task(request_id, params, meta)
+    def _task_update(self, request_id: Any, params: dict, meta: dict, principal: str) -> dict:
+        task, error = self._find_task(request_id, params, meta, principal)
         if error is not None:
             return error
         responses = params.get("inputResponses") or {}
@@ -249,8 +250,8 @@ class Server:
             task.touch()
         return make_result(request_id, "complete")
 
-    def _task_cancel(self, request_id: Any, params: dict, meta: dict) -> dict:
-        task, error = self._find_task(request_id, params, meta)
+    def _task_cancel(self, request_id: Any, params: dict, meta: dict, principal: str) -> dict:
+        task, error = self._find_task(request_id, params, meta, principal)
         if error is not None:
             return error
         if task.status not in ("completed", "cancelled"):
@@ -296,10 +297,10 @@ class Client:
         self.log: list[dict] = []
 
     def send(self, method: str, params: dict | None = None, capabilities: dict | None = None,
-              version: str = PROTOCOL_VERSION) -> dict:
+              version: str = PROTOCOL_VERSION, principal: str = "learner") -> dict:
         self.next_id += 1
         request = make_request(self.next_id, method, params, capabilities, version)
-        response = self.server.handle(request)
+        response = self.server.handle(request, principal=principal)
         self.log.extend([request, response])
         return response
 
