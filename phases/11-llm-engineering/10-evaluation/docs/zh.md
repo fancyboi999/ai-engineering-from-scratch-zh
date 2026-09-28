@@ -856,7 +856,7 @@ DeepEval 与 Pytest 集成。运行 `deepeval test run test_evals.py`，把评�
 - [DeepEval Documentation](https://docs.confident-ai.com)——Python 原生的评估框架，带 14+ 指标、Pytest 集成和幻觉检测
 - [Braintrust Eval Guide](https://www.braintrust.dev/docs)——生产评估平台，带实验跟踪、打分函数和数据集管理
 - [Ribeiro et al., 2020 -- "Beyond Accuracy: Behavioral Testing of NLP Models with CheckList"](https://arxiv.org/abs/2005.04118)——系统化的行为测试方法（最小功能、不变性、方向性预期），适用于 LLM 评估
-- [LMSYS Chatbot Arena](https://chat.lmsys.org)——实时人工评估平台，用户对模型输出投票，是 LLM 最大的成对比较数据集
+- [Arena（原 LMSYS Chatbot Arena）](https://arena.ai/)——实时人工评估平台，用户对模型输出投票，是 LLM 最大的成对比较数据集
 - [Es et al., "RAGAS: Automated Evaluation of Retrieval Augmented Generation" (EACL 2024 demo)](https://arxiv.org/abs/2309.15217)——RAG 的无参考指标（忠实度、答案相关性、上下文 precision/recall）；不靠标注者就能扩展到生产的评估模式。
 - [Liu et al., "G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment" (EMNLP 2023)](https://arxiv.org/abs/2303.16634)——把思维链 + 填表作为一种 judge 协议；每个 judge 构建者都需要的校准和偏见结果。
 - [Hugging Face LLM Evaluation Guidebook](https://huggingface.co/spaces/OpenEvals/evaluation-guidebook)——来自维护 Open LLM Leaderboard 团队的实用建议，关于数据污染、指标选择和可复现性。

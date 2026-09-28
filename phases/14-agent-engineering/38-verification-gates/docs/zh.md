@@ -140,7 +140,6 @@ python3 code/main.py
 - [Type-Checked Compliance: Deterministic Guardrails (arXiv 2604.01483)](https://arxiv.org/pdf/2604.01483) —— Lean 4 作为确定性关卡的上限
 - [logi-cmd/agent-guardrails — merge gate spec](https://github.com/logi-cmd/agent-guardrails) —— 范围 + 变异测试关卡
 - [Guardrails AI x MLflow](https://guardrailsai.com/blog/guardrails-mlflow) —— 把确定性校验器当 CI 打分器
-- [Akira, Real-Time Guardrails for Agentic Systems](https://www.akira.ai/blog/real-time-guardrails-agentic-systems) —— 工具前/后关卡
 - 阶段 14 · 27 —— prompt 注入防御（关卡的对抗搭档）
 - 阶段 14 · 36 —— 这个关卡强制的范围契约
 - 阶段 14 · 37 —— 这个关卡打分的反馈日志

@@ -106,7 +106,7 @@
 | Open ASR Leaderboard (HF) | 英语 + 多语种 + 长音频 | `huggingface.co/spaces/hf-audio/open_asr_leaderboard` |
 | TTS Arena (HF) | 英语 TTS | `huggingface.co/spaces/TTS-AGI/TTS-Arena` |
 | Artificial Analysis Speech | TTS + STT，成对投票算 ELO | `artificialanalysis.ai/speech` |
-| MMAU-Pro | LALM 推理 | `mmaubenchmark.github.io` |
+| MMAU-Pro | LALM 推理 | `sonalkum.github.io/mmau-pro` |
 | SpeakerBench / VoxSRC | 说话人识别 | `voxsrc.github.io` |
 | MMAU 音乐子集 | 音乐 LALM | （在 MMAU 内） |
 | HEAR benchmark | 自监督音频 | `hearbenchmark.com` |
@@ -224,5 +224,5 @@ def eer(same_scores, diff_scores):
 - [Fréchet Audio Distance (Kilgour et al. 2019)](https://arxiv.org/abs/1812.08466) —— 音乐生成的标准。
 - [Open ASR Leaderboard](https://huggingface.co/spaces/hf-audio/open_asr_leaderboard) —— 2026 年实时排名。
 - [TTS Arena](https://huggingface.co/spaces/TTS-AGI/TTS-Arena) —— 人类投票的 TTS 排行榜。
-- [MMAU-Pro benchmark](https://mmaubenchmark.github.io/) —— LALM 推理排行榜。
+- [MMAU-Pro benchmark](https://sonalkum.github.io/mmau-pro/) —— LALM 推理排行榜。
 - [HEAR benchmark](https://hearbenchmark.com/) —— 音频 SSL 基准。
