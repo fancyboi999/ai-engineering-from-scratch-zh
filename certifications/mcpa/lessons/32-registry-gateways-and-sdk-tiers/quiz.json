@@ -1,0 +1,78 @@
+{
+  "lesson": "32-registry-gateways-and-sdk-tiers",
+  "title": "发现、路由并信任服务器",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "团队把服务器发布到 MCP Registry 时，registry 实际保存什么？",
+      "options": [
+        "服务器历次返回的所有工具描述的缓存副本",
+        "证明服务器代码不存在安全漏洞的密码学证明",
+        "服务器自身的运行时日志，供客户端审计历史工具调用",
+        "用于命名、版本化和定位服务器的元数据，而非服务器自身代码"
+      ],
+      "correct": 3,
+      "explanation": "MCP Registry 保存 server.json 元数据，包括名称、版本以及 package 或 remote 位置，从不托管服务器自身源代码。"
+    },
+    {
+      "stage": "check",
+      "question": "从未证明自己拥有 io.github.acme 账号的发布者，尝试发布名为 io.github.acme/reporting-tool 的服务器。registry 会怎么做？",
+      "options": [
+        "拒绝发布，因为该命名空间属于另一位已验证所有者",
+        "接受发布，因为任何人都可以任意选择名称",
+        "发布条目，但把版本字符串标为禁止使用的范围",
+        "静默把名称改分配到发布者实际控制的命名空间"
+      ],
+      "correct": 0,
+      "explanation": "命名空间身份验证会把反向 DNS 名称绑定到已经证明所有权的特定 GitHub 账号或域名，因此其他发布者不能冒用。"
+    },
+    {
+      "stage": "check",
+      "question": "server.json 的 $schema 字段指向 2025-12-11 schema revision。这个日期能说明服务器自身的什么信息？",
+      "options": [
+        "除非连接日期精确匹配 2025-12-11，否则服务器会拒绝连接",
+        "什么也说明不了；schema 日期与 protocol version 分别跟踪",
+        "服务器在线路层使用 MCP protocol version 2025-12-11",
+        "2026-07-28 revision 发布后，服务器就会停止工作"
+      ],
+      "correct": 1,
+      "explanation": "server.json schema version 描述元数据文档自身结构，与服务器运行时所使用的 MCP protocol version 完全独立地跟踪。"
+    },
+    {
+      "stage": "check",
+      "question": "gateway 收到请求，其中 Mcp-Method header 是 prompts/get，但 JSON-RPC body 的 method 字段是 tools/call。gateway 必须怎么做？",
+      "options": [
+        "信任 header 进行路由，并让 body 中的方法照常执行",
+        "先执行 body 中的方法，再在响应中纠正 header",
+        "在到达任何后端前，以 header mismatch 拒绝请求",
+        "回退到旧式 session，以便协调两种方法"
+      ],
+      "correct": 2,
+      "explanation": "gateway 路由或执行请求前，header 与 body 必须一致；不一致时应以 HeaderMismatch 和 HTTP 400 拒绝，不能触碰任何后端。"
+    },
+    {
+      "stage": "post",
+      "question": "两个不同的已认证调用方都通过 gateway 请求同一个 private scope 资源。正确的缓存行为是什么？",
+      "options": [
+        "gateway 完全不为任何调用方缓存 private scope 结果",
+        "gateway 用第一个调用方的缓存条目响应第二个调用方",
+        "第一个请求完成后，gateway 从缓存同时服务两个调用方",
+        "gateway 为每个调用方重新取得资源，绝不共享该条目"
+      ],
+      "correct": 3,
+      "explanation": "private cacheScope 结果绝不能在不同调用方之间共享，因此 gateway 必须分别取得，而不能复用另一位调用方的缓存条目。"
+    },
+    {
+      "stage": "post",
+      "question": "一个 Tier 1 SDK 连续五周在每次运行中都未通过同一项 conformance test。其 tier 会怎样变化？",
+      "options": [
+        "降至 Tier 2，因为持续失败超过四周会触发降级",
+        "保留 Tier 1，因为只有一项测试失败永远不足以产生影响",
+        "直接降至 Tier 3，因为任何 conformance failure 都视为 critical",
+        "从 tiering system 中移除，直到手动重新提交"
+      ],
+      "correct": 0,
+      "explanation": "只有 conformance test 连续失败满四周才会降级；五周已经超过阈值，因此从 Tier 1 降至 Tier 2。"
+    }
+  ]
+}
