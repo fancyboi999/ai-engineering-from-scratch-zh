@@ -203,6 +203,27 @@ test('lesson route renders unique crawlable HTML with a path-only canonical', fu
   assert.match(response.body, /path=phases%2F01-math%2F02-calculus/);
 });
 
+test('lesson route gives JavaScript a loading state and no-JavaScript readers a concise fallback', function () {
+  const assets = makeAssets();
+  assets.lesson.template = fs.readFileSync(path.join(__dirname, '..', 'site', 'lesson.html'), 'utf8');
+  const entry = assets.lesson.manifest.lessons['certifications/claude/lessons/01-models'];
+  entry.excerpt = 'A long scraped excerpt '.repeat(200);
+  const handler = lessonApi.createHandler({ loadAssets: function () { return assets.lesson; } });
+  const response = invoke(handler, {
+    method: 'GET',
+    url: '/lesson?path=certifications%2Fclaude%2Flessons%2F01-models&track=claude-example',
+    query: { path: 'certifications/claude/lessons/01-models', track: 'claude-example' },
+  });
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /document\.documentElement\.classList\.add\('js'\)/);
+  assert.match(response.body, /\.js \.lesson-seo-fallback \{ display: none; \}/);
+  assert.match(response.body, /html:not\(\.js\) \.lesson-seo-loading \{ display: none; \}/);
+  assert.match(response.body, /class="lesson-loading lesson-seo-loading"/);
+  assert.match(response.body, /Choose model boundaries from requirements and evidence\./);
+  assert.doesNotMatch(response.body, /A long scraped excerpt A long scraped excerpt/);
+  assert.equal((response.body.match(/<h1(?:\s|>)/g) || []).length, 1);
+});
+
 test('lesson route keeps certification navigation inside the selected track', function () {
   const assets = makeAssets();
   const handler = lessonApi.createHandler({ loadAssets: function () { return assets.lesson; } });

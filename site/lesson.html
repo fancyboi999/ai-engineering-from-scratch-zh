@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>document.documentElement.classList.add('js');</script>
   <link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">
   <link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
   <!-- AIFS:LESSON-SEO:START -->
@@ -295,6 +296,9 @@
     }
     /* ────────────────────────────────────────────────────────── */
 
+    .js .lesson-seo-fallback { display: none; }
+    html:not(.js) .lesson-seo-loading { display: none; }
+
     .lesson-loading {
       display: flex;
       flex-direction: column;
@@ -405,7 +409,7 @@
       -webkit-hyphens: none;
     }
 
-    .lesson-article > p:first-of-type::first-letter,
+    .lesson-article:not(.lesson-seo-fallback) > p:first-of-type::first-letter,
     .lesson-article .drop-cap::first-letter {
       float: left;
       font-family: var(--font-display);

@@ -252,18 +252,18 @@ function lessonFallback(entry, lessonPath, contextParams, heading) {
   const links = [];
   if (previous) links.push(`<a class="lesson-nav-btn prev" href="${lessonHref(previous, contextParams)}"><span class="nav-label">&larr; 上一节</span><span class="nav-title">${escapeHtml(previous.title)}</span></a>`);
   if (next) links.push(`<a class="lesson-nav-btn next" href="${lessonHref(next, contextParams)}"><span class="nav-label">下一节 &rarr;</span><span class="nav-title">${escapeHtml(next.title)}</span></a>`);
-  const excerpt = entry.excerpt || entry.description;
+  const summary = entry.description || entry.excerpt;
 
   return [
     '        <article class="lesson-article lesson-seo-fallback" data-server-rendered="true">',
     `          <p class="lesson-meta-tag">${escapeHtml(context)}</p>`,
     `          <h1>${escapeHtml(heading)}</h1>`,
-    excerpt ? `          <p class="motto">${escapeHtml(excerpt)}</p>` : '',
-    entry.description && entry.description !== excerpt ? `          <p>${escapeHtml(entry.description)}</p>` : '',
+    summary ? `          <p class="motto">${escapeHtml(summary)}</p>` : '',
     `          <p>这是 AI Engineering from Scratch 简体中文版的免费课程。你可以阅读完整说明、运行课程代码，并在交互阅读器或仓库源码中核验结果。</p>`,
     '          <p><a href="catalog.html">浏览完整课程目录</a>' + (sourceUrl ? `，或<a href="${escapeHtml(sourceUrl)}">在 GitHub 打开本课</a>` : '') + '。</p>',
     links.length ? `          <nav class="lesson-nav-bottom" aria-label="课程导航">${links.join('')}</nav>` : '',
     '        </article>',
+    '        <div class="lesson-loading lesson-seo-loading" role="status" aria-live="polite"><div class="spinner"></div><div class="lesson-loading-text">课程加载中...</div></div>',
   ].filter(Boolean).join('\n');
 }
 
