@@ -1197,7 +1197,7 @@
       "domain": "use-cases-and-ecosystem",
       "objective": "梳理构建和部署 MCP 的团队角色、职责、治理与采用模式",
       "type": "single",
-      "prompt": "某 SDK 维护者声称其 SDK 达到了 SDK 分级体系的 Tier 1 标准。哪组事实真正支持这一说法？",
+      "prompt": "某 SDK 维护者正核对 SDK 分级体系的 Tier 1 标准。下列哪一组选项列出的条件均属于 Tier 1 要求？",
       "options": [
         "它通过 100% 的一致性测试，并在七天内修复严重缺陷",
         "它通过 100% 的一致性测试，但需要一个月才能分诊新报告的问题",
@@ -1207,7 +1207,7 @@
       "correct": [
         0
       ],
-      "explanation": "Tier 1 要求通过全部一致性测试、在规范发布前交付功能、在两个工作日内分诊问题，并在七天内修复严重缺陷。只通过 80% 的测试或用一个月分诊问题，描述的是较低等级或已经滑落的 Tier 1 SDK，而不是实际达到 Tier 1 门槛的 SDK。",
+      "explanation": "通过全部一致性测试和在七天内修复严重缺陷，都是 Tier 1 的必要条件，但仅凭这两项不能证明已满足全部要求。Tier 1 还要求在规范发布前交付功能、在两个工作日内分诊问题，并满足稳定版本、文档及维护策略等要求。其余选项中的一个月分诊、实验性状态或仅通过 80% 测试均不符合要求。",
       "references": [
         "certifications/mcpa/lessons/32-registry-gateways-and-sdk-tiers"
       ]
