@@ -121,9 +121,9 @@ blueprint 上每个领域都以这一次交互的阶段出现，而不是独立�
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)，本次交互所依据的完整规范
-- [MCP architecture overview](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture)，介绍本交互所演示的角色
-- [MCP changelog since 2025-11-25](https://modelcontextprotocol.io/specification/2026-07-28/changelog)，说明无状态核心替代了什么
+- [MCP 2026-07-28 规范](https://modelcontextprotocol.io/specification/2026-07-28)，本次交互所依据的完整规范
+- [MCP 架构概览](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture)，介绍本交互所演示的角色
+- [MCP 自 2025-11-25 以来的变更记录](https://modelcontextprotocol.io/specification/2026-07-28/changelog)，说明无状态核心替代了什么
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 全部章节，本路线使用的协议事实唯一来源
 - `phases/13-tools-and-protocols/23-capstone-tool-ecosystem`，以另一种范围构建完整工具生态
 - MCPA 认证页面 training.linuxfoundation.org/certification/model-context-protocol-associate-mcpa，提供官方考试形式、时间与领域权重

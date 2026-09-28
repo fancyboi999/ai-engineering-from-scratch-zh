@@ -153,7 +153,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/17-tool-invocatio
 ## 延伸阅读
 
 - [Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)，尤其是 Error Handling 和 Stateful Tools
-- [Multi Round-Trip Requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr)
+- [多轮请求](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr)
 - [Cancellation](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/cancellation) 和 [Progress](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/progress)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 的第 5、7、8 节
 - `phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control`，深入讲解超时、取消和流量控制

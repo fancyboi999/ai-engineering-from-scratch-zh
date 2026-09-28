@@ -90,11 +90,11 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/28-roles-and-adop
 
 ## 延伸阅读
 
-- [MCP governance and stewardship](https://modelcontextprotocol.io/community/governance)
-- [Working and Interest Groups](https://modelcontextprotocol.io/community/working-interest-groups)
-- [SEP guidelines](https://modelcontextprotocol.io/community/sep-guidelines)
-- [SDK tiering system](https://modelcontextprotocol.io/community/sdk-tiers)
-- [Design principles](https://modelcontextprotocol.io/community/design-principles)
-- [Contributor ladder](https://modelcontextprotocol.io/community/contributor-ladder)
-- [MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)，尤其是 Authorization 和 Streamable HTTP transport，其中包含本课要求目录逐字引用的 MUST 陈述
+- [MCP 治理与维护](https://modelcontextprotocol.io/community/governance)
+- [工作组与兴趣小组](https://modelcontextprotocol.io/community/working-interest-groups)
+- [SEP 编写指南](https://modelcontextprotocol.io/community/sep-guidelines)
+- [SDK 分层体系](https://modelcontextprotocol.io/community/sdk-tiers)
+- [设计原则](https://modelcontextprotocol.io/community/design-principles)
+- [贡献者成长路径](https://modelcontextprotocol.io/community/contributor-ladder)
+- [MCP 2026-07-28 规范](https://modelcontextprotocol.io/specification/2026-07-28)，尤其是 Authorization 和 Streamable HTTP transport，其中包含本课要求目录逐字引用的 MUST 陈述
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 4、5、6、9、10、12、15 节

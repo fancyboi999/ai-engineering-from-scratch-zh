@@ -131,10 +131,10 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/15-deprecated-cli
 
 ## 延伸阅读
 
-- [Roots (deprecated)](https://modelcontextprotocol.io/specification/2026-07-28/client/roots)
-- [Sampling (deprecated)](https://modelcontextprotocol.io/specification/2026-07-28/client/sampling)
-- [Logging (deprecated)](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/logging)
-- [Deprecated features registry](https://modelcontextprotocol.io/specification/2026-07-28/deprecated)
-- [Feature lifecycle and deprecation policy](https://modelcontextprotocol.io/community/feature-lifecycle)
+- [Roots（已弃用）](https://modelcontextprotocol.io/specification/2026-07-28/client/roots)
+- [Sampling（已弃用）](https://modelcontextprotocol.io/specification/2026-07-28/client/sampling)
+- [Logging（已弃用）](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/logging)
+- [已弃用功能登记表](https://modelcontextprotocol.io/specification/2026-07-28/deprecated)
+- [功能生命周期与弃用政策](https://modelcontextprotocol.io/community/feature-lifecycle)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 11 节和第 15 节
 - `phases/13-tools-and-protocols/11-mcp-sampling`，深入构建 sampling 迁移路径

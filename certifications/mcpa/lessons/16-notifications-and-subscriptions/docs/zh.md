@@ -121,7 +121,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/16-notifications-
 
 ## 延伸阅读
 
-- [MCP message patterns](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns)，介绍 requests、MRTR 和 subscribe-and-notify
+- [MCP 消息模式](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns)，介绍 requests、MRTR 和 subscribe-and-notify
 - [Subscriptions](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/subscriptions)
 - [Progress](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/progress)
 - [Cancellation](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/cancellation)

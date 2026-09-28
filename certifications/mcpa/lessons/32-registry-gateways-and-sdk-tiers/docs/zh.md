@@ -132,10 +132,10 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/32-registry-gatew
 
 ## 延伸阅读
 
-- [The MCP Registry](https://modelcontextprotocol.io/registry/about)
-- [Registry package types](https://modelcontextprotocol.io/registry/package-types)
-- [Registry authentication](https://modelcontextprotocol.io/registry/authentication)
-- [Registry aggregators](https://modelcontextprotocol.io/registry/registry-aggregators)
-- [SDK tiering system](https://modelcontextprotocol.io/community/sdk-tiers)
+- [MCP Registry](https://modelcontextprotocol.io/registry/about)
+- [Registry 包类型](https://modelcontextprotocol.io/registry/package-types)
+- [Registry 身份认证](https://modelcontextprotocol.io/registry/authentication)
+- [Registry 聚合器](https://modelcontextprotocol.io/registry/registry-aggregators)
+- [SDK 分层体系](https://modelcontextprotocol.io/community/sdk-tiers)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 9、10 和 15 节
 - `phases/13-tools-and-protocols/17-mcp-gateways-and-registries`，更深入地构建完整 gateway policy engine

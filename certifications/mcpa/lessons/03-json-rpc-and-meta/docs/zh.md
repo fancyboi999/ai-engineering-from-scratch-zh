@@ -116,7 +116,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/03-json-rpc-and-m
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28, Base Protocol](https://modelcontextprotocol.io/specification/2026-07-28/basic)，重点阅读 Messages 与 `_meta` 通用字段
-- [SEP-414, OpenTelemetry trace context in `_meta`](https://modelcontextprotocol.io/seps/414-request-meta)
-- [TypeScript schema, source of truth for every message shape](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/schema/2026-07-28/schema.ts)
+- [MCP 2026-07-28 规范：基础协议](https://modelcontextprotocol.io/specification/2026-07-28/basic)，重点阅读 Messages 与 `_meta` 通用字段
+- [SEP-414：在 `_meta` 中传递 OpenTelemetry trace 上下文](https://modelcontextprotocol.io/seps/414-request-meta)
+- [TypeScript Schema：全部消息格式的权威定义](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/schema/2026-07-28/schema.ts)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 2、3 节

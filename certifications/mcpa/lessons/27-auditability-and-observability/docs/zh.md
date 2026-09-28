@@ -119,8 +119,8 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/27-auditability-a
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28, Base Protocol](https://modelcontextprotocol.io/specification/2026-07-28/basic)，了解 `_meta` 保留键和 OpenTelemetry trace context 章节
-- [SEP-414, OpenTelemetry trace context in `_meta`](https://modelcontextprotocol.io/seps/414-request-meta)
-- [Logging (deprecated)](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/logging)
+- [MCP 2026-07-28 规范：基础协议](https://modelcontextprotocol.io/specification/2026-07-28/basic)，了解 `_meta` 保留键和 OpenTelemetry trace context 章节
+- [SEP-414：在 `_meta` 中传递 OpenTelemetry trace 上下文](https://modelcontextprotocol.io/seps/414-request-meta)
+- [Logging（已弃用）](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/logging)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 3、11、13 节
 - `phases/13-tools-and-protocols/20-opentelemetry-genai`，了解完整 tracing 后端在本课 `_meta` 传播之外所需的 span 层级和 `gen_ai.*` 属性

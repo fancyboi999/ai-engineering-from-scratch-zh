@@ -131,8 +131,8 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/25-consent-and-le
 
 ## 延伸阅读
 
-- [Model Context Protocol specification 2026-07-28, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)，参阅 User Interaction Model 和两种工具错误通道
-- [Model Context Protocol specification 2026-07-28, Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation)，参阅 form mode、URL mode 和三种响应 action
-- [Model Context Protocol specification 2026-07-28, Authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization)，参阅 Scope Selection Strategy 和 Step-Up Authorization Flow
+- [MCP 2026-07-28 规范：工具](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)，参阅 User Interaction Model 和两种工具错误通道
+- [MCP 2026-07-28 规范：信息征询](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation)，参阅 form mode、URL mode 和三种响应 action
+- [MCP 2026-07-28 规范：授权](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization)，参阅 Scope Selection Strategy 和 Step-Up Authorization Flow
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 7、11 和 12 节
 - `phases/13-tools-and-protocols/12-mcp-roots-and-elicitation`，从第一性原理构建 elicitation

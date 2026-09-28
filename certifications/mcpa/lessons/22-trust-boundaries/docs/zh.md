@@ -102,9 +102,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/22-trust-boundari
 
 ## 延伸阅读
 
-- [MCP security best practices](https://modelcontextprotocol.io/specification/2026-07-28/basic/security_best_practices)，尤其是 Local MCP Server Compromise 和 stdio Transport Security
-- [MCP specification 2026-07-28, base protocol](https://modelcontextprotocol.io/specification/2026-07-28/basic)，参阅 `_meta` 自报身份规则和图标安全要求
-- [MCP specification 2026-07-28, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)，参阅不可信注解警告和 human-in-the-loop 指南
-- [SEP-1024: MCP Client Security Requirements for Local Server Installation](https://modelcontextprotocol.io/community/seps/1024-mcp-client-security-requirements-for-local-server-installation)
+- [MCP 安全最佳实践](https://modelcontextprotocol.io/specification/2026-07-28/basic/security_best_practices)，尤其是 Local MCP Server Compromise 和 stdio Transport Security
+- [MCP 2026-07-28 规范：基础协议](https://modelcontextprotocol.io/specification/2026-07-28/basic)，参阅 `_meta` 自报身份规则和图标安全要求
+- [MCP 2026-07-28 规范：工具](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)，参阅不可信注解警告和 human-in-the-loop 指南
+- [SEP-1024：MCP 客户端安装本地服务器的安全要求](https://modelcontextprotocol.io/community/seps/1024-mcp-client-security-requirements-for-local-server-installation)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 的第 3、12 和 13 节
 - `phases/13-tools-and-protocols/15-mcp-security-tool-poisoning`，它基于相同线协议结构构建了更深入的威胁模型

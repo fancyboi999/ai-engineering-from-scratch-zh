@@ -131,9 +131,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/23-oauth-authoriz
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28: Authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization)
-- [MCP specification 2026-07-28: Authorization Server Discovery](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/authorization-server-discovery)
-- [MCP specification 2026-07-28: Authorization Security Considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
-- [MCP tutorial: Understanding Authorization](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/authorization)
+- [MCP 2026-07-28 规范：授权](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization)
+- [MCP 2026-07-28 规范：授权服务器发现](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/authorization-server-discovery)
+- [MCP 2026-07-28 规范：授权安全注意事项](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
+- [MCP 教程：理解授权](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/authorization)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 12 节
 - `phases/13-tools-and-protocols/16-mcp-security-oauth-2-1` 和 `phases/13-tools-and-protocols/18-mcp-auth-production`，深入构建 OAuth 流程及其生产加固方案

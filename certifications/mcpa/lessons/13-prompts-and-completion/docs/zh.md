@@ -154,7 +154,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/13-prompts-and-co
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28: Prompts](https://modelcontextprotocol.io/specification/2026-07-28/server/prompts)
-- [MCP specification 2026-07-28: Completion](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/completion)
+- [MCP 2026-07-28 规范：提示模板](https://modelcontextprotocol.io/specification/2026-07-28/server/prompts)
+- [MCP 2026-07-28 规范：补全](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/completion)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 10 节
 - `phases/13-tools-and-protocols/10-mcp-resources-and-prompts`，深入构建 resources 与 prompts 原语

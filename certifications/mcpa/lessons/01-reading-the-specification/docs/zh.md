@@ -124,11 +124,11 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/01-reading-the-sp
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)
-- [MCP specification 2026-07-28, Base Protocol](https://modelcontextprotocol.io/specification/2026-07-28/basic)
-- [MCP specification 2026-07-28, Changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog)
-- [MCP specification 2026-07-28, Deprecated Features](https://modelcontextprotocol.io/specification/2026-07-28/deprecated)
-- [Feature Lifecycle and Deprecation Policy](https://modelcontextprotocol.io/community/feature-lifecycle)
-- [SEP Guidelines](https://modelcontextprotocol.io/community/sep-guidelines)
+- [MCP 2026-07-28 规范](https://modelcontextprotocol.io/specification/2026-07-28)
+- [MCP 2026-07-28 规范：基础协议](https://modelcontextprotocol.io/specification/2026-07-28/basic)
+- [MCP 2026-07-28 规范：变更记录](https://modelcontextprotocol.io/specification/2026-07-28/changelog)
+- [MCP 2026-07-28 规范：已弃用功能](https://modelcontextprotocol.io/specification/2026-07-28/deprecated)
+- [功能生命周期与弃用政策](https://modelcontextprotocol.io/community/feature-lifecycle)
+- [SEP 编写指南](https://modelcontextprotocol.io/community/sep-guidelines)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 的第 1、15 节
 - `phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations`，基于这些版本时代规则构建一致性测试工具

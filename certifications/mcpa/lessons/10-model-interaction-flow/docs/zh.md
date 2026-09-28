@@ -98,9 +98,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/10-model-interact
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28: Tools, Message Flow and User Interaction Model](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
-- [MCP specification 2026-07-28: Multi Round-Trip Requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr)
-- [MCP architecture overview](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture)
-- [MCP client best practices: interaction with prompt caching](https://modelcontextprotocol.io/docs/2026-07-28/develop/clients/client-best-practices)
+- [MCP 2026-07-28 规范：工具、消息流与用户交互模型](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+- [MCP 2026-07-28 规范：多轮请求](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr)
+- [MCP 架构概览](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture)
+- [MCP 客户端最佳实践：与 prompt 缓存协作](https://modelcontextprotocol.io/docs/2026-07-28/develop/clients/client-best-practices)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 5、7、10 节
 - `phases/13-tools-and-protocols/02-function-calling-deep-dive`：深入学习工具调用循环中的模型侧逻辑

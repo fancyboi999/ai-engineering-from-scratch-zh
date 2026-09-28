@@ -150,9 +150,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/31-mcp-apps
 
 ## 延伸阅读
 
-- [MCP Apps overview](https://modelcontextprotocol.io/extensions/apps/overview)
-- [Build an MCP App](https://modelcontextprotocol.io/extensions/apps/build)
-- [SEP-1865: MCP Apps, Interactive User Interfaces for MCP](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp)
-- [MCP Apps specification, 2026-01-26](https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx)
+- [MCP Apps 概览](https://modelcontextprotocol.io/extensions/apps/overview)
+- [构建 MCP App](https://modelcontextprotocol.io/extensions/apps/build)
+- [SEP-1865：MCP Apps 交互式用户界面](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp)
+- [MCP Apps 规范（2026-01-26）](https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 14 节
 - `phases/13-tools-and-protocols/14-mcp-apps`，围绕同一个扩展构建完整的请求与资源服务器，以及约束更严格的 Streamable HTTP adapter

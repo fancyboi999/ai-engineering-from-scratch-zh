@@ -123,9 +123,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/04-the-stateless-
 
 ## 延伸阅读
 
-- [Statelessness, MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28/basic#statelessness)
-- [Stateful Tools, MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28/server/tools#stateful-tools)
-- [SEP-2575: Make MCP Stateless](https://modelcontextprotocol.io/seps/2575-stateless-mcp)
-- [SEP-2567: Sessionless MCP via Explicit State Handles](https://modelcontextprotocol.io/seps/2567-sessionless-mcp)
+- [MCP 2026-07-28 规范：无状态性](https://modelcontextprotocol.io/specification/2026-07-28/basic#statelessness)
+- [MCP 2026-07-28 规范：有状态工具](https://modelcontextprotocol.io/specification/2026-07-28/server/tools#stateful-tools)
+- [SEP-2575：让 MCP 无状态化](https://modelcontextprotocol.io/seps/2575-stateless-mcp)
+- [SEP-2567：通过显式状态句柄实现无会话 MCP](https://modelcontextprotocol.io/seps/2567-sessionless-mcp)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 4 节
 - `phases/13-tools-and-protocols/06-mcp-fundamentals`，构建本课所依赖的逐请求 JSON-RPC 模型

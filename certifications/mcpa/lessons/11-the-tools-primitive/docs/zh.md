@@ -130,8 +130,8 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/11-the-tools-prim
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28, Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
-- [MCP specification 2026-07-28, Subscriptions](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/subscriptions)
-- [MCP specification 2026-07-28, Schema Reference](https://modelcontextprotocol.io/specification/2026-07-28/schema)
+- [MCP 2026-07-28 规范：工具](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+- [MCP 2026-07-28 规范：订阅](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/subscriptions)
+- [MCP 2026-07-28 规范：Schema 参考](https://modelcontextprotocol.io/specification/2026-07-28/schema)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 10 节
 - `phases/13-tools-and-protocols/07-building-an-mcp-server` 和 `phases/13-tools-and-protocols/28-mcp-tool-contracts-and-content`：深入构建工具契约和 content 处理

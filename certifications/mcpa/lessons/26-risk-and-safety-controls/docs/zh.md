@@ -125,9 +125,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/26-risk-and-safet
 
 ## 延伸阅读
 
-- [MCP security best practices](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)，尤其是 Token Passthrough、Server-Side Request Forgery 和 State Handle Hijacking
-- [Authorization security considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
-- [Multi Round-Trip Requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr) 中的 Security Considerations
+- [MCP 安全最佳实践](https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices)，尤其是 Token Passthrough、Server-Side Request Forgery 和 State Handle Hijacking
+- [授权安全注意事项](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
+- [多轮请求](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr) 中的 Security Considerations
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 13 节
 - `phases/13-tools-and-protocols/15-mcp-security-tool-poisoning`，了解本课所基于的攻击面
 - `phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift`，深入了解准入固定与回滚

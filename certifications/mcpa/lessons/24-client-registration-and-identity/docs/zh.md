@@ -120,10 +120,10 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/24-client-registr
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28: Client Registration](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration)
-- [MCP specification 2026-07-28: Authorization Security Considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
-- [MCP Authorization Extensions overview](https://modelcontextprotocol.io/extensions/auth/overview)
-- [OAuth Client Credentials extension](https://modelcontextprotocol.io/extensions/auth/oauth-client-credentials)
-- [Enterprise-Managed Authorization extension](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization)
-- [SEP-991: Enable URL-based Client Registration using OAuth Client ID Metadata Documents](https://modelcontextprotocol.io/seps/991-enable-url-based-client-registration-using-oauth-c)
+- [MCP 2026-07-28 规范：客户端注册](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration)
+- [MCP 2026-07-28 规范：授权安全注意事项](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
+- [MCP 授权扩展概览](https://modelcontextprotocol.io/extensions/auth/overview)
+- [OAuth 客户端凭据扩展](https://modelcontextprotocol.io/extensions/auth/oauth-client-credentials)
+- [企业托管授权扩展](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization)
+- [SEP-991：使用 OAuth 客户端 ID 元数据文档注册 URL 客户端](https://modelcontextprotocol.io/seps/991-enable-url-based-client-registration-using-oauth-c)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 12 节

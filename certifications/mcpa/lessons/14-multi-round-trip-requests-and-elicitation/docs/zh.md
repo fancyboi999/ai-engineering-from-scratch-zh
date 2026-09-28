@@ -131,9 +131,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/14-multi-round-tr
 
 ## 延伸阅读
 
-- [Multi Round-Trip Requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr)
+- [多轮请求](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr)
 - [Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation)
-- [SEP-2322: Multi Round-Trip Requests](https://modelcontextprotocol.io/seps/2322-MRTR)
-- [SEP-1036: URL Mode Elicitation for secure out-of-band interactions](https://modelcontextprotocol.io/seps/1036-url-mode-elicitation-for-secure-out-of-band-intera)
+- [SEP-2322：多轮请求](https://modelcontextprotocol.io/seps/2322-MRTR)
+- [SEP-1036：用于安全带外交互的 URL 模式信息征询](https://modelcontextprotocol.io/seps/1036-url-mode-elicitation-for-secure-out-of-band-intera)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 7 节和第 11 节
 - `phases/13-tools-and-protocols/12-mcp-roots-and-elicitation`，从服务器作者视角逐步讲解信息征询

@@ -160,8 +160,8 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/21-long-running-w
 
 ## 延伸阅读
 
-- [Tasks，MCP extensions](https://modelcontextprotocol.io/extensions/tasks/overview)
-- [SEP-2663：Tasks Extension](https://modelcontextprotocol.io/seps/2663-tasks-extension)
+- [MCP 扩展：Tasks](https://modelcontextprotocol.io/extensions/tasks/overview)
+- [SEP-2663：Tasks 扩展](https://modelcontextprotocol.io/seps/2663-tasks-extension)
 - [SEP-1686：Tasks（2025-11-25 实验版，历史记录）](https://modelcontextprotocol.io/seps/1686-tasks)
 - [Stateful Tools，MCP 2026-07-28 规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools#stateful-tools)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 4、14 节

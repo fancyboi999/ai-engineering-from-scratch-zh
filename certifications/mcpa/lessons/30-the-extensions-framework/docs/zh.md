@@ -135,8 +135,8 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/30-the-extensions
 
 ## 延伸阅读
 
-- [MCP Extensions Overview](https://modelcontextprotocol.io/extensions/overview)
-- [SEP-2133: Extensions](https://modelcontextprotocol.io/seps/2133-extensions)
-- [Extension Negotiation, MCP versioning](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning#extension-negotiation)
+- [MCP 扩展概览](https://modelcontextprotocol.io/extensions/overview)
+- [SEP-2133：扩展](https://modelcontextprotocol.io/seps/2133-extensions)
+- [扩展协商与 MCP 版本控制](https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning#extension-negotiation)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 14 节
 - `phases/13-tools-and-protocols/17-mcp-gateways-and-registries`，从 gateway 角度讲解逐请求能力协商

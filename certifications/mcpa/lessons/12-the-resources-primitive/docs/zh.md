@@ -94,7 +94,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/12-the-resources-
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28: Resources](https://modelcontextprotocol.io/specification/2026-07-28/server/resources)
-- [MCP specification 2026-07-28: Caching](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/caching)
+- [MCP 2026-07-28 规范：资源](https://modelcontextprotocol.io/specification/2026-07-28/server/resources)
+- [MCP 2026-07-28 规范：缓存](https://modelcontextprotocol.io/specification/2026-07-28/server/utilities/caching)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 10 节
 - `phases/13-tools-and-protocols/10-mcp-resources-and-prompts`：深入构建 resources 与 prompts 服务器

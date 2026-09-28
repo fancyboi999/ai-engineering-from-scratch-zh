@@ -94,8 +94,8 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/02-the-integratio
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)，重点阅读 Overview 与 Tools 页面
-- [MCP architecture overview](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture)
-- [JSON-RPC 2.0 specification](https://www.jsonrpc.org/specification)
+- [MCP 2026-07-28 规范](https://modelcontextprotocol.io/specification/2026-07-28)，重点阅读 Overview 与 Tools 页面
+- [MCP 架构概览](https://modelcontextprotocol.io/docs/2026-07-28/learn/architecture)
+- [JSON-RPC 2.0 规范](https://www.jsonrpc.org/specification)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 2、3、5、10 节
 - `phases/13-tools-and-protocols/06-mcp-fundamentals`，深入构建无状态请求模型

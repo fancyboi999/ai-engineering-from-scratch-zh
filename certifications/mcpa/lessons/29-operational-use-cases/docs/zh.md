@@ -114,9 +114,9 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/29-operational-us
 
 ## 延伸阅读
 
-- [MCP server concepts](https://modelcontextprotocol.io/docs/2026-07-28/learn/server-concepts)，了解本课所基于的 tools、resources、prompts 控制划分
-- [MCP client concepts](https://modelcontextprotocol.io/docs/2026-07-28/learn/client-concepts)，了解 elicitation 及其依托的 client 功能
-- [Extensions overview](https://modelcontextprotocol.io/extensions/overview)，了解扩展标识符、协商与优雅降级
-- [MCP Tasks](https://modelcontextprotocol.io/extensions/tasks/overview)、[MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview)、[Skills over MCP](https://modelcontextprotocol.io/extensions/skills/overview) 和 [authorization extensions](https://modelcontextprotocol.io/extensions/auth/overview)
+- [MCP 服务端概念](https://modelcontextprotocol.io/docs/2026-07-28/learn/server-concepts)，了解本课所基于的 tools、resources、prompts 控制划分
+- [MCP 客户端概念](https://modelcontextprotocol.io/docs/2026-07-28/learn/client-concepts)，了解 elicitation 及其依托的 client 功能
+- [扩展概览](https://modelcontextprotocol.io/extensions/overview)，了解扩展标识符、协商与优雅降级
+- [MCP Tasks 扩展](https://modelcontextprotocol.io/extensions/tasks/overview)、[MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview)、[基于 MCP 的 Skills](https://modelcontextprotocol.io/extensions/skills/overview) 和 [授权扩展](https://modelcontextprotocol.io/extensions/auth/overview)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 10、14 节
 - `phases/13-tools-and-protocols/23-capstone-tool-ecosystem`，查看完整的端到端生态系统场景

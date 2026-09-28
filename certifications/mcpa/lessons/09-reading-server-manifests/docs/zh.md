@@ -90,7 +90,7 @@ python3 scripts/check_mcpa_wire.py certifications/mcpa/lessons/09-reading-server
 
 ## 延伸阅读
 
-- [MCP specification 2026-07-28: Discovery](https://modelcontextprotocol.io/specification/2026-07-28/server/discover)
-- [MCP specification 2026-07-28: Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
-- [MCP Registry overview](https://modelcontextprotocol.io/registry/about)
+- [MCP 2026-07-28 规范：发现](https://modelcontextprotocol.io/specification/2026-07-28/server/discover)
+- [MCP 2026-07-28 规范：工具](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+- [MCP Registry 概览](https://modelcontextprotocol.io/registry/about)
 - `certifications/mcpa/research/mcp-2026-07-28-brief.md` 第 6、10、15 节
