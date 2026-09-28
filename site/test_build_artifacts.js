@@ -558,7 +558,7 @@ test('build-time SEO manifests cover every readable lesson and expose canonical 
   );
   assert.deepEqual(Object.keys(lessonManifest.lessons).sort(), expectedPaths);
   assert.equal(certificationManifest.version, 1);
-  assert.equal(Object.keys(certificationManifest.tracks).length, 4);
+  assert.equal(Object.keys(certificationManifest.tracks).length, certifications.tracks.length);
 
   function inspectKeys(value) {
     if (!value || typeof value !== 'object') return;
@@ -643,7 +643,7 @@ test('build-time SEO manifests cover every readable lesson and expose canonical 
 
   const trackEntries = Object.values(certificationManifest.tracks);
   for (const field of ['title', 'description', 'excerpt', 'canonicalUrl']) {
-    assert.equal(new Set(trackEntries.map(track => track[field])).size, 4, `track ${field} values are not unique`);
+    assert.equal(new Set(trackEntries.map(track => track[field])).size, trackEntries.length, `track ${field} values are not unique`);
   }
   for (const track of trackEntries) {
     assert.ok(track.seoTitle.length <= 60);
@@ -660,7 +660,7 @@ test('build-time SEO manifests cover every readable lesson and expose canonical 
   const catalogDiscovery = renderCatalogDiscovery(phases, lessonManifest);
   const certificationDiscovery = renderCertificationDiscovery(certifications, certificationManifest);
   assert.equal((catalogDiscovery.match(/href="\/lessons\//g) || []).length, expectedCoursePaths.length);
-  assert.equal((certificationDiscovery.match(/href="certification\?id=/g) || []).length, 4);
+  assert.equal((certificationDiscovery.match(/href="certification\?id=/g) || []).length, certifications.tracks.length);
   assert.ok((certificationDiscovery.match(/href="\/lesson\?path=/g) || []).length >= expectedCertificationPaths.length);
   assert.doesNotMatch(catalogDiscovery, /lesson\.html\?/);
 
