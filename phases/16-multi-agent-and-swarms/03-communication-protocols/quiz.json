@@ -19,7 +19,7 @@
       "question": "在 A2A 中，「agent card」是什么，为什么它很重要？",
       "options": ["一个展示 agent 性能指标的可视化仪表盘", "一个位于知名（well-known）URL 上的 JSON 文档，用来描述 agent 的能力、技能和端点，使其他 agent 能够发现它并向它委派任务", "一种用于验证 agent 身份的安全凭证", "一个用来设置 agent 系统提示的配置文件"],
       "correct": 1,
-      "explanation": "agent card（托管在 /.well-known/agent.json）是 agent 对外宣告自身的方式。它列出技能、支持的输入/输出格式以及任务端点。其他 agent 通过读取这张 card 来决定是否以及如何委派工作。"
+      "explanation": "agent card（托管在 /.well-known/agent-card.json）是 agent 对外宣告自身的方式。它列出技能、支持的输入/输出格式以及任务端点。其他 agent 通过读取这张 card 来决定是否以及如何委派工作。"
     },
     {
       "stage": "post",

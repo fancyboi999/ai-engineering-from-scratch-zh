@@ -314,6 +314,7 @@ function loadFigureRuntime({ reducedMotion = false } = {}) {
       disabled: false,
       hidden: false,
       dataset: {},
+      style: {},
       attributes: {},
       children: [],
       parentNode: null,
@@ -1472,7 +1473,7 @@ test('homepage preserves live GitHub CTAs and the motion-aware learner marquee',
   assert.match(homepage, /@media \(min-width: 601px\) and \(max-width: 1279px\) \{[\s\S]*?\.manual-masthead\.container\s*\{[\s\S]*?padding-left: clamp\(24px, 2\.5vw, 32px\);[\s\S]*?padding-right: clamp\(24px, 2\.5vw, 32px\);/);
   assert.ok(wideMasthead, 'wide-screen masthead layout is missing');
   assert.match(wideMasthead[0], /grid-template-columns: minmax\(0, 1fr\) minmax\(360px, 400px\)/);
-  assert.match(wideMasthead[0], /"title figure"/);
+  assert.match(wideMasthead[0], /"title curiosity"/);
   assert.match(wideMasthead[0], /"install figure"/);
   assert.match(wideMasthead[0], /\.masthead-figure\s*\{[\s\S]*?position: static;[\s\S]*?grid-area: figure/);
   assert.match(homepage, /\.masthead-cta\s*\{\s*display: grid;\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
@@ -2003,6 +2004,43 @@ test('every Agent Skills figure mounts through the shared lesson runtime', () =>
   runtime.window.AIFSFigureRuntime.disposeRoot(root);
 });
 
+test('lesson figures never animate a color through CSS var() values', () => {
+  const manifest = buildFigureProviderManifest(path.resolve(__dirname, '..'), __dirname);
+  const runtime = loadFigureRuntime({ reducedMotion: true });
+  const context = { console, document: runtime.window.document, window: runtime.window };
+  for (const provider of manifest.providerOrder) {
+    const file = path.join(__dirname, provider);
+    vm.runInNewContext(fs.readFileSync(file, 'utf8'), context, { filename: file });
+  }
+
+  const colorAttributes = new Set(['fill', 'stroke', 'stop-color', 'color', 'flood-color', 'lighting-color']);
+  const offenders = new Set();
+  const visit = (figureId, node) => {
+    const attribute = node.getAttribute ? node.getAttribute('attributeName') : null;
+    if (colorAttributes.has(attribute)) {
+      const values = ['values', 'from', 'to'].map(name => node.getAttribute(name) || '').join(';');
+      if (values.includes('var(')) offenders.add(`${figureId} animates ${attribute} through var()`);
+    }
+    for (const child of node.children || []) visit(figureId, child);
+  };
+
+  const figures = Object.entries(runtime.window.LESSON_FIGURES);
+  let mounted = 0;
+  for (const [figureId, figure] of figures) {
+    const host = runtime.element('div');
+    try {
+      figure(host, {});
+    } catch {
+      continue;
+    }
+    mounted++;
+    visit(figureId, host);
+  }
+
+  assert.ok(mounted >= figures.length * 0.95, `only ${mounted} of ${figures.length} figures mounted in the test DOM`);
+  assert.deepEqual([...offenders], []);
+});
+
 test('figure manifest deterministically routes only providers needed by lesson figure IDs', () => {
   const root = path.resolve(__dirname, '..');
   const first = buildFigureProviderManifest(root, __dirname);
@@ -2268,4 +2306,41 @@ test('MCP registry drift quarantines and deactivates only the drifted release', 
   assert.equal(result.evidence.rollbackCandidate.activeRouting, false);
   assert.equal(result.evidence.rollbackCandidate.activationRequires, 'explicit rollback decision');
   assert.match(result.verdict, /separately admitted, healthy 3\.9\.2 release/i);
+});
+
+test('lesson page includes completion panel and button contract', () => {
+  const lessonHtml = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  assert.match(lessonHtml, /renderLessonCompletionPanel\(container\)/);
+  assert.match(lessonHtml, /function mountLessonCompletionPanel/);
+  assert.match(lessonHtml, /function renderLessonCompletionPanel/);
+  assert.match(lessonHtml, /function syncLessonCompletionUi/);
+  assert.match(lessonHtml, /完成课程/);
+  assert.match(lessonHtml, /已完成 ✓/);
+  assert.match(lessonHtml, /标记为未完成/);
+  assert.match(lessonHtml, /\.ai-panel--complete/);
+  assert.match(lessonHtml, /\.lesson-complete-btn/);
+  assert.match(lessonHtml, /\.lesson-complete-btn\.is-completed/);
+  assert.match(lessonHtml, /\.lesson-complete-btn:disabled\.is-completed/);
+  assert.match(lessonHtml, /\.lesson-unmark-btn/);
+  assert.match(lessonHtml, /completeBtn\.disabled = isDone/);
+  assert.doesNotMatch(lessonHtml, /completeBtn\.setAttribute\('aria-pressed'/);
+  assert.match(lessonHtml, /statusEl\.setAttribute\('data-state', 'complete'\)/);
+  assert.match(lessonHtml, /statusEl\.setAttribute\('data-state', 'incomplete'\)/);
+  assert.match(lessonHtml, /statusState !== \(isDone \? 'complete' : 'incomplete'\)/);
+
+  const runtime = loadProgressRuntime();
+  const lesson = 'phases/01-math-foundations/01-scalar-derivatives';
+  assert.equal(runtime.api.isLessonComplete(lesson), false);
+
+  runtime.api.markLessonComplete(lesson, 'learner');
+  assert.equal(runtime.api.isLessonComplete(lesson), true);
+  const firstCompletedAt = runtime.api.getLessonProgress(lesson).completedAt;
+  assert.ok(firstCompletedAt > 0);
+
+  runtime.api.markLessonComplete(lesson, 'learner');
+  assert.equal(runtime.api.getLessonProgress(lesson).completedAt, firstCompletedAt);
+
+  runtime.api.unmarkLessonComplete(lesson);
+  assert.equal(runtime.api.isLessonComplete(lesson), false);
+  assert.equal(runtime.api.getLessonProgress(lesson).completedAt, null);
 });
