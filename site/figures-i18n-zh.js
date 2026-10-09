@@ -14,6 +14,14 @@
 
   // widget 标题（.lf-label）
   var L = {
+    'A2A DISCOVERY': 'A2A 发现机制',
+    'CONTRACT NET': '合同网协议',
+    'WORK STEALING': '工作窃取',
+    'HANDOFF ROUTING': '交接路由',
+    'DEBATE TOPOLOGY': '辩论拓扑',
+    'THEORY OF MIND': '心智理论',
+    'CTDE': '中心化训练与去中心化执行',
+    'CHECKPOINT REPLAY': '检查点回放',
     'AGENT LOOP': '智能体循环',
     'ATTENTION HEATMAP': '注意力热力图',
     'AUTONOMY OVERSIGHT': '自主性监督',
@@ -170,6 +178,14 @@
 
   // 操作提示（.lf-head 末位 span）
   var H = {
+    'card then task': '先拉取名片再委派任务',
+    'announce, bid, award': '发布、投标、中标',
+    'pull, not push': '拉取而非推送',
+    'pass the conversation': '交接会话控制权',
+    'who talks to whom': '谁与谁对话',
+    'beliefs about beliefs': '关于信念的信念',
+    'train wide, run local': '全局训练，本地运行',
+    'crash then resume': '崩溃后恢复',
     'add the harmonics': '叠加谐波试试',
     'conv vs dense': '卷积 vs 全连接',
     'drag N': '拖动 N',
@@ -613,6 +629,10 @@
 
   // 说明散文（.lf-cap，按 widget 名索引）
   var CAP = {
+    'sw-agent-card-discovery': 'A2A 是 agent 之间的横向线协议。客户端首先从知名 URL 获取 Agent Card 以了解远端 agent 能做什么，然后发送消息，由远端 agent 转换为任务。任务在不透明生命周期（TASK_STATE_SUBMITTED、TASK_STATE_WORKING、TASK_STATE_COMPLETED）中推进并返回产物。这就是以 agent 为一等公民重新构建的 HTTP 与 REST。',
+    'sw-contract-net': 'FIPA 合同网协议将任务分配建模为暗标拍卖。主管广播征求方案（CFP），空闲 agent 提交报价，主管将合同授予最优标的。MCP tools/call 与现代任务市场正是这一 1980 年代机制在 JSON 时代的重述。',
+    'sw-work-stealing': '工作窃取用本地双端队列替代了中心化瓶颈。繁忙的 agent 向自身队列尾部压入任务；空闲 agent 则从其他工作节点的头部窃取。争用保持在局部，吞吐量随 worker 数量扩展，且无须中心协调者持有全图。',
+    'sw-handoff-routing': 'Agent 交接（Handoff）直接将当前轮次转交给专业 agent，而无需经由 supervisor 往返周转。调用方转交状态、上下文与连接。新 agent 直接与用户对话，直至决定交回或结束。',
     'kv-cache-sizer': '缓存为每个 token、每一层、每个 KV 头各存一份 key 和 value。它随序列长度和批大小线性增长——这正是为什么塞满 GPU 的是高批量下的长上下文，而不是权重。',
     'gradient-descent': '每一步沿梯度乘以学习率的方向下坡。太小就爬得极慢；太大会越过谷底直至发散。训练就是在两者之间寻找那个合适的学习率。',
     'softmax-temperature': '温度在指数运算前先除 logits。低于 1 时分布向头部 token 收紧；高于 1 时趋向均匀。T→0 就是 argmax；T→∞ 就是抛硬币。',
