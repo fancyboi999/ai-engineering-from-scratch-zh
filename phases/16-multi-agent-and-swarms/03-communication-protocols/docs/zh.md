@@ -72,7 +72,7 @@ MCP 是 **agent 对工具**的通信。它帮不了 agent 彼此对话。
 ### A2A（Agent2Agent 协议）
 
 **作者：** Google（现归 Linux Foundation，标识为 `lf.a2a.v1`）
-**规范版本：** 1.0.0
+**规范版本：** 1.0.1
 **问题：** 自主 agent 如何彼此协作、谈判、委派任务？
 
 A2A 是用于 **agent 对等协作**的协议。MCP 把 agent 连到工具，A2A 把 agent 连到其他 agent。每个 agent 在一个 well-known URL 上发布一张 **Agent Card**，其他 agent 据此发现它、与它谈判、把任务委派给它。
@@ -87,17 +87,17 @@ sequenceDiagram
     Client->>Remote: GET /.well-known/agent-card.json
     Remote-->>Client: Agent Card（技能、模式、安全）
 
-    Client->>Remote: POST /message:send
-    Remote-->>Client: 任务（已提交/处理中）
+    Client->>Remote: POST /message:send (returnImmediately)
+    Remote-->>Client: 任务（TASK_STATE_SUBMITTED 或 TASK_STATE_WORKING）
 
     alt 轮询
         Client->>Remote: GET /tasks/{id}
         Remote-->>Client: 任务状态 + 产物
     else 流式传输
         Client->>Remote: POST /message:stream
-        Remote-->>Client: SSE: 状态更新
-        Remote-->>Client: SSE: 产物更新
-        Remote-->>Client: SSE: 完成
+        Remote-->>Client: SSE: statusUpdate
+        Remote-->>Client: SSE: artifactUpdate
+        Remote-->>Client: SSE: statusUpdate TASK_STATE_COMPLETED，流关闭
     end
 ```
 
@@ -157,36 +157,36 @@ sequenceDiagram
       }
     }
   },
-  "security": [{ "bearer": [] }]
+  "securityRequirements": [{ "schemes": { "bearer": { "list": [] } } }]
 }
 ```
 
 几个要注意的点：
 - **Skills（技能）** 是一个 agent 能做的事。每项技能有 ID、标签、支持的输入/输出 MIME 类型。客户端 agent 据此判断这个远端 agent 能不能处理它的请求。
 - **supportedInterfaces** 列出多种协议绑定。单个 agent 能同时说 JSON-RPC、REST 和 gRPC。
-- **Security（安全）** 内置在 card 里。客户端在发出第一个请求之前就知道需要什么认证。
+- **Security（安全）** 直接内置在 card 内部：`securitySchemes` 命名每种机制，`securityRequirements` 指明适用项。客户端在发出第一个请求之前就知道需要什么认证。
 
 #### 任务生命周期
 
-任务（Task）是 A2A 里的核心工作单元。它们在一组已定义的状态之间流转：
+任务（Task）是 A2A 里的核心工作单元。它们在一组已定义的状态之间流转（图表中省略了线缆上传输时每个状态所带的 `TASK_STATE_` 前缀）：
 
 ```mermaid
 stateDiagram-v2
-    [*] --> submitted
-    submitted --> working
-    working --> input_required: 需要更多信息
-    input_required --> working: 客户端发送数据
-    working --> completed: 成功
-    working --> failed: 出错
-    working --> canceled: 客户端取消
-    submitted --> rejected: agent 拒绝
+    [*] --> SUBMITTED
+    SUBMITTED --> WORKING
+    WORKING --> INPUT_REQUIRED: 需要更多信息
+    INPUT_REQUIRED --> WORKING: 客户端发送数据
+    WORKING --> COMPLETED: 成功
+    WORKING --> FAILED: 出错
+    WORKING --> CANCELED: 客户端取消
+    SUBMITTED --> REJECTED: agent 拒绝
 
-    completed --> [*]
-    failed --> [*]
-    canceled --> [*]
-    rejected --> [*]
+    COMPLETED --> [*]
+    FAILED --> [*]
+    CANCELED --> [*]
+    REJECTED --> [*]
 
-    note right of completed
+    note right of COMPLETED
         终态不可变。
         后续操作在同一个 contextId 下
         创建新任务。
@@ -212,7 +212,7 @@ stateDiagram-v2
 
 A2A 用 JSON-RPC 2.0。真实的消息交换长这样：
 
-**客户端发送一个任务：**
+**客户端发送消息：**
 ```json
 {
   "jsonrpc": "2.0",
@@ -269,16 +269,16 @@ A2A 用 JSON-RPC 2.0。真实的消息交换长这样：
 **通过 SSE 流式传输：**
 ```text
 POST /message:stream HTTP/1.1
-Content-Type: application/json
+Content-Type: application/a2a+json
 A2A-Version: 1.0
 
-data: {"task":{"id":"task-123","status":{"state":"TASK_STATE_WORKING"}}}
+data: {"task":{"id":"task-123","contextId":"ctx-123","status":{"state":"TASK_STATE_WORKING"}}}
 
-data: {"statusUpdate":{"taskId":"task-123","status":{"state":"TASK_STATE_WORKING","message":{"role":"ROLE_AGENT","parts":[{"text":"Searching documentation..."}]}}}}
+data: {"statusUpdate":{"taskId":"task-123","contextId":"ctx-123","status":{"state":"TASK_STATE_WORKING","message":{"messageId":"msg-002","role":"ROLE_AGENT","parts":[{"text":"Searching documentation..."}]}}}}
 
-data: {"artifactUpdate":{"taskId":"task-123","artifact":{"artifactId":"art-1","parts":[{"text":"partial findings..."}]},"append":true,"lastChunk":false}}
+data: {"artifactUpdate":{"taskId":"task-123","contextId":"ctx-123","artifact":{"artifactId":"art-1","parts":[{"text":"partial findings..."}]},"append":true,"lastChunk":false}}
 
-data: {"statusUpdate":{"taskId":"task-123","status":{"state":"TASK_STATE_COMPLETED"}}}
+data: {"statusUpdate":{"taskId":"task-123","contextId":"ctx-123","status":{"state":"TASK_STATE_COMPLETED"}}}
 ```
 
 ### ACP（Agent Communication Protocol）
@@ -612,12 +612,12 @@ swarm-message-bus
 ```typescript
 import crypto from "node:crypto";
 
-type MessageRole = "user" | "agent";
+type MessageRole = "ROLE_USER" | "ROLE_AGENT";
 
 type MessagePart =
-  | { kind: "text"; text: string }
-  | { kind: "data"; data: unknown; mediaType: string }
-  | { kind: "file"; name: string; url: string; mediaType: string };
+  | { text: string }
+  | { data: unknown; mediaType: string }
+  | { url: string; filename: string; mediaType: string };
 
 type TrajectoryEntry = {
   reasoning: string;
@@ -651,11 +651,11 @@ function createMessage(
 }
 
 function textMessage(role: MessageRole, text: string): AgentMessage {
-  return createMessage(role, [{ kind: "text", text }]);
+  return createMessage(role, [{ text }]);
 }
 ```
 
-注意：`MessagePart` 是多模态的（文本、结构化数据、文件），和真实的 A2A、ACP 规范一样。`TrajectoryEntry` 捕获推理链，对应 ACP 的 TrajectoryMetadata。
+注意：`MessagePart` 是多模态的（文本、结构化数据、文件），正如真实 A2A 和 ACP 规范那样。与 A2A 1.0 一样，当前存在的字段（`text`、`data` 或 `url`）即表明该 part 的类型，没有 `kind` 标记。`TrajectoryEntry` 捕获推理链，对应 ACP 的 TrajectoryMetadata。
 
 ### 第 2 步：A2A Agent Card 与注册表
 
@@ -671,11 +671,17 @@ type Skill = {
   outputModes: string[];
 };
 
+type AgentInterface = {
+  url: string;
+  protocolBinding: string;
+  protocolVersion: string;
+};
+
 type AgentCard = {
   name: string;
   description: string;
   version: string;
-  url: string;
+  supportedInterfaces: AgentInterface[];
   capabilities: {
     streaming: boolean;
     pushNotifications: boolean;
@@ -724,20 +730,20 @@ class AgentRegistry {
 
 ```typescript
 type TaskState =
-  | "submitted"
-  | "working"
-  | "input-required"
-  | "auth-required"
-  | "completed"
-  | "failed"
-  | "canceled"
-  | "rejected";
+  | "TASK_STATE_SUBMITTED"
+  | "TASK_STATE_WORKING"
+  | "TASK_STATE_INPUT_REQUIRED"
+  | "TASK_STATE_AUTH_REQUIRED"
+  | "TASK_STATE_COMPLETED"
+  | "TASK_STATE_FAILED"
+  | "TASK_STATE_CANCELED"
+  | "TASK_STATE_REJECTED";
 
 const TERMINAL_STATES: TaskState[] = [
-  "completed",
-  "failed",
-  "canceled",
-  "rejected",
+  "TASK_STATE_COMPLETED",
+  "TASK_STATE_FAILED",
+  "TASK_STATE_CANCELED",
+  "TASK_STATE_REJECTED",
 ];
 
 type TaskStatus = {
@@ -761,13 +767,14 @@ type Task = {
 };
 
 type TaskEvent =
-  | { kind: "statusUpdate"; taskId: string; status: TaskStatus }
+  | { statusUpdate: { taskId: string; status: TaskStatus } }
   | {
-      kind: "artifactUpdate";
-      taskId: string;
-      artifact: Artifact;
-      append: boolean;
-      lastChunk: boolean;
+      artifactUpdate: {
+        taskId: string;
+        artifact: Artifact;
+        append: boolean;
+        lastChunk: boolean;
+      };
     };
 
 type TaskHandler = (
@@ -799,22 +806,22 @@ class TaskManager {
     if (!handler) {
       const task = this.createTask(contextId);
       task.status = {
-        state: "rejected",
+        state: "TASK_STATE_REJECTED",
         timestamp: Date.now(),
-        message: textMessage("agent", `No handler for ${agentName}`),
+        message: textMessage("ROLE_AGENT", `No handler for ${agentName}`),
       };
       return task;
     }
 
     const task = this.createTask(contextId);
     task.history.push(message);
-    task.status = { state: "submitted", timestamp: Date.now() };
+    task.status = { state: "TASK_STATE_SUBMITTED", timestamp: Date.now() };
 
     await this.processTask(task, handler, message).catch((err) => {
       task.status = {
-        state: "failed",
+        state: "TASK_STATE_FAILED",
         timestamp: Date.now(),
-        message: textMessage("agent", String(err)),
+        message: textMessage("ROLE_AGENT", String(err)),
       };
     });
     return task;
@@ -827,11 +834,9 @@ class TaskManager {
   cancelTask(taskId: string): boolean {
     const task = this.tasks.get(taskId);
     if (!task || TERMINAL_STATES.includes(task.status.state)) return false;
-    task.status = { state: "canceled", timestamp: Date.now() };
+    task.status = { state: "TASK_STATE_CANCELED", timestamp: Date.now() };
     this.emit(taskId, {
-      kind: "statusUpdate",
-      taskId,
-      status: task.status,
+      statusUpdate: { taskId, status: task.status },
     });
     return true;
   }
@@ -840,7 +845,7 @@ class TaskManager {
     const task: Task = {
       id: crypto.randomUUID(),
       contextId: contextId ?? crypto.randomUUID(),
-      status: { state: "submitted", timestamp: Date.now() },
+      status: { state: "TASK_STATE_SUBMITTED", timestamp: Date.now() },
       artifacts: [],
       history: [],
     };
@@ -853,42 +858,39 @@ class TaskManager {
     handler: TaskHandler,
     message: AgentMessage
   ) {
-    task.status = { state: "working", timestamp: Date.now() };
+    task.status = { state: "TASK_STATE_WORKING", timestamp: Date.now() };
     this.emit(task.id, {
-      kind: "statusUpdate",
-      taskId: task.id,
-      status: task.status,
+      statusUpdate: { taskId: task.id, status: task.status },
     });
 
     try {
       for await (const event of handler(task, message)) {
         if (TERMINAL_STATES.includes(task.status.state)) break;
 
-        if (event.kind === "statusUpdate") {
-          task.status = event.status;
+        if ("statusUpdate" in event) {
+          task.status = event.statusUpdate.status;
         }
-        if (event.kind === "artifactUpdate") {
+        if ("artifactUpdate" in event) {
+          const update = event.artifactUpdate;
           const existing = task.artifacts.find(
-            (a) => a.id === event.artifact.id
+            (a) => a.id === update.artifact.id
           );
-          if (existing && event.append) {
-            existing.parts.push(...event.artifact.parts);
+          if (existing && update.append) {
+            existing.parts.push(...update.artifact.parts);
           } else {
-            task.artifacts.push(event.artifact);
+            task.artifacts.push(update.artifact);
           }
         }
         this.emit(task.id, event);
       }
     } catch (err) {
       task.status = {
-        state: "failed",
+        state: "TASK_STATE_FAILED",
         timestamp: Date.now(),
-        message: textMessage("agent", String(err)),
+        message: textMessage("ROLE_AGENT", String(err)),
       };
       this.emit(task.id, {
-        kind: "statusUpdate",
-        taskId: task.id,
-        status: task.status,
+        statusUpdate: { taskId: task.id, status: task.status },
       });
     }
   }
@@ -901,7 +903,7 @@ class TaskManager {
 }
 ```
 
-这实现了真实的 A2A 任务生命周期：submitted、working、input-required，再到终态。handler 是异步生成器，yield 出事件（状态更新和产物分片），对应 SSE 流式模型。
+这实现了真实的 A2A 任务生命周期：`TASK_STATE_SUBMITTED`、`TASK_STATE_WORKING`、`TASK_STATE_INPUT_REQUIRED`，再到终态。handler 是异步生成器，yield 出 `statusUpdate` 与 `artifactUpdate` 事件，与 SSE 流所携带的包装格式相同。
 
 ### 第 4 步：ACP 风格的审计轨迹
 
@@ -1231,7 +1233,13 @@ async function protocolDemo() {
     name: "researcher",
     description: "Searches and summarizes findings",
     version: "1.0.0",
-    url: "https://researcher.local/a2a/v1",
+    supportedInterfaces: [
+      {
+        url: "https://researcher.local/a2a/v1",
+        protocolBinding: "JSONRPC",
+        protocolVersion: "1.0",
+      },
+    ],
     capabilities: { streaming: true, pushNotifications: false },
     defaultInputModes: ["text/plain"],
     defaultOutputModes: ["text/plain", "application/json"],
@@ -1250,7 +1258,13 @@ async function protocolDemo() {
     name: "coder",
     description: "Writes code from specs",
     version: "1.0.0",
-    url: "https://coder.local/a2a/v1",
+    supportedInterfaces: [
+      {
+        url: "https://coder.local/a2a/v1",
+        protocolBinding: "JSONRPC",
+        protocolVersion: "1.0",
+      },
+    ],
     capabilities: { streaming: false, pushNotifications: false },
     defaultInputModes: ["text/plain", "application/json"],
     defaultOutputModes: ["text/plain"],
@@ -1275,9 +1289,13 @@ async function protocolDemo() {
     "researcher",
     async function* (task, message) {
       yield {
-        kind: "statusUpdate" as const,
-        taskId: task.id,
-        status: { state: "working" as const, timestamp: Date.now() },
+        statusUpdate: {
+          taskId: task.id,
+          status: {
+            state: "TASK_STATE_WORKING" as const,
+            timestamp: Date.now(),
+          },
+        },
       };
 
       researchTrajectory.push({
@@ -1302,41 +1320,45 @@ async function protocolDemo() {
       });
 
       yield {
-        kind: "artifactUpdate" as const,
-        taskId: task.id,
-        artifact: {
-          id: crypto.randomUUID(),
-          name: "research-results",
-          parts: [
-            {
-              kind: "data" as const,
-              data: {
-                findings: [
-                  "React 19 compiler auto-memoizes components",
-                  "No more manual useMemo/useCallback needed",
-                  "Compiler runs at build time, not runtime",
-                ],
-                sources: ["react.dev/blog/react-19"],
+        artifactUpdate: {
+          taskId: task.id,
+          artifact: {
+            id: crypto.randomUUID(),
+            name: "research-results",
+            parts: [
+              {
+                data: {
+                  findings: [
+                    "React 19 compiler auto-memoizes components",
+                    "No more manual useMemo/useCallback needed",
+                    "Compiler runs at build time, not runtime",
+                  ],
+                  sources: ["react.dev/blog/react-19"],
+                },
+                mediaType: "application/json",
               },
-              mediaType: "application/json",
-            },
-          ],
+            ],
+          },
+          append: false,
+          lastChunk: true,
         },
-        append: false,
-        lastChunk: true,
       };
 
       yield {
-        kind: "statusUpdate" as const,
-        taskId: task.id,
-        status: { state: "completed" as const, timestamp: Date.now() },
+        statusUpdate: {
+          taskId: task.id,
+          status: {
+            state: "TASK_STATE_COMPLETED" as const,
+            timestamp: Date.now(),
+          },
+        },
       };
     }
   );
 
   auditRunner.registerAgent("researcher", async () => ({
     output: [
-      textMessage("agent", "React 19 compiler auto-memoizes components"),
+      textMessage("ROLE_AGENT", "React 19 compiler auto-memoizes components"),
     ],
     trajectory: researchTrajectory,
   }));
@@ -1366,7 +1388,7 @@ async function protocolDemo() {
   );
 
   console.log("\n2. Identity Verification (ANP)");
-  const message = textMessage("user", "Research React 19 compiler features");
+  const message = textMessage("ROLE_USER", "Research React 19 compiler features");
   const signature = signPayload(coderIdentity, message.id);
   const verified = identityRegistry.verify(
     coderIdentity.did,
@@ -1428,7 +1450,7 @@ protocolDemo().catch((err) => {
 
 **Schema 漂移。** Agent A 发布的 Agent Card 宣称输出 `application/json`。但 JSON schema 在不同版本之间变了。Agent B 按旧格式解析，拿到一堆垃圾。修法：给你的技能和输出 schema 打版本号。A2A 规范在 Agent Card 上支持 `version` 正是为此。
 
-**违反状态机。** 一个 agent handler 先 yield 了 `completed` 事件，然后还想 yield 更多产物。可任务已经不可变了。你的代码要么默默丢弃这些更新，要么抛异常。修法：yield 之前先检查是否已是终态。上面的 `TaskManager` 用终态后的 `break` 来强制这一点。
+**违反状态机。** 一个 agent handler yield 了一个 `TASK_STATE_COMPLETED` 状态更新，随后又尝试 yield 更多产物。可任务已经不可变了。你的代码要么默默丢弃这些更新，要么抛异常。修法：yield 之前先检查是否已是终态。上面的 `TaskManager` 用终态后的 `break` 来强制保证这一点。
 
 **信任解析失败。** Agent A 想验证 Agent B 的 DID，但 Agent B 的域名挂了，DID 文档拉不到。你是失败放行（接受未验证的 agent），还是失败拒绝（一概拒掉）？ANP 推荐按最小信任原则失败拒绝。
 
@@ -1505,7 +1527,7 @@ graph TD
 
 ## 延伸阅读
 
-- [Google A2A specification](https://github.com/google/A2A) —— 官方规范与 SDK（v1.0.0，Linux Foundation）
+- [Google A2A specification](https://github.com/google/A2A) —— 官方规范与 SDK（v1.0.1，Linux Foundation）
 - [IBM/BeeAI ACP specification](https://github.com/i-am-bee/acp) —— agent run 和轨迹元数据的 OpenAPI 3.1 规范
 - [Agent Network Protocol](https://github.com/agent-network-protocol/AgentNetworkProtocol) —— 基于 DID 的身份、E2EE、元协议谈判
 - [Model Context Protocol docs](https://modelcontextprotocol.io/) —— Anthropic 的 MCP 规范（Phase 13 已讲）

@@ -17,24 +17,52 @@ A2A 就是那次调用的通用线协议。标准发现、标准任务模型、�
 
 ### 四个要素
 
-**Agent Card。** 位于 `/.well-known/agent.json` 的 JSON 文档，描述这个 agent：名字、技能、端点、支持的模态、认证要求。发现就是去读这张 card。
+**Agent Card。** 位于 `/.well-known/agent-card.json` 的 JSON 文档，描述这个 agent：名字、技能、`supportedInterfaces`（端点 URL、协议绑定、协议版本）、默认输入与输出媒体类型、以及认证要求（`securitySchemes` 加 `securityRequirements`）。发现就是去读这张 card。
 
+```http
+GET /.well-known/agent-card.json HTTP/1.1
+Host: agent.example.com
 ```
-GET https://agent.example.com/.well-known/agent.json
-→ {
-    "name": "code-review-agent",
-    "skills": ["review-python", "review-typescript"],
-    "endpoints": {
-      "tasks": "https://agent.example.com/tasks"
+
+```json
+{
+  "name": "code-review-agent",
+  "description": "Reviews Python and TypeScript code.",
+  "version": "1.0.0",
+  "supportedInterfaces": [
+    {
+      "url": "https://agent.example.com",
+      "protocolBinding": "HTTP+JSON",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "capabilities": {"streaming": false, "pushNotifications": false},
+  "securitySchemes": {
+    "bearer": {"httpAuthSecurityScheme": {"scheme": "Bearer"}}
+  },
+  "securityRequirements": [{"schemes": {"bearer": {"list": []}}}],
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [
+    {
+      "id": "review-python",
+      "name": "Review Python",
+      "description": "Reviews Python code.",
+      "tags": ["code-review", "python"]
     },
-    "auth": {"type": "bearer"},
-    "modalities": ["text", "structured"]
-  }
+    {
+      "id": "review-typescript",
+      "name": "Review TypeScript",
+      "description": "Reviews TypeScript code.",
+      "tags": ["code-review", "typescript"]
+    }
+  ]
+}
 ```
 
-**Task。** 工作单元。一个异步、有状态的对象，带生命周期：`submitted → working → completed / failed / canceled`。客户端发送一个任务，轮询或订阅来获取更新。
+**Task。** 工作单元。一个异步、有状态的对象，带生命周期：`TASK_STATE_SUBMITTED` → `TASK_STATE_WORKING` → `TASK_STATE_COMPLETED` / `TASK_STATE_FAILED` / `TASK_STATE_CANCELED`。客户端发送消息，服务端创建任务，客户端轮询或订阅来获取更新。
 
-**Artifact（产物）。** 任务产出的结果类型。文本、结构化 JSON、图像、视频、音频。产物是类型化的，所以不同模态都是一等公民。
+**Artifact（产物）。** 任务产出的结果类型。文本、结构化 JSON、图像、视频、音频。产物是类型化的：每个 part 持有 `text`、`raw`、`url` 或 `data` 之一，并可指明其 `mediaType`，因此不同模态都是一等公民。
 
 **不透明生命周期。** A2A 不规定远端 agent *如何*解决任务。客户端看到的是状态转移和产物；实现可以自由使用任何框架。
 
@@ -47,29 +75,33 @@ GET https://agent.example.com/.well-known/agent.json
 
 ### 发现流程
 
-```
-Client                     Agent server
-  ├──GET /.well-known/agent.json──>
-  <──Agent Card JSON─────────────
-  ├──POST /tasks {skill, input}──>
-  <──201 task_id, state=submitted
-  ├──GET /tasks/{id}──────────────>
-  <──state=working, 42% done──────
-  ├──GET /tasks/{id}──────────────>
-  <──state=completed, artifacts──
+```mermaid
+sequenceDiagram
+    participant C as 客户端
+    participant S as Agent 服务端
+    C->>S: GET /.well-known/agent-card.json
+    S-->>C: Agent Card JSON
+    C->>S: POST /message:send (returnImmediately)
+    S-->>C: task, TASK_STATE_SUBMITTED
+    C->>S: GET /tasks/{id}
+    S-->>C: TASK_STATE_WORKING
+    C->>S: GET /tasks/{id}
+    S-->>C: TASK_STATE_COMPLETED, artifacts
 ```
 
-或者用流式：订阅 `/tasks/{id}/events` 的 SSE 来推送更新。
+这些是 HTTP+JSON 绑定路由，且每个请求携带 `A2A-Version: 1.0`。默认情况下 `SendMessage` 会阻塞直到任务达到终态或中断状态，因此轮询的客户端会设置 `configuration.returnImmediately` 以便立即取回任务。
+
+或者用流式：`POST /message:stream` 返回 Server-Sent Events（先是一个 `task`，然后是 `statusUpdate` 与 `artifactUpdate` 事件），而 `/tasks/{id}:subscribe` 则重新附着到正在运行的任务上。当任务达到终态时流关闭；不存在 `final` 标记。
 
 ### 认证
 
 A2A 支持三种常见模式：
 
-- **Bearer token** —— OAuth2 或不透明 token。
-- **mTLS** —— 双向 TLS；组织间互相证明身份。
-- **签名请求** —— 对载荷做 HMAC。
+- **Bearer token**：OAuth2 或不透明 token（`httpAuthSecurityScheme` 或 `oauth2SecurityScheme`）。
+- **mTLS**：双向 TLS；组织间互相证明身份（`mtlsSecurityScheme`）。
+- **API key**：标头、查询参数或 cookie 中的 key（`apiKeySecurityScheme`）。
 
-认证在 Agent Card 里声明；客户端发现并遵从。
+认证在 Agent Card 里声明：`securitySchemes` 命名每种方案，`securityRequirements` 规定客户端必须满足哪些方案。客户端发现并遵从。
 
 ### 到 2026 年 4 月的 150+ 个组织
 
@@ -104,17 +136,17 @@ sw-agent-card-discovery
 
 ## 动手构建
 
-`code/main.py` 用 `http.server` 和 JSON 实现一个 A2A 最小服务器和客户端。服务器：
+`code/main.py` 用 `http.server` 和 JSON 在 1.0 HTTP+JSON 绑定上实现一个 A2A 最小服务端和客户端。服务端：
 
-- 暴露 `/.well-known/agent.json`，
-- 接受 `POST /tasks`，
+- 暴露 `/.well-known/agent-card.json`，
+- 接受 `POST /message:send`，
 - 管理任务状态，
 - 在 `GET /tasks/{id}` 上返回产物。
 
 客户端：
 
 - 拉取 Agent Card，
-- 提交一个任务，
+- 发送带 `returnImmediately` 的消息，
 - 轮询直到完成，
 - 读取产物。
 
@@ -124,7 +156,7 @@ sw-agent-card-discovery
 python3 code/main.py
 ```
 
-脚本在后台线程里启动服务器，然后对它跑客户端。你能看到完整流程：发现、提交、轮询、产物。
+脚本在后台线程里启动服务器，然后对它跑客户端。你能看到完整流程：发现、发送消息、轮询、产物。
 
 ## 实际使用
 
@@ -134,8 +166,8 @@ python3 code/main.py
 
 检查清单：
 
-- **钉死规范版本。** A2A 仍在演进；Agent Card 应该声明协议版本。
-- **幂等的任务创建。** 重复提交（网络重试）应该只产出一个任务。
+- **钉死规范版本。** A2A 仍在演进；每个 `supportedInterfaces` 条目都应声明其 `protocolVersion`，客户端发送 `A2A-Version: 1.0`。
+- **幂等的任务创建。** 重复提交（网络重试）应该只产出一个任务。依据客户端的 `messageId` 进行去重。
 - **产物 schema。** 声明 agent 返回什么形状；消费方应该校验。
 - **限流 + 认证。** A2A 是面向公网的；套用标准 web 安全。
 - **失败任务的死信。** 长期观察模式，找出反复出现的失败类型。
@@ -143,8 +175,8 @@ python3 code/main.py
 ## 练习
 
 1. 跑 `code/main.py`。确认客户端发现了服务器并收到正确的产物。
-2. 给服务器加第二个技能（比如「summarize」）。更新 Agent Card。写一个根据任务类型挑技能的客户端。
-3. 实现一个 SSE 流式端点：`/tasks/{id}/events`，发出状态变化。客户端需要做哪些不同的事？
+2. 给服务端加第二个技能（比如「summarize」）。更新 Agent Card。写一个根据任务类型挑技能的客户端。1.0 请求没有 skill 字段，因此服务端根据消息的 part 进行路由。
+3. 实现 `POST /message:stream`：用 Server-Sent Events 回应（先是一个 `task`，然后是 `statusUpdate` 事件），并在终态时关闭流。客户端需要做哪些不同的事？
 4. 读 A2A 规范（https://a2a-protocol.org/latest/specification/）。指出规范强制要求、而这个演示没实现的三件事。
 5. 对比 A2A（Agent Card 发现）和 MCP（通过 `listTools` 的服务器端能力列举）。自描述的 agent 和能力探测之间的取舍是什么？
 
@@ -153,17 +185,18 @@ python3 code/main.py
 | 术语 | 大家嘴上怎么说 | 它实际是什么意思 |
 |------|----------------|------------------------|
 | A2A | 「agent 对 agent」 | 让 agent 跨系统调其他 agent 的对等协议。Google 2025。 |
-| Agent Card | 「agent 的名片」 | 位于 `/.well-known/agent.json` 的 JSON，描述技能、端点、认证。 |
+| Agent Card | 「agent 的名片」 | 位于 `/.well-known/agent-card.json` 的 JSON，描述技能、`supportedInterfaces`、认证。 |
 | Task | 「工作单元」 | 带生命周期的异步有状态对象；完成时产出产物。 |
 | Artifact | 「结果」 | 类型化输出：文本、结构化 JSON、图像、视频、音频。一等媒体。 |
 | Opaque lifecycle | 「怎么解决是 agent 自己的事」 | 客户端看到状态转移；服务器可自由选框架/工具。 |
-| Discovery | 「找到那个 agent」 | `GET /.well-known/agent.json` 返回 card。 |
+| Discovery | 「找到那个 agent」 | `GET /.well-known/agent-card.json` 返回 card。 |
 | MCP vs A2A | 「工具 vs 对等端」 | MCP：纵向 agent ↔ 工具。A2A：横向 agent ↔ agent。 |
 | ACP / ANP / NLIP | 「兄弟协议」 | 相邻规范；A2A 是 2026 年采用最广的。 |
 
 ## 延伸阅读
 
 - [A2A specification](https://a2a-protocol.org/latest/specification/) —— 标准规范
+- [A2A v1.0.1 release](https://github.com/a2aproject/A2A/tree/v1.0.1)：本课所遵循的打标签 `docs/specification.md` 以及规范化的 `specification/a2a.proto`
 - [Google Developers Blog — A2A announcement](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/) —— 2025 年 4 月发布博文
 - [A2A GitHub repo](https://github.com/a2aproject/A2A) —— 参考实现与 SDK
 - [Liu et al. — A Survey of Agent Interoperability Protocols](https://arxiv.org/html/2505.02279v1) —— MCP、ACP、A2A、ANP 对比
