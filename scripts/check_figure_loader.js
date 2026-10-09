@@ -277,7 +277,7 @@ async function main() {
   assert.equal(await single.window.AIFS_mountLessonFigures(scope(['few-shot-curve'])), true);
   assert.deepEqual(single.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260831b',
+    'https://course.example/figures-i18n-zh.js?v=20261009a',
   ]);
   assert.equal(single.mounts.length, 1);
 
@@ -289,7 +289,7 @@ async function main() {
   assert.deepEqual(multi.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
     'https://course.example/figures-alignment3.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260831b',
+    'https://course.example/figures-i18n-zh.js?v=20261009a',
   ]);
   assert.equal(multi.mounts.length, 2, 'mount may be retried; renderer-level markers make it idempotent');
 
@@ -298,7 +298,7 @@ async function main() {
   await spa.window.AIFS_mountLessonFigures(scope(['al-instruct-pipeline']));
   assert.deepEqual(spa.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260831b',
+    'https://course.example/figures-i18n-zh.js?v=20261009a',
     'https://course.example/figures-alignment3.js?v=20260801a',
   ], 'a SPA remount loads only its new module; i18n stays loaded before each mount');
   assert.equal(spa.mounts.length, 2);
@@ -307,7 +307,7 @@ async function main() {
   assert.equal(await failed.window.AIFS_mountLessonFigures(scope(['few-shot-curve'])), true);
   assert.deepEqual(failed.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260831b',
+    'https://course.example/figures-i18n-zh.js?v=20261009a',
   ]);
   assert.equal(failed.mounts.length, 1, 'a failed module must not block mounting the lesson body');
   assert.equal(failed.warnings.length, 1);
@@ -317,7 +317,7 @@ async function main() {
   await retry.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
   assert.deepEqual(retry.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20260831b',
+    'https://course.example/figures-i18n-zh.js?v=20261009a',
     'https://course.example/figures-llmeng.js?v=20260801a',
   ], 'a later mount must retry a previously failed module without reloading i18n');
   assert.equal(retry.mounts.length, 2);

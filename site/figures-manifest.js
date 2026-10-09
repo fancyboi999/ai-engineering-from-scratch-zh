@@ -10,7 +10,7 @@
   var baseUrl = current && current.src
     ? current.src.replace(/[^/?#]+(?:[?#].*)?$/, '')
     : '/';
-  var i18nSrc = 'figures-i18n-zh.js?v=20260831b';
+  var i18nSrc = 'figures-i18n-zh.js?v=20261009a';
 
   var MODULES = [
   {
