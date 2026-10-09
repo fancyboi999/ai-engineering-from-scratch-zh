@@ -15,13 +15,11 @@ function setup() {
   const answer = { textContent: '一个非常非官方的测试。' };
   const hint = { textContent: '问一个大问题。得到一个小回答。' };
   const label = { textContent: '问问机器' };
-  const sponsor = { hidden: true };
   const children = {
     '[data-intelligence-trigger]': button,
     '[data-intelligence-answer]': answer,
     '[data-intelligence-hint]': hint,
     '[data-intelligence-label]': label,
-    '[data-intelligence-sponsor]': sponsor,
   };
   const card = {
     getAttribute(name) { return attributes.get(name) ?? null; },
@@ -42,7 +40,7 @@ function setup() {
     },
   };
   return {
-    doc, card, button, answer, hint, label, sponsor, children, environment, handlers,
+    doc, card, button, answer, hint, label, children, environment, handlers,
     click(detail = 1) { handlers.forEach(handler => handler({ detail })); },
   };
 }
@@ -138,24 +136,4 @@ test('the optional button label and unavailable matchMedia do not prevent activa
   state.click();
   assert.equal(state.answer.textContent, '先定义“到了”。');
   assert.equal(state.card.getAttribute('data-motion'), 'animate');
-});
-
-test('the sponsor link appears after the second answer and stays', () => {
-  const state = setup();
-  init(state.doc, state.environment);
-  state.click();
-  assert.equal(state.sponsor.hidden, true);
-  state.click();
-  assert.equal(state.sponsor.hidden, false);
-  state.click();
-  assert.equal(state.sponsor.hidden, false);
-});
-
-test('a card without the sponsor link still answers', () => {
-  const state = setup();
-  delete state.children['[data-intelligence-sponsor]'];
-  assert.equal(init(state.doc, state.environment), true);
-  state.click();
-  state.click();
-  assert.equal(state.answer.textContent, '先定义“智能”。');
 });
