@@ -15,7 +15,6 @@
     var answer = card.querySelector('[data-intelligence-answer]');
     var hint = card.querySelector('[data-intelligence-hint]');
     var label = card.querySelector('[data-intelligence-label]');
-    var sponsor = card.querySelector('[data-intelligence-sponsor]');
     if (!button || !answer || !hint) return false;
 
     var runtime = environment || root;
@@ -31,7 +30,6 @@
       answer.textContent = replies[index][0];
       hint.textContent = replies[index][1];
       if (label) label.textContent = '再问一次';
-      if (sponsor && count >= 2) sponsor.hidden = false;
     });
 
     card.setAttribute('data-intelligence-ready', 'true');
