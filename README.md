@@ -40,6 +40,7 @@
   <a href="https://www.ipwo.net/?ref=githubgoofishcli"><ins>IPWO</ins></a> 拥有 9000 万+ 活跃住宅 IP 资源，覆盖 195+ 个国家和地区。<br>
   提供动态住宅代理、静态住宅代理及不限量住宅代理。<br>
   适用于网页抓取、数据采集、浏览器自动化、跨境业务等场景。<br>
+  我们订阅使用 Claude / Claude Code 时采用住宅 IP，长期使用稳定。<br>
   支持<a href="https://www.ipwo.net/?ref=githubgoofishcli"><ins>免费测试</ins></a>，<strong>9 折优惠码：</strong><code>0203</code>
 </p>
 
