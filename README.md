@@ -28,6 +28,21 @@
 
 > 本项目是 [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch)（作者 [Rohit Ghumare](https://github.com/rohitg00)，MIT 协议）的**简体中文衍生版**。衷心感谢原作者创作并开源了这套课程。
 
+## 特别鸣谢
+
+<p align="center">
+  <a href="https://www.ipwo.net/?ref=githubgoofishcli">
+    <img src="assets/ipwo-banner.png" alt="IPWO 住宅代理：稳定连接、全球节点、多协议支持" width="95%">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.ipwo.net/?ref=githubgoofishcli"><ins>IPWO</ins></a> 拥有 9000 万+ 活跃住宅 IP 资源，覆盖 195+ 个国家和地区。<br>
+  提供动态住宅代理、静态住宅代理及不限量住宅代理。<br>
+  适用于网页抓取、数据采集、浏览器自动化、跨境业务等场景。<br>
+  支持<a href="https://www.ipwo.net/?ref=githubgoofishcli"><ins>免费测试</ins></a>，<strong>9 折优惠码：</strong><code>0203</code>
+</p>
+
 ### 这个中文版做了什么
 
 中文版提供课程翻译、配套视频、交互式学习网站和 AI 导师：
