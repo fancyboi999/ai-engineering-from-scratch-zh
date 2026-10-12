@@ -70,7 +70,14 @@ function createServer() {
       }
       for (const [key, value] of target.searchParams) url.searchParams.append(key, value);
       req.query = queryObject(url.searchParams);
-      if (handlers[target.pathname]) return await handlers[target.pathname](req, res);
+      if (handlers[target.pathname]) {
+        const handler = handlers[target.pathname];
+        if (typeof handler === 'function') return await handler(req, res);
+        const request = new Request(url, { method: req.method, headers: req.headers, ...(req.method === 'GET' || req.method === 'HEAD' ? {} : { body: req, duplex: 'half' }) });
+        const response = await handler.fetch(request);
+        res.writeHead(response.status, Object.fromEntries(response.headers));
+        return res.end(Buffer.from(await response.arrayBuffer()));
+      }
       if (!isFile(target.pathname)) {
         res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
         return res.end(req.method === 'HEAD' ? undefined : fs.readFileSync(path.join(SITE, '404.html')));

@@ -170,6 +170,26 @@ test('MCP negotiates only the implemented revision and rejects legacy or missing
   assert.equal(latest.status, 200); assert.deepEqual((await latest.json()).result, {});
 });
 
+test('MCP raw Web Request rejects oversized chunked JSON before whitespace is discarded', async t => {
+  const base = await listen(createServer(), t);
+  const ping = JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'ping' });
+  const sendChunked = bytes => new Promise((resolve, reject) => {
+    const body = Buffer.from(ping + ' '.repeat(bytes - Buffer.byteLength(ping)));
+    const req = http.request(base + '/mcp', { method: 'POST', headers: {
+      'Content-Type': 'application/json', Accept: 'application/json, text/event-stream',
+      'MCP-Protocol-Version': '2025-11-25', 'Transfer-Encoding': 'chunked',
+    } }, res => {
+      const chunks = []; res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString('utf8') }));
+    });
+    req.on('error', reject); req.write(body.subarray(0, 32768)); req.end(body.subarray(32768));
+  });
+  assert.equal((await sendChunked(65536)).status, 200);
+  const oversized = await sendChunked(65537);
+  assert.equal(oversized.status, 413);
+  assert.equal(JSON.parse(oversized.body).code, 'request_too_large');
+});
+
 test('real quota enforcement returns 429 and bodyless HEAD', async t => {
   const handler = catalog.createHandler({ limit: createLimiter({ limit: 1, vercel: false }) });
   const base = await listen(http.createServer((req, res) => { req.query = {}; handler(req, res); }), t);

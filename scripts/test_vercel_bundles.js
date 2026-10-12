@@ -37,7 +37,13 @@ async function main() {
     req.query = Object.fromEntries(url.searchParams);
     const handler = handlers[url.pathname];
     if (!handler) { res.writeHead(404); res.end(); return; }
-    await handler(req, res);
+    if (typeof handler === 'function') await handler(req, res);
+    else {
+      const request = new Request(url, { method: req.method, headers: req.headers, ...(req.method === 'GET' || req.method === 'HEAD' ? {} : { body: req, duplex: 'half' }) });
+      const response = await handler.fetch(request);
+      res.writeHead(response.status, Object.fromEntries(response.headers));
+      res.end(Buffer.from(await response.arrayBuffer()));
+    }
   });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');

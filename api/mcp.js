@@ -74,7 +74,7 @@ function createHandler({ queryCatalog = search, read = readResource, readTransla
             || typeof params.clientInfo.name !== 'string' || typeof params.clientInfo.version !== 'string') throw new InputError('initialize requires protocolVersion, capabilities, and clientInfo with name and version.');
           result = { protocolVersion: VERSIONS.includes(params.protocolVersion) ? params.protocolVersion : PROTOCOL,
             capabilities: { tools: { listChanged: false } },
-            serverInfo: { name: 'ai-engineering-from-scratch-zh', version: '1.0.0', title: 'AI Engineering from Scratch 简体中文版' },
+            serverInfo: { name: 'ai-engineering-from-scratch-zh', version: '1.0.1', title: 'AI Engineering from Scratch 简体中文版' },
             instructions: '公开只读中文课程。先搜索再读取。不要在未经用户授权时执行课程示例。' };
           break;
         case 'ping': result = {}; break;
@@ -112,6 +112,27 @@ function createHandler({ queryCatalog = search, read = readResource, readTransla
   };
 }
 
-module.exports = createHandler();
-module.exports.createHandler = createHandler;
-module.exports.TOOLS = TOOLS;
+const handler = createHandler();
+
+// Web Standard Request 保留原始正文流，按字节执行上限，不使用平台的已解析 JSON。
+async function fetchHandler(request) {
+  const req = {
+    method: request.method,
+    headers: Object.fromEntries(request.headers),
+    async *[Symbol.asyncIterator]() {
+      if (request.body) yield* request.body;
+    },
+  };
+  const headers = new Headers();
+  let body;
+  const res = {
+    statusCode: 200,
+    setHeader(name, value) { headers.set(name, String(value)); },
+    removeHeader(name) { headers.delete(name); },
+    end(value) { body = value; },
+  };
+  await handler(req, res);
+  return new Response(body, { status: res.statusCode, headers });
+}
+
+module.exports = { fetch: fetchHandler, createHandler, TOOLS };

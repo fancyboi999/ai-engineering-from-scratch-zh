@@ -3,7 +3,7 @@
   "name": "io.github.fancyboi999/ai-engineering-from-scratch-zh",
   "title": "AI Engineering from Scratch 简体中文版",
   "description": "检索公开中文 AI 工程课程与项目，读取原始 Markdown；不执行代码。",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://aieng-zh.cn/docs",
   "repository": {
     "url": "https://github.com/fancyboi999/ai-engineering-from-scratch-zh",
