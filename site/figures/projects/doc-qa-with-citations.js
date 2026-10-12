@@ -1,22 +1,22 @@
 (function () {
   "use strict";
   const controls = [
-    { key: "question", label: "Question", type: "text", value: "cache expire" },
+    { key: "question", label: "问题", type: "text", value: "cache expire" },
     {
       key: "text",
-      label: "Source text",
+      label: "来源文本",
       type: "text",
       value: "Cache entries expire after sixty seconds. Bananas are yellow.",
     },
     {
       key: "quote",
-      label: "Proposed quote",
+      label: "提议的引文",
       type: "text",
       value: "Bananas are yellow.",
     },
     {
       key: "size",
-      label: "Chunk characters",
+      label: "分块字符数",
       type: "range",
       value: 35,
       min: 10,
@@ -25,7 +25,7 @@
     },
     {
       key: "overlap",
-      label: "Chunk overlap",
+      label: "分块重叠字符数",
       type: "range",
       value: 5,
       min: 0,
@@ -42,7 +42,7 @@
       valid = offset >= 0 && v.quote.trim().length > 0;
     if (v.overlap >= v.size)
       return {
-        summary: "Reject overlap at or above chunk size",
+        summary: "拒绝大于或等于分块大小的重叠长度",
         metrics: [],
         bars: [],
       };
@@ -54,18 +54,18 @@
     }
     return {
       summary: !valid
-        ? "Reject unsupported quote"
+        ? "拒绝无来源支持的引文"
         : matches === 0
-          ? "Exact quote exists, but query relevance needs review"
-          : "Exact quote with lexical query overlap",
+          ? "存在逐字引文，但与查询的相关性仍需审查"
+          : "逐字引文与查询存在词汇重叠",
       metrics: [
-        { label: "Quote start", value: offset },
-        { label: "Query terms supported", value: matches },
+        { label: "引文起始位置", value: offset },
+        { label: "获得支持的查询词数", value: matches },
       ],
       bars: [
-        { label: "Matched query terms", value: matches, max: terms.size || 1 },
+        { label: "匹配的查询词数", value: matches, max: terms.size || 1 },
       ],
-      columns: ["start", "end", "chunk"],
+      columns: ["起点", "终点", "分块"],
       rows: chunks,
     };
   };
@@ -73,26 +73,26 @@
     "pj-doc-qa-with-citations-1",
     Object.assign(
       {
-        title: "Load local documents with stable provenance",
+        title: "加载本地文档并保留稳定来源信息",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Keep source identity, content hash and exact offsets before retrieving anything.",
+              "在检索前保留来源标识、内容哈希和精确偏移量。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "Keep source identity, content hash and exact offsets before retrieving anything. Character windows are an intentionally simple baseline: overlap preserves context near boundaries but does not create new evidence. The loader refuses symlinks that escape its root, so a document scan cannot silently read another directory.",
+              "在检索前保留来源标识、内容哈希和精确偏移量。字符窗口是刻意保持简单的基线：重叠能保留边界附近的上下文，但不会创造新证据。加载器拒绝越出根目录的符号链接，防止文档扫描悄悄读取其他目录。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "The second overlapping chunk of abcdef starts at offset 3 when size=4 and overlap=1.",
+              "当 size=4、overlap=1 时，abcdef 的第二个重叠分块从偏移量 3 开始。",
           },
         ],
         caption:
-          "The second overlapping chunk of abcdef starts at offset 3 when size=4 and overlap=1.",
+          "当 size=4、overlap=1 时，abcdef 的第二个重叠分块从偏移量 3 开始。",
       },
       { lab: { controls, calculate } },
     ),
@@ -101,26 +101,26 @@
     "pj-doc-qa-with-citations-2",
     Object.assign(
       {
-        title: "Rank chunks with an inspectable keyword score",
+        title: "用可检查的关键词得分排序分块",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Term frequency saturates through a logarithm, and document frequency reduces the weight of common words.",
+              "词频通过对数趋于饱和，文档频率则降低常见词的权重。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "Term frequency saturates through a logarithm, and document frequency reduces the weight of common words. Return the whole chunk contract with its score, not just the text, because the next stage needs source offsets. This lexical baseline will miss synonyms; measure it before adding an embedding service.",
+              "词频通过对数趋于饱和，文档频率则降低常见词的权重。返回包含得分的完整分块契约，而不只是文本，因为下一阶段需要来源偏移量。这个词汇基线会漏掉同义词；添加嵌入（embedding）服务前先测量它的表现。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "A socket query selects the socket chunk, while an unknown term abstains.",
+              "socket 查询选中包含 socket 的分块，未知词则触发弃答。",
           },
         ],
         caption:
-          "A socket query selects the socket chunk, while an unknown term abstains.",
+          "socket 查询选中包含 socket 的分块，未知词则触发弃答。",
       },
       { lab: { controls, calculate } },
     ),
@@ -129,26 +129,26 @@
     "pj-doc-qa-with-citations-3",
     Object.assign(
       {
-        title: "Accept only answers grounded in retrieved spans",
+        title: "只接受有检索片段支持的答案",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Ask the model to select an exact quote and a source id, then validate both.",
+              "要求模型选择逐字引文和来源 ID，再校验两者。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "Ask the model to select an exact quote and a source id, then validate both. A quoted substring gives a checkable span; it does not guarantee the source is true. Empty retrieval returns an explicit abstention without calling the model. A later paraphrasing writer would need a different support gate.",
+              "要求模型选择逐字引文和来源 ID，再校验两者。引用的子串提供可核查片段，但不保证来源内容真实。检索为空时直接明确弃答，不调用模型。若后续写作采用转述，就需要另一种支持性检查。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "A model response containing words absent from its cited chunk is rejected.",
+              "模型响应若含有被引分块中不存在的词，就会被拒绝。",
           },
         ],
         caption:
-          "A model response containing words absent from its cited chunk is rejected.",
+          "模型响应若含有被引分块中不存在的词，就会被拒绝。",
       },
       { lab: { controls, calculate } },
     ),
@@ -157,26 +157,26 @@
     "pj-doc-qa-with-citations-4",
     Object.assign(
       {
-        title: "Use a framework splitter without losing offsets",
+        title: "使用框架分块器并保留偏移量",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "The adapter keeps the from-scratch retrieval and answer validator.",
+              "适配器保留从零实现的检索与答案校验器。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "The adapter keeps the from-scratch retrieval and answer validator. The optional LangChain path contributes recursive splitting and a fake model interface, then converts every chunk back to exact source offsets. If a splitter rewrites text, reject it instead of inventing provenance. Repeated overlapping substrings must advance the search cursor by one position, not by the full chunk length.",
+              "适配器保留从零实现的检索与答案校验器。可选的 LangChain 路径提供递归分块和假模型接口，再将每个分块还原为精确来源偏移量。分块器若改写文本，就拒绝结果，不能编造来源信息。遇到重复的重叠子串，搜索游标应前进一个位置，而非整个分块长度。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "Framework chunks are converted to the same source-span contract used by the baseline.",
+              "框架分块转换为与基线相同的来源片段契约。",
           },
         ],
         caption:
-          "Framework chunks are converted to the same source-span contract used by the baseline.",
+          "框架分块转换为与基线相同的来源片段契约。",
       },
       { lab: { controls, calculate } },
     ),

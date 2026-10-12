@@ -35,21 +35,21 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请使用逗号分隔的有限数值");
       return n;
     });
 
   const buildLab = (stage) => ({
     controls: [
-      text("query", "Query", "release replicas"),
+      text("query", "查询", "release replicas"),
       text(
         "notes",
-        "Notes separated by |",
+        "笔记（用 | 分隔）",
         "deploy replicas | restore backups | café guest wifi",
       ),
-      text("alias", "One alias from=to", "release=deploy"),
-      number("k", "Results k", 2, 1, 3),
-      number("expected", "Expected note number", 1, 1, 3),
+      text("alias", "一条别名映射（from=to）", "release=deploy"),
+      number("k", "结果数 k", 2, 1, 3),
+      number("expected", "预期笔记编号", 1, 1, 3),
     ],
     calculate(v) {
       const [from, to] = v.alias.split("=");
@@ -91,27 +91,27 @@
       return {
         summary:
           stage === 1
-            ? "Canonical query tokens: " + tokens(v.query).join(", ")
+            ? "规范化查询 token：" + tokens(v.query).join(", ")
             : stage === 4
-              ? "Expected note " +
+              ? "预期笔记 " +
                 v.expected +
                 (ranked.some((x) => x.id === v.expected)
-                  ? " is retrieved"
-                  : " is missed")
-              : "Sparse cosine scores computed from your notes.",
+                  ? " 已检索到"
+                  : " 未检索到")
+              : "根据你的笔记计算稀疏向量余弦得分。",
         metrics: [
-          metric("Notes", docs.length),
-          metric("Query terms", Object.keys(q).length),
+          metric("笔记数", docs.length),
+          metric("查询词数", Object.keys(q).length),
           metric(
-            "Hit at k",
+            "前 k 项是否命中",
             ranked.some((x) => x.id === v.expected),
           ),
         ],
-        bars: ranked.map((x) => bar("Note " + x.id, x.score, 1)),
+        bars: ranked.map((x) => bar("笔记 " + x.id, x.score, 1)),
         columns:
           stage === 2
-            ? ["Term", "Document frequency", "IDF"]
-            : ["Note", "Score", "Matched terms"],
+            ? ["词项", "文档频率", "IDF"]
+            : ["笔记", "得分", "匹配词项"],
         rows:
           stage === 2
             ? Object.entries(df).map(([t, n]) => [t, n, idf[t].toFixed(4)])
@@ -127,26 +127,26 @@
     "pj-semantic-notes-search-1",
     Object.assign(
       {
-        title: "Normalize notes without losing identity",
+        title: "规范化笔记并保留标识",
         steps: [
           {
-            label: "Text",
+            label: "文本",
             detail:
-              "Orchard operators type café with different Unicode encodings. Apply case folding and NFC normalization to both text and alias keys so equivalent spellings share tokens. An alias is one explicit lexical substitution.",
+              "Orchard 运维人员可能用不同 Unicode 编码输入 café。对文本和别名键同时执行大小写折叠与 NFC 规范化，使等价拼写共享 token。一个别名就是一次明确的词汇替换。",
           },
           {
-            label: "Case fold",
+            label: "大小写折叠",
             detail:
-              '"CAFE\\u0301" -> ["café"]\nalias release -> deploy\n"release café" -> ["deploy","café"]',
+              '"CAFE\\u0301" -> ["café"]\n别名 release -> deploy\n"release café" -> ["deploy","café"]',
           },
           {
-            label: "Alias",
+            label: "别名",
             detail:
-              "Normalize before the Unicode word regex; otherwise a combining mark can disappear. Do not recursively expand aliases into cycles.",
+              "在 Unicode 单词正则匹配前先规范化，否则组合标记可能丢失。不要递归展开别名形成循环。",
           },
         ],
         caption:
-          "When would mapping release to deploy harm retrieval rather than help it?",
+          "什么情况下将 release 映射到 deploy 会损害检索而不是帮助检索？",
       },
       { lab: buildLab(1) },
     ),
@@ -155,26 +155,26 @@
     "pj-semantic-notes-search-2",
     Object.assign(
       {
-        title: "Weight terms by document rarity",
+        title: "按文档中的稀有程度加权词项",
         steps: [
           {
-            label: "Count",
+            label: "计数",
             detail:
-              "Rare operational terms separate notes better than common project names. Count document frequency once per note, multiply frequency by smoothed rarity, then normalize each sparse vector.",
+              "稀有运维词比常见项目名更能区分笔记。每篇笔记对文档频率只计一次，将词频乘以平滑后的稀有度，再规范化每个稀疏向量。",
           },
           {
-            label: "Weight",
+            label: "加权",
             detail:
               "N=3; df(orchard)=3 -> idf=1\ndf(restore)=1 -> idf=log(4/2)+1=1.6931",
           },
           {
-            label: "Normalize",
+            label: "规范化",
             detail:
-              "Build a set of words per document for document frequency. Repeating orchard ten times in one note does not make it occur in ten documents.",
+              "用每篇文档的单词集合计算文档频率。在一篇笔记中重复 orchard 十次，不代表它出现在十篇文档中。",
           },
         ],
         caption:
-          "Why normalize vector length before comparing a short note with a long runbook?",
+          "比较短笔记与长操作手册前，为什么要规范化向量长度？",
       },
       { lab: buildLab(2) },
     ),
@@ -183,26 +183,26 @@
     "pj-semantic-notes-search-3",
     Object.assign(
       {
-        title: "Rank queries with a stable tie rule",
+        title: "用稳定的同分规则排序查询结果",
         steps: [
           {
-            label: "Query",
+            label: "查询",
             detail:
-              "The CLI returns paths, previews and matching tokens for your own markdown folder. Query and note vectors use the same alias map and IDF table; unknown terms contribute no weight.",
+              "CLI 为你自己的 Markdown 文件夹返回路径、预览和匹配的 token。查询与笔记向量使用相同的别名映射和 IDF 表；未知词不贡献权重。",
           },
           {
-            label: "Dot product",
+            label: "点积",
             detail:
-              "query=release replicas\nalias release=deploy\nmatching note: release.md; matched terms: deploy (replica is singular in the file fixture)",
+              "query=release replicas\n别名 release=deploy\n匹配笔记：release.md；匹配词项：deploy（文件 fixture 中 replica 为单数）",
           },
           {
-            label: "Top k",
+            label: "前 k 项",
             detail:
-              "Compute the query vector using index IDF, then dot products against note vectors. Break equal scores by document id.",
+              "使用索引的 IDF 计算查询向量，再与笔记向量求点积。同分时按文档 ID 排序。",
           },
         ],
         caption:
-          "What does an empty result mean if the note uses a synonym absent from the alias map?",
+          "如果笔记使用了别名表中没有的同义词，空结果意味着什么？",
       },
       { lab: buildLab(3) },
     ),
@@ -211,26 +211,26 @@
     "pj-semantic-notes-search-4",
     Object.assign(
       {
-        title: "Measure retrieval before adding embeddings",
+        title: "添加嵌入（embedding）前先测量检索效果",
         steps: [
           {
-            label: "Labels",
+            label: "标注",
             detail:
-              "Measure whether the intended note appears near the top before adding a different retrieval backend. The supplied notes span deployment, restore and guest Wi-Fi so an alias can help one topic while harming another.",
+              "添加其他检索后端前，先测量目标笔记是否出现在前列。给定笔记涵盖部署、恢复和访客 Wi-Fi，因此一个别名可能帮助某个主题，却损害另一个主题。",
           },
           {
-            label: "Retrieve",
+            label: "检索",
             detail:
-              "labels: restore -> backup.md; café -> café.md\nhits=2,total=2,k=1 -> recall=1\nadd a misleading alias -> inspect changed hit ids",
+              "标注：restore -> backup.md；café -> café.md\nhits=2,total=2,k=1 -> recall=1\n添加误导性别名 -> 检查变化后的命中 ID",
           },
           {
-            label: "Score",
+            label: "得分",
             detail:
-              "Keep labeled queries outside the tuning examples. Call the actual search function inside evaluation instead of reconstructing a separate scorer.",
+              "标注查询应与调参示例分离。评估时调用真实搜索函数，不要另写一个评分器。",
           },
         ],
         caption:
-          "How many new labels would you collect before claiming improved retrieval for beginners?",
+          "在声称检索对初学者更好之前，你会收集多少条新标注？",
       },
       { lab: buildLab(4) },
     ),

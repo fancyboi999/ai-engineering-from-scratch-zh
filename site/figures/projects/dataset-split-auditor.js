@@ -14,9 +14,9 @@
     }).join("");
   }
   function textStages(text) {
-    if (typeof text !== "string") throw new Error("Text must be a string.");
+    if (typeof text !== "string") throw new Error("文本必须为字符串。");
     if (Array.from(text).some(c => c.codePointAt(0) >= 0xd800 && c.codePointAt(0) <= 0xdfff)) {
-      throw new Error("An unpaired surrogate cannot be encoded as Python UTF-8 text.");
+      throw new Error("未配对的代理码位不能编码为 Python UTF-8 文本。");
     }
     const nfkc = text.normalize("NFKC"), folded = casefold(nfkc);
     // Python split includes U+001C..U+001F and U+0085, but excludes U+FEFF.
@@ -25,7 +25,7 @@
   }
   async function sha256(text) {
     if (!window.crypto || !window.crypto.subtle) {
-      throw new Error("SHA-256 requires Web Crypto. Open this page on HTTPS or localhost.");
+      throw new Error("SHA-256 需要 Web Crypto。请通过 HTTPS 或 localhost 打开此页面。");
     }
     const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
     return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
@@ -47,10 +47,10 @@
     const seen = new Set();
     records.forEach(record => {
       if (!["id", "group", "text"].every(key => typeof record[key] === "string" && record[key].length > 0)) {
-        throw new Error("Each visible record needs a nonempty id, group and text.");
+        throw new Error("每条可见记录都需要非空的 id、group 和 text。");
       }
       if (seen.has(record.id)) {
-        throw new Error("Duplicate record id " + JSON.stringify(record.id) + ". Give each row its own identity before auditing.");
+        throw new Error("重复记录 ID " + JSON.stringify(record.id) + "。审计前请为每行分配独立标识。");
       }
       seen.add(record.id);
     });
@@ -59,10 +59,10 @@
     return { id: "record:" + record.id, label: record.id, value, detail, tone };
   }
   function rawItem(record) {
-    return rowItem(record, JSON.stringify(record.text), "Group: " + JSON.stringify(record.group));
+    return rowItem(record, JSON.stringify(record.text), "分组：" + JSON.stringify(record.group));
   }
   function partitions(train, test, render = rawItem) {
-    return [{ id: "train", label: "Train", items: train.map(render) }, { id: "test", label: "Test", items: test.map(render) }];
+    return [{ id: "train", label: "训练集", items: train.map(render) }, { id: "test", label: "测试集", items: test.map(render) }];
   }
   async function inspect(train, test) {
     validate(train.concat(test));
@@ -87,7 +87,7 @@
   }
   function auditView(details) {
     const links = [];
-    [["contentEvidence", "Same normalized content"], ["groupEvidence", "Same original group"]].forEach(([kind, label]) => {
+    [["contentEvidence", "相同规范化内容"], ["groupEvidence", "相同原始分组"]].forEach(([kind, label]) => {
       details[kind].forEach(entry => entry.train_ids.forEach(trainId => entry.test_ids.forEach(testId => {
         links.push({ from: "record:" + trainId, to: "record:" + testId, label, tone: "bad" });
       })));
@@ -96,38 +96,38 @@
       lanes: partitions(details.train, details.test, record => {
         const content = details.audit.content_leaks.includes(record.fingerprint), group = details.audit.group_leaks.includes(record.group);
         return rowItem(record, JSON.stringify(record.text),
-          "Group: " + JSON.stringify(record.group) + ". " + (content ? "Content overlaps. " : "") + (group ? "Group overlaps." : ""),
+          "分组：" + JSON.stringify(record.group) + ". " + (content ? "内容重叠。" : "") + (group ? "分组重叠。" : ""),
           content || group ? "bad" : "good");
       }),
       links,
       metrics: [
-        { label: "Shared fingerprints", value: details.audit.content_leaks.length },
-        { label: "Shared groups", value: details.audit.group_leaks.length },
-        { label: "Audit clean", value: details.audit.clean },
+        { label: "共有指纹数", value: details.audit.content_leaks.length },
+        { label: "共有分组数", value: details.audit.group_leaks.length },
+        { label: "审计无泄漏", value: details.audit.clean },
       ],
-      columns: ["Evidence", "Exact key", "Train record IDs", "Test record IDs"],
-      rows: details.contentEvidence.map(entry => ["Content", entry.value, entry.train_ids.join(", "), entry.test_ids.join(", ")])
-        .concat(details.groupEvidence.map(entry => ["Group", JSON.stringify(entry.value), entry.train_ids.join(", "), entry.test_ids.join(", ")])),
+      columns: ["证据", "精确键", "训练集记录 ID", "测试集记录 ID"],
+      rows: details.contentEvidence.map(entry => ["内容", entry.value, entry.train_ids.join(", "), entry.test_ids.join(", ")])
+        .concat(details.groupEvidence.map(entry => ["分组", JSON.stringify(entry.value), entry.train_ids.join(", "), entry.test_ids.join(", ")])),
     };
   }
   const field = (key, label, value) => ({ key, label, type: "text", value });
   const count = (key, label, value, max) => ({ key, label, type: "range", value, min: 0, max, step: 1 });
   function rowCount(value) {
-    if (!Number.isInteger(value) || value < 0 || value > 12) throw new Error("Row counts must be whole numbers between zero and twelve.");
+    if (!Number.isInteger(value) || value < 0 || value > 12) throw new Error("行数必须为 0 到 12 之间的整数。");
     return value;
   }
 
   window.AIFSProjectFigures.register("pj-dataset-split-auditor-1", {
-    title: "Watch two records become fingerprints",
-    caption: "Follow actual text through normalization, Unicode casefolding, whitespace collapse and SHA-256.",
+    title: "观察两条记录如何生成指纹",
+    caption: "跟踪实际文本经过规范化、Unicode 大小写折叠、空白合并和 SHA-256 的过程。",
     lab: {
-      question: "Will these two different text strings produce the same content fingerprint?",
-      controls: [field("textA", "Record A text", "  Straße\t"), field("textB", "Record B text", "STRASSE")],
+      question: "这两个不同文本字符串会生成相同内容指纹吗？",
+      controls: [field("textA", "记录 A 的文本", "  Straße\t"), field("textB", "记录 B 的文本", "STRASSE")],
       scenarios: [
-        { label: "German casefold", values: { textA: "  Straße\t", textB: "STRASSE" } },
-        { label: "Greek sigma", values: { textA: "ΟΣ", textB: "ος" } },
-        { label: "Compatible forms", values: { textA: "Ａ  ﬃ", textB: "a ffi" } },
-        { label: "Different meaning", values: { textA: "rollout passed", textB: "rollout failed" } },
+        { label: "德语大小写折叠", values: { textA: "  Straße\t", textB: "STRASSE" } },
+        { label: "希腊字母 sigma", values: { textA: "ΟΣ", textB: "ος" } },
+        { label: "兼容形式", values: { textA: "Ａ  ﬃ", textB: "a ffi" } },
+        { label: "不同含义", values: { textA: "rollout passed", textB: "rollout failed" } },
       ],
       calculate: async values => {
         const records = await Promise.all([fingerprint({ id: "record-a", text: values.textA }), fingerprint({ id: "record-b", text: values.textB })]);
@@ -135,23 +135,23 @@
           record.utf8 = Array.from(new TextEncoder().encode(record.normalized), byte => byte.toString(16).padStart(2, "0")).join(" ");
         });
         const operations = [
-          ["Raw text", "raw", "Start with two independent record IDs. Quotation marks make spaces and control characters visible."],
-          ["Normalize compatible forms", "nfkc", "NFKC replaces compatible Unicode forms, such as full-width letters, before comparing content."],
-          ["Apply Unicode casefold", "folded", "Python casefold can expand characters: ß becomes ss, and both Greek sigma forms become σ."],
-          ["Collapse whitespace", "normalized", "Python split/join reduces whitespace runs to a single space and removes leading and trailing whitespace."],
-          ["Encode UTF-8", "utf8", "Hash these actual UTF-8 bytes. Byte values are hexadecimal; equal byte sequences produce equal digests."],
-          ["Compute SHA-256", "fingerprint", "The full SHA-256 digests below are computed by Web Crypto from the normalized UTF-8 bytes."],
+          ["原始文本", "raw", "从两个独立记录 ID 开始。引号使空格和控制字符可见。"],
+          ["规范化兼容形式", "nfkc", "比较内容前，NFKC 先替换全角字母等兼容 Unicode 形式。"],
+          ["应用 Unicode 大小写折叠", "folded", "Python casefold 可以展开字符：ß 变为 ss，两种希腊 sigma 形式都变为 σ。"],
+          ["合并空白", "normalized", "Python split/join 将连续空白合并为单个空格，并移除首尾空白。"],
+          ["编码为 UTF-8", "utf8", "对这些实际 UTF-8 字节计算哈希。字节值用十六进制表示；相同字节序列生成相同摘要。"],
+          ["计算 SHA-256", "fingerprint", "下方完整 SHA-256 摘要由 Web Crypto 根据规范化后的 UTF-8 字节计算。"],
         ];
         const frames = operations.map(([label, key, explanation], index) => ({
           label, explanation,
           lanes: [{ id: "records", label, items: records.map(record => rowItem(record,
-            index < 4 ? JSON.stringify(record[key]) : record[key] || "(zero bytes)",
-            "Record identity stays " + record.id, index === 5 ? "good" : "active")) }],
+            index < 4 ? JSON.stringify(record[key]) : record[key] || "（零字节）",
+            "记录标识保持为 " + record.id, index === 5 ? "good" : "active")) }],
         }));
         const same = records[0].fingerprint === records[1].fingerprint;
         Object.assign(frames.at(-1), {
-          summary: same ? "Two record identities share one content fingerprint." : "The records have different content fingerprints.",
-          metrics: [{ label: "Same normalized content", value: same }],
+          summary: same ? "两个记录标识共享一个内容指纹。" : "这些记录的内容指纹不同。",
+          metrics: [{ label: "相同规范化内容", value: same }],
           formula: "SHA-256(UTF-8(collapse_whitespace(casefold(NFKC(text)))))",
           receipt: { records },
         });
@@ -161,21 +161,21 @@
   });
 
   window.AIFSProjectFigures.register("pj-dataset-split-auditor-2", {
-    title: "Find the records behind an overlap",
-    caption: "Content equality and group equality are separate checks. Every connection names the two records involved.",
+    title: "找出重叠背后的记录",
+    caption: "内容相等与分组相等是独立检查。每条连线都指明涉及的两条记录。",
     lab: {
-      question: "Do these partitions share normalized content, a group identity, both, or neither?",
+      question: "这些分区共享规范化内容、分组标识、两者都有，还是都没有？",
       controls: [
-        field("trainId", "Train record ID", "train-a"), field("trainGroup", "Train group", "incident-A"),
-        field("trainText", "Train text", "Timeout after rollout"), field("testId", "Test record ID", "test-b"),
-        field("testGroup", "Test group", "incident-B"), field("testText", "Test text", " timeout AFTER rollout "),
+        field("trainId", "训练集记录 ID", "train-a"), field("trainGroup", "训练集分组", "incident-A"),
+        field("trainText", "训练集文本", "Timeout after rollout"), field("testId", "测试集记录 ID", "test-b"),
+        field("testGroup", "测试集分组", "incident-B"), field("testText", "测试集文本", " timeout AFTER rollout "),
       ],
       scenarios: [
-        { label: "Content only", values: {} },
-        { label: "Group only", values: { testGroup: "incident-A", testText: "Cache warmed" } },
-        { label: "Both", values: { testGroup: "incident-A" } },
-        { label: "Clean", values: { testText: "Cache warmed" } },
-        { label: "Duplicate ID", values: { testId: "train-a" } },
+        { label: "仅内容相同", values: {} },
+        { label: "仅分组相同", values: { testGroup: "incident-A", testText: "Cache warmed" } },
+        { label: "两者都相同", values: { testGroup: "incident-A" } },
+        { label: "无泄漏", values: { testText: "Cache warmed" } },
+        { label: "重复 ID", values: { testId: "train-a" } },
       ],
       calculate: async values => {
         const train = [{ id: values.trainId, group: values.trainGroup, text: values.trainText }];
@@ -183,27 +183,27 @@
         const details = await inspect(train, test);
         return { frames: [
           {
-            label: "Validate record identities",
-            explanation: "Both records have nonempty IDs, groups and text. Their IDs are unique across the combined train and test arrays.",
-            lanes: partitions(train, test), metrics: [{ label: "Validated record IDs", value: train.length + test.length }],
+            label: "校验记录标识",
+            explanation: "两条记录的 ID、分组和文本均非空。它们的 ID 在合并后的训练与测试数组中唯一。",
+            lanes: partitions(train, test), metrics: [{ label: "已校验记录 ID 数", value: train.length + test.length }],
           },
           {
-            label: "Index normalized content",
-            explanation: "Each partition indexes full SHA-256 fingerprints. The record IDs remain separate even when their content keys match.",
-            lanes: partitions(details.train, details.test, record => rowItem(record, record.fingerprint, "Normalized text: " + JSON.stringify(record.normalized), "active")),
-            columns: ["Partition", "Record ID", "Normalized text", "Content key"],
-            rows: details.train.map(record => ["train", record.id, record.normalized, record.fingerprint])
-              .concat(details.test.map(record => ["test", record.id, record.normalized, record.fingerprint])),
+            label: "索引规范化内容",
+            explanation: "每个分区索引完整 SHA-256 指纹。即使内容键匹配，记录 ID 仍各自独立。",
+            lanes: partitions(details.train, details.test, record => rowItem(record, record.fingerprint, "规范化文本：" + JSON.stringify(record.normalized), "active")),
+            columns: ["分区", "记录 ID", "规范化文本", "内容键"],
+            rows: details.train.map(record => ["训练集（train）", record.id, record.normalized, record.fingerprint])
+              .concat(details.test.map(record => ["测试集（test）", record.id, record.normalized, record.fingerprint])),
           },
           {
-            label: "Index original groups",
-            explanation: "Group keys use the original strings. Unlike text fingerprints, group IDs are never casefolded or trimmed.",
-            lanes: partitions(details.train, details.test, record => rowItem(record, JSON.stringify(record.group), "Group membership for " + record.id, "active")),
+            label: "索引原始分组",
+            explanation: "分组键使用原始字符串。与文本指纹不同，分组 ID 不做大小写折叠，也不去除首尾空白。",
+            lanes: partitions(details.train, details.test, record => rowItem(record, JSON.stringify(record.group), "所属分组的记录：" + record.id, "active")),
           },
           {
-            label: "Intersect the two indexes",
-            explanation: "Only keys present in both partitions are leaks. Follow each connection to inspect the named records.",
-            summary: details.audit.clean ? "Both intersections are empty." : "The shared keys identify the records to investigate.",
+            label: "求两个索引的交集",
+            explanation: "只有两个分区中都存在的键才构成泄漏。沿每条连线检查对应记录。",
+            summary: details.audit.clean ? "两个交集均为空。" : "共有键指出需要调查的记录。",
             ...auditView(details),
             receipt: { audit: details.audit, content_evidence: details.contentEvidence, group_evidence: details.groupEvidence },
           },
@@ -221,33 +221,33 @@
     });
     return values.reverseRows ? rows.reverse() : rows;
   }
-  function groupItem(group, detail, value = group.records.length + " records", tone = "neutral") {
+  function groupItem(group, detail, value = group.records.length + " 条记录", tone = "neutral") {
     return {
       id: "group:" + group.id, label: group.id, value,
-      detail: "Members: " + group.records.map(record => record.id).join(", ") + ". " + detail, tone,
+      detail: "成员：" + group.records.map(record => record.id).join(", ") + ". " + detail, tone,
     };
   }
 
   window.AIFSProjectFigures.register("pj-dataset-split-auditor-3", {
-    title: "Move whole groups across the split",
-    caption: "A stable hash chooses a partition for every group. Group size changes the resulting row balance, not its bucket.",
+    title: "按完整分组划分数据",
+    caption: "稳定哈希为每个分组选择分区。分组大小影响最终行数平衡，不影响哈希桶。",
     lab: {
-      question: "Where will each incident group go, and why can the row split differ from the requested threshold?",
+      question: "每个事故分组会进入哪个分区？为什么行数比例可能与请求阈值不同？",
       controls: [
-        field("seed", "Split seed", "course"),
-        { key: "testFraction", label: "Requested test threshold", type: "range", value: 0.5, min: 0.01, max: 0.99, step: 0.01 },
-        count("groupASize", "Rows in incident-A", 9, 12), count("groupBSize", "Rows in incident-B", 1, 12),
-        { key: "reverseRows", label: "Reverse input row order", type: "checkbox", value: false },
+        field("seed", "划分种子", "course"),
+        { key: "testFraction", label: "请求的测试集阈值", type: "range", value: 0.5, min: 0.01, max: 0.99, step: 0.01 },
+        count("groupASize", "incident-A 的行数", 9, 12), count("groupBSize", "incident-B 的行数", 1, 12),
+        { key: "reverseRows", label: "反转输入行顺序", type: "checkbox", value: false },
       ],
       scenarios: [
-        { label: "Nine plus one", values: {} }, { label: "Change the seed", values: { seed: "experiment-1" } },
-        { label: "Equal group sizes", values: { groupASize: 5, groupBSize: 5 } },
-        { label: "Reverse rows", values: { reverseRows: true } }, { label: "No records", values: { groupASize: 0, groupBSize: 0 } },
+        { label: "九加一", values: {} }, { label: "修改种子", values: { seed: "experiment-1" } },
+        { label: "相同分组大小", values: { groupASize: 5, groupBSize: 5 } },
+        { label: "反转行顺序", values: { reverseRows: true } }, { label: "无记录", values: { groupASize: 0, groupBSize: 0 } },
       ],
       calculate: async values => {
-        if (typeof values.seed !== "string") throw new Error("Seed must be text.");
+        if (typeof values.seed !== "string") throw new Error("种子必须为文本。");
         if (!Number.isFinite(values.testFraction) || values.testFraction <= 0 || values.testFraction >= 1) {
-          throw new Error("Test fraction must be strictly between zero and one.");
+          throw new Error("测试比例必须严格介于 0 与 1 之间。");
         }
         textStages(values.seed);
         const rows = groupRecords(values);
@@ -259,42 +259,42 @@
         }));
         const frames = [
           {
-            label: "Read the input rows",
-            explanation: "These are the actual synthetic fixture records. Row order may change, but each ID and group travels together.",
-            lanes: [{ id: "input", label: "Input rows", items: rows.map(rawItem) }], metrics: [{ label: "Input records", value: rows.length }],
+            label: "读取输入行",
+            explanation: "这些是实际的合成 fixture 记录。行顺序可以变化，但每个 ID 始终与其分组一起移动。",
+            lanes: [{ id: "input", label: "输入行", items: rows.map(rawItem) }], metrics: [{ label: "输入记录数", value: rows.length }],
           },
           {
-            label: "Collect whole groups",
-            explanation: "Collect all record IDs with the same incident key. The split will make one decision for each complete group.",
-            lanes: [{ id: "pending", label: "Groups awaiting a decision", items: groups.map(group => groupItem(group, "")) }],
-            metrics: [{ label: "Distinct groups", value: groups.length }],
+            label: "收集完整分组",
+            explanation: "收集事故键相同的所有记录 ID。划分会对每个完整分组作一次决策。",
+            lanes: [{ id: "pending", label: "等待决策的分组", items: groups.map(group => groupItem(group, "")) }],
+            metrics: [{ label: "不同分组数", value: groups.length }],
           },
           {
-            label: "Hash seed, NUL and group",
-            explanation: "The separator is a real NUL byte, shown escaped below. Interpret the full digest as an integer and divide by 2^256.",
+            label: "对种子、NUL 与分组计算哈希",
+            explanation: "分隔符是真实 NUL 字节，下方以转义形式显示。将完整摘要解释为整数，再除以 2^256。",
             formula: 'bucket = int(SHA-256(UTF-8(seed + "\\u0000" + group)), 16) / 2^256',
-            lanes: [{ id: "pending", label: "Stable group buckets", items: groups.map(group => groupItem(group, "SHA-256: " + group.digest, String(group.bucket), "active")) }],
-            columns: ["Group", "Exact hash input", "Full SHA-256", "Bucket"],
+            lanes: [{ id: "pending", label: "稳定分组哈希桶", items: groups.map(group => groupItem(group, "SHA-256: " + group.digest, String(group.bucket), "active")) }],
+            columns: ["分组", "精确哈希输入", "完整 SHA-256", "哈希桶"],
             rows: groups.map(group => [group.id, JSON.stringify(group.key), group.digest, group.bucket]),
           },
           {
-            label: "Compare with the threshold",
-            explanation: "A group enters test only when its bucket is strictly less than the requested threshold. Equality goes to train.",
-            formula: "test if bucket < " + values.testFraction + "; otherwise train",
-            lanes: [{ id: "pending", label: "Computed decisions", items: groups.map(group => groupItem(group,
-              group.bucket + " < " + values.testFraction + " is " + (group.bucket < values.testFraction), group.partition, "active")) }],
+            label: "与阈值比较",
+            explanation: "只有哈希桶值严格小于请求阈值时，分组才进入测试集。相等时进入训练集。",
+            formula: "进入测试集的条件：bucket < " + values.testFraction + "；否则进入训练集",
+            lanes: [{ id: "pending", label: "计算出的决策", items: groups.map(group => groupItem(group,
+              group.bucket + " < " + values.testFraction + " 的结果为 " + (group.bucket < values.testFraction), (group.partition === "train" ? "训练集（train）" : "测试集（test）"), "active")) }],
           },
         ];
         groups.forEach((movedGroup, movedIndex) => {
           const assigned = groups.slice(0, movedIndex + 1);
           frames.push({
-            label: "Move " + movedGroup.id,
-            explanation: movedGroup.records.length + " records move together into " + movedGroup.partition + ". No row is moved separately to force a balanced count.",
+            label: "移动 " + movedGroup.id,
+            explanation: movedGroup.records.length + " 条记录一起移入 " + (movedGroup.partition === "train" ? "训练集（train）" : "测试集（test）") + "。不会单独移动某行来强行平衡数量。",
             lanes: ["pending", "train", "test"].map(partition => {
               const members = partition === "pending" ? groups.slice(movedIndex + 1) : assigned.filter(group => group.partition === partition);
               return {
-                id: partition, label: partition === "pending" ? "Not moved yet" : partition === "train" ? "Train" : "Test",
-                items: members.map(group => groupItem(group, "Bucket: " + group.bucket, undefined, group.id === movedGroup.id ? "active" : "neutral")),
+                id: partition, label: partition === "pending" ? "尚未移动" : partition === "train" ? "训练集" : "测试集",
+                items: members.map(group => groupItem(group, "哈希桶：" + group.bucket, undefined, group.id === movedGroup.id ? "active" : "neutral")),
               };
             }),
           });
@@ -305,16 +305,16 @@
         const trainGroups = new Set(train.map(record => record.group));
         const overlap = Array.from(testGroups).filter(group => trainGroups.has(group));
         frames.push({
-          label: "Measure the resulting rows",
-          explanation: "The threshold controls each group's decision, not an exact row quota. An empty partition is a valid split result and must be reported honestly.",
-          summary: rows.length ? test.length + " of " + rows.length + " rows are in test (" + Math.round(observed * 10000) / 100 + "%)." : "No records were supplied; there is no observed row fraction.",
+          label: "测量最终行数",
+          explanation: "阈值控制每个分组的决策，不是精确行数配额。空分区是有效的划分结果，必须如实报告。",
+          summary: rows.length ? test.length + " / " + rows.length + " 行在测试集中（" + Math.round(observed * 10000) / 100 + "%）。" : "未提供记录；没有可观察的行数比例。",
           lanes: ["train", "test"].map(partition => ({
-            id: partition, label: partition === "train" ? "Train" : "Test",
-            items: groups.filter(group => group.partition === partition).map(group => groupItem(group, "Bucket: " + group.bucket, undefined, "good")),
+            id: partition, label: partition === "train" ? "训练集" : "测试集",
+            items: groups.filter(group => group.partition === partition).map(group => groupItem(group, "哈希桶：" + group.bucket, undefined, "good")),
           })),
-          metrics: [{ label: "Train rows", value: train.length }, { label: "Test rows", value: test.length }, { label: "Groups crossing partitions", value: overlap.length }],
-          bars: [{ label: "Requested test threshold", value: values.testFraction * 100, max: 100, unit: "%" }]
-            .concat(observed === null ? [] : [{ label: "Observed test row share", value: observed * 100, max: 100, unit: "%" }]),
+          metrics: [{ label: "训练集行数", value: train.length }, { label: "测试集行数", value: test.length }, { label: "跨分区分组数", value: overlap.length }],
+          bars: [{ label: "请求的测试集阈值", value: values.testFraction * 100, max: 100, unit: "%" }]
+            .concat(observed === null ? [] : [{ label: "实际测试集行数占比", value: observed * 100, max: 100, unit: "%" }]),
           receipt: {
             seed: values.seed, test_fraction: values.testFraction,
             groups: groups.map(group => ({ group: group.id, record_ids: group.records.map(record => record.id), hash_input: group.key, sha256: group.digest, bucket: group.bucket, partition: group.partition })),
@@ -327,19 +327,19 @@
   });
 
   window.AIFSProjectFigures.register("pj-dataset-split-auditor-4", {
-    title: "Decide whether the split is usable",
-    caption: "Count the visible records, inspect leakage evidence, and require two nonempty partitions plus a clean audit.",
+    title: "判断划分是否可用",
+    caption: "统计可见记录，检查泄漏证据，并要求两个分区非空且审计无泄漏。",
     lab: {
-      question: "Can a clean audit still produce an unusable evaluation split?",
+      question: "审计无泄漏时，评估划分仍可能不可用吗？",
       controls: [
-        count("trainRows", "Train record count", 1, 5), count("testRows", "Test record count", 1, 5),
-        field("trainGroup", "Train group", "incident-A"), field("testGroup", "Test group", "incident-B"),
-        field("trainText", "Text in each train record", "Rollout completed"), field("testText", "Text in each test record", "Cache warmed"),
+        count("trainRows", "训练集记录数", 1, 5), count("testRows", "测试集记录数", 1, 5),
+        field("trainGroup", "训练集分组", "incident-A"), field("testGroup", "测试集分组", "incident-B"),
+        field("trainText", "每条训练记录的文本", "Rollout completed"), field("testText", "每条测试记录的文本", "Cache warmed"),
       ],
       scenarios: [
-        { label: "Clean and nonempty", values: {} }, { label: "Empty test", values: { testRows: 0 } },
-        { label: "Content leakage", values: { testText: "ROLLOUT completed" } },
-        { label: "Group leakage", values: { testGroup: "incident-A" } }, { label: "Both empty", values: { trainRows: 0, testRows: 0 } },
+        { label: "无泄漏且非空", values: {} }, { label: "测试集为空", values: { testRows: 0 } },
+        { label: "内容泄漏", values: { testText: "ROLLOUT completed" } },
+        { label: "分组泄漏", values: { testGroup: "incident-A" } }, { label: "两者均为空", values: { trainRows: 0, testRows: 0 } },
       ],
       calculate: async values => {
         const records = (partition, size, group, text) => Array.from({ length: rowCount(size) }, (_, index) => ({ id: partition + "-" + (index + 1), group, text }));
@@ -353,30 +353,30 @@
           audit: details.audit, usable: train.length > 0 && test.length > 0 && details.audit.clean,
         };
         const counts = [
-          { label: "Train rows", value: receipt.train_rows }, { label: "Test rows", value: receipt.test_rows },
-          { label: "Train groups", value: receipt.train_groups }, { label: "Test groups", value: receipt.test_groups },
+          { label: "训练集行数", value: receipt.train_rows }, { label: "测试集行数", value: receipt.test_rows },
+          { label: "训练集分组数", value: receipt.train_groups }, { label: "测试集分组数", value: receipt.test_groups },
         ];
         const lanes = partitions(train, test);
         const checks = [
-          { id: "check:train", label: "Train is nonempty", value: receipt.train_rows > 0, detail: receipt.train_rows + " > 0" },
-          { id: "check:test", label: "Test is nonempty", value: receipt.test_rows > 0, detail: receipt.test_rows + " > 0" },
-          { id: "check:audit", label: "Audit is clean", value: details.audit.clean, detail: details.audit.content_leaks.length + " content leaks; " + details.audit.group_leaks.length + " group leaks" },
+          { id: "check:train", label: "训练集非空", value: receipt.train_rows > 0, detail: receipt.train_rows + " > 0" },
+          { id: "check:test", label: "测试集非空", value: receipt.test_rows > 0, detail: receipt.test_rows + " > 0" },
+          { id: "check:audit", label: "审计无泄漏", value: details.audit.clean, detail: details.audit.content_leaks.length + " 处内容泄漏；" + details.audit.group_leaks.length + " 处分组泄漏" },
         ].map(check => ({ ...check, tone: check.value ? "good" : "bad" }));
         return { frames: [
-          { label: "Read the visible records", explanation: "Only these rows enter the report. Setting a count to zero removes those records entirely.", lanes },
-          { label: "Count rows and groups", explanation: "Count rows directly, then count the unique original group strings in each partition. Empty partitions have zero groups.", lanes, metrics: counts },
-          { label: "Inspect cross-partition evidence", explanation: "Run the content and group intersections against only the visible rows. Empty partitions cannot contribute an overlap.", ...auditView(details) },
+          { label: "读取可见记录", explanation: "只有这些行进入报告。将数量设为零会完全移除对应记录。", lanes },
+          { label: "统计行数与分组数", explanation: "直接统计行数，再统计每个分区中不同的原始分组字符串。空分区的分组数为零。", lanes, metrics: counts },
+          { label: "检查跨分区证据", explanation: "只对可见行求内容与分组交集。空分区不会产生重叠。", ...auditView(details) },
           {
-            label: "Require all three conditions",
-            explanation: "A clean audit alone is insufficient. Both partitions must contain records, and neither kind of leakage may be present.",
-            lanes: [{ id: "conditions", label: "Required conditions", items: checks }],
+            label: "要求三个条件全部满足",
+            explanation: "仅审计无泄漏还不够。两个分区都必须包含记录，且两类泄漏都不能存在。",
+            lanes: [{ id: "conditions", label: "必需条件", items: checks }],
             formula: "usable = (train_rows > 0) && (test_rows > 0) && audit.clean",
           },
           {
-            label: "Write the audit receipt",
-            explanation: "This is the complete report produced from the visible records. The usable field is the Boolean conjunction of all three conditions.",
-            summary: receipt.usable ? "This split passes the three usability conditions." : "This split is not usable; inspect the failed condition.",
-            lanes: [{ id: "conditions", label: "Required conditions", items: checks }], metrics: counts.concat([{ label: "Usable", value: receipt.usable }]), receipt,
+            label: "写入审计凭据",
+            explanation: "这是由可见记录生成的完整报告。usable 字段是三个条件的布尔合取。",
+            summary: receipt.usable ? "此划分通过三个可用性条件。" : "此划分不可用；请检查未通过的条件。",
+            lanes: [{ id: "conditions", label: "必需条件", items: checks }], metrics: counts.concat([{ label: "可用", value: receipt.usable }]), receipt,
           },
         ] };
       },

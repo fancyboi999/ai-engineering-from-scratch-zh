@@ -35,21 +35,21 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请使用逗号分隔的有限数值");
       return n;
     });
 
   const buildLab = (stage) => ({
     controls: [
-      text("before", "Previous policy", "tokens expire after 60 minutes"),
-      text("after", "Incoming policy", "tokens expire after 15 minutes"),
-      check("present", "Document present in incoming corpus", true),
-      number("oldTime", "Previous timestamp", 100, 0, 500),
-      number("updated", "Incoming timestamp", 200, 0, 500),
-      number("now", "Query time", 210, 0, 600),
-      number("maxAge", "Maximum age", 60, 0, 300),
-      number("expected", "Expected version", 1, 0, 5),
-      number("current", "Current version", 1, 0, 5),
+      text("before", "先前策略", "tokens expire after 60 minutes"),
+      text("after", "新输入策略", "tokens expire after 15 minutes"),
+      check("present", "文档存在于新输入语料库", true),
+      number("oldTime", "先前时间戳", 100, 0, 500),
+      number("updated", "新输入时间戳", 200, 0, 500),
+      number("now", "查询时间", 210, 0, 600),
+      number("maxAge", "最大年龄", 60, 0, 300),
+      number("expected", "预期版本", 1, 0, 5),
+      number("current", "当前版本", 1, 0, 5),
     ],
     calculate(v) {
       const normal = (s) => s.normalize("NFC").replace(/\r\n/g, "\n").trim();
@@ -67,32 +67,32 @@
         summary:
           stage === 3
             ? commit
-              ? "Version matches: next snapshot " + (v.current + 1)
-              : "Stale writer: preserve version " + v.current
+              ? "版本匹配：下一快照 " + (v.current + 1)
+              : "写入者版本过期：保留版本 " + v.current
             : stage === 4
               ? eligible
-                ? "Current source eligible"
-                : "Source excluded at query time"
-              : "Planned operation: " + operation,
+                ? "当前来源符合条件"
+                : "查询时排除该来源"
+              : "计划操作：" + ({ delete: "删除（delete）", update: "更新（update）", refresh: "刷新（refresh）", unchanged: "未变（unchanged）" })[operation],
         metrics: [
-          metric("Operation", operation),
-          metric("Age", age),
-          metric("Citation eligible", eligible),
-          metric("CAS accepted", commit),
+          metric("操作", ({ delete: "删除（delete）", update: "更新（update）", refresh: "刷新（refresh）", unchanged: "未变（unchanged）" })[operation]),
+          metric("年龄", age),
+          metric("可用于引用", eligible),
+          metric("CAS 已接受", commit),
         ],
         bars: [
-          bar("Source age", Math.max(0, age), v.maxAge),
-          bar("Allowed age", v.maxAge),
+          bar("来源年龄", Math.max(0, age), v.maxAge),
+          bar("允许年龄", v.maxAge),
         ],
-        columns: ["Field", "Before", "After"],
+        columns: ["字段", "之前", "之后"],
         rows: [
           [
-            "Normalized text",
+            "规范化文本",
             normal(v.before),
-            v.present ? normal(v.after) : "(deleted)",
+            v.present ? normal(v.after) : "（已删除）",
           ],
-          ["Timestamp", v.oldTime, v.updated],
-          ["Snapshot version", v.current, commit ? v.current + 1 : v.current],
+          ["时间戳", v.oldTime, v.updated],
+          ["快照版本", v.current, commit ? v.current + 1 : v.current],
         ],
       };
     },
@@ -101,26 +101,26 @@
     "pj-rag-freshness-pipeline-1",
     Object.assign(
       {
-        title: "Normalize documents and fingerprint content",
+        title: "规范化文档并生成内容指纹",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "The Orchard policy keeps the same document id when its timeout changes. Normalize Unicode and line endings before hashing the body, and retain updated time separately. A later observation of unchanged content is a refresh, not a rewrite.",
+              "Orchard 策略的超时时间变化时，文档 ID 保持不变。正文哈希前先规范化 Unicode 与行尾，更新时间单独保留。之后再次观察到未变的内容属于刷新，不是重写。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "id=orchard-auth\ntext: tokens expire after 60 minutes\nupdated: 100 -> 200\ncontent hash: unchanged",
+              "id=orchard-auth\n文本：tokens expire after 60 minutes\nupdated: 100 -> 200\n内容哈希：未变",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "Hash normalized UTF-8 bytes. Do not hash the timestamp into content identity.",
+              "对规范化后的 UTF-8 字节计算哈希，不要把时间戳计入内容标识。",
           },
         ],
         caption:
-          "Why should two differently encoded versions of café produce the same fingerprint?",
+          "为什么 café 的两种不同编码应生成相同指纹？",
       },
       { lab: buildLab(1) },
     ),
@@ -129,26 +129,26 @@
     "pj-rag-freshness-pipeline-2",
     Object.assign(
       {
-        title: "Plan inserts updates deletions and refreshes",
+        title: "规划插入、更新、删除与刷新",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Ingestion receives a complete corpus snapshot. The after fixture replaces a retired backup note and edits the token lifetime. Missing ids must be deleted so obsolete evidence cannot remain searchable.",
+              "摄取接收完整语料快照。变更后的 fixture 替换了已退役的备份笔记，并修改 token 有效期。必须删除缺失 ID，防止过时证据仍可被搜索到。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "before ids: orchard-auth, retired-backup\nafter ids: orchard-auth, restore-runbook\nupdate: orchard-auth; delete: retired-backup; insert: restore-runbook",
+              "之前的 ID：orchard-auth, retired-backup\n之后的 ID：orchard-auth, restore-runbook\n更新：orchard-auth；删除：retired-backup；插入：restore-runbook",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "Build the incoming id map before deciding any operation. A duplicate incoming id is an error, not last-write-wins.",
+              "决定操作前先构建输入 ID 映射。重复输入 ID 是错误，不能采用最后写入者覆盖规则。",
           },
         ],
         caption:
-          "How would the contract change if the importer received only a partial change feed?",
+          "如果导入器只收到部分变更流，契约应如何调整？",
       },
       { lab: buildLab(2) },
     ),
@@ -157,26 +157,26 @@
     "pj-rag-freshness-pipeline-3",
     Object.assign(
       {
-        title: "Persist an index with atomic replacement",
+        title: "通过原子替换持久化索引",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Two ingestion processes can read version 1 simultaneously. A persistent sibling lock serializes their version checks and replacement writes. Exactly one may commit with expected_version=1; the next writer must reread.",
+              "两个摄取进程可能同时读到版本 1。持久化的同级锁文件使版本检查和替换写入串行执行。expected_version=1 时只能有一个进程提交，下一个写入者必须重新读取。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "writer A expects 1 -> commits version 2\nwriter B expects 1 -> stale index version\nindex.json.lock remains as the stable lock inode",
+              "写入者 A 预期版本 1 -> 提交版本 2\n写入者 B 预期版本 1 -> 索引版本过期\nindex.json.lock 保留为稳定的锁 inode",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "On POSIX, hold flock across read, compare, fsync and rename. Never unlink the lock after release: waiting processes could then lock different files.",
+              "在 POSIX 上，读取、比较、fsync 和 rename 全程持有 flock。释放后不要删除锁文件，否则等待进程可能锁住不同文件。",
           },
         ],
         caption:
-          "What happens if a process exits after writing the temporary file but before rename?",
+          "进程写完临时文件但尚未 rename 就退出，会发生什么？",
       },
       { lab: buildLab(3) },
     ),
@@ -185,26 +185,26 @@
     "pj-rag-freshness-pipeline-4",
     Object.assign(
       {
-        title: "Exclude expired evidence at query time",
+        title: "在查询时排除过期证据",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "After the edit, a query must return the 15-minute policy and never the retired 60-minute text. Freshness is enforced when answering, even if no ingestion job has run since the last snapshot.",
+              "编辑后，查询必须返回 15 分钟策略，绝不能返回已废弃的 60 分钟文本。即使最后一次快照后没有运行摄取任务，也要在回答时检查新鲜度。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "updated=200; now=210; max_age=60 -> age 10, eligible\nupdated=200; now=500; max_age=60 -> age 300, excluded",
+              "updated=200; now=210; max_age=60 -> 年龄 10，符合条件\nupdated=200; now=500; max_age=60 -> 年龄 300，已排除",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "Read one committed snapshot for the query. Return its version and the source hash with each hit so callers can detect stale citations.",
+              "查询只读取一个已提交快照。每个命中都返回快照版本和来源哈希，供调用方检测过期引用。",
           },
         ],
         caption:
-          "Should a future-dated document receive a negative age and become the best result?",
+          "时间标在未来的文档应获得负年龄并成为最佳结果吗？",
       },
       { lab: buildLab(4) },
     ),
