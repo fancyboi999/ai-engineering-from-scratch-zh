@@ -17,7 +17,7 @@ pj-web-change-brief-1
 
 ## 示例推演
 
-对 <nav>Visits 12</nav><p>Bring a mug &amp; a spoon.</p> 返回一块：Bring a mug & a spoon。访问计数变化不应改变结果。段落内 inline strong 标签应保留相邻文本，不创建另一个块。
+对 <nav>Visits 12</nav><p>Bring a mug &amp; a spoon.</p> 返回一块：`Bring a mug & a spoon.`。访问计数变化不应改变结果。段落内 inline strong 标签应保留相邻文本，不创建另一个块。
 
 编码前写下示例返回字段和一个应失败输入。把预期结果放在实现旁，区分契约变化与错误。
 
