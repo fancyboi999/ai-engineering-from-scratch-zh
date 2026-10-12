@@ -1,0 +1,105 @@
+{
+  "id": "configuration-drift-explainer",
+  "title": "配置漂移解释器",
+  "tagline": "解释两个环境为何对同一设置解析出不同结果。",
+  "summary": "帮助开发者比较声明的默认值、环境覆盖值和观测到的 JSON 配置。保留优先级与脱敏规则，展示被覆盖的值，把每条解释关联到源文件或变量名。导出漂移报告，让助手无需接收秘密值也能使用。",
+  "level": 2,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "脱敏配置差异与优先级证据 JSON",
+  "prerequisiteProjects": [
+    "json-schema-output-guard"
+  ],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      "."
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-load-layers",
+      "title": "加载具名配置层",
+      "summary": "比较环境前，先拒绝含糊的配置。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "有界 JSON",
+        "标量值",
+        "来源身份"
+      ],
+      "timeout": 120,
+      "figure": "pj-configuration-drift-explainer-1"
+    },
+    {
+      "id": "02-resolve-provenance",
+      "title": "带来源追踪地解析优先级",
+      "summary": "选择最后声明的值，同时保留每个被覆盖的设置。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "最后写入优先",
+        "历史",
+        "确定性"
+      ],
+      "timeout": 120,
+      "figure": "pj-configuration-drift-explainer-2"
+    },
+    {
+      "id": "03-compare-effective-values",
+      "title": "比较生效值",
+      "summary": "区分相等、变化、缺失和意外的键。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "存在性",
+        "脱敏",
+        "稳定排序"
+      ],
+      "timeout": 120,
+      "figure": "pj-configuration-drift-explainer-3"
+    },
+    {
+      "id": "04-export-ci-evidence",
+      "title": "导出脱敏 CI 证据",
+      "summary": "生成助手无需接收秘密值也能使用的报告。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "JSON 产物",
+        "CI 退出状态",
+        "消费者契约"
+      ],
+      "timeout": 120,
+      "figure": "pj-configuration-drift-explainer-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "录制的本地命令输出。输入和范围见 README。"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "id": "web-change-brief",
+  "title": "网页变更简报",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "将嘈杂 HTML 快照变为精确可读文本变更的小报告。",
+  "summary": "将嘈杂 HTML 快照变为精确可读文本变更的小报告。",
+  "youWillBuild": "独立变更报告、changes.json 与可复用 baseline.json 快照。",
+  "usefulFor": [
+    "同 URL 的两份保存 HTML 快照，或保存 JSON 基线和一个显式真实 HTTP(S) URL。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "languageWhy": {
+    "Go": "Go's standard library exposes HTTP limits, context cancellation, atomic file replacement and safe HTML templates with no framework."
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "比较页面前提取文本",
+    "比较精确文本并保留重复项",
+    "抓取单页而不丢基线",
+    "导出可供人工检查的简报"
+  ],
+  "prerequisites": [
+    "编写 Go 函数、切片、映射和错误返回。",
+    "理解 HTTP 响应状态、Content-Type 和正文。",
+    "理解文本快照与渲染网页暴露的信息不同。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-web-change-brief-1",
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-extract-readable-blocks",
+      "title": "比较页面前提取文本",
+      "summary": "将 HTML 扫描成规范可读块，排除已知噪声区域。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "go",
+      "languageWhy": "Go 标准库无需框架即可提供 HTTP 限制、context 取消、原子文件替换和安全 HTML 模板。",
+      "concepts": [
+        "扫描",
+        "规范化",
+        "噪声过滤"
+      ],
+      "figure": "pj-web-change-brief-1"
+    },
+    {
+      "id": "02-compare-snapshots",
+      "title": "比较精确文本并保留重复项",
+      "summary": "构建稳定快照，统计新增和移除文本出现次数。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "go",
+      "languageWhy": "Go 标准库无需框架即可提供 HTTP 限制、context 取消、原子文件替换和安全 HTML 模板。",
+      "concepts": [
+        "规范 URL",
+        "内容哈希",
+        "多重集差异"
+      ],
+      "figure": "pj-web-change-brief-2"
+    },
+    {
+      "id": "03-fetch-and-save",
+      "title": "抓取单页而不丢基线",
+      "summary": "约束真实 HTTP 工作，验证保存快照的完整性。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "go",
+      "languageWhy": "Go 标准库无需框架即可提供 HTTP 限制、context 取消、原子文件替换和安全 HTML 模板。",
+      "concepts": [
+        "HTTP 边界",
+        "context 取消",
+        "原子写入"
+      ],
+      "figure": "pj-web-change-brief-3"
+    },
+    {
+      "id": "04-export-change-evidence",
+      "title": "导出可供人工检查的简报",
+      "summary": "在来源和哈希旁展示精确新增和移除语句。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "go",
+      "languageWhy": "Go 标准库无需框架即可提供 HTTP 限制、context 取消、原子文件替换和安全 HTML 模板。",
+      "concepts": [
+        "安全模板",
+        "可移植报告",
+        "显式接受"
+      ],
+      "figure": "pj-web-change-brief-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "构建与评分",
+      "caption": "新 starter 失败；完整原创方案通过全部四阶段。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查应用输出",
+      "caption": "原创离线 fixture 的实际输出。provider 与证据边界见 README。"
+    }
+  ]
+}

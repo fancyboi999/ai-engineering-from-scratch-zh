@@ -1,0 +1,122 @@
+{
+  "id": "changelog-writer-from-git",
+  "title": "从 Git 生成变更日志",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "将约定式提交记录变成稳定的发布说明。",
+  "summary": "读取真实的 Git 修订范围，保留迁移页脚和 revert 引用，再导出可复现的 Markdown 及来源回执。",
+  "usefulFor": [
+    "读取真实的 Git 修订范围，保留迁移页脚和 revert 引用，再导出可复现的 Markdown 及来源回执。",
+    "将可移植 JSON 回执接入自己的审查或发布工作流。"
+  ],
+  "youWillBuild": "读取真实的 Git 修订范围，保留迁移页脚和 revert 引用，再导出可复现的 Markdown 及来源回执。",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "读取不可变的 Git 导出",
+    "分类约定式提交标题",
+    "按稳定顺序分组提交",
+    "渲染有界的发布说明"
+  ],
+  "prerequisites": [
+    {
+      "title": "开发环境",
+      "path": "phases/00-setup-and-tooling/01-dev-environment"
+    },
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      "."
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-read-an-immutable-git-export",
+      "title": "读取不可变的 Git 导出",
+      "summary": "逐行读取制表符分隔的哈希与标题，拒绝重复哈希、格式错误的十六进制 ID 和空标题。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "读取快照",
+        "验证哈希",
+        "唯一提交",
+        "保留标题"
+      ]
+    },
+    {
+      "id": "02-classify-conventional-subjects",
+      "title": "分类约定式提交标题",
+      "summary": "从首个冒号加空格边界解析类型、可选作用域和可选破坏性标记。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "初始语法",
+        "可选作用域",
+        "破坏性标记",
+        "保留描述"
+      ]
+    },
+    {
+      "id": "03-group-commits-with-stable-ordering",
+      "title": "按稳定顺序分组提交",
+      "summary": "先将破坏性变更映射到独立章节，再处理功能和修复分组。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "分类",
+        "破坏性变更优先级",
+        "分组映射",
+        "稳定哈希顺序"
+      ]
+    },
+    {
+      "id": "04-render-bounded-release-notes",
+      "title": "渲染有界的发布说明",
+      "summary": "验证发布标签，限制最大提交数，按固定顺序输出章节。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "发布标签",
+        "提交预算",
+        "转义内容",
+        "固定章节顺序"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-changelog-writer-from-git-1"
+}
