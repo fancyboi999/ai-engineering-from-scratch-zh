@@ -1,0 +1,154 @@
+{
+  "id": "multi-agent-code-review-panel",
+  "title": "多 agent 代码审查小组",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "一个审查分歧工作台，用来衡量法定票数何时有帮助、何时会掩盖发现。",
+  "summary": "一个审查分歧工作台，用来衡量法定票数何时有帮助、何时会掩盖发现。输入中的 files 将名称映射到文本或行数组。可选的 reviewers 包含 id、cost、findings 记录。预期标签使用 {file,line,rule}；报告记录源指纹，以及各审查者与共识的对比指标。",
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "校验审查证据",
+    "汇总独立支持",
+    "预留费用并执行截止时间",
+    "衡量审查小组的精确率与召回率"
+  ],
+  "prerequisites": [
+    "Node 22.18+，评分器需要 Python 3",
+    "TypeScript 对象、集合、Promise、AbortSignal 以及精确率/召回率。"
+  ],
+  "youWillBuild": "一个审查分歧工作台，用来衡量法定票数何时有帮助、何时会掩盖发现。",
+  "usefulFor": [
+    "输入中的 files 将名称映射到文本或行数组。可选的 reviewers 包含 id、cost、findings 记录。预期标签使用 {file,line,rule}；报告记录源指纹，以及各审查者与共识的对比指标。"
+  ],
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "node",
+      "cli.ts",
+      "--input",
+      "samples/review.json",
+      "--output",
+      "panel.json",
+      "--html",
+      "panel.html"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-evidence",
+      "title": "校验审查证据",
+      "summary": "要求文件存在于给定快照中，行号为从 1 开始的正整数，引用非空且完全匹配，rule id 稳定，严重程度介于 1 到 3。所有审查者共用证据校验。它防止虚构位置进入聚合边界，但一致意见和引用文本仍不能证明发现正确。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "未知的审查者输出只有通过运行时校验后，才能成为类型化的发现。",
+      "concepts": [
+        "validateFinding"
+      ],
+      "difficulty": "starter",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-multi-agent-code-review-panel-1"
+    },
+    {
+      "id": "02-agreement",
+      "title": "汇总独立支持",
+      "summary": "按文件、行号和规则对有效发现分组。每组每位审查者只计一票，拒绝重复的审查者身份，并保留所有严重程度投票。达到法定票数就形成共识；单票发现仍以 needs-review 显示。即使形成共识，也保留分歧标记，让用户检查冲突的严重程度判断。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "集合显式表达审查者身份和每份审查的去重。",
+      "concepts": [
+        "aggregate"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-multi-agent-code-review-panel-2"
+    },
+    {
+      "id": "03-budgets",
+      "title": "预留费用并执行截止时间",
+      "summary": "启动每位审查者之前先预留其费用。跳过剩余预算无法容纳的工作并记录决定。让每位审查者与截止时间竞速，超时后中止其信号。失败保留在轨迹中，已完成的审查仍可聚合。适配器必须遵守 AbortSignal 才能停止外部工作；运行器不能强迫远程服务取消。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Promise 和 AbortSignal 支持并行审查调用，并显式标明终态。",
+      "concepts": [
+        "runPanel"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-multi-agent-code-review-panel-3"
+    },
+    {
+      "id": "04-evaluate",
+      "title": "衡量审查小组的精确率与召回率",
+      "summary": "将去重后的发现 id 与预期集合比较。精确率衡量预测发现中有多少符合预期；召回率衡量找回了多少预期发现。两个集合都要去重，避免重复审查抬高指标。预测数为零时，精确率为零，而不是误导性的满分。调整法定票数前，先试留出的输入。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "用小型纯指标函数，先通过确定性 fixture 建立基线，再考虑模型集成。",
+      "concepts": [
+        "evaluate"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts",
+        "{tests}/integration.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-multi-agent-code-review-panel-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制：起始代码先失败，随后参考方案的所有阶段通过。参考方案通过不授予学习者证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "查看输出",
+      "caption": "本地确定性演示命令的实际输出记录。fixture 与实时适配器的限制见 README。"
+    }
+  ]
+}
