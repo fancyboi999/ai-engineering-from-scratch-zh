@@ -83,16 +83,23 @@ function createHandler({ queryCatalog = search, read = readResource, readTransla
           result = { tools: TOOLS };
           break;
         case 'tools/call': {
+          if (params.name !== 'search_curriculum' && params.name !== 'read_resource') throw new InputError('Unknown tool. Use tools/list to discover tools.');
           const args = params.arguments === undefined ? {} : params.arguments;
-          let value;
-          if (params.name === 'search_curriculum') value = queryCatalog(args);
-          else if (params.name === 'read_resource') {
-            if (!object(args) || Object.keys(args).some(key => key !== 'path' && key !== 'lang')) throw new InputError('read_resource accepts only path and lang.');
-            value = await readTranslated(args.path, args.lang, { read });
-          } else throw new InputError('Unknown tool. Use tools/list to discover tools.');
-          result = value
-            ? { content: [{ type: 'text', text: JSON.stringify(value) }], structuredContent: value }
-            : { content: [{ type: 'text', text: 'Resource not found. Search the curriculum and use a returned path.' }], isError: true };
+          if (!object(args)) throw new InputError('Tool arguments must be an object.');
+          try {
+            let value;
+            if (params.name === 'search_curriculum') value = queryCatalog(args);
+            else {
+              if (Object.keys(args).some(key => key !== 'path' && key !== 'lang')) throw new InputError('read_resource accepts only path and lang.');
+              value = await readTranslated(args.path, args.lang, { read });
+            }
+            result = value
+              ? { content: [{ type: 'text', text: JSON.stringify(value) }], structuredContent: value }
+              : { content: [{ type: 'text', text: 'Resource not found. Search the curriculum and use a returned path.' }], isError: true };
+          } catch (error) {
+            if (!(error instanceof InputError)) throw error;
+            result = { content: [{ type: 'text', text: error.message }], isError: true };
+          }
           break;
         }
         default: return rpcError(req, res, 200, message.id, -32601, 'Method not found');

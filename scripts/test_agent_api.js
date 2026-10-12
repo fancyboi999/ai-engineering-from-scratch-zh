@@ -144,7 +144,13 @@ test('MCP rejects malformed requests, unsafe origins, unsupported transport and 
   assert.equal((await rpc(handler, ' '.repeat(65537))).status, 413);
   for (const body of [[], null, {}, { jsonrpc: '2.0', id: null, method: 'ping' }, { jsonrpc: '2.0', id: 1, method: 'ping', params: [] }]) assert.equal((await rpc(handler, body)).json.error.code, -32600);
   const missing = await rpc(handler, { jsonrpc: '2.0', id: 1, method: 'unknown' }); assert.equal(missing.json.error.code, -32601);
-  for (const params of [{ name: 'unknown' }, { name: 'search_curriculum', arguments: null }, { name: 'search_curriculum', arguments: { limit: '1' } }, { name: 'read_resource', arguments: {} }, { name: 'read_resource', arguments: { path: 'x', extra: true } }]) assert.equal((await rpc(handler, { jsonrpc: '2.0', id: 2, method: 'tools/call', params })).json.error.code, -32602);
+  for (const params of [{ name: 'unknown' }, { name: 'search_curriculum', arguments: null }, { name: 'read_resource', arguments: [] }]) assert.equal((await rpc(handler, { jsonrpc: '2.0', id: 2, method: 'tools/call', params })).json.error.code, -32602);
+  for (const params of [{ name: 'search_curriculum', arguments: { limit: '1' } }, { name: 'search_curriculum', arguments: { limit: 51 } }, { name: 'read_resource', arguments: {} }, { name: 'read_resource', arguments: { path: 'x', extra: true } }]) {
+    const failure = await rpc(handler, { jsonrpc: '2.0', id: 2, method: 'tools/call', params });
+    assert.equal(failure.json.error, undefined);
+    assert.equal(failure.json.result.isError, true);
+    assert.ok(failure.json.result.content[0].text.length > 0);
+  }
   const absent = await rpc(handler, { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'read_resource', arguments: { path: 'missing' } } }); assert.equal(absent.json.result.isError, true);
 });
 
@@ -170,7 +176,7 @@ test('REST and MCP serve Chinese source only, with Chinese identity and canonica
   const server = mcp.createHandler({ read });
   const call = args => rpc(server, { jsonrpc: '2.0', id: 9, method: 'tools/call', params: { name: 'read_resource', arguments: args } });
   assert.deepEqual((await call({ path: entry.path, lang: 'zh' })).json.result.structuredContent, entry);
-  assert.equal((await call({ path: entry.path, lang: 'en' })).json.error.code, -32602);
+  assert.equal((await call({ path: entry.path, lang: 'en' })).json.result.isError, true);
   assert.equal((await call({ path: 'missing' })).json.result.isError, true);
   const tools = await rpc(server, { jsonrpc: '2.0', id: 10, method: 'tools/list' });
   assert.deepEqual(tools.json.result.tools.find(tool => tool.name === 'read_resource').inputSchema.properties.lang.enum, ['zh']);
