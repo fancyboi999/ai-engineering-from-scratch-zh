@@ -6,7 +6,7 @@
 
 ## 定位
 
-核心课程包含 20 个阶段、523 节课。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
+核心课程包含 20 个阶段、528 节课。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
 你会亲手写出反向传播、分词器、注意力机制和 agent 循环，所以当 PyTorch 或其他库登场时，它们不再是黑盒。
 
 `certifications/claude/` 是独立的 Claude 认证备考层，包含 4 条路线、33 节认证课、诊断和原创模拟题。
@@ -28,7 +28,8 @@ certifications/claude/
   lessons/NN-slug/            # 认证课程
   assessments/<exam-code>/    # 诊断和完整模拟题
 glossary/terms.md              # 术语表唯一数据源
-site/                          # 纯静态站点
+site/                          # 静态页面与构建器
+api/                           # Vercel 只读 REST / MCP 接口
 scripts/                       # 审计和构建工具
 .github/workflows/build.yml    # 中文站 CI
 ```
@@ -135,11 +136,11 @@ node scripts/test_tts.js
 
 ## 同步与冲突
 
-- 只跟踪 `upstream/main`，以 `.sync-upstream-base` 作为已检视基准。
+- 只跟踪 `upstream/main`，以 `.sync-upstream-base` 作为已检视基准。同步前读取 `.sync-upstream-pending.json`（若存在），先处理其中未完成的批次；上游新增提交数为 0 不表示这些批次已完成。每项通过对应本地和线上验证后移出 pending 清单。
 - 不用上游英文 `build.js`、`lesson.html`、域名、GitHub 链接或营销数据覆盖中文保护层。
 - 必须保留 `aieng-zh.cn`、中文仓链接、`docs/zh.md`、`md-render.js` 单一渲染器、静态 `/lessons/` 预渲染和中文 quiz 锚点。
 - 冲突时以当前中文实现为基底，语义移植上游变更，不整文件覆盖。
 
 ---
 
-最后审校：2026-09-21。
+最后审校：2026-10-12。
