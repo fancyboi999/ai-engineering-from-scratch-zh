@@ -151,6 +151,7 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: "1.25.x"
+          cache: false
       - name: Rust 核心运行器
         run: rustup toolchain install stable --profile minimal && rustup default stable
       - name: 项目严格离线参考评分（缺运行时或 skip 均失败）

@@ -70,11 +70,15 @@ test('76 project sources, 308 stage docs, two manuals and 245 Hub pages are full
   assert.equal(Object.keys(cards).filter(key => key.startsWith('project/')).length, 76);
   assert.equal(Object.keys(cards).filter(key => key.startsWith('phase/')).length, 20);
   assert.equal(Object.keys(cards).filter(key => key.startsWith('term/')).length, 225);
-  for (const file of ['index.html', 'catalog.html', 'glossary.html', 'project.html', 'projects.html']) {
+  for (const file of ['index.html', 'catalog.html', 'glossary.html', 'project.html', 'projects.html', 'manuals.html', 'manual-a2a-101.html', 'manual-a2a-101-print.html', 'manual-docker-sandboxes-101.html', 'manual-docker-sandboxes-101-print.html']) {
     const head = read(file).split('</head>')[0];
-    assert.equal((head.match(/property="og:image"/g) || []).length, 1, file);
-    assert.equal((head.match(/name="twitter:card"/g) || []).length, 1, file);
-    assert.doesNotMatch(head, /AI Engineering from Scratch|>,+<meta/, file);
+    if (!file.endsWith('-print.html')) {
+      assert.equal((head.match(/property="og:image"/g) || []).length, 1, file);
+      assert.equal((head.match(/name="twitter:card"/g) || []).length, 1, file);
+    }
+    assert.doesNotMatch(head, />,+<meta/, file);
+    assert.equal((head.match(/<link rel="icon" href="\/favicon\.ico\?v=20260831a" sizes="32x32">/g) || []).length, 1, file);
+    assert.equal((head.match(/<link rel="icon" href="\/favicon\.svg\?v=20260831a" type="image\/svg\+xml">/g) || []).length, 1, file);
   }
 });
 

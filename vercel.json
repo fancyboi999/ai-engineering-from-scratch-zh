@@ -19,12 +19,12 @@
     "api/markdown.js": {
       "maxDuration": 10,
       "includeFiles": "{site/*.html,site/agent-pages/*.md}",
-      "excludeFiles": "site/**/*.js"
+      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,hubs,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
     },
     "api/v1/markdown.js": {
       "maxDuration": 10,
       "includeFiles": "{site/*.html,site/agent-pages/*.md}",
-      "excludeFiles": "site/**/*.js"
+      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,hubs,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
     },
     "api/not-found.js": {
       "maxDuration": 10,
@@ -40,7 +40,8 @@
     },
     "api/og.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/og-cards.json,site/lesson-seo.json,site/certification-seo.json,lib/og-fonts/*.json}"
+      "includeFiles": "{site/og-cards.json,site/lesson-seo.json,site/certification-seo.json,lib/og-fonts/*.json}",
+      "excludeFiles": "{phases/**,projects/**,manuals/**,certifications/**,site/{lessons,project-content,hubs,agent-pages,assets,figures}/**,site/*.{html,js,css,png,jpg,gif,svg,ico,txt,md,xml}}"
     }
   },
   "routes": [
