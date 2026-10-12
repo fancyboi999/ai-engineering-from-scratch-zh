@@ -35,7 +35,7 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请使用逗号分隔的有限数");
       return n;
     });
 
@@ -43,17 +43,17 @@
     controls: [
       text(
         "file",
-        "Workspace file text",
+        "工作区文件文本",
         "def total(price, quantity): return price + quantity",
       ),
-      text("old", "Exact old expression", "price + quantity"),
-      text("replacement", "Proposed replacement", "price * quantity"),
-      text("failure", "Observed test output", "AssertionError: 10 != 21"),
-      text("marker", "Proposal failure marker", "AssertionError"),
-      number("used", "Actions used", 1, 0, 6),
-      number("budget", "Action budget", 4, 1, 6),
-      number("price", "Test price", 7, 0, 20),
-      number("quantity", "Test quantity", 3, 0, 10),
+      text("old", "确切的旧表达式", "price + quantity"),
+      text("replacement", "拟替换内容", "price * quantity"),
+      text("failure", "观察到的测试输出", "AssertionError: 10 != 21"),
+      text("marker", "提案失败标记", "AssertionError"),
+      number("used", "已用操作次数", 1, 0, 6),
+      number("budget", "操作预算", 4, 1, 6),
+      number("price", "测试单价", 7, 0, 20),
+      number("quantity", "测试数量", 3, 0, 10),
     ],
     calculate(v) {
       const count = v.old ? v.file.split(v.old).length - 1 : 0,
@@ -65,35 +65,35 @@
       return {
         summary:
           v.used >= v.budget
-            ? "budget_exhausted"
+            ? "预算已耗尽"
             : !observed
-              ? "Planner abstains: marker absent"
+              ? "规划器弃权：未找到标记"
               : count !== 1
-                ? "Patch precondition fails: " + count + " matches"
+                ? "补丁前置条件不满足：" + count + " 处匹配"
                 : allowed
-                  ? "Apply exact proposal, then rerun real tests"
-                  : "rejected",
+                  ? "应用确切提案，然后重新运行真实测试"
+                  : "已拒绝",
         metrics: [
-          metric("Exact matches", count),
-          metric("Observed failure matches", observed),
-          metric("Expected test value", expected),
+          metric("确切匹配数", count),
+          metric("观察到的失败是否匹配", observed),
+          metric("预期测试值", expected),
           metric(
-            "Predicted proposed value",
-            multiply ? expected : "not interpreted",
+            "提案预测值",
+            multiply ? expected : "未解释执行",
           ),
         ],
         bars: [
-          bar("Broken addition output", before),
-          bar("Expected product", expected),
+          bar("错误加法输出", before),
+          bar("预期乘积", expected),
         ],
-        columns: ["Observation", "State"],
+        columns: ["观察", "状态"],
         rows: [
           [
-            "Test before",
-            before === expected ? "fixture passes accidentally" : "failure",
+            "修改前测试",
+            before === expected ? "固定用例碰巧通过" : "失败",
           ],
-          ["Patch", allowed ? "eligible" : "blocked"],
-          ["Test after", "must execute; prediction is not proof"],
+          ["补丁", allowed ? "符合条件" : "已阻止"],
+          ["修改后测试", "必须执行；预测不是证据"],
         ],
       };
     },
@@ -102,26 +102,26 @@
     "pj-tiny-coding-agent-1",
     Object.assign(
       {
-        title: "Confine file tools to a workspace",
+        title: "将文件工具限制在工作区内",
         steps: [
           {
-            label: "Relative path",
+            label: "相对路径",
             detail:
-              "The Orchard basket repair runs in a disposable copy of a trusted Python workspace. Resolve every requested file under that root before opening it. A path may look local while a symlink redirects it outside the workspace.",
+              "Orchard 购物篮修复在可信 Python 工作区的可丢弃副本中运行。打开任何请求文件前，先在该根目录下解析路径。路径可能看似位于本地，但符号链接会将它重定向到工作区外。",
           },
           {
-            label: "Resolve",
+            label: "解析",
             detail:
-              "basket.py -> contained existing file\n../basket.py -> reject\nsymlink to external file -> reject",
+              "basket.py -> 范围内的已有文件\n../basket.py -> 拒绝\n指向外部文件的符号链接 -> 拒绝",
           },
           {
-            label: "Containment",
+            label: "范围限制",
             detail:
-              "Compare resolved path components, not string prefixes. The caller chooses the workspace; a model response must not choose a new root.",
+              "比较解析后的路径组件，而不是字符串前缀。工作区由调用方选择；模型响应不得选择新的根目录。",
           },
         ],
         caption:
-          "Why does copying a trusted repository not turn its tests into sandboxed code?",
+          "为什么复制可信仓库并不会让其测试变成沙箱代码？",
       },
       { lab: buildLab(1) },
     ),
@@ -130,26 +130,26 @@
     "pj-tiny-coding-agent-2",
     Object.assign(
       {
-        title: "Apply exact patches with preconditions",
+        title: "按前置条件应用精确补丁",
         steps: [
           {
-            label: "Precondition",
+            label: "前置条件",
             detail:
-              "A patch states exactly what it expects to replace. The broken basket multiplies neither price nor quantity: it returns price + quantity. Replace that expression only when it appears once.",
+              "补丁明确声明要替换的内容。错误的购物篮函数没有将单价与数量相乘，而是返回 price + quantity。只有该表达式恰好出现一次时才替换。",
           },
           {
-            label: "Replacement",
+            label: "替换",
             detail:
-              "old: price + quantity\nnew: price * quantity\noccurrences=1 -> write; occurrences=0 or 2 -> reject",
+              "旧内容：price + quantity\n新内容：price * quantity\n出现次数=1 -> 写入；出现次数=0 或 2 -> 拒绝",
           },
           {
-            label: "Atomic write",
+            label: "原子写入",
             detail:
-              "Count exact matches before opening a temporary output file. Preserve file permissions when replacing the original.",
+              "打开临时输出文件前统计确切匹配次数。替换原文件时保留文件权限。",
           },
         ],
         caption:
-          "What should happen when another editor fixes the file after the planner proposes a patch?",
+          "规划器提出补丁后，另一位编辑者修复了文件，此时应该怎样处理？",
       },
       { lab: buildLab(2) },
     ),
@@ -158,26 +158,26 @@
     "pj-tiny-coding-agent-3",
     Object.assign(
       {
-        title: "Run real tests through one allowed command",
+        title: "通过唯一允许的命令运行真实测试",
         steps: [
           {
-            label: "Argv",
+            label: "参数数组",
             detail:
-              "Run the actual unittest suite before claiming a repair. In the original basket example, total(7,3) returns 10 instead of 21; total(7,0) returns 7 instead of 0. Both failures should disappear after the patch.",
+              "声称修复前先运行实际 unittest 套件。在原始购物篮示例中，total(7,3) 返回 10 而非 21；total(7,0) 返回 7 而非 0。应用补丁后，两项失败都应消失。",
           },
           {
-            label: "Timeout",
+            label: "超时",
             detail:
-              "before: 2 failed assertions\nafter: 2 executed tests, OK\nzero tests or skipped tests -> not success",
+              "修改前：2 条断言失败\n修改后：实际执行 2 项测试，OK\n零测试或存在跳过的测试 -> 不算成功",
           },
           {
-            label: "Evidence",
+            label: "证据",
             detail:
-              "Read the final unittest summary from stderr and require a positive executed test count. On POSIX, stop the process group when the test deadline expires.",
+              "从 stderr 读取最终 unittest 摘要，要求实际执行测试数大于零。在 POSIX 上，测试到期时停止整个进程组。",
           },
         ],
         caption:
-          'Why must a printed "Ran 999 tests" line not count as test evidence?',
+          '为什么打印出来的 "Ran 999 tests" 行不能算作测试证据？',
       },
       { lab: buildLab(3) },
     ),
@@ -186,26 +186,26 @@
     "pj-tiny-coding-agent-4",
     Object.assign(
       {
-        title: "Stop the coding loop on evidence or budget",
+        title: "按证据或预算停止编码循环",
         steps: [
           {
-            label: "Action",
+            label: "操作",
             detail:
-              "The planner now receives each observation. It tests first, selects a supplied exact repair only when its failure marker appears, then tests again. This transparent rule planner does not claim to invent code from a model.",
+              "规划器现在接收每次观察。它先测试，只有出现对应失败标记时才选择给定的精确修复，然后再次测试。这个透明的规则规划器不声称通过模型创造代码。",
           },
           {
-            label: "Observation",
+            label: "观察",
             detail:
-              "test -> AssertionError\nproposal marker matches -> patch\ntest -> OK -> completed",
+              "测试 -> AssertionError\n提案标记匹配 -> 应用补丁\n测试 -> OK -> completed（已完成）",
           },
           {
-            label: "Stop",
+            label: "停止",
             detail:
-              "Call the planner again after every tool result. Retain the requested action with each observation and stop on abstention or exhausted steps.",
+              "每次工具返回结果后再次调用规划器。将请求操作与每次观察一起保留，在弃权或步数耗尽时停止。",
           },
         ],
         caption:
-          "How would you plug in a model while keeping the same patch preconditions and completion rule?",
+          "如何接入模型，同时保留相同的补丁前置条件与完成规则？",
       },
       { lab: buildLab(4) },
     ),

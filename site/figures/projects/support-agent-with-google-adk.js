@@ -1,23 +1,30 @@
 (function () {
   "use strict";
+  // 保留路由、状态和工具枚举；仅在显示边界使用中文标签。
+  const display = {
+    billing: "账单", access: "访问", platform: "平台", human: "人工",
+    read_invoice: "读取账单", read_account: "读取账户", read_status: "读取状态",
+    received: "已接收", routed: "已路由", answered: "已回答", escalated: "已升级",
+    classify: "分类", respond: "回复", escalate: "升级处理",
+  };
   const steps = [
-    { label: "Validate", detail: "Apply the shared deterministic boundary." },
-    { label: "Choose", detail: "Keep route and capability separate." },
+    { label: "校验", detail: "应用共享的确定性边界检查。" },
+    { label: "选择", detail: "将路由与能力分开。" },
     {
-      label: "Retain",
-      detail: "Store inspectable evidence and response state.",
+      label: "保留",
+      detail: "存储可检查的证据与响应状态。",
     },
   ];
   window.AIFSProjectFigures.register("pj-support-agent-with-google-adk-1", {
-    title: "Redact before any model request",
+    title: "任何模型请求前先脱敏",
     steps,
     caption:
-      "The two documented patterns are a limited example, not a complete privacy filter.",
+      "文档中的两种模式只是有限示例，不是完整隐私过滤器。",
     lab: {
       controls: [
         {
           key: "text",
-          label: "Ticket text",
+          label: "工单文本",
           type: "text",
           value: "invoice for learner@example.invalid api_key=EXAMPLE_VALUE",
         },
@@ -29,17 +36,17 @@
         const valid = v.text.trim() && v.text.length <= 10000;
         return {
           summary: valid
-            ? "Only the cleaned text may enter the session."
-            : "Reject the ticket.",
+            ? "只有清理后的文本可以进入会话。"
+            : "拒绝此工单。",
           metrics: [
-            { label: "Input characters", value: v.text.length },
+            { label: "输入字符数", value: v.text.length },
             {
-              label: "Changed by filter",
-              value: clean === v.text ? "no" : "yes",
+              label: "过滤器是否修改文本",
+              value: clean === v.text ? "否" : "是",
             },
           ],
-          rows: [["Cleaned ticket", clean]],
-          columns: ["Boundary", "Text"],
+          rows: [["清理后的工单", clean]],
+          columns: ["边界", "文本"],
         };
       },
     },
@@ -66,77 +73,77 @@
     };
   }
   window.AIFSProjectFigures.register("pj-support-agent-with-google-adk-2", {
-    title: "Separate a routing score from permission",
+    title: "将路由得分与权限分开",
     steps,
     caption:
-      "Ties escalate. A valid specialist cannot use another specialist’s tool.",
+      "得分相同则升级给人工处理。合法的专职 agent 也不能使用其他专职 agent 的工具。",
     lab: {
       controls: [
         {
           key: "text",
-          label: "Ticket text",
+          label: "工单文本",
           type: "text",
           value: "invoice login",
         },
         {
           key: "tool",
-          label: "Requested capability",
+          label: "请求的能力",
           type: "select",
           value: "read_invoice",
           options: Object.values(tools).map((value) => ({
             value,
-            label: value,
+            label: display[value],
           })),
         },
       ],
       calculate(v) {
         const r = route(v.text),
           allowed = tools[r.selected] === v.tool;
-        let summary = "Reject the requested capability.";
+        let summary = "拒绝请求的能力。";
         if (r.selected === "human")
-          summary = "Escalate before a model or read capability runs.";
-        else if (allowed) summary = "Authorize " + v.tool;
+          summary = "运行模型或读取能力前先升级给人工。";
+        else if (allowed) summary = "授权 " + display[v.tool] + "（" + v.tool + "）";
         return {
           summary,
           metrics: [
-            { label: "Route", value: r.selected },
-            { label: "Allowed", value: allowed ? "yes" : "no" },
+            { label: "路由", value: display[r.selected] },
+            { label: "是否允许", value: allowed ? "是" : "否" },
           ],
-          bars: r.scores.map(([label, value]) => ({ label, value, max: 3 })),
+          bars: r.scores.map(([label, value]) => ({ label: display[label], value, max: 3 })),
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-support-agent-with-google-adk-3", {
-    title: "A response must survive the transition",
+    title: "状态转移后必须保留响应",
     steps,
     caption:
-      "Terminal states cannot accept another event. Human routing permits escalation, not an automatic answer.",
+      "终止状态不能接受更多事件。人工路由允许升级处理，不允许自动回答。",
     lab: {
       controls: [
         {
           key: "state",
-          label: "Current state",
+          label: "当前状态",
           type: "select",
           value: "routed",
           options: ["received", "routed", "answered", "escalated"].map(
-            (value) => ({ value, label: value }),
+            (value) => ({ value, label: display[value] }),
           ),
         },
         {
           key: "event",
-          label: "Event",
+          label: "事件",
           type: "select",
           value: "respond",
           options: ["classify", "respond", "escalate"].map((value) => ({
             value,
-            label: value,
+            label: display[value],
           })),
         },
-        { key: "human", label: "Human route", type: "checkbox", value: false },
+        { key: "human", label: "人工路由", type: "checkbox", value: false },
         {
           key: "text",
-          label: "Reply text",
+          label: "回复文本",
           type: "text",
           value: "Use the receipt invoice reference.",
         },
@@ -150,67 +157,67 @@
           next && !(v.event === "respond" && (v.human || !v.text.trim()));
         return {
           summary: valid
-            ? "Transition to " + next
-            : "Reject the transition and preserve prior state.",
-          metrics: [{ label: "Next state", value: valid ? next : v.state }],
+            ? "转移到 " + display[next]
+            : "拒绝转移，保留先前状态。",
+          metrics: [{ label: "下一状态", value: display[valid ? next : v.state] }],
           rows: [
             [
-              "Retained response",
-              valid && v.event === "respond" ? v.text.trim() : "none",
+              "保留的响应",
+              valid && v.event === "respond" ? v.text.trim() : "无",
             ],
           ],
-          columns: ["Session field", "Value"],
+          columns: ["会话字段", "值"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-support-agent-with-google-adk-4", {
-    title: "Apply the same gate before ADK",
+    title: "进入 ADK 前应用同一门禁",
     steps,
     caption:
-      "Real SDK tests establish graph behavior. A deterministic fixture model is labeled; it does not establish language-model quality.",
+      "真实 SDK 测试验证图行为。确定性测试模型有明确标注；它不能证明语言模型质量。",
     lab: {
       controls: [
         {
           key: "text",
-          label: "Ticket topic",
+          label: "工单主题",
           type: "text",
           value: "account login",
         },
         {
           key: "proposed",
-          label: "Model-proposed route",
+          label: "模型提议的路由",
           type: "select",
           value: "access",
           options: ["billing", "access", "platform"].map((value) => ({
             value,
-            label: value,
+            label: display[value],
           })),
         },
       ],
       calculate(v) {
         const r = route(v.text);
         const valid = r.selected !== "human" && r.selected === v.proposed;
-        let summary = "Reject the route override before running ADK.";
+        let summary = "运行 ADK 前拒绝路由覆盖。";
         if (r.selected === "human")
-          summary = "Human escalation: no ADK model calls.";
+          summary = "升级给人工：不调用 ADK 模型。";
         else if (valid)
           summary =
-            "Run triage and specialist on cleaned text and authorized guidance.";
+            "基于清理后的文本与授权指引，运行分诊和专职 agent。";
         return {
           summary,
           metrics: [
-            { label: "Allowed route", value: r.selected },
-            { label: "Model calls", value: valid ? 2 : 0 },
+            { label: "允许的路由", value: display[r.selected] },
+            { label: "模型调用数", value: valid ? 2 : 0 },
           ],
           rows: [
-            ["Read capability", valid ? tools[r.selected] : "none"],
+            ["读取能力", valid ? display[tools[r.selected]] + "（" + tools[r.selected] + "）" : "无"],
             [
-              "Reply state",
-              valid ? "answered with retained draft" : "no automatic answer",
+              "回复状态",
+              valid ? "已回答并保留草稿" : "无自动回答",
             ],
           ],
-          columns: ["Gate result", "Value"],
+          columns: ["门禁结果", "值"],
         };
       },
     },

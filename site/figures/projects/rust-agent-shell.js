@@ -155,7 +155,7 @@
           {
             label: "落实边界检查",
             detail:
-              "工作区=/work/orchard\nrelease.md -> /work/orchard/release.md -> 允许\nlink.md -> /outside/credentials -> 拒绝",
+              "工作区：workspace=/work/orchard\nrelease.md -> /work/orchard/release.md -> 允许\nlink.md -> /outside/credentials -> 拒绝",
           },
           {
             label: "检查输出",
