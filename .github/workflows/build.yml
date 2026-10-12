@@ -18,6 +18,8 @@ on:
       - "api/**"
       - "lib/**"
       - "vercel.json"
+      - "package.json"
+      - "package-lock.json"
       - "learning-paths/**"
       - "README.md"
       - "ROADMAP.md"

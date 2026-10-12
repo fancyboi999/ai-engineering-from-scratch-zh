@@ -1,0 +1,10 @@
+{
+  "name": "ai-engineering-from-scratch-zh",
+  "private": true,
+  "scripts": {
+    "vercel-build": "node site/build.js"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
