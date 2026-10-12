@@ -1,0 +1,248 @@
+{
+  "id": "research-report-agent",
+  "title": "研究报告 agent",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "将一个问题和一堆文档转成每句都能核查的报告。",
+  "summary": "构建深度研究工具背后的流水线：搜索语料库，提取精确片段，规划研究，只依据证据写作，验证每条主张，发布带脚注和轨迹的 HTML 报告，再用已提交的公开评估 fixture 评分。",
+  "usefulFor": [
+    "准备技术决策备忘录，将主张链接到支持它的源段落。",
+    "来源文档变化后比较报告，检查哪些主张需要修订。"
+  ],
+  "youWillBuild": "技术决策证据账本，展示来源更新如何改变已发布主张。",
+  "hours": 20,
+  "languages": [
+    "Rust",
+    "Python",
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "BM25 检索",
+    "带偏移量的片段提取",
+    "研究规划",
+    "记录与回放模型调用",
+    "引用依据",
+    "主张验证",
+    "运行预算与终态",
+    "追踪",
+    "公开 fixture 评估"
+  ],
+  "prerequisites": [
+    {
+      "title": "检索增强生成",
+      "path": "phases/11-llm-engineering/06-rag"
+    },
+    {
+      "title": "结构化输出",
+      "path": "phases/11-llm-engineering/03-structured-outputs"
+    },
+    {
+      "title": "agent 循环",
+      "path": "phases/14-agent-engineering/01-the-agent-loop"
+    },
+    {
+      "title": "验证门禁",
+      "path": "phases/14-agent-engineering/38-verification-gates"
+    }
+  ],
+  "stages": [
+    {
+      "id": "01-search-the-corpus",
+      "title": "搜索语料库",
+      "summary": "加载带头部的 Markdown 文档，用 BM25 排序。",
+      "hours": 5,
+      "concepts": [
+        "文档解析",
+        "分词",
+        "BM25",
+        "IDF"
+      ],
+      "difficulty": "core",
+      "language": "rust+python",
+      "languageWhy": "Rust 负责排序和 JSON 解析；Python 向后续阶段暴露小型进程适配器。",
+      "figure": "pj-rra-bm25",
+      "runners": [
+        {
+          "language": "rust"
+        },
+        {
+          "language": "python"
+        }
+      ]
+    },
+    {
+      "id": "02-extract-snippets",
+      "title": "提取可引用的片段",
+      "summary": "将文档分成句子，保留每个片段的精确字符偏移量。",
+      "hours": 2,
+      "concepts": [
+        "句子范围",
+        "偏移量",
+        "片段评分",
+        "可独立理解的句子"
+      ],
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "Python 字符串切片保留验证器使用的精确证据范围。",
+      "figure": "pj-rra-snippet-offsets",
+      "runners": [
+        {
+          "language": "python"
+        }
+      ]
+    },
+    {
+      "id": "03-plan-the-research",
+      "title": "规划研究",
+      "summary": "用规则规划器将问题拆成 facet，再安全地换成已记录模型。",
+      "hours": 2,
+      "concepts": [
+        "查询分解",
+        "Model 协议",
+        "记录与回放",
+        "回退"
+      ],
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "Python 协议将规划与实时模型传输和记录回复隔离。",
+      "figure": "pj-rra-plan-facets",
+      "runners": [
+        {
+          "language": "python"
+        }
+      ]
+    },
+    {
+      "id": "04-write-with-citations",
+      "title": "只依据证据写作",
+      "summary": "从片段组合章节，拒绝没有有效引用的句子。",
+      "hours": 2,
+      "concepts": [
+        "抽取式写作",
+        "引用格式",
+        "验证器"
+      ],
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "Python dataclass 让片段、章节和引用关系明确。",
+      "figure": "pj-rra-cited-writer",
+      "runners": [
+        {
+          "language": "python"
+        }
+      ]
+    },
+    {
+      "id": "05-verify-every-claim",
+      "title": "验证每条主张",
+      "summary": "在运行预算内捕获名字替换、否定翻转和数字变化。",
+      "hours": 2,
+      "concepts": [
+        "主张支持",
+        "投毒草稿",
+        "预算",
+        "终态"
+      ],
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "Python 集合和计数器让支持规则与预算可检查。",
+      "figure": "pj-rra-critic",
+      "runners": [
+        {
+          "language": "python"
+        }
+      ]
+    },
+    {
+      "id": "06-publish-the-report",
+      "title": "发布报告",
+      "summary": "渲染带编号脚注的 HTML，写出整个运行的轨迹。",
+      "hours": 2,
+      "concepts": [
+        "HTML 渲染",
+        "脚注",
+        "追踪",
+        "流水线"
+      ],
+      "difficulty": "core",
+      "language": "python+typescript",
+      "languageWhy": "Python 序列化证据；TypeScript 验证并渲染可访问的 HTML。",
+      "figure": "pj-rra-publish",
+      "runners": [
+        {
+          "language": "python"
+        },
+        {
+          "language": "typescript"
+        }
+      ]
+    },
+    {
+      "id": "07-score-the-report",
+      "title": "为公开 fixture 评分",
+      "summary": "在已提交的公开评估 fixture 上衡量引用精确率、来源召回率和事实覆盖率。",
+      "hours": 2,
+      "concepts": [
+        "公开 fixture 评估",
+        "引用精确率",
+        "召回率",
+        "评分卡"
+      ],
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "Python 计算每题指标和可复现汇总分数。",
+      "figure": "pj-rra-scorecard",
+      "runners": [
+        {
+          "language": "python"
+        }
+      ]
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-rra-pipeline",
+  "languageReasons": [
+    {
+      "language": "Rust",
+      "why": "仅用标准库构建 BM25 索引并解析 JSON 请求。"
+    },
+    {
+      "language": "Python",
+      "why": "组合证据提取、已记录模型调用、验证和评估。"
+    },
+    {
+      "language": "TypeScript",
+      "why": "验证证据契约，渲染可交互、可移植的 HTML 报告。"
+    }
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "run_report.py",
+      "How does a secrets proxy protect API keys from prompt injection?",
+      "--out",
+      "out"
+    ],
+    "cwd": "solution"
+  },
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案所有阶段通过的过程。参考方案通过不会为学习者颁发证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "生成的 HTML 报告、来源悬停证据和展开运行轨迹的真实浏览器录制。"
+    }
+  ]
+}
