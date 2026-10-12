@@ -1,23 +1,23 @@
 (function () {
   "use strict";
   const steps = [
-    { label: "Audio", detail: "Keep sample coordinates and source bytes." },
+    { label: "音频", detail: "保留采样坐标与源字节。" },
     {
-      label: "Process",
-      detail: "Apply an explicit signal or transport contract.",
+      label: "处理",
+      detail: "应用明确的信号或传输契约。",
     },
-    { label: "Review", detail: "Compare transcript evidence with playback." },
+    { label: "审阅", detail: "将转写证据与播放内容比较。" },
   ];
   window.AIFSProjectFigures.register("pj-voice-note-transcriber-pipeline-1", {
-    title: "The sample rate defines the clock",
+    title: "采样率定义时钟",
     steps,
     caption:
-      "The same sample index produces a different time at a different rate.",
+      "同一采样索引在不同采样率下对应不同时间。",
     lab: {
       controls: [
         {
           key: "index",
-          label: "Sample index",
+          label: "采样索引",
           type: "number",
           value: 800,
           min: 0,
@@ -25,7 +25,7 @@
         },
         {
           key: "rate",
-          label: "Sample rate Hz",
+          label: "采样率（Hz）",
           type: "select",
           value: "16000",
           options: [
@@ -36,7 +36,7 @@
         },
         {
           key: "sample",
-          label: "Signed16-bit sample",
+          label: "有符号 16 位采样值",
           type: "range",
           value: 16384,
           min: -32768,
@@ -45,11 +45,11 @@
       ],
       calculate(v) {
         return {
-          summary: "Timestamp = sample index / sample rate.",
+          summary: "时间戳 = 采样索引 / 采样率。",
           metrics: [
-            { label: "Seconds", value: (v.index / Number(v.rate)).toFixed(4) },
+            { label: "秒", value: (v.index / Number(v.rate)).toFixed(4) },
             {
-              label: "Normalized amplitude",
+              label: "归一化振幅",
               value: (v.sample / 32768).toFixed(4),
             },
           ],
@@ -60,21 +60,21 @@
               (v.index / Number(v.rate)).toFixed(4),
             ],
           ],
-          columns: ["Index", "Hz", "Seconds"],
+          columns: ["索引", "Hz", "秒"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-voice-note-transcriber-pipeline-2", {
-    title: "Choose which acoustic frames survive",
+    title: "选择保留哪些声学帧",
     steps,
     caption:
-      "Frame energies are an authored example. Loud noise can pass; quiet words can fail.",
+      "帧能量是编写的示例。强噪声可能通过，轻声词语可能被滤掉。",
     lab: {
       controls: [
         {
           key: "threshold",
-          label: "RMS threshold",
+          label: "RMS 阈值",
           type: "range",
           value: 0.02,
           min: 0,
@@ -83,7 +83,7 @@
         },
         {
           key: "gap",
-          label: "Maximum silent gap ms",
+          label: "最大静音间隔（ms）",
           type: "range",
           value: 40,
           min: 0,
@@ -104,41 +104,41 @@
         }
         const kept = merged.filter(([a, b]) => b - a >= 40);
         return {
-          summary: `Keep ${kept.length} activity segments after the 40 ms minimum.`,
+          summary: `按 40 ms 最短时长筛选后，保留 ${kept.length} 个活跃片段。`,
           metrics: [
-            { label: "Active frames", value: active.length },
+            { label: "活跃帧数", value: active.length },
             {
-              label: "Kept milliseconds",
+              label: "保留时长（ms）",
               value: kept.reduce((sum, [a, b]) => sum + b - a, 0),
             },
           ],
           bars: energies.map((value, i) => ({
-            label: "Frame " + i,
+            label: "帧 " + i,
             value,
             max: 0.3,
           })),
           rows: kept.map(([a, b]) => [String(a), String(b)]),
-          columns: ["Start ms", "End ms"],
+          columns: ["开始时间（ms）", "结束时间（ms）"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-voice-note-transcriber-pipeline-3", {
-    title: "A recognizer request carries actual audio",
+    title: "识别请求携带实际音频",
     steps,
     caption:
-      "Only transient timeouts retry. Supplied reference mode makes no recognition request.",
+      "只重试暂时性超时。给定参考文本模式不发出识别请求。",
     lab: {
       controls: [
         {
           key: "reference",
-          label: "Use supplied reference text",
+          label: "使用给定参考文本",
           type: "checkbox",
           value: false,
         },
         {
           key: "timeouts",
-          label: "Timeouts before success",
+          label: "成功前超时次数",
           type: "range",
           value: 1,
           min: 0,
@@ -146,7 +146,7 @@
         },
         {
           key: "retries",
-          label: "Allowed retries",
+          label: "允许重试次数",
           type: "range",
           value: 1,
           min: 0,
@@ -158,39 +158,39 @@
           ? 0
           : Math.min(v.timeouts + 1, v.retries + 1);
         const success = v.reference || v.timeouts <= v.retries;
-        let summary = "Timeout budget exhausted; retain a failure.";
+        let summary = "超时预算已耗尽；保留失败记录。";
         if (v.reference)
-          summary = "No recognizer call; label the supplied transcript.";
+          summary = "不调用识别器；标注给定转写文本的来源。";
         else if (success)
-          summary = "Record returned text and the exact segment audio hash.";
+          summary = "记录返回文本与对应音频片段的确切哈希。";
         return {
           summary,
           metrics: [
-            { label: "HTTP attempts", value: attempts },
+            { label: "HTTP 尝试次数", value: attempts },
             {
-              label: "Recognition performed",
-              value: v.reference ? "no" : "endpoint mode",
+              label: "是否执行识别",
+              value: v.reference ? "否" : "端点模式",
             },
           ],
           rows: [
-            ["Payload", "multipart model + WAV file"],
-            ["Evidence", "segment SHA256 and attempt count"],
+            ["载荷", "multipart model 字段 + WAV 文件"],
+            ["证据", "片段 SHA256 与尝试次数"],
           ],
-          columns: ["Contract", "Value"],
+          columns: ["契约", "值"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-voice-note-transcriber-pipeline-4", {
-    title: "Convert a validated cue to WebVTT",
+    title: "将校验过的字幕条目转换为 WebVTT",
     steps,
     caption:
-      "The review page links segment times to actual playback; it does not infer word alignment.",
+      "审阅页面将片段时间关联到实际播放，不推断词语对齐。",
     lab: {
       controls: [
         {
           key: "start",
-          label: "Cue start seconds",
+          label: "字幕开始时间（秒）",
           type: "number",
           value: 1.234,
           min: 0,
@@ -199,7 +199,7 @@
         },
         {
           key: "end",
-          label: "Cue end seconds",
+          label: "字幕结束时间（秒）",
           type: "number",
           value: 3.5,
           min: 0,
@@ -208,7 +208,7 @@
         },
         {
           key: "duration",
-          label: "Audio duration seconds",
+          label: "音频时长（秒）",
           type: "number",
           value: 5.685,
           min: 0,
@@ -235,18 +235,18 @@
         return {
           summary: valid
             ? stamp(v.start) + " --> " + stamp(v.end)
-            : "Reject cue order or an endpoint beyond the audio.",
+            : "拒绝顺序错误或结束点超出音频的字幕条目。",
           metrics: [
             {
-              label: "Cue length seconds",
+              label: "字幕时长（秒）",
               value: (v.end - v.start).toFixed(3),
             },
           ],
           rows: [
-            ["Audio evidence", "original clip hash"],
-            ["Correction flow", "edit JSON, verify hash, rerender"],
+            ["音频证据", "原始片段哈希"],
+            ["修正流程", "编辑 JSON，验证哈希，再次渲染"],
           ],
-          columns: ["Artifact", "Preserved link"],
+          columns: ["产物", "保留的关联"],
         };
       },
     },

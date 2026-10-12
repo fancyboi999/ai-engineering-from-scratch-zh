@@ -3,7 +3,7 @@
   const controls = [
     {
       key: "start",
-      label: "New hunk start line",
+      label: "新文件差异块起始行",
       type: "range",
       value: 10,
       min: 1,
@@ -12,7 +12,7 @@
     },
     {
       key: "context",
-      label: "Context rows before addition",
+      label: "新增行之前的上下文行数",
       type: "range",
       value: 2,
       min: 0,
@@ -21,7 +21,7 @@
     },
     {
       key: "removed",
-      label: "Deleted rows before addition",
+      label: "新增行之前的删除行数",
       type: "range",
       value: 3,
       min: 0,
@@ -30,19 +30,19 @@
     },
     {
       key: "line",
-      label: "Added source line",
+      label: "新增源码行",
       type: "text",
       value: "eval(input);",
     },
     {
       key: "quote",
-      label: "Reviewer quote",
+      label: "审阅者引用",
       type: "text",
       value: "eval(input)",
     },
     {
       key: "comment",
-      label: "Line is a comment",
+      label: "该行是注释",
       type: "checkbox",
       value: false,
     },
@@ -54,28 +54,28 @@
         !/^\s*(?:\/\/|\*|#)/.test(source) && /\beval\s*\(/.test(source);
     return {
       summary: !anchored
-        ? "Reject fabricated quote"
+        ? "拒绝虚构引用"
         : detected
-          ? "Anchored lexical candidate for human review"
-          : "No dynamic-eval candidate from this line",
+          ? "有原文锚点的词法候选项，供人工审阅"
+          : "此行没有动态 eval 候选项",
       metrics: [
-        { label: "New-file addition line", value: v.start + v.context },
-        { label: "Deletions affecting new line", value: 0 },
-        { label: "Quote supported", value: anchored },
+        { label: "新文件新增行号", value: v.start + v.context },
+        { label: "影响新文件行号的删除行数", value: 0 },
+        { label: "引用有原文支持", value: anchored },
       ],
       bars: [
-        { label: "Old rows consumed", value: v.context + v.removed, max: 16 },
+        { label: "已消耗旧文件行数", value: v.context + v.removed, max: 16 },
         {
-          label: "New rows consumed before addition",
+          label: "新增行前已消耗的新文件行数",
           value: v.context,
           max: 16,
         },
       ],
-      columns: ["field", "value"],
+      columns: ["字段", "值"],
       rows: [
-        ["location", "src/run.ts:" + (v.start + v.context)],
-        ["source", source],
-        ["quote", v.quote],
+        ["位置", "src/run.ts:" + (v.start + v.context)],
+        ["源码", source],
+        ["引用", v.quote],
       ],
     };
   };
@@ -83,21 +83,21 @@
     "pj-pr-review-reporter-1",
     Object.assign(
       {
-        title: "Recover new-file line numbers",
+        title: "还原新文件行号",
         steps: [
-          { label: "Input contract", detail: "parseDiff" },
+          { label: "输入契约", detail: "parseDiff" },
           {
-            label: "Recover new-file line numbers",
+            label: "还原新文件行号",
             detail:
-              "Parse hunk headers into old and new counters. Context consumes both counters, deletions consume only the old counter, and additions consume the new counter while producing a reviewable location. Reject truncated hunks and parent-traversing paths. The parser is deliberately for text unified diffs; binary patches and combined merge diffs are outside the contract. Wire Python into TypeScript using execFileSync and stdin, never an interpolated shell command.",
+              "将差异块头部解析为旧文件与新文件的行计数器。上下文行推进两者，删除行只推进旧计数器，新增行推进新计数器并产出可审阅的位置。拒绝截断的差异块与向父目录穿越的路径。解析器只处理文本统一差异；二进制补丁和合并差异不在契约内。通过 execFileSync 与 stdin 将 Python 接入 TypeScript，绝不用字符串插值构造 shell 命令。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "A replacement stays on the new file line even when the old side removes several lines.",
+              "即使旧文件一侧删除多行，替换内容仍对应新文件中的行号。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "进入下一步，在下一次副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -106,21 +106,21 @@
     "pj-pr-review-reporter-2",
     Object.assign(
       {
-        title: "Generate narrow review candidates",
+        title: "生成范围明确的审阅候选项",
         steps: [
-          { label: "Input contract", detail: "inspect" },
+          { label: "输入契约", detail: "inspect" },
           {
-            label: "Generate narrow review candidates",
+            label: "生成范围明确的审阅候选项",
             detail:
-              "Build explicit static detectors for dynamic eval, shell exec, disabled TLS validation and empty catch handlers. Inspect only added lines. These patterns produce review candidates rather than proof of exploitable behavior. Keeping rule ids stable makes deduplication possible when a later model reviewer reports the same concern.",
+              "为动态 eval、shell exec、禁用 TLS 校验和空 catch 处理器构建明确的静态检测器。只检查新增行。这些模式产生的是审阅候选项，不是存在可利用行为的证据。保持规则 ID 稳定，便于后续模型审阅者报告同一问题时去重。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "The fixture emits a high-severity eval candidate with an exact quote and new-file line 2.",
+              "固定测试输入产生一个高严重级别的 eval 候选项，附带确切引用和新文件第 2 行的位置。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "进入下一步，在下一次副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -129,21 +129,21 @@
     "pj-pr-review-reporter-3",
     Object.assign(
       {
-        title: "Verify and merge findings",
+        title: "验证并合并发现",
         steps: [
-          { label: "Input contract", detail: "verify, merge" },
+          { label: "输入契约", detail: "verify, merge" },
           {
-            label: "Verify and merge findings",
+            label: "验证并合并发现",
             detail:
-              "Require an existing added-line location and a nonempty exact source substring for every candidate. Reject fabricated files, deleted-line locations, empty quotes and invalid severity values. Merge findings by file, line and rule; keep the stronger severity when reviewers disagree. The quote gate establishes location support, not the truth of a security claim, which still needs review.",
+              "每个候选项必须指向已有新增行，引用必须是非空的确切源码子串。拒绝虚构文件、删除行位置、空引用和无效严重级别。按文件、行号和规则合并发现；审阅者意见不一致时保留较高严重级别。引用门禁证明的是位置有依据，不是安全结论属实；后者仍需审阅。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Unsupported candidates stay in a rejected collection; duplicate supported candidates collapse into one finding.",
+              "缺少支持的候选项保留在拒绝集合中；重复且有依据的候选项合并为一个发现。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "进入下一步，在下一次副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -152,21 +152,21 @@
     "pj-pr-review-reporter-4",
     Object.assign(
       {
-        title: "Publish a local escaped report",
+        title: "发布经过转义的本地报告",
         steps: [
-          { label: "Input contract", detail: "escapeHTML, render" },
+          { label: "输入契约", detail: "escapeHTML, render" },
           {
-            label: "Publish a local escaped report",
+            label: "发布经过转义的本地报告",
             detail:
-              "Render a self-contained report with source locations, quoted evidence, severity and message. Escape source text as carefully as prose: a diff can contain executable HTML. Keep external publication outside the tool. The CLI writes review.html locally and prints a machine-readable summary for automation.",
+              "渲染包含源码位置、引用证据、严重级别和说明的独立报告。像处理正文一样仔细转义源码：差异中也可能包含可执行 HTML。外部发布不属于工具职责。CLI 在本地写入 review.html，并打印供自动化使用的机器可读摘要。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Open review.html to inspect the anchored finding. The source quote renders as text even when it contains HTML.",
+              "打开 review.html 检查有原文锚点的发现。即使源码引用含有 HTML，也以文本显示。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "进入下一步，在下一次副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),

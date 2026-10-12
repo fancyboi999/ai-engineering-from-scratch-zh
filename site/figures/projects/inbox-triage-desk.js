@@ -1,32 +1,32 @@
 (function () {
   "use strict";
   const steps = [
-    { label: "Input", detail: "Inspect original message data." },
-    { label: "Rule", detail: "Apply an explicit contract." },
-    { label: "Evidence", detail: "Keep the result inspectable." },
+    { label: "输入", detail: "检查原始邮件数据。" },
+    { label: "规则", detail: "应用明确的契约。" },
+    { label: "证据", detail: "保留可检查的结果。" },
   ];
   window.AIFSProjectFigures.register("pj-inbox-triage-desk-1", {
-    title: "What survives email parsing?",
+    title: "邮件解析保留了哪些信息？",
     steps,
     caption:
-      "Edit the plain-text message fields. MIME decoding is implemented in Python; this lab inspects the resulting record.",
+      "编辑邮件的纯文本字段。MIME 解码由 Python 实现；本实验检查解码后的记录。",
     lab: {
       controls: [
         {
           key: "sender",
-          label: "Sender address",
+          label: "发件人地址",
           type: "text",
           value: "mira@example.invalid",
         },
         {
           key: "body",
-          label: "Plain-text body",
+          label: "纯文本正文",
           type: "text",
           value: "Could you print six table labels?",
         },
         {
           key: "hasId",
-          label: "Message has an ID",
+          label: "邮件有 ID",
           type: "checkbox",
           value: true,
         },
@@ -35,18 +35,18 @@
         const valid = /^[^\s@]+@[^\s@]+$/.test(v.sender);
         return {
           summary: valid
-            ? "Preserve the body beside its message identity."
-            : "Reject the record before classifying it.",
+            ? "将正文与邮件标识一同保留。"
+            : "分类前先拒绝无效记录。",
           metrics: [
             {
-              label: "Body bytes",
+              label: "正文字节数",
               value: new TextEncoder().encode(v.body).length,
             },
             {
-              label: "Identity",
+              label: "标识",
               value: v.hasId
-                ? "Provided Message-ID"
-                : "Digest fallback required",
+                ? "已提供 Message-ID"
+                : "需用摘要作为后备标识",
             },
           ],
           rows: [
@@ -54,21 +54,21 @@
             ["text", v.body],
             ["body_status", v.body.trim() ? "plain" : "no-plain-body"],
           ],
-          columns: ["Field", "Parsed value"],
+          columns: ["字段", "解析值"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-inbox-triage-desk-2", {
-    title: "A rule match is evidence, not certainty",
+    title: "规则匹配是证据，不是确定结论",
     steps,
     caption:
-      "Conflicting categories become uncertain. Change the message and inspect the exact phrases.",
+      "类别冲突时归为不确定。修改邮件，检查匹配到的确切短语。",
     lab: {
       controls: [
         {
           key: "text",
-          label: "Message body",
+          label: "邮件正文",
           type: "text",
           value: "Please confirm. For your information, the room changed.",
         },
@@ -91,42 +91,42 @@
           categories.size === 1 ? [...categories][0] : "uncertain";
         return {
           summary:
-            category + " queue; every classification still needs review.",
+            ({ action: "待行动", uncertain: "不确定", information: "信息" }[category]) + "队列；每项分类仍需审阅。",
           metrics: [
-            { label: "Matched categories", value: categories.size },
+            { label: "匹配类别数", value: categories.size },
             {
-              label: "Priority",
+              label: "优先级",
               value: { action: 0, uncertain: 1, information: 2 }[category],
             },
           ],
-          rows: hits.length ? hits : [["uncertain", "No phrase matched", ""]],
-          columns: ["Category", "Source quote", "Start offset"],
+          rows: (hits.length ? hits : [["uncertain", "没有匹配短语", ""]]).map(([category, quote, offset]) => [{ action: "待行动", uncertain: "不确定", information: "信息" }[category], quote, offset]),
+          columns: ["类别", "原文引用", "开始偏移"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-inbox-triage-desk-3", {
-    title: "Validate the quote before drafting",
+    title: "起草前校验引用",
     steps,
     caption:
-      "A draft leaves the commitment for a person to write. An invented quote stops the proposal.",
+      "草稿中的承诺留给人来写。虚构引用会阻止提案生成。",
     lab: {
       controls: [
         {
           key: "source",
-          label: "Source body",
+          label: "来源正文",
           type: "text",
           value: "Please bring two folding chairs.",
         },
         {
           key: "quote",
-          label: "Proposed evidence quote",
+          label: "拟用的证据引用",
           type: "text",
           value: "two folding chairs",
         },
         {
           key: "sameMessage",
-          label: "Decision has matching message ID",
+          label: "决策中的邮件 ID 一致",
           type: "checkbox",
           value: true,
         },
@@ -136,31 +136,31 @@
         const valid = found && v.sameMessage;
         return {
           summary: valid
-            ? "Build an unsent draft with an editable response placeholder."
-            : "Reject the decision; identity and exact evidence must both match.",
+            ? "生成未发送草稿，保留可编辑的回复占位文本。"
+            : "拒绝此决策；标识与确切证据必须同时匹配。",
           metrics: [
-            { label: "Quote found", value: found ? "yes" : "no" },
-            { label: "Messages sent", value: 0 },
+            { label: "找到引用", value: found ? "是" : "否" },
+            { label: "已发送邮件数", value: 0 },
           ],
           rows: [
-            ["Source", v.source],
-            ["Draft response", "[Write and check your response here.]"],
+            ["来源", v.source],
+            ["回复草稿", "[在此撰写并检查回复。]"],
           ],
-          columns: ["Record", "Text"],
+          columns: ["记录", "文本"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-inbox-triage-desk-4", {
-    title: "Build the review queue",
+    title: "构建审阅队列",
     steps,
     caption:
-      "Counts change the queue and draft total. Categories remain separate from thread identity.",
+      "数量会改变队列与草稿总数。类别与邮件线程标识仍然分开。",
     lab: {
       controls: [
         {
           key: "action",
-          label: "Action messages",
+          label: "待行动邮件数",
           type: "range",
           value: 3,
           min: 0,
@@ -168,7 +168,7 @@
         },
         {
           key: "uncertain",
-          label: "Uncertain messages",
+          label: "不确定邮件数",
           type: "range",
           value: 2,
           min: 0,
@@ -176,7 +176,7 @@
         },
         {
           key: "information",
-          label: "Information messages",
+          label: "信息类邮件数",
           type: "range",
           value: 5,
           min: 0,
@@ -191,18 +191,18 @@
         ]);
         const count = v.action + v.uncertain + v.information;
         return {
-          summary: `Export ${count} review entries and ${count} unsent drafts.`,
+          summary: `导出 ${count} 条审阅记录和 ${count} 份未发送草稿。`,
           metrics: [
-            { label: "Draft files", value: count },
-            { label: "Messages sent", value: 0 },
+            { label: "草稿文件数", value: count },
+            { label: "已发送邮件数", value: 0 },
           ],
           bars: rows.map((r) => ({
-            label: r[1],
+            label: { action: "待行动", uncertain: "不确定", information: "信息" }[r[1]],
             value: Number(r[2]),
             max: 20,
           })),
-          rows,
-          columns: ["Priority", "Category", "Messages"],
+          rows: rows.map(([priority, category, count]) => [priority, { action: "待行动", uncertain: "不确定", information: "信息" }[category], count]),
+          columns: ["优先级", "类别", "邮件数"],
         };
       },
     },
