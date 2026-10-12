@@ -3,7 +3,7 @@ const schemas = require('../lib/agent-schemas');
 const { quality, send, problem, apiHeaders, createLimiter } = require('../lib/agent-http');
 
 const PROTOCOL = '2025-11-25';
-const VERSIONS = [PROTOCOL, '2025-03-26'];
+const VERSIONS = [PROTOCOL];
 const annotations = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
 const TOOLS = [
   { name: 'search_curriculum', description: '检索 AI Engineering from Scratch 中文版已发布的课程与项目。返回 read_resource 使用的稳定路径，不运行课程代码。', inputSchema: schemas.searchInput, outputSchema: schemas.searchOutput, annotations },
@@ -47,6 +47,8 @@ function createHandler({ queryCatalog = search, read = readResource, readTransla
     }
     if (!quality(req.headers.accept, 'application/json') || !quality(req.headers.accept, 'text/event-stream')) return problem(req, res, 406, 'representation_not_supported', 'Accept must allow application/json and text/event-stream.');
     if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) return problem(req, res, 415, 'unsupported_media_type', 'Send Content-Type: application/json.');
+    const headerVersion = req.headers['mcp-protocol-version'];
+    if (headerVersion !== undefined && !VERSIONS.includes(headerVersion)) return problem(req, res, 400, 'unsupported_protocol_version', 'Supported MCP version: ' + PROTOCOL);
     let message;
     try { message = await readBody(req); }
     catch (error) {
@@ -56,8 +58,8 @@ function createHandler({ queryCatalog = search, read = readResource, readTransla
     if (!object(message) || message.jsonrpc !== '2.0'
       || (Object.hasOwn(message, 'id') && typeof message.id !== 'string' && !(typeof message.id === 'number' && Number.isFinite(message.id)))
       || (message.params !== undefined && !object(message.params))) return rpcError(req, res, 400, null, -32600, 'Invalid Request');
-    const version = req.headers['mcp-protocol-version'] || '2025-03-26';
-    if (!VERSIONS.includes(version)) return problem(req, res, 400, 'unsupported_protocol_version', 'Supported MCP versions: ' + VERSIONS.join(', '));
+    // 初始化可从 params 协商；无状态服务的后续请求必须显式携带已协商的版本。
+    if (headerVersion === undefined && message.method !== 'initialize') return problem(req, res, 400, 'unsupported_protocol_version', 'Send MCP-Protocol-Version: ' + PROTOCOL + ' after initialization.');
     if (typeof message.method !== 'string') {
       if (Object.hasOwn(message, 'id') && (Object.hasOwn(message, 'result') !== Object.hasOwn(message, 'error'))) { res.statusCode = 202; return res.end(); }
       return rpcError(req, res, 400, null, -32600, 'Invalid Request');

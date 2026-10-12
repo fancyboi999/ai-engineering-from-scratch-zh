@@ -118,6 +118,55 @@ test('real MCP transport initializes, searches, reads and rejects unsafe or over
   const get = await fetch(base + '/mcp'); assert.equal(get.status, 405); assert.equal(get.headers.get('allow'), 'POST');
 });
 
+test('navigation Markdown includes every published lesson, glossary definition and prerequisite edge', async t => {
+  const vm = require('node:vm');
+  const data = vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../site/data.js'), 'utf8') + ';({PHASES,GLOSSARY,ROADMAP_PREREQS})');
+  const manifest = require('../site/lesson-seo.json');
+  const base = await listen(createServer(), t);
+  const readMarkdown = async route => {
+    const response = await fetch(base + route, { headers: { Accept: 'text/markdown' } });
+    assert.equal(response.status, 200, route);
+    return response.text();
+  };
+  for (const route of ['/', '/catalog']) {
+    const body = await readMarkdown(route);
+    const linked = new Set([...body.matchAll(/https:\/\/aieng-zh\.cn\/lessons\/([^\s)]+)\//g)].map(match => 'phases/' + match[1]));
+    const expected = Object.keys(manifest.lessons).filter(key => key.startsWith('phases/'));
+    assert.deepEqual([...linked].sort(), expected.sort(), route);
+    for (const phase of data.PHASES) assert.ok(body.includes(phase.name), phase.name);
+  }
+  const glossary = await readMarkdown('/glossary');
+  assert.match(glossary, new RegExp(`${data.GLOSSARY.length} 个术语`));
+  for (const term of data.GLOSSARY) {
+    assert.ok(glossary.includes(term.means), term.term);
+    assert.ok(glossary.includes('/glossary.html#' + term.slug), term.term);
+  }
+  assert.doesNotMatch(glossary, /正在加载|0\s+已索引术语/);
+  const roadmap = await readMarkdown('/roadmap');
+  for (const phase of data.PHASES) {
+    const section = roadmap.split(`## 阶段 ${String(phase.id).padStart(2, '0')}：`)[1]?.split('\n## ')[0];
+    assert.ok(section, phase.name);
+    const required = data.ROADMAP_PREREQS[phase.id] || [];
+    for (const id of required) assert.ok(section.includes(`阶段 ${String(id).padStart(2, '0')}：${data.PHASES.find(p => p.id === id).name}`), `${id} -> ${phase.id}`);
+    if (!required.length) assert.match(section, /前置阶段：无/);
+  }
+});
+
+test('MCP negotiates only the implemented revision and rejects legacy or missing version headers', async t => {
+  const base = await listen(createServer(), t);
+  const initialize = { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-03-26', capabilities: {}, clientInfo: { name: 'version-test', version: '1' } } };
+  const first = await fetch(base + '/mcp', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' }, body: JSON.stringify(initialize) });
+  assert.equal(first.status, 200); assert.equal((await first.json()).result.protocolVersion, '2025-11-25');
+  const old = await rpc(base, [{ jsonrpc: '2.0', id: 2, method: 'ping' }], { 'MCP-Protocol-Version': '2025-03-26' });
+  assert.equal(old.status, 400); assert.equal((await old.json()).code, 'unsupported_protocol_version');
+  const missing = await fetch(base + '/mcp', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' }, body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'ping' }) });
+  assert.equal(missing.status, 400); assert.equal((await missing.json()).code, 'unsupported_protocol_version');
+  const batch = await rpc(base, [{ jsonrpc: '2.0', id: 4, method: 'ping' }]);
+  assert.equal(batch.status, 400); assert.equal((await batch.json()).error.code, -32600);
+  const latest = await rpc(base, { jsonrpc: '2.0', id: 5, method: 'ping' });
+  assert.equal(latest.status, 200); assert.deepEqual((await latest.json()).result, {});
+});
+
 test('real quota enforcement returns 429 and bodyless HEAD', async t => {
   const handler = catalog.createHandler({ limit: createLimiter({ limit: 1, vercel: false }) });
   const base = await listen(http.createServer((req, res) => { req.query = {}; handler(req, res); }), t);

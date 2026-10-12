@@ -59,7 +59,7 @@ REST 使用 `/api/v1/` 和 `X-API-Version: 1`，兼容性新增沿用 v1，破�
 
 ## 托管 MCP server
 
-Streamable HTTP 地址：`https://aieng-zh.cn/mcp`。支持协议版本 `2025-11-25`、`2025-03-26`；初始化协商协议，提供 `search_curriculum` 和 `read_resource` 两个工具，并包含输入/输出 JSON Schema 和只读注解。
+Streamable HTTP 地址：`https://aieng-zh.cn/mcp`。支持协议版本 `2025-11-25`；初始化协商协议，提供 `search_curriculum` 和 `read_resource` 两个工具，并包含输入/输出 JSON Schema 和只读注解。
 
 ```json
 {
@@ -72,7 +72,7 @@ Streamable HTTP 地址：`https://aieng-zh.cn/mcp`。支持协议版本 `2025-11
 }
 ```
 
-各客户端的配置键可能不同；地址和传输协议才是集成契约。使用 POST JSON-RPC，发送 `Content-Type: application/json` 和 `Accept: application/json, text/event-stream`，初始化后携带 `MCP-Protocol-Version`。
+各客户端的配置键可能不同；地址和传输协议才是集成契约。使用 POST JSON-RPC，发送 `Content-Type: application/json` 和 `Accept: application/json, text/event-stream`，初始化可省略版本头；初始化后必须携带 `MCP-Protocol-Version: 2025-11-25`。其他版本或后续请求缺少版本头时返回 400。不接受 JSON-RPC batch。
 
 这是无状态服务：返回 JSON，通知返回 202 且无正文；GET 返回 405，不提供 SSE 长连接。没有 session ID、服务端主动请求、订阅或可恢复流。POST 正文上限为 64 KiB。有 Origin 的请求只允许 `https://aieng-zh.cn`，服务端客户端可省略 Origin。
 

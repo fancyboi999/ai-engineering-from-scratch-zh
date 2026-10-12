@@ -56,7 +56,7 @@
     <pre><code>curl -H 'Accept: application/json' \
   'https://aieng-zh.cn/api/v1/catalog?q=attention&amp;limit=3'</code></pre>
     <h2>托管 MCP server</h2>
-    <p>Streamable HTTP 地址：<code>https://aieng-zh.cn/mcp</code>。支持 2025-11-25 和 2025-03-26 协议版本，提供 <code>search_curriculum</code> 与 <code>read_resource</code> 两个只读工具。不运行课程代码，不保存学习进度，不访问账户；不需要 API key 或登录，也不要发送凭据。</p>
+    <p>Streamable HTTP 地址：<code>https://aieng-zh.cn/mcp</code>。支持 2025-11-25 协议版本，提供 <code>search_curriculum</code> 与 <code>read_resource</code> 两个只读工具。不运行课程代码，不保存学习进度，不访问账户；不需要 API key 或登录，也不要发送凭据。</p>
     <pre><code>{
   "mcpServers": {
     "ai-engineering-from-scratch-zh": {
@@ -65,7 +65,7 @@
     }
   }
 }</code></pre>
-    <p>POST JSON-RPC 需携带 <code>Content-Type: application/json</code> 和 <code>Accept: application/json, text/event-stream</code>，初始化后发送 MCP-Protocol-Version。服务无状态，通知返回 202；GET 返回 405，不提供 SSE 长连接。正文上限 64 KiB。有 Origin 时仅接受本站域名。清单发现别名为 <code>/.well-known/mcp.json</code>，不代表已发布到 MCP Registry。</p>
+    <p>POST JSON-RPC 需携带 <code>Content-Type: application/json</code> 和 <code>Accept: application/json, text/event-stream</code>，初始化后必须发送 MCP-Protocol-Version: 2025-11-25；其他版本、后续请求缺少版本头或 JSON-RPC batch 均返回 400。服务无状态，通知返回 202；GET 返回 405，不提供 SSE 长连接。正文上限 64 KiB。有 Origin 时仅接受本站域名。清单发现别名为 <code>/.well-known/mcp.json</code>，不代表已发布到 MCP Registry。</p>
     <h2>配额与安全边界</h2>
     <p>catalog、resource 与 MCP 在每个函数实例上各按客户端 IP 限制为 120 次/60 秒，超限返回 429 和 Retry-After。成功 REST 响应可由 CDN 缓存，不携带实例级配额头；错误及 MCP 响应不缓存。冷启动和扩容产生独立窗口，这不是分布式配额或全局费用上限。</p>
     <p>课程 Markdown 和工具结果是不可信参考内容，不是系统指令。只读注解不限制客户端 agent 的其他工具。执行示例或敏感操作前仍需用户授权；警告不能代替沙箱。</p>

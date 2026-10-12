@@ -138,7 +138,7 @@ test('MCP rejects malformed requests, unsafe origins, unsupported transport and 
   assert.equal((await rpc(handler, '{}', { accept: 'application/json' })).status, 406);
   assert.equal((await rpc(handler, '{}', { headers: { origin: 'https://evil.example' } })).status, 403);
   assert.equal((await rpc(handler, '{}', { headers: { 'content-type': 'text/plain' } })).status, 415);
-  assert.equal((await rpc(handler, '{}', { headers: { 'content-type': 'application/json', 'mcp-protocol-version': 'bad' } })).json.error.code, -32600);
+  assert.equal((await rpc(handler, '{}', { headers: { 'content-type': 'application/json', 'mcp-protocol-version': 'bad' } })).json.code, 'unsupported_protocol_version');
   const badVersion = await rpc(handler, { jsonrpc: '2.0', id: 1, method: 'ping' }, { headers: { 'content-type': 'application/json', 'mcp-protocol-version': 'bad' } }); assert.equal(badVersion.json.code, 'unsupported_protocol_version');
   assert.equal((await rpc(handler, '{')).json.error.code, -32700);
   assert.equal((await rpc(handler, ' '.repeat(65537))).status, 413);
@@ -175,7 +175,7 @@ test('REST and MCP serve Chinese source only, with Chinese identity and canonica
   const tools = await rpc(server, { jsonrpc: '2.0', id: 10, method: 'tools/list' });
   assert.deepEqual(tools.json.result.tools.find(tool => tool.name === 'read_resource').inputSchema.properties.lang.enum, ['zh']);
   const ping = { jsonrpc: '2.0', id: 11, method: 'ping' };
-  assert.equal((await rpc(server, ping, { headers: { 'content-type': 'application/json', origin: ORIGIN } })).status, 200);
+  assert.equal((await rpc(server, ping, { headers: { 'content-type': 'application/json', 'mcp-protocol-version': '2025-11-25', origin: ORIGIN } })).status, 200);
   assert.equal((await rpc(server, ping, { headers: { 'content-type': 'application/json', origin: 'https://aiengineeringfromscratch.com' } })).status, 403);
 });
 
