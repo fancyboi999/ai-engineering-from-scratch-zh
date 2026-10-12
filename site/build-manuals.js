@@ -620,8 +620,8 @@ ${noindex ? '<meta name="robots" content="noindex">\n' : ''}<link rel="canonical
 <meta property="og:title" content="${escapeHtml(ogTitle)}">
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:image" content="${SITE_ORIGIN}/og/${card}.png">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">
+<link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -697,6 +697,8 @@ function printPage(manual) {
 <html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">
+<link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
 <title>${escapeHtml(manual.title)}: ${escapeHtml(manual.subtitle)}</title>
 <meta name="author" content="${AUTHOR}">
 <meta name="subject" content="${escapeHtml(manual.summary)}">

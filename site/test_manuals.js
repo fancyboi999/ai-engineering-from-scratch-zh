@@ -447,6 +447,11 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
   const data = fs.readFileSync(path.join(site, 'manuals-data.js'), 'utf8');
   const print = fs.readFileSync(path.join(site, 'manual-demo-101-print.html'), 'utf8');
   for (const page of [html, index, print]) {
+    const head = page.slice(0, page.indexOf('</head>'));
+    assert.deepEqual(head.match(/<link rel="icon"[^>]*>/g) || [], [
+      '<link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">',
+      '<link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">',
+    ]);
     assert.match(page, /lang="zh-CN"/);
     assert.match(page, /https:\/\/aieng-zh\.cn\//);
     assert.doesNotMatch(page, /aiengineeringfromscratch\.com|github\.com\/rohitg00|sponsors\.html|releases\/latest\/download/);
