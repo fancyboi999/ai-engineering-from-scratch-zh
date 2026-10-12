@@ -639,6 +639,11 @@
   display: none;
 }
 
+.pj-workspace > *,
+.pj-hero-grid > * {
+  min-width: 0;
+}
+
 .pj-stage-rail {
   position: sticky;
   top: calc(var(--header-offset) + 8px);
@@ -788,6 +793,24 @@
 
 .pj-doc .pj-code {
   margin: 18px 0;
+}
+
+/* MDRender emits native pre/code, not the legacy .pj-code wrapper. */
+.pj-doc pre {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pj-doc pre code {
+  display: block;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.pj-doc :not(pre) > code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .pj-doc blockquote {
