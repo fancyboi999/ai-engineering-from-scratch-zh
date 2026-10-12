@@ -460,9 +460,9 @@ function writeMarkdown(file, { name, description, version }) {
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260831a';
-  const appRelease = '20261012a';
+  const appRelease = '20261012b';
   const styleRelease = '20260831a';
-  const navigationRelease = '20260831b';
+  const navigationRelease = '20261012b';
   const narrationRelease = '20260831a';
   const roadmapRelease = '20261012a';
   const pages = [
@@ -489,6 +489,8 @@ test('shared site asset families use the expected cache keys on every page', () 
     assert.equal(versionFor(source, 'style.css'), styleRelease, `${page} has stale style.css`);
     assert.equal(versionFor(source, 'progress.js'), release, `${page} has stale progress.js`);
     assert.equal(versionFor(source, 'header.js'), navigationRelease, `${page} has stale header.js`);
+    assert.equal(versionFor(source, 'cmdpalette.js'), '20261012b', `${page} has stale cmdpalette.js`);
+    if (source.includes('src="certifications.js')) assert.equal(versionFor(source, 'certifications.js'), '20261012b', `${page} has stale certifications.js`);
   }
 
   assert.equal(versionFor(sourceFor('index.html'), 'app.js'), appRelease);

@@ -2031,6 +2031,10 @@ function withCard(html, type, id, spec) {
   return cleaned.replace('</head>', cardTags(cardUrl(type, id, spec), spec).join('\n') + '\n</head>');
 }
 
+function versionNavigationAssets(html) {
+  return html.replace(/(\bsrc=["']\/?(?:app|header|cmdpalette|certifications)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261012b$2');
+}
+
 function stampSiteCards(cards) {
   const pages = { home: 'index', prereqs: 'prereqs', projects: 'projects', manuals: 'manuals' };
   for (const [key, spec] of Object.entries(cards)) {
@@ -2101,6 +2105,7 @@ function build() {
   const hubs = require('./build-hubs').writeHubs({
     phases, prerequisites: roadmapPrereqs, glossary: glossaryTerms,
     categories: GLOSSARY_CATEGORY_ORDER, lessonManifest: seoManifests.lessonManifest,
+    versionHtml: versionNavigationAssets,
     minutes: Object.fromEntries(phases.flatMap(phase => phase.lessons.map(lesson => {
       const rel = lessonPath(lesson.url);
       return [rel, Number(lesson.time) || lessonMinutes(rel)];
@@ -2169,6 +2174,10 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   });
   fs.writeFileSync(path.join(__dirname, 'og-cards.json'), JSON.stringify(ogCards, null, 2) + '\n');
   stampSiteCards(ogCards.cards);
+  for (const file of fs.readdirSync(__dirname).filter(name => name.endsWith('.html'))) {
+    const target = path.join(__dirname, file);
+    fs.writeFileSync(target, versionNavigationAssets(fs.readFileSync(target, 'utf8')));
+  }
   syncCounts(totalLessons, artifacts.length);
   writeSitemap(phases, glossaryTerms.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths, { projects, manuals, hubs });
