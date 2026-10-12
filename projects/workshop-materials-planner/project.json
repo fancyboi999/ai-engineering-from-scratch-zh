@@ -1,0 +1,110 @@
+{
+  "id": "workshop-materials-planner",
+  "title": "工作坊物料规划器",
+  "level": 2,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "缩放工作坊计划，准确展示缺少哪些物料。",
+  "summary": "帮助工作坊主持人核对每位参与者的材料、可复用设备和库存快照。通过显式单位转换与声明共享规则计算缺口，让无法换算数量保持可见，导出装箱清单及参与人数对比。",
+  "prerequisiteProjects": [
+    "csv-repair-workbench"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "建模参与者、材料和库存单位",
+    "分别缩放耗材与共享设备",
+    "计算缺口并审核不确定换算",
+    "导出装箱清单和参与人数情景"
+  ],
+  "youWillBuild": "packing-list.csv、shortages.json 和 HTML 假设情景规划器",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-workshop-materials-planner-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-model",
+      "title": "建模参与者、材料和库存单位",
+      "summary": "校验数量、单位和显式共享规则。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "十进制运算",
+        "单位转换"
+      ],
+      "figure": "pj-workshop-materials-planner-1"
+    },
+    {
+      "id": "02-scale",
+      "title": "分别缩放耗材与共享设备",
+      "summary": "用不同方程缩放耗材与可复用工具。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "向上取整除法",
+        "资源复用"
+      ],
+      "figure": "pj-workshop-materials-planner-2"
+    },
+    {
+      "id": "03-shortages",
+      "title": "计算缺口并审核不确定换算",
+      "summary": "核对库存，不猜未知换算。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "库存记账",
+        "不确定性"
+      ],
+      "figure": "pj-workshop-materials-planner-3"
+    },
+    {
+      "id": "04-scenarios",
+      "title": "导出装箱清单和参与人数情景",
+      "summary": "比较参与人数并导出装箱回执。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "假设情景规划",
+        "CSV 集成"
+      ],
+      "figure": "pj-workshop-materials-planner-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案每个阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "与生成的本地界面交互的上游录制。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

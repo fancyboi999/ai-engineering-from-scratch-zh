@@ -1,0 +1,108 @@
+{
+  "id": "subtitle-localization-desk",
+  "title": "字幕本地化工作台",
+  "level": 2,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "翻译字幕，同时让时间和术语保持可见。",
+  "summary": "帮助课程创作者通过词表、可选真实翻译 provider 和明确审核步骤，本地化附带 WebVTT 字幕。保留 cue 标识与时间戳，标记超过选定阅读预算的文本，导出审核后字幕和并排 HTML 工作台。",
+  "prerequisiteProjects": [],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "解析字幕 cue 并保留时间",
+    "对翻译提案应用词表",
+    "审核 cue 长度、术语和含义",
+    "导出本地化字幕和审核决策"
+  ],
+  "youWillBuild": "经审核 WebVTT 文件、translation-decisions.json 和双语 HTML 审核页",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-subtitle-localization-desk-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-cues",
+      "title": "解析字幕 cue 并保留时间",
+      "summary": "解析 cue 标识，保留精确时间字符串。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "WebVTT",
+        "定时文本"
+      ],
+      "figure": "pj-subtitle-localization-desk-1"
+    },
+    {
+      "id": "02-glossary",
+      "title": "对翻译提案应用词表",
+      "summary": "对提供的翻译提案应用经审核词表。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "术语",
+        "人工翻译"
+      ],
+      "figure": "pj-subtitle-localization-desk-2"
+    },
+    {
+      "id": "03-reading-budget",
+      "title": "审核 cue 长度、术语和含义",
+      "summary": "不移动时间戳，计算阅读压力。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "每秒字符数",
+        "质量标记"
+      ],
+      "figure": "pj-subtitle-localization-desk-3"
+    },
+    {
+      "id": "04-review-export",
+      "title": "导出本地化字幕和审核决策",
+      "summary": "输出本地化 WebVTT 前要求明确审核。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "审核决策",
+        "往返解析"
+      ],
+      "figure": "pj-subtitle-localization-desk-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案每个阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "与生成的本地界面交互的上游录制。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

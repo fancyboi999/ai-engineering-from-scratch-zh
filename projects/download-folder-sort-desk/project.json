@@ -1,0 +1,108 @@
+{
+  "id": "download-folder-sort-desk",
+  "title": "下载文件夹整理台",
+  "level": 1,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "将拥挤的文件夹变成可审核的归档计划。",
+  "summary": "结合文件元数据、内容哈希和可解释的分类评分，帮助整理本地下载文件。生成无冲突的目标提案和重复文件组，再导出 HTML 审核台和 JSON 移动计划，供其他文件管理器消费。",
+  "prerequisiteProjects": [],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "盘点文件并计算内容标识",
+    "根据可见文件特征评分分类",
+    "规划目标并暴露命名冲突",
+    "为文件管理器导出经审核的归档计划"
+  ],
+  "youWillBuild": "可搜索 HTML 归档计划、重复文件组和 moves.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-download-folder-sort-desk-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-inventory",
+      "title": "盘点文件并计算内容标识",
+      "summary": "对字节计算哈希，保留相对根目录的文件标识。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "内容标识",
+        "文件系统遍历"
+      ],
+      "figure": "pj-download-folder-sort-desk-1"
+    },
+    {
+      "id": "02-score",
+      "title": "根据可见文件特征评分分类",
+      "summary": "根据扩展名和文件名证据解释分类。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "评分",
+        "同分决胜"
+      ],
+      "figure": "pj-download-folder-sort-desk-2"
+    },
+    {
+      "id": "03-destinations",
+      "title": "规划目标并暴露命名冲突",
+      "summary": "先预留当前目标，再规划下一个文件。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "冲突处理",
+        "重复文件组"
+      ],
+      "figure": "pj-download-folder-sort-desk-3"
+    },
+    {
+      "id": "04-review",
+      "title": "为文件管理器导出经审核的归档计划",
+      "summary": "消费选定移动项前检查源文件标识。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "批准",
+        "过期数据"
+      ],
+      "figure": "pj-download-folder-sort-desk-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案每个阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "与生成的本地界面交互的上游录制。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}
