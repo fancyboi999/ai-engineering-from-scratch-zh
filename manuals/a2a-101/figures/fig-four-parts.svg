@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 384" role="img" aria-labelledby="fig-four-parts-title fig-four-parts-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-four-parts-title">四种 part</title>
+  <desc id="fig-four-parts-desc">顶部：part 恰好包含 text、raw、url、data 四个内容成员之一，每种还可带 mediaType、filename、metadata。下方为采集中的四个 part，按发送顺序排列：planner 用 raw base64 发送媒体类型 text/x-diff 的 refunds.diff 文件，code-reviewer 以 text 发送问题，以 application/json 的 data part 发送审查发现，以及 code-reviewer 用 -32005 CONTENT_TYPE_NOT_SUPPORTED 拒绝的 image/png url part。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">一个 PART 恰好包含一项</text>
+  <text x="344" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">每种都有的可选字段</text>
+  <rect x="20" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">text</text>
+  <rect x="96" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="130" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">raw</text>
+  <rect x="172" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="206" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">url</text>
+  <rect x="248" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="282" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">data</text>
+  <rect x="344" y="26" width="92" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="390" y="44.75" font-size="12.5" text-anchor="middle" font-weight="400">mediaType</text>
+  <rect x="444" y="26" width="84" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="486" y="44.75" font-size="12.5" text-anchor="middle" font-weight="400">filename</text>
+  <rect x="536" y="26" width="84" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="578" y="44.75" font-size="12.5" text-anchor="middle" font-weight="400">metadata</text>
+  <text x="20" y="76" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">采集中的四个 PART，按发送顺序</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="84" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="120.9" font-size="13" text-anchor="middle" font-weight="700">raw</text>
+  <rect x="88" y="84" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="105" font-size="11.5">LS0tIGEvcGF5bWVudHMvcmVmdW5kcy5weQor</text>
+  <text x="358.4" y="105" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">236 个 base64 字符的前 36 个</text>
+  <text x="100" y="123" font-size="11" fill="var(--m-green-ink, #336b40)">filename &quot;refunds.diff&quot;   mediaType &quot;text/x-diff&quot;</text>
+  <text x="100" y="141" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">planner 发送，五行 diff · 06-input-required.http</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="158" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="194.9" font-size="13" text-anchor="middle" font-weight="700">text</text>
+  <rect x="88" y="158" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="179" font-size="11.5">&quot;Which base branch should I compare this diff against?&quot;</text>
+  <text x="100" y="197" font-size="11" fill="var(--m-green-ink, #336b40)">mediaType 缺失：套件视为 text/plain</text>
+  <text x="100" y="215" font-size="11" class="m-serif" fill="var(--m-blue-ink, #2f5d9a)">code-reviewer 的 status.message · 06-input-required.http</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="232" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="268.9" font-size="13" text-anchor="middle" font-weight="700">data</text>
+  <rect x="88" y="232" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="253" font-size="11.5">&quot;base&quot;: &quot;main&quot;</text>
+  <text x="206.6" y="253" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">另有 findings，两个对象含 file、line、severity、finding</text>
+  <text x="100" y="271" font-size="11" fill="var(--m-green-ink, #336b40)">mediaType &quot;application/json&quot;</text>
+  <text x="100" y="289" font-size="11" class="m-serif" fill="var(--m-blue-ink, #2f5d9a)">code-reviewer 的 review.json 产物 part 2 · 06-input-required.http</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="306" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="342.9" font-size="13" text-anchor="middle" font-weight="700">url</text>
+  <rect x="88" y="306" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="327" font-size="11.5">&quot;https://example.com/screenshot.png&quot;</text>
+  <text x="100" y="345" font-size="11" fill="var(--m-green-ink, #336b40)">mediaType &quot;image/png&quot;</text>
+  <text x="100" y="363" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">planner 发送 · 11-errors.http</text>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <rect x="396" y="315" width="214" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="503" y="334.1" font-size="12" text-anchor="middle" font-weight="700">CONTENT_TYPE_NOT_SUPPORTED</text>
+  <text x="503" y="351.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">以错误 -32005 拒绝</text>
+  </g>
+</svg>

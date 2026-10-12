@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 510" role="img" aria-labelledby="fig-spec-layers-title fig-spec-layers-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-spec-layers-title">test-runner 的 A2A 协议栈</title>
+  <desc id="fig-spec-layers-desc">顶部是客户端 agent planner，含卡片缓存与接口选择。下方是 A2A 为 localhost:41241 的 test-runner 定义的三层：包含 /.well-known/agent-card.json、/a2a/jsonrpc、/a2a/rest 路径的绑定，操作，数据模型。虚线下是 test-runner 自建的 HTTP 路由器、请求处理器、任务存储、事件广播，再下面是不透明的 agent 逻辑，真实 agent 也在这里放模型与工具。</desc>
+  <defs><marker id="fig-spec-layers-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">客户端 AGENT</text>
+  <line x1="552" y1="26" x2="552" y2="90" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="548" y1="26" x2="552" y2="26" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="548" y1="90" x2="552" y2="90" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <text x="560" y="55" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">你</text>
+  <text x="560" y="69" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">构建它</text>
+  <text x="20" y="118" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A2A 协议</text>
+  <rect x="20" y="126" width="520" height="60" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>
+  <text x="28" y="143" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">卡片与</text>
+  <text x="28" y="157" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">绑定</text>
+  <rect x="20" y="192" width="520" height="60" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>
+  <text x="28" y="209" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">操作</text>
+  <rect x="20" y="258" width="520" height="46" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>
+  <text x="28" y="275" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">数据模型</text>
+  <line x1="552" y1="126" x2="552" y2="304" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="548" y1="126" x2="552" y2="126" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="548" y1="304" x2="552" y2="304" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <text x="560" y="212" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">A2A</text>
+  <text x="560" y="226" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">定义它</text>
+  <line x1="20" y1="320" x2="540" y2="320" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="344" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">TEST-RUNNER · LOCALHOST:41241</text>
+  <rect x="20" y="352" width="520" height="76" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>
+  <text x="28" y="369" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">服务器</text>
+  <rect x="20" y="434" width="520" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-plum-ink, #8a3d72)" stroke-dasharray="5 4"/>
+  <text x="28" y="451" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">agent</text>
+  <text x="28" y="465" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">逻辑</text>
+  <line x1="552" y1="352" x2="552" y2="500" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="548" y1="352" x2="552" y2="352" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="548" y1="500" x2="552" y2="500" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <text x="560" y="423" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">其维护者</text>
+  <text x="560" y="437" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">构建它</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="26" width="400" height="64" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="220" y="45.75" font-size="12.5" text-anchor="middle" font-weight="700">planner</text>
+  <text x="220" y="63.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">卡片缓存：按技能 ID 归组 agent</text>
+  <text x="220" y="78.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">接口：JSONRPC，版本 1.0</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="96" y="132" width="212" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="202" y="150.95" font-size="11.5" text-anchor="middle" font-weight="700">/.well-known/agent-card.json</text>
+  <text x="202" y="168.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">卡片，普通 GET</text>
+  <line x1="202" y1="90" x2="202" y2="131" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-spec-layers-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M202 90 L202 131" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
+  <rect class="m-knock" x="207" y="99.53" width="47.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="210" y="110.5" font-size="11.5">GET 卡片</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <rect x="316" y="132" width="112" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="372" y="150.95" font-size="11.5" text-anchor="middle" font-weight="700">/a2a/jsonrpc</text>
+  <text x="372" y="168.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">JSONRPC 1.0</text>
+  <rect x="436" y="132" width="96" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="484" y="150.95" font-size="11.5" text-anchor="middle" font-weight="700">/a2a/rest</text>
+  <text x="484" y="168.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTP+JSON 1.0</text>
+  <line x1="372" y1="90" x2="372" y2="131" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-spec-layers-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M372 90 L372 131" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
+  <rect class="m-knock" x="377" y="99.53" width="116.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="380" y="110.5" font-size="11.5">POST SendMessage</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <text x="110" y="209" font-size="11">SendMessage · SendStreamingMessage · GetTask</text>
+  <text x="110" y="224" font-size="11">ListTasks · CancelTask · SubscribeToTask</text>
+  <text x="110" y="239" font-size="11">4 种推送配置操作 · GetExtendedAgentCard</text>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <text x="110" y="276" font-size="11">AgentCard · Task · TaskStatus · Message · Part</text>
+  <text x="110" y="291" font-size="11">Artifact · TaskStatusUpdateEvent · TaskArtifactUpdateEvent</text>
+  </g>
+  <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
+  <rect x="84" y="358" width="100" height="64" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="134" y="377.6" font-size="12" text-anchor="middle" font-weight="700">HTTP 路由器</text>
+  <text x="134" y="394.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Handler</text>
+  <text x="134" y="409.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">路由 3 个路径</text>
+  <rect x="190" y="358" width="120" height="64" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="250" y="377.6" font-size="12" text-anchor="middle" font-weight="700">请求处理器</text>
+  <text x="250" y="394.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Agent.send</text>
+  <text x="250" y="409.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">创建任务</text>
+  <rect x="316" y="358" width="92" height="64" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="362" y="377.6" font-size="12" text-anchor="middle" font-weight="700">任务存储</text>
+  <text x="362" y="394.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Agent.tasks</text>
+  <text x="362" y="409.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">内存中</text>
+  <rect x="414" y="358" width="118" height="64" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="473" y="377.6" font-size="12" text-anchor="middle" font-weight="700">广播</text>
+  <text x="473" y="394.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Agent.broadcast</text>
+  <text x="473" y="409.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">SSE 和 webhook</text>
+  </g>
+  <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
+  <rect x="84" y="442" width="150" height="50" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="159" y="462.1" font-size="12" text-anchor="middle" font-weight="700">run_tests()</text>
+  <text x="159" y="479.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">capture/agents.py</text>
+  <rect x="242" y="442" width="120" height="50" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)" stroke-dasharray="5 4"/>
+  <text x="302" y="462.1" font-size="12" text-anchor="middle" font-weight="700">模型</text>
+  <text x="302" y="479.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">套件未包含</text>
+  <rect x="370" y="442" width="162" height="50" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)" stroke-dasharray="5 4"/>
+  <text x="451" y="462.1" font-size="12" text-anchor="middle" font-weight="700">Git、容器</text>
+  <text x="451" y="479.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">套件未包含</text>
+  </g>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 384" role="img" aria-labelledby="fig-message-fields-title fig-message-fields-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-message-fields-title">消息各字段由谁设置</title>
+  <desc id="fig-message-fields-desc">表格展示 06-input-required.http 审查三条消息的八个 Message 字段，按发送顺序逐列出现。planner 首条消息 14a03569 没有 contextId 和 taskId。code-reviewer 问题 46494a30 带 contextId 49c5a238、taskId e5c95b09。planner 回答 096d3737 回传两个 ID。角色为 ROLE_USER、ROLE_AGENT、ROLE_USER。三条均未设置 metadata、extensions、referenceTaskIds。右列说明谁设置各字段，最后注释说明服务器将两个 ID 写入保存的首条消息副本。</desc>
+  <text x="28" y="34" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">字段</text>
+  <text x="452" y="34" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">设置者</text>
+  <rect x="20" y="48" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <circle cx="30" cy="65" r="3" fill="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="40" y="69" font-size="12" font-weight="700">messageId</text>
+  <text x="452" y="62" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者生成</text>
+  <text x="452" y="76" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每条消息各一个</text>
+  <rect x="20" y="82" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="40" y="103" font-size="12">contextId</text>
+  <text x="452" y="96" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器生成，</text>
+  <text x="452" y="110" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端回传</text>
+  <rect x="20" y="116" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="40" y="137" font-size="12">taskId</text>
+  <text x="452" y="130" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器生成，</text>
+  <text x="452" y="144" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回传以继续任务</text>
+  <rect x="20" y="150" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <circle cx="30" cy="167" r="3" fill="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="40" y="171" font-size="12" font-weight="700">role</text>
+  <text x="452" y="164" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">方向：</text>
+  <text x="452" y="178" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端到服务器为 USER</text>
+  <rect x="20" y="184" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <circle cx="30" cy="201" r="3" fill="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="40" y="205" font-size="12" font-weight="700">parts</text>
+  <text x="452" y="198" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者，至少</text>
+  <text x="452" y="212" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个 part</text>
+  <rect x="20" y="218" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
+  <text x="40" y="236" font-size="12" fill="var(--m-ink-mute, #6f6f6a)">metadata</text>
+  <text x="304" y="236" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">套件采集均未设置</text>
+  <text x="452" y="236" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者：JSON 对象</text>
+  <rect x="20" y="246" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
+  <text x="40" y="264" font-size="12" fill="var(--m-ink-mute, #6f6f6a)">extensions</text>
+  <text x="304" y="264" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">套件采集均未设置</text>
+  <text x="452" y="264" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者：扩展 URI</text>
+  <rect x="20" y="274" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
+  <text x="40" y="292" font-size="12" fill="var(--m-ink-mute, #6f6f6a)">referenceTaskIds</text>
+  <text x="304" y="292" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">套件采集均未设置</text>
+  <text x="452" y="292" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者：相关任务</text>
+  <line x1="160" y1="48" x2="160" y2="218" stroke="var(--m-panel-edge, #e4e1d4)" stroke-width="1"/>
+  <line x1="256" y1="48" x2="256" y2="218" stroke="var(--m-panel-edge, #e4e1d4)" stroke-width="1"/>
+  <line x1="352" y1="48" x2="352" y2="218" stroke="var(--m-panel-edge, #e4e1d4)" stroke-width="1"/>
+  <line x1="448" y1="48" x2="448" y2="218" stroke="var(--m-panel-edge, #e4e1d4)" stroke-width="1"/>
+  <circle cx="30" cy="364" r="3" fill="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="40" y="368" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">proto Message 中为 REQUIRED</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="160" y="10" width="96" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="208" y="27" font-size="11.5" text-anchor="middle" font-weight="700">planner</text>
+  <text x="208" y="42" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首条消息</text>
+  <text x="208" y="69" font-size="11" text-anchor="middle">14a03569</text>
+  <text x="208" y="103" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">省略</text>
+  <text x="208" y="137" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">省略</text>
+  <text x="208" y="171" font-size="11" text-anchor="middle">ROLE_USER</text>
+  <text x="208" y="205" font-size="11" text-anchor="middle">text, raw</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="256" y="10" width="96" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="304" y="27" font-size="11.5" text-anchor="middle" font-weight="700">code-reviewer</text>
+  <text x="304" y="42" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">它的问题</text>
+  <text x="304" y="69" font-size="11" text-anchor="middle">46494a30</text>
+  <text x="304" y="103" font-size="11" text-anchor="middle">49c5a238</text>
+  <text x="304" y="137" font-size="11" text-anchor="middle">e5c95b09</text>
+  <text x="304" y="171" font-size="11" text-anchor="middle">ROLE_AGENT</text>
+  <text x="304" y="205" font-size="11" text-anchor="middle">text</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <rect x="352" y="10" width="96" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="400" y="27" font-size="11.5" text-anchor="middle" font-weight="700">planner</text>
+  <text x="400" y="42" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回答</text>
+  <text x="400" y="69" font-size="11" text-anchor="middle">096d3737</text>
+  <text x="400" y="103" font-size="11" text-anchor="middle">49c5a238</text>
+  <text x="400" y="137" font-size="11" text-anchor="middle">e5c95b09</text>
+  <text x="400" y="171" font-size="11" text-anchor="middle">ROLE_USER</text>
+  <text x="400" y="205" font-size="11" text-anchor="middle">text &quot;main&quot;</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="328" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器将 contextId 49c5a238 和 taskId e5c95b09 写入其保存的</text>
+  <text x="20" y="343" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首条消息副本，planner 发送原消息时没有这两个字段。</text>
+  </g>
+</svg>

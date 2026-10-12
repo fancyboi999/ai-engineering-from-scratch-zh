@@ -1,0 +1,333 @@
+{
+  "id": "a2a-101",
+  "title": "A2A 101",
+  "subtitle": "Agent2Agent 协议：从用途到每个请求与响应",
+  "summary": "一个 agent 如何将工作交给内部不可见的另一个 agent。本手册的每个请求、响应和流事件均来自录制运行。",
+  "audience": "你是工程师，已构建过调用工具或模型 API 的 agent，熟悉 HTTP 和 JSON，但尚未读过 A2A 规范。",
+  "edition": "2026.10",
+  "status": "ready",
+  "pin": {
+    "subject": "A2A 协议",
+    "version": "1.0.1",
+    "source": "https://github.com/a2aproject/A2A",
+    "commit": "3303592",
+    "date": "2026-05-28",
+    "verified": "2026-10-06"
+  },
+  "outcomes": [
+    "阅读 agent 卡片，在发送任何内容前说明 agent 提供什么、如何访问以及有什么要求。",
+    "判断运行中任意时刻的任务状态，以及客户端下一步允许做什么。",
+    "根据工作选择阻塞调用、轮询、流式传输或推送通知。",
+    "逐行读懂任一种 JSON 绑定中的 A2A 请求、响应或流帧。",
+    "说出客户端必须处理的错误，以及服务器可能无意违反的规则。"
+  ],
+  "palette": [
+    {
+      "hue": "violet",
+      "meaning": "客户端 agent 及其发送内容"
+    },
+    {
+      "hue": "blue",
+      "meaning": "远程 agent、卡片和返回消息"
+    },
+    {
+      "hue": "green",
+      "meaning": "part 与产物：任务产生的内容"
+    },
+    {
+      "hue": "amber",
+      "meaning": "任务、任务状态及转换"
+    },
+    {
+      "hue": "teal",
+      "meaning": "服务器存储的任务记录"
+    },
+    {
+      "hue": "indigo",
+      "meaning": "流、订阅与推送通知"
+    },
+    {
+      "hue": "plum",
+      "meaning": "agent 内部的模型或逻辑，A2A 从不展示"
+    },
+    {
+      "hue": "olive",
+      "meaning": "agent 自行调用的工具和系统：CI、Git、MCP 服务器"
+    },
+    {
+      "hue": "rose",
+      "meaning": "错误、失败、拒绝和取消"
+    },
+    {
+      "hue": "grey",
+      "meaning": "操作员、宿主以及协议之外的一切"
+    }
+  ],
+  "sources": [
+    {
+      "name": "协议定义",
+      "path": "specification/a2a.proto at v1.0.1",
+      "usedFor": "所有对象、字段、枚举值和方法，引用键为 proto"
+    },
+    {
+      "name": "规范",
+      "path": "docs/specification.md at v1.0.1",
+      "usedFor": "所有规则，逐字引用，引用键为 spec §N"
+    },
+    {
+      "name": "main 分支规范",
+      "path": "docs/specification.md at main 679ab3a (2026-10-05)",
+      "usedFor": "v1.0.1 之后新增的规则，逐字引用并标为未发布，引用键为 spec-main §N"
+    },
+    {
+      "name": "项目文档（随附副本）",
+      "path": "research/sources/docs.md",
+      "usedFor": "项目页面的原文引述，逐字核对"
+    },
+    {
+      "name": "参考 SDK",
+      "path": "a2a-python v1.2.2",
+      "usedFor": "规范未规定时生产实现的行为，引用键为 sdk"
+    },
+    {
+      "name": "采集套件",
+      "path": "manuals/a2a-101/capture/",
+      "usedFor": "展示的每个请求、响应和流帧，按文件引用"
+    }
+  ],
+  "quoteSources": {
+    "spec": "research/sources/specification.md",
+    "proto": "research/sources/a2a.proto",
+    "docs": "research/sources/docs.md",
+    "sdk": null,
+    "spec-main": "research/sources/specification-main.md"
+  },
+  "capture": {
+    "run": [
+      "python3",
+      "capture/run.py"
+    ],
+    "check": [
+      "python3",
+      "capture/run.py",
+      "--check"
+    ]
+  },
+  "front": "front.md",
+  "plate": {
+    "figure": "plate-planner-run",
+    "title": "一个 planner，三个远程 agent",
+    "caption": "planner 读取三张卡片并委派三个任务：一个立即完成，一个回答问题后完成，一个操作员批准后完成。泳道按 capture/out/19-planner.log 的顺序从上到下排列，ID 缩短至 8 个字符。"
+  },
+  "parts": [
+    {
+      "number": 1,
+      "title": "一页看懂协议",
+      "thesis": "A2A 标准化 agent 如何发现其他 agent、交付工作及跟踪工作，agent 自身不在范围内。",
+      "accent": "blue",
+      "sections": [
+        {
+          "id": "1.1",
+          "file": "sections/1-1-what-a2a-standardizes.md"
+        },
+        {
+          "id": "1.2",
+          "file": "sections/1-2-one-task-request-by-request.md"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "AgentCard",
+      "thesis": "客户端发送消息前，AgentCard 说明 agent 提供什么、如何访问以及有什么要求。",
+      "accent": "violet",
+      "sections": [
+        {
+          "id": "2.1",
+          "file": "sections/2-1-agentcard-fields.md"
+        },
+        {
+          "id": "2.2",
+          "file": "sections/2-2-discovery-and-supported-interfaces.md"
+        },
+        {
+          "id": "2.3",
+          "file": "sections/2-3-extended-cards-and-signatures.md"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "数据模型",
+      "thesis": "每次 A2A 交换都由五种对象构成：Message、Part、Artifact、Task，以及归组任务的 contextId。",
+      "accent": "green",
+      "sections": [
+        {
+          "id": "3.1",
+          "file": "sections/3-1-message.md"
+        },
+        {
+          "id": "3.2",
+          "file": "sections/3-2-part.md"
+        },
+        {
+          "id": "3.3",
+          "file": "sections/3-3-artifact-and-chunks.md"
+        },
+        {
+          "id": "3.4",
+          "file": "sections/3-4-task-and-task-state.md"
+        },
+        {
+          "id": "3.5",
+          "file": "sections/3-5-context-id.md"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "操作",
+      "thesis": "十一种操作创建、读取、取消和跟踪任务，客户端调用前必须理解各自规则。",
+      "accent": "amber",
+      "sections": [
+        {
+          "id": "4.1",
+          "file": "sections/4-1-send-message.md"
+        },
+        {
+          "id": "4.2",
+          "file": "sections/4-2-input-required-and-auth-required.md"
+        },
+        {
+          "id": "4.3",
+          "file": "sections/4-3-get-task-and-list-tasks.md"
+        },
+        {
+          "id": "4.4",
+          "file": "sections/4-4-cancel-task-and-terminal-states.md"
+        },
+        {
+          "id": "4.5",
+          "file": "sections/4-5-streaming-and-subscribe-to-task.md"
+        },
+        {
+          "id": "4.6",
+          "file": "sections/4-6-push-notification-configs.md"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "绑定",
+      "thesis": "相同操作通过 JSON-RPC、HTTP+JSON、gRPC 传输，三者共享两个头和同一错误模型。",
+      "accent": "indigo",
+      "sections": [
+        {
+          "id": "5.1",
+          "file": "sections/5-1-json-rpc.md"
+        },
+        {
+          "id": "5.2",
+          "file": "sections/5-2-http-json.md"
+        },
+        {
+          "id": "5.3",
+          "file": "sections/5-3-grpc.md"
+        },
+        {
+          "id": "5.4",
+          "file": "sections/5-4-version-and-extension-headers.md"
+        },
+        {
+          "id": "5.5",
+          "file": "sections/5-5-errors.md"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "安全与扩展",
+      "thesis": "卡片声明认证方式和适用扩展，规范列出双方必须检查的内容。",
+      "accent": "plum",
+      "sections": [
+        {
+          "id": "6.1",
+          "file": "sections/6-1-security-schemes-and-in-task-authorization.md"
+        },
+        {
+          "id": "6.2",
+          "file": "sections/6-2-extensions.md"
+        },
+        {
+          "id": "6.3",
+          "file": "sections/6-3-security-requirements.md"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "实现 A2A",
+      "thesis": "客户端与服务器遵循前面各部分的规则，官方测试套件按规则检查服务器。",
+      "accent": "teal",
+      "sections": [
+        {
+          "id": "7.1",
+          "file": "sections/7-1-a-client.md"
+        },
+        {
+          "id": "7.2",
+          "file": "sections/7-2-a-server.md"
+        },
+        {
+          "id": "7.3",
+          "file": "sections/7-3-conformance-testing.md"
+        },
+        {
+          "id": "7.4",
+          "file": "sections/7-4-from-0-3-to-1-0.md"
+        }
+      ]
+    }
+  ],
+  "reference": {
+    "title": "参考",
+    "accent": "grey",
+    "thesis": "查阅手册中所有名称的表格。",
+    "summary": "按绑定列出的操作、对象与字段、任务状态、错误、术语表、来源以及图表索引。",
+    "sections": [
+      {
+        "id": "R.1",
+        "file": "sections/r-1-operations-by-binding.md"
+      },
+      {
+        "id": "R.2",
+        "file": "sections/r-2-objects-and-fields.md"
+      },
+      {
+        "id": "R.3",
+        "file": "sections/r-3-task-states.md"
+      },
+      {
+        "id": "R.4",
+        "file": "sections/r-4-errors.md"
+      },
+      {
+        "id": "R.5",
+        "file": "sections/r-5-glossary.md"
+      },
+      {
+        "id": "R.6",
+        "file": "sections/r-6-sources.md"
+      },
+      {
+        "id": "R.7",
+        "file": "sections/r-7-index-of-figures.md"
+      }
+    ]
+  },
+  "related": [
+    "phases/13-tools-and-protocols/19-a2a-protocol",
+    "phases/16-multi-agent-and-swarms/12-a2a-protocol",
+    "phases/13-tools-and-protocols/06-mcp-fundamentals"
+  ]
+}

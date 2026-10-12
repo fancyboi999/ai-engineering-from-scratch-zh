@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 444" role="img" aria-labelledby="fig-trust-boundaries-title fig-trust-boundaries-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-trust-boundaries-title">套件中的信任边界</title>
+  <desc id="fig-trust-boundaries-desc">六行按 planner 遇到的顺序展示套件双方之间的数据跨界位置。agent 卡片：伪造卡片将消息送往别处，planner 因此通过 HTTPS 验证签名。回复 part 如 review.json：文本可能写成指令，planner 验证 data part，按有类型字段决策。文件与 URL part：恶意文件或 agent 获取任意 URL，agent 检查类型、大小和 URL。webhook URL：SSRF，agent 拒绝私有主机。入站通知：伪造，planner 检查 Authorization 和任务 ID。存储记录：秘密明文保存，agent 脱敏、限定读取范围并设置保留期。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">数据跨界位置</text>
+  <text x="232" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">威胁</text>
+  <text x="432" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">检查</text>
+  <rect x="232" y="422" width="14" height="12" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="252" y="432" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">planner 检查</text>
+  <rect x="432" y="422" width="14" height="12" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="452" y="432" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">远程 agent 检查</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="28" width="200" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="120" y="48.1" font-size="12" text-anchor="middle" font-weight="700">agent 卡片</text>
+  <text x="120" y="65.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">/.well-known/agent-card.json</text>
+  <rect x="232" y="28" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="326" y="48.1" font-size="12" text-anchor="middle" font-weight="700">伪造卡片</text>
+  <text x="326" y="65.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">消息发往其端点</text>
+  <rect x="432" y="28" width="188" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="526" y="48.1" font-size="12" text-anchor="middle" font-weight="700">验证签名</text>
+  <text x="526" y="65.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kid deployer-key-1, HTTPS</text>
+  <line x1="220" y1="53" x2="232" y2="53" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="420" y1="53" x2="432" y2="53" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="94" width="200" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="120" y="114.1" font-size="12" text-anchor="middle" font-weight="700">回复中的 part</text>
+  <text x="120" y="131.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">review.json, test-log.txt</text>
+  <rect x="232" y="94" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="326" y="114.1" font-size="12" text-anchor="middle" font-weight="700">注入指令</text>
+  <text x="326" y="131.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">看起来像指令的文本</text>
+  <rect x="432" y="94" width="188" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="526" y="114.1" font-size="12" text-anchor="middle" font-weight="700">验证 data part</text>
+  <text x="526" y="131.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">按有类型字段决策</text>
+  <line x1="220" y1="119" x2="232" y2="119" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="420" y1="119" x2="432" y2="119" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="160" width="200" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="120" y="180.1" font-size="12" text-anchor="middle" font-weight="700">文件与 URL part</text>
+  <text x="120" y="197.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">refunds.diff, screenshot.png</text>
+  <rect x="232" y="160" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="326" y="180.1" font-size="12" text-anchor="middle" font-weight="700">恶意文件、SSRF</text>
+  <text x="326" y="197.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agent 获取任意 URL</text>
+  <rect x="432" y="160" width="188" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="526" y="180.1" font-size="12" text-anchor="middle" font-weight="700">检查类型与大小</text>
+  <text x="526" y="197.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先验证 URL</text>
+  <line x1="220" y1="185" x2="232" y2="185" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="420" y1="185" x2="432" y2="185" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="226" width="200" height="50" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="120" y="246.1" font-size="12" text-anchor="middle" font-weight="700">webhook URL</text>
+  <text x="120" y="263.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">localhost:41250/a2a-events</text>
+  <rect x="232" y="226" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="326" y="246.1" font-size="12" text-anchor="middle" font-weight="700">SSRF</text>
+  <text x="326" y="263.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">推送到内部主机</text>
+  <rect x="432" y="226" width="188" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="526" y="246.1" font-size="12" text-anchor="middle" font-weight="700">拒绝私有主机</text>
+  <text x="526" y="263.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或维护允许列表</text>
+  <line x1="220" y1="251" x2="232" y2="251" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="420" y1="251" x2="432" y2="251" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="292" width="200" height="50" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="120" y="312.1" font-size="12" text-anchor="middle" font-weight="700">POST /a2a-events</text>
+  <text x="120" y="329.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">通知到达</text>
+  <rect x="232" y="292" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="326" y="312.1" font-size="12" text-anchor="middle" font-weight="700">伪造通知</text>
+  <text x="326" y="329.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">按假事件行动</text>
+  <rect x="432" y="292" width="188" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="526" y="312.1" font-size="12" text-anchor="middle" font-weight="700">检查 Authorization</text>
+  <text x="526" y="329.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">且 taskId 属于你</text>
+  <line x1="220" y1="317" x2="232" y2="317" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="420" y1="317" x2="432" y2="317" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="358" width="200" height="50" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="120" y="378.1" font-size="12" text-anchor="middle" font-weight="700">存储记录</text>
+  <text x="120" y="395.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">历史、配置、日志</text>
+  <rect x="232" y="358" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="326" y="378.1" font-size="12" text-anchor="middle" font-weight="700">秘密明文保存</text>
+  <text x="326" y="395.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回传 hook_secret_91d2</text>
+  <rect x="432" y="358" width="188" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="526" y="378.1" font-size="12" text-anchor="middle" font-weight="700">脱敏，限定读取范围</text>
+  <text x="526" y="395.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">设置保留策略</text>
+  <line x1="220" y1="383" x2="232" y2="383" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="420" y1="383" x2="432" y2="383" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 430" role="img" aria-labelledby="fig-guarantees-title fig-guarantees-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-guarantees-title">A2A 的保证与宿主的实现</title>
+  <desc id="fig-guarantees-desc">两列六行。左侧为 A2A 规范保证：已知路径的卡片、声明安全方案并在 HTTP 头传凭据、任务 ID 和不可再变化的已结束状态、每条流有序事件及 webhook 至少尝试一次、服务器保留期间可 GetTask 读取、四种带媒体类型的 part。右侧灰色为宿主实现：信任哪些 agent、签发凭据、批准范围、恰好一次效果、自己的任务记录及保留策略、相信什么内容。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · 协议保证</text>
+  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · 宿主实现</text>
+  <line x1="320" y1="8" x2="320" y2="422" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="30" width="284" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="162" y="50.25" font-size="12.5" text-anchor="middle" font-weight="700">已知路径上的卡片</text>
+  <text x="162" y="67.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">/.well-known/agent-card.json</text>
+  <rect x="336" y="30" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="50.25" font-size="12.5" text-anchor="middle" font-weight="700">信任哪些 agent</text>
+  <text x="478" y="67.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">注册中心、允许列表、签名密钥</text>
+  <line x1="304" y1="55" x2="336" y2="55" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="96" width="284" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="162" y="116.25" font-size="12.5" text-anchor="middle" font-weight="700">声明的安全方案</text>
+  <text x="162" y="133.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTP 头传输凭据</text>
+  <rect x="336" y="96" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="116.25" font-size="12.5" text-anchor="middle" font-weight="700">签发凭据</text>
+  <text x="478" y="133.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">token、OAuth、操作员渠道</text>
+  <line x1="304" y1="121" x2="336" y2="121" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="162" width="284" height="50" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="162" y="182.25" font-size="12.5" text-anchor="middle" font-weight="700">任务 ID 与状态</text>
+  <text x="162" y="199.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已结束任务不再变化</text>
+  <rect x="336" y="162" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="182.25" font-size="12.5" text-anchor="middle" font-weight="700">一次批准允许什么</text>
+  <text x="478" y="199.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">授权策略与审计</text>
+  <line x1="304" y1="187" x2="336" y2="187" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="228" width="284" height="50" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="162" y="248.25" font-size="12.5" text-anchor="middle" font-weight="700">每条流的有序事件</text>
+  <text x="162" y="265.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个 webhook 至少尝试一次</text>
+  <rect x="336" y="228" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="248.25" font-size="12.5" text-anchor="middle" font-weight="700">恰好一次的效果</text>
+  <text x="478" y="265.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">去重与幂等处理器</text>
+  <line x1="304" y1="253" x2="336" y2="253" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="294" width="284" height="50" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="162" y="314.25" font-size="12.5" text-anchor="middle" font-weight="700">保留期间可 GetTask</text>
+  <text x="162" y="331.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未规定保留期</text>
+  <rect x="336" y="294" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="314.25" font-size="12.5" text-anchor="middle" font-weight="700">自己的任务记录</text>
+  <text x="478" y="331.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">保留、历史、清除</text>
+  <line x1="304" y1="319" x2="336" y2="319" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+  <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="360" width="284" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="162" y="380.25" font-size="12.5" text-anchor="middle" font-weight="700">四种 part</text>
+  <text x="162" y="397.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">各有媒体类型</text>
+  <rect x="336" y="360" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="380.25" font-size="12.5" text-anchor="middle" font-weight="700">相信什么内容</text>
+  <text x="478" y="397.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">验证与注入检查</text>
+  <line x1="304" y1="385" x2="336" y2="385" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  </g>
+</svg>

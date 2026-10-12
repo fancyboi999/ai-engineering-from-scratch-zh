@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 452" role="img" aria-labelledby="fig-history-and-pages-title fig-history-and-pages-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-history-and-pages-title">历史规则与列表分页</title>
+  <desc id="fig-history-and-pages-desc">顶部为审查任务 e5c95b09 的存储历史，history[0] 至 history[3] 四条消息，另有从不属于历史的当前状态消息 2 findings。historyLength 未设置时 GetTask 返回全部四条，值为 1 时只返回 history[3]，为 0 时无 history 字段。底部为 test-runner 的五个任务，按状态时间戳最新优先排序。pageSize 2 的 ListTasks 先返回 f22ed7af、8ae21dcb，再返回 728ba084、d0c28826，每页末尾是不透明的下一页游标 token。第五个任务 3d8f7801 未被请求。两页都没有产物或历史。第三次调用按 TASK_STATE_CANCELED 过滤，不带 historyLength，得到 f22ed7af 及完整历史。</desc>
+  <text x="20" y="16" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · 历史</text>
+  <text x="126" y="16" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GetTask 读取 code-reviewer 的审查任务 e5c95b09</text>
+  <text x="560" y="16" font-size="11" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">historyLength</text>
+  <text x="530" y="36" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">未设置</text>
+  <text x="590" y="36" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1</text>
+  <line x1="20" y1="230" x2="620" y2="230" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="250" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · 分页</text>
+  <text x="112" y="250" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ListTasks 读取 test-runner，pageSize 2、historyLength 0</text>
+  <text x="32" y="272" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">id</text>
+  <text x="118" y="272" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">state</text>
+  <text x="300" y="272" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">status.timestamp</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="44" width="600" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="60" font-size="11" fill="var(--m-teal-ink, #18696a)">history[0]</text>
+  <text x="104" y="60" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">ROLE_USER</text>
+  <text x="184" y="60" font-size="11" class="m-serif">Review this diff of payments-api. + refunds.diff</text>
+  <rect x="20" y="68" width="600" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="84" font-size="11" fill="var(--m-teal-ink, #18696a)">history[1]</text>
+  <text x="104" y="84" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">ROLE_AGENT</text>
+  <text x="184" y="84" font-size="11" class="m-serif">Which base branch should I compare this diff against?</text>
+  <rect x="20" y="92" width="600" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="108" font-size="11" fill="var(--m-teal-ink, #18696a)">history[2]</text>
+  <text x="104" y="108" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">ROLE_USER</text>
+  <text x="184" y="108" font-size="11" class="m-serif">main</text>
+  <rect x="20" y="116" width="600" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="132" font-size="11" fill="var(--m-teal-ink, #18696a)">history[3]</text>
+  <text x="104" y="132" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">ROLE_AGENT</text>
+  <text x="184" y="132" font-size="11" class="m-serif">Comparing the diff against main</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="148" width="600" height="24" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="30" y="164" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">status.message</text>
+  <text x="184" y="164" font-size="11" class="m-serif">2 findings，每次返回，不在历史中</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <text x="30" y="192" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">返回的历史消息</text>
+  <circle cx="530" cy="56" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <circle cx="530" cy="80" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <circle cx="530" cy="104" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <circle cx="530" cy="128" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <circle cx="530" cy="160" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <text x="530" y="192" font-size="12" text-anchor="middle" font-weight="700">4</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <circle cx="590" cy="128" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <circle cx="590" cy="160" r="3.5" fill="var(--m-ink, #1a1a1a)"/>
+  <text x="590" y="192" font-size="12" text-anchor="middle" font-weight="700">1</text>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <text x="30" y="214" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">04-polling.http 的任务 d0c28826，historyLength 0：回复完全没有 history 字段</text>
+  </g>
+  <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="280" width="440" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="32" y="296" font-size="11.5">f22ed7af</text>
+  <text x="118" y="296" font-size="11.5" fill="var(--m-amber-ink, #85590c)">TASK_STATE_CANCELED</text>
+  <text x="300" y="296" font-size="11.5" fill="var(--m-teal-ink, #18696a)">09:00:03.750</text>
+  <rect x="20" y="304" width="440" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="32" y="320" font-size="11.5">8ae21dcb</text>
+  <text x="118" y="320" font-size="11.5" fill="var(--m-amber-ink, #85590c)">TASK_STATE_FAILED</text>
+  <text x="300" y="320" font-size="11.5" fill="var(--m-teal-ink, #18696a)">09:00:03.000</text>
+  <rect x="20" y="328" width="440" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="32" y="344" font-size="11.5">728ba084</text>
+  <text x="118" y="344" font-size="11.5" fill="var(--m-amber-ink, #85590c)">TASK_STATE_COMPLETED</text>
+  <text x="300" y="344" font-size="11.5" fill="var(--m-teal-ink, #18696a)">09:00:02.250</text>
+  <rect x="20" y="352" width="440" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="32" y="368" font-size="11.5">d0c28826</text>
+  <text x="118" y="368" font-size="11.5" fill="var(--m-amber-ink, #85590c)">TASK_STATE_COMPLETED</text>
+  <text x="300" y="368" font-size="11.5" fill="var(--m-teal-ink, #18696a)">09:00:01.500</text>
+  <rect x="20" y="376" width="440" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)" stroke-dasharray="5 4"/>
+  <text x="32" y="392" font-size="11.5" fill="var(--m-ink-mute, #6f6f6a)">3d8f7801</text>
+  <text x="118" y="392" font-size="11.5" fill="var(--m-ink-mute, #6f6f6a)">TASK_STATE_COMPLETED</text>
+  <text x="300" y="392" font-size="11.5" fill="var(--m-ink-mute, #6f6f6a)">09:00:00.750</text>
+  </g>
+  <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
+  <rect x="470" y="280" width="150" height="48" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="545" y="298.95" font-size="11.5" text-anchor="middle" font-weight="700">第 1 页</text>
+  <text x="545" y="316.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">返回游标 1</text>
+  </g>
+  <g data-beat="8"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/>
+  <rect x="470" y="328" width="150" height="48" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="545" y="346.95" font-size="11.5" text-anchor="middle" font-weight="700">第 2 页</text>
+  <text x="545" y="364.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">返回游标 2</text>
+  </g>
+  <g data-beat="9"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.914;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.914;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.25s" begin="indefinite" fill="freeze"/>
+  <rect x="470" y="376" width="150" height="24" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
+  <text x="545" y="391.45" font-size="11.5" text-anchor="middle" font-weight="700">未请求</text>
+  <text x="30" y="418" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两页 totalSize 都为 5，任务均无产物或历史</text>
+  <text x="30" y="438" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">按 TASK_STATE_CANCELED 过滤，不带 historyLength：f22ed7af、完整历史、token &quot;&quot;</text>
+  </g>
+</svg>
