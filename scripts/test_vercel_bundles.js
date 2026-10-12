@@ -40,7 +40,7 @@ async function main() {
     if (typeof handler === 'function') await handler(req, res);
     else {
       const request = new Request(url, { method: req.method, headers: req.headers, ...(req.method === 'GET' || req.method === 'HEAD' ? {} : { body: req, duplex: 'half' }) });
-      const response = await handler.fetch(request);
+      const response = await handler.fetch(request, { socket: req.socket });
       res.writeHead(response.status, Object.fromEntries(response.headers));
       res.end(Buffer.from(await response.arrayBuffer()));
     }

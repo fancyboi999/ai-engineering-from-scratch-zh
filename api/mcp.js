@@ -112,27 +112,29 @@ function createHandler({ queryCatalog = search, read = readResource, readTransla
   };
 }
 
-const handler = createHandler();
-
-// Web Standard Request 保留原始正文流，按字节执行上限，不使用平台的已解析 JSON。
-async function fetchHandler(request) {
-  const req = {
-    method: request.method,
-    headers: Object.fromEntries(request.headers),
-    async *[Symbol.asyncIterator]() {
-      if (request.body) yield* request.body;
-    },
+function createFetchHandler(options) {
+  const handler = createHandler(options);
+  // Web Request 保留原始正文流；本地 socket 只由非 HTTP 的可信桥接上下文提供。
+  return async function fetchHandler(request, context) {
+    const req = {
+      method: request.method,
+      headers: Object.fromEntries(request.headers),
+      socket: context?.socket,
+      async *[Symbol.asyncIterator]() {
+        if (request.body) yield* request.body;
+      },
+    };
+    const headers = new Headers();
+    let body;
+    const res = {
+      statusCode: 200,
+      setHeader(name, value) { headers.set(name, String(value)); },
+      removeHeader(name) { headers.delete(name); },
+      end(value) { body = value; },
+    };
+    await handler(req, res);
+    return new Response(body, { status: res.statusCode, headers });
   };
-  const headers = new Headers();
-  let body;
-  const res = {
-    statusCode: 200,
-    setHeader(name, value) { headers.set(name, String(value)); },
-    removeHeader(name) { headers.delete(name); },
-    end(value) { body = value; },
-  };
-  await handler(req, res);
-  return new Response(body, { status: res.statusCode, headers });
 }
 
-module.exports = { fetch: fetchHandler, createHandler, TOOLS };
+module.exports = { fetch: createFetchHandler(), createFetchHandler, createHandler, TOOLS };

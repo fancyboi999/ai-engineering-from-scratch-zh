@@ -190,6 +190,20 @@ test('MCP raw Web Request rejects oversized chunked JSON before whitespace is di
   assert.equal(JSON.parse(oversized.body).code, 'request_too_large');
 });
 
+test('MCP Web entry isolates trusted socket addresses and ignores forwarding headers locally', async () => {
+  const { createFetchHandler } = require('../api/mcp');
+  const handler = createFetchHandler({ limit: createLimiter({ limit: 1, vercel: false }) });
+  const call = (address, extra = {}) => handler(new Request('http://127.0.0.1/mcp', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream', 'MCP-Protocol-Version': '2025-11-25', ...extra },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'ping' }),
+  }), { socket: { remoteAddress: address } });
+  assert.equal((await call('192.0.2.1')).status, 200);
+  assert.equal((await call('192.0.2.2')).status, 200);
+  const blocked = await call('192.0.2.1', { 'x-forwarded-for': '192.0.2.3', 'x-vercel-forwarded-for': '192.0.2.3' });
+  assert.equal(blocked.status, 429); assert.equal((await blocked.json()).code, 'rate_limit_exceeded');
+  assert.equal((await call('192.0.2.3')).status, 200);
+});
+
 test('real quota enforcement returns 429 and bodyless HEAD', async t => {
   const handler = catalog.createHandler({ limit: createLimiter({ limit: 1, vercel: false }) });
   const base = await listen(http.createServer((req, res) => { req.query = {}; handler(req, res); }), t);

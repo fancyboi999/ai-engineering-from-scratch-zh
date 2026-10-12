@@ -74,7 +74,7 @@ function createServer() {
         const handler = handlers[target.pathname];
         if (typeof handler === 'function') return await handler(req, res);
         const request = new Request(url, { method: req.method, headers: req.headers, ...(req.method === 'GET' || req.method === 'HEAD' ? {} : { body: req, duplex: 'half' }) });
-        const response = await handler.fetch(request);
+        const response = await handler.fetch(request, { socket: req.socket });
         res.writeHead(response.status, Object.fromEntries(response.headers));
         return res.end(Buffer.from(await response.arrayBuffer()));
       }
