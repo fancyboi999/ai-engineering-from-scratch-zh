@@ -3,7 +3,7 @@
   const controls = [
     {
       key: "votes",
-      label: "Distinct supporters",
+      label: "不同支持者数",
       type: "range",
       value: 2,
       min: 0,
@@ -12,7 +12,7 @@
     },
     {
       key: "quorum",
-      label: "Required quorum",
+      label: "所需法定票数",
       type: "range",
       value: 2,
       min: 1,
@@ -21,7 +21,7 @@
     },
     {
       key: "budget",
-      label: "Reviewer budget",
+      label: "审查者预算",
       type: "range",
       value: 3,
       min: 0,
@@ -30,7 +30,7 @@
     },
     {
       key: "predicted",
-      label: "Unique predictions",
+      label: "去重后的预测数",
       type: "range",
       value: 3,
       min: 0,
@@ -39,7 +39,7 @@
     },
     {
       key: "expected",
-      label: "Expected findings",
+      label: "预期发现数",
       type: "range",
       value: 2,
       min: 1,
@@ -48,7 +48,7 @@
     },
     {
       key: "hits",
-      label: "True positives",
+      label: "真阳性",
       type: "range",
       value: 2,
       min: 0,
@@ -59,7 +59,7 @@
   const calculate = function (v, stepIndex) {
     if (v.hits > Math.min(v.predicted, v.expected))
       return {
-        summary: "Reject impossible ground-truth intersection",
+        summary: "拒绝不可能的真实标签交集",
         metrics: [],
         bars: [],
       };
@@ -69,17 +69,17 @@
     return {
       summary:
         support >= v.quorum
-          ? "Consensus reached; correctness still requires ground truth"
-          : "Needs review: insufficient independent support",
+          ? "已达成共识；正确性仍需真实标签验证"
+          : "需要审查：独立支持不足",
       metrics: [
-        { label: "Admitted supporters", value: support },
-        { label: "Precision", value: precision.toFixed(3) },
-        { label: "Recall", value: recall.toFixed(3) },
+        { label: "纳入的支持者数", value: support },
+        { label: "精确率", value: precision.toFixed(3) },
+        { label: "召回率", value: recall.toFixed(3) },
       ],
       bars: [
-        { label: "True positives", value: v.hits, max: 10 },
-        { label: "False positives", value: v.predicted - v.hits, max: 10 },
-        { label: "Missed findings", value: v.expected - v.hits, max: 10 },
+        { label: "真阳性", value: v.hits, max: 10 },
+        { label: "假阳性", value: v.predicted - v.hits, max: 10 },
+        { label: "漏检发现数", value: v.expected - v.hits, max: 10 },
       ],
     };
   };
@@ -87,21 +87,21 @@
     "pj-multi-agent-code-review-panel-1",
     Object.assign(
       {
-        title: "Validate reviewer evidence",
+        title: "校验审查者证据",
         steps: [
-          { label: "Input contract", detail: "validateFinding" },
+          { label: "输入契约", detail: "validateFinding" },
           {
-            label: "Validate reviewer evidence",
+            label: "校验审查者证据",
             detail:
-              "Require a file present in the supplied snapshot, a positive one-based line, an exact nonempty quote, a stable rule id and a severity from one through three. Evidence validation is shared across all reviewers. It protects the aggregation boundary against fabricated locations, but agreement and quoted text still do not prove a finding is correct.",
+              "要求文件存在于给定快照中、行号为从 1 开始的正数、引文逐字匹配且非空、规则 ID 稳定，严重等级为 1 到 3。所有审查者共用证据校验。它防止伪造位置进入聚合边界，但一致意见和引文仍不能证明发现正确。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "A supported quote enters the panel. A plausible finding on a nonexistent line is rejected.",
+              "有来源支持的引文进入评审小组。即使发现看起来合理，引用不存在的行也会被拒绝。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "前进一步，在下一项操作生效前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -110,21 +110,21 @@
     "pj-multi-agent-code-review-panel-2",
     Object.assign(
       {
-        title: "Aggregate independent support",
+        title: "聚合独立支持",
         steps: [
-          { label: "Input contract", detail: "aggregate" },
+          { label: "输入契约", detail: "aggregate" },
           {
-            label: "Aggregate independent support",
+            label: "聚合独立支持",
             detail:
-              "Group valid findings by file, line and rule. Count one vote per reviewer per group, reject duplicate reviewer identities, and retain every severity vote. A quorum produces consensus; a singleton remains visible as needs-review. A disagreement flag survives consensus so the user can inspect conflicting severity judgments.",
+              "按文件、行号和规则分组有效发现。每组中每位审查者只计一票，拒绝重复审查者身份，并保留所有严重等级投票。达到法定票数形成共识；单票发现仍以 needs-review 展示。达成共识后分歧标记仍保留，供用户检查相互冲突的严重等级判断。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "One reviewer repeating a finding stays at one vote; two reviewers with different severity values show consensus and disagreement.",
+              "一位审查者重复发现仍只计一票；两位审查者给出不同严重等级时，同时展示共识和分歧。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "前进一步，在下一项操作生效前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -133,21 +133,21 @@
     "pj-multi-agent-code-review-panel-3",
     Object.assign(
       {
-        title: "Reserve costs and enforce deadlines",
+        title: "预留成本并执行截止时间",
         steps: [
-          { label: "Input contract", detail: "runPanel" },
+          { label: "输入契约", detail: "runPanel" },
           {
-            label: "Reserve costs and enforce deadlines",
+            label: "预留成本并执行截止时间",
             detail:
-              "Reserve each reviewer cost before launching it. Skip work that cannot fit the remaining budget and record the decision. Race each reviewer against a deadline and abort its signal when time expires. Failures remain in the trace while completed reviews can still be aggregated. Adapters must honor AbortSignal to stop external work; the runner cannot force a remote service to cancel.",
+              "启动每位审查者前先预留成本。剩余预算不足的任务跳过，并记录决策。每位审查者与截止计时竞争，超时后触发中止信号。失败保留在追踪记录中，已完成审查仍可聚合。适配器必须响应 AbortSignal 才能停止外部工作；运行器无法强制远程服务取消。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "The demo launches two reviewers, skips the third under budget, and preserves the severity disagreement.",
+              "演示启动两位审查者，因预算跳过第三位，并保留严重等级分歧。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "前进一步，在下一项操作生效前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -156,21 +156,21 @@
     "pj-multi-agent-code-review-panel-4",
     Object.assign(
       {
-        title: "Measure panel precision and recall",
+        title: "测量评审小组的精确率与召回率",
         steps: [
-          { label: "Input contract", detail: "evaluate" },
+          { label: "输入契约", detail: "evaluate" },
           {
-            label: "Measure panel precision and recall",
+            label: "测量评审小组的精确率与召回率",
             detail:
-              "Evaluate unique finding ids against an expected set. Precision measures how many predicted findings are expected; recall measures how much of the expected set was found. Deduplicate both sets so repeated reviewers cannot inflate the metric. Zero predictions produce precision zero rather than a misleading perfect score. Try held-out inputs before adjusting quorum.",
+              "将去重后的发现 ID 与预期集合比较。精确率衡量预测发现中有多少符合预期；召回率衡量预期集合中有多少被找到。两个集合都去重，避免重复审查者虚增指标。没有预测时精确率为零，而非误导性的满分。调整法定票数前，先测试留出输入。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "False positives reduce precision while missed expected findings reduce recall; quorum is a tradeoff to measure.",
+              "假阳性降低精确率，漏掉预期发现降低召回率；法定票数的取舍需要实际测量。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "前进一步，在下一项操作生效前检查边界。",
       },
       { lab: { controls, calculate } },
     ),

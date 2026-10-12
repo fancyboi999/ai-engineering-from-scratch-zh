@@ -3,7 +3,7 @@
   const controls = [
     {
       key: "reads",
-      label: "Requested repeated read actions",
+      label: "请求的重复读取次数",
       type: "range",
       value: 3,
       min: 1,
@@ -12,7 +12,7 @@
     },
     {
       key: "steps",
-      label: "Step budget",
+      label: "步数预算",
       type: "range",
       value: 5,
       min: 0,
@@ -21,7 +21,7 @@
     },
     {
       key: "bytes",
-      label: "Serialized result characters",
+      label: "序列化结果字符数",
       type: "range",
       value: 60,
       min: 1,
@@ -30,7 +30,7 @@
     },
     {
       key: "budget",
-      label: "Context character budget",
+      label: "上下文字符预算",
       type: "range",
       value: 180,
       min: 0,
@@ -39,7 +39,7 @@
     },
     {
       key: "failures",
-      label: "Timeouts before success",
+      label: "成功前的超时次数",
       type: "range",
       value: 1,
       min: 0,
@@ -48,7 +48,7 @@
     },
     {
       key: "retries",
-      label: "Retry allowance",
+      label: "允许重试次数",
       type: "range",
       value: 2,
       min: 0,
@@ -57,7 +57,7 @@
     },
     {
       key: "scope",
-      label: "Resource outside scope",
+      label: "资源超出授权范围",
       type: "checkbox",
       value: false,
     },
@@ -69,24 +69,24 @@
       v.scope || v.steps === 0 ? 0 : Math.min(v.failures + 1, v.retries + 1);
     return {
       summary: v.scope
-        ? "Reject plan before provider"
+        ? "调用 provider 前拒绝计划"
         : !success
-          ? "Timeout retries exhausted"
+          ? "超时重试次数已耗尽"
           : retained < v.reads
-            ? "Partial retained results: budget exhausted"
-            : "Completed with request-local cache",
+            ? "仅保留部分结果：预算已耗尽"
+            : "使用请求内缓存完成",
       metrics: [
-        { label: "Provider calls", value: calls },
-        { label: "Cache hits", value: success ? Math.max(0, retained - 1) : 0 },
+        { label: "provider 调用次数", value: calls },
+        { label: "缓存命中次数", value: success ? Math.max(0, retained - 1) : 0 },
       ],
       bars: [
         {
-          label: "Retained results",
+          label: "保留的结果数",
           value: success && !v.scope ? retained : 0,
           max: v.reads,
         },
         {
-          label: "Retained characters",
+          label: "保留的字符数",
           value: success && !v.scope ? retained * v.bytes : 0,
           max: v.budget || 1,
         },
@@ -97,26 +97,26 @@
     "pj-cloud-agent-with-aws-strands-1",
     Object.assign(
       {
-        title: "Validate a scoped cloud inspection plan",
+        title: "校验限定范围的云检查计划",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "The model proposes intent; a deterministic validator grants authority.",
+              "模型提出意图，确定性校验器授予权限。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "The model proposes intent; a deterministic validator grants authority. Accept only explicitly named read operations and resource ids from the caller scope. Reject unknown keys and oversized plans so additional model-generated instructions cannot silently become executable parameters.",
+              "模型提出意图，确定性校验器授予权限。只接受明确命名的读取操作和调用方授权范围内的资源 ID。拒绝未知键和过大的计划，防止模型额外生成的指令悄悄变成可执行参数。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "A delete operation or an out-of-scope resource fails before any provider call.",
+              "删除操作或越界资源会在任何 provider 调用前被拒绝。",
           },
         ],
         caption:
-          "A delete operation or an out-of-scope resource fails before any provider call.",
+          "删除操作或越界资源会在任何 provider 调用前被拒绝。",
       },
       { lab: { controls, calculate } },
     ),
@@ -125,26 +125,26 @@
     "pj-cloud-agent-with-aws-strands-2",
     Object.assign(
       {
-        title: "Execute reads within step and response budgets",
+        title: "在步数与响应预算内执行读取",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Charge steps before starting an operation and charge serialized output before retaining it.",
+              "开始操作前扣除步数，保留序列化输出前扣除输出预算。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "Charge steps before starting an operation and charge serialized output before retaining it. Output limits cannot undo the cost of a call, but they prevent a large result from flooding later context. Keep partial results and an explicit terminal state so a budget stop remains diagnosable.",
+              "开始操作前扣除步数，保留序列化输出前扣除输出预算。输出限制无法撤销调用成本，但能防止大结果挤占后续上下文。保留部分结果和明确的终止状态，让预算导致的停止仍可诊断。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "A zero-step budget performs no provider calls and returns budget_exhausted.",
+              "步数预算为零时不调用 provider，并返回 budget_exhausted。",
           },
         ],
         caption:
-          "A zero-step budget performs no provider calls and returns budget_exhausted.",
+          "步数预算为零时不调用 provider，并返回 budget_exhausted。",
       },
       { lab: { controls, calculate } },
     ),
@@ -153,26 +153,26 @@
     "pj-cloud-agent-with-aws-strands-3",
     Object.assign(
       {
-        title: "Retry transient reads and reuse completed requests",
+        title: "重试暂时失败的读取并复用已完成请求",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "Retry only transient timeout failures and cache successful reads by a canonical action identity.",
+              "只重试暂时性超时，按规范化操作标识缓存成功的读取。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "Retry only transient timeout failures and cache successful reads by a canonical action identity. A permission failure is not transient and must escape immediately. This cache is request-local: real cloud state changes, so a long-lived cache needs an explicit TTL or version instead of silently reusing old data.",
+              "只重试暂时性超时，按规范化操作标识缓存成功的读取。权限错误不是暂时故障，必须立即向外传播。缓存仅限本次请求：真实云状态会变化，长期缓存需要明确的 TTL 或版本，不能悄悄复用旧数据。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "A transient timeout retries, while a permission failure is propagated after one call.",
+              "暂时性超时会重试；权限错误在一次调用后直接传播。",
           },
         ],
         caption:
-          "A transient timeout retries, while a permission failure is propagated after one call.",
+          "暂时性超时会重试；权限错误在一次调用后直接传播。",
       },
       { lab: { controls, calculate } },
     ),
@@ -181,26 +181,26 @@
     "pj-cloud-agent-with-aws-strands-4",
     Object.assign(
       {
-        title: "Drive the actual Strands loop with a local model",
+        title: "用本地模型驱动真实 Strands 循环",
         steps: [
           {
-            label: "Input",
+            label: "输入",
             detail:
-              "The real Strands Agent consumes streaming events from an injected Model subclass.",
+              "真实 Strands Agent 消费注入的 Model 子类产生的流式事件。",
           },
           {
-            label: "Transform",
+            label: "转换",
             detail:
-              "The real Strands Agent consumes streaming events from an injected Model subclass. This exercises the framework loop without credentials or cloud calls. The model still only proposes a plan; parse and scope-check its result with the earlier validator. A separate Bedrock constructor is explicit and is not invoked by offline demos or tests.",
+              "真实 Strands Agent 消费注入的 Model 子类产生的流式事件。这样无需凭据或云调用就能运行框架循环。模型仍只提出计划；用前面的校验器解析结果并检查授权范围。单独的 Bedrock 构造器需显式调用，离线演示和测试不会使用它。",
           },
           {
-            label: "Verify",
+            label: "验证",
             detail:
-              "The framework produces one recorded JSON plan in one model call, then the independent validator checks it.",
+              "框架通过一次模型调用生成一个录制的 JSON 计划，再由独立校验器检查。",
           },
         ],
         caption:
-          "The framework produces one recorded JSON plan in one model call, then the independent validator checks it.",
+          "框架通过一次模型调用生成一个录制的 JSON 计划，再由独立校验器检查。",
       },
       { lab: { controls, calculate } },
     ),
