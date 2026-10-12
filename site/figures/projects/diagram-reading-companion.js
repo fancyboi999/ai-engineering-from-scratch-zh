@@ -1,32 +1,32 @@
 window.AIFSProjectFigures.register("pj-diagram-reading-companion-1", {
-  title: "Load an SVG and validate declared nodes and edges",
+  title: "加载 SVG 并校验声明的节点和边",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Verify that every authored explanation points to a real SVG element.",
+        "核验每个自编解释指向真实 SVG 元素。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "loadDiagram(svg: string, value: unknown): {svg:string;graph:Graph}",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "declared",
-        label: "Declared IDs",
+        label: "声明的 ID",
         type: "text",
         value: "collect,check,share",
       },
-      { key: "svg", label: "SVG IDs", type: "text", value: "collect,check" },
+      { key: "svg", label: "SVG ID", type: "text", value: "collect,check" },
     ],
     calculate(v) {
       const a = v.declared.split(",").map((x) => x.trim()),
@@ -34,43 +34,43 @@ window.AIFSProjectFigures.register("pj-diagram-reading-companion-1", {
         missing = a.filter((x) => !b.includes(x));
       return {
         summary: missing.length
-          ? "Reject missing SVG elements."
-          : "Every declared node resolves.",
-        columns: ["Missing ID"],
+          ? "拒绝缺失 SVG 元素。"
+          : "每个声明节点均可解析。",
+        columns: ["缺失 ID"],
         rows: missing.map((x) => [x]),
-        metrics: [{ label: "Resolved", value: a.length - missing.length }],
+        metrics: [{ label: "已解析", value: a.length - missing.length }],
       };
     },
   },
 });
 
 window.AIFSProjectFigures.register("pj-diagram-reading-companion-2", {
-  title: "Compute branches, cycles and candidate reading order",
+  title: "计算分支、环和候选阅读顺序",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Keep branches and cycles visible instead of flattening a graph into a misleading list.",
+        "保留可见分支和环，不将图展平成误导列表。",
     },
-    { label: "Compute", detail: "analyzeGraph(graph: Graph): Analysis" },
+    { label: "计算", detail: "analyzeGraph(graph: Graph): Analysis" },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "branch",
-        label: "Include clarification branch",
+        label: "包含澄清分支",
         type: "checkbox",
         value: true,
       },
       {
         key: "cycle",
-        label: "Clarification returns to check",
+        label: "澄清返回检查步骤",
         type: "checkbox",
         value: false,
       },
@@ -79,17 +79,17 @@ window.AIFSProjectFigures.register("pj-diagram-reading-companion-2", {
       return {
         summary:
           v.cycle && v.branch
-            ? "A back-edge exposes the clarification cycle."
-            : "Candidate traversal finishes without a back-edge.",
+            ? "回边暴露澄清环。"
+            : "候选遍历没有回边，完成。",
         metrics: [
           {
-            label: "Edges",
+            label: "边数",
             value: 2 + (v.branch ? 1 : 0) + (v.branch && v.cycle ? 1 : 0),
           },
-          { label: "Branches", value: v.branch ? 1 : 0 },
-          { label: "Back-edge cycles", value: v.branch && v.cycle ? 1 : 0 },
+          { label: "分支数", value: v.branch ? 1 : 0 },
+          { label: "回边环数", value: v.branch && v.cycle ? 1 : 0 },
         ],
-        columns: ["Order"],
+        columns: ["顺序"],
         rows: (v.branch
           ? ["collect", "check", "share", "clarify"]
           : ["collect", "check", "share"]
@@ -100,30 +100,30 @@ window.AIFSProjectFigures.register("pj-diagram-reading-companion-2", {
 });
 
 window.AIFSProjectFigures.register("pj-diagram-reading-companion-3", {
-  title: "Review explanations and reading order",
+  title: "审阅解释和阅读顺序",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Apply an author review without losing the original graph relationships.",
+        "应用作者审阅，不丢失原图关系。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "reviewGraph(graph: Graph, value?: unknown): {schemaVersion:1;graph:Graph;order:string[];reviewed:boolean}",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "order",
-        label: "Reviewed order",
+        label: "已审阅顺序",
         type: "text",
         value: "collect,check,clarify,share",
       },
@@ -137,9 +137,9 @@ window.AIFSProjectFigures.register("pj-diagram-reading-companion-3", {
           ids.every((x) => known.includes(x));
       return {
         summary: ok
-          ? "Valid permutation: accept review."
-          : "Reject missing, duplicated or unknown node.",
-        columns: ["Step", "Node"],
+          ? "有效排列：接受审阅。"
+          : "拒绝缺失、重复或未知节点。",
+        columns: ["步骤", "节点"],
         rows: ids.map((x, i) => [i + 1, x]),
       };
     },
@@ -147,30 +147,30 @@ window.AIFSProjectFigures.register("pj-diagram-reading-companion-3", {
 });
 
 window.AIFSProjectFigures.register("pj-diagram-reading-companion-4", {
-  title: "Export the navigable walkthrough and graph data",
+  title: "导出可导航讲解和图数据",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Connect focusable node buttons to the authored picture and export a reusable review.",
+        "将可聚焦节点按钮连接到自编图像，导出可复用审阅。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "renderWalkthrough(svg:string, review:ReturnType<typeof reviewGraph>):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "index",
-        label: "Focused step",
+        label: "聚焦步骤",
         type: "range",
         value: 2,
         min: 1,
@@ -181,11 +181,11 @@ window.AIFSProjectFigures.register("pj-diagram-reading-companion-4", {
     calculate(v) {
       const order = ["collect", "check", "share", "clarify"];
       return {
-        summary: "Keyboard navigation chooses one declared SVG id.",
+        summary: "键盘导航选择一个已声明 SVG ID。",
         metrics: [
-          { label: "Selected node", value: order[v.index - 1] },
-          { label: "Previous available", value: v.index > 1 ? "yes" : "no" },
-          { label: "Next available", value: v.index < 4 ? "yes" : "no" },
+          { label: "选中节点", value: order[v.index - 1] },
+          { label: "可到上一步", value: v.index > 1 ? "yes" : "no" },
+          { label: "可到下一步", value: v.index < 4 ? "yes" : "no" },
         ],
       };
     },

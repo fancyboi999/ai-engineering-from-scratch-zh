@@ -1,23 +1,23 @@
 (function () {
   "use strict";
   window.AIFSProjectFigures.register("pj-hedged-request-lab-1", {
-    title: "Nearest-rank percentiles",
+    title: "最近秩分位数",
     steps: [
       {
-        label: "Inputs",
-        detail: "Small samples make tail percentiles coarse.",
+        label: "输入",
+        detail: "小样本使尾部分位数较粗糙。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Small samples make tail percentiles coarse.",
+    caption: "小样本使尾部分位数较粗糙。",
     lab: {
       controls: [
         {
           key: "samples",
-          label: "Latency samples ms",
+          label: "延迟样本（毫秒）",
           type: "text",
           value: "2,4,10,20,80",
         },
@@ -28,35 +28,35 @@
           .map(Number)
           .sort((a, b) => a - b);
         if (a.some((x) => !Number.isFinite(x) || x < 0))
-          throw Error("Invalid sample");
+          throw Error("无效样本");
         return {
-          summary: a.length + " samples",
+          summary: a.length + " 个样本",
           metrics: [
-            { label: "P50 ms", value: a[Math.ceil(a.length * 0.5) - 1] },
-            { label: "P95 ms", value: a[Math.ceil(a.length * 0.95) - 1] },
+            { label: "P50（毫秒）", value: a[Math.ceil(a.length * 0.5) - 1] },
+            { label: "P95（毫秒）", value: a[Math.ceil(a.length * 0.95) - 1] },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-hedged-request-lab-2", {
-    title: "Hedge timer",
+    title: "对冲计时器",
     steps: [
       {
-        label: "Inputs",
-        detail: "A second attempt begins only if the first has not won.",
+        label: "输入",
+        detail: "只有首次尝试尚未胜出时才启动第二次。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "A second attempt begins only if the first has not won.",
+    caption: "只有首次尝试尚未胜出时才启动第二次。",
     lab: {
       controls: [
         {
           key: "primary",
-          label: "Primary latency ms",
+          label: "主请求延迟（毫秒）",
           type: "range",
           value: 80,
           min: 0,
@@ -65,7 +65,7 @@
         },
         {
           key: "secondary",
-          label: "Secondary latency ms",
+          label: "次请求延迟（毫秒）",
           type: "range",
           value: 5,
           min: 0,
@@ -74,7 +74,7 @@
         },
         {
           key: "delay",
-          label: "Hedge delay ms",
+          label: "对冲延时（毫秒）",
           type: "range",
           value: 10,
           min: 0,
@@ -88,34 +88,34 @@
             ? Math.min(v.primary, v.delay + v.secondary)
             : v.primary;
         return {
-          summary: "Winner at " + win + "ms",
-          metrics: [{ label: "Calls launched", value: launched ? 2 : 1 }],
+          summary: "胜出时间：" + win + "ms",
+          metrics: [{ label: "已发起调用数", value: launched ? 2 : 1 }],
           bars: [
-            { label: "Baseline", value: v.primary, max: 400 },
-            { label: "Hedged", value: win, max: 400 },
+            { label: "基线", value: v.primary, max: 400 },
+            { label: "对冲", value: win, max: 400 },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-hedged-request-lab-3", {
-    title: "Cancellation evidence",
+    title: "取消证据",
     steps: [
       {
-        label: "Inputs",
-        detail: "Client cancellation and completed server work are separate.",
+        label: "输入",
+        detail: "客户端取消与服务器完成工作是两回事。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Client cancellation and completed server work are separate.",
+    caption: "客户端取消与服务器完成工作是两回事。",
     lab: {
       controls: [
         {
           key: "started",
-          label: "Service requests started",
+          label: "已启动服务请求数",
           type: "range",
           value: 2,
           min: 0,
@@ -124,7 +124,7 @@
         },
         {
           key: "cancelled",
-          label: "Client cancellations",
+          label: "客户端取消数",
           type: "range",
           value: 1,
           min: 0,
@@ -135,33 +135,33 @@
       calculate(v) {
         const c = Math.min(v.started, v.cancelled);
         return {
-          summary: "Server may still complete all " + v.started + " requests",
+          summary: "服务器仍可能完成全部 " + v.started + " 个请求",
           metrics: [
-            { label: "Client cancellation observations", value: c },
-            { label: "Proven work saved", value: 0 },
+            { label: "客户端取消观察数", value: c },
+            { label: "已证明节省的工作", value: 0 },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-hedged-request-lab-4", {
-    title: "Work ratio",
+    title: "工作量比值",
     steps: [
       {
-        label: "Inputs",
-        detail: "Count all launched attempts before comparing latency.",
+        label: "输入",
+        detail: "比较延迟前统计全部已发起尝试。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Count all launched attempts before comparing latency.",
+    caption: "比较延迟前统计全部已发起尝试。",
     lab: {
       controls: [
         {
           key: "baseline",
-          label: "Baseline calls",
+          label: "基线调用数",
           type: "range",
           value: 3,
           min: 0,
@@ -170,7 +170,7 @@
         },
         {
           key: "hedged",
-          label: "Hedged calls",
+          label: "对冲调用数",
           type: "range",
           value: 6,
           min: 0,
@@ -181,14 +181,14 @@
       calculate(v) {
         return {
           summary: v.baseline
-            ? (v.hedged / v.baseline).toFixed(2) + "x request work"
-            : "No baseline denominator",
+            ? (v.hedged / v.baseline).toFixed(2) + " 倍请求工作量"
+            : "没有基线分母",
           metrics: [
-            { label: "Additional requests", value: v.hedged - v.baseline },
+            { label: "额外请求数", value: v.hedged - v.baseline },
           ],
           bars: [
-            { label: "Baseline", value: v.baseline, max: 40 },
-            { label: "Hedged", value: v.hedged, max: 40 },
+            { label: "基线", value: v.baseline, max: 40 },
+            { label: "对冲", value: v.hedged, max: 40 },
           ],
         };
       },

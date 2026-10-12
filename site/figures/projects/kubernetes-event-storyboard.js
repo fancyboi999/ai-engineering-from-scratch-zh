@@ -1,23 +1,23 @@
 (function () {
   "use strict";
   window.AIFSProjectFigures.register("pj-kubernetes-event-storyboard-1", {
-    title: "Capture lag",
+    title: "捕获延迟",
     steps: [
       {
-        label: "Inputs",
-        detail: "Occurrence and observation are different timestamps.",
+        label: "输入",
+        detail: "发生时间与观察时间是不同时间戳。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Occurrence and observation are different timestamps.",
+    caption: "发生时间与观察时间是不同时间戳。",
     lab: {
       controls: [
         {
           key: "occur",
-          label: "Last occurrence minute",
+          label: "最近发生时刻（分钟）",
           type: "range",
           value: 3,
           min: 0,
@@ -26,7 +26,7 @@
         },
         {
           key: "observe",
-          label: "Observed minute",
+          label: "观察时刻（分钟）",
           type: "range",
           value: 5,
           min: 0,
@@ -38,9 +38,9 @@
         return {
           summary:
             v.observe >= v.occur
-              ? "Capture lag " + (v.observe - v.occur) + " minutes"
-              : "Clock ordering needs investigation",
-          columns: ["Clock", "Minute"],
+              ? "捕获延迟：" + (v.observe - v.occur) + " 分钟"
+              : "需要调查时钟顺序",
+          columns: ["时钟", "分钟"],
           rows: [
             ["occurrence", v.occur],
             ["observation", v.observe],
@@ -50,20 +50,20 @@
     },
   });
   window.AIFSProjectFigures.register("pj-kubernetes-event-storyboard-2", {
-    title: "Series deduplication",
+    title: "序列去重",
     steps: [
-      { label: "Inputs", detail: "Snapshots of one UID use maximum count." },
+      { label: "输入", detail: "同一 UID 的快照使用最大计数。" },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Snapshots of one UID use maximum count.",
+    caption: "同一 UID 的快照使用最大计数。",
     lab: {
       controls: [
         {
           key: "a",
-          label: "Earlier snapshot count",
+          label: "较早快照计数",
           type: "range",
           value: 2,
           min: 0,
@@ -72,7 +72,7 @@
         },
         {
           key: "b",
-          label: "Later snapshot count",
+          label: "较晚快照计数",
           type: "range",
           value: 4,
           min: 0,
@@ -81,7 +81,7 @@
         },
         {
           key: "other",
-          label: "Distinct event count",
+          label: "不同事件计数",
           type: "range",
           value: 1,
           min: 0,
@@ -91,14 +91,14 @@
       ],
       calculate(v) {
         return {
-          summary: "Grouped count " + (Math.max(v.a, v.b) + v.other),
+          summary: "分组计数：" + (Math.max(v.a, v.b) + v.other),
           metrics: [
-            { label: "Same UID retained count", value: Math.max(v.a, v.b) },
-            { label: "Naive overcount", value: v.a + v.b + v.other },
+            { label: "同 UID 保留计数", value: Math.max(v.a, v.b) },
+            { label: "简单累加的重复计数", value: v.a + v.b + v.other },
           ],
           bars: [
             {
-              label: "Correct total",
+              label: "正确总数",
               value: Math.max(v.a, v.b) + v.other,
               max: 20,
             },
@@ -108,32 +108,32 @@
     },
   });
   window.AIFSProjectFigures.register("pj-kubernetes-event-storyboard-3", {
-    title: "UID matching",
+    title: "UID 匹配",
     steps: [
-      { label: "Inputs", detail: "Names are not stable object identity." },
+      { label: "输入", detail: "名称不是稳定对象标识。" },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Names are not stable object identity.",
+    caption: "名称不是稳定对象标识。",
     lab: {
       controls: [
         {
           key: "event",
-          label: "Event object UID",
+          label: "事件对象 UID",
           type: "text",
           value: "pod-old",
         },
         {
           key: "workload",
-          label: "Snapshot UID",
+          label: "快照 UID",
           type: "text",
           value: "pod-new",
         },
         {
           key: "revision",
-          label: "Snapshot revision",
+          label: "快照版本",
           type: "text",
           value: "8",
         },
@@ -142,31 +142,31 @@
         return {
           summary:
             v.event === v.workload
-              ? "Revision " + v.revision
-              : "Revision unknown: UID mismatch",
-          metrics: [{ label: "Identity match", value: v.event === v.workload }],
+              ? "版本 " + v.revision
+              : "版本未知：UID 不匹配",
+          metrics: [{ label: "标识匹配", value: v.event === v.workload }],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-kubernetes-event-storyboard-4", {
-    title: "Context redaction",
+    title: "上下文脱敏",
     steps: [
       {
-        label: "Inputs",
-        detail: "Only an explicit subset reaches the assistant.",
+        label: "输入",
+        detail: "只有明确子集传给助手。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Only an explicit subset reaches the assistant.",
+    caption: "只有明确子集传给助手。",
     lab: {
       controls: [
         {
           key: "events",
-          label: "Raw events",
+          label: "原始事件数",
           type: "range",
           value: 5,
           min: 0,
@@ -175,7 +175,7 @@
         },
         {
           key: "repeated",
-          label: "Repeated snapshots",
+          label: "重复快照数",
           type: "range",
           value: 2,
           min: 0,
@@ -186,12 +186,12 @@
       calculate(v) {
         const n = Math.max(0, v.events - v.repeated);
         return {
-          summary: n + " distinct event identities before grouping",
+          summary: n + " 个分组前的不同事件标识",
           metrics: [
-            { label: "Messages exported", value: 0 },
-            { label: "Spec fields exported", value: 0 },
+            { label: "导出消息数", value: 0 },
+            { label: "导出 spec 字段数", value: 0 },
           ],
-          bars: [{ label: "Retained identities", value: n, max: 20 }],
+          bars: [{ label: "保留标识数", value: n, max: 20 }],
         };
       },
     },

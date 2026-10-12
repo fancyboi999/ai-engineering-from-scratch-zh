@@ -1,30 +1,30 @@
 window.AIFSProjectFigures.register("pj-bookmark-path-organizer-1", {
-  title: "Import bookmarks with their original hierarchy",
+  title: "导入书签及其原始层级",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Flatten a folder tree while keeping original URLs and every ancestor folder.",
+        "展平文件夹树，保留原 URL 和每个祖先文件夹。",
     },
-    { label: "Compute", detail: "importBookmarks(input: unknown): Bookmark[]" },
+    { label: "计算", detail: "importBookmarks(input: unknown): Bookmark[]" },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "folder",
-        label: "Ancestor path",
+        label: "祖先路径",
         type: "text",
         value: "Maps/Basics",
       },
       {
         key: "title",
-        label: "Bookmark title",
+        label: "书签标题",
         type: "text",
         value: "Coordinates",
       },
@@ -32,9 +32,9 @@ window.AIFSProjectFigures.register("pj-bookmark-path-organizer-1", {
     calculate(v) {
       const p = v.folder.split("/").filter(Boolean);
       return {
-        summary: "Flattening retains each ancestor.",
-        metrics: [{ label: "Depth", value: p.length }],
-        columns: ["Field", "Value"],
+        summary: "展平时保留每个祖先。",
+        metrics: [{ label: "深度", value: p.length }],
+        columns: ["字段", "值"],
         rows: [
           ["title", v.title],
           ["folders", JSON.stringify(p)],
@@ -45,29 +45,29 @@ window.AIFSProjectFigures.register("pj-bookmark-path-organizer-1", {
 });
 
 window.AIFSProjectFigures.register("pj-bookmark-path-organizer-2", {
-  title: "Normalize links and explain duplicate groups",
+  title: "规范化链接并解释重复组",
   steps: [
     {
-      label: "Read evidence",
-      detail: "Explain exactly why two saved links point at the same document.",
+      label: "读取证据",
+      detail: "精确解释两个保存链接为什么指向同一文档。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "normalizeURL(value: string): string; groupDuplicates(items: Bookmark[]): Group[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "url",
-        label: "Saved URL",
+        label: "保存的 URL",
         type: "text",
         value: "https://EXAMPLE.invalid:443/maps#intro",
       },
@@ -84,42 +84,42 @@ window.AIFSProjectFigures.register("pj-bookmark-path-organizer-2", {
         u.hash = "";
         return {
           summary:
-            "Only the fragment is discarded beyond URL parser normalization.",
-          columns: ["Original", "Group key"],
+            "除 URL 解析器规范化外，只丢弃片段。",
+          columns: ["原始值", "分组键"],
           rows: [[v.url, u.href]],
         };
       } catch {
-        return { summary: "Reject this URL." };
+        return { summary: "拒绝此 URL。" };
       }
     },
   },
 });
 
 window.AIFSProjectFigures.register("pj-bookmark-path-organizer-3", {
-  title: "Rank topics and assemble a reading path",
+  title: "排序主题并组装阅读路径",
   steps: [
     {
-      label: "Read evidence",
-      detail: "Rank a reading collection with visible keyword evidence.",
+      label: "读取证据",
+      detail: "用可见关键词证据为阅读集合排序。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "readingPath(groups: Group[], topics: Record<string,string[]>): Reading[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
-      { key: "title", label: "Title", type: "text", value: "Map basics" },
+      { key: "title", label: "标题", type: "text", value: "Map basics" },
       {
         key: "notes",
-        label: "Notes",
+        label: "笔记",
         type: "text",
         value: "Read this map first",
       },
@@ -130,11 +130,11 @@ window.AIFSProjectFigures.register("pj-bookmark-path-organizer-3", {
       const a = has(v.title) ? 3 : 0,
         b = has(v.notes) ? 1 : 0;
       return {
-        summary: "Topic keyword: map",
-        metrics: [{ label: "Score", value: a + b }],
+        summary: "主题关键词：map",
+        metrics: [{ label: "分数", value: a + b }],
         bars: [
-          { label: "Title", value: a, max: 4 },
-          { label: "Notes", value: b, max: 4 },
+          { label: "标题", value: a, max: 4 },
+          { label: "笔记", value: b, max: 4 },
         ],
       };
     },
@@ -142,30 +142,30 @@ window.AIFSProjectFigures.register("pj-bookmark-path-organizer-3", {
 });
 
 window.AIFSProjectFigures.register("pj-bookmark-path-organizer-4", {
-  title: "Export an editable collection and progress file",
+  title: "导出可编辑集合和进度文件",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Carry reading order and completion between a browser review and the next command.",
+        "在浏览器审阅和下一命令间传递阅读顺序与完成状态。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "applyProgress(items: Reading[], value?: unknown): {items: Reading[]; progress: Progress}; renderCollection(items: Reading[], progress: Progress): string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "completed",
-        label: "Completed IDs (comma separated)",
+        label: "已完成 ID（逗号分隔）",
         type: "text",
         value: "a,b",
       },
@@ -179,10 +179,10 @@ window.AIFSProjectFigures.register("pj-bookmark-path-organizer-4", {
           new Set(ids).size === ids.length &&
           ids.every((x) => ["a", "b", "c"].includes(x));
       return {
-        summary: ok ? "Progress accepted." : "Reject unknown or duplicate IDs.",
+        summary: ok ? "进度已接受。" : "拒绝未知或重复 ID。",
         metrics: [
-          { label: "Completed", value: ok ? ids.length : 0 },
-          { label: "Remaining", value: ok ? 3 - ids.length : 3 },
+          { label: "已完成", value: ok ? ids.length : 0 },
+          { label: "剩余", value: ok ? 3 - ids.length : 3 },
         ],
       };
     },

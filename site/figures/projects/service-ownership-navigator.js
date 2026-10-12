@@ -1,28 +1,28 @@
 window.AIFSProjectFigures.register("pj-service-ownership-navigator-1", {
-  title: "Load service metadata and ownership rules",
+  title: "加载服务元数据和归属规则",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Keep source positions while combining service metadata and repository rules.",
+        "组合服务元数据与仓库规则，同时保留源位置。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "parseOwnershipRules(text:string,source?:string):Rule[]; loadCatalog(value:unknown):Catalog",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "line",
-        label: "Ownership rule",
+        label: "归属规则",
         type: "text",
         value: "/services/images/ @team/media @team/oncall",
       },
@@ -30,40 +30,40 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-1", {
     calculate(v) {
       const p = v.line.trim().split(/\s+/);
       return {
-        summary: "Retain the rule separately from catalog ownership.",
-        columns: ["Pattern", "Owners"],
+        summary: "规则与目录归属分开保留。",
+        columns: ["模式", "负责人"],
         rows: [[p[0], p.slice(1).join(", ")]],
-        metrics: [{ label: "Owner count", value: Math.max(0, p.length - 1) }],
+        metrics: [{ label: "负责人数", value: Math.max(0, p.length - 1) }],
       };
     },
   },
 });
 
 window.AIFSProjectFigures.register("pj-service-ownership-navigator-2", {
-  title: "Resolve paths and conflicting ownership evidence",
+  title: "解析路径和冲突归属证据",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Resolve a concrete file using deterministic rule precedence and expose disagreement.",
+        "按确定性规则优先级解析具体文件，展示分歧。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "matchesRule(pattern:string,path:string):boolean; resolveOwnership(catalog:Catalog,path:string):Ownership",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "specific",
-        label: "Specific cache rule present",
+        label: "存在特定缓存规则",
         type: "checkbox",
         value: true,
       },
@@ -71,8 +71,8 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-2", {
     calculate(v) {
       return {
         summary:
-          "Last matching rule wins; earlier disagreement remains evidence.",
-        columns: ["Rule", "Owners", "Effective"],
+          "最后匹配规则优先；先前分歧仍作为证据。",
+        columns: ["规则", "负责人", "生效"],
         rows: [
           ["/services/", "@platform", "no"],
           ["/services/images/", "@media", v.specific ? "no" : "yes"],
@@ -80,37 +80,37 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-2", {
             ? [["/services/images/cache/**", "@cache", "yes"]]
             : []),
         ],
-        metrics: [{ label: "Matching rules", value: v.specific ? 3 : 2 }],
+        metrics: [{ label: "匹配规则数", value: v.specific ? 3 : 2 }],
       };
     },
   },
 });
 
 window.AIFSProjectFigures.register("pj-service-ownership-navigator-3", {
-  title: "Check local runbook references",
+  title: "检查本地运行手册引用",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Check that a handoff points to a supplied runbook and resolvable local references.",
+        "检查交接是否指向给定运行手册及可解析本地引用。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "checkRunbook(catalog:Catalog,service:Service):{path,exists,headings,links,issues}",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "linked",
-        label: "Local links declared",
+        label: "声明的本地链接数",
         type: "range",
         value: 4,
         min: 0,
@@ -119,7 +119,7 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-3", {
       },
       {
         key: "available",
-        label: "Linked files available",
+        label: "可用链接文件数",
         type: "range",
         value: 3,
         min: 0,
@@ -129,10 +129,10 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-3", {
     ],
     calculate(v) {
       return {
-        summary: "Only supplied local files count as checked evidence.",
+        summary: "只有给定本地文件算作已检查证据。",
         metrics: [
-          { label: "Resolved", value: Math.min(v.linked, v.available) },
-          { label: "Missing", value: Math.max(0, v.linked - v.available) },
+          { label: "已解析", value: Math.min(v.linked, v.available) },
+          { label: "缺失", value: Math.max(0, v.linked - v.available) },
         ],
       };
     },
@@ -140,30 +140,30 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-3", {
 });
 
 window.AIFSProjectFigures.register("pj-service-ownership-navigator-4", {
-  title: "Export a searchable directory and cited handoff packet",
+  title: "导出可搜索目录和有引用的交接包",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Export a local handoff with every ownership answer linked to evidence.",
+        "导出本地交接，每条归属答案均关联证据。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "handoffPacket(catalog:Catalog,path:string):{schemaVersion:1,ownership,runbook,dependencies}; renderDirectory(catalog,packet):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "path",
-        label: "Requested file",
+        label: "请求文件",
         type: "text",
         value: "services/images/cache/store.ts",
       },
@@ -173,13 +173,13 @@ window.AIFSProjectFigures.register("pj-service-ownership-navigator-4", {
         v.path === "services/images" || v.path.startsWith("services/images/");
       return {
         summary: found
-          ? "Include image-service catalog evidence."
-          : "No image-service root match.",
-        columns: ["Lookup field", "Value"],
+          ? "包含图像服务目录证据。"
+          : "没有图像服务根匹配。",
+        columns: ["查询字段", "值"],
         rows: [
-          ["Path", v.path],
-          ["Service", found ? "images" : "unresolved"],
-          ["Evidence source", found ? "catalog.json" : "none"],
+          ["路径", v.path],
+          ["服务", found ? "images" : "unresolved"],
+          ["证据来源", found ? "catalog.json" : "none"],
         ],
       };
     },

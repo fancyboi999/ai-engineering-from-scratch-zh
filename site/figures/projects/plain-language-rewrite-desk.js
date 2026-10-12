@@ -1,27 +1,27 @@
 window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-1", {
-  title: "Segment prose and record protected terms and facts",
+  title: "切分正文并记录受保护术语与事实",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Separate paragraphs while recording the facts later revisions must preserve.",
+        "分离段落，记录后续修订必须保留的事实。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail: "segmentProse(text:string,protectedTerms?:string[]):Paragraph[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "text",
-        label: "Protected numeric facts",
+        label: "受保护数值事实",
         type: "text",
         value: "A map uses 15% and 2 cm.",
       },
@@ -32,40 +32,40 @@ window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-1", {
           /[-+]?\d+(?:[.,]\d+)*(?:%|\s*(?:km|cm|mm|ms|kg|m|s)\b)?/g,
         ) || [];
       return {
-        summary: "Keep repeated numeric expressions as separate evidence.",
-        columns: ["Numeric expression"],
+        summary: "将重复数值表达保留为独立证据。",
+        columns: ["数值表达"],
         rows: n.map((x) => [x]),
-        metrics: [{ label: "Recorded facts", value: n.length }],
+        metrics: [{ label: "已记录事实", value: n.length }],
       };
     },
   },
 });
 
 window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-2", {
-  title: "Produce simpler candidate paragraphs",
+  title: "生成更简明的候选段落",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Make the proposal source visible instead of presenting deterministic editing as model reasoning.",
+        "展示提案来源，不把确定性编辑说成模型推理。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "proposeParagraphs(paragraphs:Paragraph[],recorded?:Record<string,string>):{id,candidate,method}[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "text",
-        label: "Original sentence",
+        label: "原始句子",
         type: "text",
         value: "In order to utilize a map prior to walking.",
       },
@@ -76,11 +76,11 @@ window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-2", {
         .replace(/\butilize\b/gi, "use")
         .replace(/\bprior to\b/gi, "before");
       return {
-        summary: "Visible phrase substitution, not a model claim.",
-        columns: ["Original", "Candidate"],
+        summary: "可见短语替换，不是模型能力声明。",
+        columns: ["原始值", "候选"],
         rows: [[v.text, out]],
         metrics: [
-          { label: "Characters removed", value: v.text.length - out.length },
+          { label: "移除字符数", value: v.text.length - out.length },
         ],
       };
     },
@@ -88,31 +88,31 @@ window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-2", {
 });
 
 window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-3", {
-  title: "Compare omissions, numbers and readability measures",
+  title: "比较遗漏、数字和可读性指标",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Compare observable editing changes and surface recorded fact violations.",
+        "比较可观察编辑变化，展示对已记录事实的违反。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "measures(text:string):{words,sentences,averageWords,longWords}; compareParagraphs(paragraphs,proposals,definitions?):Comparison[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
-      { key: "original", label: "Original percent", type: "number", value: 15 },
+      { key: "original", label: "原始百分比", type: "number", value: 15 },
       {
         key: "candidate",
-        label: "Candidate percent",
+        label: "候选百分比",
         type: "number",
         value: 10,
       },
@@ -121,12 +121,12 @@ window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-3", {
       return {
         summary:
           v.original === v.candidate
-            ? "Numeric literal preserved."
-            : "Block acceptance: numeric fact changed.",
+            ? "保留数值字面量。"
+            : "阻止接受：数值事实已改变。",
         metrics: [
-          { label: "Original", value: v.original + "%" },
-          { label: "Candidate", value: v.candidate + "%" },
-          { label: "Difference", value: v.candidate - v.original },
+          { label: "原始值", value: v.original + "%" },
+          { label: "候选", value: v.candidate + "%" },
+          { label: "差异", value: v.candidate - v.original },
         ],
       };
     },
@@ -134,41 +134,41 @@ window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-3", {
 });
 
 window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-4", {
-  title: "Export accepted revisions and a change record",
+  title: "导出已接受修订和变更记录",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Apply only explicitly accepted, fact-checked proposals and retain all other original text.",
+        "只应用明确接受并核查事实的提案，保留其余全部原文。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "exportRevisions(comparisons,value?):{markdown,changeRecord,decisions,unresolved}; renderDesk(comparisons,state):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "decision",
-        label: "Author decision",
+        label: "作者决定",
         type: "select",
         value: "pending",
         options: [
-          { value: "pending", label: "Pending" },
-          { value: "accept", label: "Accept" },
-          { value: "reject", label: "Reject" },
+          { value: "pending", label: "待处理" },
+          { value: "accept", label: "接受" },
+          { value: "reject", label: "拒绝" },
         ],
       },
       {
         key: "issue",
-        label: "Unresolved fact issue",
+        label: "未解决事实问题",
         type: "checkbox",
         value: false,
       },
@@ -177,13 +177,13 @@ window.AIFSProjectFigures.register("pj-plain-language-rewrite-desk-4", {
       return {
         summary:
           v.decision === "accept" && v.issue
-            ? "Reject the review file."
-            : "Export " +
+            ? "拒绝审阅文件。"
+            : "导出 " +
               (v.decision === "accept" ? "candidate" : "original") +
-              " paragraph.",
+              " 段落。",
         metrics: [
           {
-            label: "Unresolved review",
+            label: "未解决审阅",
             value: v.decision === "pending" ? 1 : 0,
           },
         ],

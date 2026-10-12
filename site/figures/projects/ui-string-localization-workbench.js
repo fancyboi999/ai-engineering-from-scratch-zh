@@ -1,28 +1,28 @@
 window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-1", {
-  title: "Read message keys, placeholders and context",
+  title: "读取消息键、占位符和上下文",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Record stable keys and exact interpolation contracts before translation.",
+        "翻译前记录稳定键和精确插值契约。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "placeholders(text:string):string[]; readCatalog(value:unknown):Message[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "text",
-        label: "Message template",
+        label: "消息模板",
         type: "text",
         value: "{count} of {count} tools",
       },
@@ -30,46 +30,46 @@ window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-1", {
     calculate(v) {
       const p = v.text.match(/\{[a-zA-Z_][a-zA-Z0-9_]*\}/g) || [];
       return {
-        summary: "Multiplicity is part of the contract.",
-        columns: ["Placeholder"],
+        summary: "重复次数是契约的一部分。",
+        columns: ["占位符"],
         rows: p.sort().map((x) => [x]),
-        metrics: [{ label: "Occurrences", value: p.length }],
+        metrics: [{ label: "出现次数", value: p.length }],
       };
     },
   },
 });
 
 window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-2", {
-  title: "Generate bounded translation proposals",
+  title: "生成有界翻译提案",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Bound recorded translation proposals and report contract problems before review.",
+        "限制已记录翻译提案，审阅前报告契约问题。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "proposeTranslations(messages:Message[],recorded:unknown,locale:string):Proposal[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "source",
-        label: "Source template",
+        label: "源模板",
         type: "text",
         value: "{count} tools",
       },
       {
         key: "proposal",
-        label: "Proposed translation",
+        label: "拟议翻译",
         type: "text",
         value: "Herramientas",
       },
@@ -81,9 +81,9 @@ window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-2", {
       return {
         summary:
           JSON.stringify(a) === JSON.stringify(b)
-            ? "Placeholder contract preserved."
-            : "Block approval: placeholder multiset changed.",
-        columns: ["Source", "Proposal"],
+            ? "占位符契约已保留。"
+            : "阻止批准：占位符多重集合已改变。",
+        columns: ["来源", "提案"],
         rows: [[JSON.stringify(a), JSON.stringify(b)]],
       };
     },
@@ -91,31 +91,31 @@ window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-2", {
 });
 
 window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-3", {
-  title: "Preview strings with supplied interpolation values",
+  title: "用给定插值值预览字符串",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Render interpolation as text so reviewers can see real layout content.",
+        "将插值渲染为文本，让审阅者看到真实布局内容。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "previewMessage(template:string,values:Record<string,string|number>):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
-      { key: "name", label: "Member name", type: "text", value: "Lina" },
+      { key: "name", label: "成员姓名", type: "text", value: "Lina" },
       {
         key: "count",
-        label: "Selected tools",
+        label: "选中工具数",
         type: "range",
         value: 3,
         min: 0,
@@ -125,11 +125,11 @@ window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-3", {
     ],
     calculate(v) {
       return {
-        summary: "Variables render as text in the preview.",
-        columns: ["Message", "Preview"],
+        summary: "变量在预览中作为文本渲染。",
+        columns: ["消息", "预览"],
         rows: [
-          ["Greeting", "Hola, " + v.name],
-          ["Count", v.count + " herramientas"],
+          ["问候", "Hola, " + v.name],
+          ["计数", v.count + " herramientas"],
         ],
       };
     },
@@ -137,36 +137,36 @@ window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-3", {
 });
 
 window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-4", {
-  title: "Export approved locale and unresolved questions",
+  title: "导出已批准 locale 和未解决问题",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Export only explicitly approved translations with their context checks.",
+        "只导出明确批准的翻译及其上下文检查。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "reviewTranslations(messages,proposals,value?):{catalog,unresolved,review}; renderWorkbench(messages,proposals,state,locale,values?):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "approve",
-        label: "Approve translation",
+        label: "批准翻译",
         type: "checkbox",
         value: true,
       },
       {
         key: "ack",
-        label: "Acknowledge ambiguous context",
+        label: "确认歧义上下文",
         type: "checkbox",
         value: false,
       },
@@ -174,10 +174,10 @@ window.AIFSProjectFigures.register("pj-ui-string-localization-workbench-4", {
     calculate(v) {
       const accepted = v.approve && v.ack;
       return {
-        summary: accepted ? "Export this key." : "Keep this key unresolved.",
+        summary: accepted ? "导出此键。" : "此键保持未解决。",
         metrics: [
-          { label: "Approved keys", value: accepted ? 1 : 0 },
-          { label: "Unresolved keys", value: accepted ? 0 : 1 },
+          { label: "已批准键数", value: accepted ? 1 : 0 },
+          { label: "未解决键数", value: accepted ? 0 : 1 },
         ],
       };
     },

@@ -1,25 +1,25 @@
 (function () {
   "use strict";
   window.AIFSProjectFigures.register("pj-signed-webhook-inbox-1", {
-    title: "Raw bytes",
+    title: "原始字节",
     steps: [
       {
-        label: "Inputs",
+        label: "输入",
         detail:
-          "A space changes signed input even when JSON meaning is unchanged.",
+          "即使 JSON 含义不变，一个空格也会改变签名输入。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
     caption:
-      "A space changes signed input even when JSON meaning is unchanged.",
+      "即使 JSON 含义不变，一个空格也会改变签名输入。",
     lab: {
       controls: [
         {
           key: "body",
-          label: "Raw JSON body",
+          label: "原始 JSON 请求体",
           type: "text",
           value: '{"eventId":"business-42"}',
         },
@@ -27,11 +27,11 @@
       calculate(v) {
         const bytes = new TextEncoder().encode(v.body);
         return {
-          summary: bytes.length + " exact bytes enter the signature",
+          summary: bytes.length + " 个精确字节进入签名",
           metrics: [
-            { label: "Bytes after one added space", value: bytes.length + 1 },
+            { label: "增加一个空格后的字节数", value: bytes.length + 1 },
           ],
-          columns: ["Input", "Byte count"],
+          columns: ["输入", "字节数"],
           rows: [
             [v.body, bytes.length],
             [v.body + " ", bytes.length + 1],
@@ -41,23 +41,23 @@
     },
   });
   window.AIFSProjectFigures.register("pj-signed-webhook-inbox-2", {
-    title: "Timestamp window",
+    title: "时间戳窗口",
     steps: [
       {
-        label: "Inputs",
-        detail: "Bound old and future signatures with an inclusive interval.",
+        label: "输入",
+        detail: "用包含端点的区间限制旧签名和未来签名。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Bound old and future signatures with an inclusive interval.",
+    caption: "用包含端点的区间限制旧签名和未来签名。",
     lab: {
       controls: [
         {
           key: "age",
-          label: "Seconds since signature",
+          label: "签名后秒数",
           type: "range",
           value: 300,
           min: 0,
@@ -66,7 +66,7 @@
         },
         {
           key: "window",
-          label: "Allowed skew seconds",
+          label: "允许偏差秒数",
           type: "range",
           value: 300,
           min: 0,
@@ -77,83 +77,83 @@
       calculate(v) {
         return {
           summary:
-            v.age <= v.window ? "Timestamp accepted" : "Timestamp rejected",
+            v.age <= v.window ? "时间戳接受" : "时间戳拒绝",
           metrics: [
             {
-              label: "Outside window seconds",
+              label: "超出窗口秒数",
               value: Math.max(0, v.age - v.window),
             },
           ],
           bars: [
-            { label: "Age", value: v.age, max: 600 },
-            { label: "Window", value: v.window, max: 600 },
+            { label: "经过时间", value: v.age, max: 600 },
+            { label: "窗口", value: v.window, max: 600 },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-signed-webhook-inbox-3", {
-    title: "Delivery identity",
+    title: "投递标识",
     steps: [
       {
-        label: "Inputs",
-        detail: "Transport retries share an ID and the exact same body.",
+        label: "输入",
+        detail: "传输重试共享 ID 和完全相同的请求体。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Transport retries share an ID and the exact same body.",
+    caption: "传输重试共享 ID 和完全相同的请求体。",
     lab: {
       controls: [
         {
           key: "first",
-          label: "Accepted ID",
+          label: "已接受 ID",
           type: "text",
           value: "delivery-1",
         },
         {
           key: "next",
-          label: "Incoming ID",
+          label: "传入 ID",
           type: "text",
           value: "delivery-1",
         },
-        { key: "body", label: "Incoming body", type: "text", value: "same" },
+        { key: "body", label: "传入请求体", type: "text", value: "same" },
       ],
       calculate(v) {
         return {
           summary:
             v.next !== v.first
-              ? "New transport delivery"
+              ? "新传输投递"
               : v.body === "same"
-                ? "Duplicate retry: reuse entry"
-                : "Identity conflict: reject",
+                ? "重复重试：复用条目"
+                : "标识冲突：拒绝",
           metrics: [
-            { label: "New stored delivery", value: v.next !== v.first ? 1 : 0 },
+            { label: "新存储投递", value: v.next !== v.first ? 1 : 0 },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-signed-webhook-inbox-4", {
-    title: "Explicit replay",
+    title: "显式重放",
     steps: [
       {
-        label: "Inputs",
-        detail: "A new run is distinct from a new transport delivery.",
+        label: "输入",
+        detail: "新运行不同于新传输投递。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "A new run is distinct from a new transport delivery.",
+    caption: "新运行不同于新传输投递。",
     lab: {
       controls: [
         {
           key: "runs",
-          label: "Replay run IDs",
+          label: "重放运行 ID",
           type: "text",
           value: "review-1,review-1,review-2",
         },
@@ -165,14 +165,14 @@
             .filter(Boolean),
           unique = [...new Set(runs)];
         return {
-          summary: unique.length + " processing receipts",
+          summary: unique.length + " 条处理回执",
           metrics: [
             {
-              label: "Repeated runs reused",
+              label: "复用的重复运行数",
               value: runs.length - unique.length,
             },
           ],
-          columns: ["Stored run ID"],
+          columns: ["存储的运行 ID"],
           rows: unique.map((x) => [x]),
         };
       },

@@ -1,27 +1,27 @@
 window.AIFSProjectFigures.register("pj-api-tutorial-runner-1", {
-  title: "Extract explicit requests from an authored tutorial",
+  title: "从自编教程提取明确请求",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Identify executable tutorial examples without guessing intent from arbitrary code blocks.",
+        "识别可执行教程示例，不从任意代码块猜测意图。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail: "extractRequests(markdown:string):RequestStep[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "before",
-        label: "Lines before request fence",
+        label: "请求围栏前的行数",
         type: "range",
         value: 4,
         min: 0,
@@ -30,7 +30,7 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-1", {
       },
       {
         key: "steps",
-        label: "Explicit request blocks",
+        label: "明确请求块数量",
         type: "range",
         value: 3,
         min: 1,
@@ -40,10 +40,10 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-1", {
     ],
     calculate(v) {
       return {
-        summary: "Source locations identify the exact example to repair.",
+        summary: "源位置指出要修复的精确示例。",
         metrics: [
-          { label: "Opening fence line", value: v.before + 1 },
-          { label: "Request count", value: v.steps },
+          { label: "起始围栏行", value: v.before + 1 },
+          { label: "请求数", value: v.steps },
         ],
       };
     },
@@ -51,30 +51,30 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-1", {
 });
 
 window.AIFSProjectFigures.register("pj-api-tutorial-runner-2", {
-  title: "Resolve typed variables across steps",
+  title: "跨步骤解析类型化变量",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Make dependencies explicit and preserve captured primitive types.",
+        "明确依赖，保留捕获的基本类型。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "resolveValue(value:unknown,variables:Record<string,string|number|boolean>):unknown; captureVariables(body,declarations,previous?):Record<string,string|number|boolean>",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "id",
-        label: "Captured numeric loan ID",
+        label: "捕获的数值借用 ID",
         type: "number",
         value: 41,
       },
@@ -82,11 +82,11 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-2", {
     calculate(v) {
       return {
         summary:
-          "Exact substitution keeps a number; URL substitution encodes text.",
-        columns: ["Boundary", "Value"],
+          "精确替换保留数字；URL 替换编码文本。",
+        columns: ["边界", "值"],
         rows: [
-          ["JSON body", JSON.stringify({ loan: v.id })],
-          ["Request path", "/loans/" + encodeURIComponent(String(v.id))],
+          ["JSON 请求体", JSON.stringify({ loan: v.id })],
+          ["请求路径", "/loans/" + encodeURIComponent(String(v.id))],
         ],
       };
     },
@@ -94,30 +94,30 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-2", {
 });
 
 window.AIFSProjectFigures.register("pj-api-tutorial-runner-3", {
-  title: "Run bounded requests against a test service",
+  title: "对测试服务运行有界请求",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Exercise the actual HTTP wire with bounded local or explicitly opted-in requests.",
+        "用有界本地或明确启用的请求演练真实 HTTP 传输。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "runTutorial(steps:RequestStep[],baseURL:string,options?):Promise<Receipt[]>",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "bytes",
-        label: "Response bytes",
+        label: "响应字节数",
         type: "range",
         value: 80000,
         min: 0,
@@ -126,7 +126,7 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-3", {
       },
       {
         key: "limit",
-        label: "Byte limit",
+        label: "字节上限",
         type: "range",
         value: 65536,
         min: 1024,
@@ -138,14 +138,14 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-3", {
       return {
         summary:
           v.bytes > v.limit
-            ? "Abort response and skip remaining requests."
-            : "Response fits the configured bound.",
+            ? "中止响应，跳过剩余请求。"
+            : "响应符合配置上限。",
         metrics: [
-          { label: "Over budget", value: Math.max(0, v.bytes - v.limit) },
+          { label: "超出预算", value: Math.max(0, v.bytes - v.limit) },
         ],
         bars: [
-          { label: "Response", value: v.bytes, max: 131072 },
-          { label: "Limit", value: v.limit, max: 131072 },
+          { label: "响应", value: v.bytes, max: 131072 },
+          { label: "上限", value: v.limit, max: 131072 },
         ],
       };
     },
@@ -153,30 +153,30 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-3", {
 });
 
 window.AIFSProjectFigures.register("pj-api-tutorial-runner-4", {
-  title: "Export source-linked failures and correction proposals",
+  title: "导出关联来源的失败与修正提案",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Produce portable test evidence and require a reviewed correction rather than silently editing a tutorial.",
+        "生成可移植测试证据，要求经过审阅的修正，不悄悄编辑教程。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "exportResults(steps,receipts):{junit,html,corrections}; acceptedCorrections(receipts,value):{id,line,proposal}[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "failure",
-        label: "First failing step",
+        label: "首个失败步骤",
         type: "range",
         value: 2,
         min: 1,
@@ -186,13 +186,13 @@ window.AIFSProjectFigures.register("pj-api-tutorial-runner-4", {
     ],
     calculate(v) {
       return {
-        summary: "Stop after the first failure, preserving source evidence.",
+        summary: "首个失败后停止，保留源证据。",
         metrics: [
-          { label: "Passed", value: v.failure - 1 },
-          { label: "Failed", value: 1 },
-          { label: "Skipped", value: 3 - v.failure },
+          { label: "通过", value: v.failure - 1 },
+          { label: "失败", value: 1 },
+          { label: "跳过", value: 3 - v.failure },
         ],
-        columns: ["Step", "Status"],
+        columns: ["步骤", "状态"],
         rows: [1, 2, 3].map((n) => [
           n,
           n < v.failure ? "pass" : n === v.failure ? "fail" : "skip",

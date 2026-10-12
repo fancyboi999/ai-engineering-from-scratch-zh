@@ -1,53 +1,53 @@
 (function () {
   "use strict";
   window.AIFSProjectFigures.register("pj-configuration-drift-explainer-1", {
-    title: "Scalar validation",
+    title: "标量校验",
     steps: [
       {
-        label: "Inputs",
-        detail: "Nested values need an explicit merge contract.",
+        label: "输入",
+        detail: "嵌套值需要明确合并契约。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Nested values need an explicit merge contract.",
+    caption: "嵌套值需要明确合并契约。",
     lab: {
       controls: [
-        { key: "value", label: "JSON scalar", type: "text", value: "30" },
+        { key: "value", label: "JSON 标量", type: "text", value: "30" },
       ],
       calculate(v) {
         const x = JSON.parse(v.value);
         const ok =
           x === null || ["string", "number", "boolean"].includes(typeof x);
         return {
-          summary: ok ? "Accepted scalar" : "Rejected nested value",
-          metrics: [{ label: "Accepted", value: ok }],
-          columns: ["Value", "Type"],
+          summary: ok ? "接受的标量" : "拒绝的嵌套值",
+          metrics: [{ label: "接受", value: ok }],
+          columns: ["值", "类型"],
           rows: [[JSON.stringify(x), x === null ? "null" : typeof x]],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-configuration-drift-explainer-2", {
-    title: "Layer precedence",
+    title: "层级优先级",
     steps: [
       {
-        label: "Inputs",
-        detail: "Last layer wins while history remains visible.",
+        label: "输入",
+        detail: "最后一层优先，同时保留可见历史。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Last layer wins while history remains visible.",
+    caption: "最后一层优先，同时保留可见历史。",
     lab: {
       controls: [
         {
           key: "base",
-          label: "Default timeout",
+          label: "默认超时",
           type: "range",
           value: 30,
           min: 0,
@@ -56,7 +56,7 @@
         },
         {
           key: "override",
-          label: "Override timeout",
+          label: "覆盖超时",
           type: "range",
           value: 5,
           min: 0,
@@ -66,9 +66,9 @@
       ],
       calculate(v) {
         return {
-          summary: "Effective timeout " + v.override,
-          metrics: [{ label: "Shadowed timeout", value: v.base }],
-          columns: ["Source", "Value"],
+          summary: "生效超时 " + v.override,
+          metrics: [{ label: "被覆盖的超时", value: v.base }],
+          columns: ["来源", "值"],
           rows: [
             ["defaults.json", v.base],
             ["env:TIMEOUT", v.override],
@@ -78,23 +78,23 @@
     },
   });
   window.AIFSProjectFigures.register("pj-configuration-drift-explainer-3", {
-    title: "Observed drift",
+    title: "观察到的漂移",
     steps: [
       {
-        label: "Inputs",
-        detail: "Missing and explicit values have separate meanings.",
+        label: "输入",
+        detail: "缺失值和明确值含义不同。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Missing and explicit values have separate meanings.",
+    caption: "缺失值和明确值含义不同。",
     lab: {
       controls: [
         {
           key: "expected",
-          label: "Expected timeout",
+          label: "预期超时",
           type: "range",
           value: 5,
           min: 0,
@@ -103,7 +103,7 @@
         },
         {
           key: "actual",
-          label: "Observed timeout",
+          label: "观察超时",
           type: "range",
           value: 30,
           min: 0,
@@ -113,43 +113,43 @@
       ],
       calculate(v) {
         return {
-          summary: v.expected === v.actual ? "equal" : "changed",
-          metrics: [{ label: "Difference", value: v.actual - v.expected }],
+          summary: "漂移状态：" + (v.expected === v.actual ? "equal" : "changed"),
+          metrics: [{ label: "差异", value: v.actual - v.expected }],
           bars: [
-            { label: "Expected", value: v.expected, max: 60 },
-            { label: "Observed", value: v.actual, max: 60 },
+            { label: "预期", value: v.expected, max: 60 },
+            { label: "观察", value: v.actual, max: 60 },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-configuration-drift-explainer-4", {
-    title: "Redacted export",
+    title: "脱敏导出",
     steps: [
       {
-        label: "Inputs",
-        detail: "Classification happens before display redaction.",
+        label: "输入",
+        detail: "分类发生在显示脱敏之前。",
       },
       {
-        label: "Compute",
-        detail: "Change an input to inspect the calculated result.",
+        label: "计算",
+        detail: "改变输入，检查计算结果。",
       },
     ],
-    caption: "Classification happens before display redaction.",
+    caption: "分类发生在显示脱敏之前。",
     lab: {
       controls: [
-        { key: "key", label: "Key", type: "text", value: "api_token" },
-        { key: "old", label: "Expected", type: "text", value: "before" },
-        { key: "now", label: "Observed", type: "text", value: "after" },
+        { key: "key", label: "键", type: "text", value: "api_token" },
+        { key: "old", label: "预期", type: "text", value: "before" },
+        { key: "now", label: "观察", type: "text", value: "after" },
       ],
       calculate(v) {
         const hide = /(password|secret|token|api[_-]?key|credential)/i.test(
           v.key,
         );
         return {
-          summary: v.old === v.now ? "equal" : "changed",
-          metrics: [{ label: "Redacted", value: hide }],
-          columns: ["Key", "Expected", "Observed"],
+          summary: "漂移状态：" + (v.old === v.now ? "equal" : "changed"),
+          metrics: [{ label: "已脱敏", value: hide }],
+          columns: ["键", "预期", "观察"],
           rows: [
             [v.key, hide ? "[REDACTED]" : v.old, hide ? "[REDACTED]" : v.now],
           ],

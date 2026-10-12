@@ -1,34 +1,34 @@
 window.AIFSProjectFigures.register("pj-field-notes-map-builder-1", {
-  title: "Import coordinates, timestamps and evidence",
+  title: "导入坐标、时间戳和证据",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Keep each location and its original evidence as an independent observation.",
+        "将每个位置及原证据保留为独立观察记录。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail: "importObservations(value: unknown): Observation[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
-      { key: "lon", label: "Longitude", type: "number", value: 77.59 },
-      { key: "lat", label: "Latitude", type: "number", value: 12.97 },
+      { key: "lon", label: "经度", type: "number", value: 77.59 },
+      { key: "lat", label: "纬度", type: "number", value: 12.97 },
     ],
     calculate(v) {
       const ok = Math.abs(v.lon) <= 180 && Math.abs(v.lat) <= 90;
       return {
         summary: ok
-          ? "Valid WGS84 coordinates."
-          : "Reject out-of-range location.",
-        columns: ["GeoJSON coordinate array"],
+          ? "有效 WGS84 坐标。"
+          : "拒绝越界位置。",
+        columns: ["GeoJSON 坐标数组"],
         rows: [[JSON.stringify([v.lon, v.lat])]],
       };
     },
@@ -36,30 +36,30 @@ window.AIFSProjectFigures.register("pj-field-notes-map-builder-1", {
 });
 
 window.AIFSProjectFigures.register("pj-field-notes-map-builder-2", {
-  title: "Compute distances and explain nearby groups",
+  title: "计算距离并解释邻近组",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Group nearby records using a reproducible distance rule and retained pairwise evidence.",
+        "用可复现距离规则和保留的成对证据给邻近记录分组。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "distanceMeters(a,b): number; groupNearby(items:Observation[],radiusMeters:number):Groups",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "delta",
-        label: "Longitude separation at equator (degrees)",
+        label: "赤道上的经度差（度）",
         type: "range",
         value: 0.001,
         min: 0,
@@ -68,7 +68,7 @@ window.AIFSProjectFigures.register("pj-field-notes-map-builder-2", {
       },
       {
         key: "radius",
-        label: "Grouping radius (meters)",
+        label: "分组半径（米）",
         type: "range",
         value: 120,
         min: 0,
@@ -81,15 +81,15 @@ window.AIFSProjectFigures.register("pj-field-notes-map-builder-2", {
       return {
         summary:
           d <= v.radius
-            ? "Add a nearby edge."
-            : "Keep these points disconnected.",
+            ? "添加邻近边。"
+            : "保持这些点不连接。",
         metrics: [
-          { label: "Distance", value: d.toFixed(2) + " m" },
-          { label: "Radius", value: v.radius + " m" },
+          { label: "距离", value: d.toFixed(2) + " m" },
+          { label: "半径", value: v.radius + " m" },
         ],
         bars: [
-          { label: "Distance", value: d, max: 1200 },
-          { label: "Threshold", value: v.radius, max: 1200 },
+          { label: "距离", value: d, max: 1200 },
+          { label: "阈值", value: v.radius, max: 1200 },
         ],
       };
     },
@@ -97,44 +97,44 @@ window.AIFSProjectFigures.register("pj-field-notes-map-builder-2", {
 });
 
 window.AIFSProjectFigures.register("pj-field-notes-map-builder-3", {
-  title: "Review groups without merging observations",
+  title: "审阅组，不合并观察记录",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Let reviewers split a computed group without deleting any observation.",
+        "允许审阅者拆分计算组，不删除任何观察记录。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "reviewGroups(groups:Groups,value?:unknown):{schemaVersion:1;groups;decisions}",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "members",
-        label: "Component members",
+        label: "连通分量成员数",
         type: "range",
         value: 3,
         min: 1,
         max: 10,
         step: 1,
       },
-      { key: "split", label: "Keep separate", type: "checkbox", value: true },
+      { key: "split", label: "保持分离", type: "checkbox", value: true },
     ],
     calculate(v) {
       return {
-        summary: "Review changes groups without deleting evidence.",
+        summary: "审阅改变分组，不删除证据。",
         metrics: [
-          { label: "Exported groups", value: v.split ? v.members : 1 },
-          { label: "Original observations", value: v.members },
+          { label: "导出组数", value: v.split ? v.members : 1 },
+          { label: "原始观察记录数", value: v.members },
         ],
       };
     },
@@ -142,31 +142,31 @@ window.AIFSProjectFigures.register("pj-field-notes-map-builder-3", {
 });
 
 window.AIFSProjectFigures.register("pj-field-notes-map-builder-4", {
-  title: "Export GeoJSON and a portable map report",
+  title: "导出 GeoJSON 和可移植地图报告",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Produce a mapping interchange artifact and a reviewable offline map.",
+        "生成地图交换产物和可审阅离线地图。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "exportGeoJSON(items:Observation[],review):{type:string;features:any[]}; renderMap(items,groups,review):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
-      { key: "lon", label: "Longitude", type: "number", value: -179.999 },
+      { key: "lon", label: "经度", type: "number", value: -179.999 },
       {
         key: "origin",
-        label: "First observation longitude",
+        label: "首条观察记录经度",
         type: "number",
         value: 179.999,
       },
@@ -175,10 +175,10 @@ window.AIFSProjectFigures.register("pj-field-notes-map-builder-4", {
       const x = v.origin + ((v.lon - v.origin + 540) % 360) - 180;
       return {
         summary:
-          "Unwrap around the first point for the schematic view; keep original GeoJSON coordinates.",
+          "示意图围绕首点展开；保留原 GeoJSON 坐标。",
         metrics: [
-          { label: "Display longitude", value: x.toFixed(3) },
-          { label: "Export longitude", value: v.lon },
+          { label: "显示经度", value: x.toFixed(3) },
+          { label: "导出经度", value: v.lon },
         ],
       };
     },

@@ -1,27 +1,27 @@
 window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-1", {
-  title: "Tokenize a corpus and count word histories",
+  title: "对语料分词并统计词历史",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Count words and one- or two-word histories without crossing sentence boundaries.",
+        "统计词和一词／两词历史，不跨越句子边界。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail: "tokenize(text: string): string[]; train(corpus: unknown): Model",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "text",
-        label: "Corpus sentence",
+        label: "语料句子",
         type: "text",
         value: "garden club shares seeds garden club shares tools",
       },
@@ -31,12 +31,12 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-1", {
         c = {};
       t.forEach((x) => (c[x] = (c[x] || 0) + 1));
       return {
-        summary: "Repeated tokens increment unigram evidence.",
-        columns: ["Token", "Count"],
+        summary: "重复 token 增加 unigram 证据。",
+        columns: ["token", "计数"],
         rows: Object.entries(c),
         metrics: [
-          { label: "Tokens", value: t.length },
-          { label: "Vocabulary", value: Object.keys(c).length },
+          { label: "token 数", value: t.length },
+          { label: "词汇量", value: Object.keys(c).length },
         ],
       };
     },
@@ -44,30 +44,30 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-1", {
 });
 
 window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-2", {
-  title: "Rank prefix and next-word candidates",
+  title: "排序前缀和下一词候选",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Rank candidates by the longest observed history and show the underlying count.",
+        "按最长观察历史排序候选，展示底层计数。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "suggest(model: Model, prefix: string, history?: string[], limit?: number): Suggestion[]",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "history",
-        label: "Matching history length",
+        label: "匹配历史长度",
         type: "range",
         value: 2,
         min: 0,
@@ -76,7 +76,7 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-2", {
       },
       {
         key: "count",
-        label: "Observed count",
+        label: "观察计数",
         type: "range",
         value: 3,
         min: 1,
@@ -86,15 +86,15 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-2", {
     ],
     calculate(v) {
       return {
-        summary: "Rank first by history length, then count.",
+        summary: "先按历史长度，再按计数排序。",
         metrics: [
-          { label: "Display score", value: v.history * 1000000 + v.count },
-          { label: "Context order", value: v.history },
+          { label: "显示分数", value: v.history * 1000000 + v.count },
+          { label: "上下文阶数", value: v.history },
         ],
-        columns: ["Evidence", "Value"],
+        columns: ["证据", "值"],
         rows: [
-          ["Conditional count", v.count],
-          ["History tokens", v.history],
+          ["条件计数", v.count],
+          ["历史 token", v.history],
         ],
       };
     },
@@ -102,30 +102,30 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-2", {
 });
 
 window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-3", {
-  title: "Accept suggestions in a writing pad",
+  title: "在写作板接受建议",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Distinguish an unfinished token from a completed word before inserting a suggestion.",
+        "插入建议前区分未完成 token 与已完成单词。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "completeText(model: Model, text: string, limit?: number): {prefix:string;history:string[];suggestions:Suggestion[]}; acceptSuggestion(text:string,prefix:string,word:string):string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "text",
-        label: "Current text",
+        label: "当前文本",
         type: "text",
         value: "Garden club sh",
       },
@@ -135,13 +135,13 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-3", {
         t = tail.toLowerCase().match(/[a-z]+/g) || [],
         prefix = /[a-z]$/i.test(tail) ? t.pop() || "" : "";
       return {
-        summary: "Trailing whitespace marks a completed token.",
-        columns: ["Field", "Value"],
+        summary: "尾部空白标记已完成 token。",
+        columns: ["字段", "值"],
         rows: [
-          ["Prefix", prefix],
-          ["History", JSON.stringify(t.slice(-2))],
+          ["前缀", prefix],
+          ["历史", JSON.stringify(t.slice(-2))],
           [
-            "Accept shares",
+            "接受 shares",
             v.text.slice(0, v.text.length - prefix.length) + "shares ",
           ],
         ],
@@ -151,30 +151,30 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-3", {
 });
 
 window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-4", {
-  title: "Export the learned model and editor function",
+  title: "导出学习到的模型和编辑器函数",
   steps: [
     {
-      label: "Read evidence",
+      label: "读取证据",
       detail:
-        "Validate a portable model and ship a pad that calls the same suggestion functions.",
+        "校验可移植模型，交付调用相同建议函数的写作板。",
     },
     {
-      label: "Compute",
+      label: "计算",
       detail:
         "importModel(value: unknown): Model; renderPad(model: Model, initial?: string): string",
     },
     {
-      label: "Inspect result",
-      detail: "Change an input and explain the resulting decision.",
+      label: "检查结果",
+      detail: "改变输入，解释由此产生的决定。",
     },
   ],
   caption:
-    "Original calculated teaching mechanism. Real exported artifacts come from the TypeScript implementation.",
+    "原创计算教学机制。真实导出产物由 TypeScript 实现生成。",
   lab: {
     controls: [
       {
         key: "total",
-        label: "Unigram count",
+        label: "unigram 计数",
         type: "range",
         value: 5,
         min: 1,
@@ -183,7 +183,7 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-4", {
       },
       {
         key: "conditional",
-        label: "Conditional count",
+        label: "条件计数",
         type: "range",
         value: 3,
         min: 1,
@@ -195,11 +195,11 @@ window.AIFSProjectFigures.register("pj-vocabulary-autocomplete-pad-4", {
       return {
         summary:
           v.conditional <= v.total
-            ? "Counts can be imported."
-            : "Reject: conditional count exceeds its total.",
+            ? "可以导入计数。"
+            : "拒绝：条件计数超过总数。",
         metrics: [
           {
-            label: "Remaining contexts",
+            label: "剩余上下文数",
             value: Math.max(0, v.total - v.conditional),
           },
         ],
