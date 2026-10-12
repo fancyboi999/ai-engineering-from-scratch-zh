@@ -196,40 +196,164 @@ const facility = fs.readFileSync(path.join(__dirname, 'test_project_figure_runti
 const facilityContext = { require, __dirname, exports: {} };
 vm.runInNewContext(facility.slice(0, facility.indexOf('\nconst controls =')) + '\nexports.environment = environment;', facilityContext);
 const environment = facilityContext.exports.environment;
-async function settle() {
-  // Web Crypto is asynchronous; allow its completion without a real browser.
-  for (let i = 0; i < 20; i++) await new Promise(resolve => setImmediate(resolve));
+function completionBoundary(timeoutMs = 5000) {
+  const pending = new Set();
+  function track(result) {
+    if (!result || typeof result.then !== 'function') return result;
+    // Observe both outcomes without creating an orphan rejected Promise. The
+    // caller still receives the original Promise and its original result/error.
+    const observed = Promise.resolve(result).then(
+      () => pending.delete(observed), () => pending.delete(observed));
+    pending.add(observed);
+    return result;
+  }
+  async function settle() {
+    let timer;
+    try {
+      await Promise.race([
+        (async () => {
+          // A calculation can launch another digest after its previous digest.
+          // Track the full calculation too, so an empty digest queue cannot be
+          // mistaken for completion. Runtime's result handlers run before this
+          // drain finishes, including the rejection-to-error-message handler.
+          while (pending.size) await Promise.all([...pending]);
+        })(),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(`Figure calculation did not settle within ${timeoutMs} ms`)), timeoutMs);
+        }),
+      ]);
+    } finally { clearTimeout(timer); }
+  }
+  return { track, settle };
+}
+function runtimeFixture(slug, crypto = webcrypto, timeoutMs = 5000) {
+  const env = environment(), providers = new Map(), completion = completionBoundary(timeoutMs);
+  env.window.crypto = { subtle: { digest: (...args) => completion.track(crypto.subtle.digest(...args)) } };
+  const register = env.window.LF.register;
+  env.window.LF.register = entries => { register(entries); for (const [id, render] of Object.entries(entries)) providers.set(id, render); };
+  const registerFigure = env.window.AIFSProjectFigures.register;
+  env.window.AIFSProjectFigures.register = (id, config) => registerFigure(id, {
+    ...config,
+    lab: { ...config.lab, calculate: (...args) => completion.track(config.lab.calculate(...args)) },
+  });
+  vm.runInNewContext(source(slug), { window: env.window, TextEncoder });
+  return { env, providers, completion };
 }
 for (const slug of slugs) {
   test(`${slug}: actual shared-runtime registration renders Chinese text safely`, async () => {
-    const env = environment();
-    const providers = new Map();
-    env.window.crypto = webcrypto;
-    const register = env.window.LF.register;
-    env.window.LF.register = entries => { register(entries); for (const [id, render] of Object.entries(entries)) providers.set(id, render); };
-    vm.runInNewContext(source(slug), { window: env.window, TextEncoder });
+    const { env, providers, completion } = runtimeFixture(slug);
     assert.equal(providers.size, 4);
     for (const [id, render] of providers) {
       const host = env.el('div'); env.document.body.append(host);
       const cleanup = render(host);
-      await settle();
-      assert.ok(host.querySelector('.pj-mechanism-lab'), id);
-      chinese(host.textContent, `${id}: rendered text`);
-      assert.notEqual(host.querySelector('.pj-trace-state').hidden, true, `${id}: computation rendered`);
-      assert.equal(host.querySelector('script'), null, `${id}: no HTML injection`);
-      const input = host.querySelectorAll('input').find(x => x.getAttribute('type') === 'text');
-      if (input) {
-        input.value = '<script>alert("中文")</script>&'; input.dispatch('input');
-        await settle();
-        assert.equal(host.querySelector('script'), null);
-        const message = host.querySelector('.pj-lab-message');
-        if (message.textContent) chinese(message.textContent, `${id}: error/announcement`);
+      try {
+        await completion.settle();
+        assert.ok(host.querySelector('.pj-mechanism-lab'), id);
+        chinese(host.textContent, `${id}: rendered text`);
+        assert.notEqual(host.querySelector('.pj-trace-state').hidden, true, `${id}: computation rendered`);
+        assert.equal(host.querySelector('script'), null, `${id}: no HTML injection`);
+        const input = host.querySelectorAll('input').find(x => x.getAttribute('type') === 'text');
+        if (input) {
+          input.value = '<script>alert("中文")</script>&'; input.dispatch('input');
+          await completion.settle();
+          assert.equal(host.querySelector('script'), null);
+          const message = host.querySelector('.pj-lab-message');
+          if (message.textContent) chinese(message.textContent, `${id}: error/announcement`);
+        }
+      } finally {
+        cleanup(); host.remove();
+        assert.equal(env.timers.size, 0);
       }
-      cleanup(); host.remove();
     }
     assert.equal(env.timers.size, 0);
   });
 }
+
+test('completion boundary waits for held native digests on mount and overlapping input changes', async () => {
+  let release, digestCalls = 0;
+  let gate = new Promise(resolve => { release = resolve; });
+  const crypto = { subtle: { digest(...args) {
+    digestCalls++;
+    return gate.then(() => webcrypto.subtle.digest(...args));
+  } } };
+  const { env, providers, completion } = runtimeFixture('dataset-split-auditor', crypto);
+  const host = env.el('div'); env.document.body.append(host);
+  const cleanup = providers.get('pj-dataset-split-auditor-4')(host);
+  try {
+    assert.equal(host.querySelector('.pj-trace-state').hidden, true);
+    assert.equal(digestCalls, 1);
+    const mounted = completion.settle();
+    release(); await mounted;
+    assert.equal(digestCalls, 2, 'test partition digest launches after train digest');
+    assert.equal(host.querySelector('.pj-trace-state').hidden, false);
+    assert.equal(host.querySelector('.pj-mechanism-lab').getAttribute('aria-busy'), 'false');
+    gate = new Promise(resolve => { release = resolve; });
+    const input = host.querySelectorAll('input').find(x => x.getAttribute('type') === 'text');
+    input.value = '<script>alert("中文")</script>&'; input.dispatch('input');
+    assert.equal(host.querySelector('.pj-mechanism-lab').getAttribute('aria-busy'), 'true');
+    assert.equal(digestCalls, 3);
+    input.value += ' updated'; input.dispatch('input');
+    assert.equal(digestCalls, 4, 'both input revisions have pending calculations');
+    const updated = completion.settle();
+    release(); await updated;
+    assert.equal(digestCalls, 6, 'both revisions complete their serial test digest');
+    assert.equal(host.querySelector('.pj-trace-state').hidden, false);
+    assert.equal(host.querySelector('.pj-mechanism-lab').getAttribute('aria-busy'), 'false');
+    assert.ok(host.textContent.includes(input.value), 'provided text is rendered literally');
+    assert.equal(host.querySelector('script'), null);
+  } finally {
+    release(); cleanup(); host.remove();
+    assert.equal(env.timers.size, 0);
+  }
+});
+
+test('completion boundary follows serial native digests and handled native rejection', async () => {
+  const completion = completionBoundary();
+  const bytes = new TextEncoder().encode('fixture');
+  let result;
+  const calculation = completion.track((async () => {
+    const first = await completion.track(webcrypto.subtle.digest('SHA-256', bytes));
+    return completion.track(webcrypto.subtle.digest('SHA-256', first));
+  })());
+  calculation.then(value => { result = value; });
+  await completion.settle();
+  const first = await webcrypto.subtle.digest('SHA-256', bytes);
+  const expected = await webcrypto.subtle.digest('SHA-256', first);
+  assert.deepEqual(new Uint8Array(result), new Uint8Array(expected));
+  const rejected = completion.track(webcrypto.subtle.digest('not-a-digest', bytes));
+  let observedError;
+  const handled = rejected.catch(error => { observedError = error; });
+  await completion.settle(); await handled;
+  assert.equal(observedError.name, 'NotSupportedError');
+  const crypto = { subtle: { digest: () => webcrypto.subtle.digest('not-a-digest', bytes) } };
+  const fixture = runtimeFixture('dataset-split-auditor', crypto);
+  const host = fixture.env.el('div'); fixture.env.document.body.append(host);
+  const cleanup = fixture.providers.get('pj-dataset-split-auditor-4')(host);
+  try {
+    await fixture.completion.settle();
+    assert.equal(host.querySelector('.pj-trace-state').hidden, true);
+    assert.equal(host.querySelector('.pj-mechanism-lab').getAttribute('aria-busy'), 'false');
+    chinese(host.querySelector('.pj-lab-message').textContent, 'runtime exposes the rejection');
+  } finally {
+    cleanup(); host.remove();
+    assert.equal(fixture.env.timers.size, 0);
+  }
+});
+
+test('never-settling digest fails within the explicit bound and still cleans the host', async () => {
+  const crypto = { subtle: { digest: () => new Promise(() => {}) } };
+  const { env, providers, completion } = runtimeFixture('dataset-split-auditor', crypto, 25);
+  const host = env.el('div'); env.document.body.append(host);
+  const cleanup = providers.get('pj-dataset-split-auditor-4')(host);
+  try {
+    await assert.rejects(completion.settle(), /Figure calculation did not settle within 25 ms/);
+    assert.equal(host.querySelector('.pj-trace-state').hidden, true, 'incomplete work never counts as rendered');
+    assert.equal(host.querySelector('script'), null);
+  } finally {
+    cleanup(); host.remove();
+    assert.equal(env.timers.size, 0);
+  }
+});
 
 test('display translations keep status signals and policy selections live', async () => {
   const get = (slug, stage) => configs(slug).get(`pj-${slug}-${stage}`).lab;
