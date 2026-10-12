@@ -21,6 +21,7 @@ for (const route of ['/phase/setup-and-tooling', '/glossary/attention']) {
     const cases = [
       ['*/*', 200, 'text/html'], ['text/html, text/markdown;q=0', 200, 'text/html'],
       ['text/html;q=1, text/markdown;q=0.1', 200, 'text/html'],
+      ['text/html, text/markdown;q=.1', 200, 'text/html'],
       ['text/html;q=0.1, text/markdown;q=1', 200, 'text/markdown'],
       ['text/html, text/markdown', 200, 'text/markdown'],
       ['text/markdown;q=0, */*;q=1', 200, 'text/html'],

@@ -164,7 +164,7 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: "1"
         run: |
-          node --test site/test*.js lib/test*.js scripts/test_lesson_reader.js scripts/test_site_integration.js scripts/test_hub_negotiation.js
+          node --test site/test*.js lib/test*.js scripts/test_lesson_reader.js scripts/test_site_integration.js scripts/test_hub_negotiation.js scripts/test_reader_sidebar_routes.js
           node scripts/check_hubs.js
           node scripts/audit_manuals.js --skip-capture
           node scripts/check_manual_outputs.js
@@ -179,3 +179,4 @@ jobs:
           test -n "$CHROME_PATH" || { echo "缺少 Chrome，真实 DOM gate 未执行"; exit 1; }
           export CHROME_PATH
           node scripts/test_attribute_safety.js
+          node scripts/test_project_layout.js

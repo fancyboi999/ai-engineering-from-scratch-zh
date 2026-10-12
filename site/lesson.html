@@ -3469,10 +3469,10 @@
         }
 
         if (learningPathMode) {
-          var pathReturnHref = 'catalog.html';
+          var pathReturnHref = '/catalog.html';
           var pathReturnLabel = '完整课程目录';
           if (learningPath.kind === 'career-route') {
-            pathReturnHref = 'learning-paths.html#career-route-' + encodeURIComponent(learningPath.id);
+            pathReturnHref = '/learning-paths.html#career-route-' + encodeURIComponent(learningPath.id);
             pathReturnLabel = '返回职业路线';
           }
           var pathHtml = '<div class="sidebar-phase-nav"><a href="' + pathReturnHref + '">&larr; ' + pathReturnLabel + '</a></div>';
