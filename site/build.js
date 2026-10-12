@@ -2233,6 +2233,7 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   writeSitemap(phases, glossaryTerms.length, certifications, learningPaths);
   writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths);
   writeLessonPages(phases);
+  require('./build-agents').build();
 }
 
 // ─── sitemap.xml from the same PHASES the site renders ───────────────────

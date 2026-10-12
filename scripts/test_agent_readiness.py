@@ -110,7 +110,7 @@ def main() -> None:
     assert_public_html_route(paths, "/certification", "id", "certification")
     representation = paths["/api/v1/markdown"]
     assert representation["parameters"][0]["name"] == "path"
-    assert {"200", "404", "405", "406"} == set(representation["get"]["responses"])
+    assert {"200", "400", "404", "405", "406", "503"} == set(representation["get"]["responses"])
     for response in representation["head"]["responses"].values():
         assert "content" not in response, "HEAD must not advertise a response body"
     for status in ("200", "404"):

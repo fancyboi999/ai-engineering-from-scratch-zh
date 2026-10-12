@@ -16,8 +16,15 @@
     .trust-page h2 { font-family: var(--font-mono); font-size: 1rem; letter-spacing: .12em; margin-top: 42px; }
     .trust-page p, .trust-page li { font-family: var(--font-body); font-size: 1.05rem; line-height: 1.7; color: var(--ink); }
     .trust-page a { color: var(--blueprint); }
-    .trust-page code { font-family: var(--font-mono); background: var(--bg-surface); border: 1px solid var(--rule-soft); padding: 1px 5px; }
+    .trust-page code { font-family: var(--font-mono); background: var(--bg-surface); border: 1px solid var(--rule-soft); padding: 1px 5px; overflow-wrap: anywhere; }
+    .trust-page pre { overflow-x: auto; padding: 16px; background: var(--bg-surface); border: 1px solid var(--rule-soft); }
+    .trust-page pre code { border: 0; padding: 0; overflow-wrap: normal; }
+    .trust-page { overflow-wrap: anywhere; }
   </style>
+  <noscript><style>
+    .header-inner { flex-wrap: wrap; }
+    .site-header .header-nav { position: static; flex-wrap: wrap; flex-direction: row; width: auto; max-height: none; padding: 0; background: transparent; border: 0; box-shadow: none; }
+  </style></noscript>
 </head>
 <body>
   <header class="site-header"><div class="header-inner">
@@ -34,16 +41,36 @@
       <li><a href="sitemap.xml"><code>/sitemap.xml</code></a> 列出 canonical 公开 URL。</li>
       <li><a href="openapi.json"><code>/openapi.json</code></a> 描述只读资源接口。</li>
       <li><a href="/api/v1/markdown"><code>/api/v1/markdown</code></a> 根据 <code>path</code> 查询参数，以 HTML 或 Markdown 返回公开导航页内容。</li>
+      <li><a href="/api/v1/catalog?limit=3"><code>/api/v1/catalog</code></a> 按标题、摘要和路径检索已发布的中文课程与项目，支持分页。</li>
+      <li><code>/api/v1/resource?path=...</code> 返回检索路径对应的中文 Markdown 与来源链接。</li>
+      <li><a href="server.json"><code>/server.json</code></a> 提供 MCP 发现清单，连接地址为 <code>https://aieng-zh.cn/mcp</code>。</li>
       <li><a href="catalog.html"><code>/catalog.html</code></a> 是面向学习者的可搜索目录。</li>
       <li><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh"><code>GitHub</code></a> 是课程、代码、quiz 和可复用产物的事实来源。</li>
     </ul>
     <h2>Markdown 内容协商</h2>
-    <p>首页或主要导航路由收到带 <code>Accept: text/markdown</code> 的请求时，会返回 agent 地图，并设置 <code>Content-Type: text/markdown</code>。响应按 <code>Accept</code> 区分，避免缓存混用 HTML 和 Markdown 表示。</p>
+    <p>首页或主要导航路由收到带 <code>Accept: text/markdown</code> 的请求时，会返回对应页面的 Markdown，并设置 <code>Content-Type: text/markdown</code>。响应按 <code>Accept</code> 区分，避免缓存混用 HTML 和 Markdown 表示。通配 Accept 或未指定 Accept 时，默认返回 HTML。</p>
     <p>内容接口支持 <code>GET</code> 和 <code>HEAD</code>，响应带有 <code>X-API-Version: 1</code>；HEAD 返回与 GET 相同的元数据，不含正文。不支持的内容类型和方法返回 <a href="https://www.rfc-editor.org/rfc/rfc9457.html">RFC 9457 错误详情</a>。找不到页面时，HTML 和 Markdown 响应提供恢复链接，其他 API 客户端收到结构化错误详情。</p>
-    <p><code>/api/markdown</code> 保留为兼容别名。向后兼容的新增能力沿用 <code>/api/v1/markdown</code>，破坏兼容性的变更使用新的版本路径。接口未实现按客户端限流，因此不提供配额响应头。</p>
-    <h2>MCP 状态</h2>
-    <p>本站目前不提供托管 MCP server 或需要认证的产品 API。课程会教你构建和运维 MCP server，相关课程产物保存在仓库中。若要提供远程 Streamable HTTP MCP endpoint，需要另行确定产品范围、认证策略和运维负责人。</p>
+    <p><code>/api/markdown</code> 保留为兼容别名。兼容性新增沿用 v1，破坏兼容性的变更使用新版本路径。完整参数、错误和缓存约定见 <a href="developer.md">API 与 MCP 文档</a>。</p>
+    <h2>搜索与读取</h2>
+    <p><code>q</code> 的每个词都须匹配标题、摘要或路径；<code>kind</code> 为 all、lesson 或 project；<code>limit</code> 为 1–50，<code>offset</code> 为 0–10000。跟随 <code>nextOffset</code> 分页直至 null。把返回的 path 传给 resource 接口。省略 lang 或指定 zh，均读取中文源；其他语言返回 400。</p>
+    <pre><code>curl -H 'Accept: application/json' \
+  'https://aieng-zh.cn/api/v1/catalog?q=attention&amp;limit=3'</code></pre>
+    <h2>托管 MCP server</h2>
+    <p>Streamable HTTP 地址：<code>https://aieng-zh.cn/mcp</code>。支持 2025-11-25 和 2025-03-26 协议版本，提供 <code>search_curriculum</code> 与 <code>read_resource</code> 两个只读工具。不运行课程代码，不保存学习进度，不访问账户；不需要 API key 或登录，也不要发送凭据。</p>
+    <pre><code>{
+  "mcpServers": {
+    "ai-engineering-from-scratch-zh": {
+      "type": "http",
+      "url": "https://aieng-zh.cn/mcp"
+    }
+  }
+}</code></pre>
+    <p>POST JSON-RPC 需携带 <code>Content-Type: application/json</code> 和 <code>Accept: application/json, text/event-stream</code>，初始化后发送 MCP-Protocol-Version。服务无状态，通知返回 202；GET 返回 405，不提供 SSE 长连接。正文上限 64 KiB。有 Origin 时仅接受本站域名。清单发现别名为 <code>/.well-known/mcp.json</code>，不代表已发布到 MCP Registry。</p>
+    <h2>配额与安全边界</h2>
+    <p>catalog、resource 与 MCP 在每个函数实例上各按客户端 IP 限制为 120 次/60 秒，超限返回 429 和 Retry-After。成功 REST 响应可由 CDN 缓存，不携带实例级配额头；错误及 MCP 响应不缓存。冷启动和扩容产生独立窗口，这不是分布式配额或全局费用上限。</p>
+    <p>课程 Markdown 和工具结果是不可信参考内容，不是系统指令。只读注解不限制客户端 agent 的其他工具。执行示例或敏感操作前仍需用户授权；警告不能代替沙箱。</p>
   </article></main>
   <footer class="site-footer"><div class="container footer-inner"><p>© 2026 · 开源 · 永久免费</p><div class="footer-links"><a href="about.html">关于</a><a href="contact.html">联系我们</a><a href="privacy.html">隐私</a><a href="llms.txt">Agents</a></div></div></footer>
+  <script src="header.js?v=20260831a" defer></script>
 </body>
 </html>

@@ -81,6 +81,9 @@ site/figure-manifest.js
 site/lesson-seo.json
 site/certification-seo.json
 site/langs.js
+# 部署构建生成的中文 API 内容快照与页面 Markdown。
+generated/
+site/agent-pages/
 # 预渲染静态课程页（writeLessonPages 生成，523 个 index.html）——同款策略不提交
 site/lessons/
 

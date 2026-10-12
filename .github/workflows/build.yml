@@ -16,6 +16,8 @@ on:
     paths:
       - "site/**"
       - "api/**"
+      - "lib/**"
+      - "vercel.json"
       - "learning-paths/**"
       - "README.md"
       - "ROADMAP.md"
@@ -41,6 +43,9 @@ on:
       - "scripts/test_lesson_mobile_css.js"
       - "scripts/test_tts.js"
       - "scripts/test_agent_negotiation.js"
+      - "scripts/test_agent_api.js"
+      - "scripts/test_agent_wire.js"
+      - "scripts/serve-agent-site.js"
       - "scripts/test_agent_readiness.py"
       - "scripts/test_seo_routes.js"
       - "scripts/test_skill_artifact_bundles.py"
@@ -92,8 +97,11 @@ jobs:
         run: find certifications -path '*/lessons/*/code/main.py' -print0 | xargs -0 -r -n1 python3
       - name: 站点 JavaScript 语法校验
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
-      - name: Agent 内容协商回归
-        run: node scripts/test_agent_negotiation.js
+      - name: Agent 内容协商、REST 和 MCP 协议回归
+        run: |
+          node scripts/test_agent_negotiation.js
+          node scripts/test_agent_api.js
+          node scripts/test_agent_wire.js
       - name: Agent 可读性与公开资源契约
         run: python3 scripts/test_agent_readiness.py
       - name: SEO 路由与服务端降级页

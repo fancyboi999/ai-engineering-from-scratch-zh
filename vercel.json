@@ -3,8 +3,17 @@
   "outputDirectory": "site",
   "framework": null,
   "installCommand": "echo skip",
+  "functions": {
+    "api/mcp.js": { "maxDuration": 10, "includeFiles": "generated/agent-content.json" },
+    "api/v1/catalog.js": { "maxDuration": 10, "includeFiles": "generated/agent-content.json" },
+    "api/v1/resource.js": { "maxDuration": 10, "includeFiles": "generated/agent-content.json" },
+    "api/markdown.js": { "maxDuration": 10, "includeFiles": "{site/*.html,site/agent-pages/*.md}", "excludeFiles": "site/**/*.js" },
+    "api/v1/markdown.js": { "maxDuration": 10, "includeFiles": "{site/*.html,site/agent-pages/*.md}", "excludeFiles": "site/**/*.js" },
+    "api/not-found.js": { "maxDuration": 10, "includeFiles": "site/404.html" }
+  },
   "routes": [
-    { "src": "/", "methods": ["GET", "HEAD"], "dest": "/api/markdown?path=/" }
+    { "src": "/", "methods": ["GET", "HEAD"], "dest": "/api/markdown?path=/" },
+    { "src": "/(index|about|catalog|glossary|prereqs|developer|contact|privacy|learning-paths|certifications)\\.html", "methods": ["GET", "HEAD"], "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }], "dest": "/api/markdown?path=/$1.html" }
   ],
   "rewrites": [
     { "source": "/lesson", "destination": "/api/lesson" },
@@ -20,16 +29,22 @@
     { "source": "/privacy", "has": [{ "type": "header", "key": "accept", "value": ".*" }], "destination": "/api/markdown?path=/privacy" },
     { "source": "/glossary", "destination": "/glossary.html" },
     { "source": "/catalog", "destination": "/catalog.html" },
+    { "source": "/certifications", "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }], "destination": "/api/markdown?path=/certifications" },
     { "source": "/certifications", "destination": "/certifications.html" },
     { "source": "/assessment", "destination": "/assessment.html" },
     { "source": "/path", "destination": "/prereqs.html" },
     { "source": "/roadmap", "destination": "/prereqs.html" },
     { "source": "/about", "destination": "/about.html" },
+    { "source": "/learning-paths", "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }], "destination": "/api/markdown?path=/learning-paths" },
     { "source": "/learning-paths", "destination": "/learning-paths.html" },
     { "source": "/developer", "destination": "/developer.html" },
     { "source": "/docs", "destination": "/developer.html" },
     { "source": "/contact", "destination": "/contact.html" },
-    { "source": "/privacy", "destination": "/privacy.html" }
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/mcp", "destination": "/api/mcp" },
+    { "source": "/.well-known/mcp.json", "destination": "/server.json" },
+    { "source": "/api/openapi.json", "destination": "/openapi.json" },
+    { "source": "/api/:missing*", "destination": "/api/not-found?api=1" }
   ],
   "headers": [
     {
