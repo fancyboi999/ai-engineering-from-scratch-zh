@@ -1,0 +1,121 @@
+{
+  "id": "voice-note-transcriber-pipeline",
+  "title": "语音笔记转录流水线",
+  "level": 3,
+  "levelName": "工程实践",
+  "tagline": "使用真实可选 HTTP 识别器，将选定 WAV 转成可检查的转录与字幕审核页，并提供如实标注的离线语音 fixture。",
+  "summary": "使用真实可选 HTTP 识别器，将选定 WAV 转成可检查的转录与字幕审核页，并提供如实标注的离线语音 fixture。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "audio.wav、captions.vtt、transcript.json，以及带嵌入播放和 cue 跳转按钮的 HTML 页。",
+  "usefulFor": [
+    "audio.wav、captions.vtt、transcript.json，以及带嵌入播放和 cue 跳转按钮的 HTML 页。"
+  ],
+  "skills": [
+    "处理前解码音频时钟",
+    "测量活动，不宣称语音检测",
+    "将真实 WAV 字节送过识别器边界",
+    "导出可听、可纠正的转录"
+  ],
+  "prerequisites": [
+    "Python bytes、列表和上下文管理器。",
+    "采样率、声道和有符号整数音频样本。",
+    "可调用 provider 接口和基本 HTTP 请求结构。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-voice-note-transcriber-pipeline-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、显式算法和确定性本地测试。"
+  },
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-pcm",
+      "title": "处理前解码音频时钟",
+      "summary": "整数样本 0、16384 和 -16384 变成 0、0.5 和 -0.5。16000 Hz 下样本索引 800 表示 0.05 秒。同一索引若按 8000 Hz 解释，即使不改一个字节，时间戳也会翻倍。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-voice-note-transcriber-pipeline-1",
+      "concepts": [
+        "PCM WAV",
+        "样本归一化",
+        "样本时钟"
+      ]
+    },
+    {
+      "id": "02-activity",
+      "title": "测量活动，不宣称语音检测",
+      "summary": "1000 Hz 下，40 个振幅 0.5 的样本、20 个静音样本和 40 个活动样本，在 gap_ms 为 40 时合并为 [0,100]。合并跨度为 100 ms。min_ms 为 40 时，孤立的 20 ms 突发被丢弃。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-voice-note-transcriber-pipeline-2",
+      "concepts": [
+        "RMS 能量",
+        "间隔合并",
+        "活动限制"
+      ]
+    },
+    {
+      "id": "03-transcribe",
+      "title": "将真实 WAV 字节送过识别器边界",
+      "summary": "provider 超时后成功，记录 attempts=2。每个输出行保留 start、end、text 和精确编码片段的 SHA256。第二片段不能与前一片段重叠，小数样本索引无效。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-voice-note-transcriber-pipeline-3",
+      "concepts": [
+        "multipart HTTP",
+        "有界重试",
+        "音频哈希"
+      ]
+    },
+    {
+      "id": "04-captions",
+      "title": "导出可听、可纠正的转录",
+      "summary": "fixture CLI 将原创朗读音频与提供参考文本配对，明确标注方法。真实识别用 --endpoint。检查播放后，编辑 transcript.json 行并用 --review-file 重渲染；报告必须匹配原始音频哈希。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-voice-note-transcriber-pipeline-4",
+      "concepts": [
+        "WebVTT",
+        "音频审核",
+        "可移植导出"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}

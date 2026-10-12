@@ -1,0 +1,155 @@
+{
+  "id": "cloud-agent-with-aws-strands",
+  "title": "使用 AWS Strands 的云端 agent",
+  "level": 4,
+  "levelName": "系统实践",
+  "tagline": "限定范围的云端故障读取器，为每次缓存命中和重试保留执行回执。",
+  "summary": "限定范围的云端故障读取器，为每次缓存命中和重试保留执行回执。导入 run(payload, provider)。provider 只接收经过校验的操作和范围内资源。可选 Strands 模型提出计划，但绝不会绕过确定性校验器。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "限定范围的云端故障读取器，为每次缓存命中和重试保留执行回执。",
+  "usefulFor": [
+    "导入 run(payload, provider)。provider 只接收经过校验的操作和范围内资源。可选 Strands 模型提出计划，但绝不会绕过确定性校验器。"
+  ],
+  "skills": [
+    "校验限定范围的云端检查计划",
+    "在步骤和响应预算内执行读取",
+    "重试暂时性读取失败并复用已完成请求",
+    "用本地模型驱动真正的 Strands 循环"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "JSON、集合、异常、回调和环境配置。可选 SDK 对照使用 requirements-framework.txt。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-cloud-agent-with-aws-strands-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、显式算法和确定性本地测试。"
+  },
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "incident.json"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-plan",
+      "title": "校验限定范围的云端检查计划",
+      "summary": "删除操作或范围外资源在任何 provider 调用前失败。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-cloud-agent-with-aws-strands-1",
+      "concepts": [
+        "校验",
+        "一个",
+        "限定范围的",
+        "云端"
+      ]
+    },
+    {
+      "id": "02-executor",
+      "title": "在步骤和响应预算内执行读取",
+      "summary": "零步骤预算不执行 provider 调用，返回 budget_exhausted。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-cloud-agent-with-aws-strands-2",
+      "concepts": [
+        "执行",
+        "读取",
+        "限制内",
+        "步骤"
+      ]
+    },
+    {
+      "id": "03-retry",
+      "title": "重试暂时性读取失败并复用已完成请求",
+      "summary": "暂时性超时会重试，权限失败则在一次调用后传播。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-cloud-agent-with-aws-strands-3",
+      "concepts": [
+        "重试",
+        "暂时性的",
+        "读取",
+        "与"
+      ]
+    },
+    {
+      "id": "04-strands-adapter",
+      "title": "用本地模型驱动真正的 Strands 循环",
+      "summary": "框架通过一次模型调用产生一份录制 JSON 计划，再由独立校验器检查。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-cloud-agent-with-aws-strands-4",
+      "concepts": [
+        "驱动",
+        "该",
+        "真实的",
+        "Strands"
+      ],
+      "runners": [
+        {
+          "language": "python"
+        },
+        {
+          "language": "python",
+          "optional": true,
+          "requires": [
+            "python:strands"
+          ],
+          "argv": [
+            "{python}",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "{stage}/tests-framework",
+            "-p",
+            "test_framework.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    },
+    {
+      "gif": "media/framework.gif",
+      "poster": "media/framework.png",
+      "title": "验证真实 SDK",
+      "caption": "安装依赖后，用确定性本地模型执行的可选真实 SDK 测试。没有在线云服务或模型 provider 调用。"
+    }
+  ]
+}

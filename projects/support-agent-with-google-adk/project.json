@@ -1,0 +1,149 @@
+{
+  "id": "support-agent-with-google-adk",
+  "title": "使用 Google ADK 的支持 agent",
+  "level": 3,
+  "levelName": "工程实践",
+  "tagline": "构建脱敏且获授权的支持审核，保留回复和证据，再通过真实 Google ADK agent 运行同一政策。",
+  "summary": "构建脱敏且获授权的支持审核，保留回复和证据，再通过真实 Google ADK agent 运行同一政策。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "HTML 审核页和 support.json，包含脱敏工单、选定能力、来源指引、回复或升级和状态历史。",
+  "usefulFor": [
+    "HTML 审核页和 support.json，包含脱敏工单、选定能力、来源指引、回复或升级和状态历史。"
+  ],
+  "skills": [
+    "开始会话前校验",
+    "将路由与授权分开决策",
+    "在交接中保留实际响应",
+    "在真实 ADK 路径内复用政策"
+  ],
+  "prerequisites": [
+    "Python 字典、异常和模块导入。",
+    "异步函数和模型事件迭代器。",
+    "区分请求分类与能力授权。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-support-agent-with-google-adk-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、显式算法和确定性本地测试。"
+  },
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-intake",
+      "title": "开始会话前校验",
+      "summary": "对 invoice for sam@example.invalid api_key=EXAMPLE_TOKEN，可用工单文本变成 invoice for [email] api_key=[redacted]。空字符串在路由前失败。相同清洗文本必须进入基线和 ADK 路径。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-support-agent-with-google-adk-1",
+      "concepts": [
+        "输入校验",
+        "脱敏",
+        "来源处理"
+      ]
+    },
+    {
+      "id": "02-routing",
+      "title": "将路由与授权分开决策",
+      "summary": "invoice refund 选择 billing，可使用 read_invoice。invoice login 让 billing 和 access 同分，因此升级。billing 路由请求 read_account 会被拒绝，尽管该工具对其他专家有效。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-support-agent-with-google-adk-2",
+      "concepts": [
+        "路由评分",
+        "同分",
+        "能力允许列表"
+      ]
+    },
+    {
+      "id": "03-handoff",
+      "title": "在交接中保留实际响应",
+      "summary": "begin 后对 invoice 执行 classify，再以 Check the invoice reference 执行 respond，得到 answered 并保留 response=\"Check the invoice reference\"。历史记录 classify 和 respond。对 invoice login 分类后 respond 会失败；escalate 才是有效转换。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-support-agent-with-google-adk-3",
+      "concepts": [
+        "状态转换",
+        "不可变历史",
+        "响应保留"
+      ]
+    },
+    {
+      "id": "04-adk-adapter",
+      "title": "在真实 ADK 路径内复用政策",
+      "summary": "login 工单选择 read_account 和 access-recovery 指引。fixture 专家据此回复，最终交接保存回复。access 路由请求 read_invoice，会在图运行前抛出 PermissionError。可选测试检查模型请求，保证原始邮件和示例 key 没有跨越边界。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-support-agent-with-google-adk-4",
+      "concepts": [
+        "ADK Workflow",
+        "共享政策边界",
+        "provider 注入"
+      ],
+      "runners": [
+        {
+          "language": "python"
+        },
+        {
+          "language": "python",
+          "optional": true,
+          "requires": [
+            "python:google.adk"
+          ],
+          "argv": [
+            "{python}",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "{stage}/tests-framework",
+            "-p",
+            "test_framework.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    },
+    {
+      "gif": "media/framework.gif",
+      "poster": "media/framework.png",
+      "title": "验证真实 SDK",
+      "caption": "安装依赖后，用确定性本地模型执行的可选真实 SDK 测试。没有在线云服务或模型 provider 调用。"
+    }
+  ]
+}
