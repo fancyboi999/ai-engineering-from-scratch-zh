@@ -1,0 +1,127 @@
+{
+  "id": "semantic-notes-search",
+  "title": "语义笔记搜索",
+  "level": 1,
+  "levelName": "入门实践",
+  "tagline": "通过 Unicode 规范化、显式别名和可检查词法分数搜索 markdown 笔记。",
+  "summary": "用显式同义词扩展和归一化 TF-IDF 分数搜索本地笔记。解释每个匹配，不把检索藏在托管嵌入服务里。",
+  "youWillBuild": "本地笔记搜索，解释每次匹配，并展示别名何时有益、何时有害。",
+  "usefulFor": [
+    "本地笔记搜索，解释每次匹配，并展示别名何时有益、何时有害。",
+    "这是有显式别名、可解释的词法 TF-IDF 基线，不是学习得到的嵌入模型。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理清晰可见，不把机制藏在框架背后。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "规范化笔记并保留标识",
+    "按文档稀有度加权词项",
+    "用稳定同分规则排序查询",
+    "添加嵌入前测量检索效果"
+  ],
+  "prerequisites": [
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    },
+    {
+      "title": "检索增强生成",
+      "path": "phases/11-llm-engineering/06-rag"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-semantic-notes-search-1",
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-normalize-notes",
+      "title": "规范化笔记并保留标识",
+      "summary": "返回规范 Unicode 单词 token。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "Unicode",
+        "分词",
+        "同义词"
+      ],
+      "figure": "pj-semantic-notes-search-1"
+    },
+    {
+      "id": "02-weight-the-index",
+      "title": "按文档稀有度加权词项",
+      "summary": "从 id 到字符串的映射构建索引。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "TF-IDF",
+        "规范化",
+        "文档频率"
+      ],
+      "figure": "pj-semantic-notes-search-2"
+    },
+    {
+      "id": "03-rank-queries",
+      "title": "用稳定同分规则排序查询",
+      "summary": "返回最多 k 个对象，包含 id、score 和匹配词项。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "余弦相似度",
+        "前 k 项",
+        "稳定排序"
+      ],
+      "figure": "pj-semantic-notes-search-3"
+    },
+    {
+      "id": "04-measure-recall",
+      "title": "添加嵌入前测量检索效果",
+      "summary": "评估标注的查询到 id 案例，报告 hits、total 和 recall。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "召回率",
+        "评估 fixture",
+        "错误分析"
+      ],
+      "figure": "pj-semantic-notes-search-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}

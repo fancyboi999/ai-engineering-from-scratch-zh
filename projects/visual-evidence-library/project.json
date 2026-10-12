@@ -1,0 +1,121 @@
+{
+  "id": "visual-evidence-library",
+  "title": "视觉证据库",
+  "level": 3,
+  "levelName": "工程实践",
+  "tagline": "用可检查的坐标证据，查找截图和图表中的文本。",
+  "summary": "用可检查的坐标证据，查找截图和图表中的文本。",
+  "youWillBuild": "独立 HTML 证据图库，带高亮矩形和可复用 evidence.json。",
+  "usefulFor": [
+    "JSON 清单，指定本地 SVG、PNG 或 JPEG 资源、声明尺寸和显式提供的文本矩形。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "Python 无需 OCR 框架，就能明确展示文件校验、Unicode token 搜索、HTTP 载荷和 SVG 解析。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "校验图像路径和文本矩形",
+    "排序匹配并保留矩形",
+    "将提取提案与标签分开",
+    "导出可指认的证据"
+  ],
+  "prerequisites": [
+    "能处理嵌套 Python 字典和列表。",
+    "理解图像像素中的 x/y 坐标及宽/高。",
+    "理解提供的标签与独立观察证据之间的区别。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-visual-evidence-library-1",
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-validate-evidence",
+      "title": "校验图像路径和文本矩形",
+      "summary": "索引之前保留文本断言的来源位置。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "Python 无需 OCR 框架，就能明确展示文件校验、Unicode token 搜索、HTTP 载荷和 SVG 解析。",
+      "concepts": [
+        "路径包含关系",
+        "边界框",
+        "来源追溯"
+      ],
+      "figure": "pj-visual-evidence-library-1"
+    },
+    {
+      "id": "02-search-text-regions",
+      "title": "排序匹配并保留矩形",
+      "summary": "用透明词法查询覆盖率搜索区域文本。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "Python 无需 OCR 框架，就能明确展示文件校验、Unicode token 搜索、HTTP 载荷和 SVG 解析。",
+      "concepts": [
+        "Unicode token",
+        "查询覆盖率",
+        "稳定排序"
+      ],
+      "figure": "pj-visual-evidence-library-2"
+    },
+    {
+      "id": "03-review-vision-proposals",
+      "title": "将提取提案与标签分开",
+      "summary": "调用可选视觉端点，索引前要求审核。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "Python 无需 OCR 框架，就能明确展示文件校验、Unicode token 搜索、HTTP 载荷和 SVG 解析。",
+      "concepts": [
+        "HTTP 适配器",
+        "结构化输出",
+        "人工审核"
+      ],
+      "figure": "pj-visual-evidence-library-3"
+    },
+    {
+      "id": "04-export-the-gallery",
+      "title": "导出可指认的证据",
+      "summary": "渲染可移植图库，带精确区域覆盖层和 JSON 结果。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "Python 无需 OCR 框架，就能明确展示文件校验、Unicode token 搜索、HTTP 载荷和 SVG 解析。",
+      "concepts": [
+        "坐标转换",
+        "安全渲染",
+        "可移植报告"
+      ],
+      "figure": "pj-visual-evidence-library-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "构建与评分",
+      "caption": "全新起始实现失败；完整原创参考方案通过全部四阶段。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查应用输出",
+      "caption": "编写的离线 fixture 所产生的实际输出。provider 和证据边界见 README。"
+    }
+  ]
+}
