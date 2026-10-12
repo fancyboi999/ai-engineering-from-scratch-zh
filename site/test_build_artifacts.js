@@ -464,6 +464,7 @@ test('shared site asset families use the expected cache keys on every page', () 
   const styleRelease = '20260831a';
   const navigationRelease = '20260831b';
   const narrationRelease = '20260831a';
+  const roadmapRelease = '20261012a';
   const pages = [
     'about.html',
     'assessment.html',
@@ -492,7 +493,8 @@ test('shared site asset families use the expected cache keys on every page', () 
 
   assert.equal(versionFor(sourceFor('index.html'), 'app.js'), appRelease);
   assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.css'), release);
-  assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.js'), release);
+  assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.js'), roadmapRelease);
+  assert.equal(versionFor(sourceFor('developer.html'), 'header.js'), navigationRelease);
   assert.match(
     fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8'),
     new RegExp(`NARRATION_VERSION = '${narrationRelease}'`)

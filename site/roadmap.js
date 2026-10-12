@@ -738,16 +738,13 @@
       var numericId = parseInt(nodeId, 10);
       var nextNodeState = 'default';
       if (numericId === id) {
-        node.classList.add('is-selected');
-        setNodeState(node, '已选择', true);
+        nextNodeState = 'selected';
       } else if (ancestors[numericId]) {
-        node.classList.add('is-prerequisite');
-        setNodeState(node, '前置阶段', true);
+        nextNodeState = 'prerequisite';
       } else if (descendants[numericId]) {
-        node.classList.add('is-unlock');
-        setNodeState(node, '后续解锁', true);
-      } else {
-        node.classList.add('is-dimmed');
+        nextNodeState = 'unlock';
+      } else if (id !== null) {
+        nextNodeState = 'dimmed';
       }
       nextNodeStates[nodeId] = nextNodeState;
       if (routeNodeStates[nodeId] !== nextNodeState) updateNodeRouteState(nodeId, nextNodeState);
@@ -782,9 +779,9 @@
     if (nextState !== 'default') node.classList.add('is-' + nextState);
     node.setAttribute('aria-pressed', nextState === 'selected' ? 'true' : 'false');
     restoreNodeState(node);
-    if (nextState === 'selected') setNodeState(node, 'Selected', true);
-    else if (nextState === 'prerequisite') setNodeState(node, 'Prerequisite', true);
-    else if (nextState === 'unlock') setNodeState(node, 'Unlocks', true);
+    if (nextState === 'selected') setNodeState(node, '已选择', true);
+    else if (nextState === 'prerequisite') setNodeState(node, '前置阶段', true);
+    else if (nextState === 'unlock') setNodeState(node, '后续解锁', true);
   }
 
   function updateEdgeRouteState(key, nextState) {
@@ -1003,11 +1000,13 @@
     var recommendationHtml = recommendation
       ? '<div class="roadmap-recommendation"><span>建议下一步</span><button type="button" data-route-phase="' + recommendation.id + '">阶段 ' + formatPhase(recommendation.id) + ' · ' + escapeHtml(recommendation.name) + '</button></div>'
       : '';
-    panel.innerHTML =
+    updateInspector(
       '<span class="roadmap-inspector-eyebrow">路线检查器</span>' +
       '<h2>选择一个阶段</h2>' +
       '<p class="roadmap-inspector-copy">选择节点即可查看通往它的完整路线、它会解锁的所有阶段，以及最适合从本地进度继续的课程。</p>' +
-      recommendationHtml;
+      recommendationHtml,
+      !!animate
+    );
   }
 
   function renderInspector(id, animate) {
@@ -1022,7 +1021,7 @@
     var lesson = nextLessonForPhase(phase);
     var lessonLink = lesson ? lessonPageUrl(lesson) : '';
     var actionLabel = progress.done === progress.total && progress.total > 0 ? '复习本阶段' : (progress.done > 0 ? '继续本阶段' : '开始本阶段');
-    panel.innerHTML =
+    updateInspector(
       '<span class="roadmap-inspector-eyebrow">阶段 ' + formatPhase(id) + '</span>' +
       '<h2>' + escapeHtml(phase.name) + '</h2>' +
       '<span class="roadmap-inspector-state">' + state.label + '</span>' +
@@ -1042,7 +1041,9 @@
       '<div class="roadmap-actions">' +
         (lessonLink ? '<a class="roadmap-action roadmap-action-primary" href="' + lessonLink + '">' + actionLabel + '</a>' : '') +
         '<a class="roadmap-action" href="' + phaseGithubUrl(phase) + '" target="_blank" rel="noopener">在 GitHub 查看本阶段</a>' +
-      '</div>';
+      '</div>',
+      !!animate
+    );
   }
 
   function renderRouteSection(title, ids, emptyMessage) {
