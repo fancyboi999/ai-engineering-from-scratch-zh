@@ -336,6 +336,24 @@
     }, Promise.resolve());
   }
 
+  function prerequisiteHtml(prerequisite) {
+    if (typeof prerequisite === 'string') {
+      return '<li>' + esc(prerequisite.trim() || '前置要求信息无效') + '</li>';
+    }
+    var title = prerequisite && typeof prerequisite.title === 'string' && prerequisite.title.trim()
+      ? prerequisite.title : '前置要求信息无效';
+    var coursePath = prerequisite && typeof prerequisite.path === 'string' ? prerequisite.path : '';
+    var knownCourse = /^(phases\/[a-z0-9-]+\/[a-z0-9-]+)$/.test(coursePath) &&
+      typeof PHASES !== 'undefined' && Array.isArray(PHASES) && PHASES.some(function (phase) {
+        return (phase.lessons || []).some(function (lesson) {
+          var match = /(?:^|\/)(phases\/[^/]+\/[^/]+)\/?$/.exec(lesson.url || '');
+          return match && match[1] === coursePath;
+        });
+      });
+    if (!knownCourse || title === '前置要求信息无效') return '<li>' + esc(title) + '</li>';
+    return '<li><a href="/lessons/' + coursePath.replace(/^phases\//, '') + '/">' + esc(title) + '</a></li>';
+  }
+
   async function renderProject() {
     var params = new URLSearchParams(window.location.search);
     var id = params.get('id') || '';
@@ -350,9 +368,7 @@
     document.getElementById('pjCrumb').textContent = project.title;
     var level = levelInfo(project.level);
 
-    var prereqs = (project.prerequisites || []).map(function (p) {
-      return '<li><a href="lesson.html?path=' + esc(p.path) + '">' + esc(p.title) + '</a></li>';
-    }).join('');
+    var prereqs = (project.prerequisites || []).map(prerequisiteHtml).join('');
     var why = project.languageWhy || {};
     (project.languageReasons || []).forEach(function (item) { why[item.language] = item.why; });
     var whyHtml = Object.keys(why).map(function (lang) {
