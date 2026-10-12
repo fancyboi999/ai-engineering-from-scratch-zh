@@ -81,6 +81,82 @@
 
 在 [AI 工程学习路径](https://aieng-zh.cn/learning-paths.html) 中对比四大核心领域与六大职业发展路线。
 
+## 实战项目与技术手册
+
+核心课程仍是 **20 个阶段、528 节课**。独立的[实战项目目录](https://aieng-zh.cn/projects.html)另有 **76 项就绪项目、308 个阶段**，配备分阶段 starter、参考实现和本地评分器；[技术手册](https://aieng-zh.cn/manuals.html)另有 **2 本**。这些不是新增核心课，也不是官方认证。
+
+下面三个项目可作为起点。在仓库根目录运行命令；starter 在实现对应阶段之前会失败。
+
+<details>
+<summary><strong>01 · 检索评估实验室</strong> · Python · 排序指标与回归检查</summary>
+
+候选版提高了平均 NDCG，但某个查询最相关证据的排名反而降低。构建逐查询比较，报告回归，并让它能够阻止发布检查通过。
+
+使用 Python 3.10+。先复习 [RAG](phases/11-llm-engineering/06-rag/docs/zh.md)与[模型评估](phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)。依次实现排序验证、precision 与 recall、排名敏感指标和系统比较。
+
+```bash
+python3 scripts/project_test.py retrieval-evaluation-lab \
+  --init learning-artifacts/retrieval-evaluation-lab
+python3 scripts/project_test.py retrieval-evaluation-lab \
+  --stage 1 --path learning-artifacts/retrieval-evaluation-lab --strict
+python3 scripts/project_test.py retrieval-evaluation-lab \
+  --all --path learning-artifacts/retrieval-evaluation-lab --strict
+```
+
+**保留产物：** 可复现的比较，包含逐查询差值与用于评分的相关性判断。指标描述的是这些判断，并不能证明回答正确。
+
+[开始项目](https://aieng-zh.cn/project.html?id=retrieval-evaluation-lab) · [查看参考实现](projects/retrieval-evaluation-lab/solution/) · [使用自己的输入](projects/retrieval-evaluation-lab/README.md#使用自己的输入运行)
+
+</details>
+
+<details>
+<summary><strong>02 · Agent 轨迹调试器</strong> · TypeScript · 轨迹解析与计时</summary>
+
+所给轨迹的总耗时仍为 100 ms，但 token 总用量增加了 200，且有一个 span 开始失败。分离重叠子任务与父任务执行时间，再生成可检查的报告，揭示变化。
+
+评分器需要 Node.js 22.18+ 和 Python 3。依次实现 JSONL 解析、父级验证、区间运算和可检查的时间线。
+
+```bash
+python3 scripts/project_test.py agent-trace-debugger \
+  --init learning-artifacts/agent-trace-debugger
+python3 scripts/project_test.py agent-trace-debugger \
+  --stage 1 --path learning-artifacts/agent-trace-debugger --strict
+python3 scripts/project_test.py agent-trace-debugger \
+  --all --path learning-artifacts/agent-trace-debugger --strict
+```
+
+**保留产物：** 输入轨迹、HTML 时间线与 JSON 回归报告。保留每个 span 独占的 token 数，避免把父级与子级用量重复计数。
+
+[开始项目](https://aieng-zh.cn/project.html?id=agent-trace-debugger) · [查看参考实现](projects/agent-trace-debugger/solution/) · [交互式探索计时](https://aieng-zh.cn/project.html?id=agent-trace-debugger&stage=03-timing)
+
+</details>
+
+<details>
+<summary><strong>03 · 工具调用防火墙</strong> · Rust · 角色检查与批准回执</summary>
+
+写入内容在审查后改变，或批准被重放。验证调用信封，检查调用方角色与路径，再消耗一次与精确请求和内容绑定的批准。
+
+使用 Rust 与 Python 3.10+。先复习[工具 schema 设计](phases/13-tools-and-protocols/05-tool-schema-design/docs/zh.md)和[安全边界](phases/17-infrastructure-and-production/25-security-secrets-audit/docs/zh.md)。调用应用提供身份，模型只是提出操作。
+
+```bash
+python3 scripts/project_test.py tool-call-firewall \
+  --init learning-artifacts/tool-call-firewall
+python3 scripts/project_test.py tool-call-firewall \
+  --stage 1 --path learning-artifacts/tool-call-firewall --strict
+python3 scripts/project_test.py tool-call-firewall \
+  --all --path learning-artifacts/tool-call-firewall --strict
+```
+
+**保留产物：** 展示请求操作和策略决策的审计回执。批准只在一次调用中单次使用；本项目不提供持久授权，也不是操作系统沙箱。
+
+[开始项目](https://aieng-zh.cn/project.html?id=tool-call-firewall) · [查看参考实现](projects/tool-call-firewall/solution/) · [探索批准边界](https://aieng-zh.cn/project.html?id=tool-call-firewall&stage=03-consume-a-request-bound-approval-once)
+
+</details>
+
+[浏览全部项目](https://aieng-zh.cn/projects.html) · [职业实践指南](learning-paths/CAREER-PRACTICE.md) · [A2A 101 手册](https://aieng-zh.cn/manual-a2a-101.html) · [Docker Sandboxes 101 手册](https://aieng-zh.cn/manual-docker-sandboxes-101.html)
+
+项目默认评分离线核心，不等于真实模型、可选框架或云服务能力验证。手册中的 capture 是冻结上游的原始证据，版本核验日期是历史记录，不是本次现场复验；中文网页提供实际生成的打印 HTML，不提供未发布的 PDF 下载。
+
 ## 30 秒添加 AI 导师
 
 ```bash

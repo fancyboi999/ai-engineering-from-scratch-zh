@@ -9,6 +9,8 @@
 核心课程包含 20 个阶段、528 节课。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
 你会亲手写出反向传播、分词器、注意力机制和 agent 循环，所以当 PyTorch 或其他库登场时，它们不再是黑盒。
 
+`projects/` 是独立实战层（76 项就绪项目、308 阶段），`manuals/` 是独立技术手册层（2 本）。它们不计入核心 528 课。
+
 `certifications/claude/` 是独立的 Claude 认证备考层，包含 4 条路线、33 节认证课、诊断和原创模拟题。
 认证课程单独统计，使用独立的站点构建与学习路径。
 
@@ -44,7 +46,8 @@ scripts/                       # 审计和构建工具
 6. 代码保持 stdlib-first，不为满足形式而伪造 provider API 集成。
 7. 不直接 push `main`；所有更改走 PR。
 8. 不提交构建产物 `site/sitemap.xml`、`site/llms.txt`、`site/build-meta.js`、`site/certification-data.js`、`site/lessons/`。
-9. `site/data.js` 是中文仓跟踪的构建产物；课程、术语或站点数据变动后必须重建并与源文件一起提交。
+9. 项目、手册、Hub、OG 数据与目录从中文源构建；不提交 `site/projects-data.js`、`site/project-content/`、`site/manuals-data.js`、`site/manuals.html`、`site/manual-*.html`、`site/hubs/`、`site/lesson-terms.json` 或 `site/og-cards.json`。
+10. `site/data.js` 是中文仓跟踪的构建产物；课程、术语或站点数据变动后必须重建并与源文件一起提交。
 
 ## 依赖约束
 
@@ -125,6 +128,20 @@ find certifications/claude/lessons -path '*/code/main.py' -print0 | xargs -0 -n1
 node scripts/check_figure_loader.js
 node scripts/test_tts.js
 ```
+
+项目与手册整合还需运行：
+
+```bash
+python3 scripts/project_test.py --all --solution --strict --report /tmp/project-grade.json
+node --test site/test*.js lib/test*.js scripts/test_site_integration.js
+node scripts/audit_manuals.js --skip-capture
+node scripts/check_manual_outputs.js
+node scripts/check_hubs.js
+node scripts/test_og.js
+node scripts/check_og_cards.js --require-manifests
+```
+
+图表冻结对等回归需要 `AIFS_FIGURE_FROZEN_ROOT`（组 1/2）与 `AIFS_FIGURES_FROZEN_ROOT`（组 3）指向冻结的 `56c886c8821fc488b6f9608895c983d18f0d1ea3` 源根；CI 显式取得该 oracle，缺源不能跳过。OG 字集在全部元数据生成后由开发机用固定 OFL 字体运行 `scripts/build-og-fonts.js` 重建，CI 和部署只检查，不启动 Chromium。卡片 URL 的内容 hash 同时包括字体与 renderer。
 
 `.github/workflows/build.yml` 定义 CI 检查命令。`audit_certifications.py` 校验认证题的答案位置与分布。课程时长以各课 `docs/zh.md` 为源，ROADMAP 行与阶段汇总随正文更新；专项路径的必修范围和时长以 `learning-paths/*.json` 为源。
 
