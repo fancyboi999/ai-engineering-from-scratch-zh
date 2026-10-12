@@ -16,10 +16,10 @@
   <text x="540" y="64.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">加唯一后缀</text>
   <text x="540" y="79.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">新 id，small 规格</text>
   <line x1="220" y1="59" x2="259" y2="59" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-teal)"/>
-  <rect class="m-knock" x="229.6" y="42.03" width="19.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="225" y="42.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="239.5" y="53" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">捕获</text>
   <line x1="420" y1="59" x2="459" y2="59" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-ink)"/>
-  <rect class="m-knock" x="429.6" y="42.03" width="19.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="425" y="42.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="439.5" y="53" font-size="11.5" text-anchor="middle">上传</text>
   <text x="20" y="124" font-size="11" letter-spacing="1.2" fill="var(--m-green-ink, #336b40)">随镜像迁移</text>
   <text x="330" y="124" font-size="11" letter-spacing="1.2" fill="var(--m-grey-ink, #5e5e59)">留在宿主</text>
@@ -48,7 +48,7 @@
   <text x="475" y="293.1" font-size="12" text-anchor="middle" font-weight="700">运行进程与内存</text>
   <text x="475" y="310.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">目的地从镜像启动</text>
   <path d="M300 133 V110 H340 V89" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-7-1-head-teal)"/>
-  <rect class="m-knock" x="147" y="95.42" width="35.7" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="147" y="95.42" width="61" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="150" y="106" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">复制入镜像</text>
   <rect x="330" y="326" width="290" height="40" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
   <text x="475" y="341.1" font-size="12" text-anchor="middle" font-weight="700">活跃 HTTP 方法规则</text>
@@ -58,6 +58,6 @@
   <text x="320" y="410.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器默认1h，创建起硬上限24h</text>
   <text x="320" y="425.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--on-timeout stop保留，delete删除，sbx --cloud ttl +2h延长</text>
   <path d="M540 89 V100 H632 V405 H621" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-7-1-head-amber)"/>
-  <rect class="m-knock" x="569.8" y="101.42" width="32.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="561" y="101.42" width="50" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="586" y="112" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">时钟启动</text>
 </svg>

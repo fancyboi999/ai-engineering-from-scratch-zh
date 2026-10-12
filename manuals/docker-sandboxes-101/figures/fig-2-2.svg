@@ -26,12 +26,12 @@
   <line x1="170" y1="92.5" x2="259" y2="92.5" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-2-2-head-teal)"/>
   <rect class="m-knock" x="168.6" y="75.92" width="91.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="214.5" y="86.5" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">template save</text>
-  <rect class="m-knock" x="202.59" y="96.92" width="23.82" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="195" y="96.92" width="39" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="214.5" y="107.5" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先停止</text>
   <line x1="430" y1="92.5" x2="489" y2="92.5" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-2-2-head-teal)"/>
   <rect class="m-knock" x="430.1" y="75.92" width="58.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="459.5" y="86.5" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">--output</text>
-  <rect class="m-knock" x="441.65" y="96.92" width="35.7" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="436.59" y="96.92" width="45.82" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="459.5" y="107.5" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tar文件</text>
   <line x1="345" y1="125" x2="345" y2="199" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-2-head-ink)"/>
   <rect class="m-knock" x="350" y="151.03" width="116.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
@@ -39,9 +39,9 @@
   <rect class="m-knock" x="350" y="166.42" width="166.38" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="353" y="177" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--pull never -t m101-tpl:v1</text>
   <line x1="555" y1="125" x2="555" y2="199" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-2-head-olive)"/>
-  <rect class="m-knock" x="560" y="151.03" width="19.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="560" y="151.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="563" y="162" font-size="11.5" fill="var(--m-olive-ink, #515f26)">复制</text>
-  <rect class="m-knock" x="560" y="166.42" width="17.88" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="560" y="166.42" width="28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="563" y="177" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">手动</text>
   <text x="20" y="284" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">另一宿主的加载依据帮助，未录制</text>
 </svg>

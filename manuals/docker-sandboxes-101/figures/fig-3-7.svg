@@ -13,7 +13,7 @@
   <text x="155" y="80.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">remote · streamable-http</text>
   <text x="155" y="95.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">requires_oauth: false · auth status: []</text>
   <line x1="290" y1="52" x2="349" y2="52" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-7-head-olive)"/>
-  <rect class="m-knock" x="303.2" y="35.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="294" y="35.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="320" y="46" font-size="11.5" text-anchor="middle" fill="var(--m-olive-ink, #515f26)">不受策略</text>
   <rect x="70" y="150" width="230" height="56" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="185" y="173.25" font-size="12.5" text-anchor="middle" font-weight="700">mcp-gateway-m101-mcp</text>
@@ -22,10 +22,10 @@
   <text x="185" y="303.25" font-size="12.5" text-anchor="middle" font-weight="700">m101-mcp-dyn网关</text>
   <text x="185" y="320.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">动态 · sbx mcp load</text>
   <line x1="150" y1="110" x2="150" y2="149" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-7-head-ink)"/>
-  <rect class="m-knock" x="155" y="118.53" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="155" y="118.53" width="63.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="158" y="129.5" font-size="11.5">创建时固定</text>
   <path d="M40 110 V308 H69" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-3-7-head-ink)"/>
-  <rect class="m-knock" x="45" y="239.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="45" y="239.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="48" y="250" font-size="11.5">实时加载</text>
   <rect x="380" y="128" width="240" height="100" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="500" y="150.75" font-size="12.5" text-anchor="middle" font-weight="700">m101-mcp · tools/list</text>

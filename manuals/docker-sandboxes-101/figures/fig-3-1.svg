@@ -16,7 +16,7 @@
   <text x="507" y="43.1" font-size="12" text-anchor="middle" font-weight="700">正向代理 :3128</text>
   <text x="507" y="60.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">gateway.docker.internal</text>
   <line x1="20" y1="88" x2="620" y2="88" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <rect class="m-knock" x="17" y="72.42" width="210.6" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="17" y="72.42" width="215" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="20" y="83" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">hypervisor · kern.hv_support 为1</text>
   <text x="20" y="110" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">客户机 · M101-DEMO</text>
   <rect x="20" y="118" width="420" height="330" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>

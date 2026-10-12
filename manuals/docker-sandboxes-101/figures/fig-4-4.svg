@@ -50,7 +50,7 @@
   <rect class="m-knock" x="45" y="369.53" width="102.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="48" y="380.5" font-size="11.5">sbx env create</text>
   <line x1="40" y1="450" x2="40" y2="479" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-4-4-head-teal)"/>
-  <rect class="m-knock" x="45" y="453.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="45" y="453.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="48" y="464.5" font-size="11.5" fill="var(--m-teal-ink, #18696a)">记录计划</text>
   <path d="M160 528 V535" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <rect x="340" y="402" width="280" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
@@ -60,7 +60,7 @@
   <text x="480" y="499.1" font-size="12" text-anchor="middle" font-weight="700">+ env: GREETING: servus</text>
   <text x="480" y="516.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">仍 + 5 to add，未应用任何项</text>
   <line x1="360" y1="360" x2="360" y2="401" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-4-head-ink)"/>
-  <rect class="m-knock" x="365" y="369.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="365" y="369.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="368" y="380.5" font-size="11.5">一个参数</text>
   <line x1="360" y1="450" x2="360" y2="479" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-4-head-ink)"/>
 </svg>

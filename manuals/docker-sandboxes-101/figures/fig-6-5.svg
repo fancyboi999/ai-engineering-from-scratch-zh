@@ -19,7 +19,7 @@
   <line x1="170" y1="52" x2="429" y2="52" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-5-head-ink)"/>
   <rect class="m-knock" x="223.9" y="35.42" width="151.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="46" font-size="11" text-anchor="middle">http://localhost:12434</text>
-  <rect class="m-knock" x="254.92" y="56.42" width="89.16" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="244.8" y="56.42" width="109.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="67" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">12434端口 TCP 已开</text>
   <rect x="20" y="88" width="150" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="95" y="105.25" font-size="12.5" text-anchor="middle" font-weight="700">printer</text>
@@ -27,7 +27,7 @@
   <line x1="170" y1="110" x2="429" y2="110" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-5-head-ink)"/>
   <rect class="m-knock" x="181" y="93.42" width="237" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="104" font-size="11" text-anchor="middle">http://model-runner.docker.internal</text>
-  <rect class="m-knock" x="240.07" y="114.42" width="118.86" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="227.42" y="114.42" width="144.16" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="125" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">以 LLM_URL 注入，含 /v1/</text>
   <rect x="20" y="146" width="150" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="95" y="163.25" font-size="12.5" text-anchor="middle" font-weight="700">容器</text>
@@ -35,7 +35,7 @@
   <line x1="170" y1="168" x2="429" y2="168" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-5-head-ink)"/>
   <rect class="m-knock" x="220.6" y="151.42" width="157.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="162" font-size="11" text-anchor="middle">http://172.17.0.1:12434</text>
-  <rect class="m-knock" x="272.74" y="172.42" width="53.52" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="252.5" y="172.42" width="94" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="183" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">依据文档，未录制</text>
   <rect x="20" y="204" width="150" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="95" y="221.25" font-size="12.5" text-anchor="middle" font-weight="700">socket 客户端</text>
@@ -43,7 +43,7 @@
   <line x1="170" y1="226" x2="429" y2="226" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-5-head-ink)"/>
   <rect class="m-knock" x="204.1" y="209.42" width="190.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="220" font-size="11" text-anchor="middle">http://localhost/exp/vDD4.40</text>
-  <rect class="m-knock" x="216.31" y="230.42" width="166.38" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="213.78" y="230.42" width="171.44" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="241" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">model status 的 endpointHost</text>
   <rect x="20" y="262" width="150" height="44" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="95" y="279.25" font-size="12.5" text-anchor="middle" font-weight="700">docker-agent</text>
@@ -51,7 +51,7 @@
   <line x1="170" y1="284" x2="429" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-5-head-ink)"/>
   <rect class="m-knock" x="187.6" y="267.42" width="223.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="278" font-size="11" text-anchor="middle">http://host.docker.internal:12434</text>
-  <rect class="m-knock" x="278.68" y="288.42" width="41.64" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="263.5" y="288.42" width="72" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="299.5" y="299" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">经过沙箱代理</text>
   <rect x="20" y="324" width="600" height="34" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="320" y="344.45" font-size="11.5" text-anchor="middle" font-weight="400">所有路径均不检查凭据：可达端口就能运行模型</text>

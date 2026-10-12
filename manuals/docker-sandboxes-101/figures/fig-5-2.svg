@@ -24,7 +24,7 @@
   <rect class="m-knock" x="167.5" y="149.03" width="88.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="170.5" y="160" font-size="11.5">model: local</text>
   <line x1="162.5" y1="255" x2="162.5" y2="289" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-2-head-ink)"/>
-  <rect class="m-knock" x="167.5" y="261.03" width="75" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="167.5" y="261.03" width="79.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="170.5" y="272" font-size="11.5">无 base_url</text>
   <rect x="335" y="66" width="285" height="62" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="345" y="84" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">agents.root</text>

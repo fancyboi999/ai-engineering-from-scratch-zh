@@ -24,7 +24,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M75 76 L199 76" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="109.65" y="59.03" width="164.7" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="192" y="70" font-size="11.5" text-anchor="middle">CONNECT example.com:443</text>
-  <rect class="m-knock" x="141.48" y="80.42" width="101.04" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="131.36" y="80.42" width="121.28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="192" y="91" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">环境中的 HTTPS_PROXY</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
@@ -40,7 +40,7 @@
   <text x="24" y="166" font-size="11" text-anchor="middle">3</text>
   <line x1="325" y1="162" x2="449" y2="162" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-4-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M325 162 L449 162" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="298.25" y="145.03" width="178.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="289.05" y="145.03" width="196.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="387.5" y="156" font-size="11.5" text-anchor="middle">匹配 sandbox:m101-policy 规则</text>
   </g>
   <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
@@ -66,7 +66,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-rose-ink, #b0344d)" opacity="0"><animateMotion path="M200 291 L76 291" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="78.6" y="274.03" width="226.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="192" y="285" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">HTTP/1.1 403 Forbidden, 90 bytes</text>
-  <rect class="m-knock" x="150.39" y="295.42" width="83.22" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="135.21" y="295.42" width="113.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="192" y="306" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">TLS 内，使用代理 CA</text>
   </g>
   <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
@@ -108,7 +108,7 @@
   <text x="24" y="510" font-size="11" text-anchor="middle">11</text>
   <line x1="200" y1="506" x2="574" y2="506" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-4-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M200 506 L574 506" keyPoints="0;0;1;1" keyTimes="0;0.882;0.963;1" calcMode="linear" dur="6.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.882;0.894;0.963;1" dur="6.8s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="350" y="489.03" width="75" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="336.2" y="489.03" width="102.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="387.5" y="500" font-size="11.5" text-anchor="middle">TLS 隧道，不检查</text>
   <rect class="m-knock" x="280.55" y="510.42" width="213.9" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="387.5" y="521" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTP/1.0 200 Connection established</text>

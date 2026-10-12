@@ -11,7 +11,7 @@
   <text x="485" y="46.25" font-size="12.5" text-anchor="middle" font-weight="700">/run/sandbox/source</text>
   <text x="485" y="63.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">virtiofs ro · Read-only file system</text>
   <line x1="290" y1="51" x2="349" y2="51" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-2-head-ink)"/>
-  <rect class="m-knock" x="292.35" y="34.03" width="54.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="280.85" y="34.03" width="77.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="319.5" y="45" font-size="11.5" text-anchor="middle">绑定挂载，ro</text>
   <rect x="350" y="110" width="270" height="70" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="485" y="132.75" font-size="12.5" text-anchor="middle" font-weight="700">私有克隆，相同路径</text>
@@ -27,7 +27,7 @@
   <text x="485" y="234.25" font-size="12.5" text-anchor="middle" font-weight="700">git-daemon :9418</text>
   <text x="485" y="251.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发布为127.0.0.1:&lt;port&gt;-&gt;9418/tcp4</text>
   <line x1="485" y1="180" x2="485" y2="213" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-2-head-ink)"/>
-  <rect class="m-knock" x="490" y="185.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="490" y="185.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="493" y="196.5" font-size="11.5">提供克隆</text>
   <rect x="20" y="110" width="270" height="70" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="155" y="132.75" font-size="12.5" text-anchor="middle" font-weight="700">remote sandbox-m101-clone</text>

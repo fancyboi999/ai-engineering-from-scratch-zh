@@ -29,7 +29,7 @@
   <line x1="262" y1="134" x2="262" y2="209" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-amber)"/>
   <rect class="m-knock" x="267" y="160.53" width="61.2" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="270" y="171.5" font-size="11.5" fill="var(--m-amber-ink, #85590c)">sbx stop</text>
-  <rect class="m-knock" x="267" y="175.92" width="35.7" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="267" y="175.92" width="61" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="270" y="186.5" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或自动停止</text>
   <line x1="358" y1="210" x2="358" y2="135" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-amber)"/>
   <rect class="m-knock" x="363" y="161.53" width="102.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
@@ -39,7 +39,7 @@
   <path d="M380 242 H560 V135" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-2-1-head-amber)"/>
   <rect class="m-knock" x="446.3" y="225.03" width="47.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="470" y="236" font-size="11.5" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">sbx rm</text>
-  <rect class="m-knock" x="410.57" y="246.42" width="118.86" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="405.51" y="246.42" width="128.98" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="470" y="257" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sbx prune，仅 stopped</text>
   <text x="20" y="292" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">虚线边框：无运行 microVM · 双边框：无残留记录</text>
 </svg>

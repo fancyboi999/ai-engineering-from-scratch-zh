@@ -6,7 +6,11 @@
 
 ## 模板包含什么 {#s-sbx-template-save-and-load-what-a-template-holds}
 
-**模板：** 沙箱容器文件系统的快照，存为镜像。原文：“Templates are saved snapshots of sandboxes that can be reused to create new sandboxes with: sbx run --pull never -t TAG AGENT [WORKSPACE]” {{help-sbx sbx template}}。文档区分镜像与 kit：“A template contains image content; the agent kit still supplies runtime settings such as credentials and network rules” {{docs-sbx Saving a sandbox as a template}}，模板保存镜像内容，凭据与网络规则等运行设置仍由 kit 提供。挂载文件系统不在其中，因为“A saved template isn't a backup of the whole sandbox” {{docs-sbx Saving a sandbox as a template}}，模板不是整个沙箱的备份，宿主工作区和 `/var/lib/docker` 的 Docker 存储均不包含。容器文件系统中的其他内容都包含，连 agent 写入文件的密钥也不例外。凭据应留在 [sbx secret](#s-sbx-secret-set-import-and-set-custom) 和代理中。`/home/agent/.claude/settings.json` 等配置“are always recreated when a sandbox is created” {{docs-sbx Limitations}}，创建沙箱时总会重新生成，因此修改也不会保留。
+**模板：** 沙箱容器文件系统的快照，存为镜像。原文：“Templates are saved snapshots of sandboxes that can be reused to create new sandboxes with: sbx run --pull never -t TAG AGENT [WORKSPACE]” {{help-sbx sbx template}}。文档区分镜像与 kit：“A template contains image content; the agent kit still supplies runtime settings such as credentials and network rules” {{docs-sbx Saving a sandbox as a template}}，模板保存镜像内容，凭据与网络规则等运行设置仍由 kit 提供。
+
+挂载文件系统不在其中，因为“A saved template isn't a backup of the whole sandbox” {{docs-sbx Saving a sandbox as a template}}，模板不是整个沙箱的备份，宿主工作区和 `/var/lib/docker` 的 Docker 存储均不包含。容器文件系统中的其他内容都包含，连 agent 写入文件的密钥也不例外。凭据应留在 [sbx secret](#s-sbx-secret-set-import-and-set-custom) 和代理中。
+
+`/home/agent/.claude/settings.json` 等配置“are always recreated when a sandbox is created” {{docs-sbx Limitations}}，创建沙箱时总会重新生成，因此修改也不会保留。
 
 每个内置 agent 从 `docker/sandbox-templates:<variant>` 启动；`m101-demo` 拉取的是 `docker/sandbox-templates:shell-docker`。后缀为 `-docker` 的变体“include Docker Engine for building and running containers inside the sandbox” {{docs-sbx Choose a template}}，包含用于沙箱内构建和运行容器的 Docker Engine，所以 `docker version` 在 `m101-demo` 内能响应。设置 `platform.images.useDHI` 后，“the default template docker/sandbox-templates:claude-code-docker becomes dhi/sbx-templates:claude-code-docker” {{docs-sbx platform.images.useDHI}}，默认仓库改变，tag 保持相同。
 

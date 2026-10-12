@@ -31,7 +31,7 @@
   <path d="M320 144 V166 H320 V189" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
   <path d="M520 144 V166 H320 V189" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
   <line x1="320" y1="238" x2="320" y2="269" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-teal)"/>
-  <rect class="m-knock" x="325" y="242.53" width="75" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="325" y="242.53" width="121" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="328" y="253.5" font-size="11.5" fill="var(--m-teal-ink, #18696a)">锁定记录保存授权集合</text>
   <rect x="20" y="270" width="600" height="170" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <rect x="23" y="273" width="594" height="164" fill="none" stroke="var(--m-teal-ink, #18696a)"/>
@@ -61,10 +61,10 @@
   <text x="480" y="518.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">移除拒绝就是扩权</text>
   <text x="480" y="533.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">应用前停下询问</text>
   <line x1="160" y1="440" x2="160" y2="481" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-2-head-amber)"/>
-  <rect class="m-knock" x="165" y="449.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="165" y="449.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="168" y="460.5" font-size="11.5" fill="var(--m-amber-ink, #85590c)">相同授权</text>
   <line x1="480" y1="440" x2="480" y2="481" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-2-head-rose)"/>
-  <rect class="m-knock" x="485" y="449.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="485" y="449.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="488" y="460.5" font-size="11.5" fill="var(--m-rose-ink, #b0344d)">更广授权</text>
   <text x="20" y="572" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kit 不自行授权；各行是宿主回答的请求，锁定记录判断下一版。</text>
   <text x="20" y="590" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">来源：hello-kit/kit.yaml、kitspec2/5.3/7.4/9.5、kitcap network-policy@2/credential@1。</text>
