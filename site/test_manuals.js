@@ -462,3 +462,18 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
   assert.match(html, /src="header\.js"/);
   assert.match(index, /aria-label="搜索"/);
 });
+
+test('audit CLI fails closed when a mistaken root or selector loads no manuals', () => {
+  const { spawnSync } = require('node:child_process');
+  const { root } = fixture();
+  const script = path.join(__dirname, '..', 'scripts', 'audit_manuals.js');
+  for (const args of [ ['--root', tempDir('manual-empty-')], ['--root', root, '--manual', 'missing-101'] ]) {
+    const result = spawnSync(process.execPath, [script, ...args, '--skip-capture'], { encoding: 'utf8' });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /no manuals found/);
+    assert.doesNotMatch(result.stdout, /TOTAL 0/);
+  }
+  const result = spawnSync(process.execPath, [script, '--root', root, '--manual', 'demo-101', '--skip-capture'], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /TOTAL 0/);
+});

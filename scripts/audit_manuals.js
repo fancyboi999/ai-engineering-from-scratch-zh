@@ -367,6 +367,7 @@ function main(argv) {
   let loaded;
   try {
     loaded = manuals.loadAll({ only, root });
+    if (!loaded.length) throw new Error(`no manuals found${only ? ` for ${only}` : ''}; --root must point to the manuals directory`);
   } catch (error) {
     console.error(`audit-manuals: ${error.message}`);
     return 1;
