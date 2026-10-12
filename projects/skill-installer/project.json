@@ -1,0 +1,150 @@
+{
+  "id": "skill-installer",
+  "title": "跨 agent 技能安装器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "校验本地技能包，转换 agent 元数据，验证内容摘要，并在不覆盖学习者修改的前提下原子安装。",
+  "summary": "校验本地技能包，转换 agent 元数据，验证内容摘要，并在不覆盖学习者修改的前提下原子安装。",
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "校验可移植包",
+    "转换元数据并计算内容哈希",
+    "在根目录内原子安装",
+    "升级时保护本地修改"
+  ],
+  "prerequisites": [
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    },
+    {
+      "title": "安全与密钥审计",
+      "path": "phases/17-infrastructure-and-production/25-security-secrets-audit"
+    }
+  ],
+  "youWillBuild": "一个跨 agent 升级工具：提供可审查的差异，不丢失本地修改。",
+  "usefulFor": [
+    "一个跨 agent 升级工具：提供可审查的差异，不丢失本地修改。",
+    "inspect 是试运行。"
+  ],
+  "demo": {
+    "command": [
+      "node",
+      "demo.ts"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-bundle",
+      "title": "校验可移植包",
+      "summary": "接收包含 SKILL.md 和可选参考文件的命名包。接触磁盘之前，校验每条相对路径。拒绝点路径段、绝对路径、盘符前缀、反斜杠以及保留的安装元数据。每个文本文件限制为 100 KB。安装器读取内存中的包，网络获取和签名信任另行负责。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "TypeScript 为包和 agent 目标提供显式契约。",
+      "concepts": [
+        "safePath",
+        "validate"
+      ],
+      "difficulty": "starter",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-skill-installer-1"
+    },
+    {
+      "id": "02-translate",
+      "title": "转换元数据并计算内容哈希",
+      "summary": "保留同一份指令正文，只重新生成一个小型、带引号的元数据头。参考文件逐字节保留。对排序后的路径/内容对计算 SHA-256 摘要，让文件插入顺序不影响完整性。摘要检测内容变化，但不证明发布者身份；调用者负责取得可信的预期摘要。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "类型化目标名称将支持的适配器限定为三个已知 agent。",
+      "concepts": [
+        "digest",
+        "translate"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-skill-installer-2"
+    },
+    {
+      "id": "03-install",
+      "title": "在根目录内原子安装",
+      "summary": "创建目录前检查预期摘要。用 lstat 检查每个 agent 目录，拒绝符号链接。在目标旁暂存完整的转换后包，再重命名。已有的托管安装先移至临时备份，以便最终重命名失败时恢复。这个教学事务假设只有一个可信本地写入者；恶意并发替换文件系统需要操作系统级隔离。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Node 提供 lstat、排他写入和目录重命名，支持有边界的本地事务。",
+      "concepts": [
+        "install"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-skill-installer-3"
+    },
+    {
+      "id": "04-upgrades",
+      "title": "升级时保护本地修改",
+      "summary": "替换安装之前，确认每个跟踪文件仍匹配先前摘要，且没有出现未托管文件。用户编辑了跟踪文件或添加了自己的文件时，拒绝升级。用户可以有意识地把这些改动纳入源包。重复安装成功后，不留下暂存或备份目录。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "摘要比较让更新行为明确，而不依赖时间戳。",
+      "concepts": [
+        "install"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-skill-installer-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制：起始代码先失败，随后参考方案的所有阶段通过。参考方案通过不授予学习者证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "查看输出",
+      "caption": "本地确定性演示命令的实际输出记录。fixture 与实时适配器的限制见 README。"
+    }
+  ]
+}
