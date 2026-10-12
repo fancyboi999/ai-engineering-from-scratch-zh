@@ -1,0 +1,134 @@
+{
+  "id": "browser-agent",
+  "title": "浏览器 agent",
+  "level": 5,
+  "levelName": "前沿",
+  "tagline": "一份表单运行回执：先检查请求的值，再相信成功横幅。",
+  "summary": "一份表单运行回执：先检查请求的值，再相信成功横幅。以实现 observe、act 和 capture 的适配器替换 Driver。只有在启动教学 fixture 的服务并设置 BROWSE_BIN 后，才运行 cli.ts --live。",
+  "hours": 8,
+  "languages": [
+    "TypeScript",
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "将 DOM 状态转成受约束的操作",
+    "在完成、停滞或预算耗尽时停止",
+    "用 Python 验证截图像素",
+    "驱动真实 fixture 并为运行评分"
+  ],
+  "prerequisites": [
+    "需要 Node 22.18+、Python 3，以及 DOM 标签、异步函数、子进程参数和字节数组知识。实时 Chromium 还需要已安装的 gstack browse 可执行文件。"
+  ],
+  "youWillBuild": "一份表单运行回执：先检查请求的值，再相信成功横幅。",
+  "usefulFor": [
+    "以实现 observe、act 和 capture 的适配器替换 Driver。只有在启动教学 fixture 的服务并设置 BROWSE_BIN 后，才运行 cli.ts --live。"
+  ],
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "node",
+      "cli.ts",
+      "--task",
+      "samples/contact.json",
+      "--output",
+      "browser-run.json"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-observations",
+      "title": "将 DOM 状态转成受约束的操作",
+      "summary": "从小型表单读取标签、值、禁用状态和稳定的 id。验证 id 唯一性和字段类型。每次选择一个操作：填写姓名、填写邮箱，再点击唯一确定的 Save request 按钮。页面正文绝不作为指令解释。字段缺失、标签歧义、危险按钮和意外来源都会明确返回阻止结果。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "TypeScript 可以表达观察结果和操作联合类型，且不提供任意脚本操作。",
+      "concepts": [
+        "parseObservation",
+        "choose"
+      ],
+      "difficulty": "starter",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-browser-agent-1"
+    },
+    {
+      "id": "02-bounded-loop",
+      "title": "在完成、停滞或预算耗尽时停止",
+      "summary": "每次操作后重新观察。状态重复、策略阻止操作或步数预算耗尽时停止。完成需要 DOM 成功标记及独立的截图检查。执行前记录每个选定操作。fixture 后端明确是模拟器，提供确定性的观察结果以测试循环，不声称覆盖浏览器。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "注入式驱动器将策略与 Chromium 分离，支持确定性的失败测试。",
+      "concepts": [
+        "runAgent",
+        "FixtureDriver"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-browser-agent-2"
+    },
+    {
+      "id": "03-visual-proof",
+      "title": "用 Python 验证截图像素",
+      "summary": "读取 PNG 签名、块长度和 CRC，再解压有大小上限的图像载荷。逆向还原 PNG 行过滤器，统计代表成功的绿色像素。将这个视觉信号与 DOM 标记结合；单独任何一个都不够。这是针对教学 fixture 的狭义像素状态检测器，不是 OCR 或通用视觉。损坏、超大、交错以及不支持的颜色格式均明确失败。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Python 标准库无需图像依赖即可解码有大小上限的 RGB/RGBA PNG。",
+      "concepts": [
+        "inspectPNG"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-browser-agent-3"
+    },
+    {
+      "id": "04-real-browser",
+      "title": "驱动真实 fixture 并为运行评分",
+      "summary": "通过回环地址为 fixture.html 提供服务，用 gstack browse 导航到该页面。GstackDriver 读取 DOM 观察结果、填写标签、点击观察到的按钮，并捕获真实截图。命令使用参数数组而非 shell。用 --live 运行同一个有界策略，将轨迹与 fixture 后端比较。模拟运行和真实浏览器运行的完成分数要分开记录。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Node 子进程的 argv 调用将同一驱动器契约适配到已安装的 gstack 浏览器。",
+      "concepts": [
+        "GstackDriver",
+        "scoreRuns"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-browser-agent-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案所有阶段通过的过程。参考方案通过不会为学习者颁发证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和实时适配器的限制见 README。"
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "id": "memory-server",
+  "title": "持久化记忆服务器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "具有修订历史的持久化记忆工作台，为 REST 和 MCP 提供统一边界。",
+  "summary": "具有修订历史的持久化记忆工作台，为 REST 和 MCP 提供统一边界。在环境中设置 MEMORY_TOKEN，运行 node cli.ts --data-dir memory-data --serve --port 8788。REST 和 MCP 共享同一存储；token 不写入文件。",
+  "hours": 8,
+  "languages": [
+    "TypeScript",
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "将文本、命名空间和来源放在一起",
+    "串行化带修订版本的写入",
+    "在真实 Rust 进程中为向量评分",
+    "提供 REST 和 MCP 工具"
+  ],
+  "prerequisites": [
+    "需要 Node 22.18+、Rust 2021 和用于评分器的 Python 3",
+    "Promise、追加日志、HTTP、命名空间、修订版本和向量点积。"
+  ],
+  "youWillBuild": "具有修订历史的持久化记忆工作台，为 REST 和 MCP 提供统一边界。",
+  "usefulFor": [
+    "在环境中设置 MEMORY_TOKEN，运行 node cli.ts --data-dir memory-data --serve --port 8788。REST 和 MCP 共享同一存储；token 不写入文件。"
+  ],
+  "demo": {
+    "command": [
+      "node",
+      "demo-persistent.ts"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-record-contract",
+      "title": "将文本、命名空间和来源放在一起",
+      "summary": "每条记忆都需要有界 id、命名空间、文本和来源定位信息。绝不返回脱离来源的字符串。小型特征哈希嵌入将归一化词项映射到固定向量；它是确定性词法投影，不是预训练语义模型。哈希碰撞在预期之内，也说明了为什么检索仍需词法证据。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "TypeScript 提供类型化记忆记录；运行时验证保护 JSON 输入。",
+      "concepts": [
+        "validateMemory",
+        "embed"
+      ],
+      "difficulty": "starter",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node",
+        "rustc"
+      ],
+      "timeout": 90,
+      "figure": "pj-memory-server-1"
+    },
+    {
+      "id": "02-durable-log",
+      "title": "串行化带修订版本的写入",
+      "summary": "加载版本化事件日志，为每个 namespace/id 对重建最新记录。更新必须指明预期修订版本。串行化写入，避免两个从修订版本零竞争的调用者都成功。修改内存映射前先追加。这是单进程存储：追加完成不保证断电持久性，多服务器进程需要外部锁或数据库。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Promise 串行化本地写入，JSONL 则让持久历史可检查。",
+      "concepts": [
+        "MemoryStore.put",
+        "MemoryStore.list"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node",
+        "rustc"
+      ],
+      "timeout": 90,
+      "figure": "pj-memory-server-2"
+    },
+    {
+      "id": "03-hybrid-search",
+      "title": "在真实 Rust 进程中为向量评分",
+      "summary": "用标准 Rust 工具链编译 score.rs，通过 stdin 发送查询和文档向量。计算余弦相似度，零范数向量返回零。组合 60% 的词法查询覆盖率与 40% 的余弦分数，用 id 打破平局。跨进程边界前检查维度和有限值。Rust 二进制编译到私有临时目录，正常进程退出时删除。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Rust 通过狭窄的行协议处理数值内核；TypeScript 负责检索和来源。",
+      "concepts": [
+        "cosineScores",
+        "MemoryStore.search"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node",
+        "rustc"
+      ],
+      "timeout": 90,
+      "figure": "pj-memory-server-3"
+    },
+    {
+      "id": "04-transports",
+      "title": "提供 REST 和 MCP 工具",
+      "summary": "绑定本地服务器，要求 bearer token，限制请求体，并通过 JSON-RPC POST 实现 health、REST 写入/搜索及 MCP 初始化/工具子集。工具执行失败在成功的 JSON-RPC 响应中使用 isError；未知协议方法使用 JSON-RPC 错误。这是教学子集，不提供会话、流式传输或生产认证。测试实际 HTTP 字节，避免序列化丢失来源或修订版本。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Node HTTP 用两种线格式提供相同的 MemoryStore 方法。",
+      "concepts": [
+        "createMemoryServer"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "rustc"
+      ],
+      "timeout": 90,
+      "figure": "pj-memory-server-4",
+      "runners": [
+        {
+          "language": "typescript",
+          "argv": [
+            "node",
+            "--experimental-strip-types",
+            "--test",
+            "{tests}/stage.test.ts",
+            "{tests}/integration.test.ts"
+          ]
+        },
+        {
+          "language": "python",
+          "optional": true,
+          "requires": [
+            "python:mcp"
+          ],
+          "argv": [
+            "{python}",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "{stage}/tests-framework",
+            "-p",
+            "test_standard_client.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案所有阶段通过的过程。参考方案通过不会为学习者颁发证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和实时适配器的限制见 README。"
+    }
+  ]
+}

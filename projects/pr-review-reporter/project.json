@@ -1,0 +1,138 @@
+{
+  "id": "pr-review-reporter",
+  "title": "PR 审查报告器",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "本地补丁审查产物，保留 Git 行级证据，可作为 SARIF 接入 CI。",
+  "summary": "本地补丁审查产物，保留 Git 行级证据，可作为 SARIF 接入 CI。使用 --diff - 从 stdin 读取；使用 --repo /path --base REF --head REF 获取只读 Git diff；或使用 --candidates recorded-findings.json，对照提供的补丁验证另一位审查者的发现。",
+  "hours": 8,
+  "languages": [
+    "Python",
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "恢复新文件行号",
+    "生成狭义审查候选",
+    "验证并合并发现",
+    "发布经过转义的本地报告"
+  ],
+  "prerequisites": [
+    "需要 Node 22.18+、Python 3，且仅 --repo 模式需要 Git",
+    "统一 diff 计数器、JSON、精确源引文和 HTML 转义。"
+  ],
+  "youWillBuild": "本地补丁审查产物，保留 Git 行级证据，可作为 SARIF 接入 CI。",
+  "usefulFor": [
+    "使用 --diff - 从 stdin 读取；使用 --repo /path --base REF --head REF 获取只读 Git diff；或使用 --candidates recorded-findings.json，对照提供的补丁验证另一位审查者的发现。"
+  ],
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "node",
+      "cli.ts",
+      "--diff",
+      "samples/change.diff",
+      "--output",
+      "review.json",
+      "--html",
+      "review.html",
+      "--sarif",
+      "review.sarif"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-diff-lines",
+      "title": "恢复新文件行号",
+      "summary": "将 hunk 头解析为旧、新计数器。上下文消耗两个计数器，删除只消耗旧计数器，添加消耗新计数器并产生可审查位置。拒绝截断 hunk 和向父目录穿越的路径。解析器有意只处理文本统一 diff；二进制补丁和 combined merge diff 不在契约内。用 execFileSync 和 stdin 将 Python 接入 TypeScript，绝不用插值 shell 命令。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Python 处理流式文本语法，TypeScript 消费类型化 JSON 边界。",
+      "concepts": [
+        "parseDiff"
+      ],
+      "difficulty": "starter",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-pr-review-reporter-1"
+    },
+    {
+      "id": "02-inspect",
+      "title": "生成狭义审查候选",
+      "summary": "为动态 eval、shell exec、禁用 TLS 验证和空 catch 处理器构建明确的静态检测器。只检查添加行。这些模式产生审查候选，不证明存在可利用行为。保持 rule id 稳定，方便后续模型审查者报告同一问题时去重。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "类型化发现必须具有源引文、位置和 rule id，才能进入报告流水线。",
+      "concepts": [
+        "inspect"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-pr-review-reporter-2"
+    },
+    {
+      "id": "03-anchors",
+      "title": "验证并合并发现",
+      "summary": "每个候选必须对应已有的添加行位置，并包含非空、精确的源子串。拒绝伪造文件、删除行位置、空引文和无效严重级别。按 file、line 和 rule 合并发现；审查者意见不一致时保留更高严重级别。引文门禁证明位置有支持，不证明安全主张为真；后者仍需审查。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "类型化验证结果阻止被拒绝的模型建议进入渲染器。",
+      "concepts": [
+        "verify",
+        "merge"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-pr-review-reporter-3"
+    },
+    {
+      "id": "04-report",
+      "title": "发布经过转义的本地报告",
+      "summary": "渲染独立报告，包含源位置、引用证据、严重级别和消息。对源文本和正文同样仔细转义：diff 可能包含可执行 HTML。外部发布不属于工具职责。CLI 在本地写出 review.html，打印可供自动化使用的机器可读摘要。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "TypeScript 将已验证数据组合成 HTML，对每个不可信字符串转义。",
+      "concepts": [
+        "escapeHTML",
+        "render"
+      ],
+      "difficulty": "core",
+      "requires": [
+        "node",
+        "python3"
+      ],
+      "timeout": 90,
+      "figure": "pj-pr-review-reporter-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案所有阶段通过的过程。参考方案通过不会为学习者颁发证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和实时适配器的限制见 README。"
+    }
+  ]
+}

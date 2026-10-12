@@ -1,0 +1,170 @@
+{
+  "id": "mcp-at-scale",
+  "title": "MCP 工具发现工作台",
+  "level": 4,
+  "levelName": "系统",
+  "tagline": "一个限定范围的 MCP 清单服务器，在可测量的上下文预算内发现 schema。",
+  "summary": "一个限定范围的 MCP 清单服务器，在可测量的上下文预算内发现 schema。运行 python3 cli.py /absolute/inventory.json --serve 启动 stdio 服务器。tools/call catalog_search 接受 query、max_chars 和 k；响应返回选中的公共 schema 及其字符数。",
+  "hours": 10,
+  "languages": [
+    "Python",
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "一个限定范围的 MCP 清单服务器，在可测量的上下文预算内发现 schema。",
+  "usefulFor": [
+    "运行 python3 cli.py /absolute/inventory.json --serve 启动 stdio 服务器。tools/call catalog_search 接受 query、max_chars 和 k；响应返回选中的公共 schema 及其字符数。"
+  ],
+  "skills": [
+    "构建 250 个只读工具的目录",
+    "在明确的上下文预算内选择工具",
+    "通过 stdio 实现带初始化的 JSON-RPC",
+    "通过协议分页审计目录覆盖率"
+  ],
+  "prerequisites": [
+    "需要 Python 3.10+、Node 22.18+，以及字典、JSON-RPC 请求 id、stdin/stdout 和子进程知识。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-mcp-at-scale-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、明确算法和确定性本地测试。",
+    "TypeScript": "类型化线协议消息和真实子进程集成。"
+  },
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/inventory.json",
+      "--query",
+      "pods count",
+      "--max-chars",
+      "500"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-registry",
+      "title": "构建 250 个只读工具的目录",
+      "summary": "生成的目录恰好包含 250 个唯一工具。",
+      "language": "python",
+      "languageWhy": "Python 标准库的集合、字节和文件操作可直接实现本阶段。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-mcp-at-scale-1",
+      "concepts": [
+        "构建",
+        "一个",
+        "目录",
+        "的"
+      ]
+    },
+    {
+      "id": "02-discovery",
+      "title": "在明确的上下文预算内选择工具",
+      "summary": "查询 pods count 首先选择 pods_count，绝不超过序列化预算。",
+      "language": "python",
+      "languageWhy": "Python 标准库的集合、字节和文件操作可直接实现本阶段。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-mcp-at-scale-2",
+      "concepts": [
+        "选择",
+        "工具",
+        "在……内",
+        "一个"
+      ]
+    },
+    {
+      "id": "03-protocol",
+      "title": "通过 stdio 实现带初始化的 JSON-RPC",
+      "summary": "初始化前调用返回 -32002；初始化后的 tools/list 返回 32 个工具和一个游标。",
+      "language": "python",
+      "languageWhy": "Python 标准库的集合、字节和文件操作可直接实现本阶段。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-mcp-at-scale-3",
+      "concepts": [
+        "实现",
+        "已初始化",
+        "JSON-RPC",
+        "通过"
+      ]
+    },
+    {
+      "id": "04-audit",
+      "title": "通过协议分页审计目录覆盖率",
+      "summary": "完整遍历八页，返回 250 个唯一名称。",
+      "language": "python",
+      "languageWhy": "Python 标准库的集合、字节和文件操作可直接实现本阶段。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-mcp-at-scale-4",
+      "concepts": [
+        "审计",
+        "目录",
+        "覆盖率",
+        "通过"
+      ]
+    },
+    {
+      "id": "05-typed-client",
+      "title": "用类型化客户端测试真实线协议",
+      "summary": "启动 Python 服务器，从 TypeScript 验证每个序列化响应。",
+      "language": "typescript",
+      "languageWhy": "Node 流和明确的 TypeScript 接口让进程边界可见。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-mcp-at-scale-5",
+      "concepts": [
+        "stdio",
+        "请求响应关联",
+        "超时"
+      ],
+      "runners": [
+        {
+          "language": "typescript"
+        },
+        {
+          "language": "python"
+        },
+        {
+          "language": "python",
+          "optional": true,
+          "requires": [
+            "python:mcp"
+          ],
+          "argv": [
+            "{python}",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "{stage}/tests-framework",
+            "-p",
+            "test_standard_client.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案所有阶段通过的过程。参考方案通过不会为学习者颁发证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和实时适配器的限制见 README。"
+    }
+  ]
+}
