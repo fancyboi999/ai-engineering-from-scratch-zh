@@ -1,0 +1,119 @@
+{
+  "id": "tool-call-firewall",
+  "title": "工具调用防火墙",
+  "level": 4,
+  "levelName": "系统",
+  "tagline": "结构化工具请求越过副作用边界前先授权。",
+  "summary": "构建默认拒绝策略评估器，具有有界参数、角色权限、一次性批准、结构化审计日志。产物是库门禁；应用须在每次真实工具执行前放置它。",
+  "usefulFor": [
+    "证明具体授权并执行了哪项操作的批准回执。",
+    "原生 CLI 要求调用应用提供可信角色。"
+  ],
+  "youWillBuild": "证明具体授权并执行了哪项操作的批准回执。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "验证无歧义调用封装",
+    "评估角色与路径策略",
+    "一次性消费绑定请求的批准",
+    "记录有界审计证据"
+  ],
+  "prerequisites": [
+    {
+      "title": "工具模式设计",
+      "path": "phases/13-tools-and-protocols/05-tool-schema-design"
+    },
+    {
+      "title": "安全与秘密审计",
+      "path": "phases/17-infrastructure-and-production/25-security-secrets-audit"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-validate-an-unambiguous-call-envelope",
+      "title": "验证无歧义调用封装",
+      "summary": "此本地练习用竖线分隔符解析有界四字段封装。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "starter",
+      "concepts": [
+        "字节预算",
+        "封装字段",
+        "控制字符门禁",
+        "调用身份"
+      ]
+    },
+    {
+      "id": "02-evaluate-role-and-path-policy",
+      "title": "评估角色与路径策略",
+      "summary": "只有 reader、editor 角色。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "已知角色",
+        "路径组件",
+        "工具权限",
+        "决定"
+      ]
+    },
+    {
+      "id": "03-consume-a-request-bound-approval-once",
+      "title": "一次性消费绑定请求的批准",
+      "summary": "批准绑定可信应用提供的完整调用身份，仅在要求批准的决定中消费。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "决定门禁",
+        "匹配身份",
+        "检查未使用",
+        "消费一次"
+      ]
+    },
+    {
+      "id": "04-record-bounded-audit-evidence",
+      "title": "记录有界审计证据",
+      "summary": "策略决定后格式化稳定制表符分隔审计行。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "唯一调用",
+        "容量检查",
+        "省略参数",
+        "记录决定"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

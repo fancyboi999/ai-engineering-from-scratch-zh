@@ -1,0 +1,119 @@
+{
+  "id": "skill-validator",
+  "title": "SKILL.md 验证器与加载器",
+  "level": 1,
+  "levelName": "入门",
+  "tagline": "验证 skill 元数据，只加载任务需要的上下文。",
+  "summary": "构建有界 Agent Skills 加载器，具有刻意精简的 frontmatter 语法、严格元数据验证、安全引用路径和渐进披露。支持的 YAML 子集明确；不支持形式失败，不会猜测。",
+  "usefulFor": [
+    "解释 skill 为何在一个 agent 中可用、另一个中失败的兼容性检查器。",
+    "解析器接受普通单行值和 JSON 兼容带引号字符串。"
+  ],
+  "youWillBuild": "解释 skill 为何在一个 agent 中可用、另一个中失败的兼容性检查器。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "解析明确的 frontmatter 子集",
+    "验证名称和描述",
+    "约束资源路径",
+    "在字符预算内加载上下文"
+  ],
+  "prerequisites": [
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    },
+    {
+      "title": "结构化输出",
+      "path": "phases/11-llm-engineering/03-structured-outputs"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-parse-an-explicit-frontmatter-subset",
+      "title": "解析明确的 frontmatter 子集",
+      "summary": "只拆开开头的 --- 块。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "starter",
+      "concepts": [
+        "头部边界",
+        "键拆分",
+        "重复门禁",
+        "保留正文"
+      ]
+    },
+    {
+      "id": "02-validate-names-and-descriptions",
+      "title": "验证名称和描述",
+      "summary": "加载器仅接受 1 至 64 字节的小写名称，内部为单连字符，不限制数字开头，描述非空白且不超过 1024 字符。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "读取字段",
+        "名称语法",
+        "文件夹身份",
+        "类型化 skill"
+      ]
+    },
+    {
+      "id": "03-contain-resource-paths",
+      "title": "约束资源路径",
+      "summary": "相对 skill 根解析资源名。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "相对输入",
+        "组件门禁",
+        "规范化",
+        "包含约束"
+      ]
+    },
+    {
+      "id": "04-load-context-within-a-character-budget",
+      "title": "在字符预算内加载上下文",
+      "summary": "发现返回名称与描述。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "发现元数据",
+        "选择激活",
+        "统计字符",
+        "完整加载或拒绝"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "id": "desktop-control",
+  "title": "桌面控制后端",
+  "level": 4,
+  "levelName": "系统",
+  "tagline": "可审计的坐标与帧动作运行器，生成可复现的前后像素产物。",
+  "summary": "可审计的坐标与帧动作运行器，生成可复现的前后像素产物。Backend trait 是可复用边界。TSV 使用 capture、click<TAB>x<TAB>y<TAB>generation 和 type<TAB>text；运行器拒绝未知动作，调用上限为 32。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "验证帧和坐标空间",
+    "渲染并操作 fixture 场景",
+    "拒绝过期观测和耗尽的预算",
+    "构建显式启用的原生边界"
+  ],
+  "prerequisites": [
+    "Rust 2021 工具链",
+    "结构体、trait、泛型、Result、可变借用和字节向量。Python 3 运行评分器和演示包装器。"
+  ],
+  "youWillBuild": "可审计的坐标与帧动作运行器，生成可复现的前后像素产物。",
+  "usefulFor": [
+    "Backend trait 是可复用边界。TSV 使用 capture、click<TAB>x<TAB>y<TAB>generation 和 type<TAB>text；运行器拒绝未知动作，调用上限为 32。"
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-frame-contract",
+      "title": "验证帧和坐标空间",
+      "summary": "截图有物理像素尺寸，而原生桌面点击可能使用逻辑坐标。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "starter",
+      "concepts": [
+        "Frame.validate",
+        "Frame.logical_point"
+      ],
+      "figure": "pj-desktop-control-1",
+      "timeout": 90
+    },
+    {
+      "id": "02-backend-trait",
+      "title": "渲染并操作 fixture 场景",
+      "summary": "在一个 Backend trait 后定义 capture、click 和 type_text。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "core",
+      "concepts": [
+        "Backend",
+        "FixtureBackend"
+      ],
+      "figure": "pj-desktop-control-2",
+      "timeout": 90
+    },
+    {
+      "id": "03-controller",
+      "title": "拒绝过期观测和耗尽的预算",
+      "summary": "在后端外包一层 Controller。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "core",
+      "concepts": [
+        "Controller.capture",
+        "Controller.click",
+        "Controller.type_text"
+      ],
+      "figure": "pj-desktop-control-3",
+      "timeout": 90
+    },
+    {
+      "id": "04-native-adapter",
+      "title": "构建显式启用的原生边界",
+      "summary": "不用 shell，构造 macOS screencapture 和 AppleScript 参数数组。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "core",
+      "concepts": [
+        "click_argv",
+        "text_argv",
+        "png_dimensions",
+        "MacBackend"
+      ],
+      "figure": "pj-desktop-control-4",
+      "timeout": 90
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

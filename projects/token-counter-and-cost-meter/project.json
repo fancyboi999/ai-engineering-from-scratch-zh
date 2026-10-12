@@ -1,0 +1,119 @@
+{
+  "id": "token-counter-and-cost-meter",
+  "title": "Token 计数器与成本计量器",
+  "level": 1,
+  "levelName": "入门",
+  "tagline": "用整数算术核算用量与预算。",
+  "summary": "构建显式近似分词器、精确已记录用量记账、价目表成本计算和预算准入。估算明确标记，绝不当作 provider 分词器计数。价格是 fixture 输入，不是当前 provider 定价结论。",
+  "usefulFor": [
+    "解释真实账单为何不同于预检估算的用量对账工具。",
+    "费率是显式 fixture 输入，以每 token 整数纳美元计，不是当前 provider 价格。"
+  ],
+  "youWillBuild": "解释真实账单为何不同于预检估算的用量对账工具。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "按已说明边界估算文本",
+    "验证已记录用量",
+    "用溢出检查整数计价",
+    "按账本准入工作"
+  ],
+  "prerequisites": [
+    {
+      "title": "分词器",
+      "path": "phases/10-llms-from-scratch/01-tokenizers"
+    },
+    {
+      "title": "验证门禁",
+      "path": "phases/14-agent-engineering/38-verification-gates"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-estimate-text-with-a-documented-bound",
+      "title": "按已说明边界估算文本",
+      "summary": "统计 Unicode 标量，用可配置每 token 字符比例向上整除。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "starter",
+      "concepts": [
+        "统计标量",
+        "读取比例",
+        "向上整除",
+        "标明估算"
+      ]
+    },
+    {
+      "id": "02-validate-recorded-usage",
+      "title": "验证已记录用量",
+      "summary": "缓存输入是输入子集，不是重复相加的额外 token 类别。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "解析计数",
+        "检查无符号数",
+        "缓存子集",
+        "用量记录"
+      ]
+    },
+    {
+      "id": "03-price-with-checked-integers",
+      "title": "用溢出检查整数计价",
+      "summary": "fixture 价目表以每 token 纳美元计价。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "未缓存费用",
+        "缓存费用",
+        "输出费用",
+        "溢出检查求和"
+      ]
+    },
+    {
+      "id": "04-admit-work-against-a-ledger",
+      "title": "按账本准入工作",
+      "summary": "只有 spent 加报价在配置限制内才预留报价金额。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "读取账本",
+        "溢出检查加法",
+        "比较限制",
+        "提交预留"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

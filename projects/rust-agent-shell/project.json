@@ -1,0 +1,145 @@
+{
+  "id": "rust-agent-shell",
+  "title": "Rust 流式 agent 工具壳",
+  "level": 4,
+  "levelName": "系统",
+  "tagline": "构建真实 stdin/stdout Rust 动作循环，包含有界读取、显式命令语法、路径包含约束和流式 JSON 事件。",
+  "summary": "构建真实 stdin/stdout Rust 动作循环，包含有界读取、显式命令语法、路径包含约束和流式 JSON 事件。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "解析刻意精简的动作语言",
+    "将文件工具限制在有界根目录",
+    "跟踪预算与终止状态",
+    "经真实 stdin 流式输出有界 JSON 事件"
+  ],
+  "prerequisites": [
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    },
+    {
+      "title": "工具模式设计",
+      "path": "phases/13-tools-and-protocols/05-tool-schema-design"
+    }
+  ],
+  "youWillBuild": "可检查的仓库观测进程，可供不同编程 agent 使用。",
+  "usefulFor": [
+    "可检查的仓库观测进程，可供不同编程 agent 使用。",
+    "JSONL 请求使用调用者 ID 和显式工具参数对象。"
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-grammar",
+      "title": "解析刻意精简的动作语言",
+      "summary": "为 help、pwd、list、read、字面搜索、quit 定义动作枚举。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "starter",
+      "concepts": [
+        "Action",
+        "parse_action"
+      ],
+      "figure": "pj-rust-agent-shell-1",
+      "timeout": 90
+    },
+    {
+      "id": "02-filesystem",
+      "title": "将文件工具限制在有界根目录",
+      "summary": "规范化工作区根与请求目标，拒绝绝对路径和父目录遍历，验证符号链接仍在根内。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "core",
+      "concepts": [
+        "contained",
+        "read_text",
+        "execute"
+      ],
+      "figure": "pj-rust-agent-shell-2",
+      "timeout": 90
+    },
+    {
+      "id": "03-session",
+      "title": "跟踪预算与终止状态",
+      "summary": "将工具包进拥有根、请求计数和关闭状态的会话。",
+      "hours": 2,
+      "language": "rust",
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "core",
+      "concepts": [
+        "Session.new",
+        "Session.handle"
+      ],
+      "figure": "pj-rust-agent-shell-3",
+      "timeout": 90
+    },
+    {
+      "id": "04-streaming",
+      "title": "经真实 stdin 流式输出有界 JSON 事件",
+      "summary": "用 BufRead 增量读取输入，分配无界字符串前限制每行。",
+      "hours": 2,
+      "language": "rust+python",
+      "runners": [
+        {
+          "language": "rust"
+        },
+        {
+          "language": "python"
+        }
+      ],
+      "languageWhy": "Rust 让状态所有权和可能失败的系统调用显式可见，且实现仍只用标准库。",
+      "requires": [
+        "rustc"
+      ],
+      "difficulty": "core",
+      "concepts": [
+        "read_bounded",
+        "json_string",
+        "Event.json",
+        "run_loop"
+      ],
+      "figure": "pj-rust-agent-shell-4",
+      "timeout": 90
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "id": "sandbox-ladder",
+  "title": "沙箱策略规划器",
+  "level": 4,
+  "levelName": "系统",
+  "tagline": "按显式能力要求选择隔离控制。",
+  "summary": "选择建模隔离策略，检查可选本地 Docker 调用，用观测的无害探针对比请求控制。",
+  "usefulFor": [
+    "将请求能力映射到观测运行时探针的沙箱证据规划器。",
+    "默认输出是策略模拟。"
+  ],
+  "youWillBuild": "选择建模隔离策略，检查可选本地 Docker 调用，用观测的无害探针对比请求控制。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "解析能力请求",
+    "定义建模控制配置",
+    "选择成本最低的充分配置",
+    "报告残余假设"
+  ],
+  "prerequisites": [
+    {
+      "title": "面向 AI 的 Docker",
+      "path": "phases/00-setup-and-tooling/07-docker-for-ai"
+    },
+    {
+      "title": "安全与秘密审计",
+      "path": "phases/17-infrastructure-and-production/25-security-secrets-audit"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-parse-the-capability-request",
+      "title": "解析能力请求",
+      "summary": "以四个显式布尔值表示威胁模型：不可信代码、带秘密宿主、拒绝网络、要求内核分离。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "starter",
+      "concepts": [
+        "解析键",
+        "拒绝重复项",
+        "精确布尔值",
+        "威胁要求"
+      ]
+    },
+    {
+      "id": "02-define-modeled-control-profiles",
+      "title": "定义建模控制配置",
+      "summary": "将进程、文件系统、容器网络和 microVM 边界建模为数据。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "文件系统控制",
+        "网络控制",
+        "内核控制",
+        "要求匹配"
+      ]
+    },
+    {
+      "id": "03-select-the-least-costly-sufficient-profile",
+      "title": "选择成本最低的充分配置",
+      "summary": "比较成本前过滤不充分配置。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "过滤控制",
+        "应用预算",
+        "稳定最小值",
+        "不降级"
+      ]
+    },
+    {
+      "id": "04-report-residual-assumptions",
+      "title": "报告残余假设",
+      "summary": "返回选定 fixture，明确说明尚未执行操作系统强制约束。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "重新检查要求",
+        "标明模型",
+        "列出残余项",
+        "运行时验证"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

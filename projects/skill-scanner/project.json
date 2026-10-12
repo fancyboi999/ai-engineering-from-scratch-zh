@@ -1,0 +1,119 @@
+{
+  "id": "skill-scanner",
+  "title": "Skill 供应链扫描器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "用精确来源证据发现风险指令模式。",
+  "summary": "构建离线提示扫描器，保留 UTF-8 偏移，报告显式策略模式，对独立发现项评分，输出审查门禁。它是透明启发式，不是恶意软件检测器，也不承诺未标记 skill 安全。",
+  "usefulFor": [
+    "引用新增能力的 skill 变更审查助手。",
+    "扫描器输出版本化 JSON，包含文件路径、精确 UTF-8 字节区间和提示规则。"
+  ],
+  "youWillBuild": "引用新增能力的 skill 变更审查助手。",
+  "hours": 8,
+  "languages": [
+    "Rust"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "保留字节精确的来源区间",
+    "检测具名提示模式",
+    "对独立证据评分，避免膨胀",
+    "构建显式审查门禁"
+  ],
+  "prerequisites": [
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    },
+    {
+      "title": "安全与秘密审计",
+      "path": "phases/17-infrastructure-and-production/25-security-secrets-audit"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-retain-byte-accurate-source-spans",
+      "title": "保留字节精确的来源区间",
+      "summary": "将 UTF-8 来源拆成编号行，保留指向原缓冲区、终点不含的字节偏移。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "starter",
+      "concepts": [
+        "读取字节",
+        "拆分终止符",
+        "跟踪偏移",
+        "精确来源切片"
+      ]
+    },
+    {
+      "id": "02-detect-named-advisory-patterns",
+      "title": "检测具名提示模式",
+      "summary": "规则检查转小写行文本，但报告原偏移。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "规范视图",
+        "匹配具名规则",
+        "保留证据",
+        "输出发现项"
+      ]
+    },
+    {
+      "id": "03-score-distinct-evidence-without-inflation",
+      "title": "对独立证据评分，避免膨胀",
+      "summary": "每来源行中每规则只计一次，即使收集器重复发现项。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "验证发现项",
+        "规则与行身份",
+        "去重",
+        "溢出检查评分"
+      ]
+    },
+    {
+      "id": "04-build-an-explicit-review-gate",
+      "title": "构建显式审查门禁",
+      "summary": "跨阈值要求审查；低于阈值只表示这些规则未跨配置阈值。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "检查边界",
+        "验证切片",
+        "比较阈值",
+        "人工审查报告"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}
