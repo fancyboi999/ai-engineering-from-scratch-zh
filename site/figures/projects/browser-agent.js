@@ -3,7 +3,7 @@
   const controls = [
     {
       key: "name",
-      label: "Name already filled (0/1)",
+      label: "姓名已填写（0/1）",
       type: "range",
       value: 0,
       min: 0,
@@ -12,7 +12,7 @@
     },
     {
       key: "email",
-      label: "Email already filled (0/1)",
+      label: "邮箱已填写（0/1）",
       type: "range",
       value: 0,
       min: 0,
@@ -21,7 +21,7 @@
     },
     {
       key: "budget",
-      label: "Observation budget",
+      label: "观察次数预算",
       type: "range",
       value: 4,
       min: 1,
@@ -30,17 +30,17 @@
     },
     {
       key: "green",
-      label: "Green pixels per ten thousand",
+      label: "每万像素中的绿色像素数",
       type: "range",
       value: 100,
       min: 0,
       max: 10000,
       step: 1,
     },
-    { key: "origin", label: "Origin changed", type: "checkbox", value: false },
+    { key: "origin", label: "来源域已改变", type: "checkbox", value: false },
     {
       key: "dangerous",
-      label: "Submit marked dangerous",
+      label: "提交按钮标记为危险",
       type: "checkbox",
       value: false,
     },
@@ -58,16 +58,16 @@
           : "visual-mismatch";
     return {
       summary:
-        state +
-        "; completion requires values, allowed origin, DOM success and fixture pixel signal.",
+        ({ blocked: "已阻止", "budget-exhausted": "预算耗尽", complete: "已完成", "visual-mismatch": "视觉不匹配" }[state]) +
+        "；完成需要字段值、允许的来源域、DOM 成功标志和 fixture 像素信号。",
       metrics: [
-        { label: "Required observations", value: observations },
-        { label: "Green fraction", value: v.green / 10000 },
+        { label: "所需观察次数", value: observations },
+        { label: "绿色像素比例", value: v.green / 10000 },
       ],
       bars: [
-        { label: "Fill actions", value: fills, max: 4 },
-        { label: "Submit and verify", value: 2, max: 4 },
-        { label: "Available observations", value: v.budget, max: 8 },
+        { label: "填写操作", value: fills, max: 4 },
+        { label: "提交与验证", value: 2, max: 4 },
+        { label: "可用观察次数", value: v.budget, max: 8 },
       ],
     };
   };
@@ -75,21 +75,21 @@
     "pj-browser-agent-1",
     Object.assign(
       {
-        title: "Turn DOM state into constrained actions",
+        title: "将 DOM 状态转成受约束的操作",
         steps: [
-          { label: "Input contract", detail: "parseObservation, choose" },
+          { label: "输入契约", detail: "parseObservation, choose" },
           {
-            label: "Turn DOM state into constrained actions",
+            label: "将 DOM 状态转成受约束的操作",
             detail:
-              "Read labels, values, disabled states and stable ids from a small form. Validate unique ids and field types. Choose one action at a time: fill the name, fill email, then click the uniquely identified Save request button. Page prose is never interpreted as instructions. Missing fields, ambiguous labels, dangerous buttons and unexpected origins cause an explicit blocked result.",
+              "从小表单读取标签、值、禁用状态和稳定 ID。验证 ID 唯一性和字段类型。每次只选一个操作：填写姓名、填写邮箱，再点击唯一标识的 Save request 按钮。页面文字绝不当作指令执行。字段缺失、标签歧义、危险按钮或意外来源域都会明确返回 blocked。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "The action union contains fill and click only; injected page prose has no execution path.",
+              "操作联合类型只包含 fill 和 click；注入的页面文字没有执行路径。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -98,21 +98,21 @@
     "pj-browser-agent-2",
     Object.assign(
       {
-        title: "Stop on completion, stalling or budget",
+        title: "完成、停滞或预算耗尽时停止",
         steps: [
-          { label: "Input contract", detail: "runAgent, FixtureDriver" },
+          { label: "输入契约", detail: "runAgent, FixtureDriver" },
           {
-            label: "Stop on completion, stalling or budget",
+            label: "完成、停滞或预算耗尽时停止",
             detail:
-              "Observe after every action. Stop if the state repeats, if policy blocks an action, or if the step budget is consumed. Completion requires the DOM success flag and a separate screenshot check. Trace every selected action before execution. The fixture backend is explicitly a simulator; it supplies deterministic observations to test the loop and does not claim browser coverage.",
+              "每次操作后都观察。状态重复、策略阻止操作或步骤预算耗尽时停止。完成既需要 DOM 成功标志，也需要独立的截图检查。执行前记录每个选中操作的轨迹。fixture 后端明确是模拟器，只提供确定性观察来测试循环，不代表浏览器覆盖。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "A successful run records name, email, submit and done. An unresponsive driver stops as stalled instead of clicking forever.",
+              "成功运行会记录 name、email、submit 和 done。驱动无响应时以 stalled 停止，而不是一直点击。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -121,21 +121,21 @@
     "pj-browser-agent-3",
     Object.assign(
       {
-        title: "Verify screenshot pixels in Python",
+        title: "用 Python 验证截图像素",
         steps: [
-          { label: "Input contract", detail: "inspectPNG" },
+          { label: "输入契约", detail: "inspectPNG" },
           {
-            label: "Verify screenshot pixels in Python",
+            label: "用 Python 验证截图像素",
             detail:
-              "Read the PNG signature, chunk lengths and CRCs, then decompress a bounded image payload. Reverse PNG row filters and count green success pixels. Combine this visual signal with the DOM flag; neither alone is sufficient. This is a narrow pixel-state detector for the authored fixture, not OCR or general vision. Corrupt, oversized, interlaced and unsupported color formats fail explicitly.",
+              "读取 PNG 签名、块长度和 CRC，再解压大小受限的图像载荷。还原 PNG 行滤波并统计表示成功的绿色像素。将视觉信号与 DOM 标志结合；单独任何一个都不够。这只是针对所编写 fixture 的像素状态检测器，不是 OCR 或通用视觉。损坏、超大、隔行或不支持的颜色格式都会明确失败。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "A green 4x4 fixture scores 1.0 and a red fixture scores zero; the real browser screenshot usually has a small positive success fraction.",
+              "绿色 4x4 fixture 得分为 1.0，红色 fixture 为零；真实浏览器截图通常只有较小的正值成功像素比例。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -144,21 +144,21 @@
     "pj-browser-agent-4",
     Object.assign(
       {
-        title: "Drive the real fixture and score the run",
+        title: "驱动真实 fixture 并为运行评分",
         steps: [
-          { label: "Input contract", detail: "GstackDriver, scoreRuns" },
+          { label: "输入契约", detail: "GstackDriver, scoreRuns" },
           {
-            label: "Drive the real fixture and score the run",
+            label: "驱动真实 fixture 并为运行评分",
             detail:
-              "Serve fixture.html over loopback and navigate to it with gstack browse. GstackDriver reads DOM observations, fills labels, clicks the observed button and captures a real screenshot. Commands use argument arrays instead of a shell. Run the same bounded policy with --live and compare its trace with the fixture backend. Keep completion scores separate for simulated and real-browser runs.",
+              "通过回环地址提供 fixture.html，用 gstack browse 打开。GstackDriver 读取 DOM 观察、按标签填写、点击观察到的按钮，并截取真实截图。命令使用参数数组，不经过 shell。加 --live 运行同一受限策略，与 fixture 后端的轨迹比较。模拟运行与真实浏览器运行的完成得分分开记录。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Start `python3 -m http.server 8877 --bind 127.0.0.1 --directory projects/browser-agent/solution`, navigate with `$BROWSE_BIN goto http://127.0.0.1:8877/fixture.html`, then run `node projects/browser-agent/solution/main.ts --live`. The run saves browser-result.png and reports actual Chromium mode.",
+              "启动 `python3 -m http.server 8877 --bind 127.0.0.1 --directory projects/browser-agent/solution`，用 `$BROWSE_BIN goto http://127.0.0.1:8877/fixture.html` 打开页面，再运行 `node projects/browser-agent/solution/main.ts --live`。运行会保存 browser-result.png，并报告实际 Chromium 模式。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),

@@ -2,11 +2,11 @@
   "use strict";
   const steps = [
     {
-      label: "Snapshot",
-      detail: "Retain the declared source and extraction policy.",
+      label: "快照",
+      detail: "保留声明的来源与提取策略。",
     },
-    { label: "Compute", detail: "Apply bounded, inspectable transformations." },
-    { label: "Report", detail: "Preserve exact change evidence." },
+    { label: "计算", detail: "应用受限且可检查的转换。" },
+    { label: "报告", detail: "保留精确的变更证据。" },
   ];
   const blocks = (s) =>
     s
@@ -28,27 +28,27 @@
         x,
         String(l),
         String(r),
-        r > l ? "added " + (r - l) : l > r ? "removed " + (l - r) : "unchanged",
+        r > l ? "新增 " + (r - l) : l > r ? "删除 " + (l - r) : "未改变",
       ]);
     }
     return { rows, common };
   };
   window.AIFSProjectFigures.register("pj-web-change-brief-1", {
-    title: "Filter readable blocks explicitly",
+    title: "明确过滤可读文本块",
     steps,
     caption:
-      "Use | between already extracted blocks. This lab shows phrase filtering after HTML scanning.",
+      "用 | 分隔已提取的文本块。此实验展示 HTML 扫描后的短语过滤。",
     lab: {
       controls: [
         {
           key: "text",
-          label: "Extracted blocks separated by |",
+          label: "用 | 分隔的提取文本块",
           type: "text",
           value: "Community workshop | Updated today 15:00 | Bring a mug",
         },
         {
           key: "ignore",
-          label: "Ignore phrase",
+          label: "忽略短语",
           type: "text",
           value: "updated today",
         },
@@ -60,32 +60,32 @@
           (x) => !phrase || !x.toLowerCase().includes(phrase),
         );
         return {
-          summary: `Keep ${kept.length} of ${input.length} readable blocks.`,
+          summary: `保留 ${input.length} 个可读文本块中的 ${kept.length} 个。`,
           metrics: [
-            { label: "Removed blocks", value: input.length - kept.length },
+            { label: "移除的文本块数", value: input.length - kept.length },
           ],
-          rows: input.map((x) => [x, kept.includes(x) ? "kept" : "filtered"]),
-          columns: ["Block", "Decision"],
+          rows: input.map((x) => [x, kept.includes(x) ? "保留" : "已过滤"]),
+          columns: ["文本块", "决定"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-web-change-brief-2", {
-    title: "Count text occurrences, not just membership",
+    title: "统计文本出现次数，而不只检查存在与否",
     steps,
     caption:
-      "Use | between blocks. Reordering does not count as a text change, but duplicate counts do.",
+      "用 | 分隔文本块。重新排序不算文本变更，重复次数改变则算。",
     lab: {
       controls: [
         {
           key: "before",
-          label: "Before blocks",
+          label: "变更前文本块",
           type: "text",
           value: "A | A | B",
         },
         {
           key: "after",
-          label: "After blocks",
+          label: "变更后文本块",
           type: "text",
           value: "A | B | C",
         },
@@ -95,38 +95,38 @@
           b = blocks(v.after),
           r = diff(a, b);
         return {
-          summary: `${r.common} unchanged block occurrences.`,
+          summary: `${r.common} 次文本块出现未改变。`,
           metrics: [
-            { label: "Before blocks", value: a.length },
-            { label: "After blocks", value: b.length },
+            { label: "变更前文本块", value: a.length },
+            { label: "变更后文本块", value: b.length },
           ],
           rows: r.rows,
-          columns: ["Exact text", "Before count", "After count", "Change"],
+          columns: ["精确文本", "变更前次数", "变更后次数", "变更"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-web-change-brief-3", {
-    title: "Do not accept a failed fetch as a baseline",
+    title: "不将失败的获取结果作为基线",
     steps,
     caption:
-      "HTTP success, supported media, size and cancellation are independent gates.",
+      "HTTP 成功、支持的媒体类型、大小和取消状态是独立检查项。",
     lab: {
       controls: [
         {
           key: "status",
-          label: "HTTP status",
+          label: "HTTP 状态",
           type: "select",
           value: "200",
           options: [
-            { value: "200", label: "200 OK" },
-            { value: "503", label: "503 Unavailable" },
-            { value: "404", label: "404 Not found" },
+            { value: "200", label: "200 成功" },
+            { value: "503", label: "503 不可用" },
+            { value: "404", label: "404 未找到" },
           ],
         },
         {
           key: "bytes",
-          label: "Response bytes",
+          label: "响应字节数",
           type: "number",
           value: 125000,
           min: 0,
@@ -135,55 +135,55 @@
         },
         {
           key: "html",
-          label: "HTML Content-Type",
+          label: "HTML 内容类型（Content-Type）",
           type: "checkbox",
           value: true,
         },
         {
           key: "cancelled",
-          label: "Request cancelled",
+          label: "请求已取消",
           type: "checkbox",
           value: false,
         },
       ],
       calculate(v) {
         const checks = [
-          ["Status 200", v.status === "200"],
-          ["HTML type", v.html],
-          ["At most 2 MB", v.bytes <= 2000000],
-          ["Not cancelled", !v.cancelled],
+          ["状态为 200", v.status === "200"],
+          ["HTML 类型", v.html],
+          ["不超过 2 MB", v.bytes <= 2000000],
+          ["未取消", !v.cancelled],
         ];
         const accepted = checks.every((x) => x[1]);
         return {
           summary: accepted
-            ? "Fetch is eligible for extraction. Baseline replacement remains explicit."
-            : "Keep the prior baseline and report the fetch failure.",
+            ? "获取结果可以提取。替换基线仍需明确操作。"
+            : "保留原基线并报告获取失败。",
           metrics: [
-            { label: "Passed gates", value: checks.filter((x) => x[1]).length },
-            { label: "Baseline replacements", value: 0 },
+            { label: "通过的检查项数", value: checks.filter((x) => x[1]).length },
+            { label: "基线替换次数", value: 0 },
           ],
-          rows: checks.map(([k, ok]) => [k, ok ? "pass" : "fail"]),
-          columns: ["Gate", "Result"],
+          rows: checks.map(([k, ok]) => [k, ok ? "通过" : "失败"]),
+          columns: ["检查项", "结果"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-web-change-brief-4", {
-    title: "Show the changed statement itself",
+    title: "展示改变的陈述本身",
     steps,
     caption:
-      "The report carries exact text and counts. It does not infer the publisher’s intent.",
+      "报告携带精确文本与次数，不推断发布者意图。",
     lab: {
       controls: [
         {
           key: "before",
-          label: "Prior statement",
+          label: "先前陈述",
           type: "text",
           value: "The workshop starts at 14:00.",
         },
         {
           key: "after",
-          label: "Current statement",
+          label: "当前陈述",
           type: "text",
           value: "The workshop starts at 15:00.",
         },
@@ -193,11 +193,11 @@
         return {
           summary:
             v.before.trim() === v.after.trim()
-              ? "No text change."
-              : "Review the removed and added statements side by side.",
-          metrics: [{ label: "Unchanged occurrences", value: r.common }],
+              ? "文本没有变化。"
+              : "并排审核删除和新增的陈述。",
+          metrics: [{ label: "未改变的出现次数", value: r.common }],
           rows: r.rows,
-          columns: ["Exact evidence", "Before", "After", "Report action"],
+          columns: ["精确证据", "之前", "之后", "报告操作"],
         };
       },
     },

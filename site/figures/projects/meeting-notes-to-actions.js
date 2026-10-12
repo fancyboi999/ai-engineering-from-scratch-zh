@@ -1,24 +1,24 @@
 (function () {
   "use strict";
   const controls = [
-    { key: "owner", label: "Owner", type: "text", value: "Mira" },
-    { key: "due", label: "Due date", type: "text", value: "2026-10-01" },
-    { key: "today", label: "Review date", type: "text", value: "2026-09-29" },
+    { key: "owner", label: "负责人", type: "text", value: "Mira" },
+    { key: "due", label: "截止日期", type: "text", value: "2026-10-01" },
+    { key: "today", label: "审核日期", type: "text", value: "2026-09-29" },
     {
       key: "task",
-      label: "Task",
+      label: "任务",
       type: "text",
       value: "Update the migration guide",
     },
     {
       key: "approved",
-      label: "Reviewer explicitly approved",
+      label: "审核者已明确批准",
       type: "checkbox",
       value: false,
     },
     {
       key: "copies",
-      label: "Repeated source mentions",
+      label: "来源中的重复提及次数",
       type: "range",
       value: 2,
       min: 1,
@@ -37,23 +37,23 @@
       exported = ready && v.approved;
     return {
       summary: invalid
-        ? "Reject impossible calendar date"
+        ? "拒绝不可能的日历日期"
         : missing
-          ? "Keep commitment pending with missing-field flags"
+          ? "将承诺保留为待定，并标记缺失字段"
           : exported
-            ? "One approved commitment can enter CSV"
-            : "Ready for review; approval is still required",
+            ? "一条已批准的承诺可以进入 CSV"
+            : "可以审核；仍需批准",
       metrics: [
-        { label: "Source citations preserved", value: v.copies },
+        { label: "保留的来源引用数", value: v.copies },
         {
-          label: "Overdue",
+          label: "已逾期",
           value: dateOk(v.due) && dateOk(v.today) && v.due < v.today,
         },
       ],
       bars: [
-        { label: "Mentions", value: v.copies, max: 5 },
-        { label: "Deduplicated commitments", value: 1, max: 5 },
-        { label: "Exported approved rows", value: exported ? 1 : 0, max: 5 },
+        { label: "提及次数", value: v.copies, max: 5 },
+        { label: "去重后的承诺数", value: 1, max: 5 },
+        { label: "已导出的批准行数", value: exported ? 1 : 0, max: 5 },
       ],
     };
   };
@@ -61,17 +61,17 @@
     "pj-meeting-notes-to-actions-1",
     Object.assign(
       {
-        title: "Parse explicit action records with line provenance",
+        title: "解析明确的行动记录并保留源行",
         steps: [
-          { label: "Lines", detail: "Enumerate original note lines." },
-          { label: "Marker", detail: "Accept only explicit ACTION records." },
+          { label: "行", detail: "枚举原始笔记行。" },
+          { label: "标记", detail: "只接受明确的 ACTION 记录。" },
           {
-            label: "Provenance",
-            detail: "Retain the raw line and its number.",
+            label: "来源",
+            detail: "保留原始行及其行号。",
           },
         ],
         caption:
-          "Parse ACTION lines, keep source line numbers, and reject malformed marked lines..",
+          "解析 ACTION 行，保留源行号，拒绝格式错误的标记行。",
       },
       { lab: { controls, calculate } },
     ),
@@ -80,16 +80,16 @@
     "pj-meeting-notes-to-actions-2",
     Object.assign(
       {
-        title: "Validate owners and calendar dates",
+        title: "验证负责人和日历日期",
         steps: [
           {
-            label: "Fields",
-            detail: "Check task text and explicit unknown markers.",
+            label: "字段",
+            detail: "检查任务文本和明确的未知标记。",
           },
-          { label: "Calendar", detail: "Parse the real ISO date." },
-          { label: "Flags", detail: "Keep missing commitments visible." },
+          { label: "日历", detail: "解析真实的 ISO 日期。" },
+          { label: "标志", detail: "展示缺失信息的承诺。" },
         ],
-        caption: "Validate owner, task, and ISO date.",
+        caption: "验证负责人、任务和 ISO 日期。",
       },
       { lab: { controls, calculate } },
     ),
@@ -98,14 +98,14 @@
     "pj-meeting-notes-to-actions-3",
     Object.assign(
       {
-        title: "Deduplicate exact commitments without losing citations",
+        title: "精确去重承诺并保留引用",
         steps: [
-          { label: "Key", detail: "Normalize the three commitment fields." },
-          { label: "Group", detail: "Merge only exact keys." },
-          { label: "Citations", detail: "Retain every original line." },
+          { label: "键", detail: "规范化承诺的三个字段。" },
+          { label: "分组", detail: "只合并完全相同的键。" },
+          { label: "引用", detail: "保留每一条原始行。" },
         ],
         caption:
-          "Merge exact normalized duplicates and sort provenance line numbers.",
+          "合并规范化后完全相同的重复项，并对来源行号排序。",
       },
       { lab: { controls, calculate } },
     ),
@@ -114,14 +114,14 @@
     "pj-meeting-notes-to-actions-4",
     Object.assign(
       {
-        title: "Publish an escaped HTML checklist and summary",
+        title: "发布已转义的 HTML 清单与摘要",
         steps: [
-          { label: "Classify", detail: "Compute review and overdue flags." },
-          { label: "Escape", detail: "Treat imported text as data." },
-          { label: "Publish", detail: "Write a portable HTML checklist." },
+          { label: "分类", detail: "计算审核和逾期标志。" },
+          { label: "转义", detail: "将导入的文本当作数据。" },
+          { label: "发布", detail: "写出可移植的 HTML 清单。" },
         ],
         caption:
-          "Return HTML and counts for ready, review, and overdue actions.",
+          "返回 HTML，以及就绪、待审核和逾期行动的数量。",
       },
       { lab: { controls, calculate } },
     ),

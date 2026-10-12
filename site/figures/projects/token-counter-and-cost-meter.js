@@ -35,25 +35,25 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请输入逗号分隔的有限数值");
       return n;
     });
 
   const buildLab = (stage) => ({
     controls: [
-      text("text", "Text to estimate", "Explain Orchard guest tokens"),
-      number("ratio", "Characters per estimated token", 4, 1, 8),
-      number("input", "Recorded input tokens", 100, 0, 500),
-      number("cached", "Cached input tokens", 40, 0, 500),
-      number("output", "Recorded output tokens", 20, 0, 200),
-      number("inputRate", "Input nano-dollars/token", 2, 0, 20),
-      number("cachedRate", "Cached nano-dollars/token", 1, 0, 20),
-      number("outputRate", "Output nano-dollars/token", 5, 0, 20),
-      number("reservation", "Reserved nano-dollars", 600, 0, 2000),
+      text("text", "待估算文本", "Explain Orchard guest tokens"),
+      number("ratio", "每个估算 token 的字符数", 4, 1, 8),
+      number("input", "记录的输入 token 数", 100, 0, 500),
+      number("cached", "缓存输入 token 数", 40, 0, 500),
+      number("output", "记录的输出 token 数", 20, 0, 200),
+      number("inputRate", "输入费率（nano-dollars/token）", 2, 0, 20),
+      number("cachedRate", "缓存费率（nano-dollars/token）", 1, 0, 20),
+      number("outputRate", "输出费率（nano-dollars/token）", 5, 0, 20),
+      number("reservation", "预留金额（nano-dollars）", 600, 0, 2000),
     ],
     calculate(v) {
       if (v.cached > v.input)
-        throw Error("Cached tokens cannot exceed input tokens");
+        throw Error("缓存 token 数不能超过输入 token 数");
       const uncached = (v.input - v.cached) * v.inputRate,
         cache = v.cached * v.cachedRate,
         output = v.output * v.outputRate,
@@ -61,28 +61,28 @@
       return {
         summary:
           stage === 1
-            ? "Approximation: " +
+            ? "近似估算：" +
               Math.ceil([...v.text].length / v.ratio) +
-              " tokens, not a provider count"
+              " token，并非 provider 的计数"
             : total > v.reservation
-              ? "Recorded usage exceeds reservation"
-              : "Settle recorded usage and release unused reservation",
+              ? "记录的用量超过预留金额"
+              : "结算记录的用量并释放未用预留金额",
         metrics: [
-          metric("Estimated tokens", Math.ceil([...v.text].length / v.ratio)),
-          metric("Actual nano-dollars", total),
-          metric("Unused reservation", Math.max(0, v.reservation - total)),
-          metric("Overrun", Math.max(0, total - v.reservation)),
+          metric("估算 token 数", Math.ceil([...v.text].length / v.ratio)),
+          metric("实际金额（nano-dollars）", total),
+          metric("未用预留金额", Math.max(0, v.reservation - total)),
+          metric("超支", Math.max(0, total - v.reservation)),
         ],
         bars: [
-          bar("Uncached input charge", uncached),
-          bar("Cached input charge", cache),
-          bar("Output charge", output),
+          bar("未缓存输入费用", uncached),
+          bar("缓存输入费用", cache),
+          bar("输出费用", output),
         ],
-        columns: ["Component", "Tokens", "Rate", "Charge"],
+        columns: ["组成部分", "token 数", "费率", "费用"],
         rows: [
-          ["Input", v.input - v.cached, v.inputRate, uncached],
-          ["Cached", v.cached, v.cachedRate, cache],
-          ["Output", v.output, v.outputRate, output],
+          ["输入", v.input - v.cached, v.inputRate, uncached],
+          ["缓存", v.cached, v.cachedRate, cache],
+          ["输出", v.output, v.outputRate, output],
         ],
       };
     },
@@ -91,25 +91,25 @@
     "pj-token-counter-and-cost-meter-1",
     Object.assign(
       {
-        title: "Estimate text with a documented bound",
+        title: "按明确记录的界限估算文本",
         steps: [
           {
-            label: "Count scalars",
+            label: "统计标量值",
             detail:
-              "Start with a visible approximation. At four characters per token, 21 Unicode scalar values estimate six tokens. This is a baseline for preflight planning; actual provider counts can differ by language, punctuation and tokenizer.",
+              "先给出可见的近似估算。按每 token 四个字符，21 个 Unicode 标量值估算为六个 token。这是预检规划的基线；provider 的实际计数会因语言、标点和分词器而不同。",
           },
           {
-            label: "Read ratio",
-            detail: "characters=21; ratio=4\nceil(21/4)=6 estimated tokens",
+            label: "读取比例",
+            detail: "characters=21; ratio=4\nceil(21/4)=6 个估算 token",
           },
           {
-            label: "Ceiling division",
+            label: "向上取整除法",
             detail:
-              "Use quotient plus a remainder check, avoiding overflow from adding ratio-1. Never label this result a provider tokenizer count.",
+              "用商加余数检查，避免加上 ratio-1 导致溢出。绝不将此结果标为 provider 分词器计数。",
           },
         ],
         caption:
-          "Why might the same number of characters cost different token counts in two languages?",
+          "为什么两种语言中相同字符数可能对应不同的 token 数？",
       },
       { lab: buildLab(1) },
     ),
@@ -118,26 +118,26 @@
     "pj-token-counter-and-cost-meter-2",
     Object.assign(
       {
-        title: "Validate recorded usage",
+        title: "验证记录的用量",
         steps: [
           {
-            label: "Parse counters",
+            label: "解析计数器",
             detail:
-              "The JSON adapter reads recorded input/output usage and cached input details. Rust validates the corresponding input,output,cached triplet. Cached tokens are a subset of input tokens, not an additional input charge.",
+              "JSON 适配器读取已记录的输入/输出用量和缓存输入详情。Rust 验证对应的 input,output,cached 三元组。缓存 token 是输入 token 的子集，不是额外的输入费用。",
           },
           {
-            label: "Check unsigned",
+            label: "检查无符号值",
             detail:
-              "input_tokens=100; output_tokens=20; cached_tokens=40\nwire=100,20,40\nuncached input=60",
+              "input_tokens=100; output_tokens=20; cached_tokens=40\nwire=100,20,40\n未缓存输入=60",
           },
           {
-            label: "Cached subset",
+            label: "缓存子集",
             detail:
-              "Reject booleans, negative values and cached counts above input. Keep provider response normalization outside the arithmetic core.",
+              "拒绝布尔值、负值和大于输入数的缓存计数。provider 响应的规范化放在算术核心之外。",
           },
         ],
         caption:
-          "What should happen when a provider response omits required input usage?",
+          "provider 响应缺少必需的输入用量时应该怎样处理？",
       },
       { lab: buildLab(2) },
     ),
@@ -146,26 +146,26 @@
     "pj-token-counter-and-cost-meter-3",
     Object.assign(
       {
-        title: "Price with checked integers",
+        title: "用带检查的整数计算费用",
         steps: [
           {
-            label: "Uncached charge",
+            label: "未缓存费用",
             detail:
-              "Use supplied integer rate cards in nano-dollars per token. With input=2, output=5 and cached=1, the recorded request costs 260 nano-dollars. These fixture rates are not current provider prices.",
+              "使用给定的整数费率表，单位为 nano-dollars/token。input=2、output=5、cached=1 时，记录的请求费用为 260 nano-dollars。这些 fixture 费率不是 provider 的当前价格。",
           },
           {
-            label: "Cache charge",
+            label: "缓存费用",
             detail:
-              "60 uncached * 2 = 120\n40 cached * 1 = 40\n20 output * 5 = 100\ntotal=260 nano_dollars",
+              "60 个未缓存 token * 2 = 120\n40 个缓存 token * 1 = 40\n20 个输出 token * 5 = 100\ntotal=260 nano_dollars",
           },
           {
-            label: "Output charge",
+            label: "输出费用",
             detail:
-              "Multiply and add with checked u64 operations. Do not round each component through floating-point dollars.",
+              "使用带检查的 u64 乘法和加法。不要经浮点美元值对各组成部分分别取整。",
           },
         ],
         caption:
-          "How would an overflow affect budget admission if arithmetic wrapped silently?",
+          "如果算术静默回绕，溢出会怎样影响预算准入？",
       },
       { lab: buildLab(3) },
     ),
@@ -174,26 +174,26 @@
     "pj-token-counter-and-cost-meter-4",
     Object.assign(
       {
-        title: "Admit work against a ledger",
+        title: "按账本准入任务",
         steps: [
           {
-            label: "Read ledger",
+            label: "读取账本",
             detail:
-              "Replay reservations against recorded usage. The first Orchard request reserves 600 and settles 260, releasing 340. A later request requiring 1,500 is blocked when only 430 remains. Saved JSON retains request ids and all settlement fields.",
+              "对照记录的用量回放预留操作。第一个 Orchard 请求预留 600，结算 260，释放 340。只剩 430 时，后续需要 1,500 的请求被阻止。保存的 JSON 保留请求 ID 和全部结算字段。",
           },
           {
-            label: "Checked addition",
+            label: "带检查的加法",
             detail:
-              "limit=1000\nrequest 1 reserved=600 actual=260 unused=340\nrequest 2 actual=310 -> spent=570\nremaining=430; larger reservation -> blocked",
+              "limit=1000\n请求 1 reserved=600 actual=260 unused=340\n请求 2 actual=310 -> spent=570\nremaining=430；更大的预留请求 -> 被阻止",
           },
           {
-            label: "Compare limit",
+            label: "比较限额",
             detail:
-              "A settlement must record actual usage even when it exceeds the estimate. Mark an overrun explicitly; do not hide it by capping the billed cost.",
+              "即使用量超过估算，结算也必须记录实际用量。明确标记超支，不要用费用上限掩盖它。",
           },
         ],
         caption:
-          "Which fields can the agent-budget-planner reuse without confusing a quote with actual usage?",
+          "agent-budget-planner 可以复用哪些字段，而不混淆报价与实际用量？",
       },
       { lab: buildLab(4) },
     ),

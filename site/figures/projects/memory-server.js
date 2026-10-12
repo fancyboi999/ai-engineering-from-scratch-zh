@@ -1,16 +1,16 @@
 (function () {
   "use strict";
   const controls = [
-    { key: "query", label: "Query", type: "text", value: "cache policy" },
+    { key: "query", label: "查询", type: "text", value: "cache policy" },
     {
       key: "text",
-      label: "Memory text",
+      label: "记忆文本",
       type: "text",
       value: "cache policy expires quickly",
     },
     {
       key: "revision",
-      label: "Stored revision",
+      label: "已存修订号",
       type: "range",
       value: 1,
       min: 0,
@@ -19,7 +19,7 @@
     },
     {
       key: "expected",
-      label: "Caller expected revision",
+      label: "调用者预期修订号",
       type: "range",
       value: 1,
       min: 0,
@@ -28,7 +28,7 @@
     },
     {
       key: "namespace",
-      label: "Namespace differs",
+      label: "命名空间不同",
       type: "checkbox",
       value: false,
     },
@@ -60,21 +60,21 @@
     return {
       summary:
         v.expected === v.revision
-          ? "Write may append revision " + (v.revision + 1)
-          : "Reject stale write before append",
+          ? "写入可追加修订号 " + (v.revision + 1)
+          : "追加前拒绝过期写入",
       metrics: [
-        { label: "Lexical coverage", value: lex.toFixed(3) },
-        { label: "Cosine of feature hashes", value: cos.toFixed(3) },
-        { label: "Returned score", value: score.toFixed(3) },
+        { label: "词项覆盖率", value: lex.toFixed(3) },
+        { label: "特征哈希余弦相似度", value: cos.toFixed(3) },
+        { label: "返回得分", value: score.toFixed(3) },
       ],
       bars: [
         {
-          label: "Lexical contribution",
+          label: "词项贡献",
           value: v.namespace ? 0 : 0.6 * lex,
           max: 1,
         },
         {
-          label: "Cosine contribution",
+          label: "余弦贡献",
           value: v.namespace ? 0 : 0.4 * cos,
           max: 1,
         },
@@ -85,21 +85,21 @@
     "pj-memory-server-1",
     Object.assign(
       {
-        title: "Keep text, namespace and provenance together",
+        title: "将文本、命名空间和来源一并保存",
         steps: [
-          { label: "Input contract", detail: "validateMemory, embed" },
+          { label: "输入契约", detail: "validateMemory, embed" },
           {
-            label: "Keep text, namespace and provenance together",
+            label: "将文本、命名空间和来源一并保存",
             detail:
-              "Every memory needs a bounded id, namespace, text and source locator. Never return a detached string without its provenance. The small feature-hashing embedding maps normalized terms into a fixed vector; it is a deterministic lexical projection, not a pretrained semantic model. Hash collisions are expected and explain why lexical evidence remains part of retrieval.",
+              "每条记忆都需要受限的 ID、命名空间、文本和来源定位符。绝不返回脱离来源的字符串。小型特征哈希嵌入将规范化词项映射到固定向量；它是确定性的词项投影，不是预训练语义模型。哈希碰撞是预期现象，这也是检索仍需保留词项证据的原因。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "The vector has 32 buckets, while each record retains a readable source locator.",
+              "向量有 32 个桶，每条记录同时保留可读的来源定位符。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -108,24 +108,24 @@
     "pj-memory-server-2",
     Object.assign(
       {
-        title: "Serialize revisioned writes",
+        title: "串行执行带修订号的写入",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail: "MemoryStore.put, MemoryStore.list",
           },
           {
-            label: "Serialize revisioned writes",
+            label: "串行执行带修订号的写入",
             detail:
-              "Load a versioned event log and reconstruct the latest record for each namespace/id pair. An update must name its expected revision. Serialize writes so two callers racing from revision zero cannot both succeed. Append before mutating the in-memory map. This is a single-process store: append completion is not a power-loss durability guarantee, and multiple server processes require an external lock or database.",
+              "加载带版本的事件日志，重建每个 namespace/id 对的最新记录。更新必须指定预期修订号。串行执行写入，让两个从修订号零开始竞争的调用者不能同时成功。先追加，再改变内存映射。这是单进程存储：追加完成不保证断电后的持久性；多个服务进程需要外部锁或数据库。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Two concurrent creates return one success and one revision conflict; reopening recovers the successful record.",
+              "两个并发创建会返回一次成功和一次修订冲突；重新打开后可恢复成功的记录。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -134,24 +134,24 @@
     "pj-memory-server-3",
     Object.assign(
       {
-        title: "Score vectors in a real Rust process",
+        title: "在真实 Rust 进程中为向量评分",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail: "cosineScores, MemoryStore.search",
           },
           {
-            label: "Score vectors in a real Rust process",
+            label: "在真实 Rust 进程中为向量评分",
             detail:
-              "Compile score.rs with the standard Rust toolchain and send query and document vectors over stdin. Compute cosine similarity, returning zero for a zero-norm vector. Combine 60 percent lexical query coverage with 40 percent cosine score and use ids to break ties. Test dimensions and finite values before crossing the process boundary. The Rust binary is compiled into a private temporary directory.",
+              "用标准 Rust 工具链编译 score.rs，通过 stdin 发送查询与文档向量。计算余弦相似度，零范数向量返回零。将 60% 的查询词项覆盖率与 40% 的余弦得分组合，同分时按 ID 排序。跨进程前验证维度和有限数值。Rust 二进制编译到私有临时目录。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "The Rust kernel scores identical vectors as 1.0 and search returns the matching memory with its source intact.",
+              "Rust 计算内核为相同向量打分 1.0，搜索会返回匹配的记忆并完整保留来源。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),
@@ -160,21 +160,21 @@
     "pj-memory-server-4",
     Object.assign(
       {
-        title: "Expose REST and MCP tools",
+        title: "提供 REST 和 MCP 工具",
         steps: [
-          { label: "Input contract", detail: "createMemoryServer" },
+          { label: "输入契约", detail: "createMemoryServer" },
           {
-            label: "Expose REST and MCP tools",
+            label: "提供 REST 和 MCP 工具",
             detail:
-              "Bind a local server, require a bearer token, bound request bodies, and implement health, REST writes/search and the MCP initialization/tools subset over JSON-RPC POST. Tool execution failures use isError inside a successful JSON-RPC response; unknown protocol methods use a JSON-RPC error. This is a teaching subset without sessions, streaming or production authentication. Test actual HTTP bytes so serialization cannot drop source or revision.",
+              "绑定本地服务，要求 bearer token，限制请求体大小，并通过 JSON-RPC POST 实现 health、REST 写入/搜索及 MCP 初始化/工具子集。工具执行失败在成功的 JSON-RPC 响应中使用 isError；未知协议方法使用 JSON-RPC 错误。这是教学子集，不含会话、流式传输或生产级认证。测试实际 HTTP 字节，防止序列化丢失来源或修订号。",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "The demo performs an actual REST write and MCP search over loopback, then prints source, revision and score.",
+              "演示通过回环地址执行实际 REST 写入和 MCP 搜索，然后打印来源、修订号和得分。",
           },
         ],
-        caption: "Advance to inspect the boundary before the next effect.",
+        caption: "继续前进，在下一次产生副作用前检查边界。",
       },
       { lab: { controls, calculate } },
     ),

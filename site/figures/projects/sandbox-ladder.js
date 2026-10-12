@@ -35,21 +35,22 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请输入逗号分隔的有限数值");
       return n;
     });
 
   const buildLab = (stage) => ({
     controls: [
-      check("untrusted", "Untrusted code", true),
-      check("secrets", "Secret-bearing host", true),
-      check("network", "Require denied network", true),
-      check("kernel", "Require separate kernel", false),
-      number("budget", "Modeled cost budget", 3, 1, 5),
-      check("observedReadOnly", "Probe: root write denied", true),
-      check("observedNoRoute", "Probe: default route absent", false),
+      check("untrusted", "不可信代码", true),
+      check("secrets", "存有机密的宿主", true),
+      check("network", "要求禁止网络", true),
+      check("kernel", "要求独立内核", false),
+      number("budget", "模型成本预算", 3, 1, 5),
+      check("observedReadOnly", "探测：根目录写入被拒绝", true),
+      check("observedNoRoute", "探测：没有默认路由", false),
     ],
     calculate(v) {
+      const profileLabel = { process: "进程", filesystem: "文件系统", container: "容器", microvm: "microVM" };
       const p = [
         ["process", false, false, false, 1],
         ["filesystem", true, false, false, 2],
@@ -66,31 +67,31 @@
       return {
         summary:
           stage === 4
-            ? "Observed probes: " +
+            ? "观察到的探测结果：" +
               (v.observedReadOnly && v.observedNoRoute
-                ? "two checks pass; escape resistance unproven"
-                : "requested controls are not both observed")
+                ? "两项检查通过；抗逃逸能力未证实"
+                : "未同时观察到所要求的两项控制")
             : chosen
-              ? "Least-cost sufficient model: " + chosen[0]
-              : "No sufficient model within budget",
+              ? "成本最低的充分模型：" + profileLabel[chosen[0]]
+              : "预算内没有充分模型",
         metrics: [
-          metric("Selected", chosen?.[0] || "none"),
+          metric("选择结果", profileLabel[chosen?.[0]] || "无"),
           metric(
-            "OS enforcement",
-            stage === 4 ? "probe inputs only" : "not established",
+            "操作系统强制执行",
+            stage === 4 ? "仅为探测输入" : "未证实",
           ),
-          metric("Kernel requirement", v.kernel),
+          metric("内核要求", v.kernel),
         ],
-        bars: rows.map((x) => bar(x[0] + " cost", x[4], 5)),
+        bars: rows.map((x) => bar(profileLabel[x[0]] + " 成本", x[4], 5)),
         columns: [
-          "Profile",
-          "Filesystem",
-          "Network denial",
-          "Separate kernel",
-          "Cost",
-          "Sufficient",
+          "配置档",
+          "文件系统",
+          "禁止网络",
+          "独立内核",
+          "成本",
+          "满足要求",
         ],
-        rows,
+        rows: rows.map(([id, ...values]) => [profileLabel[id], ...values]),
       };
     },
   });
@@ -98,26 +99,26 @@
     "pj-sandbox-ladder-1",
     Object.assign(
       {
-        title: "Parse the capability request",
+        title: "解析能力请求",
         steps: [
           {
-            label: "Parse keys",
+            label: "解析键",
             detail:
-              "Write the threat requirement as booleans before selecting a runtime. Here network=true means network denial is required, and host_kernel=true means a separate kernel is required. Neither name grants access.",
+              "选择运行时前，先将威胁防护要求写成布尔值。这里 network=true 表示要求禁止网络，host_kernel=true 表示要求独立内核。这两个名称都不授予访问权限。",
           },
           {
-            label: "Reject duplicates",
+            label: "拒绝重复项",
             detail:
-              "untrusted=true,secrets=true,network=true,host_kernel=false\nrequired: filesystem boundary + denied network",
+              "untrusted=true,secrets=true,network=true,host_kernel=false\n要求：文件系统边界 + 禁止网络",
           },
           {
-            label: "Exact booleans",
+            label: "精确布尔值",
             detail:
-              "Reject duplicate keys and values other than exact true/false. Do not guess what network=yes means.",
+              "拒绝重复键以及非精确 true/false 的值。不要猜测 network=yes 的含义。",
           },
         ],
         caption:
-          "Which additional requirement would make a shared-kernel container insufficient?",
+          "增加哪项要求会让共享内核的容器不再满足条件？",
       },
       { lab: buildLab(1) },
     ),
@@ -126,26 +127,26 @@
     "pj-sandbox-ladder-2",
     Object.assign(
       {
-        title: "Define modeled control profiles",
+        title: "定义控制配置模型",
         steps: [
           {
-            label: "Filesystem control",
+            label: "文件系统控制",
             detail:
-              "Profiles are modeled capabilities with illustrative costs. A process boundary has no filesystem or network isolation in this model; the container profile models both but shares its host kernel.",
+              "配置档描述建模的能力，成本仅作示例。在此模型中，进程边界没有文件系统或网络隔离；容器配置模拟两种隔离，但与宿主共享内核。",
           },
           {
-            label: "Network control",
+            label: "网络控制",
             detail:
               "process: filesystem=false, network=false, kernel=false\ncontainer: filesystem=true, network=true, kernel=false",
           },
           {
-            label: "Kernel control",
+            label: "内核控制",
             detail:
-              "Test requirements independently. A low cost is irrelevant when one required capability is absent.",
+              "分别测试各项要求。缺少任何必需能力时，低成本也没有意义。",
           },
         ],
         caption:
-          "Why is the model not evidence that a running container has these settings?",
+          "为什么模型不能证明正在运行的容器具备这些设置？",
       },
       { lab: buildLab(2) },
     ),
@@ -154,26 +155,26 @@
     "pj-sandbox-ladder-3",
     Object.assign(
       {
-        title: "Select the least costly sufficient profile",
+        title: "选择成本最低的充分配置",
         steps: [
           {
-            label: "Filter controls",
+            label: "筛选控制能力",
             detail:
-              "The cheapest sufficient profile may exceed the allowed budget. When kernel separation is required, budget 4 cannot silently downgrade to a container costing 3.",
+              "最便宜的充分配置也可能超出预算。要求内核分离时，预算为 4 不能悄悄降级为成本为 3 的容器。",
           },
           {
-            label: "Apply budget",
+            label: "应用预算",
             detail:
-              "kernel separation required; candidates costs 1,2,3,5\nbudget 4 -> no sufficient profile\nbudget 5 -> microvm-fixture",
+              "要求内核分离；候选成本为 1,2,3,5\n预算 4 -> 没有充分配置\n预算 5 -> microvm-fixture",
           },
           {
-            label: "Stable minimum",
+            label: "稳定选择最小值",
             detail:
-              "Filter by capabilities first, then cost, then stable name ordering. Return a limit error if the remaining set is empty.",
+              "先按能力筛选，再按成本和稳定名称顺序选择。剩余集合为空时返回限制错误。",
           },
         ],
         caption:
-          "What should change when two sufficient profiles have the same modeled cost?",
+          "两个充分配置的模型成本相同时，选择规则应如何处理？",
       },
       { lab: buildLab(3) },
     ),
@@ -182,26 +183,26 @@
     "pj-sandbox-ladder-4",
     Object.assign(
       {
-        title: "Report residual assumptions",
+        title: "报告残余假设",
         steps: [
           {
-            label: "Recheck requirements",
+            label: "重新检查要求",
             detail:
-              "The optional Docker adapter produces an inspectable argument list and only runs a caller-selected image already present locally. Its harmless probes test a denied root write and absence of a default route. No microVM implementation is included.",
+              "可选 Docker 适配器生成可检查的参数列表，只运行调用者选定且本地已存在的镜像。无害探测检查根目录写入被拒绝和默认路由缺失。这里不包含 microVM 实现。",
           },
           {
-            label: "Name model",
+            label: "明确模型名称",
             detail:
-              "--docker-image alpine:local -> command preview\n--execute -> docker_probe with observed stdout\nshared host kernel remains a residual",
+              "--docker-image alpine:local -> 命令预览\n--execute -> docker_probe 及观察到的 stdout\n共享宿主内核仍是残余风险",
           },
           {
-            label: "List residuals",
+            label: "列出残余风险",
             detail:
-              "Keep policy_simulation and docker_probe results distinct. A successful probe is evidence for those checks only, not proof against container escape.",
+              "区分 policy_simulation 与 docker_probe 的结果。成功探测只能证明对应检查，不能证明能防止容器逃逸。",
           },
         ],
         caption:
-          "If root_write becomes allowed, which runtime setting would you inspect first?",
+          "如果 root_write 变为允许，你会先检查哪个运行时设置？",
       },
       { lab: buildLab(4) },
     ),
