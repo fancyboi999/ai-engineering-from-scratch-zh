@@ -49,7 +49,15 @@ export function consolidate(corrections: Correction[]): Rule[] {
   const ids = new Map<string, string>();
   for (const raw of corrections) {
     const c = ingest(raw);
-    const signature = JSON.stringify(c);
+    const locator = c.locator ?? `session:${c.session}#${c.id}`;
+    // 持久化证据会改变属性顺序并补齐默认定位符；按同一字段语义比较。
+    const signature = JSON.stringify([
+      c.session,
+      c.scope,
+      c.rule,
+      c.source,
+      locator,
+    ]);
     if (ids.has(c.id)) {
       if (ids.get(c.id) !== signature)
         throw new Error("conflicting correction id");
@@ -75,7 +83,7 @@ export function consolidate(corrections: Correction[]): Rule[] {
       id: c.id,
       session: c.session,
       source: c.source,
-      locator: c.locator ?? `session:${c.session}#${c.id}`,
+      locator,
     });
     if (!r.sessions.includes(c.session)) r.sessions.push(c.session);
   }
