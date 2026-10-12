@@ -21,10 +21,10 @@
     return {
       title,
       steps: [
-        { label: "Inspect the boundary", detail },
+        { label: "检查边界", detail },
         {
-          label: "Change the input",
-          detail: "The result below is computed from the current controls.",
+          label: "修改输入",
+          detail: "下方结果根据当前控件值计算。",
         },
       ],
       caption: detail,
@@ -34,13 +34,13 @@
   window.AIFSProjectFigures.register(
     "pj-llm-gateway-with-fallbacks-1",
     config(
-      "Validate provider order",
-      "Only configured endpoints are eligible; duplicate URLs do not create extra attempts.",
+      "校验 provider 顺序",
+      "只有已配置的端点可用；重复 URL 不会增加尝试次数。",
       {
         controls: [
           text(
             "urls",
-            "Comma-separated provider URLs",
+            "逗号分隔的 provider URL",
             "https://primary.example/v1/chat/completions, http://127.0.0.1:11434/v1/chat/completions",
           ),
         ],
@@ -73,14 +73,14 @@
           const invalid = rows.some((r) => r[1] === "invalid");
           return {
             summary: invalid
-              ? "Reject the provider list before any request"
-              : `${accepted} distinct providers in input order`,
-            metrics: [{ label: "Eligible", value: invalid ? 0 : accepted }],
+              ? "发出请求前拒绝无效 provider 列表"
+              : `按输入顺序共有 ${accepted} 个不同 provider`,
+            metrics: [{ label: "可用数量", value: invalid ? 0 : accepted }],
             bars: [
-              { label: "Accepted entries", value: accepted, max: rows.length },
+              { label: "接受的条目数", value: accepted, max: rows.length },
             ],
-            columns: ["Endpoint", "Decision"],
-            rows,
+            columns: ["端点", "决定"],
+            rows: rows.map(([url, status]) => [url, { accepted: "已接受", invalid: "无效", duplicate: "重复" }[status]]),
           };
         },
       },
@@ -89,17 +89,17 @@
   window.AIFSProjectFigures.register(
     "pj-llm-gateway-with-fallbacks-2",
     config(
-      "Classify an observed status",
-      "429 and server errors allow fallback; other errors stop this route.",
+      "对观察到的状态分类",
+      "429 和服务器错误允许回退；其他错误会终止此路由。",
       {
-        controls: [number("status", "HTTP status", 503, 0, 650)],
+        controls: [number("status", "HTTP 状态码", 503, 0, 650)],
         calculate(v) {
           const kind = classify(v.status);
           return {
-            summary: `${v.status} → ${kind}`,
-            metrics: [{ label: "Can fall back", value: kind === "retry" }],
+            summary: `${v.status} → ${{ success: "成功", retry: "可重试", terminal: "终止", invalid: "无效" }[kind]}`,
+            metrics: [{ label: "可回退", value: kind === "retry" }],
             bars: ["success", "retry", "terminal", "invalid"].map((label) => ({
-              label,
+              label: { success: "成功", retry: "可重试", terminal: "终止", invalid: "无效" }[label],
               value: kind === label ? 1 : 0,
               max: 1,
             })),
@@ -111,45 +111,45 @@
   window.AIFSProjectFigures.register(
     "pj-llm-gateway-with-fallbacks-3",
     config(
-      "Bound response reading",
-      "Byte limits and deadlines are independent. The timing here is a model, not a network measurement.",
+      "限制响应读取",
+      "字节上限与截止时间互相独立。这里的时间是模型估算，不是网络实测。",
       {
         controls: [
-          text("body", "Response body", '{"answer":"ready"}'),
-          number("limit", "Response byte limit", 24, 1, 128),
-          number("delay", "Modeled response time (ms)", 70, 0, 200),
-          number("deadline", "Remaining deadline (ms)", 100, 1, 200),
+          text("body", "响应正文", '{"answer":"ready"}'),
+          number("limit", "响应字节上限", 24, 1, 128),
+          number("delay", "模拟响应耗时（ms）", 70, 0, 200),
+          number("deadline", "截止前剩余时间（ms）", 100, 1, 200),
         ],
         calculate(v) {
           const bytes = new TextEncoder().encode(v.body).length;
           const read = Math.min(bytes, v.limit + 1);
-          let summary = "Response accepted";
+          let summary = "响应已接受";
           if (v.delay > v.deadline)
-            summary = "Cancelled before the response completes";
+            summary = "响应完成前已取消";
           else if (bytes > v.limit)
-            summary = "Response rejected: byte limit exceeded";
+            summary = "响应已拒绝：超出字节上限";
           return {
             summary,
             metrics: [
-              { label: "UTF-8 bytes", value: bytes },
-              { label: "Bounded bytes read if complete", value: read },
+              { label: "UTF-8 字节数", value: bytes },
+              { label: "完成时的受限读取字节数", value: read },
             ],
             bars: [
               {
-                label: "Response bytes",
+                label: "响应字节数",
                 value: bytes,
                 max: Math.max(bytes, v.limit),
               },
               {
-                label: "Time consumed",
+                label: "已耗时间",
                 value: Math.min(v.delay, v.deadline),
                 max: v.deadline,
               },
             ],
-            columns: ["Limit", "Value"],
+            columns: ["限制", "值"],
             rows: [
-              ["Body read ceiling", v.limit + 1],
-              ["Remaining time", Math.max(0, v.deadline - v.delay)],
+              ["正文读取上限", v.limit + 1],
+              ["剩余时间", Math.max(0, v.deadline - v.delay)],
             ],
           };
         },
@@ -159,23 +159,23 @@
   window.AIFSProjectFigures.register(
     "pj-llm-gateway-with-fallbacks-4",
     config(
-      "Share one deadline across fallbacks",
-      "Simulate ordered observed responses; each attempt spends the same overall time budget.",
+      "多次回退共享一个截止时间",
+      "模拟按序观察到的响应；每次尝试消耗同一个总时间预算。",
       {
         controls: [
           text(
             "providers",
-            "Provider observations JSON",
+            "provider 观察记录 JSON",
             '[{"status":503,"ms":35,"bytes":40},{"status":200,"ms":50,"bytes":90}]',
           ),
-          number("attempts", "Maximum attempts", 2, 1, 5),
-          number("deadline", "Total deadline (ms)", 65, 1, 250),
-          number("limit", "Maximum response bytes", 128, 1, 256),
+          number("attempts", "最大尝试次数", 2, 1, 5),
+          number("deadline", "总截止时限（ms）", 65, 1, 250),
+          number("limit", "最大响应字节数", 128, 1, 256),
         ],
         calculate(v) {
           const providers = JSON.parse(v.providers);
           if (!Array.isArray(providers) || !providers.length)
-            throw new Error("Expected provider observations");
+            throw new Error("需要 provider 观察记录");
           let elapsed = 0,
             attempts = 0,
             state = "exhausted";
@@ -188,7 +188,7 @@
               p.bytes < 0 ||
               classify(p.status) === "invalid"
             )
-              throw new Error("Use valid status, nonnegative ms and bytes");
+              throw new Error("请使用有效状态码、非负的 ms 和 bytes");
             if (attempts >= v.attempts) break;
             attempts++;
             if (elapsed + p.ms >= v.deadline) {
@@ -214,14 +214,14 @@
             }
           }
           return {
-            summary: `${state} after ${attempts} attempts and ${elapsed} ms`,
-            metrics: [{ label: "Time remaining", value: v.deadline - elapsed }],
+            summary: `${{ exhausted: "已耗尽", cancelled: "已取消", "response-limit": "响应超限", completed: "已完成", "terminal-error": "终止性错误" }[state]}：尝试 ${attempts} 次，耗时 ${elapsed} ms`,
+            metrics: [{ label: "剩余时间", value: v.deadline - elapsed }],
             bars: [
-              { label: "Spent milliseconds", value: elapsed, max: v.deadline },
-              { label: "Attempts", value: attempts, max: v.attempts },
+              { label: "已耗毫秒数", value: elapsed, max: v.deadline },
+              { label: "尝试次数", value: attempts, max: v.attempts },
             ],
-            columns: ["Attempt", "Outcome", "Elapsed ms", "Remaining ms"],
-            rows,
+            columns: ["尝试序号", "结果", "已耗时（ms）", "剩余时间（ms）"],
+            rows: rows.map(([attempt, outcome, elapsed, remaining]) => [attempt, outcome === "deadline" ? "截止时间" : outcome, elapsed, remaining]),
           };
         },
       },

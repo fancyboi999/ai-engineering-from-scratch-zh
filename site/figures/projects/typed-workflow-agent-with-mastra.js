@@ -1,21 +1,21 @@
 (function () {
   "use strict";
   const steps = [
-    { label: "Contract", detail: "Validate the input and selected actions." },
-    { label: "State", detail: "Keep waiting distinct from failure." },
-    { label: "Effect", detail: "Invoke tools only after the required gate." },
+    { label: "契约", detail: "校验输入与选定操作。" },
+    { label: "状态", detail: "区分等待与失败。" },
+    { label: "副作用", detail: "通过必需门禁后才调用工具。" },
   ];
   window.AIFSProjectFigures.register("pj-typed-workflow-agent-with-mastra-1", {
-    title: "Types need runtime validation",
+    title: "类型也需要运行时校验",
     steps,
     caption:
-      "This keyword classifier is an inspectable baseline; it is not an authorization system.",
+      "这个关键词分类器是可检查的基线，不是授权系统。",
     lab: {
       controls: [
-        { key: "id", label: "Ticket ID", type: "text", value: "workshop-42" },
+        { key: "id", label: "工单 ID", type: "text", value: "workshop-42" },
         {
           key: "text",
-          label: "Message",
+          label: "消息",
           type: "text",
           value: "Update the workshop equipment label",
         },
@@ -27,36 +27,36 @@
           : "read";
         return {
           summary: valid
-            ? "Validated ticket with " + intent + " intent."
-            : "Reject malformed ticket before planning.",
+            ? "已校验工单，意图为" + (intent === "write" ? "写入" : "读取") + "。"
+            : "规划前拒绝格式错误的工单。",
           metrics: [
-            { label: "Characters", value: v.text.length },
-            { label: "Intent", value: valid ? intent : "none" },
+            { label: "字符数", value: v.text.length },
+            { label: "意图", value: valid ? (intent === "write" ? "写入" : "读取") : "无" },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-typed-workflow-agent-with-mastra-2", {
-    title: "Approval follows the selected tool",
+    title: "根据选定工具决定审批要求",
     steps,
     caption:
-      "A saved checkpoint cannot disable approval by changing only its flag.",
+      "已保存的检查点不能仅通过修改标志关闭审批。",
     lab: {
       controls: [
         {
           key: "tool",
-          label: "Selected action",
+          label: "选定操作",
           type: "select",
           value: "update",
           options: [
-            { value: "lookup", label: "lookup" },
-            { value: "update", label: "update" },
+            { value: "lookup", label: "查找" },
+            { value: "update", label: "更新" },
           ],
         },
         {
           key: "required",
-          label: "requiresApproval flag",
+          label: "requiresApproval 标志",
           type: "checkbox",
           value: true,
         },
@@ -66,40 +66,40 @@
           valid = expected === v.required;
         return {
           summary: valid
-            ? "Plan contract is internally consistent."
-            : "Reject the edited checkpoint.",
+            ? "计划契约内部一致。"
+            : "拒绝被修改的检查点。",
           metrics: [
-            { label: "Expected flag", value: String(expected) },
-            { label: "Stored flag", value: String(v.required) },
+            { label: "预期标志", value: String(expected) },
+            { label: "存储的标志", value: String(v.required) },
           ],
-          rows: [[v.tool, expected ? "review before effects" : "read-only"]],
-          columns: ["Action", "Policy"],
+          rows: [[v.tool === "update" ? "更新" : "查找", expected ? "产生副作用前审阅" : "只读"]],
+          columns: ["操作", "政策"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-typed-workflow-agent-with-mastra-3", {
-    title: "Budget failed calls as well as successes",
+    title: "失败调用也计入预算",
     steps,
     caption:
-      "The scratch runtime suspends before mutation. Retrying a real write still needs idempotency.",
+      "手写运行时在变更前暂停。重试真实写入仍需幂等性。",
     lab: {
       controls: [
         {
           key: "write",
-          label: "Plan contains update",
+          label: "计划包含 update",
           type: "checkbox",
           value: true,
         },
         {
           key: "approved",
-          label: "Approval supplied",
+          label: "已提供批准",
           type: "checkbox",
           value: false,
         },
         {
           key: "failures",
-          label: "Failures before success",
+          label: "成功前失败次数",
           type: "range",
           value: 1,
           min: 0,
@@ -107,7 +107,7 @@
         },
         {
           key: "budget",
-          label: "Shared call budget",
+          label: "共享调用预算",
           type: "range",
           value: 3,
           min: 1,
@@ -118,48 +118,48 @@
         const paused = v.write && !v.approved;
         const calls = paused ? 0 : Math.min(v.failures + 1, 2, v.budget);
         const ok = !paused && v.failures < 2 && v.failures + 1 <= v.budget;
-        let summary = "Failed after the attempt or call limit.";
-        if (paused) summary = "Suspended before the first tool call.";
-        else if (ok) summary = "Complete with a usable result.";
+        let summary = "达到尝试或调用上限后失败。";
+        if (paused) summary = "首次工具调用前已暂停。";
+        else if (ok) summary = "完成并获得可用结果。";
         return {
           summary,
           metrics: [
-            { label: "Observed calls", value: calls },
-            { label: "Per-action attempts", value: 2 },
+            { label: "观察到的调用数", value: calls },
+            { label: "每项操作尝试上限", value: 2 },
           ],
-          bars: [{ label: "Consumed calls", value: calls, max: v.budget }],
+          bars: [{ label: "已消耗调用数", value: calls, max: v.budget }],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-typed-workflow-agent-with-mastra-4", {
-    title: "Resume the stored plan, not a new request",
+    title: "恢复已存计划，而不是新请求",
     steps,
     caption:
-      "The real SDK stores suspension in SQLite. These controls model the approval gate around the restored plan.",
+      "真实 SDK 将暂停状态存入 SQLite。这些控件模拟恢复计划外的审批门禁。",
     lab: {
       controls: [
         {
           key: "approved",
-          label: "Reviewer approved",
+          label: "审阅者已批准",
           type: "checkbox",
           value: false,
         },
         {
           key: "ticket",
-          label: "Ticket ID matches",
+          label: "工单 ID 一致",
           type: "checkbox",
           value: true,
         },
         {
           key: "digest",
-          label: "Plan digest matches",
+          label: "计划摘要一致",
           type: "checkbox",
           value: true,
         },
         {
           key: "stored",
-          label: "Run exists in local store",
+          label: "本地存储中存在该运行",
           type: "checkbox",
           value: true,
         },
@@ -169,25 +169,25 @@
         if (!v.stored) status = "missing run";
         else if (!v.approved) status = "suspended";
         else if (!v.ticket || !v.digest) status = "failed";
-        let summary = "Reject recovery or mismatched approval.";
+        let summary = "拒绝无效恢复或不匹配的批准。";
         if (status === "success")
-          summary = "Resume execute with the original action and query.";
+          summary = "使用原始操作与查询恢复执行。";
         else if (status === "suspended")
-          summary = "Keep the pending approval and perform no effect.";
+          summary = "保持待审批状态，不产生副作用。";
         return {
           summary,
           metrics: [
-            { label: "SDK result", value: status },
-            { label: "Tool calls", value: status === "success" ? 1 : 0 },
+            { label: "SDK 结果", value: { success: "成功", "missing run": "运行不存在", suspended: "已暂停", failed: "失败" }[status] },
+            { label: "工具调用数", value: status === "success" ? 1 : 0 },
           ],
           rows: [
-            ["Persistent context", "runId, ticketId, planHash, plan"],
+            ["持久化上下文", "runId, ticketId, planHash, plan"],
             [
-              "Reviewer identity",
-              "Must be authenticated by the integrating application",
+              "审阅者身份",
+              "必须由集成应用验证身份",
             ],
           ],
-          columns: ["Boundary", "Stored or required data"],
+          columns: ["边界", "存储或要求的数据"],
         };
       },
     },

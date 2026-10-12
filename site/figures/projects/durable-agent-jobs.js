@@ -1,38 +1,38 @@
 (function () {
   "use strict";
   window.AIFSProjectFigures.register("pj-durable-agent-jobs-1", {
-    title: "A retry needs one stable identity",
+    title: "重试需要稳定的标识",
     steps: [
       {
-        label: "Validate bytes",
+        label: "校验字节",
         detail:
-          "The identifier must start with a lowercase letter, then contain lowercase letters, digits or hyphens, with at most 64 characters.",
+          "标识符必须以小写字母开头，后续只能包含小写字母、数字或连字符，总长不超过 64 个字符。",
       },
       {
-        label: "Create intention",
+        label: "创建任务意图",
         detail:
-          "A valid new job starts queued, version 0, attempts 0. It has no lease or output yet.",
+          "有效的新任务初始为 queued，版本 0、尝试次数 0，尚无租约或输出。",
       },
       {
-        label: "Bind input",
+        label: "绑定输入",
         detail:
-          "The CLI binds an identifier to immutable text. Identical enqueue is safe; changed text conflicts.",
+          "CLI 将标识符绑定到不可变文本。相同内容再次入队是安全的；文本变化则产生冲突。",
       },
     ],
     caption:
-      "Change the identifier and payload relationship to compute whether creation or redelivery is permitted.",
+      "改变标识符与载荷的关系，计算是否允许创建或重复投递。",
     lab: {
       controls: [
-        { key: "id", label: "Job identifier", type: "text", value: "report-1" },
+        { key: "id", label: "任务标识符", type: "text", value: "report-1" },
         {
           key: "exists",
-          label: "ID already stored",
+          label: "ID 已存储",
           type: "checkbox",
           value: false,
         },
         {
           key: "changed",
-          label: "Payload changed",
+          label: "载荷已变化",
           type: "checkbox",
           value: false,
         },
@@ -40,50 +40,50 @@
       calculate(v) {
         const valid = /^[a-z][a-z0-9-]{0,63}$/.test(v.id);
         const conflict = valid && v.exists && v.changed;
-        let summary = "Create queued version 0; no effect executed";
-        if (!valid) summary = "Rejected: invalid identifier";
+        let summary = "创建版本 0 的 queued 任务；尚未执行副作用";
+        if (!valid) summary = "已拒绝：标识符无效";
         else if (conflict)
-          summary = "Rejected: identity already binds different text";
+          summary = "已拒绝：该标识已绑定其他文本";
         else if (v.exists)
-          summary = "Identical redelivery: retain existing job";
+          summary = "相同内容重复投递：保留已有任务";
         return {
           summary: summary,
           metrics: [
-            { label: "Identifier length", value: v.id.length },
-            { label: "New jobs added", value: valid && !v.exists ? 1 : 0 },
-            { label: "Effects executed", value: 0 },
+            { label: "标识符长度", value: v.id.length },
+            { label: "新增任务数", value: valid && !v.exists ? 1 : 0 },
+            { label: "已执行副作用数", value: 0 },
           ],
-          bars: [{ label: "ID length /64", value: v.id.length, max: 64 }],
+          bars: [{ label: "ID 长度 /64", value: v.id.length, max: 64 }],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-durable-agent-jobs-2", {
-    title: "Check authority before changing the ledger",
+    title: "修改账本前检查权限",
     steps: [
       {
-        label: "Compare version",
+        label: "比较版本",
         detail:
-          "The caller's expected version must equal the queued record's current version.",
+          "调用方的预期版本必须等于 queued 记录的当前版本。",
       },
       {
-        label: "Check attempt cap",
+        label: "检查尝试次数上限",
         detail:
-          "Recovery retains attempts. A queued job can still have exhausted its retry budget.",
+          "恢复保留尝试次数。处于 queued 状态的任务也可能已经耗尽重试预算。",
       },
       {
-        label: "Persist claim",
+        label: "持久化认领",
         detail:
-          "A successful transition increments version and attempts, sets expiry, then saves while the ledger lock is held.",
+          "成功转移会递增版本与尝试次数，设置到期时间，然后在持有账本锁时保存。",
       },
     ],
     caption:
-      "The lease interval is half open: expiry is the first millisecond at which completion is rejected.",
+      "租约区间是半开的：到期时刻是首次拒绝完成提交的毫秒。",
     lab: {
       controls: [
         {
           key: "current",
-          label: "Current version",
+          label: "当前版本",
           type: "number",
           value: 2,
           min: 0,
@@ -92,7 +92,7 @@
         },
         {
           key: "expected",
-          label: "Expected version",
+          label: "预期版本",
           type: "number",
           value: 2,
           min: 0,
@@ -101,7 +101,7 @@
         },
         {
           key: "attempts",
-          label: "Previous attempts",
+          label: "已有尝试次数",
           type: "range",
           value: 1,
           min: 0,
@@ -110,7 +110,7 @@
         },
         {
           key: "cap",
-          label: "Attempt cap",
+          label: "尝试次数上限",
           type: "range",
           value: 3,
           min: 1,
@@ -119,7 +119,7 @@
         },
         {
           key: "now",
-          label: "Claim time ms",
+          label: "认领时间（ms）",
           type: "number",
           value: 100,
           min: 0,
@@ -128,7 +128,7 @@
         },
         {
           key: "ttl",
-          label: "Lease duration ms",
+          label: "租约时长（ms）",
           type: "range",
           value: 10,
           min: 1,
@@ -138,27 +138,27 @@
       ],
       calculate(v) {
         const accepted = v.current === v.expected && v.attempts < v.cap;
-        let summary = "Claim accepted; persist before execution";
+        let summary = "认领已接受；执行前先持久化";
         if (v.current !== v.expected)
-          summary = "Conflict: stale expected version";
+          summary = "冲突：预期版本已过期";
         else if (!accepted)
-          summary = "Attempt cap reached; retain queued record";
+          summary = "已达尝试次数上限；保留 queued 记录";
         return {
           summary: summary,
           metrics: [
             {
-              label: "Resulting version",
+              label: "更新后的版本",
               value: v.current + (accepted ? 1 : 0),
             },
             {
-              label: "Resulting attempts",
+              label: "更新后的尝试次数",
               value: v.attempts + (accepted ? 1 : 0),
             },
-            { label: "Lease expiry", value: accepted ? v.now + v.ttl : 0 },
+            { label: "租约到期时间", value: accepted ? v.now + v.ttl : 0 },
           ],
           bars: [
             {
-              label: "Attempts consumed",
+              label: "已消耗尝试次数",
               value: v.attempts + (accepted ? 1 : 0),
               max: v.cap,
             },
@@ -168,31 +168,31 @@
     },
   });
   window.AIFSProjectFigures.register("pj-durable-agent-jobs-3", {
-    title: "Time and version independently fence a worker",
+    title: "时间与版本分别隔离工作进程",
     steps: [
       {
-        label: "Try completion",
+        label: "尝试提交完成",
         detail:
-          "A running worker needs both its current version and time strictly before expiry.",
+          "运行中的工作进程必须持有当前版本，且时间严格早于到期时刻。",
       },
       {
-        label: "Reclaim",
+        label: "回收",
         detail:
-          "At expiry, running v1 becomes queued v2. This invalidates the old worker before another claim.",
+          "到期时，running v1 变成 queued v2。这会在再次认领前使旧工作进程失效。",
       },
       {
-        label: "Retry",
+        label: "重试",
         detail:
-          "The new worker claims v3. Old v1 cannot finish, even if it reports an earlier clock.",
+          "新工作进程认领 v3。旧 v1 即使报告较早的时间，也不能完成。",
       },
     ],
     caption:
-      "Move the clock to 110 and switch the submitted version to see the two independent checks.",
+      "将时钟移到 110，再切换提交版本，观察两项独立检查。",
     lab: {
       controls: [
         {
           key: "now",
-          label: "Completion time ms",
+          label: "完成时间（ms）",
           type: "range",
           value: 109,
           min: 95,
@@ -201,7 +201,7 @@
         },
         {
           key: "version",
-          label: "Submitted version",
+          label: "提交版本",
           type: "number",
           value: 1,
           min: 0,
@@ -210,7 +210,7 @@
         },
         {
           key: "retry",
-          label: "Replacement already claimed v3",
+          label: "接替者已认领 v3",
           type: "checkbox",
           value: false,
         },
@@ -219,60 +219,60 @@
         const current = v.retry ? 3 : 1,
           expiry = v.retry ? 120 : 110,
           accepted = v.version === current && v.now < expiry;
-        let summary = "Completion accepted";
-        if (v.version !== current) summary = "Rejected: stale version";
-        else if (!accepted) summary = "Rejected: lease expired";
+        let summary = "完成提交已接受";
+        if (v.version !== current) summary = "已拒绝：版本过期";
+        else if (!accepted) summary = "已拒绝：租约到期";
         return {
           summary: summary,
           metrics: [
-            { label: "Current claim version", value: current },
-            { label: "Lease expires at", value: expiry },
-            { label: "Time remaining ms", value: Math.max(0, expiry - v.now) },
+            { label: "当前认领版本", value: current },
+            { label: "租约到期时刻", value: expiry },
+            { label: "剩余时间（ms）", value: Math.max(0, expiry - v.now) },
           ],
           bars: [
-            { label: "Completion time", value: v.now, max: 125 },
-            { label: "Expiry", value: expiry, max: 125 },
+            { label: "完成时间", value: v.now, max: 125 },
+            { label: "到期时间", value: expiry, max: 125 },
           ],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-durable-agent-jobs-4", {
-    title: "Recover across the effect-completion gap",
+    title: "从副作用与完成提交之间的空档恢复",
     steps: [
       {
-        label: "Persist v1",
+        label: "持久化 v1",
         detail:
-          "Save the running claim before executing the local text receipt.",
+          "执行本地文本回执前，先保存 running 状态的认领记录。",
       },
       {
-        label: "Publish effect",
+        label: "发布副作用",
         detail:
-          "A synced temporary receipt is linked without overwriting an existing output.",
+          "将已同步落盘的临时回执建立链接，不覆盖已有输出。",
       },
       {
-        label: "Crash and retry",
+        label: "崩溃与重试",
         detail:
-          "After expiry, recovery reaches v3, reuses an identical receipt when present and persists completed v4.",
+          "到期后，恢复推进到 v3；若存在相同回执则复用，随后持久化 completed v4。",
       },
     ],
     caption:
-      "This computes a one-job process-crash timeline. It does not simulate a filesystem power failure.",
+      "这里计算单任务的进程崩溃时间线，不模拟文件系统断电。",
     lab: {
       controls: [
         {
           key: "point",
-          label: "Crash point",
+          label: "崩溃位置",
           type: "select",
           value: "effect",
           options: [
-            { value: "claim", label: "After claim" },
-            { value: "effect", label: "After effect" },
+            { value: "claim", label: "认领后" },
+            { value: "effect", label: "副作用后" },
           ],
         },
         {
           key: "recover",
-          label: "Recovery clock ms",
+          label: "恢复时钟（ms）",
           type: "range",
           value: 111,
           min: 100,
@@ -283,34 +283,34 @@
       calculate(v) {
         const effect = v.point === "effect",
           expired = v.recover >= 110;
-        let summary = "Lease still owned: replacement cannot execute";
+        let summary = "租约仍被持有：接替者不能执行";
         if (expired && effect)
-          summary = "Reclaim, reuse the existing effect, complete v4";
+          summary = "回收，复用已有副作用，完成 v4";
         else if (expired)
-          summary = "Reclaim, publish the first effect, complete v4";
+          summary = "回收，首次发布副作用，完成 v4";
         return {
           summary: summary,
           metrics: [
-            { label: "Effects before restart", value: effect ? 1 : 0 },
+            { label: "重启前的副作用数", value: effect ? 1 : 0 },
             {
-              label: "New effects on restart",
+              label: "重启新增副作用数",
               value: expired && !effect ? 1 : 0,
             },
-            { label: "Completed jobs", value: expired ? 1 : 0 },
+            { label: "已完成任务数", value: expired ? 1 : 0 },
           ],
-          columns: ["Moment", "Version", "Effects"],
+          columns: ["时刻", "版本", "副作用数"],
           rows: [
-            ["claim at 100", 1, 0],
-            ["crash", 1, effect ? 1 : 0],
+            ["100 时认领", 1, 0],
+            ["崩溃", 1, effect ? 1 : 0],
             [
-              "restart at " + v.recover,
+              "重启时刻 " + v.recover,
               expired ? 4 : 1,
               expired || effect ? 1 : 0,
             ],
           ],
           bars: [
             {
-              label: "Persisted effect count",
+              label: "已持久化副作用数",
               value: expired || effect ? 1 : 0,
               max: 1,
             },
