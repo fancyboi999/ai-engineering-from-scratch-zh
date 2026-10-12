@@ -1,0 +1,103 @@
+{
+  "id": "plain-language-rewrite-desk",
+  "title": "简明语言改写台",
+  "tagline": "让解释更易读，同时检查有哪些变化。",
+  "summary": "用可见的句子和词汇指标、保护术语以及可选的真实改写 provider，帮助技术作者修改晦涩文字。比较原始与提案段落，显示数字变化和定义缺失，仅导出作者接受的修订及 Markdown 变更记录。",
+  "level": 2,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [
+    "glossary-hovercard-publisher"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "已接受的 Markdown、段落级 HTML 对照与 revision-decisions.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "类型化本地转换与可移植浏览器界面使用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-plain-language-rewrite-desk-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-record-facts",
+      "title": "分段并记录保护术语与事实",
+      "summary": "segmentProse(text:string,protectedTerms?:string[]):Paragraph[]",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-plain-language-rewrite-desk-1",
+      "concepts": [
+        "分段并记录保护术语与事实"
+      ]
+    },
+    {
+      "id": "02-propose-rewrites",
+      "title": "生成更简单的候选段落",
+      "summary": "proposeParagraphs(paragraphs:Paragraph[],recorded?:Record<string,string>):{id,candidate,method}[]",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-plain-language-rewrite-desk-2",
+      "concepts": [
+        "生成更简单的候选段落"
+      ]
+    },
+    {
+      "id": "03-compare-facts",
+      "title": "比较遗漏、数字与可读性指标",
+      "summary": "measures(text:string):{words,sentences,averageWords,longWords}; compareParagraphs(paragraphs,proposals,definitions?):Comparison[]",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-plain-language-rewrite-desk-3",
+      "concepts": [
+        "比较遗漏、数字与可读性指标"
+      ]
+    },
+    {
+      "id": "04-accepted-export",
+      "title": "导出已接受修订与变更记录",
+      "summary": "exportRevisions(comparisons,value?):{markdown,changeRecord,decisions,unresolved}; renderDesk(comparisons,state):string",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-plain-language-rewrite-desk-4",
+      "concepts": [
+        "导出已接受修订与变更记录"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制：起始代码先失败，随后参考方案的所有阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "查看实际输出",
+      "caption": "与生成的本地界面交互的上游录制。运行文档中的命令，查看你自己的输出。"
+    }
+  ]
+}

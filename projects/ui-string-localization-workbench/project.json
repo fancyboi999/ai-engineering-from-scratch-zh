@@ -1,0 +1,103 @@
+{
+  "id": "ui-string-localization-workbench",
+  "title": "UI 字符串本地化工作台",
+  "tagline": "审查翻译后的界面文本，不破坏占位符。",
+  "summary": "帮助小型产品团队本地化 JSON 消息目录，同时保留稳定键、变量占位符和上下文备注。在 UI 预览中比较已记录或真实 provider 的提案，要求审查有歧义的字符串，并导出已批准 locale 目录和未解决字符串队列。",
+  "level": 2,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [
+    "glossary-hovercard-publisher"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "已审查的 locale JSON、交互式消息预览与 unresolved-strings.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "类型化本地转换与可移植浏览器界面使用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-ui-string-localization-workbench-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-catalog-contract",
+      "title": "读取消息键、占位符与上下文",
+      "summary": "placeholders(text:string):string[]; readCatalog(value:unknown):Message[]",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-ui-string-localization-workbench-1",
+      "concepts": [
+        "读取消息键、占位符与上下文"
+      ]
+    },
+    {
+      "id": "02-recorded-proposals",
+      "title": "生成有边界的翻译提案",
+      "summary": "proposeTranslations(messages:Message[],recorded:unknown,locale:string):Proposal[]",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-ui-string-localization-workbench-2",
+      "concepts": [
+        "生成有边界的翻译提案"
+      ]
+    },
+    {
+      "id": "03-message-preview",
+      "title": "用提供的插值预览字符串",
+      "summary": "previewMessage(template:string,values:Record<string,string|number>):string",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-ui-string-localization-workbench-3",
+      "concepts": [
+        "用提供的插值预览字符串"
+      ]
+    },
+    {
+      "id": "04-approved-catalog",
+      "title": "导出已批准 locale 与未解决问题",
+      "summary": "reviewTranslations(messages,proposals,value?):{catalog,unresolved,review}; renderWorkbench(messages,proposals,state,locale,values?):string",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-ui-string-localization-workbench-4",
+      "concepts": [
+        "导出已批准 locale 与未解决问题"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制：起始代码先失败，随后参考方案的所有阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "查看实际输出",
+      "caption": "与生成的本地界面交互的上游录制。运行文档中的命令，查看你自己的输出。"
+    }
+  ]
+}

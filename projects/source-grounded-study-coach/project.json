@@ -1,0 +1,122 @@
+{
+  "id": "source-grounded-study-coach",
+  "title": "有来源依据的学习教练",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "构建带来源证据和可见复习计划的练习题。",
+  "summary": "构建带来源证据和可见复习计划的练习题。",
+  "youWillBuild": "独立的答案揭示练习页与 progress.json，包含到期卡片和可复现的计划状态。",
+  "usefulFor": [
+    "包含来源段落、编写的问题、可接受答案和证据偏移量的 JSON 卡组，以及带日期的作答事件。"
+  ],
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "languageWhy": {
+    "TypeScript": "TypeScript 用同一套显式数据类型处理卡组校验、事件处理和可移植 HTML 练习视图。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "给每个答案标明来源位置",
+    "返回显示来源的反馈",
+    "重放作答事件，生成可见的复习计划",
+    "把阅读材料变成实用练习页"
+  ],
+  "prerequisites": [
+    "能编写 TypeScript 函数、数组和对象类型。",
+    "能从本地文件读取 JSON 并处理抛出的错误。",
+    "理解答案字符串匹配并不代表语义理解。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-source-grounded-study-coach-1",
+  "demo": {
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "demo.ts"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-ground-the-deck",
+      "title": "给每个答案标明来源位置",
+      "summary": "对照不可变的来源段落校验编写的卡片。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "languageWhy": "TypeScript 用同一套显式数据类型处理卡组校验、事件处理和可移植 HTML 练习视图。",
+      "concepts": [
+        "证据偏移量",
+        "唯一 ID",
+        "输入校验"
+      ],
+      "figure": "pj-source-grounded-study-coach-1"
+    },
+    {
+      "id": "02-grade-with-evidence",
+      "title": "返回显示来源的反馈",
+      "summary": "对受限简短答案评分，并展示支持段落。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "languageWhy": "TypeScript 用同一套显式数据类型处理卡组校验、事件处理和可移植 HTML 练习视图。",
+      "concepts": [
+        "规范化",
+        "可接受变体",
+        "有依据的反馈"
+      ],
+      "figure": "pj-source-grounded-study-coach-2"
+    },
+    {
+      "id": "03-schedule-review",
+      "title": "重放作答事件，生成可见的复习计划",
+      "summary": "从稳定、带日期的作答事件推导到期日期。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "languageWhy": "TypeScript 用同一套显式数据类型处理卡组校验、事件处理和可移植 HTML 练习视图。",
+      "concepts": [
+        "事件重放",
+        "幂等性",
+        "日历计算"
+      ],
+      "figure": "pj-source-grounded-study-coach-3"
+    },
+    {
+      "id": "04-export-practice",
+      "title": "把阅读材料变成实用练习页",
+      "summary": "导出可移植的答案揭示与复习视图，进度可复现。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "languageWhy": "TypeScript 用同一套显式数据类型处理卡组校验、事件处理和可移植 HTML 练习视图。",
+      "concepts": [
+        "HTML 渲染",
+        "进度导出",
+        "provider 边界"
+      ],
+      "figure": "pj-source-grounded-study-coach-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "构建与评分",
+      "caption": "全新起始代码失败；完整的原创方案通过全部四阶段。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "查看应用输出",
+      "caption": "编写的离线 fixture 的实际输出记录。provider 与证据边界见 README。"
+    }
+  ]
+}

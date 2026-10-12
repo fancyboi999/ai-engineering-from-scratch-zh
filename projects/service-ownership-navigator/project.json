@@ -1,0 +1,104 @@
+{
+  "id": "service-ownership-navigator",
+  "title": "服务归属导航器",
+  "tagline": "查找服务的所有者和 runbook，每个答案都有证据。",
+  "summary": "把编写的服务目录、仓库归属规则与 runbook 链接合并为本地目录。在请求路径上解析归属，显示冲突和缺失的 runbook，用文件级证据回答交接问题。导出静态站点和 JSON 查询接口，不发送通知。",
+  "level": 2,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [
+    "semantic-notes-search",
+    "doc-qa-with-citations"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "静态服务目录与有来源依据的归属查询 JSON",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "类型化本地转换与可移植浏览器界面使用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-service-ownership-navigator-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-load-evidence",
+      "title": "加载服务元数据与归属规则",
+      "summary": "parseOwnershipRules(text:string,source?:string):Rule[]; loadCatalog(value:unknown):Catalog",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-service-ownership-navigator-1",
+      "concepts": [
+        "加载服务元数据与归属规则"
+      ]
+    },
+    {
+      "id": "02-resolve-paths",
+      "title": "解析路径与冲突的归属证据",
+      "summary": "matchesRule(pattern:string,path:string):boolean; resolveOwnership(catalog:Catalog,path:string):Ownership",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-service-ownership-navigator-2",
+      "concepts": [
+        "解析路径与冲突的归属证据"
+      ]
+    },
+    {
+      "id": "03-check-runbooks",
+      "title": "检查本地 runbook 引用",
+      "summary": "checkRunbook(catalog:Catalog,service:Service):{path,exists,headings,links,issues}",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-service-ownership-navigator-3",
+      "concepts": [
+        "检查本地 runbook 引用"
+      ]
+    },
+    {
+      "id": "04-export-handoff",
+      "title": "导出可搜索目录与带引用的交接包",
+      "summary": "handoffPacket(catalog:Catalog,path:string):{schemaVersion:1,ownership,runbook,dependencies}; renderDirectory(catalog,packet):string",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-service-ownership-navigator-4",
+      "concepts": [
+        "导出可搜索目录与带引用的交接包"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制：起始代码先失败，随后参考方案的所有阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "查看实际输出",
+      "caption": "与生成的本地界面交互的上游录制。运行文档中的命令，查看你自己的输出。"
+    }
+  ]
+}
