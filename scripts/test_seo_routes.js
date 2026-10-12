@@ -700,3 +700,138 @@ test('server and browser source links honor generated repository identity', func
   assert.match(lessonTemplate, /AIFSContentSource/);
   assert.doesNotMatch(lessonTemplate, /api\.github\.com\/repos\/rohitg00\/ai-engineering-from-scratch\/contents/);
 });
+
+function withLessonMarkdown(assets) {
+  assets.lesson.readMarkdown = () => '# 中文向量\n\n> 完整课程摘要。\n\n## 核心概念\n\n这是完整正文，不是抓取摘要。\n\n```python\nprint("</script><script>unsafe</script>")\n```\n';
+  return assets;
+}
+
+test('lesson Markdown negotiation returns exact Chinese source and byte-accurate HEAD metadata', () => {
+  const assets = withLessonMarkdown(makeAssets());
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  const query = { path: 'phases/01-math/01-vectors' };
+  for (const accept of ['text/markdown', 'text/markdown, text/html;q=0.8', 'text/html;q=0, text/*']) {
+    const get = invoke(handler, { method: 'GET', query, headers: { accept } });
+    const head = invoke(handler, { method: 'HEAD', query, headers: { accept } });
+    assert.equal(get.statusCode, 200);
+    assert.equal(get.body, assets.lesson.readMarkdown());
+    assert.equal(get.headers['content-type'], 'text/markdown; charset=utf-8');
+    assert.equal(get.headers['content-language'], 'zh-CN');
+    assert.equal(get.headers.vary, 'Accept, Accept-Encoding');
+    assert.equal(Number(get.headers['content-length']), Buffer.byteLength(get.body));
+    assert.deepEqual(head.headers, get.headers);
+    assert.equal(head.body, '');
+  }
+});
+
+test('lesson HTML uses the shared renderer for full Chinese body and safely embeds source', () => {
+  const assets = withLessonMarkdown(makeAssets());
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  for (const accept of [undefined, 'text/html, text/markdown;q=0.5', 'text/markdown;q=0, */*']) {
+    const response = invoke(handler, { method: 'GET', query: { path: 'phases/01-math/01-vectors' }, headers: { accept } });
+    assert.equal(response.statusCode, 200);
+    assert.match(response.headers['content-type'], /^text\/html/);
+    assert.match(response.body, /这是完整正文，不是抓取摘要。/);
+    assert.match(response.body, /核心概念<\/h2>/);
+    assert.equal((response.body.match(/<h1(?:\s|>)/g) || []).length, 1);
+    assert.doesNotMatch(response.body, /<script>unsafe/);
+    const embedded = JSON.parse(response.body.match(/id="lessonMarkdown">([\s\S]*?)<\/script>/)[1]);
+    assert.equal(embedded.lang, 'zh');
+    assert.equal(embedded.path, 'phases/01-math/01-vectors');
+    assert.equal(embedded.markdown, assets.lesson.readMarkdown());
+    assert.match(response.body, /rel="canonical" href="https:\/\/aieng-zh\.cn\/lessons\/01-math\/01-vectors\/"/);
+  }
+});
+
+test('lesson negotiation fails closed for unsupported types and source failures', () => {
+  const assets = withLessonMarkdown(makeAssets());
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  for (const accept of ['application/json', '*/*;q=0', 'text/html;q=0, text/markdown;q=0']) {
+    const response = invoke(handler, { method: 'GET', query: { path: 'phases/01-math/01-vectors' }, headers: { accept } });
+    assert.equal(response.statusCode, 406);
+    assert.equal(response.headers['cache-control'], 'no-store');
+  }
+  assets.lesson.readMarkdown = () => { throw new Error('SourceBoundary: symlink'); };
+  for (const accept of ['text/html', 'text/markdown']) {
+    const response = invoke(handler, { method: 'GET', query: { path: 'phases/01-math/01-vectors' }, headers: { accept } });
+    assert.equal(response.statusCode, 500);
+    assert.equal(response.headers['cache-control'], 'no-store');
+    assert.doesNotMatch(response.body, /完整正文/);
+  }
+});
+
+test('both published certification programs serve Markdown and independent-preparation HTML', () => {
+  const assets = withLessonMarkdown(withSecondProgram(makeAssets()));
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  for (const lessonPath of ['certifications/claude/lessons/01-models', 'certifications/mcpa/lessons/01-discovery']) {
+    const markdown = invoke(handler, { method: 'GET', query: { path: lessonPath }, headers: { accept: 'text/markdown' } });
+    assert.equal(markdown.statusCode, 200);
+    assert.equal(markdown.body, assets.lesson.readMarkdown());
+    const html = invoke(handler, { method: 'GET', query: { path: lessonPath } });
+    assert.equal(html.statusCode, 200);
+    assert.match(html.body, /独立社区备考/);
+    assert.match(html.body, /不颁发证书，也不保证通过考试/);
+  }
+});
+
+test('lesson Markdown requests preserve legacy redirects and reject unknown or unsafe paths before reading source', () => {
+  const assets = withLessonMarkdown(makeAssets());
+  let reads = 0;
+  assets.lesson.readMarkdown = () => { reads++; return '# 正文'; };
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  for (const lessonPath of ['phases/01-math/99-missing', '../README', 'phases/01-math/../01-vectors', 'certifications/unknown/lessons/01-test', '__proto__']) {
+    for (const method of ['GET', 'HEAD']) {
+      const response = invoke(handler, { method, query: { path: lessonPath }, headers: { accept: 'text/markdown' } });
+      assert.equal(response.statusCode, 404, lessonPath);
+      assert.equal(response.headers['cache-control'], 'no-store');
+      if (method === 'HEAD') assert.equal(response.body, '');
+    }
+  }
+  const legacy = invoke(handler, { method: 'GET', query: { path: 'phases/01-math/01-vectors', legacy: '1' }, headers: { accept: 'text/markdown' } });
+  assert.equal(legacy.statusCode, 308);
+  assert.equal(legacy.headers.location, '/lesson?path=phases%2F01-math%2F01-vectors');
+  assert.equal(reads, 0);
+});
+
+test('Hub mount only activates with a declared, matching phase route and filters glossary links', () => {
+  const assets = withLessonMarkdown(makeAssets());
+  const entry = assets.lesson.manifest.lessons['phases/01-math/01-vectors'];
+  assets.lesson.template = assets.lesson.template.replace('</main>', '<!-- AIFS:LESSON-HUBS:START --><!-- AIFS:LESSON-HUBS:END --></main>');
+  assets.lesson.hubRoutes = { phaseHubPath: () => '/phase/math' };
+  assets.lesson.lessonTerms = { [entry.path]: [{ term: '向量', href: '/glossary/vector' }, { term: '危险', href: 'javascript:alert(1)' }] };
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  const request = () => invoke(handler, { method: 'GET', query: { path: entry.path } });
+  assert.doesNotMatch(request().body, /class="lesson-hub-links"/);
+  entry.context.hub = '/phase/wrong';
+  assert.doesNotMatch(request().body, /class="lesson-hub-links"/);
+  entry.context.hub = '/phase/math';
+  const html = request().body;
+  assert.match(html, /class="lesson-hub-links"/);
+  assert.match(html, /href="\/phase\/math"/);
+  assert.match(html, /href="\/glossary\/vector">向量/);
+  assert.doesNotMatch(html, /javascript:alert|危险/);
+  assert.match(html, /"item":"https:\/\/aieng-zh\.cn\/phase\/math"/);
+  assets.lesson.hubRoutes = null;
+  assert.doesNotMatch(request().body, /class="lesson-hub-links"/);
+});
+
+test('OG reader adapter uses Chinese helper card IDs and never swallows rendering failures', () => {
+  const assets = withLessonMarkdown(makeAssets());
+  const calls = [];
+  const ogCards = {
+    lessonCard(entry) { calls.push(['lesson', entry.path]); return { title: entry.title }; },
+    trackCard(entry) { calls.push(['track', entry.id]); return { title: entry.title }; },
+    cardUrl(type, id, spec, lang) { assert.equal(lang, undefined); return `https://aieng-zh.cn/og/${type}/${id}.png?v=helper-version`; },
+    cardTags(url) { return [`<meta property="og:image" content="${url}">`]; },
+  };
+  assets.lesson.ogCards = assets.certification.ogCards = ogCards;
+  const lesson = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  const track = certificationApi.createHandler({ loadAssets: () => assets.certification });
+  assert.match(invoke(lesson, { method: 'GET', query: { path: 'phases/01-math/01-vectors' } }).body, /og\/lesson\/phases\/01-math\/01-vectors\.png\?v=helper-version/);
+  assert.match(invoke(track, { method: 'GET', query: { id: 'claude-example' } }).body, /og\/track\/claude-example\.png\?v=helper-version/);
+  assert.deepEqual(calls, [['lesson', 'phases/01-math/01-vectors'], ['track', 'claude-example']]);
+  ogCards.cardTags = () => { throw new Error('OG rendering failed'); };
+  assert.equal(invoke(lesson, { method: 'GET', query: { path: 'phases/01-math/01-vectors' } }).statusCode, 500);
+  assert.equal(invoke(track, { method: 'GET', query: { id: 'claude-example' } }).statusCode, 500);
+  assert.equal(invoke(lesson, { method: 'GET', query: { path: 'phases/01-math/01-vectors' }, headers: { accept: 'text/markdown' } }).statusCode, 200);
+});

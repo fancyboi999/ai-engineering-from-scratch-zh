@@ -14,6 +14,7 @@ function loadProductionAssets() {
   if (!productionAssets) {
     productionAssets = {
       template: fs.readFileSync(path.join(__dirname, '..', 'site', 'certification.html'), 'utf8'),
+      ogCards: fs.existsSync(path.join(__dirname, '..', 'lib', 'og-cards.js')) ? require('../lib/og-cards') : null,
       manifest: JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'certification-seo.json'), 'utf8')),
     };
   }
@@ -114,7 +115,7 @@ function trackLessons(entry) {
   });
 }
 
-function certificationHead(entry, trackId) {
+function certificationHead(entry, trackId, assets) {
   const canonical = canonicalForTrack(trackId);
   const title = entry.seoTitle || `${entry.title} - AI Engineering from Scratch`;
   const description = entry.description || entry.excerpt || '免费、独立的认证备考路线，包含有序课程与原创练习。';
@@ -148,19 +149,21 @@ function certificationHead(entry, trackId) {
     ],
   };
 
+  const card = assets.ogCards && assets.ogCards.trackCard(entry);
+  const imageTags = card
+    ? assets.ogCards.cardTags(assets.ogCards.cardUrl('track', entry.id, card), card)
+    : [`<meta property="og:image" content="${ORIGIN}/og-image.png?v=3">`, '<meta name="twitter:card" content="summary_large_image">', `<meta name="twitter:image" content="${ORIGIN}/og-image.png?v=3">`];
   return [
     `  <title>${escapeHtml(title)}</title>`,
     `  <meta name="description" content="${escapeHtml(description)}">`,
     `  <link rel="canonical" href="${escapeHtml(canonical)}">`,
     `  <meta property="og:title" content="${escapeHtml(title)}">`,
     `  <meta property="og:description" content="${escapeHtml(description)}">`,
-    `  <meta property="og:image" content="${ORIGIN}/og-image.png?v=3">`,
+    ...imageTags.map(tag => `  ${tag}`),
     `  <meta property="og:url" content="${escapeHtml(canonical)}">`,
     '  <meta property="og:type" content="website">',
-    '  <meta name="twitter:card" content="summary_large_image">',
     `  <meta name="twitter:title" content="${escapeHtml(title)}">`,
     `  <meta name="twitter:description" content="${escapeHtml(description)}">`,
-    `  <meta name="twitter:image" content="${ORIGIN}/og-image.png?v=3">`,
     `  <script type="application/ld+json" id="certificationJsonLd">${jsonForHtml(jsonLd)}</script>`,
   ].join('\n');
 }
@@ -248,7 +251,7 @@ function createHandler(options) {
         sendRedirect(res, method, trackId);
         return;
       }
-      let html = replaceMarkedRegion(template, SEO_START, SEO_END, certificationHead(entry, trackId));
+      let html = replaceMarkedRegion(template, SEO_START, SEO_END, certificationHead(entry, trackId, assets));
       html = replaceMarkedRegion(html, FALLBACK_START, FALLBACK_END, certificationFallback(entry, trackId));
       send(res, method, 200, html, 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800');
     } catch (_) {

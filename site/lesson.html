@@ -171,8 +171,49 @@
       min-width: 0;
       margin-left: 240px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       padding: 56px 32px 96px;
+    }
+
+    .lesson-hub-links {
+      flex: 0 0 100%;
+      max-width: 720px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--rule-soft);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      overflow-wrap: anywhere;
+    }
+
+    .lesson-hub-trail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 8px;
+      list-style: none;
+      text-transform: uppercase;
+    }
+
+    .lesson-hub-trail li + li::before {
+      content: "/";
+      margin-right: 8px;
+      color: var(--ink-mute);
+    }
+
+    .lesson-hub-terms {
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: inherit;
+      color: inherit;
+    }
+
+    .lesson-hub-terms span {
+      color: var(--ink-mute);
+      text-transform: uppercase;
     }
 
     .lesson-content {
@@ -349,7 +390,7 @@
 
     .lesson-article h1 {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(min(2rem, 10vw), 5vw, 3rem);
       font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.02em;
@@ -362,7 +403,7 @@
 
     .lesson-article h2 {
       font-family: var(--font-display);
-      font-size: clamp(1.5rem, 3vw, 1.9rem);
+      font-size: clamp(min(1.5rem, 7.5vw), 3vw, 1.9rem);
       font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.02em;
@@ -2510,7 +2551,7 @@
       .lesson-article p,
       .lesson-article ul li,
       .lesson-article ol li { font-size: 0.96rem; }
-      .lesson-article h1 { font-size: clamp(1.9rem, 12vw, 2.55rem); }
+      .lesson-article h1 { font-size: min(12vw, 2.55rem); }
       .lesson-article > p:first-of-type::first-letter { font-size: 2.6rem; }
       .lesson-article ul { padding-left: 18px; }
       .lesson-article ol { padding-left: 24px; }
@@ -2618,6 +2659,8 @@
         </div>
         <!-- AIFS:LESSON-FALLBACK:END -->
       </div>
+      <!-- AIFS:LESSON-HUBS:START -->
+      <!-- AIFS:LESSON-HUBS:END -->
     </main>
     <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
   </div>
@@ -2645,7 +2688,7 @@
       });
     }());
   </script>
-  <script src="content-source.js?v=20260831a"></script>
+  <script src="content-source.js?v=20261012a"></script>
   <script src="progress.js?v=20260831a"></script>
   <script id="learningPathProgressRuntime">
     (function (root) {
@@ -2861,6 +2904,7 @@
       var SOURCE_OWNER = /^[A-Za-z0-9-]+$/.test(SOURCE_CONFIG.owner || '') ? SOURCE_CONFIG.owner : 'fancyboi999';
       var SOURCE_REPO = /^[A-Za-z0-9_.-]+$/.test(SOURCE_CONFIG.repo || '') ? SOURCE_CONFIG.repo : 'ai-engineering-from-scratch-zh';
       var REPO_TREE = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/' + encodeURIComponent(ACTIVE_REF) + '/';
+      var embeddedLesson = readEmbeddedLesson();
       var certificationTrack = null;
       var certificationOriginTrack = null;
       var certificationLesson = null;
@@ -3566,6 +3610,24 @@
           });
       }
 
+      function readEmbeddedLesson() {
+        var node = document.getElementById('lessonMarkdown');
+        if (!node) return null;
+        try {
+          var data = JSON.parse(node.textContent);
+          return data && typeof data.markdown === 'string' ? data : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function embeddedLessonMarkdown(path) {
+        if (!embeddedLesson || embeddedLesson.path !== path || embeddedLesson.lang !== 'zh') return null;
+        // 本地联调要读正在修改的源；部署嵌入正文则与本次构建版本一致。
+        if (window.AIFSContentSource && window.AIFSContentSource.isLocal()) return null;
+        return embeddedLesson.markdown;
+      }
+
       function fetchLesson(path, retried) {
         if (certificationLesson && path === certificationLesson.path && typeof certificationLesson.markdown === 'string') {
           lessonQuizPromise = Promise.resolve(certificationLesson.quiz || null);
@@ -3589,11 +3651,14 @@
           : 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + ACTIVE_REF + '/' + path + '/docs/zh.md';
         startQuizFetch(path, !!retried);
 
-        fetch(rawUrl, fetchOptions)
-          .then(function (res) {
-            if (!res.ok) throw new Error('fetch-failed');
-            return res.text();
-          })
+        var embeddedMarkdown = embeddedLessonMarkdown(path);
+        var lessonDocument = embeddedMarkdown !== null
+          ? Promise.resolve(embeddedMarkdown)
+          : fetch(rawUrl, fetchOptions).then(function (res) {
+              if (!res.ok) throw new Error('fetch-failed');
+              return res.text();
+            });
+        lessonDocument
           .then(function (md) {
             try {
               renderLesson(md);
@@ -3626,7 +3691,7 @@
       // 客户端逐课 SEO：动态设置 canonical / description / JSON-LD（LearningResource）
       function updateLessonSeo(title, md) {
         var ORIGIN = location.origin;  // 跟随部署域名:fork 部署时 canonical/og:url/JSON-LD 自动指向自己
-        var path = new URLSearchParams(location.search).get('path') || '';
+        var path = lessonPath || '';
         if (!path) return;  // 防御：空 path 会生成 /lessons// 这种坏 canonical
         // canonical 指向预渲染静态页（SEO 主体）；旧 ?path= URL 仅作兼容入口
         var url = ORIGIN + lessonHref(path);
@@ -3645,8 +3710,7 @@
         set('meta[property="og:description"]', desc);
         set('meta[name="twitter:title"]', fullTitle);
         set('meta[name="twitter:description"]', desc);
-        set('meta[property="og:image"]', ORIGIN + '/og-image.png?v=2');   // 社交卡图跟随部署域名
-        set('meta[name="twitter:image"]', ORIGIN + '/og-image.png?v=2');
+        // 服务端 OG helper 已写入版本化课程卡；客户端不能覆盖为旧静态图。
         var ogu = document.querySelector('meta[property="og:url"]');
         if (!ogu) { ogu = document.createElement('meta'); ogu.setAttribute('property', 'og:url'); document.head.appendChild(ogu); }
         ogu.setAttribute('content', url);
@@ -3664,9 +3728,14 @@
           }
           breadcrumbs.push({ '@type': 'ListItem', position: breadcrumbs.length + 1, name: title, item: url });
         } else {
+          var phaseLesson = phaseLessonForPath(path);
+          var phase = phaseLesson && phaseLesson.phase;
+          var hub = phase && /^\/phase\/[a-z0-9-]+$/.test(phase.hub || '') ? phase.hub : '';
           breadcrumbs = [
             { '@type': 'ListItem', position: 1, name: '首页', item: ORIGIN },
-            { '@type': 'ListItem', position: 2, name: '课程表', item: ORIGIN + '/catalog.html' },
+            hub
+              ? { '@type': 'ListItem', position: 2, name: '阶段 ' + String(phase.id).padStart(2, '0') + '：' + phase.name, item: ORIGIN + hub }
+              : { '@type': 'ListItem', position: 2, name: '课程表', item: ORIGIN + '/catalog.html' },
             { '@type': 'ListItem', position: 3, name: title, item: url }
           ];
         }

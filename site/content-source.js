@@ -21,7 +21,7 @@
     if (!value || /[%\\?#]/.test(value) || /^\//.test(value) || /(?:^|\/)\.{1,2}(?:\/|$)/.test(value) || /\/\//.test(value)) {
       throw new Error('Invalid repository content path');
     }
-    var allowed = /^(?:phases\/[a-z0-9-]+\/[a-z0-9-]+|certifications\/claude\/(?:lessons\/[a-z0-9-]+|assessments\/[a-z0-9-]+))(?:\/[A-Za-z0-9._-]+)*$/;
+    var allowed = /^(?:phases\/[a-z0-9-]+\/[a-z0-9-]+|certifications\/(?:claude|mcpa)\/(?:lessons\/[a-z0-9-]+|assessments\/[a-z0-9-]+))(?:\/[A-Za-z0-9._-]+)*$/;
     if (!allowed.test(value)) throw new Error('Repository content path is outside the allowed lesson trees');
     return value;
   }
