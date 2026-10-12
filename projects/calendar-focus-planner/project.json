@@ -1,0 +1,119 @@
+{
+  "id": "calendar-focus-planner",
+  "title": "日历专注计划器",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "找到日历中的真实空闲时间，安排优先任务，并解释哪些任务放不下。",
+  "summary": "找到日历中的真实空闲时间，安排优先任务，并解释哪些任务放不下。",
+  "youWillBuild": "可检查的 HTML 计划、机器可读日程，以及供手动导入的可移植 ICS 建议。",
+  "usefulFor": [
+    "用自己的输入生成可审核产物，供其他应用读取。"
+  ],
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "languageWhy": {
+    "TypeScript": "标准库解析、明确契约和可移植产物让机制保持可见。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "读取显式日历区间",
+    "先合并重叠，再寻找空档",
+    "按优先级排程，不假装所有任务都能放下",
+    "导出可审核的日历建议"
+  ],
+  "prerequisites": [
+    {
+      "title": "开发环境",
+      "path": "phases/00-setup-and-tooling/01-dev-environment"
+    },
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-calendar-focus-planner-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.ics",
+      "tasks.json",
+      "2026-10-14",
+      "output",
+      "10"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-read-calendar",
+      "title": "读取显式日历区间",
+      "summary": "parseCalendar(text)",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "concepts": [
+        "读取显式日历区间"
+      ],
+      "figure": "pj-calendar-focus-planner-1"
+    },
+    {
+      "id": "02-compute-free-time",
+      "title": "先合并重叠，再寻找空档",
+      "summary": "availableSlots(events, window, bufferMinutes=0)",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "concepts": [
+        "先合并重叠，再寻找空档"
+      ],
+      "figure": "pj-calendar-focus-planner-2"
+    },
+    {
+      "id": "03-place-tasks",
+      "title": "按优先级排程，不假装所有任务都能放下",
+      "summary": "schedule(tasks, events, window, bufferMinutes=0)",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "concepts": [
+        "按优先级排程，不假装所有任务都能放下"
+      ],
+      "figure": "pj-calendar-focus-planner-3"
+    },
+    {
+      "id": "04-export-proposals",
+      "title": "导出可审核的日历建议",
+      "summary": "exportCalendar(plan, createdAt); renderPlan(plan)",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "concepts": [
+        "导出可审核的日历建议"
+      ],
+      "figure": "pj-calendar-focus-planner-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "构建与验证",
+      "caption": "实际 starter 失败和参考评分器输出；参考方案通过不授予学习者证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "使用完成的产物",
+      "caption": "上游录制的真实输入、计算输出和生成的可移植报告。"
+    }
+  ]
+}

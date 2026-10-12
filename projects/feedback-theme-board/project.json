@@ -1,0 +1,117 @@
+{
+  "id": "feedback-theme-board",
+  "title": "反馈主题看板",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "用可检查的短语证据为产品反馈分组，统计不同来源，并导出本地 issue 草稿。",
+  "summary": "用可检查的短语证据为产品反馈分组，统计不同来源，并导出本地 issue 草稿。",
+  "youWillBuild": "可移植证据看板、JSON 摘要和未发送的 Markdown 调查草稿。",
+  "usefulFor": [
+    "用自己的输入生成可审核产物，供其他应用读取。"
+  ],
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "languageWhy": {
+    "TypeScript": "标准库解析、明确契约和可移植产物让机制保持可见。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "以稳定身份导入反馈",
+    "匹配短语并保留原始文本范围",
+    "统计证据，不夸大来源支持",
+    "发布证据和可审核的调查草稿"
+  ],
+  "prerequisites": [
+    {
+      "title": "开发环境",
+      "path": "phases/00-setup-and-tooling/01-dev-environment"
+    },
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-feedback-theme-board-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.jsonl",
+      "themes.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-import-feedback",
+      "title": "以稳定身份导入反馈",
+      "summary": "parseFeedback(text); validateThemes(value)",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "concepts": [
+        "以稳定身份导入反馈"
+      ],
+      "figure": "pj-feedback-theme-board-1"
+    },
+    {
+      "id": "02-match-evidence",
+      "title": "匹配短语并保留原始文本范围",
+      "summary": "findEvidence(row, phrase)",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "concepts": [
+        "匹配短语并保留原始文本范围"
+      ],
+      "figure": "pj-feedback-theme-board-2"
+    },
+    {
+      "id": "03-count-without-inflation",
+      "title": "统计证据，不夸大来源支持",
+      "summary": "buildBoard(rows, themes)",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "concepts": [
+        "统计证据，不夸大来源支持"
+      ],
+      "figure": "pj-feedback-theme-board-3"
+    },
+    {
+      "id": "04-publish-and-integrate",
+      "title": "发布证据和可审核的调查草稿",
+      "summary": "draftIssue(theme); renderBoard(board)",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "concepts": [
+        "发布证据和可审核的调查草稿"
+      ],
+      "figure": "pj-feedback-theme-board-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "构建与验证",
+      "caption": "实际 starter 失败和参考评分器输出；参考方案通过不授予学习者证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "使用完成的产物",
+      "caption": "上游录制的真实输入、计算输出和生成的可移植报告。"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "id": "decision-tradeoff-explorer",
+  "title": "决策取舍探索器",
+  "tagline": "展示不同优先级何时会改变首选方案。",
+  "summary": "帮助社区团队使用用户提供的标准表和支撑笔记比较实际项目方案。应用明确约束、加权评分和敏感性分析，让缺失值保持可见，并导出交互式 HTML 决策看板和可复用决策记录。",
+  "level": 3,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "交互式取舍看板、criteria.csv 和 decision-record.json",
+  "prerequisiteProjects": [
+    "csv-sql-question-workbench",
+    "chart-storyboard-builder"
+  ],
+  "demo": {
+    "command": [
+      "node",
+      "--experimental-strip-types",
+      "cli.ts"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-declare-evidence",
+      "title": "声明方案与证据",
+      "summary": "明确范围、约束和不确定性。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "starter",
+      "concepts": [
+        "带类型的 JSON",
+        "来源笔记",
+        "未知值"
+      ],
+      "timeout": 120,
+      "figure": "pj-decision-tradeoff-explorer-1"
+    },
+    {
+      "id": "02-normalize-and-score",
+      "title": "计算可比较的分数",
+      "summary": "归一化单位，不掩盖缺失值或硬约束。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "core",
+      "concepts": [
+        "固定范围",
+        "加权求和",
+        "约束"
+      ],
+      "timeout": 120,
+      "figure": "pj-decision-tradeoff-explorer-2"
+    },
+    {
+      "id": "03-sweep-preferences",
+      "title": "探索敏感性与支配关系",
+      "summary": "找到偏好变化何时会逆转排名。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "core",
+      "concepts": [
+        "Pareto 支配",
+        "敏感性",
+        "同分排序"
+      ],
+      "timeout": 120,
+      "figure": "pj-decision-tradeoff-explorer-3"
+    },
+    {
+      "id": "04-export-board",
+      "title": "导出选定情景",
+      "summary": "让看板生成可复用的决策记录。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "core",
+      "concepts": [
+        "HTML 输出",
+        "CSV",
+        "下载的证据"
+      ],
+      "timeout": 120,
+      "figure": "pj-decision-tradeoff-explorer-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制的生成本地界面交互。按文档命令运行，检查你自己的输出。"
+    }
+  ]
+}
