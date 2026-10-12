@@ -95,3 +95,13 @@ i18n/*/phases/
 i18n/*/.cache/
 i18n/*/.translate-cache.json
 i18n/*/ui.json
+
+# 项目、手册、Hub 与动态 OG 数据由主构建从中文源生成。
+site/projects-data.js
+site/project-content/
+site/manual-*.html
+site/manuals.html
+site/manuals-data.js
+site/hubs/
+site/lesson-terms.json
+site/og-cards.json

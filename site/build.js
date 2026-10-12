@@ -758,137 +758,8 @@ function extractLessonMeta(relPath) {
   return result;
 }
 
-function normalizeWhitespace(value) {
-  return String(value || '').replace(/\s+/g, ' ').trim();
-}
-
-function plainMarkdown(value) {
-  return normalizeWhitespace(value)
-    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/[*_~]+/g, '')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/\\([\\`*_[\]{}()#+\-.!])/g, '$1');
-}
-
-function truncateText(value, limit) {
-  const text = normalizeWhitespace(value);
-  if (!limit || text.length <= limit) return text;
-  const clipped = text.slice(0, Math.max(0, limit - 1));
-  // 中文没有稳定的空格分词；若按最后一个空格截断，夹有英文术语的中文描述
-  // 会在很早的位置被截掉，反而达不到 SEO 描述长度下限。
-  if (/[\u3400-\u9fff]/.test(text)) return clipped.trimEnd() + '…';
-  const boundary = clipped.lastIndexOf(' ');
-  return (boundary >= Math.floor(limit * 0.65) ? clipped.slice(0, boundary) : clipped).trimEnd() + '…';
-}
-
-function wordCount(value) {
-  const text = normalizeWhitespace(value);
-  return text ? text.split(' ').length : 0;
-}
-
-function truncateWords(value, limit) {
-  const words = normalizeWhitespace(value).split(' ').filter(Boolean);
-  if (!limit || words.length <= limit) return words.join(' ');
-  return words.slice(0, limit).join(' ') + '…';
-}
-
-function seoTitleFor(title) {
-  const brandedTitle = `${title} | AI Engineering from Scratch`;
-  return brandedTitle.length <= 60 ? brandedTitle : truncateText(title, 60);
-}
-
-function descriptionFromParts(title, parts) {
-  const uniqueParts = [];
-  for (const value of parts) {
-    const text = normalizeWhitespace(value);
-    if (text && !uniqueParts.includes(text)) uniqueParts.push(text);
-  }
-  let body = '';
-  for (const part of uniqueParts) {
-    body = normalizeWhitespace(`${body} ${part}`);
-    const candidate = body.toLowerCase().startsWith(title.toLowerCase()) ? body : `${title}: ${body}`;
-    if (candidate.length >= 125) break;
-  }
-  const source = body
-    ? (body.toLowerCase().startsWith(title.toLowerCase()) ? body : `${title}: ${body}`)
-    : title;
-  return { description: truncateText(source, 160), descriptionSourceLength: source.length };
-}
-
-function lessonDocumentSeo(markdown, fallbackTitle) {
-  const lines = String(markdown || '').split(/\r?\n/);
-  let title = normalizeWhitespace(fallbackTitle);
-  let summary = '';
-  let inFence = false;
-  let paragraph = [];
-  const paragraphs = [];
-
-  function flushParagraph() {
-    const text = plainMarkdown(paragraph.join(' '));
-    if (text) paragraphs.push(text);
-    paragraph = [];
-  }
-
-  for (const raw of lines) {
-    const line = raw.trim();
-    if (/^```/.test(line)) {
-      flushParagraph();
-      inFence = !inFence;
-      continue;
-    }
-    if (inFence) continue;
-    if (!line) {
-      flushParagraph();
-      continue;
-    }
-    if (line.startsWith('# ')) {
-      title = plainMarkdown(line.slice(2)) || title;
-      flushParagraph();
-      continue;
-    }
-    if (line.startsWith('>')) {
-      if (!summary) summary = plainMarkdown(line.replace(/^>\s*/, ''));
-      flushParagraph();
-      continue;
-    }
-    const listItem = line.match(/^(?:[-*+]\s|\d+[.)]\s)(.+)$/);
-    if (listItem) {
-      const item = plainMarkdown(listItem[1]).replace(/^\[[ xX]\]\s*/, '');
-      if (item) paragraph.push(/[.!?]$/.test(item) ? item : item + '.');
-      continue;
-    }
-    if (/^#{2,6}\s/.test(line) ||
-        /^\*\*(Type|Languages|Prerequisites|Time):\*\*/i.test(line) ||
-        /^\|/.test(line) ||
-        /^(?:---+|===+)$/.test(line)) {
-      flushParagraph();
-      continue;
-    }
-    paragraph.push(line);
-  }
-  flushParagraph();
-
-  const proseParts = [summary].concat(paragraphs).filter(Boolean);
-  const excerptSource = proseParts.join(' ') || title;
-  const excerpt = truncateWords(excerptSource, 220);
-  const { description, descriptionSourceLength } = descriptionFromParts(title, proseParts);
-  return {
-    title,
-    seoTitle: seoTitleFor(title),
-    description,
-    excerpt,
-    sourceWordCount: wordCount(excerptSource),
-    descriptionSourceLength,
-  };
-}
+const { normalizeWhitespace, plainMarkdown, truncateText, wordCount, truncateWords,
+  seoTitleFor, descriptionFromParts, lessonDocumentSeo } = require('../lib/lesson-document');
 
 function canonicalLessonUrl(lessonPathValue) {
   if (lessonPathValue.startsWith('phases/')) {
@@ -1169,7 +1040,7 @@ function renderCatalogDiscovery(phases, lessonManifest) {
       if (!seo) continue;
       rows.push(
         `            <tr data-generated-discovery="lesson">` +
-        `<td>${htmlEscape(String(phase.id).padStart(2, '0'))}</td>` +
+        `<td><a href="${require('../lib/hub-routes').phaseHubPath(relPath)}">${htmlEscape(String(phase.id).padStart(2, '0'))}</a></td>` +
         `<td><a href="${htmlEscape(lessonHref(relPath))}">${htmlEscape(seo.title)}</a></td>` +
         `<td>${htmlEscape(lesson.type || '')}</td>` +
         `<td>${htmlEscape(lesson.lang || '')}</td>` +
@@ -1232,6 +1103,11 @@ function replaceGeneratedDiscovery(filePath, startMarker, endMarker, content) {
 
 function writeSeoArtifacts(phases, certifications, learningPaths) {
   const manifests = buildSeoManifests(phases, certifications, learningPaths);
+  const { phaseHubPath } = require('../lib/hub-routes');
+  for (const entry of Object.values(manifests.lessonManifest.lessons)) {
+    const hub = phaseHubPath(entry.path);
+    if (hub) entry.context.hub = hub;
+  }
   fs.writeFileSync(LESSON_SEO_OUTPUT_PATH, JSON.stringify(manifests.lessonManifest, null, 2) + '\n', 'utf8');
   fs.writeFileSync(CERTIFICATION_SEO_OUTPUT_PATH, JSON.stringify(manifests.certificationManifest, null, 2) + '\n', 'utf8');
   replaceGeneratedDiscovery(
@@ -2142,6 +2018,34 @@ function writeLangs() {
   console.log('   wrote langs.js (1 language)');
 }
 
+function lessonMinutes(rel) {
+  if (!rel) return 0;
+  const text = fs.readFileSync(path.join(REPO_ROOT, rel, 'docs/zh.md'), 'utf8');
+  const match = /\*\*预计时间：\*\*\s*(?:约|~)?\s*([\d.]+)\s*(小时|分钟|min|hour)/i.exec(text);
+  return match ? Math.round(Number(match[1]) * (/小时|hour/i.test(match[2]) ? 60 : 1)) : 0;
+}
+
+function withCard(html, type, id, spec) {
+  const { cardTags, cardUrl } = require('../lib/og-cards');
+  const cleaned = html.replace(/\s*<meta (?:property="og:image(?::[^"]*)?"|name="twitter:(?:image(?::[^"]*)?|card)")[^>]*>/g, '');
+  return cleaned.replace('</head>', cardTags(cardUrl(type, id, spec), spec).join('\n') + '\n</head>');
+}
+
+function stampSiteCards(cards) {
+  const pages = { home: 'index', prereqs: 'prereqs', projects: 'projects', manuals: 'manuals' };
+  for (const [key, spec] of Object.entries(cards)) {
+    const [type, id] = key.split('/');
+    let file;
+    if (type === 'page') file = (pages[id] || id) + '.html';
+    if (type === 'manual') file = 'manual-' + id + '.html';
+    if (type === 'term') file = 'hubs/glossary/' + id + '.html';
+    if (type === 'phase') file = 'hubs/phase/' + id + '.html';
+    if (!file || !fs.existsSync(path.join(__dirname, file))) continue;
+    const target = path.join(__dirname, file);
+    fs.writeFileSync(target, withCard(fs.readFileSync(target, 'utf8'), type, id, spec));
+  }
+}
+
 function build() {
   console.log('📖 Reading source files...');
   writeBuildMeta();
@@ -2188,6 +2092,31 @@ function build() {
   console.log('🔎 Generating lesson and certification SEO manifests...');
   const seoManifests = writeSeoArtifacts(phases, certifications, learningPaths);
 
+  const projects = require('./build-projects').buildData({ strict: true });
+  require('./build-projects').bundleContent(projects, REPO_ROOT, __dirname);
+  fs.writeFileSync(path.join(__dirname, 'projects-data.js'), `window.AIFS_PROJECTS = ${JSON.stringify(projects, null, 2)};\n`);
+  const manualBuilder = require('./build-manuals');
+  const manuals = manualBuilder.loadAll().filter(manual => manual.status === 'ready');
+  manualBuilder.writeWeb(manuals);
+  const hubs = require('./build-hubs').writeHubs({
+    phases, prerequisites: roadmapPrereqs, glossary: glossaryTerms,
+    categories: GLOSSARY_CATEGORY_ORDER, lessonManifest: seoManifests.lessonManifest,
+    minutes: Object.fromEntries(phases.flatMap(phase => phase.lessons.map(lesson => {
+      const rel = lessonPath(lesson.url);
+      return [rel, Number(lesson.time) || lessonMinutes(rel)];
+    }))),
+  });
+  for (const hub of hubs.phaseModels) phases.find(phase => phase.id === hub.id).hub = hub.href;
+  replaceGeneratedDiscovery(path.join(__dirname, 'index.html'),
+    '<!-- GENERATED:INTEGRATED-DISCOVERY:START -->', '<!-- GENERATED:INTEGRATED-DISCOVERY:END -->',
+    `<section class="course-paths-section container" aria-label="实战与主题发现"><h2>在课程之外动手实践</h2>
+    <p><a href="projects.html">${projects.projects.length} 项实战项目</a> · <a href="manuals.html">${manuals.length} 本技术手册</a> · <a href="glossary.html">${glossaryTerms.length} 个术语</a></p>
+    <p>${hubs.phaseModels.map(phase => `<a href="${phase.href}">阶段 ${phase.id}：${htmlEscape(phase.name)}</a>`).join(' · ')}</p></section>`);
+  replaceGeneratedDiscovery(path.join(__dirname, 'glossary.html'),
+    '<!-- GENERATED:GLOSSARY-INDEX:START -->', '<!-- GENERATED:GLOSSARY-INDEX:END -->', hubs.glossaryIndex);
+  replaceGeneratedDiscovery(path.join(__dirname, 'glossary.html'),
+    '<!-- GENERATED:GLOSSARY-JSONLD:START -->', '<!-- GENERATED:GLOSSARY-JSONLD:END -->', hubs.glossaryJsonLd);
+
   // Stats
   let totalLessons = 0;
   let completeLessons = 0;
@@ -2229,15 +2158,26 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   fs.writeFileSync(OUTPUT_PATH, output, 'utf8');
   console.log(`\n✅ Generated ${OUTPUT_PATH}`);
 
+  const ogCards = require('./og-cards').buildOgCards({
+    stats: { lessons: totalLessons, phases: phases.length, terms: glossaryTerms.length,
+      skills: artifacts.filter(item => item.kind === 'skill').length,
+      prompts: artifacts.filter(item => item.kind === 'prompt').length, tracks: certifications.tracks.length },
+    projects: projects.projects, manuals,
+    terms: hubs.termModels.filter(model => model.page).map(model => model.term),
+    phases: hubs.phaseModels.map(phase => ({ id: phase.id, name: phase.name, slug: phase.slug,
+      lessons: phase.lessons.length, description: phase.lede })),
+  });
+  fs.writeFileSync(path.join(__dirname, 'og-cards.json'), JSON.stringify(ogCards, null, 2) + '\n');
+  stampSiteCards(ogCards.cards);
   syncCounts(totalLessons, artifacts.length);
-  writeSitemap(phases, glossaryTerms.length, certifications, learningPaths);
-  writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths);
-  writeLessonPages(phases);
+  writeSitemap(phases, glossaryTerms.length, certifications, learningPaths, { projects, manuals, hubs });
+  writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths, { projects, manuals, hubs });
+  writeLessonPages(phases, seoManifests.lessonManifest);
   require('./build-agents').build({ phases, glossaryTerms, roadmapPrereqs });
 }
 
 // ─── sitemap.xml from the same PHASES the site renders ───────────────────
-function writeSitemap(phases, glossaryCount, certifications, learningPaths) {
+function writeSitemap(phases, glossaryCount, certifications, learningPaths, additions) {
   const today = new Date().toISOString().slice(0, 10);
   const urls = [
     { loc: '/', priority: '1.0', freq: 'weekly' },
@@ -2269,6 +2209,15 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths) {
       if (p) urls.push({ loc: lessonStaticHref(p), priority: '0.6', freq: 'monthly' });
     }
   }
+  if (additions) {
+    urls.push({ loc: '/projects.html', priority: '0.8', freq: 'weekly' }, { loc: '/manuals.html', priority: '0.8', freq: 'monthly' });
+    for (const project of additions.projects.projects) {
+      urls.push({ loc: '/project.html?id=' + project.id, priority: '0.7', freq: 'monthly' });
+      for (const stage of project.stages) urls.push({ loc: '/project.html?id=' + project.id + '&stage=' + stage.id, priority: '0.6', freq: 'monthly' });
+    }
+    for (const manual of additions.manuals) urls.push({ loc: '/manual-' + manual.id + '.html', priority: '0.7', freq: 'monthly' });
+    for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages]) urls.push({ loc: page.href, priority: '0.6', freq: 'monthly' });
+  }
   const body = urls.map(u =>
     `  <url>\n    <loc>${SITE_ORIGIN}${u.loc.replace(/&/g, '&amp;')}</loc>\n` +
     `    <lastmod>${today}</lastmod>\n    <changefreq>${u.freq}</changefreq>\n` +
@@ -2280,7 +2229,7 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths) {
 }
 
 // ─── llms.txt: a link-rich map of the curriculum for AI agents ───────────
-function writeLlms(phases, glossaryCount, artifactCount, certifications, learningPaths) {
+function writeLlms(phases, glossaryCount, artifactCount, certifications, learningPaths, additions) {
   const rawOrigin = 'https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/' + resolveRef();
   let total = 0;
   phases.forEach(p => { total += p.lessons.filter(l => lessonPath(l.url)).length; });
@@ -2328,6 +2277,15 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
       if (lesson.summary) out += ` — ${lesson.summary}`;
       out += `\n`;
     }
+  }
+  if (additions) {
+    out += '\n## 实战项目与技术手册\n';
+    out += `- [实战项目](${SITE_ORIGIN}/projects.html) — ${additions.projects.projects.length} 项，${additions.projects.projects.reduce((sum, project) => sum + project.stages.length, 0)} 个阶段\n`;
+    for (const project of additions.projects.projects) out += `- [${project.title}](${SITE_ORIGIN}/project.html?id=${project.id}) — ${project.summary}\n`;
+    out += `- [技术手册](${SITE_ORIGIN}/manuals.html)\n`;
+    for (const manual of additions.manuals) out += `- [${manual.title}](${SITE_ORIGIN}/manual-${manual.id}.html) — ${manual.summary}\n`;
+    out += '\n## 阶段与术语发现\n';
+    for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages]) out += `- [${page.href.startsWith('/phase/') ? additions.hubs.phaseModels.find(model => model.href === page.href).name : additions.hubs.termModels.find(model => model.href === page.href).term.term}](${SITE_ORIGIN}${page.href})\n`;
   }
   fs.writeFileSync(path.join(__dirname, 'llms.txt'), out, 'utf8');
   console.log(`   wrote llms.txt`);
@@ -2387,7 +2345,7 @@ function lessonJsonLd(title, desc, url) {
   return JSON.stringify(ld).replace(/</g, '\\u003c');
 }
 
-function writeLessonPages(phases) {
+function writeLessonPages(phases, lessonManifest) {
   const template = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
   const lessonsRoot = path.join(__dirname, 'lessons');
   fs.rmSync(lessonsRoot, { recursive: true, force: true });  // 清掉改名课程的孤儿页
@@ -2462,8 +2420,8 @@ function writeLessonPages(phases) {
     const title = mdRender.extractTitle(md);
     const desc = mdRender.lessonDescription(md);
     const url = SITE_ORIGIN + lessonStaticHref(f.rel);
-    const docTitle = title + ' - AI Engineering from Scratch';
-    const ogTitle = title + ' · AI Engineering from Scratch 简体中文版';
+    const docTitle = title + ' - AI 工程从零开始';
+    const ogTitle = title + ' · AI 工程从零开始';
 
     // 正文结构与客户端 renderLesson 完全同构：parseMd + AI 面板占位 + 上下课导航
     let body = mdRender.parseMd(md);
@@ -2495,6 +2453,16 @@ function writeLessonPages(phases) {
     page = page.replace('</head>', () =>
       '  <script type="application/ld+json" id="lessonJsonLd">' + lessonJsonLd(title, desc, url) + '</script>\n</head>');
     page = page.replace(LOADING_BLOCK, () => article);
+    if (lessonManifest) {
+      const entry = lessonManifest.lessons[f.rel];
+      const og = require('../lib/og-cards');
+      page = withCard(page, 'lesson', entry.id || f.rel, og.lessonCard(entry));
+      page = page.replace(/<!-- AIFS:LESSON-HUBS:START -->[\s\S]*?<!-- AIFS:LESSON-HUBS:END -->/,
+        () => '<!-- AIFS:LESSON-HUBS:START -->' + require('../api/lesson').lessonHubLinks(entry, title, {
+          hubRoutes: require('../lib/hub-routes'),
+          lessonTerms: JSON.parse(fs.readFileSync(path.join(__dirname, 'lesson-terms.json'), 'utf8')).lessons,
+        }) + '<!-- AIFS:LESSON-HUBS:END -->');
+    }
     // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz
     const prerenderedPayload = { path: f.rel, quiz };
     page = page.replace(
@@ -2693,11 +2661,6 @@ function verifyCurriculum() {
   console.log(`✅ 课程数一致性校验通过：${fsLessons} 课 / ${phaseCount} 阶段（文件系统 = README 表格 = badge/散文 = ROADMAP 总计 = 各 phase 标题课数）`);
 }
 
-if (require.main === module) {
-  verifySiteCss();
-  if (process.argv.includes('--check')) verifyCurriculum();
-  else build();
-}
 
 module.exports = {
   FIGURE_PROVIDER_ORDER,
@@ -2722,4 +2685,11 @@ module.exports = {
   verifyCurriculum,
   verifySiteCss,
   writeLessonPages,
+  withCard,
 };
+
+if (require.main === module) {
+  verifySiteCss();
+  if (process.argv.includes('--check')) verifyCurriculum();
+  else build();
+}

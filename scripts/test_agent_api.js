@@ -18,7 +18,31 @@ const rpc = (handler, body, overrides = {}) => invoke(handler, { method: 'POST',
 
 test('catalog paginates stable unique paths and validates typed inputs', () => {
   const first = search({ limit: 2 }); const next = search({ limit: 2, offset: first.nextOffset });
-  assert.equal(first.total, Object.keys(require('../site/lesson-seo.json').lessons).length); assert.equal(first.items.length, 2);
+  const fs = require('node:fs'), path = require('node:path');
+  const root = path.resolve(__dirname, '..');
+  const lessonPaths = Object.keys(require('../site/lesson-seo.json').lessons).sort();
+  const projectPaths = fs.readdirSync(path.join(root, 'projects')).filter(id => {
+    const manifest = path.join(root, 'projects', id, 'project.json');
+    return !id.startsWith('_') && fs.existsSync(manifest) && JSON.parse(fs.readFileSync(manifest, 'utf8')).status === 'ready';
+  }).map(id => 'projects/' + id).sort();
+  const allPaths = kind => {
+    const items = []; let offset = 0;
+    do { const page = search({ kind, limit: 50, offset }); items.push(...page.items); offset = page.nextOffset; } while (offset !== null);
+    assert.equal(new Set(items.map(item => item.path)).size, items.length);
+    return items.map(item => item.path).sort();
+  };
+  assert.deepEqual(allPaths('lesson'), lessonPaths);
+  assert.deepEqual(allPaths('project'), projectPaths);
+  assert.deepEqual(allPaths('all'), [...lessonPaths, ...projectPaths].sort());
+  assert.equal(first.total, lessonPaths.length + projectPaths.length); assert.equal(first.items.length, 2);
+  assert.equal(projectPaths.length, 76);
+  for (const resourcePath of projectPaths) {
+    const entry = readResource(resourcePath);
+    assert.equal(entry.markdown, fs.readFileSync(path.join(root, resourcePath, 'README.md'), 'utf8'));
+    assert.equal(entry.kind, 'project');
+    assert.equal(entry.sourceUrl, `https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/${resourcePath}/README.md`);
+    assert.equal(entry.url, `https://aieng-zh.cn/project.html?id=${resourcePath.split('/')[1]}`);
+  }
   assert.equal(new Set([...first.items, ...next.items].map(item => item.path)).size, 4);
   assert.equal(search({ q: 'unmatched-term-3c57caa' }).nextOffset, null);
   assert.equal(search({ offset: 10000 }).items.length, 0);

@@ -7,6 +7,7 @@ const handlers = {
   '/api/markdown': require('../api/markdown'), '/api/v1/markdown': require('../api/v1/markdown'),
   '/api/v1/catalog': require('../api/v1/catalog'), '/api/v1/resource': require('../api/v1/resource'),
   '/api/mcp': require('../api/mcp'), '/api/not-found': require('../api/not-found'),
+  '/api/og': require('../api/og'),
   '/api/lesson': require('../api/lesson'), '/api/certification': require('../api/certification'),
 };
 

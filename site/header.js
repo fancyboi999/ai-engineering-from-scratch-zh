@@ -199,6 +199,10 @@
     }
 
     var target = current;
+    if (current === 'project.html') target = 'projects.html';
+    if (/^manual-/.test(current)) target = 'manuals.html';
+    if (/^\/glossary\//.test(location.pathname)) target = 'glossary.html';
+    if (/^\/phase\//.test(location.pathname)) target = 'catalog.html';
     if (current === 'certification.html' || current === 'assessment.html') {
       target = 'certifications.html';
     } else if (current === 'lesson.html') {
@@ -234,6 +238,8 @@
   }
 
   function addNavigationLinks(nav) {
+    ensureNavigationLink(nav, 'projects.html', '实战项目', '');
+    ensureNavigationLink(nav, 'manuals.html', '技术手册', '');
     ensureNavigationLink(nav, 'learning-paths.html', '学习路径', '');
     ensureNavigationLink(nav, 'certifications.html', '认证', 'header-mobile-only');
   }

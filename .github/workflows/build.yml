@@ -14,6 +14,8 @@ on:
   push:
     branches: [main]
     paths:
+      - "projects/**"
+      - "manuals/**"
       - "site/**"
       - "api/**"
       - "lib/**"
@@ -136,3 +138,37 @@ jobs:
           node scripts/test_figures_i18n_zh.js
       - name: 浏览器朗读回归校验
         run: node scripts/test_tts.js
+      - name: 冻结图表计算 oracle（不依赖浅克隆的 lane 对象）
+        run: |
+          git fetch --no-tags https://github.com/rohitg00/ai-engineering-from-scratch.git 56c886c8821fc488b6f9608895c983d18f0d1ea3
+          mkdir -p "$RUNNER_TEMP/aifs-figure-frozen"
+          git archive 56c886c8821fc488b6f9608895c983d18f0d1ea3 site/figures/projects | tar -x -C "$RUNNER_TEMP/aifs-figure-frozen"
+          echo "AIFS_FIGURE_FROZEN_ROOT=$RUNNER_TEMP/aifs-figure-frozen" >> "$GITHUB_ENV"
+          echo "AIFS_FIGURES_FROZEN_ROOT=$RUNNER_TEMP/aifs-figure-frozen" >> "$GITHUB_ENV"
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25.x"
+      - name: Rust 核心运行器
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - name: 项目严格离线参考评分（缺运行时或 skip 均失败）
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+          GOPROXY: "off"
+          GOSUMDB: "off"
+        run: python3 scripts/project_test.py --all --solution --strict --report "$RUNNER_TEMP/project-grade.json"
+      - name: 项目、图表、Hub、手册与课程读取集成回归
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          node --test site/test*.js lib/test*.js scripts/test_lesson_reader.js scripts/test_site_integration.js
+          node scripts/check_hubs.js
+          node scripts/audit_manuals.js --skip-capture
+          node scripts/check_manual_outputs.js
+          node manuals/_shared/figkit.js check manuals/a2a-101
+          node manuals/_shared/figkit.js check manuals/docker-sandboxes-101
+          python3 manuals/a2a-101/tests/test_static_contract.py
+          node scripts/test_og.js
+          node scripts/check_og_cards.js --require-manifests

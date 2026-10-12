@@ -22,7 +22,7 @@ test('serves Markdown for the canonical homepage when preferred', () => {
   assert.equal(result.headers.vary, 'Accept, Accept-Encoding');
   assert.equal(result.headers['x-api-version'], '1');
   assert.equal(Object.keys(result.headers).some(name => /ratelimit/i.test(name)), false);
-  assert.match(result.body, /^# AI Engineering from Scratch/);
+  assert.match(result.body, /^# AI 工程从零开始/);
 });
 
 test('keeps HTML when HTML has the higher quality value', () => {

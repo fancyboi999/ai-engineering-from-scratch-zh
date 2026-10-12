@@ -88,7 +88,7 @@ test('costs and validation agree with the Python estimation contract', () => {
   const results = python(cases.map(args => ({ op: 'estimate', args })));
   cases.forEach((args, index) => {
     const values = Object.fromEntries(['inputTokens', 'outputLimit', 'inputRate', 'outputRate'].map((key, i) => [key, args[i]]));
-    if (results[index].error) assert.throws(() => calculate(1, values), /nonnegative safe integer/);
+    if (results[index].error) assert.throws(() => calculate(1, values), /非负安全整数/);
     else assert.equal(calculate(1, values).receipt.estimate, results[index].value);
   });
 });
@@ -97,12 +97,12 @@ test('every numeric field rejects negatives, fractions and booleans without coer
   for (let stage = 1; stage <= 4; stage++) {
     for (const control of config(stage).controls.filter(control => control.type === 'number')) {
       for (const invalid of [-1, 1.5, true, null, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
-        assert.throws(() => calculate(stage, { [control.key]: invalid }), /nonnegative safe integer/, `${stage}: ${control.key}`);
+        assert.throws(() => calculate(stage, { [control.key]: invalid }), /非负安全整数/, `${stage}: ${control.key}`);
       }
     }
   }
-  assert.throws(() => calculate(1, { inputTokens: Number.MAX_SAFE_INTEGER, inputRate: 2 }), /Input product/);
-  assert.throws(() => calculate(2, { limit: 10 }), /must fit the limit/);
+  assert.throws(() => calculate(1, { inputTokens: Number.MAX_SAFE_INTEGER, inputRate: 2 }), /输入乘积/);
+  assert.throws(() => calculate(2, { limit: 10 }), /不能超出限额/);
 });
 
 test('reservation counts existing holds, preserves rejected state and moves accepted request identity', () => {
@@ -112,7 +112,7 @@ test('reservation counts existing holds, preserves rejected state and moves acce
   assert.deepEqual(rejected.receipt.after, ledger(100, 20, { A: 30 }));
   const accepted = calculate(2, { amount: 50 });
   assert.deepEqual(accepted.receipt.after.holds, { A: 30, B: 50 });
-  assert.equal(accepted.bars.find(bar => bar.label === 'Available').value, 0);
+  assert.equal(accepted.bars.find(bar => bar.label === '可用').value, 0);
   assert.equal(itemLane(accepted.frames[0], 'new-request'), 'pending');
   assert.equal(itemLane(accepted.frames.at(-1), 'new-request'), 'held');
   assert.deepEqual(accepted.frames[0].receipt.holds, { A: 30 });
@@ -139,7 +139,7 @@ test('settlement moves identified actual and unused portions to persistent desti
   assert.equal(itemLane(result.frames.at(-1), 'unused-A'), 'available');
   assert.deepEqual(result.receipt.after, { limit: 100, spent: 40, holds: {}, closed: ['A'] });
   assert.equal(result.receipt.released, 50);
-  assert.equal(result.bars.find(bar => bar.label === 'Available').value, 60);
+  assert.equal(result.bars.find(bar => bar.label === '可用').value, 60);
   assert.equal(calculate(3, { actual: 0 }).receipt.released, 70);
   assert.equal(calculate(3, { actual: 70 }).receipt.released, 0);
 });
@@ -179,16 +179,21 @@ test('ordered replay exposes deadline then budget, preserves rejected state and 
   assert.equal(result.receipt.ledger.spent, 80);
   assert.equal(result.receipt.elapsed_ms, 60);
   assert.deepEqual(result.receipt.events.map(event => [event.id, event.status, event.reason]), [['A', 'completed', undefined], ['B', 'rejected', 'budget exceeded'], ['C', 'rejected', 'deadline'], ['D', 'completed', undefined]]);
-  assert.equal(result.frames.some(frame => frame.label === 'C: check budget'), false);
+  assert.equal(result.frames.some(frame => frame.label === 'C：检查预算'), false);
+  let rejectedFrames = 0;
   for (let index = 1; index < result.frames.length; index++) {
     const frame = result.frames[index];
-    if (frame.label.includes('reject for')) {
+    if (/因(?:截止时间|预算)拒绝/.test(frame.label)) {
+      rejectedFrames++;
       assert.deepEqual(frame.receipt.ledger, result.frames[index - 1].receipt.ledger);
       assert.equal(frame.receipt.elapsed_ms, result.frames[index - 1].receipt.elapsed_ms);
     }
   }
+  assert.equal(rejectedFrames, 2);
   const separate = calculate(4, { deadline: 200 });
-  assert.ok(separate.bars.filter(bar => bar.unit === 'teaching units').every(bar => bar.max === 100));
+  const costs = separate.bars.filter(bar => bar.unit === '教学单位');
+  assert.ok(costs.length > 0);
+  assert.ok(costs.every(bar => bar.max === 100));
   assert.equal(separate.bars.find(bar => bar.unit === 'ms').max, 200);
   assert.equal(calculate(4, { deadline: 60 }).receipt.events.at(-1).status, 'completed');
   assert.equal(calculate(4, { deadline: 10, limit: 10 }).receipt.events[0].reason, 'deadline');

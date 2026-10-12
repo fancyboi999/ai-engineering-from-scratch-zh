@@ -17,7 +17,7 @@ test('token maps treat JavaScript property names as ordinary search terms', () =
   for (const term of ['constructor', '__proto__']) {
     const result = calculate({ query: term, notes: `${term} | restore backups` });
     assert.deepEqual(result.rows, [[1, '1.0000', term]]);
-    assert.equal(result.metrics.find(metric => metric.label === 'Query terms').value, 1);
+    assert.equal(result.metrics.find(metric => metric.label === '查询词数').value, 1);
   }
 });
 

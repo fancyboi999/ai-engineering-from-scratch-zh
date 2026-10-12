@@ -137,12 +137,12 @@ test("early normalization frames expose only the current transformation and reta
 
 test("missing Web Crypto and invalid UTF-8 fail explicitly instead of fabricating a fingerprint", async () => {
   const unavailable = registry(null).get("pj-dataset-split-auditor-1").lab;
-  await assert.rejects(unavailable.calculate(inputs(1)), /SHA-256 requires Web Crypto/);
-  await assert.rejects(lab(1).calculate(inputs(1, { textA: "\ud800" })), /unpaired surrogate/);
+  await assert.rejects(unavailable.calculate(inputs(1)), /SHA-256 需要 Web Crypto/);
+  await assert.rejects(lab(1).calculate(inputs(1, { textA: "\ud800" })), /未配对的代理码位/);
 });
 
 test("content-only, group-only, both and clean audits match Python with inspectable record links", async () => {
-  for (const scenario of lab(2).scenarios.filter(scenario => scenario.label !== "Duplicate ID")) {
+  for (const scenario of lab(2).scenarios.filter(scenario => scenario.label !== "重复 ID")) {
     const values = inputs(2, scenario.values);
     const result = await calculate(2, scenario.values);
     assert.deepEqual(receipt(result).audit, python({ op: "audit", args: auditRows(values) }), scenario.label);
@@ -169,9 +169,9 @@ test("duplicate or incomplete record identities block the audit before hashing",
   let hashCalls = 0;
   const local = registry({ subtle: { digest() { hashCalls += 1; throw new Error("unexpected hash"); } } });
   const calculator = local.get("pj-dataset-split-auditor-2").lab.calculate;
-  await assert.rejects(calculator(inputs(2, { testId: "train-a" })), /Duplicate record id "train-a"/);
+  await assert.rejects(calculator(inputs(2, { testId: "train-a" })), /重复记录 ID "train-a"/);
   for (const field of ["trainId", "testId", "trainText", "testText", "trainGroup", "testGroup"]) {
-    await assert.rejects(calculator(inputs(2, { [field]: "" })), /nonempty id, group and text/);
+    await assert.rejects(calculator(inputs(2, { [field]: "" })), /非空的 id、group 和 text/);
   }
   assert.equal(hashCalls, 0);
 });
@@ -195,7 +195,7 @@ test("the default group trace uses exact seed-NUL-group hashes and produces nine
     assert.equal(group.sha256, createHash("sha256").update(group.hash_input).digest("hex"));
   }
   validateFrames(result);
-  const moveA = result.frames.find(frame => frame.label === "Move incident-A");
+  const moveA = result.frames.find(frame => frame.label === "移动 incident-A");
   assert.equal(moveA.lanes.find(lane => lane.id === "test").items[0].id, "group:incident-A");
   assert.match(moveA.lanes.find(lane => lane.id === "test").items[0].detail, /A-01, A-02.*A-09/);
   assert.equal(moveA.lanes.find(lane => lane.id === "pending").items[0].id, "group:incident-B");
@@ -240,10 +240,10 @@ test("changing group size preserves buckets, and zero records never invent a gro
     }
   }
   for (const testFraction of [0, 1, -1, NaN, Infinity]) {
-    await assert.rejects(lab(3).calculate(inputs(3, { testFraction })), /strictly between zero and one/);
+    await assert.rejects(lab(3).calculate(inputs(3, { testFraction })), /严格介于 0 与 1 之间/);
   }
   for (const groupASize of [-1, 0.5, 13, NaN]) {
-    await assert.rejects(lab(3).calculate(inputs(3, { groupASize })), /whole numbers/);
+    await assert.rejects(lab(3).calculate(inputs(3, { groupASize })), /0 到 12 之间的整数/);
   }
 });
 
