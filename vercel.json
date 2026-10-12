@@ -422,6 +422,14 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=300, s-maxage=86400, stale-while-revalidate=604800"
+        },
+        {
+          "key": "Vary",
+          "value": "Accept, Accept-Encoding"
+        },
+        {
+          "key": "Content-Language",
+          "value": "zh-CN"
         }
       ]
     },

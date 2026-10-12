@@ -101,6 +101,8 @@ test('real HTTP negotiates Hub and static lesson Markdown, serves dynamic PNG, a
     assert.equal(head.status, 200); assert.equal(await head.text(), '');
     const html = await fetch(base + route, { headers: { Accept: 'text/html' } });
     assert.equal(html.status, 200); assert.match(await html.text(), /lang="zh-CN"/);
+    assert.match(html.headers.get('vary'), /Accept/);
+    assert.equal(html.headers.get('content-language'), 'zh-CN');
   }
   const response = await fetch(base + '/og/project/agent-budget-planner.png');
   assert.equal(response.status, 200);
