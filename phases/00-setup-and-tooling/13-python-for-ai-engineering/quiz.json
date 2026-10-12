@@ -1,0 +1,78 @@
+{
+  "lesson": "13-python-for-ai-engineering",
+  "title": "AI 工程的 Python 基础",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "你运行了同一份训练脚本两次，每次得到的测试集评分都不同。哪项修改能让每次运行的训练集和测试集划分完全一致？",
+      "options": [
+        "在划分前先将数据集列表转换为元组",
+        "调用两次 random.shuffle 而非一次",
+        "在划分时使用更大的测试集比例",
+        "使用 random.Random(42) 对索引进行洗牌"
+      ],
+      "correct": 3,
+      "explanation": "固定种子的生成器在每次运行时产生完全相同的随机数序列，从而保证洗牌顺序和数据划分稳定一致。其他选项要么依然是随机洗牌，要么对顺序毫无影响。"
+    },
+    {
+      "stage": "check",
+      "question": "调用生成器函数会返回什么？",
+      "options": [
+        "一个包含该函数 yield 出的所有值的列表",
+        "该函数 yield 出的第一个值，随后函数直接停止",
+        "一个生成器对象，只有每次调用 next() 时才会执行函数体",
+        "None，因为函数体内没有 return 语句"
+      ],
+      "correct": 2,
+      "explanation": "直接调用生成器函数不会执行函数体内的任何代码，而是返回一个生成器对象。每次调用 next() 才会让函数体执行到下一个 yield 处并暂停在那里。"
+    },
+    {
+      "stage": "check",
+      "question": "调用 batches(range(10), 4) 时使用默认的 drop_last=False。它会产出哪些 batch 大小？",
+      "options": [
+        "4, 4",
+        "2, 4, 4",
+        "4, 4, 2",
+        "4, 4, 4"
+      ],
+      "correct": 2,
+      "explanation": "islice 每次最多取 4 项元素。10 项元素会产生 2 个完整的 batch 以及最后一个包含 2 项的 batch。若设置 drop_last=True，生成器则会丢弃最后这个不满的 batch。"
+    },
+    {
+      "stage": "check",
+      "question": "为什么在 100 万个浮点数上跑纯 Python 点积会比 NumPy 点积慢得多？",
+      "options": [
+        "zip() 函数在配对元素前会对两个输入列表进行排序",
+        "for 循环在每次迭代时都会完整复制一份列表",
+        "解释器需要对每个元素逐一进行类型检查并创建 Python 对象",
+        "Python 浮点数的精度比 NumPy float64 低"
+      ],
+      "correct": 2,
+      "explanation": "两个版本在 64 位浮点数上执行完全相同的算术计算。但 Python 循环对每个元素都要执行大约 10 条字节码指令，并为每个中间结果创建 Python 浮点对象；而 NumPy 直接在连续的 8 字节原始内存上运行编译好的 C 循环。"
+    },
+    {
+      "stage": "post",
+      "question": "函数 def add(item, bucket=[]) 会将 item 追加到 bucket 并返回 bucket。你先后调用了 add(1) 和 add(2)，第二次调用会返回什么？",
+      "options": [
+        "[1]",
+        "[2, 1]",
+        "[1, 2]",
+        "[2]"
+      ],
+      "correct": 2,
+      "explanation": "Python 在执行 def 语句定义函数时仅计算一次默认参数。两次调用追加到了同一个列表对象中。应使用 None 作为默认值，并在函数体内动态创建列表。"
+    },
+    {
+      "stage": "post",
+      "question": "在训练模型前对特征进行标准化处理。均值和标准差必须来自哪里？",
+      "options": [
+        "仅来自测试集划分",
+        "来自各自独立的每个 mini-batch",
+        "来自训练集与测试集的总和",
+        "仅来自训练集划分"
+      ],
+      "correct": 3,
+      "explanation": "如果使用包含测试集的统计数据，会将测试集的信息泄露给训练过程，导致测试评分虚高。必须仅在训练集上计算均值和标准差，再将相同数值应用到测试集。"
+    }
+  ]
+}

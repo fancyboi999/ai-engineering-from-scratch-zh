@@ -8,11 +8,11 @@
  *      future" pattern is what your code does at the call site — you fire and
  *      forget, the promise hands you the answer hours later.
  *   2. Cost simulator matching main.py: SYNC, SYNC+CACHE, BATCH, BATCH+CACHE
- *      across three workloads. Pricing constants 2026-04 per docs/zh.md.
+ *      across three workloads. Pricing constants 2026-04 per docs/en.md.
  *
  * Citations:
  *   - OpenAI Batch API: platform.openai.com/docs/guides/batch
- *   - Anthropic Message Batches: docs.anthropic.com/en/docs/build-with-claude/batch-processing
+ *   - Anthropic Message Batches: platform.claude.com/docs/en/build-with-claude/batch-processing
  *   - Vertex AI Batch Prediction: cloud.google.com/vertex-ai/generative-ai/docs/model-reference/batch-prediction
  *
  * Runs on Node 20+ stdlib. No npm deps.

@@ -4,12 +4,12 @@
 
 <p align="center">
   <b>从零开始，亲手实现每一个 AI 算法</b><br/>
-  <sub>523 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
+  <sub>528 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
 </p>
 
 <p align="center">
   <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/在线阅读-aieng--zh.cn-3553ff?style=flat-square&labelColor=fafaf5" alt="在线阅读 aieng-zh.cn"></a>
-  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-523-3553ff?style=flat-square&labelColor=fafaf5" alt="523 lessons"></a>
+  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-528-3553ff?style=flat-square&labelColor=fafaf5" alt="528 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
   <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff&cacheSeconds=21600" alt="GitHub stars"></a>
@@ -21,7 +21,7 @@
 
 > 通过推导、代码和实验学习 AI 工程。
 >
-> 523 节课，20 个阶段，覆盖 Python、TypeScript、Rust、Julia。课程配有中文正文、测验、
+> 528 节课，20 个阶段，覆盖 Python、TypeScript、Rust、Julia。课程配有中文正文、测验、
 > 可运行示例和可复用产物。免费阅读，开源，采用 MIT 许可。
 >
 > 从基础算法到 LLM 应用、agent 与生产系统，按你的目标选择学习路径。
@@ -50,7 +50,7 @@
 
 | | |
 |---|---|
-| 🇨🇳 **全站简体中文** | 523 节课正文、243 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
+| 🇨🇳 **全站简体中文** | 528 节课正文、243 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
 | 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、[AI 工程学习路径](https://aieng-zh.cn/learning-paths.html)、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
 | 🎬 **配套动画讲解视频** | 333 节中文配音动画已上线，覆盖阶段 0–14 的全部课程。可在课程页内嵌播放，提供直链与 B 站播放源，配合正文、数学推导和代码实践学习 |
 | 🔍 **为 AI 检索优化** | 构建时自动生成 `sitemap.xml` / `llms.txt` / 结构化数据，方便被搜索引擎和 AI 助手引用 |
@@ -62,7 +62,7 @@
 
 ## 从这里开始：选择你想构建的内容
 
-开始前不需要先扫完 523 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
+开始前不需要先扫完 528 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
 
 | 你的目标 | 在 GitHub 上学习 | 在网站上学习 |
 |---|---|---|
@@ -121,7 +121,7 @@ npx skills add fancyboi999/ai-engineering-from-scratch-zh
 demo。这些碎片很少能拼到一起。你做出了一个聊天机器人，却讲不清它的 loss 曲线；你给
 agent 挂了个函数，却说不出调用它的那个模型内部，attention 到底在干什么。
 
-这套课程就是那根脊椎。20 个阶段，523 节课，四种语言：Python、TypeScript、Rust、Julia。
+这套课程就是那根脊椎。20 个阶段，528 节课，四种语言：Python、TypeScript、Rust、Julia。
 一头是线性代数，另一头是自主 agent 集群。每个算法都先从最原始的数学手写出来。反向传播、
 分词器、注意力、agent 循环——等 PyTorch 登场时，你已经知道它底层在做什么了。
 
@@ -309,7 +309,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 二十个阶段。点开任意阶段即可展开它的课程列表。
 
 <a id="phase-0"></a>
-### Phase 0: 配置与工具链 `12 lessons`
+### Phase 0: 配置与工具链 `13 lessons`
 > 把环境准备好，迎接后面所有的内容。
 
 | # | Lesson | Type | Lang |
@@ -326,6 +326,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 10 | [终端与 Shell](phases/00-setup-and-tooling/10-terminal-and-shell/) | Learn | — |
 | 11 | [面向 AI 的 Linux](phases/00-setup-and-tooling/11-linux-for-ai/) | Learn | — |
 | 12 | [调试与性能分析](phases/00-setup-and-tooling/12-debugging-and-profiling/) | Build | Python |
+| 13 | [AI 工程的 Python 基础](phases/00-setup-and-tooling/13-python-for-ai-engineering/) | Build | Python |
 
 <details id="phase-1">
 <summary><b>Phase 1 — 数学基础</b> &nbsp;<code>22 lessons</code>&nbsp; <em>每个 AI 算法背后的直觉，用代码讲清楚。</em></summary>
@@ -359,7 +360,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 </details>
 
 <details id="phase-2">
-<summary><b>Phase 2 — 机器学习基础</b> &nbsp;<code>18 lessons</code>&nbsp; <em>经典机器学习——至今仍是大多数生产 AI 的骨架。</em></summary>
+<summary><b>Phase 2 — 机器学习基础</b> &nbsp;<code>21 lessons</code>&nbsp; <em>经典机器学习——至今仍是大多数生产 AI 的骨架。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -382,6 +383,9 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 16 | [异常检测](phases/02-ml-fundamentals/16-anomaly-detection/) | Build | Python |
 | 17 | [处理不平衡数据](phases/02-ml-fundamentals/17-imbalanced-data/) | Build | Python |
 | 18 | [特征选择](phases/02-ml-fundamentals/18-feature-selection/) | Build | Python |
+| 19 | [ML 系统设计 —— 从业务问题到落地模型](phases/02-ml-fundamentals/19-ml-system-design/) | Build | Python |
+| 20 | [生产环境中的模型监控 —— 数据漂移与概念漂移](phases/02-ml-fundamentals/20-model-monitoring-and-drift/) | Build | Python |
+| 21 | [特征平台与训练-推理偏斜](phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/) | Build | Python |
 
 </details>
 
@@ -844,7 +848,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 </details>
 
 <details id="phase-17">
-<summary><b>Phase 17 — 基础设施与生产</b> &nbsp;<code>28 lessons</code>&nbsp; <em>把 AI 交付到真实世界。</em></summary>
+<summary><b>Phase 17 — 基础设施与生产</b> &nbsp;<code>29 lessons</code>&nbsp; <em>把 AI 交付到真实世界。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -877,6 +881,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 26 | [合规 — SOC 2、HIPAA、GDPR、EU AI Act、ISO 42001](phases/17-infrastructure-and-production/26-compliance-frameworks/) | Learn | Python |
 | 27 | [面向 LLM 的 FinOps — 单位经济与多租户归因](phases/17-infrastructure-and-production/27-finops-llms/) | Learn | Python |
 | 28 | [自托管推理服务选型——让引擎匹配硬件与规模](phases/17-infrastructure-and-production/28-self-hosted-serving-selection/) | Learn | Python |
+| 29 | [模型演示接口 —— 从函数到可分享应用](phases/17-infrastructure-and-production/29-model-demo-interfaces/) | Build | Python |
 
 </details>
 
@@ -1025,7 +1030,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 
 ### 把课程产出技能装进你的 agent
 
-仓库在 `phases/**/outputs/` 下交付了 396 个技能和 99 个提示词。
+仓库在 `phases/**/outputs/` 下交付了 400 个技能和 100 个提示词。
 
 **导师技能：通过 [skills.sh](https://skills.sh) 选择安装。** 默认发现 `skills/` 下的 9 个导师技能：
 

@@ -473,7 +473,7 @@
       "explanation": "最窄的真实作用域可在保留团队审查的同时减少上下文膨胀和冲突指令。私有配置不能充当可复现的项目策略。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/memory"
+        "https://code.claude.com/docs/en/memory"
       ]
     },
     {
@@ -516,7 +516,7 @@
       "explanation": "Skill 支持对可复用方法及其资产进行渐进式披露。它应定义输入和输出，但本身不会授予工具权限或授权。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/memory"
+        "https://code.claude.com/docs/en/memory"
       ]
     },
     {
@@ -559,7 +559,7 @@
       "explanation": "新鲜状态和稳定的发现 schema 让 CI 可复现，并支持修复验证。写入权限和隐藏的本地状态会削弱审查者的独立性和可审计性。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/sdk/sdk-headless"
+        "https://code.claude.com/docs/en/headless"
       ]
     },
     {
@@ -815,7 +815,7 @@
       "explanation": "Skill 提供可复用的指导和渐进式披露，同时仍可供团队进行版本控制。隐藏副作用和机密内容都不是工作流指令。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/memory"
+        "https://code.claude.com/docs/en/memory"
       ]
     },
     {
@@ -1093,7 +1093,7 @@
       "explanation": "团队和 CI 行为必须来自可审核的项目状态。用户记忆适用于个人偏好，不适合存放必需的共享策略或可复现的关卡。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/memory"
+        "https://code.claude.com/docs/en/memory"
       ]
     },
     {
@@ -1179,7 +1179,7 @@
       "explanation": "已声明的版本和执行边界使运行结果可比较，并限制故障范围。交互式会话和隐藏命令会引入其他运行无法复现的未跟踪状态。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/sdk/sdk-headless"
+        "https://code.claude.com/docs/en/headless"
       ]
     },
     {

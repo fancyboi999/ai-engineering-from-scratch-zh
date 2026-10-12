@@ -632,6 +632,26 @@
       "mcp-registry-admission",
       "mcp-conformance-operations"
     ]
+  },
+  {
+    "src": "figures-python.js?v=20261011a",
+    "figures": [
+      "s0-list-vs-generator"
+    ]
+  },
+  {
+    "src": "figures-mlprod.js?v=20261011a",
+    "figures": [
+      "mlprod-drift-psi",
+      "mlprod-pit-join",
+      "mlprod-serving-cost"
+    ]
+  },
+  {
+    "src": "figures-demo.js?v=20261011a",
+    "figures": [
+      "demo-token-bucket"
+    ]
   }
 ];
 

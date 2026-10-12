@@ -15,6 +15,13 @@
   // widget 标题（.lf-label）
   var L = {
     'A2A DISCOVERY': 'A2A 发现机制',
+    'LIST VERSUS GENERATOR': '列表对比生成器',
+    'LIST VS GENERATOR': '列表对比生成器',
+    'BATCH VERSUS ONLINE': '批处理对比在线推理',
+    'BATCH VS ONLINE': '批处理对比在线推理',
+    'POPULATION STABILITY INDEX': '群体稳定性指标 (PSI)',
+    'POINT-IN-TIME JOIN': '时点连接 (Point-in-Time Join)',
+    'TOKEN BUCKET': '令牌桶限流',
     'CONTRACT NET': '合同网协议',
     'WORK STEALING': '工作窃取',
     'HANDOFF ROUTING': '交接路由',
@@ -178,6 +185,15 @@
 
   // 操作提示（.lf-head 末位 span）
   var H = {
+    'eight rows, batch size two': '8 行数据，批大小为 2',
+    'a list holds every row, a generator holds one batch': '列表保留所有行，生成器仅保留单个批次',
+    'drag traffic and freshness': '拖动流量与时效',
+    'drag the drift': '拖动数据漂移',
+    'drag the label day': '拖动标签日期',
+    'drag staleness or runs per day': '拖动最大延迟或每日运行次数',
+    'shift the current window': '平移当前数据窗口',
+    'move the label day or change the TTL': '移动标签日期或更改 TTL',
+    'one client, 24 requests in 12 seconds': '单个客户端，12 秒内 24 次请求',
     'card then task': '先拉取名片再委派任务',
     'announce, bid, award': '发布、投标、中标',
     'pull, not push': '拉取而非推送',
@@ -330,6 +346,23 @@
   // 控件 label（.lf-ctrl label 首个文本节点，按 trim 后精确匹配）。
   // 英文词样本（cat / the / doc1 等演示数据）刻意不收录。
   var C = {
+    'requests per day (millions)': '每日请求量（百万次）',
+    'max staleness (hours)': '最大陈旧度（小时）',
+    'mean shift (reference std units)': '均值偏移（基准标准差倍数）',
+    'spread ratio (current std / reference std)': '离散度比率（当前标准差 / 基准标准差）',
+    'label day': '标签日期',
+    'TTL (days)': 'TTL 生存期（天）',
+    'bucket capacity (burst size)': '桶容量（突发并发上限）',
+    'refill rate (tokens per second)': '补充速率（每秒令牌数）',
+    'max staleness': '最大时效/延迟',
+    'runs per day': '每日运行次数',
+    'entity count': '实体数量',
+    'peak QPS': '峰值 QPS',
+    'mean shift': '均值漂移',
+    'scale ratio': '尺度比率',
+    'TTL days': 'TTL 天数',
+    'capacity': '容量 (Burst)',
+    'refill / sec': '每秒补充量',
     '"great" weight': '"great" 权重',
     '"not" weight': '"not" 权重',
     '"okay" weight': '"okay" 权重',
@@ -629,6 +662,11 @@
 
   // 说明散文（.lf-cap，按 widget 名索引）
   var CAP = {
+    's0-list-vs-generator': '列表会在训练开始前构建出每一行，并在内存中常驻完整数据集；生成器每次仅产出一个 batch，因此显存开销取决于批大小而非数据集总规模。两者产生完全相同顺序的相同 batch。',
+    'mlprod-serving-cost': '批处理推理成本随待评分实体总数和每日运行次数线性缩放，因为每次运行都会对所有实体重新评分；在线推理成本则受峰值 QPS 驱动，因为必须预留足够的副本实例在延迟预算内响应实时流量。时效要求宽松时批处理大幅胜出；时效要求极高时批处理运行过于频繁，在线推理更划算。',
+    'mlprod-drift-psi': '基准窗口切分为 10 个十分位分箱，每个分箱占 10% 的样本量。平移当前窗口会改变各分箱的样本占比。PSI 将这些变化按对数比率加权求和。分箱占比从 10% 暴涨到 30% 所贡献的漂移量远大于增至 12%。0.1 与 0.25 的判定带属于信用评分的经验法则，而非严格的统计检验。',
+    'mlprod-pit-join': '对于每个标签事件，时点连接（Point-in-Time Join）仅读取事件时间戳等于或早于标签时间戳、且仍在 TTL 窗口内的最新特征快照。标签日期之后的行属于未来数据，使用它们会导致特征穿越泄露。如果 TTL 窗口内没有任何记录，特征库将填充默认值。',
+    'demo-token-bucket': '每次请求消耗当前客户端桶里的一个令牌。桶以恒定速率补充，且永远不会超过其最大容量。容量决定了 Demo 能承受的突发并发上限，补充速率决定了长期平稳请求率。被拒绝的请求会收到携带 Retry-After 标头的 HTTP 429 响应，且不会触发底层模型运行。',
     'sw-agent-card-discovery': 'A2A 是 agent 之间的横向线协议。客户端首先从知名 URL 获取 Agent Card 以了解远端 agent 能做什么，然后发送消息，由远端 agent 转换为任务。任务在不透明生命周期（TASK_STATE_SUBMITTED、TASK_STATE_WORKING、TASK_STATE_COMPLETED）中推进并返回产物。这就是以 agent 为一等公民重新构建的 HTTP 与 REST。',
     'sw-contract-net': 'FIPA 合同网协议将任务分配建模为暗标拍卖。主管广播征求方案（CFP），空闲 agent 提交报价，主管将合同授予最优标的。MCP tools/call 与现代任务市场正是这一 1980 年代机制在 JSON 时代的重述。',
     'sw-work-stealing': '工作窃取用本地双端队列替代了中心化瓶颈。繁忙的 agent 向自身队列尾部压入任务；空闲 agent 则从其他工作节点的头部窃取。争用保持在局部，吞吐量随 worker 数量扩展，且无须中心协调者持有全图。',

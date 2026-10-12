@@ -1025,4 +1025,4 @@ Python 代码（`code/prompt_engineering.py`）是一个独立的测试框架。
 - [Shin et al., 2023——"Prompt Engineering a Prompt Engineer"](https://arxiv.org/abs/2311.05661)——用 LLM 自动优化 prompt，元 prompt 的基础
 - [Arena（原 LMSYS Chatbot Arena）](https://arena.ai/)——LLM 的实时盲测对比，你可以把同一个 prompt 在多个模型上测试，并投票哪个回复更好
 - [DAIR.AI Prompt Engineering Guide](https://www.promptingguide.ai/)——详尽的 prompt 技巧目录，附带示例（zero-shot、few-shot、CoT、ReAct、self-consistency）；从业者在更广义"Prompt engineering"层面上的参考资料。
-- [Anthropic prompt library](https://docs.anthropic.com/en/prompt-library)——按用例精选的、已验证好用的 prompt；展示了在生产中落地的结构性模式。
+- [Claude 提示词最佳实践](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)——Anthropic 官方关于提示词结构的工程指南，附带实战示例（已替代早期 Prompt Library）。

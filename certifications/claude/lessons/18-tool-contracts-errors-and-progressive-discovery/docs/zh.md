@@ -296,6 +296,6 @@ tool 问题往往是接口问题。在增加 prompt 复杂度之前，先修复�
 
 - [Claude tool use 文档](https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview)
 - [MCP 规范](https://modelcontextprotocol.io/specification/latest)
-- [Claude Code MCP 文档](https://docs.anthropic.com/en/docs/claude-code/mcp)
+- [Claude Code MCP 文档](https://code.claude.com/docs/en/mcp)
 - 阶段 13 第 05 课：tool schema 设计
 - 阶段 13 第 15 课：tool poisoning 威胁

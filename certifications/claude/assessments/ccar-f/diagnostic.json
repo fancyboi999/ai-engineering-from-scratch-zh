@@ -179,7 +179,7 @@
       "explanation": "指南应放在其适用范围最窄的位置。简洁的根文件可保持可发现性，版本化的路径规则既减少无关上下文，又让团队可复现。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/memory",
+        "https://code.claude.com/docs/en/memory",
         "certifications/claude/lessons/15-claude-code-for-development-teams"
       ]
     },
@@ -223,7 +223,7 @@
       "explanation": "全新且已声明的输入让 CI 可复现、可审查。交互式上下文、隐藏的本地 hook 和部署凭据都会引入未声明状态与不必要的权限。",
       "references": [
         "certifications/claude/lessons/19-claude-code-memory-rules-skills-and-ci",
-        "https://docs.anthropic.com/en/docs/claude-code/sdk/sdk-headless"
+        "https://code.claude.com/docs/en/headless"
       ]
     },
     {
