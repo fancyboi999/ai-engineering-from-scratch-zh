@@ -17,6 +17,16 @@
     WARN = "var(--warn,#b8870f)",
     BAD = "#d4493f";
 
+  const labTitles = {
+    "THREE LANGUAGES, ONE PIPELINE": "三种语言，一条流水线",
+    "BM25 RANKING": "BM25 排名",
+    "SNIPPETS WITH EXACT OFFSETS": "带精确偏移的片段",
+    "PLAN THE RESEARCH": "规划研究",
+    "WRITE ONLY FROM EVIDENCE": "只根据证据写作",
+    "VERIFY EVERY CLAIM": "验证每条主张",
+    "PUBLISH THE REPORT": "发布报告",
+    "SCORE THE PUBLIC FIXTURES": "为公开 fixture 评分",
+  };
   function pilotLab(label) {
     var n = function (key, label, value, min, max, step) {
       return {
@@ -44,17 +54,17 @@
     if (label === "BM25 RANKING")
       return {
         controls: [
-          n("N", "Documents in corpus", 12, 1, 30),
-          n("df", "Documents containing term", 3, 1, 30),
-          n("tf", "Term occurrences", 2, 0, 12),
-          n("length", "Document length", 80, 1, 300),
-          n("average", "Average document length", 100, 1, 300),
-          n("k1", "Frequency saturation k1", 1.5, 0.1, 3, 0.1),
-          n("b", "Length correction b", 0.75, 0, 1, 0.05),
+          n("N", "语料库文档数", 12, 1, 30),
+          n("df", "包含词项的文档数", 3, 1, 30),
+          n("tf", "词项出现次数", 2, 0, 12),
+          n("length", "文档长度", 80, 1, 300),
+          n("average", "平均文档长度", 100, 1, 300),
+          n("k1", "词频饱和参数 k1", 1.5, 0.1, 3, 0.1),
+          n("b", "长度修正参数 b", 0.75, 0, 1, 0.05),
         ],
         calculate: function (v) {
           if (v.df > v.N)
-            throw Error("Document frequency cannot exceed corpus size");
+            throw Error("文档频率不能超过语料库大小");
           var idf = Math.log(1 + (v.N - v.df + 0.5) / (v.df + 0.5));
           var contribution = function (tf) {
             return (
@@ -64,15 +74,15 @@
           };
           return {
             summary:
-              "BM25 contribution is computed from frequency, rarity and length.",
+              "BM25 贡献由词频、稀有度和长度计算得出。",
             metrics: [
               m("IDF", idf.toFixed(4)),
-              m("Score", contribution(v.tf).toFixed(4)),
+              m("得分", contribution(v.tf).toFixed(4)),
             ],
             bars: [
               b("tf=" + v.tf, contribution(v.tf)),
-              b("tf doubled", contribution(v.tf * 2)),
-              b("tf tripled", contribution(v.tf * 3)),
+              b("tf 翻倍", contribution(v.tf * 2)),
+              b("tf 三倍", contribution(v.tf * 3)),
             ],
           };
         },
@@ -80,10 +90,10 @@
     if (label === "SNIPPETS WITH EXACT OFFSETS")
       return {
         controls: [
-          t("source", "Source body", "Old rule. New rule."),
-          n("start", "Start character offset", 10, 0, 100),
-          n("end", "End character offset", 19, 0, 100),
-          t("quote", "Stored quote", "New rule."),
+          t("source", "源正文", "Old rule. New rule."),
+          n("start", "起始字符偏移", 10, 0, 100),
+          n("end", "结束字符偏移", 19, 0, 100),
+          t("quote", "已存引文", "New rule."),
         ],
         calculate: function (v) {
           var points = Array.from(v.source),
@@ -92,21 +102,21 @@
             v.start <= v.end && v.end <= points.length && slice === v.quote;
           return {
             summary: valid
-              ? "Exact source span matches"
-              : "Source span changed or offset invalid",
+              ? "精确源区间匹配"
+              : "源区间已改变或偏移无效",
             metrics: [
-              m("Source characters", points.length),
-              m("Span length", Math.max(0, v.end - v.start)),
-              m("Exact match", valid),
+              m("源字符数", points.length),
+              m("区间长度", Math.max(0, v.end - v.start)),
+              m("精确匹配", valid),
             ],
             bars: [
-              b("Span characters", Math.max(0, v.end - v.start), points.length),
-              b("Source characters", points.length),
+              b("区间字符数", Math.max(0, v.end - v.start), points.length),
+              b("源字符数", points.length),
             ],
-            columns: ["Field", "Value"],
+            columns: ["字段", "值"],
             rows: [
-              ["Slice", slice],
-              ["Stored quote", v.quote],
+              ["切片", slice],
+              ["已存引文", v.quote],
             ],
           };
         },
@@ -116,16 +126,16 @@
         controls: [
           t(
             "question",
-            "Research question",
+            "研究问题",
             "How do Orchard guest tokens expire?",
           ),
-          n("count", "Maximum facets", 4, 1, 4),
+          n("count", "最大研究维度数", 4, 1, 4),
           t(
             "reply",
-            "Optional planner reply",
+            "可选规划器回复",
             '{"facets":[{"sub_question":"When do guest tokens expire?","keywords":["tokens","expire"]}]}',
           ),
-          c("useModel", "Use supplied planner reply", true),
+          c("useModel", "使用给定的规划器回复", true),
         ],
         calculate: function (v) {
           var facets = [],
@@ -154,10 +164,10 @@
           }
           if (source !== "model")
             facets = [
-              "Overview",
-              "How it works",
-              "Risks and limits",
-              "When to use it",
+              "概览",
+              "工作原理",
+              "风险与限制",
+              "适用时机",
             ]
               .slice(0, v.count)
               .map(function (f) {
@@ -170,13 +180,15 @@
                 ];
               });
           return {
-            summary: source + ": " + facets.length + " facets",
+            summary:
+              ({ rules: "规则", model: "模型", "rules-fallback": "规则回退" })[source] +
+              ": " + facets.length + " 个研究维度",
             metrics: [
-              m("Planner source", source),
-              m("Facet count", facets.length),
+              m("规划来源", ({ rules: "规则", model: "模型", "rules-fallback": "规则回退" })[source]),
+              m("研究维度数", facets.length),
             ],
-            bars: [b("Facets", facets.length, 4)],
-            columns: ["Subquestion", "Query keywords"],
+            bars: [b("研究维度", facets.length, 4)],
+            columns: ["子问题", "查询关键词"],
             rows: facets,
           };
         },
@@ -186,11 +198,11 @@
         controls: [
           t(
             "text",
-            "Proposed report text",
+            "候选报告文本",
             "Tokens expire after 15 minutes [S1].",
           ),
-          t("ids", "Available snippet ids", "S1,S2"),
-          n("maximum", "Sentence budget", 3, 1, 8),
+          t("ids", "可用片段 ID", "S1,S2"),
+          n("maximum", "句子预算", 3, 1, 8),
         ],
         calculate: function (v) {
           var ids = v.ids.split(",").map(function (x) {
@@ -223,27 +235,32 @@
           return {
             summary:
               kept.length +
-              " structurally cited sentences remain; support still needs verification.",
+              " 个引用结构合格的句子保留下来；仍需验证证据支持。",
             metrics: [
-              m("Input sentences", rows.length),
-              m("Kept within budget", kept.length),
+              m("输入句子数", rows.length),
+              m("预算内保留的句子数", kept.length),
             ],
             bars: [
-              b("Input", rows.length),
-              b("Structurally eligible", kept.length),
+              b("输入", rows.length),
+              b("结构合格", kept.length),
             ],
-            columns: ["Sentence", "Citations", "Citation check"],
-            rows: rows,
+            columns: ["句子", "引用", "引用检查"],
+            rows: rows.map(function (row) {
+              return [row[0], row[1], ({
+                uncited: "无引用", dangling: "悬空引用",
+                "valid citation structure": "引用结构有效",
+              })[row[2]]];
+            }),
           };
         },
       };
     if (label === "VERIFY EVERY CLAIM")
       return {
         controls: [
-          t("source", "Source sentence", "Tokens expire after 15 minutes."),
-          t("claim", "Draft sentence", "Tokens expire after 60 minutes."),
-          n("used", "Work units used", 4, 0, 12),
-          n("budget", "Work budget", 5, 1, 12),
+          t("source", "源句子", "Tokens expire after 15 minutes."),
+          t("claim", "草稿句子", "Tokens expire after 60 minutes."),
+          n("used", "已用工作单位", 4, 0, 12),
+          n("budget", "工作预算", 5, 1, 12),
         ],
         calculate: function (v) {
           var token = function (s) {
@@ -277,15 +294,19 @@
                     ? "insufficient lexical overlap"
                     : "lexical match";
           return {
-            summary: reason + "; source truth is outside this check.",
+            summary: ({
+              "budget exhausted": "预算耗尽", "number changed": "数字改变",
+              "negation changed": "否定改变", "insufficient lexical overlap": "词项重叠不足",
+              "lexical match": "词项匹配",
+            })[reason] + "；此检查不判断来源本身是否真实。",
             metrics: [
-              m("Overlap", overlap.toFixed(3)),
-              m("Numbers agree", numbers),
-              m("Remaining work", Math.max(0, v.budget - v.used)),
+              m("重叠率", overlap.toFixed(3)),
+              m("数字一致", numbers),
+              m("剩余工作量", Math.max(0, v.budget - v.used)),
             ],
             bars: [
-              b("Lexical overlap", overlap, 1),
-              b("Work used", v.used, v.budget),
+              b("词项重叠率", overlap, 1),
+              b("已用工作量", v.used, v.budget),
             ],
           };
         },
@@ -293,10 +314,10 @@
     if (label === "PUBLISH THE REPORT")
       return {
         controls: [
-          t("source", "Document source", "Tokens expire after 15 minutes."),
-          t("snippet", "Snippet text", "Tokens expire after 15 minutes."),
-          t("title", "Report title", "Orchard <policy> audit"),
-          n("version", "Payload schema version", 1, 0, 3),
+          t("source", "文档来源", "Tokens expire after 15 minutes."),
+          t("snippet", "片段文本", "Tokens expire after 15 minutes."),
+          t("title", "报告标题", "Orchard <policy> audit"),
+          n("version", "载荷 schema 版本", 1, 0, 3),
         ],
         calculate: function (v) {
           var escaped = v.title
@@ -307,21 +328,21 @@
           var valid = v.version === 1 && v.source === v.snippet;
           return {
             summary: valid
-              ? "Version and exact evidence are valid for rendering"
-              : "Reject payload before publication",
+              ? "版本与精确证据有效，可以渲染"
+              : "发布前拒绝载荷",
             metrics: [
-              m("Schema supported", v.version === 1),
-              m("Source matches", v.source === v.snippet),
+              m("schema 受支持", v.version === 1),
+              m("来源匹配", v.source === v.snippet),
             ],
             bars: [
-              b("Source characters", Array.from(v.source).length),
-              b("Snippet characters", Array.from(v.snippet).length),
+              b("源字符数", Array.from(v.source).length),
+              b("片段字符数", Array.from(v.snippet).length),
             ],
-            columns: ["Boundary", "Serialized value"],
+            columns: ["边界", "序列化值"],
             rows: [
-              ["HTML text", escaped],
-              ["Evidence", v.snippet],
-              ["Publish", valid ? "eligible" : "blocked"],
+              ["HTML 文本", escaped],
+              ["证据", v.snippet],
+              ["发布", valid ? "合格" : "已阻止"],
             ],
           };
         },
@@ -329,12 +350,12 @@
     if (label === "SCORE THE PUBLIC FIXTURES")
       return {
         controls: [
-          n("claims", "Claims", 10, 0, 20),
-          n("supported", "Supported claims", 8, 0, 20),
-          n("expected", "Expected sources", 4, 0, 10),
-          n("found", "Supported expected sources found", 3, 0, 10),
-          n("facts", "Labeled facts", 6, 0, 12),
-          n("covered", "Supported facts covered", 4, 0, 12),
+          n("claims", "主张数", 10, 0, 20),
+          n("supported", "有证据支持的主张数", 8, 0, 20),
+          n("expected", "预期来源数", 4, 0, 10),
+          n("found", "找到且有支持的预期来源数", 3, 0, 10),
+          n("facts", "标注事实数", 6, 0, 12),
+          n("covered", "覆盖且有支持的事实数", 4, 0, 12),
         ],
         calculate: function (v) {
           if (
@@ -342,7 +363,7 @@
             v.found > v.expected ||
             v.covered > v.facts
           )
-            throw Error("A numerator cannot exceed its denominator");
+            throw Error("分子不能超过分母");
           var precision = v.claims ? v.supported / v.claims : 0,
             recall = v.expected ? v.found / v.expected : null,
             coverage = v.facts ? v.covered / v.facts : null;
@@ -357,32 +378,32 @@
             : 0;
           return {
             summary:
-              "Computed sample score " +
+              "计算得到的样本得分 " +
               score.toFixed(2) +
-              "; public fixtures do not measure unseen generalization.",
+              "；公开 fixture 不能衡量未见样本上的泛化能力。",
             metrics: [
-              m("Precision", precision.toFixed(3)),
-              m("Recall", recall === null ? "unavailable" : recall.toFixed(3)),
+              m("精确率", precision.toFixed(3)),
+              m("召回率", recall === null ? "不可用" : recall.toFixed(3)),
               m(
-                "Coverage",
-                coverage === null ? "unavailable" : coverage.toFixed(3),
+                "覆盖率",
+                coverage === null ? "不可用" : coverage.toFixed(3),
               ),
             ],
             bars: [
-              b("Precision", precision, 1),
-              b("Recall", recall || 0, 1),
-              b("Coverage", coverage || 0, 1),
+              b("精确率", precision, 1),
+              b("召回率", recall || 0, 1),
+              b("覆盖率", coverage || 0, 1),
             ],
           };
         },
       };
     return {
       controls: [
-        n("documents", "Corpus documents", 12, 0, 40),
-        n("facets", "Research facets", 4, 1, 6),
-        n("perFacet", "Snippets per facet", 3, 0, 6),
-        n("sentenceLimit", "Sentences per section", 3, 1, 6),
-        n("budget", "Work budget", 5, 0, 8),
+        n("documents", "语料库文档数", 12, 0, 40),
+        n("facets", "研究维度数", 4, 1, 6),
+        n("perFacet", "每个维度的片段数", 3, 0, 6),
+        n("sentenceLimit", "每节句子数", 3, 1, 6),
+        n("budget", "工作预算", 5, 0, 8),
       ],
       calculate: function (v) {
         var snippets = v.documents
@@ -392,19 +413,19 @@
         return {
           summary:
             v.budget < 5
-              ? "Budget stops the five-step pipeline"
+              ? "预算使五步流水线停止"
               : !sentences
-                ? "No evidence available for a report"
-                : "Bounded pipeline can gather and verify evidence",
+                ? "没有可供报告使用的证据"
+                : "受限流水线可以收集并验证证据",
           metrics: [
-            m("Candidate snippets", snippets),
-            m("Maximum sentences", sentences),
-            m("Required steps", 5),
+            m("候选片段数", snippets),
+            m("最大句子数", sentences),
+            m("所需步骤数", 5),
           ],
           bars: [
-            b("Gathered candidates", snippets),
-            b("Sentence cap", sentences),
-            b("Work budget", v.budget, 5),
+            b("收集的候选数", snippets),
+            b("句子上限", sentences),
+            b("工作预算", v.budget, 5),
           ],
         };
       },
@@ -437,7 +458,7 @@
     host.appendChild(
       el("div", { class: "lf" }, [
         el("div", { class: "lf-head" }, [
-          el("span", { class: "lf-label" }, [label]),
+          el("span", { class: "lf-label" }, [labTitles[label]]),
           el("span", {}, [hint]),
         ]),
         el("div", { class: "lf-body" }, [
@@ -451,7 +472,27 @@
       pilotLab(label),
     );
   }
+  function evidenceDisplay(text) {
+    const translations = {
+      "Containers share the host kernel.": "容器共享宿主内核。",
+      "A microVM boots its own guest kernel.": "microVM 启动独立的客户内核。",
+      "Egress stays deny-by-default.": "出站流量默认拒绝。",
+      "A shim intercepts system calls.": "shim 拦截系统调用。",
+      "Each microVM has its own kernel.": "每个 microVM 有独立内核。",
+      "Containers share the host kernel [S1].": "容器共享宿主内核 [S1]。",
+      "Each microVM has its own kernel [S4].": "每个 microVM 有独立内核 [S4]。",
+      "Sandboxes are always safe.": "沙箱总是安全的。",
+      "A runtime uses VMs [S99].": "某运行时使用 VM [S99]。",
+      "A microVM has no guest kernel [S4].": "microVM 没有客户内核 [S4]。",
+      "Boot takes 900 ms [S6].": "启动耗时 900 ms [S6]。",
+      "uncited": "无引用",
+      "number changed": "数字改变",
+      '"Sure! Here are…"': '“当然！以下是……”',
+    };
+    return translations[text] || text;
+  }
   function txt(x, y, s, fill, size, anchor, weight) {
+    s = evidenceDisplay(s);
     var a = {
       x: x,
       y: y,
@@ -545,9 +586,9 @@
     var D = "9s";
     var svg = svgEl("svg", { viewBox: "0 0 520 300" });
     var lanes = [
-      { y: 18, name: "RUST", why: "fast, safe index", color: WARN },
-      { y: 118, name: "PYTHON", why: "model glue", color: BP },
-      { y: 218, name: "TYPESCRIPT", why: "web viewer", color: INK },
+      { y: 18, name: "RUST", why: "快速安全的索引", color: WARN },
+      { y: 118, name: "PYTHON", why: "模型衔接", color: BP },
+      { y: 218, name: "TYPESCRIPT", why: "网页查看器", color: INK },
     ];
     lanes.forEach(function (l) {
       svg.appendChild(box(6, l.y, 508, 76, RULE, SURF));
@@ -558,17 +599,17 @@
       svg.appendChild(box(x, y, w, 34, color || RULE, BG));
       svg.appendChild(txt(x + w / 2, y + 21, label, INK, 10));
     }
-    stage(126, 39, 88, "corpus", WARN);
-    stage(250, 39, 88, "BM25 index", WARN);
-    stage(374, 39, 118, "JSON on stdout", WARN);
+    stage(126, 39, 88, "语料库", WARN);
+    stage(250, 39, 88, "BM25 索引", WARN);
+    stage(374, 39, 118, "stdout 输出 JSON", WARN);
     svg.appendChild(arrow(214, 56, 248, 56));
     svg.appendChild(arrow(338, 56, 372, 56));
     var py = [
-      ["plan", 126],
-      ["snippets", 200],
-      ["writer", 274],
-      ["critic", 348],
-      ["score", 422],
+      ["规划", 126],
+      ["片段", 200],
+      ["写作器", 274],
+      ["审查器", 348],
+      ["得分", 422],
     ];
     py.forEach(function (p, i) {
       stage(p[1], 139, 66, p[0], BP);
@@ -605,7 +646,7 @@
     svg.appendChild(reveal(res, 0.32, 0.6, D));
     var rep = group([
       box(-34, -9, 68, 18, INK, BG),
-      txt(0, 4, "report", INK, 9),
+      txt(0, 4, "报告", INK, 9),
     ]);
     rep.appendChild(
       animT("translate", "381,156;381,156;381,206;176,206;176,256;176,256", D, {
@@ -613,20 +654,20 @@
       }),
     );
     svg.appendChild(reveal(rep, 0.64, 0.92, D));
-    svg.appendChild(txt(260, 111, "one JSON line per request", MUTE, 9));
+    svg.appendChild(txt(260, 111, "每个请求一行 JSON", MUTE, 9));
     card(
       host,
       "THREE LANGUAGES, ONE PIPELINE",
-      "each part in the language that fits it",
+      "各部分使用适合的语言",
       svg,
-      "Rust owns the search engine because indexing is tight loops over bytes. Python owns the parts that talk to models, and TypeScript renders the report in the browser. The lanes only meet through plain JSON, so each side can be tested and replaced on its own.",
+      "索引是对字节的紧密循环，因此搜索引擎交给 Rust。Python 负责与模型交互的部分，TypeScript 在浏览器中渲染报告。各泳道只通过普通 JSON 对接，因而每一侧都能独立测试和替换。",
     );
   }
 
   function bm25(host) {
     var D = "8s";
     var svg = svgEl("svg", { viewBox: "0 0 520 250" });
-    svg.appendChild(txt(20, 24, "query", MUTE, 10, "start"));
+    svg.appendChild(txt(20, 24, "查询", MUTE, 10, "start"));
     svg.appendChild(box(70, 10, 74, 22, BP, BG));
     svg.appendChild(txt(107, 25, "microvm", BP, 10));
     svg.appendChild(box(150, 10, 64, 22, BP, BG));
@@ -677,7 +718,7 @@
       svg.appendChild(g);
     });
     svg.appendChild(line(320, 12, 320, 238, RULE, "3 3"));
-    svg.appendChild(txt(420, 30, "term frequency saturates", SOFT, 10));
+    svg.appendChild(txt(420, 30, "词频贡献趋于饱和", SOFT, 10));
     var ox = 345,
       oy = 120,
       w = 150,
@@ -707,8 +748,8 @@
     );
     svg.appendChild(curve);
     svg.appendChild(txt(ox + w, oy + 14, "tf", MUTE, 9, "end"));
-    svg.appendChild(txt(ox - 4, oy - h + 4, "score", MUTE, 9, "end"));
-    svg.appendChild(txt(420, 160, "rare words weigh more (idf)", SOFT, 10));
+    svg.appendChild(txt(ox - 4, oy - h + 4, "得分", MUTE, 9, "end"));
+    svg.appendChild(txt(420, 160, "稀有词权重更高（idf）", SOFT, 10));
     svg.appendChild(txt(350, 186, "kernel", INK, 10, "start"));
     svg.appendChild(box(410, 176, 90, 14, RULE, SURF));
     svg.appendChild(
@@ -729,9 +770,9 @@
     card(
       host,
       "BM25 RANKING",
-      "score, then sort",
+      "先评分，再排序",
       svg,
-      "Each document gets a score from every query word it contains. Repeating a word helps less and less, and a word that appears in few documents counts for more than a common one. The bars settle into the final ranking the search engine returns.",
+      "文档中每个匹配的查询词都贡献得分。重复一个词带来的收益逐渐减少；只在少数文档出现的词比常见词权重更高。条形最终排列成搜索引擎返回的排名。",
     );
   }
 
@@ -772,15 +813,15 @@
       box(20, 146, 480, 58, BP, BG),
       txt(34, 166, "S3  doc-04  start=34  end=71", BP, 11, "start", "700"),
       txt(34, 190, "text == source[34:71]", INK, 11, "start"),
-      txt(486, 190, "match", BP, 11, "end", "700"),
+      txt(486, 190, "匹配", BP, 11, "end", "700"),
     ]);
     svg.appendChild(reveal(out, 0.62, 0.98, D));
     card(
       host,
       "SNIPPETS WITH EXACT OFFSETS",
-      "source span verification",
+      "源区间验证",
       svg,
-      "The extractor splits each document into sentences and keeps where every sentence starts and ends in the source. A snippet is only valid if slicing the source at those offsets gives back the exact text. That makes every later citation checkable by code.",
+      "提取器将文档拆成句子，保留每个句子在来源中的起止位置。按偏移切片得到的文本与片段完全相同时，片段才有效。这样后续每个引用都能用代码核验。",
     );
   }
 
@@ -788,7 +829,7 @@
     var D = "9s";
     var svg = svgEl("svg", { viewBox: "0 0 520 250" });
     svg.appendChild(box(110, 10, 300, 30, INK, SURF));
-    svg.appendChild(txt(260, 30, "How should I isolate an AI agent?", INK, 11));
+    svg.appendChild(txt(260, 30, "应该怎样隔离 AI agent？", INK, 11));
     svg.appendChild(box(20, 70, 70, 44, MUTE, SURF));
     svg.appendChild(
       svgEl("circle", {
@@ -810,11 +851,11 @@
         "stroke-width": "1.5",
       }),
     );
-    svg.appendChild(txt(55, 128, "recorded", MUTE, 9));
-    svg.appendChild(txt(55, 140, "replies", MUTE, 9));
+    svg.appendChild(txt(55, 128, "已录制的", MUTE, 9));
+    svg.appendChild(txt(55, 140, "回复", MUTE, 9));
     svg.appendChild(box(200, 66, 120, 50, BP, BG));
-    svg.appendChild(txt(260, 88, "planner", BP, 12, "middle", "700"));
-    svg.appendChild(txt(260, 104, "model interface", MUTE, 9));
+    svg.appendChild(txt(260, 88, "规划器", BP, 12, "middle", "700"));
+    svg.appendChild(txt(260, 104, "模型接口", MUTE, 9));
     svg.appendChild(arrow(260, 40, 260, 64));
     svg.appendChild(arrow(92, 92, 198, 92));
     var badReply = group([
@@ -823,14 +864,14 @@
     ]);
     var strike = line(342, 77, 500, 77, BAD, null, "2");
     badReply.appendChild(strike);
-    badReply.appendChild(txt(421, 102, "not JSON: rejected", BAD, 9));
+    badReply.appendChild(txt(421, 102, "非 JSON：拒绝", BAD, 9));
     svg.appendChild(reveal(badReply, 0.1, 0.38, D));
     var fallback = group([
       box(336, 70, 170, 34, BP, BG),
-      txt(421, 91, "rule-based fallback", BP, 10),
+      txt(421, 91, "基于规则回退", BP, 10),
     ]);
     svg.appendChild(reveal(fallback, 0.4, 0.99, D));
-    var facets = ["what", "how", "risks", "tradeoffs"];
+    var facets = ["是什么", "工作方式", "风险", "取舍"];
     facets.forEach(function (f, i) {
       var x = 40 + i * 118;
       var g = group([
@@ -841,21 +882,21 @@
       svg.appendChild(reveal(g, 0.5 + i * 0.08, 0.99, D));
     });
     svg.appendChild(
-      txt(260, 236, "each facet becomes one report section", MUTE, 9),
+      txt(260, 236, "每个研究维度成为报告的一节", MUTE, 9),
     );
     card(
       host,
       "PLAN THE RESEARCH",
-      "question to facets",
+      "问题转为研究维度",
       svg,
-      "The planner turns one question into the few angles a good report must cover. It talks to models through one interface, so tests replay recorded replies instead of calling a live model. When a reply is not valid JSON, the plan falls back to rules instead of failing.",
+      "规划器将一个问题分解为报告必须覆盖的几个角度。它通过统一接口与模型交互，因此测试回放录制回复，而不调用实时模型。回复不是有效 JSON 时，规划会回退到规则，而不是失败。",
     );
   }
 
   function citedWriter(host) {
     var D = "9s";
     var svg = svgEl("svg", { viewBox: "0 0 520 250" });
-    svg.appendChild(txt(20, 20, "evidence", MUTE, 10, "start"));
+    svg.appendChild(txt(20, 20, "证据", MUTE, 10, "start"));
     var sn = [
       ["S1", "Containers share the host kernel."],
       ["S2", "A shim intercepts system calls."],
@@ -869,19 +910,19 @@
         txt(
           50,
           y + 17,
-          s[1].length > 20 ? s[1].slice(0, 19) + "…" : s[1],
+          evidenceDisplay(s[1]).length > 20 ? evidenceDisplay(s[1]).slice(0, 19) + "…" : evidenceDisplay(s[1]),
           SOFT,
           9,
           "start",
         ),
       );
     });
-    svg.appendChild(txt(200, 20, "report sentences", MUTE, 10, "start"));
+    svg.appendChild(txt(200, 20, "报告句子", MUTE, 10, "start"));
     var rows = [
       { t: "Containers share the host kernel [S1].", ok: true },
       { t: "Each microVM has its own kernel [S4].", ok: true },
       { t: "Sandboxes are always safe.", ok: false, why: "uncited" },
-      { t: "A runtime uses VMs [S99].", ok: false, why: "dangling S99" },
+      { t: "A runtime uses VMs [S99].", ok: false, why: "悬空引用 S99" },
     ];
     rows.forEach(function (r, i) {
       var y = 30 + i * 34;
@@ -889,7 +930,7 @@
         box(200, y, 300, 26, r.ok ? RULE : BAD, SURF),
         txt(210, y + 17, r.t, r.ok ? INK : BAD, 10, "start"),
       ]);
-      if (r.ok) g.appendChild(txt(492, y + 17, "ok", BP, 10, "end", "700"));
+      if (r.ok) g.appendChild(txt(492, y + 17, "通过", BP, 10, "end", "700"));
       svg.appendChild(reveal(g, 0.08 + i * 0.14, 0.99, D));
       if (!r.ok) {
         var bad = group([
@@ -906,28 +947,28 @@
       }),
     );
     svg.appendChild(reveal(dot, 0.02, 0.32, D));
-    svg.appendChild(txt(260, 180, "validator rules", MUTE, 10));
+    svg.appendChild(txt(260, 180, "验证器规则", MUTE, 10));
     svg.appendChild(
-      txt(260, 200, "every sentence ends with a marker", SOFT, 10),
+      txt(260, 200, "每个句子以引用标记结尾", SOFT, 10),
     );
     svg.appendChild(
-      txt(260, 218, "every marker names a real snippet", SOFT, 10),
+      txt(260, 218, "每个标记指向实际片段", SOFT, 10),
     );
     card(
       host,
       "WRITE ONLY FROM EVIDENCE",
-      "no marker, no sentence",
+      "没有标记就不保留句子",
       svg,
-      "The writer may only arrange snippets that search found, and every sentence carries the id of its snippet. A separate validator rejects sentences with no marker and markers that point at nothing. Grounding is enforced by code, not by asking nicely.",
+      "写作器只能组织搜索找到的片段，每句都携带片段 ID。独立验证器拒绝没有标记的句子，以及不指向任何片段的标记。证据落地由代码强制执行，不靠口头要求。",
     );
   }
 
   function critic(host) {
     var D = "9s";
     var svg = svgEl("svg", { viewBox: "0 0 520 250" });
-    svg.appendChild(txt(20, 20, "sentence", MUTE, 10, "start"));
+    svg.appendChild(txt(20, 20, "句子", MUTE, 10, "start"));
     svg.appendChild(
-      txt(330, 20, "overlap with cited snippet", MUTE, 10, "start"),
+      txt(330, 20, "与引用片段的重叠率", MUTE, 10, "start"),
     );
     var rows = [
       { t: "Containers share the host kernel [S1].", v: 0.92, ok: true },
@@ -935,7 +976,7 @@
         t: "A microVM has no guest kernel [S4].",
         v: 0.38,
         ok: false,
-        why: "negation flipped",
+        why: "否定被反转",
       },
       {
         t: "Boot takes 900 ms [S6].",
@@ -974,8 +1015,8 @@
       );
       svg.appendChild(bar);
       var verdict = r.ok
-        ? txt(460, y + 19, "kept", BP, 10, "start", "700")
-        : txt(460, y + 19, "flagged", BAD, 10, "start", "700");
+        ? txt(460, y + 19, "保留", BP, 10, "start", "700")
+        : txt(460, y + 19, "已标记", BAD, 10, "start", "700");
       svg.appendChild(reveal(verdict, 0.16 + i * 0.12, 0.99, D));
       if (!r.ok)
         svg.appendChild(
@@ -987,7 +1028,7 @@
           ),
         );
     });
-    svg.appendChild(txt(20, 184, "run budget", MUTE, 10, "start"));
+    svg.appendChild(txt(20, 184, "运行预算", MUTE, 10, "start"));
     svg.appendChild(box(100, 173, 260, 16, RULE, BG));
     var budget = svgEl("rect", {
       x: 100,
@@ -1003,18 +1044,18 @@
       }),
     );
     svg.appendChild(budget);
-    svg.appendChild(txt(370, 185, "steps left", MUTE, 9, "start"));
+    svg.appendChild(txt(370, 185, "剩余步骤", MUTE, 9, "start"));
     var badge = group([
       box(100, 206, 260, 30, BP, BG),
-      txt(230, 226, "completed · 2 sentences dropped", BP, 11, "middle", "700"),
+      txt(230, 226, "已完成 · 丢弃 2 句", BP, 11, "middle", "700"),
     ]);
     svg.appendChild(reveal(badge, 0.62, 0.99, D));
     card(
       host,
       "VERIFY EVERY CLAIM",
-      "the critic reads the source",
+      "审查器读取来源",
       svg,
-      "The critic compares each sentence with the snippet it cites and flags sentences the source does not support, like a flipped negation or a changed number. It runs inside a budget and always ends in a named state, so a run never just stops silently.",
+      "审查器将每句与其引用片段比较，标记来源不支持的句子，例如否定反转或数字改变。它在预算内运行，并总以明确状态结束，不会无声停止。",
     );
   }
 
@@ -1032,16 +1073,16 @@
       svgEl("rect", { x: 254, y: 14, width: 250, height: 16, fill: SURF }),
     );
     svg.appendChild(txt(266, 26, "report.html", MUTE, 9, "start"));
-    svg.appendChild(txt(266, 50, "Isolating agents", INK, 12, "start", "700"));
+    svg.appendChild(txt(266, 50, "隔离 agent", INK, 12, "start", "700"));
     svg.appendChild(
-      txt(266, 72, "Containers share the host", SOFT, 10, "start"),
+      txt(266, 72, "容器共享宿主", SOFT, 10, "start"),
     );
-    svg.appendChild(txt(266, 86, "kernel.", SOFT, 10, "start"));
+    svg.appendChild(txt(266, 86, "内核。", SOFT, 10, "start"));
     svg.appendChild(txt(310, 86, "[1]", BP, 10, "start", "700"));
     svg.appendChild(
-      txt(266, 104, "Each microVM has its own", SOFT, 10, "start"),
+      txt(266, 104, "每个 microVM 有独立", SOFT, 10, "start"),
     );
-    svg.appendChild(txt(266, 118, "kernel.", SOFT, 10, "start"));
+    svg.appendChild(txt(266, 118, "内核。", SOFT, 10, "start"));
     var m2 = txt(310, 118, "[2]", BP, 10, "start", "700");
     svg.appendChild(m2);
     var ring = svgEl("rect", {
@@ -1066,18 +1107,18 @@
     );
     var pop = group([
       box(270, 132, 222, 42, BP, SURF),
-      txt(280, 149, '"Each microVM runs its own', INK, 9.5, "start"),
-      txt(280, 164, 'guest kernel."  doc-04', INK, 9.5, "start"),
+      txt(280, 149, '“每个 microVM 运行独立的', INK, 9.5, "start"),
+      txt(280, 164, '客户内核。”  doc-04', INK, 9.5, "start"),
     ]);
     svg.appendChild(reveal(pop, 0.3, 0.8, D));
     svg.appendChild(cursor);
     svg.appendChild(txt(16, 210, "trace.json", MUTE, 10, "start"));
     var segs = [
-      ["search", 60, WARN],
-      ["plan", 50, BP],
-      ["write", 90, BP],
-      ["verify", 80, BP],
-      ["publish", 60, INK],
+      ["搜索", 60, WARN],
+      ["规划", 50, BP],
+      ["写作", 90, BP],
+      ["验证", 80, BP],
+      ["发布", 60, INK],
     ];
     var x = 90;
     segs.forEach(function (s, i) {
@@ -1096,23 +1137,23 @@
     card(
       host,
       "PUBLISH THE REPORT",
-      "footnotes quote the source",
+      "脚注引用来源",
       svg,
-      "TypeScript turns report.json into a page where every footnote marker opens the exact source sentence it cites. Next to the report, trace.json records each step, how long it took, and how the run ended, so a reader can audit both the claims and the process.",
+      "TypeScript 将 report.json 转成网页，每个脚注标记都能打开引用的精确源句子。报告旁的 trace.json 记录每个步骤、耗时和运行结束方式，让读者同时审计主张与过程。",
     );
   }
 
   function scorecard(host) {
     var D = "9s";
     var svg = svgEl("svg", { viewBox: "0 0 520 240" });
-    svg.appendChild(txt(20, 20, "public fixtures", MUTE, 10, "start"));
+    svg.appendChild(txt(20, 20, "公开 fixture", MUTE, 10, "start"));
     for (var i = 0; i < 6; i++) {
       var y = 30 + i * 26;
       svg.appendChild(box(20, y, 120, 20, RULE, SURF));
       svg.appendChild(txt(30, y + 14, "Q" + (i + 1), INK, 10, "start"));
       svg.appendChild(
         reveal(
-          txt(128, y + 14, "run", BP, 9, "end", "700"),
+          txt(128, y + 14, "运行", BP, 9, "end", "700"),
           0.05 + i * 0.06,
           0.99,
           D,
@@ -1120,9 +1161,9 @@
       );
     }
     var gauges = [
-      ["citation precision", 1.0, "1.00"],
-      ["source recall", 0.92, "0.92"],
-      ["fact coverage", 0.67, "0.67"],
+      ["引用精确率", 1.0, "1.00"],
+      ["来源召回率", 0.92, "0.92"],
+      ["事实覆盖率", 0.67, "0.67"],
     ];
     gauges.forEach(function (g, i) {
       var y = 34 + i * 40;
@@ -1159,7 +1200,7 @@
       );
     });
     svg.appendChild(txt(470, 110, "87.5", BP, 26, "middle", "700"));
-    svg.appendChild(txt(470, 130, "score / 100", MUTE, 9));
+    svg.appendChild(txt(470, 130, "得分 / 100", MUTE, 9));
     var sy = 200;
     svg.appendChild(line(20, sy, 500, sy, MUTE));
     [0, 25, 50, 75, 100].forEach(function (t) {
@@ -1185,15 +1226,15 @@
           (sy - 3),
         fill: WARN,
       }),
-      txt(mx, sy - 20, "beat this", WARN, 10, "middle", "700"),
+      txt(mx, sy - 20, "超越此基线", WARN, 10, "middle", "700"),
     ]);
     svg.appendChild(reveal(marker, 0.78, 0.99, D));
     card(
       host,
       "SCORE THE PUBLIC FIXTURES",
-      "reference baseline",
+      "参考基线",
       svg,
-      "The scorecard runs the whole pipeline on six checked-in public evaluation questions. It checks lexical citation support, expected sources and key facts. The reference baseline scores 87.5 on these fixtures; the demo also uses question h4. Compare all three metrics, and use separate private questions to measure generalization.",
+      "评分卡在六个已入库的公开评估问题上运行完整流水线，检查词项级引用支持、预期来源和关键事实。参考基线在这些 fixture 上得分 87.5；演示还使用问题 h4。比较三项指标，并用独立私有问题衡量泛化。",
     );
   }
 
