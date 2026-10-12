@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目集 - 从零开始学 AI 工程</title>
+  <meta name="description" content="从简单到进阶，构建真实 AI 项目。每个项目交付有用产物、分阶段测试和学习指导，欢迎社区投稿。">
+  <link rel="canonical" href="https://aieng-zh.cn/projects.html">
+  <meta property="og:title" content="项目集 · 从零开始学 AI 工程">
+  <meta property="og:description" content="从简单到进阶构建真实 AI 项目，逐阶段评分。">
+  <meta property="og:image" content="https://aieng-zh.cn/og/page/projects.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="项目集 - 从零开始学 AI 工程">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://aieng-zh.cn/og/page/projects.png">
+  <meta name="twitter:image:alt" content="项目集 - 从零开始学 AI 工程">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260824a">
+  <link rel="stylesheet" href="projects.css?v=20260929c">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body data-projects-page="catalog">
+  <a href="#main" class="skip-link">跳到正文</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / 从零开始</a>
+      <nav class="header-nav">
+        <a href="index.html#contents">课程目录</a>
+        <a href="catalog.html">课程索引</a>
+        <a href="projects.html">项目</a>
+        <a href="prereqs.html">路线图</a>
+        <a href="glossary.html">术语表</a>
+        <a href="about.html">关于</a>
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github"><span>GitHub</span><span class="star-count" data-loading="true">…</span></a>
+      </nav>
+      <button class="search-toggle" type="button" data-cmd-palette aria-label="搜索"><span aria-hidden="true">⌕</span></button>
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button>
+    </div>
+  </header>
+
+  <main id="main" class="pj-page">
+    <section class="pj-container pj-hero" aria-labelledby="pjTitle">
+      <div class="pj-eyebrow">项目 · 从简单到进阶</div>
+      <h1 id="pjTitle">构建真正有人用的工具。</h1>
+      <p class="pj-lede">每个项目把课程知识变成可运行产物：报告生成器、记忆服务器、任务队列或 agent。你逐阶段构建，评分器检查每个阶段，导师陪你完成。</p>
+      <div class="pj-hero-stats" id="pjStats"></div>
+      <div class="pj-actions">
+        <a class="pj-action" id="pjStartLink" href="#ladder">开始第一个项目</a>
+        <a class="pj-action secondary" href="#submit">提交你的项目</a>
+      </div>
+    </section>
+
+    <section class="pj-container pj-section" aria-labelledby="howTitle">
+      <div class="pj-section-heading"><div><div class="pj-eyebrow">怎样学习</div><h2 id="howTitle">三条命令，一个项目</h2></div><p>按任务选择 Python、Rust、TypeScript 或 Go。核心测试离线运行；可选框架实验单独列出依赖。</p></div>
+      <ol class="pj-steps">
+        <li>
+          <div class="pj-step-head"><span class="pj-step-n" aria-hidden="true">01</span><h3>创建工作区</h3></div>
+          <p>复制初始文件。每个待实现函数都给出了精确签名。</p>
+          <pre class="pj-cmd" data-copy-label="复制初始化命令"><code>python3 scripts/project_test.py research-report-agent --init my-report-agent</code></pre>
+        </li>
+        <li>
+          <div class="pj-step-head"><span class="pj-step-n" aria-hidden="true">02</span><h3>运行评分器</h3></div>
+          <p>一次构建一个阶段。评分器检查当前工作及所有先前阶段。</p>
+          <pre class="pj-cmd" data-copy-label="复制评分命令"><code>python3 scripts/project_test.py research-report-agent --stage 1 --path my-report-agent</code></pre>
+        </li>
+        <li>
+          <div class="pj-step-head"><span class="pj-step-n" aria-hidden="true">03</span><h3>跟随导师学习</h3></div>
+          <p>需要指导？在 Claude Code 中逐阶段学习，获得提示和反馈。</p>
+          <pre class="pj-cmd" data-command-label="Claude Code" data-copy-label="复制导师命令"><code>/build-project research-report-agent</code></pre>
+        </li>
+      </ol>
+    </section>
+
+    <section class="pj-container pj-section" id="ladder" aria-labelledby="ladderTitle">
+      <div class="pj-section-heading"><div><div class="pj-eyebrow">进阶阶梯</div><h2 id="ladderTitle">选择难度</h2></div><p>五个级别，每级增加一种新的工程挑战。新项目编写或提交后加入对应级别。</p></div>
+      <div class="pj-filters" role="toolbar" aria-label="筛选项目">
+        <div class="pj-filter-group" id="pjSourceFilter"></div>
+        <label class="pj-toggle"><input type="checkbox" id="pjShowPlanned" checked> 显示规划项目</label>
+      </div>
+      <div class="pj-ladder" id="pjLadder" aria-live="polite"></div>
+    </section>
+
+    <section class="pj-container pj-section" id="submit" aria-labelledby="submitTitle">
+      <div class="pj-submit">
+        <div>
+          <div class="pj-eyebrow">社区</div>
+          <h2 id="submitTitle">做出了有用的工具？把它加入阶梯。</h2>
+          <p>社区项目与核心项目使用相同结构：<code>project.json</code>，包含课程、初始实现和测试的各阶段，以及参考解。项目在此展示并附上你的 GitHub 账号。</p>
+          <ul class="pj-checklist">
+            <li>交付真实产物，而非聊天演示</li>
+            <li>每阶段都有无需 API key、离线通过的测试</li>
+            <li>独立评估 fixture，明确分数能证明什么、不能证明什么</li>
+            <li>原创实现，附官方规范和研究链接</li>
+          </ul>
+        </div>
+        <div class="pj-submit-card">
+          <p>复制后，先将 <code>projects/my-project/project.json</code> 中的 <code>id</code> 设为 <code>my-project</code>，再运行评分器。</p>
+          <pre class="pj-cmd"><code>cp -r projects/_template projects/my-project
+python3 scripts/project_test.py my-project \
+  --all --solution --strict</code></pre>
+          <a class="pj-action" id="pjSubmitGuide" href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/projects/SUBMITTING.md" target="_blank" rel="noopener">阅读投稿指南</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><p>从零开始学 AI 工程 · 开源 · 永久免费。</p><div class="footer-links"><a href="index.html">首页</a><a href="catalog.html">课程索引</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a></div></div></footer>
+
+  <script src="data.js?v=20260821c"></script>
+  <script src="projects-data.js?v=20260929b"></script>
+  <script src="content-source.js?v=20260821a"></script>
+  <script src="header.js?v=20260927a" defer></script>
+  <script src="cmdpalette.js?v=20260821a" defer></script>
+  <script src="projects.js?v=20260929c" defer></script>
+</body>
+</html>
