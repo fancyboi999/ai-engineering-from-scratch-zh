@@ -1,0 +1,106 @@
+{
+  "id": "signed-webhook-inbox",
+  "title": "签名 webhook 收件箱",
+  "tagline": "接受交付一次，保留安全重放所需证据。",
+  "summary": "帮助开发者将外部事件送进 agent 工作流，不丢重试，也不接受被改载荷。按原创签名方案验证原始正文，执行时间戳限制，分派前存储稳定交付身份。导出 HTTP 接收器与重放 CLI，区分传输重试和新业务事件。",
+  "level": 4,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "本地 webhook 接收器、交付账本和显式重放 CLI",
+  "prerequisiteProjects": [
+    "workflow-hooks",
+    "durable-agent-jobs"
+  ],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      "."
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-preserve-delivery",
+      "title": "保留原始字节与交付身份",
+      "summary": "解码业务数据前，读取被认证的精确正文。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "原始字节",
+        "交付 ID",
+        "有界正文"
+      ],
+      "timeout": 120,
+      "figure": "pj-signed-webhook-inbox-1"
+    },
+    {
+      "id": "02-verify-authenticity",
+      "title": "验证签名与时间戳边界",
+      "summary": "按明确教学方案认证身份、时间戳与原始字节。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "HMAC",
+        "时间戳窗口",
+        "常数时间比较"
+      ],
+      "timeout": 120,
+      "figure": "pj-signed-webhook-inbox-2"
+    },
+    {
+      "id": "03-durable-deduplication",
+      "title": "用持久化收件箱去重重试",
+      "summary": "确认交付前，持久化接受的身份和正文。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "fsync",
+        "原子链接",
+        "身份冲突"
+      ],
+      "timeout": 120,
+      "figure": "pj-signed-webhook-inbox-3"
+    },
+    {
+      "id": "04-replay-receipts",
+      "title": "用处理回执重放已接受交付",
+      "summary": "明确新的处理运行，同时保持传输去重。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "重放身份",
+        "处理账本",
+        "本地产物"
+      ],
+      "timeout": 120,
+      "figure": "pj-signed-webhook-inbox-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "录制的本地命令输出。输入和范围见 README。"
+    }
+  ]
+}

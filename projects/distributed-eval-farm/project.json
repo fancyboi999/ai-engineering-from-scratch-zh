@@ -1,0 +1,118 @@
+{
+  "id": "distributed-eval-farm",
+  "title": "分布式评估集群协调器",
+  "level": 5,
+  "levelName": "前沿",
+  "tagline": "划分案例、租赁分片，汇总有界并发 worker。",
+  "summary": "构建持久化同主机评估协调器，划分已记录预测，将分片租给真实 worker 进程，拦截过期完成，并保留绑定数据集的回执。",
+  "usefulFor": [
+    "以精确数据集身份恢复中断的批量评估",
+    "检查分片所有权、进程回执和过期 worker 拒绝"
+  ],
+  "youWillBuild": "构建持久化同主机评估协调器，划分已记录预测，将分片租给真实 worker 进程，拦截过期完成，并保留绑定数据集的回执。",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "划分稳定案例身份",
+    "为每个分片租约设置版本栅栏",
+    "接受幂等完成回执",
+    "运行有界本地 worker 池"
+  ],
+  "prerequisites": [
+    "Linux 或 macOS 上的 Go 1.22 或更高版本",
+    "评分器所需的 Python 3.10 或更高版本",
+    "Go 结构体、指针、错误和 JSON 文件",
+    "goroutine、channel 和 context 取消"
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      ".",
+      "demo"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-partition-stable-case-identities",
+      "title": "划分稳定案例身份",
+      "summary": "用 FNV-1a 将每个非空唯一案例 ID 分配到正数个分片之一。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "稳定 ID",
+        "字节哈希",
+        "对数量取模",
+        "单一分区"
+      ]
+    },
+    {
+      "id": "02-fence-each-shard-lease",
+      "title": "为每个分片租约设置版本栅栏",
+      "summary": "协调器拥有一条租约记录。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "未完成分片",
+        "到期检查",
+        "新所有者",
+        "递增版本"
+      ]
+    },
+    {
+      "id": "03-accept-idempotent-completion-receipts",
+      "title": "接受幂等完成回执",
+      "summary": "完成提交携带分片所有者、租约版本和非空结果。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "所有者与版本",
+        "租约边界",
+        "结果身份",
+        "幂等回执"
+      ]
+    },
+    {
+      "id": "04-run-a-bounded-local-worker-pool",
+      "title": "运行有界本地 worker 池",
+      "summary": "将有界池与持久化租约及实际 worker 进程组合；保留已评分案例覆盖，拒绝过期回执。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "有界 goroutine",
+        "唯一分派",
+        "协作取消",
+        "稳定结果"
+      ],
+      "timeout": 120
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

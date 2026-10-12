@@ -1,0 +1,116 @@
+{
+  "id": "llm-gateway-with-fallbacks",
+  "title": "带回退的 LLM 网关",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "按明确故障语义将有界请求经 provider 路由。",
+  "summary": "构建本地非流式 HTTP 代理，具有真实 provider 回退、每 provider 环境凭据、响应限制和单一总截止时间。用回环服务器验证完整线路。",
+  "usefulFor": [
+    "将已有 chat-completions 客户端连接到本地回退端点",
+    "追踪 provider 故障而不转发调用者凭据"
+  ],
+  "youWillBuild": "构建本地非流式 HTTP 代理，具有真实 provider 回退、每 provider 环境凭据、响应限制和单一总截止时间。用回环服务器验证完整线路。",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "验证 provider 端点",
+    "分类故障而非全部重试",
+    "发送一次有界 HTTP 请求",
+    "按总尝试预算路由"
+  ],
+  "prerequisites": [
+    {
+      "title": "结构化输出",
+      "path": "phases/11-llm-engineering/03-structured-outputs"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      "."
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-validate-provider-endpoints",
+      "title": "验证 provider 端点",
+      "summary": "把 provider 列表视为可信配置。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "解析 URL",
+        "传输规则",
+        "无凭据",
+        "稳定端点列表"
+      ]
+    },
+    {
+      "id": "02-classify-failures-without-retrying-everything",
+      "title": "分类故障而非全部重试",
+      "summary": "区分可修复的故障和有问题的请求。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "状态边界",
+        "2xx 成功",
+        "429 和 5xx",
+        "终止客户端错误"
+      ]
+    },
+    {
+      "id": "03-send-one-bounded-http-request",
+      "title": "发送一次有界 HTTP 请求",
+      "summary": "在字节和时间上约束一次请求。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "受 context 约束的 POST",
+        "HTTP 传输",
+        "限制加一",
+        "关闭响应正文"
+      ]
+    },
+    {
+      "id": "04-route-with-a-total-attempt-budget",
+      "title": "按总尝试预算路由",
+      "summary": "路由调用者正文，同时保护凭据隐私。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "provider 顺序",
+        "尝试预算",
+        "故障类别",
+        "终止结果"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

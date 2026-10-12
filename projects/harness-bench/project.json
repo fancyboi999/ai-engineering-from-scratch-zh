@@ -1,0 +1,120 @@
+{
+  "id": "harness-bench",
+  "title": "Harness 基准测试",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "在相同任务和调用预算下比较 harness 行为。",
+  "summary": "针对同一有序案例与模型配置比较基线、错误重试和证据策略。统计实际调用，拒绝不可比回执，重放有限记录或调用配置的 HTTP 模型。",
+  "usefulFor": [
+    "在固定调用预算下判断重试或提供证据是否改善助手",
+    "导出可审查的每次调用轨迹及数据集和模型回执"
+  ],
+  "youWillBuild": "针对同一有序案例与模型配置比较基线、错误重试和证据策略。统计实际调用，拒绝不可比回执，重放有限记录或调用配置的 HTTP 模型。",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "加载未见的基准案例",
+    "精确定义正确答案",
+    "在调用预算内运行 harness",
+    "用相同分母比较运行"
+  ],
+  "prerequisites": [
+    {
+      "title": "模型评估",
+      "path": "phases/02-ml-fundamentals/09-model-evaluation"
+    },
+    {
+      "title": "结构化输出",
+      "path": "phases/11-llm-engineering/03-structured-outputs"
+    }
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      "."
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-load-unseen-benchmark-cases",
+      "title": "加载未见的基准案例",
+      "summary": "比较策略前先冻结案例。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "JSON 字段",
+        "案例预算",
+        "唯一 ID",
+        "留出记录"
+      ]
+    },
+    {
+      "id": "02-define-exactly-what-a-correct-answer-means",
+      "title": "精确定义正确答案",
+      "summary": "看到分数前先定义答案契约。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "规范空白",
+        "转小写",
+        "保留内容",
+        "精确相等"
+      ]
+    },
+    {
+      "id": "03-run-a-harness-under-a-call-budget",
+      "title": "在调用预算内运行 harness",
+      "summary": "将调用花在策略上，不要花在答案泄露上。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "仅 prompt 输入",
+        "计入尝试",
+        "评估答案",
+        "具名终止状态"
+      ]
+    },
+    {
+      "id": "04-compare-runs-on-equal-denominators",
+      "title": "用相同分母比较运行",
+      "summary": "排名前证明运行可比。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "计数不变量",
+        "相同数据集大小",
+        "稳定排名",
+        "限定范围的测量"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}

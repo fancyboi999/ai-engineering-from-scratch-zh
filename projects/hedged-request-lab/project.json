@@ -1,0 +1,106 @@
+{
+  "id": "hedged-request-lab",
+  "title": "对冲请求实验室",
+  "tagline": "测量摆脱慢读取请求所需的额外工作。",
+  "summary": "帮助客户端开发者评估安全读取的延迟重复请求。只在可配置延迟后发第二次尝试，接受首个有效响应，分别记录取消、迟到完成和重复服务工作。从受控本地端点导出有界 HTTP 客户端及延迟与工作量报告。",
+  "level": 4,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "对冲读取客户端、可控端点 fixture 和延迟与工作量比较回执",
+  "prerequisiteProjects": [
+    "llm-gateway-with-fallbacks",
+    "agent-trace-debugger"
+  ],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      "."
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-measure-safe-reads",
+      "title": "测量安全读取延迟",
+      "summary": "汇总观测样本，不虚构性能保证。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "百分位",
+        "安全读取",
+        "测量"
+      ],
+      "timeout": 120,
+      "figure": "pj-hedged-request-lab-1"
+    },
+    {
+      "id": "02-schedule-duplicate",
+      "title": "调度延迟重复尝试",
+      "summary": "只有延迟先于胜出响应到期，才发起第二次安全读取。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "计时器",
+        "重叠",
+        "截止时间"
+      ],
+      "timeout": 120,
+      "figure": "pj-hedged-request-lab-2"
+    },
+    {
+      "id": "03-validate-and-account",
+      "title": "验证胜出响应并核算迟到工作",
+      "summary": "快速错误不能胜出；取消是观测，不是费用保证。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "有效胜出响应",
+        "迟到结果",
+        "取消"
+      ],
+      "timeout": 120,
+      "figure": "pj-hedged-request-lab-3"
+    },
+    {
+      "id": "04-export-tradeoffs",
+      "title": "导出延迟与重复工作权衡",
+      "summary": "同时报告更快的响应和产生它们的额外请求。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "比较回执",
+        "服务工作",
+        "消费者"
+      ],
+      "timeout": 120,
+      "figure": "pj-hedged-request-lab-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "录制的本地命令输出。输入和范围见 README。"
+    }
+  ]
+}

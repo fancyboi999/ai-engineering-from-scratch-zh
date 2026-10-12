@@ -1,0 +1,118 @@
+{
+  "id": "durable-agent-jobs",
+  "title": "持久化 agent 任务",
+  "level": 4,
+  "levelName": "系统",
+  "tagline": "持久化任务状态，拒绝过期 worker 完成。",
+  "summary": "构建持久化本地报告队列，具有版本租约、不可变输入、幂等输出回执和可复现的 worker 进程崩溃恢复。",
+  "usefulFor": [
+    "worker 崩溃后恢复本地报告任务",
+    "观察并测试输出效果与持久化完成之间的间隙"
+  ],
+  "youWillBuild": "构建持久化本地报告队列，具有版本租约、不可变输入、幂等输出回执和可复现的 worker 进程崩溃恢复。",
+  "hours": 8,
+  "languages": [
+    "Go"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "创建稳定任务身份",
+    "以租约和版本认领",
+    "完成或回收到期工作",
+    "写入并恢复原子快照"
+  ],
+  "prerequisites": [
+    "Linux 或 macOS 上的 Go 1.22 或更高版本",
+    "评分器所需的 Python 3.10 或更高版本",
+    "Go 结构体、指针、错误和 JSON 文件",
+    "基础进程生命周期与文件系统操作"
+  ],
+  "inspiredBy": [],
+  "demo": {
+    "command": [
+      "go",
+      "run",
+      ".",
+      "demo"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-create-jobs-with-stable-identity",
+      "title": "创建稳定任务身份",
+      "summary": "接受有界标识，每任务从 queued 状态、零版本开始。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "验证 ID",
+        "初始状态",
+        "零版本",
+        "无副作用"
+      ]
+    },
+    {
+      "id": "02-claim-with-a-lease-and-version",
+      "title": "以租约和版本认领",
+      "summary": "只有 queued 工作可认领。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "预期版本",
+        "尝试上限",
+        "租约算术",
+        "原子状态修改"
+      ]
+    },
+    {
+      "id": "03-finish-or-reclaim-expired-work",
+      "title": "完成或回收到期工作",
+      "summary": "Finish 仅对租约到期前的当前 running 版本成功。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "租约边界",
+        "重新入队到期工作",
+        "递增版本",
+        "拦截过期 worker"
+      ]
+    },
+    {
+      "id": "04-write-and-recover-atomic-snapshots",
+      "title": "写入并恢复原子快照",
+      "summary": "将已验证快照与加锁入队、持久化认领和崩溃安全的本地回执复用组合。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "验证快照",
+        "写临时文件",
+        "刷新并重命名",
+        "恢复记录"
+      ],
+      "timeout": 120
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "录制内容展示 starter 失败后全部参考阶段通过。参考通过不授予学员证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器限制见 README。"
+    }
+  ]
+}
