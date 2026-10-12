@@ -32,11 +32,11 @@
     },
     "api/lesson.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/lesson.html,site/lesson-seo.json,site/lesson-terms.json,site/figure-manifest.js,site/lesson-markdown.js,site/md-render.js,phases/**/docs/zh.md,certifications/*/lessons/*/docs/zh.md,lib/og-fonts/*.json}"
+      "includeFiles": "{site/lesson.html,site/lesson-seo.json,site/lesson-terms.json,site/figure-manifest.js,site/lesson-markdown.js,site/md-render.js,phases/**/docs/zh.md,certifications/*/lessons/*/docs/zh.md,lib/og-fonts/*.json,lib/og-render.js}"
     },
     "api/certification.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/certification.html,site/certification-seo.json,lib/og-fonts/*.json}"
+      "includeFiles": "{site/certification.html,site/certification-seo.json,lib/og-fonts/*.json,lib/og-render.js}"
     },
     "api/og.js": {
       "maxDuration": 10,
