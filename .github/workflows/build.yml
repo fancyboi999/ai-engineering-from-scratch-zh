@@ -173,10 +173,11 @@ jobs:
           python3 manuals/a2a-101/tests/test_static_contract.py
           node scripts/test_og.js
           node scripts/check_og_cards.js --require-manifests
-      - name: 真实 DOM 属性安全回归（非视觉验收）
+      - name: 真实 DOM 安全与有界显示回归（非视觉验收）
         run: |
           CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME_PATH" || { echo "缺少 Chrome，真实 DOM gate 未执行"; exit 1; }
           export CHROME_PATH
           node scripts/test_attribute_safety.js
           node scripts/test_project_layout.js
+          node scripts/test_ui_display.js

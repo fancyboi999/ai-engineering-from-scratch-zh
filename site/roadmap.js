@@ -45,6 +45,7 @@
   var SVG_W = PAD_X * 2 + MAX_COLUMNS * NODE_W + (MAX_COLUMNS - 1) * COLUMN_GAP;
   var SVG_H = PAD_Y * 2 + (TIER_ORDER.length - 1) * TIER_GAP + NODE_H;
   var MIN_ZOOM = 0.7;
+  var NAME_MAX = 22;
   var MAX_ZOOM = 1.3;
 
   var phaseMap = {};
@@ -69,7 +70,12 @@
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
-    if (typeof PHASES === 'undefined' || !Array.isArray(PHASES) || !PREREQS || !validateRoadmapData()) {
+    var phasesLoaded = typeof PHASES !== 'undefined' && Array.isArray(PHASES);
+    if (phasesLoaded && PHASES.length === 0) {
+      showEmptyRoadmap();
+      return;
+    }
+    if (!phasesLoaded || !PREREQS || !validateRoadmapData()) {
       showDataError();
       return;
     }
@@ -295,6 +301,8 @@
       nodeEls[phase.id] = node;
     }
 
+    fitGraphNodeTitles();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitGraphNodeTitles);
     applyZoom(zoom, false);
     setRovingFocus(rovingId, false);
     if (selectedId !== null) applyRouteHighlight(selectedId);
@@ -408,6 +416,9 @@
     stateText.textContent = state.label;
     surface.appendChild(stateText);
 
+    var fullName = svgEl('title');
+    fullName.textContent = phase.name;
+    group.insertBefore(fullName, group.firstChild);
     var lines = splitName(phase.name);
     for (var i = 0; i < lines.length; i++) {
       var title = svgEl('text', {
@@ -416,6 +427,7 @@
         y: lines.length === 1 ? 45 : 38 + i * 16
       });
       title.textContent = lines[i];
+      title.setAttribute('data-title-line', lines[i]);
       surface.appendChild(title);
     }
 
@@ -473,12 +485,47 @@
 
   function splitName(name) {
     var value = String(name || '').toUpperCase();
-    if (value.length <= 22) return [value];
+    if (Array.from(value).length <= NAME_MAX) return [value];
     var midpoint = Math.ceil(value.length / 2);
     var split = value.lastIndexOf(' ', midpoint);
     if (split < 5) split = value.indexOf(' ', midpoint);
-    if (split === -1) return [value.slice(0, 22) + '…'];
-    return [value.slice(0, split), value.slice(split + 1)];
+    if (split < 1 || split > NAME_MAX || value.length - split - 1 > NAME_MAX) split = value.lastIndexOf(' ', NAME_MAX);
+    if (split < 1) return [clipLine(value)];
+    return [value.slice(0, split), clipLine(value.slice(split + 1))];
+  }
+
+  function clipLine(line) {
+    if (Array.from(line).length <= NAME_MAX) return line;
+    var cut = line.lastIndexOf(' ', NAME_MAX - 1);
+    var clipped = cut > 10 ? line.slice(0, cut) : Array.from(line).slice(0, NAME_MAX - 1).join('');
+    return clipped.replace(/[\s,;:&·-]+$/, '') + '…';
+  }
+
+  function fitNodeTitle(label) {
+    var original = label.getAttribute('data-title-line') || label.textContent;
+    label.textContent = original;
+    var characters = Array.from(original.replace(/…$/, ''));
+    var available = NODE_W - 28;
+    function width() {
+      try {
+        var measured = label.getComputedTextLength();
+        if (Number.isFinite(measured) && measured > 0) return measured;
+      } catch (_) {}
+      // The node title is 18px with 0.45px letter spacing; no SVG measurement
+      // means using a conservative full-em bound, not claiming it was measured.
+      return Array.from(label.textContent).length * 18.45;
+    }
+    while (width() > available && characters.length) {
+      characters.pop();
+      label.textContent = characters.join('') + '…';
+    }
+  }
+
+  function fitGraphNodeTitles() {
+    var graph = document.getElementById('roadmapGraph');
+    if (!graph) return;
+    var labels = graph.querySelectorAll('.roadmap-node-title');
+    for (var i = 0; i < labels.length; i++) fitNodeTitle(labels[i]);
   }
 
   function edgePath(fromId, toId) {
@@ -1188,9 +1235,19 @@
     return element;
   }
 
-  function showDataError() {
+  function showGraphMessage(message) {
     var wrap = document.getElementById('roadmapGraphWrap');
-    if (wrap) wrap.innerHTML = '<p>无法加载路线图数据。请重新构建站点并刷新页面。</p>';
+    if (wrap) wrap.innerHTML = '<p class="roadmap-graph-message" dir="auto">' + escapeHtml(message) + '</p>';
+  }
+
+  function showDataError() {
+    showGraphMessage('无法加载路线图数据。请重新构建站点并刷新页面。');
+  }
+
+  function showEmptyRoadmap() {
+    renderHeroStats();
+    setText('roadmapNextPhase', '暂无阶段');
+    showGraphMessage('还没有已发布的阶段。');
   }
 
   function escapeHtml(value) {

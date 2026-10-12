@@ -2031,8 +2031,10 @@ function withCard(html, type, id, spec) {
   return cleaned.replace('</head>', cardTags(cardUrl(type, id, spec), spec).join('\n') + '\n</head>');
 }
 
-function versionNavigationAssets(html) {
-  return html.replace(/(\bsrc=["']\/?(?:app|header|cmdpalette|certifications)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261012b$2');
+function versionSharedAssets(html) {
+  return html.replace(/(\bsrc=["']\/?(?:app|header|cmdpalette|certifications)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261012b$2')
+    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261012e$2')
+    .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261012e$2');
 }
 
 function stampSiteCards(cards) {
@@ -2105,7 +2107,7 @@ function build() {
   const hubs = require('./build-hubs').writeHubs({
     phases, prerequisites: roadmapPrereqs, glossary: glossaryTerms,
     categories: GLOSSARY_CATEGORY_ORDER, lessonManifest: seoManifests.lessonManifest,
-    versionHtml: versionNavigationAssets,
+    versionHtml: versionSharedAssets,
     minutes: Object.fromEntries(phases.flatMap(phase => phase.lessons.map(lesson => {
       const rel = lessonPath(lesson.url);
       return [rel, Number(lesson.time) || lessonMinutes(rel)];
@@ -2181,7 +2183,7 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   stampSiteCards(ogCards.cards);
   for (const file of fs.readdirSync(__dirname).filter(name => name.endsWith('.html'))) {
     const target = path.join(__dirname, file);
-    fs.writeFileSync(target, versionNavigationAssets(fs.readFileSync(target, 'utf8')));
+    fs.writeFileSync(target, versionSharedAssets(fs.readFileSync(target, 'utf8')));
   }
   syncCounts(totalLessons, artifacts.length);
   writeSitemap(phases, glossaryTerms.length, certifications, learningPaths, { projects, manuals, hubs });
