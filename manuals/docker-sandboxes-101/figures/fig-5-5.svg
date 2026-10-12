@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 482" role="img" aria-labelledby="fig-5-5-title fig-5-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-5-title">三次 shell 调用经过批准顺序</title>
+  <desc id="fig-5-5-desc">从上向下是guarded.yaml的shell批准顺序。preempt_yolo的log-hook.sh每次回allow，仅建议。deny shell:cmd=rm*拒绝rm -rf work/m101-nothing；allow shell:cmd=echo*在两模式执行echo。无ask模式。pwd标签safe由安全模式决定：restricted执行并输出目录，strict询问，无终端--exec转为用户拒绝。</desc>
+  <defs><marker id="fig-5-5-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-5-5-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-5-5-head-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-olive-ink, #515f26)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">GUARDED.YAML 的 SHELL，--SAFETY STRICT/RESTRICTED</text>
+  <text x="20" y="36" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">20-STRICT.NDJSON, 20-RESTRICTED.NDJSON</text>
+  <rect x="20" y="50" width="250" height="52" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="145" y="71.1" font-size="12" text-anchor="middle" font-weight="700">preempt_yolo hook</text>
+  <text x="145" y="88.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">log-hook.sh，每次调用</text>
+  <rect x="300" y="50" width="320" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="460" y="63.6" font-size="12" text-anchor="middle" font-weight="700">allow，仅建议</text>
+  <text x="460" y="80.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">pre_tool_use_pre_yolo, allowed: true</text>
+  <text x="460" y="95.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">此处 deny/ask 会结束判断</text>
+  <line x1="270" y1="76" x2="299" y2="76" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-5-head-ink)"/>
+  <line x1="80" y1="102" x2="80" y2="121" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-5-head-ink)"/>
+  <rect class="m-knock" x="85" y="100.92" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="88" y="111.5" font-size="11">继续</text>
+  <rect x="20" y="122" width="250" height="52" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="145" y="143.1" font-size="12" text-anchor="middle" font-weight="700">匹配 deny？</text>
+  <text x="145" y="160.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">shell:cmd=rm*</text>
+  <rect x="300" y="122" width="320" height="52" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="460" y="135.6" font-size="12" text-anchor="middle" font-weight="700">rm -rf work/m101-nothing</text>
+  <text x="460" y="152.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Tool &#39;shell&#39; is denied by</text>
+  <text x="460" y="167.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">permissions configuration.</text>
+  <line x1="270" y1="148" x2="299" y2="148" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-5-head-rose)"/>
+  <line x1="80" y1="174" x2="80" y2="193" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-5-head-ink)"/>
+  <rect class="m-knock" x="85" y="172.92" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="88" y="183.5" font-size="11">no</text>
+  <rect x="20" y="194" width="250" height="52" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="145" y="215.1" font-size="12" text-anchor="middle" font-weight="700">匹配 allow？</text>
+  <text x="145" y="232.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">shell:cmd=echo*</text>
+  <rect x="300" y="194" width="320" height="52" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="460" y="215.1" font-size="12" text-anchor="middle" font-weight="700">执行 echo m101-ok</text>
+  <text x="460" y="232.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两模式结果 m101-ok</text>
+  <line x1="270" y1="220" x2="299" y2="220" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-5-head-olive)"/>
+  <line x1="80" y1="246" x2="80" y2="265" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-5-head-ink)"/>
+  <rect class="m-knock" x="85" y="244.92" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="88" y="255.5" font-size="11">no</text>
+  <rect x="20" y="266" width="250" height="52" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="145" y="287.1" font-size="12" text-anchor="middle" font-weight="700">匹配 ask？</text>
+  <text x="145" y="304.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">guarded.yaml 没有</text>
+  <line x1="80" y1="318" x2="80" y2="337" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-5-head-ink)"/>
+  <rect class="m-knock" x="85" y="316.92" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="88" y="327.5" font-size="11">no</text>
+  <rect x="20" y="338" width="250" height="52" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="145" y="359.1" font-size="12" text-anchor="middle" font-weight="700">按标签应用安全模式</text>
+  <text x="145" y="376.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">pwd 标签 safe</text>
+  <rect x="300" y="338" width="320" height="52" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="460" y="359.1" font-size="12" text-anchor="middle" font-weight="700">restricted：执行 pwd</text>
+  <text x="460" y="376.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">结果 $CAPTURE</text>
+  <line x1="270" y1="364" x2="299" y2="364" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-5-head-olive)"/>
+  <line x1="80" y1="390" x2="80" y2="409" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-5-head-ink)"/>
+  <rect class="m-knock" x="85" y="388.92" width="45.6" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="88" y="399.5" font-size="11">strict</text>
+  <rect x="20" y="410" width="250" height="52" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="145" y="431.1" font-size="12" text-anchor="middle" font-weight="700">strict：询问用户</text>
+  <text x="145" y="448.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先默认 hooks，此处无</text>
+  <rect x="300" y="410" width="320" height="52" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="460" y="431.1" font-size="12" text-anchor="middle" font-weight="700">--exec 下无终端</text>
+  <text x="460" y="448.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">The user rejected the tool call.</text>
+  <line x1="270" y1="436" x2="299" y2="436" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-5-head-rose)"/>
+</svg>

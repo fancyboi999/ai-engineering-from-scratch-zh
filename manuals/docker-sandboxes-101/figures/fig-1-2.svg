@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 412" role="img" aria-labelledby="fig-1-2-title fig-1-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-1-2-title">在沙箱启动 docker-agent 的两种方式</title>
+  <desc id="fig-1-2-desc">两列各一启动路径。左：sbx run docker-agent 在项目目录从 docker/sandbox-templates:docker-agent 创建沙箱，内部启动 run --yolo，只读工作区项目配置并应用 sbx 策略；没有录制。右：宿主 docker-agent run --sandbox agent.yaml 驱动 sbx 使用 docker/docker-agent-sbx-templates:latest；内部报告 version main，文件目录/kit 只读，放行 models.dev 与允许主机；录于 capture/out/27。</desc>
+  <text x="20" y="20" font-size="12" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">A · sbx run docker-agent</text>
+  <text x="336" y="20" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">B · docker-agent run --sandbox</text>
+  <line x1="320" y1="8" x2="320" y2="404" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <rect x="20" y="32" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="162" y="52.1" font-size="12" text-anchor="middle" font-weight="700">输入命令</text>
+  <text x="162" y="69.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sbx run docker-agent ~/my-project</text>
+  <rect x="20" y="94" width="284" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="162" y="114.1" font-size="12" text-anchor="middle" font-weight="700">sbx 创建沙箱</text>
+  <text x="162" y="131.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">docker/sandbox-templates:docker-agent</text>
+  <rect x="20" y="156" width="284" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="162" y="176.1" font-size="12" text-anchor="middle" font-weight="700">内部启动命令</text>
+  <text x="162" y="193.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">docker-agent run --yolo</text>
+  <rect x="20" y="218" width="284" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="162" y="238.1" font-size="12" text-anchor="middle" font-weight="700">agent 文件</text>
+  <text x="162" y="255.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">仅工作区项目配置</text>
+  <rect x="20" y="280" width="284" height="50" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="162" y="300.1" font-size="12" text-anchor="middle" font-weight="700">network</text>
+  <text x="162" y="317.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">沙箱的 sbx 策略</text>
+  <rect x="20" y="342" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
+  <text x="162" y="362.1" font-size="12" text-anchor="middle" font-weight="700">本手册</text>
+  <text x="162" y="379.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">仅文档，未录制</text>
+  <rect x="336" y="32" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="52.1" font-size="12" text-anchor="middle" font-weight="700">输入命令</text>
+  <text x="478" y="69.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">docker-agent run --sandbox agent.yaml</text>
+  <rect x="336" y="94" width="284" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="478" y="114.1" font-size="12" text-anchor="middle" font-weight="700">docker-agent 驱动 sbx</text>
+  <text x="478" y="131.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">docker/docker-agent-sbx-templates:latest</text>
+  <rect x="336" y="156" width="284" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="478" y="176.1" font-size="12" text-anchor="middle" font-weight="700">内部 agent 程序</text>
+  <text x="478" y="193.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">docker-agent version main</text>
+  <rect x="336" y="218" width="284" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="478" y="238.1" font-size="12" text-anchor="middle" font-weight="700">agent 文件</text>
+  <text x="478" y="255.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">文件目录与 kit 均 ro</text>
+  <rect x="336" y="280" width="284" height="50" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="478" y="300.1" font-size="12" text-anchor="middle" font-weight="700">network</text>
+  <text x="478" y="317.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sbx 策略加 models.dev 与允许主机</text>
+  <rect x="336" y="342" width="284" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="478" y="362.1" font-size="12" text-anchor="middle" font-weight="700">本手册</text>
+  <text x="478" y="379.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">capture/out/27-*</text>
+</svg>
