@@ -9,7 +9,7 @@ const { once } = require('node:events');
 async function main() {
   const output = path.resolve(process.argv[2] || path.join(__dirname, '../.vercel/output'));
   const functions = path.join(output, 'functions');
-  const names = ['api/v1/catalog', 'api/v1/resource', 'api/mcp', 'api/markdown', 'api/v1/markdown'];
+  const names = ['api/v1/catalog', 'api/v1/resource', 'api/mcp', 'api/markdown', 'api/v1/markdown', 'api/lesson', 'api/certification'];
   const handlers = {};
   const hashes = [];
   for (const name of names) {
@@ -21,6 +21,10 @@ async function main() {
     handlers['/' + name] = require(filename);
     if (name.includes('markdown')) {
       for (const page of ['index', 'developer', 'glossary', 'prereqs']) assert.ok(fs.statSync(path.join(directory, 'site/agent-pages', page + '.md')).size > 200);
+    } else if (name === 'api/lesson' || name === 'api/certification') {
+      const page = name.split('/')[1];
+      assert.ok(fs.statSync(path.join(directory, 'site', page + '.html')).size > 200);
+      assert.ok(fs.statSync(path.join(directory, 'site', page + '-seo.json')).size > 200);
     } else {
       const content = fs.readFileSync(path.join(directory, 'generated/agent-content.json'));
       assert.ok(JSON.parse(content).length >= 595);
@@ -55,7 +59,13 @@ async function main() {
     });
     assert.equal(mcp.status, 200);
     assert.equal((await mcp.json()).result.structuredContent.items.length, 1);
-    console.log('standalone function bundles: 5/5 passed; snapshots, Markdown, REST and MCP loaded from compiled artifacts');
+    const lesson = await fetch(base + '/api/lesson?path=' + encodeURIComponent('phases/00-setup-and-tooling/01-dev-environment'));
+    assert.equal(lesson.status, 200); assert.match(await lesson.text(), /https:\/\/aieng-zh\.cn\/lessons\//);
+    const certManifest = JSON.parse(fs.readFileSync(path.join(functions, 'api/certification.func/site/certification-seo.json'), 'utf8'));
+    const track = Object.keys(certManifest.tracks)[0];
+    const certification = await fetch(base + '/api/certification?id=' + encodeURIComponent(track));
+    assert.equal(certification.status, 200); assert.match(await certification.text(), /https:\/\/aieng-zh\.cn\/certification/);
+    console.log('standalone function bundles: 7/7 passed; snapshots, Markdown, REST, MCP and existing readers loaded from compiled artifacts');
   } finally {
     server.closeAllConnections(); server.close();
   }
