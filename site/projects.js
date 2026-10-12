@@ -184,7 +184,7 @@
       if (index % 2) return part;
       return part.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (match, label, href) {
         if (/^(?:https?:|mailto:|#)/.test(href)) return match;
-        var parts = (baseDir + '/' + href).split('/');
+        var parts = (href.indexOf('phases/') === 0 ? href : baseDir + '/' + href).split('/');
         var normalized = [];
         parts.forEach(function (part) {
           if (part === '..') normalized.pop();

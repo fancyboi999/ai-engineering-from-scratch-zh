@@ -84,3 +84,11 @@ test('projects.js delegates all Markdown rendering to MDRender and resolves sour
   assert.match(result.html, /\.\.\/raw/);
   assert.ok(!fs.readFileSync(path.join(__dirname, 'projects.js'), 'utf8').includes('function inline('));
 });
+
+test('project Markdown keeps root-relative course links on the Chinese lesson route', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'projects.js'), 'utf8');
+  const renderSource = source.slice(source.indexOf('  function renderMarkdown('), source.indexOf('  function sourceBadge('));
+  const context = { window: { MDRender }, repoFileUrl: value => 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/' + value };
+  vm.runInNewContext(renderSource + '\nresult = renderMarkdown("[agent 循环](phases/14-agent-engineering/01-the-agent-loop/)", "projects/test/stages/01/docs");', context);
+  assert.match(context.result.html, /href="lesson\.html\?path=phases\/14-agent-engineering\/01-the-agent-loop"/);
+});
