@@ -99,6 +99,51 @@ class A2AStaticContractTests(unittest.TestCase):
                             self.assertIn(piece.strip(), source_text, (path, source))
         self.assertEqual(total, 42)
 
+    def test_http_json_body_labels_and_cjk_piece_spacing(self):
+        svg = ET.parse(ROOT / "figures/fig-two-json-bindings.svg").getroot()
+        texts = list(svg.iter("{http://www.w3.org/2000/svg}text"))
+        bodies = [node for node in texts if (node.text or "").strip() in ("请求体：", "响应体：")]
+        self.assertEqual(len(bodies), 3)
+        for label, expected in zip(bodies, ("SendMessageRequest", "SendMessageResponse", "Task")):
+            value = texts[texts.index(label) + 1]
+            self.assertEqual(value.text, expected)
+            self.assertEqual(label.text.strip(), "请求体：" if expected == "SendMessageRequest" else "响应体：")
+            self.assertEqual(label.get("y"), value.get("y"))
+            # 四个全角字形各占一个 em，类型文本必须位于标签之后。
+            label_end = float(label.get("x")) + 4 * float(label.get("font-size"))
+            self.assertGreater(float(value.get("x")), label_end)
+
+    def test_task_store_header_and_lifeline_geometry(self):
+        svg = ET.parse(ROOT / "figures/fig-reading-a-sequence.svg").getroot()
+        ns = "{http://www.w3.org/2000/svg}"
+        header = next(node for node in svg.iter(ns + "rect") if node.get("x") == "366" and node.get("y") == "8")
+        bottom = float(header.get("y")) + float(header.get("height"))
+        labels = [node for node in svg.iter(ns + "text") if node.get("x") == "416" and float(node.get("y")) < bottom]
+        self.assertEqual([node.text for node in labels], ["任务存储", "test-runner", "内部"])
+        for node in labels:
+            self.assertGreater(float(node.get("y")), float(header.get("y")))
+            self.assertLess(float(node.get("y")) + float(node.get("font-size")) * 0.24, bottom)
+        lifeline = next(node for node in svg.iter(ns + "line") if node.get("x1") == node.get("x2") == "416")
+        self.assertEqual(float(lifeline.get("y1")), bottom)
+        self.assertEqual(lifeline.get("y2"), "432")
+
+    def test_registry_label_knockout_covers_cjk_width(self):
+        svg = ET.parse(ROOT / "figures/fig-finding-an-agent.svg").getroot()
+        ns = "{http://www.w3.org/2000/svg}"
+        nodes = list(svg.iter())
+        label = next(node for node in nodes if node.tag == ns + "text" and node.text == "或查询注册中心")
+        mask = nodes[nodes.index(label) - 1]
+        self.assertEqual(mask.tag, ns + "rect")
+        self.assertEqual(mask.get("class"), "m-knock")
+        half_width = len(label.text) * float(label.get("font-size")) / 2
+        center = float(label.get("x"))
+        self.assertLess(float(mask.get("x")), center - half_width)
+        self.assertGreater(float(mask.get("x")) + float(mask.get("width")), center + half_width)
+        # 同一 mask 覆盖路由 y=123，保留原路径，不让线穿过文字。
+        self.assertLess(float(mask.get("y")), 123)
+        self.assertGreater(float(mask.get("y")) + float(mask.get("height")), 123)
+        self.assertTrue(any(node.get("d") == "M200 123 H430 V72 H459" for node in svg.iter(ns + "path")))
+
     def test_frozen_evidence_bytes(self):
         digest = hashlib.sha256()
         paths = sorted(

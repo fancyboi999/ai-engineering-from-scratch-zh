@@ -15,9 +15,9 @@
   <text x="450" y="78.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">959 字节，从 capabilities 到 version</text>
   <line x1="190" y1="59" x2="279" y2="59" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-card-signature-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M190 59 L279 59" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="221.6" y="42.42" width="25.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="215" y="42.42" width="39" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="234.5" y="53" font-size="11" text-anchor="middle">规范化</text>
-  <rect class="m-knock" x="207.74" y="63.42" width="53.52" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="200.15" y="63.42" width="68.7" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="234.5" y="74" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">规则 1 至 3</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
@@ -62,7 +62,7 @@
   <text x="302" y="348" font-size="11">&quot;yPk834ji&quot;</text>
   <line x1="230" y1="335" x2="289" y2="335" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-card-signature-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M230 335 L289 335" keyPoints="0;0;1;1" keyTimes="0;0.692;0.904;1" calcMode="linear" dur="2.6s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.692;0.723;0.904;1" dur="2.6s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="249.9" y="318.42" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="245.5" y="318.42" width="28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="259.5" y="329" font-size="11" text-anchor="middle">重建</text>
   </g>
   <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
@@ -71,7 +71,7 @@
   <text x="565" y="347.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">步骤 5</text>
   <line x1="450" y1="335" x2="509" y2="335" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-card-signature-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M450 335 L509 335" keyPoints="0;0;1;1" keyTimes="0;0.75;0.922;1" calcMode="linear" dur="3.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.75;0.775;0.922;1" dur="3.2s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="469.9" y="318.42" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="465.5" y="318.42" width="28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="479.5" y="329" font-size="11" text-anchor="middle">匹配</text>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
@@ -85,7 +85,7 @@
   <text x="302" y="431" font-size="11">另一个值</text>
   <line x1="230" y1="409" x2="289" y2="409" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-card-signature-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M230 409 L289 409" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="249.9" y="392.42" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="245.5" y="392.42" width="28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="259.5" y="403" font-size="11" text-anchor="middle">重建</text>
   </g>
   <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
@@ -94,7 +94,7 @@
   <text x="565" y="421.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">步骤 6</text>
   <line x1="450" y1="409" x2="509" y2="409" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-card-signature-head-rose)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-rose-ink, #b0344d)" opacity="0"><animateMotion path="M450 409 L509 409" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="469.9" y="392.42" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="465.5" y="392.42" width="28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="479.5" y="403" font-size="11" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">不同</text>
   </g>
 </svg>

@@ -21,7 +21,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M100 84 L349 84" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="184.05" y="67.03" width="81.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="225" y="78" font-size="11.5" text-anchor="middle">SendMessage</text>
-  <rect class="m-knock" x="138.84" y="88.42" width="172.32" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="131.25" y="88.42" width="187.5" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="225" y="99" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">text 与 refunds.diff，无 taskId</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
@@ -31,7 +31,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-amber-ink, #85590c)" opacity="0"><animateMotion path="M350 128 L555 128" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="363.75" y="111.03" width="178.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="122" font-size="11.5" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">TASK_STATE_INPUT_REQUIRED</text>
-  <rect class="m-knock" x="420.3" y="132.42" width="65.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="395" y="132.42" width="116" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="143" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">询问：哪个基准分支？</text>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
@@ -39,9 +39,9 @@
   <text x="24" y="176" font-size="11" text-anchor="middle">3</text>
   <line x1="350" y1="172" x2="101" y2="172" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-input-required-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M350 172 L101 172" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="118.5" y="155.03" width="213" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="116.2" y="155.03" width="217.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="225" y="166" font-size="11.5" text-anchor="middle">task，TASK_STATE_INPUT_REQUIRED</text>
-  <rect class="m-knock" x="198.24" y="176.42" width="53.52" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="178" y="176.42" width="94" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="225" y="187" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">阻塞调用在此返回</text>
   </g>
   <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
@@ -59,9 +59,9 @@
   <text x="24" y="264" font-size="11" text-anchor="middle">5</text>
   <line x1="350" y1="260" x2="555" y2="260" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-input-required-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M350 260 L555 260" keyPoints="0;0;1;1" keyTimes="0;0.75;0.922;1" calcMode="linear" dur="3.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.75;0.775;0.922;1" dur="3.2s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="398.25" y="243.03" width="109.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="389.05" y="243.03" width="127.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="254" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">history：问题、main</text>
-  <rect class="m-knock" x="426.24" y="264.42" width="53.52" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="406" y="264.42" width="94" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="275" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">问题离开当前状态</text>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
@@ -79,9 +79,9 @@
   <text x="24" y="352" font-size="11" text-anchor="middle">7</text>
   <line x1="350" y1="348" x2="555" y2="348" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-input-required-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M350 348 L555 348" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="401.7" y="331.03" width="102.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="397.1" y="331.03" width="111.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="342" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">产物 review.json</text>
-  <rect class="m-knock" x="372.78" y="352.42" width="160.44" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="360.13" y="352.42" width="185.74" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="363" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个 text part 和一个 data part</text>
   </g>
   <g data-beat="8"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/>
@@ -91,7 +91,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-amber-ink, #85590c)" opacity="0"><animateMotion path="M350 392 L555 392" keyPoints="0;0;1;1" keyTimes="0;0.84;0.95;1" calcMode="linear" dur="5s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.84;0.856;0.95;1" dur="5s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="381" y="375.03" width="144" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="386" font-size="11.5" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">TASK_STATE_COMPLETED</text>
-  <rect class="m-knock" x="405.45" y="396.42" width="95.1" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="392.8" y="396.42" width="120.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="453" y="407" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">状态消息：2 findings</text>
   </g>
   <g data-beat="9"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.914;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.914;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.25s" begin="indefinite" fill="freeze"/>
@@ -99,9 +99,9 @@
   <text x="24" y="440" font-size="11" text-anchor="middle">9</text>
   <line x1="350" y1="436" x2="101" y2="436" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-input-required-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M350 436 L101 436" keyPoints="0;0;1;1" keyTimes="0;0.857;0.955;1" calcMode="linear" dur="5.6s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.857;0.871;0.955;1" dur="5.6s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="135.75" y="419.03" width="178.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="133.45" y="419.03" width="183.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="225" y="430" font-size="11.5" text-anchor="middle">task，TASK_STATE_COMPLETED</text>
-  <rect class="m-knock" x="168.54" y="440.42" width="112.92" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="150.83" y="440.42" width="148.34" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="225" y="451" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">review.json，四条历史消息</text>
   </g>
 </svg>

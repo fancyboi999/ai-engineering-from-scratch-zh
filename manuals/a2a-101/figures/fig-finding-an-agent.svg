@@ -32,7 +32,7 @@
   <text x="110" y="118.1" font-size="12" text-anchor="middle" font-weight="700">注册中心或目录</text>
   <text x="110" y="135.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">无标准查询 API</text>
   <path d="M200 123 H430 V72 H459" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-finding-an-agent-head-grey)"/>
-  <rect class="m-knock" x="291.21" y="116.42" width="47.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="273.5" y="116.42" width="83" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="315" y="127" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或查询注册中心</text>
   </g>
   <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>

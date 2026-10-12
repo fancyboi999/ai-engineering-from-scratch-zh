@@ -5,7 +5,7 @@ const { figure } = require('../../../_shared/figkit.js');
 const lanes = [
   { x: 70, w: 96, hue: 'violet', title: 'planner', sub: "客户端 agent" },
   { x: 250, w: 112, hue: 'blue', title: 'test-runner', sub: "远程 agent" },
-  { x: 416, w: 100, hue: 'teal', title: "任务存储", sub: "test-runner 内部", pad: 8 },
+  { x: 416, w: 100, h: 56, hue: 'teal', title: "任务存储", sub: ['test-runner', '内部'], pad: 8 },
   { x: 514, w: 84, hue: 'indigo', title: 'webhook', sub: '/a2a-events', pad: 8 },
   { x: 600, w: 72, hue: 'grey', title: '操作员', sub: "人", pad: 7 },
 ];
@@ -27,8 +27,9 @@ module.exports = figure('fig-reading-a-sequence', {
   desc: "五条生命线：planner、test-runner、test-runner 的任务存储、/a2a-events 的 webhook 接收器、操作员。八个编号行各展示一种箭头样式：SendMessage 为墨色实线调用，任务保存为青色实线写入，TASK_STATE_WORKING 为琥珀色虚线状态变化，statusUpdate 流帧和推送 POST 为靛蓝色点线事件，planner 向操作员请求批准为 A2A 之外的橄榄色虚线效果，TaskNotFoundError 为玫红色虚线失败，SendMessage 结果为墨色虚线回复。",
 }, f => {
   for (const lane of lanes) {
-    f.box({ x: lane.x, y: 8, w: lane.w, h: 40, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 12, anchor: 'middle', pad: lane.pad });
-    f.lifeline(lane.x, 48, 432);
+    const height = lane.h || 40;
+    f.box({ x: lane.x, y: 8, w: lane.w, h: height, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 12, anchor: 'middle', pad: lane.pad });
+    f.lifeline(lane.x, 8 + height, 432);
   }
   rows.forEach(([from, to, style, label, note, labelX], index) => {
     const y = 84 + index * 46;

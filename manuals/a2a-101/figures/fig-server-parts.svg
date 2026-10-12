@@ -68,7 +68,7 @@
   <text x="170" y="485.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agent 逻辑，独立线程</text>
   <line x1="170" y1="426" x2="170" y2="449" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-server-parts-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M170 426 L170 449" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="175" y="426.53" width="54.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="175" y="426.53" width="86.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="178" y="437.5" font-size="11.5">每请求一个线程</text>
   </g>
   <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
@@ -77,11 +77,11 @@
   <text x="170" y="555.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先记录，再发给各订阅者</text>
   <line x1="170" y1="496" x2="170" y2="519" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-server-parts-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M170 496 L170 519" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="175" y="496.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="175" y="496.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="178" y="507.5" font-size="11.5">生成事件</text>
   <path d="M320 543 H335 V413 H349" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-server-parts-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M320 543 H335 V413 H349" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="343" y="526.42" width="29.76" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="343" y="526.42" width="50" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="346" y="537" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">写入任务</text>
   </g>
   <g data-beat="8"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/>
@@ -93,11 +93,11 @@
   <text x="485" y="625.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">POST 到各 webhook URL</text>
   <line x1="170" y1="566" x2="170" y2="589" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round" marker-end="url(#fig-server-parts-head-indigo)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M170 566 L170 589" keyPoints="0;0;1;1" keyTimes="0;0.84;0.95;1" calcMode="linear" dur="5s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.84;0.856;0.95;1" dur="5s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="175" y="566.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="175" y="566.53" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="178" y="577.5" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">每个事件</text>
   <path d="M270 566 V578 H485 V589" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fig-server-parts-head-indigo)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M270 566 V578 H485 V589" keyPoints="0;0;1;1" keyTimes="0;0.84;0.95;1" calcMode="linear" dur="5s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.84;0.856;0.95;1" dur="5s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="382" y="563.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="382" y="563.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="385" y="574" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">每个事件</text>
   </g>
 </svg>

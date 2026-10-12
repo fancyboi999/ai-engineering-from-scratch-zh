@@ -26,7 +26,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M110 152 L399 152" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="183" y="135.03" width="144" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="255" y="146" font-size="11.5" text-anchor="middle">SendStreamingMessage</text>
-  <rect class="m-knock" x="171.81" y="156.42" width="166.38" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="166.75" y="156.42" width="176.5" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="255" y="167" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">messageId 5bc8fbbc，无 taskId</text>
   <line x1="400" y1="198" x2="111" y2="198" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-one-streamed-task-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M400 198 L111 198" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
@@ -40,7 +40,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M400 232 L111 232" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="158.85" y="215.03" width="192.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="255" y="226" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">task · TASK_STATE_SUBMITTED</text>
-  <rect class="m-knock" x="180.72" y="236.42" width="148.56" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="163.01" y="236.42" width="183.98" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="255" y="247" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务 728ba084，history 保存请求</text>
   <text x="488" y="236" font-size="11" fill="var(--m-amber-ink, #85590c)">09:00:01.750Z</text>
   </g>
@@ -62,7 +62,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M400 324 L111 324" keyPoints="0;0;1;1" keyTimes="0;0.75;0.922;1" calcMode="linear" dur="3.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.75;0.775;0.922;1" dur="3.2s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="151.95" y="307.03" width="206.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="255" y="318" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">artifactUpdate · test-log.txt</text>
-  <rect class="m-knock" x="189.63" y="328.42" width="130.74" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="182.04" y="328.42" width="145.92" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="255" y="339" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首块：collected 12 items</text>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>

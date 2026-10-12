@@ -21,7 +21,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M90 86 L319 86" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="164.05" y="69.03" width="81.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="80" font-size="11.5" text-anchor="middle">SendMessage</text>
-  <rect class="m-knock" x="118.84" y="90.42" width="172.32" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="111.25" y="90.42" width="187.5" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="101" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">returnImmediately、webhook 配置</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
@@ -29,9 +29,9 @@
   <text x="24" y="130" font-size="11" text-anchor="middle">2</text>
   <line x1="320" y1="126" x2="91" y2="126" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-push-webhook-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M320 126 L91 126" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="129.55" y="109.03" width="150.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="124.95" y="109.03" width="160.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="120" font-size="11.5" text-anchor="middle">任务 d7d3dceb SUBMITTED</text>
-  <rect class="m-knock" x="184.18" y="130.42" width="41.64" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="169" y="130.42" width="72" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="141" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">调用立即返回</text>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
@@ -49,9 +49,9 @@
   <text x="24" y="210" font-size="11" text-anchor="middle">4</text>
   <line x1="320" y1="206" x2="559" y2="206" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round" marker-end="url(#fig-push-webhook-head-indigo)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M320 206 L559 206" keyPoints="0;0;1;1" keyTimes="0;0.692;0.904;1" calcMode="linear" dur="2.6s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.692;0.723;0.904;1" dur="2.6s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="350.75" y="189.03" width="178.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="348.45" y="189.03" width="183.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="440" y="200" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">5 次 POST · artifactUpdate</text>
-  <rect class="m-knock" x="383.54" y="210.42" width="112.92" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="370.89" y="210.42" width="138.22" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="440" y="221" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">test-log.txt 的五个分块</text>
   </g>
   <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
@@ -61,7 +61,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M320 246 L559 246" keyPoints="0;0;1;1" keyTimes="0;0.75;0.922;1" calcMode="linear" dur="3.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.75;0.775;0.922;1" dur="3.2s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="371.45" y="229.03" width="137.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="440" y="240" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">POST artifactUpdate</text>
-  <rect class="m-knock" x="362.75" y="250.42" width="154.5" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="355.16" y="250.42" width="169.68" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="440" y="261" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">summary.json，一个 data part</text>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
@@ -81,7 +81,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M560 326 L321 326" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="388.7" y="309.03" width="102.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="440" y="320" font-size="11.5" text-anchor="middle">204 No Content</text>
-  <rect class="m-knock" x="404.33" y="330.42" width="71.34" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="391.68" y="330.42" width="96.64" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="440" y="341" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次 POST 的回答</text>
   </g>
   <g data-beat="8"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/>
@@ -91,15 +91,15 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M90 366 L319 366" keyPoints="0;0;1;1" keyTimes="0;0.84;0.95;1" calcMode="linear" dur="5s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.84;0.856;0.95;1" dur="5s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="95.05" y="349.03" width="219.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="360" font-size="11.5" text-anchor="middle">ListTaskPushNotificationConfigs</text>
-  <rect class="m-knock" x="181.21" y="370.42" width="47.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="163.5" y="370.42" width="83" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="381" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务结束后发送</text>
   <circle cx="24" cy="406" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="24" y="410" font-size="11" text-anchor="middle">9</text>
   <line x1="320" y1="406" x2="91" y2="406" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-push-webhook-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M320 406 L91 406" keyPoints="0;0;1;1" keyTimes="0;0.84;0.95;1" calcMode="linear" dur="5s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.84;0.856;0.95;1" dur="5s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="146.8" y="389.03" width="116.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="135.3" y="389.03" width="139.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="400" font-size="11.5" text-anchor="middle">一个配置，id 92c697ef</text>
-  <rect class="m-knock" x="175.27" y="410.42" width="59.46" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="160.09" y="410.42" width="89.82" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="421" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器分配的 ID</text>
   </g>
   <g data-beat="9"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.914;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.914;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.25s" begin="indefinite" fill="freeze"/>
@@ -109,13 +109,13 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M90 446 L319 446" keyPoints="0;0;1;1" keyTimes="0;0.857;0.955;1" calcMode="linear" dur="5.6s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.857;0.871;0.955;1" dur="5.6s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="101.95" y="429.03" width="206.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="440" font-size="11.5" text-anchor="middle">GetTaskPushNotificationConfig</text>
-  <rect class="m-knock" x="169.33" y="450.42" width="71.34" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="166.8" y="450.42" width="76.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="461" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">taskId 和 id</text>
   <circle cx="24" cy="486" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="24" y="490" font-size="11" text-anchor="middle">11</text>
   <line x1="320" y1="486" x2="91" y2="486" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-push-webhook-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M320 486 L91 486" keyPoints="0;0;1;1" keyTimes="0;0.857;0.955;1" calcMode="linear" dur="5.6s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.857;0.871;0.955;1" dur="5.6s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="188.2" y="469.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="179" y="469.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="480" font-size="11.5" text-anchor="middle">相同配置</text>
   </g>
   <g data-beat="10"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.923;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.923;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="5.85s" begin="indefinite" fill="freeze"/>
@@ -131,7 +131,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M320 566 L91 566" keyPoints="0;0;1;1" keyTimes="0;0.871;0.96;1" calcMode="linear" dur="6.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.871;0.884;0.96;1" dur="6.2s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="167.5" y="549.03" width="75" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="560" font-size="11.5" text-anchor="middle">result: {}</text>
-  <rect class="m-knock" x="169.33" y="570.42" width="71.34" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <rect class="m-knock" x="154.15" y="570.42" width="101.7" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="205" y="581" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">此配置不再有 POST</text>
   </g>
 </svg>

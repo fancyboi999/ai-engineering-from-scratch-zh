@@ -30,7 +30,7 @@ const ROWS = [
   {
     rpc: 'rpc SendMessage(SendMessageRequest) returns (SendMessageResponse)',
     left: [code('POST /a2a/jsonrpc'), code('Content-Type: application/json'), code('"jsonrpc": "2.0", "id": 1,'), bold('"method": "SendMessage",'), typed('"params": ', 'SendMessageRequest')],
-    right: [bold('POST /a2a/rest/message:send'), code('Content-Type: application/a2a+json'), typed("响应体： ", 'SendMessageRequest')],
+    right: [bold('POST /a2a/rest/message:send'), code('Content-Type: application/a2a+json'), typed("请求体： ", 'SendMessageRequest')],
     leftReply: [code('HTTP/1.1 200 OK'), code('"jsonrpc": "2.0", "id": 1,'), typed('"result": ', 'SendMessageResponse')],
     rightReply: [code('HTTP/1.1 200 OK'), code('Content-Type: application/a2a+json'), typed("响应体： ", 'SendMessageResponse')],
   },
