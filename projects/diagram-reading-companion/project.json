@@ -1,0 +1,103 @@
+{
+  "id": "diagram-reading-companion",
+  "title": "图表阅读助手",
+  "tagline": "为图表提供可检查的阅读顺序与说明。",
+  "summary": "帮助教育者把编写好的 SVG 图表和显式节点边清单变成可用键盘导航的说明。检查被引用节点是否存在，展示分支与环，让作者审核阅读顺序，并导出无障碍 HTML 导览和图 JSON。",
+  "level": 2,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [
+    "glossary-hovercard-publisher"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "可导航的 HTML 图表导览，以及经过审核的图清单",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "带类型的本地转换和可移植浏览器界面用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-diagram-reading-companion-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-load-diagram",
+      "title": "加载 SVG 并校验声明的节点和边",
+      "summary": "loadDiagram(svg: string, value: unknown): {svg:string;graph:Graph}",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-diagram-reading-companion-1",
+      "concepts": [
+        "加载 SVG 并校验声明的节点和边"
+      ]
+    },
+    {
+      "id": "02-analyze-graph",
+      "title": "计算分支、环和候选阅读顺序",
+      "summary": "analyzeGraph(graph: Graph): Analysis",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-diagram-reading-companion-2",
+      "concepts": [
+        "计算分支、环和候选阅读顺序"
+      ]
+    },
+    {
+      "id": "03-review-explanations",
+      "title": "审核说明和阅读顺序",
+      "summary": "reviewGraph(graph: Graph, value?: unknown): {schemaVersion:1;graph:Graph;order:string[];reviewed:boolean}",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-diagram-reading-companion-3",
+      "concepts": [
+        "审核说明和阅读顺序"
+      ]
+    },
+    {
+      "id": "04-export-walkthrough",
+      "title": "导出可导航导览和图数据",
+      "summary": "renderWalkthrough(svg:string, review:ReturnType<typeof reviewGraph>):string",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-diagram-reading-companion-4",
+      "concepts": [
+        "导出可导航导览和图数据"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制的生成本地界面交互。按文档命令运行，检查你自己的输出。"
+    }
+  ]
+}

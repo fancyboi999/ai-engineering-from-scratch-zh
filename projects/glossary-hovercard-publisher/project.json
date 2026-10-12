@@ -1,0 +1,101 @@
+{
+  "id": "glossary-hovercard-publisher",
+  "title": "术语悬浮卡发布器",
+  "tagline": "在读者正在阅读的页面中解释陌生术语。",
+  "summary": "帮助教育者使用经过审核的术语表和最长短语匹配，为现有课程 HTML 添加上下文定义。保留代码与链接，支持键盘可访问的定义，并导出独立注解课程和可复用术语文件。",
+  "level": 1,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "带注解的 HTML 课程、glossary.json 和术语覆盖报告",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "带类型的本地转换和可移植浏览器界面用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-glossary-hovercard-publisher-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-validate-glossary",
+      "title": "校验术语、别名和原创定义",
+      "summary": "validateGlossary(value: unknown): Term[]",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-glossary-hovercard-publisher-1",
+      "concepts": [
+        "校验术语、别名和原创定义"
+      ]
+    },
+    {
+      "id": "02-match-text",
+      "title": "在合格文本节点中匹配短语",
+      "summary": "matchTerms(text: string, terms: Term[]): Match[]",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-glossary-hovercard-publisher-2",
+      "concepts": [
+        "在合格文本节点中匹配短语"
+      ]
+    },
+    {
+      "id": "03-accessible-definitions",
+      "title": "在上下文中渲染无障碍定义",
+      "summary": "annotateLesson(html: string, terms: Term[]): {html: string; coverage: Coverage[]}",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-glossary-hovercard-publisher-3",
+      "concepts": [
+        "在上下文中渲染无障碍定义"
+      ]
+    },
+    {
+      "id": "04-publish-bundle",
+      "title": "导出课程和可复用术语包",
+      "summary": "publishGlossary(lesson: string, terms: Term[]): {html: string; glossary: Term[]; coverage: Coverage[]}",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-glossary-hovercard-publisher-4",
+      "concepts": [
+        "导出课程和可复用术语包"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制的生成本地界面交互。按文档命令运行，检查你自己的输出。"
+    }
+  ]
+}

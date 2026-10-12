@@ -1,0 +1,103 @@
+{
+  "id": "api-tutorial-runner",
+  "title": "API 教程运行器",
+  "tagline": "检查 API 教程从第一个请求到最终结果是否仍能运行。",
+  "summary": "帮助文档作者验证一连串 HTTP 示例。解析显式请求块，只替换先前响应中已声明的变量，并针对本地 fixture 或明确选择的测试端点运行。生成关联源文档的报告，暴露过时示例，让助手提出需审核的修正建议。",
+  "level": 2,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [
+    "json-schema-output-guard"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "可重放请求清单、JUnit 结果和带注解的教程 HTML",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "带类型的本地转换和可移植浏览器界面用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-api-tutorial-runner-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-extract-requests",
+      "title": "从编写好的教程提取显式请求",
+      "summary": "extractRequests(markdown:string):RequestStep[]",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-api-tutorial-runner-1",
+      "concepts": [
+        "从编写好的教程提取显式请求"
+      ]
+    },
+    {
+      "id": "02-typed-variables",
+      "title": "跨步骤解析带类型的变量",
+      "summary": "resolveValue(value:unknown,variables:Record<string,string|number|boolean>):unknown; captureVariables(body,declarations,previous?):Record<string,string|number|boolean>",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-api-tutorial-runner-2",
+      "concepts": [
+        "跨步骤解析带类型的变量"
+      ]
+    },
+    {
+      "id": "03-bounded-http",
+      "title": "针对测试服务运行有界请求",
+      "summary": "runTutorial(steps:RequestStep[],baseURL:string,options?):Promise<Receipt[]>",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-api-tutorial-runner-3",
+      "concepts": [
+        "针对测试服务运行有界请求"
+      ]
+    },
+    {
+      "id": "04-source-linked-report",
+      "title": "导出关联源文档的失败与修正建议",
+      "summary": "exportResults(steps,receipts):{junit,html,corrections}; acceptedCorrections(receipts,value):{id,line,proposal}[]",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-api-tutorial-runner-4",
+      "concepts": [
+        "导出关联源文档的失败与修正建议"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制的生成本地界面交互。按文档命令运行，检查你自己的输出。"
+    }
+  ]
+}

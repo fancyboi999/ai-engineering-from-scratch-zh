@@ -1,0 +1,101 @@
+{
+  "id": "bookmark-path-organizer",
+  "title": "书签阅读路径整理器",
+  "tagline": "从保存的链接中整理出有用的阅读路径。",
+  "summary": "帮助读者从导出的杂乱书签中整理出有用的集合。保守地归一化 URL、合并完全重复项，根据保存的标题和笔记为用户定义的主题评分，并将可编辑阅读路径导出为 HTML 和 JSON。",
+  "level": 1,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "独立阅读路径页面，以及保留原始 URL 的 bookmarks.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "带类型的本地转换和可移植浏览器界面用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-bookmark-path-organizer-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-import-hierarchy",
+      "title": "按原始层级导入书签",
+      "summary": "importBookmarks(input: unknown): Bookmark[]",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-bookmark-path-organizer-1",
+      "concepts": [
+        "按原始层级导入书签"
+      ]
+    },
+    {
+      "id": "02-explain-duplicates",
+      "title": "归一化链接并解释重复分组",
+      "summary": "normalizeURL(value: string): string; groupDuplicates(items: Bookmark[]): Group[]",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-bookmark-path-organizer-2",
+      "concepts": [
+        "归一化链接并解释重复分组"
+      ]
+    },
+    {
+      "id": "03-rank-reading-path",
+      "title": "为主题排序并组装阅读路径",
+      "summary": "readingPath(groups: Group[], topics: Record<string,string[]>): Reading[]",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-bookmark-path-organizer-3",
+      "concepts": [
+        "为主题排序并组装阅读路径"
+      ]
+    },
+    {
+      "id": "04-export-progress",
+      "title": "导出可编辑集合和进度文件",
+      "summary": "applyProgress(items: Reading[], value?: unknown): {items: Reading[]; progress: Progress}; renderCollection(items: Reading[], progress: Progress): string",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-bookmark-path-organizer-4",
+      "concepts": [
+        "导出可编辑集合和进度文件"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制的生成本地界面交互。按文档命令运行，检查你自己的输出。"
+    }
+  ]
+}

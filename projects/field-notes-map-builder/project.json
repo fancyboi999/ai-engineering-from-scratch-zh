@@ -1,0 +1,103 @@
+{
+  "id": "field-notes-map-builder",
+  "title": "实地笔记地图构建器",
+  "tagline": "把带位置标签的观测转成其他工具可用的地图。",
+  "summary": "帮助社区制图小组探索包含坐标、笔记和可选照片的观测。校验位置，用明确距离规则为附近记录分组，审核时保留原始观测，并导出 GeoJSON、独立地图和观测表。",
+  "level": 2,
+  "languages": [
+    "TypeScript"
+  ],
+  "source": "core",
+  "prerequisiteProjects": [
+    "csv-repair-workbench"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "youWillBuild": "GeoJSON FeatureCollection、独立 HTML 地图和经过审核的观测分组",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "languageWhy": {
+    "TypeScript": "带类型的本地转换和可移植浏览器界面用 Node 标准库运行。"
+  },
+  "figures": true,
+  "overviewFigure": "pj-field-notes-map-builder-1",
+  "demo": {
+    "command": [
+      "node",
+      "cli.ts",
+      "sample.json",
+      "output"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-import-observations",
+      "title": "导入坐标、时间戳和证据",
+      "summary": "importObservations(value: unknown): Observation[]",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-field-notes-map-builder-1",
+      "concepts": [
+        "导入坐标、时间戳和证据"
+      ]
+    },
+    {
+      "id": "02-distance-groups",
+      "title": "计算距离并解释附近分组",
+      "summary": "distanceMeters(a,b): number; groupNearby(items:Observation[],radiusMeters:number):Groups",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-field-notes-map-builder-2",
+      "concepts": [
+        "计算距离并解释附近分组"
+      ]
+    },
+    {
+      "id": "03-review-groups",
+      "title": "审核分组，不合并观测",
+      "summary": "reviewGroups(groups:Groups,value?:unknown):{schemaVersion:1;groups;decisions}",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-field-notes-map-builder-3",
+      "concepts": [
+        "审核分组，不合并观测"
+      ]
+    },
+    {
+      "id": "04-export-geojson",
+      "title": "导出 GeoJSON 和可移植地图报告",
+      "summary": "exportGeoJSON(items:Observation[],review):{type:string;features:any[]}; renderMap(items,groups,review):string",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "typescript",
+      "timeout": 60,
+      "figure": "pj-field-notes-map-builder-4",
+      "concepts": [
+        "导出 GeoJSON 和可移植地图报告"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后每个参考阶段通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制的生成本地界面交互。按文档命令运行，检查你自己的输出。"
+    }
+  ]
+}
