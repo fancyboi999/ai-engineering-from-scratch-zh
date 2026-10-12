@@ -1,0 +1,53 @@
+{
+  "id": "your-project-id",
+  "title": "你的项目标题",
+  "level": 1,
+  "levelName": "入门",
+  "tagline": "一句话说明成品能为谁做什么。",
+  "summary": "用两三句话说明学习者要构建什么、练习哪些概念。",
+  "usefulFor": [
+    "具体说明什么情况下有人会运行它"
+  ],
+  "youWillBuild": "精确描述产物：输入、输出及生成文件。",
+  "hours": 6,
+  "languages": [
+    "Python"
+  ],
+  "status": "draft",
+  "source": "community",
+  "author": {
+    "name": "你的姓名",
+    "github": "your-github-handle"
+  },
+  "skills": [
+    "技能一",
+    "技能二"
+  ],
+  "prerequisites": [
+    {
+      "title": "agent 循环",
+      "path": "phases/14-agent-engineering/01-the-agent-loop"
+    }
+  ],
+  "inspiredBy": [],
+  "stages": [
+    {
+      "id": "01-first-stage",
+      "title": "第一阶段",
+      "summary": "一句话说明本阶段增加什么。",
+      "hours": 1,
+      "concepts": [
+        "概念"
+      ],
+      "difficulty": "starter",
+      "language": "python"
+    }
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  }
+}
