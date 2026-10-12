@@ -1,0 +1,114 @@
+{
+  "id": "streaming-answer-recovery",
+  "title": "流式回答恢复",
+  "tagline": "重连流式回答，不重复文本，也不隐藏未完成结果。",
+  "summary": "为集成助手输出的开发者构建浏览器回答视图和本地事件流。处理拆分的 UTF-8 字节、事件 ID、重连、取消和部分引用。区分中断的草稿与完成的回答，并提供可下载的事件轨迹来复现渲染故障。",
+  "level": 3,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "TypeScript",
+    "Go"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "可复用浏览器组件、SSE fixture 服务和可回放事件轨迹",
+  "prerequisiteProjects": [
+    "agent-trace-debugger",
+    "json-schema-output-guard"
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-decode-sse",
+      "title": "将分块字节解码为完整事件",
+      "summary": "让 UTF-8 和 SSE 分帧跨越任意传输边界。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "starter",
+      "concepts": [
+        "TextDecoder",
+        "SSE 分帧",
+        "持久 ID"
+      ],
+      "timeout": 120,
+      "figure": "pj-streaming-answer-recovery-1"
+    },
+    {
+      "id": "02-stable-answer-state",
+      "title": "按稳定身份渲染文本和引用",
+      "summary": "让重复投递无害，同时保留未完成状态。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "core",
+      "concepts": [
+        "事件身份",
+        "去重",
+        "部分引用"
+      ],
+      "timeout": 120,
+      "figure": "pj-streaming-answer-recovery-2"
+    },
+    {
+      "id": "03-reconnect-and-cancel",
+      "title": "处理重连与取消",
+      "summary": "从最后接受的事件恢复，不从最后一段字节恢复。",
+      "hours": 2,
+      "language": "typescript+go",
+      "difficulty": "core",
+      "concepts": [
+        "Last-Event-ID",
+        "HTTP fixture",
+        "AbortSignal"
+      ],
+      "timeout": 120,
+      "figure": "pj-streaming-answer-recovery-3",
+      "runners": [
+        {
+          "language": "typescript"
+        },
+        {
+          "language": "go"
+        }
+      ]
+    },
+    {
+      "id": "04-trace-and-component",
+      "title": "导出并回放中断回答的轨迹",
+      "summary": "交付浏览器组件和可回放的已接受事件产物。",
+      "hours": 2,
+      "language": "typescript",
+      "difficulty": "core",
+      "concepts": [
+        "轨迹 schema",
+        "浏览器组件",
+        "下载"
+      ],
+      "timeout": 120,
+      "figure": "pj-streaming-answer-recovery-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案每个阶段通过的过程。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "与生成的本地界面交互的录制。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

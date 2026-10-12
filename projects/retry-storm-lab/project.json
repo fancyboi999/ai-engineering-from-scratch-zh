@@ -1,0 +1,114 @@
+{
+  "id": "retry-storm-lab",
+  "title": "重试风暴实验",
+  "tagline": "观察多个看似合理的重试如何叠加成服务过载。",
+  "summary": "帮助 SDK 作者在大量客户端同时失败时选择重试行为。用确定性服务模型回放并发客户端，对比有界退避、抖动和共享重试预算，再对本地 HTTP fixture 运行同一策略。导出放大效应与恢复时间线，以及可复用客户端策略。",
+  "level": 3,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "Go",
+    "TypeScript"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "重试策略库、确定性工作负载回放和放大效应时间线",
+  "prerequisiteProjects": [
+    "llm-gateway-with-fallbacks",
+    "agent-budget-planner"
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-deterministic-service",
+      "title": "用确定性时钟建模并发故障",
+      "summary": "在离散事件回放中呈现整体重试负载。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "离散时钟",
+        "容量",
+        "放大效应"
+      ],
+      "timeout": 120,
+      "figure": "pj-retry-storm-lab-1"
+    },
+    {
+      "id": "02-bounded-jitter",
+      "title": "比较有界退避与抖动",
+      "summary": "用可复现的客户端专属序列分散计划重试。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "指数退避",
+        "全抖动",
+        "种子"
+      ],
+      "timeout": 120,
+      "figure": "pj-retry-storm-lab-2"
+    },
+    {
+      "id": "03-shared-budget",
+      "title": "实施共享重试预算和服务端延迟",
+      "summary": "限制跨客户端的总尝试次数，而不只是单个请求。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "共享预算",
+        "Retry-After",
+        "互斥锁"
+      ],
+      "timeout": 120,
+      "figure": "pj-retry-storm-lab-3"
+    },
+    {
+      "id": "04-local-http-replay",
+      "title": "对本地 HTTP 服务回放",
+      "summary": "执行实际 HTTP 请求，独立验证导出的计数器。",
+      "hours": 2,
+      "language": "go+typescript",
+      "difficulty": "core",
+      "concepts": [
+        "context 取消",
+        "回环 fixture",
+        "回执验证"
+      ],
+      "timeout": 120,
+      "figure": "pj-retry-storm-lab-4",
+      "runners": [
+        {
+          "language": "go"
+        },
+        {
+          "language": "typescript"
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案每个阶段通过的过程。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "本地命令输出的录制。输入和范围见 README。"
+    }
+  ]
+}

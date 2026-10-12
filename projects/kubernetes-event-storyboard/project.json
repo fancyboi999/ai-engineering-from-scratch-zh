@@ -1,0 +1,114 @@
+{
+  "id": "kubernetes-event-storyboard",
+  "title": "Kubernetes 事件分镜",
+  "tagline": "将工作负载事件转成时间线，每条线索都能追溯到确切对象。",
+  "summary": "帮助值班工程师检查导出的 Kubernetes 事件和工作负载快照。对重复事件分组，区分观察时间与发生时间，将每项调查建议关联到对象身份和发布修订版本。导出 HTML 时间线及供助手使用的脱敏 JSON 上下文包。",
+  "level": 3,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "Go",
+    "TypeScript"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "HTML 工作负载时间线和版本化 JSON 上下文包",
+  "prerequisiteProjects": [
+    "agent-trace-debugger",
+    "postmortem-writer"
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-parse-snapshots",
+      "title": "解析事件和工作负载快照",
+      "summary": "将发生时间与采集导出的时间分开。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "starter",
+      "concepts": [
+        "Kubernetes 事件",
+        "对象 UID",
+        "时间戳验证"
+      ],
+      "timeout": 120,
+      "figure": "pj-kubernetes-event-storyboard-1"
+    },
+    {
+      "id": "02-group-occurrences",
+      "title": "对重复事件分组并保留时间戳",
+      "summary": "先去重事件快照，再累加不同序列。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "序列计数",
+        "身份冲突",
+        "时间范围"
+      ],
+      "timeout": 120,
+      "figure": "pj-kubernetes-event-storyboard-2"
+    },
+    {
+      "id": "03-connect-revisions",
+      "title": "将证据关联到工作负载修订版本",
+      "summary": "沿所有者 UID 追踪，不根据名称猜测。",
+      "hours": 2,
+      "language": "go",
+      "difficulty": "core",
+      "concepts": [
+        "所有者图",
+        "修订版本",
+        "歧义证据"
+      ],
+      "timeout": 120,
+      "figure": "pj-kubernetes-event-storyboard-3"
+    },
+    {
+      "id": "04-export-storyboard",
+      "title": "导出脱敏的助手上下文包",
+      "summary": "在 TypeScript 时间线中消费 Go 数据包。",
+      "hours": 2,
+      "language": "go+typescript",
+      "difficulty": "core",
+      "concepts": [
+        "跨语言 JSON",
+        "脱敏",
+        "HTML 时间线"
+      ],
+      "timeout": 120,
+      "figure": "pj-kubernetes-event-storyboard-4",
+      "runners": [
+        {
+          "language": "go"
+        },
+        {
+          "language": "typescript"
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案每个阶段通过的过程。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "与生成的本地界面交互的录制。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

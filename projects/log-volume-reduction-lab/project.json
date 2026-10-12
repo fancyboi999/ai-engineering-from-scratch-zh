@@ -1,0 +1,113 @@
+{
+  "id": "log-volume-reduction-lab",
+  "title": "日志量缩减实验",
+  "tagline": "缩减嘈杂日志流，同时保留稀有故障的证据。",
+  "summary": "帮助工程师为助手构建紧凑的日志上下文。学习有界模板分组、计数和代表性示例，再用专门编写的故障 fixture 比较均匀采样和稀有度感知采样。导出压缩后的 JSONL 和覆盖报告，显示丢失了哪些重要事件。",
+  "level": 2,
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "languages": [
+    "Rust",
+    "Python"
+  ],
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "紧凑日志上下文 JSONL 和稀有事件覆盖率比较",
+  "prerequisiteProjects": [
+    "token-counter-and-cost-meter"
+  ],
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-parse-bounded-logs",
+      "title": "解析日志记录并限制规模",
+      "summary": "将每一行转成经过验证、有定位信息的记录。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "starter",
+      "concepts": [
+        "UTF-8",
+        "边界",
+        "定位信息"
+      ],
+      "timeout": 120,
+      "figure": "pj-log-volume-reduction-lab-1"
+    },
+    {
+      "id": "02-group-templates",
+      "title": "对重复模板分组并保留源定位信息",
+      "summary": "统计重复次数，不丢弃其源范围。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "BTreeMap",
+        "代表项",
+        "组身份"
+      ],
+      "timeout": 120,
+      "figure": "pj-log-volume-reduction-lab-2"
+    },
+    {
+      "id": "03-compare-samplers",
+      "title": "比较采样策略对稀有事件的表现",
+      "summary": "将固定记录预算用于常见或稀有模板。",
+      "hours": 2,
+      "language": "rust",
+      "difficulty": "core",
+      "concepts": [
+        "采样",
+        "稀有度",
+        "确定性"
+      ],
+      "timeout": 120,
+      "figure": "pj-log-volume-reduction-lab-3"
+    },
+    {
+      "id": "04-export-coverage",
+      "title": "导出紧凑上下文与覆盖率",
+      "summary": "衡量哪些诊断模板在压缩后保留下来。",
+      "hours": 2,
+      "language": "rust+python",
+      "difficulty": "core",
+      "concepts": [
+        "JSONL",
+        "跨语言契约",
+        "覆盖率"
+      ],
+      "timeout": 120,
+      "figure": "pj-log-volume-reduction-lab-4",
+      "runners": [
+        {
+          "language": "rust"
+        },
+        {
+          "language": "python"
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "记录了 starter 的失败，以及随后参考方案每个阶段通过的过程。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "本地命令输出的录制。输入和范围见 README。"
+    }
+  ]
+}
