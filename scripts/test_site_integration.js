@@ -109,3 +109,57 @@ test('real HTTP negotiates Hub and static lesson Markdown, serves dynamic PNG, a
   assert.equal(png.readUInt32BE(16), 1200); assert.equal(png.readUInt32BE(20), 630);
   assert.match(response.url, /\?v=[a-f0-9]+$/);
 });
+
+test('app.js modal Hub wire switches phases, rejects undeclared targets and preserves keyboard close/focus', () => {
+  const source = read('app.js');
+  const functions = ['phaseHubHref', 'openModal', 'closeModal', 'initModal'].map(name => {
+    const match = source.match(new RegExp('  function ' + name + '\\([^]*?\\n  \\}'));
+    assert.ok(match, name + ' source function missing');
+    return match[0];
+  }).join('\n');
+  const elements = new Map(); let active;
+  function element(id) {
+    if (elements.has(id)) return elements.get(id);
+    const classes = new Set(), attributes = {}, listeners = {};
+    const value = { hidden: true, textContent: '', style: {}, isConnected: true,
+      setAttribute: (key, v) => { attributes[key] = v; },
+      getAttribute: key => attributes[key], removeAttribute: key => { delete attributes[key]; },
+      addEventListener: (key, listener) => { listeners[key] = listener; },
+      focus: () => { active = value; },
+      classList: { add: key => classes.add(key), remove: key => classes.delete(key), contains: key => classes.has(key),
+        toggle: (key, enabled) => enabled ? classes.add(key) : classes.delete(key) },
+      querySelectorAll: () => [element('modalClose'), element('modalPhaseLink')],
+    };
+    elements.set(id, value); return value;
+  }
+  const events = new Map(), originFocus = element('origin'); active = originFocus;
+  const phases = vm.runInNewContext(read('data.js') + '\nPHASES');
+  const context = vm.createContext({ PHASES: phases, currentPhaseIdx: -1, modalReturnFocus: null,
+    document: { get activeElement() { return active; }, body: element('body'), getElementById: element,
+      addEventListener: (name, listener) => { if (!events.has(name)) events.set(name, []); events.get(name).push(listener); } },
+    window: {}, requestAnimationFrame: callback => callback(), renderModalLessons: phase => { context.renderedPhase = phase; },
+    bindProgressActions: () => {},
+  });
+  vm.runInContext(functions + '\ninitModal();', context);
+  const link = element('modalPhaseLink'), overlay = element('modalOverlay');
+  for (const index of [0, 14]) {
+    context.openModal(index, true);
+    assert.equal(link.hidden, false); assert.equal(link.getAttribute('href'), phases[index].hub);
+    assert.equal(link.textContent, '查看' + phases[index].name + '阶段概览');
+    assert.equal(context.renderedPhase, phases[index]); assert.equal(overlay.classList.contains('open'), true);
+    assert.equal(active, element('modalClose'));
+    for (const listener of events.get('keydown')) listener({ key: 'Escape', target: { closest: () => null } });
+    assert.equal(overlay.classList.contains('open'), false); assert.equal(active, originFocus);
+    assert.equal(element('body').style.overflow, '');
+  }
+  const valid = phases[0].hub;
+  for (const invalid of [undefined, 'https://aiengineeringfromscratch.com/phase/setup-and-tooling', '/phase/not-published', '/phase/math-foundations']) {
+    phases[0].hub = invalid; context.openModal(0, false);
+    assert.equal(link.hidden, true); assert.equal(link.getAttribute('href'), undefined);
+    assert.equal(context.renderedPhase, phases[0]); context.closeModal(true);
+  }
+  phases[0].hub = valid; context.openModal(0, true);
+  assert.equal(link.hidden, false); assert.equal(link.getAttribute('href'), valid); context.closeModal(true);
+  assert.match(read('index.html'), /<a id="modalPhaseLink" hidden>/);
+  assert.match(read('index.html'), /app\.js\?v=20261012a/);
+});

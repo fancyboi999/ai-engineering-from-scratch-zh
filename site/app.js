@@ -301,6 +301,13 @@
   var currentPhaseIdx = -1;
   var modalReturnFocus = null;
 
+  function phaseHubHref(phase) {
+    var first = phase.lessons && phase.lessons[0];
+    var match = /\/phases\/(\d+-[a-z0-9-]+)\//.exec(first && first.url || '');
+    var expected = match ? '/phase/' + match[1].replace(/^\d+-/, '') : '';
+    return expected && phase.hub === expected ? expected : '';
+  }
+
   function openModal(idx, fromKeyboard) {
     var p = PHASES[idx];
     if (!p) return;
@@ -310,6 +317,18 @@
     document.getElementById('modalPhaseNum').textContent = 'PHASE ' + String(p.id).padStart(2, '0');
     document.getElementById('modalTitle').textContent = p.name;
     document.getElementById('modalDesc').textContent = p.desc;
+    var hubLink = document.getElementById('modalPhaseLink');
+    if (hubLink) {
+      var hub = phaseHubHref(p);
+      hubLink.hidden = !hub;
+      if (hub) {
+        hubLink.setAttribute('href', hub);
+        hubLink.textContent = '查看' + p.name + '阶段概览';
+      } else {
+        hubLink.removeAttribute('href');
+      }
+    }
+
 
     renderModalLessons(p);
 
