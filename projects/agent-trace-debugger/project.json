@@ -1,0 +1,157 @@
+{
+  "id": "agent-trace-debugger",
+  "title": "Agent 跟踪调试器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "用前后对比的回归报告解释重叠、自身耗时和失败 span 的 token 开销。",
+  "summary": "用前后对比的回归报告解释重叠、自身耗时和失败 span 的 token 开销。从你的埋点中逐行导出 Span JSON 对象，并在 CI 中把 trace.json 与 trace.html 一起保留。",
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "读取 JSONL 跟踪",
+    "校验父子关系",
+    "区分工作时间与等待时间",
+    "渲染可检查的时间线"
+  ],
+  "prerequisites": [
+    "Node 22.18+，以及用于评分器的 Python 3",
+    "TypeScript 对象、数组、Map、排序和区间运算。"
+  ],
+  "youWillBuild": "用前后对比的回归报告解释重叠、自身耗时和失败 span 的 token 开销。",
+  "usefulFor": [
+    "从你的埋点中逐行导出 Span JSON 对象，并在 CI 中把 trace.json 与 trace.html 一起保留。"
+  ],
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "node",
+      "cli.ts",
+      "--input",
+      "samples/trace.jsonl",
+      "--baseline",
+      "samples/before.jsonl",
+      "--output",
+      "trace.html",
+      "--json",
+      "trace.json"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-parse",
+      "title": "读取 JSONL 跟踪",
+      "summary": "每个非空行解析为一个 JSON 对象。要求稳定的 ID、名称、有限的开始和结束时间、非负 token 数，以及明确的 ok 或 error 状态。遇到格式错误的行就停止处理并报告行号。悄悄丢弃坏 span 会扭曲耗时和成本结论。时间是相对毫秒，不是墙钟时间戳。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "TypeScript 为 span 建模，同时保留日志边界的运行时检查。",
+      "concepts": [
+        "parseTrace"
+      ],
+      "difficulty": "starter",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-agent-trace-debugger-1"
+    },
+    {
+      "id": "02-tree",
+      "title": "校验父子关系",
+      "summary": "子 span 必须引用已有父节点，且时间区间位于父区间内。检查每条祖先链是否有环，并拒绝重复 ID。允许多个根节点，因为一次跟踪可能包含重叠的独立运行。先校验再聚合，避免损坏的图生成貌似可信的图表。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "Map 提供稳定的身份查找，Set 揭示环。",
+      "concepts": [
+        "validateTree"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-agent-trace-debugger-2"
+    },
+    {
+      "id": "03-timing",
+      "title": "区分工作时间与等待时间",
+      "summary": "包含子节点的时长是结束减开始。独占时长要减去直接子节点区间的并集，而不是它们的和，因为并行子节点会重叠。根区间的并集给出跨运行的墙钟耗时。token 按 span 自身记录，只汇总一次。最慢结果指向独占时长最大的 span，避免选中主要在等待子节点的根。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "区间运算无需依赖跟踪库，也能揭示并发。",
+      "concepts": [
+        "unionDuration",
+        "analyze"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-agent-trace-debugger-3"
+    },
+    {
+      "id": "04-timeline",
+      "title": "渲染可检查的时间线",
+      "summary": "生成独立 HTML 时间线，每个 span 一行，条形按比例缩放，用颜色标出错误。插入标记前转义 span 名称。包含自身耗时、总耗时、墙钟耗时、token 和错误数。空跟踪也应生成可读产物。输出是本地静态报告，不加载第三方脚本。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "HTML 无需构建流水线或图表依赖，就能展示同一份带类型的分析。",
+      "concepts": [
+        "render"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts",
+        "{tests}/integration.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-agent-trace-debugger-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后参考方案的全部阶段通过。参考方案通过不授予学习者证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "来自本地确定性演示命令的实际输出。fixture 和实时适配器的限制见 README。"
+    }
+  ]
+}

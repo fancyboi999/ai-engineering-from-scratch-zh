@@ -1,0 +1,157 @@
+{
+  "id": "json-schema-output-guard",
+  "title": "JSON Schema 输出守卫",
+  "level": 1,
+  "levelName": "入门",
+  "tagline": "为模型输出契约提供 schema 预检和有界修复回执。",
+  "summary": "为模型输出契约提供 schema 预检和有界修复回执。在应用边界调用 guard(raw,schema)，或调用 repair(generate,schema,maxAttempts)，其中 generate 接收结构化 Issue[] 和从 1 开始的尝试编号。",
+  "hours": 8,
+  "languages": [
+    "TypeScript"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "解析不可信边界",
+    "递归遍历 schema",
+    "拒绝有歧义和不支持的契约",
+    "用有限预算修复"
+  ],
+  "prerequisites": [
+    "Node 22.18+，以及用于评分器的 Python 3",
+    "TypeScript 联合类型、递归函数、JSON 和异步回调。"
+  ],
+  "youWillBuild": "为模型输出契约提供 schema 预检和有界修复回执。",
+  "usefulFor": [
+    "在应用边界调用 guard(raw,schema)，或调用 repair(generate,schema,maxAttempts)，其中 generate 接收结构化 Issue[] 和从 1 开始的尝试编号。"
+  ],
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "node",
+      "cli.ts",
+      "--schema",
+      "samples/schema.json",
+      "--attempts",
+      "samples/attempts.json",
+      "--output",
+      "guard.json",
+      "--html",
+      "guard.html"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-parse-json",
+      "title": "解析不可信边界",
+      "summary": "模型响应是字节串。将整个字符串解析为 JSON，拒绝 Markdown 包装和尾随文本，并在解析前限制 UTF-8 字节大小。既接受 JSON 基本类型，也接受对象：基本类型是否有用由 schema 决定，不由解析器决定。不要不断删掉文本直到解析成功，那会隐藏真实输出契约。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "TypeScript 将未知数据与带类型的应用值区分开。",
+      "concepts": [
+        "parseJSON"
+      ],
+      "difficulty": "starter",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-json-schema-output-guard-1"
+    },
+    {
+      "id": "02-validate-types",
+      "title": "递归遍历 schema",
+      "summary": "实现对象、数组和基本类型校验。必需属性按自身属性语义检查。继承属性不满足契约。把 integer 当作 number 的细化类型，拒绝非有限数字，并为每个失败保留路径。递归下降深度限制为 32，避免 schema 和值无限消耗栈。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "递归联合类型无需导入校验器，就能描述 schema 子集。",
+      "concepts": [
+        "validate"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-json-schema-output-guard-2"
+    },
+    {
+      "id": "03-constraints",
+      "title": "拒绝有歧义和不支持的契约",
+      "summary": "增加数字边界、enum 成员校验、最小 Unicode 字符串长度、数组边界和封闭对象。转义属性路径内的斜杠和波浪号。教学子集以外的关键词是配置错误，不能悄悄成功。本实现明确不声称完整符合 JSON Schema：引用、格式和组合器需要额外工作。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "带类型的 issue 对象让 CLI 和重试循环的错误报告保持稳定。",
+      "concepts": [
+        "validate",
+        "guard"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-json-schema-output-guard-3"
+    },
+    {
+      "id": "04-bounded-repair",
+      "title": "用有限预算修复",
+      "summary": "只向生成回调传递结构化校验反馈。解释输出前先计数每次调用。接受后立即停止；最后一次被拒绝后返回明确 exhausted 状态。provider 失败直接传播，不伪装成 schema 失败。跟踪记录每次尝试，因此第三次成功响应不会掩盖前两次契约违规。",
+      "hours": 2,
+      "language": "typescript",
+      "languageWhy": "异步函数类型支持确定性模拟生成，以及后续 provider 适配器。",
+      "concepts": [
+        "repair"
+      ],
+      "difficulty": "core",
+      "runner": [
+        "node",
+        "--experimental-strip-types",
+        "--test",
+        "{tests}/stage.test.ts",
+        "{tests}/integration.test.ts"
+      ],
+      "requires": [
+        "node"
+      ],
+      "timeout": 90,
+      "figure": "pj-json-schema-output-guard-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制的 starter 失败，随后参考方案的全部阶段通过。参考方案通过不授予学习者证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "来自本地确定性演示命令的实际输出。fixture 和实时适配器的限制见 README。"
+    }
+  ]
+}
