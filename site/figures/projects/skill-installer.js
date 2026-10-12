@@ -21,7 +21,7 @@
     label,
     type: "select",
     value,
-    options: options.map((x) => ({ value: x, label: x })),
+    options: options.map((x) => ({ value: x, label: ({ codex: "Codex", claude: "Claude", cursor: "Cursor" })[x] })),
   });
   const metric = (label, value) => ({ label, value });
   const bar = (label, value, max) => ({ label, value, max });
@@ -35,20 +35,20 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请使用逗号分隔的有限数值");
       return n;
     });
 
   const buildLab = (stage) => ({
     controls: [
-      text("name", "Skill name", "orchard-release"),
-      text("description", "Description", "Review deployment evidence"),
-      text("file", "Resource path", "references/checklist.md"),
-      select("agent", "Target agent", "codex", ["codex", "claude", "cursor"]),
-      text("installed", "Installed file text", "Check replicas"),
-      text("current", "Current local file text", "Check replicas"),
-      text("incoming", "Incoming upgrade text", "Check replicas and restore"),
-      check("digestMatches", "Trusted source digest matches", true),
+      text("name", "技能名称", "orchard-release"),
+      text("description", "描述", "Review deployment evidence"),
+      text("file", "资源路径", "references/checklist.md"),
+      select("agent", "目标 agent", "codex", ["codex", "claude", "cursor"]),
+      text("installed", "已安装文件文本", "Check replicas"),
+      text("current", "当前本地文件文本", "Check replicas"),
+      text("incoming", "新升级文本", "Check replicas and restore"),
+      check("digestMatches", "与可信来源摘要匹配", true),
     ],
     calculate(v) {
       const valid =
@@ -74,30 +74,30 @@
       return {
         summary:
           !valid || !safe
-            ? "Bundle rejected"
+            ? "技能包已拒绝"
             : !v.digestMatches
-              ? "Integrity mismatch"
+              ? "完整性不匹配"
               : conflict
-                ? "Upgrade blocked: preserve local edit"
+                ? "升级受阻：保留本地编辑"
                 : stage === 2
-                  ? "Quoted metadata is compatible with the validator"
-                  : "Bundle can be staged at " + destination,
+                  ? "带引号的元数据与校验器兼容"
+                  : "技能包可暂存于 " + destination,
         metrics: [
-          metric("Metadata valid", valid),
-          metric("Path contained lexically", safe),
-          metric("Local edit conflict", conflict),
+          metric("元数据有效", valid),
+          metric("路径在词法上未越界", safe),
+          metric("本地编辑冲突", conflict),
         ],
         bars: [
-          bar("Current characters", [...v.current].length),
-          bar("Upgrade characters", [...v.incoming].length),
+          bar("当前字符数", [...v.current].length),
+          bar("升级字符数", [...v.incoming].length),
         ],
-        columns: ["Field", "Value"],
+        columns: ["字段", "值"],
         rows: [
-          ["Destination", destination],
-          ["YAML name", "name: " + JSON.stringify(v.name)],
-          ["YAML description", "description: " + JSON.stringify(v.description)],
+          ["目标路径", destination],
+          ["YAML 名称", "name: " + JSON.stringify(v.name)],
+          ["YAML 描述", "description: " + JSON.stringify(v.description)],
           [
-            "Upgrade diff",
+            "升级差异",
             v.current === v.incoming
               ? "unchanged"
               : v.current + " -> " + v.incoming,
@@ -110,26 +110,26 @@
     "pj-skill-installer-1",
     Object.assign(
       {
-        title: "Validate a portable bundle",
+        title: "校验可移植技能包",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "A portable bundle carries metadata and relative UTF-8 files. Treat SKILL.md as an entry document and reject any resource name that could escape the selected install root. The original Orchard bundle includes a restore checklist.",
+              "可移植技能包包含元数据和使用相对路径的 UTF-8 文件。将 SKILL.md 作为入口文档，拒绝任何可能越出选定安装根目录的资源名称。原始 Orchard 技能包包含恢复检查清单。",
           },
           {
-            label: "Validate a portable bundle",
+            label: "校验可移植技能包",
             detail:
-              "name=orchard-release\nfiles: SKILL.md, references/checklist.md\n../settings.json -> rejected",
+              "name=orchard-release\n文件：SKILL.md, references/checklist.md\n../settings.json -> 拒绝",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Validate every file path before creating directories. Reserve .installed.json for the installer receipt.",
+              "创建目录前校验每个文件路径。.installed.json 留给安装器凭据使用。",
           },
         ],
         caption:
-          "Why must a Windows backslash be rejected even when the current machine uses slash paths?",
+          "即使当前机器使用正斜杠路径，为什么也必须拒绝 Windows 反斜杠？",
       },
       { lab: buildLab(1) },
     ),
@@ -138,26 +138,26 @@
     "pj-skill-installer-2",
     Object.assign(
       {
-        title: "Translate metadata and hash content",
+        title: "转换元数据并计算内容哈希",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "Serialize name and description as JSON-compatible double-quoted YAML scalars. The Rust validator accepts that same subset, including escapes. Source and translated digests differ because translation rewrites metadata.",
+              "将 name 和 description 序列化为兼容 JSON 的双引号 YAML 标量。Rust 校验器接受相同子集，包括转义。转换会重写元数据，因此来源摘要与转换后摘要不同。",
           },
           {
-            label: "Translate metadata and hash content",
+            label: "转换元数据并计算内容哈希",
             detail:
-              'source bundle digest -> expected source identity\ntranslated SKILL.md: name: "orchard-release"\ntranslated digest -> installed content identity',
+              '来源技能包摘要 -> 预期来源标识\n转换后的 SKILL.md：name: "orchard-release"\n转换后摘要 -> 已安装内容标识',
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Sort file entries before hashing. A digest verifies content against a trusted expectation; computing it from untrusted bytes does not establish publisher identity.",
+              "哈希前先排序文件条目。摘要用于将内容与可信预期比对；从不可信字节计算摘要并不能证明发布者身份。",
           },
         ],
         caption:
-          "How should a description containing a quote survive installer-to-validator round trip?",
+          "含引号的描述应如何通过安装器与校验器之间的往返转换？",
       },
       { lab: buildLab(2) },
     ),
@@ -166,26 +166,26 @@
     "pj-skill-installer-3",
     Object.assign(
       {
-        title: "Install atomically within a root",
+        title: "在根目录内原子安装",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "Install into a caller-owned disposable root. The installer writes every file to a private sibling directory and renames it into the agent discovery path only after the bundle is complete.",
+              "安装到调用方拥有的临时根目录。安装器先将所有文件写入私有同级目录，技能包完整后才重命名到 agent 发现路径。",
           },
           {
-            label: "Install atomically within a root",
+            label: "在根目录内原子安装",
             detail:
               "root/.agents/skills/orchard-release/\nSKILL.md + references/checklist.md + .installed.json",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Check parent directories for symlinks before staging. Keep the agent directory mapping separate from portable skill content.",
+              "暂存前检查父目录是否为符号链接。agent 目录映射与可移植技能内容分开管理。",
           },
         ],
         caption:
-          "What should a reader observe if a write fails before the rename?",
+          "重命名前写入失败，读取者应看到什么？",
       },
       { lab: buildLab(3) },
     ),
@@ -194,26 +194,26 @@
     "pj-skill-installer-4",
     Object.assign(
       {
-        title: "Protect edits during upgrades",
+        title: "升级时保护本地编辑",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "An upgrade must preserve local edits. Compare the current files with the previous installed digest and reject modified or unmanaged files. The demo edits the checklist, retries installation, and retains the edit.",
+              "升级必须保留本地编辑。将当前文件与上次安装摘要比较，拒绝已修改或不受管理的文件。演示修改检查清单后重试安装，编辑内容仍被保留。",
           },
           {
-            label: "Protect edits during upgrades",
+            label: "升级时保护本地编辑",
             detail:
-              "installed checklist hash=A\nlocal edit -> current hash=B\nupgrade -> modified installation; local text remains",
+              "已安装清单哈希=A\n本地编辑 -> 当前哈希=B\n升级 -> 检测到安装内容已修改；本地文本保留",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Read the existing receipt and verify its file list before moving the destination. Restore a moved backup if the final rename fails.",
+              "移动目标目录前读取现有凭据并核验文件列表。最终重命名失败时恢复已移走的备份。",
           },
         ],
         caption:
-          "What would a reviewable merge need to show before replacing a locally edited checklist?",
+          "替换本地编辑过的清单前，可审查的合并需要展示什么？",
       },
       { lab: buildLab(4) },
     ),

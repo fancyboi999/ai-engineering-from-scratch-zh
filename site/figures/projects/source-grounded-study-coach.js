@@ -2,11 +2,11 @@
   "use strict";
   const steps = [
     {
-      label: "Source",
-      detail: "Keep the passage and authored policy visible.",
+      label: "来源",
+      detail: "保持原文和作者制定的策略可见。",
     },
-    { label: "Decision", detail: "Apply the stated deterministic contract." },
-    { label: "Review", detail: "Explain the result with evidence." },
+    { label: "决策", detail: "应用明确的确定性契约。" },
+    { label: "审查", detail: "用证据解释结果。" },
   ];
   const norm = (s) =>
     s
@@ -16,27 +16,27 @@
       .replace(/[.!?]+$/u, "")
       .replace(/\s+/gu, " ");
   window.AIFSProjectFigures.register("pj-source-grounded-study-coach-1", {
-    title: "An answer needs a supporting quote",
+    title: "答案需要引文支持",
     steps,
     caption:
-      "The deck validates exact answer evidence before asking a question.",
+      "卡组在提问前校验答案的逐字证据。",
     lab: {
       controls: [
         {
           key: "source",
-          label: "Source passage",
+          label: "来源段落",
           type: "text",
           value: "Each packet records the harvest year.",
         },
         {
           key: "answer",
-          label: "Canonical answer",
+          label: "标准答案",
           type: "text",
           value: "harvest year",
         },
         {
           key: "start",
-          label: "Evidence start",
+          label: "证据起点",
           type: "number",
           value: 0,
           min: 0,
@@ -44,7 +44,7 @@
         },
         {
           key: "end",
-          label: "Evidence end",
+          label: "证据终点",
           type: "number",
           value: 37,
           min: 0,
@@ -62,43 +62,43 @@
         const valid = bounds && v.answer.trim() && quote.includes(v.answer);
         return {
           summary: valid
-            ? "The canonical answer has a valid source location."
-            : "Reject this card: repair its offsets or answer evidence.",
+            ? "标准答案具有有效的来源位置。"
+            : "拒绝此卡：修正偏移量或答案证据。",
           metrics: [
-            { label: "Source UTF-16 length", value: v.source.length },
-            { label: "Valid offsets", value: bounds ? "yes" : "no" },
+            { label: "来源 UTF-16 长度", value: v.source.length },
+            { label: "偏移量有效", value: bounds ? "yes" : "no" },
           ],
           rows: [
-            ["Quote", quote || "(invalid range)"],
-            ["Expected answer", v.answer],
+            ["引文", quote || "（无效范围）"],
+            ["预期答案", v.answer],
           ],
-          columns: ["Field", "Text"],
+          columns: ["字段", "文本"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-source-grounded-study-coach-2", {
-    title: "Grade the exact answer contract",
+    title: "按精确答案契约评分",
     steps,
     caption:
-      "A correct paraphrase can need manual review. This baseline does not grade arbitrary meaning.",
+      "正确转述也可能需要人工审查。这个基线不能对任意语义评分。",
     lab: {
       controls: [
         {
           key: "answer",
-          label: "Canonical answer",
+          label: "标准答案",
           type: "text",
           value: "paper envelopes",
         },
         {
           key: "response",
-          label: "Learner response",
+          label: "学习者回答",
           type: "text",
           value: " PAPER   ENVELOPES! ",
         },
         {
           key: "variant",
-          label: "Author-approved variant",
+          label: "作者认可的变体",
           type: "text",
           value: "a paper envelope",
         },
@@ -111,29 +111,29 @@
             (Boolean(v.variant.trim()) && response === norm(v.variant)));
         return {
           summary: correct
-            ? "Accepted by the explicit string-matching policy."
-            : "Review the source and compare the expected answer.",
-          metrics: [{ label: "Accepted", value: correct ? "yes" : "no" }],
+            ? "通过明确的字符串匹配策略。"
+            : "查看来源并对照预期答案。",
+          metrics: [{ label: "已接受", value: correct ? "yes" : "no" }],
           rows: [
-            ["Expected", norm(v.answer)],
-            ["Response", response],
-            ["Approved variant", norm(v.variant)],
+            ["预期值", norm(v.answer)],
+            ["回答", response],
+            ["认可变体", norm(v.variant)],
           ],
-          columns: ["Comparison", "Normalized text"],
+          columns: ["比较项", "规范化文本"],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-source-grounded-study-coach-3", {
-    title: "Calculate the next review date",
+    title: "计算下次复习日期",
     steps,
     caption:
-      "This is a visible teaching policy. Correctness changes the interval; it does not establish learning quality.",
+      "这是公开可见的教学策略。答题正确性改变复习间隔，但不能证明学习质量。",
     lab: {
       controls: [
         {
           key: "box",
-          label: "Current box",
+          label: "当前盒级",
           type: "range",
           value: 1,
           min: 0,
@@ -141,13 +141,13 @@
         },
         {
           key: "correct",
-          label: "Answer accepted",
+          label: "答案已接受",
           type: "checkbox",
           value: true,
         },
         {
           key: "date",
-          label: "Attempt date",
+          label: "作答日期",
           type: "text",
           value: "2026-09-02",
         },
@@ -159,32 +159,32 @@
           Number.isFinite(time) &&
           new Date(time).toISOString().slice(0, 10) === v.date;
         if (!valid)
-          return { summary: "Reject an invalid calendar date.", metrics: [] };
+          return { summary: "拒绝无效日历日期。", metrics: [] };
         const box = v.correct ? Math.min(5, v.box + 1) : 0;
         const interval = v.correct ? 2 ** (box - 1) : 1;
         return {
           summary:
-            "Next due: " +
+            "下次到期：" +
             new Date(time + interval * 86400000).toISOString().slice(0, 10),
           metrics: [
-            { label: "Next box", value: box },
-            { label: "Interval days", value: interval },
+            { label: "下一盒级", value: box },
+            { label: "间隔天数", value: interval },
           ],
-          bars: [{ label: "Review interval", value: interval, max: 16 }],
+          bars: [{ label: "复习间隔", value: interval, max: 16 }],
         };
       },
     },
   });
   window.AIFSProjectFigures.register("pj-source-grounded-study-coach-4", {
-    title: "Choose the due queue for a report",
+    title: "为报告选择到期队列",
     steps,
     caption:
-      "The source passage remains available on every practice card. The page records actual typed answers locally and downloads the attempt log for the next CLI run.",
+      "每张练习卡都保留来源段落。页面在本地记录实际输入的答案，并下载作答日志供下次 CLI 运行使用。",
     lab: {
       controls: [
         {
           key: "day",
-          label: "Report day in September",
+          label: "九月的报告日期",
           type: "range",
           value: 3,
           min: 1,
@@ -203,13 +203,13 @@
         ]);
         const count = rows.filter((r) => r[2] === "due").length;
         return {
-          summary: `Show ${count} due cards for September ${v.day}.`,
+          summary: `显示 9 月 ${v.day} 日的 ${count} 张到期卡。`,
           metrics: [
-            { label: "Due cards", value: count },
-            { label: "Future cards", value: 3 - count },
+            { label: "到期卡数", value: count },
+            { label: "尚未到期卡数", value: 3 - count },
           ],
           rows,
-          columns: ["Card", "Due date", "Queue"],
+          columns: ["卡片", "到期日期", "队列"],
         };
       },
     },

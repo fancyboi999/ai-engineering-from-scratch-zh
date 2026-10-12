@@ -35,26 +35,26 @@
     s.split(",").map((x) => {
       const n = Number(x.trim());
       if (!Number.isFinite(n))
-        throw Error("Use comma-separated finite numbers");
+        throw Error("请使用逗号分隔的有限数值");
       return n;
     });
 
   const buildLab = (stage) => ({
     controls: [
-      text("query", "Request", "release replicas"),
+      text("query", "请求", "release replicas"),
       text(
         "keywords",
-        "Skill keywords comma-separated",
+        "技能关键词（以逗号分隔）",
         "release,replicas,release",
       ),
       text(
         "files",
-        "Changed paths comma-separated",
+        "变更路径（以逗号分隔）",
         "deploy/orchard.yaml,deploy/orchard.yaml",
       ),
-      number("competitor", "Second skill score", 6, 0, 20),
-      number("margin", "Required score margin", 2, 0, 6),
-      check("permission", "Dependency read permission available", true),
+      number("competitor", "第二个技能得分", 6, 0, 20),
+      number("margin", "要求的得分差距", 2, 0, 6),
+      check("permission", "依赖所需读取权限可用", true),
     ],
     calculate(v) {
       const q = new Set(words(v.query)),
@@ -79,19 +79,19 @@
                 : "ready";
       return {
         summary:
-          status +
+          ({ "no-match": "无匹配（no-match）", ambiguous: "有歧义（ambiguous）", "other skill leads": "其他技能领先", blocked: "受阻（blocked）", ready: "就绪（ready）" })[status] +
           (status === "ready" ? ": check-tests -> release-review" : ""),
         metrics: [
-          metric("Keyword points", keywords.length * 2),
-          metric("Path points", paths.length * 3),
-          metric("Duplicates contribute", "0"),
-          metric("Margin", Math.abs(score - v.competitor)),
+          metric("关键词分数", keywords.length * 2),
+          metric("路径分数", paths.length * 3),
+          metric("重复项贡献", "0"),
+          metric("得分差距", Math.abs(score - v.competitor)),
         ],
-        bars: [bar("Release review", score), bar("Other skill", v.competitor)],
-        columns: ["Evidence", "Contribution"],
+        bars: [bar("发布审查", score), bar("其他技能", v.competitor)],
+        columns: ["证据", "贡献"],
         rows: keywords
-          .map((w) => ["keyword:" + w, 2])
-          .concat(paths.map((p) => ["path:" + p, 3])),
+          .map((w) => ["关键词：" + w, 2])
+          .concat(paths.map((p) => ["路径：" + p, 3])),
       };
     },
   });
@@ -99,26 +99,26 @@
     "pj-skill-router-1",
     Object.assign(
       {
-        title: "Parse a typed skill catalog",
+        title: "解析带类型的技能目录",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "Discover a skill from its SKILL.md name and description, then read routing.json as a local routing extension. The directory name must match the skill name. Routing metadata is not part of the portable skill format.",
+              "从 SKILL.md 的名称和描述发现技能，再读取 routing.json 作为本地路由扩展。目录名必须与技能名匹配。路由元数据不属于可移植技能格式。",
           },
           {
-            label: "Parse a typed skill catalog",
+            label: "解析带类型的技能目录",
             detail:
-              "skills/release-review/SKILL.md -> name release-review\nrouting.json -> keywords,paths,priority,requires,permissions",
+              "skills/release-review/SKILL.md -> 名称 release-review\nrouting.json -> keywords,paths,priority,requires,permissions",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Validate the merged record with parseSkill. Refuse symlinked or oversized discovery files before parsing them.",
+              "用 parseSkill 校验合并记录。解析发现文件前先拒绝符号链接文件或过大的文件。",
           },
         ],
         caption:
-          "What should happen when directory release-review declares name publish?",
+          "release-review 目录声明名称为 publish 时，应如何处理？",
       },
       { lab: buildLab(1) },
     ),
@@ -127,26 +127,26 @@
     "pj-skill-router-2",
     Object.assign(
       {
-        title: "Score words and repository paths",
+        title: "为词汇与仓库路径评分",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "Repeated evidence must not inflate a match. The Orchard request repeats the same changed path, but it should earn its path contribution only once. Keywords contribute two points and distinct matched paths contribute three.",
+              "重复证据不能虚增匹配分数。Orchard 请求重复了同一变更路径，但路径贡献只能计一次。关键词各贡献两分，不同的匹配路径各贡献三分。",
           },
           {
-            label: "Score words and repository paths",
+            label: "为词汇与仓库路径评分",
             detail:
-              "keywords release,replicas -> 4 points\nfiles deploy/orchard.yaml repeated twice -> 3 points\nscore=7, not 10",
+              "关键词 release,replicas -> 4 分\n文件 deploy/orchard.yaml 重复两次 -> 3 分\nscore=7，而不是 10",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Canonicalize separators and deduplicate before scoring. Keep reasons aligned with the exact evidence counted.",
+              "评分前统一分隔符并去重。解释理由应与实际计数的证据一致。",
           },
         ],
         caption:
-          "Should two different path rules matching one file count as two independent observations?",
+          "两条不同路径规则匹配同一文件，应算作两次独立观察吗？",
       },
       { lab: buildLab(2) },
     ),
@@ -155,26 +155,26 @@
     "pj-skill-router-3",
     Object.assign(
       {
-        title: "Resolve dependencies before execution",
+        title: "执行前解析依赖",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "Selecting release-review first requires check-tests. A depth-first traversal emits dependencies before the selected skill and validates permissions throughout the graph. A denied dependency blocks the whole plan.",
+              "选择 release-review 需要先运行 check-tests。深度优先遍历先输出依赖，再输出所选技能，并校验整个图的权限。一个依赖被拒绝就会阻断整个计划。",
           },
           {
-            label: "Resolve dependencies before execution",
+            label: "执行前解析依赖",
             detail:
-              "release-review requires check-tests\nallowed=[read]\nplan=[check-tests,release-review]",
+              "release-review 依赖 check-tests\nallowed=[read]\nplan=[check-tests,release-review]",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Track active and visited sets separately: active finds cycles, visited prevents repeated execution. Do not append a parent before its dependencies.",
+              "分别维护 active 和 visited 集合：active 用于发现环，visited 防止重复执行。不要在依赖之前追加父技能。",
           },
         ],
         caption:
-          "What would happen if check-tests secretly required a network permission?",
+          "如果 check-tests 暗中需要网络权限，会发生什么？",
       },
       { lab: buildLab(3) },
     ),
@@ -183,26 +183,26 @@
     "pj-skill-router-4",
     Object.assign(
       {
-        title: "Abstain on ambiguous or blocked requests",
+        title: "对有歧义或受阻请求弃选",
         steps: [
           {
-            label: "Input contract",
+            label: "输入契约",
             detail:
-              "Abstain when two skills score too closely or the chosen plan needs unavailable permissions. An explanation of why routing stopped is more useful than an arbitrary winning skill.",
+              "两个技能得分太接近，或所选计划需要不可用权限时，放弃选择。解释路由为何停止，比随意选出一个获胜技能更有用。",
           },
           {
-            label: "Abstain on ambiguous or blocked requests",
+            label: "对有歧义或受阻请求弃选",
             detail:
-              "publish request -> release-publish score 2\nallowed=[read]; publish requires network\nstatus=blocked, no execution plan",
+              "publish 请求 -> release-publish 得分 2\nallowed=[read]；publish 需要 network\nstatus=blocked，无执行计划",
           },
           {
-            label: "Observe the result",
+            label: "观察结果",
             detail:
-              "Apply the score margin before dependency planning. Treat ranking as evidence for selection, not authority to execute a tool.",
+              "依赖规划前先检查得分差距。排序只提供选择证据，不授予工具执行权限。",
           },
         ],
         caption:
-          "How would you tune one ambiguous keyword without overfitting to the example request?",
+          "如何调整一个有歧义的关键词，而不过拟合示例请求？",
       },
       { lab: buildLab(4) },
     ),
