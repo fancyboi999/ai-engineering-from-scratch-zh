@@ -2111,6 +2111,11 @@ function build() {
       return [rel, Number(lesson.time) || lessonMinutes(rel)];
     }))),
   });
+  fs.writeFileSync(path.join(__dirname, 'hub-pages.json'), JSON.stringify({ pages: Object.fromEntries(
+    [...hubs.phasePages, ...hubs.termPages].map(page => [page.href, {
+      html: 'hubs' + page.href + '.html', markdown: 'agent-pages' + page.href + '.md',
+    }])
+  ) }, null, 2) + '\n');
   for (const hub of hubs.phaseModels) phases.find(phase => phase.id === hub.id).hub = hub.href;
   replaceGeneratedDiscovery(path.join(__dirname, 'index.html'),
     '<!-- GENERATED:INTEGRATED-DISCOVERY:START -->', '<!-- GENERATED:INTEGRATED-DISCOVERY:END -->',

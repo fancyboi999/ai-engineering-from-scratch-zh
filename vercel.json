@@ -18,13 +18,13 @@
     },
     "api/markdown.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/*.html,site/agent-pages/*.md}",
-      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,hubs,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
+      "includeFiles": "{site/*.html,site/hub-pages.json,site/hubs/{phase,glossary}/*.html,site/agent-pages/{*,phase/*,glossary/*}.md}",
+      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
     },
     "api/v1/markdown.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/*.html,site/agent-pages/*.md}",
-      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,hubs,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
+      "includeFiles": "{site/*.html,site/hub-pages.json,site/hubs/{phase,glossary}/*.html,site/agent-pages/{*,phase/*,glossary/*}.md}",
+      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
     },
     "api/not-found.js": {
       "maxDuration": 10,
@@ -45,6 +45,14 @@
     }
   },
   "routes": [
+    {
+      "src": "/glossary/([a-z0-9]+(?:-[a-z0-9]+)*)/?",
+      "dest": "/api/markdown?path=/glossary/$1"
+    },
+    {
+      "src": "/phase/([a-z0-9]+(?:-[a-z0-9]+)*)/?",
+      "dest": "/api/markdown?path=/phase/$1"
+    },
     {
       "src": "/og/([a-z]+)/([a-z0-9][a-z0-9/-]*)\\.png",
       "methods": [
@@ -67,52 +75,6 @@
         }
       ],
       "dest": "/api/lesson?path=phases/$1/$2"
-    },
-    {
-      "src": "/phase/([a-z0-9]+(?:-[a-z0-9]+)*)/?",
-      "methods": [
-        "GET",
-        "HEAD"
-      ],
-      "has": [
-        {
-          "type": "header",
-          "key": "accept",
-          "value": "(?i).*text/markdown.*"
-        }
-      ],
-      "dest": "/agent-pages/phase/$1.md"
-    },
-    {
-      "src": "/phase/([a-z0-9]+(?:-[a-z0-9]+)*)/?",
-      "methods": [
-        "GET",
-        "HEAD"
-      ],
-      "dest": "/hubs/phase/$1.html"
-    },
-    {
-      "src": "/glossary/([a-z0-9]+(?:-[a-z0-9]+)*)/?",
-      "methods": [
-        "GET",
-        "HEAD"
-      ],
-      "has": [
-        {
-          "type": "header",
-          "key": "accept",
-          "value": "(?i).*text/markdown.*"
-        }
-      ],
-      "dest": "/agent-pages/glossary/$1.md"
-    },
-    {
-      "src": "/glossary/([a-z0-9]+(?:-[a-z0-9]+)*)/?",
-      "methods": [
-        "GET",
-        "HEAD"
-      ],
-      "dest": "/hubs/glossary/$1.html"
     },
     {
       "src": "/",

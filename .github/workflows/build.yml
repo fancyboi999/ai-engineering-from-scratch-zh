@@ -164,7 +164,7 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: "1"
         run: |
-          node --test site/test*.js lib/test*.js scripts/test_lesson_reader.js scripts/test_site_integration.js
+          node --test site/test*.js lib/test*.js scripts/test_lesson_reader.js scripts/test_site_integration.js scripts/test_hub_negotiation.js
           node scripts/check_hubs.js
           node scripts/audit_manuals.js --skip-capture
           node scripts/check_manual_outputs.js
