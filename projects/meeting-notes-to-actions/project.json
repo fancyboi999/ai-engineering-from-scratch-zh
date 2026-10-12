@@ -1,0 +1,126 @@
+{
+  "id": "meeting-notes-to-actions",
+  "title": "会议笔记转行动项",
+  "level": 2,
+  "levelName": "动手构建",
+  "tagline": "关联来源的承诺收件箱，只有明确审核决策后才可导出。",
+  "summary": "关联来源的承诺收件箱，只有明确审核决策后才可导出。使用 schema_version1 的 actions.json 回执，带稳定的行动 id 和原始源行。CSV 列为 id、owner、due 和 task，只包含已批准行动。",
+  "youWillBuild": "关联来源的承诺收件箱，只有明确审核决策后才可导出。",
+  "usefulFor": [
+    "使用 schema_version1 的 actions.json 回执，带稳定的行动 id 和原始源行。CSV 列为 id、owner、due 和 task，只包含已批准行动。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理清晰可见，不把机制藏在框架背后。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "解析显式行动记录并保留行来源",
+    "校验负责人和日历日期",
+    "对完全相同的承诺去重并保留引用",
+    "发布经转义的 HTML 清单和摘要"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "逐行解析、字典、ISO 日期、转义和 JSON 文件。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-meeting-notes-to-actions-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/notes.txt",
+      "--today",
+      "2026-09-29",
+      "--output",
+      "actions.json",
+      "--html",
+      "actions.html",
+      "--csv",
+      "approved.csv"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-parse-lines",
+      "title": "解析显式行动记录并保留行来源",
+      "summary": "解析 ACTION 行，保留源行号，拒绝畸形的标记行。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "保守提取",
+        "来源追溯"
+      ],
+      "figure": "pj-meeting-notes-to-actions-1"
+    },
+    {
+      "id": "02-validate-commitments",
+      "title": "校验负责人和日历日期",
+      "summary": "校验负责人、任务和 ISO 日期。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "日期校验",
+        "不确定性"
+      ],
+      "figure": "pj-meeting-notes-to-actions-2"
+    },
+    {
+      "id": "03-deduplicate-actions",
+      "title": "对完全相同的承诺去重并保留引用",
+      "summary": "合并规范化后完全相同的重复项，并排序来源行号。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "去重",
+        "稳定标识"
+      ],
+      "figure": "pj-meeting-notes-to-actions-3"
+    },
+    {
+      "id": "04-publish-checklist",
+      "title": "发布经转义的 HTML 清单和摘要",
+      "summary": "返回 HTML，以及就绪、待审核和逾期行动的计数。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "HTML 转义",
+        "审核队列",
+        "产物发布"
+      ],
+      "figure": "pj-meeting-notes-to-actions-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}

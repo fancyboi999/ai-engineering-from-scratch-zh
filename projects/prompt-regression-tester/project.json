@@ -1,0 +1,125 @@
+{
+  "id": "prompt-regression-tester",
+  "title": "Prompt 回归测试器",
+  "level": 1,
+  "levelName": "入门实践",
+  "tagline": "通过明确检查、配对回归和可复现发布门禁，比较录制响应上的 prompt 版本。",
+  "summary": "通过明确检查、配对回归和可复现发布门禁，比较录制响应上的 prompt 版本。",
+  "youWillBuild": "用于审核 prompt 变更的工具包，准确指出哪些用户承诺被破坏。",
+  "usefulFor": [
+    "用于审核 prompt 变更的工具包，准确指出哪些用户承诺被破坏。",
+    "附带录制是编写的 fixture。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理清晰可见，不把机制藏在框架背后。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "评分前校验案例",
+    "不调用模型，对录制输出评分",
+    "跨版本比较相同案例",
+    "按明确容差设置发布门禁"
+  ],
+  "prerequisites": [
+    {
+      "title": "结构化输出",
+      "path": "phases/11-llm-engineering/03-structured-outputs"
+    },
+    {
+      "title": "模型评估",
+      "path": "phases/02-ml-fundamentals/09-model-evaluation"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-prompt-regression-tester-1",
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-validate-cases",
+      "title": "评分前校验案例",
+      "summary": "校验唯一案例 id、prompt 和支持的检查：contains、excludes 和 json。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "评估契约",
+        "schema 校验"
+      ],
+      "figure": "pj-prompt-regression-tester-1"
+    },
+    {
+      "id": "02-score-recordings",
+      "title": "不调用模型，对录制输出评分",
+      "summary": "对 contains、excludes 和有效 JSON 检查评分。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "回放",
+        "断言",
+        "失败证据"
+      ],
+      "figure": "pj-prompt-regression-tester-2"
+    },
+    {
+      "id": "03-pair-revisions",
+      "title": "跨版本比较相同案例",
+      "summary": "返回配对案例结果，以及回归和改进计数。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "配对比较",
+        "回归检测"
+      ],
+      "figure": "pj-prompt-regression-tester-3"
+    },
+    {
+      "id": "04-gate-releases",
+      "title": "按明确容差设置发布门禁",
+      "summary": "对比较报告应用有限的最低通过比例和整数回归预算。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "发布门禁",
+        "预算",
+        "空证据"
+      ],
+      "figure": "pj-prompt-regression-tester-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}

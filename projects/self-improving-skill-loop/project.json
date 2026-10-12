@@ -1,0 +1,135 @@
+{
+  "id": "self-improving-skill-loop",
+  "title": "自改进技能循环",
+  "level": 5,
+  "levelName": "前沿实践",
+  "tagline": "从标注开发集错误改进显式路由技能，晋升前要求独立评估门禁。",
+  "summary": "从标注开发集错误改进显式路由技能，晋升前要求独立评估门禁。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "从纠错到技能的实验运行器，保留来源、防止泄漏并支持回滚。",
+  "usefulFor": [
+    "从纠错到技能的实验运行器，保留来源、防止泄漏并支持回滚。",
+    "实验从开发数据提出确定性路由规则。"
+  ],
+  "skills": [
+    "划分标注案例，防止身份泄漏",
+    "执行透明路由技能并评分",
+    "只从开发集错误提出规则",
+    "晋升前要求独立门禁"
+  ],
+  "prerequisites": [
+    {
+      "title": "模型评估",
+      "path": "phases/02-ml-fundamentals/09-model-evaluation"
+    },
+    {
+      "title": "仓库记忆与状态",
+      "path": "phases/14-agent-engineering/34-repo-memory-and-state"
+    },
+    {
+      "title": "验证门禁",
+      "path": "phases/14-agent-engineering/38-verification-gates"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-self-improving-skill-loop-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、显式算法和确定性本地测试。"
+  },
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-dataset",
+      "title": "划分标注案例，防止身份泄漏",
+      "summary": "每个案例恰出现在一个分区；重复 id 会停止运行。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-self-improving-skill-loop-1",
+      "concepts": [
+        "划分",
+        "标注的",
+        "案例",
+        "不含"
+      ]
+    },
+    {
+      "id": "02-skill",
+      "title": "执行透明路由技能并评分",
+      "summary": "规则 [reset, password] 匹配 reset password，但不匹配只有 reset 的输入。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-self-improving-skill-loop-2",
+      "concepts": [
+        "执行",
+        "与",
+        "评分",
+        "一个"
+      ]
+    },
+    {
+      "id": "03-propose",
+      "title": "只从开发集错误提出规则",
+      "summary": "重复的 refund token 提出 billing 规则；两个标签共用的 token 被拒绝。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-self-improving-skill-loop-3",
+      "concepts": [
+        "提出",
+        "规则",
+        "来自",
+        "开发集"
+      ]
+    },
+    {
+      "id": "04-promotion",
+      "title": "晋升前要求独立门禁",
+      "summary": "候选修好一个案例却破坏此前正确案例时，不能晋升。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、bytes 和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-self-improving-skill-loop-4",
+      "concepts": [
+        "要求",
+        "一个",
+        "独立的",
+        "门禁"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}

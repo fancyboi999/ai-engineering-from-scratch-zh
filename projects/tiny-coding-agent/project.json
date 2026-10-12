@@ -1,0 +1,125 @@
+{
+  "id": "tiny-coding-agent",
+  "title": "微型编码 agent",
+  "level": 1,
+  "levelName": "入门实践",
+  "tagline": "构建有界编码循环，在一次性工作区应用精确补丁，通过允许列表工具契约运行真实测试。",
+  "summary": "构建有界编码循环，在一次性工作区应用精确补丁，通过允许列表工具契约运行真实测试。",
+  "youWillBuild": "修复 agent，展示补丁/测试证据链，拒绝无依据的成功声明。",
+  "usefulFor": [
+    "修复 agent，展示补丁/测试证据链，拒绝无依据的成功声明。",
+    "CLI 将可信 Python 工作区复制到新目标，再作为本地代码运行测试。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理清晰可见，不把机制藏在框架背后。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "将文件工具限制在工作区内",
+    "应用带前置条件的精确补丁",
+    "通过一个允许的命令运行真实测试",
+    "根据证据或预算停止编码循环"
+  ],
+  "prerequisites": [
+    {
+      "title": "Agent 循环",
+      "path": "phases/14-agent-engineering/01-the-agent-loop"
+    },
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-tiny-coding-agent-1",
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-confine-paths",
+      "title": "将文件工具限制在工作区内",
+      "summary": "在工作区内解析已有相对文件路径，拒绝路径遍历、绝对路径、符号链接逃逸和非文件。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "路径包含关系",
+        "工具边界"
+      ],
+      "figure": "pj-tiny-coding-agent-1"
+    },
+    {
+      "id": "02-apply-exact-patches",
+      "title": "应用带前置条件的精确补丁",
+      "summary": "替换一个精确出现项；缺失或歧义匹配时保留文件。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "补丁前置条件",
+        "原子写入"
+      ],
+      "figure": "pj-tiny-coding-agent-2"
+    },
+    {
+      "id": "03-run-real-tests",
+      "title": "通过一个允许的命令运行真实测试",
+      "summary": "在工作区运行 unittest discovery，报告 passed、tests、output 和终态。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "子进程",
+        "超时",
+        "测试证据"
+      ],
+      "figure": "pj-tiny-coding-agent-3"
+    },
+    {
+      "id": "04-bound-the-loop",
+      "title": "根据证据或预算停止编码循环",
+      "summary": "消费补丁和测试动作，记录结果，返回 completed、failed 或 budget_exhausted。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "agent 循环",
+        "允许列表工具",
+        "终态"
+      ],
+      "figure": "pj-tiny-coding-agent-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "id": "agent-budget-planner",
+  "title": "Agent 预算规划器",
+  "level": 3,
+  "levelName": "工程实践",
+  "tagline": "识别费用回执的预算控制器，让不确定的支出始终可见。",
+  "summary": "识别费用回执的预算控制器，让不确定的支出始终可见。导入 execute_jobs，并提供 invoke(job) -> (value, actual_cost)。只有费率和回执确实已换算为该单位时，才使用 unit=nano_dollars。",
+  "youWillBuild": "识别费用回执的预算控制器，让不确定的支出始终可见。",
+  "usefulFor": [
+    "导入 execute_jobs，并提供 invoke(job) -> (value, actual_cost)。只有费率和回执确实已换算为该单位时，才使用 unit=nano_dollars。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理清晰可见，不把机制藏在框架背后。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "用整数微额度单位估算请求费用",
+    "派发前预留额度",
+    "结算实际用量并释放未用预算",
+    "在费用和时间限制内调度"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "函数、字典、异常、整数运算和回调函数。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-agent-budget-planner-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--mode",
+      "execute",
+      "--output",
+      "budget.json"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-estimate-cost",
+      "title": "用整数微额度单位估算请求费用",
+      "summary": "校验非负整数 token 数与费率，再计算最坏情况费用。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "整数记账",
+        "费用估算"
+      ],
+      "figure": "pj-agent-budget-planner-1"
+    },
+    {
+      "id": "02-reserve-capacity",
+      "title": "派发前预留额度",
+      "summary": "返回包含唯一请求预留的新账本。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "预留额度",
+        "接纳控制"
+      ],
+      "figure": "pj-agent-budget-planner-2"
+    },
+    {
+      "id": "03-settle-and-release",
+      "title": "结算实际用量并释放未用预算",
+      "summary": "每个请求只结算一次，实际费用不得超过其预留。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "结算",
+        "幂等性",
+        "不可变性"
+      ],
+      "figure": "pj-agent-budget-planner-3"
+    },
+    {
+      "id": "04-schedule-under-deadlines",
+      "title": "在费用和时间限制内调度",
+      "summary": "在整数费用和毫秒限制下调度已知任务估算。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用显式数据结构和确定性标准库操作。",
+      "concepts": [
+        "截止时间",
+        "轨迹事件",
+        "有界执行"
+      ],
+      "figure": "pj-agent-budget-planner-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化与评分",
+      "caption": "上游录制先展示起始实现失败，再展示参考方案全部阶段通过。参考方案通过不会为学习者赢得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和在线适配器的限制见 README。"
+    }
+  ]
+}
