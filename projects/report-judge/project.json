@@ -1,0 +1,135 @@
+{
+  "id": "report-judge",
+  "title": "报告评审器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "审计句子级引用，测试词汇支持，用配对不确定性区间比较报告修订。",
+  "summary": "审计句子级引用，测试词汇支持，用配对不确定性区间比较报告修订。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "展示不确定性和待人工审核主张的证据审计工作台。",
+  "usefulFor": [
+    "展示不确定性和待人工审核主张的证据审计工作台。",
+    "评审器提供保守的词汇证据检查。"
+  ],
+  "skills": [
+    "解析主张与引用标记",
+    "先检查证据再平均分数",
+    "报告精确率、覆盖率与来源召回率",
+    "用 bootstrap 区间比较配对修订"
+  ],
+  "prerequisites": [
+    {
+      "title": "检索增强生成",
+      "path": "phases/11-llm-engineering/06-rag"
+    },
+    {
+      "title": "模型评估",
+      "path": "phases/02-ml-fundamentals/09-model-evaluation"
+    },
+    {
+      "title": "验证门禁",
+      "path": "phases/14-agent-engineering/38-verification-gates"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-report-judge-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、明确算法和确定性本地测试。"
+  },
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-claims",
+      "title": "解析主张与引用标记",
+      "summary": "One [S1]. Two [S2]. 变成两项可独立审计的主张。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-report-judge-1",
+      "concepts": [
+        "解析",
+        "主张",
+        "和",
+        "引用"
+      ]
+    },
+    {
+      "id": "02-support",
+      "title": "先检查证据再平均分数",
+      "summary": "将有来源的限制从 10 改成 5，得到 reason number 和零支持分。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-report-judge-2",
+      "concepts": [
+        "检查",
+        "证据",
+        "之前",
+        "平均"
+      ]
+    },
+    {
+      "id": "03-metrics",
+      "title": "报告精确率、覆盖率与来源召回率",
+      "summary": "报告引用两个预期来源之一，即使精确率完美，召回率也只有 0.5。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-report-judge-3",
+      "concepts": [
+        "报告",
+        "精确率",
+        "覆盖率",
+        "和"
+      ]
+    },
+    {
+      "id": "04-compare",
+      "title": "用 bootstrap 区间比较配对修订",
+      "summary": "一致的 +1 改进得到平均 delta 1 和区间 [1, 1]。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-report-judge-4",
+      "concepts": [
+        "比较",
+        "配对",
+        "修订",
+        "使用"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器的限制见 README。"
+    }
+  ]
+}

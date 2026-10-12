@@ -1,0 +1,112 @@
+{
+  "title": "数据集契约门禁",
+  "tagline": "隔离无效记录，按明确的数据集规则阻止摄取。",
+  "level": 2,
+  "summary": "定义小型版本化数据契约，检查字段类型和边界，找出重复组内的每一行，将接受记录与隔离记录分开导出。CLI 退出码控制摄取门禁，源行报告解释失败原因。",
+  "languageWhy": {
+    "Python": "标准字典、数值检查和 JSONL I/O 让跨行校验易于检查。"
+  },
+  "prerequisiteProjects": [
+    "dataset-split-auditor",
+    "json-schema-output-guard"
+  ],
+  "id": "dataset-contract-gate",
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "status": "ready",
+  "hours": 8,
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "prerequisites": [
+    "Python 3.12+；字典、列表和命令行 I/O"
+  ],
+  "youWillBuild": "accepted.jsonl、quarantine.jsonl、receipt.json 和 review.html",
+  "skills": [
+    "校验明确的质量契约",
+    "检查每条记录，不做强制转换",
+    "找出重复组中的全部行",
+    "导出分区并执行数据集门禁"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-dataset-contract-gate-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.jsonl",
+      "--contract",
+      "samples/contract.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-validate-contract",
+      "title": "校验明确的质量契约",
+      "summary": "要求 version=1 且 fields 为非空对象。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "校验明确的质量契约"
+      ],
+      "figure": "pj-dataset-contract-gate-1"
+    },
+    {
+      "id": "02-check-records",
+      "title": "检查每条记录，不做强制转换",
+      "summary": "使用已校验的契约。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "检查每条记录，不做强制转换"
+      ],
+      "figure": "pj-dataset-contract-gate-2"
+    },
+    {
+      "id": "03-check-uniqueness",
+      "title": "找出重复组中的全部行",
+      "summary": "对每个 unique 列，将有效类型的值索引到从 1 开始的输入行号。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "找出重复组中的全部行"
+      ],
+      "figure": "pj-dataset-contract-gate-3"
+    },
+    {
+      "id": "04-quarantine-and-gate",
+      "title": "导出分区并执行数据集门禁",
+      "summary": "返回 schema_version=1、passed、counts、dataset_issues、duplicates、accepted 和 quarantine。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "导出分区并执行数据集门禁"
+      ],
+      "figure": "pj-dataset-contract-gate-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

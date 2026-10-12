@@ -1,0 +1,122 @@
+{
+  "id": "dataset-split-auditor",
+  "title": "数据集划分审计器",
+  "level": 1,
+  "levelName": "入门者",
+  "tagline": "点名导致内容泄漏和事件泄漏记录的数据集门禁。",
+  "summary": "点名导致内容泄漏和事件泄漏记录的数据集门禁。向 CLI 传入 {train,test} 记录，或传入 {records} 并指定 --split 0.25 --seed experiment-1。在 CI 中添加 --check，划分不可用时返回 exit2。",
+  "youWillBuild": "点名导致内容泄漏和事件泄漏记录的数据集门禁。",
+  "usefulFor": [
+    "向 CLI 传入 {train,test} 记录，或传入 {records} 并指定 --split 0.25 --seed experiment-1。在 CI 中添加 --check，划分不可用时返回 exit2。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理保持可见，不把机制藏在框架后面。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "为规范化记录生成指纹",
+    "审计重复内容与分组泄漏",
+    "用稳定哈希划分分组",
+    "同时报告划分大小和泄漏"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "列表、集合、字典、Unicode 规范化和哈希函数。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-dataset-split-auditor-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "split-audit.json",
+      "--html",
+      "split-audit.html"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-fingerprint-records",
+      "title": "为规范化记录生成指纹",
+      "summary": "对文本做 NFKC 规范化、大小写折叠和空白折叠，再生成稳定 SHA-256 指纹。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "指纹",
+        "Unicode 规范化"
+      ],
+      "figure": "pj-dataset-split-auditor-1"
+    },
+    {
+      "id": "02-audit-leakage",
+      "title": "审计重复内容与分组泄漏",
+      "summary": "校验 id、text 和 group，然后报告 train 与 test 的交集。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "数据泄漏",
+        "分组",
+        "证据"
+      ],
+      "figure": "pj-dataset-split-auditor-2"
+    },
+    {
+      "id": "03-split-groups",
+      "title": "用稳定哈希划分分组",
+      "summary": "返回不存在分组重叠的 train 和 test 数组。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "确定性划分",
+        "分组隔离"
+      ],
+      "figure": "pj-dataset-split-auditor-3"
+    },
+    {
+      "id": "04-report-distribution",
+      "title": "同时报告划分大小和泄漏",
+      "summary": "生成 JSON 审计，包含分区大小、分组数和 usable 标志；该标志要求两个分区都非空且无泄漏。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "评估就绪",
+        "数据集审计"
+      ],
+      "figure": "pj-dataset-split-auditor-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器的限制见 README。"
+    }
+  ]
+}

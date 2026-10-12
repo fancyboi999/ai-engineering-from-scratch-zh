@@ -1,0 +1,123 @@
+{
+  "id": "local-model-eval-harness",
+  "title": "本地模型评估工具",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "可复现的本地模型录制与对比产物，展示覆盖率和置信度误差。",
+  "summary": "可复现的本地模型录制与对比产物，展示覆盖率和置信度误差。record.py 写出 cli.py 使用的同一 {manifest,source,labels,records} 契约。--baseline 仅比较标签指纹相同的记录；--min-accuracy 提供本地 CI 门禁。",
+  "youWillBuild": "可复现的本地模型录制与对比产物，展示覆盖率和置信度误差。",
+  "usefulFor": [
+    "record.py 写出 cli.py 使用的同一 {manifest,source,labels,records} 契约。--baseline 仅比较标签指纹相同的记录；--min-accuracy 提供本地 CI 门禁。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理保持可见，不把机制藏在框架后面。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "校验预测记录",
+    "测量规范化精确答案准确率",
+    "测量置信度校准",
+    "同时发布准确率和延迟"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "JSON、比率、排序、百分位数和基础 HTTP。实时录制器还需要已运行的回环 OpenAI 兼容模型服务器。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-local-model-eval-harness-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "scorecard.json",
+      "--html",
+      "reliability.html"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-validate-predictions",
+      "title": "校验预测记录",
+      "summary": "校验唯一 ID、字符串答案、[0,1] 内的 confidence 和非负 latency_ms。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "已录制预测",
+        "有限值"
+      ],
+      "figure": "pj-local-model-eval-harness-1"
+    },
+    {
+      "id": "02-measure-accuracy",
+      "title": "测量规范化精确答案准确率",
+      "summary": "基于完整标签映射返回 correct、total、accuracy 和 coverage。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "准确率",
+        "覆盖率",
+        "缺失数据"
+      ],
+      "figure": "pj-local-model-eval-harness-2"
+    },
+    {
+      "id": "03-measure-calibration",
+      "title": "测量置信度校准",
+      "summary": "按分箱数量加权计算固定宽度分箱 ECE，保留每箱证据。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "校准",
+        "ECE",
+        "置信度"
+      ],
+      "figure": "pj-local-model-eval-harness-3"
+    },
+    {
+      "id": "04-publish-scorecard",
+      "title": "同时发布准确率和延迟",
+      "summary": "将指标与最近秩延迟百分位数、测量来源标签组合。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "百分位数",
+        "测量来源追踪"
+      ],
+      "figure": "pj-local-model-eval-harness-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器的限制见 README。"
+    }
+  ]
+}

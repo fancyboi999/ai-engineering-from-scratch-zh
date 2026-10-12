@@ -1,0 +1,125 @@
+{
+  "id": "retrieval-evaluation-lab",
+  "title": "检索评估实验室",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "用精确率、召回率、倒数排名和折扣增益衡量排序质量，同时展示重复与缺失判断。",
+  "summary": "用精确率、召回率、倒数排名和折扣增益衡量排序质量，同时展示重复与缺失判断。",
+  "youWillBuild": "检索回归侦探，揭示哪些证据移动及聚合值为何变化。",
+  "usefulFor": [
+    "检索回归侦探，揭示哪些证据移动及聚合值为何变化。",
+    "指标适用于提供的标签。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库让解析、评分和失败处理保持可见，不把机制藏在框架后面。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "校验排序与分级判断",
+    "计算前 k 项精确率和召回率",
+    "奖励靠前的有用证据",
+    "逐查询比较系统"
+  ],
+  "prerequisites": [
+    {
+      "title": "检索增强生成",
+      "path": "phases/11-llm-engineering/06-rag"
+    },
+    {
+      "title": "模型评估",
+      "path": "phases/02-ml-fundamentals/09-model-evaluation"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-retrieval-evaluation-lab-1",
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-validate-rankings",
+      "title": "校验排序与分级判断",
+      "summary": "拒绝重复排序 ID、非正截断值和无效相关性等级。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "评估契约",
+        "分级相关性"
+      ],
+      "figure": "pj-retrieval-evaluation-lab-1"
+    },
+    {
+      "id": "02-precision-and-recall",
+      "title": "计算前 k 项精确率和召回率",
+      "summary": "在截断 k 处，针对正等级判断计算二元精确率和召回率。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "精确率",
+        "召回率",
+        "截断值"
+      ],
+      "figure": "pj-retrieval-evaluation-lab-2"
+    },
+    {
+      "id": "03-rank-sensitive-metrics",
+      "title": "奖励靠前的有用证据",
+      "summary": "返回前 k 项倒数排名和 NDCG。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "MRR",
+        "NDCG",
+        "折扣增益"
+      ],
+      "figure": "pj-retrieval-evaluation-lab-3"
+    },
+    {
+      "id": "04-compare-systems",
+      "title": "逐查询比较系统",
+      "summary": "为每个命名系统生成逐查询指标和宏平均值，附未判断结果计数。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "languageWhy": "使用明确的数据结构和确定性的标准库操作。",
+      "concepts": [
+        "宏平均",
+        "配对系统"
+      ],
+      "figure": "pj-retrieval-evaluation-lab-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器的限制见 README。"
+    }
+  ]
+}

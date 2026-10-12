@@ -1,0 +1,111 @@
+{
+  "id": "database-migration-rehearsal",
+  "title": "数据库迁移演练",
+  "level": 3,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "在副本上演练拟议迁移，准确展示变化。",
+  "summary": "让开发者或编码 agent 在可丢弃的数据库副本上提出 SQLite 迁移。记录前后的模式和行数不变量，测试声明的回滚步骤，展示不可逆变化。导出机器可读演练回执和审核页面，不触碰源数据库。",
+  "prerequisiteProjects": [
+    "csv-sql-question-workbench",
+    "json-schema-output-guard"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "快照本地数据库并定义不变量",
+    "仅在可丢弃副本上应用迁移",
+    "执行回滚并检测数据丢失",
+    "导出证据供明确的发布决策使用"
+  ],
+  "youWillBuild": "模式差异、不变量结果和可逆迁移回执",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-database-migration-rehearsal-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-snapshot",
+      "title": "快照本地数据库并定义不变量",
+      "summary": "从只读源捕获模式、行数和内容身份。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "SQLite 备份",
+        "行指纹"
+      ],
+      "figure": "pj-database-migration-rehearsal-1"
+    },
+    {
+      "id": "02-migration",
+      "title": "仅在可丢弃副本上应用迁移",
+      "summary": "在可丢弃内存副本上运行提供的 SQL。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "SQLite 授权器",
+        "迁移证据"
+      ],
+      "figure": "pj-database-migration-rehearsal-2"
+    },
+    {
+      "id": "03-rollback",
+      "title": "执行回滚并检测数据丢失",
+      "summary": "执行声明的逆操作并比较所有捕获状态。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "回滚验证",
+        "数据丢失"
+      ],
+      "figure": "pj-database-migration-rehearsal-3"
+    },
+    {
+      "id": "04-receipt",
+      "title": "导出证据供明确的发布决策使用",
+      "summary": "组合模式差异、不变量和回滚，生成发布证据。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "不变量",
+        "发布审核"
+      ],
+      "figure": "pj-database-migration-rehearsal-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}
