@@ -8,7 +8,7 @@ const { execFileSync } = require('node:child_process');
 const { webcrypto } = require('node:crypto');
 
 // The import checkpoint is byte-identical to the frozen upstream providers.
-// Keep the reference in Git, not in a generated fixture or a /tmp dependency.
+// CI supplies the pinned upstream tree; local Git is a fallback, never a skip.
 const referenceCommit = '04e84b1a213c620c860a0d169ea9524e17c0f513';
 const slugs = [
   'agent-trace-debugger', 'changelog-writer-from-git', 'cloud-agent-with-aws-strands',
@@ -22,9 +22,12 @@ const clone = value => JSON.parse(JSON.stringify(value));
 const chinese = (value, where) => assert.match(value, /[\u4e00-\u9fff]/u, where);
 function source(slug, reference = false) {
   const relative = `site/figures/projects/${slug}.js`;
-  return reference
-    ? execFileSync('git', ['show', `${referenceCommit}:${relative}`], { cwd: path.join(__dirname, '..'), encoding: 'utf8' })
-    : fs.readFileSync(path.join(__dirname, 'figures/projects', `${slug}.js`), 'utf8');
+  if (reference) {
+    const frozenRoot = process.env.AIFS_FIGURE_FROZEN_ROOT || process.env.AIFS_FIGURES_FROZEN_ROOT;
+    if (frozenRoot) return fs.readFileSync(path.join(frozenRoot, relative), 'utf8');
+    return execFileSync('git', ['show', `${referenceCommit}:${relative}`], { cwd: path.join(__dirname, '..'), encoding: 'utf8' });
+  }
+  return fs.readFileSync(path.join(__dirname, 'figures/projects', `${slug}.js`), 'utf8');
 }
 function configs(slug, reference = false) {
   const registry = new Map();
