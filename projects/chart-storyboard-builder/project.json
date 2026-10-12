@@ -1,0 +1,110 @@
+{
+  "id": "chart-storyboard-builder",
+  "title": "图表故事板构建器",
+  "level": 2,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "把表格变成可供检查的可视化解释。",
+  "summary": "帮助社区组织者依据列的角色，明确选择聚合方式和图表形式，解释小型数据集。把每条注释绑定到绘制的数值，展示缺失数据与坐标轴选择，导出 SVG 图表序列、HTML 及机器可读的图表规格。",
+  "prerequisiteProjects": [
+    "csv-sql-question-workbench"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "分析列并声明角色与单位",
+    "计算聚合值并选择图表语法",
+    "将注释绑定到实际绘制的数值",
+    "导出无障碍可视化故事板和数据回执"
+  ],
+  "youWillBuild": "SVG 图表、独立 HTML 故事板和 chart-specs.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-chart-storyboard-builder-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-roles",
+      "title": "分析列并声明角色与单位",
+      "summary": "声明列的含义，区分空值与零。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "列角色",
+        "有限数值"
+      ],
+      "figure": "pj-chart-storyboard-builder-1"
+    },
+    {
+      "id": "02-aggregate",
+      "title": "计算聚合值并选择图表语法",
+      "summary": "计算绘图数据并展示缺失时段。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "聚合",
+        "图表语法"
+      ],
+      "figure": "pj-chart-storyboard-builder-2"
+    },
+    {
+      "id": "03-annotations",
+      "title": "将注释绑定到实际绘制的数值",
+      "summary": "将每条注释锚定到计算所得的数据点。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "有数据依据的注释",
+        "来源追踪"
+      ],
+      "figure": "pj-chart-storyboard-builder-3"
+    },
+    {
+      "id": "04-publish",
+      "title": "导出无障碍可视化故事板和数据回执",
+      "summary": "生成可移植 SVG 图表和机器可读回执。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "SVG",
+        "无障碍图表"
+      ],
+      "figure": "pj-chart-storyboard-builder-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

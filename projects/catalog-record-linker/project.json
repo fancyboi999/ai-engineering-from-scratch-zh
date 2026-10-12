@@ -1,0 +1,110 @@
+{
+  "id": "catalog-record-linker",
+  "title": "目录记录关联器",
+  "level": 2,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "核对两份目录，不在无提示的情况下合并不同条目。",
+  "summary": "帮助图书馆员或组织者核对两份 CSV 导出中不一致的条目记录。利用规范化字段和 token 相似度生成候选配对，收集明确的匹配决定，导出保留来源的映射表及经过审核的合并目录。",
+  "prerequisiteProjects": [
+    "csv-repair-workbench"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "导入两份目录并保留稳定的来源标识",
+    "生成候选配对并解释相似度",
+    "审核匹配并解决字段冲突",
+    "导出映射表和合并目录"
+  ],
+  "youWillBuild": "HTML 配对审核队列、crosswalk.csv 和 merged-catalog.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-catalog-record-linker-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-import",
+      "title": "导入两份目录并保留稳定的来源标识",
+      "summary": "保留稳定 ID 和原始目录字段。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "CSV",
+        "来源身份"
+      ],
+      "figure": "pj-catalog-record-linker-1"
+    },
+    {
+      "id": "02-candidates",
+      "title": "生成候选配对并解释相似度",
+      "summary": "用加权 token 重叠率对可解释的配对排序。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "Jaccard 相似度",
+        "候选筛选阈值"
+      ],
+      "figure": "pj-catalog-record-linker-2"
+    },
+    {
+      "id": "03-decisions",
+      "title": "审核匹配并解决字段冲突",
+      "summary": "要求明确的一对一关联和字段解决方案。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "实体核对",
+        "审核"
+      ],
+      "figure": "pj-catalog-record-linker-3"
+    },
+    {
+      "id": "04-export",
+      "title": "导出映射表和合并目录",
+      "summary": "导出保留来源的映射表及经过审核的实体。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "集成契约",
+        "指纹"
+      ],
+      "figure": "pj-catalog-record-linker-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

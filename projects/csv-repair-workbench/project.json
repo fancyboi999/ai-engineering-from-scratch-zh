@@ -1,0 +1,108 @@
+{
+  "id": "csv-repair-workbench",
+  "title": "CSV 修复工作台",
+  "level": 1,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "修复杂乱表格，不丢失原始单元格。",
+  "summary": "通过明确的转换序列，帮助表格所有者修复不一致标签、日期和缺失值。预览每个变化单元格，将有歧义的情况留待审核，导出清理后的 CSV、可复用转换配方和 HTML 对比。",
+  "prerequisiteProjects": [],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "分析列并保留原始单元格",
+    "提出明确的规范化规则",
+    "预览变化并审核有歧义的值",
+    "导出可复用修复配方和清理后的表格"
+  ],
+  "youWillBuild": "cleaned.csv、recipe.json 和单元格级 HTML 前后对比报告",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-csv-repair-workbench-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-profile",
+      "title": "分析列并保留原始单元格",
+      "summary": "保留精确的源单元格，同时统计缺失值与不同值。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "CSV 解析",
+        "来源追踪"
+      ],
+      "figure": "pj-csv-repair-workbench-1"
+    },
+    {
+      "id": "02-rules",
+      "title": "提出明确的规范化规则",
+      "summary": "根据提供的政策构建顺序明确的配方。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "规范化",
+        "有序规则"
+      ],
+      "figure": "pj-csv-repair-workbench-2"
+    },
+    {
+      "id": "03-preview",
+      "title": "预览变化并审核有歧义的值",
+      "summary": "展示每个变化单元格并隔离不确定日期。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "歧义",
+        "单元格差异"
+      ],
+      "figure": "pj-csv-repair-workbench-3"
+    },
+    {
+      "id": "04-export",
+      "title": "导出可复用修复配方和清理后的表格",
+      "summary": "重放配方并校验人工单元格决定。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "审核回执",
+        "CSV 导出"
+      ],
+      "figure": "pj-csv-repair-workbench-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

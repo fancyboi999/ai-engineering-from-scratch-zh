@@ -1,0 +1,111 @@
+{
+  "id": "community-learning-path-finder",
+  "title": "社区学习路径规划器",
+  "level": 3,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "构建能解释前置要求和取舍的学习路径。",
+  "summary": "帮助学习者从明确的工作坊与资源目录中选择可行顺序。结合前置依赖图、声明的目标和时间预算，解释选择每项资源的原因，导出可编辑的 HTML 学习地图以及供其他课程平台使用的机器可读路径。",
+  "prerequisiteProjects": [
+    "bookmark-path-organizer",
+    "semantic-notes-search"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "建模资源、目标及前置依赖关系",
+    "寻找可行路径并展示缺失的前置要求",
+    "在明确的时间预算内排序备选方案",
+    "导出可编辑学习地图与集成契约"
+  ],
+  "youWillBuild": "HTML 学习地图、path.json 和 unmet-prerequisites.json",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-community-learning-path-finder-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-catalog",
+      "title": "建模资源、目标及前置依赖关系",
+      "summary": "建模资源耗时、目标和前置依赖边。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "有向图",
+        "环检测"
+      ],
+      "figure": "pj-community-learning-path-finder-1"
+    },
+    {
+      "id": "02-closure",
+      "title": "寻找可行路径并展示缺失的前置要求",
+      "summary": "将目标展开为前置资源优先的序列。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "依赖闭包",
+        "拓扑排序"
+      ],
+      "figure": "pj-community-learning-path-finder-2"
+    },
+    {
+      "id": "03-rank",
+      "title": "在明确的时间预算内排序备选方案",
+      "summary": "在声明的时间预算内最大化目标覆盖。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "精确搜索",
+        "取舍"
+      ],
+      "figure": "pj-community-learning-path-finder-3"
+    },
+    {
+      "id": "04-progress",
+      "title": "导出可编辑学习地图与集成契约",
+      "summary": "导出学习地图并校验完成回执。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "课程集成",
+        "进度校验"
+      ],
+      "figure": "pj-community-learning-path-finder-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}
