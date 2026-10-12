@@ -147,7 +147,10 @@ test('navigation Markdown includes every published lesson, glossary definition a
     const section = roadmap.split(`## 阶段 ${String(phase.id).padStart(2, '0')}：`)[1]?.split('\n## ')[0];
     assert.ok(section, phase.name);
     const required = data.ROADMAP_PREREQS[phase.id] || [];
-    for (const id of required) assert.ok(section.includes(`阶段 ${String(id).padStart(2, '0')}：${data.PHASES.find(p => p.id === id).name}`), `${id} -> ${phase.id}`);
+    for (const id of required) {
+      const label = `阶段 ${String(id).padStart(2, '0')}：${data.PHASES.find(p => p.id === id).name}`;
+      assert.ok(section.includes(`[${label}](${ORIGIN}/prereqs.html#phase-${String(id).padStart(2, '0')})`), `${id} -> ${phase.id}`);
+    }
     if (!required.length) assert.match(section, /前置阶段：无/);
   }
 });

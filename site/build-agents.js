@@ -68,7 +68,7 @@ function navigationMarkdown(filename, html, data, manifest) {
       const required = (roadmapPrereqs[phase.id] || []).map(id => {
         const prerequisite = byId.get(id);
         if (!prerequisite) throw new Error(`Unknown prerequisite phase: ${id}`);
-        return `[${phaseLabel(prerequisite)}](${ORIGIN}/index.html#phase-${id})`;
+        return `[${phaseLabel(prerequisite)}](${ORIGIN}/prereqs.html#phase-${String(id).padStart(2, '0')})`;
       });
       lines.push('', `## ${phaseLabel(phase)}`, '', phase.desc || '', '', `课程数：${phase.lessons.length}`, '', `前置阶段：${required.length ? required.join('、') : '无'}`);
     }
