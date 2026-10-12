@@ -1,0 +1,110 @@
+{
+  "id": "infrastructure-plan-explainer",
+  "title": "基础设施计划解释器",
+  "level": 2,
+  "languages": [
+    "Python"
+  ],
+  "source": "core",
+  "tagline": "在基础设施变更前解释替换、未知值和依赖。",
+  "summary": "为审核拟议变更的开发者读取保存的 Terraform 计划 JSON。保留未知与敏感值标记，区分替换和原地更新，追踪声明的依赖。生成解释链接到精确计划地址的审核简报；绝不应用计划。",
+  "prerequisiteProjects": [
+    "json-schema-output-guard"
+  ],
+  "status": "ready",
+  "hours": 8,
+  "prerequisites": [
+    "Python 3.10+；列表、字典和函数"
+  ],
+  "skills": [
+    "加载版本化计划，不暴露敏感值",
+    "分类创建、更新、替换和删除动作",
+    "追踪声明的依赖与未知结果",
+    "导出关联地址的审核解释"
+  ],
+  "youWillBuild": "Markdown 变更简报和 JSON 资源影响图",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "overviewFigure": "pj-infrastructure-plan-explainer-1",
+  "figures": true,
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/input.json",
+      "--output",
+      "demo-output"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-load",
+      "title": "加载版本化计划，不暴露敏感值",
+      "summary": "保留未知和敏感标记，丢弃原始计划字段。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "starter",
+      "concepts": [
+        "Terraform JSON",
+        "递归脱敏"
+      ],
+      "figure": "pj-infrastructure-plan-explainer-1"
+    },
+    {
+      "id": "02-actions",
+      "title": "分类创建、更新、替换和删除动作",
+      "summary": "区分替换与普通更新。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "动作序列",
+        "替换顺序"
+      ],
+      "figure": "pj-infrastructure-plan-explainer-2"
+    },
+    {
+      "id": "03-dependencies",
+      "title": "追踪声明的依赖与未知结果",
+      "summary": "追踪引用到具体计划地址。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "图的边",
+        "未知结果"
+      ],
+      "figure": "pj-infrastructure-plan-explainer-3"
+    },
+    {
+      "id": "04-brief",
+      "title": "导出关联地址的审核解释",
+      "summary": "在脱敏变更证据旁发布精确资源身份。",
+      "hours": 2,
+      "language": "python",
+      "difficulty": "core",
+      "concepts": [
+        "Markdown 回执",
+        "稳定锚点"
+      ],
+      "figure": "pj-infrastructure-plan-explainer-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查实际输出",
+      "caption": "上游录制：与生成的本地界面交互。运行文档中的命令，检查你自己的输出。"
+    }
+  ]
+}

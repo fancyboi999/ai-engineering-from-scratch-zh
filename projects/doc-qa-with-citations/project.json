@@ -1,0 +1,158 @@
+{
+  "id": "doc-qa-with-citations",
+  "title": "带引用的文档问答与 LangChain",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "区分精确来源支持和问题相关性的引用回执。",
+  "summary": "区分精确来源支持和问题相关性的引用回执。导入 query(directory, question, model)。模型回调返回 JSON {source:chunk_id,quote:exact_text}。--response 接受已记录响应并应用同一门禁。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "区分精确来源支持和问题相关性的引用回执。",
+  "usefulFor": [
+    "导入 query(directory, question, model)。模型回调返回 JSON {source:chunk_id,quote:exact_text}。--response 接受已记录响应并应用同一门禁。"
+  ],
+  "skills": [
+    "加载本地文档并保留稳定来源",
+    "用可检查的关键词分数排序分块",
+    "只接受有检索片段依据的答案",
+    "使用框架分块器而不丢失偏移"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "pathlib、字符串、偏移、字典和回调函数。可选 LangChain 依赖单独固定版本。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-doc-qa-with-citations-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、明确算法和确定性本地测试。"
+  },
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "samples/docs",
+      "When does cache expire?",
+      "--output",
+      "answer.json",
+      "--html",
+      "answer.html"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-documents",
+      "title": "加载本地文档并保留稳定来源",
+      "summary": "当 size=4、overlap=1 时，abcdef 的第二个重叠分块从偏移 3 开始。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-doc-qa-with-citations-1",
+      "concepts": [
+        "加载",
+        "本地",
+        "文档",
+        "使用"
+      ]
+    },
+    {
+      "id": "02-retrieval",
+      "title": "用可检查的关键词分数排序分块",
+      "summary": "socket 查询选中 socket 分块，未知词则拒答。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-doc-qa-with-citations-2",
+      "concepts": [
+        "排序",
+        "分块",
+        "使用",
+        "一个"
+      ]
+    },
+    {
+      "id": "03-answer",
+      "title": "只接受有检索片段依据的答案",
+      "summary": "模型响应若含其所引用分块中不存在的词，会被拒绝。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-doc-qa-with-citations-3",
+      "concepts": [
+        "接受",
+        "仅",
+        "答案",
+        "有依据"
+      ]
+    },
+    {
+      "id": "04-adapter",
+      "title": "使用框架分块器而不丢失偏移",
+      "summary": "框架分块转换为与基线相同的来源片段契约。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-doc-qa-with-citations-4",
+      "concepts": [
+        "使用",
+        "一个",
+        "框架",
+        "分块器"
+      ],
+      "runners": [
+        {
+          "language": "python"
+        },
+        {
+          "language": "python",
+          "optional": true,
+          "requires": [
+            "python:langchain_text_splitters"
+          ],
+          "argv": [
+            "{python}",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "{stage}/tests-framework",
+            "-p",
+            "test_framework.py"
+          ]
+        }
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器的限制见 README。"
+    },
+    {
+      "gif": "media/framework.gif",
+      "poster": "media/framework.png",
+      "title": "验证真实 SDK",
+      "caption": "上游实际可选 SDK 测试使用已安装依赖和确定性本地模型。不调用真实云或模型 provider。"
+    }
+  ]
+}

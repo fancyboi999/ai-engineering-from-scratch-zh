@@ -1,0 +1,131 @@
+{
+  "id": "rag-freshness-pipeline",
+  "title": "RAG 新鲜度流水线",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "构建内容寻址文档索引，支持删除追踪、版本检查和新鲜度感知检索。",
+  "summary": "构建内容寻址文档索引，支持删除追踪、版本检查和新鲜度感知检索。",
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "youWillBuild": "过时答案事件实验，证明编辑或删除后的政策不能继续被引用。",
+  "usefulFor": [
+    "过时答案事件实验，证明编辑或删除后的政策不能继续被引用。",
+    "导入器要求完整语料，不是局部变更流。"
+  ],
+  "skills": [
+    "规范化文档并生成内容指纹",
+    "规划插入、更新、删除和刷新",
+    "以原子替换持久化索引",
+    "查询时排除过期证据"
+  ],
+  "prerequisites": [
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    },
+    {
+      "title": "检索增强生成",
+      "path": "phases/11-llm-engineering/06-rag"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-rag-freshness-pipeline-1",
+  "languageWhy": {
+    "Python": "标准库数据结构、明确算法和确定性本地测试。"
+  },
+  "demo": {
+    "command": [
+      "python3",
+      "demo.py"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-fingerprint",
+      "title": "规范化文档并生成内容指纹",
+      "summary": "规范等价的 é 编码得到相同内容哈希。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "starter",
+      "figure": "pj-rag-freshness-pipeline-1",
+      "concepts": [
+        "规范化",
+        "文档",
+        "和",
+        "指纹"
+      ]
+    },
+    {
+      "id": "02-changes",
+      "title": "规划插入、更新、删除和刷新",
+      "summary": "被移除文档出现在 delete 中，过时分块不能继续被搜索。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-rag-freshness-pipeline-2",
+      "concepts": [
+        "规划",
+        "插入",
+        "更新",
+        "删除"
+      ]
+    },
+    {
+      "id": "03-snapshot",
+      "title": "以原子替换持久化索引",
+      "summary": "拒绝过时写入者，最后提交的快照仍可读取。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "core",
+      "figure": "pj-rag-freshness-pipeline-3",
+      "concepts": [
+        "持久化",
+        "一个",
+        "索引",
+        "使用"
+      ]
+    },
+    {
+      "id": "04-retrieve",
+      "title": "查询时排除过期证据",
+      "summary": "即使关键词分数完美，过期匹配笔记也被排除。",
+      "language": "python",
+      "languageWhy": "Python 标准库集合、字节和文件操作直接展示本阶段机制。",
+      "hours": 2,
+      "difficulty": "stretch",
+      "figure": "pj-rag-freshness-pipeline-4",
+      "concepts": [
+        "排除",
+        "过期",
+        "证据",
+        "在"
+      ]
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "上游录制：起始代码先失败，随后参考实现的各阶段全部通过。参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "本地确定性演示命令的实际输出。fixture 和真实适配器的限制见 README。"
+    }
+  ]
+}

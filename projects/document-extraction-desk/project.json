@@ -1,0 +1,119 @@
+{
+  "id": "document-extraction-desk",
+  "title": "文档抽取审核台",
+  "level": 2,
+  "levelName": "构建者",
+  "tagline": "从文本文档抽取结构化字段，检查精确来源片段，导出前批准有歧义的值。",
+  "summary": "从文本文档抽取结构化字段，检查精确来源片段，导出前批准有歧义的值。",
+  "youWillBuild": "本地 HTML 审核台，可下载绑定来源的批准决定和已批准 JSON 值映射。",
+  "usefulFor": [
+    "使用自己的输入生成可供审核、能被其他应用使用的产物。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库解析、明确契约和可移植产物让机制保持可见。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "抽取值前先定义字段",
+    "抽取候选，不丢失证据",
+    "将批准绑定到一个文档版本",
+    "展示证据并导出审核后的值"
+  ],
+  "prerequisites": [
+    {
+      "title": "开发环境",
+      "path": "phases/00-setup-and-tooling/01-dev-environment"
+    },
+    {
+      "title": "数据管理",
+      "path": "phases/00-setup-and-tooling/09-data-management"
+    }
+  ],
+  "figures": true,
+  "overviewFigure": "pj-document-extraction-desk-1",
+  "demo": {
+    "command": [
+      "python3",
+      "cli.py",
+      "sample.txt",
+      "--schema",
+      "schema.json",
+      "--output",
+      "output/review.html"
+    ],
+    "cwd": "solution"
+  },
+  "stages": [
+    {
+      "id": "01-define-fields",
+      "title": "抽取值前先定义字段",
+      "summary": "validate_schema(schema)",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "concepts": [
+        "抽取值前先定义字段"
+      ],
+      "figure": "pj-document-extraction-desk-1"
+    },
+    {
+      "id": "02-retain-source-spans",
+      "title": "抽取候选，不丢失证据",
+      "summary": "extract_candidates(text, schema)",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "concepts": [
+        "抽取候选，不丢失证据"
+      ],
+      "figure": "pj-document-extraction-desk-2"
+    },
+    {
+      "id": "03-review-and-approve",
+      "title": "将批准绑定到一个文档版本",
+      "summary": "typed_value(quote, kind); review_document(text, schema, candidates, decisions=None)",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "concepts": [
+        "将批准绑定到一个文档版本"
+      ],
+      "figure": "pj-document-extraction-desk-3"
+    },
+    {
+      "id": "04-export-review-desk",
+      "title": "展示证据并导出审核后的值",
+      "summary": "render_review(report)",
+      "hours": 2,
+      "difficulty": "stretch",
+      "language": "python",
+      "concepts": [
+        "展示证据并导出审核后的值"
+      ],
+      "figure": "pj-document-extraction-desk-4"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "构建并验证",
+      "caption": "实际起始代码失败和参考评分器输出；参考实现通过不代表学习者获得完成证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "使用完成的产物",
+      "caption": "上游录制的真实输入、计算输出及生成的可移植报告。"
+    }
+  ]
+}
