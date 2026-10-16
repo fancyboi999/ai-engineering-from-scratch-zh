@@ -47,9 +47,18 @@ async function main() {
     };
     watchdog = setTimeout(() => { for (const operation of pending.values()) operation.reject(Error('Project DOM gate timed out')); socket.close(); }, 90000);
     await command('Page.enable');
+    // 测试旧 URL 的重定向行为
+    for (const id of ['agent-budget-planner', 'dataset-split-auditor']) {
+      await command('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false, screenWidth: 1440, screenHeight: 900 });
+      await command('Page.navigate', { url: `${base}/project.html?id=${id}` });
+      await delay(500); // 等待 JS 执行重定向
+      const finalUrl = await evaluate('window.location.pathname');
+      assert.equal(finalUrl, `/project/${id}/`, `旧 URL /project.html?id=${id} 应重定向到 /project/${id}/`);
+    }
+    // 使用新的预渲染页面 URL 进行布局测试
     for (const width of [1440, 390]) for (const theme of ['light', 'dark']) for (const id of ['agent-budget-planner', 'dataset-split-auditor', 'research-report-agent', 'csv-repair-workbench', 'dataset-contract-gate', 'web-change-brief']) {
       await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false, screenWidth: width, screenHeight: 900 });
-      await command('Page.navigate', { url: `${base}/project.html?id=${id}` });
+      await command('Page.navigate', { url: `${base}/project/${id}/` });
       let loaded = false;
       for (let attempt = 0; attempt < 200; attempt++) {
         loaded = await evaluate("!!document.querySelector('#pjDoc pre .code-copy')");

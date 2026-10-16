@@ -513,7 +513,10 @@
         drawStage();
       });
 
-      fetch(stage.contentUrl || contentUrl(stage.doc)).then(function (res) {
+      var fetchUrl = stage.contentUrl || contentUrl(stage.doc);
+      // 确保 URL 是绝对路径，以便从预渲染的 /project/<id>/<stage>/ 页面正确加载
+      if (fetchUrl && !fetchUrl.startsWith('/') && !fetchUrl.startsWith('http')) fetchUrl = '/' + fetchUrl;
+      fetch(fetchUrl).then(function (res) {
         if (!res.ok) throw new Error(String(res.status));
         return res.text();
       }).then(function (md) {
