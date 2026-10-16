@@ -2205,6 +2205,7 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
   writeSitemap(phases, glossaryTerms.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLessonPages(phases, seoManifests.lessonManifest);
+  writeProjectPages(projects, ogCards.cards);
   require('./build-agents').build({ phases, glossaryTerms, roadmapPrereqs });
 }
 
@@ -2244,8 +2245,8 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths, addi
   if (additions) {
     urls.push({ loc: '/projects.html', priority: '0.8', freq: 'weekly' }, { loc: '/manuals.html', priority: '0.8', freq: 'monthly' });
     for (const project of additions.projects.projects) {
-      urls.push({ loc: '/project.html?id=' + project.id, priority: '0.7', freq: 'monthly' });
-      for (const stage of project.stages) urls.push({ loc: '/project.html?id=' + project.id + '&stage=' + stage.id, priority: '0.6', freq: 'monthly' });
+      urls.push({ loc: '/project/' + project.id + '/', priority: '0.7', freq: 'monthly' });
+      for (const stage of project.stages) urls.push({ loc: '/project/' + project.id + '/' + stage.id + '/', priority: '0.6', freq: 'monthly' });
     }
     for (const manual of additions.manuals) urls.push({ loc: '/manual-' + manual.id + '.html', priority: '0.7', freq: 'monthly' });
     for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages]) urls.push({ loc: page.href, priority: '0.6', freq: 'monthly' });
@@ -2313,7 +2314,7 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
   if (additions) {
     out += '\n## 实战项目与技术手册\n';
     out += `- [实战项目](${SITE_ORIGIN}/projects.html) — ${additions.projects.projects.length} 项，${additions.projects.projects.reduce((sum, project) => sum + project.stages.length, 0)} 个阶段\n`;
-    for (const project of additions.projects.projects) out += `- [${project.title}](${SITE_ORIGIN}/project.html?id=${project.id}) — ${project.summary}\n`;
+    for (const project of additions.projects.projects) out += `- [${project.title}](${SITE_ORIGIN}/project/${project.id}/) — ${project.summary}\n`;
     out += `- [技术手册](${SITE_ORIGIN}/manuals.html)\n`;
     for (const manual of additions.manuals) out += `- [${manual.title}](${SITE_ORIGIN}/manual-${manual.id}.html) — ${manual.summary}\n`;
     out += '\n## 阶段与术语发现\n';
@@ -2518,6 +2519,160 @@ function writeLessonPages(phases, lessonManifest) {
     console.warn(`⚠️  ${skipped.length} 课登记了但没有 docs/zh.md，未生成静态页：`);
     skipped.forEach(s => console.warn('   - ' + s));
   }
+}
+
+// ─── 预渲染项目页：site/project/<id>/index.html 和 site/project/<id>/<stage>/index.html ──
+// 与课程页同理：爬虫从 SPA shell 拿到的是通用标题和描述，这里预渲染每个项目/阶段
+// 独立 URL + 独立 title/description/canonical/JSON-LD，让 Google 正确索引。
+function writeProjectPages(projects, ogCards) {
+  const template = fs.readFileSync(path.join(__dirname, 'project.html'), 'utf8');
+  const projectRoot = path.join(__dirname, 'project');
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+
+  const absolutized = template.replace(
+    /(?<![\w-])(href|src)="(?!(?:[a-z][a-z0-9+.-]*:|\/\/|\/|#))([A-Za-z0-9_][^"]*)"/g,
+    '$1="/$2"'
+  );
+
+  const og = require('../lib/og-cards');
+  let projectCount = 0;
+  let stageCount = 0;
+
+  for (const project of projects.projects) {
+    const projectUrl = `${SITE_ORIGIN}/project/${project.id}/`;
+    const projectTitle = `${project.title} - 项目 - 从零开始学 AI 工程`;
+    const projectDesc = project.summary || project.tagline;
+    const stagesLabel = `${project.stages.length} 个阶段`;
+    const hoursLabel = `${project.hours} 小时`;
+    const levelNames = { 1: '入门', 2: '构建', 3: '工程', 4: '系统', 5: '前沿' };
+    const levelName = levelNames[project.level] || '';
+
+    const projectJsonLd = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'LearningResource',
+          name: project.title,
+          description: projectDesc,
+          url: projectUrl,
+          inLanguage: 'zh-CN',
+          isAccessibleForFree: true,
+          educationalLevel: levelName,
+          timeRequired: `PT${project.hours}H`,
+          isPartOf: { '@type': 'Course', name: 'AI Engineering from Scratch 简体中文版', url: SITE_ORIGIN },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: '首页', item: SITE_ORIGIN },
+            { '@type': 'ListItem', position: 2, name: '项目', item: `${SITE_ORIGIN}/projects.html` },
+            { '@type': 'ListItem', position: 3, name: project.title, item: projectUrl },
+          ],
+        },
+      ],
+    }).replace(/</g, '\\u003c');
+
+    let projectPage = absolutized;
+    projectPage = projectPage.replace(/<title>[^<]*<\/title>/, `<title>${mdRender.escapeHtml(projectTitle)}</title>`);
+    projectPage = projectPage.replace(
+      /<meta name="description" content="[^"]*">/,
+      `<meta name="description" content="${mdRender.escapeAttr(projectDesc)}">`
+    );
+    projectPage = projectPage.replace(
+      /<meta property="og:title" content="[^"]*">/,
+      `<meta property="og:title" content="${mdRender.escapeAttr(projectTitle)}">`
+    );
+    projectPage = projectPage.replace(
+      /<meta property="og:description" content="[^"]*">/,
+      `<meta property="og:description" content="${mdRender.escapeAttr(projectDesc)}">`
+    );
+    const projectCardSpec = ogCards && ogCards[`project/${project.id}`];
+    if (projectCardSpec) {
+      const cardUrl = og.cardUrl('project', project.id, projectCardSpec);
+      const cardTagsHtml = og.cardTags(cardUrl, projectCardSpec).join('\n  ');
+      projectPage = projectPage.replace(
+        /<meta property="og:image" content="[^"]*">[\s\S]*?<meta name="twitter:image:alt" content="[^"]*">/,
+        cardTagsHtml
+      );
+    }
+    projectPage = projectPage.replace('</head>',
+      `  <link rel="canonical" href="${projectUrl}">\n` +
+      `  <meta property="og:url" content="${projectUrl}">\n` +
+      `  <script type="application/ld+json">${projectJsonLd}</script>\n</head>`);
+
+    const projectOutDir = path.join(projectRoot, project.id);
+    fs.mkdirSync(projectOutDir, { recursive: true });
+    fs.writeFileSync(path.join(projectOutDir, 'index.html'), projectPage, 'utf8');
+    projectCount++;
+
+    for (const stage of project.stages) {
+      const stageUrl = `${SITE_ORIGIN}/project/${project.id}/${stage.id}/`;
+      const stageTitle = `${stage.title} - ${project.title} - 项目 - 从零开始学 AI 工程`;
+      const stageDesc = stage.summary || `${project.title} 的第 ${stage.number} 阶段：${stage.title}`;
+      const difficultyLabels = { starter: '入门', builder: '构建', engineer: '工程', systems: '系统', frontier: '前沿', core: '核心' };
+      const difficultyLabel = difficultyLabels[stage.difficulty] || stage.difficulty || '';
+
+      const stageJsonLd = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'LearningResource',
+            name: stage.title,
+            description: stageDesc,
+            url: stageUrl,
+            inLanguage: 'zh-CN',
+            isAccessibleForFree: true,
+            educationalLevel: difficultyLabel,
+            timeRequired: stage.hours ? `PT${stage.hours}H` : undefined,
+            isPartOf: { '@type': 'LearningResource', name: project.title, url: projectUrl },
+          },
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: '首页', item: SITE_ORIGIN },
+              { '@type': 'ListItem', position: 2, name: '项目', item: `${SITE_ORIGIN}/projects.html` },
+              { '@type': 'ListItem', position: 3, name: project.title, item: projectUrl },
+              { '@type': 'ListItem', position: 4, name: stage.title, item: stageUrl },
+            ],
+          },
+        ],
+      }).replace(/</g, '\\u003c');
+
+      let stagePage = absolutized;
+      stagePage = stagePage.replace(/<title>[^<]*<\/title>/, `<title>${mdRender.escapeHtml(stageTitle)}</title>`);
+      stagePage = stagePage.replace(
+        /<meta name="description" content="[^"]*">/,
+        `<meta name="description" content="${mdRender.escapeAttr(stageDesc)}">`
+      );
+      stagePage = stagePage.replace(
+        /<meta property="og:title" content="[^"]*">/,
+        `<meta property="og:title" content="${mdRender.escapeAttr(stageTitle)}">`
+      );
+      stagePage = stagePage.replace(
+        /<meta property="og:description" content="[^"]*">/,
+        `<meta property="og:description" content="${mdRender.escapeAttr(stageDesc)}">`
+      );
+      if (projectCardSpec) {
+        const cardUrl = og.cardUrl('project', project.id, projectCardSpec);
+        const cardTagsHtml = og.cardTags(cardUrl, projectCardSpec).join('\n  ');
+        stagePage = stagePage.replace(
+          /<meta property="og:image" content="[^"]*">[\s\S]*?<meta name="twitter:image:alt" content="[^"]*">/,
+          cardTagsHtml
+        );
+      }
+      stagePage = stagePage.replace('</head>',
+        `  <link rel="canonical" href="${stageUrl}">\n` +
+        `  <meta property="og:url" content="${stageUrl}">\n` +
+        `  <script type="application/ld+json">${stageJsonLd}</script>\n</head>`);
+
+      const stageOutDir = path.join(projectOutDir, stage.id);
+      fs.mkdirSync(stageOutDir, { recursive: true });
+      fs.writeFileSync(path.join(stageOutDir, 'index.html'), stagePage, 'utf8');
+      stageCount++;
+    }
+  }
+
+  console.log(`   wrote ${projectCount} project pages and ${stageCount} stage pages under site/project/`);
 }
 
 // ─── 自动同步站点文案里的课程数 / 产出数 ─────

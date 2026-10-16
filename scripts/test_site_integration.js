@@ -50,11 +50,11 @@ test('76 project sources, 308 stage docs, two manuals and 245 Hub pages are full
   let stages = 0;
   const sitemap = read('sitemap.xml');
   for (const project of projects) {
-    assert.ok(sitemap.includes('/project.html?id=' + project.id));
+    assert.ok(sitemap.includes('/project/' + project.id + '/'));
     for (const stage of project.stages) {
       const source = fs.readFileSync(path.join(root, project.path, 'stages', stage.id, 'docs/zh.md'), 'utf8');
       assert.equal(read(`project-content/${project.id}/stages/${stage.id}/docs/zh.md`), source);
-      assert.ok(sitemap.includes('&amp;stage=' + stage.id));
+      assert.ok(sitemap.includes('/project/' + project.id + '/' + stage.id + '/'));
       stages++;
     }
   }

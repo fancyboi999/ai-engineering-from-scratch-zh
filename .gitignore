@@ -86,6 +86,8 @@ generated/
 site/agent-pages/
 # 预渲染静态课程页（writeLessonPages 生成，523 个 index.html）——同款策略不提交
 site/lessons/
+# 预渲染项目页（writeProjectPages 生成）——同款策略不提交
+site/project/
 
 # scripts/build_catalog.py 的可再生产物；中文仓的发布与课数真相仍由
 # site/build.js 管理，因此忽略 catalog.json，避免误提交生成文件。

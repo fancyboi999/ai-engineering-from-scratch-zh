@@ -105,7 +105,7 @@ python3 scripts/project_test.py retrieval-evaluation-lab \
 
 **保留产物：** 可复现的比较，包含逐查询差值与用于评分的相关性判断。指标描述的是这些判断，并不能证明回答正确。
 
-[开始项目](https://aieng-zh.cn/project.html?id=retrieval-evaluation-lab) · [查看参考实现](projects/retrieval-evaluation-lab/solution/) · [使用自己的输入](projects/retrieval-evaluation-lab/README.md#使用自己的输入运行)
+[开始项目](https://aieng-zh.cn/project/retrieval-evaluation-lab/) · [查看参考实现](projects/retrieval-evaluation-lab/solution/) · [使用自己的输入](projects/retrieval-evaluation-lab/README.md#使用自己的输入运行)
 
 </details>
 
@@ -127,7 +127,7 @@ python3 scripts/project_test.py agent-trace-debugger \
 
 **保留产物：** 输入轨迹、HTML 时间线与 JSON 回归报告。保留每个 span 独占的 token 数，避免把父级与子级用量重复计数。
 
-[开始项目](https://aieng-zh.cn/project.html?id=agent-trace-debugger) · [查看参考实现](projects/agent-trace-debugger/solution/) · [交互式探索计时](https://aieng-zh.cn/project.html?id=agent-trace-debugger&stage=03-timing)
+[开始项目](https://aieng-zh.cn/project/agent-trace-debugger/) · [查看参考实现](projects/agent-trace-debugger/solution/) · [交互式探索计时](https://aieng-zh.cn/project/agent-trace-debugger/03-timing/)
 
 </details>
 
@@ -149,7 +149,7 @@ python3 scripts/project_test.py tool-call-firewall \
 
 **保留产物：** 展示请求操作和策略决策的审计回执。批准只在一次调用中单次使用；本项目不提供持久授权，也不是操作系统沙箱。
 
-[开始项目](https://aieng-zh.cn/project.html?id=tool-call-firewall) · [查看参考实现](projects/tool-call-firewall/solution/) · [探索批准边界](https://aieng-zh.cn/project.html?id=tool-call-firewall&stage=03-consume-a-request-bound-approval-once)
+[开始项目](https://aieng-zh.cn/project/tool-call-firewall/) · [查看参考实现](projects/tool-call-firewall/solution/) · [探索批准边界](https://aieng-zh.cn/project/tool-call-firewall/03-consume-a-request-bound-approval-once/)
 
 </details>
 

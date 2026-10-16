@@ -102,7 +102,7 @@ function build(navigation) {
     if (project.status !== 'ready') continue;
     const resourcePath = `projects/${directory}`;
     entries.push({ path: resourcePath, kind: 'project', title: project.title,
-      description: project.summary, url: `${ORIGIN}/project.html?id=${encodeURIComponent(project.id)}`,
+      description: project.summary, url: `${ORIGIN}/project/${encodeURIComponent(project.id)}/`,
       sourceUrl: `${REPO}/blob/main/${resourcePath}/README.md`,
       markdown: fs.readFileSync(path.join(ROOT, resourcePath, 'README.md'), 'utf8'),
     });

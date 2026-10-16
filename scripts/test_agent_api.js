@@ -41,7 +41,7 @@ test('catalog paginates stable unique paths and validates typed inputs', () => {
     assert.equal(entry.markdown, fs.readFileSync(path.join(root, resourcePath, 'README.md'), 'utf8'));
     assert.equal(entry.kind, 'project');
     assert.equal(entry.sourceUrl, `https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/${resourcePath}/README.md`);
-    assert.equal(entry.url, `https://aieng-zh.cn/project.html?id=${resourcePath.split('/')[1]}`);
+    assert.equal(entry.url, `https://aieng-zh.cn/project/${resourcePath.split('/')[1]}/`);
   }
   assert.equal(new Set([...first.items, ...next.items].map(item => item.path)).size, 4);
   assert.equal(search({ q: 'unmatched-term-3c57caa' }).nextOffset, null);
