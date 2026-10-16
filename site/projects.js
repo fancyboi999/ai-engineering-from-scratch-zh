@@ -7,6 +7,25 @@
 (function () {
   'use strict';
 
+  // 旧 URL (/project.html?id=...) 规范化：注入 canonical 并重定向到预渲染页
+  // Google 把 JS 重定向当作信号，有助于合并重复索引
+  (function redirectLegacyProjectUrl() {
+    if (document.body.getAttribute('data-projects-page') !== 'project') return;
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('id');
+    if (!id) return;
+    var stage = params.get('stage');
+    var canonicalPath = '/project/' + encodeURIComponent(id) + '/' + (stage ? encodeURIComponent(stage) + '/' : '');
+    var canonicalUrl = window.location.origin + canonicalPath;
+    // 注入 canonical 标签（爬虫可能不执行重定向但会读取 canonical）
+    var link = document.createElement('link');
+    link.rel = 'canonical';
+    link.href = canonicalUrl;
+    document.head.appendChild(link);
+    // JS 重定向到预渲染页
+    window.location.replace(canonicalPath);
+  })();
+
   var DATA = window.AIFS_PROJECTS || { levels: [], projects: [], planned: [] };
   var root = document.documentElement;
   var PROGRESS_KEY = 'aifs.projects.progress.v1';
@@ -90,7 +109,7 @@
   }
 
   function projectHref(id, stageId) {
-    var href = 'project.html?id=' + encodeURIComponent(id) + (stageId ? '&stage=' + encodeURIComponent(stageId) : '');
+    var href = '/project/' + encodeURIComponent(id) + '/' + (stageId ? encodeURIComponent(stageId) + '/' : '');
     return window.AIFSRouteLinks ? window.AIFSRouteLinks.adaptHref(href) : href;
   }
 
@@ -354,9 +373,26 @@
     return '<li><a href="/lessons/' + coursePath.replace(/^phases\//, '') + '/">' + esc(title) + '</a></li>';
   }
 
-  async function renderProject() {
+  function parseProjectUrl() {
+    // 支持两种 URL 格式：
+    // 旧：/project.html?id=foo&stage=bar
+    // 新：/project/foo/bar/
     var params = new URLSearchParams(window.location.search);
-    var id = params.get('id') || '';
+    var id = params.get('id');
+    var stage = params.get('stage');
+    if (!id) {
+      var match = window.location.pathname.match(/^\/project\/([^/]+)(?:\/([^/]+))?\/?$/);
+      if (match) {
+        id = decodeURIComponent(match[1]);
+        stage = match[2] ? decodeURIComponent(match[2]) : null;
+      }
+    }
+    return { id: id || '', stage: stage };
+  }
+
+  async function renderProject() {
+    var parsed = parseProjectUrl();
+    var id = parsed.id;
     var project = DATA.projects.filter(function (p) { return p.id === id; })[0];
     var hero = document.getElementById('pjProjectHero');
     if (!project) {
@@ -413,7 +449,7 @@
     var certificateHost = document.getElementById('pjCertificate');
     if (certificateHost && window.AIFSProjectCertificates) window.AIFSProjectCertificates.mount(certificateHost, project);
 
-    var requested = params.get('stage');
+    var requested = parsed.stage;
     var stageIndex = Math.max(0, project.stages.findIndex(function (s) { return s.id === requested; }));
     if (!requested) {
       var progress = progressFor(project.id);
@@ -508,8 +544,8 @@
       go(Number(link.getAttribute('data-stage-index')), true);
     });
     window.addEventListener('popstate', function () {
-      var s = new URLSearchParams(window.location.search).get('stage');
-      var idx = project.stages.findIndex(function (st) { return st.id === s; });
+      var parsed = parseProjectUrl();
+      var idx = project.stages.findIndex(function (st) { return st.id === parsed.stage; });
       go(idx === -1 ? 0 : idx, false);
     });
 
