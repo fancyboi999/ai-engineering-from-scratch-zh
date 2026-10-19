@@ -1,5 +1,5 @@
 'use strict';
-const { renderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
+const { renderHeader, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -14,7 +14,7 @@ const MAX_COVERED_LESSONS = 8;
 const CORE_TERMS = 20;
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap';
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
-const SITE_HEADER = `<header class="site-header"><div class="header-inner"><a href="/" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a><nav class="header-nav">${renderNavigation('/')}</nav><button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button></div></header>`;
+const SITE_HEADER = renderHeader({ base: '/' });
 const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/hubs.css">';
 const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>`;
 const EXPLORE_LINKS = [

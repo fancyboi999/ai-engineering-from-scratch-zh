@@ -138,7 +138,7 @@ async function main() {
       ['catalog.html', '课程表', false], ['glossary.html', '术语表', true],
       ['projects.html', '实战项目', true], ['manuals.html', '技术手册', true],
       ['manual-reverse-engineering-101.html', '技术手册', true],
-      ['contact.html', null, false], ['privacy.html', null, false],
+      ['contact.html', null, false], ['privacy.html', null, false], ['developer.html', null, false],
       ['skills.html', 'Agent 技能', true], ['how-to-learn.html', '学习方法', true],
       ['inside-an-ai-agent.html', 'Agent 内部机制', true], ['certifications.html', '认证', true],
       ['certification?id=claude-ccao-f', '认证', true],
@@ -150,7 +150,7 @@ async function main() {
     ];
     for (const width of [1920, 1280, 390]) {
       // Every generator on desktop; the two originally inconsistent pages at each breakpoint.
-      for (const [page, active, narration] of (width === 1920 ? contexts : contexts.slice(0, 2))) {
+      for (const [page, active, narration] of (width === 1920 ? contexts : contexts.filter(([page]) => ['catalog.html', 'certifications.html', 'contact.html'].includes(page)))) {
         await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
         await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/${page}` });
         let ready = false;
@@ -168,7 +168,11 @@ async function main() {
           home:document.querySelector('.logo')?.getAttribute('aria-current'),
           narration:!!document.getElementById('ttsToggle'),
           narrationRequested:!!document.querySelector('script[data-aifs-tts]'),
-          github:document.querySelectorAll('.site-header .header-github').length
+          github:document.querySelectorAll('.site-header .header-github').length,
+          searchSvg:!!document.querySelector('.search-toggle svg circle'),
+          searchSize:[document.querySelector('.search-toggle').offsetWidth,document.querySelector('.search-toggle').offsetHeight],
+          slot:!!document.querySelector('.header-narration-slot'),
+          themeSize:['width','height'].map(key=>parseFloat(getComputedStyle(document.querySelector('#themeToggle'))[key]))
         })`);
         assert.deepEqual(state.links, width > 820 && width <= 1400 ? menu.filter(label => !priorities.includes(label)) : menu, page);
         assert.deepEqual(state.priority, width > 820 && width <= 1400 ? priorities : [], page);
@@ -177,9 +181,56 @@ async function main() {
         assert.equal(state.narration, narration, page);
         if (!narration) assert.equal(state.narrationRequested, false, page);
         assert.equal(state.github, 1, page);
+        assert.equal(state.searchSvg, true, page);
+        assert.deepEqual(state.searchSize, width <= 600 ? [44,44] : [36,36], page);
+        assert.equal(state.slot, true, page);
+        assert.deepEqual(state.themeSize, width > 1400 ? [36,36] : [44,44], page);
         console.log('shared navigation:', JSON.stringify({page,width,active,narration,consistent:true}));
       }
     }
+    // Exercise the real lazy-load boundary, including a failed request and retry.
+    await command('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await command('Network.enable');
+    await command('Network.setBlockedURLs', { urls: ['*cmdpalette.js*'] });
+    await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/contact.html` });
+    for (let attempt = 0; attempt < 100; attempt++) {
+      if (await evaluate("document.readyState==='complete' && !!document.querySelector('.header-menu-toggle')")) break;
+      await delay(50);
+    }
+    assert.equal(await evaluate("typeof CmdPalette"), 'undefined');
+    await evaluate("document.querySelector('.search-toggle').click()");
+    let failed = false;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      failed = await evaluate("document.querySelector('.search-toggle').hasAttribute('data-search-error')");
+      if (failed) break;
+      await delay(50);
+    }
+    assert.ok(failed, 'search request failure was not exposed for retry');
+    await command('Network.setBlockedURLs', { urls: [] });
+    await evaluate("document.querySelector('.search-toggle').click()");
+    let opened = false;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      opened = await evaluate("!!document.querySelector('#cmdPalette input') && document.body.hasAttribute('data-palette-open')");
+      if (opened) break;
+      await delay(50);
+    }
+    assert.ok(opened, 'search retry did not open the palette');
+    assert.equal(await evaluate("document.querySelector('.search-toggle').title"), '搜索（⌘K）');
+    await evaluate("(function(){const input=document.querySelector('#cmdPalette input');input.value='反向传播';input.dispatchEvent(new Event('input',{bubbles:true}));})()");
+    let results = false;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      results = await evaluate("!!document.querySelector('#cmdPalette [data-href*=\"/lessons/\"]')");
+      if (results) break;
+      await delay(50);
+    }
+    assert.ok(results, 'lazy search lacks the real lesson index');
+    await evaluate("window.CmdPalette.close();document.querySelector('.header-menu-toggle').click()");
+    const beforeTheme = await evaluate("document.documentElement.getAttribute('data-theme')");
+    await evaluate("document.getElementById('themeToggle').click()");
+    const afterTheme = await evaluate("({theme:document.documentElement.getAttribute('data-theme'),stored:localStorage.getItem('theme')})");
+    assert.notEqual(afterTheme.theme, beforeTheme);
+    assert.equal(afterTheme.theme, afterTheme.stored);
+    console.log('shared header controls: lazy search failure/retry, course result, and single theme toggle passed');
   } finally {
     clearTimeout(watchdog); if (socket) socket.close(); server.closeAllConnections(); server.close();
     if (browser && browser.pid && browser.exitCode === null) { const stopped = new Promise(resolve => browser.once('exit', resolve)); browser.kill(); await stopped; }

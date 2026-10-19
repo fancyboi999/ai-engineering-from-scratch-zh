@@ -143,13 +143,7 @@ const html = `<!DOCTYPE html>
 </head>
 <body data-am-depth="intro">
   <a href="#main" class="skip-link">跳到正文</a>
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
-      <nav class="header-nav">${navigation.renderNavigation()}</nav>
-      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button>
-    </div>
-  </header>
+  ${navigation.renderHeader()}
 
   <main id="main" class="am">
     <div class="am-screen">

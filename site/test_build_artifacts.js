@@ -462,9 +462,9 @@ function writeMarkdown(file, { name, description, version }) {
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260831a';
   const appRelease = '20261019a';
-  const styleRelease = '20261019b';
-  const navigationRelease = '20261019b';
-  const narrationRelease = '20260831a';
+  const styleRelease = '20261019c';
+  const navigationRelease = '20261019c';
+  const narrationRelease = '20261019a';
   const roadmapRelease = '20261019a';
   const pages = [
     'about.html',
@@ -2599,7 +2599,14 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
     assert.deepEqual(links, expected.map(([href, label]) => [new URL(href, 'https://aieng-zh.cn/').href, label]), file);
     assert.doesNotMatch(nav[1], /header-mobile-only/, file);
     assert.equal((nav[1].match(/class="header-github"/g) || []).length, 1, file);
-    assert.match(html, /header\.js\?v=20261019b/, file);
+    assert.match(html, /header\.js\?v=20261019c/, file);
+    const shell = html.match(/<header\b[^>]*class="site-header"[^>]*>[\s\S]*?<\/header>/)[0];
+    assert.equal((shell.match(/class="search-toggle"/g) || []).length, 1, file);
+    assert.match(shell, /<circle cx="11" cy="11" r="8"\/>/, file);
+    assert.doesNotMatch(shell, /⌕/, file);
+    assert.equal((shell.match(/id="themeToggle"/g) || []).length, 1, file);
+    assert.equal((shell.match(/class="header-narration-slot"/g) || []).length, 1, file);
+    assert.match(shell, /class="logo-label">AI \/ FROM SCRATCH<\/span>/, file);
     checked++;
   }
   assert.ok(checked >= 25, `only ${checked} shared headers checked`);
