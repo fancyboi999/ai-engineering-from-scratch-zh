@@ -43,8 +43,8 @@ node | ds | 1,1 | Dataset | __len__, __getitem__
 node | dl | 2,1 | DataLoader | 批次、打乱、工作进程
 node | model | 3,1 | nn.Module | forward(), parameters()
 node | loss | 3,2 | 损失函数 | logits 与目标
-node | tape | 2,2 | 自动求导 | loss.backward()
-node | opt | 1,2 | 优化器 | step(), zero_grad()
+node | tape | 4,2 | 自动求导 | loss.backward()
+node | opt | 4,1 | 优化器 | step(), zero_grad()
 edge | ds | dl | 样本
 edge | dl | model | 批次
 edge | model | loss | 输出

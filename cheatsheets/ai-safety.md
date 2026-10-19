@@ -16,7 +16,7 @@ node | in | 1,1 | 用户 prompt |
 node | pre | 2,1 | 生成前检测 | 检查 prompt 的规则
 node | llm | 3,1 | 模型输出流 | 每块 4 个 token
 node | dur | 3,2 | 生成中过滤 | 缓冲 2 个分块
-node | post | 2,2 | 生成后检查 | 分类器、规则引擎
+node | post | 2,3 | 生成后检查 | 分类器、规则引擎
 node | agg | 1,2 | 聚合 | 取最高严重程度
 node | out | 1,3 | 最终动作 | RequestTrace
 edge | in | pre |

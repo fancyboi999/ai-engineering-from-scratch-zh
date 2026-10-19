@@ -76,11 +76,11 @@ type: architecture
 from: manuals/a2a-101/capture/README.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/4-6-push-notification-configs.md, manuals/a2a-101/sections/7-1-a-client.md
 
 ```arch
-node | planner | 1,2 | planner.py | 客户端 agent
+node | planner | 2,2 | planner.py | 客户端 agent
 node | card | 2,1 | Agent 卡片 | /.well-known/agent-card.json
-node | runner | 2,2 | test-runner | :41241 流式与推送
-node | reviewer | 3,1 | code-reviewer | :41242 需要输入
-node | deployer | 3,2 | deployer | :41243 bearer，需要认证
+node | runner | 1,2 | test-runner | :41241 流式与推送
+node | reviewer | 3,2 | code-reviewer | :41242 需要输入
+node | deployer | 2,3 | deployer | :41243 bearer，需要认证
 node | hook | 1,3 | Webhook | :41250 /a2a-events
 node | operator | 3,3 | 操作员 | 在 A2A 之外批准
 edge | planner | card | GET

@@ -206,12 +206,22 @@ async function main() {
           client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
           grid:[...document.querySelectorAll('.cs-tile')].map(tile=>({right:tile.getBoundingClientRect().right,parentRight:tile.parentElement.getBoundingClientRect().right})),
           tables:[...document.querySelectorAll('.cs-table')].map(table=>({right:table.getBoundingClientRect().right,parentRight:table.closest('.cs-block').getBoundingClientRect().right})),
-          clipped:[...document.querySelectorAll('.cs-table th,.cs-table td')].filter(cell=>cell.scrollWidth>cell.clientWidth+2).map(cell=>cell.textContent.slice(0,60))
+          clipped:[...document.querySelectorAll('.cs-table th,.cs-table td')].filter(cell=>cell.scrollWidth>cell.clientWidth+2).map(cell=>cell.textContent.slice(0,60)),
+          diagramLabels:[...document.querySelectorAll('.cs-arch')].filter(svg=>svg.getBoundingClientRect().width>0).flatMap(svg=>[...svg.querySelectorAll('.cs-arch-node')].flatMap(node=>{
+            const box=node.getBBox(),outside=[];
+            for(let text=node.nextElementSibling;text&&!text.classList.contains('cs-arch-node');text=text.nextElementSibling){
+              if(!text.matches('.cs-arch-label,.cs-arch-sub'))continue;
+              const rect=text.getBBox();
+              if(rect.x<box.x-1||rect.x+rect.width>box.x+box.width+1||rect.y<box.y-1||rect.y+rect.height>box.y+box.height+1)outside.push(text.textContent);
+            }
+            return outside;
+          }))
         })`);
         assert.ok(layout.scroll <= layout.client + 1, file + ' scrolls horizontally at ' + width);
         assert.ok(layout.grid.every(box=>box.right<=box.parentRight+1), file + ' tiles escape their grid');
         assert.ok(layout.tables.every(box=>box.right<=box.parentRight+1), file + ' table escapes its card at ' + width);
         assert.deepEqual(layout.clipped, [], file + ' has overflowing table-cell content');
+        assert.deepEqual(layout.diagramLabels, [], file + ' SVG labels escape their node boxes at ' + width);
       }
     }
     for (const page of ['contact.html', 'privacy.html', 'developer.html', 'how-to-learn.html']) {
