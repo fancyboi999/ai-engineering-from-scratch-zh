@@ -16,7 +16,7 @@
 
 ## 问题背景
 
-一个 fp16 的 700 亿参数模型，光参数就要 140 GB。没有消费级 GPU 装得下。ZeRO-3 把参数 shard 到各个 rank 上，但每次 forward 仍要每个 rank 把整层 allgather 出来，每层付 log(N) 跳。Pipeline parallel 走另一条路：把模型切成 N 个 stage，每个 rank 放一个 stage。第 1 层的 forward 在 rank 0 上算完，把激活张量交给 rank 1；rank 1 跑第 2 层再交给 rank 2；以此类推。Backward 反向流动。内存线性下降，因为每个 rank 只持有一个 stage；计算是顺序的，这就是 bubble 问题。
+一个 fp16 的 700 亿参数模型，光参数就要 140 GB。没有消费级 GPU 装得下。ZeRO-3 把参数 shard 到各个 rank 上，但每次 forward 仍要每个 rank 把整层 allgather 出来，每层付 $\log(N)$ 跳。Pipeline parallel 走另一条路：把模型切成 N 个 stage，每个 rank 放一个 stage。第 1 层的 forward 在 rank 0 上算完，把激活张量交给 rank 1；rank 1 跑第 2 层再交给 rank 2；以此类推。Backward 反向流动。内存线性下降，因为每个 rank 只持有一个 stage；计算是顺序的，这就是 bubble 问题。
 
 Bubble 是 pipeline 开头的空闲（等第一个 microbatch 到达最后一个 stage）和结尾的空闲（等最后一个 microbatch 反向排空）。有 M 个 microbatch 和 N 个 stage 时，每 stage 的 bubble 比例是 (N-1)/(M+N-1)。在 M=8、N=4 时是 27%。在 M=64、N=4 时是 4.5%。每步 microbatch 越多 bubble 越小，这意味着每 microbatch 的 batch size 要小，而这个约束正是驱动 microbatch 设计的因素。
 

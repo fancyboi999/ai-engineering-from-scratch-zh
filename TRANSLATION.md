@@ -37,6 +37,8 @@
 | `## Ship It` | `## 拿去用` |
 | `## Exercises` | `## 练习` |
 | `## Key Terms` | `## 关键术语` |
+| `## Summary` | `## 总结` |
+| `### Hints` | `### 提示` |
 | `## Further Reading` | `## 延伸阅读` |
 | `## Pitfalls` | `## 常见坑` |
 | `## Connections` | `## 关联` |
@@ -86,6 +88,10 @@
 ### 保留英文，不翻
 
 `agent`、`token`、`prompt`、`transformer`、`LLM`、`MCP`、`API`、`GPU`/`CPU`、`PyTorch`、`NumPy`、所有产品名和库名。
+
+## 测验选项去偏
+
+翻译阶段保持选项顺序、`stage` 与 `correct` 不变。集成阶段使用中文仓现有 `scripts/debias_quizzes.py` 做确定性去偏；选项重排时必须同步 `correct`，并用 `scripts/audit_quiz_debias.py` 或其 `compare_quiz` 核对题干、解析、选项集合及正确答案内容没有变化。上游原题的题数与阶段分布保持原样，不为套用六题模板删题。
 
 ## humanizer 要点（翻译时套用）
 

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何学完一节课 · 从零开始学 AI 工程</title>
+  <meta name="description" content="每个课程环节该做什么：在哪里运行动手构建代码、实际使用环节需要安装什么、如何使用拿去用产物，以及练习的步骤。">
+  <link rel="canonical" href="https://aieng-zh.cn/how-to-learn.html">
+  <meta property="og:title" content="如何学完一节课 · 从零开始学 AI 工程">
+  <meta property="og:description" content="每个课程环节该做什么：在哪里运行动手构建代码、实际使用环节需要安装什么、如何使用拿去用产物，以及练习的步骤。">
+  <meta property="og:url" content="https://aieng-zh.cn/how-to-learn.html">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261019a">
+  <style>
+    .trust-page { max-width: 780px; margin: 0 auto; padding: 100px 0 80px; }
+    .trust-page h1, .trust-page h2 { font-family: var(--font-display); color: var(--blueprint); text-transform: uppercase; }
+    .trust-page h1 { font-size: clamp(min(2.4rem, 12vw), 6vw, 3.8rem); line-height: 1; }
+    .trust-page h2 { font-family: var(--font-mono); font-size: 1rem; letter-spacing: .12em; margin-top: 42px; }
+    .trust-page p { font-family: var(--font-body); font-size: 1.05rem; line-height: 1.7; color: var(--ink); }
+    .trust-page a { color: var(--blueprint); }
+    .trust-page .about-eyebrow { font-family: var(--font-mono); font-size: .74rem; letter-spacing: .16em; text-transform: uppercase; color: var(--blueprint); margin: 0 0 12px; }
+    .guide-page ol, .guide-page ul { font-family: var(--font-body); font-size: 1.05rem; line-height: 1.7; color: var(--ink); padding-left: 1.4em; }
+    .guide-page li { margin: 6px 0; }
+    .guide-page pre { background: var(--bg-surface, rgba(0,0,0,.04)); border: 1px solid var(--rule-soft); padding: 14px 16px; overflow-x: auto; font-size: .86rem; line-height: 1.6; }
+    .guide-page code { font-family: var(--font-mono); font-size: .88em; overflow-wrap: anywhere; }
+    .guide-page pre code { overflow-wrap: normal; }
+    .guide-page h2 { scroll-margin-top: 80px; }
+    .guide-toc { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 28px 0 8px; padding: 14px 0; border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft); font-family: var(--font-mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }
+    @media (max-width: 640px) { .trust-page { padding: 56px 0 56px; } }
+  </style>
+  <link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">
+  <link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
+<meta property="og:image" content="https://aieng-zh.cn/og/page/how-to-learn.png?v=5776a03ccd5e">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="如何学完一节课 - 从零构建 AI 工程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aieng-zh.cn/og/page/how-to-learn.png?v=5776a03ccd5e">
+<meta name="twitter:image:alt" content="如何学完一节课 - 从零构建 AI 工程">
+</head>
+<body>
+  <a href="#main" class="skip-link">跳到正文</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH
+      </a>
+      <nav class="header-nav">
+        <a href="index.html#contents">课程目录</a>
+        <a href="catalog.html">课程表</a>
+        <a href="prereqs.html">路线图</a>
+        <a href="glossary.html">术语表</a>
+        <a href="about.html">关于</a>
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          <span class="star-count" data-loading="true" aria-label="GitHub stars">…</span>
+        </a>
+      </nav>
+      <button class="search-toggle" type="button" data-cmd-palette
+        aria-label="搜索 (⌘K)" title="搜索 (⌘K)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">
+        <span class="theme-icon" id="themeIcon">N</span>
+      </button>
+    </div>
+  </header>
+  <main class="container" id="main"><article class="trust-page guide-page">
+    <p class="about-eyebrow">从这里开始</p>
+    <h1>如何学完一节课</h1>
+    <p>每节课都按同样的顺序组织。本页说明每个环节的任务、代码的运行位置，以及练习卡住时的处理方法。开始第一节课前读一遍，遇到不清楚的步骤再回来查。</p>
+
+    <nav class="guide-toc" aria-label="本页目录">
+      <a href="#setup">一次性配置</a>
+      <a href="#read">阅读</a>
+      <a href="#build-it">动手构建</a>
+      <a href="#use-it">实际使用</a>
+      <a href="#ship-it">拿去用</a>
+      <a href="#exercises">练习</a>
+      <a href="#summary">总结</a>
+      <a href="#check">测验与检查点</a>
+      <a href="#projects">项目</a>
+      <a href="#stuck">卡住时怎么办</a>
+    </nav>
+
+    <h2 id="setup">一次性配置</h2>
+    <p>课程代码在你自己的电脑上运行。你可以在网站或 GitHub 阅读正文，运行代码则需要克隆仓库。只需克隆一次：</p>
+    <pre><code>git clone https://github.com/fancyboi999/ai-engineering-from-scratch-zh.git
+cd ai-engineering-from-scratch-zh
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner</code></pre>
+    <p>检查会列出现在和后续需要的工具。每项失败都会输出原因和修复命令。课程命令都从仓库根目录运行，也就是包含 <code>README.md</code> 和 <code>phases/</code> 的目录。</p>
+    <p>每节课对应一个目录，例如 <code>phases/01-math-foundations/01-linear-algebra-intuition/</code>。其中包含 <code>docs/zh.md</code>（课程正文）、<code>code/</code>（要构建和运行的程序）、<code>outputs/</code>（课程产物）和 <code>quiz.json</code>。初学者请从 <a href="lesson.html?path=phases/00-setup-and-tooling/01-dev-environment">第 0 阶段：开发环境</a>.</p>
+
+    <h2 id="read">阅读：摘要、问题背景、核心概念</h2>
+    <p>开头几个环节解释思路。先不看代码，读完后用自己的话说两句话：它解决什么问题，又是怎么解决的。如果说不清，写代码前再读一遍核心概念。</p>
+
+    <h2 id="build-it">动手构建：亲手写出最小版本</h2>
+    <p>动手构建环节不用框架，用普通代码实现这个思路。完整程序在课程的 <code>code/</code> 目录中，课程页面会给出运行命令，例如：</p>
+    <pre><code>python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py</code></pre>
+    <ol>
+      <li>在自己的目录（例如 <code>scratch/</code>）中新建文件，例如 <code>my_vectors.py</code>。逐步输入课程代码，不要整段复制粘贴。</li>
+      <li>每完成一步就运行文件，对比程序输出和课程输出。</li>
+      <li>如果结果不同，运行 <code>code/</code> 中的完整文件，查看参考结果。</li>
+      <li>改一个数值，预测新输出，再运行代码。如果预测不对，找出造成差异的那一行。</li>
+    </ol>
+
+    <h2 id="use-it">实际使用：用成熟的库完成同一件事</h2>
+    <p>实际使用环节用 NumPy、scikit-learn 或 PyTorch 等常用库完成同一项工作。先写过最小版本，你就能看懂库替你做了什么。在仓库根目录创建虚拟环境，再安装依赖：</p>
+    <pre><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</code></pre>
+    <p>Windows 用户将 <code>source</code> 那一行替换为 <code>.venv\Scripts\activate</code>。<code>requirements.txt</code> 包含整套课程的依赖。学习单课时，只安装实际使用代码导入的库即可，例如 <code>pip install numpy</code>。把代码写入自己的文件，运行并核对结果是否与动手构建代码一致。</p>
+
+    <h2 id="ship-it">拿去用：留下一件可复用的工具</h2>
+    <p>拿去用环节指出本课在 <code>outputs/</code> 目录中提供的文件。这个环节不需要部署，而是给日常工作留下一件工具：</p>
+    <ul>
+      <li><strong>prompt</strong>（<code>prompt-*.md</code>）：把标题下的正文复制到 AI 助手聊天中。助手会按 prompt 描述的方式帮助你处理本课主题。</li>
+      <li><strong>技能</strong>（<code>skill-*.md</code> 或包含 <code>SKILL.md</code> 的目录）：安装到支持技能的编程 agent。示例命令 <code>python3 scripts/install_skills.py .claude/skills --phase 1</code> 在仓库根目录运行，会安装第 1 阶段的技能。将目标目录替换为所用 agent 的项目技能目录，先加 <code>--dry-run</code> 查看清单。</li>
+      <li><strong>agent 或 MCP 服务器</strong>：后续阶段会构建这些程序，课程会说明启动方法。</li>
+    </ul>
+    <p>打开产物并阅读。改一行，让它更适合你的工作。每周都用的工具，比只读过的工具更能帮助你学习。</p>
+
+    <h2 id="exercises">练习：逐题完成的步骤</h2>
+    <p>练习不直接给答案。按以下步骤完成：</p>
+    <ol>
+      <li><strong>复述任务。</strong>写清输入是什么，输出应该是什么。</li>
+      <li><strong>预测。</strong>写代码前先手算一个小例子，例如两个各含两个数的向量。</li>
+      <li><strong>从课程代码出发。</strong>多数练习是在动手构建代码上新增一个函数或做一项修改。先找与任务最接近的函数。</li>
+      <li><strong>写出最小版本</strong>，先让小例子运行正确。</li>
+      <li><strong>检查。</strong>与预测对比，再测试一个边界情况，例如零向量或空列表。</li>
+    </ol>
+    <p>许多课程在练习后设有<strong>提示</strong>。每条提示给出第一步和检查答案的方法。先尝试上述步骤，再打开提示。</p>
+    <h2 id="summary">总结：复习速查表</h2>
+    <p>部分课程以总结结尾，用一页汇总重要公式、定义和直觉。把它当作速查表：做练习前浏览一遍，开始下一课前再读一遍。</p>
+    <p>课程还提供可打印的<a href="/cheatsheets">速查表</a>。每份围绕一个主题，例如 RAG 或 LLM 服务，用一两页列出任务、命令、带注释的代码、图表、默认值和修复办法。每个区块链接到相应课程，课程页也列出相关速查表。做练习时可以放在旁边查阅。</p>
+
+    <h2 id="check">测验与检查点</h2>
+    <p>网站每节课顶部有五个检查点：阅读、构建、运行、证明和继续。完成后逐项标记。课末测验检查主要概念，进度只保存在当前浏览器中。当你能解释代码输出，并且能有依据地做一项小修改时，再进入下一课。</p>
+
+    <h2 id="projects">项目：按目标选择</h2>
+    <p>项目是分阶段构建的较大程序，每个阶段都有测试。完成项目所需的课程阶段后再开始。</p>
+    <ul>
+      <li>按求职目标选项目时，打开<a href="projects.html">实战项目</a>，在<strong>按角色选择</strong>中选择职位。列表会从易到难展示能证明相应能力的项目。</li>
+      <li>要查看某个角色需要的课程，打开<a href="learning-paths.html">学习路径</a>。每条职业路线都以可证明能力的项目阶段收尾。</li>
+      <li>初学者从第 1 级开始。完整做完一个项目，再开始第二个。</li>
+    </ul>
+
+    <h2 id="stuck">卡住时怎么办</h2>
+    <p>记录命令、运行目录和完整报错。常见原因是目录不对、缺少依赖或 Python 版本过旧。重新运行环境检查。如果仍有问题，搜索 <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues" target="_blank" rel="noopener">问题列表</a>，或到<a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/discussions" target="_blank" rel="noopener">讨论区</a>提问。附上课程路径、命令和报错。</p>
+  </article></main>
+  <footer class="site-footer"><div class="container footer-inner"><p>© 2026 · 开源 · 永久免费</p><div class="footer-links"><a href="about.html">关于</a><a href="contact.html">联系</a><a href="developer.html">开发者资源</a><a href="sponsors.html">支持本站</a></div></div></footer>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"如何学完一节课 · 从零开始学 AI 工程","url":"https://aieng-zh.cn/how-to-learn.html","isPartOf":{"@type":"WebSite","name":"从零开始学 AI 工程","url":"https://aieng-zh.cn"}}</script>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var stored = '';
+      try { stored = localStorage.getItem('theme') || ''; } catch (_) {}
+      root.setAttribute('data-theme', stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+      function updateIcon() {
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.textContent = root.getAttribute('data-theme') === 'light' ? 'N' : 'D';
+      }
+
+      updateIcon();
+      document.addEventListener('DOMContentLoaded', function () {
+        updateIcon();
+        var btn = document.getElementById('themeToggle');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          root.setAttribute('data-theme', next);
+          try { localStorage.setItem('theme', next); } catch (_) {}
+          updateIcon();
+        });
+      });
+    })();
+  </script>
+  <script src="data.js?v=20261019a"></script>
+  <script src="progress.js?v=20260822a"></script>
+  <script src="header.js?v=20261019a" defer></script>
+  <script src="cmdpalette.js?v=20261019a" defer></script>
+</body>
+</html>

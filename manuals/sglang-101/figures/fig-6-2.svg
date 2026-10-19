@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 236" role="img" aria-labelledby="fig-6-2-title fig-6-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-6-2-title">一个 token 经过 MoE 层</title>
+  <desc id="fig-6-2-desc">从左到右四阶段。TopK 为每个 token 选择专家，moe-a2a-backend 指定的 dispatcher 将 token 发往专家所在 GPU，MoeRunner 用 moe-runner-backend 指定的分组矩阵乘计算本地专家，dispatcher 合并结果并传回。</desc>
+  <defs><marker id="fig-6-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-6-2-head-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-indigo-ink, #4b4f9e)"/></marker></defs>
+  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">每步的一个 MOE 层</text>
+  <rect x="20" y="40" width="142" height="92" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="91" y="73.75" font-size="12.5" text-anchor="middle" font-weight="700">TopK</text>
+  <text x="91" y="91.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">选择专家</text>
+  <text x="91" y="106.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">针对各 token</text>
+  <rect x="176" y="40" width="142" height="92" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="247" y="73.75" font-size="12.5" text-anchor="middle" font-weight="700">dispatch</text>
+  <text x="247" y="91.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">token 发往</text>
+  <text x="247" y="106.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">专家 GPU</text>
+  <rect x="332" y="40" width="142" height="92" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="403" y="73.75" font-size="12.5" text-anchor="middle" font-weight="700">MoeRunner</text>
+  <text x="403" y="91.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">分组矩阵</text>
+  <text x="403" y="106.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">multiply</text>
+  <rect x="488" y="40" width="142" height="92" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="559" y="73.75" font-size="12.5" text-anchor="middle" font-weight="700">combine</text>
+  <text x="559" y="91.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">结果发回</text>
+  <text x="559" y="106.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">对应 token</text>
+  <line x1="162" y1="86" x2="175" y2="86" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-2-head-ink)"/>
+  <line x1="318" y1="86" x2="331" y2="86" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round" marker-end="url(#fig-6-2-head-indigo)"/>
+  <line x1="474" y1="86" x2="487" y2="86" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round" marker-end="url(#fig-6-2-head-indigo)"/>
+  <text x="176" y="156" font-size="11" fill="var(--m-indigo-ink, #4b4f9e)">--moe-a2a-backend</text>
+  <text x="332" y="156" font-size="11" fill="var(--m-plum-ink, #8a3d72)">--moe-runner-backend</text>
+  <text x="488" y="156" font-size="11" fill="var(--m-indigo-ink, #4b4f9e)">--moe-a2a-backend</text>
+  <line x1="20" y1="176" x2="630" y2="176" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="20" y="198" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--deepep-mode auto：prefill 用 normal，decode 用 low_latency</text>
+  <text x="20" y="218" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">All-to-all 后端将 --ep-size 设为 --tp-size</text>
+</svg>

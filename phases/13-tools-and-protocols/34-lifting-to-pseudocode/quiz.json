@@ -1,0 +1,78 @@
+{
+  "lesson": "34-lifting-to-pseudocode",
+  "title": "提升为伪代码：从零实现 IR、SSA 与结构恢复",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "Ghidra 将正确目标文件中的 percent_change 反编译为返回 16 字节、接收三个参数的函数。源码只有两个 int 参数并返回 int。这说明什么？",
+      "options": [
+        "目标文件损坏",
+        "伪代码是推导出的主张；即使每条指令都正确，类型和调用约定猜测也可能错误",
+        "Ghidra 无法读取 ELF 可重定位目标文件",
+        "clang 错误编译了函数"
+      ],
+      "correct": 1,
+      "explanation": "指令正确，反编译器也读取正确。返回值和第三参数的猜测来自 idiv 同时写 rax、rdx，且没有调用者提供相反证据。"
+    },
+    {
+      "stage": "check",
+      "question": "System V AMD64 调用约定中，哪个寄存器传递第二个整数参数？",
+      "options": [
+        "%rcx",
+        "%rdx",
+        "%rsi",
+        "%rax"
+      ],
+      "correct": 2,
+      "explanation": "顺序为 %rdi、%rsi、%rdx、%rcx、%r8、%r9（psABI 3.2.3 节），结果通过 %rax 返回。"
+    },
+    {
+      "stage": "check",
+      "question": "提升器看到 cmpl $0x4, %ecx 后接 ja。分支在哪个 C 条件成立时跳转？",
+      "options": [
+        "ecx != 4",
+        "有符号比较 ecx > 4",
+        "(unsigned int)ecx > 4",
+        "有符号比较 ecx >= 4"
+      ],
+      "correct": 2,
+      "explanation": "ja 检查 CF = 0 且 ZF = 0，即无符号大于。负 ecx 是很大的无符号值，所以该跳转也覆盖 grade 中低于 60 的分数。"
+    },
+    {
+      "stage": "check",
+      "question": "SSA 为什么在 total 的循环头为总和放置 phi？",
+      "options": [
+        "循环头读取内存",
+        "两次总和定义到达循环头：初始零与循环体内更新",
+        "每个循环头都为所有寄存器放 phi",
+        "循环内标志寄存器发生变化"
+      ],
+      "correct": 1,
+      "explanation": "phi 放在各定义的支配边界。循环头是初始化块与回边的汇合处，两项到达定义需要合并名称。"
+    },
+    {
+      "stage": "post",
+      "question": "grade 将符号扩展后的 score 乘以 0x66666667，右移 34 位，再加乘积符号位。计算的是什么？",
+      "options": [
+        "按 C 向零截断的 score / 10",
+        "score * 10",
+        "score % 10",
+        "score 的哈希"
+      ],
+      "correct": 0,
+      "explanation": "0x66666667 是 2^34 / 10 的上取整。非负分数的乘移得到 floor(score / 10)，加符号位将负商向零修正，与 C 除法一致。"
+    },
+    {
+      "stage": "post",
+      "question": "本文提升器输出 int total(int *param_1, int param_2)，Ghidra 输出 int total(long param_1, uint param_2)。哪个说法正确？",
+      "options": [
+        "两个签名证明目标被编译了两次",
+        "param_1 被用作指针，所以 Ghidra 错误",
+        "二者都与指令相容；提升器从 4 字节带比例加载推断指针，Ghidra 保留寄存器宽度",
+        "源码是 const int *，所以提升器错误"
+      ],
+      "correct": 2,
+      "explanation": "机器码没有类型。提升器将 rdi + rdx * 4 的加载视为 int 元素访问，Ghidra 保留 64 位整数。二者都无法恢复 const。"
+    }
+  ]
+}

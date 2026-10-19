@@ -143,11 +143,11 @@ class MLP(nn.Module):
 
 | 模块 | 作用 | 参数量 |
 |--------|-------------|------------|
-| nn.Linear(in, out) | Wx + b | in*out + out |
+| nn.Linear(in, out) | $Wx + b$ | in*out + out |
 | nn.Conv2d(in_ch, out_ch, k) | 二维卷积 | in_ch*out_ch*k*k + out_ch |
 | nn.BatchNorm1d(features) | 归一化激活 | 2 * features |
 | nn.Dropout(p) | 随机置零 | 0 |
-| nn.ReLU() | max(0, x) | 0 |
+| nn.ReLU() | $\max(0, x)$ | 0 |
 | nn.GELU() | 高斯误差线性 | 0 |
 | nn.Embedding(vocab, dim) | 查找表 | vocab * dim |
 | nn.LayerNorm(dim) | 按样本归一化 | 2 * dim |
@@ -356,7 +356,7 @@ class MNISTModel(nn.Module):
 
 输出层产出 10 个原始 logit（每个数字一个）。不做 softmax——`CrossEntropyLoss` 内部会处理。
 
-参数量：784*256 + 256 + 256*128 + 128 + 128*10 + 10 = 235,146。以现代标准看微不足道。GPT-2 small 有 1.24 亿。这个几秒就训完。
+参数量：$784 \cdot 256 + 256 + 256 \cdot 128 + 128 + 128 \cdot 10 + 10 = 235{,}146$。以现代标准看微不足道。GPT-2 small 有 1.24 亿。这个几秒就训完。
 
 ### 第 3 步：训练循环
 

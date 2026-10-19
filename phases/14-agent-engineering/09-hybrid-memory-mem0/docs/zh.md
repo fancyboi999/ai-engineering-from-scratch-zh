@@ -32,7 +32,7 @@ Mem0（arXiv:2504.19413，2025 年 4 月）在 `add(text, user_id, metadata)` �
 
 1. 从文本里抽取候选事实（一个 LLM 驱动的步骤）。
 2. 把每个事实写进向量存储（embedding）供语义搜索。
-3. 把每个事实写进 KV 存储，键为 (user_id, fact_type, entity)，供 O(1) 查找。
+3. 把每个事实写进 KV 存储，键为 (user_id, fact_type, entity)，供 $O(1)$ 查找。
 4. 把每个事实作为带类型的边写进图存储（Mem0g），供关系查询。
 
 在 `search(query, user_id)` 上：

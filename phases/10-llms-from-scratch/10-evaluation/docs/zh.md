@@ -67,8 +67,8 @@ graph TD
 
 困惑度衡量模型对一串 token 有多惊讶。形式上，它是指数化的平均负对数似然：
 
-```
-PPL = exp(-1/N * sum(log P(token_i | context)))
+```math
+\text{PPL} = \exp\left(-\frac{1}{N} \sum_i \log P(\text{token}_i \mid \text{context})\right)
 ```
 
 困惑度为 10，意味着模型平均而言，在每个 token 位置上的不确定性相当于在 10 个选项里均匀选择。越低越好。GPT-2 在 WikiText-103 上得困惑度 ~30。GPT-3 得 ~20。Llama 3 8B 得 ~7。
@@ -504,7 +504,7 @@ RAGAS 衡量通用 eval 漏掉的东西：模型的答案是否扎根于检索�
 | MMLU | "那个基准" | Massive Multitask Language Understanding——57 个学科的 15,908 道选择题，到 2025 年被刷到 88% 以上饱和 |
 | HumanEval | "代码 eval" | OpenAI 的 164 道 Python 函数补全题，只测孤立的函数生成 |
 | SWE-bench | "真实编码 eval" | 来自 12 个 Python 仓库的 2,294 个 GitHub issue，衡量包含测试生成在内的端到端 bug 修复 |
-| 困惑度 | "模型有多困惑" | exp(-avg(log P(token_i 给定 context)))——越低意味着模型给实际 token 分配的概率越高 |
+| 困惑度 | "模型有多困惑" | $\exp(-\mathop{\mathrm{avg}}(\log P(\text{token}_i \text{ 给定上下文})))$——越低意味着模型给实际 token 分配的概率越高 |
 | ELO 评分 | "给模型的国际象棋排名" | 从成对胜负记录计算的相对实力评分，被 Chatbot Arena 用来给 100+ 个模型排名 |
 | LLM-as-judge | "用 AI 给 AI 打分" | 一个强模型对照评分准则给弱模型的输出打分，每次判断约 0.01 美元、和人类评判者约 80% 一致 |
 | 数据污染 | "模型看过测试" | 训练数据包含基准题，在不提升真实能力的情况下虚高分数 |

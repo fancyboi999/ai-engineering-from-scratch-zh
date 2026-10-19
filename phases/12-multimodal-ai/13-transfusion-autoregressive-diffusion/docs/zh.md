@@ -62,9 +62,9 @@ M[i, j] = 1 if:
 扩散损失是标准的：给一个图像 patch 加噪，让模型预测噪声（或等价地预测干净 patch）。Transfusion 的版本用 flow matching——预测从含噪到干净的速度场。
 
 训练时：
-1. 对每个图像 patch x0，采一个随机时间步 t。
-2. 采噪声 ε，算 xt = (1-t) * x0 + t * ε（flow matching 的线性插值）。
-3. transformer 预测 v_theta(xt, t)；损失 = MSE(v_theta(xt, t), ε - x0)。
+1. 对每个图像 patch $x_0$，采一个随机时间步 $t$。
+2. 采噪声 $\epsilon$，算 $x_t = (1-t) \cdot x_0 + t \cdot \epsilon$（flow matching 的线性插值）。
+3. transformer 预测 $v_\theta(x_t, t)$；$\text{loss} = \mathop{\mathrm{MSE}}(v_\theta(x_t, t), \epsilon - x_0)$。
 4. 与来自同一序列的文本 NTP 损失一起反向传播。
 
 推理时，生成是：

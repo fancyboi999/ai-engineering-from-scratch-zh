@@ -12,7 +12,7 @@ tags: [onboarding, curriculum, ai-engineering, learning-plan]
 
 # 开始学习
 
-你正在引导学习者进入 **AI Engineering from Scratch** 课程：20 个阶段、523 节课，从线性代数到自主 agent。你的任务是在当前目录产出 `LEARNING.md`，这份单一文件记录他们为何学习、应从哪里开始以及学习路径。之后每次 `learn` session 都会读取并更新它，因此把它当作学习者的唯一事实来源。
+你正在引导学习者进入 **AI Engineering from Scratch** 课程：20 个阶段的核心课程，从线性代数到自主 agent。你的任务是在当前目录产出 `LEARNING.md`，这份单一文件记录他们为何学习、应从哪里开始以及学习路径。之后每次 `learn` session 都会读取并更新它，因此把它当作学习者的唯一事实来源。
 
 适用于任何 agent。环境有结构化问题/选项工具时，每个问题都使用它；否则用纯文本展示带字母选项并等待回复。
 
@@ -34,6 +34,7 @@ skill 名称可移植，但调用语法属于宿主。展示下一条命令前�
 - `MCP-LEARNING.md` 属于 Model Context Protocol (MCP) 路线的 `learn-mcp`。
 - `MCP-ENGINEERING-LEARNING.md` 是同一 `learn-mcp` 路线的旧文件名，不是独立路线。
 - `AGENT-SKILLS-LEARNING.md` 属于 `learn-agent-skills`。
+- `REVERSE-ENGINEERING-LEARNING.md` 属于 `learn-reverse-engineering`。
 - `CLAUDE-CERTIFICATION.md` 属于 `claude-certification`。
 
 学习者在续学请求中点名路线时，即使其他状态文件存在，也立即分派给该所有者，然后停止此 skill。
@@ -49,6 +50,10 @@ skill 名称可移植，但调用语法属于宿主。展示下一条命令前�
 ## 专门 Agent Skills 交接
 
 学习者明确想学习 Agent Skills 而非完整课程，或存在 `AGENT-SKILLS-LEARNING.md` 且其要求恢复该路线时，不运行定位，也不创建 `LEARNING.md`。路由至可移植 skill `learn-agent-skills`，来源是 `learning-paths/agent-skills.json`，状态文件是 `AGENT-SKILLS-LEARNING.md`。在 Codex 使用 `learn-agent-skills`、Claude Code 使用 `/learn-agent-skills`，或要求其他兼容宿主使用 `learn-agent-skills`。专用 tutor 拥有五课顺序、真实宿主证据、sandbox boundaries、第 26 课前的第 25 课和 tool-poisoning prerequisite gate，以及 release gate。
+
+## 专门逆向工程交接
+
+学习者要求逆向工程路径，或存在 `REVERSE-ENGINEERING-LEARNING.md` 且其要求继续该路径时，交接给可移植技能 `learn-reverse-engineering`。唯一真相是 `learning-paths/reverse-engineering.json`。按宿主调用契约渲染交接。不要把此路径状态复制到 `LEARNING.md`；专用导师负责十四节课的顺序，以及第 32 课前的 `own-binaries-only` 检查。
 
 若 `LEARNING.md` 已存在，绝不覆盖。概述它的内容（mission、entry point、目前进度），并只提供恰好三条路径：
 

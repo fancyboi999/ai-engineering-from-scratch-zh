@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-2-4-title fig-2-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-2-4-title">捕获中各 provider 声明的副作用</title>
+  <desc id="fig-2-4-desc">表格五列分别为：可用 ghidra 的 30 个操作、不可用 hopper 的 37 个操作、不可用 ida 的 13 个操作、不可用 kuna 的 13 个操作，以及未绑定 provider 的 19 个无需目标操作。七行各对应一个副作用标志。launches_process 为真的数量依次为 30/30、37/37、0、13/13、12/19；may_write_filesystem 为 30/30、6/37、0、13/13、6/19；may_show_ui 为 0、37/37、4/13、0、2/19；may_access_network 为 0、0、13/13、0、2/19；mutates_artifact 为 3/30、6/37、0、0、0；changes_permissions、requires_root 全为假。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">副作用标志</text>
+  <rect x="166" y="26" width="88" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="210" y="41.6" font-size="12" text-anchor="middle" font-weight="700">ghidra</text>
+  <text x="210" y="58.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">30 个操作</text>
+  <text x="210" y="73.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">available</text>
+  <rect x="257" y="26" width="88" height="56" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="301" y="41.6" font-size="12" text-anchor="middle" font-weight="700">hopper</text>
+  <text x="301" y="58.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">37 个操作</text>
+  <text x="301" y="73.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">unavailable</text>
+  <rect x="348" y="26" width="88" height="56" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="392" y="41.6" font-size="12" text-anchor="middle" font-weight="700">ida</text>
+  <text x="392" y="58.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">13 个操作</text>
+  <text x="392" y="73.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">unavailable</text>
+  <rect x="439" y="26" width="88" height="56" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="483" y="41.6" font-size="12" text-anchor="middle" font-weight="700">kuna</text>
+  <text x="483" y="58.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">13 个操作</text>
+  <text x="483" y="73.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">unavailable</text>
+  <rect x="530" y="26" width="88" height="56" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="574" y="41.6" font-size="12" text-anchor="middle" font-weight="700">target-free</text>
+  <text x="574" y="58.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">19 个操作</text>
+  <text x="574" y="73.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">无绑定</text>
+  <rect x="20" y="92" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="112" font-size="11">launches_process</text>
+  <rect x="166" y="92" width="88" height="32" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="112" font-size="12" text-anchor="middle">30 / 30</text>
+  <rect x="257" y="92" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="112" font-size="12" text-anchor="middle">37 / 37</text>
+  <rect x="348" y="92" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="112" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="439" y="92" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="112" font-size="12" text-anchor="middle">13 / 13</text>
+  <rect x="530" y="92" width="88" height="32" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="112" font-size="12" text-anchor="middle">12 / 19</text>
+  <rect x="20" y="124" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="144" font-size="11">may_write_filesystem</text>
+  <rect x="166" y="124" width="88" height="32" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="144" font-size="12" text-anchor="middle">30 / 30</text>
+  <rect x="257" y="124" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="144" font-size="12" text-anchor="middle">6 / 37</text>
+  <rect x="348" y="124" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="144" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="439" y="124" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="144" font-size="12" text-anchor="middle">13 / 13</text>
+  <rect x="530" y="124" width="88" height="32" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="144" font-size="12" text-anchor="middle">6 / 19</text>
+  <rect x="20" y="156" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="176" font-size="11">may_show_ui</text>
+  <rect x="166" y="156" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="176" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="257" y="156" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="176" font-size="12" text-anchor="middle">37 / 37</text>
+  <rect x="348" y="156" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="176" font-size="12" text-anchor="middle">4 / 13</text>
+  <rect x="439" y="156" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="176" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="530" y="156" width="88" height="32" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="176" font-size="12" text-anchor="middle">2 / 19</text>
+  <rect x="20" y="188" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="208" font-size="11">may_access_network</text>
+  <rect x="166" y="188" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="208" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="257" y="188" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="208" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="348" y="188" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="208" font-size="12" text-anchor="middle">13 / 13</text>
+  <rect x="439" y="188" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="208" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="530" y="188" width="88" height="32" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="208" font-size="12" text-anchor="middle">2 / 19</text>
+  <rect x="20" y="220" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="240" font-size="11">mutates_artifact</text>
+  <rect x="166" y="220" width="88" height="32" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="240" font-size="12" text-anchor="middle">3 / 30</text>
+  <rect x="257" y="220" width="88" height="32" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="240" font-size="12" text-anchor="middle">6 / 37</text>
+  <rect x="348" y="220" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="240" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="439" y="220" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="240" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="530" y="220" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="240" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="20" y="252" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="272" font-size="11">changes_permissions</text>
+  <rect x="166" y="252" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="272" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="257" y="252" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="272" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="348" y="252" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="272" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="439" y="252" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="272" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="530" y="252" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="272" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="20" y="284" width="142" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="26" y="304" font-size="11">requires_root</text>
+  <rect x="166" y="284" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="210" y="304" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="257" y="284" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="301" y="304" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="348" y="284" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="392" y="304" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="439" y="284" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="483" y="304" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+  <rect x="530" y="284" width="88" height="32" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="574" y="304" font-size="12" text-anchor="middle" fill="var(--m-ink-mute, #6f6f6a)">0</text>
+</svg>

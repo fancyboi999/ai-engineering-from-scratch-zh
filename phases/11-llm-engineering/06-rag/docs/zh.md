@@ -94,20 +94,20 @@ graph LR
 
 **余弦相似度**：两个向量夹角的余弦值。范围从 -1（相反）到 1（相同）。忽略幅度，只在意方向。这是 RAG 的默认选择。
 
-```
-cosine_sim(a, b) = dot(a, b) / (||a|| * ||b||)
+```math
+\mathop{\mathrm{cosine\_sim}}(a, b) = \frac{\mathop{\mathrm{dot}}(a, b)}{\lVert a \rVert \cdot \lVert b \rVert}
 ```
 
 **点积**：原始内积。更大的向量得到更高的分数。当幅度携带信息时有用（更长的文档可能更相关）。
 
-```
-dot(a, b) = sum(a_i * b_i)
+```math
+\mathop{\mathrm{dot}}(a, b) = \sum_i a_i b_i
 ```
 
 **L2（欧氏）距离**：向量空间里的直线距离。距离越小 = 越相似。对幅度差异敏感。
 
-```
-L2(a, b) = sqrt(sum((a_i - b_i)^2))
+```math
+\mathop{\mathrm{L2}}(a, b) = \sqrt{\sum_i (a_i - b_i)^2}
 ```
 
 余弦相似度是标准选择。它优雅地处理不同长度的文档，因为它按幅度做了归一化。当有人说"向量搜索"时，他们几乎总是指余弦相似度。

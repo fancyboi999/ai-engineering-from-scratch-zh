@@ -371,6 +371,45 @@
   color: var(--ink-soft);
 }
 
+.pj-role-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.pj-role-pick select {
+  min-height: 36px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--rule-soft);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.pj-role-pick select:focus-visible {
+  outline: 2px solid var(--blueprint);
+  outline-offset: 2px;
+}
+
+.pj-role-note {
+  margin: -6px 0 20px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.pj-role-note a {
+  color: var(--blueprint);
+}
+
 .pj-ladder {
   display: flex;
   flex-direction: column;

@@ -30,19 +30,19 @@ while True:
 
 **AlphaZero（2017）。** Silver 等人。给定一个规则已知的游戏（国际象棋、将棋、围棋）：
 
-- 策略-价值网络：单塔 `f_θ(s) → (p, v)`。`p` 是合法走子上的先验。`v` 是期望对局结果。
-- 蒙特卡洛树搜索（MCTS）：每一步，展开一棵可能续法的树。用 `(p, v)` 当先验 + 自举。用 UCB（PUCT）选节点：`a* = argmax Q(s, a) + c · p(a|s) · √N(s) / (1 + N(s, a))`。
-- 自我对弈：让 agent 对阵 agent 下棋。在第 `t` 步，MCTS 的访问分布 `π_t` 成为策略训练目标。
-- 损失：`L = (v - z)² - π · log p + c · ||θ||²`。`z` 是对局结果（+1 / 0 / -1）。
+- 策略-价值网络：单塔 $f_\theta(s) \to (p, v)$。$p$ 是合法走子上的先验。$v$ 是期望对局结果。
+- 蒙特卡洛树搜索（MCTS）：每一步，展开一棵可能续法的树。用 $(p, v)$ 当先验 + 自举。用 UCB（PUCT）选节点：$a^{\ast} = \arg\max_a Q(s, a) + c \cdot p(a \mid s) \cdot \sqrt{N(s)} / (1 + N(s, a))$。
+- 自我对弈：让 agent 对阵 agent 下棋。在第 $t$ 步，MCTS 的访问分布 $\pi_t$ 成为策略训练目标。
+- 损失：$L = (v - z)^2 - \pi \cdot \log p + c \cdot \lVert \theta \rVert^2$。$z$ 是对局结果（+1 / 0 / -1）。
 
 零人类知识。零手工启发式。一套配方，各下几千万局自我对弈后就精通了国际象棋、将棋和围棋。
 
 **MuZero（2019）。** Schrittwieser 等人。去掉规则必须已知的要求。
 
-- 不用固定环境，而是学一个*潜在动力学模型* `(h, g, f)`：
-  - `h(s)`：把观测编码成潜在状态。
-  - `g(s_latent, a)`：预测下一个潜在状态 + 奖励。
-  - `f(s_latent)`：预测策略先验 + 价值。
+- 不用固定环境，而是学一个*潜在动力学模型* $(h, g, f)$：
+  - $h(s)$：把观测编码成潜在状态。
+  - $g(s_{\text{latent}}, a)$：预测下一个潜在状态 + 奖励。
+  - $f(s_{\text{latent}})$：预测策略先验 + 价值。
 - MCTS 在*学到的潜在空间*里跑。同样的搜索，同样的训练循环。
 - 在围棋、国际象棋、将棋*以及* Atari 上都能用——一个算法，无需规则知识。
 
@@ -54,11 +54,11 @@ while True:
 
 - "游戏"：回答一道数学 / 编程 / 推理题。"赢" = 验证器（测试用例通过、数值答案对上）返回 1。
 - 策略：LLM。动作：token。状态：prompt + 目前为止的回复。
-- 没有 critic（PPO 式 V_φ）。而是对每个 prompt，从策略采样 `G` 个补全。给每个算奖励。用**组相对优势** `A_i = (r_i - mean_r) / std_r` 作为 REINFORCE 式更新的信号。
+- 没有 critic（PPO 式 $V_\phi$）。而是对每个 prompt，从策略采样 $G$ 个补全。给每个算奖励。用**组相对优势** $A_i = (r_i - \text{mean}_r) / \text{std}_r$ 作为 REINFORCE 式更新的信号。
 - 到参考策略的 KL 惩罚，防止漂移（像 RLHF）。
 - 完整损失：
 
-  `L_GRPO(θ) = -E_{q, {o_i}} [ (1/G) Σ_i A_i · log π_θ(o_i | q) ] + β · KL(π_θ || π_ref)`
+  $L_{\text{GRPO}}(\theta) = -\mathbb E_{q, \lbrace o_i \rbrace} \left[ \frac{1}{G} \sum_i A_i \cdot \log \pi_\theta(o_i \mid q) \right] + \beta \cdot \mathrm{KL}(\pi_\theta \Vert \pi_{\text{ref}})$
 
 没有奖励模型，没有 critic，没有 MCTS。组相对基线一举取代了这三者。在推理 benchmark 上以零头的算力匹敌或超过 PPO-RLHF 的质量。
 
@@ -144,7 +144,7 @@ def grpo_step(theta, p_idx, G=8, beta=0.01, lr=0.1, rng=None):
 ## 注意事项
 
 - **靠验证器作弊的奖励 hacking。** GRPO 继承了 RLHF 的风险：如果验证器错了或可被利用，LLM 就会找到那个漏洞。稳健的验证器（多个测试用例、形式化证明）很重要。
-- **组太小。** 组基线的方差大约按 `1/√G` 走。低于 `G = 4`，优势信号有噪声；标准选择是 `G = 8` 到 `64`。
+- **组太小。** 组基线的方差大约按 $1/\sqrt{G}$ 走。低于 $G = 4$，优势信号有噪声；标准选择是 $G = 8$ 到 `64`。
 - **长度偏差。** 不同长度的 LLM 补全有不同的对数概率。按 token 数归一化，或用序列级对数概率，或截断到最大长度。
 - **纯自我对弈循环。** AlphaZero 式训练在一般和博弈上可能卡进支配循环。用多样化对手池缓解（联赛对弈，第 10 课）。
 - **搜索-策略失配。** AlphaZero 训练策略去模仿搜索输出。如果策略网络太小、表示不了搜索的分布，训练就停滞。
@@ -195,7 +195,7 @@ Refuse AlphaZero on imperfect-info games (route to CFR). Refuse GRPO without a t
 
 ## 练习
 
-1. **简单。** 在 `code/main.py` 里实现 GRPO 赌博机。在 2 个 prompt × 各 4 个答案 token 上训练。用 `G=8` 在 < 1000 次更新内收敛。
+1. **简单。** 在 `code/main.py` 里实现 GRPO 赌博机。在 2 个 prompt × 各 4 个答案 token 上训练。用 $G=8$ 在 < 1000 次更新内收敛。
 2. **中等。** 接入 PPO（裁剪）和原版 REINFORCE。在同一个赌博机上和 GRPO 对比样本效率和奖励方差。
 3. **困难。** 扩展到一条长度为 2 的"推理链"：agent 吐出两个 token，验证器对这一对给奖励。测一下 GRPO 如何处理两步序列上的信用分配。（提示：对每条*完整序列*算组优势，传播到两个 token 位置。）
 
@@ -203,11 +203,11 @@ Refuse AlphaZero on imperfect-info games (route to CFR). Refuse GRPO without a t
 
 | 术语 | 大家嘴上怎么说 | 它实际是什么 |
 |------|-----------------|-----------------------|
-| MCTS | "配学习式网络的树搜索" | 蒙特卡洛树搜索；带学习式 `(p, v)` 先验的 UCB1/PUCT 选择。 |
+| MCTS | "配学习式网络的树搜索" | 蒙特卡洛树搜索；带学习式 $(p, v)$ 先验的 UCB1/PUCT 选择。 |
 | AlphaZero | "自我对弈 + MCTS" | 训练成匹配 MCTS 访问和对局结果的策略-价值网络。 |
 | MuZero | "学习式模型的 AlphaZero" | 同样的循环，但通过学到的动力学在潜在空间里跑。 |
 | GRPO | "无 critic 的 PPO" | 组相对策略优化；带组均值基线 + KL 的 REINFORCE。 |
-| PUCT | "AlphaZero 的 UCB" | `Q + c · p · √N / (1 + N_a)` —— 在价值估计和先验间平衡。 |
+| PUCT | "AlphaZero 的 UCB" | $Q + c \cdot p \cdot \sqrt{N} / (1 + N_a)$ —— 在价值估计和先验间平衡。 |
 | 自我对弈 | "agent 对阵过去的自己" | 零和的标准做法；对称训练信号。 |
 | 联赛对弈 | "基于种群的自我对弈" | 把过去 + 当前 + exploiter 采样作对手。 |
 | 验证器奖励 | "可验证 RL" | 奖励来自一个确定性检查器（测试通过、答案对上）。 |

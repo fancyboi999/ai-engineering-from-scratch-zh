@@ -41,21 +41,23 @@ graph LR
 
 ### Dropout
 
-最简单的正则化技术，却有着最优雅的解释。训练时，以概率 p 随机把每个神经元的输出置零。
+最简单的正则化技术，却有着最优雅的解释。训练时，以概率 $p$ 随机把每个神经元的输出置零。
 
+```math
+\text{output} = \text{activation}(z) \cdot \text{mask} \quad \text{其中 }\text{mask}[i] \sim \text{Bernoulli}(1 - p)
 ```
-output = activation(z) * mask    where mask[i] ~ Bernoulli(1 - p)
-```
 
-p = 0.5 时，每次前向传播都有一半神经元被置零。网络必须学出冗余的表示，因为它没法预测哪些神经元会可用。这防止了协同适应（co-adaptation）——神经元学会依赖某些特定的其他神经元在场。
+$p = 0.5$ 时，每次前向传播都有一半神经元被置零。网络必须学出冗余的表示，因为它没法预测哪些神经元会可用。这防止了协同适应（co-adaptation）——神经元学会依赖某些特定的其他神经元在场。
 
-集成解释：一个有 N 个神经元、带 dropout 的网络创造了 2^N 个可能的子网络（每种神经元开/关的组合）。带 dropout 训练近似于同时训练全部 2^N 个子网络，每个在不同的 mini-batch 上。测试时，你用上所有神经元（不 dropout），并把输出按 (1 - p) 缩放，以匹配训练时的期望值。这等价于对 2^N 个子网络的预测取平均——单个模型里的一个巨型集成。
+集成解释：一个有 $N$ 个神经元、带 dropout 的网络创造了 $2^N$ 个可能的子网络（每种神经元开/关的组合）。带 dropout 训练近似于同时训练全部 $2^N$ 个子网络，每个在不同的 mini-batch 上。测试时，你用上所有神经元（不 dropout），并把输出按 $(1 - p)$ 缩放，以匹配训练时的期望值。这等价于对 $2^N$ 个子网络的预测取平均——单个模型里的一个巨型集成。
 
 实践中，缩放是在训练时而不是测试时施加（反向 dropout，inverted dropout）：
 
-```
-During training:  output = activation(z) * mask / (1 - p)
-During testing:   output = activation(z)   (no change needed)
+```math
+\begin{aligned}
+\text{训练时：} \quad & \text{output} = \text{activation}(z) \cdot \text{mask} / (1 - p) \\
+\text{测试时：} \quad & \text{output} = \text{activation}(z) \quad \text{（无需更改）}
+\end{aligned}
 ```
 
 这样更干净，因为测试代码根本不用知道 dropout 的存在。
@@ -66,15 +68,15 @@ During testing:   output = activation(z)   (no change needed)
 
 把所有权重的平方幅度加进损失里：
 
-```
-total_loss = task_loss + (lambda / 2) * sum(w_i^2)
+```math
+\text{total\_loss} = \text{task\_loss} + \frac{\lambda}{2} \sum_i w_i^2
 ```
 
-正则化项的梯度是 lambda * w。这意味着每一步每个权重都按一个与自身幅度成比例的比例朝零收缩。大权重受罚更重。模型被推向那些没有单个权重独大的解。
+正则化项的梯度是 $\lambda w$。这意味着每一步每个权重都按一个与自身幅度成比例的比例朝零收缩。大权重受罚更重。模型被推向那些没有单个权重独大的解。
 
 为什么这有助于泛化：过拟合的模型往往有放大训练数据中噪声的大权重。权重衰减让权重保持小，从而限制模型的有效容量，逼它依赖稳健、可泛化的特征，而不是记住的怪癖。
 
-lambda 超参数控制强度。典型值：
+$\lambda$ 超参数控制强度。典型值：
 
 - transformer 上的 AdamW 用 0.01
 - CNN 上的 SGD 用 1e-4
@@ -88,16 +90,18 @@ lambda 超参数控制强度。典型值：
 
 对某一层一个 mini-batch 的激活：
 
-```
-mu = (1/B) * sum(x_i)           (batch mean)
-sigma^2 = (1/B) * sum((x_i - mu)^2)   (batch variance)
-x_hat = (x_i - mu) / sqrt(sigma^2 + eps)   (normalize)
-y = gamma * x_hat + beta        (scale and shift)
+```math
+\begin{aligned}
+\mu &= \frac{1}{B} \sum_i x_i && \text{（批均值）} \\
+\sigma^2 &= \frac{1}{B} \sum_i (x_i - \mu)^2 && \text{（批方差）} \\
+\hat{x} &= \frac{x_i - \mu}{\sqrt{\sigma^2 + \epsilon}} && \text{（归一化）} \\
+y &= \gamma \hat{x} + \beta && \text{（缩放和平移）}
+\end{aligned}
 ```
 
 Gamma 和 beta 是可学习参数，如果撤销归一化更优，它们能让网络撤销归一化。没有它们，你就是在强迫每层的输出零均值单位方差，而这未必是网络想要的。
 
-**训练 vs 推理的区别：** 训练时，mu 和 sigma 来自当前 mini-batch。推理时，你用训练中累积的滑动平均（动量 = 0.1 的指数滑动平均，即 90% 旧 + 10% 新）。
+**训练 vs 推理的区别：** 训练时，$\mu$ 和 $\sigma$ 来自当前 mini-batch。推理时，你用训练中累积的滑动平均（动量 = 0.1 的指数滑动平均，即 90% 旧 + 10% 新）。
 
 BatchNorm 为什么有效至今仍有争议。原始论文声称它减少了"内部协变量偏移"（internal covariate shift，即随着前面的层更新，层输入的分布在变）。Santurkar 等人（2018）证明这个解释是错的。真正的原因：BatchNorm 让损失曲面更平滑。梯度更有预测性，Lipschitz 常数更小，优化器能安全地走更大的步子。这就是为什么 BatchNorm 让你能用更高的学习率、收敛得更快。
 
@@ -107,14 +111,16 @@ BatchNorm 有个根本性的局限：它依赖批统计量。批大小为 1 时�
 
 跨特征归一化，而不是跨批。对单个样本：
 
-```
-mu = (1/D) * sum(x_j)           (feature mean)
-sigma^2 = (1/D) * sum((x_j - mu)^2)   (feature variance)
-x_hat = (x_j - mu) / sqrt(sigma^2 + eps)
-y = gamma * x_hat + beta
+```math
+\begin{aligned}
+\mu &= \frac{1}{D} \sum_j x_j && \text{（特征均值）} \\
+\sigma^2 &= \frac{1}{D} \sum_j (x_j - \mu)^2 && \text{（特征方差）} \\
+\hat{x} &= \frac{x_j - \mu}{\sqrt{\sigma^2 + \epsilon}} \\
+y &= \gamma \hat{x} + \beta
+\end{aligned}
 ```
 
-D 是特征维度。每个样本独立归一化——不依赖批大小。这就是为什么 transformer 用 LayerNorm 而不是 BatchNorm。序列长度各异，批大小往往很小（生成时甚至为 1），而且训练和推理时的计算完全一致。
+$D$ 是特征维度。每个样本独立归一化——不依赖批大小。这就是为什么 transformer 用 LayerNorm 而不是 BatchNorm。序列长度各异，批大小往往很小（生成时甚至为 1），而且训练和推理时的计算完全一致。
 
 transformer 里的 LayerNorm 施加在每个自注意力块和每个前馈块之后（Post-LN），或者之前（Pre-LN，训练更稳定）。
 
@@ -122,9 +128,11 @@ transformer 里的 LayerNorm 施加在每个自注意力块和每个前馈块之
 
 去掉均值减法的 LayerNorm。由 Zhang & Sennrich（2019）提出。
 
-```
-rms = sqrt((1/D) * sum(x_j^2))
-y = gamma * x / rms
+```math
+\begin{aligned}
+\text{rms} &= \sqrt{\frac{1}{D} \sum_j x_j^2} \\
+y &= \gamma \cdot \frac{x}{\text{rms}}
+\end{aligned}
 ```
 
 就这样。没有均值计算，没有 beta 参数。观察发现：LayerNorm 里的重新居中（减均值）对模型表现贡献极小，却要花算力。去掉它能在开销少约 10% 的情况下得到同样的准确率。
@@ -515,8 +523,8 @@ LayerNorm，不是 BatchNorm。Dropout p=0.1，不是 p=0.5。这些是 transfor
 |------|----------------|----------------------|
 | 过拟合（Overfitting） | "模型把数据背下来了" | 模型的训练表现显著超过测试表现，表明它学的是噪声而非信号 |
 | 正则化（Regularization） | "防止过拟合" | 任何约束模型复杂度以改善泛化的技术：dropout、权重衰减、归一化、数据增强 |
-| Dropout | "随机删神经元" | 训练时以概率 p 把随机神经元置零，逼出冗余表示；等价于训练一个集成 |
-| 权重衰减（Weight decay） | "L2 惩罚" | 每步减去 lambda * w 把所有权重朝零收缩；通过权重幅度惩罚复杂度 |
+| Dropout | "随机删神经元" | 训练时以概率 $p$ 把随机神经元置零，逼出冗余表示；等价于训练一个集成 |
+| 权重衰减（Weight decay） | "L2 惩罚" | 每步减去 $\lambda w$ 把所有权重朝零收缩；通过权重幅度惩罚复杂度 |
 | 批归一化（Batch normalization） | "按批归一化" | 跨批维度归一化层输出，训练时用批统计量、推理时用滑动平均 |
 | 层归一化（Layer normalization） | "按样本归一化" | 在每个样本内跨特征归一化；不依赖批，用在批大小多变的 transformer 里 |
 | RMSNorm | "去掉均值的 LayerNorm" | 均方根归一化；从 LayerNorm 去掉减均值，准确率相同、提速 10% |

@@ -55,8 +55,8 @@ flowchart LR
 
 朴素文本条件化为每个 prompt `c` 学 `epsilon_theta(x_t, t, c)`。CFG 用同一个网络训练，但 10% 的时候把 `c` 丢掉（换成空嵌入），得到一个同时预测条件和无条件噪声的单一模型。推理时：
 
-```
-eps = eps_uncond + w * (eps_cond - eps_uncond)
+```math
+\epsilon = \epsilon_{\text{uncond}} + w \cdot (\epsilon_{\text{cond}} - \epsilon_{\text{uncond}})
 ```
 
 `w` 是引导尺度。`w=0` 是无条件，`w=1` 是朴素条件，`w>1` 把输出推向"更受 prompt 约束"，代价是多样性。SD 默认 `w=7.5`。

@@ -117,7 +117,7 @@ python3 code/main.py
 
 - **记忆就是数据库。** 规模化时选一个真实存储（向量数据库、Postgres）。内存标准库是给原型用的。
 - **记录检索轨迹。** 每个动作都记录驱动它的前 k 条记忆。这是你的调试能力。
-- **给每个 agent 的 token 设预算。** 每个 agent 每 tick 的「检索 + 反思 + 计划」是 O(k) 次 LLM 调用。N 个 agent × T 个 tick × 每 tick 调用数能把你的预算吃光。
+- **给每个 agent 的 token 设预算。** 每个 agent 每 tick 的「检索 + 反思 + 计划」是 $O(k)$ 次 LLM 调用。N 个 agent × T 个 tick × 每 tick 调用数能把你的预算吃光。
 - **周期性压缩记忆。** summarize-and-prune 掉低重要性条目。保留策略是一个设计决策，不是细节。
 - **显式检测空间 / 社会规范违例。** 这套架构学不会它们。
 

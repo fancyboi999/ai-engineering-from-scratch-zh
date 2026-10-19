@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-8-2-title fig-8-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-8-2-title">两个截止时间与三次实测首次调用</title>
+  <desc id="fig-8-2-desc">横轴 0 至 340 秒。灰条 0 至 60 秒为 SDK 2.3.1 客户端默认 60,000 ms；灰虚线条 0 至 240 秒为文档示例客户端设置；蓝条 0 至 330 秒为 rea 启动 deadline 330,000 ms。三个编号标记是实测首次调用：本 Mac 上 33,872 字节 ledger-arm64-O1 的 list_procedures 为 6.3 秒；文档中 WSL2 下 Linux x64 的 binary_overview 约 64 秒；Windows x64 约 163 秒，后者默认 60 秒会超时。</desc>
+  <text x="60" y="44" font-size="11" fill="var(--m-grey-ink, #5e5e59)">客户端默认 60,000 ms（SDK 2.3.1）</text>
+  <rect x="60" y="50" width="99" height="16" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="60" y="94" font-size="11" fill="var(--m-grey-ink, #5e5e59)">文档示例客户端设置，240,000 ms</text>
+  <rect x="60" y="100" width="395" height="16" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
+  <text x="60" y="144" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">rea 启动截止 330,000 ms，REA_GHIDRA_STARTUP_TIMEOUT_MS</text>
+  <rect x="60" y="150" width="544" height="16" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="60" y="194" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">实测首次 Ghidra 调用</text>
+  <line x1="70" y1="219" x2="70" y2="236" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <circle cx="70" cy="210" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
+  <text x="70" y="214" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">1</text>
+  <line x1="165" y1="219" x2="165" y2="236" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <circle cx="165" cy="210" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
+  <text x="165" y="214" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">2</text>
+  <line x1="328" y1="219" x2="328" y2="236" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <circle cx="328" cy="210" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
+  <text x="328" y="214" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">3</text>
+  <line x1="60" y1="236" x2="620" y2="236" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="60" y1="232" x2="60" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="60" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0 s</text>
+  <line x1="159" y1="232" x2="159" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="159" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">60 s</text>
+  <line x1="258" y1="232" x2="258" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="258" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">120 s</text>
+  <line x1="356" y1="232" x2="356" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="356" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">180 s</text>
+  <line x1="455" y1="232" x2="455" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="455" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">240 s</text>
+  <line x1="554" y1="232" x2="554" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="554" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">300 s</text>
+  <text x="20" y="282" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">实测首次调用</text>
+  <circle cx="30" cy="298" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
+  <text x="30" y="302" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">1</text>
+  <text x="48" y="302" font-size="11" class="m-serif">6.3 s：本 Mac 的 list_procedures，ledger-arm64-O1，33,872 字节</text>
+  <circle cx="30" cy="316" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
+  <text x="30" y="320" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">2</text>
+  <text x="48" y="320" font-size="11" class="m-serif">约 64 s：文档中 WSL2 / Linux x64 的 binary_overview</text>
+  <circle cx="30" cy="334" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
+  <text x="30" y="338" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">3</text>
+  <text x="48" y="338" font-size="11" class="m-serif">约 163 s：文档中 Windows x64 的 binary_overview，默认 60 s 超时</text>
+</svg>

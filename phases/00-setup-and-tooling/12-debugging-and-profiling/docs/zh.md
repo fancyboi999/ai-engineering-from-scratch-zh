@@ -395,3 +395,15 @@ python phases/00-setup-and-tooling/12-debugging-and-profiling/code/debug_tools.p
 3. 用 `tracemalloc` 找出你数据加载流水线里哪一行分配了最多内存。
 4. 为一个简单的训练任务配好 TensorBoard，判断模型是不是过拟合了。
 5. 在一个训练循环里用 `breakpoint()`。练习从调试器提示符检查张量的形状、设备和梯度值。
+
+### 提示
+
+**练习 1。** 运行 `python3 phases/00-setup-and-tooling/12-debugging-and-profiling/code/debug_tools.py`，阅读每个演示函数的输出。再修改 `demo_nan_detection` 中的模型，让输出除以零并重跑；`detect_nan` 应输出带步骤编号的 NaN 警告。
+
+**练习 2。** 用 `python -m cProfile -s cumtime your_script.py` 运行循环，或用 `cProfile.Profile()` 包裹它。查看 `cumtime` 列顶部几行；你自己代码中累计耗时最长的函数就是最慢的函数。
+
+**练习 3。** 像 `demo_memory_tracking` 一样，在数据加载前调用 `tracemalloc.start()`，加载后调用 `tracemalloc.take_snapshot()`。输出 `snapshot.statistics("lineno")[:5]`；第一行会给出分配量最大的文件和行号。
+
+**练习 4。** 每个 epoch 用 `SummaryWriter` 记录训练损失和验证损失，再运行 `tensorboard --logdir=runs`。如果训练损失持续下降而验证损失上升，模型就发生了过拟合。
+
+**练习 5。** 在循环的 `loss.backward()` 后添加 `breakpoint()` 并运行。在 `(Pdb)` 提示符中输出 `x.shape`、`x.device` 和 `next(model.parameters()).grad`，再输入 `c` 继续下一步。

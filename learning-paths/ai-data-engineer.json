@@ -4,7 +4,11 @@
   "id": "ai-data-engineer",
   "title": "AI 数据系统",
   "workFamily": "AI 数据系统",
-  "commonTitles": ["AI 数据工程师", "机器学习数据工程师", "检索工程师"],
+  "commonTitles": [
+    "AI 数据工程师",
+    "机器学习数据工程师",
+    "检索工程师"
+  ],
   "summary": "为 AI 系统构建可靠的数据、特征、嵌入、检索、评估和可观测性管道。",
   "keywords": "ai data engineer pipelines feature engineering embeddings retrieval rag quality observability",
   "decisionPrompt": "你是否想让支撑训练、检索、评估和生产行为的数据变得可信？",
@@ -46,9 +50,22 @@
     "能复现管道结果，并记录回滚方法。"
   ],
   "coverage": {
-    "strong": ["数据和特征管道", "嵌入与检索", "RAG 评估", "AI 可观测性"],
-    "partial": ["血缘关系与 schema 演进", "管道编排与数据回填", "数据治理"],
-    "outsideCourse": ["企业数据仓库或数据湖的所有权", "合规决策权", "线上数据平台值班经验"]
+    "strong": [
+      "数据和特征管道",
+      "嵌入与检索",
+      "RAG 评估",
+      "AI 可观测性"
+    ],
+    "partial": [
+      "血缘关系与 schema 演进",
+      "管道编排与数据回填",
+      "数据治理"
+    ],
+    "outsideCourse": [
+      "企业数据仓库或数据湖的所有权",
+      "合规决策权",
+      "线上数据平台值班经验"
+    ]
   },
   "completionClaim": "完成本路线表明你能够构建和评估可追溯的 AI 数据管道，但不保证获得相关职位，也不能证明你有运行企业数据平台的经验。",
   "sourceBasis": {
@@ -95,21 +112,86 @@
       "id": "interview-readiness-evidence",
       "title": "面试与就绪度证据",
       "outcome": "展示遥测数据如何区分数据、检索和生成故障。",
-      "lessonPaths": ["phases/17-infrastructure-and-production/13-llm-observability"],
+      "lessonPaths": [
+        "phases/17-infrastructure-and-production/13-llm-observability"
+      ],
       "artifact": "一份故障分析，将生产症状关联到负责的数据或检索阶段。"
     }
   ],
   "lessons": [
-    {"order": 1, "path": "phases/00-setup-and-tooling/09-data-management", "minutes": 45, "required": true},
-    {"order": 2, "path": "phases/02-ml-fundamentals/08-feature-engineering", "minutes": 90, "required": true},
-    {"order": 3, "path": "phases/02-ml-fundamentals/13-ml-pipelines", "minutes": 120, "required": true},
-    {"order": 4, "path": "phases/10-llms-from-scratch/03-data-pipelines", "minutes": 90, "required": true},
-    {"order": 5, "path": "phases/11-llm-engineering/04-embeddings", "minutes": 75, "required": true},
-    {"order": 6, "path": "phases/11-llm-engineering/05-context-engineering", "minutes": 90, "required": true},
-    {"order": 7, "path": "phases/11-llm-engineering/06-rag", "minutes": 90, "required": true},
-    {"order": 8, "path": "phases/11-llm-engineering/07-advanced-rag", "minutes": 90, "required": true},
-    {"order": 9, "path": "phases/11-llm-engineering/10-evaluation", "minutes": 45, "required": true},
-    {"order": 10, "path": "phases/11-llm-engineering/13-production-app", "minutes": 120, "required": true},
-    {"order": 11, "path": "phases/17-infrastructure-and-production/13-llm-observability", "minutes": 60, "required": true}
+    {
+      "order": 1,
+      "path": "phases/00-setup-and-tooling/09-data-management",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 2,
+      "path": "phases/02-ml-fundamentals/08-feature-engineering",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 3,
+      "path": "phases/02-ml-fundamentals/13-ml-pipelines",
+      "minutes": 120,
+      "required": true
+    },
+    {
+      "order": 4,
+      "path": "phases/10-llms-from-scratch/03-data-pipelines",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 5,
+      "path": "phases/11-llm-engineering/04-embeddings",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 6,
+      "path": "phases/11-llm-engineering/05-context-engineering",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 7,
+      "path": "phases/11-llm-engineering/06-rag",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 8,
+      "path": "phases/11-llm-engineering/07-advanced-rag",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 9,
+      "path": "phases/11-llm-engineering/10-evaluation",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 10,
+      "path": "phases/11-llm-engineering/13-production-app",
+      "minutes": 120,
+      "required": true
+    },
+    {
+      "order": 11,
+      "path": "phases/17-infrastructure-and-production/13-llm-observability",
+      "minutes": 60,
+      "required": true
+    }
+  ],
+  "projects": [
+    "csv-repair-workbench",
+    "dataset-split-auditor",
+    "dataset-contract-gate",
+    "document-extraction-desk",
+    "sensitive-text-redaction-gate",
+    "rag-freshness-pipeline"
   ]
 }

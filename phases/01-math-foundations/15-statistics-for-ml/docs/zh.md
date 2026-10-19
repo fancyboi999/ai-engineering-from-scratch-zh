@@ -44,7 +44,7 @@ Mode:   most frequent value
         Useful for categorical data. For continuous data, rarely informative.
 ```
 
-均值是平衡点。中位数是过半的标记。当它们分道扬镳时，你的分布就是偏斜的。收入分布的均值 >> 中位数（亿万富翁带来的右偏）。训练中的损失分布常常是均值 << 中位数（简单样本带来的左偏）。
+均值是平衡点。中位数是过半的标记。当它们分道扬镳时，你的分布就是偏斜的。收入分布的$\text{mean} \gg \text{median}$（亿万富翁带来的右偏）。训练中的损失分布常常是$\text{mean} \ll \text{median}$（简单样本带来的左偏）。
 
 **离散程度的度量**回答"数据有多分散？"
 
@@ -75,14 +75,16 @@ For latency monitoring:
 
 在 ML 里，你关心推理延迟、预测置信度分布和理解误差分布的百分位数。一个平均误差低、但 P99 误差糟糕的模型，对安全攸关的应用可能毫无用处。
 
-**样本统计 vs 总体统计。** 从样本计算方差时，除以 (n-1) 而不是 n。这是贝塞尔校正。它弥补了你的样本均值不是真正的总体均值这一事实。分母用 n，你会系统性地低估真正的方差。用 (n-1)，估计就是无偏的。
+**样本统计 vs 总体统计。** 从样本计算方差时，除以 $(n-1)$ 而不是 $n$。这是贝塞尔校正。它弥补了你的样本均值不是真正的总体均值这一事实。分母用 $n$，你会系统性地低估真正的方差。用 $(n-1)$，估计就是无偏的。
 
-```
-Population variance: sigma^2 = (1/N) * sum((x_i - mu)^2)
-Sample variance:     s^2     = (1/(n-1)) * sum((x_i - x_bar)^2)
+```math
+\begin{aligned}
+\text{总体方差：} \quad \sigma^2 &= \frac{1}{N} \sum (x_i - \mu)^2 \\
+\text{样本方差：} \quad s^2 &= \frac{1}{n-1} \sum (x_i - \bar{x})^2
+\end{aligned}
 ```
 
-实践中：如果 n 很大（数千个样本），差别可忽略。如果 n 很小（几十个样本），它就要紧了。
+实践中：如果 $n$ 很大（数千个样本），差别可忽略。如果 $n$ 很小（几十个样本），它就要紧了。
 
 ### 相关：变量如何一起移动
 
@@ -100,7 +102,7 @@ r =  0:  no linear relationship (but there might be a nonlinear one!)
 Range: [-1, 1]
 ```
 
-Pearson 假设关系是线性的、且两个变量大致正态分布。它对离群点敏感。单个极端点就能把 r 从 0.1 拽到 0.9。
+Pearson 假设关系是线性的、且两个变量大致正态分布。它对离群点敏感。单个极端点就能把 $r$ 从 0.1 拽到 0.9。
 
 **Spearman 秩相关**度量单调关联：
 
@@ -139,7 +141,7 @@ Cov(X, Y) < 0:  when X increases, Y tends to decrease
 Cov(X, Y) = 0:  no linear co-movement
 ```
 
-对 d 个特征，协方差矩阵 C 是一个 d x d 矩阵，其中 C[i][j] = Cov(feature_i, feature_j)。对角元 C[i][i] 是每个特征的方差。
+对 $d$ 个特征，协方差矩阵 $C$ 是一个 $d \times d$ 矩阵，其中 $C[i][j] = \mathop{\mathrm{Cov}}(\text{feature}_i, \text{feature}_j)$。对角元 $C[i][i]$ 是每个特征的方差。
 
 ```
 C = | Var(x1)      Cov(x1,x2)  Cov(x1,x3) |
@@ -155,7 +157,7 @@ Properties:
 
 **与 PCA 的联系。** PCA 对协方差矩阵做特征分解。特征向量是主成分（方差最大的方向）。特征值告诉你每个成分捕获多少方差。这正是第 10 课讲的，但现在你看清了为什么协方差矩阵是该被分解的对象：它编码了你数据中所有成对的线性关系。
 
-**与相关的联系。** 相关矩阵是标准化变量（各除以自己的标准差）的协方差矩阵。相关把协方差归一化，使所有值落在 [-1, 1] 里。
+**与相关的联系。** 相关矩阵是标准化变量（各除以自己的标准差）的协方差矩阵。相关把协方差归一化，使所有值落在 $[-1, 1]$ 里。
 
 ### 假设检验
 
@@ -205,10 +207,11 @@ t 检验比较均值。它有好几种类型。
 
 **单样本 t 检验：** 总体均值是否不同于一个假设值？
 
-```
-t = (x_bar - mu_0) / (s / sqrt(n))
-
-degrees of freedom = n - 1
+```math
+\begin{aligned}
+t &= \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \\[4pt]
+\text{自由度} &= n - 1
+\end{aligned}
 ```
 
 **双样本 t 检验（独立）：** 两组的均值是否不同？
@@ -297,19 +300,20 @@ engineering cost of deploying a new model.
 
 **效应量**量化差异有多大，与样本量无关：
 
-```
-Cohen's d = (mean_1 - mean_2) / pooled_std
-
-d = 0.2:  small effect
-d = 0.5:  medium effect
-d = 0.8:  large effect
+```math
+\begin{aligned}
+\text{Cohen's } d &= \frac{\text{mean}_1 - \text{mean}_2}{\text{pooled\_std}} \\[4pt]
+d &= 0.2: \quad \text{小效应} \\
+d &= 0.5: \quad \text{中等效应} \\
+d &= 0.8: \quad \text{大效应}
+\end{aligned}
 ```
 
 总是同时报告 p 值和效应量。p 值告诉你差异是不是真的。效应量告诉你它是否要紧。
 
 ### 多重比较问题
 
-当你检验许多假设时，有些会因偶然而"显著"。如果你在 alpha = 0.05 下检验 20 件事，即便什么都不是真的，你也预期会有 1 个假阳性。
+当你检验许多假设时，有些会因偶然而"显著"。如果你在 $\alpha = 0.05$ 下检验 20 件事，即便什么都不是真的，你也预期会有 1 个假阳性。
 
 ```
 P(at least one false positive) = 1 - (1 - alpha)^m
@@ -320,7 +324,7 @@ P(false positive) = 1 - 0.95^20 = 0.64
 You have a 64% chance of at least one false positive.
 ```
 
-**Bonferroni 校正：** 把 alpha 除以检验数量。
+**Bonferroni 校正：** 把 $\alpha$ 除以检验数量。
 
 ```
 Adjusted alpha = alpha / m = 0.05 / 20 = 0.0025
@@ -417,11 +421,11 @@ Kruskal-Wallis:     compares multiple groups (replaces ANOVA)
 - More statistical power (better at detecting real differences)
 ```
 
-在 ML 实验里，你通常 n 很小（5 或 10 个交叉验证折），所以像 Wilcoxon 符号秩这样的非参数检验往往比 t 检验更合适。
+在 ML 实验里，你通常 $n$ 很小（5 或 10 个交叉验证折），所以像 Wilcoxon 符号秩这样的非参数检验往往比 t 检验更合适。
 
 ### 中心极限定理：实践含义
 
-CLT 说样本均值的分布随 n 增长趋近正态分布，不管底层总体分布如何。
+CLT 说样本均值的分布随 $n$ 增长趋近正态分布，不管底层总体分布如何。
 
 ```
 If X_1, X_2, ..., X_n are iid with mean mu and variance sigma^2:
@@ -473,7 +477,7 @@ For highly skewed distributions, you might need n >= 100.
 
 9. **数据不独立却假设独立。** 同一病人的医学影像、同一文档的多个句子。组内的观测是相关的。
 
-10. **P 值篡改（p-hacking）。** 试不同的检验、子集或排除标准，直到拿到 p < 0.05。这个结果是搜索的产物。
+10. **P 值篡改（p-hacking）。** 试不同的检验、子集或排除标准，直到拿到 $p < 0.05$。这个结果是搜索的产物。
 
 ## 动手构建
 
@@ -484,7 +488,7 @@ For highly skewed distributions, you might need n >= 100.
 3. **假设检验**（单样本 t 检验、双样本 t 检验、卡方检验）
 4. **Bootstrap 置信区间**（对任意统计量，不需要任何假设）
 5. **A/B 测试模拟器**（生成数据、检验、检查第一类和第二类错误）
-6. **统计显著性 vs 实际显著性演示**（展示大 n 让一切都"显著"）
+6. **统计显著性 vs 实际显著性演示**（展示大 $n$ 让一切都"显著"）
 
 全部从零写，只用 `math` 和 `random`。不用 numpy，不用 scipy。
 
@@ -501,7 +505,7 @@ f3-bootstrap-resample
 | 标准差 | 方差的平方根。用原始单位度量离散程度。 |
 | 百分位数 | 给定百分比的数据落在其以下的值。 |
 | IQR | 四分位距。Q3 减 Q1。中间 50% 的离散程度。 |
-| Pearson 相关 | 度量两个变量之间的线性关联。范围 [-1, 1]。 |
+| Pearson 相关 | 度量两个变量之间的线性关联。范围 $[-1, 1]$。 |
 | Spearman 相关 | 用秩度量单调关联。 |
 | 协方差矩阵 | 所有特征两两之间协方差构成的矩阵。 |
 | 原假设 | 无效应或无差异的默认假设。 |

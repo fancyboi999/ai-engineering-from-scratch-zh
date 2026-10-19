@@ -24,7 +24,7 @@
 
 ### 事件、样本空间和概率
 
-样本空间 S 是所有可能结果的集合。事件是样本空间的一个子集。概率把事件映射到 0 到 1 之间的数。
+样本空间 $S$ 是所有可能结果的集合。事件是样本空间的一个子集。概率把事件映射到 0 到 1 之间的数。
 
 ```
 Coin flip:
@@ -37,15 +37,15 @@ Single die roll:
 ```
 
 三条公理定义了全部概率：
-1. 对任何事件 A，P(A) >= 0
-2. P(S) = 1（总会发生点什么）
-3. 当 A 和 B 不能同时发生时，P(A or B) = P(A) + P(B)
+1. 对任何事件 $A$，$P(A) \ge 0$
+2. $P(S) = 1$（总会发生点什么）
+3. 当 $A$ 和 $B$ 不能同时发生时，$P(A \text{ 或 } B) = P(A) + P(B)$
 
 其余一切（贝叶斯定理、期望、各种分布）都从这三条规则推出来。
 
 ### 条件概率与独立性
 
-P(A|B) 是在 B 发生的条件下 A 的概率。
+$P(A \mid B)$ 是在 $B$ 发生的条件下 $A$ 的概率。
 
 ```
 P(A|B) = P(A and B) / P(B)
@@ -58,9 +58,11 @@ Example: deck of cards
 
 当知道一个事件对另一个没有任何信息时，两个事件就是独立的：
 
-```
-Independent:   P(A|B) = P(A)
-Equivalent to: P(A and B) = P(A) * P(B)
+```math
+\begin{aligned}
+\text{独立：} \quad & P(A \mid B) = P(A) \\
+\text{等价于：} \quad & P(A \text{ 和 } B) = P(A) \cdot P(B)
+\end{aligned}
 ```
 
 抛硬币是独立的。不放回地抽牌则不是。
@@ -98,27 +100,33 @@ integral from -inf to +inf of f(x) dx = 1
 
 **Bernoulli：** 一次试验，两种结果。建模二分类。
 
-```
-P(X = 1) = p
-P(X = 0) = 1 - p
-Mean = p,  Variance = p(1-p)
+```math
+\begin{aligned}
+P(X = 1) &= p \\
+P(X = 0) &= 1 - p \\
+\text{均值} = p, &\quad \text{方差} = p(1-p)
+\end{aligned}
 ```
 
-**Categorical：** 一次试验，k 种结果。建模多分类（softmax 输出）。
+**Categorical：** 一次试验，$k$ 种结果。建模多分类（softmax 输出）。
 
-```
-P(X = i) = p_i,  where sum of p_i = 1
-Example: P(cat) = 0.7,  P(dog) = 0.2,  P(bird) = 0.1
+```math
+\begin{aligned}
+& P(X = i) = p_i, \quad \text{其中 } \textstyle\sum_i p_i = 1 \\
+& \text{示例：} P(\text{cat}) = 0.7, \quad P(\text{dog}) = 0.2, \quad P(\text{bird}) = 0.1
+\end{aligned}
 ```
 
 **均匀：** 所有结果概率相等。用于随机初始化。
 
-```
-Discrete: P(X = k) = 1/n for k in {1, ..., n}
-Continuous: f(x) = 1/(b-a) for x in [a, b]
+```math
+\begin{aligned}
+\text{离散：} \quad & P(X = k) = 1/n \text{ 对于 } k \in \lbrace 1, \ldots, n \rbrace \\
+\text{连续：} \quad & f(x) = 1/(b-a) \text{ 对于 } x \in [a, b]
+\end{aligned}
 ```
 
-**正态（高斯）：** 钟形曲线。由均值（mu）和方差（sigma^2）参数化。
+**正态（高斯）：** 钟形曲线。由均值（$\mu$）和方差（$\sigma^2$）参数化。
 
 ```
 f(x) = (1 / sqrt(2*pi*sigma^2)) * exp(-(x - mu)^2 / (2*sigma^2))
@@ -131,45 +139,51 @@ Standard normal: mu = 0, sigma = 1
 
 **Poisson：** 固定区间内稀有事件的计数。建模事件率。
 
-```
-P(X = k) = (lambda^k * e^(-lambda)) / k!
-Mean = lambda,  Variance = lambda
+```math
+\begin{aligned}
+P(X = k) &= \frac{\lambda^k e^{-\lambda}}{k!} \\
+\text{均值} = \lambda, &\quad \text{方差} = \lambda
+\end{aligned}
 ```
 
 ### 期望值与方差
 
 期望值是按权重加权的平均结果。
 
-```
-Discrete:   E[X] = sum of x_i * P(X = x_i)
-Continuous: E[X] = integral of x * f(x) dx
+```math
+\begin{aligned}
+\text{离散：} \quad & \mathbb{E}[X] = \sum_i x_i \, P(X = x_i) \\
+\text{连续：} \quad & \mathbb{E}[X] = \int x \, f(x) \, dx
+\end{aligned}
 ```
 
 方差衡量围绕均值的离散程度。
 
-```
-Var(X) = E[(X - E[X])^2] = E[X^2] - (E[X])^2
-Standard deviation = sqrt(Var(X))
+```math
+\begin{aligned}
+\mathrm{Var}(X) &= \mathbb{E}[(X - \mathbb{E}[X])^2] = \mathbb{E}[X^2] - (\mathbb{E}[X])^2 \\
+\text{标准差} &= \sqrt{\mathrm{Var}(X)}
+\end{aligned}
 ```
 
 在 ML 里，期望值以损失函数的形式出现（在数据分布上的平均损失）。方差告诉你模型的稳定性。梯度方差高意味着训练有噪声。
 
 ### 联合分布与边缘分布
 
-联合分布 P(X, Y) 同时描述两个随机变量。
+联合分布 $P(X, Y)$ 同时描述两个随机变量。
 
-联合 PMF 示例（X = 天气，Y = 雨伞）：
+联合 PMF 示例（$X$ = 天气，$Y$ = 雨伞）：
 
-| | Y=0（没带伞） | Y=1（带伞） | 边缘 P(X) |
+| | $Y=0$（没带伞） | $Y=1$（带伞） | 边缘 $P(X)$ |
 |---|---|---|---|
-| X=0（晴） | 0.40 | 0.10 | P(X=0) = 0.50 |
-| X=1（雨） | 0.05 | 0.45 | P(X=1) = 0.50 |
-| **边缘 P(Y)** | P(Y=0) = 0.45 | P(Y=1) = 0.55 | 1.00 |
+| $X=0$（晴） | 0.40 | 0.10 | $P(X=0) = 0.50$ |
+| $X=1$（雨） | 0.05 | 0.45 | $P(X=1) = 0.50$ |
+| **边缘 $P(Y)$** | $P(Y=0) = 0.45$ | $P(Y=1) = 0.55$ | 1.00 |
 
 边缘分布把另一个变量求和消掉：
 
-```
-P(X = x) = sum over all y of P(X = x, Y = y)
+```math
+P(X = x) = \sum_{y} P(X = x, Y = y)
 ```
 
 上表里的行总和与列总和就是边缘分布。
@@ -196,23 +210,27 @@ This works for ANY starting distribution.
 
 原始概率会带来数值问题。把许多小概率乘在一起会很快下溢到零。
 
-```
-P(sentence) = P(word1) * P(word2) * ... * P(word_n)
-            = 0.01 * 0.003 * 0.02 * ...
-            -> 0.0 (underflow after ~30 terms)
+```math
+\begin{aligned}
+P(\text{sentence}) &= P(\text{word}_1) \cdot P(\text{word}_2) \cdot \ldots \cdot P(\text{word}_n) \\
+&= 0.01 \cdot 0.003 \cdot 0.02 \cdot \ldots \\
+&\to 0.0 \quad \text{（在此之后下溢：} \sim 30 \text{ 项）}
+\end{aligned}
 ```
 
 对数概率解决了这个问题。乘法变成加法。
 
-```
-log P(sentence) = log P(word1) + log P(word2) + ... + log P(word_n)
-                = -4.6 + -5.8 + -3.9 + ...
-                -> finite number (no underflow)
+```math
+\begin{aligned}
+\log P(\text{sentence}) &= \log P(\text{word}_1) + \log P(\text{word}_2) + \ldots + \log P(\text{word}_n) \\
+&= -4.6 + -5.8 + -3.9 + \ldots \\
+&\to \text{有限数值（未下溢）}
+\end{aligned}
 ```
 
 规则：
-- log(a * b) = log(a) + log(b)
-- 对数概率总是 <= 0（因为 0 < P <= 1）
+- $\log(a \cdot b) = \log(a) + \log(b)$
+- 对数概率总是 $\le 0$（因为 $0 < P \le 1$）
 - 越负 = 越不可能
 - 交叉熵损失是正确类别的负对数概率
 
@@ -430,24 +448,34 @@ print(f"Log-softmax: {log_probs}")
 
 4. 写一个函数，接收一组对数概率，返回最可能的序列、总对数概率和等价的原始概率。用一个 50 词的句子测试，每个词概率为 0.01。
 
+### 提示
+
+**练习 1。** 从均匀分布采样 `u`，返回 $-\ln(1 - u) / \lambda$。检查样本均值接近 $1/\lambda$，直方图各区间符合 $\lambda e^{-\lambda x}$。
+
+**练习 2。** 填写 6×6 联合概率表，每格都是概率且总和为 1，再调用 `joint_to_marginals`。使用 `check_independence`：只有每格都等于两个边缘概率的乘积时，两颗骰子才独立。
+
+**练习 3。** 对 logits 应用 `softmax`，取索引 3 对应概率的 $-\ln$。结果应接近 0.421，与 `nn.CrossEntropyLoss` 在相同 logits 和目标上的结果一致。
+
+**练习 4。** 将对数概率相加，不要直接相乘原始概率。50 个词的概率均为 0.01 时，总对数概率应为 $50 \ln(0.01) \approx -230.26$，原始概率为 $10^{-100}$。
+
 ## 关键术语
 
 | 术语 | 人们常说 | 它实际指什么 |
 |------|----------------|----------------------|
-| 样本空间 | "所有可能性" | 一次实验所有可能结果组成的集合 S |
+| 样本空间 | "所有可能性" | 一次实验所有可能结果组成的集合 $S$ |
 | PMF | "概率函数" | 给出每个离散结果确切概率的函数，所有概率之和为 1 |
 | PDF | "概率曲线" | 连续变量的密度函数。在区间上积分得到概率 |
-| 条件概率 | "给定某事的概率" | P(A\|B) = P(A and B) / P(B)。贝叶斯思维和贝叶斯定理的基础 |
-| 独立性 | "互不影响" | P(A and B) = P(A) * P(B)。知道一个事件对另一个没有任何信息 |
+| 条件概率 | "给定某事的概率" | $P(A \mid B) = P(A \text{ 和 } B) / P(B)$。贝叶斯思维和贝叶斯定理的基础 |
+| 独立性 | "互不影响" | $P(A \text{ 和 } B) = P(A) \cdot P(B)$。知道一个事件对另一个没有任何信息 |
 | 期望值 | "平均值" | 所有结果按概率加权的和。损失函数就是一个期望值 |
 | 方差 | "有多分散" | 偏离均值的平方的期望。方差高 = 估计有噪声、不稳定 |
-| 正态分布 | "钟形曲线" | f(x) = (1/sqrt(2*pi*sigma^2)) * exp(-(x-mu)^2/(2*sigma^2))。因中心极限定理而无处不在 |
+| 正态分布 | "钟形曲线" | $f(x) = (1/\sqrt{2\pi\sigma^2}) \cdot \exp(-(x-\mu)^2/(2\sigma^2))$。因中心极限定理而无处不在 |
 | 中心极限定理 | "平均后变正态" | 许多独立样本的均值会收敛到正态分布，不管来源是什么 |
-| 联合分布 | "两个变量放一起" | P(X, Y) 描述 X 和 Y 每种结果组合的概率 |
-| 边缘分布 | "把另一个变量求和掉" | P(X) = sum_y P(X, Y)。从联合分布里恢复出一个变量的分布 |
-| 对数概率 | "概率的对数" | log P(x)。把乘积变成求和，防止长序列里的数值下溢 |
-| Softmax | "把分数变成概率" | softmax(z_i) = exp(z_i) / sum(exp(z_j))。把实值 logits 映射成一个合法的概率分布 |
-| 交叉熵 | "损失函数" | -sum(p_true * log(p_predicted))。衡量两个分布有多不同。越低越好 |
+| 联合分布 | "两个变量放一起" | $P(X, Y)$ 描述 $X$ 和 $Y$ 每种结果组合的概率 |
+| 边缘分布 | "把另一个变量求和掉" | $P(X) = \sum_y P(X, Y)$。从联合分布里恢复出一个变量的分布 |
+| 对数概率 | "概率的对数" | $\log P(x)$。把乘积变成求和，防止长序列里的数值下溢 |
+| Softmax | "把分数变成概率" | $\text{softmax}(z_i) = \exp(z_i) / \sum_j \exp(z_j)$。把实值 logits 映射成一个合法的概率分布 |
+| 交叉熵 | "损失函数" | $-\sum p_{\text{true}} \cdot \log(p_{\text{predicted}})$。衡量两个分布有多不同。越低越好 |
 | Logits | "模型原始输出" | softmax 之前未归一化的分数。得名于 logistic 函数 |
 | 采样 | "抽随机值" | 按概率分布生成值。模型生成输出的方式 |
 

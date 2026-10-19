@@ -39,15 +39,15 @@ features += weight_a * control_a(depth) + weight_b * control_b(pose)
 
 ### LoRA（Hu et al., 2021）
 
-对模型里任意一个线性层 `W ∈ R^{d×d}`，冻结 `W`，加上一个低秩增量：
+对模型里任意一个线性层 $W \in \mathbb{R}^{d \times d}$，冻结 $W$，加上一个低秩增量：
 
+```math
+W' = W + \Delta W, \quad \Delta W = B A, \quad A \in \mathbb{R}^{r \times d}, \quad B \in \mathbb{R}^{d \times r}
 ```
-W' = W + ΔW,  ΔW = B @ A,  A ∈ R^{r×d},  B ∈ R^{d×r}
-```
 
-其中 `r << d`。注意力用秩 4-16 是标准，重度微调用秩 64-128。新参数量：`2 · d · r` 而不是 `d²`。对 SDXL 注意力 `d=640`、`r=16`：每个适配器 2 万参数而不是 41 万——少 20 倍。整个模型上看：一个 LoRA 通常是 20-200MB，而基模型是 5GB。
+其中 $r \ll d$。注意力用秩 4-16 是标准，重度微调用秩 64-128。新参数量：$2 \cdot d \cdot r$ 而不是 $d^2$。对 SDXL 注意力 $d=640$、$r=16$：每个适配器 2 万参数而不是 41 万——少 20 倍。整个模型上看：一个 LoRA 通常是 20-200MB，而基模型是 5GB。
 
-推理时你可以缩放 LoRA：`W' = W + α · B @ A`。`α = 0.5-1.5` 是正常的。多个 LoRA 加性叠加（照例提醒一句，它们会以非线性的方式互相作用）。
+推理时你可以缩放 LoRA：$W' = W + \alpha \cdot B A$。$\alpha = 0.5\text{-}1.5$ 是正常的。多个 LoRA 加性叠加（照例提醒一句，它们会以非线性的方式互相作用）。
 
 ### IP-Adapter（Ye et al., 2023）
 
@@ -74,7 +74,7 @@ v4-controlnet-zero
 
 `code/main.py` 在一维上模拟这两套机制：
 
-1. **LoRA。** 一个预训练线性层 `W`。冻结它。训一个低秩的 `B @ A`，使 `W + BA` 匹配一个目标线性层。证明 `r = 1` 就足以完美学出一个秩 1 的修正。
+1. **LoRA。** 一个预训练线性层 $W$。冻结它。训一个低秩的 $BA$，使 $W + BA$ 匹配一个目标线性层。证明 $r = 1$ 就足以完美学出一个秩 1 的修正。
 
 2. **ControlNet-lite。** 一个「冻结基」预测器和一个读取额外信号的「旁路网络」。旁路网络的输出由一个初始化为零的可学习标量门控（我们这版的零卷积）。训练并看着门慢慢爬升。
 
@@ -98,11 +98,11 @@ h = base(x) + gated
 
 ## 坑
 
-- **过度缩放 LoRA。** `α = 2` 或 `α = 3` 是常见的「让它更强」黑招，会产出过度风格化 / 坏掉的输出。把 `α` 保持在 `≤ 1.5`。
+- **过度缩放 LoRA。** $\alpha = 2$ 或 $\alpha = 3$ 是常见的「让它更强」黑招，会产出过度风格化 / 坏掉的输出。把 权重保持在 $\alpha \le 1.5$。
 - **ControlNet 权重冲突。** 用一个权重 1.0 的 Pose ControlNet 和一个权重 1.0 的 Depth ControlNet 通常会过冲。权重之和 ≈ 1.0 是个安全默认。
 - **LoRA 用错了基模型。** SDXL 的 LoRA 在 SD 1.5 上会悄悄变空操作，因为注意力维度对不上。Diffusers 在 0.30+ 会警告。
 - **Textual Inversion 漂移。** 在一个检查点上训的 token 在另一个上会严重漂移。LoRA 更可移植。
-- **LoRA 权重合并与存储。** 你可以把一个 LoRA 烘进基模型权重里以加快推理（运行时不用加），但你就失去了运行时缩放 `α` 的能力。两个版本都留着。
+- **LoRA 权重合并与存储。** 你可以把一个 LoRA 烘进基模型权重里以加快推理（运行时不用加），但你就失去了运行时缩放 $\alpha$ 的能力。两个版本都留着。
 
 ## 实际使用
 
@@ -125,7 +125,7 @@ h = base(x) + gated
 
 1. **简单。** 在 `code/main.py` 里把 LoRA 秩 `r` 从 1 变到 4。秩到多少时 LoRA 能精确匹配一个秩 2 的目标增量？
 2. **中等。** 在两个目标变换上训两个独立的 LoRA。一起加载它们，展示它们的加性相互作用。这种相互作用什么时候打破线性？
-3. **困难。** 用 diffusers 叠：SDXL-base + Canny-ControlNet（权重 0.8）+ 一个风格 LoRA（α 0.8）+ IP-Adapter（权重 0.6）。随着栈权重变化，测量 FID 与 prompt 遵循之间的权衡。
+3. **困难。** 用 diffusers 叠：SDXL-base + Canny-ControlNet（权重 0.8）+ 一个风格 LoRA（$\alpha$ 0.8）+ IP-Adapter（权重 0.6）。随着栈权重变化，测量 FID 与 prompt 遵循之间的权衡。
 
 ## 关键术语
 
@@ -133,9 +133,9 @@ h = base(x) + gated
 |------|-----------------|-----------------------|
 | ControlNet | 「空间控制」 | 克隆的编码器 + 零卷积跳跃连接；读一张条件图像。 |
 | 零卷积 | 「一开始是恒等」 | 初始化为零的 1×1 卷积；ControlNet 一开始是空操作。 |
-| LoRA | 「低秩适配器」 | `W + B @ A`，`r << d`；参数比全量微调少 100 倍。 |
+| LoRA | 「低秩适配器」 | $W + BA$，$r \ll d$；参数比全量微调少 100 倍。 |
 | 秩 r | 「那个旋钮」 | LoRA 的压缩程度；典型 4-16，重度个性化用 64+。 |
-| α | 「LoRA 强度」 | LoRA 增量的运行时缩放。 |
+| $\alpha$ | 「LoRA 强度」 | LoRA 增量的运行时缩放。 |
 | IP-Adapter | 「参考图像」 | 通过 CLIP 图像 token 实现的小型图像条件适配器。 |
 | DreamBooth | 「全量主体微调」 | 在某主体的约 30 张图上训练整个模型。 |
 | Textual Inversion | 「新 token」 | 只学一个新词嵌入；遗产，大多被取代。 |
@@ -144,7 +144,7 @@ h = base(x) + gated
 
 一个真正的文生图 SaaS 在同一个基检查点上服务数百个 LoRA 和十几个 ControlNet。这个服务问题看起来很像 LLM 多租户（生产文献在连续批处理和 LoRAX / S-LoRA 下讲的是 LLM 那个情形）：
 
-- **热插拔 LoRA，别合并。** 把 `W' = W + α·B·A` 合进基模型每步推理快约 3-5%，但冻结了 `α` 和基模型。把 LoRA 作为秩 r 的增量热驻在显存里；diffusers 暴露了 `pipe.load_lora_weights()` + `pipe.set_adapters([...], adapter_weights=[...])` 来做逐请求激活。切换成本是那 `2 · d · r · num_layers` 个权重——MB 量级，亚秒。
+- **热插拔 LoRA，别合并。** 把 $W' = W + \alpha \cdot B \cdot A$ 合进基模型每步推理快约 3-5%，但冻结了 $\alpha$ 和基模型。把 LoRA 作为秩 r 的增量热驻在显存里；diffusers 暴露了 `pipe.load_lora_weights()` + `pipe.set_adapters([...], adapter_weights=[...])` 来做逐请求激活。切换成本是那 `2 · d · r · num_layers` 个权重——MB 量级，亚秒。
 - **ControlNet 当第二条注意力通道。** 克隆的编码器与基模型并行跑。两个权重各 1.0 的 ControlNet = 每步多两次前向，而不是合成一次。批大小余量按平方下降。每个激活的 ControlNet 按约 1.5 倍单步成本预算。
 - **LoRA 也量化。** 如果你量化了基模型（见第 07 课，8GB 上的 Flux），LoRA 增量也能干净地量化到 8-bit 或 4-bit。QLoRA 风格的加载让你能在一个 4-bit Flux 基模型上叠 5-10 个 LoRA 而不爆内存。
 

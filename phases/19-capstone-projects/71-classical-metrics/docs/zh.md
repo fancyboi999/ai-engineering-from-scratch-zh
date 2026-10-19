@@ -105,7 +105,7 @@ def lcs_length(a, b):
     return int(dp[n, m])
 ```
 
-numpy 表让实现更易读；纯 Python 列表也能跑。选用 ROUGE-L 的任务，每个任务要付出 O(n m) 的代价。对典型的摘要长度，这仍在一毫秒以内。
+numpy 表让实现更易读；纯 Python 列表也能跑。选用 ROUGE-L 的任务，每个任务要付出 $O(n m)$ 的代价。对典型的摘要长度，这仍在一毫秒以内。
 
 ## Accuracy
 

@@ -63,7 +63,7 @@ Qwen2-VL 引入了多模态旋转位置嵌入。不用 NaViT 的分数位置或 
 
 M-RoPE 不用重训就自带原生动态分辨率。推理时你喂任意 HxW 图，patch 嵌入器产出 H/14 x W/14 个 token，每个 token 拿到它的 (t=0, r=行, c=列) 位置，RoPE 用正确的频率旋转注意力，搞定。Qwen2.5-VL 和 Qwen3-VL 延续这个。InternVL3 的 V2PE 是同样的想法，每种模态用可变编码。
 
-与 AnyRes 不同，M-RoPE 在原生分辨率下是 O(H x W / P^2) 个 token——没有切块的乘性开销。与 NaViT 不同，它仍然期望每次前向一张图。跨分辨率批处理仍需在它之上叠 patch-n'-pack。
+与 AnyRes 不同，M-RoPE 在原生分辨率下是 $O(H \times W / P^2)$ 个 token——没有切块的乘性开销。与 NaViT 不同，它仍然期望每次前向一张图。跨分辨率批处理仍需在它之上叠 patch-n'-pack。
 
 ### NaFlex（SigLIP 2）
 

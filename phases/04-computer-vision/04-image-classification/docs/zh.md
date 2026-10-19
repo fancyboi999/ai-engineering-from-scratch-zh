@@ -52,18 +52,20 @@ flowchart LR
 
 分类器为每张图像产生 `C` 个数，叫 logits。应用 softmax 把它们转成概率分布：
 
-```
-softmax(z)_i = exp(z_i) / sum_j exp(z_j)
+```math
+\mathop{\mathrm{softmax}}(z)_i = \frac{\exp(z_i)}{\sum_j \exp(z_j)}
 ```
 
 交叉熵衡量正确类别的负对数概率：
 
-```
-CE(z, y) = -log( softmax(z)_y )
-        = -z_y + log( sum_j exp(z_j) )
+```math
+\begin{aligned}
+\mathrm{CE}(z, y) &= -\log\left( \mathop{\mathrm{softmax}}(z)_y \right) \\
+&= -z_y + \log\left( \sum_j \exp(z_j) \right)
+\end{aligned}
 ```
 
-右边那个形式是数值稳定的版本（log-sum-exp）。PyTorch 的 `nn.CrossEntropyLoss` 把 softmax + NLL 融成一个操作，直接接原始 logits。自己先做 softmax 几乎总是 bug——你算的是 log(softmax(softmax(z)))，一个没有意义的量。
+右边那个形式是数值稳定的版本（log-sum-exp）。PyTorch 的 `nn.CrossEntropyLoss` 把 softmax + NLL 融成一个操作，直接接原始 logits。自己先做 softmax 几乎总是 bug——你算的是 $\log(\mathop{\mathrm{softmax}}(\mathop{\mathrm{softmax}}(z)))$，一个没有意义的量。
 
 ### 为什么增广有用
 
@@ -105,7 +107,7 @@ mixup 的表亲。不去对着 `[0, 0, 1, 0, 0]` 训练，而是对着 `[eps/C, 
 聚合准确率掩盖了不平衡。一个 90-10 的二分类器，永远预测多数类就能拿 90%。真正告诉你发生了什么的工具：
 
 - **逐类准确率** —— 每类一个数；立刻暴露表现差的类别。
-- **混淆矩阵** —— C x C 的网格，第 i 行第 j 列 = 真实类别 i 被预测成类别 j 的计数；对角线是正确的，非对角线才是你的模型真正所在的地方。
+- **混淆矩阵** —— $C \times C$ 的网格，第 $i$ 行第 $j$ 列 = 真实类别 $i$ 被预测成类别 $j$ 的计数；对角线是正确的，非对角线才是你的模型真正所在的地方。
 - **Top-1 / Top-5** —— 正确类别是否在前 1 或前 5 个预测里；Top-5 对 ImageNet 要紧，因为像"Norwich terrier"和"Norfolk terrier"这样的类别确实有歧义。
 - **校准（ECE）** —— 一个 0.8 置信度的预测，是不是 80% 的时候真的对？现代网络系统性地过度自信；用温度缩放或标签平滑修。
 

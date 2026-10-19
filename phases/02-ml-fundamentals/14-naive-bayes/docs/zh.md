@@ -30,8 +30,8 @@
 
 贝叶斯定理把条件概率翻转过来：
 
-```
-P(class | features) = P(features | class) * P(class) / P(features)
+```math
+P(\text{class} \mid \text{features}) = \frac{P(\text{features} \mid \text{class}) \cdot P(\text{class})}{P(\text{features})}
 ```
 
 我们想要 `P(class | features)` —— 给定文档里的词，它属于某个类的概率。我们能从下面这些算出它：
@@ -43,15 +43,15 @@ P(class | features) = P(features | class) * P(class) / P(features)
 
 ### 朴素独立假设
 
-精确计算 `P(features | class)` 需要估计所有特征联合的概率。词表有 10000 个词，你得估计一个 2^10000 种可能组合上的分布。不可能。
+精确计算 `P(features | class)` 需要估计所有特征联合的概率。词表有 10000 个词，你得估计一个 $2^{10{,}000}$ 种可能组合上的分布。不可能。
 
 朴素假设：给定类别后，每个特征都条件独立。
 
-```
-P(w1, w2, ..., wn | class) = P(w1 | class) * P(w2 | class) * ... * P(wn | class)
+```math
+P(w_1, w_2, \ldots, w_n \mid \text{class}) = P(w_1 \mid \text{class}) \cdot P(w_2 \mid \text{class}) \cdots P(w_n \mid \text{class})
 ```
 
-你不再估一个不可能的联合分布，而是估 n 个简单的逐特征分布。每个只需要一个计数。
+你不再估一个不可能的联合分布，而是估 $n$ 个简单的逐特征分布。每个只需要一个计数。
 
 这个假设显然是错的。在任何文档里，"machine" 和 "learning" 这两个词都不独立。但分类器不需要正确的概率估计，它需要正确的排序 —— 哪个类概率最高。独立假设引入系统性误差，但这些误差对所有类的影响相似，所以排序还是对的。
 
@@ -59,7 +59,7 @@ P(w1, w2, ..., wn | class) = P(w1 | class) * P(w2 | class) * ... * P(wn | class)
 
 三个原因：
 
-1. **排序而非校准。** 分类只需要排第一的类正确。哪怕 P(spam) = 0.99999 而真实概率是 0.7，分类器还是正确地挑了 spam。我们不需要正确的概率，我们需要正确的赢家。
+1. **排序而非校准。** 分类只需要排第一的类正确。哪怕 $P(\text{spam}) = 0.99999$ 而真实概率是 0.7，分类器还是正确地挑了 spam。我们不需要正确的概率，我们需要正确的赢家。
 
 2. **高偏差，低方差。** 独立假设是个强先验。它狠狠约束了模型，从而防止过拟合。训练数据有限时，一个略错但稳定的模型，胜过一个理论正确但极不稳定的模型。这就是偏差-方差权衡在起作用。
 
@@ -76,31 +76,33 @@ P(w1, w2, ..., wn | class) = P(w1 | class) * P(w2 | class) * ... * P(wn | class)
 - 非垃圾邮件提到 "free" 5 次、"money" 10 次、"meeting" 100 次（共 115 个词）
 - 40% 的邮件是垃圾，60% 是非垃圾
 
-用拉普拉斯平滑（alpha=1）：
+用拉普拉斯平滑（$\alpha=1$）：
 
-```
-P(free | spam)    = (80 + 1) / (150 + 3) = 81/153 = 0.529
-P(money | spam)   = (60 + 1) / (150 + 3) = 61/153 = 0.399
-P(meeting | spam) = (10 + 1) / (150 + 3) = 11/153 = 0.072
-
-P(free | not-spam)    = (5 + 1) / (115 + 3) = 6/118 = 0.051
-P(money | not-spam)   = (10 + 1) / (115 + 3) = 11/118 = 0.093
-P(meeting | not-spam) = (100 + 1) / (115 + 3) = 101/118 = 0.856
+```math
+\begin{aligned}
+P(\text{free} \mid \text{spam}) &= (80 + 1) / (150 + 3) = 81/153 = 0.529 \\
+P(\text{money} \mid \text{spam}) &= (60 + 1) / (150 + 3) = 61/153 = 0.399 \\
+P(\text{meeting} \mid \text{spam}) &= (10 + 1) / (150 + 3) = 11/153 = 0.072 \\[6pt]
+P(\text{free} \mid \text{非垃圾邮件}) &= (5 + 1) / (115 + 3) = 6/118 = 0.051 \\
+P(\text{money} \mid \text{非垃圾邮件}) &= (10 + 1) / (115 + 3) = 11/118 = 0.093 \\
+P(\text{meeting} \mid \text{非垃圾邮件}) &= (100 + 1) / (115 + 3) = 101/118 = 0.856
+\end{aligned}
 ```
 
 新邮件含有："free"（2 次）、"money"（1 次）、"meeting"（0 次）。
 
+```math
+\begin{aligned}
+\log P(\text{spam} \mid \text{email}) &= \log(0.4) + 2 \log(0.529) + 1 \log(0.399) + 0 \log(0.072) \\
+&= -0.916 + 2(-0.637) + (-0.919) + 0 \\
+&= -3.109 \\[6pt]
+\log P(\text{非垃圾邮件} \mid \text{email}) &= \log(0.6) + 2 \log(0.051) + 1 \log(0.093) + 0 \log(0.856) \\
+&= -0.511 + 2(-2.976) + (-2.375) + 0 \\
+&= -8.838
+\end{aligned}
 ```
-log P(spam | email) = log(0.4) + 2*log(0.529) + 1*log(0.399) + 0*log(0.072)
-                    = -0.916 + 2*(-0.637) + (-0.919) + 0
-                    = -3.109
 
-log P(not-spam | email) = log(0.6) + 2*log(0.051) + 1*log(0.093) + 0*log(0.856)
-                        = -0.511 + 2*(-2.976) + (-2.375) + 0
-                        = -8.838
-```
-
-Spam 以大比分胜出。"free" 出现两次是 spam 的强证据。注意 "meeting" 没出现对两个对数和都贡献零（0 * log(P)）—— 在多项式 NB 里，缺席的词没有影响。是伯努利 NB 才显式地建模词的缺席。
+Spam 以大比分胜出。"free" 出现两次是 spam 的强证据。注意 "meeting" 没出现对两个对数和都贡献零（$0 \cdot \log P$）—— 在多项式 NB 里，缺席的词没有影响。是伯努利 NB 才显式地建模词的缺席。
 
 ### 三个变体
 
@@ -110,8 +112,8 @@ Spam 以大比分胜出。"free" 出现两次是 spam 的强证据。注意 "mee
 
 把每个特征建模为计数。最适合特征是词频或 TF-IDF 值的文本数据。
 
-```
-P(word_i | class) = (count of word_i in class + alpha) / (total words in class + alpha * vocab_size)
+```math
+P(\text{word}_i \mid \text{class}) = \frac{\text{计数：} \text{word}_i \text{ 属于该类} + \alpha}{\text{该类词总数} + \alpha \cdot \text{vocab\_size}}
 ```
 
 `alpha` 是拉普拉斯平滑（下面解释）。这个变体是文本分类的主力。
@@ -120,8 +122,8 @@ P(word_i | class) = (count of word_i in class + alpha) / (total words in class +
 
 把每个特征建模为正态分布。最适合连续特征。
 
-```
-P(x_i | class) = (1 / sqrt(2 * pi * var)) * exp(-(x_i - mean)^2 / (2 * var))
+```math
+P(x_i \mid \text{class}) = \frac{1}{\sqrt{2 \pi \cdot \text{var}}} \cdot \exp\left(-\frac{(x_i - \text{mean})^2}{2 \cdot \text{var}}\right)
 ```
 
 每个类对每个特征都有自己的均值和方差。当特征在每个类内真的服从钟形曲线时它很好用。
@@ -130,8 +132,8 @@ P(x_i | class) = (1 / sqrt(2 * pi * var)) * exp(-(x_i - mean)^2 / (2 * var))
 
 把每个特征建模为二元（出现或缺席）。最适合短文本或二元特征向量。
 
-```
-P(word_i | class) = (docs in class containing word_i + alpha) / (total docs in class + 2 * alpha)
+```math
+P(\text{word}_i \mid \text{class}) = \frac{\text{该类别中包含此词的文档数：} \text{word}_i + \alpha}{\text{该类文档总数} + 2 \alpha}
 ```
 
 和多项式不同，伯努利显式地惩罚词的缺席。如果 "free" 通常出现在垃圾邮件里却没出现在这封邮件里，伯努利会把它当作反对 spam 的证据。
@@ -152,11 +154,11 @@ P(word_i | class) = (docs in class containing word_i + alpha) / (total docs in c
 
 拉普拉斯平滑给每个特征计数加一个小计数 `alpha`（通常 1）：
 
-```
-P(word_i | class) = (count(word_i, class) + alpha) / (total_words_in_class + alpha * vocab_size)
+```math
+P(\text{word}_i \mid \text{class}) = \frac{\text{count}(\text{word}_i, \text{class}) + \alpha}{\text{total\_words\_in\_class} + \alpha \cdot \text{vocab\_size}}
 ```
 
-alpha=1 时，每个词至少有一丁点概率。测试邮件里出现的 "discombobulate" 不再杀死 spam 概率了。这个平滑有贝叶斯解释：它等价于在词分布上放一个均匀的狄利克雷先验。
+$\alpha=1$ 时，每个词至少有一丁点概率。测试邮件里出现的 "discombobulate" 不再杀死 spam 概率了。这个平滑有贝叶斯解释：它等价于在词分布上放一个均匀的狄利克雷先验。
 
 alpha 越高意味着平滑越强（分布越均匀）。alpha 越低意味着模型越信任数据。alpha 是你要调的超参数。
 
@@ -175,8 +177,8 @@ alpha 的效果：
 
 解法：在对数空间里工作。不乘概率，而是加它们的对数：
 
-```
-log P(class | x1, x2, ..., xn) = log P(class) + sum_i log P(xi | class)
+```math
+\log P(\text{class} \mid x_1, x_2, \ldots, x_n) = \log P(\text{class}) + \sum_i \log P(x_i \mid \text{class})
 ```
 
 这把预测变成一个点积：
@@ -194,7 +196,7 @@ prediction = argmax(log_scores)
 
 | 维度 | 朴素贝叶斯 | 逻辑回归 |
 |--------|------------|-------------------|
-| 类型 | 生成式（建模 P(X\|Y)） | 判别式（建模 P(Y\|X)） |
+| 类型 | 生成式（建模 $P(X \mid Y){}$） | 判别式（建模 $P(Y \mid X){}$） |
 | 训练 | 数频率 | 优化损失函数 |
 | 小数据 | 更好（强先验有帮助） | 更差（不够估权重） |
 | 大数据 | 更差（错误假设拖后腿） | 更好（灵活边界） |
@@ -221,8 +223,8 @@ flowchart LR
 
 实践中，我们在对数空间里工作以避免浮点下溢。不乘许多小概率，而是加它们的对数：
 
-```
-log P(class | features) = log P(class) + sum_i log P(feature_i | class)
+```math
+\log P(\text{class} \mid \text{features}) = \log P(\text{class}) + \sum_i \log P(\text{feature}_i \mid \text{class})
 ```
 
 ```figure
@@ -239,7 +241,7 @@ naive-bayes
 
 1. **fit(X, y)**：对每个类，统计每个特征的频率。加拉普拉斯平滑。计算对数概率。存储类先验（类频率的对数）。
 
-2. **predict_log_proba(X)**：对每个样本，为所有类计算 log P(class) + sum of log P(feature_i | class)。这是一次矩阵乘法：X @ log_probs.T + log_priors。
+2. **predict_log_proba(X)**：对每个样本，为所有类计算 $\log P(\text{class})$ + sum of $\log P(\text{feature}_i \mid \text{class})$。这是一次矩阵乘法：X @ log_probs.T + log_priors。
 
 3. **predict(X)**：返回对数概率最高的类。
 
@@ -312,9 +314,9 @@ class GaussianNB:
 
 ### 预测速度
 
-朴素贝叶斯预测是一次矩阵乘法。对 n 个样本、d 个特征、k 个类：
-- MultinomialNB：一次矩阵乘法 (n x d) @ (d x k) = O(n * d * k)
-- GaussianNB：n * k 次高斯 PDF 计算，每次跨 d 个特征 = O(n * d * k)
+朴素贝叶斯预测是一次矩阵乘法。对 $n$ 个样本、$d$ 个特征、$k$ 个类：
+- MultinomialNB：一次矩阵乘法 $(n \times d) \mathbin{@} (d \times k) = O(n \cdot d \cdot k)$
+- GaussianNB：$n \cdot k$ 次高斯 PDF 计算，每次跨 $d$ 个特征 = $O(n \cdot d \cdot k)$
 
 两者在每个维度上都是线性的。和 KNN（需要计算到所有训练点的距离）或带 RBF 核的 SVM（需要对所有支持向量做核计算）相比，NB 在预测时快好几个数量级。
 
@@ -387,7 +389,7 @@ CountVectorizer 里的 `binary=True` 标志把所有计数转成 0/1。没有它
 
 ### 校准 NB 概率
 
-NB 概率校准得不好。当 NB 说 P(spam) = 0.95 时，真实概率可能是 0.7。如果你需要可靠的概率估计（比如要设阈值或要和其他模型组合），用 sklearn 的 CalibratedClassifierCV：
+NB 概率校准得不好。当 NB 说 $P(\text{spam}) = 0.95$ 时，真实概率可能是 0.7。如果你需要可靠的概率估计（比如要设阈值或要和其他模型组合），用 sklearn 的 CalibratedClassifierCV：
 
 ```python
 from sklearn.calibration import CalibratedClassifierCV
@@ -405,7 +407,7 @@ proba = calibrated_nb.predict_proba(X_test)
 
 2. **零方差特征。** GaussianNB 要除以方差。如果某个特征对某个类方差为零（所有值相同），概率计算就崩。代码给所有方差加一个小平滑项（1e-9）来防止这个。
 
-3. **类别不平衡。** 如果 99% 的邮件是非垃圾，先验 P(not-spam) = 0.99 强到压过似然证据。你可以手动设类先验，或用 sklearn 里的 class_prior 参数。
+3. **类别不平衡。** 如果 99% 的邮件是非垃圾，先验 $P(\text{非垃圾邮件}) = 0.99$ 强到压过似然证据。你可以手动设类先验，或用 sklearn 里的 class_prior 参数。
 
 4. **特征缩放。** MultinomialNB 不需要缩放（它在计数上工作）。GaussianNB 也不需要缩放（它估计逐特征统计量）。这相比对特征尺度敏感的逻辑回归和 SVM 是个优势。
 
@@ -431,7 +433,7 @@ NB 在独立假设导致排序错误（而不只是概率错误）时失败。�
 
 1. **平滑实验。** 在文本数据上用 alpha 值 0.01、0.1、1.0、10.0、100.0 训练 MultinomialNB。把准确率对 alpha 画出来。性能在哪里达峰？为什么非常高的 alpha 有害？
 
-2. **特征独立性检验。** 拿一个真实文本数据集。挑两个明显相关的词（"machine" 和 "learning"）。计算 P(word1 | class) * P(word2 | class)，和 P(word1 AND word2 | class) 对比。独立假设错得多离谱？它影响分类准确率吗？
+2. **特征独立性检验。** 拿一个真实文本数据集。挑两个明显相关的词（"machine" 和 "learning"）。计算 $P(\text{word}_1 \mid \text{class}) \cdot P(\text{word}_2 \mid \text{class})$，和 $P(\text{word}_1 \text{ 且 } \text{word}_2 \mid \text{class})$ 对比。独立假设错得多离谱？它影响分类准确率吗？
 
 3. **伯努利实现。** 给代码扩展一个 BernoulliNB 类。把词袋转成二元（出现/缺席），在文本数据上和 MultinomialNB 对比准确率。伯努利什么时候赢？
 
@@ -444,14 +446,14 @@ NB 在独立假设导致排序错误（而不只是概率错误）时失败。�
 | 术语 | 大家怎么说 | 它实际是什么 |
 |------|----------------|----------------------|
 | 朴素贝叶斯 | "简单的概率分类器" | 应用贝叶斯定理、并假设给定类别后特征条件独立的分类器 |
-| 条件独立 | "特征互不影响" | P(A, B \| C) = P(A \| C) * P(B \| C) —— 一旦你知道 C，知道 B 不会告诉你关于 A 的任何新东西 |
+| 条件独立 | "特征互不影响" | $P(A, B \mid C) = P(A \mid C) \cdot P(B \mid C)$ —— 一旦你知道 $C$，知道 $B$ 不会告诉你关于 $A$ 的任何新东西 |
 | 拉普拉斯平滑 | "加一平滑" | 给每个特征加一个小计数，防止零概率主导预测 |
-| 先验 | "看到数据之前你信什么" | P(class) —— 观测任何特征之前每个类的概率 |
-| 似然 | "数据拟合得有多好" | P(features \| class) —— 已知类别时观测到这些特征的概率 |
-| 后验 | "看到数据之后你信什么" | P(class \| features) —— 观测特征之后类别的更新概率 |
-| 生成式模型 | "建模数据如何生成" | 学习 P(X \| Y) 和 P(Y)，再用贝叶斯定理得到 P(Y \| X) 的模型 |
-| 判别式模型 | "建模决策边界" | 直接学习 P(Y \| X)、不建模 X 如何生成的模型 |
-| 对数概率 | "避免下溢" | 用 log P 代替 P，防止许多小数的乘积在浮点里变成零 |
+| 先验 | "看到数据之前你信什么" | $P(\text{class})$ —— 观测任何特征之前每个类的概率 |
+| 似然 | "数据拟合得有多好" | $P(\text{features} \mid \text{class})$ —— 已知类别时观测到这些特征的概率 |
+| 后验 | "看到数据之后你信什么" | $P(\text{class} \mid \text{features})$ —— 观测特征之后类别的更新概率 |
+| 生成式模型 | "建模数据如何生成" | 学习 $P(X \mid Y)$ 和 $P(Y)$，再用贝叶斯定理得到 $P(Y \mid X)$ 的模型 |
+| 判别式模型 | "建模决策边界" | 直接学习 $P(Y \mid X)$、不建模 $X$ 如何生成的模型 |
+| 对数概率 | "避免下溢" | 用 $\log P$ 代替 $P$，防止许多小数的乘积在浮点里变成零 |
 
 ## 延伸阅读
 

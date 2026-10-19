@@ -35,7 +35,7 @@ test('catalog paginates stable unique paths and validates typed inputs', () => {
   assert.deepEqual(allPaths('project'), projectPaths);
   assert.deepEqual(allPaths('all'), [...lessonPaths, ...projectPaths].sort());
   assert.equal(first.total, lessonPaths.length + projectPaths.length); assert.equal(first.items.length, 2);
-  assert.equal(projectPaths.length, 76);
+  assert.equal(projectPaths.length, 78);
   for (const resourcePath of projectPaths) {
     const entry = readResource(resourcePath);
     assert.equal(entry.markdown, fs.readFileSync(path.join(root, resourcePath, 'README.md'), 'utf8'));

@@ -96,7 +96,7 @@ Relative error: 19.2%
 
 仅仅一次减法就有 19% 的相对误差。在 ML 里，这在你做以下事情时发生：
 
-- 计算均值很大的数据的方差：当 E[x] 很大时的 `E[x^2] - E[x]^2`
+- 计算均值很大的数据的方差：当 $\mathbb{E}[x]$ 很大时的 $\mathbb{E}[x^2] - \mathbb{E}[x]^2$
 - 减去几乎相等的对数概率
 - 用过小的 epsilon 计算有限差分梯度
 
@@ -141,20 +141,22 @@ log(1e-46) = -inf        (input underflowed to 0, then log(0) = -inf)
 
 技巧：在做指数前减去最大值。
 
-```
-log(sum(exp(x_i))) = max(x) + log(sum(exp(x_i - max(x))))
+```math
+\log\left(\sum_i \exp(x_i)\right) = \max(x) + \log\left(\sum_i \exp(x_i - \max(x))\right)
 ```
 
 它为什么有效：减去 `max(x)` 后，最大的指数是 `exp(0) = 1`。不可能上溢。和里至少有一项是 1，所以和至少是 1，而 `log(1) = 0`。不可能下溢到 `-inf`。
 
 证明：
 
-```
-log(sum(exp(x_i)))
-= log(sum(exp(x_i - c + c)))                    (add and subtract c)
-= log(sum(exp(x_i - c) * exp(c)))               (exp(a+b) = exp(a)*exp(b))
-= log(exp(c) * sum(exp(x_i - c)))               (factor out exp(c))
-= c + log(sum(exp(x_i - c)))                    (log(a*b) = log(a) + log(b))
+```math
+\begin{aligned}
+& \log\left(\sum_i \exp(x_i)\right) \\
+&= \log\left(\sum_i \exp(x_i - c + c)\right) && \text{（加上再减去 } c\text{)} \\
+&= \log\left(\sum_i \exp(x_i - c) \cdot \exp(c)\right) && (\exp(a+b) = \exp(a) \cdot \exp(b)) \\
+&= \log\left(\exp(c) \cdot \sum_i \exp(x_i - c)\right) && \text{（提取公因子 } \exp(c)\text{)} \\
+&= c + \log\left(\sum_i \exp(x_i - c)\right) && (\log(a \cdot b) = \log(a) + \log(b))
+\end{aligned}
 ```
 
 令 `c = max(x)`，上溢就被消除了。
@@ -170,8 +172,8 @@ log(sum(exp(x_i)))
 
 Softmax 把 logits 转成概率：
 
-```
-softmax(x_i) = exp(x_i) / sum(exp(x_j))
+```math
+\mathop{\mathrm{softmax}}(x_i) = \frac{\exp(x_i)}{\sum_j \exp(x_j)}
 ```
 
 不用这个技巧，logits 为 [100, 101, 102] 会导致上溢：
@@ -242,18 +244,18 @@ math.isfinite(x)    # True if x is neither nan nor inf
 
 中心差分公式：
 
-```
-df/dx ~= (f(x + h) - f(x - h)) / (2h)
+```math
+\frac{df}{dx} \approx \frac{f(x + h) - f(x - h)}{2h}
 ```
 
-这是 O(h^2) 精度，比只有 O(h) 的前向差分 `(f(x+h) - f(x)) / h` 好得多。
+这是 $O(h^2)$ 精度，比只有 $O(h)$ 的前向差分 $(f(x+h) - f(x)) / h$ 好得多。
 
-选 h：太大近似就不准。太小灾难性抵消会毁掉答案。`h = 1e-5` 到 `1e-7` 是典型值。
+选 $h$：太大近似就不准。太小灾难性抵消会毁掉答案。`h = 1e-5` 到 `1e-7` 是典型值。
 
 检查：计算解析梯度和数值梯度之间的相对差。
 
-```
-relative_error = |grad_analytical - grad_numerical| / max(|grad_analytical|, |grad_numerical|, 1e-8)
+```math
+\text{relative\_error} = \frac{\lvert \text{grad}_{\text{analytical}} - \text{grad}_{\text{numerical}} \rvert}{\max(\lvert \text{grad}_{\text{analytical}} \rvert, \lvert \text{grad}_{\text{numerical}} \rvert, 10^{-8})}
 ```
 
 经验法则：
@@ -289,7 +291,7 @@ relative_error = |grad_analytical - grad_numerical| / max(|grad_analytical|, |gr
 5. Net effect: same update, but no underflow
 ```
 
-动态损失缩放自动调整缩放因子。从一个大值（65536）开始。如果梯度上溢到 `inf`，就减半。如果 N 步没有上溢，就翻倍。
+动态损失缩放自动调整缩放因子。从一个大值（65536）开始。如果梯度上溢到 `inf`，就减半。如果 $N$ 步没有上溢，就翻倍。
 
 ### bfloat16 vs float16：为什么训练用 bfloat16 胜出
 
@@ -350,8 +352,8 @@ Layer 50: values in [0, inf]
 
 归一化在每一层把激活值重新中心化和重新缩放：
 
-```
-LayerNorm(x) = (x - mean(x)) / (std(x) + epsilon) * gamma + beta
+```math
+\mathop{\mathrm{LayerNorm}}(x) = \frac{x - \mathop{\mathrm{mean}}(x)}{\mathop{\mathrm{std}}(x) + \epsilon} \cdot \gamma + \beta
 ```
 
 `epsilon`（通常 1e-5）在所有激活值都相同时防止除以零。学到的参数 `gamma` 和 `beta` 让网络恢复它需要的任何尺度。
@@ -568,7 +570,7 @@ check_tensor("ugly", [1.0, float('inf'), 3.0])
 
 ## 练习
 
-1. **灾难性抵消。** 在 float32 下用朴素公式 `E[x^2] - E[x]^2` 计算 [1000000.0, 1000001.0, 1000002.0] 的方差。然后用 Welford 的在线算法计算它。把误差和真实方差（0.6667）对比。
+1. **灾难性抵消。** 在 float32 下用朴素公式 $\mathbb{E}[x^2] - \mathbb{E}[x]^2$ 计算 [1000000.0, 1000001.0, 1000002.0] 的方差。然后用 Welford 的在线算法计算它。把误差和真实方差（0.6667）对比。
 
 2. **精度狩猎。** 在 Python 里找出最小的正 float32 值 `x`，使 `1.0 + x == 1.0`。这就是机器 epsilon。验证它与 `numpy.finfo(numpy.float32).eps` 一致。
 
@@ -578,17 +580,29 @@ check_tensor("ugly", [1.0, float('inf'), 3.0])
 
 5. **损失缩放实验。** 用 float16 模拟训练：创建范围在 [1e-9, 1e-3] 的随机梯度，转成 float16，测量有多少比例变成零。然后应用损失缩放（乘以 1024），转成 float16，缩放回来，再次测量零的比例。
 
+### 提示
+
+**练习 1。** 平方前先用 `np.float32` 转换三个值，再调用 `variance_naive` 和 `welford_variance`。float32 在 $10^{12}$ 附近的相邻数间距远大于 1，因此朴素结果预计偏离 0.6667，而 Welford 结果应较接近。
+
+**练习 2。** 从 `x = np.float32(1.0)` 开始，只要 `np.float32(1.0) + x != np.float32(1.0)` 就将它减半。所有值都保持 float32，最后将仍能改变和的那个值与 `numpy.finfo(numpy.float32).eps` 比较，后者为 $2^{-23}$。
+
+**练习 3。** 先预测每种输入的结果。$n$ 个相等值 $c$ 的结果为 $c + \ln n$。只有一个较大值时，结果接近该值。值都接近 -1000 时，结果接近 $-1000 + \ln n$；而 `logsumexp_naive` 会返回 `-inf`，因为每项指数都下溢为 0。
+
+**练习 4。** 对于 $y = Wx + b$ 和损失 $L$，$W$ 的梯度是上游梯度与 $x$ 的外积。将损失封装为展平后 $W$ 的函数，调用 `numerical_gradient`，再把两个结果传给 `check_gradient`。
+
+**练习 5。** 用 `10 ** np.random.uniform(-9, -3, n)` 在对数尺度上采样数值，并用 `np.float16` 转换。Float16 无法保留小于约 $6 \times 10^{-8}$ 的值，因此缩放前预计约四分之一变为零；乘以 1024 后，变零的值应几乎没有。
+
 ## 关键术语
 
 | 术语 | 人们常说 | 它实际指什么 |
 |------|----------------|----------------------|
 | IEEE 754 | "浮点标准" | 定义二进制浮点格式、舍入规则和特殊值（inf、nan）的国际标准。每个现代 CPU 和 GPU 都实现了它。 |
-| 机器 epsilon | "精度极限" | 在给定浮点格式下使 1.0 + e != 1.0 的最小值 e。对 float32 约为 1.19e-7。 |
+| 机器 epsilon | "精度极限" | 在给定浮点格式下使 $1.0 + e \ne 1.0$ 的最小值 $e$。对 float32 约为 1.19e-7。 |
 | 灾难性抵消 | "减法导致的精度损失" | 减去两个几乎相等的浮点数时，有效数字相消、舍入噪声主导结果。 |
 | 上溢 | "数太大" | 结果超过最大可表示值变成 inf。exp(89) 让 float32 上溢。 |
 | 下溢 | "数太小" | 结果比最小可表示正数更接近零，变成 0.0。exp(-104) 让 float32 下溢。 |
-| Log-sum-exp 技巧 | "先减最大值" | 通过提出 exp(max(x)) 来计算 log(sum(exp(x)))，防止上溢和下溢。用于 softmax、交叉熵和对数概率运算。 |
-| 稳定 softmax | "不会爆炸的 softmax" | 在做指数前减去 max(logits)。数值上结果相同，不可能上溢。 |
+| Log-sum-exp 技巧 | "先减最大值" | 通过提出 $\exp(\max(x))$ 来计算 $\log(\sum \exp(x))$，防止上溢和下溢。用于 softmax、交叉熵和对数概率运算。 |
+| 稳定 softmax | "不会爆炸的 softmax" | 在做指数前减去 $\max(\text{logits})$。数值上结果相同，不可能上溢。 |
 | 梯度检查 | "验证你的反向传播" | 把反向传播的解析梯度和有限差分的数值梯度对照，逮住实现 bug。 |
 | 混合精度 | "前向 float16、反向 float32" | 对速度关键的运算用低精度浮点，对数值敏感的运算用高精度浮点。典型加速 2-3 倍。 |
 | 损失缩放 | "防止梯度下溢" | 反向传播前把损失乘以一个大常数，让梯度留在 float16 的可表示范围里，再在更新权重前除以同一常数。 |
@@ -596,7 +610,7 @@ check_tensor("ugly", [1.0, float('inf'), 3.0])
 | 梯度裁剪 | "给梯度范数封顶" | 缩放梯度向量使其范数不超过阈值。防止爆炸梯度毁掉权重。 |
 | NaN | "非数" | 来自未定义运算（0/0、inf-inf、sqrt(-1)）的特殊浮点值。在后续所有算术里传播。 |
 | Inf | "无穷" | 来自上溢或除以零的特殊浮点值。可组合产生 NaN（inf - inf、inf * 0）。 |
-| 数值梯度 | "暴力求导数" | 通过求值 f(x+h) 和 f(x-h) 再除以 2h 来近似导数。慢，但用于验证可靠。 |
+| 数值梯度 | "暴力求导数" | 通过求值 $f(x+h)$ 和 $f(x-h)$ 再除以 $2h$ 来近似导数。慢，但用于验证可靠。 |
 
 ## 延伸阅读
 

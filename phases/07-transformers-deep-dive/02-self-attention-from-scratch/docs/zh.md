@@ -11,7 +11,7 @@
 
 - 只用 NumPy 从零实现缩放点积 self-attention，包括 query/key/value 投影和 softmax 加权求和
 - 构建一个 multi-head attention 层，拆分多个头、并行计算注意力、再拼接结果
-- 追踪注意力矩阵如何捕捉 token 之间的关系，并解释为什么除以 sqrt(d_k) 能防止 softmax 饱和
+- 追踪注意力矩阵如何捕捉 token 之间的关系，并解释为什么除以 $\sqrt{d_k}$ 能防止 softmax 饱和
 - 应用因果掩码，把双向注意力转成自回归（解码器风格）注意力
 
 ## 问题背景
@@ -109,10 +109,10 @@ attention-matrix
 
 ### 为什么要缩放？
 
-点积随维度 dk 增大。如果 dk = 64，点积可能落在几十的量级，把 softmax 推进梯度消失的区域。修法是：除以 sqrt(dk)。
+点积随维度 $d_k$ 增大。如果 $d_k = 64$，点积可能落在几十的量级，把 softmax 推进梯度消失的区域。修法是：除以 $\sqrt{d_k}$。
 
-```
-Scaled scores = (Q @ K^T) / sqrt(dk)
+```math
+\text{缩放后的分数} = \frac{Q K^T}{\sqrt{d_k}}
 ```
 
 这让数值保持在 softmax 能产生有用梯度的范围里。
@@ -159,8 +159,8 @@ flowchart LR
 
 一行公式：
 
-```
-Attention(Q, K, V) = softmax( Q @ K^T / sqrt(dk) ) @ V
+```math
+\text{注意力}(Q, K, V) = \mathop{\mathrm{softmax}}\left( \frac{Q K^T}{\sqrt{d_k}} \right) V
 ```
 
 ```figure
@@ -302,7 +302,7 @@ print(f"\nAttn weights (averaged over heads):")
 print(attn_weights[0].detach().numpy().round(3))
 ```
 
-关键区别：multi-head attention 并行跑多个注意力函数，每个有自己的、大小为 dk = d_model / n_heads 的 Q、K、V 投影，然后拼接结果。这让模型能同时关注不同类型的关系。
+关键区别：multi-head attention 并行跑多个注意力函数，每个有自己的、大小为 $d_k = d_{\text{model}} / n_{\text{heads}}$ 的 Q、K、V 投影，然后拼接结果。这让模型能同时关注不同类型的关系。
 
 ## 拿去用
 
@@ -322,7 +322,7 @@ print(attn_weights[0].detach().numpy().round(3))
 | Query (Q) | "提问向量" | 输入的一个可学习投影，表示这个 token 在找什么信息 |
 | Key (K) | "标签向量" | 一个可学习投影，表示这个 token 包含什么信息，用来和 query 匹配 |
 | Value (V) | "内容向量" | 一个可学习投影，携带真正的信息，根据注意力分数被聚合 |
-| 缩放点积注意力 | "注意力公式" | softmax(QK^T / sqrt(dk)) @ V —— 缩放防止高维下 softmax 饱和 |
+| 缩放点积注意力 | "注意力公式" | $\mathop{\mathrm{softmax}}(QK^T / \sqrt{d_k}) V$ —— 缩放防止高维下 softmax 饱和 |
 | Self-attention | "token 看自己也看别人" | Q、K、V 都来自同一序列的注意力，让每个位置都能关注其他每个位置 |
 | 注意力权重 | "关注多少" | 位置上的一个概率分布，由对缩放点积做 softmax 得到 |
 | Multi-head attention | "并行注意力" | 用不同投影跑多个注意力函数，再拼接结果，得到更丰富的表示 |

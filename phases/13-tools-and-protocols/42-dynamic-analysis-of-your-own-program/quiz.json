@@ -1,0 +1,90 @@
+{
+  "lesson": "42-dynamic-analysis-of-your-own-program",
+  "title": "动态分析自己的程序：调试器、跟踪与静态结论验证",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "你在自己程序的一个构建中为 bump、classify、sum_balances 设置断点，运行到结束，每个断点都报告 hit count = 0。该次运行证明什么？",
+      "options": [
+        "这个输入在这个构建中没有执行三个函数的非内联副本；不能说明其他输入或其他构建",
+        "断点设置了错误地址",
+        "三个函数是死代码，可以删除",
+        "程序没有函数"
+      ],
+      "correct": 0,
+      "explanation": "命中数是对一个构建的一次执行的观察。-O2 下编译器内联三个函数，将结果折叠为常数，所以导出的副本没有运行。符号表中仍有它们。"
+    },
+    {
+      "stage": "check",
+      "question": "bump 断点中，lldb 打印 x0 = 0x16fdfe008、x1 = 0x5；memory read -s4 -fx -c8 $x0 打印 0x00000073 0x000000fa 0x00000009 0x00000000 0x00000000 0x3ff40000 0x00000719 0x00000001。第二个字确认哪个静态结论？",
+      "options": [
+        "rate 是 float",
+        "结构体长度为 16 字节",
+        "x1 保存结构体指针",
+        "balance 在偏移 4，值为 250，对应 DWARF 的 DW_AT_data_member_location 0x04"
+      ],
+      "correct": 3,
+      "explanation": "这些字是从 a 开始的结构体字节。字 1 位于偏移 4，保存 0xfa = 250，与 frame variable a->balance 一致。字 4、5 是偏移 16 的 IEEE-754 double 1.25，字 6、7 是偏移 24 的 label 指针。"
+    },
+    {
+      "stage": "check",
+      "question": "-O0 的 classify 首个条件分支为 tbz w8, #0x1f, 0x100000504，顺序落下地址为 0x1000004f4。余额 -40 的账户运行时在 0x1000004f4 停止。第 33 课的边结论得到确认还是反驳？",
+      "options": [
+        "确认，因为 tbz 在第 31 位为零时跳转，负余额按提升条件预测顺序落入 return -1 块",
+        "反驳，因为 -40 小于 200",
+        "未观察，因为 tbz 不是条件分支",
+        "反驳，因为没有跳到 0x100000504"
+      ],
+      "correct": 0,
+      "explanation": "tbz 表示测试位，为零则跳转。-40 的第 31 位置位，所以不跳转，顺序落下。静态结论规定 balance >= 0 采用跳转边，balance < 0 采用顺序边，停止恰好展示了它。"
+    },
+    {
+      "stage": "check",
+      "question": "watchpoint set variable a->balance 报告 size = 4、type = m，watchpoint list 打印 Number of supported hardware watchpoints: 4。为什么 lldb 要报告数量？",
+      "options": [
+        "因为观察点是软件实现，lldb 限制数量以保持速度",
+        "因为数据观察点使用每核调试寄存器：x86-64 的 DR0 至 DR3，arm64 的 DBGWVR/DBGWCR 对；数量固定，宽区域可能占多个",
+        "因为该数量表示观察的字节数",
+        "因为 macOS 最多允许四个调试器"
+      ],
+      "correct": 1,
+      "explanation": "硬件观察点把每次内存访问与少量地址寄存器比较。x86-64 有四个，arm64 实现有 2 至 64 个，上游实验机器报告四个。槽用完后 lldb 拒绝下一个观察点。"
+    },
+    {
+      "stage": "post",
+      "question": "你在 bump 断点用 process save-core --style stack 保存 core。lldb -c 加载后显示 balance = 250，但 label = \"\"，指针 0x100000719 完整。发生了什么？",
+      "options": [
+        "lldb 无法从 core 打印字符串",
+        "程序从未设置 label",
+        "字符串在可执行文件的 __TEXT 段，仅栈式 core 不含该段，所以指针存在，背后的字节不存在",
+        "core 已损坏"
+      ],
+      "correct": 2,
+      "explanation": "仅栈式 core 保存栈和修改过的内存。字面量 \"savings\" 是二进制的只读数据。lldb 警告此类 core 可能无法显示二进制；--style full 包含全部进程内存。"
+    },
+    {
+      "stage": "post",
+      "question": "在 Apple silicon，为什么 clang -g -o account account.c 生成的二进制无需额外签名就可由 lldb 调试？",
+      "options": [
+        "因为二进制携带 com.apple.security.cs.debugger 权限",
+        "因为链接器默认对 arm64 输出做 ad-hoc 签名（adhoc,linker-signed），二进制未加固且无 entitlements，因此不满足 Apple 拒绝调试的规则",
+        "因为 lldb 忽略代码签名",
+        "因为 Command Line Tools 禁用了 SIP"
+      ],
+      "correct": 1,
+      "explanation": "codesign -dvvv 显示 Signature=adhoc、flags=0x20002(adhoc,linker-signed)，没有 entitlements。调试器侧由 Apple 以私有权限签名的 debugserver 覆盖。只有启用加固且缺少 get-task-allow 的目标才会拒绝任务端口。"
+    },
+    {
+      "stage": "post",
+      "question": "对于使用 Apple silicon Mac 的学习者，哪项关于 rr 记录重放的说法正确？",
+      "options": [
+        "rr 仅支持 Linux，需要硬件性能计数器；macOS 的虚拟化不暴露它们，因此需要 Linux 机器，或其他主机上启用计数器虚拟化的虚拟机",
+        "rr 在 macOS 运行，以 dtrace 记录",
+        "rr 可在 macOS Docker 内运行，因为 Docker 运行 Linux",
+        "rr 自 5.9.0 起替代 macOS 的 lldb"
+      ],
+      "correct": 0,
+      "explanation": "rr 在 Linux 上使用 Intel、AMD Zen 或某些 AArch64 核心的性能计数器，包括 Linux 下 Apple M 系列。其 wiki 说明 macOS 虚拟化不支持性能计数器虚拟化，因此排除了上游实验机器的 Docker 和 Colima 虚拟机。"
+    }
+  ]
+}

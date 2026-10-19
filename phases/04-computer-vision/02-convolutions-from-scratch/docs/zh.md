@@ -74,8 +74,8 @@ flowchart LR
 
 给定输入空间尺寸 `H`、核大小 `K`、padding `P`、stride `S`：
 
-```
-H_out = floor( (H - K + 2P) / S ) + 1
+```math
+H_{\text{out}} = \left\lfloor \frac{H - K + 2P}{S} \right\rfloor + 1
 ```
 
 记住它。每设计一个架构，你都要算上几十遍。
@@ -88,7 +88,7 @@ H_out = floor( (H - K + 2P) / S ) + 1
 | 2x2 池化 | 32 | 2 | 0 | 2 | 16 |
 | 大感受野 | 32 | 7 | 3 | 2 | 16 |
 
-"Same padding"意思是选一个 P，使得当 S == 1 时 H_out == H。对奇数 K，那就是 P = (K - 1) / 2。这就是 3x3 核称霸的原因——它是仍然有中心的最小奇数核。
+"Same padding"意思是选一个 $P$，使得当 $S = 1$ 时 $H_{\text{out}} = H$。对奇数 $K$，那就是 $P = (K - 1) / 2$。这就是 3x3 核称霸的原因——它是仍然有中心的最小奇数核。
 
 ### Padding
 

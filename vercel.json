@@ -32,7 +32,7 @@
     },
     "api/lesson.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/lesson.html,site/lesson-seo.json,site/lesson-terms.json,site/figure-manifest.js,site/lesson-markdown.js,site/md-render.js,phases/**/docs/zh.md,certifications/*/lessons/*/docs/zh.md,lib/og-fonts/*.json,lib/og-render.js}"
+      "includeFiles": "{site/lesson.html,site/lesson-seo.json,site/lesson-terms.json,site/cheatsheet-map.json,site/figure-manifest.js,site/lesson-markdown.js,site/md-render.js,phases/**/docs/zh.md,certifications/*/lessons/*/docs/zh.md,lib/og-fonts/*.json,lib/og-render.js}"
     },
     "api/certification.js": {
       "maxDuration": 10,
@@ -40,7 +40,7 @@
     },
     "api/og.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/og-cards.json,site/lesson-seo.json,site/certification-seo.json,lib/og-fonts/*.json}",
+      "includeFiles": "{site/og-cards.json,site/anatomy/inside-an-ai-agent-og.png,site/lesson-seo.json,site/certification-seo.json,lib/og-fonts/*.json}",
       "excludeFiles": "{phases/**,projects/**,manuals/**,certifications/**,site/{lessons,project-content,hubs,agent-pages,assets,figures}/**,site/*.{html,js,css,png,jpg,gif,svg,ico,txt,md,xml}}"
     }
   },
@@ -85,7 +85,7 @@
       "dest": "/api/markdown?path=/"
     },
     {
-      "src": "/(index|about|catalog|glossary|prereqs|developer|contact|privacy|learning-paths|certifications)\\.html",
+      "src": "/(index|about|catalog|glossary|prereqs|skills|how-to-learn|inside-an-ai-agent|developer|contact|privacy|learning-paths|certifications)\\.html",
       "methods": [
         "GET",
         "HEAD"
@@ -101,6 +101,47 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/cheatsheets",
+      "destination": "/cheatsheets/index.html"
+    },
+    {
+      "source": "/cheatsheets/:topic([a-z0-9-]+)",
+      "destination": "/cheatsheets/:topic.html"
+    },
+    {
+      "source": "/skills",
+      "destination": "/api/markdown?path=/skills",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*"
+        }
+      ]
+    },
+    {
+      "source": "/how-to-learn",
+      "destination": "/api/markdown?path=/how-to-learn",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*"
+        }
+      ]
+    },
+    {
+      "source": "/inside-an-ai-agent",
+      "destination": "/api/markdown?path=/inside-an-ai-agent",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*"
+        }
+      ]
+    },
     {
       "source": "/projects",
       "destination": "/projects.html"
@@ -456,6 +497,11 @@
     {
       "source": "/hubs/:kind(phase|glossary)/:slug.html",
       "destination": "/:kind/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/cheatsheets/:topic([a-z0-9-]+).html",
+      "destination": "/cheatsheets/:topic",
       "permanent": true
     }
   ]

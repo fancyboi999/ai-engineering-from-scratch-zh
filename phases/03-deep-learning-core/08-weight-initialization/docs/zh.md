@@ -38,40 +38,40 @@
 
 考虑一个有 fan_in 个输入的层：
 
-```
-z = w1*x1 + w2*x2 + ... + w_n*x_n
-```
-
-如果每个权重 wi 取自一个方差为 Var(w) 的分布、每个输入 xi 方差为 Var(x)，那么输出方差是：
-
-```
-Var(z) = fan_in * Var(w) * Var(x)
+```math
+z = w_1 x_1 + w_2 x_2 + \cdots + w_n x_n
 ```
 
-如果 Var(w) = 1、fan_in = 512，输出方差就是输入方差的 512 倍。10 层之后：512^10 = 1.2e27。你的信号爆炸了。
+如果每个权重 $w_i$ 取自一个方差为 $\mathrm{Var}(w)$ 的分布、每个输入 $x_i$ 方差为 $\mathrm{Var}(x)$，那么输出方差是：
 
-如果 Var(w) = 0.001，输出方差每层缩小 0.001 * 512 = 0.512 倍。10 层之后：0.512^10 = 0.00013。你的信号消失了。
+```math
+\mathrm{Var}(z) = \text{fan}_{\text{in}} \cdot \mathrm{Var}(w) \cdot \mathrm{Var}(x)
+```
 
-目标是：选一个 Var(w) 使得 Var(z) = Var(x)。信号幅度跨层保持不变。
+如果 $\mathrm{Var}(w) = 1$、$\text{fan}_{\text{in}} = 512$，输出方差就是输入方差的 512 倍。10 层之后：$512^{10} = 1.2 \times 10^{27}$。你的信号爆炸了。
+
+如果 $\mathrm{Var}(w) = 0.001$，输出方差每层缩小 $0.001 \cdot 512 = 0.512$ 倍。10 层之后：$0.512^{10} = 0.00013$。你的信号消失了。
+
+目标是：选一个 $\mathrm{Var}(w)$ 使得 $\mathrm{Var}(z) = \mathrm{Var}(x)$。信号幅度跨层保持不变。
 
 ### Xavier/Glorot 初始化
 
 Glorot 和 Bengio（2010）为 sigmoid 和 tanh 激活推出了解。要在前向和反向传播里都保持方差不变：
 
-```
-Var(w) = 2 / (fan_in + fan_out)
+```math
+\mathrm{Var}(w) = \frac{2}{\text{fan}_{\text{in}} + \text{fan}_{\text{out}}}
 ```
 
 实践中，权重取自：
 
-```
-w ~ Uniform(-limit, limit)  where limit = sqrt(6 / (fan_in + fan_out))
+```math
+w \sim \text{Uniform}(-\text{limit}, \text{limit}) \quad \text{其中 } \text{limit} = \sqrt{\frac{6}{\text{fan}_{\text{in}} + \text{fan}_{\text{out}}}}
 ```
 
 或者：
 
-```
-w ~ Normal(0, sqrt(2 / (fan_in + fan_out)))
+```math
+w \sim \text{Normal}\left(0, \sqrt{\frac{2}{\text{fan}_{\text{in}} + \text{fan}_{\text{out}}}}\right)
 ```
 
 它有效是因为 sigmoid 和 tanh 在零附近近似线性，而初始化得当的激活值就活在那里。方差能稳定地穿过几十层。
@@ -82,27 +82,27 @@ ReLU 杀掉一半输出（所有负值变成零）。有效的 fan_in 减半，�
 
 He 等人（2015）调整了公式：
 
-```
-Var(w) = 2 / fan_in
+```math
+\mathrm{Var}(w) = \frac{2}{\text{fan}_{\text{in}}}
 ```
 
 权重取自：
 
-```
-w ~ Normal(0, sqrt(2 / fan_in))
+```math
+w \sim \text{Normal}\left(0, \sqrt{\frac{2}{\text{fan}_{\text{in}}}}\right)
 ```
 
-那个因子 2 补偿了 ReLU 把一半激活置零这件事。没有它，信号每层缩小约 0.5 倍。50 层时：0.5^50 = 8.8e-16。Kaiming 初始化防止了这一点。
+那个因子 2 补偿了 ReLU 把一半激活置零这件事。没有它，信号每层缩小约 0.5 倍。50 层时：$0.5^{50} = 8.8 \times 10^{-16}$。Kaiming 初始化防止了这一点。
 
 ### Transformer 初始化
 
 GPT-2 引入了一种不同的套路。残差连接把每个子层的输出加回到它的输入上：
 
-```
-x = x + sublayer(x)
+```math
+x = x + \text{sublayer}(x)
 ```
 
-每次相加都增大方差。有 N 个残差层时，方差按正比于 N 增长。GPT-2 把残差层的权重按 1/sqrt(2N) 缩放，N 是层数。这让累积的信号幅度保持稳定。
+每次相加都增大方差。有 $N$ 个残差层时，方差按正比于 $N$ 增长。GPT-2 把残差层的权重按 $1/\sqrt{2N}$ 缩放，$N$ 是层数。这让累积的信号幅度保持稳定。
 
 Llama 3（4050 亿参数，126 层）用了类似的方案。没有这个缩放，残差流会在 126 层注意力和前馈块里无界增长。
 
@@ -341,7 +341,7 @@ nn.init.zeros_(layer.bias)
 
 当你调 `nn.Linear(512, 256)` 时，PyTorch 默认用 Kaiming 均匀初始化。这就是为什么大多数简单网络"就这么能跑"——PyTorch 已经替你做了对的选择。但当你搭自定义架构、或者深过 20 层时，你就需要理解发生了什么，并可能要覆盖默认值。
 
-对 transformer，HuggingFace 的模型通常在它们的 `_init_weights` 方法里处理初始化。GPT-2 的实现把残差投影按 1/sqrt(N) 缩放。如果你从零搭一个 transformer，得自己把这个加上。
+对 transformer，HuggingFace 的模型通常在它们的 `_init_weights` 方法里处理初始化。GPT-2 的实现把残差投影按 $1/\sqrt{N}$ 缩放。如果你从零搭一个 transformer，得自己把这个加上。
 
 ## 拿去用
 
@@ -350,13 +350,13 @@ nn.init.zeros_(layer.bias)
 
 ## 练习
 
-1. 加上 LeCun 初始化（Var = 1/fan_in，为 SELU 激活设计）。用 LeCun 初始化 + tanh 跑 50 层实验，和 Xavier + tanh 对比。
+1. 加上 LeCun 初始化（$\mathrm{Var} = 1/\text{fan}_{\text{in}}$，为 SELU 激活设计）。用 LeCun 初始化 + tanh 跑 50 层实验，和 Xavier + tanh 对比。
 
-2. 实现 GPT-2 的残差缩放：把每层的输出在加回残差流之前乘上 1/sqrt(2*N)。带缩放和不带缩放各跑 50 层，测量残差幅度增长得多快。
+2. 实现 GPT-2 的残差缩放：把每层的输出在加回残差流之前乘上 $1/\sqrt{2N}$。带缩放和不带缩放各跑 50 层，测量残差幅度增长得多快。
 
 3. 写一个"初始化健康检查"函数，接收一个网络的层维度和激活类型，然后推荐正确的初始化，如果当前初始化会出问题就警告。
 
-4. 用 fan_in = 16 对比 fan_in = 1024 跑实验。Xavier 和 Kaiming 会适应 fan_in，但随机初始化不会。展示"能用"和"坏掉"之间的差距如何随着层变大而拉宽。
+4. 用 $\text{fan} _{\text{in}} = 16$ 对比 $\text{fan} _{\text{in}} = 1024$ 跑实验。Xavier 和 Kaiming 会适应 fan_in，但随机初始化不会。展示"能用"和"坏掉"之间的差距如何随着层变大而拉宽。
 
 5. 实现正交初始化（生成一个随机矩阵，算它的 SVD，用正交矩阵 U）。在 50 层的 ReLU 网络上和 Kaiming 对比。
 
@@ -368,10 +368,10 @@ nn.init.zeros_(layer.bias)
 | 打破对称（Symmetry breaking） | "让神经元不一样" | 用随机初始化确保神经元学到不同的特征，而不是算同一个函数 |
 | fan-in | "一个神经元的输入数" | 进入的连接数，决定输入方差在加权和里怎么累积 |
 | fan-out | "一个神经元的输出数" | 输出的连接数，与反向传播时维持梯度方差有关 |
-| Xavier/Glorot 初始化 | "sigmoid 的初始化" | Var(w) = 2/(fan_in + fan_out)，设计来让方差穿过 sigmoid 和 tanh 激活保持不变 |
-| Kaiming/He 初始化 | "ReLU 的初始化" | Var(w) = 2/fan_in，把 ReLU 把一半激活置零这件事算了进去 |
+| Xavier/Glorot 初始化 | "sigmoid 的初始化" | $\mathrm{Var}(w) = 2/(\text{fan} _{\text{in}} + \text{fan} _{\text{out}})$，设计来让方差穿过 sigmoid 和 tanh 激活保持不变 |
+| Kaiming/He 初始化 | "ReLU 的初始化" | $\mathrm{Var}(w) = 2/\text{fan}_{\text{in}}$，把 ReLU 把一半激活置零这件事算了进去 |
 | 方差传播（Variance propagation） | "信号穿过层时怎么涨怎么缩" | 对激活方差如何随权重尺度逐层变化的数学分析 |
-| 残差缩放（Residual scaling） | "GPT-2 的初始化技巧" | 把残差连接权重按 1/sqrt(2N) 缩放，防止方差穿过 N 个 transformer 层时增长 |
+| 残差缩放（Residual scaling） | "GPT-2 的初始化技巧" | 把残差连接权重按 $1/\sqrt{2N}$ 缩放，防止方差穿过 $N$ 个 transformer 层时增长 |
 | 死亡网络（Dead network） | "什么都训练不动" | 糟糕的初始化导致所有梯度为零或所有激活饱和的网络 |
 | 激活爆炸（Exploding activations） | "值跑到无穷" | 权重方差太高，导致激活幅度穿过层时指数级增长 |
 

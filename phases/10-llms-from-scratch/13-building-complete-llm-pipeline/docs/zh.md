@@ -249,7 +249,7 @@ python code/main.py gate    # read manifest.out.yaml, apply eval gates, ship-or-
 | Manifest | "那个配方文件" | 描述流水线版本、种子、逐阶段配置和关卡阈值的 YAML 或 JSON——足以重放一次运行 |
 | 内容寻址 | "按哈希不按名" | 按内容的 SHA-256 存产物，这样你永远不会把版本 A 和版本 B 搞混 |
 | Eval 关卡 | "交付标准" | 基准指标和安全分数上的数值阈值，产物被标为可交付前必须通过 |
-| KL 预算 | "对齐漂了多远" | 跨对齐阶段累计 KL(policy \|\| reference) 的一个上限，作为关卡强制执行 |
+| KL 预算 | "对齐漂了多远" | 跨对齐阶段累计 $\mathrm{KL}(\text{policy} \Vert \text{reference})$ 的一个上限，作为关卡强制执行 |
 | MFU | "你用了 GPU 多少" | 模型 FLOPs 利用率——实际 FLOPs 除以理论峰值。70B 规模典型 40%，7B 是 55% |
 | 回滚计划 | "坏了我们怎么办" | 每个阶段失败时预先写好的一组动作：重跑、回退、用修订输入重训 |
 | 编排器 | "指挥者" | 读 manifest、分派阶段、核对哈希、在任何契约违规时停止的进程 |

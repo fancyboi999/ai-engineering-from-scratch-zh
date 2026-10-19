@@ -48,10 +48,8 @@ graph TD
 
 **Gini 不纯度**衡量的是：如果按照该节点的类别分布给一个随机样本打标签，它被错分的概率。
 
-```
-Gini(S) = 1 - sum(p_k^2)
-
-其中 p_k 是集合 S 中类别 k 的占比。
+```math
+\text{Gini}(S) = 1 - \sum_k p_k^2 \quad \text{其中 } p_k \text{ 为类别占比 } k \text{ 属于集合 } S.
 ```
 
 对于纯节点（全是一个类），Gini = 0。对于 50/50 的二分裂，Gini = 0.5。越低越好。
@@ -64,8 +62,8 @@ Gini = 1 - (0.6^2 + 0.4^2) = 1 - (0.36 + 0.16) = 0.48
 
 **熵**衡量节点里的信息量（混乱度）。已在阶段 1 第 09 课讲过。
 
-```
-Entropy(S) = -sum(p_k * log2(p_k))
+```math
+\text{熵}(S) = -\sum_k p_k \log_2(p_k)
 ```
 
 对于纯节点，熵 = 0。对于 50/50 的二分裂，熵 = 1.0。越低越好。
@@ -81,20 +79,21 @@ Entropy = -(0.6 * log2(0.6) + 0.4 * log2(0.4))
 
 **信息增益**是分裂后不纯度（熵或 Gini）的减少量。
 
-```
-IG(S, feature, threshold) = Impurity(S) - weighted_avg(Impurity(S_left), Impurity(S_right))
-
-其中权重是各子节点的样本占比。
+```math
+\begin{aligned}
+& IG(S, \text{feature}, \text{threshold}) = \text{不纯度}(S) - \text{weighted\_avg}(\text{不纯度}(S_{\text{left}}), \text{不纯度}(S_{\text{right}})) \\[4pt]
+& \text{其中权重为每个子节点的样本占比。}
+\end{aligned}
 ```
 
 每个节点上的贪心算法：试遍每个特征和每个可能的阈值。挑出让信息增益最大的那对（特征，阈值）。
 
 ### 分裂是怎么进行的
 
-对于当前节点上有 n 个特征、m 个样本的数据集：
+对于当前节点上有 $n$ 个特征、$m$ 个样本的数据集：
 
-1. 对每个特征 j（j = 1 到 n）：
-   - 按特征 j 给样本排序
+1. 对每个特征 $j$（$j = 1$ 到 $n$）：
+   - 按特征 $j$ 给样本排序
    - 把每对相邻不同值的中点当阈值试一遍
    - 为每个阈值计算信息增益
 2. 选出信息增益最高的特征和阈值
@@ -109,7 +108,7 @@ IG(S, feature, threshold) = Impurity(S) - weighted_avg(Impurity(S_left), Impurit
 
 **预剪枝**在树长满之前就停下：
 - 最大深度：树到达设定深度就停止分裂
-- 每叶最小样本数：节点样本少于 k 个就停
+- 每叶最小样本数：节点样本少于 $k$ 个就停
 - 最小信息增益：最佳分裂带来的不纯度改善低于阈值就停
 - 最大叶子节点数：限制叶子总数
 
@@ -125,8 +124,8 @@ IG(S, feature, threshold) = Impurity(S) - weighted_avg(Impurity(S_left), Impurit
 
 **方差减少**取代信息增益：
 
-```
-VR(S, feature, threshold) = Var(S) - weighted_avg(Var(S_left), Var(S_right))
+```math
+VR(S, \text{feature}, \text{threshold}) = \text{Var}(S) - \text{weighted\_avg}(\text{Var}(S_{\text{left}}), \text{Var}(S_{\text{right}}))
 ```
 
 挑选最能减少方差的分裂。树把输入空间切成一块块区域，在每块区域里预测一个常数（均值）。
@@ -155,7 +154,7 @@ graph TD
 
 **Bagging（自助聚合）：** 每棵树在一个自助样本上训练，也就是从训练数据里有放回随机采样得到的样本。每个自助样本里大约出现原始样本的 63%（其余是袋外样本，可以用来验证）。
 
-**特征随机化：** 在每次分裂时，只考虑一个随机的特征子集。分类的默认值是 sqrt(n_features)，回归是 n_features/3。这能防止所有树都在同一个主导特征上分裂。
+**特征随机化：** 在每次分裂时，只考虑一个随机的特征子集。分类的默认值是 $\sqrt{n_{\text{features}}}$，回归是 $n_{\text{features}}/3$。这能防止所有树都在同一个主导特征上分裂。
 
 关键洞察：对许多去相关的树取平均，能降低方差而不增加偏差。单棵树可能平庸，但集成是强的。
 
@@ -165,9 +164,8 @@ graph TD
 
 **平均不纯度减少（MDI）：** 对每个特征，把它在所有树、所有用到它的节点上带来的总不纯度减少加起来。在更靠前的分裂上带来更大不纯度减少的特征更重要。
 
-```
-importance(feature_j) = sum over all nodes where feature_j is used:
-    (n_samples_at_node / n_total_samples) * impurity_decrease
+```math
+\text{importance}(\text{feature}_j) = \sum_{\text{使用此特征的节点}_j \text{ 被使用}} \frac{n_{\text{节点样本数}}}{n_{\text{样本总数}}} \cdot \text{impurity\_decrease}
 ```
 
 这个方法快（训练时顺带算出），但偏向高基数特征和有很多可能分裂点的特征。
@@ -444,7 +442,7 @@ print(f"Feature importances: {rf.feature_importances_}")
 
 1. 在一个有 3 个类的二维数据集上训练单棵决策树。手动追踪分裂，画出矩形决策边界。对比 max_depth=2 和 max_depth=10 时的边界。
 
-2. 为回归树实现方差减少分裂。为 200 个点生成 y = sin(x) + 噪声，拟合你的回归树。把树的分段常数预测和真实曲线画在一起对比。
+2. 为回归树实现方差减少分裂。为 200 个点生成 $y = \sin(x) + \text{noise}$，拟合你的回归树。把树的分段常数预测和真实曲线画在一起对比。
 
 3. 构建 1、5、10、50 和 200 棵树的随机森林。把训练准确率和测试准确率随树数量的变化画出来。观察到测试准确率会到平台期但不会下降（森林抗过拟合）。
 

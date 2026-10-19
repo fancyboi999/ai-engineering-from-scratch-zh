@@ -32,8 +32,8 @@ SFT 给了你什么：模型现在会回答问题，而不是续写问题。它�
 
 对每条提示，从 SFT 模型采样 K 个补全。一个标注员对它们排序。训练一个奖励模型，给任意「提示-回复」对打分，使得对于那些 `y_w` 被偏好于 `y_l` 的对：
 
-```
-L_RM = -log sigmoid(r(x, y_w) - r(x, y_l))
+```math
+L_{\text{RM}} = -\log \sigma\big(r(x, y_w) - r(x, y_l)\big)
 ```
 
 这就是 Bradley-Terry 成对偏好损失。RM 通常从 SFT 模型初始化，把 LM 头换成一个标量头。
@@ -44,8 +44,8 @@ L_RM = -log sigmoid(r(x, y_w) - r(x, y_l))
 
 定义目标：
 
-```
-J(pi) = E_{x~D, y~pi(.|x)} [ r(x, y) ] - beta * KL(pi(.|x) || pi_SFT(.|x))
+```math
+J(\pi) = \mathbb{E}_{x \sim D,\, y \sim \pi(\cdot \mid x)} \big[ r(x, y) \big] - \beta \, \mathrm{KL}\big(\pi(\cdot \mid x) \,\|\, \pi_{\text{SFT}}(\cdot \mid x)\big)
 ```
 
 用 PPO 最大化它。KL 项让 `pi` 不至于离 SFT 策略漂太远。没有它，优化器会找到对抗样本——这些字符串在 RM 下得分高，是因为 RM 从没见过它们，而不是因为人类真的更喜欢它们。
@@ -56,8 +56,8 @@ KL 系数 `beta` 是 RLHF 里最重要的那一个超参数。太低：奖励作
 
 RLHF 之后，模型更受人类青睐，但在标准基准上反而退步（SQuAD、HellaSwag、DROP）。Ouyang et al. 把这叫对齐税，并用 PPO-ptx 修它：把预训练梯度混进 RL 目标里，让模型不至于忘掉那些它从没因之得到奖励的下游任务。
 
-```
-J_ptx(pi) = J(pi) + gamma * E_{x~D_pretrain} [ log pi(x) ]
+```math
+J_{\text{ptx}}(\pi) = J(\pi) + \gamma \, \mathbb{E}_{x \sim D_{\text{pretrain}}} \big[ \log \pi(x) \big]
 ```
 
 PPO-ptx 成了标配。Anthropic、DeepMind、Meta 都用了某种变体。
@@ -84,7 +84,7 @@ al-instruct-pipeline
 要看的东西：
 
 - `beta = 0.1` 与 `beta = 0.0` 两种情况下的奖励轨迹。
-- 训练步数推进时的 KL(pi || pi_SFT)。
+- 训练步数推进时的 $\mathrm{KL}(\pi \Vert \pi_{\text{SFT}})$。
 - 最终动作分布与标注员偏好的对比。
 
 ## 拿去用
@@ -109,7 +109,7 @@ al-instruct-pipeline
 |------|-----------------|------------------------|
 | SFT | 「指令微调」 | 第 1 阶段：在「提示-回复」对上做交叉熵微调 |
 | 奖励模型 | 「那个 RM」 | 对 (提示, 回复) 打分的标量回归器，用 Bradley-Terry 在成对标注上训练 |
-| Bradley-Terry | 「成对偏好损失」 | -log sigmoid(r_w - r_l)；把成对排序化简成二分类 |
+| Bradley-Terry | 「成对偏好损失」 | $-\log \sigma(r_w - r_l)$；把成对排序化简成二分类 |
 | KL 惩罚 | 「那个正则项」 | `beta * KL(pi || pi_SFT)`——把 RL 策略拴在 SFT 锚点附近 |
 | PPO-ptx | 「带预训练混合的 PPO」 | 在 PPO 目标里加入一部分预训练对数似然，抵消对齐税 |
 | 对齐税 | 「RLHF 退步」 | RLHF 没瞄准的标准基准上，RLHF 之后出现的掉点 |

@@ -95,6 +95,29 @@ python3 phases/13-tools-and-protocols/06-mcp-fundamentals/code/main.py
 - 在第 26 课前，确认你能解释工具投毒和不可信指令。[第 15 课](15-mcp-security-tool-poisoning/)是此项预检的可选复习，不是这条路径的第六节必修课。
 - [第 23 课](23-capstone-tool-ecosystem/)是可选的系统综合项目，不是完成第 22 课后下一节 Agent Skills 课程。参加之前先完成第 06 至 20 课。
 
+## 逆向工程路径
+
+十四节课教你阅读自己构建的编译程序，合计约 32 小时 25 分钟。第 32 至 36 课构建核心流水线：解析文件、解码指令、提升为伪代码、将已知内容记录为证据，再证明重建函数与原始函数等价。第 37 至 45 课学习流水线周边的技术：历史与主要工具、调用约定、编译器惯用模式、链接与剥离符号的二进制、类型恢复、调试、字节码格式、二进制差异分析与符号执行，以及 AI 辅助分析。每节课都在同一组测试固件上运行真实工具。配套手册[逆向工程 101](../../manuals/reverse-engineering-101/)使用 rea 6.7.0 与 Ghidra 12.1.4 分析同一测试固件。
+
+| 课程 | 你要构建什么 | 时间 |
+|---|---|---|
+| [32：程序解剖：从零编写 ELF 读取器](32-program-anatomy-elf-from-scratch/) | ELF 读取器：文件头、节区、符号与重定位 | 2 小时 |
+| [33：反汇编与控制流：从字节到可核验的图](33-disassembly-and-control-flow/) | x86-64 解码器、线性扫描、递归下降与控制流图 | 2 小时 30 分钟 |
+| [34：提升为伪代码：从零实现 IR、SSA 与结构恢复](34-lifting-to-pseudocode/) | 从指令到结构化伪代码的提升器 | 2 小时 30 分钟 |
+| [35：二进制分析中的证据、置信度与未知项](35-evidence-confidence-and-unknowns/) | 包含置信度、限制与未知项的证据台账 | 1 小时 45 分钟 |
+| [36：重建并证明等价：差分测试、字节比较与证据循环](36-rebuild-and-prove-equal/) | 差分测试框架，以及遮蔽重定位字段的字节比较 | 1 小时 50 分钟 |
+| [37：逆向工程全景：历史、工具家族与反编译器构造](37-the-reverse-engineering-landscape/) | 五款工具的比较框架、历史时间线与四种 IR | 2 小时 30 分钟 |
+| [38：调用约定与栈帧：System V、Windows x64 与 AArch64](38-calling-conventions-and-stack-frames/) | System V、Windows x64 与 AArch64 调用约定分析器 | 2 小时 20 分钟 |
+| [39：编译器惯用模式：优化怎样改变代码，又怎样读回源码](39-compiler-idioms-and-optimization/) | 识别除法、switch、循环与条件选择的惯用模式识别器 | 2 小时 30 分钟 |
+| [40：链接、加载与剥离符号后的二进制：PLT、GOT、导入、修正与函数识别](40-linking-loading-and-stripped-binaries/) | PE、Mach-O 修正与 ELF 链接读取器，以及剥离符号后的函数识别器 | 2 小时 40 分钟 |
+| [41：恢复数据与类型：结构体、数组、C++ 对象和 DWARF](41-recovering-data-and-types/) | 用 DWARF 读取器核验的结构体与 C++ 类型恢复过程 | 2 小时 20 分钟 |
+| [42：动态分析自己的程序：调试器、跟踪与静态结论验证](42-dynamic-analysis-of-your-own-program/) | 确认或反驳静态结论的 lldb 验证框架 | 2 小时 10 分钟 |
+| [43：超越原生代码：Python、JVM、.NET 与 WebAssembly 字节码](43-bytecode-and-managed-formats/) | .pyc、JVM class、.NET CIL 与 WebAssembly 读取器 | 2 小时 30 分钟 |
+| [44：二进制差异分析与符号执行：匹配函数并求解输入](44-binary-diffing-and-symbolic-execution/) | 函数差异分析器与小型符号执行器 | 2 小时 30 分钟 |
+| [45：AI 辅助逆向工程：LLM 反编译器、分析 agent 与真值](45-ai-assisted-reverse-engineering/) | 用于评估 AI 重建与分析报告的真值评分表 | 2 小时 20 分钟 |
+
+这条路径中的每个目标都是你自己编写并编译的程序。第 32 课从法律与授权规则开始。若要由导师引导学习并记录进度，运行 `learn-reverse-engineering` 技能。学习顺序与检查点定义在[逆向工程路径清单](../../learning-paths/reverse-engineering.json)中。
+
 ## 完整阶段
 
 请查看[ROADMAP.md](../../ROADMAP.md)了解完整课程计划。

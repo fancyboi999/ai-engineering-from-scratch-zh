@@ -109,3 +109,27 @@ site/lesson-terms.json
 site/og-cards.json
 
 site/hub-pages.json
+
+# 主题速查表与关联索引由中文源生成。
+site/cheatsheets/
+site/cheatsheet-map.json
+!.claude/skills/blueprint-figure/
+!.claude/skills/blueprint-figure/**
+!.claude/skills/course-style/
+!.claude/skills/course-style/**
+!.claude/skills/isometric-explainer/
+!.claude/skills/isometric-explainer/**
+!.claude/skills/motion-figure/
+!.claude/skills/motion-figure/**
+!.claude/skills/write-manual/
+!.claude/skills/write-manual/**
+!.claude/skills/learn-reverse-engineering/
+!.claude/skills/learn-reverse-engineering/**
+!.claude/skills/course-guide/
+!.claude/skills/course-guide/**
+!.claude/skills/learn/
+!.claude/skills/learn/**
+!.claude/skills/start-learning/
+!.claude/skills/start-learning/**
+!.claude/skills/build-project/
+!.claude/skills/build-project/**

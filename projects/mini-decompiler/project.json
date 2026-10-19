@@ -1,0 +1,196 @@
+{
+  "id": "mini-decompiler",
+  "title": "迷你反编译器",
+  "level": 5,
+  "levelName": "前沿",
+  "tagline": "支持明确限定的 x86-64 子集，将你编译的目标文件函数转换为结构化 C，再验证输出。",
+  "summary": "支持明确限定的 x86-64 子集，将你编译的 ELF 可重定位目标文件中的函数转换为结构化 C。重新编译输出，在输入网格上执行差分测试，比较屏蔽重定位字段后的字节，并生成列出全部未知项的证据报告。",
+  "hours": 18,
+  "languages": [
+    "Python"
+  ],
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "读取 ELF64 节、符号和 RELA 记录",
+    "解码 x86-64 子集并对照反汇编清单",
+    "恢复基本块、跳转表、支配关系与循环",
+    "提升为显式表示标志位的 IR，构建最小 SSA",
+    "折叠复制、死代码与常量除法",
+    "恢复 System V 参数、指针、结构体类型与符号性",
+    "将图结构化为不使用 goto 的 C",
+    "通过重编译、差分网格和掩码字节验证输出"
+  ],
+  "prerequisites": [
+    "Python 3.10+，仅使用标准库。clang 可选，用于阶段 8 的重编译与差分验证。",
+    "关于 ELF 结构、反汇编与控制流、提升到伪代码、调用约定、编译器惯用法，以及重建与等价验证的课程。"
+  ],
+  "youWillBuild": "将你编译的 x86-64 可重定位目标文件的函数转换为一个 C 文件，并用证据报告说明已证实和仍未知的内容。",
+  "usefulFor": [
+    "对自己的目标文件和源代码运行 python3 -m minidec verify。命令生成 decompiled.c、recompiled.o 和 report.json；CI 可在状态为 fail 或 unknown 时阻断。"
+  ],
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "-m",
+      "minidec",
+      "decompile",
+      "../fixtures/samples-x86_64-O1.o"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-elf-loader",
+      "title": "读取 ELF 可重定位目标文件",
+      "summary": "校验 ELF64 文件头，读取节头、符号表及每条 RELA 记录，从 .text 切出各函数及其重定位和对齐填充。PC 相对记录指向 S + A + (end of instruction - P)，因此必须知道字段所在指令的结束位置才能解析目标。",
+      "hours": 2,
+      "language": "python",
+      "languageWhy": "struct.unpack_from 用显式小端格式读取固定布局表，无需第三方解析器。",
+      "concepts": [
+        "ElfObject",
+        "ElfObject.function",
+        "relocation_target"
+      ],
+      "difficulty": "starter",
+      "timeout": 60,
+      "figure": "pj-mini-decompiler-1"
+    },
+    {
+      "id": "02-decoder",
+      "title": "解码 x86-64 子集",
+      "summary": "为测试固件使用的指令解码传统前缀、REX、单字节和双字节操作码、ModRM、SIB、位移及立即数。记录位移和立即数字段的位置，将重定位匹配到操作数。每条指令的地址、字节和 AT&T 文本都必须与捕获的反汇编清单一致。",
+      "hours": 3,
+      "language": "python",
+      "languageWhy": "整数位运算与 dataclass 直接表达各个编码字段。",
+      "concepts": [
+        "decode",
+        "linear_sweep",
+        "compare_with_objdump"
+      ],
+      "difficulty": "core",
+      "timeout": 60,
+      "figure": "pj-mini-decompiler-2"
+    },
+    {
+      "id": "03-control-flow",
+      "title": "恢复控制流",
+      "summary": "通过递归下降追踪控制流，根据重定位和边界检查解析位置无关跳转表，划分基本块，再计算支配节点、支配边界、后支配节点、回边与自然循环。找不到匹配惯用法的间接跳转保持未解析并报告。",
+      "hours": 2,
+      "language": "python",
+      "languageWhy": "字典和集合承载图，迭代支配算法无需图算法库。",
+      "concepts": [
+        "recursive_descent",
+        "jump_table_resolver",
+        "ControlFlowGraph",
+        "dominance_frontiers"
+      ],
+      "difficulty": "core",
+      "timeout": 60,
+      "figure": "pj-mini-decompiler-3"
+    },
+    {
+      "id": "04-lift-and-ssa",
+      "title": "提升到 IR 并构建 SSA",
+      "summary": "将每条指令提升为小型 IR：标志位成为普通变量，栈帧管理被消除，帧指针槽成为局部变量。在迭代支配边界插入 phi 语句，沿支配树重命名，使每个值只有一个定义；窄定义用于宽操作时显式转换。",
+      "hours": 3,
+      "language": "python",
+      "languageWhy": "冻结的 dataclass 生成可哈希的 IR 表达式，便于比较和重写。",
+      "concepts": [
+        "lift_instruction",
+        "lift_function",
+        "insert_phis",
+        "rename"
+      ],
+      "difficulty": "core",
+      "timeout": 60,
+      "figure": "pj-mini-decompiler-4"
+    },
+    {
+      "id": "05-optimize",
+      "title": "化简并折叠惯用法",
+      "summary": "将标志位条件转为比较，传播复制与常量，删除无用定义，合并等价 phi，替换单次使用值，同时禁止把加载移过存储。识别有符号常量除法的乘法加移位形式，仅在乘数、移位量和误差界足以证明除数时折叠。",
+      "hours": 2,
+      "language": "python",
+      "languageWhy": "Python 整数没有固定位宽，因此 32 位和 64 位回绕必须显式实现并测试。",
+      "concepts": [
+        "magic_divisor",
+        "optimize",
+        "propagate_copies",
+        "remove_dead_code"
+      ],
+      "difficulty": "core",
+      "timeout": 60,
+      "figure": "pj-mini-decompiler-5"
+    },
+    {
+      "id": "06-signature",
+      "title": "恢复签名与类型",
+      "summary": "System V 参数寄存器在首次写入前被读取，则是参数；最高使用的参数寄存器确定参数数量。将 phi 网合并为 C 变量，将带缩放的元素访问推断为元素指针，将常量偏移推断为结构体，并根据使用值的指令判定符号性。每个选择都携带指令证据。",
+      "hours": 2,
+      "language": "python",
+      "languageWhy": "SSA 键上的并查集与普通字典使每条类型证据都可检查。",
+      "concepts": [
+        "collect_params",
+        "coalesce_webs",
+        "infer_types",
+        "recover_signature"
+      ],
+      "difficulty": "core",
+      "timeout": 60,
+      "figure": "pj-mini-decompiler-6"
+    },
+    {
+      "id": "07-structure-and-emit",
+      "title": "结构化控制流图并生成 C",
+      "summary": "以后支配节点作为汇合点匹配循环、二路和多路条件，生成 if、if-else、while、do-while、switch，以及恢复的结构体和表定义。不匹配任何形状的区域产生计数在内的 goto；所有启发式推断写入未知项清单。",
+      "hours": 2,
+      "language": "python",
+      "languageWhy": "显式优先级表配合字符串拼接，使生成的 C 可读、可编译。",
+      "concepts": [
+        "Structurer",
+        "decompile",
+        "decompile_all",
+        "translation_unit"
+      ],
+      "difficulty": "stretch",
+      "timeout": 90,
+      "figure": "pj-mini-decompiler-7"
+    },
+    {
+      "id": "08-verify",
+      "title": "验证输出",
+      "summary": "以测试固件的编译选项重新编译 C，屏蔽重定位字段后逐函数比较，比较重定位指向的常量，并在覆盖极限值、零、负数及比较常量的输入网格上并行运行原版与候选版。报告对未证实项保守失败，列出全部未知项。缺少 clang 时跳过重编译与差分验证并说明原因。",
+      "hours": 2,
+      "language": "python",
+      "languageWhy": "subprocess 驱动 clang 和生成的 C 测试驱动，json 输出证据报告。",
+      "concepts": [
+        "mask_relocations",
+        "compare_function_bytes",
+        "input_grid",
+        "verify"
+      ],
+      "difficulty": "stretch",
+      "timeout": 180,
+      "figure": "pj-mini-decompiler-8"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "实录：初始模板失败，随后参考实现的所有阶段通过。参考实现通过不代表学习者获得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "反编译并验证",
+      "caption": "对仓库中 O1 目标文件执行 decompile 和 verify 的真实输出。verify 需要 PATH 中存在 clang。"
+    }
+  ]
+}

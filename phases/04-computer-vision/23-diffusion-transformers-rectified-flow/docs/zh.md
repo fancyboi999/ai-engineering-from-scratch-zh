@@ -59,8 +59,8 @@ DDPM 把前向过程定义为一个含噪 SDE，`x_t` 被越来越多地破坏�
 
 Rectified flow 把干净数据和纯噪声之间定义为一条**直线**插值：
 
-```
-x_t = (1 - t) * x_0 + t * epsilon,     t in [0, 1]
+```math
+x_t = (1 - t) \, x_0 + t \, \epsilon, \qquad t \in [0, 1]
 ```
 
 训练一个网络去预测速度 `v_theta(x_t, t) = epsilon - x_0`——沿从干净数据到噪声的直线路径的前进方向（`dx_t/dt`）。采样时，你把这个速度反向积分，从噪声朝数据迈步。得到的 ODE 更接近一条直线，所以采样所需的积分步数少得多。
@@ -338,7 +338,7 @@ out = pipe(prompt, guidance_scale=3.5, num_inference_steps=28).images[0]
 | DiT | "扩散 transformer" | 替换 U-Net 作扩散去噪器的 transformer；作用于 patch 化的潜变量 |
 | AdaLN | "自适应层归一化" | 通过 LayerNorm 之后应用的学习式 scale、shift、gate 做时间步/文本条件化；每个现代 DiT 的标准 |
 | MMDiT | "多模态 DiT（SD3）" | 文本和图像 token 的独立权重流，共享一个联合自注意力 |
-| 单流 / 双流 | "FLUX 技巧" | 前 N 个块双流（每模态独立权重），后面的块单流（拼接 + 共享权重）以提效率 |
+| 单流 / 双流 | "FLUX 技巧" | 前 $N$ 个块双流（每模态独立权重），后面的块单流（拼接 + 共享权重）以提效率 |
 | Rectified flow | "噪声到数据的直线" | 数据和噪声之间的线性插值；网络预测速度；推理时所需 ODE 步数更少 |
 | 速度目标 | "epsilon - x_0" | rectified flow 里的回归目标；从干净数据指向噪声 |
 | CFG 引导 | "无分类器引导" | 混合条件和无条件预测；rectified-flow 模型仍在用 |

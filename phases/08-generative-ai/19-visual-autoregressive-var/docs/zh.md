@@ -21,7 +21,7 @@ VAR 通过改变所生成的东西来修这个生成顺序问题。VAR 不是在
 
 ### VQ-VAE 多尺度分词器
 
-VAR 需要一个**多尺度离散分词器**。对一张图像 x，它产出一串分辨率逐级升高的 token 网格：
+VAR 需要一个**多尺度离散分词器**。对一张图像 $x$，它产出一串分辨率逐级升高的 token 网格：
 
 ```
 x -> encoder -> latent f
@@ -31,13 +31,13 @@ f -> tokenize at 2x2: token grid z_2 of shape (2, 2)
 f -> tokenize at (H/p)x(W/p): token grid z_K of shape (H/p, W/p)
 ```
 
-每个 z_k 用同一个码本（典型大小 4096-16384）。各尺度上的 token 化不是独立的——它被训练成：把每个尺度的残差加起来能重建 f：
+每个 $z_k$ 用同一个码本（典型大小 4096-16384）。各尺度上的 token 化不是独立的——它被训练成：把每个尺度的残差加起来能重建 $f$：
 
-```
-f ≈ upsample(embed(z_1), target_size) + ... + upsample(embed(z_K), target_size)
+```math
+f \approx \mathop{\mathrm{upsample}}(\mathop{\mathrm{embed}}(z_1), \text{target\_size}) + \cdots + \mathop{\mathrm{upsample}}(\mathop{\mathrm{embed}}(z_K), \text{target\_size})
 ```
 
-这是一个**残差 VQ** 变体。尺度 k 捕捉尺度 1..k-1 漏掉的东西。解码器接受所有尺度嵌入之和，产出图像。
+这是一个**残差 VQ** 变体。尺度 $k$ 捕捉尺度 $1 \ldots k-1$ 漏掉的东西。解码器接受所有尺度嵌入之和，产出图像。
 
 多尺度 VQ 分词器训练一次（像 VQGAN），然后冻结。所有生成工作都由上层的自回归模型完成。
 
@@ -50,9 +50,9 @@ f ≈ upsample(embed(z_1), target_size) + ... + upsample(embed(z_K), target_size
 [START, z_1 tokens, z_2 tokens, z_3 tokens, ..., z_K tokens]
 ```
 
-位置嵌入同时编码尺度索引和尺度内的空间位置。注意力在尺度顺序上是因果的：尺度 k、位置 (i, j) 的 token 能注意尺度 1..k 上的所有 token，以及尺度 k 自身中在任何所用的尺度内顺序里更早的 token（VAR 用固定位置注意力、无尺度内因果性——一个尺度内的所有位置并行预测）。
+位置嵌入同时编码尺度索引和尺度内的空间位置。注意力在尺度顺序上是因果的：尺度 $k$、位置 $(i, j)$ 的 token 能注意尺度 $1 \ldots k$ 上的所有 token，以及尺度 $k$ 自身中在任何所用的尺度内顺序里更早的 token（VAR 用固定位置注意力、无尺度内因果性——一个尺度内的所有位置并行预测）。
 
-训练损失：在每个尺度 k，给定所有先前尺度的 token，预测 z_k 的 token。在离散 VQ 码上做交叉熵损失。结构和 GPT 一样，只是这个「序列」现在是按尺度结构化的。
+训练损失：在每个尺度 $k$，给定所有先前尺度的 token，预测 $z_k$ 的 token。在离散 VQ 码上做交叉熵损失。结构和 GPT 一样，只是这个「序列」现在是按尺度结构化的。
 
 ### 生成
 
@@ -66,7 +66,7 @@ decode: f = sum of embed-and-upsample scales 1..K
 image = VAE_decoder(f)
 ```
 
-对 K = 10 个尺度，生成是 10 次 transformer 前向。每一次并行产出它整个尺度——一个尺度内部没有逐 token 自回归。对一张 256x256 的图像，这大约是 10 次前向，而 DiT 是 28-50 次。
+对 $K = 10$ 个尺度，生成是 10 次 transformer 前向。每一次并行产出它整个尺度——一个尺度内部没有逐 token 自回归。对一张 256x256 的图像，这大约是 10 次前向，而 DiT 是 28-50 次。
 
 ### 为什么下一尺度胜过下一 token
 
@@ -125,9 +125,9 @@ gx-var-next-scale
 | VAR | 「视觉自回归」 | 在一个 VQ token 网格金字塔上通过下一尺度预测来生成图像 |
 | 下一尺度预测 | 「先预测粗的，再细的」 | 模型在递增的分辨率尺度上预测 token，以所有先前尺度为条件 |
 | 多尺度 VQ 分词器 | 「残差 VQ」 | 产出 K 个递增分辨率 token 网格的 VQ-VAE，解码器把所有尺度加起来 |
-| 尺度 k | 「金字塔第 k 层」 | K 个分辨率层级之一，从 k=1 的 1x1 到 k=K 的 (H/p)x(W/p) |
-| 尺度内并行 | 「每个尺度一次前向」 | 尺度 k 的所有 token 在一次 transformer 前向中预测，而非自回归 |
-| 尺度间因果 | 「尺度顺序注意力」 | 尺度 k 的 token 能注意尺度 1..k 的全部，但不能注意尺度 k+1..K |
+| 尺度 $k$ | 「金字塔第 $k$ 层」 | K 个分辨率层级之一，从 $k$=1 的 1x1 到 $k$=K 的 (H/p)x(W/p) |
+| 尺度内并行 | 「每个尺度一次前向」 | 尺度 $k$ 的所有 token 在一次 transformer 前向中预测，而非自回归 |
+| 尺度间因果 | 「尺度顺序注意力」 | 尺度 $k$ 的 token 能注意尺度 $1 \ldots k$ 的全部，但不能注意尺度 $k+1 \ldots K$ |
 | 残差 VQ | 「加性 token 化」 | 每个尺度的 token 编码低尺度留下的残差；解码器把所有尺度嵌入加起来 |
 | VAR 扩展律 | 「图像 GPT 扩展」 | FID 在算力上遵循可预测的幂律，像语言模型的困惑度 |
 | HART | 「混合 VAR + 文本」 | 文本条件 VAR 变体，把 MaskGIT 风格的迭代解码与 VAR 的尺度结构结合 |

@@ -461,11 +461,11 @@ function writeMarkdown(file, { name, description, version }) {
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260831a';
-  const appRelease = '20261012b';
-  const styleRelease = '20261012e';
-  const navigationRelease = '20261012b';
+  const appRelease = '20261019a';
+  const styleRelease = '20261019a';
+  const navigationRelease = '20261019a';
   const narrationRelease = '20260831a';
-  const roadmapRelease = '20261012e';
+  const roadmapRelease = '20261019a';
   const pages = [
     'about.html',
     'assessment.html',
@@ -493,8 +493,8 @@ test('shared site asset families use the expected cache keys on every page', () 
     }
     assert.equal(versionFor(source, 'progress.js'), release, `${page} has stale progress.js`);
     assert.equal(versionFor(source, 'header.js'), navigationRelease, `${page} has stale header.js`);
-    assert.equal(versionFor(source, 'cmdpalette.js'), '20261012b', `${page} has stale cmdpalette.js`);
-    if (source.includes('src="certifications.js')) assert.equal(versionFor(source, 'certifications.js'), '20261012b', `${page} has stale certifications.js`);
+    assert.equal(versionFor(source, 'cmdpalette.js'), '20261019a', `${page} has stale cmdpalette.js`);
+    if (source.includes('src="certifications.js')) assert.equal(versionFor(source, 'certifications.js'), '20261019a', `${page} has stale certifications.js`);
   }
 
   assert.equal(versionFor(sourceFor('index.html'), 'app.js'), appRelease);
@@ -1443,11 +1443,43 @@ test('repository exposes the four core AI engineering learning paths', () => {
       new RegExp(`class="learning-paths-node [^"]+"[^>]+href="learning-paths\\.html#${anchor}"[^>]+aria-label="查看\\s*${title}所需的能力"`)
     );
   }
-  assert.match(readme, /528 节课 · 20 个阶段/);
+  assert.match(readme, /542 节课 · 20 个阶段/);
   assert.match(readme, /https:\/\/aieng-zh\.cn\/learning-paths\.html/);
   assert.doesNotMatch(readme, /<!-- STATS:START|<\/b> readers/);
   assert.doesNotMatch(readme, /\[stats-start\]: #/);
   assert.doesNotMatch(readme, /## AI Engineering Learning Paths|site\/assets\/figures\/006-ai-engineering-learning-paths\.svg/);
+});
+
+test('reverse engineering is a focused route with all fourteen canonical lessons and its ownership gate', () => {
+  const root = path.resolve(__dirname, '..');
+  const roadmap = parseRoadmap(fs.readFileSync(path.join(root, 'ROADMAP.md'), 'utf8'));
+  const phases = parseReadme(fs.readFileSync(path.join(root, 'README.md'), 'utf8'), roadmap);
+  const learningPaths = parseLearningPaths(root, phases);
+  const route = learningPaths.find(entry => entry.id === 'reverse-engineering');
+  assert.ok(route, 'reverse-engineering manifest is missing');
+  assert.equal(route.title, '逆向工程');
+  assert.equal(route.stateFile, 'REVERSE-ENGINEERING-LEARNING.md');
+  assert.equal(route.lessons.length, 14);
+  assert.deepEqual(route.lessons.map(lesson => lesson.order), Array.from({ length: 14 }, (_, index) => index + 1));
+  assert.deepEqual(
+    route.lessons.map(lesson => Number(lesson.path.match(/^phases\/13-tools-and-protocols\/(\d+)-/)[1])),
+    Array.from({ length: 14 }, (_, index) => index + 32)
+  );
+  const canonicalLessons = new Map(phases.flatMap(phase => phase.lessons.map(lesson => [
+    lesson.url.split('/tree/main/')[1].replace(/\/$/, ''), lesson.name,
+  ])));
+  for (const lesson of route.lessons) {
+    assert.ok(canonicalLessons.has(lesson.path), `${lesson.path} is missing from the canonical catalog`);
+    assert.equal(lesson.title, canonicalLessons.get(lesson.path), `${lesson.path} title drifted`);
+    assert.ok(fs.existsSync(path.join(root, lesson.path, 'docs', 'zh.md')), `${lesson.path} has no Chinese source`);
+  }
+  const ownershipGate = route.prerequisites.find(entry => entry.id === 'own-binaries-only');
+  assert.ok(ownershipGate, 'the ownership and authorization prerequisite is missing');
+  assert.equal(ownershipGate.required, true);
+  assert.equal(ownershipGate.type, 'knowledge');
+  assert.match(ownershipGate.title, /自己构建|获授权/);
+  assert.deepEqual(route.lessons[0].prerequisiteChecks, ['own-binaries-only']);
+  assert.equal(route.quickStart.lessonPath, route.lessons[0].path);
 });
 
 test('homepage preserves live GitHub CTAs and the motion-aware learner marquee', () => {
@@ -1780,7 +1812,7 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   assert.match(lessonHtml, /fetch\(quizUrl, fetchOptions\)/);
   assert.doesNotMatch(lessonHtml, /<script src="figures(?:\.js|-(?!manifest))/);
   assert.match(lessonHtml, /<script src="figure-manifest\.js/);
-  assert.match(lessonHtml, /<script src="figures-manifest\.js\?v=20261013d/);
+  assert.match(lessonHtml, /<script src="figures-manifest\.js\?v=20261019a/);
   assert.match(lessonHtml, /<script src="progress\.js\?v=20260831a/);
   assert.match(fs.readFileSync(path.join(__dirname, 'lesson-figures.js'), 'utf8'), /providerBaseUrl \+ provider/);
   assert.match(lessonHtml, /import\('https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@11/);

@@ -1,0 +1,353 @@
+{
+  "id": "reverse-engineering-101",
+  "title": "逆向工程入门",
+  "subtitle": "用 rea 与 Ghidra 阅读自己构建的编译程序：从文件字节到有证据支撑的伪代码",
+  "summary": "没有源代码时如何阅读编译程序，并验证自己的发现。所有清单均来自 rea 6.7.0 与 Ghidra 12.1.4 对本手册专用程序的运行记录。",
+  "audience": "你会编写 C、Python 或 JavaScript，使用编码 agent，但从未用反编译器阅读机器码。你希望理解编译程序的行为，并检查 agent 对它的判断。",
+  "edition": "2026.10",
+  "status": "ready",
+  "pin": {
+    "subject": "rea（rea-agents）与 Ghidra provider",
+    "version": "rea-agents 6.7.0, Ghidra 12.1.4",
+    "source": "https://github.com/morluto/rea",
+    "commit": "27dc42d10249f0410904a75c0997842eb03b931c",
+    "date": "2026-10-18",
+    "verified": "2026-10-18"
+  },
+  "outcomes": [
+    "读取编译程序的文件头、节、符号和重定位，将地址映射为文件偏移。",
+    "对自己构建的程序运行带 Ghidra provider 的 rea，阅读 Evidence 记录中的置信度、权威性、限制和未知项。",
+    "找到函数，阅读汇编和伪代码，追踪引用，指出反编译输出不完整的位置。",
+    "在输入网格上运行原版与重建函数，并屏蔽重定位后比较字节，验证两者等价。",
+    "让 agent 通过 MCP 驱动 rea，维护证据账本，区分观察结果与推断。"
+  ],
+  "palette": [
+    {
+      "hue": "blue",
+      "meaning": "rea：CLI、MCP 服务及领域层"
+    },
+    {
+      "hue": "violet",
+      "meaning": "Ghidra provider：analyzeHeadless、桥接层和反编译器"
+    },
+    {
+      "hue": "green",
+      "meaning": "分析产物：测试固件、字节、节和符号"
+    },
+    {
+      "hue": "plum",
+      "meaning": "agent 及其模型调用"
+    },
+    {
+      "hue": "olive",
+      "meaning": "脚本与托管代码：JavaScript 应用和 WASM 模块"
+    },
+    {
+      "hue": "indigo",
+      "meaning": "MCP 消息与会话"
+    },
+    {
+      "hue": "amber",
+      "meaning": "生命周期：会话、分析阶段和结论状态"
+    },
+    {
+      "hue": "teal",
+      "meaning": "持久记录：Evidence bundle 与快照"
+    },
+    {
+      "hue": "rose",
+      "meaning": "失败：错误信封、被拒绝的结论和错误输出"
+    },
+    {
+      "hue": "grey",
+      "meaning": "rea 之外：宿主机、编译器和读者"
+    }
+  ],
+  "sources": [
+    {
+      "name": "发布标签处的 rea 源码",
+      "path": "rea-agents-6.7.0 (27dc42d)",
+      "usedFor": "关于 rea 行为的所有结论；各节 Sources 行列出文件"
+    },
+    {
+      "name": "发布标签处的 rea 文档",
+      "path": "docs/ and DISCLAIMER.md at 27dc42d",
+      "usedFor": "文档声明的行为、限制与负责任使用规则"
+    },
+    {
+      "name": "捕获的运行记录",
+      "path": "capture/out/ (rea 6.7.0, Ghidra 12.1.4, macOS 26.2 arm64)",
+      "usedFor": "所有清单和图中的每个数字"
+    },
+    {
+      "name": "格式与架构规范",
+      "path": "ELF gABI, Mach-O headers, Intel SDM, Arm ARM",
+      "usedFor": "ELF、Mach-O、x86-64、AArch64 编码与调用约定"
+    },
+    {
+      "name": "程序分析论文",
+      "path": "papers named in each Sources line",
+      "usedFor": "反汇编、控制流结构化、SSA、类型恢复和反编译器评估"
+    },
+    {
+      "name": "法律条文与法院判决",
+      "path": "17 U.S.C. 1201, Directive 2009/24/EC, CJEU and US decisions",
+      "usedFor": "分析与互操作的法律依据"
+    },
+    {
+      "name": "工具发布说明",
+      "path": "vendor release notes named in each Sources line",
+      "usedFor": "Ghidra 等工具的版本与功能"
+    }
+  ],
+  "quoteSources": {
+    "readme": null,
+    "cli": null,
+    "mcp": null,
+    "ghidra": null,
+    "native": null,
+    "install": null,
+    "readiness": null,
+    "ledgers": null,
+    "jsgraph": null,
+    "design": null,
+    "law": null,
+    "spec": null,
+    "paper": null
+  },
+  "capture": {
+    "run": [
+      "python3",
+      "capture/run.py"
+    ],
+    "check": [
+      "python3",
+      "capture/run.py",
+      "--check"
+    ],
+    "timeoutSeconds": 900
+  },
+  "front": "front.md",
+  "plate": {
+    "figure": "plate-rea-investigation",
+    "title": "一个函数，四个视角",
+    "caption": "你写的 C、clang 生成的六条指令、Ghidra 返回的伪代码，以及 rea 为它们写下的 Evidence 记录，取自 capture/out/06-function-percent-change.json。"
+  },
+  "parts": [
+    {
+      "number": 1,
+      "title": "一页认识 rea",
+      "thesis": "rea 向分析引擎询问程序，将每个回答作为 Evidence 记录返回，说明它如何得知。",
+      "summary": "rea 统一什么、交给 Ghidra 什么，以及对函数的一次完整调查。",
+      "accent": "blue",
+      "sections": [
+        {
+          "id": "1.1",
+          "file": "sections/1-1-rea-providers-and-evidence.md"
+        },
+        {
+          "id": "1.2",
+          "file": "sections/1-2-rea-function-end-to-end.md"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "授权与安装",
+      "thesis": "只有拥有分析权利，且 rea doctor 报告 provider 健康时，才能分析程序。",
+      "summary": "法律与 rea 的负责任使用规则、Ghidra provider 安装、各命令声明的能力。",
+      "accent": "grey",
+      "sections": [
+        {
+          "id": "2.1",
+          "file": "sections/2-1-the-readme-use-rule-and-the-law.md"
+        },
+        {
+          "id": "2.2",
+          "file": "sections/2-2-rea-doctor-and-the-ghidra-provider.md"
+        },
+        {
+          "id": "2.3",
+          "file": "sections/2-3-rea-capabilities.md"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "分析产物",
+      "thesis": "引擎运行之前，rea 先读取文件本身：格式、加载映像，以及各地址在磁盘上的位置。",
+      "summary": "inspect-artifact、二进制布局与 Mach-O 加载映像、address-to-file-offset，以及 analyze 概览。",
+      "accent": "green",
+      "sections": [
+        {
+          "id": "3.1",
+          "file": "sections/3-1-inspect-artifact.md"
+        },
+        {
+          "id": "3.2",
+          "file": "sections/3-2-inspect-binary-layout-and-the-load-image.md"
+        },
+        {
+          "id": "3.3",
+          "file": "sections/3-3-address-to-file-offset.md"
+        },
+        {
+          "id": "3.4",
+          "file": "sections/3-4-analyze-overview.md"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Ghidra provider",
+      "thesis": "rea 对 Ghidra 的每个问题，都通过桥接调用进入新的无界面项目，回答也携带引擎限制。",
+      "summary": "open_binary 与桥接、过程、汇编、引用与跳转表、字符串和伪代码。",
+      "accent": "violet",
+      "sections": [
+        {
+          "id": "4.1",
+          "file": "sections/4-1-open-binary-and-the-headless-bridge.md"
+        },
+        {
+          "id": "4.2",
+          "file": "sections/4-2-list-procedures-and-function-bodies.md"
+        },
+        {
+          "id": "4.3",
+          "file": "sections/4-3-procedure-assembly.md"
+        },
+        {
+          "id": "4.4",
+          "file": "sections/4-4-xrefs-and-the-jump-table.md"
+        },
+        {
+          "id": "4.5",
+          "file": "sections/4-5-list-strings.md"
+        },
+        {
+          "id": "4.6",
+          "file": "sections/4-6-analyze-function-and-pseudocode.md"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "证据",
+      "thesis": "Evidence 记录说明对象、引擎、置信度与限制，任一内容改变都会改变 id。",
+      "summary": "Evidence 记录、残留未知项、快照、bundle，以及两个构建的比较。",
+      "accent": "teal",
+      "sections": [
+        {
+          "id": "5.1",
+          "file": "sections/5-1-the-evidence-record.md"
+        },
+        {
+          "id": "5.2",
+          "file": "sections/5-2-residual-unknowns-and-coverage.md"
+        },
+        {
+          "id": "5.3",
+          "file": "sections/5-3-snapshots-and-the-answer-cache.md"
+        },
+        {
+          "id": "5.4",
+          "file": "sections/5-4-evidence-bundles-export-and-import.md"
+        },
+        {
+          "id": "5.5",
+          "file": "sections/5-5-compare-and-compare-functions.md"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "脚本与托管代码",
+      "thesis": "对 JavaScript，rea 只读取文件而不运行，返回模块及其关系图。",
+      "summary": "analyze-javascript-application 与应用图，以及使用 WABT provider 的 inspect-wasm-artifact。",
+      "accent": "olive",
+      "sections": [
+        {
+          "id": "6.1",
+          "file": "sections/6-1-analyze-javascript-application.md"
+        },
+        {
+          "id": "6.2",
+          "file": "sections/6-2-inspect-wasm-artifact.md"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "重建与验证",
+      "thesis": "rea 记录声明的结论是否通过，因此重建函数等价的证明必须来自你自己的测试。",
+      "summary": "verify_reconstruction 及其限制，以及通过执行和字节比较验证重建等价的测试程序。",
+      "accent": "rose",
+      "sections": [
+        {
+          "id": "7.1",
+          "file": "sections/7-1-verify-reconstruction.md"
+        },
+        {
+          "id": "7.2",
+          "file": "sections/7-2-a-proof-harness-outside-rea.md"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "通过 MCP 驱动 agent",
+      "thesis": "agent 通过拥有 207 个工具的 MCP 服务访问 rea，发现的质量取决于保留的证据。",
+      "summary": "MCP 服务、工具与期限，以及从问题到证据的一次 agent 调查。",
+      "accent": "indigo",
+      "sections": [
+        {
+          "id": "8.1",
+          "file": "sections/8-1-the-rea-mcp-server.md"
+        },
+        {
+          "id": "8.2",
+          "file": "sections/8-2-an-agent-investigation.md"
+        }
+      ]
+    }
+  ],
+  "reference": {
+    "title": "参考",
+    "accent": "grey",
+    "thesis": "本手册所有 rea 名称的速查表。",
+    "summary": "命令与 MCP 工具、Evidence 字段、捕获中出现的错误、术语表、来源和图索引。",
+    "sections": [
+      {
+        "id": "R.1",
+        "file": "sections/r-1-commands-and-tools.md"
+      },
+      {
+        "id": "R.2",
+        "file": "sections/r-2-evidence-fields.md"
+      },
+      {
+        "id": "R.3",
+        "file": "sections/r-3-errors.md"
+      },
+      {
+        "id": "R.4",
+        "file": "sections/r-4-glossary.md"
+      },
+      {
+        "id": "R.5",
+        "file": "sections/r-5-sources.md"
+      },
+      {
+        "id": "R.6",
+        "file": "sections/r-6-figure-index.md"
+      }
+    ]
+  },
+  "related": [
+    "phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch",
+    "phases/13-tools-and-protocols/33-disassembly-and-control-flow",
+    "phases/13-tools-and-protocols/34-lifting-to-pseudocode",
+    "phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns",
+    "phases/13-tools-and-protocols/36-rebuild-and-prove-equal"
+  ]
+}

@@ -146,6 +146,14 @@ SDK 在底层干的就是这件事。看懂原始 HTTP 调用，调试时会更�
 2. 试试原始 HTTP 版本，把它的响应格式和 SDK 版本对比一下
 3. 故意用一个错误的 API 密钥，读一读报错信息
 
+### 提示
+
+**练习 1。** 在 Anthropic Console 创建密钥，按课程说明存入 `ANTHROPIC_API_KEY`，然后运行 `code/first_api_call.py`。脚本输出模型回复且没有报错，就表示调用成功。
+
+**练习 2。** `code/first_api_call.py` 中两个函数都只输出正文和 token 数。在 `call_with_sdk()` 中添加 `print(response)`，在 `call_raw_http()` 中添加 `print(result)`，运行后查看两份完整响应。比较字段名：原始 JSON 中的 `content`、`usage` 和 `stop_reason` 与 SDK 转为对象属性的字段相同。
+
+**练习 3。** 只在一个终端中把 `ANTHROPIC_API_KEY` 设为假值，然后重跑脚本。在输出中找到 HTTP 状态码和错误类型；认证失败会返回 401。
+
 ## 关键术语
 
 | 术语 | 大家怎么说 | 它实际是什么 |

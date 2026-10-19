@@ -80,8 +80,8 @@ graph TD
 
 损失函数用成对偏好的 Bradley-Terry 模型：
 
-```
-loss = -log(sigmoid(reward(preferred) - reward(rejected)))
+```math
+\text{loss} = -\log\big(\mathop{\mathrm{sigmoid}}(\text{reward}(\text{preferred}) - \text{reward}(\text{rejected}))\big)
 ```
 
 这是关键方程。`sigmoid(reward(A) - reward(B))` 给出回复 A 比回复 B 更受偏好的概率。损失推动奖励模型给受偏好的回复分配更高的分数。
@@ -96,8 +96,8 @@ PPO 是一个强化学习算法。在 RLHF 里，"环境" 是奖励模型，"智
 
 目标：
 
-```
-maximize: E[R(prompt, response)] - beta * KL(policy || reference)
+```math
+\text{最大化：} \quad \mathbb{E}[R(\text{prompt}, \text{response})] - \beta \cdot \mathrm{KL}(\text{policy} \,\|\, \text{reference})
 ```
 
 第一项推动模型生成高奖励回复。第二项（KL 散度惩罚）防止模型偏离 SFT checkpoint 太远。
@@ -110,7 +110,7 @@ maximize: E[R(prompt, response)] - beta * KL(policy || reference)
 
 KL 惩罚说：你可以改进，但你不能变成一个完全不同的模型。靠近那个本来就已经合理的 SFT 版本。漂得太远，KL 成本就会盖过奖励。
 
-**InstructGPT 数字：** PPO 训练用 lr=1.5e-5、KL 系数 beta=0.02、256K episode（prompt-回复对）、每个 batch 跑 4 个 PPO epoch。整条 RLHF 流水线在一个 GPU 集群上花了好几天。
+**InstructGPT 数字：** PPO 训练用 lr=1.5e-5、KL 系数 $\beta=0.02$、256K episode（prompt-回复对）、每个 batch 跑 4 个 PPO epoch。整条 RLHF 流水线在一个 GPU 集群上花了好几天。
 
 ```mermaid
 graph LR
@@ -133,12 +133,14 @@ graph LR
 
 ### PPO 目标的细节
 
-PPO 用一个 "裁剪的代理目标" 来防止过大的更新。新策略和旧策略概率之间的比率被裁剪到 [1 - epsilon, 1 + epsilon] 区间，epsilon 通常是 0.2。
+PPO 用一个 "裁剪的代理目标" 来防止过大的更新。新策略和旧策略概率之间的比率被裁剪到 $[1 - \epsilon, 1 + \epsilon]$ 区间，$\epsilon$ 通常是 0.2。
 
-```
-ratio = pi_new(action | state) / pi_old(action | state)
-clipped_ratio = clip(ratio, 1 - epsilon, 1 + epsilon)
-loss = -min(ratio * advantage, clipped_ratio * advantage)
+```math
+\begin{aligned}
+\text{ratio} &= \pi_{\text{new}}(\text{action} \mid \text{state}) / \pi_{\text{old}}(\text{action} \mid \text{state}) \\
+\text{clipped\_ratio} &= \mathop{\mathrm{clip}}(\text{ratio}, 1 - \epsilon, 1 + \epsilon) \\
+\text{loss} &= -\min(\text{ratio} \cdot \text{advantage}, \text{clipped\_ratio} \cdot \text{advantage})
+\end{aligned}
 ```
 
 优势函数（advantage）估计当前回复相比期望质量好多少。在 RLHF 里：
@@ -606,9 +608,9 @@ if __name__ == "__main__":
 
 3. 模拟奖励作弊。创建一个给长回复高分的奖励模型（reward = len(response) / 100）。用这个有缺陷的奖励模型跑 PPO，观察策略模型生成越来越长、重复的输出。然后加一个 0.1 的 KL 惩罚，展示它如何防止这种退化行为。
 
-4. 实现多目标奖励。训练两个奖励模型——一个针对有用性，一个针对简洁性。把它们组合成 R = 0.7 * R_helpful + 0.3 * R_concise。展示组合目标产出的回复既有帮助又简洁，避开了单一有用性奖励的啰嗦陷阱。
+4. 实现多目标奖励。训练两个奖励模型——一个针对有用性，一个针对简洁性。把它们组合成 $R = 0.7 \cdot R_{\text{helpful}} + 0.3 \cdot R_{\text{concise}}$。展示组合目标产出的回复既有帮助又简洁，避开了单一有用性奖励的啰嗦陷阱。
 
-5. 对比不同的 KL 系数。用 beta=0.001（太低，奖励作弊）、beta=0.02（标准）、beta=0.5（太高，学不动）跑 PPO。各画出奖励曲线和 KL 曲线。beta=0.02 那次应该显示奖励稳步提升、KL 有界。
+5. 对比不同的 KL 系数。用 $\beta=0.001$（太低，奖励作弊）、$\beta=0.02$（标准）、$\beta=0.5$（太高，学不动）跑 PPO。各画出奖励曲线和 KL 曲线。$\beta=0.02$ 那次应该显示奖励稳步提升、KL 有界。
 
 ## 关键术语
 
@@ -616,10 +618,10 @@ if __name__ == "__main__":
 |------|----------------|----------------------|
 | RLHF | "用人类反馈训练" | 基于人类反馈的强化学习：一条三阶段流水线（SFT、奖励模型、PPO），用人类偏好信号优化语言模型输出 |
 | 奖励模型 | "一个给回复打分的模型" | 一个带标量输出头的 transformer，用 Bradley-Terry 损失在成对人类偏好上训练 |
-| Bradley-Terry | "那个比较模型" | 一个概率模型，P(A > B) = sigmoid(score(A) - score(B))，把成对偏好转换成一个一致的打分函数 |
+| Bradley-Terry | "那个比较模型" | 一个概率模型，$P(A > B) = \mathop{\mathrm{sigmoid}}(\text{score}(A) - \text{score}(B))$，把成对偏好转换成一个一致的打分函数 |
 | PPO | "那个 RL 算法" | 近端策略优化：更新策略以最大化奖励，同时裁剪更新幅度以防止不稳定 |
 | KL 散度 | "两个分布有多不同" | 衡量策略模型的 token 分布和参考模型的差异——用作惩罚以防止奖励作弊 |
-| KL 惩罚 | "拴住模型的绳子" | 从奖励信号里减去 Beta * KL(policy \|\| reference)——防止策略偏离 SFT checkpoint 太远 |
+| KL 惩罚 | "拴住模型的绳子" | 从奖励信号里减去 $\beta \cdot \mathrm{KL}(\text{policy} \Vert \text{reference})$——防止策略偏离 SFT checkpoint 太远 |
 | 奖励作弊 | "钻奖励的空子" | 当策略通过利用奖励模型的弱点找到退化的高奖励输出，而不是真正改进 |
 | 偏好对 | "A 和 B 哪个好？" | 一个由 (prompt, preferred_response, rejected_response) 组成的训练样本——RLHF 训练数据的基本单元 |
 | 参考模型 | "冻结的 SFT checkpoint" | SFT 模型的一份拷贝，权重永不改变——用作 KL 散度计算的锚点 |

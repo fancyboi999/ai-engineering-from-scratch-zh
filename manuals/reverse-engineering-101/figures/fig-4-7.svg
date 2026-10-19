@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 276" role="img" aria-labelledby="fig-4-7-title fig-4-7-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-4-7-title">按加载命令分类的 ledger-arm64-O1 共 39 个字符串</title>
+  <desc id="fig-4-7-desc">六行按地址排序。头部两个加载命令字符串为 dyld 和 libSystem 路径。__TEXT,__cstring 从 0x100000770 起有十个字符串，包括标签、格式串和一个空填充。Chained fixups 从 0x100008069 起有六个导入名；exports trie 从 0x1000080b2 起有七个边标签；LC_SYMTAB 字符串表从 0x10000821a 起有十三个名称；0x10000831c 有一个代码签名标识 ledger-arm64-O1。总计 39，等于 overview 的 string_count。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">位置</text>
+  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">地址</text>
+  <text x="450" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">数量</text>
+  <text x="500" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">示例</text>
+  <rect x="20" y="28" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="28" y="49" font-size="11" font-weight="700">头部加载命令</text>
+  <text x="250" y="49" font-size="11">0x100000404, 0x100000490</text>
+  <text x="450" y="49" font-size="11">2</text>
+  <text x="500" y="49" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">/usr/lib/dyld</text>
+  <rect x="20" y="62" width="600" height="34" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="28" y="83" font-size="11" font-weight="700">__TEXT,__cstring</text>
+  <text x="250" y="83" font-size="11">0x100000770 至 0x1000007cf</text>
+  <text x="450" y="83" font-size="11">10</text>
+  <text x="500" y="83" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">score %d grade %s</text>
+  <rect x="20" y="96" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="28" y="117" font-size="11" font-weight="700">Chained fixups 导入</text>
+  <text x="250" y="117" font-size="11">0x100008069 至 0x1000080a7</text>
+  <text x="450" y="117" font-size="11">6</text>
+  <text x="500" y="117" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">___stack_chk_fail</text>
+  <rect x="20" y="130" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="28" y="151" font-size="11" font-weight="700">导出 trie 边</text>
+  <text x="250" y="151" font-size="11">0x1000080b2 至 0x100008111</text>
+  <text x="450" y="151" font-size="11">7</text>
+  <text x="500" y="151" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">_label</text>
+  <rect x="20" y="164" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="28" y="185" font-size="11" font-weight="700">LC_SYMTAB 字符串表</text>
+  <text x="250" y="185" font-size="11">0x10000821a 至 0x1000082a5</text>
+  <text x="450" y="185" font-size="11">13</text>
+  <text x="500" y="185" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">_grade_label</text>
+  <rect x="20" y="198" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="28" y="219" font-size="11" font-weight="700">代码签名</text>
+  <text x="250" y="219" font-size="11">0x10000831c</text>
+  <text x="450" y="219" font-size="11">1</text>
+  <text x="500" y="219" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ledger-arm64-O1</text>
+  <text x="20" y="262" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">string_count 39 · 各项 encoding 均 US-ASCII · 10 个程序字符串、29 个名称与路径</text>
+</svg>

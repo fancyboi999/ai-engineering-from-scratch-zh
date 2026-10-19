@@ -31,7 +31,7 @@
 
 **域适配。** 在仿真里训练，用少量真实数据微调。两种风味：
 
-- **Real2Sim2Real：** 用真实 rollout 学一个残差仿真器 `f(s, a, z) - f_sim(s, a)`，在修正后的仿真里训练。不用多少真实数据就能缩小鸿沟。
+- **Real2Sim2Real：** 用真实 rollout 学一个残差仿真器 $f(s, a, z) - f_{\text{sim}}(s, a)$，在修正后的仿真里训练。不用多少真实数据就能缩小鸿沟。
 - **观测适配：** 训练一个策略，通过一个学到的特征提取器（如 GAN 像素到像素）把真实观测 → 类仿真观测。控制器留在仿真里。
 
 **特权学习 / 师生。** Miki 等人 2022（ANYmal 四足）。在仿真里训练一个能访问特权信息（真值摩擦、地形高度、IMU 漂移）的*老师*。蒸馏出一个只看真实传感器观测的*学生*。学生学会从历史中推断特权特征，跨物理参数都稳健。
@@ -128,7 +128,7 @@ Refuse to deploy without (a) a zero-shot sim-variant test, (b) a safety shield, 
 
 ## 练习
 
-1. **简单。** 在固定滑动 GridWorld（slip=0.0）上训练一个 Q-learning agent。在 slip ∈ {0.0, 0.1, 0.3, 0.5} 上评估。画出回报对 slip。
+1. **简单。** 在固定滑动 GridWorld（slip=0.0）上训练一个 Q-learning agent。在 $\text{slip} \in \lbrace 0.0, 0.1, 0.3, 0.5 \rbrace$ 上评估。画出回报对 slip。
 2. **中等。** 训练一个采样 `slip ~ Uniform[0, 0.3]` 的 DR Q-learning agent。在同样的扫描上评估。在 slip=0.5（分布外）时 DR 带来了多少收益？
 3. **困难。** 实现一个课程：从 slip=0.0 起，每次策略达到最优的 90% 就拓宽 DR 范围。测一下零样本到达 slip=0.3 所需的总环境步数，对比固定 DR 基线。
 

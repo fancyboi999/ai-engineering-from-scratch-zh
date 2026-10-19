@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 306" role="img" aria-labelledby="fig-5-3b-title fig-5-3b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-3b-title">六项结果及其背后机制</title>
+  <desc id="fig-5-3b-desc">独立实践报告的六行，各列负载、报告结果与解释它的 SGLang 机制：内核、基数缓存、分块 prefill、decode graph 上限、注意力数据与专家并行，以及草稿 token 成本。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">WORKLOAD</text>
+  <text x="222" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">报告结果</text>
+  <text x="440" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">MECHANISM</text>
+  <rect x="20" y="30" width="190" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="115" y="50.45" font-size="11.5" text-anchor="middle" font-weight="700">独特 prompt、稠密模型</text>
+  <text x="222" y="52" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">相差几个百分点</text>
+  <rect x="440" y="30" width="180" height="34" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="530" y="50.45" font-size="11.5" text-anchor="middle" font-weight="700">相同内核家族</text>
+  <rect x="20" y="74" width="190" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="115" y="94.45" font-size="11.5" text-anchor="middle" font-weight="700">重复前缀</text>
+  <text x="222" y="96" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首 token 583 对 2,141 ms</text>
+  <rect x="440" y="74" width="180" height="34" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="530" y="94.45" font-size="11.5" text-anchor="middle" font-weight="700">基数缓存</text>
+  <rect x="20" y="118" width="190" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="115" y="138.45" font-size="11.5" text-anchor="middle" font-weight="700">16k-token prompt</text>
+  <text x="222" y="140" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首 token 更慢，TPOT 更快</text>
+  <rect x="440" y="118" width="180" height="34" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="530" y="138.45" font-size="11.5" text-anchor="middle" font-weight="700">分块 prefill 8,192</text>
+  <rect x="20" y="162" width="190" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="115" y="182.45" font-size="11.5" text-anchor="middle" font-weight="700">无并发上限</text>
+  <text x="222" y="184" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ITL 100.92 对 28.84 ms</text>
+  <rect x="440" y="162" width="180" height="34" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-dasharray="5 4"/>
+  <text x="530" y="182.45" font-size="11.5" text-anchor="middle" font-weight="700">图上限，推测</text>
+  <rect x="20" y="206" width="190" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="115" y="226.45" font-size="11.5" text-anchor="middle" font-weight="700">DeepSeek MoE、多 GPU</text>
+  <text x="222" y="228" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">参考引擎、审计的 MLPerf</text>
+  <rect x="440" y="206" width="180" height="34" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="530" y="226.45" font-size="11.5" text-anchor="middle" font-weight="700">注意力 DP 与 EP</text>
+  <rect x="20" y="250" width="190" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="115" y="270.45" font-size="11.5" text-anchor="middle" font-weight="700">B200 上的 MTP</text>
+  <text x="222" y="272" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">TPOT 18.43 降至 9.92 ms</text>
+  <rect x="440" y="250" width="180" height="34" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="530" y="270.45" font-size="11.5" text-anchor="middle" font-weight="700">草稿成本、接受率</text>
+  <text x="20" y="300" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">虚线边框标记手册的假设，并非报告结论。</text>
+</svg>

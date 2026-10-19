@@ -87,10 +87,10 @@ flowchart LR
 
 ### 像素网格上的交叉熵
 
-对 C 类的语义分割，模型输出是 `(N, C, H, W)`。目标是带整数类别 ID 的 `(N, H, W)`。交叉熵与分类情形完全相同，只是在每个空间位置上应用：
+对 $C$ 类的语义分割，模型输出是 `(N, C, H, W)`。目标是带整数类别 ID 的 `(N, H, W)`。交叉熵与分类情形完全相同，只是在每个空间位置上应用：
 
-```
-Loss = 在 (n, h, w) 上对 -log( softmax(logits[n, :, h, w])[target[n, h, w]] ) 求平均
+```math
+\text{损失} = \mathop{\mathrm{mean}}\limits_{(n, h, w)} \left[ -\log\left( \mathop{\mathrm{softmax}}(\text{logits}[n, :, h, w])[\text{target}[n, h, w]] \right) \right]
 ```
 
 PyTorch 的 `F.cross_entropy` 原生处理这个形状。不需要 reshape。
@@ -101,17 +101,19 @@ PyTorch 的 `F.cross_entropy` 原生处理这个形状。不需要 reshape。
 
 Dice 损失通过直接优化预测掩码和真值掩码之间的重叠来解决：
 
-```
-Dice(p, y) = 2 * sum(p * y) / (sum(p) + sum(y) + epsilon)
-Dice_loss = 1 - Dice
+```math
+\begin{aligned}
+\mathop{\mathrm{Dice}}(p, y) &= \frac{2 \sum (p \cdot y)}{\sum p + \sum y + \epsilon} \\
+\text{Dice}_{\text{loss}} &= 1 - \text{Dice}
+\end{aligned}
 ```
 
 其中 `p` 是某个类别的 sigmoid/softmax 概率图，`y` 是二值真值掩码。只有重叠完美时损失才为零。因为它基于比例，类别不平衡无关紧要。
 
 实践中，用**组合损失**：
 
-```
-L = L_cross_entropy + lambda * L_dice       (lambda 约 1)
+```math
+L = L_{\text{cross\_entropy}} + \lambda \cdot L_{\text{dice}} \qquad (\lambda \approx 1)
 ```
 
 交叉熵在训练早期给出稳定梯度；Dice 让训练的尾段聚焦在真正匹配掩码形状上。这个组合是医学影像的默认，在任何类别不平衡的数据集上都很难被超越。
@@ -120,7 +122,7 @@ L = L_cross_entropy + lambda * L_dice       (lambda 约 1)
 
 - **像素准确率** —— 预测正确的像素百分比。便宜。在不平衡数据上失效，原因和分类里的准确率一样。
 - **逐类 IoU** —— 每个类别掩码的交并比；跨类别求平均 = mIoU。
-- **Dice（像素上的 F1）** —— 类似 IoU；`Dice = 2 * IoU / (1 + IoU)`。医学影像偏好 Dice，驾驶领域偏好 IoU；它们单调相关。
+- **Dice（像素上的 F1）** —— 类似 IoU；$\text{Dice} = 2 \cdot \text{IoU} / (1 + \text{IoU})$。医学影像偏好 Dice，驾驶领域偏好 IoU；它们单调相关。
 - **边界 F1** —— 衡量预测边界与真值边界的接近程度，连小偏移也惩罚。对半导体检测这类高精度任务很重要。
 
 报逐类 IoU，不只 mIoU。平均 IoU 会在其他九个都到 85% 时掩盖某个 15% 的类别。

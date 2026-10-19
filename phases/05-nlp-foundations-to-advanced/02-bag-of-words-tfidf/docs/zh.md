@@ -23,9 +23,11 @@
 
 **TF-IDF** 给 BoW 重新加权。一个在每篇文档里都出现的词没有信息量，把它的权重调小。一个在全语料里罕见、却在某一篇里频繁出现的词是信号，把它的权重调大。
 
-```
-TF-IDF(w, d) = TF(w, d) * IDF(w)
-             = count(w in d) / |d| * log(N / df(w))
+```math
+\begin{aligned}
+\text{TF-IDF}(w, d) &= \text{TF}(w, d) \cdot \text{IDF}(w) \\
+&= \frac{\mathop{\mathrm{count}}(w \text{ 在 } d)}{|d|} \cdot \log\frac{N}{\mathop{\mathrm{df}}(w)}
+\end{aligned}
 ```
 
 其中 `TF` 是词在该文档里的词频，`df` 是文档频率（多少篇文档含这个词），`N` 是文档总数。那个 `log` 把无处不在的词的权重压在有界范围内。

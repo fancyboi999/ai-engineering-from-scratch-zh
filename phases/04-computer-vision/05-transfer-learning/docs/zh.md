@@ -100,8 +100,8 @@ backbone.heads.head = nn.Linear(..., num_classes)                       # torchv
 
 差异化 LR 的一个更平滑版本，用于现代微调（BEiT、DINOv2、ViT-B 微调）。不是把层分组成阶段，而是给每一层一个比它上面那层略小的 LR：
 
-```
-lr_layer_k = base_lr * decay^(L - k)
+```math
+\text{lr\_layer}_k = \text{base\_lr} \cdot \text{decay}^{L - k}
 ```
 
 decay = 0.75、L = 12 个 transformer 块时，第一块以头部 LR 的 `0.75^11 ≈ 0.04x` 训练。对 transformer 微调比对 CNN 更要紧，CNN 用按阶段分组的 LR 通常就够了。

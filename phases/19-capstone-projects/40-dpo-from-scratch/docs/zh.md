@@ -27,42 +27,46 @@ DPO 用一个监督 loss 替掉了这两个阶段。Reward model 根本不需要
 
 从 Bradley-Terry 模型出发。给定 prompt `x`、两个补全 `y_w`（chosen）和 `y_l`（rejected），人类偏好 `y_w` 的概率是：
 
-```text
-P(y_w > y_l | x) = sigmoid( r(x, y_w) - r(x, y_l) )
+```math
+P(y_w > y_l \mid x) = \sigma\big( r(x, y_w) - r(x, y_l) \big)
 ```
 
 其中 `r` 是某个隐式 reward 函数。RLHF 先用偏好数据拟合 `r`，再训一个 policy `pi` 去最大化 `r`，同时用 KL 锚定：
 
-```text
-max_pi   E_{x, y~pi} [ r(x, y) ] - beta * KL(pi || pi_ref)
+```math
+\max_{\pi} \; \mathbb{E}_{x, y \sim \pi} \big[ r(x, y) \big] - \beta \, \mathrm{KL}(\pi \,\|\, \pi_{\text{ref}})
 ```
 
 DPO 的推导观察到：在这个目标下，最优 policy `pi*` 可以用 `r` 显式写出来：
 
-```text
-pi*(y | x) = (1/Z(x)) * pi_ref(y | x) * exp( r(x, y) / beta )
+```math
+\pi^*(y \mid x) = \frac{1}{Z(x)} \, \pi_{\text{ref}}(y \mid x) \exp\!\left( \frac{r(x, y)}{\beta} \right)
 ```
 
 把 `r` 反解出来：
 
-```text
-r(x, y) = beta * ( log pi*(y | x) - log pi_ref(y | x) ) + beta * log Z(x)
+```math
+r(x, y) = \beta \big( \log \pi^*(y \mid x) - \log \pi_{\text{ref}}(y \mid x) \big) + \beta \log Z(x)
 ```
 
 `log Z(x)` 这项只跟 `x` 有关、跟 `y` 无关，所以算偏好差值时直接消掉：
 
-```text
-r(x, y_w) - r(x, y_l) = beta * ( log pi_theta(y_w|x) - log pi_ref(y_w|x)
-                                - log pi_theta(y_l|x) + log pi_ref(y_l|x) )
+```math
+\begin{aligned}
+r(x, y_w) - r(x, y_l) = \beta \big( &\log \pi_\theta(y_w \mid x) - \log \pi_{\text{ref}}(y_w \mid x) \\
+&- \log \pi_\theta(y_l \mid x) + \log \pi_{\text{ref}}(y_l \mid x) \big)
+\end{aligned}
 ```
 
 代入 Bradley-Terry sigmoid，取偏好对上的负对数似然：
 
-```text
-L_DPO(theta) = - E_{(x, y_w, y_l)} [
-  log sigmoid( beta * ( log pi_theta(y_w|x) - log pi_ref(y_w|x)
-                       - log pi_theta(y_l|x) + log pi_ref(y_l|x) ) )
-]
+```math
+\begin{aligned}
+L_{\text{DPO}}(\theta) = -\mathbb{E}_{(x, y_w, y_l)} \Big[
+  \log \sigma\big( \beta \big( &\log \pi_\theta(y_w \mid x) - \log \pi_{\text{ref}}(y_w \mid x) \\
+  &- \log \pi_\theta(y_l \mid x) + \log \pi_{\text{ref}}(y_l \mid x) \big) \big)
+\Big]
+\end{aligned}
 ```
 
 这就是 loss。每个样本就是一个标量上的 sigmoid，由四个 log-probability 算出来。没有单独的 reward model，没有 PPO，loss 里也没有 KL 项——KL 约束在推导的闭式解里就已经内化了。
@@ -87,8 +91,8 @@ flowchart LR
 
 在跑训练之前做个 sanity check 很有用。对 `log pi_theta(y_w | x)` 求梯度：
 
-```text
-d L_DPO / d log pi_theta(y_w | x) = - beta * (1 - sigmoid(z))
+```math
+\frac{\partial L_{\text{DPO}}}{\partial \log \pi_\theta(y_w \mid x)} = -\beta \big(1 - \sigma(z)\big)
 ```
 
 其中 `z` 是 sigmoid 的参数。对所有 `z` 这个值都是负的，意味着：提高 policy 对 chosen 补全的 log-probability 会降低 loss。对称地，对 `log pi_theta(y_l | x)` 的梯度是正的：提高 rejected 的 log-probability 会增大 loss。训练会把 chosen 推上去、把 rejected 压下去。Reference 是冻结的，不动。

@@ -90,14 +90,14 @@ flowchart TD
 
 参数 `w` 的数值梯度：
 
-```
-grad_numerical = (loss(w + eps) - loss(w - eps)) / (2 * eps)
+```math
+\text{grad\_numerical} = \frac{\text{loss}(w + \text{eps}) - \text{loss}(w - \text{eps})}{2 \cdot \text{eps}}
 ```
 
 一致性度量（相对差异）：
 
-```
-rel_diff = |grad_analytical - grad_numerical| / max(|grad_analytical|, |grad_numerical|, 1e-8)
+```math
+\text{rel\_diff} = \frac{\lvert \text{grad\_analytical} - \text{grad\_numerical} \rvert}{\max(\lvert \text{grad\_analytical} \rvert, \lvert \text{grad\_numerical} \rvert, 10^{-8})}
 ```
 
 如果 `rel_diff < 1e-5`：正确。如果 `rel_diff > 1e-3`：几乎肯定有 bug。

@@ -106,6 +106,14 @@ git push origin my-progress
 2. 写一个 `.gitignore`，排除模型 checkpoint 文件（`.pt`、`.pth`、`.safetensors`）
 3. 用 `git log --oneline` 看看这个仓库的提交历史，读一读课程是怎么一节节加进来的
 
+### 提示
+
+**练习 1。** 在 GitHub 点击 Fork，再用 `git clone` 克隆你自己 fork 的 URL。执行 `git push -u origin my-progress` 后，打开你的 GitHub 仓库，确认分支列表中有包含该文件的 `my-progress` 分支。
+
+**练习 2。** 在仓库根目录的 `.gitignore` 中为每种扩展名各写一行模式，例如 `*.pt`。为每种扩展名创建一个空文件，再运行 `git status`；这些文件均不应出现在未跟踪文件列表中。
+
+**练习 3。** 先运行 `git log --oneline`，再运行 `git log --oneline -- phases/00-setup-and-tooling`，只查看修改过本阶段的提交。选一个提交，执行 `git show --stat <hash>`，查看它新增了哪些课程文件。
+
 ## 关键术语
 
 | 术语 | 大家怎么说 | 它实际是什么 |

@@ -325,7 +325,7 @@
 | 24 | [多模态 RAG 与跨模态检索](phases/12-multimodal-ai/24-multimodal-rag-cross-modal) | ✅ | ~180 min |
 | 25 | [多模态智能体与计算机操作 (总结项目)](phases/12-multimodal-ai/25-multimodal-agents-computer-use) | ✅ | ~240 min |
 
-## Phase 13: 工具与协议 — ✅ (~43 hours)
+## Phase 13: 工具与协议 — ✅ (~76 hours)
 
 | # | Lesson | Status | Est. |
 |---|--------|--------|------|
@@ -360,6 +360,20 @@
 | 29 | [MCP 可靠性、取消与流量控制](phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/) | ✅ | ~120 min |
 | 30 | [MCP Registry 供应链：准入、漂移与回滚](phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/) | ✅ | ~90 min |
 | 31 | [MCP 一致性工程：版本、证据与运维](phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/) | ✅ | ~100 min |
+| 32 | [程序剖析：从零读取 ELF](phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/) | ✅ | ~120 min |
+| 33 | [反汇编与控制流：从字节到可验证的图](phases/13-tools-and-protocols/33-disassembly-and-control-flow/) | ✅ | ~150 min |
+| 34 | [提升为伪代码：从零构建 IR、SSA 与结构化流程](phases/13-tools-and-protocols/34-lifting-to-pseudocode/) | ✅ | ~150 min |
+| 35 | [二进制分析中的证据、置信度与未知项](phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns/) | ✅ | ~105 min |
+| 36 | [重建并证明等价：差分测试、字节比较与证据循环](phases/13-tools-and-protocols/36-rebuild-and-prove-equal/) | ✅ | ~110 min |
+| 37 | [逆向工程全景：历史、工具家族与反编译器构建](phases/13-tools-and-protocols/37-the-reverse-engineering-landscape/) | ✅ | ~150 min |
+| 38 | [调用约定与栈帧：System V、Windows x64 与 AArch64](phases/13-tools-and-protocols/38-calling-conventions-and-stack-frames/) | ✅ | ~140 min |
+| 39 | [编译器惯用模式：优化如何改变代码及如何读回](phases/13-tools-and-protocols/39-compiler-idioms-and-optimization/) | ✅ | ~150 min |
+| 40 | [链接、加载与去符号二进制：PLT、GOT、导入、修复与函数识别](phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries/) | ✅ | ~160 min |
+| 41 | [恢复数据与类型：结构体、数组、C++ 对象与 DWARF](phases/13-tools-and-protocols/41-recovering-data-and-types/) | ✅ | ~140 min |
+| 42 | [对自有程序做动态分析：调试器、跟踪与静态结论验证](phases/13-tools-and-protocols/42-dynamic-analysis-of-your-own-program/) | ✅ | ~130 min |
+| 43 | [原生代码之外：Python、JVM、.NET 与 WebAssembly 字节码](phases/13-tools-and-protocols/43-bytecode-and-managed-formats/) | ✅ | ~150 min |
+| 44 | [二进制差分与符号执行：函数匹配与输入求解](phases/13-tools-and-protocols/44-binary-diffing-and-symbolic-execution/) | ✅ | ~150 min |
+| 45 | [AI 辅助逆向工程：LLM 反编译器、分析 agent 与真实依据](phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/) | ✅ | ~140 min |
 
 ## Phase 14: 智能体工程 — ✅ (~57 hours)
 
@@ -638,6 +652,6 @@
 
 ---
 
-**总计：20 个阶段，528 节课 | 528 已完成 | 全部课程与项目的估算合计约 1178 小时**
+**总计：20 个阶段，542 节课 | 542 已完成 | 核心课程（含综合项目）的估算合计约 1210 小时，独立实战项目另计**
 
 欢迎修订现有课程、完善示例或贡献新课程。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。

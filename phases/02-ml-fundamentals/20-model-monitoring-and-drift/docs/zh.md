@@ -43,17 +43,17 @@
 
 将输入特征 $x$ 与真实标签 $y$ 的联合概率分布展开写为两种条件概率形式：
 
-```text
-P(x, y) = P(x) * P(y | x) = P(y) * P(x | y)
+```math
+P(x, y) = P(x) \cdot P(y \mid x) = P(y) \cdot P(x \mid y)
 ```
 
 每种漂移类型对应着不同因子的变动：
 
 | 漂移类型 | 改变的部分 | 保持不变的部分 | 支付风控示例 | 哪层监控能捕捉 |
 |---|---|---|---|---|
-| 协变量漂移（Covariate drift） | $P(x)$ | $P(y \| x)$ | 营销活动带来了更多高客单价的用户 | 输入特征监控 |
-| 先验漂移（Prior drift / Label shift） | $P(y)$ | $P(x \| y)$ | 黑产集中发起攻击，欺诈率翻倍，但单笔欺诈行为模式不变 | 预测输出与结果监控 |
-| 概念漂移（Concept drift） | $P(y \| x)$ | $P(x)$ 可保持不变 | 同样的消费金额与类目现在面临完全不同的被盗刷概率 | 仅真实结果监控能看见 |
+| 协变量漂移（Covariate drift） | $P(x)$ | $P(y \mid x)$ | 营销活动带来了更多高客单价的用户 | 输入特征监控 |
+| 先验漂移（Prior drift / Label shift） | $P(y)$ | $P(x \mid y)$ | 黑产集中发起攻击，欺诈率翻倍，但单笔欺诈行为模式不变 | 预测输出与结果监控 |
+| 概念漂移（Concept drift） | $P(y \mid x)$ | $P(x)$ 可保持不变 | 同样的消费金额与类目现在面临完全不同的被盗刷概率 | 仅真实结果监控能看见 |
 
 Gama 等人在经典综述中将 $P(y | x)$ 的变动称为真实概念漂移（Real concept drift），而将仅改变 $P(x)$ 却不影响 $P(y | x)$ 的变动称为虚拟漂移（Virtual drift）。该综述还根据时间演进维度将漂移划分为突发型（Sudden）、增量型（Incremental）、渐变型（Gradual）以及周期重现型（Reoccurring）。
 
@@ -87,8 +87,8 @@ Gama 等人在经典综述中将 $P(y | x)$ 的变动称为真实概念漂移（
 
 PSI（Population Stability Index）源于银行信贷评分风控体系。它将基准数据切分为若干分箱（通常为 10 个等频分箱，即按基准十分位数切分），确保每个分箱在基准中各占 10% 的样本量。随后统计当前窗口的数据在各分箱中的实际占比，并计算加权和：
 
-```text
-PSI = sum over bins of (current_share - reference_share) * ln(current_share / reference_share)
+```math
+\text{PSI} = \sum_{\text{bins}} (\text{current\_share} - \text{reference\_share}) \cdot \ln\left(\frac{\text{current\_share}}{\text{reference\_share}}\right)
 ```
 
 某个分箱占比为零会导致对数项发散到负无穷，因此必须对所有占比做极小值平滑截断（如截断为 0.0001）。PSI 在形式上具备对称性，数学上等价于当前分布相对基准分布的 KL 散度与基准分布相对当前分布的 KL 散度之和。
@@ -99,8 +99,8 @@ PSI = sum over bins of (current_share - reference_share) * ln(current_share / re
 
 双样本 KS 检验统计量 $D$ 定义为两个经验累积分布函数（ECDF）之间的最大垂直绝对距离：
 
-```text
-D = max over x of | F_reference(x) - F_current(x) |
+```math
+D = \max_x \left\lvert F_{\text{reference}}(x) - F_{\text{current}}(x) \right\rvert
 ```
 
 若两组样本完全相同，则 $D = 0$；若两组样本的取值区间完全无交集，则 $D = 1$。它完全无需手动分箱。其 p-value 可以通过有效样本量 $n \cdot m / (n + m)$ 下的极限 Kolmogorov 分布计算得出。
@@ -111,12 +111,14 @@ D = max over x of | F_reference(x) - F_current(x) |
 
 针对支付渠道等离散类别特征，可以构建一个两行（第一行为基准频数，第二行为当前窗口频数）、$k$ 列（对应各个离散类别）的列联表。每个单元格的期望频数根据行合计与列合计计算：
 
-```text
-expected[r][c] = row_total[r] * column_total[c] / grand_total
-chi2 = sum over cells of (observed - expected)^2 / expected
+```math
+\begin{aligned}
+\text{expected}[r][c] &= \text{row\_total}[r] \cdot \text{column\_total}[c] / \text{grand\_total} \\
+\text{chi2} &= \sum_{\text{cells}} (\text{observed} - \text{expected})^2 / \text{expected}
+\end{aligned}
 ```
 
-该检验具有 $k - 1$ 个自由度。如果在当前窗口中出现了从未见过的全新类别，该单元格会贡献极大的卡方值，因此卡方检验对未知枚举值的出现极其敏锐。Cramér's V 用于度量其效应量大小，对于两行列表，它直接等于 $\sqrt{\chi^2 / \text{grand\_total}}$。
+该检验具有 $k - 1$ 个自由度。如果在当前窗口中出现了从未见过的全新类别，该单元格会贡献极大的卡方值，因此卡方检验对未知枚举值的出现极其敏锐。Cramér's V 用于度量其效应量大小，对于两行列表，它直接等于 $\sqrt{\chi^2 / \text{总样本数}}$。
 
 ### 告警阈值与防误报策略
 
@@ -324,9 +326,9 @@ print(chi2.statistic, chi2.pvalue, chi2.dof)
 | 术语 | 常见说法 | 实际含义 |
 |---|---|---|
 | 数据漂移（Data drift） | "数据变了" | 输入特征、预测输出或标签的统计分布相较于基准窗口发生显著改变 |
-| 协变量漂移（Covariate drift） | "来了新用户" | 输入特征边缘分布 $P(x)$ 改变，但输入与真实标签的关系 $P(y \| x)$ 保持不变 |
-| 先验漂移（Prior drift） | "正样本比以前多" | 标签边缘分布 $P(y)$ 改变，但各类别下的特征模式 $P(x \| y)$ 不变，亦称标签漂移 |
-| 概念漂移（Concept drift） | "游戏规则变了" | 条件概率分布 $P(y \| x)$ 发生改变，相同的输入在现实中对应着不同的正确答案 |
+| 协变量漂移（Covariate drift） | "来了新用户" | 输入特征边缘分布 $P(x)$ 改变，但输入与真实标签的关系 $P(y \mid x)$ 保持不变 |
+| 先验漂移（Prior drift） | "正样本比以前多" | 标签边缘分布 $P(y)$ 改变，但各类别下的特征模式 $P(x \mid y)$ 不变，亦称标签漂移 |
+| 概念漂移（Concept drift） | "游戏规则变了" | 条件概率分布 $P(y \mid x)$ 发生改变，相同的输入在现实中对应着不同的正确答案 |
 | 基准窗口（Reference window） | "对照样本" | 一段固定的纯净基线样本切片（通常取自训练集），所有当前窗口均与其做横向比对 |
 | PSI | "稳定性评分" | 各分箱中 (当前占比 - 基准占比) 乘以对数比率的对称加权求和指标 |
 | KS 统计量 | "KS 检验" | 两个经验累积分布函数（ECDF）之间的最大垂直绝对距离 $D$ |

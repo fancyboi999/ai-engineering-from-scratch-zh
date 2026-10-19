@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 472" role="img" aria-labelledby="plate-rea-investigation-title plate-rea-investigation-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="plate-rea-investigation-title">一个函数，四个视角</title>
+  <desc id="plate-rea-investigation-desc">使用 Ghidra provider 对 ledger-arm64-O1 的 _percent_change 运行 rea function 的记录。顶部，你调用 rea 6.7.0，将问题交给已绑定 ghidra 的 BinarySession；会话通过 bridge.sock 调用 GhidraClient，后者启动无界面 Ghidra 12.1.4 JVM，导入分析 33872 字节的 mach-o arm64 可执行文件 ledger-arm64-O1。三列展示同一函数：你在 ledger.c 写的 C；clang -O1 生成的六条指令，从 0x100000500 的 cbz w0 到 0x100000514 的 ret；Ghidra 反编译伪代码，含源码没有的第二次零值检查。底部 Evidence ev_b492c85e 标明操作 analyze_function、provider ghidra 12.1.4、配置摘要、confidence observed、静态读取的权威来源、十条限制、对象 sha256。</desc>
+  <defs><marker id="plate-rea-investigation-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="plate-rea-investigation-head-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-olive-ink, #515f26)"/></marker><marker id="plate-rea-investigation-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">四个视角</text>
+  <text x="620" y="18" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">rea function ledger-arm64-O1 _percent_change --provider ghidra</text>
+  <rect x="20" y="30" width="70" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="55" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">你</text>
+  <text x="55" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ledger.c</text>
+  <rect x="150" y="30" width="100" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="200" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">rea 6.7.0</text>
+  <text x="200" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">CLI</text>
+  <rect x="310" y="30" width="115" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="367.5" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">BinarySession</text>
+  <text x="367.5" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已绑定 ghidra</text>
+  <rect x="500" y="30" width="120" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="560" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">GhidraClient</text>
+  <text x="560" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bridge.sock</text>
+  <line x1="90" y1="50" x2="149" y2="50" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <rect class="m-knock" x="88.9" y="33.03" width="61.2" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="119.5" y="44" font-size="11.5" text-anchor="middle">function</text>
+  <line x1="250" y1="50" x2="309" y2="50" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <rect class="m-knock" x="265" y="33.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="279.5" y="44" font-size="11.5" text-anchor="middle">执行</text>
+  <line x1="425" y1="50" x2="499" y2="50" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <rect class="m-knock" x="447.5" y="33.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="462" y="44" font-size="11.5" text-anchor="middle">调用</text>
+  <rect x="500" y="92" width="120" height="44" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="560" y="108.95" font-size="11.5" text-anchor="middle" font-weight="700">Ghidra 12.1.4</text>
+  <text x="560" y="126.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">导入、分析</text>
+  <line x1="560" y1="70" x2="560" y2="91" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#plate-rea-investigation-head-olive)"/>
+  <rect class="m-knock" x="565" y="69.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="568" y="80.5" font-size="11.5" fill="var(--m-olive-ink, #515f26)">启动</text>
+  <rect x="220" y="92" width="185" height="44" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="312.5" y="108.95" font-size="11.5" text-anchor="middle" font-weight="700">ledger-arm64-O1</text>
+  <text x="312.5" y="126.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mach-o arm64，33872 字节</text>
+  <line x1="367.5" y1="70" x2="367.5" y2="91" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <rect class="m-knock" x="372.5" y="69.53" width="98" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="375.5" y="80.5" font-size="11.5">读取、计算 hash</text>
+  <line x1="55" y1="70" x2="55" y2="165" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <rect class="m-knock" x="60" y="106.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="63" y="117.5" font-size="11.5">编写</text>
+  <line x1="560" y1="136" x2="560" y2="165" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <rect class="m-knock" x="565" y="139.53" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="568" y="150.5" font-size="11.5">反编译</text>
+  <rect x="20" y="166" width="190" height="134" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="26" y="184" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">你编写 · ledger.c</text>
+  <text x="26" y="199" font-size="11">int percent_change(</text>
+  <text x="26" y="214" font-size="11">  int before, int after) {</text>
+  <text x="26" y="229" font-size="11">  if (before == 0)</text>
+  <text x="26" y="244" font-size="11">    return 0;</text>
+  <text x="26" y="259" font-size="11">  return (after - before)</text>
+  <text x="26" y="274" font-size="11">    * 100 / before;</text>
+  <text x="26" y="289" font-size="11">}</text>
+  <rect x="220" y="166" width="185" height="119" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="226" y="184" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">clang -O1 生成 · 24 字节</text>
+  <text x="226" y="199" font-size="11">500  cbz w0, 0x100000514</text>
+  <text x="226" y="214" font-size="11">504  sub w8, w1, w0</text>
+  <text x="226" y="229" font-size="11">508  mov w9, #0x64</text>
+  <text x="226" y="244" font-size="11">50c  mul w8, w8, w9</text>
+  <text x="226" y="259" font-size="11">510  sdiv w0, w8, w0</text>
+  <text x="226" y="274" font-size="11">514  ret</text>
+  <rect x="415" y="166" width="205" height="179" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="421" y="184" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Ghidra 反编译</text>
+  <text x="421" y="199" font-size="11">ulong _percent_change(</text>
+  <text x="421" y="214" font-size="11">  ulong param_1,int param_2)</text>
+  <text x="421" y="229" font-size="11">iVar2 = (int)param_1;</text>
+  <text x="421" y="244" font-size="11">if (iVar2 != 0) {</text>
+  <text x="421" y="259" font-size="11">  uVar1 = 0;</text>
+  <text x="421" y="274" font-size="11">  if (iVar2 != 0) {</text>
+  <text x="421" y="289" font-size="11">  uVar1 = ((param_2 - iVar2)</text>
+  <text x="421" y="304" font-size="11">    * 100) / iVar2;</text>
+  <text x="421" y="319" font-size="11">  param_1 = (ulong)uVar1;</text>
+  <text x="421" y="334" font-size="11">return param_1;</text>
+  <line x1="517" y1="345" x2="517" y2="365" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-teal)"/>
+  <rect class="m-knock" x="522" y="344.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="525" y="355" font-size="11.5" fill="var(--m-teal-ink, #18696a)">记录</text>
+  <rect x="20" y="366" width="600" height="92" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="320" y="392.1" font-size="12" text-anchor="middle" font-weight="700">_percent_change 的 Evidence ev_b492c85e</text>
+  <text x="320" y="409.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">操作 analyze_function · provider ghidra 12.1.4</text>
+  <text x="320" y="424.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">confidence observed · 十条限制</text>
+  <text x="320" y="439.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">对象 ledger-arm64-O1 · mach-o arm64</text>
+</svg>

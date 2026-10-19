@@ -39,27 +39,29 @@ DeepSeek-V3 在主模型之上加 `D` 个 MTP 模块。每个模块 `k`（`k = 1
 
 训练时，对到位置 `i` 的前缀，按深度的隐藏状态是：
 
-```
-h_i^(0) = main model backbone at position i
-h_i^(k) = T_k( M_k * concat(RMSNorm(h_i^(k-1)), RMSNorm(E(t_{i+k}))) )   for k >= 1
+```math
+\begin{aligned}
+h_i^{(0)} &= \text{该位置的主模型骨干：} i \\
+h_i^{(k)} &= T_k\Big( M_k \cdot \mathop{\mathrm{concat}}\big(\mathop{\mathrm{RMSNorm}}(h_i^{(k-1)}), \mathop{\mathrm{RMSNorm}}(E(t_{i+k}))\big) \Big) \quad \text{对于 } k \ge 1
+\end{aligned}
 ```
 
 按深度的预测是：
 
-```
-logits_{i+k} = Out(h_i^(k-1))   for k = 1..D
+```math
+\text{logits}_{i+k} = \mathop{\mathrm{Out}}(h_i^{(k-1)}) \quad \text{对于 } k = 1, \ldots, D
 ```
 
 按深度的损失是对真值 `t_{i+k}` 的交叉熵：
 
-```
-L_k = CE(logits_{i+k}, t_{i+k})
+```math
+L_k = \mathop{\mathrm{CE}}(\text{logits}_{i+k}, t_{i+k})
 ```
 
 跨深度的联合损失：
 
-```
-L_MTP = (lambda / D) * sum_{k=1..D} L_k
+```math
+L_{\text{MTP}} = \frac{\lambda}{D} \sum_{k=1}^{D} L_k
 ```
 
 `lambda` 是一个小加权因子——DeepSeek-V3 在训练前 10% 用 0.3，之后用 0.1。总训练损失是 `L_main + L_MTP`。
@@ -174,7 +176,7 @@ MTP 集成在 DeepSeek-V3（2024 年 12 月）和 DeepSeek-R1 系列里。推理
 
 2. 为一个稠密 70B 模型（hidden 8192，80 层）配 D=1 MTP 模块计算参数开销。和 DeepSeek-V3 报告的 14B 开销对比。解释为什么 DeepSeek 的数字更高：MTP transformer 块继承了相同的 MoE 结构，膨胀了每模块参数量。
 
-3. 在玩具里实现 D=2：加第二个 MTP 模块，接收 h^(1) 并预测 `t_{i+2}`。验证联合损失和参数核算匹配 DeepSeek 论文的方程 19-21。
+3. 在玩具里实现 D=2：加第二个 MTP 模块，接收 $h^{(1)}$ 并预测 `t_{i+2}`。验证联合损失和参数核算匹配 DeepSeek 论文的方程 19-21。
 
 4. 把玩具切换成并行 MTP（Gloeckle 风格）：在主隐藏状态之上加 D 个输出头，每个预测一个不同偏移。测量按深度损失在同一合成信号上和顺序版本如何比较。顺序版本对 k > 1 应该产出更低的深度 k 损失，因为它以中间预测为条件。
 
@@ -190,8 +192,8 @@ MTP 集成在 DeepSeek-V3（2024 年 12 月）和 DeepSeek-R1 系列里。推理
 | 顺序 MTP | "DeepSeek-V3 风格" | 每个模块以上一深度的隐藏状态加下一个 token 的 embedding 为条件；保住因果链 |
 | 共享输出头 | "复用主头" | MTP 模块调用主模型的 LM 头，不是单独的输出投影 |
 | 共享 embedding | "复用主表" | 到处用同一张词表 embedding 表；无重复参数 |
-| 投影矩阵 M_k | "结合隐藏 + 下一个 token" | 一个 `h x 2h` 线性层，把上一隐藏状态和目标 token embedding 折进下一深度的输入 |
-| 联合损失 L_MTP | "平均后的额外损失" | 按深度交叉熵损失的算术平均，按 `lambda` 缩放 |
+| 投影矩阵 $M_k$ | "结合隐藏 + 下一个 token" | 一个 `h x 2h` 线性层，把上一隐藏状态和目标 token embedding 折进下一深度的输入 |
+| 联合损失 $L_{\text{MTP}}$ | "平均后的额外损失" | 按深度交叉熵损失的算术平均，按 `lambda` 缩放 |
 | 深度 1 处的接受率 | "MTP draft 多常对" | D=1 MTP 模块的 top-1 预测等于主模型 top-1 预测的比率；DeepSeek-V3 上 80%+ |
 | Lambda 加权 | "额外损失的重要性" | 按深度的缩放因子；DeepSeek-V3 上训练开始 0.3，之后 0.1 |
 

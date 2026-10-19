@@ -28,9 +28,11 @@ Gao、Schulman、Hilton（2023）直接测了这件事。从 10 万条标注训�
 
 Gao et al. 给了一个函数形式。设 `d = sqrt(KL(pi || pi_init))`。设 `R_proxy(d)` 为平均代理奖励，`R_gold(d)` 为平均金标准奖励。实证上：
 
-```
-R_proxy(d) = alpha * d - beta_proxy * d^2
-R_gold(d)  = alpha * d - beta_gold  * d^2
+```math
+\begin{aligned}
+R_{\text{proxy}}(d) &= \alpha d - \beta_{\text{proxy}} d^2 \\
+R_{\text{gold}}(d) &= \alpha d - \beta_{\text{gold}} d^2
+\end{aligned}
 ```
 
 其中 `beta_gold > beta_proxy`。两者都从零 KL 开始上升，都会达峰，金标准的峰离原点更近。在大 `d` 处，金标准跌破基线，而代理还在往上爬。在 BoN 采样、PPO、SFT-to-best 之间，代理-金标准缝隙都有同样的特征。

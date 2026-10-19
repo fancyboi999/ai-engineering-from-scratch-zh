@@ -26,13 +26,13 @@
 Heusel et al. (2017)。步骤：
 
 1. 为 N 张真实图和 N 张生成图提取 Inception-v3 特征（2048 维）。
-2. 给每一池拟合一个高斯：算均值 `μ_r, μ_g` 和协方差 `Σ_r, Σ_g`。
-3. FID = `||μ_r - μ_g||² + Tr(Σ_r + Σ_g - 2 · (Σ_r · Σ_g)^0.5)`。
+2. 给每一池拟合一个高斯：算均值 $\mu_r, \mu_g$ 和协方差 $\Sigma_r, \Sigma_g$。
+3. $\text{FID} = \lVert \mu_r - \mu_g \rVert^2 + \mathop{\mathrm{Tr}}\left(\Sigma_r + \Sigma_g - 2 \cdot (\Sigma_r \cdot \Sigma_g)^{0.5}\right)$。
 
 解读：特征空间里两个多元高斯之间的 Fréchet 距离。越低 = 分布越相似。
 
 失效模式：
-- **小 N 上有偏。** FID 是在特征分布上的均方——小 N 会低估协方差，给出假性偏低的 FID。永远用 N ≥ 10,000。
+- **小 N 上有偏。** FID 是在特征分布上的均方——小 N 会低估协方差，给出假性偏低的 FID。永远用 $N \ge 10{,}000$。
 - **依赖 Inception。** Inception-v3 是在 ImageNet 上训的。离 ImageNet 很远的领域（人脸、艺术、文字图像）算出来的 FID 毫无意义。用一个领域专属的特征提取器。
 - **刷分。** 过拟合 Inception 先验能在没有视觉质量提升的情况下拿到低 FID。用 CMMD（下文）来对付它。
 

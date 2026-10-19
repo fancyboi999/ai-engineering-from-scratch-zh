@@ -69,11 +69,11 @@ Show-o 在推理时支持四个任务，由 prompt 格式选定：
 
 每步解掩多少 token 的调度塑造质量。Show-o 推荐 cosine：
 
-```
-mask_ratio(t) = cos(pi * t / (2 * T))   # t = 0..T
+```math
+\text{mask\_ratio}(t) = \cos\left(\frac{\pi t}{2T}\right) \qquad t = 0, \ldots, T
 ```
 
-第 0 步，所有 token 被掩（比例 1.0）。第 T 步，无掩码。cosine 把质量集中在预测最有信息量的中段比例上。linear 调度也能用，但平台化更快。
+第 0 步，所有 token 被掩（比例 1.0）。第 $T$ 步，无掩码。cosine 把质量集中在预测最有信息量的中段比例上。linear 调度也能用，但平台化更快。
 
 ### Show-o2
 
@@ -117,7 +117,7 @@ masked-diffusion-unmask
 
 3. cosine 调度 vs linear 调度：对 T=8 追一遍每步未掩 token 数。哪个更均衡？
 
-4. 一张 512x512 的 Show-o 图是 1024 个 token。在词表 K=16384 下，模型吐出 1024 * log2(16384) = 14,336 比特（约 1.75 KiB）数据。Stable Diffusion 输出 512*512*24 比特 = 6,291,456 比特（约 768 KiB）原始像素。压缩比是多少，它买来什么质量？
+4. 一张 512x512 的 Show-o 图是 1024 个 token。在词表 $K=16384$ 下，模型吐出 $1024 \cdot \log_2(16384) = 14{,}336$ 比特（约 1.75 KiB）数据。Stable Diffusion 输出 512*512*24 比特 = 6,291,456 比特（约 768 KiB）原始像素。压缩比是多少，它买来什么质量？
 
 5. 读 LlamaGen（arXiv:2406.06525）。LlamaGen 的类别条件自回归图像模型与 Show-o 的掩码路线有何不同？
 

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 404" role="img" aria-labelledby="fig-5-4-title fig-5-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-4-title">一次 analyze_function 调用经过快照缓存</title>
+  <desc id="fig-5-4-desc">顶行：procedure _percent_change 的 analyze_function 通过可缓存检查，因为 Ghidra 将操作标为 cachePolicy snapshot、mutatesArtifact false，随后生成 query ID。中间：query ID 是 canonical JSON 的 SHA-256，内容包括目标摘要 01b5d08b08fb、kind executable、format mach-o、architecture arm64，provider ghidra 12.1.4 与 profile digest 3fc72c9b4b7 的绑定，以及操作和参数。左下命中后重放条目，并注明未重新运行 provider。右下未命中则 Ghidra bridge 回答，记录 Evidence ev_b492c85e，按 ID 存条目。末行：annotate_native_function 等修改操作在 rea 分派给 Ghidra 前就使缓存失效，即使后续响应失败，之后快照导出也会被拒绝。</desc>
+  <defs><marker id="fig-5-4-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-5-4-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
+  <rect x="20" y="28" width="220" height="52" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="130" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">analyze_function</text>
+  <text x="130" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">{&quot;procedure&quot;: &quot;_percent_change&quot;}</text>
+  <rect x="270" y="28" width="160" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="350" y="41.75" font-size="12.5" text-anchor="middle" font-weight="700">可缓存？</text>
+  <text x="350" y="59.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">cachePolicy snapshot</text>
+  <text x="350" y="74.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mutatesArtifact false</text>
+  <rect x="460" y="28" width="160" height="52" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="540" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">Query ID</text>
+  <text x="540" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">query_ 加 SHA-256</text>
+  <line x1="240" y1="54" x2="269" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-4-head-ink)"/>
+  <line x1="430" y1="54" x2="459" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-4-head-ink)"/>
+  <rect class="m-knock" x="435.75" y="37.03" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="444.5" y="48" font-size="11.5" text-anchor="middle">是</text>
+  <rect x="20" y="104" width="600" height="92" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="30" y="122" font-size="12" font-weight="700" fill="var(--m-teal-ink, #18696a)">query_ = canonical JSON 的 SHA-256</text>
+  <text x="30" y="140" font-size="11">target: sha256 01b5d08b, executable, mach-o, arm64</text>
+  <text x="30" y="155" font-size="11">binding: provider ghidra 12.1.4, analysis_profile digest 3fc72c9b</text>
+  <text x="30" y="170" font-size="11">operation: analyze_function</text>
+  <text x="30" y="185" font-size="11">parameters: {&quot;procedure&quot;: &quot;_percent_change&quot;}</text>
+  <line x1="540" y1="80" x2="540" y2="103" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-4-head-ink)"/>
+  <rect x="20" y="236" width="290" height="74" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="165" y="253.25" font-size="12.5" text-anchor="middle" font-weight="700">找到条目：重放</text>
+  <text x="165" y="270.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">添加限制：来自本地</text>
+  <text x="165" y="285.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">REA 分析快照；本次调用</text>
+  <text x="165" y="300.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未重新运行 provider。</text>
+  <rect x="330" y="236" width="290" height="74" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="475" y="253.25" font-size="12.5" text-anchor="middle" font-weight="700">无条目：调用 Ghidra bridge</text>
+  <text x="475" y="270.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">目标首次调用需 5 至 7 s，</text>
+  <text x="475" y="285.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">随后记录 Evidence ev_b492c85e</text>
+  <text x="475" y="300.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">并按 ID 保存条目</text>
+  <line x1="165" y1="196" x2="165" y2="235" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-4-head-ink)"/>
+  <rect class="m-knock" x="170" y="204.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="173" y="215.5" font-size="11.5">命中</text>
+  <line x1="475" y1="196" x2="475" y2="235" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-4-head-ink)"/>
+  <rect class="m-knock" x="480" y="204.53" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="483" y="215.5" font-size="11.5">未命中</text>
+  <rect x="20" y="334" width="290" height="56" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="165" y="349.75" font-size="12.5" text-anchor="middle" font-weight="700">annotate_native_function</text>
+  <text x="165" y="367.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">修改操作，在 rea</text>
+  <text x="165" y="382.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">分派给 Ghidra 之前</text>
+  <rect x="330" y="334" width="290" height="56" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="475" y="349.75" font-size="12.5" text-anchor="middle" font-weight="700">invalidateSnapshot</text>
+  <text x="475" y="367.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">即使调用失败也丢弃条目，</text>
+  <text x="475" y="382.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">查询未命中，拒绝快照导出</text>
+  <line x1="310" y1="362" x2="329" y2="362" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-4-head-amber)"/>
+</svg>

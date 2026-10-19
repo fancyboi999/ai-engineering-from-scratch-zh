@@ -43,6 +43,7 @@ https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/mai
 - `MCP-LEARNING.md` 属于 Model Context Protocol (MCP) 路线的 `learn-mcp`。
 - `MCP-ENGINEERING-LEARNING.md` 是同一 `learn-mcp` 路线的旧文件名，不是独立路线。
 - `AGENT-SKILLS-LEARNING.md` 属于 `learn-agent-skills`。
+- `REVERSE-ENGINEERING-LEARNING.md` 属于 `learn-reverse-engineering`。
 - `CLAUDE-CERTIFICATION.md` 属于 `claude-certification`。
 
 学习者在续学请求中点名路线时，即使其他状态文件存在，也立即分派给所有者。所有者是 `learn` 时继续第 0 步；否则调用点名所有者并停止本 skill。
@@ -58,6 +59,10 @@ https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/mai
 ## 专门 Agent Skills 交接
 
 学习者要求 Agent Skills 路线，或者存在 `AGENT-SKILLS-LEARNING.md` 且其要求继续/恢复 Agent Skills 时，交接给可移植 skill `learn-agent-skills`。其唯一事实来源为 `learning-paths/agent-skills.json`。按宿主调用契约渲染交接。不要选择数值上的下一节第 13 阶段课程，也不要将 Agent Skills 状态复制到 `LEARNING.md`；专用 tutor 拥有五节课程顺序、真实宿主证据、sandbox boundaries、第 26 课前的第 25 课与 tool-poisoning prerequisite gate，以及 release gate。
+
+## 专门逆向工程交接
+
+学习者要求逆向工程路径，或存在 `REVERSE-ENGINEERING-LEARNING.md` 且其要求继续该路径时，交接给可移植技能 `learn-reverse-engineering`。唯一真相是 `learning-paths/reverse-engineering.json`。按宿主调用契约渲染交接。不要把此路径状态复制到 `LEARNING.md`；专用导师负责十四节课的顺序，以及第 32 课前的 `own-binaries-only` 检查。
 
 ## 第 0 步 —— 定位状态
 

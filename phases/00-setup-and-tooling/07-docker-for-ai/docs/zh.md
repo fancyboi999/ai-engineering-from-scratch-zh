@@ -375,6 +375,16 @@ docker logs -f <container_id>
 3. 往 Dockerfile 里加上 `flask`，重建，在 5000 端口跑一个简单的 API 服务器。用 `-p 5000:5000` 映射端口
 4. 用 `docker images` 量一下镜像大小。试着把基础镜像从 `devel` 换成 `runtime`，对比两者大小
 
+### 提示
+
+**练习 1。** 按课程命令运行 `docker build -t ai-dev -f phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile .` 构建，再通过 `docker run --rm ai-dev` 在容器内执行导入。Mac 上按课程说明省略 `--gpus all`。容器输出的版本应以 `2.6.0` 开头。
+
+**练习 2。** 在 `code/` 文件夹运行 `docker compose up -d`，再用 `docker compose exec ai-dev bash` 进入 `ai-dev` 服务。在其中运行 `curl http://qdrant:6333/collections`；收到 JSON 回复表示 Compose 网络能解析该服务名。
+
+**练习 3。** 在 Dockerfile 中添加 `RUN pip install flask` 并重新构建。启动服务时指定 `host="0.0.0.0"`，因为绑定容器内 localhost 的服务无法从外部访问。在宿主机打开 `http://localhost:5000`，确认端口映射可用。
+
+**练习 4。** 运行 `docker images ai-dev`，记录 SIZE 列。将 `FROM` 行中的 `devel` 改为 `runtime`，用新标签构建并比较体积；runtime 镜像省去了编译器和头文件。
+
 ## 关键术语
 
 | 术语 | 大家口头怎么说 | 它实际指什么 |

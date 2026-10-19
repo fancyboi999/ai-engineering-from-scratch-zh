@@ -24,7 +24,7 @@ function collect(root) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const file = path.join(dir, entry.name);
       if (entry.isDirectory()) walk(file);
-      else if (entry.name === 'zh.md') {
+      else if (['zh.md', 'project.json', 'manual.json'].includes(entry.name)) {
         text.push(fs.readFileSync(file, 'utf8'));
       }
     }

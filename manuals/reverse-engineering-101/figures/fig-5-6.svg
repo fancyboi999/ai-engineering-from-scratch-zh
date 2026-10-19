@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="fig-5-6-title fig-5-6-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-6-title">比较 -O1 与 -O2 构建中的两个函数</title>
+  <desc id="fig-5-6-desc">两表各八个比较维度。左侧 _percent_change：identity、pseudocode 272 对 272 码点、assembly 161 对 161、comments 0 对 0、calls 1 对 1、strings_names 1 对 1、cfg 3 对 3 均 unchanged；references 3 对 3 为 unknown，因为未命名引用端点在两个不同 artifact 间没有稳定身份，因此整体 status unknown。右侧 _total：identity、comments、calls 未变，pseudocode 从 300 增至 2904 码点、assembly 336 至 1866、references 4 至 13、strings_names 2 至 11、cfg 5 至 16 基本块，因此五维 changed，整体 status changed。注释说明 references 为何 unknown。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · _PERCENT_CHANGE，-O1 对 -O2</text>
+  <rect x="20" y="26" width="290" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
+  <text x="30" y="42.45" font-size="11.5" font-weight="700">status unknown：7 unchanged，1 unknown</text>
+  <rect x="20" y="52" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="68" font-size="11">identity</text>
+  <text x="140" y="68" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">digests equal</text>
+  <text x="235" y="68" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="20" y="76" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="92" font-size="11">pseudocode</text>
+  <text x="140" y="92" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">272 to 272</text>
+  <text x="235" y="92" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="20" y="100" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="116" font-size="11">assembly</text>
+  <text x="140" y="116" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">161 to 161</text>
+  <text x="235" y="116" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="20" y="124" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="140" font-size="11">comments</text>
+  <text x="140" y="140" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">0 to 0</text>
+  <text x="235" y="140" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="20" y="148" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="164" font-size="11">calls</text>
+  <text x="140" y="164" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">1 to 1</text>
+  <text x="235" y="164" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="20" y="172" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
+  <text x="30" y="188" font-size="11">references</text>
+  <text x="140" y="188" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">3 to 3</text>
+  <text x="235" y="188" font-size="11" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">unknown</text>
+  <rect x="20" y="196" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="212" font-size="11">strings_names</text>
+  <text x="140" y="212" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">1 to 1</text>
+  <text x="235" y="212" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="20" y="220" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="30" y="236" font-size="11">cfg</text>
+  <text x="140" y="236" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">3 to 3</text>
+  <text x="235" y="236" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <text x="330" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · _TOTAL，-O1 对 -O2</text>
+  <rect x="330" y="26" width="290" height="26" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="340" y="42.45" font-size="11.5" font-weight="700">status changed，8 维中 5 维</text>
+  <rect x="330" y="52" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="340" y="68" font-size="11">identity</text>
+  <text x="450" y="68" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">digests equal</text>
+  <text x="545" y="68" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="330" y="76" width="290" height="24" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="340" y="92" font-size="11">pseudocode</text>
+  <text x="450" y="92" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">300 to 2904</text>
+  <text x="545" y="92" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">changed</text>
+  <rect x="330" y="100" width="290" height="24" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="340" y="116" font-size="11">assembly</text>
+  <text x="450" y="116" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">336 to 1866</text>
+  <text x="545" y="116" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">changed</text>
+  <rect x="330" y="124" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="340" y="140" font-size="11">comments</text>
+  <text x="450" y="140" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">0 to 0</text>
+  <text x="545" y="140" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="330" y="148" width="290" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="340" y="164" font-size="11">calls</text>
+  <text x="450" y="164" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">1 to 1</text>
+  <text x="545" y="164" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">unchanged</text>
+  <rect x="330" y="172" width="290" height="24" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="340" y="188" font-size="11">references</text>
+  <text x="450" y="188" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">4 to 13</text>
+  <text x="545" y="188" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">changed</text>
+  <rect x="330" y="196" width="290" height="24" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="340" y="212" font-size="11">strings_names</text>
+  <text x="450" y="212" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">2 to 11</text>
+  <text x="545" y="212" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">changed</text>
+  <rect x="330" y="220" width="290" height="24" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="340" y="236" font-size="11">cfg</text>
+  <text x="450" y="236" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">5 to 16</text>
+  <text x="545" y="236" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">changed</text>
+  <text x="20" y="268" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两个文本维度按码点计数，其余按条目计数。</text>
+  <text x="20" y="284" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">虚线行为 unknown：未命名引用端点在两个 artifact 间没有稳定身份。</text>
+</svg>

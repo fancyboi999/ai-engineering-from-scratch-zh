@@ -97,7 +97,7 @@ ViT-B/16 堆 12 个这样的块，每个 12 个注意力头，共 8600 万参数
 
 - 16x16 patch -> 196 token，标准。
 - 32x32 patch -> 49 token，更快但分辨率更低。
-- 8x8 patch -> 784 token，更细但 O(n^2) 注意力成本缩放很差。
+- 8x8 patch -> 784 token，更细但 $O(n^2)$ 注意力成本缩放很差。
 
 patch 越大 = token 越少 = 越快但空间细节越少。SwinV2 在层级窗口里用 4x4 patch。
 

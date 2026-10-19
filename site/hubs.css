@@ -357,3 +357,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.hub-sheet {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hub-sheet a {
+  color: var(--blueprint);
+}

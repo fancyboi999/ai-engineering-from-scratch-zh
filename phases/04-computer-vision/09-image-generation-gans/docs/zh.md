@@ -9,7 +9,7 @@
 
 ## 学习目标
 
-- 解释生成器和判别器之间的极小极大博弈，以及为什么均衡对应于 p_model = p_data
+- 解释生成器和判别器之间的极小极大博弈，以及为什么均衡对应于 $p_{\text{model}} = p_{\text{data}}$
 - 用 PyTorch 实现一个 DCGAN，在 60 行以内让它生成连贯的 32x32 合成图像
 - 用三个标准技巧稳定 GAN 训练：非饱和损失、谱归一化、TTUR（双时间尺度更新规则）
 - 读懂训练曲线，区分健康收敛与模式崩溃、震荡、判别器完胜
@@ -45,8 +45,8 @@ flowchart LR
 
 G 想让 D 出错。D 想做对。形式上：
 
-```
-min_G max_D  E_x[log D(x)] + E_z[log(1 - D(G(z)))]
+```math
+\min_G \max_D \; \mathbb{E}_x[\log D(x)] + \mathbb{E}_z[\log(1 - D(G(z)))]
 ```
 
 从右往左读：D 在最大化对真（`log D(real)`）图像和假（`log (1 - D(fake))`）图像的准确率。G 在最小化 D 对假图的准确率——它想让 `D(G(z))` 高。
@@ -57,9 +57,11 @@ Goodfellow 证明了这个极小极大有一个全局均衡，此时 `p_G = p_da
 
 上面那个形式数值不稳定。训练早期，每张假图的 `D(G(z))` 都接近零，所以 `log(1 - D(G(z)))` 关于 G 的梯度消失。修法：把 G 的损失翻过来。
 
-```
-L_D = -E_x[log D(x)] - E_z[log(1 - D(G(z)))]
-L_G = -E_z[log D(G(z))]                          # 非饱和
+```math
+\begin{aligned}
+L_D &= -\mathbb{E}_x[\log D(x)] - \mathbb{E}_z[\log(1 - D(G(z)))] \\
+L_G &= -\mathbb{E}_z[\log D(G(z))] \qquad \text{（非饱和）}
+\end{aligned}
 ```
 
 现在当 `D(G(z))` 接近零时，G 的损失很大，它的梯度有信息量。每个现代 GAN 都用这个变体训练。
@@ -299,8 +301,8 @@ def build_sn_discriminator(img_channels=3, feat=64):
 |------|----------------|----------------------|
 | 生成器（G） | "画东西的网" | 把噪声映射到图像；被训练来骗过判别器 |
 | 判别器（D） | "评审" | 二分类器；被训练来区分真图和生成图 |
-| 极小极大 | "博弈" | 一个对抗损失对 G 取 min、对 D 取 max；均衡是 p_G = p_data |
-| 非饱和损失 | "数值上理智的版本" | G 的损失是 -log(D(G(z))) 而非 log(1 - D(G(z)))，避免训练早期梯度消失 |
+| 极小极大 | "博弈" | 一个对抗损失对 G 取 min、对 D 取 max；均衡是 $p_G = p_{\text{data}}$ |
+| 非饱和损失 | "数值上理智的版本" | G 的损失是 $-\log(D(G(z)))$ 而非 $\log(1 - D(G(z)))$，避免训练早期梯度消失 |
 | 模式崩溃 | "生成器只做一种东西" | G 只产出数据分布的一小个子集；用 SN、minibatch discrimination 或更大 batch 修 |
 | TTUR | "两个学习率" | D 比 G 快地学习，通常 2-4 倍；稳定训练 |
 | 谱归一化 | "1-Lipschitz 层" | 一种权重归一化，约束每层的 Lipschitz 常数；阻止 D 变得任意陡 |

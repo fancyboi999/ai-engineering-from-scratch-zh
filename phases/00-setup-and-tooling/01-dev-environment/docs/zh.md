@@ -210,3 +210,11 @@ Next: python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vector
 1. 运行验证脚本并修复任何失败项
 2. 为本课程创建一个 Python 虚拟环境并安装 PyTorch
 3. 用全部四种语言写一个 "hello world" 并各自运行
+
+### 提示
+
+**练习 1。** 从仓库根目录运行 `python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner`。先修复第一条失败项，再看下一条。重新运行脚本，直到所有必需探测均通过。
+
+**练习 2。** 在仓库根目录用 `uv venv` 创建环境并激活，然后按第 6 步中适合你硬件的命令安装 PyTorch。在环境内运行 `python -c "import torch; print(torch.__version__)"`；输出版本号即表示安装成功。
+
+**练习 3。** 使用“核心概念”中的四种运行时：Python、Node.js 上的 TypeScript、Rust 和 Julia。每种语言各写一个小文件，分别用 `python3`、`npx tsx`（Node.js 不能直接运行 `.ts` 文件）、`cargo run` 或 `rustc`、`julia` 执行。每次运行都须输出你的消息，并以状态码 0 退出。

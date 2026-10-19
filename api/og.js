@@ -92,7 +92,8 @@ function createHandler({ manifest = readSite, render = renderCard } = {}) {
     try {
       if (!rendered.has(location)) {
         if (rendered.size >= RENDERED_LIMIT) rendered.delete(rendered.keys().next().value);
-        rendered.set(location, render(spec));
+        if (spec.image && spec.image !== "anatomy/inside-an-ai-agent-og.png") throw new Error("Unknown poster asset");
+        rendered.set(location, spec.image ? fs.readFileSync(path.join(SITE, spec.image)) : render(spec));
       }
     } catch (_) {
       return send(res, method, 500, 'no-store', '无法渲染卡片');

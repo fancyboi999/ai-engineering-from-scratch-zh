@@ -4,7 +4,11 @@
   "id": "agentic-ai-engineer",
   "title": "Agent 系统工程",
   "workFamily": "Agent 系统工程",
-  "commonTitles": ["Agent 系统工程师", "Agentic AI 工程师", "AI Agent 工程师"],
+  "commonTitles": [
+    "Agent 系统工程师",
+    "Agentic AI 工程师",
+    "AI Agent 工程师"
+  ],
   "summary": "构建使用工具的 agent 循环，并让上下文、记忆、编排、安全、评估和生产控制都明确可见。",
   "keywords": "agentic ai engineer agents tools mcp memory orchestration safety evaluation runtime observability",
   "decisionPrompt": "你是否想构建一类使用工具的系统，让它的状态、决策、失败和控制措施始终可观测？",
@@ -46,9 +50,22 @@
     "能从轨迹中评估行为，并根据追踪来运行系统。"
   ],
   "coverage": {
-    "strong": ["工具契约和 agent 循环", "上下文、记忆和状态", "编排和失败模式", "Agent 安全、评估和可观测性"],
-    "partial": ["分布式 agent 系统", "人工审批实践", "长运行工作流的持久性"],
-    "outsideCourse": ["生产环境集群的所有权", "服务提供商内部的模型控制", "多年线上值班经验"]
+    "strong": [
+      "工具契约和 agent 循环",
+      "上下文、记忆和状态",
+      "编排和失败模式",
+      "Agent 安全、评估和可观测性"
+    ],
+    "partial": [
+      "分布式 agent 系统",
+      "人工审批实践",
+      "长运行工作流的持久性"
+    ],
+    "outsideCourse": [
+      "生产环境集群的所有权",
+      "服务提供商内部的模型控制",
+      "多年线上值班经验"
+    ]
   },
   "completionClaim": "完成本路线表明你能够构建和评估可观测的 agent 系统，但不保证获得相关职位，也不能证明你有运行生产环境 agent 集群的经验。",
   "sourceBasis": {
@@ -105,19 +122,98 @@
     }
   ],
   "lessons": [
-    {"order": 1, "path": "phases/13-tools-and-protocols/01-the-tool-interface", "minutes": 45, "required": true},
-    {"order": 2, "path": "phases/13-tools-and-protocols/05-tool-schema-design", "minutes": 45, "required": true},
-    {"order": 3, "path": "phases/13-tools-and-protocols/06-mcp-fundamentals", "minutes": 55, "required": true},
-    {"order": 4, "path": "phases/14-agent-engineering/01-the-agent-loop", "minutes": 60, "required": true},
-    {"order": 5, "path": "phases/14-agent-engineering/06-tool-use-and-function-calling", "minutes": 60, "required": true},
-    {"order": 6, "path": "phases/11-llm-engineering/05-context-engineering", "minutes": 90, "required": true},
-    {"order": 7, "path": "phases/14-agent-engineering/07-memory-virtual-context-memgpt", "minutes": 75, "required": true},
-    {"order": 8, "path": "phases/14-agent-engineering/13-langgraph-stateful-graphs", "minutes": 75, "required": true},
-    {"order": 9, "path": "phases/14-agent-engineering/28-orchestration-patterns", "minutes": 60, "required": true},
-    {"order": 10, "path": "phases/14-agent-engineering/26-failure-modes-agentic", "minutes": 60, "required": true},
-    {"order": 11, "path": "phases/14-agent-engineering/27-prompt-injection-defense", "minutes": 75, "required": true},
-    {"order": 12, "path": "phases/14-agent-engineering/30-eval-driven-agent-development", "minutes": 60, "required": true},
-    {"order": 13, "path": "phases/14-agent-engineering/29-production-runtimes", "minutes": 60, "required": true},
-    {"order": 14, "path": "phases/14-agent-engineering/24-agent-observability-platforms", "minutes": 45, "required": true}
+    {
+      "order": 1,
+      "path": "phases/13-tools-and-protocols/01-the-tool-interface",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 2,
+      "path": "phases/13-tools-and-protocols/05-tool-schema-design",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 3,
+      "path": "phases/13-tools-and-protocols/06-mcp-fundamentals",
+      "minutes": 55,
+      "required": true
+    },
+    {
+      "order": 4,
+      "path": "phases/14-agent-engineering/01-the-agent-loop",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 5,
+      "path": "phases/14-agent-engineering/06-tool-use-and-function-calling",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 6,
+      "path": "phases/11-llm-engineering/05-context-engineering",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 7,
+      "path": "phases/14-agent-engineering/07-memory-virtual-context-memgpt",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 8,
+      "path": "phases/14-agent-engineering/13-langgraph-stateful-graphs",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 9,
+      "path": "phases/14-agent-engineering/28-orchestration-patterns",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 10,
+      "path": "phases/14-agent-engineering/26-failure-modes-agentic",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 11,
+      "path": "phases/14-agent-engineering/27-prompt-injection-defense",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 12,
+      "path": "phases/14-agent-engineering/30-eval-driven-agent-development",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 13,
+      "path": "phases/14-agent-engineering/29-production-runtimes",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 14,
+      "path": "phases/14-agent-engineering/24-agent-observability-platforms",
+      "minutes": 45,
+      "required": true
+    }
+  ],
+  "projects": [
+    "tiny-coding-agent",
+    "skill-router",
+    "agent-trace-debugger",
+    "memory-server",
+    "tool-call-firewall",
+    "durable-agent-jobs",
+    "browser-agent"
   ]
 }

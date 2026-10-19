@@ -1,0 +1,78 @@
+{
+  "lesson": "33-disassembly-and-control-flow",
+  "title": "反汇编与控制流：从字节到可核验的图",
+  "questions": [
+    {
+      "stage": "pre",
+      "question": "llvm-objdump 的反汇编列表将函数每个字节都解码为真实助记符。这能证明什么？",
+      "options": [
+        "函数没有间接跳转",
+        "只能证明线性扫描为每个字节找到了指令边界；代码内嵌数据处仍可能出错",
+        "列表中的每条指令都会执行",
+        "控制流图完整"
+      ],
+      "correct": 1,
+      "explanation": "扫描会将数据解码为代码，并在几个字节内重新同步。因此可信的列表并不能证明指令边界或可达性。"
+    },
+    {
+      "stage": "check",
+      "question": "48 8d 0d 00 00 00 00 解码为 leaq (%rip), %rcx，.rela.text 在位移字段处有 R_X86_64_PC32 .rodata-0x4。链接后操作数指向哪里？",
+      "options": [
+        "lea 自身地址",
+        ".rodata+0x4",
+        ".rodata-0x4",
+        ".rodata+0x0，因为处理器将字段加到下一条指令地址，该地址比字段起点多 4 字节"
+      ],
+      "correct": 3,
+      "explanation": "R_X86_64_PC32 存入 S + A - P。字段为指令最后 4 字节，所以最终目标是 S + A + 4 = .rodata + 0。"
+    },
+    {
+      "stage": "check",
+      "question": "陷阱夹具的表字节为 31 c0 90 48，下一条真实指令为 83 c0 01（addl $1, %eax）。线性扫描在跳转目标 0x14 打印什么？",
+      "options": [
+        "0x14 的 addl $0x1, %eax",
+        "没有指令从 0x14 开始。0x13 的 48 变成 REX 前缀，扫描打印跨越 0x13 至 0x17 的 addq $0x1, %rax",
+        "0x14 的 nop",
+        "0x13 的无效操作码错误"
+      ],
+      "correct": 1,
+      "explanation": "REX 字节与真实 add 的三个字节合并，列表因而提前一字节显示 64 位 add，而分支目标没有指令。"
+    },
+    {
+      "stage": "check",
+      "question": "对 -O0 的 grade 递归下降时，在 jmpq *%rax 停止并报告三个块。什么证据能让它继续进入四个分支块？",
+      "options": [
+        "列表中块的排列顺序",
+        "符号表中的函数大小",
+        ".rodata 的表字节，目标文件中全是零",
+        "命名表的 lea 重定位、限制索引的 cmp 或 sub 加 ja，以及 .rela.rodata 的五条 R_X86_64_PC32，给出 target = addend - 4k"
+      ],
+      "correct": 3,
+      "explanation": "可重定位目标文件的表中是占位符。表条目的重定位是目标的唯一来源，边界检查给出条目数。"
+    },
+    {
+      "stage": "post",
+      "question": "Cooper、Harvey、Kennedy 的迭代支配算法为何按逆后序处理块？",
+      "options": [
+        "这样无需 intersect 步骤",
+        "因为入口块必须最后处理",
+        "因为逆后序就是内存地址顺序",
+        "让块被访问时，大多数前驱已有直接支配节点，使不动点在少量遍历中收敛"
+      ],
+      "correct": 3,
+      "explanation": "逆后序在正向前驱之后访问块，每轮可沿正向边传播支配信息，仅回边需要下一轮。"
+    },
+    {
+      "stage": "post",
+      "question": "-O1 下 clang 将 grade 编译成 cmpl $4, %ecx; ja; 带 .rodata 重定位的 leaq (%rip), %rcx; movl (%rcx,%rax,4), %eax; retq。分析应报告什么？",
+      "options": [
+        "未解析间接跳转",
+        ".rodata+0x14 的值表，内容为 1、2、3、4、4，三个基本块，无间接转移",
+        "有五个代码目标的跳转表",
+        "通过表进行调用"
+      ],
+      "correct": 1,
+      "explanation": "加载是普通 movl，函数紧接着返回。优化器将分支块替换为返回值表，改变的是加载而非控制流。"
+    }
+  ]
+}

@@ -29,25 +29,25 @@
 
 预计算一个形状为 `(max_len, d_model)` 的固定矩阵 `PE`：
 
-```
-PE[pos, 2i]   = sin(pos / 10000^(2i / d_model))
-PE[pos, 2i+1] = cos(pos / 10000^(2i / d_model))
+```math
+\begin{aligned}
+PE_{(pos, 2i)} &= \sin\left(pos / 10000^{2i / d_{\text{model}}}\right) \\
+PE_{(pos, 2i+1)} &= \cos\left(pos / 10000^{2i / d_{\text{model}}}\right)
+\end{aligned}
 ```
 
 然后在注意力之前 `X' = X + PE[:N]`。每个维度是一个不同频率的正弦波。模型学着从相位模式里读出位置。超过 `max_len` 就失败：模型只见过位置 0–2047，没人告诉它位置 2048 发生什么。
 
 ### RoPE
 
-旋转 Q 和 K 向量（不是嵌入）。对一对维度 `(2i, 2i+1)`：
+旋转 Q 和 K 向量（不是嵌入）。对一对维度 $(2i, 2i+1)$：
 
-```
-[q'_2i    ]   [ cos(pos·θ_i)  -sin(pos·θ_i) ] [q_2i   ]
-[q'_2i+1  ] = [ sin(pos·θ_i)   cos(pos·θ_i) ] [q_2i+1 ]
-
-θ_i = base^(-2i / d_head),  base = 10000 by default
+```math
+\begin{bmatrix} q'_{2i} \\ q'_{2i+1} \end{bmatrix} = \begin{bmatrix} \cos(pos \cdot \theta_i) & -\sin(pos \cdot \theta_i) \\ \sin(pos \cdot \theta_i) & \cos(pos \cdot \theta_i) \end{bmatrix} \begin{bmatrix} q_{2i} \\ q_{2i+1} \end{bmatrix}
+\qquad \theta_i = \text{base}^{-2i / d_{\text{head}}}, \quad \text{base} = 10000 \text{ 默认}
 ```
 
-对 key 在位置 `pos_k` 上应用同样的旋转。点积 `q'_m · k'_n` 就变成只关于 `(m - n)` 的函数。也就是说：**注意力分数只取决于相对距离**，尽管旋转是按绝对位置定的。漂亮的把戏。
+对 key 在位置 `pos_k` 上应用同样的旋转。点积 $q'_m \cdot k'_n$ 就变成只关于 $(m - n)$ 的函数。也就是说：**注意力分数只取决于相对距离**，尽管旋转是按绝对位置定的。漂亮的把戏。
 
 扩展 RoPE：`base` 可以被缩放（NTK-aware、YaRN、LongRoPE），在不重训的情况下外推到更长的上下文。Llama 3 就这样把上下文从 8K 扩到了 128K。
 
@@ -55,11 +55,11 @@ PE[pos, 2i+1] = cos(pos / 10000^(2i / d_model))
 
 跳过嵌入这个把戏。直接给注意力分数加偏置：
 
-```
-attn_score[i, j] = (q_i · k_j) / √d  -  m_h · |i - j|
+```math
+\text{attn\_score}[i, j] = \frac{q_i \cdot k_j}{\sqrt{d}} - m_h \cdot |i - j|
 ```
 
-其中 `m_h` 是一个每头的斜率（如 `1 / 2^(8·h/H)`）。近的 token 被抬高；远的 token 被惩罚。无训练期成本。论文显示其长度外推胜过正弦，在原训练长度上与 RoPE 持平。
+其中 $m_h$ 是一个每头的斜率（如 $1 / 2^{8h/H}$）。近的 token 被抬高；远的 token 被惩罚。无训练期成本。论文显示其长度外推胜过正弦，在原训练长度上与 RoPE 持平。
 
 ### 2026 年怎么选
 
@@ -113,7 +113,7 @@ def apply_rope(x, pos, base=10000):
     return out
 ```
 
-关键：对位置 `m` 的 Q 和位置 `n` 的 K 应用同一个函数。它们的点积在每个坐标对上都带出一个 `cos((m-n)·θ_i)` 因子。注意力免费学到相对位置。
+关键：对位置 $m$ 的 Q 和位置 $n$ 的 K 应用同一个函数。它们的点积在每个坐标对上都带出一个 $\cos((m-n) \cdot \theta_i)$ 因子。注意力免费学到相对位置。
 
 ### 第 3 步：ALiBi 斜率和偏置
 
@@ -168,7 +168,7 @@ model = AutoModel.from_pretrained("meta-llama/Llama-3.2-3B")
 | 位置编码 | "告诉注意力顺序" | 任何加到嵌入或注意力上、编码位置的信号。 |
 | Sinusoidal | "最初那个" | 几何频率的 `sin/cos` 加到嵌入上；不外推。 |
 | RoPE | "旋转嵌入" | 按位置相关的角度旋转 Q、K；点积编码相对距离。 |
-| ALiBi | "线性偏置把戏" | 给注意力分数加 `-m·|i-j|`；不需要嵌入，外推极佳。 |
+| ALiBi | "线性偏置把戏" | 给注意力分数加 $-m \cdot \lvert i-j \rvert$；不需要嵌入，外推极佳。 |
 | base | "RoPE 的旋钮" | RoPE 里的频率缩放器；调大可在推理时扩展上下文。 |
 | NTK-aware | "一种 RoPE 缩放招数" | 重缩放 `base`，让高频维度在上下文扩展时不被挤压。 |
 | YaRN | "高级那个" | 每个维度的插值+外推，保住注意力熵。 |

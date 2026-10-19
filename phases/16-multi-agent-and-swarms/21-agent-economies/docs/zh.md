@@ -61,8 +61,8 @@ Google Research（《Mechanism design for large language models》）提出用�
 
 一个绑定 DID 的声誉分数从确认的贡献中累积。一条简单的更新规则：
 
-```
-rep(i, t+1) = alpha * rep(i, t) + (1 - alpha) * contribution_quality(i, t)
+```math
+\text{rep}(i, t+1) = \alpha \cdot \text{rep}(i, t) + (1 - \alpha) \cdot \text{contribution\_quality}(i, t)
 ```
 
 衰减因子 `alpha` 接近 1。声誉：

@@ -4,7 +4,11 @@
   "id": "ai-evaluation-reliability-engineer",
   "title": "AI 评估与可靠性",
   "workFamily": "AI 评估与可靠性",
-  "commonTitles": ["AI 评估工程师", "AI 可靠性工程师", "机器学习站点可靠性工程师"],
+  "commonTitles": [
+    "AI 评估工程师",
+    "AI 可靠性工程师",
+    "机器学习站点可靠性工程师"
+  ],
   "summary": "衡量模型和 agent 行为，暴露失败模式，为运行时埋点，并围绕证据构建发布与事故控制措施。",
   "keywords": "ai evaluation reliability engineer evals testing observability metrics load canary chaos sre",
   "decisionPrompt": "你是否想将模型和系统的不确定性转化为评估、可观测性、发布和恢复证据？",
@@ -46,9 +50,22 @@
     "能将一次失败演练转化为经过测试的可靠性改进。"
   ],
   "coverage": {
-    "strong": ["模型、LLM 和 agent 评估", "失败分类法和可观测性", "推理指标和负载测试", "实验、发布、混沌和 SRE 控制"],
-    "partial": ["人工标注运营", "事故领导力", "大型分布式基础设施"],
-    "outsideCourse": ["生产值班的所有权", "合规签核权", "大规模基准实验室运营"]
+    "strong": [
+      "模型、LLM 和 agent 评估",
+      "失败分类法和可观测性",
+      "推理指标和负载测试",
+      "实验、发布、混沌和 SRE 控制"
+    ],
+    "partial": [
+      "人工标注运营",
+      "事故领导力",
+      "大型分布式基础设施"
+    ],
+    "outsideCourse": [
+      "生产值班的所有权",
+      "合规签核权",
+      "大规模基准实验室运营"
+    ]
   },
   "completionClaim": "完成本路线表明你能够构建基于证据的评估与可靠性门禁，但不保证获得相关职位，也不能证明你有负责线上生产事故的经验。",
   "sourceBasis": {
@@ -96,22 +113,93 @@
       "id": "interview-readiness-evidence",
       "title": "面试与就绪度证据",
       "outcome": "展示目标、事故和纠正措施如何构成可靠性的操作系统。",
-      "lessonPaths": ["phases/17-infrastructure-and-production/23-sre-for-ai"],
+      "lessonPaths": [
+        "phases/17-infrastructure-and-production/23-sre-for-ai"
+      ],
       "artifact": "一份可靠性案例研究，包含 SLO、失败证据、响应决策和已验证的纠正措施。"
     }
   ],
   "lessons": [
-    {"order": 1, "path": "phases/02-ml-fundamentals/09-model-evaluation", "minutes": 90, "required": true},
-    {"order": 2, "path": "phases/11-llm-engineering/10-evaluation", "minutes": 45, "required": true},
-    {"order": 3, "path": "phases/14-agent-engineering/30-eval-driven-agent-development", "minutes": 60, "required": true},
-    {"order": 4, "path": "phases/14-agent-engineering/26-failure-modes-agentic", "minutes": 60, "required": true},
-    {"order": 5, "path": "phases/14-agent-engineering/23-otel-genai-conventions", "minutes": 60, "required": true},
-    {"order": 6, "path": "phases/17-infrastructure-and-production/08-inference-metrics-goodput", "minutes": 60, "required": true},
-    {"order": 7, "path": "phases/17-infrastructure-and-production/13-llm-observability", "minutes": 60, "required": true},
-    {"order": 8, "path": "phases/17-infrastructure-and-production/21-ab-testing-llm-features", "minutes": 60, "required": true},
-    {"order": 9, "path": "phases/17-infrastructure-and-production/22-load-testing-llm-apis", "minutes": 75, "required": true},
-    {"order": 10, "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive", "minutes": 60, "required": true},
-    {"order": 11, "path": "phases/17-infrastructure-and-production/24-chaos-engineering-llm", "minutes": 60, "required": true},
-    {"order": 12, "path": "phases/17-infrastructure-and-production/23-sre-for-ai", "minutes": 60, "required": true}
+    {
+      "order": 1,
+      "path": "phases/02-ml-fundamentals/09-model-evaluation",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 2,
+      "path": "phases/11-llm-engineering/10-evaluation",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 3,
+      "path": "phases/14-agent-engineering/30-eval-driven-agent-development",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 4,
+      "path": "phases/14-agent-engineering/26-failure-modes-agentic",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 5,
+      "path": "phases/14-agent-engineering/23-otel-genai-conventions",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 6,
+      "path": "phases/17-infrastructure-and-production/08-inference-metrics-goodput",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 7,
+      "path": "phases/17-infrastructure-and-production/13-llm-observability",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 8,
+      "path": "phases/17-infrastructure-and-production/21-ab-testing-llm-features",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 9,
+      "path": "phases/17-infrastructure-and-production/22-load-testing-llm-apis",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 10,
+      "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 11,
+      "path": "phases/17-infrastructure-and-production/24-chaos-engineering-llm",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 12,
+      "path": "phases/17-infrastructure-and-production/23-sre-for-ai",
+      "minutes": 60,
+      "required": true
+    }
+  ],
+  "projects": [
+    "prompt-regression-tester",
+    "json-schema-output-guard",
+    "retrieval-evaluation-lab",
+    "local-model-eval-harness",
+    "report-judge",
+    "retry-storm-lab",
+    "distributed-eval-farm"
   ]
 }

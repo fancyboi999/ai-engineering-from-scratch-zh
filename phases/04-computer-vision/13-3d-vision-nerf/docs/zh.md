@@ -26,7 +26,7 @@
 
 ### 点云
 
-点云是 R^3 里 N 个点的无序集合，每个点可选地带特征（颜色、强度、法向）。
+点云是 $\mathbb{R}^3$ 里 $N$ 个点的无序集合，每个点可选地带特征（颜色、强度、法向）。
 
 ```
 cloud = [
@@ -44,8 +44,8 @@ cloud = [
 
 PointNet（Qi 等人，2017）用一个点子解决了两者：对每个点应用共享 MLP，再用一个对称函数（max pool）聚合。结果是一个不依赖顺序的固定大小向量。
 
-```
-f(P) = max_{p in P} MLP(p)
+```math
+f(P) = \max_{p \in P} \mathop{\mathrm{MLP}}(p)
 ```
 
 这就是 PointNet 的整个核心。更深的变体（PointNet++、Point Transformer）加了层级采样和局部聚合，但对称函数技巧没变。
@@ -89,22 +89,23 @@ NeRF MLP:  (x, y, z, theta, phi) -> (sigma, r, g, b)
 
 朴素 MLP 直接吃 `(x, y, z)` 无法表示高频细节，因为 MLP 在谱上偏向低频。NeRF 通过在 MLP 之前把每个坐标编码成傅里叶特征向量来修这点：
 
-```
-gamma(p) = (sin(2^0 pi p), cos(2^0 pi p), sin(2^1 pi p), cos(2^1 pi p), ...)
+```math
+\gamma(p) = \left(\sin(2^0 \pi p), \cos(2^0 \pi p), \sin(2^1 \pi p), \cos(2^1 \pi p), \ldots\right)
 ```
 
-最多 L=10 个频率级。这和 transformer 用于位置的技巧一样，在扩散的时间条件化里也再次出现（第 10 课）。没有它，NeRF 看起来很模糊。
+最多 $L=10$ 个频率级。这和 transformer 用于位置的技巧一样，在扩散的时间条件化里也再次出现（第 10 课）。没有它，NeRF 看起来很模糊。
 
 ### 体积渲染
 
+```math
+\begin{aligned}
+C(r) &= \sum_i T_i \left(1 - \exp(-\sigma_i \delta_i)\right) c_i \\[4pt]
+T_i &= \exp\left(-\sum_{j<i} \sigma_j \delta_j\right) \\
+\delta_i &= t_{i+1} - t_i
+\end{aligned}
 ```
-C(r) = sum_i T_i * (1 - exp(-sigma_i * delta_i)) * c_i
 
-T_i  = exp(- sum_{j<i} sigma_j * delta_j)
-delta_i = t_{i+1} - t_i
-```
-
-`T_i` 是透射率——多少光能存活到点 i。`(1 - exp(-sigma_i * delta_i))` 是点 i 处的不透明度。`c_i` 是颜色。最终像素是沿射线的加权和。
+`T_i` 是透射率——多少光能存活到点 $i$。`(1 - exp(-sigma_i * delta_i))` 是点 $i$ 处的不透明度。`c_i` 是颜色。最终像素是沿射线的加权和。
 
 ### 什么取代了 NeRF
 

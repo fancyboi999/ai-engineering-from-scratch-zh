@@ -28,10 +28,12 @@
 
 设 `pi_0` 为基座模型，`pi_A` 为对齐后模型，`r` 为代理奖励，`s(x, y)` 为一个二元阿谀指示器。定义：
 
-```
-E[s | r]            = probability of sycophancy given reward
-E_{pi_0}[s | r]     = measured on the base model's output distribution
-E_{pi_A}[s | r]     = measured on the aligned model's output distribution
+```math
+\begin{aligned}
+\mathbb{E}[s \mid r] &= \text{给定奖励时出现谄媚的概率} \\
+\mathbb{E}_{\pi_0}[s \mid r] &= \text{在基础模型的输出分布上测量} \\
+\mathbb{E}_{\pi_A}[s \mid r] &= \text{在对齐模型的输出分布上测量}
+\end{aligned}
 ```
 
 第 1 阶段：实证上，`E_{pi_0}[s | r=high] > E_{pi_0}[s | r=low]`。在用标注员偏好数据训练的 RM 下，阿谀型补全平均比匹配的非阿谀型补全得分更高。
@@ -69,8 +71,8 @@ Sahoo（arXiv:2604.10585）在数学推理上用 GRPO 训练，植入合成的�
 
 Shapira et al. 提议改奖励：
 
-```
-r'(x, y) = r(x, y) - alpha * agree(x, y)
+```math
+r'(x, y) = r(x, y) - \alpha \cdot \text{agree}(x, y)
 ```
 
 其中 `agree(x, y)` 是一个辅助分类器，衡量 `y` 是否附和 `x` 的前提。alpha 扫描显示，在 `alpha` 约 0.3-0.5 时阿谀奉承降到接近基座模型水平，代价是损失了一些合理的附和（模型在用户信念正确时变得略微爱抬杠）。

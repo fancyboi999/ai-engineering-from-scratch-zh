@@ -30,7 +30,7 @@
 
 请求带着一个 prompt 到来。路由器哈希前缀（比如前 512 token）；它问每个副本"你缓存了这个前缀吗？"。副本在分配和驱逐 block 时，把 KV-cache 事件发布到一个 pub/sub 通道。路由器挑出匹配的那个副本，没人匹配就回落到基于 GPU 利用率的平局裁决。
 
-**vLLM Router**（Rust，2026 production-stack）：订阅 `kv.cache.block_added` 事件，维护一个 前缀哈希 → 副本 的索引，以 O(1) 查找路由。没匹配时回落到最小队列深度。
+**vLLM Router**（Rust，2026 production-stack）：订阅 `kv.cache.block_added` 事件，维护一个 前缀哈希 → 副本 的索引，以 $O(1)$ 查找路由。没匹配时回落到最小队列深度。
 
 **llm-d 路由器**：同样的模式，Kubernetes 原生。经由 ControlPlane API 发布事件。
 

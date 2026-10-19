@@ -30,22 +30,24 @@ Hoffmann et al.（2022）训练了一小族叫 Chinchilla 的模型，发现了�
 
 来自 Chinchilla 论文，损失遵循：
 
-```
-L(N, D) = A / N^α + B / D^β + E
+```math
+L(N, D) = \frac{A}{N^\alpha} + \frac{B}{D^\beta} + E
 ```
 
-- `N` = 参数（非嵌入）。
-- `D` = 训练 token。
-- `α ≈ 0.34`、`β ≈ 0.28`（大致对称）。
-- `E ≈ 1.69`，不可约的损失上限。
-- `A ≈ 406`、`B ≈ 411`。
+- $N$ = 参数（非嵌入）。
+- $D$ = 训练 token。
+- $\alpha \approx 0.34$、$\beta \approx 0.28$（大致对称）。
+- $E \approx 1.69$，不可约的损失上限。
+- $A \approx 406$、$B \approx 411$。
 
-随着你扩展，两项相互权衡。在固定算力（C = 6ND）下对 `N` 求导并解：
+随着你扩展，两项相互权衡。在固定算力（$C = 6ND$）下对 $N$ 求导并解：
 
-```
-N_opt ≈ 0.6 × (C/6)^0.5
-D_opt ≈ 0.6 × (C/6)^0.5
-D_opt / N_opt ≈ 20
+```math
+\begin{aligned}
+N_{\text{opt}} &\approx 0.6 \times (C/6)^{0.5} \\
+D_{\text{opt}} &\approx 0.6 \times (C/6)^{0.5} \\
+D_{\text{opt}} / N_{\text{opt}} &\approx 20
+\end{aligned}
 ```
 
 算力最优：每参数 20 个 token。
@@ -90,7 +92,7 @@ scaling-laws
 
 ## 动手构建
 
-见 `code/main.py`。我们实现 Chinchilla 损失方程，并在几个算力预算下分别解出算力最优的 `(N, D)`。
+见 `code/main.py`。我们实现 Chinchilla 损失方程，并在几个算力预算下分别解出算力最优的 $(N, D)$。
 
 ### 第 1 步：Chinchilla 损失
 
@@ -99,11 +101,11 @@ def chinchilla_loss(N, D, A=406.4, B=410.7, alpha=0.34, beta=0.28, E=1.69):
     return A / N ** alpha + B / D ** beta + E
 ```
 
-在固定 `C = 6ND` 下把 `L` 画成 `(N, D)` 上的等高线。找最小值。
+在固定 $C = 6ND$ 下把 $L$ 画成 $(N, D)$ 上的等高线。找最小值。
 
 ### 第 2 步：算力最优前沿
 
-对从 `1e17` 到 `1e25` FLOPs 的算力预算，找出在 `6ND = C` 约束下最小化损失的 `(N, D)`。验证比例 `D/N ≈ 20`。
+对从 `1e17` 到 `1e25` FLOPs 的算力预算，找出在 $6ND = C$ 约束下最小化损失的 $(N, D)$。验证比例 $D/N \approx 20$。
 
 ### 第 3 步：过度训练的代价
 
@@ -133,9 +135,9 @@ def chinchilla_loss(N, D, A=406.4, B=410.7, alpha=0.34, beta=0.28, E=1.69):
 
 ## 练习
 
-1. **简单。** 跑 `code/main.py`。打印算力预算 `1e20`、`1e22`、`1e24` 下的 Chinchilla 最优 `(N, D)`。和真实模型表对比。
-2. **中等。** 实现 Hoffmann 损失作为算力函数的曲线。对算力最优前沿画损失 vs `log10(C)`。找出定律预测我们需要 `>10^28` FLOPs 才能让交叉熵再降 0.1 的那个点。
-3. **困难。** 在同一数据集上训练的 5 个极小模型（10 万到 1000 万参数）上拟合你自己的 scaling law。估计 `α` 和 `E`。你的指数和已发表的匹配得怎么样？
+1. **简单。** 跑 `code/main.py`。打印算力预算 `1e20`、`1e22`、`1e24` 下的 Chinchilla 最优 $(N, D)$。和真实模型表对比。
+2. **中等。** 实现 Hoffmann 损失作为算力函数的曲线。对算力最优前沿画损失 vs `log10(C)`。找出定律预测我们需要 $>10^{28}$ FLOPs 才能让交叉熵再降 0.1 的那个点。
+3. **困难。** 在同一数据集上训练的 5 个极小模型（10 万到 1000 万参数）上拟合你自己的 scaling law。估计 $\alpha$ 和 $E$。你的指数和已发表的匹配得怎么样？
 
 ## 关键术语
 
@@ -146,7 +148,7 @@ def chinchilla_loss(N, D, A=406.4, B=410.7, alpha=0.34, beta=0.28, E=1.69):
 | 算力（C） | "花掉的 FLOPs" | 标准 transformer 约为 `6 × N × D`。 |
 | Chinchilla 最优 | "D/N ≈ 20" | 让每个预训练 FLOP 损失最小的比例。 |
 | 过度训练 | "超过 Chinchilla" | 多花训练 FLOPs 省推理 FLOPs；D/N >> 20。 |
-| 不可约损失 | "下限" | scaling law 里的 `E` 项；数据本身的熵。 |
+| 不可约损失 | "下限" | scaling law 里的 $E$ 项；数据本身的熵。 |
 | 涌现能力 | "规模上的突然跳跃" | 常是打分器假象；连续损失是平滑的。 |
 | 有效算力 | "训练效率倍增器" | 更好的数据 / 优化器 / 架构让一个 FLOP 走得更远。 |
 

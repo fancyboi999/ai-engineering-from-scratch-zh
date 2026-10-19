@@ -4,12 +4,12 @@
 
 <p align="center">
   <b>从零开始，亲手实现每一个 AI 算法</b><br/>
-  <sub>528 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
+  <sub>542 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
 </p>
 
 <p align="center">
   <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/在线阅读-aieng--zh.cn-3553ff?style=flat-square&labelColor=fafaf5" alt="在线阅读 aieng-zh.cn"></a>
-  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-528-3553ff?style=flat-square&labelColor=fafaf5" alt="528 lessons"></a>
+  <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-542-3553ff?style=flat-square&labelColor=fafaf5" alt="542 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
   <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff&cacheSeconds=21600" alt="GitHub stars"></a>
@@ -21,7 +21,7 @@
 
 > 通过推导、代码和实验学习 AI 工程。
 >
-> 528 节课，20 个阶段，覆盖 Python、TypeScript、Rust、Julia。课程配有中文正文、测验、
+> 542 节课，20 个阶段，覆盖 Python、TypeScript、Rust、Julia。课程配有中文正文、测验、
 > 可运行示例和可复用产物。免费阅读，开源，采用 MIT 许可。
 >
 > 从基础算法到 LLM 应用、agent 与生产系统，按你的目标选择学习路径。
@@ -50,7 +50,7 @@
 
 | | |
 |---|---|
-| 🇨🇳 **全站简体中文** | 528 节课正文、243 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
+| 🇨🇳 **全站简体中文** | 542 节课正文、243 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
 | 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、[AI 工程学习路径](https://aieng-zh.cn/learning-paths.html)、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
 | 🎬 **配套动画讲解视频** | 333 节中文配音动画已上线，覆盖阶段 0–14 的全部课程。可在课程页内嵌播放，提供直链与 B 站播放源，配合正文、数学推导和代码实践学习 |
 | 🔍 **为 AI 检索优化** | 构建时自动生成 `sitemap.xml` / `llms.txt` / 结构化数据，方便被搜索引擎和 AI 助手引用 |
@@ -62,7 +62,7 @@
 
 ## 从这里开始：选择你想构建的内容
 
-开始前不需要先扫完 528 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
+开始前不需要先扫完 542 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
 
 | 你的目标 | 在 GitHub 上学习 | 在网站上学习 |
 |---|---|---|
@@ -83,7 +83,7 @@
 
 ## 实战项目与技术手册
 
-核心课程仍是 **20 个阶段、528 节课**。独立的[实战项目目录](https://aieng-zh.cn/projects.html)另有 **76 项就绪项目、308 个阶段**，配备分阶段 starter、参考实现和本地评分器；[技术手册](https://aieng-zh.cn/manuals.html)另有 **2 本**。这些不是新增核心课，也不是官方认证。
+核心课程仍是 **20 个阶段、542 节课**。独立的[实战项目目录](https://aieng-zh.cn/projects.html)另有 **78 项就绪项目、322 个阶段**，配备分阶段 starter、参考实现和本地评分器；[技术手册](https://aieng-zh.cn/manuals.html)另有 **3 本已发布手册**（另有 1 本 SGLang 草稿）。这些不是新增核心课，也不是官方认证。
 
 下面三个项目可作为起点。在仓库根目录运行命令；starter 在实现对应阶段之前会失败。
 
@@ -197,7 +197,7 @@ npx skills add fancyboi999/ai-engineering-from-scratch-zh
 demo。这些碎片很少能拼到一起。你做出了一个聊天机器人，却讲不清它的 loss 曲线；你给
 agent 挂了个函数，却说不出调用它的那个模型内部，attention 到底在干什么。
 
-这套课程就是那根脊椎。20 个阶段，528 节课，四种语言：Python、TypeScript、Rust、Julia。
+这套课程就是那根脊椎。20 个阶段，542 节课，四种语言：Python、TypeScript、Rust、Julia。
 一头是线性代数，另一头是自主 agent 集群。每个算法都先从最原始的数学手写出来。反向传播、
 分词器、注意力、agent 循环——等 PyTorch 登场时，你已经知道它底层在做什么了。
 
@@ -752,7 +752,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 </details>
 
 <details id="phase-13">
-<summary><b>Phase 13 — 工具与协议</b> &nbsp;<code>31 lessons</code>&nbsp; <em>AI 与真实世界之间的接口，包括 Agent Skills 与无状态 MCP 的生产契约。</em></summary>
+<summary><b>Phase 13 — 工具与协议</b> &nbsp;<code>45 lessons</code>&nbsp; <em>AI 与真实世界之间的接口，包括 Agent Skills 与无状态 MCP 的生产契约。</em></summary>
 <br/>
 
 | # | Lesson | Type | Lang |
@@ -788,6 +788,20 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 29 | [MCP 可靠性、取消与流量控制](phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/) | Build | Python |
 | 30 | [MCP Registry 供应链：准入、漂移与回滚](phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift/) | Build | Python |
 | 31 | [MCP 一致性工程：版本、证据与运维](phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations/) | Build | Python |
+| 32 | [程序剖析：从零读取 ELF](phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/) | Build | Python |
+| 33 | [反汇编与控制流：从字节到可验证的图](phases/13-tools-and-protocols/33-disassembly-and-control-flow/) | Build | Python |
+| 34 | [提升为伪代码：从零构建 IR、SSA 与结构化流程](phases/13-tools-and-protocols/34-lifting-to-pseudocode/) | Build | Python |
+| 35 | [二进制分析中的证据、置信度与未知项](phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns/) | Build | Python |
+| 36 | [重建并证明等价：差分测试、字节比较与证据循环](phases/13-tools-and-protocols/36-rebuild-and-prove-equal/) | Build | Python |
+| 37 | [逆向工程全景：历史、工具家族与反编译器构建](phases/13-tools-and-protocols/37-the-reverse-engineering-landscape/) | Build | Python |
+| 38 | [调用约定与栈帧：System V、Windows x64 与 AArch64](phases/13-tools-and-protocols/38-calling-conventions-and-stack-frames/) | Build | Python |
+| 39 | [编译器惯用模式：优化如何改变代码及如何读回](phases/13-tools-and-protocols/39-compiler-idioms-and-optimization/) | Build | Python |
+| 40 | [链接、加载与去符号二进制：PLT、GOT、导入、修复与函数识别](phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries/) | Build | Python |
+| 41 | [恢复数据与类型：结构体、数组、C++ 对象与 DWARF](phases/13-tools-and-protocols/41-recovering-data-and-types/) | Build | Python |
+| 42 | [对自有程序做动态分析：调试器、跟踪与静态结论验证](phases/13-tools-and-protocols/42-dynamic-analysis-of-your-own-program/) | Build | Python |
+| 43 | [原生代码之外：Python、JVM、.NET 与 WebAssembly 字节码](phases/13-tools-and-protocols/43-bytecode-and-managed-formats/) | Build | Python |
+| 44 | [二进制差分与符号执行：函数匹配与输入求解](phases/13-tools-and-protocols/44-binary-diffing-and-symbolic-execution/) | Build | Python |
+| 45 | [AI 辅助逆向工程：LLM 反编译器、分析 agent 与真实依据](phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/) | Build | Python |
 
 [模型上下文协议（MCP）路径](learning-paths/model-context-protocol.json)包含第 06–18、28–31 课，共 17 节必修课，按清单顺序学习，其中第 18 课先于第 17 课。[Agent Skills 路径](learning-paths/agent-skills.json)包含第 22、24–27 课，共 5 节必修课。第 23 课是两条路径的可选系统综合项目，开始前按各路径清单完成前置要求。
 

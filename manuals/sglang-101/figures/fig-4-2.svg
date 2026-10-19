@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="fig-4-2-title fig-4-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-4-2-title">哪些 decode 批次能重放计算图</title>
+  <desc id="fig-4-2-desc">80 GB GPU、张量并行 1、max_bs 256 时，decode 批次到达 CUDA graph runner。大小 13 的批次重放为 16 捕获的图；256 重放最大图；300 超过 max_bs，改用 eager，每个内核一次提交，调度日志显示 cuda graph False。</desc>
+  <defs><marker id="fig-4-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-2-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">DECODE 批次</text>
+  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">CAN_RUN_GRAPH</text>
+  <text x="450" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">执行内容</text>
+  <rect x="20" y="30" width="150" height="48" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="95" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">bs = 13</text>
+  <text x="95" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行请求</text>
+  <rect x="250" y="30" width="130" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="315" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">13 &lt;= 256</text>
+  <text x="315" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">fits</text>
+  <rect x="450" y="30" width="170" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="535" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">重放 graph 16</text>
+  <text x="535" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">3 个填充槽位</text>
+  <line x1="170" y1="54" x2="249" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
+  <line x1="380" y1="54" x2="449" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
+  <rect x="20" y="110" width="150" height="48" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="95" y="129.25" font-size="12.5" text-anchor="middle" font-weight="700">bs = 256</text>
+  <text x="95" y="146.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行请求</text>
+  <rect x="250" y="110" width="130" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="315" y="129.25" font-size="12.5" text-anchor="middle" font-weight="700">256 &lt;= 256</text>
+  <text x="315" y="146.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">fits</text>
+  <rect x="450" y="110" width="170" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="535" y="129.25" font-size="12.5" text-anchor="middle" font-weight="700">重放 graph 256</text>
+  <text x="535" y="146.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">最大捕获桶</text>
+  <line x1="170" y1="134" x2="249" y2="134" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
+  <line x1="380" y1="134" x2="449" y2="134" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
+  <rect x="20" y="190" width="150" height="48" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="95" y="209.25" font-size="12.5" text-anchor="middle" font-weight="700">bs = 300</text>
+  <text x="95" y="226.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行请求</text>
+  <rect x="250" y="190" width="130" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="315" y="209.25" font-size="12.5" text-anchor="middle" font-weight="700">300 &gt; 256</text>
+  <text x="315" y="226.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">过大</text>
+  <rect x="450" y="190" width="170" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="535" y="209.25" font-size="12.5" text-anchor="middle" font-weight="700">eager 前向传播</text>
+  <text x="535" y="226.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">cuda graph: False</text>
+  <line x1="170" y1="214" x2="249" y2="214" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
+  <line x1="380" y1="214" x2="449" y2="214" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-2-head-rose)"/>
+  <text x="20" y="268" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">捕获大小：1、2、4、8、12，然后 16 至 256，步长 8</text>
+  <text x="20" y="286" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">80 GB GPU、TP 1 的默认 max_bs 为 256</text>
+</svg>

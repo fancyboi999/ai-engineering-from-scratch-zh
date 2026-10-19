@@ -45,7 +45,7 @@ graph LR
 
 ### 旋转
 
-二维里按角度 theta 的旋转保持距离和夹角不变。它让每个点沿圆弧移动。
+二维里按角度 $\theta$ 的旋转保持距离和夹角不变。它让每个点沿圆弧移动。
 
 ```mermaid
 graph LR
@@ -66,18 +66,12 @@ graph LR
 
 在三维里，你绕一根轴旋转。每根轴都有自己的旋转矩阵：
 
-```
-Rz(theta) = | cos  -sin  0 |     Rotate around z-axis
-            | sin   cos  0 |     (x-y plane spins, z stays)
-            |  0     0   1 |
-
-Rx(theta) = | 1   0     0    |   Rotate around x-axis
-            | 0  cos  -sin   |   (y-z plane spins, x stays)
-            | 0  sin   cos   |
-
-Ry(theta) = |  cos  0  sin |     Rotate around y-axis
-            |   0   1   0  |     (x-z plane spins, y stays)
-            | -sin  0  cos |
+```math
+\begin{aligned}
+R_z(\theta) &= \begin{bmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix} \quad \text{绕 z 轴旋转（x-y 平面旋转，z 不变）} \\[6pt]
+R_x(\theta) &= \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta \\ 0 & \sin\theta & \cos\theta \end{bmatrix} \quad \text{绕 x 轴旋转（y-z 平面旋转，x 不变）} \\[6pt]
+R_y(\theta) &= \begin{bmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{bmatrix} \quad \text{绕 y 轴旋转（x-z 平面旋转，y 不变）}
+\end{aligned}
 ```
 
 ### 缩放
@@ -123,8 +117,8 @@ graph LR
 ```
 
 剪切矩阵：
-- `Shx = [[1, k], [0, 1]]` 把 x 平移 k * y
-- `Shy = [[1, 0], [k, 1]]` 把 y 平移 k * x
+- `Shx = [[1, k], [0, 1]]` 把 $x$ 平移 $k \cdot y$
+- `Shy = [[1, 0], [k, 1]]` 把 $y$ 平移 $k \cdot x$
 
 ### 反射
 
@@ -196,7 +190,7 @@ Eigenvector [1, -1] with eigenvalue 1:
 
 ### 特征分解
 
-如果一个矩阵有 n 个线性无关的特征向量，它就可以被分解：
+如果一个矩阵有 $n$ 个线性无关的特征向量，它就可以被分解：
 
 ```
 A = V @ D @ V^(-1)
@@ -210,7 +204,7 @@ This says: rotate into eigenvector coordinates, scale along each axis, rotate ba
 
 ### 特征值为什么重要
 
-**PCA。** 协方差矩阵的特征向量就是主成分。特征值告诉你每个成分捕获了多少方差。按特征值排序，保留前 k 个，你就得到了降维。
+**PCA。** 协方差矩阵的特征向量就是主成分。特征值告诉你每个成分捕获了多少方差。按特征值排序，保留前 $k$ 个，你就得到了降维。
 
 **稳定性。** 在循环网络和动力系统里，模大于 1 的特征值会让输出爆炸。模小于 1 则让它们消失。这就是用一句话说清楚的梯度消失/爆炸问题。
 
@@ -309,7 +303,7 @@ print(f"Same? {result1 == result2}")
 
 ### 第 3 步：从零求特征值（2x2）
 
-对于一个 2x2 矩阵 `[[a, b], [c, d]]`，特征值是特征方程的解：`lambda^2 - (a+d)*lambda + (ad - bc) = 0`。
+对于一个 2x2 矩阵 `[[a, b], [c, d]]`，特征值是特征方程的解：$\lambda^2 - (a+d)\lambda + (ad - bc) = 0$。
 
 ```python
 def eigenvalues_2x2(matrix):
@@ -443,6 +437,14 @@ print(f"Rotate 90 around x: {np.round(rotated_x, 4)}")
 
 3. 构造一个由三个变换组成的复合变换（旋转 30 度、缩放 [1.5, 0.8]、剪切 kx=0.3），把它作用到排成一圈的 8 个点上。打印变换前后的坐标。计算复合矩阵的行列式，验证它等于各个行列式的乘积。
 
+### 提示
+
+**练习 1。** 用 `mat_vec_mul` 将 `rotation_2d`、`scaling_2d` 和 `shearing_2d` 应用于每个角点。对于旋转，分别计算变换前后的 4 条边长和 2 条对角线长；它们都应保持不变。
+
+**练习 2。** 写出特征方程 $\lambda^2 - (\text{trace})\lambda + \det = 0$ 并求解。检查两个根之和等于迹（7），乘积等于行列式（10），再与 `eigenvalues_2x2` 和 `np.linalg.eigvals` 比较。
+
+**练习 3。** 构建三个矩阵，其中剪切使用 `shearing_2d(0.3, 0)`；用 `mat_mul` 按应用顺序相乘，将结果作用于 8 个点 $(\cos\theta, \sin\theta)$。旋转和剪切的行列式均为 1，因此组合矩阵的 `det_2x2` 应等于 $1.5 \times 0.8 = 1.2$。
+
 ## 关键术语
 
 | 术语 | 人们常说 | 它实际指什么 |
@@ -454,9 +456,9 @@ print(f"Rotate 90 around x: {np.round(rotated_x, 4)}")
 | 组合 | "做两件事" | 把变换矩阵相乘以串联多个操作。顺序很重要：B @ A 表示先施加 A，再施加 B。 |
 | 特征向量 | "特殊方向" | 一个被矩阵只缩放、从不旋转的方向。是该变换的指纹。 |
 | 特征值 | "拉伸了多少" | 矩阵缩放它的特征向量时所用的标量因子。可以为负（翻转）或为复数（旋转）。 |
-| 特征分解 | "把矩阵拆开" | 把矩阵写成 V @ D @ V^(-1)，将它分离成基本的缩放方向和缩放幅度。 |
+| 特征分解 | "把矩阵拆开" | 把矩阵写成 $V D V^{-1}$，将它分离成基本的缩放方向和缩放幅度。 |
 | 行列式 | "矩阵算出的一个数" | 变换把面积（二维）或体积（三维）缩放的倍数。为零意味着变换不可逆。 |
-| 特征方程 | "特征值的来源" | det(A - lambda * I) = 0。其根为特征值的多项式。 |
+| 特征方程 | "特征值的来源" | $\det(A - \lambda I) = 0$。其根为特征值的多项式。 |
 
 ## 延伸阅读
 

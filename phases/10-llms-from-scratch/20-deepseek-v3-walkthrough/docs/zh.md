@@ -180,7 +180,7 @@ moe-routing
 | num_experts_per_tok | "top-k 路由" | 每 token 发射多少被路由的专家；DeepSeek-V3 用 8 |
 | 共享专家 | "常开专家" | 不管路由怎样都处理每个 token 的专家；DeepSeek-V3 用 1 |
 | 无辅助损失路由 | "偏置调整的负载均衡" | 训练时调整的每专家偏置项，不加损失项就保持专家负载均衡 |
-| MTP 模块 | "额外预测头" | 从 h^(1) 和 E(t+1) 预测 t+2 的 transformer 块；更密的训练，免费的推测解码 draft |
+| MTP 模块 | "额外预测头" | 从 $h^{(1)}$ 和 $E(t+1)$ 预测 $t+2$ 的 transformer 块；更密的训练，免费的推测解码 draft |
 | DualPipe | "双向流水线" | 把前向/反向计算与跨节点 all-to-all 重叠的训练调度 |
 | 激活参数比例 | "稀疏性" | active_params / total_params；DeepSeek-V3 打到 5.5% |
 | FP8 训练 | "8 位训练" | 训练存储和许多计算操作用 FP8；相比 BF16 大约把内存减半，质量代价小 |

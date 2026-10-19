@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 318" role="img" aria-labelledby="fig-6-1-title fig-6-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-6-1-title">八 GPU 的一个 TP 组，三种切分</title>
+  <desc id="fig-6-1-desc">g0 至 g7 八 GPU 绘成三行。tp-size 8 时，每层跨全部八卡切分；attn-dp-size 4 时，注意力层分四组各两卡：g0/g1、g2/g3、g4/g5、g6/g7，各有独立 scheduler 和 KV 缓存；ep-size 8 时，专家层用同八卡构成一组。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">参数与层</text>
+  <text x="196" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">同样八张 GPU</text>
+  <text x="20" y="52" font-size="12" font-weight="700">--tp-size 8</text>
+  <text x="20" y="70" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">稠密层与 FFN 层</text>
+  <rect x="194" y="30" width="438" height="80" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <rect x="200" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="222" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g0</text>
+  <rect x="254" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="276" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g1</text>
+  <rect x="308" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="330" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g2</text>
+  <rect x="362" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="384" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g3</text>
+  <rect x="416" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="438" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g4</text>
+  <rect x="470" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="492" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g5</text>
+  <rect x="524" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="546" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g6</text>
+  <rect x="578" y="40" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="600" y="56.6" font-size="12" text-anchor="middle" font-weight="700">g7</text>
+  <text x="200" y="96" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个 TP 组：每权重矩阵分八份</text>
+  <text x="20" y="142" font-size="12" font-weight="700">--attn-dp-size 4</text>
+  <text x="20" y="160" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">注意力层</text>
+  <rect x="196" y="120" width="106" height="80" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="202" y="186" font-size="11" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">分组 0</text>
+  <rect x="304" y="120" width="106" height="80" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="310" y="186" font-size="11" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">分组 1</text>
+  <rect x="412" y="120" width="106" height="80" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="418" y="186" font-size="11" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">分组 2</text>
+  <rect x="520" y="120" width="106" height="80" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="526" y="186" font-size="11" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">分组 3</text>
+  <rect x="200" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="222" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g0</text>
+  <rect x="254" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="276" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g1</text>
+  <rect x="308" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="330" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g2</text>
+  <rect x="362" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="384" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g3</text>
+  <rect x="416" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="438" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g4</text>
+  <rect x="470" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="492" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g5</text>
+  <rect x="524" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="546" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g6</text>
+  <rect x="578" y="130" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="600" y="146.6" font-size="12" text-anchor="middle" font-weight="700">g7</text>
+  <text x="20" y="220" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">各组独立 scheduler、请求与 KV 缓存</text>
+  <text x="20" y="252" font-size="12" font-weight="700">--ep-size 8</text>
+  <text x="20" y="270" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">专家层</text>
+  <rect x="194" y="236" width="438" height="72" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <rect x="200" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="222" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g0</text>
+  <rect x="254" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="276" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g1</text>
+  <rect x="308" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="330" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g2</text>
+  <rect x="362" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="384" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g3</text>
+  <rect x="416" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="438" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g4</text>
+  <rect x="470" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="492" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g5</text>
+  <rect x="524" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="546" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g6</text>
+  <rect x="578" y="244" width="44" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="600" y="260.6" font-size="12" text-anchor="middle" font-weight="700">g7</text>
+  <text x="200" y="296" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个专家组，等同 TP 组</text>
+</svg>

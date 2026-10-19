@@ -61,7 +61,7 @@ flowchart LR
 
 ### 匈牙利算法
 
-给定一个 `M x N` 的代价矩阵（轨迹 x 检测），找出使总代价最小的一对一分配。代价通常是 `1 - IoU(track_bbox, detection_bbox)` 或外观特征的负余弦相似度。运行时是 O((M+N)^3)；M、N 最多约 1000 时，在 Python 里通过 `scipy.optimize.linear_sum_assignment` 够快。
+给定一个 `M x N` 的代价矩阵（轨迹 x 检测），找出使总代价最小的一对一分配。代价通常是 `1 - IoU(track_bbox, detection_bbox)` 或外观特征的负余弦相似度。运行时是 $O((M+N)^3)$；$M, N$ 最多约 1000 时，在 Python 里通过 `scipy.optimize.linear_sum_assignment` 够快。
 
 ### ByteTrack 的关键点子
 

@@ -1030,6 +1030,18 @@ NumPy 会从末尾维度向前逐维比对两个数组的形状。当对应维�
 4. 分别用纯 Python 和 NumPy 实现 `matvec(matrix, vector)` 矩阵向量乘法。使用 `best_time` 在大小为 4、64 和 1024 时进行基准测试，找出 NumPy 开始胜出当前机器的尺寸拐点。
 5. 编写代码重现核心概念小节中的语法统计：使用 `ast.parse` 和 `ast.walk` 遍历 `phases/*/*/code/*.py` 下的所有文件，统计包含 `ast.ListComp`、`ast.Yield` 和 `ast.With` 的文件数量并与表中数字比对。
 
+### 提示
+
+**练习 1。** 从 `code/main.py` 导入 `run_demo`，分别用 `seed=7` 和 `seed=8` 调用，再用 `format_report` 输出两个结果。由随机数据决定的值会变；切分大小只取决于 `n` 和 `test_fraction`，所以不会变。
+
+**练习 2。** 先对列表副本排序。长度为奇数时取中间元素，为偶数时取中间两个元素的均值。用 `[3, 1, 2]`、`[4, 1, 3, 2]` 等列表与 `statistics.median` 对照，结果必须一致。
+
+**练习 3。** 阅读 `code/main.py` 中的 `load_records`，保留解析步骤，但用 `yield` 逐条返回 `Record`，不再追加到列表。用 `save_records` 和 `make_dataset(200_000)` 生成文件，再比较 `peak_bytes(lambda: load_records(path))` 与 `peak_bytes(lambda: sum(1 for _ in your_generator(path)))`。必须在可调用对象内部消费生成器，否则 `peak_bytes` 只测到创建开销。生成器版本的内存峰值应小得多。
+
+**练习 4。** 纯 Python 版本参考 `dot`，对每一行调用一次；NumPy 版本使用 `np.array(matrix) @ np.array(vector)`。用 `best_time` 计时，为每种规模输出一行表格。比较耗时前，先确认两种结果相等。
+
+**练习 5。** 用 `Path.read_text` 读取每个文件，经 `ast.parse` 解析，再用 `any(isinstance(node, ast.ListComp) for node in ast.walk(tree))` 检查某种结构。每个文件只计一次，因为“核心概念”中的表格统计的是文件数。
+
 ## 关键术语
 
 | 术语 | 常见说法 | 实际含义 |

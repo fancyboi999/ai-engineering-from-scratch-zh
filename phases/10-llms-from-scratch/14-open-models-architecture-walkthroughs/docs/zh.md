@@ -52,8 +52,8 @@
 
 LayerNorm 减均值、除标准差、缩放、平移。RMSNorm 只保留缩放：
 
-```
-RMSNorm(x) = x / sqrt(mean(x^2) + eps) * gamma
+```math
+\mathop{\mathrm{RMSNorm}}(x) = \frac{x}{\sqrt{\mathop{\mathrm{mean}}(x^2) + \epsilon}} \cdot \gamma
 ```
 
 不减均值。没有偏置。每个 token 少一次 matmul。Zhang 和 Sennrich（2019）论证它在机器翻译上匹敌 LayerNorm，同时快 10%。每个现代开放模型都跑它。
@@ -78,8 +78,8 @@ score = q_rotated . k_rotated
 
 GPT-2 的 MLP 是 `x -> gelu(xW1 + b1) -> (...)W2 + b2`。SwiGLU（Shazeer 2020）把激活换成一个门控乘积：
 
-```
-SwiGLU(x) = (xW1) * sigmoid(xW1) * xV
+```math
+\mathop{\mathrm{SwiGLU}}(x) = (xW_1) \cdot \mathop{\mathrm{sigmoid}}(xW_1) \cdot xV
 ```
 
 两个并行投影而不是一个，由 Swish 激活门控。经验上每参数困惑度更强。Llama 2 采用了它，大家都跟进。MLP 的隐藏大小通常设成让总参数量匹配原始稠密 MLP：如果 GPT-2 用 `ff_dim = 4 * hidden`，SwiGLU 用 `ff_dim = (2/3) * 4 * hidden = 8/3 * hidden`。
@@ -90,7 +90,7 @@ GPT-2 用 **多头注意力（MHA）**：每个头有自己的 Q、K、V 投影�
 
 **多查询注意力（MQA，Shazeer 2019）** 让所有头共享一个 K 和一个 V。把 KV cache 砍 num_heads 倍，在典型模型上是 12 倍到 32 倍的削减。在难基准上精度略降。
 
-**分组查询注意力（GQA，Ainslie et al. 2023）** 是中间地带：G 组 Q 头共享一个 K 和一个 V。Llama 3 8B 用 GQA，32 个 Q 头、8 个 KV 头（G=8），所以 KV cache 相比完整 MHA 缩小 4 倍。
+**分组查询注意力（GQA，Ainslie et al. 2023）** 是中间地带：$G$ 组 Q 头共享一个 K 和一个 V。Llama 3 8B 用 GQA，32 个 Q 头、8 个 KV 头（$G=8$），所以 KV cache 相比完整 MHA 缩小 4 倍。
 
 **多头潜在注意力（MLA，DeepSeek 2024）** 把 K 和 V 压进一个共享的低秩潜在表示，再按头投影回去。进一步减小 KV cache，同时保留每个头的表达力。DeepSeek-V2 和 V3 靠它实现长 context 性能。
 
@@ -154,6 +154,7 @@ graph LR
 | Qwen 2.5 72B | 2024 | 72B | 72B | RMSNorm | SwiGLU | RoPE (YaRN) | GQA (64/8) | 否 | 128k |
 | DeepSeek V2 236B | 2024 | 236B | 21B | RMSNorm | SwiGLU | RoPE | MLA | 是（160 专家，top-6） | 128k |
 | DeepSeek V3 | 2024 | 671B | 37B | RMSNorm | SwiGLU | RoPE | MLA | 是（256 专家，top-8） | 128k |
+| Spark-X2.5 4B | 2026 | 4.1B | 4.1B | RMSNorm | GeGLU | RoPE + 滑动（3:1） | GQA（16/4），输出门控 | 否 | 1M |
 
 扫一遍各列。RMSNorm 是通用的。SwiGLU 或它的 GeGLU 表亲是通用的。RoPE 是通用的。7B 以上 GQA 是通用的，除非被 MLA 取代。MoE 是顶端的区分项。
 
@@ -175,7 +176,11 @@ Llama 3 8B 配置：
 }
 ```
 
-每个字段都对应你已经实现过的某个东西。
+每个字段都对应着你已经实现过的东西。较新的配置还增加了几个会影响计算结果的字段，计算器会在这些字段存在时读取它们：
+
+- `head_dim`：当头维度不是 `hidden_size / num_attention_heads` 时显式设置。Gemma 2 9B 的 hidden 为 3584，头数为 16，但 `head_dim` 是 256，因此 Q 投影的形状是 3584 x 4096，并非方阵。
+- `tie_word_embeddings`：LM 头是否复用 embedding 矩阵。Llama 3 8B 不共享权重；如果只把 embedding 算一次，就会少算 525M 参数。
+- `layer_types` 与 `sliding_window`：哪些层关注完整上下文，哪些层只关注最近 W 个 token。
 
 - `hidden_size`：embedding 维度。
 - `intermediate_size`：MLP 隐藏大小（3.5 倍 hidden——SwiGLU 的算式）。
@@ -207,6 +212,15 @@ activation_mem ~ batch_size * seq_len * hidden_size * num_layers * bytes_per_ele
 kv_cache = 2 * num_layers * num_kv_heads * head_dim * max_seq_len * bytes_per_element
 ```
 
+这个公式假设每层都缓存完整序列。滑动窗口层只需要最近 W 个 token，所以混合模型需要逐层求和：
+
+```text
+kv_cache = 2 * num_kv_heads * head_dim * bytes_per_element
+           * (full_layers * max_seq_len + sliding_layers * min(W, max_seq_len))
+```
+
+Spark-X2.5 4B 每三个滑动窗口层（$W = 512$）搭配一个完整注意力层：36 层中有 9 个完整注意力层、27 个滑动窗口层。在 1M token 上下文下，BF16 每条序列约需 38.7 GB（36 GiB）。如果全部 36 层都缓存完整上下文，就需要 154.6 GB（144 GiB）。完整注意力层承担了几乎全部缓存开销，所以阅读长上下文模型配置时，应先看完整注意力层与滑动窗口层的比例。
+
 128k context、BF16、head_dim = hidden / num_heads = 128 的 Llama 3 8B：
 每条序列 `2 * 32 * 8 * 128 * 131072 * 2 = 17.2 GB`。
 
@@ -219,6 +233,7 @@ kv_cache = 2 * num_layers * num_kv_heads * head_dim * max_seq_len * bytes_per_el
 - **最高开放能力，接受 MoE 复杂性**：DeepSeek V3、Mixtral 8x22B。每激活 FLOP 的最佳能力。
 - **长 context 需求**：Llama 3（用 RoPE 缩放到 128k）、DeepSeek（MLA 优势）。
 - **低延迟服务**：Gemma 2 9B（滑动窗口削减长 context 计算）。
+- **小显存预算下的长上下文**：Spark-X2.5 4B 等混合滑动窗口模型，只有四分之一的层承担完整上下文的开销。
 
 ```figure
 rmsnorm-vs-layernorm
@@ -237,7 +252,9 @@ config = {
 }
 ```
 
-脚本逐字段走查架构，计算 embedding、注意力（带 GQA 削减）、MLP（带 SwiGLU 扩展）、layernorm 和头的参数量。然后它计算所述 context 长度下的 KV cache 并打印一个摘要。
+脚本逐字段遍历架构，计算 embedding、注意力（考虑 GQA 缩减，以及配置中显式给出的 `head_dim`）、MLP（SwiGLU 或 GeGLU 扩展）、layernorm 和未与 embedding 共享权重的 LM 头各自的参数量。随后逐层计算指定上下文长度下的 KV 缓存；滑动窗口层的缓存长度以窗口大小为上限。最后打印汇总。
+
+稠密模型的总参数量与公布值精确吻合：Llama 3 8B 为 8,030,261,248，Gemma 2 9B 为 9,241,705,984，Spark-X2.5 4B 为 4,112,079,360。Qwen 2.5 72B 相差 819,200，这正是练习 1 要检查的内容。
 
 实现见 `code/main.py`。
 
@@ -246,6 +263,8 @@ config = {
 在脚本里捆绑的 Llama 3 8B、Mistral 7B、Mixtral 8x7B 和 DeepSeek V3 配置上跑这个计算器。对比参数细分。注意 MoE 模型的总参数量碾压稠密模型，但激活参数量往往更小。注意 DeepSeek V3 的 KV cache 比 Llama 3 405B 的更小，尽管它有更多总参数——那就是 MLA 在起作用。
 
 然后插入你本地有的任意模型的配置，读摘要，决定它是否塞得进你的 GPU。
+
+再比较 Gemma 2 9B 和 Spark-X2.5 4B。脚本会为两者分别打印实际所需的 KV 缓存，以及所有层都使用完整注意力时所需的 KV 缓存。Gemma 2 在 8k 上下文中以 1:1 交替使用两类层，因此节省有限。Spark-X2.5 在 1M 上下文中使用 512 token 窗口，两类层比例为 3:1，所以节省约 4 倍。
 
 ## 拿去用
 
@@ -275,7 +294,7 @@ config = {
 | MoE | "稀疏专家" | Mixture of Experts：每块 N 个 MLP，路由器每 token 挑 top-k——巨大的总参数，小的激活参数 |
 | Top-k 路由 | "每 token 挑 k 个专家" | 路由器为每个专家算一个分数，激活最高的 k 个——典型 k 是 2（Mixtral）到 8（DeepSeek） |
 | YaRN | "拉伸 RoPE" | 又一个 RoPE 扩展——插值旋转角，在推理时把 context 从 8k 扩到 128k+ |
-| 滑动窗口注意力 | "别注意所有东西" | 每个 token 只注意最近 W 个 token——把注意力成本封顶在每 token O(W)，Gemma 2 和早期 Mistral 用 |
+| 滑动窗口注意力 | "别注意所有东西" | 每个 token 只注意最近 $W$ 个 token——把注意力成本封顶在每 token $O(W)$，Gemma 2 和早期 Mistral 用 |
 | 激活参数 | "每 token 跑什么" | 对 MoE 模型，每 token 做一次前向传播的参数量（远小于总参数）——决定每 token FLOPs |
 
 ## 延伸阅读

@@ -1,0 +1,347 @@
+{
+  "id": "sglang-101",
+  "title": "SGLang 101",
+  "subtitle": "用 SGLang 部署语言模型，从单个请求到 GPU 集群，补上参数列表之外的判断",
+  "summary": "SGLang 如何把 GPU 内存与时间转化为 token，各项功能为何存在，以及哪些默认值可以信赖。示例来自上游记录的 SGLang 0.5.22 运行。",
+  "audience": "已经调用过模型 API，希望自行部署开源模型的工程师。你知道 token 和 GPU 是什么，尚未读过推理服务引擎的调度器或缓存实现，希望在付费前弄清哪些设置真正重要。",
+  "edition": "2026.10",
+  "status": "draft",
+  "pin": {
+    "subject": "SGLang",
+    "version": "0.5.22",
+    "source": "https://github.com/sgl-project/sglang",
+    "commit": "baa9befa381511cd4d56f83980951e5a45fffc6d",
+    "date": "2026-10-13",
+    "verified": "2026-10-16"
+  },
+  "outcomes": [
+    "启动 SGLang，发送请求，读懂调度器为请求写下的每一行日志。",
+    "计算模型的 KV 缓存成本，有依据地设置池容量，并解释服务器为何耗尽内存。",
+    "编写能命中前缀缓存的 prompt，用 cached_tokens 和 /metrics 证明命中率。",
+    "对服务器做基准测试，找出并发拐点，同时报告 TTFT、TPOT 和吞吐量。",
+    "根据测量选择张量并行、数据并行、专家并行或 prefill-decode 分离。",
+    "判断公开 SGLang 基准的版本、负载，以及解释结果的机制。"
+  ],
+  "palette": [
+    {
+      "hue": "blue",
+      "meaning": "SGLang 服务进程：tokenizer manager、scheduler、detokenizer"
+    },
+    {
+      "hue": "violet",
+      "meaning": "模型及其前向传播：内核、注意力后端、CUDA graphs"
+    },
+    {
+      "hue": "green",
+      "meaning": "KV 缓存：池槽位、基数树节点、缓存的 token"
+    },
+    {
+      "hue": "plum",
+      "meaning": "模型计算：prefill 与 decode 步骤"
+    },
+    {
+      "hue": "olive",
+      "meaning": "客户端与网络：HTTP、OpenAI API、基准客户端"
+    },
+    {
+      "hue": "indigo",
+      "meaning": "流与消息：ZMQ 消息和流式 token"
+    },
+    {
+      "hue": "amber",
+      "meaning": "生命周期：请求状态和调度器阶段"
+    },
+    {
+      "hue": "teal",
+      "meaning": "持久状态：主机内存与存储层、磁盘上的权重"
+    },
+    {
+      "hue": "rose",
+      "meaning": "失败：内存耗尽、回撤、中止、崩溃"
+    },
+    {
+      "hue": "grey",
+      "meaning": "SGLang 外部：操作系统、其他程序、GPU 驱动"
+    }
+  ],
+  "sources": [
+    {
+      "name": "发布标签对应的 SGLang 源码",
+      "path": "v0.5.22 (baa9befa)",
+      "usedFor": "所有默认值和机制；每节来源行列出所用文件"
+    },
+    {
+      "name": "捕获的运行记录",
+      "path": "capture/out/ (SGLang 0.5.22, MLX, Qwen3-0.6B-4bit, macOS 26.2 arm64)",
+      "usedFor": "每段 listing 和每个标为实测的数字"
+    },
+    {
+      "name": "SGLang GitHub issue 与 PR",
+      "path": "github.com/sgl-project/sglang",
+      "usedFor": "事故与各项功能的设计历史"
+    },
+    {
+      "name": "论文",
+      "path": "SGLang (arXiv 2312.07104) 以及代码所实现方法的论文",
+      "usedFor": "RadixAttention 的原始设计和 SGLang 实现的方法"
+    },
+    {
+      "name": "发布标签对应的 SGLang 文档",
+      "path": "docs/ at baa9befa",
+      "usedFor": "文档描述的行为，并与代码核对"
+    },
+    {
+      "name": "独立实践报告",
+      "path": "SGLang 团队之外的工程博客、基准测试和审计结果",
+      "usedFor": "本手册无法运行的 GPU 行为，标明作者和日期"
+    },
+    {
+      "name": "SGLang 团队与厂商报告",
+      "path": "LMSYS、RadixArk 和硬件厂商文章",
+      "usedFor": "始终标明由原作者提出的主张"
+    }
+  ],
+  "quoteSources": {
+    "code": null,
+    "docs": null,
+    "paper": null,
+    "issue": null,
+    "field": null,
+    "team": null
+  },
+  "capture": {
+    "run": [
+      "python3",
+      "capture/run.py"
+    ],
+    "check": [
+      "python3",
+      "capture/run.py",
+      "--check"
+    ],
+    "timeoutSeconds": 1800
+  },
+  "front": "front.md",
+  "plate": {
+    "figure": "plate-sglang-request",
+    "title": "一个请求，三个进程，一个缓存",
+    "caption": "捕获记录中的聊天请求经过三个进程。基数缓存提供了 2,999 个 prompt token 中的 2,998 个。来源：capture/out/cache-experiment.txt。"
+  },
+  "parts": [
+    {
+      "number": 1,
+      "title": "一页读懂 SGLang",
+      "thesis": "推理服务引擎要让昂贵的 GPU 忙于计算此前未算过的 token，SGLang 的每项功能都服务于这个目标。",
+      "summary": "对比 prefill 与 decode，理解评估服务器的四个指标，跟踪捕获记录中的一个完整请求。",
+      "accent": "blue",
+      "sections": [
+        {
+          "id": "1.1",
+          "file": "sections/1-1-what-a-serving-engine-owns.md"
+        },
+        {
+          "id": "1.2",
+          "file": "sections/1-2-one-request-end-to-end.md"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "请求路径",
+      "thesis": "请求经过三个进程，中间的调度器决定谁运行、谁等待、谁被移出。",
+      "summary": "sglang serve、调度循环与策略、准入与回撤、重叠调度器，以及响应路径。",
+      "accent": "amber",
+      "sections": [
+        {
+          "id": "2.1",
+          "file": "sections/2-1-sglang-serve-and-the-three-processes.md"
+        },
+        {
+          "id": "2.2",
+          "file": "sections/2-2-the-scheduler-loop-and-schedule-policy.md"
+        },
+        {
+          "id": "2.3",
+          "file": "sections/2-3-admission-and-retraction.md"
+        },
+        {
+          "id": "2.4",
+          "file": "sections/2-4-the-overlap-scheduler.md"
+        },
+        {
+          "id": "2.5",
+          "file": "sections/2-5-streaming-stop-strings-and-the-openai-api.md"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "KV 缓存",
+      "thesis": "决定一张 GPU 能服务多少用户的是内存，而基数树决定多少内存需要重复付费。",
+      "summary": "每个 token 的字节数、启动容量计算、RadixCache、利于前缀复用的 prompt、淘汰与 HiCache，以及混合模型。",
+      "accent": "green",
+      "sections": [
+        {
+          "id": "3.1",
+          "file": "sections/3-1-kv-bytes-per-token-and-the-kv-pool.md"
+        },
+        {
+          "id": "3.2",
+          "file": "sections/3-2-mem-fraction-static-and-startup-sizing.md"
+        },
+        {
+          "id": "3.3",
+          "file": "sections/3-3-radixcache.md"
+        },
+        {
+          "id": "3.4",
+          "file": "sections/3-4-prefix-friendly-prompts.md"
+        },
+        {
+          "id": "3.5",
+          "file": "sections/3-5-eviction-policies-and-hicache.md"
+        },
+        {
+          "id": "3.6",
+          "file": "sections/3-6-hybrid-models-and-the-cache.md"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "每次前向传播",
+      "thesis": "decode 的大部分时间花在启动开销和内存传输上，因此 SGLang 会预先为 GPU 选择计算图、内核和草稿 token。",
+      "summary": "ForwardMode 与 CUDA graphs、注意力后端、量化、推测解码、结构化输出，以及确定性推理。",
+      "accent": "violet",
+      "sections": [
+        {
+          "id": "4.1",
+          "file": "sections/4-1-forwardmode-and-cuda-graphs.md"
+        },
+        {
+          "id": "4.2",
+          "file": "sections/4-2-attention-backend.md"
+        },
+        {
+          "id": "4.3",
+          "file": "sections/4-3-quantization.md"
+        },
+        {
+          "id": "4.4",
+          "file": "sections/4-4-speculative-decoding.md"
+        },
+        {
+          "id": "4.5",
+          "file": "sections/4-5-structured-outputs-with-xgrammar.md"
+        },
+        {
+          "id": "4.6",
+          "file": "sections/4-6-deterministic-inference-and-logprobs.md"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "测量服务器",
+      "thesis": "没有延迟目标的吞吐量数字没有意义；调优前先测出拐点。",
+      "summary": "sglang.benchmark.serving、/metrics 端点，以及如何阅读他人发布的基准。",
+      "accent": "olive",
+      "sections": [
+        {
+          "id": "5.1",
+          "file": "sections/5-1-sglang-benchmark-serving.md"
+        },
+        {
+          "id": "5.2",
+          "file": "sections/5-2-the-metrics-endpoint.md"
+        },
+        {
+          "id": "5.3",
+          "file": "sections/5-3-reading-other-peoples-benchmarks.md"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "从单机到集群",
+      "thesis": "单张 GPU 饱和后再跨 GPU 拆分模型；测出 prefill 的干扰后再分离 prefill 与 decode。",
+      "summary": "张量、数据、注意力数据和专家并行，MoE 服务、prefill-decode 分离，以及模型网关。",
+      "accent": "indigo",
+      "sections": [
+        {
+          "id": "6.1",
+          "file": "sections/6-1-tp-size-dp-size-and-attn-dp-size.md"
+        },
+        {
+          "id": "6.2",
+          "file": "sections/6-2-moe-serving-deepep-and-eplb.md"
+        },
+        {
+          "id": "6.3",
+          "file": "sections/6-3-prefill-decode-disaggregation.md"
+        },
+        {
+          "id": "6.4",
+          "file": "sections/6-4-sgl-model-gateway.md"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "生产与训练",
+      "thesis": "运行 SGLang 时记下默认值；强化学习会把服务器视为训练循环的一部分。",
+      "summary": "按顺序部署和调优，以及作为 Miles rollout 引擎的 SGLang。",
+      "accent": "plum",
+      "sections": [
+        {
+          "id": "7.1",
+          "file": "sections/7-1-operating-sglang.md"
+        },
+        {
+          "id": "7.2",
+          "file": "sections/7-2-sglang-as-an-rl-rollout-engine.md"
+        }
+      ]
+    }
+  ],
+  "reference": {
+    "title": "参考",
+    "thesis": "集中查阅本手册使用的参数、指标、事故、术语和来源。",
+    "accent": "grey",
+    "sections": [
+      {
+        "id": "R.1",
+        "file": "sections/r-1-flags-and-defaults.md"
+      },
+      {
+        "id": "R.2",
+        "file": "sections/r-2-metrics.md"
+      },
+      {
+        "id": "R.3",
+        "file": "sections/r-3-incident-index.md"
+      },
+      {
+        "id": "R.4",
+        "file": "sections/r-4-glossary.md"
+      },
+      {
+        "id": "R.5",
+        "file": "sections/r-5-sources.md"
+      },
+      {
+        "id": "R.6",
+        "file": "sections/r-6-figure-index.md"
+      }
+    ]
+  },
+  "related": [
+    "phases/17-infrastructure-and-production/04-vllm-serving-internals",
+    "phases/17-infrastructure-and-production/08-inference-metrics-goodput",
+    "phases/17-infrastructure-and-production/05-eagle3-speculative-decoding",
+    "phases/17-infrastructure-and-production/09-production-quantization",
+    "phases/17-infrastructure-and-production/28-self-hosted-serving-selection",
+    "phases/10-llms-from-scratch/12-inference-optimization",
+    "phases/11-llm-engineering/15-prompt-caching"
+  ]
+}

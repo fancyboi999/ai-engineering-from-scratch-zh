@@ -11,7 +11,7 @@
 
 稠密 transformer 推理时的 FLOPs 等于它的参数量（前向通过乘 2）。把稠密模型放大，每个 token 都付全额账单。到 2024 年，前沿撞上了一堵算力墙：要变得有意义地更聪明，每 token 需要指数级更多的 FLOPs。
 
-Mixture of Experts 打断了这个绑定。把每个 FFN 换成 `E` 个独立专家 + 一个为每个 token 挑 `k` 个专家的路由器。总参数 = `E × FFN_size`。每 token 激活参数 = `k × FFN_size`。2026 年典型配置：`E=256`、`k=8`。存储随 `E` 增长，算力随 `k` 增长。
+Mixture of Experts 打断了这个绑定。把每个 FFN 换成 $E$ 个独立专家 + 一个为每个 token 挑 $k$ 个专家的路由器。总参数 = $E \times \text{FFN 大小}$。每 token 激活参数 = $k \times \text{FFN 大小}$。2026 年典型配置：$E=256$、$k=8$。存储随 $E$ 增长，算力随 $k$ 增长。
 
 2026 年的前沿几乎全是 MoE：DeepSeek-V3（671B 总 / 37B 激活）、Mixtral 8×22B、Qwen2.5-MoE、Llama 4、Kimi K2、gpt-oss。在 Artificial Analysis 的独立排行榜上，前 10 个开源模型全是 MoE。
 
@@ -46,7 +46,7 @@ h = h + sum_{e in top_k}(
 如果路由器把 90% 的 token 都送进专家 3，其他专家就饿死了。试过三种修法：
 
 1. **辅助负载均衡损失**（Switch Transformer、Mixtral）。加一个与专家使用率方差成比例的惩罚。有效，但多了一个超参和第二个梯度信号。
-2. **专家容量 + token 丢弃**（早期 Switch）。每个专家最多处理 `C × N/E` 个 token；溢出的 token 跳过这一层。伤质量。
+2. **专家容量 + token 丢弃**（早期 Switch）。每个专家最多处理 $C \times N/E$ 个 token；溢出的 token 跳过这一层。伤质量。
 3. **无辅助损失均衡**（DeepSeek-V3）。给每个专家加一个学到的偏置，移动路由器的 top-k 选择。偏置在训练损失之外更新。对主目标无惩罚。2024 年的大解锁。
 
 DeepSeek-V3 的做法：每个训练步之后，对每个专家，检查它的使用率高于还是低于目标。把偏置推 `±γ`。选择用 `scores + bias`。门控用的专家概率是原始 `scores`，不变。把路由和表达解耦了。
@@ -59,7 +59,7 @@ DeepSeek-V2/V3 还把专家分成*共享*和*路由*两类。每个 token 都过
 
 经典 MoE（GShard、Switch）：每个专家和一个完整 FFN 一样宽。`E` 小（8–64），`k` 小（1–2）。
 
-现代细粒度 MoE（DeepSeek-V3、Qwen-MoE）：每个专家更窄（1/8 FFN 大小）。`E` 大（256+），`k` 更大（8+）。同样的总参数，但组合数扩展快得多。每个 token 有 `C(256, 8) = 400 trillion` 种可能的"专家"。质量上去，延迟不动。
+现代细粒度 MoE（DeepSeek-V3、Qwen-MoE）：每个专家更窄（1/8 FFN 大小）。$E$ 大（256+），$k$ 更大（8+）。同样的总参数，但组合数扩展快得多。每个 token 有 $\binom{256}{8} \approx 400$ 万亿 种可能的"专家"。质量上去，延迟不动。
 
 ### 成本画像
 
@@ -159,7 +159,7 @@ model = AutoModelForCausalLM.from_pretrained("mistralai/Mixtral-8x22B-v0.1")
 | 无辅助损失 | "DeepSeek-V3 的把戏" | 只通过路由器选择上的每专家偏置来均衡；无额外梯度。 |
 | 共享专家 | "总是开着" | 每个 token 都过的额外专家；捕捉通用知识。 |
 | 专家并行 | "按专家分片" | 把不同专家分到不同 GPU；让 token 跨网络路由。 |
-| 稀疏度 | "激活参数 < 总参数" | 比值 `k × expert_size / (E × expert_size)`；DeepSeek-V3 是 37/671 ≈ 5.5%。 |
+| 稀疏度 | "激活参数 < 总参数" | 比值 $k \times \text{专家大小} / (E \times \text{专家大小})$；DeepSeek-V3 是 37/671 ≈ 5.5%。 |
 
 ## 延伸阅读
 

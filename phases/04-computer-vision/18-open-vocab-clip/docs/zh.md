@@ -42,7 +42,7 @@ flowchart LR
 
 ### 目标
 
-给定一个 batch 的 N 个（图像，标题）对，构建一个 NxN 的相似度矩阵。训练两个编码器，让对角线（匹配的对）相似度高、非对角线（不匹配的）相似度低。
+给定一个 batch 的 $N$ 个（图像，标题）对，构建一个 $N \times N$ 的相似度矩阵。训练两个编码器，让对角线（匹配的对）相似度高、非对角线（不匹配的）相似度低。
 
 ```
 sim_matrix = image_embeddings @ text_embeddings.T / tau
@@ -58,9 +58,11 @@ loss = (loss_i2t + loss_t2i) / 2
 
 SigLIP（Zhai 等人，2023）把 softmax 换成了逐对 sigmoid：
 
-```
-loss = 对所有对求 log(1 + exp(-y_ij * sim_ij)) 的均值
-y_ij = 匹配则 +1，否则 -1
+```math
+\begin{aligned}
+\text{loss} &= \mathop{\mathrm{mean}}\limits_{\text{pairs}} \log\left(1 + \exp(-y_{ij} \cdot \text{sim}_{ij})\right) \\
+y_{ij} &= \begin{cases} +1 & \text{若匹配} \\ -1 & \text{其他情况} \end{cases}
+\end{aligned}
 ```
 
 逐对损失去掉了 CLIP 需要的 batch 级归一化。SigLIP 在小 batch 下训得更好，在同等数据下匹敌或超过 CLIP。

@@ -179,4 +179,5 @@ test('write-hubs: 只写指定生成目录，清理过期页面，不改源文�
 test('build-hubs: 真实中文源全量生成与模板检查（隔离 /tmp）', () => {
   const { hubs } = checkHubs();
   assert.equal(hubs.phasePages.length, 20);
+  assert.equal(hubs.phaseModels.reduce((total, phase) => total + phase.lessons.length, 0), 542);
 });

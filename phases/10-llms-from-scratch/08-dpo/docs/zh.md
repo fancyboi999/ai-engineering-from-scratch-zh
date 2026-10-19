@@ -32,51 +32,53 @@ DPO 把 RLHF 化简成单个监督学习步骤。一个模型。一个损失函�
 
 RLHF 优化这个目标：
 
-```
-maximize: E[R(x, y)] - beta * KL(pi || pi_ref)
-```
-
-其中 R 是奖励模型，pi 是策略，pi_ref 是参考模型，beta 是 KL 系数。
-
-DPO 论文表明这个目标有一个闭式最优解。对任意奖励函数 R，最优策略是：
-
-```
-pi*(y | x) = pi_ref(y | x) * exp(R(x, y) / beta) / Z(x)
+```math
+\text{最大化：} \quad \mathbb{E}[R(x, y)] - \beta \cdot \mathrm{KL}(\pi \,\|\, \pi_{\text{ref}})
 ```
 
-其中 Z(x) 是一个归一化常数。重新整理：
+其中 $R$ 是奖励模型，$\pi$ 是策略，$\pi_{\text{ref}}$ 是参考模型，$\beta$ 是 KL 系数。
 
+DPO 论文表明这个目标有一个闭式最优解。对任意奖励函数 $R$，最优策略是：
+
+```math
+\pi^*(y \mid x) = \pi_{\text{ref}}(y \mid x) \cdot \exp(R(x, y) / \beta) / Z(x)
 ```
-R(x, y) = beta * log(pi*(y | x) / pi_ref(y | x)) + beta * log Z(x)
+
+其中 $Z(x)$ 是一个归一化常数。重新整理：
+
+```math
+R(x, y) = \beta \log \frac{\pi^*(y \mid x)}{\pi_{\text{ref}}(y \mid x)} + \beta \log Z(x)
 ```
 
 这就是突破。奖励完全用策略模型的概率和参考模型的概率来表达。你不需要训练一个单独的奖励模型。奖励 *隐含* 在那个概率比里。
 
 把它代入 Bradley-Terry 偏好模型：
 
-```
-P(y_w > y_l | x) = sigmoid(R(x, y_w) - R(x, y_l))
-                  = sigmoid(beta * (log pi(y_w|x)/pi_ref(y_w|x) - log pi(y_l|x)/pi_ref(y_l|x)))
+```math
+\begin{aligned}
+P(y_w > y_l \mid x) &= \mathop{\mathrm{sigmoid}}(R(x, y_w) - R(x, y_l)) \\
+&= \mathop{\mathrm{sigmoid}}\left(\beta \left(\log \frac{\pi(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \log \frac{\pi(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right)
+\end{aligned}
 ```
 
-Z(x) 项抵消了，因为两个回复都以同一个 prompt x 为条件。剩下的，是一个只依赖策略模型在 preferred 和 rejected 回复上的对数概率、以及参考模型对数概率的函数。
+$Z(x)$ 项抵消了，因为两个回复都以同一个 prompt $x$ 为条件。剩下的，是一个只依赖策略模型在 preferred 和 rejected 回复上的对数概率、以及参考模型对数概率的函数。
 
 ### DPO 损失
 
-```
-L_DPO = -log(sigmoid(beta * (log pi(y_w|x)/pi_ref(y_w|x) - log pi(y_l|x)/pi_ref(y_l|x))))
+```math
+L_{\text{DPO}} = -\log \mathop{\mathrm{sigmoid}}\left(\beta \left(\log \frac{\pi(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \log \frac{\pi(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right)
 ```
 
 我们逐块拆解：
 
-- **y_w** = preferred（胜出）回复
-- **y_l** = rejected（落败）回复
-- **x** = prompt
-- **pi** = 当前模型（正在训练）
-- **pi_ref** = 参考模型（冻结的 SFT checkpoint）
-- **beta** = 控制偏离参考程度的温度参数（通常 0.1 到 0.5）
+- **$y_w$** = preferred（胜出）回复
+- **$y_l$** = rejected（落败）回复
+- **$x$** = prompt
+- **$\pi$** = 当前模型（正在训练）
+- **$\pi_{\text{ref}}$** = 参考模型（冻结的 SFT checkpoint）
+- **$\beta$** = 控制偏离参考程度的温度参数（通常 0.1 到 0.5）
 
-比率 `log pi(y|x) / pi_ref(y|x)` 是对数概率比。当这个比率为正，当前模型给回复 y 分配的概率高于参考。为负时，当前模型分配的概率更低。
+比率 `log pi(y|x) / pi_ref(y|x)` 是对数概率比。当这个比率为正，当前模型给回复 $y$ 分配的概率高于参考。为负时，当前模型分配的概率更低。
 
 DPO 损失推动模型为 preferred 回复增大对数概率比、为 rejected 回复减小它。beta 参数控制模型偏离参考能有多激进——小 beta 意味着允许大幅偏离，大 beta 让模型靠近参考。
 
@@ -641,7 +643,7 @@ if __name__ == "__main__":
 | DPO | "没有 RL 的 RLHF" | 直接偏好优化：一个监督学习算法，直接在偏好对上优化语言模型，绕过奖励模型和 PPO |
 | 隐式奖励 | "奖励在模型里" | 奖励函数由策略和参考模型之间的对数概率比决定——不需要单独的奖励模型 |
 | Beta（DPO） | "那个温度" | 控制策略能偏离参考模型多远——小 beta 允许大幅偏离，大 beta 让模型靠近 |
-| 对数概率比 | "模型变了多少" | log pi(y\|x) - log pi_ref(y\|x)——为正意味着当前模型分配的概率高于参考 |
+| 对数概率比 | "模型变了多少" | $\log \pi(y \mid x) - \log \pi_{\text{ref}}(y \mid x)$——为正意味着当前模型分配的概率高于参考 |
 | 参考模型 | "那个冻结的 checkpoint" | SFT 模型的一份拷贝，权重永不改变——作为计算概率比的锚点 |
 | KTO | "没有成对的 DPO" | Kahneman-Tversky Optimization：用非成对的 "好" 或 "坏" 标签工作，而不需要偏好对 |
 | ORPO | "一步对齐" | Odds Ratio Preference Optimization：通过给 SFT 损失加一个偏好项，把 SFT 和对齐合进一个训练循环 |

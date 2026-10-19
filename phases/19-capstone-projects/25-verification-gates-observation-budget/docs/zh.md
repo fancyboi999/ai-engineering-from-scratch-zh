@@ -82,7 +82,7 @@ token counter 故意只用一个很蠢的 `len(text) // 4` 估算。重点是 ga
 
 ## 为什么 chain 顺序重要
 
-deny 总比 allow 便宜。`WhitelistGate` 是 O(1) 的哈希查找；`RegexGate` 是 O(pattern * argv)`；`RecencyGate` 要读 message store 的一小段；`BudgetGate` 要看整本 ledger。顺序应该按成本从低到高排，这样被拒绝的 call 会尽早短路，不会把昂贵逻辑白跑一遍。
+deny 总比 allow 便宜。`WhitelistGate` 是 $O(1)$ 的哈希查找；`RegexGate` 是 $O(\text{pattern} \cdot \text{argv})$`；`RecencyGate` 要读 message store 的一小段；`BudgetGate` 要看整本 ledger。顺序应该按成本从低到高排，这样被拒绝的 call 会尽早短路，不会把昂贵逻辑白跑一遍。
 
 顺序还应该按 blast radius 排。Whitelist 是最强约束：这个 tool 根本不在契约里。Regex 次之：这个参数形状不在契约里。Recency 再后：调用本身合法，但上下文窗口已经老了。Budget 放最后，因为它本质上只在前面都过了时才有意义。
 

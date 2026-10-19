@@ -14,6 +14,10 @@ on:
   push:
     branches: [main]
     paths:
+      - "cheatsheets/**"
+      - "scripts/agent-machine/**"
+      - "scripts/check_lesson_math.js"
+      - "scripts/build-og-fonts.js"
       - "projects/**"
       - "manuals/**"
       - "site/**"
@@ -77,6 +81,23 @@ jobs:
           echo "✅ 站点构建成功，data.js 已生成"
       - name: 课程数一致性校验（防 README/ROADMAP 课数漂移）
         run: node site/build.js --check
+      - name: 中文数学与速查表校验
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          const html = fs.readFileSync('site/lesson.html', 'utf8');
+          const base = /var KATEX_BASE = '([^']+)'/.exec(html)[1];
+          const integrity = /var KATEX_JS_SRI = '([^']+)'/.exec(html)[1];
+          const response = await fetch(base + 'katex.min.js');
+          if (!response.ok) throw new Error(`KaTeX download failed: ${response.status}`);
+          const bytes = Buffer.from(await response.arrayBuffer());
+          const actual = 'sha384-' + crypto.createHash('sha384').update(bytes).digest('base64');
+          if (actual !== integrity) throw new Error('Pinned KaTeX integrity mismatch');
+          fs.writeFileSync(process.env.RUNNER_TEMP + '/aieng-katex.cjs', bytes);
+          NODE
+          node scripts/check_lesson_math.js --katex "$RUNNER_TEMP/aieng-katex.cjs"
+          node site/build-cheatsheets.js --check
       - name: 中文课程结构与站内链接校验
         run: python3 scripts/audit_lessons.py --strict
       - name: Claude 认证课程合约校验
@@ -160,6 +181,13 @@ jobs:
           GOPROXY: "off"
           GOSUMDB: "off"
         run: python3 scripts/project_test.py --all --solution --strict --report "$RUNNER_TEMP/project-grade.json"
+      - name: 逆向验证器真实对象回归
+        run: |
+          command -v clang
+          python3 -m unittest discover -s phases/13-tools-and-protocols/36-rebuild-and-prove-equal/code/tests -v
+          # Apple clang 冻结字节与 macOS 运行记录不要求 Linux 编译器重现；
+          # 此 gate 运行可移植的真实重定位边界，包含符号、addend 和节偏移。
+          python3 -m unittest discover -s phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/code/tests -k ByteFieldTests -v
       - name: 项目、图表、Hub、手册与课程读取集成回归
         env:
           PYTHONDONTWRITEBYTECODE: "1"

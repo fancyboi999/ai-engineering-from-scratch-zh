@@ -1,0 +1,179 @@
+{
+  "id": "binary-inspector",
+  "title": "二进制检查器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "静态读取你编译的 ELF、PE/COFF 和 Mach-O 文件，报告布局、名称、链接和函数入口。",
+  "summary": "检查你自行编译的程序。输入 ELF64 目标文件、COFF 目标文件、PE32+ 映像或 Mach-O 64 文件，输出格式、架构、节和段的权限与熵。读取符号并用小型 Itanium 解码器还原 C++ 名称，报告导入、导出、重定位、链式修正和字符串所属的节。以未剥离符号的构建为基准评价函数入口识别，生成 JSON 报告、带字节图的 HTML 报告以及两个构建的差异。",
+  "hours": 10,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "struct 模块直接读取固定布局的记录，因此检查器报告的每个字段都来自可以手工核对的偏移。"
+  },
+  "status": "ready",
+  "source": "core",
+  "author": {
+    "name": "AI Engineering from Scratch",
+    "github": "rohitg00"
+  },
+  "skills": [
+    "识别二进制格式并解析文件头",
+    "绘制节和段的布局，显示权限与熵",
+    "读取符号表并还原 C++ 名称",
+    "追踪导入、导出、重定位与链式修正",
+    "恢复函数入口并对照真值评分",
+    "发布 JSON 报告、HTML 字节图和构建差异"
+  ],
+  "prerequisites": [
+    "检查器和评分器需要 Python 3.10+",
+    "阶段 13 第 32、40、41 课：ELF 表、链接与加载、C++ 名称",
+    "十六进制运算、小端字节序和 struct 模块"
+  ],
+  "youWillBuild": "静态读取你编译的 ELF、PE/COFF 和 Mach-O 文件，报告布局、名称、链接和函数入口。",
+  "usefulFor": [
+    "发布前检查构建内容：哪些节可写、可执行，导入哪些库，以及 strip 删除了哪些名称。",
+    "比较自己程序的两次构建，查看哪些节变大、哪些符号移动、哪些字符串改变。"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-binary-inspector-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "inspect",
+      "fixtures/tally-arm64-O2.stripped",
+      "--truth",
+      "fixtures/tally-arm64-O2",
+      "--json",
+      "report.json",
+      "--html",
+      "report.html"
+    ]
+  },
+  "stages": [
+    {
+      "id": "01-headers",
+      "title": "识别格式并解析文件头",
+      "summary": "读取魔数，识别 ELF64、COFF 目标文件、PE32+ 映像或 Mach-O 64。将各格式的文件头解析为统一结构：格式、架构、类型、入口和原始字段。按顺序读取 Mach-O 加载命令。对 32 位、大端、通用格式及截断文件抛出说明原因的 FormatError。",
+      "hours": 1.5,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "struct.unpack_from 配合显式边界检查，让每个文件头字段都对应一次受检读取。",
+      "concepts": [
+        "魔数",
+        "ELF 文件头",
+        "COFF 文件头",
+        "PE 可选头",
+        "Mach-O 加载命令"
+      ],
+      "timeout": 90,
+      "figure": "pj-binary-inspector-1"
+    },
+    {
+      "id": "02-layout",
+      "title": "节、段、权限与熵",
+      "summary": "列出各格式的节名、地址、文件偏移、大小和文件内字节数。从格式标志生成 r/w/x 权限串。列出 ELF 程序头和 Mach-O 段。对各区域实际占用的文件字节计算香农熵，单位为位/字节；零填充区域报告 0。",
+      "hours": 1.5,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "collections.Counter 和 math.log2 用三行代码表达熵公式，可对照手工计数检查。",
+      "concepts": [
+        "节头",
+        "程序头",
+        "权限标志",
+        "香农熵"
+      ],
+      "timeout": 90,
+      "figure": "pj-binary-inspector-2"
+    },
+    {
+      "id": "03-symbols",
+      "title": "符号、字符串表与名称还原",
+      "summary": "读取 ELF .symtab 与 .dynsym、COFF 符号及辅助记录、Mach-O nlist_64 项。通过带边界检查的 C 字符串读取从字符串表解析名称。报告值、大小、类型、绑定和所属节。还原文档规定的 Itanium C++ 名称子集，对超出范围的名称返回 None。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "小型递归下降解析器直接处理字符串，展示 Itanium 语法和替换表，无需外部库。",
+      "concepts": [
+        "符号表",
+        "字符串表",
+        "COFF 辅助记录",
+        "nlist",
+        "Itanium 名称修饰"
+      ],
+      "timeout": 90,
+      "figure": "pj-binary-inspector-3"
+    },
+    {
+      "id": "04-linkage",
+      "title": "导入、导出、重定位与链式修正",
+      "summary": "读取 ELF RELA、COFF 重定位、Mach-O relocation_info 和 PE 基址重定位。读取 PE 导入、导出目录。逐字解码 Mach-O 链式修正为绑定和重定基址，读取带 ULEB128 值的导出 trie。解引用前检查每个指针；链或 trie 循环、越出页面时立即失败。",
+      "hours": 2,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "整数移位与掩码按加载器的方式解码打包的 64 位修正字。",
+      "concepts": [
+        "重定位",
+        "导入地址表",
+        "导出目录",
+        "链式修正",
+        "导出 trie",
+        "ULEB128"
+      ],
+      "timeout": 90,
+      "figure": "pj-binary-inspector-4"
+    },
+    {
+      "id": "05-discovery",
+      "title": "字符串归属与函数入口恢复",
+      "summary": "提取 ASCII 和 UTF-16LE 字符串，标明所属的节和段。用五种方法查找函数入口：符号、LC_FUNCTION_STARTS、序言扫描、直接调用目标和入口点。以未剥离构建的符号表为基准，计算每种方法的精确率和召回率。",
+      "hours": 1.5,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "集合让真阳性、假阳性和遗漏各用一个操作表达。",
+      "concepts": [
+        "字符串提取",
+        "函数入口",
+        "序言模式",
+        "调用目标",
+        "精确率与召回率"
+      ],
+      "timeout": 120,
+      "figure": "pj-binary-inspector-5"
+    },
+    {
+      "id": "06-report",
+      "title": "JSON 报告、HTML 字节图与构建差异",
+      "summary": "将各阶段组合为带版本的 JSON 报告并校验。生成含字节图的独立 HTML 报告。文件片段的颜色由所属区域决定，亮度由熵决定。转义二进制文件提供的所有字符串。比较两份报告，显示节增长、符号移动与删除，以及导入、导出和字符串的变化。",
+      "hours": 1.5,
+      "difficulty": "core",
+      "language": "python",
+      "languageWhy": "标准库 json 与 html 生成脚本和评审者都能读取的报告。",
+      "concepts": [
+        "报告 schema",
+        "字节图",
+        "HTML 转义",
+        "构建差异"
+      ],
+      "timeout": 180,
+      "figure": "pj-binary-inspector-6"
+    }
+  ],
+  "demos": [
+    {
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "title": "初始化并评分",
+      "caption": "实录：初始模板失败，随后参考实现的所有阶段通过。参考实现通过不代表学习者获得证书。"
+    },
+    {
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "title": "检查输出",
+      "caption": "演示命令对已剥离符号的 arm64 构建产生的真实输出，以未剥离版本评分，并比较 -O0 与 -O2 构建。"
+    }
+  ]
+}

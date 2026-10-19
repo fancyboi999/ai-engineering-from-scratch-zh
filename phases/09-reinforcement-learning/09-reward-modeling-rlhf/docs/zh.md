@@ -21,31 +21,31 @@ RLHF（Christiano 等人 2017；Ouyang 等人 2022）把偏好转成一个奖励
 
 ![Three-stage RLHF: SFT, RM training on pairwise prefs, PPO with KL penalty](../assets/rlhf.svg)
 
-**第 1 阶段：监督微调（SFT）。** 从一个预训练基座模型开始。在目标行为的人写示范（遵循指令的回复、有帮助的答复等）上微调。结果：一个*偏向好行为*但动作空间仍无界的模型 `π_SFT`。
+**第 1 阶段：监督微调（SFT）。** 从一个预训练基座模型开始。在目标行为的人写示范（遵循指令的回复、有帮助的答复等）上微调。结果：一个*偏向好行为*但动作空间仍无界的模型 $\pi_{\text{SFT}}$。
 
 **第 2 阶段：奖励模型训练。**
 
-- 对 prompt `x`，收集成对回复 `(y_+, y_-)`，由人类标注为"y_+ 优于 y_-"。
-- 训练一个奖励模型 `R_φ(x, y)`，给 `y_+` 打更高分。
+- 对 prompt $x$，收集成对回复 $(y_+, y_-)$，由人类标注为"y_+ 优于 y_-"。
+- 训练一个奖励模型 $R_\phi(x, y)$，给 $y_+$ 打更高分。
 - 损失：**Bradley-Terry 成对逻辑斯蒂**：
 
-  `L(φ) = -E[ log σ(R_φ(x, y_+) - R_φ(x, y_-)) ]`
+  $L(\phi) = -\mathbb{E}[ \log \sigma(R_\phi(x, y_+) - R_\phi(x, y_-)) ]$
 
-  σ 是 sigmoid。奖励之差蕴含了偏好的对数几率。BT 自 1952 年（Bradley-Terry）起就是标准，也是现代 RLHF 里占主导的选择。
+  $\sigma$ 是 sigmoid。奖励之差蕴含了偏好的对数几率。BT 自 1952 年（Bradley-Terry）起就是标准，也是现代 RLHF 里占主导的选择。
 
-- `R_φ` 通常从 SFT 模型初始化，上面加一个标量头。同样的 transformer 主干；一个线性层输出奖励。
+- $R_\phi$ 通常从 SFT 模型初始化，上面加一个标量头。同样的 transformer 主干；一个线性层输出奖励。
 
 **第 3 阶段：带 KL 惩罚地对 RM 做 PPO。**
 
-- 从 `π_SFT` 初始化可训练策略 `π_θ`。保留一个冻结的*参考* `π_ref = π_SFT`。
-- 回复 `y` 末尾的奖励：
+- 从 $\pi_{\text{SFT}}$ 初始化可训练策略 $\pi_\theta$。保留一个冻结的*参考* $\pi_{\text{ref}} = \pi_{\text{SFT}}$。
+- 回复 $y$ 末尾的奖励：
 
-  `r_total(x, y) = R_φ(x, y) - β · KL(π_θ(·|x) || π_ref(·|x))`
+  $r_{\text{total}}(x, y) = R_\phi(x, y) - \beta \cdot \mathrm{KL}(\pi_\theta(\cdot \mid x) \Vert \pi_{\text{ref}}(\cdot \mid x))$
 
-  KL 惩罚阻止 `π_θ` 从 `π_SFT` 任意漂移——它是*正则项*，不是硬性信任域。`β` 通常 `0.01`-`0.05`。
+  KL 惩罚阻止 $\pi_\theta$ 从 $\pi_{\text{SFT}}$ 任意漂移——它是*正则项*，不是硬性信任域。$\beta$ 通常 `0.01`-`0.05`。
 - 用这个奖励跑 PPO（第 08 课）。优势在 token 级轨迹上计算，但 RM 只给完整回复打分。
 
-**为什么要 KL？** 没有它，PPO 会乐呵呵地找到奖励 hacking 策略——RM 只在分布内补全上训过。一个分布外的回复可能比任何人写的都打分更高。KL 让 `π_θ` 待在 RM 训练所在的流形附近。它是 RLHF 里最重要的那一个旋钮。
+**为什么要 KL？** 没有它，PPO 会乐呵呵地找到奖励 hacking 策略——RM 只在分布内补全上训过。一个分布外的回复可能比任何人写的都打分更高。KL 让 $\pi_\theta$ 待在 RM 训练所在的流形附近。它是 RLHF 里最重要的那一个旋钮。
 
 **2026 现状：**
 
@@ -97,7 +97,7 @@ def rm_train_step(w, x, y_pos, y_neg, lr):
 
 ### 第 3 步：在 RM 之上跑类 PPO 策略
 
-我们的玩具策略从词表里产出单个 token。我们在 RM 下给这个 token 打分，算 `log π_θ(token | prompt)`，加上一个到参考的 KL 惩罚，再套用裁剪的 PPO 代理。
+我们的玩具策略从词表里产出单个 token。我们在 RM 下给这个 token 打分，算 $\log \pi_\theta(\text{token} \mid \text{prompt})$，加上一个到参考的 KL 惩罚，再套用裁剪的 PPO 代理。
 
 ```python
 def rlhf_step(theta, ref, w, prompt, rng, eps=0.2, beta=0.1, lr=0.05):
@@ -113,7 +113,7 @@ def rlhf_step(theta, ref, w, prompt, rng, eps=0.2, beta=0.1, lr=0.05):
 
 ### 第 4 步：盯住 KL
 
-每次更新都跟踪平均 `KL(π_θ || π_ref)`。如果它爬过 `~5-10`，策略就漂得离 `π_SFT` 太远了——要么 `β` 调低过头了，要么奖励 hacking 开始了。这是真 RLHF 里头号诊断量。
+每次更新都跟踪平均 $\mathrm{KL}(\pi_\theta \Vert \pi_{\text{ref}})$。如果它爬过 `~5-10`，策略就漂得离 $\pi_{\text{SFT}}$ 太远了——要么 $\beta$ 调低过头了，要么奖励 hacking 开始了。这是真 RLHF 里头号诊断量。
 
 ### 第 5 步：用 TRL 的生产配方
 
@@ -163,7 +163,7 @@ for batch in dataloader:
 
 ## 注意事项
 
-- **过度优化 / 奖励 hacking。** RM 不完美；`π_θ` 找到了打分高但其实很糟的对抗性补全。症状：奖励无限攀升而人评分平台期或下跌。修法：早停、调高 `β`、拓宽 RM 训练数据。
+- **过度优化 / 奖励 hacking。** RM 不完美；$\pi_\theta$ 找到了打分高但其实很糟的对抗性补全。症状：奖励无限攀升而人评分平台期或下跌。修法：早停、调高 $\beta$、拓宽 RM 训练数据。
 - **长度 hacking。** 在有帮助回复上训的 RM 常常隐式地奖励长度。策略学会给回复灌水。补救：长度归一化奖励，或用长度感知 RM 的 RLAIF。
 - **RM 太小。** RM 至少要和策略一样大。一个小 RM 没法忠实地给策略的输出打分。
 - **KL 调参。** β 太低 → 漂移和奖励 hacking。β 太高 → 策略几乎不变。标准技巧是用*自适应* β，把每步的 KL 钉在一个固定值上。
@@ -213,7 +213,7 @@ Refuse to ship RLHF-PPO without a KL monitor. Refuse to use an RM smaller than t
 ## 练习
 
 1. **简单。** 在 `code/main.py` 里用 500 对合成偏好训练 Bradley-Terry 奖励模型。在留出的 100 对上测成对准确率。应超过 90%。
-2. **中等。** 用 `β ∈ {0.0, 0.1, 1.0}` 跑玩具 PPO-RLHF 循环。对每个，画出随更新变化的 RM 分数对到参考的 KL。哪个跑出了奖励 hacking？
+2. **中等。** 用 $\beta \in \lbrace 0.0, 0.1, 1.0 \rbrace$ 跑玩具 PPO-RLHF 循环。对每个，画出随更新变化的 RM 分数对到参考的 KL。哪个跑出了奖励 hacking？
 3. **困难。** 在同一份偏好数据上实现 DPO（闭式偏好似然损失），和 RLHF-PPO 流水线对比所用算力和达到的最终 RM 分数。
 
 ## 关键术语
@@ -222,8 +222,8 @@ Refuse to ship RLHF-PPO without a KL monitor. Refuse to use an RM smaller than t
 |------|-----------------|-----------------------|
 | RLHF | "对齐 RL" | 三阶段 SFT + RM + PPO 流水线（Christiano 2017，Ouyang 2022）。 |
 | 奖励模型（RM） | "打分网络" | 通过 Bradley-Terry 拟合到成对偏好上的学习式标量函数。 |
-| Bradley-Terry | "成对逻辑斯蒂损失" | `P(y_+ ≻ y_-) = σ(R(y_+) - R(y_-))`；标准 RM 目标。 |
-| KL 惩罚 | "待在参考附近" | 奖励里的 `β · KL(π_θ || π_ref)`；反奖励 hacking 的正则项。 |
+| Bradley-Terry | "成对逻辑斯蒂损失" | $P(y_+ \succ y_-) = \sigma(R(y_+) - R(y_-))$；标准 RM 目标。 |
+| KL 惩罚 | "待在参考附近" | 奖励里的 $\beta \cdot \mathrm{KL}(\pi_\theta \Vert \pi_{\text{ref}})$；反奖励 hacking 的正则项。 |
 | 奖励 hacking | "Goodhart 定律" | 策略利用 RM 缺陷；症状：奖励涨、人评分平。 |
 | RLAIF | "AI 标注的偏好" | 标签来自另一个 LM 而非人类的 RLHF。 |
 | PRM | "过程奖励模型" | 给部分推理步打分；用在推理流水线里。 |

@@ -14,7 +14,7 @@ tags: [navigation, curriculum, ai-engineering, router]
 
 # 课程导航
 
-你是 **AI Engineering from Scratch** 课程的导览层：523 节课、20 个阶段。学习者告诉你想理解、构建或修复什么；你准确指出它在课程中的位置，以及下一条要运行的命令。适用于任何 agent。
+你是 **AI Engineering from Scratch** 课程的导览层：核心课程、20 个阶段。学习者告诉你想理解、构建或修复什么；你准确指出它在课程中的位置，以及下一条要运行的命令。适用于任何 agent。
 
 ## 宿主调用契约
 
@@ -41,6 +41,8 @@ Claude certification 路线是独立、AI-native 的课程。对于 CCAO-F、CCD
 Model Context Protocol (MCP) 有专门路线。对于 MCP 客户端、服务端、JSON-RPC、无状态请求、transports、MRTR、tasks、授权、gateways、registries、可靠性或一致性，路由至 `learn-mcp`。其唯一事实来源是 `learning-paths/model-context-protocol.json`；顺序遵循 manifest，而不是数值上的下一课；状态写在 `MCP-LEARNING.md`。
 
 Agent Skills 也有独立的专门路线。对于 Agent Skills、`SKILL.md`、skill discovery、invocation、人或模型可调用性、权限边界、sandboxes、skill evals、packaging 或 portability，路由至 `learn-agent-skills`。其唯一事实来源是 `learning-paths/agent-skills.json`。这条路线有顺序固定的五节课，因此是通常 1-3 节课限制的例外。tool poisoning 是第 26 课的知识预检；第 15 课是路线外可选复习。
+
+逆向工程有独立的专项路径。对于文件格式、ELF、Mach-O、反汇编、控制流图、反编译、表示提升或二进制证据，路由至 `learn-reverse-engineering`。唯一真相是 `learning-paths/reverse-engineering.json`，状态保存在 `REVERSE-ENGINEERING-LEARNING.md`。所有分析目标都必须是学习者自己构建的程序。
 
 ## 如何路由
 

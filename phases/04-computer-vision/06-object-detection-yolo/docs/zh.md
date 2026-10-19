@@ -74,11 +74,13 @@ anchor 框先验（416x416 输入的例子）：
 
 原始的 `tx, ty, tw, th` 不是框坐标；它们是回归目标，画图前要先变换：
 
-```
-中心 x  = (sigmoid(tx) + cell_x) * stride
-中心 y  = (sigmoid(ty) + cell_y) * stride
-宽度    = anchor_w * exp(tw)
-高度    = anchor_h * exp(th)
+```math
+\begin{aligned}
+\text{中心 } x &= (\sigma(t_x) + \text{cell}_x) \cdot \text{stride} \\
+\text{中心 } y &= (\sigma(t_y) + \text{cell}_y) \cdot \text{stride} \\
+\text{width} &= \text{anchor}_w \cdot \exp(t_w) \\
+\text{height} &= \text{anchor}_h \cdot \exp(t_h)
+\end{aligned}
 ```
 
 `sigmoid` 把中心偏移量限制在单元内。`exp` 让宽度从 anchor 自由缩放而不会变号。`stride` 把网格坐标缩放回像素。这个解码步骤从 v2 起在每个 YOLO 版本里都一样。
@@ -87,11 +89,11 @@ anchor 框先验（416x416 输入的例子）：
 
 检测里两个框之间通用的相似度度量：
 
-```
-IoU(A, B) = area(A 交 B) / area(A 并 B)
+```math
+\mathrm{IoU}(A, B) = \frac{\mathop{\mathrm{area}}(A \cap B)}{\mathop{\mathrm{area}}(A \cup B)}
 ```
 
-IoU = 1 表示完全相同；IoU = 0 表示无重叠。预测和真值框之间的 IoU 决定了一个预测是否算真阳性（通常 IoU >= 0.5）。两个预测之间的 IoU 是 NMS 用来去重的。
+$\mathrm{IoU} = 1$ 表示完全相同；$\mathrm{IoU} = 0$ 表示无重叠。预测和真值框之间的 IoU 决定了一个预测是否算真阳性（通常 $\mathrm{IoU} \ge 0.5$）。两个预测之间的 IoU 是 NMS 用来去重的。
 
 ### 非极大值抑制
 
@@ -113,11 +115,13 @@ NMS(boxes, scores, iou_threshold):
 
 YOLO 损失是三个损失加权相加：
 
-```
-L = lambda_coord * L_box(pred, target, 在 obj=1 处)
-  + lambda_obj   * L_obj(pred, 1,     在 obj=1 处)
-  + lambda_noobj * L_obj(pred, 0,     在 obj=0 处)
-  + lambda_cls   * L_cls(pred, target, 在 obj=1 处)
+```math
+\begin{aligned}
+L = {} & \lambda_{\text{coord}} \cdot L_{\text{box}}(\text{pred}, \text{target}, \text{其中 obj}=1) \\
++ {} & \lambda_{\text{obj}} \cdot L_{\text{obj}}(\text{pred}, 1, \text{其中 obj}=1) \\
++ {} & \lambda_{\text{noobj}} \cdot L_{\text{obj}}(\text{pred}, 0, \text{其中 obj}=0) \\
++ {} & \lambda_{\text{cls}} \cdot L_{\text{cls}}(\text{pred}, \text{target}, \text{其中 obj}=1)
+\end{aligned}
 ```
 
 只有含物体的单元才对框回归和分类损失有贡献。不含物体的单元只对 objectness 损失有贡献（教模型保持沉默）。`lambda_noobj` 通常很小（约 0.5），因为绝大多数单元是空的，否则会主导总损失。

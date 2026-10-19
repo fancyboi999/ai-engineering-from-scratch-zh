@@ -8,23 +8,23 @@
   <link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
   <!-- AIFS:LESSON-SEO:START -->
   <title>课程 - AI 工程从零开始</title>
-  <meta name="description" content="AI 工程从零开始 课程中的一节。528 节课、20 个阶段、四种语言，每个算法都从最原始的数学手写出来。">
+  <meta name="description" content="AI 工程从零开始 课程中的一节。542 节课、20 个阶段、四种语言，每个算法都从最原始的数学手写出来。">
   <meta property="og:title" content="AI 工程从零开始 · 课程">
-  <meta property="og:description" content="528 节课，20 个阶段。亲手写出反向传播、分词器、注意力机制和 agent 循环。">
+  <meta property="og:description" content="542 节课，20 个阶段。亲手写出反向传播、分词器、注意力机制和 agent 循环。">
   <meta property="og:image" content="https://aieng-zh.cn/og-image.png?v=2">
   <!-- og:url omitted intentionally: lesson.html is a static template that loads the lesson body client-side via ?path=. Static hosting cannot template the URL, so we let crawlers fall back to the request URL (which is the lesson-specific share link). -->
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AI 工程从零开始">
-  <meta name="twitter:description" content="528 节课，20 个阶段。从原始数学开始亲手构建。">
+  <meta name="twitter:description" content="542 节课，20 个阶段。从原始数学开始亲手构建。">
   <meta name="twitter:image" content="https://aieng-zh.cn/og-image.png?v=2">
   <link rel="canonical" href="https://aieng-zh.cn/lesson.html">
   <!-- AIFS:LESSON-SEO:END -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261012e">
-  <link rel="stylesheet" href="certifications.css?v=20261012e">
+  <link rel="stylesheet" href="style.css?v=20261019a">
+  <link rel="stylesheet" href="certifications.css?v=20261019a">
   <style>
     .scroll-progress {
       position: fixed;
@@ -439,6 +439,41 @@
       scroll-margin-top: var(--header-offset, 92px);
     }
 
+    .lesson-article p.lesson-section-guide {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+      color: var(--ink-soft);
+      margin: -4px 0 20px;
+    }
+
+    .lesson-article .lesson-section-guide a {
+      color: var(--blueprint);
+    }
+
+    .lesson-article details.lesson-hints {
+      margin: 28px 0;
+      border: 1px solid var(--rule-soft);
+      padding: 0 18px;
+    }
+
+    .lesson-article details.lesson-hints > summary {
+      cursor: pointer;
+      padding: 14px 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blueprint);
+    }
+
+    .lesson-article details.lesson-hints > summary:focus-visible {
+      outline: 2px solid var(--blueprint);
+      outline-offset: 2px;
+    }
+
     .lesson-article p {
       font-family: var(--font-body);
       font-size: 1.06rem;
@@ -583,15 +618,41 @@
       color: var(--blueprint);
     }
 
-    .lesson-article .math-inline {
-      background: var(--code-bg);
-      padding: 1px 6px;
-      border: 1px solid var(--rule-soft);
-      color: var(--blueprint);
+    .lesson-article .math-inline,
+    .lesson-article .math-display {
+      color: var(--ink);
     }
 
-    .lesson-article .math-inline .katex {
-      font-size: 1.04em;
+    .lesson-article .math-inline {
+      white-space: nowrap;
+    }
+
+    .lesson-article .math-display {
+      margin: 20px 0;
+      padding: 4px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    .lesson-article .math-display[data-math-rendered] {
+      white-space: normal;
+    }
+
+    .lesson-article .math-inline:not([data-math-rendered]),
+    .lesson-article .math-display:not([data-math-rendered]) {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+    }
+
+    .lesson-article .katex {
+      font-size: 1.08em;
+      color: inherit;
+    }
+
+    .lesson-article .katex-display {
+      margin: 0;
     }
 
     .lesson-article pre {
@@ -2691,9 +2752,9 @@
     <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
   </div>
 
-  <script src="md-render.js?v=20261013e"></script>
+  <script src="md-render.js?v=20261019a"></script>
   <script src="build-meta.js"></script>
-  <script src="data.js?v=20260831a"></script>
+  <script src="data.js?v=20261019a"></script>
   <script>
     (function () {
       var path = '';
@@ -2836,11 +2897,11 @@
     });
     window._mermaidReady = mermaid;
   </script>
-  <script src="header.js?v=20261012b" defer></script>
-  <script src="cmdpalette.js?v=20261012b" defer></script>
+  <script src="header.js?v=20261019a" defer></script>
+  <script src="cmdpalette.js?v=20261019a" defer></script>
   <script src="lesson-figures.js?v=b88d7b13ddfa"></script>
-  <script src="figure-manifest.js?v=766dfefe6b05"></script>
-  <script src="figures-manifest.js?v=20261013d"></script>
+  <script src="figure-manifest.js?v=c3b2e00c7426"></script>
+  <script src="figures-manifest.js?v=20261019a"></script>
   <script>
     (function () {
       // 渲染器（parseMd 等纯函数）已抽至 md-render.js，与 build.js 预渲染共用。
@@ -4027,14 +4088,54 @@
       // DOM 增强（代码复制/mermaid/公式/figure/AI 面板/TOC）。
       // 两条路径共用：运行时渲染（renderLesson 注入后调用）与预渲染静态页
       // （正文已在 HTML 里，boot 直接调用）。前提：#lessonContent 内已有正文。
+      function renderSectionGuides(article) {
+        if (!article) return;
+        var guides = [
+          ['动手构建', 'build-it', '在自己的文件中输入代码，每完成一步就运行一次。'],
+          ['实际使用', 'use-it', '在虚拟环境中安装库，再将结果与“动手构建”的结果比较。'],
+          ['拿去用', 'ship-it', '打开本课 outputs/ 文件夹中的产物，将它用于自己的工作。'],
+          ['练习', 'exercises', '复述任务，先手算一个小例子，再实现能工作的最小版本。'],
+          ['总结', 'summary', '保留这里的公式和概念，在练习或项目开始前快速复习。']
+        ];
+        article.querySelectorAll('h2').forEach(function (heading) {
+          var guide = guides.find(function (entry) { return heading.textContent.trim() === entry[0]; });
+          if (!guide || heading.dataset.guideAdded) return;
+          heading.dataset.guideAdded = 'true';
+          var note = document.createElement('p');
+          note.className = 'lesson-section-guide';
+          note.appendChild(document.createTextNode(guide[2] + ' '));
+          var link = document.createElement('a');
+          link.href = '/how-to-learn.html#' + guide[1];
+          link.textContent = '查看这一部分的学习方法';
+          note.appendChild(link);
+          heading.insertAdjacentElement('afterend', note);
+        });
+        var hints = Array.from(article.querySelectorAll('h3')).find(function (heading) { return heading.textContent.trim() === '提示'; });
+        if (!hints) return;
+        var details = document.createElement('details');
+        details.className = 'lesson-hints';
+        var summary = document.createElement('summary');
+        summary.textContent = '提示：先尝试练习，再展开查看';
+        details.appendChild(summary);
+        var node = hints.nextElementSibling;
+        while (node && !/^H[12]$/.test(node.tagName) && node.tagName !== 'NAV' && !node.classList.contains('ai-panels') && node.id !== 'lessonActionPanel') {
+          var next = node.nextElementSibling;
+          details.appendChild(node);
+          node = next;
+        }
+        details.id = hints.id;
+        hints.replaceWith(details);
+      }
+
       function enhanceLesson() {
         var el = document.getElementById('lessonContent');
         var article = el && el.querySelector('.lesson-article');
         if (article && !article.querySelector('#lessonActionPanel')) renderLessonActionPanel(article);
 
+        renderSectionGuides(article);
         initCodeCopy();
         renderMermaidBlocks();
-        renderMathSpans();
+        renderMathBlocks(document.querySelector(".lesson-article"));
         if (window.AIFS_mountLessonFigures) {
           window.AIFS_mountLessonFigures(el);
         } else if (window.mountLessonFigures) {
@@ -4347,31 +4448,71 @@
       }
 
 
-      // 按需加载 KaTeX 并渲染 math-tex span；任何一步失败都回退原 code 样式。
-      function renderMathSpans() {
-        var spans = document.querySelectorAll('code.math-tex');
-        if (!spans.length) return;
-        var KATEX = 'https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min';
-        if (!document.getElementById('katex-css')) {
-          var link = document.createElement('link');
-          link.id = 'katex-css'; link.rel = 'stylesheet'; link.href = KATEX + '.css';
-          document.head.appendChild(link);
-        }
-        function renderAll() {
-          spans.forEach(function (el) {
-            try {
-              var span = document.createElement('span');
-              span.className = 'math-inline';
-              window.katex.render(texPreprocess(el.getAttribute('data-tex')), span, { throwOnError: true, strict: false });
-              el.replaceWith(span);
-            } catch (e) { el.classList.remove('math-tex'); }
+      var KATEX_BASE = 'https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/';
+      var KATEX_JS_SRI = 'sha384-CwjPRVHTvLiMBFjEoij+QZViMV5rhTOIp7CJzl24JEqpRDA1sJFHVXXLURktbYYp';
+      var KATEX_CSS_SRI = 'sha384-nH0MfJ44wi1dd7w6jinlyBgljjS8EJAh2JBoRad8a3VDw2K69vfaaqm4WnR+gXtA';
+      var katexPromise = null;
+
+      function loadKatex() {
+        if (window.katex) return Promise.resolve(window.katex);
+        if (!katexPromise) {
+          katexPromise = new Promise(function (resolve, reject) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = KATEX_BASE + 'katex.min.css';
+            link.integrity = KATEX_CSS_SRI;
+            link.crossOrigin = 'anonymous';
+            document.head.appendChild(link);
+            var script = document.createElement('script');
+            script.src = KATEX_BASE + 'katex.min.js';
+            script.integrity = KATEX_JS_SRI;
+            script.crossOrigin = 'anonymous';
+            script.onload = function () {
+              if (window.katex) {
+                resolve(window.katex);
+                return;
+              }
+              katexPromise = null;
+              reject(new Error('katex loaded without defining window.katex'));
+            };
+            script.onerror = function () {
+              katexPromise = null;
+              reject(new Error('katex failed to load'));
+            };
+            document.head.appendChild(script);
           });
         }
-        if (window.katex) { renderAll(); return; }
-        var script = document.createElement('script');
-        script.src = KATEX + '.js';
-        script.onload = renderAll;
-        document.head.appendChild(script);
+        return katexPromise;
+      }
+
+      function renderMathBlocks(root) {
+        var nodes = (root || document).querySelectorAll('[data-math]:not([data-math-rendered]), code.math-tex');
+        if (!nodes.length) return Promise.resolve();
+        return loadKatex().then(function (katex) {
+          Array.prototype.forEach.call(nodes, function (node) {
+            if (!node.isConnected) return;
+            var legacy = node.matches('code.math-tex');
+            var tex = legacy ? texPreprocess(node.getAttribute('data-tex')) : node.textContent;
+            if (legacy) {
+              var replacement = document.createElement('span');
+              replacement.className = 'math-inline';
+              node.replaceWith(replacement);
+              node = replacement;
+            }
+            try {
+              katex.render(tex, node, {
+                displayMode: node.classList.contains('math-display'),
+                throwOnError: true,
+                strict: 'ignore',
+                trust: false
+              });
+              node.setAttribute('data-math-rendered', '');
+            } catch (error) {
+              node.textContent = tex;
+              node.setAttribute('title', String(error && error.message || error));
+            }
+          });
+        }).catch(function () {});
       }
 
 

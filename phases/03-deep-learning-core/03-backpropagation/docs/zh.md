@@ -26,7 +26,7 @@
 
 ### 链式法则，应用到网络上
 
-你在阶段 01 第 05 课见过链式法则。快速回顾：如果 y = f(g(x))，那么 dy/dx = f'(g(x)) * g'(x)。你沿着这条链把导数乘起来。
+你在阶段 01 第 05 课见过链式法则。快速回顾：如果 $y = f(g(x))$，那么 $\frac{dy}{dx} = f'(g(x)) \cdot g'(x)$。你沿着这条链把导数乘起来。
 
 在神经网络里，这条"链"就是从输入到损失的那一串操作。每一层施加权重、加偏置、过激活。损失函数把最终输出和目标做比较。反向传播沿着这条链反向追溯，算出每个操作对误差贡献了多少。
 
@@ -45,9 +45,9 @@ graph LR
     y["目标"] --> loss
 ```
 
-前向传播：值从左流向右。x 和 w 产出 z1 = w*x。加上 b 得到 z2。sigmoid 给出激活值 a。用损失函数把 a 和目标 y 做比较。
+前向传播：值从左流向右。$x$ 和 $w$ 产出 $z_1 = w x$。加上 $b$ 得到 $z_2$。sigmoid 给出激活值 $a$。用损失函数把 $a$ 和目标 $y$ 做比较。
 
-反向传播：梯度从右流向左。从 dL/da（损失随激活值如何变化）开始。乘上 da/dz2（sigmoid 导数），得到 dL/dz2。拆成 dL/db（等于 dL/dz2，因为 z2 = z1 + b）和 dL/dz1。然后 dL/dw = dL/dz1 * x，dL/dx = dL/dz1 * w。
+反向传播：梯度从右流向左。从 $\partial L/\partial a$（损失随激活值如何变化）开始。乘上 $\partial a/\partial z_2$（sigmoid 导数），得到 $\partial L/\partial z_2$。拆成 $\partial L/\partial b$（等于 $\partial L/\partial z_2$，因为 $z_2 = z_1 + b$）和 $\partial L/\partial z_1$。然后 $\partial L/\partial w = \partial L/\partial z_1 \cdot x$，$\partial L/\partial x = \partial L/\partial z_1 \cdot w$。
 
 反向传播过程中，图里每个节点只有一项工作：拿上游传来的梯度，乘上自己的局部导数，再往下传。
 
@@ -84,7 +84,7 @@ graph RL
     L1 -- "dL/dz1 = dL/da1 * sigmoid'(z1)" --> I["输入"]
 ```
 
-在每一层，梯度都会被乘上 sigmoid 导数。sigmoid 导数是 a * (1 - a)，最大值是 0.25（当 a = 0.5 时）。深入三层，梯度最多被乘上 0.25^3 = 0.0156。深入十层：0.25^10 = 0.000001。
+在每一层，梯度都会被乘上 sigmoid 导数。sigmoid 导数是 $a(1 - a)$，最大值是 0.25（当 $a = 0.5$ 时）。深入三层，梯度最多被乘上 $0.25^3 = 0.0156$。深入十层：$0.25^{10} = 0.000001$。
 
 ### 梯度消失
 
@@ -102,32 +102,35 @@ After 10 layers:  gradient * 0.25^10 = 0.000001x original
 
 ### 推导一个 2 层网络的梯度
 
-具体算一个网络：输入 x，隐藏层带 sigmoid，输出层带 sigmoid，用 MSE 损失。
+一个输入为 $x$、隐藏层和输出层均使用 sigmoid、损失为 MSE 的网络，其具体数学计算如下。
 
 前向传播：
-```
-z1 = W1 * x + b1
-a1 = sigmoid(z1)
-z2 = W2 * a1 + b2
-a2 = sigmoid(z2)
-L = (a2 - y)^2
+
+```math
+\begin{aligned}
+z_1 &= W_1 x + b_1 \\
+a_1 &= \text{sigmoid}(z_1) \\
+z_2 &= W_2 a_1 + b_2 \\
+a_2 &= \text{sigmoid}(z_2) \\
+L &= (a_2 - y)^2
+\end{aligned}
 ```
 
 反向传播（逐步应用链式法则）：
-```
-dL/da2 = 2(a2 - y)
-da2/dz2 = a2 * (1 - a2)
-dL/dz2 = dL/da2 * da2/dz2 = 2(a2 - y) * a2 * (1 - a2)
 
-dL/dW2 = dL/dz2 * a1
-dL/db2 = dL/dz2
-
-dL/da1 = dL/dz2 * W2
-da1/dz1 = a1 * (1 - a1)
-dL/dz1 = dL/da1 * da1/dz1
-
-dL/dW1 = dL/dz1 * x
-dL/db1 = dL/dz1
+```math
+\begin{aligned}
+\frac{\partial L}{\partial a_2} &= 2(a_2 - y) \\
+\frac{\partial a_2}{\partial z_2} &= a_2 (1 - a_2) \\
+\frac{\partial L}{\partial z_2} &= \frac{\partial L}{\partial a_2} \cdot \frac{\partial a_2}{\partial z_2} = 2(a_2 - y) \cdot a_2 (1 - a_2) \\[6pt]
+\frac{\partial L}{\partial W_2} &= \frac{\partial L}{\partial z_2} \cdot a_1 \\
+\frac{\partial L}{\partial b_2} &= \frac{\partial L}{\partial z_2} \\[6pt]
+\frac{\partial L}{\partial a_1} &= \frac{\partial L}{\partial z_2} \cdot W_2 \\
+\frac{\partial a_1}{\partial z_1} &= a_1 (1 - a_1) \\
+\frac{\partial L}{\partial z_1} &= \frac{\partial L}{\partial a_1} \cdot \frac{\partial a_1}{\partial z_1} \\[6pt]
+\frac{\partial L}{\partial W_1} &= \frac{\partial L}{\partial z_1} \cdot x \\
+\frac{\partial L}{\partial b_1} &= \frac{\partial L}{\partial z_1}
+\end{aligned}
 ```
 
 每个梯度都是从损失反向追溯回来的一连串局部导数的乘积。反向传播就这么点东西。
@@ -185,9 +188,9 @@ def __mul__(self, other):
     return out
 ```
 
-对加法：d(a+b)/da = 1，d(a+b)/db = 1。所以两个输入都直接拿到输出的梯度。
+对加法：$\partial(a+b)/\partial a = 1$，$\partial(a+b)/\partial b = 1$。所以两个输入都直接拿到输出的梯度。
 
-对乘法：d(a*b)/da = b，d(a*b)/db = a。每个输入拿到对方的值乘上输出梯度。
+对乘法：$\partial(ab)/\partial a = b$，$\partial(ab)/\partial b = a$。每个输入拿到对方的值乘上输出梯度。
 
 那个 `+=` 至关重要。一个 Value 可能被用在多个操作里。它的梯度是来自所有路径的梯度之和。
 
@@ -209,7 +212,7 @@ def sigmoid(self):
     return out
 ```
 
-sigmoid 导数：sigmoid(x) * (1 - sigmoid(x))。我们在前向传播里已经算出 sigmoid(x) = s 了。复用它，不用多干活。
+sigmoid 导数：$\text{sigmoid}(x) \cdot (1 - \text{sigmoid}(x))$。我们在前向传播里已经算出 $\text{sigmoid}(x) = s$ 了。复用它，不用多干活。
 
 ```python
 def mse_loss(predicted, target):
@@ -217,7 +220,7 @@ def mse_loss(predicted, target):
     return diff * diff
 ```
 
-单个输出的 MSE：(predicted - target)^2。我们把减法表达成加上一个取负的 Value。
+单个输出的 MSE：$(\text{predicted} - \text{target})^2$。我们把减法表达成加上一个取负的 Value。
 
 ### 第 4 步：反向传播
 
@@ -241,7 +244,7 @@ def backward(self):
         v._backward()
 ```
 
-从损失开始（梯度 = 1.0，因为 dL/dL = 1）。沿着排好序的图反向走。每个节点的 `_backward` 把梯度推给它的子节点。
+从损失开始（梯度 = 1.0，因为 $dL/dL = 1$）。沿着排好序的图反向走。每个节点的 `_backward` 把梯度推给它的子节点。
 
 ### 第 5 步：Layer 与 Network
 
@@ -301,7 +304,7 @@ class Network:
             p.grad = 0.0
 ```
 
-一个 Neuron 接收输入，算出加权和加偏置，再施加 sigmoid。权重初始化按 sqrt(2/n_inputs) 缩放，防止 sigmoid 在更深的网络里饱和。一个 Layer 是一组 Neuron。一个 Network 是一组 Layer。`parameters()` 方法把所有可学习的 Value 收集起来，方便我们更新它们。
+一个 Neuron 接收输入，算出加权和加偏置，再施加 sigmoid。权重初始化按 $\sqrt{2/n_{\text{inputs}}}$ 缩放，防止 sigmoid 在更深的网络里饱和。一个 Layer 是一组 Neuron。一个 Network 是一组 Layer。`parameters()` 方法把所有可学习的 Value 收集起来，方便我们更新它们。
 
 ### 第 6 步：在 XOR 上训练
 
@@ -439,9 +442,9 @@ with torch.no_grad():
 
 ## 练习
 
-1. 给 Value 类加一个 `__sub__` 方法（a - b = a + (-1 * b)）。然后实现一个 `__neg__` 方法。对像 (a - b)^2 这样的简单表达式，把结果和手算对比，验证梯度是否正确。
+1. 给 Value 类加一个 `__sub__` 方法$(a - b = a + (-1 \cdot b))$。然后实现一个 `__neg__` 方法。对像 $(a - b)^2$ 这样的简单表达式，把结果和手算对比，验证梯度是否正确。
 
-2. 给 Value 加一个 `relu` 方法（输出 max(0, x)，导数在 x > 0 时为 1，否则为 0）。把隐藏层里的 sigmoid 换成 relu，再在 XOR 上训练。对比收敛速度。你应该看到训练更快——这预告了第 04 课。
+2. 给 Value 加一个 `relu` 方法（输出 $\max(0, x)$，导数在 $x \gt 0$ 时为 1，否则为 0）。把隐藏层里的 sigmoid 换成 relu，再在 XOR 上训练。对比收敛速度。你应该看到训练更快——这预告了第 04 课。
 
 3. 在 Value 上实现一个支持整数次幂的 `__pow__` 方法。用它把 `mse_loss` 换成一个规范的 `(predicted - target) ** 2` 表达式。验证梯度和原实现一致。
 
@@ -453,14 +456,14 @@ with torch.no_grad():
 
 | 术语 | 大家怎么说 | 实际是什么 |
 |------|----------------|----------------------|
-| 反向传播（Backpropagation） | "网络在学习" | 一个算法，通过在计算图上反向应用链式法则，为每个权重算出 dL/dw |
+| 反向传播（Backpropagation） | "网络在学习" | 一个算法，通过在计算图上反向应用链式法则，为每个权重算出 $\partial L/\partial w$ |
 | 计算图（Computational graph） | "网络结构" | 一张有向无环图，节点是操作，边正向携带值、反向携带梯度 |
-| 链式法则（Chain rule） | "把导数乘起来" | 若 y = f(g(x))，则 dy/dx = f'(g(x)) * g'(x)——反向传播的数学根基 |
+| 链式法则（Chain rule） | "把导数乘起来" | 若 $y = f(g(x))$，则 $\frac{dy}{dx} = f'(g(x)) \cdot g'(x)$——反向传播的数学根基 |
 | 梯度（Gradient） | "最陡上升的方向" | 损失对某个参数的偏导数——告诉你怎么改这个参数才能减小损失 |
 | 梯度消失（Vanishing gradient） | "深层网络学不动" | 梯度在穿过 sigmoid 这类饱和激活的层时指数级缩小 |
 | 前向传播（Forward pass） | "跑网络" | 依次施加每层操作、存下中间值，从输入算出输出 |
 | 反向传播（Backward pass） | "算梯度" | 反向遍历计算图，用链式法则在每个节点累加梯度 |
-| 学习率（Learning rate） | "学得多快" | 一个标量，控制更新权重时的步长：w_new = w_old - lr * gradient |
+| 学习率（Learning rate） | "学得多快" | 一个标量，控制更新权重时的步长：$w_{\text{new}} = w_{\text{old}} - \text{lr} \cdot \text{gradient}$ |
 | 拓扑排序（Topological sort） | "正确的顺序" | 图节点的一种排序，每个节点都排在它依赖的所有节点之后——保证梯度在传播前已被完全累加 |
 | 自动微分（Autograd） | "自动求导" | 一个系统，在前向计算时构建计算图并自动计算梯度——也就是 PyTorch 引擎在做的事 |
 

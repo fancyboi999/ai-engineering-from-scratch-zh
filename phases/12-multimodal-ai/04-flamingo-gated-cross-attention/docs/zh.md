@@ -30,18 +30,18 @@ Flamingo 从一个冻结的 Chinchilla 70B LLM 起步。全部 70B 权重原封�
 
 ### Perceiver resampler
 
-对 prompt 里的每张图，ViT 产出 N 个 patch token。Perceiver resampler 有 K 个固定的可学习 latent（Flamingo 用 K=64）。每个 resampler 块分两个子步骤：
+对 prompt 里的每张图，ViT 产出 $N$ 个 patch token。Perceiver resampler 有 $K$ 个固定的可学习 latent（Flamingo 用 $K=64$）。每个 resampler 块分两个子步骤：
 
-1. 交叉注意力：K 个 latent 关注 N 个 patch token（Q 来自 latent，K/V 来自 patch）。
+1. 交叉注意力：$K$ 个 latent 关注 $N$ 个 patch token（Q 来自 latent，$K$/V 来自 patch）。
 2. latent 内部的自注意力 + FFN。
 
-过完 6 个 resampler 块，输出是 K=64 个维度 1024 的视觉 token，无论 ViT 产出了多少 patch。一张 224x224 的图（196 个 patch）和一张 480x480 的图（900 个 patch）都以 64 个 resampler token 的形式出来。
+过完 6 个 resampler 块，输出是 $K=64$ 个维度 1024 的视觉 token，无论 ViT 产出了多少 patch。一张 224x224 的图（196 个 patch）和一张 480x480 的图（900 个 patch）都以 64 个 resampler token 的形式出来。
 
-对视频，resampler 在时间维上应用：每帧的 patch 产出 64 个 latent，一个时间位置编码让模型能区分 t=0 和 t=N。整段视频变成 T * 64 个视觉 token。
+对视频，resampler 在时间维上应用：每帧的 patch 产出 64 个 latent，一个时间位置编码让模型能区分 $t=0$ 和 $t=N$。整段视频变成 $T \cdot 64$ 个视觉 token。
 
 ### 门控交叉注意力
 
-在冻结 LLM 每隔 M 层（Flamingo 用 M=4），插入一个新的门控交叉注意力块：
+在冻结 LLM 每隔 $M$ 层（Flamingo 用 $M=4$），插入一个新的门控交叉注意力块：
 
 ```
 x_after_llm_block = llm_block(x_before)
@@ -148,7 +148,7 @@ cross-attention-fusion
 | OBELICS | "交错网页语料" | 一个开放数据集，1.41 亿个按阅读顺序排布图像和文本的网页 |
 | Chinchilla | "70B 冻结基座" | Flamingo 冻结的文本 LLM，来自 DeepMind 的 Chinchilla 论文 |
 | 门控调度 | "alpha 怎么变" | 训练中交叉注意力门打开的速率 |
-| 交叉注意力频率 | "每 M 层" | 多久插入一个门控交叉注意力块；Flamingo 用 M=4 |
+| 交叉注意力频率 | "每 M 层" | 多久插入一个门控交叉注意力块；Flamingo 用 $M=4$ |
 | OpenFlamingo | "开放复现" | MosaicML/LAION 的 3-9B 开放 checkpoint；架构与 Flamingo 完全相同 |
 
 ## 延伸阅读

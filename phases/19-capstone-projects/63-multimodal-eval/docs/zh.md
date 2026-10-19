@@ -49,15 +49,14 @@ flowchart TB
 
 ### BLEU-4
 
-```text
-BLEU-4 = BP * exp(mean(log p1, log p2, log p3, log p4))
+```math
+\text{BLEU-4} = \text{BP} \cdot \exp\big(\text{mean}(\log p_1, \log p_2, \log p_3, \log p_4)\big)
 ```
 
 其中 `p_n` 是修正后的 n-gram 精度（生成的 n-gram 中出现在任一参考里的、做了截断的计数，除以生成的 n-gram 总数），`BP` 是简短惩罚：
 
-```text
-BP = 1                如果生成长度 > 参考长度
-   = exp(1 - r/g)     否则，其中 r 是参考长度，g 是生成长度
+```math
+\text{BP} = \begin{cases} 1 & \text{若生成长度} > \text{参考长度} \\ \exp(1 - r/g) & \text{其他情况，其中 } r \text{ 为参考长度，} g \text{ 为生成长度} \end{cases}
 ```
 
 对于某些 `p_n` 为零的小样本，需要平滑。实现采用 Chen 和 Cherry 的「method 1」（对任何零计数，分子分母各加 1），这是低计数情形下最安全的默认做法。

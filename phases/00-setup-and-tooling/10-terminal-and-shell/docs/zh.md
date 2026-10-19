@@ -336,6 +336,16 @@ env | grep -i torch
 3. 用 `for i in $(seq 1 100); do echo "epoch $i loss: $(echo "scale=4; 1/$i" | bc)"; sleep 0.1; done > fake_train.log` 造一份假训练日志，然后用 `grep`、`tail` 和 `awk` 只抽出 loss 值。
 4. 为一台你有权限的服务器配一条 SSH config 条目（或用 `localhost` 来练语法）。
 
+### 提示
+
+**练习 1。** 先运行 `tmux new -s practice`，用前缀 `Ctrl+B` 后接 `"` 和 `%` 分屏，再用 `Ctrl+B` 和方向键切换面板。按 `Ctrl+B`、`d` 脱离会话，运行 `tmux ls`，再用 `tmux attach -t practice` 重新连接；三个程序都应仍在运行。
+
+**练习 2。** 将 `code/shell_aliases.sh` 中的行复制到 `~/.zshrc` 或 `~/.bashrc` 末尾，对该文件执行 `source`。用 `alias` 或 `type <name>` 检查一个新别名，确认 shell 已识别它。
+
+**练习 3。** 先运行 `tail -5 fake_train.log` 查看行格式，再用 `grep loss` 筛选，并通过 `awk '{print $NF}'` 只输出最后一列。结果应是 100 个逐渐减小的数字。
+
+**练习 4。** 将课程中的 `Host gpu` 块复制到 `~/.ssh/config`，把 `HostName` 和 `User` 改为你的服务器信息，或改为 `localhost` 和本机用户名。运行 `ssh -G gpu` 输出实际使用的设置。如果有可访问且接受你密钥的 SSH 服务，再运行 `ssh gpu` 连接。
+
 ## 关键术语
 
 | 术语 | 大家口头怎么说 | 它实际指什么 |

@@ -4,7 +4,11 @@
   "id": "applied-ai-engineer",
   "title": "LLM 产品工程",
   "workFamily": "LLM 产品工程",
-  "commonTitles": ["应用 AI 工程师", "LLM 工程师", "AI 产品工程师"],
+  "commonTitles": [
+    "应用 AI 工程师",
+    "LLM 工程师",
+    "AI 产品工程师"
+  ],
   "summary": "将语言模型能力转化为经过评估、安全、成本可控且经得住生产流量考验的产品行为。",
   "keywords": "applied ai engineer llm product prompt structured output rag tools evaluation guardrails production",
   "decisionPrompt": "你是否想将语言模型能力转化为可靠的产品功能，并让用户行为可衡量？",
@@ -46,9 +50,22 @@
     "能解释部署、网关、canary 和回滚选择。"
   ],
   "coverage": {
-    "strong": ["Prompt 和结构化输出设计", "上下文、检索和工具", "LLM 评估和防护栏", "成本可控的生产发布"],
-    "partial": ["产品发现", "用户体验研究", "完整的云端运营"],
-    "outsideCourse": ["视觉和音频产品专业化", "基础模型训练的所有权", "商业产品管理"]
+    "strong": [
+      "Prompt 和结构化输出设计",
+      "上下文、检索和工具",
+      "LLM 评估和防护栏",
+      "成本可控的生产发布"
+    ],
+    "partial": [
+      "产品发现",
+      "用户体验研究",
+      "完整的云端运营"
+    ],
+    "outsideCourse": [
+      "视觉和音频产品专业化",
+      "基础模型训练的所有权",
+      "商业产品管理"
+    ]
   },
   "completionClaim": "完成本路线表明你能够构建和评估生产风格的 LLM 功能，但不保证获得相关职位，也不能证明你拥有线上商业产品的所有权。",
   "sourceBasis": {
@@ -96,22 +113,92 @@
       "id": "interview-readiness-evidence",
       "title": "面试与就绪度证据",
       "outcome": "展示功能如何凭借回滚证据通过受控暴露逐步推进。",
-      "lessonPaths": ["phases/17-infrastructure-and-production/20-shadow-canary-progressive"],
+      "lessonPaths": [
+        "phases/17-infrastructure-and-production/20-shadow-canary-progressive"
+      ],
       "artifact": "一份产品案例研究，包含评估结果、成本权衡、发布门禁和回滚决策。"
     }
   ],
   "lessons": [
-    {"order": 1, "path": "phases/11-llm-engineering/01-prompt-engineering", "minutes": 90, "required": true},
-    {"order": 2, "path": "phases/11-llm-engineering/03-structured-outputs", "minutes": 90, "required": true},
-    {"order": 3, "path": "phases/11-llm-engineering/04-embeddings", "minutes": 75, "required": true},
-    {"order": 4, "path": "phases/11-llm-engineering/05-context-engineering", "minutes": 90, "required": true},
-    {"order": 5, "path": "phases/11-llm-engineering/06-rag", "minutes": 90, "required": true},
-    {"order": 6, "path": "phases/11-llm-engineering/09-function-calling", "minutes": 75, "required": true},
-    {"order": 7, "path": "phases/11-llm-engineering/10-evaluation", "minutes": 45, "required": true},
-    {"order": 8, "path": "phases/11-llm-engineering/11-caching-cost", "minutes": 45, "required": true},
-    {"order": 9, "path": "phases/11-llm-engineering/12-guardrails", "minutes": 45, "required": true},
-    {"order": 10, "path": "phases/11-llm-engineering/13-production-app", "minutes": 120, "required": true},
-    {"order": 11, "path": "phases/17-infrastructure-and-production/19-ai-gateways", "minutes": 60, "required": true},
-    {"order": 12, "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive", "minutes": 60, "required": true}
+    {
+      "order": 1,
+      "path": "phases/11-llm-engineering/01-prompt-engineering",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 2,
+      "path": "phases/11-llm-engineering/03-structured-outputs",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 3,
+      "path": "phases/11-llm-engineering/04-embeddings",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 4,
+      "path": "phases/11-llm-engineering/05-context-engineering",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 5,
+      "path": "phases/11-llm-engineering/06-rag",
+      "minutes": 90,
+      "required": true
+    },
+    {
+      "order": 6,
+      "path": "phases/11-llm-engineering/09-function-calling",
+      "minutes": 75,
+      "required": true
+    },
+    {
+      "order": 7,
+      "path": "phases/11-llm-engineering/10-evaluation",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 8,
+      "path": "phases/11-llm-engineering/11-caching-cost",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 9,
+      "path": "phases/11-llm-engineering/12-guardrails",
+      "minutes": 45,
+      "required": true
+    },
+    {
+      "order": 10,
+      "path": "phases/11-llm-engineering/13-production-app",
+      "minutes": 120,
+      "required": true
+    },
+    {
+      "order": 11,
+      "path": "phases/17-infrastructure-and-production/19-ai-gateways",
+      "minutes": 60,
+      "required": true
+    },
+    {
+      "order": 12,
+      "path": "phases/17-infrastructure-and-production/20-shadow-canary-progressive",
+      "minutes": 60,
+      "required": true
+    }
+  ],
+  "projects": [
+    "token-counter-and-cost-meter",
+    "json-schema-output-guard",
+    "doc-qa-with-citations",
+    "research-report-agent",
+    "llm-gateway-with-fallbacks",
+    "streaming-answer-recovery"
   ]
 }

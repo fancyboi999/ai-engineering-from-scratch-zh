@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="fig-2-1-title fig-2-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-2-1-title">第一条命令前的五个问题</title>
+  <desc id="fig-2-1-desc">左侧纵列五个问题，各附法律或判决：17 U.S.C. 1201(f)(1) 和 Directive 2009/24/EC 第 6(1)(a) 条要求合法副本；法律规定目的，如互操作、研究、纠错、获授权测试；1201(f)(1)、第 6(1)(b) 条和 Sega 要求没有其他途径取得事实；第 6(1)(c) 条和 C-13/20 要求仅处理必要部分；第 6(2)(c) 条、Sega 和 Connectix 要求最终使用自己的表达。各问题的玫红虚线指向“否：停止、先取得授权、README、免责声明”。最后问题的向下实线指向绿色框“五次都是：开始分析”，列出专为本手册编写的 ledger.c、ledger-main.c、js-app、ledger.wat。</desc>
+  <defs><marker id="fig-2-1-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-2-1-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">依次回答五个问题</text>
+  <rect x="440" y="26" width="180" height="300" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="530" y="156.25" font-size="12.5" text-anchor="middle" font-weight="700">否：停止</text>
+  <text x="530" y="173.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先取得授权</text>
+  <text x="530" y="188.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">README，免责声明</text>
+  <text x="530" y="203.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">rea 不会询问</text>
+  <rect x="20" y="26" width="300" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="170" y="43.1" font-size="12" text-anchor="middle" font-weight="700">合法副本</text>
+  <text x="170" y="60.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">U.S.C. 1201(f)(1) · 2009/24/EC Art. 6(1)(a)</text>
+  <line x1="320" y1="48" x2="439" y2="48" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-rose)"/>
+  <rect class="m-knock" x="370.75" y="31.03" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="379.5" y="42" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">否</text>
+  <line x1="170" y1="70" x2="170" y2="89" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-1-head-ink)"/>
+  <rect class="m-knock" x="175" y="68.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="178" y="79.5" font-size="11.5">是</text>
+  <rect x="20" y="90" width="300" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="170" y="107.1" font-size="12" text-anchor="middle" font-weight="700">法律规定的目的</text>
+  <text x="170" y="124.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">互操作、研究、纠错、测试</text>
+  <line x1="320" y1="112" x2="439" y2="112" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-rose)"/>
+  <rect class="m-knock" x="370.75" y="95.03" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="379.5" y="106" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">否</text>
+  <line x1="170" y1="134" x2="170" y2="153" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-1-head-ink)"/>
+  <rect class="m-knock" x="175" y="132.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="178" y="143.5" font-size="11.5">是</text>
+  <rect x="20" y="154" width="300" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="170" y="171.1" font-size="12" text-anchor="middle" font-weight="700">没有其他途径取得事实</text>
+  <text x="170" y="188.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1201(f)(1)、第 6(1)(b) 条、Sega：没有其他途径</text>
+  <line x1="320" y1="176" x2="439" y2="176" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-rose)"/>
+  <rect class="m-knock" x="370.75" y="159.03" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="379.5" y="170" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">否</text>
+  <line x1="170" y1="198" x2="170" y2="217" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-1-head-ink)"/>
+  <rect class="m-knock" x="175" y="196.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="178" y="207.5" font-size="11.5">是</text>
+  <rect x="20" y="218" width="300" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="170" y="235.1" font-size="12" text-anchor="middle" font-weight="700">仅处理必要部分</text>
+  <text x="170" y="252.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">第 6(1)(c) 条 · C-13/20：限于必要程度</text>
+  <line x1="320" y1="240" x2="439" y2="240" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-rose)"/>
+  <rect class="m-knock" x="370.75" y="223.03" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="379.5" y="234" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">否</text>
+  <line x1="170" y1="262" x2="170" y2="281" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-1-head-ink)"/>
+  <rect class="m-knock" x="175" y="260.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="178" y="271.5" font-size="11.5">是</text>
+  <rect x="20" y="282" width="300" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="170" y="299.1" font-size="12" text-anchor="middle" font-weight="700">最终使用自己的表达</text>
+  <text x="170" y="316.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">第 6(2)(c) 条、Sega、Connectix：不复制代码</text>
+  <line x1="320" y1="304" x2="439" y2="304" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-rose)"/>
+  <rect class="m-knock" x="370.75" y="287.03" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="379.5" y="298" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">否</text>
+  <line x1="170" y1="326" x2="170" y2="349" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-1-head-ink)"/>
+  <rect class="m-knock" x="175" y="326.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="178" y="337.5" font-size="11.5">是</text>
+  <rect x="20" y="350" width="300" height="56" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="170" y="365.6" font-size="12" text-anchor="middle" font-weight="700">五次都是：开始分析</text>
+  <text x="170" y="382.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ledger.c, ledger-main.c, js-app, ledger.wat</text>
+  <text x="170" y="397.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">专为本手册编写</text>
+</svg>

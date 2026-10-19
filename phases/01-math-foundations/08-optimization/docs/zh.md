@@ -38,8 +38,8 @@ minimize L(w) where:
 
 最简单的优化器。计算损失对每个权重的梯度。把每个权重往它梯度的反方向移动。这一步乘上学习率。
 
-```
-w = w - lr * gradient
+```math
+w = w - \text{lr} \cdot \text{gradient}
 ```
 
 整个算法就这么点。一行。
@@ -94,9 +94,11 @@ SGD 和小批量里的噪声不是 bug。它有助于逃出浅的局部最小值
 
 原始梯度下降只看当前梯度。如果梯度来回曲折（在狭窄山谷里很常见），进展就慢。动量把过去的梯度累积进一个速度项来修这个问题。
 
-```
-v = beta * v + gradient
-w = w - lr * v
+```math
+\begin{aligned}
+v &= \beta \cdot v + \text{gradient} \\
+w &= w - \text{lr} \cdot v
+\end{aligned}
 ```
 
 打个比方：一个滚下坡的球。它不会在每个凸起处停下重新启动。它在一致的方向上积累速度，并抑制摆动。
@@ -124,17 +126,17 @@ graph TD
 
 Adam（Adaptive Moment Estimation）为每个权重追踪两样东西：
 
-1. 一阶矩（m）：梯度的滑动平均（像动量）
-2. 二阶矩（v）：梯度平方的滑动平均（梯度幅度）
+1. 一阶矩（$m$）：梯度的滑动平均（像动量）
+2. 二阶矩（$v$）：梯度平方的滑动平均（梯度幅度）
 
-```
-m = beta1 * m + (1 - beta1) * gradient
-v = beta2 * v + (1 - beta2) * gradient^2
-
-m_hat = m / (1 - beta1^t)    bias correction
-v_hat = v / (1 - beta2^t)    bias correction
-
-w = w - lr * m_hat / (sqrt(v_hat) + epsilon)
+```math
+\begin{aligned}
+m &= \beta_1 \cdot m + (1 - \beta_1) \cdot \text{gradient} \\
+v &= \beta_2 \cdot v + (1 - \beta_2) \cdot \text{gradient}^2 \\[4pt]
+\hat{m} &= m / (1 - \beta_1^t) \quad \text{bias correction} \\
+\hat{v} &= v / (1 - \beta_2^t) \quad \text{bias correction} \\[4pt]
+w &= w - \text{lr} \cdot \hat{m} / (\sqrt{\hat{v}} + \epsilon)
+\end{aligned}
 ```
 
 除以 `sqrt(v_hat)` 是关键洞见。梯度大的权重被一个大数除（有效步小）。梯度小的权重被一个小数除（有效步大）。每个权重都拿到自己的自适应学习率。
@@ -149,14 +151,14 @@ w = w - lr * m_hat / (sqrt(v_hat) + epsilon)
 
 | 调度 | 公式 | 适用场景 |
 |----------|---------|----------|
-| 阶梯衰减 | 每 N 个 epoch lr = lr * factor | 简单、手动控制 |
-| 指数衰减 | lr = lr_0 * decay^t | 平滑下降 |
-| 余弦退火 | lr = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(pi * t / T)) | transformer、现代训练 |
+| 阶梯衰减 | 每 $N$ 个 epoch $\text{lr} = \text{lr} \cdot \text{factor}$ | 简单、手动控制 |
+| 指数衰减 | $\text{lr} = \text{lr}_0 \cdot \text{decay}^t$ | 平滑下降 |
+| 余弦退火 | $\text{lr} = \text{lr} _{\min} + 0.5 \cdot (\text{lr} _{\max} - \text{lr} _{\min}) \cdot (1 + \cos(\pi t / T))$ | transformer、现代训练 |
 | Warmup + 衰减 | 线性爬升，然后衰减 | 大模型，防止早期不稳定 |
 
 ### 凸 vs 非凸
 
-凸函数只有一个最小值。梯度下降总能找到它。像 `f(x) = x^2` 这样的二次函数是凸的。
+凸函数只有一个最小值。梯度下降总能找到它。像 $f(x) = x^2$ 这样的二次函数是凸的。
 
 神经网络损失函数是非凸的。它们有许多局部最小值、鞍点和平坦区域。
 
@@ -205,8 +207,8 @@ gradient-descent
 
 Rosenbrock 函数是经典的优化基准。它的最小值在 (1, 1)，处在一条狭窄弯曲的山谷里——好找，却难跟。
 
-```
-f(x, y) = (1 - x)^2 + 100 * (y - x^2)^2
+```math
+f(x, y) = (1 - x)^2 + 100 \cdot (y - x^2)^2
 ```
 
 ```python
@@ -351,9 +353,19 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(adam, T_max=100)
 
 2. **动量对比。** 用动量值 [0.0, 0.5, 0.9, 0.99] 在 Rosenbrock 函数上跑 SGD。追踪每一步的损失。哪个动量值收敛最快？哪个会越过头？
 
-3. **逃离鞍点。** 定义函数 `f(x, y) = x^2 - y^2`（原点处是鞍点）。从 (0.01, 0.01) 出发。比较原始 GD、带动量的 SGD 和 Adam 的表现。哪个逃出了鞍点？
+3. **逃离鞍点。** 定义函数 $f(x, y) = x^2 - y^2$（原点处是鞍点）。从 (0.01, 0.01) 出发。比较原始 GD、带动量的 SGD 和 Adam 的表现。哪个逃出了鞍点？
 
 4. **实现学习率衰减。** 给 GradientDescent 类加一个指数衰减调度：`lr = lr_0 * 0.999^step`。在 Rosenbrock 函数上比较有衰减和无衰减时的收敛。
+
+### 提示
+
+**练习 1。** 遍历学习率，为每个值创建 `GradientDescent(lr=...)`，再连同 `rosenbrock`、`rosenbrock_gradient` 传给 `optimize`。发散时损失会增长或变为 `nan`；极小值位于 $(1, 1)$，损失为 0。
+
+**练习 2。** 为每个动量值创建 `SGDMomentum(momentum=m)`，记录每步后的损失。用 `find_convergence_step` 比较速度，并通过损失上下波动判断是否过冲。
+
+**练习 3。** 写出梯度 $(2x, -2y)$，让三种优化器从 (0.01, 0.01) 出发。每 100 步输出 $y$：能逃离鞍点的优化器会使 $\lvert y \rvert$ 明显增大。
+
+**练习 4。** 在 `GradientDescent` 中保存 `lr_0` 和步数计数，在 `step` 内计算 `lr = lr_0 * 0.999 ** step`。输出第 0 和第 1000 步的学习率；它应从 `lr_0` 降到约 $0.37 \times \text{lr}_0$。
 
 ## 关键术语
 
@@ -365,7 +377,7 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(adam, T_max=100)
 | SGD | "随机采样" | 随机梯度下降。在一个随机子集而非整个数据集上算梯度。实践中几乎总是指小批量 SGD。 |
 | 小批量 | "一小块数据" | 用来估计梯度的训练数据小子集（32-256 个样本）。在速度和梯度准确度之间平衡。 |
 | Adam | "默认优化器" | Adaptive Moment Estimation。追踪每个权重梯度及梯度平方的滑动平均，给每个权重自己的学习率。 |
-| 偏差修正 | "修正冷启动" | Adam 的一阶和二阶矩初始化为零。偏差修正除以 (1 - beta^t) 来在早期步骤中补偿。 |
+| 偏差修正 | "修正冷启动" | Adam 的一阶和二阶矩初始化为零。偏差修正除以 $(1 - \beta^t)$ 来在早期步骤中补偿。 |
 | 学习率调度 | "随时间改变 lr" | 在训练中调整学习率的函数。早期大步，后期小步。 |
 | 凸函数 | "一个山谷" | 任何局部最小值都是全局最小值的函数。梯度下降总能找到它。神经网络损失不是凸的。 |
 | 鞍点 | "平的但不是最小值" | 梯度为零、但在某些方向是最小值、另一些方向是最大值的点。在高维中常见。 |

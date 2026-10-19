@@ -28,15 +28,15 @@ SVM 直接对接阶段 1：优化是凸的（第 18 课），间隔用范数衡�
 
 ### 最大间隔分类器
 
-给定线性可分的数据，标签 y_i 属于 {-1, +1}，特征向量为 x_i，我们想要一个超平面 w^T x + b = 0 把两类分开。
+给定线性可分的数据，标签 $y_i \in \lbrace -1, +1 \rbrace$，特征向量为 $x_i$，我们想要一个超平面 $w^T x + b = 0$ 把两类分开。
 
-点 x_i 到超平面的距离是：
+点 $x_i$ 到超平面的距离是：
 
+```math
+\text{distance} = \frac{\lvert w^T x_i + b \rvert}{\lVert w \rVert}
 ```
-distance = |w^T x_i + b| / ||w||
-```
 
-对于正确分类的点：y_i * (w^T x_i + b) > 0。间隔是超平面到任一侧最近点距离的两倍。
+对于正确分类的点：$y_i (w^T x_i + b) > 0$。间隔是超平面到任一侧最近点距离的两倍。
 
 ```mermaid
 graph LR
@@ -51,19 +51,23 @@ graph LR
 
 优化问题：
 
-```
-maximize    2 / ||w||     (间隔宽度)
-subject to  y_i * (w^T x_i + b) >= 1  for all i
-```
-
-等价地（最小化 ||w||^2 更好优化）：
-
-```
-minimize    (1/2) ||w||^2
-subject to  y_i * (w^T x_i + b) >= 1  for all i
+```math
+\begin{aligned}
+\text{最大化} \quad & \frac{2}{\lVert w \rVert} \quad \text{（间隔宽度）} \\
+\text{满足约束} \quad & y_i (w^T x_i + b) \ge 1 \quad \text{对所有 } i
+\end{aligned}
 ```
 
-这是一个凸二次规划，有唯一的全局解。恰好落在间隔边界上（即 y_i * (w^T x_i + b) = 1）的数据点就是支持向量。它们是唯一决定决策边界的点。移动或删掉任何一个非支持向量的点，边界都不变。
+等价地（最小化 $\lVert w \rVert^2$ 更好优化）：
+
+```math
+\begin{aligned}
+\text{最小化} \quad & \frac{1}{2} \lVert w \rVert^2 \\
+\text{满足约束} \quad & y_i (w^T x_i + b) \ge 1 \quad \text{对所有 } i
+\end{aligned}
+```
+
+这是一个凸二次规划，有唯一的全局解。恰好落在间隔边界上（即 $y_i (w^T x_i + b) = 1$）的数据点就是支持向量。它们是唯一决定决策边界的点。移动或删掉任何一个非支持向量的点，边界都不变。
 
 ### 支持向量：关键的少数
 
@@ -85,30 +89,32 @@ graph TD
 
 真实数据很少是完美可分的。有些点可能落在边界错误的一侧，或者落在间隔内部。软间隔形式通过引入松弛变量来允许违规。
 
-```
-minimize    (1/2) ||w||^2 + C * sum(xi_i)
-subject to  y_i * (w^T x_i + b) >= 1 - xi_i
-            xi_i >= 0  for all i
+```math
+\begin{aligned}
+\text{最小化} \quad & \frac{1}{2} \lVert w \rVert^2 + C \sum_i \xi_i \\
+\text{满足约束} \quad & y_i (w^T x_i + b) \ge 1 - \xi_i \\
+& \xi_i \ge 0 \quad \text{对所有 } i
+\end{aligned}
 ```
 
-松弛变量 xi_i 衡量点 i 违反间隔的程度。C 控制权衡：
+松弛变量 $\xi_i$ 衡量点 $i$ 违反间隔的程度。$C$ 控制权衡：
 
-| C 取值 | 行为 |
+| $C$ 取值 | 行为 |
 |---------|----------|
-| C 大 | 重罚违规。窄间隔，更少误分类。过拟合 |
-| C 小 | 允许更多违规。宽间隔，更多误分类。欠拟合 |
+| $C$ 大 | 重罚违规。窄间隔，更少误分类。过拟合 |
+| $C$ 小 | 允许更多违规。宽间隔，更多误分类。欠拟合 |
 
-C 是正则化强度的倒数。C 大 = 正则化弱。C 小 = 正则化强。
+$C$ 是正则化强度的倒数。$C$ 大 = 正则化弱。$C$ 小 = 正则化强。
 
 ### Hinge loss：SVM 的损失函数
 
 软间隔 SVM 可以重写成一个无约束优化：
 
-```
-minimize    (1/2) ||w||^2 + C * sum(max(0, 1 - y_i * (w^T x_i + b)))
+```math
+\text{最小化} \quad \frac{1}{2} \lVert w \rVert^2 + C \sum_i \max(0, 1 - y_i (w^T x_i + b))
 ```
 
-项 max(0, 1 - y_i * f(x_i)) 就是 hinge loss。当点被正确分类且在间隔之外时它为零。当点落在间隔内或被误分类时它是线性的。
+项 $\max(0, 1 - y_i f(x_i))$ 就是 hinge loss。当点被正确分类且在间隔之外时它为零。当点落在间隔内或被误分类时它是线性的。
 
 ```
 单个点的 hinge loss：
@@ -130,9 +136,11 @@ y*f(x) < 1 时线性惩罚。
 
 和 logistic loss（逻辑回归）对比：
 
-```
-Hinge:     max(0, 1 - y*f(x))          在间隔处硬截断
-Logistic:  log(1 + exp(-y*f(x)))        平滑，永不恰好为零
+```math
+\begin{aligned}
+\text{合页损失：} \quad & \max(0, 1 - y f(x)) && \text{在间隔处硬截断} \\
+\text{逻辑损失：} \quad & \log(1 + \exp(-y f(x))) && \text{平滑，永远不会恰好为零}
+\end{aligned}
 ```
 
 hinge loss 产生稀疏解（只有支持向量有非零贡献）。logistic loss 用到所有数据点。这让 SVM 在预测时更省内存。
@@ -141,36 +149,40 @@ hinge loss 产生稀疏解（只有支持向量有非零贡献）。logistic los
 
 你可以在 hinge loss 加 L2 正则化上做梯度下降来训练线性 SVM，不用去解带约束的 QP：
 
+```math
+\begin{aligned}
+& L(w, b) = \frac{\lambda}{2} \lVert w \rVert^2 + \frac{1}{n} \sum_i \max(0, 1 - y_i (w^T x_i + b)) \\[6pt]
+& \text{相对于以下变量的梯度：} w\text{:} \\
+& \quad \text{若 } y_i (w^T x_i + b) \ge 1\text{:} \quad \frac{\partial L}{\partial w} = \lambda w \\
+& \quad \text{若 } y_i (w^T x_i + b) < 1\text{:} \quad \frac{\partial L}{\partial w} = \lambda w - y_i x_i \\[6pt]
+& \text{相对于以下变量的梯度：} b\text{:} \\
+& \quad \text{若 } y_i (w^T x_i + b) \ge 1\text{:} \quad \frac{\partial L}{\partial b} = 0 \\
+& \quad \text{若 } y_i (w^T x_i + b) < 1\text{:} \quad \frac{\partial L}{\partial b} = -y_i
+\end{aligned}
 ```
-L(w, b) = (lambda/2) * ||w||^2 + (1/n) * sum(max(0, 1 - y_i * (w^T x_i + b)))
 
-关于 w 的梯度：
-  若 y_i * (w^T x_i + b) >= 1:  dL/dw = lambda * w
-  若 y_i * (w^T x_i + b) < 1:   dL/dw = lambda * w - y_i * x_i
-
-关于 b 的梯度：
-  若 y_i * (w^T x_i + b) >= 1:  dL/db = 0
-  若 y_i * (w^T x_i + b) < 1:   dL/db = -y_i
-```
-
-这叫原始形式（primal formulation）。每个 epoch 的复杂度是 O(n * d)，n 是样本数，d 是特征数。对于大规模、稀疏、高维的数据（文本分类），这很快。
+这叫原始形式（primal formulation）。每个 epoch 的复杂度是 $O(n \cdot d)$，$n$ 是样本数，$d$ 是特征数。对于大规模、稀疏、高维的数据（文本分类），这很快。
 
 ### 对偶形式与核技巧
 
 SVM 问题的拉格朗日对偶（来自阶段 1 第 18 课，KKT 条件）是：
 
-```
-maximize    sum(alpha_i) - (1/2) * sum_ij(alpha_i * alpha_j * y_i * y_j * (x_i . x_j))
-subject to  0 <= alpha_i <= C
-            sum(alpha_i * y_i) = 0
+```math
+\begin{aligned}
+\text{最大化} \quad & \sum_i \alpha_i - \frac{1}{2} \sum_{i,j} \alpha_i \alpha_j y_i y_j (x_i \cdot x_j) \\
+\text{满足约束} \quad & 0 \le \alpha_i \le C \\
+& \sum_i \alpha_i y_i = 0
+\end{aligned}
 ```
 
-对偶只涉及数据点之间的点积 x_i . x_j。这是关键洞察。把每个点积换成一个核函数 K(x_i, x_j)，SVM 就能学到非线性边界，而全程不用显式计算那个变换。
+对偶只涉及数据点之间的点积 $x_i \cdot x_j$。这是关键洞察。把每个点积换成一个核函数 $K(x_i, x_j)$，SVM 就能学到非线性边界，而全程不用显式计算那个变换。
 
-```
-Linear kernel:      K(x, z) = x . z
-Polynomial kernel:  K(x, z) = (x . z + c)^d
-RBF (Gaussian):     K(x, z) = exp(-gamma * ||x - z||^2)
+```math
+\begin{aligned}
+\text{线性核：} \quad & K(x, z) = x \cdot z \\
+\text{多项式核：} \quad & K(x, z) = (x \cdot z + c)^d \\
+\text{RBF（高斯核）：} \quad & K(x, z) = \exp(-\gamma \lVert x - z \rVert^2)
+\end{aligned}
 ```
 
 RBF 核把数据映射到一个无限维空间。在输入空间里靠得近的点，核值接近 1；离得远的点，核值接近 0。它能学到任意平滑的决策边界。
@@ -186,20 +198,22 @@ graph LR
     A -->|"核技巧<br>K(x,z) = phi(x).phi(z)"| B
 ```
 
-核技巧在高维空间里计算点积，却从不真的进入那个空间。对于 D 维空间里 d 次的多项式核，显式特征空间有 O(D^d) 维。但 K(x, z) 在 O(D) 时间内就能算出来。
+核技巧在高维空间里计算点积，却从不真的进入那个空间。对于 $D$ 维空间里 $d$ 次的多项式核，显式特征空间有 $O(D^d)$ 维。但 $K(x, z)$ 在 $O(D)$ 时间内就能算出来。
 
 ### 用于回归的 SVM（SVR）
 
-支持向量回归在数据周围拟合一根宽度为 epsilon 的管子。管子内的点损失为零。管子外的点被线性惩罚。
+支持向量回归在数据周围拟合一根宽度为 $\epsilon$ 的管子。管子内的点损失为零。管子外的点被线性惩罚。
 
-```
-minimize    (1/2) ||w||^2 + C * sum(xi_i + xi_i*)
-subject to  y_i - (w^T x_i + b) <= epsilon + xi_i
-            (w^T x_i + b) - y_i <= epsilon + xi_i*
-            xi_i, xi_i* >= 0
+```math
+\begin{aligned}
+\text{最小化} \quad & \frac{1}{2} \lVert w \rVert^2 + C \sum_i (\xi_i + \xi_i^*) \\
+\text{满足约束} \quad & y_i - (w^T x_i + b) \le \epsilon + \xi_i \\
+& (w^T x_i + b) - y_i \le \epsilon + \xi_i^* \\
+& \xi_i, \xi_i^* \ge 0
+\end{aligned}
 ```
 
-epsilon 参数控制管子宽度。管子越宽 = 支持向量越少 = 拟合越平滑。管子越窄 = 支持向量越多 = 拟合越紧。
+$\epsilon$ 参数控制管子宽度。管子越宽 = 支持向量越少 = 拟合越平滑。管子越窄 = 支持向量越多 = 拟合越紧。
 
 ### SVM 为什么输给了深度学习（以及它何时仍然赢）
 
@@ -208,7 +222,7 @@ epsilon 参数控制管子宽度。管子越宽 = 支持向量越少 = 拟合越
 | 因素 | SVM | 深度学习 |
 |--------|------|---------------|
 | 特征工程 | 需要 | 自己学特征 |
-| 可扩展性 | 核方法是 O(n^2) 到 O(n^3) | 用 SGD 时每 epoch O(n) |
+| 可扩展性 | 核方法是 $O(n^2)$ 到 $O(n^3)$ | 用 SGD 时每 epoch $O(n)$ |
 | 图像/文本/音频 | 需要手工特征 | 从原始数据学 |
 | 大数据集（>10 万） | 慢 | 扩展性好 |
 | GPU 加速 | 收益有限 | 大幅加速 |
@@ -324,9 +338,9 @@ print(f"Accuracy: {clf.score(X_test, y_test):.4f}")
 print(f"Support vectors: {clf['svm'].n_support_}")
 ```
 
-重要：训练 SVM 之前一定要缩放特征。SVM 对特征量级敏感，因为间隔依赖 ||w||，未缩放的特征会扭曲几何关系。
+重要：训练 SVM 之前一定要缩放特征。SVM 对特征量级敏感，因为间隔依赖 $\lVert w \rVert$，未缩放的特征会扭曲几何关系。
 
-对于大数据集，用 `LinearSVC`（原始形式，每 epoch O(n)）而不是 `SVC`（对偶形式，O(n^2) 到 O(n^3)）：
+对于大数据集，用 `LinearSVC`（原始形式，每 epoch $O(n)$）而不是 `SVC`（对偶形式，$O(n^2)$ 到 $O(n^3){}$）：
 
 ```python
 from sklearn.svm import LinearSVC
@@ -341,13 +355,13 @@ clf = Pipeline([
 
 1. 生成一个二维线性可分数据集。训练你的 LinearSVM，识别支持向量。验证支持向量正是离决策边界最近的那些点。
 
-2. 在一个有噪声的数据集上让 C 从 0.001 变到 1000。为每个 C 值画出决策边界。观察从宽间隔（欠拟合）到窄间隔（过拟合）的转变。
+2. 在一个有噪声的数据集上让 $C$ 从 0.001 变到 1000。为每个 $C$ 值画出决策边界。观察从宽间隔（欠拟合）到窄间隔（过拟合）的转变。
 
 3. 造一个类边界是圆形（非线性）的数据集。说明线性 SVM 会失败。计算 RBF 核矩阵，说明在核诱导的特征空间里两类变得可分。
 
 4. 在同一数据集上对比 hinge loss 和 logistic loss。训练一个线性 SVM 和一个逻辑回归。数一数有多少训练点对各自模型的决策边界有贡献（支持向量 vs 全部点）。
 
-5. 实现 SVR（epsilon 不敏感损失）。把它拟合到 y = sin(x) + 噪声。画出预测周围的 epsilon 管子，并高亮支持向量（管子外的点）。
+5. 实现 SVR（epsilon 不敏感损失）。把它拟合到 $y = \sin(x) + \text{noise}$。画出预测周围的 epsilon 管子，并高亮支持向量（管子外的点）。
 
 ## 关键术语
 
@@ -355,16 +369,16 @@ clf = Pipeline([
 |------|----------------------|
 | 支持向量 | 离决策边界最近的训练点。唯一决定超平面的点 |
 | 间隔 | 决策边界到最近支持向量的距离。SVM 要把它最大化 |
-| Hinge loss | max(0, 1 - y*f(x))。正确分类且在间隔外时为零，否则线性惩罚 |
-| C 参数 | 间隔宽度和分类错误之间的权衡。C 大 = 窄间隔，C 小 = 宽间隔 |
+| Hinge loss | $\max(0, 1 - y f(x))$。正确分类且在间隔外时为零，否则线性惩罚 |
+| $C$ 参数 | 间隔宽度和分类错误之间的权衡。$C$ 大 = 窄间隔，$C$ 小 = 宽间隔 |
 | 软间隔 | 通过松弛变量允许间隔违规的 SVM 形式。能处理不可分数据 |
 | 核技巧 | 在高维特征空间里计算点积，而不显式映射到那个空间 |
-| 线性核 | K(x, z) = x . z。等价于标准点积。用于线性可分数据 |
-| RBF 核 | K(x, z) = exp(-gamma * \|\|x-z\|\|^2)。映射到无限维。学任意平滑边界 |
-| 多项式核 | K(x, z) = (x . z + c)^d。映射到多项式组合的特征空间 |
+| 线性核 | $K(x, z) = x \cdot z$。等价于标准点积。用于线性可分数据 |
+| RBF 核 | $K(x, z) = \exp(-\gamma \Vert x-z \Vert^2)$。映射到无限维。学任意平滑边界 |
+| 多项式核 | $K(x, z) = (x \cdot z + c)^d$。映射到多项式组合的特征空间 |
 | 对偶形式 | SVM 问题的重新表述，只依赖数据点之间的点积。让核成为可能 |
 | SVR | 支持向量回归。在数据周围拟合一个 epsilon 管子。管子内的点损失为零 |
-| 松弛变量 | xi_i：衡量一个点违反间隔的程度。对间隔外正确分类的点为零 |
+| 松弛变量 | $\xi_i$：衡量一个点违反间隔的程度。对间隔外正确分类的点为零 |
 | 最大间隔 | 选择那个使到各类最近点距离最大化的超平面的原则 |
 
 ## 延伸阅读

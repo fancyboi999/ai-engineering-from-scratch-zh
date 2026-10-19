@@ -53,8 +53,8 @@ For each drafted token x_t:
 
 如果 draft 模型的 token 级接受率是 `α`，每次 target 前向传播产出的预期 token 数是：
 
-```
-E[tokens] = (1 - α^{K+1}) / (1 - α)        # K = draft length, α in [0, 1]
+```math
+\mathbb{E}[\text{tokens}] = \frac{1 - \alpha^{K+1}}{1 - \alpha} \qquad K = \text{草稿长度}, \ \alpha \in [0, 1]
 ```
 
 在 `α = 0.8, K = 4` 时：`(1 - 0.8^5)/(1 - 0.8) = 3.36` 个 token/前向。一次 target 前向大约花 `cost_q * K + cost_p`（K 次 draft 步骤加一次 target 验证）。如果 `cost_p >> cost_q * K`，吞吐上的加速比是 `3.36× / 1 = 3.36×`。
@@ -175,7 +175,7 @@ def speculative_step(p_target, q_draft, K, temperature=1.0):
 
 1. 实现精确拒绝规则并经验性验证它。经 `speculative_decode` 和经普通 target 采样各跑 1 万个样本；计算两个输出分布之间的 TV 距离。应该 < 0.01。
 
-2. 计算加速公式。给定固定的 `α` 和 `K`，画出每次 target 前向的预期 token 数。为 α ∈ {0.5, 0.7, 0.9} 找出最优 K。
+2. 计算加速公式。给定固定的 `α` 和 `K`，画出每次 target 前向的预期 token 数。为 $\alpha \in \lbrace 0.5, 0.7, 0.9 \rbrace$ 找出最优 $K$。
 
 3. 训练一个微型 draft。拿一个 124M 的 GPT-2 target，在 1 亿 token 上用 KL 损失蒸馏一个 30M 的 GPT-2 draft。在留出文本上测量 `α`。预期：0.6-0.7。
 

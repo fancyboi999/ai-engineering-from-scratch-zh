@@ -173,7 +173,13 @@ function buildData(options = {}) {
   }
   const planned = roadmap.filter(project => !readyIds.has(project.id)).map(project => ({ ...project, status: 'planned' }));
   for (const project of loaded.filter(project => project.status === 'draft')) if (!seen.has(project.id)) planned.push({ ...project, status: 'draft' });
-  return { generated: new Date().toISOString().slice(0, 10), repo: 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh', levels: LEVELS, projects, planned };
+  const pathsDir = path.join(root, 'learning-paths');
+  const routes = fs.existsSync(pathsDir) ? fs.readdirSync(pathsDir).filter(file => file.endsWith('.json')).sort().map(file => readJson(path.join(pathsDir, file))) : [];
+  const roles = routes.filter(route => route.kind === 'career-route' && Array.isArray(route.projects)).map(route => {
+    for (const id of route.projects) ensure(readyIds.has(id), `learning-paths/${route.id}: ${id} is not a ready project`);
+    return { id: route.id, title: route.title, projects: route.projects.slice() };
+  });
+  return { generated: new Date().toISOString().slice(0, 10), repo: 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh', levels: LEVELS, projects, planned, roles };
 }
 
 function bundleContent(data, root, outDir) {

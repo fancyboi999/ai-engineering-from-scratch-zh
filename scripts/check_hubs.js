@@ -67,7 +67,7 @@ function validatePages(hubs) {
       assert(fs.existsSync(path.join(root, sourcePath, 'docs/zh.md')), `${page.href} 链接不存在：${sourcePath}`);
     }
   }
-  assert.equal(hubs.phaseModels.reduce((sum, phase) => sum + phase.lessons.length, 0), 528);
+  assert.equal(hubs.phaseModels.reduce((sum, phase) => sum + phase.lessons.length, 0), 542);
   assert.equal(hubs.termModels.length, hubs.termPages.length + hubs.skipped.length);
   assert(hubs.termPages.length > 200, '中文术语不应被英文空格计数误过滤');
 }

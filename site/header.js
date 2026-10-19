@@ -32,6 +32,7 @@
       try {
         var resolved = new URL(href, (locationValue || window.location).href);
         if (resolved.origin !== (locationValue || window.location).origin) return href;
+        href = resolved.pathname + resolved.search + resolved.hash;
       } catch (_) {
         return href;
       }
@@ -39,6 +40,10 @@
     if (/^\/(lesson|certification)(?=[?#]|$)/.test(href)) {
       return href.replace(/^\/(lesson|certification)(?=[?#]|$)/, '$1.html');
     }
+    if (/^\/cheatsheets(?:\/|$)/.test(href)) {
+      return href.replace(/^\/cheatsheets(?=[?#]|$)/, '/cheatsheets/index.html').replace(/^(\/cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
+    }
+    if (/^\/roadmap(?=[?#]|$)/.test(href)) return href.replace('/roadmap', '/prereqs.html');
     return href.replace(/(^|\/)(lesson|certification)(?=[?#]|$)/, '$1$2.html');
   }
 
@@ -241,6 +246,10 @@
     ensureNavigationLink(nav, 'projects.html', '实战项目', '');
     ensureNavigationLink(nav, 'manuals.html', '技术手册', '');
     ensureNavigationLink(nav, 'learning-paths.html', '学习路径', '');
+    ensureNavigationLink(nav, 'how-to-learn.html', '学习方法', '');
+    ensureNavigationLink(nav, 'skills.html', 'Agent 技能', '');
+    ensureNavigationLink(nav, 'inside-an-ai-agent.html', 'Agent 内部机制', '');
+    ensureNavigationLink(nav, 'cheatsheets', '速查表', '');
     ensureNavigationLink(nav, 'certifications.html', '认证', 'header-mobile-only');
   }
 

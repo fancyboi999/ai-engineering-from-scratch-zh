@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 492" role="img" aria-labelledby="fig-1-1-title fig-1-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-1-1-title">rea 统一什么，又将什么交给 Ghidra</title>
+  <desc id="fig-1-1-desc">宿主横栏下有两个栈，环境为 macOS 26.2 arm64、Node 22.22.0、JDK 21.0.12.1。左栈为 rea 6.7.0：共用一个 BinarySession 的 CLI 和 MCP 适配器，有 153 条命令、207 个工具、6 个 prompt；会话保持一个目标和一个注册表选定且不替换的 provider；EvidenceLedger 保存含 16 字段和 ev_ 内容 hash 的 Evidence；Zod 契约和含 code、category、message、retryable 的错误投影；GhidraProvider 与 GhidraClient 通过 bridge.sock 传递 JSON 行。右栈为 Ghidra 12.1.4：作为最后 post-script 的 ReaGhidraBridge.java；根据头部选择加载器的 analyzeHeadless 导入；发现 13 个过程、39 个字符串的 FunctionManager、ReferenceManager、BasicBlockModel；使用 mac_arm_64 原生 decompile 的 DecompInterface；关闭即删除的 Program 数据库。底部为产物 ledger-arm64-O1 及私有副本 target-01b5d08b08fb.bin。</desc>
+  <rect x="20" y="28" width="600" height="30" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>
+  <text x="30" y="47" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">宿主 · macOS 26.2 arm64 · Node 22.22.0 · JDK 21.0.12.1 · 已设置 GHIDRA_INSTALL_DIR</text>
+  <line x1="320" y1="66" x2="320" y2="414" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="80" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">REA 6.7.0 · 统一的部分</text>
+  <text x="336" y="80" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">GHIDRA 12.1.4 · REA 交给它的部分</text>
+  <rect x="20" y="90" width="284" height="56" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="162" y="105.6" font-size="12" text-anchor="middle" font-weight="700">CLI 与 MCP</text>
+  <text x="162" y="122.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">153 条命令、207 个工具、6 个 prompt</text>
+  <text x="162" y="137.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两者共用一个 BinarySession</text>
+  <rect x="20" y="156" width="284" height="56" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="162" y="171.6" font-size="12" text-anchor="middle" font-weight="700">BinarySession</text>
+  <text x="162" y="188.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个目标、一个绑定 provider</text>
+  <text x="162" y="203.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">注册表只选择，不替换</text>
+  <rect x="20" y="222" width="284" height="56" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="162" y="237.6" font-size="12" text-anchor="middle" font-weight="700">Evidence</text>
+  <text x="162" y="254.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">16 个字段、ev_ 内容 hash</text>
+  <text x="162" y="269.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">EvidenceLedger、快照、bundle</text>
+  <rect x="20" y="288" width="284" height="56" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="162" y="303.6" font-size="12" text-anchor="middle" font-weight="700">契约与错误</text>
+  <text x="162" y="320.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">各工具均有 Zod schema</text>
+  <text x="162" y="335.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">code, category, message, retryable</text>
+  <rect x="20" y="354" width="284" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="162" y="369.6" font-size="12" text-anchor="middle" font-weight="700">GhidraProvider, GhidraClient</text>
+  <text x="162" y="386.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">配置摘要、私有副本</text>
+  <text x="162" y="401.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">通过 bridge.sock 传递 JSON 行</text>
+  <rect x="336" y="90" width="284" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="478" y="105.6" font-size="12" text-anchor="middle" font-weight="700">ReaGhidraBridge.java</text>
+  <text x="478" y="122.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GhidraScript，最后的 -postScript</text>
+  <text x="478" y="137.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个 Program、一个 socket 客户端</text>
+  <rect x="336" y="156" width="284" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="478" y="171.6" font-size="12" text-anchor="middle" font-weight="700">analyzeHeadless 导入</text>
+  <text x="478" y="188.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">根据文件头选择加载器</text>
+  <text x="478" y="203.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">-readOnly，默认自动分析</text>
+  <rect x="336" y="222" width="284" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="478" y="237.6" font-size="12" text-anchor="middle" font-weight="700">FunctionManager, ReferenceManager</text>
+  <text x="478" y="254.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">BasicBlockModel、Listing 文本</text>
+  <text x="478" y="269.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">此处 13 个过程、39 个字符串</text>
+  <rect x="336" y="288" width="284" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="478" y="303.6" font-size="12" text-anchor="middle" font-weight="700">DecompInterface, decompile</text>
+  <text x="478" y="320.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mac_arm_64 原生二进制</text>
+  <text x="478" y="335.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">伪代码与高层 p-code</text>
+  <rect x="336" y="354" width="284" height="56" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="478" y="369.6" font-size="12" text-anchor="middle" font-weight="700">Program 数据库</text>
+  <text x="478" y="386.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">地址、符号、引用</text>
+  <text x="478" y="401.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">关闭时删除：-deleteProject</text>
+  <rect x="20" y="424" width="284" height="56" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="162" y="439.6" font-size="12" text-anchor="middle" font-weight="700">ledger-arm64-O1</text>
+  <text x="162" y="456.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mach-o arm64，33872 字节</text>
+  <text x="162" y="471.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sha256 以 01b5d08b 开头</text>
+  <rect x="336" y="424" width="284" height="56" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="478" y="439.6" font-size="12" text-anchor="middle" font-weight="700">target-01b5d08b08fb.bin</text>
+  <text x="478" y="456.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Ghidra 导入的私有副本</text>
+  <text x="478" y="471.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">相同字节，关闭时删除</text>
+</svg>

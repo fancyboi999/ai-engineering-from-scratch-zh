@@ -629,6 +629,7 @@ p.dropcap::first-letter {
 }
 
 .modal-close:focus-visible,
+.modal-search:focus-visible,
 .modal-lesson-open:focus-visible,
 .modal-lesson-toggle:focus-visible,
 .modal-reset:focus-visible {
@@ -717,6 +718,53 @@ p.dropcap::first-letter {
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform var(--motion-enter) var(--ease-out);
+}
+
+.modal-search-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.modal-search-wrap[hidden] {
+  display: none;
+}
+
+.modal-search-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.modal-search {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: 0;
+  color: var(--ink);
+  outline: none;
+  transition: border-color var(--motion-feedback) ease;
+}
+
+.modal-search::placeholder {
+  color: var(--ink-mute);
+}
+
+.modal-search:focus {
+  border-color: var(--blueprint);
+}
+
+.modal-search[type="search"]::-webkit-search-decoration,
+.modal-search[type="search"]::-webkit-search-cancel-button,
+.modal-search[type="search"]::-webkit-search-results-button,
+.modal-search[type="search"]::-webkit-search-results-decoration {
+  display: none;
 }
 
 .modal-footer {

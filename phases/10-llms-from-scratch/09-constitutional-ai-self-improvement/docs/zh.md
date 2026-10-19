@@ -74,22 +74,22 @@ DeepSeek 在 DeepSeekMath 论文（2024）里引入 GRPO，并把它用作 DeepS
 
 回忆 PPO 的目标（来自第 07 课）：
 
-```
-L_PPO = E[min(r(theta) * A, clip(r(theta), 1-eps, 1+eps) * A)]
+```math
+L_{\text{PPO}} = \mathbb{E}\left[\min\left(r(\theta) \cdot A, \mathop{\mathrm{clip}}(r(\theta), 1-\epsilon, 1+\epsilon) \cdot A\right)\right]
 ```
 
 其中 `A` 是 advantage，通常用 GAE 配一个习得的价值网络 `V(s)` 来估计。价值网络是第二个和策略一样大的模型。它使内存翻倍，并引入它自己的训练循环。
 
-GRPO 把价值函数扔了。对每个 prompt，它采样一组 G 个回复（通常 G=16 或 64）。计算每个回复的奖励，然后在组内归一化：
+GRPO 把价值函数扔了。对每个 prompt，它采样一组 $G$ 个回复（通常 $G=16$ 或 64）。计算每个回复的奖励，然后在组内归一化：
 
-```
-A_i = (r_i - mean(r_1, ..., r_G)) / std(r_1, ..., r_G)
+```math
+A_i = \frac{r_i - \mathop{\mathrm{mean}}(r_1, \ldots, r_G)}{\mathop{\mathrm{std}}(r_1, \ldots, r_G)}
 ```
 
 advantage 是这个回复的奖励相对它兄弟们的 z-score。没有价值函数。组本身就是 baseline。
 
-```
-L_GRPO = E[min(r(theta) * A_group, clip(r(theta), 1-eps, 1+eps) * A_group)] - beta * KL(pi || pi_ref)
+```math
+L_{\text{GRPO}} = \mathbb{E}\left[\min\left(r(\theta) \cdot A_{\text{group}}, \mathop{\mathrm{clip}}(r(\theta), 1-\epsilon, 1+\epsilon) \cdot A_{\text{group}}\right)\right] - \beta \cdot \mathrm{KL}(\pi \,\|\, \pi_{\text{ref}})
 ```
 
 对参考模型的 KL 惩罚仍在，和 PPO 一样。裁剪比率仍在。消失的是那个单独的批判者。

@@ -41,8 +41,8 @@ prediction-game
 
 **N-gram 概率：** `P(w_i | w_{i-n+1}, ..., w_{i-1})`。固定 `n`（通常三元组取 3，4-gram 取 4）。从计数算：
 
-```text
-P(w | context) = count(context, w) / count(context)
+```math
+P(w \mid \text{context}) = \frac{\mathop{\mathrm{count}}(\text{context}, w)}{\mathop{\mathrm{count}}(\text{context})}
 ```
 
 **零计数问题。** 任何训练里没见过的 n-gram 都得概率零。2007 年一项对 Brown 语料的研究发现，即便是 4-gram 模型，留出集里也有 30% 的 4-gram 在训练里没出现过。不平滑，你没法在任何真实文本上评估。
@@ -60,8 +60,8 @@ Kneser-Ney 的洞见很深。"San Francisco" 是个常见二元组。一元组 "
 
 **评估：困惑度。** 在留出测试集上，每词平均负对数似然的指数。越低越好。困惑度 100 意味着模型困惑的程度，相当于在 100 个词里均匀选一个。
 
-```text
-perplexity = exp(- (1/N) * Σ log P(w_i | context_i))
+```math
+\text{perplexity} = \exp\left(-\frac{1}{N} \sum_i \log P(w_i \mid \text{context}_i)\right)
 ```
 
 ```figure

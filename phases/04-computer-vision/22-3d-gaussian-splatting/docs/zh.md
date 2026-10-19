@@ -61,12 +61,13 @@ flowchart LR
 
 世界位置 `mu`、3D 协方差 `Sigma` 的 3D 高斯，投影成一个屏幕位置 `mu'`、2D 协方差 `Sigma'` 的 2D 高斯：
 
-```
-mu' = project(mu)
-Sigma' = J W Sigma W^T J^T          (2 x 2)
-
-W = 观看变换（相机的旋转 + 平移）
-J = 透视投影在 mu' 处的雅可比
+```math
+\begin{aligned}
+\mu' &= \mathop{\mathrm{project}}(\mu) \\
+\Sigma' &= J W \Sigma W^T J^T \qquad (2 \times 2) \\[6pt]
+W &= \text{观察变换（相机旋转和平移）} \\
+J &= \text{透视投影在此处的雅可比矩阵：} \mu'
+\end{aligned}
 ```
 
 2D 高斯的足迹是一个椭圆，其轴是 `Sigma'` 的特征向量。那个椭圆内每个像素都接收该高斯的贡献，由 `exp(-0.5 * (p - mu')^T Sigma'^-1 (p - mu'))` 加权。
@@ -75,12 +76,13 @@ J = 透视投影在 mu' 处的雅可比
 
 对一个像素，覆盖它的高斯按从后到前排序（或等价地用反转公式从前到后）。颜色用和自 1980 年代以来每个半透明光栅化器相同的方程合成：
 
-```
-C_pixel = sum_i alpha_i * T_i * c_i
-
-T_i = prod_{j < i} (1 - alpha_j)       到 i 为止的透射率
-alpha_i = opacity_i * exp(-0.5 * d^T Sigma'^-1 d)   局部贡献
-c_i = eval_SH(SH_i, view_direction)    随视角的颜色
+```math
+\begin{aligned}
+C_{\text{pixel}} &= \sum_i \alpha_i T_i c_i \\[6pt]
+T_i &= \prod_{j < i} (1 - \alpha_j) && \text{到此处的透射率：} i \\
+\alpha_i &= \text{opacity}_i \cdot \exp\left(-0.5 \, d^T \Sigma'^{-1} d\right) && \text{局部贡献} \\
+c_i &= \mathop{\mathrm{eval\_SH}}(\text{SH}_i, \text{view\_direction}) && \text{依赖观察方向的颜色}
+\end{aligned}
 ```
 
 这**和 NeRF 的体积渲染是同一个方程**，只不过作用于一组显式的稀疏高斯，而不是沿射线的稠密采样。正是这个等同性，让渲染质量匹敌 NeRF——两者都在积分同一个辐射场方程。
@@ -97,7 +99,7 @@ c_i = eval_SH(SH_i, view_direction)    随视角的颜色
 - 当一个大尺度高斯梯度大时，把它**分裂（Split）**成两个更小的——一个大高斯太平滑、拟合不了那块区域。
 - **剪枝（Prune）**不透明度掉到阈值以下的高斯——它们没在贡献。
 
-致密化每 N 次迭代跑一次。一个场景通常从约 10 万个初始高斯（用 SfM 点播种）增长到训练结束时的 100-500 万个。
+致密化每 $N$ 次迭代跑一次。一个场景通常从约 10 万个初始高斯（用 SfM 点播种）增长到训练结束时的 100-500 万个。
 
 ### 一段话讲清球谐
 

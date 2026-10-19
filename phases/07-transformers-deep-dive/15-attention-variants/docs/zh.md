@@ -9,11 +9,11 @@
 
 ## 问题背景
 
-完整注意力在序列长度上花 `O(N²)` 显存和 `O(N²)` 算力。对一个 128K 上下文的 Llama 3 70B，那是每层 160 亿个注意力条目，乘以 80 层。Flash Attention（第 12 课）藏掉了 `O(N²)` 的激活显存，但没改算术成本——每个 token 仍然关注其他每个 token。
+完整注意力在序列长度上花 $O(N^2)$ 显存和 $O(N^2)$ 算力。对一个 128K 上下文的 Llama 3 70B，那是每层 160 亿个注意力条目，乘以 80 层。Flash Attention（第 12 课）藏掉了 $O(N^2)$ 的激活显存，但没改算术成本——每个 token 仍然关注其他每个 token。
 
 三类变体改变注意力矩阵本身的拓扑：
 
-1. **滑动窗口注意力（SWA）。** 每个 token 关注一个固定的邻居窗口，而非整个前缀。显存和算力降到 `O(N · W)`，其中 `W` 是窗口。Gemma 2/3、Mistral 7B 的前几层、Phi-3-Long。
+1. **滑动窗口注意力（SWA）。** 每个 token 关注一个固定的邻居窗口，而非整个前缀。显存和算力降到 $O(N \cdot W)$，其中 $W$ 是窗口。Gemma 2/3、Mistral 7B 的前几层、Phi-3-Long。
 2. **稀疏 / 块注意力。** 只有选中的对 `(i, j)` 被打分；其余被强制为零权重。Longformer、BigBird、OpenAI 稀疏 transformer。
 3. **差分注意力。** 用各自的 Q/K 投影算两张注意力图，一张减另一张。干掉那个把权重渗进前几个 token 的"注意力汇（attention sink）"。微软的 DIFF Transformer（2024）。
 
@@ -23,7 +23,7 @@
 
 ### 滑动窗口注意力（SWA）
 
-位置 `i` 的每个 query 只关注 `[i - W, i]`（因果 SWA）或 `[i - W/2, i + W/2]`（双向）里的位置。窗口外的 token 在分数矩阵里得 `-inf`。
+位置 $i$ 的每个 query 只关注 $[i - W, i]$（因果 SWA）或 $[i - W/2, i + W/2]$（双向）里的位置。窗口外的 token 在分数矩阵里得 $-\infty$。
 
 ```
 完整因果：              滑动窗口 (W=4)：
@@ -39,17 +39,17 @@
 7 | x x x x x x x x  7 |          x x x x
 ```
 
-对 `N = 8192` 和 `W = 1024`，分数矩阵期望上有 1024 × 8192 个非零行——8 倍的削减。
+对 $N = 8192$ 和 $W = 1024$，分数矩阵期望上有 1024 × 8192 个非零行——8 倍的削减。
 
-**SWA 让 KV 缓存缩小。** 每层只需保留 K 和 V 的最后 `W` 个 token。对一个类 Gemma-3 配置（1024 窗口、128K 上下文），KV 缓存降 128 倍。
+**SWA 让 KV 缓存缩小。** 每层只需保留 K 和 V 的最后 $W$ 个 token。对一个类 Gemma-3 配置（1024 窗口、128K 上下文），KV 缓存降 128 倍。
 
-**质量代价。** 纯 SWA transformer 在长程检索上吃力。修法：把 SWA 层和完整注意力层交错。Gemma 3 用 5:1 的 SWA:全局。Mistral 7B 用了一个因果 SWA 栈，信息通过重叠窗口"向前流"——每层把有效感受野扩展 `W`，`L` 层之后模型能往回关注 `L × W` 个 token。
+**质量代价。** 纯 SWA transformer 在长程检索上吃力。修法：把 SWA 层和完整注意力层交错。Gemma 3 用 5:1 的 SWA:全局。Mistral 7B 用了一个因果 SWA 栈，信息通过重叠窗口"向前流"——每层把有效感受野扩展 $W$，`L` 层之后模型能往回关注 `L × W` 个 token。
 
 ### 稀疏 / 块注意力
 
 提前挑一个 `N × N` 的稀疏模式。三种规范形状：
 
-- **局部 + 跨步（OpenAI 稀疏 transformer）。** 关注最后 `W` 个 token，加上之前每第 `stride` 个 token。以 `O(N · sqrt(N))` 算力同时捕捉局部和长程。
+- **局部 + 跨步（OpenAI 稀疏 transformer）。** 关注最后 $W$ 个 token，加上之前每第 `stride` 个 token。以 $O(N \cdot \sqrt{N})$ 算力同时捕捉局部和长程。
 - **Longformer / BigBird。** 局部窗口 + 一小组全局 token（如 `[CLS]`），它们关注所有人也被所有人关注 + 随机稀疏连接。同等质量下经验上 2 倍上下文。
 - **Native Sparse Attention（DeepSeek，2025）。** 学哪些 `(Q, K)` 块重要；在 kernel 层跳过零块。兼容 FlashAttention。
 
@@ -61,13 +61,15 @@
 
 差分注意力通过算**两张**注意力图并相减来修这点：
 
-```
-A1 = softmax(Q1 K1^T / √d)
-A2 = softmax(Q2 K2^T / √d)
-DiffAttn = (A1 - λ · A2) V
+```math
+\begin{aligned}
+A_1 &= \mathop{\mathrm{softmax}}(Q_1 K_1^T / \sqrt{d}) \\
+A_2 &= \mathop{\mathrm{softmax}}(Q_2 K_2^T / \sqrt{d}) \\
+\text{DiffAttn} &= (A_1 - \lambda \cdot A_2) V
+\end{aligned}
 ```
 
-其中 `λ` 是一个学到的标量（通常 0.5–0.8）。A1 捕捉真实内容权重；A2 捕捉那个汇。相减抵消了汇，把权重重新分配给相关 token。
+其中 $\lambda$ 是一个学到的标量（通常 0.5–0.8）。A1 捕捉真实内容权重；A2 捕捉那个汇。相减抵消了汇，把权重重新分配给相关 token。
 
 报告的结果（微软 2024）：困惑度低 5–10%、同训练长度下有效上下文长 1.5–2 倍、大海捞针检索更锐利。
 
@@ -75,12 +77,12 @@ DiffAttn = (A1 - λ · A2) V
 
 | 变体 | 算力 | KV 缓存 | 相比完整的质量 | 生产使用 |
 |---------|---------|----------|-----------------|----------------|
-| 完整注意力 | O(N²) | 每层 O(N) | 基线 | 每个模型的默认层 |
-| SWA（窗口 1024） | O(N·W) | 每层 O(W) | -0.1 ppl，配全局层不错 | Gemma 2/3、Phi-3-Long |
-| 局部 + 跨步稀疏 | O(N·√N) | 混合 | 类似 SWA | OpenAI 稀疏 transformer、Longformer |
-| BigBird（局部 + 全局 + 随机） | 约 O(N) | 混合 | 2 倍上下文下追平完整 | 早期长上下文 BERT |
-| Native Sparse（DeepSeek-V3.2） | O(N · 激活比例) | O(N) | 在 0.05 ppl 之内 | DeepSeek-V3.2，2025 |
-| 差分 | O(2·N²) | O(2N) | -5 到 -10% ppl | DIFF Transformer、2026 早期模型 |
+| 完整注意力 | $O(N^2)$ | 每层 $O(N)$ | 基线 | 每个模型的默认层 |
+| SWA（窗口 1024） | $O(N \cdot W)$ | 每层 $O(W)$ | -0.1 ppl，配全局层不错 | Gemma 2/3、Phi-3-Long |
+| 局部 + 跨步稀疏 | $O(N \cdot \sqrt{N})$ | 混合 | 类似 SWA | OpenAI 稀疏 transformer、Longformer |
+| BigBird（局部 + 全局 + 随机） | 约 $O(N)$ | 混合 | 2 倍上下文下追平完整 | 早期长上下文 BERT |
+| Native Sparse（DeepSeek-V3.2） | $O(N \cdot \text{激活比例})$ | $O(N)$ | 在 0.05 ppl 之内 | DeepSeek-V3.2，2025 |
+| 差分 | $O(2 \cdot N^2)$ | $O(2N)$ | -5 到 -10% ppl | DIFF Transformer、2026 早期模型 |
 
 ```figure
 gqa-kv-sharing
@@ -142,7 +144,7 @@ def diff_attention(Q1, K1, Q2, K2, V, lam):
 
 ### 第 5 步：KV 缓存大小
 
-打印 `N = 131072` 时每种变体的每层缓存大小。SWA 和稀疏变体降 10–100 倍。差分翻倍。清醒地付你的显存账单。
+打印 $N = 131072$ 时每种变体的每层缓存大小。SWA 和稀疏变体降 10–100 倍。差分翻倍。清醒地付你的显存账单。
 
 ## 实际使用
 
@@ -185,17 +187,17 @@ out = flex_attention(q, k, v, block_mask=mask)
 1. **简单。** 跑 `code/main.py`。验证 `window=4` 的 SWA 把每行最后 4 个 token 之外的一切置零。验证 `window=n` 逐 bit 复现完整因果注意力。
 2. **中等。** 在第 07 课的收官项目之上实现 `window=1024` 的因果 SWA。在 tinyshakespeare 上训 1,000 步。验证损失相比完整注意力退化多少？峰值显存降多少？
 3. **困难。** 在收官模型里实现 Gemma-3 风格的 5:1 层混合（5 个 SWA、1 个全局）。在同等参数下，把损失、显存和生成质量和纯 SWA、纯全局基线对比。
-4. **困难。** 实现每头一个学到的 `λ` 的差分注意力。在一个合成检索任务（一根针、2,000 个干扰项）上训练。在同等参数下，测检索准确率相比单注意力基线的情况。
+4. **困难。** 实现每头一个学到的 $\lambda$ 的差分注意力。在一个合成检索任务（一根针、2,000 个干扰项）上训练。在同等参数下，测检索准确率相比单注意力基线的情况。
 
 ## 关键术语
 
 | 术语 | 大家嘴上怎么说 | 实际是什么意思 |
 |------|-----------------|-----------------------|
-| 滑动窗口注意力（SWA） | "局部注意力" | 每个 query 关注它最后 `W` 个 token；KV 缓存缩到 `O(W)`。 |
-| 有效感受野 | "模型能往回看多远" | 在窗口为 `W` 的 `L` 层 SWA 栈里，最多 `L × W` 个 token。 |
+| 滑动窗口注意力（SWA） | "局部注意力" | 每个 query 关注它最后 $W$ 个 token；KV 缓存缩到 $O(W)$。 |
+| 有效感受野 | "模型能往回看多远" | 在窗口为 $W$ 的 $L$ 层 SWA 栈里，最多 $L \times W$ 个 token。 |
 | Longformer / BigBird | "局部 + 全局 + 随机" | 带几个始终关注的全局 token 的稀疏模式；早期长上下文方法。 |
 | Native Sparse Attention | "DeepSeek 的 kernel 把戏" | 学块级稀疏；在 kernel 层跳过零块同时保住质量。 |
-| 差分注意力 | "两张图，一张减" | DIFF Transformer：从第一张注意力图里减去 `λ` 倍的第二张来抵消注意力汇。 |
+| 差分注意力 | "两张图，一张减" | DIFF Transformer：从第一张注意力图里减去 $\lambda$ 倍的第二张来抵消注意力汇。 |
 | 注意力汇（Attention sink） | "权重渗到 token 0" | softmax 归一化强迫行加和为 1；无信息的 query 把权重倒在位置 0。 |
 | FlexAttention | "掩码即 Python" | PyTorch 2.5+ 的 API，把任意掩码函数编译成 FlashAttention 形状的 kernel。 |
 | 层类型混合 | "5:1 SWA-对-全局" | 在栈里交错稀疏和完整注意力层，以更低显存保住质量。 |

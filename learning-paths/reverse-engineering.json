@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "id": "reverse-engineering",
+  "title": "逆向工程",
+  "summary": "读取自己构建的编译程序：解析文件、解码指令、提升为伪代码、记录证据并验证重建等价，再学习这条流水线周边的技术与主要工具。",
+  "estimatedMinutes": 1945,
+  "stateFile": "REVERSE-ENGINEERING-LEARNING.md",
+  "prerequisites": [
+    {
+      "type": "knowledge",
+      "required": true,
+      "title": "Python、十六进制与命令行",
+      "description": "能阅读 Python、运行命令，并在十六进制与十进制之间转换。无需汇编或二进制分析经验。"
+    },
+    {
+      "type": "software",
+      "required": true,
+      "title": "Python 3.10 或更高版本",
+      "description": "路径中的读取器、解码器、提升器和账本仅用 Python 标准库。编译好的测试固件已在仓库中。"
+    },
+    {
+      "type": "software",
+      "required": false,
+      "title": "用于重建测试固件与第 36 课的 clang",
+      "description": "clang 从源代码重建测试固件，并编译第 36 课的差分测试驱动。没有 clang 时，第 36 课读取已提交的目标文件，将行为结论标为 unknown。"
+    },
+    {
+      "id": "own-binaries-only",
+      "type": "knowledge",
+      "required": true,
+      "title": "只分析自己构建或获授权分析的程序",
+      "description": "第 32 课实验前，确认每个目标都是你编写并编译的程序，或已取得书面授权。第 32 课开篇说明法律与授权规则。"
+    }
+  ],
+  "invocation": {
+    "codex": "learn-reverse-engineering，或从 /skills 选择",
+    "claudeCode": "/learn-reverse-engineering",
+    "portableFallback": "使用 learn-reverse-engineering 开始或继续逆向工程路径。"
+  },
+  "conceptualFallback": "阅读网站或各课的 docs/zh.md，手工追踪指定测试固件。将检查点记录为概念学习；仓库和 Python 3 就绪前，解码器、提升器、证据账本和验证证据均保留为待完成。",
+  "quickStart": {
+    "estimatedMinutes": 10,
+    "lessonPath": "phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch",
+    "goal": "解析一个并非手写字节生成的编译目标文件，指出其中的节、符号和重定位。",
+    "workingDirectory": "phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch",
+    "command": "python3 code/main.py code/fixtures/ledger-x86_64-O0.o",
+    "expectedEvidence": [
+      "读取器根据前四个字节识别文件格式。",
+      "输出节表、四个函数符号及重定位记录，并包含各自偏移。"
+    ]
+  },
+  "lessons": [
+    {
+      "order": 1,
+      "phase": 13,
+      "lesson": 32,
+      "title": "程序解剖：从零构建 ELF 读取器",
+      "path": "phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch",
+      "minutes": 120,
+      "required": true,
+      "prerequisiteChecks": [
+        "own-binaries-only"
+      ],
+      "checkpoint": "解析 ELF64 和 Mach-O 测试固件，将节、符号及重定位输出与已记录的参考结果匹配。"
+    },
+    {
+      "order": 2,
+      "phase": 13,
+      "lesson": 33,
+      "title": "反汇编与控制流：从字节到可核查的图",
+      "path": "phases/13-tools-and-protocols/33-disassembly-and-control-flow",
+      "minutes": 150,
+      "required": true,
+      "checkpoint": "解码测试固件函数，结果与 llvm-objdump 一致，再构建 grade 的控制流图及支配关系。"
+    },
+    {
+      "order": 3,
+      "phase": 13,
+      "lesson": 34,
+      "title": "提升到伪代码：从零实现 IR、SSA 与结构化",
+      "path": "phases/13-tools-and-protocols/34-lifting-to-pseudocode",
+      "minutes": 150,
+      "required": true,
+      "checkpoint": "将 percent_change 提升到 SSA 和结构化伪代码，解释与 Ghidra 输出的每处差异。"
+    },
+    {
+      "order": 4,
+      "phase": 13,
+      "lesson": 35,
+      "title": "二进制分析中的证据、置信度与未知项",
+      "path": "phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns",
+      "minutes": 105,
+      "required": true,
+      "checkpoint": "将一个发现记录为证据条目，写出置信度、限制及残留未知项，并重新计算证据 id。"
+    },
+    {
+      "order": 5,
+      "phase": 13,
+      "lesson": 36,
+      "title": "重建并验证等价：差分测试、字节比较与证据循环",
+      "path": "phases/13-tools-and-protocols/36-rebuild-and-prove-equal",
+      "minutes": 110,
+      "required": true,
+      "checkpoint": "对重建函数运行差分网格和重定位掩码字节比较，将结果记为证据。"
+    },
+    {
+      "order": 6,
+      "phase": 13,
+      "lesson": 37,
+      "title": "逆向工程全景：历史、工具家族与反编译器结构",
+      "path": "phases/13-tools-and-protocols/37-the-reverse-engineering-landscape",
+      "minutes": 150,
+      "required": true,
+      "checkpoint": "在四个测试固件函数上运行比较测试，说明工具在哪些位置虚构或遗漏代码，再指出三种工具中的同一流水线阶段。"
+    },
+    {
+      "order": 7,
+      "phase": 13,
+      "lesson": 38,
+      "title": "调用约定与栈帧：System V、Windows x64 与 AArch64",
+      "path": "phases/13-tools-and-protocols/38-calling-conventions-and-stack-frames",
+      "minutes": 140,
+      "required": true,
+      "checkpoint": "在三种 ABI 下推断一个函数的参数数量、栈帧大小和保存寄存器，并为每项推断引用规范规则。"
+    },
+    {
+      "order": 8,
+      "phase": 13,
+      "lesson": 39,
+      "title": "编译器惯用法：优化如何改变代码，以及如何读回原意",
+      "path": "phases/13-tools-and-protocols/39-compiler-idioms-and-optimization",
+      "minutes": 150,
+      "required": true,
+      "checkpoint": "从魔数乘数和移位量恢复除数，用指令证据判断同一函数在 -O0 与 -O2 下的 switch 降低形式。"
+    },
+    {
+      "order": 9,
+      "phase": 13,
+      "lesson": 40,
+      "title": "链接、加载与符号剥离：PLT、GOT、导入、修正与函数识别",
+      "path": "phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries",
+      "minutes": 160,
+      "required": true,
+      "checkpoint": "在 Mach-O 构建中沿桩和修正追踪一个导入调用，使用未剥离构建的签名为剥离构建中的函数命名。"
+    },
+    {
+      "order": 10,
+      "phase": 13,
+      "lesson": 41,
+      "title": "恢复数据与类型：结构体、数组、C++ 对象与 DWARF",
+      "path": "phases/13-tools-and-protocols/41-recovering-data-and-types",
+      "minutes": 140,
+      "required": true,
+      "checkpoint": "从内存访问推断结构体布局，对照 DWARF 读取器核对每个字段，再将一次虚调用解析到 vtable 槽。"
+    },
+    {
+      "order": 11,
+      "phase": 13,
+      "lesson": 42,
+      "title": "自己程序的动态分析：调试器、跟踪与静态结论核实",
+      "path": "phases/13-tools-and-protocols/42-dynamic-analysis-of-your-own-program",
+      "minutes": 130,
+      "required": true,
+      "checkpoint": "根据调试器记录，将一个构建的静态结论评为已确认、已反驳或未观察到，并解释 -O2 构建为何从未命中断点。"
+    },
+    {
+      "order": 12,
+      "phase": 13,
+      "lesson": 43,
+      "title": "原生代码之外：Python、JVM、.NET 与 WebAssembly 字节码",
+      "path": "phases/13-tools-and-protocols/43-bytecode-and-managed-formats",
+      "minutes": 150,
+      "required": true,
+      "checkpoint": "从 .pyc、class 文件与 Wasm 模块解析同一函数，对照参考工具核对清单，并列出各容器保留的信息。"
+    },
+    {
+      "order": 13,
+      "phase": 13,
+      "lesson": 44,
+      "title": "二进制差异与符号执行：匹配函数并求解输入",
+      "path": "phases/13-tools-and-protocols/44-binary-diffing-and-symbolic-execution",
+      "minutes": 150,
+      "required": true,
+      "checkpoint": "用分阶段匹配器匹配两个优化级别的函数，展示掩码修复的重定位案例，为 grade 的每条路径求解一个输入。"
+    },
+    {
+      "order": 14,
+      "phase": 13,
+      "lesson": 45,
+      "title": "AI 辅助逆向工程：LLM 反编译器、分析 agent 与真值",
+      "path": "phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering",
+      "minutes": 140,
+      "required": true,
+      "checkpoint": "按评分卡全部六个字段评价候选重建，对每个未通过的候选解释失败证据。"
+    }
+  ],
+  "optionalLessons": []
+}

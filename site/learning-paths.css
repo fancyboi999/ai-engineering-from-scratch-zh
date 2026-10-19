@@ -646,6 +646,18 @@
   margin-top: 9px !important;
 }
 
+.career-projects-link {
+  margin-top: 12px !important;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.career-projects-link a {
+  color: var(--blueprint);
+}
+
 .career-guide-footer {
   display: flex;
   justify-content: space-between;

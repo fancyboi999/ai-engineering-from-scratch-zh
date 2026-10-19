@@ -51,7 +51,7 @@ flowchart LR
 
 **分箱：** 把连续值变成类别。当特征和目标的关系非线性但呈阶梯状时有用（比如年龄段）。
 
-**多项式特征：** 造出 x^2、x^3、x1*x2 这些项。让线性模型能捕捉非线性关系，代价是更多特征。
+**多项式特征：** 造出 $x^2$、$x^3$、$x_1 x_2$ 这些项。让线性模型能捕捉非线性关系，代价是更多特征。
 
 ### 类别特征
 
@@ -69,10 +69,12 @@ flowchart LR
 
 **TF-IDF：** 词频-逆文档频率。按词在所有文档中有多独特来加权。像 "the" 这样的常见词权重低。罕见、有辨识度的词权重高。
 
-```
-TF(word, doc) = count(word in doc) / total words in doc
-IDF(word) = log(total docs / docs containing word)
-TF-IDF = TF * IDF
+```math
+\begin{aligned}
+\text{TF}(\text{word}, \text{doc}) &= \frac{\text{计数（文档中的词）}}{\text{文档词总数}} \\
+\text{IDF}(\text{word}) &= \log \frac{\text{文档总数}}{\text{包含该词的文档数}} \\
+\text{TF-IDF} &= \text{TF} \cdot \text{IDF}
+\end{aligned}
 ```
 
 ### 缺失值
@@ -87,7 +89,7 @@ TF-IDF = TF * IDF
 
 ### 特征交互
 
-有时候关系藏在组合里。"身高"和"体重"单独看都不如"BMI = 体重 / 身高^2"有预测力。特征交互会让特征空间倍增，所以用领域知识来挑对的那些。
+有时候关系藏在组合里。"身高"和"体重"单独看都不如$\text{BMI} = \text{weight} / \text{height}^2$有预测力。特征交互会让特征空间倍增，所以用领域知识来挑对的那些。
 
 ### 特征选择
 

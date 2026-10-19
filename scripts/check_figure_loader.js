@@ -91,6 +91,9 @@ function scope(names) {
 }
 
 function registeredFigures(source) {
+  // 新逆向工程模块将完整注册表写在一行，仍按实际键名核对manifest。
+  const inline = /LF\.register\(\{([^\n]+)\}\);/.exec(source);
+  if (inline) return [...inline[1].matchAll(/['"]([^'"]+)['"]\s*:/g)].map(match => match[1]);
   const start = source.indexOf('LF.register({');
   if (start === -1 && source.includes('LF.register(figures)')) {
     return objectFigures(source, 'var figures = {');

@@ -35,6 +35,8 @@ function loadProductionAssets() {
       lessonTerms: fs.existsSync(path.join(__dirname, '..', 'site', 'lesson-terms.json'))
         ? JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'lesson-terms.json'), 'utf8')).lessons
         : {},
+      cheatsheets: fs.existsSync(path.join(__dirname, '..', 'site', 'cheatsheet-map.json'))
+        ? JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'cheatsheet-map.json'), 'utf8')).lessons : {},
       languageCodes: Array.isArray(languageRegistry.languages)
         ? languageRegistry.languages
           .filter(function (language) { return language.source || language.ci; })
@@ -295,6 +297,14 @@ function declaredLessonHub(entry, assets) {
   return hub === assets.hubRoutes.phaseHubPath(entry.path) ? hub : '';
 }
 
+function sheetLinks(lessonPath, sheets) {
+  const list = sheets && Object.prototype.hasOwnProperty.call(sheets, lessonPath) && Array.isArray(sheets[lessonPath]) ? sheets[lessonPath] : [];
+  const links = list
+    .filter(item => item && typeof item.title === 'string' && /^\/cheatsheets\/[a-z0-9-]+$/.test(item.href || ''))
+    .map(item => `<a href="${escapeHtml(item.href)}">${escapeHtml(item.title)}</a>`);
+  return links.length ? `        <p class="lesson-hub-terms"><span>速查表：</span> ${links.join(', ')}</p>` : '';
+}
+
 function lessonHubLinks(entry, heading, assets) {
   const hub = declaredLessonHub(entry, assets);
   if (!hub) return '';
@@ -307,6 +317,7 @@ function lessonHubLinks(entry, heading, assets) {
     '      <nav class="lesson-hub-links" aria-label="阶段与术语链接">',
     `        <ol class="lesson-hub-trail"><li><a href="/">首页</a></li><li><a href="${escapeHtml(hub)}">${escapeHtml(contextLabel(entry.context))}</a></li><li aria-current="page">${escapeHtml(heading)}</li></ol>`,
     links.length ? `        <p class="lesson-hub-terms"><span>本课术语：</span> ${links.join('、')}</p>` : '',
+    sheetLinks(entry.path, assets.cheatsheets),
     '      </nav>',
   ].filter(Boolean).join('\n');
 }

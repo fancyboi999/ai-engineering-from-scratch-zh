@@ -86,8 +86,8 @@ RoIAlign 在 COCO 上白送 3-4 个点的掩码 AP。如今每个在乎定位的
 
 Mask R-CNN 有四个损失加在一起：
 
-```
-L = L_rpn_cls + L_rpn_box + L_box_cls + L_box_reg + L_mask
+```math
+L = L_{\text{rpn\_cls}} + L_{\text{rpn\_box}} + L_{\text{box\_cls}} + L_{\text{box\_reg}} + L_{\text{mask}}
 ```
 
 - `L_rpn_cls`、`L_rpn_box` —— RPN proposal 的 objectness + 框回归。

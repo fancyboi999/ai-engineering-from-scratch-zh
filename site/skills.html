@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>技能 - 从零开始学 AI 工程</title>
+  <link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">
+  <link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
+  <meta name="description" content="从零开始学 AI 工程的编程 agent 技能：开始学习、讲解课程、认证备考，以及制作图表和手册。">
+  <link rel="canonical" href="https://aieng-zh.cn/skills.html">
+  <link rel="alternate" type="text/markdown" href="https://aieng-zh.cn/skills.md">
+  <meta property="og:title" content="技能 · 从零开始学 AI 工程">
+  <meta property="og:description" content="16 个编程 agent 技能：课程辅导、水平测验、认证备考，以及图表和手册工具。">
+  <meta property="og:url" content="https://aieng-zh.cn/skills.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:title" content="技能 · 从零开始学 AI 工程">
+  <meta name="twitter:description" content="16 个编程 agent 技能：课程辅导、水平测验、认证备考，以及图表和手册工具。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261019a">
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var stored = '';
+      try { stored = localStorage.getItem('theme') || ''; } catch (_) {}
+      root.setAttribute('data-theme', stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    })();
+  </script>
+  <style>:root {
+  --m-paper: #fafaf5;
+  --m-panel: #f3f1e8;
+  --m-panel-edge: #e4e1d4;
+  --m-ink: #1a1a1a;
+  --m-ink-soft: #4a4a4a;
+  --m-ink-mute: #6f6f6a;
+  --m-rule: rgba(26, 26, 26, 0.16);
+  --m-rule-strong: rgba(26, 26, 26, 0.42);
+  --m-accent: #3553ff;
+  --m-code-bg: #efece0;
+
+  --m-grey-ink: #5e5e59;
+  --m-grey-fill: #ecebe3;
+  --m-blue-ink: #2f5d9a;
+  --m-blue-fill: #e6edf6;
+  --m-teal-ink: #18696a;
+  --m-teal-fill: #e1efee;
+  --m-violet-ink: #5b4fa3;
+  --m-violet-fill: #ebe8f5;
+  --m-green-ink: #336b40;
+  --m-green-fill: #e5f0e4;
+  --m-amber-ink: #85590c;
+  --m-amber-fill: #f5ecd9;
+  --m-plum-ink: #8a3d72;
+  --m-plum-fill: #f4e6ef;
+  --m-olive-ink: #515f26;
+  --m-olive-fill: #eef0dc;
+  --m-indigo-ink: #4b4f9e;
+  --m-indigo-fill: #e9e9f6;
+  --m-rose-ink: #b0344d;
+  --m-rose-fill: #f7e4e7;
+
+  --m-font-display: 'VT323', ui-monospace, 'JetBrains Mono', monospace;
+  --m-font-body: 'Source Serif 4', 'Source Serif Pro', 'Iowan Old Style', Georgia, 'Songti SC', 'Noto Serif CJK SC', serif;
+  --m-font-mono: 'JetBrains Mono', ui-monospace, Consolas, 'Noto Sans CJK SC', 'PingFang SC', monospace;
+}
+
+[data-theme="dark"] {
+  --m-paper: #0a0d1a;
+  --m-panel: #121729;
+  --m-panel-edge: #232a45;
+  --m-ink: #e8e6dc;
+  --m-ink-soft: #b4b2aa;
+  --m-ink-mute: #8a8882;
+  --m-rule: rgba(232, 230, 220, 0.18);
+  --m-rule-strong: rgba(232, 230, 220, 0.45);
+  --m-accent: #6b8eff;
+  --m-code-bg: #131830;
+
+  --m-grey-ink: #b9b7ae;
+  --m-grey-fill: rgba(232, 230, 220, 0.08);
+  --m-blue-ink: #8fb3e8;
+  --m-blue-fill: rgba(110, 150, 220, 0.16);
+  --m-teal-ink: #6cc4c2;
+  --m-teal-fill: rgba(80, 180, 175, 0.15);
+  --m-violet-ink: #b3a8ec;
+  --m-violet-fill: rgba(150, 135, 230, 0.16);
+  --m-green-ink: #8fcf98;
+  --m-green-fill: rgba(110, 190, 120, 0.15);
+  --m-amber-ink: #e0b45c;
+  --m-amber-fill: rgba(220, 170, 70, 0.15);
+  --m-plum-ink: #e29ccb;
+  --m-plum-fill: rgba(220, 130, 190, 0.15);
+  --m-olive-ink: #c3cf7e;
+  --m-olive-fill: rgba(180, 190, 100, 0.15);
+  --m-indigo-ink: #a9adf0;
+  --m-indigo-fill: rgba(140, 145, 235, 0.16);
+  --m-rose-ink: #f08aa0;
+  --m-rose-fill: rgba(235, 110, 135, 0.16);
+}
+.sk { padding: 104px 0 56px; overflow-x: clip; }
+.sk-hero { padding-bottom: 28px; border-bottom: 1px solid var(--rule-soft); }
+.sk-eyebrow { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blueprint); margin: 0 0 12px; }
+.sk h1 { font-family: var(--font-display); font-size: clamp(3rem, 9vw, 6rem); line-height: 0.9; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 18px; color: var(--ink); }
+.sk-lede { max-width: 58ch; font-size: 1.15rem; line-height: 1.55; margin: 0 0 24px; color: var(--ink); }
+.sk-install { max-width: 720px; border: 1px solid var(--rule-soft); background: var(--bg-surface); font-family: var(--font-mono); font-size: 0.84rem; }
+.sk-install-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--rule-soft); color: var(--ink-mute); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.sk-install pre { margin: 0; padding: 14px 12px; overflow-x: auto; background: none; border: 0; }
+.sk-install pre code { font-size: 0.95rem; color: var(--ink); }
+.sk-install p { margin: 0; padding: 10px 12px 12px; border-top: 1px solid var(--paper-rule); font-family: var(--font-body); font-size: 0.9rem; color: var(--ink-soft); }
+.sk-index { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; }
+.sk-index a { display: inline-flex; gap: 8px; align-items: baseline; padding: 6px 12px; border: 1px solid var(--rule-soft); background: var(--bg); color: var(--ink); text-decoration: none; font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; transition: border-color var(--motion-feedback) ease; }
+.sk-index a span { color: var(--ink-mute); }
+.sk-index a:hover, .sk-index a:focus-visible { border-color: var(--blueprint); color: var(--blueprint); }
+
+.sk-group { padding: 44px 0 8px; border-bottom: 1px solid var(--rule-soft); scroll-margin-top: 80px; }
+.sk-group-head { display: grid; grid-template-columns: 72px 1fr; gap: 12px; align-items: baseline; margin-bottom: 20px; }
+.sk-num { font-family: var(--font-display); font-size: 2.6rem; line-height: 1; color: var(--blueprint); }
+.sk h2 { font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); margin: 0 0 4px; }
+.sk-group-head p { margin: 0; color: var(--ink-soft); }
+.sk-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 14px; margin-bottom: 36px; }
+.sk-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 16px 18px; border: 1px solid var(--rule-soft); background: var(--bg); transition: border-color var(--motion-feedback) ease; scroll-margin-top: 90px; }
+.sk-card:hover, .sk-card:target { border-color: var(--blueprint); }
+.sk-card header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.sk-card h3 { margin: 0; font-size: 1rem; }
+.sk-card h3 code { font-family: var(--font-mono); font-weight: 600; color: var(--blueprint); background: none; padding: 0; }
+.sk-version { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-mute); }
+.sk-line { margin: 0; font-size: 0.98rem; line-height: 1.55; color: var(--ink); }
+.sk-card dl { display: grid; grid-template-columns: 60px 1fr; gap: 4px 10px; margin: 0; font-size: 0.86rem; }
+.sk-card dt { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); padding-top: 3px; }
+.sk-card dd { margin: 0; color: var(--ink-soft); }
+.sk-card q { quotes: none; display: inline-block; margin: 0 4px 4px 0; padding: 1px 7px; border: 1px solid var(--rule-soft); background: var(--bg-surface); font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink); }
+.sk-card footer { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--paper-rule); font-family: var(--font-mono); font-size: 0.74rem; }
+.sk-card footer a { color: var(--blueprint); text-decoration: none; }
+.sk-card footer a:hover { text-decoration: underline; }
+.sk-copy { min-height: 30px; padding: 4px 10px; border: 1px solid var(--ink); background: var(--bg); color: var(--ink); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background-color var(--motion-feedback) ease, color var(--motion-feedback) ease; }
+.sk-copy:hover, .sk-copy:focus-visible { background: var(--ink); color: var(--bg); }
+.sk-copy:active { transform: scale(0.97); }
+
+.sk-card--example { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); grid-template-rows: auto auto auto 1fr; gap: 10px 28px; }
+.sk-card--example > * { grid-column: 1; }
+.sk-card--example > .sk-example { grid-column: 2; grid-row: 1 / span 4; align-self: start; }
+.sk-card--example > footer { align-self: end; }
+.sk-example { display: grid; gap: 8px; color: var(--ink); text-decoration: none; border: 1px solid var(--paper-rule); background: var(--bg-surface); padding: 10px; }
+.sk-example > span { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em; color: var(--blueprint); }
+.sk-example img, .sk-example svg { display: block; width: 100%; height: auto; }
+.sk-example--svg svg { max-height: 300px; }
+.sk-example--text strong { font-family: var(--font-display); font-size: 1.8rem; text-transform: uppercase; font-weight: 400; }
+.sk-example--text > span { font-family: var(--font-body); font-size: 0.92rem; color: var(--ink-soft); }
+.sk-example--live .lesson-figure { margin: 0; }
+.sk-swatches { grid-template-columns: repeat(5, 1fr); }
+.sk-swatches i { display: block; height: 44px; border: 1px solid var(--rule-soft); }
+.sk-swatches > span { grid-column: 1 / -1; }
+.sk-dark { display: none !important; }
+[data-theme="dark"] .sk-dark { display: block !important; }
+[data-theme="dark"] .sk-light { display: none !important; }
+
+.sk-band { margin: 0 0 26px; }
+
+.sl { --sl-ease: cubic-bezier(0.23, 1, 0.32, 1); margin: 0; display: grid; gap: 12px; border: 1px solid var(--rule-soft); background: var(--bg); padding: 0 0 12px; }
+.sl-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 12px; border-bottom: 1px solid var(--rule-soft); background: var(--bg-surface); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.sl-head button, .sl-ask { min-height: 40px; padding: 0 12px; border: 1px solid var(--ink); background: var(--bg); color: var(--ink); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.02em; cursor: pointer; transition: transform 140ms var(--sl-ease), background-color 160ms ease, color 160ms ease, border-color 160ms ease; }
+.sl-head button { min-height: 32px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.sl-head button:active, .sl-ask:active { transform: scale(0.96); }
+.sl-ask[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+@media (hover: hover) and (pointer: fine) { .sl-ask:hover, .sl-head button:hover { border-color: var(--blueprint); } }
+.sl-note { margin: 0 12px; font-size: 0.95rem; line-height: 1.5; color: var(--ink-soft); }
+.sl-asks { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 12px; }
+.sl-pane { margin: 0 12px; border: 1px solid var(--rule-soft); padding: 8px 10px 10px; min-width: 0; }
+.sl-pane h4 { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin: 0 0 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.sl-pane h4 span:last-child { color: var(--ink); letter-spacing: 0.02em; }
+.sl ol { list-style: none; margin: 0; padding: 0; }
+.sl-always { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 10px; }
+.sl-always li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 6px; border: 1px solid transparent; font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease; }
+.sl-always li b { font-weight: 400; color: var(--ink-soft); }
+.sl-always li.sl-match { border-color: var(--blueprint); color: var(--blueprint); background: var(--bg-surface); }
+.sl-always li.sl-match b { color: var(--blueprint); }
+.sl-loaded { display: grid; gap: 8px; min-height: 40px; }
+.sl-loaded li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-family: var(--font-mono); font-size: 12.5px; transition: transform 260ms var(--sl-ease), opacity 260ms var(--sl-ease); }
+.sl-loaded li.sl-enter { opacity: 0; transform: translateY(6px); }
+.sl-loaded .sl-path { overflow-wrap: anywhere; color: var(--ink); }
+.sl-loaded .sl-ref .sl-path { padding-left: 14px; color: var(--ink-soft); }
+.sl-loaded b { font-weight: 500; color: var(--blueprint); }
+.sl-bar { grid-column: 1 / -1; display: block; position: relative; height: 8px; background: var(--bg-surface); }
+.sl-bar i { position: relative; display: block; height: 100%; background: var(--blueprint); }
+.sl-bar i::before, .sl-bar i::after { content: ''; position: absolute; top: 0; bottom: 0; width: 8px; background: var(--bg-surface); -webkit-mask: var(--sl-dots-lo) repeat; mask: var(--sl-dots-lo) repeat; }
+.sl-bar i::before { right: 8px; }
+.sl-bar i::after { right: 0; -webkit-mask: var(--sl-dots-hi) repeat; mask: var(--sl-dots-hi) repeat; }
+.sl-bar em { position: absolute; inset: 0; background: var(--bg-surface); -webkit-mask: var(--sl-dots-mid) repeat; mask: var(--sl-dots-mid) repeat; animation: sl-veil 480ms steps(4, end) both; }
+@keyframes sl-veil { from { opacity: 1; } to { opacity: 0; } }
+.sl-meter { margin: 0 12px; }
+.sl-meter p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin: 0 0 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.sl-meter p span:last-child { color: var(--ink); letter-spacing: 0.02em; text-transform: none; font-size: 12.5px; }
+.sl-track { position: relative; height: 14px; background: var(--bg-surface); overflow: hidden; }
+.sl-track::before { content: ''; position: absolute; inset: 0; background: var(--ink); -webkit-mask: var(--sl-dots-ghost) repeat; mask: var(--sl-dots-ghost) repeat; opacity: 0.35; }
+.sl-track i { position: absolute; inset: 0; background: var(--blueprint); transform-origin: left center; transform: scaleX(0.004); transition: transform 300ms var(--sl-ease); }
+.sl-verdict { margin: 0 12px; padding: 10px 12px; border: 1px solid var(--blueprint); background: var(--bg-surface); font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; color: var(--ink); }
+
+.sk-artifacts { max-width: 760px; margin-bottom: 36px; }
+.sk-artifacts pre { padding: 12px 14px; border: 1px solid var(--rule-soft); background: var(--code-bg); overflow-x: auto; font-size: 0.82rem; }
+.sk-artifacts a, .sk-how a { color: var(--blueprint); }
+
+.sk-how { padding: 44px 0 12px; }
+.sk-how > h2 { margin-bottom: 18px; color: var(--blueprint); }
+
+.sk-cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 40px; padding: 22px; border: 1px solid var(--ink); background: var(--bg-surface); }
+.sk-cta p { flex: 1 1 260px; margin: 0; font-family: var(--font-display); font-size: 2rem; line-height: 1; text-transform: uppercase; }
+.sk-btn { display: inline-flex; align-items: center; min-height: 44px; padding: 9px 16px; border: 1px solid var(--ink); background: var(--bg); color: var(--ink); font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; }
+.sk-btn--primary { background: var(--blueprint); border-color: var(--blueprint); color: #fff; }
+.sk-btn:hover, .sk-btn:focus-visible { background: var(--ink); color: var(--bg); }
+.sk-btn--primary:hover, .sk-btn--primary:focus-visible { background: var(--accent-hover); color: #fff; }
+
+@media (max-width: 760px) {
+  .sk { padding-top: 88px; }
+  .sk-card--example { display: flex; }
+  .sk-group-head { grid-template-columns: 48px 1fr; }
+  .sk-num { font-size: 2rem; }
+  .sk-cta p { font-size: 1.6rem; }
+  .sl-always { grid-template-columns: 1fr; }
+}
+@media (max-width: 400px) {
+  .sl-always li { font-size: 11px; padding: 3px 4px; }
+  .sl-pane, .sl-note, .sl-asks, .sl-meter, .sl-verdict { margin-left: 8px; margin-right: 8px; }
+  .sk-example { padding: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-copy, .sk-card, .sk-index a, .sl-ask, .sl-head button, .sl-always li, .sl-loaded li, .sl-track i { transition: none; }
+  .sl-bar em { animation: none; opacity: 0; }
+}
+#motion-figure.sk-card--example { display: flex; }
+#motion-figure.sk-card--example > footer { align-self: stretch; }
+.sk-example svg .m-serif { font-family: var(--m-font-body); }
+.sk-how > p { max-width: 68ch; margin: 0 0 12px; color: var(--ink-soft); line-height: 1.6; }
+.sk-how q { quotes: none; font-family: var(--font-mono); font-size: 0.86rem; color: var(--ink); }
+.sk-example svg { fill: var(--m-ink); }
+</style>
+<meta property="og:image" content="https://aieng-zh.cn/og/page/skills.png?v=5e5d5c1a8087">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Agent 技能 - 从零构建 AI 工程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aieng-zh.cn/og/page/skills.png?v=5e5d5c1a8087">
+<meta name="twitter:image:alt" content="Agent 技能 - 从零构建 AI 工程">
+</head>
+<body>
+  <a href="#main" class="skip-link">跳到正文</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
+      <nav class="header-nav">
+        <a href="index.html#contents">课程目录</a>
+        <a href="catalog.html">课程表</a>
+        <a href="skills.html" >技能</a>
+        <a href="prereqs.html">路线图</a>
+        <a href="glossary.html">术语表</a>
+        <a href="about.html">关于</a>
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github">GitHub <span class="star-count" data-loading="true" aria-label="GitHub stars">…</span></a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button>
+    </div>
+  </header>
+
+  <main id="main" class="sk">
+    <section class="sk-hero container">
+      <div class="dither sk-band" data-seed="skills" data-label="16 个技能 · 供 agent 使用" aria-hidden="true"></div>
+      <p class="sk-eyebrow">FIG_SKL · 编程 agent 技能</p>
+      <h1 >技能</h1>
+      <p class="sk-lede">技能是一份简短的指令文件。请求匹配某个技能时，agent 会读取文件并按步骤执行。这 16 个技能用于课程辅导、水平测验，以及图表和手册制作。</p>
+      <div class="sk-install">
+        <div class="sk-install-bar"><span>安装全部 16 个</span><button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh" >复制</button></div>
+        <pre><code>npx skills add fancyboi999/ai-engineering-from-scratch-zh</code></pre>
+        <p>安装单个技能时加 <code>--skill &lt;name&gt;</code>。先列出技能时加 <code>--list</code>。支持 Claude、Cursor、Codex、OpenClaw、Hermes，以及所有能读取 SKILL.md 的 agent。</p>
+      </div>
+      <nav class="sk-index" aria-label="技能分组"><a href="#start"><span>01</span>开始学习</a><a href="#learn"><span>02</span>学习与练习</a><a href="#paths"><span>03</span>专项路径</a><a href="#certify"><span>04</span>认证备考</a><a href="#make"><span>05</span>制作图表与手册</a><a href="#artifacts"><span>06</span>课程产物</a></nav>
+    </section>
+
+    <div class="container">
+      <section class="sk-group" id="start" aria-labelledby="start-title">
+        <div class="sk-group-head">
+          <span class="sk-num">01</span>
+          <div><h2 id="start-title">开始学习</h2><p>首次学习这套课程时使用。</p></div>
+        </div>
+        <div class="sk-cards">
+        <article class="sk-card" id="start-learning">
+          <header><h3><code>/start-learning</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">询问学习目标与可用时间，进行分级测验，并写出供其他技能使用的学习计划。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>开始学习</q> <q>配置课程</q></dd>
+            <dt >写入产物</dt><dd>LEARNING.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill start-learning" aria-label="复制安装命令： start-learning">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/start-learning/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="find-your-level">
+          <header><h3><code>/find-your-level</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">用简短的自适应测验判断适合的起点，以及可以跳过的课程。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>测测我的水平</q> <q>我该从哪里开始</q></dd>
+            <dt >写入产物</dt><dd>不写文件，只给出学习起点。</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill find-your-level" aria-label="复制安装命令： find-your-level">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/find-your-level/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="course-guide">
+          <header><h3><code>/course-guide</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">提供主题、问题或报错，它会找出相应课程，并给出下一条运行命令。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>哪节课讲 RAG</q> <q>注意力机制这里我卡住了</q></dd>
+            <dt >写入产物</dt><dd>不写文件，只给出课程链接。</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill course-guide" aria-label="复制安装命令： course-guide">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/course-guide/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        </div>
+      </section>
+      <section class="sk-group" id="learn" aria-labelledby="learn-title">
+        <div class="sk-group-head">
+          <span class="sk-num">02</span>
+          <div><h2 id="learn-title">学习与练习</h2><p>每次学习时使用，读取并更新你的计划。</p></div>
+        </div>
+        <div class="sk-cards">
+        <article class="sk-card" id="learn">
+          <header><h3><code>/learn</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">在终端中逐节讲解下一课，提问并记录学习进度。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>/learn</q> <q>教我下一课</q></dd>
+            <dt >写入产物</dt><dd>LEARNING.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill learn" aria-label="复制安装命令： learn">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/learn/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="check-understanding">
+          <header><h3><code>/check-understanding</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">对一个阶段进行测验，指出继续之前需要复习的课程。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>测验第 3 阶段</q> <q>检查我的理解</q></dd>
+            <dt >写入产物</dt><dd>不写文件，只输出得分与复习建议。</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill check-understanding" aria-label="复制安装命令： check-understanding">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/check-understanding/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="build-project">
+          <header><h3><code>/build-project</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">每次指导一个项目阶段，只给提示。你亲手写代码并运行阶段评分器。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>做一个项目</q> <q>继续我的项目</q></dd>
+            <dt >写入产物</dt><dd>PROJECTS-LEARNING.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill build-project" aria-label="复制安装命令： build-project">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/build-project/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        </div>
+      </section>
+      <section class="sk-group" id="paths" aria-labelledby="paths-title">
+        <div class="sk-group-head">
+          <span class="sk-num">03</span>
+          <div><h2 id="paths-title">专项路径</h2><p>围绕一个主题逐课学习。</p></div>
+        </div>
+        <div class="sk-cards">
+        <article class="sk-card" id="learn-mcp">
+          <header><h3><code>/learn-mcp</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">沿 Model Context Protocol 路径逐课学习客户端、服务器、传输、安全、网关与一致性。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>教我 MCP</q> <q>继续 MCP 路径</q></dd>
+            <dt >写入产物</dt><dd>MCP-LEARNING.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill learn-mcp" aria-label="复制安装命令： learn-mcp">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/learn-mcp/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="learn-agent-skills">
+          <header><h3><code>/learn-agent-skills</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">沿 Agent Skills 路径逐课学习技能的编写、发现、运行、安全、测试、打包与移植。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>教我 agent 技能</q> <q>继续技能路径</q></dd>
+            <dt >写入产物</dt><dd>AGENT-SKILLS-LEARNING.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill learn-agent-skills" aria-label="复制安装命令： learn-agent-skills">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/learn-agent-skills/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="learn-reverse-engineering">
+          <header><h3><code>/learn-reverse-engineering</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">沿逆向工程路径逐课学习：读取自己编译的程序，解码、提升表示、记录证据，并证明重建结果等价。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>教我逆向工程</q> <q>继续逆向工程路径</q></dd>
+            <dt >写入产物</dt><dd>REVERSE-ENGINEERING-LEARNING.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill learn-reverse-engineering" aria-label="复制安装命令： learn-reverse-engineering">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/learn-reverse-engineering/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        </div>
+      </section>
+      <section class="sk-group" id="certify" aria-labelledby="certify-title">
+        <div class="sk-group-head">
+          <span class="sk-num">04</span>
+          <div><h2 id="certify-title">认证备考</h2><p>通过课程、实验和限时练习准备考试。</p></div>
+        </div>
+        <div class="sk-cards">
+        <article class="sk-card" id="claude-certification">
+          <header><h3><code>/claude-certification</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">指导四条独立的 Claude 认证备考路线：选择路线、逐课学习、运行实验、参加模拟考试。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>准备 Claude 认证</q> <q>继续我的认证备考</q></dd>
+            <dt >写入产物</dt><dd>CLAUDE-CERTIFICATION.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill claude-certification" aria-label="复制安装命令： claude-certification">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/claude-certification/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="mcpa-certification">
+          <header><h3><code>/mcpa-certification</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">指导 Model Context Protocol Associate 考试备考，提供课程、实践实验和带反馈的练习题。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>准备 MCPA</q> <q>MCPA 模拟考试</q></dd>
+            <dt >写入产物</dt><dd>MCPA-CERTIFICATION.md</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill mcpa-certification" aria-label="复制安装命令： mcpa-certification">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/mcpa-certification/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        </div>
+      </section>
+      <section class="sk-group" id="make" aria-labelledby="make-title">
+        <div class="sk-group-head">
+          <span class="sk-num">05</span>
+          <div><h2 id="make-title">制作图表与手册</h2><p>制作符合本站风格的图表和手册。</p></div>
+        </div>
+        <div class="sk-cards">
+        <article class="sk-card sk-card--example" id="course-style">
+          <header><h3><code>/course-style</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">定义明暗主题配色、字体、图表标签和清晰的技术写作规则。本组其他技能会读取它。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>使用课程风格</q> <q>检查这段技术文字是否清楚</q></dd>
+            <dt >写入产物</dt><dd>不写文件，供其他技能读取。</dd>
+          </dl>
+          <div class="sk-example sk-swatches" aria-label="课程配色"><i style="background:var(--bg)"></i><i style="background:var(--bg-surface)"></i><i style="background:var(--ink)"></i><i style="background:var(--blueprint)"></i><i style="background:var(--warn)"></i><span>纸张、表面、墨色、蓝图色和警告色，均支持明暗主题。</span></div>
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill course-style" aria-label="复制安装命令： course-style">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/course-style/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card sk-card--example" id="blueprint-figure">
+          <header><h3><code>/blueprint-figure</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">为课程、README 和手册制作静态 SVG 图表。提供九种图形、配色规则，以及标签字号和重叠检查。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>画一张请求路径图</q> <q>为本课制作 FIG_012</q></dd>
+            <dt >写入产物</dt><dd>一个 SVG 文件</dd>
+          </dl>
+          <a class="sk-example sk-example--svg" href="manuals.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 384" role="img" aria-labelledby="fig-four-parts-title fig-four-parts-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-four-parts-title">四种 part</title>
+  <desc id="fig-four-parts-desc">顶部：part 恰好包含 text、raw、url、data 四个内容成员之一，每种还可带 mediaType、filename、metadata。下方为采集中的四个 part，按发送顺序排列：planner 用 raw base64 发送媒体类型 text/x-diff 的 refunds.diff 文件，code-reviewer 以 text 发送问题，以 application/json 的 data part 发送审查发现，以及 code-reviewer 用 -32005 CONTENT_TYPE_NOT_SUPPORTED 拒绝的 image/png url part。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">一个 PART 恰好包含一项</text>
+  <text x="344" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">每种都有的可选字段</text>
+  <rect x="20" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">text</text>
+  <rect x="96" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="130" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">raw</text>
+  <rect x="172" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="206" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">url</text>
+  <rect x="248" y="26" width="68" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="282" y="44.75" font-size="12.5" text-anchor="middle" font-weight="700">data</text>
+  <rect x="344" y="26" width="92" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="390" y="44.75" font-size="12.5" text-anchor="middle" font-weight="400">mediaType</text>
+  <rect x="444" y="26" width="84" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="486" y="44.75" font-size="12.5" text-anchor="middle" font-weight="400">filename</text>
+  <rect x="536" y="26" width="84" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="578" y="44.75" font-size="12.5" text-anchor="middle" font-weight="400">metadata</text>
+  <text x="20" y="76" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">采集中的四个 PART，按发送顺序</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="84" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="120.9" font-size="13" text-anchor="middle" font-weight="700">raw</text>
+  <rect x="88" y="84" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="105" font-size="11.5">LS0tIGEvcGF5bWVudHMvcmVmdW5kcy5weQor</text>
+  <text x="358.4" y="105" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">236 个 base64 字符的前 36 个</text>
+  <text x="100" y="123" font-size="11" fill="var(--m-green-ink, #336b40)">filename &quot;refunds.diff&quot;   mediaType &quot;text/x-diff&quot;</text>
+  <text x="100" y="141" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">planner 发送，五行 diff · 06-input-required.http</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="158" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="194.9" font-size="13" text-anchor="middle" font-weight="700">text</text>
+  <rect x="88" y="158" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="179" font-size="11.5">&quot;Which base branch should I compare this diff against?&quot;</text>
+  <text x="100" y="197" font-size="11" fill="var(--m-green-ink, #336b40)">mediaType 缺失：套件视为 text/plain</text>
+  <text x="100" y="215" font-size="11" class="m-serif" fill="var(--m-blue-ink, #2f5d9a)">code-reviewer 的 status.message · 06-input-required.http</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="232" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="268.9" font-size="13" text-anchor="middle" font-weight="700">data</text>
+  <rect x="88" y="232" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="253" font-size="11.5">&quot;base&quot;: &quot;main&quot;</text>
+  <text x="206.6" y="253" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">另有 findings，两个对象含 file、line、severity、finding</text>
+  <text x="100" y="271" font-size="11" fill="var(--m-green-ink, #336b40)">mediaType &quot;application/json&quot;</text>
+  <text x="100" y="289" font-size="11" class="m-serif" fill="var(--m-blue-ink, #2f5d9a)">code-reviewer 的 review.json 产物 part 2 · 06-input-required.http</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <rect x="20" y="306" width="68" height="66" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="54" y="342.9" font-size="13" text-anchor="middle" font-weight="700">url</text>
+  <rect x="88" y="306" width="532" height="66" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
+  <text x="100" y="327" font-size="11.5">&quot;https://example.com/screenshot.png&quot;</text>
+  <text x="100" y="345" font-size="11" fill="var(--m-green-ink, #336b40)">mediaType &quot;image/png&quot;</text>
+  <text x="100" y="363" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">planner 发送 · 11-errors.http</text>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <rect x="396" y="315" width="214" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="503" y="334.1" font-size="12" text-anchor="middle" font-weight="700">CONTENT_TYPE_NOT_SUPPORTED</text>
+  <text x="503" y="351.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">以错误 -32005 拒绝</text>
+  </g>
+</svg>
+<span>制作示例：A2A 101 手册图表 →</span></a>
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill blueprint-figure" aria-label="复制安装命令： blueprint-figure">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/blueprint-figure/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card sk-card--example" id="motion-figure">
+          <header><h3><code>/motion-figure</code></h3><span class="sk-version">v1.1.0</span></header>
+          <p class="sk-line">制作动画与交互图表：SVG 动画、滑块组件、带控件和计算结果的图表，以及本页顶部这样的抖色条带。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>用动画解释这个概念</q> <q>展示这个系统如何工作</q></dd>
+            <dt >写入产物</dt><dd>课程图表、独立图表或抖色条带</dd>
+          </dl>
+          <div class="sk-example sk-example--live"><figure class="sl" data-skill-loader>
+            <div class="sl-head"><span>技能加载器 · 一次 agent 会话</span><button type="button" class="sl-replay" >重播</button></div>
+            <p class="sl-note">选择一个请求。agent 始终保留所有技能的名称和描述。请求匹配时，才读取完整 SKILL.md，再按需读取其中列出的参考文件。</p>
+            <div class="sl-asks" role="group" aria-label="请求"><button type="button" class="sl-ask" data-ask="0" aria-pressed="true">测测我的水平</button><button type="button" class="sl-ask" data-ask="1" aria-pressed="false">教我 MCP</button><button type="button" class="sl-ask" data-ask="2" aria-pressed="false">画一张请求路径图</button><button type="button" class="sl-ask" data-ask="3" aria-pressed="false">为这个工具编写手册</button></div>
+            <div class="sl-pane"><h4><span>始终加载</span><span>16 条描述 · 1,774 tokens</span></h4><ol class="sl-always"><li data-skill="start-learning"><span>start-learning</span><b>117</b></li><li data-skill="find-your-level"><span>find-your-level</span><b>121</b></li><li data-skill="course-guide"><span>course-guide</span><b>157</b></li><li data-skill="learn"><span>learn</span><b>119</b></li><li data-skill="check-understanding"><span>check-understanding</span><b>80</b></li><li data-skill="build-project"><span>build-project</span><b>101</b></li><li data-skill="learn-mcp"><span>learn-mcp</span><b>134</b></li><li data-skill="learn-agent-skills"><span>learn-agent-skills</span><b>112</b></li><li data-skill="learn-reverse-engineering"><span>learn-reverse-engineering</span><b>117</b></li><li data-skill="claude-certification"><span>claude-certification</span><b>121</b></li><li data-skill="mcpa-certification"><span>mcpa-certification</span><b>100</b></li><li data-skill="course-style"><span>course-style</span><b>106</b></li><li data-skill="blueprint-figure"><span>blueprint-figure</span><b>90</b></li><li data-skill="motion-figure"><span>motion-figure</span><b>98</b></li><li data-skill="isometric-explainer"><span>isometric-explainer</span><b>93</b></li><li data-skill="write-manual"><span>write-manual</span><b>108</b></li></ol></div>
+            <div class="sl-pane"><h4><span>本次请求加载</span><span data-loaded-total></span></h4><ol class="sl-loaded" data-loaded></ol></div>
+            <div class="sl-meter"><p><span>已用上下文</span><span data-meter-label></span></p><div class="sl-track"><i data-meter></i></div></div>
+            <p class="sl-verdict" data-verdict aria-live="polite"></p>
+            <script type="application/json" class="sl-data">{"skills":[{"name":"start-learning","tokens":117},{"name":"find-your-level","tokens":121},{"name":"course-guide","tokens":157},{"name":"learn","tokens":119},{"name":"check-understanding","tokens":80},{"name":"build-project","tokens":101},{"name":"learn-mcp","tokens":134},{"name":"learn-agent-skills","tokens":112},{"name":"learn-reverse-engineering","tokens":117},{"name":"claude-certification","tokens":121},{"name":"mcpa-certification","tokens":100},{"name":"course-style","tokens":106},{"name":"blueprint-figure","tokens":90},{"name":"motion-figure","tokens":98},{"name":"isometric-explainer","tokens":93},{"name":"write-manual","tokens":108}],"requests":[{"say":"测测我的水平","skill":"find-your-level","files":[{"path":"find-your-level/SKILL.md","tokens":1710},{"path":"references/answer-key.md","tokens":331}]},{"say":"教我 MCP","skill":"learn-mcp","files":[{"path":"learn-mcp/SKILL.md","tokens":2141}]},{"say":"画一张请求路径图","skill":"blueprint-figure","files":[{"path":"blueprint-figure/SKILL.md","tokens":2074},{"path":"references/kinds.md","tokens":1104},{"path":"references/grammar.md","tokens":1705},{"path":"references/checks.md","tokens":1063}]},{"say":"为这个工具编写手册","skill":"write-manual","files":[{"path":"write-manual/SKILL.md","tokens":2544},{"path":"references/manual-json.md","tokens":1389},{"path":"references/section-template.md","tokens":835},{"path":"references/research-and-sources.md","tokens":920},{"path":"references/prose-rules.md","tokens":845}]}],"full":64119}</script>
+          </figure><span>交互演示：选择请求。token 数按实际技能文件的字节数除以 4 估算。</span></div>
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill motion-figure" aria-label="复制安装命令： motion-figure">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/motion-figure/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card sk-card--example" id="isometric-explainer">
+          <header><h3><code>/isometric-explainer</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">用交互式等距机器逐步展示流程，由经过测试的状态模型驱动。用控件禁用部件，观察故障如何发生。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>用机器解释缓存如何淘汰条目</q> <q>为本课制作等距交互讲解</q></dd>
+            <dt >写入产物</dt><dd>独立 HTML 页面及其源文件</dd>
+          </dl>
+          <a class="sk-example" href="inside-an-ai-agent.html"><img class="sk-light" src="anatomy/inside-an-ai-agent-machine.png" width="2400" height="1260" loading="lazy" decoding="async" alt="一台等距卡片处理机器，展示 AI agent 处理一次请求的过程。"><img class="sk-dark" src="anatomy/inside-an-ai-agent-machine-dark.png" width="2400" height="1260" loading="lazy" decoding="async" alt=""><span>制作示例：AI agent 内部机制 →</span></a>
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill isometric-explainer" aria-label="复制安装命令： isometric-explainer">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/isometric-explainer/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card sk-card--example" id="write-manual">
+          <header><h3><code>/write-manual</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">围绕一个工具的固定版本编写长篇手册，包含来源、目录、每个示例的离线运行记录、图表与审计。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>为这个工具编写手册</q> <q>开始编写入门手册</q></dd>
+            <dt >写入产物</dt><dd>手册目录：manual.json、章节、图表、运行记录</dd>
+          </dl>
+          <a class="sk-example sk-example--text" href="manuals.html"><strong >技术手册</strong><span>每本手册对应一个固定版本。阅读手册 →</span></a>
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill write-manual" aria-label="复制安装命令： write-manual">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/write-manual/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        </div>
+      </section>
+
+      <section class="sk-group" id="artifacts" aria-labelledby="artifacts-title">
+        <div class="sk-group-head">
+          <span class="sk-num">06</span>
+          <div><h2 id="artifacts-title">课程产物</h2><p>许多课程最后会提供技能或 prompt 文件。可以按阶段或标签安装。</p></div>
+        </div>
+        <div class="sk-artifacts">
+          <p><strong>409 个技能与 100 个 prompt</strong> 位于对应课程的 <code>phases/**/outputs/</code> 目录。克隆仓库后，将需要的文件复制到 agent 的项目技能目录。</p>
+          <pre><code>python3 scripts/install_skills.py ./.claude/skills --phase 14
+python3 scripts/install_skills.py ./.cursor/skills --tag rag
+python3 scripts/install_skills.py .skills --type all --dry-run</code></pre>
+          <p><a href="catalog.html">浏览课程表 →</a></p>
+        </div>
+      </section>
+
+      <section class="sk-how" aria-labelledby="how-title">
+        <h2 id="how-title">请求制作图表</h2>
+        <p>告诉技能读者需要理解什么，以及图表用于课程、README、手册还是独立页面。有真实数据就提供数据，图表会根据这些数值计算结果。</p>
+        <p>例如：<q>为技能课程画一张图，展示 agent 如何加载技能。使用真实文件大小。</q></p>
+      </section>
+
+      <section class="sk-cta">
+        <p>agent 如何发现和加载技能</p>
+        <a class="sk-btn sk-btn--primary" href="lesson?path=phases%2F13-tools-and-protocols%2F22-skills-and-agent-sdks">阅读课程</a>
+        <a class="sk-btn" href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/tree/main/skills" target="_blank" rel="noopener">查看 GitHub 上的全部技能 ↗</a>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© 2026 · 开源 · 永久免费</p>
+      <div class="footer-links">
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a>
+        <a href="about.html">关于</a>
+        <a href="catalog.html">课程表</a>
+        <a href="skills.html" >技能</a>
+        <a href="glossary.html">术语表</a>
+        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new/choose" target="_blank" rel="noopener">报告问题</a>
+        <a href="sponsors.html">支持本站</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var icon = document.getElementById('themeIcon');
+      var sync = function () { if (icon) icon.textContent = root.getAttribute('data-theme') === 'light' ? 'N' : 'D'; };
+      sync();
+      document.getElementById('themeToggle').addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (_) {}
+        sync();
+      });
+      document.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-copy]');
+        if (!button) return;
+        var done = function () { var label = button.textContent; button.textContent = '已复制'; setTimeout(function () { button.textContent = label; }, 1400); };
+        if (navigator.clipboard) navigator.clipboard.writeText(button.getAttribute('data-copy')).then(done, function () {});
+      });
+    })();
+  </script>
+  <script src="header.js?v=20261019a" defer></script>
+  <script src="dither.js?v=20261013a" defer></script>
+  <script src="skills-demo.js?v=20261019a" defer></script>
+</body>
+</html>

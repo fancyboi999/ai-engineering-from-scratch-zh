@@ -41,10 +41,10 @@ Qwen2.5-Omni 的分解：
 
 两者并行运行：
 
-1. Thinker 吐出文本 token t_i。
-2. Talker（经流式）消费 t_i 并吐出语音 token s_i, s_{i+1}, ..., s_{i+k}。
+1. Thinker 吐出文本 token $t_i$。
+2. Talker（经流式）消费 $t_i$ 并吐出语音 token $s_i, s_{i+1}, \ldots, s_{i+k}$。
 3. 语音解码器在语音 token 到来时消费它们并吐出音频采样。
-4. 等 Thinker 走到文本 token t_{i+3} 时，Talker 已经为 t_0..t_{i+2} 流出了音频。
+4. 等 Thinker 走到文本 token $t_{i+3}$ 时，Talker 已经为 $t_0, \ldots, t_{i+2}$ 流出了音频。
 
 ### TMRoPE —— 时间对齐的多模态位置
 

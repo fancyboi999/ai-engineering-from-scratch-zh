@@ -29,7 +29,7 @@
 
 2026 年的实现：
 
-- **Outlines。** 把 JSON Schema 或正则编译成有限状态机。每个 token 都有 O(1) 的有效下一 token 查找。基于 FSM，所以递归 schema 需要拍平。
+- **Outlines。** 把 JSON Schema 或正则编译成有限状态机。每个 token 都有 $O(1)$ 的有效下一 token 查找。基于 FSM，所以递归 schema 需要拍平。
 - **XGrammar / llguidance。** 上下文无关文法引擎。处理递归 JSON Schema。近乎零解码开销。OpenAI 在他们 2025 年的结构化输出实现里点名了 llguidance。
 - **vLLM 引导解码。** 通过 Outlines、XGrammar 或 lm-format-enforcer 后端，内置 `guided_json`、`guided_regex`、`guided_choice`、`guided_grammar`。
 - **Instructor。** 基于 Pydantic 的、套在任何 LLM 上的封装。校验失败时重试。跨厂商，但不修改 logits——它靠重试 + 感知结构化输出的 prompt。
@@ -210,7 +210,7 @@ Refuse any design that puts `answer` or `decision` before reasoning fields. Refu
 |------|-----------------|-----------------------|
 | 约束解码 | 强制有效输出 | 在每个生成步骤掩掉非法 token 的 logits。 |
 | logit 处理器 | 那个做约束的东西 | 函数：`(logits, state) -> masked_logits`。 |
-| FSM | 有限状态机 | 编译后的文法表示；O(1) 的有效下一 token 查找。 |
+| FSM | 有限状态机 | 编译后的文法表示；$O(1)$ 的有效下一 token 查找。 |
 | CFG | 上下文无关文法 | 处理递归的文法；比 FSM 慢但更具表达力。 |
 | Schema 字段顺序 | 它要紧吗？ | 要紧——第一个字段就认定了；永远把 reasoning 放在 answer 之前。 |
 | 引导解码 | vLLM 给它起的名字 | 同一个概念，集成进推理服务器。 |

@@ -863,7 +863,7 @@ Batch API 对所有 token 给一律 50% 的折扣。结果在 24 小时内到达
 #     return None
 ```
 
-在生产里，把线性扫描换成一个向量索引（Redis Vector Search、Pinecone 或 pgvector）。线性扫描对 <1,000 条目有效。超过那个，用 ANN（近似最近邻）做 O(log n) 的查找。
+在生产里，把线性扫描换成一个向量索引（Redis Vector Search、Pinecone 或 pgvector）。线性扫描对 <1,000 条目有效。超过那个，用 ANN（近似最近邻）做 $O(\log n)$ 的查找。
 
 ## 拿去用
 

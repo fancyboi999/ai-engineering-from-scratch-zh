@@ -147,7 +147,7 @@ def is_correction(utterance):
 
 ## 坑
 
-- **全历史重生成成本。** 让 LLM 每轮重新生成状态，总 token 成本是 O(n²)。给历史设上限或摘要旧轮次。
+- **全历史重生成成本。** 让 LLM 每轮重新生成状态，总 token 成本是 $O(n^2)$。给历史设上限或摘要旧轮次。
 - **schema 漂移。** 事后新增槽位会破坏旧训练数据。给你的 schema 打版本。
 - **大小写敏感。** "Italian" vs "italian" vs "ITALIAN"——到处归一化。
 - **隐式继承。** 如果用户之前指定了 "for 4 people"，一个改时间的新请求不该清掉 people。永远传完整历史。

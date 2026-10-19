@@ -177,7 +177,7 @@ print(f"InfoNCE with identical pairs:  {loss_same:.3f}")
 print(f"InfoNCE with random pairs:     {loss_random:.3f}")
 ```
 
-相同的对应给出低损失（大 batch 加冷温度时接近 0）。随机的对在 16 对的 batch 下应给出 log(2N-1) = 约 log(31) = 约 3.4。
+相同的对应给出低损失（大 batch 加冷温度时接近 0）。随机的对在 16 对的 batch 下应给出 $\log(2N-1) \approx \log(31) \approx 3.4$。
 
 ### 第 4 步：MAE 风格的掩码
 

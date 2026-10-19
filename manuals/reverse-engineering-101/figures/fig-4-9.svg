@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 356" role="img" aria-labelledby="fig-4-9-title fig-4-9-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-4-9-title">percent_change 的源代码与反编译结果</title>
+  <desc id="fig-4-9-desc">上下两块。上方是 ledger.c 中四行 percent_change C 源码，下方是 analyze_function 记录中十四行 Ghidra _percent_change 伪代码。玫红标记三行：ABI 返回四字节，返回类型却是 ulong；第二次测试已测试过的 iVar2；返回整个 param_1 寄存器，而源代码返回 int。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">LEDGER.C · 原始编写内容</text>
+  <rect x="20" y="26" width="600" height="72" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="32" y="44" font-size="11">int percent_change(int before, int after) {</text>
+  <text x="32" y="58" font-size="11">    if (before == 0) return 0;</text>
+  <text x="32" y="72" font-size="11">    return (after - before) * 100 / before;</text>
+  <text x="32" y="86" font-size="11">}</text>
+  <text x="20" y="122" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">GHIDRA 12.1.4 伪代码 · _PERCENT_CHANGE</text>
+  <rect x="20" y="130" width="600" height="216" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="32" y="148" font-size="11">ulong _percent_change(ulong param_1,int param_2)</text>
+  <text x="32" y="162" font-size="11">{</text>
+  <text x="32" y="176" font-size="11">  uint uVar1;</text>
+  <text x="32" y="190" font-size="11">  int iVar2;</text>
+  <text x="32" y="204" font-size="11">  iVar2 = (int)param_1;</text>
+  <text x="32" y="218" font-size="11">  if (iVar2 != 0) {</text>
+  <text x="32" y="232" font-size="11">    uVar1 = 0;</text>
+  <text x="32" y="246" font-size="11">    if (iVar2 != 0) {</text>
+  <text x="32" y="260" font-size="11">      uVar1 = ((param_2 - iVar2) * 100) / iVar2;</text>
+  <text x="32" y="274" font-size="11">    }</text>
+  <text x="32" y="288" font-size="11">    param_1 = (ulong)uVar1;</text>
+  <text x="32" y="302" font-size="11">  }</text>
+  <text x="32" y="316" font-size="11">  return param_1;</text>
+  <text x="32" y="330" font-size="11">}</text>
+  <line x1="360" y1="144" x2="384" y2="144" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1"/>
+  <text x="392" y="148" font-size="11" class="m-serif" fill="var(--m-rose-ink, #b0344d)">返回 ulong，ABI 却是 4 字节</text>
+  <line x1="360" y1="242" x2="384" y2="242" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1"/>
+  <text x="392" y="246" font-size="11" class="m-serif" fill="var(--m-rose-ink, #b0344d)">对已测试值做第二次测试</text>
+  <line x1="360" y1="312" x2="384" y2="312" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1"/>
+  <text x="392" y="316" font-size="11" class="m-serif" fill="var(--m-rose-ink, #b0344d)">返回 param_1，源码返回 int</text>
+</svg>

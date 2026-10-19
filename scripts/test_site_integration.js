@@ -16,13 +16,13 @@ const projects = vm.runInNewContext(read('projects-data.js') + '\nwindow.AIFS_PR
 // These checks consume the real integrated build, not frozen English fixtures.
 test('build.js publishes exports before loading the manual builder and has no require-time writes', () => {
   const before = read('data.js');
-  const result = spawnSync(process.execPath, ['-e', "const b=require('./site/build'); const m=require('./site/build-manuals'); if(typeof b.githubSourceUrl!=='function'||m.loadAll().length!==2)process.exit(1)"], { cwd: root, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, ['-e', "const b=require('./site/build'); const m=require('./site/build-manuals'); if(typeof b.githubSourceUrl!=='function'||m.loadAll().length!==4)process.exit(1)"], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout, '');
   assert.equal(read('data.js'), before);
 });
 
-test('all 528 static lessons preserve Chinese source rendering, canonical, quiz and Hub discovery', () => {
+test('all 542 static lessons preserve Chinese source rendering, canonical, quiz and Hub discovery', () => {
   let count = 0;
   for (const entry of Object.values(lessons).filter(entry => entry.path.startsWith('phases/'))) {
     const file = entry.path.replace(/^phases\//, 'lessons/') + '/index.html';
@@ -42,11 +42,11 @@ test('all 528 static lessons preserve Chinese source rendering, canonical, quiz 
     }
     count++;
   }
-  assert.equal(count, 528);
+  assert.equal(count, 542);
 });
 
-test('76 project sources, 308 stage docs, two manuals and 245 Hub pages are fully generated', () => {
-  assert.equal(projects.length, 76);
+test('78 project sources, 322 stage docs, four manual sources and 245 Hub pages are fully generated', () => {
+  assert.equal(projects.length, 78);
   let stages = 0;
   const sitemap = read('sitemap.xml');
   for (const project of projects) {
@@ -58,23 +58,30 @@ test('76 project sources, 308 stage docs, two manuals and 245 Hub pages are full
       stages++;
     }
   }
-  assert.equal(stages, 308);
-  for (const id of ['a2a-101', 'docker-sandboxes-101']) {
+  assert.equal(stages, 322);
+  for (const id of ['a2a-101', 'docker-sandboxes-101', 'reverse-engineering-101', 'sglang-101']) {
     assert.match(read(`manual-${id}.html`), /lang="zh-CN"/);
     assert.match(read(`manual-${id}-print.html`), /lang="zh-CN"/);
-    assert.ok(sitemap.includes(`/manual-${id}.html`));
+    assert.equal(sitemap.includes(`/manual-${id}.html`), id !== 'sglang-101', `${id} publication status`);
+    assert.equal(/<meta name="robots" content="noindex">/.test(read(`manual-${id}.html`)), id === 'sglang-101', `${id} indexing status`);
   }
+  const listedManuals = vm.runInNewContext(read('manuals-data.js') + '\nwindow.AIFS_MANUALS', { window: {} });
+  assert.deepEqual(Array.from(listedManuals, manual => manual.id).sort(), ['a2a-101', 'docker-sandboxes-101', 'reverse-engineering-101']);
+  assert.doesNotMatch(read('manuals.html'), /href="manual-sglang-101(?:-print)?\.html"/);
   assert.equal(fs.readdirSync(path.join(site, 'hubs/phase')).length, 20);
   assert.equal(fs.readdirSync(path.join(site, 'hubs/glossary')).length, 225);
   const cards = JSON.parse(read('og-cards.json')).cards;
-  assert.equal(Object.keys(cards).filter(key => key.startsWith('project/')).length, 76);
+  assert.equal(Object.keys(cards).filter(key => key.startsWith('project/')).length, 78);
+  assert.deepEqual(Object.keys(cards).filter(key => key.startsWith('manual/')).sort(), ['manual/a2a-101', 'manual/docker-sandboxes-101', 'manual/reverse-engineering-101']);
   assert.equal(Object.keys(cards).filter(key => key.startsWith('phase/')).length, 20);
   assert.equal(Object.keys(cards).filter(key => key.startsWith('term/')).length, 225);
-  for (const file of ['index.html', 'catalog.html', 'glossary.html', 'project.html', 'projects.html', 'manuals.html', 'manual-a2a-101.html', 'manual-a2a-101-print.html', 'manual-docker-sandboxes-101.html', 'manual-docker-sandboxes-101-print.html']) {
+  for (const file of ['index.html', 'catalog.html', 'glossary.html', 'project.html', 'projects.html', 'manuals.html', 'manual-a2a-101.html', 'manual-a2a-101-print.html', 'manual-docker-sandboxes-101.html', 'manual-docker-sandboxes-101-print.html', 'manual-reverse-engineering-101.html', 'manual-reverse-engineering-101-print.html', 'manual-sglang-101.html', 'manual-sglang-101-print.html']) {
     const head = read(file).split('</head>')[0];
     if (!file.endsWith('-print.html')) {
       assert.equal((head.match(/property="og:image"/g) || []).length, 1, file);
-      assert.equal((head.match(/name="twitter:card"/g) || []).length, 1, file);
+      // Drafts are rendered for review but are excluded from the published OG manifest.
+      assert.equal((head.match(/name="twitter:card"/g) || []).length, file === 'manual-sglang-101.html' ? 0 : 1, file);
+      if (file === 'manual-sglang-101.html') assert.match(head, /property="og:image" content="https:\/\/aieng-zh\.cn\/og\/page\/manuals\.png"/);
     }
     assert.doesNotMatch(head, />,+<meta/, file);
     assert.equal((head.match(/<link rel="icon" href="\/favicon\.ico\?v=20260831a" sizes="32x32">/g) || []).length, 1, file);
@@ -163,5 +170,5 @@ test('app.js modal Hub wire switches phases, rejects undeclared targets and pres
   phases[0].hub = valid; context.openModal(0, true);
   assert.equal(link.hidden, false); assert.equal(link.getAttribute('href'), valid); context.closeModal(true);
   assert.match(read('index.html'), /<a class="modal-phase-link" id="modalPhaseLink" hidden>/);
-  assert.match(read('index.html'), /app\.js\?v=20261012b/);
+  assert.match(read('index.html'), /app\.js\?v=20261019a/);
 });

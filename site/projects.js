@@ -300,9 +300,19 @@
       [community, '社区贡献'],
     ].map(function (s) { return '<div><strong>' + formatCount(s[0]) + '</strong><span>' + s[1] + '</span></div>'; }).join('');
 
-    var first = DATA.projects[0];
     var start = document.getElementById('pjStartLink');
-    if (first && start) start.href = projectHref(first.id);
+
+    var roleSelect = document.getElementById('pjRole');
+    var roleNote = document.getElementById('pjRoleNote');
+    var roles = DATA.roles || [];
+    var role = new URLSearchParams(window.location.search).get('role') || '';
+    if (!roles.some(function (r) { return r.id === role; })) role = '';
+    if (roleSelect) {
+      roleSelect.innerHTML = '<option value="">全部职业</option>' + roles.map(function (r) {
+        return '<option value="' + esc(r.id) + '">' + esc(r.title) + '</option>';
+      }).join('');
+      roleSelect.value = role;
+    }
 
     var sources = [['all', '全部'], ['core', '核心'], ['community', '社区']];
     var current = readStore(SOURCE_KEY, 'all');
@@ -312,11 +322,24 @@
       filter.innerHTML = sources.map(function (s) {
         return '<button type="button" class="pj-chip' + (s[0] === current ? ' is-active' : '') + '" data-source="' + s[0] + '" aria-pressed="' + (s[0] === current) + '">' + s[1] + '</button>';
       }).join('');
-      var include = function (item) { return current === 'all' || item.source === current; };
+      var picked = roles.filter(function (r) { return r.id === role; })[0];
+      var include = function (item) {
+        if (picked && picked.projects.indexOf(item.id) === -1) return false;
+        return current === 'all' || item.source === current;
+      };
+      var first = DATA.projects.filter(function (p) { return !picked || picked.projects.indexOf(p.id) !== -1; })[0];
+      if (first && start) start.href = projectHref(first.id);
+      if (roleNote) {
+        roleNote.hidden = !picked;
+        roleNote.innerHTML = picked
+          ? '这些项目用于证明你具备<strong>' + esc(picked.title) + '</strong>所需的能力。从最低级别开始，完成一个项目后再做下一个。<a href="learning-paths.html#career-route-' + esc(picked.id) + '">查看这条路线的课程</a>。'
+          : '';
+      }
       ladder.innerHTML = DATA.levels.map(function (level) {
         var ready = DATA.projects.filter(function (p) { return p.level === level.level && include(p); });
-        var planned = showPlanned.checked ? DATA.planned.filter(function (p) { return p.level === level.level && include(p); }) : [];
+        var planned = showPlanned.checked && !picked ? DATA.planned.filter(function (p) { return p.level === level.level && include(p); }) : [];
         var cards = ready.map(projectCard).join('') + planned.map(plannedCard).join('');
+        if (!cards && picked) return '';
         if (!cards) {
           cards = current === 'community'
             ? '<div class="pj-empty">本级别还没有社区项目。<a href="#submit">来做第一个。</a></div>'
@@ -326,6 +349,9 @@
           '<header class="pj-level-head"><div class="pj-level-n">' + level.level + '</div><div><h3>' + esc(level.name) + '</h3><p>' + esc(level.summary) + '</p></div></header>' +
           '<div class="pj-level-cards">' + cards + '</div></section>';
       }).join('');
+      if (picked && !ladder.innerHTML) {
+        ladder.innerHTML = '<div class="pj-empty">当前来源下没有该职业的项目。选择“全部”查看相关项目。</div>';
+      }
     }
 
     filter.addEventListener('click', function (event) {
@@ -336,6 +362,16 @@
       draw();
     });
     showPlanned.addEventListener('change', draw);
+    if (roleSelect) {
+      roleSelect.addEventListener('change', function () {
+        role = roleSelect.value;
+        var url = new URL(window.location.href);
+        if (role) url.searchParams.set('role', role);
+        else url.searchParams.delete('role');
+        window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+        draw();
+      });
+    }
     draw();
   }
 

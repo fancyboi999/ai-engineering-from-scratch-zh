@@ -8,7 +8,6 @@
 **预计时间：** ~90 分钟
 
 ## 学习目标
-
 - 建模一条小型论文记录，包含下游循环需要读取的字段。
 - 仅用 stdlib 数据结构在摘要上构建 BM25 索引。
 - 遍历引用图以找到词法搜索遗漏的论文。
@@ -69,10 +68,12 @@ flowchart TD
 
 分词器就是 `lower` 然后按非字母数字字符切分。不做词干化。生产系统会换成一个小型 stemmer，接口不变。
 
-```text
-idf(t)      = log((N - df + 0.5) / (df + 0.5) + 1.0)
-tf_norm(t)  = (f * (k1 + 1)) / (f + k1 * (1 - b + b * dl / avgdl))
-score(d, q) = sum over t in q of idf(t) * tf_norm(t)
+```math
+\begin{aligned}
+\text{idf}(t) &= \log\!\left(\frac{N - \text{df} + 0.5}{\text{df} + 0.5} + 1.0\right) \\
+\text{tf\_norm}(t) &= \frac{f \cdot (k_1 + 1)}{f + k_1 \cdot \left(1 - b + b \cdot \text{dl} / \text{avgdl}\right)} \\
+\text{score}(d, q) &= \sum_{t \in q} \text{idf}(t) \cdot \text{tf\_norm}(t)
+\end{aligned}
 ```
 
 ## 引用图遍历

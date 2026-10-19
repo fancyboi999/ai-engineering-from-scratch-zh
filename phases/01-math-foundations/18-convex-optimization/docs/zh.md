@@ -26,7 +26,7 @@
 
 ### 凸集
 
-一个集合 S 是凸的，如果对 S 中任意两点，它们之间的线段也完全落在 S 里。
+一个集合 $S$ 是凸的，如果对 $S$ 中任意两点，它们之间的线段也完全落在 $S$ 里。
 
 | 凸集 | 非凸 |
 |---|---|
@@ -34,12 +34,12 @@
 | **三角形**：所有内部点都有同样的性质 | **甜甜圈/环形**：那个洞意味着某些线段会离开集合 |
 | 任意两点之间的线段都留在集合内 | 某些点对之间的线段会离开集合 |
 
-形式化检验：对 S 中任意点 x、y 和任意 t 属于 [0, 1]，点 tx + (1-t)y 也在 S 里。
+形式化检验：对 $S$ 中任意点 $x, y$ 和任意 $t \in [0, 1]$，点 $tx + (1-t)y$ 也在 $S$ 里。
 
 凸集的例子：
-- 一条线、一个平面、整个 R^n
+- 一条线、一个平面、整个 $\mathbb{R}^n$
 - 一个球（圆、球面、超球面）
-- 一个半空间：{x : a^T x <= b}
+- 一个半空间：$\lbrace x : a^T x \le b \rbrace$
 - 任意多个凸集的交集
 
 非凸集的例子：
@@ -49,10 +49,10 @@
 
 ### 凸函数
 
-一个函数 f 是凸的，如果它的定义域是凸集，且对它定义域里任意两点 x、y 和任意 t 属于 [0, 1]：
+一个函数 $f$ 是凸的，如果它的定义域是凸集，且对它定义域里任意两点 $x, y$ 和任意 $t \in [0, 1]$：
 
-```
-f(tx + (1-t)y) <= t*f(x) + (1-t)*f(y)
+```math
+f(tx + (1-t)y) \le t f(x) + (1-t) f(y)
 ```
 
 几何上：图像上任意两点之间的线段位于图像之上或之上。
@@ -64,26 +64,26 @@ f(tx + (1-t)y) <= t*f(x) + (1-t)*f(y)
 | **局部最小值** | 每个局部最小值都是全局最小值 | 可能存在多个高度不同的局部最小值 |
 
 常见凸函数：
-- f(x) = x^2（抛物线）
-- f(x) = |x|（绝对值）
-- f(x) = e^x（指数）
-- f(x) = max(0, x)（ReLU，尽管是分段线性）
-- f(x) = -log(x)（x > 0 时，负对数）
-- 任何线性函数 f(x) = a^T x + b（既凸又凹）
+- $f(x) = x^2$（抛物线）
+- $f(x) = \lvert x \rvert$（绝对值）
+- $f(x) = e^x$（指数）
+- $f(x) = \max(0, x)$（ReLU，尽管是分段线性）
+- $f(x) = -\log(x)$（$x > 0$ 时，负对数）
+- 任何线性函数 $f(x) = a^T x + b$（既凸又凹）
 
 ### 检验凸性
 
 三个实用检验，从最简单到最严格。
 
-**检验 1：二阶导数检验（一维）。** 如果对所有 x 有 f''(x) >= 0，那么 f 是凸的。
+**检验 1：二阶导数检验（一维）。** 如果对所有 $x$ 有 $f''(x) \ge 0$，那么 $f$ 是凸的。
 
-- f(x) = x^2：f''(x) = 2 >= 0。凸。
-- f(x) = x^3：f''(x) = 6x。x < 0 时为负。非凸。
-- f(x) = e^x：f''(x) = e^x > 0。凸。
+- $f(x) = x^2$：$f''(x) = 2 \ge 0$。凸。
+- $f(x) = x^3$：$f''(x) = 6x$。$x < 0$ 时为负。非凸。
+- $f(x) = e^x$：$f''(x) = e^x > 0$。凸。
 
-**检验 2：Hessian 检验（多元）。** 如果对所有 x，Hessian 矩阵 H(x) 半正定，那么 f 是凸的。Hessian 是二阶偏导数构成的矩阵。
+**检验 2：Hessian 检验（多元）。** 如果对所有 $x$，Hessian 矩阵 $H(x)$ 半正定，那么 $f$ 是凸的。Hessian 是二阶偏导数构成的矩阵。
 
-**检验 3：定义检验。** 直接检查不等式 f(tx + (1-t)y) <= t*f(x) + (1-t)*f(y)。对导数难算的函数有用。
+**检验 3：定义检验。** 直接检查不等式 $f(tx + (1-t)y) \le t f(x) + (1-t) f(y)$。对导数难算的函数有用。
 
 ### 凸性为什么重要
 
@@ -129,20 +129,22 @@ graph LR
 
 ### Hessian 矩阵
 
-函数 f: R^n -> R 的 Hessian H 是二阶偏导数构成的 n x n 矩阵。
+函数 $f: \mathbb{R}^n \to \mathbb{R}$ 的 Hessian $H$ 是二阶偏导数构成的 $n \times n$ 矩阵。
 
+```math
+H_{ij} = \frac{\partial^2 f}{\partial x_i \, \partial x_j}
 ```
-H[i][j] = d^2 f / (dx_i dx_j)
-```
 
-对 f(x, y) = x^2 + 3xy + y^2：
+对 $f(x, y) = x^2 + 3xy + y^2$：
 
-```
-df/dx = 2x + 3y       d^2f/dx^2 = 2      d^2f/dxdy = 3
-df/dy = 3x + 2y       d^2f/dydx = 3      d^2f/dy^2 = 2
-
-H = [ 2  3 ]
-    [ 3  2 ]
+```math
+\begin{gathered}
+\begin{aligned}
+\frac{\partial f}{\partial x} &= 2x + 3y & \frac{\partial^2 f}{\partial x^2} &= 2 & \frac{\partial^2 f}{\partial x \, \partial y} &= 3 \\
+\frac{\partial f}{\partial y} &= 3x + 2y & \frac{\partial^2 f}{\partial y \, \partial x} &= 3 & \frac{\partial^2 f}{\partial y^2} &= 2
+\end{aligned} \\[8pt]
+H = \begin{bmatrix} 2 & 3 \\ 3 & 2 \end{bmatrix}
+\end{gathered}
 ```
 
 Hessian 告诉你曲率：
@@ -151,18 +153,17 @@ Hessian 告诉你曲率：
 - 符号混合：鞍点（在某些方向向上弯、另一些向下弯）
 - 零特征值：在那个方向平坦（退化）
 
-为了凸，Hessian 必须处处半正定（所有特征值 >= 0），不只是在某一点。
+为了凸，Hessian 必须处处半正定（所有特征值 $\ge 0$），不只是在某一点。
 
 ### 牛顿法
 
 梯度下降用一阶信息（梯度）。牛顿法用二阶信息（Hessian）。它在当前点拟合一个二次近似，并直接跳到那个二次函数的最小值。
 
-```
-Update rule:
-  x_new = x - H^(-1) * gradient
-
-Compare to gradient descent:
-  x_new = x - lr * gradient
+```math
+\begin{aligned}
+\text{更新规则：} \quad & x_{\text{new}} = x - H^{-1} \cdot \text{gradient} \\
+\text{与梯度下降比较：} \quad & x_{\text{new}} = x - \text{lr} \cdot \text{gradient}
+\end{aligned}
 ```
 
 牛顿法用 Hessian 的逆代替标量学习率。这会基于局部曲率自动调整步长和方向。
@@ -190,14 +191,14 @@ graph TD
 - 尺度不变（不管你怎么参数化问题都有效）
 
 缺点：
-- 计算 Hessian 花 O(n^2) 内存、求逆花 O(n^3)
-- 对一个百万权重的神经网络，那是 10^12 个元素和 10^18 次操作
+- 计算 Hessian 花 $O(n^2)$ 内存、求逆花 $O(n^3)$
+- 对一个百万权重的神经网络，那是 $10^{12}$ 个元素和 $10^{18}$ 次操作
 - 对深度学习不实用
 
 ### 约束优化
 
-无约束优化：在所有 x 上最小化 f(x)。
-约束优化：在约束下最小化 f(x)。
+无约束优化：在所有 $x$ 上最小化 $f(x)$。
+约束优化：在约束下最小化 $f(x)$。
 
 真实问题有约束。你想最小化成本但预算有限。你想最小化误差但模型复杂度有界。
 
@@ -216,22 +217,24 @@ graph LR
 
 拉格朗日乘子法把一个约束问题转换成无约束的。
 
-问题：在 g(x) = 0 的约束下最小化 f(x)。
+问题：在 $g(x) = 0$ 的约束下最小化 $f(x)$。
 
-解法：引入一个新变量（拉格朗日乘子 lambda），求解无约束问题：
+解法：引入一个新变量（拉格朗日乘子 $\lambda$），求解无约束问题：
 
-```
-L(x, lambda) = f(x) + lambda * g(x)
-```
-
-在解处，L 的梯度为零：
-
-```
-dL/dx = df/dx + lambda * dg/dx = 0
-dL/dlambda = g(x) = 0
+```math
+L(x, \lambda) = f(x) + \lambda g(x)
 ```
 
-几何直觉：在约束最小值处，f 的梯度必须与约束 g 的梯度平行。如果它们不平行，你就能沿约束曲面移动并进一步减小 f。
+在解处，$L$ 的梯度为零：
+
+```math
+\begin{aligned}
+\frac{\partial L}{\partial x} &= \frac{\partial f}{\partial x} + \lambda \frac{\partial g}{\partial x} = 0 \\
+\frac{\partial L}{\partial \lambda} &= g(x) = 0
+\end{aligned}
+```
+
+几何直觉：在约束最小值处，$f$ 的梯度必须与约束 $g$ 的梯度平行。如果它们不平行，你就能沿约束曲面移动并进一步减小 $f$。
 
 ```mermaid
 graph LR
@@ -240,39 +243,41 @@ graph LR
     S --- C["在解处，f 的梯度平行于 g 的梯度"]
 ```
 
-例子：在 x + y = 1 的约束下最小化 f(x,y) = x^2 + y^2。
+例子：在 $x + y = 1$ 的约束下最小化 $f(x,y) = x^2 + y^2$。
 
+```math
+\begin{aligned}
+L &= x^2 + y^2 + \lambda(x + y - 1) \\[4pt]
+\frac{\partial L}{\partial x} &= 2x + \lambda = 0 \implies x = -\lambda/2 \\
+\frac{\partial L}{\partial y} &= 2y + \lambda = 0 \implies y = -\lambda/2 \\
+\frac{\partial L}{\partial \lambda} &= x + y - 1 = 0 \\[4pt]
+&\text{由前两式：} x = y \\
+&\text{代入：} 2x = 1, \text{ 因此 } x = y = 0.5, \ \lambda = -1
+\end{aligned}
 ```
-L = x^2 + y^2 + lambda(x + y - 1)
 
-dL/dx = 2x + lambda = 0  =>  x = -lambda/2
-dL/dy = 2y + lambda = 0  =>  y = -lambda/2
-dL/dlambda = x + y - 1 = 0
-
-From first two: x = y
-Substituting: 2x = 1, so x = y = 0.5, lambda = -1
-```
-
-直线 x + y = 1 上离原点最近的点是 (0.5, 0.5)。
+直线 $x + y = 1$ 上离原点最近的点是 $(0.5, 0.5)$。
 
 ### KKT 条件
 
 Karush-Kuhn-Tucker 条件把拉格朗日乘子推广到不等式约束。
 
-问题：在 g_i(x) <= 0（i = 1, ..., m）的约束下最小化 f(x)。
+问题：在 $g_i(x) \le 0$（$i = 1, \ldots, m$）的约束下最小化 $f(x)$。
 
 KKT 条件（最优性的必要条件）：
 
-```
-1. Stationarity:    df/dx + sum(lambda_i * dg_i/dx) = 0
-2. Primal feasibility:  g_i(x) <= 0  for all i
-3. Dual feasibility:    lambda_i >= 0  for all i
-4. Complementary slackness:  lambda_i * g_i(x) = 0  for all i
+```math
+\begin{aligned}
+&\text{1. 平稳性：} && \frac{\partial f}{\partial x} + \sum_i \lambda_i \frac{\partial g_i}{\partial x} = 0 \\
+&\text{2. 原始可行性：} && g_i(x) \le 0 \quad \text{对所有 } i \\
+&\text{3. 对偶可行性：} && \lambda_i \ge 0 \quad \text{对所有 } i \\
+&\text{4. 互补松弛：} && \lambda_i \, g_i(x) = 0 \quad \text{对所有 } i
+\end{aligned}
 ```
 
-互补松弛是关键洞见：要么约束是活跃的（g_i = 0，解落在边界上），要么乘子为零（约束无关紧要）。一个不影响解的约束有 lambda = 0。
+互补松弛是关键洞见：要么约束是活跃的（$g_i = 0$，解落在边界上），要么乘子为零（约束无关紧要）。一个不影响解的约束有 $\lambda = 0$。
 
-KKT 条件是 SVM 的核心。支持向量就是约束活跃（lambda > 0）的数据点。所有其他数据点 lambda = 0，不影响决策边界。
+KKT 条件是 SVM 的核心。支持向量就是约束活跃（$\lambda > 0$）的数据点。所有其他数据点 $\lambda = 0$，不影响决策边界。
 
 ### 正则化作为约束优化
 
@@ -280,25 +285,27 @@ L1 和 L2 正则化不是随意的技巧。它们是伪装的约束优化问题�
 
 **L2 正则化（Ridge）：**
 
+```math
+\begin{aligned}
+&\text{最小化 } \text{损失}(w) \text{ 满足约束 } \lVert w \rVert^2 \le t \\[4pt]
+&\text{等价的无约束形式：} \\
+&\text{最小化 } \text{损失}(w) + \lambda \lVert w \rVert^2
+\end{aligned}
 ```
-minimize  Loss(w)  subject to  ||w||^2 <= t
 
-Equivalent unconstrained form:
-minimize  Loss(w) + lambda * ||w||^2
-```
-
-约束 ||w||^2 <= t 定义一个球（二维里的圆、三维里的球面）。解是损失等高线首次触到这个球之处。
+约束 $\lVert w \rVert^2 \le t$ 定义一个球（二维里的圆、三维里的球面）。解是损失等高线首次触到这个球之处。
 
 **L1 正则化（LASSO）：**
 
+```math
+\begin{aligned}
+&\text{最小化 } \text{损失}(w) \text{ 满足约束 } \lVert w \rVert_1 \le t \\[4pt]
+&\text{等价的无约束形式：} \\
+&\text{最小化 } \text{损失}(w) + \lambda \lVert w \rVert_1
+\end{aligned}
 ```
-minimize  Loss(w)  subject to  ||w||_1 <= t
 
-Equivalent unconstrained form:
-minimize  Loss(w) + lambda * ||w||_1
-```
-
-约束 ||w||_1 <= t 定义一个菱形（二维里旋转的正方形）。
+约束 $\lVert w \rVert_1 \le t$ 定义一个菱形（二维里旋转的正方形）。
 
 | 性质 | L2 约束（圆） | L1 约束（菱形） |
 |---|---|---|
@@ -315,11 +322,13 @@ minimize  Loss(w) + lambda * ||w||_1
 
 拉格朗日对偶函数：
 
-```
-Primal: minimize f(x) subject to g(x) <= 0
-Lagrangian: L(x, lambda) = f(x) + lambda * g(x)
-Dual function: d(lambda) = min_x L(x, lambda)
-Dual problem: maximize d(lambda) subject to lambda >= 0
+```math
+\begin{aligned}
+&\text{原始问题：} && \text{最小化 } f(x) \text{ 满足约束 } g(x) \le 0 \\
+&\text{拉格朗日函数：} && L(x, \lambda) = f(x) + \lambda g(x) \\
+&\text{对偶函数：} && d(\lambda) = \min_x L(x, \lambda) \\
+&\text{对偶问题：} && \text{最大化 } d(\lambda) \text{ 满足约束 } \lambda \ge 0
+\end{aligned}
 ```
 
 对偶为什么重要：
@@ -346,7 +355,7 @@ Replace x_i^T x_j with K(x_i, x_j) to get the kernel trick.
 
 **大多数局部最小值已经够好。** 在高维空间里，随机临界点（梯度为零之处）压倒性地是鞍点，不是局部最小值。存在的少数局部最小值往往损失值接近全局最小值。当参数空间有上百万维时，被困进一个糟糕的局部最小值极不可能。
 
-**鞍点而非局部最小值才是真正的障碍。** 在一个有 n 个参数的函数里，鞍点有正负曲率方向的混合。对高维里一个随机临界点，所有 n 个特征值都为正（局部最小值）的概率大致是 2^(-n)。几乎所有临界点都是鞍点。SGD 的噪声有助于逃出它们。
+**鞍点而非局部最小值才是真正的障碍。** 在一个有 $n$ 个参数的函数里，鞍点有正负曲率方向的混合。对高维里一个随机临界点，所有 $n$ 个特征值都为正（局部最小值）的概率大致是 $2^{-n}$。几乎所有临界点都是鞍点。SGD 的噪声有助于逃出它们。
 
 **过参数化让曲面变平滑。** 参数比训练样本多的网络有更平滑、更连通的损失曲面。更宽的网络有更少的坏局部最小值。这反直觉，但经验上一致。
 
@@ -365,21 +374,21 @@ Replace x_i^T x_j with K(x_i, x_j) to get the kernel trick.
 
 纯牛顿法对大模型不实用。几种近似让二阶信息变得可用。
 
-**L-BFGS（有限内存 BFGS）：** 用最近 m 次梯度差近似 Hessian 的逆。需要 O(mn) 内存而非 O(n^2)。对约 10,000 个参数以内的问题工作良好。用于经典 ML（逻辑回归、CRF），不用于深度学习。
+**L-BFGS（有限内存 BFGS）：** 用最近 $m$ 次梯度差近似 Hessian 的逆。需要 $O(mn)$ 内存而非 $O(n^2)$。对约 10,000 个参数以内的问题工作良好。用于经典 ML（逻辑回归、CRF），不用于深度学习。
 
 **自然梯度：** 用 Fisher 信息矩阵（对数似然的期望 Hessian）代替标准 Hessian。这考虑了概率分布的几何。K-FAC（Kronecker 因子近似曲率）把 Fisher 矩阵近似为 Kronecker 积，使它对神经网络实用。
 
-**无 Hessian 优化：** 用共轭梯度解 Hx = g 而从不构造 H。只需要 Hessian-向量积，它可以通过自动微分在 O(n) 时间里算出。
+**无 Hessian 优化：** 用共轭梯度解 $Hx = g$ 而从不构造 $H$。只需要 Hessian-向量积，它可以通过自动微分在 $O(n)$ 时间里算出。
 
 **对角近似：** Adam 的二阶矩是 Hessian 对角线的对角近似。AdaHessian 通过 Hutchinson 估计器用实际的 Hessian 对角元来扩展它。
 
 | 方法 | 内存 | 每步代价 | 何时用 |
 |--------|--------|--------------|-------------|
-| 梯度下降 | O(n) | O(n) | 基线，大模型 |
-| 牛顿法 | O(n^2) | O(n^3) | 小凸问题 |
-| L-BFGS | O(mn) | O(mn) | 中等凸问题 |
-| Adam | O(n) | O(n) | 深度学习默认 |
-| K-FAC | O(n) | 每层 O(n) | 研究、大批量训练 |
+| 梯度下降 | $O(n)$ | $O(n)$ | 基线，大模型 |
+| 牛顿法 | $O(n^2)$ | $O(n^3)$ | 小凸问题 |
+| L-BFGS | $O(mn)$ | $O(mn)$ | 中等凸问题 |
+| Adam | $O(n)$ | $O(n)$ | 深度学习默认 |
+| K-FAC | $O(n)$ | 每层 $O(n)$ | 研究、大批量训练 |
 
 ```figure
 convex-vs-nonconvex
@@ -516,15 +525,27 @@ print(f"Support vectors: {svm.n_support_}")
 
 ## 练习
 
-1. **凸性画廊。** 用检查器检验这些函数的凸性：f(x) = x^4、f(x) = sin(x)、f(x,y) = x^2 + y^2、f(x,y) = x*y、f(x) = max(x, 0)。解释为什么每个结果都说得通。
+1. **凸性画廊。** 用检查器检验这些函数的凸性：$f(x) = x^4$、$f(x) = \sin(x)$、$f(x,y) = x^2 + y^2$、$f(x,y) = xy$、$f(x) = \max(x, 0)$。解释为什么每个结果都说得通。
 
-2. **牛顿 vs 梯度下降竞速。** 从起点 (10, 10) 在 f(x,y) = 50*x^2 + y^2 上跑两个方法。每个要多少步才到损失 < 1e-10？当条件数（Hessian 最大与最小特征值之比）增大时，梯度下降会怎样？
+2. **牛顿 vs 梯度下降竞速。** 从起点 $(10, 10)$ 在 $f(x,y) = 50x^2 + y^2$ 上跑两个方法。每个要多少步才到损失 < 1e-10？当条件数（Hessian 最大与最小特征值之比）增大时，梯度下降会怎样？
 
-3. **拉格朗日乘子几何。** 在 x + 2y = 4 的约束下最小化 f(x,y) = (x-3)^2 + (y-3)^2。通过检查解处 f 的梯度是否与 g 的梯度平行来验证解。
+3. **拉格朗日乘子几何。** 在 $x + 2y = 4$ 的约束下最小化 $f(x,y) = (x-3)^2 + (y-3)^2$。通过检查解处 $f$ 的梯度是否与 $g$ 的梯度平行来验证解。
 
-4. **正则化约束。** 实现 L1 约束的优化：在 |x| + |y| <= 1 的约束下最小化 (x-3)^2 + (y-2)^2。展示解有一个坐标等于零（菱形约束带来的稀疏性）。
+4. **正则化约束。** 实现 L1 约束的优化：在 $\lvert x \rvert + \lvert y \rvert \le 1$ 的约束下最小化 $(x-3)^2 + (y-2)^2$。展示解有一个坐标等于零（菱形约束带来的稀疏性）。
 
 5. **Hessian 特征值分析。** 计算 Rosenbrock 函数在 (1,1) 和 (-1,1) 处的 Hessian。计算两点的特征值。特征值告诉你最小值处与远离它处的曲率有什么不同？
+
+### 提示
+
+**练习 1。** 运行 `check_convexity` 前先预测结果：一维看 $f''(x)$ 的符号，二维看 Hessian 的特征值。对于 $f(x,y) = xy$，Hessian 特征值为 1 和 -1，因此检查器应报告非凸。
+
+**练习 2。** 将 $f$ 的梯度和 Hessian 传给 `optimize_gd` 与 `newtons_method`。牛顿法一步即可解二次函数。由于 $2/100$ 项，梯度下降的学习率必须小于 $50x^2$，因此 $y$ 方向移动较慢。改成 $100x^2$ 后再次比较步数。
+
+**练习 3。** 使用约束 $g(x,y) = x + 2y - 4$ 调用 `lagrange_solve`。在解处检查 $x + 2y = 4$，并检查 $\nabla f = (2(x-3), 2(y-3))$ 是 $\nabla g = (1, 2)$ 的倍数。
+
+**练习 4。** 无约束极小值 (3, 2) 在菱形外，所以解位于边界。使用投影梯度下降：先走一个梯度步，再投影回 $\lvert x \rvert + \lvert y \rvert \le 1$。检查结果使约束取等号，并与 `demo_regularization_geometry` 对照。
+
+**练习 5。** 在每个点调用 `rosenbrock_hessian`，将结果传给 `hessian_eigenvalues_2d`。在 (1, 1) 处，两个特征值均为正且比值很大，说明谷地一个方向窄、另一个方向平。与 (-1, 1) 处的比值比较。
 
 ## 关键术语
 
@@ -543,7 +564,7 @@ print(f"Support vectors: {svm.n_support_}")
 | 互补松弛 | 在解处，要么约束活跃，要么它的乘子为零。绝不两者都非零 |
 | 对偶 | 每个约束问题都有一个伴随对偶问题。对凸问题，两者有相同的最优值 |
 | 强对偶 | 原始和对偶最优值相等。对满足 Slater 条件的凸问题成立 |
-| L-BFGS | 存最近 m 次梯度差而非完整 Hessian 的近似二阶方法 |
+| L-BFGS | 存最近 $m$ 次梯度差而非完整 Hessian 的近似二阶方法 |
 | 鞍点 | 梯度为零、但在某些方向是最小值、另一些方向是最大值的点 |
 | 过参数化 | 用比训练样本多的参数。让损失曲面变平滑、减少坏的局部最小值 |
 

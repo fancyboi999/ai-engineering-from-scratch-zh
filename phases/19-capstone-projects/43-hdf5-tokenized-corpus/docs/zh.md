@@ -16,7 +16,7 @@
 
 ## 问题
 
-现代语言模型训练每秒要在几十个 worker 上读取数十万个样本。JSONL 在第一次冷缓存 page fault 时就死了：JSON 解析器慢、文档边界不可寻址、seek 到"第 4,217,884 个样本"需要从头扫文件。即使 Parquet 压缩率不错，也不适合，因为 trainer 不要列、要的是一条带 O(1) 随机访问的扁平 token 流。
+现代语言模型训练每秒要在几十个 worker 上读取数十万个样本。JSONL 在第一次冷缓存 page fault 时就死了：JSON 解析器慢、文档边界不可寻址、seek 到"第 4,217,884 个样本"需要从头扫文件。即使 Parquet 压缩率不错，也不适合，因为 trainer 不要列、要的是一条带 $O(1)$ 随机访问的扁平 token 流。
 
 HDF5 合适是因为它提供分块、可扩容、纯整数的 dataset，读取时 chunk 对 page cache 友好。Trainer 请求 `tokens[3,200,000 : 3,200,8192]` 这样一个切片，HDF5 就从 page cache 把请求的 hyperslab 拷贝到新分配的 NumPy 数组里。代价是每个 worker 一个打开的文件句柄加一个 chunk 大小的 page-cache 占用——相比解析 JSONL 的代价可以忽略不计。
 

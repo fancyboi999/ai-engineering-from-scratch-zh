@@ -2048,9 +2048,9 @@ function withCard(html, type, id, spec) {
 }
 
 function versionSharedAssets(html) {
-  return html.replace(/(\bsrc=["']\/?(?:app|header|cmdpalette|certifications)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261012b$2')
-    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261012e$2')
-    .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261012e$2');
+  return html.replace(/(\bsrc=["']\/?(?:app|header|cmdpalette|certifications|projects|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo|cheatsheets)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
+    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|cheatsheets|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
+    .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2');
 }
 
 function stampSiteCards(cards) {
@@ -2118,9 +2118,17 @@ function build() {
   require('./build-projects').bundleContent(projects, REPO_ROOT, __dirname);
   fs.writeFileSync(path.join(__dirname, 'projects-data.js'), `window.AIFS_PROJECTS = ${JSON.stringify(projects, null, 2)};\n`);
   const manualBuilder = require('./build-manuals');
-  const manuals = manualBuilder.loadAll().filter(manual => manual.status === 'ready');
-  manualBuilder.writeWeb(manuals);
+  const allManuals = manualBuilder.loadAll();
+  const manuals = allManuals.filter(manual => manual.status === 'ready');
+  // 草稿可按明确URL阅读，保留draft/noindex；目录与就绪统计仅列ready。
+  manualBuilder.writeWeb(allManuals);
+  require('./build-skills').build();
+  require('node:child_process').execFileSync(process.execPath, [path.join(REPO_ROOT, 'scripts/agent-machine/build.mjs')], { cwd: REPO_ROOT, stdio: 'inherit' });
+  const sheetBuilder = require('./build-cheatsheets');
+  const sheets = sheetBuilder.writeCheatsheets({ siteDir: __dirname, versionHtml: versionSharedAssets });
+  const sheetCoverage = sheetBuilder.coverage(sheets.topics);
   const hubs = require('./build-hubs').writeHubs({
+    cheatsheets: sheetCoverage.phases,
     phases, prerequisites: roadmapPrereqs, glossary: glossaryTerms,
     categories: GLOSSARY_CATEGORY_ORDER, lessonManifest: seoManifests.lessonManifest,
     versionHtml: versionSharedAssets,
@@ -2129,6 +2137,7 @@ function build() {
       return [rel, Number(lesson.time) || lessonMinutes(rel)];
     }))),
   });
+  hubs.cheatsheetPages = sheets.pages;
   fs.writeFileSync(path.join(__dirname, 'hub-pages.json'), JSON.stringify({ pages: Object.fromEntries(
     [...hubs.phasePages, ...hubs.termPages].map(page => [page.href, {
       html: 'hubs' + page.href + '.html', markdown: 'agent-pages' + page.href + '.md',
@@ -2216,6 +2225,9 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths, addi
     { loc: '/', priority: '1.0', freq: 'weekly' },
     { loc: '/catalog.html', priority: '0.8', freq: 'weekly' },
     { loc: '/prereqs.html', priority: '0.7', freq: 'monthly' },
+    { loc: '/skills.html', priority: '0.7', freq: 'monthly' },
+    { loc: '/inside-an-ai-agent.html', priority: '0.7', freq: 'monthly' },
+    { loc: '/how-to-learn.html', priority: '0.7', freq: 'monthly' },
     { loc: '/about.html', priority: '0.5', freq: 'monthly' },
     { loc: '/learning-paths.html', priority: '0.8', freq: 'weekly' },
     { loc: '/developer.html', priority: '0.5', freq: 'monthly' },
@@ -2249,7 +2261,7 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths, addi
       for (const stage of project.stages) urls.push({ loc: '/project/' + project.id + '/' + stage.id + '/', priority: '0.6', freq: 'monthly' });
     }
     for (const manual of additions.manuals) urls.push({ loc: '/manual-' + manual.id + '.html', priority: '0.7', freq: 'monthly' });
-    for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages]) urls.push({ loc: page.href, priority: '0.6', freq: 'monthly' });
+    for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages, ...additions.hubs.cheatsheetPages]) urls.push({ loc: page.href, priority: '0.6', freq: 'monthly' });
   }
   const body = urls.map(u =>
     `  <url>\n    <loc>${SITE_ORIGIN}${u.loc.replace(/&/g, '&amp;')}</loc>\n` +
@@ -2317,6 +2329,9 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
     for (const project of additions.projects.projects) out += `- [${project.title}](${SITE_ORIGIN}/project/${project.id}/) — ${project.summary}\n`;
     out += `- [技术手册](${SITE_ORIGIN}/manuals.html)\n`;
     for (const manual of additions.manuals) out += `- [${manual.title}](${SITE_ORIGIN}/manual-${manual.id}.html) — ${manual.summary}\n`;
+    out += '\n## 速查表与学习工具\n';
+    for (const page of additions.hubs.cheatsheetPages) out += `- [${page.href}](${SITE_ORIGIN}${page.href})\n`;
+    out += `- [学习方法](${SITE_ORIGIN}/how-to-learn.html)\n- [Agent 技能](${SITE_ORIGIN}/skills.html)\n- [AI Agent 内部机制](${SITE_ORIGIN}/inside-an-ai-agent.html)\n`;
     out += '\n## 阶段与术语发现\n';
     for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages]) out += `- [${page.href.startsWith('/phase/') ? additions.hubs.phaseModels.find(model => model.href === page.href).name : additions.hubs.termModels.find(model => model.href === page.href).term.term}](${SITE_ORIGIN}${page.href})\n`;
   }
@@ -2494,6 +2509,7 @@ function writeLessonPages(phases, lessonManifest) {
         () => '<!-- AIFS:LESSON-HUBS:START -->' + require('../api/lesson').lessonHubLinks(entry, title, {
           hubRoutes: require('../lib/hub-routes'),
           lessonTerms: JSON.parse(fs.readFileSync(path.join(__dirname, 'lesson-terms.json'), 'utf8')).lessons,
+          cheatsheets: JSON.parse(fs.readFileSync(path.join(__dirname, 'cheatsheet-map.json'), 'utf8')).lessons,
         }) + '<!-- AIFS:LESSON-HUBS:END -->');
     }
     // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz

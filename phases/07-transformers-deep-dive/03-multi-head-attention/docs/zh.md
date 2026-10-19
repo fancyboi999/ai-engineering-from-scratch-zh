@@ -11,7 +11,7 @@
 
 单个 self-attention 头计算一个注意力矩阵。这个矩阵捕捉一种关系——通常是那个最能压低训练损失的关系。如果你的数据里主谓一致、共指、长程语篇、句法分块全缠在一起，单个头会把它们抹进一个 softmax 分布里，丢掉一半信号。
 
-2017 年 Vaswani 论文给出的修法：并行跑几个注意力函数，每个有自己的 Q、K、V 投影，再把输出拼起来。每个头在一个维度为 `d_model / n_heads` 的更小子空间里工作。总参数量不变，表达力上去了。
+2017 年 Vaswani 论文给出的修法：并行跑几个注意力函数，每个有自己的 Q、K、V 投影，再把输出拼起来。每个头在一个维度为 $d_{\text{model}} / n_{\text{heads}}$ 的更小子空间里工作。总参数量不变，表达力上去了。
 
 multi-head attention 是 2026 年每个 transformer 出厂自带的默认配置。唯一还有争论的是头*要多少个*，以及 key 和 value 是否共享投影（Grouped-Query Attention、Multi-Query Attention、Multi-head Latent Attention）。
 
@@ -19,7 +19,7 @@ multi-head attention 是 2026 年每个 transformer 出厂自带的默认配置�
 
 ![Multi-head attention 拆分、注意、拼接](../assets/multi-head-attention.svg)
 
-**拆分。** 取形状 `(N, d_model)` 的 `X`。投影到各自形状 `(N, d_model)` 的 Q、K、V。reshape 成 `(N, n_heads, d_head)`，其中 `d_head = d_model / n_heads`。transpose 成 `(n_heads, N, d_head)`。
+**拆分。** 取形状 `(N, d_model)` 的 `X`。投影到各自形状 `(N, d_model)` 的 Q、K、V。reshape 成 `(N, n_heads, d_head)`，其中 $d_{\text{head}} = d_{\text{model}} / n_{\text{heads}}$。transpose 成 `(n_heads, N, d_head)`。
 
 **并行注意。** 在每个头内部跑缩放点积注意力。每个头产出 `(N, d_head)`。这些头在嵌入的不同子空间上工作，注意力计算本身期间互不通信。
 
@@ -36,7 +36,7 @@ multi-head attention 是 2026 年每个 transformer 出厂自带的默认配置�
 | Grouped-query (GQA) | N | G（如 N/8） | Llama 2 70B、Llama 3+、Qwen 2+、Mistral |
 | Multi-head latent (MLA) | N | 压成低秩 | DeepSeek-V2、V3 |
 
-GQA 是现代默认选择，因为它把 KV-cache 显存砍掉 `N/G` 倍，同时几乎保住全部质量。MLA 走得更远，把 K/V 压进一个潜空间，再在计算时投影回来——花 FLOPs，省更多显存。
+GQA 是现代默认选择，因为它把 KV-cache 显存砍掉 $N/G$ 倍，同时几乎保住全部质量。MLA 走得更远，把 K/V 压进一个潜空间，再在计算时投影回来——花 FLOPs，省更多显存。
 
 ```figure
 multihead-split
@@ -129,7 +129,7 @@ out = scaled_dot_product_attention(q, k, v, is_causal=True, enable_gqa=True)
 | 大（~1B） | 2048 | 16 | 128 |
 | 前沿（~70B） | 8192 | 64 | 128 |
 
-`d_head` 几乎总是落在 64 或 128。它是衡量一个头能"看见"多少的单位。低于 32，头就开始和缩放因子 `sqrt(d_head)` 较劲；高于 256，你就失去了"许多小专家"的好处。
+`d_head` 几乎总是落在 64 或 128。它是衡量一个头能"看见"多少的单位。低于 32，头就开始和缩放因子 $\sqrt{d_{\text{head}}}$ 较劲；高于 256，你就失去了"许多小专家"的好处。
 
 ## 拿去用
 
@@ -145,7 +145,7 @@ out = scaled_dot_product_attention(q, k, v, is_causal=True, enable_gqa=True)
 
 | 术语 | 大家嘴上怎么说 | 实际是什么意思 |
 |------|-----------------|-----------------------|
-| 头（Head） | "一个独立的注意力电路" | 一个维度为 `d_head = d_model / n_heads` 的 Q/K/V 投影，带自己的注意力矩阵。 |
+| 头（Head） | "一个独立的注意力电路" | 一个维度为 $d_{\text{head}} = d_{\text{model}} / n_{\text{heads}}$ 的 Q/K/V 投影，带自己的注意力矩阵。 |
 | d_head | "头维度" | 每个头的隐藏宽度；生产中几乎总是 64 或 128。 |
 | 拆分 / 合并 | "reshape 小把戏" | 在注意力前后做 `(N, d_model) ↔ (n_heads, N, d_head)` 的 reshape+transpose。 |
 | W_o | "输出投影" | 拼接头之后作用的 `(d_model, d_model)` 矩阵；头在这里混合。 |

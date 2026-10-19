@@ -16,7 +16,7 @@
 
 ## 问题背景
 
-N 个 rank 上的朴素 allreduce，会把张量发给一个 root 共 N 次，再广播回来 N 次。每个 rank 的带宽按 O(N) 增长，root 成为瓶颈，墙钟时间下限是最慢那条链路乘以 N。Ring allreduce 把这个过程压平成 2(N-1) 个大小为 T/N 的 chunk，于是每个 rank 的字节数降到 2T(N-1)/N，且与集群规模无关。Tree allreduce 在 N 小、链路高延迟时占优，因为它的深度是 log2(N) 跳，而不是 2(N-1)。给集群形态选错了拓扑，那块最慢的 GPU 就会决定整步的耗时。
+N 个 rank 上的朴素 allreduce，会把张量发给一个 root 共 N 次，再广播回来 N 次。每个 rank 的带宽按 $O(N)$ 增长，root 成为瓶颈，墙钟时间下限是最慢那条链路乘以 N。Ring allreduce 把这个过程压平成 $2(N-1)$ 个大小为 $T/N$ 的 chunk，于是每个 rank 的字节数降到 $2T(N-1)/N$，且与集群规模无关。Tree allreduce 在 N 小、链路高延迟时占优，因为它的深度是 $\log_2(N)$ 跳，而不是 $2(N-1)$。给集群形态选错了拓扑，那块最慢的 GPU 就会决定整步的耗时。
 
 这条线你要读的每一个分布式训练框架，都依赖这四个原语。PyTorch DDP 用每个参数 bucket 一次 allreduce 来同步梯度。ZeRO 用 reduce_scatter 来 shard optimizer state，用 allgather 来广播更新后的参数。FSDP 把整个 forward 拆成 allgather 加 reduce_scatter。Pipeline parallel 需要 broadcast 在 stage group 之间传递激活值。如果你实现不了这四个 collective，你就没法推理为什么训练卡住、为什么梯度不匹配偏偏出在 rank 3、为什么换个拓扑 pipeline bubble 就翻倍。
 

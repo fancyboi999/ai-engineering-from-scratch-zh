@@ -89,7 +89,7 @@ graph LR
 - Jina-Reranker-v2 Multilingual：开源权重，100+ 语言
 - bge-reranker-v2-m3：开源权重，强基线
 - cross-encoder/ms-marco-MiniLM-L-6-v2：开源权重，可在 CPU 上跑做原型
-- ColBERTv2 / Jina-ColBERT-v2：late-interaction 多向量重排器——打分时是 O(tokens) 而非 O(docs)
+- ColBERTv2 / Jina-ColBERT-v2：late-interaction 多向量重排器——打分时是 $O(\text{tokens})$ 而非 $O(\text{docs})$
 
 ### 查询变换
 

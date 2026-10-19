@@ -100,20 +100,20 @@ MTEB（Massive Text Embedding Benchmark）v2 覆盖检索、分类、聚类、�
 
 **余弦相似度**：两个向量夹角的余弦值。范围从 -1（相反）到 1（方向相同）。忽略幅度——一个 10 词的句子和一篇 500 词的文档，只要方向相同就能得 1.0 分。这是 90% 用例的默认选择。
 
-```
-cosine_sim(a, b) = dot(a, b) / (||a|| * ||b||)
+```math
+\mathop{\mathrm{cosine\_sim}}(a, b) = \frac{\mathop{\mathrm{dot}}(a, b)}{\lVert a \rVert \cdot \lVert b \rVert}
 ```
 
 **点积**：两个向量的原始内积。当向量已归一化（单位长度）时，与余弦相似度完全相同。计算更快。OpenAI 的 embedding 是归一化的，所以点积和余弦给出相同的排序。
 
-```
-dot(a, b) = sum(a_i * b_i)
+```math
+\mathop{\mathrm{dot}}(a, b) = \sum_i a_i b_i
 ```
 
 **欧氏（L2）距离**：向量空间里的直线距离。越小 = 越相似。对幅度差异敏感。当空间里的绝对位置重要、而不只是方向重要时使用。
 
-```
-L2(a, b) = sqrt(sum((a_i - b_i)^2))
+```math
+\mathop{\mathrm{L2}}(a, b) = \sqrt{\sum_i (a_i - b_i)^2}
 ```
 
 什么时候用哪个：
@@ -134,7 +134,7 @@ L2(a, b) = sqrt(sum((a_i - b_i)^2))
 2. 上层稀疏——远距离簇之间的长程连接
 3. 下层稠密——邻近向量之间的细粒度连接
 4. 搜索从顶层开始，贪心地往下逐层细化
-5. 以 O(log n) 而非 O(n) 的时间返回近似的 top-k 结果
+5. 以 $O(\log n)$ 而非 $O(n)$ 的时间返回近似的 top-k 结果
 
 HNSW 用一点点准确率损失（通常 95-99% recall）换来巨大的速度提升。1000 万个向量时，暴力搜索要几秒，HNSW 只要几毫秒。
 
@@ -491,7 +491,7 @@ embeddings = model.encode(["semantic search query", "another document"])
 | Embedding | "文本变数字" | 一个稠密向量，几何上的接近编码了语义相似 |
 | Word2Vec | "embedding 鼻祖" | 2013 年的模型，通过预测上下文词来学习词向量；证明了向量算术能编码语义 |
 | 余弦相似度 | "两个向量有多像" | 向量夹角的余弦值；1 = 方向相同，0 = 正交，-1 = 相反 |
-| HNSW | "快速向量搜索" | Hierarchical Navigable Small World 图——多层结构，实现 O(log n) 的近似最近邻搜索 |
+| HNSW | "快速向量搜索" | Hierarchical Navigable Small World 图——多层结构，实现 $O(\log n)$ 的近似最近邻搜索 |
 | Bi-encoder | "分开嵌入，快速比较" | 把查询和文档独立编码成向量；支持预计算和快速检索 |
 | Cross-encoder | "慢但准的重排器" | 把查询-文档对联合过一遍完整模型；准确率更高，无法预计算 |
 | Matryoshka embedding | "可截断的向量" | 训练成前 N 维捕捉最重要信息的 embedding，支持可变大小存储 |

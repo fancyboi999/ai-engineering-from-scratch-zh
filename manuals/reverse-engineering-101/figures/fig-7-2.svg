@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 324" role="img" aria-labelledby="fig-7-2-title fig-7-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-7-2-title">一个证明的两条路径</title>
+  <desc id="fig-7-2-desc">两列自上而下。路径一执行并比较：ledger.c 是原始代码，以本机 -O1 编译；percent_change_wide.c 为候选，重命名 cand_percent_change；driver.c 将两者链接为 differential；输入网格含九类危险情况的 92 格，貌似合理的一对有 28 次不匹配，等价一对为零。路径二重编译并比较：ledger-x86_64-O1.o 的 grade 为 46 字节，含一个 R_X86_64_PC32 重定位；grade_switch.c 以 clang、x86_64-unknown-linux-gnu、-O1 编译；mask_relocations 将双方偏移 38 的四字节清零；.rodata+0x10 与 .rodata-0x4 重定位形状相同；双方 read_table 均得 1、2、3、4、4，grade_case10_wrong 得 1、2、3、4、3。</desc>
+  <defs><marker id="fig-7-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-7-2-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">路径一：执行并比较</text>
+  <text x="340" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">路径二：重编译并比较</text>
+  <rect x="20" y="30" width="280" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="160" y="45.1" font-size="12" text-anchor="middle" font-weight="700">ledger.c</text>
+  <text x="160" y="62.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">原始代码，本机 -O1 编译</text>
+  <line x1="160" y1="70" x2="160" y2="89" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="20" y="90" width="280" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="160" y="105.1" font-size="12" text-anchor="middle" font-weight="700">percent_change_wide.c</text>
+  <text x="160" y="122.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">候选，重命名 cand_percent_change</text>
+  <line x1="160" y1="130" x2="160" y2="149" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="20" y="150" width="280" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="160" y="165.1" font-size="12" text-anchor="middle" font-weight="700">differential</text>
+  <text x="160" y="182.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">driver.c 将两者链接为一个程序</text>
+  <line x1="160" y1="190" x2="160" y2="209" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="20" y="210" width="280" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="160" y="225.1" font-size="12" text-anchor="middle" font-weight="700">输入网格</text>
+  <text x="160" y="242.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">九类危险情况，共 92 格</text>
+  <rect x="340" y="30" width="280" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="480" y="45.1" font-size="12" text-anchor="middle" font-weight="700">ledger-x86_64-O1.o</text>
+  <text x="480" y="62.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">grade：46 字节，一个 R_X86_64_PC32</text>
+  <line x1="480" y1="70" x2="480" y2="89" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="340" y="90" width="280" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="480" y="105.1" font-size="12" text-anchor="middle" font-weight="700">grade_switch.c</text>
+  <text x="480" y="122.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">clang -target x86_64-unknown-linux-gnu -O1</text>
+  <line x1="480" y1="130" x2="480" y2="149" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="340" y="150" width="280" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="480" y="165.1" font-size="12" text-anchor="middle" font-weight="700">mask_relocations</text>
+  <text x="480" y="182.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">双方偏移 38 的四字节清零</text>
+  <line x1="480" y1="190" x2="480" y2="209" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="340" y="210" width="280" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="480" y="225.1" font-size="12" text-anchor="middle" font-weight="700">重定位记录</text>
+  <text x="480" y="242.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">.rodata+0x10 与 .rodata-0x4，形状相同</text>
+  <line x1="160" y1="250" x2="87" y2="269" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-2-head-rose)"/>
+  <line x1="160" y1="250" x2="232" y2="269" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <rect x="20" y="270" width="135" height="40" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="87.5" y="285.1" font-size="12" text-anchor="middle" font-weight="700">貌似合理的一对</text>
+  <text x="87.5" y="302.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">28 次不匹配</text>
+  <rect x="165" y="270" width="135" height="40" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="232.5" y="285.1" font-size="12" text-anchor="middle" font-weight="700">等价的一对</text>
+  <text x="232.5" y="302.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0 次不匹配</text>
+  <line x1="480" y1="250" x2="403" y2="269" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
+  <line x1="480" y1="250" x2="545" y2="269" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-2-head-rose)"/>
+  <rect x="340" y="270" width="126" height="40" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="403" y="285.1" font-size="12" text-anchor="middle" font-weight="700">read_table</text>
+  <text x="403" y="302.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1, 2, 3, 4, 4</text>
+  <rect x="470" y="270" width="150" height="40" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="545" y="284.8" font-size="11" text-anchor="middle" font-weight="700">grade_case10_wrong</text>
+  <text x="545" y="301.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1, 2, 3, 4, 3</text>
+</svg>

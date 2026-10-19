@@ -83,11 +83,13 @@ Marigold（Ke 等人，CVPR 2024）把深度估计重新框定为条件图到图
 
 要把一个带深度 `d` 的像素 `(u, v)` 抬升到相机坐标里的 3D 点 `(X, Y, Z)`：
 
-```
-fx, fy, cx, cy = 相机内参
-X = (u - cx) * d / fx
-Y = (v - cy) * d / fy
-Z = d
+```math
+\begin{aligned}
+f_x, f_y, c_x, c_y &= \text{相机内参} \\
+X &= (u - c_x) \cdot d / f_x \\
+Y &= (v - c_y) \cdot d / f_y \\
+Z &= d
+\end{aligned}
 ```
 
 内参来自 EXIF 元数据、一个标定图案，或一个单目内参估计器（Perspective Fields、UniDepth）。没有内参，你仍能假设一个 60-70° FOV 和中等分辨率主点来渲染点云——能用于可视化，不能用于测量。
@@ -246,7 +248,7 @@ depth_np = np.array(out["depth"])
 | 单目深度 | "单图深度" | 从一张 RGB 帧做深度估计，无立体或 LiDAR |
 | 相对深度 | "有序深度" | 没有真实世界单位的有序 z 值 |
 | 度量深度 | "绝对距离" | 以米计的深度；需要标定或一个用度量监督训练的模型 |
-| AbsRel | "绝对相对误差" | |d_pred - d_gt| / d_gt 的均值；标准深度指标 |
+| AbsRel | "绝对相对误差" | $\lvert d_{\text{pred}} - d_{\text{gt}} \rvert / d_{\text{gt}}$ 的均值；标准深度指标 |
 | Delta 准确率 | "delta < 1.25" | 预测在真值 25% 以内的像素所占比例 |
 | 针孔相机 | "fx, fy, cx, cy" | 用于把 (u, v, d) 抬升到 (X, Y, Z) 的相机模型 |
 | DPT | "Dense Prediction Transformer" | 用在冻结 ViT 编码器之上做深度的基于卷积的解码器 |

@@ -30,8 +30,8 @@
 
 最简单的办法。挑个数字，每一步都用它。
 
-```
-lr(t) = lr_0
+```math
+\text{lr}(t) = \text{lr}_0
 ```
 
 很少最优。它要么对训练末期太高（在极小值附近振荡），要么对训练初期太低（在小步子上浪费算力）。对小模型和调试还行。对任何训练超过一小时的东西都是个糟糕的选择。
@@ -40,11 +40,11 @@ lr(t) = lr_0
 
 ResNet 时代的老派做法。在固定的 epoch 处把学习率砍一个倍数（通常 10 倍）。
 
-```
-lr(t) = lr_0 * gamma^(floor(epoch / step_size))
+```math
+\text{lr}(t) = \text{lr}_0 \cdot \gamma^{\lfloor \text{epoch} / \text{step\_size} \rfloor}
 ```
 
-其中 gamma = 0.1、step_size = 30 意味着：lr 每 30 个 epoch 降 10 倍。ResNet-50 用的就是这个——lr=0.1，在第 30、60、90 个 epoch 各降 10 倍。
+其中 $\gamma = 0.1$、step_size = 30 意味着：lr 每 30 个 epoch 降 10 倍。ResNet-50 用的就是这个——lr=0.1，在第 30、60、90 个 epoch 各降 10 倍。
 
 问题是：最优的衰减点取决于数据集和架构。换个问题，你就得重新调什么时候降。这些转变是突兀的——速率突然变化时，损失可能会尖峰。
 
@@ -52,24 +52,24 @@ lr(t) = lr_0 * gamma^(floor(epoch / step_size))
 
 从最大学习率到最小学习率的平滑衰减，沿着一条余弦曲线：
 
+```math
+\text{lr}(t) = \text{lr} _{\min} + 0.5 \cdot (\text{lr} _{\max} - \text{lr} _{\min}) \cdot \left(1 + \cos\left(\frac{\pi t}{T}\right)\right)
 ```
-lr(t) = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(pi * t / T))
-```
 
-其中 t 是当前步、T 是总步数。
+其中 $t$ 是当前步、$T$ 是总步数。
 
-t=0 时，余弦项是 1，所以 lr = lr_max。t=T 时，余弦项是 -1，所以 lr = lr_min。衰减先温和、中间加速、接近末尾又变温和。
+$t=0$ 时，余弦项是 1，所以 $\text{lr} = \text{lr} _{\max}$。$t=T$ 时，余弦项是 -1，所以 $\text{lr} = \text{lr} _{\min}$。衰减先温和、中间加速、接近末尾又变温和。
 
-这是大多数现代训练的默认选项。除了 lr_max 和 lr_min 没有别的超参数要调。余弦的形状契合一个经验观察：大部分学习发生在训练中段——你想在那段关键时期保持合理的步长。
+这是大多数现代训练的默认选项。除了 $\text{lr} _{\max}$ 和 $\text{lr} _{\min}$ 没有别的超参数要调。余弦的形状契合一个经验观察：大部分学习发生在训练中段——你想在那段关键时期保持合理的步长。
 
 ### Warmup：为什么从小起步
 
 Adam 和其他自适应优化器维护着梯度均值和方差的滑动估计。在第 0 步，这些估计被初始化为零。最初几次梯度更新基于的是垃圾统计量。如果你的学习率在这段期间很大，模型就会走出巨大、方向很差的步子。
 
-Warmup 修复了这个。从一个极小的学习率起步（常常是 lr_max / warmup_steps 甚至零），在前 N 步里线性爬升到 lr_max。等你到达完整学习率时，Adam 的统计量已经稳定了。
+Warmup 修复了这个。从一个极小的学习率起步（常常是 $\text{lr} _{\max}$ / warmup_steps 甚至零），在前 $N$ 步里线性爬升到 $\text{lr} _{\max}$。等你到达完整学习率时，Adam 的统计量已经稳定了。
 
-```
-lr(t) = lr_max * (t / warmup_steps)     for t < warmup_steps
+```math
+\text{lr}(t) = \text{lr} _{\max} \cdot \frac{t}{\text{warmup\_steps}} \quad \text{对于 } t < \text{warmup\_steps}
 ```
 
 典型 warmup：总训练步数的 1-5%。Llama 3 训练了约 1.8 万亿 token，warmup 了 2000 步。GPT-3 在 3.75 亿 token 上 warmup。
@@ -398,13 +398,13 @@ scheduler = get_cosine_schedule_with_warmup(
 
 ## 练习
 
-1. 实现指数衰减：lr(t) = lr_0 * gamma^t，gamma = 0.999。在圆形数据集上和余弦退火对比。
+1. 实现指数衰减：$\text{lr}(t) = \text{lr}_0 \cdot \gamma^t$，$\gamma = 0.999$。在圆形数据集上和余弦退火对比。
 
 2. 实现学习率范围测试（Leslie Smith）：训练几百步，同时把 LR 从 1e-7 指数级增到 1。画损失对 LR 的图。最优的 max LR 就在损失开始上升之前。
 
 3. 用 warmup + 余弦训练，但改 warmup 长度：总步数的 0%、1%、5%、10%、20%。找出训练最稳定的那个最佳点。
 
-4. 实现带热重启的余弦退火（SGDR）：每 T 步把学习率重置到 lr_max 再衰减一次。在更长的训练里和标准余弦对比。
+4. 实现带热重启的余弦退火（SGDR）：每 $T$ 步把学习率重置到 $\text{lr} _{\max}$ 再衰减一次。在更长的训练里和标准余弦对比。
 
 5. 做一个"调度外科医生"，监控训练损失，在损失稳定时自动从 warmup 切到余弦，并在损失停滞太久时降 lr。
 
@@ -414,12 +414,12 @@ scheduler = get_cosine_schedule_with_warmup(
 |------|----------------|----------------------|
 | 学习率（Learning rate） | "模型学得多快" | 乘在梯度上、决定参数更新幅度的标量 |
 | 调度（Schedule） | "随时间改 LR" | 一个把训练步映射到学习率的函数，设计来优化收敛 |
-| Warmup | "从小 LR 起步" | 在前 N 步里把 LR 从接近零线性爬到目标值，稳定优化器统计量 |
-| 余弦退火（Cosine annealing） | "平滑的 LR 衰减" | 训练中沿着余弦曲线把 LR 从 lr_max 降到 lr_min |
+| Warmup | "从小 LR 起步" | 在前 $N$ 步里把 LR 从接近零线性爬到目标值，稳定优化器统计量 |
+| 余弦退火（Cosine annealing） | "平滑的 LR 衰减" | 训练中沿着余弦曲线把 LR 从 $\text{lr} _{\max}$ 降到 $\text{lr} _{\min}$ |
 | 阶梯衰减（Step decay） | "在里程碑处降 LR" | 在固定的 epoch 间隔把 LR 乘上一个倍数（通常 0.1） |
 | 1cycle 策略 | "先上后下" | Leslie Smith 的方法，在单个周期里把 LR 先爬升后下降以更快收敛 |
 | LR 范围测试 | "找最佳学习率" | 短暂训练同时增大 LR，找出损失开始发散的那个值 |
-| 带热重启的余弦（Cosine with warm restarts） | "重置再重复" | 周期性地把 LR 重置到 lr_max 再衰减一次（SGDR） |
+| 带热重启的余弦（Cosine with warm restarts） | "重置再重复" | 周期性地把 LR 重置到 $\text{lr} _{\max}$ 再衰减一次（SGDR） |
 | Eta min | "LR 的下限" | 调度衰减到的最小学习率 |
 | 峰值学习率（Peak learning rate） | "最大 LR" | 训练中达到的最高 LR，通常在 warmup 之后 |
 

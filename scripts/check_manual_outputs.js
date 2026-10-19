@@ -5,22 +5,26 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const vm = require('node:vm');
 const builder = require('../site/build-manuals.js');
 
-// 计数来自 2026-10-12 冻结快照，不查询实时上游。
+// 原两本保留 2026-10-12 冻结计数；新增手册按本次同步的固定源检验。
 const EXPECTED = {
   'a2a-101': { sections: 28, references: 7, figures: 31 },
   'docker-sandboxes-101': { sections: 33, references: 8, figures: 34 },
+  'reverse-engineering-101': { sections: 26, references: 6, figures: 37 },
+  'sglang-101': { sections: 28, references: 6, figures: 63 },
 };
 
 function checkManualOutputs(root) {
   const manuals = builder.loadAll({ root });
-  assert.deepEqual(manuals.map(manual => manual.id).sort(), Object.keys(EXPECTED).sort(), 'both frozen manuals must be present');
+  assert.deepEqual(manuals.map(manual => manual.id).sort(), Object.keys(EXPECTED).sort(), 'the frozen pair and both new manual sources must be present');
   const out = fs.mkdtempSync(path.join(os.tmpdir(), 'manual-output-check-'));
   try {
-    assert.equal(builder.writeWeb(manuals, out), 2, 'both manuals must be listed');
+    assert.equal(builder.writeWeb(manuals, out), 3, 'only the three ready manuals must be listed');
     for (const manual of manuals) {
       const expected = EXPECTED[manual.id];
+      assert.equal(manual.status, manual.id === 'sglang-101' ? 'draft' : 'ready', `${manual.id} status`);
       const sections = manual.parts.reduce((sum, part) => sum + part.sections.length, 0);
       assert.equal(sections, expected.sections, `${manual.id} sections`);
       assert.equal(manual.reference.sections.length, expected.references, `${manual.id} references`);
@@ -31,6 +35,8 @@ function checkManualOutputs(root) {
         assert.match(html, /<html lang="zh-CN"/);
         assert.match(html, new RegExp(`https://aieng-zh\\.cn/manual-${manual.id}\\.html`));
         assert.doesNotMatch(html, /aiengineeringfromscratch\.com|github\.com\/rohitg00|sponsors\.html/);
+        assert.equal(/<meta name="robots" content="noindex">/.test(html), mode === 'print' || manual.status === 'draft', `${manual.id} ${mode} indexing status`);
+
         assert.equal((html.match(/class="m-section"/g) || []).length, expected.sections + expected.references, `${manual.id} ${mode} rendered sections`);
         assert.equal((html.match(/class="m-fig" id=/g) || []).length, expected.figures, `${manual.id} ${mode} rendered figures`);
         const anchors = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]));
@@ -38,6 +44,13 @@ function checkManualOutputs(root) {
         for (const doc of manual.documents) {
           for (const block of doc.blocks.filter(block => block.type === 'listing')) {
             assert.ok(html.includes(`data-source="${block.source}"`), `${manual.id} listing source ${block.source}`);
+          }
+          // 文内外部来源链接也属于内容；新增手册不能靠删除引用通过域名保护检查。
+          for (const block of doc.blocks.filter(block => typeof block.text === 'string')) {
+            for (const [, url] of block.text.matchAll(/\[[^\]]+\]\((https?:\/\/[^)]+)\)/g)) {
+              const escaped = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+              assert.ok(html.includes(`href="${escaped}"`), `${manual.id} ${mode} source link ${url}`);
+            }
           }
         }
       }
@@ -49,6 +62,13 @@ function checkManualOutputs(root) {
     const data = fs.readFileSync(path.join(out, 'manuals-data.js'), 'utf8');
     assert.doesNotMatch(data, /"pdf"/);
     assert.match(data, /"print"/);
+    const listed = vm.runInNewContext(data + '\nwindow.AIFS_MANUALS', { window: {} });
+    assert.deepEqual(Array.from(listed, manual => manual.id).sort(), ['a2a-101', 'docker-sandboxes-101', 'reverse-engineering-101']);
+    const index = fs.readFileSync(path.join(out, 'manuals.html'), 'utf8');
+    for (const manual of manuals) {
+      assert.equal(index.includes(`href="manual-${manual.id}.html"`), manual.status === 'ready', `${manual.id} index listing`);
+    }
+
     return manuals.length;
   } finally {
     fs.rmSync(out, { recursive: true, force: true });

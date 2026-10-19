@@ -153,7 +153,7 @@ source: spec §3.1
 
 ## 图表
 
-### 九种类型
+### 十种类型
 
 | Kind | 用途 |
 |---|---|
@@ -166,8 +166,9 @@ source: spec §3.1
 | `state` | 状态机及转换 |
 | `decision` | 失败位置与各结果的含义 |
 | `layers` | 分层及每层拥有的部分 |
+| `chart` | 在坐标轴上绘制实测数据：参数扫描、分布及重复运行的波动 |
 
-[_shared/templates](_shared/templates) 使用图表套件提供每种类型的示例。
+[_shared/templates](_shared/templates) 使用图表套件提供每种类型的示例。`chart` 在图表套件上使用 [_shared/chart.js](_shared/chart.js)，从捕获工具写出的汇总文件读取数值，让图表与原始数据保持一致。
 
 ### 颜色
 
