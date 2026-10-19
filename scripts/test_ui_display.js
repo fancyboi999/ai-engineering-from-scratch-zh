@@ -134,6 +134,7 @@ async function main() {
     const priorities = ['课程目录', '课程表', '学习路径'];
     const contexts = [
       ['index.html#contents', null, false], ['prereqs.html', '路线图', true],
+      ['roadmap', '路线图', true], ['path', '路线图', true],
       ['catalog.html', '课程表', false], ['glossary.html', '术语表', true],
       ['projects.html', '实战项目', true], ['manuals.html', '技术手册', true],
       ['manual-reverse-engineering-101.html', '技术手册', true],

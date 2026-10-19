@@ -216,6 +216,7 @@
     }
 
     var target = current;
+    if (current === 'roadmap.html' || current === 'path.html') target = 'prereqs.html';
     if (current === 'project.html' || /^\/project\//.test(pathname)) target = 'projects.html';
     if (/^manual-/.test(current)) target = 'manuals.html';
     if (/^\/(?:hubs\/)?glossary\//.test(pathname)) target = 'glossary.html';
