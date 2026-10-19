@@ -462,7 +462,7 @@ function writeMarkdown(file, { name, description, version }) {
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260831a';
   const appRelease = '20261019a';
-  const styleRelease = '20261019a';
+  const styleRelease = '20261019b';
   const navigationRelease = '20261019a';
   const narrationRelease = '20260831a';
   const roadmapRelease = '20261019a';
@@ -1592,9 +1592,9 @@ test('shared header progressively compacts without hiding GitHub stars or search
   assert.match(headerSource, /open && !header\.contains\(event\.target\)[\s\S]*?setOpen\(false, false\)/);
   assert.match(headerSource, /event\.key === 'Escape'[\s\S]*?setOpen\(false, true\)/);
 
-  assert.match(styles, /\.header-inner\s*\{[\s\S]*?width: 100%;[\s\S]*?max-width: 1360px;[\s\S]*?min-width: 0;/);
+  assert.match(styles, /\.header-inner\s*\{[\s\S]*?width: 100%;[\s\S]*?max-width: 1480px;[\s\S]*?min-width: 0;/);
   assert.match(styles, /\.header-nav,\s*\n\.header-priority-nav\s*\{[\s\S]*?white-space: nowrap;/);
-  assert.match(styles, /@media \(max-width: 1480px\) and \(min-width: 1401px\)/);
+  assert.match(styles, /@media \(max-width: 1560px\) and \(min-width: 1401px\)/);
   assert.match(styles, /@media \(max-width: 1400px\) \{[\s\S]*?\.header-priority-nav\s*\{[\s\S]*?\.header-inner > \.header-github[\s\S]*?\.header-inner > \.search-toggle[\s\S]*?\.header-nav\s*\{[\s\S]*?width: min\(360px, calc\(100vw - 32px\)\);[\s\S]*?overflow-y: auto;/);
   assert.match(styles, /@media \(max-width: 820px\) \{[\s\S]*?\.header-priority-nav\s*\{\s*display: none;[\s\S]*?\.header-inner > \.header-github[\s\S]*?\.header-inner > \.search-toggle/);
   assert.match(styles, /@media \(max-width: 480px\) \{[\s\S]*?\.header-inner > \.header-github svg\s*\{\s*display: none;[\s\S]*?\.header-inner > \.header-github::before/);

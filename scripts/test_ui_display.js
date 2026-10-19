@@ -94,6 +94,41 @@ async function main() {
         assert.deepEqual(row.stats, ['0', '0', '0 / 0', '暂无阶段']);
       }
     }
+    // Real shared header and generated glossary index, with external fonts blocked.
+    for (const width of [1920, 1600, 1561, 1560, 1481, 1401, 1400, 820, 390, 320]) {
+      await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/glossary.html` });
+      let loaded = false;
+      for (let attempt = 0; attempt < 100; attempt++) {
+        loaded = await evaluate("!!document.querySelector('.header-nav[aria-label=\"主导航\"]') && !!document.querySelector('.glossary-index-groups a')");
+        if (loaded) break;
+        await delay(50);
+      }
+      assert.ok(loaded, 'actual glossary/header did not initialize');
+      await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+      const row = await evaluate(`(function(){
+        const inner=document.querySelector('.header-inner'),logo=inner.querySelector('.logo');
+        const range=document.createRange();range.selectNodeContents(logo);
+        const boxes=[...inner.children].filter(e=>getComputedStyle(e).display!=='none'&&getComputedStyle(e).position!=='absolute').map(e=>({name:e.className,...e.getBoundingClientRect().toJSON()})).sort((a,b)=>a.left-b.left);
+        const groups=document.querySelector('.glossary-index-groups');
+        const group=groups.firstElementChild,heading=group.querySelector('h3'),link=group.querySelector('a');
+        return {width:innerWidth,client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+          boxes,labelRight:range.getBoundingClientRect().right,logoRight:logo.getBoundingClientRect().right,
+          columns:getComputedStyle(groups).gridTemplateColumns.split(' ').length,
+          headingGap:link.getBoundingClientRect().top-heading.getBoundingClientRect().bottom,
+          listStyle:getComputedStyle(group.querySelector('ul')).listStyleType};
+      })()`);
+      for (let index = 1; index < row.boxes.length; index++) {
+        assert.ok(row.boxes[index].left >= row.boxes[index-1].right-1, JSON.stringify(row));
+      }
+      assert.ok(row.boxes.at(-1).right <= row.client+1, JSON.stringify(row));
+      assert.ok(row.scroll <= row.client+1, JSON.stringify(row));
+      if (width > 1400) assert.ok(row.labelRight <= row.logoRight+1, JSON.stringify(row));
+      assert.equal(row.columns, width <= 600 ? 1 : width <= 1000 ? 2 : 3);
+      assert.ok(row.headingGap >= 12, JSON.stringify(row));
+      assert.equal(row.listStyle, 'none');
+      console.log('header/glossary layout:', JSON.stringify({width,columns:row.columns,headingGap:row.headingGap,overlap:false}));
+    }
   } finally {
     clearTimeout(watchdog); if (socket) socket.close(); server.closeAllConnections(); server.close();
     if (browser && browser.pid && browser.exitCode === null) { const stopped = new Promise(resolve => browser.once('exit', resolve)); browser.kill(); await stopped; }
