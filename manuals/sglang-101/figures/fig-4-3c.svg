@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-4-3c-title fig-4-3c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-3c-title">24 GB 卡的 BF16 池满后，吞吐量不再上升</title>
   <desc id="fig-4-3c-desc">NVIDIA L4 上 Qwen3-8B 的输出吞吐量对并发 1 至 64，每点三个种子，带状区域为最小至最大运行值。BF16 曲线在并发 32 升至 270 token/s，64 时降至 251；FP8 持续上升，64 时达 736。</desc>
-  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="230.5" x2="606" y2="230.5" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="230.5" x2="606" y2="230.5" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="234.5" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="66" y1="175" x2="606" y2="175" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="175" x2="606" y2="175" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="179" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">400</text>
-  <line x1="66" y1="119.5" x2="606" y2="119.5" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="119.5" x2="606" y2="119.5" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="123.5" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">600</text>
-  <line x1="66" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="68" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">800</text>
   <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="64" x2="66" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

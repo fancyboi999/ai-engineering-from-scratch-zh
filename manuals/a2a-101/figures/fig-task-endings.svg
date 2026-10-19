@@ -2,7 +2,7 @@
   <title id="fig-task-endings-title">任务结束的四种方式</title>
   <desc id="fig-task-endings-desc">四张卡片，分别对应套件的终态。Completed：test-runner 任务 3d8f7801，agent 因测试已运行而选择，状态消息 1 failed, 11 passed，产物 test-log.txt、summary.json。Failed：任务 8ae21dcb，agent 因提交 deadbee 不存在而选择，无产物。Canceled：任务 f22ed7af，客户端通过 CancelTask 选择，保留两个日志分块。Rejected：deployer 任务 23cf3710，策略拒绝，无产物。下方，向已取消任务发消息得到 UnsupportedOperationError，再次取消得到 TaskNotCancelableError。</desc>
   <defs><marker id="fig-task-endings-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="16" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">套件中的四种终态</text>
+  <text x="20" y="16" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">套件中的四种终态</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <rect x="20" y="28" width="290" height="42" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="23" y="31" width="284" height="36" fill="none" stroke="var(--m-amber-ink, #85590c)"/>
@@ -50,8 +50,8 @@
   <text x="334" y="358" font-size="11.5" fill="var(--m-green-ink, #336b40)">产物：无</text>
   </g>
   <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
-  <line x1="20" y1="384" x2="620" y2="384" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="20" y="400" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">结束之后</text>
+  <line x1="20" y1="384" x2="620" y2="384" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="400" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">结束之后</text>
   <text x="140" y="400" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">调用已取消任务 f22ed7af，来自 10-cancel.http</text>
   <rect x="20" y="410" width="250" height="30" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="145" y="428.45" font-size="11.5" text-anchor="middle" font-weight="700">SendMessage, taskId f22ed7af</text>

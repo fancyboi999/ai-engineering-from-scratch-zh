@@ -2,8 +2,8 @@
   <title id="fig-card-signature-title">签署与验证 deployer 卡片</title>
   <desc id="fig-card-signature-desc">上半部分分三步签名：deployer 卡片排除 signatures，用 RFC 8785 规范化为 959 字节负载。受保护头 {&quot;alg&quot;:&quot;HS256&quot;,&quot;typ&quot;:&quot;JOSE&quot;,&quot;kid&quot;:&quot;deployer-key-1&quot;} 与负载分别 base64url 编码，用句点连接为 1,348 字符的签名输入。HMAC-SHA256 签名得到 signatures[0]，protected 为 eyJhbGci，signature 为 yPk834ji。下半部分分四步验证：发布卡片重建相同负载，签名匹配，返回 True。将 description 改为原始字面量 &quot;Deploys a tagged build to production.&quot; 的副本重建不同负载，返回 False。</desc>
   <defs><marker id="fig-card-signature-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-card-signature-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">签名</text>
-  <text x="20" y="300" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">验证</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">签名</text>
+  <text x="20" y="300" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">验证</text>
   <rect x="20" y="30" width="170" height="58" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="105" y="46.6" font-size="12" text-anchor="middle" font-weight="700">deployer 卡片</text>
   <text x="105" y="63.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">11 个成员，</text>

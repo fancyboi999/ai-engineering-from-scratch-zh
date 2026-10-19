@@ -1,19 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-6-2c-title fig-6-2c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-6-2c-title">MoE 模型每输出 token 时间随批次增长</title>
   <desc id="fig-6-2c-desc">GB10 上 Qwen3-30B-A3B 的每输出 token 时间中位数。BF16 从并发 1 的 32.5 ms 增至 64 的 254，约八倍；FP8 从 18.4 增到 132。新增请求将 token 路由到其他专家，因此每个 decode 步读取更多专家权重。</desc>
-  <line x1="66" y1="276" x2="606" y2="276" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="276" x2="606" y2="276" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="280" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="239.33" x2="606" y2="239.33" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="239.33" x2="606" y2="239.33" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="243.33" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">50</text>
-  <line x1="66" y1="202.67" x2="606" y2="202.67" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="202.67" x2="606" y2="202.67" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="206.67" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="66" y1="166" x2="606" y2="166" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="166" x2="606" y2="166" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="170" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">150</text>
-  <line x1="66" y1="129.33" x2="606" y2="129.33" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="129.33" x2="606" y2="129.33" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="133.33" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="66" y1="92.67" x2="606" y2="92.67" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="92.67" x2="606" y2="92.67" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="96.67" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">250</text>
-  <line x1="66" y1="56" x2="606" y2="56" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="56" x2="606" y2="56" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="60" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
   <line x1="66" y1="276" x2="606" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="56" x2="66" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

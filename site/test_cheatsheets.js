@@ -231,3 +231,43 @@ test('Chinese default descriptions still require their numeric facts in the sour
   const thin = fixtureRoot('Run serve --port 8080 --enable-metrics. GET /health.');
   assert.match(sheets.checkTopic(topic, thin).join('\n'), /"30000" is not in its from files/);
 });
+
+test('architecture connectors avoid unrelated nodes in both poster orientations', () => {
+  // Segment/rectangle clipping is independent of the renderer's node layout.
+  // Insets ignore sub-pixel rounding at a box border, not interior crossings.
+  function crosses(start, end, box) {
+    let enter = 0, leave = 1;
+    for (const [position, delta, low, high] of [
+      [start[0], end[0] - start[0], box.x + 0.5, box.x + box.width - 0.5],
+      [start[1], end[1] - start[1], box.y + 0.5, box.y + box.height - 0.5],
+    ]) {
+      if (delta === 0) { if (position < low || position > high) return false; }
+      else {
+        const bounds = [(low - position) / delta, (high - position) / delta].sort((a, b) => a - b);
+        enter = Math.max(enter, bounds[0]);
+        leave = Math.min(leave, bounds[1]);
+        if (enter > leave) return false;
+      }
+    }
+    return leave > 0 && enter < 1;
+  }
+  let checked = 0;
+  for (const topic of sheets.loadTopics(root)) for (const block of topic.blocks.filter(block => block.type === 'architecture')) {
+    for (const narrow of [false, true]) {
+      const svg = sheets.architectureSvg(block, narrow);
+      const nodes = [...svg.matchAll(/<rect class="cs-arch-node" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)]
+        .map((match, i) => ({ id: block.nodes[i].id, x: +match[1], y: +match[2], width: +match[3], height: +match[4] }));
+      const edges = [...svg.matchAll(/<line class="cs-arch-edge" x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"/g)];
+      assert.equal(nodes.length, block.nodes.length);
+      assert.equal(edges.length, block.edges.length);
+      for (const [index, line] of edges.entries()) for (const node of nodes) {
+        const edge = block.edges[index];
+        if (node.id === edge.from || node.id === edge.to) continue;
+        assert.equal(crosses([+line[1], +line[2]], [+line[3], +line[4]], node), false,
+          `${topic.id} ${narrow ? 'narrow' : 'wide'}: ${edge.from} -> ${edge.to} crosses ${node.id}`);
+      }
+      checked++;
+    }
+  }
+  assert.ok(checked >= 50, 'expected both orientations of all architecture diagrams');
+});

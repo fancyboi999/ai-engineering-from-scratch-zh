@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 276" role="img" aria-labelledby="fig-4-7-title fig-4-7-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-7-title">按加载命令分类的 ledger-arm64-O1 共 39 个字符串</title>
   <desc id="fig-4-7-desc">六行按地址排序。头部两个加载命令字符串为 dyld 和 libSystem 路径。__TEXT,__cstring 从 0x100000770 起有十个字符串，包括标签、格式串和一个空填充。Chained fixups 从 0x100008069 起有六个导入名；exports trie 从 0x1000080b2 起有七个边标签；LC_SYMTAB 字符串表从 0x10000821a 起有十三个名称；0x10000831c 有一个代码签名标识 ledger-arm64-O1。总计 39，等于 overview 的 string_count。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">位置</text>
-  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">地址</text>
-  <text x="450" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">数量</text>
-  <text x="500" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">示例</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">位置</text>
+  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">地址</text>
+  <text x="450" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">数量</text>
+  <text x="500" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">示例</text>
   <rect x="20" y="28" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="28" y="49" font-size="11" font-weight="700">头部加载命令</text>
   <text x="250" y="49" font-size="11">0x100000404, 0x100000490</text>

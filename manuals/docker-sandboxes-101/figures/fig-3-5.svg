@@ -2,9 +2,9 @@
   <title id="fig-3-5-title">api.github.com 的主机允许与 kit HTTP 规则</title>
   <desc id="fig-3-5-desc">两列。左为 balanced 的 default-code-and-containers，允许 github.com:443及子域；携带数据正文的 POST api.github.com /repos/o/r/issues 被允许，因为主机规则只读主机/端口。右为 network-policy@2，对hosts api.github.com、methods DELETE拒绝，阻止DELETE /repos/o/r，原POST仍通过；拒绝只在方法匹配时优先。</desc>
   <defs><marker id="fig-3-5-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-3-5-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-3-5-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · 主机允许，BALANCED 预设</text>
-  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · KIT HTTP 规则，NETWORK-POLICY@2</text>
-  <line x1="320" y1="8" x2="320" y2="292" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · 主机允许，BALANCED 预设</text>
+  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · KIT HTTP 规则，NETWORK-POLICY@2</text>
+  <line x1="320" y1="8" x2="320" y2="292" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <rect x="20" y="30" width="284" height="60" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="162" y="47.75" font-size="12.5" text-anchor="middle" font-weight="700">default-code-and-containers</text>
   <text x="162" y="65.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">github.com:443 · **.github.com:443</text>

@@ -15,11 +15,11 @@ from: phases/03-deep-learning-core/06-optimizers/docs/zh.md
 node | loss | 1,1 | 损失 | 前向传播输出
 node | bwd | 2,1 | loss.backward() | 链式法则填充梯度
 node | clip | 3,1 | clip_grad_norm_ | max_norm=1.0
-node | m | 1,2 | 一阶矩 m_t | 均值，beta1 0.9
-node | v | 2,2 | 二阶矩 v_t | 方差，beta2 0.999
-node | hat | 3,2 | 偏差修正 | 除以 1 - beta^t
+node | m | 2,2 | 一阶矩 m_t | 均值，beta1 0.9
+node | v | 3,2 | 二阶矩 v_t | 方差，beta2 0.999
+node | hat | 3,3 | 偏差修正 | 除以 1 - beta^t
 node | upd | 2,3 | Adam 更新 | lr · m̂ / (√v̂ + ε)
-node | wd | 3,3 | 解耦衰减 | 减去 lr · λ · w
+node | wd | 1,3 | 解耦衰减 | 减去 lr · λ · w
 edge | loss | bwd |
 edge | bwd | clip |
 edge | clip | m |

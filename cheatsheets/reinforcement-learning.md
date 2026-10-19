@@ -15,10 +15,10 @@ from: phases/09-reinforcement-learning/08-ppo/docs/zh.md, phases/09-reinforcemen
 node | envs | 1,1 | N 个并行环境 | 各执行 T 步
 node | actor | 2,1 | Actor | softmax 策略
 node | buf | 1,2 | 轨迹缓冲区 | s, a, r, log_pi_old
-node | critic | 2,2 | Critic | 每状态的 v_old
-node | gae | 1,3 | GAE | 优势、回报
-node | clip | 2,3 | 裁剪替代目标 | K 个 epoch，小批量
-node | diag | 1,4 | 诊断 | 平均 KL、裁剪比例
+node | critic | 1,3 | Critic | 每状态的 v_old
+node | gae | 3,2 | GAE | 优势、回报
+node | clip | 3,1 | 裁剪替代目标 | K 个 epoch，小批量
+node | diag | 4,1 | 诊断 | 平均 KL、裁剪比例
 edge | actor | envs | 动作
 edge | envs | buf | 转移
 edge | critic | buf | 价值

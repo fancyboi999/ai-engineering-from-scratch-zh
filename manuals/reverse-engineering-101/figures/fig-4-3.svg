@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="fig-4-3-title fig-4-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-3-title">ledger-arm64-O1 的十三个过程</title>
   <desc id="fig-4-3-desc">按地址排序的十三行。libSystem 提供 EXTERNAL:0x1 至 0x4 四个外部函数。__text 内有五个内部函数：0x100000500 的 _percent_change，24 字节；0x100000518 的 _grade，60 字节；0x100000554 的 _total，52 字节；0x100000588 的 _grade_label，72 字节；0x1000005d0 的 entry，368 字节。__stubs 从 0x100000740 起有四个各 12 字节的 thunk，各解析到一个外部函数。内部函数体共 576 字节，等于 __text 大小。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">地址</text>
-  <text x="150" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">名称</text>
-  <text x="330" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">函数体</text>
-  <text x="410" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">分类</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">地址</text>
+  <text x="150" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">名称</text>
+  <text x="330" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">函数体</text>
+  <text x="410" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">分类</text>
   <rect x="20" y="28" width="600" height="26" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-panel-edge, #e4e1d4)"/>
   <text x="28" y="45" font-size="11">EXTERNAL:0x1</text>
   <text x="150" y="45" font-size="11" font-weight="700">___stack_chk_fail</text>

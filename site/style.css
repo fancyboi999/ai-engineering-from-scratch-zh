@@ -9,7 +9,7 @@
   --bg-surface-hover: #ece9dc;
   --ink: #1a1a1a;
   --ink-soft: #4a4a4a;
-  --ink-mute: #7a7a78;
+  --ink-mute: #666660;
   --rule: #1a1a1a;
   --rule-soft: rgba(26, 26, 26, 0.16);
   --paper-rule: rgba(26, 26, 26, 0.08);
@@ -59,7 +59,7 @@
   --bg-surface-hover: #1b2244;
   --ink: #e8e6dc;
   --ink-soft: #a8a6a0;
-  --ink-mute: #7a7878;
+  --ink-mute: #96948e;
   --rule: #e8e6dc;
   --rule-soft: rgba(232, 230, 220, 0.18);
   --paper-rule: rgba(232, 230, 220, 0.08);
@@ -2516,3 +2516,19 @@ body[data-palette-open] {
 
 /* Keep the centered shell in place across short and scrollable pages. */
 html { scrollbar-gutter: stable; }
+
+/* Shared document rhythm for help, policy and developer pages. */
+.trust-page h1 { margin-block-end: 20px; }
+.trust-page h2 { margin-block-end: 12px; }
+.trust-page p + p { margin-block-start: 16px; }
+.trust-page ul,
+.trust-page ol { padding-inline-start: 1.4em; margin-block: 12px 20px; }
+.trust-page li + li { margin-block-start: 6px; }
+.trust-page pre { margin-block: 16px; }
+.trust-page .about-eyebrow {
+  margin-block-end: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  color: var(--blueprint);
+}

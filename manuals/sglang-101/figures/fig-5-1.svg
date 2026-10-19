@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 236" role="img" aria-labelledby="fig-5-1-title fig-5-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-1-title">并发上限 8 后吞吐量停止增长，延迟继续增加</title>
   <desc id="fig-5-1-desc">基准扫描的两个条形图。左侧并发上限 1、8、32 的输出吞吐量为 175.15、255.63、252.74 token/s；右侧同样上限的 TTFT 中位数为 162.98、785.79、3917.54 ms。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">输出 TOK/S</text>
-  <text x="340" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">TTFT 中位数，MS</text>
-  <line x1="320" y1="8" x2="320" y2="228" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">输出 TOK/S</text>
+  <text x="340" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">TTFT 中位数，MS</text>
+  <line x1="320" y1="8" x2="320" y2="228" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <text x="20" y="56" font-size="11.5">上限 1</text>
   <rect x="80" y="40" width="105.09" height="22" fill="var(--m-olive-ink, #515f26)"/>
   <text x="191.09" y="56" font-size="11.5">175.15</text>

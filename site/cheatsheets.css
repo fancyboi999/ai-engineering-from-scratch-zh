@@ -751,7 +751,7 @@
 
 .cs-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 12px;
   margin: 0;
   padding: 0;
@@ -839,7 +839,16 @@
   }
 }
 
+/* API identifiers must not impose a minimum column width on screen cards. */
+@media screen {
+  .cs-table th,
+  .cs-table td,
+  .cs-page .cs-table .cs-cmd { overflow-wrap: anywhere; }
+}
+
 @media screen and (max-width: 680px) {
+  /* Keep long API names and defaults inside their columns on narrow screens. */
+  .cs-table { table-layout: fixed; }
   .cs-page {
     padding: 84px 12px 40px;
     font-size: 14px;

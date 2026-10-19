@@ -2,58 +2,58 @@
   <title id="fig-context-and-tasks-title">一个上下文，两个任务</title>
   <desc id="fig-context-and-tasks-desc">树图根为上下文 49c5a238。第一个子节点是已完成审查任务 e5c95b09，历史包含两次 SendMessage 的四条消息：planner 的 diff 请求、agent 问题、带 taskId 和 contextId 的 planner 回答 main、agent 回复，之后是产物 review.json。第二个子节点为同上下文的后续任务，采集未到此处，因此用虚线绘制。其首条消息携带 contextId 49c5a238、referenceTaskIds 引用 e5c95b09，不带 taskId。</desc>
   <defs><marker id="fig-context-and-tasks-head-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-violet-ink, #5b4fa3)"/></marker></defs>
-  <rect x="190" y="12" width="260" height="46" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)"/>
+  <rect x="190" y="12" width="260" height="46" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)"/>
   <text x="320" y="31" font-size="12.5" text-anchor="middle" font-weight="700">上下文 49c5a238</text>
   <text x="320" y="48" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">code-reviewer 创建，对你不透明</text>
-  <path d="M320 58 V78 H170 V96" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M320 58 V78 H170 V96" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   <rect x="20" y="96" width="300" height="50" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="23" y="99" width="294" height="44" fill="none" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="170" y="116.25" font-size="12.5" text-anchor="middle" font-weight="700">任务 e5c95b09 · 审查</text>
   <text x="170" y="133.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">TASK_STATE_COMPLETED, status: 2 findings</text>
-  <path d="M36 146 V399" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M36 146 V399" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   <text x="20" y="444" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">紫色：planner 发送。蓝色：code-reviewer 发送。ID 缩短至 8 个字符。</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
-  <text x="56" y="160" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">调用 1 · 审查 DIFF</text>
+  <text x="56" y="160" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">调用 1 · 审查 DIFF</text>
   <rect x="56" y="168" width="264" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="188" y="182.1" font-size="12" text-anchor="middle" font-weight="700">ROLE_USER · 14a03569</text>
   <text x="188" y="199.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">text 和 raw refunds.diff，不带 ID</text>
-  <path d="M36 187 H55" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M36 187 H55" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
   <rect x="56" y="212" width="264" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="188" y="226.1" font-size="12" text-anchor="middle" font-weight="700">ROLE_AGENT · 46494a30</text>
   <text x="188" y="243.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">询问使用哪个基准分支</text>
-  <path d="M36 231 H55" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M36 231 H55" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
-  <text x="56" y="266" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">调用 2 · 回答问题</text>
+  <text x="56" y="266" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">调用 2 · 回答问题</text>
   <rect x="56" y="274" width="264" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="188" y="288.1" font-size="12" text-anchor="middle" font-weight="700">ROLE_USER · 096d3737 · main</text>
   <text x="188" y="305.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">taskId e5c95b09, contextId 49c5a238</text>
-  <path d="M36 293 H55" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M36 293 H55" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   </g>
   <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
   <rect x="56" y="318" width="264" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="188" y="332.1" font-size="12" text-anchor="middle" font-weight="700">ROLE_AGENT · 8f9ee658</text>
   <text x="188" y="349.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Comparing the diff against main</text>
-  <path d="M36 337 H55" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M36 337 H55" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   </g>
   <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
-  <text x="56" y="374" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">结果</text>
+  <text x="56" y="374" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">结果</text>
   <rect x="56" y="380" width="264" height="38" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="188" y="394.1" font-size="12" text-anchor="middle" font-weight="700">产物 review.json</text>
   <text x="188" y="411.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个 text part 和一个 data part</text>
-  <path d="M36 399 H55" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M36 399 H55" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-linejoin="round"/>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
-  <path d="M320 78 H596 V96" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
+  <path d="M320 78 H596 V96" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <rect x="360" y="96" width="260" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="490" y="116.25" font-size="12.5" text-anchor="middle" font-weight="700">后续任务</text>
   <text x="490" y="133.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器创建 ID</text>
   </g>
   <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
-  <text x="376" y="168" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">其首条消息</text>
-  <path d="M596 146 V175" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
+  <text x="376" y="168" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">其首条消息</text>
+  <path d="M596 146 V175" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <rect x="376" y="176" width="244" height="66" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-dasharray="5 4"/>
   <text x="498" y="189.1" font-size="12" text-anchor="middle" font-weight="700">ROLE_USER · 新 messageId</text>
   <text x="498" y="206.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">contextId 49c5a238</text>

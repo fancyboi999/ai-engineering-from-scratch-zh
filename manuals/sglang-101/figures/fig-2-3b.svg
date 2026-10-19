@@ -13,10 +13,10 @@
   <text x="475" y="218" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">600</text>
   <line x1="610" y1="200" x2="610" y2="205" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="610" y="218" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">800</text>
-  <text x="70" y="240" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">DECODE 步数</text>
+  <text x="70" y="240" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">DECODE 步数</text>
   <text x="64" y="43.98" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.7</text>
   <text x="64" y="181.6" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.098</text>
-  <line x1="70" y1="177.6" x2="475" y2="177.6" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="1.5 3.5"/>
+  <line x1="70" y1="177.6" x2="475" y2="177.6" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="1.5 3.5"/>
   <path d="M70 39.98000000000002 L475 177.5972 L542.5 177.5972 L542.5 36.779600000000016 L610 59.71580000000003" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <line x1="542.5" y1="30" x2="542.5" y2="200" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1" stroke-dasharray="5 4"/>
   <text x="542.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">retraction</text>

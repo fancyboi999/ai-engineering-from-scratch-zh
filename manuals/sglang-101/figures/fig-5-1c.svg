@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-5-1c-title fig-5-1c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-1c-title">GB10 吞吐量与并发，每点三个种子</title>
   <desc id="fig-5-1c-desc">NVIDIA GB10 上 Qwen3-30B-A3B，输入 512、输出 128 token。并发 64 时 FP8 升至 441 token/s，BF16 为 235；EAGLE-3 在并发至 32 时领先 BF16，64 时达 276。关闭 CUDA graphs 与默认曲线重合。带状为三个种子的最小和最大值。</desc>
-  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="240" x2="606" y2="240" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="240" x2="606" y2="240" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="244" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="66" y1="194" x2="606" y2="194" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="194" x2="606" y2="194" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="198" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="66" y1="148" x2="606" y2="148" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="148" x2="606" y2="148" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="152" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <line x1="66" y1="102" x2="606" y2="102" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="102" x2="606" y2="102" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="106" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">400</text>
-  <line x1="66" y1="56" x2="606" y2="56" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="56" x2="606" y2="56" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="60" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">500</text>
   <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="56" x2="66" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

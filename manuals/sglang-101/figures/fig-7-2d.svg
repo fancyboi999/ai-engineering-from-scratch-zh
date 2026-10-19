@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-7-2d-title fig-7-2d-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-7-2d-title">GB10 上的 48 步 GRPO</title>
   <desc id="fig-7-2d-desc">单 NVIDIA GB10 上 Miles、Qwen3-0.6B、GSM8K、一个种子，48 步普通 GRPO 的各步原始奖励与 1,024-token 上限截断比例。前八步平均奖励 0.636，后八步 0.758；相应截断比例均值从 0.33 降至 0.08。</desc>
-  <line x1="66" y1="268" x2="606" y2="268" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="268" x2="606" y2="268" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="272" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="216.5" x2="606" y2="216.5" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="216.5" x2="606" y2="216.5" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="220.5" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.25</text>
-  <line x1="66" y1="165" x2="606" y2="165" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="165" x2="606" y2="165" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="169" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.5</text>
-  <line x1="66" y1="113.5" x2="606" y2="113.5" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="113.5" x2="606" y2="113.5" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="117.5" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.75</text>
-  <line x1="66" y1="62" x2="606" y2="62" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="62" x2="606" y2="62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="66" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1</text>
   <line x1="66" y1="268" x2="606" y2="268" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="62" x2="66" y2="268" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

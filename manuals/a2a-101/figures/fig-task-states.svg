@@ -14,7 +14,7 @@
   <rect x="250" y="290" width="140" height="42" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)" stroke-dasharray="5 4"/>
   <text x="320" y="306.25" font-size="12.5" text-anchor="middle" font-weight="700">INPUT_REQUIRED</text>
   <text x="320" y="323.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">值 6</text>
-  <text x="470" y="12" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">终态</text>
+  <text x="470" y="12" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">终态</text>
   <rect x="470" y="20" width="150" height="54" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="473" y="23" width="144" height="48" fill="none" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="545" y="34.75" font-size="12.5" text-anchor="middle" font-weight="700">COMPLETED</text>

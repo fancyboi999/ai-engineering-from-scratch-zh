@@ -1,19 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 370" role="img" aria-labelledby="fig-5-3c-title fig-5-3c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-3c-title">相同吞吐量，满池时的不同选择</title>
   <desc id="fig-5-3c-desc">单 NVIDIA L4、Qwen3-8B，比较 SGLang 0.5.22 与 vLLM 0.31.0，并发 1 至 64 的 TTFT 中位数和 P99 ITL。KV 池分别 24,094、24,096 token，每点三个种子，对数刻度。至并发 16，ITL 曲线重合，SGLang 首 token 更早。32、64 时 vLLM 首 token 更早，分别 1,813 对 2,871 ms、10,953 对 18,356 ms，但其 P99 ITL 升到 619、1,363 ms，SGLang 为 102、114 ms。</desc>
-  <line x1="70" y1="306" x2="606" y2="306" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="306" x2="606" y2="306" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="310" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">50</text>
-  <line x1="70" y1="281.94" x2="606" y2="281.94" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="281.94" x2="606" y2="281.94" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="285.94" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="70" y1="243.82" x2="606" y2="243.82" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="243.82" x2="606" y2="243.82" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="247.82" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <line x1="70" y1="202.04" x2="606" y2="202.04" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="202.04" x2="606" y2="202.04" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="206.04" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1k</text>
-  <line x1="70" y1="163.91" x2="606" y2="163.91" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="163.91" x2="606" y2="163.91" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="167.91" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">3k</text>
-  <line x1="70" y1="122.13" x2="606" y2="122.13" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="122.13" x2="606" y2="122.13" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="126.13" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">10k</text>
-  <line x1="70" y1="84" x2="606" y2="84" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="84" x2="606" y2="84" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="88" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">30k</text>
   <line x1="70" y1="306" x2="606" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="84" x2="70" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

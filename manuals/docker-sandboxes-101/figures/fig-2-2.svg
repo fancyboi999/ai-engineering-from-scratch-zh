@@ -2,7 +2,7 @@
   <title id="fig-2-2-title">从停止沙箱到模板、tar和新沙箱</title>
   <desc id="fig-2-2-desc">顶行从左到右：带标记文件的已停止 m101-demo，template save 将 library/m101-tpl:v1 写运行时镜像存储，--output 导出 OCI 布局 m101-tpl.tar。底行：create --pull never -t m101-tpl:v1 从存储创建带标记的 m101-from-tpl；tar 复制到另一宿主，由 template load 导入。</desc>
   <defs><marker id="fig-2-2-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker><marker id="fig-2-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-2-2-head-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-olive-ink, #515f26)"/></marker></defs>
-  <text x="20" y="40" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">在录制 MAC</text>
+  <text x="20" y="40" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">在录制 MAC</text>
   <rect x="20" y="60" width="150" height="65" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="95" y="80.25" font-size="12.5" text-anchor="middle" font-weight="700">m101-demo</text>
   <text x="95" y="97.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sbx stop m101-demo</text>

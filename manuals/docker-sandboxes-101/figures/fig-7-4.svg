@@ -3,7 +3,7 @@
   <desc id="fig-7-4-desc">左八项录制确认：内部哨兵/外部密钥、example.com默认拒绝、内部私有Engine29.8.1、sandbox-m101-clone取提交、3128代理、内部MCP_GATEWAY_URL、27工具集、无provider key的DMR ai/qwen3:4b。右六项：五项未测转述（MITM重签HTTPS、libkrun VMM、几十毫秒启动、kit签名验证、帮助无policy approval但403提它），玫红框为有争议外传路径。</desc>
   <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">录制文件确认</text>
   <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-grey-ink, #5e5e59)">仅转述，未测试</text>
-  <line x1="320" y1="8" x2="320" y2="432" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <line x1="320" y1="8" x2="320" y2="432" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <rect x="20" y="30" width="284" height="42" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="162" y="46.1" font-size="12" text-anchor="middle" font-weight="700">内部哨兵，外部真实密钥</text>
   <text x="162" y="63.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">10-env-sentinel.txt, 10-receiver.log</text>

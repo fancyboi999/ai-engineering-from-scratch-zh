@@ -4,7 +4,7 @@
   --m-panel-edge: #e4e1d4;
   --m-ink: #1a1a1a;
   --m-ink-soft: #4a4a4a;
-  --m-ink-mute: #6f6f6a;
+  --m-ink-mute: #666660;
   --m-rule: rgba(26, 26, 26, 0.16);
   --m-rule-strong: rgba(26, 26, 26, 0.42);
   --m-accent: #3553ff;
@@ -42,7 +42,7 @@
   --m-panel-edge: #232a45;
   --m-ink: #e8e6dc;
   --m-ink-soft: #b4b2aa;
-  --m-ink-mute: #8a8882;
+  --m-ink-mute: #96948e;
   --m-rule: rgba(232, 230, 220, 0.18);
   --m-rule-strong: rgba(232, 230, 220, 0.45);
   --m-accent: #6b8eff;

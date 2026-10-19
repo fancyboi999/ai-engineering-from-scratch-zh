@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 456" role="img" aria-labelledby="fig-3-3-title fig-3-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-3-3-title">ledger-arm64-O1 的加载映像</title>
   <desc id="fig-3-3-desc">四条 LC_SEGMENT_64 按地址从低到高排列。0x0 的 __PAGEZERO 跨 4 GiB，不含文件字节。0x100000000 的 __TEXT 映射文件字节 0 到 16384，含 __text、__stubs、__cstring、__const、__unwind_info，LC_MAIN 指向内部 entryoff 1488。0x100004000 的 __DATA_CONST 映射 16384 到 32768，含 __got、__const。0x100008000 的 __LINKEDIT 映射 32768 到 33872，含链式修正、导出 trie、函数入口、符号表、字符串表及代码签名。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">ADDRESS</text>
-  <text x="140" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">段与节</text>
-  <text x="540" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">文件偏移</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ADDRESS</text>
+  <text x="140" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">段与节</text>
+  <text x="540" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">文件偏移</text>
   <text x="20" y="46" font-size="11">0x0</text>
   <rect x="140" y="30" width="380" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="152" y="47.25" font-size="12.5" font-weight="700">__PAGEZERO · 预留 4 GiB</text>

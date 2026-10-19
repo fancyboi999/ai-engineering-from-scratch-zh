@@ -2,8 +2,8 @@
   <title id="fig-3-7-title">一次注册、两个网关、两份工具列表</title>
   <desc id="fig-3-7-desc">宿主存一次m101-deepwiki，经add从https://mcp.deepwiki.com/mcp注册，无需OAuth的远程streamable-http。各沙箱独立MCP_GATEWAY_URL。静态m101-mcp列ask_wiki_question、read_wiki_contents、read_wiki_structure、code-mode、mcp-exec；动态m101-mcp-dyn起初code-mode、mcp-add、mcp-config-set、mcp-exec、mcp-find，load加入三工具并通知tools/list_changed。远程服务器在VM外，未录制OAuth。</desc>
   <defs><marker id="fig-3-7-head-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-olive-ink, #515f26)"/></marker><marker id="fig-3-7-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-3-7-head-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-indigo-ink, #4b4f9e)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">宿主</text>
-  <text x="350" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">沙箱</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">宿主</text>
+  <text x="350" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">沙箱</text>
   <rect x="350" y="26" width="270" height="50" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="485" y="46.25" font-size="12.5" text-anchor="middle" font-weight="700">mcp.deepwiki.com/mcp</text>
   <text x="485" y="63.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">远程端点，在VM外</text>

@@ -2051,7 +2051,7 @@ function withCard(html, type, id, spec) {
 function versionSharedAssets(html) {
   return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo|cheatsheets)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
-    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|cheatsheets|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261019c$2')
+    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|cheatsheets|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261019d$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2');
 }
 

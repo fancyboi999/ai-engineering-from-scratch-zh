@@ -32,8 +32,8 @@
   <line x1="470" y1="218" x2="470" y2="261" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-4-head-ink)"/>
   <rect class="m-knock" x="475" y="228.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="478" y="239.5" font-size="11.5">否</text>
-  <text x="20" y="98" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">步骤 1</text>
-  <text x="20" y="192" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">步骤 2</text>
-  <text x="20" y="286" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">步骤 3</text>
+  <text x="20" y="98" font-size="11" fill="var(--m-ink-mute, #666660)">步骤 1</text>
+  <text x="20" y="192" font-size="11" fill="var(--m-ink-mute, #666660)">步骤 2</text>
+  <text x="20" y="286" font-size="11" fill="var(--m-ink-mute, #666660)">步骤 3</text>
   <text x="20" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">各分支都将请求文本插入所选服务器的树</text>
 </svg>

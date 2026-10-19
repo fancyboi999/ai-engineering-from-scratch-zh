@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 418" role="img" aria-labelledby="fig-5-6-title fig-5-6-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-6-title">同一轮次轴的两次运行及两项评估</title>
   <desc id="fig-5-6-desc">顶为轮次0至4的三个会话，每格一个模型回复。-1/-2为files.yaml重放，依次list_directory、单文件答案、被拒wc -l、read_file README、单行答案，五轮匹配。-3为guarded的restricted，第0轮echo m101-ok首个分歧，之后不比较。相同退出0，--fail-on-divergence分歧退出1。底eval：数行预期/实际shell，F1 1.0、相关性1/1、长度S；列文件预期list_directory，实际加shell，F1 0.67、相关性1/1、长度S。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">SESSIONS DIFF, 21-SESSIONS-DIFF.TXT</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">SESSIONS DIFF, 21-SESSIONS-DIFF.TXT</text>
   <text x="166" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">turn 0</text>
   <text x="266.8" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">turn 1</text>
   <text x="367.6" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">turn 2</text>
@@ -50,7 +50,7 @@
   <text x="116" y="204" font-size="11" fill="var(--m-rose-ink, #b0344d)">第0轮首个分歧：list_directory对shell</text>
   <text x="20" y="226" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">-1对-2：五轮行为相同，退出0</text>
   <text x="20" y="242" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">-1对-3：会话分歧，--fail-on-divergence退出1</text>
-  <text x="20" y="274" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">FILES.YAML评估，22-EVAL-CONTAINER-ENV.TXT</text>
+  <text x="20" y="274" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">FILES.YAML评估，22-EVAL-CONTAINER-ENV.TXT</text>
   <text x="26" y="294" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">评估会话</text>
   <text x="228" y="294" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">工具调用</text>
   <text x="420" y="294" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">F1</text>

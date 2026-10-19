@@ -13,13 +13,13 @@ from: phases/08-generative-ai/07-latent-diffusion-stable-diffusion/docs/zh.md, p
 
 ```arch
 node | text | 1,1 | 文本编码器 | 冻结，CLIP 或 T5
-node | noise | 2,1 | 含噪潜变量 | 初始为 N(0, I)
-node | den | 3,1 | 去噪器 | U-Net 或 DiT
-node | cfg | 4,1 | CFG 混合 | 有条件与无条件
-node | lat | 4,2 | 干净潜变量 | 64 x 64 x 4
-node | dec | 3,2 | VAE 解码器 | 潜变量转像素
-node | img | 2,2 | 图像 | 512 x 512 x 3
-node | enc | 1,2 | VAE 编码器 | 训练与 img2img
+node | noise | 1,2 | 含噪潜变量 | 初始为 N(0, I)
+node | den | 2,1 | 去噪器 | U-Net 或 DiT
+node | cfg | 3,1 | CFG 混合 | 有条件与无条件
+node | lat | 4,1 | 干净潜变量 | 64 x 64 x 4
+node | dec | 4,2 | VAE 解码器 | 潜变量转像素
+node | img | 3,2 | 图像 | 512 x 512 x 3
+node | enc | 2,2 | VAE 编码器 | 训练与 img2img
 edge | text | den | 交叉注意力
 edge | noise | den |
 edge | den | cfg | 两个 eps

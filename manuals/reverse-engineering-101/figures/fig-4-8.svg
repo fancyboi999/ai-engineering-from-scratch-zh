@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 444" role="img" aria-labelledby="fig-4-8-title fig-4-8-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-8-title">_grade 档案的十六个侧面</title>
   <desc id="fig-4-8-desc">表格列出 _grade 的 analyze_function 记录中 normalized_result 的十六个键：procedure、pseudocode、assembly、comments、callers、callees、incoming_references、outgoing_references、unresolved_calls、referenced_strings、referenced_names、basic_blocks、native_api、native_value_flow、facet_availability、limitations，并列各键在 _grade 中的值与内容说明。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">侧面</text>
-  <text x="200" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">对 _GRADE</text>
-  <text x="380" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">内容</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">侧面</text>
+  <text x="200" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">对 _GRADE</text>
+  <text x="380" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">内容</text>
   <rect x="20" y="26" width="600" height="26" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="32" y="42.6" font-size="12" font-weight="700">Evidence ev_41e8ca1c · analyze_function · observed</text>
   <rect x="20" y="52" width="600" height="24" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>

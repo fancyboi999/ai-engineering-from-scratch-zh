@@ -13,54 +13,54 @@
   <text x="480" y="135.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">DeepSeek V3, GLM MoE</text>
   <line x1="240" y1="66" x2="240" y2="100" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
   <line x1="400" y1="66" x2="400" y2="100" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
-  <line x1="28" y1="146" x2="28" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="28" y1="194" x2="36" y2="194" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="28" y1="146" x2="28" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="28" y1="194" x2="36" y2="194" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="40" y="198" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Hopper</text>
   <rect x="148" y="170" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="224" y="189.1" font-size="12" text-anchor="middle" font-weight="700">fa3</text>
   <text x="224" y="206.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">issue 17411</text>
-  <line x1="28" y1="250" x2="36" y2="250" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="28" y1="250" x2="36" y2="250" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="40" y="254" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Blackwell SM100</text>
   <rect x="148" y="226" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="224" y="245.1" font-size="12" text-anchor="middle" font-weight="700">trtllm_mha</text>
   <text x="224" y="262.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">K/V 宽度不同时用 fa4</text>
-  <line x1="28" y1="306" x2="36" y2="306" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="28" y1="306" x2="36" y2="306" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="40" y="310" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">AMD ROCm</text>
   <rect x="148" y="282" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="224" y="301.1" font-size="12" text-anchor="middle" font-weight="700">aiter</text>
   <text x="224" y="318.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">全部 MHA 模型</text>
-  <line x1="28" y1="362" x2="36" y2="362" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="28" y1="362" x2="36" y2="362" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="40" y="366" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Apple MPS</text>
   <rect x="148" y="338" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="224" y="357.1" font-size="12" text-anchor="middle" font-weight="700">torch_native</text>
   <text x="224" y="374.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">PyTorch SDPA</text>
-  <line x1="28" y1="418" x2="36" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="28" y1="418" x2="36" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="40" y="422" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">其他 GPU</text>
   <rect x="148" y="394" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="224" y="413.1" font-size="12" text-anchor="middle" font-weight="700">flashinfer</text>
   <text x="224" y="430.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">有 sinks 时用 triton</text>
-  <line x1="348" y1="146" x2="348" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="348" y1="194" x2="356" y2="194" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="348" y1="146" x2="348" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="348" y1="194" x2="356" y2="194" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="360" y="198" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Hopper</text>
   <rect x="468" y="170" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="544" y="189.1" font-size="12" text-anchor="middle" font-weight="700">fa3</text>
   <text x="544" y="206.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同 MHA</text>
-  <line x1="348" y1="250" x2="356" y2="250" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="348" y1="250" x2="356" y2="250" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="360" y="254" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Blackwell SM100</text>
   <rect x="468" y="226" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="544" y="245.1" font-size="12" text-anchor="middle" font-weight="700">flashinfer</text>
   <text x="544" y="262.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">DeepSeek V3 覆盖值</text>
-  <line x1="348" y1="306" x2="356" y2="306" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="348" y1="306" x2="356" y2="306" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="360" y="310" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">AMD ROCm</text>
   <rect x="468" y="282" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="544" y="301.1" font-size="12" text-anchor="middle" font-weight="700">aiter</text>
   <text x="544" y="318.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">16 或 128 KV head 时</text>
-  <line x1="348" y1="362" x2="356" y2="362" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="348" y1="362" x2="356" y2="362" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="360" y="366" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Apple MPS</text>
   <rect x="468" y="338" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="544" y="357.1" font-size="12" text-anchor="middle" font-weight="700">torch_native</text>
   <text x="544" y="374.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">PyTorch SDPA</text>
-  <line x1="348" y1="418" x2="356" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <line x1="348" y1="418" x2="356" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="360" y="422" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">其他 GPU</text>
   <rect x="468" y="394" width="152" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="544" y="413.1" font-size="12" text-anchor="middle" font-weight="700">triton</text>

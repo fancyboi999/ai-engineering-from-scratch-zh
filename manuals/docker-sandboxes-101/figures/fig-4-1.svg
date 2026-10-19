@@ -2,8 +2,8 @@
   <title id="fig-4-1-title">v3 描述文件及携带它的 manifest</title>
   <desc id="fig-4-1-desc">左为hello-kit/kit.yaml从syntax到capabilities的九个顶层项，说明各项去向。右为registry返回m101/hello-kit:v1的无注解OCI index与linux/arm64 manifest。manifest含四项vnd.docker.sandbox.kit注解：JSON描述及402个deb provides、schema-version3、network-policy@2、built-by sandbox-kit3.0.0-m.8；另有四项OCI键、config、16层及/usr/share/sandbox/kit/kit源码。青绿线连接源行与目标。</desc>
   <defs><marker id="fig-4-1-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">HELLO-KIT 的原始 KIT.YAML</text>
-  <text x="356" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">REGISTRY 返回内容</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">HELLO-KIT 的原始 KIT.YAML</text>
+  <text x="356" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">REGISTRY 返回内容</text>
   <rect x="20" y="28" width="306" height="26" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="28" y="44.45" font-size="11.5" font-weight="700">capture/fixtures/kits/hello-kit/kit.yaml</text>
   <rect x="20" y="54" width="306" height="39" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>

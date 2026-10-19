@@ -2,7 +2,7 @@
   <title id="fig-7-1-title">sbx move 搬到云端什么</title>
   <desc id="fig-7-1-desc">顶本地m101-demo停止并捕获模板，上传，带后缀moved-m101-demo在云启动。左列随镜像：文件系统、kit网络规则、重新发布为云URL的TCP端口、本地环境变量。右列留宿主：绑定挂载、secret存储密钥、本地策略、运行进程；活跃HTTP方法规则先提示。底目的地TTL默认一小时，创建起24小时上限。</desc>
   <defs><marker id="fig-7-1-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker><marker id="fig-7-1-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-7-1-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">SBX MOVE M101-DEMO --TO CLOUD</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">SBX MOVE M101-DEMO --TO CLOUD</text>
   <rect x="20" y="30" width="200" height="58" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="120" y="46.75" font-size="12.5" text-anchor="middle" font-weight="700">m101-demo</text>
   <text x="120" y="64.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sandboxd 的本地沙箱</text>

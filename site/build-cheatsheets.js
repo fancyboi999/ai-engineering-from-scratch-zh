@@ -298,6 +298,20 @@ function wrap(text, size, width) {
   const lines = [];
   let line = '';
   for (const word of words) {
+    // SVG text has no CSS line wrapping. Split identifiers/URLs that cannot
+    // fit even on an empty line, retaining every character and the ARIA name.
+    if (textWidth(word, size) > width) {
+      if (line) lines.push(line);
+      line = '';
+      for (const char of Array.from(word)) {
+        if (line && textWidth(line + char, size) > width) {
+          lines.push(line);
+          line = '';
+        }
+        line += char;
+      }
+      continue;
+    }
     const separator = /[\u2e80-\u9fff]$/.test(line) || /^[\u2e80-\u9fff]/.test(word) ? '' : ' ';
     const next = line ? `${line}${separator}${word}` : word;
     if (line && textWidth(next, size) > width) {
