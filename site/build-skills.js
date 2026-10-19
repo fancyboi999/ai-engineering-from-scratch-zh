@@ -1,4 +1,5 @@
 'use strict';
+const { renderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -260,15 +261,7 @@ function build({ siteDir = __dirname } = {}) {
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
-      <nav class="header-nav">
-        <a href="index.html#contents">课程目录</a>
-        <a href="catalog.html">课程表</a>
-        <a href="skills.html" >技能</a>
-        <a href="prereqs.html">路线图</a>
-        <a href="glossary.html">术语表</a>
-        <a href="about.html">关于</a>
-        <a href="${GITHUB}" target="_blank" rel="noopener" class="header-github">GitHub <span class="star-count" data-loading="true" aria-label="GitHub stars">…</span></a>
-      </nav>
+      <nav class="header-nav">${renderNavigation()}</nav>
       <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button>
     </div>
   </header>
@@ -351,7 +344,7 @@ python3 scripts/install_skills.py .skills --type all --dry-run</code></pre>
       });
     })();
   </script>
-  <script src="header.js?v=20261015b" defer></script>
+  <script src="header.js?v=${HEADER_ASSET_VERSION}" defer></script>
   <script src="dither.js?v=20261013a" defer></script>
   <script src="skills-demo.js?v=20261013a" defer></script>
 </body>

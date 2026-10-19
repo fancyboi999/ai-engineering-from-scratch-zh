@@ -166,8 +166,8 @@
   function ensureNarration() {
     var current = pageFile(location.href);
     // 首页和课程表是密集导航界面，不挂载全页朗读；其他内容页（含认证）加载。
-    var isHome = current === 'index.html' && !/\/lessons\//.test(location.pathname || '');
-    if (isHome || current === 'catalog.html') return;
+    var isHome = /^\/(?:index\.html)?$/.test(sitePath());
+    if (isHome || current === 'catalog.html' || !document.querySelector('.theme-toggle')) return;
     if (window.__AIFS_TTS_VERSION === NARRATION_VERSION || document.querySelector('script[data-aifs-tts="' + NARRATION_VERSION + '"]')) return;
     var script = document.createElement('script');
     script.src = HEADER_BASE + 'tts.js?v=' + NARRATION_VERSION;
@@ -188,6 +188,17 @@
     }
   }
 
+  function sitePath() {
+    var pathname = location.pathname || '/';
+    if (HEADER_BASE) {
+      try {
+        var base = new URL(HEADER_BASE).pathname;
+        if (pathname.indexOf(base) === 0) pathname = '/' + pathname.slice(base.length);
+      } catch (_) {}
+    }
+    return pathname;
+  }
+
   function syncCurrentPage(header) {
     var nav = header.querySelector('.header-nav');
     var logo = header.querySelector('.logo');
@@ -198,19 +209,22 @@
     if (logo) logo.removeAttribute('aria-current');
 
     var current = pageFile(location.href);
-    if (current === 'index.html') {
+    var pathname = sitePath();
+    if (/^\/(?:index\.html)?$/.test(pathname)) {
       if (logo) logo.setAttribute('aria-current', 'page');
       return;
     }
 
     var target = current;
-    if (current === 'project.html') target = 'projects.html';
+    if (current === 'project.html' || /^\/project\//.test(pathname)) target = 'projects.html';
     if (/^manual-/.test(current)) target = 'manuals.html';
-    if (/^\/glossary\//.test(location.pathname)) target = 'glossary.html';
-    if (/^\/phase\//.test(location.pathname)) target = 'catalog.html';
+    if (/^\/(?:hubs\/)?glossary\//.test(pathname)) target = 'glossary.html';
+    if (/^\/(?:hubs\/)?phase\//.test(pathname) || /^\/lessons\//.test(pathname)) target = 'catalog.html';
+    if (/^\/cheatsheets(?:\/|$)/.test(pathname)) target = 'cheatsheets.html';
     if (current === 'certification.html' || current === 'assessment.html') {
       target = 'certifications.html';
     } else if (current === 'lesson.html') {
+      target = 'catalog.html';
       try {
         var params = new URLSearchParams(location.search);
         var lessonPath = params.get('path') || '';
@@ -221,36 +235,12 @@
     }
 
     for (var j = 0; j < links.length; j++) {
-      if (pageFile(links[j].href) === target) {
+      var page = links[j].getAttribute('data-header-page') || pageFile(links[j].href).replace(/\.html$/, '');
+      if (page === target.replace(/\.html$/, '')) {
         links[j].setAttribute('aria-current', 'page');
         break;
       }
     }
-  }
-
-  function ensureNavigationLink(nav, filename, label, className) {
-    var links = nav.querySelectorAll('a');
-    for (var i = 0; i < links.length; i++) {
-      if (pageFile(links[i].href) === filename) return;
-    }
-
-    var link = document.createElement('a');
-    link.href = HEADER_BASE + filename;
-    link.className = className || '';
-    link.textContent = label;
-    var github = nav.querySelector('.header-github');
-    nav.insertBefore(link, github || null);
-  }
-
-  function addNavigationLinks(nav) {
-    ensureNavigationLink(nav, 'projects.html', '实战项目', '');
-    ensureNavigationLink(nav, 'manuals.html', '技术手册', '');
-    ensureNavigationLink(nav, 'learning-paths.html', '学习路径', '');
-    ensureNavigationLink(nav, 'how-to-learn.html', '学习方法', '');
-    ensureNavigationLink(nav, 'skills.html', 'Agent 技能', '');
-    ensureNavigationLink(nav, 'inside-an-ai-agent.html', 'Agent 内部机制', '');
-    ensureNavigationLink(nav, 'cheatsheets', '速查表', '');
-    ensureNavigationLink(nav, 'certifications.html', '认证', 'header-mobile-only');
   }
 
   function setupNavigation(header) {
@@ -259,7 +249,6 @@
     var logo = header.querySelector('.logo');
     if (!inner || !nav || !logo || inner.querySelector('.header-menu-toggle')) return;
 
-    addNavigationLinks(nav);
     syncCurrentPage(header);
 
     navId += 1;
@@ -287,8 +276,8 @@
       return child.tagName === 'A';
     });
     routeLinks.forEach(function (link) {
+      if (!link.hasAttribute('data-header-priority')) return;
       var target = pageFile(link.href);
-      if (target !== 'index.html' && target !== 'catalog.html' && target !== 'learning-paths.html') return;
       var marker = document.createComment('header-priority-' + target);
       nav.insertBefore(marker, link);
       priorityEntries.push({ link: link, marker: marker });

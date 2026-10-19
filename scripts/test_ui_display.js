@@ -22,7 +22,7 @@ async function main() {
   let fixture = 'long';
   const server = http.createServer((req, res) => {
     res.setHeader('Content-Security-Policy', "default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self'; img-src 'self' data:");
-    if (new URL(req.url, 'http://localhost').pathname === '/data.js') {
+    if (new URL(req.url, 'http://localhost').pathname === '/data.js' && fixture !== 'real') {
       // Synthetic display data exists only in this response; never edit data.js or manifests.
       const phases = JSON.parse(JSON.stringify(data.PHASES));
       phases[0].name = longChinese; phases[1].name = longMixed; phases[2].name = '短名';
@@ -94,6 +94,7 @@ async function main() {
         assert.deepEqual(row.stats, ['0', '0', '0 / 0', '暂无阶段']);
       }
     }
+    fixture = 'real';
     // Real shared header and generated glossary index, with external fonts blocked.
     for (const width of [1920, 1600, 1561, 1560, 1481, 1401, 1400, 820, 390, 320]) {
       await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
@@ -128,6 +129,55 @@ async function main() {
       assert.ok(row.headingGap >= 12, JSON.stringify(row));
       assert.equal(row.listStyle, 'none');
       console.log('header/glossary layout:', JSON.stringify({width,columns:row.columns,headingGap:row.headingGap,overlap:false}));
+    }
+    const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '学习方法', 'Agent 技能', 'Agent 内部机制', '关于'];
+    const priorities = ['课程目录', '课程表', '学习路径'];
+    const contexts = [
+      ['index.html#contents', null, false], ['prereqs.html', '路线图', true],
+      ['catalog.html', '课程表', false], ['glossary.html', '术语表', true],
+      ['projects.html', '实战项目', true], ['manuals.html', '技术手册', true],
+      ['manual-reverse-engineering-101.html', '技术手册', true],
+      ['contact.html', null, false], ['privacy.html', null, false],
+      ['skills.html', 'Agent 技能', true], ['how-to-learn.html', '学习方法', true],
+      ['inside-an-ai-agent.html', 'Agent 内部机制', true], ['certifications.html', '认证', true],
+      ['certification?id=claude-ccao-f', '认证', true],
+      ['lessons/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/', '课程表', true],
+      ['project/binary-inspector/', '实战项目', true],
+      ['hubs/phase/tools-and-protocols.html', '课程表', true],
+      ['hubs/glossary/activation-checkpointing.html', '术语表', true],
+      ['cheatsheets/sglang-serving.html', '速查表', true],
+    ];
+    for (const width of [1920, 1280, 390]) {
+      // Every generator on desktop; the two originally inconsistent pages at each breakpoint.
+      for (const [page, active, narration] of (width === 1920 ? contexts : contexts.slice(0, 2))) {
+        await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+        await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/${page}` });
+        let ready = false;
+        for (let attempt = 0; attempt < 100; attempt++) {
+          ready = await evaluate("document.readyState==='complete' && !!document.querySelector('.header-menu-toggle')");
+          if (ready) break;
+          await delay(50);
+        }
+        assert.ok(ready, page + ' header did not initialize');
+        await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+        const state = await evaluate(`({
+          links:[...document.querySelectorAll('.header-nav>a:not(.header-github)')].map(a=>a.textContent.trim()),
+          priority:[...document.querySelectorAll('.header-priority-nav>a')].map(a=>a.textContent.trim()),
+          active:document.querySelector('.header-nav a[aria-current="page"],.header-priority-nav a[aria-current="page"]')?.textContent.trim()||null,
+          home:document.querySelector('.logo')?.getAttribute('aria-current'),
+          narration:!!document.getElementById('ttsToggle'),
+          narrationRequested:!!document.querySelector('script[data-aifs-tts]'),
+          github:document.querySelectorAll('.site-header .header-github').length
+        })`);
+        assert.deepEqual(state.links, width > 820 && width <= 1400 ? menu.filter(label => !priorities.includes(label)) : menu, page);
+        assert.deepEqual(state.priority, width > 820 && width <= 1400 ? priorities : [], page);
+        assert.equal(state.active, active, page);
+        assert.equal(state.home, page.startsWith('index.html') ? 'page' : null, page);
+        assert.equal(state.narration, narration, page);
+        if (!narration) assert.equal(state.narrationRequested, false, page);
+        assert.equal(state.github, 1, page);
+        console.log('shared navigation:', JSON.stringify({page,width,active,narration,consistent:true}));
+      }
     }
   } finally {
     clearTimeout(watchdog); if (socket) socket.close(); server.closeAllConnections(); server.close();

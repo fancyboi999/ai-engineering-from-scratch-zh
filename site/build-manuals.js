@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { renderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const fs = require('fs');
 const path = require('path');
@@ -617,7 +618,7 @@ function manualArticle(manual, mode) {
   return `<article class="manual">${coverHtml(manual, mode)}${mode === 'print' ? tocHtml(manual, 'print') : ''}${body.join('\n')}\n${colophonHtml(manual)}</article>`;
 }
 
-const SITE_HEADER = '<header class="site-header"><div class="header-inner"><a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a><nav class="header-nav"><a href="index.html#contents">大纲</a><a href="catalog.html">课程表</a><a href="projects.html">项目</a><a href="manuals.html">手册</a><a href="prereqs.html">路线图</a><a href="glossary.html">术语表</a><a href="about.html">关于</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github"><span>GitHub</span><span class="star-count" data-loading="true">…</span></a></nav><button class="search-toggle" type="button" data-cmd-palette aria-label="搜索"><span aria-hidden="true">⌕</span></button><button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button></div></header>';
+const SITE_HEADER = `<header class="site-header"><div class="header-inner"><a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a><nav class="header-nav">${renderNavigation()}</nav><button class="search-toggle" type="button" data-cmd-palette aria-label="搜索"><span aria-hidden="true">⌕</span></button><button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button></div></header>`;
 
 function pageShell({ title, ogTitle, description, canonical, noindex, card, main }) {
   const css = shared('tokens.css') + shared('manual.css') + shared('web.css');
@@ -649,7 +650,7 @@ ${main}
 <footer class="site-footer"><div class="container footer-inner"><p>AI Engineering from Scratch · 中文开源课程。</p><div class="footer-links"><a href="index.html">首页</a><a href="manuals.html">手册</a><a href="catalog.html">课程表</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a></div></div></footer>
 <script src="data.js"></script>
 <script src="content-source.js"></script>
-<script src="header.js" defer></script>
+<script src="header.js?v=${HEADER_ASSET_VERSION}" defer></script>
 <script src="cmdpalette.js" defer></script>
 <script>${shared('dither.js')}</script>
 <script>${shared('motion.js')}</script>

@@ -11,6 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { normalizeHeaderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(REPO_ROOT, 'README.md');
@@ -2048,7 +2049,8 @@ function withCard(html, type, id, spec) {
 }
 
 function versionSharedAssets(html) {
-  return html.replace(/(\bsrc=["']\/?(?:app|header|cmdpalette|certifications|projects|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo|cheatsheets)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
+  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo|cheatsheets)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
+    .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
     .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|cheatsheets|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261019b$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2');
 }
