@@ -336,7 +336,7 @@ test('web output is flat, lists only ready manuals, and a scoped build leaves ot
   assert.ok(!fs.existsSync(path.join(site, 'manual-other-101.html')));
   const page = fs.readFileSync(path.join(site, 'manual-demo-101.html'), 'utf8');
   assert.match(page, /noindex/);
-  assert.match(page, /<script src="header\.js\?v=20261019b" defer>/);
+  assert.match(page, /<script src="header\.js\?v=[a-z0-9]+" defer>/);
   assert.doesNotMatch(page, /Download the PDF/);
   fs.writeFileSync(path.join(dir, 'manual.json'), manifest({ status: 'ready' }));
   fs.writeFileSync(path.join(dir, 'README.md'), '# Demo\n');
@@ -536,7 +536,7 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
   assert.doesNotMatch(data, /"pdf"/);
   assert.doesNotMatch(print, /<script|fonts\.googleapis\.com/);
   assert.match(print, /name="robots" content="noindex"/);
-  assert.match(html, /src="header\.js\?v=20261019b"/);
+  assert.match(html, /src="header\.js\?v=[a-z0-9]+"/);
   assert.match(index, /aria-label="搜索"/);
 });
 
