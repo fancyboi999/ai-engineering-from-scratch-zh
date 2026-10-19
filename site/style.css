@@ -265,7 +265,7 @@ p.dropcap::first-letter {
 
 .header-inner {
   width: 100%;
-  max-width: 1360px;
+  max-width: 1480px;
   margin: 0 auto;
   padding: 0 28px;
   height: 64px;
@@ -286,7 +286,7 @@ p.dropcap::first-letter {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
   min-width: 0;
   margin-inline-end: auto;
   white-space: nowrap;
@@ -1195,7 +1195,7 @@ body.js-anim .toc-row.in-view {
   }
 }
 
-@media (max-width: 1480px) and (min-width: 1401px) {
+@media (max-width: 1560px) and (min-width: 1401px) {
   .header-inner {
     padding: 0 24px;
     gap: 8px;
@@ -1630,6 +1630,13 @@ body.js-anim .toc-row.in-view {
     width: 44px;
     height: 44px;
     font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .logo {
+    font-size: 0.95rem;
+    gap: 4px;
   }
 }
 
