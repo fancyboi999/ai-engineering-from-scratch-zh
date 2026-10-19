@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-5-1f-title fig-5-1f-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-1f-title">同一 L4、同一服务，高温与冷却后测量</title>
   <desc id="fig-5-1f-desc">NVIDIA L4 上 Qwen3-8B 的输出吞吐量对并发，两次扫描命令相同。首次卡温约 87 C，无遥测；第二次每轮等待 72 C，并记录时钟。冷却组每点更高，并发 32 最多高 39%；64 时因 KV 池满而下降。</desc>
-  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="209.33" x2="606" y2="209.33" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="209.33" x2="606" y2="209.33" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="213.33" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="66" y1="132.67" x2="606" y2="132.67" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="132.67" x2="606" y2="132.67" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="136.67" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="66" y1="56" x2="606" y2="56" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="56" x2="606" y2="56" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="60" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
   <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="56" x2="66" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

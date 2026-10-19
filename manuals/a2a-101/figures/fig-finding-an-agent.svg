@@ -2,9 +2,9 @@
   <title id="fig-finding-an-agent-title">从主机到经过检查的调用</title>
   <desc id="fig-finding-an-agent-desc">三个阶段从上到下逐步绘制。首先 planner 找 code-reviewer 卡片：直接配置给出主机，GET /.well-known/agent-card.json 返回卡片，注册中心是套件未使用的第三条途径。其次选择接口 0，即 /a2a/jsonrpc 上的 JSON-RPC 1.0，跳过 HTTP+JSON 接口 1。最后读取能力标志：streaming 为 true，pushNotifications 缺失。忽略缺失标志的 CreateTaskPushNotificationConfig 调用以 -32003 失败。</desc>
   <defs><marker id="fig-finding-an-agent-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-finding-an-agent-head-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-grey-ink, #5e5e59)"/></marker><marker id="fig-finding-an-agent-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">1 · 找到卡片</text>
-  <text x="20" y="176" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">2 · 选支持的首个接口</text>
-  <text x="20" y="284" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">3 · 可选调用前检查标志</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">1 · 找到卡片</text>
+  <text x="20" y="176" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">2 · 选支持的首个接口</text>
+  <text x="20" y="284" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">3 · 可选调用前检查标志</text>
   <rect x="20" y="35" width="180" height="46" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="110" y="53.1" font-size="12" text-anchor="middle" font-weight="700">直接配置</text>
   <text x="110" y="70.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">端口 41241、41242、41243</text>
@@ -36,12 +36,12 @@
   <text x="315" y="127" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或查询注册中心</text>
   </g>
   <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
-  <line x1="540" y1="81" x2="540" y2="188" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <line x1="540" y1="81" x2="540" y2="188" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <rect x="20" y="188" width="600" height="30" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="32" y="207" font-size="11">[0] JSONRPC, &quot;1.0&quot;, http://localhost:41242/a2a/jsonrpc</text>
   <text x="610" y="207" font-size="11" text-anchor="end" font-weight="700" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">已选</text>
-  <rect x="20" y="224" width="600" height="30" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
-  <text x="32" y="243" font-size="11" fill="var(--m-ink-mute, #6f6f6a)">[1] HTTP+JSON, &quot;1.0&quot;, http://localhost:41242/a2a/rest</text>
+  <rect x="20" y="224" width="600" height="30" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="5 4"/>
+  <text x="32" y="243" font-size="11" fill="var(--m-ink-mute, #666660)">[1] HTTP+JSON, &quot;1.0&quot;, http://localhost:41242/a2a/rest</text>
   <text x="610" y="243" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">跳过：不是 JSON-RPC</text>
   </g>
   <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>

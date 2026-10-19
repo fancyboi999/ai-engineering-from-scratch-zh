@@ -5,24 +5,24 @@
   <rect x="22" y="8" width="96" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="70" y="23.1" font-size="12" text-anchor="middle" font-weight="700">planner</text>
   <text x="70" y="40.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端 agent</text>
-  <line x1="70" y1="48" x2="70" y2="432" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="70" y1="48" x2="70" y2="432" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="194" y="8" width="112" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="250" y="23.1" font-size="12" text-anchor="middle" font-weight="700">test-runner</text>
   <text x="250" y="40.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">远程 agent</text>
-  <line x1="250" y1="48" x2="250" y2="432" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="250" y1="48" x2="250" y2="432" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="366" y="8" width="100" height="56" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="416" y="23.6" font-size="12" text-anchor="middle" font-weight="700">任务存储</text>
   <text x="416" y="40.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">test-runner</text>
   <text x="416" y="55.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">内部</text>
-  <line x1="416" y1="64" x2="416" y2="432" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="416" y1="64" x2="416" y2="432" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="472" y="8" width="84" height="40" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="514" y="23.1" font-size="12" text-anchor="middle" font-weight="700">webhook</text>
   <text x="514" y="40.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">/a2a-events</text>
-  <line x1="514" y1="48" x2="514" y2="432" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="514" y1="48" x2="514" y2="432" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="564" y="8" width="72" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="600" y="23.1" font-size="12" text-anchor="middle" font-weight="700">操作员</text>
   <text x="600" y="40.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">人</text>
-  <line x1="600" y1="48" x2="600" y2="432" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="600" y1="48" x2="600" y2="432" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <circle cx="24" cy="84" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="24" y="88" font-size="11" text-anchor="middle">1</text>

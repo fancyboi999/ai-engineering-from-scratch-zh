@@ -2,7 +2,7 @@
   <title id="fig-4-3-title">从 spec.yaml 到签名产物，再入沙箱</title>
   <desc id="fig-4-3-desc">首行已录：hello-mixin含spec.yaml/files，validate验证，pack写hello-mixin.zip。第二行未运行，依据帮助：sign --key写spec旁kit.sig.bundle，push --sign向HTTPS registry推manifest、签名/溯源referrer。第三行未运行：verify/provenance读回，旁有四项准入设置。第四行已录：create --kit建m101-kit，装tree并复制HELLO.md；kit add追加env-mixin至m101-demo的swap容器；hello-mixin因声明文件被拒。</desc>
   <defs><marker id="fig-4-3-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-3-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">编写/打包（12-VALIDATE.TXT、12-PACK.TXT）</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">编写/打包（12-VALIDATE.TXT、12-PACK.TXT）</text>
   <rect x="20" y="28" width="140" height="52" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="90" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">hello-mixin/</text>
   <text x="90" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">spec.yaml, files/</text>
@@ -18,7 +18,7 @@
   <line x1="160" y1="54" x2="179" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
   <line x1="310" y1="54" x2="329" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
   <line x1="460" y1="54" x2="479" y2="54" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-teal)"/>
-  <text x="110" y="118" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">签名/发布（HELP-SBX，未运行）</text>
+  <text x="110" y="118" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">签名/发布（HELP-SBX，未运行）</text>
   <rect x="20" y="128" width="160" height="66" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)" stroke-dasharray="5 4"/>
   <text x="100" y="148.6" font-size="12" text-anchor="middle" font-weight="700">sbx kit sign --key</text>
   <text x="100" y="165.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">写 kit.sig.bundle</text>
@@ -36,7 +36,7 @@
   <line x1="380" y1="161" x2="399" y2="161" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-teal)"/>
   <rect class="m-knock" x="372.7" y="144.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="389.5" y="155" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">push</text>
-  <text x="20" y="232" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">读回（未运行）</text>
+  <text x="20" y="232" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">读回（未运行）</text>
   <rect x="300" y="242" width="140" height="52" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)" stroke-dasharray="5 4"/>
   <text x="370" y="263.1" font-size="12" text-anchor="middle" font-weight="700">sbx kit verify</text>
   <text x="370" y="280.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--key cosign.pub</text>
@@ -49,7 +49,7 @@
   <text x="158" y="255.6" font-size="12" text-anchor="middle" font-weight="700">kit 准入设置</text>
   <text x="158" y="272.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kit.allowedSources, kit.requireSignature,</text>
   <text x="158" y="287.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kit.trustedSigners, kit.allowLocalKits</text>
-  <text x="20" y="332" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">消费（12-RUN-KIT.TXT、12-KIT-ADD.TXT、12-KIT-ADD-FILES.TXT）</text>
+  <text x="20" y="332" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">消费（12-RUN-KIT.TXT、12-KIT-ADD.TXT、12-KIT-ADD-FILES.TXT）</text>
   <rect x="20" y="342" width="200" height="70" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="120" y="364.6" font-size="12" text-anchor="middle" font-weight="700">sbx create shell --kit</text>
   <text x="120" y="381.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">m101-kit：安装tree，</text>

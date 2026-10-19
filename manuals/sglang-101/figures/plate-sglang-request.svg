@@ -2,7 +2,7 @@
   <title id="plate-sglang-request-title">一个请求，三个进程，一个缓存</title>
   <desc id="plate-sglang-request-desc">2,999-token prompt 的聊天请求经过 tokenizer manager、scheduler 与 detokenizer。Scheduler 从基数缓存找到 2,998 token，只 prefill 一个，34.0 ms 收到首 token。下方是同一 system prompt 的三个版本：保持不变、开头加请求 ID、末尾加 ID，并列缓存 token 与首 token 时间中位数。</desc>
   <defs><marker id="plate-sglang-request-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="plate-sglang-request-head-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-indigo-ink, #4b4f9e)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">一个请求 · 稳定 SYSTEM PROMPT 第 3 轮</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">一个请求 · 稳定 SYSTEM PROMPT 第 3 轮</text>
   <rect x="20" y="34" width="100" height="56" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="70" y="57.25" font-size="12.5" text-anchor="middle" font-weight="700">客户端</text>
   <text x="70" y="74.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2,999 token</text>
@@ -28,7 +28,7 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M460 62 L479 62" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
   </g>
   <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
-  <text x="20" y="124" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">基数缓存视角的 PROMPT</text>
+  <text x="20" y="124" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">基数缓存视角的 PROMPT</text>
   <rect x="20" y="134" width="590" height="30" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="30" y="154" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">2,998 缓存 token · system prompt 与聊天模板</text>
   </g>
@@ -37,7 +37,7 @@
   <text x="620" y="184" font-size="11" text-anchor="end" fill="var(--m-plum-ink, #8a3d72)">1 个新 token</text>
   <text x="20" y="184" font-size="12" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">34.0 ms 后首 token</text>
   </g>
-  <text x="20" y="226" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">同一 SYSTEM PROMPT 的三种形式 · 第 2 至 5 或 1 至 5 轮中位数</text>
+  <text x="20" y="226" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">同一 SYSTEM PROMPT 的三种形式 · 第 2 至 5 或 1 至 5 轮中位数</text>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
   <rect x="20" y="238" width="260" height="44" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="32" y="263.75" font-size="12.5" font-weight="700">保持不变</text>
@@ -56,5 +56,5 @@
   <text x="300" y="377" font-size="12" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">3,028 中缓存 2,985</text>
   <text x="620" y="377" font-size="13" text-anchor="end" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">88.2 ms</text>
   </g>
-  <text x="20" y="412" font-size="11" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">来源：capture/out/cache-experiment.txt · SGLang 0.5.22 / MLX · Qwen3-0.6B-4bit</text>
+  <text x="20" y="412" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">来源：capture/out/cache-experiment.txt · SGLang 0.5.22 / MLX · Qwen3-0.6B-4bit</text>
 </svg>

@@ -2,8 +2,8 @@
   <title id="fig-7-2-title">一个证明的两条路径</title>
   <desc id="fig-7-2-desc">两列自上而下。路径一执行并比较：ledger.c 是原始代码，以本机 -O1 编译；percent_change_wide.c 为候选，重命名 cand_percent_change；driver.c 将两者链接为 differential；输入网格含九类危险情况的 92 格，貌似合理的一对有 28 次不匹配，等价一对为零。路径二重编译并比较：ledger-x86_64-O1.o 的 grade 为 46 字节，含一个 R_X86_64_PC32 重定位；grade_switch.c 以 clang、x86_64-unknown-linux-gnu、-O1 编译；mask_relocations 将双方偏移 38 的四字节清零；.rodata+0x10 与 .rodata-0x4 重定位形状相同；双方 read_table 均得 1、2、3、4、4，grade_case10_wrong 得 1、2、3、4、3。</desc>
   <defs><marker id="fig-7-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-7-2-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">路径一：执行并比较</text>
-  <text x="340" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">路径二：重编译并比较</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">路径一：执行并比较</text>
+  <text x="340" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">路径二：重编译并比较</text>
   <rect x="20" y="30" width="280" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="160" y="45.1" font-size="12" text-anchor="middle" font-weight="700">ledger.c</text>
   <text x="160" y="62.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">原始代码，本机 -O1 编译</text>

@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 322" role="img" aria-labelledby="fig-4-5-title fig-4-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-5-title">-O0 的跳转表与 -O1 的值表</title>
   <desc id="fig-4-5-desc">两列对比。左侧为第 33 课夹具 ledger-x86_64-O0.o 的 grade：边界检查、带 .rodata 重定位的 leaq、缩放读取、加法，再经 rax 执行 jmpq；.rela.rodata 的五个重定位目标为 0x91、0x88、0x7f、0x76、0x76，因此图有八块十一边。右侧为 arm64 -O1 捕获中的 _grade：比较与 b.hi、构造 0x1000007d0 的 adrp 和 add，再用一次 ldr 返回五个值 1、2、3、4、4 中的一个；档案含三块两边，jump_tables 列表为空。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · -O0 的 GRADE，X86-64 对象文件</text>
-  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · -O1 的 _GRADE，ARM64 可执行文件</text>
-  <line x1="320" y1="8" x2="320" y2="314" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · -O0 的 GRADE，X86-64 对象文件</text>
+  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · -O1 的 _GRADE，ARM64 可执行文件</text>
+  <line x1="320" y1="8" x2="320" y2="314" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <rect x="20" y="28" width="284" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="162" y="51.45" font-size="11.5" text-anchor="middle" font-weight="400">第 33 课夹具 ledger-x86_64-O0.o</text>
   <rect x="336" y="28" width="284" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>

@@ -2,8 +2,8 @@
   <title id="fig-5-2-title">ResidualUnknown 与修订链</title>
   <desc id="fig-5-2-desc">左为 compare_functions 在 _total 比较发生变化时记录的 unknown 第 1 次修订：unk_ ID 由 domain、question、scope digest、comparison scope 哈希生成；revision 1、前驱 null、status contradicted、severity medium、domain function-comparison；comparison scope 指定比较记录及五个变化维度；左档案和比较记录为支持证据，右档案为反对证据；要求 authority 为 artifact bytes、confidence 为 observed，推荐一次 analyze_function 探测，并有一个 mutation evidence ID。右侧为 update_unknown 的变化：expected_revision 1、revision 2、前次与本次修订摘要、status resolved 与 verified resolution，以及两个 mutation evidence ID。下方是每次变更写入的 mutation Evidence，provider 为 rea-unknown-registry。</desc>
   <defs><marker id="fig-5-2-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-5-2-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">COMPARE_FUNCTIONS 调用 RECORD_UNKNOWN</text>
-  <text x="400" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">UPDATE_UNKNOWN</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">COMPARE_FUNCTIONS 调用 RECORD_UNKNOWN</text>
+  <text x="400" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">UPDATE_UNKNOWN</text>
   <rect x="20" y="30" width="330" height="362" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="30" y="48" font-size="12" font-weight="700" fill="var(--m-amber-ink, #85590c)">ResidualUnknown，第 1 次修订</text>
   <text x="30" y="66" font-size="11">unknown_id: unk_ + domain 的 SHA-256，</text>

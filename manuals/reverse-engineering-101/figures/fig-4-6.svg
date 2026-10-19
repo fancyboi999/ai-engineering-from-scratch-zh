@@ -2,9 +2,9 @@
   <title id="fig-4-6-title">四个 ledger 函数的全部引用</title>
   <desc id="fig-4-6-desc">每函数一行。中间为函数、入口和函数体大小。左侧为 entry 内到达它的调用位置：_percent_change 为 0x1000006a0，_total 为 0x1000006bc，_grade_label 为 0x1000006ec；_grade 没有调用位置，因为已内联进 _grade_label。右侧为把它作为数据引用的 LC_FUNCTION_STARTS 条目：0x100008118、0x10000811a、0x10000811b、0x10000811c，对应 ULEB128 增量 0x500、0x18、0x3c、0x34。</desc>
   <defs><marker id="fig-4-6-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">ENTRY 中的调用位置</text>
-  <text x="230" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">函数</text>
-  <text x="420" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">LC_FUNCTION_STARTS 条目</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ENTRY 中的调用位置</text>
+  <text x="230" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">函数</text>
+  <text x="420" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">LC_FUNCTION_STARTS 条目</text>
   <rect x="230" y="36" width="180" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="320" y="56.25" font-size="12.5" text-anchor="middle" font-weight="700">_percent_change</text>
   <text x="320" y="73.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0x100000500 · 24 B</text>

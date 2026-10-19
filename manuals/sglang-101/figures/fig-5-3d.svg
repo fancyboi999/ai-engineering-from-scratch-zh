@@ -1,19 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 350" role="img" aria-labelledby="fig-5-3d-title fig-5-3d-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-3d-title">两个前缀缓存，相同结果</title>
   <desc id="fig-5-3d-desc">单 NVIDIA L4、Qwen3-8B、八用户，比较开启基数缓存的 SGLang 0.5.22、开启前缀缓存的 vLLM 0.31.0，以及关闭缓存的 SGLang，TTFT 中位数对共享 prompt 长度 0 至 4,096，每点三个种子，对数刻度。两条缓存曲线始终在 354 至 488 ms；无缓存时共享 4,096 token 的中位数升到 14,706 ms。</desc>
-  <line x1="70" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="70" y1="243.02" x2="606" y2="243.02" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="243.02" x2="606" y2="243.02" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="247.02" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">500</text>
-  <line x1="70" y1="210.51" x2="606" y2="210.51" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="210.51" x2="606" y2="210.51" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="214.51" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1k</text>
-  <line x1="70" y1="178" x2="606" y2="178" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="178" x2="606" y2="178" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="182" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2k</text>
-  <line x1="70" y1="135.02" x2="606" y2="135.02" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="135.02" x2="606" y2="135.02" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="139.02" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">5k</text>
-  <line x1="70" y1="102.51" x2="606" y2="102.51" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="102.51" x2="606" y2="102.51" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="106.51" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">10k</text>
-  <line x1="70" y1="70" x2="606" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="70" x2="606" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="74" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">20k</text>
   <line x1="70" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="70" x2="70" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

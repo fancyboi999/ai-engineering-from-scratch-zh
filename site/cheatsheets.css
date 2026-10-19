@@ -839,13 +839,16 @@
   }
 }
 
-@media screen and (max-width: 680px) {
-  /* Keep long API names and defaults inside their columns on narrow screens. */
-  .cs-table { table-layout: fixed; }
+/* API identifiers must not impose a minimum column width on screen cards. */
+@media screen {
   .cs-table th,
   .cs-table td,
   .cs-page .cs-table .cs-cmd { overflow-wrap: anywhere; }
+}
 
+@media screen and (max-width: 680px) {
+  /* Keep long API names and defaults inside their columns on narrow screens. */
+  .cs-table { table-layout: fixed; }
   .cs-page {
     padding: 84px 12px 40px;
     font-size: 14px;

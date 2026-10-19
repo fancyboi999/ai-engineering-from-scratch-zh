@@ -4,19 +4,19 @@
   <defs><marker id="fig-3-4-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-3-4-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-3-4-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
   <rect x="20" y="10" width="110" height="30" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="75" y="28.3" font-size="11" text-anchor="middle" font-weight="700">内部 curl</text>
-  <line x1="75" y1="40" x2="75" y2="628" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="75" y1="40" x2="75" y2="628" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="145" y="10" width="110" height="30" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="200" y="28.3" font-size="11" text-anchor="middle" font-weight="700">proxy :3128</text>
-  <line x1="200" y1="40" x2="200" y2="628" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="200" y1="40" x2="200" y2="628" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="270" y="10" width="110" height="30" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="325" y="28.3" font-size="11" text-anchor="middle" font-weight="700">sandboxd</text>
-  <line x1="325" y1="40" x2="325" y2="628" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="325" y1="40" x2="325" y2="628" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="395" y="10" width="110" height="30" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="450" y="28.3" font-size="11" text-anchor="middle" font-weight="700">策略存储</text>
-  <line x1="450" y1="40" x2="450" y2="628" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="450" y1="40" x2="450" y2="628" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="520" y="10" width="110" height="30" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="575" y="28.3" font-size="11" text-anchor="middle" font-weight="700">example.com</text>
-  <line x1="575" y1="40" x2="575" y2="628" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="575" y1="40" x2="575" y2="628" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <circle cx="24" cy="76" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="24" y="80" font-size="11" text-anchor="middle">1</text>

@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-3-2c-title fig-3-2c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-3-2c-title">池从未满时，增大毫无收益</title>
   <desc id="fig-3-2c-desc">NVIDIA GB10 上 Qwen3-30B-A3B 的输出吞吐量对并发 1 至 64，每点三个种子，比较 --mem-fraction-static 0.7 与 0.82。BF16 池从 234,600 增到 383,065 token，FP8 从 1,084,458 增到 1,378,545，但每对曲线重合：并发 64 时 BF16 为 235 对 239 tok/s，FP8 为 441 对 443。</desc>
-  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="241.6" x2="606" y2="241.6" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="241.6" x2="606" y2="241.6" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="245.6" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="66" y1="197.2" x2="606" y2="197.2" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="197.2" x2="606" y2="197.2" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="201.2" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="66" y1="152.8" x2="606" y2="152.8" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="152.8" x2="606" y2="152.8" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="156.8" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <line x1="66" y1="108.4" x2="606" y2="108.4" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="108.4" x2="606" y2="108.4" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="112.4" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">400</text>
-  <line x1="66" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="68" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">500</text>
   <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="64" x2="66" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

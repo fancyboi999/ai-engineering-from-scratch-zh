@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 478" role="img" aria-labelledby="fig-1-3-title fig-1-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-1-3-title">一条 Evidence 记录的 16 个字段</title>
   <desc id="fig-1-3-desc">_percent_change 的 analyze_function Evidence 记录，以 16 字段表格展示捕获值，右侧附注。evidence_id 为 ev_ 加 64 位十六进制，是语义内容的 SHA-256。subject 为 ledger-arm64-O1、mach-o、arm64，带 sha256 01b5d08b08fb 和 local_path。provider 为 ghidra、Ghidra、12.1.4。analysis_profile 有 25 参数，摘要 3fc72c9b。predicate_type 为 rea.analysis，operation 为 analyze_function，parameters 为过程 _percent_change。raw_result 含 value、limitations；normalized_result 是含过程、伪代码、汇编和块的档案。confidence 为 observed，authority 表示静态读取磁盘文件，environment 为 null，limitations 有十条字符串，relationship_coverage 为 complete 并带一条调用引用诊断，locations、evidence_links 为空。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">一条 EVIDENCE 记录</text>
-  <text x="396" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">字段内容</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">一条 EVIDENCE 记录</text>
+  <text x="396" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">字段内容</text>
   <rect x="20" y="26" width="360" height="28" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="30" y="43.3" font-size="11" font-weight="700">analyze_function 的 Evidence ev_b492c85e</text>
   <rect x="20" y="54" width="360" height="26" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>

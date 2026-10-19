@@ -2,8 +2,8 @@
   <title id="fig-5-5-title">三次 shell 调用经过批准顺序</title>
   <desc id="fig-5-5-desc">从上向下是guarded.yaml的shell批准顺序。preempt_yolo的log-hook.sh每次回allow，仅建议。deny shell:cmd=rm*拒绝rm -rf work/m101-nothing；allow shell:cmd=echo*在两模式执行echo。无ask模式。pwd标签safe由安全模式决定：restricted执行并输出目录，strict询问，无终端--exec转为用户拒绝。</desc>
   <defs><marker id="fig-5-5-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-5-5-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-5-5-head-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-olive-ink, #515f26)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">GUARDED.YAML 的 SHELL，--SAFETY STRICT/RESTRICTED</text>
-  <text x="20" y="36" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">20-STRICT.NDJSON, 20-RESTRICTED.NDJSON</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">GUARDED.YAML 的 SHELL，--SAFETY STRICT/RESTRICTED</text>
+  <text x="20" y="36" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">20-STRICT.NDJSON, 20-RESTRICTED.NDJSON</text>
   <rect x="20" y="50" width="250" height="52" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="145" y="71.1" font-size="12" text-anchor="middle" font-weight="700">preempt_yolo hook</text>
   <text x="145" y="88.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">log-hook.sh，每次调用</text>

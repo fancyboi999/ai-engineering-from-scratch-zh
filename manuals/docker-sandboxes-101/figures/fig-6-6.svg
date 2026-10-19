@@ -11,8 +11,8 @@
   <line x1="270" y1="55" x2="399" y2="55" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-6-head-ink)"/>
   <rect class="m-knock" x="304" y="38.42" width="61" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="334.5" y="49" font-size="11" text-anchor="middle">拉取、配置</text>
-  <rect x="10" y="118" width="360" height="246" fill="none" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
-  <text x="20" y="110" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">COMPOSE 项目 M101</text>
+  <rect x="10" y="118" width="360" height="246" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="5 4"/>
+  <text x="20" y="110" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">COMPOSE 项目 M101</text>
   <rect x="20" y="130" width="340" height="74" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="190" y="154.75" font-size="12.5" text-anchor="middle" font-weight="700">printer, alpine:3.22</text>
   <text x="190" y="172.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">LLM_MODEL=ai/qwen3:4b</text>

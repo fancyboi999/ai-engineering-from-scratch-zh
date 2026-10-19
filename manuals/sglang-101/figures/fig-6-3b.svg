@@ -2,7 +2,7 @@
   <title id="fig-6-3b-title">一次传输的 KVPoll 状态</title>
   <desc id="fig-6-3b-desc">一行四状态：Bootstrapping 1、WaitingForInput 2、Transferring 3、Success 4，依次前进。下方 Failed 0 可由 bootstrap、等待、传输三阶段到达。</desc>
   <defs><marker id="fig-6-3b-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-6-3b-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">一个请求、一次传输</text>
+  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">一个请求、一次传输</text>
   <rect x="20" y="34" width="140" height="50" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="90" y="54.1" font-size="12" text-anchor="middle" font-weight="700">Bootstrapping</text>
   <text x="90" y="71.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">KVPoll 1</text>

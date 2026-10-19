@@ -5,15 +5,15 @@
   <rect x="22" y="10" width="136" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="90" y="25.1" font-size="12" text-anchor="middle" font-weight="700">planner</text>
   <text x="90" y="42.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端 agent</text>
-  <line x1="90" y1="50" x2="90" y2="602" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="90" y1="50" x2="90" y2="602" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="252" y="10" width="136" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="320" y="25.1" font-size="12" text-anchor="middle" font-weight="700">test-runner</text>
   <text x="320" y="42.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">localhost:41241</text>
-  <line x1="320" y1="50" x2="320" y2="602" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="320" y1="50" x2="320" y2="602" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="485" y="10" width="150" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="560" y="25.1" font-size="12" text-anchor="middle" font-weight="700">webhook 接收器</text>
   <text x="560" y="42.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">:41250/a2a-events</text>
-  <line x1="560" y1="50" x2="560" y2="602" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="560" y1="50" x2="560" y2="602" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <circle cx="24" cy="86" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="24" y="90" font-size="11" text-anchor="middle">1</text>

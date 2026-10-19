@@ -37,7 +37,7 @@
   <line x1="150" y1="89" x2="150" y2="57" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-1-head-ink)"/>
   <circle cx="168" cy="73" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="168" y="77" font-size="11" text-anchor="middle">6</text>
-  <text x="20" y="340" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">按编号执行的步骤</text>
+  <text x="20" y="340" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">按编号执行的步骤</text>
   <circle cx="29" cy="358" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="29" y="362" font-size="11" text-anchor="middle">1</text>
   <text x="46" y="362" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTP 发送 POST /generate</text>

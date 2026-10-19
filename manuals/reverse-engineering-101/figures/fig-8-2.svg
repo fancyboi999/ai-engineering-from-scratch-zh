@@ -30,7 +30,7 @@
   <text x="455" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">240 s</text>
   <line x1="554" y1="232" x2="554" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="554" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">300 s</text>
-  <text x="20" y="282" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">实测首次调用</text>
+  <text x="20" y="282" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">实测首次调用</text>
   <circle cx="30" cy="298" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <text x="30" y="302" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">1</text>
   <text x="48" y="302" font-size="11" class="m-serif">6.3 s：本 Mac 的 list_procedures，ledger-arm64-O1，33,872 字节</text>

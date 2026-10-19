@@ -3,7 +3,7 @@
   <desc id="fig-2-3-desc">两条表示 4,096-token KV 池。第一条五请求各预留 256 prompt 加 512 输出，共 3,840 token，余 256。第二条第六个请求还需 768，超过池末端 512 token，因此调度器让它等待。</desc>
   <line x1="561.52" y1="30" x2="561.52" y2="176" stroke="var(--m-ink, #1a1a1a)" stroke-width="1" stroke-dasharray="5 4"/>
   <text x="565.52" y="26" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">池末端</text>
-  <text x="70" y="26" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">准入：五个请求</text>
+  <text x="70" y="26" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">准入：五个请求</text>
   <rect x="70" y="36" width="30.72" height="28" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <rect x="100.72" y="36" width="61.44" height="28" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="162.16" y="36" width="30.72" height="28" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
@@ -16,7 +16,7 @@
   <rect x="469.36" y="36" width="61.44" height="28" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="530.8" y="36" width="30.72" height="28" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="70" y="84" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每请求预留 256 输入 + 512 输出 = 768 token</text>
-  <text x="70" y="120" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">第六个请求需总计 4,608</text>
+  <text x="70" y="120" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">第六个请求需总计 4,608</text>
   <rect x="70" y="130" width="30.72" height="28" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <rect x="100.72" y="130" width="61.44" height="28" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="162.16" y="130" width="30.72" height="28" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>

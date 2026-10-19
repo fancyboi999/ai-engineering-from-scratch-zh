@@ -191,7 +191,7 @@ async function main() {
     // Real content: narrow poster tables must stay in the card, not merely in
     // a document whose overflow is hidden. Include all generated topics.
     const sheetFiles = fs.readdirSync(path.join(root, 'site/cheatsheets')).filter(file => file.endsWith('.html'));
-    for (const width of [320, 390]) {
+    for (const width of [320, 390, 768, 1440]) {
       await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
       for (const file of sheetFiles) {
         await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/cheatsheets/${file}` });
@@ -210,7 +210,7 @@ async function main() {
         })`);
         assert.ok(layout.scroll <= layout.client + 1, file + ' scrolls horizontally at ' + width);
         assert.ok(layout.grid.every(box=>box.right<=box.parentRight+1), file + ' tiles escape their grid');
-        assert.ok(layout.tables.every(box=>box.right<=box.parentRight+1), file + ' table escapes its card');
+        assert.ok(layout.tables.every(box=>box.right<=box.parentRight+1), file + ' table escapes its card at ' + width);
         assert.deepEqual(layout.clipped, [], file + ' has overflowing table-cell content');
       }
     }
@@ -253,7 +253,7 @@ async function main() {
       return ['light','dark'].flatMap(theme=>{document.documentElement.setAttribute('data-theme',theme);const style=getComputedStyle(document.documentElement);const probe=document.createElement('span');document.body.appendChild(probe);const colors=['--m-ink-mute','--m-paper','--m-panel','--m-code-bg'].map(key=>{probe.style.color=style.getPropertyValue(key);return luminance(getComputedStyle(probe).color);});probe.remove();return colors.slice(1).map(background=>(Math.max(colors[0],background)+.05)/(Math.min(colors[0],background)+.05));});
     })()`);
     assert.ok(manualContrast.every(ratio=>ratio>=4.5), 'manual muted text contrast: ' + JSON.stringify(manualContrast));
-    console.log('site layout: 26 cheat sheets at 320/390px, four document flows, mobile 404, and 12 muted-text contrasts passed');
+    console.log('site layout: 26 cheat sheets at 320/390/768/1440px, four document flows, mobile 404, and 12 muted-text contrasts passed');
     // Exercise the real lazy-load boundary, including a failed request and retry.
     await command('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await command('Network.enable');

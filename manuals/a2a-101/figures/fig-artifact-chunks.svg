@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 474" role="img" aria-labelledby="fig-artifact-chunks-title fig-artifact-chunks-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-artifact-chunks-title">五个分块成为一个存储产物</title>
   <desc id="fig-artifact-chunks-desc">顶部：套件时钟上的流式运行九帧。第 1、2、9 帧是状态帧，时间戳为 09:00:01.750Z、09:00:02.000Z、09:00:02.250Z，间隔 250 ms。第 3 至第 8 帧为无时间戳的产物更新，位于第二和第三个时间点之间。中部：表格列出第 3 至第 8 帧的 artifactId、标志及对存储任务的作用。第 3 帧创建 test-log 及首个 part，第 4 至第 7 帧各追加一个 part，第 7 帧设 lastChunk，第 8 帧创建 summary 产物。底部：存储的 test-log.txt 产物含五个 text part，每分块一个。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">套件时钟上的九帧</text>
-  <line x1="36" y1="70" x2="51" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="69" y1="70" x2="301" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="319" y1="70" x2="337" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="355" y1="70" x2="372" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="390" y1="70" x2="408" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="426" y1="70" x2="444" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="462" y1="70" x2="480" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="498" y1="70" x2="515" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="533" y1="70" x2="551" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
-  <line x1="569" y1="70" x2="604" y2="70" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1"/>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">套件时钟上的九帧</text>
+  <line x1="36" y1="70" x2="51" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="69" y1="70" x2="301" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="319" y1="70" x2="337" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="355" y1="70" x2="372" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="390" y1="70" x2="408" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="426" y1="70" x2="444" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="462" y1="70" x2="480" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="498" y1="70" x2="515" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="533" y1="70" x2="551" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <line x1="569" y1="70" x2="604" y2="70" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <text x="435" y="98" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">第 3 至第 8 帧没有时间戳</text>
   <rect x="20" y="114" width="330" height="26" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="32" y="130.6" font-size="12" font-weight="700">流中：artifactId 与标志</text>

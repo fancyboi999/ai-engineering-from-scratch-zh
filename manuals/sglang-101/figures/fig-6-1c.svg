@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-6-1c-title fig-6-1c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-6-1c-title">两个模型副本服务量反而少于一个</title>
   <desc id="fig-6-1c-desc">Qwen3-8B 输出吞吐量对并发 1 至 64，每点三个种子，带状为最小至最大运行值。一张 L4 在并发 32 达 270 token/s，64 为 251。两张 L4 使用 --dp-size 2，第二张为共享卡，此时并发 8 峰值仅 64 token/s，并发 64 降到 42。</desc>
-  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="66" y1="212" x2="606" y2="212" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="212" x2="606" y2="212" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="216" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="66" y1="138" x2="606" y2="138" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="138" x2="606" y2="138" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="142" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <line x1="66" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="66" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="68" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
   <line x1="66" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="66" y1="64" x2="66" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

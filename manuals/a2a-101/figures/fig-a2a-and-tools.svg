@@ -2,14 +2,14 @@
   <title id="fig-a2a-and-tools-title">agent 之间用 A2A，各自内部用工具</title>
   <desc id="fig-a2a-and-tools-desc">客户端 agent planner 通过 A2A 向三个远程 agent 发送 SendMessage：端口 41241 的 test-runner 提供 run-tests 技能，端口 41242 的 code-reviewer 提供 review-diff 和 answer-question，端口 41243 的 deployer 提供 deploy。planner 只看到卡片和端点。虚线下的内容对 planner 隐藏，各 agent 运行自身逻辑，把各自系统作为工具：test-runner 用 Git 和 CI 执行器，code-reviewer 用 Git，deployer 用部署 API。</desc>
   <defs><marker id="fig-a2a-and-tools-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">客户端 AGENT</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">客户端 AGENT</text>
   <rect x="170" y="26" width="300" height="44" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="320" y="43.25" font-size="12.5" text-anchor="middle" font-weight="700">planner</text>
   <text x="320" y="60.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">交付 payments-api：测试、审查、部署</text>
-  <text x="20" y="96" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A2A · PLANNER 可见内容</text>
-  <line x1="20" y1="102" x2="620" y2="102" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="20" y="230" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">对 PLANNER 隐藏</text>
-  <line x1="20" y1="236" x2="620" y2="236" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="96" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A2A · PLANNER 可见内容</text>
+  <line x1="20" y1="102" x2="620" y2="102" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="230" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">对 PLANNER 隐藏</text>
+  <line x1="20" y1="236" x2="620" y2="236" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <text x="320" y="404" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">套件用 Python 模拟这些系统。真实 agent 通过 MCP 或任意 API 调用它们。</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <path d="M320 70 V112 H113 V139" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-a2a-and-tools-head-ink)"/>

@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 346" role="img" aria-labelledby="fig-3-5-title fig-3-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-3-5-title">并排比较两份概览</title>
   <desc id="fig-3-5-desc">两列。左侧为 arm64 Mach-O 可执行文件：Ghidra 文档 target-01b5d08b08fb.bin，有 12 内存块、13 过程、39 字符串，列出从 0x100000000 的 __TEXT 到 0x10000c000 的 EXTERNAL 的全部块。右侧为 x86-64 ELF 可重定位目标：文档 target-9a4a8082ba5e.o，有 10 块、4 过程、20 字符串，从 0x100000 的 .text 到独立地址空间中的 _elfSectionHeaders。两记录均来自 rea-workflow provider，置信度 derived。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · LEDGER-ARM64-O1 · MACH-O ARM64</text>
-  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · LEDGER-X86_64-O1.O · ELF X86_64</text>
-  <line x1="320" y1="8" x2="320" y2="338" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · LEDGER-ARM64-O1 · MACH-O ARM64</text>
+  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · LEDGER-X86_64-O1.O · ELF X86_64</text>
+  <line x1="320" y1="8" x2="320" y2="338" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <rect x="20" y="28" width="284" height="46" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="162" y="46.25" font-size="12.5" text-anchor="middle" font-weight="700">target-01b5d08b08fb.bin</text>
   <text x="162" y="63.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">12 段 · 13 过程 · 39 字符串</text>

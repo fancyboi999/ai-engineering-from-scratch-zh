@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-3-3c-title fig-3-3c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-3-3c-title">共享 prompt 越长，树节省越多</title>
   <desc id="fig-3-3c-desc">NVIDIA L4 上 Qwen3-8B 的首 token 时间中位数对共享 system prompt 长度，每点三个种子，对数刻度。开启基数缓存时中位数保持 349 至 479 ms，关闭时从无共享 prompt 的 379 ms 增至共享 4,096 token 的 14,706 ms。</desc>
-  <line x1="70" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="286" x2="606" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="290" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="70" y1="243.24" x2="606" y2="243.24" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="243.24" x2="606" y2="243.24" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="247.24" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <line x1="70" y1="196.38" x2="606" y2="196.38" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="196.38" x2="606" y2="196.38" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="200.38" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1k</text>
-  <line x1="70" y1="153.62" x2="606" y2="153.62" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="153.62" x2="606" y2="153.62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="157.62" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">3k</text>
-  <line x1="70" y1="106.76" x2="606" y2="106.76" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="106.76" x2="606" y2="106.76" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="110.76" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">10k</text>
-  <line x1="70" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="64" x2="606" y2="64" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="68" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">30k</text>
   <line x1="70" y1="286" x2="606" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="64" x2="70" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

@@ -2,9 +2,9 @@
   <title id="fig-4-2-title">哪些 decode 批次能重放计算图</title>
   <desc id="fig-4-2-desc">80 GB GPU、张量并行 1、max_bs 256 时，decode 批次到达 CUDA graph runner。大小 13 的批次重放为 16 捕获的图；256 重放最大图；300 超过 max_bs，改用 eager，每个内核一次提交，调度日志显示 cuda graph False。</desc>
   <defs><marker id="fig-4-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-2-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">DECODE 批次</text>
-  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">CAN_RUN_GRAPH</text>
-  <text x="450" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">执行内容</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">DECODE 批次</text>
+  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">CAN_RUN_GRAPH</text>
+  <text x="450" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">执行内容</text>
   <rect x="20" y="30" width="150" height="48" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="95" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">bs = 13</text>
   <text x="95" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行请求</text>

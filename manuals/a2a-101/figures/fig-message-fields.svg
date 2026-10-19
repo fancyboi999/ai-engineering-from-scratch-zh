@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 384" role="img" aria-labelledby="fig-message-fields-title fig-message-fields-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-message-fields-title">消息各字段由谁设置</title>
   <desc id="fig-message-fields-desc">表格展示 06-input-required.http 审查三条消息的八个 Message 字段，按发送顺序逐列出现。planner 首条消息 14a03569 没有 contextId 和 taskId。code-reviewer 问题 46494a30 带 contextId 49c5a238、taskId e5c95b09。planner 回答 096d3737 回传两个 ID。角色为 ROLE_USER、ROLE_AGENT、ROLE_USER。三条均未设置 metadata、extensions、referenceTaskIds。右列说明谁设置各字段，最后注释说明服务器将两个 ID 写入保存的首条消息副本。</desc>
-  <text x="28" y="34" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">字段</text>
-  <text x="452" y="34" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">设置者</text>
+  <text x="28" y="34" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">字段</text>
+  <text x="452" y="34" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">设置者</text>
   <rect x="20" y="48" width="600" height="34" fill="var(--m-paper, #fafaf5)" stroke="var(--m-panel-edge, #e4e1d4)"/>
   <circle cx="30" cy="65" r="3" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="40" y="69" font-size="12" font-weight="700">messageId</text>
@@ -26,17 +26,17 @@
   <text x="40" y="205" font-size="12" font-weight="700">parts</text>
   <text x="452" y="198" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者，至少</text>
   <text x="452" y="212" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个 part</text>
-  <rect x="20" y="218" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
-  <text x="40" y="236" font-size="12" fill="var(--m-ink-mute, #6f6f6a)">metadata</text>
-  <text x="304" y="236" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">套件采集均未设置</text>
+  <rect x="20" y="218" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="5 4"/>
+  <text x="40" y="236" font-size="12" fill="var(--m-ink-mute, #666660)">metadata</text>
+  <text x="304" y="236" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #666660)">套件采集均未设置</text>
   <text x="452" y="236" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者：JSON 对象</text>
-  <rect x="20" y="246" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
-  <text x="40" y="264" font-size="12" fill="var(--m-ink-mute, #6f6f6a)">extensions</text>
-  <text x="304" y="264" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">套件采集均未设置</text>
+  <rect x="20" y="246" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="5 4"/>
+  <text x="40" y="264" font-size="12" fill="var(--m-ink-mute, #666660)">extensions</text>
+  <text x="304" y="264" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #666660)">套件采集均未设置</text>
   <text x="452" y="264" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者：扩展 URI</text>
-  <rect x="20" y="274" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #6f6f6a)" stroke-dasharray="5 4"/>
-  <text x="40" y="292" font-size="12" fill="var(--m-ink-mute, #6f6f6a)">referenceTaskIds</text>
-  <text x="304" y="292" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">套件采集均未设置</text>
+  <rect x="20" y="274" width="600" height="28" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="5 4"/>
+  <text x="40" y="292" font-size="12" fill="var(--m-ink-mute, #666660)">referenceTaskIds</text>
+  <text x="304" y="292" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #666660)">套件采集均未设置</text>
   <text x="452" y="292" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发送者：相关任务</text>
   <line x1="160" y1="48" x2="160" y2="218" stroke="var(--m-panel-edge, #e4e1d4)" stroke-width="1"/>
   <line x1="256" y1="48" x2="256" y2="218" stroke="var(--m-panel-edge, #e4e1d4)" stroke-width="1"/>
@@ -49,8 +49,8 @@
   <text x="208" y="27" font-size="11.5" text-anchor="middle" font-weight="700">planner</text>
   <text x="208" y="42" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首条消息</text>
   <text x="208" y="69" font-size="11" text-anchor="middle">14a03569</text>
-  <text x="208" y="103" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">省略</text>
-  <text x="208" y="137" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #6f6f6a)">省略</text>
+  <text x="208" y="103" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #666660)">省略</text>
+  <text x="208" y="137" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-mute, #666660)">省略</text>
   <text x="208" y="171" font-size="11" text-anchor="middle">ROLE_USER</text>
   <text x="208" y="205" font-size="11" text-anchor="middle">text, raw</text>
   </g>

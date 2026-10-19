@@ -5,27 +5,27 @@
   <rect x="10" y="8" width="100" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="60" y="22.8" font-size="11" text-anchor="middle" font-weight="700">你</text>
   <text x="60" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">读者</text>
-  <line x1="60" y1="48" x2="60" y2="596" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="60" y1="48" x2="60" y2="596" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="114" y="8" width="100" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="164" y="22.8" font-size="11" text-anchor="middle" font-weight="700">rea 6.7.0</text>
   <text x="164" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">独立 CLI</text>
-  <line x1="164" y1="48" x2="164" y2="596" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="164" y1="48" x2="164" y2="596" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="218" y="8" width="100" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="268" y="22.8" font-size="11" text-anchor="middle" font-weight="700">会话</text>
   <text x="268" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">BinarySession</text>
-  <line x1="268" y1="48" x2="268" y2="596" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="268" y1="48" x2="268" y2="596" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="322" y="8" width="100" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="372" y="22.8" font-size="11" text-anchor="middle" font-weight="700">客户端</text>
   <text x="372" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GhidraClient</text>
-  <line x1="372" y1="48" x2="372" y2="596" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="372" y1="48" x2="372" y2="596" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="426" y="8" width="100" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="476" y="22.8" font-size="11" text-anchor="middle" font-weight="700">Ghidra JVM</text>
   <text x="476" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bridge.sock</text>
-  <line x1="476" y1="48" x2="476" y2="596" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="476" y1="48" x2="476" y2="596" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="530" y="8" width="100" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="580" y="22.8" font-size="11" text-anchor="middle" font-weight="700">分析产物</text>
   <text x="580" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ledger-arm64-O1</text>
-  <line x1="580" y1="48" x2="580" y2="596" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="2 3"/>
+  <line x1="580" y1="48" x2="580" y2="596" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <circle cx="16" cy="84" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="16" y="88" font-size="11" text-anchor="middle">1</text>

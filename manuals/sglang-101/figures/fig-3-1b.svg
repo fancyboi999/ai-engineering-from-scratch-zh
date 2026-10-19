@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="fig-3-1b-title fig-3-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-3-1b-title">请求行指向同一个槽位池</title>
   <desc id="fig-3-1b-desc">ReqToTokenPool 的请求 A、B 两行各列 KV 槽位索引。两行都以共享 system prompt 的槽 1 至 4 开头，再指向各自问题的槽。下方 KV 池条带显示槽 1 至 4 只存一份，由两行共享；空闲列表分配新槽位。</desc>
-  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">REQTOTOKENPOOL 行</text>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">REQTOTOKENPOOL 行</text>
   <text x="20" y="56" font-size="12">请求 A</text>
   <rect x="120" y="34" width="46" height="34" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="143" y="54.6" font-size="12" text-anchor="middle" font-weight="700">1</text>
@@ -30,7 +30,7 @@
   <text x="403" y="100.6" font-size="12" text-anchor="middle" font-weight="700">8</text>
   <text x="440" y="56" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单元格保存槽位索引</text>
   <text x="440" y="102" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">位置 0 至 5</text>
-  <text x="20" y="150" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">KV 池槽位</text>
+  <text x="20" y="150" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">KV 池槽位</text>
   <rect x="20" y="160" width="54" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="47" y="183.6" font-size="12" text-anchor="middle" font-weight="700">0</text>
   <rect x="80" y="160" width="54" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>

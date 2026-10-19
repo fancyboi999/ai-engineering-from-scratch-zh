@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-4-9-title fig-4-9-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-9-title">同一行在两个批次中归约</title>
   <desc id="fig-4-9-desc">两列对比。左侧默认矩阵乘内核在批次 1 时用两个 tile 归约同一请求行，在批次 37 时用四个 tile，部分和的相加顺序不同，结果末位可能变化。右侧批次不变内核在两批次都使用同样固定切分，结果比特相同。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A · 默认内核</text>
-  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B · 批次不变内核</text>
-  <line x1="320" y1="8" x2="320" y2="332" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · 默认内核</text>
+  <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · 批次不变内核</text>
+  <line x1="320" y1="8" x2="320" y2="332" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <text x="20" y="44" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">批次含 1 请求</text>
   <rect x="20" y="54" width="139" height="26" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="165" y="54" width="139" height="26" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>

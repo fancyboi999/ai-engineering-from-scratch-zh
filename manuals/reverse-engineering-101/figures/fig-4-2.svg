@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 426" role="img" aria-labelledby="fig-4-2-title fig-4-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-4-2-title">一次 Ghidra 会话的私有运行根目录</title>
   <desc id="fig-4-2-desc">目录名由 rea-ghidra- 加随机后缀组成，由 GhidraClient start() 创建，close_binary 后删除。包含六个 Ghidra 目录、名为 target-01b5d08b08fb.bin 的目标哈希副本、带七个键的 session.json 描述符、bridge.sock Unix socket、ownership.json，以及 ghidra.log 和 script.log。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">会话根目录 · 每次 START() 一个</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">会话根目录 · 每次 START() 一个</text>
   <rect x="20" y="26" width="600" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="320" y="46.25" font-size="12.5" text-anchor="middle" font-weight="700">rea-ghidra-&lt;random&gt;</text>
   <text x="320" y="63.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GhidraClient start() 创建，close_binary 后删除</text>

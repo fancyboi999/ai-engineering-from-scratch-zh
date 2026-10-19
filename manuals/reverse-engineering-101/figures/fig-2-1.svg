@@ -2,7 +2,7 @@
   <title id="fig-2-1-title">第一条命令前的五个问题</title>
   <desc id="fig-2-1-desc">左侧纵列五个问题，各附法律或判决：17 U.S.C. 1201(f)(1) 和 Directive 2009/24/EC 第 6(1)(a) 条要求合法副本；法律规定目的，如互操作、研究、纠错、获授权测试；1201(f)(1)、第 6(1)(b) 条和 Sega 要求没有其他途径取得事实；第 6(1)(c) 条和 C-13/20 要求仅处理必要部分；第 6(2)(c) 条、Sega 和 Connectix 要求最终使用自己的表达。各问题的玫红虚线指向“否：停止、先取得授权、README、免责声明”。最后问题的向下实线指向绿色框“五次都是：开始分析”，列出专为本手册编写的 ledger.c、ledger-main.c、js-app、ledger.wat。</desc>
   <defs><marker id="fig-2-1-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-2-1-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">依次回答五个问题</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">依次回答五个问题</text>
   <rect x="440" y="26" width="180" height="300" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
   <text x="530" y="156.25" font-size="12.5" text-anchor="middle" font-weight="700">否：停止</text>
   <text x="530" y="173.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先取得授权</text>

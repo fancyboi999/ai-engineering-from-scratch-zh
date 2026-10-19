@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 268" role="img" aria-labelledby="fig-5-1b-title fig-5-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-1b-title">基准报告各行如何计算</title>
   <desc id="fig-5-1b-desc">基准报告的五行，各附 calculate_metrics 所用公式，以及并发上限 8 的运行值：Concurrency 7.96、Peak concurrent requests 16、TTFT 中位数 785.79 ms、TPOT 中位数 22.52 ms、ITL 中位数 20.35 ms。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">报告行</text>
-  <text x="232" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">计算方式</text>
-  <text x="515" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">上限为 8</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">报告行</text>
+  <text x="232" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">计算方式</text>
+  <text x="515" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">上限为 8</text>
   <rect x="20" y="32" width="200" height="34" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="120" y="52.6" font-size="12" text-anchor="middle" font-weight="700">Concurrency</text>
   <text x="232" y="54" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">E2E 延迟总和 / 时长</text>

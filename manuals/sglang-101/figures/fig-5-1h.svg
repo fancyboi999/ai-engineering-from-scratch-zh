@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="fig-5-1h-title fig-5-1h-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-1h-title">固定长度：较慢首 token，较平滑 decode</title>
   <desc id="fig-5-1h-desc">NVIDIA L4 上 Qwen3-8B 的 TTFT 中位数和 P99 ITL 对 --random-range-ratio，并发上限 16、64 个 prompt，每点三个种子，对数刻度。比例 1.0 时各请求输入 512、输出 128 token，BF16/FP8 的 TTFT 为 1,996/1,526 ms，P99 ITL 为 82/55 ms。比例 0.0 长度变化时，TTFT 为 291/129 ms，P99 ITL 为 300/95 ms。</desc>
-  <line x1="70" y1="294" x2="606" y2="294" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="294" x2="606" y2="294" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="298" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">30</text>
-  <line x1="70" y1="239.1" x2="606" y2="239.1" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="239.1" x2="606" y2="239.1" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="243.1" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
-  <line x1="70" y1="189" x2="606" y2="189" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="189" x2="606" y2="189" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="193" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <line x1="70" y1="134.1" x2="606" y2="134.1" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="134.1" x2="606" y2="134.1" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="138.1" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1k</text>
-  <line x1="70" y1="84" x2="606" y2="84" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="84" x2="606" y2="84" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="88" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">3k</text>
   <line x1="70" y1="294" x2="606" y2="294" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="84" x2="70" y2="294" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
