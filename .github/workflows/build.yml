@@ -185,7 +185,9 @@ jobs:
         run: |
           command -v clang
           python3 -m unittest discover -s phases/13-tools-and-protocols/36-rebuild-and-prove-equal/code/tests -v
-          python3 -m unittest discover -s phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/code/tests -v
+          # Apple clang 冻结字节与 macOS 运行记录不要求 Linux 编译器重现；
+          # 此 gate 运行可移植的真实重定位边界，包含符号、addend 和节偏移。
+          python3 -m unittest discover -s phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/code/tests -k ByteFieldTests -v
       - name: 项目、图表、Hub、手册与课程读取集成回归
         env:
           PYTHONDONTWRITEBYTECODE: "1"
