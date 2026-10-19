@@ -212,6 +212,39 @@ class CandidateTests(unittest.TestCase):
 
 
 class ByteFieldTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("clang"), "clang is required for the ELF relocation boundary")
+    def test_external_relocations_preserve_symbol_and_addend_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sources = {
+                "original": "extern int foo(int); int f(int x) { return foo(x) + 1; }",
+                "same": "extern int foo(int); int f(int x) { return foo(x) + 1; }",
+                "different": "extern int bar(int); int f(int x) { return bar(x) + 1; }",
+                "defined": "__attribute__((noinline)) int foo(int x){return x+1;} __attribute__((noinline)) int bar(int x){return x+2;} int f(int x){return foo(x)+1;}",
+                "defined_same": "__attribute__((noinline)) int foo(int x){return x+1;} __attribute__((noinline)) int bar(int x){return x+2;} int f(int x){return foo(x)+1;}",
+                "defined_different": "__attribute__((noinline)) int foo(int x){return x+1;} __attribute__((noinline)) int bar(int x){return x+2;} int f(int x){return bar(x)+1;}",
+                "code_address": "static int foo(int x){return x+1;} void *f(void){return (char *)(void *)foo;}",
+                "code_offset": "static int foo(int x){return x+1;} void *f(void){return (char *)(void *)foo+4;}",
+                "address": "extern char data[]; char *f(void) { return data; }",
+                "offset": "extern char data[]; char *f(void) { return data + 4; }",
+            }
+            objects = {}
+            for name, source in sources.items():
+                path = root / (name + ".c")
+                obj = root / (name + ".o")
+                path.write_text(source)
+                subprocess.run([shutil.which("clang"), *main.FIXTURE_FLAGS, "-fno-pic", str(path), "-o", str(obj)], check=True, capture_output=True)
+                objects[name] = (path, obj)
+            for original, candidate, expected in [("original", "same", "pass"), ("original", "different", "fail"), ("address", "offset", "fail"), ("defined", "defined_same", "pass"), ("defined", "defined_different", "fail"), ("code_address", "code_offset", "fail")]:
+                with self.subTest(original=original, candidate=candidate):
+                    source, obj = objects[candidate]
+                    claim = main.Candidate(candidate, {"target": {"function": "f"}, "claims": {"name": "f"}}, source, obj)
+                    result = main.field_bytes(claim, None, target=objects[original][1])
+                    self.assertEqual(result["status"], expected)
+                    self.assertEqual(result["detail"]["relocations_match"], expected == "pass")
+                    self.assertEqual(result["detail"]["differing_offsets"], [])
+                    self.assertEqual(result["detail"]["original_size"], result["detail"]["rebuilt_size"])
+
     def test_correct_candidates_pass_bytes_including_the_table_constants(self) -> None:
         first = main.field_bytes(main.load_candidate("f1_mul_first"))
         self.assertEqual((first["status"], first["evidence"]), ("pass", "16 bytes equal after masking 0 relocation bytes"))
@@ -237,7 +270,7 @@ class ByteFieldTests(unittest.TestCase):
         wide = main.field_bytes(main.load_candidate("f1_wide_long"))
         self.assertEqual(wide["evidence"], "size 16 vs 26 bytes")
         thresholds = main.field_bytes(main.load_candidate("f2_thresholds"))
-        self.assertEqual(thresholds["evidence"], "size 46 vs 39 bytes; relocation records differ in count, offset, type, or target section")
+        self.assertEqual(thresholds["evidence"], "size 46 vs 39 bytes; relocation records differ in count, offset, type, target section, or target identity/addend")
         clamp = main.field_bytes(main.load_candidate("f2_clamp"))
         self.assertEqual(clamp["detail"]["rebuilt_size"], 50)
         self.assertEqual(clamp["status"], "fail")

@@ -1,4 +1,7 @@
 import json
+import shutil
+import subprocess
+import tempfile
 import sys
 import unittest
 from pathlib import Path
@@ -108,6 +111,37 @@ class ElfReaderTests(unittest.TestCase):
 
 
 class LegTwoTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("clang"), "clang is required for the ELF relocation boundary")
+    def test_external_relocations_preserve_symbol_and_addend_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sources = {
+                "original": "extern int foo(int); int f(int x) { return foo(x) + 1; }",
+                "same": "extern int foo(int); int f(int x) { return foo(x) + 1; }",
+                "different": "extern int bar(int); int f(int x) { return bar(x) + 1; }",
+                "defined": "__attribute__((noinline)) int foo(int x){return x+1;} __attribute__((noinline)) int bar(int x){return x+2;} int f(int x){return foo(x)+1;}",
+                "defined_same": "__attribute__((noinline)) int foo(int x){return x+1;} __attribute__((noinline)) int bar(int x){return x+2;} int f(int x){return foo(x)+1;}",
+                "defined_different": "__attribute__((noinline)) int foo(int x){return x+1;} __attribute__((noinline)) int bar(int x){return x+2;} int f(int x){return bar(x)+1;}",
+                "code_address": "static int foo(int x){return x+1;} void *f(void){return (char *)(void *)foo;}",
+                "code_offset": "static int foo(int x){return x+1;} void *f(void){return (char *)(void *)foo+4;}",
+                "address": "extern char data[]; char *f(void) { return data; }",
+                "offset": "extern char data[]; char *f(void) { return data + 4; }",
+            }
+            objects = {}
+            for name, source in sources.items():
+                path = root / (name + ".c")
+                obj = root / (name + ".o")
+                path.write_text(source)
+                subprocess.run([shutil.which("clang"), *main.FIXTURE_FLAGS, "-fno-pic", str(path), "-o", str(obj)], check=True, capture_output=True)
+                objects[name] = (path, obj)
+            for original, candidate, expected in [("original", "same", "pass"), ("original", "different", "fail"), ("address", "offset", "fail"), ("defined", "defined_same", "pass"), ("defined", "defined_different", "fail"), ("code_address", "code_offset", "fail")]:
+                with self.subTest(original=original, candidate=candidate):
+                    result = main.prove_bytes("f", objects[candidate][1], original=objects[original][1])
+                    self.assertEqual(result.status, expected)
+                    self.assertEqual(result.relocations_match, expected == "pass")
+                    self.assertTrue(result.masked_equal)
+                    self.assertEqual(result.original_size, result.candidate_size)
+
     def test_committed_objects_reach_the_expected_verdicts(self) -> None:
         for name, expected in EXPECTED_LEG_TWO.items():
             function = "percent_change" if name.startswith("percent") else "grade"

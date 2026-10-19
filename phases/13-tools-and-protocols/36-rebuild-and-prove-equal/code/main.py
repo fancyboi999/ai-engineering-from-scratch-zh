@@ -283,6 +283,7 @@ def compare_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 SHT_SYMTAB = 2
 SHT_RELA = 4
 STT_SECTION = 3
+STT_FUNC = 2
 EM_X86_64 = 62
 ET_REL = 1
 RELOC_NAMES = {0: "R_X86_64_NONE", 1: "R_X86_64_64", 2: "R_X86_64_PC32", 4: "R_X86_64_PLT32", 10: "R_X86_64_32", 11: "R_X86_64_32S"}
@@ -462,7 +463,7 @@ class LegTwoReport:
         elif not self.masked_equal:
             reasons.append(f"{len(self.differing_offsets)} unmasked bytes differ, first at offset {self.differing_offsets[0]:#x}")
         if not self.relocations_match:
-            reasons.append("relocation records differ in count, offset, type, or target section")
+            reasons.append("relocation records differ in count, offset, type, target section, or target identity/addend")
         if self.tables_equal is False:
             reasons.append(f"referenced constants differ: {self.original_table} vs {self.candidate_table}")
         return reasons
@@ -497,12 +498,25 @@ def prove_bytes(function: str, candidate: Path, original: Path = ORIGINAL_OBJECT
     differing = [index for index, (a, b) in enumerate(zip(masked_left, masked_right)) if a != b]
     detail = []
     relocations_match = len(left.relocations) == len(right.relocations)
+    # 掩码后目标位移不再可见，外部绑定和代码目标仍须保留身份。
+    undefined_left = {symbol["name"] for symbol in original_obj.symbols if symbol["shndx"] == 0}
+    undefined_right = {symbol["name"] for symbol in candidate_obj.symbols if symbol["shndx"] == 0}
+    code_left = {symbol["name"] for symbol in original_obj.symbols if symbol["type"] == STT_FUNC} | {".text"}
+    code_right = {symbol["name"] for symbol in candidate_obj.symbols if symbol["type"] == STT_FUNC} | {".text"}
     for reloc_left, reloc_right in zip(left.relocations, right.relocations):
         same = (
             reloc_left.offset == reloc_right.offset
             and reloc_left.type == reloc_right.type
             and reloc_left.symbol == reloc_right.symbol
         )
+        if reloc_left.symbol in undefined_left or reloc_right.symbol in undefined_right:
+            same = same and (
+                reloc_left.symbol in undefined_left
+                and reloc_right.symbol in undefined_right
+                and reloc_left.addend == reloc_right.addend
+            )
+        if reloc_left.symbol in code_left or reloc_right.symbol in code_right:
+            same = same and reloc_left.symbol in code_left and reloc_right.symbol in code_right and reloc_left.addend == reloc_right.addend
         relocations_match = relocations_match and same
         detail.append(
             {

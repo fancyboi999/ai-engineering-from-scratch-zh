@@ -96,6 +96,7 @@ python3 -m minidec decompile samples/samples-x86_64-O1.o --function tenths_and_f
 - `magic_divisor(0x66666667, 31)` 为 `None`：低于 32 的移位量不可能来自该惯用法。
 - `magic_divisor(0x66666668, 34)` 为 `None`：比正确乘数大一，无法通过向上取整检查。
 - `division_identity_holds(0x66666667, 34, 11)` 为假。
+- 编译 `int f(void) { int x = -5; return x * -2; }` 的 `-O0` 目标文件。常量折叠只能计算当前运算，最终输出 `return 10;`；不能因预先计算无关的 `a << b` 而抛出负移位异常。
 - `record` 对 `m->reads` 的加载先于存储。替换必须让 `ecx_2 = rdi_0->field_0 + 1` 保持在 `store32(rdi_0) = ecx_2` 上方，否则 C 会读取新值。
 
 ## 扩展

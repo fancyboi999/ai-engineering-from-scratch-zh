@@ -403,7 +403,7 @@ python3 code/main.py
 python3 -m unittest discover -s code/tests -v
 ```
 
-35 项测试证明：
+36 项测试证明：
 
 - `c_div()` 向零截断，`wrap32()` 遵循补码。
 - 模型对 `(3, INT_MAX)` 得 -133，陷阱单元在 x86-64 得 trap、AArch64 得 -2147483648。
@@ -411,6 +411,7 @@ python3 -m unittest discover -s code/tests -v
 - ELF 读取器在记录偏移和大小找到四函数。
 - percent_change 为 16 字节且无重定位；grade 在 `0x26` 有一个 `R_X86_64_PC32`。
 - 重定位字段为零，屏蔽不改变此 RELA 目标。
+- 外部未定义符号和已定义代码目标都必须保留相同身份与加数；两个目标都在 `.text` 节不能替代这项检查。已定义表的布局变化仍通过读取并比较实际常量判断。
 - 八个提交候选都达到预期状态并给出记录原因。
 - grade_case10_wrong 通过屏蔽字节比较，只在常量检查失败。
 - 已记录第一条路径有十个朴素通过、28 不匹配、零模型分歧。

@@ -1,6 +1,8 @@
 
 from __future__ import annotations
 
+import operator
+
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -154,9 +156,9 @@ def make_simplifier(defs: dict[tuple[str, int], Any], recognize_division: bool, 
         left, right = expr.left, expr.right
         if isinstance(left, Const) and isinstance(right, Const):
             a, b = left.value, right.value
-            table = {"+": a + b, "-": a - b, "*": a * b, "&": a & b, "|": a | b, "^": a ^ b, "<<": a << b}
+            table = {"+": operator.add, "-": operator.sub, "*": operator.mul, "&": operator.and_, "|": operator.or_, "^": operator.xor, "<<": operator.lshift}
             if expr.op in table:
-                return Const(truncate(table[expr.op], expr.width), expr.width)
+                return Const(truncate(table[expr.op](a, b), expr.width), expr.width)
         if expr.op in ("+", "-") and isinstance(right, Const) and right.value == 0:
             return left
         if expr.op == "*" and isinstance(right, Const) and right.value == 1:

@@ -1,10 +1,14 @@
 
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-from minidec.elf import load_object
+import minidec
+from minidec.elf import STT_SECTION, load_object
 from minidec.emit import decompile_all, translation_unit
 from minidec.verify import (
     MEMORY_WORDS,
@@ -122,6 +126,94 @@ class GridAndDriverTests(unittest.TestCase):
 
 @unittest.skipUnless(find_clang(), NO_CLANG)
 class RecompileTests(unittest.TestCase):
+    def test_negative_constants_decompile_through_the_cli_and_execute(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            source = work / "negative.c"
+            source.write_text("int f(void) { int x = -5; return x * -2; }\n", encoding="utf-8")
+            obj = recompile(source, "O0", work / "negative.o")
+            env = dict(os.environ, PYTHONPATH=str(Path(minidec.__file__).resolve().parent.parent))
+            result = subprocess.run([sys.executable, "-m", "minidec", "decompile", str(obj)], env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("return 10;", result.stdout)
+            candidate = work / "candidate.c"
+            candidate.write_text(result.stdout, encoding="utf-8")
+            driver = work / "driver.c"
+            driver.write_text('#include <stdio.h>\nint f(void); int main(void) { printf("%d\\n", f()); return f() != 10; }\n', encoding="utf-8")
+            binary = work / "run"
+            built = subprocess.run([find_clang(), str(candidate), str(driver), "-o", str(binary)], capture_output=True, text=True)
+            self.assertEqual(built.returncode, 0, built.stderr)
+            executed = subprocess.run([str(binary)], capture_output=True, text=True)
+            self.assertEqual((executed.returncode, executed.stdout), (0, "10\n"), executed.stderr)
+
+    def test_external_call_identity_survives_relocation_masking(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            objects = []
+            for index, callee in enumerate(("foo", "bar", "foo")):
+                source = work / f"call_{index}.c"
+                source.write_text(f"extern int {callee}(int); int f(int x) {{ return {callee}(x) + 1; }}\n", encoding="utf-8")
+                objects.append(load_object(recompile(source, "O1", source.with_suffix(".o"))))
+            different = compare_function_bytes(objects[0], objects[1], "f")
+            self.assertTrue(different.masked_equal)
+            self.assertFalse(different.relocations_match)
+            self.assertEqual(different.status, "differs")
+            self.assertEqual(compare_function_bytes(objects[0], objects[2], "f").status, "pass")
+
+    def test_external_symbol_addends_survive_relocation_masking(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            objects = []
+            for offset in (0, 1):
+                source = work / f"address_{offset}.c"
+                source.write_text(f"extern int foo[]; int *f(void) {{ return foo + {offset}; }}\n", encoding="utf-8")
+                obj = source.with_suffix(".o")
+                # Non-PIC emits the address displacement in the relocation addend,
+                # rather than an extra arithmetic instruction after a GOT load.
+                built = subprocess.run([find_clang(), *fixture_flags("O1"), "-fno-pic", str(source), "-o", str(obj)], capture_output=True, text=True)
+                self.assertEqual(built.returncode, 0, built.stderr)
+                objects.append(load_object(obj))
+            comparison = compare_function_bytes(objects[0], objects[1], "f")
+            self.assertTrue(comparison.masked_equal)
+            self.assertEqual([obj.function("f").relocations[0].addend for obj in objects], [0, 4])
+            self.assertFalse(comparison.relocations_match)
+            self.assertEqual(comparison.status, "differs")
+
+    def test_code_targets_survive_relocation_masking(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            for kind in ("named", "section"):
+                with self.subTest(kind=kind):
+                    objects = []
+                    for index, target in enumerate(("foo", "bar", "foo")):
+                        if kind == "named":
+                            text = (
+                                "__attribute__((noinline)) int foo(int x) { return x + 1; }\n"
+                                "__attribute__((noinline)) int bar(int x) { return x + 2; }\n"
+                                f"int f(int x) {{ return {target}(x) + 1; }}\n"
+                            )
+                        else:
+                            # Keep the call displacement in a section-symbol relocation.
+                            # The two real code targets start at offsets 16 and 32.
+                            text = (
+                                ".text\n.globl f\n.type f,@function\nf:\n.byte 0xe8\n.long 0\nret\n.size f, .-f\n"
+                                ".p2align 4\nfoo: mov $1,%eax\nret\n.p2align 4\nbar: mov $2,%eax\nret\n"
+                                f".reloc f+1, R_X86_64_PC32, .text+{12 if target == 'foo' else 28}\n"
+                            )
+                        source = work / f"{kind}_{index}.{'c' if kind == 'named' else 's'}"
+                        source.write_text(text, encoding="utf-8")
+                        objects.append(load_object(recompile(source, "O1", source.with_suffix(".o"))))
+                    for obj in objects:
+                        relocation = obj.function("f").relocations[0]
+                        self.assertEqual(relocation.symbol.section, ".text")
+                        self.assertNotEqual(relocation.symbol.shndx, 0)
+                        self.assertEqual(relocation.symbol.type == STT_SECTION, kind == "section")
+                    different = compare_function_bytes(objects[0], objects[1], "f")
+                    self.assertTrue(different.masked_equal)
+                    self.assertFalse(different.relocations_match)
+                    self.assertEqual(different.status, "differs")
+                    self.assertEqual(compare_function_bytes(objects[0], objects[2], "f").status, "pass")
+
     def test_emitted_unit_recompiles_and_matches_bytes_for_the_straight_line_functions(self):
         elf = load_object(O1)
         results = decompile_all(elf)

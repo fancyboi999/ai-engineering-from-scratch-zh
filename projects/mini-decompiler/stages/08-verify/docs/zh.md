@@ -6,7 +6,7 @@
 
 构建 `verify` 命令，将反编译文本转为带证据的结论。包含两个验证分支和一份报告。
 
-**字节验证。** 使用测试固件选项（`-target x86_64-unknown-linux-gnu -O1 -fno-asynchronous-unwind-tables -c`）重编译 `decompiled.c`。逐函数从原版和候选目标文件切出字节，将双方全部重定位字段清零后比较。再比较重定位的偏移、类型和目标节，以及各 PC 相对重定位指向的数据节中的字。掩码字节相同但表内容不同，仍算差异。
+**字节验证。** 使用测试固件选项（`-target x86_64-unknown-linux-gnu -O1 -fno-asynchronous-unwind-tables -c`）重编译 `decompiled.c`。逐函数从原版和候选目标文件切出字节，将双方全部重定位字段清零后比较。再比较重定位的偏移、类型和目标节，以及各 PC 相对重定位指向的数据节中的字。目标是未定义外部符号（`SHN_UNDEF`）时，还必须核对符号名与加数，否则调用不同函数或指向同一符号的不同位置会被掩码隐藏。掩码字节相同但表内容不同，仍算差异。
 
 **行为验证。** 编译原始源代码、全部函数重命名为 `cand_<name>` 的候选版，以及生成的 C 驱动。每个输入单元给驱动一行。驱动以相同内存的副本调用双方，打印双方结果及调用后内存，除法触发陷阱则打印 `trap`。两行不同的单元均为不匹配。
 
@@ -69,7 +69,7 @@ pj-mini-decompiler-8
 |---|---|
 | `recompile(source, opt, out) -> Path` | 用 `fixture_flags(opt)` 运行 clang。缺少 clang 或编译错误时抛出含编译器文本的 `VerifyError`。 |
 | `mask_relocations(data, relocations) -> (bytes, ranges)` | 将各重定位偏移处的 `width` 字节清零；返回掩码字节及 `(offset, width)` 范围。 |
-| `compare_function_bytes(original, candidate, name, tables=None) -> ByteComparison` | 比较掩码字节、重定位形状、引用常量。候选缺少函数时为 `unknown`，绝不算通过。 |
+| `compare_function_bytes(original, candidate, name, tables=None) -> ByteComparison` | 比较掩码字节、重定位形状、引用常量。任一重定位指向 `SHN_UNDEF` 时，要求双方均为未定义符号，且符号名与加数相同。命名的 `.text` 目标要求符号名与加数相同；双方都是 `.text` 节符号时，比较 `symbol.value + addend`。数据节保留原有映射与常量比较规则。候选缺少函数时为 `unknown`，绝不算通过。 |
 | `classify(args, constants) -> str` | 按输入网格一节的优先级给单元分类。 |
 | `input_grid(signature, constants=None, limit=400) -> list[Cell]` | 上述值集合的笛卡尔积，不重复单元。 |
 | `differential_test(original_source, candidate_source, decompiled, opt, workdir)` | 构建测试程序，运行各函数网格。 |

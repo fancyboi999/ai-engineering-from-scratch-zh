@@ -93,7 +93,7 @@ class ByteComparison:
         elif not self.masked_equal:
             reasons.append(f"{len(self.differing_offsets)} unmasked bytes differ, first at offset 0x{self.differing_offsets[0]:x}")
         if not self.relocations_match:
-            reasons.append("relocation records differ in count, offset, type or target section")
+            reasons.append("relocation records differ in count, offset, type, target section or code/undefined target identity")
         if self.constants_equal is False:
             reasons.append("referenced constants differ: " + "; ".join(f"{e['original']} vs {e['candidate']}" for e in self.constants if not e["equal"]))
         return reasons

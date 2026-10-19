@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from .elf import ElfObject, Relocation, load_object, relocation_target
+from .elf import STT_SECTION, ElfObject, Relocation, load_object, relocation_target
 from .emit import Decompiled, decompile_all, translation_unit
 from .types import Signature
 
@@ -106,7 +106,7 @@ class ByteComparison:
         elif not self.masked_equal:
             reasons.append(f"{len(self.differing_offsets)} unmasked bytes differ, first at offset 0x{self.differing_offsets[0]:x}")
         if not self.relocations_match:
-            reasons.append("relocation records differ in count, offset, type or target section")
+            reasons.append("relocation records differ in count, offset, type, target section or code/undefined target identity")
         if self.constants_equal is False:
             reasons.append("referenced constants differ: " + "; ".join(f"{e['original']} vs {e['candidate']}" for e in self.constants if not e["equal"]))
         return reasons
@@ -152,6 +152,24 @@ def compare_function_bytes(original: ElfObject, candidate: ElfObject, name: str,
     lengths = {(info["section"], info["offset"]): len(info["values"]) * info["width"] // 8 for info in (tables or {}).values()}
     for reloc_left, reloc_right in zip(left.relocations, right.relocations):
         same = reloc_left.offset == reloc_right.offset and reloc_left.type == reloc_right.type and reloc_left.symbol.section == reloc_right.symbol.section
+        # SHN_UNDEF has no section identity; its link-time target is the name plus addend.
+        # Data-section targets keep their existing mapping and constant comparison.
+        if reloc_left.symbol.shndx == 0 or reloc_right.symbol.shndx == 0:
+            same = same and (
+                reloc_left.symbol.shndx == reloc_right.symbol.shndx == 0
+                and reloc_left.symbol.name == reloc_right.symbol.name
+                and reloc_left.addend == reloc_right.addend
+            )
+        elif reloc_left.symbol.section == ".text" or reloc_right.symbol.section == ".text":
+            if reloc_left.symbol.type == reloc_right.symbol.type == STT_SECTION:
+                same = same and reloc_left.symbol.value + reloc_left.addend == reloc_right.symbol.value + reloc_right.addend
+            else:
+                same = same and (
+                    reloc_left.symbol.type != STT_SECTION
+                    and reloc_right.symbol.type != STT_SECTION
+                    and reloc_left.symbol.name == reloc_right.symbol.name
+                    and reloc_left.addend == reloc_right.addend
+                )
         relocations_match = relocations_match and same
         detail.append(
             {

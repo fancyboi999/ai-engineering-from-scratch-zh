@@ -181,6 +181,11 @@ jobs:
           GOPROXY: "off"
           GOSUMDB: "off"
         run: python3 scripts/project_test.py --all --solution --strict --report "$RUNNER_TEMP/project-grade.json"
+      - name: 逆向验证器真实对象回归
+        run: |
+          command -v clang
+          python3 -m unittest discover -s phases/13-tools-and-protocols/36-rebuild-and-prove-equal/code/tests -v
+          python3 -m unittest discover -s phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/code/tests -v
       - name: 项目、图表、Hub、手册与课程读取集成回归
         env:
           PYTHONDONTWRITEBYTECODE: "1"

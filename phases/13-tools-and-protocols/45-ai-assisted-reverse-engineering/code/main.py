@@ -725,6 +725,19 @@ def compile_candidate_object(candidate: Candidate, workdir: Path | None) -> Path
     return candidate.committed_object if candidate.committed_object.exists() else None
 
 
+def same_relocation(left: Reloc, right: Reloc) -> bool:
+    if (left.offset, left.type, left.symbol.section) != (right.offset, right.type, right.symbol.section):
+        return False
+    if left.symbol.shndx == 0 or right.symbol.shndx == 0:
+        return left.symbol.shndx == right.symbol.shndx == 0 and (left.symbol.name, left.addend) == (right.symbol.name, right.addend)
+    if left.symbol.section == ".text":
+        if left.symbol.type == STT_SECTION or right.symbol.type == STT_SECTION:
+            return left.symbol.type == right.symbol.type == STT_SECTION and left.symbol.value + left.addend == right.symbol.value + right.addend
+        return (left.symbol.name, left.addend) == (right.symbol.name, right.addend)
+    # 数据表可迁移；下游仍读取并比较表常量，不把节内偏移当语义身份。
+    return True
+
+
 def field_bytes(candidate: Candidate, workdir: Path | None = None, target: Path = TARGET_OBJECT) -> dict[str, Any]:
     """Lesson 36 leg two: same compiler and flags, masked relocation fields, same relocation
     shape, and the same constants behind every relocation."""
@@ -741,7 +754,7 @@ def field_bytes(candidate: Candidate, workdir: Path | None = None, target: Path 
     masked_right, _ = mask_relocations(rebuilt.data, rebuilt.relocations)
     differing = [index for index, (a, b) in enumerate(zip(masked_left, masked_right)) if a != b]
     same_shape = len(original.relocations) == len(rebuilt.relocations) and all(
-        a.offset == b.offset and a.type == b.type and a.symbol.section == b.symbol.section for a, b in zip(original.relocations, rebuilt.relocations)
+        same_relocation(a, b) for a, b in zip(original.relocations, rebuilt.relocations)
     )
     claim = TABLE_CLAIMS.get(candidate.function)
     original_table = rebuilt_table = None
@@ -754,7 +767,7 @@ def field_bytes(candidate: Candidate, workdir: Path | None = None, target: Path 
     elif differing:
         reasons.append(f"{len(differing)} unmasked bytes differ, first at offset {differing[0]:#x}")
     if not same_shape:
-        reasons.append("relocation records differ in count, offset, type, or target section")
+        reasons.append("relocation records differ in count, offset, type, target section, or target identity/addend")
     if original_table is not None and original_table != rebuilt_table:
         reasons.append(f"referenced constants differ: {original_table} vs {rebuilt_table}")
     detail = {
