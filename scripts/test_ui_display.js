@@ -240,12 +240,13 @@ async function main() {
       assert.ok(gaps.sections.every(gap=>gap>=12), page + ' section heading touches its content');
     }
     await command('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
-    await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/404.html` });
+    await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/__layout-audit-missing/nested` });
     for (let attempt = 0; attempt < 100; attempt++) {
       if (await evaluate("document.readyState==='complete' && !!document.querySelector('h1')")) break;
       await delay(50);
     }
     assert.equal(await evaluate('innerWidth'), 390, '404 uses a desktop layout viewport on phones');
+    assert.equal(await evaluate("getComputedStyle(document.documentElement).getPropertyValue('--ink-mute').trim()"), '#666660', 'nested 404 does not load the site stylesheet');
     // Shared muted text remains readable on each supported surface in both themes.
     const contrast = await evaluate(`(()=>{
       const luminance=color=>{const c=color.match(/[\\d.]+/g).slice(0,3).map(Number).map(n=>{n/=255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4;});return c[0]*.2126+c[1]*.7152+c[2]*.0722;};
