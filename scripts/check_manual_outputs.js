@@ -55,7 +55,7 @@ function checkManualOutputs(root) {
         }
       }
       assert.doesNotMatch(print, /<script|<animate|class="m-packet"|fonts\.googleapis\.com/);
-      assert.match(web, /<script src="header\.js" defer>/);
+      assert.match(web, /<script src="header\.js\?v=[a-z0-9]+" defer>/);
       assert.ok(web.includes(`href="manual-${manual.id}-print.html"`));
       console.log(`${manual.id}: ${sections} sections, ${expected.references} references, ${expected.figures} figures; web/print/URLs/provenance OK`);
     }

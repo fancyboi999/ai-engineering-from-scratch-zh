@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import navigation from "../../lib/site-navigation.js";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import * as k from "./kit/iso-kit.mjs";
@@ -145,14 +146,7 @@ const html = `<!DOCTYPE html>
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
-      <nav class="header-nav">
-        <a href="index.html#contents">课程目录</a>
-        <a href="catalog.html">课程表</a>
-        <a href="prereqs.html">路线图</a>
-        <a href="glossary.html">术语表</a>
-        <a href="about.html">关于</a>
-        <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github">GitHub <span class="star-count" data-loading="true" aria-label="GitHub stars">…</span></a>
-      </nav>
+      <nav class="header-nav">${navigation.renderNavigation()}</nav>
       <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button>
     </div>
   </header>
@@ -307,7 +301,7 @@ ${STUDIO ? STUDIO_PANEL : `          <a class="am-btn am-poster" href="anatomy/i
       });
     })();
   </script>
-  <script src="header.js?v=20261015b" defer></script>
+  <script src="header.js?v=${navigation.HEADER_ASSET_VERSION}" defer></script>
   <script>${wrapped.replace(/<\/(script)/gi, "<\\/$1")}</script>
 </body>
 </html>

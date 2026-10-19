@@ -463,7 +463,7 @@ test('shared site asset families use the expected cache keys on every page', () 
   const release = '20260831a';
   const appRelease = '20261019a';
   const styleRelease = '20261019b';
-  const navigationRelease = '20261019a';
+  const navigationRelease = '20261019b';
   const narrationRelease = '20260831a';
   const roadmapRelease = '20261019a';
   const pages = [
@@ -1570,8 +1570,8 @@ test('shared header progressively compacts without hiding GitHub stars or search
   assert.match(headerSource, /var COMPACT_HEADER_QUERY = '\(max-width: 1400px\)'/);
   assert.match(headerSource, /var NARROW_HEADER_QUERY = '\(max-width: 820px\)'/);
   assert.match(headerSource, /priorityNav\.className = 'header-priority-nav'/);
-  assert.match(headerSource, /target !== 'index\.html' && target !== 'catalog\.html' && target !== 'learning-paths\.html'/);
-  assert.match(headerSource, /ensureNavigationLink\(nav, 'learning-paths\.html', '学习路径', ''\)/);
+  assert.match(headerSource, /link\.hasAttribute\('data-header-priority'\)/);
+  assert.doesNotMatch(headerSource, /ensureNavigationLink|addNavigationLinks/);
   assert.match(headerSource, /if \(isNarrow\) restorePriorityLinks\(\);[\s\S]*?else movePriorityLinksOut\(\)/);
 
   assert.match(
@@ -2573,4 +2573,34 @@ test('lesson page includes completion panel and button contract', () => {
   runtime.api.unmarkLessonComplete(lesson);
   assert.equal(runtime.api.isLessonComplete(lesson), false);
   assert.equal(runtime.api.getLessonProgress(lesson).completedAt, null);
+});
+
+test('all shared headers render one complete menu before JavaScript runs', () => {
+  const expected = [
+    ['index.html#contents', '课程目录'], ['catalog.html', '课程表'], ['prereqs.html', '路线图'],
+    ['learning-paths.html', '学习路径'], ['certifications.html', '认证'], ['projects.html', '实战项目'],
+    ['manuals.html', '技术手册'], ['glossary.html', '术语表'], ['cheatsheets', '速查表'],
+    ['how-to-learn.html', '学习方法'], ['skills.html', 'Agent 技能'],
+    ['inside-an-ai-agent.html', 'Agent 内部机制'], ['about.html', '关于'],
+  ];
+  const files = fs.readdirSync(__dirname).filter(name => name.endsWith('.html') && !name.endsWith('-print.html')).concat([
+    'hubs/phase/tools-and-protocols.html', 'hubs/glossary/activation-checkpointing.html',
+    'cheatsheets/index.html', 'cheatsheets/sglang-serving.html',
+    'lessons/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/index.html',
+    'project/binary-inspector/index.html',
+  ]);
+  let checked = 0;
+  for (const file of files) {
+    const html = fs.readFileSync(path.join(__dirname, file), 'utf8');
+    const nav = html.match(/<nav\b[^>]*class="header-nav"[^>]*>([\s\S]*?)<\/nav>/);
+    if (!nav) continue; // Standalone print/404 surfaces have no shared navigation.
+    const links = [...nav[1].matchAll(/<a href="([^"]+)"[^>]*data-header-page="[^"]+"[^>]*>([^<]+)<\/a>/g)]
+      .map(match => [new URL(match[1], 'https://aieng-zh.cn/' + file).href, match[2]]);
+    assert.deepEqual(links, expected.map(([href, label]) => [new URL(href, 'https://aieng-zh.cn/').href, label]), file);
+    assert.doesNotMatch(nav[1], /header-mobile-only/, file);
+    assert.equal((nav[1].match(/class="header-github"/g) || []).length, 1, file);
+    assert.match(html, /header\.js\?v=20261019b/, file);
+    checked++;
+  }
+  assert.ok(checked >= 25, `only ${checked} shared headers checked`);
 });

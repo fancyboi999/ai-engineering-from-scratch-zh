@@ -7,6 +7,7 @@ const { execFileSync } = require('node:child_process');
 const markdown = require('./md-render');
 const { phaseSlug } = require('../lib/hub-routes');
 const { SITE_HEADER } = require('./build-hubs');
+const { HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const ORIGIN = 'https://aieng-zh.cn';
 const REPO = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh';
@@ -24,7 +25,7 @@ const MAX_SUBTITLE = 120;
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap';
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
 const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css">';
-const BODY_ASSETS = '<script src="/header.js" defer></script>\n<script src="/cheatsheets.js" defer></script>';
+const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/cheatsheets.js" defer></script>`;
 
 const TYPES = {
   concepts: { group: 'know', label: '概念' },
@@ -883,6 +884,8 @@ function checkLinks(built, root = REPO_ROOT) {
       if (/^https?:/.test(href)) continue;
       const target = href.split('#')[0];
       if (!target || known.has(target) || fixed.has(target)) continue;
+      const staticPage = /^\/([a-z0-9-]+\.html)$/.exec(target);
+      if (staticPage && fs.existsSync(path.join(root, 'site', staticPage[1]))) continue;
       const lesson = /^\/lessons\/([a-z0-9-]+\/[a-z0-9-]+)\/$/.exec(target);
       if (lesson && fs.existsSync(path.join(root, 'phases', lesson[1], 'docs', 'zh.md'))) continue;
       const phase = /^\/phase\/([a-z0-9-]+)$/.exec(target);
