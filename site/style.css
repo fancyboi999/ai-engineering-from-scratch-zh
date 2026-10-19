@@ -450,6 +450,7 @@ p.dropcap::first-letter {
 }
 
 .theme-toggle {
+  flex-shrink: 0;
   background: transparent;
   border: 1px solid var(--rule-soft);
   width: 36px;
@@ -2500,3 +2501,18 @@ body[data-palette-open] {
     flex-shrink: 0;
   }
 }
+
+/* Stable toolbar geometry whether page narration is available or not. */
+.header-narration-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+}
+.header-mobile-tools .header-narration-slot { flex-basis: 44px; width: 44px; height: 44px; }
+.header-mobile-tools .header-narration-slot:empty { display: none; }
+
+/* Keep the centered shell in place across short and scrollable pages. */
+html { scrollbar-gutter: stable; }

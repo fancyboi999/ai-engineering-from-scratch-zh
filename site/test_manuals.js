@@ -537,7 +537,7 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
   assert.doesNotMatch(print, /<script|fonts\.googleapis\.com/);
   assert.match(print, /name="robots" content="noindex"/);
   assert.match(html, /src="header\.js\?v=[a-z0-9]+"/);
-  assert.match(index, /aria-label="搜索"/);
+  assert.match(index, /data-cmd-palette aria-label="搜索（⌘K）"/);
 });
 
 test('PDF downloads link only the two published ready manuals and never enter print output', () => {

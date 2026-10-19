@@ -10,7 +10,7 @@
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   var COMPACT_HEADER_QUERY = '(max-width: 1400px)';
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
-  var NARRATION_VERSION = '20260831a';
+  var NARRATION_VERSION = '20261019a';
   var HEADER_BASE = document.currentScript && document.currentScript.src
     ? new URL('.', document.currentScript.src).href
     : '';
@@ -167,7 +167,7 @@
     var current = pageFile(location.href);
     // 首页和课程表是密集导航界面，不挂载全页朗读；其他内容页（含认证）加载。
     var isHome = /^\/(?:index\.html)?$/.test(sitePath());
-    if (isHome || current === 'catalog.html' || !document.querySelector('.theme-toggle')) return;
+    if (isHome || current === 'catalog.html' || document.querySelector('.site-header[data-header-narration=\"off\"]') || !document.querySelector('.theme-toggle')) return;
     if (window.__AIFS_TTS_VERSION === NARRATION_VERSION || document.querySelector('script[data-aifs-tts="' + NARRATION_VERSION + '"]')) return;
     var script = document.createElement('script');
     script.src = HEADER_BASE + 'tts.js?v=' + NARRATION_VERSION;
@@ -422,9 +422,77 @@
     syncLayout();
   }
 
+  // Existing page handlers retain ownership. Newly equipped utility pages use
+  // this handler, so one click can never toggle the theme twice.
+  function setupHeaderTheme(header) {
+    if (header.getAttribute('data-header-theme-owner') !== 'header') return;
+    var button = header.querySelector('#themeToggle');
+    var root = document.documentElement;
+    var stored = '';
+    try { stored = localStorage.getItem('theme') || ''; } catch (_) {}
+    root.setAttribute('data-theme', stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    function paintTheme() {
+      var icon = button.querySelector('#themeIcon');
+      if (icon) icon.textContent = root.getAttribute('data-theme') === 'light' ? 'N' : 'D';
+    }
+    paintTheme();
+    button.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (_) {}
+      paintTheme();
+    });
+  }
+
+  // Content-only pages load the shared course index on the first search.
+  // Cache and retry the load; do not add 1 MB to every initial page visit.
+  function setupHeaderSearch(header) {
+    if (window.CmdPalette) return;
+    var button = header.querySelector('[data-cmd-palette]');
+    var pending = null;
+    var searchTitle = button.title;
+    function loadScript(name) {
+      return new Promise(function (resolve, reject) {
+        var script = document.createElement('script');
+        script.src = HEADER_BASE + name + '?v=20261019a';
+        script.onload = resolve;
+        script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
+        document.head.appendChild(script);
+      });
+    }
+    function openSearch() {
+      if (window.CmdPalette) { window.CmdPalette.open(); return; }
+      button.setAttribute('aria-busy', 'true');
+      button.removeAttribute('data-search-error');
+      if (!pending) pending = (typeof PHASES === 'undefined' ? loadScript('data.js') : Promise.resolve())
+        .then(function () { return loadScript('cmdpalette.js'); });
+      pending.then(function () {
+        button.removeAttribute('aria-busy');
+        button.title = searchTitle;
+        window.CmdPalette.open();
+      }).catch(function () {
+        pending = null;
+        button.removeAttribute('aria-busy');
+        button.setAttribute('data-search-error', 'true');
+        button.title = '搜索暂不可用，点击重试';
+      });
+    }
+    button.addEventListener('click', function () { if (!window.CmdPalette) openSearch(); });
+    document.addEventListener('keydown', function (event) {
+      if (!window.CmdPalette && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openSearch();
+      }
+    });
+  }
+
   function load() {
     var headers = document.querySelectorAll('.site-header');
-    for (var i = 0; i < headers.length; i++) setupNavigation(headers[i]);
+    for (var i = 0; i < headers.length; i++) {
+      setupHeaderTheme(headers[i]);
+      setupHeaderSearch(headers[i]);
+      setupNavigation(headers[i]);
+    }
     loadStars();
     ensureNarration();
   }

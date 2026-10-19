@@ -14,7 +14,7 @@
  */
 (function () {
   if (typeof window === 'undefined') return;
-  window.__AIFS_TTS_VERSION = '20260818b';
+  window.__AIFS_TTS_VERSION = '20261019a';
   var synth = window.speechSynthesis;
   if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') return;
 
@@ -982,7 +982,9 @@
     btn.setAttribute('aria-label', '朗读当前页面');
     btn.title = '朗读当前页面';
     btn.setAttribute('aria-pressed', 'false');
-    themeToggle.parentNode.insertBefore(btn, themeToggle);
+    var slot = document.querySelector('.header-narration-slot');
+    if (slot) slot.appendChild(btn);
+    else themeToggle.parentNode.insertBefore(btn, themeToggle);
     btn.addEventListener('click', function (e) {
       if (ignoreGestureControlClick(e)) return;
       // The speaker is the on/off switch — pause lives in the control bar.

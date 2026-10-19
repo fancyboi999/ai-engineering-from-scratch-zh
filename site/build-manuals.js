@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-const { renderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
+const { renderHeader, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const fs = require('fs');
 const path = require('path');
@@ -618,7 +618,7 @@ function manualArticle(manual, mode) {
   return `<article class="manual">${coverHtml(manual, mode)}${mode === 'print' ? tocHtml(manual, 'print') : ''}${body.join('\n')}\n${colophonHtml(manual)}</article>`;
 }
 
-const SITE_HEADER = `<header class="site-header"><div class="header-inner"><a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a><nav class="header-nav">${renderNavigation()}</nav><button class="search-toggle" type="button" data-cmd-palette aria-label="搜索"><span aria-hidden="true">⌕</span></button><button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button></div></header>`;
+const SITE_HEADER = renderHeader();
 
 function pageShell({ title, ogTitle, description, canonical, noindex, card, main }) {
   const css = shared('tokens.css') + shared('manual.css') + shared('web.css');

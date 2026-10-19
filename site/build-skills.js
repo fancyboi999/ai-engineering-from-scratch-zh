@@ -1,5 +1,5 @@
 'use strict';
-const { renderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
+const { renderHeader, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -258,13 +258,7 @@ function build({ siteDir = __dirname } = {}) {
 </head>
 <body>
   <a href="#main" class="skip-link">跳到正文</a>
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span> AI / FROM SCRATCH</a>
-      <nav class="header-nav">${renderNavigation()}</nav>
-      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button"><span class="theme-icon" id="themeIcon">N</span></button>
-    </div>
-  </header>
+  ${renderHeader()}
 
   <main id="main" class="sk">
     <section class="sk-hero container">
