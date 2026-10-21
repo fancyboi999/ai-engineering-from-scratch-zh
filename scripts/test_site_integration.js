@@ -10,6 +10,12 @@ const { createServer } = require('./serve-agent-site');
 const root = path.resolve(__dirname, '..');
 const site = path.join(root, 'site');
 const read = file => fs.readFileSync(path.join(site, file), 'utf8');
+const manualRoot = path.join(root, 'manuals');
+const manualManifests = fs.readdirSync(manualRoot).flatMap(id => {
+  const file = path.join(manualRoot, id, 'manual.json');
+  return fs.existsSync(file) ? [JSON.parse(fs.readFileSync(file, 'utf8'))] : [];
+});
+const publishedManualIds = manualManifests.filter(manual => manual.status === 'ready').map(manual => manual.id).sort();
 const lessons = JSON.parse(read('lesson-seo.json')).lessons;
 const projects = vm.runInNewContext(read('projects-data.js') + '\nwindow.AIFS_PROJECTS', { window: {} }).projects;
 
@@ -59,29 +65,34 @@ test('78 project sources, 322 stage docs, four manual sources and 245 Hub pages 
     }
   }
   assert.equal(stages, 322);
-  for (const id of ['a2a-101', 'docker-sandboxes-101', 'reverse-engineering-101', 'sglang-101']) {
+  for (const { id, status } of manualManifests) {
     assert.match(read(`manual-${id}.html`), /lang="zh-CN"/);
     assert.match(read(`manual-${id}-print.html`), /lang="zh-CN"/);
-    assert.equal(sitemap.includes(`/manual-${id}.html`), id !== 'sglang-101', `${id} publication status`);
-    assert.equal(/<meta name="robots" content="noindex">/.test(read(`manual-${id}.html`)), id === 'sglang-101', `${id} indexing status`);
+    assert.equal(sitemap.includes(`/manual-${id}.html`), status === 'ready', `${id} publication status`);
+    assert.equal(/<meta name="robots" content="noindex">/.test(read(`manual-${id}.html`)), status !== 'ready', `${id} indexing status`);
   }
   const listedManuals = vm.runInNewContext(read('manuals-data.js') + '\nwindow.AIFS_MANUALS', { window: {} });
-  assert.deepEqual(Array.from(listedManuals, manual => manual.id).sort(), ['a2a-101', 'docker-sandboxes-101', 'reverse-engineering-101']);
-  assert.doesNotMatch(read('manuals.html'), /href="manual-sglang-101(?:-print)?\.html"/);
+  assert.deepEqual(Array.from(listedManuals, manual => manual.id).sort(), publishedManualIds);
+  for (const { id, status } of manualManifests) {
+    assert.equal(read('manuals.html').includes('href="manual-' + id + '.html"'), status === 'ready', id + ' listing status');
+  }
   assert.equal(fs.readdirSync(path.join(site, 'hubs/phase')).length, 20);
   assert.equal(fs.readdirSync(path.join(site, 'hubs/glossary')).length, 225);
   const cards = JSON.parse(read('og-cards.json')).cards;
   assert.equal(Object.keys(cards).filter(key => key.startsWith('project/')).length, 78);
-  assert.deepEqual(Object.keys(cards).filter(key => key.startsWith('manual/')).sort(), ['manual/a2a-101', 'manual/docker-sandboxes-101', 'manual/reverse-engineering-101']);
+  assert.deepEqual(Object.keys(cards).filter(key => key.startsWith('manual/')).sort(), publishedManualIds.map(id => 'manual/' + id));
   assert.equal(Object.keys(cards).filter(key => key.startsWith('phase/')).length, 20);
   assert.equal(Object.keys(cards).filter(key => key.startsWith('term/')).length, 225);
-  for (const file of ['index.html', 'catalog.html', 'glossary.html', 'project.html', 'projects.html', 'manuals.html', 'manual-a2a-101.html', 'manual-a2a-101-print.html', 'manual-docker-sandboxes-101.html', 'manual-docker-sandboxes-101-print.html', 'manual-reverse-engineering-101.html', 'manual-reverse-engineering-101-print.html', 'manual-sglang-101.html', 'manual-sglang-101-print.html']) {
+  const manualFiles = manualManifests.flatMap(manual => [`manual-${manual.id}.html`, `manual-${manual.id}-print.html`]);
+  for (const file of ['index.html', 'catalog.html', 'glossary.html', 'project.html', 'projects.html', 'manuals.html', ...manualFiles]) {
     const head = read(file).split('</head>')[0];
     if (!file.endsWith('-print.html')) {
       assert.equal((head.match(/property="og:image"/g) || []).length, 1, file);
       // Drafts are rendered for review but are excluded from the published OG manifest.
-      assert.equal((head.match(/name="twitter:card"/g) || []).length, file === 'manual-sglang-101.html' ? 0 : 1, file);
-      if (file === 'manual-sglang-101.html') assert.match(head, /property="og:image" content="https:\/\/aieng-zh\.cn\/og\/page\/manuals\.png"/);
+      const manual = manualManifests.find(entry => file === `manual-${entry.id}.html`);
+      const draft = manual && manual.status !== 'ready';
+      assert.equal((head.match(/name="twitter:card"/g) || []).length, draft ? 0 : 1, file);
+      if (draft) assert.match(head, /property="og:image" content="https:\/\/aieng-zh\.cn\/og\/page\/manuals\.png(?:\?v=[a-f0-9]+)?"/);
     }
     assert.doesNotMatch(head, />,+<meta/, file);
     assert.equal((head.match(/<link rel="icon" href="\/favicon\.ico\?v=20260831a" sizes="32x32">/g) || []).length, 1, file);
