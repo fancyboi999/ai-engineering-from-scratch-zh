@@ -14,7 +14,7 @@
  */
 (function () {
   if (typeof window === 'undefined') return;
-  window.__AIFS_TTS_VERSION = '20261019a';
+  window.__AIFS_TTS_VERSION = '20261021a';
   var synth = window.speechSynthesis;
   if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') return;
 

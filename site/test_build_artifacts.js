@@ -466,7 +466,7 @@ test('shared site asset families use the expected cache keys on every page', () 
   const styleRelease = '20261019d';
   const navigationRelease = HEADER_ASSET_VERSION;
   assert.match(navigationRelease, /^\d{8}[a-z]$/);
-  const narrationRelease = '20261019a';
+  const narrationRelease = '20261021a';
   const roadmapRelease = '20261019a';
   const pages = [
     'about.html',

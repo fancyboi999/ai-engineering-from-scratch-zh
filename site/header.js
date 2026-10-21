@@ -10,7 +10,7 @@
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   var COMPACT_HEADER_QUERY = '(max-width: 1400px)';
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
-  var NARRATION_VERSION = '20261019a';
+  var NARRATION_VERSION = '20261021a';
   var HEADER_BASE = document.currentScript && document.currentScript.src
     ? new URL('.', document.currentScript.src).href
     : '';
@@ -456,7 +456,7 @@
     function loadScript(name) {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = HEADER_BASE + name + '?v=20261019a';
+        script.src = HEADER_BASE + name + '?v=20261021a';
         script.onload = resolve;
         script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
         document.head.appendChild(script);
