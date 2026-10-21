@@ -28,9 +28,9 @@ NN-lesson-name/
 同步英文课程时，将正文译为 `docs/zh.md`。保留代码、路径、URL 与机器读取的字段，翻译面向读者的说明。
 翻译完成后，中文仓库仅保留 `docs/zh.md` 作为课程正文。
 
-课程测验包含 6 题：1 道 `pre`、3 道 `check`、2 道 `post`。题目使用
+新编课程通常包含 6 题：1 道 `pre`、3 道 `check`、2 道 `post`。同步课程保留上游实际题数与阶段分布。题目使用
 `stage`、`question`、`options`、`correct`、`explanation` 字段；`correct` 为从 0 开始的选项索引。
-翻译时保持答案索引和对应选项语义一致。
+翻译时保持选项顺序和答案索引。集成去偏按 `TRANSLATION.md` 重排选项并同步索引，验证正确答案内容不变。
 
 Claude 认证课使用独立的目录、测验和实验契约，见 [AGENTS.md](AGENTS.md#claude-认证契约)。
 

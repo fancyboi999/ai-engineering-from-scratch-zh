@@ -6,12 +6,12 @@
 
 ## 定位
 
-核心课程包含 20 个阶段、542 节课。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
+核心课程按 `phases/`、README 与 ROADMAP 登记，数量以 `node site/build.js --check` 的当前结果为准。每个算法都先从原始数学构建，再使用生产框架完成同一操作。
 你会亲手写出反向传播、分词器、注意力机制和 agent 循环，所以当 PyTorch 或其他库登场时，它们不再是黑盒。
 
-`projects/` 是独立实战层（78 项就绪项目、322 阶段），`manuals/` 是独立技术手册层（3 本已发布、1 本草稿）。它们不计入核心 542 课。
+`projects/` 是独立实战层，`manuals/` 是独立技术手册层。就绪状态和数量以各自清单与当前构建为准，不计入核心课程。
 
-`certifications/claude/` 是独立的 Claude 认证备考层，包含 4 条路线、33 节认证课、诊断和原创模拟题。
+`certifications/` 是独立认证备考层；路线、课程、诊断和原创模拟题以各 program 与 track manifest 为准。
 认证课程单独统计，使用独立的站点构建与学习路径。
 
 ## 仓库结构
@@ -24,7 +24,7 @@ phases/
       code/                   # 实现与测试
       quiz.json               # 6 道题
       outputs/                # 可复用产物
-certifications/claude/
+certifications/<program>/
   program.json                # 项目声明、核验日期、官方链接
   tracks/*.json               # 考试蓝图、路线和学习计划
   lessons/NN-slug/            # 认证课程
@@ -160,4 +160,4 @@ node scripts/check_og_cards.js --require-manifests
 
 ---
 
-最后审校：2026-10-19。
+最后审校：2026-10-21。
