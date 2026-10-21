@@ -47,6 +47,8 @@ def configs(profile):
         "dp2-tokens": (p["model"], ["--dp-size", "2", "--load-balance-method", "total_tokens"]),
         "default-kv-max": (p["model"], [], {}, "0.82"),
         "fp8-kv-max": (p["fp8"], ["--kv-cache-dtype", "fp8_e4m3"], {}, "0.82"),
+        "small-pool": (p["model"], [], {}, "0.74"),
+        "fp8-small-pool": (p["fp8"], ["--kv-cache-dtype", "fp8_e4m3"], {}, "0.74"),
         "sglang-h2h": (p["model"], []),
         "pd": (p["model"], []),
         "pd-swap": (p["model"], []),

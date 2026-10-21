@@ -620,7 +620,17 @@ function manualArticle(manual, mode) {
 
 const SITE_HEADER = renderHeader();
 
-function pageShell({ title, ogTitle, description, canonical, noindex, card, main }) {
+function highlightsScripts(highlights) {
+  if (!highlights) return '';
+  const ctx = JSON.stringify({ path: `manuals/${highlights.id}`, lang: 'zh-CN', title: highlights.title }).replace(/</g, '\u003c');
+  return `<script src="highlights-anchor.js"></script>
+<script src="highlights-store.js"></script>
+<script src="highlights.js"></script>
+<script>(function () { function mount() { var article = document.querySelector('article.manual'); if (article && window.AIFSHighlights) window.AIFSHighlights.mount(article, ${ctx}); } if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount(); }());</script>
+`;
+}
+
+function pageShell({ title, ogTitle, description, canonical, noindex, card, main, highlights }) {
   const css = shared('tokens.css') + shared('manual.css') + shared('web.css');
   return `<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
@@ -640,7 +650,7 @@ ${noindex ? '<meta name="robots" content="noindex">\n' : ''}<link rel="canonical
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${FONT_LINK}" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<style>${css}</style>
+${highlights ? '<link rel="stylesheet" href="highlights.css">\n' : ''}<style>${css}</style>
 <script>${shared('theme.js')}</script>
 </head>
 <body>
@@ -654,7 +664,7 @@ ${main}
 <script src="cmdpalette.js" defer></script>
 <script>${shared('dither.js')}</script>
 <script>${shared('motion.js')}</script>
-</body>
+${highlightsScripts(highlights)}</body>
 </html>
 `;
 }
@@ -667,6 +677,7 @@ function webPage(manual) {
     canonical: `${SITE_ORIGIN}/${pageName(manual.id)}`,
     noindex: manual.status === 'draft',
     card: manual.status === 'ready' ? `manual/${manual.id}` : 'page/manuals',
+    highlights: { id: manual.id, title: manual.title },
     main: `<main id="main" class="m-web"><div class="m-layout"><aside class="m-sidebar">${tocHtml(manual, 'web')}</aside>${manualArticle(manual, 'web')}</div></main>`,
   });
 }

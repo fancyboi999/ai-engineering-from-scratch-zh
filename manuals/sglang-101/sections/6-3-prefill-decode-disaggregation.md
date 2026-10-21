@@ -102,7 +102,28 @@ Decode 一次只能运行两个请求，另外 19 个等待 decode 内存。Pref
 
 危险之处发生在后面。每个失败请求通过路由器仍返回 HTTP 200，但没有文本。基准把 240 个请求全部计为成功，还打印出比 FP8 服务器更高的吞吐量。只有两个数字露出了问题：重新分词后的输出 token 数为零，平均 TTFT 为 0.00 ms。
 
-我们没有发布那些吞吐量数字。现在工具会拒绝所有请求 TTFT 均为 0 的运行。我们正在将 decode 放到更大池上重新测量。阅读任何分离部署基准的吞吐量前，先检查 `Total generated tokens (retokenized)`。
+我们没有发布那些吞吐量数字。现在工具会拒绝所有请求 TTFT 均为 0 的运行。
+
+上游随后反向拆分。Decode 获得完整的 24,094 token 池，prefill 放在共享卡上，池容量为 2,925。不超过 8 用户时，每个请求都返回文本。16 用户时，8,192 个生成 token 中只有 2,048 个以文本返回。32 用户时，所有请求都返回空内容，工具停止了扫描。
+
+```listing
+title: 交换角色后的分离部署失败记录
+source: capture/gpu/out-l4/bench-pd-swap.txt
+lang: text
+note: 8、16 和 32 用户时的基准摘要。比较生成 token 数与重新分词后的 token 数。
+---
+c8: Successful requests: 32
+c8: Total generated tokens: 4096
+c8: Total generated tokens (retokenized): 4096
+c16: Successful requests: 64
+c16: Total generated tokens: 8192
+c16: Total generated tokens (retokenized): 2048
+c32: Successful requests: 128
+c32: Total generated tokens: 16384
+c32: Total generated tokens (retokenized): 0
+```
+
+固定速率扫描和原始拆分方向分别在每秒 4 个请求和 4 用户时以同样方式失败。上游没有获得这对显卡在负载下分离部署的有效实测结果，也不声称有。阅读任何分离部署基准的吞吐量前，先检查 `Total generated tokens (retokenized)`。
 
 ## 应该测什么
 
@@ -122,4 +143,4 @@ Decode 一次只能运行两个请求，另外 19 个等待 decode 内存。Pref
 - 根据自己的并发选择 prefill/decode 比例，随后观察传输失败。
 ```
 
-来源：python/sglang/srt/arg_groups/fields/disagg.py, python/sglang/srt/arg_groups/choices.py, python/sglang/srt/environ.py, python/sglang/srt/disaggregation/prefill.py, python/sglang/srt/disaggregation/decode.py, python/sglang/srt/disaggregation/base/conn.py (KVPoll), python/sglang/srt/disaggregation/common/conn.py, python/sglang/srt/disaggregation/mooncake/conn.py, python/sglang/srt/managers/data_parallel_controller.py, python/sglang/srt/observability/metrics_collector.py, sgl-model-gateway/src/routers/http/pd_router.rs and pd_types.rs, and docs/docs/advanced_features/pd_disaggregation.mdx, all at v0.5.22. capture/gpu/incidents/l4-pd-mooncake-tcp-queue.txt. Issues #12591, #9266, #9926, pull request #9803. Novita AI on Hugging Face, 2026-01-22. dstack, "Benchmarking Prefill-Decode ratios", 2025-09-25. LMSYS, 96 H100 deployment, 2025-05-05. The Mooncake team on the LMSYS blog, 2025-07-20.
+来源：python/sglang/srt/arg_groups/fields/disagg.py, python/sglang/srt/arg_groups/choices.py, python/sglang/srt/environ.py, python/sglang/srt/disaggregation/prefill.py, python/sglang/srt/disaggregation/decode.py, python/sglang/srt/disaggregation/base/conn.py (KVPoll), python/sglang/srt/disaggregation/common/conn.py, python/sglang/srt/disaggregation/mooncake/conn.py, python/sglang/srt/managers/data_parallel_controller.py, python/sglang/srt/observability/metrics_collector.py, sgl-model-gateway/src/routers/http/pd_router.rs and pd_types.rs, and docs/docs/advanced_features/pd_disaggregation.mdx, all at v0.5.22. capture/gpu/incidents/l4-pd-mooncake-tcp-queue.txt, capture/gpu/out-l4/bench-pd-swap.txt. Issues #12591, #9266, #9926, pull request #9803. Novita AI on Hugging Face, 2026-01-22. dstack, "Benchmarking Prefill-Decode ratios", 2025-09-25. LMSYS, 96 H100 deployment, 2025-05-05. The Mooncake team on the LMSYS blog, 2025-07-20.

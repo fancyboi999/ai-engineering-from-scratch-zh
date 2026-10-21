@@ -56,6 +56,7 @@ on:
       - "scripts/serve-agent-site.js"
       - "scripts/test_agent_readiness.py"
       - "scripts/test_seo_routes.js"
+      - "scripts/test_function_bundles.js"
       - "scripts/test_skill_artifact_bundles.py"
   pull_request:
     branches: [main]
@@ -122,6 +123,10 @@ jobs:
         run: find certifications -path '*/lessons/*/code/main.py' -print0 | xargs -0 -r -n1 python3
       - name: 站点 JavaScript 语法校验
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
+      - name: 部署函数文件追踪与独立 bundle 运行
+        run: |
+          npm install --prefix "$RUNNER_TEMP/function-trace" --no-save --no-package-lock @vercel/nft@1.5.0
+          NODE_PATH="$RUNNER_TEMP/function-trace/node_modules" node --test scripts/test_function_bundles.js
       - name: Agent 内容协商、REST 和 MCP 协议回归
         run: |
           node scripts/test_agent_negotiation.js

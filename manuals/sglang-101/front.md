@@ -55,7 +55,7 @@
 
 **团队报告**或**厂商报告：** SGLang 团队、RadixArk 或硬件厂商发布的数字。手册将其作为作者主张转述，若有独立结果则进行对照。
 
-GPU 工具在一张 NVIDIA GB10 上运行。CUDA graphs、FP8、EAGLE-3、确定性推理，以及单 GPU 上 MoE decode 成本都有上游实测。DeepEP 与 prefill-decode 分离需要多张 GPU，相应章节以代码和实践报告支撑论证，并明确标签。
+GPU 工具在一张 NVIDIA GB10 上运行。CUDA graphs、FP8、EAGLE-3、确定性推理，以及单 GPU 上 MoE decode 成本都有上游实测。DeepEP 与 prefill-decode 分离需要多张 GPU。DeepEP 以代码和实践报告支撑论证；第 6.3 节另有两张 L4 的分离部署失败记录，未获得有效的负载性能结果。
 
 ## 捕获工具
 

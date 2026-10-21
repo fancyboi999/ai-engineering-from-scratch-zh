@@ -78,6 +78,7 @@ caption: 每行从左向右，依次为负载、报告结果、SGLang 机制。�
 | L4 | SGLang 0.5.22 对 vLLM 0.31.0，相同池，64 用户 | 257 对 241 tok/s，P99 ITL 114 对 1,363 ms，TTFT 中位数 18,356 对 10,953 ms，[见下文](#s-reading-other-peoples-benchmarks) | 满池时不同的准入选择 |
 | L4 | 同一对引擎，4,096 token 共享 prompt | 88.4 对 86.8 tok/s，TTFT 中位数 474 对 375 ms，[见下文](#s-reading-other-peoples-benchmarks) | 两个都能命中的前缀缓存 |
 | L4 | 同一对引擎，泊松到达，每秒 4 个请求 | 257.5 对 286.6 tok/s，P99 TPOT 127 对 187 ms，[见下文](#s-reading-other-peoples-benchmarks) | 固定速率下相同的准入取舍 |
+| L4 | 同一对引擎，混合 prompt 长度，16 用户 | 159.6 对 169.6 tok/s，P99 ITL 363 对 191 ms，[见下文](#s-reading-other-peoples-benchmarks) | 各引擎如何将 prefill 混入流式输出 |
 | 两张 L4 | 一张卡与其他任务共享，`--tp-size 2` | 启动时被拒绝，[第 6.1 节](#s-tp-size-dp-size-and-attn-dp-size) | 内存平衡检查 |
 | 两张 L4 | 通过 TCP 分离 prefill 和 decode | 第三分钟后所有请求都返回 HTTP 200，但内容为空，[第 6.3 节](#s-prefill-decode-disaggregation) | 传输会话失败且未恢复 |
 
@@ -224,11 +225,37 @@ Goodput 展示了这对延迟目标的含义。我们设首 token 1 s、每 toke
 
 每秒 4 时，时钟解释不了差距，因为 vLLM 的时钟中位数更低，为 1,245 对 1,350 MHz。每秒 8 时吞吐量范围重叠。每秒 16 时，两种引擎所有运行重试三次后仍低于 1,000 MHz，因此我们不比较这一行。
 
-这里只有一个模型、一张 GPU、三种负载。主要结论与实践报告一致：稠密模型配独立 prompt，两种引擎吞吐量持平。它还补上吞吐量图隐藏的部分：池满后，要在更快首 token 与更平滑输出之间取舍，两种引擎默认选择不同。
+### 同一对引擎与波次到达
+
+最后一种负载来自[第 5.1 节](#s-sglang-benchmark-serving)，请求按波次到达。每次运行发送 64 个 prompt，输入 512 token、输出 128 token，上限为 16 用户。只改变 `--random-range-ratio`。设为 1.0 时，所有 prompt 等长，请求同时完成，替补请求也同时到达。设为 0.5 和 0.0 时，长度混合，请求逐个到达。
+
+```listing
+title: 波次中的 vLLM
+source: capture/gpu/out-l4/server-h2h-waves-vllm.log
+lang: text
+note: vLLM 启动时的池，以及 16 个运行中请求时的一行统计日志。
+---
+INFO 10-18 18:38:07 [kv_cache_utils.py:2464] GPU KV cache size: 24,096 tokens, Maximum concurrency for 8,192 tokens per request: 2.94x
+INFO 10-18 19:14:22 [loggers.py:320] Engine 000: Avg prompt throughput: 960.0 tokens/s, Avg generation throughput: 187.3 tokens/s, Running: 16 reqs, Waiting: 0 reqs, GPU KV cache usage: 22.6%, Prefix cache hit rate: 8.5%
+```
+
+| 长度比例 | 输出 tok/s，SGLang / vLLM | TTFT 中位数，SGLang / vLLM | TPOT 中位数，SGLang / vLLM | P99 ITL，SGLang / vLLM |
+|---|---|---|---|---|
+| 1.0，等长 | 182.3 / 181.7 | 1,775 / 1,499 ms | 74.7 / 76.8 ms | 81 / 502 ms |
+| 0.5，混合 | 159.6 / 169.6 | 325 / 353 ms | 87.8 / 81.4 ms | 363 / 191 ms |
+| 0.0，混合 | 158.2 / 174.4 | 283 / 284 ms | 86.7 / 75.0 ms | 302 / 202 ms |
+
+**上游实测不同流量形态下，胜出者不同。** 等长时两种引擎吞吐量持平，取舍与满池时一致。vLLM 首 token 更早，为 1,499 对 1,775 ms，差距超过 seed 波动范围。SGLang 流式输出更平稳，P99 ITL 为 81 对 502 ms。
+
+混合长度时，vLLM 领先。比例为 0.5 时，输出为 169.6 对 159.6 tok/s，高 6%，差距超过 seed 波动范围。每 token 耗时中位数为 81.4 对 87.8 ms，P99 ITL 为 191 对 363 ms。比例为 0.0 时，吞吐量范围重叠，但 vLLM 的每 token 耗时和 P99 ITL 仍更低。所有时钟中位数均不低于 1,410 MHz。
+
+上游的解释是：新 prompt 逐个到达时，每次 prefill 与运行中的 decode 共用一步。vLLM 的工作拆分减少了流式输出停顿。上游没有针对这一负载测试 SGLang 的 mixed chunk。
+
+这些结果只覆盖一个模型、一张 GPU 和四种负载。主要结论与实践报告一致：稠密模型配独立 prompt 时，两种引擎吞吐量差距在 6% 内。它也补上了吞吐量图表隐藏的信息。池满时，需要在首 token 快和流式输出平稳之间取舍，两种引擎默认选择不同。混合 prompt 长度时，这种取舍消失，vLLM 在两方面都领先。
 
 ## 我们的建议
 
-稠密模型配独立 prompt，选择引擎不是吞吐量决策，而是满池时的延迟决策：SGLang 保护流式输出，vLLM 保护首 token。超过该点后，固定速率下 vLLM 在我们的 L4 上还多提供 11% 输出。应根据模型支持、启动时间和现有硬件选择。
+稠密模型配独立 prompt，选择引擎主要是延迟决策，流量形态决定胜出者。满池或波次到达时，SGLang 保护流式输出，vLLM 保护首 token。混合长度 prompt 逐个到达时，vLLM 在吞吐量和流式平稳程度上均领先。超过满池点后，固定速率下 vLLM 在上游 L4 上还多提供 11% 输出。应先考虑模型支持、启动时间和现有硬件，再测量自己的长度分布。
 
 重复前缀场景，先检查前缀缓存开启，再测量。我们的 L4 上，前缀能装入池时，两种缓存都基本持平，TTFT 低于 500 ms；SGLang 关闭缓存则为 14,706 ms。多 GPU 上的 DeepSeek 级 MoE，优先从 SGLang 开始，因为实际部署多使用它。
 
@@ -255,4 +282,4 @@ Goodput 展示了这对延迟目标的含义。我们设首 token 1 s、每 toke
 - v0.5.22 使用 `--cuda-graph-max-bs-decode`，旧参数有歧义。
 ```
 
-来源：python/sglang/srt/arg_groups/memory_hook.py (GPU memory tiers), python/sglang/srt/arg_groups/fields/exec_.py (cuda_graph_max_bs_decode), python/sglang/srt/arg_groups/fields/schedule.py, all at v0.5.22 (baa9befa); the field reports linked in the text, fetched 2026-10-16; aimultiple.com/inference-engines; deepinfra.com/blog/vllm-vs-sglang; lmsys.org/blog/2024-07-25-sglang-llama3; inferencex.semianalysis.com/blog/mi355x-deepseek-v4-pro-sglang-110x-in-26-days. capture/gpu/out-l4/server-h2h-sglang.log, capture/gpu/out-l4/server-h2h-vllm.log, capture/gpu/out-l4/server-h2h-prefix-sglang.log, capture/gpu/out-l4/server-h2h-prefix-vllm.log, capture/gpu/out-l4/server-h2h-rate-sglang.log, capture/gpu/out-l4/server-h2h-rate-vllm.log, capture/gpu/summary/l4.json, capture/gpu/sweep.py (vllm and sglang-h2h configs), capture/gpu/incidents/l4-vllm-flashinfer-jit.txt.
+来源：python/sglang/srt/arg_groups/memory_hook.py (GPU memory tiers), python/sglang/srt/arg_groups/fields/exec_.py (cuda_graph_max_bs_decode), python/sglang/srt/arg_groups/fields/schedule.py, all at v0.5.22 (baa9befa); the field reports linked in the text, fetched 2026-10-16; aimultiple.com/inference-engines; deepinfra.com/blog/vllm-vs-sglang; lmsys.org/blog/2024-07-25-sglang-llama3; inferencex.semianalysis.com/blog/mi355x-deepseek-v4-pro-sglang-110x-in-26-days. capture/gpu/out-l4/server-h2h-sglang.log, capture/gpu/out-l4/server-h2h-vllm.log, capture/gpu/out-l4/server-h2h-prefix-sglang.log, capture/gpu/out-l4/server-h2h-prefix-vllm.log, capture/gpu/out-l4/server-h2h-rate-sglang.log, capture/gpu/out-l4/server-h2h-rate-vllm.log, capture/gpu/out-l4/server-h2h-waves-vllm.log, capture/gpu/summary/l4.json, capture/gpu/sweep.py (vllm and sglang-h2h configs), capture/gpu/incidents/l4-vllm-flashinfer-jit.txt.

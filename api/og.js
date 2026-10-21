@@ -1,9 +1,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { renderCard } = require('../lib/og-render');
-const { STATIC_TYPES, cardPath, lessonCard, trackCard } = require('../lib/og-cards');
+const { STATIC_TYPES, cardPath, lessonCard, trackCard, readPoster } = require('../lib/og-cards');
 
-const SITE = path.join(__dirname, '..', 'site');
 const ID = /^[a-z0-9][a-z0-9-]*(?:\/[a-z0-9][a-z0-9-]*){0,3}$/;
 const QUERY_NAMES = new Set(['type', 'id', 'lang', 'v']);
 const IMMUTABLE = 'public, max-age=31536000, s-maxage=31536000, immutable';
@@ -15,7 +14,16 @@ function own(object, key) {
 }
 
 function readSite(name) {
-  return JSON.parse(fs.readFileSync(path.join(SITE, name), 'utf8'));
+  switch (name) {
+    case 'lesson-seo.json':
+      return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'lesson-seo.json'), 'utf8'));
+    case 'certification-seo.json':
+      return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'certification-seo.json'), 'utf8'));
+    case 'og-cards.json':
+      return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'og-cards.json'), 'utf8'));
+    default:
+      throw new Error(`Unknown social card manifest: ${name}`);
+  }
 }
 
 function findCard(type, id, lang, manifest) {
@@ -93,7 +101,7 @@ function createHandler({ manifest = readSite, render = renderCard } = {}) {
       if (!rendered.has(location)) {
         if (rendered.size >= RENDERED_LIMIT) rendered.delete(rendered.keys().next().value);
         if (spec.image && spec.image !== "anatomy/inside-an-ai-agent-og.png") throw new Error("Unknown poster asset");
-        rendered.set(location, spec.image ? fs.readFileSync(path.join(SITE, spec.image)) : render(spec));
+        rendered.set(location, spec.image ? readPoster(spec.image) : render(spec));
       }
     } catch (_) {
       return send(res, method, 500, 'no-store', '无法渲染卡片');

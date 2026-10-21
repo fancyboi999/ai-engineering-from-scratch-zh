@@ -1,6 +1,6 @@
 # SGLang 101
 
-从笔记本上的一个请求，到 GPU 集群上的 SGLang 0.5.22 服务，补上参数列表之外的判断。文档解释 `sglang serve` 的 535 个选项各做什么，本手册解释哪些选项重要、每项功能为何存在、哪些默认值假定了你并不具备的机器，以及上游修改设置后测到了什么。中文网页入口是 [aieng-zh.cn/manual-sglang-101.html](https://aieng-zh.cn/manual-sglang-101.html)。本手册沿用上游的 `draft` 状态；公开站点是否生成草稿取决于构建参数，不应将入口地址视为已发布证明。上游在手册发布后会为课程 release 附上 `aiefs-manual-sglang-101.pdf`。
+从笔记本上的一个请求，到 GPU 集群上的 SGLang 0.5.22 服务，补上参数列表之外的判断。文档解释 `sglang serve` 的 535 个选项各做什么，本手册解释哪些选项重要、每项功能为何存在、哪些默认值假定了你并不具备的机器，以及上游修改设置后测到了什么。中文网页入口是 [aieng-zh.cn/manual-sglang-101.html](https://aieng-zh.cn/manual-sglang-101.html)。本次同步沿用上游的 `ready` 状态，构建后列入手册目录；实际发布状态以部署验证为准。上游课程 release 附带 PDF `aiefs-manual-sglang-101.pdf`。
 
 ## 内容
 
@@ -38,7 +38,7 @@
 | 框架 | PyTorch 2.13.0、MLX 0.32.4、Python 3.12.12 |
 | 模型 | `mlx-community/Qwen3-0.6B-4bit` |
 
-GPU 记录来自一台配备单张 GB10（计算能力 12.1、aarch64）的 NVIDIA DGX Spark，运行 PyPI 的 SGLang 0.5.22、PyTorch 2.14.1+cu130 和 CUDA 13.0，模型为 `Qwen/Qwen3-30B-A3B-Instruct-2507` 及其 FP8 checkpoint。`capture/README.md` 说明如何运行 GPU 工具。中文维护没有重新运行这些 GPU 实验；原始记录保留上游内容。
+GPU 记录包括 NVIDIA L4 上的 Qwen3-8B 对照，以及 NVIDIA DGX Spark 上的 GB10 实验。后者配备单张 GB10（计算能力 12.1、aarch64），运行 PyPI 的 SGLang 0.5.22、PyTorch 2.14.1+cu130 和 CUDA 13.0，模型为 `Qwen/Qwen3-30B-A3B-Instruct-2507` 及其 FP8 checkpoint。`capture/README.md` 说明如何运行 GPU 工具。中文维护没有重新运行这些 GPU 实验；原始记录保留上游内容。
 
 ## 运行捕获工具
 
@@ -55,7 +55,7 @@ python3 capture/run.py --check
 
 ```bash
 node manuals/_shared/figkit.js build manuals/sglang-101
-node site/build-manuals.js --drafts
+node site/build-manuals.js
 node scripts/audit_manuals.js --manual sglang-101
 ```
 

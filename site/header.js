@@ -37,14 +37,14 @@
         return href;
       }
     }
-    if (/^\/(lesson|certification)(?=[?#]|$)/.test(href)) {
-      return href.replace(/^\/(lesson|certification)(?=[?#]|$)/, '$1.html');
+    if (/^\/(lesson|certification|highlights)(?=[?#]|$)/.test(href)) {
+      return href.replace(/^\/(lesson|certification|highlights)(?=[?#]|$)/, '$1.html');
     }
     if (/^\/cheatsheets(?:\/|$)/.test(href)) {
       return href.replace(/^\/cheatsheets(?=[?#]|$)/, '/cheatsheets/index.html').replace(/^(\/cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
     }
     if (/^\/roadmap(?=[?#]|$)/.test(href)) return href.replace('/roadmap', '/prereqs.html');
-    return href.replace(/(^|\/)(lesson|certification)(?=[?#]|$)/, '$1$2.html');
+    return href.replace(/(^|\/)(lesson|certification|highlights)(?=[?#]|$)/, '$1$2.html');
   }
 
   function adaptRouteLink(link) {

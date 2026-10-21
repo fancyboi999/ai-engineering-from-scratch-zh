@@ -133,7 +133,7 @@ caption: 12 步中各阶段秒数中位数。绿色为 SGLang 生成，紫色为
 
 ### 四十八步
 
-随后我们以相同设置运行 48 步：内存比例 0.4、温度 1、一个默认 seed。随着步骤推进，策略开始学习，rollout 也变快了。
+随后上游以相同设置运行 48 步：内存比例 0.4、温度 1，先用默认 seed。随着步骤推进，策略开始学习，rollout 也变快了。
 
 ```listing
 title: 48 步中的最后一次 GRPO 步骤
@@ -154,16 +154,42 @@ id: fig-7-2d
 kind: chart
 title: GB10 上四十八步 GRPO
 claim: 48 步间，原始奖励均值从 0.636 升至 0.758，被截断样本占比从 0.33 降至 0.08。
-caption: 一个 seed 下，各步原始奖励与被 1,024 token 上限截断的样本占比。均值取前 8 步和后 8 步。来源：capture/gpu/summary/miles-gb10.json。
+caption: 默认 seed 各步原始奖励与 1,024 token 截断比例。虚线表示 seed 2 和 3 的原始奖励。均值取前 8 步与后 8 步。来源：capture/gpu/summary/miles-gb10.json。
 ```
 
-这里只有一个 seed。相邻步骤奖励差可达 0.207，例如第 30 步 0.801，第 31 步 0.594。应看 8 步均值的趋势，不看单步。
+相邻步骤奖励差可达 0.207，例如第 30 步 0.801，第 31 步 0.594。应看 8 步均值的趋势，不看单步。
 
 对数概率差距没有消失。前 8 步为 0.0153，后 8 步为 0.0146，全部 48 步保持在 0.0138 至 0.0162。训练不会缩小这种差距，它来自 SGLang 与 FSDP 内核。Miles 中处理它的是 true on-policy 模式。
 
 最后几行日志也需说明。SGLang 调度器打印 `crashed with exit code -15`，Ray job 随后却报告成功。-15 表示调度器收到 SIGTERM，这里发生在已完成任务结束时。应根据 job 状态告警，不要只看这一行。
 
 相信运行结果前，还有两条日志值得认识。约 30% 样本触及 1,024 token 上限，因此奖励包含未写完就被截断的回答。启动时 SGLang 还打印一次 `post-warmup freeze_gc failed`，但后续训练正常，这里该警告没有造成可见损失。
+
+### 再测两个 seed
+
+上游又以 `MILES_SEED=2` 和 `MILES_SEED=3` 各运行相同的 48 步。这个变量同时设置训练 seed 和 rollout seed。GB10 在此负载下三次关机，每次都发生在运行开始后 10 至 15 分钟。因此这两次运行增加了保护：脚本在 GPU 达到 84 C 时暂停容器，降到 74 C 或经过 2 分钟后恢复。
+
+seed 2 的五小时运行中，容器约 60% 时间处于暂停状态。暂停不改变模型计算，因此奖励、响应长度、截断比例和对数概率差距仍有效。rollout 耗时则无效，上游不报告 seed 2 和 3 的耗时。
+
+```listing
+title: seed 2 的最后一步
+source: capture/gpu/out-miles/plain-48-s2-excerpt.log
+lang: text
+note: MILES_SEED=2 时第 47 步的 rollout 和训练指标，以及任务状态。长行已截断。
+---
+metrics.py:94 - perf 47: {'rollout/raw_reward_unfiltered': 0.6484375, 'rollout/num_training_samples': 256, 'rollout/episode_raw_reward': 0.6484375, 'rollout/episode_response_length/mean': 514.0390625, 'rollout/episode_response_length/median
+{'train/loss': -5.122274160385132e-09, 'train/pg_loss': -5.122274160385132e-09, 'train/entropy_loss': 0.0, 'train/pg_clipfrac': 0.0, 'train/ppo_kl': 0.0, 'train/ess_ratio': 1.0, 'train/train_rollout_logprob_abs_diff': 0.014963770285248756,
+Job 'raysubmit_y4umCbEa8Qp5Bbad' succeeded
+```
+
+| 均值，前 8 步 / 后 8 步 | 默认 seed | Seed 2 | Seed 3 |
+|---|---|---|---|
+| 原始奖励 | 0.636 / 0.758 | 0.653 / 0.736 | 0.614 / 0.766 |
+| 响应长度，token | 724 / 447 | 712 / 480 | 734 / 456 |
+| 在 1,024 token 截断的比例 | 0.33 / 0.08 | 0.30 / 0.12 | 0.34 / 0.09 |
+| 对数概率差距 | 0.0153 / 0.0146 | 0.0153 / 0.0150 | 0.0156 / 0.0146 |
+
+**上游实测三个 seed 的结果一致。** 奖励上升，响应变短，被截断的响应减少。全部 144 步的对数概率差距保持在 0.0136 至 0.0164。三个 seed 相邻步骤间的最大奖励变化依次为 0.207、0.160 和 0.203。
 
 ### GB10 上 true on-policy 未能启动
 
@@ -214,6 +240,7 @@ Miles 调用的至少四项能力在 v0.5.22 不存在：disk-delta 的 `/pull_w
 **真实事故：** Miles issue #860 报告，滑动窗口注意力模型的 `/release_memory_occupation`“静默无效” {{issue radixark/miles#860}}。滑动窗口 KV 池在构造函数中关闭 memory saver，因此 Megatron 启动时，同置运行会内存耗尽。一位用户看到 DeepSeek-V4-Flash 的 30.19 GB KV 池始终驻留。2026-10-16 时 issue 仍开放。相信同置部署前，先确认新模型的每个内存标签都真的释放了内存。
 
 ```takeaways
+- 长时间 RL 任务中 GPU 过热时暂停运行；暂停会改变耗时，不改变计算结果。
 - 固定 Miles 镜像及其 release lock，不要混入原版 SGLang。
 - 释放内存前暂停生成，因为释放调用要求服务器空闲。
 - 从单节点同置部署开始，注意 `--colocate` 会覆盖传输模式。
@@ -226,4 +253,4 @@ Miles 调用的至少四项能力在 v0.5.22 不存在：disk-delta 的 `/pull_w
 - 针对 rollout 服务器自身错误告警，因为训练器可能持续等待已经退出的引擎。
 ```
 
-来源：Miles at v0.1.2 (a22fd824): train.py, release-lock.json, docker/Dockerfile, docs/developer/versions.md, miles/ray/rollout/inference_controller.py, miles/backends/training_utils/weight_update/protocol.py, session.py, protocols/broadcast.py, protocols/cuda_ipc.py, protocols/p2p.py, protocols/delta.py, miles/true_on_policy/model_profiles.py, docs/advanced/p2p-weight-transfer.md; SGLang at v0.5.22: python/sglang/srt/entrypoints/http_server.py, python/sglang/srt/managers/io_struct.py (PauseGenerationReqInput), python/sglang/srt/managers/scheduler_components/weight_updater.py, python/sglang/srt/constants.py, python/sglang/srt/arg_groups/fields/exec_.py, python/sglang/srt/arg_groups/choices.py, python/sglang/srt/arg_groups/attention_hook.py, python/sglang/srt/layers/logprob_processor.py, docs/docs/advanced_features/sglang_for_rl.mdx; Miles issues #860, #1485, #3277, #3714; RadixArk and LMSYS posts: lmsys.org/blog/2025-11-19-miles and lmsys.org/blog/2026-08-18-miles-v0-1. Miles at 08752a12: miles/backends/fsdp_utils/actor.py, miles/true_on_policy/schema.py, examples/infra_features/true_on_policy/run_simple.py and run_simple_amd_triton.py. capture/gpu/miles_grpo.py, capture/gpu/miles_summary.py, capture/gpu/out-miles/plain-excerpt.log, capture/gpu/out-miles/plain-48-excerpt.log, capture/gpu/out-miles/true-on-policy-error.log, capture/gpu/summary/miles-gb10.json. capture/gpu/out-miles/true-on-policy-fa3-error.log.
+来源：Miles at v0.1.2 (a22fd824): train.py, release-lock.json, docker/Dockerfile, docs/developer/versions.md, miles/ray/rollout/inference_controller.py, miles/backends/training_utils/weight_update/protocol.py, session.py, protocols/broadcast.py, protocols/cuda_ipc.py, protocols/p2p.py, protocols/delta.py, miles/true_on_policy/model_profiles.py, docs/advanced/p2p-weight-transfer.md; SGLang at v0.5.22: python/sglang/srt/entrypoints/http_server.py, python/sglang/srt/managers/io_struct.py (PauseGenerationReqInput), python/sglang/srt/managers/scheduler_components/weight_updater.py, python/sglang/srt/constants.py, python/sglang/srt/arg_groups/fields/exec_.py, python/sglang/srt/arg_groups/choices.py, python/sglang/srt/arg_groups/attention_hook.py, python/sglang/srt/layers/logprob_processor.py, docs/docs/advanced_features/sglang_for_rl.mdx; Miles issues #860, #1485, #3277, #3714; RadixArk and LMSYS posts: lmsys.org/blog/2025-11-19-miles and lmsys.org/blog/2026-08-18-miles-v0-1. Miles at 08752a12: miles/backends/fsdp_utils/actor.py, miles/true_on_policy/schema.py, examples/infra_features/true_on_policy/run_simple.py and run_simple_amd_triton.py. capture/gpu/miles_grpo.py, capture/gpu/miles_summary.py, capture/gpu/out-miles/plain-excerpt.log, capture/gpu/out-miles/plain-48-excerpt.log, capture/gpu/out-miles/plain-48-s2-excerpt.log, capture/gpu/out-miles/plain-48-s3-excerpt.log, capture/gpu/out-miles/plain-48-thermostat.log, capture/gpu/out-miles/true-on-policy-error.log, capture/gpu/summary/miles-gb10.json. capture/gpu/out-miles/true-on-policy-fa3-error.log.

@@ -150,7 +150,21 @@ caption: 输出吞吐量与最大并发的关系，每点三个 seed。梅紫色
 
 [第 5.1 节](#s-sglang-benchmark-serving) 的开环扫描也一致。固定到达速率下，双副本每秒最多只有 0.21 个请求满足延迟目标，单 L4 为 0.96。
 
-两个设置可能有帮助，但我们尚未测量：`--load-balance-method total_tokens` 将请求发给 token 最少的副本；或者将两台独立服务器放在[第 6.4 节](#s-sgl-model-gateway) 网关后，各自设置权重。更直接的教训是，只有各副本的池容量相近，数据并行才增加容量。相信容量之和前，先检查每个 `DP` rank 的 `#tokens` 行。
+上游随后测量了两种可能改进的设置之一。`--load-balance-method total_tokens` 将请求发给持有 token 最少的副本。
+
+```listing
+title: 同一组容量不均的副本，按 token 路由
+source: capture/gpu/out-l4/server-dp2-tokens.log
+lang: text
+note: 启动时的两个池。第二张卡仍与其他任务共享，副本池容量只有约八分之一。
+---
+[2026-10-19 00:24:05 DP0] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 24094, K size: 1.65 GB, V size: 1.65 GB
+[2026-10-19 00:24:06 DP1] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 2925, K size: 0.20 GB, V size: 0.20 GB
+```
+
+**上游实测相对轮询有明显改善，但仍不如单卡。** 64 用户时，按 token 路由的双副本输出 114.7 tok/s，轮询为 41.7，单 L4 为 250.9。8 用户时，三者依次为 92.1、64.2 和 112.6。64 用户时 TTFT 中位数从 4,763 降至 3,977 ms，时钟中位数则为 1,020 MHz，轮询运行时为 675 MHz。因此部分提升可能来自显卡状态。
+
+另一种设置是将两台独立服务器放在[第 6.4 节](#s-sgl-model-gateway) 的网关后，各自设置权重。上游尚未测量。更直接的教训是，只有各副本的池容量相近，数据并行才增加容量。相信容量之和前，先检查每个 `DP` rank 的 `#tokens` 行。
 
 ```takeaways
 - 将 --tp-size 设为能装下模型和 KV 缓存的最少 GPU 数。
@@ -162,4 +176,4 @@ caption: 输出吞吐量与最大并发的关系，每点三个 seed。梅紫色
 - 将请求发给节点 0，每个 TP 组尽量留在同一机器。
 ```
 
-来源：python/sglang/srt/distributed/parallel_state.py (initialize_model_parallel), python/sglang/srt/distributed/bootstrap.py (_check_tp_memory_balance), capture/gpu/incidents/l4-tp-unbalanced-memory.txt, capture/gpu/out-l4/server-dp2.log, capture/gpu/summary/l4.json, python/sglang/srt/arg_groups/fields/parallel.py, python/sglang/srt/arg_groups/parallel_hook.py (handle_deprecated_dp_attention, handle_data_parallelism), python/sglang/srt/server_args.py, python/sglang/srt/entrypoints/engine.py, and python/sglang/srt/managers/data_parallel_controller.py, all at v0.5.22. capture/out/metrics.txt. Pull request #41818, issue #19953. LMSYS, "SGLang v0.4", 2024-12-04. Luca Lowndes, "SGLang optimisations", 2025-11-07. Ant Group on the LMSYS blog, 2025-09-26.
+来源：python/sglang/srt/distributed/parallel_state.py (initialize_model_parallel), python/sglang/srt/distributed/bootstrap.py (_check_tp_memory_balance), capture/gpu/incidents/l4-tp-unbalanced-memory.txt, capture/gpu/out-l4/server-dp2.log, capture/gpu/out-l4/server-dp2-tokens.log, capture/gpu/summary/l4.json, python/sglang/srt/arg_groups/fields/parallel.py, python/sglang/srt/arg_groups/parallel_hook.py (handle_deprecated_dp_attention, handle_data_parallelism), python/sglang/srt/server_args.py, python/sglang/srt/entrypoints/engine.py, and python/sglang/srt/managers/data_parallel_controller.py, all at v0.5.22. capture/out/metrics.txt. Pull request #41818, issue #19953. LMSYS, "SGLang v0.4", 2024-12-04. Luca Lowndes, "SGLang optimisations", 2025-11-07. Ant Group on the LMSYS blog, 2025-09-26.

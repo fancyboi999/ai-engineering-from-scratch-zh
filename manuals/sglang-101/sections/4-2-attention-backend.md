@@ -71,6 +71,29 @@ v0.5.22 文档的注意力后端页面仍列出了 Cutlass MLA 和 Dual Chunk Fl
 
 我们在 Mac 上捕获运行时，SGLang 走 MLX runtime。MLX 有自己的注意力路径，因此那里没有运行这里列出的后端。
 
+## 上游在 L4 上测到了什么
+
+上游在单张 L4 上用 `Qwen/Qwen3-8B` 运行[第 5.1 节](#s-sglang-benchmark-serving) 的负载扫描，每点三个 seed。默认服务器选择 `flashinfer` 后端，另一台设置 `--attention-backend triton`。两者池容量均为 24,094 token，均重放 decode 计算图。每次运行从不超过 72 C 开始，SM 时钟中位数不低于 1,000 MHz。
+
+```listing
+title: 负载下的 Triton 服务器
+source: capture/gpu/out-l4/server-load-triton.log
+lang: text
+note: 启动时的池，以及 33 个运行中请求时的一行 decode 日志。
+---
+[2026-10-18 14:28:40] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 24094, K size: 1.65 GB, V size: 1.65 GB
+[2026-10-18 16:11:42] Decode batch, #running-req: 33, #token: 20422, token usage: 0.85, cuda graph: True, gen throughput (token/s): 311.50, #queue-req: 0
+```
+
+| 并发 | 输出 tok/s，flashinfer / triton | TPOT 中位数，flashinfer / triton | TTFT 中位数，flashinfer / triton |
+|---|---|---|---|
+| 1 | 13.42 / 13.94 | 60.16 / 59.98 ms | 189 / 183 ms |
+| 8 | 112.62 / 112.90 | 66.01 / 65.83 ms | 170 / 187 ms |
+| 32 | 270.11 / 270.91 | 96.18 / 96.99 ms | 2,970 / 2,833 ms |
+| 64 | 250.85 / 257.29 | 107.42 / 107.76 ms | 18,349 / 18,260 ms |
+
+**上游实测两者持平。** 所有并发下，吞吐量差距均在 3% 内，每 token 耗时中位数差距在 1 ms 内。上游的解释是：稠密 8B 模型中，注意力内核只占每步的一小部分，权重读取决定了速度。
+
 ## 我们的建议
 
 除非已经在自己的流量上测过，否则不设置 `--attention-backend`。默认值包含了其他用户发现的回退，例如 #17411，也包含 SM100 上 DeepSeek V3 这样的模型覆盖规则。同一个 issue 也是例外：用户认真测量后，可能找到比库升级后失效的默认值更好的选项。先测量，再覆盖，并在参数旁记录原因。
@@ -90,4 +113,4 @@ v0.5.22 文档的注意力后端页面仍列出了 Cutlass MLA 和 Dual Chunk Fl
 - 固定内核库版本，每次升级后重跑延迟测试。
 ```
 
-来源：python/sglang/srt/arg_groups/model_override_base.py (get_default_attn_backend), arg_groups/choices.py (ATTENTION_BACKEND_CHOICES), layers/attention/base_attn_backend.py, layers/attention/attention_registry.py, model_executor/model_runner_components/attention_backend_setup.py, arg_groups/fields/spec.py, and docs/docs/advanced_features/attention_backend.mdx at v0.5.22; PR #32114; issue #17411; field report by Varad More (2026-04-22).
+来源：python/sglang/srt/arg_groups/model_override_base.py (get_default_attn_backend), arg_groups/choices.py (ATTENTION_BACKEND_CHOICES), layers/attention/base_attn_backend.py, layers/attention/attention_registry.py, model_executor/model_runner_components/attention_backend_setup.py, arg_groups/fields/spec.py, and docs/docs/advanced_features/attention_backend.mdx at v0.5.22; PR #32114; issue #17411; field report by Varad More (2026-04-22); capture/gpu/out-l4/server-load-triton.log, capture/gpu/summary/l4.json (load.default, load.triton).

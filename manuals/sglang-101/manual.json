@@ -5,7 +5,7 @@
   "summary": "SGLang 如何把 GPU 内存与时间转化为 token，各项功能为何存在，以及哪些默认值可以信赖。示例来自上游记录的 SGLang 0.5.22 运行。",
   "audience": "已经调用过模型 API，希望自行部署开源模型的工程师。你知道 token 和 GPU 是什么，尚未读过推理服务引擎的调度器或缓存实现，希望在付费前弄清哪些设置真正重要。",
   "edition": "2026.10",
-  "status": "draft",
+  "status": "ready",
   "pin": {
     "subject": "SGLang",
     "version": "0.5.22",
