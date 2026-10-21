@@ -541,3 +541,36 @@ test('shared adds distinguish duplicates, partial capacity failures and read-onl
   assert.deepEqual(readOnly.addShared(shared), { ok: false, added: 0, duplicates: 0, failed: 3, error: 'newer-schema' });
   assert.equal(readOnly.page(LESSON_PATH), null);
 });
+
+test('retrying a duplicate shared add persists its session-only copy after quota recovery', () => {
+  const storage = memoryStorage();
+  const write = storage.setItem;
+  let blocked = true;
+  let writes = 0;
+  storage.setItem = (key, value) => {
+    writes++;
+    if (blocked) {
+      const error = new Error('quota');
+      error.name = 'QuotaExceededError';
+      throw error;
+    }
+    write(key, value);
+  };
+  const store = StoreModule.create(fakeWindow(storage));
+  const shared = { path: LESSON_PATH, title: 'Shared', items: [StoreModule.normalizeItem(sampleItem())] };
+  assert.deepEqual(store.addShared(shared), { ok: false, added: 1, duplicates: 0, failed: 0, error: 'quota' });
+  assert.equal(storage.getItem(KEY), null);
+  assert.deepEqual(store.addShared(shared), { ok: false, added: 0, duplicates: 1, failed: 0, error: 'quota' });
+  assert.equal(writes, 2);
+  blocked = false;
+  assert.deepEqual(store.addShared(shared), { ok: true, added: 0, duplicates: 1, failed: 0, error: '' });
+  assert.equal(writes, 3);
+  assert.equal(store.info().persistent, true);
+  assert.equal(store.info().lastError, '');
+  assert.equal(StoreModule.create(fakeWindow(storage)).items(LESSON_PATH).length, 1);
+  store.addShared(shared);
+  assert.equal(writes, 3, 'persisted duplicates need no further write');
+  write(KEY, JSON.stringify({ schemaVersion: 3, pages: {} }));
+  assert.deepEqual(store.addShared(shared), { ok: false, added: 0, duplicates: 0, failed: 1, error: 'newer-schema' });
+  assert.equal(writes, 3, 'read-only schema must not be overwritten');
+});

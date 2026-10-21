@@ -771,6 +771,8 @@
       });
       if (!result.added) {
         memory = JSON.parse(snapshot);
+        // A previous write may have left these duplicates only in memory.
+        if (result.duplicates && (dirty || !persistent)) save(memory);
         result.ok = !result.failed && persistent;
         if (!persistent && !result.error) result.error = lastError || 'not-persistent';
         return result;
