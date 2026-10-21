@@ -194,10 +194,11 @@ test('search covers every table row and term', () => {
   }
 });
 
-test('the search index stays small and still finds flags in long cells', () => {
+test('the Chinese full-text search index stays bounded and finds flags in long cells', () => {
   const built = sheets.buildCheatsheets({ edition: '2026-01-01' });
   const gzipped = require('node:zlib').gzipSync(built.search).length;
-  assert.ok(gzipped < 200000, `search.json is ${gzipped} bytes gzipped`);
+  // Chinese descriptions remain searchable; the full corpus currently compresses to about 273 kB.
+  assert.ok(gzipped < 300000, `search.json is ${gzipped} bytes gzipped`);
   const index = JSON.parse(built.search);
   const sglang = index.find(item => item.i === 'sglang-serving');
   assert.ok(sglang.r.some(row => row.join(' ').includes('--mem-fraction-static')));
