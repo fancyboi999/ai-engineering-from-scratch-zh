@@ -1196,6 +1196,26 @@ body.js-anim .toc-row.in-view {
   }
 }
 
+/* Keep the complete desktop menu inside the header with CJK fallback fonts. */
+@media (max-width: 1800px) and (min-width: 1561px) {
+  .header-inner {
+    gap: 8px;
+  }
+
+  .logo {
+    font-size: 1.4rem;
+  }
+
+  .header-nav {
+    gap: 12px;
+  }
+
+  .header-nav a:not(.header-github) {
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+  }
+}
+
 @media (max-width: 1560px) and (min-width: 1401px) {
   .header-inner {
     padding: 0 24px;
@@ -1208,10 +1228,10 @@ body.js-anim .toc-row.in-view {
 
   .header-nav,
   .header-priority-nav {
-    gap: 14px;
+    gap: 12px;
   }
 
-  .header-nav a,
+  .header-nav a:not(.header-github),
   .header-priority-nav a {
     font-size: 0.74rem;
     letter-spacing: 0.06em;
