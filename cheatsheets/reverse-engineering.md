@@ -1,10 +1,11 @@
 ---
 id: reverse-engineering
 title: 使用 rea 逆向工程
-subtitle: 阅读编译后的程序，并证明分析结论。固定使用 rea-agents 6.5.0 与 Ghidra 12.1.4。
+subtitle: 阅读编译后的程序，并证明分析结论。固定使用 rea-agents 6.7.0 与 Ghidra 12.1.4。
 hue: 350
 sources: manuals/reverse-engineering-101, phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch, phases/13-tools-and-protocols/33-disassembly-and-control-flow, phases/13-tools-and-protocols/34-lifting-to-pseudocode, phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns, phases/13-tools-and-protocols/36-rebuild-and-prove-equal, phases/13-tools-and-protocols/37-the-reverse-engineering-landscape, phases/13-tools-and-protocols/38-calling-conventions-and-stack-frames, phases/13-tools-and-protocols/39-compiler-idioms-and-optimization, phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries, phases/13-tools-and-protocols/41-recovering-data-and-types, phases/13-tools-and-protocols/42-dynamic-analysis-of-your-own-program, phases/13-tools-and-protocols/43-bytecode-and-managed-formats, phases/13-tools-and-protocols/44-binary-diffing-and-symbolic-execution, phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering
 code: RE
+source_hash: a1252a7791718f02
 ---
 
 ## rea CLI 任务
@@ -32,9 +33,9 @@ from: manuals/reverse-engineering-101/sections/r-1-commands-and-tools.md, manual
 | 导出规范副本 | `rea evidence-export <bundle> <out>` |
 | 校验证据包 | `rea evidence-import <bundle>` |
 | 比较两个证据包 | `rea compare <left> <right>` |
-| 启动 MCP 服务 | `npx -y rea-agents@6.5.0 mcp` |
+| 启动 MCP 服务 | `npx -y rea-agents@6.7.0 mcp` |
 | 写入客户端注册 | `rea setup` |
-| 检查客户端注册 | `rea doctor --client <id>` |
+| 检查客户端注册 | `rea setup --client <id> --dry-run` |
 | 重新捕获并比较 | `python3 run.py --check` |
 
 ## 从 shell 完成一次调查
@@ -141,7 +142,6 @@ from: manuals/reverse-engineering-101/sections/r-1-commands-and-tools.md, manual
 |---|---|---|
 | `REA_GHIDRA_STARTUP_TIMEOUT_MS` | 330,000 ms | rea 等待 Ghidra 的时长 |
 | 客户端工具调用期限 | 60,000 ms | SDK 2.3.1，应高于首次调用耗时 |
-| 桥接层 `shutdown` 期限 | 10 秒 | 随后 Ghidra 删除项目 |
 | 不带 `--format` 的输出 | TOON | 脚本中传入 `--format json` |
 | 未声明 `confidence` | `observed` | 生产者未给出值时 |
 | 未声明 `authority` | `shipped-artifact` | 生产者未给出值时 |
@@ -150,12 +150,11 @@ from: manuals/reverse-engineering-101/sections/r-1-commands-and-tools.md, manual
 
 ## 故障排查
 type: troubleshooting
-from: manuals/reverse-engineering-101/sections/r-3-errors.md, manuals/reverse-engineering-101/sections/8-1-the-rea-mcp-server.md, manuals/reverse-engineering-101/sections/2-2-rea-doctor-and-the-ghidra-provider.md, manuals/reverse-engineering-101/sections/4-6-analyze-function-and-pseudocode.md, manuals/reverse-engineering-101/sections/7-2-a-proof-harness-outside-rea.md, manuals/reverse-engineering-101/capture/README.md
+from: manuals/reverse-engineering-101/sections/r-3-errors.md, manuals/reverse-engineering-101/sections/8-1-the-rea-mcp-server.md, manuals/reverse-engineering-101/sections/2-2-rea-doctor-and-the-ghidra-provider.md, manuals/reverse-engineering-101/sections/7-2-a-proof-harness-outside-rea.md, manuals/reverse-engineering-101/capture/README.md
 
 | 现象 | 原因 | 修正 |
 |---|---|---|
 | `inspect-binary-layout` 退出 1，`capability_unavailable` | pwntools 配置仅支持 Linux x64 | macOS 使用 `rea inspect-macho` |
-| `invalid_request`：未知过程名 | 目标中不存在该名称 | 修正名称后重试 |
 | 客户端超时，Java 仍运行 | 首次 Ghidra 调用超过客户端期限 | 提高单次调用期限 |
 | 首次调用 `provider_timeout` | Ghidra 启动超时 | 提高 `REA_GHIDRA_STARTUP_TIMEOUT_MS` |
 | `target_unavailable`："No app is open." | 尚未 `open_binary` | 先调用 `open_binary` |
@@ -190,7 +189,7 @@ from: manuals/reverse-engineering-101/sections/1-1-rea-providers-and-evidence.md
 type: tips
 from: manuals/reverse-engineering-101/sections/8-1-the-rea-mcp-server.md, manuals/reverse-engineering-101/sections/5-1-the-evidence-record.md, manuals/reverse-engineering-101/sections/7-1-verify-reconstruction.md, manuals/reverse-engineering-101/sections/8-2-an-agent-investigation.md, manuals/reverse-engineering-101/sections/7-2-a-proof-harness-outside-rea.md
 
-- 使用精确版本注册 `rea-agents@6.5.0`。
+- 使用精确版本注册 `rea-agents@6.7.0`。
 - 阅读 `normalized_result` 前，先看 `confidence`、`authority` 和 `limitations`。
 - 在 `close_binary` 前导出证据包。
 - 结构声明通过仅表示 Ghidra 文本相同，行为与字节仍需自行证明。

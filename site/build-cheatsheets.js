@@ -8,6 +8,8 @@ const markdown = require('./md-render');
 const { phaseSlug } = require('../lib/hub-routes');
 const { SITE_HEADER } = require('./build-hubs');
 const { HEADER_ASSET_VERSION } = require('../lib/site-navigation');
+const topicMap = require('./cheatsheet-topics');
+const evidenceCheck = require('./cheatsheet-evidence');
 
 const ORIGIN = 'https://aieng-zh.cn';
 const REPO = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh';
@@ -22,6 +24,22 @@ const COLUMNS = 4;
 const MAX_PAGES = 2;
 const PAGE_BUDGETS = [870, 930];
 const MAX_SUBTITLE = 120;
+const SEARCH_DETAIL = 60;
+const KIND_LABELS = { concept: '概念', commands: '命令与 API', comparison: '方案对比', debugging: '故障排查', manual: '手册', project: '项目' };
+const TRACKS = [
+  ['foundations', '基础知识', ['00', '01', '02', '03']],
+  ['vision-audio', '视觉与音频', ['04', '06']],
+  ['language', '语言与 transformer', ['05', '07', '10']],
+  ['generative', '生成与多模态', ['08', '12']],
+  ['rl-safety', '强化学习、安全与对齐', ['09', '18']],
+  ['llm-engineering', 'LLM 工程', ['11']],
+  ['tools', '工具与协议', ['13']],
+  ['agents', 'agent 与自主系统', ['14', '15', '16']],
+  ['production', '生产与基础设施', ['17']],
+  ['capstones', '综合项目', ['19']],
+  ['manuals', '手册', []],
+  ['projects', '项目', []],
+];
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap';
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
 const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css">';
@@ -36,6 +54,7 @@ const TYPES = {
   flow: { group: 'see', label: '图解' },
   architecture: { group: 'see', label: '图解' },
   defaults: { group: 'numbers', label: '参数' },
+  comparison: { group: 'compare', label: '对比' },
   troubleshooting: { group: 'fix', label: '排错' },
   qa: { group: 'recall', label: '回顾' },
   tips: { group: 'recall', label: '回顾' },
@@ -45,6 +64,7 @@ const GROUPS = [
   ['do', '任务与命令'],
   ['code', '代码注解'],
   ['see', '图解'],
+  ['compare', '方案对比'],
   ['numbers', '默认值与数值'],
   ['fix', '故障排查'],
   ['recall', '问答与提示'],
@@ -54,9 +74,10 @@ const TABLE_SHAPES = {
   'command-table': 2,
   defaults: 3,
   troubleshooting: 3,
+  comparison: 'header',
 };
 const SOURCE_EXTENSIONS = /\.(?:md|py|ts|js|mjs|rs|jl|go|sh|txt|log|json|jsonl|yaml|yml|toml|csv)$/;
-const COMMENT = { bash: /\s{2,}#\s/, sh: /\s{2,}#\s/, python: /\s{2,}#\s/, py: /\s{2,}#\s/, yaml: /\s{2,}#\s/, text: /\s{2,}#\s/, typescript: /\s{2,}\/\/\s/, ts: /\s{2,}\/\/\s/, javascript: /\s{2,}\/\/\s/, js: /\s{2,}\/\/\s/, rust: /\s{2,}\/\/\s/ };
+const COMMENT = { bash: /\s{2,}#\s/, sh: /\s{2,}#\s/, python: /\s{2,}#\s/, py: /\s{2,}#\s/, yaml: /\s{2,}#\s/, text: /\s{2,}#\s/, typescript: /\s{2,}\/\/\s/, ts: /\s{2,}\/\/\s/, javascript: /\s{2,}\/\/\s/, js: /\s{2,}\/\/\s/, rust: /\s{2,}\/\/\s/, go: /\s{2,}\/\/\s/, tsx: /\s{2,}\/\/\s/ };
 const FULL_COMMENT = /^\s*(?:#|\/\/)\s?/;
 
 function escapeHtml(value) {
@@ -106,7 +127,7 @@ function parseFrontMatter(lines, errors) {
   }
   let end = 1;
   for (; end < lines.length && lines[end] !== '---'; end++) {
-    const match = /^([a-z]+):\s*(.*)$/.exec(lines[end]);
+    const match = /^([a-z_]+):\s*(.*)$/.exec(lines[end]);
     if (match) meta[match[1]] = match[2].trim();
     else if (lines[end].trim()) errors.push(`front matter line ${end + 1} is not "key: value"`);
   }
@@ -241,7 +262,7 @@ function parseTopic(text, file = '') {
     ids.add(id);
     const col = block.meta.col ? Number(block.meta.col) : 0;
     if (block.meta.col && !(col >= 1 && col <= COLUMNS)) errors.push(`${where}: col must be 1 to ${COLUMNS}`);
-    const defaultSpan = ['annotated-code', 'architecture', 'troubleshooting', 'defaults'].includes(type) ? 2 : 1;
+    const defaultSpan = ['annotated-code', 'architecture', 'troubleshooting', 'defaults', 'comparison'].includes(type) ? 2 : 1;
     const span = block.meta.span ? Number(block.meta.span) : defaultSpan;
     if (!(span >= 1 && span <= COLUMNS)) errors.push(`${where}: span must be 1 to ${COLUMNS}`);
     if (col && col + span - 1 > COLUMNS) errors.push(`${where}: col ${col} with span ${span} runs past column ${COLUMNS}`);
@@ -249,8 +270,10 @@ function parseTopic(text, file = '') {
     if (TABLE_SHAPES[type]) {
       const table = parseTable(block.body);
       if (!table.rows.length) errors.push(`${where}: the table has no rows`);
+      const width = TABLE_SHAPES[type] === 'header' ? table.header.length : TABLE_SHAPES[type];
+      if (TABLE_SHAPES[type] === 'header' && !(width >= 3 && width <= 5)) errors.push(`${where}: a comparison table needs 3 to 5 columns`);
       for (const row of table.rows) {
-        if (row.length !== TABLE_SHAPES[type]) errors.push(`${where}: row "${row.join(' | ')}" needs ${TABLE_SHAPES[type]} cells`);
+        if (row.length !== width) errors.push(`${where}: row "${row.join(' | ')}" needs ${width} cells`);
       }
       out.header = table.header;
       out.rows = table.rows;
@@ -278,6 +301,7 @@ function parseTopic(text, file = '') {
     hue: Number.isFinite(hue) ? hue : 222,
     code: meta.code || initials(meta.title || ''),
     sources: splitList(meta.sources),
+    sourceHash: meta.source_hash || '',
     blocks: parsed,
     errors,
     hash: sha(text).slice(0, 12),
@@ -329,6 +353,94 @@ function svgText(lines, x, y, size, className, anchor = 'middle') {
   return lines.map((line, index) => `<text class="${className}" x="${x}" y="${y + index * size * 1.25}" font-size="${size}" text-anchor="${anchor}">${escapeHtml(line)}</text>`).join('');
 }
 
+function segmentCrossesBox(start, end, box) {
+  let enter = 0, leave = 1;
+  for (const [position, delta, low, high] of [
+    [start[0], end[0] - start[0], box.x, box.x + box.w],
+    [start[1], end[1] - start[1], box.y, box.y + box.h],
+  ]) {
+    if (delta === 0) {
+      // A segment on a clearance boundary is safe; its interior is not.
+      if (position <= low || position >= high) return false;
+    } else {
+      const bounds = [(low - position) / delta, (high - position) / delta].sort((a, b) => a - b);
+      enter = Math.max(enter, bounds[0]);
+      leave = Math.min(leave, bounds[1]);
+      if (enter >= leave) return false;
+    }
+  }
+  return leave > 0 && enter < 1;
+}
+
+function architectureRoute(from, to, boxes) {
+  const center = r => [r.x + r.w / 2, r.y + r.h / 2];
+  const [ax, ay] = center(from), [bx, by] = center(to);
+  const dx = bx - ax, dy = by - ay;
+  const clip = r => Math.min(dx ? r.w / 2 / Math.abs(dx) : Infinity, dy ? r.h / 2 / Math.abs(dy) : Infinity);
+  if (from !== to) {
+    const start = [ax + dx * clip(from), ay + dy * clip(from)];
+    const end = [bx - dx * clip(to), by - dy * clip(to)];
+    if (!boxes.some(box => box !== from && box !== to && segmentCrossesBox(start, end, box))) return [start, end];
+  }
+
+  // Route only obstructed edges. Grid coordinates follow box clearance lanes,
+  // not authored rows/columns, so transposed mobile diagrams use the same pathfinder.
+  const clearance = 6;
+  const obstacles = boxes.map(r => ({ x: r.x - clearance, y: r.y - clearance, w: r.w + 2 * clearance, h: r.h + 2 * clearance }));
+  const ports = r => {
+    const [x, y] = center(r);
+    return [
+      { point: [r.x, y], anchor: [r.x - clearance, y], direction: 'x' },
+      { point: [r.x + r.w, y], anchor: [r.x + r.w + clearance, y], direction: 'x' },
+      { point: [x, r.y], anchor: [x, r.y - clearance], direction: 'y' },
+      { point: [x, r.y + r.h], anchor: [x, r.y + r.h + clearance], direction: 'y' },
+    ];
+  };
+  const starts = ports(from), ends = ports(to);
+  // A self-loop must enter on another face rather than select its own start.
+  const sources = from === to ? [starts[1]] : starts;
+  const targets = from === to ? [ends[2]] : ends;
+  const xs = [...new Set([...obstacles.flatMap(r => [r.x, r.x + r.w]), ...starts.concat(ends).map(p => p.anchor[0])])].sort((a, b) => a - b);
+  const ys = [...new Set([...obstacles.flatMap(r => [r.y, r.y + r.h]), ...starts.concat(ends).map(p => p.anchor[1])])].sort((a, b) => a - b);
+  const at = point => `${xs.indexOf(point[0])},${ys.indexOf(point[1])}`;
+  const targetAt = new Map(targets.map(p => [at(p.anchor), p]));
+  const distance = new Map(), pending = [];
+  for (const port of sources) {
+    const [x, y] = at(port.anchor).split(',').map(Number);
+    const state = { x, y, direction: port.direction, cost: 0, previous: null, port };
+    const key = `${x},${y},${state.direction}`;
+    distance.set(key, 0);
+    pending.push(state);
+  }
+  while (pending.length) {
+    pending.sort((a, b) => b.cost - a.cost);
+    const state = pending.pop();
+    if (state.cost !== distance.get(`${state.x},${state.y},${state.direction}`)) continue;
+    const target = targetAt.get(`${state.x},${state.y}`);
+    if (target) {
+      const points = [target.point];
+      for (let step = state; step; step = step.previous) points.push([xs[step.x], ys[step.y]]);
+      points.push(state.port.point);
+      points.reverse();
+      // Merge collinear legs to keep the SVG and edge-label placement small.
+      return points.filter((p, i) => !i || i === points.length - 1 ||
+        !((points[i - 1][0] === p[0] && p[0] === points[i + 1][0]) || (points[i - 1][1] === p[1] && p[1] === points[i + 1][1])));
+    }
+    const start = [xs[state.x], ys[state.y]];
+    for (const [x, y, direction] of [[state.x - 1, state.y, 'x'], [state.x + 1, state.y, 'x'], [state.x, state.y - 1, 'y'], [state.x, state.y + 1, 'y']]) {
+      if (x < 0 || x >= xs.length || y < 0 || y >= ys.length) continue;
+      const end = [xs[x], ys[y]];
+      if (obstacles.some(box => segmentCrossesBox(start, end, box))) continue;
+      const cost = state.cost + Math.abs(end[0] - start[0]) + Math.abs(end[1] - start[1]) + (direction === state.direction ? 0 : 12);
+      const key = `${x},${y},${direction}`;
+      if (cost >= (distance.get(key) ?? Infinity)) continue;
+      distance.set(key, cost);
+      pending.push({ x, y, direction, cost, previous: state, port: state.port });
+    }
+  }
+  throw new Error('No architecture route between node boxes');
+}
+
 function architectureSvg(source, narrow = false) {
   const block = narrow ? { ...source, span: 1, id: `${source.id}-n`, nodes: source.nodes.map(node => ({ ...node, col: node.row, row: node.col })) } : source;
   const width = 300 * (block.span || 1) + 14 * ((block.span || 1) - 1);
@@ -338,40 +450,28 @@ function architectureSvg(source, narrow = false) {
   const sideLabels = block.edges.filter(edge => rowOf.get(edge.from) && rowOf.get(edge.to) && rowOf.get(edge.from).row === rowOf.get(edge.to).row && edge.label);
   const wantGap = Math.max(28, ...sideLabels.map(edge => textWidth(edge.label, 8.5) + 12));
   const gapX = cols > 1 ? Math.min(wantGap, (width * 0.36) / (cols - 1)) : 0;
-  const nodeW = (width - 2 - gapX * (cols - 1)) / cols;
+  // Leave room for connectors that need to pass around the outside row/column.
+  const margin = 8;
+  const nodeW = (width - 2 * margin - gapX * (cols - 1)) / cols;
   const labelSize = 10.5;
   const subSize = 9;
   const laid = block.nodes.map(node => ({ ...node, labelLines: wrap(node.label, labelSize, nodeW - 10), subLines: node.sub ? wrap(node.sub, subSize, nodeW - 10) : [] }));
   const nodeH = Math.max(...laid.map(node => 10 + node.labelLines.length * labelSize * 1.25 + node.subLines.length * subSize * 1.25 + 4));
   const gapY = 34;
-  const height = rows * nodeH + (rows - 1) * gapY + 2;
-  const box = node => ({ x: 1 + (node.col - 1) * (nodeW + gapX), y: 1 + (node.row - 1) * (nodeH + gapY), w: nodeW, h: nodeH });
-  const byId = new Map(laid.map(node => [node.id, node]));
+  const height = rows * nodeH + (rows - 1) * gapY + 2 * margin;
+  const box = node => ({ x: margin + (node.col - 1) * (nodeW + gapX), y: margin + (node.row - 1) * (nodeH + gapY), w: nodeW, h: nodeH });
+  const byId = new Map(laid.map(node => [node.id, box(node)]));
+  const boxes = [...byId.values()];
   const parts = [];
   for (const edge of block.edges) {
-    const a = box(byId.get(edge.from));
-    const b = box(byId.get(edge.to));
-    const ax = a.x + a.w / 2;
-    const ay = a.y + a.h / 2;
-    const bx = b.x + b.w / 2;
-    const by = b.y + b.h / 2;
-    const clip = (r, dx, dy) => {
-      const tx = dx ? (r.w / 2) / Math.abs(dx) : Infinity;
-      const ty = dy ? (r.h / 2) / Math.abs(dy) : Infinity;
-      const t = Math.min(tx, ty);
-      return t;
-    };
-    const dx = bx - ax;
-    const dy = by - ay;
-    const t1 = clip(a, dx, dy);
-    const t2 = clip(b, dx, dy);
-    const x1 = ax + dx * t1;
-    const y1 = ay + dy * t1;
-    const x2 = bx - dx * t2;
-    const y2 = by - dy * t2;
+    const route = architectureRoute(byId.get(edge.from), byId.get(edge.to), boxes);
     const round = value => Math.round(value * 10) / 10;
-    parts.push(`<line class="cs-arch-edge" x1="${round(x1)}" y1="${round(y1)}" x2="${round(x2)}" y2="${round(y2)}" marker-end="url(#cs-arrow-${block.id})"/>`);
+    parts.push(`<polyline class="cs-arch-edge" data-from="${escapeHtml(edge.from)}" data-to="${escapeHtml(edge.to)}" points="${route.map(point => point.map(round).join(',')).join(' ')}" fill="none" marker-end="url(#cs-arrow-${block.id})"/>`);
     if (edge.label) {
+      const legs = route.slice(1).map((point, i) => ({ start: route[i], end: point, length: Math.hypot(point[0] - route[i][0], point[1] - route[i][1]) }));
+      const leg = legs.reduce((longest, candidate) => candidate.length > longest.length ? candidate : longest);
+      const [x1, y1] = leg.start, [x2, y2] = leg.end;
+      const dx = x2 - x1, dy = y2 - y1;
       const mx = round((x1 + x2) / 2);
       const my = round((y1 + y2) / 2);
       const lw = textWidth(edge.label, 8.5) + 6;
@@ -516,31 +616,83 @@ function textLength(html) {
 function estimateBlock(block) {
   const scale = block.span || 1;
   let h = 34;
-  if (TABLE_SHAPES[block.type]) {
-    const widths = block.type === 'troubleshooting' ? [14, 16, 20] : block.type === 'defaults' ? [12, 12, 16] : [18, 22];
-    h += 16;
-    for (const row of block.rows) h += 6 + 17 * Math.max(...row.map((cell, index) => Math.ceil(displayLength(plain(cell)) / (widths[index] * scale)) || 1));
+  if (block.type === 'comparison') {
+    const width = (36 * scale) / block.header.length;
+    const lines = cells => Math.max(...cells.map(cell => Math.ceil(displayLength(plain(cell)) / width) || 1));
+    h += 24 + 17 * (lines(block.header) - 1);
+    for (const row of block.rows) h += 6 + 17 * lines(row);
+  } else if (TABLE_SHAPES[block.type]) {
+    const widths = TABLE_WIDTHS[block.type] || TABLE_WIDTHS.default;
+    h += block.type === 'defaults' ? 30 : 16;
+    for (const row of block.rows) h += 6 + 17 * Math.max(...row.map((cell, index) => cellLines(cell, widths[index] * scale)));
   } else if (block.type === 'annotated-code') {
-    h += 18 + block.code.reduce((sum, line) => sum + (line.trim() ? 17 * Math.max(1, Math.ceil(line.length / (34 * scale))) : 6), 0);
+    const pattern = COMMENT[block.lang] || COMMENT.bash;
+    const noted = block.code.some(line => pattern.test(line) && !FULL_COMMENT.test(line));
+    h += 18;
+    for (const line of block.code) {
+      if (!line.trim()) {
+        h += 6;
+        continue;
+      }
+      const match = FULL_COMMENT.test(line) ? null : pattern.exec(line);
+      const code = match ? line.slice(0, match.index) : line;
+      const note = match ? line.slice(match.index + match[0].length) : '';
+      const codeLines = Math.ceil(displayLength(code) / ((noted ? 28 : 54) * scale)) || 1;
+      const noteLines = note ? Math.ceil(displayLength(note) / (20 * scale)) : 1;
+      h += 17 * Math.max(codeLines, noteLines);
+    }
   } else if (block.type === 'architecture' || block.type === 'flow') {
     const svg = block.type === 'architecture' ? architectureSvg(block) : flowSvg(block);
     const viewBox = /viewBox="0 0 (\d+) (\d+)"/.exec(svg);
-    h += viewBox ? Number(viewBox[2]) * (330 * scale) / Number(viewBox[1]) : 200;
+    h += viewBox ? Number(viewBox[2]) * (350 * scale) / Number(viewBox[1]) : 200;
   } else {
     for (const item of block.items) {
       if (block.type === 'qa') h += 8 + 18 * (Math.ceil(displayLength(plain(item.lead)) / (40 * scale)) + Math.ceil(displayLength(plain(item.text)) / (44 * scale)));
       else h += 6 + 18 * Math.ceil((displayLength(plain(item.lead)) + displayLength(plain(item.text)) + 2) / (44 * scale));
     }
   }
+  const fromText = block.from.map(source => sourceLink(source).label).join(', ');
+  h += 13 * Math.max(0, Math.ceil(fromText.length / (50 * scale)) - 1);
   return h + 16;
 }
 
+const TABLE_WIDTHS = { troubleshooting: [13, 15, 15], defaults: [13, 10, 20], 'command-table': [21, 21], default: [17, 26] };
+
+function cellLines(cell, width) {
+  const text = plain(cell);
+  if (!/`/.test(cell)) return Math.ceil(displayLength(text) / width) || 1;
+  let lines = 1;
+  let used = 0;
+  for (const word of text.split(/(?<=[\s=,/])/).filter(Boolean)) {
+    const size = displayLength(word.trimEnd());
+    if (used && used + size > width) {
+      lines += 1;
+      used = 0;
+    }
+    if (size > width) {
+      lines += Math.ceil(size / width) - 1;
+      used = size % width;
+    } else {
+      used += displayLength(word);
+    }
+  }
+  return lines;
+}
 const ROW_UNIT = 8;
 const STRETCH_ROWS = 40;
 const BLOCK_GAP = 12;
 
 function layout(topic) {
   const heights = topic.blocks.map(estimateBlock);
+  const natural = topic.blocks.map((_, index) => index);
+  const first = packBlocks(topic, heights, natural);
+  if (first.pages <= MAX_PAGES) return first;
+  const tallest = natural.slice().sort((a, b) => heights[b] * (topic.blocks[b].span || 1) - heights[a] * (topic.blocks[a].span || 1) || a - b);
+  const second = packBlocks(topic, heights, tallest);
+  return second.pages < first.pages ? second : first;
+}
+
+function packBlocks(topic, heights, order) {
   const pages = [];
   const newPage = () => {
     const budget = Math.floor((PAGE_BUDGETS[pages.length] || PAGE_BUDGETS[PAGE_BUDGETS.length - 1]) / ROW_UNIT);
@@ -567,7 +719,9 @@ function layout(topic) {
     }
     return best && { ...best, span };
   };
-  const places = topic.blocks.map((block, index) => {
+  const places = [];
+  order.forEach(index => {
+    const block = topic.blocks[index];
     const rows = Math.ceil((heights[index] + BLOCK_GAP) / ROW_UNIT);
     let pageIndex = 0;
     let spot = null;
@@ -579,7 +733,7 @@ function layout(topic) {
       spot = fit(page, block, Math.min(rows, page.budget)) || { col: 0, start: 0, span: Math.min(block.span || 1, COLUMNS) };
     }
     for (let k = 0; k < spot.span; k++) pages[pageIndex].taken[spot.col + k].push([spot.start, spot.start + rows]);
-    return { page: pageIndex, col: spot.col + 1, span: spot.span, row: spot.start + 1, rows };
+    places[index] = { page: pageIndex, col: spot.col + 1, span: spot.span, row: spot.start + 1, rows };
   });
   const used = pages.map(page => Math.max(0, ...page.taken.flat().map(([, b]) => b)) * ROW_UNIT);
   for (const place of places) {
@@ -625,18 +779,22 @@ function topicCounts(topic) {
   return { blocks: topic.blocks.length, rows, diagrams };
 }
 
+function tileHtml(topic) {
+  const counts = topicCounts(topic);
+  return `<li class="cs-tile" data-kind="${topic.kind}" style="--h:${topic.hue}"><a href="${topic.href}"><span class="cs-code" aria-hidden="true">${escapeHtml(topic.code)}</span><span class="cs-tile-name">${escapeHtml(topic.title)}</span><span class="cs-tile-sub">${escapeHtml(plain(topic.subtitle))}</span><span class="cs-tile-meta"><span class="cs-tile-kind">${KIND_LABELS[topic.kind]}</span>${counts.rows} 行 · ${counts.diagrams} 张图</span></a></li>`;
+}
+
 function indexMain(topics, year, phases) {
-  const search = `<div class="cs-search" role="search"><label for="cs-q" class="cs-kicker">搜索任务、命令与术语</label><input id="cs-q" type="search" autocomplete="off" spellcheck="false" placeholder="显存比例、因果掩码、预算" data-index="${BASE}/search.json"><p class="cs-search-count" aria-live="polite"></p><ol class="cs-results" hidden></ol></div>`;
-  const tiles = topics.map(topic => {
-    const counts = topicCounts(topic);
-    return `<li class="cs-tile" style="--h:${topic.hue}"><a href="${topic.href}"><span class="cs-code" aria-hidden="true">${escapeHtml(topic.code)}</span><span class="cs-tile-name">${escapeHtml(topic.title)}</span><span class="cs-tile-sub">${escapeHtml(plain(topic.subtitle))}</span><span class="cs-tile-meta">${counts.rows} 行 · ${counts.diagrams} 张图 · ${counts.blocks} 个区块</span></a></li>`;
-  }).join('');
+  const search = `<div class="cs-search" role="search"><label for="cs-q" class="cs-kicker">搜索主题、任务、命令与术语</label><input id="cs-q" type="search" autocomplete="off" spellcheck="false" placeholder="显存比例、因果掩码、预算" data-index="${BASE}/search.json"><p class="cs-search-count" aria-live="polite"></p><ol class="cs-results" hidden></ol></div>`;
+  const tracks = TRACKS.map(([slug, label]) => ({ slug, label, topics: topics.filter(topic => topic.track === slug).sort((a, b) => a.title.localeCompare(b.title)) })).filter(track => track.topics.length);
+  const kinds = Object.keys(KIND_LABELS).map(kind => [kind, topics.filter(topic => topic.kind === kind).length]).filter(([, count]) => count);
+  const filters = `<div class="cs-filters"><div class="cs-filter-kinds" role="group" aria-label="按速查表类型筛选"><button type="button" data-kind="" aria-pressed="true">全部 <span>${topics.length}</span></button>${kinds.map(([kind, count]) => `<button type="button" data-kind="${kind}" aria-pressed="false">${KIND_LABELS[kind]} <span>${count}</span></button>`).join('')}</div><nav class="cs-track-nav" aria-label="主题分组">${tracks.map(track => `<a href="${BASE}#t-${track.slug}">${escapeHtml(track.label)} <span>${track.topics.length}</span></a>`).join('')}</nav><p class="cs-filter-count" aria-live="polite"></p></div>`;
+  const sections = tracks.map(track => `<section class="cs-index-section cs-track" id="t-${track.slug}" aria-labelledby="h-${track.slug}"><h2 id="h-${track.slug}">${escapeHtml(track.label)} <span class="cs-count">${track.topics.length}</span></h2><ol class="cs-tiles">${track.topics.map(tileHtml).join('')}</ol></section>`).join('');
   const byPhase = phases.filter(phase => phase.topics.length).map(phase => `<li id="p-${phase.slug}"><a href="/phase/${phase.slug}">${escapeHtml(phase.label)}</a><span>${phase.topics.map(topic => `<a href="${topic.href}">${escapeHtml(topic.title)}</a>`).join(', ')}</span></li>`).join('');
-  const head = `<header class="cs-index-head"><p class="cs-kicker">AI Engineering from Scratch</p><h1>速查表</h1><p class="cs-sub">每个主题一张海报，汇集工作中常用的任务、命令、代码、图解、默认值和排错方法。全部内容均来自本课程的课程正文或技术手册。</p>${search}</header>`;
-  const list = `<section class="cs-index-section" aria-labelledby="topics"><h2 id="topics">主题</h2><ol class="cs-tiles">${tiles}</ol></section>`;
+  const head = `<header class="cs-index-head"><p class="cs-kicker">AI Engineering from Scratch</p><h1>速查表</h1><p class="cs-sub">${topics.length} 张主题海报，汇集工作中常用的任务、命令、代码、图解、默认值与排错方法。内容均来自本课程的正文、手册或项目。</p>${search}${filters}</header>`;
   const phaseList = byPhase ? `<section class="cs-index-section" aria-labelledby="by-phase"><h2 id="by-phase">按阶段浏览</h2><ul class="cs-by-phase">${byPhase}</ul></section>` : '';
-  const how = '<section class="cs-index-section" aria-labelledby="how"><h2 id="how">使用方法</h2><ul class="cs-tips"><li>颜色表示区块类型：蓝色为任务与命令，红色为排错方法。每张海报顶部都有图例。</li><li>点击命令即可复制。请替换尖括号中的占位值，例如 <code>&lt;model&gt;</code>.</li><li>每个区块都标明了来源课程或手册章节，需要了解原理时可直接打开。</li><li>每张海报可打印为一至两页横向页面，适配 A4 和 Letter 纸张。</li></ul></section>';
-  return `<main id="main" class="cs-page cs-index">${head}${list}${phaseList}${how}<footer class="cs-foot"><p class="cs-stamp"><span>aieng-zh.cn${BASE}</span><span>${copyLine(year)}</span></p></footer></main>`;
+  const how = '<section class="cs-index-section" aria-labelledby="how"><h2 id="how">使用方法</h2><ul class="cs-tips"><li>颜色表示区块类型：蓝色为任务与命令，红色为排错方法。每张海报顶部都有图例。</li><li>点击命令即可复制。请替换尖括号中的占位值，例如 <code>&lt;model&gt;</code>.</li><li>每个区块标明了来源课程或手册章节，需要了解原理时可直接打开。</li><li>每张海报可打印为一至两页横向页面，适配 A4 和 Letter 纸张。</li></ul></section>';
+  return `<main id="main" class="cs-page cs-index">${head}${sections}${phaseList}${how}<footer class="cs-foot"><p class="cs-stamp"><span>aieng-zh.cn${BASE}</span><span>${copyLine(year)}</span></p></footer></main>`;
 }
 
 function shell({ title, description, href, card, main, bodyClass, hue = 222 }, assets) {
@@ -695,11 +853,28 @@ function topicFiles(root) {
   return fs.readdirSync(dir).filter(name => name.endsWith('.md') && name !== 'AUTHORING.md' && name !== 'README.md').sort().map(name => path.join(dir, name));
 }
 
+function trackOf(topic) {
+  if (topic.kind === 'manual') return 'manuals';
+  if (topic.kind === 'project') return 'projects';
+  const counts = new Map();
+  for (const source of topic.sources) {
+    const phase = /^phases\/(\d{2})-/.exec(source);
+    if (phase) counts.set(phase[1], (counts.get(phase[1]) || 0) + (phase[1] === '19' ? 0.5 : 1));
+  }
+  const best = Array.from(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];
+  if (!best) return topic.sources.some(source => source.startsWith('manuals/')) ? 'manuals' : 'projects';
+  return (TRACKS.find(([, , phases]) => phases.includes(best[0])) || TRACKS[0])[0];
+}
+
 function loadTopics(root = REPO_ROOT) {
+  const map = topicMap.loadTopicMap(root);
+  const kinds = new Map(map.topics.map(entry => [entry.id, entry.kind]));
   return topicFiles(root).map(file => {
     const topic = parseTopic(fs.readFileSync(file, 'utf8'), file);
     topic.file = path.relative(root, file);
     topic.href = `${BASE}/${topic.id}`;
+    topic.kind = kinds.get(topic.id) || 'concept';
+    topic.track = trackOf(topic);
     return topic;
   });
 }
@@ -747,16 +922,27 @@ function phaseList(root, map) {
   });
 }
 
+function searchRow(title, rest, blockId, showDetail) {
+  const detail = plain(rest);
+  let shown = '';
+  if (showDetail) shown = detail.length <= SEARCH_DETAIL ? detail : `${detail.slice(0, SEARCH_DETAIL - 1)}…`;
+  const spans = (rest.match(/`[^`]+`/g) || []).join(' ').replace(/`/g, '');
+  const extra = factTokens(spans).filter(token => !shown.includes(token) && !title.includes(token));
+  return extra.length ? [title, shown, blockId, extra.join(' ')] : [title, shown, blockId];
+}
+
 function searchIndex(topics) {
   return topics.map(topic => ({
     i: topic.id,
     t: topic.title,
     c: topic.code,
     h: topic.hue,
-    r: topic.blocks.flatMap(block => {
-      if (TABLE_SHAPES[block.type]) return block.rows.map(row => [plain(row[0]), plain(row[1]), block.id]);
-      if (block.type === 'concepts' || block.type === 'glossary') return block.items.map(item => [plain(item.lead), plain(item.text), block.id]);
-      return [[plain(block.title), '', block.id]];
+    k: topic.kind,
+    b: topic.blocks.map(block => block.id),
+    r: topic.blocks.flatMap((block, index) => {
+      if (TABLE_SHAPES[block.type]) return block.rows.map(row => searchRow(plain(row[0]), row.slice(1).join(' · '), index, block.type === 'task-table' || block.type === 'defaults'));
+      if (block.type === 'concepts' || block.type === 'glossary') return block.items.map(item => searchRow(plain(item.lead), item.text, index, block.type === 'glossary'));
+      return [[plain(block.title), '', index]];
     }),
   }));
 }
@@ -863,6 +1049,10 @@ function checkTopic(topic, root = REPO_ROOT, cache = new Map()) {
     if (!fs.existsSync(path.join(root, source))) problems.push(`${topic.file}: source ${source} does not exist`);
   }
   for (const block of topic.blocks) {
+    for (const source of block.from) {
+      if (path.posix.normalize(source) !== source || source.split('/').includes('..') || path.isAbsolute(source)) problems.push(`${topic.file}: block "${block.title}" names ${source}, which is not a plain repository path`);
+      else if (!topic.sources.some(allowed => source === allowed || source.startsWith(`${allowed.replace(/\/+$/, '')}/`))) problems.push(`${topic.file}: block "${block.title}" names ${source}, which is not a source of this topic`);
+    }
     const missing = block.from.filter(source => !fs.existsSync(path.join(root, source)));
     for (const source of missing) problems.push(`${topic.file}: block "${block.title}" names ${source}, which does not exist`);
     if (missing.length) continue;
@@ -875,6 +1065,59 @@ function checkTopic(topic, root = REPO_ROOT, cache = new Map()) {
   const { pages } = layout(topic);
   if (pages > MAX_PAGES) problems.push(`${topic.file}: the poster needs ${pages} pages, the limit is ${MAX_PAGES}`);
   return problems;
+}
+
+const EMPTY_VALUES = /^(?:|-|n\/a|tbd|todo|not given|not covered|not listed|not stated|none stated|no number given|unknown)$/i;
+const QUALITY_RULES = {
+  concept: { doRows: 4, troubleRows: 3 },
+  commands: { doRows: 8, troubleRows: 3, code: true },
+  comparison: { doRows: 3, troubleRows: 3, compare: true },
+  debugging: { doRows: 4, troubleRows: 5 },
+  manual: { doRows: 8, troubleRows: 3, code: true },
+  project: { doRows: 6, troubleRows: 3 },
+};
+
+function blockSize(block) {
+  if (TABLE_SHAPES[block.type]) return block.rows.length;
+  if (block.type === 'annotated-code') return block.code.filter(line => line.trim()).length;
+  if (block.type === 'architecture') return block.nodes.length;
+  return (block.items || []).length;
+}
+
+function qualityReport(topic) {
+  const rules = QUALITY_RULES[topic.kind] || QUALITY_RULES.concept;
+  const checks = [];
+  const add = (name, pass, detail) => checks.push({ name, pass, detail });
+  const types = new Set(topic.blocks.map(block => block.type));
+  const rows = type => topic.blocks.filter(block => block.type === type).reduce((sum, block) => sum + block.rows.length, 0);
+  const doRows = rows('task-table') + rows('command-table');
+  add('blocks', topic.blocks.length >= 10 && topic.blocks.length <= 14, `${topic.blocks.length} blocks, 10 to 14 needed`);
+  add('variety', types.size >= 6, `${types.size} block types, 6 needed`);
+  add('tasks', doRows >= rules.doRows, `${doRows} task or command rows, ${rules.doRows} needed for a ${topic.kind} sheet`);
+  add('diagram', types.has('flow') || types.has('architecture'), 'a flow or architecture diagram');
+  add('troubleshooting', rows('troubleshooting') >= rules.troubleRows, `${rows('troubleshooting')} troubleshooting rows, ${rules.troubleRows} needed`);
+  add('recall', types.has('qa') || types.has('tips'), 'a qa or tips block');
+  if (rules.code) add('code', types.has('annotated-code'), 'an annotated-code block');
+  if (rules.compare) add('comparison', types.has('comparison'), 'a comparison table');
+  const emptyDefaults = topic.blocks.filter(block => block.type === 'defaults').flatMap(block => block.rows.filter(row => EMPTY_VALUES.test(plain(row[1])))).map(row => plain(row[0]));
+  add('defaults', !emptyDefaults.length, emptyDefaults.length ? `defaults without a value: ${emptyDefaults.join(', ')}` : 'every default has a value');
+  const minimum = { 'annotated-code': 3, architecture: 3, flow: 3 };
+  const thin = topic.blocks.filter(block => blockSize(block) < (minimum[block.type] || 2)).map(block => block.title);
+  add('thin', !thin.length, thin.length ? `thin blocks: ${thin.join(', ')}` : 'no thin block');
+  const seen = new Set();
+  const duplicates = [];
+  for (const block of topic.blocks) {
+    const keys = TABLE_SHAPES[block.type] ? block.rows.map(row => plain(row.join(' ')).toLowerCase()) : (block.items || []).map(item => plain(`${item.lead} ${item.text}`).toLowerCase());
+    for (const key of keys) {
+      if (seen.has(key)) duplicates.push(key);
+      seen.add(key);
+    }
+  }
+  add('duplicates', !duplicates.length, duplicates.length ? `duplicate rows: ${duplicates.slice(0, 3).join(' | ')}` : 'no duplicate row');
+  const { pages } = layout(topic);
+  add('fit', pages <= MAX_PAGES, `${pages} pages, ${MAX_PAGES} at most`);
+  const passed = checks.filter(check => check.pass).length;
+  return { id: topic.id, kind: topic.kind, score: Math.round((passed / checks.length) * 100), pass: passed === checks.length, failures: checks.filter(check => !check.pass).map(check => `${check.name}: ${check.detail}`) };
 }
 
 function checkLinks(built, root = REPO_ROOT) {
@@ -994,7 +1237,14 @@ function writePrint(outDir, options = {}) {
   return built;
 }
 
+const CLI_FLAGS = new Set(['--check', '--check-topic', '--check-quality', '--status', '--print', '--edition', '--katex']);
+
 function main(argv) {
+  const unknown = argv.filter(arg => arg.startsWith('--') && !CLI_FLAGS.has(arg));
+  if (unknown.length) {
+    console.error(`Unknown option: ${unknown.join(', ')}. Options: ${Array.from(CLI_FLAGS).join(', ')}`);
+    return 2;
+  }
   const flag = name => argv.includes(name);
   const value = name => {
     const index = argv.indexOf(name);
@@ -1021,6 +1271,18 @@ function main(argv) {
     console.log(`Wrote the print edition of ${built.topics.length} topic posters to ${value('--print')}/print.html`);
     return 0;
   }
+  if (flag('--check-quality')) {
+    const reports = loadTopics().map(qualityReport);
+    for (const report of reports) console.log(`${String(report.score).padStart(3)}  ${report.id}${report.pass ? '' : `  ${report.failures.join('; ')}`}`);
+    const failed = reports.filter(report => !report.pass);
+    console.log(`Quality: ${reports.length - failed.length} of ${reports.length} sheets pass the rubric. Mean score ${Math.round(reports.reduce((sum, report) => sum + report.score, 0) / reports.length)}.`);
+    return failed.length ? 1 : 0;
+  }
+  if (flag('--status')) {
+    const topics = loadTopics();
+    console.log(JSON.stringify(topicMap.mapStatus(topicMap.loadTopicMap(REPO_ROOT), topics, REPO_ROOT), null, 2));
+    return 0;
+  }
   if (flag('--check')) {
     const invalid = topicErrors(loadTopics());
     if (invalid.length) {
@@ -1039,7 +1301,16 @@ function main(argv) {
     const codes = first.topics.map(topic => topic.code);
     if (new Set(codes).size !== codes.length) problems.push('two topics share a code');
     for (const item of checkLinks(first)) problems.push(`broken link on ${item.page}: ${item.href}`);
+    const map = topicMap.loadTopicMap(REPO_ROOT);
+    problems.push(...topicMap.mapProblems(map, first.topics, REPO_ROOT));
+    const evidence = evidenceCheck.checkEvidence(map, first.topics, REPO_ROOT);
+    problems.push(...evidence.problems);
+    const status = topicMap.mapStatus(map, first.topics, REPO_ROOT);
     console.log(`Checked ${first.topics.length} cheat sheet topics (${first.topics.reduce((sum, topic) => sum + topic.blocks.length, 0)} blocks).`);
+    console.log(`Resolved ${evidence.refs} evidence references in ${first.topics.length} evidence files.`);
+    console.log(`Coverage: ${status.coverage.covered} of ${status.coverage.total} lessons, manuals and projects are in ${map.topics.length} topics (${status.coverage.lessons} of ${status.coverage.lessonTotal} lessons).`);
+    if (status.missing.length) console.log(`${status.missing.length} topics have no sheet yet: ${status.missing.join(', ')}. 应由 agent 翻译并补齐，不运行外部模型生成工作流。`);
+    if (status.stale.length) console.log(`${status.stale.length} sheets are older than their sources: ${status.stale.join(', ')}.`);
     for (const problem of problems) console.error(`  ${problem}`);
     return problems.length ? 1 : 0;
   }
@@ -1050,4 +1321,4 @@ function main(argv) {
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));
 
-module.exports = { parseTopic, loadTopics, buildCheatsheets, writeCheatsheets, writePrint, printHtml, prerenderMath, checkTopic, checkLinks, coverage, layout, factTokens, blockFacts, architectureSvg, flowSvg, TYPES };
+module.exports = { qualityReport, QUALITY_RULES, trackOf, parseTopic, loadTopics, buildCheatsheets, writeCheatsheets, writePrint, printHtml, prerenderMath, checkTopic, checkLinks, coverage, layout, factTokens, blockFacts, architectureSvg, flowSvg, TYPES };

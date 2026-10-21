@@ -14,6 +14,7 @@ subtitle: 启动、规划容量、衡量并排查 SGLang 服务。基于 SGLang 
 hue: 200
 code: LS
 sources: manuals/sglang-101, phases/17-infrastructure-and-production/03-vllm-serving
+source_hash: <当前中文来源哈希>
 ---
 
 ## 启动服务
@@ -26,7 +27,7 @@ sglang serve --model-path <model> --port 30000   # 启动 HTTP 服务
 ```
 ````
 
-Frontmatter 有五个必填键。`id`、`title`、`subtitle` 是文本。副标题最多 120 字符。`hue` 是 0 至 359 的数字，决定海报颜色。`sources` 列出覆盖的课程和手册，课程页根据这些路径反向链接速查表。可选的 `code` 设置卡片上的两个字母，默认取英文标题首字母。中文主题应显式保留独立代码，各主题不能重码。
+Frontmatter 的内容字段如下。`id`、`title`、`subtitle` 是文本。副标题最多 120 字符。`hue` 是 0 至 359 的数字，决定海报颜色。`sources` 列出覆盖的课程和手册，课程页根据这些路径反向链接速查表。可选的 `code` 设置卡片上的两个字母，默认取英文标题首字母。中文主题应显式保留独立代码，各主题不能重码。
 
 每个区块以 `## ` 标题开始，标题显示在彩色栏上。其后的 `key: value` 行为区块元数据，空行结束元数据，之后才是正文。
 
@@ -36,7 +37,7 @@ Frontmatter 有五个必填键。`id`、`title`、`subtitle` 是文本。副标�
 | `from` | 是 | 用逗号分隔的仓库路径，必须包含本区块事实的来源 |
 | `lang` | 代码区块必填 | `annotated-code` 区块的语言 |
 | `col` | 否 | 海报列号，1 至 4。省略时按顺序放置并平衡各列 |
-| `span` | 否 | 区块跨列数，1 至 4。代码注解、架构、默认值和排错默认跨 2 列，其余跨 1 列 |
+| `span` | 否 | 区块跨列数，1 至 4。代码注解、架构、对比、默认值和排错默认跨 2 列，其余跨 1 列 |
 
 ## 区块类型
 
@@ -49,6 +50,7 @@ Frontmatter 有五个必填键。`id`、`title`、`subtitle` 是文本。副标�
 | `annotated-code` | 墨色 | 一个代码围栏，注释前至少两个空格，构建时将注释对齐成列 |
 | `flow` | 青色 | 编号列表：`1. **执行者**：发生什么`，构建时绘制编号步骤 |
 | `architecture` | 青色 | `arch` 围栏，使用下文的 `node` 与 `edge` 行 |
+| `comparison` | 钢蓝色 | 3 至 5 列的方案对比表，首列列出对比因素 |
 | `defaults` | 琥珀色 | 表格：`\| 设置 \| 默认值 \| 说明 \|` |
 | `troubleshooting` | 红色 | 表格：`\| 现象 \| 原因 \| 修正 \|` |
 | `qa` | 绿色 | 列表：`- **问题？** 答案。` |
@@ -79,3 +81,14 @@ edge | api | sched | ZMQ
 使用短句。一行只写一条表格行或一个列表项。说明读者该输入什么、会得到什么，不讲故事。翻译遵循根目录 `TRANSLATION.md`。
 
 运行 `node site/build-cheatsheets.js --check` 与 `node --test site/test_cheatsheets.js`。构建后在真实浏览器中检查检索、复制、来源链接、中文 SVG 换行和打印布局。生成的 `site/cheatsheets/`、`site/cheatsheet-map.json` 不提交。
+
+
+## 主题覆盖与来源版本
+
+`cheatsheets/topics.yaml` 登记主题的 `id`、中文 `title`、`kind` 与 `sources`。每节核心课程、手册和项目至少由一个主题覆盖；主题文件的标题与来源必须与清单一致。`kind` 使用 `concept`、`commands`、`comparison`、`debugging`、`manual` 或 `project`，保持机器标识英文。
+
+`source_hash` 由 `site/cheatsheet-topics.js` 的 `sourceHash(sources, root)` 按当前中文源计算；翻译或来源内容发生变化后，先核对受影响事实再刷新哈希。不要用上游英文哈希冒充中文内容已同步。
+
+源于冻结上游的证据文件声明 `upstream_revision`，并保留原始英文逐条记录的路径、行号和数值；区块标题对应中文海报。其版本由 `site/cheatsheet-evidence.js` 固定，校验需要 `AIFS_CHEATSHEET_EVIDENCE_ROOT` 指向该版本的原始源码，根目录 `.aifs-upstream-revision` 标明同一 SHA。CI 在 `.github/workflows/build.yml` 显式取得该 oracle；缺源不能跳过。原始记录只证明出处，不证明本次执行或当前供应商行为。
+
+不运行上游外部 LLM 生成工作流。主题由当前 agent 或已授权子 agent 翻译整合。除来源与覆盖检查外，运行 `node site/build-cheatsheets.js --check-quality` 检查区块、排错、对比和打印页数。完整构建后再检查，避免把尚未生成的手册页面误报为断链。

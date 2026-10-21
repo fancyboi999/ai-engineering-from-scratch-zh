@@ -5,6 +5,7 @@ subtitle: 发现 agent、发送工作、跟踪任务并处理错误。基于 A2A
 hue: 140
 sources: manuals/a2a-101
 code: AP
+source_hash: b83b7fddd751c3cd
 ---
 
 ## 通过 JSON-RPC 执行任务
@@ -186,11 +187,9 @@ from: manuals/a2a-101/sections/r-1-operations-by-binding.md, manuals/a2a-101/sec
 
 ## 提示
 type: tips
-from: manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/1-2-one-task-request-by-request.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/r-4-errors.md, manuals/a2a-101/sections/4-6-push-notification-configs.md
+from: manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/1-2-one-task-request-by-request.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/4-6-push-notification-configs.md
 
-- 每次请求都发送 `A2A-Version: 1.0`，不带补丁版本号。
 - 轮询、订阅或等待 webhook 时设置 `returnImmediately: true`。
 - 从第一帧获取任务标识和上下文标识。
 - 能力标志缺失或为 `false` 时，跳过相应操作。
-- 调用方无权访问任务时返回 `TaskNotFoundError`。
 - 幂等处理推送通知，通知可能重复到达。

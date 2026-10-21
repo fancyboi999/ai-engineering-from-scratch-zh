@@ -1,331 +1,121 @@
+# Evidence: cheatsheets/sglang-serving.md
+upstream_revision: 45fa4084de6ba2f88fa96a41e69efa2166f868b3
+
 # 证据对照：使用 SGLang 提供 LLM 服务
 
-中文主题：[使用 SGLang 提供 LLM 服务](../sglang-serving.md)。
+中文主题：[使用 SGLang 提供 LLM 服务](../sglang-serving.md)。下列逐条英文记录保留冻结上游版本的路径、行号与数值；标题对应中文主题。
+
+原始记录中的 docs/en.md 和行号只在上述 upstream 版本有效，不代表当前 docs/zh.md 的行号，也不表示本次重新运行了命令、GPU 测量或外部模型。当前中文主题的 from 路径另由构建器校验。
+
+Abbreviations: S = manuals/sglang-101/sections, R = manuals/sglang-101, C = manuals/sglang-101/capture, O = manuals/sglang-101/capture/gpu/out-l4.
+
+## 启动服务 (annotated-code)
+
+原始区块：Start a server (annotated-code, 3 lines)
+- HF_HUB_OFFLINE=1 for offline runs: C/README.md:40
+- sglang serve flags --model-path, --host, --port: O/server-default.command.txt:1
+- --enable-cache-report, --enable-metrics, --mem-fraction-static 0.85: O/server-default.command.txt:1
+- /ready returns 200 when ready: S/7-1-operating-sglang.md:12
+
+## 三个进程 (architecture)
+
+原始区块：Three processes (architecture, 6 nodes)
+- Client sends POST /generate: S/1-2-one-request-end-to-end.md:20
+- TokenizerManager converts text to token ids: S/2-1-sglang-serve-and-the-three-processes.md:18
+- Scheduler runs batches over the KV pool: S/2-1-sglang-serve-and-the-three-processes.md:22
+- Detokenizer turns ids back to text: S/2-1-sglang-serve-and-the-three-processes.md:24
+- Model on GPU runs the forward pass: S/2-1-sglang-serve-and-the-three-processes.md:26
+- KV pool stores slots per token: S/3-1-kv-bytes-per-token-and-the-kv-pool.md:30
+
+## 请求与检查 (task-table)
+
+原始区块：Requests and checks (task-table, 8 rows)
+- POST /generate native request: S/1-2-one-request-end-to-end.md:24
+- POST /v1/chat/completions OpenAI format: S/2-5-streaming-stop-strings-and-the-openai-api.md:20
+- meta_info field cached_tokens: S/2-5-streaming-stop-strings-and-the-openai-api.md:30
+- /ready readiness probe: S/7-1-operating-sglang.md:12
+- --random-range-ratio 1.0: S/5-1-sglang-benchmark-serving.md:40
+- --max-concurrency 8: S/5-1-sglang-benchmark-serving.md:44
+- --request-rate for fixed arrivals: S/5-1-sglang-benchmark-serving.md:70
+- test_deterministic with --n-trials and --test-mode: S/4-6-deterministic-inference-and-logprobs.md:50
+
+## 捕获工具与审计命令 (command-table)
+
+原始区块：Kit and audit commands (command-table, 4 rows)
+- python3 capture/run.py --check: R/README.md:46
+- python3 capture/run.py --only small-pool: C/README.md:14
+- SGLANG_KIT_PROFILE=gb10 python3 capture/gpu/run.py: C/README.md:52
+- node scripts/audit_manuals.js --manual sglang-101, TOTAL 0: R/README.md:61
+
+## 关键默认值 (defaults)
+
+原始区块：Defaults that matter (defaults, 7 rows)
+- --schedule-policy fcfs: S/2-2-the-scheduler-loop-and-schedule-policy.md:60
+- --schedule-conservativeness 1.0: S/2-3-admission-and-retraction.md:22
+- --radix-eviction-policy lru: S/3-5-eviction-policies-and-hicache.md:18
+- --kv-cache-dtype auto: S/3-1-kv-bytes-per-token-and-the-kv-pool.md:70
+- --stream-interval 1: S/2-5-streaming-stop-strings-and-the-openai-api.md:60
+- --tp-size 1: S/6-1-tp-size-dp-size-and-attn-dp-size.md:20
+- --cache-threshold 0.3: S/6-4-sgl-model-gateway.md:50
+
+## 修正这些错误 (troubleshooting)
+
+原始区块：Fix these errors (troubleshooting, 7 rows)
+- [METAL] Command buffer execution failed, 87 percent pool, 0.4 fix: S/3-2-mem-fraction-static-and-startup-sizing.md:20, 60
+- Median TTFT near 28 s, admission queue: S/2-3-admission-and-retraction.md:70
+- KV cache pool is full. Retract requests. with max_new_tokens: S/2-3-admission-and-retraction.md:95
+- The memory capacity is unbalanced, no flag disables it: S/6-1-tp-size-dp-size-and-attn-dp-size.md:150
+- cuda graph: False under load, --cuda-graph-max-bs-decode: S/4-1-forwardmode-and-cuda-graphs.md:70
+- ambiguous option --cuda-graph-max-bs, split flags: S/4-1-forwardmode-and-cuda-graphs.md:160
+- #cached-token: 0 with random ID at start: S/3-4-prefix-friendly-prompts.md:10
+
+## 按此顺序调优 (flow)
+
+原始区块：Tune in this order (flow, 6 steps)
+- Measure at three caps with --random-range-ratio 1.0: S/7-1-operating-sglang.md:80, S/5-1-sglang-benchmark-serving.md:40
+- Set --mem-fraction-static on shared machines: S/7-1-operating-sglang.md:82
+- Shared text first, no request ID at start: S/7-1-operating-sglang.md:84
+- Cap --max-running-requests at the knee: S/7-1-operating-sglang.md:86
+- Change kernels one at a time, graph and attention: S/7-1-operating-sglang.md:88
+- Add --tp-size or --dp-size when one replica saturates: S/6-1-tp-size-dp-size-and-attn-dp-size.md:20
+
+## 应监控的指标 (concepts)
+
+原始区块：Numbers to watch (concepts, 5 bullets)
+- sglang:token_usage near 1.0: S/5-2-the-metrics-endpoint.md:40
+- sglang:num_queue_reqs above 0 for minutes: S/5-2-the-metrics-endpoint.md:60
+- sglang:cache_hit_rate and sglang:prefill_effective_tokens_total: S/5-2-the-metrics-endpoint.md:30, 50
+- cached_tokens reused prompt tokens: S/2-5-streaming-stop-strings-and-the-openai-api.md:30
+- Goodput meets TTFT and TPOT together: S/1-1-what-a-serving-engine-owns.md:30
+
+## 已记录的事故 (concepts)
+
+原始区块：Incidents on record (concepts, 4 bullets)
+- Issue #36889 Mamba cap to 2: S/2-2-the-scheduler-loop-and-schedule-policy.md:150
+- Issue #17411 FlashInfer Hopper seven times slower: S/4-2-attention-backend.md:10
+- Issue #5274 EAGLE-3 concurrency 20: S/4-4-speculative-decoding.md:10
+- Issue #35129 hash removal 66.8 to 94.4 percent: S/3-4-prefix-friendly-prompts.md:60
+
+## 术语表 (glossary)
+
+原始区块：Glossary (glossary, 5 bullets)
+- ITL inter-token latency: S/1-1-what-a-serving-engine-owns.md:30
+- MLA multi-head latent attention: S/3-1-kv-bytes-per-token-and-the-kv-pool.md:50
+- MoE mixture of experts: S/6-2-moe-serving-deepep-and-eplb.md:10
+- EPLB expert placement load balancing: S/6-2-moe-serving-deepep-and-eplb.md:60
+- PD prefill-decode disaggregation: S/6-3-prefill-decode-disaggregation.md:10
 
-以下为当前中文区块的来源索引。文末保留冻结上游 `0d4b1ca0c6d75b8e413be88ca4174598eba4d1e0` 的原始逐条定位记录，便于回查英文原文。原始记录中的 `docs/en.md` 与行号属于该上游版本，不是当前 `docs/zh.md` 的行号，也不表示本次已执行这些命令或重现性能数据。
+## 问答 (qa)
 
-当前中文来源按区块登记如下。正文说明、代码注释和图中标签见链接的中文主题；命令、API 标识与数值保留原样。
+原始区块：Questions (qa, 3 bullets)
+- Tokenizer process first when idle GPU: S/2-1-sglang-serve-and-the-three-processes.md:70
+- Pool never full at 64 users: S/3-2-mem-fraction-static-and-startup-sizing.md:180
+- Pin a tag such as v0.5.22, not latest: S/7-1-operating-sglang.md:10
 
-## 任务
+## 提示 (tips)
 
-对应主题区块：**任务**（`task-table`）。
-
-来源文件：
-
-- [`manuals/sglang-101/capture/out/server-default.command.txt`](../../manuals/sglang-101/capture/out/server-default.command.txt)
-- [`manuals/sglang-101/capture/one_request.py`](../../manuals/sglang-101/capture/one_request.py)
-- [`manuals/sglang-101/capture/run.py`](../../manuals/sglang-101/capture/run.py)
-- [`manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md`](../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)
-- [`manuals/sglang-101/sections/5-2-the-metrics-endpoint.md`](../../manuals/sglang-101/sections/5-2-the-metrics-endpoint.md)
-- [`manuals/sglang-101/sections/7-1-operating-sglang.md`](../../manuals/sglang-101/sections/7-1-operating-sglang.md)
-
-构建器核对的标识与数值：
-
-- `--model-path`
-- `--port`
-- `--max-concurrency`
-- `--request-rate`
-
-## 启动服务（终端 1）
-
-对应主题区块：**启动服务（终端 1）**（`annotated-code`）。
-
-来源文件：
-
-- [`manuals/sglang-101/capture/out/server-default.command.txt`](../../manuals/sglang-101/capture/out/server-default.command.txt)
-- [`manuals/sglang-101/sections/r-1-flags-and-defaults.md`](../../manuals/sglang-101/sections/r-1-flags-and-defaults.md)
-- [`manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md`](../../manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md)
-- [`manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md`](../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)
-
-构建器核对的标识与数值：
-
-- `--model-path`
-- `--port`
-- `--enable-cache-report`
-- `--enable-metrics`
-- `--mem-fraction-static`
-
-## 运行基准（终端 2）
-
-对应主题区块：**运行基准（终端 2）**（`annotated-code`）。
-
-来源文件：
-
-- [`manuals/sglang-101/capture/run.py`](../../manuals/sglang-101/capture/run.py)
-- [`manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md`](../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)
-- [`manuals/sglang-101/sections/r-1-flags-and-defaults.md`](../../manuals/sglang-101/sections/r-1-flags-and-defaults.md)
-- [`manuals/sglang-101/capture/out/bench-random-c8.txt`](../../manuals/sglang-101/capture/out/bench-random-c8.txt)
-- [`manuals/sglang-101/capture/out/bench-random-c32.txt`](../../manuals/sglang-101/capture/out/bench-random-c32.txt)
-
-构建器核对的标识与数值：
-
-- `--backend`
-- `sglang.benchmark.serving`
-- `--port`
-- `--dataset-name`
-- `--random-input-len`
-- `--random-output-len`
-- `--random-range-ratio`
-- `--num-prompts`
-- `--max-concurrency`
-
-## 关键选项
-
-对应主题区块：**关键选项**（`command-table`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/r-1-flags-and-defaults.md`](../../manuals/sglang-101/sections/r-1-flags-and-defaults.md)
-- [`manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md`](../../manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md)
-- [`manuals/sglang-101/sections/2-3-admission-and-retraction.md`](../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)
-- [`manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md`](../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)
-- [`manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md`](../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md)
-- [`manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md`](../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)
-
-构建器核对的标识与数值：
-
-- `--mem-fraction-static`
-- `--max-total-tokens`
-- `--max-running-requests`
-- `--chunked-prefill-size`
-- `--schedule-policy`
-- `--schedule-conservativeness`
-- `--disable-radix-cache`
-- `--tp-size`
-
-## 三个进程
-
-对应主题区块：**三个进程**（`architecture`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md`](../../manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md)
-- [`manuals/sglang-101/sections/3-1-kv-bytes-per-token-and-the-kv-pool.md`](../../manuals/sglang-101/sections/3-1-kv-bytes-per-token-and-the-kv-pool.md)
-- [`manuals/sglang-101/sections/3-3-radixcache.md`](../../manuals/sglang-101/sections/3-3-radixcache.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 一次请求的端到端流程
-
-对应主题区块：**一次请求的端到端流程**（`flow`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md`](../../manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md)
-- [`manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md`](../../manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md)
-- [`manuals/sglang-101/sections/2-3-admission-and-retraction.md`](../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)
-- [`manuals/sglang-101/sections/3-3-radixcache.md`](../../manuals/sglang-101/sections/3-3-radixcache.md)
-
-构建器核对的标识与数值：
-
-- `match_prefix`
-- `max_new_tokens`
-
-## 代码默认值
-
-对应主题区块：**代码默认值**（`defaults`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/r-1-flags-and-defaults.md`](../../manuals/sglang-101/sections/r-1-flags-and-defaults.md)
-
-构建器核对的标识与数值：
-
-- `--mem-fraction-static`
-- `--max-running-requests`
-- `--chunked-prefill-size`
-- `--schedule-conservativeness`
-- `1.0`
-- `--schedule-policy`
-- `fcfs`
-- `--enable-cache-report`
-- `--enable-metrics`
-- `--watchdog-timeout`
-- `300 s`
-
-## 关键指标
-
-对应主题区块：**关键指标**（`concepts`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/r-2-metrics.md`](../../manuals/sglang-101/sections/r-2-metrics.md)
-- [`manuals/sglang-101/sections/5-2-the-metrics-endpoint.md`](../../manuals/sglang-101/sections/5-2-the-metrics-endpoint.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 应阅读的日志行
-
-对应主题区块：**应阅读的日志行**（`command-table`）。
-
-来源文件：
-
-- [`manuals/sglang-101/capture/out/server-default.log`](../../manuals/sglang-101/capture/out/server-default.log)
-- [`manuals/sglang-101/capture/out/server-small-pool.log`](../../manuals/sglang-101/capture/out/server-small-pool.log)
-- [`manuals/sglang-101/capture/out/oom-exploratory.log`](../../manuals/sglang-101/capture/out/oom-exploratory.log)
-- [`manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md`](../../manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md)
-- [`manuals/sglang-101/sections/2-3-admission-and-retraction.md`](../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)
-
-构建器核对的标识与数值：
-
-- `bytes_per_slot`
-- `pool_size`
-- `max_total_num_tokens`
-- `max_running_requests`
-
-## 故障排查
-
-对应主题区块：**故障排查**（`troubleshooting`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/r-3-incident-index.md`](../../manuals/sglang-101/sections/r-3-incident-index.md)
-- [`manuals/sglang-101/sections/2-3-admission-and-retraction.md`](../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)
-- [`manuals/sglang-101/sections/1-2-one-request-end-to-end.md`](../../manuals/sglang-101/sections/1-2-one-request-end-to-end.md)
-- [`manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md`](../../manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md)
-- [`manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md`](../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)
-
-构建器核对的标识与数值：
-
-- `--mem-fraction-static`
-- `--disable-overlap-schedule`
-- `--schedule-conservativeness`
-- `--enable-cache-report`
-- `cached_tokens`
-
-## 术语表
-
-对应主题区块：**术语表**（`glossary`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/r-4-glossary.md`](../../manuals/sglang-101/sections/r-4-glossary.md)
-- [`manuals/sglang-101/sections/3-3-radixcache.md`](../../manuals/sglang-101/sections/3-3-radixcache.md)
-- [`manuals/sglang-101/capture/out/bench-shared-prefix.txt`](../../manuals/sglang-101/capture/out/bench-shared-prefix.txt)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 问答
-
-对应主题区块：**问答**（`qa`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md`](../../manuals/sglang-101/sections/2-1-sglang-serve-and-the-three-processes.md)
-- [`manuals/sglang-101/sections/2-3-admission-and-retraction.md`](../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)
-- [`manuals/sglang-101/sections/3-3-radixcache.md`](../../manuals/sglang-101/sections/3-3-radixcache.md)
-- [`manuals/sglang-101/sections/5-2-the-metrics-endpoint.md`](../../manuals/sglang-101/sections/5-2-the-metrics-endpoint.md)
-- [`manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md`](../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 提示
-
-对应主题区块：**提示**（`tips`）。
-
-来源文件：
-
-- [`manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md`](../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)
-- [`manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md`](../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)
-- [`manuals/sglang-101/sections/3-3-radixcache.md`](../../manuals/sglang-101/sections/3-3-radixcache.md)
-- [`manuals/sglang-101/sections/7-1-operating-sglang.md`](../../manuals/sglang-101/sections/7-1-operating-sglang.md)
-
-构建器核对的标识与数值：
-
-- `--random-range-ratio`
-- `--mem-fraction-static`
-
-## 冻结上游的原始定位记录
-
-以下文本原样保留，只用作历史审计证据；英文说明不属于站点可见文案。
-
-````text
-# Evidence: cheatsheets/sglang-serving.md (after trim pass)
-
-Paths are relative to /private/tmp/aiefs-cheatsheets/manuals/sglang-101/. S = sections/, C = capture/, O = capture/out/.
-
-## Front matter
-- subtitle pin 0.5.22: manual.json lines 9-15
-
-## Tasks (task-table, 8)
-- sglang serve --model-path --port 30000: O/server-default.command.txt:1
-- POST /generate {"text": ...}: C/one_request.py:13
-- POST /v1/chat/completions: C/one_request.py:17
-- GET /ready readiness: S/7-1:49,57
-- GET /metrics: C/run.py:94, S/5-2:11
-- fixed concurrency cap --max-concurrency 8: C/run.py:34, S/5-1:29
-- fixed request rate --request-rate (default inf): S/5-1:42
-- docker stop sends SIGTERM to main process: S/7-1:118
-
-## Start the server (terminal 1) (annotated-code, 5 lines)
-- sglang serve --model-path --port 30000 --enable-cache-report --enable-metrics --mem-fraction-static 0.4: O/server-default.command.txt:1
-- cache report and metrics meaning: S/r-1:35,57. fraction meaning: S/3-2:55
-
-## Benchmark it (terminal 2) (annotated-code, 5 lines)
-- benchmark --backend sglang --port 30000 --dataset-name random --random-input-len 512 --random-output-len 128 --random-range-ratio 1.0: C/run.py:23,26, S/5-1:27-29
-- default range ratio 0.0 halves prompts: S/5-1:40,45
-- --num-prompts 32 --max-concurrency 8: C/run.py:34. 255.63 tok/s: O/bench-random-c8.txt:23
-
-## Key flags (command-table, 8)
-- --mem-fraction-static: S/3-2:55
-- --max-total-tokens: S/r-1:12
-- --max-running-requests at the knee: S/r-1:13, S/5-1:131
-- --chunked-prefill-size: S/r-1:14, meaning S/2-1:75
-- --schedule-policy lpm: S/2-2:62-71
-- --schedule-conservativeness 1.3: S/2-3:114
-- --disable-radix-cache: S/r-1:31
-- --tp-size: S/6-1:13
-
-## Three processes (architecture, 6 nodes, 6 edges)
-- TokenizerManager main process: S/2-1:19. Scheduler owns GPU: S/2-1:21. DetokenizerManager: S/2-1:23
-- ZMQ links: S/2-1:25. port 30000: S/2-1:46
-- UnifiedRadixCache, match_prefix: S/3-3:60,77
-- KV pool one slot per token: S/3-1:59
-
-## One request, end to end (flow, 7)
-- 1: S/2-1:19,25. 2: S/2-2:21,62. 3: S/3-3:60, S/2-2:53. 4: S/2-3:19
-- 5: S/2-2:22,26. 6: S/2-2:22,24. 7: S/2-1:23
-
-## Defaults in the code (8, all S/r-1)
-- mem-fraction-static None: r-1:11. max-running-requests None: r-1:13. chunked-prefill-size None: r-1:14
-- schedule-conservativeness 1.0: r-1:16. schedule-policy fcfs: r-1:23. enable-cache-report False: r-1:35
-- enable-metrics None, resolves to off: r-1:57. watchdog-timeout 300 s: r-1:58
-
-## Key metrics (concepts, 8)
-- TTFT, ITL, queue time histograms: S/r-2:11,12,15. p99 over 5 min alert: S/5-2:81
-- num_queue_reqs, token_usage, num_retracted_reqs alerts: S/5-2:83-85
-- prefill_effective_tokens_total windowed hit rate: S/5-2:47,66
-- cache_hit_rate last interval: S/5-2:39
-
-## Log lines to read (command-table, 8)
-- bytes_per_slot=114688, pool_size=181574: O/server-default.log:61
-- max_total_num_tokens=181574, max_running_requests=4096: O/server-default.log:70
-- #new-token: 3, #cached-token: 2: O/server-default.log:94, S/2-1 listing via 1-2:87
-- #running-req: 5 ... #queue-req: 11: O/server-small-pool.log:118
-- KV cache pool is full. Retract requests.: S/2-3:82
-- crashed with exit code -15: O/server-default.log:566, S/2-1:111
-- Insufficient Memory: O/oom-exploratory.log:15, S/3-2:43 (memory outside the pool)
-
-## Troubleshooting (8)
-- Insufficient Memory, 87 percent, 0.4: S/r-3:11
-- RuntimeError, --disable-overlap-schedule, keep overlap on: S/r-3:12
-- retractions, raise conservativeness: S/2-3:114, S/r-3:21
-- high TTFT fast TPOT, past knee, cap: S/2-3:65-74, S/5-1:123,131
-- no cached_tokens without --enable-cache-report: S/1-2:133
-- #cached-token near 0, id at start, shared text first: S/3-4:29-33
-- health check failed, 20 s, /ready: S/r-3:70
-- crash line at shutdown, process group: S/r-3:13
-
-## Glossary (8)
-- TTFT: S/r-4:71, expansion S/3-3:16. TPOT: S/r-4:69, O/bench-shared-prefix.txt:40. ITL: S/r-4:34, O/bench-shared-prefix.txt:46
-- KV cache: S/r-4:35. TP: S/r-4:65. DP: S/r-4:20. EP: S/r-4:25. PD: S/r-4:55
-
-## Q&A (5)
-- GIL: S/2-1:3,13. Five requests, 768 each: S/2-3:38. 2,998 of 2,999: S/3-3:65
-- 0.942 vs 0.636, trust counters: S/5-2:56,111. Knee at or below 8: S/5-1:123
-
-## Tips (6)
-- --random-range-ratio 1.0: S/5-1:47. p50/p99 TTFT and TPOT: S/5-1:129
-- steps of 0.02: S/3-2:88. radix cache on, measure hit rate per feature: S/3-3:98-102
-- pin lmsysorg/sglang:v0.5.22: S/7-1:24,161. mount ~/.cache/sglang: S/7-1:41,162
-````
+原始区块：Tips (tips, 4 bullets)
+- --enable-cache-report and --enable-metrics at start: S/2-5-streaming-stop-strings-and-the-openai-api.md:30, S/5-2-the-metrics-endpoint.md:10
+- Pool size in the startup log: S/2-1-sglang-serve-and-the-three-processes.md:40
+- SIGTERM to the main process only: S/7-1-operating-sglang.md:120
+- SGLANG_ENABLE_HEALTH_ENDPOINT_GENERATION=false: S/7-1-operating-sglang.md:14

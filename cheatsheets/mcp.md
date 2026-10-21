@@ -5,6 +5,7 @@ subtitle: 通过 stdio 和 Streamable HTTP 构建、调用并提供无状态 MCP
 hue: 160
 sources: phases/13-tools-and-protocols/06-mcp-fundamentals, phases/13-tools-and-protocols/07-building-an-mcp-server, phases/13-tools-and-protocols/08-building-an-mcp-client, phases/13-tools-and-protocols/09-mcp-transports, phases/13-tools-and-protocols/12-mcp-roots-and-elicitation, phases/13-tools-and-protocols/16-mcp-security-oauth-2-1, phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control
 code: MC
+source_hash: e528b68b9e4293fc
 ---
 
 ## 任务

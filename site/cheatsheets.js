@@ -120,9 +120,9 @@
         }).then(function (topics) {
           entries = [];
           topics.forEach(function (topic) {
-            entries.push({ topic: topic, title: topic.t, meta: '速查表', href: '/cheatsheets/' + topic.i, text: topic.t.toLowerCase() });
+            entries.push({ topic: topic, title: topic.t, meta: '速查表', href: '/cheatsheets/' + topic.i, text: (topic.t + ' ' + topic.i.replace(/-/g, ' ') + ' ' + (topic.k || '')).toLowerCase(), rank: 0 });
             topic.r.forEach(function (row) {
-              entries.push({ topic: topic, title: row[0], meta: topic.t + (row[1] ? ' · ' + row[1] : ''), href: '/cheatsheets/' + topic.i + '#' + row[2], text: (row[0] + ' ' + row[1] + ' ' + topic.t).toLowerCase() });
+              entries.push({ topic: topic, title: row[0], meta: topic.t + (row[1] ? ' · ' + row[1] : ''), href: '/cheatsheets/' + topic.i + '#' + (topic.b ? topic.b[row[2]] : row[2]), text: (row[0] + ' ' + row[1] + ' ' + (row[3] || '') + ' ' + topic.t).toLowerCase(), rank: 1 });
             });
           });
           return entries;
@@ -144,6 +144,8 @@
       }
       var found = entries.filter(function (entry) {
         return words.every(function (word) { return entry.text.indexOf(word) >= 0; });
+      }).sort(function (a, b) {
+        return a.rank - b.rank;
       });
       found.slice(0, 40).forEach(function (entry) {
         var item = element('li');
@@ -171,7 +173,38 @@
     });
   }
 
+  function bindFilters() {
+    var buttons = document.querySelectorAll('.cs-filter-kinds button');
+    if (!buttons.length) return;
+    var count = document.querySelector('.cs-filter-count');
+    function apply(kind) {
+      var shown = 0;
+      Array.prototype.forEach.call(buttons, function (button) {
+        button.setAttribute('aria-pressed', button.getAttribute('data-kind') === kind ? 'true' : 'false');
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.cs-track'), function (section) {
+        var visible = 0;
+        Array.prototype.forEach.call(section.querySelectorAll('.cs-tile'), function (tile) {
+          var show = !kind || tile.getAttribute('data-kind') === kind;
+          tile.hidden = !show;
+          if (show) visible += 1;
+        });
+        section.hidden = !visible;
+        shown += visible;
+        var link = document.querySelector('.cs-track-nav a[href$="#' + section.id + '"]');
+        if (link) link.hidden = !visible;
+      });
+      if (count) count.textContent = kind ? '显示 ' + shown + ' 张速查表' : '';
+    }
+    Array.prototype.forEach.call(buttons, function (button) {
+      button.addEventListener('click', function () {
+        apply(button.getAttribute('data-kind'));
+      });
+    });
+  }
+
   function start() {
+    bindFilters();
     bindPrint();
     bindCopy();
     bindSearch();
