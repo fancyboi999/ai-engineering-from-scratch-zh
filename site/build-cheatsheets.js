@@ -42,8 +42,10 @@ const TRACKS = [
 ];
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap';
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
-const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css">';
-const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/cheatsheets.js" defer></script>`;
+const CHEATSHEET_CSS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'cheatsheets.css'))).digest('hex').slice(0, 12);
+const CHEATSHEET_JS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'cheatsheets.js'))).digest('hex').slice(0, 12);
+const HEAD_ASSETS = `<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css?v=${CHEATSHEET_CSS_VERSION}">`;
+const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/cheatsheets.js?v=${CHEATSHEET_JS_VERSION}" defer></script>`;
 
 const TYPES = {
   concepts: { group: 'know', label: '概念' },
