@@ -750,3 +750,26 @@ test('Chinese quotes re-anchor after a preceding paragraph changes', () => {
   assert.ok(hit);
   assert.equal(after.text.slice(hit.start, hit.end), '梯度指向损失增长最快的方向');
 });
+
+test('adopting shared highlights preserves the share on failure or partial success', () => {
+  const vm = require('node:vm');
+  const source = fs.readFileSync(path.join(__dirname, 'highlights.js'), 'utf8');
+  const fn = source.slice(source.indexOf('  function adoptShared(indexes)'), source.indexOf('  function dismissShared()'));
+  for (const result of [
+    { ok: false, added: 0, duplicates: 0, failed: 2, error: 'page-full' },
+    { ok: false, added: 1, duplicates: 0, failed: 1, error: 'page-full' },
+    { ok: false, added: 0, duplicates: 0, failed: 2, error: 'newer-schema' },
+    { ok: false, added: 1, duplicates: 0, failed: 0, error: 'quota' },
+    { ok: true, added: 0, duplicates: 2, failed: 0, error: '' },
+    { ok: true, added: 2, duplicates: 0, failed: 0, error: '' },
+  ]) {
+    let dismissed = false;
+    let message = '';
+    const context = { state: { shared: {} }, Store: { addShared: () => result }, toast: value => { message = value; }, storageMessage: () => '存储不可写。', dismissShared: () => { dismissed = true; } };
+    vm.runInNewContext(fn + '\nadoptShared();', context);
+    assert.equal(dismissed, result.ok);
+    if (!result.ok) assert.match(message, /分享链接已保留/);
+    if (result.failed) assert.match(message, new RegExp(result.failed + ' 条未能加入'));
+    if (!result.added && !result.duplicates) assert.doesNotMatch(message, /已保存/);
+  }
+});

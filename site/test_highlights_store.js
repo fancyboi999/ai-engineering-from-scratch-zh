@@ -330,9 +330,9 @@ test('adding shared highlights makes new local copies once', () => {
   owner.add(LESSON_PATH, sampleItem({ quote: { exact: 'another' }, position: { start: 300, end: 307, length: 600 } }));
   const shared = owner.decodeShare(owner.share(LESSON_PATH));
   const reader = storeWith().store;
-  assert.equal(reader.addShared(shared, [1]), 1);
-  assert.equal(reader.addShared(shared), 1);
-  assert.equal(reader.addShared(shared), 0);
+  assert.equal(reader.addShared(shared, [1]).added, 1);
+  assert.equal(reader.addShared(shared).added, 1);
+  assert.equal(reader.addShared(shared).added, 0);
   const items = reader.items(LESSON_PATH);
   assert.equal(items.length, 2);
   assert.ok(items.every(item => /^h/.test(item.id)));
@@ -417,7 +417,7 @@ test('a shared add that would exceed the budget keeps session-only highlights', 
   while (store.add(`phases/0${i % 9}-a/${i}-b`, sampleItem({ quote: { exact: big + i } }))) i++;
   const before = store.pages().reduce((n, page) => n + page.items.length, 0);
   const shared = { path: 'phases/09-new/01-page', title: 'New', items: [StoreModule.normalizeItem({ quote: { exact: big + 'shared' } })] };
-  assert.equal(store.addShared(shared), 0);
+  assert.deepEqual(store.addShared(shared), { ok: false, added: 0, duplicates: 0, failed: 1, error: 'full' });
   assert.equal(store.pages().reduce((n, page) => n + page.items.length, 0), before);
   assert.equal(store.page('phases/09-new/01-page'), null);
 });
@@ -429,8 +429,9 @@ test('conflict copies never push a page past its item cap', () => {
   const exported = JSON.parse(store.exportJson());
   exported.pages[LESSON_PATH].items.slice(0, 20).forEach(item => { item.note = 'remote ' + item.id; item.updatedAt += 1000; });
   const result = store.importJson(JSON.stringify(exported));
-  assert.deepEqual([result.updated, result.conflicts, result.skipped], [20, 0, 20]);
+  assert.deepEqual([result.updated, result.conflicts, result.skipped], [0, 0, 20]);
   assert.equal(store.items(LESSON_PATH).length, 500);
+  assert.deepEqual(store.items(LESSON_PATH).map(item => item.note), ids.map((_, i) => 'local ' + i));
   assert.equal(StoreModule.create(fakeWindow(memoryStorage({ [KEY]: JSON.stringify({ schemaVersion: 2, pages: { [LESSON_PATH]: store.page(LESSON_PATH) } }) }))).info().lastError, '');
 });
 
@@ -448,14 +449,14 @@ test('ids and quotes named like object prototype members are kept', () => {
   const { store } = storeWith({ [KEY]: raw });
   assert.deepEqual(store.items(LESSON_PATH).map(item => item.id).sort(), ['__proto__', 'constructor', 'toString']);
   const shared = { path: MANUAL_PATH, title: 'M', items: ['toString', '__proto__', 'constructor'].map(exact => StoreModule.normalizeItem({ quote: { exact } })) };
-  assert.equal(store.addShared(shared), 3);
+  assert.equal(store.addShared(shared).added, 3);
 });
 
 test('a share link does not rename an existing page, and oversized shares are refused', () => {
   const { store } = storeWith();
   store.add(LESSON_PATH, sampleItem(), { title: 'My title' });
   const shared = { path: LESSON_PATH, title: 'Their title', items: [StoreModule.normalizeItem({ quote: { exact: 'new text' } })] };
-  assert.equal(store.addShared(shared), 1);
+  assert.equal(store.addShared(shared).added, 1);
   assert.equal(store.page(LESSON_PATH).title, 'My title');
   for (let i = 0; i < 30; i++) store.add(MANUAL_PATH, sampleItem({ quote: { exact: 'z'.repeat(19000) + i } }));
   assert.equal(store.share(MANUAL_PATH), '');
@@ -505,8 +506,8 @@ test('a share with the same words in two places keeps both notes, once', () => {
   const shared = owner.decodeShare(owner.share(LESSON_PATH));
   const reader = storeWith().store;
   reader.add(LESSON_PATH, sampleItem({ note: '', quote: { exact: 'Try again', prefix: 'one ', suffix: ' two' } }));
-  assert.equal(reader.addShared(shared), 2);
-  assert.equal(reader.addShared(shared), 0);
+  assert.equal(reader.addShared(shared).added, 2);
+  assert.equal(reader.addShared(shared).added, 0);
   assert.deepEqual(reader.items(LESSON_PATH).map(item => item.note).sort(), ['', 'first', 'second']);
 });
 
@@ -516,4 +517,27 @@ test('confirming or re-attaching a highlight clears its saved original quote', (
   assert.equal(store.items(LESSON_PATH)[0].originalQuote.exact, 'old text');
   store.update(LESSON_PATH, item.id, { status: 'anchored', review: 'confirmed', originalQuote: null });
   assert.equal(store.items(LESSON_PATH)[0].originalQuote, null);
+});
+
+test('sharing rejects more than 100 selected highlights without truncating the payload', () => {
+  const { store } = storeWith();
+  const ids = [];
+  for (let i = 0; i < 101; i++) ids.push(store.add(LESSON_PATH, sampleItem({ quote: { exact: 'quote ' + i } })).id);
+  assert.equal(store.share(LESSON_PATH), '');
+  assert.equal(store.info().lastError, 'share-too-many');
+  const selected = store.share(LESSON_PATH, ids.slice(0, 100));
+  assert.equal(store.decodeShare(selected).items.length, 100);
+});
+
+test('shared adds distinguish duplicates, partial capacity failures and read-only rejection', () => {
+  const { store } = storeWith();
+  for (let i = 0; i < 499; i++) store.add(LESSON_PATH, sampleItem({ quote: { exact: 'quote ' + i } }));
+  const shared = { path: LESSON_PATH, title: 'Shared', items: ['quote 0', 'new one', 'new two'].map(exact => StoreModule.normalizeItem(sampleItem({ quote: { exact } }))) };
+  const result = store.addShared(shared);
+  assert.deepEqual(result, { ok: false, added: 1, duplicates: 1, failed: 1, error: 'page-full' });
+  assert.equal(store.items(LESSON_PATH).length, 500);
+  assert.deepEqual(store.addShared(shared), { ok: false, added: 0, duplicates: 2, failed: 1, error: 'page-full' });
+  const readOnly = storeWith({ [KEY]: JSON.stringify({ schemaVersion: 3, pages: {} }) }).store;
+  assert.deepEqual(readOnly.addShared(shared), { ok: false, added: 0, duplicates: 0, failed: 3, error: 'newer-schema' });
+  assert.equal(readOnly.page(LESSON_PATH), null);
 });

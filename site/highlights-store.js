@@ -310,7 +310,7 @@
   function sharePayload(state, path, ids) {
     var page = state.pages[path];
     if (!page) return null;
-    var items = page.items.filter(function (item) { return !ids || ids.indexOf(item.id) >= 0; }).slice(0, MAX_SHARE_ITEMS);
+    var items = page.items.filter(function (item) { return !ids || ids.indexOf(item.id) >= 0; });
     if (!items.length) return null;
     return {
       v: SHARE_FORMAT,
@@ -660,21 +660,20 @@
       var winner = incomingWins ? item : local;
       var loser = incomingWins ? local : item;
       var noteConflict = loser.note && winner.note !== loser.note && winner.note.indexOf(loser.note) < 0;
+      var copy = noteConflict ? conflictCopy(loser, winner) : null;
+      var copyExists = copy && target.items.some(function (entry) { return entry.id === copy.id; });
+      // Never replace either note unless both versions can survive this merge.
+      if (copy && !copyExists && target.items.length >= MAX_ITEMS_PER_PAGE) {
+        result.skipped++;
+        return;
+      }
       if (incomingWins) {
         target.items[index] = item;
         result.updated++;
       } else {
         result.unchanged++;
       }
-      if (noteConflict) {
-        var copy = conflictCopy(loser, winner);
-        for (var k = 0; k < target.items.length; k++) {
-          if (target.items[k].id === copy.id) return;
-        }
-        if (target.items.length >= MAX_ITEMS_PER_PAGE) {
-          result.skipped++;
-          return;
-        }
+      if (copy && !copyExists) {
         target.items.push(copy);
         result.conflicts++;
       }
@@ -720,8 +719,13 @@
     }
 
     function share(path, ids) {
+      if (lastError === 'share-too-many' || lastError === 'share-too-large') lastError = '';
       var payload = sharePayload(load(), path, ids);
       if (!payload) return '';
+      if (payload.i.length > MAX_SHARE_ITEMS) {
+        lastError = 'share-too-many';
+        return '';
+      }
       var encoded = encodeShare(payload);
       if (encoded.length > MAX_SHARE_LENGTH) {
         lastError = 'share-too-large';
@@ -731,9 +735,18 @@
     }
 
     function addShared(shared, indexes) {
-      if (!shared || !PATH_PATTERN.test(shared.path)) return 0;
+      var result = { ok: false, added: 0, duplicates: 0, failed: 0, error: '' };
+      if (!shared || !PATH_PATTERN.test(shared.path) || !Array.isArray(shared.items)) {
+        result.error = 'invalid-share';
+        return result;
+      }
+      var selected = shared.items.filter(function (_, index) { return !indexes || indexes.indexOf(index) >= 0; });
       var state = writable();
-      if (!state) return 0;
+      if (!state) {
+        result.failed = selected.length;
+        result.error = 'newer-schema';
+        return result;
+      }
       var snapshot = JSON.stringify(state);
       var isNew = !own(state.pages, shared.path) || !state.pages[shared.path].title;
       var target = ensurePage(state, shared.path, isNew ? { title: shared.title } : null);
@@ -742,30 +755,39 @@
         keys[shareKey(item.quote, item.note)] = true;
         if (item.originalQuote) keys[shareKey(item.originalQuote, item.note)] = true;
       });
-      var added = 0;
-      shared.items.forEach(function (item, index) {
-        if (indexes && indexes.indexOf(index) < 0) return;
+      selected.forEach(function (item) {
         var key = shareKey(item.quote, item.note);
-        if (keys[key] || target.items.length >= MAX_ITEMS_PER_PAGE) return;
-        keys[key] = true;
-        var copy = normalizeItem(Object.assign({}, item, { id: newId(), createdAt: Date.now(), updatedAt: Date.now() }));
-        if (copy) {
-          target.items.push(copy);
-          added++;
+        if (keys[key]) { result.duplicates++; return; }
+        if (target.items.length >= MAX_ITEMS_PER_PAGE) {
+          result.failed++;
+          result.error = 'page-full';
+          return;
         }
+        var copy = normalizeItem(Object.assign({}, item, { id: newId(), createdAt: Date.now(), updatedAt: Date.now() }));
+        if (!copy) { result.failed++; result.error = 'invalid-share'; return; }
+        keys[key] = true;
+        target.items.push(copy);
+        result.added++;
       });
-      if (!added) {
+      if (!result.added) {
         memory = JSON.parse(snapshot);
-        return 0;
+        result.ok = !result.failed && persistent;
+        if (!persistent && !result.error) result.error = lastError || 'not-persistent';
+        return result;
       }
       if (size(state) > MAX_BYTES) {
         memory = JSON.parse(snapshot);
         lastError = 'full';
-        return 0;
+        result.failed += result.added;
+        result.added = 0;
+        result.error = 'full';
+        return result;
       }
       sortItems(target.items);
       save(state);
-      return added;
+      result.ok = !result.failed && persistent;
+      if (!persistent) result.error = lastError || 'not-persistent';
+      return result;
     }
 
     function onChange(fn) {

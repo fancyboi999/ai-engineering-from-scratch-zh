@@ -1135,9 +1135,18 @@
 
   function adoptShared(indexes) {
     if (!state.shared) return;
-    var added = Store.addShared(state.shared, indexes);
-    toast(added ? '已加入 ' + added + ' 条高亮。' : "这些高亮已保存。");
-    if (!indexes) dismissShared();
+    var result = Store.addShared(state.shared, indexes);
+    var message = result.added ? '已加入 ' + result.added + ' 条高亮。' : '';
+    if (result.duplicates) message += result.duplicates + ' 条已保存。';
+    if (result.failed) message += result.failed + ' 条未能加入。';
+    if (!result.ok) {
+      var reason = result.error === 'page-full' ? '当前页面已达到 500 条高亮上限。' : storageMessage();
+      message += reason || '无法保存，请导出备份或释放浏览器存储后重试。';
+      if (result.added && !result.failed) message += '新增高亮目前仅在此标签页保留。';
+      message += '分享链接已保留。';
+    }
+    toast(message || '没有可加入的高亮。');
+    if (!indexes && result.ok) dismissShared();
   }
 
   function dismissShared() {
@@ -1179,7 +1188,7 @@
     if (!state.ctx) return;
     var link = shareUrl(state.ctx.path, ids);
     if (!link) {
-      toast(Store.info().lastError === 'share-too-large' ? "这些高亮超出单个链接的长度限制。请减少分享数量，或使用同步文件。" : "当前页面还没有可分享的高亮。");
+      toast(Store.info().lastError === 'share-too-many' ? "单个分享链接最多包含 100 条高亮。请减少数量，或使用同步文件。" : Store.info().lastError === 'share-too-large' ? "这些高亮超出单个链接的长度限制。请减少分享数量，或使用同步文件。" : "当前页面还没有可分享的高亮。");
       return;
     }
     showShareLink(link);
