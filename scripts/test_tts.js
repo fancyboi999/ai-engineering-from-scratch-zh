@@ -155,6 +155,7 @@ class Element extends EventTarget {
       if (!value) return false;
       if (value === this.tagName) return true;
       if (value[0] === '.') return this.classList.contains(value.slice(1));
+      if (value === 'a[href]') return this.tagName === 'a' && !!this.href;
       if (value === '[data-tts]') return this.attributes.has('data-tts');
       const action = /^\[data-tts="(.+)"\]$/.exec(value);
       return !!action && this.getAttribute('data-tts') === action[1];
@@ -262,7 +263,7 @@ class Utterance {
   }
 }
 
-function boot() {
+function boot(url = 'https://aieng-zh.cn/lessons/phase/current/') {
   const document = new Document();
   const timers = [];
   const intervals = new Map();
@@ -302,6 +303,9 @@ function boot() {
     window,
     document,
     navigator: { userAgent: 'Firefox' },
+    location: new URL(url),
+    URL,
+    URLSearchParams,
     localStorage: new Storage(),
     sessionStorage: new Storage(),
     SpeechSynthesisUtterance: Utterance,
@@ -466,6 +470,79 @@ function testStopJumpRateAndVoiceInvalidateOldUtterances() {
   assert.strictEqual(env.sessionStorage.getItem('tts:resume'), null);
 }
 
+function testNavigationResume() {
+  const env = boot();
+  const next = env.document.createElement('a');
+  next.className = 'lesson-nav-btn next';
+  next.href = 'https://aieng-zh.cn/lessons/phase/next/';
+  const child = env.document.createElement('span');
+  next.appendChild(child);
+  const click = (target) => env.document.dispatch('click', { type: 'click', target });
+  const intent = () => env.sessionStorage.getItem('tts:resume');
+
+  assert.doesNotThrow(() => click(child), 'idle link clicks must not throw');
+  assert.strictEqual(intent(), null, 'idle navigation must not arm resume');
+  env.api.state.waiting = true;
+  click(child);
+  assert.strictEqual(intent(), null, 'waiting for content is not active playback');
+  start(env);
+  env.api.state.waiting = true;
+  click(child);
+  assert.strictEqual(intent(), null, 'a pending content handoff must not arm another resume');
+  env.api.state.waiting = false;
+  click(child);
+  assert.strictEqual(JSON.parse(intent()).target, '/lessons/phase/next/');
+
+  env.api.state.paused = true;
+  click(child);
+  assert.strictEqual(intent(), null, 'paused navigation clears an earlier resume intent');
+  env.api.state.paused = false;
+
+  for (const [className, href] of [
+    ['', next.href],
+    ['continue-link', 'https://aieng-zh.cn/catalog'],
+    ['lesson-nav-btn next', 'https://other.example/lessons/phase/next/'],
+    ['', 'blob:https://aieng-zh.cn/download'],
+  ]) {
+    click(child);
+    assert.ok(intent(), 'arm a prior intent before testing ordinary navigation');
+    const link = env.document.createElement('a');
+    link.className = className;
+    link.href = href;
+    click(link);
+    assert.strictEqual(intent(), null, className + ' ' + href + ' must not arm resume');
+    assert.strictEqual(env.api.state.navigationTarget, '');
+  }
+
+  const continuation = env.document.createElement('a');
+  continuation.className = 'continue-link';
+  continuation.href = 'https://aieng-zh.cn/lesson.html?path=phases/phase/next';
+  click(continuation);
+  assert.strictEqual(JSON.parse(intent()).target, '/lesson?path=phases%2Fphase%2Fnext');
+
+  const previous = env.document.createElement('a');
+  previous.className = 'lesson-nav-btn prev';
+  previous.href = 'https://aieng-zh.cn/lessons/phase/previous/';
+  click(previous);
+  assert.strictEqual(JSON.parse(intent()).target, '/lessons/phase/previous/',
+    'previous-lesson navigation keeps its existing continuation behavior');
+}
+
+function testSilentNavigationResume() {
+  const env = boot('https://aieng-zh.cn/lessons/phase/current/?ttsTest=silent');
+  start(env);
+  const next = env.document.createElement('a');
+  next.className = 'lesson-nav-btn next';
+  next.href = 'https://aieng-zh.cn/lessons/phase/next/?track=example';
+  env.document.dispatch('click', { type: 'click', target: next });
+  assert.strictEqual(new URL(next.href).searchParams.get('ttsTest'), 'silent');
+  assert.strictEqual(new URL(next.href).searchParams.get('track'), 'example');
+  assert.strictEqual(JSON.parse(env.sessionStorage.getItem('tts:resume')).target,
+    '/lessons/phase/next/?track=example&ttsTest=silent');
+}
+
+testNavigationResume();
+testSilentNavigationResume();
 testGestureRecovery();
 testControlGestureDoesNotReverseIntoStop();
 testLateCallbacksCannotAdvanceReplacement();

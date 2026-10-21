@@ -31,6 +31,8 @@
     if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.indexOf('//') === 0) {
       try {
         var resolved = new URL(href, (locationValue || window.location).href);
+        // Blob URLs inherit their creator's origin, but are not document routes.
+        if (!/^(https?|file):$/.test(resolved.protocol)) return href;
         if (resolved.origin !== (locationValue || window.location).origin) return href;
         href = resolved.pathname + resolved.search + resolved.hash;
       } catch (_) {
