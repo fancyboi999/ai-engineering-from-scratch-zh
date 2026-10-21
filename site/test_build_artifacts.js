@@ -7,6 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const vm = require('node:vm');
+const { HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 
 const {
   FIGURE_PROVIDER_ORDER,
@@ -462,9 +463,10 @@ function writeMarkdown(file, { name, description, version }) {
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20260831a';
   const appRelease = '20261019a';
-  const styleRelease = '20261019d';
-  const navigationRelease = '20261019c';
-  const narrationRelease = '20261019a';
+  const styleRelease = '20261021a';
+  const navigationRelease = HEADER_ASSET_VERSION;
+  assert.match(navigationRelease, /^\d{8}[a-z]$/);
+  const narrationRelease = '20261021a';
   const roadmapRelease = '20261019a';
   const pages = [
     'about.html',
@@ -2581,7 +2583,7 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
     ['learning-paths.html', '学习路径'], ['certifications.html', '认证'], ['projects.html', '实战项目'],
     ['manuals.html', '技术手册'], ['glossary.html', '术语表'], ['cheatsheets', '速查表'],
     ['how-to-learn.html', '学习方法'], ['skills.html', 'Agent 技能'],
-    ['inside-an-ai-agent.html', 'Agent 内部机制'], ['about.html', '关于'],
+    ['inside-an-ai-agent.html', 'Agent 内部机制'], ['highlights.html', '我的高亮'], ['about.html', '关于'],
   ];
   const files = fs.readdirSync(__dirname).filter(name => name.endsWith('.html') && !name.endsWith('-print.html')).concat([
     'hubs/phase/tools-and-protocols.html', 'hubs/glossary/activation-checkpointing.html',
@@ -2599,7 +2601,7 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
     assert.deepEqual(links, expected.map(([href, label]) => [new URL(href, 'https://aieng-zh.cn/').href, label]), file);
     assert.doesNotMatch(nav[1], /header-mobile-only/, file);
     assert.equal((nav[1].match(/class="header-github"/g) || []).length, 1, file);
-    assert.match(html, /header\.js\?v=20261019c/, file);
+    assert.ok(html.includes('header.js?v=' + HEADER_ASSET_VERSION), file + ' has stale header.js');
     const shell = html.match(/<header\b[^>]*class="site-header"[^>]*>[\s\S]*?<\/header>/)[0];
     assert.equal((shell.match(/class="search-toggle"/g) || []).length, 1, file);
     assert.match(shell, /<circle cx="11" cy="11" r="8"\/>/, file);

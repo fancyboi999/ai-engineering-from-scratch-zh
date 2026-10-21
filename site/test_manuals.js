@@ -202,6 +202,9 @@ test('print document anchors follow the kept-together header while web anchors s
   const out = tempDir('manual-anchor-web-');
   manuals.writeWeb([manual], out, { only: manual.id });
   const web = fs.readFileSync(path.join(out, `manual-${manual.id}.html`), 'utf8');
+  assert.match(web, /highlights\.css/);
+  assert.match(web, /AIFSHighlights\.mount\(article,/);
+  assert.match(web, /"lang":"zh-CN"/);
   for (const doc of manual.documents) {
     const sectionClass = doc.kind === 'front' ? 'm-front-section' : 'm-section';
     assert.ok(print.includes(`<section class="${sectionClass}" data-accent="${doc.accent}"><header class="m-section-head" id="${doc.anchor}">`), `${doc.anchor}: print anchor must be on the header`);

@@ -10,7 +10,7 @@
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   var COMPACT_HEADER_QUERY = '(max-width: 1400px)';
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
-  var NARRATION_VERSION = '20261019a';
+  var NARRATION_VERSION = '20261021a';
   var HEADER_BASE = document.currentScript && document.currentScript.src
     ? new URL('.', document.currentScript.src).href
     : '';
@@ -31,20 +31,22 @@
     if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.indexOf('//') === 0) {
       try {
         var resolved = new URL(href, (locationValue || window.location).href);
+        // Blob URLs inherit their creator's origin, but are not document routes.
+        if (!/^(https?|file):$/.test(resolved.protocol)) return href;
         if (resolved.origin !== (locationValue || window.location).origin) return href;
         href = resolved.pathname + resolved.search + resolved.hash;
       } catch (_) {
         return href;
       }
     }
-    if (/^\/(lesson|certification)(?=[?#]|$)/.test(href)) {
-      return href.replace(/^\/(lesson|certification)(?=[?#]|$)/, '$1.html');
+    if (/^\/(lesson|certification|highlights)(?=[?#]|$)/.test(href)) {
+      return href.replace(/^\/(lesson|certification|highlights)(?=[?#]|$)/, '$1.html');
     }
     if (/^\/cheatsheets(?:\/|$)/.test(href)) {
       return href.replace(/^\/cheatsheets(?=[?#]|$)/, '/cheatsheets/index.html').replace(/^(\/cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
     }
     if (/^\/roadmap(?=[?#]|$)/.test(href)) return href.replace('/roadmap', '/prereqs.html');
-    return href.replace(/(^|\/)(lesson|certification)(?=[?#]|$)/, '$1$2.html');
+    return href.replace(/(^|\/)(lesson|certification|highlights)(?=[?#]|$)/, '$1$2.html');
   }
 
   function adaptRouteLink(link) {
@@ -454,7 +456,7 @@
     function loadScript(name) {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = HEADER_BASE + name + '?v=20261019a';
+        script.src = HEADER_BASE + name + '?v=20261021a';
         script.onload = resolve;
         script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
         document.head.appendChild(script);

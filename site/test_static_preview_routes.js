@@ -145,6 +145,29 @@ test('shared adapter covers dynamically inserted links, click races, and command
   );
 });
 
+test('static preview preserves non-document URLs through insertion and click adaptation', () => {
+  const runtime = loadRouteRuntime('http://127.0.0.1:8000/site/index.html');
+  const hrefs = [
+    'blob:http://127.0.0.1:8000/9a4ed121-73f0-47c4-8bf1-a7bd511d733b',
+    'data:application/json,%7B%22probe%22%3Atrue%7D',
+    'mailto:reader@example.com',
+    'tel:+123456789',
+    'javascript:void(0)',
+  ];
+  for (const href of hrefs) {
+    assert.equal(runtime.api.adaptHref(href), href);
+    const link = testLink(href);
+    runtime.mutate({ type: 'childList', addedNodes: [link] });
+    assert.equal(link.value(), href);
+    runtime.click(link);
+    assert.equal(link.value(), href);
+  }
+  assert.equal(
+    runtime.api.adaptHref('http://127.0.0.1:8000/highlights?color=yellow'),
+    'highlights.html?color=yellow'
+  );
+});
+
 test('deployed contextual routes stay extensionless while zh canonicals keep static lesson URLs', () => {
   const production = loadRouteRuntime('https://aieng-zh.cn/index.html');
   assert.equal(

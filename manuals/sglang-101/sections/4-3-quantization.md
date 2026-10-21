@@ -146,6 +146,31 @@ caption: 输出吞吐量与最大并发的关系，每个点使用三个 seed。
 
 这张卡上的 goodput 结果很明确。我们的目标是 TTFT 小于 1 s、TPOT 小于 100 ms。并发 32 和 64 时，BF16 每秒达标请求数都是 0；FP8 在并发 64 时每秒有 2.87 个请求达标。
 
+### 池装不下前缀时
+
+上述 L4 测试给 BF16 分配了完整的池。上游随后将两个版本都设为相同的较小预算 `--mem-fraction-static 0.74`，运行[第 3.3 节](#s-radixcache) 的共享前缀扫描。每次运行以 8 用户发送 64 个 prompt，分为四组，每组 16 个，共享系统 prompt 长度从 0 至 4,096 token。四组各 4,096 token 的前缀需要约 16,000 token 缓存。
+
+```listing
+title: 同一内存预算下的两个池
+source: capture/gpu/out-l4/server-small-pool-bf16-fp8.log
+lang: text
+note: 内存比例同为 0.74 时的 BF16 池和 FP8 池。
+---
+[2026-10-18 19:35:26] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 6559, K size: 0.45 GB, V size: 0.45 GB
+[2026-10-18 22:02:58] KV Cache is allocated. dtype: torch.float8_e4m3fn, #tokens: 107299, K size: 3.68 GB, V size: 3.68 GB
+```
+
+| 共享 prompt token 数 | 输出 tok/s，BF16 / FP8 | TTFT 中位数，BF16 / FP8 |
+|---|---|---|
+| 0 | 113.5 / 180.1 | 354 / 255 ms |
+| 1,024 | 95.0 / 164.1 | 470 / 349 ms |
+| 2,048 | 25.9 / 155.1 | 12,576 / 380 ms |
+| 4,096 | 10.9 / 134.8 | 40,126 / 372 ms |
+
+**上游实测 BF16 出现性能断崖，FP8 没有。** BF16 池容纳 6,559 token，共享长度达到 2,048 token 时，四个前缀就装不下。首 token 耗时中位数从 470 ms 升至 12.6 s。FP8 池容纳 107,299 token，保留了所有前缀，各长度下首 token 均低于 400 ms。共享 2,048 token 时，FP8 输出吞吐量是 BF16 的 6.0 倍。
+
+最后一行有个限制。共享 4,096 token 时，BF16 在三次尝试后仍低于 1,000 MHz 的时钟下限，中位数仅 390 MHz。因此应以 2,048 那一行为结果。FP8 运行的时钟中位数为 1,200 至 1,260 MHz。
+
 ## 我们的建议
 
 使用离线量化 checkpoint，不传 `--quantization`。文档同样建议“优先采用离线量化，而非在线量化” {{docs}}。在线量化增加加载时间，还会产生一个没人评估过的 checkpoint。
@@ -172,4 +197,4 @@ Prefill 和 decode 分别运行在不同服务器时，按阶段选择量化。�
 - 读取 KV Cache is allocated 日志，确认每个选择换来的池容量。
 ```
 
-来源：capture/gpu/out-gb10/server-default.log, server-fp8.log, server-fp8.command.txt, generate.txt, fp8-generate.txt, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-l4/server-load-default.log, server-load-fp8.log, python/sglang/srt/arg_groups/choices.py (QUANTIZATION_CHOICES), arg_groups/fields/model.py (kv_cache_dtype, quantization_param_path), configs/model_config.py (_verify_quantization), layers/quantization/__init__.py (get_quantization_config), layers/quantization/gptq/gptq.py (override_quantization_method), layers/quantization/fp8.py, and docs/docs/advanced_features/quantization.mdx at v0.5.22; PR #32114; field reports by Cloudflare (2026-08-03), joshua8.ai (2026-01-10), and Pivot News (2026-05-19).
+来源：capture/gpu/out-gb10/server-default.log, server-fp8.log, server-fp8.command.txt, generate.txt, fp8-generate.txt, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-l4/server-load-default.log, server-load-fp8.log, python/sglang/srt/arg_groups/choices.py (QUANTIZATION_CHOICES), arg_groups/fields/model.py (kv_cache_dtype, quantization_param_path), configs/model_config.py (_verify_quantization), layers/quantization/__init__.py (get_quantization_config), layers/quantization/gptq/gptq.py (override_quantization_method), layers/quantization/fp8.py, and docs/docs/advanced_features/quantization.mdx at v0.5.22; PR #32114; field reports by Cloudflare (2026-08-03), joshua8.ai (2026-01-10), and Pivot News (2026-05-19); capture/gpu/out-l4/server-small-pool-bf16-fp8.log, capture/gpu/summary/l4.json (prefix.small-pool, prefix.fp8-small-pool).

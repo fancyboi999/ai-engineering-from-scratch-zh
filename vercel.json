@@ -350,9 +350,31 @@
     {
       "source": "/api/:missing*",
       "destination": "/api/not-found?api=1"
+    },
+    {
+      "source": "/highlights",
+      "destination": "/highlights.html"
     }
   ],
   "headers": [
+    {
+      "source": "/highlights",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/highlights.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
     {
       "source": "/(.*)\\.(css|js|png|jpg|jpeg|svg|webp|woff2|woff|ttf|ico)",
       "headers": [
@@ -502,6 +524,11 @@
     {
       "source": "/cheatsheets/:topic([a-z0-9-]+).html",
       "destination": "/cheatsheets/:topic",
+      "permanent": true
+    },
+    {
+      "source": "/highlights.html",
+      "destination": "/highlights",
       "permanent": true
     }
   ]

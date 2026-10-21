@@ -19,12 +19,13 @@ const EXPECTED = {
 function checkManualOutputs(root) {
   const manuals = builder.loadAll({ root });
   assert.deepEqual(manuals.map(manual => manual.id).sort(), Object.keys(EXPECTED).sort(), 'the frozen pair and both new manual sources must be present');
+  const readyIds = manuals.filter(manual => manual.status === 'ready').map(manual => manual.id).sort();
   const out = fs.mkdtempSync(path.join(os.tmpdir(), 'manual-output-check-'));
   try {
-    assert.equal(builder.writeWeb(manuals, out), 3, 'only the three ready manuals must be listed');
+    assert.equal(builder.writeWeb(manuals, out), readyIds.length, 'all ready manuals must be listed');
     for (const manual of manuals) {
       const expected = EXPECTED[manual.id];
-      assert.equal(manual.status, manual.id === 'sglang-101' ? 'draft' : 'ready', `${manual.id} status`);
+      assert.equal(manual.status, 'ready', `${manual.id} status`);
       const sections = manual.parts.reduce((sum, part) => sum + part.sections.length, 0);
       assert.equal(sections, expected.sections, `${manual.id} sections`);
       assert.equal(manual.reference.sections.length, expected.references, `${manual.id} references`);
@@ -63,7 +64,7 @@ function checkManualOutputs(root) {
     assert.doesNotMatch(data, /"pdf"/);
     assert.match(data, /"print"/);
     const listed = vm.runInNewContext(data + '\nwindow.AIFS_MANUALS', { window: {} });
-    assert.deepEqual(Array.from(listed, manual => manual.id).sort(), ['a2a-101', 'docker-sandboxes-101', 'reverse-engineering-101']);
+    assert.deepEqual(Array.from(listed, manual => manual.id).sort(), readyIds);
     const index = fs.readFileSync(path.join(out, 'manuals.html'), 'utf8');
     for (const manual of manuals) {
       assert.equal(index.includes(`href="manual-${manual.id}.html"`), manual.status === 'ready', `${manual.id} index listing`);

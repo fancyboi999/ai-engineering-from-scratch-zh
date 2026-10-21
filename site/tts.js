@@ -14,7 +14,7 @@
  */
 (function () {
   if (typeof window === 'undefined') return;
-  window.__AIFS_TTS_VERSION = '20261019a';
+  window.__AIFS_TTS_VERSION = '20261021a';
   var synth = window.speechSynthesis;
   if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') return;
 
@@ -797,8 +797,8 @@
       if (!link) return;
       state.navigationTarget = '';
       clearResumeTarget();
-      if (!isPlaying() || !isLessonContinuationLink(link)) return;
-      if (silentMode) {
+      if (!state.playing || state.paused || state.waiting || !isLessonContinuationLink(link)) return;
+      if (new URL(location.href).searchParams.get('ttsTest') === 'silent') {
         var silentUrl = new URL(link.href, location.href);
         silentUrl.searchParams.set('ttsTest', 'silent');
         link.href = silentUrl.toString();
