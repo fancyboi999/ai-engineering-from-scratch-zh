@@ -328,3 +328,11 @@ test('architecture self-loops leave and return on different node faces', () => {
   };
   for (const narrow of [false, true]) assertArchitectureRoutes(block, narrow, block.id);
 });
+
+test('search retains API names, status codes and terms from omitted table columns', () => {
+  const index = JSON.parse(sheets.buildCheatsheets({ edition: '2026-01-01' }).search);
+  const rows = index.flatMap(topic => topic.r.map(row => (row[0] + ' ' + row[1] + ' ' + (row[3] || '') + ' ' + topic.t).toLowerCase()));
+  for (const query of ['CreateTaskPushNotificationConfig', 'FAILED_PRECONDITION', 'INVALID_ARGUMENT', 'AlphaZero']) {
+    assert.ok(rows.some(text => text.includes(query.toLowerCase())), `missing searchable term: ${query}`);
+  }
+});

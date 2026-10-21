@@ -928,9 +928,7 @@ function searchRow(title, rest, blockId, showDetail) {
   const detail = plain(rest);
   let shown = '';
   if (showDetail) shown = detail.length <= SEARCH_DETAIL ? detail : `${detail.slice(0, SEARCH_DETAIL - 1)}…`;
-  const spans = (rest.match(/`[^`]+`/g) || []).join(' ').replace(/`/g, '');
-  const extra = factTokens(spans).filter(token => !shown.includes(token) && !title.includes(token));
-  return extra.length ? [title, shown, blockId, extra.join(' ')] : [title, shown, blockId];
+  return detail && detail !== shown ? [title, shown, blockId, detail] : [title, shown, blockId];
 }
 
 function searchIndex(topics) {
