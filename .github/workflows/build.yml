@@ -59,7 +59,6 @@ on:
       - "scripts/test_function_bundles.js"
       - "scripts/test_skill_artifact_bundles.py"
   pull_request:
-    branches: [main]
 
 jobs:
   build:
