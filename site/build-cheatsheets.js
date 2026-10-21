@@ -792,9 +792,9 @@ function indexMain(topics, year, phases) {
   const kinds = Object.keys(KIND_LABELS).map(kind => [kind, topics.filter(topic => topic.kind === kind).length]).filter(([, count]) => count);
   const filters = `<div class="cs-filters"><div class="cs-filter-kinds" role="group" aria-label="按速查表类型筛选"><button type="button" data-kind="" aria-pressed="true">全部 <span>${topics.length}</span></button>${kinds.map(([kind, count]) => `<button type="button" data-kind="${kind}" aria-pressed="false">${KIND_LABELS[kind]} <span>${count}</span></button>`).join('')}</div><nav class="cs-track-nav" aria-label="主题分组">${tracks.map(track => `<a href="${BASE}#t-${track.slug}">${escapeHtml(track.label)} <span>${track.topics.length}</span></a>`).join('')}</nav><p class="cs-filter-count" aria-live="polite"></p></div>`;
   const sections = tracks.map(track => `<section class="cs-index-section cs-track" id="t-${track.slug}" aria-labelledby="h-${track.slug}"><h2 id="h-${track.slug}">${escapeHtml(track.label)} <span class="cs-count">${track.topics.length}</span></h2><ol class="cs-tiles">${track.topics.map(tileHtml).join('')}</ol></section>`).join('');
-  const byPhase = phases.filter(phase => phase.topics.length).map(phase => `<li id="p-${phase.slug}"><a href="/phase/${phase.slug}">${escapeHtml(phase.label)}</a><span>${phase.topics.map(topic => `<a href="${topic.href}">${escapeHtml(topic.title)}</a>`).join(', ')}</span></li>`).join('');
+  const byPhase = phases.filter(phase => phase.topics.length).map(phase => `<li id="p-${phase.slug}"><div class="cs-phase-heading"><a class="cs-phase-name" href="/phase/${phase.slug}"><span class="cs-phase-number">${escapeHtml(phase.number)}</span><span>${escapeHtml(phase.label)}</span></a><span class="cs-phase-count">${phase.topics.length} 个主题</span></div><ul class="cs-phase-topics" aria-label="${escapeHtml(phase.label)}的速查表">${phase.topics.map(topic => `<li><a href="${topic.href}">${escapeHtml(topic.title)}</a></li>`).join('')}</ul></li>`).join('');
   const head = `<header class="cs-index-head"><p class="cs-kicker">AI Engineering from Scratch</p><h1>速查表</h1><p class="cs-sub">${topics.length} 张主题海报，汇集工作中常用的任务、命令、代码、图解、默认值与排错方法。内容均来自本课程的正文、手册或项目。</p>${search}${filters}</header>`;
-  const phaseList = byPhase ? `<section class="cs-index-section" aria-labelledby="by-phase"><h2 id="by-phase">按阶段浏览</h2><ul class="cs-by-phase">${byPhase}</ul></section>` : '';
+  const phaseList = byPhase ? `<section class="cs-index-section cs-phase-index" aria-labelledby="by-phase"><h2 id="by-phase">按阶段浏览</h2><ul class="cs-by-phase">${byPhase}</ul></section>` : '';
   const how = '<section class="cs-index-section" aria-labelledby="how"><h2 id="how">使用方法</h2><ul class="cs-tips"><li>颜色表示区块类型：蓝色为任务与命令，红色为排错方法。每张海报顶部都有图例。</li><li>点击命令即可复制。请替换尖括号中的占位值，例如 <code>&lt;model&gt;</code>.</li><li>每个区块标明了来源课程或手册章节，需要了解原理时可直接打开。</li><li>每张海报可打印为一至两页横向页面，适配 A4 和 Letter 纸张。</li></ul></section>';
   return `<main id="main" class="cs-page cs-index">${head}${sections}${phaseList}${how}<footer class="cs-foot"><p class="cs-stamp"><span>aieng-zh.cn${BASE}</span><span>${copyLine(year)}</span></p></footer></main>`;
 }
@@ -918,9 +918,10 @@ function phaseList(root, map) {
   return fs.readdirSync(dir).filter(name => /^\d+-/.test(name)).sort().map(name => {
     const readme = path.join(dir, name, 'README.md');
     const text = fs.existsSync(readme) ? fs.readFileSync(readme, 'utf8') : '';
-    const title = /^#\s+(Phase\s+\d+\s*:\s*.+?)\s*$/m.exec(text);
+    const title = /^#\s+(.+?)\s*$/m.exec(text);
     const slug = phaseSlug(name);
-    return { slug, label: title ? title[1] : name, topics: map.phases[slug] || [] };
+    const label = title ? title[1].replace(/^(?:阶段\s*\d+\s*[：:]|Phase\s+\d+\s*:)\s*/i, '') : name;
+    return { slug, number: name.match(/^\d+/)[0], label, topics: map.phases[slug] || [] };
   });
 }
 

@@ -182,6 +182,14 @@ test('lesson and phase pages learn which topics cover them', () => {
   assert.ok(vercel.functions && JSON.stringify(vercel.functions).includes('site/cheatsheet-map.json'));
 });
 
+test('the phase index displays the Chinese titles from phase READMEs', () => {
+  const built = sheets.buildCheatsheets({ edition: '2026-01-01' });
+  const index = built.pages.find(page => page.file === 'index.html').html;
+  assert.match(index, /href="\/phase\/setup-and-tooling"[^>]*>[\s\S]*?环境与工具/);
+  assert.match(index, /href="\/phase\/capstone-projects"[^>]*>[\s\S]*?综合项目/);
+  assert.doesNotMatch(index, />00-setup-and-tooling<|>19-capstone-projects</);
+});
+
 test('search covers every table row and term', () => {
   const built = sheets.buildCheatsheets({ edition: '2026-01-01' });
   const index = JSON.parse(built.search);
