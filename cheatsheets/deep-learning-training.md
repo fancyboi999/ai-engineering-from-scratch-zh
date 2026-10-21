@@ -5,6 +5,7 @@ subtitle: 选择优化器、初始化、归一化、正则化与学习率调度�
 hue: 270
 sources: phases/03-deep-learning-core/03-backpropagation, phases/03-deep-learning-core/04-activation-functions, phases/03-deep-learning-core/06-optimizers, phases/03-deep-learning-core/07-regularization, phases/03-deep-learning-core/08-weight-initialization, phases/03-deep-learning-core/09-learning-rate-schedules, phases/03-deep-learning-core/13-debugging-neural-networks
 code: TN
+source_hash: 4935c9f249b745c3
 ---
 
 ## 一步 AdamW

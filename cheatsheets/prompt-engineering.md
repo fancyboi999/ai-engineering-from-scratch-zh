@@ -5,6 +5,7 @@ subtitle: 编写 prompt、添加样例与推理、投票，并规划上下文窗
 hue: 230
 sources: phases/11-llm-engineering/01-prompt-engineering, phases/11-llm-engineering/02-few-shot-cot, phases/11-llm-engineering/05-context-engineering, phases/11-llm-engineering/15-prompt-caching
 code: PE
+source_hash: 5e8a01a9f2b9cad6
 ---
 
 ## 窗口中包含什么

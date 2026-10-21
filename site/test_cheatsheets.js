@@ -190,8 +190,18 @@ test('search covers every table row and term', () => {
     const entry = index.find(item => item.i === topic.id);
     const rows = topic.blocks.filter(block => block.rows).reduce((sum, block) => sum + block.rows.length, 0);
     assert.ok(entry.r.length >= rows, topic.id);
-    for (const row of entry.r) assert.ok(topic.blocks.some(block => block.id === row[2]));
+    for (const row of entry.r) assert.ok(topic.blocks[row[2]] && entry.b[row[2]] === topic.blocks[row[2]].id);
   }
+});
+
+test('the Chinese full-text search index stays bounded and finds flags in long cells', () => {
+  const built = sheets.buildCheatsheets({ edition: '2026-01-01' });
+  const gzipped = require('node:zlib').gzipSync(built.search).length;
+  // Chinese descriptions remain searchable; the full corpus currently compresses to about 273 kB.
+  assert.ok(gzipped < 300000, `search.json is ${gzipped} bytes gzipped`);
+  const index = JSON.parse(built.search);
+  const sglang = index.find(item => item.i === 'sglang-serving');
+  assert.ok(sglang.r.some(row => row.join(' ').includes('--mem-fraction-static')));
 });
 
 test('the print edition carries the attribution and renders math ahead of time', () => {
@@ -232,42 +242,98 @@ test('Chinese default descriptions still require their numeric facts in the sour
   assert.match(sheets.checkTopic(topic, thin).join('\n'), /"30000" is not in its from files/);
 });
 
-test('architecture connectors avoid unrelated nodes in both poster orientations', () => {
-  // Segment/rectangle clipping is independent of the renderer's node layout.
-  // Insets ignore sub-pixel rounding at a box border, not interior crossings.
-  function crosses(start, end, box) {
-    let enter = 0, leave = 1;
-    for (const [position, delta, low, high] of [
-      [start[0], end[0] - start[0], box.x + 0.5, box.x + box.width - 0.5],
-      [start[1], end[1] - start[1], box.y + 0.5, box.y + box.height - 0.5],
-    ]) {
-      if (delta === 0) { if (position < low || position > high) return false; }
-      else {
-        const bounds = [(low - position) / delta, (high - position) / delta].sort((a, b) => a - b);
-        enter = Math.max(enter, bounds[0]);
-        leave = Math.min(leave, bounds[1]);
-        if (enter > leave) return false;
-      }
+// Segment/rectangle clipping is independent of the renderer's pathfinder.
+// Insets ignore sub-pixel rounding at a box border, not interior crossings.
+function crossesNode(start, end, box) {
+  let enter = 0, leave = 1;
+  for (const [position, delta, low, high] of [
+    [start[0], end[0] - start[0], box.x + 0.5, box.x + box.width - 0.5],
+    [start[1], end[1] - start[1], box.y + 0.5, box.y + box.height - 0.5],
+  ]) {
+    if (delta === 0) { if (position < low || position > high) return false; }
+    else {
+      const bounds = [(low - position) / delta, (high - position) / delta].sort((a, b) => a - b);
+      enter = Math.max(enter, bounds[0]);
+      leave = Math.min(leave, bounds[1]);
+      if (enter > leave) return false;
     }
-    return leave > 0 && enter < 1;
   }
+  return leave > 0 && enter < 1;
+}
+
+function assertArchitectureRoutes(block, narrow, name) {
+  const svg = sheets.architectureSvg(block, narrow);
+  const [, width, height] = /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(svg).map(Number);
+  const nodes = [...svg.matchAll(/<rect class="cs-arch-node" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)]
+    .map((match, i) => ({ id: block.nodes[i].id, x: +match[1], y: +match[2], width: +match[3], height: +match[4] }));
+  const edges = [...svg.matchAll(/<polyline class="cs-arch-edge" data-from="([^"]+)" data-to="([^"]+)" points="([^"]+)"/g)];
+  assert.equal(nodes.length, block.nodes.length);
+  assert.equal(edges.length, block.edges.length);
+  for (const [index, line] of edges.entries()) {
+    const edge = block.edges[index];
+    assert.equal(line[1], edge.from);
+    assert.equal(line[2], edge.to);
+    const points = line[3].split(' ').map(point => point.split(',').map(Number));
+    assert.ok(points.length >= 2);
+    for (const [x, y] of points) assert.ok(Number.isFinite(x) && Number.isFinite(y) && x >= 0 && x <= width && y >= 0 && y <= height,
+      `${name}: connector point ${x},${y} outside viewBox`);
+    for (const [point, id] of [[points[0], edge.from], [points.at(-1), edge.to]]) {
+      const box = nodes.find(node => node.id === id);
+      const [x, y] = point;
+      const atVerticalSide = Math.min(Math.abs(x - box.x), Math.abs(x - box.x - box.width)) <= 0.2 && y >= box.y - 0.2 && y <= box.y + box.height + 0.2;
+      const atHorizontalSide = Math.min(Math.abs(y - box.y), Math.abs(y - box.y - box.height)) <= 0.2 && x >= box.x - 0.2 && x <= box.x + box.width + 0.2;
+      assert.ok(atVerticalSide || atHorizontalSide, `${name}: ${id} endpoint is not on its node border`);
+    }
+    for (let i = 1; i < points.length; i++) for (const node of nodes) {
+      assert.equal(crossesNode(points[i - 1], points[i], node), false,
+        `${name} ${narrow ? 'narrow' : 'wide'}: ${edge.from} -> ${edge.to} segment ${i} crosses ${node.id}`);
+    }
+  }
+  return edges;
+}
+
+test('architecture connectors avoid unrelated nodes in both poster orientations', () => {
   let checked = 0;
   for (const topic of sheets.loadTopics(root)) for (const block of topic.blocks.filter(block => block.type === 'architecture')) {
     for (const narrow of [false, true]) {
-      const svg = sheets.architectureSvg(block, narrow);
-      const nodes = [...svg.matchAll(/<rect class="cs-arch-node" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)]
-        .map((match, i) => ({ id: block.nodes[i].id, x: +match[1], y: +match[2], width: +match[3], height: +match[4] }));
-      const edges = [...svg.matchAll(/<line class="cs-arch-edge" x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"/g)];
-      assert.equal(nodes.length, block.nodes.length);
-      assert.equal(edges.length, block.edges.length);
-      for (const [index, line] of edges.entries()) for (const node of nodes) {
-        const edge = block.edges[index];
-        if (node.id === edge.from || node.id === edge.to) continue;
-        assert.equal(crosses([+line[1], +line[2]], [+line[3], +line[4]], node), false,
-          `${topic.id} ${narrow ? 'narrow' : 'wide'}: ${edge.from} -> ${edge.to} crosses ${node.id}`);
-      }
+      assertArchitectureRoutes(block, narrow, topic.id);
       checked++;
     }
   }
   assert.ok(checked >= 50, 'expected both orientations of all architecture diagrams');
+});
+
+test('architecture routes detour around horizontal, vertical and diagonal blockers', () => {
+  for (const [name, coordinates] of [
+    ['horizontal', [[1, 1], [3, 1], [2, 1]]],
+    ['vertical', [[1, 1], [1, 3], [1, 2]]],
+    ['diagonal', [[1, 1], [3, 3], [2, 2]]],
+    ['multiple', [[1, 2], [4, 2], [2, 2], [3, 2], [2, 1], [3, 3]]],
+  ]) {
+    const block = {
+      id: name, title: '中文架构与较长标签', span: 2,
+      nodes: coordinates.map(([col, row], i) => ({ id: `n${i}`, col, row, label: '中文节点', sub: '多行说明文字' })),
+      edges: [{ from: 'n0', to: 'n1', label: '往返请求' }, { from: 'n1', to: 'n0', label: '返回结果' }],
+    };
+    for (const narrow of [false, true]) for (const edge of assertArchitectureRoutes(block, narrow, name)) {
+      assert.ok(edge[3].split(' ').length > 2, `${name}: blocked connector needs a detour`);
+    }
+  }
+});
+
+test('architecture self-loops leave and return on different node faces', () => {
+  const block = {
+    id: 'self-loop', title: '重试循环', span: 2,
+    nodes: [{ id: 'worker', col: 1, row: 1, label: 'worker', sub: '重试请求' }],
+    edges: [{ from: 'worker', to: 'worker', label: 'retry' }],
+  };
+  for (const narrow of [false, true]) assertArchitectureRoutes(block, narrow, block.id);
+});
+
+test('search retains API names, status codes and terms from omitted table columns', () => {
+  const index = JSON.parse(sheets.buildCheatsheets({ edition: '2026-01-01' }).search);
+  const rows = index.flatMap(topic => topic.r.map(row => (row[0] + ' ' + row[1] + ' ' + (row[3] || '') + ' ' + topic.t).toLowerCase()));
+  for (const query of ['CreateTaskPushNotificationConfig', 'FAILED_PRECONDITION', 'INVALID_ARGUMENT', 'AlphaZero']) {
+    assert.ok(rows.some(text => text.includes(query.toLowerCase())), `missing searchable term: ${query}`);
+  }
 });

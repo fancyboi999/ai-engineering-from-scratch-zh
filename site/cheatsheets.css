@@ -5,6 +5,7 @@
   --g-code: #2b2b2b;
   --g-see: #0f7f78;
   --g-numbers: #a86a00;
+  --g-compare: #3d5a80;
   --g-fix: #c0392b;
   --g-recall: #2e7d32;
   --bar-ink: #ffffff;
@@ -25,6 +26,7 @@
   --g-code: #d8d6cc;
   --g-see: #5fd1c4;
   --g-numbers: #f0b44a;
+  --g-compare: #8fb3d9;
   --g-fix: #ff8a7a;
   --g-recall: #7fd38a;
   --bar-ink: #0a0d1a;
@@ -43,6 +45,7 @@
 .cs-g-code { --g: var(--g-code); }
 .cs-g-see { --g: var(--g-see); }
 .cs-g-numbers { --g: var(--g-numbers); }
+.cs-g-compare { --g: var(--g-compare); }
 .cs-g-fix { --g: var(--g-fix); }
 .cs-g-recall { --g: var(--g-recall); }
 
@@ -296,7 +299,31 @@
 .cs-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
+  table-layout: fixed;
+}
+
+.cs-table th:first-child {
+  width: 40%;
+}
+
+.cs-cols-3 th:first-child {
+  width: 30%;
+}
+
+.cs-t-command-table th:first-child {
+  width: 50%;
+}
+
+.cs-t-defaults th:nth-child(2) {
+  width: 24%;
+}
+
+.cs-t-comparison th:first-child {
+  width: 20%;
+}
+
+.cs-page .cs-table .cs-cmd {
+  overflow-wrap: anywhere;
 }
 
 .cs-table thead th {
@@ -338,9 +365,14 @@
   width: 30%;
 }
 
-.cs-t-command-table tbody th,
-.cs-t-defaults tbody th {
-  width: auto;
+
+
+.cs-t-comparison tbody th {
+  width: 22%;
+}
+
+.cs-t-comparison thead th:not(:first-child) {
+  color: var(--g);
 }
 
 .cs-page .cs-cmd {
@@ -804,6 +836,73 @@
   text-transform: uppercase;
 }
 
+.cs-tile-kind {
+  margin-right: 8px;
+  padding: 0 4px;
+  border: 1px solid currentColor;
+}
+
+.cs-tile[hidden],
+.cs-track[hidden],
+.cs-track-nav a[hidden] {
+  display: none;
+}
+
+.cs-filters {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cs-filter-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cs-filter-kinds button {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid var(--ink);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cs-filter-kinds button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.cs-filter-kinds span,
+.cs-track-nav span,
+.cs-count {
+  opacity: 0.7;
+}
+
+.cs-track-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.74em;
+  text-transform: uppercase;
+}
+
+.cs-track-nav a {
+  color: var(--ink);
+}
+
+.cs-filter-count {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--ink-mute);
+  font-size: 0.72em;
+}
+
 .cs-by-phase {
   margin: 0;
   padding: 0;
@@ -899,6 +998,7 @@
     --g-code: #2b2b2b;
     --g-see: #0f7f78;
     --g-numbers: #a86a00;
+    --g-compare: #3d5a80;
     --g-fix: #c0392b;
     --g-recall: #2e7d32;
     --bar-ink: #ffffff;
@@ -961,9 +1061,14 @@
   }
 }
 
-.cs-grid > .cs-t-architecture > .cs-bb,
-.cs-grid > .cs-t-flow > .cs-bb {
+.cs-grid > .cs-t-architecture > .cs-bb {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.cs-grid > .cs-t-flow > .cs-bb {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }

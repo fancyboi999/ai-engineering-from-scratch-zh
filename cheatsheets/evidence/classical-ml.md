@@ -1,249 +1,18 @@
+# Evidence: cheatsheets/classical-ml.md
+upstream_revision: 45fa4084de6ba2f88fa96a41e69efa2166f868b3
+
 # 证据对照：经典机器学习
 
-中文主题：[经典机器学习](../classical-ml.md)。
+中文主题：[经典机器学习](../classical-ml.md)。下列逐条英文记录保留冻结上游版本的路径、行号与数值；标题对应中文主题。
 
-以下为当前中文区块的来源索引。文末保留冻结上游 `0d4b1ca0c6d75b8e413be88ca4174598eba4d1e0` 的原始逐条定位记录，便于回查英文原文。原始记录中的 `docs/en.md` 与行号属于该上游版本，不是当前 `docs/zh.md` 的行号，也不表示本次已执行这些命令或重现性能数据。
+原始记录中的 docs/en.md 和行号只在上述 upstream 版本有效，不代表当前 docs/zh.md 的行号，也不表示本次重新运行了命令、GPU 测量或外部模型。当前中文主题的 from 路径另由构建器校验。
 
-当前中文来源按区块登记如下。正文说明、代码注释和图中标签见链接的中文主题；命令、API 标识与数值保留原样。
+Abbreviations: 02 = phases/02-ml-fundamentals/02-linear-regression, 03 = phases/02-ml-fundamentals/03-logistic-regression, 04 = phases/02-ml-fundamentals/04-decision-trees, 05 = phases/02-ml-fundamentals/05-support-vector-machines, 06 = phases/02-ml-fundamentals/06-knn-and-distances, 07 = phases/02-ml-fundamentals/07-unsupervised-learning, 08 = phases/02-ml-fundamentals/08-feature-engineering, 09 = phases/02-ml-fundamentals/09-model-evaluation, 10 = phases/02-ml-fundamentals/10-bias-variance, 11 = phases/02-ml-fundamentals/11-ensemble-methods, 12 = phases/02-ml-fundamentals/12-hyperparameter-tuning, 13 = phases/02-ml-fundamentals/13-ml-pipelines, 14 = phases/02-ml-fundamentals/14-naive-bayes, 17 = phases/02-ml-fundamentals/17-imbalanced-data, 18 = phases/02-ml-fundamentals/18-feature-selection, D = docs/en.md.
 
-## 拟合模型
 
-对应主题区块：**拟合模型**（`task-table`）。
+## 拟合模型 (task-table)
 
-来源文件：
-
-- [`phases/02-ml-fundamentals/02-linear-regression/docs/zh.md`](../../phases/02-ml-fundamentals/02-linear-regression/docs/zh.md)
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-- [`phases/02-ml-fundamentals/04-decision-trees/docs/zh.md`](../../phases/02-ml-fundamentals/04-decision-trees/docs/zh.md)
-- [`phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md`](../../phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md)
-- [`phases/02-ml-fundamentals/06-knn-and-distances/docs/zh.md`](../../phases/02-ml-fundamentals/06-knn-and-distances/docs/zh.md)
-- [`phases/02-ml-fundamentals/07-unsupervised-learning/docs/zh.md`](../../phases/02-ml-fundamentals/07-unsupervised-learning/docs/zh.md)
-
-构建器核对的标识与数值：
-
-- `Ridge`
-- `class_weight`
-- `LogisticRegression`
-- `n_estimators`
-- `random_state`
-- `RandomForestClassifier`
-- `SVC`
-- `max_iter`
-- `LinearSVC`
-- `n_neighbors`
-- `KNeighborsClassifier`
-- `n_clusters`
-- `KMeans`
-- `fit`
-- `min_samples`
-- `DBSCAN`
-
-## 指标
-
-对应主题区块：**指标**（`command-table`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md`](../../phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 关键公式
-
-对应主题区块：**关键公式**（`concepts`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/02-linear-regression/docs/zh.md`](../../phases/02-ml-fundamentals/02-linear-regression/docs/zh.md)
-- [`phases/02-ml-fundamentals/03-logistic-regression/docs/zh.md`](../../phases/02-ml-fundamentals/03-logistic-regression/docs/zh.md)
-- [`phases/02-ml-fundamentals/04-decision-trees/docs/zh.md`](../../phases/02-ml-fundamentals/04-decision-trees/docs/zh.md)
-- [`phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md`](../../phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md)
-- [`phases/02-ml-fundamentals/10-bias-variance/docs/zh.md`](../../phases/02-ml-fundamentals/10-bias-variance/docs/zh.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 无泄漏预处理
-
-对应主题区块：**无泄漏预处理**（`annotated-code`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md`](../../phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md)
-- [`phases/02-ml-fundamentals/13-ml-pipelines/code/pipeline.py`](../../phases/02-ml-fundamentals/13-ml-pipelines/code/pipeline.py)
-
-构建器核对的标识与数值：
-
-- `scaler.fit_transform`
-- `X_scaled`
-- `fit_transform`
-- `X_train_scaled`
-- `X_train`
-- `scaler.transform`
-- `X_test_scaled`
-- `X_test`
-- `transform`
-- `Pipeline`
-- `StandardScaler`
-- `LogisticRegression`
-- `pipe.fit`
-- `y_train`
-- `fit`
-- `pipe.predict`
-- `predict`
-- `cross_val_score`
-- `full_pipe`
-
-## 无泄漏验证
-
-对应主题区块：**无泄漏验证**（`flow`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md`](../../phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)
-- [`phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md`](../../phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md)
-
-构建器核对的标识与数值：
-
-- `fit_transform`
-
-## 问答
-
-对应主题区块：**问答**（`qa`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/03-logistic-regression/docs/zh.md`](../../phases/02-ml-fundamentals/03-logistic-regression/docs/zh.md)
-- [`phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md`](../../phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md)
-- [`phases/02-ml-fundamentals/10-bias-variance/docs/zh.md`](../../phases/02-ml-fundamentals/10-bias-variance/docs/zh.md)
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-- [`phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md`](../../phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 提示
-
-对应主题区块：**提示**（`tips`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/zh.md`](../../phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/zh.md)
-- [`phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md`](../../phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)
-- [`phases/02-ml-fundamentals/08-feature-engineering/docs/zh.md`](../../phases/02-ml-fundamentals/08-feature-engineering/docs/zh.md)
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## ColumnTransformer 流水线
-
-对应主题区块：**ColumnTransformer 流水线**（`architecture`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md`](../../phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md)
-- [`phases/02-ml-fundamentals/13-ml-pipelines/code/pipeline.py`](../../phases/02-ml-fundamentals/13-ml-pipelines/code/pipeline.py)
-
-构建器核对的标识与数值：
-
-- `most_frequent`
-
-## 超参数调优
-
-对应主题区块：**超参数调优**（`annotated-code`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/zh.md`](../../phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/zh.md)
-
-构建器核对的标识与数值：
-
-- `param_dist`
-- `learning_rate`
-- `loguniform`
-- `max_depth`
-- `randint`
-- `n_estimators`
-- `RandomizedSearchCV`
-- `GradientBoostingRegressor`
-- `n_iter`
-- `neg_mean_squared_error`
-- `random_state`
-- `n_jobs`
-- `search.fit`
-- `X_train`
-- `y_train`
-- `fit`
-- `search.best_params_`
-- `search.best_score_`
-- `best_params_`
-- `best_score_`
-- `print`
-
-## 故障排查
-
-对应主题区块：**故障排查**（`troubleshooting`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/10-bias-variance/docs/zh.md`](../../phases/02-ml-fundamentals/10-bias-variance/docs/zh.md)
-- [`phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md`](../../phases/02-ml-fundamentals/13-ml-pipelines/docs/zh.md)
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-- [`phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md`](../../phases/02-ml-fundamentals/05-support-vector-machines/docs/zh.md)
-- [`phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/zh.md`](../../phases/02-ml-fundamentals/12-hyperparameter-tuning/docs/zh.md)
-- [`phases/02-ml-fundamentals/06-knn-and-distances/docs/zh.md`](../../phases/02-ml-fundamentals/06-knn-and-distances/docs/zh.md)
-
-构建器核对的标识与数值：
-
-- `handle_unknown`
-- `OneHotEncoder`
-- `StandardScaler`
-
-## 起始值
-
-对应主题区块：**起始值**（`defaults`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-- [`phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md`](../../phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)
-- [`phases/02-ml-fundamentals/11-ensemble-methods/docs/zh.md`](../../phases/02-ml-fundamentals/11-ensemble-methods/docs/zh.md)
-- [`phases/02-ml-fundamentals/04-decision-trees/docs/zh.md`](../../phases/02-ml-fundamentals/04-decision-trees/docs/zh.md)
-- [`phases/02-ml-fundamentals/14-naive-bayes/docs/zh.md`](../../phases/02-ml-fundamentals/14-naive-bayes/docs/zh.md)
-
-构建器核对的标识与数值：
-
-- `0.5`
-- `5`
-- `sqrt(n_features)`
-- `100`
-- `0.1`
-- `3`
-- `1.0`
-- `36.8%`
-
-## 缩略语
-
-对应主题区块：**缩略语**（`glossary`）。
-
-来源文件：
-
-- [`phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md`](../../phases/02-ml-fundamentals/09-model-evaluation/docs/zh.md)
-- [`phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md`](../../phases/02-ml-fundamentals/17-imbalanced-data/docs/zh.md)
-- [`phases/02-ml-fundamentals/07-unsupervised-learning/docs/zh.md`](../../phases/02-ml-fundamentals/07-unsupervised-learning/docs/zh.md)
-- [`phases/02-ml-fundamentals/18-feature-selection/docs/zh.md`](../../phases/02-ml-fundamentals/18-feature-selection/docs/zh.md)
-
-此区块为概念说明或流程。构建器不自动证明自然语言陈述；应结合中文主题与以下原始逐条定位记录核对。
-
-## 冻结上游的原始定位记录
-
-以下文本原样保留，只用作历史审计证据；英文说明不属于站点可见文案。
-
-````text
-# Evidence: classical-ml
-
-Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/. Each lesson is named by its number: 02 = 02-linear-regression, 03 = 03-logistic-regression, 04 = 04-decision-trees, 05 = 05-support-vector-machines, 06 = 06-knn-and-distances, 07 = 07-unsupervised-learning, 08 = 08-feature-engineering, 09 = 09-model-evaluation, 10 = 10-bias-variance, 11 = 11-ensemble-methods, 12 = 12-hyperparameter-tuning, 13 = 13-ml-pipelines, 14 = 14-naive-bayes, 17 = 17-imbalanced-data, 18 = 18-feature-selection. D = docs/en.md.
-
-## Fit a model (task-table, 8)
+原始区块：Fit a model (task-table, 8)
 - Ridge(alpha=1.0): 02/D:513
 - LogisticRegression(class_weight="balanced"): 17/D:480, 492
 - RandomForestClassifier(n_estimators=100, random_state=42): 04/D:429
@@ -253,7 +22,9 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - KMeans(n_clusters=3, random_state=42).fit(data): 07/D:466
 - DBSCAN(eps=1.5, min_samples=5).fit(data), noise points: 07/D:467, 76
 
-## Metrics (command-table, 6)
+## 指标 (command-table)
+
+原始区块：Metrics (command-table, 6)
 - Accuracy formula, misleading when imbalanced: 09/D:103
 - Precision, false positives costly: 09/D:104
 - Recall, false negatives costly: 09/D:105
@@ -261,7 +32,9 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - AUC-ROC 0.5 random, 1.0 perfect, threshold independent: 09/D:107
 - R-squared, negative when worse than mean: 09/D:114
 
-## Key formulas (concepts, 8)
+## 关键公式 (concepts)
+
+原始区块：Key formulas (concepts, 8)
 - MSE: 02/D:52-54
 - Normal equation, O(n^3) in features: 02/D:101-105
 - Ridge cost: 02/D:150-152
@@ -271,14 +44,18 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - RBF kernel: 05/D:180-185
 - Bias, variance, noise split: 10/D:59-61
 
-## Leak-free preprocessing (annotated-code, 13 lines)
+## 无泄漏预处理 (annotated-code)
+
+原始区块：Leak-free preprocessing (annotated-code, 13 lines)
 - leaky X_scaled = scaler.fit_transform(X): 13/D:56, comment 13/D:63
 - X_train_scaled, X_test_scaled: 13/D:69-70
 - Pipeline scaler + LogisticRegression: 13/D:84-87
 - pipe.fit, pipe.predict and what each step calls: 13/D:89-100
 - cross_val_score(full_pipe, df, y, cv=5, scoring="accuracy"): 13/code/pipeline.py:550. Per fold fit: 13/D:44, 315
 
-## ColumnTransformer pipeline (architecture, 7 nodes)
+## ColumnTransformer 流水线 (architecture)
+
+原始区块：ColumnTransformer pipeline (architecture, 7 nodes)
 - raw DataFrame with numeric and categorical columns: 13/code/pipeline.py:520-527
 - numeric columns age, income, score: 13/code/pipeline.py:541
 - categorical columns city, plan: 13/code/pipeline.py:542
@@ -287,7 +64,9 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - ColumnTransformer joins both: 13/D:105-106, 123-126, 345
 - Model GradientBoostingClassifier, predict: 13/D:128-131, 13/code/pipeline.py:545-548
 
-## Validate without leakage (flow, 7)
+## 无泄漏验证 (flow)
+
+原始区块：Validate without leakage (flow, 7)
 1. test set touched exactly once: 09/D:47
 2. K folds, stratified: 09/D:84-90
 3. scaler fit_transform on training data: 13/D:94
@@ -296,13 +75,17 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 6. average K scores: 09/D:86
 7. report on test set: 09/D:47, 49
 
-## Tune hyperparameters (annotated-code, 12 lines)
+## 超参数调优 (annotated-code)
+
+原始区块：Tune hyperparameters (annotated-code, 12 lines)
 - param_dist with loguniform, randint: 12/D:496-503
 - RandomizedSearchCV args n_iter=100, cv=5, scoring, random_state=42, n_jobs=-1: 12/D:505-513
 - n_jobs=-1 all CPU cores, loguniform for rates, randint for integers: 12/D:518
 - search.fit, best_params_, -best_score_: 12/D:514-516
 
-## Starting values (defaults, 8)
+## 起始值 (defaults)
+
+原始区块：Starting values (defaults, 8)
 - threshold 0.5, lower for imbalance: 17/D:159
 - K = 5 or 10: 09/D:88
 - sqrt(n_features), n_features / 3: 11/D:70
@@ -312,7 +95,9 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - Naive Bayes alpha 1.0 Laplace: 14/D:171
 - out of bag 36.8%, free validation: 11/D:66
 
-## Troubleshooting (8)
+## 故障排查 (troubleshooting)
+
+原始区块：Troubleshooting (8)
 - high train and test error, bias: 10/D:158
 - low train, high test, variance: 10/D:159
 - test error rising, early stopping: 10/D:161
@@ -322,14 +107,18 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - unscaled features for SVM: 05/D:341. KNN needs scaling: 06/D:371
 - best value at search edge: 12/D:527
 
-## Questions (qa, 5)
+## 问答 (qa)
+
+原始区块：Questions (qa, 5)
 - MSE non-convex with sigmoid, log loss convex: 03/D:77, 89
 - SVM margin depends on norm of w: 05/D:341
 - L1 pushes weights to zero: 10/D:101
 - more data does not fix high bias: 09/D:120, 10/D:233
 - class weights equal oversampling in expectation: 17/D:155
 
-## Tips (6)
+## 提示 (tips)
+
+原始区块：Tips (6)
 - sweep learning rate first: 12/D:227
 - log scale for learning rate and regularization: 12/D:229
 - n_estimators high with early stopping: 12/D:231
@@ -337,9 +126,10 @@ Paths are relative to /private/tmp/aiefs-cheatsheets/phases/02-ml-fundamentals/.
 - was_this_missing indicator before imputing: 08/D:87
 - threshold from validation set: 17/D:163
 
-## Abbreviations (glossary, 4)
+## 缩略语 (glossary)
+
+原始区块：Abbreviations (glossary, 4)
 - AUC-ROC: 09/D:107
 - SMOTE k-NN interpolation of minority samples: 17/D:522
 - GMM, soft assignments, EM: 07/D:98-102, 493
 - RFE, train rank prune repeat: 18/D:526
-````

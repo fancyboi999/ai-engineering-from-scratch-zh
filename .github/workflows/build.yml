@@ -74,6 +74,13 @@ jobs:
           package-manager-cache: false
       - name: build data.js
         run: node site/build.js
+      - name: 冻结速查表英文证据来源（不将英文行号冒充中文行号）
+        run: |
+          git fetch --no-tags https://github.com/rohitg00/ai-engineering-from-scratch.git 45fa4084de6ba2f88fa96a41e69efa2166f868b3
+          mkdir -p "$RUNNER_TEMP/aifs-cheatsheet-evidence"
+          git archive 45fa4084de6ba2f88fa96a41e69efa2166f868b3 phases manuals projects cheatsheets | tar -x -C "$RUNNER_TEMP/aifs-cheatsheet-evidence"
+          echo 45fa4084de6ba2f88fa96a41e69efa2166f868b3 > "$RUNNER_TEMP/aifs-cheatsheet-evidence/.aifs-upstream-revision"
+          echo "AIFS_CHEATSHEET_EVIDENCE_ROOT=$RUNNER_TEMP/aifs-cheatsheet-evidence" >> "$GITHUB_ENV"
       - name: verify output
         run: |
           test -f site/data.js || { echo "data.js 未生成"; exit 1; }
@@ -98,6 +105,7 @@ jobs:
           NODE
           node scripts/check_lesson_math.js --katex "$RUNNER_TEMP/aieng-katex.cjs"
           node site/build-cheatsheets.js --check
+          node site/build-cheatsheets.js --check-quality
       - name: 中文课程结构与站内链接校验
         run: python3 scripts/audit_lessons.py --strict
       - name: Claude 认证课程合约校验

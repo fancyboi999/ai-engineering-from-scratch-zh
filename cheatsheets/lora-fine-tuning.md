@@ -5,6 +5,7 @@ subtitle: 添加 LoRA 适配器、为 QLoRA 加载 4 位基座、遮蔽 SFT 标�
 hue: 310
 sources: phases/11-llm-engineering/08-fine-tuning-lora, phases/10-llms-from-scratch/06-instruction-tuning-sft, phases/19-capstone-projects/38-classifier-finetuning, phases/19-capstone-projects/39-instruction-tuning-sft
 code: FT
+source_hash: 69905774bb399a14
 ---
 
 ## 任务

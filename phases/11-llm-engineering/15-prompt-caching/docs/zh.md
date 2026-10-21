@@ -25,7 +25,7 @@
 
 | Provider | API 风格 | 命中折扣 | 写入溢价 | 默认 TTL | 最小可缓存 |
 |---------|-----------|--------------|---------------|-------------|---------------|
-| Anthropic | 在内容块上显式打 `cache_control` 标记 | 输入打 9 折（省 90%） | 加收 25% | 5 分钟（可延至 1 小时） | 1,024 token（Sonnet/Opus），2,048（Haiku） |
+| Anthropic | 在内容块上显式打 `cache_control` 标记 | 输入打 1 折（省 90%） | 加收 25% | 5 分钟（可延至 1 小时） | 1,024 token（Sonnet/Opus），2,048（Haiku） |
 | OpenAI | 自动前缀检测 | 输入打 5 折 | 无 | 最长 1 小时（尽力而为） | 1,024 token |
 | Google（Gemini） | 显式 `CachedContent` API | 按存储计费；读取约为正常的 25% | 按 token·小时收存储费 | 用户设置（默认 1 小时） | 4,096 token（Flash），32,768（Pro） |
 

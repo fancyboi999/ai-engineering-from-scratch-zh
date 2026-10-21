@@ -51,8 +51,20 @@ async function main() {
     for (const id of ['agent-budget-planner', 'dataset-split-auditor']) {
       await command('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false, screenWidth: 1440, screenHeight: 900 });
       await command('Page.navigate', { url: `${base}/project.html?id=${id}` });
-      await delay(500); // 等待 JS 执行重定向
-      const finalUrl = await evaluate('window.location.pathname');
+      let finalUrl;
+      for (let attempt = 0; attempt < 200; attempt++) {
+        try {
+          const history = await command('Page.getNavigationHistory');
+          finalUrl = new URL(history.entries[history.currentIndex].url).pathname;
+        } catch (error) {
+          // Chrome can briefly detach the page while a navigation commits.
+          let protocolError;
+          try { protocolError = JSON.parse(error.message); } catch (_) {}
+          if (protocolError?.code !== -32000 || protocolError.message !== 'Not attached to an active page') throw error;
+        }
+        if (finalUrl === `/project/${id}/`) break;
+        await delay(50);
+      }
       assert.equal(finalUrl, `/project/${id}/`, `旧 URL /project.html?id=${id} 应重定向到 /project/${id}/`);
     }
     // 使用新的预渲染页面 URL 进行布局测试
