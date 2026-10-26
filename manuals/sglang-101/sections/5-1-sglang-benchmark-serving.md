@@ -139,14 +139,29 @@ sglang serve --model-path Qwen/Qwen3-30B-A3B-Instruct-2507 --host 127.0.0.1 --po
 
 上限 8 时，单次运行报告 TTFT 中位数 677.61 ms；上限 32 时却为 390.38 ms。负载更大，首 token 反而更快，队列解释不了这一点。一次运行只是一个样本，它可能因你未观察到的原因而失真。
 
-所以我们像模型团队比较训练实验那样运行扫描。`capture/gpu/sweep.py` 将 1 至 64 的各并发上限分别运行三次，seed 为 1、2、3。它传入 `--output-details`，每次保留每个请求的 TTFT 和 token 间隔。`capture/gpu/summarize.py` 将每个点的三次运行汇总为中位数、最小值、最大值。
+所以我们像模型团队比较训练实验那样运行扫描。[扫描脚本](manuals/sglang-101/capture/gpu/sweep.py)将 1 至 64 的各并发上限分别运行三次，seed 为 1、2、3。它传入 `--output-details`，每次保留每个请求的 TTFT 和 token 间隔。[汇总脚本](manuals/sglang-101/capture/gpu/summarize.py)将每个点的三次运行汇总为中位数、最小值、最大值。
 
 | 上限 | 单次工具运行的 TTFT 中位数 | 三个 seed 的 TTFT 中位数（最小至最大） |
 |---|---|---|
 | 8 | 677.61 ms | 209.98 ms (185.25 至 216.02) |
 | 32 | 390.38 ms | 416.37 ms (338.06 至 434.64) |
 
-**我们在同一 GB10 上测得两组结果。** 后续三次运行都未重现 677.61 ms。首 token 随上限增大而变慢，符合队列预期。
+**我们在 GB10 上测得两组结果，但来自不同服务器。** 单次工具运行的池容量为 227,243 token，采集日期为 2026-10-17。扫描服务器的池容量为 234,600 token，采集日期为 2026-10-16。后续扫描没有重现 677.61 ms。从上限 2 起，首 token 随上限增大而变慢，符合队列预期。
+
+后来我们从单次工具运行的服务器日志中找到了异常原因：工具为每次运行使用 seed 7，也没有清理前缀缓存。使用同一种子时，客户端每次都会发送相同的首批 prompt {{code}}。因此每次运行都可能从前一次运行的缓存命中 prompt：
+
+```listing
+title: 一次从缓存命中 prompt 的扫描
+source: capture/gpu/out-gb10/server-default.log
+lang: text
+note: cap 32 的工具运行中三行 prefill 日志。前两行各有 29 个请求，只需要计算一个新 token；第三行是第一个缓存中没有的 prompt。长行已截断。
+---
+[2026-10-17 14:23:00] Prefill batch, #new-seq: 14, #new-token: 14, #cached-token: 6879, token usage: 0.07, …
+[2026-10-17 14:23:00] Prefill batch, #new-seq: 15, #new-token: 15, #cached-token: 7634, token usage: 0.07, …
+[2026-10-17 14:23:47] Prefill batch, #new-seq: 1, #new-token: 510, #cached-token: 2, token usage: 0.01, …
+```
+
+我们统计了每次工具运行的 prefill 日志。上限 8 时，64 个 prompt 里有 16 个在运行前已缓存。上限 32 时，128 个 prompt 里有 64 个已缓存；上限 64 时，256 个里有 128 个已缓存。缓存命中跳过 prefill，因此这些请求能更快拿到首 token。缓存优势分别覆盖上限 32 时一半的请求、上限 8 时四分之一的请求，所以首 token 中位数会下降。
 
 ```figure
 id: fig-5-1c
@@ -170,7 +185,7 @@ claim: 约一半请求的等待时间比另一半高几倍，因此中位数无�
 caption: 每条曲线从汇总请求中抽取 51 个分位数绘制，从最快到最慢。玫瑰色线标记 P90，时间轴为对数刻度。来源：capture/gpu/summary/gb10.json 中上限 16 的逐请求负载扫描记录。
 ```
 
-**我们在 GB10 上测到了两组请求。** BF16 中，最快一半请求的首 token 为 186.3 至 211.8 ms；从第 68 百分位开始，请求等待 1,639.8 至 1,743.4 ms。中位数为 237.6 ms，P90 为 1,721.5 ms，是前者的 7.2 倍。FP8 也分两组：快的一半为 122.7 至 139.5 ms，慢的一半为 589.9 至 1,162.2 ms。
+**我们在 GB10 上测到了两组请求。** BF16 中，最快一半请求的首 token 为 186.3 至 211.8 ms。从第 68 百分位开始，等待时间升至 1,639.8 至 1,743.4 ms。中位数为 237.6 ms，P90 为 1,721.5 ms，是中位数的 7.2 倍。FP8 也分两组。快的一半为 122.7 至 139.5 ms，慢的一半为 589.9 至 1,162.2 ms。
 
 EAGLE-3 的中位数最慢，为 579.3 ms，尾部却最短，P90 为 1,007.4 ms。它的每 token 耗时分布反而最宽：中位数 82.8 ms，P99 191.3 ms。因为每一步接受的草稿 token 数会变化。
 
@@ -211,7 +226,7 @@ caption: 实线为 TTFT 中位数，虚线为 P99 token 间延迟，每个点三
 
 **我们测得**固定长度下，BF16 首 token 慢了 6.9 倍，FP8 慢了 11.8 倍。混合长度发送的 token 更少，seed 1 的输入为 17,870，而非 32,768，因此部分差距来自工作量减少。但它解释不了另一个结果：混合长度下，P99 ITL 从 82 升至 300 ms。新 prompt 逐个到达，每次 prefill 都打断运行中的 decode；固定长度则只在波次之间做 prefill。
 
-GB10 上的 Qwen3-30B-A3B 也呈现相同形状，每个点三个 seed。固定长度下，BF16 的 TTFT 中位数 1,650 ms，P99 ITL 169 ms；混合长度时为 320 ms 和 230 ms。FP8 从 1,050 ms 和 92 ms，变成 188 ms 和 127 ms。两张 GPU、两个模型呈现同样取舍，说明原因在负载，而非硬件。
+GB10 上的 Qwen3-30B-A3B 也呈现相同形状，每个点使用三个 seed。固定长度下，BF16 的 TTFT 中位数为 1,650 ms，P99 ITL 为 169 ms。混合长度时，它们分别为 320 ms 和 230 ms。FP8 的对应数值从 1,050 ms 和 92 ms 变为 188 ms 和 127 ms。两张 GPU、两个模型都呈现相同取舍，说明原因在负载，而非硬件。
 
 两种设置实际测了两种不同服务形态。固定长度测突发：首 token 慢，之后输出平滑。混合长度测稳定流量：首 token 快，流式输出中有停顿。比较两个构建时保留 `--random-range-ratio 1.0`，因为它精确可重复。但用它制定延迟目标前，也要测试真实长度分布。
 
@@ -315,4 +330,4 @@ caption: 蓝色为降至 72 C 且记录时钟的扫描，玫瑰色为无遥测�
 - 每次运行记录 SM 时钟与温度，剔除降频运行。
 ```
 
-来源：python/sglang/benchmark/serving.py (calculate_metrics, argument defaults), python/sglang/benchmark/datasets/common.py (compute_random_lens), python/sglang/bench_serving.py, PR #40795, all at v0.5.22 (baa9befa); capture/out/serve-help.txt, capture/out/server-default.command.txt, capture/out/server-default.log, capture/out/bench-random-c1.txt, capture/out/bench-random-c8.txt, capture/out/bench-random-c32.txt; capture/gpu/sweep.py, capture/gpu/summarize.py, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-gb10/server-default.command.txt, capture/gpu/out-gb10/bench-random-c8.txt, capture/gpu/out-gb10/bench-random-c32.txt, capture/gpu/incidents/l4-thermal-throttle.txt; issue #3196. capture/gpu/out-l4/server-waves-default.log.
+来源：python/sglang/benchmark/serving.py (calculate_metrics, argument defaults), python/sglang/benchmark/datasets/common.py (compute_random_lens), python/sglang/bench_serving.py, PR #40795, all at v0.5.22 (baa9befa); capture/out/serve-help.txt, capture/out/server-default.command.txt, capture/out/server-default.log, capture/out/bench-random-c1.txt, capture/out/bench-random-c8.txt, capture/out/bench-random-c32.txt; capture/gpu/sweep.py, capture/gpu/summarize.py, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-gb10/server-default.command.txt, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/bench-random-c8.txt, capture/gpu/out-gb10/bench-random-c32.txt, capture/gpu/incidents/l4-thermal-throttle.txt, capture/gpu/out-l4/server-waves-default.log.

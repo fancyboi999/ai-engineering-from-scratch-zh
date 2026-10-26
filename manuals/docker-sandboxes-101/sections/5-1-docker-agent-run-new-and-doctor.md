@@ -42,7 +42,7 @@ note: 文件第5、13、24行。tool_call 事件在 call 后、tool_definition �
 
 ## 每次录制的模型 {#s-docker-agent-run-new-and-doctor-the-model-in-every-recording}
 
-文档称 `ai/qwen3` 为“the model Docker Agent reaches for by default” {{docs-agent Set Up a Model}}，默认模型。无 Model Runner 时，`doctor` 将 `auto` 解析为8B tag `ai/qwen3:latest`（`16-doctor.txt`）。录制 Mac 两次拉取均在最后5.03 GB blob 后出现 digest 不匹配（`25-model-pull-latest.txt`）。所以每个套件 agent 文件指定同仓库4B tag `ai/qwen3:4b`。它是思考模型，每次回答前流式输出数千推理 token。`--exec` 打印它们，套件压成一行，如 `[... 299 lines of model reasoning cut by run.py ...]`（`18-run-exec.txt`）。
+文档称 `ai/qwen3` 为{{docs-agent Set Up a Model}}，默认模型。无 Model Runner 时，`doctor` 将 `auto` 解析为8B tag `ai/qwen3:latest`（`16-doctor.txt`）。录制 Mac 两次拉取均在最后5.03 GB blob 后出现 digest 不匹配（`25-model-pull-latest.txt`）。所以每个套件 agent 文件指定同仓库4B tag `ai/qwen3:4b`。它是思考模型，每次回答前流式输出数千推理 token。`--exec` 打印它们，套件压成一行，如 `[... 299 lines of model reasoning cut by run.py ...]`（`18-run-exec.txt`）。
 
 ## doctor 与 models {#s-docker-agent-run-new-and-doctor-doctor-and-models}
 
@@ -87,7 +87,7 @@ No issues found.
 [exit 0]
 ```
 
-没有 runner，`auto` 仍指定 `dmr/ai/qwen3:latest`，issue 行说明为何无法运行。runner 启动后，`auto` 选择唯一已拉取模型，符合 provider 页所说 auto-selection “prefers a locally-installed model” {{docs-agent Docker Model Runner}}，优先本地模型。即使无守护进程，`models list` 也输出 `dmr ai/qwen3:latest` 一行（`16-models.txt`）。交互式修复用 `setup`，有四条路径：`~/.config/cagent/.env` 的 provider key、Model Runner 拉取、自定义 OpenAI 兼容端点及 Claude Code harness {{help-agent docker-agent setup}}。
+没有 runner，`auto` 仍指定 `dmr/ai/qwen3:latest`，issue 行说明为何无法运行。runner 启动后，`auto` 选择唯一已拉取模型，符合 provider 页所说 auto-selection {{docs-agent Docker Model Runner}}，优先本地模型。即使无守护进程，`models list` 也输出 `dmr ai/qwen3:latest` 一行（`16-models.txt`）。交互式修复用 `setup`，有四条路径：`~/.config/cagent/.env` 的 provider key、Model Runner 拉取、自定义 OpenAI 兼容端点及 Claude Code harness {{help-agent docker-agent setup}}。
 
 ## new {#s-docker-agent-run-new-and-doctor-new}
 

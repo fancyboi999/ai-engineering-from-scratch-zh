@@ -8,7 +8,7 @@
 
 ## Ghidra provider 的要求
 
-**Ghidra provider：** rea 中通过 `analyzeHeadless` 驱动现有 Ghidra 安装的适配器。需要环境变量 `GHIDRA_INSTALL_DIR`、`JAVA_HOME` 提供绝对路径，拒绝相对路径。策略固定版本：`SUPPORTED_GHIDRA_VERSION = "12.1.4"`、`SUPPORTED_GHIDRA_JAVA_MAJOR = 21`。文档解释实际含义：“接受 Ghidra 12.1.x，以及该安装的 `application.java.min`、`application.java.max` 声明的 64 位完整 JDK。”{{install Ghidra}}。安装还须在 `Ghidra/Features/Decompiler/os/<platform>/` 下包含适配宿主机的原生反编译器，且“REA 不构建或安装原生工具，也不改变 Gatekeeper 隔离设置。”{{install Ghidra}}。
+**Ghidra provider：** rea 中通过 `analyzeHeadless` 驱动现有 Ghidra 安装的适配器。需要环境变量 `GHIDRA_INSTALL_DIR`、`JAVA_HOME` 提供绝对路径，拒绝相对路径。策略固定版本：`SUPPORTED_GHIDRA_VERSION = "12.1.4"`、`SUPPORTED_GHIDRA_JAVA_MAJOR = 21`。安装文档要求 Ghidra 12.1.x，并要求 JDK 版本符合该安装 `application.java.min` 与 `application.java.max` 属性，且为 64 位完整 JDK {{install Ghidra}}。`Ghidra/Features/Decompiler/os/<platform>/` 还必须包含适配宿主机的原生反编译器。REA 不构建或安装原生工具，也不会更改 Gatekeeper 隔离设置 {{install Ghidra}}。
 
 录制 Mac 上，Homebrew 将两个工具安装到以下位置：
 
@@ -33,7 +33,7 @@ OpenJDK 64-Bit Server VM Homebrew (build 21.0.12.1, mixed mode, sharing)
 …
 ```
 
-安装文档对各主机使用同一模式：“在 REA 之外解压 Ghidra 并安装 JDK，然后导出绝对路径：”{{install Ghidra}}。使用 Homebrew 的 Mac 上为：
+安装文档要求先在 REA 之外解压 Ghidra 并安装 JDK，再导出两个工具的绝对路径 {{install Ghidra}}。使用 Homebrew 的 Mac 上为：
 
 ```bash
 export GHIDRA_INSTALL_DIR=/opt/homebrew/Cellar/ghidra/12.1.4/libexec
@@ -106,7 +106,7 @@ note: 保留开头、首项检查和两项读取安装的检查，省略其余�
 | `ghidra-java` | JDK 主版本是否匹配 `application.java.min`、64 位、存在 `javac` | `21.0.12.1`、64 位、JDK | 各失败属性有独立代码 |
 
 
-原生反编译器检查读取 `decompile` 二进制的可执行头，与宿主机比较。因此其他平台的构建会“报告为不兼容，而非仅根据目录名接受”{{install Ghidra}}。文档概括：“Doctor 校验平台、架构、Ghidra 12.1.x 应用版本、`support/analyzeHeadless` 或 `support/analyzeHeadless.bat`、安装要求的 Java 主版本范围、64 位 JDK，以及 `javac`/`javac.exe` 是否存在。”{{install Ghidra}}。[此图](#fig-2-2)按顺序展示九项检查。
+原生反编译器检查读取 `decompile` 二进制的可执行头，与宿主机比较。因此检查会读取二进制可执行头并与宿主机比较，因此会将其他平台的构建报告为不兼容，而不会只按目录名判定 {{install Ghidra}}。Doctor 会校验平台、架构、Ghidra 12.1.x 应用版本、headless 启动程序、安装要求的 Java 主版本范围、64 位 JDK，以及 `javac` 是否存在 {{install Ghidra}}。[此图](#fig-2-2)按顺序展示九项检查。
 
 ```figure
 id: fig-2-2
@@ -120,7 +120,7 @@ caption: 从左到右、再向下阅读，底部两框是报告的两个结论�
 
 报告有两个结论。`healthy` 针对选定范围，此处为含 `providers: ["ghidra"]` 的 `explicit`，`scope_checks` 只列该范围检查。`environment_healthy` 针对整套审计检查，仅在 provider 之外的检查全通过、所有已配置 provider 全通过，且至少一个 provider 可用时为真。
 
-录制 Mac 上 `healthy` 为真，`environment_healthy` 为假。Hopper、IDA、Kuna 未配置，公式忽略它们；Ghidra 已配置且通过。因此假值来自 Ghidra 范围之外的检查，位于捕获 `--filter-output` 排除的集合中，该集合涉及用户的 skill 安装及 agent 注册（capture/README.md）。退出状态跟随选定范围：`rea doctor` 返回 0（capture/out/00-commands.txt），因为“不可用的可选 provider 对无关任务仅作信息提示”{{cli Output and exit status}}。
+录制 Mac 上 `healthy` 为真，`environment_healthy` 为假。Hopper、IDA、Kuna 未配置，公式忽略它们；Ghidra 已配置且通过。因此假值来自 Ghidra 范围之外的检查，位于捕获 `--filter-output` 排除的集合中，该集合涉及用户的 skill 安装及 agent 注册（capture/README.md）。退出状态跟随选定范围：`rea doctor` 返回 0（capture/out/00-commands.txt），REA 将不可用的可选 provider 作为信息提示；它不会阻止无关任务 {{cli Output and exit status}}。
 
 ## 检查失败时
 

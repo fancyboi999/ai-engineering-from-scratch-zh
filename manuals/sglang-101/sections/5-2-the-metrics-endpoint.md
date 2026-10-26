@@ -8,9 +8,9 @@
 
 ## 先开启它
 
-端点默认关闭。v0.5.22 的 `enable_metrics` 字段默认为 `False` {{code}}，不传 `--enable-metrics`，`/metrics` 路径就不会返回有用内容。我们的捕获服务器启动时设置了参数，见[第 5.1 节](#s-sglang-benchmark-serving)。默认实验结束后，它导出了 81 个指标族，共 603 行以 `sglang:` 开头的样本。
+端点默认关闭。v0.5.22 的 `enable_metrics` 字段默认为 `False` {{code}}。不传 `--enable-metrics` 时，服务不会挂载 `/metrics`。我们的捕获服务器启动时设置了参数，见[第 5.1 节](#s-sglang-benchmark-serving)。默认实验结束后，它导出了 81 个指标族，共 603 行以 `sglang:` 开头的样本。
 
-**我们的建议：** 每台服务器都带上 `--enable-metrics`，包括笔记本上的服务器。成本只是每个请求更新几个计数器；没有历史数据的一次事故，成本却是整场调查。
+**我们的建议：** 每台服务器都带上 `--enable-metrics`，包括笔记本上的服务器。我们没有测量它的成本，预计与 decode 步骤相比很小。缺少历史数据的一次事故，成本却是整场调查。
 
 ## 三类时间序列
 
@@ -82,7 +82,7 @@ sum(rate(sglang:prefill_effective_tokens_total{mode=~".*_hit"}[5m]))
 | `inter_token_latency_seconds` | histogram | 5 分钟 p99 超过目标 | prefill batch 会阻塞运行中的 decode，第 5.1 节的 1,948 ms 间隔就是例子 |
 | `num_queue_reqs` | gauge | 连续数分钟大于 0 | 服务器已越过拐点，新请求只会等待 |
 | `token_usage` | gauge | 连续数分钟接近 1.0 | KV 池已满，下一步就是回撤 |
-| `num_retracted_reqs` | gauge | 大于 0 | 调度器移出请求后重新计算，见[第 2.3 节](#s-admission-and-retraction) |
+| `num_retracted_requests_total` | counter | 每分钟速率超过约 1 | 调度器移出请求后重新计算，见[第 2.3 节](#s-admission-and-retraction) |
 | `prefill_effective_tokens_total` | counter | 部署后窗口命中率下降 | prompt 变化破坏了前缀，见第 3.4 节 |
 
 Histogram 的 p99 由桶计算：

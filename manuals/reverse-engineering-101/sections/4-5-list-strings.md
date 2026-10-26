@@ -61,7 +61,7 @@ note: 请求参数、39 项中的三项，以及七项限制中的两项字符�
 label: 空结果证明什么
 source: ghidra §Admitted inventory semantics
 ---
-"Packed or undefined literals, including Rust strings, may be absent; an empty result does not prove text is absent."
+压缩或未定义的字面量可能不会出现，Rust 字符串也包括在内。因此空结果不能证明二进制中没有文本。
 ```
 
 `termination` 有两个值。`missing` 表示需要空字节的字符串类型缺少该字节。`present_or_not_required` 包含其他情况，因为 Ghidra 无法区分已有终止符与不需要终止符的布局。`byte_length` 计入终止符：`F` 是两字节。

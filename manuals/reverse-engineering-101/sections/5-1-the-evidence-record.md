@@ -6,7 +6,7 @@ agent 告诉你，`before` 为 0 时 `_percent_change` 返回 0。你想知道 r
 
 ## 每次成功观测对应一条记录
 
-**Evidence 记录：** rea 为成功观测返回的唯一记录类型。模式是包含十六个字段的严格对象，多字段或少字段都会被拒绝。没有调用者或被调用者集合的操作也写入 `relationship_coverage`，值为 `null`。MCP 服务同时以 `structuredContent` 和文本副本返回记录："Evidence-producing tools return the complete canonical Evidence record in both text and structured content." {{mcp Tool results}}
+**Evidence 记录：** rea 为成功观测返回的唯一记录类型。模式是包含十六个字段的严格对象，多字段或少字段都会被拒绝。没有调用者或被调用者集合的操作也写入 `relationship_coverage`，值为 `null`。MCP 服务会在 `structuredContent` 和文本副本中同时返回完整规范记录 {{mcp Tool results}}
 
 ```listing
 title: _percent_change 档案记录的十六个字段
@@ -98,7 +98,7 @@ MCP 处理器可以在引擎启动前执行预检，引擎回答后才构建记�
 | `inspect_analysis_view`，provider `rea-analysis-view` | `derived` | `shipped-artifact` | `15-js-app-view-summary.json` |
 | `record_unknown`，provider `rea-unknown-registry` | `derived` | `analyst-inference` | 采集中没有 |
 
-谨慎理解 `observed`。在档案里，它表示 rea 记录了 Ghidra 返回的内容，以磁盘字节为权威来源，不表示伪代码就是程序源码。provider 文档说明了这一点："Assembly is complete Ghidra Listing text; pseudocode is Ghidra decompiler output." {{ghidra Admitted function-analysis semantics}}
+谨慎理解 `observed`。在档案里，它表示 rea 记录了 Ghidra 返回的内容，以磁盘字节为权威来源，不表示伪代码就是程序源码。Assembly 是完整的 Ghidra Listing 文本，pseudocode 则由 Ghidra decompiler 生成 {{ghidra Admitted function-analysis semantics}}
 
 `binary_overview` 为 `derived`，因为 rea 工作流从 provider 调用计算它。首条限制直说："Derived by an REA composed workflow." 其他八条继承 Ghidra 限制，每条以 provider、版本和操作开头，例如 "Ghidra (ghidra 12.1.4) read_binary_inventory_summary:"（`05-analyze-arm64-O1.json`）。[第 35 课](phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns)用纯 Python 构建具有相同三个词和五种权威来源的账本。
 
@@ -129,7 +129,7 @@ note: 显示 27 项限制的前两项。
 
 `evidence_links` 指明计算派生记录所依据的记录。比较链接它比较的两份档案，视图链接父记录。`locations` 说明在产物何处看到了事实。`15-js-app.json` 的 JavaScript 记录携带一个 `artifact-path` 位置 `artifact-root`。Ghidra 档案没有位置，因为地址位于 `normalized_result` 内。
 
-即使为空，`analysis_profile` 也是标识的一部分："`analysis_profile` is always present: a concrete profile object or `null`; either value participates in semantic identity." {{mcp Tool results}}
+即使值为 `null`，`analysis_profile` 仍始终存在，并参与语义标识计算 {{mcp Tool results}}
 
 配置的 provider 与记录 `provider` 不同，会被拒绝并报 "Analysis profile provider does not match Evidence provider"。配置摘要是其 provider 与 parameters 的规范 JSON 的 SHA-256。[快照缓存](#s-snapshots-and-the-answer-cache)也用同一摘要作为键的一部分。
 

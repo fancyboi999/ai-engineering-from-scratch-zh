@@ -14,7 +14,7 @@ SGLang 在两个位置路由请求，默认值不同。
 
 **多服务器之前：** `sgl-model-gateway` 是独立 Rust 程序，路由到多台 SGLang 服务器。此前名为 `sgl-router`，2025-12-05 的 [PR #14312](https://github.com/sgl-project/sglang/pull/14312) 为“减少混淆”而重命名。默认策略为 `cache_aware` {{code}}。
 
-一份实践报告展示差异。Jarvislabs 称，“SGLang 默认路由按顺序将请求交给下一张 GPU，完全不知道对话缓存在哪里” {{field Jarvislabs 2026-08}}。其流量中，23% 输入 token 被重新计算。加入一个将每段对话固定到同一 GPU 的请求头后，缓存命中率从 64.7% 提至 92.1%，TTFT 中位数减半。[文章](https://jarvislabs.ai/blog/managed-endpoints) 未说明轮询来自哪个组件，但与服务器内默认值相符。
+一份实践报告展示了其中的差异。Jarvislabs 测得其流量有 23% 的输入 token 被重新计算 {{field Jarvislabs 2026-08}}。加入请求头、将每段对话固定到同一 GPU 后，缓存命中率从 64.7% 提高到 92.1%，TTFT 中位数减半。[报告](https://jarvislabs.ai/blog/managed-endpoints)没有说明轮询来自哪个组件，但结果与服务器内部的默认值相符。
 
 ## cache_aware 如何选服务器
 

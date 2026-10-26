@@ -9,6 +9,8 @@
   --m-rule-strong: rgba(26, 26, 26, 0.42);
   --m-accent: #3553ff;
   --m-code-bg: #efece0;
+  --m-shine: #ffffff;
+  --m-shade: #1a1a1a;
 
   --m-grey-ink: #5e5e59;
   --m-grey-fill: #ecebe3;
@@ -47,6 +49,8 @@
   --m-rule-strong: rgba(232, 230, 220, 0.45);
   --m-accent: #6b8eff;
   --m-code-bg: #131830;
+  --m-shine: #3a4266;
+  --m-shade: #000000;
 
   --m-grey-ink: #b9b7ae;
   --m-grey-fill: rgba(232, 230, 220, 0.08);

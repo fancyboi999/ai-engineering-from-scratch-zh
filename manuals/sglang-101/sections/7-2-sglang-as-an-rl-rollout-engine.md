@@ -231,7 +231,7 @@ SGLang 启动 21 秒后停止。其 FA3 后端只接受 SM 8.0 至 SM 9.0 GPU，
 
 ## Miles 使用自己的 SGLang
 
-Miles 不使用本手册其他章节描述的 SGLang 发布版。Docker 镜像基于 `lmsysorg/sglang:v0.5.21`，检出 `sglang-miles` 分支。v0.1.2 release lock 固定 SGLang commit `b84bec5761a6`。Miles 文档明确说：“在 Miles 旁安装原版 `sglang` 或上游 Megatron-LM 无法工作。” {{docs}}
+Miles 不使用本手册其他章节描述的 SGLang 发布版。Docker 镜像基于 `lmsysorg/sglang:v0.5.21`，检出 `sglang-miles` 分支。v0.1.2 release lock 固定 SGLang commit `b84bec5761a6`。Miles 文档说明它需要自带的 SGLang 分支，直接安装原版 `sglang` 或上游 Megatron-LM 都无法运行 {{docs}}。
 
 Miles 调用的至少四项能力在 v0.5.22 不存在：disk-delta 的 `/pull_weights` 端点、`register_lora_adapter`、`get_parallelism_info`、`--true-on-policy-contract` 参数。
 

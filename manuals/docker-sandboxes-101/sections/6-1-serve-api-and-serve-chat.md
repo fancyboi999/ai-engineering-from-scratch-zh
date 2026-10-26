@@ -32,7 +32,7 @@ models:
 
 ## serve api：先会话，再运行 {#s-serve-api-and-serve-chat-serve-api-a-session-then-a-run}
 
-**serve api：** “exposes your agents through a REST-style API with Server-Sent Events (SSE) streaming” {{docs-agent API Server}}，通过 REST 风格 API 和 SSE 提供 agent。监听 `127.0.0.1:8080`；`--auth-token` 为空表示不认证 {{help-agent docker-agent serve api}}。`--max-request-size` 对超过1 MiB 的正文返回413；`--session-workingdir-root` 限制新会话的 `working_dir` {{help-agent docker-agent serve api}}。
+**serve api：** {{docs-agent API Server}}，通过 REST 风格 API 和 SSE 提供 agent。监听 `127.0.0.1:8080`；`--auth-token` 为空表示不认证 {{help-agent docker-agent serve api}}。`--max-request-size` 对超过1 MiB 的正文返回413；`--session-workingdir-root` 限制新会话的 `working_dir` {{help-agent docker-agent serve api}}。
 
 这里会话数据库默认值不同。`serve api -s` 在当前目录写 `session.db`，而 `run`、`serve a2a` 和 `serve acp` 用 `<data-dir>/session.db` {{help-agent docker-agent serve api}}（[冲突 C63](#s-ref-sources-and-the-conflicts-register)）。录制传入 `-s work/api-session.db` 与 `--fake work/cassettes/23-api`，由 cassette 给出模型回答（capture/out/23-serve-api.log）。
 
@@ -105,7 +105,7 @@ caption: 从上向下读。墨色实线是请求，墨色虚线是回复，靛�
 
 ## serve chat：OpenAI 兼容子集 {#s-serve-api-and-serve-chat-serve-chat-the-openai-compatible-subset}
 
-**serve chat：** “exposes the agent through an OpenAI-compatible API at /v1/chat/completions and /v1/models” {{help-agent docker-agent serve chat}}，在这两个路径提供兼容 API。模型 id 为 agent 名称，所以录制列 `root`（文件内名称），而 `serve api` 用 `pong`（文件名）。
+**serve chat：** {{help-agent docker-agent serve chat}}，在这两个路径提供兼容 API。模型 id 为 agent 名称，所以录制列 `root`（文件内名称），而 `serve api` 用 `pong`（文件名）。
 
 ```listing
 title: 模型列表、一次 completion 与无 token 请求

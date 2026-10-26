@@ -8,7 +8,7 @@
 
 ## well-known 路径的 card {#s-serve-a2a-the-card-at-the-well-known-path}
 
-**serve a2a：** “Start an A2A server that exposes the agent via the Agent-to-Agent protocol” {{help-agent docker-agent serve a2a}}，启动 A2A agent 服务器。监听 `127.0.0.1:8082`；`-a` “defaults to the team's first agent” {{help-agent docker-agent serve a2a}}，默认团队首个 agent，而旧插件默认 `root`（[冲突 C64](#s-ref-sources-and-the-conflicts-register)）。`--auth-token` 覆盖 card 与所有调用，非回环监听需它或 `--insecure-no-auth` {{docs-agent A2A Protocol}}。会话安全策略默认 `restricted` {{docs-agent A2A Protocol}}。
+**serve a2a：** {{help-agent docker-agent serve a2a}}，启动 A2A agent 服务器。监听 `127.0.0.1:8082`；`-a` {{help-agent docker-agent serve a2a}}，默认团队首个 agent，而旧插件默认 `root`（[冲突 C64](#s-ref-sources-and-the-conflicts-register)）。`--auth-token` 覆盖 card 与所有调用，非回环监听需它或 `--insecure-no-auth` {{docs-agent A2A Protocol}}。会话安全策略默认 `restricted` {{docs-agent A2A Protocol}}。
 
 Docker Agent 文档没写 card 路径或协议版本（[冲突 C71](#s-ref-sources-and-the-conflicts-register)）。录制在 `/.well-known/agent-card.json` 找到 card；`/.well-known/agent.json` 及对 `/` 的 POST 都返回404（capture/README.md）。
 
@@ -129,11 +129,11 @@ caption: 从上向下读。墨色实线是请求，墨色虚线是回复，梅�
 | task `metadata` 以 `https://google.github.io/adk-docs/a2a/a2a-extension/` 为键 | 扩展在 `capabilities.extensions` 声明，数据以 URI 为键 | 不同：card 未声明扩展 |
 | artifact 唯一 part 是空 `data` 对象，标 `adk_partial` | artifact 需唯一 `artifactId` 及至少一个 part | 允许，但为空 |
 
-`adk_*` 来自服务器底层 A2A 库，v1.129.0 迁到 `adka2a/v2` {{rel-agent v1.129.0}}。文档列四个限制，包括“A2A artifact support not yet integrated” {{docs-agent A2A Protocol}}（[冲突 C70](#s-ref-sources-and-the-conflicts-register)），尚未集成 artifact。但录制答案以 artifact 到达，与之冲突。其他三项涉及工具事件、memory 与子 agent，pong agent 都没有，所以无法测试。
+`adk_*` 来自服务器底层 A2A 库，v1.129.0 迁到 `adka2a/v2` {{rel-agent v1.129.0}}。文档列四个限制，包括{{docs-agent A2A Protocol}}（[冲突 C70](#s-ref-sources-and-the-conflicts-register)），尚未集成 artifact。但录制答案以 artifact 到达，与之冲突。其他三项涉及工具事件、memory 与子 agent，pong agent 都没有，所以无法测试。
 
 ## a2a 工具集是客户端 {#s-serve-a2a-the-a2a-toolset-is-the-client-side}
 
-agent 文件用 `type: a2a` 工具集调用远程 agent，接受 `url`、可选 `name` 和 `headers`，如 `--auth-token` 的 bearer token {{docs-agent A2A Tool}}。schema 增加 `allow_private_ips`：“Opt in to dialling non-public IP addresses (valid for type 'fetch', 'api', 'openapi', 'a2a', and remote MCP toolsets)” {{schema allow_private_ips}}，显式允许这些类型拨号非公共 IP。不设置时直连拒绝回环，因此 `127.0.0.1:8082` 需 `allow_private_ips: true`。未运行此工具集。协议本身见 [A2A 课程](phases/13-tools-and-protocols/19-a2a-protocol)。
+agent 文件用 `type: a2a` 工具集调用远程 agent，接受 `url`、可选 `name` 和 `headers`，如 `--auth-token` 的 bearer token {{docs-agent A2A Tool}}。schema 增加 `allow_private_ips`{{schema allow_private_ips}}，显式允许这些类型拨号非公共 IP。不设置时直连拒绝回环，因此 `127.0.0.1:8082` 需 `allow_private_ips: true`。未运行此工具集。协议本身见 [A2A 课程](phases/13-tools-and-protocols/19-a2a-protocol)。
 
 ```takeaways
 - 从 `/.well-known/agent-card.json` 获取 card，再 POST 到 `supportedInterfaces` URL。

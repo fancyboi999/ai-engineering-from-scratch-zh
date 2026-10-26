@@ -1,6 +1,6 @@
 # 混合模型与缓存
 
-> 滑动窗口和 Mamba 层保存的状态，无法像逐 token 树那样在任意位置拆分，因此混合模型是当前 SGLang 缓存容易出错的地方。
+> 滑动窗口和 Mamba 层保存的状态，无法像逐 token 树那样在任意位置拆分，因此 v0.5.22 中许多缓存失败报告都来自混合模型。
 
 团队部署混合线性注意力和全注意力层的模型，开启 HiCache，运行二十个命中主机层的请求。二十个答案都流畅，却回答了另一个 prompt。Usage 显示全量缓存 token，日志没有警告。
 
@@ -47,9 +47,9 @@ caption: 从根向下读。按 --mamba-track-interval 默认值每 256 decode to
 
 ## Issue 中的问题
 
-v0.5.22 大多数开放缓存 bug 涉及混合模型，以下四个代表不同问题。
+v0.5.22 中有许多混合模型缓存问题报告。我们没有亲自运行混合模型。以下四个 issue 展示了不同故障类型。
 
-1. **主机层命中返回错误答案。** Issue #39830 是开头故事 {{issue #39830}}。开启 HiCache 的混合线性注意力模型，20 次主机命中全部流畅回答另一 prompt。冷请求和 GPU 命中正确。更早也有 GPU 路径同类报告。
+1. **主机层命中返回错误答案。** Issue #39830 是开头故事 {{issue #39830}}。开启 HiCache 的混合线性注意力模型，20 次主机命中全部流畅回答另一个 prompt。冷请求和 GPU 命中正确。
 2. **相同 prompt 完全不复用。** Issue #22935 中，重复 prompt 的匹配在边内结束，拆分节点没有 Mamba 状态 {{issue #22935}}，因此只能停在最后一个有状态节点，相同 prompt 也无法复用。
 3. **一种策略让首 token 慢 4.7 倍。** Issue #37834 中，某选项强制 `no_buffer` {{issue #37834}}。快照深度是后续请求无法到达的。检索负载命中率从 88.2% 降至 65.9%，平均 TTFT 从 226 ms 增至 1,063 ms。
 4. **默认值拖慢 decode。** Issue #36131 报告释放窗口外 SWA 槽位的新默认值 {{issue #36131}}，使 DGX Spark 和 Thor 上混合 SWA 模型的单流 decode 吞吐量下降。
@@ -62,7 +62,7 @@ v0.5.22 大多数开放缓存 bug 涉及混合模型，以下四个代表不同�
 2. **复用。** 重复 prompt，读取 `#cached-token`。相同 prompt 缓存数很少，表明遇到 issue #22935 的拆分问题。
 3. **延迟。** 比较 `--mamba-radix-cache-strategy auto` 与部署指南推荐策略的 TTFT。只有命中率仍保持时，才选择更快策略。
 
-每次升级前阅读模型家族的开放 issue。从 2026-09-01 到 v0.5.22 标签，334 个提交改动过缓存代码。混合模型的新版本可能修一个 bug，又引入另一个。
+每次升级前阅读模型家族的开放 issue。从 2026-09-01 到 v0.5.22 标签，`python/sglang/srt/mem_cache` 路径有约 330 个提交。混合模型的新版本可能修一个 bug，又引入另一个。
 
 ```takeaways
 - 每个新模型都读 hybrid_swa 与 hybrid_ssm。
@@ -72,4 +72,4 @@ v0.5.22 大多数开放缓存 bug 涉及混合模型，以下四个代表不同�
 - 每次升级前读模型家族的开放缓存 issue。
 ```
 
-Sources: python/sglang/srt/mem_cache/unified_radix_cache.py, python/sglang/srt/mem_cache/unified_cache/components/README.md, python/sglang/srt/arg_groups/fields/exec_.py (mamba_radix_cache_strategy, mamba_track_interval), python/sglang/srt/arg_groups/fields/schedule.py (swa_full_tokens_ratio), python/sglang/srt/arg_groups/model_overrides/deepseek_v4.py, python/sglang/srt/arg_groups/fields/observability.py (kv_canary) at v0.5.22, capture/out/server-default.log, issues #39830, #22935, #37834, and #36131.
+Sources: python/sglang/srt/mem_cache/unified_radix_cache.py, python/sglang/srt/mem_cache/unified_cache/components/README.md, python/sglang/srt/arg_groups/fields/exec_.py (mamba_radix_cache_strategy, mamba_track_interval), python/sglang/srt/arg_groups/fields/schedule.py (swa_full_tokens_ratio), python/sglang/srt/arg_groups/model_overrides/deepseek_v4.py, python/sglang/srt/arg_groups/fields/observability.py (kv_canary) at v0.5.22, capture/out/server-default.log, issues #39830, #22935, #37834, and #36131; 2026-09-01 至 v0.5.22 的 `python/sglang/srt/mem_cache` commit 列表（2026-10-22 计数：333）。

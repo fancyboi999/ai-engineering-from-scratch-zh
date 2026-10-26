@@ -15,12 +15,11 @@
     "verified": "2026-10-16"
   },
   "outcomes": [
-    "启动 SGLang，发送请求，读懂调度器为请求写下的每一行日志。",
-    "计算模型的 KV 缓存成本，有依据地设置池容量，并解释服务器为何耗尽内存。",
-    "编写能命中前缀缓存的 prompt，用 cached_tokens 和 /metrics 证明命中率。",
-    "对服务器做基准测试，找出并发拐点，同时报告 TTFT、TPOT 和吞吐量。",
-    "根据测量选择张量并行、数据并行、专家并行或 prefill-decode 分离。",
-    "判断公开 SGLang 基准的版本、负载，以及解释结果的机制。"
+    "安装 SGLang，启动模型，并让它通过两种 API 返回首个答案。",
+    "按 GPU 显存规划 KV 池，并排查启动时的显存不足。",
+    "按流量调整服务：共享 prompt、长文档、高并发或 FP8。",
+    "为自己的服务做基准测试，并用指标观察生产运行。",
+    "评估多 GPU 扩展方式，并在相信基准前核对其条件。"
   ],
   "palette": [
     {
@@ -124,24 +123,28 @@
   "front": "front.md",
   "plate": {
     "figure": "plate-sglang-request",
-    "title": "一个请求，三个进程，一个缓存",
-    "caption": "捕获记录中的聊天请求经过三个进程。基数缓存提供了 2,999 个 prompt token 中的 2,998 个。来源：capture/out/cache-experiment.txt。"
+    "title": "一张 L4 上的一棵基数树",
+    "caption": "在我们的 L4 上，system prompt 是基数树中共享节点，重复请求从该节点继续分支。重复请求缓存了 2,998/2,999 个 token，首 token 时间从 2,143.9 ms 降到 82.5 ms。来源：capture/gpu/out-l4/server-h2h-prefix-vllm-no-cache.log 等记录。"
   },
   "parts": [
     {
       "number": 1,
       "title": "一页读懂 SGLang",
-      "thesis": "推理服务引擎要让昂贵的 GPU 忙于计算此前未算过的 token，SGLang 的每项功能都服务于这个目标。",
-      "summary": "对比 prefill 与 decode，理解评估服务器的四个指标，跟踪捕获记录中的一个完整请求。",
+      "thesis": "先运行一个能回答请求的服务，再根据流量调整少数重要设置。",
+      "summary": "安装 SGLang、启动模型、检查健康状态并读懂请求经过服务时发生的事。",
       "accent": "blue",
       "sections": [
         {
           "id": "1.1",
-          "file": "sections/1-1-what-a-serving-engine-owns.md"
+          "file": "sections/1-1-install-sglang-and-serve-your-first-model.md"
         },
         {
           "id": "1.2",
-          "file": "sections/1-2-one-request-end-to-end.md"
+          "file": "sections/1-2-check-that-the-server-is-healthy.md"
+        },
+        {
+          "id": "1.3",
+          "file": "sections/1-3-what-the-server-does-with-your-request.md"
         }
       ]
     },
@@ -306,7 +309,7 @@
   ],
   "reference": {
     "title": "参考",
-    "thesis": "集中查阅本手册使用的参数、指标、事故、术语和来源。",
+    "thesis": "本手册使用的参数、指标、捕获记录和来源集中列在此处。",
     "accent": "grey",
     "sections": [
       {
@@ -332,8 +335,13 @@
       {
         "id": "R.6",
         "file": "sections/r-6-figure-index.md"
+      },
+      {
+        "id": "R.7",
+        "file": "sections/r-7-how-this-manual-was-made.md"
       }
-    ]
+    ],
+    "summary": "运行环境、捕获方法、证据标签与研究来源。"
   },
   "related": [
     "phases/17-infrastructure-and-production/04-vllm-serving-internals",

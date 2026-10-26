@@ -75,7 +75,7 @@ note: 省略了新条目的 args 数组。
 }
 ```
 
-Setup 报告 `ready`，动作为 `configured_claude_code`（capture/out/18-setup-claude-duplicate.json）。条目还包含捕获 Mac 的 Ghidra 目录与解析后的 JDK 主目录。由于捕获工具直接从 npx 缓存路径启动 rea，条目的 command 也是缓存路径。安装文档明确说："Do not register paths inside npm's temporary package cache." {{install Package runners and global installation}}。应通过 `npx -y rea-agents@6.7.0 setup` 获得固定版本的 `npx` 形式，或者从全局安装运行。
+Setup 报告 `ready`，动作为 `configured_claude_code`（capture/out/18-setup-claude-duplicate.json）。条目还包含捕获 Mac 的 Ghidra 目录与解析后的 JDK 主目录。由于捕获工具直接从 npx 缓存路径启动 rea，条目的 command 也是缓存路径。安装文档不建议将 npm 临时包缓存中的路径注册为 server {{install Package runners and global installation}}。应通过 `npx -y rea-agents@6.7.0 setup` 获得固定版本的 `npx` 形式，或者从全局安装运行。
 
 每次 setup 都先加 `--dry-run` 阅读计划，再去掉该选项重新运行，批准列出的更改。
 
@@ -250,7 +250,7 @@ caption: 从左到右，单位为秒。灰条为客户端默认值，灰色虚�
 
 客户端在启动期间放弃时，待处理查询可能已经中断。对同一目标再次调用 `open_binary` 会复用当前客户端，而非重新开始。文档规定的恢复在同一连接完成 {{mcp Ghidra first-query deadlines and recovery}}。若保留记录重要，先导出包，再调用 `close_binary` 并检查结果。然后使用相同路径与 `provider_id: "ghidra"` 调用 `open_binary`，以更长客户端期限重试首次查询。
 
-文档补充 "No macOS cold-start recovery was exercised." {{mcp Ghidra first-query deadlines and recovery}}，因此记录本手册的 Mac 也没有恢复运行记录。这里 `close_binary` 耗时 491 ms，关闭 Ghidra 进程及临时项目。两个工具描述都说明何时关闭：`open_binary` 以 "Call close_binary when the investigation is finished." 结尾，`close_binary` 以 "When the investigation is finished" 开头。
+文档没有记录 macOS 冷启动恢复测试 {{mcp Ghidra first-query deadlines and recovery}}，因此本手册的 Mac 捕获也没有相关恢复记录。这里 `close_binary` 耗时 491 ms，关闭 Ghidra 进程及临时项目。两个工具描述都说明何时关闭：`open_binary` 以 "Call close_binary when the investigation is finished." 结尾，`close_binary` 以 "When the investigation is finished" 开头。
 
 ```takeaways
 - 用精确版本注册 `npx -y rea-agents@6.7.0 mcp`，并重启客户端。

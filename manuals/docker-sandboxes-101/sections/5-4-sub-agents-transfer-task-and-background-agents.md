@@ -46,7 +46,7 @@ agents:
 
 ## transfer_task：子会话中的子 agent {#s-sub-agents-transfer-task-and-background-agents-transfer-task-a-child-in-a-sub-session}
 
-**委派：** 带 `agent`、`task` 和 `expected_output` 的 `transfer_task` 调用，由 `sub_agents` 添加到父 agent。“The call blocks until the sub-agent returns its result, which becomes the tool's response” {{docs-agent Transfer Task Tool}}，调用阻塞至子 agent 返回结果，结果成为工具响应。
+**委派：** 带 `agent`、`task` 和 `expected_output` 的 `transfer_task` 调用，由 `sub_agents` 添加到父 agent。{{docs-agent Transfer Task Tool}}，调用阻塞至子 agent 返回结果，结果成为工具响应。
 
 ```listing
 title: 一次委派与一次会话移交的事件
@@ -73,11 +73,11 @@ stream_stopped (stop, normal)
 
 writer 从未看到用户消息。子会话先有包含 `<task>` 和 `<expected_output>` 的系统消息，再有隐式用户消息“Please proceed.”。子会话用 writer 自己的 `max_iterations: 3`，`"tools_approved": false`。随后 `agent_switching` 把控制交回 `root`，句子作为工具响应返回。
 
-“Unlike other tools, `transfer_task` is always auto-approved” {{docs-agent Multi-Agent Systems}}，与其他工具不同，它总是自动批准。录制符合此规则：`--exec` 下未发确认。委派给链中已有 agent 会失败，嵌套深度最多10 {{docs-agent Transfer Task Tool}}。`sub_agents` 项也可为 registry 引用；未固定 digest 时每次运行重新解析 tag {{schema AgentConfig}}。
+{{docs-agent Multi-Agent Systems}}，与其他工具不同，它总是自动批准。录制符合此规则：`--exec` 下未发确认。委派给链中已有 agent 会失败，嵌套深度最多10 {{docs-agent Transfer Task Tool}}。`sub_agents` 项也可为 registry 引用；未固定 digest 时每次运行重新解析 tag {{schema AgentConfig}}。
 
 ## 会话移交 {#s-sub-agents-transfer-task-and-background-agents-the-session-move}
 
-**会话移交：** `handoffs` 添加的 `handoff` 调用，只带 `agent` 参数。指定 agent “becomes the active agent and sees the full conversation history” {{docs-agent Multi-Agent Systems}}，成为活跃 agent 并看到完整历史。录制中句子返回后，`root` 在下一模型轮次调用它。工具响应告知 `reviewer` 可用工具和 agent，再由 `reviewer` 回答用户。
+**会话移交：** `handoffs` 添加的 `handoff` 调用，只带 `agent` 参数。指定 agent {{docs-agent Multi-Agent Systems}}，成为活跃 agent 并看到完整历史。录制中句子返回后，`root` 在下一模型轮次调用它。工具响应告知 `reviewer` 可用工具和 agent，再由 `reviewer` 回答用户。
 
 第二条消息直接到达 `reviewer`，移交后 transcript 没有 `root` 行。`force_handoff` 在每个最终响应做同样移交，无需工具调用 {{schema AgentConfig}}。
 
@@ -98,7 +98,7 @@ root <- tool_call_response Run Background Agent: The user rejected the tool call
 stderr: Error: Agent terminated: detected 5 consecutive identical calls to run_background_agent. This indicates a degenerate loop where the model is not making progress.
 ```
 
-`--exec` 且无 `--safety` 时，调用本身请求批准，无终端便被拒绝。模型重复调用，直到运行时以退出码1停止。限制为 `max_consecutive_tool_calls`；0 “uses the default of 5” {{schema AgentConfig}}，使用默认5。运行中的任务内，“any tool call that would normally prompt the user for approval will be automatically denied” {{docs-agent Background Agents Tool}}，本需询问用户的调用自动拒绝。因此无界面协调者需为 `run_background_agent` 及子 agent 工具添加 `allow`。录制未测试此配置。
+`--exec` 且无 `--safety` 时，调用本身请求批准，无终端便被拒绝。模型重复调用，直到运行时以退出码1停止。限制为 `max_consecutive_tool_calls`；0 “uses the default of 5” {{schema AgentConfig}}，使用默认5。运行中的任务内，{{docs-agent Background Agents Tool}}，本需询问用户的调用自动拒绝。因此无界面协调者需为 `run_background_agent` 及子 agent 工具添加 `allow`。录制未测试此配置。
 
 套件每条消息只请求一次工具调用。一轮两次并行调用无法从 cassette 重放，见 [session.db、sessions diff 与 eval](#s-session-db-sessions-diff-and-eval)。
 

@@ -52,7 +52,7 @@ ports:
 
 ## 计划 {#s-sbxenv-yaml-and-sbx-env-plan-the-plan}
 
-`sbx env plan` 读取文件，打印应用后将设置的内容。“Nothing is applied, approved, or recorded” {{help-sbx sbx env plan}}，不应用、不批准、不记录。
+`sbx env plan` 读取文件，打印应用后将设置的内容。{{help-sbx sbx env plan}}，不应用、不批准、不记录。
 
 ```listing
 title: m101-env 的首个计划
@@ -96,7 +96,7 @@ note: LOAD ENVIRONMENT 块已截去。
 
 计划形状与文件一致，边栏携带结论。有五种符号 {{help-sbx sbx env}}：`+` 添加，`~` 改变，`-` 销毁；`>` 标记再次运行的命令，`!` 标记环境曾应用但已不再声明的资源。
 
-已批准且未变化的行不显示。“Literal secret values appear as SHA-256 digests” {{docs-sbx Review an environment plan}}，字面密钥值以 SHA-256 digest 展示。文件没写 `tcp4`：自 v0.42.0 发布端口默认用它 {{rel-sbx v0.42.0}}。[图](#fig-4-4) 跟踪文件经计划到状态记录。
+已批准且未变化的行不显示。{{docs-sbx Review an environment plan}}，字面密钥值以 SHA-256 digest 展示。文件没写 `tcp4`：自 v0.42.0 发布端口默认用它 {{rel-sbx v0.42.0}}。[图](#fig-4-4) 跟踪文件经计划到状态记录。
 
 ```figure
 id: fig-4-4
@@ -108,11 +108,11 @@ caption: 从上向下读。计划行来自 capture/out/14-env-plan.txt；右分�
 
 ## 宿主命令与批准 {#s-sbxenv-yaml-and-sbx-env-plan-host-commands-and-approval}
 
-`lifecycle` 块在沙箱外的宿主运行，使用你的权限。`initialize` 每次 `create`、`run` 执行，`postCreate` 在沙箱存在后执行，`preRemove` 在确认 `sbx env rm` 后执行 {{help-sbx sbx env}}。命令通过你的 shell 从项目目录运行，可逐命令指定 `workdir` 和 `timeout`。包含任意此类命令的环境“asks on every invocation, whether or not this one is what runs them” {{help-sbx sbx env}}，每次调用都询问，不论本次是否运行它们，因为批准命令也信任其脚本。`--skip-host-commands` 全部跳过，`--auto-approve` 一次回答是；`sbx settings set env.rememberHostCommands true` 则只在命令改变时再询问。
+`lifecycle` 块在沙箱外的宿主运行，使用你的权限。`initialize` 每次 `create`、`run` 执行，`postCreate` 在沙箱存在后执行，`preRemove` 在确认 `sbx env rm` 后执行 {{help-sbx sbx env}}。命令通过你的 shell 从项目目录运行，可逐命令指定 `workdir` 和 `timeout`。包含任意此类命令的环境{{help-sbx sbx env}}，每次调用都询问，不论本次是否运行它们，因为批准命令也信任其脚本。`--skip-host-commands` 全部跳过，`--auto-approve` 一次回答是；`sbx settings set env.rememberHostCommands true` 则只在命令改变时再询问。
 
 ## 状态记录与第二次计划 {#s-sbxenv-yaml-and-sbx-env-plan-the-state-record-and-the-second-plan}
 
-“What was approved is recorded per environment under sbx's state directory, not next to the file” {{help-sbx sbx env}}，批准按环境记录在 sbx 状态目录而非文件旁，“so a later invocation asks only about what moved” {{help-sbx sbx env}}，后续只问变化项。具体路径未录制，因为只运行 `plan`，从未 `create`。第二次录制改了一个输入：
+{{help-sbx sbx env}}，批准按环境记录在 sbx 状态目录而非文件旁，{{help-sbx sbx env}}，后续只问变化项。具体路径未录制，因为只运行 `plan`，从未 `create`。第二次录制改了一个输入：
 
 ```listing
 title: 同一文件改变一个参数
@@ -129,13 +129,13 @@ $ sbx env plan --env-arg greeting=servus ./fixtures/env
 
 每行仍是 `+`，因为从未应用。一次 `create` 后，同样编辑只会输出 `~ GREETING: hello -> servus`，其形式如帮助中的 kit 参数变化 {{help-sbx sbx env}}。工作区、kit、端口、密钥、绑定与 `sandboxOptions` 变更等下次 create；新 `env` 值传到下次会话 {{docs-sbx Update an environment}}。
 
-多个 `PATH` 按顺序深合并，“later files override earlier ones” {{help-sbx sbx env create}}，后文件覆盖前文件；`ports` 等列表连接而非覆盖。不传 `PATH` 时，家目录 `.sbxenv.yaml` 作为基础层合入 {{help-sbx sbx env create}}。项目中隐藏的 `.sbxenv.yaml` 不再读取。
+多个 `PATH` 按顺序深合并，{{help-sbx sbx env create}}，后文件覆盖前文件；`ports` 等列表连接而非覆盖。不传 `PATH` 时，家目录 `.sbxenv.yaml` 作为基础层合入 {{help-sbx sbx env create}}。项目中隐藏的 `.sbxenv.yaml` 不再读取。
 
 ## rm、只读文件与 --cloud {#s-sbxenv-yaml-and-sbx-env-plan-rm-the-read-only-file-and-cloud}
 
-`sbx env rm` 移除沙箱及其作用域配置的密钥。绑定属于用户全局，所以保留；“pass --prune-bindings to also remove the bindings this environment declares” {{help-sbx sbx env rm}}，加此参数可一并移除声明绑定。文件自身在沙箱内只读绑定，防止 agent 决定下次计划询问什么。`sandboxOptions.writableEnvFiles: true` 解除限制 {{help-sbx sbx env}}。
+`sbx env rm` 移除沙箱及其作用域配置的密钥。绑定属于用户全局，所以保留；{{help-sbx sbx env rm}}，加此参数可一并移除声明绑定。文件自身在沙箱内只读绑定，防止 agent 决定下次计划询问什么。`sandboxOptions.writableEnvFiles: true` 解除限制 {{help-sbx sbx env}}。
 
-带 `--cloud` 时，“workspace, additionalWorkspaces and clone name host directories, which a cloud sandbox cannot mount” {{help-sbx sbx env}}，这些宿主目录无法挂载；宿主端口绑定、MCP 定义与动态密钥来源在任何宿主命令前就被拒绝。[云端一节](#s-sbx-cloud-run-move-and-ttl) 展示剩余能力。
+带 `--cloud` 时，{{help-sbx sbx env}}，这些宿主目录无法挂载；宿主端口绑定、MCP 定义与动态密钥来源在任何宿主命令前就被拒绝。[云端一节](#s-sbx-cloud-run-move-and-ttl) 展示剩余能力。
 
 ```takeaways
 - `sbxenv.yaml` 在沙箱内默认只读；只有 agent 必须编辑时才设 `writableEnvFiles`。

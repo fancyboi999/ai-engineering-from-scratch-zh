@@ -103,7 +103,7 @@ note: x86-64 档案的完整 assembly 数组。Ghidra 以 Intel 语法和大写�
 
 ## 不返回警告放在哪里
 
-`_grade` 的 `raw_result.limitations` 为空。函数调用被 Ghidra 标为不返回的目标时，扫描可能在此停止，这个列表会给出调用点。在 macOS 与 Linux 上，rea 导入后运行修复脚本，清除六个常见库名称的错误不返回标志，因此这里读取的是修复后的函数体。文档说明未清除标志的效果："An inferred no-return call can terminate that body before subsequent bytes." {{ghidra §Admitted function-analysis semantics}}
+`_grade` 的 `raw_result.limitations` 为空。函数调用被 Ghidra 标为不返回的目标时，扫描可能在此停止，这个列表会给出调用点。在 macOS 与 Linux 上，rea 导入后运行修复脚本，清除六个常见库名称的错误不返回标志，因此这里读取的是修复后的函数体。Ghidra 文档说明，若不清除这个推断标志，函数体可能在后续字节之前就被截断 {{ghidra §Admitted function-analysis semantics}}。
 
 ```takeaways
 - 分组读汇编：常量、算术、比较与分支、返回。

@@ -57,11 +57,13 @@ caption: 从左向右读。数字为 KVPoll 类中的值。琥珀色箭头为状
 
 默认值均来自 v0.5.22 代码 {{code}}。`mooncake_tcp` 适用于没有 RDMA 网卡的集群，我们没有测量它的速度。
 
-不要直接请求 prefill 或 decode 服务器。调度器会断言 bootstrap room 存在，错误信息为“Do not send requests directly to prefill or decode instances; send to the router instead” {{code}}。
+请求必须发送给 router，不能直接请求 prefill 或 decode 服务器。调度器会检查是否提供了 bootstrap room {{code}}。
 
 ## 我们的建议
 
 不要从分离部署开始。先用单服务器，再在网关后添加数据并行副本。只有实测证明，在服务并发下 prefill 干扰损害 token 间延迟，才拆分两者。分离增加了另一组故障：bootstrap、RDMA 传输、两个超时，以及必须正确配对服务器的路由器。
+
+尾延迟收益有适用条件，不是分离部署的默认保证。2025 年的一项研究比较了分离服务器与同时运行 prefill、decode 的服务器。研究发现收益取决于请求负载和 KV cache 传输路径。我们没有复测这项研究。决定保留分离架构前，应使用相同 GPU 和相同流量，与单服务器配置对比 {{paper disaggregated-serving 2025-11}}。
 
 一次真实事故展示跳过测量的代价。用户各运行一台 TP4 的 prefill 和 decode 服务器（[issue #12591](https://github.com/sgl-project/sglang/issues/12591)），TTFT 却高于不分离的单台 TP4。原因是旧 Mooncake 传输引擎，升级后修复。维护者还建议，在不使用注意力数据并行时设置 `SGLANG_DISAGGREGATION_QUEUE_SIZE=1`。没有单服务器基线，就没人能知道分离让结果更差。
 
@@ -69,7 +71,7 @@ caption: 从左向右读。数字为 KVPoll 类中的值。琥珀色箭头为状
 
 GLM-4.5 部署在并发 64 时，prefill 端记录大量“Prefill bootstrap failed”和“Aborted by AbortReq”（[issue #9266](https://github.com/sgl-project/sglang/issues/9266)）；并发四至七却正常。路由器给 prefill 客户端的超时太短，中止了仍在运行的请求。[PR #9803](https://github.com/sgl-project/sglang/pull/9803) 修复了超时。
 
-维护者在相关讨论中给出一般规则（[issue #9926](https://github.com/sgl-project/sglang/issues/9926)）：“Aborted by AbortReq”意味着客户端或路由器主动中止。怀疑传输前，先查超时。
+维护者在相关讨论中给出一般规则（[issue #9926](https://github.com/sgl-project/sglang/issues/9926)）：`Aborted by AbortReq` 表示客户端或路由器主动中止。怀疑传输前，先查超时。
 
 Novita AI 在 H200 上运行 GLM-4.7 时发现另一种延迟 {{field Novita 2026-01}}。分离搭配重叠调度器，吞吐量提高约 10%，TTFT 却严重恶化。Prefill 端的 KV 传输等待下一 batch 的内核启动；没有 CUDA graphs 时，他们 92 层模型的启动需要数百毫秒。修复新增了 `--disaggregation-async-transfer` 参数。我们在 v0.5.22 代码中找不到它，复制命令前先核对版本。
 
@@ -77,7 +79,9 @@ Novita AI 在 H200 上运行 GLM-4.7 时发现另一种延迟 {{field Novita 202
 
 比例取决于流量。dstack 在八张 H200 上，用 SGLang 分离部署和纯张量并行测试 gpt-oss-120b {{field dstack 2025-09}}。高并发下，一台 prefill 配三台 decode，在 prefill 重、decode 重、均衡三类负载中，各指标都胜出。低并发下，三比一、二比二的 TTFT 更好。[文章](https://dstack.ai/blog/benchmarking-pd-ratios/) 只有图表、无绝对数字，因此只能作为方向参考。
 
-最大规模的例子中，SGLang 团队报告使用每节点八张 H100 的配置运行 DeepSeek，并列出 4 个 prefill 节点和 9 个 decode 节点；原报告同时称总计 12 个节点，与这组分配不一致，不能据此核算总 GPU 数 {{team 2025-05}}。他们报告输入长度 2000 token 时，每节点每秒输入 52.3k、输出 22.3k token。Mooncake 团队则报告 Kimi K2 在 128 张 H200 上使用 4 个 prefill、12 个 decode 节点 {{team 2025-07}}。更多节点分给 decode，是为了让 KV 池能容纳大小 480 的 batch。两份都是系统建设团队自己的报告。
+在最大规模的例子中，SGLang 团队报告用 12 个节点、每节点八张 H100 运行 DeepSeek {{team 2025-05}}。报告中的 prefill 测量使用 4 个节点，decode 测量使用 9 个节点，两个角色分开运行。团队报告输入长度 2,000 token 时，每节点每秒处理 52.3k 个输入 token 和 22.3k 个输出 token。
+
+Mooncake 团队则报告 Kimi K2 在 128 张 H200 上使用 4 个 prefill、12 个 decode 节点 {{team 2025-07}}。更多节点分给 decode，是为了让 KV 池能容纳大小为 480 的 batch。这两份都是系统构建团队自己发布的结果。
 
 ## 两张 L4 上发生了什么
 
@@ -100,11 +104,11 @@ Mean TTFT (ms):                          0.00
 
 Decode 一次只能运行两个请求，另外 19 个等待 decode 内存。Prefill 不断为它们生成 KV 缓存，发往 decode 的 TCP 传输队列填满。扫描开始三分钟后，传输会话失败，此后没有恢复，所有后续请求传输均失败。
 
-危险之处发生在后面。每个失败请求通过路由器仍返回 HTTP 200，但没有文本。基准把 240 个请求全部计为成功，还打印出比 FP8 服务器更高的吞吐量。只有两个数字露出了问题：重新分词后的输出 token 数为零，平均 TTFT 为 0.00 ms。
+危险之处发生在后面。每个失败请求通过路由器仍计为成功，但没有文本。每秒 8 个请求时，基准把 240 个请求全部计为成功，并报告 751.85 输出 token/s，高于同速率下 FP8 服务器的 728.61。只有两个数字露出了问题：重新分词后的输出 token 数为零，平均 TTFT 为 0.00 ms。
 
 我们没有发布那些吞吐量数字。现在工具会拒绝所有请求 TTFT 均为 0 的运行。
 
-上游随后反向拆分。Decode 获得完整的 24,094 token 池，prefill 放在共享卡上，池容量为 2,925。不超过 8 用户时，每个请求都返回文本。16 用户时，8,192 个生成 token 中只有 2,048 个以文本返回。32 用户时，所有请求都返回空内容，工具停止了扫描。
+上游随后反向拆分。Decode 获得完整的 24,094-token 池，prefill 使用共享卡上的 2,925-token 池。从 1 到 8 用户时，每个请求都返回文本。16 用户时，8,192 个生成 token 中只有 2,048 个以文本返回。32 用户时，所有请求都返回空内容，工具停止了扫描。
 
 ```listing
 title: 交换角色后的分离部署失败记录
@@ -123,7 +127,7 @@ c32: Total generated tokens: 16384
 c32: Total generated tokens (retokenized): 0
 ```
 
-固定速率扫描和原始拆分方向分别在每秒 4 个请求和 4 用户时以同样方式失败。上游没有获得这对显卡在负载下分离部署的有效实测结果，也不声称有。阅读任何分离部署基准的吞吐量前，先检查 `Total generated tokens (retokenized)`。
+原始拆分方向的两次扫描都很早失败。并发 2 时，8,192 个生成 token 中仅有 512 个以文本返回；并发 4 时，一个都没有。固定速率扫描从每秒 0.5 个请求起就丢失大部分输出。上游没有获得这对显卡在负载下分离部署的有效实测结果，也不声称有。阅读任何分离部署基准的吞吐量前，先检查 `Total generated tokens (retokenized)`。
 
 ## 应该测什么
 

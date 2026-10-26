@@ -8,11 +8,11 @@
 
 rea 中这个词涵盖三种东西，只有一种是可以保留的缓存。
 
-**目标快照：** Ghidra 启动器以 `-readOnly` 和 `-deleteProject` 导入的输入私有副本。会话关闭时删除，分析不保留："Each new provider session still imports the target into a fresh temporary project." {{mcp Ghidra first-query deadlines and recovery}}
+**目标快照：** Ghidra 启动器以 `-readOnly` 和 `-deleteProject` 导入的输入私有副本。每个新的 provider session 都会重新导入目标；会话关闭后，这个副本随项目删除 {{mcp Ghidra first-query deadlines and recovery}}
 
 **分析快照缓存：** 单会话内存表 `AnalysisSnapshotCache`，为一个目标标识保存最多 10,000 项。这是本节讨论的缓存。
 
-**快照文件：** `close_binary` 写入、`open_binary` 读取的 JSON 文件。包含目标标识、provider 绑定、缓存条目和会话 Evidence bundle。CLI 文档说明它是什么、不是什么："These are cached observations, not a saved provider database: only eligible exact queries can reuse a result, and new or live queries can still require provider startup." {{cli Save and reuse analysis snapshots}}
+**快照文件：** `close_binary` 写入、`open_binary` 读取的 JSON 文件。包含目标标识、provider 绑定、缓存条目和会话 Evidence bundle。CLI 文档说明，快照文件保存的是可复用观察，不是 provider 数据库。只有符合条件的精确查询能命中；新的或实时查询仍可能启动 provider {{cli Save and reuse analysis snapshots}}
 
 ## 查询 id
 
@@ -75,7 +75,9 @@ caption: 从上向下读。虚线回复是重放，实线调用是 provider 运�
 
 ## 保存与加载
 
-`close_binary` 接收 `snapshot_path` 和 `overwrite`。`closeWithSnapshot` 等待进行中的调用结束，导出快照、写文件、关闭 provider。回执增加 `primitive_entries`、`workflow_entries`、`evidence_records`。`open_binary` 也接收 `snapshot_path`，打开目标前读取文件，将条目导入新会话。采集关闭两个目标时都没有提供路径，因此两次 `close_binary` 结果为 `null`（`10-mcp-15-close-binary-O1.json`、`10-mcp-25-close-binary-O2.json`）。CLI 选项是 `--snapshot`："An exact CLI cache hit is normally read before starting a provider process." {{cli Save and reuse analysis snapshots}} Windows 的 Ghidra provider 可能先启动，因为必须接纳源文件。
+`close_binary` 接收 `snapshot_path` 和 `overwrite`。`closeWithSnapshot` 等待进行中的调用结束，导出快照、写文件、关闭 provider。回执增加 `primitive_entries`、`workflow_entries`、`evidence_records`。`open_binary` 也接收 `snapshot_path`，打开目标前读取文件，将条目导入新会话。采集关闭两个目标时都没有提供路径，因此两次 `close_binary` 结果为 `null`（`10-mcp-15-close-binary-O1.json`、`10-mcp-25-close-binary-O2.json`）。
+
+CLI 通过 `--snapshot` 使用快照。精确 CLI 缓存命中时，通常会在启动 provider 进程前读取结果 {{cli Save and reuse analysis snapshots}}。Windows 上的 Ghidra provider 可能仍会先启动，因为它必须接收源文件。
 
 加载文件会完整检查。条目必须按规范 id 排序，每个查询 id 都重新计算并匹配，id 不得重复。每项都必须在 bundle 中有配置与结果相同的 Evidence 记录。bundle 记录若针对另一目标，整个文件失败。
 
@@ -112,7 +114,7 @@ note: 三项限制中省略两项。
 
 rea 向 provider 发送这种调用前，`BinarySession` 调用 `invalidateSnapshot`，清空缓存并设置标志。从此每次查找都为空，新结果不保存，导出失败并报 "Analysis snapshots are unavailable because analysis metadata may have changed"。错误给出退出方法：用 `export_evidence_bundle` 导出 Evidence，不带快照关闭目标，再重新打开。变更后的导入也以相同方式拒绝。
 
-6.7.0 的顺序是先失效，再调用 provider。失败回复无法证明写入没有到达 Ghidra，因此变更调用即使失败也关闭缓存。6.4.0 顺序相反，只在成功调用后失效。CLI 文档说明规则："Dispatching a metadata write invalidates the active session's snapshot cache, even if its reply fails: the provider may already have applied the write." {{cli Save and reuse analysis snapshots}}
+6.7.0 会先让缓存失效，再调用 provider。调用失败也会使缓存失效，因为失败回复无法证明写入没有到达 Ghidra。6.4.0 的顺序相反，只在调用成功后才失效。CLI 遵循相同规则 {{cli Save and reuse analysis snapshots}}
 
 ```takeaways
 - 以相同参数重复查询获得缓存答案，并阅读追加的限制。

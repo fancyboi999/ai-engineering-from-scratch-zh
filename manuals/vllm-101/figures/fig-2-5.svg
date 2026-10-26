@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-2-5-title fig-2-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-2-5-title">锁定时钟为 900 MHz 时，32 用户下的 FP8 权重</title>
+  <desc id="fig-2-5-desc">在 NVIDIA L4 上以 32 个用户运行 Qwen3-8B 的 BF16 和 FP8 checkpoint，SM 时钟锁定为 900 MHz，KV 缓存池固定为 24,096 个 token，每种设置使用两个随机种子。BF16 每秒输出 208.8 个 token，FP8 为 284.7 个。每个 token 的耗时中位数分别为 119.9 ms 和 83.8 ms。</desc>
+  <text x="66" y="30" font-size="12" fill="var(--m-ink, #1a1a1a)">输出 token/s，越高越好</text>
+  <line x1="66" y1="260" x2="286" y2="260" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="60" y="264" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="66" y1="155" x2="286" y2="155" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="60" y="159" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">200</text>
+  <line x1="66" y1="50" x2="286" y2="50" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="60" y="54" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">400</text>
+  <line x1="66" y1="260" x2="286" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="66" y1="50" x2="66" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <rect x="91" y="150.4" width="60" height="109.6" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="121" y="144.4" font-size="11" text-anchor="middle" fill="var(--m-grey-ink, #5e5e59)">208.8</text>
+  <text x="121" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">BF16</text>
+  <rect x="201" y="110.54" width="60" height="149.46" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="231" y="104.54" font-size="11" text-anchor="middle" fill="var(--m-green-ink, #336b40)">284.7</text>
+  <text x="231" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">FP8</text>
+  <text x="366" y="30" font-size="12" fill="var(--m-ink, #1a1a1a)">单 token 中位耗时 ms，越低越好</text>
+  <line x1="366" y1="260" x2="586" y2="260" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="360" y="264" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="366" y1="190" x2="586" y2="190" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="360" y="194" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">50</text>
+  <line x1="366" y1="120" x2="586" y2="120" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="360" y="124" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100</text>
+  <line x1="366" y1="50" x2="586" y2="50" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="360" y="54" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">150</text>
+  <line x1="366" y1="260" x2="586" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="366" y1="50" x2="366" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <rect x="391" y="92.18" width="60" height="167.82" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="421" y="86.18" font-size="11" text-anchor="middle" fill="var(--m-grey-ink, #5e5e59)">119.9</text>
+  <text x="421" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">BF16</text>
+  <rect x="501" y="142.65" width="60" height="117.35" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="531" y="136.65" font-size="11" text-anchor="middle" fill="var(--m-green-ink, #336b40)">83.8</text>
+  <text x="531" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">FP8</text>
+  <text x="66" y="312" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两次运行均为 32 用户，使用相同 KV 缓存池。数值是两个随机种子的中位数。</text>
+</svg>

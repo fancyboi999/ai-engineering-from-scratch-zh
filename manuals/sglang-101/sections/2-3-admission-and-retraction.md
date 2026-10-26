@@ -79,9 +79,9 @@ Mean TPOT (ms):                          24.26
 
 **回撤：** 从 decode 批次移除运行请求，释放其 KV 槽位，并放回等待队列。它们之后重新 prefill。
 
-检查失败时，SGLang 输出 `KV cache pool is full. Retract requests.`。它优先回撤输出 token 最少的请求；相同输出数量中优先回撤 prompt 最长的，因为丢失工作最少 {{code}}。随后重置比例为新估计值：已解码 token 加每请求 20 token，再除以 `max_new_tokens` 总量。v0.5.22 中，若只剩最后一个请求仍放不下，会以 “Out of memory even after retracting all other requests” 中止它，避免无限循环。
+检查失败时，SGLang 输出 `KV cache pool is full. Retract requests.`。它优先回撤输出 token 最少的请求；输出数量相同时，优先回撤 prompt 最长的请求，因为这样损失的工作最少 {{code}}。随后重置比例为新估计值：已解码 token 加每请求 20 token，再除以 `max_new_tokens` 总量。v0.5.22 中，若回撤所有其他请求后最后一个请求仍放不下，调度器会中止它，结束循环 {{code}}。
 
-上游小池运行没有发生回撤，指标端点证实了这一点。
+我们的小池运行没有发生回撤。服务器日志没有 `Retract requests` 记录，指标端点也显示为零，但这个指标有一个限制：`num_retracted_reqs` 是 gauge，调度器每个日志间隔都会重置它。因此读数为 0 只覆盖最近一个间隔。`num_retracted_requests_total` 才是整次运行的累计计数。
 
 ```listing
 title: 小池运行中回撤为零
@@ -103,7 +103,7 @@ caption: 从左向右按 decode 步读。琥珀色线为未设置 ignore_eos 的
 
 ## 事故：回撤成为问题
 
-一台八张 H20 运行 DeepSeek-R1 的服务器，各 rank 反复输出 `KV cache pool is full. Retract requests.`，随后连健康检查也不响应 {{issue #8463}}。评论者追到原因：回撤无法释放足够内存，循环永不结束。Issue 未修复便关闭。v0.5.22 中止最后一个请求的行为处理了该循环。
+一台八张 H20 运行 DeepSeek-R1 的服务器，各 rank 反复输出 `KV cache pool is full. Retract requests.`，随后连健康检查也不响应 {{issue #8463}}。评论者认为，回撤未能释放足够内存，导致循环重复。Issue 未修复便关闭。v0.5.22 会在回撤所有其他请求后仍然缺少内存时中止最后一个请求。这个改动用于结束循环，但我们没有复现该事故。
 
 另一用户发现回撤后 decode 吞吐量从约 429 token/s 降到 20至38，并一直维持低位 {{issue #26248}}。该 issue 因不活跃而关闭，未记录原因。教训仍成立：日志中的回撤是性能警报。
 
@@ -113,7 +113,7 @@ caption: 从左向右按 decode 步读。琥珀色线为未设置 ignore_eos 的
 
 SGLang 调优文档认为偶尔回撤（约每分钟一次）可以接受。超过该频率应视作配置问题。提高 `--schedule-conservativeness`，例如设为 1.3，让预测初值更高；或降低 `--max-running-requests`。不要只靠增大 `--mem-fraction-static` 修复，[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)说明代价。
 
-客户端应设置合理的 `max_new_tokens`。请求 4,096 却只用 200 token，会让每个新请求看起来比实际大约 20 倍。
+客户端应设置合理的 `max_new_tokens`。如果请求 4,096 个输出 token 却只使用 200，准入控制会为每个新请求预留约 20 倍的实际输出空间。
 
 ```takeaways
 - 按未缓存 prompt 加 max_new_tokens 与空闲池比较，计算准入。

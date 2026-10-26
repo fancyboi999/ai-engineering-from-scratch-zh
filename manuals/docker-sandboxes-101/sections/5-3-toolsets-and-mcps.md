@@ -80,7 +80,7 @@ note: description 与 output schema 已截去。
 …
 ```
 
-`debug tool FILE TOOL JSON` 不经过模型轮次直接调用工具；“Calls have real side effects and bypass other hooks and approval checks” {{help-agent docker-agent debug tool}}，有真实副作用，绕过其他 hooks 与批准检查。`20-debug-tool.txt` 中，`shell` 参数 `{"cmd":"echo m101-direct"}` 输出 `m101-direct`。模型调用前可用它测试工具。
+`debug tool FILE TOOL JSON` 不经过模型轮次直接调用工具；{{help-agent docker-agent debug tool}}，有真实副作用，绕过其他 hooks 与批准检查。`20-debug-tool.txt` 中，`shell` 参数 `{"cmd":"echo m101-direct"}` 输出 `m101-direct`。模型调用前可用它测试工具。
 
 ## 工具集共有键 {#s-toolsets-and-mcps-keys-every-toolset-shares}
 

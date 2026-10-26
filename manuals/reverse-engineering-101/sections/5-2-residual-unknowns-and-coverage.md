@@ -19,13 +19,13 @@ note: 文件第 1052 行和第 1894 行，之间内容全部省略。
 "Resolved reference metadata identifies computed, indirect, external, call, jump, and data edges; unresolved targetless flows remain unknown, and function classifications distinguish thunks and externals.",
 ```
 
-provider 文档用一句话给出同样限制："Callers/callees contain only resolved functions." {{ghidra Admitted function-analysis semantics}}
+provider 文档说明 callers 与 callees 只包含已解析的函数 {{ghidra Admitted function-analysis semantics}}
 
-所有 rea 工具背后的设计规则更短："Missing coverage is unknown, not absence." {{design Define the contract}}
+rea 的设计规则是：缺少覆盖数据表示未知，不能据此断言目标不存在 {{design Define the contract}}
 
 **关系覆盖：** Evidence 记录的 `relationship_coverage` 字段，说明调用者与被调用者集合的完整程度。状态为 `complete`、`partial` 或 `unknown`。`partial` 列出限制，可指明受限方向。`unknown` 给出原因。provider 未为 `procedure_callers` 或 `procedure_callees` 报告覆盖时，rea 写入 `unknown`。其他操作没有覆盖时写 `null`。
 
-provider 的注意事项保留在 `limitations`，不会使覆盖变为 partial。同一契约界定 `complete`："`complete` means that set was returned without a known read limit; it does not claim every possible runtime edge." {{design Define the contract}}
+provider 的注意事项保留在 `limitations`，不会使覆盖变为 partial。`complete` 表示 provider 返回了集合且没有已知读取限制，但不保证包含所有运行时边 {{design Define the contract}}
 
 档案有一部分确实以数字声明覆盖。值流报告是否被截断，以及省略的操作、输入和边数量。`inspect-evidence-bundle` 为 bundle 中每份档案重复这些数字。
 
@@ -49,7 +49,7 @@ note: 八条记录之一，native_dossier 之前字段已省略。
 }
 ```
 
-这里的零是 rea 明确担保的计数，其他位置的空数组却没有这样的说明。契约说明这些字段的用途："`native_dossier.value_flow` independently reports truncation, unavailable or unknown metadata." {{mcp Tool results}}
+这里的零是 rea 明确担保的计数，其他位置的空数组却没有这样的说明。`native_dossier.value_flow` 会分别报告数据截断、不可用和未知元数据 {{mcp Tool results}}
 
 采集中另外两个空列表说明同样道理。`14-compare-bundles.json` 的 `rea compare` 列出十条只存在于一个 bundle 的记录，全部归类为 `unknown`，结论类别为 `unresolved_branch`，因为 bundle 没有完整性标记（见[比较](#s-compare-and-compare-functions)）。`15-js-app-view-summary.json` 的 JavaScript 摘要视图为一个六文件应用报告 `"semantic_unknowns": 118`，语义覆盖标为 `unknown`（见[应用图](#s-analyze-javascript-application)）。[图](#fig-5-3)将三种列表并排。
 

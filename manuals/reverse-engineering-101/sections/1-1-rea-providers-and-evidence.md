@@ -12,15 +12,15 @@
 
 id 由 `ev_` 和语义内容的 SHA-256 组成。同样字节上的同样观察，在任何机器上都得到同一 id。即使 `relationship_coverage` 为 `null`，也在 id 覆盖范围内。因此旧版 rea 的记录可能无法通过新版检查（[第 5.4 节](#s-evidence-bundles-export-and-import)）。`confidence` 为 `observed`、`derived` 或 `inferred`，`authority` 说明支撑事实的来源类型。
 
-MCP 文档规定：“产生 Evidence 的工具，在文本和结构化内容中都返回完整规范 Evidence 记录。”{{mcp Tool results}}。[第 1.2 节](#s-rea-function-end-to-end)逐字段阅读一条记录，[第 5 部分](#p-5)完整介绍记录。
+MCP 工具会在文本和 `structuredContent` 中都返回完整、规范的 Evidence 记录 {{mcp Tool results}}。[第 1.2 节](#s-rea-function-end-to-end)逐字段阅读一条记录，[第 5 部分](#p-5)完整介绍记录。
 
 **Provider：** 统一接口后的分析引擎。`GhidraProvider implements AnalysisProviderCandidate`，提供 `identity()`、`capabilities()`、`inspectAvailability()`、`inspectTargetSupport(target)`、`resolveAnalysisProfile(...)` 和 `createClient(...)`。6.7.0 的会话有四个深度 provider：`hopper`、`ghidra`、`ida`、`kuna`，另有无需引擎的辅助 provider。本手册仅使用 `ghidra`。Kuna 需要自行安装，其已有覆盖记录在 Linux；录制 Mac 将它报告为 `not_configured`。
 
-注册表按 id 排序候选，不启动引擎即可选择，“注册顺序从不影响选择或调用者可见的输出”。绑定后保持不变：“选定的 provider 在运行时失败后绝不会被自动替换。”{{mcp Identity and discovery}}。
+注册表按 id 排序候选，因此无需启动引擎即可选择。注册顺序不会影响选择或调用者可见的输出。provider 绑定后不会变化；运行失败时系统不会自动切换 provider {{mcp Identity and discovery}}。
 
-**适配器：** 调用者访问会话的方式。独立 CLI 有 153 条命令和一个别名，MCP 服务有 207 个工具和 6 个 prompt。捕获的 `server_identity.catalog.counts` 报告这些数字（capture/out/02-capabilities.json）。两种适配器共享一个 `BinarySession`，它“管理 CLI 与 MCP 适配器共享的唯一活动目标”。CLI 名称用连字符，MCP 名称用 `_` 分词。native 家族例外：`rea function` 调用 `analyze_function`，`rea decompile` 调用 `procedure_pseudo_code`，`rea analyze` 调用 `binary_overview`。
+**适配器：** 调用者访问会话的方式。独立 CLI 有 153 条命令和一个别名，MCP 服务有 207 个工具和 6 个 prompt。捕获的 `server_identity.catalog.counts` 报告这些数字（capture/out/02-capabilities.json）。两种适配器共享一个 `BinarySession`，由它管理唯一的活动目标。CLI 名称用连字符，MCP 名称用 `_` 分词。native 家族例外：`rea function` 调用 `analyze_function`，`rea decompile` 调用 `procedure_pseudo_code`，`rea analyze` 调用 `binary_overview`。
 
-rea 不替你规划调查。维护者在路线图中划分职责：“agent 选择目标，并利用检查、捕获、跟踪和比较结果组织调查”（[rea issue 32](https://github.com/morluto/rea/issues/32)）。同文要求工具结果“区分观察、推断和未知项”。规划由你或 agent 负责，rea 为每个问题返回可检查的记录。
+rea 不替你规划调查。REA issue 32 的路线图将调查规划交给 agent：它选择目标，并综合检查、捕获、跟踪和比较结果组织调查。该路线图还要求工具结果区分观察、推断与未知项（[rea issue 32](https://github.com/morluto/rea/issues/32)）。规划由你或 agent 负责，rea 为每个问题返回可检查的记录。
 
 捕获对同一文件使用了两种适配器：
 
@@ -56,7 +56,7 @@ caption: 各栈从上往下读。计数来自 capture/out/02-capabilities.json �
 
 ## rea 交给 Ghidra 的工作
 
-rea 没有自己的反汇编器或反编译器。面对原生可执行文件，它在新的临时项目中启动 `analyzeHeadless`，导入文件的私有副本，让 Ghidra 默认自动分析完成，再通过 socket 提问。回答来自 Ghidra。函数档案“组合 Ghidra FunctionManager、Listing、ReferenceManager、BasicBlockModel 和反编译器观察”，每条 `analyze_function` 的限制都如此说明（capture/out/06-function-percent-change.json）。provider 文档也划清边界：“伪代码是 Ghidra 反编译器输出，两者都不是原始源码。”{{ghidra Admitted function-analysis semantics}}。
+rea 没有自己的反汇编器或反编译器。面对原生可执行文件，它在新的临时项目中启动 `analyzeHeadless`，导入文件的私有副本，让 Ghidra 默认自动分析完成，再通过 socket 提问。回答来自 Ghidra。函数档案会组合 Ghidra FunctionManager、Listing、ReferenceManager、BasicBlockModel 和反编译器的观察；每条 `analyze_function` 限制都有说明（capture/out/06-function-percent-change.json）。伪代码来自 Ghidra decompiler，并非程序的原始源码 {{ghidra Admitted function-analysis semantics}}。
 
 **桥接：** `ReaGhidraBridge.java` 是一个 `GhidraScript`，由 `analyzeHeadless` 作为最后的 post-script 运行，随后在 Unix socket 上服务请求。请求是一行 JSON：`{ id, token, method, params }`；回复为 `{ id, ok: true, result }` 或 `{ id, ok: false, error }`。桥接通过一个 Java `switch` 处理 17 个清单方法和 13 个函数方法。[第 4 部分](#p-4)逐项追踪。
 

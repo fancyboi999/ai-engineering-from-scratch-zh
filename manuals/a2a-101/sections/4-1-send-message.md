@@ -21,7 +21,7 @@ planner 用同一个方法向 `code-reviewer` 发送两条消息。第一条询�
 label: 默认阻塞
 source: spec §3.2.2
 ---
-"The operation MUST wait until the task reaches a terminal state (`TASK_STATE_COMPLETED`, `TASK_STATE_FAILED`, `TASK_STATE_CANCELED`, `TASK_STATE_REJECTED`) or an interrupted state (`TASK_STATE_INPUT_REQUIRED`, `TASK_STATE_AUTH_REQUIRED`) before returning."
+操作必须等到任务进入终态或中断态后再返回。终态包括 `TASK_STATE_COMPLETED`、`TASK_STATE_FAILED`、`TASK_STATE_CANCELED` 和 `TASK_STATE_REJECTED`；中断态包括 `TASK_STATE_INPUT_REQUIRED` 与 `TASK_STATE_AUTH_REQUIRED`。
 ```
 
 `03-blocking-task.http` 中，不带 `configuration` 的 `SendMessage` 返回任务 `3d8f7801`，状态为 `TASK_STATE_COMPLETED`，包含全部产物。客户端看不到 `TASK_STATE_SUBMITTED` 或 `TASK_STATE_WORKING`。规范不设时间上限，客户端超时后就无法获知任务 ID。 {{spec §3.2.2}} {{spec §3.4.2}}

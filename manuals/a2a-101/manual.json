@@ -100,7 +100,12 @@
     "proto": "research/sources/a2a.proto",
     "docs": "research/sources/docs.md",
     "sdk": null,
-    "spec-main": "research/sources/specification-main.md"
+    "spec-main": "research/sources/specification-main.md",
+    "sdk-go": null,
+    "sdk-java": null,
+    "sdk-js": null,
+    "sdk-dotnet": null,
+    "sdk-rust": null
   },
   "capture": {
     "run": [

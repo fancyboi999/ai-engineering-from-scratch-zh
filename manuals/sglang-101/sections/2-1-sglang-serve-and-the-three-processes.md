@@ -46,7 +46,7 @@ lang: text
 SGLANG_USE_MLX=1 sglang serve --model-path mlx-community/Qwen3-0.6B-4bit --disable-cuda-graph --host 127.0.0.1 --port 30000 --enable-cache-report --enable-metrics --mem-fraction-static 0.4
 ```
 
-两个参数不是默认值，且都有意设置。`--enable-cache-report` 在每个 OpenAI 风格响应中添加缓存 token 数，[第 2.5 节](#s-streaming-stop-strings-and-the-openai-api)会展示。`--mem-fraction-static 0.4` 限制 KV 池，[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)解释不加它时上游遇到的崩溃。
+三个参数不是默认值，且都有意设置。`--enable-cache-report` 在每个 OpenAI 风格响应中添加缓存 token 数，[第 2.5 节](#s-streaming-stop-strings-and-the-openai-api)会展示。`--enable-metrics` 开启 `/metrics` 端点，[第 5.2 节](#s-the-metrics-endpoint)会读取它。`--mem-fraction-static 0.4` 限制 KV 池，[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)解释不加它时上游遇到的崩溃。
 
 日志对另一个参数提出异议。SGLang 文档的 Apple silicon 页面要求传 `--disable-cuda-graph`，但日志第二行说该参数“已弃用，将在未来版本移除”，替代项是 `--cuda-graph-backend-{decode,prefill}=disabled`。
 
@@ -108,7 +108,7 @@ lang: text
 [2026-10-16 14:01:45] Subprocess scheduler_0 (pid=5909) crashed with exit code -15. Triggering SIGQUIT for cleanup...
 ```
 
-主进程 PID 为 5782，scheduler 为 5909。退出码 -15 就是工具自己发送的 SIGTERM，因此 “crashed” 一词有误导性。应学会读退出码：真实 scheduler 崩溃也输出相同结构，只是退出码不同，见[第 2.4 节](#s-the-overlap-scheduler)。
+主进程 PID 为 5782，scheduler 为 5909。退出码 -15 对应工具自己发送的 SIGTERM，因此这不是真正的崩溃。真实 scheduler 故障会打印 traceback，并显示 `SIGQUIT received ... It usually means one child failed`，见[第 2.4 节](#s-the-overlap-scheduler)。
 
 ## 本手册的建议
 

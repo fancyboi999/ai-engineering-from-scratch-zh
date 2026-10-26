@@ -65,7 +65,7 @@ note: 删去 output_ids 和 weight_versions 列表。
 - `num_retractions` 为 0。非零值的代价见[第 2.3 节](#s-admission-and-retraction)。
 - `cached_tokens` 为五个 prompt token 中的两个，均来自设备，无主机内存缓存。
 
-工具首个请求为何已有两个缓存 token？答案很清楚。接受流量前，服务以 “The capital city of France is” 预热 {{code}}。工具 prompt 是 “The capital of France is”，前两个 token 在基数树中匹配预热。缓存不关心前缀由哪个用户发送。
+工具首个请求为何已有两个缓存 token？答案很清楚。接受流量前，服务以 `The capital city of France is` 预热 {{code}}。工具 prompt 是 `The capital of France is`，前两个 token 在基数树中匹配预热。缓存不关心前缀由哪个用户发送。
 
 ## OpenAI 响应提供什么
 
@@ -109,7 +109,7 @@ Mac 读者注意：v0.5.22 的 MLX decode 默认贪心，除非设置 `--mlx-ena
 
 **停止条件：** 结束请求的规则，可以是停止 token、停止字符串、正则、`max_new_tokens` 上限、中止或语法结束。
 
-SGLang 在每一步后按固定顺序在 scheduler 检查停止条件 {{code}}。先检查停止字符串，再检查序列结束 token。代码注释解释原因：推测解码单步可能接受多个 token，按 token 检查只会裁掉最后一个，使停止字符串泄漏。Detokenizer 仅从输出裁掉匹配的停止文本。
+SGLang 在每一步后按固定顺序由 scheduler 检查停止条件 {{code}}。停止字符串先于序列结束 token 检查。推测解码单步可能接受多个 token；若按 token 检查，最多只会裁掉最后一个 token，停止字符串的其余部分就会泄漏到输出中。Detokenizer 只裁掉匹配的停止文本。
 
 ```figure
 id: fig-2-5
@@ -136,7 +136,7 @@ caption: 自上而下读。蓝色生命线为 SGLang 进程，橄榄色为客户
 
 调试、测量或自建客户端时使用原生 `/generate`，其 `meta_info` 提供每请求的排队时间、首 token 延迟、缓存命中与回撤。OpenAI 格式容不下其中多数数据。
 
-已有 OpenAI 格式应用则使用 OpenAI 端点。每个服务器都开启 `--enable-cache-report`，让这些客户端也看到缓存命中。它没有额外成本，[第 3 部分](#s-prefix-friendly-prompts)说明这个数字的价值。
+已有 OpenAI 格式应用则使用 OpenAI 端点。每个服务器都开启 `--enable-cache-report`，让这些客户端也能看到缓存命中。我们没有测量这项功能的成本，[第 3 部分](#s-prefix-friendly-prompts)说明命中数的价值。
 
 ```takeaways
 - 调试和测量用 /generate，读取 meta_info。

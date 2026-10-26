@@ -54,7 +54,7 @@
         "properties": { "name": { "type": "string" }, "path": { "type": "string" }, "usedFor": { "type": "string" } }
       }
     },
-    "quoteSources": { "type": "object", "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" }, "additionalProperties": { "type": ["string", "null"] }, "description": "引用键到随仓库保存的来源文件的映射。null 表示该键的引文无法校验。" },
+    "quoteSources": { "type": "object", "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" }, "additionalProperties": { "type": ["string", "null"] }, "description": "来源标记所用的键及对应的随仓库保存文件。null 表示没有随仓库保存的文件。每个来源标记和 rule 块都必须使用已声明的键。" },
     "capture": {
       "type": "object",
       "required": ["run", "check"],

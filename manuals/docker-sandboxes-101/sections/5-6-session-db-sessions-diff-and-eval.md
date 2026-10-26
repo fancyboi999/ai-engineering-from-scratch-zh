@@ -8,7 +8,7 @@
 
 ## session.db {#s-session-db-sessions-diff-and-eval-session-db}
 
-**会话：** “the record of a conversation, including every message, tool call, sub-agent run, and cost” {{docs-agent Sessions}}，包含每条消息、工具调用、子 agent 运行与成本的对话记录。位于数据目录的 `session.db`，默认 `~/.cagent`，除非 `--data-dir` 或 `-s` 指向别处 {{help-agent docker-agent run}}。`--session -1` 按创建时间恢复最新会话 {{docs-agent Sessions}}。
+**会话：** {{docs-agent Sessions}}，包含每条消息、工具调用、子 agent 运行与成本的对话记录。位于数据目录的 `session.db`，默认 `~/.cagent`，除非 `--data-dir` 或 `-s` 指向别处 {{help-agent docker-agent run}}。`--session -1` 按创建时间恢复最新会话 {{docs-agent Sessions}}。
 
 ```listing
 title: 本部分运行后的会话存储
@@ -55,7 +55,7 @@ def replay(name):
 
 ## sessions diff {#s-session-db-sessions-diff-and-eval-sessions-diff}
 
-“Comparison is over the sequence of tool calls, not over the assistant's prose” {{help-agent docker-agent sessions diff}}，比较工具调用序列而非回答文字；报告停在首个分歧。
+{{help-agent docker-agent sessions diff}}，比较工具调用序列而非回答文字；报告停在首个分歧。
 
 ```listing
 title: 帮助示例、可用形式与分歧
@@ -93,7 +93,7 @@ Error: sessions diverged
 
 **评估会话：** 含用户消息、预期工具调用及 `evals` 块的 JSON 会话 {{docs-agent Evaluation}}。块含 `relevance` 声明、`size` 和 `working_dir`。`eval` 在容器重放，评分工具调用 F1、评判模型相关性与长度。
 
-录制用 `--judge-model dmr/ai/qwen3:4b` 尝试三次。直接执行时，两项都报 `exec: "docker": executable file not found in $PATH`，因为 `docker/docker-agent:1.149.0` 没有发现 Model Runner 的 `docker` CLI（`22-eval.txt`）。加 `--models-gateway http://model-runner.docker.internal/engines` 后，judge 检查先报403。文档解释：“the LLM judge runs on the host, not inside the eval container” {{docs-agent Evaluation}}，judge 在宿主，无法访问该名称（`22-eval-gateway.txt`）。改为 `-e DOCKER_AGENT_MODELS_GATEWAY=…` 后只改变容器，两项都成功运行。
+录制用 `--judge-model dmr/ai/qwen3:4b` 尝试三次。直接执行时，两项都报 `exec: "docker{{docs-agent Evaluation}}，judge 在宿主，无法访问该名称（`22-eval-gateway.txt`）。改为 `-e DOCKER_AGENT_MODELS_GATEWAY=…` 后只改变容器，两项都成功运行。
 
 ```listing
 title: 成功的 eval 运行

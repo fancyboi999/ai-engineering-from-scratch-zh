@@ -30,7 +30,7 @@ Issue 见[事故索引](#s-ref-incident-index)。以下 PR 解释设计变化。
 
 | PR | 改动 | 使用章节 |
 |---|---|---|
-| [#9241](https://github.com/sgl-project/sglang/pull/9241) | 预热后冻结垃圾回收器 | [1.2](#s-one-request-end-to-end) |
+| [#9241](https://github.com/sgl-project/sglang/pull/9241) | 预热后冻结垃圾回收器 | [1.2](#s-check-that-the-server-is-healthy) |
 | [#11210](https://github.com/sgl-project/sglang/pull/11210) | 单线程两个 CUDA stream 实现重叠 | [2.4](#s-the-overlap-scheduler) |
 | [#14312](https://github.com/sgl-project/sglang/pull/14312) | 将 `sgl-router` 更名为 `sgl-model-gateway` | [6.4](#s-sgl-model-gateway) |
 | [#23906](https://github.com/sgl-project/sglang/pull/23906) | 将 prefill graph 字段移入按阶段配置 | [4.1](#s-forwardmode-and-cuda-graphs) |
@@ -66,30 +66,30 @@ Issue 见[事故索引](#s-ref-incident-index)。以下 PR 解释设计变化。
 
 | 作者 | 报告 | 月份 | 使用章节 |
 |---|---|---|---|
-| AIMultiple | [推理引擎基准](https://aimultiple.com/inference-engines) | 2026-01，回答于 2026-10 | [1.1](#s-what-a-serving-engine-owns), [5.3](#s-reading-other-peoples-benchmarks) |
+| AIMultiple | [推理引擎基准](https://aimultiple.com/inference-engines) | 2026-01，回答于 2026-10 | [1.1](#s-what-the-server-does-with-your-request), [5.3](#s-reading-other-peoples-benchmarks) |
 | Alibaba Cloud、RBG 与 Mooncake 团队 | [用 SGLang RBG 和 Mooncake 构建生产推理平台](https://www.alibabacloud.com/blog/building-a-production-grade-cloud-native-large-model-inference-platform-with-sglang-rbg-%2B-mooncake_602933) | 2026-03 | [3.5](#s-eviction-policies-and-hicache) |
 | Ant Group | [LMSYS 博客：H20 上使用 SGLang 运行 DeepSeek-R1](https://www.lmsys.org/blog/2025-09-26-sglang-ant-group/) | 2025-09 | [4.4](#s-speculative-decoding), [6.1](#s-tp-size-dp-size-and-attn-dp-size), [6.2](#s-moe-serving-deepep-and-eplb), [7.1](#s-operating-sglang) |
 | CERIT-SC | [在 CERIT-SC 运行 LLM](https://blog.cerit.io/blog/run-llm2/)与[后续文章](https://blog-dev.cerit.io/blog/llm3/) | 2025-10, 2026-04 | [7.1](#s-operating-sglang) |
 | Cloudflare | [更小、更快、更安全的模型](https://blog.cloudflare.com/smaller-faster-safer-models/) | 2026-08 | [3.1](#s-kv-bytes-per-token-and-the-kv-pool), [4.3](#s-quantization) |
-| Crusoe | [AMD MI355X 上的 MLPerf Inference v6.1 结果](https://www.crusoe.ai/resources/blog/serving-5-75-million-tokens-per-second-crusoes-mlperf-inference-v6-1-results-on-amd-mi355x) | 2026-09 | [1.1](#s-what-a-serving-engine-owns), [5.3](#s-reading-other-peoples-benchmarks), [6.2](#s-moe-serving-deepep-and-eplb) |
+| Crusoe | [AMD MI355X 上的 MLPerf Inference v6.1 结果](https://www.crusoe.ai/resources/blog/serving-5-75-million-tokens-per-second-crusoes-mlperf-inference-v6-1-results-on-amd-mi355x) | 2026-09 | [1.1](#s-what-the-server-does-with-your-request), [5.3](#s-reading-other-peoples-benchmarks), [6.2](#s-moe-serving-deepep-and-eplb) |
 | David Noel Ng | [GH200 基准，第 4 部分](https://dnhkng.github.io/posts/gh200-benchmarking-part-4-dsv4-released/) | 2026-08 | [4.4](#s-speculative-decoding) |
 | DeepInfra | [vLLM vs SGLang](https://deepinfra.com/blog/vllm-vs-sglang) | 2026-08 | [5.3](#s-reading-other-peoples-benchmarks) |
 | Doubleword | [SGLang 快速启动](https://fergusfinn.com/blog/fast-sglang-starts/) | 2026-04 | [7.1](#s-operating-sglang) |
 | dstack | [Prefill-decode 配比基准](https://dstack.ai/blog/benchmarking-pd-ratios/) | 2025-09 | [6.3](#s-prefill-decode-disaggregation) |
 | Hazy Research | [张量并行 Llama megakernel](https://hazyresearch.stanford.edu/blog/2025-09-28-tp-llama-main) | 2025-09 | [4.1](#s-forwardmode-and-cuda-graphs) |
 | InferenceX by SemiAnalysis | [GLM-5 FP8 on MI355X](https://inferencex.semianalysis.com/blog/mi355x-glm5-fp8-sglang-40-cheaper-than-b200), [MI355X 上 DeepSeek-V4-Pro 的 26 天优化](https://inferencex.semianalysis.com/blog/mi355x-deepseek-v4-pro-sglang-110x-in-26-days),，以及 [GLM-5 NVFP4 on B200](https://inferencex.semianalysis.com/blog/b200-glm5-nvfp4-vs-h200-fp8-3-6x-perf-per-dollar) | 2026-05 | [4.1](#s-forwardmode-and-cuda-graphs), [5.3](#s-reading-other-peoples-benchmarks) |
-| Jarvislabs | [H100 上的 SGLang 与 vLLM](https://jarvislabs.ai/blog/vllm-sglang-trtllm-comparison) | 2026-05 | [1.1](#s-what-a-serving-engine-owns), [4.1](#s-forwardmode-and-cuda-graphs), [5.3](#s-reading-other-peoples-benchmarks) |
+| Jarvislabs | [H100 上的 SGLang 与 vLLM](https://jarvislabs.ai/blog/vllm-sglang-trtllm-comparison) | 2026-05 | [1.1](#s-what-the-server-does-with-your-request), [4.1](#s-forwardmode-and-cuda-graphs), [5.3](#s-reading-other-peoples-benchmarks) |
 | Jarvislabs | [托管端点](https://jarvislabs.ai/blog/managed-endpoints) | 2026-08 | [3.4](#s-prefix-friendly-prompts), [6.4](#s-sgl-model-gateway) |
 | joshua8.ai | [LLM 推理基准](https://joshua8.ai/llm-inference-benchmark/) | 2026-01 | [4.1](#s-forwardmode-and-cuda-graphs), [4.3](#s-quantization), [5.3](#s-reading-other-peoples-benchmarks) |
-| LinkedIn Engineering | [LinkedIn 使用 SGLang 扩展 LLM 排序系统](https://www.linkedin.com/blog/engineering/ai/scaling-llm-based-ranking-systems-with-sglang-at-linkedin) | 2026-02 | [1.2](#s-one-request-end-to-end), [2.1](#s-sglang-serve-and-the-three-processes), [7.1](#s-operating-sglang) |
+| LinkedIn Engineering | [LinkedIn 使用 SGLang 扩展 LLM 排序系统](https://www.linkedin.com/blog/engineering/ai/scaling-llm-based-ranking-systems-with-sglang-at-linkedin) | 2026-02 | [1.2](#s-check-that-the-server-is-healthy), [2.1](#s-sglang-serve-and-the-three-processes), [7.1](#s-operating-sglang) |
 | Luca Lowndes | [SGLang 优化](https://luca.lowndes.net/blog/sglang-optimisations) | 2025-11 | [6.1](#s-tp-size-dp-size-and-attn-dp-size) |
 | Modal | [LLM 年鉴](https://modal.com/llm-almanac/summary) | 2025-06 | [5.3](#s-reading-other-peoples-benchmarks) |
 | Novita AI | [Hugging Face：SGLang 与 GLM MoE 模型](https://huggingface.co/blog/novita/sglang-glm4-moe) | 2026-01 | [6.3](#s-prefill-decode-disaggregation) |
 | Pivot News | [混合 Blackwell 基准摘要](https://pivotnews.ai/build/benchmarking-vllm-vs-sglang-vs-llama-cpp-on-a-mixed-blackwel) | 2026-05 | [4.3](#s-quantization), [5.3](#s-reading-other-peoples-benchmarks) |
 | RunPod | [何时选择 SGLang 而非 vLLM](https://runpod.ghost.io/when-to-choose-sglang-over-vllm-multi-turn-conversations-and-kv-cache-reuse/) | 2025-06 | [3.3](#s-radixcache), [5.3](#s-reading-other-peoples-benchmarks) |
-| SemiAnalysis | [InferenceMAX](https://newsletter.semianalysis.com/p/inferencemax-open-source-inference) | 2025-10 | [1.1](#s-what-a-serving-engine-owns), [5.3](#s-reading-other-peoples-benchmarks) |
-| Spheron | [vLLM vs TensorRT-LLM vs SGLang](https://www.spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks/) | 2026 | [1.1](#s-what-a-serving-engine-owns), [5.3](#s-reading-other-peoples-benchmarks) |
-| Steve Rawlinson | [双 H100 上的 vLLM 与 SGLang](https://rawlinson.ca/articles/vllm-vs-sglang-performance-benchmark-h100) | 2025-12 | [1.1](#s-what-a-serving-engine-owns), [3.2](#s-mem-fraction-static-and-startup-sizing), [5.3](#s-reading-other-peoples-benchmarks) |
+| SemiAnalysis | [InferenceMAX](https://newsletter.semianalysis.com/p/inferencemax-open-source-inference) | 2025-10 | [1.1](#s-what-the-server-does-with-your-request), [5.3](#s-reading-other-peoples-benchmarks) |
+| Spheron | [vLLM vs TensorRT-LLM vs SGLang](https://www.spheron.network/blog/vllm-vs-tensorrt-llm-vs-sglang-benchmarks/) | 2026 | [1.1](#s-what-the-server-does-with-your-request), [5.3](#s-reading-other-peoples-benchmarks) |
+| Steve Rawlinson | [双 H100 上的 vLLM 与 SGLang](https://rawlinson.ca/articles/vllm-vs-sglang-performance-benchmark-h100) | 2025-12 | [1.1](#s-what-the-server-does-with-your-request), [3.2](#s-mem-fraction-static-and-startup-sizing), [5.3](#s-reading-other-peoples-benchmarks) |
 | Thinking Machines | [消除 LLM 推理的不确定性](https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/) | 2025-09 | [4.6](#s-deterministic-inference-and-logprobs) |
 | Varad More | [推理引擎基准系统](https://github.com/varad-more/inference-engine-benchmark-system) | 2026-04 | [3.3](#s-radixcache), [4.2](#s-attention-backend), [4.5](#s-structured-outputs-with-xgrammar), [5.3](#s-reading-other-peoples-benchmarks) |
 | vLLM 社区 | [讨论 #17221](https://github.com/vllm-project/vllm/discussions/17221) | 2025-04 | [5.3](#s-reading-other-peoples-benchmarks) |

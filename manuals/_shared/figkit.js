@@ -10,7 +10,7 @@ const MONO = 0.6;
 const SERIF = 0.54;
 const ASCENT = 0.78;
 const DESCENT = 0.22;
-const NEUTRALS = ['ink', 'ink-soft', 'ink-mute', 'panel', 'panel-edge', 'paper', 'accent', 'code-bg'];
+const NEUTRALS = ['ink', 'ink-soft', 'ink-mute', 'panel', 'panel-edge', 'paper', 'accent', 'code-bg', 'shine', 'shade'];
 const DASH = { solid: null, dashed: '5 4', dotted: '1.5 3.5' };
 const STEP = 0.6;
 const FADE = 0.45;
@@ -27,7 +27,29 @@ const STYLES = {
   fail: { hue: 'rose', dash: 'dashed' },
 };
 
-const ROOT_BLOCK = /:root\s*\{([\s\S]*?)\}/.exec(fs.readFileSync(path.join(__dirname, 'tokens.css'), 'utf8'));
+const ISO = {
+  true: { ax: 0.8660254, ay: 0.5 },
+  plate: { ax: 0.9761871, ay: 0.2169305 },
+};
+const TONE = { shine: 0.45, shade: 0.16 };
+const SHADOW = { reach: 0.6, max: 22, dx: 1, dy: -0.35, opacity: 0.12 };
+
+function hull(points) {
+  const sorted = points.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const half = list => {
+    const out = [];
+    for (const point of list) {
+      while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], point) <= 0) out.pop();
+      out.push(point);
+    }
+    out.pop();
+    return out;
+  };
+  return half(sorted).concat(half(sorted.slice().reverse()));
+}
+
+const ROOT_BLOCK =/:root\s*\{([\s\S]*?)\}/.exec(fs.readFileSync(path.join(__dirname, 'tokens.css'), 'utf8'));
 if (!ROOT_BLOCK) throw new Error('tokens.css: :root block missing');
 const TOKENS = new Map([...ROOT_BLOCK[1].matchAll(/--(m-[a-z-]+):\s*([^;]+);/g)].map(match => [match[1], match[2].trim().toLowerCase()]));
 const HUES = [...TOKENS.keys()].map(name => /^m-([a-z]+)-ink$/.exec(name)).filter(Boolean).map(match => match[1]).filter(hue => TOKENS.has(`m-${hue}-fill`));
@@ -45,6 +67,7 @@ function inkOf(hue) { return NEUTRALS.includes(hue) ? color(hue) : color(`${hue}
 function fillOf(hue) { return NEUTRALS.includes(hue) ? color(hue) : color(`${hue}-fill`); }
 function num(value) { return Number.isInteger(value) ? String(value) : String(Math.round(value * 100) / 100); }
 function fraction(value, total) { return String(Math.round((value / total) * 1000) / 1000); }
+function pointList(points) { return points.map(([x, y]) => `${num(x)},${num(y)}`).join(' '); }
 function attrs(map) { return Object.entries(map).filter(([, v]) => v !== undefined && v !== null && v !== false).map(([k, v]) => ` ${k}="${typeof v === 'number' ? num(v) : escapeHtml(v)}"`).join(''); }
 
 function measure(text, size, serif = false, spacing = 0) {
@@ -218,6 +241,141 @@ class Figure {
 
   dot(x, y, options = {}) {
     this.emit(`<circle${attrs({ cx: x, cy: y, r: options.r || 2.5, fill: inkOf(options.hue || 'ink') })}/>`);
+    return this;
+  }
+
+  isoView({ ox, oy, s = 1, angle = 'plate' }) {
+    const m = ISO[angle];
+    if (!m) throw new Error(`${this.id}: unknown iso angle ${angle}`);
+    const P = (x, y, z = 0) => [ox + (x - y) * m.ax * s, oy + (x + y) * m.ay * s - z * s];
+    const at = (sx, c) => {
+      const diff = (sx - ox) / (m.ax * s);
+      return [(diff + c) / 2, (c - diff) / 2];
+    };
+    return { P, at, s, angle };
+  }
+
+  polygon(points, options) {
+    this.emit(`<polygon${attrs({
+      points: pointList(points),
+      fill: options.fill || 'none',
+      'fill-opacity': options.fillOpacity,
+      stroke: options.stroke,
+      'stroke-width': options.strokeWidth,
+      'stroke-opacity': options.strokeOpacity,
+      'stroke-linejoin': options.stroke ? 'round' : undefined,
+      'stroke-dasharray': options.dash ? DASH[options.dash] : undefined,
+    })}/>`);
+  }
+
+  isoBlock(view, options) {
+    const { P } = view;
+    const { x, y, w, d, h } = options;
+    const z = options.z || 0;
+    const hue = options.hue || 'grey';
+    const x1 = x + w;
+    const y1 = y + d;
+    const z1 = z + h;
+    const top = [P(x, y, z1), P(x1, y, z1), P(x1, y1, z1), P(x, y1, z1)];
+    const end = [P(x1, y, z), P(x1, y1, z), P(x1, y1, z1), P(x1, y, z1)];
+    const front = [P(x, y1, z), P(x1, y1, z), P(x1, y1, z1), P(x, y1, z1)];
+    const outline = [P(x, y, z1), P(x1, y, z1), P(x1, y, z), P(x1, y1, z), P(x, y1, z), P(x, y1, z1)];
+    if (options.shadow !== false && h > 0) this.isoShadow(view, { x, y, w, d, h, z });
+    const ink = inkOf(options.inkHue || hue);
+    const fill = fillOf(hue);
+    this.polygon(outline, { fill: color('panel') });
+    for (const [face, tone] of [[top, 'shine'], [front, null], [end, 'shade']]) {
+      this.polygon(face, { fill });
+      if (tone) this.polygon(face, { fill: color(tone), fillOpacity: TONE[tone] });
+    }
+    const near = P(x1, y1, z1);
+    if (options.edges !== false) for (const far of [P(x1, y, z1), P(x, y1, z1), P(x1, y1, z)]) {
+      this.emit(`<polyline${attrs({ points: pointList([near, far]), fill: 'none', stroke: ink, 'stroke-width': 0.8, 'stroke-opacity': 0.6 })}/>`);
+    }
+    this.polygon(outline, { stroke: ink, strokeWidth: options.ink || 1.5, dash: options.dash });
+    return { top: P(x + w / 2, y + d / 2, z1), near, outline, box: { x, y, z, w, d, h }, P: (u, v, k) => P(x + u, y + v, z + k) };
+  }
+
+  isoBeam(view, options) {
+    const { P, at } = view;
+    const { sx0, sx1, c, back, h } = options;
+    const z = options.z || 0;
+    const hue = options.hue || 'grey';
+    const [ax0, ay0] = at(sx0, c);
+    const [ax1, ay1] = at(sx1, c);
+    const [bx0, by0] = at(sx0, c - back);
+    const [bx1, by1] = at(sx1, c - back);
+    const front = [P(ax0, ay0, z), P(ax1, ay1, z), P(ax1, ay1, z + h), P(ax0, ay0, z + h)];
+    const top = [P(ax0, ay0, z + h), P(ax1, ay1, z + h), P(bx1, by1, z + h), P(bx0, by0, z + h)];
+    const outline = [front[0], front[1], front[2], top[2], top[3], front[3]];
+    const fill = fillOf(hue);
+    const ink = inkOf(options.inkHue || hue);
+    if (options.shadow !== false) {
+      const drop = h * SHADOW.reach;
+      this.polygon([front[0], front[1], [front[1][0] + drop, front[1][1] + drop * 0.25], [front[0][0] + drop, front[0][1] + drop * 0.25]], { fill: color('accent'), fillOpacity: SHADOW.opacity });
+    }
+    this.polygon(outline, { fill: color('panel') });
+    this.polygon(front, { fill });
+    this.polygon(top, { fill });
+    this.polygon(top, { fill: color('shine'), fillOpacity: TONE.shine });
+    this.emit(`<polyline${attrs({ points: pointList([front[3], front[2]]), fill: 'none', stroke: ink, 'stroke-width': 0.8, 'stroke-opacity': 0.6 })}/>`);
+    this.polygon(outline, { stroke: ink, strokeWidth: options.ink || 1.4, dash: options.dash });
+    return { front, top, left: front[3], right: front[2] };
+  }
+
+  isoDrum(view, options) {
+    const { P } = view;
+    const m = ISO[view.angle];
+    const { x, y, r, h } = options;
+    const z = options.z || 0;
+    const hue = options.hue || 'grey';
+    const rx = r * Math.SQRT2 * m.ax * view.s;
+    const ry = r * Math.SQRT2 * m.ay * view.s;
+    const [tx, ty] = P(x, y, z + h);
+    const [bx, by] = P(x, y, z);
+    const ink = inkOf(options.inkHue || hue);
+    const fill = fillOf(hue);
+    const width = options.ink || 1.4;
+    const side = [[tx - rx, ty]];
+    for (let i = 0; i <= 16; i += 1) {
+      const a = Math.PI - (Math.PI * i) / 16;
+      side.push([bx + rx * Math.cos(a), by + ry * Math.sin(a)]);
+    }
+    side.push([tx + rx, ty]);
+    this.polygon(side, { fill });
+    this.polygon(side, { fill: color('shade'), fillOpacity: TONE.shade / 2 });
+    this.polygon(side, { stroke: ink, strokeWidth: width });
+    this.emit(`<ellipse${attrs({ cx: tx, cy: ty, rx, ry, fill })}/>`);
+    this.emit(`<ellipse${attrs({ cx: tx, cy: ty, rx, ry, fill: color('shine'), 'fill-opacity': TONE.shine, stroke: ink, 'stroke-width': width })}/>`);
+    return { top: [tx, ty - ry], center: [tx, ty] };
+  }
+
+  isoShadow(view, { x, y, w, d, h, z = 0 }) {
+    const { P } = view;
+    const reach = Math.min(h * SHADOW.reach, SHADOW.max);
+    const corners = [];
+    for (const [px, py] of [[x, y], [x + w, y], [x + w, y + d], [x, y + d]]) {
+      corners.push(P(px, py, z), P(px + reach * SHADOW.dx, py + reach * SHADOW.dy, z));
+    }
+    this.polygon(hull(corners), { fill: color('accent'), fillOpacity: SHADOW.opacity });
+  }
+
+  isoBoard(view, options) {
+    return this.isoBlock(view, { ...options, hue: 'paper', inkHue: 'ink-mute', shadow: false, ink: 1 });
+  }
+
+  isoFlow(view, points, options = {}) {
+    const d = points.map((point, index) => {
+      const [px, py] = view.P(...point);
+      return `${index ? 'L' : 'M'}${num(px)} ${num(py)}`;
+    }).join(' ');
+    return this.path(d, options);
+  }
+
+  leader(from, to, options = {}) {
+    const ink = inkOf(options.hue || 'ink-mute');
+    this.emit(`<polyline${attrs({ points: pointList([from, to]), fill: 'none', stroke: ink, 'stroke-width': 0.8, 'stroke-dasharray': '2 3' })}/>`);
+    this.emit(`<circle${attrs({ cx: to[0], cy: to[1], r: 2, fill: ink })}/>`);
     return this;
   }
 

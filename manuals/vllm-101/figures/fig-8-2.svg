@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 250" role="img" aria-labelledby="fig-8-2-title fig-8-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-8-2-title">每步共享 2,048-token 预算：先 decode，再用提示词块填满余量</title>
+  <desc id="fig-8-2-desc">三个 scheduler 步骤，默认预算为 2,048 个 token。8 个正在运行的请求各生成一个 decode token；一个新的 4,096-token 提示词以每块 2,040 个 token 的方式填充剩余预算。步骤 3 处理提示词最后 16 个 token，新请求从步骤 4 开始 decode。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每步预算：--MAX-NUM-BATCHED-TOKENS 2048</text>
+  <text x="20" y="58" font-size="12" font-weight="700">步骤 1</text>
+  <rect x="90" y="34" width="14" height="36" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <rect x="106" y="34" width="517.97" height="36" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="116" y="57" font-size="11.5" fill="var(--m-plum-ink, #8a3d72)">新请求的 2,040 个提示词 token</text>
+  <text x="20" y="116" font-size="12" font-weight="700">步骤 2</text>
+  <rect x="90" y="92" width="14" height="36" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <rect x="106" y="92" width="517.97" height="36" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="116" y="115" font-size="11.5" fill="var(--m-plum-ink, #8a3d72)">新请求的 2,040 个提示词 token</text>
+  <text x="20" y="174" font-size="12" font-weight="700">步骤 3</text>
+  <rect x="90" y="150" width="14" height="36" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <rect x="106" y="150" width="4.06" height="36" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="160" y="173" font-size="11.5" fill="var(--m-ink-soft, #4a4a4a)">提示词最后 16 个 token；步骤 4 开始 decode</text>
+  <rect x="112.06" y="150" width="497.94" height="36" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
+  <rect x="20" y="214" width="12" height="12" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="40" y="224" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">decode：每个运行中请求生成一个 token</text>
+  <rect x="340" y="214" width="12" height="12" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="360" y="224" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">新提示词的一个 chunk</text>
+</svg>

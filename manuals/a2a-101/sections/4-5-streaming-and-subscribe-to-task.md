@@ -44,7 +44,7 @@ data: {"jsonrpc": "2.0", "id": 1, "result": {"artifactUpdate": {… "append": tr
 label: 流不是任务
 source: spec §3.5.2
 ---
-"The task lifecycle is independent of any individual stream's lifecycle"
+任务生命周期与任一单独流的生命周期相互独立
 ```
 
 1.0 没有结束标记：TaskStatusUpdateEvent 的 `final` 布尔字段已删除。任务流 `MUST` 在任务进入终态时关闭，`SubscribeToTask` 流也一样。`message` 帧后立即关闭。 {{docs whats-new-v1}} {{spec §3.1.2}} {{spec §3.1.6}}

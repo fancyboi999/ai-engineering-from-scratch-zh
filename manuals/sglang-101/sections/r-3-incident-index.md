@@ -23,7 +23,7 @@
 
 | 事故 | 现象 | 原因 | 修复或状态 | 章节 |
 |---|---|---|---|---|
-| LinkedIn 实践报告, 2026-02 | 小型排序模型的 P99 达数秒 | 分词、ZMQ 消息、垃圾回收、GIL、调度器 | 批量分词、评分路径、预热后 `gc.freeze`（PR 9241） | [1.2](#s-one-request-end-to-end), [2.1](#s-sglang-serve-and-the-three-processes) |
+| LinkedIn 实践报告, 2026-02 | 小型排序模型的 P99 达数秒 | 分词、ZMQ 消息、垃圾回收、GIL、调度器 | 批量分词、评分路径、预热后 `gc.freeze`（PR 9241） | [1.2](#s-check-that-the-server-is-healthy), [2.1](#s-sglang-serve-and-the-three-processes) |
 | [#36889](https://github.com/sgl-project/sglang/issues/36889) | 接受 `--max-running-requests 8`，但两流即达吞吐上限 | Mamba 状态缓存将运行请求限制为 2 | 仅一条 info 行报告该限制 | [2.2](#s-the-scheduler-loop-and-schedule-policy) |
 | [#8463](https://github.com/sgl-project/sglang/issues/8463) | 反复 `KV cache pool is full. Retract requests.`，随后健康检查失败 | 回撤无法释放足够内存并反复循环 | 未修复即关闭；0.5.22 中止最后一个请求 | [2.3](#s-admission-and-retraction) |
 | [#26248](https://github.com/sgl-project/sglang/issues/26248) | 回撤后 decode 从约 429 降至 20至38 token/s | 未记录 | 因不活跃关闭 | [2.3](#s-admission-and-retraction) |
@@ -75,7 +75,7 @@
 | `sglang:utilization` | 繁忙服务器的 gauge 仍为 0 | 代码注释关联 #22713 的回归 | 使用队列与延迟序列 | [5.2](#s-the-metrics-endpoint) |
 | [#35884](https://github.com/sgl-project/sglang/issues/35884) | 失败健康探测增加负载 | 超时 `/health` 调用未取消自身请求 | 将探测失败视为一个现象 | [5.2](#s-the-metrics-endpoint), [7.1](#s-operating-sglang) |
 | [#22511](https://github.com/sgl-project/sglang/issues/22511) | GLM-5 高负载时出现 “health check failed” | 负载下 20 秒无输出到达 detokenizer | 用 `/ready` 作就绪检查 | [5.2](#s-the-metrics-endpoint), [7.1](#s-operating-sglang) |
-| AIMultiple, 2026-01 | 至少五篇文章重复“SGLang 快 29%” | 来自列出 SGLang v0.2.3 的一次离线测试 | 忽略不带版本的结果 | [1.1](#s-what-a-serving-engine-owns), [5.3](#s-reading-other-peoples-benchmarks) |
+| AIMultiple, 2026-01 | 至少五篇文章重复“SGLang 快 29%” | 来自列出 SGLang v0.2.3 的一次离线测试 | 忽略不带版本的结果 | [1.1](#s-what-the-server-does-with-your-request), [5.3](#s-reading-other-peoples-benchmarks) |
 | [vLLM discussion #17221](https://github.com/vllm-project/vllm/discussions/17221) | 看起来 SGLang 只用 7 GB，对方 21 GB | 参数对应错误：`--context-length` 对应 `--max-model-len` | 使用对应参数比较 | [5.3](#s-reading-other-peoples-benchmarks) |
 
 ## 第 6、7 部分：集群与运维

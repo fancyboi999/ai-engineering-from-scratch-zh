@@ -42,7 +42,7 @@ Qwen3-0.6B 的上游实测值为 `bytes_per_slot=114688`。第二行给出了全
 | Llama-3.1-70B | GQA，80 层，8 KV head | 320 KiB | 8 路张量并行时 40 KiB |
 | DeepSeek-V3 | MLA，61 层，潜变量 512 加 64 | 68.6 KiB | 每张 GPU 均为 68.6 KiB |
 
-两个结果常让人意外：0.6B 模型的每 token 成本几乎等于 8B 模型，因为决定成本的是层数与 KV head 数，不是参数量。Llama-3.1-8B 的 100,000-token 会话占用 12.5 GiB KV，已接近权重大小。
+两个结果常让人意外：0.6B 模型的每 token 成本几乎等于 8B 模型，因为决定成本的是层数与 KV head 数，不是参数量。Llama-3.1-8B 的 100,000-token 会话占用 12.2 GiB KV，已接近权重大小。
 
 **多头潜在注意力（MLA）：** DeepSeek 的注意力机制，每 token 保存一个压缩潜变量，而非各 head 独立的 key 和 value。MLA 每 token 小，但所有张量并行 rank 都保存完整潜变量 {{code}}。增加张量并行 GPU 并不会增加可容纳 token 数。[第 6.1 节](#s-tp-size-dp-size-and-attn-dp-size)说明注意力数据并行如何处理该问题。
 
@@ -74,7 +74,7 @@ caption: 自上而下读。每行是一个 ReqToTokenPool 条目，下方条带�
 
 ## 缓存就是池
 
-SGLang 没有独立缓存大小设置。论文直接说明设计：缓存 token 与当前运行请求共享同一个内存池 {{paper}}。缓存前缀就是当前没有运行请求锁定的 KV。新请求需要空间时，从同一个池淘汰没有请求锁定的前缀。
+SGLang 没有独立缓存大小设置。该设计让缓存 token 与当前运行请求共用一个内存池 {{paper}}。缓存前缀就是当前没有运行请求锁定的 KV。新请求需要空间时，从同一个池淘汰没有请求锁定的前缀。
 
 因此启动日志只有 `max_total_num_tokens` 一个数，没有两个。上游 Mac 设置 `--mem-fraction-static 0.4` 后为 181,574 token。模型上下文允许 40,960 token，因此池可容纳四个满长会话，或约 180 个各 1,000-token 会话。运行请求与缓存前缀争用同一批槽位。
 
@@ -84,7 +84,9 @@ SGLang 没有独立缓存大小设置。论文直接说明设计：缓存 token 
 
 改变该数字的两个旋钮是[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)的内存比例，以及 KV 数据类型。`--kv-cache-dtype` 默认 `auto`，保留模型类型，除非 checkpoint 要求 FP8 {{code}}。FP8 将每 token 字节数减半。
 
-实践报告说明了影响幅度。Cloudflare 报告 FP8 KV 使 Kimi K2.6 内存中容纳的上下文从约 686,000 token 增至约 137 万 {{field Cloudflare 2026-08}}。同一报告测得低并发时每请求吞吐量低了几个百分点。并发 64 时 BF16 内存耗尽，而 FP8 达到 2,192 token/s。这是用少量每 token 速度换取两倍用户容量。照搬前应阅读 [Cloudflare 文章](https://blog.cloudflare.com/smaller-faster-safer-models/)中的准确性检查。
+实践报告说明了影响幅度。Cloudflare 报告 FP8 KV 使 Kimi K2.6 内存中可容纳的上下文从约 686,000 token 增至约 137 万 {{field Cloudflare 2026-08}}。同一报告测得低并发时每请求吞吐量降低几个百分点。并发 64 时 BF16 内存耗尽，而 FP8 达到 2,192 token/s。这是用少量每 token 速度换取两倍用户容量。照搬前应阅读 [Cloudflare 文章](https://blog.cloudflare.com/smaller-faster-safer-models/)中的准确性检查。
+
+我们自己的 FP8 运行同时改变了权重与 KV cache，且每个用户都更快，无法据此隔离 FP8 KV 单独的效果。只改 FP8 KV 的证据应查看 Cloudflare 等实测，并仍要为自己的模型验证缩放因子和准确率。想查看容量效果，可打开[GPU 服务示意图](https://aieng-zh.cn/inside-an-llm-serving-gpu?users=64)。图中显示 L4 上 64 用户时的 BF16 运行：24,094-token 池能容纳 37 个请求，其余 27 个等待。将权重和 KV cache 改为 FP8 后，池增至 142,369 token。
 
 ## 测量什么
 
@@ -102,4 +104,4 @@ SGLang 没有独立缓存大小设置。论文直接说明设计：缓存 token 
 - 购买更多 GPU 前可试 FP8 KV，并在自己的数据核对准确性。
 ```
 
-Sources: python/sglang/srt/model_executor/pool_configurator.py (_compute_cell_size, calculate_pool_sizes), python/sglang/srt/mem_cache/memory_pool.py (ReqToTokenPool), python/sglang/srt/mem_cache/allocator/token.py (TokenToKVPoolAllocator), python/sglang/srt/hardware_backend/mlx/model_runner.py (_compute_pool_size), python/sglang/srt/arg_groups/fields/model.py (kv_cache_dtype) at v0.5.22, capture/out/server-default.log, the SGLang paper (arXiv 2312.07104), the Cloudflare report of 2026-08-03.
+Sources: python/sglang/srt/model_executor/pool_configurator.py (_compute_cell_size, calculate_pool_sizes), python/sglang/srt/mem_cache/memory_pool.py (ReqToTokenPool), python/sglang/srt/mem_cache/allocator/token.py (TokenToKVPoolAllocator), python/sglang/srt/hardware_backend/mlx/model_runner.py (_compute_pool_size), python/sglang/srt/arg_groups/fields/model.py (kv_cache_dtype) at v0.5.22, capture/out/server-default.log, capture/gpu/out-l4/server-load-default.log, capture/gpu/out-l4/server-load-fp8.log, the SGLang paper (arXiv 2312.07104), the Cloudflare report of 2026-08-03.

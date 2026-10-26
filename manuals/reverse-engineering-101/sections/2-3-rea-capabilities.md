@@ -150,7 +150,7 @@ note: 仅保留 hopper、ida、kuna 的 provider 与可用性；省略诊断、�
 
 不可用候选仍列出操作：Hopper 37 个、IDA 13 个、Kuna 13 个。Hopper、IDA 的组均为 `available: true`，唯独 Hopper 的 `search_bytes` 为 `available: false`，原因为“尚未验证 Hopper 的掩码字节搜索”。Kuna 所有组均为 `available: false`，代码 `not_configured`，原因与候选相同。本手册未运行 Kuna，因为已有覆盖记录仅在 Linux，而捕获主机是 Mac。
 
-引擎可用性与操作可用性是不同事实。文档规定：“这些命令描述 binary-session provider 与辅助能力。”{{cli Choose a provider}}。使用 `--provider ghidra` 或 `provider_id: "ghidra"` 时，仅 Ghidra 块适用。
+引擎可用性与操作可用性是不同事实。这些命令分别属于 binary-session provider 和辅助能力 {{cli Choose a provider}}。使用 `--provider ghidra` 或 `provider_id: "ghidra"` 时，仅 Ghidra 块适用。
 
 ## 限制是声明的一部分
 

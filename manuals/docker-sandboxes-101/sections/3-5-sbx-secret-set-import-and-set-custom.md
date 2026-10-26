@@ -8,7 +8,7 @@
 
 ## 服务密钥 {#s-sbx-secret-set-import-and-set-custom-service-secrets}
 
-**服务密钥：** 存在13个服务名称之一下的值：`anthropic, copilot, cursor, devin, droid, github, google, groq, mistral, nebius, openai, openrouter, xai` {{help-sbx sbx secret set}}，比文档表多两个（[冲突 C21](#s-ref-sources-and-the-conflicts-register)）。值来自 `-t`、stdin、`--command`，或 `--ref` 指定的 1Password `op://` 引用或 AWS Secrets Manager ARN。`--oauth` 是第五种来源，本地仅“openai/global only” {{help-sbx sbx secret set}}（[冲突 C22](#s-ref-sources-and-the-conflicts-register)）。Anthropic OAuth 来自 agent 自己登录。自 v0.46.0，命令 helper “from a fresh temporary directory on the host” {{help-sbx sbx secret set}}，从宿主新建临时目录运行，因此相对 helper 路径不再解析（[冲突 C38](#s-ref-sources-and-the-conflicts-register)）。`--refresh` 设置缓存时间，默认55分钟。
+**服务密钥：** 存在13个服务名称之一下的值：`anthropic, copilot, cursor, devin, droid, github, google, groq, mistral, nebius, openai, openrouter, xai` {{help-sbx sbx secret set}}，比文档表多两个（[冲突 C21](#s-ref-sources-and-the-conflicts-register)）。值来自 `-t`、stdin、`--command`，或 `--ref` 指定的 1Password `op://` 引用或 AWS Secrets Manager ARN。`--oauth` 是第五种来源，本地仅“openai/global only” {{help-sbx sbx secret set}}（[冲突 C22](#s-ref-sources-and-the-conflicts-register)）。Anthropic OAuth 来自 agent 自己登录。自 v0.46.0，命令 helper {{help-sbx sbx secret set}}，从宿主新建临时目录运行，因此相对 helper 路径不再解析（[冲突 C38](#s-ref-sources-and-the-conflicts-register)）。`--refresh` 设置缓存时间，默认55分钟。
 
 默认全局作用域，`--sandbox` 可收窄。`secret ls` 用 `-g`、`--sandbox`、`--service` 与 `--json` 过滤；`secret rm` 接受 `--all`、`--placeholder` 和 `--registry` {{help-sbx sbx secret rm}}。存储是 macOS Keychain、Windows Credential Manager 或 Linux Secret Service {{docs-sbx Where secrets are stored}}。没有 keyring 时，Linux 使用 `~/.config/com.docker.sandboxes` 下权限为 `0700` 的文件。kit 批准与真实值分开，存于 `~/.config/sbx/credentials.yaml` {{docs-sbx Credential bindings}}。
 
@@ -77,7 +77,7 @@ Authorization: m101-dummy-receiver-0000
 
 ## SSH agent {#s-sbx-secret-set-import-and-set-custom-the-ssh-agent}
 
-有一条凭据路径确实跨越边界：“SSH agent forwarding is enabled by default” {{docs-sbx Credential isolation}}，默认开启 SSH agent 转发；客户机显示 `SSH_AUTH_SOCK=/run/ssh-agent.sock` 与 `SSH_AUTH_SOCK_GATEWAY=gateway.docker.internal:3129`（capture/out/04-env.txt）。密钥留在宿主，内部任何进程可请求签名。在 `sbx settings list` 中关闭 `ssh.agentForwardingEnabled` 后执行 `sbx daemon restart` {{docs-sbx SSH agent}}。MCP 密钥也留在宿主，键为 `mcp:<server>:client_secret`，见 [sbx mcp add](#s-sbx-mcp-add-load-and-static-mcp)。
+有一条凭据路径确实跨越边界{{docs-sbx Credential isolation}}，默认开启 SSH agent 转发；客户机显示 `SSH_AUTH_SOCK=/run/ssh-agent.sock` 与 `SSH_AUTH_SOCK_GATEWAY=gateway.docker.internal:3129`（capture/out/04-env.txt）。密钥留在宿主，内部任何进程可请求签名。在 `sbx settings list` 中关闭 `ssh.agentForwardingEnabled` 后执行 `sbx daemon restart` {{docs-sbx SSH agent}}。MCP 密钥也留在宿主，键为 `mcp:<server>:client_secret`，见 [sbx mcp add](#s-sbx-mcp-add-load-and-static-mcp)。
 
 ```figure
 id: fig-3-6

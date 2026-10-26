@@ -86,7 +86,7 @@ note: 默认服务器日志中的两行。省略了时间戳和 batch 日志末�
 
 Jarvislabs 的实践报告 {{field Jarvislabs 2026-05}} 在一张 H100 上使用 SGLang 默认参数运行 Qwen2.5-7B。并发 300 时，平均 token 间延迟为 17.72 ms，vLLM 为 12.28 ms。不设并发上限时，两者分别是 100.92 ms 和 28.84 ms。文章没有记录 SGLang 版本和服务器日志。
 
-我们将以下解释明确标为假设。该 GPU 上默认 decode `max_bs` 为 256，而延迟断点恰好略高于它。维护者也在较小的显卡上观察到类似现象。20 至 35 GB 档位的代码注释说，旧上限“在 bs>=32 时强制 eager decode，导致相对 vLLM 的高并发吞吐量崩塌” {{code}}。PR #37898 在 2026-09-04 将这个上限从 24 提高到 48。
+我们将以下解释明确标为假设。该 GPU 上默认 decode `max_bs` 为 256，而延迟断点恰好略高于它。维护者也在较小的显卡上观察到类似现象。20 至 35 GB 档位的代码注释指出，旧上限会在 `bs>=32` 时强制使用 eager decode，导致高并发吞吐量显著低于 vLLM {{code}}。PR #37898 在 2026-09-04 将这个上限从 24 提高到 48。
 
 ## 我们在 GB10 上测到了什么
 
@@ -108,13 +108,13 @@ Jarvislabs 的实践报告 {{field Jarvislabs 2026-05}} 在一张 H100 上使用
 
 上游最初在 L4 上用稠密 `Qwen/Qwen3-8B` 做的扫描有误。显卡温度达到 87 C，发生热降频，SM 时钟仅为 360 MHz，额定值为 2,040 MHz。降频使每一步都变慢，节省的启动时间被噪声淹没。上游已移除那组数字。每次基准都应记录 GPU 时钟和温度，方法见[第 5.1 节](#s-sglang-benchmark-serving)。
 
-上游随后在降温后的 L4 上重复对照。每次运行从不超过 72 C 开始。SM 时钟中位数低于 1,000 MHz 的运行会重试，最多三次。开启计算图的服务器运行于 2026-10-16，关闭计算图的服务器运行于 2026-10-18，两者池容量均为 24,094 token。
+上游先在不同日期重复了降温后的 L4 对照，随后在 2026-10-21 同一天、连续运行两台服务器。各次运行从不超过 72 C 开始，SM 时钟中位数低于 1,000 MHz 时最多重试三次。两台服务器的池容量均为 24,094 token。下表列出同日运行的结果。
 
 ```listing
 title: 相同 batch 开启和关闭计算图
 source: capture/gpu/out-l4/server-load-graphs-on-off.log
 lang: text
-note: 两台服务器各截取一行 33 个运行中请求的 decode 日志。第一台重放计算图，第二台使用 eager 模式。
+note: 早期两台服务器各截取一行 33 个运行中请求的 decode 日志，运行日期不同。第一台重放计算图，第二台使用 eager 模式。
 ---
 [2026-10-16 20:32:22] Decode batch, #running-req: 33, #token: 19597, token usage: 0.81, cuda graph: True, gen throughput (token/s): 319.70, #queue-req: 0
 [2026-10-18 18:01:00] Decode batch, #running-req: 33, #token: 20422, token usage: 0.85, cuda graph: False, gen throughput (token/s): 350.78, #queue-req: 0
@@ -122,20 +122,29 @@ note: 两台服务器各截取一行 33 个运行中请求的 decode 日志。�
 
 | 并发 | TPOT 中位数，开启 / 关闭计算图 | 输出 tok/s，开启 / 关闭 | P99 ITL，开启 / 关闭 |
 |---|---|---|---|
-| 1 | 60.16 / 60.63 ms | 13.42 / 13.81 | 104 / 104 ms |
-| 8 | 66.01 / 66.64 ms | 112.62 / 111.60 | 71 / 68 ms |
-| 32 | 96.18 / 94.11 ms | 270.11 / 270.80 | 103 / 89 ms |
-| 64 | 107.42 / 106.70 ms | 250.85 / 256.41 | 114 / 98 ms |
+| 1 | 60.15 / 60.64 ms | 13.93 / 14.67 | 104 / 104 ms |
+| 8 | 66.01 / 66.60 ms | 112.60 / 111.67 | 70 / 68 ms |
+| 16 | 70.08 / 70.59 ms | 201.21 / 200.16 | 80 / 73 ms |
+| 32 | 95.65 / 94.12 ms | 270.61 / 270.81 | 103 / 87 ms |
+| 64，见下文 | 103.39 / 103.12 ms | 264.10 / 265.30 | 109 / 90 ms |
 
-**上游实测** L4 上的差异也很小。不超过 16 用户时，计算图在 60 至 70 ms 的一步中节省 0.5 至 0.6 ms，不到 1%。所有并发下吞吐量差距均在 3% 内。从 32 用户起，关闭计算图的服务器 P99 ITL 更低；32 用户时为 89 对 103 ms。上游尚未查明机制，且两台服务器在不同日期运行，因此这只能作为线索，不能视为结论。
+L4 的服务器只为最多 48 个运行请求捕获 decode graph。64 用户时，超过 48 的 batch 在两台服务器上都会用 eager，因此最后一行不衡量计算图。
 
-上游的解释是：batch 为 1 时，8B 模型每步约从内存读取 16 GB 权重。计算图消除的启动时间相对这次读取很短。
+**上游实测** L4 上的差异仍很小。不超过 16 用户时，计算图在 60 至 70 ms 的一步中节省 0.5 至 0.7 ms，约 1%。从 2 个用户起，吞吐量差距不超过 1.2%；1 用户时差距为 5%。
+
+16 与 32 用户时，关闭计算图的服务器 P99 ITL 更低，且 seed 范围没有重叠。分别是 73 对 80 ms，以及 87 对 103 ms。两台服务器在这些 batch 大小都重放了计算图。我们还没有找到这种差距的机制，因此只报告结果，不做解释。
+
+同日的 GB10 对照没有出现这种差距：所有并发下，开启与关闭计算图的 P99 ITL 相差不超过 7%，TPOT 中位数相差不超过 2%。
+
+我们的解释是，batch 为 1 时，8B 模型每步约从内存读取 16 GB 权重。计算图消除的启动时间相对这次读取很短。
+
+[Inside an LLM Serving GPU 示意图](https://aieng-zh.cn/inside-an-llm-serving-gpu?graphs=off&users=1)展示了 L4 上无计算图的一步如何读取权重并继续处理。该入口使用一个用户的数据。我们最早的对照中，这一步多耗时 0.47 ms，总计 60.63 ms。
 
 ## 我们的建议
 
 保持 CUDA graphs 开启，并根据流量设置大小。默认 `max_bs` 适合中等并发。如果基准或生产峰值的请求数超过它，在测量前将 `--cuda-graph-max-bs-decode` 和 `--max-running-requests` 设为目标值。SemiAnalysis InferenceX 的配置 {{field InferenceX 2026-05}} 会根据测试并发推导这两个值。
 
-不要指望计算图在任何机器上都能让慢 decode 变快。在 GB10 上，混合专家模型一个 decode 步骤需要数十毫秒，计算图带来的变化不超过 3%。L4 上的稠密 8B 模型节省不到 1%。先分别测量开启和关闭计算图的结果，再判断是否应归咎于启动路径。
+不要指望计算图在任何机器上都能让慢 decode 变快。在 GB10 上，混合专家模型一个 decode 步骤需要数十毫秒，计算图带来的变化不超过 3%。L4 上的稠密 8B 模型约节省 1%。16 与 32 用户时，无计算图的 P99 token 间延迟反而更低。检查中位数与尾部，并在自己的 GPU 上测量两种设置，再判断是否应归咎于启动路径。
 
 不要靠关闭计算图解决内存问题。捕获时内存不足，应降低 `--cuda-graph-max-bs-decode` 或 `--mem-fraction-static`。没有 decode 计算图的服务器，必须为每位用户的每个 token 支付启动开销。
 
@@ -169,4 +178,4 @@ note: 帮助文本末尾弃用参数部分的两行。
 - 将旧配置的 --cuda-graph-max-bs 和 --disable-cuda-graph 换成 v0.5.22 按阶段设置的参数。
 ```
 
-来源：capture/out/server-default.log, capture/out/serve-help.txt, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/server-no-cuda-graph.log, capture/gpu/summary/gb10.json, capture/gpu/incidents/l4-thermal-throttle.txt, capture/gpu/out-l4/server-load-graphs-on-off.log, capture/gpu/summary/l4.json (load.default, load.no-cuda-graph), python/sglang/srt/model_executor/forward_batch_info.py (ForwardMode), model_executor/model_runner.py (_forward_raw), model_executor/cuda_graph_config.py (default_prefill_backend), model_executor/runner/decode_cuda_graph_runner.py (can_run_graph), arg_groups/memory_hook.py (_handle_gpu_memory_settings), arg_groups/cuda_graph_hook.py (generate_decode_cuda_graph_batch_sizes), and server_args.py (deprecated flags) at v0.5.22; the argument parser of the installed v0.5.22 package; PRs #23906, #29458, #37898, #42285; issues #23769 and #36478; field reports by Hazy Research (2025-09-28), Jarvislabs (2026-05-18), joshua8.ai (2026-01-10), and SemiAnalysis InferenceX (2026-05-26).
+来源：capture/out/server-default.log, capture/out/serve-help.txt, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/server-no-cuda-graph.log, capture/gpu/summary/gb10.json, capture/gpu/incidents/l4-thermal-throttle.txt, capture/gpu/out-l4/server-load-graphs-on-off.log, capture/gpu/out-l4/graphs-sameday-starts.log, capture/gpu/out-l4/cuda-graph-max-bs-ambiguous.txt, capture/gpu/summary/l4.json (load.default, load.no-cuda-graph, load.graphs-on-b, load.graphs-off-b), python/sglang/srt/model_executor/forward_batch_info.py (ForwardMode), model_executor/model_runner.py (_forward_raw), model_executor/cuda_graph_config.py (default_prefill_backend), model_executor/runner/decode_cuda_graph_runner.py (can_run_graph), arg_groups/memory_hook.py (_handle_gpu_memory_settings), arg_groups/cuda_graph_hook.py (generate_decode_cuda_graph_batch_sizes), and server_args.py (deprecated flags) at v0.5.22; the argument parser of the installed v0.5.22 package; PRs #23906, #29458, #37898, #42285; issues #23769 and #36478; field reports by Hazy Research (2025-09-28), Jarvislabs (2026-05-18), joshua8.ai (2026-01-10), and SemiAnalysis InferenceX (2026-05-26).

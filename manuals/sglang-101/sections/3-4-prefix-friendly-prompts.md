@@ -26,7 +26,7 @@ note: 三行汇总；省略上方十五行逐请求记录。稳定组丢弃用�
 {"summary": "id-at-end", "median_ttft_ms": 88.2, "min_ttft_ms": 83.7, "max_ttft_ms": 118.1, "median_cached_tokens": 2985, "prompt_tokens": 3028}
 ```
 
-上游实测，ID 放开头时首 token 等待为 1,255 ms，对照 45 ms，长约 28 倍。同一 ID 放末尾只比稳定 prompt 多 43 ms。三种情况 token 几乎相同，仅顺序不同。
+上游在 Mac 上用 4-bit MLX `Qwen3-0.6B` 实测，ID 放开头时首 token 等待为 1,255 ms，对照 45 ms，长约 28 倍。这个倍数取决于显卡的 prefill 速度，但未命中的 token 数不会变。同一 ID 放末尾只比稳定 prompt 多 43 ms。三种情况 token 几乎相同，仅顺序不同。
 
 缓存数量解释了时间。稳定 prompt 复用 2,999 中的 2,998 个，即[第 3.3 节](#s-radixcache)所说的上限。ID 在开头只匹配随机十六进制之前五个 token。变化之后的每个 token 都属于树的不同分支，即使剩余文本相同。
 
@@ -34,9 +34,11 @@ note: 三行汇总；省略上方十五行逐请求记录。稳定组丢弃用�
 id: fig-3-4
 kind: comparison
 title: 相同 token 的三种顺序
-claim: Prompt 开头随机 ID 使 3,029 token 未命中，相同 ID 放末尾只损失约 45 token。
-caption: 每条从左向右表示 prompt token，绿色缓存复用，梅紫重新 prefill。来源：capture/out/cache-experiment.txt。
+claim: 捕获记录中，prompt 开头的随机 ID 使约 3,027 token 未命中；放到末尾则仅损失约 45 token。
+caption: 每条从左向右表示 prompt token，绿色缓存复用，梅紫重新 prefill。条带宽度仅作数量级示意，不代表同一轮的配对总数。来源：capture/out/cache-experiment.txt。
 ```
+
+汇总中的 `prompt_tokens` 与 `median_cached_tokens` 是两个独立统计值，不能直接相减。逐轮数据的未命中数是 3,031、3,027、3,025、3,025 和 3,028 token；中位数为 3,027 token。
 
 ## 顺序为何重要
 

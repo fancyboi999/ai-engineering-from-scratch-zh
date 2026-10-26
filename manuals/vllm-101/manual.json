@@ -1,0 +1,393 @@
+{
+  "id": "vllm-101",
+  "title": "vLLM 101",
+  "subtitle": "用 vLLM 部署、估算、调优和排查开源模型，并为每项选择提供实测依据",
+  "summary": "介绍如何安装 vLLM、在 GPU 上部署模型、针对负载调优和按症状排查问题。实测使用 vLLM 0.31.0、NVIDIA L4 和 DGX Spark。",
+  "audience": "你已经通过 API 调用过模型，现在想自行部署开源模型。你了解 token 和 GPU，并希望在付费使用之前知道哪些设置最重要。",
+  "edition": "2026.10",
+  "status": "ready",
+  "pin": {
+    "subject": "vLLM",
+    "version": "0.31.0",
+    "source": "https://github.com/vllm-project/vllm",
+    "commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+    "date": "2026-10-05",
+    "verified": "2026-10-22"
+  },
+  "outcomes": [
+    "安装 vLLM、部署模型，并从启动日志中读出服务器容量信息。",
+    "估算 GPU 能容纳的用户数，并修复启动时的内存不足。",
+    "为实际负载挑出最重要的一两个参数，其余维持默认值。",
+    "根据测量结果判断何时值得使用 speculative decoding、FP8 或不同编译级别。",
+    "根据症状排查服务器变慢或故障的问题。"
+  ],
+  "palette": [
+    {
+      "hue": "blue",
+      "meaning": "vLLM 服务：API server 进程和 engine core"
+    },
+    {
+      "hue": "violet",
+      "meaning": "模型及其前向计算：kernel、attention backend 和 CUDA graph"
+    },
+    {
+      "hue": "green",
+      "meaning": "KV cache：block、缓存池和前缀缓存"
+    },
+    {
+      "hue": "plum",
+      "meaning": "模型计算：prefill 和 decode 步骤"
+    },
+    {
+      "hue": "olive",
+      "meaning": "客户端和网络：HTTP、OpenAI API 与基准测试客户端"
+    },
+    {
+      "hue": "indigo",
+      "meaning": "进程间的消息与数据流，以及流式输出的 token"
+    },
+    {
+      "hue": "amber",
+      "meaning": "生命周期：请求状态和调度步骤"
+    },
+    {
+      "hue": "teal",
+      "meaning": "持久状态：磁盘权重、主机内存和卸载的 KV cache"
+    },
+    {
+      "hue": "rose",
+      "meaning": "故障：内存不足、抢占、中止和崩溃"
+    },
+    {
+      "hue": "grey",
+      "meaning": "vLLM 之外：操作系统、其他程序和 GPU 驱动"
+    }
+  ],
+  "sources": [
+    {
+      "name": "发布标签对应的 vLLM 源码",
+      "path": "v0.31.0 (db9527a4)",
+      "usedFor": "第 8 部分和参考章节中的所有默认行为与机制"
+    },
+    {
+      "name": "实测记录",
+      "path": "capture/gpu/ (NVIDIA L4 with Qwen3-8B, DGX Spark GB10 with Qwen3-30B-A3B, vLLM 0.31.0)",
+      "usedFor": "所有代码清单及标为实测的数值"
+    },
+    {
+      "name": "该版本标签对应的 vLLM 文档",
+      "path": "docs/ at v0.31.0",
+      "usedFor": "安装方法和文档说明的行为，并与源码核对"
+    },
+    {
+      "name": "vLLM GitHub issues 和 pull requests",
+      "path": "github.com/vllm-project/vllm",
+      "usedFor": "事故记录和各功能的演变过程"
+    },
+    {
+      "name": "论文",
+      "path": "the PagedAttention paper (SOSP 2023)",
+      "usedFor": "缓存池的原始设计"
+    }
+  ],
+  "front": "front.md",
+  "plate": {
+    "figure": "plate-vllm-request",
+    "title": "L4 上的一个缓存池",
+    "caption": "Scheduler 在 2,048-token 预算内安排每个步骤。Block table 会将请求映射到不连续的 block。我们的 L4 缓存池包含 1,506 个 16-token block。来源：capture/gpu/summary/l4.json 和 capture/gpu/out-l4/server-h2h-prefix-vllm.log。"
+  },
+  "parts": [
+    {
+      "number": 1,
+      "title": "启动与接入",
+      "thesis": "不修改任何设置，也能用 vLLM 部署模型并验证服务可用。",
+      "summary": "安装 vLLM 并部署首个模型，检查服务健康状态，了解服务器的关键指标，并设置常用选项。",
+      "accent": "blue",
+      "sections": [
+        {
+          "id": "1.1",
+          "file": "sections/1-1-install-vllm-and-serve-your-first-model.md"
+        },
+        {
+          "id": "1.2",
+          "file": "sections/1-2-check-that-the-server-is-healthy.md"
+        },
+        {
+          "id": "1.3",
+          "file": "sections/1-3-understand-what-happens-to-your-request.md"
+        },
+        {
+          "id": "1.4",
+          "file": "sections/1-4-set-the-server-options-every-deployment-needs.md"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "估算资源",
+      "thesis": "能容纳多少用户由 KV cache 决定，所以选 GPU 或参数前先计算容量。",
+      "summary": "每个 token 的内存占用、内存不足修复、DGX Spark 统一内存、FP8 KV cache 和权重，以及长上下文。",
+      "accent": "green",
+      "sections": [
+        {
+          "id": "2.1",
+          "file": "sections/2-1-count-the-memory-before-you-pick-a-gpu.md"
+        },
+        {
+          "id": "2.2",
+          "file": "sections/2-2-fix-out-of-memory-at-startup.md"
+        },
+        {
+          "id": "2.3",
+          "file": "sections/2-3-size-memory-on-a-dgx-spark.md"
+        },
+        {
+          "id": "2.4",
+          "file": "sections/2-4-fit-more-users-with-an-fp8-kv-cache.md"
+        },
+        {
+          "id": "2.5",
+          "file": "sections/2-5-fit-a-bigger-model-with-fp8-weights.md"
+        },
+        {
+          "id": "2.6",
+          "file": "sections/2-6-serve-long-contexts-and-hybrid-models.md"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "针对负载调优",
+      "thesis": "不同负载各有一两个重要参数，而大多数默认值已经合适。",
+      "summary": "针对 chat、RAG 和 agent、长文档、长会话、JSON、批处理、multi-LoRA、可复现输出、RL rollout 和推理模型的配置方法。",
+      "accent": "amber",
+      "sections": [
+        {
+          "id": "3.1",
+          "file": "sections/3-1-tune-chat-for-many-users.md"
+        },
+        {
+          "id": "3.2",
+          "file": "sections/3-2-make-repeated-prompts-hit-the-prefix-cache.md"
+        },
+        {
+          "id": "3.3",
+          "file": "sections/3-3-keep-long-prompts-from-stalling-short-ones.md"
+        },
+        {
+          "id": "3.4",
+          "file": "sections/3-4-keep-long-sessions-cheap.md"
+        },
+        {
+          "id": "3.5",
+          "file": "sections/3-5-return-valid-json-and-tool-calls.md"
+        },
+        {
+          "id": "3.6",
+          "file": "sections/3-6-run-batch-and-offline-jobs.md"
+        },
+        {
+          "id": "3.7",
+          "file": "sections/3-7-serve-many-fine-tunes-with-multi-lora.md"
+        },
+        {
+          "id": "3.8",
+          "file": "sections/3-8-get-reproducible-outputs.md"
+        },
+        {
+          "id": "3.9",
+          "file": "sections/3-9-use-vllm-as-an-rl-rollout-engine.md"
+        },
+        {
+          "id": "3.10",
+          "file": "sections/3-10-serve-reasoning-models.md"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "加速功能",
+      "thesis": "加速功能只对部分负载有效，应根据自己的负载测量结果决定是否启用。",
+      "summary": "Speculative decoding、CUDA graph 和编译级别、异步调度，以及 attention backend。",
+      "accent": "violet",
+      "sections": [
+        {
+          "id": "4.1",
+          "file": "sections/4-1-speed-up-decode-with-eagle3.md"
+        },
+        {
+          "id": "4.2",
+          "file": "sections/4-2-use-n-gram-speculation-for-copy-heavy-work.md"
+        },
+        {
+          "id": "4.3",
+          "file": "sections/4-3-keep-cuda-graphs-and-compile-on.md"
+        },
+        {
+          "id": "4.4",
+          "file": "sections/4-4-leave-async-scheduling-on.md"
+        },
+        {
+          "id": "4.5",
+          "file": "sections/4-5-change-the-attention-backend-only-for-a-reason.md"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "测量性能",
+      "thesis": "只有基准测试匹配实际负载并记录运行条件时，结果才有参考价值。",
+      "summary": "测试自己的服务器、监控生产环境，并针对某种负载选择 vLLM 或 SGLang。",
+      "accent": "olive",
+      "sections": [
+        {
+          "id": "5.1",
+          "file": "sections/5-1-benchmark-your-server-in-15-minutes.md"
+        },
+        {
+          "id": "5.2",
+          "file": "sections/5-2-watch-vllm-in-production.md"
+        },
+        {
+          "id": "5.3",
+          "file": "sections/5-3-decide-between-vllm-and-sglang.md"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "横向扩展",
+      "thesis": "先调好一块 GPU，再增加 GPU；根据任务特点选择并行布局。",
+      "summary": "Tensor、pipeline 和 data 并行，expert 并行，将 prefill 和 decode 分配到不同服务器，Kubernetes，以及其他加速器。",
+      "accent": "indigo",
+      "sections": [
+        {
+          "id": "6.1",
+          "file": "sections/6-1-choose-tensor-pipeline-or-data-parallelism.md"
+        },
+        {
+          "id": "6.2",
+          "file": "sections/6-2-serve-moe-models-with-expert-parallelism.md"
+        },
+        {
+          "id": "6.3",
+          "file": "sections/6-3-split-prefill-and-decode.md"
+        },
+        {
+          "id": "6.4",
+          "file": "sections/6-4-run-vllm-on-kubernetes.md"
+        },
+        {
+          "id": "6.5",
+          "file": "sections/6-5-run-vllm-on-other-accelerators.md"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "运行与排查",
+      "thesis": "从实际症状开始，查看一行日志或指标，再调整一个设置。",
+      "summary": "按症状排查问题，以及在生产环境运行 vLLM。",
+      "accent": "rose",
+      "sections": [
+        {
+          "id": "7.1",
+          "file": "sections/7-1-troubleshoot-by-symptom.md"
+        },
+        {
+          "id": "7.2",
+          "file": "sections/7-2-run-vllm-in-production.md"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "vLLM 的工作原理",
+      "thesis": "内部机制解释了默认行为；对默认设置感到意外时，可以阅读这一部分。",
+      "summary": "进程、调度器、KV 缓存池、attention backend、model runner、编译和 graph、speculation、KV connector 与发展历史。",
+      "accent": "plum",
+      "sections": [
+        {
+          "id": "8.1",
+          "file": "sections/8-1-why-vllm-runs-three-kinds-of-process.md"
+        },
+        {
+          "id": "8.2",
+          "file": "sections/8-2-why-one-token-budget-replaces-a-prefill-phase.md"
+        },
+        {
+          "id": "8.3",
+          "file": "sections/8-3-how-the-block-pool-manages-kv-memory.md"
+        },
+        {
+          "id": "8.4",
+          "file": "sections/8-4-how-vllm-picks-an-attention-backend.md"
+        },
+        {
+          "id": "8.5",
+          "file": "sections/8-5-what-model-runner-v2-changed.md"
+        },
+        {
+          "id": "8.6",
+          "file": "sections/8-6-how-compile-and-cuda-graphs-are-captured.md"
+        },
+        {
+          "id": "8.7",
+          "file": "sections/8-7-how-speculative-decoding-checks-drafts.md"
+        },
+        {
+          "id": "8.8",
+          "file": "sections/8-8-how-kv-connectors-move-the-cache.md"
+        },
+        {
+          "id": "8.9",
+          "file": "sections/8-9-where-vllm-came-from.md"
+        }
+      ]
+    }
+  ],
+  "reference": {
+    "title": "Reference",
+    "thesis": "在此查询参数、指标、事故、版本固定信息或图表。",
+    "accent": "grey",
+    "sections": [
+      {
+        "id": "R.1",
+        "file": "sections/r-1-flags-and-defaults.md"
+      },
+      {
+        "id": "R.2",
+        "file": "sections/r-2-metrics.md"
+      },
+      {
+        "id": "R.3",
+        "file": "sections/r-3-incident-index.md"
+      },
+      {
+        "id": "R.4",
+        "file": "sections/r-4-version-pins.md"
+      },
+      {
+        "id": "R.5",
+        "file": "sections/r-5-glossary.md"
+      },
+      {
+        "id": "R.6",
+        "file": "sections/r-6-sources.md"
+      },
+      {
+        "id": "R.7",
+        "file": "sections/r-7-lab-notes.md"
+      },
+      {
+        "id": "R.8",
+        "file": "sections/r-8-figure-index.md"
+      }
+    ]
+  },
+  "related": [
+    "phases/17-infrastructure-and-production/04-vllm-serving-internals",
+    "phases/17-infrastructure-and-production/08-inference-metrics-goodput",
+    "phases/17-infrastructure-and-production/05-eagle3-speculative-decoding"
+  ]
+}

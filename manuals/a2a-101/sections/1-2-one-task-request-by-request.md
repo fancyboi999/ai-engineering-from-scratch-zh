@@ -47,7 +47,7 @@ Accept: text/event-stream
 
 ## 第 1 帧：任务出现 {#s-one-task-request-by-request-frame-1-the-task-appears}
 
-任务流的开头固定，必须从 Task 对象开始："the stream `MUST` begin with the Task object" {{spec §3.1.2}}。这个任务已处于 `TASK_STATE_SUBMITTED`：
+任务流必须先发送 `Task` 对象 {{spec §3.1.2}}。这个任务已处于 `TASK_STATE_SUBMITTED`：
 
 ```listing
 title: 第 1 帧，新任务
@@ -92,11 +92,11 @@ note: JSON-RPC 包装、消息 parts 和闭合括号已省略。
 
 第 9 帧是最后一个 `statusUpdate`。它在 `09:00:02.250Z` 将任务移到 `TASK_STATE_COMPLETED`，状态消息为 "1 failed, 11 passed"（1 项失败，11 项通过）。尽管有测试失败，任务仍完成，因为失败是结果的一部分。
 
-随后服务器关闭连接，没有帧宣告关闭，因为 1.0 删除了 `final` 标志 {{docs whats-new-v1}}。规则要求任务到达终态时必须关闭流："The stream `MUST` close when the task reaches a terminal state" {{spec §3.1.2}}。中断态是否关闭流，规范自相矛盾（[冲突 D3](#s-ref-sources)）。[中断态](#s-input-required-and-auth-required)一节列出关闭时机，其[图表](#fig-auth-required)跟踪一个保持打开的流。
+随后服务器关闭连接，没有帧宣告关闭，因为 1.0 删除了 `final` 标志 {{docs whats-new-v1}}。任务到达终态时，服务必须关闭流 {{spec §3.1.2}}。中断态是否关闭流，规范自相矛盾（[冲突 D3](#s-ref-sources)）。[中断态](#s-input-required-and-auth-required)一节列出关闭时机，其[图表](#fig-auth-required)跟踪一个保持打开的流。
 
 ## 流结束后的任务 {#s-one-task-request-by-request-the-task-after-the-stream}
 
-关闭后任务仍保存在存储中，客户端通过 `GetTask` 读取。此操作用于推送通知之后或流结束之后获取任务最终状态："for fetching the final state of a task after being notified via a push notification or after a stream has ended" {{spec §3.1.3}}。[GetTask 与 ListTasks](#s-get-task-and-list-tasks)介绍其返回内容。
+关闭后任务仍保存在存储中，客户端通过 `GetTask` 读取。客户端可以在收到推送通知或流结束后调用此操作，读取任务最终状态 {{spec §3.1.3}}。[GetTask 与 ListTasks](#s-get-task-and-list-tasks)介绍其返回内容。
 
 ```takeaways
 - 从第一帧取出任务 ID 和上下文 ID，并让后续每帧与它们匹配。

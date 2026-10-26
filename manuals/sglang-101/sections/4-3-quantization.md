@@ -40,9 +40,45 @@ PR #32114 在 2026-09-10 删除了普通 GPTQ CUDA 内核，CUDA 构建的方法
 
 `--kv-cache-dtype` 接受 `auto`、`bf16`、`fp8_e4m3`、`fp8_e5m2`、`mxfp8`（仅 FA4）、`nvfp4` 和 `fp4_mx_block16`。FP8 将每个 token 的字节数减半，FP4 降至四分之一，同一池因此能容纳两倍或四倍的 token。[第 3.1 节](#s-kv-bytes-per-token-and-the-kv-pool) 展示如何计算模型每个 token 的字节数。
 
-FP8 需要每个张量的缩放因子。`--quantization-param-path` 的帮助文本说，KV 缓存 dtype 为 FP8 时，“通常应提供”该文件，否则缩放因子“默认为 1.0，可能导致准确率问题” {{code}}。每次改变 KV 缓存 dtype 都应检查准确率。
+FP8 需要每个张量的缩放因子。`--quantization-param-path` 的帮助文本建议，在 KV 缓存 dtype 为 FP8 时提供缩放因子文件。若未提供，缩放因子默认为 1.0，可能影响准确率 {{code}}。每次改变 KV 缓存 dtype 都应检查准确率。
 
 Cloudflare 公布了它的检查结果。Kimi K2.6 使用 BF16 与 FP8 KV 时，GSM8K 分别为 94.24、94.09，MMLU 为 89.11、89.04，MMLU-Pro 为 80.29、79.29 {{field Cloudflare 2026-08}}。这是他们在自己模型上测得的数字，你的模型可能不同。
+
+2026 年，vLLM 团队测试了未经校准的 FP8 KV cache。大多数模型的结果接近 BF16。他们指出，在 FlashMLA backend 上运行 Kimi-K2.5 时应使用校准缩放因子 {{field vLLM 2026-04}}。我们没有复测这些模型。
+
+2026-10-23，我们在一张 L4 上做了自己的检查：使用 SGLang 0.5.22，测 `Qwen/Qwen3-8B` 和 `Qwen/Qwen3-8B-FP8` 的前 500 道 GSM8K 题，8-shot，greedy 解码。两个 checkpoint 都没有包含 KV 缩放因子，因此 FP8 KV 运行使用的 scale 为 1.0。
+
+```listing
+title: GSM8K 准确率，500 题、8-shot，Qwen3-8B，SGLang 0.5.22
+source: capture/gpu/out-l4/gsm8k-fp8-accuracy.txt
+lang: text
+note: 展示 SGLang 结果。文件中的 vLLM 结果略去。
+---
+engine   config                     correct   accuracy   Wilson 95% interval
+SGLang   BF16                       458/500   91.6%      88.8 to 93.7
+SGLang   FP8 weights                456/500   91.2%      88.4 to 93.4
+SGLang   FP8 KV cache               458/500   91.6%      88.8 to 93.7
+SGLang   FP8 weights + FP8 KV       460/500   92.0%      89.3 to 94.1
+…
+```
+
+四组 Wilson 置信区间互相重叠。这次运行没有显示准确率差异。500 道题还不足以排除几个百分点的下降。这只是一个模型和一个基准，部署自己的模型前仍须测准确率。
+
+### 检查缩放因子是否已加载
+
+不传 `--quantization-param-path` 时，日志会出现 `Using FP8 KV cache but no scaling factors provided` {{code}}。不过 checkpoint 也可能把缩放因子一并写入权重文件，因此这条警告本身无法说明服务最终使用了哪组值。
+
+先检查 checkpoint 的索引文件，搜索以 `k_scale` 或 `v_scale` 结尾的张量名：
+
+```bash
+grep -oE '"[^"]*(k|v)_scale"' model.safetensors.index.json | sort -u
+```
+
+2026-10-22，我们检查了 `Qwen/Qwen3-30B-A3B-Instruct-2507-FP8` 的索引。索引列出权重 scale，却没有 KV scale，因此下方 FP8 服务器使用 KV scale 1.0。
+
+然后检查加载日志。PR #35455 之前，SGLang 会漏载 compressed-tensors checkpoint 中的 KV scale，日志中的 `k_scale` 参数会报 not found {{issue #35455}}。这项修复已包含在 v0.5.22 {{code}}。如果仍看到 `k_scale` 或 `v_scale` 缺失警告，说明 loader 跳过了该缩放因子。在 scale 接近 1.0 的 checkpoint 上，这个 PR 测得 GSM8K 准确率从漏载时的 0.960 升至正确加载后的 0.965。
+
+最后，用你自己的 prompt 分别运行 FP8 和非 FP8 配置。正式上线前要对比答案。
 
 ## 量化是容量决策
 
@@ -76,7 +112,9 @@ note: 启动日志中的四行，省略时间戳。
 
 **我们实测**了两个选择带来的收益。权重从 57.75 GB 降至 29.75 GB，加载时间从 323.61 s 降至 152.29 s。池容量从 227,243 增至 1,083,008 个 token，是原来的 4.77 倍。
 
-这个数字是两种效应相乘的结果。权重缩小后，给池多留出了 28.00 GB，按日志单位计算，池从 20.80 GB 增至 49.58 GB。随后每个 token 的字节数又减半：48 层、4 个 KV 头、头大小 128 时，从 98,304 降至 49,152 字节。
+这个数字是两种效应相乘的结果。权重缩小后，给池多留出了 28.00 GB；按日志单位计算，池从 20.80 GB 增至 49.58 GB，增加 28.78 GB。随后每个 token 的字节数又减半：48 层、4 个 KV 头、头大小 128 时，从 98,304 降至 49,152 字节。
+
+扫描服务器的池容量不同于上方单次启动日志。BF16 扫描池为 234,600 token，FP8 扫描池为 1,084,458 token。请以相应 sweep 汇总数据为准。
 
 Listing 第二行就是上一小节提到的警告。我们没有提供缩放因子文件，所以所有缩放因子都为 1.0。在温度为 0 的首个请求中，两台服务器生成了相同的 12 个 token。但这只有一个 prompt，不能算准确率检查。
 
@@ -167,17 +205,19 @@ note: 内存比例同为 0.74 时的 BF16 池和 FP8 池。
 | 2,048 | 25.9 / 155.1 | 12,576 / 380 ms |
 | 4,096 | 10.9 / 134.8 | 40,126 / 372 ms |
 
-**上游实测 BF16 出现性能断崖，FP8 没有。** BF16 池容纳 6,559 token，共享长度达到 2,048 token 时，四个前缀就装不下。首 token 耗时中位数从 470 ms 升至 12.6 s。FP8 池容纳 107,299 token，保留了所有前缀，各长度下首 token 均低于 400 ms。共享 2,048 token 时，FP8 输出吞吐量是 BF16 的 6.0 倍。
+**上游实测 BF16 出现性能断崖，FP8 没有。** BF16 池只能容纳 6,559 token。共享长度达到 2,048 token 后，四个前缀便放不下。首 token 中位数从 470 ms 升至 12.6 s。
 
-最后一行有个限制。共享 4,096 token 时，BF16 在三次尝试后仍低于 1,000 MHz 的时钟下限，中位数仅 390 MHz。因此应以 2,048 那一行为结果。FP8 运行的时钟中位数为 1,200 至 1,260 MHz。
+FP8 池可容纳 107,299 token，因此保留了所有前缀。各长度下的首 token 时间都低于 400 ms。共享 2,048 token 时，FP8 输出吞吐量是 BF16 的 6.0 倍。
+
+最后一行有个限制。共享 4,096 token 时，BF16 在三次尝试后仍低于 1,000 MHz 的时钟下限，中位数仅 390 MHz。因此应以 2,048 那一行为结果。该行 BF16 时钟中位数为 1,275 MHz，高于下限，但一半样本仍带热降频标志。FP8 运行的时钟中位数为 1,200 至 1,260 MHz。
 
 ## 我们的建议
 
-使用离线量化 checkpoint，不传 `--quantization`。文档同样建议“优先采用离线量化，而非在线量化” {{docs}}。在线量化增加加载时间，还会产生一个没人评估过的 checkpoint。
+使用离线量化 checkpoint，不传 `--quantization`。文档也建议优先使用离线量化 {{docs}}。在线量化增加加载时间，还会产生一个没人评估过的 checkpoint。
 
 根据内存而非速度选择 KV 缓存 dtype。如果池已满导致请求排队，搭配缩放因子文件的 FP8 缓存是最便宜的扩容方式。如果池还有空间，保持模型 dtype。
 
-在 GB10 这样 decode 等待内存的 GPU 上，FP8 权重也是成本最低的提速方式。我们在所有并发下测得吞吐量接近翻倍。上线服务前，先在自己的任务上检查准确率。
+在 GB10 这样 decode 等待内存的 GPU 上，FP8 的吞吐收益明显。我们在 GB10 对照中同时改变了权重和 KV cache dtype，吞吐量是基线的 1.73 至 1.88 倍。因此它不能单独证明 FP8 权重的收益。要评估只改 FP8 KV 的效果，可参考[第 3.1 节](#s-kv-bytes-per-token-and-the-kv-pool)引用的独立实测；仍须为自己的模型检查缩放因子和准确率。
 
 Prefill 和 decode 分别运行在不同服务器时，按阶段选择量化。更小的权重有助于 decode，却可能拖慢 prefill。
 
@@ -197,4 +237,4 @@ Prefill 和 decode 分别运行在不同服务器时，按阶段选择量化。�
 - 读取 KV Cache is allocated 日志，确认每个选择换来的池容量。
 ```
 
-来源：capture/gpu/out-gb10/server-default.log, server-fp8.log, server-fp8.command.txt, generate.txt, fp8-generate.txt, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-l4/server-load-default.log, server-load-fp8.log, python/sglang/srt/arg_groups/choices.py (QUANTIZATION_CHOICES), arg_groups/fields/model.py (kv_cache_dtype, quantization_param_path), configs/model_config.py (_verify_quantization), layers/quantization/__init__.py (get_quantization_config), layers/quantization/gptq/gptq.py (override_quantization_method), layers/quantization/fp8.py, and docs/docs/advanced_features/quantization.mdx at v0.5.22; PR #32114; field reports by Cloudflare (2026-08-03), joshua8.ai (2026-01-10), and Pivot News (2026-05-19); capture/gpu/out-l4/server-small-pool-bf16-fp8.log, capture/gpu/summary/l4.json (prefix.small-pool, prefix.fp8-small-pool).
+来源：capture/gpu/out-gb10/server-default.log, server-fp8.log, server-fp8.command.txt, generate.txt, fp8-generate.txt, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-l4/server-load-default.log, server-load-fp8.log, capture/gpu/out-l4/gsm8k-fp8-accuracy.txt, capture/gpu/out-l4/server-pools.log, capture/gpu/out-l4/server-small-pool-bf16-fp8.log, python/sglang/srt/arg_groups/choices.py (QUANTIZATION_CHOICES), arg_groups/fields/model.py (kv_cache_dtype, quantization_param_path), configs/model_config.py (_verify_quantization), layers/quantization/__init__.py (get_quantization_config), layers/quantization/gptq/gptq.py (override_quantization_method), layers/quantization/fp8.py, model_executor/model_runner_components/load_model_utils.py (load_kv_cache_scales), layers/quantization/compressed_tensors/compressed_tensors.py (kv_cache_scheme), and docs/docs/advanced_features/quantization.mdx at v0.5.22; PR #32114; PR #35455 (compressed-tensors KV scales, merged 2026-08-20); 2026-10-22 的 Qwen/Qwen3-30B-A3B-Instruct-2507-FP8 `model.safetensors.index.json`; vLLM 团队，The State of FP8 KV-Cache and Attention Quantization in vLLM (2026-04-22); field reports by Cloudflare (2026-08-03), joshua8.ai (2026-01-10), and Pivot News (2026-05-19); capture/gpu/summary/l4.json (prefix.small-pool, prefix.fp8-small-pool).

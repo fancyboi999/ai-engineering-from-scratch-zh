@@ -8,7 +8,7 @@
 
 ## 在宿主注册 {#s-sbx-mcp-add-load-and-static-mcp-register-on-the-host}
 
-**sbx mcp add：** “Register an MCP server by name. The server is validated and its specification is stored for use with sbx create/run --static-mcp.” {{help-sbx sbx mcp add}} 按名称注册，验证服务器并存储 spec，供 sbx create/run --static-mcp 使用。
+**sbx mcp add：** {{help-sbx sbx mcp add}} 按名称注册，验证服务器并存储 spec，供 sbx create/run --static-mcp 使用。
 
 `--url` 接受四种形式：远程端点、社区 registry URL、`server.json` 或 `server.yaml` manifest URL，以及 `dhi.io/` 镜像引用。其他镜像引用被拒绝；`--local` 用 `docker run` 在宿主运行 registry OCI 服务器 {{help-sbx sbx mcp add}}。录制注册并列出一个远程服务器：
 
@@ -36,7 +36,7 @@ lang: json
 }
 ```
 
-帮助自带的 registry 示例在 2026-10-08 无法解析：添加 `https://registry.modelcontextprotocol.io/v0/servers/fetch-mcp/versions/latest` 报 `registry returned status 404`（capture/out/11-mcp-add-registry.txt）。另一输入是 `--command`，运行在宿主：“The process runs with your host user's full permissions” {{help-sbx sbx mcp add}}，拥有宿主用户的完整权限。本地服务器启动容器时使用宿主 Docker，不受 [microVM](#s-sbx-diagnose-and-the-microvm-boundary) 引擎边界限制 {{docs-sbx Local stdio server}}。
+帮助自带的 registry 示例在 2026-10-08 无法解析：添加 `https://registry.modelcontextprotocol.io/v0/servers/fetch-mcp/versions/latest` 报 `registry returned status 404`（capture/out/11-mcp-add-registry.txt）。另一输入是 `--command`，运行在宿主{{help-sbx sbx mcp add}}，拥有宿主用户的完整权限。本地服务器启动容器时使用宿主 Docker，不受 [microVM](#s-sbx-diagnose-and-the-microvm-boundary) 引擎边界限制 {{docs-sbx Local stdio server}}。
 
 OAuth 元数据通过 RFC 9728 和 RFC 8414 发现，也可用 `--oauth-authorization-server` 手动提供。`--client-id` 指定预注册客户端，动态注册遵循 RFC 7591。`--scope` 按文档优先级记录默认 scopes，`--resource` 设置 RFC 8707 indicator，`--callback-port` 固定监听端口 {{help-sbx sbx mcp add}}。token 留在宿主，由 `sbx mcp auth [server|--all]`、`auth status` 和 `auth rm` 管理 {{help-sbx sbx mcp auth}}。
 
@@ -44,7 +44,7 @@ deepwiki 无需 OAuth：`sbx mcp inspect` 报 `requires_oauth: false`，`auth st
 
 ## 每沙箱一个网关 {#s-sbx-mcp-add-load-and-static-mcp-one-gateway-per-sandbox}
 
-**MCP 网关：** 宿主端点，“brokers access to registered MCP servers” {{docs-sbx MCP gateway}}，代理访问已注册 MCP 服务器。`m101-mcp` 内环境有 `MCP_GATEWAY_URL=http://mcp-gateway.docker.internal/mcp` 和 `MCP_SENTINEL_TOKEN_NAME=proxy-managed`（capture/out/11-static-inside.txt）。文档列出启动时读取该 URL 的 Claude Code、Codex、Devin、Gemini、Kiro 和 OpenCode {{docs-sbx Prerequisites}}，没有 Docker Agent。普通 `shell` 沙箱仍可用 curl 访问网关（capture/fixtures/mcp-probe.sh）：
+**MCP 网关：** 宿主端点，{{docs-sbx MCP gateway}}，代理访问已注册 MCP 服务器。`m101-mcp` 内环境有 `MCP_GATEWAY_URL=http://mcp-gateway.docker.internal/mcp` 和 `MCP_SENTINEL_TOKEN_NAME=proxy-managed`（capture/out/11-static-inside.txt）。文档列出启动时读取该 URL 的 Claude Code、Codex、Devin、Gemini、Kiro 和 OpenCode {{docs-sbx Prerequisites}}，没有 Docker Agent。普通 `shell` 沙箱仍可用 curl 访问网关（capture/fixtures/mcp-probe.sh）：
 
 ```listing
 title: m101-mcp 内网关的 initialize 响应
@@ -65,7 +65,7 @@ data: {"jsonrpc":"2.0","id":1,"result":{"capabilities":{"logging":{},"prompts":{
 
 网关自称 `mcp-gateway-m101-mcp`，每沙箱一个；响应协议版本 `2025-11-25`，声明 `tools.listChanged: true`。`sbx mcp ls` 增加 `GATEWAY` 列 `LOCAL, managed by you`，JSON 有 `signed_in_as` {{help-sbx sbx mcp ls}}。默认 `false` 的 `mcp.forceLocalGateway` 及 `SBX_MCP_URL=none` 可在账户本会使用托管网关时选择本地数据平面 {{docs-sbx mcp.forceLocalGateway}}。
 
-文档区分 Desktop 产品：“You don't need the Docker Desktop MCP Toolkit to use `sbx mcp`” {{docs-sbx MCP gateway}}，使用 sbx mcp 不需要 Desktop MCP Toolkit。Kevin Wittek 在 2026-09-04 说宿主注册的服务器不受网络策略限制 {{talk 2026-09-04 T02}}，agent 在 VM 内启动的服务器则受限制。[DMR、Compose models 与 MCP 网关服务](#s-dmr-compose-models-and-the-mcp-gateway-service) 介绍 Toolkit 网关。
+文档区分 Desktop 产品{{docs-sbx MCP gateway}}，使用 sbx mcp 不需要 Desktop MCP Toolkit。Kevin Wittek 在 2026-09-04 说宿主注册的服务器不受网络策略限制 {{talk 2026-09-04 T02}}，agent 在 VM 内启动的服务器则受限制。[DMR、Compose models 与 MCP 网关服务](#s-dmr-compose-models-and-the-mcp-gateway-service) 介绍 Toolkit 网关。
 
 ## 静态与动态 {#s-sbx-mcp-add-load-and-static-mcp-static-and-dynamic}
 
@@ -86,7 +86,7 @@ $ sbx mcp load m101-deepwiki --sandbox m101-mcp-dyn
 MCP server "m101-deepwiki" loaded into sandbox "m101-mcp-dyn" (live)
 ```
 
-帮助承诺通知：“Connected agents see the new server's tools immediately via the standard MCP tools/list_changed notification” {{help-sbx sbx mcp load}}，连接中的 agent 会经标准通知立即看到新工具。探针每次新建会话，因此录制了两个列表，未录制通知本身。内置工具归网关：`mcp-exec`、`code-mode`、`mcp-find`、`mcp-add`、`mcp-config-set`，以及 OAuth 服务器的 `<server>-authorize` {{docs-sbx Built-in gateway tools}}。Cedar MCP 策略将它们作为 `MCP::Primordial` 资源，服务器工具为 `MCP::Tool` 资源 {{docs-sbx Built-in gateway tools}}，见[组织策略](#s-org-policies-profiles-and-the-audit-log)。
+帮助承诺通知{{help-sbx sbx mcp load}}，连接中的 agent 会经标准通知立即看到新工具。探针每次新建会话，因此录制了两个列表，未录制通知本身。内置工具归网关：`mcp-exec`、`code-mode`、`mcp-find`、`mcp-add`、`mcp-config-set`，以及 OAuth 服务器的 `<server>-authorize` {{docs-sbx Built-in gateway tools}}。Cedar MCP 策略将它们作为 `MCP::Primordial` 资源，服务器工具为 `MCP::Tool` 资源 {{docs-sbx Built-in gateway tools}}，见[组织策略](#s-org-policies-profiles-and-the-audit-log)。
 
 `sbx mcp catalog` 在 v0.45.0 移除 {{rel-sbx v0.45.0}}，产品页的 `sbx mcp enable` 从未存在（[冲突 C11](#s-ref-sources-and-the-conflicts-register)）。[图](#fig-3-7) 展示存储、两个网关与加载。协议本身见 [MCP 课程](phases/13-tools-and-protocols/06-mcp-fundamentals)。
 

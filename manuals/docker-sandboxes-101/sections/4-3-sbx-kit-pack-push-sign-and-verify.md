@@ -65,7 +65,7 @@ $ zip listing of work/hello-mixin.zip (size, name)
      297  spec.yaml
 ```
 
-`pack` 要求“The directory must contain a valid spec.yaml and an optional files/ directory” {{help-sbx sbx kit pack}}，有效 spec.yaml 及可选 files/。同一 ZIP 验证结果为 `kind: "zip"`（`capture/out/12-validate-zip.json`）。v3 目录在两条命令中都失败，见[描述文件一节](#s-syntax-docker-sandbox-kit-3-and-kit-yaml)。[图](#fig-4-3) 展示完整路径，未执行步骤用虚线框。
+`pack` 要求{{help-sbx sbx kit pack}}，有效 spec.yaml 及可选 files/。同一 ZIP 验证结果为 `kind: "zip"`（`capture/out/12-validate-zip.json`）。v3 目录在两条命令中都失败，见[描述文件一节](#s-syntax-docker-sandbox-kit-3-and-kit-yaml)。[图](#fig-4-3) 展示完整路径，未执行步骤用虚线框。
 
 ```figure
 id: fig-4-3
@@ -77,15 +77,15 @@ caption: 逐行读。实线框来自 capture/out/12-validate.txt、12-pack.txt�
 
 ## sign、push --sign 与 pull {#s-sbx-kit-pack-push-sign-and-verify-sign-push-sign-and-pull}
 
-录制套件未执行这三个命令，因为没有 registry 与签名身份；来源是帮助文本。`sbx kit sign` 默认无密钥，使用 CI provider 的 OIDC token 或浏览器登录。“A token is never read from SIGSTORE_ID_TOKEN, so it cannot be chosen by anything that can set an environment variable” {{help-sbx sbx kit sign}}，不读此环境变量，避免能设置环境变量的程序选择 token。`--key` 用未加密 PEM 私钥签名。“For a local directory, a detached signature bundle is written to kit.sig.bundle next to spec.yaml” {{help-sbx sbx kit sign}}，本地目录的分离签名包写在 spec.yaml 旁的 kit.sig.bundle。
+录制套件未执行这三个命令，因为没有 registry 与签名身份；来源是帮助文本。`sbx kit sign` 默认无密钥，使用 CI provider 的 OIDC token 或浏览器登录。{{help-sbx sbx kit sign}}，不读此环境变量，避免能设置环境变量的程序选择 token。`--key` 用未加密 PEM 私钥签名。{{help-sbx sbx kit sign}}，本地目录的分离签名包写在 spec.yaml 旁的 kit.sig.bundle。
 
-`sbx kit push DIRECTORY REFERENCE` 按 `schemaVersion` 选择产物：`"1"` 为 ZIP，`"2"` 为 tar+gzip 层，spec 在 config blob {{help-sbx sbx kit push}}。“With --sign, the pushed manifest is signed and the Sigstore bundle is attached to the kit as an OCI referrer” {{help-sbx sbx kit push}}，带 --sign 时签名 manifest 并以 OCI referrer 附加 Sigstore 包。不论签名与否，“Every push also attaches a SLSA provenance attestation as an OCI referrer” {{help-sbx sbx kit push}}，每次还附加 SLSA 溯源证明；“The provenance is unsigned unless --sign is given” {{help-sbx sbx kit push}}，否则溯源不签名。`--tlog-upload=false` 不将私有 kit 写入 Rekor 日志。`pull` 要求“The registry must support HTTPS” {{help-sbx sbx kit pull}}，registry 支持 HTTPS。
+`sbx kit push DIRECTORY REFERENCE` 按 `schemaVersion` 选择产物：`"1"` 为 ZIP，`"2{{help-sbx sbx kit push}}，带 --sign 时签名 manifest 并以 OCI referrer 附加 Sigstore 包。不论签名与否，{{help-sbx sbx kit push}}，每次还附加 SLSA 溯源证明；{{help-sbx sbx kit push}}，否则溯源不签名。`--tlog-upload=false` 不将私有 kit 写入 Rekor 日志。`pull` 要求{{help-sbx sbx kit pull}}，registry 支持 HTTPS。
 
-发布后的 v3 镜像可用同一命令按引用签名，但“V3 kits shared as source directories or Git references can't be signed” {{docs-sbx Sign and verify kits}}，源目录或 Git 引用形式不能签名。
+发布后的 v3 镜像可用同一命令按引用签名，但{{docs-sbx Sign and verify kits}}，源目录或 Git 引用形式不能签名。
 
 ## verify、provenance 与准入设置 {#s-sbx-kit-pack-push-sign-and-verify-verify-provenance-and-the-settings-that-admit-a-kit}
 
-`sbx kit verify` 用 `--key PUB` 验证密钥签名，或用 `--certificate-identity` 与 `--certificate-oidc-issuer` 验证无密钥签名。`--insecure-ignore-tlog` 接受私有无密钥签名，但“It has no effect on key-based verification” {{help-sbx sbx kit verify}}，不影响密钥验证。`sbx kit provenance REFERENCE` 打印证明；“only attestations that verify and whose subject matches the kit's own digest are reported as VERIFIED” {{help-sbx sbx kit provenance}}，只有验证成功且 subject 匹配 kit digest 的证明才标为 VERIFIED。
+`sbx kit verify` 用 `--key PUB` 验证密钥签名，或用 `--certificate-identity` 与 `--certificate-oidc-issuer` 验证无密钥签名。`--insecure-ignore-tlog` 接受私有无密钥签名，但{{help-sbx sbx kit verify}}，不影响密钥验证。`sbx kit provenance REFERENCE` 打印证明；{{help-sbx sbx kit provenance}}，只有验证成功且 subject 匹配 kit digest 的证明才标为 VERIFIED。
 
 六项设置决定沙箱接受什么，录制宿主全部为默认值：
 
@@ -103,11 +103,11 @@ kit.requireSignature                 false                              bool    
 kit.trustedSigners                   [{"identityRegexp":"^.*@docker\…   json     default             JSON array of trusted signer policies (key-base…
 ```
 
-“When `kit.requireSignature` is `true`, `sbx` rejects unsigned kits, signatures that don't match `kit.trustedSigners`, and ZIP kits” {{docs-sbx Require signed kits}}，开启签名要求后拒绝未签名、不匹配信任身份以及 ZIP kit。`kit.trustedSigners` 的“The default policy trusts Docker employee identities ending in `@docker.com`, attested by Google's issuer” {{docs-sbx kit.trustedSigners}}，默认信任由 Google issuer 证明的 Docker 员工身份。[设置表](#s-ref-settings-keys-environment-variables-and-paths) 列出各键环境变量。
+{{docs-sbx Require signed kits}}，开启签名要求后拒绝未签名、不匹配信任身份以及 ZIP kit。`kit.trustedSigners` 的{{docs-sbx kit.trustedSigners}}，默认信任由 Google issuer 证明的 Docker 员工身份。[设置表](#s-ref-settings-keys-environment-variables-and-paths) 列出各键环境变量。
 
 ## kit add 与 builder {#s-sbx-kit-pack-push-sign-and-verify-kit-add-and-the-builder}
 
-`sbx kit add SANDBOX REFERENCE` 重建容器并追加 mixin，“preserving kit-owned volumes (e.g. agent session state) across the swap” {{help-sbx sbx kit add}}，替换时保留 kit 卷，如会话状态。录制展示接受和拒绝情况：
+`sbx kit add SANDBOX REFERENCE` 重建容器并追加 mixin，{{help-sbx sbx kit add}}，替换时保留 kit 卷，如会话状态。录制展示接受和拒绝情况：
 
 ```listing
 title: kit add 接受 env-mixin，拒绝 hello-mixin
@@ -137,7 +137,7 @@ error: kit "hello-mixin" declares files, which the kit-add recreate flow does no
 
 没有 recreate-aware 标签的旧沙箱会被拒绝 {{help-sbx sbx kit add}}；`long-running@1` 也不能如此添加 {{rel-sbx v0.47.0}}。`sbx create shell --kit ./fixtures/kits/hello-mixin` 完整应用同一 mixin：一条安装命令、一个工作区文件和一条允许规则（`capture/out/12-run-kit.txt`、`12-policy-kit.txt`）。
 
-v3 源构建“run inside a shared builder sandbox named sbx-kit-builder, created on first use” {{help-sbx sbx kit builder}}，按帮助应在首次使用时创建的共享 builder 沙箱运行。`sbx kit builder status` 报告状态，`history` 转发给 `docker buildx history`：
+v3 源构建{{help-sbx sbx kit builder}}，按帮助应在首次使用时创建的共享 builder 沙箱运行。`sbx kit builder status` 报告状态，`history` 转发给 `docker buildx history`：
 
 ```listing
 title: 构建前的 builder

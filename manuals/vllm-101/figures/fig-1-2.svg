@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 346" role="img" aria-labelledby="fig-1-2-title fig-1-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-1-2-title">每次启动后要看的六行日志</title>
+  <desc id="fig-1-2-desc">DGX Spark 使用 vLLM 0.31.0 和 Qwen3-30B-A3B 时的启动日志：版本 0.31.0、V2 模型 runner、FLASH_ATTN attention backend、加载权重 56.93 GiB 耗时 330 秒、KV cache 剩余 31.32 GiB、缓存池 234,960 个 token。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">日志行</text>
+  <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">实测值</text>
+  <text x="410" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">说明</text>
+  <rect x="20" y="30" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="32" y="52.45" font-size="11.5" font-weight="700">version</text>
+  <text x="250" y="54" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">0.31.0</text>
+  <text x="410" y="54" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">正在运行的版本</text>
+  <rect x="20" y="80" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="32" y="102.45" font-size="11.5" font-weight="700">正在使用的 模型 runner</text>
+  <text x="250" y="104" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">V2</text>
+  <text x="410" y="104" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">当前使用的 模型 runner</text>
+  <rect x="20" y="130" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="32" y="152.45" font-size="11.5" font-weight="700">attention backend</text>
+  <text x="250" y="154" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">FLASH_ATTN</text>
+  <text x="410" y="154" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">用于 attention 的 kernel</text>
+  <rect x="20" y="180" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="32" y="202.45" font-size="11.5" font-weight="700">模型加载情况</text>
+  <text x="250" y="204" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">56.93 GiB, 330 s</text>
+  <text x="410" y="204" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">权重占用的内存</text>
+  <rect x="20" y="230" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="32" y="252.45" font-size="11.5" font-weight="700">可用 KV cache 内存</text>
+  <text x="250" y="254" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">31.32 GiB</text>
+  <text x="410" y="254" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">KV cache 剩余内存</text>
+  <rect x="20" y="280" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="32" y="302.45" font-size="11.5" font-weight="700">GPU KV cache 容量</text>
+  <text x="250" y="304" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">234,960 tokens</text>
+  <text x="410" y="304" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">可容纳的用户数</text>
+  <text x="20" y="338" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次启动后、接入流量前，先检查这些日志。</text>
+</svg>

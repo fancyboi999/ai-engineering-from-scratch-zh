@@ -8,7 +8,7 @@
 
 ## 推送到 registry {#s-share-push-and-share-pull-push-to-a-registry}
 
-**share push：** “Push an agent configuration file to an OCI registry” {{help-agent docker-agent share push}}，推送 agent 配置到 OCI registry。录制将带 `filesystem` 和 `shell` 的 `files.yaml` 推到 `localhost:15000` 的 `registry:2` 容器：
+**share push：** {{help-agent docker-agent share push}}，推送 agent 配置到 OCI registry。录制将带 `filesystem` 和 `shell` 的 `files.yaml` 推到 `localhost:15000` 的 `registry:2` 容器：
 
 ```listing
 title: 向本地 registry 推送一次
@@ -55,9 +55,9 @@ lang: json
 }
 ```
 
-**artifactType：** OCI manifest 中表明产物种类的字段。此处表示 Docker Agent config，config 和唯一层仍用 Docker 镜像 media type。`io.docker.agent.version` 记录推送程序版本；`io.docker.cagent.version` 重复它，因为 v1.23.3 重命名注解“while maintaining backward compatibility with the old annotation” {{rel-agent v1.23.3}}，同时兼容旧注解。
+**artifactType：** OCI manifest 中表明产物种类的字段。此处表示 Docker Agent config，config 和唯一层仍用 Docker 镜像 media type。`io.docker.agent.version` 记录推送程序版本；`io.docker.cagent.version` 重复它，因为 v1.23.3 重命名注解{{rel-agent v1.23.3}}，同时兼容旧注解。
 
-`instruction_file` 读取的文件随产物分发。推送时“the file contents are inlined into the pushed artifact, so the published agent stays self-contained” {{docs-agent Agent Configuration}}，文件内联使 agent 自包含。[图](#fig-6-4) 展示推送、manifest 与两条返回路径。
+`instruction_file` 读取的文件随产物分发。推送时{{docs-agent Agent Configuration}}，文件内联使 agent 自包含。[图](#fig-6-4) 展示推送、manifest 与两条返回路径。
 
 ```figure
 id: fig-6-4
@@ -69,11 +69,11 @@ caption: 顶行从左到右，再从上向下读 manifest 字段。紫色是 age
 
 ## --key 与 --encrypt {#s-share-push-and-share-pull-key-and-encrypt}
 
-录制推送没有 `--key`，manifest 无证明。此 flag 于 v1.132.0 新增 {{rel-agent v1.132.0}}，接受内联密钥或 `file://` 路径 {{help-agent docker-agent share push}}。带 `--key` 时证明写进 manifest 注解；“the YAML itself is always pushed in clear” {{help-agent docker-agent share push}}，YAML 自身始终明文推送。PEM 或 OpenSSH 密钥（Ed25519、ECDSA、RSA）记录签名；其他值是至少16字节的对称密钥，记录 MAC {{help-agent docker-agent share push}}。
+录制推送没有 `--key`，manifest 无证明。此 flag 于 v1.132.0 新增 {{rel-agent v1.132.0}}，接受内联密钥或 `file://` 路径 {{help-agent docker-agent share push}}。带 `--key` 时证明写进 manifest 注解；{{help-agent docker-agent share push}}，YAML 自身始终明文推送。PEM 或 OpenSSH 密钥（Ed25519、ECDSA、RSA）记录签名；其他值是至少16字节的对称密钥，记录 MAC {{help-agent docker-agent share push}}。
 
-`--encrypt` 还嵌入完整 YAML 加密副本；Ed25519 不能加密 {{help-agent docker-agent share push}}。自 v1.138.1 签名覆盖“a DSSE-wrapped in-toto statement instead of raw YAML bytes” {{rel-agent v1.138.1}}，即 DSSE 包装的 in-toto 声明而非原始 YAML 字节。帮助与录制都没命名证明注解，所以不列出。
+`--encrypt` 还嵌入完整 YAML 加密副本；Ed25519 不能加密 {{help-agent docker-agent share push}}。自 v1.138.1 签名覆盖{{rel-agent v1.138.1}}，即 DSSE 包装的 in-toto 声明而非原始 YAML 字节。帮助与录制都没命名证明注解，所以不列出。
 
-另一端 `share pull --key` 检查签名或 MAC，或解密副本比较。“The pull fails if the artifact is unprotected or the check does not pass” {{help-agent docker-agent share pull}}，未保护或检查未通过都拉取失败。两条命令均可读 `DOCKER_AGENT_ENCRYPT_KEY` 代替 flag。
+另一端 `share pull --key` 检查签名或 MAC，或解密副本比较。{{help-agent docker-agent share pull}}，未保护或检查未通过都拉取失败。两条命令均可读 `DOCKER_AGENT_ENCRYPT_KEY` 代替 flag。
 
 ## 拉取与按引用运行 {#s-share-push-and-share-pull-pull-and-run-by-reference}
 
@@ -101,9 +101,9 @@ README.md has 1 line.
 [exit 0]
 ```
 
-引用也可用于 `sub_agents`。“Tag references are checked against the registry on every `docker agent run`” {{docs-agent Agent Distribution}}，每次都查 registry，所以应固定 digest，如 `myorg/agent@sha256:…`，从缓存启动。`serve api --pull-interval N` 每 N 分钟重新拉取 {{help-agent docker-agent serve api}}。本地工作时 `run` 还接受文件的普通 `http://localhost` URL，无需 registry {{docs-agent Agent Distribution}}。
+引用也可用于 `sub_agents`。{{docs-agent Agent Distribution}}，每次都查 registry，所以应固定 digest，如 `myorg/agent@sha256:…`，从缓存启动。`serve api --pull-interval N` 每 N 分钟重新拉取 {{help-agent docker-agent serve api}}。本地工作时 `run` 还接受文件的普通 `http://localhost` URL，无需 registry {{docs-agent Agent Distribution}}。
 
-私有仓库先 `docker login`。Docker Agent 仅为 `docker.com` 下 HTTPS URL 自行转发 Docker token，`docker.io` 不属于此范围 {{docs-agent Agent Distribution}}，所以私有 Hub 仓库需 `docker login docker.io`。旧材料指向 Hub 的 `agentcatalog` namespace，v1.116.0 移除了对“discontinued `agentcatalog` Docker Hub namespace” {{rel-agent v1.116.0}} 的引用，即已停用的命名空间。
+私有仓库先 `docker login`。Docker Agent 仅为 `docker.com` 下 HTTPS URL 自行转发 Docker token，`docker.io` 不属于此范围 {{docs-agent Agent Distribution}}，所以私有 Hub 仓库需 `docker login docker.io`。旧材料指向 Hub 的 `agentcatalog` namespace，v1.116.0 移除了对{{rel-agent v1.116.0}} 的引用，即已停用的命名空间。
 
 ```takeaways
 - 他人会运行的 agent 推送时加 `--key`。

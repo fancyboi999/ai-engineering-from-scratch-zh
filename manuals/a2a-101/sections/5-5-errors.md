@@ -24,7 +24,7 @@ caption: 左侧为 capture/out/11-errors.http 中 JSON-RPC GetTask，右侧为 c
 label: 指明错误的详情
 source: spec §11.6
 ---
-"implementations **MUST** include a `google.rpc.ErrorInfo` object in the `details` array for A2A-specific errors"
+A2A 特定错误的 `details` 数组必须包含 `google.rpc.ErrorInfo` 对象
 ```
 
 `reason` 是去掉 `Error` 后缀的大写蛇形错误名，如 `TASK_NOT_FOUND`，`domain` 是 `a2a-protocol.org`。gRPC 绑定也有同样 `MUST`，JSON-RPC 只有 `SHOULD`。`metadata` 为自由形式：套件填写，参考 SDK 留空，见套件 README。 {{spec §11.6}} {{spec §10.6}} {{spec §9.5}}

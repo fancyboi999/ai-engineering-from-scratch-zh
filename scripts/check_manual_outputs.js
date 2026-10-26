@@ -8,12 +8,14 @@ const path = require('node:path');
 const vm = require('node:vm');
 const builder = require('../site/build-manuals.js');
 
-// 原两本保留 2026-10-12 冻结计数；新增手册按本次同步的固定源检验。
+// 手册计数按本次审阅的固定 upstream/main manifest 与图表源检验。
 const EXPECTED = {
   'a2a-101': { sections: 28, references: 7, figures: 31 },
   'docker-sandboxes-101': { sections: 33, references: 8, figures: 34 },
+  'miles-101': { sections: 34, references: 5, figures: 18 },
   'reverse-engineering-101': { sections: 26, references: 6, figures: 37 },
-  'sglang-101': { sections: 28, references: 6, figures: 63 },
+  'sglang-101': { sections: 29, references: 7, figures: 63 },
+  'vllm-101': { sections: 44, references: 8, figures: 26 },
 };
 
 function checkManualOutputs(root) {

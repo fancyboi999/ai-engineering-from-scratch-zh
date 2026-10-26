@@ -18,7 +18,7 @@
 | Counter | 只增长的 Prometheus 累计值，使用时间窗口内的速率读取 | [5.2](#s-the-metrics-endpoint) |
 | CUDA graph | 固定形状与地址的内核启动记录，GPU 通过一次 CPU 调用重放 | [4.1](#s-forwardmode-and-cuda-graphs) |
 | 数据并行（DP） | 多个完整模型副本，各自处理请求并维护 KV 缓存 | [6.1](#s-tp-size-dp-size-and-attn-dp-size) |
-| Decode | 生成后续 token 的循环，每请求每 token 一次前向传播 | [1.1](#s-what-a-serving-engine-owns) |
+| Decode | 生成后续 token 的循环，每请求每 token 一次前向传播 | [1.1](#s-what-the-server-does-with-your-request) |
 | DetokenizerManager | 将输出 token ID 转为文本并送回 TokenizerManager 的进程 | [2.1](#s-sglang-serve-and-the-three-processes) |
 | 草稿模型 | 低成本提出后续几个 token 的小模型或 head | [4.4](#s-speculative-decoding) |
 | EPLB | 记录专家使用情况并在 GPU 间迁移专家的专家并行负载均衡器 | [6.2](#s-moe-serving-deepep-and-eplb) |
@@ -26,7 +26,7 @@
 | ForwardMode | 批次标签，指示 model runner 执行哪类前向传播 | [4.1](#s-forwardmode-and-cuda-graphs) |
 | Gauge | 每次日志间隔由调度器覆盖的值，抓取只看到最新值 | [5.2](#s-the-metrics-endpoint) |
 | GEMM 后端 | 执行量化权重矩阵乘法的内核库 | [4.3](#s-quantization) |
-| Goodput | 同时满足 TTFT 与 TPOT 目标的每秒请求数 | [1.1](#s-what-a-serving-engine-owns) |
+| Goodput | 同时满足 TTFT 与 TPOT 目标的每秒请求数 | [1.1](#s-what-the-server-does-with-your-request) |
 | 语法队列 | 语法仍在编译的请求列表 | [4.5](#s-structured-outputs-with-xgrammar) |
 | 分组查询注意力 | 多个 query head 共用一个 key/value head，使 KV head 少于 attention head | [3.1](#s-kv-bytes-per-token-and-the-kv-pool) |
 | HiCache | 将基数树从 GPU 内存延伸到主机内存和存储的分层缓存 | [3.5](#s-eviction-policies-and-hicache) |
@@ -34,7 +34,7 @@
 | ITL | 全部请求汇总的流式输出块之间的间隔 | [5.1](#s-sglang-benchmark-serving) |
 | KV 缓存 | 保存每层此前所有 token 的 key/value，让 decode 不必重算 | [3.1](#s-kv-bytes-per-token-and-the-kv-pool) |
 | KV 缓存 dtype | 已缓存 key/value 的格式 | [4.3](#s-quantization) |
-| KV 池 | 保存服务器保留的每个 token 的 key/value 的内存 | [1.2](#s-one-request-end-to-end) |
+| KV 池 | 保存服务器保留的每个 token 的 key/value 的内存 | [1.2](#s-what-the-server-does-with-your-request) |
 | L1, L2, L3 | HiCache 三层：GPU 池、锁页主机内存池、可选共享存储后端 | [3.5](#s-eviction-policies-and-hicache) |
 | Logprob | 服务器采样分布下某 token 的对数概率 | [4.6](#s-deterministic-inference-and-logprobs) |
 | Mamba 层 | 每序列保存一个固定大小状态的状态空间或线性注意力层 | [3.6](#s-hybrid-models-and-the-cache) |
@@ -51,7 +51,7 @@
 | 暂停与恢复 | 带 mode 的 `POST /pause_generation`，默认 `abort` 结束所有运行请求 | [7.2](#s-sglang-as-an-rl-rollout-engine) |
 | 峰值并发请求 | 基准运行中任一秒内活跃请求数的最大值 | [5.1](#s-sglang-benchmark-serving) |
 | 流水线并行（PP） | 整层按顺序分配到不同 GPU，`--pp-size` 设置阶段数 | [6.1](#s-tp-size-dp-size-and-attn-dp-size) |
-| Prefill | 对完整 prompt 前向传播，计算 key/value 并生成首输出 token | [1.1](#s-what-a-serving-engine-owns) |
+| Prefill | 对完整 prompt 前向传播，计算 key/value 并生成首输出 token | [1.1](#s-what-the-server-does-with-your-request) |
 | Prefill-decode 分离（PD） | 两类 SGLang 服务分别负责 prefill 与 decode，之间传输 KV | [6.3](#s-prefill-decode-disaggregation) |
 | RadixCache | token 序列的基数树，节点保存边上 token 的 KV 槽位索引 | [3.3](#s-radixcache) |
 | ReqToTokenPool | 每运行请求一行、每 token 位置一列的表 | [3.1](#s-kv-bytes-per-token-and-the-kv-pool) |
@@ -63,7 +63,7 @@
 | 停止条件 | 结束请求的规则：停止 token、字符串、正则、长度限制、中止或语法结束 | [2.5](#s-streaming-stop-strings-and-the-openai-api) |
 | 尾延迟优化 LRU（tlru） | 只保留满足下一轮延迟目标所需会话部分的淘汰策略 | [3.5](#s-eviction-policies-and-hicache) |
 | 张量并行（TP） | 每层权重矩阵切为 `--tp-size` 片，每 GPU 一片 | [6.1](#s-tp-size-dp-size-and-attn-dp-size) |
-| 吞吐量 | 全部用户每秒获得的输出 token 数 | [1.1](#s-what-a-serving-engine-owns) |
+| 吞吐量 | 全部用户每秒获得的输出 token 数 | [1.1](#s-what-the-server-does-with-your-request) |
 | TokenizerManager | 主进程中接收请求、应用聊天模板并分词的对象 | [2.1](#s-sglang-serve-and-the-three-processes) |
 | TokenToKVPoolAllocator | KV 槽位空闲列表 | [3.1](#s-kv-bytes-per-token-and-the-kv-pool) |
 | TPOT | 每请求首 token 之后的时间除以剩余输出 token 数 | [5.1](#s-sglang-benchmark-serving) |

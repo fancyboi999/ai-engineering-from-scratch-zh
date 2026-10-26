@@ -77,7 +77,7 @@ note: 启动日志中的一行。MLX 路径不捕获 CUDA graphs，因此 CUDA g
 
 代码帮助处理其中成本较低的部分。Python 导入 `sglang` 时，将 Triton、TorchInductor、CUDA、TileLang、FlashInfer 缓存统一指向 `SGLANG_CACHE_DIR`，默认 `~/.cache/sglang` {{code}}。把该目录和 Hugging Face 缓存挂到生命周期长于 pod 的卷上，重启即可复用已编译内核和已下载权重。
 
-同一报告也为慢启动辩护：“SGLang 每秒多生成 10% token，比快启动 10 秒更有价值。” {{field Doubleword 2026-04}} 对连续运行多日的集群，我们赞同。但每晚缩容到零的集群，启动时间是真实成本，持久缓存应是第一项修复。
+同一报告还认为，对持续运行多日的集群，提高 10% token 吞吐量比缩短 10 秒启动时间更有价值 {{field Doubleword 2026-04}}。我们认同这个判断。但每晚都会缩容到零的集群承担着真实启动成本，因此应先修复持久缓存。
 
 ## 健康检查：/ready、/health 与 /health_generate
 
@@ -89,7 +89,7 @@ SGLang 有两类健康端点 {{code}}：
 - `SGLANG_ENABLE_HEALTH_ENDPOINT_GENERATION` 默认为 true，因此普通 `/health` 也会生成这个 token。
 - 等待超时由 `SGLANG_HEALTH_CHECK_TIMEOUT` 决定，默认 20 s。期间没有输出，处理器将服务器标为 `UnHealthy` 并返回 503。
 
-文档字符串称服务器繁忙时，探测请求不花额外成本，因为调度器任意输出都能证明存活。工作量上如此，时间上却不成立。**真实事故：** issue #22511 报告，v0.5.10、两张 H800 运行 GLM-5，高负载下出现“health check failed. server could not get a response from detokenizer for last 20 seconds” {{issue #22511}}。相关 issue #35884 发现超时探测将请求留在调度器中，失败探测不断累积 {{issue #35884}}。
+文档字符串称服务器繁忙时，探测请求不花额外成本，因为调度器任意输出都能证明存活。工作量上如此，时间上却不成立。**真实事故：** issue #22511 报告，v0.5.10、两张 H800 运行 GLM-5，高负载下记录了错误 `health check failed. server could not get a response from detokenizer for last 20 seconds` {{issue #22511}}。相关 issue #35884 发现超时探测将请求留在调度器中，失败探测不断累积 {{issue #35884}}。
 
 **我们的建议：** 就绪探针使用 `/ready`，存活探针不要触发生成。设置 `SGLANG_ENABLE_HEALTH_ENDPOINT_GENERATION=false`，`/health` 就会不经调度器请求直接返回 200 {{code}}。较慢的深度检查使用 `/health_generate`，只通知人，不重启进程。这样不会因为探测在队列等待，就杀掉最忙的 pod。
 
@@ -188,9 +188,13 @@ caption: 从上往下读。每行是一项设置或操作，附上支持它的�
 
 批量分词将 P99 延迟从 4,583 降至 464 ms；跳过 decode 的评分路径将 P99 从 6,220 降至 454 ms；预热和 `gc.freeze()` 消除了 100 至 300 ms 的垃圾回收停顿。375M 排序器从每 GPU 每秒 750 项提高至 2,200 项。大部分相关 PR 由 LinkedIn 自己编写，因此其“改进前”对应更旧的 SGLang。
 
-**CERIT-SC** 是捷克学术服务，2025 年从 vLLM 迁到 SGLang，到 2026-04 报告已服务 1000 亿 token {{field CERIT-SC 2026-04}}。重点是其流量形状：Kimi K2.6 的 prompt 中位数 2,179 token，第 95 百分位为 99,746，他们将其归因于 agent 编程工具。SGLang 问题包括工具调用泄漏到推理输出、偶发挂起、模型循环占住 KV 缓存。修复属于运维：输出上限 32K token，为容易循环的负载设置 presence penalty。他们仍按模型同时使用两种引擎。
+**CERIT-SC** 是捷克学术服务。它在 2025 年从 vLLM 迁到 SGLang，到 2026-04 已报告服务 1000 亿 token {{field CERIT-SC 2026-04}}。它的流量形状值得关注：Kimi K2.6 的 prompt 中位数为 2,179 token，第 95 百分位为 99,746。团队认为这是 agent 编程工具造成的。
 
-**Ant Group** 在 2025-09-26 的 LMSYS 博客发布了 H20、SGLang v0.5.2 的 DeepSeek-R1 部署 {{field Ant Group 2025-09}}。他们选择 EP16 而非 EP32，因为 batch 32 时前者为每秒 675 token，后者 585。更多推测草稿 token 在 batch 1 提升 21%，在 batch 32 损失约 18%。他们出售三个延迟档位，最严格的 TPOT 小于 30 ms 档位使用 batch 12。实测档位表是一项产品决策，这正是重点。
+SGLang 的问题包括工具调用泄漏到推理输出、偶发挂起，以及模型循环占住 KV 缓存。修复办法属于运维：将输出上限设为 32K token，并对容易循环的负载设置 presence penalty。CERIT-SC 仍按模型同时使用两种引擎。
+
+**Ant Group** 于 2025-09-26 在 LMSYS 博客发布了 H20 上运行 SGLang v0.5.2 和 DeepSeek-R1 的报告 {{field Ant Group 2025-09}}。他们选择 EP16，而非 EP32。batch 为 32 时，两者吞吐量分别为每秒 675 和 585 token。
+
+增加推测草稿 token 后，batch 1 的速度提升 21%，batch 32 则下降约 18%。Ant Group 提供三个延迟档位。最严格档位要求 TPOT 低于 30 ms，并使用 batch 12。这体现了产品决策的重要性。
 
 **我们的建议：** 阅读生产报告，看流量形状和修复顺序，不要照搬吞吐量。LinkedIn 先修 CPU，再修 GPU；CERIT-SC 先限制输出，再调其他；Ant Group 选择更小专家组，因为故障影响范围与实际售卖的 batch 大小，比峰值吞吐量更重要。
 

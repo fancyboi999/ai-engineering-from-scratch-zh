@@ -33,7 +33,7 @@ note: Installation 与 Storage 分组已截去。录制套件将字节与块大�
 
 `kern.hv_support is 1` 是 macOS 的硬件虚拟化标志。客户机运行于宿主 hypervisor：macOS 用 Hypervisor.framework，Windows 用 Windows Hypervisor Platform，Linux 用 KVM（[冲突 C3](#s-ref-sources-and-the-conflicts-register)）。`mkfs.erofs` 行给出客户机根文件系统格式与页大小，内部 `getconf PAGESIZE` 报告 `16384`（[冲突 C45](#s-ref-sources-and-the-conflicts-register)）。最后一行检查登录状态。`sbx` 无需 Docker Desktop，但没有 Docker 账户仍拒绝创建沙箱（[冲突 C15](#s-ref-sources-and-the-conflicts-register)）。
 
-FAQ 给出 Docker 的理由：“Tie sandboxes to a real person”和“Authenticate against Docker infrastructure” {{docs-sbx FAQ}}，即关联真实用户并向 Docker 基础设施认证。它还列出产品自身的出站主机，从 `login.docker.com` 开始。
+FAQ 给出 Docker 的理由：“Tie sandboxes to a real person”和{{docs-sbx FAQ}}，即关联真实用户并向 Docker 基础设施认证。它还列出产品自身的出站主机，从 `login.docker.com` 开始。
 
 ## 从内核向上的五层 {#s-sbx-diagnose-and-the-microvm-boundary-five-layers-from-the-kernel-up}
 
@@ -69,12 +69,12 @@ host on $CAPTURE/fixtures/repo type virtiofs (rw,nosuid,nodev,relatime)
 label: 隔离边界在哪里
 source: docs-sbx Isolation layers
 ---
-"The agent runs as a non-root user with sudo privileges inside the VM. The hypervisor boundary is the isolation control, not in-VM privilege separation."
+agent 在 VM 内以有 sudo 权限的非 root 用户运行。隔离依靠 hypervisor 边界，而非 VM 内的权限分离。
 ```
 
 引文释义：agent 在 VM 内以有 sudo 权限的非 root 用户运行。隔离控制点是 hypervisor 边界，不是 VM 内的权限分离。
 
-listing 中的 Docker Engine 29.8.1、containerd v2.3.5 及 agent 构建的所有镜像都归 VM。文档一句话说明结果：“The agent has no path to your host Docker daemon.” {{docs-sbx Docker Engine isolation}}，agent 没有通往宿主 Docker 守护进程的路径。
+listing 中的 Docker Engine 29.8.1、containerd v2.3.5 及 agent 构建的所有镜像都归 VM。文档一句话说明结果{{docs-sbx Docker Engine isolation}}，agent 没有通往宿主 Docker 守护进程的路径。
 
 宿主侧也没有沙箱 Docker API。Kevin Wittek 在 2026-04-23 说宿主不提供 Moby API {{talk 2026-04-23 T06}}。依赖它的 REST 客户端无法操作沙箱，入口是 `sbx exec`，见 [sbx exec、cp 与 ports](#s-sbx-exec-cp-and-ports)。
 
