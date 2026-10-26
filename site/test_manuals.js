@@ -184,6 +184,27 @@ test('section routes keep stable paths and provide a lastmod date for every docu
   assert.equal(manuals.sectionHref(manual, '#missing'), null);
 });
 
+test('chapter fragment links remain in the current document and assets load at the site root', () => {
+  const manual = manuals.loadManual(fixture({ 'manual.json': manifest({ status: 'ready' }), 'README.md': '# Demo manual\n' }).dir);
+  const out = tempDir('manual-fragment-links-');
+  manuals.writeWeb([manual], out, { only: manual.id });
+  const html = fs.readFileSync(path.join(out, 'manual/manual-demo-101/intro.html'), 'utf8');
+  const documentUrl = new URL('https://aieng-zh.cn/manual-demo-101/intro');
+  const base = html.match(/<base href="([^"]+)"/);
+  const resolutionBase = base ? new URL(base[1], documentUrl) : documentUrl;
+  for (const fragment of ['#main', '#fig-1-1']) {
+    assert.ok(html.includes(`href="${fragment}"`), `missing local link ${fragment}`);
+    const actual = new URL(fragment, resolutionBase);
+    assert.equal(actual.pathname, documentUrl.pathname, `${fragment} leaves the chapter`);
+    assert.equal(actual.hash, fragment);
+  }
+  for (const file of ['style.css', 'data.js', 'content-source.js', 'header.js']) {
+    const match = html.match(new RegExp(`(?:href|src)="([^"\\s]*${file.replace('.', '\\.')}[^"\\s]*)"`));
+    assert.ok(match, `missing shared asset ${file}`);
+    assert.equal(new URL(match[1], resolutionBase).pathname, '/' + file);
+  }
+});
+
 test('offline print embeds licensed CJK text fonts and keeps headings and listings pageable', () => {
   const manual = manuals.loadManual(fixture().dir);
   const print = manuals.printPage(manual);

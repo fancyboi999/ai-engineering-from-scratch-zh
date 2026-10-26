@@ -773,12 +773,12 @@ function highlightsScripts(highlights) {
 }
 
 function pageShell({ title, ogTitle, description, canonical, noindex, card, main, highlights, rooted = false, jsonld = [] }) {
+  const base = rooted ? '/' : '';
   const css = shared('tokens.css') + shared('manual.css') + shared('web.css');
   const jsonldHtml = jsonld.length ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': jsonld }).replace(/</g, '\\u003c')}</script>` : '';
   return `<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
-${rooted ? '<base href="/">\n' : ''}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(title)}</title>
@@ -793,20 +793,20 @@ ${noindex ? '<meta name="robots" content="noindex">\n' : ''}<link rel="canonical
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${FONT_LINK}" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-${highlights ? '<link rel="stylesheet" href="highlights.css">\n' : ''}<style>${css}</style>
+<link rel="stylesheet" href="${base}style.css">
+${highlights ? `<link rel="stylesheet" href="${base}highlights.css">\n` : ''}<style>${css}</style>
 ${jsonldHtml}
 <script>${shared('theme.js')}</script>
 </head>
 <body>
 <a href="#main" class="skip-link">跳到正文</a>
-${SITE_HEADER}
+${rooted ? renderHeader({ base: '/' }) : SITE_HEADER}
 ${main}
-<footer class="site-footer"><div class="container footer-inner"><p>AI Engineering from Scratch · 中文开源课程。</p><div class="footer-links"><a href="index.html">首页</a><a href="manuals.html">手册</a><a href="catalog.html">课程表</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a></div></div></footer>
-<script src="data.js"></script>
-<script src="content-source.js"></script>
-<script src="header.js?v=${HEADER_ASSET_VERSION}" defer></script>
-<script src="cmdpalette.js" defer></script>
+<footer class="site-footer"><div class="container footer-inner"><p>AI Engineering from Scratch · 中文开源课程。</p><div class="footer-links"><a href="${base}index.html">首页</a><a href="${base}manuals.html">手册</a><a href="${base}catalog.html">课程表</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a></div></div></footer>
+<script src="${base}data.js"></script>
+<script src="${base}content-source.js"></script>
+<script src="${base}header.js?v=${HEADER_ASSET_VERSION}" defer></script>
+<script src="${base}cmdpalette.js" defer></script>
 <script>${shared('dither.js')}</script>
 <script>${shared('motion.js')}</script>
 ${highlightsScripts(highlights)}</body>
