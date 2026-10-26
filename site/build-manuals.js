@@ -634,7 +634,7 @@ function blockHtml(block, doc, manual, acc) {
     }
     case 'figure-index': return tableHtml(['图', '图中说明的结论'], [...manual.figures.values()].map(figure => ({ accent: figure.accent, cells: [`<a class="m-xref" href="#${figure.id}">${figure.number}</a>`, figure.claimHtml] })));
     case 'contents': return tocHtml(manual, 'web');
-    case 'listing': return `<figure class="m-listing"><div class="m-listing-head"><span class="m-listing-title">${inline(block.title)}</span>${evidenceLink(evidenceUrl(block.sourceFile, where))}<span>${escapeHtml(block.lang)}</span></div><pre><code>${highlight(block.code, block.lang)}</code></pre>${block.note ? `<figcaption class="m-listing-note">${inline(block.note)}</figcaption>` : ''}</figure>`;
+    case 'listing': return `<figure class="m-listing" data-source="${escapeHtml(block.source)}"><div class="m-listing-head"><span class="m-listing-title">${inline(block.title)}</span>${evidenceLink(evidenceUrl(block.sourceFile, where))}<span>${escapeHtml(block.lang)}</span></div><pre><code>${highlight(block.code, block.lang)}</code></pre>${block.note ? `<figcaption class="m-listing-note">${inline(block.note)}</figcaption>` : ''}</figure>`;
     case 'takeaways': return `<aside class="m-takeaways"><div class="m-box-label">${TAKEAWAYS_LABEL}</div><ul>${block.items.map(item => `<li>${inline(item)}</li>`).join('')}</ul></aside>`;
     case 'rule': return `<aside class="m-rule"><div class="m-box-label">${escapeHtml(block.label)}</div><p>${inline(block.quote)}</p></aside>`;
     case 'lab-runs': return labRunsHtml(manual, where);
@@ -914,7 +914,7 @@ function sectionPage(manual, order, index, targets, modified) {
     { '@type': 'ListItem', position: 4, name: doc.title, item: canonical },
   ];
   const body = retargetSectionLinks(docHtml(doc, 'web', manual), targets, pathName);
-  const article = `<article class="manual m-section-page"><div class="m-kicker m-crumbs">${crumbs.join(' / ')}</div>${body}<nav class="m-cover-actions m-pager" aria-label="章节导航">${pager.join('')}</nav><p class="m-kicker m-section-pin">${escapeHtml(pinLine(manual))}</p></article>`;
+  const article = `<article class="manual m-section-page"><div class="m-kicker m-crumbs">${crumbs.join(' / ')}</div>${body}<nav class="m-cover-actions m-pager" aria-label="章节导航">${pager.join('')}</nav><p class="m-kicker m-section-pin">${escapeHtml(pinLine(manual))}；核验日期沿用上游记录，不代表本次中文同步重测。</p></article>`;
   const jsonld = [
     {
       '@type': 'TechArticle',

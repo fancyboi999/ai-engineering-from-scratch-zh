@@ -574,7 +574,8 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
   }
   assert.match(html, /github\.com\/fancyboi999\/ai-engineering-from-scratch-zh/);
   assert.match(html, /class="m-evidence"[^>]*>完整记录<\/a>/);
-  assert.doesNotMatch(html, /capture\/out\/task\.json/);
+  assert.match(html, /data-source="capture\/out\/task\.json"/);
+  assert.doesNotMatch(html.replace(/\sdata-source="[^"]*"/g, ''), /capture\/out\/task\.json/);
   assert.match(html, /上游记录的核验日期为 2026-10-06/);
   assert.match(html, /href="manual-demo-101-print\.html">打印版/);
   assert.match(data, /"print": "manual-demo-101-print\.html"/);
