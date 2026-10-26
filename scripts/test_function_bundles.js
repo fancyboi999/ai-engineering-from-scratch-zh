@@ -5,11 +5,23 @@ const path = require('node:path');
 const { createRequire } = require('node:module');
 const test = require('node:test');
 const { nodeFileTrace } = require('@vercel/nft');
+const { getTransformedRoutes } = require('@vercel/routing-utils');
 const { globSync } = createRequire(require.resolve('@vercel/nft'))('glob');
 
 const ROOT = path.join(__dirname, '..');
 const config = require('../vercel.json');
 const budgets = { certification: 5, lesson: 30, og: 10 };
+
+test('deployment routing compiles with the Vercel platform parser', () => {
+  const transformed = getTransformedRoutes(config);
+  assert.ok(!transformed.error, transformed.error && transformed.error.message);
+  assert.ok(transformed.routes.length > 0, 'the complete deployment routes must be compiled');
+  const invalid = getTransformedRoutes({
+    ...config,
+    headers: [{ source: '/manual-[a-z0-9-]+/[a-z0-9-]+', headers: [{ key: 'Vary', value: 'Accept' }] }],
+  });
+  assert.equal(invalid.error && invalid.error.code, 'invalid_header', 'raw RegExp syntax must not bypass path-to-regexp validation');
+});
 const sourceOnly = [
   /^scripts\//,
   /^projects\/(?!.*\/docs\/zh\.md$)/,

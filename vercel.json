@@ -619,7 +619,7 @@
       ]
     },
     {
-      "source": "/manual-[a-z0-9-]+/[a-z0-9-]+",
+      "source": "/:manual(manual-[a-z0-9-]+)/:section([a-z0-9-]+)",
       "headers": [
         {
           "key": "Cache-Control",

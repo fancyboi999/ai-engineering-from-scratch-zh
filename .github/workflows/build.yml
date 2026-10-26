@@ -144,7 +144,7 @@ jobs:
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
       - name: 部署函数文件追踪与独立 bundle 运行
         run: |
-          npm install --prefix "$RUNNER_TEMP/function-trace" --no-save --no-package-lock @vercel/nft@1.5.0
+          npm install --prefix "$RUNNER_TEMP/function-trace" --no-save --no-package-lock @vercel/nft@1.5.0 @vercel/routing-utils@6.6.0
           NODE_PATH="$RUNNER_TEMP/function-trace/node_modules" node --test scripts/test_function_bundles.js
       - name: Agent 内容协商、REST 和 MCP 协议回归
         run: |

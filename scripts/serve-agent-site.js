@@ -50,8 +50,9 @@ function createServer() {
         res.writeHead(rule.permanent ? 308 : 307, { Location: destination + url.search });
         return res.end();
       }
-      for (const rule of config.headers) if (new RegExp('^' + rule.source + '$').test(url.pathname)) {
-        for (const header of rule.headers) res.setHeader(header.key, header.value);
+      for (const rule of config.headers) {
+        const matcher = /:\w+\(/.test(rule.source) ? compile(rule.source).regex : new RegExp('^' + rule.source + '$');
+        if (matcher.test(url.pathname)) for (const header of rule.headers) res.setHeader(header.key, header.value);
       }
       let destination = url.pathname;
       let routed = false;
