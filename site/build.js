@@ -2049,7 +2049,8 @@ function withCard(html, type, id, spec) {
 }
 
 function versionSharedAssets(html) {
-  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
+  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
+    .replace(/(\bsrc=["']\/?(?:projects|project-markdown)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
     .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261021a$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2');
@@ -2540,8 +2541,52 @@ function writeLessonPages(phases, lessonManifest) {
 }
 
 // ─── 预渲染项目页：site/project/<id>/index.html 和 site/project/<id>/<stage>/index.html ──
-// 与课程页同理：爬虫从 SPA shell 拿到的是通用标题和描述，这里预渲染每个项目/阶段
-// 独立 URL + 独立 title/description/canonical/JSON-LD，让 Google 正确索引。
+// 与课程页同理：正文、阶段链接及元数据一起生成，不依赖爬虫运行脚本和二次 fetch。
+function projectPageContent(template, project, stage) {
+  const esc = mdRender.escapeHtml;
+  const attr = mdRender.escapeAttr;
+  const href = item => `/project/${project.id}/${item.id}/`;
+  const hero = `<div class="pj-hero-grid"><div><h1>${esc(project.title)}</h1>` +
+    `<p class="pj-lede">${esc(project.summary || project.tagline)}</p>` +
+    `<div class="pj-meta-row"><span>${project.stages.length} 阶段</span><span>~${project.hours} 小时</span>` +
+    `<span>${esc(project.languages.join(', '))}</span></div></div>` +
+    `<div class="pj-hero-side">${project.youWillBuild ? `<h2>最终产物</h2><p>${esc(project.youWillBuild)}</p>` : ''}</div></div>`;
+  const rail = project.stages.map(item => `<li><a class="pj-stage-link${stage === item ? ' is-current' : ''}" href="${href(item)}"` +
+    `${stage === item ? ' aria-current="step"' : ''}><span class="pj-stage-n">${item.number}</span>` +
+    `<span class="pj-stage-text"><span class="pj-stage-title">${esc(item.title)}</span></span></a></li>`).join('');
+  let article;
+  if (stage) {
+    const source = safeRepoFile(stage.doc, REPO_ROOT);
+    if (!source) throw new Error(`Missing project stage source: ${stage.doc}`);
+    const markdown = fs.readFileSync(source, 'utf8');
+    const rendered = require('./project-markdown').render(markdown, path.posix.dirname(stage.doc), mdRender,
+      target => githubSourceUrl(target, 'blob'));
+    const index = project.stages.indexOf(stage);
+    const neighbors = [project.stages[index - 1], project.stages[index + 1]].filter(Boolean);
+    article = `<header class="pj-stage-head"><h2>${esc(stage.title)}</h2><p class="pj-lede">${esc(stage.summary)}</p></header>` +
+      `<div class="pj-doc" id="pjDoc" data-prerendered-stage="${stage.id}">${rendered.html}</div>` +
+      `<footer class="pj-stage-foot"><nav class="pj-stage-nav" aria-label="相邻阶段">` +
+      neighbors.map(item => `<a class="pj-action secondary" href="${href(item)}">${esc(item.title)}</a>`).join('') +
+      `</nav><a class="pj-source-link" href="${attr(githubSourceUrl(stage.doc, 'blob'))}">在 GitHub 查看本课</a></footer>`;
+  } else {
+    article = `<h2>项目阶段</h2>` + project.stages.map(item => `<section><h3><a href="${href(item)}">` +
+      `${esc(item.title)}</a></h3><p>${esc(item.summary)}</p></section>`).join('');
+  }
+  const replacements = [
+    ['<span id="pjCrumb">项目</span>', `<span id="pjCrumb">${esc(project.title)}</span>`],
+    ['<p>正在加载项目…</p>', hero],
+    ['id="pjWorkspace" hidden', 'id="pjWorkspace"'],
+    ['<ol class="pj-stage-list" id="pjStageList"></ol>', `<ol class="pj-stage-list" id="pjStageList">${rail}</ol>`],
+    ['<article class="pj-stage" id="pjStage" aria-live="polite"></article>',
+      `<article class="pj-stage" id="pjStage" aria-live="polite">${article}</article>`],
+  ];
+  for (const [anchor, replacement] of replacements) {
+    if (template.split(anchor).length !== 2) throw new Error(`Project template anchor mismatch: ${anchor}`);
+    template = template.replace(anchor, () => replacement);
+  }
+  return template;
+}
+
 function writeProjectPages(projects, ogCards) {
   const template = fs.readFileSync(path.join(__dirname, 'project.html'), 'utf8');
   const projectRoot = path.join(__dirname, 'project');
@@ -2616,7 +2661,8 @@ function writeProjectPages(projects, ogCards) {
     projectPage = projectPage.replace('</head>',
       `  <link rel="canonical" href="${projectUrl}">\n` +
       `  <meta property="og:url" content="${projectUrl}">\n` +
-      `  <script type="application/ld+json">${projectJsonLd}</script>\n</head>`);
+      `  <script type="application/ld+json" data-project-seo>${projectJsonLd}</script>\n</head>`);
+    projectPage = projectPageContent(projectPage, project, null);
 
     const projectOutDir = path.join(projectRoot, project.id);
     fs.mkdirSync(projectOutDir, { recursive: true });
@@ -2681,7 +2727,8 @@ function writeProjectPages(projects, ogCards) {
       stagePage = stagePage.replace('</head>',
         `  <link rel="canonical" href="${stageUrl}">\n` +
         `  <meta property="og:url" content="${stageUrl}">\n` +
-        `  <script type="application/ld+json">${stageJsonLd}</script>\n</head>`);
+        `  <script type="application/ld+json" data-project-seo>${stageJsonLd}</script>\n</head>`);
+      stagePage = projectPageContent(stagePage, project, stage);
 
       const stageOutDir = path.join(projectOutDir, stage.id);
       fs.mkdirSync(stageOutDir, { recursive: true });

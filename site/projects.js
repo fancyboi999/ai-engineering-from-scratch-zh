@@ -198,26 +198,7 @@
   }
 
   function renderMarkdown(md, baseDir) {
-    // 在交给共享渲染器前解析项目相对链接，不引入第二套 Markdown 解析器。
-    var source = String(md).split(/(```[\s\S]*?```|`[^`\n]+`)/g).map(function (part, index) {
-      if (index % 2) return part;
-      return part.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (match, label, href) {
-        if (/^(?:https?:|mailto:|#)/.test(href)) return match;
-        var parts = (href.indexOf('phases/') === 0 ? href : baseDir + '/' + href).split('/');
-        var normalized = [];
-        parts.forEach(function (part) {
-          if (part === '..') normalized.pop();
-          else if (part && part !== '.') normalized.push(part);
-        });
-        var target = normalized.join('/');
-        var url = target.indexOf('phases/') === 0
-          ? 'https://aieng-zh.cn/lesson.html?path=' + target.replace(/\/$/, '')
-          : repoFileUrl(target);
-        return '[' + label + '](' + url + ')';
-      });
-    }).join('');
-    var html = window.MDRender.parseMd(source).replace(/href="https:\/\/aieng-zh\.cn\/lesson\.html\?/g, 'href="lesson.html?');
-    return { title: window.MDRender.extractTitle(source), html: html };
+    return window.AIFSProjectMarkdown.render(md, baseDir, window.MDRender, repoFileUrl);
   }
 
   function sourceBadge(item) {
@@ -382,7 +363,7 @@
       return previous.then(function () {
         return new Promise(function (resolve, reject) {
           var script = document.createElement('script');
-          script.src = source + (scriptVersion ? (source.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(scriptVersion) : '');
+          script.src = '/' + source.replace(/^\/+/, '') + (scriptVersion ? (source.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(scriptVersion) : '');
           script.onload = resolve;
           script.onerror = reject;
           document.head.appendChild(script);
@@ -426,11 +407,49 @@
     return { id: id || '', stage: stage };
   }
 
+  function updateProjectSeo(project, stage) {
+    var title = (stage ? stage.title + ' - ' : '') + project.title + ' - 项目 - 从零开始学 AI 工程';
+    var description = stage ? stage.summary : project.summary || project.tagline;
+    var canonical = 'https://aieng-zh.cn/project/' + project.id + '/' + (stage ? stage.id + '/' : '');
+    document.title = title;
+    var link = document.querySelector('link[rel="canonical"]');
+    if (link) link.href = canonical;
+    [['name', 'description', description], ['property', 'og:title', title],
+      ['property', 'og:description', description], ['property', 'og:url', canonical]].forEach(function (item) {
+      var meta = document.querySelector('meta[' + item[0] + '="' + item[1] + '"]');
+      if (meta) meta.content = item[2];
+    });
+    var structured = document.querySelector('script[data-project-seo]');
+    if (structured) {
+      var data = JSON.parse(structured.textContent);
+      var resource = data['@graph'][0];
+      resource.name = stage ? stage.title : project.title;
+      resource.description = description;
+      resource.url = canonical;
+      resource.timeRequired = 'PT' + (stage ? stage.hours : project.hours) + 'H';
+      resource.educationalLevel = stage ? difficultyLabel(stage.difficulty)
+        : { 1: '入门', 2: '构建', 3: '工程', 4: '系统', 5: '前沿' }[project.level] || '';
+      resource.isPartOf = stage
+        ? { '@type': 'LearningResource', name: project.title, url: 'https://aieng-zh.cn/project/' + project.id + '/' }
+        : { '@type': 'Course', name: 'AI Engineering from Scratch 简体中文版', url: 'https://aieng-zh.cn' };
+      var crumbs = [{ '@type': 'ListItem', position: 1, name: '首页', item: 'https://aieng-zh.cn' },
+        { '@type': 'ListItem', position: 2, name: '项目', item: 'https://aieng-zh.cn/projects.html' },
+        { '@type': 'ListItem', position: 3, name: project.title, item: 'https://aieng-zh.cn/project/' + project.id + '/' }];
+      if (stage) crumbs.push({ '@type': 'ListItem', position: 4, name: stage.title, item: canonical });
+      data['@graph'][1].itemListElement = crumbs;
+      structured.textContent = JSON.stringify(data);
+    }
+  }
+
   async function renderProject() {
     var parsed = parseProjectUrl();
     var id = parsed.id;
     var project = DATA.projects.filter(function (p) { return p.id === id; })[0];
     var hero = document.getElementById('pjProjectHero');
+    var initialDoc = document.getElementById('pjDoc');
+    var prerenderedStage = initialDoc && {
+      id: initialDoc.getAttribute('data-prerendered-stage'), html: initialDoc.innerHTML
+    };
     if (!project) {
       hero.innerHTML = '<div class="pj-eyebrow">未找到项目</div><h1>从阶梯中选择一个项目。</h1><p><a class="pj-action" href="projects.html">全部项目</a></p>';
       return;
@@ -549,6 +568,13 @@
         drawStage();
       });
 
+      if (prerenderedStage && prerenderedStage.id === stage.id) {
+        var initialDoc = document.getElementById('pjDoc');
+        initialDoc.innerHTML = prerenderedStage.html;
+        mountFigures(initialDoc);
+        return;
+      }
+
       var fetchUrl = stage.contentUrl || contentUrl(stage.doc);
       // 确保 URL 是绝对路径，以便从预渲染的 /project/<id>/<stage>/ 页面正确加载
       if (fetchUrl && !fetchUrl.startsWith('/') && !fetchUrl.startsWith('http')) fetchUrl = '/' + fetchUrl;
@@ -572,6 +598,7 @@
       if (push) history.pushState({ stage: index }, '', projectHref(project.id, project.stages[index].id));
       drawRail();
       drawStage();
+      updateProjectSeo(project, parseProjectUrl().stage ? project.stages[index] : null);
       var title = document.getElementById('pjStageTitle');
       if (push && title) title.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     }
