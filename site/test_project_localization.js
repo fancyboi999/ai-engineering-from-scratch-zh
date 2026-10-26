@@ -64,7 +64,7 @@ for (const slug of localizedProjects) {
 test('projects.js delegates all Markdown rendering to MDRender and resolves source links without changing code', () => {
   const root = { setAttribute() {} };
   const context = {
-    window: { MDRender, matchMedia: () => ({ matches: false }) },
+    window: { MDRender, AIFSProjectMarkdown: require('./project-markdown'), matchMedia: () => ({ matches: false }) },
     document: {
       documentElement: root, currentScript: null,
       body: { getAttribute: () => '' },
@@ -88,7 +88,15 @@ test('projects.js delegates all Markdown rendering to MDRender and resolves sour
 test('project Markdown keeps root-relative course links on the Chinese lesson route', () => {
   const source = fs.readFileSync(path.join(__dirname, 'projects.js'), 'utf8');
   const renderSource = source.slice(source.indexOf('  function renderMarkdown('), source.indexOf('  function sourceBadge('));
-  const context = { window: { MDRender }, repoFileUrl: value => 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/' + value };
+  const context = { window: { MDRender, AIFSProjectMarkdown: require('./project-markdown') }, repoFileUrl: value => 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/' + value };
   vm.runInNewContext(renderSource + '\nresult = renderMarkdown("[agent 循环](phases/14-agent-engineering/01-the-agent-loop/)", "projects/test/stages/01/docs");', context);
-  assert.match(context.result.html, /href="lesson\.html\?path=phases\/14-agent-engineering\/01-the-agent-loop"/);
+  assert.match(context.result.html, /href="\/lessons\/14-agent-engineering\/01-the-agent-loop\/"/);
+});
+
+test('project Markdown links to Chinese course documents use their static canonical URL', () => {
+  const markdown = require('./project-markdown');
+  const result = markdown.render('[Agent 循环](../../../../../../phases/14-agent-engineering/01-the-agent-loop/docs/zh.md#loop)',
+    'projects/tiny-coding-agent/stages/02-apply-exact-patches/docs', MDRender, value => 'https://github.com/example/' + value);
+  assert.match(result.html, /href="\/lessons\/14-agent-engineering\/01-the-agent-loop\/#loop"/);
+  assert.doesNotMatch(result.html, /lesson\.html|zh\.md/);
 });
