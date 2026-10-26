@@ -5,7 +5,7 @@ code: CN
 subtitle: 复数旋转、DFT 与 FFT、窗函数、采样、频谱图、Mel 滤波器组及 MFCC。使用课程中的 Python 代码。
 hue: 290
 sources: phases/01-math-foundations/19-complex-numbers, phases/01-math-foundations/20-fourier-transform, phases/06-speech-and-audio/01-audio-fundamentals, phases/06-speech-and-audio/02-spectrograms-mel-features
-source_hash: 4e04b8833fa94d93
+source_hash: f37b7cf158bebf3d
 ---
 
 ## 8 点 Cooley-Tukey FFT

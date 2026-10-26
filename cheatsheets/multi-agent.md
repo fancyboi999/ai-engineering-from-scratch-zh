@@ -5,7 +5,7 @@ subtitle: Agent、交接、共享状态与编排器：选择模式、投票、�
 hue: 290
 sources: phases/16-multi-agent-and-swarms/01-why-multi-agent, phases/16-multi-agent-and-swarms/04-primitive-model, phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern, phases/16-multi-agent-and-swarms/06-hierarchical-architecture, phases/16-multi-agent-and-swarms/10-group-chat-speaker-selection, phases/16-multi-agent-and-swarms/11-handoffs-and-routines, phases/16-multi-agent-and-swarms/13-shared-memory-blackboard, phases/16-multi-agent-and-swarms/14-consensus-and-bft, phases/16-multi-agent-and-swarms/15-voting-debate-topology, phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints, phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink, phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks
 code: MA
-source_hash: d5be1678f92ea623
+source_hash: e52cb77fead99492
 ---
 
 ## 四个基本要素

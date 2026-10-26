@@ -5,7 +5,7 @@ code: QF
 subtitle: 按硬件、引擎与工作负载选择权重格式。速查位宽、内存、命令及损失准确率的陷阱。
 hue: 30
 sources: phases/10-llms-from-scratch/11-quantization, phases/17-infrastructure-and-production/07-tensorrt-llm-blackwell, phases/17-infrastructure-and-production/09-production-quantization, phases/11-llm-engineering/08-fine-tuning-lora
-source_hash: 449ced7c8afc82ba
+source_hash: 991ba4f402ad8ee5
 ---
 
 ## 生产格式对比

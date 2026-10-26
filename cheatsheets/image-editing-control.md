@@ -5,7 +5,7 @@ code: CI
 subtitle: 使用 Diffusers 完成文生图、图生图、局部重绘、LoRA 与 ControlNet。参数、默认值和修正方法。
 hue: 265
 sources: phases/08-generative-ai/08-controlnet-lora-conditioning, phases/08-generative-ai/09-inpainting-outpainting-editing, phases/04-computer-vision/11-stable-diffusion
-source_hash: 898f82f72b6415f0
+source_hash: e20a6ec97fbb826c
 ---
 
 ## 进入 U-Net 的控制信号

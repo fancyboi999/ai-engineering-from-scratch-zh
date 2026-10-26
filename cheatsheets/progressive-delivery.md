@@ -5,7 +5,7 @@ code: SC
 subtitle: 影子运行、金丝雀门禁、快速回滚、序贯 A/B 测试、混沌保护与配置漂移报告。
 hue: 28
 sources: phases/17-infrastructure-and-production/20-shadow-canary-progressive, phases/17-infrastructure-and-production/21-ab-testing-llm-features, phases/17-infrastructure-and-production/24-chaos-engineering-llm, projects/configuration-drift-explainer
-source_hash: 329b493a69a2e8cb
+source_hash: 70ac1826f452785a
 ---
 
 ## 发布顺序

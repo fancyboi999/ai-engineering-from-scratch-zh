@@ -5,7 +5,7 @@ code: AF
 subtitle: 音频采样、分帧、加窗、mel、MFCC、分类与评分。使用课程中的 Python 标准库实现。
 hue: 25
 sources: phases/06-speech-and-audio/01-audio-fundamentals, phases/06-speech-and-audio/02-spectrograms-mel-features, phases/06-speech-and-audio/03-audio-classification, phases/06-speech-and-audio/17-audio-evaluation-metrics
-source_hash: 3bb3d8d60296efba
+source_hash: 35c589f2e466087f
 ---
 
 ## 从波形到标签

@@ -5,7 +5,7 @@ code: SD
 subtitle: 在不损失质量的前提下起草与验证。普通草稿、Medusa、EAGLE-3、MTP、加速公式、vLLM 配置与门禁。
 hue: 252
 sources: phases/07-transformers-deep-dive/16-speculative-decoding, phases/10-llms-from-scratch/15-speculative-decoding-eagle3, phases/10-llms-from-scratch/18-multi-token-prediction, phases/10-llms-from-scratch/25-speculative-decoding, phases/17-infrastructure-and-production/05-eagle3-speculative-decoding, phases/19-capstone-projects/14-speculative-decoding-server
-source_hash: f0647dffc516f27f
+source_hash: f15e630367196805
 ---
 
 ## 草稿类型对比

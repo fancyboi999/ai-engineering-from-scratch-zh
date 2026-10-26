@@ -5,7 +5,7 @@ code: RT
 subtitle: VAD、轮次检测、打断、延迟预算与全双工语音，让语音 agent 及时作答。
 hue: 285
 sources: phases/06-speech-and-audio/11-real-time-audio-processing, phases/06-speech-and-audio/12-voice-assistant-pipeline, phases/06-speech-and-audio/14-voice-activity-detection-turn-taking, phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki, phases/14-agent-engineering/22-voice-agents-pipecat-livekit, phases/19-capstone-projects/03-realtime-voice-assistant
-source_hash: b60d80b848a54eb2
+source_hash: 7b36b9d65b21db08
 ---
 
 ## 级联语音流水线

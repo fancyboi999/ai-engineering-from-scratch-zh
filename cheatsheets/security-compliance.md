@@ -5,7 +5,7 @@ code: AU
 subtitle: 密钥库托管密钥、个人信息脱敏、审计日志、签名 webhook、框架控制措施与 AI 法规日期。
 hue: 140
 sources: phases/17-infrastructure-and-production/25-security-secrets-audit, phases/17-infrastructure-and-production/26-compliance-frameworks, phases/18-ethics-safety-alignment/24-regulatory-frameworks-eu-us-uk-korea, projects/signed-webhook-inbox
-source_hash: 22b07c523f6dc42e
+source_hash: 62e84f40b4a481fc
 ---
 
 ## 运行实验

@@ -5,7 +5,7 @@ code: OL
 subtitle: 选择 SGD、Adam 或 AdamW，设置学习率曲线，再安全地裁剪、缩放和累积梯度。
 hue: 28
 sources: phases/03-deep-learning-core/06-optimizers, phases/03-deep-learning-core/09-learning-rate-schedules, phases/19-capstone-projects/44-cosine-lr-warmup, phases/19-capstone-projects/45-gradient-clipping-amp, phases/19-capstone-projects/46-gradient-accumulation
-source_hash: 725c899653ede8da
+source_hash: a714db48dd1c0330
 ---
 
 ## 优化器对比

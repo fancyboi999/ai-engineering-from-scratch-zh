@@ -5,7 +5,7 @@ code: BA
 subtitle: 读取 ELF 与 Mach-O，解码 x86-64，构建 CFG，提升到 C 并验证。仅使用 Python 标准库。
 hue: 28
 sources: phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch, phases/13-tools-and-protocols/33-disassembly-and-control-flow, phases/13-tools-and-protocols/34-lifting-to-pseudocode, projects/binary-inspector, projects/mini-decompiler
-source_hash: 5f2e634ceefc9727
+source_hash: 74057c431a63f960
 ---
 
 ## 从字节到经检查的 C

@@ -5,7 +5,7 @@ code: OV
 subtitle: 对比 LLaVA、LLaVA-OneVision、Qwen-VL 与 InternVL3 的连接器、分辨率、视频、token 与训练方式。
 hue: 265
 sources: phases/12-multimodal-ai/05-llava-visual-instruction-tuning, phases/12-multimodal-ai/06-any-resolution-patch-n-pack, phases/12-multimodal-ai/08-llava-onevision-single-multi-video, phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps, phases/12-multimodal-ai/10-internvl3-native-multimodal
-source_hash: 89bdcfaa4b1ca296
+source_hash: ed62a33fc60d78c3
 ---
 
 ## 模型家族对比
@@ -18,8 +18,8 @@ from: phases/12-multimodal-ai/05-llava-visual-instruction-tuning/docs/zh.md, pha
 | 视觉到 LLM | 2 层 MLP、GELU | 相同 MLP 投影器 | Qwen2-VL：合并图块上的 2 层 MLP | 原生，无对齐阶段 |
 | 训练方案 | 在文本 LLM 上后加视觉 | 在文本 LLM 上后加视觉 | 在文本 LLM 上后加视觉 | 原生多模态预训练 |
 | 高分辨率 | AnyRes：336 图块加缩略图 | AnyRes-9 或 AnyRes-4，384 图块 | Qwen2-VL：任意可被 28 整除的 H 与 W | ViR 选择低、中或高分辨率 |
-| 视频 | 逐帧拼接 | 32 帧，每帧 81 个 token | 动态 FPS、`<time>` token | 预训练中视频文本占 5% |
-| 视觉 token | 基础 576，AnyRes 2880 | 每样本固定 3000-4000 | 随输入增长 | 通过 ViR 取 256、576 或 2048+ |
+| 视频 | 逐帧拼接 | 32 帧，每帧 196 个 token | 动态 FPS、绝对时间 M-RoPE | 预训练中视频文本占 5% |
+| 视觉 token | 基础 576，AnyRes 2880 | 每样本 6000-9000，各场景预算均衡 | 随输入增长 | 通过 ViR 取 256、576 或 2048+ |
 | 训练 | 先对齐，再指令微调 | SI、OV、TT 三阶段 | Qwen3-VL：各阶段侧重 OCR、定位与 agent | 一个预训练阶段，再指令微调 |
 | 更换 LLM | 重训投影器 | 重训投影器 | 重训适配器 | 后期无法更换 |
 
@@ -47,7 +47,7 @@ from: phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/docs/zh.md, phases/1
 
 1. **Qwen-VL（2023）**：448 分辨率，以文本表示定位框，Q-Former 有 256 个查询。
 2. **Qwen2-VL（2024）**：M-RoPE、原生动态分辨率、MLP 投影器。
-3. **Qwen2.5-VL（2025）**：动态 FPS、绝对时间 token、ViT 中的窗口注意力。
+3. **Qwen2.5-VL（2025）**：动态 FPS、绝对时间 M-RoPE、ViT 中的窗口注意力。
 4. **Qwen2.5-VL agent**：JSON 工具调用，ScreenSpot 从 55% 提高至 84%。
 5. **Qwen3-VL（2025）**：Qwen3 基座、思考模式、更多 OCR 数据，保留 ViT 与 M-RoPE。
 
@@ -104,7 +104,7 @@ from: phases/12-multimodal-ai/05-llava-visual-instruction-tuning/docs/zh.md, pha
 - **AnyRes 4x4**：1344x1344 图像得到 9216 + 576，约 9800 个 token。
 - **Qwen2-VL 原生**：1120x672 得到 40x24 个合并图块，960 个 token。
 - **OneVision 图像**：AnyRes-9 配合 2x2 池化，9 * 182 + 182 = 1820 个 token。
-- **OneVision 视频**：32 帧配合 3x3 池化，32 * 81 = 2592 个 token。
+- **OneVision 视频**：32 帧配合 2x2 池化，32 * 196 = 6272 个 token。
 - **动态 FPS 上限**：$fps_{max} = B / (T \cdot \text{tokens per frame})$
 - **Qwen2.5-VL 视频**：60 s、4 FPS、每帧 81 个 token，总计 19440 个 token。
 
@@ -131,7 +131,7 @@ from: phases/12-multimodal-ai/05-llava-visual-instruction-tuning/code/main.py, p
 | LLaVA prompt 的 image_tokens | 576 | 替换图像占位符 |
 | `MRoPEConfig` 的 base | 10000.0 | 各频带的 RoPE 频率基数 |
 | Qwen2-VL 视频采样 | 1-2 FPS | 接受任意帧数 |
-| OneVision 规划器预算 | 4096 | 每样本视觉 token 数 |
+| OneVision 教学规划器预算 | 4096 | 课程代码中每样本视觉 token 数 |
 | 动态 FPS 演示预算 | 32768 | 3x 池化后每帧 81 个 token |
 | `dvd_throughput` 的 llm_tokens | 128 | 每请求输出 token 数 |
 

@@ -5,7 +5,7 @@ subtitle: 分块、索引、检索、融合、重排、带引用生成，并评�
 hue: 100
 sources: phases/11-llm-engineering/06-rag, phases/11-llm-engineering/07-advanced-rag, phases/05-nlp-foundations-to-advanced/13-question-answering, phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag, phases/19-capstone-projects/64-chunking-strategies-advanced, phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense, phases/19-capstone-projects/66-reranker-cross-encoder, phases/19-capstone-projects/67-query-rewriting-hyde, phases/19-capstone-projects/68-rag-eval-precision-recall, phases/19-capstone-projects/69-end-to-end-rag-system
 code: RA
-source_hash: f09562a7ba3f13ac
+source_hash: dcc6fa1be126522e
 ---
 
 ## 端到端 RAG 流水线

@@ -5,7 +5,7 @@ code: CT
 subtitle: 分词、词干提取、词形还原、计数、TF-IDF 加权、情感分类，以及用 LDA 或 BERTopic 发现主题。
 hue: 30
 sources: phases/05-nlp-foundations-to-advanced/01-text-processing, phases/05-nlp-foundations-to-advanced/02-bag-of-words-tfidf, phases/05-nlp-foundations-to-advanced/05-sentiment-analysis, phases/05-nlp-foundations-to-advanced/15-topic-modeling
-source_hash: 0e02b21c3b5a6845
+source_hash: b11605227699eb45
 ---
 
 ## 经典文本流水线

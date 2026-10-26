@@ -5,7 +5,7 @@ code: EE
 subtitle: 规划、运行并验证带 hash 的阶段 DAG。包含综合项目中的分类头替换、SFT 损失掩码、DPO 损失和默认值。
 hue: 215
 sources: phases/10-llms-from-scratch/13-building-complete-llm-pipeline, phases/19-capstone-projects/07-end-to-end-fine-tuning-pipeline, phases/19-capstone-projects/38-classifier-finetuning, phases/19-capstone-projects/39-instruction-tuning-sft, phases/19-capstone-projects/40-dpo-from-scratch
-source_hash: da197233cc6b5199
+source_hash: b9861d57c6dabca2
 ---
 
 ## 命令

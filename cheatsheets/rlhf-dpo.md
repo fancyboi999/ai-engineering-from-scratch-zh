@@ -5,7 +5,7 @@ code: RD
 subtitle: 奖励模型加 PPO 对比 DPO 及其变体。包含损失、beta 与 KL 设置、失败模式及修正。
 hue: 20
 sources: phases/09-reinforcement-learning/09-reward-modeling-rlhf, phases/10-llms-from-scratch/07-rlhf, phases/10-llms-from-scratch/08-dpo, phases/18-ethics-safety-alignment/03-direct-preference-optimization-family, phases/19-capstone-projects/40-dpo-from-scratch
-source_hash: 9cc4ab0809f0c288
+source_hash: f5d04ab36903d9d2
 ---
 
 ## RLHF 与 DPO 对比

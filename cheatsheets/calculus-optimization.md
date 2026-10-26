@@ -5,7 +5,7 @@ code: CG
 subtitle: 导数、自动微分、梯度下降、动量、Adam、牛顿法与凸性检验。包含从零实现的 Python 和 PyTorch 示例。
 hue: 30
 sources: phases/01-math-foundations/04-calculus-for-ml, phases/01-math-foundations/05-chain-rule-and-autodiff, phases/01-math-foundations/08-optimization, phases/01-math-foundations/18-convex-optimization
-source_hash: 1d7d86559de30e98
+source_hash: dfb1282c4741dc72
 ---
 
 ## 单个神经元的前向与反向传播

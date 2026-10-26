@@ -5,7 +5,7 @@ code: IT
 subtitle: 熵、交叉熵、KL、稳定 softmax 与 log-sum-exp、浮点格式、PCA，以及距离选择。
 hue: 280
 sources: phases/01-math-foundations/09-information-theory, phases/01-math-foundations/10-dimensionality-reduction, phases/01-math-foundations/13-numerical-stability, phases/01-math-foundations/14-norms-and-distances
-source_hash: e57b4c256ae68bc8
+source_hash: 4e59ecc4b4435592
 ---
 
 ## 信息论公式

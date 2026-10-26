@@ -5,7 +5,7 @@ code: TL
 subtitle: 构建 124M GPT，使用 AdamW 与余弦预热训练，加载 GPT-2 权重，并设置流水线门禁。
 hue: 28
 sources: phases/19-capstone-projects/35-gpt-model-assembly, phases/19-capstone-projects/36-training-loop-eval, phases/19-capstone-projects/37-loading-pretrained-weights, phases/19-capstone-projects/44-cosine-lr-warmup, phases/10-llms-from-scratch/13-building-complete-llm-pipeline
-source_hash: 8219c1640db41acc
+source_hash: bc52bb5292b03ae4
 ---
 
 ## 运行课程

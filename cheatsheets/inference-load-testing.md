@@ -5,7 +5,7 @@ code: IM
 subtitle: 找出负载测试失真的原因：TTFT、TPOT、goodput、P99、真实 prompt、重试风暴与对冲读取。
 hue: 352
 sources: phases/17-infrastructure-and-production/08-inference-metrics-goodput, phases/17-infrastructure-and-production/22-load-testing-llm-apis, projects/retry-storm-lab, projects/hedged-request-lab
-source_hash: 898c821b33f84f6a
+source_hash: 682265efdbc1d240
 ---
 
 ## 现象、原因与修正

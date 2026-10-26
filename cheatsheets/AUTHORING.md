@@ -89,6 +89,6 @@ edge | api | sched | ZMQ
 
 `source_hash` 由 `site/cheatsheet-topics.js` 的 `sourceHash(sources, root)` 按当前中文源计算；翻译或来源内容发生变化后，先核对受影响事实再刷新哈希。不要用上游英文哈希冒充中文内容已同步。
 
-源于冻结上游的证据文件声明 `upstream_revision`，并保留原始英文逐条记录的路径、行号和数值；区块标题对应中文海报。其版本由 `site/cheatsheet-evidence.js` 固定，校验需要 `AIFS_CHEATSHEET_EVIDENCE_ROOT` 指向该版本的原始源码，根目录 `.aifs-upstream-revision` 标明同一 SHA。CI 在 `.github/workflows/build.yml` 显式取得该 oracle；缺源不能跳过。原始记录只证明出处，不证明本次执行或当前供应商行为。
+源于冻结上游的证据文件声明 `upstream_revision`，并保留原始英文逐条记录的路径、行号和数值；区块标题对应中文海报。可用的冻结版本由 `site/cheatsheet-evidence.js` 声明。单一版本使用 `AIFS_CHEATSHEET_EVIDENCE_ROOT`；多版本使用 `AIFS_CHEATSHEET_EVIDENCE_ROOTS`，按操作系统路径分隔符连接多个源根。每个源根的 `.aifs-upstream-revision` 标明其 SHA，校验按每份证据声明的版本选择源根。CI 在 `.github/workflows/build.yml` 显式取得该 oracle；缺源不能跳过。原始记录只证明出处，不证明本次执行或当前供应商行为。
 
 不运行上游外部 LLM 生成工作流。主题由当前 agent 或已授权子 agent 翻译整合。除来源与覆盖检查外，运行 `node site/build-cheatsheets.js --check-quality` 检查区块、排错、对比和打印页数。完整构建后再检查，避免把尚未生成的手册页面误报为断链。

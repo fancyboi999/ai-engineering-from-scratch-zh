@@ -96,7 +96,7 @@ async function main() {
     }
     fixture = 'real';
     // Real shared header and generated glossary index, with external fonts blocked.
-    for (const width of [1920, 1600, 1561, 1560, 1481, 1401, 1400, 820, 390, 320]) {
+    for (const width of [1920, 1600, 1561, 1560, 1481, 1480, 1401, 1400, 820, 390, 320]) {
       await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
       await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/glossary.html` });
       let loaded = false;
@@ -124,13 +124,13 @@ async function main() {
       }
       assert.ok(row.boxes.at(-1).right <= row.client+1, JSON.stringify(row));
       assert.ok(row.scroll <= row.client+1, JSON.stringify(row));
-      if (width > 1400) assert.ok(row.labelRight <= row.logoRight+1, JSON.stringify(row));
+      if (width > 1480) assert.ok(row.labelRight <= row.logoRight+1, JSON.stringify(row));
       assert.equal(row.columns, width <= 600 ? 1 : width <= 1000 ? 2 : 3);
       assert.ok(row.headingGap >= 12, JSON.stringify(row));
       assert.equal(row.listStyle, 'none');
       console.log('header/glossary layout:', JSON.stringify({width,columns:row.columns,headingGap:row.headingGap,overlap:false}));
     }
-    const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '学习方法', 'Agent 技能', 'Agent 内部机制', '我的高亮', '关于'];
+    const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '编程练习', '学习方法', 'Agent 技能', 'Agent 内部机制', '我的高亮', '关于'];
     const priorities = ['课程目录', '课程表', '学习路径'];
     const contexts = [
       ['index.html#contents', null, false], ['prereqs.html', '路线图', true],
@@ -174,8 +174,8 @@ async function main() {
           slot:!!document.querySelector('.header-narration-slot'),
           themeSize:['width','height'].map(key=>parseFloat(getComputedStyle(document.querySelector('#themeToggle'))[key]))
         })`);
-        assert.deepEqual(state.links, width > 820 && width <= 1400 ? menu.filter(label => !priorities.includes(label)) : menu, page);
-        assert.deepEqual(state.priority, width > 820 && width <= 1400 ? priorities : [], page);
+        assert.deepEqual(state.links, width > 820 && width <= 1480 ? menu.filter(label => !priorities.includes(label)) : menu, page);
+        assert.deepEqual(state.priority, width > 820 && width <= 1480 ? priorities : [], page);
         assert.equal(state.active, active, page);
         assert.equal(state.home, page.startsWith('index.html') ? 'page' : null, page);
         assert.equal(state.narration, narration, page);
@@ -184,7 +184,7 @@ async function main() {
         assert.equal(state.searchSvg, true, page);
         assert.deepEqual(state.searchSize, width <= 600 ? [44,44] : [36,36], page);
         assert.equal(state.slot, true, page);
-        assert.deepEqual(state.themeSize, width > 1400 ? [36,36] : [44,44], page);
+        assert.deepEqual(state.themeSize, width > 1480 ? [36,36] : [44,44], page);
         console.log('shared navigation:', JSON.stringify({page,width,active,narration,consistent:true}));
       }
     }

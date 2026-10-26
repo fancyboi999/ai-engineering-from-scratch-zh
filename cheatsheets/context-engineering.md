@@ -5,7 +5,7 @@ code: CE
 subtitle: 分配窗口预算、排列上下文、换入换出记忆、融合记忆存储并持久化 agent 状态。
 hue: 280
 sources: phases/11-llm-engineering/05-context-engineering, phases/14-agent-engineering/07-memory-virtual-context-memgpt, phases/14-agent-engineering/08-memory-blocks-sleep-time-compute, phases/14-agent-engineering/09-hybrid-memory-mem0, phases/14-agent-engineering/34-repo-memory-and-state, projects/memory-server
-source_hash: 8637fc73db10fe16
+source_hash: 152e89c10eba15a7
 ---
 
 ## 上下文窗口预算

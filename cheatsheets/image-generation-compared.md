@@ -5,7 +5,7 @@ code: GD
 subtitle: GAN、DDPM、潜在扩散、整流流 DiT、流匹配与 VAR。包含目标、步数、代码和修正方法。
 hue: 315
 sources: phases/04-computer-vision/09-image-generation-gans, phases/04-computer-vision/10-image-generation-diffusion, phases/04-computer-vision/11-stable-diffusion, phases/04-computer-vision/23-diffusion-transformers-rectified-flow, phases/08-generative-ai/13-flow-matching-rectified-flows, phases/08-generative-ai/19-visual-autoregressive-var
-source_hash: cb411dddc4875cd0
+source_hash: bbaea57ac3b2d9c3
 ---
 
 ## 采样成本对比

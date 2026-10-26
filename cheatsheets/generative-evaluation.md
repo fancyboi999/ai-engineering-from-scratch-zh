@@ -5,7 +5,7 @@ code: EG
 subtitle: FID、CLIP 分数、CMMD、Elo、WER、MOS、SECS、EER 与 FAD。涵盖代码、样本量和各指标的失效方式。
 hue: 45
 sources: phases/08-generative-ai/14-evaluation-fid-clip-score, phases/06-speech-and-audio/17-audio-evaluation-metrics, phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified
-source_hash: 81785e79b8446044
+source_hash: a98ff18977b5137a
 ---
 
 ## FID 与 CLIP 分数

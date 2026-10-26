@@ -5,7 +5,7 @@ subtitle: 计算注意力、应用掩码、拆分多头、加入位置并堆叠�
 hue: 12
 sources: phases/07-transformers-deep-dive/02-self-attention-from-scratch, phases/07-transformers-deep-dive/03-multi-head-attention, phases/07-transformers-deep-dive/04-positional-encoding, phases/07-transformers-deep-dive/05-full-transformer, phases/07-transformers-deep-dive/07-gpt-causal-language-modeling, phases/07-transformers-deep-dive/12-kv-cache-flash-attention, phases/07-transformers-deep-dive/13-scaling-laws, phases/07-transformers-deep-dive/14-build-a-transformer-capstone, phases/05-nlp-foundations-to-advanced/10-attention-mechanism, phases/19-capstone-projects/32-token-positional-embeddings, phases/19-capstone-projects/33-multihead-self-attention, phases/19-capstone-projects/34-transformer-block, phases/19-capstone-projects/35-gpt-model-assembly, phases/10-llms-from-scratch/04-pre-training-mini-gpt
 code: TA
-source_hash: af7d13dd45302b44
+source_hash: a48fe297db1c2ae2
 ---
 
 ## 一个 pre-LN 解码器区块
@@ -119,7 +119,7 @@ from: phases/07-transformers-deep-dive/04-positional-encoding/docs/zh.md, phases
 | 初始化标准差 | 0.02 | Linear 与 Embedding 权重 |
 | 残差投影缩放 | 1 / sqrt(2 * num_layers) | out_proj 与 fc2 |
 | GPT-2 small d_model | 768 | 12 个头、12 层，约 124M |
-| 每 token 每层的 KV 字节数 | `2 * d_head * dtype_size` | 每头，包含 K 与 V |
+| 每 token 每层的 KV 字节数 | `2 * n_kv_heads * d_head * dtype_size` | 所有 KV 头，包含 K 与 V |
 | 计算最优比例 | 20 | 每参数对应的 token 数 |
 
 ## 故障排查

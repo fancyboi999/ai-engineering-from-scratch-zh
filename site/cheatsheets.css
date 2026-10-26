@@ -283,15 +283,6 @@
   padding: 6px 8px 7px;
 }
 
-.cs-from {
-  margin: 0;
-  padding: 3px 8px 4px;
-  border-top: 1px dotted var(--rule-soft);
-  color: var(--ink-mute);
-  font-size: 0.68em;
-  line-height: 1.35;
-}
-
 .cs-from a {
   color: inherit;
 }

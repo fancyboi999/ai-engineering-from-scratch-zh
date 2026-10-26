@@ -5,7 +5,7 @@ code: AT
 subtitle: 定义、验证、分派和保护工具调用。将技能保存为代码，检索、组合并改进它们。
 hue: 160
 sources: phases/14-agent-engineering/06-tool-use-and-function-calling, phases/14-agent-engineering/10-skill-libraries-voyager, phases/11-llm-engineering/09-function-calling
-source_hash: 163699a110cf541f
+source_hash: a2f1468c51d65ff7
 ---
 
 ## 函数调用循环

@@ -6,7 +6,7 @@ const path = require('node:path');
 
 const MAP_FILE = 'cheatsheets/topics.yaml';
 const KINDS = ['concept', 'commands', 'comparison', 'debugging', 'manual', 'project'];
-const FIELDS = ['id', 'title', 'kind', 'sources'];
+const FIELDS = ['id', 'title', 'kind', 'sources', 'explainer'];
 const HASH_EXTENSIONS = /\.(?:md|py|ts|tsx|js|mjs|rs|jl|go|sh|txt|log|json|jsonl|yaml|yml|toml|csv)$/;
 const SKIP_DIRS = new Set(['node_modules', '__pycache__', 'figures', 'media', 'starter', 'notebook', 'assets', 'images']);
 const SKIP_FILES = new Set(['quiz.json', 'package-lock.json', '.gitkeep']);
@@ -71,6 +71,7 @@ function parseTopicMap(text, file = MAP_FILE) {
     if (!topic.title) errors.push(`${where}: topic "${topic.id}" needs a title`);
     if (!KINDS.includes(topic.kind)) errors.push(`${where}: topic "${topic.id}" kind must be one of ${KINDS.join(', ')}`);
     if (!topic.sources.length) errors.push(`${where}: topic "${topic.id}" needs sources`);
+    if (topic.explainer !== undefined && !/^[a-z0-9]+(?:-[a-z0-9]+)*\.html$/.test(topic.explainer)) errors.push(`${where}: explainer "${topic.explainer}" must be a page name such as inside-a-decompiler.html`);
   }
   return { topics, errors };
 }

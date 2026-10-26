@@ -188,3 +188,16 @@ test('deployed contextual routes stay extensionless while zh canonicals keep sta
   assert.match(lesson, /<link rel="canonical" href="https:\/\/aieng-zh\.cn\/lesson\.html">/);
   assert.match(certification, /<link rel="canonical" href="https:\/\/aieng-zh\.cn\/certification\.html">/);
 });
+
+
+test('plain static preview resolves practice and manual chapter pages', () => {
+  const { api } = loadRouteRuntime('http://localhost:8000/index.html');
+  for (const [href, expected] of [
+    ['/practice', '/practice/index.html'],
+    ['/practice/adam-step', '/practice/adam-step.html'],
+    ['/practice/tracks/optimizers', '/practice/tracks/optimizers.html'],
+    ['/manual-vllm-101/count-the-memory-before-you-pick-a-gpu', '/manual/manual-vllm-101/count-the-memory-before-you-pick-a-gpu.html'],
+  ]) assert.equal(api.adaptHref(href), expected);
+  const deployed = loadRouteRuntime('https://aieng-zh.cn/').api;
+  assert.equal(deployed.adaptHref('/practice/adam-step'), '/practice/adam-step');
+});

@@ -133,3 +133,8 @@ site/cheatsheet-map.json
 !.claude/skills/start-learning/**
 !.claude/skills/build-project/
 !.claude/skills/build-project/**
+
+# 编程练习与手册章节由中文源构建。
+site/practice/
+site/practice-map.json
+site/manual/

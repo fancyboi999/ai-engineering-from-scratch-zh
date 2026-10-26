@@ -5,7 +5,7 @@ code: GA
 subtitle: 损失、DCGAN 代码、Pix2Pix、CycleGAN 和 StyleGAN，以及默认值、故障特征与修正方法。
 hue: 12
 sources: phases/08-generative-ai/01-generative-models-taxonomy-history, phases/08-generative-ai/03-gans-generator-discriminator, phases/08-generative-ai/04-conditional-gans-pix2pix, phases/08-generative-ai/05-stylegan, phases/04-computer-vision/09-image-generation-gans
-source_hash: 33d4b6be5b1c2df8
+source_hash: 007ed77e22f94fc9
 ---
 
 ## StyleGAN 生成器

@@ -5,7 +5,7 @@ code: ND
 subtitle: 安全运行 notebook，加载和划分数据集，避免大文件进入 git，分析时间与内存，发现无声的 AI bug。
 hue: 285
 sources: phases/00-setup-and-tooling/05-jupyter-notebooks, phases/00-setup-and-tooling/09-data-management, phases/00-setup-and-tooling/12-debugging-and-profiling
-source_hash: 3169bc8bda196a58
+source_hash: 8f1f13ab32ab617b
 ---
 
 ## Notebook 快捷键

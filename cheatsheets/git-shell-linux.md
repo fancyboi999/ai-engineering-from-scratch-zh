@@ -5,7 +5,7 @@ code: GS
 subtitle: 提交和分支、管道和日志筛选、用 tmux 保持运行、向 GPU 主机传文件，并修复 Linux 错误。
 hue: 25
 sources: phases/00-setup-and-tooling/02-git-and-collaboration, phases/00-setup-and-tooling/10-terminal-and-shell, phases/00-setup-and-tooling/11-linux-for-ai
-source_hash: 6f10f2f95ae6a1d9
+source_hash: de7f1e70867eab6b
 ---
 
 ## Git 如何移动你的工作

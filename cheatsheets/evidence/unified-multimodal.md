@@ -1,17 +1,13 @@
 # Evidence: cheatsheets/unified-multimodal.md
-upstream_revision: 45fa4084de6ba2f88fa96a41e69efa2166f868b3
+upstream_revision: 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a
 
 # 证据对照：统一多模态模型
 
-中文主题：[统一多模态模型](../unified-multimodal.md)。下列逐条英文记录保留冻结上游版本的路径、行号与数值；标题对应中文主题。
-
-原始记录中的 docs/en.md 和行号只在上述 upstream 版本有效，不代表当前 docs/zh.md 的行号，也不表示本次重新运行了命令、GPU 测量或外部模型。当前中文主题的 from 路径另由构建器校验。
+下列英文记录保留冻结上游的路径、行号和数值。它们不代表中文行号，也不代表本次重新运行了命令、GPU 测量或外部模型。区块标题对应中文速查表。
 
 Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-visual-autoregressive-var. CH = P12/11-chameleon-early-fusion-tokens, EMU = P12/12-emu3-next-token-for-generation, TF = P12/13-transfusion-autoregressive-diffusion, SO = P12/14-show-o-discrete-diffusion-unified, JP = P12/15-janus-pro-decoupled-encoders, MIO = P12/16-mio-any-to-any-streaming. d = docs/en.md, c = code/main.py.
 
-## 四类统一架构对比 (comparison)
-
-原始区块：Four unified designs side by side (comparison, 7 rows)
+## 四类统一架构对比 (comparison, 7 rows)
 - Image form: CH/d:36-42 discrete VQ, TF/d:34 continuous 16x16 patches, SO/d:21 discrete, JP/d:32-34 SigLIP in, VQ out
 - Image loss: CH/d:42 one loss, EMU/d:39 next-token, TF/d:40 and TF/d:66-67 flow matching MSE, SO/d:44 cross-entropy on MASK tokens, JP/d:68 emits VQ tokens autoregressively
 - Image attention: CH/d:27 one autoregressive decoder, TF/d:46 and TF/d:53 bidirectional within image, SO/d:36 bidirectional within image block, JP/d:70 text-style transformer body
@@ -20,9 +16,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - Weak point: CH/d:84-85 tokenizer ceiling, SO/d:86 slow inference, TF/d:94 loss weights need tuning, SO/d:87 lossy by tokenizer, JP/d:86 two tokenizers to train
 - Key number: EMU/d:70 FID 5.4 vs 5.6, TF/d:90 3-5 FID points at 7B, SO/d:48 ~16 vs ~1000, JP/d:57 GenEval 0.80 vs 0.67
 
-## 按场景选择 (tips)
-
-原始区块：Use X when (tips, 8)
+## 按场景选择 (tips, 8)
 - Chameleon family for image generation, mixed-modality output: CH/d:59, CH/d:93
 - Adapter VLM for understanding only, reuses pretrained compute: CH/d:93, LLaVA-family JP/d:86
 - Emu3 one checkpoint, prompt templates, gen + chat + video: EMU/d:58-64
@@ -32,9 +26,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - VAR about 10 passes vs DiT 28-50: VAR/d:69
 - MIO speech in and out, <500ms TTFAB: MIO/d:26, MIO/d:151
 
-## Janus-Pro 解耦路由 (architecture)
-
-原始区块：Janus-Pro decoupled routing (architecture, 8 nodes)
+## Janus-Pro 解耦路由 (architecture, 8 nodes)
 - Input image, understand path starts here: JP/d:32
 - SigLIP-SO400m then 2-layer MLP: JP/d:32
 - Generation path through VQ tokenizer, optional conditioning image: JP/d:33, JP/c:79-80
@@ -44,9 +36,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - Text out autoregressively: JP/d:67
 - VQ decoder to pixels: JP/d:34
 
-## Show-o 掩码采样循环 (flow)
-
-原始区块：Show-o masked sampling loop (flow, 6 steps)
+## Show-o 掩码采样循环 (flow, 6 steps)
 1. All tokens MASK, SEQ_LEN 16, VOCAB 8: SO/c:14-16, SO/c:67
 2. cosine_schedule(T), T=8: SO/c:19-21, SO/c:66, SO/c:92
 3. predict all masked in parallel: SO/d:48, SO/c:46-53
@@ -54,18 +44,14 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 5. rest stay masked for next step: SO/c:60-63, SO/c:70-76
 6. step_unmask(tokens, prompt_seed, 1.0) fills the rest: SO/c:77-78
 
-## 残差多尺度分词器（VAR） (annotated-code)
-
-原始区块：Residual multi-scale tokenizer (annotated-code, 10 lines)
+## 残差多尺度分词器（VAR） (annotated-code, 10 lines)
 - SCALES = (1, 2, 4, 8), 8x8 image: VAR/c:35-36
 - CODEBOOK = 16: VAR/c:37
 - residual = img.copy() and loop over zip(SCALES, codebooks): VAR/c:109-111
 - downsample, encode, recon = book[tok], residual update, tokens.append: VAR/c:112-116
 - decoder out = out + upsample(book[tok], IMG): VAR/c:120-126
 
-## 双损失步骤（Transfusion） (annotated-code)
-
-原始区块：Two-loss step (annotated-code, 8 lines)
+## 双损失步骤（Transfusion） (annotated-code, 8 lines)
 - weights dict with text_w 1.0, img_w 0.1: TF/c:114
 - build_mask(tokens), causal text, bidirectional image: TF/c:44-45, TF/c:130
 - text_loss line: TF/c:94
@@ -75,9 +61,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - img_loss = mse(pred_flat, tgt_flat): TF/c:107
 - total line: TF/c:109
 
-## 代码任务 (task-table)
-
-原始区块：Tasks in code (task-table, 8)
+## 代码任务 (task-table, 8)
 - tokenize_multiscale(img, codebooks): VAR/c:106
 - image_to_tokens(img), 8x8 to 4 tokens: CH/c:44-58, CH/c:140
 - TokCost("image 512x512", 512, 8) and tokens(): EMU/c:17-32, EMU/c:40
@@ -87,20 +71,16 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - build_vocab(): MIO/c:23-42
 - streaming_decode_latency(model_size_b=8): MIO/c:80-83, MIO/c:150
 
-## 关键公式 (concepts)
-
-原始区块：Key formulas (concepts, 7)
+## 关键公式 (concepts, 7)
 - Residual VQ sum: VAR/d:36-40
 - Flow matching x_t and MSE against epsilon - x_0: TF/d:66-67
 - CFG mixed = uncond + gamma * (cond - uncond): EMU/c:63
 - Cosine mask ratio, 1.0 at step 0, none at step T: SO/d:72-76
 - Show-o loss on MASK tokens, text masks only last token: SO/d:44
 - 32000 + 8192 = 40192: CH/d:42
-- 64 * 64 * 8 = 32,768 video tokens, 4 s at 8 FPS, 256x256: EMU/d:33
+- 32 * 32 * 8 = 8,192 video tokens, 4 s at 8 FPS, 256x256: EMU/d:33
 
-## 应记住的数值 (defaults)
-
-原始区块：Numbers to keep (defaults, 8)
+## 应记住的数值 (defaults, 8)
 - 8192, 1024 tokens per 512x512: CH/d:36, CH/d:42
 - 32768, 4096 tokens, 30.5 dB: EMU/d:29, EMU/d:31
 - CFG 3.0-7.0, with and without caption: EMU/d:52
@@ -110,9 +90,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - VAR K = 10, 10 passes for 256x256: VAR/d:69
 - <500ms conversational: MIO/d:26, MIO/d:151
 
-## 故障排查 (troubleshooting)
-
-原始区块：Troubleshooting (troubleshooting, 8)
+## 故障排查 (troubleshooting, 8)
 - 34B diverged, logit magnitude explosion, QK-Norm and dropout after every residual-add: CH/d:67-71
 - PSNR 26-28 dB ceiling, better tokenizer: CH/d:75-77, continuous patches TF/d:19-25
 - one head dominates, schedule mismatch, tune loss weights: TF/d:94
@@ -122,9 +100,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - skip stage 2 loses cross-modality context: MIO/d:69, MIO/d:73
 - skip stage 3 speech is poor: MIO/d:70, MIO/d:73
 
-## 缩写 (glossary)
-
-原始区块：Abbreviations (glossary, 8)
+## 缩写 (glossary, 8)
 - VAR: VAR/d:125
 - VQ-VAE: CH/d:33, CH/d:137
 - NTP: EMU/d:121
@@ -134,9 +110,7 @@ Abbreviations: P12 = phases/12-multimodal-ai. VAR = phases/08-generative-ai/19-v
 - TTFAB: MIO/d:151
 - Residual-VQ, base content, later prosody: MIO/d:148
 
-## 问答 (qa)
-
-原始区块：Questions (qa, 6)
+## 问答 (qa, 6)
 - one encoder fails, VQ weak semantics, SigLIP poor reconstruction: JP/d:21-22
 - inpainting free from masked prediction: SO/d:66
 - VAR one pass per scale in parallel: VAR/d:69, VAR/d:75

@@ -5,7 +5,7 @@ code: LA
 subtitle: 向量、变换、特征值、SVD 与 Ax = b 求解器。采用课程中从零实现的 Python 与 NumPy 代码。
 hue: 230
 sources: phases/01-math-foundations/01-linear-algebra-intuition, phases/01-math-foundations/02-vectors-matrices-operations, phases/01-math-foundations/03-matrix-transformations, phases/01-math-foundations/11-singular-value-decomposition, phases/01-math-foundations/17-linear-systems
-source_hash: e09f8ad8b2120b16
+source_hash: cab426c73f50f5d8
 ---
 
 ## SVD：旋转、缩放、旋转

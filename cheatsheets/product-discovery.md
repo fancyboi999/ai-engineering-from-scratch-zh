@@ -5,7 +5,7 @@ code: OW
 subtitle: 定义成果、核实工作流、排列假设、选择切片、编写规格、设置指标，再选择阶段。
 hue: 330
 sources: phases/14-agent-engineering/47-outcomes-before-output, phases/14-agent-engineering/48-discover-the-real-workflow, phases/14-agent-engineering/49-map-assumptions-and-risk, phases/14-agent-engineering/50-choose-the-smallest-testable-slice, phases/14-agent-engineering/51-write-specifications-that-preserve-judgment, phases/14-agent-engineering/52-design-success-metrics, phases/14-agent-engineering/53-prototype-pilot-or-production
-source_hash: 4ae0998fcbcce537
+source_hash: e402874c1200ea30
 ---
 
 ## 从请求到阶段

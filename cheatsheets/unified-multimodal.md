@@ -5,7 +5,7 @@ code: UM
 subtitle: 选择统一架构：离散 NTP、双损失扩散、掩码扩散、解耦编码器、下一尺度预测与任意模态互转。
 hue: 290
 sources: phases/08-generative-ai/19-visual-autoregressive-var, phases/12-multimodal-ai/11-chameleon-early-fusion-tokens, phases/12-multimodal-ai/12-emu3-next-token-for-generation, phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion, phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified, phases/12-multimodal-ai/15-janus-pro-decoupled-encoders, phases/12-multimodal-ai/16-mio-any-to-any-streaming
-source_hash: 71d61aa3367b9d76
+source_hash: 0b2825525671443d
 ---
 
 ## 四类统一架构对比
@@ -129,7 +129,7 @@ from: phases/08-generative-ai/19-visual-autoregressive-var/docs/zh.md, phases/12
 - **余弦掩码比例**：$\cos(\pi t / 2T)$。第 0 步比例为 1.0，第 T 步无掩码。
 - **Show-o 损失**：掩码 token 上的交叉熵。文本 NTP 只掩码最后一个 token。
 - **Chameleon 词表**：32000 个文本标识加 8192 个图像标识，共 40192。
-- **Emu3 视频**：4 s、8 FPS、256x256 对应 64 * 64 * 8 = 32,768 tokens。
+- **Emu3 视频**：4 s、8 FPS、256x256 对应 32 * 32 * 8 = 8,192 tokens。
 
 ## 应记住的数值
 type: defaults

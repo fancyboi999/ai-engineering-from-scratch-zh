@@ -5,7 +5,7 @@ code: VL
 subtitle: ViT、桥接器与 LLM。包含投影器、Q-Former、Perceiver、门控交叉注意力、训练阶段和配置数值。
 hue: 265
 sources: phases/04-computer-vision/25-vision-language-models, phases/12-multimodal-ai/03-blip2-qformer-bridge, phases/12-multimodal-ai/04-flamingo-gated-cross-attention, phases/12-multimodal-ai/05-llava-visual-instruction-tuning, phases/12-multimodal-ai/07-open-weight-vlm-recipes, phases/19-capstone-projects/60-projection-layer-modality-align, phases/19-capstone-projects/61-cross-attention-fusion
-source_hash: 24eab480196b284d
+source_hash: b8549a63833ad351
 ---
 
 ## ViT-MLP-LLM 模式

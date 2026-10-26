@@ -5,7 +5,7 @@ code: SA
 subtitle: 排查 token 拒绝、工具元数据投毒与内容注入。速查 CIMD、PKCE、iss、受众和 PVE 检查。
 hue: 350
 sources: phases/13-tools-and-protocols/15-mcp-security-tool-poisoning, phases/13-tools-and-protocols/16-mcp-security-oauth-2-1, phases/13-tools-and-protocols/18-mcp-auth-production, phases/14-agent-engineering/27-prompt-injection-defense
-source_hash: 75631233397b1ed8
+source_hash: f77de2d7090017ee
 ---
 
 ## token 拒绝

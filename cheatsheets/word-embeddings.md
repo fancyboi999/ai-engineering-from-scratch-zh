@@ -5,7 +5,7 @@ code: WG
 subtitle: 统计词频、用 TF-IDF 加权、训练稠密向量并将罕见词拆为子词。使用课程中的 Python。
 hue: 25
 sources: phases/05-nlp-foundations-to-advanced/02-bag-of-words-tfidf, phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec, phases/05-nlp-foundations-to-advanced/04-glove-fasttext-subword
-source_hash: 1c715549fc218de1
+source_hash: 1707ae389b02c48a
 ---
 
 ## 带负采样的 Skip-gram

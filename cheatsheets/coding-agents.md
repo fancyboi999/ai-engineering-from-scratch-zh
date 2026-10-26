@@ -5,7 +5,7 @@ code: CL
 subtitle: 选择运行框架，设置预算与闸门，运行综合项目 agent 和三个编程 agent 项目。
 hue: 25
 sources: phases/15-autonomous-systems/09-coding-agent-landscape, phases/19-capstone-projects/01-terminal-native-coding-agent, phases/19-capstone-projects/09-code-migration-agent, phases/19-capstone-projects/16-github-issue-to-pr-agent, phases/19-capstone-projects/29-end-to-end-coding-task-demo, projects/tiny-coding-agent, projects/rust-agent-shell, projects/pr-review-reporter
-source_hash: 97b21f2730bb3d95
+source_hash: a8d76f59e6ac41d3
 ---
 
 ## JSON 工具调用与 CodeAct

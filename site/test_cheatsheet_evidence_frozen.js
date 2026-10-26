@@ -34,9 +34,13 @@ function fixture(t, { revision = REVISION, ref = 'L01/d:2-3', heading = '启动�
     '',
   ].join('\n'));
   const old = process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT;
+  const oldRoots = process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS;
+  delete process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS;
   if (oracle) process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT = upstream;
   else delete process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT;
   t.after(() => {
+    if (oldRoots === undefined) delete process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS;
+    else process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS = oldRoots;
     if (old === undefined) delete process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT;
     else process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT = old;
   });
@@ -122,4 +126,22 @@ test('an exact Chinese block title wins over an earlier section containing the s
   const map = { topics: [{ id: 'demo', sources: [SOURCE] }] };
   const topics = [{ id: 'demo', blocks: [{ title: '损失', items: Array.from({ length: 6 }, () => ({})) }] }];
   assert.deepEqual(checkEvidence(map, topics, data.local).problems, []);
+});
+
+
+test('each frozen edition resolves against its own source root', t => {
+  const revision = '3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a';
+  const data = fixture(t, { revision, marker: revision });
+  const old = process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS;
+  const other = path.join(data.local, 'old-oracle');
+  fs.mkdirSync(other, { recursive: true });
+  fs.writeFileSync(path.join(other, '.aifs-upstream-revision'), REVISION + '\n');
+  process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS = [other, data.upstream].join(path.delimiter);
+  t.after(() => {
+    if (old === undefined) delete process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS;
+    else process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS = old;
+  });
+  assert.deepEqual(data.run().problems, []);
+  fs.writeFileSync(path.join(data.upstream, '.aifs-upstream-revision'), REVISION + '\n');
+  assert.match(data.run().problems.join('\n'), /matching 3f9715c/);
 });

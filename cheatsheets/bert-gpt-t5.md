@@ -5,7 +5,7 @@ code: BG
 subtitle: 对比仅编码器、仅解码器和编码器-解码器：训练目标、掩码、模块、解码及选型。
 hue: 32
 sources: phases/07-transformers-deep-dive/05-full-transformer, phases/07-transformers-deep-dive/06-bert-masked-language-modeling, phases/07-transformers-deep-dive/07-gpt-causal-language-modeling, phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder
-source_hash: a72c9a813f2a3db5
+source_hash: 1b493fb10da030f9
 ---
 
 ## 三类架构对比

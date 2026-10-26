@@ -5,7 +5,7 @@ code: GK
 subtitle: 图矩阵、拉普拉斯与消息传递、实体链接、关系抽取及混合图记忆。
 hue: 160
 sources: phases/01-math-foundations/21-graph-theory, phases/05-nlp-foundations-to-advanced/25-entity-linking, phases/05-nlp-foundations-to-advanced/26-relation-extraction-kg, phases/14-agent-engineering/09-hybrid-memory-mem0
-source_hash: b1c5096612ebf143
+source_hash: 60af3ba52a3ba242
 ---
 
 ## 图矩阵

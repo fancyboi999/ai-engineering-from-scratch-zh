@@ -5,7 +5,7 @@ subtitle: 梯度、概率、信息、优化器、矩阵分解与浮点安全。�
 hue: 260
 sources: phases/01-math-foundations/02-vectors-matrices-operations, phases/01-math-foundations/04-calculus-for-ml, phases/01-math-foundations/05-chain-rule-and-autodiff, phases/01-math-foundations/06-probability-and-distributions, phases/01-math-foundations/07-bayes-theorem, phases/01-math-foundations/08-optimization, phases/01-math-foundations/09-information-theory, phases/01-math-foundations/10-dimensionality-reduction, phases/01-math-foundations/11-singular-value-decomposition, phases/01-math-foundations/12-tensor-operations, phases/01-math-foundations/13-numerical-stability, phases/01-math-foundations/14-norms-and-distances, phases/01-math-foundations/16-sampling-methods, phases/01-math-foundations/17-linear-systems
 code: MM
-source_hash: 10c840ab4b2ea7a7
+source_hash: 7a5a6405f11dde72
 ---
 
 ## 计算图、前向与反向传播

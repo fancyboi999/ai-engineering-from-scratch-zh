@@ -5,7 +5,7 @@ code: NP
 subtitle: BIO 标签、CRF 与 HMM 标注器、Viterbi、依存分析、共指簇，以及到知识库的实体链接。
 hue: 160
 sources: phases/05-nlp-foundations-to-advanced/06-named-entity-recognition, phases/05-nlp-foundations-to-advanced/07-pos-tagging-parsing, phases/05-nlp-foundations-to-advanced/24-coreference-resolution, phases/05-nlp-foundations-to-advanced/25-entity-linking
-source_hash: 4cf478ba5073db05
+source_hash: 2d7752a05102d9dd
 ---
 
 ## 抽取流水线

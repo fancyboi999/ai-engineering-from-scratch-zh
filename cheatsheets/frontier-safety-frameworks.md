@@ -5,7 +5,7 @@ code: FS
 subtitle: 对比 RSP v3.0、PF v2 与 FSF v3，并速查 METR 时间跨度、WMDP、CAIS、CAISI 和 2025 年双重用途证据。
 hue: 350
 sources: phases/15-autonomous-systems/19-anthropic-rsp, phases/15-autonomous-systems/20-openai-preparedness-deepmind-fsf, phases/15-autonomous-systems/21-metr-external-evaluation, phases/15-autonomous-systems/22-cais-caisi-societal-risk, phases/18-ethics-safety-alignment/17-wmdp-dual-use-evaluation, phases/18-ethics-safety-alignment/18-frontier-safety-frameworks-rsp-pf-fsf, phases/18-ethics-safety-alignment/30-dual-use-risk-cyber-bio-chem-nuclear
-source_hash: 10cd8ebbf83b632f
+source_hash: 752fa4c228c3aee9
 ---
 
 ## 三家实验室的框架

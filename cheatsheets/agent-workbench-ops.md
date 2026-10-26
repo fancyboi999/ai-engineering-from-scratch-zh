@@ -5,7 +5,7 @@ code: RM
 subtitle: 明确任务边界，用经过 schema 校验的文件保存状态，启动前探测环境，每次会话结束时生成交接包。
 hue: 30
 sources: phases/14-agent-engineering/34-repo-memory-and-state, phases/14-agent-engineering/35-initialization-scripts, phases/14-agent-engineering/40-multi-session-handoff, phases/14-agent-engineering/41-workbench-for-real-repos, phases/14-agent-engineering/43-frame-the-task-before-code
-source_hash: 487539f1058bcfbb
+source_hash: fb2a1611d0adb7fe
 ---
 
 ## 一次工作台会话

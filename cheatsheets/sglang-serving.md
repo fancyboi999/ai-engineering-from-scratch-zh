@@ -5,13 +5,13 @@ code: LS
 subtitle: 启动、规划容量、测量并排查 SGLang 服务。基于上游 SGLang 0.5.22 手册与 GPU 捕获记录。
 hue: 200
 sources: manuals/sglang-101
-source_hash: 624fb8969a5d6992
+source_hash: 241e5f7bd3f8e502
 ---
 
 ## 启动服务
 type: annotated-code
 lang: bash
-from: manuals/sglang-101/capture/gpu/out-l4/server-default.command.txt, manuals/sglang-101/capture/README.md, manuals/sglang-101/sections/1-2-one-request-end-to-end.md
+from: manuals/sglang-101/capture/gpu/out-l4/server-default.command.txt, manuals/sglang-101/capture/README.md, manuals/sglang-101/sections/1-1-install-sglang-and-serve-your-first-model.md
 
 ```bash
 export HF_HUB_OFFLINE=1   # 模型缓存后不再连接 Hub
@@ -40,7 +40,7 @@ edge | detok | client | 文本
 
 ## 请求与检查
 type: task-table
-from: manuals/sglang-101/sections/1-2-one-request-end-to-end.md, manuals/sglang-101/sections/2-5-streaming-stop-strings-and-the-openai-api.md, manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md, manuals/sglang-101/sections/4-6-deterministic-inference-and-logprobs.md, manuals/sglang-101/sections/7-1-operating-sglang.md
+from: manuals/sglang-101/sections/1-1-install-sglang-and-serve-your-first-model.md, manuals/sglang-101/sections/2-5-streaming-stop-strings-and-the-openai-api.md, manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md, manuals/sglang-101/sections/4-6-deterministic-inference-and-logprobs.md, manuals/sglang-101/sections/7-1-operating-sglang.md
 
 | 任务 | 代码 |
 |---|---|
@@ -53,16 +53,16 @@ from: manuals/sglang-101/sections/1-2-one-request-end-to-end.md, manuals/sglang-
 | 按固定到达速率发送 | `--request-rate <rate>` |
 | 测试输出稳定性 | `python3 -m sglang.test.test_deterministic --n-trials 50 --test-mode single` |
 
-## 捕获工具与审计命令
+## 测量服务性能
 type: command-table
-from: manuals/sglang-101/README.md, manuals/sglang-101/capture/README.md
+from: manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md
 
 | 命令 | 作用 |
 |---|---|
-| `python3 capture/run.py --check` | 重新捕获服务并比较稳定事实。缺少 SGLang 0.5.22 与 MLX 时输出 `skipped`。 |
-| `python3 capture/run.py --only small-pool` | 捕获一种服务配置。 |
-| `SGLANG_KIT_PROFILE=gb10 python3 capture/gpu/run.py` | 捕获一个配置档中的八个 GPU 服务。 |
-| `node scripts/audit_manuals.js --manual sglang-101` | 审计手册，必须报告 `TOTAL 0`。 |
+| `python -m sglang.benchmark.serving --backend sglang --port 30000 --dataset-name random --num-prompts 32 --max-concurrency 8 --seed 7` | 发送 32 个随机 prompt，最多同时处理 8 个请求，然后输出报告。 |
+| `--random-input-len 512 --random-output-len 128` | 设置 prompt 与回答长度。 |
+| `--random-range-ratio 1.0` | 保持所设长度。默认值 0.0 会使平均长度约减半。 |
+| `--request-rate <rate>` | 按固定速率发送请求，模拟真实流量中服务可能积压的情况。 |
 
 ## 关键默认值
 type: defaults
@@ -105,7 +105,7 @@ from: manuals/sglang-101/sections/7-1-operating-sglang.md, manuals/sglang-101/se
 
 ## 应监控的指标
 type: concepts
-from: manuals/sglang-101/sections/5-2-the-metrics-endpoint.md, manuals/sglang-101/sections/1-1-what-a-serving-engine-owns.md, manuals/sglang-101/sections/2-5-streaming-stop-strings-and-the-openai-api.md
+from: manuals/sglang-101/sections/5-2-the-metrics-endpoint.md, manuals/sglang-101/sections/1-3-what-the-server-does-with-your-request.md, manuals/sglang-101/sections/2-5-streaming-stop-strings-and-the-openai-api.md
 
 - **sglang:token_usage**：接近 1.0 表示 KV 池已满。
 - **sglang:num_queue_reqs**：持续数分钟高于 0，表示服务已超过拐点。
@@ -124,7 +124,7 @@ from: manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md,
 
 ## 术语表
 type: glossary
-from: manuals/sglang-101/sections/1-1-what-a-serving-engine-owns.md, manuals/sglang-101/sections/3-1-kv-bytes-per-token-and-the-kv-pool.md, manuals/sglang-101/sections/6-2-moe-serving-deepep-and-eplb.md, manuals/sglang-101/sections/6-3-prefill-decode-disaggregation.md
+from: manuals/sglang-101/sections/1-3-what-the-server-does-with-your-request.md, manuals/sglang-101/sections/3-1-kv-bytes-per-token-and-the-kv-pool.md, manuals/sglang-101/sections/6-2-moe-serving-deepep-and-eplb.md, manuals/sglang-101/sections/6-3-prefill-decode-disaggregation.md
 
 - **ITL**：token 间延迟，即相邻 token 的时间间隔。
 - **MLA**：多头潜在注意力，DeepSeek 使用的紧凑 KV 布局。

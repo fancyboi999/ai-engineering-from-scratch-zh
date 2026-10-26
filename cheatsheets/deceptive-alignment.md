@@ -5,7 +5,7 @@ code: MO
 subtitle: 欺骗性对齐的术语、证据、数字、简化代码与控制协议。对应第 18 阶段第 6 至 10 课。
 hue: 330
 sources: phases/18-ethics-safety-alignment/06-mesa-optimization-deceptive-alignment, phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception, phases/18-ethics-safety-alignment/08-in-context-scheming-frontier-models, phases/18-ethics-safety-alignment/09-alignment-faking, phases/18-ethics-safety-alignment/10-ai-control-subversion
-source_hash: 63c0966a7e598d66
+source_hash: 06d578c2eaa21678
 ---
 
 ## 术语

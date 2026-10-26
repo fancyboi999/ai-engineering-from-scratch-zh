@@ -5,7 +5,7 @@ code: JP
 subtitle: 即时执行的磁带式自动微分，对比经追踪和编译的纯函数。用两者实现相同的 MNIST MLP，掌握 API 与常见坑。
 hue: 280
 sources: phases/03-deep-learning-core/10-mini-framework, phases/03-deep-learning-core/11-intro-to-pytorch, phases/03-deep-learning-core/12-intro-to-jax
-source_hash: b13377827844d954
+source_hash: 6155c9ed1505aefd
 ---
 
 ## 并排对比

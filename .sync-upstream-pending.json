@@ -1,0 +1,99 @@
+{
+  "base": "45fa4084de6ba2f88fa96a41e69efa2166f868b3",
+  "target": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
+  "pending": [
+    {
+      "scope": "core",
+      "work": "现有课程正文、代码、测验及产物纠错"
+    },
+    {
+      "scope": "reader",
+      "work": "课程阅读器、目录完成状态与高亮布局"
+    },
+    {
+      "scope": "manuals",
+      "work": "新增vLLM/Miles及现有手册、章节页与来源证据"
+    },
+    {
+      "scope": "practice",
+      "work": "51道练习内容、浏览器运行器、持久化与路由"
+    },
+    {
+      "scope": "cheatsheets",
+      "work": "速查表内容、来源冻结与布局质量"
+    },
+    {
+      "scope": "machines",
+      "work": "反编译器/GPU交互图解、figure及技能"
+    }
+  ],
+  "decisions": [
+    {
+      "scope": "上游模型生成与多语言流水线",
+      "decision": "不移植外部LLM生成、定时翻译和非中文i18n内容；中文内容由本轮agent翻译。",
+      "paths": [
+        ".github/workflows/cheatsheets-generate.yml",
+        ".github/workflows/practice-generate.yml",
+        ".github/workflows/translate.yml",
+        "scripts/cheatsheets/",
+        "scripts/practice/generate.js",
+        "scripts/practice/prompt.md",
+        "scripts/practice/report.js",
+        "scripts/practice/test_generate.js",
+        "scripts/translate_lessons.py",
+        "scripts/translate_matrix.py",
+        "scripts/translation_freshness.py",
+        "scripts/test_translate_workflow.py",
+        "i18n/",
+        "docs/i18n.md",
+        "site/ui-strings.json"
+      ]
+    },
+    {
+      "scope": "上游推广与仓库流程",
+      "decision": "保留中文站推广、构建产物跟踪、主分支与翻译契约；不移植上游收款联系方式、star history、translations分支和不提交data.js规则。",
+      "paths": [
+        "SPONSORS.md",
+        "site/sponsors.html",
+        "site/test_sponsors.js",
+        "README.md",
+        ".github/PULL_REQUEST_TEMPLATE.md",
+        "AGENTS.md",
+        "CONTRIBUTING.md"
+      ]
+    },
+    {
+      "scope": "中文渲染与URL",
+      "decision": "以md-render.js、中文路由和versionSharedAssets语义整合新增交互、章节URL和资源版本；不新增上游的平行Markdown渲染器或全站clean URL重写。",
+      "paths": [
+        "site/lesson-markdown.js",
+        "site/clean-urls.js",
+        "site/version-assets.js",
+        "site/test_clean_urls.js"
+      ]
+    },
+    {
+      "scope": "构建产物",
+      "decision": "从中文源重建site/data.js和所有忽略产物；不复制上游生成数据。",
+      "paths": [
+        "site/data.js"
+      ]
+    },
+    {
+      "scope": "手册写作技能",
+      "decision": "现有中文技能已允许授权批量同步按逻辑批次，语义覆盖上游本轮提交粒度调整；保留中文技能契约。",
+      "paths": [
+        "skills/write-manual/SKILL.md",
+        ".claude/skills/write-manual/SKILL.md"
+      ]
+    },
+    {
+      "scope": "新增手册速查表",
+      "decision": "上游topics清单新增Miles与vLLM但尚无速查表正文；本轮依据同一冻结手册整理两张中文速查表并逐项记录证据。",
+      "paths": [
+        "cheatsheets/miles-rl.md",
+        "cheatsheets/vllm-serving.md"
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@ code: LC
 subtitle: 计算每次调用价格、缓存前缀和语义、批处理离线任务并限制支出。使用课程中的 Python 与 Rust。
 hue: 40
 sources: phases/11-llm-engineering/11-caching-cost, phases/11-llm-engineering/15-prompt-caching, phases/17-infrastructure-and-production/14-prompt-semantic-caching, phases/17-infrastructure-and-production/15-batch-apis, phases/17-infrastructure-and-production/27-finops-llms, projects/token-counter-and-cost-meter, projects/agent-budget-planner
-source_hash: 35f2d1031b64a1c3
+source_hash: f5c3d765fd5ae059
 ---
 
 ## 任务

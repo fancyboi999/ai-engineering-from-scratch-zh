@@ -5,7 +5,7 @@ code: SR
 subtitle: 解码 CTC、运行和调优 Whisper、使用 VAD 门控，并交付 WAV 转字幕流水线。
 hue: 265
 sources: phases/06-speech-and-audio/04-speech-recognition-asr, phases/06-speech-and-audio/05-whisper-architecture-finetuning, phases/07-transformers-deep-dive/10-audio-transformers-whisper, phases/06-speech-and-audio/14-voice-activity-detection-turn-taking, projects/voice-note-transcriber-pipeline
-source_hash: d0d712ad067027f3
+source_hash: cbfb6d5b76b5faeb
 ---
 
 ## 代码任务

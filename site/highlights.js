@@ -1596,6 +1596,7 @@
     state.translated = isTranslated();
     readShare();
     ui.launcher.hidden = false;
+    document.documentElement.classList.add('aifs-hl-launch-on');
     paint(false);
     renderPanel();
     state.hashPending = /^#hl-/.test(window.location.hash || '');
@@ -1621,6 +1622,7 @@
     state.runtime = {};
     state.findAgain = '';
     if (ui.launcher) ui.launcher.hidden = true;
+    document.documentElement.classList.remove('aifs-hl-launch-on');
     if (ui.shareBar) ui.shareBar.hidden = true;
     if (ui.panel && !ui.panel.hidden) closePanel(false);
   }

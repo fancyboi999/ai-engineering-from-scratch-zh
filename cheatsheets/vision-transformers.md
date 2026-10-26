@@ -5,7 +5,7 @@ code: VT
 subtitle: 切分图块、嵌入、添加 CLS 与位置，运行 pre-LN 块。涵盖 token 数、参数计算与任意分辨率打包。
 hue: 220
 sources: phases/04-computer-vision/14-vision-transformers, phases/07-transformers-deep-dive/09-vision-transformers, phases/12-multimodal-ai/01-vision-transformer-patch-tokens, phases/12-multimodal-ai/06-any-resolution-patch-n-pack, phases/19-capstone-projects/58-vision-encoder-patches, phases/19-capstone-projects/59-vit-transformer
-source_hash: 4c3f75baa18ada34
+source_hash: c86fe6670fe5c3b8
 ---
 
 ## ViT 流水线

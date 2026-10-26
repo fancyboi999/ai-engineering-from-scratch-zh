@@ -52,6 +52,7 @@
 |---|---|
 | 🇨🇳 **全站简体中文** | 542 节课正文、243 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
 | 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、[AI 工程学习路径](https://aieng-zh.cn/learning-paths.html)、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
+| 🧪 **编程练习与技术手册** | [浏览器编程练习](https://aieng-zh.cn/practice)支持代码实现、论文方法、小模型训练与实验；[技术手册](https://aieng-zh.cn/manuals.html)按固定版本讲解 vLLM、Miles、SGLang、A2A、Docker Sandboxes 与逆向工程 |
 | 🎬 **配套动画讲解视频** | 333 节中文配音动画已上线，覆盖阶段 0–14 的全部课程。可在课程页内嵌播放，提供直链与 B 站播放源，配合正文、数学推导和代码实践学习 |
 | 🔍 **为 AI 检索优化** | 构建时自动生成 `sitemap.xml` / `llms.txt` / 结构化数据，方便被搜索引擎和 AI 助手引用 |
 | ✅ **课数一致性护栏** | CI 自动校验课程数（`node site/build.js --check`），防止课程列表与磁盘上的实际内容漂移 |

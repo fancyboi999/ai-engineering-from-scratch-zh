@@ -5,7 +5,7 @@ code: SP
 subtitle: 请求流水线、重试、回退链、SSE 流、恢复、演示限制与回退网关。
 hue: 15
 sources: phases/11-llm-engineering/13-production-app, phases/17-infrastructure-and-production/29-model-demo-interfaces, projects/streaming-answer-recovery, projects/llm-gateway-with-fallbacks
-source_hash: 9884e0bb081293c9
+source_hash: c2e0d189811f84db
 ---
 
 ## 课程任务

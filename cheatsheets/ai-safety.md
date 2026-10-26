@@ -5,7 +5,7 @@ subtitle: 识别攻击、检测风险、衡量拒答、门控输出并审计对�
 hue: 340
 sources: phases/19-capstone-projects/15-constitutional-safety-harness, phases/19-capstone-projects/82-jailbreak-taxonomy, phases/19-capstone-projects/83-prompt-injection-detector, phases/19-capstone-projects/84-refusal-evaluation, phases/19-capstone-projects/85-content-classifier-integration, phases/19-capstone-projects/86-constitutional-rules-engine, phases/19-capstone-projects/87-end-to-end-safety-gate, phases/18-ethics-safety-alignment/02-reward-hacking-goodhart, phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification, phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif, phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception, phases/18-ethics-safety-alignment/09-alignment-faking, phases/18-ethics-safety-alignment/10-ai-control-subversion, phases/18-ethics-safety-alignment/11-scalable-oversight-weak-to-strong, phases/18-ethics-safety-alignment/12-red-teaming-pair-automated-attacks, phases/18-ethics-safety-alignment/13-many-shot-jailbreaking, phases/18-ethics-safety-alignment/14-ascii-art-visual-jailbreaks, phases/18-ethics-safety-alignment/15-indirect-prompt-injection, phases/18-ethics-safety-alignment/16-red-team-tooling-garak-llamaguard-pyrit, phases/18-ethics-safety-alignment/29-moderation-systems-openai-perspective-llamaguard
 code: AS
-source_hash: b350b292223071cb
+source_hash: f4812a376b9b3c9b
 ---
 
 ## 三道检查点的安全门控

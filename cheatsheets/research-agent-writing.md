@@ -5,7 +5,7 @@ code: PW
 subtitle: 用 UCB 调度实验，以五维评分评审器迭代草稿，并输出 LaTeX、BibTeX 与清单。
 hue: 280
 sources: phases/19-capstone-projects/54-paper-writer, phases/19-capstone-projects/55-critic-loop, phases/19-capstone-projects/56-iteration-scheduler, phases/19-capstone-projects/57-end-to-end-research-demo
-source_hash: 9f3325a62d18f1c5
+source_hash: e05467138f76f37c
 ---
 
 ## 端到端研究演示

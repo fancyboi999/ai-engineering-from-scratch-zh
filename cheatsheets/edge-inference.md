@@ -5,7 +5,7 @@ code: EI
 subtitle: 选择边缘平台与量化格式：带宽上限、格式、导出步骤和设备端测量。
 hue: 262
 sources: phases/17-infrastructure-and-production/12-edge-inference, phases/04-computer-vision/15-real-time-edge, phases/10-llms-from-scratch/11-quantization
-source_hash: 226c655a6c9eed2e
+source_hash: 5245f8dad0c9a07f
 ---
 
 ## 四种边缘平台对比

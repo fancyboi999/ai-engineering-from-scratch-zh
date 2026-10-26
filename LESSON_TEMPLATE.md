@@ -4,22 +4,18 @@
 
 ## 目录结构
 
-```text
-NN-lesson-name/
-├── code/
-│   ├── main.py            (主实现)
-│   ├── main.ts            (TypeScript 版本，如适用)
-│   ├── main.rs            (Rust 版本，如适用)
-│   └── main.jl            (Julia 版本，如适用)
-├── notebook/
-│   └── lesson.ipynb       (可选，用于实验的 Jupyter notebook)
-├── docs/
-│   └── zh.md              (中文课程文档)
-├── quiz.json              (6 道分阶段测验)
-└── outputs/
-    ├── prompt-*.md         (本节课产出的提示词)
-    └── skill-*.md          (本节课产出的技能)
-```
+| 路径 | 内容 |
+|---|---|
+| `code/main.py` | 主实现 |
+| `code/main.ts` | TypeScript 版本，如适用 |
+| `code/main.rs` | Rust 版本，如适用 |
+| `code/main.jl` | Julia 版本，如适用 |
+| `code/tests/` | 至少 5 个测试 |
+| `notebook/lesson.ipynb` | 可选实验 notebook |
+| `docs/zh.md` | 中文课程正文 |
+| `quiz.json` | 新编课通常为 6 题：1 pre、3 check、2 post；同步保留上游题数 |
+| `outputs/prompt-*.md` | 课程产出的提示词 |
+| `outputs/skill-*.md` | 课程产出的技能 |
 
 ## 文档格式（docs/zh.md）
 
@@ -43,7 +39,7 @@ NN-lesson-name/
 
 ## 核心概念
 
-[先用图、表和直觉建立心智模型，暂不写代码。]
+[先用 Mermaid、SVG、表格或已注册的 `figure` 建立心智模型，暂不写代码。]
 
 ## 动手构建
 

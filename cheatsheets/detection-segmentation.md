@@ -5,7 +5,7 @@ code: DC
 subtitle: 比较边界框、像素掩码、实例掩码、关键点与文本提示掩码的输出、损失、指标和修正方法。
 hue: 355
 sources: phases/04-computer-vision/06-object-detection-yolo, phases/04-computer-vision/07-semantic-segmentation-unet, phases/04-computer-vision/08-instance-segmentation-mask-rcnn, phases/04-computer-vision/21-keypoint-pose, phases/04-computer-vision/24-sam3-open-vocab-segmentation
-source_hash: 2c462070e71a8d25
+source_hash: fffbbb6f6a8c59c8
 ---
 
 ## 任务对比

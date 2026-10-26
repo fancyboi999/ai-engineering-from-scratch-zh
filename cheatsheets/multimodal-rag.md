@@ -5,7 +5,7 @@ code: MV
 subtitle: 嵌入页面图像，用 MaxSim 评分，融合模态并引用证据区域。代码来自课程的 Python 与 TypeScript 实现。
 hue: 285
 sources: phases/12-multimodal-ai/23-colpali-vision-native-rag, phases/12-multimodal-ai/24-multimodal-rag-cross-modal, phases/19-capstone-projects/04-multimodal-document-qa, projects/visual-evidence-library
-source_hash: 5383643e32bcd459
+source_hash: b85cd8d412d94a80
 ---
 
 ## 视觉优先的文档问答流水线
@@ -103,7 +103,7 @@ from: phases/12-multimodal-ai/23-colpali-vision-native-rag/docs/zh.md
 | 页面向量 | $N_p$ 个图块向量 | 一个池化向量 | 每个分块一个向量 |
 | 评分 | MaxSim | 双编码器 | 分块余弦相似度 |
 | OCR 步骤 | 无 | 无 | OCR / pdftotext |
-| 存储 | 约为 text-RAG 的 30 倍 | 较小 | 每 50 个分块约 150 kB |
+| 存储 | PQ 压缩后约为 text-RAG 的 15 倍 | 较小 | 每 50 个分块约 150 kB |
 | 召回 | 强 | 较弱 | 丢失图表与表格 |
 | 适用重点 | 质量 | 规模 | 纯文本文档 |
 
@@ -123,7 +123,7 @@ type: concepts
 from: phases/12-multimodal-ai/23-colpali-vision-native-rag/docs/zh.md, phases/19-capstone-projects/04-multimodal-document-qa/docs/zh.md
 
 - **MaxSim**：对查询 token 和页面图块计算 $\sum_i \max_j \cos(q_i, p_j)$。
-- **ColPali 存储**：50 * 729 * 128 * 4 字节，原始约 18 MB，PQ 后约 4 MB。
+- **ColPali 存储**：50 * 729 * 128 * 4 字节，原始约 18 MB，8 倍 PQ 压缩后约 2.3 MB。
 - **Text-RAG 存储**：50 个分块 * 768 维 * 4 字节，约 150 kB。
 - **PQ**：存储缩小约 8 倍，并保留向量相似性。
 - **ViDoRe**：ColPali-v1 的 nDCG@5 约为 80%，Text-RAG 约为 50-60%。
