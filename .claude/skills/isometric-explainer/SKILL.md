@@ -43,7 +43,7 @@ tags: [isometric, svg, interactive, explainer, simulation]
 7. 静态几何只构建一次，每部件一个有深度键的 SVG 组，运动部件加 data-live，见 references/geometry.md。
 8. 通过 transform 平移部件。只有形状改变（例如伸长杆）才重建路径。
 9. 按深度键加当前偏移深度，从后往前绘制。顺序变化时才重排 DOM。
-10. 只用一个强调色标出活动部件与铭牌，其他部分用四级灰度和四种线调。
+10. 按 [色彩与墨线](references/colour-and-ink.md) 绘制：每种材质用三种平涂色，主要实体加墨线外轮廓和硬边投影，玻璃罩用浅色高光，状态灯反映模型结果。活动部件只用一种强调色。
 11. 控件改变真实 simulate 运行，运行、单步、禁用、修复、重置与开关都生效，配置写入 URL。见 references/live.md。
 12. 在真实浏览器验证桌面和手机、明暗主题，补 4 倍近景、线端检查、零控制台错误的场景遍历与接触表。见 references/verify.md。
 
@@ -61,7 +61,7 @@ tags: [isometric, svg, interactive, explainer, simulation]
 
 - 坐标使用世界单位，只有投影出现像素。
 - 仰角 30 度，全页一个固定方位角，参考页为 60 度。
-- 实体用四级阴影和轮廓，线使用 hi、mid、lo、faint。
+- 使用 `kit/ink.mjs` 的材质色、实体轮廓和投影；线使用 hi、mid、lo、faint。细则见 [色彩与墨线](references/colour-and-ink.md)。
 - 线端接到实体或另一条线。有意悬空时标 data-free=start、end 或空值。
 - 每工位有概念铭牌，例如 CACHE、VERIFIER，中文页面对应翻译。
 - 放在其他部件上的部件加深度偏置，绘制在支撑物之后。
@@ -103,10 +103,11 @@ tags: [isometric, svg, interactive, explainer, simulation]
 
 - references/concept.md：构思、一句话检查、概念映射、规模。
 - references/state-model.md：模型契约、事件、测试、URL 状态。
-- references/geometry.md：单位、相机、部件、工具函数、阴影、深度、铭牌。
+- references/geometry.md：单位、相机、部件、几何工具、深度和铭牌。
+- references/colour-and-ink.md：材质配色、墨线轮廓、投影、玻璃、状态灯和颜色控件。
 - references/live.md：节拍、绘制循环、排序、强调色、控件、无障碍、布局。
 - references/verify.md：浏览器验证循环与脚本。
 - templates/model.mjs、templates/model.test.mjs、templates/build.mjs、templates/live.js：可运行的缓存机器。node templates/build.mjs 生成 templates/out.html，node --test templates/model.test.mjs 运行测试。
-- kit/iso-kit.mjs、kit/lathe.mjs、kit/tube.mjs：投影、实体、旋转体、管道、基础 CSS，保留 kit/LICENSE。
+- kit/iso-kit.mjs、kit/ink.mjs、kit/lathe.mjs、kit/tube.mjs：投影、材质与墨线、旋转体、管道、基础 CSS，保留 kit/LICENSE。
 
 仓库内 scripts/agent-machine/ 与 site/test_agent_machine.js 提供完整主图，包含 57 个按深度排序的绘制项。

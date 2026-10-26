@@ -51,6 +51,8 @@ kit/iso-kit.mjs：
 | translateAlong(P,[dx,dy,dz]) | 世界偏移对应的 SVG translate |
 | figureSvg、plateHtml、ISO_CSS | SVG 根、角标框、基础样式 |
 
+`kit/ink.mjs` 提供 `inkSolid`、`silhouetteSvg`、`castShadowSvg`、`glassSvg` 和 `wobbleFilter`，用于增加材质色、轮廓、投影、玻璃高光与手绘抖动。完整用法见[色彩与墨线](colour-and-ink.md)。
+
 kit/lathe.mjs 的 frameAlong、disc、ribsOf、dotsOf、circleOf、spokesOf、viewOf 构建任意轴向的滚筒、滚轮、杆与端口。kit/tube.mjs 的 tubePieces、tubeSvg 构建按深度拆段的弯管。
 
 ## 阴影与色调
@@ -61,6 +63,7 @@ kit/lathe.mjs 的 frameAlong、disc、ribsOf、dotsOf、circleOf、spokesOf、vi
 - 轮廓调为 hi、mid、lo、faint。运动或重要部件用 hi，工位主体用 mid，底座和凹槽用 lo，接缝用 faint。
 - 灰阶来自 CSS 变量。浅色 anatomy-shade-0 至 3 为 #dcdace 至 #f5f3ea，深色为 #0b0e1b 至 #14192e。
 - 强调色 anatomy-lit 浅色 #3553ff、深色 #6b8eff。舞台其他部分不用彩色。
+- 新页面的三色材料、轮廓和硬边投影见[色彩与墨线](colour-and-ink.md)；不要把阴影做成蓝紫色渐变或模糊光晕。
 
 ## 绘制项与深度键
 
