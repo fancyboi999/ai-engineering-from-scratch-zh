@@ -74,7 +74,7 @@ LayoutLMv3 是基于 OCR 的文档理解的巅峰。在表单和发票上强。�
 
 ### DocLLM（2023）
 
-DocLLM（Wang 等人，arXiv:2401.00908）是 LayoutLM 的生成式兄弟。以版面 token 为条件生成自由形式答案。在文档 QA 上更好；仍依赖 OCR 输入。
+DocLLM（Wang 等人，arXiv:2401.00908，提交于 2023 年 12 月 31 日，因此编号带有 2024 年 1 月前缀）是 LayoutLM 的生成式兄弟。以版面 token 为条件生成自由形式答案。在文档 QA 上更好；仍依赖 OCR 输入。
 
 ### 时代 3 —— VLM 原生（2024+）
 

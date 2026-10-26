@@ -124,7 +124,7 @@ agent 循环本身是一个 worker，它消费事件（用户消息、工具结�
 
 这部分你不用客气。
 
-- LangChain 的《Anatomy of an Agent Harness》列举了十一个组件 —— prompt、工具、hook、sandbox、编排、记忆、skill、子 agent，和一个运行时「笨循环」。它没点名队列、把 worker 当部署单元、触发器语义、把会话持久化当独立关切、或授权策略。它把 harness 当成一个你去配置的对象，而不是一个你去部署的系统。
+- LangChain 的《Anatomy of an Agent Harness》介绍了几类核心 harness 组件：prompt、工具、hook、sandbox、编排、记忆、skill、子 agent 和运行时「笨循环」。它没点名队列、把 worker 当部署单元、触发器语义、把会话持久化当独立关切、或授权策略。它把 harness 当成一个你去配置的对象，而不是一个你去部署的系统。
 - Addy Osmani 的《Agent Harness Engineering》落地了 `Agent = Model + Harness` 的框定和棘轮模式，但没说 harness 是用什么造出来的。读起来像个立场，不是一份规格。
 - Anthropic 和 OpenAI 在接触面上挖得最深，但都待在自己的运行时里。2026 年 4 月 Agents SDK 里的「harness-compute separation」公告是第一篇明确支持控制平面 / 数据平面拆分的厂商文章。那是个原语想法，不是个新想法。
 - agentic_harness 一书把 harness 当成一个配置对象（Jaymin West 的《Agentic Engineering》第 6 章），里头最强的一句是「harness 是 agent 系统里的主要安全边界」。那只是授权策略，换了个说法。
@@ -193,7 +193,7 @@ python3 code/main.py
 厂商框定：
 
 - [Addy Osmani, Agent Harness Engineering](https://addyosmani.com/blog/agent-harness-engineering/) —— `Agent = Model + Harness` 和棘轮模式；基础设施层面单薄
-- [LangChain, The Anatomy of an Agent Harness](https://blog.langchain.com/the-anatomy-of-an-agent-harness/) —— 十一个组件：prompt、工具、hook、编排、sandbox、记忆、skill、子 agent、运行时；遗漏了队列、部署、授权
+- [LangChain, The Anatomy of an Agent Harness](https://blog.langchain.com/the-anatomy-of-an-agent-harness/) —— 核心组件包括 prompt、工具、hook、编排、sandbox、记忆、skill、子 agent、运行时；没有谈队列、部署、授权
 - [OpenAI, Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering/) —— Codex 团队对其运行时周围接触面的看法
 - [OpenAI, Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/) —— agent 循环归约成对函数调用的一个 `while`
 - [Anthropic, Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) —— 一个特定运行时内的长跨度接触面

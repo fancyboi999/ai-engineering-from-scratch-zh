@@ -20,7 +20,7 @@ BLIP-2 把 32 个视觉 token 喂进冻结 LLM 的输入层。每个 prompt 一�
 
 Flamingo 的答案：根本不改 LLM 的输入流。在已有的 LLM 块之间插入额外的交叉注意力层。文本 token 照旧流过 LLM 的因果自注意力。每隔几个 LLM 块，文本 token 还会通过一个新的门控层交叉关注图像特征。这个门（初始化为零）意味着第 0 步时新层是 no-op——模型的行为与预训练 LLM 一模一样。随着训练推进，门打开，视觉信息开始流入。
 
-Flamingo 回答的第二个问题：每个 prompt 里图像数量可变（0 张、1 张或很多张）时怎么处理？用一个 Perceiver resampler——一个小型交叉注意力模块，无论你有多少个 patch，都产出固定数量的视觉 latent token。无论 prompt 里有几张图，LLM 的交叉注意力层看到的形状都一样。
+Flamingo 回答的第二个问题：每个 prompt 里图像数量可变（0 张、1 张或很多张）时怎么处理？用一个 Perceiver resampler——一个小型交叉注意力模块，把每张图的任意数量 patch 转成固定数量的视觉 latent token。图像越多，latent 总数越多；但每个文本 token 只读取一张图的 latent，因此单个文本 token 在交叉注意力里看到的形状不变。
 
 ## 核心概念
 
@@ -59,7 +59,7 @@ x_before_next_block = gated
 
 ### 用于交错输入的掩码交叉注意力
 
-在像"<image A> caption A <image B> caption B <image C> ?"这样的 prompt 里，每个文本 token 应该只看到序列中排在它前面的图像。交叉注意力掩码强制：位置 `t` 处的文本 token 只关注图像索引 `i < i_t` 的那些图像 resampler token，其中 `i_t` 是位置 `t` 之前最近的那张图。"只看最近的前一张图"和"看前面所有图"都是合法选择；Flamingo 选了前者。
+在像"<image A> caption A <image B> caption B <image C> ?"这样的 prompt 里，每个文本 token 应该只看到序列中排在它前面的图像。交叉注意力掩码强制：位置 `t` 处的文本 token 只关注最近一张先前图像 `i_t` 的 resampler token；其他图像的 token 都会被 mask，其中 `i_t` 是位置 `t` 之前最近的那张图。"只看最近的前一张图"和"看前面所有图"都是合法选择；Flamingo 选了前者。
 
 ### in-context 少样本学习
 
@@ -76,7 +76,7 @@ x_before_next_block = gated
 Flamingo 在三个数据集上训练：
 
 1. MultiModal MassiveWeb（M3W）：4300 万个图文交错的网页，重建了阅读顺序。
-2. 图文对（ALIGN + LTIP）：44 亿对。
+2. 图文对：ALIGN（18 亿对）加 LTIP（3.12 亿对），合计约 21 亿对。
 3. 视频文本对（VTP）：2700 万段短视频。
 
 OBELICS（2023）是交错网页语料的开放复现，Idefics、Idefics2 和大多数开放的"类 Flamingo"模型都在它上面训练。
@@ -102,7 +102,7 @@ Otter（2023）在 OpenFlamingo 基础上用 MIMIC-IT（一个多模态指令数
 | 冻结 LLM | 是 | 是 |
 | 少样本 in-context | 弱 | 强——论文的核心卖点 |
 | 交错输入 | 无原生支持 | 有，正是设计目标 |
-| 训练数据 | 1.3 亿对 | 13 亿对 + 4300 万交错页 |
+| 训练数据 | 1.3 亿对 | 约 21 亿对 + 2700 万视频片段 + 4300 万交错页 |
 | 参数量 | 训 188M | 训约 10B（交叉注意力层） |
 | 算力 | 8 张 A100 跑几天 | 上千张 TPUv4 跑几周 |
 

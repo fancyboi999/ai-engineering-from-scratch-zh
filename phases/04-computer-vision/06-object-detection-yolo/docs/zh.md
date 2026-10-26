@@ -83,7 +83,7 @@ anchor 框先验（416x416 输入的例子）：
 \end{aligned}
 ```
 
-`sigmoid` 把中心偏移量限制在单元内。`exp` 让宽度从 anchor 自由缩放而不会变号。`stride` 把网格坐标缩放回像素。这个解码步骤从 v2 起在每个 YOLO 版本里都一样。
+`encode` 把中心偏移存成 logit，也就是 `decode` 中 `sigmoid` 的反函数。裁剪让 logit 保持有限；如果中心恰好落在单元边缘，它最多移动 `1e-6` 个单元。`assign_targets` 也存相同的 logits，因此预测头和 `decode` 使用同一空间。`exp` 让宽度从 anchor 自由缩放而不会变号。`stride` 把网格坐标缩放回像素。
 
 ### IoU
 
@@ -203,8 +203,10 @@ def encode(box_xyxy, cell_x, cell_y, stride, anchor_wh):
     cy = 0.5 * (y1 + y2)
     w = x2 - x1
     h = y2 - y1
-    tx = cx / stride - cell_x
-    ty = cy / stride - cell_y
+    off_x = np.clip(cx / stride - cell_x, 1e-6, 1 - 1e-6)
+    off_y = np.clip(cy / stride - cell_y, 1e-6, 1 - 1e-6)
+    tx = np.log(off_x / (1 - off_x))
+    ty = np.log(off_y / (1 - off_y))
     tw = np.log(w / anchor_wh[0] + 1e-8)
     th = np.log(h / anchor_wh[1] + 1e-8)
     return np.array([tx, ty, tw, th])
@@ -273,8 +275,10 @@ def assign_targets(boxes_xyxy, classes, anchors, stride, grid_size, num_classes)
         best = int(np.argmax(ious))
         aw, ah = anchors[best]
 
-        target[gy, gx, best, 0] = cx / stride - gx
-        target[gy, gx, best, 1] = cy / stride - gy
+        off_x = np.clip(cx / stride - gx, 1e-6, 1 - 1e-6)
+        off_y = np.clip(cy / stride - gy, 1e-6, 1 - 1e-6)
+        target[gy, gx, best, 0] = np.log(off_x / (1 - off_x))
+        target[gy, gx, best, 1] = np.log(off_y / (1 - off_y))
         target[gy, gx, best, 2] = np.log(bw / aw + 1e-8)
         target[gy, gx, best, 3] = np.log(bh / ah + 1e-8)
         target[gy, gx, best, 4] = 1.0
@@ -319,7 +323,7 @@ def yolo_loss(pred, target, has_obj, lambda_coord=5.0, lambda_obj=1.0, lambda_no
                    "obj_neg": loss_obj_neg.item(), "cls": loss_cls.item()}
 ```
 
-每个 YOLO 教程要么写死、要么扫一遍的五个超参数。比例很要紧：`lambda_coord=5, lambda_noobj=0.5` 沿用了原始 YOLOv1 论文，至今仍是个合理的默认值。
+每个 YOLO 教程要么写死、要么扫一遍的四个损失权重。比例很要紧：`lambda_coord=5, lambda_noobj=0.5` 符合原始 YOLOv1 论文，至今仍是个合理的默认值。
 
 ### 第 7 步：推理流水线
 

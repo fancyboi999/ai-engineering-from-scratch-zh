@@ -61,14 +61,14 @@ coref-links
 ```python
 import spacy
 nlp = spacy.load("en_coreference_web_trf")   # 实验性模型
-doc = nlp("Apple announced new products. The company said they would ship soon.")
+doc = nlp("Apple announced new products. The company said it would ship them soon.")
 for cluster in doc._.coref_clusters:
     print(cluster, "->", [m.text for m in cluster])
 ```
 
 在一篇更长的文档上，你会得到类似这样的东西：
-- 簇 1：[Apple, The company, they]
-- 簇 2：[new products]
+- 簇 1：[Apple, The company, it]
+- 簇 2：[new products, them]
 
 ### 第 2 步：基于规则的代词消解器（教学）
 

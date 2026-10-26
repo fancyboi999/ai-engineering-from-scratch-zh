@@ -108,7 +108,7 @@ python3 code/main.py
 
 1. 加一个 inverse-square-root 变体 schedule，在 200 步 toy 训练运行上对比。哪条曲线的最终 loss 更低？
 2. 加一个 `--restart` flag，在 `total_steps / 2` 处做第二次 warmup。论证 warm restart 在 toy 运行上是改善还是损害。
-3. 加一个单元测试检查 schedule 连续性：对 `[0, total_steps]` 中的每个 step，差值 `|lr(step+1) - lr(step)|` 必须被 `lr_max / warmup_steps` 上界。
+3. 加一个单元测试检查 schedule 连续性：对 `[0, total_steps]` 中的每个 step，在 `warmup_steps > 0` 时，差值 `|lr(step+1) - lr(step)|` 必须小于预热斜率 `lr_max / warmup_steps` 与最大 cosine 斜率 `pi * (lr_max - lr_min) / (2 * (total_steps - warmup_steps))` 中的较大值。cosine 区间较短时，斜率可能大于预热斜率，所以后者单独不是安全上界。
 4. 把 schedule 接入 `torch.optim.lr_scheduler.LambdaLR`，让它能和框架代码组合。本课用的是纯 step 函数；wrapper 改变了什么？
 5. 加一个 `--plot-png` flag 用 `matplotlib` 画真图。论证本课的文本图和 PNG 哪个更适合作为 CI 运行的默认值。
 

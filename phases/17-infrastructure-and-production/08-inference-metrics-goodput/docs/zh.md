@@ -1,6 +1,6 @@
 # 推理指标 —— TTFT、TPOT、ITL、Goodput、P99
 
-> 四个指标决定一个推理部署能不能用。TTFT 是 prefill 加队列加网络。TPOT（等价于 ITL）是受内存限制的每 token decode 成本。端到端延迟是 TTFT 加上 TPOT 乘以输出长度。吞吐是跨整个集群聚合的每秒 token 数。但对产品真正重要的是 goodput —— 同时满足每一条 SLO 的请求比例。高吞吐低 goodput 意味着你在处理那些永远没法及时送到用户手里的 token。2026 年 Llama-3.1-8B-Instruct 在 TRT-LLM 上的参考数字：平均 TTFT 162 ms，平均 TPOT 7.33 ms，平均 E2E 1,093 ms。永远报 P50、P90、P99 —— 绝不只报均值。还要当心测量陷阱：GenAI-Perf 把 TTFT 排除在 ITL 计算之外，LLMPerf 把它算进去；两个工具对同一次跑的 TPOT 说法不一致。
+> 五个指标决定一个推理部署能不能用。TTFT 是 prefill 加队列加网络。TPOT（常以 ITL 报告，但不同工具对 ITL 是否包含首 token 的定义不一）是受内存限制的每 token decode 成本。端到端延迟是 TTFT 加上 TPOT 乘以输出长度。吞吐是跨整个集群聚合的每秒 token 数。但对产品真正重要的是 goodput —— 同时满足每一条 SLO 的请求比例。高吞吐低 goodput 意味着你在处理那些永远没法及时送到用户手里的 token。2026 年 Llama-3.1-8B-Instruct 在 TRT-LLM 上的参考数字：平均 TTFT 162 ms，平均 TPOT 7.33 ms，平均 E2E 1,093 ms。永远报 P50、P90、P99 —— 绝不只报均值。还要当心测量陷阱：GenAI-Perf 把 TTFT 排除在 ITL 计算之外，LLMPerf 把它算进去；两个工具对同一次跑的 TPOT 说法不一致。
 
 **类型：** Learn
 **语言：** Python（标准库，一个玩具级分位数计算器与 goodput 报告器）
@@ -104,11 +104,16 @@ LLM 延迟分布是右偏的。一个带一个长 prefill 邻居的 decode 批�
 throughput-latency
 ```
 
+
+[Inside an LLM Serving GPU](https://aieng-zh.cn/inside-an-llm-serving-gpu.html?users=1) 展示了 NVIDIA L4 上每个输出 token 的时间来源。一次 decode 要读取 16.41 GB 权重；按 300 GB/s 带宽计算，下限为 54.7 ms，实测为 60.16 ms。
+
 ## 实际使用
 
 `code/main.py` 是个玩具级 goodput 计算器。生成一个合成延迟分布，套一个 SLO，算出 goodput。也展示同一条 trace 上 GenAI-Perf vs LLMPerf 的 TPOT 差异。
 
 ## 拿去用
+
+[Inside an LLM Serving GPU](https://aieng-zh.cn/inside-an-llm-serving-gpu.html?users=1) 展示了 NVIDIA L4 上每个输出 token 的时间来源：一次 decode 要读取 16.41 GB 权重，按 300 GB/s 带宽计算的下限为 54.7 ms，实测为 60.16 ms。
 
 这一课产出 `outputs/skill-slo-goodput-gate.md`。给定一个工作负载和 SLO，它产出一份 CI/CD 就绪的基准配方，用 goodput 而不是吞吐来给部署做闸门。
 

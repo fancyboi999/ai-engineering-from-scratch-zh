@@ -53,7 +53,7 @@ L_{\text{DPO}} = -\log \sigma\!\left(
 
 - 隐式奖励缝隙 `beta * (log(pi/pi_ref)_w - log(pi/pi_ref)_l)` 无界。一点点偏好就能造出任意大的缝隙。
 - 损失把选中和拒绝的对数概率往相反方向推。只要拒绝的掉得更快，它能把选中的绝对对数概率也往下压。这就是「选中回复退化」（Degraded Chosen Response）现象。
-- 分布外的偏好（罕见罕见对 vs 罕见罕见对）会产生任意的隐式奖励。
+- 分布外的偏好（偏好两端的回复在 reference policy 下都很罕见）会产生任意的隐式奖励。
 
 ### IPO（Azar et al., 2024）
 

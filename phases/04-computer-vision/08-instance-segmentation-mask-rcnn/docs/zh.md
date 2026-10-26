@@ -84,7 +84,7 @@ RoIAlign 在 COCO 上白送 3-4 个点的掩码 AP。如今每个在乎定位的
 
 ### 损失
 
-Mask R-CNN 有四个损失加在一起：
+Mask R-CNN 有五个损失加在一起：
 
 ```math
 L = L_{\text{rpn\_cls}} + L_{\text{rpn\_box}} + L_{\text{box\_cls}} + L_{\text{box\_reg}} + L_{\text{mask}}
@@ -261,7 +261,7 @@ def train_step(model, images, targets, optimizer):
     return {k: v.item() for k, v in loss_dict.items()}
 ```
 
-`targets` 列表里每张图必须有一个 dict，含 `boxes`、`labels` 和 `masks`（作为 `(num_instances, H, W)` 二值张量）。模型在训练时返回一个四损失的 dict，在评估时返回一个预测列表，由 `model.training` 决定。
+`targets` 列表里每张图必须有一个 dict，含 `boxes`、`labels` 和 `masks`（作为 `(num_instances, H, W)` 二值张量）。模型在训练时返回一个五损失的 dict，在评估时返回一个预测列表，由 `model.training` 决定。
 
 `pycocotools` 评估器同时为框和掩码产出 mAP@IoU=0.5:0.95；你需要这两个数才能知道瓶颈是框头还是掩码头。
 

@@ -44,7 +44,7 @@ Continuous batching 在每个 decode 步之间运作。把正在跑的序列集�
 
 批大小从不被填充到一个固定数字。处在各自输出不同位置的序列共享一次融合的 forward。在 2026 年的 vLLM 里这叫 `V1 scheduler`。关键不变量：调度器每次 decode 迭代跑一次，不是每个请求跑一次。
 
-### Chunked prefill 保护 TTFT 尾部
+### Chunked prefill 保护 ITL 尾部
 
 Prefill 是计算受限的。Llama 3.3 70B 上一个 32k token 的 prompt，在一块 H100 上纯 prefill 要约 800 ms。prefill 在跑的时候，批次里其他每个序列的 decode token 都在等。在一个服务循环里，一个长 prompt 的首 token 延迟（TTFT）变成了几十个其他用户的 token 间延迟（ITL）抖动。
 
@@ -130,7 +130,7 @@ tensor-parallel
 | Chunked prefill | "prefill 切分" | 把长 prefill 拆成 512 token 切片，与 decode 交错 |
 | TTFT | "首 token 时间" | prefill + 队列 + 网络；长 prompt 下由 prefill 主导 |
 | ITL | "token 间延迟" | 相邻 decode token 之间的时间；由批大小主导 |
-| Goodput | "满足 SLO 的吞吐" | 每秒 token 数，且每个请求仍命中 TTFT 和 ITL 目标 |
+| Goodput | "满足 SLO 的吞吐" | 满足 TTFT 和 ITL 目标的请求数/秒（第 17·08 课报告为请求占比） |
 | V1 scheduler | "新调度器" | vLLM 的 2026 调度器；以 chunked prefill 运行 continuous batching |
 | `--gpu-memory-utilization` | "内存旋钮" | 加载权重和激活后留给 KV block 的 HBM 比例 |
 

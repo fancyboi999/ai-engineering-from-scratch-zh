@@ -16,7 +16,7 @@
 
 ## 问题背景
 
-标准 softmax 注意力有一个数学性质，到了规模上变成一个运营头疼事。对一个 query `q`，注意力权重是 `softmax(qK^T / sqrt(d))`。Softmax 永远产不出精确的零——每个不匹配的 token 都得到一些正的质量。那点残余质量是噪声，且随 context 长度放大。在 128k token 下，即使每个不匹配 token 只得到 0.001% 的概率，它们 127,999 个加起来贡献约 12% 的总量。模型不得不学会绕过一个随 context 增长的噪声底。
+标准 softmax 注意力有一个数学性质，到了规模上变成一个运营头疼事。对一个 query `q`，注意力权重是 `softmax(qK^T / sqrt(d))`。Softmax 永远产不出精确的零：每个不匹配的 token 都得到一些正的质量。那点残余质量是噪声，且随 context 长度放大。在 128k token 下，即使每个不匹配 token 只得到 0.0001% 的概率，它们 127,999 个加起来贡献约 13% 的总量。模型不得不学会绕过一个随 context 增长的噪声底。
 
 经验上这表现为注意力头干扰：长 context RAG 里幻觉出来的引用、10 万 token 检索任务上的 lost-in-the-middle 失败，以及超过 32k 的大海捞针基准上微妙的精度退化。Differential Transformer 论文（arXiv:2410.05258，ICLR 2025）测量了这个差距：DIFF Transformer 比同规模基线达到更低困惑度、更高长 context 准确率、更少幻觉。
 

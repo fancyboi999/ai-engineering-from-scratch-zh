@@ -141,7 +141,7 @@ python3 -m unittest code/test_main.py
 
 4. 在 R@K 之外计算 mean reciprocal rank（MRR）。MRR 对正确项落在 top K 之外的位置敏感；R@K 只对它是否落进 top K 敏感。
 
-5. 在训练期间的五个 checkpoint（step 0、10、20、30、40、50）上跑评测，画出学习曲线。确认指标轨迹和 loss 轨迹一致。
+5. 在训练期间的六个 checkpoint（step 0、10、20、30、40、50）上跑评测，画出学习曲线。确认指标轨迹和 loss 轨迹一致。
 
 ## 关键术语
 

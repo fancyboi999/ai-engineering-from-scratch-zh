@@ -1,6 +1,6 @@
 # 从 CLIP 到 BLIP-2 —— Q-Former 作为模态桥
 
-> CLIP 对齐了图像和文本，但它生不出 caption、答不了问题、也没法对话。BLIP-2（Salesforce，2023）用一座小巧的可训练桥解决了这件事：32 个可学习的 query 向量通过交叉注意力去关注一个冻结 ViT 的特征，然后直接插进一个冻结 LLM 的输入流。1.88 亿参数的桥，把一个 11B 的 LLM 连到了一个 ViT-g/14 上。一直到 2026 年，每一个基于适配器的 VLM——MiniGPT-4、InstructBLIP、LLaVA 的那些表亲——都是它的后代。本节课通读 Q-Former 的架构，讲清它的两阶段训练，并搭一个玩具版，把视觉 token 喂进一个冻结的文本解码器。
+> CLIP 对齐了图像和文本，但它生不出 caption、答不了问题、也没法对话。BLIP-2（Salesforce，2023）用一座小巧的可训练桥解决了这件事：32 个可学习的 query 向量通过交叉注意力去关注一个冻结 ViT 的特征，然后直接插进一个冻结 LLM 的输入流。1.88 亿参数的桥，把一个 ViT-g/14 连到了冻结的 LLM，最大可到 11B 的 Flan-T5-XXL。一直到 2026 年，每一个基于适配器的 VLM——MiniGPT-4、InstructBLIP、LLaVA 的那些表亲——都是它的后代。本节课通读 Q-Former 的架构，讲清它的两阶段训练，并搭一个玩具版，把视觉 token 喂进一个冻结的文本解码器。
 
 **类型：** Build
 **语言：** Python（标准库，交叉注意力 + 可学习 query 演示）
@@ -117,7 +117,7 @@ modality-projection
 
 4. 读 BLIP-2 论文（arXiv:2301.12597）第 3.2 节关于 Q-Former 如何初始化的内容。解释为什么从 BERT-base 初始化（而非随机）能加速收敛。
 
-5. 对一段 10 分钟、按 1 FPS 采到 60 帧的视频，分别算 (Q-Former → 32 token/帧) 与 (MLP 投影器 → 576 token/帧) 下每帧的 token 成本。哪个塞得进一个 128k-token 的 LLM 上下文窗口？
+5. 对一段 10 分钟、按 1 FPS 采到 60 帧的视频，分别计算 Q-Former（每帧 32 个 token）与 MLP 投影器（每帧 576 个 token）的总 token 数。上下文中还没有给 prompt 文本留位置时，两种桥各能容纳多少帧？
 
 ## 关键术语
 
@@ -132,7 +132,7 @@ modality-projection
 | 两阶段预训练 | "先表示后生成" | 阶段 1 单独训 Q-Former（ITC/ITM/ITG）；阶段 2 接上冻结 LLM，只训投影 + Q-Former |
 | 冻结骨干 | "不微调" | 视觉编码器和 LLM 权重固定；只训那座桥 |
 | 投影头 | "线性到 LLM 维度" | 把 Q-Former 输出映射到 LLM 嵌入维度的最后那个线性层 |
-| Perceiver resampler | "Flamingo 的版本" | 类似的可学习 query 交叉注意力，Flamingo 在每一层用它，而非作为单座桥 |
+| Perceiver resampler | "Flamingo 的版本" | 类似的可学习 query 交叉注意力。Flamingo 为每张图运行一次它，生成固定数量的 latent，再通过 LLM 每层的门控交叉注意力读取这些 latent |
 
 ## 延伸阅读
 

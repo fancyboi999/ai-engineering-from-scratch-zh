@@ -106,7 +106,7 @@ python3 code/main.py
 2. 加一个 `redaction` 步骤，剥掉匹配 `^Bearer ` 或 `password=` 的行。在一个固定记录上测试。
 3. 通过轮转到 `.1`、`.2` 文件把 `feedback_record.jsonl` 总大小封顶 1 MB。为轮转策略辩护。
 4. 加一个 `parent_command_id`，让重试链可见：哪个命令产出了下一个命令消费的输入。
-5. 把 JSONL 灌进一个小 TUI，高亮最新的非零退出。这个 TUI 必须展示哪八个关键特性才能在审查里有用。
+5. 把 JSONL 灌进一个小 TUI，高亮最新的非零退出。列出这个 TUI 在审查时必须展示的八个关键特性。
 
 ## 关键术语
 

@@ -93,7 +93,7 @@ UI 或 tracer 就能把被删掉的 step 画删除线，把新增的高亮出来
 
 ## 两种预算，都是硬上限
 
-`max_steps` 限制整个 session 的 step 总执行数，包含 replan 后新增的 step，默认 12。一个线性的 5 步 plan，如果中途 replan 两次、每次又多出 3 步，总执行数就是 16，直接超限。此时 executor 应拒绝继续 replan，并返回 FAILED。
+`max_steps` 限制整个 session 的 step 总执行数，包含 replan 后新增的 step，默认 12。失败尝试也计入。一个 5 步 plan 在最后一步失败后已消耗 5 次执行；每次 replan 重试该步并加 3 个新步骤，第一次修订的最后一步又失败后计数为 9，第二次修订还需要 4 次，共 13 次。executor 会执行第 12 次，拒绝第 13 次，并以 `step_budget` 为原因返回 FAILED。
 
 `max_replans` 限制第一次 plan 之后还能重规划多少次，默认 5。它甚至比 step 预算更关键。一个 planner 如果坏到连续 5 次都吐同一份坏 plan，你不该等 step 预算慢慢把它拖死，而该尽快、明确地告诉上层：replan 用完了。
 

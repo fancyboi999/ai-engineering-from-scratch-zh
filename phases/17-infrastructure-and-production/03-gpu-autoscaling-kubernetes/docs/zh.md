@@ -20,7 +20,7 @@
 
 另一边，你的节点用的是 Cluster Autoscaler。凌晨 2 点来了一个 1M token 的 prompt；集群花 3 分钟供给一个节点，请求超时了。
 
-再另一边，你部署一个 70B 模型，要跨 2 个节点用 8 块 GPU。集群空着 7 块 GPU，第 8 块散在 3 个节点上。Cluster Autoscaler 为那缺的 1 块 GPU 供给一个节点。七个节点干等 4 分钟、烧着钱，等 Kubernetes 把最后一块 GPU 拉起来。
+再另一边，你部署一个 70B 模型，要跨 2 个节点用 8 块 GPU。集群有 7 块空闲 GPU，它们分散在 3 个节点上，还缺 1 块。Cluster Autoscaler 为缺的 GPU 供给一个节点。已预留的 7 块 GPU 空等 4 分钟、白白烧钱，只为等 Kubernetes 把最后一块 GPU 拉起来。
 
 三层，三种不同的故障模式。2026 年的 GPU 感知自动扩缩不是"打开 HPA"。它是把节点供给、gang scheduling 和应用信号扩缩组合起来。
 

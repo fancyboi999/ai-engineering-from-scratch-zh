@@ -57,7 +57,7 @@ Allreduce-SUM 再除以 world_size 得到平均梯度。平均对 world_size 不
 
 ### 为什么要固定 seed
 
-每个 rank 必须用 `torch.manual_seed(seed + rank)` 来做 shuffle，但用 `torch.manual_seed(seed)` 来做参数初始化。共用一个 seed 意味着每个 rank 看到的 batch 顺序相同（数据并行就白搞了）；给参数用 rank 相关的 seed，则会让初始参数差一个 float epsilon，gradient sync 也就再也无法让副本完全一致。Seed 的套路弄对，否则参数等价的测试在第 1 步就挂。
+每个 rank 必须用 `torch.manual_seed(seed + rank)` 来做 shuffle，但用 `torch.manual_seed(seed)` 来做参数初始化。shuffle 共用一个 seed 会让每个 rank 看到相同 batch 顺序（数据并行就白搞了）。参数副本一致主要由构造时 rank 0 的 broadcast 保证，它会覆盖其他 rank 的初始化；共享 init seed 则是后备保障。如果 broadcast 被跳过或损坏，rank 相关初始化会产生不同权重，gradient sync 无法让它们重新一致。
 
 ```figure
 ci-ddp-grad-sync

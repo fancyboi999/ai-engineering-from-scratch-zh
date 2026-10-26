@@ -184,9 +184,8 @@ exp(101) = 7.31e43
 exp(102) = 1.99e44
 sum      = 2.99e44
 
-These overflow float32 (max ~3.4e38)? No, 2.69e43 < 3.4e38? Actually:
-exp(88.7) is already at the float32 limit.
-exp(100) = inf in float32.
+2.69e43 > 3.4e38, float32 最大值，因此这些指数项都会溢出。
+exp(88.7) 已接近 float32 的上限；float32 中 exp(100) = inf。
 ```
 
 用上技巧，减去 max(x) = 102：

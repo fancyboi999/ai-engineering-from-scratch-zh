@@ -533,6 +533,29 @@ for score in (-25, 0, 59, 60, 100, 115):
 
 验收标准：`-O0`、`-O1` 的 `grade` 在网格上输出相同，前者有一个 `switch` 且没有 `goto`。
 
+## 编程练习
+
+本课的夹具包含五个问题。用你构建的代码找出答案，并写入 `code/lab_answers.json`。数值可直接写数字，或写成 `"0x40"` 这样的十六进制字符串；列表使用 JSON 数组。
+
+1. `t1`：`-O1` 下调用约定判定 `percent_change` 接收的参数。
+2. `t2`：`-O1` 下 `total` 的 SSA 形式中 phi 函数的数量。
+3. `t3`：`magic_divisor` 为 `0x66666667`、移位量为 34 找到的除数。
+4. `t4`：`-O1` 下 `percent_change` 伪代码的最后一条语句，按单行文本填写。
+5. `t5`：`-O1` 下 `total` 的 `param_1` 恢复出的 C 类型。
+
+检查答案：
+
+```bash
+cd phases/13-tools-and-protocols/34-lifting-to-pseudocode
+python3 code/lab.py
+```
+
+检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
+
+### 交互图解
+
+[Inside a Decompiler](https://aieng-zh.cn/inside-a-decompiler?opt=O0) 展示本课的提升、类型标记、结构化和打印过程，以及 `code/main.py` 输出的 IR、SSA 和伪代码。链接以 `-O0` 目标文件打开：三个栈槽会变成局部变量，结构化夹具会收拢 if/else 的两条分支。
+
 ## 交付产物
 
 本课生成 `outputs/skill-lifting-to-pseudocode.md`，用于提升函数、为每行保留推导，并填写与反编译文本的差异表。产物要求参考反汇编、重定位、调用约定、编译检查、行为比较及每个差异行的判定。

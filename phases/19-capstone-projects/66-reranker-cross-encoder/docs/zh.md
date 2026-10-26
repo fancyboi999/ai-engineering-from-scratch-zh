@@ -91,7 +91,7 @@ python3 code/main.py
 
 **Cross-encoder 不对称。** `rerank(q, d)` 和 `rerank(d, q)` 是不同的分数。永远把 query 放前面。要是你不小心调换了，recall 会崩。
 
-**N 太低，暴露不出 bug。** 如果你设 N = K，cross-encoder 没法重排序，只能重新加权。提升看起来是零。把 N 设成至少 K 的三倍。
+**N 太低，暴露不出 bug。** 如果你设 N = K，cross-encoder 可以重排这 K 个候选，但不能把新候选带进 top K。Recall@K 不会变化，提升看起来是零。把 N 设成至少 K 的三倍。
 
 **训练数据漏进了评测。** 如果手工标注的训练对包含了评测 query，重排会显得像魔法一样。严格隔开 train 和 eval，哪怕是在 fixture 上。
 

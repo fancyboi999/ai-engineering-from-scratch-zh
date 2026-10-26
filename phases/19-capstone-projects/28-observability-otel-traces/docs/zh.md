@@ -77,15 +77,15 @@ metrics registry 本质上就是两个字典。counter 用 `{(name, frozen_label
 6. `wrap_tool_call(name)` decorator，负责自动发 span 并更新 metrics
 7. demo：合成一次完整 agent invocation（`gen_ai.chat` span 包住 tool span），写出 `traces.jsonl`，打印 Prometheus exposition，并以 0 退出
 
-span id 和 trace id 都是 16-byte 十六进制字符串，来自 `os.urandom`，与 OTel 的 W3C trace context 一致。exporter 自己不应该抛异常；即便 IO 报错，也应让 harness 继续跑。
+trace id 是 16-byte 值（32 个十六进制字符），span id 是 8-byte 值（16 个十六进制字符）；两者都从随机 `uuid4` 十六进制字符中截取。这符合 OTel 使用的 W3C Trace Context 长度。exporter 自己不应该抛异常；即便 IO 报错，也应让 harness 继续跑。
 
-histogram 使用固定 bucket 集（OTel 针对毫秒延迟的常用默认：5、10、25、50、100、250、500、1000、2500、5000、10000、+Inf）。样本先存列表，导出时再现算每个 bucket。
+histogram 使用固定 bucket 集，针对毫秒延迟：5、10、25、50、100、250、500、1000、2500、5000、10000、+Inf。这是精简版；OTel SDK 默认边界还包括 0、75、750 和 7500。样本先存列表，导出时再现算每个 bucket。
 
 ## 为什么手搓而不是直接上 opentelemetry-sdk
 
 OTel Python SDK 是真实依赖，但它也很重：几千行代码、真正的 exporter、额外 runtime 成本，全都超出一节课的预算。手搓版的价值在于让你看清 wire format。到生产里，你再把同一组 attribute 接回真实 SDK，批处理、OTLP exporter 和 resource detection 都会白送。
 
-conventions 本身很稳。只要 key 对得上，这节课导出的格式到 2030 年也照样能被解析，因为 OTel 对 GenAI attribute 名只会新增，不会反向破坏。
+GenAI conventions 在规范中仍标记为 Development，而且已经改过属性名：`gen_ai.usage.prompt_tokens` 改为 `gen_ai.usage.input_tokens`。发出数据时要锁定 semantic-conventions 版本，升级 SDK 时也要检查版本变化。
 
 ## 它如何接进 Track A
 

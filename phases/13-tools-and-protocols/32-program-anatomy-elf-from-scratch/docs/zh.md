@@ -380,6 +380,29 @@ macho.function_bytes("_percent_change")[:4].hex()
 
 导入列表、段映射及每个函数范围都应与捕获的工具输出一致，且测试期间不运行工具。
 
+## 编程练习
+
+本课的夹具包含五个问题。用你构建的代码找出答案，并写入 `code/lab_answers.json`。数值可直接写数字，或写成 `"0x40"` 这样的十六进制字符串；列表使用 JSON 数组。
+
+1. `t1`：`ledger-x86_64-O1.o` 的 `e_shoff`，填写数值。
+2. `t2`：该文件中 `percent_change` 的 `st_size`。
+3. `t3`：该文件中 `.text` 的文件偏移，填写十六进制。
+4. `t4`：`ledger-x86_64-O0.o` 中的重定位类型名，排序后以列表填写。
+5. `t5`：`ledger-x86_64-O1.o` 中 `.rodata+0x14` 的五个整数。
+
+检查答案：
+
+```bash
+cd phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch
+python3 code/lab.py
+```
+
+检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
+
+### 交互图解
+
+[Inside a Decompiler](https://aieng-zh.cn/inside-a-decompiler) 模拟了本课的前两个工位：卷轴读取保存 `percent_change` 的目标文件头，工作台打开 `.text` 并读取符号。关闭 Symbols 后，可以观察符号表提供了哪些事实。
+
 ## 交付产物
 
 本课生成 `outputs/skill-program-anatomy-elf-from-scratch.md`，可用于 Claude、Cursor、Codex、OpenClaw、Hermes 或任何读取 SKILL.md 的 agent。该技能将用户自己构建的目标文件或可执行文件转成布局报告，给出每个结构、符号和重定位的文件范围，并与捕获的工具输出核对。

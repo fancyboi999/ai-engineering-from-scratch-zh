@@ -36,8 +36,8 @@ Large-v3 有 15.5 亿参数。Turbo 用 4 层解码器（从 32 层砍下来）�
 <|startoftranscript|><|en|><|transcribe|><|notimestamps|> Hello world.<|endoftext|>
 ```
 
-- `<|en|>` —— 语言标签；决定走翻译还是转写的行为。
-- `<|transcribe|>` 或 `<|translate|>` —— 把任意语言输入翻成英语输出，或逐字转写。
+- `<|en|>` —— 语言标签，指出音频里说的语言。省略时，Whisper 会先检测语言。
+- `<|transcribe|>` 或 `<|translate|>` —— 任务标签：转写源语言语音，或把语音翻译成英文文本。
 - `<|notimestamps|>` —— 跳过词级时间戳（更快）。
 
 正是 prompt 让一个模型能干多种任务。把 `<|en|>` 换成 `<|fr|>`，它就转写法语。

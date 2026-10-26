@@ -222,7 +222,7 @@ $\epsilon$ 参数控制管子宽度。管子越宽 = 支持向量越少 = 拟合
 | 因素 | SVM | 深度学习 |
 |--------|------|---------------|
 | 特征工程 | 需要 | 自己学特征 |
-| 可扩展性 | 核方法是 $O(n^2)$ 到 $O(n^3)$ | 用 SGD 时每 epoch $O(n)$ |
+| 可扩展性 | 核方法是 $O(n^2)$ 到 $O(n^3)$ | 用 SGD 时每 epoch $O(n \cdot d)$，随样本数 $n$ 线性增长 |
 | 图像/文本/音频 | 需要手工特征 | 从原始数据学 |
 | 大数据集（>10 万） | 慢 | 扩展性好 |
 | GPU 加速 | 收益有限 | 大幅加速 |
@@ -340,7 +340,7 @@ print(f"Support vectors: {clf['svm'].n_support_}")
 
 重要：训练 SVM 之前一定要缩放特征。SVM 对特征量级敏感，因为间隔依赖 $\lVert w \rVert$，未缩放的特征会扭曲几何关系。
 
-对于大数据集，用 `LinearSVC`（原始形式，每 epoch $O(n)$）而不是 `SVC`（对偶形式，$O(n^2)$ 到 $O(n^3){}$）：
+对于大数据集，用 `LinearSVC`（原始形式，每 epoch $O(n \cdot d)$，随 $n$ 线性增长）而不是 `SVC`（对偶形式，$O(n^2)$ 到 $O(n^3){}$）：
 
 ```python
 from sklearn.svm import LinearSVC

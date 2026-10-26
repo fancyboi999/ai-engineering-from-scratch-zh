@@ -73,12 +73,13 @@ A = [[0, 1, 1],
 ### 度
 
 一个节点的度是连到它的边数。对有向图，你有入度（进来的边）和出度（出去的边）。
+对带权图，加权度等于与该节点相连的边权总和；带权拉普拉斯矩阵要用加权度构造度矩阵。
 
 度矩阵 $D$ 是对角的：
 
 ```math
 \begin{aligned}
-D[i][i] &= \text{节点的度：} i \\
+D[i][i] &= \text{节点 } i \text{ 的加权度} \\
 D[i][j] &= 0 \quad \text{对于 } i \ne j
 \end{aligned}
 ```
@@ -266,6 +267,9 @@ class Graph:
     def degree(self, node):
         return len(self.adj[node])
 
+    def weighted_degree(self, node):
+        return sum(self.adj[node].values())
+
     def adjacency_matrix(self):
         import numpy as np
         A = np.zeros((self.n, self.n))
@@ -278,7 +282,7 @@ class Graph:
         import numpy as np
         D = np.zeros((self.n, self.n))
         for i in range(self.n):
-            D[i][i] = self.degree(i)
+            D[i][i] = self.weighted_degree(i)
         return D
 
     def laplacian(self):

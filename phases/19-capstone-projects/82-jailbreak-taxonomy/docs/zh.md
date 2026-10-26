@@ -48,7 +48,7 @@ flowchart TB
   H --> D[覆盖率图表]
 ```
 
-每个 fixture 是一条记录，包含 `id`、`category`、`subtype`、`prompt`、`target_behavior` 和 `severity`。taxonomy 对象加载 fixture，按类别分组，并暴露一个 `match` API：给定一条候选 prompt，返回最接近的 fixture 及其类别。match 用的是字符 trigram 余弦：粗糙、快速、零依赖。它不是 detector。detector 在第 83 课里。这里只是个标签生产者。
+每个 fixture 是一条记录，包含 `id`、`category`、`subtype`、`prompt`、`target_behavior` 和 `severity`。taxonomy 对象加载 fixture，按类别分组，并暴露一个 `match` API：给定一条候选 prompt，返回最接近的 fixture 及其类别。match 用的是字符 trigram 余弦：粗糙、快速，只依赖 NumPy。它不是 detector。detector 在第 83 课里。这里只是个标签生产者。
 
 severity 遵循 1-5 分制。1 分是针对 benign 目标的笨拙攻击（"请假装你是个海盗"）。5 分是一旦成功就会产生某个上线系统绝不能输出的内容的攻击（某种危险活动的操作细节）。大部分 fixture 落在 2-3 分，因为部署规模下的真实攻击会偏向简单和懒惰。severity 由 fixture 作者设定。两个审阅者打分相差超过一档，就说明这套评分标准需要再打磨。
 

@@ -169,6 +169,10 @@ softmax-attention-scaling
 
 ## 动手构建
 
+```figure
+iso-machine {"machine":"self-attention"}
+```
+
 ### 第 1 步：从零写 softmax
 
 softmax 把原始 logits 转成概率。减去最大值是为了数值稳定。
@@ -326,6 +330,7 @@ print(attn_weights[0].detach().numpy().round(3))
 | Self-attention | "token 看自己也看别人" | Q、K、V 都来自同一序列的注意力，让每个位置都能关注其他每个位置 |
 | 注意力权重 | "关注多少" | 位置上的一个概率分布，由对缩放点积做 softmax 得到 |
 | Multi-head attention | "并行注意力" | 用不同投影跑多个注意力函数，再拼接结果，得到更丰富的表示 |
+
 
 ## 延伸阅读
 

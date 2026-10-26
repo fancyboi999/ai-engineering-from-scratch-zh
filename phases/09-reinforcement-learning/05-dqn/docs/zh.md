@@ -72,7 +72,7 @@ class ReplayBuffer:
         return rng.sample(self.buf, batch)
 ```
 
-Atari 用约 50000 容量；我们的玩具环境 5000 就够。
+Atari 的回放缓冲区容量约为 $10^6$，与原始 DQN 一致；训练开始前会先收集 50000 条转移。我们的玩具环境用 5000 就够。
 
 ### 第 2 步：一个极小的 Q 网络（手写 MLP）
 

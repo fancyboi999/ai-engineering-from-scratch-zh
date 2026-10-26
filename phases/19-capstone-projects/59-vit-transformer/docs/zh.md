@@ -69,7 +69,7 @@ ViT-Base 是一个 86M 参数的 encoder。按 2026 年的标准这算小的（S
 
 ### 要不要 causal mask？
 
-Vision Transformer 是 encoder-only 且双向的：token `i` 可以关注任意一对中的 token `j`。没有 mask。第 61 课 decoder 侧的 cross-attention 会用 causal mask，但在视觉 encoder 内部，attention 是全连接的。
+Vision Transformer 是 encoder-only 且双向的：token `i` 可以关注任意一对中的 token `j`。没有 mask。第 61 课 decoder 的 text self-attention 会用 causal mask，而它对图像 patch 的 cross-attention 不会；视觉 encoder 内部的 attention 也是全连接的。
 
 ### CLS token 学到了什么
 

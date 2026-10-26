@@ -132,13 +132,13 @@ def speculative_step(p_target, q_draft, K, temperature=1.0):
     """一轮推测解码。返回被接受 token 的列表。"""
     # 1. 起草 K 个 token
     draft_tokens = []
-    q_probs = []
+    q_dists = []
     state = draft_state_init()
     for _ in range(K):
         probs = softmax(q_draft(state) / temperature)
         t = np.random.choice(len(probs), p=probs)
         draft_tokens.append(t)
-        q_probs.append(probs[t])
+        q_dists.append(probs)
         state = draft_step(state, t)
 
     # 2. target 在每个起草位置 + 1 个额外位置计算 p
@@ -148,10 +148,10 @@ def speculative_step(p_target, q_draft, K, temperature=1.0):
     accepted = []
     for k, tok in enumerate(draft_tokens):
         r = np.random.uniform()
-        if r < p_probs_all[k][tok] / q_probs[k]:
+        if r < p_probs_all[k][tok] / q_dists[k][tok]:
             accepted.append(tok)
         else:
-            residual = np.maximum(p_probs_all[k] - q_probs[k], 0)
+            residual = np.maximum(p_probs_all[k] - q_dists[k], 0)
             residual /= residual.sum()
             accepted.append(np.random.choice(len(residual), p=residual))
             return accepted

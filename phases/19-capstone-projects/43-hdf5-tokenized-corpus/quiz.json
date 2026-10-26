@@ -7,7 +7,7 @@
       "question": "为什么把 tokenized corpus 存成可扩容、分块的 HDF5 dataset，而不是 JSONL？",
       "options": [
         "HDF5 的 logo 更小。",
-        "HDF5 提供分块、纯整数、内存映射读取和 O(1) 随机访问；JSONL 每次热路径读取都要走解析器。",
+        "HDF5 提供分块、纯整数、缓存友好的读取和 O(1) 随机访问；JSONL 每次热路径读取都要走解析器。",
         "随机原因。",
         "JSONL 已弃用。"
       ],

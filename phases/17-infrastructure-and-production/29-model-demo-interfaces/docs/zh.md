@@ -16,6 +16,7 @@
 - 规范化请求访问日志，绝不记录用户原始输入文本与明文客户端 IP 地址。
 - 将标准库 Demo 与两款主流开源框架进行架构对比，识别 Demo 迈向正式产品化的关键演进信号。
 
+
 ## 问题背景
 
 你的模型在 Jupyter Notebook 里跑得非常完美。现在评审人员想要测试 10 组输入，客户想在手机上亲眼看看效果——但他们谁都不会去打开你的 Notebook。
@@ -77,6 +78,8 @@ flowchart LR
 | 未通过的检查项 | HTTP 状态码 | 业务错误码 |
 |---|---|---|
 | 请求体超出 4,096 字节 | 413 Content Too Large | `body_too_large` |
+| 缺少 `Content-Length` 请求头 | 411 Length Required | `length_required` |
+| `Content-Length` 不是数字 | 400 Bad Request | `bad_length` |
 | 请求体在传输到达声明的 `Content-Length` 之前断流超时 | 408 Request Timeout | `request_timeout` |
 | Content-Type 不是 application/json | 415 Unsupported Media Type | `unsupported_media_type` |
 | 请求体不是合法的 JSON 对象 | 400 Bad Request | `bad_json` |

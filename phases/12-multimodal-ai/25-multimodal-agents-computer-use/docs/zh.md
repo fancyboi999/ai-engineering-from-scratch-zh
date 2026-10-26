@@ -140,7 +140,7 @@ mm-agent-loop
 
 ## 练习
 
-1. 用一个 `screenshot_region` 工具（裁剪 + 缩放）扩展动作 schema。哪些任务受益？
+1. 代码中的 schema 在九个核心动作上增加了 `screenshot_region` 工具（裁剪 + 缩放）。哪些任务受益？
 
 2. 读 AgentVista（arXiv:2602.23166）。描述最难的任务类别，以及前沿模型为什么仍然失败。
 

@@ -222,6 +222,10 @@ graph LR
 
 ## 动手构建
 
+```figure
+iso-machine {"machine":"mini-gpt"}
+```
+
 ### 第 1 步：embedding 层
 
 token embedding 把 50,257 个可能的 token 每一个映射到一个 768 维向量。位置 embedding 添加每个 token 在序列中位置的信息。两者相加。
@@ -526,6 +530,7 @@ print(f"\nGenerated: {generated_text}")
 | 残差连接 | "跳跃连接" | 把输入直接加到某个子层的输出上（x + sublayer(x)）——让深层网络的梯度得以流动 |
 | Layer normalization | "归一化激活" | 在特征维度上归一化到均值 0、方差 1，带可学习的缩放和偏置参数 |
 | 交叉熵损失 | "预测错得多离谱" | $-\log(\text{分配给正确的下一个 token 的概率})$，在所有位置上取平均——标准的 LLM 训练目标 |
+
 
 ## 延伸阅读
 

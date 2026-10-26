@@ -3,7 +3,7 @@
 > 四个原语：Agent、Task、Crew、Process。两种顶层形态：Crew（自主、基于角色的协作）和 Flow（事件驱动、确定性）。CrewAI 是 2026 年的参考实现，其文档说得很直白：「对任何生产就绪的应用，从 Flow 开始。」
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（NumPy）
 **前置要求：** 阶段 14 · 12（工作流模式）、阶段 14 · 14（Actor 模型）
 **预计时间：** ~75 分钟
 
@@ -14,7 +14,7 @@
 - 区分 Crew（自主、基于角色）和 Flow（事件驱动、确定性），并解释文档的生产建议。
 - 用 `@tool` 装饰器和 `BaseTool` 子类接入工具；权衡结构化输出 vs 自由文本。
 - 说出 CrewAI 的四种记忆类型，以及各自什么时候划算。
-- 用标准库实现一个三 agent crew（研究员、写手、编辑）来产出一份简报。
+- 用纯 Python 实现一个三 agent crew（研究员、写手、编辑）来产出一份简报。
 - 揪出 CrewAI 的三个失败模式：prompt 膨胀、manager-LLM 税、脆弱的交接。
 
 ## 问题背景
@@ -139,7 +139,7 @@ ae-crew-vs-flow
 
 ## 动手构建
 
-`code/main.py` 实现两种形态的标准库版本，外加一个三 agent crew。
+`code/main.py` 实现两种形态的纯 Python 版本，外加一个三 agent crew。
 
 形态：
 

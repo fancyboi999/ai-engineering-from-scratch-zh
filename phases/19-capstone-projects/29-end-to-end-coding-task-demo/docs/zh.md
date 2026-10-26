@@ -21,7 +21,7 @@
 
 gate chain 明明说 ALLOW，sandbox 却因为 chain 没想到的理由把它拒了。eval harness 给了 pass，OTel trace 却显示 agent 自称用过的 tool 实际上被 gate 拒绝了。Prometheus counter 本该加一次，却加了两次。observation budget 已经超了，但 agent 还在跑，因为 chain 记了预算，sandbox 却根本不知道。
 
-这节课就是整个 Track A 的 integration test。agent 必须按顺序完成 4 件事：读项目、跑测试、从失败信息定位 bug、写修复、重跑测试并停下。每一步都走 gate chain，每次 tool execution 都经过 sandbox，每个 step 都包在 span 里，eval harness 最后给整次 run 打分。
+这节课就是整个 Track A 的 integration test。agent 必须按顺序完成 6 件事：读项目、跑测试、从失败信息定位 bug、写修复、重跑测试并停下。每一步都走 gate chain，每次 tool execution 都经过 sandbox，每个 step 都包在 span 里，eval harness 最后给整次 run 打分。
 
 ## 核心概念
 

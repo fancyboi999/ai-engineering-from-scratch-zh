@@ -28,7 +28,7 @@ DeepSeek-V3（2024 年 12 月）把 MTP 重新设计成顺序模块，在每个�
 
 ### 顺序 MTP 配方
 
-DeepSeek-V3 在主模型之上加 `D` 个 MTP 模块。每个模块 `k`（`k = 1..D`）预测深度 `k` 的 token——也就是给定到位置 `i` 的前缀时的 `t_{i+k}`。
+DeepSeek-V3 在主模型之上加 `D` 个 MTP 模块。主模型预测 `t_{i+1}`。每个模块 `k`（`k = 1..D`）预测再往后 `k` 个位置的 token，即给定到位置 `i` 的前缀时的 `t_{i+k+1}`。
 
 模块 `k` 由以下组成：
 
@@ -49,13 +49,13 @@ h_i^{(k)} &= T_k\Big( M_k \cdot \mathop{\mathrm{concat}}\big(\mathop{\mathrm{RMS
 按深度的预测是：
 
 ```math
-\text{logits}_{i+k} = \mathop{\mathrm{Out}}(h_i^{(k-1)}) \quad \text{对于 } k = 1, \ldots, D
+\text{logits}_{i+k+1} = \mathop{\mathrm{Out}}(h_i^{(k)}) \quad \text{对于 } k = 1, \ldots, D
 ```
 
-按深度的损失是对真值 `t_{i+k}` 的交叉熵：
+按深度的损失是对真值 `t_{i+k+1}` 的交叉熵：
 
 ```math
-L_k = \mathop{\mathrm{CE}}(\text{logits}_{i+k}, t_{i+k})
+L_k = \mathop{\mathrm{CE}}(\text{logits}_{i+k+1}, t_{i+k+1})
 ```
 
 跨深度的联合损失：
@@ -68,11 +68,11 @@ L_{\text{MTP}} = \frac{\lambda}{D} \sum_{k=1}^{D} L_k
 
 ### 为什么顺序，而非并行
 
-Gloeckle 最初的并行 MTP 有 D 个输出头，每个直接应用在 `h_i^(0)` 上。每个头从同一个主干隐藏状态预测 `t_{i+k}`。那训练没问题，但预测彼此不以对方为条件。你没法用 `head_1` 的输出来帮 `head_2`——这些头并行发射。
+Gloeckle 最初的并行 MTP 有 D 个输出头，每个都直接作用于 `h_i^(0)`。每个头从同一个主干隐藏状态预测 `t_{i+k}`。训练可以这样做，但各头的预测互不依赖：你无法用 `head_1` 的输出帮助 `head_2`，因为这些头是并行发射的。
 
-DeepSeek-V3 的顺序设计从 `h_i^(k-1)` 加上实际的下一个 token embedding `E(t_{i+k})` 构建 `h_i^(k)`。那保住了因果链：要预测 `t_{i+k+1}`，深度 `k+1` 的模块看到的是 `t_{i+k}` 处的东西。这在结构上和一个自回归解码器消费自己的输出一模一样——使 MTP 模块能直接用作推测解码的起草器。
+DeepSeek-V3 的顺序设计用 `h_i^(k-1)` 和真实的下一个 token embedding `E(t_{i+k})` 构建 `h_i^(k)`。因果链因此得以保留：深度为 `k` 的模块要预测 `t_{i+k+1}`，它会看到位置 `i+k` 的 token。这与自回归解码器消费自身输出的方式相同，所以 MTP 模块可以直接用作推测解码的起草器。
 
-推理时：把 `h_i^(k-1)` 和起草的 `t_{i+k}` 喂进模块 `k+1`，得到 `t_{i+k+1}` 的预测。重复。那正是一个 EAGLE 风格的 draft，用训练好的 MTP 模块作为 draft 网络。DeepSeek-V3 报告第一个 MTP 模块上 80%+ 的接受率和约 1.8 倍加速。
+推理时：把 `h_i^(k-1)` 和起草的 `t_{i+k}` 喂进模块 `k`，得到 `t_{i+k+1}` 的预测。重复即可。这就是 EAGLE 风格的 draft：直接把训练好的 MTP 模块用作起草网络。DeepSeek-V3 报告第一个 MTP 模块的接受率超过 80%，加速约 1.8 倍。
 
 ### 参数核算
 
@@ -111,7 +111,12 @@ EAGLE 在预训练 *之后* 单独训练一个小 draft 模型。MTP 把 draft �
 multi-token-predict
 ```
 
+
 ## 动手构建
+
+```figure
+iso-machine {"machine":"multi-token-prediction"}
+```
 
 `code/main.py` 端到端构建单个 MTP 模块：共享 embedding、投影、transformer 块、共享输出头。然后它在一个短合成序列上计算按深度的交叉熵损失，并按组件打印参数量。一个 32 token 的玩具词表让数字可读。
 
@@ -141,7 +146,7 @@ def combine(prev_hidden, next_token_embed, M_k):
 
 ### 第 5 步：按深度损失
 
-softmax(logits) 对偏移 `k` 处真值 token 的交叉熵。用 `lambda / D` 缩放因子跨深度聚合。
+softmax(logits) 对偏移 `k+1` 处真值 token 的交叉熵。用 `lambda / D` 缩放因子跨深度聚合。
 
 ### 第 6 步：参数核算
 
@@ -176,18 +181,18 @@ MTP 集成在 DeepSeek-V3（2024 年 12 月）和 DeepSeek-R1 系列里。推理
 
 2. 为一个稠密 70B 模型（hidden 8192，80 层）配 D=1 MTP 模块计算参数开销。和 DeepSeek-V3 报告的 14B 开销对比。解释为什么 DeepSeek 的数字更高：MTP transformer 块继承了相同的 MoE 结构，膨胀了每模块参数量。
 
-3. 在玩具里实现 D=2：加第二个 MTP 模块，接收 $h^{(1)}$ 并预测 `t_{i+2}`。验证联合损失和参数核算匹配 DeepSeek 论文的方程 19-21。
+3. 在玩具里实现 D=2：加第二个 MTP 模块，接收 $h^{(1)}$ 并预测 `t_{i+3}`。验证联合损失和参数核算符合 DeepSeek 论文公式 19–21。
 
 4. 把玩具切换成并行 MTP（Gloeckle 风格）：在主隐藏状态之上加 D 个输出头，每个预测一个不同偏移。测量按深度损失在同一合成信号上和顺序版本如何比较。顺序版本对 k > 1 应该产出更低的深度 k 损失，因为它以中间预测为条件。
 
-5. 把训练好的 MTP 模块用作 EAGLE 风格的 draft：推理时调用模块 k 来提议 `t_{i+k}`。在一个留出序列上测量这些 draft token 对主模型预测的接受率。如果你在玩具上打到 50%+，你就复现了 MTP-作-draft 的经验性质。
+5. 把训练好的 MTP 模块用作 EAGLE 风格的 draft：推理时调用模块 `k` 来提议 `t_{i+k+1}`。在留出的序列上把这些候选 token 与主模型的预测比较并计算接受率。玩具实验达到 50% 以上，就复现了 MTP 可作 draft 的实测特性。
 
 ## 关键术语
 
 | 术语 | 人们怎么说 | 它实际是什么 |
 |------|----------------|------------------------|
-| MTP 模块 | "额外损失块" | 一个小 transformer 块加投影，预测主模型之前 `k` 个位置的一个 token |
-| 预测深度 | "哪个偏移" | 整数 `k`，使模块 `k` 从到位置 `i` 的前缀预测 `t_{i+k}` |
+| MTP 模块 | "额外损失块" | 一个小 transformer 块加投影，预测主模型之后第 `k+1` 个位置的 token |
+| 预测深度 | "哪个偏移" | 整数 `k`，使模块 `k` 从到位置 `i` 的前缀预测 `t_{i+k+1}`；主模型深度为 0，预测 `t_{i+1}` |
 | 并行 MTP | "Gloeckle 风格" | 同一主干隐藏状态上的 D 个独立头，无条件链 |
 | 顺序 MTP | "DeepSeek-V3 风格" | 每个模块以上一深度的隐藏状态加下一个 token 的 embedding 为条件；保住因果链 |
 | 共享输出头 | "复用主头" | MTP 模块调用主模型的 LM 头，不是单独的输出投影 |

@@ -1,6 +1,6 @@
 # Serverless LLM 的冷启动缓解
 
-> 一个 20 GB 的模型镜像从冷到能服务要花 5-10 分钟（7B）到 20+ 分钟（70B）。在一个真正的 serverless 世界里，那不是预热 —— 那是一次宕机。缓解手段在五层运作：预播种节点镜像（AWS 上的 Bottlerocket、双卷架构）、模型流式加载（NVIDIA Run:ai Model Streamer，vLLM 里原生）、GPU 内存快照（Modal checkpoint，重启最多快 10 倍）、warm pool（`min_workers=1`）、分层加载（ServerlessLLM 的 NVMe→DRAM→HBM 流水线，延迟降 10-200 倍），以及搬运输入 token（KB 级）而非 KV cache（GB 级）的 live migration。Modal 公布 2-4 秒冷启动作为下限；Baseten 默认 5-10 秒，预热后亚秒级。这一课教你测量、预算并叠加这五层。
+> 一个大型模型从冷启动到可服务要几分钟：在一台新节点上启动 70B 模型，首 token 通常需要约 3-8 分钟。在一个真正的 serverless 世界里，那不是预热 —— 那是一次宕机。缓解手段有五层：预播种节点镜像（AWS 上的 Bottlerocket、双卷架构）、模型流式加载（NVIDIA Run:ai Model Streamer，vLLM 里原生）、GPU 内存快照（Modal checkpoint，重启最多快 10 倍）、warm pool（`min_workers=1`）、分层加载（ServerlessLLM 的 NVMe→DRAM→HBM 流水线，延迟降 10-200 倍），另外还有第六种模式 live migration：搬运输入 token（KB 级）而非 KV cache（GB 级）。Modal 公布 2-4 秒冷启动作为下限；Baseten 默认 5-10 秒，预热后亚秒级。这一课教你测量、预算并叠加这五层。
 
 **类型：** Learn
 **语言：** Python（标准库，一个玩具级冷启动路径模拟器）

@@ -108,7 +108,7 @@ python3 code/main.py
 
 **规则过期作为强制函数。** 每条规则带一个 `expires_at` 日期（默认从撰写起 90 天）。当一条未过期规则连续 60 天零违规时，检查器发出一个警告；下次季度评审要么论证保留它、要么把它削弱成 `info`、要么删除。Cloudflare 的生产 AI Code Review 数据（2026 年 4 月，30 天内横跨 5,169 个仓库的 131,246 次评审运行）显示，带显式过期的规则集每仓库保持在 30 条以下；没有过期的涨到 80+，且大多从不触发。
 
-**markdown 作源，JSON 作缓存。** `agent-rules.md` 是撰写的文件；`agent-rules.lock.json` 是检查器在热路径里读的缓存。lock 由一个 pre-commit hook 重新生成。markdown diff 可审查；JSON 解析不进每一轮。和 `package.json` / `package-lock.json` 以及 `Cargo.toml` / `Cargo.lock` 同一个形态。
+**markdown 作源，JSON 作缓存。** `agent-rules.md` 是撰写的文件；`agent-rules.lock.json` 是检查器在热路径里读的缓存。lock 由一个 pre-commit hook 重新生成。markdown diff 便于审查；检查器只读取预先生成的小型 JSON，因此每一轮都不需要解析 Markdown。和 `package.json` / `package-lock.json` 以及 `Cargo.toml` / `Cargo.lock` 同一个形态。
 
 ## 实际使用
 

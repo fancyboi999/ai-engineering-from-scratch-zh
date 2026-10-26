@@ -52,7 +52,7 @@ flowchart TD
 
 ### 原子化写入
 
-标准模式：把每个 shard 写到 `<name>.tmp`，把 manifest 写到 `manifest.json.tmp`，各自 fsync，然后 rename。同一文件系统内的 POSIX rename 是原子的；要么新文件完整存在，要么旧文件还在。在最终 rename 之前崩溃，会让上一个 checkpoint 仍是活的那个。没有原子化写入，崩溃可能留下一个不完整的 shard 和一份指向它的 manifest，恢复时就把 optimizer state 加载坏了。
+标准模式：把每个 shard 写到 `<name>.tmp`，把 manifest 写到 `manifest.json.tmp`，各自 fsync，先 rename shards，最后 rename manifest。单次同一文件系统内的 POSIX rename 是原子的；一组 rename 则不是。因此 manifest rename 是提交点，loader 会按 manifest hash 校验每个 shard。每个 checkpoint 应写入独立的 step 目录；这样在 manifest rename 前崩溃，上一个 checkpoint 仍然有效。重复使用同一目录会破坏保证，因为新 manifest 落盘前旧 shard 已被替换。没有原子化写入，崩溃可能留下一个不完整的 shard 和一份指向它的 manifest，恢复时就把 optimizer state 加载坏了。
 
 ### schema 必须抵御的三种故障模式
 

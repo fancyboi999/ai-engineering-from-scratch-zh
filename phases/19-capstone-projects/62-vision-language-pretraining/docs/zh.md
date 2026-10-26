@@ -18,7 +18,7 @@
 
 一个视觉语言模型需要两种本领。它得会排序：给一句 caption，在众多图里找到对的那张。它还得会生成：给一张图，写一句 caption。只在一种本领上预训练模型，你得到的是半个系统。CLIP 把排序做到了极致，却不会 captioning。GPT-4V 会 captioning，但排序用的是一个单独的检索头。多目标预训练一遍拿下两者。
 
-InfoNCE 负责排序这一半。对于一个 N 对的 batch，模型把 N 个匹配对当作正例，把 `N^2 - N` 个不匹配对当作负例，然后在得到的 `(N, N)` 相似度矩阵上跑交叉熵 loss。LM loss 负责生成那一半：以图像为条件做标准的 next-token 预测。两个 loss 都可微，并且可以共享 encoder、projector 和 decoder 的权重。
+InfoNCE 负责排序这一半。对于一个 N 对的 batch，模型把 N 个匹配对当作正例，把 `N^2 - N` 个不匹配对当作负例，然后在得到的 `(N, N)` 相似度矩阵上跑交叉熵 loss。LM loss 负责生成那一半：以图像为条件做标准的 next-token 预测。两个 loss 都可微，并共享 encoder 和 projector 的权重；decoder 只从 LM loss 接收梯度。
 
 ## 核心概念
 
@@ -54,7 +54,7 @@ decoder 通过 cross-attention 消费 image memory token，在每个位置预测
 
 ### 组合两个 loss
 
-`total = contrastive + lm_weight * lm`，其中 `lm_weight` 是一个标量（常取 1.0）。两个 loss 共享流进 encoder 和 projection 的梯度；只有 decoder 收到 LM-loss 的梯度。这就是 CoCa、BLIP、SigLIP 风格模型都在用的多任务配方，只是权重各异。
+`total = contrastive + lm_weight * lm`，其中 `lm_weight` 是一个标量（常取 1.0）。两个 loss 共享流进 encoder 和 projection 的梯度；decoder 只收到 LM loss 的梯度。这是 CoCa 和 BLIP 使用的多任务配方，权重各不相同。SigLIP 只保留对比项，并把 softmax 换成 sigmoid pair loss。
 
 | 组件 | Loss 面 | 影响范围 |
 |-----------|--------------|---------|

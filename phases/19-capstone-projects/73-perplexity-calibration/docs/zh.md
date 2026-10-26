@@ -87,7 +87,7 @@ harness 不假设置信度来自 softmax。它接受每条预测在 `[0, 1]` 里
 
 - 全部预测错：ECE 是平均置信度，Brier 很高，perplexity 就是模型对那段文本怎么看。
 - 全部预测对且高置信度：ECE 接近零，Brier 接近零。
-- 在 p=0.5 处完全不确定的预测器：ECE 是 0.5 减去准确率，Brier 是 0.25 减去一个修正项。
+- 在 `p=0.5` 处完全不确定的预测器，所有预测都落入同一个 bin，因此 ECE 为 `|0.5 - accuracy|`。Brier 分数恰好为 `0.25`，因为无论 `y` 是 0 还是 1，`(0.5 - y)^2` 都是 `0.25`。
 - 空输入：ECE、Brier、reliability 返回 `0.0`（或全零数组）。perplexity 在零 token 情形返回 `NaN`。这些路径都不发 warning；由 runner 检查这些值，再决定报还是跳过。
 
 这些情况都已写进测试。真实模型在真实 benchmark 上不会撞到它们，但一个有 bug 的适配器、或一个极小样本会撞到，而 runner 不应崩溃。

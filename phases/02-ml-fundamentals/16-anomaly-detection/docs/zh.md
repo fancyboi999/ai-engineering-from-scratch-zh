@@ -270,6 +270,7 @@ def iqr_detect(X, factor=1.5):
 class IsolationTree:
     def __init__(self, max_depth):
         self.max_depth = max_depth
+        self.size = 0
 
     def fit(self, X, depth=0):
         n, p = X.shape
@@ -292,6 +293,26 @@ class IsolationTree:
         return self
 ```
 
+路径长度需要补偿叶节点内尚未继续划分的样本。用 $c(n)$ 估算这些样本还需要的平均路径长度：
+
+```python
+def _c_factor(n):
+    if n <= 1:
+        return 0.0
+    if n == 2:
+        return 1.0
+    return 2.0 * (np.log(n - 1) + 0.5772156649) - 2.0 * (n - 1.0) / n
+
+
+class IsolationTree:
+    def path_length(self, x, depth=0):
+        if self.is_leaf:
+            return depth + _c_factor(self.size)
+        if x[self.feature] < self.threshold:
+            return self.left.path_length(x, depth + 1)
+        return self.right.path_length(x, depth + 1)
+```
+
 孤立一个点的路径长度决定它的异常分数。路径越短越异常。
 
 `IsolationForest` 类把多棵树包起来：
@@ -301,8 +322,14 @@ class IsolationForest:
     def __init__(self, n_estimators=100, max_samples=256, seed=42):
         self.n_estimators = n_estimators
         self.max_samples = max_samples
+        self.seed = seed
+        self.trees = []
+        self.n_train = 0
 
     def fit(self, X):
+        self.n_train = X.shape[0]
+        rng = np.random.RandomState(self.seed)
+        self.trees = []
         sample_size = min(self.max_samples, X.shape[0])
         max_depth = int(np.ceil(np.log2(sample_size)))
         for _ in range(self.n_estimators):
@@ -310,14 +337,19 @@ class IsolationForest:
             tree = IsolationTree(max_depth=max_depth)
             tree.fit(X[idx])
             self.trees.append(tree)
+        return self
 
     def anomaly_score(self, X):
-        avg_path = 所有树上的平均路径长度
-        scores = 2.0 ** (-avg_path / c(max_samples))
-        return scores
+        avg_path = np.zeros(X.shape[0])
+        for tree in self.trees:
+            for i in range(X.shape[0]):
+                avg_path[i] += tree.path_length(X[i])
+        avg_path /= self.n_estimators
+        c = _c_factor(min(self.max_samples, self.n_train))
+        return 2.0 ** (-avg_path / c) if c > 0 else np.zeros(X.shape[0])
 ```
 
-归一化因子 `c(n)` 是有 $n$ 个元素的二叉搜索树里一次失败查找的期望路径长度。它等于 `2 * H(n-1) - 2*(n-1)/n`，其中 `H` 是调和数。这个归一化确保分数在不同大小的数据集间可比。
+归一化因子 `c(n)`（代码中的 `_c_factor`）是有 $n$ 个元素的二叉搜索树里一次失败查找的期望路径长度。它等于 `2 * H(n-1) - 2*(n-1)/n`，其中 `H` 是调和数。代码使用标准近似 $H(i) \approx \ln(i) + 0.5772$，其中 0.5772 是欧拉常数；原始 Isolation Forest 论文也采用这个近似。归一化后，分数可在不同大小的数据集间比较。
 
 ### 演示场景
 
