@@ -1,2 +1,4 @@
-# 保留固定上游捕获记录的原始CRLF，避免Git归一化改变证据字节。
+# 保留冻结上游捕获记录的原始 CRLF，避免 Git 归一化改变证据字节。
 manuals/sglang-101/capture/gpu/incidents/l4-vllm-flashinfer-jit.txt -text
+manuals/vllm-101/capture/gpu/incidents/l4-vllm-flashinfer-jit.txt -text
+manuals/vllm-101/capture/gpu/out-gb10/server-load-vllm.log -text

@@ -55,7 +55,13 @@ s0-gpu-dispatch
 nvidia-smi
 ```
 
-安装带 CUDA 的 PyTorch：
+安装带 CUDA 的 PyTorch。Linux 默认 wheel 已包含 CUDA；Windows 用户应在 pytorch.org 的选择器中复制对应命令：
+
+```bash
+pip install torch torchvision torchaudio
+```
+
+然后检查 PyTorch 是否能识别 GPU：
 
 ```python
 import torch

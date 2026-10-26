@@ -48,7 +48,7 @@ Sandbox Commands:
 | `large` | 8 | 16384 MiB | $0.56 |
 | `xl` | 16 | 32768 MiB | $1.12 |
 
-博客说按秒计量，文档只确认一半：“Compute isn't billed while it is stopped.” {{docs-sbx Use cloud sandboxes}}，停止时不收计算费用。该博客的250美元额度是促销。账户初始配额为10个并发沙箱、50个存储沙箱、100卷、100密钥及3个准备中镜像 {{docs-sbx-api Account quotas}}。
+博客说按秒计量，文档只确认一半{{docs-sbx Use cloud sandboxes}}，停止时不收计算费用。该博客的250美元额度是促销。账户初始配额为10个并发沙箱、50个存储沙箱、100卷、100密钥及3个准备中镜像 {{docs-sbx-api Account quotas}}。
 
 ## sbx --cloud run 与 attach {#s-sbx-cloud-run-move-and-ttl-sbx-cloud-run-and-attach}
 

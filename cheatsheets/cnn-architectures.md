@@ -5,7 +5,7 @@ code: CA
 subtitle: 计算卷积尺寸，从 LeNet 构建到 ResNet，训练分类器并微调预训练骨干。使用 PyTorch 与 NumPy。
 hue: 15
 sources: phases/04-computer-vision/02-convolutions-from-scratch, phases/04-computer-vision/03-cnns-lenet-to-resnet, phases/04-computer-vision/04-image-classification, phases/04-computer-vision/05-transfer-learning
-source_hash: 79987d4bbc52afbd
+source_hash: 83ca9606f8ed473f
 ---
 
 ## 公式

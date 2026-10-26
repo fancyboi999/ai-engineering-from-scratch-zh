@@ -5,7 +5,7 @@ code: CO
 subtitle: 批评与修订训练、层级冲突解析、输入输出护栏及其绕过方式，以及 YAML 规则引擎。
 hue: 160
 sources: phases/15-autonomous-systems/17-constitutional-ai, phases/15-autonomous-systems/18-llama-guard, phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif, phases/19-capstone-projects/86-constitutional-rules-engine
-source_hash: ed6682a0098021fd
+source_hash: 6a269b3d4d4df8fb
 ---
 
 ## CAI 训练的两个阶段

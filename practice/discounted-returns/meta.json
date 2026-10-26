@@ -1,0 +1,32 @@
+{
+  "id": "discounted-returns",
+  "title": "带 episode 边界的折扣回报",
+  "kind": "implement",
+  "summary": "计算单条及拼接 episode 的 reward-to-go，并归一化回报。",
+  "difficulty": "easy",
+  "tags": [
+    "reinforcement-learning",
+    "returns",
+    "policy-gradients"
+  ],
+  "lesson": "phases/09-reinforcement-learning/06-policy-gradients-reinforce",
+  "cheatsheet": "reinforcement-learning",
+  "minutes": 15,
+  "entry": [
+    "returns_to_go",
+    "batch_returns",
+    "normalize"
+  ],
+  "collections": [
+    "rl-basics"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "discount_includes_reward": "计算 G = gamma * (r + G)，导致当前步奖励也被折扣。",
+    "forward_sum": "从 episode 开始累加折扣奖励，而非从当前步累加到末尾。",
+    "no_epsilon": "标准差归一化时不加 1e-8，导致相同回报产生 NaN。",
+    "no_reset_at_done": "忽略 done 标记，使一条 episode 的回报包含下一条 episode 的奖励。",
+    "reset_after_add": "存储 done 步回报后才重置，导致 episode 边界切分错误。",
+    "sample_std": "使用 ddof = 1 的样本标准差，而不是总体标准差。"
+  }
+}

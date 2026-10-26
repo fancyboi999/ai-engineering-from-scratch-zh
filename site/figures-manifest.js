@@ -10,7 +10,7 @@
   var baseUrl = current && current.src
     ? current.src.replace(/[^/?#]+(?:[?#].*)?$/, '')
     : '/';
-  var i18nSrc = 'figures-i18n-zh.js?v=20261013d';
+  var i18nSrc = 'figures-i18n-zh.js?v=20261026a';
 
   var MODULES = [
   {
@@ -375,7 +375,7 @@
     ]
   },
   {
-    "src": "figures-llmstack5.js?v=20260801a",
+    "src": "figures-llmstack5.js?v=20261026a",
     "figures": [
       "l5-data-pipeline",
       "l5-spec-decode-eagle",

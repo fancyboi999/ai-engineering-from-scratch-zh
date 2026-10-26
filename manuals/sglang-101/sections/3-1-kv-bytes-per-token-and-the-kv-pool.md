@@ -6,13 +6,13 @@
 
 读完本节，你能根据模型配置计算 KV 成本，在启动日志找到相同数字，并解释 SGLang 为何以 token 计容量。
 
-## 缓存为何存在
+## 缓存为何存在 {#s-kv-bytes-per-token-and-the-kv-pool-why-the-cache-exists}
 
 **KV 缓存：** 保存每层此前所有 token 的 key 和 value，让 decode 不必重算。一次 decode 生成一个新 token，它要注意此前全部 token 的 key 和 value。没有缓存，每个新 token 都要重做整个会话的 prefill。
 
 因此缓存随会话长度和同时运行的会话数增长。除权重外，它是推理服务引擎最大的内存用户。[第 2 部分](#p-2)的每个调度决定，本质上都在管理这块内存。
 
-## 公式与第一个实测数字
+## 公式与第一个实测数字 {#s-kv-bytes-per-token-and-the-kv-pool-the-formula-and-our-first-measured-number}
 
 普通多头或分组查询注意力模型，每 token 的字节成本为：
 
@@ -42,7 +42,7 @@ Qwen3-0.6B 的上游实测值为 `bytes_per_slot=114688`。第二行给出了全
 | Llama-3.1-70B | GQA，80 层，8 KV head | 320 KiB | 8 路张量并行时 40 KiB |
 | DeepSeek-V3 | MLA，61 层，潜变量 512 加 64 | 68.6 KiB | 每张 GPU 均为 68.6 KiB |
 
-两个结果常让人意外：0.6B 模型的每 token 成本几乎等于 8B 模型，因为决定成本的是层数与 KV head 数，不是参数量。Llama-3.1-8B 的 100,000-token 会话占用 12.5 GiB KV，已接近权重大小。
+两个结果常让人意外：0.6B 模型的每 token 成本几乎等于 8B 模型，因为决定成本的是层数与 KV head 数，不是参数量。Llama-3.1-8B 的 100,000-token 会话占用 12.2 GiB KV，已接近权重大小。
 
 **多头潜在注意力（MLA）：** DeepSeek 的注意力机制，每 token 保存一个压缩潜变量，而非各 head 独立的 key 和 value。MLA 每 token 小，但所有张量并行 rank 都保存完整潜变量 {{code}}。增加张量并行 GPU 并不会增加可容纳 token 数。[第 6.1 节](#s-tp-size-dp-size-and-attn-dp-size)说明注意力数据并行如何处理该问题。
 
@@ -54,7 +54,7 @@ claim: Qwen3-0.6B 一个 token 占 114,688 字节，是模型配置五个数字�
 caption: 从左向右读。各框是启动日志 bytes_per_slot 的一个因子。来源：capture/out/server-default.log。
 ```
 
-## 两张表，一个池
+## 两张表，一个池 {#s-kv-bytes-per-token-and-the-kv-pool-two-tables-one-pool}
 
 SGLang 的 KV 缓存使用固定槽位池，每 token 一个槽位。前方两张表各回答不同问题 {{code}}。
 
@@ -72,21 +72,25 @@ claim: 共享 system prompt 的两请求将前缀指向相同 KV 槽位，使内
 caption: 自上而下读。每行是一个 ReqToTokenPool 条目，下方条带是 KV 池。机制来自 v0.5.22 代码，大小为示意。
 ```
 
-## 缓存就是池
+## 缓存就是池 {#s-kv-bytes-per-token-and-the-kv-pool-the-cache-is-the-pool}
 
-SGLang 没有独立缓存大小设置。论文直接说明设计：缓存 token 与当前运行请求共享同一个内存池 {{paper}}。缓存前缀就是当前没有运行请求锁定的 KV。新请求需要空间时，从同一个池淘汰没有请求锁定的前缀。
+SGLang 没有独立缓存大小设置。该设计让缓存 token 与当前运行请求共用一个内存池 {{paper}}。缓存前缀就是当前没有运行请求锁定的 KV。新请求需要空间时，从同一个池淘汰没有请求锁定的前缀。
 
 因此启动日志只有 `max_total_num_tokens` 一个数，没有两个。上游 Mac 设置 `--mem-fraction-static 0.4` 后为 181,574 token。模型上下文允许 40,960 token，因此池可容纳四个满长会话，或约 180 个各 1,000-token 会话。运行请求与缓存前缀争用同一批槽位。
 
-## 本手册的建议：数 token，不数 GB
+## 本手册的建议：数 token，不数 GB {#s-kv-bytes-per-token-and-the-kv-pool-our-position-count-tokens-not-gigabytes}
 
 按 `max_total_num_tokens` 而非空闲内存规划部署。将典型上下文长度乘所需并发，与该值比较。若乘积更大，调度器将回撤或排队，代价见[第 2.3 节](#s-admission-and-retraction)。
 
 改变该数字的两个旋钮是[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)的内存比例，以及 KV 数据类型。`--kv-cache-dtype` 默认 `auto`，保留模型类型，除非 checkpoint 要求 FP8 {{code}}。FP8 将每 token 字节数减半。
 
-实践报告说明了影响幅度。Cloudflare 报告 FP8 KV 使 Kimi K2.6 内存中容纳的上下文从约 686,000 token 增至约 137 万 {{field Cloudflare 2026-08}}。同一报告测得低并发时每请求吞吐量低了几个百分点。并发 64 时 BF16 内存耗尽，而 FP8 达到 2,192 token/s。这是用少量每 token 速度换取两倍用户容量。照搬前应阅读 [Cloudflare 文章](https://blog.cloudflare.com/smaller-faster-safer-models/)中的准确性检查。
+实践报告说明了影响幅度。Cloudflare 报告 FP8 KV 使 Kimi K2.6 内存中可容纳的上下文从约 686,000 token 增至约 1,370,000 {{field Cloudflare 2026-08}}。同一报告测得低并发时每请求吞吐量降低几个百分点。并发 64 时 BF16 内存耗尽，而 FP8 达到 2,192 token/s。在该报告中，FP8 KV 用少量每 token 速度换取两倍用户容量。
 
-## 测量什么
+上游自己的 FP8 运行同时改变了权重和 KV 缓存，每个用户的速度都更快。在 L4 单用户下，输出速度为 24.5 对 13.4 token/s，见[第 4.3 节](#s-quantization)。照搬前，先阅读 [Cloudflare 文章](https://blog.cloudflare.com/smaller-faster-safer-models/)中的准确性检查。
+
+[LLM 推理服务 GPU 内部](https://aieng-zh.cn/inside-an-llm-serving-gpu?users=64)交互图解将 KV 池画成 L4 六块 GDDR6 封装中的单元格。该链接打开 64 用户的 BF16 运行：24,094-token 池容纳 37 个各 640-token 的请求，其余 27 个等待。将权重和 KV 缓存切换到 FP8，可看到池增至 142,369 token。
+
+## 测量什么 {#s-kv-bytes-per-token-and-the-kv-pool-what-to-measure}
 
 - 读取或计算 `bytes_per_slot`，核对两者一致。
 - 从启动日志读取 `max_total_num_tokens`，除以典型上下文长度。
@@ -102,4 +106,4 @@ SGLang 没有独立缓存大小设置。论文直接说明设计：缓存 token 
 - 购买更多 GPU 前可试 FP8 KV，并在自己的数据核对准确性。
 ```
 
-Sources: python/sglang/srt/model_executor/pool_configurator.py (_compute_cell_size, calculate_pool_sizes), python/sglang/srt/mem_cache/memory_pool.py (ReqToTokenPool), python/sglang/srt/mem_cache/allocator/token.py (TokenToKVPoolAllocator), python/sglang/srt/hardware_backend/mlx/model_runner.py (_compute_pool_size), python/sglang/srt/arg_groups/fields/model.py (kv_cache_dtype) at v0.5.22, capture/out/server-default.log, the SGLang paper (arXiv 2312.07104), the Cloudflare report of 2026-08-03.
+来源： python/sglang/srt/model_executor/pool_configurator.py (_compute_cell_size, calculate_pool_sizes), python/sglang/srt/mem_cache/memory_pool.py (ReqToTokenPool), python/sglang/srt/mem_cache/allocator/token.py (TokenToKVPoolAllocator), python/sglang/srt/hardware_backend/mlx/model_runner.py (_compute_pool_size), python/sglang/srt/arg_groups/fields/model.py (kv_cache_dtype)，v0.5.22, capture/out/server-default.log, SGLang 论文 (arXiv 2312.07104), Cloudflare 报告， 2026-08-03, capture/gpu/out-l4/server-load-default.log 和 capture/gpu/out-l4/server-load-fp8.log，用于 L4 池容量.

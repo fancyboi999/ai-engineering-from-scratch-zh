@@ -5,7 +5,7 @@ code: PS
 subtitle: 分布、贝叶斯、检验、bootstrap、从 logits 采样与马尔可夫链。含从头实现的 Python 和 SciPy。
 hue: 160
 sources: phases/01-math-foundations/06-probability-and-distributions, phases/01-math-foundations/07-bayes-theorem, phases/01-math-foundations/15-statistics-for-ml, phases/01-math-foundations/16-sampling-methods, phases/01-math-foundations/22-stochastic-processes
-source_hash: 8cbed68c3e1c1b6a
+source_hash: 90a43103099d6273
 ---
 
 ## 从 logits 到 token

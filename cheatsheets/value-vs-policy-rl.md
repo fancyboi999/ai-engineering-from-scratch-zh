@@ -5,7 +5,7 @@ code: VM
 subtitle: 对比 Q-learning、SARSA、DQN、REINFORCE、A2C 与 PPO。目标、默认值、诊断和修正方法。
 hue: 150
 sources: phases/09-reinforcement-learning/04-q-learning-sarsa, phases/09-reinforcement-learning/05-dqn, phases/09-reinforcement-learning/06-policy-gradients-reinforce, phases/09-reinforcement-learning/07-actor-critic-a2c-a3c, phases/09-reinforcement-learning/08-ppo
-source_hash: f897f8fbb5421e0b
+source_hash: d6712f1337e2c450
 ---
 
 ## 四类方法对比

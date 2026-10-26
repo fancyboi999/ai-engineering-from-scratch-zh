@@ -5,7 +5,7 @@ code: VD
 subtitle: 帧采样、时间建模、NeRF 与高斯泼溅渲染、深度预测和跨帧目标跟踪。
 hue: 190
 sources: phases/04-computer-vision/12-video-understanding, phases/04-computer-vision/13-3d-vision-nerf, phases/04-computer-vision/22-3d-gaussian-splatting, phases/04-computer-vision/26-monocular-depth, phases/04-computer-vision/27-multi-object-tracking, phases/04-computer-vision/28-world-models-video-diffusion
-source_hash: 2b3e7be63a73d970
+source_hash: 27203b1581f87400
 ---
 
 ## 视频模型

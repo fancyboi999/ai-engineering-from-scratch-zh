@@ -5,7 +5,7 @@ code: VP
 subtitle: 测量、量化、导出并部署视觉流水线。根据内存带宽估算边缘设备上的 LLM 解码能力。
 hue: 25
 sources: phases/04-computer-vision/15-real-time-edge, phases/04-computer-vision/16-vision-pipeline-capstone, phases/17-infrastructure-and-production/12-edge-inference
-source_hash: 740d6a7c48c312f9
+source_hash: 0d6007c683e84d87
 ---
 
 ## 视觉流水线阶段

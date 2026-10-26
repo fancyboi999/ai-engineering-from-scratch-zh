@@ -5,7 +5,7 @@ code: BF
 subtitle: 测量偏差、选择公平标准、用 DP-SGD 训练并审计隐私声明。使用 Python 标准库教学示例。
 hue: 285
 sources: phases/18-ethics-safety-alignment/20-bias-representational-harm, phases/18-ethics-safety-alignment/21-fairness-criteria-group-individual-counterfactual, phases/18-ethics-safety-alignment/22-differential-privacy-for-llms
-source_hash: 69d26f081860e782
+source_hash: 1f1968b3f52ae76b
 ---
 
 ## 三类公平性对比

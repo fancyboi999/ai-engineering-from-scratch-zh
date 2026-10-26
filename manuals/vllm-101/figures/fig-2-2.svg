@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="fig-2-2-title fig-2-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-2-2-title">根据启动失败的位置选择要调整的设置</title>
+  <desc id="fig-2-2-desc">启动可能在三个阶段失败：权重加载失败说明模型对当前 GPU 太大，可使用 FP8 权重或增加 GPU；内存检查失败说明其他程序占用了内存，应降低内存比例；KV 检查失败说明最大上下文需要的缓存超出空闲空间，应缩短最大上下文。</desc>
+  <defs><marker id="fig-2-2-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-2-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">日志停止处</text>
+  <rect x="20" y="28" width="188" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="114" y="48.25" font-size="12.5" text-anchor="middle" font-weight="700">加载权重</text>
+  <text x="114" y="65.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">加载日志行之前</text>
+  <rect x="226" y="28" width="188" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="320" y="48.25" font-size="12.5" text-anchor="middle" font-weight="700">内存检查</text>
+  <text x="320" y="65.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">空闲内存不足</text>
+  <rect x="432" y="28" width="188" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="526" y="48.25" font-size="12.5" text-anchor="middle" font-weight="700">KV 检查</text>
+  <text x="526" y="65.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">最大序列长度需要</text>
+  <text x="20" y="120" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">原因</text>
+  <rect x="20" y="130" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="114" y="150.25" font-size="12.5" text-anchor="middle" font-weight="700">权重太大</text>
+  <text x="114" y="167.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">当前 GPU 无法容纳</text>
+  <rect x="226" y="130" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="320" y="150.25" font-size="12.5" text-anchor="middle" font-weight="700">内存被共享</text>
+  <text x="320" y="167.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">其他程序占用了内存</text>
+  <rect x="432" y="130" width="188" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="526" y="150.25" font-size="12.5" text-anchor="middle" font-weight="700">缓存不足</text>
+  <text x="526" y="167.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">无法容纳完整请求</text>
+  <text x="20" y="222" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">调整方式</text>
+  <rect x="20" y="232" width="188" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="114" y="252.25" font-size="12.5" text-anchor="middle" font-weight="700">FP8 权重</text>
+  <text x="114" y="269.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或增加 GPU 并行数</text>
+  <rect x="226" y="232" width="188" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="320" y="252.25" font-size="12.5" text-anchor="middle" font-weight="700">降低内存比例</text>
+  <text x="320" y="269.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--gpu-memory-utilization</text>
+  <rect x="432" y="232" width="188" height="50" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="526" y="252.25" font-size="12.5" text-anchor="middle" font-weight="700">缩短上下文</text>
+  <text x="526" y="269.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--max-model-len</text>
+  <line x1="114" y1="78" x2="114" y2="129" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-2-head-rose)"/>
+  <line x1="114" y1="180" x2="114" y2="231" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-2-head-ink)"/>
+  <line x1="320" y1="78" x2="320" y2="129" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-2-head-rose)"/>
+  <line x1="320" y1="180" x2="320" y2="231" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-2-head-ink)"/>
+  <line x1="526" y1="78" x2="526" y2="129" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-2-2-head-rose)"/>
+  <line x1="526" y1="180" x2="526" y2="231" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-2-2-head-ink)"/>
+</svg>

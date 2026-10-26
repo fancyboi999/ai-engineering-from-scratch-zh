@@ -90,6 +90,7 @@ const FIGURE_PROVIDER_ORDER = [
   'figures-infra4.js',
   'figures-claude-certifications.js',
   'figures-mcpa-certifications.js',
+  'figures-iso.js',
 ];
 
 // fork 部署可通过环境变量覆盖；默认始终指向中文站。
@@ -1050,20 +1051,19 @@ function htmlEscape(value) {
 
 function renderCatalogDiscovery(phases, lessonManifest) {
   const rows = [];
+  const { lessonNumber } = require('./catalog');
   for (const phase of phases) {
-    for (const lesson of phase.lessons) {
+    let grouped = false;
+    phase.lessons.forEach((lesson, index) => {
       const relPath = lessonPath(lesson.url);
       const seo = relPath && lessonManifest.lessons[relPath];
-      if (!seo) continue;
-      rows.push(
-        `            <tr data-generated-discovery="lesson">` +
-        `<td><a href="${require('../lib/hub-routes').phaseHubPath(relPath)}">${htmlEscape(String(phase.id).padStart(2, '0'))}</a></td>` +
-        `<td><a href="${htmlEscape(lessonHref(relPath))}">${htmlEscape(seo.title)}</a></td>` +
-        `<td>${htmlEscape(lesson.type || '')}</td>` +
-        `<td>${htmlEscape(lesson.lang || '')}</td>` +
-        `<td>${htmlEscape(lesson.status || '')}</td></tr>`
-      );
-    }
+      if (!seo) return;
+      if (!grouped) {
+        grouped = true;
+        rows.push(`<tr class="catalog-group-row" data-generated-discovery="phase"><th colspan="6" scope="rowgroup"><a href="${require('../lib/hub-routes').phaseHubPath(relPath)}">阶段 ${phase.id}：${htmlEscape(phase.name)}</a></th></tr>`);
+      }
+      rows.push(`<tr data-generated-discovery="lesson"><td></td><td>${htmlEscape(lessonNumber(phase.id, lesson.url, index + 1).label)}</td><td><a href="${htmlEscape(lessonHref(relPath))}">${htmlEscape(seo.title)}</a></td><td>${htmlEscape(lesson.type || '')}</td><td>${htmlEscape(lesson.lang || '')}</td><td>${htmlEscape(lesson.status || '')}</td></tr>`);
+    });
   }
   return rows.join('\n');
 }
@@ -2049,11 +2049,10 @@ function withCard(html, type, id, spec) {
 }
 
 function versionSharedAssets(html) {
-  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2')
-    .replace(/(\bsrc=["']\/?(?:projects|project-markdown)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
-    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261021a$2')
-    .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261019a$2');
+    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+    .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2');
 }
 
 function stampSiteCards(cards) {
@@ -2127,6 +2126,9 @@ function build() {
   manualBuilder.writeWeb(allManuals);
   require('./build-skills').build();
   require('node:child_process').execFileSync(process.execPath, [path.join(REPO_ROOT, 'scripts/agent-machine/build.mjs')], { cwd: REPO_ROOT, stdio: 'inherit' });
+  for (const machine of ['decompiler-machine', 'gpu-machine']) {
+    require('node:child_process').execFileSync(process.execPath, [path.join(REPO_ROOT, 'scripts', machine, 'build.mjs')], { cwd: REPO_ROOT, stdio: 'inherit' });
+  }
   const sheetBuilder = require('./build-cheatsheets');
   const sheets = sheetBuilder.writeCheatsheets({ siteDir: __dirname, versionHtml: versionSharedAssets });
   const sheetCoverage = sheetBuilder.coverage(sheets.topics);
@@ -2141,6 +2143,10 @@ function build() {
     }))),
   });
   hubs.cheatsheetPages = sheets.pages;
+  const practice = require('./build-practice').writePractice({ siteDir: __dirname, versionHtml: versionSharedAssets });
+  hubs.practicePages = practice.pages;
+  hubs.practice = practice;
+  console.log(`   wrote ${practice.problems.length} practice problems in ${practice.tracks.length} tracks`);
   fs.writeFileSync(path.join(__dirname, 'hub-pages.json'), JSON.stringify({ pages: Object.fromEntries(
     [...hubs.phasePages, ...hubs.termPages].map(page => [page.href, {
       html: 'hubs' + page.href + '.html', markdown: 'agent-pages' + page.href + '.md',
@@ -2150,7 +2156,7 @@ function build() {
   replaceGeneratedDiscovery(path.join(__dirname, 'index.html'),
     '<!-- GENERATED:INTEGRATED-DISCOVERY:START -->', '<!-- GENERATED:INTEGRATED-DISCOVERY:END -->',
     `<section class="course-paths-section container" aria-label="实战与主题发现"><h2>在课程之外动手实践</h2>
-    <p><a href="projects.html">${projects.projects.length} 项实战项目</a> · <a href="manuals.html">${manuals.length} 本技术手册</a> · <a href="glossary.html">${glossaryTerms.length} 个术语</a></p>
+    <p><a href="projects.html">${projects.projects.length} 项实战项目</a> · <a href="manuals.html">${manuals.length} 本技术手册</a> · <a href="glossary.html">${glossaryTerms.length} 个术语</a> · <a href="/practice">${practice.problems.length} 道编程练习</a></p>
     <p>${hubs.phaseModels.map(phase => `<a href="${phase.href}">阶段 ${phase.id}：${htmlEscape(phase.name)}</a>`).join(' · ')}</p></section>`);
   replaceGeneratedDiscovery(path.join(__dirname, 'glossary.html'),
     '<!-- GENERATED:GLOSSARY-INDEX:START -->', '<!-- GENERATED:GLOSSARY-INDEX:END -->', hubs.glossaryIndex);
@@ -2230,6 +2236,8 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths, addi
     { loc: '/prereqs.html', priority: '0.7', freq: 'monthly' },
     { loc: '/skills.html', priority: '0.7', freq: 'monthly' },
     { loc: '/inside-an-ai-agent.html', priority: '0.7', freq: 'monthly' },
+    { loc: '/inside-a-decompiler.html', priority: '0.7', freq: 'monthly' },
+    { loc: '/inside-an-llm-serving-gpu.html', priority: '0.7', freq: 'monthly' },
     { loc: '/how-to-learn.html', priority: '0.7', freq: 'monthly' },
     { loc: '/about.html', priority: '0.5', freq: 'monthly' },
     { loc: '/learning-paths.html', priority: '0.8', freq: 'weekly' },
@@ -2263,12 +2271,15 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths, addi
       urls.push({ loc: '/project/' + project.id + '/', priority: '0.7', freq: 'monthly' });
       for (const stage of project.stages) urls.push({ loc: '/project/' + project.id + '/' + stage.id + '/', priority: '0.6', freq: 'monthly' });
     }
-    for (const manual of additions.manuals) urls.push({ loc: '/manual-' + manual.id + '.html', priority: '0.7', freq: 'monthly' });
-    for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages, ...additions.hubs.cheatsheetPages]) urls.push({ loc: page.href, priority: '0.6', freq: 'monthly' });
+    for (const manual of additions.manuals) {
+      urls.push({ loc: '/manual-' + manual.id + '.html', priority: '0.7', freq: 'monthly' });
+      for (const section of require('./build-manuals').manualSectionPages(manual)) urls.push({ loc: section.href, priority: '0.6', freq: 'monthly', lastmod: section.lastmod });
+    }
+    for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages, ...additions.hubs.cheatsheetPages, ...(additions.hubs.practicePages || [])]) urls.push({ loc: page.href, priority: '0.6', freq: 'monthly' });
   }
   const body = urls.map(u =>
     `  <url>\n    <loc>${SITE_ORIGIN}${u.loc.replace(/&/g, '&amp;')}</loc>\n` +
-    `    <lastmod>${today}</lastmod>\n    <changefreq>${u.freq}</changefreq>\n` +
+    `    <lastmod>${u.lastmod || today}</lastmod>\n    <changefreq>${u.freq}</changefreq>\n` +
     `    <priority>${u.priority}</priority>\n  </url>`).join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
@@ -2335,6 +2346,12 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
     out += '\n## 速查表与学习工具\n';
     for (const page of additions.hubs.cheatsheetPages) out += `- [${page.href}](${SITE_ORIGIN}${page.href})\n`;
     out += `- [学习方法](${SITE_ORIGIN}/how-to-learn.html)\n- [Agent 技能](${SITE_ORIGIN}/skills.html)\n- [AI Agent 内部机制](${SITE_ORIGIN}/inside-an-ai-agent.html)\n`;
+    if (additions.hubs.practice) {
+      out += '\n## 编程练习\n';
+      out += `- [编程练习](${SITE_ORIGIN}/practice) — ${additions.hubs.practice.problems.length} 道题，在浏览器中实现算法、复现论文方法、训练小模型或运行实验。Python 与 NumPy 在 Web Worker 中运行；也可用 \`python3 scripts/practice/run.py <id> <file>\` 在本机检查。\n`;
+      for (const problem of additions.hubs.practice.problems) out += `- [${problem.meta.title}](${SITE_ORIGIN}${problem.href}) — ${problem.meta.summary}\n`;
+    }
+    out += `- [反编译器内部机制](${SITE_ORIGIN}/inside-a-decompiler.html)\n- [LLM 推理 GPU 内部机制](${SITE_ORIGIN}/inside-an-llm-serving-gpu.html)\n`;
     out += '\n## 阶段与术语发现\n';
     for (const page of [...additions.hubs.phasePages, ...additions.hubs.termPages]) out += `- [${page.href.startsWith('/phase/') ? additions.hubs.phaseModels.find(model => model.href === page.href).name : additions.hubs.termModels.find(model => model.href === page.href).term.term}](${SITE_ORIGIN}${page.href})\n`;
   }
@@ -2513,6 +2530,7 @@ function writeLessonPages(phases, lessonManifest) {
           hubRoutes: require('../lib/hub-routes'),
           lessonTerms: JSON.parse(fs.readFileSync(path.join(__dirname, 'lesson-terms.json'), 'utf8')).lessons,
           cheatsheets: JSON.parse(fs.readFileSync(path.join(__dirname, 'cheatsheet-map.json'), 'utf8')).lessons,
+          practice: JSON.parse(fs.readFileSync(path.join(__dirname, 'practice-map.json'), 'utf8')).lessons,
         }) + '<!-- AIFS:LESSON-HUBS:END -->');
     }
     // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz

@@ -56,7 +56,7 @@ caption: 从上到下读。planner 通过配置和 well-known 路径找到 code-
 label: 接口选择的第一条规则
 source: spec §8.3.2
 ---
-"Parse `supportedInterfaces` if present, and select the first supported transport"
+存在 `supportedInterfaces` 时，读取该列表并选择第一个受支持的传输
 ```
 
 支持意味着客户端实现了该绑定和版本。JSON-RPC 1.0 客户端跳过 `GRPC` 条目及版本为 `0.3` 的 `JSONRPC` 条目，因为同一张卡片可以列出同一绑定的多个版本。 {{spec §3.6.2}}
@@ -69,7 +69,7 @@ source: spec §8.3.2
 label: 可选调用前读取卡片
 source: spec §3.3.4
 ---
-"Clients SHOULD validate capability support by examining the Agent Card before attempting operations that require optional capabilities."
+客户端在调用依赖可选能力的操作前，应先检查 Agent Card 中声明的能力。
 ```
 
 服务器侧是 `MUST` 规则：卡片不允许的调用以固定错误失败。下表列出错误及 JSON-RPC 代码。 {{spec §3.3.4}} {{spec §5.4}}

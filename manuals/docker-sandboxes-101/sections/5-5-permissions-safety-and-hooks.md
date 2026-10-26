@@ -10,12 +10,12 @@ agent 在 CI 用 `--exec` 运行，无人看终端。你希望 `echo` 运行，`
 label: 权限不是什么
 source: docs-agent Permissions
 ---
-"Permissions are enforced client-side. They help prevent accidental operations but should not be relied upon as a security boundary for untrusted agents."
+权限在客户端执行，用于避免误操作。它们不应被当成不可信 agent 的安全边界。
 ```
 
 引文释义：权限在客户端执行，可防止误操作，但不能作为不可信 agent 的安全边界。
 
-同页说 `restricted` “is defense in depth against unwanted tool calls, not a security boundary” {{docs-agent Permissions}}，只是防止非预期工具调用的纵深防御，不是安全边界。隔离应使用沙箱，见 [docker-agent run --sandbox](#s-docker-agent-run-sandbox-end-to-end)。
+同页说 `restricted` {{docs-agent Permissions}}，只是防止非预期工具调用的纵深防御，不是安全边界。隔离应使用沙箱，见 [docker-agent run --sandbox](#s-docker-agent-run-sandbox-end-to-end)。
 
 ## 受控 agent {#s-permissions-safety-and-hooks-the-guarded-agent}
 
@@ -67,7 +67,7 @@ permissions:
 | `restricted` | 允许 | 拒绝 | 拒绝 |
 | `autonomous` | 允许 | 允许 | 允许 |
 
-`--yolo` 等于 `--safety autonomous` {{help-agent docker-agent run}}。从未选模式的会话保留“the historical default: read-only tools auto-approve, everything else asks” {{docs-agent Permissions}}，只读自动批准，其余询问。因此[run、new 与 doctor](#s-docker-agent-run-new-and-doctor) 的 `wc -l` 即使标签 `safe` 仍询问，因为 `shell` 带 `readOnlyHint: false`。
+`--yolo` 等于 `--safety autonomous` {{help-agent docker-agent run}}。从未选模式的会话保留{{docs-agent Permissions}}，只读自动批准，其余询问。因此[run、new 与 doctor](#s-docker-agent-run-new-and-doctor) 的 `wc -l` 即使标签 `safe` 仍询问，因为 `shell` 带 `readOnlyHint: false`。
 
 ## 两种模式下的三次调用 {#s-permissions-safety-and-hooks-three-calls-in-two-modes}
 
@@ -104,7 +104,7 @@ note: 三行中的第三行；restricted 每次调用各一行。
 {"agent_name": "root", "cwd": "$CAPTURE", "hook_event_name": "pre_tool_use", "safety_policy": "restricted", "session_id": "<uuid>", "tool_input": {"cmd": "rm -rf work/m101-nothing"}, "tool_name": "shell", "tool_use_id": "<call-id>"}
 ```
 
-`log-hook.sh` 将该行追加到文件，并输出 `"permission_decision":"allow"`。事件流中三个调用都出现 `pre_tool_use_pre_yolo` 和 `"allowed": true`，但 `rm` 仍被拒绝，strict 的 `pwd` 仍询问。抢先 hook 的“an allow verdict is advisory” {{schema HookMatcherConfig}}，允许只是建议；拒绝或询问才会结束判断。
+`log-hook.sh` 将该行追加到文件，并输出 `"permission_decision":"allow"`。事件流中三个调用都出现 `pre_tool_use_pre_yolo` 和 `"allowed{{schema HookMatcherConfig}}，允许只是建议；拒绝或询问才会结束判断。
 
 每次调用还有两个 hooks：流中出现 `tool_input_transform` 和 `tool_response_transform`，即使没有文件声明。默认 `true` 的 `redact_secrets` 在这些事件安装内置 hook {{schema AgentConfig}}。hook 也可同时运行多次：一条消息请求三个命令时并行运行三次，其中两次同时追加日志（`capture/README.md`）。每条记录用一次 write 写入。
 

@@ -144,12 +144,18 @@ function allZhDocs(dir) {
   return files;
 }
 
-function figureFences(files) {
+function figureFences(files, instanceKeys = false) {
   const names = [];
   for (const file of files) {
     const markdown = fs.readFileSync(file, 'utf8');
     for (const match of markdown.matchAll(/```figure\s*\n([\s\S]*?)\n```/g)) {
-      names.push(match[1].trim().split(/\s+/, 1)[0]);
+      const spec = match[1].trim();
+      const name = spec.split(/\s+/, 1)[0];
+      if (instanceKeys && name === 'iso-machine') {
+        const options = JSON.parse(spec.slice(name.length).trim());
+        assert.equal(typeof options.machine, 'string', file + ': an isometric figure must select a machine');
+        names.push(name + ':' + options.machine);
+      } else names.push(name);
     }
   }
   return names;
@@ -261,7 +267,8 @@ async function main() {
     ...lazyEntries,
   ], 'complete registry', MCP_OVERRIDES);
   const fenceNames = figureFences(allZhDocs(path.join(root, 'phases')));
-  assert.equal(new Set(fenceNames).size, fenceNames.length, 'figure fence names must be unique');
+  const fenceKeys = figureFences(allZhDocs(path.join(root, 'phases')), true);
+  assert.equal(new Set(fenceKeys).size, fenceKeys.length, 'figure instances must be unique, including parameterized machine selectors');
   const missing = fenceNames.filter(function (name) { return !completeRegistry.has(name); });
   assert.deepEqual(missing, [], 'every zh figure fence must have a renderer');
   const certFenceNames = figureFences(allZhDocs(path.join(root, 'certifications', 'claude', 'lessons')));
@@ -280,7 +287,7 @@ async function main() {
   assert.equal(await single.window.AIFS_mountLessonFigures(scope(['few-shot-curve'])), true);
   assert.deepEqual(single.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20261013d',
+    'https://course.example/figures-i18n-zh.js?v=20261026a',
   ]);
   assert.equal(single.mounts.length, 1);
 
@@ -292,7 +299,7 @@ async function main() {
   assert.deepEqual(multi.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
     'https://course.example/figures-alignment3.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20261013d',
+    'https://course.example/figures-i18n-zh.js?v=20261026a',
   ]);
   assert.equal(multi.mounts.length, 2, 'mount may be retried; renderer-level markers make it idempotent');
 
@@ -301,7 +308,7 @@ async function main() {
   await spa.window.AIFS_mountLessonFigures(scope(['al-instruct-pipeline']));
   assert.deepEqual(spa.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20261013d',
+    'https://course.example/figures-i18n-zh.js?v=20261026a',
     'https://course.example/figures-alignment3.js?v=20260801a',
   ], 'a SPA remount loads only its new module; i18n stays loaded before each mount');
   assert.equal(spa.mounts.length, 2);
@@ -310,7 +317,7 @@ async function main() {
   assert.equal(await failed.window.AIFS_mountLessonFigures(scope(['few-shot-curve'])), true);
   assert.deepEqual(failed.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20261013d',
+    'https://course.example/figures-i18n-zh.js?v=20261026a',
   ]);
   assert.equal(failed.mounts.length, 1, 'a failed module must not block mounting the lesson body');
   assert.equal(failed.warnings.length, 1);
@@ -320,7 +327,7 @@ async function main() {
   await retry.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
   assert.deepEqual(retry.requests, [
     'https://course.example/figures-llmeng.js?v=20260801a',
-    'https://course.example/figures-i18n-zh.js?v=20261013d',
+    'https://course.example/figures-i18n-zh.js?v=20261026a',
     'https://course.example/figures-llmeng.js?v=20260801a',
   ], 'a later mount must retry a previously failed module without reloading i18n');
   assert.equal(retry.mounts.length, 2);

@@ -5,7 +5,7 @@ subtitle: 训练、采样并评估 VAE、GAN、DDPM、潜空间扩散与流匹�
 hue: 300
 sources: phases/08-generative-ai/02-autoencoders-vae, phases/08-generative-ai/03-gans-generator-discriminator, phases/08-generative-ai/06-diffusion-ddpm-from-scratch, phases/08-generative-ai/07-latent-diffusion-stable-diffusion, phases/08-generative-ai/08-controlnet-lora-conditioning, phases/08-generative-ai/13-flow-matching-rectified-flows, phases/08-generative-ai/14-evaluation-fid-clip-score
 code: DG
-source_hash: 56a0bbf8bc754e83
+source_hash: 7ccc3765e2b9a18e
 ---
 
 ## 带 CFG 的潜空间扩散

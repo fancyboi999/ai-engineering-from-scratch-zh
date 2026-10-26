@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261021a">
+  <link rel="stylesheet" href="style.css?v=20261026a">
   <script>
     (function () {
       var root = document.documentElement;
@@ -38,6 +38,8 @@
   --m-rule-strong: rgba(26, 26, 26, 0.42);
   --m-accent: #3553ff;
   --m-code-bg: #efece0;
+  --m-shine: #ffffff;
+  --m-shade: #1a1a1a;
 
   --m-grey-ink: #5e5e59;
   --m-grey-fill: #ecebe3;
@@ -76,6 +78,8 @@
   --m-rule-strong: rgba(232, 230, 220, 0.45);
   --m-accent: #6b8eff;
   --m-code-bg: #131830;
+  --m-shine: #3a4266;
+  --m-shade: #000000;
 
   --m-grey-ink: #b9b7ae;
   --m-grey-fill: rgba(232, 230, 220, 0.08);
@@ -234,12 +238,12 @@
 .sk-how q { quotes: none; font-family: var(--font-mono); font-size: 0.86rem; color: var(--ink); }
 .sk-example svg { fill: var(--m-ink); }
 </style>
-<meta property="og:image" content="https://aieng-zh.cn/og/page/skills.png?v=5e5d5c1a8087">
+<meta property="og:image" content="https://aieng-zh.cn/og/page/skills.png?v=052e00a4852f">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Agent 技能 - 从零构建 AI 工程">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://aieng-zh.cn/og/page/skills.png?v=5e5d5c1a8087">
+<meta name="twitter:image" content="https://aieng-zh.cn/og/page/skills.png?v=052e00a4852f">
 <meta name="twitter:image:alt" content="Agent 技能 - 从零构建 AI 工程">
 </head>
 <body>
@@ -257,6 +261,7 @@
 <a href="manuals.html" data-header-page="manuals">技术手册</a>
 <a href="glossary.html" data-header-page="glossary">术语表</a>
 <a href="cheatsheets" data-header-page="cheatsheets">速查表</a>
+<a href="practice" data-header-page="practice">编程练习</a>
 <a href="how-to-learn.html" data-header-page="how-to-learn">学习方法</a>
 <a href="skills.html" data-header-page="skills">Agent 技能</a>
 <a href="inside-an-ai-agent.html" data-header-page="inside-an-ai-agent">Agent 内部机制</a>
@@ -566,7 +571,7 @@
             <div class="sl-pane"><h4><span>本次请求加载</span><span data-loaded-total></span></h4><ol class="sl-loaded" data-loaded></ol></div>
             <div class="sl-meter"><p><span>已用上下文</span><span data-meter-label></span></p><div class="sl-track"><i data-meter></i></div></div>
             <p class="sl-verdict" data-verdict aria-live="polite"></p>
-            <script type="application/json" class="sl-data">{"skills":[{"name":"start-learning","tokens":117},{"name":"find-your-level","tokens":121},{"name":"course-guide","tokens":157},{"name":"learn","tokens":119},{"name":"check-understanding","tokens":80},{"name":"build-project","tokens":101},{"name":"learn-mcp","tokens":134},{"name":"learn-agent-skills","tokens":112},{"name":"learn-reverse-engineering","tokens":117},{"name":"claude-certification","tokens":121},{"name":"mcpa-certification","tokens":100},{"name":"course-style","tokens":106},{"name":"blueprint-figure","tokens":90},{"name":"motion-figure","tokens":98},{"name":"isometric-explainer","tokens":93},{"name":"write-manual","tokens":108}],"requests":[{"say":"测测我的水平","skill":"find-your-level","files":[{"path":"find-your-level/SKILL.md","tokens":1710},{"path":"references/answer-key.md","tokens":331}]},{"say":"教我 MCP","skill":"learn-mcp","files":[{"path":"learn-mcp/SKILL.md","tokens":2141}]},{"say":"画一张请求路径图","skill":"blueprint-figure","files":[{"path":"blueprint-figure/SKILL.md","tokens":2074},{"path":"references/kinds.md","tokens":1104},{"path":"references/grammar.md","tokens":1705},{"path":"references/checks.md","tokens":1063}]},{"say":"为这个工具编写手册","skill":"write-manual","files":[{"path":"write-manual/SKILL.md","tokens":2544},{"path":"references/manual-json.md","tokens":1389},{"path":"references/section-template.md","tokens":835},{"path":"references/research-and-sources.md","tokens":920},{"path":"references/prose-rules.md","tokens":845}]}],"full":64119}</script>
+            <script type="application/json" class="sl-data">{"skills":[{"name":"start-learning","tokens":117},{"name":"find-your-level","tokens":121},{"name":"course-guide","tokens":157},{"name":"learn","tokens":119},{"name":"check-understanding","tokens":80},{"name":"build-project","tokens":101},{"name":"learn-mcp","tokens":134},{"name":"learn-agent-skills","tokens":112},{"name":"learn-reverse-engineering","tokens":117},{"name":"claude-certification","tokens":121},{"name":"mcpa-certification","tokens":100},{"name":"course-style","tokens":106},{"name":"blueprint-figure","tokens":90},{"name":"motion-figure","tokens":98},{"name":"isometric-explainer","tokens":93},{"name":"write-manual","tokens":108}],"requests":[{"say":"测测我的水平","skill":"find-your-level","files":[{"path":"find-your-level/SKILL.md","tokens":1710},{"path":"references/answer-key.md","tokens":331}]},{"say":"教我 MCP","skill":"learn-mcp","files":[{"path":"learn-mcp/SKILL.md","tokens":2141}]},{"say":"画一张请求路径图","skill":"blueprint-figure","files":[{"path":"blueprint-figure/SKILL.md","tokens":2074},{"path":"references/kinds.md","tokens":1104},{"path":"references/grammar.md","tokens":1705},{"path":"references/checks.md","tokens":1063}]},{"say":"为这个工具编写手册","skill":"write-manual","files":[{"path":"write-manual/SKILL.md","tokens":2544},{"path":"references/manual-json.md","tokens":1389},{"path":"references/section-template.md","tokens":835},{"path":"references/research-and-sources.md","tokens":920},{"path":"references/prose-rules.md","tokens":845}]}],"full":65730}</script>
           </figure><span>交互演示：选择请求。token 数按实际技能文件的字节数除以 4 估算。</span></div>
           <footer>
             <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill motion-figure" aria-label="复制安装命令： motion-figure">复制安装命令</button>
@@ -664,8 +669,8 @@ python3 scripts/install_skills.py .skills --type all --dry-run</code></pre>
       });
     })();
   </script>
-  <script src="header.js?v=20261021a" defer></script>
+  <script src="header.js?v=20261026a" defer></script>
   <script src="dither.js?v=20261013a" defer></script>
-  <script src="skills-demo.js?v=20261019a" defer></script>
+  <script src="skills-demo.js?v=20261026a" defer></script>
 </body>
 </html>

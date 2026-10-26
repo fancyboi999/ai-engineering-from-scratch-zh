@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 236" role="img" aria-labelledby="fig-2-1b-title fig-2-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-2-1b-title">缓存池 token 容量决定可容纳的用户数</title>
+  <desc id="fig-2-1b-desc">L4 的缓存池可容纳 24,096 个 token。启动日志报告并发量 2.94，因为它假设每个用户都使用满 8,192-token 上下文。提示词为 512 token、输出为 128 token 时，每个用户占 640 token，因此可容纳 37 个用户。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">L4 上的 QWEN3-8B KV 缓存池</text>
+  <rect x="20" y="28" width="600" height="34" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="320" y="50" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">24,096 个 token；每个 144 KiB，共 3.31 GiB</text>
+  <text x="20" y="92" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每个用户都使用 8,192 个 TOKEN 时</text>
+  <rect x="20" y="100" width="200.98" height="30" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="223.98" y="100" width="200.98" height="30" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="427.97" y="100" width="192.03" height="30" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
+  <text x="20" y="148" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">最大并发量为 2.94，即启动日志中的数值</text>
+  <text x="20" y="176" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每个用户使用 640 个 TOKEN 时</text>
+  <rect x="20" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="35.94" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="51.87" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="67.81" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="83.75" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="99.68" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="115.62" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="131.55" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="147.49" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="163.43" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="179.36" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="195.3" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="211.24" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="227.17" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="243.11" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="259.04" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="274.98" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="290.92" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="306.85" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="322.79" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="338.73" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="354.66" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="370.6" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="386.53" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="402.47" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="418.41" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="434.34" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="450.28" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="466.22" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="482.15" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="498.09" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="514.02" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="529.96" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="545.9" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="561.83" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="577.77" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <rect x="593.71" y="184" width="13.94" height="22" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="20" y="226" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">可容纳 37 个用户，每人 512 个提示词 token、128 个输出 token</text>
+</svg>

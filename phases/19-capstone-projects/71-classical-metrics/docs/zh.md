@@ -27,7 +27,7 @@ cd-bleu-overlap
 
 ## Tokenization
 
-tokenizer 就是 `re.findall(r"\w+", text.lower())`。转小写、抓字母数字连续段、丢掉标点。这节课里的每个 metric 都用这个 exact 的 tokenizer。runner 没有选择权。换了 tokenizer，你跑的就是另一个 benchmark 了。
+tokenizer 就是 `re.findall(r"\w+", text.lower())`。转小写、提取连续的词字符（字母、数字和下划线），丢弃其他字符。这节课里的每个 metric 都用这个 exact 的 tokenizer。runner 没有选择权。换了 tokenizer，你跑的就是另一个 benchmark 了。
 
 ```python
 TOKEN_RE = re.compile(r"\w+", re.UNICODE)
@@ -66,7 +66,7 @@ flowchart LR
 
 ## BLEU-4
 
-BLEU 是机器翻译的经典 metric，至今仍出现在摘要工作里。我们采用的是 corpus 级别的 BLEU-4，配标准 brevity penalty，并在 modified n-gram count 上做加一 smoothing，这样单个缺失的 4-gram 不会把分数直接推到零。
+BLEU 是机器翻译的经典 metric，至今仍出现在摘要工作里。我们采用的是句子级 BLEU-4，逐个预测与参考配对计分，配标准 brevity penalty，并在 modified n-gram count 上做加一 smoothing，这样单个缺失的 4-gram 不会把分数直接推到零。
 
 对每一个 candidate-reference 对，我们对 n 等于 1、2、3、4 计 modified n-gram precision。modified precision 会把 candidate 的某个 n-gram 计数，clip 到该 n-gram 在任一 reference 中出现的最大次数，这样 candidate 就没法靠重复某个短语来灌水。四个 precision 的几何平均再被 brevity penalty 包住。
 
@@ -109,7 +109,7 @@ numpy 表让实现更易读；纯 Python 列表也能跑。选用 ROUGE-L 的任
 
 ## Accuracy
 
-对多 target 的分类任务，accuracy 退化为对单个归一化 target 做 exact-match。我们把它单独暴露成一个函数，这样分发器可以直接基于 `metric_name` 分发，而不必在 runner 内部走字符串比较。
+对分类任务，accuracy 使用 exact-match：预测只要匹配列表中的任一归一化 target，就记为 1。我们把它单独暴露成一个函数，这样分发器可以直接基于 `metric_name` 分发，而不必在 runner 内部走字符串比较。
 
 ## 分发契约
 

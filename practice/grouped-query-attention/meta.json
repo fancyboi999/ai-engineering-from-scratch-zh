@@ -1,0 +1,40 @@
+{
+  "id": "grouped-query-attention",
+  "title": "分组查询注意力（GQA）",
+  "kind": "research",
+  "summary": "用 H 个查询头和 G 组共享键值头计算 GQA 前向过程，并通过均值池化将多头检查点转换为分组投影。",
+  "difficulty": "medium",
+  "tags": [
+    "attention",
+    "gqa",
+    "transformers",
+    "kv-cache"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/03-multi-head-attention",
+  "cheatsheet": "attention-variants",
+  "minutes": 30,
+  "entry": [
+    "repeat_kv",
+    "grouped_query_attention",
+    "mean_pool_kv_heads"
+  ],
+  "collections": [
+    "papers-to-code",
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "method": "grouped-query-attention",
+  "paper": {
+    "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+    "authors": "Ainslie et al.",
+    "year": 2023,
+    "url": "https://arxiv.org/abs/2305.13245"
+  },
+  "mutants": {
+    "no_divisibility_check": "当 n_heads 不是 n_kv_heads 的整数倍时，没有抛出 ValueError。",
+    "pool_sum_not_mean": "对每组的头求和，而不是取均值。",
+    "pool_wrong_grouping": "将投影重塑为 (D, r, G, d_head)，导致每组池化的是间隔 G 的头。",
+    "scale_by_d_model": "将分数除以 sqrt(D)，而不是 sqrt(d_head)。",
+    "tile_not_repeat": "使用 np.tile，使查询头 h 对应 h mod G 组，而不是 h // r 组。"
+  }
+}

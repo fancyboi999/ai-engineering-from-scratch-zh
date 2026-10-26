@@ -1,0 +1,41 @@
+{
+  "id": "clip-contrastive-loss",
+  "title": "CLIP 对称对比损失",
+  "kind": "research",
+  "summary": "归一化图像和文本嵌入，构建带温度缩放的相似度矩阵，并计算对称 InfoNCE 损失及其梯度。",
+  "difficulty": "medium",
+  "tags": [
+    "clip",
+    "contrastive-learning",
+    "loss-functions",
+    "gradients"
+  ],
+  "lesson": "phases/04-computer-vision/18-open-vocab-clip",
+  "cheatsheet": "self-supervised-clip",
+  "minutes": 30,
+  "entry": [
+    "similarity_logits",
+    "symmetric_infonce",
+    "symmetric_infonce_grad"
+  ],
+  "collections": [
+    "papers-to-code",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "method": "clip",
+  "paper": {
+    "title": "Learning Transferable Visual Models From Natural Language Supervision",
+    "authors": "Radford et al.",
+    "year": 2021,
+    "url": "https://arxiv.org/abs/2103.00020"
+  },
+  "mutants": {
+    "grad_no_half": "将两项梯度相加后除以 N，而不是 2N。",
+    "grad_rows_twice": "计算文本项梯度时误用了行 softmax，未使用列 softmax。",
+    "image_loss_only": "只返回图像到文本的交叉熵，遗漏文本到图像项。",
+    "no_max_shift": "对原始 logits 直接调用 np.exp，大数值会溢出为无穷。",
+    "no_normalize": "跳过 L2 归一化，logits 会受嵌入长度影响。",
+    "times_temperature": "将相似度乘以温度，而不是除以温度。"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "rectified-flow-loss",
+  "title": "Rectified Flow 损失与 Euler 采样",
+  "kind": "research",
+  "summary": "实现 Rectified Flow 线性插值、目标速度、批次损失和 Euler ODE 采样。",
+  "difficulty": "medium",
+  "tags": [
+    "rectified-flow",
+    "flow-matching",
+    "generative-models",
+    "ode-solvers"
+  ],
+  "lesson": "phases/08-generative-ai/13-flow-matching-rectified-flows",
+  "cheatsheet": "diffusion-models",
+  "minutes": 25,
+  "entry": [
+    "interpolate",
+    "target_velocity",
+    "flow_matching_loss",
+    "euler_sample"
+  ],
+  "collections": [
+    "papers-to-code",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "method": "rectified-flow",
+  "paper": {
+    "title": "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow",
+    "authors": "Liu, Gong and Liu",
+    "year": 2022,
+    "url": "https://arxiv.org/abs/2209.03003"
+  },
+  "mutants": {
+    "euler_in_place": "通过与 x0 共享内存的数组用 += 更新 x，导致调用方输入被修改。",
+    "euler_one_step_short": "循环只执行 num_steps - 1 步，样本未到达 t = 1。",
+    "euler_time_at_end": "在每步末尾 (k + 1) / n 读取速度，而不是在步首时刻读取。",
+    "interpolation_swapped": "将 t 和 1 - t 分别用于错误的端点，使路径方向反转。",
+    "mean_over_all_elements": "对所有误差元素求均值，而不是先对每个样本的特征求和再对批次求均值。",
+    "target_reversed": "目标速度用 x0 - x1，符号方向错误。"
+  }
+}

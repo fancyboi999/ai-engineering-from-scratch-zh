@@ -5,7 +5,7 @@ code: GM
 subtitle: 检查输入输出、路由分类结论、遮盖文本区间并把关工具调用。采用课程中的 Python 与 Rust 实现。
 hue: 350
 sources: phases/11-llm-engineering/12-guardrails, phases/15-autonomous-systems/18-llama-guard, phases/18-ethics-safety-alignment/29-moderation-systems-openai-perspective-llamaguard, phases/19-capstone-projects/85-content-classifier-integration, projects/sensitive-text-redaction-gate, projects/tool-call-firewall
-source_hash: 63de3bc0616abfd2
+source_hash: 5d0426c4658906d5
 ---
 
 ## 护栏检查

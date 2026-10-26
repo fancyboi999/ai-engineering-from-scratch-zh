@@ -5,7 +5,7 @@ code: MN
 subtitle: 选择大型云服务商、推理平台或自托管引擎，计算价格与容量，缩短冷启动。
 hue: 28
 sources: phases/17-infrastructure-and-production/01-managed-llm-platforms, phases/17-infrastructure-and-production/02-inference-platform-economics, phases/17-infrastructure-and-production/10-cold-start-mitigation, phases/17-infrastructure-and-production/28-self-hosted-serving-selection
-source_hash: 54d1d39c5c16eb19
+source_hash: 23d50b06eb5719cd
 ---
 
 ## 三家大型云服务商对比

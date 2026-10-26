@@ -34,7 +34,7 @@ flowchart LR
     Writer --> Report[Demo 报告]
 ```
 
-五个阶段。Seed 是三个假设的列表。Scheduler 在三个并行 slot 上跑六个实验。Bus 报告一个或多个论文触发。Picker 选出单个最佳结果。Critic loop 在基于该结果构建的草稿上迭代。Paper writer 输出最终的 LaTeX、BibTeX 和 manifest。
+六个阶段。Seed 是三个假设的列表。Scheduler 在三个并行 slot 上跑六个实验。Bus 报告一个或多个论文触发。Picker 选出单个最佳结果。Critic loop 在基于该结果构建的草稿上迭代。Paper writer 输出最终的 LaTeX、BibTeX 和 manifest。
 
 ## 为什么用 import，不是 copy
 

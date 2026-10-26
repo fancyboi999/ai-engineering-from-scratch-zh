@@ -14,6 +14,11 @@ on:
   push:
     branches: [main]
     paths:
+      - "practice/**"
+      - "research/**"
+      - "scripts/practice/**"
+      - "scripts/decompiler-machine/**"
+      - "scripts/gpu-machine/**"
       - "cheatsheets/**"
       - "scripts/agent-machine/**"
       - "scripts/check_lesson_math.js"
@@ -81,6 +86,13 @@ jobs:
           git archive 45fa4084de6ba2f88fa96a41e69efa2166f868b3 phases manuals projects cheatsheets | tar -x -C "$RUNNER_TEMP/aifs-cheatsheet-evidence"
           echo 45fa4084de6ba2f88fa96a41e69efa2166f868b3 > "$RUNNER_TEMP/aifs-cheatsheet-evidence/.aifs-upstream-revision"
           echo "AIFS_CHEATSHEET_EVIDENCE_ROOT=$RUNNER_TEMP/aifs-cheatsheet-evidence" >> "$GITHUB_ENV"
+      - name: 冻结本轮更新的速查表证据来源
+        run: |
+          git fetch --no-tags https://github.com/rohitg00/ai-engineering-from-scratch.git 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a
+          mkdir -p "$RUNNER_TEMP/aifs-cheatsheet-evidence-updated"
+          git archive 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a phases manuals projects cheatsheets | tar -x -C "$RUNNER_TEMP/aifs-cheatsheet-evidence-updated"
+          echo 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a > "$RUNNER_TEMP/aifs-cheatsheet-evidence-updated/.aifs-upstream-revision"
+          echo "AIFS_CHEATSHEET_EVIDENCE_ROOTS=$RUNNER_TEMP/aifs-cheatsheet-evidence:$RUNNER_TEMP/aifs-cheatsheet-evidence-updated" >> "$GITHUB_ENV"
       - name: verify output
         run: |
           test -f site/data.js || { echo "data.js 未生成"; exit 1; }
@@ -132,7 +144,7 @@ jobs:
         run: find site -maxdepth 1 -name '*.js' -print0 | xargs -0 -r -n1 node --check
       - name: 部署函数文件追踪与独立 bundle 运行
         run: |
-          npm install --prefix "$RUNNER_TEMP/function-trace" --no-save --no-package-lock @vercel/nft@1.5.0
+          npm install --prefix "$RUNNER_TEMP/function-trace" --no-save --no-package-lock @vercel/nft@1.5.0 @vercel/routing-utils@6.6.0
           NODE_PATH="$RUNNER_TEMP/function-trace/node_modules" node --test scripts/test_function_bundles.js
       - name: Agent 内容协商、REST 和 MCP 协议回归
         run: |
@@ -213,6 +225,12 @@ jobs:
           python3 manuals/a2a-101/tests/test_static_contract.py
           node scripts/test_og.js
           node scripts/check_og_cards.js --require-manifests
+      - name: 编程练习真实参考解与错误实现校验
+        run: |
+          python3 -m pip install 'numpy>=2.2,<3'
+          python3 scripts/practice/test_harness.py
+          python3 scripts/practice/validate.py
+          node site/build-practice.js --check
       - name: 真实 DOM 安全与有界显示回归（非视觉验收）
         run: |
           CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"

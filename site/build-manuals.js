@@ -44,6 +44,138 @@ function slugify(text) {
 function sectionAnchor(file) { return `s-${path.basename(file, '.md').replace(/^\d+-\d+-/, '').replace(/^r-\d+-/, 'ref-')}`; }
 function pageName(id) { return `manual-${id}.html`; }
 
+function manualDocuments(manual) {
+  return [
+    ...(manual.front ? [manual.front] : []),
+    ...manual.parts.flatMap(part => part.sections),
+    ...(manual.reference ? manual.reference.sections : []),
+  ];
+}
+
+function sectionHref(manual, anchorOrDoc) {
+  const anchor = typeof anchorOrDoc === 'string'
+    ? anchorOrDoc.replace(/^#/, '')
+    : anchorOrDoc && anchorOrDoc.anchor;
+  const doc = typeof anchorOrDoc === 'object' && anchorOrDoc
+    ? anchorOrDoc
+    : manualDocuments(manual).find(item => item.anchor === anchor);
+  if (!doc || !doc.anchor) return null;
+  return `/manual-${manual.id}/${doc.anchor.replace(/^s-/, '')}`;
+}
+
+function fileLastModified(files, fallback, shallow) {
+  try {
+    const out = require('child_process').execFileSync('git', ['log', '-1', '--format=%H %cs', '--', ...files], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    const [hash, date] = out.split(' ');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date || '') && !shallow.has(hash)) return date;
+  } catch (error) {
+    return fallback;
+  }
+  return fallback;
+}
+
+function manualSectionPages(manual) {
+  const shallow = new Set();
+  try {
+    const file = require('child_process').execFileSync('git', ['rev-parse', '--git-path', 'shallow'], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    const full = path.resolve(ROOT, file);
+    if (fs.existsSync(full)) {
+      for (const hash of fs.readFileSync(full, 'utf8').split(/\s+/).filter(Boolean)) shallow.add(hash);
+    }
+  } catch (error) {
+    // A missing git checkout uses the pinned verification date below.
+  }
+  return manualDocuments(manual).map(doc => {
+    const figures = doc.blocks.filter(block => block.type === 'figure')
+      .map(block => rel(path.join(manual.dir, 'figures', `${block.id}.svg`)));
+    return {
+      href: sectionHref(manual, doc),
+      lastmod: fileLastModified([doc.label, manual.label, ...figures], manual.pin.verified, shallow),
+    };
+  });
+}
+
+function evidenceUrl(file, where) {
+  const full = path.resolve(file);
+  // Isolated unit fixtures live outside the checkout. They still exercise the
+  // renderer, but must not be turned into public repository URLs.
+  const fromRoot = path.relative(ROOT, full);
+  if (fromRoot.startsWith('..') || path.isAbsolute(fromRoot)) return '#fixture-evidence';
+  ensure(fs.existsSync(full), `${where}: evidence path ${rel(full)} does not exist`);
+  return githubSourceUrl(rel(full), fs.statSync(full).isDirectory() ? 'tree' : 'blob');
+}
+
+function evidenceLink(url, label = '完整记录') {
+  return `<a class="m-evidence" href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
+}
+
+function readerCaption(caption) {
+  const text = String(caption || '').trim();
+  const matches = [...text.matchAll(/(?:\s+|。)(?:From (?!step\b)|来源[：:])[^。]*$/g)];
+  if (!matches.length) return text;
+  const match = matches[matches.length - 1];
+  const tail = text.slice(match.index).trim();
+  if (!/(?:\/|\.(?:txt|json|jsonl|log|md|py|ts|proto|http|yaml)\b|\bcapture\b|\bsource\b|\b来源[：:]|\b代码\b|\b文档\b|\b报告\b|\bv\d)/i.test(tail)) return text;
+  return text.slice(0, match.index).trim();
+}
+
+function measuredEvidence(doc, manual) {
+  const has = rel => fs.existsSync(path.join(manual.dir, rel));
+  const sources = doc.blocks.find(block => block.type === 'paragraph' && SOURCE_LINE.test(block.text));
+  if (!sources) return;
+  const context = `${doc.title} ${doc.thesis} ${sources.text}`;
+  const picked = [];
+  const add = rel => { if (has(rel) && !picked.includes(rel)) picked.push(rel); };
+  const isL4 = /L4/i.test(context);
+  const isGb10 = /GB10/i.test(context);
+  const isMac = /Mac|Apple silicon/i.test(context);
+  if (/Miles|reward/i.test(context)) add('capture/gpu/summary/miles-gb10.json');
+  else if (isL4 && !isGb10 && !isMac) {
+    add(/hot|throttl/i.test(context) ? 'capture/gpu/summary/l4-throttled.json' : 'capture/gpu/summary/l4.json');
+  } else if (isGb10 && !isL4 && !isMac) add('capture/gpu/summary/gb10.json');
+  else if (isMac && !isL4 && !isGb10 && has('capture/out/')) add('capture/out');
+  else {
+    for (const match of sources.text.matchAll(/capture\/gpu\/summary\/[\w.-]+\.json/g)) add(match[0]);
+    if (!picked.length && (has('capture/gpu/') || has('capture/out/'))) add(has('capture/gpu/') ? 'capture/gpu' : 'capture/out');
+  }
+  if (picked.length) doc.evidence = evidenceLink(evidenceUrl(path.join(manual.dir, picked[0]), doc.label), '原始运行');
+}
+
+function labRunsHtml(manual, where) {
+  const dir = path.join(manual.dir, 'capture', 'gpu', 'summary');
+  if (!fs.existsSync(dir)) return '';
+  const rows = [];
+  for (const name of fs.readdirSync(dir).filter(file => file.endsWith('.json')).sort()) {
+    const file = path.join(dir, name);
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const link = evidenceLink(evidenceUrl(file, where), '运行汇总');
+    if (data.profile && data.environment) {
+      for (const [sweep, configs] of Object.entries(data)) {
+        if (['profile', 'slo', 'environment', 'quantiles'].includes(sweep) || !configs || typeof configs !== 'object') continue;
+        const counts = Object.values(configs).flatMap(config => (config.points || []).map(point => point.output_throughput && point.output_throughput.n || 0)).filter(Boolean);
+        const low = counts.length ? Math.min(...counts) : 0;
+        const high = counts.length ? Math.max(...counts) : 0;
+        const seeds = !high ? '见对应章节' : low === high ? String(high) : `${low}–${high}`;
+        rows.push({ cells: [escapeHtml(sweep), escapeHtml(`${data.environment.gpu}${name.includes('throttled') ? '（降频）' : ''}`), String(Object.keys(configs).length), seeds, link] });
+      }
+    } else {
+      for (const [run, result] of Object.entries(data)) {
+        const started = result && Array.isArray(result.rollouts) && result.rollouts.length > 0;
+        rows.push({ cells: [escapeHtml(run), '见对应章节', '1', started ? '1' : '未进入首次 rollout', link] });
+      }
+    }
+  }
+  return tableHtml(['实验', '硬件', '配置数', '每点种子数', '数据'], rows);
+}
+
 function keyValues(lines, label, kind, required, optional = []) {
   const allowed = [...required, ...optional];
   const values = {};
@@ -106,7 +238,7 @@ function fenceBlock(info, body, label) {
     ensure(items.length >= 2, `${label}: takeaways need at least two items`);
     return { type: 'takeaways', items };
   }
-  if (['palette', 'parts', 'figure-index', 'contents'].includes(info)) {
+  if (['palette', 'parts', 'figure-index', 'contents', 'lab-runs'].includes(info)) {
     ensure(!body.some(line => line.trim()), `${label}: a ${info} block must be empty`);
     return { type: info };
   }
@@ -238,7 +370,7 @@ function inlineHtml(source, where, acc) {
   const codes = [];
   let html = String(source).replace(/`([^`]+)`/g, (match, code) => { codes.push(code); return `\u0000${codes.length - 1}\u0000`; });
   html = escapeHtml(html);
-  html = html.replace(/\{\{(.+?)\}\}/g, (match, cite) => `<span class="m-cite">${cite}</span>`);
+  html = html.replace(/\s*\{\{(.+?)\}\}/g, '');
   html = html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (match, label, href) => linkHtml(label, href.replace(/&amp;/g, '&').replace(/&#39;/g, "'"), where, acc));
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/(^|[^*\w])\*(?!\s)([^*]+?)\*(?!\w)/g, '$1<em>$2</em>');
@@ -254,6 +386,10 @@ function linkHtml(label, href, where, acc) {
   ensure(!/^[a-z][a-z0-9+.-]*:/i.test(href) && !href.startsWith('/'), `${where}: unsupported link target "${href}"`);
   const [target, fragment] = href.split('#');
   acc.repoLinks.push({ path: target, where });
+  if (/^manuals\/[^/]+\/capture(?:\/|$)/.test(target)) {
+    const full = within(ROOT, path.join(ROOT, target));
+    return `<a class="m-evidence" href="${escapeHtml(evidenceUrl(full, where) + (fragment ? `#${fragment}` : ''))}" target="_blank" rel="noopener">${label}</a>`;
+  }
   return `<a href="${escapeHtml(githubSourceUrl(target) + (fragment ? `#${fragment}` : ''))}" rel="noopener">${label}</a>`;
 }
 
@@ -469,7 +605,8 @@ function figureHtml(block) {
 }
 
 function tableHtml(head, rows) {
-  return `<div class="m-table-wrap"><table class="m-table"><thead><tr>${head.map(cell => `<th>${cell}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr${row.accent ? ` data-accent="${row.accent}"` : ''}>${row.cells.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const keep = head.map((cell, index) => ({ cell, index })).filter(({ cell, index }) => cell.trim() && rows.some(row => String(row.cells[index] || '').trim()));
+  return `<div class="m-table-wrap"><table class="m-table"><thead><tr>${keep.map(({ cell }) => `<th>${cell}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr${row.accent ? ` data-accent="${row.accent}"` : ''}>${keep.map(({ index }) => `<td>${row.cells[index] || ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 function blockHtml(block, doc, manual, acc) {
@@ -478,8 +615,9 @@ function blockHtml(block, doc, manual, acc) {
   switch (block.type) {
     case 'heading': return `<h${block.level} id="${block.id}">${inline(block.text)}</h${block.level}>`;
     case 'paragraph': {
-      if (SOURCE_LINE.test(block.text)) return `<p class="m-sources"><span class="m-sources-label">来源：</span>${inline(block.text.replace(SOURCE_LINE, ''))}</p>`;
-      return `<p${/^\*\*[^*]+[：:]\*\*\s/.test(block.text) ? ' class="m-def"' : ''}>${inline(block.text)}</p>`;
+      if (SOURCE_LINE.test(block.text)) return '';
+      const measured = /^\*\*(?:我们测得|我们实测|实测|We measured)\*\*/i.test(block.text);
+      return `<p${/^\*\*[^*]+[：:]\*\*\s/.test(block.text) ? ' class="m-def"' : ''}>${inline(block.text)}${measured && doc.evidence ? ` ${doc.evidence}` : ''}</p>`;
     }
     case 'list': {
       const tag = block.ordered ? 'ol' : 'ul';
@@ -496,9 +634,10 @@ function blockHtml(block, doc, manual, acc) {
     }
     case 'figure-index': return tableHtml(['图', '图中说明的结论'], [...manual.figures.values()].map(figure => ({ accent: figure.accent, cells: [`<a class="m-xref" href="#${figure.id}">${figure.number}</a>`, figure.claimHtml] })));
     case 'contents': return tocHtml(manual, 'web');
-    case 'listing': return `<figure class="m-listing" data-source="${escapeHtml(block.source)}"><div class="m-listing-head"><span class="m-listing-title">${inline(block.title)}</span><span class="m-listing-src">${escapeHtml(block.source)}</span><span>${escapeHtml(block.lang)}</span></div><pre><code>${highlight(block.code, block.lang)}</code></pre>${block.note ? `<figcaption class="m-listing-note">${inline(block.note)}</figcaption>` : ''}</figure>`;
+    case 'listing': return `<figure class="m-listing" data-source="${escapeHtml(block.source)}"><div class="m-listing-head"><span class="m-listing-title">${inline(block.title)}</span>${evidenceLink(evidenceUrl(block.sourceFile, where))}<span>${escapeHtml(block.lang)}</span></div><pre><code>${highlight(block.code, block.lang)}</code></pre>${block.note ? `<figcaption class="m-listing-note">${inline(block.note)}</figcaption>` : ''}</figure>`;
     case 'takeaways': return `<aside class="m-takeaways"><div class="m-box-label">${TAKEAWAYS_LABEL}</div><ul>${block.items.map(item => `<li>${inline(item)}</li>`).join('')}</ul></aside>`;
-    case 'rule': return `<aside class="m-rule"><div class="m-box-label">${escapeHtml(block.label)}</div><blockquote>${inline(block.quote)}</blockquote><div class="m-rule-src">${escapeHtml(block.source)}</div></aside>`;
+    case 'rule': return `<aside class="m-rule"><div class="m-box-label">${escapeHtml(block.label)}</div><p>${inline(block.quote)}</p></aside>`;
+    case 'lab-runs': return labRunsHtml(manual, where);
     default: throw new Error(`${where}: unknown block ${block.type}`);
   }
 }
@@ -512,14 +651,15 @@ function renderAll(manual, acc) {
   manual.paletteHtml = manual.palette.map(entry => ({ hue: entry.hue, html: inlineHtml(entry.meaning, `${label} palette`, acc) }));
   for (const part of manual.parts) part.summaryHtml = inlineHtml(part.summary || part.thesis, `${label} part ${part.number}`, acc);
   if (manual.reference) manual.reference.summaryHtml = inlineHtml(manual.reference.summary || manual.reference.thesis || '本手册所有名称的速查表。', `${label} reference`, acc);
-  if (manual.plate) manual.plate.captionHtml = inlineHtml(manual.plate.caption, `${label} plate caption`, acc);
+  if (manual.plate) manual.plate.captionHtml = inlineHtml(readerCaption(manual.plate.caption), `${label} plate caption`, acc);
   for (const doc of manual.documents) {
     for (const block of doc.blocks.filter(item => item.type === 'figure')) {
       block.claimHtml = inlineHtml(block.claim, docLine(doc, block.line), acc);
-      block.captionHtml = inlineHtml(block.caption, docLine(doc, block.line), acc);
+      block.captionHtml = inlineHtml(readerCaption(block.caption), docLine(doc, block.line), acc);
     }
   }
   for (const doc of manual.documents) {
+    measuredEvidence(doc, manual);
     doc.thesisHtml = doc.thesis ? inlineHtml(doc.thesis, docLine(doc, doc.thesisLine), acc) : '';
     doc.html = numberFigureLinks(doc.blocks.map(block => blockHtml(block, doc, manual, acc)).join('\n'), manual);
   }
@@ -537,11 +677,13 @@ function tocHtml(manual, mode) {
   return `<nav class="m-toc" aria-label="目录">${head}<ol>${groups.join('')}</ol></nav>`;
 }
 
-function docHtml(doc, mode) {
+function docHtml(doc, mode, manual) {
   const front = doc.kind === 'front';
   // Print targets must travel with the kept-together heading, not a preceding section rule.
   const anchor = ` id="${doc.anchor}"`;
-  return `<section class="${front ? 'm-front-section' : 'm-section'}"${mode === 'print' ? '' : anchor} data-accent="${doc.accent}"><header class="m-section-head"${mode === 'print' ? anchor : ''}><div class="m-section-num">${front ? '00' : doc.id}</div><h1 class="m-section-title">${escapeHtml(doc.title)}</h1>${doc.thesisHtml ? `<p class="m-thesis">${doc.thesisHtml}</p>` : ''}</header>${doc.html}</section>`;
+  const number = front ? '00' : doc.id;
+  const numberHtml = mode === 'web' && manual && !front ? `<a class="m-section-link" href="${sectionHref(manual, doc)}">${number}</a>` : number;
+  return `<section class="${front ? 'm-front-section' : 'm-section'}"${mode === 'print' ? '' : anchor} data-accent="${doc.accent}"><header class="m-section-head"${mode === 'print' ? anchor : ''}><div class="m-section-num">${numberHtml}</div><h1 class="m-section-title">${escapeHtml(doc.title)}</h1>${doc.thesisHtml ? `<p class="m-thesis">${doc.thesisHtml}</p>` : ''}</header>${doc.html}</section>`;
 }
 
 function ditherHtml(seed, label, slim) {
@@ -606,14 +748,14 @@ function coverHtml(manual, mode) {
 function manualArticle(manual, mode) {
   const band = (seed, label) => (mode === 'web' ? ditherHtml(`${manual.id}-${seed}`, label, true) : '');
   const body = [];
-  if (manual.front) body.push(docHtml(manual.front, mode));
+  if (manual.front) body.push(docHtml(manual.front, mode, manual));
   for (const part of manual.parts) {
     body.push(partHtml(part, `第 ${part.number} 部分`, band(part.anchor, `第 ${part.number} 部分 · ${part.title}`)));
-    for (const section of part.sections) body.push(docHtml(section, mode));
+    for (const section of part.sections) body.push(docHtml(section, mode, manual));
   }
   if (manual.reference) {
     body.push(partHtml(manual.reference, '参考', band('reference', manual.reference.title)));
-    for (const section of manual.reference.sections) body.push(docHtml(section, mode));
+    for (const section of manual.reference.sections) body.push(docHtml(section, mode, manual));
   }
   return `<article class="manual">${coverHtml(manual, mode)}${mode === 'print' ? tocHtml(manual, 'print') : ''}${body.join('\n')}\n${colophonHtml(manual)}</article>`;
 }
@@ -630,8 +772,10 @@ function highlightsScripts(highlights) {
 `;
 }
 
-function pageShell({ title, ogTitle, description, canonical, noindex, card, main, highlights }) {
+function pageShell({ title, ogTitle, description, canonical, noindex, card, main, highlights, rooted = false, jsonld = [] }) {
+  const base = rooted ? '/' : '';
   const css = shared('tokens.css') + shared('manual.css') + shared('web.css');
+  const jsonldHtml = jsonld.length ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': jsonld }).replace(/</g, '\\u003c')}</script>` : '';
   return `<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
@@ -649,19 +793,20 @@ ${noindex ? '<meta name="robots" content="noindex">\n' : ''}<link rel="canonical
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${FONT_LINK}" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-${highlights ? '<link rel="stylesheet" href="highlights.css">\n' : ''}<style>${css}</style>
+<link rel="stylesheet" href="${base}style.css">
+${highlights ? `<link rel="stylesheet" href="${base}highlights.css">\n` : ''}<style>${css}</style>
+${jsonldHtml}
 <script>${shared('theme.js')}</script>
 </head>
 <body>
 <a href="#main" class="skip-link">跳到正文</a>
-${SITE_HEADER}
+${rooted ? renderHeader({ base: '/' }) : SITE_HEADER}
 ${main}
-<footer class="site-footer"><div class="container footer-inner"><p>AI Engineering from Scratch · 中文开源课程。</p><div class="footer-links"><a href="index.html">首页</a><a href="manuals.html">手册</a><a href="catalog.html">课程表</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a></div></div></footer>
-<script src="data.js"></script>
-<script src="content-source.js"></script>
-<script src="header.js?v=${HEADER_ASSET_VERSION}" defer></script>
-<script src="cmdpalette.js" defer></script>
+<footer class="site-footer"><div class="container footer-inner"><p>AI Engineering from Scratch · 中文开源课程。</p><div class="footer-links"><a href="${base}index.html">首页</a><a href="${base}manuals.html">手册</a><a href="${base}catalog.html">课程表</a><a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener">GitHub</a></div></div></footer>
+<script src="${base}data.js"></script>
+<script src="${base}content-source.js"></script>
+<script src="${base}header.js?v=${HEADER_ASSET_VERSION}" defer></script>
+<script src="${base}cmdpalette.js" defer></script>
 <script>${shared('dither.js')}</script>
 <script>${shared('motion.js')}</script>
 ${highlightsScripts(highlights)}</body>
@@ -696,6 +841,115 @@ function manualCard(manual) {
   actions.push(sourceAction(manual));
   const draft = manual.status === 'draft' ? '<div class="m-draft-note">草稿版本</div>' : '';
   return `<article class="m-index-card">${draft}<div class="m-kicker m-index-pin">${pinLine(manual)}</div><h2 class="m-index-name"><a href="${pageName(manual.id)}">${escapeHtml(manual.title)}</a></h2><p class="m-index-subtitle">${escapeHtml(manual.subtitle)}</p><p class="m-index-summary">${escapeHtml(manual.summary)}</p>${partDots(manual)}<div class="m-kicker m-index-stats">${manual.parts.length} 部分 · ${sectionCount(manual)} 节 · ${manual.figures.size} 图</div><div class="m-index-actions">${actions.join('')}</div>${plateHtml(manual, 'class="m-fig m-plate"')}</article>`;
+}
+
+function manualUrl(manual) { return `/manual-${manual.id}`; }
+
+function readingOrder(manual) {
+  const order = [];
+  if (manual.front) order.push({ doc: manual.front, part: null });
+  for (const part of manual.parts) for (const doc of part.sections) order.push({ doc, part: { title: part.title, anchor: part.anchor, label: `第 ${part.number} 部分` } });
+  if (manual.reference) for (const doc of manual.reference.sections) order.push({ doc, part: { title: manual.reference.title, anchor: 'p-r', label: '参考' } });
+  return order;
+}
+
+function sectionDescription(doc) {
+  const first = doc.blocks.find(block => block.type === 'paragraph' && !SOURCE_LINE.test(block.text));
+  const value = doc.thesis || first && first.text || doc.title;
+  return String(value).replace(/`([^`]+)`/g, '$1').replace(/\{\{[^}]+\}\}/g, '').replace(/\s+/g, ' ').slice(0, 220);
+}
+
+function sectionTocHtml(manual, current) {
+  const link = (href, kicker, title, selected = false) => `<li><a href="${escapeHtml(href)}"${selected ? ' aria-current="page"' : ''}><span class="m-kicker">${escapeHtml(kicker)}</span><span>${escapeHtml(title)}</span></a></li>`;
+  const groups = [];
+  if (manual.front) groups.push(`<li class="m-toc-part" data-accent="grey"><ol>${link(sectionHref(manual, manual.front), '00', manual.front.title, manual.front === current)}</ol></li>`);
+  for (const part of manual.parts) {
+    const items = part.sections.map(doc => link(sectionHref(manual, doc), doc.id, doc.title, doc === current)).join('');
+    groups.push(`<li class="m-toc-part" data-accent="${part.accent}"><a class="m-toc-label" href="${manualUrl(manual)}#${part.anchor}"><span class="m-kicker">${String(part.number).padStart(2, '0')}</span><span>${escapeHtml(part.title)}</span></a><ol>${items}</ol></li>`);
+  }
+  if (manual.reference) {
+    const items = manual.reference.sections.map(doc => link(sectionHref(manual, doc), doc.id, doc.title, doc === current)).join('');
+    groups.push(`<li class="m-toc-part" data-accent="${manual.reference.accent}"><a class="m-toc-label" href="${manualUrl(manual)}#p-r"><span class="m-kicker">R</span><span>${escapeHtml(manual.reference.title)}</span></a><ol>${items}</ol></li>`);
+  }
+  return `<nav class="m-toc" aria-label="章节"><div class="m-kicker m-toc-label"><a href="${manualUrl(manual)}">${escapeHtml(manual.title)}</a></div><ol>${groups.join('')}</ol></nav>`;
+}
+
+function sectionTargets(manual) {
+  const targets = new Map();
+  const base = manualUrl(manual);
+  for (const part of manual.parts) targets.set(part.anchor, `${base}#${part.anchor}`);
+  if (manual.reference) targets.set('p-r', `${base}#p-r`);
+  for (const { doc } of readingOrder(manual)) {
+    const href = sectionHref(manual, doc);
+    targets.set(doc.anchor, href);
+    for (const match of doc.html.matchAll(/\sid="([a-z0-9-]+)"/g)) targets.set(match[1], href);
+  }
+  return targets;
+}
+
+function retargetSectionLinks(html, targets, current) {
+  return html.replace(/href="#([a-z0-9-]+)"/g, (match, id) => {
+    const target = targets.get(id);
+    if (!target) return match;
+    if (target === current) return `href="#${id}"`;
+    return `href="${escapeHtml(target)}#${id}"`;
+  });
+}
+
+function sectionPage(manual, order, index, targets, modified) {
+  const { doc, part } = order[index];
+  const pathName = sectionHref(manual, doc);
+  const canonical = `${SITE_ORIGIN}${pathName}`;
+  const description = sectionDescription(doc);
+  const crumbs = [`<a href="/manuals">手册</a>`, `<a href="${manualUrl(manual)}">${escapeHtml(manual.title)}</a>`];
+  if (part) crumbs.push(`<a href="${manualUrl(manual)}#${part.anchor}">${escapeHtml(`${part.label} · ${part.title}`)}</a>`);
+  const pager = [];
+  if (index > 0) pager.push(`<a class="m-action" rel="prev" href="${sectionHref(manual, order[index - 1].doc)}">上一节：${escapeHtml(order[index - 1].doc.title)}</a>`);
+  pager.push(action(`${manualUrl(manual)}#${doc.anchor}`, '在完整手册中阅读'));
+  if (index < order.length - 1) pager.push(`<a class="m-action is-primary" rel="next" href="${sectionHref(manual, order[index + 1].doc)}">下一节：${escapeHtml(order[index + 1].doc.title)}</a>`);
+  const trail = [
+    { '@type': 'ListItem', position: 1, name: '首页', item: `${SITE_ORIGIN}/` },
+    { '@type': 'ListItem', position: 2, name: '手册', item: `${SITE_ORIGIN}/manuals` },
+    { '@type': 'ListItem', position: 3, name: manual.title, item: `${SITE_ORIGIN}${manualUrl(manual)}` },
+    { '@type': 'ListItem', position: 4, name: doc.title, item: canonical },
+  ];
+  const body = retargetSectionLinks(docHtml(doc, 'web', manual), targets, pathName);
+  const article = `<article class="manual m-section-page"><div class="m-kicker m-crumbs">${crumbs.join(' / ')}</div>${body}<nav class="m-cover-actions m-pager" aria-label="章节导航">${pager.join('')}</nav><p class="m-kicker m-section-pin">${escapeHtml(pinLine(manual))}；核验日期沿用上游记录，不代表本次中文同步重测。</p></article>`;
+  const jsonld = [
+    {
+      '@type': 'TechArticle',
+      '@id': `${canonical}#article`,
+      headline: doc.title,
+      description,
+      url: canonical,
+      dateModified: modified,
+      isPartOf: { '@type': 'TechArticle', '@id': `${SITE_ORIGIN}${manualUrl(manual)}#article`, name: manual.title, url: `${SITE_ORIGIN}${manualUrl(manual)}` },
+    },
+    { '@type': 'BreadcrumbList', itemListElement: trail },
+  ];
+  return pageShell({
+    title: `${doc.title} · ${manual.title} · AI Engineering from Scratch`,
+    ogTitle: `${doc.title} · ${manual.title}`,
+    description,
+    canonical,
+    noindex: false,
+    card: `manual/${manual.id}`,
+    rooted: true,
+    jsonld,
+    main: `<main id="main" class="m-web"><div class="m-layout"><aside class="m-sidebar">${sectionTocHtml(manual, doc)}</aside>${article}</div></main>`,
+  });
+}
+
+function writeSections(manual, siteDir = SITE) {
+  const dir = path.join(siteDir, 'manual', `manual-${manual.id}`);
+  fs.rmSync(dir, { recursive: true, force: true });
+  if (manual.status !== 'ready') return 0;
+  const order = readingOrder(manual);
+  const targets = sectionTargets(manual);
+  const pages = new Map(manualSectionPages(manual).map(page => [page.href, page.lastmod]));
+  fs.mkdirSync(dir, { recursive: true });
+  order.forEach(({ doc }, index) => fs.writeFileSync(path.join(dir, `${doc.anchor.replace(/^s-/, '')}.html`), sectionPage(manual, order, index, targets, pages.get(sectionHref(manual, doc))), 'utf8'));
+  return order.length;
 }
 
 function indexPage(listed) {
@@ -786,10 +1040,15 @@ function writeWeb(manuals, siteDir = SITE, options = {}) {
   fs.mkdirSync(siteDir, { recursive: true });
   if (!options.only) {
     for (const name of fs.readdirSync(siteDir).filter(file => /^manual-[a-z0-9-]+\.html$/.test(file))) fs.rmSync(path.join(siteDir, name));
+    const sectionRoot = path.join(siteDir, 'manual');
+    if (fs.existsSync(sectionRoot)) {
+      for (const name of fs.readdirSync(sectionRoot).filter(file => /^manual-[a-z0-9-]+$/.test(file))) fs.rmSync(path.join(sectionRoot, name), { recursive: true, force: true });
+    }
   }
   for (const manual of manuals) {
     fs.writeFileSync(path.join(siteDir, pageName(manual.id)), webPage(manual), 'utf8');
     fs.writeFileSync(path.join(siteDir, printUrl(manual)), printPage(manual), 'utf8');
+    writeSections(manual, siteDir);
   }
   if (options.only) return null;
   const listed = manuals.filter(manual => options.drafts || manual.status === 'ready');
@@ -841,6 +1100,8 @@ module.exports = {
   inlineHtml,
   loadAll,
   loadManual,
+  manualSectionPages,
+  sectionHref,
   newInline,
   parseDocument,
   printPage,

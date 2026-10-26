@@ -97,7 +97,7 @@ python3 code/main.py
 
 ## 拿去用
 
-在第 77-81 课里使用这套队列 mesh 原语。第 77 课把 allreduce 接进 DDP。第 78 课把 reduce_scatter 接进 ZeRO。第 79 课把 broadcast 接进 pipeline 激活值。第 81 课把四个 collective 全部组装进端到端 demo。
+在第 77-81 课里使用这套队列 mesh 原语。第 77 课把 allreduce 接进 DDP。第 78 课把 reduce_scatter 接进 ZeRO。第 79 课用点对点 send 和 recv 传递 pipeline 激活值，而不是 collective。第 81 课把四个 collective 全部组装进端到端 demo。
 
 ## 练习
 

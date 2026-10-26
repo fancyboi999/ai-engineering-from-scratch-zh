@@ -1,0 +1,32 @@
+{
+  "id": "generalized-advantage-estimation",
+  "title": "广义优势估计（GAE）",
+  "kind": "implement",
+  "summary": "结合 gamma、lambda、终止标记和自举值，计算 TD 误差、GAE 优势值及 critic 的训练目标。",
+  "difficulty": "medium",
+  "tags": [
+    "reinforcement-learning",
+    "advantages",
+    "actor-critic",
+    "ppo"
+  ],
+  "lesson": "phases/09-reinforcement-learning/07-actor-critic-a2c-a3c",
+  "cheatsheet": "reinforcement-learning",
+  "minutes": 25,
+  "entry": [
+    "td_errors",
+    "gae"
+  ],
+  "collections": [
+    "rl-basics"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "bootstrap_through_done": "终止步仍使用 values[t + 1] 作为下一状态价值，使下一个回合的信息进入 TD 误差。",
+    "ignores_bootstrap_value": "在批次最后一步使用 0 作为下一状态价值，因此 values[T] 从未参与计算。",
+    "no_cut_in_recursion": "终止步没有重置累计优势值，导致优势值求和跨越回合边界。",
+    "no_lambda": "递推中遗漏 lam，因此每次调用都相当于 lam = 1。",
+    "returns_use_next_values": "计算回报时将优势值加上 values[t + 1]，而不是 values[t]。",
+    "td_no_done_mask": "td_errors 忽略终止标记，总是加上 gamma * values[t + 1]。"
+  }
+}

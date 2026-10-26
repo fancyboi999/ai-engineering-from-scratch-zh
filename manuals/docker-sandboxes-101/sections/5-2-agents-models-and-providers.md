@@ -8,9 +8,9 @@
 
 ## 文件与 schema {#s-agents-models-and-providers-the-file-and-its-schema}
 
-**agent 文件：** 匹配 `agent-schema.json` 的 YAML 或 HCL 文档，即 Docker Agent v16 schema。根允许16个键，只有一个必需：“Map of agent configurations. At least one agent is required” {{schema agents}}，agent 配置映射至少含一个 agent。顶层键拼错会加载失败，因为“the parser rejects unknown top-level keys” {{docs-agent Configuration Overview}}，解析器拒绝未知顶层键。
+**agent 文件：** 匹配 `agent-schema.json` 的 YAML 或 HCL 文档，即 Docker Agent v16 schema。根允许16个键，只有一个必需{{schema agents}}，agent 配置映射至少含一个 agent。顶层键拼错会加载失败，因为{{docs-agent Configuration Overview}}，解析器拒绝未知顶层键。
 
-`version` 是 schema enum 中 `"0"` 到 `"16"` 的字符串。同一文档页仍写“The current version is `15`” {{docs-agent Configuration Overview}}。录制文件声明 `"16"` 并成功加载，所以本手册遵循 schema。“When you load an older config, Docker Agent automatically migrates it to the latest schema” {{docs-agent Configuration Overview}}，旧配置加载时自动迁移。`share pull` 从 `agentcatalog/pirate` 拉取的文件声明 `version: "2"`，内联指定 `openai/gpt-4.1`（`16-share-pull-agent.yaml`）。
+`version` 是 schema enum 中 `"0"` 到 `"16{{docs-agent Configuration Overview}}。录制文件声明 `"16{{docs-agent Configuration Overview}}，旧配置加载时自动迁移。`share pull` 从 `agentcatalog/pirate` 拉取的文件声明 `version: "2"`，内联指定 `openai/gpt-4.1`（`16-share-pull-agent.yaml`）。
 
 ```listing
 title: 单 agent 运行的文件
@@ -59,9 +59,9 @@ models:
 
 - 内联 `provider/model`，如 `greeter.yaml` 的 `dmr/ai/qwen3` {{docs-agent Models}}。
 - `models` 下的名称，如 `local`，含 `provider`、`model` 和 `temperature: 0` 等参数。
-- `first_available` 列表：“At load time, Docker Agent selects the first candidate whose credentials are configured” {{docs-agent Models}}，加载时选首个已配置凭据的候选。
+- `first_available` 列表按顺序选第一个凭据已配置的候选 {{docs-agent Models}}。
 - alloy：逗号分隔两个引用，运行时在同一对话中交替使用。
-- `auto`：先选“the first cloud provider with a configured credential” {{docs-agent Set Up a Model}}，即首个已配凭据的云 provider，再选已拉取的 Model Runner 模型。
+- `auto`：先选已配置凭据的第一个云 provider {{docs-agent Set Up a Model}}，再选已拉取的 Model Runner 模型。
 
 `run --model [agent=]provider/model` 为一次运行替换引用 {{help-agent docker-agent run}}。录制 Mac 只拉4B tag 时，`doctor` 将 `auto` 解析为 `dmr/docker.io/ai/qwen3:4b`（`25-doctor.txt`）；无 Model Runner 时指定 `dmr/ai/qwen3:latest`，报告无可用模型（`16-doctor.txt`）。
 
@@ -90,7 +90,7 @@ models:
 …
 ```
 
-`files.yaml` 指定 `provider: dmr`，没有 `base_url`；随后“Docker Agent auto-discovers the DMR endpoint” {{docs-agent Docker Model Runner}}，自动发现端点。它执行 `docker model status --json`，无 Docker 守护进程响应时，`16-dry-run.txt` 将该命令打印在错误里。eval 容器没有 `docker` CLI，发现因此失败，见 [eval](#s-session-db-sessions-diff-and-eval)。
+`files.yaml` 指定 `provider: dmr`，没有 `base_url`；随后{{docs-agent Docker Model Runner}}，自动发现端点。它执行 `docker model status --json`，无 Docker 守护进程响应时，`16-dry-run.txt` 将该命令打印在错误里。eval 容器没有 `docker` CLI，发现因此失败，见 [eval](#s-session-db-sessions-diff-and-eval)。
 
 显式 `base_url` 下，`dmr.yaml` 回答 `Hello`（`25-run-dmr.txt`）。每次录制此运行都是实时的，因为显式 URL 绕过 `--record` 代理，cassette 为空（`capture/README.md`）。无法发现时设置 `base_url`，需要 cassette 时省略它。
 

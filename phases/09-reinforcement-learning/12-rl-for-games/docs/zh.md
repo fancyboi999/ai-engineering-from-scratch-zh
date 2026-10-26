@@ -1,6 +1,6 @@
 # RL 攻克游戏 —— AlphaZero、MuZero 与 LLM 推理时代
 
-> 1992 年：TD-Gammon 用纯 TD 在西洋双陆棋上击败人类冠军。2016 年：AlphaGo 击败李世石。2017 年：AlphaZero 从零开始横扫国际象棋、将棋和围棋。2024 年：DeepSeek-R1 证明了同一套配方（用 GRPO 换掉 PPO）在推理上也行。游戏是驱动本阶段每个突破的那块基准。
+> 1992 年：TD-Gammon 用纯 TD 在西洋双陆棋上击败人类冠军。2016 年：AlphaGo 击败李世石。2017 年：AlphaZero 从零开始横扫国际象棋、将棋和围棋。2025 年：DeepSeek-R1 证明了同一套配方（用 GRPO 换掉 PPO）在推理上也行。游戏是驱动本阶段每个突破的那块基准。
 
 **类型：** Build
 **语言：** Python
@@ -60,7 +60,7 @@ while True:
 
   $L_{\text{GRPO}}(\theta) = -\mathbb E_{q, \lbrace o_i \rbrace} \left[ \frac{1}{G} \sum_i A_i \cdot \log \pi_\theta(o_i \mid q) \right] + \beta \cdot \mathrm{KL}(\pi_\theta \Vert \pi_{\text{ref}})$
 
-没有奖励模型，没有 critic，没有 MCTS。组相对基线一举取代了这三者。在推理 benchmark 上以零头的算力匹敌或超过 PPO-RLHF 的质量。
+不训练奖励模型、不用 critic、也不做 MCTS。规则验证器提供奖励，组相对基线替代 critic，整个搜索步骤则被省去。在推理 benchmark 上以零头的算力匹敌或超过 PPO-RLHF 的质量。
 
 **完整的 R1 配方。** DeepSeek-R1（DeepSeek 2025）是一篇论文里的两个模型：
 
@@ -86,7 +86,7 @@ f3-selfplay-ladder
 
 ## 动手构建
 
-`code/main.py` 里的代码实现了**微缩版 GRPO**——一个带多组样本的赌博机。算法和在 LLM 上的一样；只是策略和环境更简单。它教的是 2025 年的创新所在：那个*损失*和*组相对优势*。
+`code/main.py` 里的代码实现了**微缩版 GRPO**——一个带多组样本的赌博机。算法和在 LLM 上的一样；只是策略和环境更简单。它教的是 DeepSeekMath 在 2024 年提出的创新：那个*损失*和*组相对优势*。
 
 ### 第 1 步：一个极小的验证器环境
 
@@ -144,7 +144,7 @@ def grpo_step(theta, p_idx, G=8, beta=0.01, lr=0.1, rng=None):
 ## 注意事项
 
 - **靠验证器作弊的奖励 hacking。** GRPO 继承了 RLHF 的风险：如果验证器错了或可被利用，LLM 就会找到那个漏洞。稳健的验证器（多个测试用例、形式化证明）很重要。
-- **组太小。** 组基线的方差大约按 $1/\sqrt{G}$ 走。低于 $G = 4$，优势信号有噪声；标准选择是 $G = 8$ 到 `64`。
+- **组太小。** 组均值基线的方差大约按 $1/G$ 下降，其标准误差约按 $1/\sqrt{G}$ 下降。低于 $G = 4$，优势信号有噪声；标准选择是 $G = 8$ 到 `64`。
 - **长度偏差。** 不同长度的 LLM 补全有不同的对数概率。按 token 数归一化，或用序列级对数概率，或截断到最大长度。
 - **纯自我对弈循环。** AlphaZero 式训练在一般和博弈上可能卡进支配循环。用多样化对手池缓解（联赛对弈，第 10 课）。
 - **搜索-策略失配。** AlphaZero 训练策略去模仿搜索输出。如果策略网络太小、表示不了搜索的分布，训练就停滞。

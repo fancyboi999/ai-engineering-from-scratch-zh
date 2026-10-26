@@ -5,7 +5,7 @@ code: SN
 subtitle: 对比 vLLM、SGLang、TRT-LLM 和 llama.cpp 的调度、KV 复用、精度、卸载与选型。
 hue: 262
 sources: phases/17-infrastructure-and-production/04-vllm-serving-internals, phases/17-infrastructure-and-production/06-sglang-radixattention, phases/17-infrastructure-and-production/07-tensorrt-llm-blackwell, phases/17-infrastructure-and-production/18-vllm-production-stack-lmcache, phases/17-infrastructure-and-production/28-self-hosted-serving-selection
-source_hash: 82105bbb2f0e2a47
+source_hash: b55a17e11f2afa22
 ---
 
 ## 引擎对比

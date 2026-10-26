@@ -70,7 +70,7 @@ flowchart TD
 
 Perplexity 是 loss 的指数。Loss 降 0.1，perplexity 的降幅大得多。直接比较两个配置的 perplexity 没问题，但要在一份报告里把它和线性 metrics 混在一起用，就需要归一化。
 
-本课对 `scale` 字段为 `"log"` 的 metric，在计算 improvement 之前取自然对数。阈值在 log 空间中应用。Perplexity 从 32 降到 28，即 `log(28) - log(32) = -0.133`，在 lower_is_better 指标上远超 2% 阈值。
+本课对 `scale` 字段为 `"log"` 的 metric，在计算 improvement 之前取自然对数。阈值在 log 空间中应用。Perplexity 从 32 降到 28 后会变成 `log(32) = 3.466` 和 `log(28) = 3.332`。lower_is_better 指标的相对提升为 `(3.466 - 3.332) / 3.466 = 0.039`，超过 2% 阈值。
 
 ```text
 if scale == "log":

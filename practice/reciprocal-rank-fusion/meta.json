@@ -1,0 +1,30 @@
+{
+  "id": "reciprocal-rank-fusion",
+  "title": "倒数排名融合",
+  "kind": "implement",
+  "summary": "用倒数排名融合合并多条文档排序列表，支持列表权重，并按固定并列规则输出。",
+  "difficulty": "easy",
+  "tags": [
+    "rank-fusion",
+    "hybrid-retrieval",
+    "ranking",
+    "retrieval"
+  ],
+  "lesson": "phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense",
+  "cheatsheet": "rag",
+  "minutes": 12,
+  "entry": [
+    "rrf_scores",
+    "fuse"
+  ],
+  "collections": [
+    "rag-building-blocks"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "first_appearance_ties": "只按分数排序，导致分数并列时按 ID 首次出现顺序排列，而非 doc id 较小者优先。",
+    "ignore_weights": "每个列表都累加 1 / (k + rank)，忽略列表权重。",
+    "no_length_check": "权重数与列表数不同时没有抛出 ValueError。",
+    "rank_from_zero": "排名从 0 开始计数，导致首个文档贡献 1 / k，而不是 1 / (k + 1)。"
+  }
+}

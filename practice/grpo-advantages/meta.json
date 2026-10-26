@@ -1,0 +1,41 @@
+{
+  "id": "grpo-advantages",
+  "title": "GRPO 组内优势值与裁剪目标",
+  "kind": "research",
+  "summary": "在组内归一化奖励，用 k3 估计 KL；计算每个有效 token 的 GRPO 裁剪目标，先在回答内取平均，再对回答取平均。",
+  "difficulty": "medium",
+  "tags": [
+    "grpo",
+    "reinforcement-learning",
+    "policy-gradient",
+    "kl-divergence"
+  ],
+  "lesson": "phases/09-reinforcement-learning/12-rl-for-games",
+  "cheatsheet": "reinforcement-learning",
+  "minutes": 30,
+  "entry": [
+    "group_advantages",
+    "kl_k3",
+    "grpo_objective"
+  ],
+  "collections": [
+    "papers-to-code",
+    "rl-basics"
+  ],
+  "time_limit_s": 10,
+  "method": "grpo",
+  "paper": {
+    "title": "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models",
+    "authors": "Shao et al.",
+    "year": 2024,
+    "url": "https://arxiv.org/abs/2402.03300"
+  },
+  "mutants": {
+    "k3_ratio_reversed": "在 k3 中使用 pi_theta / pi_ref，使估计量不再是 KL(pi_theta || pi_ref) 的无偏估计。",
+    "kl_added": "将 beta 乘以 k3 加到目标函数中，而不是减去它。",
+    "max_not_min": "取未裁剪和裁剪后的替代目标的最大值，因此裁剪无法限制收益。",
+    "no_eps": "除以标准差时未加 eps，因此组内奖励相同时会产生 NaN。",
+    "sample_std": "使用 ddof=1 的样本标准差，而不是总体标准差。",
+    "token_level_mean": "对整个批次的所有有效 token 一起取平均，没有先对每个回答单独取平均。"
+  }
+}

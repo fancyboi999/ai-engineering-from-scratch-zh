@@ -5,7 +5,7 @@ code: OG
 subtitle: 发出 gen_ai.* span、采样 trace、导出指标、选择平台并调试 trace。代码来自课程，仅用标准库。
 hue: 25
 sources: phases/13-tools-and-protocols/20-opentelemetry-genai, phases/14-agent-engineering/23-otel-genai-conventions, phases/14-agent-engineering/24-agent-observability-platforms, phases/17-infrastructure-and-production/13-llm-observability, phases/19-capstone-projects/11-llm-observability-dashboard, phases/19-capstone-projects/28-observability-otel-traces, projects/agent-trace-debugger
-source_hash: 9138ba7a9315ddc6
+source_hash: a922d82fee017dda
 ---
 
 ## Agent span 层级

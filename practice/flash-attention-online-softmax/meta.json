@@ -1,0 +1,40 @@
+{
+  "id": "flash-attention-online-softmax",
+  "title": "使用在线 softmax 的分块注意力",
+  "kind": "research",
+  "summary": "用 NumPy 实现 FlashAttention：跨键块维护累计最大值和累计和，对任意块大小都能计算精确注意力。",
+  "difficulty": "hard",
+  "tags": [
+    "attention",
+    "flash-attention",
+    "softmax",
+    "numerical-stability"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/12-kv-cache-flash-attention",
+  "cheatsheet": "inference-optimization",
+  "minutes": 40,
+  "entry": [
+    "online_softmax_step",
+    "flash_attention"
+  ],
+  "collections": [
+    "papers-to-code",
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "method": "flash-attention",
+  "paper": {
+    "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+    "authors": "Dao et al.",
+    "year": 2022,
+    "url": "https://arxiv.org/abs/2205.14135"
+  },
+  "mutants": {
+    "block_max_only": "累计最大值只取当前块的最大值，两个块的分数相差很大时会溢出。",
+    "causal_blocks_diagonal": "当 j >= i 时屏蔽键，导致每个查询也屏蔽自身，第一行没有可用键。",
+    "no_neginf_guard": "在指数表达式中直接使用负无穷的累计最大值，导致全屏蔽块产生 NaN。",
+    "no_rescale_acc": "遗漏用 exp(旧最大值 - 新最大值) 缩放旧累加器。",
+    "no_rescale_sum": "遗漏用 exp(旧最大值 - 新最大值) 缩放旧累计和。",
+    "partial_block_dropped": "循环提前结束，漏掉短于 block_size 的最后一块。"
+  }
+}

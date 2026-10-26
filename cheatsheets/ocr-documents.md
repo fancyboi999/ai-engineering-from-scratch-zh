@@ -5,7 +5,7 @@ code: OD
 subtitle: 训练 CTC OCR，选择文档处理栈，用 MaxSim 检索页面，并对照精确原文片段批准字段。
 hue: 165
 sources: phases/04-computer-vision/19-ocr-document-understanding, phases/12-multimodal-ai/22-document-diagram-understanding, phases/12-multimodal-ai/23-colpali-vision-native-rag, phases/19-capstone-projects/04-multimodal-document-qa, projects/document-extraction-desk
-source_hash: 88c6ed50f276193b
+source_hash: 7002a9a5cbd27f82
 ---
 
 ## 经典 OCR 流水线
@@ -114,8 +114,8 @@ from: phases/04-computer-vision/19-ocr-document-understanding/docs/zh.md, phases
 - **CTC 折叠**：先合并重复，再移除 blank。"h h h _ _ e e l l _ l l o _ _" 得到 "hello"。
 - **CER**：Levenshtein 距离除以参考文本长度，WER 则按单词计算。
 - **MaxSim**：对查询 token $q_i$ 和页面图块 $p_j$ 计算 $\sum_i \max_j \cos(q_i, p_j)$。
-- **ColPali 存储**：50 页 x 729 图块 x 128 维 x 4 字节 = 原始约 18 MB，PQ 后约 4 MB。
-- **Text-RAG 存储**：50 块 x 768 维 x 4 字节 = 约 150 kB，ColPali 约大 30x。
+- **ColPali 存储**：50 页 x 729 图块 x 128 维 x 4 字节 = 原始约 18 MB，8 倍 PQ 压缩后约 2.3 MB。
+- **Text-RAG 存储**：50 块 x 768 维 x 4 字节 = 约 150 kB，ColPali 原始存储约大 120x，PQ 后约大 15x。
 - **ViDoRe**：ColPali-v1 的 nDCG@5 约 80%，Text-RAG 约 50-60%。
 
 ## 默认值与限制

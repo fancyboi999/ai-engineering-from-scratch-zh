@@ -92,7 +92,7 @@ agent `MUST` 按 `PushNotificationConfig.authentication` 在请求头中携带�
 label: 交付
 source: spec §4.3.3
 ---
-"Agents MUST attempt delivery at least once for each configured webhook"
+每个已配置的 webhook 都必须至少尝试投递一次
 ```
 
 至少一次意味着通知可能重复，接收器也有职责：客户端 `MUST` 用 HTTP 2xx 确认接收成功，`SHOULD` 幂等处理通知以应对重复交付，`MUST` 验证任务 ID 是预期任务。 {{spec §4.3.3}}

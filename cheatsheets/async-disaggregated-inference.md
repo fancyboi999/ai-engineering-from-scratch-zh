@@ -5,7 +5,7 @@ code: AD
 subtitle: KV 缓存的共享、拆分、路由与卸载。包含公式、收益分界数值和各方法不适用的情况。
 hue: 170
 sources: phases/10-llms-from-scratch/22-async-hogwild-inference, phases/17-infrastructure-and-production/11-multi-region-kv-locality, phases/17-infrastructure-and-production/17-disaggregated-prefill-decode, phases/17-infrastructure-and-production/18-vllm-production-stack-lmcache
-source_hash: d862651b76bcf26a
+source_hash: 490bfaed187b6ba8
 ---
 
 ## 核心概念

@@ -1,0 +1,32 @@
+{
+  "id": "batch-norm",
+  "title": "Batch normalization 前向与反向传播",
+  "kind": "implement",
+  "summary": "实现训练和推理的前向传播、运行统计量更新，以及完整的反向梯度。",
+  "difficulty": "hard",
+  "tags": [
+    "batch-norm",
+    "normalization",
+    "gradients",
+    "backpropagation"
+  ],
+  "lesson": "phases/03-deep-learning-core/07-regularization",
+  "cheatsheet": "deep-learning-training",
+  "minutes": 45,
+  "entry": [
+    "batchnorm_forward",
+    "batchnorm_backward"
+  ],
+  "collections": [
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "backward_ignores_batch_stats": "计算 dx 时只返回 grad_output * gamma / std，忽略 x 对批次均值和方差的影响。",
+    "eps_outside_sqrt": "使用 sqrt(var) + eps，而不是 sqrt(var + eps)。",
+    "in_place_running_mean": "原地更新 running_mean，导致调用方数组发生变化。",
+    "inference_uses_batch_stats": "推理模式使用当前批次均值和方差，而不是运行统计量。",
+    "momentum_swapped": "将 momentum 权重给旧运行值，把 1 - momentum 权重给批次值。",
+    "unbiased_variance": "使用除数为 N - 1 的无偏方差，而不是除数为 N 的有偏方差。"
+  }
+}

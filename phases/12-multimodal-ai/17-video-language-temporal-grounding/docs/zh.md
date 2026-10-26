@@ -1,6 +1,6 @@
 # 视频-语言模型：时间 token 与 grounding
 
-> 视频不是一摞照片。一段 5 秒的片段有因果顺序、动作动词和事件时序，是图像模型表示不了的。Video-LLaMA（Zhang 等人，2023 年 6 月）出货了第一个带视听 grounding 的开放视频 LLM。VideoChat 和 Video-LLaVA 放大了这个模式。到 2025 年，Qwen2.5-VL 的 TMRoPE 缩小了与前沿专有模型的差距。每个系统解决时间 token 的方式都不同——每片段一个 Q-former、每帧 concat-pool、每 token 一次 TMRoPE。本节课通读这些模式，搭一个均匀 vs 动态帧采样器，并在时间 grounding 任务上评测。
+> 视频不是一摞照片。一段 5 秒的片段有因果顺序、动作动词和事件时序，是图像模型表示不了的。Video-LLaMA（Zhang 等人，2023 年 6 月）出货了第一个带视听 grounding 的开放视频 LLM。VideoChat 和 Video-LLaVA 放大了这个模式。到 2025 年，Qwen2.5-VL 与时间对齐的 M-RoPE 缩小了与前沿专有模型的差距。每个系统处理时间的方式都不同——每片段一个 Q-former、每帧 concat-pool、每个 token 一个时间对齐的位置 ID。本节课通读这些模式，搭一个均匀 vs 动态帧采样器，并在时间 grounding 任务上评测。
 
 **类型：** Build
 **语言：** Python（标准库，帧采样器 + 时间 grounding 评测器）
@@ -46,9 +46,9 @@ VideoChat 保留 Video-LLaMA 的想法但去掉了音频并简化。Video-LLaVA�
 
 两者都不处理长视频。都是 8-16 帧系统。
 
-### Qwen2.5-VL 与 TMRoPE
+### Qwen2.5-VL 与时间对齐的 M-RoPE
 
-Qwen2.5-VL 引入了 TMRoPE——时间-模态旋转位置嵌入。每个 patch token 携带一个 (t, h, w) 位置，其中 t 是真实时间戳（不是帧索引）。
+Qwen2.5-VL 沿用 Qwen2-VL 的 M-RoPE（Multimodal Rotary Position Embedding），并让时间轴与绝对时间对齐。每个 patch token 携带一个 (t, h, w) 位置，其中 t 使用真实时间戳（不是帧索引）。Qwen2.5-Omni（第 12.20 课）后来把音频和视频中同一做法称为 TMRoPE（Time-aligned Multimodal RoPE）。
 
 与简单时间嵌入的关键区别：
 
@@ -56,7 +56,7 @@ Qwen2.5-VL 引入了 TMRoPE——时间-模态旋转位置嵌入。每个 patch 
 - 每 token 旋转，不是每片段。每个视觉 token 按它的时间戳独立旋转。
 - 与动态 FPS 兼容。如果你这里按 2 FPS、那里按 4 FPS 采样，TMRoPE 原生处理这种不均匀间距。
 
-TMRoPE 让"猫在第几秒跳起来？"这类查询成为可能。模型能输出"在 4.2 秒"。Video-LLaMA 只能说"片段早段"。
+时间对齐的 M-RoPE 让"猫在第几秒跳起来？"这类查询成为可能。模型能输出"在 4.2 秒"。Video-LLaMA 只能说"片段早段"。
 
 ### 帧采样策略
 
@@ -70,7 +70,7 @@ TMRoPE 让"猫在第几秒跳起来？"这类查询成为可能。模型能输�
 
 ### 每帧池化
 
-在 1 FPS、每帧 576 token 下，一段 5 分钟片段是 172,800 个 token。用 Qwen2.5-VL-72B 的 128k 上下文能做，但贵。
+在 1 FPS、每帧 576 token 下，一段 5 分钟片段是 172,800 个 token。它超过 Qwen2.5-VL-72B 的 128k 上下文，因此必须降低帧率或先池化每帧 token。
 
 3x3 双线性池化减到每帧 64 token -> 5 分钟 19,200 个 token。大多数任务的甜点区。
 
@@ -91,7 +91,7 @@ TMRoPE 让"猫在第几秒跳起来？"这类查询成为可能。模型能输�
 
 - 自由文本："猫在大约 4 秒处跳起。"易解析但不精确。
 - 结构化 JSON：`{"event": "jump", "start": 4.1, "end": 4.3}`。Qwen2.5-VL 训这个。
-- 基于 token：与答案交错的特殊 `<time>4.1</time>` token。Qwen2.5-VL 的内部格式。
+- 基于 token：与答案交错的特殊 `<time>4.1</time>` token。实际模型用时间对齐的 M-RoPE 表示时间，不增加这些额外 token。
 
 基于 token 的对下游使用最准。Qwen2.5-VL 的 JSON 输出格式可直接解析。
 
@@ -138,7 +138,7 @@ video-temporal-patches
 | 术语 | 大家怎么说 | 它实际指什么 |
 |------|-----------------|------------------------|
 | 时间 grounding | "时间定位的答案" | VLM 为某事件何时发生输出一个具体的时间戳范围 |
-| TMRoPE | "时间-多模态 RoPE" | 带绝对时间戳的 3D 旋转位置，Qwen2.5-VL 所用 |
+| 时间对齐的 M-RoPE | "TMRoPE" | 时间轴使用绝对时间戳的 3D 旋转位置；Qwen2.5-VL 将其用于视频，Qwen2.5-Omni 将其音视频形式称为 TMRoPE |
 | 动态 FPS | "运动感知采样" | 在高运动段多采帧，在静态段少采 |
 | 帧池化 | "每帧空间压缩" | 在进 LLM 前用双线性插值减少每帧 patch |
 | 视频 Q-former | "片段压缩器" | 把 N 帧映射到 K 个学出 query 的交叉注意力瓶颈 |

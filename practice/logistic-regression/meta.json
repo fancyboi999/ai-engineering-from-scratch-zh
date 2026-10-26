@@ -1,0 +1,34 @@
+{
+  "id": "logistic-regression",
+  "title": "从零实现逻辑回归",
+  "kind": "implement",
+  "summary": "实现稳定 sigmoid、二元交叉熵及其梯度，并用梯度下降记录训练损失。",
+  "difficulty": "medium",
+  "tags": [
+    "logistic-regression",
+    "classification",
+    "gradients",
+    "numerical-stability"
+  ],
+  "lesson": "phases/02-ml-fundamentals/03-logistic-regression",
+  "cheatsheet": "classical-ml",
+  "minutes": 25,
+  "entry": [
+    "sigmoid",
+    "compute_loss",
+    "compute_gradients",
+    "fit"
+  ],
+  "collections": [
+    "classical-ml"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "bias_not_updated": "计算偏置梯度后，没有在 fit 中更新偏置。",
+    "grad_sum_not_mean": "对样本累加权重梯度，却没有除以 n。",
+    "grad_wrong_sign": "使用 y - p 而不是 p - y，导致梯度方向向上。",
+    "history_before_update": "在梯度更新前记录损失，历史数据落后一步。",
+    "loss_log_of_sigmoid": "直接对 sigmoid 输出取对数，模型对错误预测非常确信时损失会变成无穷大。",
+    "sigmoid_branches_swapped": "交换稳定 sigmoid 的两个分支，输出变成 1 - sigmoid(z)。"
+  }
+}

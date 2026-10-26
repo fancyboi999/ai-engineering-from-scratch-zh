@@ -200,7 +200,7 @@ pipe.fit(X_train, y_train)
 print(pipe.score(X_test, y_test))
 ```
 
-注意三件事。`stop_words=None` 保住了否定词。`ngram_range=(1, 2)` 加上二元组，于是 `not_good` 成了一个特征。`sublinear_tf=True` 抑制重复词。在 SST-2 上，这三个开关就是 75% 准确率基线和 85% 准确率基线之间的差距。
+注意三件事。`stop_words=None` 保住了否定词。`ngram_range=(1, 2)` 加上二元组，于是 `not good` 成了一个特征（scikit-learn 用空格连接两个词）。`sublinear_tf=True` 抑制重复词。在 SST-2 上，这三个开关就是 75% 准确率基线和 85% 准确率基线之间的差距。
 
 ### 什么时候该上 transformer
 

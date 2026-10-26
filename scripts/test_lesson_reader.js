@@ -157,6 +157,7 @@ test('deployed readers reuse matching Chinese embedded Markdown, but local previ
 
 test('lesson inline scripts remain syntactically valid and keep protected reader and quiz hooks', () => {
   const source = fs.readFileSync(path.join(root, 'site/lesson.html'), 'utf8');
+  const rendererSource = fs.readFileSync(path.join(root, 'site/md-render.js'), 'utf8');
   for (const match of source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
     if (/\bsrc=|type="module"/.test(match[1])) continue;
     new vm.Script(match[2]);
@@ -164,8 +165,13 @@ test('lesson inline scripts remain syntactically valid and keep protected reader
   assert.match(source, /window\.__PRERENDERED__/);
   assert.match(source, /function enhanceLesson\(/);
   assert.match(source, /function lessonHref\(/);
-  assert.match(source, /function findH2\(selectors, zhTexts\)/);
-  assert.match(source, /\['动手构建', '构建', 'Build It'\]/);
+  assert.match(source, /function lessonSectionHeadings\(article\)/);
+  assert.match(source, /MDRender\.quizPlacement\(headingInfo\)/);
+  assert.match(rendererSource, /function quizPlacement\(headings\)/);
+  assert.match(rendererSource, /firstHeading\(headings, \['核心概念', 'the concept'\]\)/);
+  assert.match(source, /buildQuizHtml\(pre, 'pre', '课前检测'\)/);
+  assert.match(source, /buildQuizHtml\(check, 'check', '课中检测'\)/);
+  assert.match(source, /buildQuizHtml\(post, 'post', '课后测验'\)/);
   assert.match(source, /_vercel\/insights\/script\.js/);
   assert.doesNotMatch(source, /function parseMd\(/);
   assert.match(source, /var parseMd = MDRender\.parseMd/);

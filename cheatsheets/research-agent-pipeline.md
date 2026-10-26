@@ -5,7 +5,7 @@ code: RP
 subtitle: 生成假设、检索论文、在沙箱运行实验、评判结果，并发布带引用的报告。
 hue: 165
 sources: phases/19-capstone-projects/05-autonomous-research-agent, phases/19-capstone-projects/50-hypothesis-generator, phases/19-capstone-projects/51-literature-retrieval, phases/19-capstone-projects/52-experiment-runner, phases/19-capstone-projects/53-result-evaluator, projects/research-report-agent
-source_hash: c0f1c6189796aace
+source_hash: 6a58026aff580591
 ---
 
 ## 研究循环

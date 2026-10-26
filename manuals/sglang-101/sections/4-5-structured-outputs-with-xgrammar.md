@@ -6,13 +6,13 @@
 
 读完本节，你能用 JSON schema、正则表达式或 EBNF 语法约束输出，也能解释 mask 的成本、读取语法队列，判断生成后还需检查什么。
 
-## 直观的修复为什么行不通
+## 直观的修复为什么行不通 {#s-structured-outputs-with-xgrammar-the-obvious-fix-and-why-it-fails}
 
-直观做法是生成后验证，失败就重试。它能工作，但依然很慢；而且往往在最重要的场景失效：某个 prompt 曾让模型违反 schema，它再次这样做的概率仍然很高。
+直观做法是生成后验证，失败就重试。它能工作，但依然很慢。它也会在你最关心的情况下失效：温度 0 时，重试相同 prompt 只会再次返回同一条错误回复。
 
 **约束解码：** 在采样器选择 token 前，移除所有会违反语法的 token。于是后端实际执行的每条规则，都成为服务器输出的一项保证。
 
-## SGLang 做了什么
+## SGLang 做了什么 {#s-structured-outputs-with-xgrammar-what-sglang-does}
 
 请求在采样参数中携带一种约束：`json_schema`、`regex`、`ebnf` 或 `structural_tag`。OpenAI chat API 会将 `response_format` 映射到同样的字段。`--grammar-backend` 选择编译引擎，v0.5.22 默认 `xgrammar`，其余选项为 `outlines`、`llguidance` 和 `none`。
 
@@ -34,19 +34,19 @@ Apple silicon 上，MLX runtime 只有使用 `--mlx-enable-sampling` 才应用�
 
 **语法队列：** 语法仍在编译的请求列表。`/metrics` 用 `sglang:num_grammar_queue_reqs` 导出其长度。
 
-## v0.5.22 未启用 jump-forward
+## v0.5.22 未启用 jump-forward {#s-structured-outputs-with-xgrammar-jump-forward-is-not-active-at-v0-5-22}
 
 SGLang 论文描述过 jump-forward 解码。语法只允许一种续写时，例如固定文本 `{"name": "`，服务器无需运行模型就写出它。v0.5.22 的语法类仍有 jump-forward 方法，但搜索 runtime 后，语法类之外找不到调用者。调度器没有使用它们，所以即使处于固定文本中，也应预期每个 token 都要一次前向传播。这是代码阅读结论，我们没有运行计时测试。
 
-## 应该测什么
+## 应该测什么 {#s-structured-outputs-with-xgrammar-what-to-measure}
 
 在自己的 schema 上测三件事。第一，新 schema 首个请求与同 schema 第二个请求的 TTFT，差值体现编译时间。第二，在真实并发下，分别有无约束时的 token 间延迟，因为每步 mask 都消耗 CPU 时间。第三，负载下语法队列的长度。
 
 Varad More 的实践报告 {{field Varad More 2026-04}} 在单张 A10G 上测试了 16 个 2B 至 9B 模型的结构化生成，其中 14 个模型上 vLLM 更快。报告没有区分编译时间和逐 token 成本，因此它说明你应该测量，不能直接当作结论。
 
-## 我们在 GB10 上测到了什么
+## 我们在 GB10 上测到了什么 {#s-structured-outputs-with-xgrammar-what-we-measured-on-a-gb10}
 
-我们在单张 NVIDIA GB10 上，对 `Qwen/Qwen3-30B-A3B-Instruct-2507` 使用默认 `xgrammar` 后端运行小型探测。探测连续五次请求“用 JSON 对象描述一张用于模型服务器的 GPU”，一次一个请求。Schema 有四个必填字段，整数 `memory_gb` 范围 1 至 1024，厂商使用 `enum`，不允许额外属性。
+我们在单张 NVIDIA GB10 上，对 `Qwen/Qwen3-30B-A3B-Instruct-2507` 使用默认 `xgrammar` 后端运行小型探测。探测连续五次请求“用 JSON 对象描述一张用于模型服务器的 GPU”，一次发送一个请求。原始 prompt 为 `Describe one GPU for a model server as a JSON object.`。Schema 有四个必填字段，整数 `memory_gb` 范围 1 至 1024，厂商使用 `enum`，不允许额外属性。
 
 | 请求 | 约束 | 延迟 | 输出 token 数 | 是否有效 |
 |---|---|---|---|---|
@@ -62,15 +62,15 @@ Varad More 的实践报告 {{field Varad More 2026-04}} 在单张 A10G 上测试
 
 Schema 限制了结构，没有约束事实。约束回复说“NVIDIA A100”有 40 GB，无约束回复却说它有“80 GB GDDR6”。语法检查句法，语义仍需你的验证器检查。
 
-## 我们的建议
+## 我们的建议 {#s-structured-outputs-with-xgrammar-our-position}
 
-凡是由程序解析的回复，都应加约束。Mask 比重试便宜。
+凡是由程序解析的回复，都应加约束。Mask 会增加每个生成步骤的工作，重试则要重新执行整个请求；我们没有测量 mask 每步增加的成本。
 
 不要相信语法后端会执行每个 JSON Schema 关键字。对消费端依赖的每个关键字，例如 `minLength`、`pattern`、`minimum` 和 `enum`，都用一个故意尝试违反它的请求测试。对重要字段，在服务器后保留一个低成本验证器。
 
-每次部署后，使用每种常见 schema 发几个请求，避免首位用户支付编译时间。GB10 上，首个请求多付出了约 330 ms。
+每次部署后，用一个约束请求预热，避免首位用户承担语法 backend 的首次启动成本。GB10 上首个请求多花约 330 ms；我们的 probe 没有发现第二个小型新 schema 增加额外成本。
 
-## 事故
+## 事故 {#s-structured-outputs-with-xgrammar-incidents}
 
 **Schema 规则被静默丢弃。** Issue #37707（2026-09-03）：使用 xgrammar 时，如果字符串字段同时设置 `pattern`，它会接受比 `minLength` 更短的值。同一报告称 outlines 丢弃了 `pattern` 和数值边界。本手册核验时，该 issue 仍未关闭。
 
@@ -79,8 +79,8 @@ Schema 限制了结构，没有约束事实。约束回复说“NVIDIA A100”�
 ```takeaways
 - 对每个由程序解析的回复，使用 json_schema 或 response_format。
 - 用故意违反规则的请求，测试你依赖的每个 JSON Schema 关键字。
-- 部署后为每种常见 schema 发一次请求，避免用户支付编译时间。
+- 每次部署后发送一个约束请求，避免用户支付首次语法处理成本。
 - 在负载下增加新 schema 时，观察 sglang:num_grammar_queue_reqs。
 ```
 
-来源：capture/out/serve-help.txt, capture/gpu/out-gb10/structured.txt, capture/gpu/structured_probe.py, python/sglang/srt/constrained/grammar_manager.py (process_req_with_grammar, get_ready_grammar_requests), constrained/base_grammar_backend.py, constrained/xgrammar_backend.py, model_executor/model_runner.py (_preprocess_logits), sampling/sampling_params.py, arg_groups/serving_hook.py (handle_grammar_backend), arg_groups/choices.py (GRAMMAR_BACKEND_CHOICES), and observability/metrics_collector.py at v0.5.22; SGLang paper (arXiv 2312.07104); issues #37707 and #38863; field report by Varad More (2026-04-22).
+来源： capture/out/serve-help.txt, capture/gpu/out-gb10/structured.txt, capture/gpu/structured_probe.py, python/sglang/srt/constrained/grammar_manager.py (process_req_with_grammar, get_ready_grammar_requests), constrained/base_grammar_backend.py, constrained/xgrammar_backend.py, model_executor/model_runner.py (_preprocess_logits), sampling/sampling_params.py, arg_groups/serving_hook.py (handle_grammar_backend), arg_groups/choices.py (GRAMMAR_BACKEND_CHOICES), observability/metrics_collector.py（v0.5.22）; SGLang 论文（arXiv 2312.07104）; issue #37707、#38863; Varad More 的实践报告（2026-04-22）.

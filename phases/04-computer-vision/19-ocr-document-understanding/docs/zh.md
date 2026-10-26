@@ -71,7 +71,7 @@ CTC 就是 CRNN 在 2015 年奏效、并在 2026 年仍训练着大多数生产 
 
 ### 版面解析
 
-对结构化文档，跑一个版面检测器（LayoutLMv3、DocLayNet），给每个区域打标签：Title、Paragraph、Figure、Table、Footnote。阅读顺序于是变成"按版面顺序遍历区域、拼接"。
+对结构化文档，跑一个版面模型（LayoutLMv3，或在 DocLayNet 数据集上训练的检测器），给每个区域打标签：Title、Paragraph、Figure、Table、Footnote。阅读顺序于是变成"按版面顺序遍历区域、拼接"。
 
 对表单，用**键值抽取**模型（视觉丰富文档用 Donut，普通扫描用 LayoutLMv3）。它们拿图像 + 检测到的文字 + 位置，预测结构化的键值对。
 
@@ -160,18 +160,23 @@ class TinyCRNN(nn.Module):
 
 ### 第 3 步：合成 OCR
 
-生成黑底白字的数字串做端到端冒烟测试。
+生成黑底白字的字符串做端到端冒烟测试。每个字符会被编码成六条竖线，表示它在词表中的二进制索引。图像必须保留字符身份：如果每个字符都只是同样的空白方框，模型就分不清 `a` 和 `x`，损失也无法下降。
 
 ```python
 import numpy as np
+
+GLYPHS = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 def synthetic_line(text, height=32, char_width=16):
     W = char_width * len(text)
     img = np.ones((height, W), dtype=np.float32)
     for i, c in enumerate(text):
         x = i * char_width
-        shade = 0.0 if c.isalnum() else 0.5
-        img[6:height - 6, x + 2:x + char_width - 2] = shade
+        code = GLYPHS.find(c) + 1
+        for bit in range(6):
+            if code >> bit & 1:
+                y = 4 + 4 * bit
+                img[y:y + 3, x + 2:x + char_width - 2] = 0.0
     return img
 
 
@@ -202,7 +207,7 @@ print(f"images: {imgs.shape}   targets: {targets.shape}   lengths: {lengths.toli
 model = TinyCRNN(vocab_size=len(vocab))
 opt = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-for step in range(200):
+for step in range(400):
     strings = ["abc" + str(step % 10)] * 4 + ["xyz" + str((step + 1) % 10)] * 4
     imgs, targets, target_lens = build_batch(strings, vocab)
     log_probs = model(imgs)  # (W', 8, vocab)
@@ -211,7 +216,7 @@ for step in range(200):
     opt.zero_grad(); loss.backward(); opt.step()
 ```
 
-在这种平凡的合成数据上，损失应在 200 步内从约 3 降到约 0.2。
+在这种简单的合成数据上，损失应在 400 步内从两位数降到约 0.3。`code/main.py` 对自有的字符串集运行相同循环，再解码三个测试字符串。
 
 ## 实际使用
 

@@ -22,7 +22,7 @@ const projects = vm.runInNewContext(read('projects-data.js') + '\nwindow.AIFS_PR
 // These checks consume the real integrated build, not frozen English fixtures.
 test('build.js publishes exports before loading the manual builder and has no require-time writes', () => {
   const before = read('data.js');
-  const result = spawnSync(process.execPath, ['-e', "const b=require('./site/build'); const m=require('./site/build-manuals'); if(typeof b.githubSourceUrl!=='function'||m.loadAll().length!==4)process.exit(1)"], { cwd: root, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, ['-e', `const b=require('./site/build'); const m=require('./site/build-manuals'); if(typeof b.githubSourceUrl!=='function'||m.loadAll().length!==${manualManifests.length})process.exit(1)`], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout, '');
   assert.equal(read('data.js'), before);
@@ -51,7 +51,7 @@ test('all 542 static lessons preserve Chinese source rendering, canonical, quiz 
   assert.equal(count, 542);
 });
 
-test('78 project sources, 322 stage docs, four manual sources and 245 Hub pages are fully generated', () => {
+test('project, stage, manual and Hub sources are fully generated', () => {
   assert.equal(projects.length, 78);
   let stages = 0;
   const sitemap = read('sitemap.xml');
@@ -181,5 +181,5 @@ test('app.js modal Hub wire switches phases, rejects undeclared targets and pres
   phases[0].hub = valid; context.openModal(0, true);
   assert.equal(link.hidden, false); assert.equal(link.getAttribute('href'), valid); context.closeModal(true);
   assert.match(read('index.html'), /<a class="modal-phase-link" id="modalPhaseLink" hidden>/);
-  assert.match(read('index.html'), /app\.js\?v=20261019a/);
+  assert.match(read('index.html'), /app\.js\?v=20261026a/);
 });

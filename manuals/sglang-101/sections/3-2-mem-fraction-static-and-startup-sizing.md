@@ -6,7 +6,7 @@
 
 读完本节，你能理解启动内存划分，预测何时失败，并有依据地设置 `--mem-fraction-static`。
 
-## 捕获到的崩溃
+## 捕获到的崩溃 {#s-mem-fraction-static-and-startup-sizing-the-crash-we-recorded}
 
 捕获工具编写前，上游用相同命令启动两次，均未设置 `--mem-fraction-static`，两次池容量差异很大。
 
@@ -40,7 +40,7 @@ RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (0000
 [2026-10-16 13:43:02] kill_process_tree called: parent_pid=81559, include_parent=True, pid=81559
 ```
 
-先读 `token usage: 0.05`。32 个请求保留 16,095 token，仅占 312,581-token 池的 5%。池预留了 34 GB，实际使用不足 2 GB。下一次前向传播的激活需要池外内存，而操作系统已无余量。一次 command buffer 失败便导致 scheduler 退出，服务随后终止整个进程树。
+先读 `token usage: 0.05`。32 个请求保留 16,095 token，仅占 312,581-token 池的 5%。池预留了约 33 GB，实际使用不足 2 GB。下一次前向传播的激活需要池外内存，而操作系统已无余量。一次 command buffer 失败便导致 scheduler 退出，服务随后终止整个进程树。
 
 ```figure
 id: fig-3-2
@@ -50,7 +50,7 @@ claim: 按空闲内存 87% 建池，留给激活的空间不足；比例 0.4 时
 caption: 每条从左向右读。绿色为 KV 池，灰色为其他用途。来源：capture/out/oom-exploratory.log 和 capture/out/server-default.log。
 ```
 
-## SGLang 如何决定划分
+## SGLang 如何决定划分 {#s-mem-fraction-static-and-startup-sizing-how-sglang-decides-the-split}
 
 **--mem-fraction-static：** 分给模型权重加 KV 池的内存比例。比例之外留给激活、CUDA graphs 和其他程序。参数默认 `None`，由 SGLang 启动时计算 {{code}}。
 
@@ -60,9 +60,9 @@ GPU 上自动值从预留量推导。起始 512 MB，每个 prefill chunk token 
 
 Apple silicon 的 MLX 后端规则更简单 {{code}}：取两个数较小者。第一项为 Metal working set 乘比例，再减当前已用内存；第二项为当前可用系统内存乘比例。第二项快照正是两次运行间变化的部分。
 
-一篇公开调优文章反着解释该比例，说它分配权重加缓冲区，剩余才是 KV 缓存。代码恰好相反：静态份额容纳权重与 KV 池。
+应将 fraction 理解为权重与 KV 池共用的显存比例。这也是代码实际采用的方式。
 
-## 默认值假定机器专属于 SGLang
+## 默认值假定机器专属于 SGLang {#s-mem-fraction-static-and-startup-sizing-the-default-assumes-the-machine-belongs-to-sglang}
 
 自动规则适合专用 GPU：没有别的程序分配内存，预留量覆盖一个 prefill chunk 的激活及 CUDA graphs。但三种常见场景会失败。
 
@@ -70,7 +70,7 @@ Apple silicon 的 MLX 后端规则更简单 {{code}}：取两个数较小者。�
 - **未知容量。** 无法读取容量的设备采用 0.95，只给激活留 5%。Issue #39675 报告 Apple MPS 正是这样在首个 prefill 内存耗尽 {{issue #39675}}。
 - **估计未考虑的额外内存。** Issue #42510 中，计算目标池时草稿模型副本仍驻留，导致草稿池分配失败 {{issue #42510}}。Issue #6027 中，64K-token DeepSeek-V3 prompt 在注意力计算时内存耗尽，尽管日志报告能容纳 274,934 个 KV token {{issue #6027}}。
 
-## GB10 的统一内存
+## GB10 的统一内存 {#s-mem-fraction-static-and-startup-sizing-unified-memory-on-a-gb10}
 
 **上游实测**在 DGX Spark 的 NVIDIA GB10 上也观察到同一规则。CPU 与 GPU 共享 121.7 GiB 内存，没有独立显存，因此启动日志各数字的含义不同。
 
@@ -91,24 +91,24 @@ note: 摘自默认 GPU 配置启动：Qwen3-30B-A3B、BF16、比例 0.7。
 
 第一行是容量。`nvidia-smi` 不报告 GB10 内存大小，因此 SGLang 从 PyTorch 读取总量。
 
-第二行是空闲内存，代码在此很谨慎。共享系统内存的设备上，`torch.cuda.mem_get_info()` 将内核文件缓存算作已用。上游首次录制时文件缓存较大，工具以此读出 67.7 GiB 空闲。SGLang 检查集成设备后，改读操作系统可用内存 {{code}}，其中包括内核可回收缓存，同次启动读得 113.55 GB。重启后两者一致：PyTorch 为 112.1 GiB，SGLang 为 112.59 GB。
+第二行是空闲内存，代码会特别处理统一内存设备。共享系统内存的设备上，`torch.cuda.mem_get_info()` 会将内核文件缓存算作已用显存。文件缓存较大时，这个读数可能远低于机器实际可用量。SGLang 判断设备是否为集成 GPU，然后改读操作系统的可用内存 {{code}}。该读数将内核可回收缓存算为可用。重启后两种方法结果一致：PyTorch 为 112.1 GiB，SGLang 为 112.59 GB。
 
 该选择的代价是池容量随机器其他活动变化。六次 BF16 启动使用同样命令与权重：
 
 | 配置 | 加载权重前可用 | SGLang 测得权重占用 | KV 池 token 数 |
 |---|---|---|---|
-| default | 112.59 GB | 57.75 GB | 227,243 |
-| no CUDA graph | 113.21 GB | 54.78 GB | 258,017 |
-| deterministic | 113.44 GB | 57.90 GB | 234,517 |
-| no radix cache | 113.17 GB | 57.34 GB | 236,315 |
-| no overlap | 113.37 GB | 57.92 GB | 233,822 |
+| 默认 | 112.59 GB | 57.75 GB | 227,243 |
+| 关闭 CUDA graph | 113.21 GB | 54.78 GB | 258,017 |
+| 确定性推理 | 113.44 GB | 57.90 GB | 234,517 |
+| 关闭基数缓存 | 113.17 GB | 57.34 GB | 236,315 |
+| 关闭重叠 | 113.37 GB | 57.92 GB | 233,822 |
 | EAGLE-3，带草稿模型 | 113.45 GB | 57.49 GB | 216,775 |
 
-权重未变，测得大小却从 54.78 GB 到 57.92 GB。SGLang 以可用内存下降量测权重，加载期间内核缓存也在变。五次无草稿启动的池相差 14%。前一天同样六次启动中，异常值却落在关闭重叠的服务上，达到 261,113 token。异常值会换位置，说明原因是机器而非参数。统一内存上，一次启动的池大小只能作为下次估计，不是常量。
+权重未变，测得大小却从 54.78 GB 到 57.92 GB。SGLang 以可用内存下降量测权重，加载期间内核缓存也在变。五次无草稿启动的池相差 14%。相同权重的测量相差约 3 GB，因此参数无法解释这种波动。统一内存上，一次启动的池大小只能作为下次估计，不是常量。
 
-## 其他程序看得见的池
+## 其他程序看得见的池 {#s-mem-fraction-static-and-startup-sizing-a-pool-that-other-programs-see}
 
-GB10 上 KV 池达数十 GB，SGLang 几秒就分配完。机器上其他程序都看见这些内存消失。上游 GB10 还为其他用户运行内存保护守护程序，空闲不足时暂停增长最快的进程。它三次在权重加载后暂停 scheduler：
+GB10 上 KV 池达数十 GB，SGLang 几秒就分配完。机器上其他程序都看见这些内存消失。上游 GB10 还为其他用户运行内存保护守护程序，空闲不足时暂停增长最快的进程。它在启动期间三次暂停 scheduler：
 
 ```listing
 title: 内存保护暂停 scheduler
@@ -120,7 +120,7 @@ note: GB10 运行中保护日志前两行。
 2026-10-16T12:53:16+00:00 2026/10/16 12:53:16 guardian pause: Paused sglang::schedul (pid 2983880, rohit): it grew 36.7 GiB in 5s with 34.2 GiB left. Resume or stop it from the app.
 ```
 
-SGLang 没报错。服务日志停在 `Load weight end`，永远到不了健康检查。保护程序按自身规则正确执行：scheduler 正是增长最快者。几秒后池完成，保护日志又说 “Back to normal”。上游与机器所有者协商，仅在实验期间停止保护程序。
+我们没有保留这三次启动的 SGLang 服务器日志。守护进程日志显示 scheduler 在 5 秒内增长 36.7 GiB，与 KV 池分配量相当。按保护程序自身规则，scheduler 是增长最快的进程。几秒后池分配完成，保护日志记录 `Back to normal`。上游与机器所有者协商，仅在实验期间停止保护程序。
 
 NVIDIA 驱动启动时也报告内存错误。GB10 内核日志成批出现：
 
@@ -133,11 +133,19 @@ note: 文件末行，上方行统计每分钟出现批次。
 NVRM: nvCheckOkFailedNoLog: Check failed: Out of memory [NV_ERR_NO_MEMORY] (0x00000051) returned from _memdescAllocInternal(pMemDesc) @ mem_desc.c:1359
 ```
 
-其中六批在分钟级上与工具的 `KV Cache is allocated` 对齐，时间为 14:36、14:55、15:04、15:30、15:47、15:58。这六个服务均变为健康并完成基准。4,096-token 池的启动未出现该错误，其余批次来自上游测试与扫描服务器。
+这些 burst 均记录于 2026-10-16，也就是 GB10 首次测试与扫描的日期。我们没有保留当天的服务日志，因此无法将每批 burst 对应到某次启动。后续捕获中的服务器都通过健康检查并完成基准。
 
 **本手册的建议：** 统一内存上，KV 池占用的是整台机器让出的内存。有依据地设置 `--mem-fraction-static`，启动前告知其他用户。不要仅凭驱动这一行报警，应对服务器未变健康报警。
 
-## 本手册的建议：共享机器自行设置比例
+### fraction 之外的内存 {#s-mem-fraction-static-and-startup-sizing-memory-outside-the-fraction}
+
+fraction 不限制 SGLang 启动时使用的全部内存。一位用户报告在 DGX Spark 上运行 27B 模型时，还有 25 至 40 GB 的短时分配不计入 SGLang 内存统计。FlashInfer autotuner 和 CUDA graph 捕获都会产生这类分配。该用户曾在宿主机上直接启动服务，导致整机冻结并需断电重启，之后改在有内存上限的容器中运行，并设置 `--mem-fraction-static 0.50`。
+
+这是 v0.5.22 之前的报告，且未注明 SGLang 版本。我们没有测量这类分配，应将它视为风险提示，不是 v0.5.22 的验证结果。上方 guard 日志显示启动时内存快速增长，但无法区分 KV 池和其他分配。
+
+在共享 GB10 上，可将 SGLang 放入有内存上限的容器，并从低于工具包使用的 0.7 起步。启动期间每秒记录一次机器可用内存，看到峰值后再调整比例。
+
+## 本手册的建议：共享机器自行设置比例 {#s-mem-fraction-static-and-startup-sizing-our-position-set-the-fraction-yourself-on-any-shared-machine}
 
 只要机器上还跑别的程序，就自行传入 `--mem-fraction-static`。捕获工具在 Mac 上使用 0.4；同样的并发 32 基准，此时 128 个请求全部完成，而此前 run 2 崩溃。
 
@@ -152,7 +160,7 @@ note: 默认工具配置的一行启动日志。
 
 预算变为 19.39 GB，即快照 48.49 GB 的 0.4。池仍容纳 181,574 token，远多于 32 个 640-token 请求所需。该负载从未填满池，因此缩池没有性能成本。
 
-上游也在 GB10 测了反方向。[第 5.1 节](#s-sglang-benchmark-serving)的负载扫描分别以工具默认 0.7 与 0.82 运行，每点三个种子。
+上游也在 GB10 测了反方向。[第 5.1 节](#s-sglang-benchmark-serving)的负载扫描分别使用工具默认的 0.7（2026-10-16）和 0.82（2026-10-17），每点三个种子。
 
 ```listing
 title: GB10 上更大的池，最满时刻
@@ -164,7 +172,7 @@ note: 比例 0.82 的池，以及整次扫描占用最高的 decode 行。
 [2026-10-17 16:47:45] Decode batch, #running-req: 64, #token: 40751, token usage: 0.11, cuda graph: True, gen throughput (token/s): 263.88, #queue-req: 0
 ```
 
-**上游实测**BF16 池从 234,600 增至 383,065 token，增长 63%。FP8 池从 1,084,458 增至 1,378,545 token。但吞吐量没变：64 用户时 BF16 为 238.72 对 235.38 tok/s，FP8 为 442.71 对 440.86。所有并发下，两中位数相差不超过 2%。
+**上游实测**BF16 池从 234,600 增至 383,065 token，增长 63%。FP8 池从 1,084,458 增至 1,378,545 token。吞吐量没有变化：64 用户时，BF16 为 238.72 对 235.38 tok/s，FP8 为 442.71 对 440.86。所有并发下，吞吐量中位数变化不超过 2%。
 
 ```figure
 id: fig-3-2c
@@ -174,7 +182,7 @@ claim: GB10 比例从 0.7 提到 0.82，BF16 池增大 63%，闭环吞吐量变�
 caption: 输出吞吐量对最大并发，每点三个种子。实线 0.7、虚线 0.82；梅紫 BF16、绿色 FP8 加 FP8 KV。来源：capture/gpu/summary/gb10.json。
 ```
 
-日志解释了原因：64 个请求占 40,751 token，即池的 11%。0.7 时最高占用也仅 17%。池从来不是限制，增大就无事可做。对比[第 4.3 节](#s-quantization)的 L4：64 用户时 BF16 池已满，FP8 几乎让吞吐量增加到三倍。
+日志解释了原因：64 个请求占 40,751 token，即池的 11%。工具包 0.7 服务器的最高 token 使用率为 18%。池不是限制，因此增大它没有性能收益。对比[第 4.3 节](#s-quantization)的 L4：64 用户时 BF16 池已满，FP8 几乎让吞吐量增加到三倍。
 
 [第 5.1 节](#s-sglang-benchmark-serving)开环扫描给出另一半答案。每秒 16 请求超过 GB10 服务能力，旧请求仍在运行，新请求持续到达，此时大池确实有用。
 
@@ -204,7 +212,7 @@ note: 每秒提供 16 请求、比例 0.82 时占用最高的 decode 行。
 
 比例也影响横向比较。一份独立基准用 SGLang 自动比例，对比 vLLM 默认 0.9 {{field Rawlinson 2025-12}}，两者 KV 池大小相差很大。相信未报告双方数值的比较前，先读[第 5.3 节](#s-reading-other-peoples-benchmarks)。
 
-## 测量什么
+## 测量什么 {#s-mem-fraction-static-and-startup-sizing-what-to-measure}
 
 - 启动时的 `max_total_num_tokens`，它是整套计算的结果。
 - Decode 日志的 `token usage`，接近 1.0 表示池满。
@@ -220,6 +228,7 @@ Apple silicon 还需注意：上游捕获的 `kv_cache_memory_usage_gb` 为 0.0�
 - 长 prompt 在注意力内存耗尽时，降低比例。
 - 比较引擎必须让双方都报告 KV 池容量。
 - GB10 每次启动读池容量，因为各次会变。
+- 共享 GB10 使用有内存上限的容器、较低比例，并记录可用内存。
 ```
 
-Sources: python/sglang/srt/arg_groups/memory_hook.py (handle_gpu_memory_settings), python/sglang/srt/mem_cache/kv_cache_configurator.py (_profile_available_bytes), python/sglang/srt/hardware_backend/mlx/model_runner.py (_compute_pool_size), python/sglang/srt/arg_groups/fields/schedule.py (mem_fraction_static) at v0.5.22, capture/out/oom-exploratory.log, capture/out/server-default.log, capture/out/metrics.txt, python/sglang/srt/utils/common.py (get_available_gpu_memory) at v0.5.22, capture/gpu/out-gb10/server-*.log, capture/gpu/out-gb10/environment.json, capture/gpu/incidents/gb10-memory-guard-pauses.txt, capture/gpu/incidents/gb10-driver-no-memory.txt, issues #39675, #42510, and #6027, the Rawlinson benchmark of 2025-12-05. capture/gpu/out-gb10/server-load-default-kv-max.log, capture/gpu/summary/gb10.json. capture/gpu/out-gb10/server-rate-default-full.log, capture/gpu/out-gb10/server-rate-default-kv-max.log.
+来源： python/sglang/srt/arg_groups/memory_hook.py (handle_gpu_memory_settings), python/sglang/srt/mem_cache/kv_cache_configurator.py (_profile_available_bytes), python/sglang/srt/hardware_backend/mlx/model_runner.py (_compute_pool_size), python/sglang/srt/arg_groups/fields/schedule.py (mem_fraction_static)，v0.5.22, capture/out/oom-exploratory.log, capture/out/server-default.log, capture/out/metrics.txt, python/sglang/srt/utils/common.py (get_available_gpu_memory)，v0.5.22, capture/gpu/out-gb10/server-*.log, capture/gpu/out-gb10/environment.json, capture/gpu/incidents/gb10-memory-guard-pauses.txt, capture/gpu/incidents/gb10-driver-no-memory.txt, issue #39675, #42510, 和 #6027, Rawlinson 基准， 2025-12-05. capture/gpu/out-gb10/server-load-default-kv-max.log, capture/gpu/summary/gb10.json. capture/gpu/out-gb10/server-rate-default-full.log, capture/gpu/out-gb10/server-rate-default-kv-max.log, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/server-pools.log, basbunarhasan, Qwen3.8-27B at 34-38 tok/s on DGX Spark, open-source one-command setup (SGLang + NVFP4 + DSpark), NVIDIA developer forum (2026-08-15)

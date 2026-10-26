@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-1-2-title fig-1-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-1-2-title">engine 退出不会停止任务</title>
+  <desc id="fig-1-2-desc">同一时间轴上的两次运行。未启用 watchdog 时，engine 启动即退出。随后 rollout loop 在 63 分钟内记录了 200,533 条 HTTP 503 错误，GPU 一直空闲，直到我们停止容器。启用 watchdog.sh 后，测试容器连续输出同类错误，连续六次检查都发现超过 100 条错误后，在 183 s 时停止。一次健康的 16 答案运行中，这类错误会成批出现，最长持续 60 s，其中两次仅相隔 45 s。回放该运行时，六次检查会误停一半以上的情况，十次检查则不会误停，因此 watchdog 默认使用十次。</desc>
+  <defs><marker id="fig-1-2-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
+  <text x="20" y="28" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">MINUTES AFTER THE ENGINE STOPPED</text>
+  <line x1="150" y1="232" x2="150" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="150" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="258.46" y1="232" x2="258.46" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="258.46" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">15</text>
+  <line x1="366.92" y1="232" x2="366.92" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="366.92" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">30</text>
+  <line x1="475.38" y1="232" x2="475.38" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="475.38" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">45</text>
+  <line x1="583.85" y1="232" x2="583.85" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="583.85" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">60</text>
+  <text x="20" y="82" font-size="12" font-weight="700">未启动 watchdog</text>
+  <text x="20" y="100" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务继续运行</text>
+  <rect x="150" y="62" width="455.54" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="377.77" y="82" font-size="11.5" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">/generate 返回 200,533 条 HTTP 503</text>
+  <text x="377.77" y="98" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GPU 空闲，任务未报告失败</text>
+  <text x="605.54" y="124" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">我们在第 63 分钟停止任务</text>
+  <text x="20" y="172" font-size="12" font-weight="700">watchdog.sh 测试</text>
+  <text x="20" y="190" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">需要连续 6 次错误检查</text>
+  <rect x="150" y="152" width="22.05" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <line x1="174.05" y1="174" x2="215.08" y2="174" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-1-2-head-amber)"/>
+  <text x="217.08" y="214" font-size="11" class="m-serif" fill="var(--m-amber-ink, #85590c)">watchdog 停止容器</text>
+  <rect x="217.08" y="152" width="250" height="44" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="342.08" y="169.25" font-size="12.5" text-anchor="middle" font-weight="700">183 s 后以状态码 1 退出</text>
+  <text x="342.08" y="186.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">连续 6 次检查均超过 100 条错误</text>
+  <text x="20" y="290" font-size="12" class="m-serif">无人值守运行前都要启动 watchdog。任务本身不会自动失败退出。</text>
+  <text x="20" y="312" font-size="12" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">健康训练的错误峰值间隔为 45 s，因此连续检查 6 次不够。请设置为 10 次。</text>
+</svg>

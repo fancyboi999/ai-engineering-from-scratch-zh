@@ -5,7 +5,7 @@ code: AI
 subtitle: 选择并调优 RLHF、DPO、IPO、KTO、SimPO、ORPO、BPO 与 Constitutional AI。涵盖损失、默认值与故障。
 hue: 290
 sources: phases/18-ethics-safety-alignment/01-instruction-following-alignment-signal, phases/18-ethics-safety-alignment/03-direct-preference-optimization-family, phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif, phases/10-llms-from-scratch/07-rlhf, phases/10-llms-from-scratch/08-dpo
-source_hash: 93ce231e3fc3a6c5
+source_hash: 1c64b8c20df6e7c3
 ---
 
 ## RLHF、RLAIF 与 DPO 对比

@@ -1,6 +1,6 @@
 # 顶点项目 07 —— 端到端微调流水线（数据到 SFT 到 DPO 到服务）
 
-> 一个在你自己的数据上训练、用你自己的偏好做 DPO 对齐、量化、推测解码、并以可测量的 $/100 万 token 提供服务的 8B 模型。2026 年的开源栈是 Axolotl v0.8、TRL 0.15、迭代用 Unsloth、量化用 GPTQ/AWQ/GGUF、服务用带 EAGLE-3 的 vLLM 0.7。这个顶点项目就是可复现地跑完整条流水线——输入 YAML，输出一个服务端点——并在 2026 Model Openness Framework 下发一张 model card。
+> 一个 8B 级模型，在你自己的数据上训练、用你自己的偏好做 DPO 对齐、量化、推测解码，并以可测量的 $/100 万 token 提供服务。2026 年的开源栈是 Axolotl v0.8、TRL 0.15、迭代用 Unsloth、量化用 GPTQ/AWQ/GGUF、服务用带 EAGLE-3 的 vLLM 0.7。这个顶点项目就是可复现地跑完整条流水线——输入 YAML，输出一个服务端点——并在 2026 Model Openness Framework 下发一张 model card。
 
 **类型：** Capstone
 **语言：** Python（流水线）、YAML（配置）、Bash（脚本）
@@ -12,7 +12,7 @@
 
 2026 年每个像样的 AI 团队都随时备着一条微调流水线。不是因为他们要发一个前沿基座模型，而是因为下游适配——领域 SFT、针对已标注偏好的 DPO、给推测解码蒸馏出的 draft、用 EAGLE-3 提供服务——才是可测量收益所在。Axolotl v0.8 搞定多 GPU 的 SFT 配置。TRL 0.15 搞定 DPO 和 GRPO。Unsloth 让你在单 GPU 上快速迭代。带 EAGLE-3 的 vLLM 0.7 把解码吞吐提到 2-3 倍且不损质量。工具是好用的；手艺在那些 YAML、数据卫生，以及评测纪律上。
 
-你将把一个 8B 基座（Llama 3.3、Qwen3 或 Gemma 3）在任务专属数据上先过 SFT 再过 DPO，量化以提供服务，并对照 lm-evaluation-harness、RewardBench-2、MT-Bench-v2、MMLU-Pro 衡量收益。你将在 2026 Model Openness Framework 下产出一张 model card。重点是可复现性——一条命令端到端重跑整条流水线。
+你将把一个 8B 到 14B 基座（Llama 3.1 8B、Qwen3 14B 或 Gemma 3 12B）在任务专属数据上先过 SFT 再过 DPO，量化以提供服务，并对照 lm-evaluation-harness、RewardBench-2、MT-Bench-v2、MMLU-Pro 衡量收益。你将在 2026 Model Openness Framework 下产出一张 model card。重点是可复现性——一条命令端到端重跑整条流水线。
 
 ## 核心概念
 
@@ -56,7 +56,7 @@ model card (2026 MOF) + safety eval (Llama Guard 4)
 ## 技术栈
 
 - 数据：去重用 Datatrove，质量用 Nemotron-CC 分类器，PII 用 Presidio
-- 基座：Llama 3.3 8B、Qwen3 14B 或 Gemma 3 12B
+- 基座：Llama 3.1 8B、Qwen3 14B 或 Gemma 3 12B
 - SFT：带 ZeRO-3、Flash Attention 3、打包序列的 Axolotl v0.8
 - 偏好调优：DPO 或 GRPO 用 TRL 0.15；单 GPU 迭代用 Unsloth
 - 量化：GPTQ（Marlin）、AWQ、通过 llama.cpp 的 GGUF
@@ -120,7 +120,7 @@ $ ./pipeline.sh config/llama3.3-8b-domainX.yaml
 
 1. 在同一个任务专属基准上跑 仅 SFT vs SFT+DPO vs SFT+GRPO。报告哪种偏好方法赢、赢多少。
 
-2. 把 Llama 3.3 8B 换成 Qwen3 14B。在质量持平时衡量 $/100 万 token。
+2. 把 Llama 3.1 8B 换成 Qwen3 14B。在质量持平时衡量 $/100 万 token。
 
 3. 衡量 EAGLE-3 在领域数据上 vs 通用 ShareGPT 上的接受率。报告差值，以及它对延迟预算意味着什么。
 
@@ -148,5 +148,5 @@ $ ./pipeline.sh config/llama3.3-8b-domainX.yaml
 - [DeepSeek R1 paper (arXiv:2501.12948)](https://arxiv.org/abs/2501.12948) —— GRPO 方法论
 - [vLLM + EAGLE-3 documentation](https://docs.vllm.ai) —— 参考服务栈
 - [SGLang SpecForge](https://github.com/sgl-project/SpecForge) —— 备选的推测解码训练器
-- [Model Openness Framework 2026](https://isocpp.org/) —— 开源发布评级标准
+- [Model Openness Framework 2026](https://arxiv.org/abs/2403.13784) —— 开源发布评级标准
 - [lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness) —— 标准评测运行器

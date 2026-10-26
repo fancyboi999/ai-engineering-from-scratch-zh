@@ -1,0 +1,32 @@
+{
+  "id": "pairwise-distances",
+  "title": "向量化两两距离",
+  "kind": "implement",
+  "summary": "通过一次矩阵乘法计算欧氏距离和余弦相似度，并处理负舍入误差与零向量。",
+  "difficulty": "medium",
+  "tags": [
+    "distances",
+    "vectorization",
+    "cosine-similarity",
+    "numerical-stability"
+  ],
+  "lesson": "phases/01-math-foundations/14-norms-and-distances",
+  "cheatsheet": "math-for-ml",
+  "minutes": 20,
+  "entry": [
+    "pairwise_sq_distances",
+    "pairwise_distances",
+    "cosine_similarity_matrix"
+  ],
+  "collections": [
+    "math-foundations"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "cosine_norm_axis0": "沿 axis 0 计算 B 的范数，除以列范数而不是行范数。",
+    "cosine_zero_nan": "不处理零向量，除以零范数后产生 NaN。",
+    "no_clip": "没有将距离平方截断到 0，导致舍入误差产生负数，开平方后变成 NaN。",
+    "plus_cross_term": "将 2ab 加到范数平方上，而不是减去它。",
+    "square_of_sum": "计算每行元素之和的平方，而不是元素平方之和。"
+  }
+}

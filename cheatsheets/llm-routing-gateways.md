@@ -5,7 +5,7 @@ code: LR
 subtitle: 选择网关、配置别名和兜底链，在低成本与前沿模型之间路由，并对慢速安全读取发起对冲。
 hue: 28
 sources: phases/13-tools-and-protocols/21-llm-routing-layer, phases/17-infrastructure-and-production/16-model-routing, phases/17-infrastructure-and-production/19-ai-gateways, projects/hedged-request-lab
-source_hash: c5a3cf33e5a221e1
+source_hash: 7ee39673c844e9e9
 ---
 
 ## AI 网关对比

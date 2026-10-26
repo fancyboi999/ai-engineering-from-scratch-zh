@@ -1,0 +1,40 @@
+{
+  "id": "train-softmax-blobs",
+  "title": "在四个点簇上训练 softmax 回归",
+  "kind": "train",
+  "summary": "用梯度下降训练多项逻辑回归，在四个高斯点簇上达到留出集准确率和对数损失目标。",
+  "difficulty": "easy",
+  "tags": [
+    "softmax",
+    "logistic-regression",
+    "gradient-descent",
+    "log-loss"
+  ],
+  "lesson": "phases/02-ml-fundamentals/03-logistic-regression",
+  "cheatsheet": "classical-ml",
+  "minutes": 25,
+  "entry": [
+    "train",
+    "predict_proba"
+  ],
+  "collections": [
+    "train-tiny-models",
+    "classical-ml"
+  ],
+  "time_limit_s": 15,
+  "budget": {
+    "steps": 500
+  },
+  "target": {
+    "metric": "held-out log loss",
+    "value": 0.11
+  },
+  "mutants": {
+    "grad_missing_onehot": "将概率作为误差，漏减独热目标。",
+    "no_bias_update": "从不更新偏置，导致各类保持相同的基础分数。",
+    "no_standardize": "直接使用原始特征训练，未按均值和标准差缩放，导致 500 步不足以收敛。",
+    "no_max_shift": "对原始分数调用 np.exp，导致远处点溢出并产生 NaN。",
+    "softmax_wrong_axis": "沿批量轴 0 而非类别轴归一化指数值。",
+    "standardizes_in_place": "用 -= 和 /= 原地缩放 X，导致调用方数组变化。"
+  }
+}

@@ -92,6 +92,8 @@ roofline
 
 ## 实际使用
 
+[Inside an LLM Serving GPU](https://aieng-zh.cn/inside-an-llm-serving-gpu.html?workload=shared&shared=4096) 展示了一个真实的 L4 run：四组请求各有自己的 4096-token system prompt。每组第一次请求计算 prompt；只要它仍在缓存中，后续请求就只计算 128-token 的问题。关闭 radix cache 后，median first token 从 479 ms 增到 14,706 ms。
+
 `code/main.py` 实现一个玩具级 radix 树 KV cache 加一个带两种策略的调度器：FCFS 和缓存感知。把同一个工作负载跑两遍，报告前缀缓存命中率和吞吐差值。然后跑一个"打乱顺序"的工作负载，展示 6.4 倍是怎么崩掉的。
 
 ## 拿去用

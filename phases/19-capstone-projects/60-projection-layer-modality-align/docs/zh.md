@@ -118,7 +118,7 @@ python3 -m unittest code/test_main.py
 
 4. 给 projector 权重加一个小的 L2 惩罚，观察它如何与 cosine 对齐相互作用（cosine 对尺度不变，所以惩罚主要是收缩那些没用到的方向）。
 
-5. 持久化 projector 权重，然后重新加载并在不跑视觉 encoder 反向传播的情况下做推理，验证部署时只需要 projector。
+5. 持久化 projector 权重，然后重新加载并在不跑视觉 encoder 反向传播的情况下做推理，验证你部署时只需额外交付 projector；部署仍然要运行视觉 encoder 的 forward pass。
 
 ## 关键术语
 

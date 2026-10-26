@@ -41,7 +41,7 @@ function plain(text) {
     .replace(/`[^`]*`/g, 'Code')
     .replace(/\{\{[^}]*\}\}/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/"[^"]*"|“[^“”]*”/g, 'Quote')
+    .replace(/[“"][^”"]*[”"]/g, 'Quote')
     .replace(/\*\*?/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -49,8 +49,8 @@ function plain(text) {
 
 function sentences(text) {
   let s = text.replace(/\b(e\.g|i\.e|vs|etc|approx|Fig|No|U\.S|Inc|Dr|Mr|Ms|p)\./g, match => match.replace(/\./g, '<dot>'));
-  s = s.replace(/([.!?]["”)])\s+(?=[A-Z0-9"(“§])/g, '$1<split>').replace(/([.!?])\s+(?=[A-Z0-9"(“§])/g, '$1<split>');
-  s = s.replace(/([。！？])(?:[”’）])?/g, '$&<split>');
+  s = s.replace(/([。！？])\s*/g, '$1<split>');
+  s = s.replace(/([.!?]["”)])\s+(?=[A-Z0-9"(“§]|\p{Script=Han})/gu, '$1<split>').replace(/([.!?])\s+(?=[A-Z0-9"(“§]|\p{Script=Han})/gu, '$1<split>');
   return s.split('<split>').map(part => part.replace(/<dot>/g, '.').trim()).filter(Boolean);
 }
 
@@ -67,23 +67,22 @@ function lexiconHits(text) {
 
 function proseIssues(span, add) {
   const raw = String(span.text);
-  const stripped = raw.replace(/`[^`]*`/g, '').replace(/\{\{[^}]*\}\}/g, '').replace(/"[^"]*"|“[^“”]*”/g, '')
-    .replace(/\b(?:[a-zA-Z0-9_.-]+\/)+[a-zA-Z0-9_.-]+\b/g, '');
+  const stripped = raw.replace(/`[^`]*`/g, '').replace(/\]\([^)]*\)/g, ']').replace(/\{\{[^}]*\}\}/g, '').replace(/[“"][^”"]*[”"]/g, '');
   if (/[—–]/.test(stripped)) add(span.where, 'dash', 'em or en dash in prose: use a colon, comma, or period');
   if (stripped.includes(';')) add(span.where, 'semicolon', 'semicolon in prose: split the sentence');
   if (/\bmay\b/i.test(stripped)) add(span.where, 'may', '"may" as a verb: use "can" or state the condition');
   for (const match of stripped.matchAll(CONTRACTION)) add(span.where, 'contraction', `contraction "${match[0]}"`);
-  // 英文俚语词表不用于判定中文正文中借用的协议名。
-  if (!/\p{Script=Han}/u.test(stripped)) for (const word of lexiconHits(stripped)) add(span.where, 'lexicon', word);
   const parts = sentences(plain(raw));
-  const chinese = /\p{Script=Han}/u.test(stripped);
   const rule = RULES[span.kind] || 'long-sentence';
-  const limit = chinese ? null : LIMITS[span.kind];
-  if (span.kind === 'claim' && !/[。.]$/.test(raw.trim())) add(span.where, rule, 'a figure claim is one sentence that ends with a period');
+  const limit = LIMITS[span.kind];
+  if (span.kind === 'claim' && !/[。.!?]$/u.test(raw.trim())) add(span.where, rule, 'a figure claim is one sentence that ends with sentence punctuation');
   if ((span.kind === 'claim' || span.kind === 'thesis') && parts.length !== 1) add(span.where, rule, `a ${span.kind} must be one sentence`);
   for (const sentence of parts) {
     const count = wordCount(sentence);
     if (limit && count > limit) add(span.where, rule, `${count} words (limit ${limit}): "${sentence.slice(0, 90)}"`);
+    if (!/\p{Script=Han}/u.test(sentence)) {
+      for (const word of lexiconHits(sentence)) add(span.where, 'lexicon', word);
+    }
     for (const [pattern, name] of TELLS) if (pattern.test(sentence)) add(span.where, 'tell', `${name}: "${sentence.slice(0, 90)}"`);
   }
 }
@@ -276,22 +275,10 @@ function lintFigure(file, id, add) {
   }
 }
 
-function normalizeQuote(text) {
-  return String(text).replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*`]/g, '').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
-}
-
 function auditManual(manual, add) {
-  const corpus = new Map();
-  const corpusFor = key => {
-    if (!corpus.has(key)) corpus.set(key, normalizeQuote(fs.readFileSync(manual.quoteSources[key], 'utf8')));
-    return corpus.get(key);
-  };
-  const checkQuote = (quote, cite, where) => {
+  const checkKey = (cite, where) => {
     const key = String(cite).trim().split(/\s+/)[0];
-    if (!(key in manual.quoteSources)) { add(where, 'quote-key', `quoted text cites "${key}", which manual.json quoteSources does not declare`); return; }
-    if (manual.quoteSources[key] === null) return;
-    const text = normalizeQuote(quote.replace(/^["“]|["”]$/g, ''));
-    if (!corpusFor(key).includes(text)) add(where, 'quote', `quote not found verbatim in ${key}: "${text.slice(0, 80)}"`);
+    if (!(key in manual.quoteSources)) add(where, 'quote-key', `a source marker cites "${key}", which manual.json quoteSources does not declare`);
   };
   const sources = new Map();
   const sourceFor = file => {
@@ -302,22 +289,27 @@ function auditManual(manual, add) {
   for (const span of manuals.proseSpans(manual)) {
     proseIssues(span, add);
     if (span.kind === 'sentence' || span.kind === 'step') stats.words += plain(span.text).split(' ').filter(Boolean).length;
-    for (const match of String(span.text).replace(/`[^`]*`/g, match => match.replace(/"/g, "\\u0022")).matchAll(/(?:"([^"“”]+)"|“([^“”]+)”)[ \t]*\{\{([^}]+)\}\}/g)) checkQuote((match[1] || match[2]).replace(/\\u0022/g, '"'), match[3], span.where);
+    for (const match of String(span.text).replace(/`[^`]*`/g, '').matchAll(/\{\{([^}]+)\}\}/g)) checkKey(match[1], span.where);
+    for (const match of String(span.text).replace(/`[^`]*`/g, '').matchAll(/[“"]([^”"]{24,}?)[”"]\s*\{\{[^}]+\}\}/g)) add(span.where, 'quote', `write the source in our own words, and put literal output in code font: "${match[1].slice(0, 80)}"`);
   }
   for (const doc of manual.documents) {
     if (!doc.thesis) add(doc.label, 'thesis', 'a one-sentence thesis blockquote is required under the title');
     const paragraphs = doc.blocks.filter(block => block.type === 'paragraph');
-    if (doc.kind === 'section' && !paragraphs.slice(0, 2).some(block => /(?:When you finish this section, you can|读完(?:本节)?后?，你(?:可以|能))/.test(block.text))) add(doc.label, 'outcome', `the first two paragraphs must contain "${manuals.OUTCOME_PHRASE} ..."`);
+    if (doc.kind === 'section' && !paragraphs.slice(0, 2).some(block => /读完(?:本节(?:后)?|后)/.test(block.text))) add(doc.label, 'outcome', `the first two paragraphs must state what the reader can do`);
     const takeaways = doc.blocks.filter(block => block.type === 'takeaways').length;
     stats.takeaways += takeaways;
     if (doc.kind === 'section' && takeaways !== 1) add(doc.label, 'takeaways', `sections need exactly one takeaways block (found ${takeaways})`);
     const last = doc.blocks[doc.blocks.length - 1];
-    if (!last || last.type !== 'paragraph' || !manuals.SOURCE_LINE.test(last.text) || !last.text.replace(manuals.SOURCE_LINE, '').trim()) add(doc.label, 'sources', 'the last block must be a "Sources: ..." paragraph');
+    if (!last || last.type !== 'paragraph' || !/^(?:Sources:|来源[：:])\s*\S/.test(last.text)) add(doc.label, 'sources', 'the last block must name its sources');
     for (const block of doc.blocks) {
       const where = `${doc.label}:${block.line}`;
       if (block.type === 'paragraph' && sentences(plain(block.text)).length > 6) add(where, 'long-paragraph', 'more than six sentences: split the paragraph by topic');
       if (block.type === 'code' && manuals.LISTING_LANGS.has(block.lang)) add(where, 'listing-fence', `a ${block.lang} block must be a listing with a capture source`);
-      if (block.type === 'rule') checkQuote(block.quote, block.source, where);
+      if (block.type === 'rule') {
+        checkKey(block.source, where);
+        for (const match of String(block.quote).replace(/`[^`]*`/g, '').matchAll(/\{\{([^}]+)\}\}/g)) checkKey(match[1], where);
+        if (/^[“"]/.test(block.quote.trim())) add(where, 'quote', 'a rule states the source in our own words, not as a quote');
+      }
       if (block.type === 'listing') {
         stats.listings += 1;
         const source = sourceFor(block.sourceFile);
@@ -367,9 +359,12 @@ function main(argv) {
   let loaded;
   try {
     loaded = manuals.loadAll({ only, root });
-    if (!loaded.length) throw new Error(`no manuals found${only ? ` for ${only}` : ''}; --root must point to the manuals directory`);
   } catch (error) {
     console.error(`audit-manuals: ${error.message}`);
+    return 1;
+  }
+  if (!loaded.length) {
+    console.error('audit-manuals: no manuals found');
     return 1;
   }
   const counts = new Map();

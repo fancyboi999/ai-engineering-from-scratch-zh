@@ -9,8 +9,8 @@ const ratio = runs.eagle3.points.map(p => [p.x, runs.default.points.find(q => q.
 
 module.exports = figure('fig-4-4b', {
   height: 350,
-  title: "MoE 模型的 EAGLE-3 收益随批次增长",
-  desc: "GB10 上 Qwen3-30B-A3B 使用 EAGLE-3 相对 BF16 默认配置的每输出 token 时间中位数加速比。并发 1 为 1.60 倍，32 升至 1.89，64 为 1.84；每步接受长度保持约 2.7 token。",
+  title: "MoE 模型批次增大时，EAGLE-3 仍保持收益",
+  desc: "GB10 上 Qwen3-30B-A3B 使用 EAGLE-3 相对 BF16 默认配置的每输出 token 时间中位数加速比。并发 1 为 1.60 倍，2 为 1.56 倍，32 达到峰值 1.89 倍，64 为 1.84 倍；每步接受长度保持约 2.7 token。",
 }, f => {
   const c = chart(f, { x: 66, y: 56, w: 540, h: 220, xScale: 'log2', xDomain: [1, 64], yDomain: [0, 3], xTicks: [1, 2, 4, 8, 16, 32, 64], yTicks: [0, 1, 2, 3], xLabel: "最大并发（基准客户端）", yLabel: "默认 TPOT 除以 EAGLE-3 TPOT", yFormat: v => `x${v}` });
   f.rule(c.px(1), c.py(1), c.px(64), c.py(1), { hue: 'rose', dash: 'dashed' });

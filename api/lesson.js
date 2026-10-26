@@ -37,6 +37,8 @@ function loadProductionAssets() {
         : {},
       cheatsheets: fs.existsSync(path.join(__dirname, '..', 'site', 'cheatsheet-map.json'))
         ? JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'cheatsheet-map.json'), 'utf8')).lessons : {},
+      practice: fs.existsSync(path.join(__dirname, '..', 'site', 'practice-map.json'))
+        ? JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'practice-map.json'), 'utf8')).lessons : {},
       languageCodes: Array.isArray(languageRegistry.languages)
         ? languageRegistry.languages
           .filter(function (language) { return language.source || language.ci; })
@@ -305,6 +307,13 @@ function sheetLinks(lessonPath, sheets) {
   return links.length ? `        <p class="lesson-hub-terms"><span>速查表：</span> ${links.join(', ')}</p>` : '';
 }
 
+function practiceLinks(lessonPath, practice) {
+  const list = practice && Object.prototype.hasOwnProperty.call(practice, lessonPath) && Array.isArray(practice[lessonPath]) ? practice[lessonPath] : [];
+  const links = list.filter(item => item && typeof item.title === 'string' && /^\/practice\/[a-z0-9-]+$/.test(item.href || ''))
+    .map(item => `<a href="${escapeHtml(item.href)}">${escapeHtml(item.title)}</a>`);
+  return links.length ? `<p class="lesson-hub-terms lesson-practice"><span>动手练习：</span>${links.join('、')}</p>` : '';
+}
+
 function lessonHubLinks(entry, heading, assets) {
   const hub = declaredLessonHub(entry, assets);
   if (!hub) return '';
@@ -318,6 +327,7 @@ function lessonHubLinks(entry, heading, assets) {
     `        <ol class="lesson-hub-trail"><li><a href="/">首页</a></li><li><a href="${escapeHtml(hub)}">${escapeHtml(contextLabel(entry.context))}</a></li><li aria-current="page">${escapeHtml(heading)}</li></ol>`,
     links.length ? `        <p class="lesson-hub-terms"><span>本课术语：</span> ${links.join('、')}</p>` : '',
     sheetLinks(entry.path, assets.cheatsheets),
+    practiceLinks(entry.path, assets.practice),
     '      </nav>',
   ].filter(Boolean).join('\n');
 }

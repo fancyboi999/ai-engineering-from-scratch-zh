@@ -6,7 +6,7 @@
 
 ## 命令与记录
 
-CLI 命令为 `rea analyze-javascript-application PATH`。普通的 `rea analyze PATH` 对目录也到达同一代码："Generic `rea analyze PATH` selects this workflow for directories and `.asar` files when neither `--provider` nor `--snapshot` is supplied." {{cli Run a command}}
+CLI 命令为 `rea analyze-javascript-application PATH`。如果 `PATH` 是目录或 `.asar` 文件，且没有指定 `--provider` 或 `--snapshot`，通用命令 `rea analyze PATH` 也会选择此工作流 {{cli Run a command}}。
 
 输入为 `input_path`、值为 `auto`、`asar` 或 `directory` 的 `format`，以及 `integrity_policy`。可选 `source_paths` 指定清单中的精确文件，rea 只分析这些文件，其他文件的关系保持未知。
 
@@ -105,9 +105,9 @@ note: 首次 analyze-javascript-application 调用的第 1、3、4、5、19 个�
 
 ## 图
 
-**应用图：** 以节点和有向边表达应用的 provider 中立模型，每条边都有证据块。文档固定两条规则。图只从语法构建："It performs no filesystem or CDP I/O, does not evaluate JavaScript, and has no application-specific node kinds." {{jsgraph JavaScript Application Graph}}
+**应用图：** 以节点和有向边表达应用的 provider 中立模型，每条边都有证据块。文档固定两条规则。图只根据语法构建。它不会访问文件系统或 CDP，不会执行 JavaScript，也不会定义应用专属节点类型 {{jsgraph JavaScript Application Graph}}。
 
-边使用固定词汇："The directed relation vocabulary is `contains`, `loads`, `imports`, `maps_to`, `exposes`, `sends`, `invokes`, `handles`, `calls`, `persists_to`, `observed_as`, and `changed_from`." {{jsgraph Entities and relationships}}
+有向关系只使用固定词汇：`contains`、`loads`、`imports`、`maps_to`、`exposes`、`sends`、`invokes`、`handles`、`calls`、`persists_to`、`observed_as` 和 `changed_from` {{jsgraph Entities and relationships}}。
 
 `15-js-app-graph.json` 的 ledger-desk 图有 42 个节点、59 条边，自身覆盖为 `complete`，没有省略。四个源码模块各以 `source_sha256` 记录自身文件 SHA-256，与 `00-fixtures.txt` 对该文件列出的摘要相同，因此无需目录摘要也能将模块对应到字节。
 
@@ -134,7 +134,7 @@ note: 首次 analyze-javascript-application 调用的第 1、3、4、5、19 个�
 | `sends`、`exposes` | 各 2 | 推断 |
 | `persists_to` | 1 | 推断，`localStorage.setItem` |
 
-每条边都说明获取方法。AST 事实的权威来源为 `ast-static-analysis`、状态 `observed`、置信度 `exact`，并带源码范围。关系的权威来源为 `static-relationship-inference`、状态 `inferred`、默认置信度 `high`，始终带有限制 "Static syntax does not prove that this relationship executes at runtime."。文档对 Electron 边规定："The `loads`, `exposes`, `invokes`, `handles`, and `imports` relationships remain static inferences." {{jsgraph Entities and relationships}}
+每条边都说明获取方法。AST 事实的权威来源为 `ast-static-analysis`、状态 `observed`、置信度 `exact`，并带源码范围。关系的权威来源为 `static-relationship-inference`、状态 `inferred`、默认置信度 `high`，始终带有限制 "Static syntax does not prove that this relationship executes at runtime."。对 Electron 应用，`loads`、`exposes`、`invokes`、`handles` 和 `imports` 关系始终是静态推断 {{jsgraph Entities and relationships}}。
 
 ```listing
 title: 从 preload.js 到 main.js 处理器的一条 invokes 边
@@ -187,7 +187,7 @@ caption: 从左上开始读。橄榄色框为应用自身代码，灰框是外�
 
 ## 大记录的视图
 
-六文件产生约 200 KB 记录。文档提醒真实应用的规模："The complete application Evidence can be hundreds of megabytes for a real application." {{cli Run a command}}
+六文件产生约 200 KB 记录。REA 文档提醒，真实应用的完整 Evidence 可能达到数百 MB {{cli Run a command}}。
 
 `inspect-analysis-view` 从已有记录读取视图，不重新分析。输入是 `source` 与 `view`。来源可以内联完整记录，或引用 MCP 会话保留的记录。视图可以是摘要、集合的一页或单个模块。采集请求了摘要，以及 `modules` 集合前 32 项。
 

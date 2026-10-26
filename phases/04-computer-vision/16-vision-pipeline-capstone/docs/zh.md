@@ -54,7 +54,7 @@ Detection(
     box: tuple[float, float, float, float],   # (x1, y1, x2, y2)，绝对像素
     score: float,                              # [0, 1]
     class_id: int,                             # 来自检测器的标签映射
-    mask: Optional[list[list[int]]],           # 若存在则 RLE 编码
+    mask_rle: Optional[str],                   # 若存在则为 RLE 字符串
 )
 
 PipelineResult(

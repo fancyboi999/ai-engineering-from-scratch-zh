@@ -1193,13 +1193,13 @@
       "The ranking that survives across the MM1, Idefics2, Cambrian-1, and Prismatic ablation tables. Data mixture moves benchmarks most, the image encoder is next, and the connector, the knob most papers obsess over, matters least. When a VLM underperforms, reach for the tallest fader first.": "MM1、Idefics2、Cambrian-1 和 Prismatic 的消融实验表都呈现出这一稳定排序：数据混合对基准成绩影响最大，图像编码器其次，而多数论文反复研究的连接器影响最小。VLM 表现不佳时，先调最高的那根滑杆。"
     },
     "l5-onevision-budget": {
-      "~3-4K visual tokens": "约 3-4K 个视觉 token",
-      "single image: AnyRes tiles, ~2900 tok": "单图：AnyRes 分块，约 2900 个 token",
-      "multi-image: 6 images x 729 tok each": "多图：6 张图 x 每张 729 个 token",
-      "video: 32 frames x 81 tok, pooled": "视频：32 帧 x 每帧池化后 81 个 token",
+      "~6-9K visual tokens max": "视觉 token 上限约 6–9K",
+      "single image: AnyRes-Max-9, up to 7290 tok": "单张图像：AnyRes-Max-9，最多 7290 token",
+      "multi-image: 6 images x 729 tok (cap 12)": "多张图像：6 张 × 729 token（上限 12 张）",
+      "video: 32 frames x 196 tok, pooled": "视频：32 帧 × 196 token，经过池化",
       "ONEVISION TOKEN BUDGET": "OneVision token 预算",
-      "same jar, three packings": "同一预算，三种装法",
-      "LLaVA-OneVision holds the visual-token budget roughly constant at a few thousand tokens per sample and just repacks it: one image at high AnyRes resolution, several images at moderate resolution, or 32 video frames pooled down to 81 tokens each. Because every scenario costs about the same, one model trains on all three without any of them dominating.": "LLaVA-OneVision 将每个样本的视觉 token 预算大致固定在几千个，只改变分配方式：一张高 AnyRes 分辨率图像、几张中等分辨率图像，或 32 帧视频，每帧池化为 81 个 token。各场景开销接近，同一个模型便能同时学习三种场景，不会让某一种独占训练。"
+      "same jar, three packings": "同一区间，三种分配",
+      "LLaVA-OneVision keeps the maximum visual-token count per sample in the same band, roughly 6K to 9K, and just repacks it: one image at high AnyRes resolution, up to 12 images at moderate resolution, or 32 video frames pooled down to 196 tokens each. Because every scenario costs about the same, one model trains on all three without any of them dominating.": "LLaVA-OneVision 将每个样本的视觉 token 上限控制在约 6K 到 9K 的同一区间：单张图像采用高分辨率 AnyRes 分块，最多 12 张图像采用中等分辨率，或将 32 帧视频的每帧池化为 196 个 token。三类输入的开销接近，可以共同训练，而不会由其中一类占据主要预算。"
     },
     "mm-mrope-axes": {
       "temporal": "时间",

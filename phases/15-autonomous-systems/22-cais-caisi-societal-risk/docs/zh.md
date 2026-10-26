@@ -1,6 +1,6 @@
 # CAIS、CAISI 与社会尺度风险
 
-> AI 安全中心（CAIS，旧金山，2022 年由 Hendrycks 和 Zhang 创立）发布了四风险框架——恶意使用、AI 竞赛、组织性风险、失控 AI——以及 2023 年 5 月那份由数百名教授和企业领袖签署的关于灭绝风险的声明。CAIS 2026 年的发布：用于前沿模型评估的 AI Dashboard、Remote Labor Index（与 Scale AI 合作）、超级智能战略论文（Superintelligence Strategy Paper）、AI Frontiers 通讯。一个不同的实体：NIST 的 AI 标准与创新中心（CAISI）——面向美国政府的自愿协议和聚焦网络、生物、化学武器风险的非密级能力评估。CAIS 把组织性风险列为四个顶级风险之一：安全文化、严格审计、多层防御和信息安全是根基，但常常被拿来跟部署速度做取舍。加州 SB-53 一旦签署，将是美国第一项州级的灾难性风险监管。
+> AI 安全中心（CAIS，旧金山，2022 年由 Dan Hendrycks 和 Oliver Zhang 创立）发布了四风险框架——恶意使用、AI 竞赛、组织性风险、失控 AI——以及 2023 年 5 月那份由数百名教授和企业领袖签署的关于灭绝风险的声明。CAIS 2026 年的发布：用于前沿模型评估的 AI Dashboard、Remote Labor Index（与 Scale AI 合作）、超级智能战略论文（Superintelligence Strategy Paper）、AI Frontiers 通讯。一个不同的实体：NIST 的 AI 标准与创新中心（CAISI）——面向美国政府的自愿协议和聚焦网络、生物、化学武器风险的非密级能力评估。CAIS 把组织性风险列为四个顶级风险之一：安全文化、严格审计、多层防御和信息安全是根基，但常常被拿来跟部署速度做取舍。加州 SB-53 一旦签署，将是美国第一项州级的灾难性风险监管。
 
 **类型：** Learn
 **语言：** Python（标准库，四风险清单与缓解匹配器）
@@ -19,7 +19,7 @@
 
 ### CAIS —— AI 安全中心
 
-- 成立：2022 年于旧金山，由 Dan Hendrycks 及同事创立（"Zhang" 这个名字指的是一位早期合作者，不是当前的联合创始人；当前领导层见 CAIS 网站）。
+- 成立：2022 年于旧金山，由 Dan Hendrycks 和 Oliver Zhang 创立。Hendrycks 任执行与研究主任，Zhang 任管理主任。
 - 性质：501(c)(3) 非营利。
 - 值得注意的 2023 年产出：关于灭绝风险的声明，由数百名研究者和 CEO 联署。声明称："减轻 AI 带来的灭绝风险，应当与大流行病和核战争等其他社会尺度风险并列，成为一项全球优先事项。"
 - 2026 年产出：用于前沿模型评估的 AI Dashboard、Remote Labor Index（与 Scale AI 联合）、超级智能战略论文、AI Frontiers 通讯。

@@ -1,0 +1,40 @@
+{
+  "id": "train-char-bigram",
+  "title": "训练二元字符语言模型",
+  "kind": "train",
+  "summary": "用梯度下降训练下一字符 logit 表，使留出集负对数似然优于一元模型。",
+  "difficulty": "medium",
+  "tags": [
+    "language-model",
+    "bigram",
+    "cross-entropy",
+    "gradient-descent"
+  ],
+  "lesson": "phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer",
+  "cheatsheet": "text-processing-classic",
+  "minutes": 40,
+  "entry": [
+    "train",
+    "next_log_probs"
+  ],
+  "collections": [
+    "train-tiny-models",
+    "llm-inference"
+  ],
+  "time_limit_s": 15,
+  "budget": {
+    "steps": 300
+  },
+  "target": {
+    "metric": "held-out mean negative log-likelihood (nats per character)",
+    "value": 2.55
+  },
+  "mutants": {
+    "target_as_context": "将每个下一字符自身作为上下文计数，导致模型无法学习字符之间的先后关系。",
+    "reversed_pairs": "交换上下文和目标，导致模型根据下一字符预测前一字符。",
+    "returns_logits": "next_log_probs 返回原始 logit，漏掉 log softmax。",
+    "lr_wrong_sign": "将梯度加到 W 上而非减去，导致损失上升。",
+    "global_rng": "从 np.random 而非 rng 参数生成初始 logit，导致相同种子的两次运行不同。",
+    "over_budget": "训练 400 步，超过 300 步预算。"
+  }
+}

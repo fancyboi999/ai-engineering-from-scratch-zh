@@ -5,7 +5,7 @@ subtitle: 使用 scikit-learn 拟合、验证、调优并排查回归、分类�
 hue: 120
 sources: phases/02-ml-fundamentals/02-linear-regression, phases/02-ml-fundamentals/03-logistic-regression, phases/02-ml-fundamentals/04-decision-trees, phases/02-ml-fundamentals/05-support-vector-machines, phases/02-ml-fundamentals/06-knn-and-distances, phases/02-ml-fundamentals/07-unsupervised-learning, phases/02-ml-fundamentals/08-feature-engineering, phases/02-ml-fundamentals/09-model-evaluation, phases/02-ml-fundamentals/10-bias-variance, phases/02-ml-fundamentals/11-ensemble-methods, phases/02-ml-fundamentals/12-hyperparameter-tuning, phases/02-ml-fundamentals/13-ml-pipelines, phases/02-ml-fundamentals/14-naive-bayes, phases/02-ml-fundamentals/17-imbalanced-data, phases/02-ml-fundamentals/18-feature-selection
 code: CM
-source_hash: 1ec3b34900163c72
+source_hash: 1ca95d60238aa67e
 ---
 
 ## 拟合模型

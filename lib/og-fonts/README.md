@@ -12,7 +12,7 @@
 
 ## 构建与补齐字集
 
-初始 atlas 包含 2329 个汉字、希腊字母、标点及数学符号。三个拉丁 atlas 保留上游字体。**这不是全 Unicode 字库，也不表示已覆盖尚未整合的 76 个项目与两本手册。** 未覆盖的汉字会抛出带字符的错误，不会静默删除、替换成问号或使用系统字体方框。
+字集以 `charset.txt` 和 `cjk.json` 的当前内容为准。三个拉丁 atlas 保留上游字体。字集来自当前课程与元数据，不是全 Unicode 字库。 未覆盖的汉字会抛出带字符的错误，不会静默删除、替换成问号或使用系统字体方框。
 
 先将固定字体下载到临时目录，或者使用已校验的离线副本：
 
@@ -43,9 +43,9 @@ node scripts/check_og_cards.js --require-manifests
 
 ## 大小与内存
 
-当前字体目录约 **2.25 MB**，其中 CJK JSON 约 **1.97 MB**；单张 96px CJK atlas 解压 bitmap **18,089,109 字节**，三个拉丁 atlas 的 bitmap 合计 **1,264,247 字节**。不同显示字号共用 CJK bitmap，不为每个字号重复解压。96px 源 glyph 缩放到标题、标签与摘要，避免只用小尺寸拉丁字体冒充中文。
+当前字体目录约 **2.26 MB**，其中 CJK JSON 约 **1.98 MB**；单张 96px CJK atlas 解压 bitmap **18,159,015 字节**，三个拉丁 atlas 的 bitmap 合计 **1,264,247 字节**。不同显示字号共用 CJK bitmap，不为每个字号重复解压。96px 源 glyph 缩放到标题、标签与摘要，避免只用小尺寸拉丁字体冒充中文。
 
-本地 Node 24 顺序渲染 15 张基础页卡片并 GC 后，RSS 约 154 MB（包括 Node、堆、zlib 临时分配和 bitmap；不是严格上限）。API 最多缓存 64 张压缩 PNG。字集补齐会增加包大小和内存，应记录新 bitmap/JSON 大小并重新验证部署包限制。此方案以子集和明确缺字失败换取小 bundle，而不是为完整 CJK 的每个字号生成大 atlas。
+运行时内存还包括 Node、堆、zlib 临时分配和 bitmap，不能以压缩 JSON 大小估算进程 RSS。API 最多缓存 64 张压缩 PNG。字集补齐会增加包大小和内存，应记录新 bitmap/JSON 大小并重新验证部署包限制。此方案以子集和明确缺字失败换取小 bundle，而不是为完整 CJK 的每个字号生成大 atlas。
 
 ## 整合接口
 
@@ -54,7 +54,5 @@ node scripts/check_og_cards.js --require-manifests
 - `validateOgCards(ogManifest,lessonSeo.lessons,certificationSeo.tracks)` 可在整合构建尾部检查全部卡片。
 - `api/og.js` 从 `site/og-cards.json`、`site/lesson-seo.json` 的 `lessons` 对象和 `site/certification-seo.json` 的 `tracks` 对象读取数据。lesson entry 含 `path/title/description/context`；track entry 含 `id/title/description/lessons`。
 - 整合配置需将 `/og/:type/:id*.png` 路由到 `/api/og?type=:type&id=:id`，并打包 `lib/og-fonts/**` 与三个 JSON manifest。API 仅支持 GET/HEAD，默认中文；缺版本或旧版本 307 到当前 URL，当前版本一年 immutable；未知卡片、非法 ID 或非中文请求 404，其他方法 405。
-- `lib/lesson-document.js` 是 hubs lane 的共享依赖。本 lane 不提供或覆盖它。独立 lane 验证时只在 `/tmp` staging 临时复制冻结上游 helper。
-- 页面 `<head>` 由整合 lane 插入 `cardTags(cardUrl(...),spec)`；`stampCards` 可更新已有中文域 `/og/` 静态卡片标签，不会替换任意旧 `og-image.png`。
-
-不包含网站全量接入、root build/config 修改或部署。最终页面视觉验收由整合后的父 agent 执行。
+- `lib/lesson-document.js` 提供共享中文课程元数据解析，供 Hub、卡片和接口使用。
+- 页面 `<head>` 由主构建器插入 `cardTags(cardUrl(...),spec)`；`stampCards` 可更新已有中文域 `/og/` 静态卡片标签，不会替换任意旧 `og-image.png`。

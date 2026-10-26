@@ -26,38 +26,39 @@
 
 ### KV 缓存的算术
 
-每个解码器层、每 token、每头：
+每个解码器层、每个 token、所有 KV 头：
 
 ```
-bytes_per_token_per_layer = 2 * d_head * dtype_size
+bytes_per_token_per_layer = 2 * n_kv_heads * d_head * dtype_size
                           ^
                           K 和 V
 ```
 
-对一个 7B 模型，32 层、32 头、d_head=128、fp16：
+对一个 7B 模型，32 层、32 个头（K 和 V 都使用全部头）、d_head=128、fp16：
 
 ```
-per token per layer = 2 * 128 * 2 = 512 bytes
-per token (32 layers) = 16 KB
-per 32K context = 512 MB
+per token per layer = 2 * 32 * 128 * 2 = 16384 bytes (16 KiB)
+per token (32 layers) = 512 KiB
+per 32K context = 16 GiB
 ```
 
 对 Llama 3 70B（80 层、d_head=128、GQA 配 8 个 KV 头）：
 
 ```
-per token per layer = 2 * 8 * 128 * 2 = 4096 bytes (4 KB)
-per 32K context = 10.4 GB
+per token per layer = 2 * 8 * 128 * 2 = 4096 bytes (4 KiB)
+per 32K context = 10 GiB
 ```
 
-这 10 GB 就是为什么 Llama 3 70B 在 128K 上下文、批大小 1 下，光 KV 缓存就要吃掉一块 40 GB A100 的大部分。
+32K 上下文需要 10 GiB；扩到 128K 就是 40 GiB。批大小为 1 时，仅 KV 缓存就会占满一块标称 40 GB 的 A100。
 
-**GQA 是 KV 缓存的胜利。** 64 头的 MHA 会是 32 GB。MLA 压得更狠。
+**GQA 能大幅缩小 KV 缓存。** 如果使用 64 个 KV 头，MHA 在 32K 上下文下需要约 80 GiB，是 GQA 的 8 倍。MLA 还能进一步压缩缓存。
 
 拖动各个维度，看缓存大小怎么变。把序列长度或批大小往上拉，看它多快就冲破一块 GPU 的容量：
 
 ```figure
 kv-cache-sizer
 ```
+
 
 ### Flash Attention —— 分块把戏
 
@@ -123,6 +124,11 @@ flash-attention-memory
 ```
 
 ## 动手构建
+
+```figure
+iso-machine {"machine":"kv-cache"}
+```
+
 
 见 `code/main.py`。我们实现：
 

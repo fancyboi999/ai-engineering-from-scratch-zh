@@ -5,7 +5,7 @@ code: GP
 subtitle: Karpenter 管节点、KAI Scheduler 管成组调度，按队列深度扩副本，结合缓存感知路由与事件时间线。
 hue: 212
 sources: phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes, phases/17-infrastructure-and-production/10-cold-start-mitigation, phases/17-infrastructure-and-production/11-multi-region-kv-locality, projects/kubernetes-event-storyboard
-source_hash: 584a9bc56a5b6874
+source_hash: 702121583338ba12
 ---
 
 ## 任务

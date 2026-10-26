@@ -30,7 +30,7 @@ REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 ```
 
-地址为 `gateway.docker.internal:3128`，不是旧插件的 `host.docker.internal:3128`（[冲突 C26](#s-ref-sources-and-the-conflicts-register)）。文档描述两条路径：“Agents use a forward proxy for HTTP and HTTPS; other TCP traffic is forwarded transparently. Both paths enforce network access policies.” {{docs-sbx Networking}} HTTP/HTTPS 使用正向代理，其他 TCP 透明转发，两者都执行网络策略。
+地址为 `gateway.docker.internal:3128`，不是旧插件的 `host.docker.internal:3128`（[冲突 C26](#s-ref-sources-and-the-conflicts-register)）。文档描述两条路径{{docs-sbx Networking}} HTTP/HTTPS 使用正向代理，其他 TCP 透明转发，两者都执行网络策略。
 
 Kevin Wittek 在 2026-01-14 说，首个原型只有环境变量，agent 曾用 `no_proxy` 绕过它 {{talk 2026-01-14 T01}}。录制向 `NO_PROXY` 中的 `gateway.docker.internal:18080` 发请求，curl 跳过正向代理，建立普通 TCP 连接。透明路径捕获它，日志记为 `transparent` 并阻止（capture/out/10-policy-log.json）。
 
@@ -63,11 +63,11 @@ exit=0
 
 `HTTP/1.1 200 OK` 表示代理接受 `CONNECT`。接下来的 `403 Forbidden` 在 TLS 会话内到达，使用沙箱信任的证书；90字节正文是批准消息。执行 `sbx policy allow network --sandbox m101-policy example.com` 后，同一请求得到 `HTTP/1.0 200 Connection established`，随后是 `HTTP/2 200` 和 `server: cloudflare`（capture/out/09-allowed.txt）。
 
-日志将其归为 `forward-bypass`：不检查、不注入凭据的隧道 {{docs-sbx Monitoring policies}}。所以 C26 的裁定是：代理只有需要自己应答时才终止 TLS，即阻止主机或主机绑定凭据时；其余走隧道。v0.47.0 发布说明同时提到“non-MITM CONNECT tunnel”与“the transparent proxy's late handshake check” {{rel-sbx v0.47.0}}，即非中间人 CONNECT 隧道与透明代理的晚期握手检查。
+日志将其归为 `forward-bypass`：不检查、不注入凭据的隧道 {{docs-sbx Monitoring policies}}。所以 C26 的裁定是：代理只有需要自己应答时才终止 TLS，即阻止主机或主机绑定凭据时；其余走隧道。v0.47.0 发布说明同时提到“non-MITM CONNECT tunnel”与{{rel-sbx v0.47.0}}，即非中间人 CONNECT 隧道与透明代理的晚期握手检查。
 
 ## 读 policy log {#s-sbx-policy-log-and-the-proxy-reading-policy-log}
 
-**policy log：** 显示“which hosts were allowed or blocked by the proxy, along with the matching rule, proxy type, and request count” {{help-sbx sbx policy log}}，即获准或被阻止的主机、匹配规则、代理类型和请求计数。接受 `[SANDBOX]`、`--json`、`--limit` 和 `--type`；帮助承认“filesystem logs are not supported yet”，尚不支持文件系统日志（[冲突 C28](#s-ref-sources-and-the-conflicts-register)）。JSON 有两个数组：
+**policy log：** 显示{{help-sbx sbx policy log}}，即获准或被阻止的主机、匹配规则、代理类型和请求计数。接受 `[SANDBOX]`、`--json`、`--limit` 和 `--type`；帮助承认“filesystem logs are not supported yet”，尚不支持文件系统日志（[冲突 C28](#s-ref-sources-and-the-conflicts-register)）。JSON 有两个数组：
 
 ```listing
 title: 拒绝规则后的 m101-policy 日志
@@ -103,7 +103,7 @@ note: 第二条 blocked、download.docker.com 和 ports.ubuntu.com 行已截去�
 
 各行含 `host`、`vm_name`、`proxy_type`、`rule`、`reason`、`last_seen`、`since` 和 `count_since`。blocked 行指定操作 `op(action=net:connect:tcp, resource=net:domain:example.com:443)`，以及 `no applicable policies` 或匹配规则。此次录制的 allowed 行 `rule` 为空，因此日志说明通过，[check network](#s-sbx-policy-init-allow-deny-and-check-network) 说明原因。`PROXY` 有五种值：`forward`、`forward-bypass`、`transparent`、`network` 和 `browser-open` {{docs-sbx Monitoring policies}}。[图](#fig-3-4) 动画展示两次请求。
 
-403 正文提到 `sbx policy approval ls`。文档描述 `approval ls`、`inspect` 与 `respond`。balanced 和 deny-all 下，无匹配规则的请求“asks for your approval instead of being denied outright” {{docs-sbx Local policy}}，会请求批准而非直接拒绝。v0.47.0 帮助树没有 `sbx policy approval`，却有 `sbx policy ls --created-via approval`（[冲突 C16](#s-ref-sources-and-the-conflicts-register)）。
+403 正文提到 `sbx policy approval ls`。文档描述 `approval ls`、`inspect` 与 `respond`。balanced 和 deny-all 下，无匹配规则的请求{{docs-sbx Local policy}}，会请求批准而非直接拒绝。v0.47.0 帮助树没有 `sbx policy approval`，却有 `sbx policy ls --created-via approval`（[冲突 C16](#s-ref-sources-and-the-conflicts-register)）。
 
 ## 主机规则看不到什么 {#s-sbx-policy-log-and-the-proxy-what-a-host-rule-cannot-see}
 

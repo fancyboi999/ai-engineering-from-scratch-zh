@@ -5,7 +5,7 @@ code: DF
 subtitle: 选择并行方式、估算内存、连接集合通信并修复挂起。使用 CPU 上的 PyTorch gloo。
 hue: 280
 sources: phases/10-llms-from-scratch/05-scaling-distributed, phases/10-llms-from-scratch/19-dualpipe-parallelism, phases/19-capstone-projects/48-distributed-fsdp-ddp, phases/19-capstone-projects/76-collective-ops-from-scratch, phases/19-capstone-projects/77-data-parallel-ddp, phases/19-capstone-projects/78-zero-parameter-sharding, phases/19-capstone-projects/79-pipeline-parallel
-source_hash: dad446fdebb5f582
+source_hash: ca65515801c686a8
 ---
 
 ## 四种策略对比

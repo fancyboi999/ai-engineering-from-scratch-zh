@@ -26,7 +26,7 @@ note: 请求和结果的文本副本已省略。
 }
 ```
 
-写入采用规范形式且是原子的。`writeEvidenceBundle` 再次验证 bundle，流式输出规范 JSON 片段。`writeTextParts` 以 `wx` 和 `0600` 模式创建暂存文件并同步。`overwrite` 为 true 时重命名覆盖目标，否则在目标不得存在时用硬链接发布。契约同样说明："Complete bundle exports stream canonical JSON into an atomically published file." {{mcp Tool results}}
+写入采用规范形式且是原子的。`writeEvidenceBundle` 再次验证 bundle，流式输出规范 JSON 片段。`writeTextParts` 以 `wx` 和 `0600` 模式创建暂存文件并同步。`overwrite` 为 true 时重命名覆盖目标，否则在目标不得存在时用硬链接发布。完整 bundle 会以规范 JSON 流式写入，再原子发布 {{mcp Tool results}}
 
 采集将服务写入文件复制为 `11-bundle-O1.json`，屏蔽采集目录并追加换行。七个数组包含一个产物、一个 provider，没有环境、场景、采集、未知项，以及八条记录。
 
@@ -85,7 +85,7 @@ note: 每行的主体与 provider、第二行及最后五行已省略。
         …
 ```
 
-行按 `evidence_id` 排序，因此首行是 `procedure_assembly` 记录，`_grade` 档案为第三行。非档案行的 `native_dossier` 为不可用，原因为 `different-operation`。八行包括 `_percent_change`、`_grade`、`_total`、`_grade_label` 四份 `analyze_function` 档案，以及 `list_procedures`、`procedure_assembly`、`xrefs`、`list_strings` 各一条。每行有相同配置摘要 `3fc72c9b…`，因为均由同一 Ghidra 会话产生。O2 bundle 有两行，即 -O2 构建的 `_total` 和 `_percent_change` 档案（`11-inspect-evidence-bundle-O2.json`）。契约列出摘要接受的过滤器："Optional `filters` match exact `evidence_id`, `operation`, `target_sha256`, `analysis_profile_digest` or `procedure_address`." {{mcp Tool results}}
+行按 `evidence_id` 排序，因此首行是 `procedure_assembly` 记录，`_grade` 档案为第三行。非档案行的 `native_dossier` 为不可用，原因为 `different-operation`。八行包括 `_percent_change`、`_grade`、`_total`、`_grade_label` 四份 `analyze_function` 档案，以及 `list_procedures`、`procedure_assembly`、`xrefs`、`list_strings` 各一条。每行有相同配置摘要 `3fc72c9b…`，因为均由同一 Ghidra 会话产生。O2 bundle 有两行，即 -O2 构建的 `_total` 和 `_percent_change` 档案（`11-inspect-evidence-bundle-O2.json`）。摘要过滤器可以精确匹配 `evidence_id`、`operation`、`target_sha256`、`analysis_profile_digest` 或 `procedure_address` {{mcp Tool results}}
 
 ## CLI 中的 evidence-export 与 evidence-import
 
@@ -105,7 +105,7 @@ same JSON content as the MCP export: yes
 
 一个字节的差异就是工具包给副本追加的换行。去掉后，副本为 178,397 字节，摘要 `47160c2d`，与 CLI 文件一致。MCP 服务与 CLI 为相同记录写入相同规范字节，兑现了本节开头的主张。
 
-`rea evidence-import PATH` 验证 bundle 并报告数量。CLI 没有会话，因此 `imported`、`total` 都是文件记录数，`13-evidence-import.json` 中为 `{"imported": 8, "unknowns_added": 0, "total": 8}`。CLI 文档划清边界："Separate CLI calls consume full saved records." {{cli Import, export and compare Evidence}}
+`rea evidence-import PATH` 验证 bundle 并报告数量。CLI 没有会话，因此 `imported`、`total` 都是文件记录数，`13-evidence-import.json` 中为 `{"imported": 8, "unknowns_added": 0, "total": 8}`。独立 CLI 调用会读取完整保存记录 {{cli Import, export and compare Evidence}}
 
 ## 用 import_evidence_bundle 导入实时会话
 
@@ -124,7 +124,7 @@ note: 请求和结果的文本副本已省略。
 }
 ```
 
-八项加入六项，总数十五。会话之前关闭过 O1，而 `close_binary` 会清空账本："`close_binary` clears them, even when no binary is active." {{mcp Retained application Evidence inputs}} 打开另一目标或重启当前目标会保留记录。
+八项加入六项，总数十五。会话之前关闭过 O1，而 `close_binary` 即使在没有活动二进制时也会清空账本 {{mcp Retained application Evidence inputs}}。打开另一目标或重启当前目标则会保留记录。
 
 因此 O2 打开时 O1 记录已消失。随后两次 `compare_functions` 内联传入 O1 的 `_percent_change` 与 `_total` 档案，工具在自身结果前记录两侧输入。这两个 O1 记录回到账本，导入只需加入另外六项。
 

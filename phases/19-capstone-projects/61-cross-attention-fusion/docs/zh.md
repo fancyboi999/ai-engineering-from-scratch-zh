@@ -64,7 +64,7 @@ image 的 key 和 value 在 decode 开始时算一次，存进一个 cache。每
 
 ### Block 组合
 
-一个 decoder block 跑：pre-LN -> self-attention -> 残差 -> pre-LN -> cross-attention -> 残差 -> pre-LN -> feed-forward -> 残差。三个子层，各有自己的 LayerNorm。Flamingo 论文在 cross-attention 上加了一个可学习的 gate，让模型能以训练期稳定性为代价而选择性地绕开 image 路径；规范的 baseline（这里用的）没有 gate。
+一个 decoder block 跑：pre-LN -> self-attention -> 残差 -> pre-LN -> cross-attention -> 残差 -> pre-LN -> feed-forward -> 残差。三个子层，各有自己的 LayerNorm。Flamingo 论文在 cross-attention 上加了一个从 0 初始化的可学习 tanh gate，使冻结语言模型起步时保持原样，并让训练更稳定；规范的 baseline（这里用的）没有 gate。
 
 ```python
 class DecoderBlock:

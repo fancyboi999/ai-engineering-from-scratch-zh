@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-8-4-title fig-8-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-8-4-title">engine 和 trainer 轮流使用同一内存</title>
+  <desc id="fig-8-4-desc">按启用 heat guard 前一次 48 步运行的阶段中位耗时，按比例绘制一个 colocated 训练步骤。rollout 期间 engine 保留权重和 KV cache，耗时 47.5 s，随后释放内存。trainer 用 0.87 s 将状态加载到 GPU，训练耗时 100.3 s，其中 23.4 s 用于计算 log probability，之后用 0.76 s 释放状态。engine 再次加载，并在 0.64 s 内获取新权重。在相同的 48 步中，每个 152.6 s 步骤有 2.2 s 没有计时器覆盖。</desc>
+  <text x="20" y="28" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">PHASE MEDIANS OF 48 STEPS, TO SCALE</text>
+  <text x="20" y="74" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">engine</text>
+  <text x="20" y="92" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">权重、KV cache</text>
+  <rect x="160" y="58" width="145.61" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="232.8" y="83" font-size="11.5" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">rollout 47.5 s</text>
+  <rect x="618.04" y="58" width="3.96" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="20" y="144" font-size="12" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">trainer</text>
+  <text x="20" y="162" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">权重、optimizer</text>
+  <rect x="305.61" y="128" width="312.44" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="461.99" y="153" font-size="11.5" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">训练 100.3 s，其中 log probability 23.4 s</text>
+  <line x1="305.61" y1="50" x2="305.61" y2="176" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <line x1="618.04" y1="50" x2="618.04" y2="176" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="309.61" y="196" font-size="11" fill="var(--m-amber-ink, #85590c)">trainer 加载 0.87 s</text>
+  <text x="614.04" y="196" font-size="11" text-anchor="end" fill="var(--m-amber-ink, #85590c)">trainer 卸载 0.76 s</text>
+  <text x="614.04" y="214" font-size="11" text-anchor="end" fill="var(--m-amber-ink, #85590c)">随后更新权重 0.64 s</text>
+  <text x="20" y="252" font-size="12" class="m-serif">同一时刻只有一端占用 GPU 内存。</text>
+  <text x="20" y="274" font-size="12" class="m-serif">约 2.5 分钟的训练步骤中，可见的交接耗时约 2 s。</text>
+  <text x="20" y="304" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每一步有 2.2 s 没有计时器覆盖，例如 engine 释放阶段。</text>
+</svg>

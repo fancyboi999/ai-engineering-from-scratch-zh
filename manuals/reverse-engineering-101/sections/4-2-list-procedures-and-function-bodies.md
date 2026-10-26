@@ -131,7 +131,7 @@ note: 从 normalized_result 截取。伪代码及其后所有切面已省略。
 label: 先按名称，再按地址
 source: native §Exact CLI selectors
 ---
-"an exact database symbol name takes precedence over a bare hexadecimal address"
+若输入既能匹配数据库符号名，也能作为十六进制地址解析，则优先按精确符号名查找。
 ```
 
 以 `0x` 或地址空间前缀开头的字符串是地址。其他字符串先作为符号名尝试。名称匹配多个函数时，返回 `ambiguous` 和入口地址列表；没有匹配时返回 `not_found`，[第 4.6 节](#s-analyze-function-and-pseudocode)将其展示为 MCP 错误 `invalid_request`。

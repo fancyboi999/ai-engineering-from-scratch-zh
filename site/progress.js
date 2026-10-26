@@ -253,6 +253,15 @@
     return match ? match[1] : '';
   }
 
+  function completedLessonPaths() {
+    var state = read();
+    var paths = [];
+    for (var path in state.lessons) {
+      if (Object.prototype.hasOwnProperty.call(state.lessons, path) && state.lessons[path].completedAt) paths.push(path);
+    }
+    return paths;
+  }
+
   function totalCompleted() {
     var state = read();
     var n = 0;
@@ -539,6 +548,7 @@
     hasLessonActivity: hasLessonActivity,
     countCompletedFromUrls: countCompletedFromUrls,
     extractPath: extractPath,
+    completedLessonPaths: completedLessonPaths,
     totalCompleted: totalCompleted,
     reset: reset,
     exportJSON: exportJSON,

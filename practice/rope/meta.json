@@ -1,0 +1,31 @@
+{
+  "id": "rope",
+  "title": "旋转位置编码（RoPE）",
+  "kind": "implement",
+  "summary": "按位置乘以 base^(-2i/d) 旋转相邻坐标对，让注意力分数只依赖位置差。",
+  "difficulty": "medium",
+  "tags": [
+    "positional-encoding",
+    "rope",
+    "transformers",
+    "attention"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/04-positional-encoding",
+  "cheatsheet": "positional-encoding",
+  "minutes": 25,
+  "entry": [
+    "rope_frequencies",
+    "apply_rope"
+  ],
+  "collections": [
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "exponent_i_over_d": "指数使用 i / d 而不是 2i / d，导致频率下降过慢。",
+    "half_split_pairs": "将坐标 i 与坐标 i + d/2 配对，而不是按相邻坐标 (2i, 2i+1) 配对。",
+    "odd_dim_unhandled": "把每隔一列的切片延伸到末尾，导致 d 为奇数时数组长度不一致并报错。",
+    "rotates_backwards": "交换 sin 项的正负号，使坐标对沿负角度旋转。",
+    "writes_input": "将旋转结果写回 x，并在计算第二个元素时读到已修改的值。"
+  }
+}

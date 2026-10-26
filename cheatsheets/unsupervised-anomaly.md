@@ -5,7 +5,7 @@ code: CD
 subtitle: 不依赖标签进行聚类、降维和离群标记。涵盖 K-Means、DBSCAN、GMM、PCA、Isolation Forest 与 LOF。
 hue: 280
 sources: phases/02-ml-fundamentals/07-unsupervised-learning, phases/02-ml-fundamentals/16-anomaly-detection, phases/01-math-foundations/10-dimensionality-reduction
-source_hash: 868d4353e1241ba0
+source_hash: becd0dc08c36d3c2
 ---
 
 ## 三种无标签任务

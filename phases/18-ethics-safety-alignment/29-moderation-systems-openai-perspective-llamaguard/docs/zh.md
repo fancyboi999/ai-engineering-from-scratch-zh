@@ -1,6 +1,6 @@
 # 审核系统 —— OpenAI、Perspective、Llama Guard
 
-> 生产审核系统把第 12-16 课定义的安全政策操作化。OpenAI Moderation API：`omni-moderation-latest`（2024）建在 GPT-4o 上，一次调用即可分类文本 + 图像；在多语言测试集上比上一版好 42%；响应模式返回 13 个类别布尔值——骚扰、骚扰/威胁、仇恨、仇恨/威胁、违法、违法/暴力、自残、自残/意图、自残/指导、性、性/未成年人、暴力、暴力/血腥；对大多数开发者免费。分层模式：输入审核（生成前）、输出审核（生成后）、自定义审核（领域规则）。异步并行调用隐藏延迟；命中标记时返回占位响应。Llama Guard 3/4（第 16 课）：14 个 MLCommons 危害、代码解释器滥用、8 种语言（v3）、多图（v4）。Perspective API（Google Jigsaw）：早于「LLM 当审核者」浪潮的毒性打分；主要是单维度毒性，带 severe-toxicity/insult/profanity 变体；内容审核研究的基线。弃用：Azure Content Moderator 于 2024 年 2 月弃用、2027 年 2 月退役，由 Azure AI Content Safety 取代。
+> 生产审核系统把第 12-16 课定义的安全政策操作化。OpenAI Moderation API：`omni-moderation-latest`（2024）建在 GPT-4o 上，一次调用即可分类文本 + 图像；在多语言测试集上比上一版好 42%；响应模式返回 13 个类别布尔值——骚扰、骚扰/威胁、仇恨、仇恨/威胁、违法、违法/暴力、自残、自残/意图、自残/指导、性、性/未成年人、暴力、暴力/血腥；对大多数开发者免费。分层模式：输入审核（生成前）、输出审核（生成后）、自定义审核（领域规则）。异步并行调用隐藏延迟；输入审核完成期间可以先显示占位响应；随后再启动首 token 流式输出。Llama Guard 3/4（第 16 课）：14 个 MLCommons 危害、代码解释器滥用、8 种语言（v3）、多图（v4）。Perspective API（Google Jigsaw）：早于「LLM 当审核者」浪潮的毒性打分；主要是单维度毒性，带 severe-toxicity/insult/profanity 变体；内容审核研究的基线。弃用：Azure Content Moderator 于 2024 年 2 月弃用、2027 年 2 月退役，由 Azure AI Content Safety 取代。
 
 **类型：** Build
 **语言：** Python（标准库，三层审核测试台）

@@ -18,7 +18,7 @@
 label: 收窄规则
 source: help-sbx sbx create --deny-network
 ---
-"Safe under centralized governance because a local deny can only narrow, never widen, egress."
+此策略适用于集中治理，因为本地 deny 规则只能收窄出站访问，不能扩大访问范围。
 ```
 
 引文释义：集中治理下这是安全的，因为本地拒绝只能收窄出站权限，不能扩大。

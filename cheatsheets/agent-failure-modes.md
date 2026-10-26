@@ -5,7 +5,7 @@ code: WA
 subtitle: 识别失败类型，在轨迹中定位并设置门禁。检测器、MAST、重试风暴、PVE 与轨迹调试器。
 hue: 0
 sources: phases/14-agent-engineering/25-multi-agent-debate, phases/14-agent-engineering/26-failure-modes-agentic, phases/14-agent-engineering/27-prompt-injection-defense, phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink, projects/agent-trace-debugger
-source_hash: c22910c596016417
+source_hash: 3d5e0b00cd3ba729
 ---
 
 ## 现象、原因与修正

@@ -5,7 +5,7 @@ code: SM
 subtitle: 用 PSO 与 ACO 优化 prompt 和路由，使用队列群体，并排比较 MADDPG、QMIX、MAPPO 与自博弈。
 hue: 160
 sources: phases/16-multi-agent-and-swarms/19-swarm-optimization-pso-aco, phases/16-multi-agent-and-swarms/20-marl-maddpg-qmix-mappo, phases/16-multi-agent-and-swarms/09-parallel-swarm-networks, phases/09-reinforcement-learning/10-multi-agent-rl
-source_hash: 17bb19cc13804e4e
+source_hash: 1618e8901348450b
 ---
 
 ## PSO 与 ACO 对比

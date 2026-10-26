@@ -5,7 +5,7 @@ code: CP
 subtitle: EU AI Act 时间线、四种监管制度、三种卡片、AB 2013 字段、福祉期望值与外部评估机构。
 hue: 30
 sources: phases/18-ethics-safety-alignment/19-model-welfare-research, phases/18-ethics-safety-alignment/24-regulatory-frameworks-eu-us-uk-korea, phases/18-ethics-safety-alignment/26-model-system-dataset-cards, phases/18-ethics-safety-alignment/27-data-provenance-training-governance, phases/18-ethics-safety-alignment/28-alignment-research-ecosystem
-source_hash: 95281ebecf8bebff
+source_hash: a619b913e012697b
 ---
 
 ## EU AI Act 时间线

@@ -1,17 +1,13 @@
 # Evidence: cheatsheets/lora-fine-tuning.md
-upstream_revision: 45fa4084de6ba2f88fa96a41e69efa2166f868b3
+upstream_revision: 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a
 
 # 证据对照：使用 LoRA 微调
 
-中文主题：[使用 LoRA 微调](../lora-fine-tuning.md)。下列逐条英文记录保留冻结上游版本的路径、行号与数值；标题对应中文主题。
-
-原始记录中的 docs/en.md 和行号只在上述 upstream 版本有效，不代表当前 docs/zh.md 的行号，也不表示本次重新运行了命令、GPU 测量或外部模型。当前中文主题的 from 路径另由构建器校验。
+下列英文记录保留冻结上游的路径、行号和数值。它们不代表中文行号，也不代表本次重新运行了命令、GPU 测量或外部模型。区块标题对应中文速查表。
 
 L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lora-advisor.md, SKILL = L08/outputs/skill-fine-tuning-guide.md, SFT = phases/10-llms-from-scratch/06-instruction-tuning-sft, C38 = phases/19-capstone-projects/38-classifier-finetuning, C39 = phases/19-capstone-projects/39-instruction-tuning-sft
 
-## 任务 (task-table)
-
-原始区块：Tasks (task-table, 8)
+## 任务 (task-table, 8)
 - get_peft_model(model, lora_config): L08/docs/en.md:449
 - model.print_trainable_parameters(): L08/docs/en.md:450
 - BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4"): L08/docs/en.md:458-460
@@ -21,9 +17,7 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - F.cross_entropy(..., ignore_index=ignore_index): C39/code/main.py:439-443
 - freeze_body(model): C38/code/main.py:173-179; C38/docs/en.md:122
 
-## 单层中的 LoRA 路径 (architecture)
-
-原始区块：LoRA path in one layer (architecture, 8 nodes)
+## 单层中的 LoRA 路径 (architecture, 8 nodes)
 - Input x: L08/docs/en.md:63
 - Output y after the merge: L08/docs/en.md:68
 - Frozen W, A, B feed the merge: L08/docs/en.md:63-67
@@ -34,17 +28,13 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - Add Wx + scaled BAx: L08/docs/en.md:82
 - Merged W' = W + (alpha/r) BA: L08/docs/en.md:186
 
-## 从零实现 LoRA (annotated-code)
-
-原始区块：LoRA from scratch (annotated-code, 13 lines)
+## 从零实现 LoRA (annotated-code, 13 lines)
 - LoRALayer, __init__, scaling, A, B, forward: L08/docs/en.md:236-247; L08/code/lora.py:6-17
 - LinearWithLoRA freeze loop and forward: L08/docs/en.md:255-267; L08/code/lora.py:20-29
 - comment "BA starts at zero": L08/docs/en.md:250. "freeze W": L08/docs/en.md:270
 - the __init__ body of LinearWithLoRA is summarized in one comment line (L08/docs/en.md:256-261)
 
-## 使用 PEFT 的 QLoRA (annotated-code)
-
-原始区块：QLoRA with PEFT (annotated-code, 11 lines)
+## 使用 PEFT 的 QLoRA (annotated-code, 11 lines)
 - BitsAndBytesConfig 4 fields: L08/docs/en.md:458-463
 - from_pretrained with quantization_config, device_map="auto": L08/docs/en.md:465-469 (model name replaced by <model>)
 - LoraConfig task_type, r=16, lora_alpha=32, lora_dropout=0.05, target_modules: L08/docs/en.md:441-447
@@ -52,9 +42,7 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - save_pretrained, 10-100MB: L08/docs/en.md:504, 507
 - double quant meaning: L08/docs/en.md:136. query and value: L08/docs/en.md:103
 
-## 一次 SFT 训练步骤 (flow)
-
-原始区块：One SFT training step (flow, 7)
+## 一次 SFT 训练步骤 (flow, 7)
 1. template <INST> ... <RESP> ...: C39/docs/en.md:22-25
 2. INST_ID 256, RESP_ID 257, PAD_ID 258: C39/docs/en.md:67-69; C39/code/main.py:40-42
 3. sft_collate pads to longest: C39/docs/en.md:74, 133; C39/code/main.py:397-410
@@ -63,9 +51,7 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 6. shifted_loss, i predicts i+1, ignore_index=-100: C39/docs/en.md:40, 89; C39/code/main.py:432-443
 7. Adam, exact-match every fifth epoch: C39/docs/en.md:103, 105
 
-## 关键公式 (concepts)
-
-原始区块：Key formulas (concepts, 6)
+## 关键公式 (concepts, 6)
 - y = Wx + BAx, W frozen: L08/docs/en.md:46-49
 - scaled update: L08/docs/en.md:82
 - 2 · r · d instead of d^2: L08/docs/en.md:14
@@ -73,9 +59,7 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - merge W' = W + (alpha/r) · BA, no overhead: L08/docs/en.md:186
 - 8B fp16 about 56GB: L08/docs/en.md:22
 
-## 默认值 (defaults)
-
-原始区块：Defaults (8)
+## 默认值 (8)
 - r 16: SKILL:51
 - lora_alpha 32, 2 x rank, alpha = rank conservative: SKILL:51; ADV:35-36; L08/docs/en.md:444
 - lora_dropout 0.05, 0.1 below 5K: SKILL:54; ADV:56-57
@@ -85,9 +69,7 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - full SFT lr 2e-5, 15x lower: SFT/docs/en.md:125, 132
 - epochs 1-3: SKILL:55
 
-## 故障排查 (troubleshooting)
-
-原始区块：Troubleshooting (7)
+## 故障排查 (7)
 - NaN losses, pad token: SKILL:63
 - loss not decreasing, try 2e-4: SKILL:88
 - overfitting fix: SKILL:95
@@ -96,9 +78,7 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - model predicts instruction without mask: C39/docs/en.md:142; fix C39/docs/en.md:75-77
 - OOM, paged optimizer, paged_adamw_8bit: L08/docs/en.md:138, 493
 
-## 缩略语 (glossary)
-
-原始区块：Abbreviations (8)
+## 缩略语 (8)
 - LoRA: L08/docs/en.md:531
 - QLoRA: L08/docs/en.md:532
 - NF4 16 levels at quantiles: L08/docs/en.md:134, 535
@@ -108,27 +88,21 @@ L08 = phases/11-llm-engineering/08-fine-tuning-lora, ADV = L08/outputs/prompt-lo
 - ChatML: SFT/docs/en.md:82-90
 - Double quantization to fp8: L08/docs/en.md:136
 
-## 问答 (qa)
-
-原始区块：Questions (5)
+## 问答 (5)
 - B zero at init: L08/docs/en.md:75, 250
 - alpha scales update: L08/docs/en.md:85
 - merge or separate: L08/docs/en.md:184-188
 - mask the instruction: C39/docs/en.md:142
 - when not to fine-tune: L08/docs/en.md:198-204; SKILL:34-36
 
-## 提示 (tips)
-
-原始区块：Tips (5)
+## 提示 (5)
 - prompt, then RAG, then fine-tune: L08/docs/en.md:198-204
 - evaluate every 100 steps, best checkpoint by eval loss: SKILL:56-57
 - compare base plus prompt vs base plus LoRA on 200+: SKILL:70-72
 - head only on 800 examples: C38/docs/en.md:131
 - raw text loss rise above 10-15%: SFT/docs/en.md:477
 
-## 选择方法 (command-table)
-
-原始区块：Choose a method (command-table, 5)
+## 选择方法 (command-table, 5)
 - full fine-tune ~56GB, VRAM >= 2x model size: L08/docs/en.md:128; ADV:22
 - LoRA fp16 base ~18GB, VRAM >= model size: L08/docs/en.md:129; ADV:23
 - QLoRA 4-bit ~6GB, VRAM >= model size / 4: L08/docs/en.md:130; ADV:24

@@ -163,7 +163,7 @@ rea 仓库内部使用更完整的验证器。文档中的 readiness 页面介�
 label: readiness 验证器不是公共工具
 source: readiness Reconstruction readiness conformance
 ---
-"The report evaluator is part of the repository verifier, not a public REA tool."
+该报告评估器属于仓库内的 verifier，不是公开的 REA 工具。
 ```
 
 应将它的聚合规则复用到自己的验证框架：
@@ -172,7 +172,7 @@ source: readiness Reconstruction readiness conformance
 label: 任何弱于 pass 的状态都不能汇总为 pass
 source: readiness Required stages
 ---
-"fail, unknown, unsupported, truncated, and skipped never aggregate to pass."
+`fail`、`unknown`、`unsupported`、`truncated` 或 `skipped` 中任一状态都不能汇总为 `pass`。
 ```
 
 ```takeaways

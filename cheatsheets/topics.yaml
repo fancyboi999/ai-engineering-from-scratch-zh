@@ -283,7 +283,8 @@
     - phases/09-reinforcement-learning/12-rl-for-games
 
 - id: reverse-engineering
-  title: "使用 rea 逆向工程"
+  explainer: inside-a-decompiler.html
+  title: "使用 rea 进行逆向工程"
   kind: manual
   sources:
     - manuals/reverse-engineering-101
@@ -303,6 +304,7 @@
     - phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering
 
 - id: sglang-serving
+  explainer: inside-an-llm-serving-gpu.html
   title: "使用 SGLang 提供 LLM 服务"
   kind: manual
   sources:
@@ -1590,3 +1592,16 @@
     - phases/19-capstone-projects/26-sandbox-runner-denylist
     - projects/sandbox-ladder
     - manuals/docker-sandboxes-101
+
+- id: miles-rl
+  title: 使用 Miles 进行强化学习后训练
+  kind: manual
+  sources:
+    - manuals/miles-101
+
+- id: vllm-serving
+  title: 使用 vLLM 提供 LLM 服务
+  kind: manual
+  explainer: inside-an-llm-serving-gpu.html
+  sources:
+    - manuals/vllm-101

@@ -5,7 +5,7 @@ code: ME
 subtitle: 数据划分与交叉验证、指标公式、偏差方差诊断、搜索策略及类别不平衡。
 hue: 210
 sources: phases/02-ml-fundamentals/09-model-evaluation, phases/02-ml-fundamentals/10-bias-variance, phases/02-ml-fundamentals/12-hyperparameter-tuning, phases/02-ml-fundamentals/17-imbalanced-data
-source_hash: ba91120babd02fa0
+source_hash: 5130f9b300a7c60e
 ---
 
 ## 诊断训练与测试误差

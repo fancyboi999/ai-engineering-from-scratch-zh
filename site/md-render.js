@@ -621,6 +621,78 @@
         return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       }
 
+      function headingIds(html) {
+        var ids = [];
+        var pattern = /<h2\b[^>]*\bid="([^"]*)"/g;
+        var match;
+        while ((match = pattern.exec(String(html || ''))) !== null) ids.push(match[1]);
+        return ids;
+      }
+
+      function sectionHeadings(markdown) {
+        var headings = [];
+        var fenced = false;
+        var lines = String(markdown || '').split(/\r?\n/);
+        for (var i = 0; i < lines.length; i++) {
+          if (/^\s*```/.test(lines[i])) { fenced = !fenced; continue; }
+          if (fenced) continue;
+          var match = lines[i].match(/^##\s+(.+?)\s*$/);
+          if (match) headings.push({ id: slugify(match[1]), text: match[1] });
+        }
+        return headings;
+      }
+
+      function sectionIds(markdown) {
+        return sectionHeadings(markdown).map(function (heading) { return heading.id; });
+      }
+
+      function headingText(heading) {
+        return typeof heading === 'string' ? heading : String(heading && (heading.text || heading.id) || '');
+      }
+
+      function hasHeading(heading, terms) {
+        var value = headingText(heading).toLowerCase();
+        for (var i = 0; i < terms.length; i++) {
+          if (value.indexOf(terms[i]) >= 0) return true;
+        }
+        return false;
+      }
+
+      function firstHeading(headings, terms) {
+        for (var i = 0; i < headings.length; i++) {
+          if (hasHeading(headings[i], terms)) return i;
+        }
+        return -1;
+      }
+
+      function quizPlacement(headings) {
+        headings = Array.isArray(headings) ? headings : [];
+        var count = headings.length;
+        var objectives = firstHeading(headings, ['学习目标', 'learning objectives']);
+        var concept = firstHeading(headings, ['核心概念', 'the concept']);
+        var build = firstHeading(headings, ['动手构建', 'build it']);
+        var use = firstHeading(headings, ['实际使用', 'use it']);
+        var ship = firstHeading(headings, ['拿去用', 'ship it']);
+        var terms = firstHeading(headings, ['关键术语', 'key terms']);
+        var pre = concept >= 0 ? concept : build >= 0 ? build : objectives >= 0 ? objectives + 1 : Math.min(1, count);
+        var post = terms >= 0 ? terms : count;
+        var check = use >= 0 ? use : ship >= 0 ? ship : terms >= 0 ? Math.max(pre, terms - 1) : Math.max(pre, count - 1);
+        pre = Math.max(0, Math.min(pre, count));
+        post = Math.max(pre, Math.min(post, count));
+        check = Math.max(pre, Math.min(check, post));
+        return { pre: pre, check: check, post: post, count: count };
+      }
+
+      function quizPanelQuestions(data) {
+        var questions = data && (data.questions || data);
+        if (!Array.isArray(questions)) return null;
+        var valid = questions.some(function (question) {
+          return question && question.question && Array.isArray(question.options) &&
+            typeof question.correct === 'number' && question.correct >= 0 && question.correct < question.options.length;
+        });
+        return valid ? [] : null;
+      }
+
       // 把课程里的伪 LaTeX 记法整理成 KaTeX 能吃的形式。
       // getAttribute 已还原 HTML 实体，这里拿到的是原始文本。
       function texPreprocess(s) {
@@ -684,6 +756,11 @@
 
   var MDRender = {
     parseMd: parseMd,
+    headingIds: headingIds,
+    sectionHeadings: sectionHeadings,
+    sectionIds: sectionIds,
+    quizPlacement: quizPlacement,
+    quizPanelQuestions: quizPanelQuestions,
     extractMath: extractMath,
     splitInlineMath: splitInlineMath,
     splitTableRow: splitTableRow,

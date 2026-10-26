@@ -392,8 +392,8 @@ mark.aifs-hl.aifs-hl-flash {
 
 .aifs-hl-launch {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
+  right: calc(var(--aifs-hl-launch-right, 16px) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--aifs-hl-launch-bottom, 16px) + env(safe-area-inset-bottom, 0px));
   z-index: 880;
   display: inline-flex;
   align-items: center;
@@ -675,8 +675,9 @@ mark.aifs-hl.aifs-hl-flash {
 
 @media (max-width: 720px) {
   .aifs-hl-launch {
-    right: 12px;
-    bottom: 12px;
+    right: calc(var(--aifs-hl-launch-right, 12px) + env(safe-area-inset-right, 0px));
+    bottom: calc(var(--aifs-hl-launch-bottom, 12px) + env(safe-area-inset-bottom, 0px));
+    min-height: 44px;
   }
 
   .aifs-hl-panel {
@@ -690,6 +691,7 @@ mark.aifs-hl.aifs-hl-flash {
     border-left: 0;
     border-right: 0;
     border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     box-shadow: 0 -4px 0 var(--rule-soft, rgba(26, 26, 26, 0.16));
   }
 
@@ -704,6 +706,18 @@ mark.aifs-hl.aifs-hl-flash {
 
   .aifs-hl-link {
     min-height: 36px;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 900px) {
+  html.aifs-hl-launch-on body {
+    padding-bottom: calc(var(--aifs-hl-launch-bottom, 16px) + 60px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 720px) {
+  html.aifs-hl-launch-on body:not(.tts-active) {
+    padding-bottom: calc(var(--aifs-hl-launch-bottom, 12px) + 60px + env(safe-area-inset-bottom, 0px));
   }
 }
 

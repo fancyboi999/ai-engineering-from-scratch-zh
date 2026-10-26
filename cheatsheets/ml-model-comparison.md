@@ -5,7 +5,7 @@ code: CC
 subtitle: 对比线性与逻辑回归、树与森林、SVM、KNN 和朴素贝叶斯，并说明各自适用场景。
 hue: 30
 sources: phases/02-ml-fundamentals/02-linear-regression, phases/02-ml-fundamentals/03-logistic-regression, phases/02-ml-fundamentals/04-decision-trees, phases/02-ml-fundamentals/05-support-vector-machines, phases/02-ml-fundamentals/06-knn-and-distances, phases/02-ml-fundamentals/14-naive-bayes
-source_hash: 619182d9492657cf
+source_hash: 987ffc52cb7156be
 ---
 
 ## 模型对比

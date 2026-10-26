@@ -1,0 +1,33 @@
+{
+  "id": "multi-head-split-merge",
+  "title": "拆分与合并多头注意力",
+  "kind": "implement",
+  "summary": "将 (B, T, D) 拆分为 H 个 head 并还原，再使用给定投影矩阵计算 batched 多头 self-attention。",
+  "difficulty": "medium",
+  "tags": [
+    "attention",
+    "multi-head-attention",
+    "transformers",
+    "reshape"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/03-multi-head-attention",
+  "cheatsheet": "transformers-attention",
+  "minutes": 30,
+  "entry": [
+    "split_heads",
+    "merge_heads",
+    "multi_head_attention"
+  ],
+  "collections": [
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "no_max_shift": "直接对原始分数调用 np.exp，大激活值会溢出为无穷大。",
+    "no_output_projection": "返回合并后的 head，却忘记乘以 w_o。",
+    "reshape_no_transpose": "使用 x.reshape(B, H, T, d_head) 拆分但不转置，导致 head 轴混淆 token 和特征。",
+    "scale_by_d_model": "分数除以 sqrt(D)，而不是 sqrt(d_head)。",
+    "softmax_wrong_axis": "沿 query 轴计算 softmax，而不是沿 key 轴。",
+    "strided_heads": "head h 使用列 h、h + H、h + 2H 等，而不是连续的 d_head 列块。"
+  }
+}

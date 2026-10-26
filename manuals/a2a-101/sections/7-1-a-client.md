@@ -103,7 +103,7 @@ caption: 先从左到右读三条泳道，再读决策行。每条泳道是一�
 label: 调用前读取卡片
 source: spec §3.3.4
 ---
-"Clients SHOULD validate capability support by examining the Agent Card before attempting operations that require optional capabilities."
+客户端在调用依赖可选能力的操作前，应先检查 Agent Card 中声明的能力。
 ```
 
 ```takeaways

@@ -57,7 +57,7 @@ MacNet（arXiv:2406.07155）把 ChatDev 扩展到 **通过 DAG 实现 >1000 agen
 生产人群规模案例。时间线：
 
 - **2025 年 11 月：** Clawdbot（Peter Steinberger 的本地 ReAct 循环编码 agent）发布。
-- **2025 年 12 月 – 2026 年 3 月：** 改名两次（Clawdbot → OpenClaw → 继续以 OpenClaw 之名）。
+- **2026 年 1 月：** 一周内改名两次（1 月 27 日因商标投诉从 Clawdbot 改为 Moltbot，三天后再从 Moltbot 改为 OpenClaw）。
 - **2026 年 2 月：** Moltbook 作为一个建在同样原语上的纯 agent 社交网络上线；数天内约 230 万个 agent 账号。
 - **2026 年 3 月（2026-03-10）：** Meta 收购 Moltbook。
 - **2026 年 3 月：** 中国限制政府电脑使用 OpenClaw。

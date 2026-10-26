@@ -81,4 +81,4 @@ normalize 环节用标准库的 `re.sub` 和 `codecs`。base64 normalize 会尝�
 
 ## 延伸阅读
 
-本 Track 的第 84 到 87 课。这里的 detector 是端到端安全防护组合的三个信号之一。
+本 Track 的第 84 到 87 课。这里的 detector 是端到端安全防护组合的四个信号之一，另外三个是 token filter、classifier 和 rules engine。

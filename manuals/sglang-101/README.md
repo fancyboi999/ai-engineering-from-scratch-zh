@@ -4,12 +4,12 @@
 
 ## 内容
 
-- 7 部分、28 节正文，另有 6 节参考。第 1 部分一页读懂 SGLang。第 2 部分跟踪一个请求经过三个进程与调度器。第 3 部分讲 KV 缓存。第 4 部分加速每次前向传播，第 5 部分测量服务器。第 6 部分把模型分布到多张 GPU，第 7 部分讲生产运行，最后介绍作为 Miles rollout 引擎的 SGLang。
+- 7 部分、29 节正文，另有 7 节参考。第 1 部分安装并检查服务，再跟踪请求。第 2 部分讲一个请求经过三个进程与调度器的过程。第 3 部分讲 KV 缓存。第 4 部分加速每次前向传播，第 5 部分测量服务器。第 6 部分把模型分布到多张 GPU，第 7 部分讲生产运行，最后介绍作为 Miles rollout 引擎的 SGLang。参考部分含[本手册的编写与验证方式](sections/r-7-how-this-manual-was-made.md)。
 - 每节围绕一个问题展开：成本、直观修法为何失败、SGLang 的做法、测量指标、默认值建议，以及带链接的真实事故。
 - 每个数字都标明证据类型：实测、代码、SGLang 团队之外工程师的实践报告，或团队与厂商的主张。
 - 封面图、使用图表工具从捕获记录与代码绘制的图，以及由 GPU 运行数据生成的图表。
 - `capture/` 中的捕获工具通过 MLX 在 Apple silicon 上启动真实服务器，发送请求、运行官方基准，将观察结果写入 `capture/out/`。
-- `capture/gpu/` 中的 GPU 工具在一张 NVIDIA GPU 上运行八组服务配置和三个随机种子的基准扫描，并记录每次运行的 GPU 时钟与温度。
+- `capture/gpu/` 中的 GPU 工具会运行服务配置和基准扫描，并记录 GPU 时钟与温度。历史数据来自 NVIDIA L4 和 DGX Spark 上的 GB10。
 
 ## 文件
 
@@ -19,7 +19,7 @@
 | `front.md`, `sections/` | 正文，每节一个文件 |
 | `figures/src/` | 图源，构建为 `figures/*.svg` |
 | `capture/` | 捕获工具与 `capture/out/` 中的原始记录 |
-| `capture/gpu/` | GPU 工具、`capture/gpu/out-gb10/` 中的输出，以及 `capture/gpu/summary/` 中的图表数据 |
+| `capture/gpu/` | GPU 工具、`capture/gpu/out-l4/` 与 `capture/gpu/out-gb10/` 中的输出，以及 `capture/gpu/summary/` 中的图表数据 |
 
 ## 固定版本
 

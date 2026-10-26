@@ -1,6 +1,6 @@
 # HDF5 Tokenized Corpus
 
-> 下载好的语料必须落到一种 trainer 能以线速流式读取的布局里。JSONL 在磁盘上扛不住 16 个 dataloader worker。HDF5 配上可扩容的分块整数 dataset 就能扛住。这节课构建：流式 tokenization 写入可扩容 HDF5 dataset、跨多文件的分片写入、训练时的内存映射读取、以及一个产出定长序列并正确 packing 的滑动窗口 dataloader。
+> 下载好的语料必须落到一种 trainer 能以线速流式读取的布局里。JSONL 在磁盘上扛不住 16 个 dataloader worker。HDF5 配上可扩容的分块整数 dataset 就能扛住。这节课构建：流式 tokenization 写入可扩容 HDF5 dataset、跨多文件的分片写入、训练时的分块读取、以及一个产出定长序列并正确 packing 的滑动窗口 dataloader。
 
 **类型：** Build
 **语言：** Python
@@ -18,7 +18,7 @@
 
 现代语言模型训练每秒要在几十个 worker 上读取数十万个样本。JSONL 在第一次冷缓存 page fault 时就死了：JSON 解析器慢、文档边界不可寻址、seek 到"第 4,217,884 个样本"需要从头扫文件。即使 Parquet 压缩率不错，也不适合，因为 trainer 不要列、要的是一条带 $O(1)$ 随机访问的扁平 token 流。
 
-HDF5 合适是因为它提供分块、可扩容、纯整数的 dataset，读取时 chunk 对 page cache 友好。Trainer 请求 `tokens[3,200,000 : 3,200,8192]` 这样一个切片，HDF5 就从 page cache 把请求的 hyperslab 拷贝到新分配的 NumPy 数组里。代价是每个 worker 一个打开的文件句柄加一个 chunk 大小的 page-cache 占用——相比解析 JSONL 的代价可以忽略不计。
+HDF5 合适是因为它提供分块、可扩容、纯整数的 dataset，读取时 chunk 对 page cache 友好。Trainer 请求 `tokens[3_200_000 : 3_208_192]` 这样一个切片，HDF5 就从 page cache 把请求的 hyperslab 拷贝到新分配的 NumPy 数组里。代价是每个 worker 一个打开的文件句柄加一个 chunk 大小的 page-cache 占用——相比解析 JSONL 的代价可以忽略不计。
 
 构建上的难点在于让写入端诚实。可扩容 dataset 很容易用错：每次写一个文档，HDF5 文件就碎片化到不可用；一次 resize 写入全部文档，进程一挂就丢掉整个分片。正确的做法是 buffer-then-extend：buffer 大小对齐 chunk 大小，分片写入分散到多个文件，这样 crash 最多丢一个分片。
 
@@ -35,7 +35,7 @@ flowchart TD
   Write --> Buffer
   Buffer --> Close[最终 flush + 关闭]
   Close --> ShardDone[分片文件完成]
-  ShardDone --> MMapRead[内存映射读取]
+  ShardDone --> MMapRead[分块读取]
   MMapRead --> Window[滑动窗口 dataloader]
   Window --> Train[训练 batch]
 ```
@@ -48,9 +48,9 @@ Token dataset 创建时用 `maxshape=(None,)` 和固定的 `chunks=(chunk_size,)
 
 单个 HDF5 文件是单点故障。流水线并行写分片：第 19 阶段第 42 课的每个输入分片对应一个 HDF5 输出分片。一个 `shards.json` 索引记录每个分片的文件路径、token 数、文档数以及 token 的 sha256。Trainer 读 `shards.json` 来计算全局偏移并校验语料。
 
-### 内存映射读取
+### 分块读取
 
-训练时每个 worker 以 `swmr=True` 模式打开自己负责的 HDF5 文件，请求 `tokens[start:stop]`。HDF5 的分块布局让这变成一次 page-cache 支撑的读取（chunk 热了之后）。Worker 永远不会把整个文件物化到内存：切片被拷贝到 dataloader 的 batch buffer，然后 dataloader 再把它拷贝到 pinned-memory 训练张量里。热路径上每次 chunk 切换一个 syscall，其余都是 RAM 访问。
+训练时每个 worker 以 `swmr=True` 模式打开自己负责的 HDF5 文件，请求 `tokens[start:stop]`。HDF5 的分块布局让热块的读取成本很低。h5py 不会把文件映射进内存，而是经由 HDF5 chunk cache 和操作系统 page cache 读取完整分块，再拷贝出请求的 hyperslab。Worker 永远不会把整个文件物化到内存：切片被拷贝到 dataloader 的 batch buffer，然后 dataloader 再把它拷贝到 pinned-memory 训练张量里。
 
 ### 滑动窗口 dataloader
 
@@ -67,10 +67,10 @@ cc-hdf5-corpus
 - `Tokenizer` - 一个字节级确定性 tokenizer，够 demo 用。接口是 `encode(text) -> list[int]` 和 `vocab_size`。
 - `HDF5ShardWriter` - 打开一个可扩容整数 dataset，把 token 缓冲到 chunk 大小，按定长步幅 resize 并写入，关闭时在 HDF5 attributes 中记录 `token_count` 和 `sha256`。
 - `ShardedTokenizationPipeline` - 遍历输入文档，路由到 writer，输出 `shards.json` 索引。
-- `MmapTokenStore` - 打开分片文件做内存映射读取，计算全局偏移，暴露单一的 `get_slice(start, stop)` API。
+- `MmapTokenStore` - 打开分片文件做分块读取（名称沿用现有 API；h5py 实际按块读取，不映射文件），计算全局偏移，暴露单一的 `get_slice(start, stop)` API。
 - `SlidingWindowDataloader` - 从全局流中随机选窗口，yield `(input_ids, target_ids)` NumPy 数组。
 
-文件底部的 demo 构建一个 tiny 内存语料，tokenize 成两个分片，通过内存映射打开，跑 10 个 batch 的 dataloader，打印每个 batch 的 shape 和 checksum。
+文件底部的 demo 构建一个 tiny 内存语料，tokenize 成两个分片，以分块读取方式打开，跑 10 个 batch 的 dataloader，打印每个 batch 的 shape 和 checksum。
 
 运行：
 
@@ -117,7 +117,7 @@ python3 code/main.py
 | 术语 | 大家嘴上说的 | 实际含义 |
 |------|------------|---------|
 | 可扩容 dataset | "Append-only" | 一个 `maxshape=(None,)` 的 HDF5 dataset，通过按 chunk 大小步幅 `resize` 来增长 |
-| 分块布局 | "HDF5 怎么存的" | 固定大小的磁盘页，内核可以 memory-map、dataloader 可以连续读取 |
+| 分块布局 | "HDF5 怎么存的" | 固定大小的磁盘块。HDF5 会整块读取并缓存，让 dataloader 能低成本连续读取范围 |
 | `swmr` 模式 | "读写并行" | Single-Writer-Multiple-Reader 模式，让 dataloader worker 安全共享文件 |
 | 分片索引 | "shards.json" | 所有 token 分片的持久索引，包含偏移和内容哈希 |
 | 滑动窗口 | "训练样本" | 全局 token 流中的一个定长切片，trainer 将其与 shift-by-one 的 target 配对 |
@@ -126,7 +126,7 @@ python3 code/main.py
 
 - [HDF5 分块文档](https://support.hdfgroup.org/documentation/hdf5/latest/hdf5_chunking.html) - 本课使用的分块可扩容 dataset 布局
 - [h5py 用户指南](https://docs.h5py.org/en/stable/) - HDF5 的 Python 绑定
-- [NumPy memory mapping](https://numpy.org/doc/stable/reference/generated/numpy.memmap.html) - h5py 通过 HDF5 暴露的读端原语
+- [h5py 分块存储](https://docs.h5py.org/en/stable/high/dataset.html#chunked-storage) - h5py 如何读取分块 dataset 并设置 chunk cache
 - 第 19 阶段 · 42 - 本课 tokenize 的下载器输出
 - 第 19 阶段 · 44 - 消费此 dataloader 的 cosine schedule
 - 第 19 阶段 · 45 - 包裹训练步骤的 AMP 循环

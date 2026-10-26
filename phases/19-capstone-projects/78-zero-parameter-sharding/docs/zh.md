@@ -16,7 +16,7 @@
 
 ## 问题背景
 
-原版 DDP 把一切都复制一遍：参数、梯度、optimizer state 在每个 rank 上都完整存在。对一个 fp16 的 70 亿参数模型，这意味着每个 rank 14 GB 参数、14 GB 梯度、28 GB optimizer state。Optimizer state 是最大的那一项，也是最容易 shard 的，因为它只在 step 时被碰，forward 和 backward 时都不碰。
+原版 DDP 把一切都复制一遍：参数、梯度、optimizer state 在每个 rank 上都完整存在。对一个 fp16 的 70 亿参数模型，这意味着每个 rank 有 14 GB 参数、14 GB 梯度和 56 GB optimizer state（Adam 的两个 float32 动量）。混合精度训练还会额外保留 28 GB 的 float32 主权重副本。Optimizer state 是最大的那一项，也是最容易 shard 的，因为它只在 step 时被碰，forward 和 backward 时都不碰。
 
 ZeRO stage 1 把 optimizer state shard 掉。每个 rank 持有 1/N 的 Adam moment。Backward 之后，ZeRO 不再 allreduce 完整梯度再本地 step，而是用 reduce_scatter 让每个 rank 只收到自己那份 shard 的求和梯度。这个 rank 把 optimizer step 应用到它那份 master parameter 的 shard 上。更新后的参数 shard 再 allgather 回来，于是每个 rank 都有完整模型供下一次 forward。Optimizer 内存按 N 下降。每步的线路流量和 DDP 一样：一次 reduce_scatter 加一次 allgather 在带宽上等于一次 allreduce。内存赢了，吞吐不变。
 

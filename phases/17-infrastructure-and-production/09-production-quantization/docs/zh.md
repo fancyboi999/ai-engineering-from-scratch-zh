@@ -100,11 +100,16 @@ AWQ 把权重缩到 4 比特。KV cache 是分开的，仍然是 FP16/FP8。对�
 gpu-memory-breakdown
 ```
 
+
+[Inside an LLM Serving GPU](https://aieng-zh.cn/inside-an-llm-serving-gpu.html?dtype=fp8&users=64) 展示了 NVIDIA L4 上的 FP8 效果：权重从 15.28 GB 降至 8.81 GB，KV pool 从 24,094 token 增至 142,369 token；64 用户时的实测输出从 250.85 token/s 增至 735.91 token/s。
+
 ## 实际使用
 
 `code/main.py` 在一段模型规模范围上，跨六种格式算内存占用（权重 + KV + 激活）和相对吞吐。展示 KV cache 在哪里主导、权重压缩在哪里划算、FP8 在哪里是安全选。
 
 ## 拿去用
+
+[Inside an LLM Serving GPU](https://aieng-zh.cn/inside-an-llm-serving-gpu.html?dtype=fp8&users=64) 的 NVIDIA L4 示例中，FP8 把权重从 15.28 GB 降到 8.81 GB、把 KV pool 从 24,094 token 扩到 142,369 token；64 个用户时的实测输出从 250.85 token/s 提高到 735.91 token/s。
 
 这一课产出 `outputs/skill-quantization-picker.md`。给定硬件、模型规模、工作负载类型和质量容忍度，挑一个格式并产出一份校准/验证方案。
 

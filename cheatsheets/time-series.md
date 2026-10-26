@@ -5,7 +5,7 @@ code: TS
 subtitle: 检查平稳性，构造滞后特征，用前向滚动验证，超越朴素基线。包含随机游走和马尔可夫链。
 hue: 170
 sources: phases/02-ml-fundamentals/15-time-series, phases/01-math-foundations/22-stochastic-processes, phases/02-ml-fundamentals/16-anomaly-detection
-source_hash: 27c79d146d7f71bb
+source_hash: 731ac2614dc43fc7
 ---
 
 ## 从序列到可信预测

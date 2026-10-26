@@ -1,0 +1,36 @@
+{
+  "id": "lab-bias-variance",
+  "title": "测量偏差与方差",
+  "kind": "lab",
+  "summary": "在重采样训练集上拟合 1 到 12 阶多项式，逐阶测量偏差平方、方差和测试误差。",
+  "difficulty": "medium",
+  "tags": [
+    "bias-variance",
+    "overfitting",
+    "model-selection"
+  ],
+  "lesson": "phases/02-ml-fundamentals/10-bias-variance",
+  "cheatsheet": "classical-ml",
+  "minutes": 30,
+  "entry": [
+    "decompose",
+    "expected_test_error",
+    "sweep_degrees",
+    "best_degree",
+    "crossover_degree",
+    "answers"
+  ],
+  "collections": [
+    "experiment-labs",
+    "classical-ml"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "no_noise_term": "计算测试误差时漏掉噪声方差。",
+    "same_seed_each_round": "每轮都使用相同 seed，训练集完全相同，方差因此为 0。",
+    "square_of_mean_bias": "对测试点上的平均误差平方，而不是对误差平方取平均。",
+    "strict_crossover": "使用严格大于比较，偏差与方差相等时不会被判为交叉点。",
+    "ties_pick_higher": "阶数按从高到低遍历，因此平局时选中较高阶数。",
+    "variance_ddof_1": "方差除以 B - 1，导致误差不再等于偏差加方差加噪声。"
+  }
+}

@@ -59,7 +59,7 @@ agent 在任务中途需要权限时，比如执行破坏性操作前需要人�
 label: 凭据传输的位置
 source: spec §7.6.1
 ---
-"Agents MUST arrange to receive credentials via an out-of-band means, unless an in-band mechanism has been negotiated out-of-band or via an extension."
+除非双方已通过带外协商或扩展约定带内凭据传输，否则 agent 必须用带外方式接收凭据。
 ```
 
 deployer 的第三个流帧指定操作员批准的位置：

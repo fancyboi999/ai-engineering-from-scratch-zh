@@ -1,0 +1,33 @@
+{
+  "id": "kv-cache-append",
+  "title": "固定容量 KV 缓存",
+  "kind": "implement",
+  "summary": "向预分配缓存追加 key 和 value，用一个 query 查询有效前缀，并拒绝超出容量的追加操作。",
+  "difficulty": "medium",
+  "tags": [
+    "kv-cache",
+    "attention",
+    "inference",
+    "transformers"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/12-kv-cache-flash-attention",
+  "cheatsheet": "inference-optimization",
+  "minutes": 25,
+  "entry": [
+    "KVCache",
+    "decode_step"
+  ],
+  "collections": [
+    "transformers-from-scratch",
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "capacity_off_by_one": "追加后刚好达到 max_len 时仍报错，因此缓存最后一格从未使用。",
+    "count_before_check": "容量检查前就将长度加 n，追加失败后长度也会出错。",
+    "full_buffer_view": "keys() 和 values() 返回整个缓冲区，attention 也会读取未使用的零行。",
+    "length_plus_one": "每次追加后长度只加 1，即使一次追加多个时间步也是如此。",
+    "no_scale": "decode_step 中漏掉除以 sqrt(d_k)。",
+    "overwrite_from_zero": "每次追加都从第 0 行写入，因此新数据会覆盖旧数据。"
+  }
+}

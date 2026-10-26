@@ -30,7 +30,7 @@ v2 里的关键框架：研究类别不会自动触发缓解措施。政策措�
 
 结构：
 
-- **关键能力等级（CCL）**：跨五个领域的能力阈值：网络、生物、ML 研发、CBRN、自主性（折进 ML 研发和网络）。
+- **关键能力等级（CCL）**：按三个组划分的能力阈值：滥用（CBRN、网络、有害操纵）、ML 研发，以及探索中的错位跟踪。自主性不是独立领域，而是归入 ML 研发和网络。
 - **追踪能力等级（Tracked Capability Levels）**：2026 年 4 月加的额外粒度。具体例子：ML 研发自主性 1 级 = 以相对于人类 + AI 工具有竞争力的成本完全自动化 AI 研发流水线。
 - **欺骗性对齐监控**：对工具性推理滥用做自动化监控的显式承诺。
 
@@ -94,7 +94,7 @@ a5-tracked-vs-research
 | Tracked Category（追踪类别） | "强制缓解" | 触发能力 + 防护措施报告；SAG 评审 |
 | Research Category（研究类别） | "仅监控" | 被追踪但无自动缓解；含长程自主性 |
 | Frontier Safety Framework | "DeepMind 的扩展政策" | FSF v3（2025 年 9 月）+ 追踪能力等级（2026 年 4 月） |
-| CCL | "关键能力等级" | DeepMind 按领域的阈值（网络、生物、ML 研发、CBRN） |
+| CCL | "关键能力等级" | DeepMind 按领域设定的阈值（CBRN、网络、有害操纵、ML 研发） |
 | ML R&D autonomy level 1（ML 研发自主性 1 级） | "研发自动化" | 以有竞争力的成本完全自动化 AI 研发流水线 |
 | Sandbagging | "策略性表现不足" | 模型在评估上表现不足；在 OpenAI 研究类别里 |
 | Instrumental reasoning（工具性推理） | "手段-目的推理" | 关于如何达成目标的推理；DeepMind 监控的对象 |

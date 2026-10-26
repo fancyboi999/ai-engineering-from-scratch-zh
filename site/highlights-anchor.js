@@ -39,7 +39,7 @@
   var ATOMIC_CLASSES = ['math-inline', 'math-display'];
   var UNIT_CLASSES = ['lesson-figure', 'mermaid-container', 'm-fig-art'];
   var CAPTION_CLASSES = ['lf-cap', 'lf-head', 'asf-caption'];
-  var BLOCK_CLASSES = ['m-fig-num', 'm-fig-title', 'm-fig-kind', 'm-listing-title', 'm-listing-src', 'm-section-num', 'm-kicker', 'quiz-option-text', 'lesson-action-step-title', 'lesson-action-step-copy', 'lesson-action-step-num'];
+  var BLOCK_CLASSES = ['m-fig-num', 'm-fig-title', 'm-fig-kind', 'm-listing-title', 'm-section-num', 'm-kicker', 'quiz-option-text', 'lesson-action-step-title', 'lesson-action-step-copy', 'lesson-action-step-num'];
   var WHITESPACE = /[\s\u00a0\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/;
   var INVISIBLE = /[\u00ad\u200b-\u200d\u2060\ufeff]/;
 

@@ -5,7 +5,7 @@ subtitle: 图像预处理、卷积、分类、微调、检测、分割与分块�
 hue: 5
 sources: phases/04-computer-vision/01-image-fundamentals, phases/04-computer-vision/02-convolutions-from-scratch, phases/04-computer-vision/03-cnns-lenet-to-resnet, phases/04-computer-vision/04-image-classification, phases/04-computer-vision/05-transfer-learning, phases/04-computer-vision/06-object-detection-yolo, phases/04-computer-vision/07-semantic-segmentation-unet, phases/04-computer-vision/08-instance-segmentation-mask-rcnn, phases/04-computer-vision/14-vision-transformers
 code: CV
-source_hash: c73b7742d49dd134
+source_hash: aa0db31dea7f2688
 ---
 
 ## Mask R-CNN 流水线

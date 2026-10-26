@@ -16,7 +16,7 @@
 
 ## 问题背景
 
-Decode 是内存受限的。一块 H100 跑 Llama 3.3 70B FP8，每解码一个 token 要读约 140 GB/s 的权重、吐出一个 token。decode 期间 GPU 算力几乎闲着 —— 瓶颈是 HBM 带宽，不是 matmul 吞吐。
+Decode 是内存受限的。一块 H100 跑 Llama 3.3 70B FP8，每个 decode 步骤都从 HBM 读取约 70 GB 权重，并为每条序列输出一个 token。decode 期间 GPU 算力几乎闲着 —— 瓶颈是 HBM 带宽，不是 matmul 吞吐。
 
 Speculative decoding 利用了这个空当。用一个便宜的草稿模型生成 K 个候选 token，然后让目标模型用一次 forward 把这 K 个全部验证。每个验证通过的 token 实际上是免费的（摊进了一次目标本来就得做的 K 个一批的 forward 里）。
 

@@ -341,7 +341,61 @@ test('architecture self-loops leave and return on different node faces', () => {
 test('search retains API names, status codes and terms from omitted table columns', () => {
   const index = JSON.parse(sheets.buildCheatsheets({ edition: '2026-01-01' }).search);
   const rows = index.flatMap(topic => topic.r.map(row => (row[0] + ' ' + row[1] + ' ' + (row[3] || '') + ' ' + topic.t).toLowerCase()));
-  for (const query of ['CreateTaskPushNotificationConfig', 'FAILED_PRECONDITION', 'INVALID_ARGUMENT', 'AlphaZero']) {
+  for (const query of ['SendStreamingMessage', 'NOT_FOUND', 'a2a-version', 'AlphaZero']) {
     assert.ok(rows.some(text => text.includes(query.toLowerCase())), `missing searchable term: ${query}`);
   }
+});
+
+test('maintainer-only content and incomplete rows fail the rubric', () => {
+  const learner = sheets.parseTopic(TOPIC, 'cheatsheets/demo.md');
+  assert.deepEqual(sheets.maintainerContent(learner), []);
+  assert.deepEqual(sheets.incompleteRows(learner), []);
+  for (const text of ['`python capture/run.py --check`', '`python3 run.py`', '`python capture/gpu/run.py --only 2-1`', '`--build-fixtures`', '`node site/build-manuals.js`', '`python scripts/audit_manuals.py`', '`manuals/demo/manual.json`']) {
+    const topic = sheets.parseTopic(TOPIC.replace('`GET /health`', text), 'cheatsheets/demo.md');
+    assert.deepEqual(sheets.maintainerContent(topic), ['Start a server'], text);
+    const report = sheets.qualityReport(topic);
+    assert.ok(report.failures.some(failure => failure.startsWith('reader:')), text);
+  }
+  const fixtures = sheets.parseTopic(TOPIC.replace('`GET /health`', '`python code/main.py fixtures/sample.bin`'), 'cheatsheets/demo.md');
+  assert.deepEqual(sheets.maintainerContent(fixtures), []);
+  for (const cell of ['-', 'TBD', '...']) {
+    const topic = sheets.parseTopic(TOPIC.replace('| 30000 | HTTP port |', `| 30000 | ${cell} |`), 'cheatsheets/demo.md');
+    assert.deepEqual(sheets.incompleteRows(topic), ['Defaults: --port'], cell);
+    assert.ok(sheets.qualityReport(topic).failures.some(failure => failure.startsWith('complete:')), cell);
+  }
+  const compare = sheets.parseTopic(TOPIC.replace('| `--port` | 30000 | HTTP port |', '| `--port` | 30000 | HTTP port |\n\n## Engines\ntype: comparison\nfrom: phases/demo/01-lesson/docs/zh.md\n\n| | A | B |\n|---|---|---|\n| Port | 30000 | ... |\n| Metrics | yes | no |'), 'cheatsheets/demo.md');
+  assert.deepEqual(sheets.incompleteRows(compare), ['Engines: Port']);
+});
+
+test('diagram edges go around nodes and labels do not overlap', () => {
+  const arch = [
+    '```arch',
+    'node | cli | 1,1 | rea CLI | one question per call',
+    'node | mcp | 2,1 | rea MCP server | 207 tools',
+    'node | session | 3,1 | BinarySession | one active target',
+    'node | art | 1,2 | rea-artifact-graph | no Ghidra needed',
+    'node | prov | 2,2 | GhidraProvider | a socket',
+    'edge | cli | session | one question',
+    'edge | mcp | session | one session',
+    'edge | session | art | inspect',
+    'edge | session | prov | bind Ghidra',
+    '```',
+  ].join('\n');
+  const topic = sheets.parseTopic(TOPIC.replace(/```arch[\s\S]*?```/, arch), 'cheatsheets/demo.md');
+  const block = topic.blocks.find(item => item.type === 'architecture');
+  for (const narrow of [false, true]) {
+    assert.deepEqual(sheets.architectureOverlaps(block, narrow), [], narrow ? 'narrow' : 'wide');
+    const { edges } = sheets.architectureLayout(block, narrow);
+    const spanning = edges.find(edge => edge.from === 'cli' && edge.to === 'session');
+    assert.ok(spanning.points.length > 2 || narrow);
+  }
+  assert.match(sheets.architectureSvg(block), /<polyline class="cs-arch-edge"/);
+  const topics = sheets.loadTopics(root);
+  const problems = topics.flatMap(item => item.blocks.filter(entry => entry.type === 'architecture').flatMap(entry => [false, true].flatMap(narrow => sheets.architectureOverlaps(entry, narrow).map(problem => `${item.id}: ${problem}`))));
+  assert.deepEqual(problems, []);
+});
+
+test('posters do not print source lines', () => {
+  const built = sheets.buildCheatsheets({ edition: '2026-01-01' });
+  for (const page of built.pages) assert.doesNotMatch(page.html, /class="cs-from"/, page.file);
 });

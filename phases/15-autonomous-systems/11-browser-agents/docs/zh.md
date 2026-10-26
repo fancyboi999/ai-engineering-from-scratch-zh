@@ -1,6 +1,6 @@
 # 浏览器 agent 与长程网页任务
 
-> ChatGPT agent（2025 年 7 月）把 Operator 和 deep research 合并成一个浏览器/终端 agent，把 BrowseComp 的 SOTA 拉到 68.9%。OpenAI 在 2025 年 8 月 31 日关停了 Operator——产品层的整合。Anthropic 收购 Vercept，把 Claude Sonnet 在 OSWorld 上从不到 15% 推到了 72.5%。WebArena-Verified（ServiceNow，ICLR 2026）修掉了原版 WebArena 中 11.3 个百分点的假阴性率，并交付了 258 任务的 Hard 子集。这些数字是真的。攻击面也是真的：OpenAI 的 preparedness 负责人公开表示，注入进浏览器 agent 的间接 prompt 注入"不是一个能被完全打补丁的 bug"。2025-2026 年有记录在案的攻击：Tainted Memories（Atlas CSRF）、HashJack（Cato Networks），以及 Perplexity Comet 中的一键劫持。
+> ChatGPT agent（2025 年 7 月）把 Operator 和 deep research 合并成一个浏览器/终端 agent，把 BrowseComp 的 SOTA 拉到 68.9%。OpenAI 在 2025 年 8 月 31 日关停了 Operator——产品层的整合。Anthropic 收购 Vercept，把 Claude Sonnet 在 OSWorld 上从不到 15% 推到了 72.5%。WebArena-Verified（ServiceNow，ICLR 2026）修正了原版 WebArena 约 11.3% 的假阴性率，并交付了 258 任务的 Hard 子集。这些数字是真的。攻击面也是真的：OpenAI 的 preparedness 负责人公开表示，注入进浏览器 agent 的间接 prompt 注入"不是一个能被完全打补丁的 bug"。2025-2026 年有记录在案的攻击：Tainted Memories（Atlas CSRF）、HashJack（Cato Networks），以及 Perplexity Comet 中只需一次点击的劫持。
 
 **类型：** Learn
 **语言：** Python（标准库，间接 prompt 注入攻击面模型）

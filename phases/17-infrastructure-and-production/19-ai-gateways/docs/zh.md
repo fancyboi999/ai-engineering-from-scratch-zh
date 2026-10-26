@@ -109,7 +109,7 @@ mx-gateway-fallback
 ## 练习
 
 1. 跑 `code/main.py`。配置从 OpenAI→Anthropic→自托管 的回退。在 5% 供应商错误率下预期命中率是多少？
-2. 你的 SLA 是 300 ms 基线上 TTFT P99 < 200 ms。哪些网关留在预算内？
+2. 你的 SLA 是 TTFT P99 < 320 ms，而模型本身测得 300 ms P99。哪些网关留在预算内？
 3. 一个医疗客户要求自托管 + PII 脱敏 + 审计。在 Portkey OSS 和 Kong 之间挑。
 4. 对比 LiteLLM vs Kong：在什么 RPS 上限时一个团队该迁移？
 5. 为一个多租户 SaaS 设计限流策略：免费档、试用档、付费档。令牌桶还是滑动窗口？

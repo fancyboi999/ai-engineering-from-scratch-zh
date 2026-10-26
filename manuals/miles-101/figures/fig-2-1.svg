@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-2-1-title fig-2-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-2-1-title">1.7B 能运行短步骤，4B 则不能</title>
+  <desc id="fig-2-1-desc">蓝色柱表示 Adam 全量微调的 trainer 状态估算值，按每个参数 16 字节计算，未包含激活值和 engine。玫红色柱表示 Ray 停止两次 4B 训练时读取的节点内存：内存比例为 0.4 时占用 115.86 GB，设为 0.2 时占用 119.18 GB；节点总内存为 121.69 GB。Ray 会在使用率超过 95%（约 115.6 GB）时停止 worker。</desc>
+  <line x1="60" y1="266" x2="620" y2="266" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="270" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="60" y1="217.54" x2="620" y2="217.54" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="221.54" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">30</text>
+  <line x1="60" y1="169.08" x2="620" y2="169.08" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="173.08" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">60</text>
+  <line x1="60" y1="120.62" x2="620" y2="120.62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="124.62" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">90</text>
+  <line x1="60" y1="72.15" x2="620" y2="72.15" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="76.15" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">120</text>
+  <line x1="60" y1="266" x2="620" y2="266" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="60" y1="56" x2="60" y2="266" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="60" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GB</text>
+  <line x1="60" y1="69.42" x2="620" y2="69.42" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="64" y="64.42" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">节点内存：121.7 GB</text>
+  <line x1="60" y1="79.25" x2="620" y2="79.25" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <rect class="m-knock" x="61" y="82.67" width="232.6" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="64" y="93.25" font-size="11" fill="var(--m-rose-ink, #b0344d)">Ray 会在节点内存超过 95% 时停止 worker</text>
+  <rect x="86" y="250.49" width="60" height="15.51" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="116" y="244.49" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">约 10 GB</text>
+  <text x="116" y="283" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0.6B</text>
+  <rect x="198" y="222.06" width="60" height="43.94" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="228" y="216.06" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">约 27 GB</text>
+  <text x="228" y="283" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1.7B</text>
+  <rect x="310" y="162.62" width="60" height="103.38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="340" y="156.62" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">约 64 GB</text>
+  <text x="340" y="283" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4B</text>
+  <rect x="422" y="78.84" width="60" height="187.16" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="452" y="72.84" font-size="11" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)"> </text>
+  <text x="452" y="283" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4B，第 1 次</text>
+  <rect x="534" y="73.48" width="60" height="192.52" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="564" y="67.48" font-size="11" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)"> </text>
+  <text x="564" y="283" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4B，第 2 次</text>
+  <text x="452" y="152.92" font-size="11" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">115.9 GB</text>
+  <text x="564" y="152.92" font-size="11" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">119.2 GB</text>
+  <path d="M60 18 H78" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="2" stroke-linejoin="round"/>
+  <text x="84" y="22" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">trainer 状态估算值</text>
+  <path d="M209.8 18 H227.8" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="2" stroke-linejoin="round"/>
+  <text x="233.8" y="22" font-size="11" fill="var(--m-rose-ink, #b0344d)">Ray 停止时的节点内存</text>
+  <text x="60" y="324" font-size="12" class="m-serif">降低 engine 内存仍无法运行 4B。所有测试都将答案上限设为 256 token。</text>
+</svg>

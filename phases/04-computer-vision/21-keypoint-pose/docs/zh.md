@@ -60,7 +60,7 @@ flowchart LR
 
 ### 亚像素定位
 
-Argmax 给出整数坐标。要亚像素精度，就对 argmax 及其邻居拟合一条抛物线来精修，或用那个著名的偏移量 `(dx, dy) = 0.25 * (heatmap[y, x+1] - heatmap[y, x-1], ...)` 方向。
+Argmax 给出整数坐标。要亚像素精度，可以对 argmax 及其邻居拟合一条抛物线来精修，或把 argmax 朝分值更高的邻点移动：`dx = 0.25 * (heatmap[y, x+1] - heatmap[y, x-1])`，`dy` 同理。代码采用后者。
 
 ### 部件亲和场（PAF）
 

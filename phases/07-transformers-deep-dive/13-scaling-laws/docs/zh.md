@@ -40,12 +40,12 @@ L(N, D) = \frac{A}{N^\alpha} + \frac{B}{D^\beta} + E
 - $E \approx 1.69$，不可约的损失上限。
 - $A \approx 406$、$B \approx 411$。
 
-随着你扩展，两项相互权衡。在固定算力（$C = 6ND$）下对 $N$ 求导并解：
+随着你扩展，两项相互权衡。在固定算力（$C = 6ND$）下对 $N$ 求导并解。代入上面的 $α$ 和 $β$ 后，指数约为：$N$ 为 0.45，$D$ 为 0.55。因此最优比例会随预算缓慢变化。`code/main.py` 用网格搜索求解。论文前两种直接测量最优点的拟合方法则得到约 0.5 的指数，由此得到参数与数据按固定比例增长的经验规则。令 $D = 20N$，代入 $C = 6ND$，可得：
 
 ```math
 \begin{aligned}
-N_{\text{opt}} &\approx 0.6 \times (C/6)^{0.5} \\
-D_{\text{opt}} &\approx 0.6 \times (C/6)^{0.5} \\
+N_{\text{opt}} &\approx 0.22 \times (C/6)^{0.5} \\
+D_{\text{opt}} &\approx 4.5 \times (C/6)^{0.5} \\
 D_{\text{opt}} / N_{\text{opt}} &\approx 20
 \end{aligned}
 ```

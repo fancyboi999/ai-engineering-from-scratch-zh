@@ -34,7 +34,7 @@ const SECTION = `# What demo is for
 
 > A demo exists so that tests have something small to render.
 
-Your test needs a manual. When you finish this section, you can render one and check it.
+Your test needs a manual. 读完本节，你能渲染手册并校验结果。
 
 ## The rule
 
@@ -42,7 +42,7 @@ Your test needs a manual. When you finish this section, you can render one and c
 label: core rule
 source: spec §1
 ---
-"The server MUST reply with a task."
+The server must reply with a task.
 \`\`\`
 
 **Task:** a unit of work with an id {{spec §1}}. See [the figures](#s-ref-figures) and [figure](#fig-1-1).
@@ -148,11 +148,16 @@ test('rejects constructs outside the subset', () => {
   assert.throws(() => manuals.parseDocument('# T\n\n```figure\nid: f-1\nkind: unsupported\ntitle: t\nclaim: c.\ncaption: c\n```\n', 'x'), /kind must be one of/);
 });
 
-test('inline markup escapes HTML and records cross references with their location', () => {
+test('inline markup escapes HTML, hides source markers, and records cross references', () => {
   const acc = manuals.newInline();
   const html = manuals.inlineHtml('**a** <b> `x < y` {{spec §2}} [s](#s-1-1)', 'doc.md:4', acc);
-  assert.match(html, /<strong>a<\/strong> &lt;b&gt; <code>x &lt; y<\/code> <span class="m-cite">spec §2<\/span> <a class="m-xref" href="#s-1-1">s<\/a>/);
+  assert.match(html, /<strong>a<\/strong> &lt;b&gt; <code>x &lt; y<\/code> <a class="m-xref" href="#s-1-1">s<\/a>/);
+  assert.doesNotMatch(html, /spec §2|m-cite/);
   assert.deepEqual(acc.refs, [{ id: 's-1-1', where: 'doc.md:4' }]);
+});
+
+test('source markers render no text and preserve sentence punctuation', () => {
+  assert.equal(manuals.inlineHtml('Stop the server {{docs Install}}.', 'doc.md:5', manuals.newInline()), 'Stop the server.');
 });
 
 test('numbers figures per part and renders the print edition', () => {
@@ -164,6 +169,40 @@ test('numbers figures per part and renders the print edition', () => {
   assert.match(html, /href="#fig-1-1">1\.1<\/a>/);
   assert.match(html, /string-set: mtitle content\(text\)/);
   assert.match(html, /<span class="m-tok-key">&quot;kind&quot;<\/span>/);
+});
+
+test('section routes keep stable paths and provide a lastmod date for every document', () => {
+  const manual = manuals.loadManual(fixture().dir);
+  const pages = manuals.manualSectionPages(manual);
+  assert.deepEqual(pages.map(page => page.href), [
+    '/manual-demo-101/front',
+    '/manual-demo-101/intro',
+    '/manual-demo-101/ref-figures',
+  ]);
+  assert.ok(pages.every(page => /^\d{4}-\d{2}-\d{2}$/.test(page.lastmod)));
+  assert.equal(manuals.sectionHref(manual, '#s-intro'), '/manual-demo-101/intro');
+  assert.equal(manuals.sectionHref(manual, '#missing'), null);
+});
+
+test('chapter fragment links remain in the current document and assets load at the site root', () => {
+  const manual = manuals.loadManual(fixture({ 'manual.json': manifest({ status: 'ready' }), 'README.md': '# Demo manual\n' }).dir);
+  const out = tempDir('manual-fragment-links-');
+  manuals.writeWeb([manual], out, { only: manual.id });
+  const html = fs.readFileSync(path.join(out, 'manual/manual-demo-101/intro.html'), 'utf8');
+  const documentUrl = new URL('https://aieng-zh.cn/manual-demo-101/intro');
+  const base = html.match(/<base href="([^"]+)"/);
+  const resolutionBase = base ? new URL(base[1], documentUrl) : documentUrl;
+  for (const fragment of ['#main', '#fig-1-1']) {
+    assert.ok(html.includes(`href="${fragment}"`), `missing local link ${fragment}`);
+    const actual = new URL(fragment, resolutionBase);
+    assert.equal(actual.pathname, documentUrl.pathname, `${fragment} leaves the chapter`);
+    assert.equal(actual.hash, fragment);
+  }
+  for (const file of ['style.css', 'data.js', 'content-source.js', 'header.js']) {
+    const match = html.match(new RegExp(`(?:href|src)="([^"\\s]*${file.replace('.', '\\.')}[^"\\s]*)"`));
+    assert.ok(match, `missing shared asset ${file}`);
+    assert.equal(new URL(match[1], resolutionBase).pathname, '/' + file);
+  }
 });
 
 test('offline print embeds licensed CJK text fonts and keeps headings and listings pageable', () => {
@@ -279,7 +318,7 @@ test('a clean fixture passes the editorial audit', () => {
 test('audit flags prose, provenance, and quote violations', () => {
   const broken = SECTION
     .replace('Your test needs a manual.', 'Your test needs a manual; it can’t wait — really.')
-    .replace('"The server MUST reply with a task."', '"The server SHOULD reply with a task."')
+    .replace('The server must reply with a task.', '"the server must reply with a task" {{spec §1}}.')
     .replace('  "kind": "task",', '  "kind": "message",');
   const found = rules(fixture({ 'sections/1-1-intro.md': broken }).dir);
   for (const rule of ['semicolon', 'contraction', 'dash', 'quote', 'provenance']) assert.ok(found.has(rule), `expected ${rule}`);
@@ -300,7 +339,7 @@ test('sentences that open with code, a quote, or a section sign count on their o
 });
 
 test('audit enforces section shape', () => {
-  const shapeless = SECTION.replace('When you finish this section, you can render one and check it.', 'It renders.').replace(/```takeaways[\s\S]*?```\n/, '').replace(/\nSources:.*\n$/, '\n');
+  const shapeless = SECTION.replace('读完本节，你能渲染手册并校验结果。', '本节有一个例子。').replace(/```takeaways[\s\S]*?```\n/, '').replace(/\nSources:.*\n$/, '\n');
   const found = rules(fixture({ 'sections/1-1-intro.md': shapeless }).dir);
   for (const rule of ['outcome', 'takeaways', 'sources']) assert.ok(found.has(rule), `expected ${rule}`);
 });
@@ -454,7 +493,7 @@ test('print and web editions carry the author, license, and colophon', () => {
 const ZH_SECTION = SECTION
   .replace('What demo is for', '演示的用途')
   .replace('A demo exists so that tests have something small to render.', '演示为测试提供一个小型渲染对象。')
-  .replace('Your test needs a manual. When you finish this section, you can render one and check it.', '你的测试需要一本手册。读完本节后，你可以渲染手册并校验结果。')
+  .replace('Your test needs a manual. 读完本节，你能渲染手册并校验结果。', '你的测试需要一本手册。读完本节后，你可以渲染手册并校验结果。')
   .replace('A request becomes a task.', '请求成为任务。')
   .replace('Sources: spec', '来源：spec');
 
@@ -475,11 +514,13 @@ test('Chinese sentence checks remain active without imposing English word counts
   assert.ok(!rules(fixture({ 'sections/1-1-intro.md': terms }).dir).has('lexicon'));
 });
 
-test('paired Chinese quotations preserve verbatim checks without swallowing code or prose', () => {
-  const text = ZH_SECTION.replace('## The rule', '`version` 是 `"0"` 到 `"16"` 的字符串。原文说：“The server MUST reply with a task.” {{spec §1}}。\n\n## The rule');
-  assert.deepEqual(issuesFor(fixture({ 'sections/1-1-intro.md': text }).dir), []);
-  assert.ok(rules(fixture({ 'sections/1-1-intro.md': text.replace('原文说：“The server MUST', '原文说：“The server SHOULD') }).dir).has('quote'));
-  assert.ok(rules(fixture({ 'sections/1-1-intro.md': text.replace('原文说：“The server MUST', '原文说：“The server MUST').replace('” {{spec §1}}', '” {{missing §1}}') }).dir).has('quote-key'));
+test('manuals paraphrase sourced claims and keep literal output in code font', () => {
+  const literal = ZH_SECTION.replace('## The rule', '`version` 是 `"0"` 到 `"16"` 的字符串。日志会打印 `The server MUST reply with a task.` {{spec §1}}。\n\n## The rule');
+  assert.ok(!rules(fixture({ 'sections/1-1-intro.md': literal }).dir).has('quote'));
+  const quote = literal.replace('日志会打印 `The server MUST reply with a task.`', '文档写道：“The server MUST reply with a task.”');
+  assert.ok(rules(fixture({ 'sections/1-1-intro.md': quote }).dir).has('quote'));
+  const missing = literal.replace('{{spec §1}}', '{{missing §1}}');
+  assert.ok(rules(fixture({ 'sections/1-1-intro.md': missing }).dir).has('quote-key'));
 });
 
 test('listing sources remain mandatory and mutated Chinese listings fail provenance', () => {
@@ -532,7 +573,9 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
     assert.doesNotMatch(page, /aiengineeringfromscratch\.com|github\.com\/rohitg00|sponsors\.html|releases\/latest\/download/);
   }
   assert.match(html, /github\.com\/fancyboi999\/ai-engineering-from-scratch-zh/);
+  assert.match(html, /class="m-evidence"[^>]*>完整记录<\/a>/);
   assert.match(html, /data-source="capture\/out\/task\.json"/);
+  assert.doesNotMatch(html.replace(/\sdata-source="[^"]*"/g, ''), /capture\/out\/task\.json/);
   assert.match(html, /上游记录的核验日期为 2026-10-06/);
   assert.match(html, /href="manual-demo-101-print\.html">打印版/);
   assert.match(data, /"print": "manual-demo-101-print\.html"/);

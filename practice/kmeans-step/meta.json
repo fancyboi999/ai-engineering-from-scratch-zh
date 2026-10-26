@@ -1,0 +1,33 @@
+{
+  "id": "kmeans-step",
+  "title": "K-means 的分配与更新",
+  "kind": "implement",
+  "summary": "实现 K-means 的分配与更新步骤，处理距离平局和空簇，并运行完整聚类直到分配结果不再变化。",
+  "difficulty": "medium",
+  "tags": [
+    "clustering",
+    "k-means",
+    "unsupervised-learning",
+    "vectorization"
+  ],
+  "lesson": "phases/02-ml-fundamentals/07-unsupervised-learning",
+  "cheatsheet": "unsupervised-anomaly",
+  "minutes": 25,
+  "entry": [
+    "assign",
+    "update",
+    "kmeans"
+  ],
+  "collections": [
+    "classical-ml"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "empty_cluster_nan": "对空簇求均值，导致质心变成 NaN。",
+    "empty_cluster_zero": "从全零开始创建新质心，使空簇移动到原点。",
+    "manhattan_distance": "按绝对差之和分配，而不是按平方欧氏距离。",
+    "one_iteration_too_many": "返回的更新步数比实际多 1。",
+    "tie_highest_index": "距离并列时分配给索引最大的质心，而不是最小的。",
+    "update_writes_input": "将新质心直接写入调用方传入的质心数组。"
+  }
+}

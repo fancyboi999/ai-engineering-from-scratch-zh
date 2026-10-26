@@ -100,7 +100,7 @@ Cutmix:
 
 ### 标签平滑
 
-mixup 的表亲。不去对着 `[0, 0, 1, 0, 0]` 训练，而是对着 `[eps/C, eps/C, 1-eps, eps/C, eps/C]` 训练，`eps` 取一个像 0.1 的小值。它阻止模型产生任意尖锐的 logits，几乎零成本地改善校准。从 PyTorch 1.10 起内建于 `nn.CrossEntropyLoss(label_smoothing=0.1)`。
+mixup 的表亲。不去对着 `[0, 0, 1, 0, 0]` 训练，而是对着 `[eps/C, eps/C, 1-eps+eps/C, eps/C, eps/C]` 训练。该目标是把 one-hot 与均匀分布混合而成，概率总和仍为 1。`eps` 取一个像 0.1 的小值。它阻止模型产生任意尖锐的 logits，几乎零成本地改善校准。从 PyTorch 1.10 起内建于 `nn.CrossEntropyLoss(label_smoothing=0.1)`。
 
 ### 超越准确率的评估
 
@@ -415,7 +415,7 @@ val_ds   = CIFAR10(root="./data", train=False, download=True, transform=eval_tf)
 | DataLoader | "组 batch 的" | 给数据集裹上打乱、组 batch 和（可选的）多 worker 加载；一半训练 bug 都赖在它头上 |
 | 增广 | "随机变换" | 训练时任何保留标签的像素级变换；教会 CNN 它天生没有的不变性 |
 | Mixup / Cutmix | "混两张图" | 把输入和标签都混合，让分类器学平滑的插值而不是硬边界 |
-| 标签平滑 | "更软的目标" | 把 one-hot 换成 (1-eps, eps/(C-1), ...)；改善校准并稍微提升准确率 |
+| 标签平滑 | "更软的目标" | 将 one-hot 与均匀分布混合，正类概率为 $1-\epsilon+\epsilon/C$，其余类为 $\epsilon/C$；改善校准并稍微提升准确率 |
 | Top-k 准确率 | "Top-5" | 正确类别在概率最高的 k 个预测里；用于类别确实有歧义的数据集 |
 | 混淆矩阵 | "错误藏在哪" | C x C 表，条目 (i, j) 统计真实类别 i 被预测成 j 的图像数；对角线是对的，非对角线告诉你该修什么 |
 

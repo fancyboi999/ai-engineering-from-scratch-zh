@@ -2,11 +2,11 @@
 
 > GPU 池满时，SGLang 默认淘汰最近最少使用的前缀；HiCache 将被淘汰前缀保存在主机内存与可选存储中。
 
-编程 agent 的会话已有八轮，历史超过 25,000 token。GPU 池只能装几十个这样的会话。第九十一个用户到达时，SGLang 必须淘汰缓存前缀腾空间。第一个用户返回时，历史已不在缓存，服务器又重算全部 25,000 token。
+编程 agent 的会话已有八轮，历史超过 25,000 token。GPU 池能装下九十个这样的会话。第九十一个用户到达时，SGLang 必须淘汰缓存前缀腾空间。第一个用户返回时，历史已不在缓存，服务器又重算全部 25,000 token。
 
 读完本节，你能根据实测命中率选择淘汰策略，判断分层缓存何时值得付出成本，以及先改哪些设置。
 
-## 淘汰移除什么
+## 淘汰移除什么 {#s-eviction-policies-and-hicache-what-eviction-removes}
 
 淘汰只移除没有运行请求锁定的缓存 token，即[基数树](#s-radixcache)叶子。绝不移除运行请求的 KV；后者叫回撤，见[第 2.3 节](#s-admission-and-retraction)。淘汰从最低得分叶子开始，向根推进。
 
@@ -22,11 +22,41 @@
 
 **尾延迟优化 LRU（tlru）：** 只保留满足下一轮延迟目标所需的会话部分，优先淘汰其余部分。来自代码引用的论文 arXiv 2510.15152。SGLang 团队报告在并发 32 的 DeepSeek-V4-Pro 上 P99 token 间延迟下降 43.9% {{team 2026-10}}。数字来自 v0.5.21 发布说明，手册未找到独立测试。
 
-## 本手册的建议：没有测量依据就保留 lru
+`tlru` 需要通过 `--radix-eviction-policy-config` 配置才能启动。`threshold` 必须大于 `next_prompt_estimate`。我们的配置为 `{"threshold": 512, "next_prompt_estimate": 256}`。
+
+## 本手册的建议：没有测量依据就保留 lru {#s-eviction-policies-and-hicache-our-position-keep-lru-until-you-have-measured-a-reason}
 
 SGLang 文档也建议从 `lru` 开始，仅依据实测命中率修改 {{docs}}。流行度变化时，频率策略会受损：昨天热门的 prompt 留在内存，今天的 prompt 为此付费。只有能说清新策略服务哪种负载时才修改，并比较前后命中率。
 
-## HiCache：一棵树的三层存储
+2026 年一项研究分析了两家公司的生产轨迹，支持这个默认策略。研究对比了 14 种淘汰策略，发现为其他缓存设计的策略相较 LRU 收益很小。研究中的活跃会话会按规律发送下一轮，因此最近使用情况能较好预测复用。
+
+研究在两种场景下发现其他策略有收益：一次性 prompt 占满缓存时，快速淘汰只用一次的前缀；以及根据重新计算一次 miss 的代价决定淘汰对象。我们没有复现实验。在 SGLang 提供的策略中，`slru` 最接近第一种场景。
+
+## 使用多轮对话轨迹的实测 {#s-eviction-policies-and-hicache-what-we-measured-with-a-multi-turn-trace}
+
+2026-10-23，我们在 L4 上用 `Qwen/Qwen3-0.6B` 运行了 24 个聊天会话。每个会话有独立的 system prompt 和 6 轮 ShareGPT 问题，每轮回答 64 token。会话以并发 8 轮流发送，每一轮都带上完整历史。命中率等于缓存的 prompt token 数除以 prompt token 总数。实验使用 L4 节点的第二张 GPU，由其所有者共享，未锁定时钟。时钟不会改变命中率，所以重点看命中率，不看时长。
+
+```listing
+title: 整段轨迹和每轮命中率，按池大小与策略划分
+source: capture/gpu/out-l4/eviction-multiturn.txt
+lang: text
+note: 摘录四行汇总。省略关闭 CUDA graphs 的运行、16,384-token LFU 运行和默认池的结果。
+---
+pool, policy                 whole trace   hit rate per turn 1 to 6                        median SM clock
+8,192 tokens, lru            0.19, 0.19    0.11, 0.31, 0.58, 0.39, 0.016, 0.013            615 MHz
+…
+8,192 tokens, lfu            0.375         0.11, 0.31, 0.58, 0.53, 0.34, 0.25              1,140 MHz
+8,192 tokens, slru           0.367         0.11, 0.31, 0.58, 0.53, 0.31, 0.26              960 MHz
+16,384 tokens, lru           0.685         rises to 0.83 at turn 6                         810 MHz
+```
+
+- **小池让 LRU 反复失效。** 8,192 token 的池小于 24 个会话循环工作的集合。LRU 在每个会话下一轮到来前淘汰其前缀，因此第 5、6 轮的命中率降到约 1.5%。
+- **LFU 与 SLRU 只在小池时有帮助。** 它们在第 5、6 轮仍命中 25% 至 34%。整段轨迹的命中率约为 LRU 的两倍。
+- **扩大池解决了问题。** 16,384 token 以及默认池下，我们测试的每项策略整段命中率都约为 0.69。
+
+因此，只有当池小于会返回的会话集合时，更换策略才有帮助。先用 `--mem-fraction-static` 或 FP8 KV cache 扩大池，再评估策略。这个池大小下，部分运行也会崩溃。[第 7.1 节](#s-operating-sglang)说明该症状。
+
+## HiCache：一棵树的三层存储 {#s-eviction-policies-and-hicache-hicache-three-tiers-for-one-tree}
 
 **HiCache：** SGLang 分层缓存，将基数树从 GPU 内存延伸至主机内存和存储后端。通过 `--enable-hierarchical-cache` 开启，默认关闭 {{code}}。代码与文档中的各层名称为：
 
@@ -36,7 +66,7 @@ SGLang 文档也建议从 `lru` 开始，仅依据实测命中率修改 {{docs}}
 
 树记录各节点的 KV 位于何处。匹配返回 GPU 与主机命中长度，再把主机部分载入新 GPU 槽位，领先需要它的计算一层 {{docs}}。
 
-`--hicache-write-policy` 决定何时生成主机副本，默认 `write_through`。代码对 `write_through` 设置命中阈值 1，对 `write_through_selective` 设 2 {{code}}。因此前者首次命中就复制，后者等第二次；`write_back` 则仅在 GPU 淘汰节点时复制。
+`--hicache-write-policy` 决定何时生成主机副本，默认 `write_through`。代码对 `write_through` 设置命中阈值 1，对 `write_through_selective` 设 2 {{code}}。因此 `write_through` 首次命中就复制，`write_through_selective` 等第二次；`write_back` 则仅在 GPU 淘汰节点时复制。
 
 ```figure
 id: fig-3-5
@@ -46,7 +76,7 @@ claim: write_through 在首次命中时生成主机副本，GPU 淘汰后无需�
 caption: 写入从左向右，回载从右向左。阈值与默认值来自 v0.5.22 UnifiedRadixCache。
 ```
 
-## 决定收益的设置
+## 决定收益的设置 {#s-eviction-policies-and-hicache-the-settings-that-decide-whether-it-helps}
 
 L3 预取有自己的规则。存储命中少于 256 token 时跳过预取 {{code}}。默认预取策略 `timeout`，等待存储的时长随 prompt 增长。
 
@@ -54,7 +84,7 @@ L3 预取有自己的规则。存储命中少于 256 token 时跳过预取 {{cod
 
 主机池大小由 `--hicache-ratio` 或 `--hicache-size` 确定。两者都不设时，最多使用 `--hicache-host-memory-fraction`，默认为可用主机内存的 0.8 {{code}}。
 
-## 其他团队测到了什么
+## 其他团队测到了什么 {#s-eviction-policies-and-hicache-what-other-teams-measured}
 
 上游未能在捕获 Mac 上运行 HiCache，外部证据也较少。下一小节是 L4 上的上游测试。找到的外部数字来自 SGLang 团队与合作方。
 
@@ -63,7 +93,7 @@ L3 预取有自己的规则。存储命中少于 256 token 时跳过预取 {{cod
 
 失败报告比成功报告记录更充分。Issue #35129 中，回载找不到空间时淘汰其他会话 GPU 前缀，250,000 次 evict 对应 376 次完成回载 {{issue #35129}}。Issue #30760 中，一个张量并行 rank 永远等待预取检查，其余 rank 继续 {{issue #30760}}。Issue #42465 中，540,000-token prompt 突发在开启 HiCache 时挂住全部 rank，关闭则能运行 {{issue #42465}}。
 
-## L4 实测
+## L4 实测 {#s-eviction-policies-and-hicache-what-we-measured-on-an-l4}
 
 上游在 24 GB L4 上用 `Qwen/Qwen3-8B` 测试 L2。每组八请求共享 2,048-token system prompt，各加 64-token 问题。组数从 4 增至 64，并发上限 8，每点三个种子。第二个服务添加 `--enable-hierarchical-cache --hicache-ratio 4`。
 
@@ -98,18 +128,20 @@ claim: L4 上 32 份不同 system prompt 时，HiCache 将 TTFT 中位数从 5,4
 caption: TTFT 中位数对不同 system prompt 数，每点三个种子，对数刻度。玫红仅 GPU，绿色增加主机层。来源：capture/gpu/summary/l4.json。
 ```
 
-| 组数 | 需保留 prompt token | TTFT 中位数，仅 GPU | TTFT 中位数，HiCache | 输出 tok/s，仅 GPU | 输出 tok/s，HiCache |
-|---|---|---|---|---|---|
-| 4 | 8,192 | 360 ms | 361 ms | 82.39 | 81.64 |
-| 16 | 32,768 | 3,259 ms | 553 ms | 37.95 | 74.75 |
-| 32 | 65,536 | 5,449 ms | 817 ms | 25.72 | 69.29 |
-| 64 | 131,072 | 6,821 ms | 3,610 ms | 21.37 | 35.93 |
+| 组数 | 需保留 prompt token | TTFT 中位数，仅 GPU / HiCache | 输出 tok/s，仅 GPU / HiCache | SM 时钟中位数，仅 GPU / HiCache |
+|---|---|---|---|---|
+| 4 | 8,192 | 360 / 361 ms | 82.39 / 81.64 | 1,455 / 1,440 MHz |
+| 16 | 32,768 | 3,259 / 553 ms | 37.95 / 74.75 | 788 / 1,223 MHz |
+| 32 | 65,536 | 5,449 / 817 ms | 25.72 / 69.29 | 465 / 765 MHz |
+| 64 | 131,072 | 6,821 / 3,610 ms | 21.37 / 35.93 | 450 / 450 MHz |
 
-**上游实测**四组全部装进 GPU 时没有额外成本。32 组时，主机层把等待中位数缩短为约 1/6.7，吞吐量增加到 2.7 倍。64 组需要的 prompt 超过 GPU 加主机总容量（约 120,000 token），HiCache 仍将等待减半，却无法接近四组结果。
+**我们测得**四组、prompt 全部能放入 GPU 时，主机层没有额外成本。32 组时，主机层将等待中位数缩短到约 1/6.7，吞吐量提高到 2.7 倍。但两台服务器的时钟都远低于 1,000 MHz 时钟下限，HiCache 服务器时钟是默认服务器的 1.65 倍。因此 6.7 倍的等待时间差同时包含了缓存效果和时钟差异。
 
-这些运行卡温较高。从 16 组起，两种服务的 52至95% 样本有热降频标志。默认服务重算更多、温度更高，因此部分损失来自时钟。上面的缓存命中日志则不依赖时钟。
+64 组的 prompt 需要的容量，超过 GPU 与主机池合计约 120,000 token 的容量。HiCache 将等待缩短了 1.9 倍，但仍远慢于四组时的结果。
 
-GB10 运行相同负载作对照，没有开启 HiCache。GB10 的 CPU/GPU 共用内存，主机副本会与原池占用同一来源。
+这些运行卡温较高。从 16 组起，两种服务的 52% 至 95% 样本都有热降频标志。默认服务重算更多、运行更热，因此部分损失来自时钟。缓存命中日志不受时钟影响，是更可靠的证据。
+
+GB10 作为对照运行相同负载，使用不同模型 `Qwen/Qwen3-30B-A3B-Instruct-2507`，且没有开启 HiCache。GB10 的 CPU/GPU 共用内存，主机副本会与原池占用同一来源。
 
 ```listing
 title: GB10 的池与 64 组运行的两行 prefill
@@ -124,9 +156,9 @@ note: 先是启动池，再是连续两行 prefill；长行已裁剪。
 
 其池容纳 260,013 token，足以同时保存 64 份 system prompt。第二行 prefill 为七个新请求找到 15,146 个缓存 token。从 4 到 64 组，TTFT 中位数始终为 448至460 ms。没有淘汰，也就没有需要主机层回载的内容。
 
-实验规则取决于工作集大小：加总用户在几分钟内会返回使用的不同前缀。总量超过 GPU 池时，主机层值得；低于时，只是白加一份副本。
+这个实验说明，要先估算工作集大小：加总用户在几分钟内会再次使用的不同前缀。在我们的测试中，工作集大于 GPU 池、但小于 GPU 加主机总池时，主机层才有收益。工作集小于 GPU 池时，主机层没有带来收益。
 
-## 本手册的建议：长会话分步加 HiCache
+## 本手册的建议：长会话分步加 HiCache {#s-eviction-policies-and-hicache-our-position-add-hicache-for-long-sessions-and-add-it-in-steps}
 
 会话寿命超过 GPU 池留存时间时，HiCache 才有回报：多轮聊天、编程 agent、重复提问的长文档。短的一次性 prompt 只增加复制与回载，无内容可复用。按以下顺序添加，每步测命中率和 P99 TTFT。
 
@@ -137,12 +169,13 @@ note: 先是启动池，再是连续两行 prefill；长行已裁剪。
 5. 最后再改淘汰策略。
 
 ```takeaways
-- 重复前缀大于 GPU 池时添加主机层。
+- 重复前缀大于 GPU 池时，在自己的显卡上测量后再添加主机层。
 - 没有实测理由就保留 lru。
+- 多轮命中率下降时先扩大池，再考虑更换策略。
 - 长多轮会话用 HiCache，一次性 prompt 不用。
 - 先仅用主机内存，测量后再加存储。
 - v0.5.22 的预取超时以代码为准。
 - 部署 HiCache 前关注 issue 中的淘汰风暴与 rank 挂起。
 ```
 
-Sources: python/sglang/srt/mem_cache/evict_policy.py, python/sglang/srt/mem_cache/unified_radix_cache.py (write_through_threshold, prefetch_timeout_base), python/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py (prefetch_threshold), python/sglang/srt/arg_groups/fields/memory.py at v0.5.22, docs/docs/advanced_features/hicache_design.mdx and radix_eviction_policy.mdx at v0.5.22, the v0.5.21 release notes, the SGLang HiCache post of 2025-09-10, the RBG and Mooncake post on the Alibaba Cloud blog of 2026-03-10, issues #35129, #30760, and #42465, arXiv 2510.15152. capture/gpu/out-l4/server-working-set-hicache.log, capture/gpu/out-l4/server-working-set-default.log, capture/gpu/summary/l4.json. capture/gpu/summary/gb10.json. capture/gpu/out-gb10/server-working-set-default.log.
+来源： python/sglang/srt/mem_cache/evict_policy.py, python/sglang/srt/mem_cache/unified_radix_cache.py (write_through_threshold, prefetch_timeout_base), python/sglang/srt/mem_cache/hybrid_cache/hybrid_pool_assembler.py (prefetch_threshold), python/sglang/srt/arg_groups/fields/memory.py，v0.5.22, docs/docs/advanced_features/hicache_design.mdx 和 radix_eviction_policy.mdx，v0.5.22, v0.5.21 发布说明, Liu, Yu, 和 Yang, When Fancy Eviction Fails: Rethinking Cache Replacement For LLM Prefix Reuse, arXiv 2609.28870 (2026-09), SGLang HiCache 文章， 2025-09-10, Alibaba Cloud 博客的 RBG 和 Mooncake 文章， 2026-03-10, issue #35129, #30760, 和 #42465, arXiv 2510.15152. capture/gpu/out-l4/server-working-set-hicache.log, capture/gpu/out-l4/server-working-set-default.log, capture/gpu/summary/l4.json. capture/gpu/summary/gb10.json. capture/gpu/out-gb10/server-working-set-default.log. capture/gpu/out-l4/eviction-multiturn.txt, capture/gpu/out-l4/small-pool-crash.txt.

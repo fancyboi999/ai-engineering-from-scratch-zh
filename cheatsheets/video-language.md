@@ -5,7 +5,7 @@ code: VV
 subtitle: 采样视频帧、规划 token 预算、编码时间、定位事件，为长视频建立索引并输出带时间戳的答案。
 hue: 320
 sources: phases/12-multimodal-ai/17-video-language-temporal-grounding, phases/12-multimodal-ai/18-long-video-million-token, phases/04-computer-vision/12-video-understanding, phases/19-capstone-projects/12-video-understanding-pipeline
-source_hash: 1ed54cae4231b30e
+source_hash: 8475cbea0582e93e
 ---
 
 ## 场景索引流程（综合项目）
@@ -41,7 +41,7 @@ from: phases/12-multimodal-ai/17-video-language-temporal-grounding/docs/zh.md, p
 | 维度 | Video-LLaMA | Video-LLaVA | Qwen2.5-VL |
 |---|---|---|---|
 | 帧 | 2 FPS 下的 16 帧片段 | 8 帧 | 动态 FPS |
-| 压缩器 | 视频 Q-former，32 个查询 | MLP | 逐 token TMRoPE |
+| 压缩器 | 视频 Q-former，32 个查询 | MLP | 逐 token 时间对齐 M-RoPE |
 | 时间位置 | 一维时间 RoPE | 可学习时间嵌入 | 绝对时间戳 (t, h, w) |
 | 说明 | 音频分支、ImageBind | 共享图像与视频编码器 | 2025 年最佳开放模型 |
 | 对“何时”的回答 | “片段开头” | 8-16 帧系统 | “在 4.2 秒处” |
@@ -168,7 +168,7 @@ from: phases/04-computer-vision/12-video-understanding/docs/zh.md, phases/12-mul
 | 膨胀模型破坏批归一化 | 激活尺度增大 | 除以 `time_kernel` |
 | 联合注意力耗时暴涨 | 对 `T*H*W` 呈平方复杂度 | 使用分离注意力 |
 | 均匀采样漏掉动作 | 丢失运动峰值 | 使用带最大帧数限制的动态 FPS |
-| 答案只说“片段开头” | 缺少绝对时间位置 | 使用 TMRoPE 与 JSON 输出 |
+| 答案只说“片段开头” | 缺少绝对时间位置 | 使用时间对齐 M-RoPE 与 JSON 输出 |
 | 2h 视频上下文溢出 | 1 FPS 下需要 583k 个 token | 加强池化或使用 VideoAgent |
 | “多少个 X”计数错误 | 计数幻觉 | 单独报告计数准确率 |
 
@@ -176,7 +176,7 @@ from: phases/04-computer-vision/12-video-understanding/docs/zh.md, phases/12-mul
 type: qa
 from: phases/12-multimodal-ai/17-video-language-temporal-grounding/docs/zh.md, phases/12-multimodal-ai/18-long-video-million-token/docs/zh.md, phases/04-computer-vision/12-video-understanding/docs/zh.md, phases/19-capstone-projects/12-video-understanding-pipeline/docs/zh.md
 
-- **TMRoPE 增加了什么？** 逐 token 的绝对时间，可处理动态 FPS 的不均匀间距。
+- **时间对齐 M-RoPE 增加了什么？** 逐 token 的绝对时间，可处理动态 FPS 的不均匀间距。
 - **用什么输出格式？** 包含时间与事件字段的结构化 JSON。
 - **用哪种池化？** 多数任务用 3x3 双线性池化，agent 工作流用 6x6。
 - **15 分钟片段走哪条路径？** 具有原生上下文的开放 72B 模型。

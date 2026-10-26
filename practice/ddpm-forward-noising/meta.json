@@ -1,0 +1,41 @@
+{
+  "id": "ddpm-forward-noising",
+  "title": "DDPM 噪声调度、闭式加噪与后验",
+  "kind": "research",
+  "summary": "构造线性 beta 调度和 alpha 累积乘积，以闭式公式从 x_0 采样 x_t，并计算 q(x_{t-1} | x_t, x_0) 的均值和方差。",
+  "difficulty": "medium",
+  "tags": [
+    "diffusion",
+    "ddpm",
+    "generative-models",
+    "noise-schedule"
+  ],
+  "lesson": "phases/08-generative-ai/06-diffusion-ddpm-from-scratch",
+  "cheatsheet": "diffusion-models",
+  "minutes": 30,
+  "entry": [
+    "make_schedule",
+    "q_sample",
+    "posterior_mean_variance"
+  ],
+  "collections": [
+    "papers-to-code",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "method": "diffusion",
+  "paper": {
+    "title": "Denoising Diffusion Probabilistic Models",
+    "authors": "Ho, Jain and Abbeel",
+    "year": 2020,
+    "url": "https://arxiv.org/abs/2006.11239"
+  },
+  "mutants": {
+    "batch_t_not_reshaped": "未重塑时间步数组对应的系数，导致系数无法沿批次中样本的其他轴广播。",
+    "no_sqrt": "将 alpha_bar 和 1 - alpha_bar 直接作为 x_t 的系数，漏掉了平方根。",
+    "prev_is_current": "在后验中用 alpha_bar_t 代替 alpha_bar_{t-1}。",
+    "prev_wraps_to_last": "使用 np.roll 构造 alpha_bar_{t-1}，导致 t = 0 时读取最后一步而不是 1。",
+    "schedule_misses_end": "除以 T 而不是 T - 1，因此最后一个 beta 小于 beta_end。",
+    "variance_is_beta": "将 beta_t 直接作为后验方差返回，未使用论文中的 tilde beta。"
+  }
+}

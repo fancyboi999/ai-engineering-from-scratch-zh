@@ -2,15 +2,15 @@
 
 > 三个命令进入沙箱：`exec` 执行命令并启动已停止的沙箱，`cp` 跨边界复制文件，`ports` 未另行指定时绑定 `tcp4`。
 
-`m101-demo` 内有服务监听 8080 端口。你想从宿主访问它，复制文件进去，再读出结果。容器使用 `docker exec`、`docker cp` 和 `docker run -p` 完成这些工作；`sbx` 有相同的三个动词，但各有一条不同规则。读完后，你能以任意用户执行命令、双向复制文件，以及发布 `localhost` 可访问的端口。
+`m101-demo` 内有服务监听 8080 端口。你想从宿主访问它，复制文件进去，再读出结果。容器使用 `docker exec`、`docker cp` 和 `docker run -p` 完成这些工作；`sbx` 有相同的三个动词，但各有一条不同规则。读完本节后，你能以任意用户执行命令、双向复制文件，以及发布 `localhost` 可访问的端口。
 
 ## sbx exec {#s-sbx-exec-cp-and-ports-sbx-exec}
 
-**exec：** `sbx exec [flags] SANDBOX COMMAND [ARG...]` 在沙箱内执行一条命令；“If the sandbox is stopped, it is started first” {{help-sbx sbx exec}}，已停止的沙箱会先启动。flags 沿用 `docker exec`，但“except detached exec (-d/--detach) is not supported” {{help-sbx sbx exec}}，不支持分离执行，所以帮助中的 `-d` 只是说明它不支持。2025 插件曾支持 `docker sandbox exec -d`，[冲突 C31](#s-ref-sources-and-the-conflicts-register) 记录此事。带 `--cloud` 时，`-d`、`--user` 和 `--privileged` “are rejected rather than silently ignored” {{help-sbx sbx exec}}，明确拒绝而非静默忽略。
+**exec：** `sbx exec [flags] SANDBOX COMMAND [ARG...]` 在沙箱内执行一条命令；{{help-sbx sbx exec}}，已停止的沙箱会先启动。flags 沿用 `docker exec`，但{{help-sbx sbx exec}}，不支持分离执行，所以帮助中的 `-d` 只是说明它不支持。2025 插件曾支持 `docker sandbox exec -d`，[冲突 C31](#s-ref-sources-and-the-conflicts-register) 记录此事。带 `--cloud` 时，`-d`、`--user` 和 `--privileged` {{help-sbx sbx exec}}，明确拒绝而非静默忽略。
 
 命令在工作区目录中以 `agent` 用户执行，uid 1000，属于 `sudo` 和 `docker` 组。`-u root` 改为 root，帮助用它运行 `apt-get update`，录制用它创建 `/opt/marker-from-demo`。`-w` 指定其他工作目录，`-e KEY=VALUE` 和 `--env-file FILE` 为该命令设置变量，`-it` 打开 shell。
 
-沙箱内部知道自身名称。自 v0.39.0 起，沙箱“expose their own identity as SANDBOX_NAME and SANDBOX_ID environment variables” {{rel-sbx v0.39.0}}，通过这两个环境变量暴露身份；`SANDBOX_VM_ID` 仍是名称的弃用副本。`WORKSPACE_DIR` 指向挂载，`HOME` 为 `/home/agent`。
+沙箱内部知道自身名称。自 v0.39.0 起，沙箱{{rel-sbx v0.39.0}}，通过这两个环境变量暴露身份；`SANDBOX_VM_ID` 仍是名称的弃用副本。`WORKSPACE_DIR` 指向挂载，`HOME` 为 `/home/agent`。
 
 ```listing
 title: 从内部读取 m101-demo 身份
@@ -35,9 +35,9 @@ WORKSPACE_DIR=$CAPTURE/fixtures/repo
 
 ## sbx cp {#s-sbx-exec-cp-and-ports-sbx-cp}
 
-**cp：** `sbx cp SRC DST`，其中“Either SRC or DST must be a sandbox path, written as SANDBOX:PATH” {{help-sbx sbx cp}}，一端必须以 `SANDBOX:PATH` 表示沙箱路径，另一端是宿主路径。“Copying between two sandboxes is not supported” {{help-sbx sbx cp}}，不支持沙箱间直接复制。录制中的 `sbx cp m101-demo:/tmp/out.txt m101-demo-2:/tmp/x` 以该消息和退出码1结束，因此这种复制要经过宿主。复制目录时，目录自身被放到目标位置；目标是已有目录时，源被放入其中。`-L` 跟随源中的符号链接。沙箱路径是容器路径，所以录制中的 `/tmp/in.txt` 位于工作区挂载外，随沙箱删除。
+**cp：** `sbx cp SRC DST`，其中{{help-sbx sbx cp}}，一端必须以 `SANDBOX:PATH` 表示沙箱路径，另一端是宿主路径。{{help-sbx sbx cp}}，不支持沙箱间直接复制。录制中的 `sbx cp m101-demo:/tmp/out.txt m101-demo-2:/tmp/x` 以该消息和退出码1结束，因此这种复制要经过宿主。复制目录时，目录自身被放到目标位置；目标是已有目录时，源被放入其中。`-L` 跟随源中的符号链接。沙箱路径是容器路径，所以录制中的 `/tmp/in.txt` 位于工作区挂载外，随沙箱删除。
 
-复制出沙箱有一条与安全历史有关的规则。2026-08-06 发布的 v0.38.0 “Fixed a destination-escape flaw in sbx cp copy-out (CVE-2026-17106)” {{rel-sbx v0.38.0}}，修复了复制出操作的目标逃逸漏洞。
+复制出沙箱有一条与安全历史有关的规则。2026-08-06 发布的 v0.38.0 {{rel-sbx v0.38.0}}，修复了复制出操作的目标逃逸漏洞。
 
 ```listing
 title: 复制进去、复制出来与一次被拒绝的复制
@@ -67,9 +67,9 @@ error: copying between sandboxes is not supported
 
 ## sbx ports {#s-sbx-exec-cp-and-ports-sbx-ports}
 
-**ports：** `sbx ports SANDBOX` 列出已发布端口，`--publish SPEC` 添加，`--unpublish SPEC` 移除。格式为 `[[HOST_IP:]HOST_PORT:]SANDBOX_PORT[/PROTOCOL]`；“If HOST_PORT is omitted, an ephemeral port is allocated automatically” {{help-sbx sbx ports}}，省略宿主端口会自动分配临时端口。发布操作会“starts a stopped sandbox before creating the host binding” {{help-sbx sbx ports}}，与 `exec` 一样先启动已停止的沙箱。
+**ports：** `sbx ports SANDBOX` 列出已发布端口，`--publish SPEC` 添加，`--unpublish SPEC` 移除。格式为 `[[HOST_IP:]HOST_PORT:]SANDBOX_PORT[/PROTOCOL]`；{{help-sbx sbx ports}}，省略宿主端口会自动分配临时端口。发布操作会{{help-sbx sbx ports}}，与 `exec` 一样先启动已停止的沙箱。
 
-要记住地址族规则：“When publishing without a PROTOCOL, tcp4 is used” {{help-sbx sbx ports}}，未指定协议默认 `tcp4`，只绑定 `127.0.0.1`；要双栈需“Publish tcp explicitly to bind both families” {{help-sbx sbx ports}}，明确写 `tcp`。v0.42.0 改为“a published port no longer listens on ::1 unless you name the protocol explicitly” {{rel-sbx v0.42.0}}，不明确写协议便不监听 `::1`。2025 插件默认绑定两种回环地址，见[冲突 C39](#s-ref-sources-and-the-conflicts-register)。
+要记住地址族规则{{help-sbx sbx ports}}，未指定协议默认 `tcp4`，只绑定 `127.0.0.1`；要双栈需{{help-sbx sbx ports}}，明确写 `tcp`。v0.42.0 改为{{rel-sbx v0.42.0}}，不明确写协议便不监听 `::1`。2025 插件默认绑定两种回环地址，见[冲突 C39](#s-ref-sources-and-the-conflicts-register)。
 
 | `PROTOCOL` | 省略 `HOST_IP` 时的宿主绑定 |
 |---|---|
@@ -137,7 +137,7 @@ $ sbx ports m101-demo --json
 [exit 0]
 ```
 
-不带协议的取消发布会移除映射，“whether it was published with that same default or as dual-stack tcp” {{help-sbx sbx ports}}，不论按默认方式还是双栈 tcp 发布。录制最后的 `sbx ports m101-demo --json` 输出 `[]`。`sbx run` 的 `-p` 仅在创建时生效，之后用 `sbx ports` 修改。`sbx ls` 在 `PORTS` 列显示绑定，录制中为 `127.0.0.1:18081->8080/tcp4`。云端发布端口会得到公共 URL，且拒绝 UDP，见 [sbx --cloud](#s-sbx-cloud-run-move-and-ttl)。
+不带协议的取消发布会移除映射，{{help-sbx sbx ports}}，不论按默认方式还是双栈 tcp 发布。录制最后的 `sbx ports m101-demo --json` 输出 `[]`。`sbx run` 的 `-p` 仅在创建时生效，之后用 `sbx ports` 修改。`sbx ls` 在 `PORTS` 列显示绑定，录制中为 `127.0.0.1:18081->8080/tcp4`。云端发布端口会得到公共 URL，且拒绝 UDP，见 [sbx --cloud](#s-sbx-cloud-run-move-and-ttl)。
 
 ```takeaways
 - 安装包时运行 `sbx exec -u root`；已停止的沙箱会因此启动。

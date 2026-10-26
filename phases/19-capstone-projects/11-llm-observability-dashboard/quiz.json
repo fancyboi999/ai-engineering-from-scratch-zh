@@ -52,14 +52,14 @@
     },
     {
       "stage": "check",
-      "question": "交付物在一次注入的 PII 泄露回归上的 MTTR 目标是多少？",
+      "question": "交付物在一次注入的 PII 泄露回归上的平均检测时间（MTTD）目标是多少？",
       "options": [
-        "在下一个值班班次之内",
-        "24 小时以内",
         "1 小时以内",
-        "从 bug 部署到 Slack 告警 5 分钟以内"
+        "从 bug 部署到 Slack 告警 5 分钟以内",
+        "在下一个值班班次之内",
+        "24 小时以内"
       ],
-      "correct": 3,
+      "correct": 1,
       "explanation": ""
     },
     {

@@ -13,7 +13,7 @@ const series = [
 module.exports = figure('fig-6-2c', {
   height: 330,
   title: "MoE 模型每输出 token 时间随批次增长",
-  desc: "GB10 上 Qwen3-30B-A3B 的每输出 token 时间中位数。BF16 从并发 1 的 32.5 ms 增至 64 的 254，约八倍；FP8 从 18.4 增到 132。新增请求将 token 路由到其他专家，因此每个 decode 步读取更多专家权重。",
+  desc: "GB10 上 Qwen3-30B-A3B 的每输出 token 时间中位数。BF16 从并发 1 的 32.5 ms 增至 64 的 254，约八倍，远低于并发的 64 倍增幅；FP8 从 18.4 增到 132。新增请求将 token 路由到其他专家，因此每个 decode 步读取更多专家权重。",
 }, f => {
   const c = chart(f, { x: 66, y: 56, w: 540, h: 220, xScale: 'log2', xDomain: [1, 64], yDomain: [0, 300], xTicks: [1, 2, 4, 8, 16, 32, 64], yTicks: [0, 50, 100, 150, 200, 250, 300], xLabel: "最大并发（基准客户端）", yLabel: "TPOT 中位数，ms" });
   for (const s of series) {

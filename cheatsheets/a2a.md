@@ -1,195 +1,145 @@
 ---
 id: a2a
 title: A2A 协议
-subtitle: 发现 agent、发送工作、跟踪任务并处理错误。基于 A2A 1.0.1。
-hue: 140
-sources: manuals/a2a-101
 code: AP
-source_hash: b83b7fddd751c3cd
+subtitle: A2A 1.0.1 的名片、消息、任务、状态、三种绑定、错误与 0.3 兼容层。事实均来自手册。
+hue: 200
+sources: manuals/a2a-101
+source_hash: d260dfe925ea7fe5
 ---
 
-## 通过 JSON-RPC 执行任务
+## 协议架构
+type: architecture
+from: manuals/a2a-101/sections/1-1-what-a2a-standardizes.md, manuals/a2a-101/sections/2-1-agentcard-fields.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/5-1-json-rpc.md, manuals/a2a-101/sections/5-2-http-json.md, manuals/a2a-101/sections/7-2-a-server.md
+
+```arch
+node | planner | 1,1 | 规划器 | 客户端，读取名片 | client
+node | card | 1,2 | AgentCard | /.well-known/agent-card.json | client
+node | jsonrpc | 2,1 | JSON-RPC | /a2a/jsonrpc | process
+node | handler | 3,1 | 处理器 | 校验后交给执行器 | process
+node | rest | 3,2 | HTTP+JSON | /a2a/rest | process
+node | store | 4,1 | 任务存储 | 各任务的记录 | store
+edge | planner | card | GET
+edge | planner | jsonrpc | POST
+edge | jsonrpc | handler | 方法
+edge | rest | handler | 路由
+edge | handler | store | 任务
+```
+
+## 发送与读取任务
 type: task-table
-from: manuals/a2a-101/capture/out/01-agent-cards.http, manuals/a2a-101/capture/out/03-blocking-task.http, manuals/a2a-101/capture/out/04-polling.http, manuals/a2a-101/capture/out/05-streaming.http, manuals/a2a-101/capture/out/06-input-required.http, manuals/a2a-101/capture/out/10-cancel.http, manuals/a2a-101/capture/out/14-resubscribe.http, manuals/a2a-101/capture/out/15-push.http
+from: manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/5-1-json-rpc.md, manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/capture/out/01-agent-cards.http
 
 | 任务 | 代码 |
 |---|---|
-| 发现 agent | `GET /.well-known/agent-card.json` |
-| 发送并等待 | `"method": "SendMessage"` |
-| 发送后立即返回 | `"configuration": {"returnImmediately": true}` |
-| 轮询任务 | `"method": "GetTask", "params": {"id": "<task id>", "historyLength": 0}` |
-| 流式跟踪任务 | `"method": "SendStreamingMessage"`，携带 `Accept: text/event-stream` |
-| 重新订阅任务流 | `"method": "SubscribeToTask", "params": {"id": "<task id>"}` |
-| 回答问题 | `"message": {"contextId": "<ctx>", "taskId": "<task id>", ...}` |
-| 注册 webhook | `"taskPushNotificationConfig": {"url": "<url>", "token": "<token>"}` |
+| 读取 agent 名片 | `GET /.well-known/agent-card.json HTTP/1.1` |
+| 发送一条消息 | 向 `/a2a/jsonrpc` POST `"method": "SendMessage"` |
+| 发送协议版本 | `A2A-Version: 1.0` |
+| 发送后立即返回 | 在 `configuration` 中设置 `"returnImmediately": true` |
+| 打开流 | `"method": "SendStreamingMessage"` |
 
-## 一次 SendMessage 请求
-type: annotated-code
-lang: http
-from: manuals/a2a-101/capture/out/04-polling.http, manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/sections/1-2-one-task-request-by-request.md, manuals/a2a-101/sections/4-1-send-message.md
-
-```http
-POST /a2a/jsonrpc HTTP/1.1  # 卡片中的 JSONRPC 地址
-Host: localhost:41241
-Content-Type: application/json
-A2A-Version: 1.0  # 每次请求都必须携带
-{"jsonrpc": "2.0", "id": 1, "method": "SendMessage",
- "params": {
-  "message": {"messageId": "<uuid>",  # 由客户端生成
-   "role": "ROLE_USER",
-   "parts": [{"text": "<request>"}]},
-  "configuration": {"returnImmediately": true}}}  # 省略则阻塞等待
-```
-
-## HTTP+JSON 路由
+## HTTP+JSON 命令
 type: command-table
-from: manuals/a2a-101/sections/r-1-operations-by-binding.md, manuals/a2a-101/capture/out/16-rest-binding.http
+from: manuals/a2a-101/sections/5-2-http-json.md, manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md, manuals/a2a-101/capture/out/16-rest-binding.http
 
 | 命令 | 作用 |
 |---|---|
-| `POST /message:send` | SendMessage |
-| `POST /message:stream` | SendStreamingMessage，返回 `StreamResponse` 流 |
-| `GET /tasks/{id=*}` | GetTask。`historyLength` 放在查询参数中 |
-| `GET /tasks` | ListTasks |
-| `POST /tasks/{id=*}:cancel` | CancelTask |
-| `POST /tasks/{id=*}:subscribe` | SubscribeToTask。也接受 `GET` |
-| `POST /tasks/{task_id=*}/pushNotificationConfigs` | CreateTaskPushNotificationConfig |
-| `GET /extendedAgentCard` | GetExtendedAgentCard |
+| `POST /a2a/rest/message:send` | 发送消息，响应可以是任务或消息。 |
+| `POST /a2a/rest/tasks/<task id>:cancel` | 请求服务端停止尚未终结的任务。 |
+| `GET /.well-known/agent-card.json` | 从约定路径读取 agent 名片。 |
+| `POST /a2a/rest/tasks/<task id>:cancel` | 任务已经终结时返回任务错误。 |
 
-## 捕获工具与一致性测试
-type: annotated-code
-lang: bash
-from: manuals/a2a-101/capture/README.md, manuals/a2a-101/sections/7-3-conformance-testing.md
-
-```bash
-python3 run.py  # 三个 agent 和一个客户端，写入 out/
-python3 run.py --check  # 重新捕获并比较
-git clone --filter=blob:none https://github.com/a2aproject/a2a-tck.git
-cd a2a-tck
-git checkout 1.0.0.alpha2  # 手册运行时使用的 TCK 标签
-uv venv && source .venv/bin/activate
-uv pip install -e .
-./run_tck.py --sut-host http://localhost:9999  # 读取卡片并测试每种绑定
-```
-
-## 捕获工具中的 agent
-type: architecture
-from: manuals/a2a-101/capture/README.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/4-6-push-notification-configs.md, manuals/a2a-101/sections/7-1-a-client.md
-
-```arch
-node | planner | 2,2 | planner.py | 客户端 agent
-node | card | 2,1 | Agent 卡片 | /.well-known/agent-card.json
-node | runner | 1,2 | test-runner | :41241 流式与推送
-node | reviewer | 3,2 | code-reviewer | :41242 需要输入
-node | deployer | 2,3 | deployer | :41243 bearer，需要认证
-node | hook | 1,3 | Webhook | :41250 /a2a-events
-node | operator | 3,3 | 操作员 | 在 A2A 之外批准
-edge | planner | card | GET
-edge | planner | runner | JSON-RPC
-edge | planner | reviewer | JSON-RPC
-edge | planner | deployer | Bearer
-edge | runner | hook | 推送
-edge | operator | deployer | 批准
-```
-
-## 一个流式任务
-type: flow
-from: manuals/a2a-101/sections/1-2-one-task-request-by-request.md
-
-1. **客户端**：读取卡片，检查 `capabilities.streaming` 是否为 true。
-2. **客户端**：发送 `SendStreamingMessage`，使用新 `messageId`，不带 `taskId`。
-3. **服务端**：第一帧为带有新标识的 Task，状态为 `TASK_STATE_SUBMITTED`。
-4. **Agent**：通过 `statusUpdate` 将任务转为 `TASK_STATE_WORKING`。
-5. **Agent**：用 `artifactUpdate` 帧构建 `test-log`，先 `append`，最后 `lastChunk`。
-6. **Agent**：最后一条 `statusUpdate` 设置 `TASK_STATE_COMPLETED`。
-7. **服务端**：关闭流。客户端通过 `GetTask` 确认。
-
-## 任务状态
-type: concepts
-from: manuals/a2a-101/sections/r-3-task-states.md
-
-- **TASK_STATE_SUBMITTED**：活跃。等待、轮询或订阅。
-- **TASK_STATE_WORKING**：活跃。处理方式与已提交任务相同。
-- **TASK_STATE_INPUT_REQUIRED**：中断。使用相同的 `taskId` 和 `contextId` 回答。
-- **TASK_STATE_AUTH_REQUIRED**：中断。批准发生在 A2A 之外。订阅或轮询。
-- **TASK_STATE_COMPLETED**：终态。读取产物。
-- **TASK_STATE_FAILED**：终态。修正输入后创建新任务。
-- **TASK_STATE_CANCELED**：终态。在相同上下文中创建新任务。
-- **TASK_STATE_REJECTED**：终态。停止并按状态消息处理。
-
-## 错误码
-type: command-table
-from: manuals/a2a-101/sections/r-4-errors.md
-
-| 命令 | 作用 |
-|---|---|
-| `-32001` TaskNotFoundError | HTTP 404, gRPC NOT_FOUND |
-| `-32002` TaskNotCancelableError | HTTP 400, FAILED_PRECONDITION |
-| `-32003` PushNotificationNotSupportedError | HTTP 400, FAILED_PRECONDITION |
-| `-32004` UnsupportedOperationError | HTTP 400, FAILED_PRECONDITION |
-| `-32005` ContentTypeNotSupportedError | HTTP 400, INVALID_ARGUMENT |
-| `-32009` VersionNotSupportedError | HTTP 400, FAILED_PRECONDITION |
-| `-32601` MethodNotFoundError | 仅限 JSON-RPC |
-| `-32602` InvalidParamsError | HTTP 400, INVALID_ARGUMENT |
-
-## 默认值
+## 设置与默认值
 type: defaults
-from: manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/4-3-get-task-and-list-tasks.md, manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/sections/r-4-errors.md, manuals/a2a-101/sections/4-6-push-notification-configs.md, manuals/a2a-101/sections/7-1-a-client.md
+from: manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/4-3-get-task-and-list-tasks.md, manuals/a2a-101/sections/2-1-agentcard-fields.md, manuals/a2a-101/sections/5-4-version-and-extension-headers.md
 
 | 设置 | 默认值 | 说明 |
 |---|---|---|
-| `returnImmediately` | `false` | 发送后等待终态或中断状态 |
-| `historyLength` | 未设置 | 服务端返回默认数量 |
-| `includeArtifacts` | `false` | ListTasks 不返回产物 |
-| ListTasks 中的 `pageSize` | 50 | 最大值为 100 |
-| 缺少 `A2A-Version` | `0.3` | 1.0 服务端会拒绝 |
-| JSON-RPC 错误状态 | `200 OK` | 工具和 SDK 的行为，规范未规定 |
-| 推送 token 请求头 | `X-A2A-Notification-Token` | 工具和 SDK 的选择 |
-| 工具请求超时 | 15 秒 | 规范未规定 |
+| `returnImmediately` | false | 发送调用等待任务进入终结或中断状态 |
+| `historyLength` | 未设置 | 由服务端决定返回多少历史记录。`0` 表示不返回历史。 |
+| `pageSize` | 50 | `ListTasks` 最大允许 100 |
+| `includeArtifacts` | false | 列表结果不包含产物 |
+| `A2A-Version` | 1.0 | 每次请求必填，不含补丁版本号 |
+
+## 绑定对比
+type: comparison
+from: manuals/a2a-101/sections/5-1-json-rpc.md, manuals/a2a-101/sections/5-2-http-json.md, manuals/a2a-101/sections/5-3-grpc.md, manuals/a2a-101/sections/5-5-errors.md, manuals/a2a-101/sections/5-4-version-and-extension-headers.md
+
+| 维度 | JSON-RPC | HTTP+JSON | gRPC |
+|---|---|---|---|
+| 操作标识 | `method` 字段，例如 `SendMessage` | 路由，例如 `POST /message:send` | `A2AService` 中的 rpc `SendMessage` |
+| 发送位置 | 单一 URL，示例中为 `/a2a/jsonrpc` | 每个操作一个路由 | 通过 HTTP/2 与 TLS 访问 `lf.a2a.v1.A2AService` |
+| 流帧 | 含完整 JSON-RPC 响应的 `data:` 行 | 只含 `StreamResponse` 的 `data:` 行 | 服务端流式 rpc，消息为 `StreamResponse` |
+| `TaskNotFoundError` | HTTP 200，错误码 `-32001` | HTTP 404 | `NOT_FOUND` |
+| 版本头 | `A2A-Version` 请求头 | `A2A-Version` 请求头 | `a2a-version` 元数据键 |
+
+## 任务状态
+type: concepts
+from: manuals/a2a-101/sections/3-4-task-and-task-state.md, manuals/a2a-101/sections/4-2-input-required-and-auth-required.md, manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md
+
+- **活动**：`TASK_STATE_SUBMITTED` 与 `TASK_STATE_WORKING`。agent 仍在处理。
+- **中断**：`TASK_STATE_INPUT_REQUIRED` 与 `TASK_STATE_AUTH_REQUIRED`。任务等待你补充输入或授权。
+- **终结**：`TASK_STATE_COMPLETED`、`TASK_STATE_FAILED`、`TASK_STATE_CANCELED`、`TASK_STATE_REJECTED`。任务不再改变。
+- **TASK_STATE_UNSPECIFIED**：示例不会发送该状态。将其视为错误。
+
+## 逐步完成一个任务
+type: flow
+from: manuals/a2a-101/sections/1-1-what-a2a-standardizes.md, manuals/a2a-101/sections/3-1-message.md, manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/4-2-input-required-and-auth-required.md, manuals/a2a-101/sections/4-3-get-task-and-list-tasks.md
+
+1. **客户端**：发送阻塞式 `SendMessage`，使用新的 `messageId`，不带 `taskId`。
+2. **服务端**：创建任务，生成 `taskId` 与 `contextId`。
+3. **Agent**：停在 `TASK_STATE_INPUT_REQUIRED`，调用返回任务及其问题。
+4. **客户端**：用第二次 `SendMessage` 回答，沿用相同的 `taskId` 与 `contextId`。
+5. **服务端**：返回同一任务及其产物，状态为 `TASK_STATE_COMPLETED`。
+6. **客户端**：用 `taskId` 调用 `GetTask`，再次读取已存储的任务。
+
+## JSON-RPC 请求
+type: annotated-code
+lang: bash
+from: manuals/a2a-101/sections/5-1-json-rpc.md, manuals/a2a-101/sections/3-1-message.md, manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/capture/out/02-message-reply.http
+
+```bash
+curl -s http://localhost:41242/a2a/jsonrpc \  # 所有操作使用同一 URL
+  -H 'Content-Type: application/json' \  # JSON 请求体
+  -H 'A2A-Version: 1.0' \  # 每次请求必填
+  -d '{
+    "jsonrpc": "2.0",  # 信封版本，始终为 2.0
+    "id": 1,  # 响应重复使用该 id
+    "method": "SendMessage",  # PascalCase 操作名
+    "params": {"message": {
+      "messageId": "d95bafc8-f2a4-427b-9cf4-bb99f4bea973",  # 由客户端生成
+      "role": "ROLE_USER",  # 客户端始终发送 ROLE_USER
+      "parts": [{"text": "What languages can you review?"}]  # 至少包含一个 part
+    }}
+  }'
+```
 
 ## 故障排查
 type: troubleshooting
-from: manuals/a2a-101/capture/out/11-errors.http, manuals/a2a-101/capture/out/10-cancel.http, manuals/a2a-101/capture/out/18-extended-card.http, manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/sections/7-4-from-0-3-to-1-0.md, manuals/a2a-101/sections/r-3-task-states.md, manuals/a2a-101/sections/7-3-conformance-testing.md
+from: manuals/a2a-101/sections/5-4-version-and-extension-headers.md, manuals/a2a-101/sections/5-5-errors.md, manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md, manuals/a2a-101/sections/7-4-from-0-3-to-1-0.md, manuals/a2a-101/sections/3-5-context-id.md
 
 | 现象 | 原因 | 修正 |
 |---|---|---|
-| `-32009` 协议版本不支持 | 缺少 `A2A-Version` 请求头，按 0.3 解析 | 发送 `A2A-Version: 1.0` |
-| `-32601` 方法不存在 | 使用 `message/send` 等 0.3 名称 | 改用 `SendMessage` |
-| `-32602` 参数无效 | 消息缺少 `messageId` | 为每条消息生成 `messageId` |
-| `-32005` 内容类型不支持 | 包含 `image/png` 内容块 | 使用卡片声明接受的模式 |
-| 消息或订阅返回 `-32004` | 任务已处于终态 | 创建新任务 |
-| `-32002` 任务不可取消 | 任务已经结束 | 用 `GetTask` 读取 |
-| GetExtendedAgentCard 返回 HTTP 401 | 缺少 bearer token | 发送 `Authorization: Bearer <token>` |
-| TCK JSON-RPC 记录因 404 失败 | TCK 在 `url` 末尾加了斜杠 | 严格按 `url` 发送 POST |
-
-## 术语表
-type: glossary
-from: manuals/a2a-101/sections/r-5-glossary.md
-
-- **Agent 卡片**：描述 agent 的 JSON，通常位于 `/.well-known/agent-card.json`。
-- **Task**：服务端为消息创建的工作单元，带有 `id`。
-- **Context**：通过一个 `contextId` 归组任务和消息的对话。
-- **Message**：一轮交互，包含 `messageId`、`role` 和内容块。
-- **Part**：最小内容单元，可为 `text`、`raw`、`url` 或 `data`。
-- **Artifact**：由内容块组成的任务产物，长产物分块到达。
-- **推送通知**：向客户端 webhook 以 HTTP POST 发送 `StreamResponse`。
-- **服务参数**：每次请求的键，例如通过请求头发送的 `A2A-Version`。
+| 每次调用均返回 `-32009` | 缺少 `A2A-Version` 请求头 | 发送 `A2A-Version: 1.0` |
+| 使用 `message/send` 时返回 `-32601` | 使用了 0.3 版本的方法名 | 改用 `SendMessage` |
+| 已完成任务返回 `-32004` | 任务已终结 | 在同一上下文中新建任务，并传入 `referenceTaskIds` |
+| 推送配置调用返回 `-32003` | 名片中没有 `pushNotifications` 能力标志 | 调用前先读取名片 |
+| 返回 `-32602`，详情为 `BadRequest` | 缺少 `message.messageId` | 为每条消息生成 `messageId` |
+| `-32001` 或 HTTP 404 | ID 不存在、已清理或对调用者不可见 | 核对 ID 后停止重试 |
 
 ## 问答
 type: qa
-from: manuals/a2a-101/sections/r-1-operations-by-binding.md, manuals/a2a-101/sections/7-4-from-0-3-to-1-0.md, manuals/a2a-101/sections/1-2-one-task-request-by-request.md, manuals/a2a-101/sections/r-4-errors.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md
+from: manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/3-1-message.md, manuals/a2a-101/sections/3-3-artifact-and-chunks.md, manuals/a2a-101/sections/6-1-security-schemes-and-in-task-authorization.md
 
-- **发送后返回什么？** 一个 `task` 或一个 `message`。单独的消息表示直接回复。
-- **`lastChunk` 会结束任务吗？** 不会。它只结束一个产物。
-- **JSON-RPC 出错为何仍为 200 OK？** 规范未规定状态码，工具和 SDK 使用 `200 OK`。
-- **客户端使用哪个接口？** `supportedInterfaces` 中第一个客户端支持的接口。
-- **0.3 的 `blocking` 如何变化？** 它被 `returnImmediately` 替代，现在发送默认会等待。
+- **发送调用为什么等待？** `returnImmediately` 默认为 false。调用会等待任务进入终结或中断状态。
+- **结果在哪里？** 在 `artifacts` 中。任务的输出不应放在消息里。
+- **为什么对其他调用者的任务返回 `TaskNotFoundError`？** 规范禁止泄露该资源是否存在。
 
 ## 提示
 type: tips
-from: manuals/a2a-101/sections/4-1-send-message.md, manuals/a2a-101/sections/1-2-one-task-request-by-request.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md, manuals/a2a-101/sections/4-6-push-notification-configs.md
+from: manuals/a2a-101/sections/3-1-message.md, manuals/a2a-101/sections/3-2-part.md, manuals/a2a-101/sections/4-3-get-task-and-list-tasks.md, manuals/a2a-101/sections/2-2-discovery-and-supported-interfaces.md
 
-- 轮询、订阅或等待 webhook 时设置 `returnImmediately: true`。
-- 从第一帧获取任务标识和上下文标识。
-- 能力标志缺失或为 `false` 时，跳过相应操作。
-- 幂等处理推送通知，通知可能重复到达。
+- 每条新消息生成新的 `messageId`，仅重试时复用。
+- 客户端发送 `ROLE_USER`，服务端发送 `ROLE_AGENT`。
+- 只检查状态时，将 `historyLength` 设为 0。
+- 调用可选功能前，先读取名片并检查能力标志。

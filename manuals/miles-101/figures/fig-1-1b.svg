@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-1-1b-title fig-1-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-1-1b-title">一个训练步骤的耗时分布</title>
+  <desc id="fig-1-1b-desc">启用 heat guard 前，在一张 GB10 上使用 Qwen3-0.6B 运行 48 步。图中为各阶段中位耗时：rollout 47.5 s，log probability 23.4 s，梯度步骤 77.0 s。后两项组成耗时 100.3 s 的训练阶段。trainer offload 耗时 0.76 s，onload 耗时 0.87 s，权重更新耗时 0.64 s。</desc>
+  <line x1="60" y1="260" x2="620" y2="260" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="264" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="60" y1="194" x2="620" y2="194" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="198" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">30</text>
+  <line x1="60" y1="128" x2="620" y2="128" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="132" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">60</text>
+  <line x1="60" y1="62" x2="620" y2="62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="66" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">90</text>
+  <line x1="60" y1="260" x2="620" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="60" y1="40" x2="60" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="60" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds per step, median</text>
+  <rect x="81" y="155.51" width="51.33" height="104.49" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="106.67" y="149.51" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">47.5 s</text>
+  <text x="106.67" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">rollout</text>
+  <rect x="174.33" y="208.57" width="51.33" height="51.43" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="200" y="202.57" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">23.4 s</text>
+  <text x="200" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">log probability</text>
+  <rect x="267.67" y="90.68" width="51.33" height="169.32" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="293.33" y="84.68" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">77.0 s</text>
+  <text x="293.33" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">梯度步骤</text>
+  <rect x="361" y="258.34" width="51.33" height="1.66" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="386.67" y="252.34" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">0.76 s</text>
+  <text x="386.67" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">offload</text>
+  <rect x="454.33" y="258.09" width="51.33" height="1.91" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="480" y="252.09" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">0.87 s</text>
+  <text x="480" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">onload</text>
+  <rect x="547.67" y="258.6" width="51.33" height="1.4" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="573.33" y="252.6" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">0.64 s</text>
+  <text x="573.33" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">权重更新</text>
+  <text x="60" y="312" font-size="12" class="m-serif">先调优训练和 rollout。三个琥珀色阶段合计约 2 s。</text>
+</svg>

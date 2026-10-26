@@ -5,7 +5,7 @@ code: TM
 subtitle: 修复 NaN 更新、内存限制、累积缩放和恢复故障。速查裁剪、AMP、重计算与原子检查点。
 hue: 20
 sources: phases/10-llms-from-scratch/34-gradient-checkpointing, phases/19-capstone-projects/45-gradient-clipping-amp, phases/19-capstone-projects/46-gradient-accumulation, phases/19-capstone-projects/47-checkpoint-save-resume, phases/19-capstone-projects/80-checkpoint-sharded-resume, phases/19-capstone-projects/81-end-to-end-distributed-train
-source_hash: 57da29f8be32bdce
+source_hash: 506db9a8c489b54d
 ---
 
 ## 训练现象
@@ -156,7 +156,7 @@ type: concepts
 from: phases/10-llms-from-scratch/34-gradient-checkpointing/docs/zh.md, phases/19-capstone-projects/46-gradient-accumulation/docs/zh.md, phases/19-capstone-projects/81-end-to-end-distributed-train/docs/zh.md
 
 - **每层激活**：约 `12 * B * L * d` 个浮点数。
-- **d=8192、L=8192、B=1**：BF16 每层 800 MB，64 层为 51 GB。
+- **d=8192、L=8192、B=1**：BF16 每层约 1.6 GB，64 层约为 103 GB。
 - **全量激活检查点**：FLOPs 约增加 33%，每步为 4 个单位而非 3 个。
 - **选择性激活检查点**：仅重计算注意力，开销约 5%。
 - **sqrt(L) 规则**：每 sqrt(L) 层设一个检查点，L=64 时为 8 个。

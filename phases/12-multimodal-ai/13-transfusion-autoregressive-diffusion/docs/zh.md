@@ -51,7 +51,7 @@ Transfusion 问：我们能两者兼得吗？让图像保持连续，仍然训�
 M[i, j] = 1 if:
   (i is text and j is text and j <= i)   # causal for text
   OR (i is image and j is image and same_image_block(i, j))   # bidirectional within image
-  OR (i is text and j is image and j < i_image_end)   # text attends to previous images
+  OR (i is text and j is image and j < i)   # text attends to images that closed before it
   OR (i is image and j is text and j < i_image_start)   # image attends to preceding text
 ```
 
@@ -97,7 +97,7 @@ MMDiT 的关键区别：
 
 Janus-Pro（第 12.15 课）通过把理解和生成的视觉编码器解耦——一个用 SigLIP、一个用 VQ——同时共享 transformer 主体，精炼了 Transfusion 的想法。Show-o（第 12.14 课）把扩散换成离散扩散（掩码预测）。统一生成家族在 Transfusion 之后迅速分叉。
 
-2026 年那些能吐图像的生产 VLM——Gemini 3 Pro、GPT-5、Claude Opus 4.7 的图像生成路径——几乎肯定用了这个家族的某个后代。细节是专有的。
+有些闭源生产 VLM 能原生生成图像，可能使用了这个家族的后代；但它们的架构没有公开，所以这类说法只能算猜测。
 
 ```figure
 cfg-guidance-scale

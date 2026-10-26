@@ -1,0 +1,40 @@
+{
+  "id": "mixture-of-experts-gating",
+  "title": "Top-k MoE 路由与 Switch 负载均衡损失",
+  "kind": "research",
+  "summary": "将 token 路由到 top-k 专家并计算重新归一化的 softmax gate，以及 Switch Transformer 的辅助损失 E * sum(f_i P_i)。",
+  "difficulty": "medium",
+  "tags": [
+    "mixture-of-experts",
+    "routing",
+    "load-balancing",
+    "transformers"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/11-mixture-of-experts",
+  "cheatsheet": "moe-hybrid-architectures",
+  "minutes": 30,
+  "entry": [
+    "route",
+    "load_balancing_loss"
+  ],
+  "collections": [
+    "papers-to-code",
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "method": "mixture-of-experts",
+  "paper": {
+    "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+    "authors": "Fedus, Zoph and Shazeer",
+    "year": 2021,
+    "url": "https://arxiv.org/abs/2101.03961"
+  },
+  "mutants": {
+    "fraction_from_probs": "使用平均 softmax 概率计算 f_i，而不是根据路由计数。",
+    "fraction_over_tokens": "将分配计数除以 T，而不是 T * k，使损失随 k 增长。",
+    "no_expert_scale": "省略总和前的因子 E，导致均匀 router 的损失为 1 / E。",
+    "no_max_shift": "直接对原始 logits 调用 np.exp，大值会溢出为无穷大。",
+    "softmax_over_all": "将选中专家的完整 softmax 概率直接作为 gate，没有重新归一化。",
+    "ties_to_higher_index": "升序排序后反转，导致 logit 并列时索引较大的专家优先。"
+  }
+}

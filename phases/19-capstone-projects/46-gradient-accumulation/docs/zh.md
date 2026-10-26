@@ -9,7 +9,7 @@
 
 ## 学习目标
 
-- 推导 effective batch 恒等式：`effective_batch = micro_batch * accum_steps`。
+- 推导 effective batch 恒等式：`effective_batch = micro_batch * accum_steps * world_size`；本课是单设备，所以等于 `micro_batch * accum_steps`。
 - 实现逐 micro-batch 的 loss 缩放，使累积梯度与单次全 batch backward 等价。
 - 在非末尾 micro-batch 上跳过优化器同步（sync-on-last-step）。
 - 阅读吞吐量-effective batch 曲线，解释收益递减现象。

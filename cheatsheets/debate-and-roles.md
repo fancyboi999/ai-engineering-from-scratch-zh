@@ -5,7 +5,7 @@ code: DR
 subtitle: 让 N 个 agent 运行 R 轮，划分规划、执行、批评和验证角色，并用法定票数控制评审门禁。
 hue: 285
 sources: phases/16-multi-agent-and-swarms/07-society-of-mind-debate, phases/16-multi-agent-and-swarms/08-role-specialization, phases/14-agent-engineering/25-multi-agent-debate, phases/19-capstone-projects/10-multi-agent-software-team, projects/multi-agent-code-review-panel
-source_hash: 8759159cddb8a986
+source_hash: 7904493a7115ff6e
 ---
 
 ## 辩论协议

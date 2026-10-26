@@ -5,7 +5,7 @@ code: GC
 subtitle: 检查 GPU，按显存选择模型，在 Docker 中运行 CUDA，存储 API 密钥并排查 API 错误。
 hue: 135
 sources: phases/00-setup-and-tooling/03-gpu-setup-and-cloud, phases/00-setup-and-tooling/04-apis-and-keys, phases/00-setup-and-tooling/07-docker-for-ai
-source_hash: 4f0c7ea6d2cf88ee
+source_hash: 72fded2948899c63
 ---
 
 ## 在哪里运行

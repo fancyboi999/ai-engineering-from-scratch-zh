@@ -4,7 +4,7 @@
 
 你的 agent 文件使用 `filesystem` 和 `shell` 工具集，模型是 Mac 上 Docker Model Runner 中的 `ai/qwen3:4b`。在宿主上，`shell` 使用你的权限。`--sandbox` 把工具移入 microVM，模型仍留在宿主。
 
-本节逐步跟踪 capture/out/27-* 的录制，[图](#fig-1-3) 画出流程。读完后，你能看懂沙箱运行的启动摘要，解释这次运行遇到的两个失败。
+本节逐步跟踪 capture/out/27-* 的录制，[图](#fig-1-3) 画出流程。读完本节后，你能看懂沙箱运行的启动摘要，解释这次运行遇到的两个失败。
 
 ```figure
 id: fig-1-3
@@ -16,7 +16,7 @@ caption: 从上向下读，每个编号行是一项步骤，第8行是结束此�
 
 ## agent 文件 {#s-docker-agent-run-sandbox-end-to-end-the-agent-file}
 
-这个文件与宿主版本只差 provider。宿主的 `127.0.0.1` “not reachable from inside the sandbox” {{docs-sbx Accessing host services from a sandbox}}，即在沙箱内不可达，所以 provider 指向 `host.docker.internal`：
+这个文件与宿主版本只差 provider。宿主的 `127.0.0.1` {{docs-sbx Accessing host services from a sandbox}}，即在沙箱内不可达，所以 provider 指向 `host.docker.internal`：
 
 ```listing
 title: 沙箱 agent 文件的 provider 块
@@ -41,7 +41,7 @@ models:
 
 ## 第1步：放行模型主机 {#s-docker-agent-run-sandbox-end-to-end-step-1-allow-the-model-host}
 
-**持久允许列表：** `docker-agent sandbox allow` 存储的主机，“are added to the sandbox proxy's allow rules on every subsequent --sandbox run” {{help-agent docker-agent sandbox allow}}，会在此后每次 `--sandbox` 运行时加入沙箱代理的允许规则。帮助文本说这是 `Blocked by network policy` 403 的解决方法。代理把 `host.docker.internal` 转为 `localhost`，因此录制在运行前放行 `localhost:12434`：
+**持久允许列表：** `docker-agent sandbox allow` 存储的主机，{{help-agent docker-agent sandbox allow}}，会在此后每次 `--sandbox` 运行时加入沙箱代理的允许规则。帮助文本说这是 `Blocked by network policy` 403 的解决方法。代理把 `host.docker.internal` 转为 `localhost`，因此录制在运行前放行 `localhost:12434`：
 
 ```listing
 title: 向持久允许列表加入一个主机
@@ -99,9 +99,9 @@ memory     32 GiB
 ✓ Created sandbox docker-agent-<hash>
 ```
 
-此次运行未设置 `--models-gateway`。它放行 `models.dev`，因为“without it the first catalog lookup fails with a `403 Blocked by network policy` error” {{docs-agent Auto-Kit}}，不放行则首次目录查询会遇到该错误。下一行重复第1步中的主机。
+此次运行未设置 `--models-gateway`。它放行 `models.dev`，因为{{docs-agent Auto-Kit}}，不放行则首次目录查询会遇到该错误。下一行重复第1步中的主机。
 
-**Auto-kit：** docker-agent 在宿主暂存的目录，“bind-mounted read-only into the VM at the same path” {{docs-agent Auto-Kit}}，以相同路径只读绑定挂载进 VM。此处为 `.m101/cache/sandbox-kits/<hash>`，其 `manifest.json` 只有 `agent_ref` 与 `built_at`（capture/out/27-kit-cache.txt）。工作区可读写，agent 文件目录、kit 和配置目录均只读。
+**Auto-kit：** docker-agent 在宿主暂存的目录，{{docs-agent Auto-Kit}}，以相同路径只读绑定挂载进 VM。此处为 `.m101/cache/sandbox-kits/<hash>`，其 `manifest.json` 只有 `agent_ref` 与 `built_at`（capture/out/27-kit-cache.txt）。工作区可读写，agent 文件目录、kit 和配置目录均只读。
 
 ## 第4步：一个普通沙箱 {#s-docker-agent-run-sandbox-end-to-end-step-4-an-ordinary-sandbox}
 
@@ -123,7 +123,7 @@ Error:
 [exit 1]
 ```
 
-数据目录位于 `virtiofs` 工作区挂载上，`mount` 显示它为 `rw`。Python `sqlite3` 向同一挂载写入也以相同方式失败（capture/out/27-sqlite-probe.txt），因此在这台宿主上，SQLite 无法通过这个挂载写入。此次运行未输出安全模式，所以[冲突 C62](#s-ref-sources-and-the-conflicts-register) 仍未解决。Docker Agent “exits but does not stop or remove the sandbox VM” {{docs-agent Sandbox Mode}}，退出却不停止或移除沙箱 VM，因此 VM 仍为 `running`。
+数据目录位于 `virtiofs` 工作区挂载上，`mount` 显示它为 `rw`。Python `sqlite3` 向同一挂载写入也以相同方式失败（capture/out/27-sqlite-probe.txt），因此在这台宿主上，SQLite 无法通过这个挂载写入。此次运行未输出安全模式，所以[冲突 C62](#s-ref-sources-and-the-conflicts-register) 仍未解决。Docker Agent {{docs-agent Sandbox Mode}}，退出却不停止或移除沙箱 VM，因此 VM 仍为 `running`。
 
 ## 第6步：从内部调用模型 {#s-docker-agent-run-sandbox-end-to-end-step-6-the-model-call-from-inside}
 
@@ -146,7 +146,7 @@ OPENAI_API_KEY=proxy-managed
 Persistent sandbox allowlist is empty.
 ```
 
-模板运行的是 `docker-agent version main`，而非 v1.149.0，尽管文档说 `:latest` 基于“The most recent `v*` release” {{docs-agent Sandbox Mode}}，即最新 `v*` 发布版本构建。provider 密钥显示为 `proxy-managed`。VM 内允许列表为空，因为获准主机以宿主代理规则的形式传入。
+模板运行的是 `docker-agent version main`，而非 v1.149.0，尽管文档说 `:latest` 基于{{docs-agent Sandbox Mode}}，即最新 `v*` 发布版本构建。provider 密钥显示为 `proxy-managed`。VM 内允许列表为空，因为获准主机以宿主代理规则的形式传入。
 
 随后录制手动在 VM 内启动同一 agent 文件，把状态存入 `/tmp/m101`。这次运行展示的是 VM 内的模型路径，不是成功的 `--sandbox` 启动：
 
@@ -162,7 +162,7 @@ The working directory contains README.md with 1 line.
 [exit 0]
 ```
 
-发往 `host.docker.internal:12434` 的请求通过 `HTTP_PROXY` 离开，因为该主机不在 `NO_PROXY` 中。“The sandbox proxy translates `host.docker.internal` to `localhost` before forwarding the request” {{docs-sbx Accessing host services from a sandbox}}，代理转发前将它转换为 `localhost`，第1步的规则允许通行。答案正确：录制套件向每个工作区复制同一 README，它只有一行 `hello`（capture/out/04-workspace.txt）。
+发往 `host.docker.internal:12434` 的请求通过 `HTTP_PROXY` 离开，因为该主机不在 `NO_PROXY` 中。{{docs-sbx Accessing host services from a sandbox}}，代理转发前将它转换为 `localhost`，第1步的规则允许通行。答案正确：录制套件向每个工作区复制同一 README，它只有一行 `hello`（capture/out/04-workspace.txt）。
 
 ## 第7步：移除沙箱 {#s-docker-agent-run-sandbox-end-to-end-step-7-remove-the-sandbox}
 
@@ -178,7 +178,7 @@ Sandbox 'docker-agent-<hash>' removed
 [exit 0]
 ```
 
-以后从同一工作区运行会复用 VM，“only when the mount set has changed” {{docs-agent Sandbox Mode}}，即只有挂载集合改变时才创建新 VM。
+以后从同一工作区运行会复用 VM，{{docs-agent Sandbox Mode}}，即只有挂载集合改变时才创建新 VM。
 
 ```takeaways
 - 首次沙箱运行前，用 `docker-agent sandbox allow localhost:PORT` 放行每个宿主服务。

@@ -5,7 +5,7 @@ code: PI
 subtitle: 发现、追踪并阻断间接 prompt 注入。涵盖 EchoLeak 攻击链、PVE 验证器、规则检测器和工具调用防火墙。
 hue: 350
 sources: phases/18-ethics-safety-alignment/15-indirect-prompt-injection, phases/18-ethics-safety-alignment/25-echoleak-cves-for-ai, phases/14-agent-engineering/27-prompt-injection-defense, phases/19-capstone-projects/83-prompt-injection-detector, projects/tool-call-firewall
-source_hash: e5b30f48d6fcf719
+source_hash: edd20ca602aacd73
 ---
 
 ## 现象、原因与修正

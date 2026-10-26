@@ -18,7 +18,7 @@ $ rea function fixtures/ledger-arm64-O1 _percent_change --provider ghidra --form
 [exit 0] (… s) -> 06-function-percent-change.json
 ```
 
-`function` 接收路径和过程名，以 `{ procedure }` 为参数运行 MCP 操作 `analyze_function`。`--provider ghidra` 指定引擎，`--format json` 和 `--filter-output` 在命令运行前、可执行程序边界处读取。不带 `--format` 时，终端输出为 TOON；退出 `0` 表示“操作已完成，结果仍可能包含部分证据、警告或未解决问题。”{{cli Output and exit status}}。[此图](#fig-1-2)追踪调用如何经过系统。
+`function` 接收路径和过程名，以 `{ procedure }` 为参数运行 MCP 操作 `analyze_function`。`--provider ghidra` 指定引擎，`--format json` 和 `--filter-output` 在命令运行前、可执行程序边界处读取。不带 `--format` 时，终端输出为 TOON；退出状态 `0` 只表示操作已完成；结果仍可能包含部分证据、警告或未解决问题 {{cli Output and exit status}}。[此图](#fig-1-2)追踪调用如何经过系统。
 
 ```figure
 id: fig-1-2

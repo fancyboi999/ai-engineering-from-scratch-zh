@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 350" role="img" aria-labelledby="fig-4-4b-title fig-4-4b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-4b-title">MoE 模型的 EAGLE-3 收益随批次增长</title>
-  <desc id="fig-4-4b-desc">GB10 上 Qwen3-30B-A3B 使用 EAGLE-3 相对 BF16 默认配置的每输出 token 时间中位数加速比。并发 1 为 1.60 倍，32 升至 1.89，64 为 1.84；每步接受长度保持约 2.7 token。</desc>
+  <title id="fig-4-4b-title">MoE 模型批次增大时，EAGLE-3 仍保持收益</title>
+  <desc id="fig-4-4b-desc">GB10 上 Qwen3-30B-A3B 使用 EAGLE-3 相对 BF16 默认配置的每输出 token 时间中位数加速比。并发 1 为 1.60 倍，2 为 1.56 倍，32 达到峰值 1.89 倍，64 为 1.84 倍；每步接受长度保持约 2.7 token。</desc>
   <line x1="66" y1="276" x2="606" y2="276" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="60" y="280" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">x0</text>
   <line x1="66" y1="202.67" x2="606" y2="202.67" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>

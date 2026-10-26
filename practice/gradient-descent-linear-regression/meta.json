@@ -1,0 +1,35 @@
+{
+  "id": "gradient-descent-linear-regression",
+  "title": "用梯度下降训练线性回归",
+  "kind": "implement",
+  "summary": "计算均方误差及权重和偏置的梯度，并用批量梯度下降在每次更新后记录损失。",
+  "difficulty": "easy",
+  "tags": [
+    "linear-regression",
+    "gradient-descent",
+    "loss-functions",
+    "gradients"
+  ],
+  "lesson": "phases/02-ml-fundamentals/02-linear-regression",
+  "cheatsheet": "classical-ml",
+  "minutes": 20,
+  "entry": [
+    "predict",
+    "compute_cost",
+    "compute_gradients",
+    "fit"
+  ],
+  "collections": [
+    "math-foundations",
+    "optimizers",
+    "classical-ml"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "bias_not_updated": "计算了 db，但从未更新偏置，因此 b 一直为 0。",
+    "error_sign": "用目标值减预测值作为误差，导致梯度指向损失增大的方向。",
+    "history_before_update": "在参数更新前记录损失，因此历史记录落后一步。",
+    "missing_factor_two": "两个梯度都遗漏系数 2，因此只有真实梯度的一半。",
+    "sequential_update": "先更新 w，再用新 w 计算 db，导致偏置更新使用错误的参数点。"
+  }
+}

@@ -5,7 +5,7 @@ subtitle: 编码文本、选择度量、估算向量大小、选择索引并修�
 hue: 170
 sources: phases/11-llm-engineering/04-embeddings, phases/05-nlp-foundations-to-advanced/22-embedding-models-deep-dive, phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec, phases/05-nlp-foundations-to-advanced/04-glove-fasttext-subword, phases/05-nlp-foundations-to-advanced/14-information-retrieval-search, phases/01-math-foundations/14-norms-and-distances, phases/02-ml-fundamentals/06-knn-and-distances, phases/04-computer-vision/20-image-retrieval-metric, phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense
 code: EV
-source_hash: 13b3d9b95e4e3e9a
+source_hash: eb4a0ed079255494
 ---
 
 ## 先检索，再重排

@@ -106,7 +106,7 @@ User-agent: peer39_crawler
 Disallow: /
 
 User-agent: YouBot
-Disallow: /
+Allow: /
 
 User-agent: Timpibot
 Disallow: /

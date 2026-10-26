@@ -85,7 +85,7 @@ ce-otel-drift
 
 8. **告警链。** Prometheus exporter 读评测分聚合和延迟百分位；Alertmanager 把警告路由到 Slack、把严重违例路由到 PagerDuty。
 
-9. **回归探针。** 注入一个 bug：被评测的聊天机器人开始 1% 的概率泄漏假 SSN。衡量 MTTR：从 bug 部署到 Slack 告警。
+9. **回归探针。** 注入一个 bug：被评测的聊天机器人开始 1% 的概率泄漏假 SSN。衡量 MTTD（平均检测时间）：从 bug 部署到 Slack 告警。检测时间是 dashboard 负责的部分；修复和重新部署在之后。
 
 ## 实际使用
 
@@ -106,7 +106,7 @@ $ curl -X POST https://my-otel-collector/v1/traces -d @trace.json
 |:-:|---|---|
 | 25 | trace schema 覆盖 | 产出标准 GenAI span 的 SDK 家族数（目标：6+） |
 | 20 | 评测正确性 | DeepEval / RAGAS 分数 vs 手工标注集 |
-| 20 | 看板体验 | 注入回归上的 MTTR（目标 5 分钟以内） |
+| 20 | 看板体验 | 注入回归的 MTTD（目标 5 分钟以内） |
 | 20 | 成本 / 规模 | 1k spans/秒下持续摄入且不积压 |
 | 15 | 告警 + 漂移检测 | Prometheus/Alertmanager 链端到端跑通 |
 | **100** | | |

@@ -50,7 +50,7 @@ f \approx \mathop{\mathrm{upsample}}(\mathop{\mathrm{embed}}(z_1), \text{target\
 [START, z_1 tokens, z_2 tokens, z_3 tokens, ..., z_K tokens]
 ```
 
-位置嵌入同时编码尺度索引和尺度内的空间位置。注意力在尺度顺序上是因果的：尺度 $k$、位置 $(i, j)$ 的 token 能注意尺度 $1 \ldots k$ 上的所有 token，以及尺度 $k$ 自身中在任何所用的尺度内顺序里更早的 token（VAR 用固定位置注意力、无尺度内因果性——一个尺度内的所有位置并行预测）。
+位置嵌入同时编码尺度索引和尺度内的空间位置。注意力按尺度分块，同时在尺度内部也是块状的：尺度 $k$、位置 $(i, j)$ 的 token 可以看到尺度 $1 \ldots k$ 的全部 token，包括尺度 $k$ 自身的所有位置。尺度内部没有 token 顺序，也没有因果遮罩，因此同一尺度的所有位置会并行预测。
 
 训练损失：在每个尺度 $k$，给定所有先前尺度的 token，预测 $z_k$ 的 token。在离散 VQ 码上做交叉熵损失。结构和 GPT 一样，只是这个「序列」现在是按尺度结构化的。
 

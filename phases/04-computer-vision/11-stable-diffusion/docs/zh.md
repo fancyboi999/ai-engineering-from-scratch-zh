@@ -235,7 +235,7 @@ for step, batch in enumerate(dataloader):
 
 - **模型家族**：SD 1.5 适合开源社区微调，SDXL 适合更高保真度，SD3 / FLUX 适合业界最强和严格的授权要求。
 - **调度器**：20-30 步用 DPM-Solver++ 2M Karras，延迟要在 1s 以内时用 LCM-LoRA。
-- **精度**：4080/4090 上用 `float16`，A100 及更新的用 `bfloat16`，显存紧张时用 `int8`（通过 `bitsandbytes` 或 `compel`）。
+- **精度**：4080/4090 上用 `float16`，A100 及更新的用 `bfloat16`，显存紧张时用 `int8`（通过 `bitsandbytes`）。
 - **条件化**：朴素文本可用；要更强的控制，在基座 pipeline 之上加 ControlNet（canny、depth、pose）。
 
 批量生成用社区工具 `AUTO1111` / `ComfyUI`；生产 API 用 `diffusers` + `accelerate`，或带 TensorRT 编译的 `optimum-nvidia`。

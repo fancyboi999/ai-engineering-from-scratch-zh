@@ -42,7 +42,7 @@ critic 更新：   在给定下一状态联合估计下，对 Q_i(x, a_1..n) 做
 
 ### QMIX（2018）—— 价值分解
 
-仅合作。全局奖励是各 agent Q 值的一个单调函数：
+仅用于合作式场景。联合动作价值 `Q_tot` 是对各 agent Q 值做单调混合所得：
 
 ```math
 Q_{\text{tot}}(\tau, a) = f\big(Q_1(\tau_1, a_1), \ldots, Q_n(\tau_n, a_n)\big), \quad \frac{\partial f}{\partial Q_i} \ge 0

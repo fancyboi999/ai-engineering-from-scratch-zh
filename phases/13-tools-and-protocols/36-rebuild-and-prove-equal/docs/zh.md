@@ -389,6 +389,29 @@ python3 code/main.py --live
 
 验收标准：证明记录列出四函数，每主张带证据 ID，任一标签字符串不同时 grade_label 失败。
 
+## 编程练习
+
+本课的夹具包含五个问题。用你构建的代码找出答案，并写入 `code/lab_answers.json`。数值可直接写数字，或写成 `"0x40"` 这样的十六进制字符串；列表使用 JSON 数组。
+
+1. `t1`：x86-64 上 `percent_change_model(3, 105)` 的结果。
+2. `t2`：x86-64 上 `percent_change_model(0, 5)` 的结果。
+3. `t3`：`grade_model(100)` 的结果。
+4. `t4`：`input_grid()` 的单元数量。
+5. `t5`：网格中 x86-64 模型会触发异常的单元数量。
+
+检查答案：
+
+```bash
+cd phases/13-tools-and-protocols/36-rebuild-and-prove-equal
+python3 code/lab.py
+```
+
+检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
+
+### 交互图解
+
+[Inside a Decompiler](https://aieng-zh.cn/inside-a-decompiler) 会把最终伪代码标记为推断，因为页面本身并不能证明它。本课进一步将该主张转化为经过检查的结论。
+
 ## 交付产物
 
 本课生成 `outputs/skill-rebuild-and-prove-equal.md`，将函数证据与候选重建转为两条路径的证明及证明记录。技能要求先读列表、覆盖每种危险类别、屏蔽重定位并检查常量，以及默认拒绝未验证结论的聚合。

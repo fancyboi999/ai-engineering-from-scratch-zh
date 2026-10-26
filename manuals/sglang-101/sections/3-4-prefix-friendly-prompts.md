@@ -6,7 +6,7 @@
 
 读完本节，你能在发送前预测哪些 prompt 能命中，用 `cached_tokens`、调度日志与 `/metrics` 证明命中率。
 
-## 实验：一个标识符，三个位置
+## 实验：一个标识符，三个位置 {#s-prefix-friendly-prompts-the-experiment-one-identifier-three-places}
 
 工具以三种形式各发送五次同一份 2,999-token system prompt 和短问题。服务器开启 `--enable-cache-report`，每次响应向客户端报告缓存 token。工具先发两个预热请求。
 
@@ -26,7 +26,7 @@ note: 三行汇总；省略上方十五行逐请求记录。稳定组丢弃用�
 {"summary": "id-at-end", "median_ttft_ms": 88.2, "min_ttft_ms": 83.7, "max_ttft_ms": 118.1, "median_cached_tokens": 2985, "prompt_tokens": 3028}
 ```
 
-上游实测，ID 放开头时首 token 等待为 1,255 ms，对照 45 ms，长约 28 倍。同一 ID 放末尾只比稳定 prompt 多 43 ms。三种情况 token 几乎相同，仅顺序不同。
+上游在 Mac 上用 4-bit MLX `Qwen3-0.6B` 实测，ID 放开头时首 token 等待为 1,255 ms，对照 45 ms，长约 28 倍。这个倍数取决于显卡的 prefill 速度，但未命中的 token 数不会变。同一 ID 放末尾只比稳定 prompt 多 43 ms。三种情况 token 几乎相同，仅顺序不同。
 
 缓存数量解释了时间。稳定 prompt 复用 2,999 中的 2,998 个，即[第 3.3 节](#s-radixcache)所说的上限。ID 在开头只匹配随机十六进制之前五个 token。变化之后的每个 token 都属于树的不同分支，即使剩余文本相同。
 
@@ -34,17 +34,19 @@ note: 三行汇总；省略上方十五行逐请求记录。稳定组丢弃用�
 id: fig-3-4
 kind: comparison
 title: 相同 token 的三种顺序
-claim: Prompt 开头随机 ID 使 3,029 token 未命中，相同 ID 放末尾只损失约 45 token。
-caption: 每条从左向右表示 prompt token，绿色缓存复用，梅紫重新 prefill。来源：capture/out/cache-experiment.txt。
+claim: 捕获记录中，prompt 开头的随机 ID 使约 3,027 token 未命中；放到末尾则仅损失约 45 token。
+caption: 每条从左向右表示 prompt token，绿色缓存复用，梅紫重新 prefill。条带宽度仅作数量级示意，不代表同一轮的配对总数。来源：capture/out/cache-experiment.txt。
 ```
 
-## 顺序为何重要
+汇总中的 `prompt_tokens` 与 `median_cached_tokens` 是两个独立统计值，不能直接相减。逐轮数据的未命中数是 3,031、3,027、3,025、3,025 和 3,028 token；中位数为 3,027 token。
+
+## 顺序为何重要 {#s-prefix-friendly-prompts-why-the-order-matters}
 
 基数树从第一个 token 开始比较，到首次不同就停止。不同点之后不能再匹配，因为每个后续 token 的注意力值依赖此前所有 token。复用后续 token 的缓存会给出错误答案。因此前缀缓存既必须精确，也不会宽容差异。
 
 聊天请求的各部分同样如此。聊天模板按固定顺序把消息变成单个 token 序列：system prompt、工具列表、历史回合、新消息。System prompt 一改，后面全部失效；只改最新消息，则只让该消息失效。
 
-## 事故
+## 事故 {#s-prefix-friendly-prompts-the-incident}
 
 Issue #35129 就是本节开头的故事 {{issue #35129}}。报告者发现三层原因叠加。
 
@@ -54,7 +56,7 @@ Issue #35129 就是本节开头的故事 {{issue #35129}}。报告者发现三�
 
 首项修复仅修改 prompt。[第 3.5 节](#s-eviction-policies-and-hicache)任何服务参数都挽回不了哈希损失的 27.6 个百分点。
 
-## 本手册的建议：先修 prompt，再调服务
+## 本手册的建议：先修 prompt，再调服务 {#s-prefix-friendly-prompts-our-position-fix-prompts-before-you-tune-the-server}
 
 将 prompt 布局视为服务系统一部分。改缓存参数前，用真实请求核对：
 
@@ -68,11 +70,11 @@ Issue #35129 就是本节开头的故事 {{issue #35129}}。报告者发现三�
 
 路由也会破坏复用。多个服务器中，请求若到没有该前缀的服务器，prompt 再稳定也会未命中。Jarvislabs 报告把同一会话固定到同一服务器，命中率从 64.7% 升至 92.1% {{field Jarvislabs 2026-08}}。[第 6.4 节](#s-sgl-model-gateway)展示网关按前缀路由。
 
-## 如何证明命中
+## 如何证明命中 {#s-prefix-friendly-prompts-how-to-prove-a-hit}
 
 从最贴近请求到最一般，使用三层测量。
 
-1. **响应。** 启动设置 `--enable-cache-report`，默认关闭 {{code}}。Usage 随后报告 `cached_tokens`。原生 `/generate` 无需参数也在 `meta_info` 返回它。
+1. **响应。** 启动设置 `--enable-cache-report`，默认关闭 {{code}}。Usage 随后报告 `cached_tokens`。原生 `/generate` 无需该参数，也在 `meta_info` 返回 `cached_tokens`。
 2. **调度日志。** 每行 `Prefill batch` 报告 `#new-token` 与 `#cached-token`。
 3. **指标。** `/metrics` 导出 `sglang:cache_hit_rate`，它是近期 prefill 批次的 gauge。[第 3.3 节](#s-radixcache)共享前缀基准后，默认服务器报告 0.94，`--disable-radix-cache` 服务器报告 0.0。
 
@@ -99,4 +101,4 @@ note: 每种形式各一行，顺序与工具发送一致，省略其余十二�
 - Prompt 稳定但命中率低时检查路由。
 ```
 
-Sources: python/sglang/srt/mem_cache/radix_cache.py (RadixKey, match_prefix), python/sglang/srt/managers/schedule_batch.py (_compute_max_prefix_len), python/sglang/srt/arg_groups/fields/serving.py (enable_cache_report), python/sglang/srt/entrypoints/openai/serving_chat.py at v0.5.22, capture/out/cache-experiment.txt, capture/out/server-default.log, capture/out/generate.txt, capture/out/metrics.txt, capture/out/no-radix-cache-metrics.txt, issue #35129, the Jarvislabs report of 2026-08-26.
+来源： python/sglang/srt/mem_cache/radix_cache.py (RadixKey, match_prefix), python/sglang/srt/managers/schedule_batch.py (_compute_max_prefix_len), python/sglang/srt/arg_groups/fields/serving.py (enable_cache_report), python/sglang/srt/entrypoints/openai/serving_chat.py，v0.5.22, capture/out/cache-experiment.txt, capture/out/server-default.log, capture/out/generate.txt, capture/out/metrics.txt, capture/out/no-radix-cache-metrics.txt, issue #35129, Jarvislabs 报告， 2026-08-26.

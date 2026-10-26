@@ -426,6 +426,29 @@ ledger.verify_unknown_chain(unknown_id)
 
 验收标准：报告每句话都引用包内 ID，唯一 `unknown` 主张已消除。
 
+## 编程练习
+
+本课的夹具包含五个问题。用你构建的代码找出答案，并写入 `code/lab_answers.json`。数值可直接写数字，或写成 `"0x40"` 这样的十六进制字符串；列表使用 JSON 数组。
+
+1. `t1`：`compute_evidence_id` 为 `rea-evidence-grade.json` 得出的证据 ID。
+2. `t2`：grade 记录中的限制数量。
+3. `t3`：grade 记录的 `relationship_coverage` 状态。
+4. `t4`：grade 记录的置信度与权威性，按两个字符串组成的列表填写。
+5. `t5`：grade 记录 subject 的 SHA-256。
+
+检查答案：
+
+```bash
+cd phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns
+python3 code/lab.py
+```
+
+检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
+
+### 交互图解
+
+[Inside a Decompiler](https://aieng-zh.cn/inside-a-decompiler?symbols=off) 展示含有“观察、推导、推断、未知”四个托盘的证据账本。链接会关闭符号表，因此函数名和终点会归为未知项，起始文件则归为推断。
+
 ## 交付产物
 
 本课生成 `outputs/skill-evidence-ledger.md`，指导 agent 将每个发现写成带置信度、权威来源、限制和链接的记录，维护未知项版本，并判断主张何时为 `pass`、`fail`、`unknown`、`unsupported`。

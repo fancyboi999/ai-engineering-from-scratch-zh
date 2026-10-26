@@ -5,7 +5,7 @@ code: FE
 subtitle: 在不泄漏数据的同一条流水线内完成填补、缩放、编码、选择和集成。包含课程 Python 实现。
 hue: 30
 sources: phases/02-ml-fundamentals/08-feature-engineering, phases/02-ml-fundamentals/11-ensemble-methods, phases/02-ml-fundamentals/13-ml-pipelines, phases/02-ml-fundamentals/18-feature-selection
-source_hash: a33f91e7c1c5f1b9
+source_hash: a187fd1eb18ce92c
 ---
 
 ## 混合列共用一条流水线

@@ -5,7 +5,7 @@ code: ED
 subtitle: 运行评估用例、把关合并、按量规评审，并把关 prompt 与报告变更。使用 Python 标准库。
 hue: 140
 sources: phases/14-agent-engineering/30-eval-driven-agent-development, phases/14-agent-engineering/38-verification-gates, phases/14-agent-engineering/39-reviewer-agent, projects/prompt-regression-tester, projects/report-judge
-source_hash: 3522d630d3c42825
+source_hash: 2c31de1478efc81e
 ---
 
 ## 从构建到签核

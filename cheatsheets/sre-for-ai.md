@@ -5,7 +5,7 @@ code: IP
 subtitle: 用 agent 分诊 LLM 事故，对每项修正设置门禁，编写有证据约束的复盘，并为助手压缩日志。
 hue: 352
 sources: phases/17-infrastructure-and-production/23-sre-for-ai, phases/17-infrastructure-and-production/24-chaos-engineering-llm, phases/19-capstone-projects/06-devops-troubleshooting-agent, projects/postmortem-writer, projects/log-volume-reduction-lab
-source_hash: b856bed1b692339c
+source_hash: 533e60b8b146c2c6
 ---
 
 ## 事故现象

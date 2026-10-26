@@ -54,7 +54,7 @@ Whisper 是在以语音为主的数据上训的。它对音乐和环境音频更
 
 BEATs（Chen 等人，2022）是一个在 AudioSet 上训的自监督 transformer。在相同参数量下比 Whisper 更好地捕捉音乐和环境声。
 
-AF-Whisper（Audio Flamingo 3 的混合体）：把 Whisper + BEATs 特征拼接作为音频输入。Whisper 携带语言信号，BEATs 携带声学信号。
+AF-Whisper（Audio Flamingo 3 的编码器）：从 Whisper-large-v3 编码器开始，在语音、声音和音乐上继续训练，让单个编码器同时携带语言和声学信号。较早的系统（如 SALMONN）通过拼接 Whisper 与 BEATs 特征来获得同样的覆盖范围。
 
 ### 音频 Q-former
 
@@ -70,7 +70,7 @@ Qwen-Audio（Chu 等人，2023）：架构类似，在更丰富的数据集上�
 
 LTU —— Listen, Think, Understand（Gong 等人，2023）：显式推理数据，专注于对音频片段的思维链。更小但更聚焦。
 
-Audio Flamingo 3（Goel 等人，2025 年 7 月）：当前开放 SOTA。8B LLM 骨干（Qwen2 7B）、Whisper-large 编码器拼 BEATs、64-query Q-former、在 100 万+ 音频-文本指令对上训练。MMAU 0.72，在部分子任务上追平专有前沿。
+Audio Flamingo 3（Goel 等人，2025 年 7 月）：当前开放 SOTA。7B LLM 骨干（Qwen2.5-7B）、基于 Whisper-large-v3 的 AF-Whisper 音频编码器、连接到 LLM 的小型适配层，并在 100 万+ 音频-文本指令对上训练。MMAU 0.72，在部分子任务上追平专有前沿。
 
 AF3 还为音频引入了按需思维链：模型可以在最终答案之前可选地吐出思考 token（"我先识别一下乐器：……"）。开启思考时，复杂推理任务的准确率提升 3-5 分。
 

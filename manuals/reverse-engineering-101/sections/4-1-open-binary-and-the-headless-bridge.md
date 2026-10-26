@@ -82,7 +82,7 @@ note: 仅保留 provider 绑定与服务身份。已省略能力、候选和工�
 label: open_binary 不做什么
 source: mcp §Ghidra first-query deadlines and recovery
 ---
-"open_binary then selects a target and provider binding; it does not establish that Ghidra has finished importing the target."
+`open_binary` 会选择目标和 provider，但不会等待 Ghidra 完成导入。
 ```
 
 ## 第一次依赖 Ghidra 的调用
@@ -123,7 +123,7 @@ note: rea mcp 标准错误的前五行。durationMs 在服务内部测量。time
 5. 写入 `session.json`，包含 `transport`、`endpoint_path`、`token`、`run_id`、`target_sha256`、`provider_version`、`profile_digest`。
 6. 启动 Java，等待桥接层接受连接。
 
-**无界面导入：** 不打开窗口运行 Ghidra，将一个文件导入项目并运行默认分析器。在 macOS 与 Linux 上，rea 不运行 `analyzeHeadless` shell 脚本，而是向 Ghidra 的 `LaunchSupport.jar` 获取环境与 JVM 参数，再自行运行 `java`。除非设置 `GHIDRA_HEADLESS_MAXMEM` 或 `GHIDRA_MAXMEM`，堆大小为 `-Xmx2G`。命令加入 `-Djava.awt.headless=true`，指定 `ghidra.Ghidra` 类与 `ghidra.app.util.headless.AnalyzeHeadless`。文档解释原因："Apple platform shell wrappers hide their environments from ownership inspection, so retaining those wrappers would prevent verified process-group cancellation during startup." {{install §Ghidra}}
+**无界面导入：** 不打开窗口运行 Ghidra，将一个文件导入项目并运行默认分析器。在 macOS 与 Linux 上，rea 不运行 `analyzeHeadless` shell 脚本，而是向 Ghidra 的 `LaunchSupport.jar` 获取环境与 JVM 参数，再自行运行 `java`。除非设置 `GHIDRA_HEADLESS_MAXMEM` 或 `GHIDRA_MAXMEM`，堆大小为 `-Xmx2G`。命令加入 `-Djava.awt.headless=true`，指定 `ghidra.Ghidra` 类与 `ghidra.app.util.headless.AnalyzeHeadless`。安装文档说明，Apple 平台的 shell wrapper 会隐藏进程所属信息。若继续使用 wrapper，启动时就无法可靠取消整个进程组 {{install §Ghidra}}。
 
 无界面参数按固定顺序排列：
 
@@ -160,11 +160,11 @@ caption: 从上向下读。每项给出文件或目录名及写入者。依据 r
 
 ## 截止时间与关闭
 
-rea 允许启动耗时 330,000 毫秒，由 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 设置。采集 Mac 的启动用了 5 到 7 秒，需要留意的是客户端限制："The pinned client SDK 2.3.1 defaults to 60,000 ms and can cancel earlier than REA's startup deadline." {{mcp §Ghidra first-query deadlines and recovery}}
+rea 允许启动耗时 330,000 毫秒，由 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 设置。采集 Mac 的启动用了 5 到 7 秒，还需注意客户端的超时限制：固定版本的 client SDK 2.3.1 默认超时为 60,000 ms，可能早于 REA 启动期限取消请求 {{mcp §Ghidra first-query deadlines and recovery}}。
 
 文档记录 Linux 夹具约 64 秒，Windows 约 163 秒。用自己机器上第一次运行的实测值设置客户端截止时间。
 
-日志中 `close_binary` 只耗时不到一秒。客户端以 10 秒上限向桥接层发送 `shutdown`，桥接层释放反编译器，`-deleteProject` 删除项目。之后对 `ledger-arm64-O2` 的 `open_binary` 约 0.4 秒，首次 `analyze_function` 又耗时数秒，因为 "Each new provider session still imports the target into a fresh temporary project." {{mcp §Ghidra first-query deadlines and recovery}}
+日志中 `close_binary` 只耗时不到一秒。客户端以 10 秒上限向桥接层发送 `shutdown`，桥接层释放反编译器，`-deleteProject` 删除项目。之后对 `ledger-arm64-O2` 的 `open_binary` 约 0.4 秒，首次 `analyze_function` 又耗时数秒，因为每个新的 provider session 都会将目标重新导入临时项目 {{mcp §Ghidra first-query deadlines and recovery}}。
 
 ```takeaways
 - 预期 `open_binary` 后第一次依赖 Ghidra 的调用耗时数秒，其余为毫秒。

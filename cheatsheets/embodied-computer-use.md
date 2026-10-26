@@ -5,7 +5,7 @@ code: EC
 subtitle: 机器人动作格式、GUI 动作模式、安全闸门，以及浏览器和桌面的有界 agent 循环。
 hue: 28
 sources: phases/12-multimodal-ai/21-embodied-vlas-openvla-pi0-groot, phases/12-multimodal-ai/25-multimodal-agents-computer-use, phases/14-agent-engineering/21-computer-use-agents, phases/15-autonomous-systems/11-browser-agents, projects/browser-agent, projects/desktop-control
-source_hash: 30a3cfcf5ece3df8
+source_hash: 6d17b12aca9e747a
 ---
 
 ## 关键术语

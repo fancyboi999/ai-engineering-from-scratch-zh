@@ -5,7 +5,7 @@ code: MG
 subtitle: 编解码器 token、MusicGen、音频编码器与投影器、Thinker 与 Talker、TTFAB 预算及音频常见坑。
 hue: 285
 sources: phases/06-speech-and-audio/09-music-generation, phases/06-speech-and-audio/10-audio-language-models, phases/08-generative-ai/11-audio-generation, phases/12-multimodal-ai/19-audio-language-whisper-to-af3, phases/12-multimodal-ai/20-omni-models-thinker-talker
-source_hash: 3002eb78d9f3d45b
+source_hash: ef5304a4b8c70acf
 ---
 
 ## 将音频转换为编解码器 token
@@ -135,12 +135,12 @@ from: phases/12-multimodal-ai/20-omni-models-thinker-talker/docs/zh.md, phases/1
 |---|---|---|
 | 麦克风到音频 token | 40-80ms | 流式处理 |
 | 预填充 | 100-200ms | 70B 时显著增加 |
-| Thinker 首个文本 token | 40ms | |
-| Talker 处理首个文本 token | 20ms | |
-| 首批语音 token 提交 | 40ms | |
+| Thinker 首个文本 token | 40ms | 随 Thinker 规模增长 |
+| Talker 处理首个文本 token | 20ms | 课程模型中至少为 15ms |
+| 首批语音 token 提交 | 40ms | 位于残差 VQ 解码之前 |
 | 残差 VQ 解码 | 30ms | `rvq_decode = 30` |
 | 语音波形解码 | 50-80ms | `wave_decode = 70` |
-| TTFAB 总计 | 320-510ms | 70B 时为 600-900ms |
+| TTFAB 总计 | 320-490ms | 70B 时为 600-900ms |
 
 ## 故障排查
 type: troubleshooting

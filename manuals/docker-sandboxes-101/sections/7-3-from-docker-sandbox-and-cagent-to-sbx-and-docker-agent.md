@@ -12,14 +12,14 @@
 label: 移除说明
 source: docs-desktop 4.80.0
 ---
-"The experimental `docker sandbox` plugin has been removed. Migrate to `docker sbx`."
+实验性的 `docker sandbox` 插件已移除，后续应迁移至 `docker sbx`。
 ```
 
 引文释义：实验性 docker sandbox 插件已移除；原说明让用户迁移到 docker sbx。下文核对这个名称是否实际存在。
 
 任何帮助树都没有 `docker sbx`，程序名为 `sbx`（[冲突 C1](#s-ref-sources-and-the-conflicts-register)）。
 
-agent 产品有三个名称。2025-09-18 博客以 cagent 发布 {{blog 2025-09-18}}，Desktop 4.49.0 在 2025-10-23 内置。4.49.0 的说明现在用现名写“Docker Agent is now available through Docker Desktop.” {{docs-desktop 4.49.0}}。文档说“In Docker Desktop versions 4.49 through 4.62, this feature was called cagent.” {{docs-agent Installation}}，这几版叫 cagent；`docker agent` 插件随 2026-02-16 的 v1.23.3 到来 {{rel-agent v1.23.3}}。
+agent 产品有三个名称。2025-09-18 博客以 cagent 发布 {{blog 2025-09-18}}，Desktop 4.49.0 在 2025-10-23 内置。4.49.0 的说明现在用现名写{{docs-desktop 4.49.0}}。{{docs-agent Installation}}，这几版叫 cagent；`docker agent` 插件随 2026-02-16 的 v1.23.3 到来 {{rel-agent v1.23.3}}。
 
 三天后 v1.23.4 重组命令，v1.30.0 在 2026-03-09 完成改名 {{rel-agent v1.30.0}}。文档说 Desktop 4.63 开始叫 Docker Agent，首个指名发布说明却是含 v1.27.1 的4.64.0（[冲突 C49](#s-ref-sources-and-the-conflicts-register)）。Desktop 4.81.0 在 2026-07-06 移除弃用 `cagent` 程序 {{docs-desktop 4.81.0}}。4.94.0 内置 v1.144.0 {{docs-desktop 4.94.0}}，比本手册固定 v1.149.0 落后五版。许多 Desktop 说明根本不写内置版本（[冲突 C50](#s-ref-sources-and-the-conflicts-register)）。
 

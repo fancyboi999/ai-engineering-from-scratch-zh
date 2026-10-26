@@ -1,17 +1,13 @@
 # Evidence: cheatsheets/multimodal-rag.md
-upstream_revision: 45fa4084de6ba2f88fa96a41e69efa2166f868b3
+upstream_revision: 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a
 
 # 证据对照：多模态与视觉原生 RAG
 
-中文主题：[多模态与视觉原生 RAG](../multimodal-rag.md)。下列逐条英文记录保留冻结上游版本的路径、行号与数值；标题对应中文主题。
-
-原始记录中的 docs/en.md 和行号只在上述 upstream 版本有效，不代表当前 docs/zh.md 的行号，也不表示本次重新运行了命令、GPU 测量或外部模型。当前中文主题的 from 路径另由构建器校验。
+下列英文记录保留冻结上游的路径、行号和数值。它们不代表中文行号，也不代表本次重新运行了命令、GPU 测量或外部模型。区块标题对应中文速查表。
 
 Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 = phases/12-multimodal-ai/24-multimodal-rag-cross-modal, C04 = phases/19-capstone-projects/04-multimodal-document-qa, VEL = projects/visual-evidence-library. d = docs/en.md, c = code/main.py.
 
-## 视觉优先的文档问答流水线 (architecture)
-
-原始区块：Architecture: Vision-first document QA pipeline (8 nodes, 7 edges)
+## Architecture: 视觉优先的文档问答流水线 (8 nodes, 7 edges)
 - PDFs, page renderer 180 DPI: C04/d:28, 53
 - ColQwen2.5-v0.2, ~2048 patches: C04/d:31
 - DocPruner 50% compression: C04/d:33
@@ -21,9 +17,7 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - VLM answerer, query + top-k page images: C04/d:41-42
 - Answer with cited pages + evidence regions, viewer with boxes on source page: C04/d:45, 48
 
-## 代码任务 (task-table)
-
-原始区块：Tasks in code (task-table, 8)
+## 代码任务 (task-table, 8)
 - maxsim(query_tokens, patches): L23/c:35-36
 - retrieve(query, pages, k=3): L23/c:70
 - doc_prune(patches, keep_fraction=0.5): C04/c:54
@@ -33,9 +27,7 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - validate_manifest(manifest, root): VEL/solution/main.py:14
 - search(assets, query, limit=20): VEL/solution/main.py:87
 
-## 运行课程与项目 (command-table)
-
-原始区块：Run the lessons and the project (command-table, 8)
+## 运行课程与项目 (command-table, 8)
 - python main.py: C04/c:9, ablation C04/c:151-160
 - npm start, --demo, exits 0: C04/code/ts/README.md:32, C04/code/ts/package.json:8
 - npm run serve, 127.0.0.1, PORT unset gives a free port: C04/code/ts/README.md:33, 36
@@ -45,16 +37,12 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - main.py --manifest ... --query "return dry seeds" --out ./visual-output: VEL/README.md:29, writes index.html and evidence.json VEL/README.md:5, 32
 - python3 demo.py: VEL/README.md:32-35
 
-## MaxSim 后期交互 (annotated-code)
-
-原始区块：MaxSim late interaction (annotated-code, 12 lines)
+## MaxSim 后期交互 (annotated-code, 12 lines)
 - max_sim_score loop body: C04/c:71-83
 - build_index(prune=True), keep_fraction 0.5: C04/c:122-129, 135
 - idx.retrieve(q, k=3) returns (Page, score): C04/c:97-101, 147
 
-## 分数融合与 agent 式重试 (flow)
-
-原始区块：Score fusion and agentic retry (flow, 8 steps)
+## 分数融合与 agent 式重试 (flow, 8 steps)
 1. Decompose quiet / vegan brunch / natural light: L24/d:84-88
 2. text_retrieve keyword counts divided by keyword count: L24/c:36-44
 3. image_retrieve tag hints natural_light, airy: L24/c:47-60
@@ -64,19 +52,15 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 7. round 2 weights 0.3, 0.5, 0.2: L24/c:113
 8. grounded_generate cites review, img tags, ambient dB: L24/c:89-96
 
-## 方案对比 (comparison)
-
-原始区块：Options side by side (comparison, 6 rows)
+## 方案对比 (comparison, 6 rows)
 - Page vectors: ColPali N_p patches L23/d:51, VisRAG single vector L23/d:70, text-RAG one vector per chunk L23/d:25
 - Scoring: MaxSim L23/d:53, bi-encoder L23/d:70, cosine L23/d:26
 - OCR: none L23/d:92, text-RAG OCR / pdftotext L23/d:23
-- Storage: ~30x L23/d:101, VisRAG smaller L23/d:70, ~150 kB L23/d:99
+- Storage: ~15x after PQ L23/d:101, VisRAG smaller L23/d:70, ~150 kB L23/d:99
 - Recall: strong L23/d:45, weaker L23/d:70, charts and tables lost L23/d:29
 - Use for: quality vs scale L23/d:72, pure-text L23/d:105
 
-## 按场景选择 (tips)
-
-原始区块：Use X when (tips, 6)
+## 按场景选择 (tips, 6)
 - ColPali for financial reports, papers, contracts, medical records: L23/d:109
 - VisRAG faster indexing, smaller storage: L23/d:70-72
 - text-RAG for wiki, chat logs, multi-million-page archives: L23/d:105-106
@@ -84,11 +68,9 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - CLIP / SigLIP 2, CLAP: L24/d:40
 - score fusion first, MoE on A/B wins: L24/d:52
 
-## 公式与数值 (concepts)
-
-原始区块：Formulas and numbers (concepts, 8)
+## 公式与数值 (concepts, 8)
 - MaxSim formula: L23/d:53
-- ColPali storage ~18 MB, ~4 MB after PQ: L23/d:98
+- ColPali storage ~18 MB, ~2.3 MB after 8x PQ: L23/d:98
 - Text-RAG ~150 kB: L23/d:99
 - PQ ~8x: L23/d:149
 - ViDoRe ~80% vs ~50-60%: L23/d:82
@@ -96,9 +78,7 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - DocPruner 50% at < 0.5% accuracy loss: C04/d:56
 - 10k pages, answers under 2s: C04/d:15, top-5 page images: C04/d:74
 
-## 默认值 (defaults)
-
-原始区块：Defaults (defaults, 8)
+## 默认值 (defaults, 8)
 - EMB_DIM 16: C04/c:24
 - keep_fraction 0.5, max(1, ...): C04/c:54, 59
 - retrieve k 5: C04/c:97
@@ -108,9 +88,7 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - --model default local-vision-model, --vision-image: VEL/solution/main.py:315, 317
 - --out default visual-output: VEL/solution/main.py:314, outputs VEL/solution/main.py:282, 298
 
-## 清单与提案错误 (troubleshooting)
-
-原始区块：Manifest and proposal errors (troubleshooting, 8)
+## 清单与提案错误 (troubleshooting, 8)
 - Asset IDs must be nonempty and unique: VEL/solution/main.py:26
 - Image dimensions must be positive integers at most 20000: VEL/solution/main.py:29-30
 - Asset must be an image inside the manifest directory: VEL/solution/main.py:33-38
@@ -120,9 +98,7 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - Vision extraction requires --provider-url, --width and --height: VEL/solution/main.py:322-325
 - Image bytes do not match the extension: VEL/solution/main.py:173-176
 
-## 缩写 (glossary)
-
-原始区块：Abbreviations (glossary, 8)
+## 缩写 (glossary, 8)
 - MaxSim: L23/d:144
 - ViDoRe, nDCG@5: L23/d:80
 - PQ / OPQ: L23/d:60, 149
@@ -132,9 +108,7 @@ Abbreviations: L23 = phases/12-multimodal-ai/23-colpali-vision-native-rag, L24 =
 - MuRAG 2022: L24/d:76
 - Evidence region: C04/d:131
 
-## 问答 (qa)
-
-原始区块：Questions (qa, 5)
+## 问答 (qa, 5)
 - MaxSim vs mean washed out: L23/c:97-99
 - Citations [1], [img 3], [audio 2 at 0:34]: L24/d:58-60
 - Recall@k per modality, fused top-k accuracy: L24/d:107-108

@@ -14,6 +14,9 @@
 `certifications/` 是独立认证备考层；路线、课程、诊断和原创模拟题以各 program 与 track manifest 为准。
 认证课程单独统计，使用独立的站点构建与学习路径。
 
+`practice/` 是独立编程练习层，题目关联核心课程，数量以当前构建为准，不计入核心课程。
+修改练习内容、检查器或运行器前读取 `practice/AUTHORING.md`；修改手册前读取 `manuals/AUTHORING.md`。
+
 ## 仓库结构
 
 ```text
@@ -48,6 +51,7 @@ scripts/                       # 审计和构建工具
 8. 不提交构建产物 `site/sitemap.xml`、`site/llms.txt`、`site/build-meta.js`、`site/certification-data.js`、`site/lessons/`。
 9. 项目、手册、Hub、OG 数据与目录从中文源构建；不提交 `site/projects-data.js`、`site/project-content/`、`site/manuals-data.js`、`site/manuals.html`、`site/manual-*.html`、`site/hubs/`、`site/lesson-terms.json` 或 `site/og-cards.json`。
 10. `site/data.js` 是中文仓跟踪的构建产物；课程、术语或站点数据变动后必须重建并与源文件一起提交。
+11. `site/practice/`、`site/practice-map.json` 和 `site/manual/` 由中文源生成，部署时重建，不提交。
 
 ## 依赖约束
 
@@ -116,6 +120,18 @@ scripts/                       # 审计和构建工具
 
 ## 本地验证
 
+编程练习变动需要 NumPy，并运行真实参考解、空实现与错误实现校验：
+
+```bash
+python3 scripts/practice/test_harness.py
+python3 scripts/practice/validate.py
+node site/build-practice.js --check
+node --test site/test_practice.js site/test_practice_store.js
+```
+
+浏览器验证覆盖 Python 实际运行、失败反馈、通过后解锁、编辑内容与进度的刷新恢复，以及移动端。
+课程阅读器交互同时验证 `/lessons/` 预渲染入口和 `lesson.html?path=` 运行时入口。
+
 提交前按实际改动执行：
 
 ```bash
@@ -160,4 +176,4 @@ node scripts/check_og_cards.js --require-manifests
 
 ---
 
-最后审校：2026-10-21。
+最后审校：2026-10-26。

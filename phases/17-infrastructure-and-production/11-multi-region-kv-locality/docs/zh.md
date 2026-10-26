@@ -51,7 +51,7 @@
 - us-east-1 ↔ eu-west-1：~75 ms。
 - us-east-1 ↔ ap-southeast-1：~220 ms。
 
-如果路由把一个 us-east-1 的请求送去 ap-southeast-1 的一个热前缀，省下的 prefill（800 → 80 ms）被 440 ms 的往返淹没。GORGO（2026 研究）把这点显式化了 —— 联合最小化 `prefill_time + network_latency`，不是只 prefill。答案常常是保持区域内路由，除非在 prefill 主导的巨型多 MB 前缀上。
+如果路由把一个 us-east-1 的请求送去 ap-southeast-1 的一个热前缀，省下的 prefill 时间是 720 ms（800 → 80 ms）；扣除约 220 ms 的往返时延后，收益缩到约 500 ms。如果远端排队或已淘汰前缀，收益还会消失。GORGO（2026 研究）把这点显式化了 —— 联合最小化 `prefill_time + network_latency`，不是只 prefill。答案常常是保持区域内路由，除非在 prefill 主导的巨型多 MB 前缀上。
 
 ### 商用"跨区域推理"在这里帮不上忙
 

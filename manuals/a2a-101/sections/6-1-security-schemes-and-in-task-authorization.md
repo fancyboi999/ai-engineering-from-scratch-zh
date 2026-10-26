@@ -59,7 +59,7 @@ note: 截自 deployer 卡片。两字段位于 capabilities 与 defaultInputMode
 label: 每次请求对照卡片检查
 source: spec §7.4
 ---
-"MUST authenticate every incoming request based on the provided credentials and its declared authentication requirements."
+服务端必须根据随请求提供的凭据和声明的认证要求验证每个请求。
 ```
 
 ## 授权范围：看不到的任务就不存在 {#s-security-schemes-and-in-task-authorization-authorization-scope-a-task-you-cannot-see-does-not-exist}

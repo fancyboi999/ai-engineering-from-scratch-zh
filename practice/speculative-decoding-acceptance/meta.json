@@ -1,0 +1,42 @@
+{
+  "id": "speculative-decoding-acceptance",
+  "title": "推测解码：接受、拒绝与重采样",
+  "kind": "research",
+  "summary": "实现 min(1, p/q) 接受规则和残差分布，使推测解码结果与 target 模型完全一致。",
+  "difficulty": "hard",
+  "tags": [
+    "speculative-decoding",
+    "sampling",
+    "inference",
+    "probability"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/16-speculative-decoding",
+  "cheatsheet": "speculative-decoding",
+  "minutes": 35,
+  "entry": [
+    "acceptance_rate",
+    "residual_distribution",
+    "speculative_step",
+    "expected_tokens"
+  ],
+  "collections": [
+    "papers-to-code",
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "method": "speculative-decoding",
+  "paper": {
+    "title": "Fast Inference from Transformers via Speculative Decoding",
+    "authors": "Leviathan et al.",
+    "year": 2023,
+    "url": "https://arxiv.org/abs/2211.17192"
+  },
+  "mutants": {
+    "accept_ratio_inverted": "使用 min(1, q / p) 作为接受概率，颠倒 draft 与 target 的比率。",
+    "alpha_unweighted": "将 alpha 错算为词表上 min(1, p / q) 的均值，而不是 min(p, q) 的总和。",
+    "expected_tokens_off_by_one": "使用 alpha 的 gamma 次方，而不是 gamma + 1 次方，漏掉 bonus token。",
+    "no_bonus_token": "draft token 全部接受后直接返回，漏掉从 target 最后一行采样的 bonus token。",
+    "residual_from_target": "拒绝后从 target 分布采样，而不是从残差分布采样。",
+    "residual_not_clipped": "对 p - q 取绝对值并归一化，而不是逐元素取 max(0, p - q)。"
+  }
+}

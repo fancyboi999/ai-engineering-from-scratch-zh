@@ -5,7 +5,7 @@ code: A2
 subtitle: 对比 MCP、A2A、ACP、ANP 和 FIPA-ACL。掌握 Agent 卡片、任务、传输名称与故障。基于 A2A 1.0.1。
 hue: 165
 sources: phases/13-tools-and-protocols/19-a2a-protocol, phases/16-multi-agent-and-swarms/02-fipa-acl-heritage, phases/16-multi-agent-and-swarms/03-communication-protocols, phases/16-multi-agent-and-swarms/12-a2a-protocol
-source_hash: a9296e2537130899
+source_hash: 9b770ef16e7d5b4d
 ---
 
 ## 四种协议对比

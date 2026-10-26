@@ -44,7 +44,7 @@ caption: 各行从左到右读：数据在哪里跨界、可能出什么问题�
 label: 读取输入前检查
 source: spec §14.1.1
 ---
-"Content MUST be validated against the A2A protocol schema before processing"
+处理内容前，必须先按 A2A 协议 schema 校验
 ```
 
 套件 planner 根据 data part 决策：从 `summary.json` 读 `failed`，从 `review.json` 每项发现读 `severity`，忽略旁边自由文本。它唯一使用远程文本之处，是对 reviewer 问题做子串检查。基于模型的 planner 会读更多。因此只按检查过的有类型字段行动。副作用操作必须经过人或策略控制的批准，如 deployer 所做。

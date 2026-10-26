@@ -5,7 +5,7 @@ code: AW
 subtitle: 选择工作流、HTN 或演化规划器，或支持重新规划的执行器。使用课程中的 Python 标准库实现。
 hue: 32
 sources: phases/14-agent-engineering/11-planning-htn-and-evolutionary, phases/14-agent-engineering/12-anthropic-workflow-patterns, phases/19-capstone-projects/24-plan-execute-control-flow, phases/14-agent-engineering/44-plan-from-evidence
-source_hash: 6965a457b50baedd
+source_hash: 6f2e76acb7d6f8ab
 ---
 
 ## 选择规划器

@@ -11,7 +11,7 @@
 
 - 解释掩码离散扩散：先均匀掩掉 token、再让 transformer 恢复它们的那套调度。
 - 在速度和质量上把并行图像解码（Show-o、MaskGIT）与自回归图像解码（Chameleon、Emu3）作比较。
-- 说出 Show-o 在一个 checkpoint 里处理的三个任务：T2I、VQA、图像修复。
+- 说出 Show-o 在一个 checkpoint 里处理的四个任务：文本生成、VQA、T2I、图像修复。
 - 挑一个掩码调度（cosine、linear、truncated）并就它对样本质量的影响作推理。
 
 ## 问题背景

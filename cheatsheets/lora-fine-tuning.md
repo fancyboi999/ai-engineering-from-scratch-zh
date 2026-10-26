@@ -122,7 +122,7 @@ from: phases/11-llm-engineering/08-fine-tuning-lora/outputs/skill-fine-tuning-gu
 | lora_dropout | 0.05 | 样例少于 5K 时用 0.1 |
 | target_modules | q_proj, v_proj | 质量不足时再扩展 |
 | QLoRA 学习率 | 2e-4 | 高于全量微调 |
-| LoRA fp16 学习率 | 5e-5 | |
+| LoRA fp16 学习率 | 5e-5 | 低于 QLoRA |
 | 全量 SFT 学习率 | 2e-5 | Llama 2 Chat，比预训练低 15 倍 |
 | Epoch 数 | 1-3 | 更多轮数增加过拟合风险 |
 

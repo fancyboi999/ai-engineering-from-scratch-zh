@@ -1,0 +1,37 @@
+{
+  "id": "lab-sglang-l4-serving",
+  "title": "读取 SGLang L4 扫描结果",
+  "kind": "lab",
+  "summary": "分析 NVIDIA L4 上的真实 SGLang 运行数据，判断饱和点、SLO 上限、FP8 增益和较小 prefill chunk 的影响。",
+  "difficulty": "medium",
+  "tags": [
+    "inference",
+    "serving",
+    "goodput",
+    "benchmarking"
+  ],
+  "lesson": "phases/17-infrastructure-and-production/08-inference-metrics-goodput",
+  "cheatsheet": "sglang-serving",
+  "minutes": 30,
+  "entry": [
+    "gains",
+    "saturation_point",
+    "largest_within",
+    "pct_change",
+    "ranges_overlap",
+    "answers"
+  ],
+  "collections": [
+    "experiment-labs",
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "absolute_gain": "使用吞吐绝对差值与 min_gain 比较，而不是相对增益。",
+    "median_ttft_for_slo": "用中位 TTFT 检查 SLO，而不是 p99 TTFT。",
+    "pct_over_new": "变化量除以新值，而不是旧值。",
+    "returns_next_level": "返回低增益步骤之后的水平，而不是该步骤之前的水平。",
+    "strict_limit": "使用严格小于，因此等于限制的值也未通过 SLO。",
+    "strict_overlap": "使用严格不等式，因此只在一个点接触的范围被判定为不重叠。"
+  }
+}

@@ -8,11 +8,11 @@
 
 ## 有类型、有版本的请求 {#s-com-docker-sandbox-capabilities-typed-versioned-requests}
 
-**能力：** kit 的 `capabilities` 列表中的类型化请求，“Everything the Kit needs but cannot supply itself” {{kitspec §7}}，即 kit 需要却无法自己提供的内容。宿主逐项授予、拒绝或询问。
+**能力：** kit 的 `capabilities` 列表中的类型化请求，{{kitspec §7}}，即 kit 需要却无法自己提供的内容。宿主逐项授予、拒绝或询问。
 
-各条目含 `<namespace>/<name>@<version>` 形式的 `type`、可选展示 `name` 和 `optional` 标志 {{kitspec §7}}。规范定义的类型严格解码 `config`，未知键报错 {{kitspec §7}}。版本指定 config schema，因此 `network-policy@1` 与 `@2` 都存在，描述文件声明其一 {{kitspec §7.1}}。“Policy-shaped types are singletons” {{kitspec §7.1}}，策略类类型是单例；实例类按请求对象重复，如 `credential@1` 每服务、每阶段一项。
+各条目含 `<namespace>/<name>@<version>` 形式的 `type`、可选展示 `name` 和 `optional` 标志 {{kitspec §7}}。规范定义的类型严格解码 `config`，未知键报错 {{kitspec §7}}。版本指定 config schema，因此 `network-policy@1` 与 `@2` 都存在，描述文件声明其一 {{kitspec §7.1}}。{{kitspec §7.1}}，策略类类型是单例；实例类按请求对象重复，如 `credential@1` 每服务、每阶段一项。
 
-设计允许未知类型：“An unknown type is the extension point working as designed” {{kitspec §7.3}}，未知类型正是扩展点。必需未知类型导致解析失败，可选未知类型则跳过并记录。
+设计允许未知类型{{kitspec §7.3}}，未知类型正是扩展点。必需未知类型导致解析失败，可选未知类型则跳过并记录。
 
 ## 固定版本的十九种类型 {#s-com-docker-sandbox-capabilities-the-nineteen-types-at-the-pin}
 
@@ -38,17 +38,17 @@
 | `kit-registry@1` | 单例，无 config | 访问运行时用于构建推送、拉取的 kit registry |
 | `sbx@1` | 单例，无 config | 按特定方式及镜像声明身份启动 workload |
 
-表格来自 `v3.0.0-m.8` tag 的 `kitspec §7.2`。main 分支增加第二十种单例 `com.docker.sandbox/agent-interactive-sessions@1` {{kitspec-main §7.2}}，固定版本时未发布。sbx 最新类型随固定版本到来：“Kits can declare `com.docker.sandbox/long-running@1` to keep local sandboxes running after all sessions disconnect” {{rel-sbx v0.47.0}}，可声明此能力让全部会话断开后本地沙箱仍运行。
+表格来自 `v3.0.0-m.8` tag 的 `kitspec §7.2`。main 分支增加第二十种单例 `com.docker.sandbox/agent-interactive-sessions@1` {{kitspec-main §7.2}}，固定版本时未发布。sbx 最新类型随固定版本到来{{rel-sbx v0.47.0}}，可声明此能力让全部会话断开后本地沙箱仍运行。
 
 ## network-policy@2 与 credential@1 {#s-com-docker-sandbox-capabilities-network-policy-2-and-credential-1}
 
-`network-policy@2` 条目是普通主机字符串，或含 `hosts`、`methods` 和 `paths` 的对象 {{kitcap network-policy@2}}。主机字符串像 `@1` 一样允许任意协议连接。带 `methods` 或 `paths` 的条目有界，只允许指定 HTTP 请求，不放行该主机的其他请求。拒绝项为“Entries to refuse. Deny wins” {{kitcap network-policy@2}}，拒绝优先。运行时“MUST answer a request these entries refuse with HTTP status `403`” {{kitcap network-policy@2}}，必须以403应答。执行代理见[策略日志一节](#s-sbx-policy-log-and-the-proxy)。
+`network-policy@2` 条目是普通主机字符串，或含 `hosts`、`methods` 和 `paths` 的对象 {{kitcap network-policy@2}}。主机字符串像 `@1` 一样允许任意协议连接。带 `methods` 或 `paths` 的条目有界，只允许指定 HTTP 请求，不放行该主机的其他请求。拒绝项为{{kitcap network-policy@2}}，拒绝优先。运行时{{kitcap network-policy@2}}，必须以403应答。执行代理见[策略日志一节](#s-sbx-policy-log-and-the-proxy)。
 
-`credential@1` 指定 `service` 和 `phase`，“never where the secret lives” {{kitcap credential@1}}，不指定密钥存储位置。使用 `apiKey.proxyManaged` 时，“The real value stays on the host” {{kitcap credential@1}}，真实值留在宿主。每个 `inject` 域名必须出现在同阶段允许列表 {{kitcap credential@1}}。对应绑定由[密钥一节](#s-sbx-secret-set-import-and-set-custom) 存储。
+`credential@1` 指定 `service` 和 `phase`，{{kitcap credential@1}}，不指定密钥存储位置。使用 `apiKey.proxyManaged` 时，{{kitcap credential@1}}，真实值留在宿主。每个 `inject` 域名必须出现在同阶段允许列表 {{kitcap credential@1}}。对应绑定由[密钥一节](#s-sbx-secret-set-import-and-set-custom) 存储。
 
 ## 解析与合并集合 {#s-com-docker-sandbox-capabilities-resolution-and-the-merged-set}
 
-运行时“MUST include exactly one `workload` Kit per composition” {{kitspec §5.3}}，每组合恰有一个 workload；“MUST fail when two Kits provide the same normalized name” {{kitspec §5.3}}，两个 kit 提供同一规范化名称必须失败，因此 `claude` 加 `claude-mixin` 被拒绝。集合中按阶段合并允许与拒绝条目，结果拒绝优先 {{kitcap network-policy@2}}。一个 kit 完全允许主机时，另一 kit 对该主机的有界条目被丢弃，因为并集是无界授权 {{kitspec §9.5}}。[图](#fig-4-2) 对三个 kit 演示此运算。
+运行时{{kitspec §5.3}}，每组合恰有一个 workload；{{kitspec §5.3}}，两个 kit 提供同一规范化名称必须失败，因此 `claude` 加 `claude-mixin` 被拒绝。集合中按阶段合并允许与拒绝条目，结果拒绝优先 {{kitcap network-policy@2}}。一个 kit 完全允许主机时，另一 kit 对该主机的有界条目被丢弃，因为并集是无界授权 {{kitspec §9.5}}。[图](#fig-4-2) 对三个 kit 演示此运算。
 
 ```figure
 id: fig-4-2
@@ -87,7 +87,7 @@ note: rules 数组只有一项，仅保留正文提到的字段。
 
 ## 更新与锁定记录 {#s-com-docker-sandbox-capabilities-updates-and-the-lock}
 
-各授权投影到规范化集合：“Consumers that gate updates store a Kit's surface in the lock and diff a candidate's against it” {{kitspec §7.4}}，管控更新的消费者在锁定记录中保存 kit 权限面，并与候选比较。新版本集合不超出已存集合可静默应用；任何扩权必须请求批准。具体包括新增允许、“a removed deny entry (the deny was part of what made the grant acceptable)” {{kitspec §7.4}}（移除原本使授权可接受的拒绝），新增凭据、路径、端口，或将只读 skills 路径改为可写。`optional` 不改变集合 {{kitspec §7.4}}。六种类型不贡献权限面：`resources@1`、`lifecycle@1`、`agent-context@1`、`agent-sessions@1`、`sbx@1` 和 `long-running@1` {{kitspec §7.4}}。
+各授权投影到规范化集合{{kitspec §7.4}}，管控更新的消费者在锁定记录中保存 kit 权限面，并与候选比较。新版本集合不超出已存集合可静默应用；任何扩权必须请求批准。具体包括新增允许、{{kitspec §7.4}}（移除原本使授权可接受的拒绝），新增凭据、路径、端口，或将只读 skills 路径改为可写。`optional` 不改变集合 {{kitspec §7.4}}。六种类型不贡献权限面：`resources@1`、`lifecycle@1`、`agent-context@1`、`agent-sessions@1`、`sbx@1` 和 `long-running@1` {{kitspec §7.4}}。
 
 ```takeaways
 - 运行前读 kit 的 `capabilities`，逐项视为由你回应的请求。

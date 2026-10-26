@@ -69,7 +69,7 @@ DENIED = {
 
 每个子进程默认有三秒 wall-clock 的预算。runner 用 `subprocess.run(..., timeout=t)`。一旦超时触发，runner 捕获 `TimeoutExpired`、杀掉进程、给该任务记一个 `timeout` 退出原因。这个任务得分为零。runner 继续往下走。
 
-超时可以通过 `task.metadata.timeout_s` 按任务配置。跑得久的单元测试可以要更多；第 70 课的 validator 把这个值上限定为三十秒，保证整个套件有界。
+超时通过 `run_candidate` 的 `timeout_s` 参数设置。第 75 课的 runner 会在每次运行中设置 `code_exec_timeout_s`。耗时较长的单元测试可以申请更长时间，但 `run_candidate` 会把值限制在 0.1 到 30 秒之间，保证套件有界。
 
 ## 输出上限
 

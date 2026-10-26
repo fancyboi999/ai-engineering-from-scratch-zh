@@ -1,0 +1,32 @@
+{
+  "id": "scaled-dot-product-attention",
+  "title": "带掩码的缩放点积注意力",
+  "kind": "implement",
+  "summary": "计算 batched softmax(QK^T / sqrt(d_k))V，支持可选布尔 mask 和 decoder 因果掩码。",
+  "difficulty": "medium",
+  "tags": [
+    "attention",
+    "transformers",
+    "masking",
+    "softmax"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/02-self-attention-from-scratch",
+  "cheatsheet": "transformers-attention",
+  "minutes": 25,
+  "entry": [
+    "causal_mask",
+    "scaled_dot_product_attention"
+  ],
+  "collections": [
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "batched_transpose": "使用 K.T 反转 batched K 的所有轴，而非只转置最后两轴。",
+    "causal_includes_diagonal": "使用 k=0 构造因果掩码，导致每个 token 也屏蔽自身，第一行没有允许的 key。",
+    "mask_after_softmax": "softmax 后才将屏蔽权重设为 0，导致行权重和不为 1。",
+    "no_max_shift": "直接对原始分数调用 np.exp，大值溢出为无穷大。",
+    "no_scale": "忘记将分数除以 sqrt(d_k)。",
+    "scale_by_dk": "将分数除以 d_k，而不是 sqrt(d_k)。"
+  }
+}

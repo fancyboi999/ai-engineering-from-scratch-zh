@@ -104,7 +104,7 @@ cc-gpt-assembly
 python3 code/main.py
 ```
 
-输出包括：参数量与 124M 参考值对照、一段随机 prompt 的生成 token ids，以及 `lm_head` 与 token embedding 在开启 tying 时确实共享 storage 的确认。
+输出包括：参数量与 124M 参考值对照、一段固定 prompt 的生成 token ids，以及 `lm_head` 与 token embedding 在开启 tying 时确实共享 storage 的确认。
 
 为了让 demo 跑得快，脚本还会额外跑一个 tiny config（`d_model=64`、`num_layers=2`）做完整端到端生成。124M 配置会被建出来，但只验证参数量和单次 forward。
 

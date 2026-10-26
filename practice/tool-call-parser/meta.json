@@ -1,0 +1,33 @@
+{
+  "id": "tool-call-parser",
+  "title": "解析并校验工具调用",
+  "kind": "implement",
+  "summary": "从模型原始回复中解析工具调用，按 JSON Schema 子集校验参数，并用 JSON pointer 标出错误路径。",
+  "difficulty": "hard",
+  "tags": [
+    "tool-calling",
+    "json-schema",
+    "parsing",
+    "agents"
+  ],
+  "lesson": "phases/19-capstone-projects/21-tool-registry-schema-validation",
+  "cheatsheet": "tool-calling",
+  "minutes": 50,
+  "entry": [
+    "parse_tool_calls",
+    "validate_args",
+    "check_reply"
+  ],
+  "collections": [
+    "agent-building-blocks"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "additional_default_false": "将未设置 additionalProperties 的 schema 当作 false 处理，导致多余键始终校验失败。",
+    "bool_is_integer": "先检查 int 再检查 bool，导致 true 和 false 被视为整数。",
+    "escape_order": "路径段中先转义 / 再转义 ~，导致 ~1 变成 ~01。",
+    "no_return_after_type": "类型出错后仍继续检查子项，导致一个错误值产生多余错误。",
+    "required_after_props": "先报告各键的错误，再报告缺失的必需属性。",
+    "single_decode": "未解码 arguments 字符串，导致参数仍是 JSON 字符串。"
+  }
+}

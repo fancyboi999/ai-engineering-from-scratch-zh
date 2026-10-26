@@ -28,20 +28,31 @@ function matches(rule, req) {
   });
 }
 
+function compile(source) {
+  const names = [];
+  const pattern = source.replace(/:(\w+)\(([^)]+)\)/g, (_, name, body) => { names.push(name); return `(${body})`; }).replace(/\.html$/, '\\.html');
+  return { names, regex: new RegExp('^' + pattern + '$') };
+}
+
+function fill(destination, names, match) {
+  return names.reduce((out, name, index) => out.replace(`:${name}`, match[index + 1] || ''), destination);
+}
+
 function createServer() {
   return http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url, 'http://127.0.0.1');
       for (const rule of config.redirects || []) {
-        const pattern = rule.source.replace(/:page\(([^)]+)\)/, '($1)').replace(/\.html$/, '\\.html');
-        const match = url.pathname.match(new RegExp('^' + pattern + '$'));
+        const { names, regex } = compile(rule.source);
+        const match = url.pathname.match(regex);
         if (!match || (rule.missing || []).some(condition => url.searchParams.has(condition.key))) continue;
-        const destination = rule.destination.replace(':page', match[1] || '');
+        const destination = fill(rule.destination, names, match);
         res.writeHead(rule.permanent ? 308 : 307, { Location: destination + url.search });
         return res.end();
       }
-      for (const rule of config.headers) if (new RegExp('^' + rule.source + '$').test(url.pathname)) {
-        for (const header of rule.headers) res.setHeader(header.key, header.value);
+      for (const rule of config.headers) {
+        const matcher = /:\w+\(/.test(rule.source) ? compile(rule.source).regex : new RegExp('^' + rule.source + '$');
+        if (matcher.test(url.pathname)) for (const header of rule.headers) res.setHeader(header.key, header.value);
       }
       let destination = url.pathname;
       let routed = false;
@@ -49,6 +60,7 @@ function createServer() {
         const match = url.pathname.match(new RegExp('^' + rule.src + '$'));
         if (match && (!rule.methods || rule.methods.includes(req.method)) && matches(rule, req)) {
           destination = rule.dest.replace(/\$(\d+)/g, (_, n) => match[Number(n)]);
+          for (const [name, value] of Object.entries(rule.headers || {})) res.setHeader(name, value);
           routed = true;
           break;
         }
@@ -59,10 +71,10 @@ function createServer() {
       };
       if (!routed && destination === '/') destination = '/index.html';
       if (!routed && !handlers[destination] && !isFile(destination)) {
-        const pageMatch = rule => rule.source.includes(':page(') && url.pathname.match(new RegExp('^' + rule.source.replace(/:page\(([^)]+)\)/, '($1)') + '$'));
-        const rule = config.rewrites.find(rule => ((rule.source === url.pathname || pageMatch(rule)) && matches(rule, req))
+        const paramMatch = rule => /:\w+\(/.test(rule.source) && url.pathname.match(compile(rule.source).regex);
+        const rule = config.rewrites.find(rule => ((rule.source === url.pathname || paramMatch(rule)) && matches(rule, req))
           || (rule.source === '/api/:missing*' && url.pathname.startsWith('/api/')));
-        if (rule) destination = rule.destination.replace(':page', (pageMatch(rule) || [])[1] || '');
+        if (rule) destination = fill(rule.destination, compile(rule.source).names, paramMatch(rule) || []);
       }
       const target = new URL(destination, 'http://127.0.0.1');
       const directory = path.resolve(SITE, '.' + target.pathname);
@@ -83,7 +95,7 @@ function createServer() {
         res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
         return res.end(req.method === 'HEAD' ? undefined : fs.readFileSync(path.join(SITE, '404.html')));
       }
-      const type = ({'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.md':'text/markdown','.txt':'text/markdown','.xml':'application/xml','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'})[path.extname(target.pathname)] || 'application/octet-stream';
+      const type = ({'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.md':'text/markdown','.txt':'text/markdown','.xml':'application/xml','.py':'text/x-python','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'})[path.extname(target.pathname)] || 'application/octet-stream';
       res.setHeader('Content-Type', type);
       if (req.method === 'HEAD') return res.end();
       fs.createReadStream(path.join(SITE, target.pathname)).pipe(res);

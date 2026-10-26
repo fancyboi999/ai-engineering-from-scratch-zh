@@ -1,4 +1,5 @@
 import argparse
+import atexit
 import json
 import os
 import shutil
@@ -15,16 +16,16 @@ from offline import prefetch, with_dataset
 HERE = Path(__file__).resolve().parent
 PYTHON = sys.executable
 PROFILES = {
-    "gb10": {"model": "Qwen/Qwen3-30B-A3B-Instruct-2507", "fp8": "Qwen/Qwen3-30B-A3B-Instruct-2507-FP8", "draft": "lmsys/SGLang-EAGLE3-Qwen3-30B-A3B-Instruct-2507-SpecForge-Nex", "fraction": "0.7"},
+    "gb10": {"model": "Qwen/Qwen3-30B-A3B-Instruct-2507", "fp8": "Qwen/Qwen3-30B-A3B-Instruct-2507-FP8", "draft": "lmsys/SGLang-EAGLE3-Qwen3-30B-A3B-Instruct-2507-SpecForge-Nex", "fraction": "0.7", "vllm_blocks": "14685", "vllm_util": "0.75", "vllm_max_len": "8192"},
     "l4": {"model": "Qwen/Qwen3-8B", "fp8": "Qwen/Qwen3-8B-FP8", "draft": "Tengyunw/qwen3_8b_eagle3", "fraction": "0.85", "moe_fp8": "Qwen/Qwen3-30B-A3B-Instruct-2507-FP8", "vllm_blocks": "1506", "vllm_util": "0.9", "vllm_max_len": "8192"},
 }
-PROFILES["l4-gpu1"] = {**PROFILES["l4"], "vllm_blocks": "183", "vllm_util": "0.83", "vllm_max_len": "2928"}
-CONCURRENCY = [1, 2, 4, 8, 16, 32, 64]
+PROFILES["l4-gpu1"] = {**PROFILES["l4"], "vllm_blocks": "183", "vllm_util": "0.83", "vllm_max_len": "2304"}
+CONCURRENCY = [int(c) for c in os.environ.get("SWEEP_CONCURRENCY", "1,2,4,8,16,32,64").split(",")]
 RATES = [0.5, 1, 2, 4, 8, 16]
 PREFIXES = [0, 256, 1024, 2048, 4096]
 GROUPS = [4, 16, 32, 64]
 MIXED_RATES = [0.5, 1, 2]
-SEEDS = [1, 2, 3]
+SEEDS = [int(x) for x in os.environ.get("SWEEP_SEEDS", "1,2,3").split(",")]
 RANDOM = ["--dataset-name", "random", "--random-input-len", "512", "--random-output-len", "128", "--random-range-ratio", "1.0"]
 
 
@@ -53,6 +54,35 @@ def configs(profile):
         "pd": (p["model"], []),
         "pd-swap": (p["model"], []),
         "vllm": (p["model"], []),
+        "vllm-no-prefix-cache": (p["model"], ["--no-enable-prefix-caching"]),
+        "vllm-b": (p["model"], []),
+        "vllm-fast-b": (p["model"], []),
+        "vllm-lock-b": (p["model"], []),
+        "vllm-lock-eagle3-k1": (p["model"], ["--speculative-config", json.dumps({"method": "eagle3", "model": p["draft"], "num_speculative_tokens": 1})]),
+        "vllm-lock-eagle3-k3": (p["model"], ["--speculative-config", json.dumps({"method": "eagle3", "model": p["draft"], "num_speculative_tokens": 3})]),
+        "vllm-lock-eagle3-k5": (p["model"], ["--speculative-config", json.dumps({"method": "eagle3", "model": p["draft"], "num_speculative_tokens": 5})]),
+        "vllm-lock-fp8": (p["fp8"], []),
+        "vllm-lock-small-pool": (p["model"], ["--num-gpu-blocks-override", "410", "--max-model-len", "4096"]),
+        "vllm-eager": (p["model"], ["--enforce-eager"]),
+        "vllm-mnbt-2048": (p["model"], ["--max-num-batched-tokens", "2048"]),
+        "vllm-mnbt-16384": (p["model"], ["--max-num-batched-tokens", "16384"]),
+        "vllm-seqs-16": (p["model"], ["--max-num-seqs", "16"]),
+        "vllm-async": (p["model"], ["--async-scheduling"]),
+        "vllm-no-async": (p["model"], ["--no-async-scheduling"]),
+        "vllm-kv-fp8": (p["model"], ["--kv-cache-dtype", "fp8"]),
+        "vllm-kv-fp8-triton": (p["model"], ["--kv-cache-dtype", "fp8", "--attention-backend", "TRITON_ATTN"]),
+        "vllm-fp8": (p["fp8"], []),
+        "vllm-eagle3": (p["model"], ["--speculative-config", json.dumps({"method": "eagle3", "model": p["draft"], "num_speculative_tokens": 3})]),
+        "vllm-ngram": (p["model"], ["--speculative-config", json.dumps({"method": "ngram", "num_speculative_tokens": 3, "prompt_lookup_max": 4})]),
+        "vllm-small-pool": (p["model"], ["--num-gpu-blocks-override", "410"]),
+        "vllm-O0": (p["model"], ["-O0"]),
+        "vllm-O1": (p["model"], ["-O1"]),
+        "vllm-O3": (p["model"], ["-O3"]),
+        "vllm-mnbt-512": (p["model"], ["--max-num-batched-tokens", "512"]),
+        "vllm-eagle3-k1": (p["model"], ["--speculative-config", json.dumps({"method": "eagle3", "model": p["draft"], "num_speculative_tokens": 1})]),
+        "vllm-eagle3-k5": (p["model"], ["--speculative-config", json.dumps({"method": "eagle3", "model": p["draft"], "num_speculative_tokens": 5})]),
+        "graphs-on-b": (p["model"], []),
+        "graphs-off-b": (p["model"], ["--cuda-graph-backend-decode", "disabled", "--cuda-graph-backend-prefill", "disabled"]),
         "moe-tp2": (p.get("moe_fp8", p["fp8"]), ["--tp-size", "2", "--kv-cache-dtype", "fp8_e4m3"]),
     }
 
@@ -136,13 +166,13 @@ def start_pd(model, port, fraction, directory, swap=False):
     return Group(started)
 
 
-def start_vllm(model, port, directory, profile):
+def start_vllm(model, port, directory, profile, flags=()):
     vllm = os.environ.get("VLLM_BIN", "vllm")
     blocks = os.environ.get("VLLM_GPU_BLOCKS", profile.get("vllm_blocks", "1506"))
     util = os.environ.get("VLLM_GPU_UTIL", profile.get("vllm_util", "0.9"))
     max_len = profile.get("vllm_max_len", "8192")
     require_free(port)
-    process = launch([vllm, "serve", model, "--host", "127.0.0.1", "--port", str(port), "--num-gpu-blocks-override", blocks, "--gpu-memory-utilization", util, "--max-model-len", max_len, "--seed", "0"], directory / "server.log", {"VLLM_USE_FLASHINFER_SAMPLER": "0"})
+    process = launch([vllm, "serve", model, "--host", "127.0.0.1", "--port", str(port), "--num-gpu-blocks-override", blocks, "--gpu-memory-utilization", util, "--max-model-len", max_len, "--seed", "0", *flags], directory / "server.log", {"VLLM_USE_FLASHINFER_SAMPLER": "0"})
     try:
         wait_healthy([port], [process], directory)
     except RuntimeError:
@@ -198,7 +228,7 @@ def temperature(index):
         return None
 
 
-def wait_cool(index, limit, timeout=900):
+def wait_cool(index, limit, timeout=int(os.environ.get("SWEEP_COOL_TIMEOUT", "900"))):
     start = time.time()
     while time.time() - start < timeout:
         current = temperature(index)
@@ -273,6 +303,18 @@ def main():
         flags = table[name][1]
         if "--speculative-draft-model-path" in flags:
             models.add(flags[flags.index("--speculative-draft-model-path") + 1])
+        if "--speculative-config" in flags:
+            draft = json.loads(flags[flags.index("--speculative-config") + 1]).get("model")
+            if draft:
+                models.add(draft)
+    lock = os.environ.get("SWEEP_LOCK_CLOCK")
+    locked = [name for name in args.configs if name.startswith("vllm-lock-")]
+    if locked and not lock:
+        parser.error(f"{', '.join(locked)} need SWEEP_LOCK_CLOCK, the SM clock in MHz to lock for the whole sweep")
+    if lock:
+        subprocess.run(["nvidia-smi", "-i", gpu_index(), "-lgc", f"{lock},{lock}"], check=True)
+        atexit.register(subprocess.run, ["nvidia-smi", "-i", gpu_index(), "-rgc"])
+        print(f"SM clock locked at {lock} MHz on GPU {gpu_index()}", flush=True)
     dataset = prefetch(sorted(models))
     for name in args.configs:
         model, flags, *rest = table[name]
@@ -286,8 +328,8 @@ def main():
             continue
         if name in ("pd", "pd-swap"):
             process = start_pd(model, args.port, fraction, directory, swap=name == "pd-swap")
-        elif name == "vllm":
-            process = start_vllm(model, args.port, directory, PROFILES[args.profile])
+        elif name.startswith("vllm"):
+            process = start_vllm(model, args.port, directory, PROFILES[args.profile], flags)
         else:
             process = start_server(model, flags, args.port, fraction, directory / "server.log", env)
         (directory / "server.command.txt").write_text(" ".join([*(f"{k}={v}" for k, v in env.items()), os.path.basename(process.args[0]), *process.args[1:]]) + "\n")
@@ -298,7 +340,7 @@ def main():
                     print(f"[{name}] {run} start {start_temp} C after {waited} s", flush=True)
                     sampler = telemetry(gpu_index(), directory / f"{run}.gpu.csv")
                     try:
-                        bench(args.port, directory / f"{run}.jsonl", bench_args, dataset, "vllm" if name == "vllm" else "sglang")
+                        bench(args.port, directory / f"{run}.jsonl", bench_args, dataset, "vllm" if name.startswith("vllm") else "sglang")
                     finally:
                         sampler.terminate()
                         sampler.wait()

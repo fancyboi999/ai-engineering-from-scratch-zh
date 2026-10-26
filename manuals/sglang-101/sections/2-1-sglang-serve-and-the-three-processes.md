@@ -6,7 +6,7 @@
 
 读完本节，你能用 `sglang serve` 启动 SGLang，说出它启动的三个进程，并从启动日志读出决定后续行为的数字。
 
-## 成本：一个 Python 线程做不完所有事
+## 成本：一个 Python 线程做不完所有事 {#s-sglang-serve-and-the-three-processes-the-cost-one-python-thread-cannot-do-everything}
 
 语言模型服务器做两类工作。GPU 工作是前向传播，每几毫秒执行一次 prefill 或 decode。CPU 工作是周边的一切：解析 HTTP、应用聊天模板、分词、把 token ID 还原为文本，以及检查停止字符串。
 
@@ -14,7 +14,7 @@
 
 LinkedIn 在 H100 和小型排序模型上测过：每秒 500 次查询时，仅批量分词就把 P99 从 4,583 ms 降至 464 ms {{field LinkedIn 2026-02}}。模型没变，变的只是模型周围的 CPU 路径。
 
-## SGLang 启动什么
+## SGLang 启动什么 {#s-sglang-serve-and-the-three-processes-what-sglang-starts}
 
 **TokenizerManager：** 主进程中的对象，接收每个请求、应用聊天模板、分词并等待答案。HTTP 服务与 TokenizerManager 共用一个进程和一个 asyncio 循环。
 
@@ -29,12 +29,12 @@ id: fig-2-1
 kind: flow
 title: 一个 SGLang 服务的三个进程
 claim: 请求通过 ZMQ 经过三个进程，只有 scheduler 接触模型，文本工作因此不会占用启动 GPU 步骤的线程。
-caption: 按编号读箭头。蓝框是 SGLang 进程，橄榄色框为客户端。PID 5782、5909 来自 capture/out/server-default.log。
+caption: 按编号读箭头。蓝框是 SGLang 进程，橄榄色框为客户端。进程 ID 5782 和 5909 来自 Mac 默认服务的 capture/out/server-default.log。
 ```
 
 张量并行时，只有 scheduler 的 rank 0 打开 ZMQ socket。它向其他 rank 广播请求，让所有 GPU 组建相同批次 {{code}}。任何 rank 都不能自行决定。
 
-## 上游运行的命令
+## 上游运行的命令 {#s-sglang-serve-and-the-three-processes-the-command-we-ran}
 
 上游在 Apple silicon Mac 上使用 MLX 后端和 4-bit Qwen3 0.6B 模型。v0.5.22 推荐 `sglang serve`。旧命令 `python -m sglang.launch_server` 仍可用，但警告会指出推荐入口是 `sglang serve` {{code}}。
 
@@ -46,13 +46,13 @@ lang: text
 SGLANG_USE_MLX=1 sglang serve --model-path mlx-community/Qwen3-0.6B-4bit --disable-cuda-graph --host 127.0.0.1 --port 30000 --enable-cache-report --enable-metrics --mem-fraction-static 0.4
 ```
 
-两个参数不是默认值，且都有意设置。`--enable-cache-report` 在每个 OpenAI 风格响应中添加缓存 token 数，[第 2.5 节](#s-streaming-stop-strings-and-the-openai-api)会展示。`--mem-fraction-static 0.4` 限制 KV 池，[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)解释不加它时上游遇到的崩溃。
+三个参数不是默认值，且都有意设置。`--enable-cache-report` 在每个 OpenAI 风格响应中添加缓存 token 数，[第 2.5 节](#s-streaming-stop-strings-and-the-openai-api)会展示。`--enable-metrics` 开启 `/metrics` 端点，[第 5.2 节](#s-the-metrics-endpoint)会读取它。`--mem-fraction-static 0.4` 限制 KV 池，[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)解释不加它时上游遇到的崩溃。
 
 日志对另一个参数提出异议。SGLang 文档的 Apple silicon 页面要求传 `--disable-cuda-graph`，但日志第二行说该参数“已弃用，将在未来版本移除”，替代项是 `--cuda-graph-backend-{decode,prefill}=disabled`。
 
 文档与代码冲突，以代码为准。该参数在 v0.5.22 仍可用，但应在后续版本移除前替换。
 
-## 先读启动日志
+## 先读启动日志 {#s-sglang-serve-and-the-three-processes-read-the-startup-log-before-anything-else}
 
 启动日志说明 SGLang 替你作了哪些决定。多数数字不是你设的参数，而是 SGLang 根据内存、模型和硬件计算的值。
 
@@ -78,7 +78,7 @@ note: 摘自启动部分；各次捕获均有同类行，但内存数字不同�
 
 Tree cache 行同样重要。从 v0.5.21 起，Linux 上的基数树默认由 Rust 实现。上游 Mac 上使用 Python，日志明确指出。
 
-## 预热与垃圾回收器
+## 预热与垃圾回收器 {#s-sglang-serve-and-the-three-processes-the-warm-up-and-the-garbage-collector}
 
 宣告就绪前，服务器先给自己发送一个请求，再调用自己的 `/freeze_gc` 端点。
 
@@ -95,7 +95,7 @@ lang: text
 
 `/freeze_gc` 有它的历史。LinkedIn 观察到每隔几秒发生 100至300 ms 的垃圾回收停顿，用预热加 `gc.freeze()` 修复 {{field LinkedIn 2026-02}}。v0.5.22 会在预热后自动做同样的事，scheduler 与 detokenizer 也包括在内 {{code}}。
 
-## 关闭日志中的进程
+## 关闭日志中的进程 {#s-sglang-serve-and-the-three-processes-the-processes-in-the-shutdown-log}
 
 服务停止时，最能看清进程拆分。上游捕获工具通过 SIGTERM 停止每个服务器。
 
@@ -108,9 +108,9 @@ lang: text
 [2026-10-16 14:01:45] Subprocess scheduler_0 (pid=5909) crashed with exit code -15. Triggering SIGQUIT for cleanup...
 ```
 
-主进程 PID 为 5782，scheduler 为 5909。退出码 -15 就是工具自己发送的 SIGTERM，因此 “crashed” 一词有误导性。应学会读退出码：真实 scheduler 崩溃也输出相同结构，只是退出码不同，见[第 2.4 节](#s-the-overlap-scheduler)。
+主进程 PID 为 5782，scheduler 为 5909。退出码 -15 对应工具自己发送的 SIGTERM，因此这不是真正的崩溃。真实 scheduler 故障会打印 traceback，并显示 `SIGQUIT received ... It usually means one child failed`，见[第 2.4 节](#s-the-overlap-scheduler)。
 
-## 本手册的建议
+## 本手册的建议 {#s-sglang-serve-and-the-three-processes-our-position}
 
 把 CPU 路径视作模型服务器的一部分。TTFT 高但 GPU 不忙时，先看 tokenizer 进程，再看内核。SGLang 可为两端增加 worker：`--tokenizer-worker-num` 和 `--detokenizer-worker-num`，默认均为 1 {{code}}。
 
@@ -123,4 +123,4 @@ lang: text
 - 先读关闭日志退出码，再判断是否崩溃。
 ```
 
-Sources: python/sglang/srt/entrypoints/engine.py (Engine docstring and process launch), python/sglang/srt/managers/io_struct.py, python/sglang/srt/environ.py (SGLANG_USE_PICKLE_IPC), python/sglang/srt/managers/scheduler_components/request_receiver.py, python/sglang/launch_server.py, python/sglang/srt/entrypoints/http_server.py (warm-up and /freeze_gc), python/sglang/srt/arg_groups/fields/serving.py at v0.5.22; docs/docs/hardware-platforms/apple_metal.mdx at v0.5.22; capture/out/server-default.command.txt and capture/out/server-default.log; LinkedIn Engineering, "Scaling LLM-based ranking systems with SGLang at LinkedIn", 2026-02-20, https://www.linkedin.com/blog/engineering/ai/scaling-llm-based-ranking-systems-with-sglang-at-linkedin.
+来源： python/sglang/srt/entrypoints/engine.py (Engine docstring 和 process launch), python/sglang/srt/managers/io_struct.py, python/sglang/srt/environ.py (SGLANG_USE_PICKLE_IPC), python/sglang/srt/managers/scheduler_components/request_receiver.py, python/sglang/launch_server.py, python/sglang/srt/entrypoints/http_server.py (warm-up 和 /freeze_gc), python/sglang/srt/arg_groups/fields/serving.py，v0.5.22; docs/docs/hardware-platforms/apple_metal.mdx，v0.5.22; capture/out/server-default.command.txt 和 capture/out/server-default.log; LinkedIn Engineering, "Scaling LLM-based ranking systems with SGLang at LinkedIn", 2026-02-20, https://www.linkedin.com/blog/engineering/ai/scaling-llm-based-ranking-systems-with-sglang-at-linkedin.

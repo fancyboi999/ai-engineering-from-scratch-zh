@@ -174,7 +174,7 @@ Refuse BERTopic on documents longer than the embedding model's context window wi
 | 混合成员归属 | 一篇文档属于多个主题 | LDA 给每篇文档分配一个在所有主题上的分布。 |
 | UMAP | 降维 | 保留局部结构的流形学习；用在 BERTopic 里。 |
 | HDBSCAN | 密度聚类 | 找出可变大小的簇；给离群点产出"噪声"标签（-1）。 |
-| c_v 连贯度 | 主题质量指标 | 滑动窗口内最靠前主题词的平均点互信息。 |
+| c_v 连贯度 | 主题质量指标 | 在滑动窗口上计算前排主题词的 NPMI，聚合成上下文向量，再用余弦相似度比较这些向量。 |
 
 ## 延伸阅读
 

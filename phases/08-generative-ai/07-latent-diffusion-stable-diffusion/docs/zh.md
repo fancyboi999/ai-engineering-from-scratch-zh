@@ -49,7 +49,7 @@ noise-schedule
 
 ## 动手构建
 
-`code/main.py` 在第 06 课的 DDPM 之上叠了一个玩具一维「VAE」（恒等编码器 + 解码器，用作演示；真正的 VAE 会是卷积网络），并加上带无分类器引导的类别条件。它表明同一个扩散损失无论你跑在原始一维值上还是编码后的值上都管用——这就是关键洞见。
+`code/main.py` 在第 06 课的 DDPM 之上叠了一个玩具一维「VAE」（演示用的固定 0.5 倍编码器及其精确逆变换解码器；真正的 VAE 会是卷积网络），并加上带无分类器引导的类别条件。它表明同一个扩散损失无论你跑在原始一维值上还是编码后的值上都管用。这就是关键洞见。
 
 ### 第 1 步：编码器/解码器
 
@@ -132,7 +132,7 @@ h = h + CrossAttention(Q=h, K=text_embed, V=text_embed)
 
 那个参考 Flux 集成是经典的「我有一块消费级 GPU，能上线这个吗？」配方。诀窍就是生产推理文献列出的那同样三个旋钮，套在一个扩散 DiT 上：
 
-1. **错峰加载。** Flux 有三个网络永远不需要同时待在显存里：T5-XXL 文本编码器（fp32 下约 10 GB）、CLIP-L（小）、12B 的 MMDiT，以及 VAE。先编码 prompt，*删掉*编码器，加载 DiT，去噪，*删掉* DiT，加载 VAE，解码。消费级 8GB GPU 一次只装得下一个阶段。
+1. **错峰加载。** Flux 有四个网络永远不需要同时待在显存里：T5-XXL 文本编码器（fp32 下约 10 GB）、CLIP-L（小）、12B 的 MMDiT，以及 VAE。先编码 prompt，*删掉*编码器，加载 DiT，去噪，*删掉* DiT，加载 VAE，解码。消费级 8GB GPU 一次只装得下一个阶段。
 2. **通过 bitsandbytes 做 4-bit 量化。** 对 T5 编码器和 DiT 都用 `BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16)`。内存砍 8 倍，按 Aritra 的基准（笔记本里有链接）文生图的质量下降感知不到。
 3. **CPU offload。** `pipe.enable_model_cpu_offload()` 随着每次前向推进自动在 CPU 和 GPU 之间换模块。加 10-20% 延迟，但让流水线根本跑得起来。
 

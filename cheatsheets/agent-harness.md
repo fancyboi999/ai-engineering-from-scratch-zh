@@ -5,7 +5,7 @@ subtitle: 模型外围的工程代码：循环契约、钩子、预算、工具�
 hue: 248
 sources: phases/14-agent-engineering/01-the-agent-loop, phases/14-agent-engineering/31-agent-workbench-why-models-fail, phases/14-agent-engineering/32-minimal-agent-workbench, phases/14-agent-engineering/33-instructions-as-executable-constraints, phases/14-agent-engineering/36-scope-contracts, phases/14-agent-engineering/37-runtime-feedback-loops, phases/14-agent-engineering/38-verification-gates, phases/14-agent-engineering/40-multi-session-handoff, phases/14-agent-engineering/42-agent-workbench-capstone, phases/15-autonomous-systems/10-claude-code-permission-modes, phases/19-capstone-projects/20-agent-harness-loop-contract, phases/19-capstone-projects/21-tool-registry-schema-validation, phases/19-capstone-projects/23-function-call-dispatcher, phases/19-capstone-projects/25-verification-gates-observation-budget, phases/19-capstone-projects/26-sandbox-runner-denylist, phases/19-capstone-projects/27-eval-harness-fixture-tasks, phases/19-capstone-projects/28-observability-otel-traces, phases/19-capstone-projects/29-end-to-end-coding-task-demo
 code: AH
-source_hash: 6d6f175b33e8dcab
+source_hash: cda53d602a199cc1
 ---
 
 ## 运行框架架构

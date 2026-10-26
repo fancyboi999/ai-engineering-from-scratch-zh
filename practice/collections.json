@@ -1,0 +1,62 @@
+[
+  {
+    "id": "math-foundations",
+    "title": "数学基础",
+    "summary": "用 NumPy 实现矩阵运算、梯度和优化。"
+  },
+  {
+    "id": "classical-ml",
+    "title": "经典机器学习",
+    "summary": "从方程出发，亲手实现深度学习之前的模型。"
+  },
+  {
+    "id": "deep-learning-core",
+    "title": "深度学习核心",
+    "summary": "练习损失函数、反向传播、归一化和优化器。"
+  },
+  {
+    "id": "optimizers",
+    "title": "优化器",
+    "summary": "一次专注一条更新规则，练习梯度下降、动量和 Adam。"
+  },
+  {
+    "id": "transformers-from-scratch",
+    "title": "从零构建 Transformer",
+    "summary": "拆解注意力、多头、位置编码和归一化等 Transformer 模块。"
+  },
+  {
+    "id": "llm-inference",
+    "title": "LLM 推理",
+    "summary": "练习分词、采样、beam search、KV cache 和 LoRA。"
+  },
+  {
+    "id": "rl-basics",
+    "title": "强化学习基础",
+    "summary": "练习回报、优势函数和 PPO 目标。"
+  },
+  {
+    "id": "rag-building-blocks",
+    "title": "RAG 基础模块",
+    "summary": "练习 RAG 系统用于排序的稠密与稀疏检索分数。"
+  },
+  {
+    "id": "agent-building-blocks",
+    "title": "Agent 基础模块",
+    "summary": "练习 agent 循环周围的解析和校验代码。"
+  },
+  {
+    "id": "papers-to-code",
+    "title": "论文转代码",
+    "summary": "实现论文的核心方法，并根据论文方程编写检查。"
+  },
+  {
+    "id": "train-tiny-models",
+    "title": "训练小模型",
+    "summary": "在浏览器中训练小模型，在步数预算内达到目标分数。"
+  },
+  {
+    "id": "experiment-labs",
+    "title": "实验练习",
+    "summary": "每次改变一个变量、测量结果，并用数值回答问题。"
+  }
+]

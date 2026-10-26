@@ -5,7 +5,7 @@ code: AV
 subtitle: 全量、滑动窗口、跨步、BigBird、差分与原生稀疏注意力：成本、KV 缓存、代码和修正。
 hue: 265
 sources: phases/07-transformers-deep-dive/12-kv-cache-flash-attention, phases/07-transformers-deep-dive/15-attention-variants, phases/10-llms-from-scratch/16-differential-attention-v2, phases/10-llms-from-scratch/17-native-sparse-attention
-source_hash: 9d19a11cbc286e0c
+source_hash: 05ce22c9c2d6662b
 ---
 
 ## 变体对比
@@ -124,7 +124,7 @@ from: phases/07-transformers-deep-dive/12-kv-cache-flash-attention/docs/zh.md, p
 | 设置 | 默认值 | 说明 |
 |---|---|---|
 | Llama 3 70B 每个 token 每层的 KV | 4096 字节 | 80 层，8 个 KV 头，fp16 |
-| Llama 3 70B 的 KV，32K 上下文 | 10.4 GB | 8 个 KV 头的 GQA |
+| Llama 3 70B 的 KV，32K 上下文 | 10 GiB | 8 个 KV 头的 GQA |
 | Gemma 3 层混合 | SWA:全局为 5:1 | window=1024 |
 | 128K 上下文的 SWA KV 缩减倍数 | 128 倍 | 窗口 1024，最近 W 个 token |
 | Gemma-3 混合 KV 缩减倍数 | ~6x | 相对纯全量注意力 |

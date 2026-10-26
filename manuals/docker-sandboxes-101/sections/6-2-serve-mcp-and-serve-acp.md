@@ -8,7 +8,7 @@ MCP 客户端已会调工具，编辑器已会与编程 agent 通信，但都不
 
 ## serve mcp：一个 agent、一个工具 {#s-serve-mcp-and-serve-acp-serve-mcp-one-agent-one-tool}
 
-**serve mcp：** “Start an MCP server that exposes the agent via the Model Context Protocol. By default, uses stdio transport” {{help-agent docker-agent serve mcp}}，默认 stdio 提供 MCP agent 服务器。`--http` 切到 `127.0.0.1:8081` 的流式 HTTP。不带 `-a` 时，团队每个 agent 都成为独立工具；只暴露一个时，`--tool-name` 重命名工具 {{help-agent docker-agent serve mcp}}。
+**serve mcp：** {{help-agent docker-agent serve mcp}}，默认 stdio 提供 MCP agent 服务器。`--http` 切到 `127.0.0.1:8081` 的流式 HTTP。不带 `-a` 时，团队每个 agent 都成为独立工具；只暴露一个时，`--tool-name` 重命名工具 {{help-agent docker-agent serve mcp}}。
 
 `--attach` 暴露运行中 TUI 的会话，按 pid、地址或会话 id 查找。`--mcp-keepalive` 仅用于 stdio；`--auth-token`、`--insecure-no-auth` 和 `--safety` 仅用于 `--http` {{help-agent docker-agent serve mcp}}。HTTP 安全策略默认 `restricted` {{docs-agent MCP Mode}}。
 
@@ -36,13 +36,13 @@ data: {"jsonrpc":"2.0","id":2,"result":{"ttlMs":0,"cacheScope":"public","tools":
 data: {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"response\":\"pong\"}"}],"structuredContent":{"response":"pong"}}}
 ```
 
-客户端请求 `2026-07-28`，v1.129.0 以“stateless Streamable HTTP transport” {{rel-agent v1.129.0}} 加入此修订，即无状态传输。服务器却回答 `2025-11-25`，所以版本应从结果读取，不能看自己的请求。所有响应均无 `Mcp-Session-Id` header。每个回答是一个 SSE `message` 事件；通知收到 `202 Accepted`（capture/out/23-mcp.http）。
+客户端请求 `2026-07-28`，v1.129.0 以{{rel-agent v1.129.0}} 加入此修订，即无状态传输。服务器却回答 `2025-11-25`，所以版本应从结果读取，不能看自己的请求。所有响应均无 `Mcp-Session-Id` header。每个回答是一个 SSE `message` 事件；通知收到 `202 Accepted`（capture/out/23-mcp.http）。
 
 工具接受一个字符串 `message`，返回 `structuredContent.response`，`content` 中也有相同文字的 JSON 字符串。注解标为只读且幂等，标题是 agent 的 `description`。`tools/call` 在整轮结束后一次返回，之前没有进度通知。套件 README 还指出 `/` 与 `/mcp` 都响应（capture/README.md）。文档在 Claude Code 中用 `claude mcp add --transport stdio`，后接 `-- docker agent serve mcp` 和引用注册 stdio 形式 {{docs-agent MCP Mode}}。
 
 ## serve acp：发给编辑器的 JSON-RPC 行 {#s-serve-mcp-and-serve-acp-serve-acp-json-rpc-lines-to-an-editor}
 
-**serve acp：** “communicates over stdio (standard input/output)” {{docs-agent ACP}}，通过标准输入输出通信。编辑器启动 `docker-agent serve acp FILE`，向 stdin 写 JSON-RPC 请求，从 stdout 读响应与通知。会话存于 `<data-dir>/session.db`，除非 `-s` 指定其他文件 {{help-agent docker-agent serve acp}}。团队文件也可用，文档说子 agent 无需为 ACP 修改 {{docs-agent ACP}}。
+**serve acp：** {{docs-agent ACP}}，通过标准输入输出通信。编辑器启动 `docker-agent serve acp FILE`，向 stdin 写 JSON-RPC 请求，从 stdout 读响应与通知。会话存于 `<data-dir>/session.db`，除非 `-s` 指定其他文件 {{help-agent docker-agent serve acp}}。团队文件也可用，文档说子 agent 无需为 ACP 修改 {{docs-agent ACP}}。
 
 ```listing
 title: stdio 上的 initialize 与 session/new

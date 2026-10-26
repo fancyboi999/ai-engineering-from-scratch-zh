@@ -5,7 +5,7 @@ code: MF
 subtitle: 三个 2026 年参考系统、软件团队综合项目，以及用 Go 实现、带租约隔离且可恢复的评估集群。
 hue: 210
 sources: phases/16-multi-agent-and-swarms/25-case-studies-2026-sota, phases/19-capstone-projects/10-multi-agent-software-team, projects/distributed-eval-farm
-source_hash: 140cc7e5d5226a03
+source_hash: 4f23171f0a8a05c9
 ---
 
 ## 三个参考案例

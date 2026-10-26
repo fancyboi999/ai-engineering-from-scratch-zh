@@ -23,9 +23,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261021a">
-  <link rel="stylesheet" href="certifications.css?v=20261021a">
-  <link rel="stylesheet" href="highlights.css?v=20261021a">
+  <link rel="stylesheet" href="style.css?v=20261026a">
+  <link rel="stylesheet" href="certifications.css?v=20261026a">
+  <link rel="stylesheet" href="highlights.css?v=20261026a">
+  <link rel="stylesheet" href="lesson-walkthrough.css?v=20261026a">
   <style>
     .scroll-progress {
       position: fixed;
@@ -2543,14 +2544,18 @@
       .mermaid-toolbar { padding-right: 44px; }
       .lesson-sidebar { transform: translateX(-100%); }
       .lesson-sidebar.open { transform: translateX(0); }
+      body {
+        --aifs-hl-launch-right: 16px;
+        --aifs-hl-launch-bottom: 72px;
+      }
       .lesson-sidebar-toggle {
         display: flex;
-        top: 70px;
-        right: 12px;
+        top: auto;
+        right: calc(16px + env(safe-area-inset-right, 0px));
+        bottom: calc(18px + env(safe-area-inset-bottom, 0px));
         left: auto;
-        width: 32px;
-        height: 32px;
-        font-size: 0.95rem;
+        width: auto;
+        height: 44px;
       }
       .lesson-main { margin-left: 0; padding: 56px 20px 80px; }
     }
@@ -2630,9 +2635,13 @@
 
     @media (max-width: 480px) {
       .lesson-main { padding: 36px 12px 56px; }
+      body {
+        --aifs-hl-launch-right: 12px;
+        --aifs-hl-launch-bottom: 68px;
+      }
       .lesson-sidebar-toggle {
-        right: 12px;
-        bottom: 14px;
+        right: calc(12px + env(safe-area-inset-right, 0px));
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
         height: 44px;
         padding: 0 12px;
       }
@@ -2703,6 +2712,7 @@
 <a href="manuals.html" data-header-page="manuals">技术手册</a>
 <a href="glossary.html" data-header-page="glossary">术语表</a>
 <a href="cheatsheets" data-header-page="cheatsheets">速查表</a>
+<a href="practice" data-header-page="practice">编程练习</a>
 <a href="how-to-learn.html" data-header-page="how-to-learn">学习方法</a>
 <a href="skills.html" data-header-page="skills">Agent 技能</a>
 <a href="inside-an-ai-agent.html" data-header-page="inside-an-ai-agent">Agent 内部机制</a>
@@ -2746,9 +2756,9 @@
     <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
   </div>
 
-  <script src="md-render.js?v=20261019a"></script>
+  <script src="md-render.js?v=20261026a"></script>
   <script src="build-meta.js"></script>
-  <script src="data.js?v=20261019a"></script>
+  <script src="data.js?v=20261026a"></script>
   <script>
     (function () {
       var path = '';
@@ -2770,10 +2780,11 @@
     }());
   </script>
   <script src="content-source.js?v=20261012a"></script>
-  <script src="progress.js?v=20260831a"></script>
-  <script src="highlights-anchor.js?v=20261021a"></script>
-  <script src="highlights-store.js?v=20261021a"></script>
-  <script src="highlights.js?v=20261021a"></script>
+  <script src="progress.js?v=20261026a"></script>
+  <script src="highlights-anchor.js?v=20261026a"></script>
+  <script src="highlights-store.js?v=20261026a"></script>
+  <script src="highlights.js?v=20261026a"></script>
+  <script src="lesson-walkthrough.js?v=20261026a"></script>
   <script id="learningPathProgressRuntime">
     (function (root) {
       'use strict';
@@ -2894,11 +2905,11 @@
     });
     window._mermaidReady = mermaid;
   </script>
-  <script src="header.js?v=20261021a" defer></script>
-  <script src="cmdpalette.js?v=20261019a" defer></script>
+  <script src="header.js?v=20261026a" defer></script>
+  <script src="cmdpalette.js?v=20261026a" defer></script>
   <script src="lesson-figures.js?v=b88d7b13ddfa"></script>
-  <script src="figure-manifest.js?v=9018d458bcfd"></script>
-  <script src="figures-manifest.js?v=20261019a"></script>
+  <script src="figure-manifest.js?v=cde3121db56b"></script>
+  <script src="figures-manifest.js?v=20261026a"></script>
   <script>
     (function () {
       // 渲染器（parseMd 等纯函数）已抽至 md-render.js，与 build.js 预渲染共用。
@@ -3049,16 +3060,6 @@
       function findLearningPath(id) {
         if (!id || typeof LEARNING_PATHS === 'undefined' || !Array.isArray(LEARNING_PATHS)) return null;
         return LEARNING_PATHS.find(function (path) { return path && path.id === id; }) || null;
-      }
-
-      function inferLearningPath(target) {
-        if (!target || typeof LEARNING_PATHS === 'undefined' || !Array.isArray(LEARNING_PATHS)) return null;
-        var preferredIds = ['agent-skills', 'model-context-protocol'];
-        for (var i = 0; i < preferredIds.length; i++) {
-          var preferred = findLearningPath(preferredIds[i]);
-          if (preferred && learningPathContains(preferred, target)) return preferred;
-        }
-        return LEARNING_PATHS.find(function (path) { return learningPathContains(path, target); }) || null;
       }
 
       function learningPathEntries(path, includeOptional) {
@@ -3383,10 +3384,9 @@
         certificationMode = !!(certificationTrack && certificationTrackContains(certificationTrack, lessonPath));
         certificationSupplementalMode = !!(certificationOriginTrack && !certificationMode);
         learningPath = !certificationMode && !certificationSupplementalMode
-          ? (requestedLearningPathId ? findLearningPath(requestedLearningPathId) : inferLearningPath(lessonPath))
+          ? findLearningPath(requestedLearningPathId)
           : null;
         learningPathMode = !!(learningPath && learningPathContains(learningPath, lessonPath));
-        if (learningPathMode && !incomingLearningPathId) replaceLearningPathInUrl(learningPath.id);
 
         syncCertificationQuizProgressVersion();
 
@@ -3559,7 +3559,8 @@
             pathReturnHref = '/learning-paths.html#career-route-' + encodeURIComponent(learningPath.id);
             pathReturnLabel = '返回职业路线';
           }
-          var pathHtml = '<div class="sidebar-phase-nav"><a href="' + pathReturnHref + '">&larr; ' + pathReturnLabel + '</a></div>';
+          var pathHtml = '<div class="sidebar-phase-nav"><a href="' + pathReturnHref + '">&larr; ' + pathReturnLabel + '</a>' +
+            '<a href="' + lessonHref(lessonPath) + '">阶段视图</a></div>';
           var requiredPathLessons = flatLessons.filter(function (item) { return item.required !== false; });
           var optionalPathLessons = flatLessons.filter(function (item) { return item.required === false; });
           pathHtml += '<div class="sidebar-phase-header">' + escapeHtml(learningPath.title || learningPath.id) + ' · ' + requiredPathLessons.length + ' 节课</div>';
@@ -3856,6 +3857,7 @@
 
       function disposeRenderedLesson(root) {
         if (window.AIFSHighlights) window.AIFSHighlights.unmount();
+        if (window.AIFSWalkthrough) window.AIFSWalkthrough.unmount();
         if (window.AIFSFigureRuntime && root) window.AIFSFigureRuntime.disposeRoot(root);
         disposeTocRuntime();
         mermaidRenderSeq++;
@@ -4150,6 +4152,7 @@
             title: (article.querySelector("h1") || {}).textContent || document.title
           });
         }
+        if (article && window.AIFSWalkthrough) window.AIFSWalkthrough.mount(article, { path: lessonPath });
 
         document.querySelectorAll('a[href^="#"]').forEach(function (link) {
           link.addEventListener('click', function (e) {
@@ -4849,73 +4852,51 @@
         }
       }
 
+      function lessonSectionHeadings(article) {
+        return Array.prototype.slice.call(article.querySelectorAll('h2')).filter(function (heading) {
+          return !heading.closest('#aiPanels, #lessonActionPanel');
+        });
+      }
+
+      function insertQuizAt(article, headings, index, html) {
+        if (!html) return;
+        if (index < headings.length) {
+          headings[index].insertAdjacentHTML('beforebegin', html);
+          return;
+        }
+        var panels = article.querySelector('#aiPanels');
+        if (panels) panels.insertAdjacentHTML('beforebegin', html);
+        else article.insertAdjacentHTML('beforeend', html);
+      }
+
       function renderQuiz(data) {
-        var questions = data.questions || data;
-        if (!questions || !questions.length) return;
+        var questions = data && (data.questions || data);
+        if (!Array.isArray(questions) || !questions.length) return;
         lessonQuizCorrectAnswers = Object.create(null);
 
         var article = document.querySelector('.lesson-article');
         if (!article) return;
+        article.querySelectorAll('.quiz-section').forEach(function (section) { section.remove(); });
 
-        function findH2(selectors, zhTexts) {
-          var el = article.querySelector(selectors);
-          if (el) return el;
-          var h2s = article.querySelectorAll('h2');
-          for (var i = 0; i < h2s.length; i++) {
-            var t = h2s[i].textContent.trim();
-            for (var j = 0; j < zhTexts.length; j++) {
-              if (t === zhTexts[j] || t.indexOf(zhTexts[j]) >= 0) return h2s[i];
-            }
-          }
-          return null;
-        }
+        var headings = lessonSectionHeadings(article);
+        var headingInfo = headings.map(function (heading) {
+          return { id: heading.id || '', text: (heading.textContent || '').trim() };
+        });
+        var place = MDRender.quizPlacement(headingInfo);
+        var pre = questions.filter(function (question) { return question.stage === 'pre'; });
+        var check = questions.filter(function (question) { return question.stage === 'check'; });
+        var post = questions.filter(function (question) { return question.stage === 'post'; });
 
-        var conceptH2 = findH2('#the-concept, #concept', ['核心概念', '概念', 'The Concept']);
-        var buildH2 = findH2('#build-it, #build', ['动手构建', '构建', 'Build It']);
-        var keyTermsH2 = findH2('#key-terms', ['核心术语', '关键术语', '术语', 'Key Terms']);
-
-        var preQuizHtml = buildQuizHtml(questions.filter(function (q) { return q.stage === 'pre'; }), 'pre', '课前检测');
-        var checkQuizHtml = buildQuizHtml(questions.filter(function (q) { return q.stage === 'check'; }), 'check', '课中检测');
-        var postQuizHtml = buildQuizHtml(questions.filter(function (q) { return q.stage === 'post'; }), 'post', '课后测验');
-
-        if (!preQuizHtml && !checkQuizHtml && !postQuizHtml) {
-          var allHtml = buildQuizHtml(questions, 'all', '测验');
-          if (allHtml && keyTermsH2) {
-            keyTermsH2.insertAdjacentHTML('beforebegin', allHtml);
-          } else if (allHtml) {
-            article.insertAdjacentHTML('beforeend', allHtml);
-          }
-          restoreQuizAnswers();
-          return;
-        }
-
-        if (preQuizHtml && conceptH2) {
-          conceptH2.insertAdjacentHTML('beforebegin', preQuizHtml);
-        } else if (preQuizHtml && buildH2) {
-          buildH2.insertAdjacentHTML('beforebegin', preQuizHtml);
-        }
-
-        // Mid-lesson check: land between Build It and Use It if possible,
-        // otherwise fall back to before Use It / Ship It / Key Terms.
-        var useH2 = findH2('#use-it, #use', ['实际使用', '上手使用', '使用', 'Use It']);
-        var shipH2 = findH2('#ship-it, #ship', ['拿去用', '交付', '部署', 'Ship It']);
-        if (checkQuizHtml && useH2) {
-          useH2.insertAdjacentHTML('beforebegin', checkQuizHtml);
-        } else if (checkQuizHtml && shipH2) {
-          shipH2.insertAdjacentHTML('beforebegin', checkQuizHtml);
-        } else if (checkQuizHtml && keyTermsH2) {
-          keyTermsH2.insertAdjacentHTML('beforebegin', checkQuizHtml);
-        } else if (checkQuizHtml) {
-          article.insertAdjacentHTML('beforeend', checkQuizHtml);
-        }
-
-        if (postQuizHtml && keyTermsH2) {
-          keyTermsH2.insertAdjacentHTML('beforebegin', postQuizHtml);
-        } else if (postQuizHtml) {
-          article.insertAdjacentHTML('beforeend', postQuizHtml);
+        if (!pre.length && !check.length && !post.length) {
+          insertQuizAt(article, headings, place.post, buildQuizHtml(questions, 'all', '测验'));
+        } else {
+          insertQuizAt(article, headings, place.pre, buildQuizHtml(pre, 'pre', '课前检测'));
+          insertQuizAt(article, headings, place.check, buildQuizHtml(check, 'check', '课中检测'));
+          insertQuizAt(article, headings, place.post, buildQuizHtml(post, 'post', '课后测验'));
         }
 
         restoreQuizAnswers();
+        restoreHeadingHash();
       }
 
       function buildQuizHtml(questions, id, title) {
@@ -5466,11 +5447,13 @@
       }
 
       function getQuizQuestions() {
-        var pathLower = (lessonPath || '').toLowerCase();
-        var lessonName = '';
-        if (currentLessonIndex >= 0) lessonName = flatLessons[currentLessonIndex].lessonName;
+        var pathParts = (lessonPath || '').toLowerCase().split('/');
+        var phaseTokens = pathParts[0] === 'phases' && pathParts[1] ? pathParts[1].split('-') : [];
+        function phaseHas(words) {
+          return words.some(function (word) { return phaseTokens.indexOf(word) >= 0; });
+        }
 
-        if (pathLower.indexOf('math') >= 0 || pathLower.indexOf('linear-algebra') >= 0 || pathLower.indexOf('calculus') >= 0) {
+        if (phaseHas(['math', 'linear', 'algebra', 'calculus'])) {
           return [
             { q: '点积衡量的是两个向量之间的什么？', opts: ['它们的和', '它们的对齐程度', '它们的叉积', '它们之间的距离'], answer: 1, explain: '点积衡量两个向量的相似度或对齐程度。当它为零时，两个向量正交。' },
             { q: '函数的梯度指向哪个方向？', opts: ['最小值', '上升最陡的方向', '最近的鞍点', '随机方向'], answer: 1, explain: '梯度始终指向函数增长最快的方向。梯度下降沿梯度的反方向移动以寻找极小值。' },
@@ -5478,7 +5461,7 @@
           ];
         }
 
-        if (pathLower.indexOf('ml') >= 0 || pathLower.indexOf('regression') >= 0 || pathLower.indexOf('classification') >= 0 || pathLower.indexOf('supervised') >= 0) {
+        if (phaseHas(['ml', 'regression', 'classification', 'supervised'])) {
           return [
             { q: '在机器学习中，损失函数的作用是什么？', opts: ['生成数据', '衡量预测有多错', '选择特征', '划分数据'], answer: 1, explain: '损失函数量化预测值与真实值之间的差异。优化器在训练过程中最小化这个值。' },
             { q: '为什么要把数据划分为训练集和测试集？', opts: ['为了节省内存', '为了在未见过的数据上评估泛化能力', '为了让训练更快', '为了减小数据集规模'], answer: 1, explain: '测试集相当于未见过的数据，能揭示模型是死记硬背了训练数据，还是学到了可泛化的规律。' },
@@ -5486,7 +5469,7 @@
           ];
         }
 
-        if (pathLower.indexOf('deep-learning') >= 0 || pathLower.indexOf('neural') >= 0 || pathLower.indexOf('backprop') >= 0 || pathLower.indexOf('activation') >= 0) {
+        if ((phaseHas(['deep']) && phaseHas(['learning'])) || phaseHas(['neural', 'backprop', 'activation', 'vision'])) {
           return [
             { q: '反向传播计算的是什么？', opts: ['前向预测', '损失相对于每个权重的梯度', '学习率', '新的训练数据'], answer: 1, explain: '反向传播利用链式法则计算每个权重对误差的贡献，然后据此调整权重。' },
             { q: '为什么神经网络需要非线性激活函数？', opts: ['为了加速训练', '没有它，堆叠多层等价于单个线性层', '为了减少内存占用', '为了归一化输出'], answer: 1, explain: '没有非线性，任何线性层的组合都会坍缩成单个线性变换。ReLU 等激活函数让网络能学习复杂模式。' },
@@ -5494,7 +5477,7 @@
           ];
         }
 
-        if (pathLower.indexOf('llm') >= 0 || pathLower.indexOf('transformer') >= 0 || pathLower.indexOf('attention') >= 0 || pathLower.indexOf('tokeniz') >= 0 || pathLower.indexOf('fine-tun') >= 0) {
+        if (phaseHas(['llm', 'llms', 'transformer', 'transformers', 'attention', 'nlp', 'tokenization'])) {
           return [
             { q: '自注意力让 Transformer 能做什么？', opts: ['按顺序处理 token', '衡量每个 token 相对于其他所有 token 的重要性', '减小词表大小', '压缩模型'], answer: 1, explain: '自注意力在所有位置之间计算成对相关性得分，让模型无需循环结构即可关联相距很远的 token。' },
             { q: '为什么 LLM 使用分词器而不是原始字符？', opts: ['字符太大', 'token 把高频模式压缩成单个单元，从而缩短序列长度', '分词器训练更快', '字符无法被嵌入'], answer: 1, explain: 'BPE 等子词分词器在词表大小和序列长度之间取得平衡，把常见词作为单个 token，把生僻词拆成片段处理。' },
@@ -5502,7 +5485,7 @@
           ];
         }
 
-        if (pathLower.indexOf('rag') >= 0 || pathLower.indexOf('retrieval') >= 0 || pathLower.indexOf('embed') >= 0 || pathLower.indexOf('vector') >= 0) {
+        if (phaseHas(['rag', 'retrieval', 'embeddings', 'vector'])) {
           return [
             { q: 'RAG 的核心思想是什么？', opts: ['训练一个更大的模型', '在生成回答之前检索相关上下文', '使用更多 GPU', '减小模型规模'], answer: 1, explain: 'RAG（检索增强生成）把 LLM 的回答建立在检索到的文档之上，减少幻觉，并且无需重新训练就能更新知识。' },
             { q: '嵌入模型产出的是什么？', opts: ['文本摘要', '文本的稠密向量表示', 'token 数量', '语法纠正'], answer: 1, explain: '嵌入模型把文本映射到固定维度的向量，其中语义相似度对应几何上的接近程度。' },
@@ -5510,7 +5493,7 @@
           ];
         }
 
-        if (pathLower.indexOf('agent') >= 0 || pathLower.indexOf('tool') >= 0 || pathLower.indexOf('mcp') >= 0) {
+        if (phaseHas(['agent', 'agents', 'tool', 'tools', 'mcp', 'protocols', 'autonomous', 'swarms'])) {
           return [
             { q: 'AI 智能体与普通聊天机器人的区别是什么？', opts: ['智能体更快', '智能体能自主采取行动并使用工具', '智能体使用更大的模型', '没有区别'], answer: 1, explain: '智能体有一个循环：观察、决策、行动。它能调用工具、读取文件、搜索网络，并串联多个步骤来完成复杂任务。' },
             { q: '什么是 MCP（模型上下文协议）？', opts: ['一种模型训练格式', '一种把 AI 模型连接到工具和数据源的标准化协议', '一种压缩算法', '一种测试框架'], answer: 1, explain: 'MCP 在 AI 助手与外部工具/数据之间提供通用接口，用标准协议取代一次性的定制集成。' },
@@ -5518,7 +5501,7 @@
           ];
         }
 
-        if (pathLower.indexOf('eval') >= 0 || pathLower.indexOf('safety') >= 0 || pathLower.indexOf('alignment') >= 0 || pathLower.indexOf('deploy') >= 0) {
+        if (phaseHas(['eval', 'evals', 'safety', 'alignment', 'ethics', 'deploy', 'production'])) {
           return [
             { q: '为什么评测（eval）对生产级 AI 系统至关重要？', opts: ['为了省钱', '为了在改动前后客观地衡量性能', '为了把模型做得更大', '评测是可选的'], answer: 1, explain: '评测是 AI 工程的测试。没有它，你无法知道一次改动是提升了还是退化了质量。每次代码变更都应该跑评测。' },
             { q: '在 AI 安全中，“对齐”是什么意思？', opts: ['对齐屏幕上的文字', '确保 AI 系统按照人类的意图和价值观行事', '让模型更快', '使用相同的训练数据'], answer: 1, explain: '对齐确保 AI 系统在能力越来越强的同时，依然保持有用、诚实、无害，按照人类的目标行事。' },
@@ -5533,19 +5516,6 @@
         ];
       }
 
-      function lessonQuizPanelQuestions(data) {
-        var source = data && (data.questions || data);
-        if (!Array.isArray(source)) return [];
-        var valid = source.filter(function (q) {
-          return q && q.question && Array.isArray(q.options) &&
-            typeof q.correct === 'number' && q.correct >= 0 && q.correct < q.options.length;
-        });
-        var post = valid.filter(function (q) { return q.stage === 'post'; });
-        return (post.length ? post : valid).slice(0, 3).map(function (q) {
-          return { q: q.question, opts: q.options, answer: q.correct, explain: q.explanation || '' };
-        });
-      }
-
       function renderQuizPanel(container) {
         var panel = document.createElement('div');
         panel.className = 'ai-panel';
@@ -5555,8 +5525,12 @@
         if (lessonQuizPromise) {
           lessonQuizPromise.then(function (data) {
             if (!panel.parentNode) return;
-            var questions = lessonQuizPanelQuestions(data);
-            fillQuizPanel(panel, questions.length ? questions : getQuizQuestions());
+            var questions = MDRender.quizPanelQuestions(data);
+            if (questions && !questions.length) {
+              panel.remove();
+              return;
+            }
+            fillQuizPanel(panel, getQuizQuestions());
           });
         } else {
           fillQuizPanel(panel, getQuizQuestions());

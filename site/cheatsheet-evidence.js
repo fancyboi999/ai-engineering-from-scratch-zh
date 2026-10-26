@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const EVIDENCE_DIR = 'cheatsheets/evidence';
-const UPSTREAM_REVISION = '45fa4084de6ba2f88fa96a41e69efa2166f868b3';
+const UPSTREAM_REVISIONS = new Set(['45fa4084de6ba2f88fa96a41e69efa2166f868b3', '3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a']);
 const SHARED_FILES = new Set(['cheatsheets/topics.yaml']);
 const PAIR = /(?:^|[\s,;:(])([A-Za-z0-9][A-Za-z0-9_]*(?:\/[A-Za-z0-9_]+)?)\s*=\s*((?:\.\.\.\/)?[A-Za-z0-9_][A-Za-z0-9_.\-/]*)/g;
 const END = '(?![\\d:/A-Za-z_-]|\\.[\\dA-Za-z])';
@@ -159,20 +159,23 @@ function checkEvidence(map, topics, root) {
     refs += parsed.sections.reduce((sum, section) => sum + section.refs.length, 0);
     let sourceRoot = root;
     if (parsed.revisions.length) {
-      if (parsed.revisions.length !== 1 || parsed.revisions[0] !== UPSTREAM_REVISION) {
-        problems.push(`${file}: upstream_revision must be exactly ${UPSTREAM_REVISION}`);
+      if (parsed.revisions.length !== 1 || !UPSTREAM_REVISIONS.has(parsed.revisions[0])) {
+        problems.push(`${file}: upstream_revision must be exactly one of ${[...UPSTREAM_REVISIONS].join(', ')}`);
         continue;
       }
       // Frozen English path:line references describe the recorded upstream source,
       // not the translated files, whose line numbers may differ.
-      sourceRoot = process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT;
-      if (!sourceRoot) {
+      const roots = (process.env.AIFS_CHEATSHEET_EVIDENCE_ROOTS || process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT || '').split(path.delimiter).filter(Boolean);
+      if (!roots.length) {
         problems.push(`${file}: AIFS_CHEATSHEET_EVIDENCE_ROOT is required for frozen upstream evidence`);
         continue;
       }
-      const marker = path.join(sourceRoot, '.aifs-upstream-revision');
-      if (!fs.existsSync(marker) || !fs.statSync(marker).isFile() || fs.readFileSync(marker, 'utf8').trim() !== UPSTREAM_REVISION) {
-        problems.push(`${file}: the evidence source root must contain .aifs-upstream-revision matching ${UPSTREAM_REVISION}`);
+      sourceRoot = roots.find(root => {
+        const marker = path.join(root, '.aifs-upstream-revision');
+        return fs.existsSync(marker) && fs.statSync(marker).isFile() && fs.readFileSync(marker, 'utf8').trim() === parsed.revisions[0];
+      });
+      if (!sourceRoot) {
+        problems.push(`${file}: the evidence source root must contain .aifs-upstream-revision matching ${parsed.revisions[0]}`);
         continue;
       }
     }

@@ -78,6 +78,11 @@ frontmatter 的 `name`、`description`、`phase`、`lesson` 应与用途及所�
 
 ## 提交 Pull Request
 
+手册、速查表和编程练习分别遵循 [手册契约](manuals/AUTHORING.md)、[速查表契约](cheatsheets/AUTHORING.md) 和 [练习契约](practice/AUTHORING.md)。
+它们使用独立清单与构建器，不计入 README 与 ROADMAP 的核心课数。
+练习检查器应拒绝空实现和每个已登记的错误实现；题面、提示、解析与学习者可见反馈使用简体中文，函数签名与机器枚举保持不变。
+手册子标题需要保留跨页引用的稳定锚点。翻译标题时，用现有显式锚点语法保存所属章节前缀和原始标题 slug，并运行手册审计。
+
 1. 从最新 `main` 创建分支，完成一个明确目标的改动。
 2. 按 [AGENTS.md](AGENTS.md#本地验证) 运行受影响的检查。完整 CI 命令见 [build.yml](.github/workflows/build.yml)。
 3. 站点改动先构建，再按 [AGENTS.md 的预览方式](AGENTS.md#本地验证) 在浏览器中检查受影响页面和交互。
