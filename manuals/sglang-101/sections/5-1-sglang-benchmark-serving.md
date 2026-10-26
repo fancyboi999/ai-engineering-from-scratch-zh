@@ -6,7 +6,7 @@
 
 读完本节，你能为 `sglang.benchmark.serving` 的设置给出理由，读懂报告每一行，并找出继续增加并发不再划算的拐点。你也能区分哪些测量结论可推广到 GPU，哪些不能。
 
-## 我们运行的命令
+## 我们运行的命令 {#s-sglang-benchmark-serving-the-command-we-ran}
 
 服务器在捕获记录使用的 Mac 上以单个进程运行 `mlx-community/Qwen3-0.6B-4bit`。本节所有运行都连接这台服务器。
 
@@ -31,7 +31,7 @@ python -m sglang.benchmark.serving --backend sglang --port 30000 \
 
 **路径变了。** 基准工具在 2026-06 移入 `sglang.benchmark` 包。`python -m sglang.bench_serving` 仍可作为弃用别名，导入新模块。但 `python -m sglang.bench_one_batch` 和 `python -m sglang.bench_offline_throughput` 在 v0.5.22 已无法运行。[PR #40795](https://github.com/sgl-project/sglang/pull/40795) 在 2026-09-22 删除了这两个别名 {{code}}。教程若还使用这两条路径，就针对旧版本，它的其他参数也值得怀疑。
 
-## 四个改变结果的默认值
+## 四个改变结果的默认值 {#s-sglang-benchmark-serving-four-defaults-that-change-the-result}
 
 客户端在开始测量前就做了选择。每项都会改变最终报告的数字，多数公开基准却不说保留了哪些默认值。
 
@@ -46,7 +46,7 @@ python -m sglang.benchmark.serving --backend sglang --port 30000 \
 
 **我们的建议：** 每次都传 `--random-range-ratio 1.0`，否则就在结果旁写明长度分布。隐藏长度的基准无法与其他结果比较。
 
-## 分块阅读报告
+## 分块阅读报告 {#s-sglang-benchmark-serving-read-the-report-block-by-block}
 
 ```listing
 title: 并发上限 8 的报告
@@ -100,7 +100,7 @@ claim: Concurrency 和 Peak concurrent requests 都由运行后的请求时间�
 caption: 每行从左向右读：报告字段、calculate_metrics 中的公式、上限 8 时的实测值。橄榄色框为客户端测量。来源：capture/out/bench-random-c8.txt 和 v0.5.22 基准模块。
 ```
 
-## 扫描与拐点
+## 扫描与拐点 {#s-sglang-benchmark-serving-the-sweep-and-the-knee}
 
 一次运行只能给出一个点。分别把上限设为 1、8、32 的三次运行，才能展示曲线形状。
 
@@ -122,9 +122,9 @@ caption: 左侧为各上限下的每秒输出 token 数，右侧为相同上限�
 
 拐点就是吞吐量停止增长的并发上限。这台机器的拐点在 8 或更低。越过拐点后，服务器已没有空闲算力可分配，新请求只能争用同样的 decode 步骤。[第 2.2 节](#s-the-scheduler-loop-and-schedule-policy) 的调度器仍会接纳它们，因为这台 Mac 的准入上限为 `max_running_requests=4096`。
 
-**哪些结论可推广到 GPU。** 绝对数字不能。Apple silicon 上的 0.6B 模型无法说明 H100 的表现。但曲线形状可以推广：每台服务器都有拐点，越过后延迟增长快于吞吐量，而默认准入上限远高于它。
+**哪些结论可推广到 GPU。** 绝对数字不能。Apple silicon 上的 0.6B 模型无法说明 H100 的表现。但在我们测过的服务器上，曲线形状相同：每台都有延迟拐点，越过后延迟增长快于吞吐量，而默认准入上限远高于它。
 
-## 把同样的 GPU 扫描当作实验运行
+## 把同样的 GPU 扫描当作实验运行 {#s-sglang-benchmark-serving-the-same-sweep-on-a-gpu-run-as-an-experiment}
 
 GPU 上的一次运行告诉了我们一件错事。GPU 工具在 NVIDIA GB10 上启动 Qwen3-30B-A3B 默认服务器，每种上限只运行一次。
 
@@ -146,7 +146,7 @@ sglang serve --model-path Qwen/Qwen3-30B-A3B-Instruct-2507 --host 127.0.0.1 --po
 | 8 | 677.61 ms | 209.98 ms (185.25 至 216.02) |
 | 32 | 390.38 ms | 416.37 ms (338.06 至 434.64) |
 
-**我们在 GB10 上测得两组结果，但来自不同服务器。** 单次工具运行的池容量为 227,243 token，采集日期为 2026-10-17。扫描服务器的池容量为 234,600 token，采集日期为 2026-10-16。后续扫描没有重现 677.61 ms。从上限 2 起，首 token 随上限增大而变慢，符合队列预期。
+**我们在同一台 GB10 上测得两组结果，但来自两个不同的服务器。** 单次工具运行的池容量为 227,243 token，采集日期为 2026-10-17。扫描服务器的池容量为 234,600 token，采集日期为 2026-10-16。后续三次运行都没有重现 677.61 ms。从上限 2 起，首 token 随上限增大而变慢，符合队列预期。
 
 后来我们从单次工具运行的服务器日志中找到了异常原因：工具为每次运行使用 seed 7，也没有清理前缀缓存。使用同一种子时，客户端每次都会发送相同的首批 prompt {{code}}。因此每次运行都可能从前一次运行的缓存命中 prompt：
 
@@ -154,7 +154,7 @@ sglang serve --model-path Qwen/Qwen3-30B-A3B-Instruct-2507 --host 127.0.0.1 --po
 title: 一次从缓存命中 prompt 的扫描
 source: capture/gpu/out-gb10/server-default.log
 lang: text
-note: cap 32 的工具运行中三行 prefill 日志。前两行各有 29 个请求，只需要计算一个新 token；第三行是第一个缓存中没有的 prompt。长行已截断。
+note: cap 32 的工具运行中三行 prefill 日志。前两行合计接纳 29 个请求，每个只需一个新 token；第三行是首个缓存中没有的 prompt。各行末尾已省略。
 ---
 [2026-10-17 14:23:00] Prefill batch, #new-seq: 14, #new-token: 14, #cached-token: 6879, token usage: 0.07, …
 [2026-10-17 14:23:00] Prefill batch, #new-seq: 15, #new-token: 15, #cached-token: 7634, token usage: 0.07, …
@@ -171,9 +171,9 @@ claim: 每个点三个 seed 的结果接近，因此曲线代表测量，曲线�
 caption: 每条曲线从左向右读，代表一种服务器配置。色带表示三个 seed 的最小和最大值。Qwen3-30B-A3B，输入 512、输出 128 token。来源：capture/gpu/summary/gb10.json。
 ```
 
-图中最宽的区间是上限 8 时的 EAGLE-3，范围 86.93 至 107.23 tok/s。其他区间都在各自中位数约 10% 以内。相对于这种波动，两倍差距是可信的。上限 64 时，FP8 为 440.86 tok/s，BF16 为 235.38。关闭 CUDA graphs 的曲线与默认曲线重合，原因见[第 4.1 节](#s-forwardmode-and-cuda-graphs)。
+图中最宽的区间是上限 8 时的 EAGLE-3，范围 86.93 至 107.23 tok/s。其他区间都在各自中位数约 10% 以内。相对于这种波动，1.9 倍的差距是可信的。上限 64 时，FP8 为 440.86 tok/s，BF16 为 235.38。关闭 CUDA graphs 的曲线与默认曲线重合，原因见[第 4.1 节](#s-forwardmode-and-cuda-graphs)。
 
-### 中位数隐藏了两类请求
+### 中位数隐藏了两类请求 {#s-sglang-benchmark-serving-a-median-hides-two-populations}
 
 `--output-details` 写出每个请求的首 token 时间。我们将上限 16、三个 seed 的所有请求排序后画图。
 
@@ -187,11 +187,31 @@ caption: 每条曲线从汇总请求中抽取 51 个分位数绘制，从最快�
 
 **我们在 GB10 上测到了两组请求。** BF16 中，最快一半请求的首 token 为 186.3 至 211.8 ms。从第 68 百分位开始，等待时间升至 1,639.8 至 1,743.4 ms。中位数为 237.6 ms，P90 为 1,721.5 ms，是中位数的 7.2 倍。FP8 也分两组。快的一半为 122.7 至 139.5 ms，慢的一半为 589.9 至 1,162.2 ms。
 
-EAGLE-3 的中位数最慢，为 579.3 ms，尾部却最短，P90 为 1,007.4 ms。它的每 token 耗时分布反而最宽：中位数 82.8 ms，P99 191.3 ms。因为每一步接受的草稿 token 数会变化。
+EAGLE-3 的中位数最慢，为 579.3 ms，尾部却最短，P90 为 1,007.4 ms。它的每 token 耗时分布反而最宽：中位数 82.8 ms，P98 191.3 ms。因为每一步接受的草稿 token 数会变化。
 
 **我们对两组请求的解释：负载造成了它们。** `--random-range-ratio 1.0` 固定长度，每个请求恰好要求 128 个 token。因此一起开始的请求一起结束，替补请求也一起到达。每一波都排在前面的请求之后等待 prefill。真实流量长度混杂。如果使用固定长度测试，应将 P90 理解为突发流量成本，而非普通请求成本。
 
-### 我们在 L4 上检验了波次假设
+前缀缓存提供了另一种解释，我们无法排除。扫描也为同一配置的所有运行保留了同一台服务器，未清空缓存。每个 seed 在各并发上限都会发送相同的首批 prompt。上限 16 时，64 个 prompt 中有 32 个来自上限 8 的运行。如果它们仍在池中，就有一半请求跳过了 prefill。我们没有保留扫描的完整服务器日志，因此无法统计命中数。
+
+我们在 L4 上检验了这个解释，没有在 GB10 上检验。2026-10-23，我们对 Qwen3-8B 运行负载扫描，每次运行前清空缓存，并将时钟锁定在 900 MHz。我们将其与同一会话中未清空缓存的运行比较：
+
+```listing
+title: L4 在 900 MHz 下运行 Qwen3-8B，清空与不清空缓存的 TTFT 中位数
+source: capture/gpu/out-l4/load-flushed-vs-unflushed.txt
+lang: text
+note: TTFT 中位数行。省略达标请求占比和 P99 ITL 行。
+---
+median TTFT, flushed against unflushed
+users   vLLM                                   SGLang
+4       650 / 145 ms (4.5x)                    532 to 645 / 141 ms (3.8 to 4.6x)
+8       951 to 978 / 264 to 274 ms (3.6x)      1,174 to 1,273 / 173 to 178 ms (6.6 to 7.3x)
+16      1,550 to 1,587 / 294 to 295 ms (5.3x)  1,804 to 1,944 / 218 ms (8.3 to 8.9x)
+…
+```
+
+L4 上，在 4 至 16 用户时，清空缓存使 SGLang 的 TTFT 中位数增至原来的 4 至 9 倍。每 token 耗时的变化不到 10%。因此在 L4 上，缓存造成了大部分快请求。我们没有重跑 GB10 扫描，所以那里的两种解释仍都不能排除。
+
+### 我们在 L4 上检验了波次假设 {#s-sglang-benchmark-serving-we-tested-the-waves-on-an-l4}
 
 只有改变被归因的变量，解释才能超出假设。我们在单张 L4 上运行 Qwen3-8B，上限 16，64 个 prompt，每个点三个 seed。只改变 `--random-range-ratio`，从 1.0 到 0.5，再到 0.0。
 
@@ -224,13 +244,46 @@ caption: 实线为 TTFT 中位数，虚线为 P99 token 间延迟，每个点三
 | 0.5 | 364 ms | 396 ms | 130 ms | 95 ms |
 | 0.0 | 291 ms | 300 ms | 129 ms | 95 ms |
 
-**我们测得**固定长度下，BF16 首 token 慢了 6.9 倍，FP8 慢了 11.8 倍。混合长度发送的 token 更少，seed 1 的输入为 17,870，而非 32,768，因此部分差距来自工作量减少。但它解释不了另一个结果：混合长度下，P99 ITL 从 82 升至 300 ms。新 prompt 逐个到达，每次 prefill 都打断运行中的 decode；固定长度则只在波次之间做 prefill。
+**我们测得**固定长度下，BF16 首 token 耗时为混合长度的 6.9 倍，FP8 为 11.8 倍。FP8 在这两个比例下的运行，其时钟中位数分别为 1,185 和 2,040 MHz。因此，FP8 倍数差距有一部分来自时钟。混合长度发送的 token 更少。seed 1 在比例 0.0 下发送 17,870 个输入 token，比例 1.0 下则为 32,768。因此，部分差距来自工作量减少。
 
-GB10 上的 Qwen3-30B-A3B 也呈现相同形状，每个点使用三个 seed。固定长度下，BF16 的 TTFT 中位数为 1,650 ms，P99 ITL 为 169 ms。混合长度时，它们分别为 320 ms 和 230 ms。FP8 的对应数值从 1,050 ms 和 92 ms 变为 188 ms 和 127 ms。两张 GPU、两个模型都呈现相同取舍，说明原因在负载，而非硬件。
+缓存还能解释另一部分。每个 seed 都先运行比例 1.0，从空缓存开始。随后运行比例 0.5 和 0.0。后两次运行的每个 prompt，都是比例 1.0 时某个 prompt 的开头部分。BF16 的池容量为 24,094 token，只能容纳那次运行 32,768 个 token 的一部分。FP8 的池容量为 142,369 token，能全部容纳。
+
+工作量减少和缓存都解释不了结果的另一面。混合长度下，P99 ITL 从 82 升至 300 ms。新 prompt 逐个到达，每次 prefill 都打断运行中的 decode；固定长度则只在波次之间做 prefill。
+
+GB10 上的 Qwen3-30B-A3B 也呈现相同形状，每个点使用三个 seed。固定长度下，BF16 的 TTFT 中位数为 1,650 ms，P99 ITL 为 169 ms。混合长度时，它们分别为 320 ms 和 230 ms。FP8 的对应数值从 1,050 ms 和 92 ms 变为 188 ms 和 127 ms。两张 GPU、两个模型都呈现相同取舍，因此在我们的这两台机器上，这种取舍来自负载，而非硬件。
 
 两种设置实际测了两种不同服务形态。固定长度测突发：首 token 慢，之后输出平滑。混合长度测稳定流量：首 token 快，流式输出中有停顿。比较两个构建时保留 `--random-range-ratio 1.0`，因为它精确可重复。但用它制定延迟目标前，也要测试真实长度分布。
 
-## Goodput 找到吞吐量隐藏的拐点
+## 每次运行之间重置前缀缓存 {#s-sglang-benchmark-serving-reset-the-prefix-cache-between-runs}
+
+一次运行结束后，前缀缓存仍保留先前 prompt 的 KV。它会改变下次运行的两件事：速度，有时还包括贪心输出，见[第 4.6 节](#s-deterministic-inference-and-logprobs)。
+
+为了观察对速度的影响有多大，我们用相同 seed 连续运行四次相同负载。模型为 `Qwen/Qwen3-0.6B`，64 个 prompt，上限 16，输入 512、输出 128 token。使用的是 L4 节点上的第二张 GPU，其拥有者会共享使用，而且没有锁定时钟。因此应看倍数，而非绝对时间。
+
+```listing
+title: 相同负载连续运行四次的 TTFT 中位数，单位 ms
+source: capture/gpu/out-l4/prefix-cache-flush.txt
+lang: text
+note: 汇总中的 SGLang 行。省略 vLLM 行。
+---
+engine        fresh   repeat, not flushed   repeat after a flush   repeat, not flushed
+SGLang 0.6B   394     82.5                  289                    77
+…
+```
+
+未清空缓存的重复运行，其 TTFT 中位数约为首次运行的 1/4.8。清空缓存后，TTFT 回到接近首次运行的水平。每 token 耗时变化不到 15%。
+
+对需要相互比较的每次运行，使用以下流程：
+
+1. 每次运行从空缓存开始。向 `sglang.benchmark.serving` 传入 `--flush-cache`，它会在预热请求后调用 `/flush_cache` {{code}}。也可以自行调用 `POST /flush_cache`，或重启服务器。
+2. 检查清空操作确已执行。只有没有请求运行或等待时，服务器才会清空缓存。否则路由返回 HTTP 400，日志显示 `Cache not flushed because there are pending requests` {{code}}。
+3. 每次运行使用新的 `--seed`，让客户端发送新的 prompt。
+4. 记录缓存 token 数。在运行前后读取 `/metrics` 的 `sglang:cached_tokens_total`。设置 `--enable-cache-report` 后，每个 OpenAI 风格响应还会提供 `usage.prompt_tokens_details.cached_tokens`。
+5. 在结果旁写明缓存设置和缓存 token 数。
+
+我们的捕获工具和扫描没有遵循这个流程。每台服务器上，每个 seed 只有第一次运行从空缓存开始。本页后续的 TTFT 数字可能偏低，尤其是 GB10：它的池能容纳我们发送的所有 prompt。每 token 耗时受到的影响较小，因为缓存命中消除了 prefill 工作，却没有改变 decode 工作。
+
+## Goodput 找到吞吐量隐藏的拐点 {#s-sglang-benchmark-serving-goodput-finds-the-knee-that-throughput-hides}
 
 GB10 的 KV 池可容纳 234,600 个 token，因此 BF16 吞吐量到上限 64 仍在上升。没有拐点的吞吐量曲线不能告诉你哪里该停，延迟目标可以。
 
@@ -239,7 +292,7 @@ GB10 的 KV 池可容纳 234,600 个 token，因此 BF16 吞吐量到上限 64 �
 | 上限 | BF16 goodput | BF16 TPOT 中位数 | FP8 goodput | FP8 TPOT 中位数 |
 |---|---|---|---|---|
 | 4 | 0.44 req/s | 71.01 ms | 0.80 req/s | 38.60 ms |
-| 8 | 0 | 102.21 ms | 1.07 req/s | 54.96 ms |
+| 8 | 0，其中一个 seed 最高为 0.04 | 102.21 ms | 1.07 req/s | 54.96 ms |
 | 16 | 0 | 154.24 ms | 1.10 req/s | 81.90 ms |
 | 32 | 0 | 201.91 ms | 0 | 104.12 ms |
 
@@ -269,11 +322,42 @@ claim: L4 上，输入每秒 4 个请求时，FP8 每秒有 3.18 个达标；BF1
 caption: 虚线为每秒完成请求数，实线为达标请求数，色带表示三个 seed 的范围。绿色为 FP8 搭配 FP8 KV 缓存，梅紫色为 BF16。来源：capture/gpu/summary/l4.json 的速率扫描。
 ```
 
-**我们在小卡上测到了不同形状。** 两台服务器在每秒不超过 1 个请求时全部达标。输入速率为 2 时，BF16 每秒还有 0.88 个达标；从 4 起没有达标请求。FP8 在输入 4 时，每秒有 3.18 个达标，是 BF16 最佳点的三倍。
+**我们在小卡上测到了不同形状。** 两台服务器在每秒不超过 1 个请求时全部达标。输入速率为 2 时，BF16 每秒还有 0.88 个达标；从 4 起没有达标请求。FP8 在输入 4 时，每秒有 3.18 个达标，是 BF16 最佳点的三倍。FP8 服务器的池容量也达到 142,369 token，而 BF16 为 24,094。从每秒输入 4 个请求起，BF16 的池就成了限制。
 
 超过峰值后，输入越多，BF16 完成越少：输入 4 时每秒完成 2.01，输入 8 时完成 1.91，输入 16 时完成 1.62。遥测揭示了原因：SM 时钟中位数从输入 4 时的 1,320 MHz，降至输入 16 时的 465 MHz。输入 16 时，70% 采样显示热降频。被动散热显卡过载时，吞吐量与延迟都会受损。
 
-## 每次运行都记录 GPU 时钟
+## 高请求速率下检查客户端 {#s-sglang-benchmark-serving-check-the-client-at-high-rates}
+
+`sglang.benchmark.serving` 用一个 Python 进程，通过 asyncio 发送全部请求 {{code}}。2026 年一项针对基准客户端的研究发现，这类客户端在高请求速率下会形成自己的队列。于是客户端报告的 TTFT 和 TPOT 都高于服务器实际值。该研究改用多进程客户端。
+
+我们没有测量这个效应。我们的开环测试最高为每秒 16 个请求，也没有记录客户端 CPU 使用率。在相信高请求速率下的 TTFT 前，先比较单个客户端进程与两个各发送一半速率的进程。
+
+## 在同一台服务器上比较客户端 {#s-sglang-benchmark-serving-compare-two-clients-on-one-server}
+
+我们的扫描表格使用 `sglang.benchmark.serving`，温度为默认值 0。同一台服务器，另一个客户端可能测出不同数字。2026-10-23，我们让三个客户端连接同一台 vLLM 0.31.0 服务器，模型为 `Qwen/Qwen3-0.6B`。三个客户端分别是设置 `--backend vllm` 的本客户端、`vllm bench serve`，以及后者的 Rust 版本。GPU 是节点上共享使用的第二张 L4。它的时钟受到限制，但所有运行都保持在 420 至 495 MHz。
+
+```listing
+title: 三个客户端各运行两轮的 TTFT 中位数，单位 ms
+source: capture/gpu/out-l4/bench-client-bias.txt
+lang: text
+note: TTFT 表格中温度 0 的行。省略温度 0.7 的行和吞吐量表格。
+---
+users   temperature   SGLang client    vllm bench       vllm bench, Rust
+1       0             154, 164         149, 150         144, 144
+…
+16      0             1,077, 1,045     1,033, 1,027     1,088, 1,038
+…
+64      0             1,688, 1,838     1,624, 1,667     1,674, 1,789
+```
+
+- 本客户端测得的 TTFT 中位数比 `vllm bench serve` 高 3% 至 10%。16 和 64 用户时，测得的输出吞吐量低 2% 至 8%。单用户时，其中一轮的吞吐量高于其他所有轮次，因此这里不报告吞吐量差距。
+- `vllm bench serve` 的 Python 和 Rust 版本差距处于噪声范围内。
+- 各客户端的随机数据集发送不同的 prompt token，因此小幅差距可能有一部分来自 prompt。
+- 温度 0.7 比温度 0 的 TPOT 中位数更高。单用户时高 10% 至 13%，16 和 64 用户时高 3% 至 6%。
+
+因此，两个公开数字之间几个百分点的差距，可能仅来自客户端。每次报告结果都要写明客户端和温度。
+
+## 每次运行都记录 GPU 时钟 {#s-sglang-benchmark-serving-record-the-gpu-clock-with-every-run}
 
 我们在 NVIDIA L4 上的首次扫描报告 CUDA graphs 没有效果。上限 1 时，开关计算图的每 token 耗时中位数都是 103.4 ms。该上限下，三个 seed 的结果为 10.0 至 14.9 tok/s，跨度达到中位数的一半。随后我们在扫描过程中读了 `nvidia-smi`。
 
@@ -289,7 +373,7 @@ index, temperature.gpu, power.draw [W], power.limit [W], clocks.current.sm [MHz]
 
 GPU 温度 87 C，软件热降频已激活，SM 时钟只有 360 MHz，额定值是 2040 MHz。L4 是 72 W 被动散热卡，同一机箱的第二张卡当时也在做其他工作。我们测到的是热 GPU，问题不在上面的服务器。
 
-现在 `capture/gpu/sweep.py` 每秒采样一次 `nvidia-smi`，写入每次运行旁的 `.gpu.csv` 文件。每次运行前最多等 900 s，让 GPU 低于 `--cool` 温度限制，默认 65 C。这个机箱中的 L4 始终降不到 69 C 以下，所以我们用 `--cool 72`。`capture/gpu/summarize.py` 为每个点添加 SM 时钟中位数、最高温度、热降频位为真的采样占比。[图 5.1c](#fig-5-1c) 的 GB10 负载扫描早于遥测采样器，因此它较窄的波动区间是唯一检查依据。
+现在 `capture/gpu/sweep.py` 每秒采样一次 `nvidia-smi`，写入每次运行旁的 `.gpu.csv` 文件。每次运行前最多等 900 s，让 GPU 低于 `--cool` 温度限制，默认 65 C。这个机箱中的 L4 温度偏高，所以我们用 `--cool 72`。`capture/gpu/summarize.py` 为每个点添加 SM 时钟中位数、最高温度、热降频位为真的采样占比。[图 5.1c](#fig-5-1c) 的 GB10 负载扫描早于遥测采样器，因此它较窄的波动区间是唯一检查依据。
 
 我们用相同命令加降温等待，重新扫描 L4。下一张图的玫瑰色曲线是降频扫描。
 
@@ -297,23 +381,23 @@ GPU 温度 87 C，软件热降频已激活，SM 时钟只有 360 MHz，额定值
 id: fig-5-1f
 kind: chart
 title: 同一台服务器、同一张 L4：热卡与降温后测量
-claim: 同卡同命令下，热卡扫描报告的吞吐量最多比降温扫描低 39%。
+claim: 同卡同命令下，热卡扫描报告的吞吐量最多比降温扫描低 28%。
 caption: 蓝色为降至 72 C 且记录时钟的扫描，玫瑰色为无遥测的首次扫描。色带为三个 seed 的范围。Qwen3-8B，输入 512、输出 128 token。来源：capture/gpu/summary/l4.json 和 capture/gpu/summary/l4-throttled.json。
 ```
 
 **我们在 L4 上测到了差异。** 上限 32 时，降温后为 270.11 tok/s，热卡为 194.16 tok/s。上限 1 时，每 token 耗时中位数分别为 60.16 ms 和 103.38 ms。
 
-降温后的运行也没达到全速。SM 时钟中位数为 1,080 至 1,515 MHz，额定值 2,040。上限 1 与 64 时，仍有 41% 至 49% 的采样带有热降频位。降温消除了最严重的错误，记录的时钟则告诉你还剩多少影响。
+降温后的运行也没达到全速。SM 时钟中位数为 1,080 至 1,515 MHz，额定值 2,040。上限 1 与 64 时，最差 seed 中仍有 41% 至 49% 的采样带有热降频位。降温消除了最严重的错误，记录的时钟则告诉你还剩多少影响。
 
 **我们的建议：** 没有每次运行的时钟和温度，基准就不构成证据。先看时钟，再看吞吐量。
 
-## 我们的建议
+## 我们的建议 {#s-sglang-benchmark-serving-our-position}
 
 报告仍符合延迟目标的最高并发，同时报告该点的吞吐量，以及 p50、p99 TTFT 和 TPOT。“上限 8，255 tok/s，首 token 中位数 0.79 s”是结果；“255 tok/s”只是口号。
 
 随后在引擎外落实拐点限制。引擎自身的上限按内存设置，而延迟早已不可接受时，内存往往还没耗尽。把上限放进客户端、网关或 `--max-running-requests`，数值由扫描确定。
 
-## 事故：手写计时脚本
+## 事故：手写计时脚本 {#s-sglang-benchmark-serving-the-incident-a-hand-written-script}
 
 [Issue #3196](https://github.com/sgl-project/sglang/issues/3196) 报告，八张 H200 上的 DeepSeek V3 只有 13 tok/s，而 DeepSeek API 为 60 tok/s {{issue #3196}}。另一位用户用两个 H100 节点达到 33 tok/s。测量脚本按空格切分统计单词，还把首 token 时间算进速度。单词不是 token，TTFT 不是 decode 时间，因此脚本低估了服务器。修复方式是用基准客户端，它按 token 计数，并区分 TTFT 和 TPOT。
 
@@ -327,7 +411,11 @@ caption: 蓝色为降至 72 C 且记录时钟的扫描，玫瑰色为无遥测�
 - 在客户端或网关落实拐点上限，引擎会接纳远多于此的请求。
 - 每个点运行三个 seed，画出最小和最大结果。
 - 根据延迟目标对应的 goodput 选择并发上限。
-- 每次运行记录 SM 时钟与温度，剔除降频运行。
+- 每次运行都记录并报告 SM 时钟和温度。
+- 将低于时钟下限的运行单独排除。
+- 比较每次运行前，传入 --flush-cache，或调用 POST /flush_cache，并记录缓存 token 数。
+- 在相信高请求速率下的 TTFT 前，将客户端拆分为多个进程。
+- 每次报告结果都写明客户端和温度，并保持两者不变。
 ```
 
-来源：python/sglang/benchmark/serving.py (calculate_metrics, argument defaults), python/sglang/benchmark/datasets/common.py (compute_random_lens), python/sglang/bench_serving.py, PR #40795, all at v0.5.22 (baa9befa); capture/out/serve-help.txt, capture/out/server-default.command.txt, capture/out/server-default.log, capture/out/bench-random-c1.txt, capture/out/bench-random-c8.txt, capture/out/bench-random-c32.txt; capture/gpu/sweep.py, capture/gpu/summarize.py, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/out-gb10/server-default.command.txt, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/bench-random-c8.txt, capture/gpu/out-gb10/bench-random-c32.txt, capture/gpu/incidents/l4-thermal-throttle.txt, capture/gpu/out-l4/server-waves-default.log.
+来源：python/sglang/benchmark/serving.py （calculate_metrics、参数默认值、flush_server_cache、--flush-cache、asyncio 客户端）, python/sglang/benchmark/datasets/common.py (compute_random_lens), python/sglang/benchmark/datasets/random.py (sample_random_requests), python/sglang/srt/entrypoints/http_server.py (flush_cache), python/sglang/srt/managers/scheduler.py (flush_cache), python/sglang/srt/observability/metrics_collector.py (cached_tokens_total), python/sglang/srt/entrypoints/openai/usage_processor.py, python/sglang/bench_serving.py, PR #40795, 均为 v0.5.22 (baa9befa); capture/out/serve-help.txt, capture/out/server-default.command.txt, capture/out/server-default.log, capture/out/bench-random-c1.txt, capture/out/bench-random-c8.txt, capture/out/bench-random-c32.txt; capture/gpu/sweep.py, capture/gpu/summarize.py, capture/gpu/summary/gb10.json, capture/gpu/summary/l4.json, capture/gpu/summary/l4-throttled.json, capture/gpu/out-gb10/server-default.command.txt, capture/gpu/out-gb10/bench-random-c8.txt, capture/gpu/out-gb10/bench-random-c32.txt, capture/gpu/incidents/l4-thermal-throttle.txt; issue #3196. capture/gpu/out-l4/server-waves-default.log, capture/gpu/out-l4/waves-default-input-tokens.txt, capture/gpu/out-gb10/server-pools.log, capture/gpu/out-gb10/server-default.log, Chandrasekar and Kramberger, Identifying and Mitigating Systemic Measurement Bias in Production LLM Inference Benchmarks, arXiv 2605.24217 (2026-05), capture/gpu/out-l4/prefix-cache-flush.txt, capture/gpu/out-l4/bench-client-bias.txt, capture/gpu/out-l4/load-flushed-vs-unflushed.txt

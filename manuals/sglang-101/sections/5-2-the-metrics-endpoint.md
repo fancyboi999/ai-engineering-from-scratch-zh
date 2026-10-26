@@ -6,15 +6,15 @@
 
 读完本节，你能开启端点，区分 gauge、counter 和 histogram，计算有意义的命中率，并为越过拐点的服务器写出六种告警。
 
-## 先开启它
+## 先开启它 {#s-the-metrics-endpoint-turn-it-on-first}
 
 端点默认关闭。v0.5.22 的 `enable_metrics` 字段默认为 `False` {{code}}。不传 `--enable-metrics` 时，服务不会挂载 `/metrics`。我们的捕获服务器启动时设置了参数，见[第 5.1 节](#s-sglang-benchmark-serving)。默认实验结束后，它导出了 81 个指标族，共 603 行以 `sglang:` 开头的样本。
 
 **我们的建议：** 每台服务器都带上 `--enable-metrics`，包括笔记本上的服务器。我们没有测量它的成本，预计与 decode 步骤相比很小。缺少历史数据的一次事故，成本却是整场调查。
 
-## 三类时间序列
+## 三类时间序列 {#s-the-metrics-endpoint-three-kinds-of-series}
 
-**Gauge：** 调度器每个日志区间都会覆盖的值，例如运行请求数。抓取只能看到最新值。**Counter：** 只增不减的累计值，例如已处理 prompt token 数。通过窗口内的增长速率读取。**Histogram：** 一组按桶划分的 counter，统计落在各个上限内的请求数。通过窗口内增长速率读取分位数。
+**Gauge：** 调度器每个日志区间都会覆盖的值，例如运行请求数。每次抓取只能看到最新值。**Counter：** 只增不减的累计值，例如已处理 prompt token 数。读取时应计算时间窗口内的增长速率。**Histogram：** 一组按桶划分的 counter，统计落在各个上限内的请求数。读取时应根据时间窗口内的增长速率计算分位数。
 
 以下快照在默认实验全部结束、服务器空闲时抓取。
 
@@ -34,7 +34,7 @@ sglang:num_retracted_reqs{…} 0.0
 
 五个 gauge 显示服务器空闲，另一个没有。缓存命中率仍保留最后运行的 prefill batch 的值，那是共享前缀基准。Gauge 回答“上个区间发生了什么”；没有新事件时，有些值衰减，有些保留原值。
 
-## 两种缓存命中率
+## 两种缓存命中率 {#s-the-metrics-endpoint-the-cache-hit-rate-two-ways}
 
 调度器根据一个日志区间内的 prefill token 计算 gauge：命中 token 数除以命中加实际计算 token 数。下面的 counter 则从服务器启动起累计同样两个量。
 
@@ -72,7 +72,7 @@ sum(rate(sglang:prefill_effective_tokens_total{mode=~".*_hit"}[5m]))
 
 设置 `--disable-radix-cache` 的服务器，其快照 gauge 为 0.0，说明没有可能命中时，它确实会归零。Counter 算出的低命中率，才是[第 3.4 节](#s-prefix-friendly-prompts) 教你采取行动的信号。
 
-## 对什么告警
+## 对什么告警 {#s-the-metrics-endpoint-what-to-alert-on}
 
 以下六条时间序列覆盖本手册中的故障，每个名称都出现在捕获记录中。
 
@@ -92,7 +92,7 @@ histogram_quantile(0.99,
   sum by (le) (rate(sglang:time_to_first_token_seconds_bucket[5m])))
 ```
 
-**我们在同一快照中测得两个 histogram。** 排队时间共 266 个请求，总和 251.7 s，平均 0.95 s；流式 TTFT 共 261 个请求，总和 612.7 s，平均 2.35 s。两条时间序列统计的请求不同，因此二者之比只是估计，不是实测占比。它提示这台 Mac 的首 token 时间中，排队占了很大部分。要得到精确占比，应比较同一批请求的排队时间与 TTFT。
+**我们在同一快照中测得两个 histogram。** 排队时间共 266 个请求，总和 251.7 s，平均 0.95 s；流式 TTFT 共 261 个请求，总和 612.7 s，平均 2.35 s。这两条时间序列统计的请求不同，因此二者之比只是估计值，并非测得的占比。它提示这台 Mac 的首 token 时间中，排队占了很大部分。要得到精确占比，应比较同一批请求的排队时间与 TTFT。
 
 ```listing
 title: 排队时间与首 token 时间对照
@@ -106,15 +106,15 @@ sglang:time_to_first_token_seconds_sum{…is_streaming="true"…} 612.7282021734
 sglang:time_to_first_token_seconds_count{…is_streaming="true"…} 261.0
 ```
 
-## 我们的建议
+## 我们的建议 {#s-the-metrics-endpoint-our-position}
 
 延迟和活动量告警，使用时间窗口内的 histogram 分位数和 counter 速率。状态告警只有条件持续时才使用 gauge，例如 `num_queue_reqs` 持续大于 0，或 `token_usage` 连续数分钟接近 1.0。一次 gauge 抓取只描述最后几秒。Gauge 与 counter 不一致时，如本节的缓存命中率，应信任 counter。
 
 依赖新指标前，先读其 HELP 文本和代码。不是每个 gauge 都正常工作。
 
-## 事故
+## 事故 {#s-the-metrics-endpoint-the-incidents}
 
-**始终不变的 gauge。** v0.5.22 的调度器代码有注释，称 `sglang:utilization` 自链接到 #22713 的一次回退后始终为 0 {{code}}。捕获记录与之相符：服务器连续忙碌数分钟后，gauge 仍为 0.0。基于它的面板会在事故中显示整个集群空闲。
+**始终不变的 gauge。** v0.5.22 的调度器代码有注释，称 `sglang:utilization` 自一次回归后始终为 0，注释链接到 #22713 {{code}}。捕获记录与之相符：服务器连续忙碌数分钟后，gauge 仍为 0.0。基于它的面板会在事故中显示整个集群空闲。
 
 **健康探测不断累积任务。** [Issue #35884](https://github.com/sgl-project/sglang/issues/35884) 报告，超时的 `/health` 调用未取消调度器中的请求 {{issue #35884}}。每次失败探测都留下一个孤儿请求，在负载下进一步增加本想检测的负载。相关[issue #22511](https://github.com/sgl-project/sglang/issues/22511) 展示大模型高负载时出现“health check failed” {{issue #22511}}。应观察队列和延迟，将失败探测视为另一个症状。
 
@@ -127,4 +127,4 @@ sglang:time_to_first_token_seconds_count{…is_streaming="true"…} 261.0
 - 比较同一请求的排队时间和 TTFT，判断多少延迟来自等待。
 ```
 
-来源：python/sglang/srt/arg_groups/fields/observability.py (enable_metrics), python/sglang/srt/managers/scheduler_components/metrics_reporter.py (cache hit rate and utilization), python/sglang/srt/observability/metrics_collector.py, all at v0.5.22 (baa9befa); capture/out/metrics.txt, capture/out/no-radix-cache-metrics.txt, capture/out/server-default.command.txt; issues #35884 and #22511.
+来源：python/sglang/srt/arg_groups/fields/observability.py (enable_metrics), python/sglang/srt/managers/scheduler_components/metrics_reporter.py （缓存命中率和利用率）, python/sglang/srt/observability/metrics_collector.py, 均为 v0.5.22 (baa9befa); capture/out/metrics.txt, capture/out/no-radix-cache-metrics.txt, capture/out/server-default.command.txt; issues #35884 and #22511.

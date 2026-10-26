@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" role="img" aria-labelledby="fig-1-3-title fig-1-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-1-3-title">一个 /generate 请求经过三个进程</title>
-  <desc id="fig-1-3-desc">四条生命线：客户端、tokenizer manager、scheduler、detokenizer。客户端发送五 token prompt，tokenizer manager 经 ZMQ 发送 ID。Scheduler 匹配两个缓存 token、prefill 三个，889 ms 后返回首 token。随后十一个 decode 步，detokenizer 返回文本，端到端 950 ms。</desc>
+  <desc id="fig-1-3-desc">四条生命线：客户端、tokenizer manager、scheduler、detokenizer。客户端发送五 token prompt，tokenizer manager 经 ZMQ 发送 ID。Scheduler 匹配两个缓存 token、prefill 三个，68 ms 后返回首 token。随后十一个 decode 步，detokenizer 返回文本，端到端 725 ms。</desc>
   <defs><marker id="fig-1-3-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-1-3-head-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-indigo-ink, #4b4f9e)"/></marker></defs>
   <rect x="15" y="10" width="110" height="30" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="70" y="28.6" font-size="12" text-anchor="middle" font-weight="700">客户端</text>
@@ -55,8 +55,8 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M390 266 L559 266" keyPoints="0;0;1;1" keyTimes="0;0.75;0.922;1" calcMode="linear" dur="3.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.75;0.775;0.922;1" dur="3.2s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="445.55" y="249.03" width="58.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="475" y="260" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">首 token</text>
-  <rect class="m-knock" x="434.71" y="270.42" width="80.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="475" y="281" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求后 889 ms</text>
+  <rect class="m-knock" x="437.68" y="270.42" width="74.64" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="475" y="281" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求后 68 ms</text>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
   <circle cx="16" cy="314" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
@@ -65,8 +65,8 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M390 314 L559 314" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="420.25" y="297.03" width="109.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="475" y="308" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">后续 11 个 token</text>
-  <rect class="m-knock" x="419.86" y="318.42" width="110.28" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="475" y="329" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">decode 步骤，61 ms</text>
+  <rect class="m-knock" x="416.89" y="318.42" width="116.22" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="475" y="329" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">decode 步骤，657 ms</text>
   </g>
   <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
   <circle cx="16" cy="362" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
@@ -75,8 +75,8 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M560 362 L221 362" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
   <rect class="m-knock" x="373.2" y="345.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="390" y="356" font-size="11.5" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">text</text>
-  <rect class="m-knock" x="312.75" y="366.42" width="154.5" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="390" y="377" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Paris, and the capital of</text>
+  <rect class="m-knock" x="297.9" y="366.42" width="184.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="390" y="377" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Paris. The capital of Italy is</text>
   </g>
   <g data-beat="8"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/>
   <circle cx="16" cy="410" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
@@ -86,6 +86,6 @@
   <rect class="m-knock" x="121.3" y="393.03" width="47.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="145" y="404" font-size="11.5" text-anchor="middle">200 OK</text>
   <rect class="m-knock" x="85.57" y="414.42" width="118.86" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="145" y="425" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">e2e_latency 0.950 s</text>
+  <text x="145" y="425" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">e2e_latency 0.725 s</text>
   </g>
 </svg>

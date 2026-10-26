@@ -26,5 +26,5 @@ module.exports = figure('fig-1-1', {
   f.arrow([478, d3.y], [478, d2.y + 55], { style: 'reply' });
   f.text(336, 270, "平均 TPOT 4.38 ms", { size: 12.5, weight: 700, hue: 'plum' });
   f.text(336, 290, "后续 127 token 各重复一次", { size: 11.5, serif: true, hue: 'ink-soft' });
-  f.text(20, 316, "来源：capture/out/bench-random-c1.txt · Qwen3-0.6B-4bit · SGLang 0.5.22 / MLX", { size: 11, serif: true, hue: 'ink-mute' });
+  f.text(20, 316, "Qwen3-0.6B-4bit · SGLang 0.5.22 / MLX", { size: 11, serif: true, hue: 'ink-mute' });
 });

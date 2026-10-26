@@ -6,7 +6,7 @@
 
 读完本节，你能用 uv 或 Docker 安装 SGLang 并启动服务，也能将第一次得到的答案与记录对照，并排查常见的启动错误。
 
-## 准备环境
+## 准备环境 {#s-install-sglang-and-serve-your-first-model-what-you-need}
 
 - Linux，以及支持 CUDA 13 的 NVIDIA GPU 驱动。SGLang 0.5.22 只发布了 CUDA 13 的 wheel 和镜像 {{docs}}。
 - 至少 24 GB GPU 显存，用于运行本节的 `Qwen/Qwen3-8B`。显存更少时可改用 `Qwen/Qwen3-0.6B`。步骤相同，输出中的数值会变化。
@@ -15,7 +15,7 @@
 
 本节的输出记录于一张 24 GB NVIDIA L4。每段输出都标明了对应的捕获文件，可逐行对照。
 
-## 检查 GPU
+## 检查 GPU {#s-install-sglang-and-serve-your-first-model-check-the-gpu}
 
 先确认驱动能识别 GPU：
 
@@ -25,13 +25,13 @@ nvidia-smi
 
 输出会显示 GPU 型号和驱动版本。如果系统找不到该命令，先安装 NVIDIA 驱动。没有驱动，SGLang 无法启动。
 
-## 安装 SGLang
+## 安装 SGLang {#s-install-sglang-and-serve-your-first-model-install-sglang}
 
 选择一种安装方式。只有 GPU 驱动的机器适合用 Docker；如果机器已安装完整 CUDA 工具包（包括 `nvcc`），可以使用 uv。
 
 在只有驱动的 L4 主机上，`pip install sglang==0.5.22` 虽然没有报错，但随后启动服务时连续遇到四种不同的工具包缺失错误。[第 7.1 节](#s-operating-sglang)列出这四个错误和对应的修复方法。
 
-### 使用 Docker
+### 使用 Docker {#s-install-sglang-and-serve-your-first-model-with-docker}
 
 拉取本手册验证的版本：
 
@@ -41,7 +41,7 @@ docker pull lmsysorg/sglang:v0.5.22
 
 这里固定了版本标签。`latest` 会随新版本移动，而每个新版本都可能改变默认值。
 
-### 使用 uv
+### 使用 uv {#s-install-sglang-and-serve-your-first-model-with-uv}
 
 创建环境并安装指定版本的 SGLang：
 
@@ -71,7 +71,7 @@ git revision: N/A
 
 如果显示的是其他版本，说明安装过程选中了别的发布版。重新运行固定版本的安装命令。
 
-## 启动服务
+## 启动服务 {#s-install-sglang-and-serve-your-first-model-start-the-server}
 
 在安装 SGLang 的环境中启动服务。下面是我们记录的 L4 命令：
 
@@ -90,7 +90,7 @@ docker run --rm --gpus all --ipc=host --shm-size 32g -p 127.0.0.1:30000:30000 \
   --enable-cache-report --enable-metrics --mem-fraction-static 0.85
 ```
 
-记录中的运行使用 uv。Docker 命令参考了 SGLang 安装文档 {{docs}}。容器内的服务使用 `--host 0.0.0.0` 才能从容器外访问；`-p` 中的 `127.0.0.1:` 则将端口限制在本机。服务没有配置 API key，因此不要把它暴露到公网网卡。
+记录中的运行使用 uv。Docker 命令参考了 SGLang 安装文档 {{docs}}。容器内的服务使用 `--host 0.0.0.0` 才能从容器外访问；`-p` 中的 `127.0.0.1:` 则将端口限制在本机。服务没有配置 API key，因此不要将它发布到网络接口。
 
 命令中的三个选项是我们的选择：
 
@@ -118,7 +118,7 @@ note: 从启动日志截取五行；其间的导入、下载和警告信息略�
 
 权重已在磁盘上，所以加载只花了 3.73 秒；但启动仍约需一分钟，其中 48.33 秒用于捕获 prefill 的 CUDA graph。同一台机器再次启动时，可以复用 `~/.cache/sglang` 中编译好的内核。
 
-### 服务启动失败时
+### 服务启动失败时 {#s-install-sglang-and-serve-your-first-model-if-the-server-does-not-start}
 
 查看日志最后一行错误，再按现象排查：
 
@@ -127,7 +127,7 @@ note: 从启动日志截取五行；其间的导入、下载和警告信息略�
 - **下载失败。** 检查网络和模型名称。启用 `HF_HUB_OFFLINE=1` 时，模型必须已在本地缓存。
 - **其他程序占用了 30000 端口。** 使用 `--port 30001` 启动，并在下文的每个请求中使用相同端口。
 
-## 用 curl 发送请求
+## 用 curl 发送请求 {#s-install-sglang-and-serve-your-first-model-send-a-request-with-curl}
 
 打开第二个终端，将请求发送给 SGLang 原生 API：
 
@@ -165,7 +165,7 @@ note: 从 /generate 响应截取；省略 token ID、请求 ID，以及 e2e_late
 
 五个 prompt token 中有两个已在缓存里。启动时服务先向自己发送了 “The capital city of France is”。我们的请求与预热 prompt 前两个 token 相同，所以前缀缓存跳过了它们。
 
-## 用 OpenAI API 发送相同的问题
+## 用 OpenAI API 发送相同的问题 {#s-install-sglang-and-serve-your-first-model-send-the-same-question-through-the-openai-api}
 
 大多数客户端使用 OpenAI 聊天 API，SGLang 在同一个端口提供了该接口。先用 curl 发送聊天请求：
 
@@ -199,7 +199,9 @@ note: 从 /v1/chat/completions 响应截取；省略 ID、时间戳和元数据�
     "reasoning_tokens": 0
 ```
 
-也可以用 OpenAI 客户端发送相同请求：
+问题包含七个英文单词，转换后是 21 个 prompt token。聊天模板在消息前后加入角色标记，规划上下文长度时也要计入它们。`"enable_thinking": false` 关闭 Qwen3 的思考模式，因此答案只有一个词，`reasoning_tokens` 为 0。
+
+现在用 Python 的 OpenAI 客户端发送相同请求：
 
 ```python
 from openai import OpenAI
@@ -217,11 +219,37 @@ print(response.choices[0].message.content)
 
 脚本会打印响应中的 `content` 字段。记录中的捕获使用 Python 标准库发送相同 JSON，也得到了 `Earth`。服务器没有设置 `--api-key`，因此不会检查 key；请求里的值可以是任意字符串。
 
-```takeaways
-- 每次启动都检查 KV 池、max_running_requests 和 tree cache 日志。
-- 测量性能前先发送预热请求。
-- 启动时添加 --enable-cache-report，让客户端看到 cached_tokens。
-- 调试请求时对照日志中的 #new-token 和 #cached-token。
+## 停止服务 {#s-install-sglang-and-serve-your-first-model-stop-the-server}
+
+在服务终端按 **Ctrl+C** 停止服务 {{docs}}。生产环境只向主进程发送停止信号。[第 7.1 节](#s-operating-sglang)解释原因。
+
+## 在 Apple silicon Mac 上运行 {#s-install-sglang-and-serve-your-first-model-on-an-apple-silicon-mac}
+
+SGLang 也能通过 MLX 后端在 Apple silicon 上运行。你需要 macOS 14 或更新版本，以及约 8 GB 可用磁盘空间。从固定标签安装带 MLX extra 的 SGLang：
+
+```bash
+git clone --branch v0.5.22 --depth 1 https://github.com/sgl-project/sglang.git
+cd sglang
+uv venv -p 3.12 .venv && source .venv/bin/activate
+cp python/pyproject_other.toml python/pyproject.toml
+uv pip install -e "python[srt_mps]"
 ```
 
-Sources: capture/gpu/out-l4/server-default.log, capture/gpu/out-l4/generate.txt; SGLang 0.5.22 源码与安装文档。
+在记录所用的 Mac 上，安装耗时 3 分 15 秒。使用小型 4-bit 模型启动服务：
+
+```bash
+SGLANG_USE_MLX=1 sglang serve --model-path mlx-community/Qwen3-0.6B-4bit \
+  --disable-cuda-graph --enable-cache-report --mem-fraction-static 0.4
+```
+
+随后发送上面的同一个 `/generate` 请求。记录中的 Mac 回答为 " Paris, and the capital of Germany is Berlin. The capital"。小模型生成的文本不同，token 数相同。如果这台 Mac 还用于其他工作，应设置 `--mem-fraction-static`。[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)展示未设置时遇到的崩溃。
+
+```takeaways
+- 在安装命令和镜像标签中固定 SGLang 版本。
+- 只有 GPU 驱动的主机使用 Docker 镜像。
+- 启动服务时加上 --enable-cache-report 和 --enable-metrics。
+- 看到就绪日志后，再发送首个请求。
+- 修改设置前，先将第一次回答与记录中的结果对照。
+```
+
+来源： capture/gpu/out-gb10/sglang-version.txt, capture/gpu/out-l4/server-default.command.txt, capture/gpu/out-l4/server-default.log, capture/gpu/out-l4/generate.txt, capture/gpu/out-l4/environment.json, capture/one_request.py, capture/gpu/incidents/l4-toolchain-failures.txt, capture/out/generate.txt; docs/docs/get-started/install.mdx 和 docs/docs/get-started/quickstart.mdx，v0.5.22; docs/docs/hardware-platforms/apple_metal.mdx 和 python/pyproject_other.toml，v0.5.22.

@@ -6,7 +6,7 @@
 
 读完本节，你能判断每次前向传播的模式，解释 CUDA graph 省下了什么。你也能看懂 SGLang 捕获的 batch 大小，让繁忙的 decode 仍在计算图中运行。
 
-## 每次前向传播都有模式
+## 每次前向传播都有模式 {#s-forwardmode-and-cuda-graphs-every-forward-pass-has-a-mode}
 
 **ForwardMode：** 标在 batch 上、告诉模型执行器该运行哪种前向传播的标签。调度器设置它，模型执行器、注意力后端和计算图执行器都会读取它。
 
@@ -23,7 +23,7 @@
 
 SGLang 把每个请求写入多个 KV 条目的前向传播统称为“extend”。因此代码也将 `TARGET_VERIFY` 算作 extend。目标模型会计算每个请求的多个草稿位置，类似带树形 mask 的小型 prefill。
 
-## 代价：一个 decode 步骤要启动许多小内核
+## 代价：一个 decode 步骤要启动许多小内核 {#s-forwardmode-and-cuda-graphs-the-cost-one-decode-step-is-a-long-list-of-small-launches}
 
 Transformer 的每层由一串内核组成：归一化、QKV 投影、注意力、输出投影、第二次归一化和 MLP。28 层模型生成一个 token，要启动数百个内核。Prefill 时，每个内核处理数千个 token，启动时间相对计算时间很短。Decode 时，每个内核只处理每个请求的一个 token。
 
@@ -41,7 +41,7 @@ caption: 每列从上往下读。内核名称对应 Llama 风格一层中的操�
 
 记录也有代价。每种捕获的形状都会占用 GPU 内存，batch 必须与某个已捕获形状完全一致。SGLang 为 decode 承担这项开销，把每个 batch 填充到下一个已捕获的大小。
 
-## SGLang 捕获什么，何时放弃重放
+## SGLang 捕获什么，何时放弃重放 {#s-forwardmode-and-cuda-graphs-what-sglang-captures-and-when-it-gives-up}
 
 **捕获桶：** SGLang 在启动时为之记录 decode 计算图的某个 batch 大小。不使用推测解码时，v0.5.22 会捕获 1、2、4、8、12，之后从 16 到 256 每隔 8 捕获一次；超过 256 后每隔 16 捕获一次，直到 511；再往上每隔 32 捕获一次，直到最大值。13 个请求的 batch 会重放大小为 16 的计算图，浪费三个槽位。
 
@@ -82,13 +82,13 @@ note: 默认服务器日志中的两行。省略了时间戳和 batch 日志末�
 
 较早的 prefill 计算图 torch.compile 路径正在 PR #42285 至 #42287 中移除。若博客说“分段 CUDA graphs 使用 torch.compile”，描述的就是旧路径。
 
-## 实践报告中的延迟陡升
+## 实践报告中的延迟陡升 {#s-forwardmode-and-cuda-graphs-the-cliff-in-field-reports}
 
 Jarvislabs 的实践报告 {{field Jarvislabs 2026-05}} 在一张 H100 上使用 SGLang 默认参数运行 Qwen2.5-7B。并发 300 时，平均 token 间延迟为 17.72 ms，vLLM 为 12.28 ms。不设并发上限时，两者分别是 100.92 ms 和 28.84 ms。文章没有记录 SGLang 版本和服务器日志。
 
 我们将以下解释明确标为假设。该 GPU 上默认 decode `max_bs` 为 256，而延迟断点恰好略高于它。维护者也在较小的显卡上观察到类似现象。20 至 35 GB 档位的代码注释指出，旧上限会在 `bs>=32` 时强制使用 eager decode，导致高并发吞吐量显著低于 vLLM {{code}}。PR #37898 在 2026-09-04 将这个上限从 24 提高到 48。
 
-## 我们在 GB10 上测到了什么
+## 我们在 GB10 上测到了什么 {#s-forwardmode-and-cuda-graphs-what-we-measured-on-a-gb10}
 
 上面的代价分析假定 GPU 很快、模型很小。我们测了另一种情况：在一张 NVIDIA GB10 上运行混合专家模型 `Qwen/Qwen3-30B-A3B-Instruct-2507`。GB10 的 CPU 与 GPU 共享内存，带宽低于数据中心 GPU 的 HBM。
 
@@ -104,11 +104,11 @@ Jarvislabs 的实践报告 {{field Jarvislabs 2026-05}} 在一张 H100 上使用
 
 我们的解释是：batch 为 1 时，这个模型的一个 decode 步骤约需 32 ms。计算图消除的启动时间相对这一步很短。每步都要读取各 token 选中的专家权重，耗时由内存带宽决定。
 
-## 上游在 L4 上测到了什么
+## 上游在 L4 上测到了什么 {#s-forwardmode-and-cuda-graphs-what-we-measured-on-an-l4}
 
 上游最初在 L4 上用稠密 `Qwen/Qwen3-8B` 做的扫描有误。显卡温度达到 87 C，发生热降频，SM 时钟仅为 360 MHz，额定值为 2,040 MHz。降频使每一步都变慢，节省的启动时间被噪声淹没。上游已移除那组数字。每次基准都应记录 GPU 时钟和温度，方法见[第 5.1 节](#s-sglang-benchmark-serving)。
 
-上游先在不同日期重复了降温后的 L4 对照，随后在 2026-10-21 同一天、连续运行两台服务器。各次运行从不超过 72 C 开始，SM 时钟中位数低于 1,000 MHz 时最多重试三次。两台服务器的池容量均为 24,094 token。下表列出同日运行的结果。
+上游先在不同日期重复了降温后的 L4 对照，随后在 2026-10-21 同一天、连续运行两台服务器。同日对照中的每次运行都从不超过 72 C 开始，SM 时钟中位数低于 1,000 MHz 时最多重试三次。两台服务器的池容量均为 24,094 token。下表列出同日运行的结果。
 
 ```listing
 title: 相同 batch 开启和关闭计算图
@@ -132,15 +132,17 @@ L4 的服务器只为最多 48 个运行请求捕获 decode graph。64 用户时
 
 **上游实测** L4 上的差异仍很小。不超过 16 用户时，计算图在 60 至 70 ms 的一步中节省 0.5 至 0.7 ms，约 1%。从 2 个用户起，吞吐量差距不超过 1.2%；1 用户时差距为 5%。
 
-16 与 32 用户时，关闭计算图的服务器 P99 ITL 更低，且 seed 范围没有重叠。分别是 73 对 80 ms，以及 87 对 103 ms。两台服务器在这些 batch 大小都重放了计算图。我们还没有找到这种差距的机制，因此只报告结果，不做解释。
+16 与 32 用户时，关闭计算图的服务器 P99 ITL 更低，且 seed 范围没有重叠。分别是 73 对 80 ms，以及 87 对 103 ms。上游尚未找到这种差距的机制，因此只报告结果，不做解释。
+
+这些 batch 大小低于默认捕获上限，但原文在此称两台服务器都重放了计算图，与关闭侧配置不一致。扫描配置为 `graphs-off-b` 的两个计算图后端都设为 `disabled`；较早对照中，33 个请求的日志也分别显示 `cuda graph: True` 和 `cuda graph: False`。现有同日记录只有起始温度与汇总指标，不能逐 batch 证明同日这两档的重放状态。
 
 同日的 GB10 对照没有出现这种差距：所有并发下，开启与关闭计算图的 P99 ITL 相差不超过 7%，TPOT 中位数相差不超过 2%。
 
 我们的解释是，batch 为 1 时，8B 模型每步约从内存读取 16 GB 权重。计算图消除的启动时间相对这次读取很短。
 
-[Inside an LLM Serving GPU 示意图](https://aieng-zh.cn/inside-an-llm-serving-gpu?graphs=off&users=1)展示了 L4 上无计算图的一步如何读取权重并继续处理。该入口使用一个用户的数据。我们最早的对照中，这一步多耗时 0.47 ms，总计 60.63 ms。
+[Inside an LLM Serving GPU 示意图](https://aieng-zh.cn/inside-an-llm-serving-gpu?graphs=off&users=1)展示了 L4 上无计算图的一步如何读取权重并继续处理。该入口展示关闭计算图、只有一个用户的运行。每个内核的启动命令都要跨越 PCIe；在上游最早的对照中，这一步多耗时 0.47 ms，总计 60.63 ms。
 
-## 我们的建议
+## 我们的建议 {#s-forwardmode-and-cuda-graphs-our-position}
 
 保持 CUDA graphs 开启，并根据流量设置大小。默认 `max_bs` 适合中等并发。如果基准或生产峰值的请求数超过它，在测量前将 `--cuda-graph-max-bs-decode` 和 `--max-running-requests` 设为目标值。SemiAnalysis InferenceX 的配置 {{field InferenceX 2026-05}} 会根据测试并发推导这两个值。
 
@@ -162,7 +164,7 @@ note: 帮助文本末尾弃用参数部分的两行。
 
 参数 `--cuda-graph-max-bs` 已不存在。我们将它传给 v0.5.22 的参数解析器，进程退出并返回 `ambiguous option: --cuda-graph-max-bs could match --cuda-graph-max-bs-decode, --cuda-graph-max-bs-prefill`。
 
-## 事故
+## 事故 {#s-forwardmode-and-cuda-graphs-incidents}
 
 **使用注意力数据并行时，捕获计算图耗尽内存。** Issue #23769（2026-04-26）：在两个各有八张 H200 的节点上，DeepSeek-V4-Pro-FP8 在捕获计算图时退出。注意力数据并行下，计算图 batch 大小按每个 rank 计算，因此捕获的图超过了实际流量所需。修复方式是降低计算图 batch 大小或 `--mem-fraction-static`。
 
@@ -178,4 +180,4 @@ note: 帮助文本末尾弃用参数部分的两行。
 - 将旧配置的 --cuda-graph-max-bs 和 --disable-cuda-graph 换成 v0.5.22 按阶段设置的参数。
 ```
 
-来源：capture/out/server-default.log, capture/out/serve-help.txt, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/server-no-cuda-graph.log, capture/gpu/summary/gb10.json, capture/gpu/incidents/l4-thermal-throttle.txt, capture/gpu/out-l4/server-load-graphs-on-off.log, capture/gpu/out-l4/graphs-sameday-starts.log, capture/gpu/out-l4/cuda-graph-max-bs-ambiguous.txt, capture/gpu/summary/l4.json (load.default, load.no-cuda-graph, load.graphs-on-b, load.graphs-off-b), python/sglang/srt/model_executor/forward_batch_info.py (ForwardMode), model_executor/model_runner.py (_forward_raw), model_executor/cuda_graph_config.py (default_prefill_backend), model_executor/runner/decode_cuda_graph_runner.py (can_run_graph), arg_groups/memory_hook.py (_handle_gpu_memory_settings), arg_groups/cuda_graph_hook.py (generate_decode_cuda_graph_batch_sizes), and server_args.py (deprecated flags) at v0.5.22; the argument parser of the installed v0.5.22 package; PRs #23906, #29458, #37898, #42285; issues #23769 and #36478; field reports by Hazy Research (2025-09-28), Jarvislabs (2026-05-18), joshua8.ai (2026-01-10), and SemiAnalysis InferenceX (2026-05-26).
+来源： capture/out/server-default.log, capture/out/serve-help.txt, capture/gpu/out-gb10/server-default.log, capture/gpu/out-gb10/server-no-cuda-graph.log, capture/gpu/summary/gb10.json, capture/gpu/incidents/l4-thermal-throttle.txt, capture/gpu/out-l4/server-load-graphs-on-off.log, capture/gpu/out-l4/server-no-cuda-graph.command.txt, capture/gpu/sweep.py (graphs-on-b, graphs-off-b), capture/gpu/summary/l4.json (load.default, load.no-cuda-graph, load.graphs-on-b, load.graphs-off-b), python/sglang/srt/model_executor/forward_batch_info.py (ForwardMode), model_executor/model_runner.py (_forward_raw), model_executor/cuda_graph_config.py (default_prefill_backend), model_executor/runner/decode_cuda_graph_runner.py (can_run_graph), arg_groups/memory_hook.py (_handle_gpu_memory_settings), arg_groups/cuda_graph_hook.py (generate_decode_cuda_graph_batch_sizes), server_args.py（已弃用参数）（v0.5.22）; 已安装 v0.5.22 包的参数解析器; PR #23906, #29458, #37898, #42285; issue #23769、#36478; Hazy Research（2025-09-28）、Jarvislabs（2026-05-18）、joshua8.ai（2026-01-10）及 SemiAnalysis InferenceX（2026-05-26）的实践报告, capture/gpu/out-l4/graphs-sameday-starts.log, capture/gpu/out-gb10/cuda-graph-max-bs-ambiguous.txt

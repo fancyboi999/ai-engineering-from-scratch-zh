@@ -6,7 +6,7 @@
 
 读完本节，你能解释混合模型为何打破[基数树](#s-radixcache)的简单图景，并在用户替你试错前验证模型缓存。
 
-## 三种层状态
+## 三种层状态 {#s-hybrid-models-and-the-cache-three-kinds-of-layer-state}
 
 [第 3.3 节](#s-radixcache)的基数树可行，是因为全注意力每 token 保存一份 key/value。任意长度缓存前缀都有效，因此能在任何 token 拆节点。另外两种层打破了规则。
 
@@ -29,7 +29,7 @@ note: 默认配置启动日志两行。
 
 新模型先读这两行。`hybrid_swa=True` 或 `hybrid_ssm=True` 表示本节内容适用。
 
-## SGLang 如何处理
+## SGLang 如何处理 {#s-hybrid-models-and-the-cache-how-sglang-handles-each-kind}
 
 `UnifiedRadixCache` 用一棵树，为每类状态配一个 component {{code}}。节点保存全注意力数据，需要时再保存 SWA 与 Mamba 数据。只有所有 component 都确认当前位置状态有效，匹配才继续。
 
@@ -45,7 +45,7 @@ claim: 新请求匹配 Mamba 模型 1,800 token，从最后 1,792-token 快照�
 caption: 从根向下读。按 --mamba-track-interval 默认值每 256 decode token 保存快照。Token 数为示例，并非捕获。
 ```
 
-## Issue 中的问题
+## Issue 中的问题 {#s-hybrid-models-and-the-cache-what-goes-wrong-in-the-issues}
 
 v0.5.22 中有许多混合模型缓存问题报告。我们没有亲自运行混合模型。以下四个 issue 展示了不同故障类型。
 
@@ -54,7 +54,7 @@ v0.5.22 中有许多混合模型缓存问题报告。我们没有亲自运行混
 3. **一种策略让首 token 慢 4.7 倍。** Issue #37834 中，某选项强制 `no_buffer` {{issue #37834}}。快照深度是后续请求无法到达的。检索负载命中率从 88.2% 降至 65.9%，平均 TTFT 从 226 ms 增至 1,063 ms。
 4. **默认值拖慢 decode。** Issue #36131 报告释放窗口外 SWA 槽位的新默认值 {{issue #36131}}，使 DGX Spark 和 Thor 上混合 SWA 模型的单流 decode 吞吐量下降。
 
-## 本手册的建议：先验证混合模型缓存
+## 本手册的建议：先验证混合模型缓存 {#s-hybrid-models-and-the-cache-our-position-test-the-cache-on-a-hybrid-model-before-you-trust-i}
 
 全注意力模型错误命中足够少见，通常保持缓存开启即可。混合模型上，上生产前做三项检查，每项只需几分钟。
 
@@ -72,4 +72,4 @@ v0.5.22 中有许多混合模型缓存问题报告。我们没有亲自运行混
 - 每次升级前读模型家族的开放缓存 issue。
 ```
 
-Sources: python/sglang/srt/mem_cache/unified_radix_cache.py, python/sglang/srt/mem_cache/unified_cache/components/README.md, python/sglang/srt/arg_groups/fields/exec_.py (mamba_radix_cache_strategy, mamba_track_interval), python/sglang/srt/arg_groups/fields/schedule.py (swa_full_tokens_ratio), python/sglang/srt/arg_groups/model_overrides/deepseek_v4.py, python/sglang/srt/arg_groups/fields/observability.py (kv_canary) at v0.5.22, capture/out/server-default.log, issues #39830, #22935, #37834, and #36131; 2026-09-01 至 v0.5.22 的 `python/sglang/srt/mem_cache` commit 列表（2026-10-22 计数：333）。
+来源： python/sglang/srt/mem_cache/unified_radix_cache.py, python/sglang/srt/mem_cache/unified_cache/components/README.md, python/sglang/srt/arg_groups/fields/exec_.py (mamba_radix_cache_strategy, mamba_track_interval), python/sglang/srt/arg_groups/fields/schedule.py (swa_full_tokens_ratio), python/sglang/srt/arg_groups/model_overrides/deepseek_v4.py, python/sglang/srt/arg_groups/fields/observability.py (kv_canary)，v0.5.22, capture/out/server-default.log, issue #39830, #22935, #37834, 和 #36131; GitHub 提交列表，路径 python/sglang/srt/mem_cache，2026-09-01 至 v0.5.22 标签（333 个提交，计数日期 2026-10-22）

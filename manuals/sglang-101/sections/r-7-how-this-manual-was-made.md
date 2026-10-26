@@ -1,89 +1,89 @@
-# 本手册的编写与验证方式
+# 本手册如何编写
 
-> 本页记录了本手册所依赖的版本、来源、机器和捕获工具，以及文中每项事实和数值的出处。
+> 本页记录支撑手册各项事实和数字的版本、来源、机器及捕获工具。
 
-## 版本
+## 版本 {#s-ref-how-this-manual-was-made-the-version}
 
-本手册固定使用 SGLang 0.5.22。该版本于 2026-10-13 发布，对应提交 `baa9befa381511cd4d56f83980951e5a45fffc6d`。事实于 2026-10-16 核验。SGLang 大约每三周发布一次；0.5.20 到 0.5.22 之间有多个默认值发生变化。旧版本的操作步骤在本版本中可能有误，相关章节会指出差异。
+本手册固定 SGLang 0.5.22，该标签发布于 2026-10-13，提交为 `baa9befa381511cd4d56f83980951e5a45fffc6d`。事实核验日期为 2026-10-16。SGLang 大约每三周发布一次，0.5.20 至 0.5.22 间已有多个默认值变化。旧版配置可能不适用于此版，各节会指出差异。
 
-## 来源及其优先级
+## 按权威性排序的来源 {#s-ref-how-this-manual-was-made-the-sources-ranked}
 
-本手册的事实来自七类来源，并按权威性排序。来源冲突时，以优先级更高的来源为准，正文会说明冲突。
+事实来自七类来源，按权威性排序。来源冲突时，以更高等级为准，正文会说明。
 
-| 排名 | 来源 | 用途 | 标记方式 |
+| 等级 | 来源 | 手册采用的内容 | 引用方式 |
 |---|---|---|---|
-| 1 | 标签对应的 SGLang 源码，`baa9befa` | 默认值和机制 | 各节来源行列出的文件 |
-| 2 | [Mac 捕获记录](manuals/sglang-101/capture/out)和 [GPU 捕获记录](manuals/sglang-101/capture/gpu) | 输出和所有标记为实测的数值 | 捕获文件 |
-| 3 | SGLang issues 和 pull requests | 事故和功能设计历史 | `issue` 及其编号 |
-| 4 | 论文 | RadixAttention 的原始设计及 SGLang 实现的方法 | `paper` 及论文标题 |
-| 5 | 标签对应的 SGLang 文档 | 与代码核对过的文档行为 | `docs` 及文档标题 |
-| 6 | 独立实测报告 | 本团队未运行的硬件配置，例如多 GPU 服务器 | `field`、作者和月份 |
-| 7 | SGLang 团队和硬件厂商报告 | 始终注明为发布者的主张 | `team` 或厂商名称及月份 |
+| 1 | 标签对应的 SGLang 源码，`baa9befa` | 全部默认值和机制 | 各节来源行的文件列表 |
+| 2 | [Mac](manuals/sglang-101/capture/out) 与 [GPU](manuals/sglang-101/capture/gpu) 的运行记录 | 全部 listing 和标为实测的数字 | 捕获文件名 |
+| 3 | SGLang issue 与 PR | 事故和各功能的设计历史 | `issue` 及编号 |
+| 4 | 论文 | RadixAttention 原始设计及 SGLang 实现的方法 | `paper` 及标题 |
+| 5 | 标签对应的 SGLang 文档 | 与代码核对过的文档行为 | `docs` 及标题 |
+| 6 | 独立实践报告 | 我们无法运行的 GPU 配置，例如单服务器多 GPU | `field`、作者及月份 |
+| 7 | SGLang 团队和供应方报告 | 主张，始终注明来自作者 | `team` 或供应方及月份 |
 
-文档的优先级低于代码。SGLang 0.5.22 的文档仍列出了代码已删除的两个 attention backend；HiCache 预取超时的文档值也与代码不同。本手册所说的“默认值”指代码实际设置的值。
+文档低于代码是有意的。0.5.22 文档仍列出代码已删除的两个注意力后端，HiCache 预取超时也与代码不同。我们说默认值时，指代码实际设置的值。
 
-## 四类证据
+## 四类证据 {#s-ref-how-this-manual-was-made-four-kinds-of-evidence}
 
-本手册中的数值会标注以下四类证据之一：
+手册每个数字在正文中都带有四种标签之一。
 
-**我们测得：** 数值来自 [Mac](manuals/sglang-101/capture/out)或 [GPU](manuals/sglang-101/capture/gpu)捕获记录，记录中注明了机器。你可以运行捕获工具复现其中的事实。
+**我们测得：** 数字来自下面机器表所列设备上的 [Mac 运行](manuals/sglang-101/capture/out)或 [GPU 运行](manuals/sglang-101/capture/gpu)。你可以运行工具，得到相同事实。
 
-**代码所示：** 默认值或机制来自对应标签的 SGLang 源码。各节的来源行列出具体文件。
+**代码显示：** 默认值或机制来自标签对应的 SGLang 源码，来源行列出文件。
 
-**独立实测：** SGLang 团队之外的工程师或公司运行了 SGLang 并发布结果。正文会注明发布者、月份、当时的版本和所用调优。
+**实践报告：** SGLang 团队之外的工程师或公司运行 SGLang 并公布结果。正文注明作者、月份、其提供的版本，以及调优内容。
 
-**团队或厂商报告：** SGLang 团队、RadixArk 或硬件厂商发布的数值。我们会标明发布者的主张，并在有独立结果时进行对照。
+**团队报告**或**供应方报告：** SGLang 团队、RadixArk 或硬件供应方发布数字。我们将其作为作者主张引用，有独立结果时会进行对照。
 
-DeepEP 和跨多 GPU 的 prefill-decode 分离需要我们当时没有的硬件。相关章节的论据来自代码和独立实测报告，正文会注明证据类型。
+DeepEP 和跨多 GPU 的 prefill-decode 分离，需要我们没有的硬件。这些章节依赖代码与实践报告论证，标签会说明。
 
-## Mac 捕获工具
+## 捕获工具 {#s-ref-how-this-manual-was-made-the-capture-kit}
 
-[Mac 捕获工具](manuals/sglang-101/capture)通过 MLX backend 在 Apple silicon 上启动真实的 SGLang 服务。工具会发送请求、运行官方基准，并将结果写入[输出目录](manuals/sglang-101/capture/out)。运行 `python3 capture/run.py` 会记录全部结果。运行 `python3 capture/run.py --check` 会在临时目录重新捕获，并比较不应改变的事实：温度为 0 时生成的文本、token 数量、缓存 token 数量、请求数、每 token 的 KV 字节数和指标名称。
+[捕获工具](manuals/sglang-101/capture)在 Apple silicon 上通过 MLX 后端启动真实 SGLang 服务器，发送请求、运行官方基准，将观察写入[输出目录](manuals/sglang-101/capture/out)。`python3 capture/run.py` 记录全部内容。`python3 capture/run.py --check` 在临时目录重新记录，再比较不应变化的事实：温度 0 下的生成文本、token 与缓存 token 计数、请求计数。每 token 的 KV 字节数和指标名也是事实。
 
-计时会因每次运行而变化，因此检查不会比较计时结果。
+每次运行时间都会变化，因此检查不比较时间。
 
-该工具要求在 Apple silicon 上安装带 MLX extra 的 SGLang 0.5.22，无法在仓库 CI 运行。缺少环境时，`--check` 会说明原因、报告 `skipped` 并以状态码 0 退出。Mac 捕获记录来自同一台机器：
+工具需要 Apple silicon 上安装 SGLang 0.5.22 的 MLX extra，无法在仓库 CI 运行。缺少该环境时，`--check` 打印 `skipped` 及原因，以代码 0 退出。全部 Mac 运行文件均录制于同一台机器：
 
-| 项目 | 配置 |
+| 项目 | 值 |
 |---|---|
-| 主机 | Apple silicon 笔记本，macOS 26.2，build 25C56，arm64 |
-| SGLang | 0.5.22，从对应标签安装并启用 `srt_mps` extra |
+| 主机 | Apple silicon 笔记本，macOS 26.2，构建 25C56，arm64 |
+| SGLang | 0.5.22，从标签安装，包含 `srt_mps` extra |
 | 框架 | PyTorch 2.13.0、MLX 0.32.4、Python 3.12.12 |
 | 模型 | `mlx-community/Qwen3-0.6B-4bit` |
-| 服务参数 | `SGLANG_USE_MLX=1`、`--disable-cuda-graph`、`--enable-cache-report`、`--enable-metrics`、`--mem-fraction-static 0.4` |
-| 记录日期 | 2026-10-16 |
+| 服务器参数 | `SGLANG_USE_MLX=1`、`--disable-cuda-graph`、`--enable-cache-report`、`--enable-metrics`、`--mem-fraction-static 0.4` |
+| 录制日期 | 2026-10-16 |
 
-工具会启动四种服务配置：默认配置、关闭基数缓存、关闭 overlap scheduler，以及使用 4,096-token 显存池的配置。0.5.22 下，关闭 overlap scheduler 的服务在首个真实批次崩溃；工具会刻意保留这次崩溃记录。[第 2.4 节](#s-the-overlap-scheduler)分析了这一记录。
+工具启动四台服务器：默认配置、关闭 radix cache、关闭重叠调度器，以及 4,096 token 池。0.5.22 关闭重叠调度器后，服务器在首个真实 batch 崩溃，工具有意记录此故障。[第 2.4 节](#s-the-overlap-scheduler)解释该记录。
 
-## GPU 捕获工具
+## GPU 工具 {#s-ref-how-this-manual-was-made-the-gpu-kit}
 
-[GPU 捕获工具](manuals/sglang-101/capture/gpu)在 NVIDIA GPU 上执行相同类型的检查。[运行脚本](manuals/sglang-101/capture/gpu/run.py)会启动八种服务配置，并写入 [GB10 运行日志](manuals/sglang-101/capture/gpu/out-gb10)。[扫描脚本](manuals/sglang-101/capture/gpu/sweep.py)对每个基准点使用三个随机种子重复测量，并记录每次运行的 GPU 时钟和温度。[汇总脚本](manuals/sglang-101/capture/gpu/summarize.py)为每台机器生成独立汇总：[GB10 数据](manuals/sglang-101/capture/gpu/summary/gb10.json)、[L4 数据](manuals/sglang-101/capture/gpu/summary/l4.json)和[发生降频的 L4 数据](manuals/sglang-101/capture/gpu/summary/l4-throttled.json)。[Miles 汇总脚本](manuals/sglang-101/capture/gpu/summarize_miles.py)会生成 [Miles 数据](manuals/sglang-101/capture/gpu/summary/miles-gb10.json)。图表会读取这四个文件。
+[GPU 工具](manuals/sglang-101/capture/gpu)在 NVIDIA GPU 上采用同样方法。[运行脚本](manuals/sglang-101/capture/gpu/run.py)启动八种服务器配置，写入 [GB10 运行日志](manuals/sglang-101/capture/gpu/out-gb10)。[扫描脚本](manuals/sglang-101/capture/gpu/sweep.py)以三个 seed 重复每个基准点，并记录每次运行的 GPU 时钟与温度。[汇总脚本](manuals/sglang-101/capture/gpu/summarize.py)为每台机器写一份汇总：[GB10 汇总数据](manuals/sglang-101/capture/gpu/summary/gb10.json)、[L4 汇总数据](manuals/sglang-101/capture/gpu/summary/l4.json)和[降频 L4 汇总数据](manuals/sglang-101/capture/gpu/summary/l4-throttled.json)。[Miles 汇总脚本](manuals/sglang-101/capture/gpu/summarize_miles.py)写入 [Miles 汇总数据](manuals/sglang-101/capture/gpu/summary/miles-gb10.json)。图表读取这四个文件。
 
-下表中的每一行代表一次 GPU 扫描。链接会打开相应汇总文件，各节会注明使用的运行日期和时钟频率。
+下表每行是 GPU 工具的一次扫描，链接打开汇总文件，各节注明所用运行的日期和时钟。
 
 ```lab-runs
 ```
 
-GB10 的所有运行日志和汇总数据来自同一台机器：
+全部 GB10 运行日志和 GB10 汇总数据均录制于同一台机器：
 
-| 项目 | 配置 |
+| 项目 | 值 |
 |---|---|
 | 主机 | NVIDIA DGX Spark，Ubuntu 24.04，aarch64 |
-| GPU | NVIDIA GB10，compute capability 12.1，与 CPU 共享 121.7 GiB 内存 |
-| SGLang | 从 PyPI 安装的 0.5.22，sglang-kernel 0.4.9，flashinfer 0.7.1 |
+| GPU | NVIDIA GB10，计算能力 12.1，与 CPU 共享 121.7 GiB 内存 |
+| SGLang | PyPI 的 0.5.22，sglang-kernel 0.4.9，flashinfer 0.7.1 |
 | 框架 | PyTorch 2.14.1+cu130、CUDA 13.0、驱动 580.159.03、Python 3.12.3 |
-| 模型 | `Qwen/Qwen3-30B-A3B-Instruct-2507`、其 FP8 checkpoint，以及 EAGLE-3 draft `lmsys/SGLang-EAGLE3-Qwen3-30B-A3B-Instruct-2507-SpecForge-Nex` |
-| 服务参数 | `--enable-cache-report`、`--enable-metrics`、`--mem-fraction-static 0.7` |
-| 记录日期 | 2026-10-16 |
+| 模型 | `Qwen/Qwen3-30B-A3B-Instruct-2507`、其 FP8 checkpoint，以及 EAGLE-3 草稿 `lmsys/SGLang-EAGLE3-Qwen3-30B-A3B-Instruct-2507-SpecForge-Nex` |
+| 服务器参数 | `--enable-cache-report`、`--enable-metrics`、`--mem-fraction-static 0.7` |
+| 录制日期 | 2026-10-16 |
 
-工具还有一个 `l4` 配置，用于在 NVIDIA L4 上运行 Qwen3-8B，并写入 [L4 运行日志](manuals/sglang-101/capture/gpu/out-l4)和 [L4 汇总数据](manuals/sglang-101/capture/gpu/summary/l4.json)。第一部分的日志示例使用 L4 服务。首次 L4 扫描时 GPU 过热并发生降频，[第 5.1 节](#s-sglang-benchmark-serving)记录了这起事故。之后我们把卡温降到 72°C 再开始每次运行。[第 4.3 节](#s-quantization)、[第 4.4 节](#s-speculative-decoding)和第 5.1 节使用了这些数据；第 5.1 节还显示卡在长时间负载下仍会降低时钟频率。
+工具还有在 NVIDIA L4 上运行 Qwen3-8B 的 `l4` 配置，写入 [L4 运行日志](manuals/sglang-101/capture/gpu/out-l4)与 [L4 汇总数据](manuals/sglang-101/capture/gpu/summary/l4.json)。第 1 部分的 listing 来自该 L4 服务器。首次 L4 扫描过热降频，[第 5.1 节](#s-sglang-benchmark-serving)将其作为事故解释。随后我们在每次运行前冷却至 72°C，重跑 L4。[第 4.3 节](#s-quantization)、[第 4.4 节](#s-speculative-decoding)和第 5.1 节使用这些运行，第 5.1 节还展示了冷却后的卡在长负载下仍会降低时钟。
 
-## 约定
+## 约定 {#s-ref-how-this-manual-was-made-conventions}
 
-本手册中的命令都用 `sglang serve` 启动服务。旧入口 `python -m sglang.launch_server` 在 0.5.22 中仍可使用，但会打印弃用警告。端口使用默认值 `30000`。捕获输出中的 `~` 表示 home 目录。
+所有命令均用 `sglang serve` 启动服务器。旧的 `python -m sglang.launch_server` 在 0.5.22 仍有效，但打印弃用警告。端口使用默认 `30000`。记录输出中的 `~` 表示主目录。
 
-文中的来源标记会指出证据位置。`{{issue #35129}}` 表示 SGLang 仓库中的 issue；`{{field Jarvislabs 2026-05}}` 表示 Jarvislabs 于对应月份发布的报告，正文会链接该报告。各节末尾的来源行会列出所依据的 SGLang 源码。listing 内容来自捕获文件，`…` 表示按说明截去了部分内容。
+引用指出一个位置。`{{issue #35129}}` 指 SGLang 仓库的一个 issue。`{{field Jarvislabs 2026-05}}` 通过作者和月份指向实践报告，正文提供链接。各节所依据的 SGLang 源码文件，只在节末来源行列一次。listing 原样复制捕获文件中的行，`…` 标记删节，note 说明删去了什么。
 
-网页上的图表可以播放，按 Replay 会重新展示步骤。打印版和减少动态效果的设置会显示最终画面。
+网页中的图可以播放动画，Replay 按钮重新播放步骤。打印和减少动态效果模式显示最后一帧。
 
-Sources: manual.json; capture/README.md, capture/run.py; capture/gpu/run.py, capture/gpu/sweep.py, capture/gpu/summarize.py, capture/gpu/summarize_miles.py, capture/gpu/out-gb10/environment.json, capture/gpu/out-l4/environment.json; capture/out/environment.json, capture/out/server-no-overlap.log.
+来源：manual.json；capture/README.md；capture/run.py；capture/gpu/run.py、capture/gpu/sweep.py、capture/gpu/summarize.py、capture/gpu/summarize_miles.py、capture/gpu/out-gb10/environment.json、capture/gpu/out-l4/environment.json；capture/out/environment.json、server-no-overlap.log。

@@ -6,7 +6,7 @@
 
 读完本节，你能在原生 `/generate` 与 OpenAI 端点之间做选择，解读原生响应每项计时，并解释流式文本为何有时等待。
 
-## 同一服务器上的两种 API
+## 同一服务器上的两种 API {#s-streaming-stop-strings-and-the-openai-api-two-apis-on-one-server}
 
 **原生 API：** SGLang 自有端点，主要是 `POST /generate`。接收文本或 token ID 以及 `sampling_params`，返回含 SGLang 数据的 `meta_info` 对象。
 
@@ -14,7 +14,7 @@
 
 两者构建相同内部请求，经过[第 2.1 节](#s-sglang-serve-and-the-three-processes)的相同三个进程，区别在于返回内容。
 
-## 原生响应提供什么
+## 原生响应提供什么 {#s-streaming-stop-strings-and-the-openai-api-what-the-native-response-tells-you}
 
 上游工具以温度 0 发送一个要求输出 12 token 的原生请求。
 
@@ -60,14 +60,14 @@ note: 删去 output_ids 和 weight_versions 列表。
 每个字段都回答生产中会问的问题：
 
 - `finish_reason` 说明停止原因，这里为 `length`，因为请求 12 个并得到 12 个 token。
-- `queue_time` 为 0.24 ms，几乎没排队。有负载时，这通常最先增长。
+- `queue_time` 为 0.24 ms，几乎没排队。负载增加后，请求在队列等待时，这个数字会增长。
 - `first_token_latency` 为 889 ms，`e2e_latency` 为 950 ms。冷服务的首 token 占去大部分时间。
 - `num_retractions` 为 0。非零值的代价见[第 2.3 节](#s-admission-and-retraction)。
 - `cached_tokens` 为五个 prompt token 中的两个，均来自设备，无主机内存缓存。
 
 工具首个请求为何已有两个缓存 token？答案很清楚。接受流量前，服务以 `The capital city of France is` 预热 {{code}}。工具 prompt 是 `The capital of France is`，前两个 token 在基数树中匹配预热。缓存不关心前缀由哪个用户发送。
 
-## OpenAI 响应提供什么
+## OpenAI 响应提供什么 {#s-streaming-stop-strings-and-the-openai-api-what-the-openai-response-tells-you}
 
 ```listing
 title: OpenAI 聊天响应
@@ -105,11 +105,11 @@ note: 删去 ID、创建时间与元数据块。
 
 Mac 读者注意：v0.5.22 的 MLX decode 默认贪心，除非设置 `--mlx-enable-sampling`，否则 `temperature`、语法掩码和输出 logprobs 都不起作用。`sglang serve` 帮助明确说明了这一点。工具使用温度 0，因此两种设置结果相同。[第 4.6 节](#s-deterministic-inference-and-logprobs)介绍 GPU 上的采样和 logprobs。
 
-## 在哪里检查停止字符串
+## 在哪里检查停止字符串 {#s-streaming-stop-strings-and-the-openai-api-where-stop-strings-are-checked}
 
 **停止条件：** 结束请求的规则，可以是停止 token、停止字符串、正则、`max_new_tokens` 上限、中止或语法结束。
 
-SGLang 在每一步后按固定顺序由 scheduler 检查停止条件 {{code}}。停止字符串先于序列结束 token 检查。推测解码单步可能接受多个 token；若按 token 检查，最多只会裁掉最后一个 token，停止字符串的其余部分就会泄漏到输出中。Detokenizer 只裁掉匹配的停止文本。
+SGLang 在每一步后按固定顺序由 scheduler 检查停止条件 {{code}}。停止字符串先于序列结束 token 检查。代码注释解释了原因。推测解码单步可能接受多个 token；若按 token 检查，最多只会裁掉最后一个 token，停止字符串的其余部分就会泄漏到输出中。Detokenizer 只裁掉匹配的停止文本。
 
 ```figure
 id: fig-2-5
@@ -119,7 +119,7 @@ claim: Scheduler 决定何时停止，detokenizer 将 ID 转为文本，output s
 caption: 自上而下读。蓝色生命线为 SGLang 进程，橄榄色为客户端，靛蓝虚点箭头为流式输出块。行为来自 v0.5.22 的 schedule_batch.py、output_streamer.py、detokenizer_manager.py。
 ```
 
-## 流式文本为何等待
+## 流式文本为何等待 {#s-streaming-stop-strings-and-the-openai-api-why-streamed-text-waits}
 
 两条规则可能延迟输出块 {{code}}：
 
@@ -128,11 +128,11 @@ caption: 自上而下读。蓝色生命线为 SGLang 进程，橄榄色为客户
 
 默认 `--stream-interval 1` 让 SGLang 每步后流式发送。非流式请求仍每 50 token 在服务内部发送一次进度，由 `SGLANG_FORCE_STREAM_INTERVAL` 控制，让 TokenizerManager 能跟踪它 {{code}}。
 
-## 事故：不再前进的 detokenizer
+## 事故：不再前进的 detokenizer {#s-streaming-stop-strings-and-the-openai-api-an-incident-the-detokenizer-that-never-moved}
 
 若 token 始终无法组成完整字符，不完整字符规则就有代价 {{issue #34740}}。文本末尾是替换字符 U+FFFD 时，detokenizer 等待。永不组成字符的字节 token 让偏移量始终不动，于是每一步重新解码整个尾部，工作量随长度平方增长。报告通过填充 ID 100 的测试设置发现它，该 ID 在 DeepSeek-V4-Pro 上解码为 U+FFFD。上游核验时该 issue 仍开放。
 
-## 本手册的建议
+## 本手册的建议 {#s-streaming-stop-strings-and-the-openai-api-our-position}
 
 调试、测量或自建客户端时使用原生 `/generate`，其 `meta_info` 提供每请求的排队时间、首 token 延迟、缓存命中与回撤。OpenAI 格式容不下其中多数数据。
 
@@ -145,4 +145,4 @@ caption: 自上而下读。蓝色生命线为 SGLang 进程，橄榄色为客户
 - 小模型答错时，应分别评判引擎和模型。
 ```
 
-Sources: python/sglang/srt/entrypoints/http_server.py (warm-up prompt, /generate), python/sglang/srt/entrypoints/openai/serving_chat.py (enable_cache_report), python/sglang/srt/managers/schedule_batch.py (update_finish_state, check_match_stop_str_prefix), python/sglang/srt/managers/scheduler_components/output_streamer.py, python/sglang/srt/managers/detokenizer_manager.py, python/sglang/srt/environ.py (SGLANG_FORCE_STREAM_INTERVAL), python/sglang/srt/arg_groups/fields/serving.py at v0.5.22; capture/out/generate.txt and capture/one_request.py; capture/out/serve-help.txt for --mlx-enable-sampling; issue https://github.com/sgl-project/sglang/issues/34740.
+来源： python/sglang/srt/entrypoints/http_server.py (warm-up prompt, /generate), python/sglang/srt/entrypoints/openai/serving_chat.py (enable_cache_report), python/sglang/srt/managers/schedule_batch.py (update_finish_state, check_match_stop_str_prefix), python/sglang/srt/managers/scheduler_components/output_streamer.py, python/sglang/srt/managers/detokenizer_manager.py, python/sglang/srt/environ.py (SGLANG_FORCE_STREAM_INTERVAL), python/sglang/srt/arg_groups/fields/serving.py，v0.5.22; capture/out/generate.txt 和 capture/one_request.py; capture/out/serve-help.txt，用于 --mlx-enable-sampling; issue https://github.com/sgl-project/sglang/issues/34740.

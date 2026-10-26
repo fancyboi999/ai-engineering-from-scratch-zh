@@ -2,11 +2,11 @@
 
 > 推测解码用 GPU 的空闲算力换取每步提交多个 token，因此它降低低负载延迟，却会在 GPU 已满时消耗吞吐量。
 
-一位用户在 A6000 上为 Llama-3.1-8B 开启 EAGLE-3，做了两次测试。Batch 为 1 时，输出从 42.0 增至 92.5 tok/s，速度翻倍以上；并发 20 时，输出却从 217.8 降至 164.4 tok/s，慢了约四分之一。两个数字都出现在 issue #5274 中，而且都正确。维护者回答，推测解码“适合小 batch，而非压力测试” {{issue #5274}}。
+一位用户在 A6000 上为 Llama-3.1-8B 开启 EAGLE-3，做了两次测试。Batch 为 1 时，输出从 42.0 增至 92.5 tok/s，速度翻倍以上；并发 20 时，输出却从 217.8 降至 164.4 tok/s，慢了约四分之一。两个数字都出现在 issue #5274 中，而且都正确。维护者回答，推测解码适合小 batch，不适合压力测试 {{issue #5274}}。
 
 读完本节，你能解释草稿、验证和接受长度，并看懂 SGLang 选择的默认值。你也能找出推测解码设置的请求上限，判断它适合哪些场景。
 
-## 代价：decode 一次只生成一个 token
+## 代价：decode 一次只生成一个 token {#s-speculative-decoding-the-cost-decode-is-one-token-at-a-time}
 
 每个 decode 步骤为每个请求提交一个 token，下一步需要这个 token 作为输入。Batch 为 1 时，一步要读取模型全部权重，只计算一个 token。GPU 还有空闲算力，瓶颈是内存流量。更大的 batch 会用其他请求填满空闲算力。
 
@@ -14,7 +14,7 @@
 
 **接受长度：** 每次验证提交的 token 数，即接受的草稿 token 加上额外的一个 token。接受长度为 3，意味着目标模型一次前向传播提交三个 token。
 
-## SGLang 中的一个步骤
+## SGLang 中的一个步骤 {#s-speculative-decoding-one-step-in-sglang}
 
 ```figure
 id: fig-4-6
@@ -30,11 +30,11 @@ caption: 从上往下读。数字采用 v0.5.22 中多数模型的默认值 (3, 
 
 接受阈值 `--speculative-accept-threshold-single` 和 `--speculative-accept-threshold-acc` 默认均为 1.0。使用这些值时，贪心请求生成的 token 与未启用推测解码时相同。
 
-## 算法与默认值
+## 算法与默认值 {#s-speculative-decoding-the-algorithms-and-the-defaults}
 
 `--speculative-algorithm` 接受 `EAGLE`、`EAGLE3`、`NEXTN`、`STANDALONE`、`NGRAM`、`DFLASH`、`DSPARK` 和 `UNO`。`NEXTN` 是 `EAGLE` 的别名。DeepSeek V3 等 checkpoint 内含多 token 预测层的模型，SGLang 会将草稿模型路径设为目标模型路径。`NGRAM` 完全不需要草稿模型，而是在已读文本中查找重复 token 序列。
 
-使用 `NGRAM` 时，SGLang 会关闭混合 chunked prefill {{code}}。v0.5.22 文档还称它会关闭 overlap scheduler 且只能在 CUDA 上运行。代码则支持 CUDA、CPU 和 XPU，并且只在 CPU 上关闭 overlap {{code}}。运行 `GET /server_info` 并查看 `disable_overlap_schedule`，确认服务的实际设置。比较 `NGRAM` 与无推测解码时，应保持 overlap 设置一致。
+使用 `NGRAM` 时，SGLang 会关闭混合 chunked prefill {{code}}。v0.5.22 文档还称 `NGRAM` 会关闭 overlap scheduler 且只能在 CUDA 上运行。代码则支持 CUDA、CPU 和 XPU，并且只在 CPU 上关闭 overlap {{code}}。运行 `GET /server_info` 并查看 `disable_overlap_schedule`，确认服务的实际设置。比较 `NGRAM` 与无推测解码时，应保持 overlap 设置一致。
 
 未设置形状时，SGLang 根据模型架构选择 `(num_steps, topk, num_draft_tokens)`。
 
@@ -45,17 +45,22 @@ caption: 从上往下读。数字采用 v0.5.22 中多数模型的默认值 (3, 
 
 Topk 为 1 时，代码强制将草稿 token 数设置为步数加一。
 
-## 没人主动要求的上限
+## 没人主动要求的上限 {#s-speculative-decoding-the-limit-nobody-asked-for}
 
-在 v0.5.22 中，如果你没有设置 `--max-running-requests`，EAGLE、NGRAM、DFLASH 和 DSPARK 都会将其设为 48，并输出一次警告 {{code}}。推测解码需要为草稿 token 留出内存，在小 batch 下效果最好，因此这个上限可以保护服务器。它也会限制你的基准。
+在 v0.5.22 中，如果你没有设置 `--max-running-requests`，EAGLE、NGRAM、DFLASH 和 DSPARK 处理器都会将其设为 48，并输出一次警告：`Max running requests is reset to 48 for speculative decoding` {{code}}。推测解码需要为草稿 token 留出内存，在小 batch 下效果最好，因此这个上限可以保护服务器。它也会限制你的基准。
 
 开启推测解码、但不显式设置上限的吞吐量测试，测的是一台最多接纳 48 个请求的服务器。如果流量有 200 个并发请求，其余 152 个就在队列等待，首 token 时间随之上升。警告只在启动时打印一次，在首个请求到来前便已滚出屏幕。
 
-## 应该测什么
+## 应该测什么 {#s-speculative-decoding-what-to-measure}
 
 调度器每条 decode 日志会输出 `accept len` 和 `accept rate`，`/metrics` 则导出 `sglang:spec_accept_length` 和 `sglang:spec_accept_rate`。用自己的 prompt 测量，因为接受率取决于文本和草稿。David Noel Ng 的实践报告 {{field David Noel Ng 2026-08}} 在两张 GH200 上测试 DeepSeek-V4-Flash，修复加载器后测得 3.5 至 5.05 个 token。
 
-用自己的流量分别运行开启和关闭推测解码的服务，保留真实输出长度，并给 benchmark client 传 `--disable-ignore-eos`。没有流量样本时，`--dataset-name speed-bench` 会读取 v0.5.22 自带的 SPEED-Bench prompt 副本 {{code}}。至少比较四项：`sglang:spec_accept_length`、TPOT 中位数、输出吞吐量、P99 ITL 与 P99 TTFT。最长回答应单独统计接受长度；`/generate` 响应的 `meta_info.spec_accept_length` 会给出该值。
+用自己的流量分别运行开启和关闭推测解码的服务，保留真实输出长度，并给 benchmark client 传 `--disable-ignore-eos`。没有流量样本时，`--dataset-name speed-bench` 会读取 v0.5.22 自带的 SPEED-Bench prompt 副本 {{code}}。比较以下指标：
+
+1. 接受长度，读取 `sglang:spec_accept_length`。
+2. TPOT 中位数和输出吞吐量。
+3. P99 ITL 和 P99 TTFT，因为中位数收益可能掩盖尾延迟损失。
+4. 单独统计最长回答的接受长度。每条 `/generate` 响应的 `meta_info` 中都有 `spec_accept_length`。
 
 随后分别开启和关闭推测解码，扫描并发，找到两条曲线的交点。Ant Group {{field Ant Group 2025-09}} 在 H20 上对 DeepSeek-R1 做了这项测量。更长的草稿在 batch 1 时提升 21%，在 batch 32 时损失约 18%。
 
@@ -67,11 +72,11 @@ claim: 相同 GPU 和模型上，推测解码让单请求速度翻倍，却降�
 caption: 单张 A6000 上 Llama-3.1-8B 开启和关闭 EAGLE-3 的输出 tok/s，来自 2025-04-11 的 issue 5274。所有柱使用同一刻度。
 ```
 
-## 我们在 GB10 上测到了什么
+## 我们在 GB10 上测到了什么 {#s-speculative-decoding-what-we-measured-on-a-gb10}
 
 我们在一张 NVIDIA GB10 上，为 `Qwen/Qwen3-30B-A3B-Instruct-2507` 运行 EAGLE-3。草稿模型为 `lmsys/SGLang-EAGLE3-Qwen3-30B-A3B-Instruct-2507-SpecForge-Nex`，形状采用 SGLang cookbook 为这组模型设置的 (3, 1, 4)。
 
-第一次启动失败了。草稿配置声明 2,048 个位置，目标模型声明 262,144 个位置。上下文长度检查抛出 `ValueError`，末尾提示需要设置环境变量 `SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1`，才能覆盖这个最大值 {{code}}。Cookbook 的对应命令设置了这个变量，因此我们也照做。
+第一次启动失败了。草稿配置声明 2,048 个位置，目标模型声明 262,144 个位置。上下文长度检查抛出 `ValueError`，末尾返回 `To allow overriding this maximum, set the env var SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1` {{code}}。Cookbook 的对应命令设置了这个变量，因此我们也照做。
 
 ```listing
 title: 设置覆盖变量后的草稿上下文长度检查
@@ -100,7 +105,7 @@ note: 启动日志中的四行，省略时间戳。
 … max_total_num_tokens=8827, chunked_prefill_size=4096, max_prefill_tokens=16384, max_running_requests=48, context_len=40960, available_gpu_mem=1.19 GB
 ```
 
-同一次启动也展示了小显卡上加载草稿的代价。这张 L4 上，仅目标模型时池容量为 24,094 个 token；加载草稿后只剩 8,827 个 token，约能容纳 13 个我们使用的 640 token 请求。
+同一次启动也展示了小显卡上加载草稿的代价。这张 L4 上，仅目标模型时池容量为 24,094 个 token；加载草稿后只剩 8,827 个 token，约能容纳 14 个我们使用的 640-token 请求。同一张卡上的扫描服务器启动时有更多可用内存，池容量为 9,951 token。
 
 **我们实测**了并发 1 至 64，每种并发运行三个 seed，以 BF16 服务器为基线：
 
@@ -121,11 +126,11 @@ claim: GB10 上，EAGLE-3 将每 token 耗时中位数在并发 1 时缩短为�
 caption: 曲线为各并发下基线 TPOT 中位数除以 EAGLE-3 TPOT 中位数。玫瑰色虚线表示没有收益，脚注给出接受长度范围。来源：capture/gpu/summary/gb10.json。
 ```
 
-这与前面的 A6000 报告相反，模型差异解释了原因。稠密模型每一步读取全部权重，更大的 batch 已经用掉了空闲算力。混合专家模型则只读取这一步各 token 选中的专家。验证过程使用这一步已经读入的专家权重，为每个请求计算四个位置。这是我们的解释，测量范围只有一个模型和一张 GPU。
+这与前面的 A6000 报告相反。上游用模型差异提出一种解释：稠密模型每一步读取全部权重，更大的 batch 已经用掉空闲算力；混合专家模型只读取这一步各 token 选中的专家，验证过程可以使用已读入的专家权重，为每个请求计算四个位置。这是假设，测量只覆盖这一个模型和一张 GB10。A6000 对照同时改变了 GPU 与模型，无法隔离模型架构的影响。
 
 上限仍是限制。并发 64 时，吞吐量仍高于基线，分别为 276.32 和 235.38 tok/s；但首 token 时间中位数分别是 7,772 ms 和 557 ms。服务器只接纳 48 个请求，其余 16 个在队列等待。
 
-## 我们在 24 GB L4 上测到了什么
+## 我们在 24 GB L4 上测到了什么 {#s-speculative-decoding-what-we-measured-on-a-24-gb-l4}
 
 我们在一张 L4 上，用稠密模型 `Qwen/Qwen3-8B` 与草稿 `Tengyunw/qwen3_8b_eagle3` 做了相同扫描。默认服务的数据记录于 2026-10-16，EAGLE-3 服务记录于 2026-10-17，两者的时钟中位数都不低于 1,080 MHz。扫描程序为每台 EAGLE-3 服务设置了上述变量。
 
@@ -139,7 +144,7 @@ note: 扫描中服务器的启动日志行，省略时间戳。
 … max_total_num_tokens=9951, chunked_prefill_size=4096, max_prefill_tokens=16384, max_running_requests=48, context_len=40960, available_gpu_mem=1.23 GB
 ```
 
-**我们实测**草稿加载后，KV 池容量为 9,951 个 token；仅加载目标模型时为 24,094。它约能容纳 14 个、每个 640 token 的请求，少于 48 个请求的上限。扫描服务器启动时有更多可用显存，池容量为 9,951 token。
+**我们实测**草稿加载后，KV 池容量为 9,951 个 token；仅加载目标模型时为 24,094。它约能容纳 15 个、每个 640-token 的请求，少于 48 个请求的上限。
 
 | 并发 | 默认 TPOT 中位数 | EAGLE-3 TPOT 中位数 | 默认输出 tok/s | EAGLE-3 输出 tok/s |
 |---|---|---|---|---|
@@ -160,20 +165,20 @@ caption: 紫色为默认 TPOT 除以 EAGLE-3 TPOT，青色为 EAGLE-3 输出吞�
 
 池容量解释了差异。池内只有 15 个请求，其余请求都在等待槽位。并发 32 时，EAGLE-3 的 TTFT 中位数为 8,040 ms，不开启时为 2,970 ms。当显卡受 KV 池限制时，草稿消耗的是 batch 所需的内存。
 
-## 测量结论的适用范围
+## 测量结论的适用范围 {#s-speculative-decoding-know-the-limits-of-our-results}
 
 前两次扫描都使用 benchmark client 的 `random` 数据集：512 个输入 token、128 个输出 token，并开启 `ignore_eos`。v0.5.22 会从 ShareGPT 读取第一轮问题，再裁剪或重复到 512 token {{code}}。这些是自然文本，但不等同于你的流量。
 
 其他团队发现，这类测试可能高估推测解码收益。以下结果均为他人研究，我们没有复测：
 
-- NVIDIA 研究人员发布的 SPEED-Bench 发现，合成 prompt 平均高估推测解码吞吐量 23%。Batch 增大时，最优草稿长度会降到 1 {{paper SPEED-Bench 2026-05}}。
+- NVIDIA 研究人员 2026 年发布的 SPEED-Bench 发现，合成 prompt 平均高估推测解码吞吐量 23%。Batch 增大时，最优草稿长度会降到 1 {{paper SPEED-Bench 2026-05}}。
 - 同一研究发现，随机 token id 会让部分 MoE 层中 20% 至 30% 的专家空闲 {{paper SPEED-Bench 2026-05}}。
-- Test-Time Speculation 研究了 EAGLE-3 等草稿模型。MATH 答案接近 20,000 token 时，接受长度从约 3.7 降至约 1.5 {{paper Test-Time Speculation 2026-05}}。
+- 2026 年的 Test-Time Speculation 研究了 EAGLE-3 等草稿模型。MATH 答案接近 20,000 token 时，接受长度从约 3.7 降至约 1.5 {{paper Test-Time Speculation 2026-05}}。
 - 2025 年的一项服务基准研究发现，推测解码降低 TPOT 中位数 1.3 倍，却使 P99 TPOT 增加 1.16 倍。由于草稿模型也要执行 prefill，TTFT 同样可能上升 {{paper inference-serving 2025-07}}。
 
 因此，这里的加速只适用于忽略 EOS 后生成 128 token 的测试 prompt。它不能预测长聊天回答或推理轨迹上的结果。GB10 上的效果也取决于真实 token 如何选择专家；我们没有测过该路由分布。
 
-## 在 L4 上测试真实 prompt
+## 在 L4 上测试真实 prompt {#s-speculative-decoding-real-prompts-on-the-l4}
 
 2026-10-23，我们在 L4 上使用四种数据集运行扫描：`random`、ShareGPT、GSM8K 问题和代码 prompt。时钟锁定在 900 MHz，每次运行前清空缓存，每个点使用两个 seed。
 
@@ -181,7 +186,7 @@ caption: 紫色为默认 TPOT 除以 EAGLE-3 TPOT，青色为 EAGLE-3 输出吞�
 title: SGLang 0.5.22、L4 900 MHz 上四种数据集的推测解码结果
 source: capture/gpu/out-l4/spec-real-prompts.txt
 lang: text
-note: 摘录 8 个并发下的 token 中位耗时，以及 32 个并发下的输出吞吐量；每个范围覆盖两个 seed。
+note: 摘录 8 个用户时的 TPOT 中位数，以及 32 个用户时的输出吞吐量。接受长度行和说明已略去。
 ---
 median TPOT at 8 users: default / EAGLE3 / NGRAM
 random     67.6 to 68.2 / 33.8 to 39.4 / 68.2 to 71.4 ms
@@ -201,9 +206,9 @@ code       365 to 366 / 566 to 581 / 377 to 386
 
 NGRAM 只在 GSM8K 和代码上有帮助，8 个并发时约为 1.1 至 1.2 倍。另两种数据集上它更慢，P99 ITL 升至 244 至 779 ms。因此数据集会显著改变结果。应使用自己的流量测试。
 
-## 长回答期间的接受长度
+## 长回答期间的接受长度 {#s-speculative-decoding-acceptance-over-a-long-answer}
 
-我们测试了 Test-Time Speculation 对短回答的观察。2026-10-23，我们在 L4 上使用 `Qwen/Qwen3-8B-FP8` 和 EAGLE-3 草稿，设置 3 步、top-k 为 1、4 个草稿 token。实验使用 L4 节点的第二张 GPU，由所有者共享，未锁定时钟。8 个 prompt 开启思考模式、greedy 解码、每次单独运行，最多生成 4,096 token。我们在 256、512、1,024、2,048 和 4,096 个输出 token 后读取 `spec_verify_ct`。
+上游用较短回答检验 Test-Time Speculation 关于接受长度的结论。2026-10-23，我们在 L4 上使用 `Qwen/Qwen3-8B-FP8` 和 EAGLE-3 草稿，设置 3 步、top-k 为 1、4 个草稿 token。实验使用 L4 节点的第二张 GPU，由所有者共享，未锁定时钟。8 个 prompt 开启思考模式、greedy 解码、每次单独运行，最多生成 4,096 token。我们在 256、512、1,024、2,048 和 4,096 个输出 token 后读取 `spec_verify_ct`。
 
 ```listing
 title: 输出不同位置的平均接受长度
@@ -227,7 +232,7 @@ segment of the output   SGLang                 vLLM
 title: 约 2,000-token 回答的 EAGLE-3 接受长度，8 个用户
 source: capture/gpu/out-l4/eagle3-long-outputs.txt
 lang: text
-note: 摘录表格。vLLM 来自 vLLM 0.31.0；与短回答的比较已略去。
+note: 摘录文件中的表格，与短回答的比较已略去。
 ---
 engine          dataset    mean acceptance length   accepted per draft position 1 / 2 / 3
 SGLang EAGLE3   GSM8K      2.68
@@ -236,19 +241,19 @@ vLLM EAGLE3     GSM8K      2.69                     0.77 / 0.54 / 0.38
 vLLM EAGLE3     ShareGPT   2.35                     0.67 / 0.42 / 0.26
 ```
 
-同一时段的短回答中，SGLang 在 GSM8K 上的接受长度为 2.69 至 2.78，在 ShareGPT 上为 2.33 至 2.43。长回答的结果在两个范围的 0.01 以内。我们没有同一时段的 vLLM 短回答数据，因此这里只列出 vLLM 的长回答结果。
+同一时段的短回答中，SGLang 在 GSM8K 上的接受长度为 2.69 至 2.78，在 ShareGPT 上为 2.33 至 2.43。长回答的结果与对应短回答范围的距离不超过 0.01。我们没有同一时段的 vLLM 短回答数据，因此这里只列出 vLLM 的长回答结果。
 
-## 我们的建议
+## 我们的建议 {#s-speculative-decoding-our-position}
 
 把推测解码视为低、中并发的延迟工具。每个副本只有少数用户的交互流量适合开启。在 KV 池受限的显卡上，高并发和批处理默认关闭。
 
-接受这条经验前，先测自己模型的交点。上面的混合专家模型在 GB10 上并发 32 时仍有收益。L4 上的稠密模型到 32 就不再胜出，因为草稿占掉了近 60% 的池。GB10 上的 KV 池有余量，推测解码在并发 64 时仍将吞吐量提高到 1.17 倍。
+接受这条经验前，先测自己模型的交点。上面的混合专家模型在 GB10 上并发 32 时仍有收益。L4 上的稠密模型到并发 32 就不再有吞吐量收益，因为草稿占掉了近 60% 的池。应按前文指标，用自己的 prompt 和输出长度测量。GB10 上的 KV 池有余量，推测解码在并发 64 时仍将吞吐量提高到 1.17 倍。
 
 开启推测解码时，始终自己设置 `--max-running-requests`。根据扫描中仍有收益的并发选择数值。
 
 优先使用模型自带的草稿层。带多 token 预测层的模型无须额外下载。使用 EAGLE-3 时，检查草稿模型是否支持 prompt 长度；接受率低时，可用自己的流量训练草稿。Google Cloud {{team Google Cloud 2025-11}} 和 Modal 与 Decagon {{team Modal 2025-11}} 都训练了自己的草稿。Modal 报告接受长度比开源草稿高 38%。两者均为厂商报告。
 
-## 事故
+## 事故 {#s-speculative-decoding-incidents}
 
 **推测解码使压力测试变慢。** Issue #5274（2025-04-11）：A6000 上的 EAGLE-3 在并发 20 时把吞吐量从 217.8 降至 164.4 tok/s，却在 batch 1 时把速度从 42.0 提至 92.5 tok/s。解决方式是只在小 batch 开启。
 
@@ -265,4 +270,4 @@ vLLM EAGLE3     ShareGPT   2.35                     0.67 / 0.42 / 0.26
 - SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1 只移除了检查，长 prompt 必须自行测试。
 ```
 
-来源：capture/gpu/out-gb10/server-eagle3.log, capture/gpu/out-l4/server-eagle3-no-env.log, capture/gpu/out-l4/server-load-eagle3.log, capture/gpu/summary/l4.json, capture/gpu/summary/gb10.json, capture/gpu/out-l4/spec-real-prompts.txt, capture/gpu/out-l4/eagle3-acceptance-by-position.txt, capture/gpu/out-l4/eagle3-long-outputs.txt, capture/gpu/sweep.py, python/sglang/srt/configs/model_config.py (_derive_context_length), docs/cookbook/specbundle/specbundle_usage.mdx, docs/docs/advanced_features/speculative_decoding.mdx, python/sglang/srt/speculative/eagle_worker_v2.py (forward_batch_generation), speculative/eagle_utils.py (build_tree_kernel_efficient, eagle_sample), arg_groups/speculative_hook.py (_auto_choose_speculative_params, _handle_eagle_family, _handle_ngram, _disable_overlap_schedule_for_cpu, _resolve_speculative_algorithm_alias), arg_groups/fields/spec.py, managers/scheduler_components/metrics_reporter.py, and observability/metrics_collector.py at v0.5.22; python/sglang/benchmark/datasets/random.py (sample_random_requests), python/sglang/benchmark/datasets/speed_bench.py, python/sglang/benchmark/serving.py (--disable-ignore-eos); issues #5274 and #6783; PR #33276; field reports by Ant Group on the LMSYS blog (2025-09-26) and David Noel Ng (2026-08-04); vendor reports by Google Cloud (2025-11-25) and Modal with Decagon (2025-11-13); Abramovich et al., SPEED-Bench: A Unified and Diverse Benchmark for Speculative Decoding, arXiv 2604.09557 (2026-02, revised 2026-05); Kumar, Sanghavi, and Das, Test-Time Speculation, arXiv 2605.09329 (2026-05); Patodiya et al., On Evaluating Performance of LLM Inference Serving Systems, arXiv 2507.09019 (2025-07).
+来源： capture/gpu/out-gb10/server-eagle3.log, capture/gpu/out-l4/server-eagle3-no-env.log, capture/gpu/out-l4/server-load-eagle3.log, capture/gpu/summary/l4.json, server-eagle3.command.txt, eagle3-bench-random-c1.txt, eagle3-bench-random-c8.txt, eagle3-bench-random-c32.txt, capture/gpu/summary/gb10.json, python/sglang/srt/configs/model_config.py (_derive_context_length), docs/cookbook/specbundle/specbundle_usage.mdx, python/sglang/srt/speculative/eagle_worker_v2.py (forward_batch_generation), speculative/eagle_utils.py (build_tree_kernel_efficient, eagle_sample), arg_groups/speculative_hook.py (_auto_choose_speculative_params, _handle_eagle_family, _handle_ngram, _disable_overlap_schedule_for_cpu, _resolve_speculative_algorithm_alias), arg_groups/fields/spec.py, managers/tokenizer_manager.py （推测解码 meta_info）, python/sglang/benchmark/datasets/random.py (sample_random_requests), python/sglang/benchmark/datasets/speed_bench.py, python/sglang/benchmark/serving.py (--disable-ignore-eos), docs/docs/advanced_features/speculative_decoding.mdx （NGRAM 行）, managers/scheduler_components/metrics_reporter.py, observability/metrics_collector.py（v0.5.22）; issue #5274、#6783; PR #33276; Ant Group 在 LMSYS 博客的实践报告（2025-09-26）及 David Noel Ng 的实践报告（2026-08-04）; Google Cloud（2025-11-25）及 Modal 与 Decagon（2025-11-13）的厂商报告; Abramovich 等, SPEED-Bench: A Unified and Diverse Benchmark for Speculative Decoding, arXiv 2604.09557 （2026-02，2026-05 修订）, Kumar、Sanghavi 和 Das, Test-Time Speculation, arXiv 2605.09329 (2026-05), capture/gpu/out-l4/eagle3-acceptance-by-position.txt, Agrawal 等, On Evaluating Performance of LLM Inference Serving Systems, arXiv 2507.09019 (2025-07), capture/gpu/out-l4/spec-real-prompts.txt, capture/gpu/out-l4/eagle3-long-outputs.txt.

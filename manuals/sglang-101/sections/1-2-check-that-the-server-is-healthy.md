@@ -6,7 +6,7 @@
 
 读完本节，你能为脚本或探针选择合适的健康检查端点，也能看懂用于规划显存的三行启动日志、预热服务并读取首批指标。
 
-## 等待 `/health` 返回 200
+## 等待 `/health` 返回 200 {#s-check-that-the-server-is-healthy-wait-until-health-returns-200}
 
 在脚本中，可以持续请求 `/health`，直到收到 200：
 
@@ -33,7 +33,7 @@ note: 取自日志第 36 至 43 行；省略 /model_info 请求和前两行 pref
 
 注意 200 行前的日志。调度器为健康检查运行了一次只含一个 token 的 prefill。默认的 `/health` 会把请求交给模型并等待结果，并非只报告进程状态。
 
-## 按用途选择端点
+## 按用途选择端点 {#s-check-that-the-server-is-healthy-choose-the-endpoint-for-the-job}
 
 SGLang 提供三个健康检查端点 {{code}}。按你要确认的问题选择：
 
@@ -43,7 +43,7 @@ SGLang 提供三个健康检查端点 {{code}}。按你要确认的问题选择�
 
 启动脚本可以用任一端点等待。但在 Kubernetes 探针中，选择会影响高负载下的行为。会生成 token 的探针和用户请求一起排队。[第 7.1 节](#s-operating-sglang)给出推荐配置和相关事故。
 
-## 查看三行启动日志
+## 查看三行启动日志 {#s-check-that-the-server-is-healthy-read-the-three-startup-lines}
 
 启动日志中的三行会告诉你服务能容纳多少内容。SGLang 会自动计算这些值，每次启动都要检查：
 
@@ -70,7 +70,7 @@ note: 摘录启动日志中的三行；省略其间内容。
 
 如果池比流量所需的容量小，先到[第 3.1 节](#s-kv-bytes-per-token-and-the-kv-pool)计算显存需求，再到[第 3.2 节](#s-mem-fraction-static-and-startup-sizing)调整池大小。
 
-## 测量前预热
+## 测量前预热 {#s-check-that-the-server-is-healthy-warm-up-the-server-before-you-measure}
 
 本节开头的日志在 ready 行前出现了 `POST /generate` 和 `POST /freeze_gc`。服务先向自己发送一个请求，然后冻结 Python 垃圾回收器，避免持续扫描启动时创建的对象。
 
@@ -78,7 +78,7 @@ note: 摘录启动日志中的三行；省略其间内容。
 
 预热无法保证每台机器上的首个请求都很快。在我们的 L4 上，启动后的首个请求花了 68 毫秒才得到第一个 token；在 Mac 上，同类请求用了 889 毫秒。测量前先发送几个自己的请求。
 
-## 查看首批指标
+## 查看首批指标 {#s-check-that-the-server-is-healthy-check-the-first-metrics}
 
 使用 `--enable-metrics` 启动的服务会在 `/metrics` 提供 Prometheus 指标。现在查看下面四项，并留好这条命令供后续使用：
 
@@ -113,4 +113,4 @@ sglang:token_usage{engine_type="unified",model_name="Qwen/Qwen3-8B",moe_ep_rank=
 - 查看 num_queue_reqs 和 token_usage，再判断回答变慢的原因。
 ```
 
-Sources: capture/gpu/out-l4/server-default.log, capture/gpu/out-l4/metrics.txt, capture/gpu/out-l4/generate.txt, capture/gpu/run.py; python/sglang/srt/entrypoints/http_server.py (health, health_generate, ready, _execute_server_warmup, _freeze_gc_after_server_warmup) at v0.5.22; LinkedIn Engineering, “Scaling LLM-based ranking systems with SGLang at LinkedIn” (https://www.linkedin.com/blog/engineering/ai/scaling-llm-based-ranking-systems-with-sglang-at-linkedin, 2026-02-20); https://github.com/sgl-project/sglang/pull/9241.
+来源： capture/gpu/out-l4/server-default.log, capture/gpu/out-l4/metrics.txt, capture/gpu/out-l4/generate.txt, capture/gpu/run.py, capture/out/generate.txt; python/sglang/srt/entrypoints/http_server.py (health, health_generate, ready, _execute_server_warmup, _freeze_gc_after_server_warmup)，v0.5.22; LinkedIn Engineering, "Scaling LLM-based ranking systems with SGLang at LinkedIn" (https://www.linkedin.com/blog/engineering/ai/scaling-llm-based-ranking-systems-with-sglang-at-linkedin, 2026-02-20); PR 9241 (https://github.com/sgl-project/sglang/pull/9241).
