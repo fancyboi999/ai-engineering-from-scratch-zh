@@ -1,32 +1,7 @@
 {
   "base": "45fa4084de6ba2f88fa96a41e69efa2166f868b3",
   "target": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
-  "pending": [
-    {
-      "scope": "core",
-      "work": "现有课程正文、代码、测验及产物纠错"
-    },
-    {
-      "scope": "reader",
-      "work": "课程阅读器、目录完成状态与高亮布局"
-    },
-    {
-      "scope": "manuals",
-      "work": "新增vLLM/Miles及现有手册、章节页与来源证据"
-    },
-    {
-      "scope": "practice",
-      "work": "51道练习内容、浏览器运行器、持久化与路由"
-    },
-    {
-      "scope": "cheatsheets",
-      "work": "速查表内容、来源冻结与布局质量"
-    },
-    {
-      "scope": "machines",
-      "work": "反编译器/GPU交互图解、figure及技能"
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "上游模型生成与多语言流水线",
