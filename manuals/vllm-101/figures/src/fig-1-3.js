@@ -12,9 +12,9 @@ module.exports = figure('fig-1-3', {
   f.kicker(330, 18, '进程 2');
   f.kicker(500, 18, '每块 GPU 各一个');
   const client = f.box({ x: 20, y: 40, w: 116, h: 64, hue: 'olive', title: '客户端', sub: ['curl、OpenAI', 'SDK、基准测试'] });
-  const api = f.box({ x: 160, y: 40, w: 150, h: 64, hue: 'blue', title: 'API server', sub: ['HTTP 路由', '分词器'] });
-  const core = f.box({ x: 330, y: 40, w: 150, h: 64, hue: 'blue', title: 'engine core', sub: ['调度器', 'KVCacheManager'] });
-  const worker = f.box({ x: 500, y: 40, w: 120, h: 64, hue: 'violet', title: 'GPU worker', sub: ['GPUModelRunner', '前向计算'] });
+  const api = f.box({ x: 160, y: 40, w: 150, h: 64, hue: 'blue', title: 'API 服务器', sub: ['HTTP 路由', '分词器'] });
+  const core = f.box({ x: 330, y: 40, w: 150, h: 64, hue: 'blue', title: '引擎核心', sub: ['调度器', 'KVCacheManager'] });
+  const worker = f.box({ x: 500, y: 40, w: 120, h: 64, hue: 'violet', title: 'GPU 工作者', sub: ['GPUModelRunner', '前向计算'] });
   f.arrow([136, 62], [159, 62], { style: 'call' });
   f.arrow([310, 62], [329, 62], { style: 'call' });
   f.arrow([480, 62], [499, 62], { style: 'call' });

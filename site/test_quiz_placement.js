@@ -6,6 +6,18 @@ const MDRender = require('./md-render.js');
 
 const ROOT = path.join(__dirname, '..');
 
+test('figure review links have deterministic, unique anchors in both render paths', () => {
+  const markdown = ['```figure', 'ce-rootcause-walk', '```', '```figure', 'iso-machine {"machine":"self-attention"}', '```',
+    '```figure', 'iso-machine {"machine":"kv-cache"}', '```'].join('\n');
+  const html = MDRender.parseMd(markdown);
+  assert.match(html, /data-figure="ce-rootcause-walk" id="figure-ce-rootcause-walk"/);
+  assert.match(html, /id="figure-iso-machine"/);
+  assert.match(html, /id="figure-iso-machine-2"/);
+  assert.equal(MDRender.parseMd(markdown), html, 'anchors do not depend on other pages or prior renders');
+  assert.match(html, /data-figure="iso-machine \{&quot;machine&quot;:&quot;self-attention&quot;\}"/,
+    'the renderer keeps the original machine configuration');
+});
+
 function lessonsWithQuiz() {
   const lessons = [];
   for (const phase of fs.readdirSync(path.join(ROOT, 'phases'))) {

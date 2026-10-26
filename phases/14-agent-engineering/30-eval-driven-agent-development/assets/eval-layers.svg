@@ -17,67 +17,67 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Eval-driven development — three layers + evaluator-optimizer loop</text>
+  <text x="480" y="26" text-anchor="middle" class="title">评估驱动开发：三层评估与评估器优化器循环</text>
 
   <rect x="40" y="50" width="290" height="220" class="bench"/>
-  <text x="185" y="72" text-anchor="middle" class="head">1. static benchmarks</text>
-  <text x="60" y="96" class="small">cross-model comparison + regression gate</text>
+  <text x="185" y="72" text-anchor="middle" class="head">1. 静态基准</text>
+  <text x="60" y="96" class="small">跨模型比较 + 回归门禁</text>
   <rect x="60" y="108" width="250" height="30" class="box"/>
-  <text x="78" y="128" class="step">SWE-bench Verified (code)</text>
+  <text x="78" y="128" class="step">SWE-bench Verified（代码）</text>
   <rect x="60" y="140" width="250" height="30" class="box"/>
-  <text x="78" y="160" class="step">WebArena / OSWorld (web/desktop)</text>
+  <text x="78" y="160" class="step">WebArena / OSWorld（网页/桌面）</text>
   <rect x="60" y="172" width="250" height="30" class="box"/>
-  <text x="78" y="192" class="step">GAIA (generalist)</text>
+  <text x="78" y="192" class="step">GAIA（通用能力）</text>
   <rect x="60" y="204" width="250" height="30" class="box"/>
-  <text x="78" y="224" class="step">BFCL V4 (tool use)</text>
+  <text x="78" y="224" class="step">BFCL V4（工具使用）</text>
   <rect x="60" y="236" width="250" height="28" class="box"/>
-  <text x="78" y="254" class="step">contamination: always report +audit</text>
+  <text x="78" y="254" class="step">污染：始终报告并审计</text>
 
   <rect x="340" y="50" width="290" height="220" class="custom"/>
-  <text x="485" y="72" text-anchor="middle" class="head">2. custom offline evals</text>
-  <text x="360" y="96" class="small">your product's shape</text>
+  <text x="485" y="72" text-anchor="middle" class="head">2. 自定义离线评估</text>
+  <text x="360" y="96" class="small">匹配你的产品形态</text>
   <rect x="360" y="108" width="250" height="30" class="box"/>
-  <text x="378" y="128" class="step">LLM-as-judge (Langfuse, Phoenix, Opik)</text>
+  <text x="378" y="128" class="step">LLM 评审（Langfuse、Phoenix、Opik）</text>
   <rect x="360" y="140" width="250" height="30" class="box"/>
-  <text x="378" y="160" class="step">execution-based (run patch, check tests)</text>
+  <text x="378" y="160" class="step">基于执行（运行补丁，检查测试）</text>
   <rect x="360" y="172" width="250" height="30" class="box"/>
-  <text x="378" y="192" class="step">trajectory-based (OSWorld-Human)</text>
+  <text x="378" y="192" class="step">基于轨迹（OSWorld-Human）</text>
   <rect x="360" y="204" width="250" height="30" class="box"/>
-  <text x="378" y="224" class="step">pinned seeds, snapshot state</text>
+  <text x="378" y="224" class="step">固定种子、保存状态快照</text>
   <rect x="360" y="236" width="250" height="28" class="box"/>
-  <text x="378" y="254" class="step">evals live next to code</text>
+  <text x="378" y="254" class="step">评估代码与产品代码相邻</text>
 
   <rect x="640" y="50" width="290" height="220" class="online"/>
-  <text x="785" y="72" text-anchor="middle" class="head">3. online evals (prod)</text>
-  <text x="660" y="96" class="small">continuous, sampled, PII-scrubbed</text>
+  <text x="785" y="72" text-anchor="middle" class="head">3. 线上评估（生产）</text>
+  <text x="660" y="96" class="small">持续采样，并清除 PII</text>
   <rect x="660" y="108" width="250" height="30" class="box"/>
-  <text x="678" y="128" class="step">session replays (Langfuse)</text>
+  <text x="678" y="128" class="step">会话重放（Langfuse）</text>
   <rect x="660" y="140" width="250" height="30" class="box"/>
-  <text x="678" y="160" class="step">guardrail-triggered alerts</text>
+  <text x="678" y="160" class="step">护栏触发告警</text>
   <rect x="660" y="172" width="250" height="30" class="box"/>
-  <text x="678" y="192" class="step">per-step cost / latency tracking</text>
+  <text x="678" y="192" class="step">逐步追踪成本与延迟</text>
   <rect x="660" y="204" width="250" height="30" class="box"/>
-  <text x="678" y="224" class="step">failure tagging (Lesson 26)</text>
+  <text x="678" y="224" class="step">失败标记（第 26 课）</text>
   <rect x="660" y="236" width="250" height="28" class="box"/>
-  <text x="678" y="254" class="step">feedback loop into custom cases</text>
+  <text x="678" y="254" class="step">反馈到自定义用例</text>
 
   <rect x="40" y="290" width="880" height="220" class="loop"/>
-  <text x="480" y="312" text-anchor="middle" class="head">evaluator-optimizer loop  (Anthropic, generalized Self-Refine)</text>
+  <text x="480" y="312" text-anchor="middle" class="head">评估器优化器循环（Anthropic，通用化 Self-Refine）</text>
 
   <rect x="60" y="328" width="200" height="50" class="box"/>
-  <text x="160" y="352" text-anchor="middle" class="step">proposer</text>
-  <text x="160" y="368" text-anchor="middle" class="small">emits candidate</text>
+  <text x="160" y="352" text-anchor="middle" class="step">提议器</text>
+  <text x="160" y="368" text-anchor="middle" class="small">输出候选方案</text>
 
   <rect x="300" y="328" width="200" height="50" class="box"/>
-  <text x="400" y="352" text-anchor="middle" class="step">evaluator</text>
-  <text x="400" y="368" text-anchor="middle" class="small">judges (pass / fail + reason)</text>
+  <text x="400" y="352" text-anchor="middle" class="step">评估器</text>
+  <text x="400" y="368" text-anchor="middle" class="small">判断通过或失败并说明原因</text>
 
   <rect x="540" y="328" width="200" height="50" class="box"/>
-  <text x="640" y="352" text-anchor="middle" class="step">refine</text>
-  <text x="640" y="368" text-anchor="middle" class="small">feedback returns to proposer</text>
+  <text x="640" y="352" text-anchor="middle" class="step">改进</text>
+  <text x="640" y="368" text-anchor="middle" class="small">将反馈返回提议器</text>
 
   <rect x="780" y="328" width="130" height="50" class="box"/>
-  <text x="845" y="358" text-anchor="middle" class="step">pass  ship</text>
+  <text x="845" y="358" text-anchor="middle" class="step">通过后交付</text>
 
   <line x1="260" y1="353" x2="300" y2="353" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="500" y1="353" x2="540" y2="353" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -85,11 +85,11 @@
   <line x1="640" y1="378" x2="160" y2="378" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="398" width="840" height="30" class="box"/>
-  <text x="78" y="418" class="step">2026 best practice: evals in CI; fail merge on &gt;=5% regression vs baseline</text>
+  <text x="78" y="418" class="step">2026 最佳实践：评估纳入 CI；相对基线退化 &gt;=5% 时阻止合并</text>
   <rect x="60" y="432" width="840" height="30" class="box"/>
-  <text x="78" y="452" class="step">every guardrail maps to a case; every learned rule maps to a failure case</text>
+  <text x="78" y="452" class="step">每道护栏对应一个用例；每条经验规则对应一个失败用例</text>
   <rect x="60" y="466" width="840" height="30" class="box"/>
-  <text x="78" y="486" class="step">LLM-judge grounds via CRITIC (external tools); avoid judge hallucination</text>
+  <text x="78" y="486" class="step">LLM 评审通过 CRITIC（外部工具）取得依据，避免评审幻觉</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">eval is not the last step. it is the outer loop that drives every Phase 14 choice.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">评估不是最后一步，而是驱动阶段 14 每项选择的外循环。</text>
 </svg>

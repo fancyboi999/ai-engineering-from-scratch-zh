@@ -18,86 +18,86 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Patch-n'-pack: variable-resolution images into one sequence</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Patch-n'-pack：将可变分辨率图像打包成一条序列</text>
 
   <rect x="30" y="50" width="200" height="200" class="box"/>
-  <text x="130" y="70" text-anchor="middle" class="head">three images, three shapes</text>
+  <text x="130" y="70" text-anchor="middle" class="head">三张图像，三种形状</text>
   <rect x="50" y="85" width="60" height="120" class="hot"/>
-  <text x="80" y="95" text-anchor="middle" class="small">receipt</text>
+  <text x="80" y="95" text-anchor="middle" class="small">收据</text>
   <text x="80" y="225" text-anchor="middle" class="small">600x1500</text>
   <rect x="125" y="105" width="90" height="50" class="cool"/>
-  <text x="170" y="100" text-anchor="middle" class="small">chart 1280x720</text>
+  <text x="170" y="100" text-anchor="middle" class="small">图表 1280x720</text>
   <text x="170" y="175" text-anchor="middle" class="small">16:9</text>
   <rect x="125" y="165" width="50" height="80" class="cold"/>
-  <text x="150" y="160" text-anchor="middle" class="small">screen</text>
+  <text x="150" y="160" text-anchor="middle" class="small">屏幕</text>
   <rect x="180" y="165" width="40" height="80" class="cold"/>
-  <text x="200" y="160" text-anchor="middle" class="small">phone</text>
-  <text x="130" y="245" text-anchor="middle" class="caption">native resolution, patch 14</text>
+  <text x="200" y="160" text-anchor="middle" class="small">手机</text>
+  <text x="130" y="245" text-anchor="middle" class="caption">原生分辨率，分块尺寸 14</text>
 
   <path d="M 235 150 L 295 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="265" y="140" text-anchor="middle" class="small">patchify each</text>
+  <text x="265" y="140" text-anchor="middle" class="small">逐图分块</text>
 
   <rect x="300" y="50" width="320" height="200" class="reg"/>
-  <text x="460" y="70" text-anchor="middle" class="head">packed sequence</text>
-  <text x="460" y="88" text-anchor="middle" class="small">concatenate all images' patches</text>
+  <text x="460" y="70" text-anchor="middle" class="head">打包序列</text>
+  <text x="460" y="88" text-anchor="middle" class="small">拼接所有图像分块</text>
   <g>
     <rect x="315" y="100" width="120" height="20" class="hot"/>
-    <text x="375" y="114" text-anchor="middle" class="small">receipt tokens (n_0)</text>
+    <text x="375" y="114" text-anchor="middle" class="small">收据 token（n_0）</text>
     <rect x="315" y="125" width="150" height="20" class="cool"/>
-    <text x="390" y="139" text-anchor="middle" class="small">chart tokens (n_1)</text>
+    <text x="390" y="139" text-anchor="middle" class="small">图表 token（n_1）</text>
     <rect x="315" y="150" width="200" height="20" class="cold"/>
-    <text x="415" y="164" text-anchor="middle" class="small">phone tokens (n_2)</text>
+    <text x="415" y="164" text-anchor="middle" class="small">手机 token（n_2）</text>
   </g>
   <text x="460" y="200" text-anchor="middle" class="step">cu_seqlens = [0, n_0, n_0+n_1, N]</text>
-  <text x="460" y="222" text-anchor="middle" class="small">FlashAttn varlen: no padding, no dense mask</text>
-  <text x="460" y="240" text-anchor="middle" class="small">N = n_0 + n_1 + n_2  (zero waste)</text>
+  <text x="460" y="222" text-anchor="middle" class="small">FlashAttn varlen：无填充、无稠密掩码</text>
+  <text x="460" y="240" text-anchor="middle" class="small">N = n_0 + n_1 + n_2（零浪费）</text>
 
   <path d="M 625 150 L 685 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="655" y="140" text-anchor="middle" class="small">block-diag</text>
+  <text x="655" y="140" text-anchor="middle" class="small">块对角</text>
 
   <rect x="690" y="50" width="240" height="200" class="cool"/>
-  <text x="810" y="70" text-anchor="middle" class="head">block-diagonal mask</text>
+  <text x="810" y="70" text-anchor="middle" class="head">块对角掩码</text>
   <g transform="translate(730,90)">
     <rect x="0" y="0" width="30" height="30" class="hot"/>
     <rect x="30" y="30" width="60" height="60" class="cool"/>
     <rect x="90" y="90" width="80" height="80" class="cold"/>
   </g>
-  <text x="810" y="230" text-anchor="middle" class="small">each image attends only within itself</text>
+  <text x="810" y="230" text-anchor="middle" class="small">每张图像只关注自身内部</text>
 
   <rect x="30" y="280" width="900" height="240" class="box"/>
-  <text x="480" y="302" text-anchor="middle" class="head">four strategies for any-resolution vision</text>
+  <text x="480" y="302" text-anchor="middle" class="head">任意分辨率视觉的四种策略</text>
 
   <rect x="50" y="320" width="200" height="180" class="hot"/>
-  <text x="150" y="342" text-anchor="middle" class="step">square resize</text>
-  <text x="150" y="364" text-anchor="middle" class="small">resize to 336x336</text>
-  <text x="150" y="380" text-anchor="middle" class="small">fixed 576 tokens</text>
-  <text x="150" y="398" text-anchor="middle" class="small">loses OCR, squishes</text>
-  <text x="150" y="416" text-anchor="middle" class="small">text, wastes pad</text>
-  <text x="150" y="440" text-anchor="middle" class="step">baseline, pre-2024</text>
-  <text x="150" y="458" text-anchor="middle" class="small">LLaVA-1.5 used this</text>
+  <text x="150" y="342" text-anchor="middle" class="step">缩放成正方形</text>
+  <text x="150" y="364" text-anchor="middle" class="small">缩放至 336x336</text>
+  <text x="150" y="380" text-anchor="middle" class="small">固定 576 个 token</text>
+  <text x="150" y="398" text-anchor="middle" class="small">损害 OCR、挤压</text>
+  <text x="150" y="416" text-anchor="middle" class="small">文本，并浪费填充</text>
+  <text x="150" y="440" text-anchor="middle" class="step">2024 年之前的基线</text>
+  <text x="150" y="458" text-anchor="middle" class="small">LLaVA-1.5 使用此方案</text>
 
   <rect x="260" y="320" width="200" height="180" class="cool"/>
-  <text x="360" y="342" text-anchor="middle" class="step">AnyRes tiling</text>
-  <text x="360" y="364" text-anchor="middle" class="small">tile MxN + thumbnail</text>
-  <text x="360" y="380" text-anchor="middle" class="small">frozen encoder at 336</text>
-  <text x="360" y="398" text-anchor="middle" class="small">fidelity + global ctx</text>
-  <text x="360" y="416" text-anchor="middle" class="small">expensive past 3x3</text>
+  <text x="360" y="342" text-anchor="middle" class="step">AnyRes 分块</text>
+  <text x="360" y="364" text-anchor="middle" class="small">MxN 分块 + 缩略图</text>
+  <text x="360" y="380" text-anchor="middle" class="small">编码器固定为 336</text>
+  <text x="360" y="398" text-anchor="middle" class="small">保真度 + 全局上下文</text>
+  <text x="360" y="416" text-anchor="middle" class="small">超过 3x3 后开销大</text>
   <text x="360" y="440" text-anchor="middle" class="step">LLaVA-NeXT (2024)</text>
 
   <rect x="470" y="320" width="200" height="180" class="cold"/>
-  <text x="570" y="342" text-anchor="middle" class="step">M-RoPE + native</text>
-  <text x="570" y="364" text-anchor="middle" class="small">3D pos (t, r, c)</text>
-  <text x="570" y="380" text-anchor="middle" class="small">arbitrary HxWxT</text>
-  <text x="570" y="398" text-anchor="middle" class="small">no position table</text>
-  <text x="570" y="416" text-anchor="middle" class="small">min/max pixel caps</text>
+  <text x="570" y="342" text-anchor="middle" class="step">M-RoPE + 原生分辨率</text>
+  <text x="570" y="364" text-anchor="middle" class="small">3D 位置（t、r、c）</text>
+  <text x="570" y="380" text-anchor="middle" class="small">任意 HxWxT</text>
+  <text x="570" y="398" text-anchor="middle" class="small">无位置表</text>
+  <text x="570" y="416" text-anchor="middle" class="small">像素数上下限</text>
   <text x="570" y="440" text-anchor="middle" class="step">Qwen2-VL / Qwen3-VL</text>
 
   <rect x="680" y="320" width="210" height="180" class="reg"/>
-  <text x="785" y="342" text-anchor="middle" class="step">NaFlex single ckpt</text>
-  <text x="785" y="364" text-anchor="middle" class="small">pick 256/729/1024</text>
-  <text x="785" y="380" text-anchor="middle" class="small">per-task at inference</text>
-  <text x="785" y="398" text-anchor="middle" class="small">patch-n'-pack train</text>
-  <text x="785" y="416" text-anchor="middle" class="small">fractional pos embed</text>
+  <text x="785" y="342" text-anchor="middle" class="step">NaFlex 单检查点</text>
+  <text x="785" y="364" text-anchor="middle" class="small">选择 256/729/1024</text>
+  <text x="785" y="380" text-anchor="middle" class="small">推理时按任务选择</text>
+  <text x="785" y="398" text-anchor="middle" class="small">patch-n'-pack 训练</text>
+  <text x="785" y="416" text-anchor="middle" class="small">分数位置嵌入</text>
   <text x="785" y="440" text-anchor="middle" class="step">SigLIP 2 (2025)</text>
-  <text x="785" y="458" text-anchor="middle" class="small">2026 open-VLM default</text>
+  <text x="785" y="458" text-anchor="middle" class="small">2026 开放 VLM 默认方案</text>
 </svg>

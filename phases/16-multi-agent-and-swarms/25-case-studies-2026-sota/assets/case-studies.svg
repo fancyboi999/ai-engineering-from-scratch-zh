@@ -16,58 +16,58 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">Three canonical 2026 case studies — pick the closest reference</text>
+  <text x="480" y="28" text-anchor="middle" class="title">2026 年三个典型案例：选择最接近的参考</text>
 
   <rect x="40" y="60" width="280" height="230" class="cool"/>
   <text x="180" y="84" text-anchor="middle" class="head">Anthropic Research</text>
-  <text x="180" y="104" text-anchor="middle" class="step">supervisor + workers</text>
-  <text x="180" y="134" text-anchor="middle" class="small">Opus 4 plans + synthesizes</text>
-  <text x="180" y="152" text-anchor="middle" class="small">Sonnet 4 subagents research</text>
-  <text x="180" y="172" text-anchor="middle" class="small">fresh context per subagent</text>
-  <text x="180" y="200" text-anchor="middle" class="step">+90.2% over single Opus 4</text>
-  <text x="180" y="220" text-anchor="middle" class="small">15x tokens per query</text>
-  <text x="180" y="238" text-anchor="middle" class="small">rainbow deploys mandatory</text>
-  <text x="180" y="268" text-anchor="middle" class="caption">use for: research, knowledge tasks</text>
+  <text x="180" y="104" text-anchor="middle" class="step">监督者 + 工作 agent</text>
+  <text x="180" y="134" text-anchor="middle" class="small">Opus 4 规划与综合</text>
+  <text x="180" y="152" text-anchor="middle" class="small">Sonnet 4 子 agent 研究</text>
+  <text x="180" y="172" text-anchor="middle" class="small">每个子 agent 使用新上下文</text>
+  <text x="180" y="200" text-anchor="middle" class="step">比单个 Opus 4 提升 +90.2%</text>
+  <text x="180" y="220" text-anchor="middle" class="small">每次查询消耗 15x token</text>
+  <text x="180" y="238" text-anchor="middle" class="small">必须使用彩虹部署</text>
+  <text x="180" y="268" text-anchor="middle" class="caption">适用于：研究、知识任务</text>
 
   <rect x="340" y="60" width="280" height="230" class="cold"/>
   <text x="480" y="84" text-anchor="middle" class="head">MetaGPT / ChatDev</text>
-  <text x="480" y="104" text-anchor="middle" class="step">SOP role-decomposition</text>
-  <text x="480" y="134" text-anchor="middle" class="small">PM · Architect · Coder · QA</text>
+  <text x="480" y="104" text-anchor="middle" class="step">按标准作业流程分工</text>
+  <text x="480" y="134" text-anchor="middle" class="small">产品经理 · 架构师 · 开发者 · 测试</text>
   <text x="480" y="152" text-anchor="middle" class="small">Code = SOP(Team)</text>
-  <text x="480" y="172" text-anchor="middle" class="small">structured artifact handoffs</text>
-  <text x="480" y="200" text-anchor="middle" class="step">communicative</text>
-  <text x="480" y="218" text-anchor="middle" class="step">dehallucination</text>
-  <text x="480" y="238" text-anchor="middle" class="small">MacNet: 1000+ agents via DAG</text>
-  <text x="480" y="268" text-anchor="middle" class="caption">use for: engineering workflows</text>
+  <text x="480" y="172" text-anchor="middle" class="small">结构化产物交接</text>
+  <text x="480" y="200" text-anchor="middle" class="step">通过沟通</text>
+  <text x="480" y="218" text-anchor="middle" class="step">消除幻觉</text>
+  <text x="480" y="238" text-anchor="middle" class="small">MacNet：通过有向无环图组织 1000+ 个 agent</text>
+  <text x="480" y="268" text-anchor="middle" class="caption">适用于：工程工作流</text>
 
   <rect x="640" y="60" width="280" height="230" class="hot"/>
   <text x="780" y="84" text-anchor="middle" class="head">OpenClaw / Moltbook</text>
-  <text x="780" y="104" text-anchor="middle" class="step">population-scale substrate</text>
-  <text x="780" y="134" text-anchor="middle" class="small">Clawdbot Nov 2025 → 247k ⭐</text>
-  <text x="780" y="152" text-anchor="middle" class="small">Moltbook 2.3M agents</text>
-  <text x="780" y="172" text-anchor="middle" class="small">Meta acquisition Mar 2026</text>
-  <text x="780" y="200" text-anchor="middle" class="step">emergent economy</text>
-  <text x="780" y="218" text-anchor="middle" class="step">prompt-injection at scale</text>
-  <text x="780" y="238" text-anchor="middle" class="small">state-level regulation response</text>
-  <text x="780" y="268" text-anchor="middle" class="caption">use for: social / network products</text>
+  <text x="780" y="104" text-anchor="middle" class="step">群体规模的基础平台</text>
+  <text x="780" y="134" text-anchor="middle" class="small">Clawdbot 2025 年十一月 → 247k ⭐</text>
+  <text x="780" y="152" text-anchor="middle" class="small">Moltbook 2.3M 个 agent</text>
+  <text x="780" y="172" text-anchor="middle" class="small">Meta 于 2026 年三月收购</text>
+  <text x="780" y="200" text-anchor="middle" class="step">涌现经济</text>
+  <text x="780" y="218" text-anchor="middle" class="step">大规模 prompt 注入</text>
+  <text x="780" y="238" text-anchor="middle" class="small">国家层面的监管响应</text>
+  <text x="780" y="268" text-anchor="middle" class="caption">适用于：社交 / 网络产品</text>
 
   <rect x="40" y="310" width="880" height="190" class="box"/>
-  <text x="480" y="334" text-anchor="middle" class="head">framework landscape — April 2026</text>
+  <text x="480" y="334" text-anchor="middle" class="head">框架全景：2026 年四月</text>
 
   <text x="60" y="368" class="step">LangGraph</text>
-  <text x="260" y="368" class="small">production leader · graph + checkpointing + HITL</text>
+  <text x="260" y="368" class="small">生产领域领先者 · 图 + 检查点 + 人工介入</text>
 
   <text x="60" y="394" class="step">CrewAI</text>
-  <text x="260" y="394" class="small">production leader · role-based crews (Sequential / Hierarchical)</text>
+  <text x="260" y="394" class="small">生产领域领先者 · 基于角色的团队（顺序 / 分层）</text>
 
   <text x="60" y="420" class="step">OpenAI Agents SDK</text>
-  <text x="260" y="420" class="small">production · Swarm successor · tool-return handoffs</text>
+  <text x="260" y="420" class="small">生产可用 · Swarm 后继者 · 通过工具返回实现交接</text>
 
   <text x="60" y="446" class="step">Microsoft Agent Framework</text>
-  <text x="260" y="446" class="small">RC Feb 2026 · orchestration patterns · AutoGen merged in</text>
+  <text x="260" y="446" class="small">2026 年二月发布候选版 · 编排模式 · 合并 AutoGen</text>
 
   <text x="60" y="472" class="step">Google ADK · Anthropic SDK</text>
-  <text x="260" y="472" class="small">production · A2A-native and research-native respectively</text>
+  <text x="260" y="472" class="small">生产可用 · 分别原生支持 A2A 与研究任务</text>
 
-  <text x="60" y="496" class="caption">all ship MCP; most ship A2A — protocol compat is no longer a differentiator</text>
+  <text x="60" y="496" class="caption">均支持 MCP，多数支持 A2A；协议兼容性已不再构成差异。</text>
 </svg>

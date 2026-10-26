@@ -13,49 +13,49 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Three scaling policies, same capability, three classifications</text>
+  <text x="440" y="26" text-anchor="middle" class="title">三种扩展策略，同一能力，三种分类</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Column headers -->
   <rect x="60" y="80" width="250" height="36" class="cool"/>
-  <text x="185" y="104" text-anchor="middle" class="label">OpenAI PF v2 (Apr 2025)</text>
+  <text x="185" y="104" text-anchor="middle" class="label">OpenAI PF v2（四月 2025）</text>
 
   <rect x="320" y="80" width="240" height="36" class="cold"/>
-  <text x="440" y="104" text-anchor="middle" class="label">Anthropic RSP v3.0 (Feb 2026)</text>
+  <text x="440" y="104" text-anchor="middle" class="label">Anthropic RSP v3.0（二月 2026）</text>
 
   <rect x="570" y="80" width="250" height="36" class="warn"/>
-  <text x="695" y="104" text-anchor="middle" class="label">DeepMind FSF v3 (Sept 2025 + Apr 2026)</text>
+  <text x="695" y="104" text-anchor="middle" class="label">DeepMind FSF v3（九月 2025 + 四月 2026）</text>
 
   <!-- Long-range Autonomy row -->
   <rect x="60" y="130" width="760" height="46" class="box"/>
-  <text x="76" y="152" class="label">long-range autonomy</text>
-  <text x="76" y="170" class="content">OpenAI: Research (not triggering) · Anthropic: named; affirmative case at threshold · DeepMind: folded into ML R&amp;D / Cyber</text>
+  <text x="76" y="152" class="label">长期自主性</text>
+  <text x="76" y="170" class="content">OpenAI：研究项（不触发门槛）· Anthropic：具名能力；到达阈值需肯定性论证 · DeepMind：并入机器学习研发 / 网络安全</text>
 
   <!-- Undermining safeguards -->
   <rect x="60" y="184" width="760" height="46" class="box"/>
-  <text x="76" y="206" class="label">undermining safeguards</text>
-  <text x="76" y="224" class="content">OpenAI: Research · Anthropic: hardcoded prohibition (refusal) · DeepMind: deceptive-alignment monitoring</text>
+  <text x="76" y="206" class="label">破坏安全防护</text>
+  <text x="76" y="224" class="content">OpenAI：研究项 · Anthropic：硬编码禁止（拒绝）· DeepMind：欺骗性对齐监测</text>
 
   <!-- R&D automation -->
   <rect x="60" y="238" width="760" height="46" class="box"/>
-  <text x="76" y="260" class="label">R&amp;D automation</text>
-  <text x="76" y="278" class="content">OpenAI: Tracked · Anthropic: AI R&amp;D-4 threshold (affirmative case) · DeepMind: ML R&amp;D autonomy level 1 (TCL, Apr 2026)</text>
+  <text x="76" y="260" class="label">研发自动化</text>
+  <text x="76" y="278" class="content">OpenAI：跟踪项 · Anthropic：AI 研发-4 阈值（肯定性论证）· DeepMind：机器学习研发自主等级 1（TCL，四月 2026）</text>
 
   <!-- Sandbagging -->
   <rect x="60" y="292" width="760" height="46" class="box"/>
-  <text x="76" y="314" class="label">sandbagging</text>
-  <text x="76" y="332" class="content">OpenAI: Research · Anthropic: addressed via eval-context gap · DeepMind: deceptive-alignment monitoring (instrumental reasoning)</text>
+  <text x="76" y="314" class="label">故意压低表现</text>
+  <text x="76" y="332" class="content">OpenAI：研究项 · Anthropic：通过评测环境差距处理 · DeepMind：欺骗性对齐监测（工具性推理）</text>
 
   <!-- Cyber uplift -->
   <rect x="60" y="346" width="760" height="46" class="box"/>
-  <text x="76" y="368" class="label">cyber uplift</text>
-  <text x="76" y="386" class="content">OpenAI: Tracked · Anthropic: ASL-3 trigger (security + deployment) · DeepMind: Cyber CCL</text>
+  <text x="76" y="368" class="label">网络安全能力提升</text>
+  <text x="76" y="386" class="content">OpenAI：跟踪项 · Anthropic：ASL-3 触发（安全 + 部署）· DeepMind：网络安全 CCL</text>
 
   <!-- Convergence note -->
   <rect x="60" y="400" width="760" height="90" class="hot"/>
-  <text x="440" y="424" text-anchor="middle" class="label">convergence + divergence</text>
-  <text x="80" y="446" class="content">converge: internal SAG, deceptive-alignment as a named risk class, standing artifacts</text>
-  <text x="80" y="462" class="content">diverge: Tracked vs Research split only in PF v2; DeepMind folds autonomy; Anthropic removed pause clause</text>
-  <text x="80" y="478" class="content">measurement dependency: all three frameworks work only if the capability measurement is not gameable</text>
+  <text x="440" y="424" text-anchor="middle" class="label">趋同与差异</text>
+  <text x="80" y="446" class="content">趋同：内部安全咨询组、将欺骗性对齐列为具名风险类别、持续维护产物</text>
+  <text x="80" y="462" class="content">差异：仅 PF v2 区分跟踪项与研究项；DeepMind 合并自主性；Anthropic 移除暂停条款</text>
+  <text x="80" y="478" class="content">测量依赖：只有能力测量无法被操纵，这三套框架才能发挥作用</text>
 </svg>

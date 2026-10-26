@@ -19,7 +19,7 @@
 
 ## 核心概念
 
-![Four MARL regimes: indep, centralized critic, self-play, league](../assets/marl.svg)
+![四种多智能体强化学习方式：独立学习、中心化评论家、自博弈和联盟](../assets/marl.svg)
 
 **形式化：马尔可夫博弈。** MDP 的推广：状态 $S$、联合动作 $a = (a_1, \ldots, a_n)$、转移 $P(s' \mid s, a)$，以及每个 agent 各自的奖励 $R_i(s, a, s')$。每个 agent $i$ 在自己的策略 $\pi_i$ 下最大化自己的回报。如果奖励相同，就是**完全合作**。如果零和，就是**对抗**。如果混合，就是**一般和**。
 

@@ -5,7 +5,7 @@ code: MP
 subtitle: 通过 stdio 与 Streamable HTTP 探测、合并和路由 MCP 2026-07-28 对端。重试 MRTR 轮次，封装 JSON-RPC 消息。
 hue: 190
 sources: phases/11-llm-engineering/14-model-context-protocol, phases/13-tools-and-protocols/08-building-an-mcp-client, phases/13-tools-and-protocols/09-mcp-transports, phases/13-tools-and-protocols/11-mcp-sampling, phases/19-capstone-projects/22-jsonrpc-stdio-transport, projects/mcp-at-scale
-source_hash: 33c69ec4647b24d2
+source_hash: 8685001d3911eb7b
 ---
 
 ## 多服务端客户端

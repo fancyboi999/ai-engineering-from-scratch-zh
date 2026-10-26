@@ -13,72 +13,72 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">GPU autoscaling — three layers, not one</text>
+  <text x="480" y="24" text-anchor="middle" class="title">GPU 自动扩缩容：三层机制协同</text>
 
   <rect x="40" y="50" width="280" height="480" class="box"/>
-  <text x="180" y="72" text-anchor="middle" class="head">layer 1 — node provisioning</text>
+  <text x="180" y="72" text-anchor="middle" class="head">第 1 层：节点供给</text>
   <rect x="60" y="90" width="240" height="70" class="node"/>
   <text x="180" y="112" text-anchor="middle" class="step">Karpenter</text>
-  <text x="180" y="130" text-anchor="middle" class="small">provisions nodes on pending pods</text>
-  <text x="180" y="146" text-anchor="middle" class="small">45-60s (vs CA 90-120s)</text>
+  <text x="180" y="130" text-anchor="middle" class="small">为待调度 pod 提供节点</text>
+  <text x="180" y="146" text-anchor="middle" class="small">45-60s（CA 为 90-120s）</text>
   <rect x="60" y="170" width="240" height="90" class="bad"/>
-  <text x="180" y="192" text-anchor="middle" class="step">consolidation trap</text>
+  <text x="180" y="192" text-anchor="middle" class="step">节点合并的陷阱</text>
   <text x="180" y="210" text-anchor="middle" class="small">WhenEmptyOrUnderutilized</text>
-  <text x="180" y="226" text-anchor="middle" class="small">evicts running GPU jobs</text>
-  <text x="180" y="244" text-anchor="middle" class="small">loses minutes of capacity</text>
+  <text x="180" y="226" text-anchor="middle" class="small">驱逐正在运行的 GPU 作业</text>
+  <text x="180" y="244" text-anchor="middle" class="small">损失数分钟算力</text>
   <rect x="60" y="270" width="240" height="100" class="node"/>
-  <text x="180" y="292" text-anchor="middle" class="step">safe setting</text>
+  <text x="180" y="292" text-anchor="middle" class="step">安全设置</text>
   <text x="180" y="310" text-anchor="middle" class="small">consolidationPolicy:</text>
   <text x="180" y="326" text-anchor="middle" class="small">WhenEmpty</text>
   <text x="180" y="342" text-anchor="middle" class="small">consolidateAfter: 1h</text>
-  <text x="180" y="358" text-anchor="middle" class="small">taint GPU nodes</text>
-  <text x="180" y="400" text-anchor="middle" class="caption">picks instance type dynamically</text>
+  <text x="180" y="358" text-anchor="middle" class="small">为 GPU 节点添加污点</text>
+  <text x="180" y="400" text-anchor="middle" class="caption">动态选择实例类型</text>
 
   <rect x="340" y="50" width="280" height="480" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">layer 2 — gang scheduling</text>
+  <text x="480" y="72" text-anchor="middle" class="head">第 2 层：成组调度</text>
   <rect x="360" y="90" width="240" height="70" class="sched"/>
   <text x="480" y="112" text-anchor="middle" class="step">KAI Scheduler</text>
-  <text x="480" y="130" text-anchor="middle" class="small">secondary to kube-scheduler</text>
-  <text x="480" y="146" text-anchor="middle" class="small">annotate workloads to opt in</text>
+  <text x="480" y="130" text-anchor="middle" class="small">作为 kube-scheduler 的辅助调度器</text>
+  <text x="480" y="146" text-anchor="middle" class="small">通过工作负载注解启用</text>
   <rect x="360" y="170" width="240" height="100" class="sched"/>
-  <text x="480" y="192" text-anchor="middle" class="step">gang scheduling</text>
-  <text x="480" y="210" text-anchor="middle" class="small">all-or-nothing placement</text>
-  <text x="480" y="226" text-anchor="middle" class="small">prevents 7-of-8 idle trap</text>
-  <text x="480" y="244" text-anchor="middle" class="small">defer all if can't fit all</text>
+  <text x="480" y="192" text-anchor="middle" class="step">成组调度</text>
+  <text x="480" y="210" text-anchor="middle" class="small">全部放置或全部不放置</text>
+  <text x="480" y="226" text-anchor="middle" class="small">避免 8 个中 7 个空等的陷阱</text>
+  <text x="480" y="244" text-anchor="middle" class="small">无法容纳全部时就全部推迟</text>
   <rect x="360" y="280" width="240" height="80" class="sched"/>
-  <text x="480" y="302" text-anchor="middle" class="step">topology awareness</text>
-  <text x="480" y="320" text-anchor="middle" class="small">NVLink / IB / rack placement</text>
-  <text x="480" y="336" text-anchor="middle" class="small">TP-8 stays on one NVLink domain</text>
+  <text x="480" y="302" text-anchor="middle" class="step">拓扑感知</text>
+  <text x="480" y="320" text-anchor="middle" class="small">NVLink / IB / 机架放置</text>
+  <text x="480" y="336" text-anchor="middle" class="small">TP-8 位于同一 NVLink 域</text>
   <rect x="360" y="370" width="240" height="90" class="sched"/>
-  <text x="480" y="392" text-anchor="middle" class="step">hierarchical queues</text>
-  <text x="480" y="410" text-anchor="middle" class="small">multi-team priority + quota</text>
-  <text x="480" y="426" text-anchor="middle" class="small">preemption rules per queue</text>
-  <text x="480" y="442" text-anchor="middle" class="small">Ray + vLLM production-stack integrate</text>
+  <text x="480" y="392" text-anchor="middle" class="step">分层队列</text>
+  <text x="480" y="410" text-anchor="middle" class="small">多团队优先级与配额</text>
+  <text x="480" y="426" text-anchor="middle" class="small">逐队列设置抢占规则</text>
+  <text x="480" y="442" text-anchor="middle" class="small">集成 Ray + vLLM production-stack</text>
 
   <rect x="640" y="50" width="280" height="480" class="box"/>
-  <text x="780" y="72" text-anchor="middle" class="head">layer 3 — application signals</text>
+  <text x="780" y="72" text-anchor="middle" class="head">第 3 层：应用信号</text>
   <rect x="660" y="90" width="240" height="80" class="bad"/>
-  <text x="780" y="112" text-anchor="middle" class="step">HPA trap</text>
+  <text x="780" y="112" text-anchor="middle" class="step">HPA 的陷阱</text>
   <text x="780" y="130" text-anchor="middle" class="small">DCGM_FI_DEV_GPU_UTIL</text>
-  <text x="780" y="146" text-anchor="middle" class="small">duty-cycle, NOT load</text>
-  <text x="780" y="162" text-anchor="middle" class="small">100% = 10 or 100 requests</text>
+  <text x="780" y="146" text-anchor="middle" class="small">忙碌占比，不是负载</text>
+  <text x="780" y="162" text-anchor="middle" class="small">100% 可能是 10 或 100 个请求</text>
   <rect x="660" y="180" width="240" height="100" class="app"/>
-  <text x="780" y="202" text-anchor="middle" class="step">correct signals</text>
-  <text x="780" y="220" text-anchor="middle" class="small">queue depth</text>
-  <text x="780" y="236" text-anchor="middle" class="small">KV cache utilization</text>
-  <text x="780" y="252" text-anchor="middle" class="small">per-replica P99 TTFT</text>
-  <text x="780" y="268" text-anchor="middle" class="small">goodput (SLO-meeting RPS)</text>
+  <text x="780" y="202" text-anchor="middle" class="step">正确的信号</text>
+  <text x="780" y="220" text-anchor="middle" class="small">队列深度</text>
+  <text x="780" y="236" text-anchor="middle" class="small">KV 缓存利用率</text>
+  <text x="780" y="252" text-anchor="middle" class="small">各副本 P99 TTFT</text>
+  <text x="780" y="268" text-anchor="middle" class="small">有效吞吐（满足 SLO 的 RPS）</text>
   <rect x="660" y="290" width="240" height="90" class="app"/>
   <text x="780" y="312" text-anchor="middle" class="step">Dynamo Planner</text>
-  <text x="780" y="330" text-anchor="middle" class="small">scales on inference signals</text>
-  <text x="780" y="346" text-anchor="middle" class="small">rate-matches prefill:decode ratio</text>
-  <text x="780" y="362" text-anchor="middle" class="small">meets SLOs, not duty cycle</text>
+  <text x="780" y="330" text-anchor="middle" class="small">根据推理信号扩缩容</text>
+  <text x="780" y="346" text-anchor="middle" class="small">匹配预填充与解码速率比例</text>
+  <text x="780" y="362" text-anchor="middle" class="small">满足 SLO，而非追逐忙碌占比</text>
   <rect x="660" y="390" width="240" height="90" class="app"/>
   <text x="780" y="412" text-anchor="middle" class="step">llm-d WVA</text>
-  <text x="780" y="430" text-anchor="middle" class="small">Workload Variant Autoscaler</text>
-  <text x="780" y="446" text-anchor="middle" class="small">disaggregated prefill + decode</text>
-  <text x="780" y="462" text-anchor="middle" class="small">per-role HPA</text>
+  <text x="780" y="430" text-anchor="middle" class="small">工作负载变体自动扩缩容器</text>
+  <text x="780" y="446" text-anchor="middle" class="small">预填充与解码分离</text>
+  <text x="780" y="462" text-anchor="middle" class="small">各角色独立 HPA</text>
 
   <rect x="40" y="540" width="880" height="30" class="box"/>
-  <text x="480" y="558" text-anchor="middle" class="step">compose all three — each alone is insufficient on a real GPU cluster</text>
+  <text x="480" y="558" text-anchor="middle" class="step">三层协同：在真实 GPU 集群上，单独一层都不够</text>
 </svg>

@@ -19,20 +19,20 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Tree of Thoughts and LATS — branching reasoning with self-evaluation</text>
+  <text x="480" y="26" text-anchor="middle" class="title">思维树与 LATS：带自评估的分支推理</text>
 
   <rect x="40" y="60" width="440" height="460" class="box"/>
-  <text x="260" y="84" text-anchor="middle" class="head">Tree of Thoughts (BFS, beam, or DFS)</text>
+  <text x="260" y="84" text-anchor="middle" class="head">思维树（BFS、束搜索或 DFS）</text>
 
   <circle cx="260" cy="120" r="18" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="260" y="124" text-anchor="middle" class="step">root</text>
+  <text x="260" y="124" text-anchor="middle" class="step">根节点</text>
 
   <line x1="240" y1="135" x2="130" y2="180" class="edge"/>
   <line x1="260" y1="138" x2="260" y2="180" class="edge"/>
   <line x1="280" y1="135" x2="390" y2="180" class="edge"/>
 
   <rect x="80" y="180" width="120" height="38" class="cool"/>
-  <text x="140" y="203" text-anchor="middle" class="small">6-4=2, score 0.2</text>
+  <text x="140" y="203" text-anchor="middle" class="small">6-4=2，评分 0.2</text>
 
   <rect x="210" y="180" width="100" height="38" class="cold"/>
   <text x="260" y="203" text-anchor="middle" class="small">4+1=5, 0.1</text>
@@ -47,43 +47,43 @@
   <line x1="400" y1="218" x2="400" y2="270" class="edge"/>
 
   <rect x="360" y="270" width="100" height="38" class="hot"/>
-  <text x="410" y="293" text-anchor="middle" class="small">done: 24</text>
+  <text x="410" y="293" text-anchor="middle" class="small">完成：24</text>
 
-  <text x="60" y="340" class="small">self-eval at each node picks the frontier.</text>
-  <text x="60" y="356" class="small">"sure / likely / impossible" classification,</text>
-  <text x="60" y="372" class="small">1..10 numeric score, or majority vote.</text>
-  <text x="60" y="400" class="step">Game of 24: CoT 4%  -- ToT 74%</text>
-  <text x="60" y="416" class="small">GPT-4 baseline vs ToT with beam-5, depth-3.</text>
-  <text x="60" y="440" class="step">cost</text>
-  <text x="60" y="456" class="small">100-1000x tokens of a single CoT trajectory.</text>
-  <text x="60" y="472" class="small">reserve for tasks with weak single-shot success.</text>
+  <text x="60" y="340" class="small">每个节点的自评估决定下一步扩展边界。</text>
+  <text x="60" y="356" class="small">“确定 / 可能 / 不可能”分类，</text>
+  <text x="60" y="372" class="small">1..10 数值评分，或多数投票。</text>
+  <text x="60" y="400" class="step">24 点游戏：CoT 4% -- ToT 74%</text>
+  <text x="60" y="416" class="small">GPT-4 基线与束宽 5、深度 3 的 ToT 对比。</text>
+  <text x="60" y="440" class="step">成本</text>
+  <text x="60" y="456" class="small">token 用量是单条 CoT 轨迹的 100-1000 倍。</text>
+  <text x="60" y="472" class="small">仅用于一次回答成功率低的任务。</text>
 
   <rect x="500" y="60" width="420" height="460" class="box"/>
   <text x="710" y="84" text-anchor="middle" class="head">LATS = ToT + ReAct + Reflexion + MCTS</text>
 
   <rect x="520" y="100" width="380" height="50" class="cool"/>
-  <text x="540" y="124" class="step">Select  walk root-to-leaf via UCT</text>
+  <text x="540" y="124" class="step">选择：沿 UCT 从根走向叶子</text>
   <text x="540" y="142" class="small">Q(s,a) + c * sqrt(ln N(s) / N(s,a))</text>
 
   <rect x="520" y="160" width="380" height="50" class="cold"/>
-  <text x="540" y="184" class="step">Expand  policy proposes K children</text>
-  <text x="540" y="202" class="small">ReAct-style next-action candidates</text>
+  <text x="540" y="184" class="step">扩展：策略提出 K 个子节点</text>
+  <text x="540" y="202" class="small">ReAct 形式的下一动作候选</text>
 
   <rect x="520" y="220" width="380" height="50" class="hot"/>
-  <text x="540" y="244" class="step">Simulate  rollout + value function</text>
-  <text x="540" y="262" class="small">score with prompted value + env reward</text>
+  <text x="540" y="244" class="step">模拟：rollout + 价值函数</text>
+  <text x="540" y="262" class="small">由提示得到的价值与环境奖励评分</text>
 
   <rect x="520" y="280" width="380" height="50" class="dsk"/>
-  <text x="540" y="304" class="step">Backpropagate  update visits and Q</text>
-  <text x="540" y="322" class="small">on failure: write reflection, reseed rollouts</text>
+  <text x="540" y="304" class="step">反向传播：更新访问次数与 Q</text>
+  <text x="540" y="322" class="small">失败时：写反思，重新启动 rollout</text>
 
   <rect x="520" y="340" width="380" height="170" class="box"/>
-  <text x="710" y="364" text-anchor="middle" class="head">when to pick LATS</text>
-  <text x="540" y="386" class="small">coding (tests as value function)</text>
-  <text x="540" y="402" class="small">math/olympiad with checkable targets</text>
-  <text x="540" y="418" class="small">deep research with multiple query paths</text>
-  <text x="540" y="434" class="small">not for short Q&amp;A or chat</text>
-  <text x="540" y="452" class="step">LATS HumanEval 92.7% pass@1 (GPT-4)</text>
-  <text x="540" y="470" class="small">SOTA at paper time (ICML 2024)</text>
-  <text x="540" y="494" class="small">evolutionary search (AlphaEvolve) is the 2025 extreme</text>
+  <text x="710" y="364" text-anchor="middle" class="head">何时选择 LATS</text>
+  <text x="540" y="386" class="small">编程（以测试为价值函数）</text>
+  <text x="540" y="402" class="small">具有可检查目标的数学或奥赛</text>
+  <text x="540" y="418" class="small">多查询路径的深度研究</text>
+  <text x="540" y="434" class="small">不适合短问答或闲聊</text>
+  <text x="540" y="452" class="step">LATS 在 HumanEval 上 pass@1 为 92.7%（GPT-4）</text>
+  <text x="540" y="470" class="small">论文发表时领先（ICML 2024）</text>
+  <text x="540" y="494" class="small">进化搜索（AlphaEvolve）是 2025 年的极致路线</text>
 </svg>

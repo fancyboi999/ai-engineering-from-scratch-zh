@@ -15,24 +15,24 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">flow matching: train on a straight line</text>
+  <text x="450" y="28" text-anchor="middle" class="title">流匹配：沿直线训练</text>
 
   <!-- DDPM vs FM comparison -->
-  <text x="225" y="70" text-anchor="middle" class="label">DDPM: curved path</text>
+  <text x="225" y="70" text-anchor="middle" class="label">DDPM：弯曲路径</text>
   <rect x="50" y="90" width="350" height="170" class="box"/>
 
   <!-- data cluster -->
   <circle cx="95" cy="210" r="18" fill="#c0392b" opacity="0.4"/>
-  <text x="95" y="240" text-anchor="middle" class="caption">x_0 (data)</text>
+  <text x="95" y="240" text-anchor="middle" class="caption">x_0（数据）</text>
   <!-- noise -->
   <circle cx="365" cy="130" r="18" fill="#2c5f8c" opacity="0.4"/>
   <text x="365" y="110" text-anchor="middle" class="caption">x_T ~ N(0, I)</text>
 
   <path d="M 95,210 Q 160,160 200,200 T 280,150 T 365,130" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="225" y="190" text-anchor="middle" class="caption">1000-step SDE</text>
-  <text x="225" y="253" text-anchor="middle" class="caption">DDIM collapses to ~50 steps</text>
+  <text x="225" y="190" text-anchor="middle" class="caption">1000 步 SDE</text>
+  <text x="225" y="253" text-anchor="middle" class="caption">DDIM 压缩至约 50 步</text>
 
-  <text x="665" y="70" text-anchor="middle" class="label">flow matching: straight line</text>
+  <text x="665" y="70" text-anchor="middle" class="label">流匹配：直线</text>
   <rect x="490" y="90" width="380" height="170" class="box"/>
 
   <circle cx="535" cy="210" r="18" fill="#c0392b" opacity="0.4"/>
@@ -42,18 +42,18 @@
 
   <line x1="535" y1="210" x2="835" y2="130" stroke="#1a1a1a" stroke-width="2"/>
   <text x="685" y="190" text-anchor="middle" class="mono">x_t = t &#183; x_1 + (1-t) &#183; x_0</text>
-  <text x="685" y="253" text-anchor="middle" class="caption">2-8 Euler steps at inference</text>
+  <text x="685" y="253" text-anchor="middle" class="caption">推理时执行 2-8 步 Euler</text>
 
   <!-- loss -->
   <rect x="50" y="290" width="820" height="70" class="hot"/>
   <text x="460" y="315" text-anchor="middle" class="label">loss = || v_&#952;(x_t, t) - (x_1 - x_0) ||&#178;</text>
-  <text x="460" y="340" text-anchor="middle" class="caption">simulation-free training; target is a constant vector along the straight line</text>
+  <text x="460" y="340" text-anchor="middle" class="caption">无模拟训练；目标是沿直线不变的常量向量</text>
 
   <!-- rectified flow -->
   <rect x="50" y="380" width="820" height="110" class="cold"/>
-  <text x="460" y="402" text-anchor="middle" class="label">rectified flow: iteratively straighten</text>
-  <text x="460" y="425" text-anchor="middle" class="caption">1. train v_1 with random (x_0, x_1) pairs</text>
-  <text x="460" y="445" text-anchor="middle" class="caption">2. sample paired (x_0, x_1) by integrating v_1 -&gt; pairs are ODE-matched</text>
-  <text x="460" y="465" text-anchor="middle" class="caption">3. retrain v_2 on those pairs -&gt; genuinely straighter flow</text>
-  <text x="460" y="482" text-anchor="middle" class="caption">2 reflow iterations enable 1-step inference (SDXL-Turbo, SD3-Turbo, Flux-schnell)</text>
+  <text x="460" y="402" text-anchor="middle" class="label">修正流：迭代拉直</text>
+  <text x="460" y="425" text-anchor="middle" class="caption">1. 用随机（x_0、x_1）对训练 v_1</text>
+  <text x="460" y="445" text-anchor="middle" class="caption">2. 积分 v_1，采样（x_0、x_1）对 -&gt; 数据对经 ODE 匹配</text>
+  <text x="460" y="465" text-anchor="middle" class="caption">3. 在这些数据对上重训 v_2 -&gt; 流更直</text>
+  <text x="460" y="482" text-anchor="middle" class="caption">2 次重流迭代支持 1 步推理（SDXL-Turbo、SD3-Turbo、Flux-schnell）</text>
 </svg>

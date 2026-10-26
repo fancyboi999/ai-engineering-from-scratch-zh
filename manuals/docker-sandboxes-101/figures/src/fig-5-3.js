@@ -20,7 +20,7 @@ module.exports = figure('fig-5-3', {
   f.kicker(400, 18, '模型拿到的工具名');
 
   const fsEntry = f.box({ x: 20, y: 30, w: 170, h: 104, hue: 'violet', title: 'type: filesystem', sub: ['files.yaml'] });
-  const fsRun = f.box({ x: 215, y: 30, w: 160, h: 104, hue: 'olive', title: '内置工具集', sub: ['位于', 'docker-agent process'] });
+  const fsRun = f.box({ x: 215, y: 30, w: 160, h: 104, hue: 'olive', title: '内置工具集', sub: ['位于', 'docker-agent 进程'] });
   f.rect(400, 30, 220, 104, { fill: color('olive-fill'), stroke: color('olive-ink') });
   fsNames.forEach((line, index) => f.text(410, 50 + index * 15, line, { size: 11 }));
   f.arrow(fsEntry.right(), [fsRun.x - 1, fsEntry.cy], { style: 'call' });

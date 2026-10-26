@@ -20,58 +20,58 @@
     </style>
   </defs>
 
-  <text x="480" y="28" text-anchor="middle" class="title">Stateless MCP auth: issuer-bound enrollment, JWKS refresh, audience pinning</text>
-  <text x="480" y="48" text-anchor="middle" class="caption">MCP 2026-07-28 · CIMD first · DCR deprecated · RFC 9207 issuer validation · authorize every request</text>
+  <text x="480" y="28" text-anchor="middle" class="title">无状态 MCP 认证：按签发者绑定注册、刷新 JWKS、固定受众</text>
+  <text x="480" y="48" text-anchor="middle" class="caption">MCP 2026-07-28 · 优先 CIMD · DCR 已弃用 · RFC 9207 签发者校验 · 逐请求授权</text>
 
   <rect x="30"  y="80" width="180" height="500" class="cool"/>
-  <text x="120" y="102" text-anchor="middle" class="head">MCP client</text>
-  <text x="46"  y="124" class="content">native or web client</text>
-  <text x="46"  y="150" class="label">holds</text>
-  <text x="46"  y="168" class="small">- client_id by issuer</text>
-  <text x="46"  y="184" class="small">- PKCE verifier</text>
-  <text x="46"  y="200" class="small">- access tokens by issuer</text>
-  <text x="46"  y="216" class="small">- expected response iss</text>
+  <text x="120" y="102" text-anchor="middle" class="head">MCP 客户端</text>
+  <text x="46"  y="124" class="content">原生或网页客户端</text>
+  <text x="46"  y="150" class="label">持有</text>
+  <text x="46"  y="168" class="small">- 按签发者保存 client_id</text>
+  <text x="46"  y="184" class="small">- PKCE 校验值</text>
+  <text x="46"  y="200" class="small">- 按签发者保存访问令牌</text>
+  <text x="46"  y="216" class="small">- 预期响应中的 iss</text>
 
   <rect x="390" y="80" width="180" height="500" class="cold"/>
-  <text x="480" y="102" text-anchor="middle" class="head">authorization server</text>
+  <text x="480" y="102" text-anchor="middle" class="head">授权服务器</text>
   <text x="406" y="124" class="content">issuer = auth.example.com</text>
-  <text x="406" y="150" class="label">publishes</text>
+  <text x="406" y="150" class="label">发布</text>
   <text x="406" y="168" class="small">- /.well-known/</text>
   <text x="406" y="184" class="small">  oauth-authorization-server</text>
   <text x="406" y="200" class="small">  (RFC 8414)</text>
-  <text x="406" y="216" class="small">- resolves CIMD client_id</text>
-  <text x="406" y="232" class="small">- DCR only as fallback</text>
-  <text x="406" y="248" class="small">- aud-pin via resource</text>
+  <text x="406" y="216" class="small">- 解析 CIMD client_id</text>
+  <text x="406" y="232" class="small">- DCR 仅作回退</text>
+  <text x="406" y="248" class="small">- 通过 resource 固定受众</text>
   <text x="406" y="264" class="small">  (RFC 8707)</text>
   <text x="406" y="280" class="small">- /token + JWKS + iss</text>
 
   <rect x="750" y="80" width="180" height="500" class="hot"/>
-  <text x="840" y="102" text-anchor="middle" class="head">MCP server</text>
+  <text x="840" y="102" text-anchor="middle" class="head">MCP 服务器</text>
   <text x="766" y="124" class="content">notes.example.com</text>
-  <text x="766" y="150" class="label">enforces</text>
+  <text x="766" y="150" class="label">执行校验</text>
   <text x="766" y="168" class="small">- aud == self.resource</text>
-  <text x="766" y="184" class="small">- iss in allow-list</text>
+  <text x="766" y="184" class="small">- iss 位于允许列表</text>
   <text x="766" y="200" class="small">  (RFC 9728)</text>
-  <text x="766" y="216" class="small">- exp not past</text>
-  <text x="766" y="232" class="small">- required scope</text>
-  <text x="766" y="248" class="small">- 401/403 with</text>
+  <text x="766" y="216" class="small">- exp 尚未过期</text>
+  <text x="766" y="232" class="small">- 所需权限范围</text>
+  <text x="766" y="248" class="small">- 401/403 携带</text>
   <text x="766" y="264" class="small">  WWW-Authenticate</text>
-  <text x="766" y="280" class="small">- no auth session cache</text>
+  <text x="766" y="280" class="small">- 不缓存认证会话</text>
 
   <rect x="220" y="380" width="160" height="170" class="aux"/>
-  <text x="300" y="402" text-anchor="middle" class="head">resource server logic</text>
+  <text x="300" y="402" text-anchor="middle" class="head">资源服务器逻辑</text>
   <text x="232" y="424" class="small">GET /.well-known/</text>
   <text x="232" y="438" class="small">  oauth-protected-resource</text>
   <text x="232" y="452" class="small">POST /mcp</text>
-  <text x="232" y="466" class="small">  (validate, then dispatch)</text>
-  <text x="232" y="480" class="small">scheduled refresh_jwks</text>
+  <text x="232" y="466" class="small">  （先校验，再分发）</text>
+  <text x="232" y="480" class="small">定时执行 refresh_jwks</text>
   <text x="232" y="494" class="small">  "0 */6 * * *"</text>
   <text x="232" y="510" class="small">validate(token,</text>
   <text x="232" y="524" class="small">  required_scope)</text>
   <text x="232" y="538" class="small">cache[iss] = {keys, ...}</text>
 
   <rect x="580" y="380" width="160" height="170" class="aux"/>
-  <text x="660" y="402" text-anchor="middle" class="head">JWKS cache</text>
+  <text x="660" y="402" text-anchor="middle" class="head">JWKS 缓存</text>
   <text x="592" y="424" class="small">key: &lt;iss&gt;</text>
   <text x="592" y="442" class="small">value: {</text>
   <text x="592" y="456" class="small">  keys: [</text>
@@ -83,32 +83,32 @@
 
   <path d="M210,160 L390,160" class="edge" marker-end="url(#arrow)"/>
   <text x="300" y="152" text-anchor="middle" class="small">GET /.well-known/oauth-authorization-server</text>
-  <text x="300" y="174" text-anchor="middle" class="caption">(1) RFC 8414 discovery</text>
+  <text x="300" y="174" text-anchor="middle" class="caption">(1) RFC 8414 发现</text>
 
   <path d="M390,200 L210,200" class="edge" marker-end="url(#arrow)"/>
-  <text x="300" y="194" text-anchor="middle" class="small">{issuer, CIMD support, jwks_uri, iss support}</text>
+  <text x="300" y="194" text-anchor="middle" class="small">{issuer, CIMD 支持, jwks_uri, iss 支持}</text>
 
   <path d="M210,240 L390,240" class="edge" marker-end="url(#arrow)"/>
   <text x="300" y="232" text-anchor="middle" class="small">client_id=https://client.example/client.json</text>
-  <text x="300" y="254" text-anchor="middle" class="caption">(2) Client ID Metadata Document</text>
+  <text x="300" y="254" text-anchor="middle" class="caption">(2) 客户端 ID 元数据文档</text>
 
   <path d="M390,280 L210,280" class="edge" marker-end="url(#arrow)"/>
-  <text x="300" y="274" text-anchor="middle" class="small">AS fetches metadata; identity stays issuer-bound</text>
+  <text x="300" y="274" text-anchor="middle" class="small">授权服务器拉取元数据；身份仍与签发者绑定</text>
 
   <path d="M210,318 L390,318" class="edge" marker-end="url(#arrow)"/>
   <text x="300" y="310" text-anchor="middle" class="small">/authorize + code_challenge + resource=...</text>
   <text x="300" y="332" text-anchor="middle" class="caption">(3) RFC 7636 PKCE + RFC 8707</text>
 
   <path d="M390,358 L210,358" class="edge" marker-end="url(#arrow)"/>
-  <text x="300" y="352" text-anchor="middle" class="small">authorization response iss, then token (aud, scope, kid)</text>
+  <text x="300" y="352" text-anchor="middle" class="small">授权响应返回 iss，再获取令牌（aud、scope、kid）</text>
 
   <path d="M210,608 L750,608" class="edge" marker-end="url(#arrow)" transform="translate(0,-40)"/>
-  <text x="480" y="562" text-anchor="middle" class="small">Authorization: Bearer eyJ... (call tool)</text>
-  <text x="480" y="582" text-anchor="middle" class="caption">(4) Every stateless MCP request validates bearer, issuer, audience, expiry, and scope</text>
+  <text x="480" y="562" text-anchor="middle" class="small">Authorization: Bearer eyJ...（调用工具）</text>
+  <text x="480" y="582" text-anchor="middle" class="caption">(4) 每个无状态 MCP 请求均校验 bearer、签发者、受众、有效期及权限范围</text>
 
   <path d="M570,470 L580,470" class="edge-cron" marker-end="url(#arrow)"/>
-  <text x="575" y="462" text-anchor="middle" class="caption">cron writes</text>
+  <text x="575" y="462" text-anchor="middle" class="caption">cron 写入</text>
 
   <path d="M740,470 L750,470" class="edge-cron" marker-end="url(#arrow)"/>
-  <text x="745" y="462" text-anchor="middle" class="caption">validate reads</text>
+  <text x="745" y="462" text-anchor="middle" class="caption">validate 读取</text>
 </svg>

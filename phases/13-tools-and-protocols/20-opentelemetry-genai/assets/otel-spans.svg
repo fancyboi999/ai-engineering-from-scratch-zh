@@ -13,7 +13,7 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">OTel GenAI span hierarchy for one agent turn</text>
+  <text x="480" y="26" text-anchor="middle" class="title">一个 agent 轮次中的 OTel GenAI span 层级</text>
 
   <rect x="40" y="60" width="880" height="40" class="cool"/>
   <text x="480" y="84" text-anchor="middle" class="step">agent.invoke_agent  INTERNAL  gen_ai.agent.name=research-agent</text>
@@ -40,7 +40,7 @@
   <text x="510" y="434" text-anchor="middle" class="step">mcp.call  CLIENT</text>
 
   <rect x="80" y="460" width="400" height="40" class="cold"/>
-  <text x="280" y="484" text-anchor="middle" class="step">llm.chat  CLIENT  synthesize</text>
+  <text x="280" y="484" text-anchor="middle" class="step">llm.chat CLIENT 综合</text>
 
-  <text x="480" y="516" text-anchor="middle" class="caption">one trace id; 11 spans; every GenAI attribute prefixed gen_ai.*  (spec v1.37+)</text>
+  <text x="480" y="516" text-anchor="middle" class="caption">一个 trace id；11 个 span；每项 GenAI 属性均以 gen_ai.* 为前缀（规范 v1.37+）</text>
 </svg>

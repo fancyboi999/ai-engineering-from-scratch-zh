@@ -1,4 +1,4 @@
-# Multi-Head Self-Attention
+# 多头自注意力
 
 > 一次线性投影，三种视角，H 个并行 head，再加一张 mask。这就是模型真正使用的 attention block。
 

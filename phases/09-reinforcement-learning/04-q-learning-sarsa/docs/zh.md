@@ -19,7 +19,7 @@
 
 ## 核心概念
 
-![Q-learning vs SARSA: off-policy max vs on-policy Q(s', a')](../assets/td.svg)
+![Q-learning 与 SARSA：离策略的最大值更新，对比在策略的 Q(s', a') 更新](../assets/td.svg)
 
 **V 的 TD(0) 更新：**
 

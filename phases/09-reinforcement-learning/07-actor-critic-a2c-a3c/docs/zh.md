@@ -21,7 +21,7 @@ A(s, a) = G - \hat{V}(s)
 
 ## 核心概念
 
-![Actor-critic: policy net plus value net, TD residual as advantage](../assets/actor-critic.svg)
+![行动者-评论家：策略网络与价值网络，以时序差分残差作为优势](../assets/actor-critic.svg)
 
 **两个网络，一个共享损失：**
 

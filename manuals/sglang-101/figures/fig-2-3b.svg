@@ -19,7 +19,7 @@
   <line x1="70" y1="177.6" x2="475" y2="177.6" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="1.5 3.5"/>
   <path d="M70 39.98000000000002 L475 177.5972 L542.5 177.5972 L542.5 36.779600000000016 L610 59.71580000000003" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <line x1="542.5" y1="30" x2="542.5" y2="200" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="542.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">retraction</text>
+  <text x="542.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">回撤</text>
   <text x="530.5" y="110" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.098 升至 0.714</text>
   <text x="272.5" y="100.56" font-size="11" class="m-serif" fill="var(--m-amber-ink, #85590c)">准入逐渐大胆</text>
 </svg>

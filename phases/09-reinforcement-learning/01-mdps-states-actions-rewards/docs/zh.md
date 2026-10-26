@@ -17,7 +17,7 @@
 
 ## 核心概念
 
-![Markov decision process: states, actions, transitions, rewards, discount](../assets/mdp.svg)
+![马尔可夫决策过程：状态、动作、转移、奖励与折扣](../assets/mdp.svg)
 
 **五个对象。**
 

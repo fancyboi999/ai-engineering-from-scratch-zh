@@ -16,8 +16,8 @@ module.exports = figure('fig-5-4', {
   desc: "顶行：procedure _percent_change 的 analyze_function 通过可缓存检查，因为 Ghidra 将操作标为 cachePolicy snapshot、mutatesArtifact false，随后生成 query ID。中间：query ID 是 canonical JSON 的 SHA-256，内容包括目标摘要 01b5d08b08fb、kind executable、format mach-o、architecture arm64，provider ghidra 12.1.4 与 profile digest 3fc72c9b4b7 的绑定，以及操作和参数。左下命中后重放条目，并注明未重新运行 provider。右下未命中则 Ghidra bridge 回答，记录 Evidence ev_b492c85e，按 ID 存条目。末行：annotate_native_function 等修改操作在 rea 分派给 Ghidra 前就使缓存失效，即使后续响应失败，之后快照导出也会被拒绝。",
 }, f => {
   const call = f.box({ x: 20, y: 28, w: 220, h: 52, hue: 'blue', title: 'analyze_function', sub: '{"procedure": "_percent_change"}' });
-  const gate = f.box({ x: 270, y: 28, w: 160, h: 52, hue: 'grey', title: "可缓存？", sub: ['cachePolicy snapshot', 'mutatesArtifact false'] });
-  const key = f.box({ x: 460, y: 28, w: 160, h: 52, hue: 'teal', title: "Query ID", sub: ["query_ 加 SHA-256"] });
+  const gate = f.box({ x: 270, y: 28, w: 160, h: 52, hue: 'grey', title: "可缓存？", sub: ["cachePolicy snapshot", "mutatesArtifact false"] });
+  const key = f.box({ x: 460, y: 28, w: 160, h: 52, hue: 'teal', title: "查询 ID", sub: ["query_ 加 SHA-256"] });
   f.arrow(call.right(), [gate.x - 1, call.cy], { style: 'call' });
   f.arrow(gate.right(), [key.x - 1, gate.cy], { style: 'call', label: "是" });
   const contents = block(f, 20, 104, 600, 'teal', "query_ = canonical JSON 的 SHA-256", [

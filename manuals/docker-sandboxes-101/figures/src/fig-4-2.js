@@ -3,17 +3,17 @@
 const { figure, color } = require('../../../_shared/figkit.js');
 
 const kits = [
-  { x: 20, title: 'hello-kit, workload', sub: ['fixtures/kits/hello-kit', 'network-policy@2, runtime:', 'allow example.com'] },
-  { x: 220, title: 'gh, mixin', sub: ['kitspec 2 example', 'network-policy@1 runtime allow', 'github.com, api.github.com,', 'uploads.github.com', 'credential@1: github, runtime,', 'GH_TOKEN proxyManaged'] },
-  { x: 420, title: 'bounds, mixin', sub: ['kitcap network-policy@2 config', 'install: registry.npmjs.org', 'runtime: allow api.github.com', 'GET and HEAD on /repos/**', 'deny api.github.com DELETE', 'deny telemetry.example.com'] },
+  { x: 20, title: 'hello-kit，工作负载', sub: ['fixtures/kits/hello-kit', 'network-policy@2，运行时：', 'allow example.com'] },
+  { x: 220, title: 'gh，混入配置', sub: ['kitspec 2 示例', 'network-policy@1 runtime allow', 'github.com, api.github.com,', 'uploads.github.com', 'credential@1: github, runtime,', 'GH_TOKEN proxyManaged'] },
+  { x: 420, title: 'bounds，混入配置', sub: ['kitcap network-policy@2 config', 'install: registry.npmjs.org', 'runtime: allow api.github.com', '对 /repos/** 使用 GET 与 HEAD', 'deny api.github.com DELETE', 'deny telemetry.example.com'] },
 ];
 
 const grants = [
-  ['runtime allow', 'example.com, github.com, uploads.github.com'],
-  ['runtime allow', 'api.github.com，任意方法/路径（丢弃有界项，kitspec9.5）'],
-  ['runtime deny', 'api.github.com DELETE、telemetry.example.com（拒绝优先，kitcap）'],
-  ['install allow', 'registry.npmjs.org（agent启动前关闭，kitspec12）'],
-  ['credential', 'github at runtime, GH_TOKEN proxyManaged, inject on api.github.com'],
+  ['运行时允许', 'example.com, github.com, uploads.github.com'],
+  ['运行时允许', 'api.github.com，任意方法/路径（丢弃有界项，kitspec9.5）'],
+  ['运行时拒绝', 'api.github.com DELETE、telemetry.example.com（拒绝优先，kitcap）'],
+  ['安装时允许', 'registry.npmjs.org（agent启动前关闭，kitspec12）'],
+  ['凭证', '运行时 github，GH_TOKEN proxyManaged，注入 api.github.com'],
 ];
 
 module.exports = figure('fig-4-2', {
@@ -40,7 +40,7 @@ module.exports = figure('fig-4-2', {
 
   f.text(330, 464, 'kit 下一版本', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
   f.box({ x: 20, y: 482, w: 280, h: 64, hue: 'amber', title: '仍在集合内', sub: ['已获准主机上的有界允许', '静默应用（kitspec7.4）'] });
-  f.box({ x: 340, y: 482, w: 280, h: 64, hue: 'rose', title: 'removes deny api.github.com DELETE', sub: ['移除拒绝就是扩权', '应用前停下询问'], titleSize: 12 });
+  f.box({ x: 340, y: 482, w: 280, h: 64, hue: 'rose', title: '移除 deny api.github.com DELETE', sub: ['移除拒绝就是扩权', '应用前停下询问'], titleSize: 12 });
   f.arrow([160, 440], [160, 481], { style: 'state', label: '相同授权' });
   f.arrow([480, 440], [480, 481], { style: 'fail', label: '更广授权' });
   f.text(20, 572, 'kit 不自行授权；各行是宿主回答的请求，锁定记录判断下一版。', { size: 11, serif: true, hue: 'ink-soft' });

@@ -7,7 +7,7 @@ module.exports = figure('fig-4-4', {
   title: "SGLang 如何选择权重格式",
   desc: "四行各列 checkpoint 与量化参数。FP8 checkpoint 不加参数，以 fp8 运行。Modelopt checkpoint 配 modelopt_fp4 是已知兼容组合，可运行。GPTQ checkpoint 无参数时在运行时转换，使用 Marlin 内核。CUDA build 上 GPTQ checkpoint 配 gptq 参数会跳过转换，启动因 Unknown quantization method 失败。",
 }, f => {
-  f.kicker(20, 18, "Checkpoint quant_method");
+  f.kicker(20, 18, "检查点 QUANT_METHOD");
   f.kicker(230, 18, '--quantization');
   f.kicker(430, 18, "启动结果");
   const rows = [

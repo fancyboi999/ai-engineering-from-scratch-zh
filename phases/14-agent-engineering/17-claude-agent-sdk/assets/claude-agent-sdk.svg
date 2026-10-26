@@ -17,39 +17,39 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Claude Agent SDK — harness with subagents, hooks, session store</text>
+  <text x="480" y="26" text-anchor="middle" class="title">Claude Agent SDK：子 agent、钩子与会话存储运行框架</text>
 
   <rect x="40" y="50" width="880" height="220" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">orchestrator spawns three subagents; each runs in its own context</text>
+  <text x="480" y="72" text-anchor="middle" class="head">编排器启动三个子 agent；各自在独立上下文中运行</text>
 
   <rect x="60" y="90" width="220" height="160" class="orch"/>
-  <text x="170" y="112" text-anchor="middle" class="head">orchestrator</text>
-  <text x="78" y="136" class="small">session: session_main</text>
-  <text x="78" y="154" class="small">context bounded — only results return</text>
-  <text x="78" y="172" class="small">tool calls: list_dir(/project)</text>
-  <text x="78" y="190" class="small">spawn 3 subs; wait for results</text>
-  <text x="78" y="208" class="small">aggregate; emit final response</text>
-  <text x="78" y="226" class="small">session persists through SessionStore</text>
+  <text x="170" y="112" text-anchor="middle" class="head">编排器</text>
+  <text x="78" y="136" class="small">会话：session_main</text>
+  <text x="78" y="154" class="small">限制上下文：仅返回结果</text>
+  <text x="78" y="172" class="small">工具调用：list_dir(/project)</text>
+  <text x="78" y="190" class="small">启动 3 个子 agent，等待结果</text>
+  <text x="78" y="208" class="small">汇总并输出最终回答</text>
+  <text x="78" y="226" class="small">通过 SessionStore 持久化会话</text>
 
   <rect x="300" y="90" width="200" height="70" class="sub"/>
-  <text x="400" y="112" text-anchor="middle" class="step">subagent 1</text>
-  <text x="318" y="130" class="small">session: session_main.sub01</text>
-  <text x="318" y="146" class="small">read_file(a.py)  result</text>
+  <text x="400" y="112" text-anchor="middle" class="step">子 agent 1</text>
+  <text x="318" y="130" class="small">会话：session_main.sub01</text>
+  <text x="318" y="146" class="small">read_file(a.py) 的结果</text>
 
   <rect x="300" y="170" width="200" height="70" class="sub"/>
-  <text x="400" y="192" text-anchor="middle" class="step">subagent 2</text>
-  <text x="318" y="210" class="small">session: session_main.sub02</text>
-  <text x="318" y="226" class="small">read_file(b.py)  result</text>
+  <text x="400" y="192" text-anchor="middle" class="step">子 agent 2</text>
+  <text x="318" y="210" class="small">会话：session_main.sub02</text>
+  <text x="318" y="226" class="small">read_file(b.py) 的结果</text>
 
   <rect x="520" y="130" width="200" height="70" class="sub"/>
-  <text x="620" y="152" text-anchor="middle" class="step">subagent 3</text>
-  <text x="538" y="170" class="small">session: session_main.sub03</text>
-  <text x="538" y="186" class="small">read_file(c.py)  result</text>
+  <text x="620" y="152" text-anchor="middle" class="step">子 agent 3</text>
+  <text x="538" y="170" class="small">会话：session_main.sub03</text>
+  <text x="538" y="186" class="small">read_file(c.py) 的结果</text>
 
   <rect x="740" y="130" width="160" height="70" class="box"/>
-  <text x="820" y="152" text-anchor="middle" class="step">aggregator</text>
-  <text x="758" y="170" class="small">merge 3 results</text>
-  <text x="758" y="186" class="small">orchestrator context +=</text>
+  <text x="820" y="152" text-anchor="middle" class="step">汇总器</text>
+  <text x="758" y="170" class="small">合并 3 个结果</text>
+  <text x="758" y="186" class="small">编排器上下文 +=</text>
 
   <line x1="280" y1="170" x2="300" y2="125" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="280" y1="170" x2="300" y2="205" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -59,7 +59,7 @@
   <line x1="720" y1="165" x2="740" y2="165" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="40" y="290" width="440" height="220" class="hook"/>
-  <text x="260" y="312" text-anchor="middle" class="head">lifecycle hooks</text>
+  <text x="260" y="312" text-anchor="middle" class="head">生命周期钩子</text>
   <rect x="60" y="328" width="400" height="26" class="box"/>
   <text x="78" y="346" class="step">SessionStart, SessionEnd</text>
   <rect x="60" y="360" width="400" height="26" class="box"/>
@@ -69,22 +69,22 @@
   <rect x="60" y="424" width="400" height="26" class="box"/>
   <text x="78" y="442" class="step">PreCompact, Stop, Notification</text>
   <rect x="60" y="456" width="400" height="46" class="box"/>
-  <text x="78" y="478" class="step">cross-cutting behavior:</text>
-  <text x="78" y="496" class="small">rate-limits, audits, logging, evals, rule enforcement</text>
+  <text x="78" y="478" class="step">横切行为：</text>
+  <text x="78" y="496" class="small">限流、审计、日志、评测、规则执行</text>
 
   <rect x="500" y="290" width="420" height="220" class="store"/>
-  <text x="710" y="312" text-anchor="middle" class="head">session store</text>
+  <text x="710" y="312" text-anchor="middle" class="head">会话存储</text>
   <rect x="520" y="328" width="380" height="26" class="box"/>
   <text x="538" y="346" class="step">append(session_id, message)</text>
   <rect x="520" y="360" width="380" height="26" class="box"/>
-  <text x="538" y="378" class="step">load(session_id)  list of turns</text>
+  <text x="538" y="378" class="step">load(session_id) 返回交互轮次列表</text>
   <rect x="520" y="392" width="380" height="26" class="box"/>
   <text x="538" y="410" class="step">list_sessions()</text>
   <rect x="520" y="424" width="380" height="26" class="box"/>
-  <text x="538" y="442" class="step">delete(session_id)  cascades to subagent sessions</text>
+  <text x="538" y="442" class="step">delete(session_id) 级联删除子 agent 会话</text>
   <rect x="520" y="456" width="380" height="46" class="box"/>
   <text x="538" y="478" class="step">list_subkeys(parent) + --session-mirror</text>
-  <text x="538" y="496" class="small">full TypeScript parity in the Python SDK</text>
+  <text x="538" y="496" class="small">Python SDK 完整提供与 TypeScript 相同的能力</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">W3C trace context propagates into CLI subprocess; entire multi-process run is one trace.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">W3C trace 上下文传播到 CLI 子进程；整个多进程运行形成一条 trace。</text>
 </svg>

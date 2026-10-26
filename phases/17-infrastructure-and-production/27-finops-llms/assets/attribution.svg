@@ -13,48 +13,48 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">FinOps for LLMs — three dimensions, four layers, three-tier enforcement</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLM FinOps：三个维度、四个层次、三级强制控制</text>
 
   <rect x="40" y="50" width="280" height="180" class="dim"/>
-  <text x="180" y="72" text-anchor="middle" class="head">three attribution dimensions</text>
+  <text x="180" y="72" text-anchor="middle" class="head">三个归因维度</text>
   <rect x="60" y="90" width="240" height="35" class="box"/>
-  <text x="180" y="112" text-anchor="middle" class="step">per-user (user_id)</text>
+  <text x="180" y="112" text-anchor="middle" class="step">逐用户（user_id）</text>
   <rect x="60" y="130" width="240" height="35" class="box"/>
-  <text x="180" y="152" text-anchor="middle" class="step">per-task (task_id + route)</text>
+  <text x="180" y="152" text-anchor="middle" class="step">逐任务（task_id + route）</text>
   <rect x="60" y="170" width="240" height="35" class="box"/>
-  <text x="180" y="192" text-anchor="middle" class="step">per-tenant (tenant_id)</text>
-  <text x="180" y="222" text-anchor="middle" class="caption">instrument all three on day 1</text>
+  <text x="180" y="192" text-anchor="middle" class="step">逐租户（tenant_id）</text>
+  <text x="180" y="222" text-anchor="middle" class="caption">从第 1 天开始同时记录三个维度</text>
 
   <rect x="340" y="50" width="280" height="180" class="layer"/>
-  <text x="480" y="72" text-anchor="middle" class="head">four token layers</text>
-  <text x="360" y="96" class="step">· prompt (40-60%)</text>
-  <text x="360" y="116" class="step">· tool (20-40%, agent-heavy)</text>
-  <text x="360" y="136" class="step">· memory (10-30%, RAG)</text>
-  <text x="360" y="156" class="step">· response (10-30%)</text>
-  <text x="480" y="200" text-anchor="middle" class="caption">bucketing all four hides the optimization lever</text>
+  <text x="480" y="72" text-anchor="middle" class="head">四层 token 用量</text>
+  <text x="360" y="96" class="step">· prompt（40-60%）</text>
+  <text x="360" y="116" class="step">· 工具（20-40%，agent 密集）</text>
+  <text x="360" y="136" class="step">· 记忆（10-30%，RAG）</text>
+  <text x="360" y="156" class="step">· 响应（10-30%）</text>
+  <text x="480" y="200" text-anchor="middle" class="caption">四层混合计量会掩盖优化着力点</text>
 
   <rect x="640" y="50" width="280" height="180" class="enforce"/>
-  <text x="780" y="72" text-anchor="middle" class="head">three-tier enforcement</text>
-  <text x="660" y="96" class="step">1. rate limit per tenant</text>
-  <text x="660" y="114" class="small">   2-3x peak, 429 + Retry-After</text>
-  <text x="660" y="138" class="step">2. daily spend cap per tenant</text>
-  <text x="660" y="156" class="small">   1.5-3x contract; tighten rate + alert CS</text>
-  <text x="660" y="180" class="step">3. kill switch on z-score &gt; 4</text>
-  <text x="660" y="198" class="small">   auto-pause + page on-call</text>
+  <text x="780" y="72" text-anchor="middle" class="head">三级强制控制</text>
+  <text x="660" y="96" class="step">1. 逐租户限流</text>
+  <text x="660" y="114" class="small">   峰值 2-3 倍，429 + Retry-After</text>
+  <text x="660" y="138" class="step">2. 逐租户每日金额上限</text>
+  <text x="660" y="156" class="small">   合同 1.5-3 倍；收紧速率并告警客户成功团队</text>
+  <text x="660" y="180" class="step">3. z-score &gt; 4 时紧急停止</text>
+  <text x="660" y="198" class="small">   自动暂停并呼叫值班人员</text>
 
   <rect x="40" y="260" width="880" height="100" class="box"/>
-  <text x="480" y="282" text-anchor="middle" class="head">unit metric — cost per product outcome, not $/M tokens</text>
-  <text x="60" y="308" class="step">cost per resolved support ticket</text>
-  <text x="60" y="326" class="step">cost per generated article</text>
-  <text x="60" y="344" class="step">cost per successful agent task</text>
-  <text x="500" y="308" class="step">cost per user-session-minute</text>
-  <text x="500" y="326" class="step">cost per index refresh</text>
-  <text x="500" y="344" class="caption">tie cost to a product outcome, else optimization is unanchored</text>
+  <text x="480" y="282" text-anchor="middle" class="head">单位指标：每次产品成果的成本，而非 $/M token</text>
+  <text x="60" y="308" class="step">每张已解决工单的成本</text>
+  <text x="60" y="326" class="step">每篇生成文章的成本</text>
+  <text x="60" y="344" class="step">每项成功 agent 任务的成本</text>
+  <text x="500" y="308" class="step">每用户会话分钟的成本</text>
+  <text x="500" y="326" class="step">每次索引刷新的成本</text>
+  <text x="500" y="344" class="caption">将成本关联产品成果，否则优化失去依据</text>
 
   <rect x="40" y="380" width="880" height="110" class="kill"/>
-  <text x="480" y="402" text-anchor="middle" class="head">stacked optimization ceiling — ~5-10% of naive baseline</text>
-  <text x="480" y="424" text-anchor="middle" class="step">cache (14) + batch (15) + route (16) + gateway (19)</text>
-  <text x="480" y="444" text-anchor="middle" class="step">each halves or 10xs; compound multiplies</text>
-  <text x="480" y="464" text-anchor="middle" class="caption">most teams run 2-3 levers; few stack all four</text>
-  <text x="480" y="484" text-anchor="middle" class="small">leaked spend = gap between best-case stack and current</text>
+  <text x="480" y="402" text-anchor="middle" class="head">叠加优化上限：约为朴素基线的 5-10%</text>
+  <text x="480" y="424" text-anchor="middle" class="step">缓存（14）+ 批处理（15）+ 路由（16）+ 网关（19）</text>
+  <text x="480" y="444" text-anchor="middle" class="step">各自减半或降低 10 倍；叠加后相乘</text>
+  <text x="480" y="464" text-anchor="middle" class="caption">多数团队仅使用 2-3 个杠杆，少数团队叠加全部四个</text>
+  <text x="480" y="484" text-anchor="middle" class="small">流失开销 = 最佳组合与现状的差距</text>
 </svg>

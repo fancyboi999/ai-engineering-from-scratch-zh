@@ -15,14 +15,14 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">autonomous research agent — best-first experiment tree</text>
+  <text x="480" y="24" text-anchor="middle" class="title">自主研究 agent：最佳优先实验树</text>
 
   <rect x="40" y="50" width="640" height="460" class="box"/>
-  <text x="360" y="72" text-anchor="middle" class="head">tree search (budget $30)</text>
+  <text x="360" y="72" text-anchor="middle" class="head">树搜索（预算 $30）</text>
 
   <rect x="300" y="92" width="120" height="38" class="cool"/>
-  <text x="360" y="114" text-anchor="middle" class="step">seed / root</text>
-  <text x="360" y="126" text-anchor="middle" class="small">hypothesis + config</text>
+  <text x="360" y="114" text-anchor="middle" class="step">初始种子 / 根节点</text>
+  <text x="360" y="126" text-anchor="middle" class="small">假设 + 配置</text>
 
   <rect x="80" y="170" width="120" height="38" class="cold"/>
   <text x="140" y="192" text-anchor="middle" class="step">sp top-4</text>
@@ -50,40 +50,40 @@
   <path d="M280,208 L560,240" class="edge"/>
 
   <rect x="360" y="310" width="120" height="38" class="hot"/>
-  <text x="420" y="332" text-anchor="middle" class="step">chosen branch</text>
-  <text x="420" y="344" text-anchor="middle" class="small">novelty x quality</text>
+  <text x="420" y="332" text-anchor="middle" class="step">选中的分支</text>
+  <text x="420" y="344" text-anchor="middle" class="small">新颖度 x 质量</text>
   <path d="M420,278 L420,310" class="edge"/>
 
-  <text x="80" y="398" class="small">expand() proposes k children by small-edit variation</text>
-  <text x="80" y="416" class="small">each child runs in a sandboxed container:</text>
+  <text x="80" y="398" class="small">expand() 通过小幅编辑变异提出 k 个子节点</text>
+  <text x="80" y="416" class="small">每个子节点在沙箱容器中运行：</text>
   <text x="80" y="432" class="small">  docker run --network=none --memory=8g --cpus=2 --read-only</text>
-  <text x="80" y="450" class="small">verify() checks: loss converged? baselines ran? seed set?</text>
+  <text x="80" y="450" class="small">verify() 检查：损失是否收敛？是否运行基线？是否设置种子？</text>
   <text x="80" y="468" class="small">score() = 0.4*novelty + 0.5*quality + 0.1*remaining_budget</text>
-  <text x="80" y="486" class="small">frontier is a max-heap; pop highest score each step</text>
+  <text x="80" y="486" class="small">候选前沿使用最大堆；每步弹出最高分节点</text>
 
   <rect x="700" y="50" width="220" height="230" class="box"/>
-  <text x="810" y="72" text-anchor="middle" class="head">writer loop</text>
+  <text x="810" y="72" text-anchor="middle" class="head">写作循环</text>
   <rect x="720" y="90" width="180" height="34" class="cool"/>
-  <text x="810" y="110" text-anchor="middle" class="step">LaTeX draft v1</text>
+  <text x="810" y="110" text-anchor="middle" class="step">LaTeX 初稿 v1</text>
   <rect x="720" y="130" width="180" height="34" class="hot"/>
-  <text x="810" y="150" text-anchor="middle" class="step">vision critique</text>
-  <text x="810" y="168" text-anchor="middle" class="small">Opus 4.7 reads PDF</text>
+  <text x="810" y="150" text-anchor="middle" class="step">视觉评审</text>
+  <text x="810" y="168" text-anchor="middle" class="small">Opus 4.7 阅读 PDF</text>
   <rect x="720" y="180" width="180" height="34" class="cool"/>
-  <text x="810" y="200" text-anchor="middle" class="step">draft v2, v3...</text>
+  <text x="810" y="200" text-anchor="middle" class="step">修订稿 v2、v3...</text>
   <rect x="720" y="220" width="180" height="34" class="dsk"/>
-  <text x="810" y="240" text-anchor="middle" class="step">reviewer ensemble</text>
-  <text x="810" y="258" text-anchor="middle" class="small">5 judges, NeurIPS rubric</text>
+  <text x="810" y="240" text-anchor="middle" class="step">评审集合</text>
+  <text x="810" y="258" text-anchor="middle" class="small">5 个评审，使用 NeurIPS 评分标准</text>
 
   <rect x="700" y="298" width="220" height="212" class="box"/>
-  <text x="810" y="318" text-anchor="middle" class="head">safety</text>
-  <text x="810" y="340" text-anchor="middle" class="small">sandbox per experiment</text>
-  <text x="810" y="356" text-anchor="middle" class="small">no network egress</text>
-  <text x="810" y="372" text-anchor="middle" class="small">bounded wall-clock</text>
-  <text x="810" y="388" text-anchor="middle" class="small">deterministic seeds</text>
-  <text x="810" y="406" text-anchor="middle" class="small">cgroup memory + pids caps</text>
-  <text x="810" y="424" text-anchor="middle" class="small">$30 hard budget / paper</text>
-  <text x="810" y="442" text-anchor="middle" class="small">red-team: fork bombs,</text>
-  <text x="810" y="458" text-anchor="middle" class="small">filesystem escape,</text>
-  <text x="810" y="474" text-anchor="middle" class="small">LLM shell-metachar injection</text>
-  <text x="810" y="498" text-anchor="middle" class="caption">Sakana v2 documented attack surface</text>
+  <text x="810" y="318" text-anchor="middle" class="head">安全</text>
+  <text x="810" y="340" text-anchor="middle" class="small">每个实验一个沙箱</text>
+  <text x="810" y="356" text-anchor="middle" class="small">禁止网络出口</text>
+  <text x="810" y="372" text-anchor="middle" class="small">限制运行时长</text>
+  <text x="810" y="388" text-anchor="middle" class="small">确定性种子</text>
+  <text x="810" y="406" text-anchor="middle" class="small">cgroup 内存 + 进程数上限</text>
+  <text x="810" y="424" text-anchor="middle" class="small">每篇论文预算硬上限 $30</text>
+  <text x="810" y="442" text-anchor="middle" class="small">红队：fork 炸弹、</text>
+  <text x="810" y="458" text-anchor="middle" class="small">文件系统逃逸、</text>
+  <text x="810" y="474" text-anchor="middle" class="small">LLM shell 元字符注入</text>
+  <text x="810" y="498" text-anchor="middle" class="caption">Sakana v2 已记录的攻击面</text>
 </svg>

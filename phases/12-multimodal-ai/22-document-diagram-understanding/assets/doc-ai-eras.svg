@@ -17,42 +17,42 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Document AI — three eras from OCR pipeline to VLM-native</text>
+  <text x="480" y="24" text-anchor="middle" class="title">文档 AI：从 OCR 流水线到原生 VLM 的三个时代</text>
 
   <rect x="30" y="50" width="900" height="210" class="box"/>
 
   <rect x="50" y="80" width="280" height="160" class="hot"/>
-  <text x="190" y="102" text-anchor="middle" class="step">Era 1: OCR pipeline</text>
-  <text x="190" y="124" text-anchor="middle" class="small">Tesseract / TrOCR detect</text>
-  <text x="190" y="140" text-anchor="middle" class="small">LayoutLMv3 layout</text>
-  <text x="190" y="156" text-anchor="middle" class="small">table recognizer</text>
-  <text x="190" y="172" text-anchor="middle" class="small">regex + domain rules</text>
-  <text x="190" y="196" text-anchor="middle" class="step">pros: cheap, deterministic</text>
-  <text x="190" y="216" text-anchor="middle" class="small">cons: brittle on new formats</text>
+  <text x="190" y="102" text-anchor="middle" class="step">时代 1：OCR 流水线</text>
+  <text x="190" y="124" text-anchor="middle" class="small">Tesseract / TrOCR 检测</text>
+  <text x="190" y="140" text-anchor="middle" class="small">LayoutLMv3 布局分析</text>
+  <text x="190" y="156" text-anchor="middle" class="small">表格识别器</text>
+  <text x="190" y="172" text-anchor="middle" class="small">正则表达式 + 领域规则</text>
+  <text x="190" y="196" text-anchor="middle" class="step">优点：便宜、确定性强</text>
+  <text x="190" y="216" text-anchor="middle" class="small">缺点：难以适应新格式</text>
 
   <rect x="340" y="80" width="280" height="160" class="cool"/>
-  <text x="480" y="102" text-anchor="middle" class="step">Era 2: OCR-free specialists</text>
-  <text x="480" y="124" text-anchor="middle" class="small">Donut: image -&gt; JSON</text>
-  <text x="480" y="140" text-anchor="middle" class="small">Nougat: paper -&gt; LaTeX</text>
-  <text x="480" y="156" text-anchor="middle" class="small">DocLLM: layout-aware gen</text>
-  <text x="480" y="172" text-anchor="middle" class="small">swin / ViT encoder</text>
-  <text x="480" y="196" text-anchor="middle" class="step">pros: single model</text>
-  <text x="480" y="216" text-anchor="middle" class="small">cons: domain-specific</text>
+  <text x="480" y="102" text-anchor="middle" class="step">时代 2：免 OCR 专用模型</text>
+  <text x="480" y="124" text-anchor="middle" class="small">Donut：图像 -&gt; JSON</text>
+  <text x="480" y="140" text-anchor="middle" class="small">Nougat：论文 -&gt; LaTeX</text>
+  <text x="480" y="156" text-anchor="middle" class="small">DocLLM：布局感知生成</text>
+  <text x="480" y="172" text-anchor="middle" class="small">swin / ViT 编码器</text>
+  <text x="480" y="196" text-anchor="middle" class="step">优点：单一模型</text>
+  <text x="480" y="216" text-anchor="middle" class="small">缺点：局限于特定领域</text>
 
   <rect x="630" y="80" width="280" height="160" class="cold"/>
-  <text x="770" y="102" text-anchor="middle" class="step">Era 3: VLM-native</text>
-  <text x="770" y="124" text-anchor="middle" class="small">Qwen2.5-VL native res</text>
-  <text x="770" y="140" text-anchor="middle" class="small">PaliGemma 2 doc-trained</text>
-  <text x="770" y="156" text-anchor="middle" class="small">Claude 4.7 at 2576px</text>
-  <text x="770" y="172" text-anchor="middle" class="small">frontier proprietary</text>
-  <text x="770" y="196" text-anchor="middle" class="step">pros: no pipeline</text>
-  <text x="770" y="216" text-anchor="middle" class="small">cons: cost + hallucination</text>
+  <text x="770" y="102" text-anchor="middle" class="step">时代 3：原生 VLM</text>
+  <text x="770" y="124" text-anchor="middle" class="small">Qwen2.5-VL 原生分辨率</text>
+  <text x="770" y="140" text-anchor="middle" class="small">PaliGemma 2 经文档训练</text>
+  <text x="770" y="156" text-anchor="middle" class="small">Claude 4.7 支持 2576px</text>
+  <text x="770" y="172" text-anchor="middle" class="small">前沿闭源模型</text>
+  <text x="770" y="196" text-anchor="middle" class="step">优点：无须流水线</text>
+  <text x="770" y="216" text-anchor="middle" class="small">缺点：成本 + 幻觉</text>
 
   <rect x="30" y="280" width="900" height="230" class="box"/>
-  <text x="480" y="302" text-anchor="middle" class="head">benchmarks + 2026 recipe picker</text>
+  <text x="480" y="302" text-anchor="middle" class="head">基准与 2026 配方选择</text>
 
   <g transform="translate(60, 320)">
-    <text x="0" y="15" class="step">benchmark</text>
+    <text x="0" y="15" class="step">基准</text>
     <text x="200" y="15" class="step">OCR+LLMv3</text>
     <text x="320" y="15" class="step">Nougat</text>
     <text x="420" y="15" class="step">PaliGemma 2</text>
@@ -70,13 +70,13 @@
     <text x="420" y="60" class="small">85.1</text>
     <text x="560" y="60" class="small">92.2</text>
 
-    <text x="0" y="80" class="small">Math LaTeX</text>
+    <text x="0" y="80" class="small">数学 LaTeX</text>
     <text x="200" y="80" class="small">-</text>
     <text x="320" y="80" class="small">90.5</text>
     <text x="420" y="80" class="small">82.0</text>
     <text x="560" y="80" class="small">94.3</text>
 
-    <text x="0" y="100" class="small">handwriting</text>
+    <text x="0" y="100" class="small">手写文字</text>
     <text x="200" y="100" class="small">65</text>
     <text x="320" y="100" class="small">-</text>
     <text x="420" y="100" class="small">80</text>
@@ -84,12 +84,12 @@
   </g>
 
   <rect x="620" y="320" width="290" height="170" class="reg"/>
-  <text x="765" y="342" text-anchor="middle" class="step">2026 picker</text>
-  <text x="765" y="362" text-anchor="middle" class="small">10M invoices/day -&gt; Era 1</text>
-  <text x="765" y="378" text-anchor="middle" class="small">scientific papers -&gt; Nougat + VLM</text>
-  <text x="765" y="394" text-anchor="middle" class="small">mixed handwriting -&gt; VLM-native</text>
-  <text x="765" y="410" text-anchor="middle" class="small">regulated -&gt; hybrid cross-check</text>
-  <text x="765" y="436" text-anchor="middle" class="step">frontier gap</text>
-  <text x="765" y="456" text-anchor="middle" class="small">open 7B VLM: ~88 DocVQA</text>
-  <text x="765" y="472" text-anchor="middle" class="small">Claude 4.7: ~95, near-human</text>
+  <text x="765" y="342" text-anchor="middle" class="step">2026 选择指南</text>
+  <text x="765" y="362" text-anchor="middle" class="small">每天 10M 张发票 -&gt; 时代 1</text>
+  <text x="765" y="378" text-anchor="middle" class="small">科学论文 -&gt; Nougat + VLM</text>
+  <text x="765" y="394" text-anchor="middle" class="small">混合手写内容 -&gt; 原生 VLM</text>
+  <text x="765" y="410" text-anchor="middle" class="small">受监管场景 -&gt; 混合交叉校验</text>
+  <text x="765" y="436" text-anchor="middle" class="step">前沿模型差距</text>
+  <text x="765" y="456" text-anchor="middle" class="small">开放 7B VLM：DocVQA 约 88</text>
+  <text x="765" y="472" text-anchor="middle" class="small">Claude 4.7：约 95，接近人类</text>
 </svg>

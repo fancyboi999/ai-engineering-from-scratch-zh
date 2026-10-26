@@ -716,6 +716,30 @@
     return { hasFigures: hosts.length > 0, sources: needed };
   }
 
+  function loadFigureLocales(root) {
+    var sources = window.AIFS_FIGURE_LOCALE_SOURCES || {};
+    var providers = window.AIFS_FIGURE_PROVIDERS || {};
+    var needed = { 'lesson-figures.js': true };
+    var scope = root || document;
+    var hosts = scope.querySelectorAll ? scope.querySelectorAll('.lesson-figure[data-figure]') : [];
+    for (var i = 0; i < hosts.length; i++) {
+      var name = ((hosts[i].dataset && hosts[i].dataset.figure) || hosts[i].getAttribute('data-figure') || '').trim().split(/\s+/)[0];
+      var files = providers[name] || [];
+      if (!files.length && FIGURE_TO_MODULE[name]) files = [FIGURE_TO_MODULE[name].split('?')[0]];
+      for (var j = 0; j < files.length; j++) needed[files[j]] = true;
+    }
+    return Promise.all(Object.keys(needed).filter(function (file) {
+      return !!sources[file];
+    }).map(function (file) { return loadScript(sources[file]); }));
+  }
+
+  function loadFigureOverlay(root) {
+    return loadFigureLocales(root).then(function () {
+      var version = window.AIFS_FIGURE_I18N_VERSION;
+      return loadScript(version ? 'figures-i18n-zh.js?v=' + encodeURIComponent(version) : i18nSrc);
+    });
+  }
+
   function ensureModules(root) {
     var required = requiredModules(root);
     if (!required.hasFigures) return Promise.resolve(false);
@@ -726,7 +750,7 @@
     // static previews built before the generated loader existed.
     if (typeof window.AIFS_loadFigureProviders === 'function') {
       return window.AIFS_loadFigureProviders(root)
-        .then(function () { return loadScript(i18nSrc); })
+        .then(function () { return loadFigureOverlay(root); })
         .then(function () { return true; });
     }
 
@@ -738,7 +762,7 @@
     // The zh layer wraps mountLessonFigures, so it must run after every
     // requested renderer has registered itself. Its own failure is non-fatal.
     return Promise.all(pending)
-      .then(function () { return loadScript(i18nSrc); })
+      .then(function () { return loadFigureOverlay(root); })
       .then(function () { return true; });
   }
 

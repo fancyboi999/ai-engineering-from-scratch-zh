@@ -19,15 +19,15 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">ReWOO — Planner, Workers, Solver (Xu et al., 2023)</text>
+  <text x="480" y="26" text-anchor="middle" class="title">ReWOO — 规划器、工作者、求解器（Xu 等人，2023）</text>
 
   <rect x="40" y="60" width="170" height="80" class="cool"/>
-  <text x="125" y="88" text-anchor="middle" class="step">Planner</text>
-  <text x="125" y="108" text-anchor="middle" class="small">one call; sees only</text>
-  <text x="125" y="124" text-anchor="middle" class="small">the user question</text>
+  <text x="125" y="88" text-anchor="middle" class="step">规划器</text>
+  <text x="125" y="108" text-anchor="middle" class="small">调用一次；仅看到</text>
+  <text x="125" y="124" text-anchor="middle" class="small">用户问题</text>
 
   <rect x="260" y="60" width="460" height="320" class="box"/>
-  <text x="490" y="84" text-anchor="middle" class="head">plan DAG and workers</text>
+  <text x="490" y="84" text-anchor="middle" class="head">规划 DAG 与工作者</text>
 
   <rect x="290" y="110" width="160" height="60" class="cold"/>
   <text x="370" y="134" text-anchor="middle" class="step">E1 = search</text>
@@ -47,41 +47,41 @@
   <line x1="370" y1="170" x2="470" y2="220" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="290" y="310" width="400" height="50" class="dsk"/>
-  <text x="490" y="334" text-anchor="middle" class="step">evidence table: E1=Paris, E2="11.2M metro", E3="11 million"</text>
+  <text x="490" y="334" text-anchor="middle" class="step">证据表：E1=Paris，E2="11.2M metro"，E3="11 million"</text>
 
   <rect x="750" y="60" width="170" height="80" class="cool"/>
-  <text x="835" y="88" text-anchor="middle" class="step">Solver</text>
-  <text x="835" y="108" text-anchor="middle" class="small">one call; reads</text>
-  <text x="835" y="124" text-anchor="middle" class="small">evidence + plan</text>
+  <text x="835" y="88" text-anchor="middle" class="step">求解器</text>
+  <text x="835" y="108" text-anchor="middle" class="small">调用一次；读取</text>
+  <text x="835" y="124" text-anchor="middle" class="small">证据 + 计划</text>
 
   <line x1="720" y1="335" x2="790" y2="140" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="40" y="160" width="170" height="220" class="box"/>
-  <text x="125" y="184" text-anchor="middle" class="head">why ReWOO</text>
-  <text x="50" y="206" class="small">no observation in planner</text>
-  <text x="50" y="222" class="small">means no feedback noise</text>
-  <text x="50" y="246" class="small">workers fan out in parallel</text>
-  <text x="50" y="262" class="small">along independent branches</text>
-  <text x="50" y="286" class="small">fewer tokens:</text>
-  <text x="50" y="302" class="small">1 planner + N small worker</text>
-  <text x="50" y="318" class="small">prompts + 1 solver call</text>
-  <text x="50" y="342" class="small">paper: 5x reduction</text>
-  <text x="50" y="358" class="small">on HotpotQA, +4 accuracy</text>
+  <text x="125" y="184" text-anchor="middle" class="head">为什么选择 ReWOO</text>
+  <text x="50" y="206" class="small">规划器没有观察信息</text>
+  <text x="50" y="222" class="small">因此没有反馈噪声</text>
+  <text x="50" y="246" class="small">工作者沿独立分支</text>
+  <text x="50" y="262" class="small">并行展开</text>
+  <text x="50" y="286" class="small">token 更少：</text>
+  <text x="50" y="302" class="small">1 个规划器 + N 个小型工作者</text>
+  <text x="50" y="318" class="small">prompt + 1 次求解器调用</text>
+  <text x="50" y="342" class="small">论文：减少 5 倍</text>
+  <text x="50" y="358" class="small">在 HotpotQA 上，准确率 +4</text>
 
   <rect x="750" y="160" width="170" height="220" class="box"/>
-  <text x="835" y="184" text-anchor="middle" class="head">when to pick it</text>
-  <text x="760" y="206" class="small">task shape is structured</text>
-  <text x="760" y="222" class="small">tools are known up front</text>
-  <text x="760" y="246" class="small">evidence is parallelizable</text>
-  <text x="760" y="262" class="small">token budget matters</text>
-  <text x="760" y="286" class="small">else prefer ReAct for</text>
-  <text x="760" y="302" class="small">unknown environments or</text>
-  <text x="760" y="318" class="small">Plan-and-Act for 30+ step</text>
-  <text x="760" y="334" class="small">web/mobile trajectories</text>
+  <text x="835" y="184" text-anchor="middle" class="head">何时选择它</text>
+  <text x="760" y="206" class="small">任务形态结构化</text>
+  <text x="760" y="222" class="small">工具预先已知</text>
+  <text x="760" y="246" class="small">证据可并行获取</text>
+  <text x="760" y="262" class="small">token 预算很重要</text>
+  <text x="760" y="286" class="small">否则，为未知环境</text>
+  <text x="760" y="302" class="small">优先选择 ReAct，或为</text>
+  <text x="760" y="318" class="small">30+ 步 Web/移动轨迹</text>
+  <text x="760" y="334" class="small">选择 Plan-and-Act</text>
 
   <rect x="40" y="400" width="880" height="100" class="box"/>
-  <text x="480" y="424" text-anchor="middle" class="head">distillation angle (ReWOO section 4)</text>
-  <text x="60" y="446" class="small">planner sees no observations, so its training signal is clean; LLaMA 7B can be fine-tuned from</text>
-  <text x="60" y="462" class="small">GPT-3.5 planner traces and match planner quality. 2026 production: small planner + large executor</text>
-  <text x="60" y="478" class="small">(or vice versa) via model router (Mastra) or dynamic handoff (OpenAI Agents SDK).</text>
+  <text x="480" y="424" text-anchor="middle" class="head">蒸馏视角（ReWOO 第 4 节）</text>
+  <text x="60" y="446" class="small">规划器看不到观察信息，因此训练信号干净；LLaMA 7B 可以基于</text>
+  <text x="60" y="462" class="small">GPT-3.5 规划轨迹微调并达到相当质量。2026 年生产模式：小规划器 + 大执行器</text>
+  <text x="60" y="478" class="small">（或反过来），通过模型路由器（Mastra）或动态交接（OpenAI Agents SDK）实现。</text>
 </svg>

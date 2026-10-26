@@ -13,58 +13,58 @@
     </style>
   </defs>
 
-  <text x="440" y="28" text-anchor="middle" class="title">enroll → embed → cosine → EER</text>
+  <text x="440" y="28" text-anchor="middle" class="title">注册 → 嵌入 → 余弦 → EER</text>
 
   <!-- Enrollment row -->
   <rect x="40" y="60" width="180" height="80" class="box"/>
-  <text x="130" y="80" text-anchor="middle" class="label">enrollment</text>
-  <text x="130" y="105" text-anchor="middle" class="content">3–5 clean clips</text>
-  <text x="130" y="123" text-anchor="middle" class="caption">&gt; 3 s each, same channel</text>
+  <text x="130" y="80" text-anchor="middle" class="label">注册</text>
+  <text x="130" y="105" text-anchor="middle" class="content">3–5 段干净音频</text>
+  <text x="130" y="123" text-anchor="middle" class="caption">每段 &gt; 3 s，相同通道</text>
 
   <line x1="225" y1="100" x2="250" y2="100" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="255" y="60" width="180" height="80" class="hot"/>
-  <text x="345" y="80" text-anchor="middle" class="label">embedder</text>
+  <text x="345" y="80" text-anchor="middle" class="label">嵌入模型</text>
   <text x="345" y="105" text-anchor="middle" class="content">ECAPA / WavLM-SV</text>
-  <text x="345" y="123" text-anchor="middle" class="caption">192-d or 256-d, L2-normalized</text>
+  <text x="345" y="123" text-anchor="middle" class="caption">192 维或 256 维，L2 归一化</text>
 
   <line x1="440" y1="100" x2="465" y2="100" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="470" y="60" width="180" height="80" class="box"/>
-  <text x="560" y="80" text-anchor="middle" class="label">anchor</text>
-  <text x="560" y="105" text-anchor="middle" class="content">mean of enroll embeds</text>
-  <text x="560" y="123" text-anchor="middle" class="caption">single speaker vector</text>
+  <text x="560" y="80" text-anchor="middle" class="label">锚点</text>
+  <text x="560" y="105" text-anchor="middle" class="content">注册嵌入的均值</text>
+  <text x="560" y="123" text-anchor="middle" class="caption">单个说话人向量</text>
 
   <!-- Verification row -->
   <rect x="40" y="165" width="180" height="80" class="box"/>
-  <text x="130" y="185" text-anchor="middle" class="label">test utterance</text>
-  <text x="130" y="210" text-anchor="middle" class="content">1 clip (&gt; 2 s)</text>
-  <text x="130" y="228" text-anchor="middle" class="caption">channel-matched if possible</text>
+  <text x="130" y="185" text-anchor="middle" class="label">测试语音</text>
+  <text x="130" y="210" text-anchor="middle" class="content">1 段音频（&gt; 2 s）</text>
+  <text x="130" y="228" text-anchor="middle" class="caption">尽可能匹配通道</text>
 
   <line x1="225" y1="205" x2="250" y2="205" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="255" y="165" width="180" height="80" class="hot"/>
-  <text x="345" y="185" text-anchor="middle" class="label">embedder</text>
-  <text x="345" y="210" text-anchor="middle" class="content">same model</text>
-  <text x="345" y="228" text-anchor="middle" class="caption">L2-normalize output</text>
+  <text x="345" y="185" text-anchor="middle" class="label">嵌入模型</text>
+  <text x="345" y="210" text-anchor="middle" class="content">相同模型</text>
+  <text x="345" y="228" text-anchor="middle" class="caption">对输出进行 L2 归一化</text>
 
   <line x1="440" y1="205" x2="465" y2="205" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="470" y="165" width="180" height="80" class="box"/>
-  <text x="560" y="185" text-anchor="middle" class="label">score</text>
+  <text x="560" y="185" text-anchor="middle" class="label">得分</text>
   <text x="560" y="210" text-anchor="middle" class="content">cosine(anchor, test)</text>
-  <text x="560" y="228" text-anchor="middle" class="caption">optional AS-norm for domain</text>
+  <text x="560" y="228" text-anchor="middle" class="caption">可选用领域 AS-norm</text>
 
   <line x1="655" y1="155" x2="680" y2="155" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="685" y="115" width="175" height="80" class="hot"/>
-  <text x="772" y="135" text-anchor="middle" class="label">threshold</text>
-  <text x="772" y="160" text-anchor="middle" class="content">accept / reject</text>
-  <text x="772" y="178" text-anchor="middle" class="caption">tune on dev set</text>
+  <text x="772" y="135" text-anchor="middle" class="label">阈值</text>
+  <text x="772" y="160" text-anchor="middle" class="content">接受 / 拒绝</text>
+  <text x="772" y="178" text-anchor="middle" class="caption">在开发集上调节</text>
 
   <!-- EER curve -->
   <rect x="40" y="270" width="400" height="170" class="box"/>
-  <text x="240" y="292" text-anchor="middle" class="label">pick threshold at EER</text>
+  <text x="240" y="292" text-anchor="middle" class="label">在 EER 处选阈值</text>
   <line x1="80" y1="410" x2="420" y2="410" stroke="#1a1a1a" stroke-width="1"/>
   <line x1="80" y1="410" x2="80" y2="310" stroke="#1a1a1a" stroke-width="1"/>
   <path d="M80,315 Q160,370 240,380 T420,405" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
@@ -74,15 +74,15 @@
   <text x="250" y="395" class="caption" font-size="10">FA = FR</text>
   <text x="90" y="310" class="caption" font-size="10">FR</text>
   <text x="410" y="310" class="caption" font-size="10">FA</text>
-  <text x="240" y="430" text-anchor="middle" class="caption">low threshold → high FA; high threshold → high FR</text>
+  <text x="240" y="430" text-anchor="middle" class="caption">低阈值 → FA 高；高阈值 → FR 高</text>
 
   <!-- Model table -->
   <rect x="460" y="270" width="385" height="170" class="box"/>
-  <text x="652" y="292" text-anchor="middle" class="label">VoxCeleb1-O EER in 2026</text>
+  <text x="652" y="292" text-anchor="middle" class="label">VoxCeleb1-O 在 2026 年的 EER</text>
   <text x="475" y="320" class="content">ReDimNet (2024)</text>        <text x="820" y="320" text-anchor="end" class="content">0.39%</text>
   <text x="475" y="340" class="content">WavLM-SV large</text>         <text x="820" y="340" text-anchor="end" class="content">0.42%</text>
   <text x="475" y="360" class="content">Pyannote 3.1</text>           <text x="820" y="360" text-anchor="end" class="content">0.65%</text>
   <text x="475" y="380" class="content">ECAPA-TDNN</text>             <text x="820" y="380" text-anchor="end" class="content">0.87%</text>
-  <text x="475" y="400" class="content">x-vector (classic)</text>    <text x="820" y="400" text-anchor="end" class="content">3.10%</text>
-  <text x="652" y="428" text-anchor="middle" class="caption">start with ECAPA; move to WavLM if domain needs it</text>
+  <text x="475" y="400" class="content">x-vector（经典）</text>    <text x="820" y="400" text-anchor="end" class="content">3.10%</text>
+  <text x="652" y="428" text-anchor="middle" class="caption">从 ECAPA 开始；领域需要时再用 WavLM</text>
 </svg>

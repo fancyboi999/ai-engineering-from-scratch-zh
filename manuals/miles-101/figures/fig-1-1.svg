@@ -6,14 +6,14 @@
   <text x="100" y="63.25" font-size="12.5" text-anchor="middle" font-weight="700">GSM8K prompt</text>
   <text x="100" y="80.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每步 32 个 prompt</text>
   <rect x="240" y="36" width="170" height="64" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="325" y="55.75" font-size="12.5" text-anchor="middle" font-weight="700">SGLang engine</text>
+  <text x="325" y="55.75" font-size="12.5" text-anchor="middle" font-weight="700">SGLang 引擎</text>
   <text x="325" y="73.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sglang::scheduler</text>
   <text x="325" y="88.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">256 个答案，47.5 s</text>
   <rect x="470" y="36" width="150" height="64" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
-  <text x="545" y="63.25" font-size="12.5" text-anchor="middle" font-weight="700">math reward</text>
+  <text x="545" y="63.25" font-size="12.5" text-anchor="middle" font-weight="700">数学奖励</text>
   <text x="545" y="80.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个答案计 1 或 0</text>
   <rect x="470" y="176" width="150" height="64" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="545" y="195.6" font-size="12" text-anchor="middle" font-weight="700">log probability</text>
+  <text x="545" y="195.6" font-size="12" text-anchor="middle" font-weight="700">对数概率</text>
   <text x="545" y="212.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">FSDPTrainRayActor</text>
   <text x="545" y="227.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">23.4 s</text>
   <rect x="240" y="176" width="170" height="64" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
@@ -42,7 +42,7 @@
   <path d="M100 176 V138 H325 V101" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-1-1-head-amber)"/>
   <circle cx="118" cy="126" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="118" y="130" font-size="11" text-anchor="middle">6</text>
-  <text x="20" y="290" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ONE STEP, MEDIAN OF 48 STEPS, RUN BEFORE THE HEAT GUARD</text>
+  <text x="20" y="290" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">一个步骤，48 步的中位数，运行于启用过热保护之前</text>
   <text x="20" y="314" font-size="12" class="m-serif">共计 152.6 s。训练阶段耗时最长，权重更新最短。</text>
   <text x="20" y="336" font-size="12" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">engine 和 trainer 轮流使用同一块 GPU 内存。</text>
 </svg>

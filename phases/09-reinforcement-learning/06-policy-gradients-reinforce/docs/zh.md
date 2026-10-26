@@ -19,7 +19,7 @@ REINFORCE 定理（Williams 1992）告诉你这个梯度是可计算的：$\nabl
 
 ## 核心概念
 
-![Policy gradient: softmax policy, log-π gradient, return-weighted update](../assets/policy-gradient.svg)
+![策略梯度：softmax 策略、log-π 梯度，以及按回报加权的更新](../assets/policy-gradient.svg)
 
 **策略梯度定理。** 对任何由 $\theta$ 参数化的策略 $\pi_\theta$：
 

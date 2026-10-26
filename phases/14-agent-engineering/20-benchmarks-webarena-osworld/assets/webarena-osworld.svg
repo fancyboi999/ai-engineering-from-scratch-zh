@@ -13,52 +13,52 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">WebArena and OSWorld — web and desktop agent benchmarks</text>
+  <text x="480" y="26" text-anchor="middle" class="title">WebArena 与 OSWorld：网页和桌面 agent 基准</text>
 
   <rect x="40" y="50" width="440" height="250" class="wa"/>
-  <text x="260" y="72" text-anchor="middle" class="head">WebArena  web agents</text>
-  <text x="60" y="96" class="small">812 tasks, 4 self-hosted apps</text>
+  <text x="260" y="72" text-anchor="middle" class="head">WebArena：网页 agent</text>
+  <text x="60" y="96" class="small">812 项任务，4 个自托管应用</text>
   <rect x="60" y="108" width="400" height="30" class="box"/>
-  <text x="78" y="128" class="step">shopping, forum, gitlab-like, business CMS</text>
+  <text x="78" y="128" class="step">购物、论坛、类 gitlab 平台、商业 CMS</text>
   <rect x="60" y="140" width="400" height="30" class="box"/>
-  <text x="78" y="160" class="step">+ utilities: map, calculator, scratchpad</text>
+  <text x="78" y="160" class="step">+ 实用工具：地图、计算器、便笺</text>
   <rect x="60" y="172" width="400" height="30" class="box"/>
-  <text x="78" y="192" class="step">execution-based evaluation via gym APIs</text>
+  <text x="78" y="192" class="step">通过 gym API 基于执行评估</text>
   <rect x="60" y="204" width="400" height="30" class="box"/>
-  <text x="78" y="224" class="step">release: GPT-4 agent 14.41%, human 78.24%</text>
+  <text x="78" y="224" class="step">发布时：GPT-4 agent 14.41%，人类 78.24%</text>
   <rect x="60" y="236" width="400" height="30" class="box"/>
-  <text x="78" y="256" class="step">extensions: VisualWebArena, TheAgentCompany</text>
+  <text x="78" y="256" class="step">扩展：VisualWebArena、TheAgentCompany</text>
   <rect x="60" y="268" width="400" height="28" class="box"/>
-  <text x="78" y="288" class="step">pinned app versions  reproducible scoring</text>
+  <text x="78" y="288" class="step">固定应用版本，可复现评分</text>
 
   <rect x="500" y="50" width="420" height="250" class="osw"/>
-  <text x="710" y="72" text-anchor="middle" class="head">OSWorld  desktop agents</text>
-  <text x="520" y="96" class="small">369 tasks, Ubuntu + Windows + macOS</text>
+  <text x="710" y="72" text-anchor="middle" class="head">OSWorld：桌面 agent</text>
+  <text x="520" y="96" class="small">369 项任务，Ubuntu + Windows + macOS</text>
   <rect x="520" y="108" width="380" height="30" class="box"/>
-  <text x="538" y="128" class="step">1920x1080 screenshots as observation</text>
+  <text x="538" y="128" class="step">以 1920x1080 截图作为观察</text>
   <rect x="520" y="140" width="380" height="30" class="box"/>
-  <text x="538" y="160" class="step">keyboard + mouse control of real apps</text>
+  <text x="538" y="160" class="step">通过键盘与鼠标控制真实应用</text>
   <rect x="520" y="172" width="380" height="30" class="box"/>
-  <text x="538" y="192" class="step">release: best model 12.24%, human 72.36%</text>
+  <text x="538" y="192" class="step">发布时：最佳模型 12.24%，人类 72.36%</text>
   <rect x="520" y="204" width="380" height="30" class="box"/>
-  <text x="538" y="224" class="step">OSWorld-G: 564-sample grounding suite + Jedi training</text>
+  <text x="538" y="224" class="step">OSWorld-G：564 样本定位套件 + Jedi 训练</text>
   <rect x="520" y="236" width="380" height="30" class="box"/>
-  <text x="538" y="256" class="step">OSWorld-Human: expert gold trajectories</text>
+  <text x="538" y="256" class="step">OSWorld-Human：专家标准轨迹</text>
   <rect x="520" y="268" width="380" height="28" class="box"/>
-  <text x="538" y="288" class="step">top agents use 1.4-2.7x more steps than needed</text>
+  <text x="538" y="288" class="step">最佳 agent 的步数仍为所需的 1.4-2.7 倍</text>
 
   <rect x="40" y="320" width="880" height="200" class="fail"/>
-  <text x="480" y="342" text-anchor="middle" class="head">two primary failure modes</text>
+  <text x="480" y="342" text-anchor="middle" class="head">两类主要失败</text>
   <rect x="60" y="358" width="840" height="40" class="box"/>
-  <text x="78" y="380" class="step">1. GUI grounding  pixel to element mapping</text>
-  <text x="78" y="394" class="small">model cannot localize a button reliably; mis-clicks dominate low-level failures</text>
+  <text x="78" y="380" class="step">1. GUI 定位：像素到元素的映射</text>
+  <text x="78" y="394" class="small">模型无法可靠定位按钮；误点击是主要底层失败</text>
   <rect x="60" y="402" width="840" height="40" class="box"/>
-  <text x="78" y="424" class="step">2. operational knowledge  which menu, which shortcut</text>
-  <text x="78" y="438" class="small">tail knowledge humans build over years; agents guess from training snapshots</text>
+  <text x="78" y="424" class="step">2. 操作知识：选择哪个菜单或快捷键</text>
+  <text x="78" y="438" class="small">人类经多年积累的长尾知识，agent 却从训练快照猜测</text>
   <rect x="60" y="446" width="840" height="64" class="box"/>
-  <text x="78" y="468" class="step">production fix: Claude/OpenAI CUA/Gemini computer use (Lesson 21)</text>
-  <text x="78" y="486" class="small">vision-based; trained on WebArena/OSWorld-shaped workloads;</text>
-  <text x="78" y="502" class="small">per-step safety services assess each action before execution</text>
+  <text x="78" y="468" class="step">生产修正：Claude/OpenAI CUA/Gemini 计算机使用（第 21 课）</text>
+  <text x="78" y="486" class="small">基于视觉，在类似 WebArena/OSWorld 的任务上训练；</text>
+  <text x="78" y="502" class="small">逐步安全服务在执行前评估每个动作</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">report success rate AND trajectory efficiency (steps / gold) on every run.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">每次运行同时报告成功率和轨迹效率（步数 / 标准步数）。</text>
 </svg>

@@ -17,7 +17,7 @@ module.exports = figure('fig-4-2', {
   ];
   for (const c of cases) {
     const batch = f.box({ x: 20, y: c.y, w: 150, h: 48, hue: 'amber', title: c.bs, sub: "运行请求" });
-    const test = f.box({ x: 250, y: c.y, w: 130, h: 48, hue: 'blue', title: c.test, sub: c.ok ? 'fits' : "过大" });
+    const test = f.box({ x: 250, y: c.y, w: 130, h: 48, hue: 'blue', title: c.test, sub: c.ok ? '可运行' : "过大" });
     const run = f.box({ x: 450, y: c.y, w: 170, h: 48, hue: c.hue, title: c.run, sub: c.sub, dash: c.ok ? undefined : 'dashed' });
     f.arrow(batch.right(), [249, c.y + 24], { style: 'call' });
     f.arrow(test.right(), [449, c.y + 24], { style: c.ok ? 'call' : 'fail' });

@@ -13,48 +13,48 @@
   </defs>
 
   <rect class="box" x="20" y="110" width="160" height="120" rx="4"/>
-  <text class="label" x="100" y="135" text-anchor="middle">raw text</text>
+  <text class="label" x="100" y="135" text-anchor="middle">原始文本</text>
   <text class="content" x="35" y="165">"The cats</text>
   <text class="content" x="35" y="185">were</text>
   <text class="content" x="35" y="205">running."</text>
 
   <path class="line" d="M 180 170 L 230 170" marker-end="url(#arrow)"/>
-  <text class="stage" x="205" y="160">tokenize</text>
+  <text class="stage" x="205" y="160">分词</text>
 
   <rect class="box" x="230" y="110" width="170" height="120" rx="4"/>
-  <text class="label" x="315" y="135" text-anchor="middle">tokens</text>
+  <text class="label" x="315" y="135" text-anchor="middle">token</text>
   <text class="content" x="245" y="165">[The, cats,</text>
   <text class="content" x="245" y="185">were, running,</text>
   <text class="content" x="245" y="205">.]</text>
 
   <path class="line" d="M 400 170 L 450 170" marker-end="url(#arrow)"/>
-  <text class="stage" x="425" y="160">stem</text>
+  <text class="stage" x="425" y="160">提取词干</text>
 
   <rect class="box" x="450" y="50" width="170" height="120" rx="4"/>
-  <text class="label" x="535" y="75" text-anchor="middle">stems</text>
+  <text class="label" x="535" y="75" text-anchor="middle">词干</text>
   <text class="content" x="465" y="105">[the, cat,</text>
   <text class="content" x="465" y="125">were, run,</text>
   <text class="content" x="465" y="145">.]</text>
 
   <path class="line" d="M 400 180 Q 420 240 450 250" marker-end="url(#arrow)"/>
-  <text class="stage" x="420" y="275">lemmatize</text>
+  <text class="stage" x="420" y="275">词形还原</text>
 
   <rect class="box" x="450" y="200" width="170" height="120" rx="4"/>
-  <text class="label" x="535" y="225" text-anchor="middle">lemmas</text>
+  <text class="label" x="535" y="225" text-anchor="middle">词元</text>
   <text class="content" x="465" y="255">[the, cat,</text>
   <text class="content" x="465" y="275">be, run,</text>
   <text class="content" x="465" y="295">.]</text>
 
   <rect class="box" x="670" y="110" width="170" height="160" rx="4" fill="#f3ece0"/>
-  <text class="label" x="755" y="135" text-anchor="middle">ready for the</text>
-  <text class="label" x="755" y="155" text-anchor="middle">model</text>
-  <text class="content" x="685" y="185">vector /</text>
-  <text class="content" x="685" y="205">embedding /</text>
-  <text class="content" x="685" y="225">feature row /</text>
-  <text class="content" x="685" y="245">index lookup</text>
+  <text class="label" x="755" y="135" text-anchor="middle">准备输入</text>
+  <text class="label" x="755" y="155" text-anchor="middle">模型</text>
+  <text class="content" x="685" y="185">向量 /</text>
+  <text class="content" x="685" y="205">嵌入 /</text>
+  <text class="content" x="685" y="225">特征行 /</text>
+  <text class="content" x="685" y="245">索引查找</text>
 
   <path class="line" d="M 620 110 Q 650 140 670 170" marker-end="url(#arrow)"/>
   <path class="line" d="M 620 260 Q 650 220 670 200" marker-end="url(#arrow)"/>
 
-  <text class="stage" x="430" y="360" text-anchor="middle">three operations. each has a job. each has a failure mode.</text>
+  <text class="stage" x="430" y="360" text-anchor="middle">三种操作，各有用途，也各有故障模式。</text>
 </svg>

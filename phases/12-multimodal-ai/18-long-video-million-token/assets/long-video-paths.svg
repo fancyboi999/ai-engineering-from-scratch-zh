@@ -17,51 +17,51 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Long-video understanding — four scaling paths</text>
+  <text x="480" y="24" text-anchor="middle" class="title">长视频理解：四条扩展路径</text>
 
   <rect x="30" y="50" width="440" height="210" class="hot"/>
-  <text x="250" y="72" text-anchor="middle" class="head">Path 1: brute context</text>
-  <text x="250" y="96" text-anchor="middle" class="small">Gemini 1.5 Pro: 1M tokens</text>
-  <text x="250" y="114" text-anchor="middle" class="small">Gemini 2.5 Pro: 10M+ tokens</text>
-  <text x="250" y="132" text-anchor="middle" class="small">Claude Opus 4.7: 1M tokens</text>
-  <text x="250" y="160" text-anchor="middle" class="step">engineering</text>
-  <text x="250" y="180" text-anchor="middle" class="small">custom attention hierarchy</text>
-  <text x="250" y="196" text-anchor="middle" class="small">MoE expert routing</text>
-  <text x="250" y="212" text-anchor="middle" class="small">closed-source</text>
-  <text x="250" y="240" text-anchor="middle" class="caption">best recall, closed only</text>
+  <text x="250" y="72" text-anchor="middle" class="head">路径 1：扩大上下文</text>
+  <text x="250" y="96" text-anchor="middle" class="small">Gemini 1.5 Pro：1M token</text>
+  <text x="250" y="114" text-anchor="middle" class="small">Gemini 2.5 Pro：10M+ token</text>
+  <text x="250" y="132" text-anchor="middle" class="small">Claude Opus 4.7：1M token</text>
+  <text x="250" y="160" text-anchor="middle" class="step">工程实现</text>
+  <text x="250" y="180" text-anchor="middle" class="small">定制注意力层级</text>
+  <text x="250" y="196" text-anchor="middle" class="small">MoE 专家路由</text>
+  <text x="250" y="212" text-anchor="middle" class="small">闭源</text>
+  <text x="250" y="240" text-anchor="middle" class="caption">召回最佳，仅限闭源</text>
 
   <rect x="490" y="50" width="440" height="210" class="cool"/>
-  <text x="710" y="72" text-anchor="middle" class="head">Path 2: ring attention</text>
-  <text x="710" y="96" text-anchor="middle" class="small">LWM: 1M-token training</text>
-  <text x="710" y="114" text-anchor="middle" class="small">LongVILA: 1400-frame videos</text>
-  <text x="710" y="132" text-anchor="middle" class="small">distributed ring pattern</text>
-  <text x="710" y="160" text-anchor="middle" class="step">engineering</text>
-  <text x="710" y="180" text-anchor="middle" class="small">each device holds chunk</text>
-  <text x="710" y="196" text-anchor="middle" class="small">rotates for attention passes</text>
-  <text x="710" y="212" text-anchor="middle" class="small">open-source</text>
-  <text x="710" y="240" text-anchor="middle" class="caption">good open scaling, heavy compute</text>
+  <text x="710" y="72" text-anchor="middle" class="head">路径 2：环形注意力</text>
+  <text x="710" y="96" text-anchor="middle" class="small">LWM：1M-token 训练</text>
+  <text x="710" y="114" text-anchor="middle" class="small">LongVILA：1400 帧视频</text>
+  <text x="710" y="132" text-anchor="middle" class="small">分布式环形模式</text>
+  <text x="710" y="160" text-anchor="middle" class="step">工程实现</text>
+  <text x="710" y="180" text-anchor="middle" class="small">各设备保存一个分块</text>
+  <text x="710" y="196" text-anchor="middle" class="small">轮转执行注意力计算</text>
+  <text x="710" y="212" text-anchor="middle" class="small">开源</text>
+  <text x="710" y="240" text-anchor="middle" class="caption">开放扩展性好，计算量大</text>
 
   <rect x="30" y="280" width="440" height="230" class="cold"/>
-  <text x="250" y="302" text-anchor="middle" class="head">Path 3: token compression</text>
-  <text x="250" y="326" text-anchor="middle" class="small">Video-XL: one summary token</text>
-  <text x="250" y="344" text-anchor="middle" class="small">per clip (100s of frames -&gt; 1)</text>
-  <text x="250" y="362" text-anchor="middle" class="small">LongVA: long-context transfer</text>
-  <text x="250" y="380" text-anchor="middle" class="small">VideoChat2: hierarchical pool</text>
-  <text x="250" y="410" text-anchor="middle" class="step">engineering</text>
-  <text x="250" y="430" text-anchor="middle" class="small">learned compressor pre-LLM</text>
-  <text x="250" y="446" text-anchor="middle" class="small">trades recall for scale</text>
-  <text x="250" y="462" text-anchor="middle" class="small">~32k context sufficient</text>
-  <text x="250" y="490" text-anchor="middle" class="caption">cheapest inference, weakest grounding</text>
+  <text x="250" y="302" text-anchor="middle" class="head">路径 3：token 压缩</text>
+  <text x="250" y="326" text-anchor="middle" class="small">Video-XL：每段一个摘要 token</text>
+  <text x="250" y="344" text-anchor="middle" class="small">每片段（100s 帧 -&gt; 1）</text>
+  <text x="250" y="362" text-anchor="middle" class="small">LongVA：长上下文迁移</text>
+  <text x="250" y="380" text-anchor="middle" class="small">VideoChat2：分层池化</text>
+  <text x="250" y="410" text-anchor="middle" class="step">工程实现</text>
+  <text x="250" y="430" text-anchor="middle" class="small">LLM 前的可训练压缩器</text>
+  <text x="250" y="446" text-anchor="middle" class="small">用召回换取规模</text>
+  <text x="250" y="462" text-anchor="middle" class="small">约 32k 上下文即可</text>
+  <text x="250" y="490" text-anchor="middle" class="caption">推理最便宜，定位依据最弱</text>
 
   <rect x="490" y="280" width="440" height="230" class="reg"/>
-  <text x="710" y="302" text-anchor="middle" class="head">Path 4: agentic retrieval</text>
-  <text x="710" y="326" text-anchor="middle" class="small">VideoAgent: LLM as query planner</text>
-  <text x="710" y="344" text-anchor="middle" class="small">tool: find_clips(keyword)</text>
-  <text x="710" y="362" text-anchor="middle" class="small">VLM reads only matches</text>
-  <text x="710" y="380" text-anchor="middle" class="small">LLM composes final answer</text>
-  <text x="710" y="410" text-anchor="middle" class="step">engineering</text>
-  <text x="710" y="430" text-anchor="middle" class="small">retrieval quality is the bottleneck</text>
-  <text x="710" y="446" text-anchor="middle" class="small">99% cheaper for single-event queries</text>
-  <text x="710" y="462" text-anchor="middle" class="small">worse for holistic understanding</text>
-  <text x="710" y="490" text-anchor="middle" class="caption">best for 2h+ specific queries</text>
+  <text x="710" y="302" text-anchor="middle" class="head">路径 4：agent 检索</text>
+  <text x="710" y="326" text-anchor="middle" class="small">VideoAgent：LLM 规划查询</text>
+  <text x="710" y="344" text-anchor="middle" class="small">工具：find_clips(keyword)</text>
+  <text x="710" y="362" text-anchor="middle" class="small">VLM 只读取匹配片段</text>
+  <text x="710" y="380" text-anchor="middle" class="small">LLM 组织最终答案</text>
+  <text x="710" y="410" text-anchor="middle" class="step">工程实现</text>
+  <text x="710" y="430" text-anchor="middle" class="small">检索质量是瓶颈</text>
+  <text x="710" y="446" text-anchor="middle" class="small">单事件查询便宜 99%</text>
+  <text x="710" y="462" text-anchor="middle" class="small">不擅长整体理解</text>
+  <text x="710" y="490" text-anchor="middle" class="caption">最适合 2h+ 视频中的具体查询</text>
 </svg>

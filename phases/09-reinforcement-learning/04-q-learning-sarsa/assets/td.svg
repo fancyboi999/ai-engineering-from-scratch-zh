@@ -14,33 +14,33 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">Q-learning vs SARSA — one line of code apart</text>
+  <text x="450" y="30" text-anchor="middle" class="title">Q-learning 与 SARSA：只差一行代码</text>
 
   <rect x="40" y="60" width="820" height="70" class="box"/>
-  <text x="60" y="85" class="label">the transition</text>
-  <text x="60" y="108" class="content">(s, a) --env.step--&gt; (r, s')   (one step, online, no episode boundary needed)</text>
+  <text x="60" y="85" class="label">状态转移</text>
+  <text x="60" y="108" class="content">(s, a) --env.step--&gt; (r, s')（单步、在线，无须回合边界）</text>
 
   <rect x="40" y="150" width="400" height="180" class="hot"/>
-  <text x="240" y="175" text-anchor="middle" class="label">Q-learning (off-policy)</text>
+  <text x="240" y="175" text-anchor="middle" class="label">Q-learning（离策略）</text>
   <text x="60" y="205" class="content">target = r + gamma * max_{a'} Q(s', a')</text>
   <text x="60" y="228" class="content">Q(s, a) += alpha * (target - Q(s, a))</text>
-  <text x="60" y="260" class="caption">assumes greedy policy from s' onward</text>
-  <text x="60" y="278" class="caption">learns Q* even while exploring</text>
-  <text x="60" y="300" class="caption">max bias: overestimates noisy Q</text>
-  <text x="60" y="320" class="caption">deep version: DQN</text>
+  <text x="60" y="260" class="caption">假定从 s' 开始采用贪心策略</text>
+  <text x="60" y="278" class="caption">探索时仍学习 Q*</text>
+  <text x="60" y="300" class="caption">最大化偏差：高估带噪声的 Q</text>
+  <text x="60" y="320" class="caption">深度版本：DQN</text>
 
   <rect x="460" y="150" width="400" height="180" class="cool"/>
-  <text x="660" y="175" text-anchor="middle" class="label">SARSA (on-policy)</text>
+  <text x="660" y="175" text-anchor="middle" class="label">SARSA（同策略）</text>
   <text x="480" y="205" class="content">a' = epsilon_greedy(Q, s')</text>
   <text x="480" y="228" class="content">target = r + gamma * Q(s', a')</text>
   <text x="480" y="251" class="content">Q(s, a) += alpha * (target - Q(s, a))</text>
-  <text x="480" y="283" class="caption">uses the ACTION actually taken</text>
-  <text x="480" y="301" class="caption">learns Q^pi for current epsilon-greedy</text>
-  <text x="480" y="319" class="caption">conservative near cliffs / danger</text>
+  <text x="480" y="283" class="caption">使用实际执行的动作</text>
+  <text x="480" y="301" class="caption">学习当前 epsilon-greedy 的 Q^pi</text>
+  <text x="480" y="319" class="caption">在悬崖或危险附近更保守</text>
 
   <rect x="40" y="350" width="820" height="70" class="box"/>
-  <text x="450" y="375" text-anchor="middle" class="label">same shape: target - Q(s,a), scaled by alpha</text>
-  <text x="450" y="398" text-anchor="middle" class="caption">the ONE symbol difference: max vs sampled a' — off-policy vs on-policy</text>
+  <text x="450" y="375" text-anchor="middle" class="label">相同结构：target - Q(s,a)，再乘 alpha</text>
+  <text x="450" y="398" text-anchor="middle" class="caption">唯一符号差异：max 与采样 a'；对应离策略与同策略</text>
 
-  <text x="450" y="450" text-anchor="middle" class="caption">everything in Phase 9 after this lesson is deep-function-approximated variants of these two updates</text>
+  <text x="450" y="450" text-anchor="middle" class="caption">阶段 9 后续内容都是这两种更新的深度函数近似变体</text>
 </svg>

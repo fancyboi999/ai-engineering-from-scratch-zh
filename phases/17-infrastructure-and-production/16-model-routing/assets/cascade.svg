@@ -16,49 +16,49 @@
       <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
     </marker>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">model routing — four signals, three patterns</text>
+  <text x="480" y="24" text-anchor="middle" class="title">模型路由：四种信号、三种模式</text>
 
   <rect x="40" y="50" width="280" height="220" class="signal"/>
-  <text x="180" y="72" text-anchor="middle" class="head">signals</text>
+  <text x="180" y="72" text-anchor="middle" class="head">信号</text>
   <rect x="60" y="90" width="240" height="35" class="box"/>
-  <text x="180" y="112" text-anchor="middle" class="step">1. task classification</text>
+  <text x="180" y="112" text-anchor="middle" class="step">1. 任务分类</text>
   <rect x="60" y="130" width="240" height="35" class="box"/>
-  <text x="180" y="152" text-anchor="middle" class="step">2. prompt length</text>
+  <text x="180" y="152" text-anchor="middle" class="step">2. prompt 长度</text>
   <rect x="60" y="170" width="240" height="35" class="box"/>
-  <text x="180" y="192" text-anchor="middle" class="step">3. embedding to known-hard</text>
+  <text x="180" y="192" text-anchor="middle" class="step">3. 与已知难题的嵌入相似度</text>
   <rect x="60" y="210" width="240" height="35" class="box"/>
-  <text x="180" y="232" text-anchor="middle" class="step">4. self-confidence (logprobs)</text>
-  <text x="180" y="258" text-anchor="middle" class="caption">combine all four; each alone misses</text>
+  <text x="180" y="232" text-anchor="middle" class="step">4. 自信程度（对数概率）</text>
+  <text x="180" y="258" text-anchor="middle" class="caption">组合四者；单独使用均会漏判</text>
 
   <rect x="340" y="50" width="280" height="220" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">pattern: CASCADE (cheap-first)</text>
+  <text x="480" y="72" text-anchor="middle" class="head">模式：级联（低成本优先）</text>
   <rect x="360" y="90" width="240" height="45" class="cheap"/>
-  <text x="480" y="115" text-anchor="middle" class="step">cheap model (Haiku-class)</text>
-  <text x="480" y="130" text-anchor="middle" class="small">$0.25/M input, $1/M output</text>
+  <text x="480" y="115" text-anchor="middle" class="step">低成本模型（Haiku 级别）</text>
+  <text x="480" y="130" text-anchor="middle" class="small">输入 $0.25/M，输出 $1/M</text>
   <rect x="360" y="150" width="240" height="35" class="signal"/>
-  <text x="480" y="172" text-anchor="middle" class="step">confidence check</text>
+  <text x="480" y="172" text-anchor="middle" class="step">置信度检查</text>
   <rect x="360" y="200" width="240" height="60" class="front"/>
-  <text x="480" y="222" text-anchor="middle" class="step">frontier only if low-confidence</text>
-  <text x="480" y="240" text-anchor="middle" class="small">~10% escalated in mixed traffic</text>
-  <text x="480" y="254" text-anchor="middle" class="small">~2x latency on escalated</text>
+  <text x="480" y="222" text-anchor="middle" class="step">仅低置信度时使用前沿模型</text>
+  <text x="480" y="240" text-anchor="middle" class="small">混合流量约 10% 升级</text>
+  <text x="480" y="254" text-anchor="middle" class="small">升级请求延迟约 2x</text>
 
   <rect x="640" y="50" width="280" height="220" class="box"/>
-  <text x="780" y="72" text-anchor="middle" class="head">pattern: PRE_ROUTE</text>
-  <text x="780" y="94" text-anchor="middle" class="small">classifier up front (5-10ms)</text>
+  <text x="780" y="72" text-anchor="middle" class="head">模式：预先路由</text>
+  <text x="780" y="94" text-anchor="middle" class="small">前置分类器（5-10ms）</text>
   <rect x="660" y="110" width="240" height="45" class="cheap"/>
-  <text x="780" y="135" text-anchor="middle" class="step">cheap for simple</text>
+  <text x="780" y="135" text-anchor="middle" class="step">简单任务用低成本模型</text>
   <rect x="660" y="170" width="240" height="45" class="front"/>
-  <text x="780" y="195" text-anchor="middle" class="step">frontier for hard</text>
-  <text x="780" y="230" text-anchor="middle" class="caption">fastest overall, quality floor depends on classifier accuracy</text>
+  <text x="780" y="195" text-anchor="middle" class="step">困难任务用前沿模型</text>
+  <text x="780" y="230" text-anchor="middle" class="caption">整体最快，质量下限取决于分类器准确率</text>
 
   <rect x="40" y="290" width="880" height="100" class="box"/>
-  <text x="480" y="312" text-anchor="middle" class="head">the 2026 price curve</text>
-  <text x="480" y="334" text-anchor="middle" class="step">GPT-4-level quality: $20/M (late 2022) → $0.40/M (2026) ≈ 50x cheaper</text>
-  <text x="480" y="352" text-anchor="middle" class="step">aggregate LLM price drop: ~10x per year, mostly serving efficiency (Phase 17 · 04-09)</text>
-  <text x="480" y="372" text-anchor="middle" class="caption">routing captures those gains at the app layer</text>
+  <text x="480" y="312" text-anchor="middle" class="head">2026 年价格曲线</text>
+  <text x="480" y="334" text-anchor="middle" class="step">GPT-4 级别质量：$20/M（2022 年末）→ $0.40/M（2026），成本降低约 50x</text>
+  <text x="480" y="352" text-anchor="middle" class="step">LLM 总体价格每年降低约 10x，主要来自服务效率提升（阶段 17 · 04-09）</text>
+  <text x="480" y="372" text-anchor="middle" class="caption">路由在应用层利用这些收益</text>
 
   <rect x="40" y="410" width="880" height="80" class="box"/>
-  <text x="480" y="432" text-anchor="middle" class="head">drift is the real risk</text>
-  <text x="480" y="454" text-anchor="middle" class="step">monitor: thumbs up/down per route · LLM-judge sample per route · escalation rate · refusal rate</text>
-  <text x="480" y="474" text-anchor="middle" class="caption">cheap-model creep is silent until a competitor benchmark surfaces it</text>
+  <text x="480" y="432" text-anchor="middle" class="head">漂移才是真正的风险</text>
+  <text x="480" y="454" text-anchor="middle" class="step">监测：各路由好评/差评、各路由的 LLM 评审抽样、升级率、拒答率</text>
+  <text x="480" y="474" text-anchor="middle" class="caption">低成本模型的质量退化往往悄然发生，直到竞品基准将其揭露</text>
 </svg>

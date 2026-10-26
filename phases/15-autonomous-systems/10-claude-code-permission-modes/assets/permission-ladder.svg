@@ -18,75 +18,75 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Claude Code permission modes and the Auto Mode classifier</text>
+  <text x="440" y="26" text-anchor="middle" class="title">Claude Code 权限模式与自动模式分类器</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Permission ladder -->
-  <text x="60" y="80" class="label">permission ladder (tight -&gt; loose)</text>
+  <text x="60" y="80" class="label">权限阶梯（严格 -&gt; 宽松）</text>
 
   <rect x="60" y="96" width="130" height="46" class="cool"/>
   <text x="125" y="116" text-anchor="middle" class="label">plan</text>
-  <text x="125" y="132" text-anchor="middle" class="small">ask before anything</text>
+  <text x="125" y="132" text-anchor="middle" class="small">任何操作前均询问</text>
 
   <rect x="200" y="96" width="130" height="46" class="cold"/>
   <text x="265" y="116" text-anchor="middle" class="label">default</text>
-  <text x="265" y="132" text-anchor="middle" class="small">ask on risky ops</text>
+  <text x="265" y="132" text-anchor="middle" class="small">高风险操作前询问</text>
 
   <rect x="340" y="96" width="130" height="46" class="dsk"/>
   <text x="405" y="116" text-anchor="middle" class="label">acceptEdits</text>
-  <text x="405" y="132" text-anchor="middle" class="small">writes auto; exec asks</text>
+  <text x="405" y="132" text-anchor="middle" class="small">写文件自动执行；运行命令前询问</text>
 
   <rect x="480" y="96" width="130" height="46" class="warn"/>
   <text x="545" y="116" text-anchor="middle" class="label">auto</text>
-  <text x="545" y="132" text-anchor="middle" class="small">classifier approves</text>
+  <text x="545" y="132" text-anchor="middle" class="small">分类器批准</text>
 
   <rect x="620" y="96" width="90" height="46" class="hot"/>
   <text x="665" y="116" text-anchor="middle" class="label">dontAsk</text>
-  <text x="665" y="132" text-anchor="middle" class="small">no prompts</text>
+  <text x="665" y="132" text-anchor="middle" class="small">不弹出询问</text>
 
   <rect x="720" y="96" width="110" height="46" class="hot"/>
   <text x="775" y="116" text-anchor="middle" class="label">bypassPermissions</text>
-  <text x="775" y="132" text-anchor="middle" class="small">throwaway sandbox</text>
+  <text x="775" y="132" text-anchor="middle" class="small">一次性沙箱</text>
 
   <!-- Auto Mode internals -->
   <rect x="60" y="170" width="770" height="200" class="box"/>
-  <text x="445" y="192" text-anchor="middle" class="label">Auto Mode (March 24, 2026) — action-review classifier</text>
+  <text x="445" y="192" text-anchor="middle" class="label">自动模式（2026 年三月 24 日）：操作审查分类器</text>
 
   <rect x="80" y="210" width="180" height="110" class="cool"/>
-  <text x="170" y="232" text-anchor="middle" class="label">proposed action</text>
-  <text x="170" y="252" text-anchor="middle" class="small">tool + payload</text>
-  <text x="170" y="270" text-anchor="middle" class="small">from agent loop</text>
+  <text x="170" y="232" text-anchor="middle" class="label">待执行操作</text>
+  <text x="170" y="252" text-anchor="middle" class="small">工具 + 载荷</text>
+  <text x="170" y="270" text-anchor="middle" class="small">来自 agent 循环</text>
 
   <rect x="290" y="210" width="180" height="110" class="warn"/>
-  <text x="380" y="232" text-anchor="middle" class="label">classifier model</text>
-  <text x="380" y="252" text-anchor="middle" class="small">separate model</text>
-  <text x="380" y="270" text-anchor="middle" class="small">reviews each action</text>
-  <text x="380" y="288" text-anchor="middle" class="small">before it runs</text>
+  <text x="380" y="232" text-anchor="middle" class="label">分类模型</text>
+  <text x="380" y="252" text-anchor="middle" class="small">独立模型</text>
+  <text x="380" y="270" text-anchor="middle" class="small">逐项审查操作</text>
+  <text x="380" y="288" text-anchor="middle" class="small">在执行之前</text>
 
   <rect x="500" y="210" width="180" height="110" class="hot"/>
-  <text x="590" y="232" text-anchor="middle" class="label">escalation block</text>
-  <text x="590" y="252" text-anchor="middle" class="small">blocks actions that</text>
-  <text x="590" y="270" text-anchor="middle" class="small">escalate beyond</text>
-  <text x="590" y="288" text-anchor="middle" class="small">the request</text>
+  <text x="590" y="232" text-anchor="middle" class="label">越权阻断</text>
+  <text x="590" y="252" text-anchor="middle" class="small">阻止超出</text>
+  <text x="590" y="270" text-anchor="middle" class="small">用户请求</text>
+  <text x="590" y="288" text-anchor="middle" class="small">范围的操作</text>
 
   <rect x="710" y="210" width="120" height="110" class="cold"/>
   <text x="770" y="232" text-anchor="middle" class="label">HITL</text>
-  <text x="770" y="252" text-anchor="middle" class="small">blocked actions</text>
-  <text x="770" y="270" text-anchor="middle" class="small">fall to user</text>
+  <text x="770" y="252" text-anchor="middle" class="small">被阻止的操作</text>
+  <text x="770" y="270" text-anchor="middle" class="small">交给用户处理</text>
 
   <path d="M260 265 L290 265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M470 265 L500 265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M680 265 L710 265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <text x="380" y="340" text-anchor="middle" class="small">approved -&gt; execute immediately</text>
-  <text x="590" y="340" text-anchor="middle" class="small">hard-block on priv-esc / exfil shapes</text>
+  <text x="380" y="340" text-anchor="middle" class="small">批准 -&gt; 立即执行</text>
+  <text x="590" y="340" text-anchor="middle" class="small">对提权或窃取数据模式强制阻断</text>
 
   <!-- Budget line -->
   <rect x="60" y="390" width="770" height="100" class="hot"/>
-  <text x="445" y="412" text-anchor="middle" class="label">budget controls are non-negotiable (Lesson 13)</text>
-  <text x="80" y="434" class="content">max_turns = hard cap on agent loop iterations</text>
-  <text x="80" y="450" class="content">max_budget_usd = dollar kill switch; aborts session on breach</text>
-  <text x="80" y="466" class="content">per-tool caps = e.g. no more than N WebFetch calls per session</text>
-  <text x="80" y="482" class="small">Availability depends on plan, org enablement, model, and provider; classifier is a layer, not a solution.</text>
+  <text x="445" y="412" text-anchor="middle" class="label">预算控制必须设置（第 13 课）</text>
+  <text x="80" y="434" class="content">max_turns = agent 循环次数硬上限</text>
+  <text x="80" y="450" class="content">max_budget_usd = 金额熔断开关；超限即终止会话</text>
+  <text x="80" y="466" class="content">单工具上限 = 例如每个会话不超过 N 次 WebFetch 调用</text>
+  <text x="80" y="482" class="small">可用性取决于套餐、组织启用情况、模型和提供方；分类器只是其中一层防护。</text>
 </svg>

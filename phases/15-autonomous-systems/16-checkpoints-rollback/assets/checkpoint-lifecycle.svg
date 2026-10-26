@@ -16,29 +16,29 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Checkpoint lifecycle: idempotency + precondition + verify + rollback</text>
+  <text x="440" y="26" text-anchor="middle" class="title">检查点生命周期：幂等性 + 前置条件 + 验证 + 回滚</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Approved action -->
   <rect x="60" y="80" width="160" height="60" class="cool"/>
-  <text x="140" y="104" text-anchor="middle" class="label">approved action</text>
-  <text x="140" y="122" text-anchor="middle" class="small">idempotency key k</text>
+  <text x="140" y="104" text-anchor="middle" class="label">已批准操作</text>
+  <text x="140" y="122" text-anchor="middle" class="small">幂等键 k</text>
 
   <!-- Preconditions -->
   <rect x="240" y="80" width="160" height="60" class="cold"/>
-  <text x="320" y="104" text-anchor="middle" class="label">precondition check</text>
-  <text x="320" y="122" text-anchor="middle" class="small">state still consistent?</text>
+  <text x="320" y="104" text-anchor="middle" class="label">前置条件检查</text>
+  <text x="320" y="122" text-anchor="middle" class="small">状态是否仍然一致？</text>
 
   <!-- Mark-as-done-first -->
   <rect x="420" y="80" width="180" height="60" class="warn"/>
-  <text x="510" y="104" text-anchor="middle" class="label">mark-as-done-first</text>
-  <text x="510" y="122" text-anchor="middle" class="small">persist "committed" BEFORE exec</text>
+  <text x="510" y="104" text-anchor="middle" class="label">先标记完成</text>
+  <text x="510" y="122" text-anchor="middle" class="small">执行前持久化 "committed"</text>
 
   <!-- Execute -->
   <rect x="620" y="80" width="180" height="60" class="hot"/>
-  <text x="710" y="104" text-anchor="middle" class="label">execute side effect</text>
-  <text x="710" y="122" text-anchor="middle" class="small">tool call / DB write / send</text>
+  <text x="710" y="104" text-anchor="middle" class="label">执行有副作用的操作</text>
+  <text x="710" y="122" text-anchor="middle" class="small">工具调用 / 数据库写入 / 发送</text>
 
   <path d="M220 110 L240 110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M400 110 L420 110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -46,35 +46,35 @@
 
   <!-- Verify -->
   <rect x="60" y="180" width="160" height="60" class="cool"/>
-  <text x="140" y="204" text-anchor="middle" class="label">post-action verify</text>
-  <text x="140" y="222" text-anchor="middle" class="small">re-read target resource</text>
+  <text x="140" y="204" text-anchor="middle" class="label">操作后验证</text>
+  <text x="140" y="222" text-anchor="middle" class="small">重新读取目标资源</text>
 
   <rect x="240" y="180" width="160" height="60" class="cool"/>
-  <text x="320" y="204" text-anchor="middle" class="label">verify passes</text>
-  <text x="320" y="222" text-anchor="middle" class="small">done</text>
+  <text x="320" y="204" text-anchor="middle" class="label">验证通过</text>
+  <text x="320" y="222" text-anchor="middle" class="small">完成</text>
 
   <rect x="420" y="180" width="180" height="60" class="hot"/>
-  <text x="510" y="204" text-anchor="middle" class="label">verify fails</text>
-  <text x="510" y="222" text-anchor="middle" class="small">known-bad state detected</text>
+  <text x="510" y="204" text-anchor="middle" class="label">验证失败</text>
+  <text x="510" y="222" text-anchor="middle" class="small">发现已知错误状态</text>
 
   <rect x="620" y="180" width="180" height="60" class="hot"/>
-  <text x="710" y="204" text-anchor="middle" class="label">rollback fires</text>
-  <text x="710" y="222" text-anchor="middle" class="small">in-band / compensating / alert</text>
+  <text x="710" y="204" text-anchor="middle" class="label">触发回滚</text>
+  <text x="710" y="222" text-anchor="middle" class="small">原路回滚 / 补偿操作 / 告警</text>
 
   <path d="M220 210 L240 210" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M600 210 L620 210" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Double-execute hazard -->
   <rect x="60" y="270" width="760" height="100" class="hot"/>
-  <text x="440" y="294" text-anchor="middle" class="label">the sharp failure: double-execute on retry after crash</text>
-  <text x="80" y="316" class="content">1. commit starts · 2. execute succeeds · 3. crash before persisting "committed"</text>
-  <text x="80" y="332" class="content">4. resume, sees "approved not committed" · 5. re-executes · 6. side effect fires twice</text>
-  <text x="80" y="352" class="content">mitigation: persist "committed" BEFORE execute ("mark-as-done-first" pattern)</text>
+  <text x="440" y="294" text-anchor="middle" class="label">严重失败：崩溃后重试导致重复执行</text>
+  <text x="80" y="316" class="content">1. 开始提交 · 2. 执行成功 · 3. 持久化 "committed" 前崩溃</text>
+  <text x="80" y="332" class="content">4. 恢复后看到“已批准、未提交”· 5. 再次执行 · 6. 副作用发生两次</text>
+  <text x="80" y="352" class="content">缓解：执行前持久化 "committed"（“先标记完成”模式）</text>
 
   <!-- Article 14 -->
   <rect x="60" y="400" width="760" height="90" class="cold"/>
-  <text x="440" y="424" text-anchor="middle" class="label">EU AI Act Article 14 — operational reading</text>
-  <text x="80" y="446" class="content">checkpoints queryable (auditor access, not just logs)</text>
-  <text x="80" y="462" class="content">rollbacks rehearsed (end-to-end test, not documented intent)</text>
-  <text x="80" y="478" class="content">audit trail survives deploys (PostgreSQL or Durable Objects, not in-memory)</text>
+  <text x="440" y="424" text-anchor="middle" class="label">欧盟《人工智能法案》第 14 条：运行层面的解读</text>
+  <text x="80" y="446" class="content">检查点可查询（审计员可访问，而非仅有日志）</text>
+  <text x="80" y="462" class="content">已演练回滚（端到端测试，而非文档意图）</text>
+  <text x="80" y="478" class="content">审计轨迹跨部署保留（PostgreSQL 或 Durable Objects，而非内存）</text>
 </svg>

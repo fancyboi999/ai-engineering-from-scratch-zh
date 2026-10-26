@@ -11,43 +11,43 @@
   </defs>
 
   <rect class="box" x="20" y="30" width="860" height="120" rx="4"/>
-  <text class="label" x="35" y="55">BIO tagging</text>
-  <text class="note" x="35" y="75">label each token with B-TYPE (begin), I-TYPE (inside), or O (outside)</text>
+  <text class="label" x="35" y="55">BIO 标注</text>
+  <text class="note" x="35" y="75">将各 token 标为 B-TYPE（起始）、I-TYPE（内部）或 O（外部）</text>
 
   <text class="content" x="40" y="110">token:  Apple  sued  Google  over  its  iPhone  search  deal  in  the  US  .</text>
   <text class="content" x="40" y="135">label:  B-ORG  O     B-ORG   O     O    B-PROD  O       O     O   O    B-GPE  O</text>
 
   <rect class="box" x="20" y="180" width="200" height="160" rx="4"/>
-  <text class="label" x="120" y="205" text-anchor="middle">rule-based</text>
-  <text class="content" x="35" y="235">gazetteer match</text>
-  <text class="content" x="35" y="255">regex + dicts</text>
-  <text class="note" x="35" y="285">high precision</text>
-  <text class="note" x="35" y="305">zero OOV coverage</text>
-  <text class="note" x="35" y="325">no disambiguation</text>
+  <text class="label" x="120" y="205" text-anchor="middle">规则式</text>
+  <text class="content" x="35" y="235">地名词表匹配</text>
+  <text class="content" x="35" y="255">正则表达式 + 字典</text>
+  <text class="note" x="35" y="285">精确率高</text>
+  <text class="note" x="35" y="305">无法覆盖未登录词</text>
+  <text class="note" x="35" y="325">不做消歧</text>
 
   <rect class="box" x="240" y="180" width="200" height="160" rx="4"/>
   <text class="label" x="340" y="205" text-anchor="middle">CRF</text>
-  <text class="content" x="255" y="235">hand features:</text>
-  <text class="content" x="255" y="255">  shape, suffix,</text>
-  <text class="content" x="255" y="275">  neighbors, case</text>
-  <text class="note" x="255" y="305">enforces valid</text>
-  <text class="note" x="255" y="325">BIO transitions</text>
+  <text class="content" x="255" y="235">人工特征：</text>
+  <text class="content" x="255" y="255">  形态、后缀、</text>
+  <text class="content" x="255" y="275">  相邻词、大小写</text>
+  <text class="note" x="255" y="305">强制合法的</text>
+  <text class="note" x="255" y="325">BIO 状态转换</text>
 
   <rect class="box" x="460" y="180" width="200" height="160" rx="4"/>
   <text class="label" x="560" y="205" text-anchor="middle">BiLSTM-CRF</text>
-  <text class="content" x="475" y="235">learned features</text>
-  <text class="content" x="475" y="255">embed → BiLSTM</text>
-  <text class="content" x="475" y="275">  → CRF head</text>
-  <text class="note" x="475" y="305">no more hand</text>
-  <text class="note" x="475" y="325">engineering</text>
+  <text class="content" x="475" y="235">学习特征</text>
+  <text class="content" x="475" y="255">嵌入 → BiLSTM</text>
+  <text class="content" x="475" y="275">  → CRF 预测头</text>
+  <text class="note" x="475" y="305">不再需要手工</text>
+  <text class="note" x="475" y="325">特征工程</text>
 
   <rect class="hot" x="680" y="180" width="200" height="160" rx="4"/>
-  <text class="label" x="780" y="205" text-anchor="middle">transformer NER</text>
-  <text class="content" x="695" y="235">fine-tune BERT</text>
-  <text class="content" x="695" y="255">token-classif head</text>
-  <text class="content" x="695" y="275">aggregate spans</text>
-  <text class="note" x="695" y="305">best accuracy</text>
-  <text class="note" x="695" y="325">most compute</text>
+  <text class="label" x="780" y="205" text-anchor="middle">transformer 命名实体识别</text>
+  <text class="content" x="695" y="235">微调 BERT</text>
+  <text class="content" x="695" y="255">token 分类头</text>
+  <text class="content" x="695" y="275">聚合文本片段</text>
+  <text class="note" x="695" y="305">准确率最高</text>
+  <text class="note" x="695" y="325">计算量最大</text>
 
-  <text class="stage" x="450" y="370" text-anchor="middle">pick the cheapest method that hits your accuracy bar</text>
+  <text class="stage" x="450" y="370" text-anchor="middle">选择满足准确率要求的最便宜方案</text>
 </svg>

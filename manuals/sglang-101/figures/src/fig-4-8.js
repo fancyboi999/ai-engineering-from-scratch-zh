@@ -19,7 +19,7 @@ module.exports = figure('fig-4-8', {
   f.arrow(gq.top(), waiting.bottom(), { style: 'state', label: "就绪" });
   const logits = f.box({ x: 20, y: 240, w: 170, h: 48, hue: 'violet', title: 'logits', sub: "每请求一行" });
   const mask = f.box({ x: 240, y: 240, w: 170, h: 48, hue: 'blue', title: "词表 bitmask", sub: "移除无效 token" });
-  const sampler = f.box({ x: 460, y: 240, w: 160, h: 48, hue: 'violet', title: 'sampler', sub: "选择有效 token" });
+  const sampler = f.box({ x: 460, y: 240, w: 160, h: 48, hue: 'violet', title: '采样器', sub: "选择有效 token" });
   f.arrow(logits.right(), [239, 264], { style: 'model' });
   f.arrow(mask.right(), [459, 264], { style: 'model' });
   f.kicker(20, 226, "每个 decode 步");

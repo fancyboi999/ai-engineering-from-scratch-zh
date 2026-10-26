@@ -1,4 +1,4 @@
-# Vision Transformers (ViT)
+# 视觉 Transformer（ViT）
 
 > 一张图像是一格格 patch。一个句子是一格格 token。同一个 transformer 两者通吃。
 

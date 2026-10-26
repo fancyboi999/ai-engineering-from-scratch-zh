@@ -14,54 +14,54 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">layered safety harness + red-team range</text>
+  <text x="480" y="24" text-anchor="middle" class="title">分层安全运行框架 + 红队靶场</text>
 
   <rect x="40" y="50" width="560" height="460" class="box"/>
-  <text x="320" y="72" text-anchor="middle" class="head">defense in depth (5 layers)</text>
+  <text x="320" y="72" text-anchor="middle" class="head">纵深防御（5 层）</text>
   <rect x="60" y="90" width="520" height="40" class="cool"/>
-  <text x="320" y="114" text-anchor="middle" class="step">1 / input sanitize</text>
-  <text x="320" y="128" text-anchor="middle" class="small">strip zero-widths, decode base64/rot13, normalize</text>
+  <text x="320" y="114" text-anchor="middle" class="step">1 / 输入清理</text>
+  <text x="320" y="128" text-anchor="middle" class="small">移除零宽字符，解码 base64/rot13 并归一化</text>
   <rect x="60" y="140" width="520" height="40" class="cool"/>
-  <text x="320" y="164" text-anchor="middle" class="step">2 / NeMo Guardrails rails</text>
-  <text x="320" y="178" text-anchor="middle" class="small">off-domain, role, policy-forbidden</text>
+  <text x="320" y="164" text-anchor="middle" class="step">2 / NeMo Guardrails 护栏</text>
+  <text x="320" y="178" text-anchor="middle" class="small">超出领域、角色及策略禁止内容</text>
   <rect x="60" y="190" width="520" height="40" class="hot"/>
-  <text x="320" y="214" text-anchor="middle" class="step">3 / classifier gate</text>
+  <text x="320" y="214" text-anchor="middle" class="step">3 / 分类器关卡</text>
   <text x="320" y="228" text-anchor="middle" class="small">Llama Guard 4 + X-Guard + ShieldGemma-2 + Nemotron 3</text>
   <rect x="60" y="240" width="520" height="40" class="dsk"/>
-  <text x="320" y="264" text-anchor="middle" class="step">4 / target model</text>
-  <text x="320" y="278" text-anchor="middle" class="small">the application being protected</text>
+  <text x="320" y="264" text-anchor="middle" class="step">4 / 目标模型</text>
+  <text x="320" y="278" text-anchor="middle" class="small">受保护的应用</text>
   <rect x="60" y="290" width="520" height="40" class="hot"/>
-  <text x="320" y="314" text-anchor="middle" class="step">5 / output filter</text>
-  <text x="320" y="328" text-anchor="middle" class="small">Llama Guard 4 + Presidio PII + citation check</text>
+  <text x="320" y="314" text-anchor="middle" class="step">5 / 输出过滤器</text>
+  <text x="320" y="328" text-anchor="middle" class="small">Llama Guard 4 + Presidio PII + 引用检查</text>
   <rect x="60" y="340" width="520" height="40" class="cold"/>
-  <text x="320" y="364" text-anchor="middle" class="step">6 / HITL tier</text>
-  <text x="320" y="378" text-anchor="middle" class="small">flagged outputs -&gt; Slack queue</text>
-  <text x="320" y="420" text-anchor="middle" class="small">every layer emits a span;</text>
-  <text x="320" y="438" text-anchor="middle" class="small">block at any layer halts and attributes</text>
-  <text x="320" y="456" text-anchor="middle" class="small">XSTest benign rate measured continuously</text>
-  <text x="320" y="484" text-anchor="middle" class="caption">over-refusal vs jailbreak: the Pareto curve</text>
+  <text x="320" y="364" text-anchor="middle" class="step">6 / 人工介入层</text>
+  <text x="320" y="378" text-anchor="middle" class="small">标记的输出 -&gt; Slack 队列</text>
+  <text x="320" y="420" text-anchor="middle" class="small">每层均输出 span；</text>
+  <text x="320" y="438" text-anchor="middle" class="small">任一层阻断即停止，并记录归属</text>
+  <text x="320" y="456" text-anchor="middle" class="small">持续测量 XSTest 良性请求通过率</text>
+  <text x="320" y="484" text-anchor="middle" class="caption">过度拒答与越狱：帕累托曲线</text>
 
   <rect x="640" y="50" width="280" height="220" class="box"/>
-  <text x="780" y="72" text-anchor="middle" class="head">red-team range</text>
+  <text x="780" y="72" text-anchor="middle" class="head">红队靶场</text>
   <rect x="660" y="90" width="240" height="30" class="hot"/>
-  <text x="780" y="110" text-anchor="middle" class="step">PAIR + TAP autonomous</text>
+  <text x="780" y="110" text-anchor="middle" class="step">PAIR + TAP 自动攻击</text>
   <rect x="660" y="124" width="240" height="30" class="hot"/>
-  <text x="780" y="144" text-anchor="middle" class="step">GCG suffix</text>
+  <text x="780" y="144" text-anchor="middle" class="step">GCG 后缀</text>
   <rect x="660" y="158" width="240" height="30" class="hot"/>
-  <text x="780" y="178" text-anchor="middle" class="step">encoding (ASCII / base64)</text>
+  <text x="780" y="178" text-anchor="middle" class="step">编码（ASCII / base64）</text>
   <rect x="660" y="192" width="240" height="30" class="hot"/>
-  <text x="780" y="212" text-anchor="middle" class="step">multi-turn persona</text>
+  <text x="780" y="212" text-anchor="middle" class="step">多轮角色扮演</text>
   <rect x="660" y="226" width="240" height="30" class="hot"/>
-  <text x="780" y="246" text-anchor="middle" class="step">code-switch multilingual</text>
+  <text x="780" y="246" text-anchor="middle" class="step">多语言切换</text>
 
   <rect x="640" y="290" width="280" height="220" class="box"/>
-  <text x="780" y="312" text-anchor="middle" class="head">outputs</text>
-  <text x="780" y="334" text-anchor="middle" class="small">CVSS 4.0 per finding</text>
-  <text x="780" y="352" text-anchor="middle" class="small">disclosure timeline</text>
-  <text x="780" y="370" text-anchor="middle" class="small">before / after harmlessness delta</text>
-  <text x="780" y="388" text-anchor="middle" class="small">per-family success rate</text>
-  <text x="780" y="406" text-anchor="middle" class="small">XSTest benign pass rate trend</text>
-  <text x="780" y="424" text-anchor="middle" class="small">constitutional self-critique run</text>
-  <text x="780" y="442" text-anchor="middle" class="small">cron scheduler + Slack alerts</text>
-  <text x="780" y="472" text-anchor="middle" class="caption">garak + PyRIT + NVIDIA Aegis shape</text>
+  <text x="780" y="312" text-anchor="middle" class="head">输出结果</text>
+  <text x="780" y="334" text-anchor="middle" class="small">每项发现的 CVSS 4.0</text>
+  <text x="780" y="352" text-anchor="middle" class="small">披露时间线</text>
+  <text x="780" y="370" text-anchor="middle" class="small">修正前后的无害性差异</text>
+  <text x="780" y="388" text-anchor="middle" class="small">各攻击类型成功率</text>
+  <text x="780" y="406" text-anchor="middle" class="small">XSTest 良性请求通过率趋势</text>
+  <text x="780" y="424" text-anchor="middle" class="small">基于原则的自我评审</text>
+  <text x="780" y="442" text-anchor="middle" class="small">cron 调度器 + Slack 告警</text>
+  <text x="780" y="472" text-anchor="middle" class="caption">garak + PyRIT + NVIDIA Aegis 架构形态</text>
 </svg>

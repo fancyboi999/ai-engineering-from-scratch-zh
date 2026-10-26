@@ -1041,7 +1041,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 20 | [Agent Harness Loop 契约](phases/19-capstone-projects/20-agent-harness-loop-contract/) | A. Agent harness | Python |
 | 21 | [带 Schema 校验的 Tool Registry](phases/19-capstone-projects/21-tool-registry-schema-validation/) | A. Agent harness | Python |
 | 22 | [基于换行分隔 stdio 的 JSON-RPC 2.0](phases/19-capstone-projects/22-jsonrpc-stdio-transport/) | A. Agent harness | Python |
-| 23 | [Function Call Dispatcher](phases/19-capstone-projects/23-function-call-dispatcher/) | A. Agent harness | Python |
+| 23 | [函数调用分发器](phases/19-capstone-projects/23-function-call-dispatcher/) | A. Agent harness | Python |
 | 24 | [Plan-Execute 控制流](phases/19-capstone-projects/24-plan-execute-control-flow/) | A. Agent harness | Python |
 | 25 | [Verification Gate 与 Observation Budget](phases/19-capstone-projects/25-verification-gates-observation-budget/) | A. Agent harness | Python |
 | 26 | [带 Denylist 与 Path Jail 的 Sandbox Runner](phases/19-capstone-projects/26-sandbox-runner-denylist/) | A. Agent harness | Python |
@@ -1051,7 +1051,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 30 | [从零实现 BPE Tokenizer](phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/) | B. NLP LLM | Python |
 | 31 | [带 Sliding Window 的 Tokenized Dataset](phases/19-capstone-projects/31-tokenized-dataset-sliding-window/) | B. NLP LLM | Python |
 | 32 | [Token Embedding 与 Positional Embedding](phases/19-capstone-projects/32-token-positional-embeddings/) | B. NLP LLM | Python |
-| 33 | [Multi-Head Self-Attention](phases/19-capstone-projects/33-multihead-self-attention/) | B. NLP LLM | Python |
+| 33 | [多头自注意力](phases/19-capstone-projects/33-multihead-self-attention/) | B. NLP LLM | Python |
 | 34 | [从零实现 Transformer Block](phases/19-capstone-projects/34-transformer-block/) | B. NLP LLM | Python |
 | 35 | [GPT 模型组装](phases/19-capstone-projects/35-gpt-model-assembly/) | B. NLP LLM | Python |
 | 36 | [训练循环与评估](phases/19-capstone-projects/36-training-loop-eval/) | B. NLP LLM | Python |
@@ -1061,7 +1061,7 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 40 | [从零实现 DPO](phases/19-capstone-projects/40-dpo-from-scratch/) | B. NLP LLM | Python |
 | 41 | [完整评估流水线](phases/19-capstone-projects/41-eval-pipeline/) | B. NLP LLM | Python |
 | 42 | [大规模语料下载器](phases/19-capstone-projects/42-large-corpus-downloader/) | C. 端到端训练 | Python |
-| 43 | [HDF5 Tokenized Corpus](phases/19-capstone-projects/43-hdf5-tokenized-corpus/) | C. 端到端训练 | Python |
+| 43 | [HDF5 分词语料库](phases/19-capstone-projects/43-hdf5-tokenized-corpus/) | C. 端到端训练 | Python |
 | 44 | [Cosine 学习率 + 线性 Warmup](phases/19-capstone-projects/44-cosine-lr-warmup/) | C. 端到端训练 | Python |
 | 45 | [Gradient Clipping 与混合精度训练](phases/19-capstone-projects/45-gradient-clipping-amp/) | C. 端到端训练 | Python |
 | 46 | [梯度累积](phases/19-capstone-projects/46-gradient-accumulation/) | C. 端到端训练 | Python |
@@ -1077,14 +1077,14 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 | 56 | [迭代调度器](phases/19-capstone-projects/56-iteration-scheduler/) | D. 自动研究 | Python |
 | 57 | [端到端研究 Demo](phases/19-capstone-projects/57-end-to-end-research-demo/) | D. 自动研究 | Python |
 | 58 | [Vision Encoder 的 Patch 切分](phases/19-capstone-projects/58-vision-encoder-patches/) | E. 多模态 | Python |
-| 59 | [Vision Transformer Encoder（ViT）](phases/19-capstone-projects/59-vit-transformer/) | E. 多模态 | Python |
+| 59 | [视觉 Transformer 编码器（ViT）](phases/19-capstone-projects/59-vit-transformer/) | E. 多模态 | Python |
 | 60 | [用 Projection Layer 做模态对齐](phases/19-capstone-projects/60-projection-layer-modality-align/) | E. 多模态 | Python |
 | 61 | [Cross-Attention 融合](phases/19-capstone-projects/61-cross-attention-fusion/) | E. 多模态 | Python |
 | 62 | [Vision-Language 预训练](phases/19-capstone-projects/62-vision-language-pretraining/) | E. 多模态 | Python |
 | 63 | [多模态评测](phases/19-capstone-projects/63-multimodal-eval/) | E. 多模态 | Python |
 | 64 | [Chunking 策略横向对比](phases/19-capstone-projects/64-chunking-strategies-advanced/) | F. 高级 RAG | Python |
 | 65 | [用 BM25 与 Dense Embedding 做 Hybrid Retrieval](phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/) | F. 高级 RAG | Python |
-| 66 | [Cross-Encoder Reranker](phases/19-capstone-projects/66-reranker-cross-encoder/) | F. 高级 RAG | Python |
+| 66 | [交叉编码器重排器](phases/19-capstone-projects/66-reranker-cross-encoder/) | F. 高级 RAG | Python |
 | 67 | [Query 改写：HyDE、Multi-Query 与 Decomposition](phases/19-capstone-projects/67-query-rewriting-hyde/) | F. 高级 RAG | Python |
 | 68 | [RAG 评测：Precision、Recall、MRR、nDCG 等](phases/19-capstone-projects/68-rag-eval-precision-recall/) | F. 高级 RAG | Python |
 | 69 | [端到端 RAG 系统](phases/19-capstone-projects/69-end-to-end-rag-system/) | F. 高级 RAG | Python |

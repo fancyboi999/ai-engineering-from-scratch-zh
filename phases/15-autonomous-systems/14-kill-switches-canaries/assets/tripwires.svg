@@ -16,42 +16,42 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Three detectors, three failure classes</text>
+  <text x="440" y="26" text-anchor="middle" class="title">三个检测器，三类失败</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Agent -->
   <rect x="330" y="80" width="220" height="80" class="cool"/>
   <text x="440" y="104" text-anchor="middle" class="label">agent</text>
-  <text x="346" y="128" class="small">reads, reasons, acts</text>
-  <text x="346" y="144" class="small">cannot touch tripwires</text>
+  <text x="346" y="128" class="small">读取、推理、行动</text>
+  <text x="346" y="144" class="small">无权改动触发器</text>
 
   <!-- Kill switch -->
   <rect x="60" y="200" width="220" height="120" class="hot"/>
-  <text x="170" y="222" text-anchor="middle" class="label">kill switch</text>
-  <text x="76" y="244" class="small">external boolean</text>
-  <text x="76" y="260" class="small">• feature flag / Redis / signed cfg</text>
-  <text x="76" y="276" class="small">• checked every action, not boot</text>
-  <text x="76" y="292" class="small">• agent cannot set OFF</text>
-  <text x="76" y="308" class="small">• re-enable = explicit human</text>
+  <text x="170" y="222" text-anchor="middle" class="label">紧急停止开关</text>
+  <text x="76" y="244" class="small">外部布尔值</text>
+  <text x="76" y="260" class="small">• 功能开关 / Redis / 签名配置</text>
+  <text x="76" y="276" class="small">• 每个动作检查，而非仅启动时</text>
+  <text x="76" y="292" class="small">• agent 无法将其设为 OFF</text>
+  <text x="76" y="308" class="small">• 重新启用需人类明确操作</text>
 
   <!-- Circuit breaker -->
   <rect x="330" y="200" width="220" height="120" class="warn"/>
-  <text x="440" y="222" text-anchor="middle" class="label">circuit breaker</text>
-  <text x="346" y="244" class="small">pattern-specific pause</text>
-  <text x="346" y="260" class="small">• 5 identical tool calls</text>
-  <text x="346" y="276" class="small">• N consecutive failures</text>
-  <text x="346" y="292" class="small">• rate above threshold</text>
-  <text x="346" y="308" class="small">• closed / open / half-open</text>
+  <text x="440" y="222" text-anchor="middle" class="label">熔断器</text>
+  <text x="346" y="244" class="small">按特定模式暂停</text>
+  <text x="346" y="260" class="small">• 5 次相同工具调用</text>
+  <text x="346" y="276" class="small">• 连续 N 次失败</text>
+  <text x="346" y="292" class="small">• 速率超过阈值</text>
+  <text x="346" y="308" class="small">• 关闭 / 开启 / 半开</text>
 
   <!-- Canary -->
   <rect x="600" y="200" width="220" height="120" class="cold"/>
-  <text x="710" y="222" text-anchor="middle" class="label">canary token</text>
-  <text x="616" y="244" class="small">bait with no legitimate use</text>
-  <text x="616" y="260" class="small">• fake AWS_SECRET_ACCESS_KEY</text>
-  <text x="616" y="276" class="small">• fake DB record sentinel</text>
-  <text x="616" y="292" class="small">• fake file in workspace</text>
-  <text x="616" y="308" class="small">• fake memory entry</text>
+  <text x="710" y="222" text-anchor="middle" class="label">金丝雀 token</text>
+  <text x="616" y="244" class="small">无合法用途的诱饵</text>
+  <text x="616" y="260" class="small">• 假 AWS_SECRET_ACCESS_KEY</text>
+  <text x="616" y="276" class="small">• 假数据库哨兵记录</text>
+  <text x="616" y="292" class="small">• 工作区中的假文件</text>
+  <text x="616" y="308" class="small">• 假记忆条目</text>
 
   <path d="M390 160 L250 200" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M440 160 L440 200" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -59,12 +59,12 @@
 
   <!-- Catches vs misses -->
   <rect x="60" y="350" width="760" height="76" class="cool"/>
-  <text x="440" y="374" text-anchor="middle" class="label">what each catches</text>
-  <text x="80" y="394" class="content">kill: operator decision  ·  breaker: repetitive / rate patterns  ·  canary: intent to touch off-limit resource</text>
-  <text x="80" y="412" class="content">Cilium/eBPF egress redirect (under 500ms) complements canaries: quarantined pod goes to forensic honeypot</text>
+  <text x="440" y="374" text-anchor="middle" class="label">各自捕获什么</text>
+  <text x="80" y="394" class="content">停止开关：操作员决策 · 熔断器：重复或速率模式 · 金丝雀：试图接触越权资源</text>
+  <text x="80" y="412" class="content">Cilium/eBPF 出站重定向（低于 500ms）补充金丝雀：隔离 pod 被导向取证蜜罐</text>
 
   <!-- What nothing catches -->
   <rect x="60" y="430" width="760" height="60" class="hot"/>
-  <text x="440" y="454" text-anchor="middle" class="label">what no detector catches</text>
-  <text x="80" y="474" class="content">semantic composites: individual actions pass every detector; composition is the attack (see Lesson 10)</text>
+  <text x="440" y="454" text-anchor="middle" class="label">所有检测器都无法捕获什么</text>
+  <text x="80" y="474" class="content">语义组合：单个动作均通过检测，但组合后形成攻击（见第 10 课）</text>
 </svg>

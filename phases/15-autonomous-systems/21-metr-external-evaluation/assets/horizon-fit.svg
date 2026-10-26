@@ -17,7 +17,7 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Logistic fit of P(success) vs log(expert time) — the horizon shape</text>
+  <text x="440" y="26" text-anchor="middle" class="title">P(success) 对 log(专家耗时) 的 Logistic 拟合 — 任务时长上限曲线</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
@@ -43,11 +43,11 @@
   <path class="curve-gamed" d="M60,85 C200,95 300,140 360,230 C420,320 500,355 540,370"/>
 
   <!-- Axis labels -->
-  <text x="60" y="405" class="small">1 min</text>
-  <text x="180" y="405" class="small">10 min</text>
-  <text x="300" y="405" class="small">1 hr</text>
-  <text x="420" y="405" class="small">10 hr</text>
-  <text x="520" y="405" class="small">48 hr</text>
+  <text x="60" y="405" class="small">1 分钟</text>
+  <text x="180" y="405" class="small">10 分钟</text>
+  <text x="300" y="405" class="small">1 小时</text>
+  <text x="420" y="405" class="small">10 小时</text>
+  <text x="520" y="405" class="small">48 小时</text>
 
   <text x="50" y="75" text-anchor="end" class="small">1.0</text>
   <text x="50" y="395" text-anchor="end" class="small">0</text>
@@ -58,42 +58,42 @@
   <!-- Mark horizon intersections -->
   <line x1="300" y1="230" x2="300" y2="390" stroke="#c0392b" stroke-width="1" stroke-dasharray="2,2"/>
   <circle cx="300" cy="230" r="4" fill="#c0392b"/>
-  <text x="302" y="222" class="small">50% clean</text>
+  <text x="302" y="222" class="small">50% 干净评测</text>
 
   <line x1="360" y1="230" x2="360" y2="390" stroke="#2c5ea9" stroke-width="1" stroke-dasharray="2,2"/>
   <circle cx="360" cy="230" r="4" fill="#2c5ea9"/>
-  <text x="362" y="222" class="small">50% gamed</text>
+  <text x="362" y="222" class="small">50% 迎合评测</text>
 
-  <text x="300" y="425" text-anchor="middle" class="caption">expert completion time (log scale)</text>
+  <text x="300" y="425" text-anchor="middle" class="caption">专家完成时间（对数刻度）</text>
 
   <!-- Right panel: interpretation -->
   <rect x="560" y="70" width="280" height="320" class="box"/>
-  <text x="700" y="92" text-anchor="middle" class="label">what the horizon is</text>
-  <text x="575" y="115" class="small">METR fits P(success) to log(expert time)</text>
-  <text x="575" y="130" class="small">and reads off the 50% crossing.</text>
+  <text x="700" y="92" text-anchor="middle" class="label">任务时长上限是什么</text>
+  <text x="575" y="115" class="small">METR 将 P(success) 拟合到 log(专家耗时)</text>
+  <text x="575" y="130" class="small">并读取 50% 交点。</text>
 
   <rect x="575" y="145" width="250" height="44" class="cool"/>
-  <text x="584" y="165" class="small">clean evaluation</text>
-  <text x="584" y="180" class="small">horizon = capability ceiling</text>
+  <text x="584" y="165" class="small">干净评测</text>
+  <text x="584" y="180" class="small">任务时长上限 = 能力上限</text>
 
   <rect x="575" y="195" width="250" height="44" class="warn"/>
-  <text x="584" y="215" class="small">eval-context gaming</text>
-  <text x="584" y="230" class="small">horizon shifts right (inflated)</text>
+  <text x="584" y="215" class="small">迎合评测环境</text>
+  <text x="584" y="230" class="small">上限右移（虚高）</text>
 
   <rect x="575" y="245" width="250" height="44" class="hot"/>
-  <text x="584" y="265" class="small">deployment reality</text>
-  <text x="584" y="280" class="small">horizon shifts left (discount)</text>
+  <text x="584" y="265" class="small">部署现实</text>
+  <text x="584" y="280" class="small">上限左移（折扣）</text>
 
-  <text x="575" y="310" class="small">doubling time ~7 months (HCAST)</text>
-  <text x="575" y="325" class="small">14 hr today → 48 hr in ~12 months</text>
-  <text x="575" y="340" class="small">METR Time Horizon 1.1 (Jan 2026)</text>
+  <text x="575" y="310" class="small">翻倍时间约 7 个月（HCAST）</text>
+  <text x="575" y="325" class="small">当前 14 小时 → 约 12 个月后 48 小时</text>
+  <text x="575" y="340" class="small">METR Time Horizon 1.1（一月 2026）</text>
   <text x="575" y="360" class="small">SWAA + HCAST + RE-Bench</text>
-  <text x="575" y="376" class="small">cites in RSP v3.0 and FSF v3</text>
+  <text x="575" y="376" class="small">RSP v3.0 与 FSF v3 中引用</text>
 
   <!-- Takeaway strip -->
   <rect x="60" y="410" width="780" height="80" class="hot"/>
-  <text x="440" y="434" text-anchor="middle" class="label">interpretation rules</text>
-  <text x="80" y="454" class="content">1. a horizon is an upper bound on capability, not a deployment reliability prediction</text>
-  <text x="80" y="470" class="content">2. measure your own distribution; public horizons predict rank-order, not absolute quality</text>
-  <text x="80" y="486" class="small">3. eval-context gaming and tooling gap typically discount the public number 10–40%</text>
+  <text x="440" y="434" text-anchor="middle" class="label">解读规则</text>
+  <text x="80" y="454" class="content">1. 时长上限是能力的上界，不是部署可靠性的预测</text>
+  <text x="80" y="470" class="content">2. 测量自己的分布；公开上限预测相对排名，而非绝对质量</text>
+  <text x="80" y="486" class="small">3. 迎合评测环境和工具差距通常会使公开数值折损 10–40%</text>
 </svg>

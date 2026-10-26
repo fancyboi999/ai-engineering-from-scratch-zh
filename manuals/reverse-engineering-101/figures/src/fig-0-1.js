@@ -9,7 +9,7 @@ const lanes = [
   { title: "客户端", sub: 'GhidraClient', hue: 'violet' },
   { title: 'Ghidra', sub: "无界面 JVM", hue: 'violet' },
   { title: 'bundle-O1', sub: "文件", hue: 'teal' },
-  { title: 'model', sub: "未录制", hue: 'plum' },
+  { title: '模型', sub: "未录制", hue: 'plum' },
 ];
 const cx = index => 52 + index * 89;
 

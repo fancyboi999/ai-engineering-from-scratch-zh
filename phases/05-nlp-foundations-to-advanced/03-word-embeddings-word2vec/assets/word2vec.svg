@@ -16,19 +16,19 @@
   </defs>
 
   <rect class="box" x="20" y="30" width="380" height="130" rx="4"/>
-  <text class="label" x="40" y="55">Skip-gram window (size 2)</text>
+  <text class="label" x="40" y="55">Skip-gram 窗口（尺寸 2）</text>
   <text class="content" x="40" y="90">"The cat sat on the mat"</text>
 
-  <text class="content" x="40" y="130">center = cat</text>
-  <text class="content" x="180" y="130">context = {The, sat, on}</text>
+  <text class="content" x="40" y="130">中心词 = cat</text>
+  <text class="content" x="180" y="130">上下文 = {The, sat, on}</text>
 
   <path class="line" d="M 95 105 L 200 105" stroke-dasharray="2,2" stroke="#c0392b"/>
   <rect x="77" y="95" width="38" height="20" rx="3" fill="none" stroke="#c0392b" stroke-width="1.5"/>
 
-  <text class="stage" x="210" y="180">network learns: dot(v_cat, u_sat) high, dot(v_cat, u_random) low</text>
+  <text class="stage" x="210" y="180">网络学习：dot(v_cat, u_sat) 高，dot(v_cat, u_random) 低</text>
 
   <rect class="box" x="430" y="30" width="450" height="330" rx="4"/>
-  <text class="label" x="450" y="55">Embedding space (2D projection of learned vectors)</text>
+  <text class="label" x="450" y="55">嵌入空间（已学向量的 2D 投影）</text>
 
   <line class="axis" x1="460" y1="310" x2="860" y2="310"/>
   <line class="axis" x1="660" y1="80" x2="660" y2="340"/>
@@ -61,5 +61,5 @@
   <path class="vec" d="M 735 200 L 705 150" marker-end="url(#arrow)"/>
   <text class="stage" x="700" y="110">king - man ≈ queen - woman</text>
 
-  <text class="stage" x="450" y="350">co-occurring words cluster. analogy vectors are directions.</text>
+  <text class="stage" x="450" y="350">共现词形成聚类；类比向量表示方向。</text>
 </svg>

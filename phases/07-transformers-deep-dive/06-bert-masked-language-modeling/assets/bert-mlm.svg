@@ -16,10 +16,10 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">masked language modeling — the 80/10/10 rule</text>
+  <text x="450" y="30" text-anchor="middle" class="title">掩码语言建模：80/10/10 规则</text>
 
   <!-- Original sentence -->
-  <text x="40" y="75" class="label">sentence</text>
+  <text x="40" y="75" class="label">句子</text>
   <rect x="140" y="60" width="80" height="28" class="box"/>
   <text x="180" y="79" text-anchor="middle" class="content">the</text>
   <rect x="230" y="60" width="80" height="28" class="box"/>
@@ -38,7 +38,7 @@
   <text x="810" y="79" text-anchor="middle" class="content">dog</text>
 
   <!-- After masking (80/10/10) -->
-  <text x="40" y="143" class="label">after masking</text>
+  <text x="40" y="143" class="label">掩码处理后</text>
   <rect x="140" y="128" width="80" height="28" class="box"/>
   <text x="180" y="147" text-anchor="middle" class="content">the</text>
   <rect x="230" y="128" width="80" height="28" class="mask"/>
@@ -56,31 +56,31 @@
   <rect x="770" y="128" width="80" height="28" class="keep"/>
   <text x="810" y="147" text-anchor="middle" class="content">dog</text>
 
-  <text x="140" y="180" class="caption">[MASK] = 80% path</text>
-  <text x="540" y="180" class="caption">random swap = 10% path ("cat" picked in place of "over")</text>
-  <text x="770" y="180" class="caption">kept as-is = 10% path</text>
+  <text x="140" y="180" class="caption">[MASK] = 80% 路径</text>
+  <text x="540" y="180" class="caption">随机替换 = 10% 路径（用 "cat" 替换 "over"）</text>
+  <text x="770" y="180" class="caption">原样保留 = 10% 路径</text>
 
   <!-- Arrow to BERT -->
   <line x1="450" y1="195" x2="450" y2="225" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- BERT encoder box -->
   <rect x="160" y="225" width="580" height="100" class="box"/>
-  <text x="450" y="252" text-anchor="middle" class="label">BERT encoder (bidirectional self-attention × 12 layers)</text>
-  <text x="450" y="272" text-anchor="middle" class="caption">every position sees every other. predicting "quick" uses "brown fox jumps".</text>
-  <text x="450" y="295" text-anchor="middle" class="caption">modernbert 2024: RoPE + RMSNorm + GeGLU + alternating local/global attention + 8k context</text>
-  <text x="450" y="314" text-anchor="middle" class="caption">output: per-position 768-d vectors</text>
+  <text x="450" y="252" text-anchor="middle" class="label">BERT 编码器（双向自注意力 × 12 层）</text>
+  <text x="450" y="272" text-anchor="middle" class="caption">每个位置都能看到其他位置。预测 "quick" 时可使用 "brown fox jumps"。</text>
+  <text x="450" y="295" text-anchor="middle" class="caption">ModernBERT 2024：RoPE + RMSNorm + GeGLU + 交替局部/全局注意力 + 8k 上下文</text>
+  <text x="450" y="314" text-anchor="middle" class="caption">输出：每个位置一个 768 维向量</text>
 
   <line x1="450" y1="325" x2="450" y2="345" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- MLM head -->
   <rect x="320" y="345" width="260" height="32" class="hot"/>
-  <text x="450" y="367" text-anchor="middle" class="content">MLM head: Linear(d_model → vocab)</text>
+  <text x="450" y="367" text-anchor="middle" class="content">掩码语言模型输出头：Linear(d_model → vocab)</text>
 
   <line x1="450" y1="377" x2="450" y2="395" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Loss -->
   <rect x="300" y="395" width="300" height="32" class="box"/>
-  <text x="450" y="417" text-anchor="middle" class="content">cross-entropy, only at selected positions</text>
+  <text x="450" y="417" text-anchor="middle" class="content">交叉熵，仅在选中位置计算</text>
 
-  <text x="450" y="460" text-anchor="middle" class="caption">no signal at unselected positions — IGNORE_INDEX is a PyTorch convention for this exact use</text>
+  <text x="450" y="460" text-anchor="middle" class="caption">未选中位置不产生信号；PyTorch 的 IGNORE_INDEX 约定正用于此场景</text>
 </svg>

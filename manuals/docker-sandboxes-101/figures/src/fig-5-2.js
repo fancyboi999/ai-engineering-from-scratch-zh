@@ -20,7 +20,7 @@ module.exports = figure('fig-5-2', {
 
   const a1 = block(f, 20, 66, 285, 'violet', 'agents.root', ['description, instruction', 'max_iterations: 8', 'toolsets: filesystem, shell']);
   const a2 = block(f, 20, 178, 285, 'plum', 'models.local', ['provider: dmr', 'model: ai/qwen3:4b', 'temperature: 0']);
-  const a3 = block(f, 20, 290, 285, 'grey', 'endpoint discovery', ['docker model status --json', '由 docker-agent 自行执行'], 'dashed');
+  const a3 = block(f, 20, 290, 285, 'grey', '端点发现', ['docker model status --json', '由 docker-agent 自行执行'], 'dashed');
   f.arrow([a1.cx, a1.bottom], [a1.cx, a2.y - 1], { style: 'call', label: 'model: local' });
   f.arrow([a2.cx, a2.bottom], [a2.cx, a3.y - 1], { style: 'call', label: '无 base_url' });
 

@@ -18,41 +18,41 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Anthropic's five workflow patterns (Dec 2024)</text>
+  <text x="480" y="26" text-anchor="middle" class="title">Anthropic 的五种工作流模式（十二月 2024）</text>
 
   <rect x="40" y="50" width="880" height="110" class="chain"/>
-  <text x="480" y="72" text-anchor="middle" class="head">1. prompt chaining — sequential, optional programmatic gate</text>
+  <text x="480" y="72" text-anchor="middle" class="head">1. prompt 链 — 顺序执行，可选程序关卡</text>
   <rect x="60" y="88" width="140" height="40" class="box"/>
   <text x="130" y="112" text-anchor="middle" class="step">LLM A</text>
   <rect x="220" y="88" width="140" height="40" class="box"/>
-  <text x="290" y="112" text-anchor="middle" class="step">gate: pass?</text>
+  <text x="290" y="112" text-anchor="middle" class="step">关卡：通过？</text>
   <rect x="380" y="88" width="140" height="40" class="box"/>
   <text x="450" y="112" text-anchor="middle" class="step">LLM B</text>
   <rect x="540" y="88" width="140" height="40" class="box"/>
   <text x="610" y="112" text-anchor="middle" class="step">LLM C</text>
   <rect x="700" y="88" width="200" height="40" class="box"/>
-  <text x="800" y="112" text-anchor="middle" class="step">output</text>
+  <text x="800" y="112" text-anchor="middle" class="step">输出</text>
   <line x1="200" y1="108" x2="220" y2="108" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="360" y1="108" x2="380" y2="108" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="520" y1="108" x2="540" y2="108" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="680" y1="108" x2="700" y2="108" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="480" y="150" text-anchor="middle" class="small">use when: task has clean linear decomposition</text>
+  <text x="480" y="150" text-anchor="middle" class="small">适用：任务能清晰地线性分解</text>
 
   <rect x="40" y="170" width="880" height="110" class="route"/>
-  <text x="480" y="192" text-anchor="middle" class="head">2. routing — classifier dispatches to specialist handlers</text>
+  <text x="480" y="192" text-anchor="middle" class="head">2. 路由 — 分类器分发给专用处理器</text>
   <rect x="60" y="208" width="160" height="40" class="box"/>
-  <text x="140" y="232" text-anchor="middle" class="step">classifier LLM</text>
+  <text x="140" y="232" text-anchor="middle" class="step">分类器 LLM</text>
   <rect x="260" y="208" width="160" height="40" class="box"/>
-  <text x="340" y="232" text-anchor="middle" class="step">refund chain</text>
+  <text x="340" y="232" text-anchor="middle" class="step">退款链</text>
   <rect x="440" y="208" width="160" height="40" class="box"/>
-  <text x="520" y="232" text-anchor="middle" class="step">bug chain</text>
+  <text x="520" y="232" text-anchor="middle" class="step">缺陷链</text>
   <rect x="620" y="208" width="160" height="40" class="box"/>
-  <text x="700" y="232" text-anchor="middle" class="step">sales chain</text>
+  <text x="700" y="232" text-anchor="middle" class="step">销售链</text>
   <line x1="220" y1="228" x2="260" y2="228" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="480" y="270" text-anchor="middle" class="small">use when: categorically different inputs need different handling</text>
+  <text x="480" y="270" text-anchor="middle" class="small">适用：不同类别输入需要不同处理</text>
 
   <rect x="40" y="290" width="440" height="150" class="par"/>
-  <text x="260" y="312" text-anchor="middle" class="head">3. parallelization — sectioning or voting</text>
+  <text x="260" y="312" text-anchor="middle" class="head">3. 并行化 — 分段处理或投票</text>
   <rect x="60" y="328" width="120" height="40" class="box"/>
   <text x="120" y="352" text-anchor="middle" class="step">LLM 1</text>
   <rect x="60" y="376" width="120" height="40" class="box"/>
@@ -60,35 +60,35 @@
   <rect x="200" y="352" width="140" height="40" class="box"/>
   <text x="270" y="376" text-anchor="middle" class="step">LLM 3</text>
   <rect x="360" y="352" width="100" height="40" class="box"/>
-  <text x="410" y="376" text-anchor="middle" class="step">aggregate</text>
-  <text x="260" y="430" text-anchor="middle" class="small">voting: majority / synthesis</text>
+  <text x="410" y="376" text-anchor="middle" class="step">聚合</text>
+  <text x="260" y="430" text-anchor="middle" class="small">投票：多数 / 综合</text>
 
   <rect x="500" y="290" width="420" height="150" class="orch"/>
-  <text x="710" y="312" text-anchor="middle" class="head">4. orchestrator-workers — dynamic dispatch</text>
+  <text x="710" y="312" text-anchor="middle" class="head">4. 编排器与工作者 — 动态分发</text>
   <rect x="520" y="328" width="140" height="40" class="box"/>
-  <text x="590" y="352" text-anchor="middle" class="step">orchestrator</text>
+  <text x="590" y="352" text-anchor="middle" class="step">编排器</text>
   <rect x="680" y="328" width="100" height="40" class="box"/>
-  <text x="730" y="352" text-anchor="middle" class="step">worker A</text>
+  <text x="730" y="352" text-anchor="middle" class="step">工作者 A</text>
   <rect x="800" y="328" width="100" height="40" class="box"/>
-  <text x="850" y="352" text-anchor="middle" class="step">worker B</text>
+  <text x="850" y="352" text-anchor="middle" class="step">工作者 B</text>
   <rect x="680" y="376" width="220" height="40" class="box"/>
-  <text x="790" y="400" text-anchor="middle" class="step">synth</text>
+  <text x="790" y="400" text-anchor="middle" class="step">综合</text>
   <line x1="660" y1="348" x2="680" y2="348" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="710" y="430" text-anchor="middle" class="small">like agent but orchestrator does not loop indefinitely</text>
+  <text x="710" y="430" text-anchor="middle" class="small">类似 agent，但编排器不会无限循环</text>
 
   <rect x="40" y="450" width="880" height="120" class="eval"/>
-  <text x="480" y="472" text-anchor="middle" class="head">5. evaluator-optimizer — propose, judge, refine</text>
+  <text x="480" y="472" text-anchor="middle" class="head">5. 评估器与优化器 — 提议、判断、改进</text>
   <rect x="60" y="488" width="160" height="40" class="box"/>
-  <text x="140" y="512" text-anchor="middle" class="step">proposer LLM</text>
+  <text x="140" y="512" text-anchor="middle" class="step">提议者 LLM</text>
   <rect x="260" y="488" width="160" height="40" class="box"/>
-  <text x="340" y="512" text-anchor="middle" class="step">evaluator LLM</text>
+  <text x="340" y="512" text-anchor="middle" class="step">评估者 LLM</text>
   <rect x="460" y="488" width="160" height="40" class="box"/>
-  <text x="540" y="512" text-anchor="middle" class="step">pass  output</text>
+  <text x="540" y="512" text-anchor="middle" class="step">通过  输出</text>
   <rect x="660" y="488" width="240" height="40" class="box"/>
-  <text x="780" y="512" text-anchor="middle" class="step">fail  feedback loops to proposer</text>
+  <text x="780" y="512" text-anchor="middle" class="step">失败  反馈回到提议者</text>
   <line x1="220" y1="508" x2="260" y2="508" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="420" y1="508" x2="460" y2="508" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="480" y="556" text-anchor="middle" class="small">Self-Refine (Lesson 05) generalized; CRITIC pattern if evaluator grounds on external tools</text>
+  <text x="480" y="556" text-anchor="middle" class="small">Self-Refine（第 05 课）的推广；若评估器基于外部工具，则是 CRITIC 模式</text>
 
-  <text x="480" y="600" text-anchor="middle" class="caption">five patterns cover most use cases. agents only when steps cannot be predicted.</text>
+  <text x="480" y="600" text-anchor="middle" class="caption">五种模式覆盖多数场景。只有无法预测步骤时才需要 agent。</text>
 </svg>

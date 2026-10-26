@@ -32,7 +32,7 @@ module.exports = figure('plate-sglang-request', {
   f.text(620, 18, 'Qwen3-8B', { size: 11, anchor: 'end', hue: 'ink-soft' });
   const procs = [
     { cx: 105, w: 170, title: 'TokenizerManager', sub: '文本转 token ID' },
-    { cx: 320, w: 160, title: 'Scheduler', sub: 'match_prefix、批次' },
+    { cx: 320, w: 160, title: '调度器', sub: 'match_prefix、批次' },
     { cx: 535, w: 170, title: 'DetokenizerManager', sub: 'token ID 转文本' },
   ];
   procs.forEach(p => f.box({ x: p.cx - p.w / 2, y: 30, w: p.w, h: 52, hue: 'blue', title: p.title, sub: [p.sub] }));

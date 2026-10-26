@@ -12,17 +12,17 @@ const gradient = (diffs[diffs.length / 2 - 1] + diffs[diffs.length / 2]) / 2;
 const step = m.step_time_s.median;
 const steps = m.step_time_s.steps;
 const TURNS = [
-  { hue: 'violet', time: m.rollout_time_s.median, line: 'rollout, SGLang engine' },
-  { hue: 'blue', time: m.log_probs_time_s.median, line: 'log probabilities, trainer' },
-  { hue: 'blue', time: gradient, line: 'GRPO update, Adam' },
-  { hue: 'amber', time: m.update_weights_time_s.median, digits: 2, line: 'weight update to the engine' },
+  { hue: 'violet', time: m.rollout_time_s.median, line: 'rollout，SGLang 引擎' },
+  { hue: 'blue', time: m.log_probs_time_s.median, line: '对数概率，训练器' },
+  { hue: 'blue', time: gradient, line: 'GRPO 更新，Adam' },
+  { hue: 'amber', time: m.update_weights_time_s.median, digits: 2, line: '将权重更新到引擎' },
 ];
 const untimed = step - TURNS.reduce((sum, turn) => sum + turn.time, 0);
 const ACTORS = [
-  { hue: 'grey', title: 'Ray head' },
+  { hue: 'grey', title: 'Ray 头节点' },
   { hue: 'amber', title: 'TrainerController' },
   { hue: 'violet', title: 'RolloutExecutor' },
-  { hue: 'green', title: 'math reward' },
+  { hue: 'green', title: '数学奖励' },
 ];
 
 module.exports = figure('plate-miles-loop', {
@@ -79,9 +79,9 @@ module.exports = figure('plate-miles-loop', {
   f.leader([NL[0], NL[1] - 28], NL, { hue: 'teal' });
 
   const RIGHT = [
-    { title: 'FSDP trainer', sub: 'FSDPTrainRayActor，运行中', hue: 'blue', to: trainer.top },
+    { title: 'FSDP 训练器', sub: 'FSDPTrainRayActor，运行中', hue: 'blue', to: trainer.top },
     { title: 'Blackwell GPU', sub: '一个芯片，共用内存池', hue: undefined, to: gpu.P(0, 0, 12) },
-    { title: 'SGLang engine', sub: '等待新权重', hue: 'violet', to: engine.top },
+    { title: 'SGLang 引擎', sub: '等待新权重', hue: 'violet', to: engine.top },
   ];
   RIGHT.forEach((label, i) => {
     const y = 50 + i * 40;
@@ -117,7 +117,7 @@ module.exports = figure('plate-miles-loop', {
 
   f.beat(0);
   const line = f.isoView({ ox: 0, oy: 590, angle: 'true' });
-  f.kicker(20, 534, `one step to scale · ${sec(step)}, median of ${steps}`);
+  f.kicker(20, 534, `单步定标 · ${sec(step)}，${steps} 次的中位数`);
   const x0 = 20;
   const span = 600;
   const edges = [x0];

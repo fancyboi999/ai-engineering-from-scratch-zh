@@ -9,7 +9,7 @@
   <text x="240" y="28.6" font-size="12" text-anchor="middle" font-weight="700">TokenizerManager</text>
   <line x1="240" y1="40" x2="240" y2="484" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="330" y="10" width="140" height="30" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="400" y="28.6" font-size="12" text-anchor="middle" font-weight="700">scheduler</text>
+  <text x="400" y="28.6" font-size="12" text-anchor="middle" font-weight="700">调度器</text>
   <line x1="400" y1="40" x2="400" y2="484" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="490" y="10" width="140" height="30" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="560" y="28.6" font-size="12" text-anchor="middle" font-weight="700">detokenizer</text>

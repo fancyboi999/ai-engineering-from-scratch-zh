@@ -13,35 +13,35 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">vLLM production-stack + LMCache — cross-engine KV reuse</text>
+  <text x="480" y="24" text-anchor="middle" class="title">vLLM production-stack + LMCache：跨引擎 KV 复用</text>
 
   <rect x="40" y="50" width="880" height="60" class="router"/>
-  <text x="480" y="74" text-anchor="middle" class="head">router (cache-aware)</text>
-  <text x="480" y="94" text-anchor="middle" class="small">consumes KV events, hashes prefixes, routes to engine with local OR shared match</text>
+  <text x="480" y="74" text-anchor="middle" class="head">路由器（感知缓存）</text>
+  <text x="480" y="94" text-anchor="middle" class="small">处理 KV 事件、计算前缀哈希，路由到本地或共享缓存匹配的引擎</text>
 
   <rect x="40" y="130" width="200" height="100" class="engine"/>
-  <text x="140" y="152" text-anchor="middle" class="step">vLLM engine 1</text>
+  <text x="140" y="152" text-anchor="middle" class="step">vLLM 引擎 1</text>
   <text x="140" y="170" text-anchor="middle" class="small">H100 80GB</text>
   <text x="140" y="188" text-anchor="middle" class="small">Connector API v0.9+</text>
-  <text x="140" y="206" text-anchor="middle" class="small">0.11.0 async offload</text>
+  <text x="140" y="206" text-anchor="middle" class="small">0.11.0 异步卸载</text>
   <rect x="260" y="130" width="200" height="100" class="engine"/>
-  <text x="360" y="152" text-anchor="middle" class="step">vLLM engine 2</text>
+  <text x="360" y="152" text-anchor="middle" class="step">vLLM 引擎 2</text>
   <text x="360" y="170" text-anchor="middle" class="small">H100 80GB</text>
   <rect x="480" y="130" width="200" height="100" class="engine"/>
-  <text x="580" y="152" text-anchor="middle" class="step">vLLM engine 3</text>
+  <text x="580" y="152" text-anchor="middle" class="step">vLLM 引擎 3</text>
   <text x="580" y="170" text-anchor="middle" class="small">H100 80GB</text>
   <rect x="700" y="130" width="200" height="100" class="engine"/>
-  <text x="800" y="152" text-anchor="middle" class="step">vLLM engine 4</text>
+  <text x="800" y="152" text-anchor="middle" class="step">vLLM 引擎 4</text>
   <text x="800" y="170" text-anchor="middle" class="small">H100 80GB</text>
 
   <rect x="40" y="260" width="880" height="100" class="cache"/>
-  <text x="480" y="282" text-anchor="middle" class="head">LMCache — cluster-shared KV cache</text>
-  <text x="480" y="306" text-anchor="middle" class="step">CPU DRAM tier (512 GB+ per socket)</text>
-  <text x="480" y="324" text-anchor="middle" class="small">asynchronous via Connector API; offload is not user-facing</text>
-  <text x="480" y="344" text-anchor="middle" class="small">decisive for: multi-tenant shared prompts, RAG chunk reuse, LoRA on shared base, preemption restore</text>
+  <text x="480" y="282" text-anchor="middle" class="head">LMCache：集群共享 KV 缓存</text>
+  <text x="480" y="306" text-anchor="middle" class="step">CPU DRAM 层（每个插槽 512 GB+）</text>
+  <text x="480" y="324" text-anchor="middle" class="small">通过 Connector API 异步执行；卸载不直接面向用户</text>
+  <text x="480" y="344" text-anchor="middle" class="small">适用于：多租户共享 prompt、RAG 分块复用、共享基础模型的 LoRA、抢占恢复</text>
 
   <rect x="40" y="380" width="880" height="80" class="disk"/>
-  <text x="480" y="402" text-anchor="middle" class="head">durable tier — Ceph / S3 / local NVMe</text>
-  <text x="480" y="424" text-anchor="middle" class="step">for blocks evicted from DRAM; slower but infinite</text>
-  <text x="480" y="444" text-anchor="middle" class="caption">16x H100 benchmark: LMCache helps when KV footprint exceeds HBM; matches baseline when it does not</text>
+  <text x="480" y="402" text-anchor="middle" class="head">持久层：Ceph / S3 / 本地 NVMe</text>
+  <text x="480" y="424" text-anchor="middle" class="step">存放 DRAM 淘汰的块；更慢但可持续扩展</text>
+  <text x="480" y="444" text-anchor="middle" class="caption">16x H100 基准：KV 占用超过 HBM 时 LMCache 有帮助，未超过时与基线一致</text>
 </svg>

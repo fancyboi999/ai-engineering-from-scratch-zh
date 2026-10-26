@@ -59,4 +59,6 @@ module.exports = figure('fig-5-2', {
   const mutation = f.box({ x: 20, y: 432, w: 600, h: 56, hue: 'teal', title: "Mutation Evidence：provider rea-unknown-registry，版本 1", sub: ["predicate rea.residual-unknown-mutation、confidence derived、authority analyst-inference", "限制：Registry mutation evidence 记录分析者意图，不是答案证明。"] });
   f.arrow([110, first.bottom], [110, mutation.y - 1], { style: 'write' });
   f.arrow([510, second.bottom], [510, mutation.y - 1], { style: 'write', label: "新增一条记录" });
-});
+})
+  // 保留冻结背景几何，只替换最终 SVG 中的完整文字节点。
+  .replace(">update</text>", ">更新</text>");

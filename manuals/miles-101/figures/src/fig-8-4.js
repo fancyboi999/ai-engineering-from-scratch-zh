@@ -30,14 +30,14 @@ module.exports = figure('fig-8-4', {
   const t4 = t3 + v('sleep_time_s');
   const t5 = t4 + v('update_weights_time_s');
 
-  f.kicker(20, 28, 'phase medians of 48 steps, to scale');
-  f.text(20, 74, 'engine', { size: 12, weight: 700, hue: 'violet' });
+  f.kicker(20, 28, '48 步各阶段中位数，按比例显示');
+  f.text(20, 74, '引擎', { size: 12, weight: 700, hue: 'violet' });
   f.text(20, 92, '权重、KV cache', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(px(0), 58, px(t1) - px(0), 40, { hue: 'violet' });
-  f.text((px(0) + px(t1)) / 2, 83, `rollout ${t1.toFixed(1)} s`, { size: 11.5, anchor: 'middle', hue: 'violet' });
+  f.text((px(0) + px(t1)) / 2, 83, `采样 ${t1.toFixed(1)} s`, { size: 11.5, anchor: 'middle', hue: 'violet' });
   f.rect(px(t4), 58, px(t5) - px(t4) + 2, 40, { hue: 'violet' });
 
-  f.text(20, 144, 'trainer', { size: 12, weight: 700, hue: 'blue' });
+  f.text(20, 144, '训练器', { size: 12, weight: 700, hue: 'blue' });
   f.text(20, 162, '权重、optimizer', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(px(t1), 128, px(t4) - px(t1), 40, { hue: 'blue' });
   f.text((px(t2) + px(t3)) / 2, 153, `训练 ${(t3 - t2).toFixed(1)} s，其中 log probability ${v('log_probs_time_s').toFixed(1)} s`, { size: 11.5, anchor: 'middle', hue: 'blue' });

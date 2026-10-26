@@ -15,34 +15,34 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Propose → Surface → Commit → Verify (all four required)</text>
+  <text x="440" y="26" text-anchor="middle" class="title">提议 → 展示 → 提交 → 验证（四步缺一不可）</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Phases -->
   <rect x="60" y="80" width="170" height="90" class="cool"/>
-  <text x="145" y="104" text-anchor="middle" class="label">1. propose</text>
-  <text x="76" y="126" class="small">intent + lineage +</text>
-  <text x="76" y="142" class="small">permissions + blast +</text>
-  <text x="76" y="158" class="small">rollback + idempotency</text>
+  <text x="145" y="104" text-anchor="middle" class="label">1. 提议</text>
+  <text x="76" y="126" class="small">意图 + 来源链 +</text>
+  <text x="76" y="142" class="small">权限 + 影响范围 +</text>
+  <text x="76" y="158" class="small">回滚 + 幂等性</text>
 
   <rect x="250" y="80" width="170" height="90" class="cold"/>
-  <text x="335" y="104" text-anchor="middle" class="label">2. surface</text>
-  <text x="266" y="126" class="small">durable store</text>
+  <text x="335" y="104" text-anchor="middle" class="label">2. 展示</text>
+  <text x="266" y="126" class="small">持久存储</text>
   <text x="266" y="142" class="small">(PostgreSQL, Redis,</text>
   <text x="266" y="158" class="small">Durable Object)</text>
 
   <rect x="440" y="80" width="170" height="90" class="cool"/>
-  <text x="525" y="104" text-anchor="middle" class="label">3. commit</text>
-  <text x="456" y="126" class="small">challenge-and-response</text>
-  <text x="456" y="142" class="small">checklist, positive ack</text>
-  <text x="456" y="158" class="small">idempotent re-exec</text>
+  <text x="525" y="104" text-anchor="middle" class="label">3. 提交</text>
+  <text x="456" y="126" class="small">质询与回应</text>
+  <text x="456" y="142" class="small">检查清单、明确确认</text>
+  <text x="456" y="158" class="small">幂等地重新执行</text>
 
   <rect x="630" y="80" width="170" height="90" class="cool"/>
-  <text x="715" y="104" text-anchor="middle" class="label">4. verify</text>
-  <text x="646" y="126" class="small">re-read target</text>
-  <text x="646" y="142" class="small">confirm side effect</text>
-  <text x="646" y="158" class="small">alert on mismatch</text>
+  <text x="715" y="104" text-anchor="middle" class="label">4. 验证</text>
+  <text x="646" y="126" class="small">重新读取目标</text>
+  <text x="646" y="142" class="small">确认副作用</text>
+  <text x="646" y="158" class="small">不一致时告警</text>
 
   <path d="M230 125 L250 125" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M420 125 L440 125" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -50,29 +50,29 @@
 
   <!-- Rubber stamp vs checklist -->
   <rect x="60" y="200" width="360" height="140" class="hot"/>
-  <text x="240" y="224" text-anchor="middle" class="label">rubber-stamp (fails audit)</text>
-  <text x="76" y="248" class="content">one "Approve?" button</text>
-  <text x="76" y="264" class="content">no structured metadata surfaced</text>
-  <text x="76" y="280" class="content">reviewer clicks in under 1s</text>
-  <text x="76" y="296" class="content">approvals predict nothing</text>
-  <text x="76" y="320" class="small">EU AI Act Article 14 is explicit: effective human oversight</text>
-  <text x="76" y="334" class="small">excludes rubber-stamp patterns.</text>
+  <text x="240" y="224" text-anchor="middle" class="label">走过场审批（无法通过审计）</text>
+  <text x="76" y="248" class="content">只有一个“批准？”按钮</text>
+  <text x="76" y="264" class="content">不展示结构化元数据</text>
+  <text x="76" y="280" class="content">审查者不到 1s 就点击</text>
+  <text x="76" y="296" class="content">批准与结果毫无预测关系</text>
+  <text x="76" y="320" class="small">欧盟 AI 法案第 14 条明确要求：有效人工监督</text>
+  <text x="76" y="334" class="small">排除走过场的模式。</text>
 
   <rect x="460" y="200" width="360" height="140" class="cool"/>
-  <text x="640" y="224" text-anchor="middle" class="label">challenge-and-response (passes)</text>
-  <text x="476" y="248" class="content">[ ] I understand what this touches</text>
-  <text x="476" y="264" class="content">[ ] I verified the blast radius</text>
-  <text x="476" y="280" class="content">[ ] I have a rollback plan</text>
-  <text x="476" y="296" class="content">Approve enabled only when all three set</text>
-  <text x="476" y="320" class="small">documented in Anthropic and MS compliance docs;</text>
-  <text x="476" y="334" class="small">required by EU AI Act Article 14 for high-risk systems.</text>
+  <text x="640" y="224" text-anchor="middle" class="label">质询与回应（可通过）</text>
+  <text x="476" y="248" class="content">[ ] 我理解这会影响什么</text>
+  <text x="476" y="264" class="content">[ ] 我已核实影响范围</text>
+  <text x="476" y="280" class="content">[ ] 我有回滚计划</text>
+  <text x="476" y="296" class="content">三项全部勾选后才可批准</text>
+  <text x="476" y="320" class="small">Anthropic 与 MS 合规文档均有说明；</text>
+  <text x="476" y="334" class="small">欧盟 AI 法案第 14 条要求高风险系统采用此方式。</text>
 
   <!-- Idempotency detail -->
   <rect x="60" y="370" width="760" height="120" class="cold"/>
-  <text x="440" y="394" text-anchor="middle" class="label">idempotency key = hash(thread_id, action, payload)</text>
-  <text x="80" y="416" class="content">propose(P) + propose(P) -> same record (no duplicate)</text>
-  <text x="80" y="432" class="content">commit(k) + commit(k) -> execute once, subsequent commits are no-ops</text>
-  <text x="80" y="448" class="content">retry after transient failure: Stripe/AWS-style idempotency, reused for agent approvals</text>
-  <text x="80" y="468" class="content">wall-clock in the key is a logging timestamp, not an idempotency key</text>
-  <text x="80" y="484" class="small">LangGraph interrupt() · MS RequestInfoEvent · Cloudflare waitForApproval() — same shape, different names</text>
+  <text x="440" y="394" text-anchor="middle" class="label">幂等键 = hash(thread_id, action, payload)</text>
+  <text x="80" y="416" class="content">propose(P) + propose(P) -&gt; 同一条记录（不重复）</text>
+  <text x="80" y="432" class="content">commit(k) + commit(k) -&gt; 仅执行一次，后续提交不再操作</text>
+  <text x="80" y="448" class="content">临时故障后重试：复用 Stripe/AWS 式幂等性进行 agent 审批</text>
+  <text x="80" y="468" class="content">键中的时钟时间是日志时间戳，不是幂等键</text>
+  <text x="80" y="484" class="small">LangGraph interrupt() · MS RequestInfoEvent · Cloudflare waitForApproval() — 形态相同，名称不同</text>
 </svg>

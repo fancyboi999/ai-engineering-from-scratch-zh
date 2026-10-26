@@ -16,9 +16,9 @@ module.exports = figure('fig-1-1', {
   desc: `在搭载 GB10 的 DGX Spark 上使用 Qwen3-0.6B，每一步都会重复六个阶段。prompt 发送到 SGLang engine，生成 256 个答案，耗时 ${s('rollout_time_s')}。随后 math reward 为每个答案评分。FSDP trainer 用 ${s('log_probs_time_s')} 计算 log probability，再用 ${gradient} 执行梯度步骤。两者组成耗时 ${s('train_time_s')} 的训练阶段。权重更新耗时 ${m.update_weights_time_s.median.toFixed(2)} s，并将新权重传给 engine。耗时取自启用 heat guard 前的一次 ${m.step_time_s.steps} 步运行，因此没有暂停影响。`,
 }, f => {
   const prompts = f.box({ x: 20, y: 36, w: 160, h: 64, hue: 'green', title: 'GSM8K prompt', sub: ['每步 32 个 prompt'] });
-  const engine = f.box({ x: 240, y: 36, w: 170, h: 64, hue: 'violet', title: 'SGLang engine', sub: ['sglang::scheduler', `256 个答案，${s('rollout_time_s')}`] });
-  const reward = f.box({ x: 470, y: 36, w: 150, h: 64, hue: 'green', title: 'math reward', sub: ['每个答案计 1 或 0'] });
-  const logp = f.box({ x: 470, y: 176, w: 150, h: 64, hue: 'blue', title: 'log probability', titleSize: 12, sub: ['FSDPTrainRayActor', s('log_probs_time_s')] });
+  const engine = f.box({ x: 240, y: 36, w: 170, h: 64, hue: 'violet', title: "SGLang 引擎", sub: ['sglang::scheduler', `256 个答案，${s('rollout_time_s')}`] });
+  const reward = f.box({ x: 470, y: 36, w: 150, h: 64, hue: 'green', title: "数学奖励", sub: ['每个答案计 1 或 0'] });
+  const logp = f.box({ x: 470, y: 176, w: 150, h: 64, hue: 'blue', title: "对数概率", titleSize: 12, sub: ['FSDPTrainRayActor', s('log_probs_time_s')] });
   const train = f.box({ x: 240, y: 176, w: 170, h: 64, hue: 'blue', title: 'GRPO 更新', sub: ['Adam，一步', gradient] });
   const sync = f.box({ x: 20, y: 176, w: 160, h: 64, hue: 'amber', title: '权重更新', sub: ['GPU 句柄，GPU 内复制', `${m.update_weights_time_s.median.toFixed(2)} s`] });
 
@@ -35,7 +35,7 @@ module.exports = figure('fig-1-1', {
   f.path(`M100 ${sync.y} V138 H325 V${engine.y + engine.h + 1}`, { style: 'state' });
   f.step(118, 126, 6);
 
-  f.kicker(20, 290, `one step, median of ${m.step_time_s.steps} steps, run before the heat guard`);
+  f.kicker(20, 290, `一个步骤，${m.step_time_s.steps} 步的中位数，运行于启用过热保护之前`);
   f.text(20, 314, `共计 ${s('step_time_s')}。训练阶段耗时最长，权重更新最短。`, { size: 12, serif: true });
   f.text(20, 336, 'engine 和 trainer 轮流使用同一块 GPU 内存。', { size: 12, serif: true, hue: 'ink-soft' });
 });

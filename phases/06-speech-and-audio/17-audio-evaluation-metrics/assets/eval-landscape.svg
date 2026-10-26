@@ -11,71 +11,71 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">audio evaluation — one metric per task, one leaderboard per metric</text>
+  <text x="440" y="26" text-anchor="middle" class="title">音频评估：每类任务一个指标，每个指标一张榜单</text>
 
   <rect x="20" y="50" width="200" height="200" class="box"/>
   <text x="120" y="72" text-anchor="middle" class="label">ASR</text>
-  <text x="30" y="96" class="content">primary:  WER (normalized)</text>
-  <text x="30" y="114" class="content">          CER for tone langs</text>
-  <text x="30" y="132" class="content">speed:    RTFx</text>
-  <text x="30" y="150" class="content">latency:  first-token ms</text>
+  <text x="30" y="96" class="content">主要指标：WER（归一化后）</text>
+  <text x="30" y="114" class="content">          声调语言使用 CER</text>
+  <text x="30" y="132" class="content">速度：RTFx</text>
+  <text x="30" y="150" class="content">延迟：首个 token，单位 ms</text>
   <text x="30" y="174" class="tag">Open ASR Leaderboard</text>
-  <text x="30" y="192" class="caption">Parakeet 6.05% avg WER</text>
+  <text x="30" y="192" class="caption">Parakeet 平均 WER 6.05%</text>
   <text x="30" y="210" class="caption">Whisper-v3-turbo 1.58% LS</text>
-  <text x="30" y="228" class="caption">Canary-Qwen 5.63% avg</text>
+  <text x="30" y="228" class="caption">Canary-Qwen 平均值 5.63%</text>
 
   <rect x="235" y="50" width="200" height="200" class="hot"/>
   <text x="335" y="72" text-anchor="middle" class="label">TTS</text>
-  <text x="245" y="96" class="content">primary:  MOS / UTMOS</text>
-  <text x="245" y="114" class="content">          SECS (cloning)</text>
-  <text x="245" y="132" class="content">round:    ASR-WER on output</text>
-  <text x="245" y="150" class="content">latency:  TTFA ms</text>
+  <text x="245" y="96" class="content">主要指标：MOS / UTMOS</text>
+  <text x="245" y="114" class="content">          SECS（声音克隆）</text>
+  <text x="245" y="132" class="content">回环：输出音频的 ASR-WER</text>
+  <text x="245" y="150" class="content">延迟：TTFA，单位 ms</text>
   <text x="245" y="174" class="tag">TTS Arena · Artificial Analysis</text>
   <text x="245" y="192" class="caption">Inworld TTS-1.5 ELO 1236</text>
   <text x="245" y="210" class="caption">Kokoro-82M ELO 1059</text>
   <text x="245" y="228" class="caption">ElevenLabs v3 ELO 1179</text>
 
   <rect x="450" y="50" width="200" height="200" class="box"/>
-  <text x="550" y="72" text-anchor="middle" class="label">speaker + diarization</text>
-  <text x="460" y="96" class="content">primary:  EER</text>
+  <text x="550" y="72" text-anchor="middle" class="label">说话人识别与分离</text>
+  <text x="460" y="96" class="content">主要指标：EER</text>
   <text x="460" y="114" class="content">          minDCF</text>
-  <text x="460" y="132" class="content">diariz:   DER / JER</text>
-  <text x="460" y="150" class="content">overlap:  per-segment F1</text>
+  <text x="460" y="132" class="content">说话人分离：DER / JER</text>
+  <text x="460" y="150" class="content">重叠：逐片段 F1</text>
   <text x="460" y="174" class="tag">VoxCeleb1-O / VoxSRC</text>
   <text x="460" y="192" class="caption">ECAPA 0.87% EER</text>
   <text x="460" y="210" class="caption">3D-Speaker 0.50% EER</text>
   <text x="460" y="228" class="caption">pyannote Precision-2 &lt; 0.40%</text>
 
   <rect x="665" y="50" width="195" height="200" class="box"/>
-  <text x="762" y="72" text-anchor="middle" class="label">audio classification</text>
-  <text x="675" y="96" class="content">exclusive: top-1, top-5</text>
-  <text x="675" y="114" class="content">multi:     mAP</text>
-  <text x="675" y="132" class="content">imbalanced: macro F1</text>
-  <text x="675" y="150" class="content">           per-class recall</text>
+  <text x="762" y="72" text-anchor="middle" class="label">音频分类</text>
+  <text x="675" y="96" class="content">互斥分类：top-1、top-5</text>
+  <text x="675" y="114" class="content">多标签：mAP</text>
+  <text x="675" y="132" class="content">类别不平衡：宏平均 F1</text>
+  <text x="675" y="150" class="content">           各类别召回率</text>
   <text x="675" y="174" class="tag">HEAR · AudioSet · ESC-50</text>
   <text x="675" y="192" class="caption">BEATs-iter3 AudioSet 0.548</text>
   <text x="675" y="210" class="caption">Audio-MAE Speech Cmd 99.0%</text>
   <text x="675" y="228" class="caption">BEATs ESC-50 97.0%</text>
 
   <rect x="20" y="265" width="410" height="220" class="box"/>
-  <text x="225" y="287" text-anchor="middle" class="label">music generation</text>
-  <text x="30" y="313" class="content">primary: FAD (Fréchet Audio Distance)</text>
-  <text x="30" y="331" class="content">        CLAP (text-audio alignment)</text>
-  <text x="30" y="349" class="content">consumer: blind-panel MOS / ELO</text>
-  <text x="30" y="375" class="tag">Suno v5 ELO 1293 (quality leader)</text>
-  <text x="30" y="395" class="caption">Udio v4 — producer tools + stems</text>
-  <text x="30" y="413" class="caption">MusicGen-large on MusicCaps ~4.5 FAD</text>
-  <text x="30" y="441" class="content">always pair FAD with human MOS panel</text>
-  <text x="30" y="459" class="content">open: ACE-Step XL / YuE / Stable Audio Open</text>
+  <text x="225" y="287" text-anchor="middle" class="label">音乐生成</text>
+  <text x="30" y="313" class="content">主要指标：FAD（Fréchet 音频距离）</text>
+  <text x="30" y="331" class="content">        CLAP（文本与音频对齐）</text>
+  <text x="30" y="349" class="content">消费级：盲听小组 MOS / ELO</text>
+  <text x="30" y="375" class="tag">Suno v5 ELO 1293（质量领先）</text>
+  <text x="30" y="395" class="caption">Udio v4：制作工具与分轨</text>
+  <text x="30" y="413" class="caption">MusicGen-large 在 MusicCaps 上约 4.5 FAD</text>
+  <text x="30" y="441" class="content">始终同时使用 FAD 与人工 MOS 评分</text>
+  <text x="30" y="459" class="content">开放模型：ACE-Step XL / YuE / Stable Audio Open</text>
 
   <rect x="450" y="265" width="410" height="220" class="hot"/>
-  <text x="655" y="287" text-anchor="middle" class="label">audio-language + streaming</text>
-  <text x="460" y="313" class="content">LALM reasoning: MMAU-Pro (1800 Q)</text>
-  <text x="460" y="331" class="content">long-audio:    LongAudioBench</text>
-  <text x="460" y="349" class="content">captioning:    FENSE / SPICE / CIDEr</text>
-  <text x="460" y="375" class="tag">Gemini 2.5 Pro ~60% MMAU-Pro overall</text>
+  <text x="655" y="287" text-anchor="middle" class="label">音频语言模型与流式处理</text>
+  <text x="460" y="313" class="content">LALM 推理：MMAU-Pro（1800 题）</text>
+  <text x="460" y="331" class="content">长音频：LongAudioBench</text>
+  <text x="460" y="349" class="content">音频描述：FENSE / SPICE / CIDEr</text>
+  <text x="460" y="375" class="tag">Gemini 2.5 Pro 在 MMAU-Pro 上总体约 60%</text>
   <text x="460" y="395" class="caption">GPT-4o Audio 52.5% — Qwen2.5-Omni 52.2%</text>
-  <text x="460" y="413" class="caption">multi-audio subset: ~22% ALL models (near random)</text>
-  <text x="460" y="441" class="content">streaming S2S: latency P50/P95 + WER</text>
+  <text x="460" y="413" class="caption">多音频子集：所有模型约 22%（接近随机）</text>
+  <text x="460" y="441" class="content">流式 S2S：P50/P95 延迟 + WER</text>
   <text x="460" y="459" class="content">Moshi 200 ms L4 · GPT-4o Realtime ~300 ms</text>
 </svg>

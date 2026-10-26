@@ -37,5 +37,5 @@
   <text x="535" y="327.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未启动服务器</text>
   <line x1="360" y1="307" x2="449" y2="307" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-6-head-ink)"/>
   <rect class="m-knock" x="368.5" y="290.42" width="72" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="404.5" y="301" font-size="11" text-anchor="middle">API socket</text>
+  <text x="404.5" y="301" font-size="11" text-anchor="middle">API 套接字</text>
 </svg>

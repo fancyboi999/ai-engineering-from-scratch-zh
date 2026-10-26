@@ -5,7 +5,7 @@ code: PR
 subtitle: 选择、构建并检查位置方案。用 Python 对比正弦、可学习位置编码、RoPE、YaRN 和 ALiBi。
 hue: 285
 sources: phases/07-transformers-deep-dive/04-positional-encoding, phases/19-capstone-projects/32-token-positional-embeddings, phases/10-llms-from-scratch/14-open-models-architecture-walkthroughs
-source_hash: e0c72d1b3cccae7f
+source_hash: 5ca31ae15a70e913
 ---
 
 ## 方案对比

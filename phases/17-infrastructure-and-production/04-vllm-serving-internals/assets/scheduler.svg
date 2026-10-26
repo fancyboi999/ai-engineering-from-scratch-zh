@@ -14,76 +14,76 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">vLLM scheduler — three compounding defaults</text>
+  <text x="480" y="24" text-anchor="middle" class="title">vLLM 调度器：三项相互增强的默认机制</text>
 
   <rect x="40" y="50" width="280" height="490" class="box"/>
-  <text x="180" y="72" text-anchor="middle" class="head">PagedAttention allocator</text>
+  <text x="180" y="72" text-anchor="middle" class="head">PagedAttention 分配器</text>
   <rect x="60" y="90" width="240" height="60" class="cool"/>
-  <text x="180" y="112" text-anchor="middle" class="step">KV cache = blocks of 16 tokens</text>
-  <text x="180" y="130" text-anchor="middle" class="small">block table per sequence;</text>
-  <text x="180" y="144" text-anchor="middle" class="small">allocate on demand, release on EOS</text>
+  <text x="180" y="112" text-anchor="middle" class="step">KV 缓存：每块 16 个 token</text>
+  <text x="180" y="130" text-anchor="middle" class="small">每条序列一张块表；</text>
+  <text x="180" y="144" text-anchor="middle" class="small">按需分配，遇到 EOS 释放</text>
   <rect x="60" y="160" width="240" height="60" class="cool"/>
-  <text x="180" y="182" text-anchor="middle" class="step">fragmentation &lt; 4%</text>
-  <text x="180" y="200" text-anchor="middle" class="small">vs 60-80% contiguous</text>
-  <text x="180" y="214" text-anchor="middle" class="small">pay only for tokens used</text>
+  <text x="180" y="182" text-anchor="middle" class="step">碎片率 &lt; 4%</text>
+  <text x="180" y="200" text-anchor="middle" class="small">连续分配的碎片率为 60-80%</text>
+  <text x="180" y="214" text-anchor="middle" class="small">仅为实际使用的 token 付出开销</text>
   <rect x="60" y="230" width="240" height="70" class="cold"/>
   <text x="180" y="252" text-anchor="middle" class="step">--gpu-memory-utilization = 0.9</text>
-  <text x="180" y="270" text-anchor="middle" class="small">the knob (not a flag)</text>
-  <text x="180" y="286" text-anchor="middle" class="small">PagedAttention is the only</text>
-  <text x="180" y="300" text-anchor="middle" class="small">allocator vLLM ships</text>
+  <text x="180" y="270" text-anchor="middle" class="small">调节项（不是功能开关）</text>
+  <text x="180" y="286" text-anchor="middle" class="small">PagedAttention 是 vLLM</text>
+  <text x="180" y="300" text-anchor="middle" class="small">提供的唯一分配器</text>
   <rect x="60" y="310" width="240" height="100" class="box"/>
-  <text x="180" y="332" text-anchor="middle" class="step">logical to physical map</text>
-  <text x="70" y="352" class="small">seq_A: [tok0..15] to block 37</text>
-  <text x="70" y="368" class="small">seq_A: [tok16..31] to block 12</text>
-  <text x="70" y="384" class="small">seq_B: [tok0..15] to block 42</text>
-  <text x="70" y="400" class="small">... block table grows with seq</text>
-  <text x="180" y="430" text-anchor="middle" class="caption">KV is virtual memory for sequences</text>
+  <text x="180" y="332" text-anchor="middle" class="step">逻辑到物理的映射</text>
+  <text x="70" y="352" class="small">seq_A: [tok0..15] 映射到块 37</text>
+  <text x="70" y="368" class="small">seq_A: [tok16..31] 映射到块 12</text>
+  <text x="70" y="384" class="small">seq_B: [tok0..15] 映射到块 42</text>
+  <text x="70" y="400" class="small">……块表随序列增长</text>
+  <text x="180" y="430" text-anchor="middle" class="caption">KV 是序列的虚拟内存</text>
 
   <rect x="340" y="50" width="280" height="490" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">continuous batching</text>
+  <text x="480" y="72" text-anchor="middle" class="head">连续批处理</text>
   <rect x="360" y="90" width="240" height="50" class="hot"/>
-  <text x="480" y="110" text-anchor="middle" class="step">iteration-level scheduling</text>
-  <text x="480" y="126" text-anchor="middle" class="small">admit / release every decode step</text>
+  <text x="480" y="110" text-anchor="middle" class="step">按迭代调度</text>
+  <text x="480" y="126" text-anchor="middle" class="small">每个解码步骤都准入或释放请求</text>
   <rect x="360" y="150" width="240" height="80" class="box"/>
-  <text x="480" y="170" text-anchor="middle" class="step">the loop</text>
-  <text x="370" y="190" class="small">1. drop finished seqs from RUNNING</text>
-  <text x="370" y="206" class="small">2. admit WAITING if KV blocks free</text>
-  <text x="370" y="222" class="small">3. one forward across the batch</text>
+  <text x="480" y="170" text-anchor="middle" class="step">调度循环</text>
+  <text x="370" y="190" class="small">1. 从 RUNNING 移除已完成序列</text>
+  <text x="370" y="206" class="small">2. KV 块有余量时准入 WAITING</text>
+  <text x="370" y="222" class="small">3. 整批执行一次前向传播</text>
   <rect x="360" y="240" width="240" height="70" class="cool"/>
-  <text x="480" y="262" text-anchor="middle" class="step">batch is always full of real work</text>
-  <text x="480" y="280" text-anchor="middle" class="small">no padding to longest seq</text>
-  <text x="480" y="296" text-anchor="middle" class="small">fast seqs leave, new seqs join</text>
+  <text x="480" y="262" text-anchor="middle" class="step">批次始终充满实际任务</text>
+  <text x="480" y="280" text-anchor="middle" class="small">无须填充至最长序列</text>
+  <text x="480" y="296" text-anchor="middle" class="small">快速序列退出，新序列加入</text>
   <rect x="360" y="320" width="240" height="90" class="cold"/>
-  <text x="480" y="342" text-anchor="middle" class="step">V1 scheduler (2026)</text>
-  <text x="480" y="360" text-anchor="middle" class="small">scheduler runs per iteration</text>
-  <text x="480" y="376" text-anchor="middle" class="small">not per request</text>
-  <text x="480" y="394" text-anchor="middle" class="small">check feature pairs against</text>
-  <text x="480" y="408" text-anchor="middle" class="small">the version's compat matrix</text>
-  <text x="480" y="430" text-anchor="middle" class="caption">3-4x over naive at 128 concurrent</text>
+  <text x="480" y="342" text-anchor="middle" class="step">V1 调度器（2026）</text>
+  <text x="480" y="360" text-anchor="middle" class="small">调度器逐次迭代运行</text>
+  <text x="480" y="376" text-anchor="middle" class="small">而非逐请求运行</text>
+  <text x="480" y="394" text-anchor="middle" class="small">对照当前版本的兼容矩阵</text>
+  <text x="480" y="408" text-anchor="middle" class="small">检查功能组合</text>
+  <text x="480" y="430" text-anchor="middle" class="caption">128 并发下为朴素实现的 3-4 倍</text>
 
   <rect x="640" y="50" width="280" height="490" class="box"/>
-  <text x="780" y="72" text-anchor="middle" class="head">chunked prefill</text>
+  <text x="780" y="72" text-anchor="middle" class="head">分块预填充</text>
   <rect x="660" y="90" width="240" height="60" class="hot"/>
-  <text x="780" y="112" text-anchor="middle" class="step">slice prefill into 512-tok chunks</text>
-  <text x="780" y="130" text-anchor="middle" class="small">interleave with decode</text>
-  <text x="780" y="144" text-anchor="middle" class="small">protect TTFT tail, not mean</text>
+  <text x="780" y="112" text-anchor="middle" class="step">将预填充切成 512-token 块</text>
+  <text x="780" y="130" text-anchor="middle" class="small">与解码交错执行</text>
+  <text x="780" y="144" text-anchor="middle" class="small">保护 TTFT 尾延迟，而非均值</text>
   <rect x="660" y="160" width="240" height="70" class="cool"/>
-  <text x="780" y="182" text-anchor="middle" class="step">P99 ITL under mixed load</text>
-  <text x="780" y="200" text-anchor="middle" class="small">without chunking: ~50 ms</text>
-  <text x="780" y="216" text-anchor="middle" class="small">with chunking: ~15 ms</text>
+  <text x="780" y="182" text-anchor="middle" class="step">混合负载下的 P99 ITL</text>
+  <text x="780" y="200" text-anchor="middle" class="small">不分块：约 50 ms</text>
+  <text x="780" y="216" text-anchor="middle" class="small">分块后：约 15 ms</text>
   <rect x="660" y="240" width="240" height="70" class="dsk"/>
-  <text x="780" y="262" text-anchor="middle" class="step">vLLM v0.18.0 feature matrix</text>
-  <text x="780" y="280" text-anchor="middle" class="small">spec decode + chunked prefill</text>
-  <text x="780" y="296" text-anchor="middle" class="small">marked compatible</text>
+  <text x="780" y="262" text-anchor="middle" class="step">vLLM v0.18.0 功能矩阵</text>
+  <text x="780" y="280" text-anchor="middle" class="small">推测解码 + 分块预填充</text>
+  <text x="780" y="296" text-anchor="middle" class="small">标记为兼容</text>
   <rect x="660" y="320" width="240" height="90" class="old"/>
-  <text x="780" y="342" text-anchor="middle" class="step">known spec-decode issues</text>
-  <text x="780" y="360" text-anchor="middle" class="small">pipeline parallelism:</text>
+  <text x="780" y="342" text-anchor="middle" class="step">已知推测解码问题</text>
+  <text x="780" y="360" text-anchor="middle" class="small">流水线并行：</text>
   <text x="780" y="376" text-anchor="middle" class="small">vllm &lt;= 0.15.0</text>
-  <text x="780" y="394" text-anchor="middle" class="small">draft models: vllm &lt;= 0.10.0</text>
-  <text x="780" y="430" text-anchor="middle" class="caption">read the release notes before flipping flags</text>
+  <text x="780" y="394" text-anchor="middle" class="small">草稿模型：vllm &lt;= 0.10.0</text>
+  <text x="780" y="430" text-anchor="middle" class="caption">切换开关前先读发布说明</text>
 
   <rect x="40" y="470" width="880" height="70" class="box"/>
-  <text x="480" y="492" text-anchor="middle" class="step">all three on together — Llama 3.3 70B FP8, H100 SXM5, 128 concurrent</text>
-  <text x="480" y="512" text-anchor="middle" class="small">throughput 2,200-2,400 tok/s  ·  25% over default vLLM  ·  3-4x naive PyTorch  ·  &lt; 4% fragmentation</text>
-  <text x="480" y="530" text-anchor="middle" class="caption">each default assumes the other two</text>
+  <text x="480" y="492" text-anchor="middle" class="step">三项同时启用：Llama 3.3 70B FP8、H100 SXM5、128 并发</text>
+  <text x="480" y="512" text-anchor="middle" class="small">吞吐 2,200-2,400 tok/s · 高于默认 vLLM 25% · 为朴素 PyTorch 的 3-4 倍 · 碎片率 &lt; 4%</text>
+  <text x="480" y="530" text-anchor="middle" class="caption">每项默认机制都假定另两项已启用</text>
 </svg>

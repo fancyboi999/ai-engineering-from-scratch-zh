@@ -17,63 +17,63 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">three failure modes, two enforcement points</text>
+  <text x="480" y="26" text-anchor="middle" class="title">三种失败模式，两个强制约束点</text>
 
   <rect x="40" y="50" width="400" height="440" class="box"/>
-  <text x="240" y="72" text-anchor="middle" class="head">prompt-for-JSON (no strict mode)</text>
+  <text x="240" y="72" text-anchor="middle" class="head">通过 prompt 要求 JSON（无严格模式）</text>
 
   <rect x="60" y="90" width="360" height="40" class="cool"/>
-  <text x="240" y="114" text-anchor="middle" class="step">generate freely</text>
+  <text x="240" y="114" text-anchor="middle" class="step">自由生成</text>
 
   <rect x="60" y="140" width="360" height="40" class="box"/>
-  <text x="240" y="164" text-anchor="middle" class="step">parse JSON</text>
+  <text x="240" y="164" text-anchor="middle" class="step">解析 JSON</text>
 
   <rect x="60" y="190" width="360" height="40" class="box"/>
-  <text x="240" y="214" text-anchor="middle" class="step">validate against schema</text>
+  <text x="240" y="214" text-anchor="middle" class="step">根据 schema 校验</text>
 
   <path d="M240,130 L240,140" class="edge" marker-end="url(#arrow)"/>
   <path d="M240,180 L240,190" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="60" y="260" width="360" height="40" class="hot"/>
-  <text x="240" y="284" text-anchor="middle" class="step">FAIL 1: parse error</text>
+  <text x="240" y="284" text-anchor="middle" class="step">失败 1：解析错误</text>
 
   <rect x="60" y="310" width="360" height="40" class="hot"/>
-  <text x="240" y="334" text-anchor="middle" class="step">FAIL 2: schema violation</text>
+  <text x="240" y="334" text-anchor="middle" class="step">失败 2：违反 schema</text>
 
   <rect x="60" y="360" width="360" height="40" class="cool"/>
-  <text x="240" y="384" text-anchor="middle" class="step">SUCCESS: typed payload</text>
+  <text x="240" y="384" text-anchor="middle" class="step">成功：带类型的载荷</text>
 
   <rect x="60" y="420" width="360" height="50" class="box"/>
-  <text x="240" y="443" text-anchor="middle" class="step">retry on failure (max 3x)</text>
-  <text x="240" y="459" text-anchor="middle" class="small">expensive but necessary without strict mode</text>
+  <text x="240" y="443" text-anchor="middle" class="step">失败时重试（最多 3 次）</text>
+  <text x="240" y="459" text-anchor="middle" class="small">开销大，但没有严格模式时必不可少</text>
 
   <rect x="480" y="50" width="440" height="440" class="cool"/>
-  <text x="700" y="72" text-anchor="middle" class="head">strict mode / constrained decoding</text>
+  <text x="700" y="72" text-anchor="middle" class="head">严格模式 / 约束解码</text>
 
   <rect x="500" y="90" width="400" height="50" class="cold"/>
-  <text x="700" y="110" text-anchor="middle" class="step">decode with schema-aware logit mask</text>
-  <text x="700" y="128" text-anchor="middle" class="small">grammar FSM rejects invalid next-tokens</text>
+  <text x="700" y="110" text-anchor="middle" class="step">使用 schema 感知 logits 掩码解码</text>
+  <text x="700" y="128" text-anchor="middle" class="small">语法有限状态机拒绝无效的下一个 token</text>
 
   <rect x="500" y="160" width="400" height="40" class="box"/>
-  <text x="700" y="184" text-anchor="middle" class="step">output parses (always)</text>
+  <text x="700" y="184" text-anchor="middle" class="step">输出始终可解析</text>
 
   <rect x="500" y="210" width="400" height="40" class="box"/>
-  <text x="700" y="234" text-anchor="middle" class="step">output validates (always)</text>
+  <text x="700" y="234" text-anchor="middle" class="step">输出始终通过校验</text>
 
   <path d="M700,140 L700,160" class="edge" marker-end="url(#arrow)"/>
   <path d="M700,200 L700,210" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="500" y="280" width="400" height="40" class="cool"/>
-  <text x="700" y="304" text-anchor="middle" class="step">SUCCESS: typed payload</text>
+  <text x="700" y="304" text-anchor="middle" class="step">成功：带类型的载荷</text>
 
   <rect x="500" y="330" width="400" height="40" class="hot"/>
-  <text x="700" y="354" text-anchor="middle" class="step">REFUSAL: typed reason</text>
+  <text x="700" y="354" text-anchor="middle" class="step">拒绝：带类型的原因</text>
 
   <rect x="500" y="400" width="400" height="80" class="box"/>
   <text x="520" y="422" class="step">OpenAI     : response_format strict:true</text>
-  <text x="520" y="440" class="step">Anthropic  : input_schema on tool_use</text>
-  <text x="520" y="458" class="step">Gemini     : responseSchema + grammar</text>
-  <text x="520" y="476" class="step">Open       : outlines / guidance / lm-format-enforcer</text>
+  <text x="520" y="440" class="step">Anthropic：tool_use 的 input_schema</text>
+  <text x="520" y="458" class="step">Gemini：responseSchema + 语法</text>
+  <text x="520" y="476" class="step">开放方案：outlines / guidance / lm-format-enforcer</text>
 
-  <text x="480" y="506" text-anchor="middle" class="caption">under strict, only the refusal branch stays; the retry loop collapses.</text>
+  <text x="480" y="506" text-anchor="middle" class="caption">严格模式下仅保留拒绝分支，无须重试循环。</text>
 </svg>

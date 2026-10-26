@@ -15,12 +15,12 @@
   </defs>
 
   <rect class="box" x="20" y="30" width="200" height="260" rx="4"/>
-  <text class="label" x="120" y="55" text-anchor="middle">1. count</text>
-  <text class="content" x="35" y="90">training corpus</text>
+  <text class="label" x="120" y="55" text-anchor="middle">1. 计数</text>
+  <text class="content" x="35" y="90">训练语料</text>
   <text class="content" x="35" y="115">  "the cat sat"</text>
   <text class="content" x="35" y="135">  "the cat ran"</text>
   <text class="content" x="35" y="155">  "the dog sat"</text>
-  <text class="content" x="35" y="190">trigram counts:</text>
+  <text class="content" x="35" y="190">三元语法计数：</text>
   <text class="content" x="35" y="210">  (the, cat, sat): 1</text>
   <text class="content" x="35" y="230">  (the, cat, ran): 1</text>
   <text class="content" x="35" y="250">  (the, dog, sat): 1</text>
@@ -29,42 +29,42 @@
   <path class="line" d="M 220 160 L 260 160" marker-end="url(#arrow)"/>
 
   <rect class="hot" x="260" y="30" width="220" height="260" rx="4"/>
-  <text class="label" x="370" y="55" text-anchor="middle">2. smooth</text>
-  <text class="content" x="275" y="90">raw count gives zero</text>
-  <text class="content" x="275" y="110">to unseen n-grams.</text>
-  <text class="content" x="275" y="145">Kneser-Ney redistributes:</text>
-  <text class="content" x="275" y="170">  discount seen counts</text>
-  <text class="content" x="275" y="190">  use continuation prob</text>
-  <text class="content" x="275" y="210">  for unseen words</text>
+  <text class="label" x="370" y="55" text-anchor="middle">2. 平滑</text>
+  <text class="content" x="275" y="90">原始计数会给未见过的</text>
+  <text class="content" x="275" y="110">n-gram 零概率。</text>
+  <text class="content" x="275" y="145">Kneser-Ney 重新分配概率：</text>
+  <text class="content" x="275" y="170">  对已见计数打折</text>
+  <text class="content" x="275" y="190">  为未见词使用</text>
+  <text class="content" x="275" y="210">  延续概率</text>
   <text class="content" x="275" y="245">P(w | prev) = max(c-D, 0)/N</text>
   <text class="content" x="275" y="265">        + λ · P_cont(w)</text>
 
   <path class="line" d="M 480 160 L 520 160" marker-end="url(#arrow)"/>
 
   <rect class="box" x="520" y="30" width="180" height="260" rx="4"/>
-  <text class="label" x="610" y="55" text-anchor="middle">3. generate</text>
-  <text class="content" x="535" y="90">sample from</text>
+  <text class="label" x="610" y="55" text-anchor="middle">3. 生成</text>
+  <text class="content" x="535" y="90">从以下分布采样</text>
   <text class="content" x="535" y="110">P(w | prev):</text>
-  <text class="content" x="535" y="145">"the" (start)</text>
+  <text class="content" x="535" y="145">"the"（起点）</text>
   <text class="content" x="535" y="165">  -> "cat" (p=0.6)</text>
   <text class="content" x="535" y="185">     -> "sat" (p=0.4)</text>
   <text class="content" x="535" y="205">        -> "on"</text>
   <text class="content" x="535" y="225">           -> "the"</text>
-  <text class="content" x="535" y="250">locally plausible,</text>
-  <text class="content" x="535" y="270">globally incoherent.</text>
+  <text class="content" x="535" y="250">局部合理，</text>
+  <text class="content" x="535" y="270">全局不连贯。</text>
 
   <path class="line" d="M 700 160 L 740 160" marker-end="url(#arrow)"/>
 
   <rect class="box" x="740" y="30" width="140" height="260" rx="4"/>
-  <text class="label" x="810" y="55" text-anchor="middle">4. evaluate</text>
-  <text class="content" x="755" y="100">perplexity</text>
+  <text class="label" x="810" y="55" text-anchor="middle">4. 评估</text>
+  <text class="content" x="755" y="100">困惑度</text>
   <text class="content" x="755" y="125">= exp(- (1/N) Σ</text>
   <text class="content" x="755" y="145">   log P(w_i | ctx))</text>
-  <text class="content" x="755" y="180">lower = better</text>
-  <text class="content" x="755" y="220">Brown corpus:</text>
-  <text class="content" x="755" y="240">  KN 4-gram ~140</text>
-  <text class="content" x="755" y="260">  transformer ~20</text>
+  <text class="content" x="755" y="180">越低越好</text>
+  <text class="content" x="755" y="220">Brown 语料：</text>
+  <text class="content" x="755" y="240">  KN 4-gram 约 140</text>
+  <text class="content" x="755" y="260">  transformer 约 20</text>
 
-  <text class="stage" x="450" y="330" text-anchor="middle">Kneser-Ney stayed the best n-gram smoother for 20 years.</text>
-  <text class="stage" x="450" y="350" text-anchor="middle">Transformers closed the perplexity gap by ~10x, not by inventing a better smoother.</text>
+  <text class="stage" x="450" y="330" text-anchor="middle">Kneser-Ney 作为最佳 n-gram 平滑方法保持了 20 年。</text>
+  <text class="stage" x="450" y="350" text-anchor="middle">Transformer 将困惑度差距缩小约 10 倍，靠的并非发明更好的平滑方法。</text>
 </svg>

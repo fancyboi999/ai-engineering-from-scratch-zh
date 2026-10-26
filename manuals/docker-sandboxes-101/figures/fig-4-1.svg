@@ -42,7 +42,7 @@
   <text x="92" y="501" font-size="11">- example.com</text>
   <text x="26" y="518" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">type/config 列表（kitspec7）</text>
   <rect x="356" y="28" width="264" height="72" fill="var(--m-panel, #f3f1e8)" stroke="var(--m-grey-ink, #5e5e59)"/>
-  <text x="364" y="45" font-size="12" font-weight="700">OCI image index，tag v1</text>
+  <text x="364" y="45" font-size="12" font-weight="700">OCI 镜像索引，标签 v1</text>
   <text x="364" y="61" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">application/vnd.oci.image.index.v1+json</text>
   <text x="364" y="76" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">linux/arm64与证明 manifest</text>
   <text x="364" y="91" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">annotations：无</text>

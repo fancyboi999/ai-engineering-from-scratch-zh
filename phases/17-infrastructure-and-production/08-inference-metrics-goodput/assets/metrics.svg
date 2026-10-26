@@ -13,54 +13,54 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">Inference metrics — throughput lies, goodput tells the truth</text>
+  <text x="480" y="24" text-anchor="middle" class="title">推理指标 — 吞吐会误导，有效吞吐揭示真相</text>
 
   <rect x="40" y="50" width="440" height="230" class="box"/>
-  <text x="260" y="72" text-anchor="middle" class="head">the four latencies</text>
+  <text x="260" y="72" text-anchor="middle" class="head">四种延迟</text>
   <rect x="60" y="90" width="400" height="35" class="cool"/>
-  <text x="260" y="112" text-anchor="middle" class="step">TTFT = queue + network + prefill</text>
+  <text x="260" y="112" text-anchor="middle" class="step">TTFT = 排队 + 网络 + 预填充</text>
   <rect x="60" y="130" width="400" height="35" class="cold"/>
-  <text x="260" y="152" text-anchor="middle" class="step">TPOT / ITL = decode per token after first</text>
+  <text x="260" y="152" text-anchor="middle" class="step">TPOT / ITL = 首个 token 后的逐 token 解码</text>
   <rect x="60" y="170" width="400" height="35" class="dsk"/>
   <text x="260" y="192" text-anchor="middle" class="step">E2E = TTFT + TPOT * output_len</text>
   <rect x="60" y="210" width="400" height="35" class="hot"/>
   <text x="260" y="232" text-anchor="middle" class="step">throughput = total_tokens / elapsed</text>
-  <text x="260" y="263" text-anchor="middle" class="caption">throughput is a fleet metric, not a user metric</text>
+  <text x="260" y="263" text-anchor="middle" class="caption">吞吐是集群指标，不是用户指标</text>
 
   <rect x="500" y="50" width="420" height="230" class="box"/>
-  <text x="710" y="72" text-anchor="middle" class="head">goodput — the SLO gate</text>
+  <text x="710" y="72" text-anchor="middle" class="head">有效吞吐 — SLO 关卡</text>
   <rect x="520" y="90" width="380" height="115" class="cool"/>
-  <text x="710" y="112" text-anchor="middle" class="step">goodput = P[ all SLO constraints held ]</text>
-  <text x="710" y="132" text-anchor="middle" class="small">TTFT P99 &lt;= a  AND</text>
-  <text x="710" y="150" text-anchor="middle" class="small">TPOT P99 &lt;= b  AND</text>
+  <text x="710" y="112" text-anchor="middle" class="step">goodput = P[所有 SLO 约束均满足]</text>
+  <text x="710" y="132" text-anchor="middle" class="small">TTFT P99 &lt;= a 且</text>
+  <text x="710" y="150" text-anchor="middle" class="small">TPOT P99 &lt;= b 且</text>
   <text x="710" y="168" text-anchor="middle" class="small">E2E P99 &lt;= c</text>
-  <text x="710" y="190" text-anchor="middle" class="small">a request is "good" only if every bound held</text>
+  <text x="710" y="190" text-anchor="middle" class="small">只有满足所有边界，请求才算“合格”</text>
   <rect x="520" y="215" width="380" height="55" class="hot"/>
-  <text x="710" y="237" text-anchor="middle" class="step">target : goodput >= 99%</text>
-  <text x="710" y="256" text-anchor="middle" class="small">used in MLPerf Inference v6.0 submissions</text>
+  <text x="710" y="237" text-anchor="middle" class="step">目标：goodput &gt;= 99%</text>
+  <text x="710" y="256" text-anchor="middle" class="small">用于 MLPerf Inference v6.0 提交</text>
 
   <rect x="40" y="300" width="440" height="230" class="box"/>
-  <text x="260" y="322" text-anchor="middle" class="head">percentiles — never mean alone</text>
+  <text x="260" y="322" text-anchor="middle" class="head">百分位数 — 不能只看均值</text>
   <rect x="60" y="340" width="400" height="35" class="cool"/>
-  <text x="260" y="362" text-anchor="middle" class="step">always P50, P90, P99</text>
+  <text x="260" y="362" text-anchor="middle" class="step">始终报告 P50、P90、P99</text>
   <rect x="60" y="380" width="400" height="35" class="cold"/>
-  <text x="260" y="402" text-anchor="middle" class="step">LLM distributions are right-skewed</text>
+  <text x="260" y="402" text-anchor="middle" class="step">LLM 分布呈右偏态</text>
   <rect x="60" y="420" width="400" height="35" class="hot"/>
-  <text x="260" y="442" text-anchor="middle" class="step">mean TPOT 7 ms can hide P99 of 40 ms</text>
+  <text x="260" y="442" text-anchor="middle" class="step">平均 TPOT 7 ms 可能掩盖 40 ms 的 P99</text>
   <rect x="60" y="460" width="400" height="55" class="dsk"/>
-  <text x="260" y="482" text-anchor="middle" class="step">reference (Llama-3.1-8B on TRT-LLM, 2026)</text>
-  <text x="260" y="500" text-anchor="middle" class="small">TTFT 162 ms, TPOT 7.33 ms, E2E 1093 ms (mean)</text>
+  <text x="260" y="482" text-anchor="middle" class="step">参考（TRT-LLM 上的 Llama-3.1-8B，2026）</text>
+  <text x="260" y="500" text-anchor="middle" class="small">TTFT 162 ms、TPOT 7.33 ms、E2E 1093 ms（均值）</text>
 
   <rect x="500" y="300" width="420" height="230" class="box"/>
-  <text x="710" y="322" text-anchor="middle" class="head">measurement trap</text>
+  <text x="710" y="322" text-anchor="middle" class="head">测量陷阱</text>
   <rect x="520" y="340" width="380" height="50" class="hot"/>
   <text x="710" y="362" text-anchor="middle" class="step">GenAI-Perf vs LLMPerf</text>
-  <text x="710" y="380" text-anchor="middle" class="small">same run, different TPOT</text>
+  <text x="710" y="380" text-anchor="middle" class="small">相同运行，不同 TPOT</text>
   <rect x="520" y="395" width="380" height="55" class="cool"/>
   <text x="710" y="417" text-anchor="middle" class="step">GenAI-Perf (NVIDIA)</text>
-  <text x="710" y="435" text-anchor="middle" class="small">ITL excludes TTFT ; starts from token 2</text>
+  <text x="710" y="435" text-anchor="middle" class="small">ITL 排除 TTFT；从 token 2 开始</text>
   <rect x="520" y="455" width="380" height="55" class="cold"/>
   <text x="710" y="477" text-anchor="middle" class="step">LLMPerf (Ray / Anyscale)</text>
-  <text x="710" y="495" text-anchor="middle" class="small">ITL includes TTFT ; starts from token 1</text>
-  <text x="710" y="522" text-anchor="middle" class="caption">state tool + version in every report</text>
+  <text x="710" y="495" text-anchor="middle" class="small">ITL 包含 TTFT；从 token 1 开始</text>
+  <text x="710" y="522" text-anchor="middle" class="caption">每份报告都说明工具 + 版本</text>
 </svg>

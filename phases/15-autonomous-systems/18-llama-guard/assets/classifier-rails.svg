@@ -16,34 +16,34 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Input rails + model + output rails + dialog rails</text>
+  <text x="440" y="26" text-anchor="middle" class="title">输入护栏 + 模型 + 输出护栏 + 对话护栏</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- User turn -->
   <rect x="60" y="80" width="130" height="60" class="cool"/>
-  <text x="125" y="104" text-anchor="middle" class="label">user turn</text>
-  <text x="125" y="122" text-anchor="middle" class="small">text / image</text>
+  <text x="125" y="104" text-anchor="middle" class="label">用户轮次</text>
+  <text x="125" y="122" text-anchor="middle" class="small">文本 / 图像</text>
 
   <!-- Normalize -->
   <rect x="210" y="80" width="130" height="60" class="warn"/>
-  <text x="275" y="104" text-anchor="middle" class="label">normalize</text>
-  <text x="275" y="122" text-anchor="middle" class="small">NFKC + homoglyph</text>
+  <text x="275" y="104" text-anchor="middle" class="label">归一化</text>
+  <text x="275" y="122" text-anchor="middle" class="small">NFKC + 同形字符</text>
 
   <!-- Input rail -->
   <rect x="360" y="80" width="130" height="60" class="cold"/>
-  <text x="425" y="104" text-anchor="middle" class="label">input rail</text>
+  <text x="425" y="104" text-anchor="middle" class="label">输入护栏</text>
   <text x="425" y="122" text-anchor="middle" class="small">Llama Guard 4</text>
 
   <!-- Model -->
   <rect x="510" y="80" width="130" height="60" class="cool"/>
-  <text x="575" y="104" text-anchor="middle" class="label">main model</text>
-  <text x="575" y="122" text-anchor="middle" class="small">(Lesson 17 weights)</text>
+  <text x="575" y="104" text-anchor="middle" class="label">主模型</text>
+  <text x="575" y="122" text-anchor="middle" class="small">（第 17 课权重）</text>
 
   <!-- Output rail -->
   <rect x="660" y="80" width="160" height="60" class="cold"/>
-  <text x="740" y="104" text-anchor="middle" class="label">output rail</text>
-  <text x="740" y="122" text-anchor="middle" class="small">Llama Guard / regex</text>
+  <text x="740" y="104" text-anchor="middle" class="label">输出护栏</text>
+  <text x="740" y="122" text-anchor="middle" class="small">Llama Guard / 正则表达式</text>
 
   <path d="M190 110 L210 110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M340 110 L360 110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -52,22 +52,22 @@
 
   <!-- Dialog rail -->
   <rect x="60" y="160" width="760" height="50" class="warn"/>
-  <text x="440" y="184" text-anchor="middle" class="label">dialog rail (Colang): cross-turn constraints — e.g. never discuss medical diagnosis, even if asked three ways</text>
+  <text x="440" y="184" text-anchor="middle" class="label">对话护栏（Colang）：跨轮约束，例如即使用三种方式提问，也不讨论医疗诊断</text>
 
   <!-- Taxonomy -->
   <rect x="60" y="230" width="760" height="100" class="cool"/>
-  <text x="440" y="254" text-anchor="middle" class="label">taxonomy (Llama Guard 4 S1–S14)</text>
-  <text x="80" y="276" class="content">S1 violent crimes · S2 non-violent crimes · S3 sex crimes · S4 child exploit</text>
-  <text x="80" y="292" class="content">S5 defamation · S6 specialized advice · S7 privacy · S8 IP · S9 indiscriminate weapons</text>
-  <text x="80" y="308" class="content">S10 hate · S11 self-harm · S12 sexual content · S13 elections · S14 code interpreter abuse</text>
+  <text x="440" y="254" text-anchor="middle" class="label">分类体系（Llama Guard 4 S1–S14）</text>
+  <text x="80" y="276" class="content">S1 暴力犯罪 · S2 非暴力犯罪 · S3 性犯罪 · S4 儿童剥削</text>
+  <text x="80" y="292" class="content">S5 诽谤 · S6 专业建议 · S7 隐私 · S8 知识产权 · S9 无差别武器</text>
+  <text x="80" y="308" class="content">S10 仇恨 · S11 自伤 · S12 性内容 · S13 选举 · S14 代码解释器滥用</text>
 
   <!-- Attack corpus -->
   <rect x="60" y="350" width="760" height="140" class="hot"/>
-  <text x="440" y="374" text-anchor="middle" class="label">documented bypasses — Huang et al. arXiv:2504.11168 (2025)</text>
-  <text x="80" y="398" class="content">Emoji Smuggling: 100% ASR on six guard systems</text>
-  <text x="80" y="414" class="content">NeMo Guard Detect: 72.54% ASR on adversarial jailbreak set</text>
-  <text x="80" y="430" class="content">Homoglyph substitution: Cyrillic "р" for Latin "p"; classifier misses</text>
-  <text x="80" y="446" class="content">Semantic paraphrase: same intent, novel vocabulary; fine-tune cannot cover all</text>
-  <text x="80" y="466" class="content">mitigation: normalize + classifier + constitution (L17) + runtime (L10/13/14)</text>
-  <text x="80" y="482" class="small">classifiers are a layer, not a solution</text>
+  <text x="440" y="374" text-anchor="middle" class="label">已记录的绕过方式：Huang 等，arXiv:2504.11168（2025）</text>
+  <text x="80" y="398" class="content">表情符号夹带：六种防护系统上的攻击成功率为 100%</text>
+  <text x="80" y="414" class="content">NeMo Guard Detect：对抗越狱测试集上的攻击成功率为 72.54%</text>
+  <text x="80" y="430" class="content">同形字符替换：以西里尔字母 "р" 替换拉丁字母 "p"，分类器漏检</text>
+  <text x="80" y="446" class="content">语义改写：意图相同，词汇不同；微调无法穷尽覆盖</text>
+  <text x="80" y="466" class="content">缓解：归一化 + 分类器 + 原则集（L17）+ 运行时（L10/13/14）</text>
+  <text x="80" y="482" class="small">分类器是一层防护，而非完整方案</text>
 </svg>

@@ -5,7 +5,7 @@ code: SL
 subtitle: Chinchilla 数学、超额训练、从原始文本到打包批次的数据流水线，以及迷你 GPT 训练循环。
 hue: 12
 sources: phases/07-transformers-deep-dive/13-scaling-laws, phases/10-llms-from-scratch/03-data-pipelines, phases/10-llms-from-scratch/04-pre-training-mini-gpt
-source_hash: f05f9c58ae7327d0
+source_hash: ac1c47320162216c
 ---
 
 ## 数据流水线

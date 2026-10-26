@@ -15,55 +15,55 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">MAST taxonomy — the 2026 reference for multi-agent failure modes</text>
+  <text x="480" y="28" text-anchor="middle" class="title">MAST 分类法：2026 多 agent 失败模式参考</text>
 
   <rect x="40" y="60" width="880" height="200" class="box"/>
-  <text x="480" y="84" text-anchor="middle" class="head">three MAST categories (Cemri 2025, NeurIPS) — 41-86.7% failure rate on real MAS</text>
+  <text x="480" y="84" text-anchor="middle" class="head">三类 MAST（Cemri 2025，NeurIPS）：真实多 agent 系统失败率 41-86.7%</text>
 
   <rect x="60" y="110" width="270" height="130" class="hot"/>
-  <text x="195" y="134" text-anchor="middle" class="head">Specification</text>
+  <text x="195" y="134" text-anchor="middle" class="head">规格</text>
   <text x="195" y="154" text-anchor="middle" class="step">41.77%</text>
-  <text x="195" y="180" text-anchor="middle" class="small">role ambiguity</text>
-  <text x="195" y="196" text-anchor="middle" class="small">unclear task definition</text>
-  <text x="195" y="212" text-anchor="middle" class="small">implicit success criteria</text>
-  <text x="195" y="232" text-anchor="middle" class="caption">fix: explicit role contracts</text>
+  <text x="195" y="180" text-anchor="middle" class="small">角色不明确</text>
+  <text x="195" y="196" text-anchor="middle" class="small">任务定义不清</text>
+  <text x="195" y="212" text-anchor="middle" class="small">隐含成功标准</text>
+  <text x="195" y="232" text-anchor="middle" class="caption">修正：显式角色契约</text>
 
   <rect x="345" y="110" width="270" height="130" class="cool"/>
-  <text x="480" y="134" text-anchor="middle" class="head">Coordination</text>
+  <text x="480" y="134" text-anchor="middle" class="head">协调</text>
   <text x="480" y="154" text-anchor="middle" class="step">36.94%</text>
-  <text x="480" y="180" text-anchor="middle" class="small">state desync</text>
-  <text x="480" y="196" text-anchor="middle" class="small">message loss / timeout</text>
-  <text x="480" y="212" text-anchor="middle" class="small">concurrent writes</text>
-  <text x="480" y="232" text-anchor="middle" class="caption">fix: versioned state + acks</text>
+  <text x="480" y="180" text-anchor="middle" class="small">状态不同步</text>
+  <text x="480" y="196" text-anchor="middle" class="small">消息丢失或超时</text>
+  <text x="480" y="212" text-anchor="middle" class="small">并发写入</text>
+  <text x="480" y="232" text-anchor="middle" class="caption">修正：带版本状态 + 确认</text>
 
   <rect x="630" y="110" width="270" height="130" class="cold"/>
-  <text x="765" y="134" text-anchor="middle" class="head">Verification</text>
+  <text x="765" y="134" text-anchor="middle" class="head">验证</text>
   <text x="765" y="154" text-anchor="middle" class="step">21.30%</text>
-  <text x="765" y="180" text-anchor="middle" class="small">no independent checker</text>
-  <text x="765" y="196" text-anchor="middle" class="small">chain of trust</text>
-  <text x="765" y="212" text-anchor="middle" class="small">silent wrong outputs</text>
-  <text x="765" y="232" text-anchor="middle" class="caption">fix: unwritable verifier</text>
+  <text x="765" y="180" text-anchor="middle" class="small">缺少独立检查器</text>
+  <text x="765" y="196" text-anchor="middle" class="small">信任链</text>
+  <text x="765" y="212" text-anchor="middle" class="small">静默错误输出</text>
+  <text x="765" y="232" text-anchor="middle" class="caption">修正：不可写的验证器</text>
 
   <rect x="40" y="270" width="880" height="230" class="cool"/>
-  <text x="480" y="294" text-anchor="middle" class="head">Groupthink family (arXiv:2508.05687)</text>
+  <text x="480" y="294" text-anchor="middle" class="head">群体思维家族（arXiv:2508.05687）</text>
 
-  <text x="60" y="326" class="step">monoculture</text>
-  <text x="220" y="326" class="small">same base model → correlated hallucinations</text>
+  <text x="60" y="326" class="step">同质化</text>
+  <text x="220" y="326" class="small">相同基础模型 → 相关幻觉</text>
 
-  <text x="60" y="352" class="step">conformity</text>
-  <text x="220" y="352" class="small">agents align with loudest peer; rewards sycophancy</text>
+  <text x="60" y="352" class="step">从众</text>
+  <text x="220" y="352" class="small">agent 跟随最强势同伴，奖励迎合</text>
 
-  <text x="60" y="378" class="step">deficient ToM</text>
-  <text x="220" y="378" class="small">fails to model each other (Lesson 18); long-horizon break</text>
+  <text x="60" y="378" class="step">心智理论不足</text>
+  <text x="220" y="378" class="small">不能相互建模（第 18 课）；长时域失效</text>
 
-  <text x="60" y="404" class="step">mixed-motive</text>
-  <text x="220" y="404" class="small">partial-incentive alignment → compromise-middle outputs</text>
+  <text x="60" y="404" class="step">混合动机</text>
+  <text x="220" y="404" class="small">激励仅部分对齐 → 折中式中间答案</text>
 
-  <text x="60" y="430" class="step">cascading</text>
-  <text x="220" y="430" class="small">retry storms; one failure amplifies through dependencies</text>
+  <text x="60" y="430" class="step">级联</text>
+  <text x="220" y="430" class="small">重试风暴；失败沿依赖放大</text>
 
-  <text x="60" y="466" class="step">fix: STRATUS</text>
-  <text x="220" y="466" class="small">detection + diagnosis + validation agents → 1.5x mitigation success</text>
-  <text x="60" y="486" class="step">+ breakers</text>
-  <text x="220" y="486" class="small">circuit breakers on every outbound call; capped retries</text>
+  <text x="60" y="466" class="step">修正：STRATUS</text>
+  <text x="220" y="466" class="small">检测、诊断、验证 agent → 缓解成功率提高 1.5 倍</text>
+  <text x="60" y="486" class="step">+ 熔断器</text>
+  <text x="220" y="486" class="small">每次外部调用使用熔断器，并限制重试</text>
 </svg>

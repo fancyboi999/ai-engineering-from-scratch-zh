@@ -5,7 +5,7 @@ code: SB
 subtitle: 选择成本最低的隔离配置，在运行器中拒绝无效调用，并设置 sbx 网络、秘密与安全策略。
 hue: 352
 sources: phases/19-capstone-projects/26-sandbox-runner-denylist, projects/sandbox-ladder, manuals/docker-sandboxes-101
-source_hash: 9e0646a1fa06faa9
+source_hash: 29fafb01c9995111
 ---
 
 ## 隔离配置阶梯

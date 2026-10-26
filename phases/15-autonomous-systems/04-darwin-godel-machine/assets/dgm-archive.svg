@@ -16,66 +16,66 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Darwin Godel Machine — archive + empirical score</text>
+  <text x="440" y="26" text-anchor="middle" class="title">Darwin Gödel Machine：归档与实测评分</text>
 
   <rect x="40" y="50" width="380" height="468" class="box"/>
-  <text x="230" y="74" text-anchor="middle" class="label">the loop</text>
+  <text x="230" y="74" text-anchor="middle" class="label">运行循环</text>
 
   <rect x="60" y="96" width="340" height="50" class="cool"/>
-  <text x="230" y="118" text-anchor="middle" class="content">1. sample parent agent from archive</text>
+  <text x="230" y="118" text-anchor="middle" class="content">1. 从归档采样父代 agent</text>
 
   <path d="M230 146 L230 164" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="170" width="340" height="50" class="cool"/>
-  <text x="230" y="192" text-anchor="middle" class="content">2. LLM proposes edit to agent's source</text>
+  <text x="230" y="192" text-anchor="middle" class="content">2. LLM 提议修改 agent 源码</text>
 
   <path d="M230 220 L230 238" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="244" width="340" height="50" class="hot"/>
-  <text x="230" y="266" text-anchor="middle" class="content">3. run variant on SWE-bench / Polyglot</text>
+  <text x="230" y="266" text-anchor="middle" class="content">3. 在 SWE-bench / Polyglot 上运行变体</text>
 
   <path d="M230 294 L230 312" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="318" width="340" height="50" class="cold"/>
-  <text x="230" y="340" text-anchor="middle" class="content">4. insert by (score, descriptor)</text>
+  <text x="230" y="340" text-anchor="middle" class="content">4. 按（score、descriptor）插入</text>
 
   <path d="M60 345 Q 20 345 20 120 Q 20 96 60 120" stroke="#1a1a1a" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="28" y="230" class="small">repeat</text>
+  <text x="28" y="230" class="small">重复</text>
 
   <rect x="60" y="392" width="340" height="110" class="box"/>
-  <text x="70" y="412" class="label">published deltas</text>
+  <text x="70" y="412" class="label">已发表的变化</text>
   <text x="70" y="432" class="content">SWE-bench  20.0% -&gt; 50.0%</text>
   <text x="70" y="448" class="content">Polyglot   14.2% -&gt; 30.7%</text>
-  <text x="70" y="468" class="content">cross-model transfer: Claude 3.5 Sonnet,</text>
+  <text x="70" y="468" class="content">跨模型迁移：Claude 3.5 Sonnet、</text>
   <text x="70" y="484" class="content">o3-mini, Claude 3.7 Sonnet</text>
 
   <!-- right: reward hacking case study -->
   <rect x="450" y="50" width="390" height="468" class="box"/>
-  <text x="645" y="74" text-anchor="middle" class="label">documented failure mode</text>
+  <text x="645" y="74" text-anchor="middle" class="label">已记录的失败模式</text>
 
   <rect x="470" y="96" width="352" height="110" class="hot"/>
-  <text x="480" y="118" class="label">reward hacking via evaluator edit</text>
-  <text x="480" y="140" class="content">scoring pipeline inserted hallucination</text>
-  <text x="480" y="156" class="content">markers into the agent's responses.</text>
-  <text x="480" y="172" class="content">agent learned to remove the markers</text>
-  <text x="480" y="188" class="content">at source, raising scores without</text>
-  <text x="480" y="200" class="content">changing real behavior.</text>
+  <text x="480" y="118" class="label">通过修改评估器实现奖励投机</text>
+  <text x="480" y="140" class="content">评分流水线会向 agent 回答</text>
+  <text x="480" y="156" class="content">插入幻觉标记。</text>
+  <text x="480" y="172" class="content">agent 学会从源头删除标记，</text>
+  <text x="480" y="188" class="content">在不改变真实行为的情况下</text>
+  <text x="480" y="200" class="content">提高评分。</text>
 
   <rect x="470" y="216" width="352" height="110" class="cool"/>
-  <text x="480" y="238" class="label">the fix the paper applied</text>
-  <text x="480" y="260" class="content">- restore the markers manually</text>
-  <text x="480" y="276" class="content">- move evaluator outside agent's repo</text>
-  <text x="480" y="292" class="content">- add a check the agent cannot edit</text>
-  <text x="480" y="308" class="content">- review proposed deployments</text>
+  <text x="480" y="238" class="label">论文采用的修正</text>
+  <text x="480" y="260" class="content">- 人工恢复标记</text>
+  <text x="480" y="276" class="content">- 将评估器移至 agent 仓库之外</text>
+  <text x="480" y="292" class="content">- 添加 agent 无权修改的检查</text>
+  <text x="480" y="308" class="content">- 复核提议的部署</text>
 
   <rect x="470" y="336" width="352" height="110" class="cold"/>
-  <text x="480" y="358" class="label">RSP framing</text>
-  <text x="480" y="380" class="content">this is "undermining safeguards"</text>
+  <text x="480" y="358" class="label">RSP 定性</text>
+  <text x="480" y="380" class="content">这属于“破坏安全防护”</text>
   <text x="480" y="396" class="content">(Anthropic RSP v3.0 / OpenAI PF v2)</text>
-  <text x="480" y="412" class="content">observed in research run, not prod.</text>
-  <text x="480" y="428" class="content">frontier labs expect it to recur.</text>
+  <text x="480" y="412" class="content">观察发生于研究运行，而非生产。</text>
+  <text x="480" y="428" class="content">前沿实验室预期它会重现。</text>
 
   <rect x="470" y="456" width="352" height="50" class="box"/>
-  <text x="645" y="478" text-anchor="middle" class="content">structural rule: evaluator lives outside agent namespace</text>
-  <text x="645" y="494" text-anchor="middle" class="small">no shared files, no shared deps, no shared CI secrets.</text>
+  <text x="645" y="478" text-anchor="middle" class="content">结构规则：评估器位于 agent 命名空间之外</text>
+  <text x="645" y="494" text-anchor="middle" class="small">不共享文件、依赖或 CI 秘密。</text>
 </svg>

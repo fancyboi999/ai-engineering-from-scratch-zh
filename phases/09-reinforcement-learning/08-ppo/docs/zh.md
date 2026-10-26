@@ -19,7 +19,7 @@ PPO（Schulman 等人 2017）把硬性的信任域约束换成一个简单的裁
 
 ## 核心概念
 
-![PPO clipped surrogate objective: ratio clipping at 1 ± ε](../assets/ppo.svg)
+![PPO 截断替代目标：在 1 ± ε 处截断概率比](../assets/ppo.svg)
 
 **重要性比率。**
 

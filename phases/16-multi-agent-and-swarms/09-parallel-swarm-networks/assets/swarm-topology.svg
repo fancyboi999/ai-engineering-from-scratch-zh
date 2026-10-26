@@ -16,11 +16,11 @@
       .edge { stroke: #1a1a1a; stroke-width: 1.2; fill: none; }
     </style>
   </defs>
-  <text x="450" y="28" text-anchor="middle" class="title">Swarm / parallel / networked architecture — no orchestrator</text>
+  <text x="450" y="28" text-anchor="middle" class="title">群体 / 并行 / 网络架构：没有编排者</text>
 
   <rect x="180" y="70" width="540" height="60" class="cold"/>
-  <text x="450" y="90" text-anchor="middle" class="head">shared queue (durable event bus in production)</text>
-  <text x="450" y="110" text-anchor="middle" class="small">T1 (slow) · T2 (fast) · T3 (slow) · T4 (fast) · T5 (fast) · ...</text>
+  <text x="450" y="90" text-anchor="middle" class="head">共享队列（生产使用持久事件总线）</text>
+  <text x="450" y="110" text-anchor="middle" class="small">T1（慢）· T2（快）· T3（慢）· T4（快）· T5（快）· ...</text>
 
   <line x1="250" y1="130" x2="180" y2="170" class="edge" marker-end="url(#arrow)"/>
   <line x1="350" y1="130" x2="340" y2="170" class="edge" marker-end="url(#arrow)"/>
@@ -28,28 +28,28 @@
   <line x1="650" y1="130" x2="720" y2="170" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="100" y="170" width="150" height="90" class="cool"/>
-  <text x="175" y="192" text-anchor="middle" class="head">Worker A</text>
-  <text x="175" y="212" text-anchor="middle" class="small">pull task</text>
-  <text x="175" y="228" text-anchor="middle" class="small">process</text>
-  <text x="175" y="244" text-anchor="middle" class="small">write result</text>
+  <text x="175" y="192" text-anchor="middle" class="head">工作者 A</text>
+  <text x="175" y="212" text-anchor="middle" class="small">拉取任务</text>
+  <text x="175" y="228" text-anchor="middle" class="small">处理</text>
+  <text x="175" y="244" text-anchor="middle" class="small">写入结果</text>
 
   <rect x="280" y="170" width="150" height="90" class="cool"/>
-  <text x="355" y="192" text-anchor="middle" class="head">Worker B</text>
-  <text x="355" y="212" text-anchor="middle" class="small">pull task</text>
-  <text x="355" y="228" text-anchor="middle" class="small">process</text>
-  <text x="355" y="244" text-anchor="middle" class="small">write result</text>
+  <text x="355" y="192" text-anchor="middle" class="head">工作者 B</text>
+  <text x="355" y="212" text-anchor="middle" class="small">拉取任务</text>
+  <text x="355" y="228" text-anchor="middle" class="small">处理</text>
+  <text x="355" y="244" text-anchor="middle" class="small">写入结果</text>
 
   <rect x="470" y="170" width="150" height="90" class="cool"/>
-  <text x="545" y="192" text-anchor="middle" class="head">Worker C</text>
-  <text x="545" y="212" text-anchor="middle" class="small">pull task</text>
-  <text x="545" y="228" text-anchor="middle" class="small">process</text>
-  <text x="545" y="244" text-anchor="middle" class="small">write result</text>
+  <text x="545" y="192" text-anchor="middle" class="head">工作者 C</text>
+  <text x="545" y="212" text-anchor="middle" class="small">拉取任务</text>
+  <text x="545" y="228" text-anchor="middle" class="small">处理</text>
+  <text x="545" y="244" text-anchor="middle" class="small">写入结果</text>
 
   <rect x="650" y="170" width="150" height="90" class="cool"/>
-  <text x="725" y="192" text-anchor="middle" class="head">Worker D</text>
-  <text x="725" y="212" text-anchor="middle" class="small">pull task</text>
-  <text x="725" y="228" text-anchor="middle" class="small">process</text>
-  <text x="725" y="244" text-anchor="middle" class="small">write result</text>
+  <text x="725" y="192" text-anchor="middle" class="head">工作者 D</text>
+  <text x="725" y="212" text-anchor="middle" class="small">拉取任务</text>
+  <text x="725" y="228" text-anchor="middle" class="small">处理</text>
+  <text x="725" y="244" text-anchor="middle" class="small">写入结果</text>
 
   <line x1="175" y1="260" x2="350" y2="320" class="edge"/>
   <line x1="355" y1="260" x2="400" y2="320" class="edge"/>
@@ -57,12 +57,12 @@
   <line x1="725" y1="260" x2="550" y2="320" class="edge"/>
 
   <rect x="300" y="320" width="300" height="50" class="hot"/>
-  <text x="450" y="340" text-anchor="middle" class="head">results pool</text>
-  <text x="450" y="358" text-anchor="middle" class="small">idempotent, durable, per-task trace IDs</text>
+  <text x="450" y="340" text-anchor="middle" class="head">结果池</text>
+  <text x="450" y="358" text-anchor="middle" class="small">幂等、持久化、逐任务 trace ID</text>
 
   <rect x="60" y="400" width="780" height="100" class="box"/>
-  <text x="450" y="422" text-anchor="middle" class="head">tradeoffs</text>
-  <text x="450" y="442" text-anchor="middle" class="small">✓ variable-duration balancing · ✓ scales to thousands · ✓ fault-tolerant with durable queue</text>
-  <text x="450" y="460" text-anchor="middle" class="small">✗ no central trace · ✗ ordered workflows break · ✗ debugging needs per-task IDs</text>
-  <text x="450" y="478" text-anchor="middle" class="small">failure modes: starvation (aging queue), hot-spotting (worker specialization), back-pressure (bounded queue)</text>
+  <text x="450" y="422" text-anchor="middle" class="head">权衡</text>
+  <text x="450" y="442" text-anchor="middle" class="small">✓ 平衡不同时长任务 · ✓ 扩展至数千工作者 · ✓ 持久队列提供容错</text>
+  <text x="450" y="460" text-anchor="middle" class="small">✗ 无中央 trace · ✗ 有序工作流会失效 · ✗ 调试需逐任务 ID</text>
+  <text x="450" y="478" text-anchor="middle" class="small">失败模式：饥饿（队列老化）、热点（工作者专门化）、背压（有界队列）</text>
 </svg>

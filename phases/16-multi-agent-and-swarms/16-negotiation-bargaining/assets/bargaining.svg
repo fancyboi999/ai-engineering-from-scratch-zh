@@ -15,49 +15,49 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">OG-Narrator decomposition and Contract Net task market</text>
+  <text x="480" y="28" text-anchor="middle" class="title">OG-Narrator 分解与合同网任务市场</text>
 
   <rect x="40" y="60" width="420" height="200" class="cool"/>
   <text x="250" y="82" text-anchor="middle" class="head">OG-Narrator (arXiv:2402.15813)</text>
 
   <rect x="70" y="110" width="150" height="70" class="box"/>
-  <text x="145" y="134" text-anchor="middle" class="step">offer generator</text>
-  <text x="145" y="152" text-anchor="middle" class="small">deterministic</text>
+  <text x="145" y="134" text-anchor="middle" class="step">报价生成器</text>
+  <text x="145" y="152" text-anchor="middle" class="small">确定性</text>
   <text x="145" y="168" text-anchor="middle" class="small">Zeuthen / Rubinstein</text>
 
   <rect x="280" y="110" width="150" height="70" class="box"/>
-  <text x="355" y="134" text-anchor="middle" class="step">LLM narrator</text>
-  <text x="355" y="152" text-anchor="middle" class="small">framing only</text>
-  <text x="355" y="168" text-anchor="middle" class="small">no numeric decisions</text>
+  <text x="355" y="134" text-anchor="middle" class="step">LLM 叙述器</text>
+  <text x="355" y="152" text-anchor="middle" class="small">仅组织措辞</text>
+  <text x="355" y="168" text-anchor="middle" class="small">不做数值决策</text>
 
   <line x1="220" y1="145" x2="276" y2="145" stroke="#1a1a1a" marker-end="url(#arrow)"/>
-  <text x="250" y="140" text-anchor="middle" class="small">price</text>
+  <text x="250" y="140" text-anchor="middle" class="small">价格</text>
 
-  <text x="250" y="210" text-anchor="middle" class="step">deal rate: 26.67% -> 88.88%</text>
-  <text x="250" y="230" text-anchor="middle" class="caption">prices stay in the ZOPA; anchors are strategic</text>
+  <text x="250" y="210" text-anchor="middle" class="step">成交率：26.67% -&gt; 88.88%</text>
+  <text x="250" y="230" text-anchor="middle" class="caption">价格保持在可接受协议区间内；锚定是策略性的</text>
 
   <rect x="500" y="60" width="420" height="200" class="hot"/>
-  <text x="710" y="82" text-anchor="middle" class="head">anti-pattern: LLM decides the price</text>
+  <text x="710" y="82" text-anchor="middle" class="head">反模式：由 LLM 决定价格</text>
 
   <rect x="540" y="110" width="340" height="70" class="box"/>
-  <text x="710" y="134" text-anchor="middle" class="step">single LLM call</text>
-  <text x="710" y="152" text-anchor="middle" class="small">generates both offer and framing</text>
-  <text x="710" y="168" text-anchor="middle" class="small">reveals reasoning in the output</text>
+  <text x="710" y="134" text-anchor="middle" class="step">单次 LLM 调用</text>
+  <text x="710" y="152" text-anchor="middle" class="small">同时生成报价与措辞</text>
+  <text x="710" y="168" text-anchor="middle" class="small">在输出中暴露推理</text>
 
-  <text x="710" y="210" text-anchor="middle" class="step">deal rate: ~27%</text>
-  <text x="710" y="230" text-anchor="middle" class="caption">prices drift; counterpart reads the reservation price</text>
+  <text x="710" y="210" text-anchor="middle" class="step">成交率：约 27%</text>
+  <text x="710" y="230" text-anchor="middle" class="caption">价格漂移；对方读到保留价格</text>
 
   <rect x="40" y="290" width="880" height="210" class="cold"/>
-  <text x="480" y="314" text-anchor="middle" class="head">Contract Net Protocol (Smith 1980 / FIPA 1996)</text>
+  <text x="480" y="314" text-anchor="middle" class="head">合同网协议（Smith 1980 / FIPA 1996）</text>
 
   <rect x="80" y="340" width="140" height="50" class="box"/>
-  <text x="150" y="370" text-anchor="middle" class="step">manager</text>
+  <text x="150" y="370" text-anchor="middle" class="step">管理者</text>
   <circle cx="400" cy="365" r="24" class="box"/>
-  <text x="400" y="370" text-anchor="middle" class="step">bidders</text>
+  <text x="400" y="370" text-anchor="middle" class="step">投标者</text>
   <rect x="550" y="340" width="140" height="50" class="box"/>
-  <text x="620" y="370" text-anchor="middle" class="step">winner</text>
+  <text x="620" y="370" text-anchor="middle" class="step">胜出者</text>
   <rect x="730" y="340" width="160" height="50" class="box"/>
-  <text x="810" y="370" text-anchor="middle" class="step">losers (reject)</text>
+  <text x="810" y="370" text-anchor="middle" class="step">未中标者（拒绝）</text>
 
   <line x1="220" y1="365" x2="376" y2="365" stroke="#1a1a1a" marker-end="url(#arrow)"/>
   <text x="295" y="355" text-anchor="middle" class="small">cfp</text>
@@ -66,7 +66,7 @@
   <line x1="424" y1="380" x2="726" y2="380" stroke="#1a1a1a" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
   <text x="575" y="400" text-anchor="middle" class="small">reject-proposal</text>
 
-  <text x="480" y="440" text-anchor="middle" class="caption">scales: broadcast + collect + award; no synchronous chat</text>
-  <text x="480" y="460" text-anchor="middle" class="caption">adopted in production task markets (Microsoft Agent Framework, some LangGraph implementations)</text>
-  <text x="480" y="480" text-anchor="middle" class="caption">FIPA performative mapping: cfp -> propose -> accept-proposal / reject-proposal</text>
+  <text x="480" y="440" text-anchor="middle" class="caption">扩展方式：广播 + 收集 + 授标；无需同步聊天</text>
+  <text x="480" y="460" text-anchor="middle" class="caption">用于生产任务市场（Microsoft Agent Framework、部分 LangGraph 实现）</text>
+  <text x="480" y="480" text-anchor="middle" class="caption">FIPA 施为映射：cfp -&gt; propose -&gt; accept-proposal / reject-proposal</text>
 </svg>

@@ -180,6 +180,7 @@ jobs:
       - name: 交互图表按需加载校验
         run: |
           node scripts/check_figure_loader.js
+          node scripts/check_figure_locales.js
           node scripts/test_figures_i18n_zh.js
       - name: 浏览器朗读回归校验
         run: node scripts/test_tts.js
@@ -239,3 +240,4 @@ jobs:
           node scripts/test_attribute_safety.js
           node scripts/test_project_layout.js
           node scripts/test_ui_display.js
+          node scripts/audit_figure_localization.js --mode dynamic --check --output "$RUNNER_TEMP/figure-localization.json"

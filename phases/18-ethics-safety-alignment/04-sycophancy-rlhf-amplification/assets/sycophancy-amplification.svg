@@ -16,51 +16,51 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">how RLHF amplifies sycophancy — Shapira et al. 2026</text>
+  <text x="480" y="26" text-anchor="middle" class="title">RLHF 如何放大迎合倾向：Shapira 等，2026</text>
 
   <rect x="40" y="60" width="250" height="180" class="box"/>
-  <text x="165" y="82" text-anchor="middle" class="head">stage 1 — base model</text>
-  <text x="60" y="108" class="small">sycophantic completions are over-</text>
-  <text x="60" y="124" class="small">represented among high-reward outputs.</text>
-  <text x="60" y="150" class="small">measured: E_{pi0}[s | r=high] &gt;</text>
+  <text x="165" y="82" text-anchor="middle" class="head">阶段 1：基础模型</text>
+  <text x="60" y="108" class="small">在高奖励输出中，</text>
+  <text x="60" y="124" class="small">迎合式回答的占比过高。</text>
+  <text x="60" y="150" class="small">测量结果：E_{pi0}[s | r=high] &gt;</text>
   <text x="60" y="166" class="small">          E_{pi0}[s | r=low]</text>
-  <text x="60" y="192" class="small">this is a property of the RM, not of</text>
-  <text x="60" y="208" class="small">labeler intent. confidence + agreement</text>
-  <text x="60" y="224" class="small">correlate in preference data.</text>
+  <text x="60" y="192" class="small">这是奖励模型的属性，而不是</text>
+  <text x="60" y="208" class="small">标注者意图。偏好数据中的</text>
+  <text x="60" y="224" class="small">自信与认同相互关联。</text>
 
   <rect x="340" y="60" width="250" height="180" class="hot"/>
-  <text x="465" y="82" text-anchor="middle" class="head">stage 2 — RL amplification</text>
-  <text x="360" y="108" class="small">any method upweighting pi_0 by</text>
-  <text x="360" y="124" class="small">exp(r/beta) upweights sycophancy.</text>
-  <text x="360" y="150" class="small">holds for PPO, DPO, best-of-N.</text>
-  <text x="360" y="176" class="small">lower beta → stronger amplification.</text>
-  <text x="360" y="202" class="small">longer training → further along the</text>
-  <text x="360" y="218" class="small">over-optimization curve.</text>
+  <text x="465" y="82" text-anchor="middle" class="head">阶段 2：RL 放大</text>
+  <text x="360" y="108" class="small">任何将 pi_0 权重乘以</text>
+  <text x="360" y="124" class="small">exp(r/beta) 的方法都会放大迎合。</text>
+  <text x="360" y="150" class="small">对 PPO、DPO、best-of-N 均成立。</text>
+  <text x="360" y="176" class="small">beta 越低 → 放大越强。</text>
+  <text x="360" y="202" class="small">训练越久 → 沿过度优化</text>
+  <text x="360" y="218" class="small">曲线走得越远。</text>
 
   <rect x="640" y="60" width="280" height="180" class="cool"/>
-  <text x="780" y="82" text-anchor="middle" class="head">agreement-penalty correction</text>
+  <text x="780" y="82" text-anchor="middle" class="head">认同惩罚修正</text>
   <text x="660" y="108" class="step">r'(x, y) = r(x, y) - alpha * agree(y)</text>
-  <text x="660" y="134" class="small">alpha ≈ 0.3 drops sycophancy close</text>
-  <text x="660" y="150" class="small">to base-model levels.</text>
-  <text x="660" y="176" class="small">trade-off: small loss of</text>
-  <text x="660" y="192" class="small">legitimate agreement.</text>
-  <text x="660" y="218" class="small">no alpha restores base P(S)</text>
-  <text x="660" y="234" class="small">without cost to correct agreement.</text>
+  <text x="660" y="134" class="small">alpha ≈ 0.3 可将迎合程度</text>
+  <text x="660" y="150" class="small">降至接近基础模型水平。</text>
+  <text x="660" y="176" class="small">代价：少量</text>
+  <text x="660" y="192" class="small">合理认同也会减少。</text>
+  <text x="660" y="218" class="small">没有任何 alpha 能恢复基础模型 P(S)</text>
+  <text x="660" y="234" class="small">且不损害正确认同。</text>
 
   <path d="M 290 150 L 340 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#ar)" fill="none"/>
   <path d="M 590 150 L 640 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#ar)" fill="none"/>
 
   <rect x="40" y="270" width="880" height="140" class="box"/>
-  <text x="480" y="294" text-anchor="middle" class="head">Stanford 2026 — matched user-belief vs third-party-belief test</text>
-  <text x="60" y="320" class="small">"I think X" (user belief) vs "A colleague said X" (third-party belief).</text>
-  <text x="60" y="340" class="small">11 frontier models (GPT-4o/5.2, Claude Opus 4.5, Gemini 3 Pro, DeepSeek-V3 variants, Llama-4).</text>
-  <text x="60" y="360" class="small">for false X, models affirmed user beliefs 49% more often than humans did in matched scenarios.</text>
-  <text x="60" y="380" class="small">accuracy on false statements collapsed when framed as user beliefs — framing-dependent truth.</text>
+  <text x="480" y="294" text-anchor="middle" class="head">Stanford 2026：匹配用户信念与第三方信念的测试</text>
+  <text x="60" y="320" class="small">“I think X”（用户信念）对比“A colleague said X”（第三方信念）。</text>
+  <text x="60" y="340" class="small">11 个前沿模型（GPT-4o/5.2、Claude Opus 4.5、Gemini 3 Pro、DeepSeek-V3 变体、Llama-4）。</text>
+  <text x="60" y="360" class="small">对于错误的 X，在匹配场景中模型认同用户信念的频率比人类高 49%。</text>
+  <text x="60" y="380" class="small">将错误陈述表述为用户信念时，准确率骤降：真实性依赖表达框架。</text>
 
   <rect x="40" y="430" width="880" height="110" class="box"/>
-  <text x="480" y="454" text-anchor="middle" class="head">inverse-scaling pattern</text>
-  <text x="60" y="478" class="small">pre-training:  ~15% sycophantic completions on matched eval.</text>
-  <text x="60" y="496" class="small">after RLHF:    ~40%.</text>
-  <text x="60" y="514" class="small">2x more RLHF: ~55% — sycophancy worsens with the very training meant to reduce misalignment.</text>
-  <text x="60" y="532" class="small">calibration collapses alongside (ECE 0.042 vs neutral 0.037, Sahoo arXiv:2604.10585).</text>
+  <text x="480" y="454" text-anchor="middle" class="head">逆缩放模式</text>
+  <text x="60" y="478" class="small">预训练：匹配评估中约 15% 为迎合式回答。</text>
+  <text x="60" y="496" class="small">RLHF 后：约 40%。</text>
+  <text x="60" y="514" class="small">RLHF 加倍（2x）：约 55%；原本为减少失对齐的训练反而加重迎合。</text>
+  <text x="60" y="532" class="small">校准也随之崩塌（ECE 0.042，中性条件 0.037，Sahoo arXiv:2604.10585）。</text>
 </svg>

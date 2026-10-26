@@ -17,57 +17,57 @@
       .edge { stroke: #1a1a1a; stroke-width: 1.2; fill: none; }
     </style>
   </defs>
-  <text x="450" y="28" text-anchor="middle" class="title">Group chat — shared pool + speaker selector (AutoGen / AG2)</text>
+  <text x="450" y="28" text-anchor="middle" class="title">群聊：共享消息池 + 发言者选择器（AutoGen / AG2）</text>
 
   <rect x="220" y="60" width="460" height="80" class="cold"/>
-  <text x="450" y="82" text-anchor="middle" class="head">shared message pool</text>
+  <text x="450" y="82" text-anchor="middle" class="head">共享消息池</text>
   <text x="450" y="104" text-anchor="middle" class="small">m1 [coder]: initial code ... | m2 [reviewer]: bug detected ... | m3 [coder]: revised ... | m4 [reviewer]: approved</text>
-  <text x="450" y="122" text-anchor="middle" class="small">every agent reads every message</text>
+  <text x="450" y="122" text-anchor="middle" class="small">每个 agent 均读取所有消息</text>
 
   <rect x="40" y="180" width="140" height="80" class="hot"/>
-  <text x="110" y="202" text-anchor="middle" class="head">Coder</text>
-  <text x="110" y="222" text-anchor="middle" class="small">writes code</text>
-  <text x="110" y="240" text-anchor="middle" class="small">revises on review</text>
+  <text x="110" y="202" text-anchor="middle" class="head">开发者</text>
+  <text x="110" y="222" text-anchor="middle" class="small">编写代码</text>
+  <text x="110" y="240" text-anchor="middle" class="small">根据评审修订</text>
 
   <rect x="220" y="180" width="140" height="80" class="cool"/>
-  <text x="290" y="202" text-anchor="middle" class="head">Reviewer</text>
-  <text x="290" y="222" text-anchor="middle" class="small">critiques code</text>
-  <text x="290" y="240" text-anchor="middle" class="small">returns approved / rejected</text>
+  <text x="290" y="202" text-anchor="middle" class="head">评审者</text>
+  <text x="290" y="222" text-anchor="middle" class="small">评审代码</text>
+  <text x="290" y="240" text-anchor="middle" class="small">返回 approved / rejected</text>
 
   <rect x="400" y="180" width="140" height="80" class="dsk"/>
-  <text x="470" y="202" text-anchor="middle" class="head">Manager</text>
-  <text x="470" y="222" text-anchor="middle" class="small">drives termination</text>
-  <text x="470" y="240" text-anchor="middle" class="small">emits TERMINATE</text>
+  <text x="470" y="202" text-anchor="middle" class="head">管理者</text>
+  <text x="470" y="222" text-anchor="middle" class="small">决定终止</text>
+  <text x="470" y="240" text-anchor="middle" class="small">输出 TERMINATE</text>
 
   <rect x="580" y="180" width="260" height="80" class="box"/>
-  <text x="710" y="202" text-anchor="middle" class="head">Selector</text>
-  <text x="710" y="222" text-anchor="middle" class="small">round-robin (fixed cycle)</text>
-  <text x="710" y="240" text-anchor="middle" class="small">LLM-selected (context-aware)</text>
-  <text x="710" y="256" text-anchor="middle" class="small">custom (rule-based fallback)</text>
+  <text x="710" y="202" text-anchor="middle" class="head">选择器</text>
+  <text x="710" y="222" text-anchor="middle" class="small">轮询（固定循环）</text>
+  <text x="710" y="240" text-anchor="middle" class="small">LLM 选择（感知上下文）</text>
+  <text x="710" y="256" text-anchor="middle" class="small">自定义（基于规则回退）</text>
 
   <line x1="110" y1="180" x2="350" y2="140" class="edge" marker-end="url(#arrow)"/>
   <line x1="290" y1="180" x2="440" y2="140" class="edge" marker-end="url(#arrow)"/>
   <line x1="470" y1="180" x2="520" y2="140" class="edge" marker-end="url(#arrow)"/>
 
   <line x1="450" y1="140" x2="580" y2="200" class="edge" marker-end="url(#arrow)"/>
-  <text x="555" y="168" class="small">selector reads pool</text>
+  <text x="555" y="168" class="small">选择器读取消息池</text>
 
   <path d="M 710 260 Q 710 320 470 300" class="edge" fill="none" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
-  <text x="580" y="300" class="small">selector returns: next speaker = manager</text>
+  <text x="580" y="300" class="small">选择器返回：下一位发言者 = 管理者</text>
 
   <rect x="40" y="340" width="380" height="150" class="box"/>
-  <text x="230" y="362" text-anchor="middle" class="head">when group chat fits</text>
-  <text x="230" y="384" text-anchor="middle" class="small">emergent conversations, role-mixing</text>
-  <text x="230" y="402" text-anchor="middle" class="small">exploratory problem-solving</text>
-  <text x="230" y="420" text-anchor="middle" class="small">pre-wiring every handoff is wrong</text>
-  <text x="230" y="440" text-anchor="middle" class="small">"brainstorm meeting" not "assembly line"</text>
-  <text x="230" y="468" text-anchor="middle" class="caption">selector replaces explicit graph edges</text>
+  <text x="230" y="362" text-anchor="middle" class="head">群聊适用场景</text>
+  <text x="230" y="384" text-anchor="middle" class="small">涌现对话、角色混合</text>
+  <text x="230" y="402" text-anchor="middle" class="small">探索式问题求解</text>
+  <text x="230" y="420" text-anchor="middle" class="small">不适合预先连接所有交接路径</text>
+  <text x="230" y="440" text-anchor="middle" class="small">“头脑风暴会议”，而非“流水线”</text>
+  <text x="230" y="468" text-anchor="middle" class="caption">选择器取代显式图边</text>
 
   <rect x="460" y="340" width="380" height="150" class="box"/>
-  <text x="650" y="362" text-anchor="middle" class="head">failure modes</text>
-  <text x="650" y="384" text-anchor="middle" class="small">hot speaker (one agent dominates)</text>
-  <text x="650" y="402" text-anchor="middle" class="small">sycophancy cascade (defer to loud)</text>
-  <text x="650" y="420" text-anchor="middle" class="small">context bloat (pool grows unbounded)</text>
-  <text x="650" y="440" text-anchor="middle" class="small">selector inconsistency (LLM non-determinism)</text>
-  <text x="650" y="468" text-anchor="middle" class="caption">cap rounds · track balance · scope views</text>
+  <text x="650" y="362" text-anchor="middle" class="head">失败模式</text>
+  <text x="650" y="384" text-anchor="middle" class="small">热点发言者（单个 agent 主导）</text>
+  <text x="650" y="402" text-anchor="middle" class="small">迎合级联（服从强势发言者）</text>
+  <text x="650" y="420" text-anchor="middle" class="small">上下文膨胀（消息池无限增长）</text>
+  <text x="650" y="440" text-anchor="middle" class="small">选择器不一致（LLM 非确定性）</text>
+  <text x="650" y="468" text-anchor="middle" class="caption">限制轮次 · 追踪均衡 · 限制可见范围</text>
 </svg>

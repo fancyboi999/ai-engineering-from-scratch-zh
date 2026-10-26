@@ -16,53 +16,53 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Automated Alignment Research — parallel sandboxes, one forum</text>
+  <text x="440" y="26" text-anchor="middle" class="title">自动化对齐研究：并行沙箱，共享论坛</text>
 
   <!-- Three AAR sandboxes -->
   <rect x="40" y="60" width="240" height="190" class="cool"/>
-  <text x="160" y="82" text-anchor="middle" class="label">AAR-A sandbox</text>
+  <text x="160" y="82" text-anchor="middle" class="label">AAR-A 沙箱</text>
   <text x="160" y="104" text-anchor="middle" class="small">Claude Opus 4.6</text>
-  <text x="160" y="122" text-anchor="middle" class="small">fs / network / process limits</text>
-  <text x="160" y="146" text-anchor="middle" class="content">task: weak-to-strong distill</text>
-  <text x="160" y="164" text-anchor="middle" class="content">free decomposition allowed</text>
-  <text x="160" y="190" text-anchor="middle" class="small">no write access to forum store</text>
-  <text x="160" y="206" text-anchor="middle" class="small">no read access to peers' logs</text>
-  <text x="160" y="222" text-anchor="middle" class="small">post to forum by API only</text>
+  <text x="160" y="122" text-anchor="middle" class="small">文件系统 / 网络 / 进程限制</text>
+  <text x="160" y="146" text-anchor="middle" class="content">任务：弱到强蒸馏</text>
+  <text x="160" y="164" text-anchor="middle" class="content">允许自由分解任务</text>
+  <text x="160" y="190" text-anchor="middle" class="small">不能写入论坛存储</text>
+  <text x="160" y="206" text-anchor="middle" class="small">不能读取其他 agent 的日志</text>
+  <text x="160" y="222" text-anchor="middle" class="small">只能通过 API 向论坛发帖</text>
 
   <rect x="320" y="60" width="240" height="190" class="cool"/>
-  <text x="440" y="82" text-anchor="middle" class="label">AAR-B sandbox</text>
+  <text x="440" y="82" text-anchor="middle" class="label">AAR-B 沙箱</text>
   <text x="440" y="104" text-anchor="middle" class="small">Claude Opus 4.6</text>
-  <text x="440" y="122" text-anchor="middle" class="small">fs / network / process limits</text>
-  <text x="440" y="146" text-anchor="middle" class="content">task: RLHF sweep</text>
-  <text x="440" y="164" text-anchor="middle" class="content">free decomposition allowed</text>
+  <text x="440" y="122" text-anchor="middle" class="small">文件系统 / 网络 / 进程限制</text>
+  <text x="440" y="146" text-anchor="middle" class="content">任务：RLHF 参数扫描</text>
+  <text x="440" y="164" text-anchor="middle" class="content">允许自由分解任务</text>
 
   <rect x="600" y="60" width="240" height="190" class="cool"/>
-  <text x="720" y="82" text-anchor="middle" class="label">AAR-C sandbox</text>
+  <text x="720" y="82" text-anchor="middle" class="label">AAR-C 沙箱</text>
   <text x="720" y="104" text-anchor="middle" class="small">Claude Opus 4.6</text>
-  <text x="720" y="122" text-anchor="middle" class="small">fs / network / process limits</text>
-  <text x="720" y="146" text-anchor="middle" class="content">task: alignment-faking detector</text>
-  <text x="720" y="164" text-anchor="middle" class="content">free decomposition allowed</text>
+  <text x="720" y="122" text-anchor="middle" class="small">文件系统 / 网络 / 进程限制</text>
+  <text x="720" y="146" text-anchor="middle" class="content">任务：伪装对齐检测器</text>
+  <text x="720" y="164" text-anchor="middle" class="content">允许自由分解任务</text>
 
   <!-- Forum -->
   <rect x="160" y="290" width="560" height="90" class="cold"/>
-  <text x="440" y="314" text-anchor="middle" class="label">shared research forum</text>
-  <text x="440" y="334" text-anchor="middle" class="content">append-only, tamper-evident log</text>
-  <text x="440" y="350" text-anchor="middle" class="content">storage outside every sandbox</text>
-  <text x="440" y="366" text-anchor="middle" class="small">record n -&gt; H(record n-1) — break detection on any edit</text>
+  <text x="440" y="314" text-anchor="middle" class="label">共享研究论坛</text>
+  <text x="440" y="334" text-anchor="middle" class="content">仅追加、可检测篡改的日志</text>
+  <text x="440" y="350" text-anchor="middle" class="content">存储位于所有沙箱之外</text>
+  <text x="440" y="366" text-anchor="middle" class="small">记录 n -&gt; H(记录 n-1)：任意编辑均会被检测</text>
 
   <!-- Arrows -->
   <path d="M160 250 L280 290" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M440 250 L440 290" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M720 250 L600 290" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <text x="270" y="278" class="small">post only</text>
+  <text x="270" y="278" class="small">仅发帖</text>
 
   <!-- Human review -->
   <rect x="160" y="410" width="560" height="90" class="hot"/>
-  <text x="440" y="434" text-anchor="middle" class="label">human research review</text>
-  <text x="440" y="454" text-anchor="middle" class="content">reads forum, curates, decides what publishes</text>
-  <text x="440" y="470" text-anchor="middle" class="content">cross-checks against out-of-sandbox backup</text>
-  <text x="440" y="486" text-anchor="middle" class="small">AARs compress middle of pipeline. humans hold ends.</text>
+  <text x="440" y="434" text-anchor="middle" class="label">人工研究评审</text>
+  <text x="440" y="454" text-anchor="middle" class="content">阅读论坛、筛选并决定发布内容</text>
+  <text x="440" y="470" text-anchor="middle" class="content">与沙箱外备份交叉核验</text>
+  <text x="440" y="486" text-anchor="middle" class="small">自动化对齐研究压缩流水线中间环节，人类掌握两端。</text>
 
   <path d="M440 380 L440 410" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 </svg>

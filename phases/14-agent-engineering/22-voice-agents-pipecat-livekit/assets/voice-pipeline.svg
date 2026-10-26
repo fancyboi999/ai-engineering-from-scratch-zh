@@ -16,32 +16,32 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Voice pipeline — Pipecat frame-based, LiveKit WebRTC transport</text>
+  <text x="480" y="26" text-anchor="middle" class="title">语音流水线：Pipecat 基于帧，LiveKit 提供 WebRTC 传输</text>
 
   <rect x="40" y="50" width="880" height="170" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">DOWNSTREAM  audio in, speech out</text>
+  <text x="480" y="72" text-anchor="middle" class="head">下游：音频输入，语音输出</text>
   <rect x="60" y="90" width="130" height="60" class="stage"/>
   <text x="125" y="114" text-anchor="middle" class="step">VAD (Silero)</text>
   <text x="125" y="132" text-anchor="middle" class="small">20-60ms</text>
 
   <rect x="210" y="90" width="130" height="60" class="stage"/>
   <text x="275" y="114" text-anchor="middle" class="step">STT</text>
-  <text x="275" y="132" text-anchor="middle" class="small">100-250ms partial</text>
+  <text x="275" y="132" text-anchor="middle" class="small">100-250ms 部分转录</text>
 
   <rect x="360" y="90" width="130" height="60" class="stage"/>
   <text x="425" y="114" text-anchor="middle" class="step">LLM</text>
-  <text x="425" y="132" text-anchor="middle" class="small">150-400ms first token</text>
+  <text x="425" y="132" text-anchor="middle" class="small">150-400ms 首个 token</text>
 
   <rect x="510" y="90" width="130" height="60" class="stage"/>
   <text x="575" y="114" text-anchor="middle" class="step">TTS</text>
-  <text x="575" y="132" text-anchor="middle" class="small">100-200ms first audio</text>
+  <text x="575" y="132" text-anchor="middle" class="small">100-200ms 首批音频</text>
 
   <rect x="660" y="90" width="130" height="60" class="stage"/>
-  <text x="725" y="114" text-anchor="middle" class="step">transport</text>
+  <text x="725" y="114" text-anchor="middle" class="step">传输</text>
   <text x="725" y="132" text-anchor="middle" class="small">30-80ms RTT</text>
 
   <rect x="810" y="90" width="90" height="60" class="box"/>
-  <text x="855" y="120" text-anchor="middle" class="step">user</text>
+  <text x="855" y="120" text-anchor="middle" class="step">用户</text>
 
   <line x1="190" y1="120" x2="210" y2="120" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="340" y1="120" x2="360" y2="120" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -49,26 +49,26 @@
   <line x1="640" y1="120" x2="660" y2="120" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="790" y1="120" x2="810" y2="120" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <text x="480" y="180" text-anchor="middle" class="small">context alternates user/assistant; every stage can carry partial output</text>
-  <text x="480" y="200" text-anchor="middle" class="small">transports: Daily, LiveKit, SmallWebRTCTransport, FastAPI WebSocket, WhatsApp, SIP</text>
+  <text x="480" y="180" text-anchor="middle" class="small">上下文交替使用 user/assistant；每个阶段均可携带部分输出</text>
+  <text x="480" y="200" text-anchor="middle" class="small">传输：Daily、LiveKit、SmallWebRTCTransport、FastAPI WebSocket、WhatsApp、SIP</text>
 
   <rect x="40" y="240" width="880" height="120" class="upstream"/>
-  <text x="480" y="262" text-anchor="middle" class="head">UPSTREAM  cancel, metrics, barge-in</text>
+  <text x="480" y="262" text-anchor="middle" class="head">上游：取消、指标、打断</text>
   <rect x="60" y="278" width="840" height="30" class="box"/>
-  <text x="78" y="298" class="step">transport detects interrupt  cancel frame propagates back: TTS  LLM  STT</text>
+  <text x="78" y="298" class="step">传输检测到打断，取消帧向上游传播：TTS、LLM、STT</text>
   <rect x="60" y="312" width="840" height="30" class="box"/>
-  <text x="78" y="332" class="step">TTS drops pending audio; LLM cancels inference; STT resets for new turn</text>
+  <text x="78" y="332" class="step">TTS 丢弃待播音频，LLM 取消推理，STT 重置以接收新轮次</text>
   <rect x="60" y="342" width="840" height="14" class="box"/>
-  <text x="78" y="354" class="step">without UPSTREAM: agent keeps talking over the user</text>
+  <text x="78" y="354" class="step">没有上游链路时，agent 会压过用户继续说话</text>
 
   <rect x="40" y="380" width="880" height="130" class="latency"/>
-  <text x="480" y="402" text-anchor="middle" class="head">end-to-end latency budget</text>
+  <text x="480" y="402" text-anchor="middle" class="head">端到端延迟预算</text>
   <rect x="60" y="418" width="840" height="30" class="box"/>
-  <text x="78" y="438" class="step">premium stack: 450-600ms  (Vapi, Retell reported)</text>
+  <text x="78" y="438" class="step">高端方案：450-600ms（Vapi、Retell 报告）</text>
   <rect x="60" y="452" width="840" height="30" class="box"/>
-  <text x="78" y="472" class="step">common stack: 800-1200ms</text>
+  <text x="78" y="472" class="step">常规方案：800-1200ms</text>
   <rect x="60" y="486" width="840" height="20" class="box"/>
-  <text x="78" y="502" class="step">&gt; 1500ms feels broken. sum your chain before shipping.</text>
+  <text x="78" y="502" class="step">超过 1500ms 会显得失灵；交付前先计算整条链路。</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">LiveKit Agents: MultimodalAgent (direct audio) vs VoicePipelineAgent (cascade with text control).</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">LiveKit Agents：MultimodalAgent（直接音频）与 VoicePipelineAgent（可控文本级联）。</text>
 </svg>

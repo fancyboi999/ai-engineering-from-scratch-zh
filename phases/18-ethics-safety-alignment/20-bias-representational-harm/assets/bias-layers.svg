@@ -13,40 +13,40 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Bias and representational harm: measurement and intervention</text>
+  <text x="480" y="24" text-anchor="middle" class="title">偏差与表征性伤害：测量与干预</text>
 
   <rect x="40" y="60" width="880" height="150" class="box"/>
-  <text x="480" y="85" text-anchor="middle" class="head">Gallegos et al. 2024 three metric categories</text>
+  <text x="480" y="85" text-anchor="middle" class="head">Gallegos 等人 2024 年的三类指标</text>
   <rect x="60" y="105" width="280" height="90" class="cool"/>
-  <text x="200" y="130" text-anchor="middle" class="step">embedding-based</text>
+  <text x="200" y="130" text-anchor="middle" class="step">基于嵌入</text>
   <text x="200" y="150" text-anchor="middle" class="small">WEAT, SEAT</text>
-  <text x="200" y="170" text-anchor="middle" class="small">pre-RLHF; measures representation</text>
+  <text x="200" y="170" text-anchor="middle" class="small">RLHF 之前；衡量表征</text>
   <rect x="360" y="105" width="280" height="90" class="cool"/>
-  <text x="500" y="130" text-anchor="middle" class="step">probability-based</text>
-  <text x="500" y="150" text-anchor="middle" class="small">stereotype log-likelihood</text>
-  <text x="500" y="170" text-anchor="middle" class="small">decoder-side; partial behaviour</text>
+  <text x="500" y="130" text-anchor="middle" class="step">基于概率</text>
+  <text x="500" y="150" text-anchor="middle" class="small">刻板印象的对数似然</text>
+  <text x="500" y="170" text-anchor="middle" class="small">解码器侧；部分行为</text>
   <rect x="660" y="105" width="240" height="90" class="cool"/>
-  <text x="780" y="130" text-anchor="middle" class="step">generated-text</text>
-  <text x="780" y="150" text-anchor="middle" class="small">resume-scoring, recommendation</text>
-  <text x="780" y="170" text-anchor="middle" class="small">ecologically valid; expensive</text>
+  <text x="780" y="130" text-anchor="middle" class="step">生成文本</text>
+  <text x="780" y="150" text-anchor="middle" class="small">简历评分、推荐</text>
+  <text x="780" y="170" text-anchor="middle" class="small">具有生态效度；成本高</text>
 
   <rect x="40" y="230" width="880" height="130" class="box"/>
-  <text x="480" y="255" text-anchor="middle" class="head">intersectionality + mechanism</text>
+  <text x="480" y="255" text-anchor="middle" class="head">交叉性 + 机制</text>
   <rect x="60" y="275" width="420" height="70" class="cold"/>
-  <text x="270" y="298" text-anchor="middle" class="step">intersectional evaluation</text>
-  <text x="270" y="316" text-anchor="middle" class="small">An et al. 2025 (PNAS Nexus): 5 models, race x gender</text>
-  <text x="270" y="334" text-anchor="middle" class="small">WinoIdentity (COLM 2025): uncertainty-based</text>
+  <text x="270" y="298" text-anchor="middle" class="step">交叉性评估</text>
+  <text x="270" y="316" text-anchor="middle" class="small">An 等人 2025（PNAS Nexus）：5 个模型，种族 x 性别</text>
+  <text x="270" y="334" text-anchor="middle" class="small">WinoIdentity（COLM 2025）：基于不确定性</text>
   <rect x="500" y="275" width="400" height="70" class="cold"/>
-  <text x="700" y="298" text-anchor="middle" class="step">mechanistic debiasing</text>
-  <text x="700" y="316" text-anchor="middle" class="small">gender neurons (Yu &amp; Ananiadou 2025)</text>
-  <text x="700" y="334" text-anchor="middle" class="small">SAE features (Ahsan &amp; Wallace 2025); UniBias heads</text>
+  <text x="700" y="298" text-anchor="middle" class="step">机制性去偏</text>
+  <text x="700" y="316" text-anchor="middle" class="small">性别神经元（Yu 与 Ananiadou 2025）</text>
+  <text x="700" y="334" text-anchor="middle" class="small">SAE 特征（Ahsan 与 Wallace 2025）；UniBias 注意力头</text>
 
   <rect x="40" y="380" width="880" height="110" class="box"/>
-  <text x="480" y="405" text-anchor="middle" class="head">harm-type separation</text>
+  <text x="480" y="405" text-anchor="middle" class="head">区分伤害类型</text>
   <rect x="60" y="425" width="400" height="55" class="hot"/>
-  <text x="260" y="450" text-anchor="middle" class="step">representational</text>
-  <text x="260" y="470" text-anchor="middle" class="small">stereotypes, erasure, demeaning portrayal</text>
+  <text x="260" y="450" text-anchor="middle" class="step">表征性伤害</text>
+  <text x="260" y="470" text-anchor="middle" class="small">刻板印象、抹除、贬损描绘</text>
   <rect x="480" y="425" width="420" height="55" class="hot"/>
-  <text x="690" y="450" text-anchor="middle" class="step">allocational</text>
-  <text x="690" y="470" text-anchor="middle" class="small">unequal material outcome (resume score, credit decision)</text>
+  <text x="690" y="450" text-anchor="middle" class="step">分配性伤害</text>
+  <text x="690" y="470" text-anchor="middle" class="small">不平等的物质结果（简历评分、信贷决策）</text>
 </svg>

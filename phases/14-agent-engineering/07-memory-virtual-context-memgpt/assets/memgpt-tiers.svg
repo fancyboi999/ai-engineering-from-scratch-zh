@@ -17,72 +17,72 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">MemGPT — virtual context as OS memory (Packer et al., 2023)</text>
+  <text x="480" y="26" text-anchor="middle" class="title">MemGPT — 将虚拟上下文视为操作系统内存（Packer 等人，2023）</text>
 
   <rect x="40" y="60" width="380" height="200" class="ram"/>
-  <text x="230" y="82" text-anchor="middle" class="head">main context  (RAM analog)</text>
-  <text x="60" y="108" class="small">fixed-size prompt window, always visible to the model</text>
+  <text x="230" y="82" text-anchor="middle" class="head">主上下文（类比 RAM）</text>
+  <text x="60" y="108" class="small">固定大小的 prompt 窗口，始终对模型可见</text>
 
   <rect x="60" y="118" width="340" height="60" class="box"/>
-  <text x="80" y="138" class="step">[core] persona, user, task</text>
-  <text x="80" y="156" class="small">named sections pinned inside the prompt</text>
-  <text x="80" y="172" class="small">editable via core_memory_{append,replace}</text>
+  <text x="80" y="138" class="step">[core] 角色、用户、任务</text>
+  <text x="80" y="156" class="small">具名区段固定在 prompt 中</text>
+  <text x="80" y="172" class="small">通过 core_memory_{append,replace} 编辑</text>
 
   <rect x="60" y="186" width="340" height="60" class="box"/>
-  <text x="80" y="206" class="step">[messages] recent turns</text>
-  <text x="80" y="224" class="small">FIFO buffer; oldest turn evicts on cap</text>
-  <text x="80" y="240" class="small">evicted turns available via conversation_search</text>
+  <text x="80" y="206" class="step">[messages] 近期轮次</text>
+  <text x="80" y="224" class="small">FIFO 缓冲区；满时驱逐最旧轮次</text>
+  <text x="80" y="240" class="small">被驱逐轮次可通过 conversation_search 查询</text>
 
   <rect x="40" y="280" width="380" height="240" class="disk"/>
-  <text x="230" y="302" text-anchor="middle" class="head">archival memory  (disk analog)</text>
-  <text x="60" y="328" class="small">unbounded, searchable external store</text>
+  <text x="230" y="302" text-anchor="middle" class="head">归档记忆（类比磁盘）</text>
+  <text x="60" y="328" class="small">无固定上限、可搜索的外部存储</text>
 
   <rect x="60" y="340" width="340" height="60" class="box"/>
-  <text x="80" y="360" class="step">record: id, text, tags, session, turn</text>
-  <text x="80" y="378" class="small">written by archival_memory_insert</text>
-  <text x="80" y="394" class="small">retrieved by archival_memory_search(top_k)</text>
+  <text x="80" y="360" class="step">记录：id、text、tags、session、turn</text>
+  <text x="80" y="378" class="small">通过 archival_memory_insert 写入</text>
+  <text x="80" y="394" class="small">通过 archival_memory_search(top_k) 检索</text>
 
   <rect x="60" y="408" width="340" height="60" class="box"/>
-  <text x="80" y="428" class="step">pluggable backend</text>
-  <text x="80" y="446" class="small">vector (semantic), KV (fact), graph (relation)</text>
-  <text x="80" y="462" class="small">Lesson 09 (Mem0) fuses all three</text>
+  <text x="80" y="428" class="step">可插拔后端</text>
+  <text x="80" y="446" class="small">向量（语义）、KV（事实）、图（关系）</text>
+  <text x="80" y="462" class="small">第 09 课（Mem0）融合三者</text>
 
-  <text x="230" y="496" text-anchor="middle" class="caption">citations (session_id, turn_id) travel with every write</text>
+  <text x="230" y="496" text-anchor="middle" class="caption">每次写入均携带 (session_id, turn_id) 引用</text>
 
   <rect x="440" y="60" width="500" height="460" class="box"/>
-  <text x="690" y="82" text-anchor="middle" class="head">the interrupt pattern — one turn</text>
+  <text x="690" y="82" text-anchor="middle" class="head">中断模式 — 一个轮次</text>
 
   <rect x="460" y="100" width="460" height="46" class="ram"/>
-  <text x="478" y="122" class="step">1. assistant "I need the user's current project"</text>
-  <text x="478" y="138" class="small">main context lacks the fact; cannot answer from window alone</text>
+  <text x="478" y="122" class="step">1. assistant：“我需要用户当前的项目”</text>
+  <text x="478" y="138" class="small">主上下文缺少该事实；仅靠窗口无法回答</text>
 
   <rect x="460" y="154" width="460" height="46" class="tool"/>
-  <text x="478" y="176" class="step">2. tool call archival_memory_search("project for ava")</text>
-  <text x="478" y="192" class="small">memory tool issued; runtime services it like an OS syscall</text>
+  <text x="478" y="176" class="step">2. 工具调用 archival_memory_search("project for ava")</text>
+  <text x="478" y="192" class="small">发出记忆工具调用；运行时像处理系统调用一样处理它</text>
 
   <rect x="460" y="208" width="460" height="46" class="disk"/>
-  <text x="478" y="230" class="step">3. archival returns record a001</text>
+  <text x="478" y="230" class="step">3. 归档返回记录 a001</text>
   <text x="478" y="246" class="small">"ava is building a retrieval bot with 12 tools"</text>
 
   <rect x="460" y="262" width="460" height="46" class="tool"/>
-  <text x="478" y="284" class="step">4. runtime splices observation into next assistant turn</text>
-  <text x="478" y="300" class="small">same shape as any tool observation in the ReAct loop</text>
+  <text x="478" y="284" class="step">4. 运行时将观察拼接到下一个 assistant 轮次</text>
+  <text x="478" y="300" class="small">与 ReAct 循环中任何工具观察的形态相同</text>
 
   <rect x="460" y="316" width="460" height="46" class="ram"/>
-  <text x="478" y="338" class="step">5. assistant answers citing a001</text>
-  <text x="478" y="354" class="small">retrieval traceable back to source record</text>
+  <text x="478" y="338" class="step">5. assistant 引用 a001 回答</text>
+  <text x="478" y="354" class="small">检索可追溯至原始记录</text>
 
   <rect x="460" y="370" width="460" height="46" class="box"/>
-  <text x="478" y="392" class="step">6. new fact emerges  archival_memory_insert</text>
-  <text x="478" y="408" class="small">write-back closes the loop for next session</text>
+  <text x="478" y="392" class="step">6. 出现新事实 archival_memory_insert</text>
+  <text x="478" y="408" class="small">写回为下次会话闭合循环</text>
 
   <rect x="460" y="424" width="460" height="46" class="box"/>
-  <text x="478" y="446" class="step">7. periodic consolidation (Letta sleep-time, Lesson 08)</text>
-  <text x="478" y="462" class="small">stale records dedupe, contradicted facts invalidate</text>
+  <text x="478" y="446" class="step">7. 定期归并（Letta 睡眠时间，第 08 课）</text>
+  <text x="478" y="462" class="small">过期记录去重，矛盾事实失效</text>
 
   <line x1="420" y1="170" x2="460" y2="170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="420" y1="230" x2="460" y2="230" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="460" y1="390" x2="420" y2="390" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">Letta (2024) extends to three tiers. Mem0 (2025) swaps archival for vector+KV+graph. Pattern survives.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">Letta（2024）扩展为三层。Mem0（2025）以向量+KV+图替换归档。模式保持不变。</text>
 </svg>

@@ -17,9 +17,9 @@ module.exports = figure('fig-4-5', {
   title: 'deterministic inference 能重复结果，但差距不变',
   desc: '随机种子 1 的四次 12 步运行中，每一步的 logprob gap。四次运行的差距都在 0.0145 至 0.0160 之间。两次 Triton 运行的初始值相同，为 0.015404，之后逐渐分开。',
 }, f => {
-  const c = chart(f, { x: 70, y: 72, w: 550, h: 200, xDomain: [0, 11], yDomain: [0.0144, 0.0162], xTicks: [0, 3, 6, 9, 11], yTicks: [0.0145, 0.015, 0.0155, 0.016], yFormat: v => v.toFixed(4), xLabel: '步骤', yLabel: 'logprob gap' });
+  const c = chart(f, { x: 70, y: 72, w: 550, h: 200, xDomain: [0, 11], yDomain: [0.0144, 0.0162], xTicks: [0, 3, 6, 9, 11], yTicks: [0.0145, 0.015, 0.0155, 0.016], yFormat: v => v.toFixed(4), xLabel: '步骤', yLabel: 'logprob 差值' });
   for (const s of series) c.series(runs[s.key].per_step.map(r => [r.step, r.logprob_abs_diff]), { hue: s.hue, dash: s.dash, name: s.name, r: 2.4 });
-  c.note(0.2, 0.01612, 'step 0: both Triton runs gave 0.015404', { hue: 'violet' });
+  c.note(0.2, 0.01612, '步骤 0：两次 Triton 运行均为 0.015404', { hue: 'violet' });
   legend(f, series.slice(0, 2), 70, 20);
   legend(f, series.slice(2), 70, 40);
   f.text(70, 332, 'engine 可以重复自身输出，但计算方式仍与 trainer 不同。', { size: 12, serif: true });

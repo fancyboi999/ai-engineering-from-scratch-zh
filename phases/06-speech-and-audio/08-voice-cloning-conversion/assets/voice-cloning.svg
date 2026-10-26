@@ -13,68 +13,68 @@
     </style>
   </defs>
 
-  <text x="440" y="28" text-anchor="middle" class="title">factor → swap speaker → recombine (plus watermark)</text>
+  <text x="440" y="28" text-anchor="middle" class="title">分解 → 替换说话人 → 重组（加入水印）</text>
 
   <rect x="40" y="60" width="180" height="70" class="box"/>
-  <text x="130" y="82" text-anchor="middle" class="label">target ref (5 s)</text>
+  <text x="130" y="82" text-anchor="middle" class="label">目标参考音频（5 s）</text>
   <text x="130" y="105" text-anchor="middle" class="content">alice_5s.wav</text>
-  <text x="130" y="121" text-anchor="middle" class="caption">dry, close-mic, single speaker</text>
+  <text x="130" y="121" text-anchor="middle" class="caption">无混响、近距离拾音、单说话人</text>
 
   <line x1="225" y1="95" x2="248" y2="95" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="252" y="60" width="180" height="70" class="hot"/>
-  <text x="342" y="82" text-anchor="middle" class="label">speaker encoder</text>
+  <text x="342" y="82" text-anchor="middle" class="label">说话人编码器</text>
   <text x="342" y="105" text-anchor="middle" class="content">ECAPA / WavLM-SV</text>
-  <text x="342" y="121" text-anchor="middle" class="caption">192-d embedding</text>
+  <text x="342" y="121" text-anchor="middle" class="caption">192 维嵌入</text>
 
   <line x1="437" y1="95" x2="460" y2="95" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="464" y="60" width="180" height="70" class="box"/>
-  <text x="554" y="82" text-anchor="middle" class="label">cloning TTS</text>
+  <text x="554" y="82" text-anchor="middle" class="label">声音克隆 TTS</text>
   <text x="554" y="105" text-anchor="middle" class="content">F5 / XTTS / VALL-E 2</text>
-  <text x="554" y="121" text-anchor="middle" class="caption">text + speaker_emb → mel</text>
+  <text x="554" y="121" text-anchor="middle" class="caption">文本 + speaker_emb → 梅尔频谱</text>
 
   <line x1="649" y1="95" x2="672" y2="95" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="676" y="60" width="170" height="70" class="hot"/>
-  <text x="761" y="82" text-anchor="middle" class="label">watermark</text>
+  <text x="761" y="82" text-anchor="middle" class="label">水印</text>
   <text x="761" y="105" text-anchor="middle" class="content">SilentCipher</text>
-  <text x="761" y="121" text-anchor="middle" class="caption">~32 bits, inaudible</text>
+  <text x="761" y="121" text-anchor="middle" class="caption">约 32 位，不可听见</text>
 
   <rect x="252" y="155" width="180" height="40" class="box"/>
-  <text x="342" y="180" text-anchor="middle" class="content">text: "add milk to list"</text>
+  <text x="342" y="180" text-anchor="middle" class="content">文本："add milk to list"</text>
   <line x1="342" y1="155" x2="342" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="40" y="230" width="180" height="70" class="box"/>
-  <text x="130" y="252" text-anchor="middle" class="label">source speech</text>
-  <text x="130" y="275" text-anchor="middle" class="content">bob saying "turn off"</text>
-  <text x="130" y="291" text-anchor="middle" class="caption">any speaker, any text</text>
+  <text x="130" y="252" text-anchor="middle" class="label">源语音</text>
+  <text x="130" y="275" text-anchor="middle" class="content">bob 说 "turn off"</text>
+  <text x="130" y="291" text-anchor="middle" class="caption">任意说话人、任意文本</text>
 
   <line x1="225" y1="265" x2="248" y2="265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="252" y="230" width="180" height="70" class="hot"/>
-  <text x="342" y="252" text-anchor="middle" class="label">content extractor</text>
-  <text x="342" y="275" text-anchor="middle" class="content">ASR PPG / WavLM frames</text>
-  <text x="342" y="291" text-anchor="middle" class="caption">speaker-invariant representation</text>
+  <text x="342" y="252" text-anchor="middle" class="label">内容提取器</text>
+  <text x="342" y="275" text-anchor="middle" class="content">ASR PPG / WavLM 帧</text>
+  <text x="342" y="291" text-anchor="middle" class="caption">与说话人无关的表征</text>
 
   <line x1="437" y1="265" x2="460" y2="265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="464" y="230" width="180" height="70" class="box"/>
-  <text x="554" y="252" text-anchor="middle" class="label">resynthesizer</text>
+  <text x="554" y="252" text-anchor="middle" class="label">重新合成器</text>
   <text x="554" y="275" text-anchor="middle" class="content">KNN-VC / Diff-HierVC</text>
-  <text x="554" y="291" text-anchor="middle" class="caption">content + alice_emb → wav</text>
+  <text x="554" y="291" text-anchor="middle" class="caption">内容 + alice_emb → wav</text>
 
   <line x1="649" y1="265" x2="672" y2="265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="676" y="230" width="170" height="70" class="hot"/>
-  <text x="761" y="252" text-anchor="middle" class="label">output</text>
-  <text x="761" y="275" text-anchor="middle" class="content">alice saying "turn off"</text>
-  <text x="761" y="291" text-anchor="middle" class="caption">content preserved</text>
+  <text x="761" y="252" text-anchor="middle" class="label">输出</text>
+  <text x="761" y="275" text-anchor="middle" class="content">alice 说 "turn off"</text>
+  <text x="761" y="291" text-anchor="middle" class="caption">保留内容</text>
 
   <rect x="40" y="330" width="800" height="130" class="hot"/>
-  <text x="440" y="354" text-anchor="middle" class="label">legal and ethical stack (required 2026)</text>
-  <text x="60"  y="382" class="content">consent gate</text>    <text x="230" y="382" class="caption">signed record + speaker-hash match before inference</text>
-  <text x="60"  y="402" class="content">watermark</text>       <text x="230" y="402" class="caption">SilentCipher or PerTh; ~32-bit payload, MP3-robust</text>
-  <text x="60"  y="422" class="content">detector pair</text>   <text x="230" y="422" class="caption">AASIST / RawNet2 — ship with the generator</text>
-  <text x="60"  y="442" class="content">audit log</text>       <text x="230" y="442" class="caption">tamper-evident record of every synthesis request</text>
+  <text x="440" y="354" text-anchor="middle" class="label">法律与伦理防护（2026 年必需）</text>
+  <text x="60"  y="382" class="content">授权关卡</text>    <text x="230" y="382" class="caption">推理前检查签名记录与说话人哈希是否匹配</text>
+  <text x="60"  y="402" class="content">水印</text>       <text x="230" y="402" class="caption">SilentCipher 或 PerTh；约 32 位载荷，可耐受 MP3 压缩</text>
+  <text x="60"  y="422" class="content">配套检测器</text>   <text x="230" y="422" class="caption">AASIST / RawNet2：随生成器一同部署</text>
+  <text x="60"  y="442" class="content">审计日志</text>       <text x="230" y="442" class="caption">为每次合成请求保存可检测篡改的记录</text>
 </svg>

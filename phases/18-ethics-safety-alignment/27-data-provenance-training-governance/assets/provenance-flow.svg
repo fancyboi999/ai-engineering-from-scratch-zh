@@ -16,54 +16,54 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Training-data governance: collection-time compliance</text>
+  <text x="480" y="24" text-anchor="middle" class="title">训练数据治理：采集时合规</text>
 
   <rect x="40" y="60" width="200" height="180" class="box"/>
-  <text x="140" y="82" text-anchor="middle" class="head">data sources</text>
+  <text x="140" y="82" text-anchor="middle" class="head">数据来源</text>
   <rect x="60" y="100" width="160" height="50" class="cool"/>
-  <text x="140" y="125" text-anchor="middle" class="step">public web</text>
-  <text x="140" y="143" text-anchor="middle" class="small">robots.txt opt-out</text>
+  <text x="140" y="125" text-anchor="middle" class="step">公开网络</text>
+  <text x="140" y="143" text-anchor="middle" class="small">通过 robots.txt 退出</text>
   <rect x="60" y="160" width="160" height="50" class="cool"/>
-  <text x="140" y="185" text-anchor="middle" class="step">first-party content</text>
-  <text x="140" y="203" text-anchor="middle" class="small">EU: legitimate interest</text>
+  <text x="140" y="185" text-anchor="middle" class="step">第一方内容</text>
+  <text x="140" y="203" text-anchor="middle" class="small">欧盟：合法利益</text>
 
   <rect x="260" y="60" width="220" height="180" class="box"/>
-  <text x="370" y="82" text-anchor="middle" class="head">opt-out infrastructure</text>
+  <text x="370" y="82" text-anchor="middle" class="head">退出机制基础设施</text>
   <rect x="280" y="100" width="180" height="50" class="cold"/>
   <text x="370" y="125" text-anchor="middle" class="step">robots.txt</text>
   <rect x="280" y="160" width="180" height="50" class="cold"/>
-  <text x="370" y="185" text-anchor="middle" class="step">C2PA "No AI Training"</text>
+  <text x="370" y="185" text-anchor="middle" class="step">C2PA“No AI Training”标记</text>
 
   <rect x="500" y="60" width="220" height="180" class="box"/>
-  <text x="610" y="82" text-anchor="middle" class="head">training pipeline</text>
+  <text x="610" y="82" text-anchor="middle" class="head">训练流水线</text>
   <rect x="520" y="100" width="180" height="50" class="hot"/>
-  <text x="610" y="125" text-anchor="middle" class="step">filter + curate</text>
-  <text x="610" y="143" text-anchor="middle" class="small">respect opt-out at collection</text>
+  <text x="610" y="125" text-anchor="middle" class="step">过滤 + 策展</text>
+  <text x="610" y="143" text-anchor="middle" class="small">采集时尊重退出选择</text>
   <rect x="520" y="160" width="180" height="50" class="hot"/>
-  <text x="610" y="185" text-anchor="middle" class="step">train -&gt; weights</text>
-  <text x="610" y="203" text-anchor="middle" class="small">irreversible embedding</text>
+  <text x="610" y="185" text-anchor="middle" class="step">训练 -&gt; 权重</text>
+  <text x="610" y="203" text-anchor="middle" class="small">不可逆地嵌入</text>
 
   <rect x="740" y="60" width="180" height="180" class="box"/>
-  <text x="830" y="82" text-anchor="middle" class="head">documentation</text>
+  <text x="830" y="82" text-anchor="middle" class="head">文档</text>
   <rect x="760" y="100" width="140" height="50" class="cool"/>
-  <text x="830" y="125" text-anchor="middle" class="step">AB 2013 summary</text>
-  <text x="830" y="143" text-anchor="middle" class="small">12 fields</text>
+  <text x="830" y="125" text-anchor="middle" class="step">AB 2013 摘要</text>
+  <text x="830" y="143" text-anchor="middle" class="small">12 个字段</text>
   <rect x="760" y="160" width="140" height="50" class="cool"/>
-  <text x="830" y="185" text-anchor="middle" class="step">Datasheet</text>
-  <text x="830" y="203" text-anchor="middle" class="small">(Lesson 26)</text>
+  <text x="830" y="185" text-anchor="middle" class="step">数据说明书</text>
+  <text x="830" y="203" text-anchor="middle" class="small">（第 26 课）</text>
 
   <path d="M 240 150 L 260 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow27)" fill="none"/>
   <path d="M 480 150 L 500 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow27)" fill="none"/>
   <path d="M 720 150 L 740 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow27)" fill="none"/>
 
   <rect x="40" y="280" width="880" height="210" class="box"/>
-  <text x="480" y="305" text-anchor="middle" class="head">2024-2025 developments</text>
-  <text x="60" y="335" class="small">EU AI Act GPAI Code of Practice Copyright chapter (2025): all GPAI providers must respect opt-outs.</text>
-  <text x="60" y="355" class="small">California AB 2013 (2024): 12 mandated fields; in effect Jan 2025 for new models.</text>
-  <text x="60" y="375" class="small">Irish DPC (May 2025), Cologne Higher Regional Court, UK ICO (Sept 2025): legitimate interest OK with opt-out.</text>
-  <text x="60" y="395" class="small">Brazilian ANPD (June 2024): suspended Meta over transparency; stricter bar than EU.</text>
-  <text x="60" y="425" class="small">Data Provenance Initiative (Jul 2024): "Consent in Crisis" -- robots.txt restrictions accelerating.</text>
-  <text x="60" y="445" class="small">irreversibility: GDPR right-to-erasure has no practical analogue for trained weights.</text>
-  <text x="60" y="465" class="small">unlearning is approximate; MIA-calibrated; see Lesson 22. compliance window is at collection.</text>
-  <text x="60" y="485" class="small">provenance chain + AB 2013 summary + Datasheet + card = the 2026 documentation minimum.</text>
+  <text x="480" y="305" text-anchor="middle" class="head">2024-2025 年进展</text>
+  <text x="60" y="335" class="small">欧盟 AI 法案通用 AI 实践准则版权章节（2025）：所有通用 AI 供应商必须尊重退出选择。</text>
+  <text x="60" y="355" class="small">加利福尼亚 AB 2013（2024）：强制 12 个字段；新模型自一月 2025 起适用。</text>
+  <text x="60" y="375" class="small">爱尔兰 DPC（五月 2025）、科隆高等地区法院、英国 ICO（九月 2025）：提供退出机制时可依据合法利益。</text>
+  <text x="60" y="395" class="small">巴西 ANPD（六月 2024）：因透明度问题暂停 Meta；门槛比欧盟更严格。</text>
+  <text x="60" y="425" class="small">Data Provenance Initiative（七月 2024）：“Consent in Crisis”—— robots.txt 限制加速增长。</text>
+  <text x="60" y="445" class="small">不可逆性：GDPR 删除权对于已训练权重没有实用对应机制。</text>
+  <text x="60" y="465" class="small">机器遗忘只是近似；需要用成员推断攻击校准；见第 22 课。合规窗口在采集时。</text>
+  <text x="60" y="485" class="small">来源链 + AB 2013 摘要 + 数据说明书 + 模型卡 = 2026 年文档最低要求。</text>
 </svg>

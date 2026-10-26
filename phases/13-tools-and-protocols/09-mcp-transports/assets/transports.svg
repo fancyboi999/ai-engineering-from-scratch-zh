@@ -13,56 +13,56 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">MCP 2026-07-28 transports and the legacy boundary</text>
+  <text x="480" y="26" text-anchor="middle" class="title">MCP 2026-07-28 传输方式及旧版边界</text>
 
   <rect x="35" y="55" width="280" height="410" class="cool"/>
-  <text x="175" y="80" text-anchor="middle" class="head">stdio: local</text>
-  <text x="55" y="112" class="step">binding</text>
-  <text x="55" y="134" class="small">client-launched child process</text>
-  <text x="55" y="152" class="small">one JSON-RPC object per line</text>
-  <text x="55" y="170" class="small">stdout protocol, stderr logs</text>
-  <text x="55" y="208" class="step">modern metadata</text>
-  <text x="55" y="230" class="small">version + capabilities per request</text>
-  <text x="55" y="248" class="small">clientInfo SHOULD repeat</text>
-  <text x="55" y="286" class="step">lifetime</text>
-  <text x="55" y="308" class="small">EOF closes transport process</text>
-  <text x="55" y="326" class="small">process is not protocol session</text>
-  <text x="55" y="364" class="step">recovery</text>
-  <text x="55" y="386" class="small">restart, rediscover, relist</text>
-  <text x="55" y="404" class="small">retry safe work with new id</text>
+  <text x="175" y="80" text-anchor="middle" class="head">stdio：本地</text>
+  <text x="55" y="112" class="step">绑定方式</text>
+  <text x="55" y="134" class="small">客户端启动子进程</text>
+  <text x="55" y="152" class="small">每行一个 JSON-RPC 对象</text>
+  <text x="55" y="170" class="small">stdout 传协议，stderr 写日志</text>
+  <text x="55" y="208" class="step">现代协议元数据</text>
+  <text x="55" y="230" class="small">每个请求携带版本与能力</text>
+  <text x="55" y="248" class="small">clientInfo 应重复携带</text>
+  <text x="55" y="286" class="step">生命周期</text>
+  <text x="55" y="308" class="small">EOF 关闭传输进程</text>
+  <text x="55" y="326" class="small">进程不是协议会话</text>
+  <text x="55" y="364" class="step">恢复</text>
+  <text x="55" y="386" class="small">重启、重新发现、重新列举</text>
+  <text x="55" y="404" class="small">用新 ID 重试安全任务</text>
 
   <rect x="340" y="55" width="280" height="410" class="cold"/>
-  <text x="480" y="80" text-anchor="middle" class="head">Streamable HTTP: modern</text>
-  <text x="360" y="112" class="step">single endpoint /mcp</text>
-  <text x="360" y="134" class="small">POST each JSON-RPC message</text>
-  <text x="360" y="152" class="small">response: JSON or scoped SSE</text>
-  <text x="360" y="188" class="step">required mirrors</text>
+  <text x="480" y="80" text-anchor="middle" class="head">Streamable HTTP：现代协议</text>
+  <text x="360" y="112" class="step">单一端点 /mcp</text>
+  <text x="360" y="134" class="small">逐条 POST JSON-RPC 消息</text>
+  <text x="360" y="152" class="small">响应：JSON 或限定范围的 SSE</text>
+  <text x="360" y="188" class="step">必须镜像到头部的字段</text>
   <text x="360" y="210" class="small">MCP-Protocol-Version</text>
-  <text x="360" y="228" class="small">Mcp-Method + conditional Mcp-Name</text>
-  <text x="360" y="246" class="small">validate every value vs body</text>
-  <text x="360" y="282" class="step">long-lived changes</text>
+  <text x="360" y="228" class="small">Mcp-Method + 条件性 Mcp-Name</text>
+  <text x="360" y="246" class="small">逐值与消息正文对照校验</text>
+  <text x="360" y="282" class="step">长时间接收变更</text>
   <text x="360" y="304" class="small">POST subscriptions/listen</text>
-  <text x="360" y="322" class="small">ack + tagged notifications + result</text>
-  <text x="360" y="358" class="step">removed modern behavior</text>
-  <text x="360" y="380" class="small">GET / DELETE return 405</text>
-  <text x="360" y="398" class="small">ignore session + replay headers</text>
-  <text x="360" y="416" class="small">no server JSON-RPC requests</text>
+  <text x="360" y="322" class="small">确认 + 带标签的通知 + 结果</text>
+  <text x="360" y="358" class="step">现代协议已移除的行为</text>
+  <text x="360" y="380" class="small">GET / DELETE 返回 405</text>
+  <text x="360" y="398" class="small">忽略会话与重放头</text>
+  <text x="360" y="416" class="small">服务器不发 JSON-RPC 请求</text>
 
   <rect x="645" y="55" width="280" height="410" class="hot"/>
-  <text x="785" y="80" text-anchor="middle" class="head">legacy compatibility only</text>
+  <text x="785" y="80" text-anchor="middle" class="head">仅用于旧版兼容</text>
   <text x="665" y="112" class="step">2025 Streamable HTTP</text>
   <text x="665" y="134" class="small">Mcp-Session-Id</text>
-  <text x="665" y="152" class="small">standalone GET + DELETE</text>
-  <text x="665" y="170" class="small">Last-Event-ID resumption</text>
+  <text x="665" y="152" class="small">独立 GET + DELETE</text>
+  <text x="665" y="170" class="small">Last-Event-ID 恢复</text>
   <text x="665" y="206" class="step">2024 HTTP+SSE</text>
-  <text x="665" y="228" class="small">separate SSE and POST endpoints</text>
-  <text x="665" y="264" class="step">safe dual-era probe</text>
-  <text x="665" y="286" class="small">modern POST first</text>
-  <text x="665" y="304" class="small">recognized modern error: stay modern</text>
-  <text x="665" y="322" class="small">unrecognized miss: try legacy</text>
-  <text x="665" y="358" class="step">migration rule</text>
-  <text x="665" y="380" class="small">keep legacy routes separate</text>
-  <text x="665" y="398" class="small">never label them 2026 behavior</text>
+  <text x="665" y="228" class="small">分离的 SSE 与 POST 端点</text>
+  <text x="665" y="264" class="step">安全探测两个协议世代</text>
+  <text x="665" y="286" class="small">先发现代协议 POST</text>
+  <text x="665" y="304" class="small">识别出的现代协议错误：继续现代协议</text>
+  <text x="665" y="322" class="small">无法识别的失败：尝试旧版</text>
+  <text x="665" y="358" class="step">迁移规则</text>
+  <text x="665" y="380" class="small">旧版路由保持独立</text>
+  <text x="665" y="398" class="small">不得标为 2026 行为</text>
 
-  <text x="480" y="505" text-anchor="middle" class="caption">Protocol semantics stay the same across bindings: every modern request is self-describing.</text>
+  <text x="480" y="505" text-anchor="middle" class="caption">不同绑定下协议语义相同：每个现代请求都自描述。</text>
 </svg>

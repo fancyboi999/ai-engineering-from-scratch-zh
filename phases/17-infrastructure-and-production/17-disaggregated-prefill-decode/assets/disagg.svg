@@ -16,54 +16,54 @@
       <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
     </marker>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">disaggregated prefill + decode — NVIDIA Dynamo / llm-d</text>
+  <text x="480" y="24" text-anchor="middle" class="title">解耦预填充 + 解码 — NVIDIA Dynamo / llm-d</text>
 
   <rect x="40" y="60" width="140" height="70" class="router"/>
-  <text x="110" y="82" text-anchor="middle" class="head">router</text>
-  <text x="110" y="100" text-anchor="middle" class="small">cache-aware</text>
-  <text x="110" y="116" text-anchor="middle" class="small">+ SLA planner</text>
+  <text x="110" y="82" text-anchor="middle" class="head">路由器</text>
+  <text x="110" y="100" text-anchor="middle" class="small">感知缓存</text>
+  <text x="110" y="116" text-anchor="middle" class="small">+ SLA 规划器</text>
 
   <rect x="240" y="60" width="260" height="120" class="pre"/>
-  <text x="370" y="82" text-anchor="middle" class="head">prefill pool — compute-bound</text>
+  <text x="370" y="82" text-anchor="middle" class="head">预填充池 — 计算受限</text>
   <text x="370" y="102" text-anchor="middle" class="step">H100 / B200</text>
-  <text x="250" y="122" class="small">· matmul-heavy forward</text>
-  <text x="250" y="138" class="small">· FLOPs-limited</text>
-  <text x="250" y="154" class="small">· scale on queue depth</text>
-  <text x="370" y="174" text-anchor="middle" class="caption">~2000 TFLOPS FP8 useful</text>
+  <text x="250" y="122" class="small">· 矩阵乘法密集的前向计算</text>
+  <text x="250" y="138" class="small">· 受 FLOPs 限制</text>
+  <text x="250" y="154" class="small">· 按队列深度扩缩容</text>
+  <text x="370" y="174" text-anchor="middle" class="caption">约 2000 TFLOPS FP8 有效算力</text>
 
   <rect x="640" y="60" width="260" height="120" class="dec"/>
-  <text x="770" y="82" text-anchor="middle" class="head">decode pool — memory-bound</text>
-  <text x="770" y="102" text-anchor="middle" class="step">H200 or aggressive quant</text>
-  <text x="650" y="122" class="small">· one token per iter, all weights</text>
-  <text x="650" y="138" class="small">· HBM-bandwidth-limited</text>
-  <text x="650" y="154" class="small">· scale on KV utilization</text>
-  <text x="770" y="174" text-anchor="middle" class="caption">~3 TB/s HBM3 ceiling</text>
+  <text x="770" y="82" text-anchor="middle" class="head">解码池 — 内存带宽受限</text>
+  <text x="770" y="102" text-anchor="middle" class="step">H200 或激进量化</text>
+  <text x="650" y="122" class="small">· 每次迭代一个 token，读取全部权重</text>
+  <text x="650" y="138" class="small">· 受 HBM 带宽限制</text>
+  <text x="650" y="154" class="small">· 按 KV 利用率扩缩容</text>
+  <text x="770" y="174" text-anchor="middle" class="caption">约 3 TB/s HBM3 上限</text>
 
   <path class="arrow" d="M180 95 L 235 95"/>
   <text x="210" y="88" text-anchor="middle" class="small">prompt</text>
   <path class="arrow" d="M500 95 L 635 95"/>
   <text x="568" y="78" text-anchor="middle" class="step">NIXL</text>
-  <text x="568" y="108" text-anchor="middle" class="small">KV transfer</text>
-  <text x="568" y="125" text-anchor="middle" class="small">RDMA or TCP</text>
+  <text x="568" y="108" text-anchor="middle" class="small">KV 传输</text>
+  <text x="568" y="125" text-anchor="middle" class="small">RDMA 或 TCP</text>
 
   <rect x="40" y="210" width="440" height="110" class="box"/>
   <text x="260" y="232" text-anchor="middle" class="head">NVIDIA Dynamo</text>
-  <text x="60" y="256" class="small">· sits above vLLM / SGLang / TRT-LLM</text>
-  <text x="60" y="274" class="small">· Planner Profiler + SLA Planner auto-configs</text>
-  <text x="60" y="292" class="small">· Rust core, Python extensibility</text>
-  <text x="60" y="310" class="small">· 30x on DeepSeek-R1; 50x MoE on GB300 NVL72</text>
+  <text x="60" y="256" class="small">· 位于 vLLM / SGLang / TRT-LLM 之上</text>
+  <text x="60" y="274" class="small">· Planner Profiler + SLA Planner 自动配置</text>
+  <text x="60" y="292" class="small">· Rust 内核，Python 可扩展</text>
+  <text x="60" y="310" class="small">· DeepSeek-R1 上 30 倍；GB300 NVL72 上 MoE 为 50 倍</text>
 
   <rect x="500" y="210" width="420" height="110" class="box"/>
   <text x="710" y="232" text-anchor="middle" class="head">llm-d (Red Hat + AWS)</text>
-  <text x="520" y="256" class="small">· Kubernetes-native Services per role</text>
-  <text x="520" y="274" class="small">· packDomain: rack for KV locality</text>
-  <text x="520" y="292" class="small">· per-role HPA (queue / KV util)</text>
-  <text x="520" y="310" class="small">· 0.5: hierarchical KV, LoRA routing, UCCL</text>
+  <text x="520" y="256" class="small">· Kubernetes 原生服务按角色划分</text>
+  <text x="520" y="274" class="small">· packDomain：按机架保持 KV 局部性</text>
+  <text x="520" y="292" class="small">· 每角色 HPA（队列 / KV 利用率）</text>
+  <text x="520" y="310" class="small">· 0.5：层次 KV、LoRA 路由、UCCL</text>
 
   <rect x="40" y="340" width="880" height="110" class="box"/>
-  <text x="480" y="362" text-anchor="middle" class="head">when it pays off</text>
-  <text x="480" y="386" text-anchor="middle" class="step">prompts > 512 tokens AND outputs > 200 tokens</text>
-  <text x="480" y="404" text-anchor="middle" class="step">MoE serving (DeepSeek-V3, future GPT-5 variants) — double win on expert routing</text>
-  <text x="480" y="424" text-anchor="middle" class="step">real case: $2M → $1.2M/yr on same workload, same SLA, no new hardware</text>
-  <text x="480" y="444" text-anchor="middle" class="caption">short prompts: transfer tax dominates, do not disaggregate</text>
+  <text x="480" y="362" text-anchor="middle" class="head">何时值得采用</text>
+  <text x="480" y="386" text-anchor="middle" class="step">prompt &gt; 512 token 且输出 &gt; 200 token</text>
+  <text x="480" y="404" text-anchor="middle" class="step">MoE 服务（DeepSeek-V3、未来 GPT-5 变体）— 专家路由带来双重收益</text>
+  <text x="480" y="424" text-anchor="middle" class="step">真实案例：相同负载、相同 SLA、无新增硬件，成本 $2M → $1.2M/年</text>
+  <text x="480" y="444" text-anchor="middle" class="caption">短 prompt：传输开销占主导，不要解耦</text>
 </svg>

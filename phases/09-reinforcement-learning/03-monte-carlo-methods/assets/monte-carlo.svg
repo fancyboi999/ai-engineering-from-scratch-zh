@@ -13,35 +13,35 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">MC: rollout, compute returns, average</text>
+  <text x="450" y="30" text-anchor="middle" class="title">蒙特卡洛：采样轨迹、计算回报、求平均</text>
 
   <rect x="40" y="60" width="820" height="90" class="hot"/>
-  <text x="60" y="85" class="label">episode i</text>
-  <text x="60" y="110" class="content">s_0 --a_0--&gt; s_1 --a_1--&gt; s_2 --a_2--&gt; ... --a_{T-1}--&gt; s_T  (terminal)</text>
-  <text x="60" y="132" class="content">rewards:   r_1      r_2       r_3                  r_T</text>
+  <text x="60" y="85" class="label">回合 i</text>
+  <text x="60" y="110" class="content">s_0 --a_0--&gt; s_1 --a_1--&gt; s_2 --a_2--&gt; ... --a_{T-1}--&gt; s_T（终止）</text>
+  <text x="60" y="132" class="content">奖励：r_1 r_2 r_3 r_T</text>
 
   <line x1="450" y1="150" x2="450" y2="175" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="40" y="180" width="820" height="80" class="box"/>
-  <text x="60" y="205" class="label">backward pass: compute returns</text>
-  <text x="60" y="230" class="content">G_t = r_{t+1} + gamma * G_{t+1}    (one pass, O(T))</text>
-  <text x="60" y="250" class="caption">the return G_t is the sampled realization of the expected return V^pi(s_t)</text>
+  <text x="60" y="205" class="label">反向遍历：计算回报</text>
+  <text x="60" y="230" class="content">G_t = r_{t+1} + gamma * G_{t+1}（遍历一次，O(T)）</text>
+  <text x="60" y="250" class="caption">回报 G_t 是期望回报 V^pi(s_t) 的一次采样实现</text>
 
   <line x1="450" y1="262" x2="450" y2="285" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="40" y="290" width="400" height="130" class="box"/>
-  <text x="240" y="315" text-anchor="middle" class="label">first-visit MC</text>
-  <text x="60" y="340" class="content">for t where s_t first visited:</text>
+  <text x="240" y="315" text-anchor="middle" class="label">首次访问蒙特卡洛</text>
+  <text x="60" y="340" class="content">对 s_t 首次被访问时的 t：</text>
   <text x="60" y="360" class="content">  N(s_t) += 1</text>
   <text x="60" y="380" class="content">  V(s_t) += (G_t - V(s_t)) / N(s_t)</text>
-  <text x="240" y="405" text-anchor="middle" class="caption">unbiased, iid samples</text>
+  <text x="240" y="405" text-anchor="middle" class="caption">无偏，独立同分布样本</text>
 
   <rect x="460" y="290" width="400" height="130" class="box"/>
-  <text x="660" y="315" text-anchor="middle" class="label">every-visit MC</text>
-  <text x="480" y="340" class="content">for every t in trajectory:</text>
+  <text x="660" y="315" text-anchor="middle" class="label">每次访问蒙特卡洛</text>
+  <text x="480" y="340" class="content">对轨迹中的每个 t：</text>
   <text x="480" y="360" class="content">  N(s_t) += 1</text>
   <text x="480" y="380" class="content">  V(s_t) += (G_t - V(s_t)) / N(s_t)</text>
-  <text x="660" y="405" text-anchor="middle" class="caption">lower variance, slightly biased</text>
+  <text x="660" y="405" text-anchor="middle" class="caption">方差更低，略有偏差</text>
 
-  <text x="450" y="450" text-anchor="middle" class="caption">no model, no bootstrap — just sample trajectories and average the returns</text>
+  <text x="450" y="450" text-anchor="middle" class="caption">无模型，无自举 — 仅采样轨迹并平均回报</text>
 </svg>

@@ -15,70 +15,70 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">2025-2026 multi-agent benchmarks and what each measures</text>
+  <text x="480" y="28" text-anchor="middle" class="title">2025-2026 多 agent 基准及其测量内容</text>
 
   <rect x="40" y="60" width="880" height="220" class="box"/>
-  <text x="480" y="84" text-anchor="middle" class="head">the five canonical benchmarks</text>
+  <text x="480" y="84" text-anchor="middle" class="head">五个典型基准</text>
 
   <rect x="60" y="110" width="170" height="150" class="cool"/>
   <text x="145" y="134" text-anchor="middle" class="step">MultiAgentBench</text>
   <text x="145" y="152" text-anchor="middle" class="step">(MARBLE)</text>
-  <text x="145" y="174" text-anchor="middle" class="small">topologies:</text>
-  <text x="145" y="190" text-anchor="middle" class="small">star/chain/tree/graph</text>
-  <text x="145" y="212" text-anchor="middle" class="small">graph wins research</text>
-  <text x="145" y="230" text-anchor="middle" class="small">coord-tax past ~4</text>
+  <text x="145" y="174" text-anchor="middle" class="small">拓扑：</text>
+  <text x="145" y="190" text-anchor="middle" class="small">星形/链/树/图</text>
+  <text x="145" y="212" text-anchor="middle" class="small">图拓扑在研究任务中领先</text>
+  <text x="145" y="230" text-anchor="middle" class="small">约 4 个以上后协调税增加</text>
   <text x="145" y="252" text-anchor="middle" class="caption">ACL 2025</text>
 
   <rect x="240" y="110" width="170" height="150" class="hot"/>
   <text x="325" y="134" text-anchor="middle" class="step">COMMA</text>
-  <text x="325" y="174" text-anchor="middle" class="small">multimodal,</text>
-  <text x="325" y="190" text-anchor="middle" class="small">asymmetric info</text>
-  <text x="325" y="212" text-anchor="middle" class="small">GPT-4o struggles</text>
-  <text x="325" y="230" text-anchor="middle" class="small">to beat random</text>
-  <text x="325" y="252" text-anchor="middle" class="caption">null-result signal</text>
+  <text x="325" y="174" text-anchor="middle" class="small">多模态、</text>
+  <text x="325" y="190" text-anchor="middle" class="small">信息不对称</text>
+  <text x="325" y="212" text-anchor="middle" class="small">GPT-4o 难以</text>
+  <text x="325" y="230" text-anchor="middle" class="small">超越随机策略</text>
+  <text x="325" y="252" text-anchor="middle" class="caption">无提升结果也是信号</text>
 
   <rect x="420" y="110" width="170" height="150" class="cold"/>
   <text x="505" y="134" text-anchor="middle" class="step">MedAgentBoard</text>
-  <text x="505" y="174" text-anchor="middle" class="small">4 medical tasks</text>
-  <text x="505" y="190" text-anchor="middle" class="small">single-LLM often</text>
-  <text x="505" y="212" text-anchor="middle" class="small">matches multi-agent</text>
-  <text x="505" y="230" text-anchor="middle" class="small">over-engineering check</text>
-  <text x="505" y="252" text-anchor="middle" class="caption">domain stress test</text>
+  <text x="505" y="174" text-anchor="middle" class="small">4 项医疗任务</text>
+  <text x="505" y="190" text-anchor="middle" class="small">单 LLM 经常</text>
+  <text x="505" y="212" text-anchor="middle" class="small">与多 agent 相当</text>
+  <text x="505" y="230" text-anchor="middle" class="small">检验是否过度设计</text>
+  <text x="505" y="252" text-anchor="middle" class="caption">领域压力测试</text>
 
   <rect x="600" y="110" width="170" height="150" class="cool"/>
   <text x="685" y="134" text-anchor="middle" class="step">AgentArch</text>
-  <text x="685" y="174" text-anchor="middle" class="small">tools + memory +</text>
-  <text x="685" y="190" text-anchor="middle" class="small">orchestration</text>
-  <text x="685" y="212" text-anchor="middle" class="small">per-layer value</text>
-  <text x="685" y="230" text-anchor="middle" class="small">attribution</text>
-  <text x="685" y="252" text-anchor="middle" class="caption">enterprise stack</text>
+  <text x="685" y="174" text-anchor="middle" class="small">工具 + 记忆 +</text>
+  <text x="685" y="190" text-anchor="middle" class="small">编排</text>
+  <text x="685" y="212" text-anchor="middle" class="small">逐层价值</text>
+  <text x="685" y="230" text-anchor="middle" class="small">归因</text>
+  <text x="685" y="252" text-anchor="middle" class="caption">企业技术栈</text>
 
   <rect x="780" y="110" width="140" height="150" class="hot"/>
   <text x="850" y="134" text-anchor="middle" class="step">SWE-bench Pro</text>
-  <text x="850" y="174" text-anchor="middle" class="small">1865 problems</text>
-  <text x="850" y="190" text-anchor="middle" class="small">~23% vs 70%+ on</text>
+  <text x="850" y="174" text-anchor="middle" class="small">1865 个问题</text>
+  <text x="850" y="190" text-anchor="middle" class="small">约 23% 对比 Verified 的 70%+</text>
   <text x="850" y="212" text-anchor="middle" class="small">Verified</text>
-  <text x="850" y="230" text-anchor="middle" class="small">contamination</text>
-  <text x="850" y="252" text-anchor="middle" class="caption">gating 2026 test</text>
+  <text x="850" y="230" text-anchor="middle" class="small">数据污染</text>
+  <text x="850" y="252" text-anchor="middle" class="caption">2026 年的准入测试</text>
 
   <rect x="40" y="290" width="880" height="210" class="box"/>
-  <text x="480" y="314" text-anchor="middle" class="head">read benchmark claims skeptically</text>
+  <text x="480" y="314" text-anchor="middle" class="head">审慎看待基准声明</text>
 
   <text x="60" y="346" class="step">[1]</text>
-  <text x="120" y="346" class="small">which benchmark + split? Verified vs Pro is a 40-point gap for frontier models</text>
+  <text x="120" y="346" class="small">哪个基准、哪个划分？前沿模型在 Verified 与 Pro 上相差 40 分</text>
 
   <text x="60" y="372" class="step">[2]</text>
-  <text x="120" y="372" class="small">contamination: is the benchmark post-training-cutoff?</text>
+  <text x="120" y="372" class="small">数据污染：基准是否晚于训练截止日期？</text>
 
   <text x="60" y="398" class="step">[3]</text>
-  <text x="120" y="398" class="small">baselines: vs single-LLM, vs random, vs prior multi-agent</text>
+  <text x="120" y="398" class="small">基线：对比单 LLM、随机策略、既有多 agent</text>
 
   <text x="60" y="424" class="step">[4]</text>
-  <text x="120" y="424" class="small">statistical significance: N trials, CI, p-value</text>
+  <text x="120" y="424" class="small">统计显著性：N 次试验、置信区间、p 值</text>
 
   <text x="60" y="450" class="step">[5]</text>
-  <text x="120" y="450" class="small">task diversity: one task or many — generalization matters</text>
+  <text x="120" y="450" class="small">任务多样性：单任务还是多任务 — 泛化很重要</text>
 
   <text x="60" y="476" class="step">[6]</text>
-  <text x="120" y="476" class="small">cost disclosure: tokens + wall-clock — 20x cost for 10% lift is a business decision</text>
+  <text x="120" y="476" class="small">成本披露：token + 总耗时 — 花 20 倍成本提升 10% 是业务决策</text>
 </svg>

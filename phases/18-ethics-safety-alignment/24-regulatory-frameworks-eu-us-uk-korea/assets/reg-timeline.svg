@@ -15,40 +15,40 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">AI regulation timeline: EU, US, UK, Korea</text>
+  <text x="480" y="24" text-anchor="middle" class="title">AI 监管时间线：欧盟、美国、英国、韩国</text>
 
   <line x1="60" y1="260" x2="900" y2="260" class="timeline"/>
 
   <line x1="100" y1="250" x2="100" y2="270" class="tick"/>
   <text x="100" y="290" text-anchor="middle" class="small">2024-08</text>
   <rect x="60" y="160" width="200" height="70" class="cool"/>
-  <text x="160" y="185" text-anchor="middle" class="step">EU AI Act in force</text>
-  <text x="160" y="205" text-anchor="middle" class="small">Regulation 2024/1689</text>
+  <text x="160" y="185" text-anchor="middle" class="step">欧盟 AI 法案生效</text>
+  <text x="160" y="205" text-anchor="middle" class="small">条例 2024/1689</text>
 
   <line x1="260" y1="250" x2="260" y2="270" class="tick"/>
   <text x="260" y="290" text-anchor="middle" class="small">2025-02</text>
   <rect x="220" y="210" width="200" height="40" class="cool"/>
-  <text x="320" y="235" text-anchor="middle" class="small">prohibited practices apply</text>
+  <text x="320" y="235" text-anchor="middle" class="small">禁止性规则开始适用</text>
 
   <line x1="420" y1="250" x2="420" y2="270" class="tick"/>
   <text x="420" y="290" text-anchor="middle" class="small">2025-08</text>
   <rect x="380" y="330" width="200" height="40" class="cool"/>
-  <text x="480" y="355" text-anchor="middle" class="small">GPAI obligations apply</text>
+  <text x="480" y="355" text-anchor="middle" class="small">通用 AI 义务开始适用</text>
 
   <line x1="580" y1="250" x2="580" y2="270" class="tick"/>
   <text x="580" y="290" text-anchor="middle" class="small">2026-01</text>
   <rect x="540" y="160" width="200" height="40" class="cold"/>
-  <text x="640" y="185" text-anchor="middle" class="small">Korea Framework Act effective</text>
+  <text x="640" y="185" text-anchor="middle" class="small">韩国框架法生效</text>
 
   <line x1="780" y1="250" x2="780" y2="270" class="tick"/>
   <text x="780" y="290" text-anchor="middle" class="small">2026-08</text>
   <rect x="720" y="330" width="200" height="70" class="hot"/>
-  <text x="820" y="355" text-anchor="middle" class="step">EU AI Act full applicability</text>
-  <text x="820" y="375" text-anchor="middle" class="small">Article 50 transparency</text>
-  <text x="820" y="395" text-anchor="middle" class="small">penalties up to 15M EUR / 3%</text>
+  <text x="820" y="355" text-anchor="middle" class="step">欧盟 AI 法案全面适用</text>
+  <text x="820" y="375" text-anchor="middle" class="small">第 50 条透明度要求</text>
+  <text x="820" y="395" text-anchor="middle" class="small">罚款最高 15M 欧元 / 3%</text>
 
   <rect x="40" y="410" width="880" height="80" class="box"/>
-  <text x="480" y="435" text-anchor="middle" class="head">2025 rebrands</text>
-  <text x="60" y="460" class="small">UK AISI -&gt; AI Security Institute (Feb 2025): narrower frontier-security focus, drops bias / free-speech framing.</text>
-  <text x="60" y="478" class="small">US AISI -&gt; CAISI (Jun 2025): Center for AI Standards and Innovation; pro-growth posture; NIST host.</text>
+  <text x="480" y="435" text-anchor="middle" class="head">2025 年机构更名</text>
+  <text x="60" y="460" class="small">英国 AISI -&gt; AI Security Institute（二月 2025）：更聚焦前沿安全，移除偏差 / 言论自由表述。</text>
+  <text x="60" y="478" class="small">美国 AISI -&gt; CAISI（六月 2025）：AI 标准与创新中心；强调增长；由 NIST 承办。</text>
 </svg>

@@ -14,69 +14,69 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">two loops replace the human preference budget</text>
+  <text x="450" y="28" text-anchor="middle" class="title">两个循环取代人工偏好预算</text>
 
   <!-- CAI column -->
   <rect x="40" y="55" width="400" height="380" class="box"/>
-  <text x="240" y="80" text-anchor="middle" class="label">Constitutional AI — subjective behavior</text>
+  <text x="240" y="80" text-anchor="middle" class="label">Constitutional AI — 主观行为</text>
 
   <rect x="60" y="100" width="360" height="32" class="hot"/>
-  <text x="240" y="121" text-anchor="middle" class="content">prompt + initial response</text>
+  <text x="240" y="121" text-anchor="middle" class="content">prompt + 初始响应</text>
 
   <line x1="240" y1="137" x2="240" y2="155" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="160" width="360" height="48" class="box"/>
-  <text x="240" y="180" text-anchor="middle" class="content">model critiques against</text>
-  <text x="240" y="198" text-anchor="middle" class="content">principle sampled from constitution</text>
+  <text x="240" y="180" text-anchor="middle" class="content">模型根据从宪法中</text>
+  <text x="240" y="198" text-anchor="middle" class="content">采样的原则进行批评</text>
 
   <line x1="240" y1="213" x2="240" y2="231" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="236" width="360" height="32" class="box"/>
-  <text x="240" y="257" text-anchor="middle" class="content">model rewrites response</text>
+  <text x="240" y="257" text-anchor="middle" class="content">模型重写响应</text>
 
   <line x1="240" y1="273" x2="240" y2="291" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="296" width="360" height="32" class="cool"/>
-  <text x="240" y="317" text-anchor="middle" class="content">SFT on (prompt, revised)</text>
+  <text x="240" y="317" text-anchor="middle" class="content">对 (prompt, revised) 进行 SFT</text>
 
   <line x1="240" y1="333" x2="240" y2="351" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="356" width="360" height="32" class="cool"/>
-  <text x="240" y="377" text-anchor="middle" class="content">DPO on pairwise AI judgments</text>
+  <text x="240" y="377" text-anchor="middle" class="content">基于成对 AI 判断进行 DPO</text>
 
-  <text x="240" y="412" text-anchor="middle" class="caption">lever is the constitution — editing text,</text>
-  <text x="240" y="427" text-anchor="middle" class="caption">not re-labeling thousands of pairs</text>
+  <text x="240" y="412" text-anchor="middle" class="caption">杠杆在于宪法 — 编辑文本，</text>
+  <text x="240" y="427" text-anchor="middle" class="caption">而非重新标注成千上万的配对</text>
 
   <!-- GRPO column -->
   <rect x="460" y="55" width="400" height="380" class="box"/>
-  <text x="660" y="80" text-anchor="middle" class="label">GRPO — verifiable behavior</text>
+  <text x="660" y="80" text-anchor="middle" class="label">GRPO — 可验证行为</text>
 
   <rect x="480" y="100" width="360" height="32" class="hot"/>
-  <text x="660" y="121" text-anchor="middle" class="content">prompt (math / code / format)</text>
+  <text x="660" y="121" text-anchor="middle" class="content">prompt（数学 / 代码 / 格式）</text>
 
   <line x1="660" y1="137" x2="660" y2="155" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="480" y="160" width="360" height="48" class="box"/>
-  <text x="660" y="180" text-anchor="middle" class="content">sample G responses</text>
+  <text x="660" y="180" text-anchor="middle" class="content">采样 G 个响应</text>
   <text x="660" y="198" text-anchor="middle" class="content">(G = 16, 32, 64)</text>
 
   <line x1="660" y1="213" x2="660" y2="231" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="480" y="236" width="360" height="32" class="box"/>
-  <text x="660" y="257" text-anchor="middle" class="content">deterministic rule grades each one</text>
+  <text x="660" y="257" text-anchor="middle" class="content">确定性规则逐项评分</text>
 
   <line x1="660" y1="273" x2="660" y2="291" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="480" y="296" width="360" height="32" class="cool"/>
-  <text x="660" y="317" text-anchor="middle" class="content">A_i = (r_i - mean) / std  (group-relative)</text>
+  <text x="660" y="317" text-anchor="middle" class="content">A_i = (r_i - mean) / std（组内相对）</text>
 
   <line x1="660" y1="333" x2="660" y2="351" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="480" y="356" width="360" height="32" class="cool"/>
-  <text x="660" y="377" text-anchor="middle" class="content">clipped surrogate + KL to reference</text>
+  <text x="660" y="377" text-anchor="middle" class="content">裁剪的替代目标 + 与参考模型的 KL</text>
 
-  <text x="660" y="412" text-anchor="middle" class="caption">no value function, no reward model —</text>
-  <text x="660" y="427" text-anchor="middle" class="caption">DeepSeek-R1 recipe, ORM only</text>
+  <text x="660" y="412" text-anchor="middle" class="caption">无需价值函数，也无需奖励模型 —</text>
+  <text x="660" y="427" text-anchor="middle" class="caption">DeepSeek-R1 配方，仅用结果奖励模型</text>
 
-  <text x="450" y="468" text-anchor="middle" class="caption">CAI for "tone". GRPO for "answer". Most 2026 pipelines run both.</text>
+  <text x="450" y="468" text-anchor="middle" class="caption">CAI 处理“语气”，GRPO 处理“答案”。多数 2026 年流水线同时使用两者。</text>
 </svg>

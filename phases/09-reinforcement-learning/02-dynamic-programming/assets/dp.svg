@@ -13,53 +13,53 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">two DP algorithms, one fixed point</text>
+  <text x="450" y="30" text-anchor="middle" class="title">两种动态规划算法，一个不动点</text>
 
   <rect x="40" y="60" width="380" height="370" class="box"/>
-  <text x="230" y="85" text-anchor="middle" class="label">policy iteration</text>
-  <text x="230" y="102" text-anchor="middle" class="caption">outer loop over (evaluate, improve)</text>
+  <text x="230" y="85" text-anchor="middle" class="label">策略迭代</text>
+  <text x="230" y="102" text-anchor="middle" class="caption">在（评估、改进）上进行外层循环</text>
 
   <rect x="70" y="125" width="320" height="50" class="hot"/>
-  <text x="230" y="146" text-anchor="middle" class="content">1. evaluate: V^pi until convergence</text>
+  <text x="230" y="146" text-anchor="middle" class="content">1. 评估：计算 V^pi 直至收敛</text>
   <text x="230" y="162" text-anchor="middle" class="content">V(s) &lt;- sum pi(a) sum P (r + g V(s'))</text>
 
   <line x1="230" y1="180" x2="230" y2="198" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="70" y="203" width="320" height="50" class="hot"/>
-  <text x="230" y="224" text-anchor="middle" class="content">2. improve: pi(s) &lt;- argmax_a Q(s,a)</text>
-  <text x="230" y="240" text-anchor="middle" class="content">greedy w.r.t. current V</text>
+  <text x="230" y="224" text-anchor="middle" class="content">2. 改进：pi(s) &lt;- argmax_a Q(s,a)</text>
+  <text x="230" y="240" text-anchor="middle" class="content">相对于当前 V 采取贪心策略</text>
 
   <line x1="230" y1="258" x2="230" y2="278" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="70" y="283" width="320" height="40" class="box"/>
-  <text x="230" y="308" text-anchor="middle" class="content">3. stop if pi unchanged</text>
+  <text x="230" y="308" text-anchor="middle" class="content">3. pi 不变时停止</text>
 
-  <text x="230" y="355" text-anchor="middle" class="caption">few outer iters (5-20)</text>
-  <text x="230" y="375" text-anchor="middle" class="caption">each inner eval is expensive</text>
-  <text x="230" y="400" text-anchor="middle" class="caption">guarantee: monotone V improvement</text>
+  <text x="230" y="355" text-anchor="middle" class="caption">外层迭代较少（5-20）</text>
+  <text x="230" y="375" text-anchor="middle" class="caption">每次内部评估成本高</text>
+  <text x="230" y="400" text-anchor="middle" class="caption">保证：V 单调改进</text>
 
   <rect x="480" y="60" width="380" height="370" class="box"/>
-  <text x="670" y="85" text-anchor="middle" class="label">value iteration</text>
-  <text x="670" y="102" text-anchor="middle" class="caption">one loop, Bellman optimality backup</text>
+  <text x="670" y="85" text-anchor="middle" class="label">价值迭代</text>
+  <text x="670" y="102" text-anchor="middle" class="caption">单层循环，贝尔曼最优性备份</text>
 
   <rect x="510" y="125" width="320" height="60" class="hot"/>
   <text x="670" y="148" text-anchor="middle" class="content">V(s) &lt;- max_a sum P (r + g V(s'))</text>
-  <text x="670" y="168" text-anchor="middle" class="content">applied to every state, every sweep</text>
+  <text x="670" y="168" text-anchor="middle" class="content">每轮扫描应用于每个状态</text>
 
   <line x1="670" y1="192" x2="670" y2="212" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="510" y="217" width="320" height="50" class="hot"/>
-  <text x="670" y="238" text-anchor="middle" class="content">stop when max_s |dV(s)| &lt; eps</text>
-  <text x="670" y="254" text-anchor="middle" class="content">sup-norm contraction by factor g</text>
+  <text x="670" y="238" text-anchor="middle" class="content">max_s |dV(s)| &lt; eps 时停止</text>
+  <text x="670" y="254" text-anchor="middle" class="content">上确界范数以因子 g 收缩</text>
 
   <line x1="670" y1="272" x2="670" y2="292" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="510" y="297" width="320" height="40" class="box"/>
-  <text x="670" y="322" text-anchor="middle" class="content">extract greedy pi from V*</text>
+  <text x="670" y="322" text-anchor="middle" class="content">从 V* 提取贪心策略 pi</text>
 
-  <text x="670" y="355" text-anchor="middle" class="caption">more sweeps (often 100+)</text>
-  <text x="670" y="375" text-anchor="middle" class="caption">each sweep O(|S| * |A|)</text>
-  <text x="670" y="400" text-anchor="middle" class="caption">convergence: ||T V - V*|| &lt;= g^k ||V_0 - V*||</text>
+  <text x="670" y="355" text-anchor="middle" class="caption">扫描轮次更多（常为 100+）</text>
+  <text x="670" y="375" text-anchor="middle" class="caption">每轮扫描 O(|S| * |A|)</text>
+  <text x="670" y="400" text-anchor="middle" class="caption">收敛：||T V - V*|| &lt;= g^k ||V_0 - V*||</text>
 
-  <text x="450" y="450" text-anchor="middle" class="caption">both land at V* — different paths, same fixed point (generalized policy iteration)</text>
+  <text x="450" y="450" text-anchor="middle" class="caption">两者都到达 V* — 路径不同，不动点相同（广义策略迭代）</text>
 </svg>

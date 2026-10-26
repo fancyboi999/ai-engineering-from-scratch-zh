@@ -13,52 +13,52 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">chaos engineering for LLMs — four planes + feedback loop</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLM 混沌工程：四个平面与反馈循环</text>
 
   <rect x="40" y="50" width="220" height="180" class="control"/>
-  <text x="150" y="72" text-anchor="middle" class="head">control plane</text>
-  <text x="150" y="92" text-anchor="middle" class="step">experiment scheduler</text>
-  <text x="60" y="116" class="small">· LitmusChaos workflow</text>
-  <text x="60" y="134" class="small">· Chaos Mesh CRDs</text>
-  <text x="60" y="152" class="small">· Harness UI</text>
+  <text x="150" y="72" text-anchor="middle" class="head">控制平面</text>
+  <text x="150" y="92" text-anchor="middle" class="step">实验调度器</text>
+  <text x="60" y="116" class="small">· LitmusChaos 工作流</text>
+  <text x="60" y="134" class="small">· Chaos Mesh CRD</text>
+  <text x="60" y="152" class="small">· Harness 界面</text>
   <text x="60" y="170" class="small">· AWS FIS / Azure Chaos Studio</text>
-  <text x="150" y="200" text-anchor="middle" class="caption">schedules, parameters, cadence</text>
+  <text x="150" y="200" text-anchor="middle" class="caption">调度、参数、频次</text>
 
   <rect x="280" y="50" width="220" height="180" class="target"/>
-  <text x="390" y="72" text-anchor="middle" class="head">target plane</text>
-  <text x="390" y="92" text-anchor="middle" class="step">services + infra + data</text>
-  <text x="300" y="116" class="small">· pods, nodes, LB</text>
-  <text x="300" y="134" class="small">· data stores, vector DB</text>
-  <text x="300" y="152" class="small">· LLM gateways</text>
-  <text x="300" y="170" class="small">· upstream providers</text>
+  <text x="390" y="72" text-anchor="middle" class="head">目标平面</text>
+  <text x="390" y="92" text-anchor="middle" class="step">服务 + 基础设施 + 数据</text>
+  <text x="300" y="116" class="small">· pod、节点、负载均衡器</text>
+  <text x="300" y="134" class="small">· 数据存储、向量数据库</text>
+  <text x="300" y="152" class="small">· LLM 网关</text>
+  <text x="300" y="170" class="small">· 上游提供方</text>
 
   <rect x="520" y="50" width="220" height="180" class="safety"/>
-  <text x="630" y="72" text-anchor="middle" class="head">safety plane</text>
-  <text x="630" y="92" text-anchor="middle" class="step">guards + abort</text>
-  <text x="540" y="116" class="small">· burn-rate gate (&gt; 2x budget)</text>
-  <text x="540" y="134" class="small">· blast-radius cap</text>
-  <text x="540" y="152" class="small">· suppression windows</text>
-  <text x="540" y="170" class="small">· trace-ID tagging</text>
-  <text x="540" y="188" class="small">· kill switch</text>
+  <text x="630" y="72" text-anchor="middle" class="head">安全平面</text>
+  <text x="630" y="92" text-anchor="middle" class="step">防护 + 中止</text>
+  <text x="540" y="116" class="small">· 消耗速率门禁（&gt; 2x 预算）</text>
+  <text x="540" y="134" class="small">· 故障影响范围上限</text>
+  <text x="540" y="152" class="small">· 抑制窗口</text>
+  <text x="540" y="170" class="small">· trace-ID 标签</text>
+  <text x="540" y="188" class="small">· 紧急停止开关</text>
 
   <rect x="760" y="50" width="160" height="180" class="obs"/>
-  <text x="840" y="72" text-anchor="middle" class="head">observability</text>
-  <text x="840" y="92" text-anchor="middle" class="step">traces + metrics</text>
-  <text x="780" y="116" class="small">· distinguish</text>
-  <text x="780" y="134" class="small">  chaos-induced from</text>
-  <text x="780" y="152" class="small">  natural failures</text>
-  <text x="780" y="170" class="small">· trace-ID correlation</text>
+  <text x="840" y="72" text-anchor="middle" class="head">可观测性</text>
+  <text x="840" y="92" text-anchor="middle" class="step">trace + 指标</text>
+  <text x="780" y="116" class="small">· 区分</text>
+  <text x="780" y="134" class="small">  混沌实验导致的故障</text>
+  <text x="780" y="152" class="small">  与自然故障</text>
+  <text x="780" y="170" class="small">· trace-ID 关联</text>
 
   <rect x="40" y="260" width="880" height="100" class="box"/>
-  <text x="480" y="282" text-anchor="middle" class="head">five LLM-specific experiments</text>
-  <text x="60" y="308" class="step">1. memory overload (KV preemption storm)</text>
-  <text x="60" y="326" class="step">2. network failure (cut gateway ↔ provider)</text>
-  <text x="60" y="344" class="step">3. provider outage (100% 429)</text>
-  <text x="500" y="308" class="step">4. malformed prompt (tokenizer bomb)</text>
-  <text x="500" y="326" class="step">5. KV eviction storm (force cascading re-prefill)</text>
+  <text x="480" y="282" text-anchor="middle" class="head">LLM 特有的五种实验</text>
+  <text x="60" y="308" class="step">1. 内存过载（KV 抢占风暴）</text>
+  <text x="60" y="326" class="step">2. 网络故障（切断网关 ↔ 提供方）</text>
+  <text x="60" y="344" class="step">3. 提供方中断（100% 429）</text>
+  <text x="500" y="308" class="step">4. 畸形 prompt（分词器炸弹）</text>
+  <text x="500" y="326" class="step">5. KV 淘汰风暴（强制级联重新预填充）</text>
 
   <rect x="40" y="380" width="880" height="80" class="box"/>
-  <text x="480" y="402" text-anchor="middle" class="head">cadence</text>
-  <text x="480" y="424" text-anchor="middle" class="step">weekly canary + SLO review · monthly game day + postmortem · quarterly audit + dep map</text>
-  <text x="480" y="444" text-anchor="middle" class="caption">without SLI/SLO + observability + rollback + runbooks + on-call, don't run in prod</text>
+  <text x="480" y="402" text-anchor="middle" class="head">执行频次</text>
+  <text x="480" y="424" text-anchor="middle" class="step">每周金丝雀与 SLO 复核 · 每月演练与复盘 · 每季度审计与依赖图</text>
+  <text x="480" y="444" text-anchor="middle" class="caption">没有 SLI/SLO、可观测性、回滚、运行手册和轮值时，不在生产运行</text>
 </svg>

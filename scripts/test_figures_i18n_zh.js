@@ -578,3 +578,61 @@ function testNestedContextCache() {
   console.log('nested context-cache: real prefix → semantic → prefix consumer, dynamic inputs, exact captions/headers/aria, number and attribute tree invariance passed');
 }
 testNestedContextCache();
+
+function testScopedProviderLocales() {
+  const svgTitle = one('title', '', 'ROOT-CAUSE WALK', { id: 'stable-title' });
+  const animatedText = new Element('text', { x: '300', y: '65' }, [
+    text('limits too low  0.86'), new Element('animate', { attributeName: 'opacity', values: '0;1', dur: '6s' })
+  ]);
+  const svg = new Element('svg', { viewBox: '0 0 520 250', 'aria-labelledby': 'stable-title' }, [svgTitle, animatedText]);
+  const option = one('option', '', 'enabled', { value: 'enabled' });
+  const meter = one('span', '', 'score 0.86 / 12 requests', { 'aria-label': 'Root cause evidence' });
+  const code = one('code', '', 'ROOT-CAUSE WALK');
+  const widget = host('locale-test', [svg, new Element('select', {}, [option]), meter,
+    new Element('pre', {}, [code]), one('button', '', 'Motion reduced')]);
+  const other = host('unrelated-widget', [one('span', '', 'ROOT-CAUSE WALK')]);
+  let observerCallback, disconnected = false;
+  const disposers = [];
+  const window = {
+    AIFS_FIGURE_LOCALES: { 'sample-provider.js': { 'locale-test': {
+      text: { 'ROOT-CAUSE WALK': '根因排查', 'limits too low  0.86': '限额过低  0.86',
+        enabled: '已启用', 'Root cause evidence': '根因证据' },
+      patterns: [['^score ([\\d.]+) / (\\d+) requests$', '得分 $1 / $2 个请求']]
+    } } },
+    LF: { registerDisposer(_host, fn) { disposers.push(fn); } },
+    MutationObserver: class {
+      constructor(callback) { this.callback = callback; }
+      observe(_host, options) {
+        if (_host === widget) observerCallback = this.callback;
+        assert.deepEqual(Array.from(options.attributeFilter), ['aria-label', 'aria-description', 'aria-roledescription', 'aria-valuetext', 'title', 'alt', 'placeholder']);
+      }
+      disconnect() { disconnected = true; }
+    }
+  };
+  const document = new Document([widget, other]);
+  vm.runInNewContext(fs.readFileSync(path.join(site, 'figures-i18n-zh.js'), 'utf8'), { window, document });
+  window.applyFigureI18n(document);
+  assert.equal(svgTitle.textContent, '根因排查');
+  assert.equal(svgTitle.getAttribute('id'), 'stable-title');
+  assert.equal(svg.getAttribute('aria-labelledby'), 'stable-title');
+  assert.equal(animatedText.firstChild.nodeValue, '限额过低  0.86');
+  assert.equal(animatedText.children[0].getAttribute('dur'), '6s', 'SVG animation subtree remains intact');
+  assert.equal(option.textContent, '已启用');
+  assert.equal(option.getAttribute('value'), 'enabled', 'option machine value remains intact');
+  assert.equal(meter.textContent, '得分 0.86 / 12 个请求');
+  assert.equal(meter.getAttribute('aria-label'), '根因证据');
+  assert.equal(code.textContent, 'ROOT-CAUSE WALK', 'nested code subtree remains intact');
+  assert.equal(other.textContent, 'ROOT-CAUSE WALK', 'dictionaries cannot leak into another widget');
+  meter.textContent = 'score 0.51 / 99 requests';
+  observerCallback();
+  assert.equal(meter.textContent, '得分 0.51 / 99 个请求', 'timer-only updates are translated');
+  observerCallback();
+  assert.equal(meter.textContent, '得分 0.51 / 99 个请求', 'translation is idempotent');
+  meter.textContent = 'Unknown explanation';
+  observerCallback();
+  assert.equal(meter.textContent, 'Unknown explanation', 'unknown prose is reported, never guessed');
+  disposers.forEach(fn => fn());
+  assert.equal(disconnected, true, 'unmount disposes the scoped observer');
+  console.log('provider locales: scoped text/aria/options, timer updates, SVG/number/code preservation and disposal passed');
+}
+testScopedProviderLocales();

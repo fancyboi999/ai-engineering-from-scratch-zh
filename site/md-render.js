@@ -64,6 +64,7 @@
         var inLabChallenge = false;
         var inMathBlock = false;
         var mathLines = [];
+        var figureAnchors = Object.create(null);
 
         function flushLabChallenge() {
           if (!inLabChallenge) return '';
@@ -145,7 +146,11 @@
               } else if (codeLang === 'figure') {
                 // escapeAttr 而非 escapeHtml：写入 HTML 属性，含 " 会截断属性值
                 // （lesson.html 旧实现的潜在 bug，抽取时顺带修正——审查发现）
-                out += '<div class="lesson-figure" data-figure="' + escapeAttr(raw.trim()) + '"></div>';
+                var figureName = raw.trim().split(/\s+/)[0].replace(/[^A-Za-z0-9_-]/g, '-');
+                var figureBase = 'figure-' + figureName;
+                figureAnchors[figureBase] = (figureAnchors[figureBase] || 0) + 1;
+                var figureId = figureBase + (figureAnchors[figureBase] > 1 ? '-' + figureAnchors[figureBase] : '');
+                out += '<div class="lesson-figure" data-figure="' + escapeAttr(raw.trim()) + '" id="' + figureId + '"></div>';
               } else if (codeLang === 'mermaid') {
                 mermaidBlocks++;
                 out += '<div class="mermaid-container">';

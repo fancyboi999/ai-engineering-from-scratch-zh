@@ -15,14 +15,14 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">encoder block vs decoder block — the 2026 skeleton</text>
+  <text x="450" y="30" text-anchor="middle" class="title">编码器块与解码器块：2026 年基本结构</text>
 
   <!-- Encoder column -->
   <rect x="40" y="60" width="360" height="450" class="box"/>
-  <text x="220" y="85" text-anchor="middle" class="label">encoder block (bidirectional)</text>
+  <text x="220" y="85" text-anchor="middle" class="label">编码器块（双向）</text>
 
   <rect x="140" y="110" width="160" height="32" class="hot"/>
-  <text x="220" y="131" text-anchor="middle" class="content">input x  (N, d)</text>
+  <text x="220" y="131" text-anchor="middle" class="content">输入 x (N, d)</text>
 
   <line x1="220" y1="142" x2="220" y2="165" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -32,7 +32,7 @@
   <line x1="220" y1="193" x2="220" y2="215" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="110" y="215" width="220" height="32" class="hot"/>
-  <text x="220" y="236" text-anchor="middle" class="content">multi-head self-attention</text>
+  <text x="220" y="236" text-anchor="middle" class="content">多头自注意力</text>
 
   <line x1="220" y1="247" x2="220" y2="272" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -41,7 +41,7 @@
 
   <!-- residual arc -->
   <path d="M 140 126 Q 60 126 60 288 Q 60 288 207 288" fill="none" stroke="#1a1a1a" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="50" y="200" class="caption">residual</text>
+  <text x="50" y="200" class="caption">残差</text>
 
   <line x1="220" y1="302" x2="220" y2="325" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -62,14 +62,14 @@
 
   <line x1="220" y1="462" x2="220" y2="482" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="140" y="482" width="160" height="22" class="hot"/>
-  <text x="220" y="498" text-anchor="middle" class="content">out (N, d)</text>
+  <text x="220" y="498" text-anchor="middle" class="content">输出 (N, d)</text>
 
   <!-- Decoder column -->
   <rect x="450" y="60" width="410" height="450" class="box"/>
-  <text x="655" y="85" text-anchor="middle" class="label">decoder block (causal + cross-attn)</text>
+  <text x="655" y="85" text-anchor="middle" class="label">解码器块（因果 + 交叉注意力）</text>
 
   <rect x="560" y="110" width="190" height="32" class="hot"/>
-  <text x="655" y="131" text-anchor="middle" class="content">input x  (M, d)</text>
+  <text x="655" y="131" text-anchor="middle" class="content">输入 x (M, d)</text>
 
   <line x1="655" y1="142" x2="655" y2="160" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -79,7 +79,7 @@
   <line x1="655" y1="184" x2="655" y2="202" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="530" y="202" width="250" height="30" class="hot"/>
-  <text x="655" y="222" text-anchor="middle" class="content">masked self-attention</text>
+  <text x="655" y="222" text-anchor="middle" class="content">掩码自注意力</text>
 
   <line x1="655" y1="232" x2="655" y2="250" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <circle cx="655" cy="264" r="10" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
@@ -93,7 +93,7 @@
   <line x1="655" y1="316" x2="655" y2="334" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="520" y="334" width="270" height="30" class="hot"/>
-  <text x="655" y="354" text-anchor="middle" class="content">cross-attention (Q:dec, KV:enc)</text>
+  <text x="655" y="354" text-anchor="middle" class="content">交叉注意力（Q：解码器，KV：编码器）</text>
 
   <!-- arrow in from encoder -->
   <line x1="400" y1="349" x2="520" y2="349" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -116,5 +116,5 @@
   <line x1="655" y1="482" x2="655" y2="495" stroke="#1a1a1a" stroke-width="1.5"/>
   <circle cx="655" cy="502" r="8" fill="#fff" stroke="#1a1a1a" stroke-width="1"/>
 
-  <text x="450" y="544" text-anchor="middle" class="caption">encoder: 2 sublayers per block. decoder: 3 sublayers per block. residuals are dashed, additions are circles.</text>
+  <text x="450" y="544" text-anchor="middle" class="caption">编码器每块 2 个子层，解码器每块 3 个子层。虚线表示残差，圆圈表示相加。</text>
 </svg>

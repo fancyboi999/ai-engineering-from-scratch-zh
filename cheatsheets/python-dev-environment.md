@@ -5,7 +5,7 @@ code: PD
 subtitle: 安装 uv，每项目一个虚拟环境，通过锁文件固定依赖，检查学习路线，配置 VS Code，避免无声的 Python bug。
 hue: 210
 sources: phases/00-setup-and-tooling/01-dev-environment, phases/00-setup-and-tooling/06-python-environments, phases/00-setup-and-tooling/08-editor-setup, phases/00-setup-and-tooling/13-python-for-ai-engineering
-source_hash: a4349266b65a23dc
+source_hash: d61ad8d2d48f1b0c
 ---
 
 ## 四层技术栈

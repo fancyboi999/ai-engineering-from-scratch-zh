@@ -15,34 +15,34 @@
   </defs>
 
   <rect class="box" x="20" y="50" width="200" height="220" rx="4"/>
-  <text class="label" x="120" y="75" text-anchor="middle">raw reviews</text>
+  <text class="label" x="120" y="75" text-anchor="middle">原始评论</text>
   <text class="content" x="35" y="105">"loved this movie"</text>
   <text class="content" x="35" y="130">"not worth your time"</text>
   <text class="content" x="35" y="155">"terrible acting"</text>
   <text class="content" x="35" y="180">"beautiful story"</text>
-  <text class="content" x="35" y="225">labels: + / - / - / +</text>
+  <text class="content" x="35" y="225">标签：+ / - / - / +</text>
 
   <path class="line" d="M 220 160 L 270 160" marker-end="url(#arrow)"/>
-  <text class="stage" x="245" y="150">tokenize</text>
-  <text class="stage" x="245" y="180">+ negate</text>
+  <text class="stage" x="245" y="150">分词</text>
+  <text class="stage" x="245" y="180">+ 否定处理</text>
 
   <rect class="box" x="270" y="50" width="240" height="220" rx="4"/>
-  <text class="label" x="390" y="75" text-anchor="middle">features</text>
+  <text class="label" x="390" y="75" text-anchor="middle">特征</text>
   <text class="content" x="285" y="105">[loved, movie]</text>
   <text class="content" x="285" y="130">[not, NOT_worth, NOT_your]</text>
   <text class="content" x="285" y="155">[terrible, acting]</text>
   <text class="content" x="285" y="180">[beautiful, story]</text>
-  <text class="content" x="285" y="225">+ bigrams: "not_worth", ...</text>
-  <text class="content" x="285" y="245">+ tf-idf weight</text>
+  <text class="content" x="285" y="225">+ 二元组："not_worth"、...</text>
+  <text class="content" x="285" y="245">+ TF-IDF 权重</text>
 
   <path class="line" d="M 510 160 L 560 160" marker-end="url(#arrow)"/>
-  <text class="stage" x="535" y="150">fit</text>
+  <text class="stage" x="535" y="150">拟合</text>
 
   <rect class="box" x="560" y="50" width="180" height="220" rx="4"/>
-  <text class="label" x="650" y="75" text-anchor="middle">classifier</text>
-  <text class="content" x="575" y="105">Naive Bayes</text>
-  <text class="content" x="575" y="130">or Logistic Reg</text>
-  <text class="content" x="575" y="165">learns:</text>
+  <text class="label" x="650" y="75" text-anchor="middle">分类器</text>
+  <text class="content" x="575" y="105">朴素贝叶斯</text>
+  <text class="content" x="575" y="130">或逻辑回归</text>
+  <text class="content" x="575" y="165">学习到：</text>
   <text class="content" x="575" y="185">w[terrible] &lt; 0</text>
   <text class="content" x="575" y="205">w[loved] &gt; 0</text>
   <text class="content" x="575" y="225">w[NOT_worth] &lt; 0</text>
@@ -56,5 +56,5 @@
   <rect class="neg" x="790" y="200" width="90" height="60" rx="4"/>
   <text class="label" x="835" y="235" text-anchor="middle">−</text>
 
-  <text class="stage" x="460" y="305" text-anchor="middle">keep stopwords. handle negation. bigrams catch what unigrams miss.</text>
+  <text class="stage" x="460" y="305" text-anchor="middle">保留停用词，处理否定；二元组捕获单词特征遗漏的信息。</text>
 </svg>

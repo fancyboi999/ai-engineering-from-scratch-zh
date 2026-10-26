@@ -16,57 +16,57 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">The 2026 red-team tooling stack</text>
+  <text x="480" y="24" text-anchor="middle" class="title">2026 红队工具栈</text>
 
   <rect x="40" y="60" width="880" height="160" class="box"/>
-  <text x="480" y="85" text-anchor="middle" class="head">runtime defense: Llama Guard + Prompt-Guard</text>
+  <text x="480" y="85" text-anchor="middle" class="head">运行时防御：Llama Guard + Prompt-Guard</text>
 
   <rect x="60" y="100" width="180" height="100" class="cool"/>
-  <text x="150" y="125" text-anchor="middle" class="step">user input</text>
+  <text x="150" y="125" text-anchor="middle" class="step">用户输入</text>
   <rect x="75" y="135" width="150" height="30" class="cold"/>
   <text x="150" y="155" text-anchor="middle" class="small">Prompt-Guard-86M</text>
   <rect x="75" y="165" width="150" height="30" class="cold"/>
   <text x="150" y="185" text-anchor="middle" class="small">Llama Guard 3/4</text>
 
   <rect x="280" y="100" width="180" height="100" class="hot"/>
-  <text x="370" y="125" text-anchor="middle" class="step">target LLM</text>
-  <text x="370" y="155" text-anchor="middle" class="small">model under deployment</text>
-  <text x="370" y="185" text-anchor="middle" class="small">14 MLCommons hazards watched</text>
+  <text x="370" y="125" text-anchor="middle" class="step">目标 LLM</text>
+  <text x="370" y="155" text-anchor="middle" class="small">正在部署的模型</text>
+  <text x="370" y="185" text-anchor="middle" class="small">监测 14 类 MLCommons 危害</text>
 
   <rect x="500" y="100" width="180" height="100" class="cool"/>
-  <text x="590" y="125" text-anchor="middle" class="step">output</text>
+  <text x="590" y="125" text-anchor="middle" class="step">输出</text>
   <rect x="515" y="135" width="150" height="30" class="cold"/>
   <text x="590" y="155" text-anchor="middle" class="small">Llama Guard 3/4</text>
   <rect x="515" y="165" width="150" height="30" class="cold"/>
-  <text x="590" y="185" text-anchor="middle" class="small">category scores</text>
+  <text x="590" y="185" text-anchor="middle" class="small">分类得分</text>
 
   <rect x="720" y="100" width="180" height="100" class="cool"/>
-  <text x="810" y="125" text-anchor="middle" class="step">user</text>
-  <text x="810" y="155" text-anchor="middle" class="small">response delivered</text>
-  <text x="810" y="185" text-anchor="middle" class="small">or refusal issued</text>
+  <text x="810" y="125" text-anchor="middle" class="step">用户</text>
+  <text x="810" y="155" text-anchor="middle" class="small">交付回答</text>
+  <text x="810" y="185" text-anchor="middle" class="small">或发出拒绝</text>
 
   <path d="M 240 150 L 280 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow16)" fill="none"/>
   <path d="M 460 150 L 500 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow16)" fill="none"/>
   <path d="M 680 150 L 720 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow16)" fill="none"/>
 
   <rect x="40" y="240" width="880" height="140" class="box"/>
-  <text x="480" y="265" text-anchor="middle" class="head">regression: Garak nightly</text>
+  <text x="480" y="265" text-anchor="middle" class="head">回归：每晚运行 Garak</text>
   <rect x="60" y="285" width="260" height="80" class="cold"/>
-  <text x="190" y="310" text-anchor="middle" class="step">probes</text>
-  <text x="190" y="330" text-anchor="middle" class="small">hallucination / leak / injection / jailbreak</text>
-  <text x="190" y="350" text-anchor="middle" class="small">static / dynamic / adaptive</text>
+  <text x="190" y="310" text-anchor="middle" class="step">探针</text>
+  <text x="190" y="330" text-anchor="middle" class="small">幻觉 / 泄露 / 注入 / 越狱</text>
+  <text x="190" y="350" text-anchor="middle" class="small">静态 / 动态 / 自适应</text>
   <rect x="340" y="285" width="260" height="80" class="cold"/>
-  <text x="470" y="310" text-anchor="middle" class="step">detectors</text>
-  <text x="470" y="330" text-anchor="middle" class="small">score expected-failure match</text>
-  <text x="470" y="350" text-anchor="middle" class="small">TBSA tier-based pass/fail</text>
+  <text x="470" y="310" text-anchor="middle" class="step">检测器</text>
+  <text x="470" y="330" text-anchor="middle" class="small">评分是否匹配预期失败</text>
+  <text x="470" y="350" text-anchor="middle" class="small">基于 TBSA 层级判定通过或失败</text>
   <rect x="620" y="285" width="260" height="80" class="cold"/>
-  <text x="750" y="310" text-anchor="middle" class="step">harnesses</text>
-  <text x="750" y="330" text-anchor="middle" class="small">run probe-detector pairs</text>
-  <text x="750" y="350" text-anchor="middle" class="small">ship report artifact</text>
+  <text x="750" y="310" text-anchor="middle" class="step">运行框架</text>
+  <text x="750" y="330" text-anchor="middle" class="small">运行探针与检测器配对</text>
+  <text x="750" y="350" text-anchor="middle" class="small">交付报告产物</text>
 
   <rect x="40" y="400" width="880" height="90" class="box"/>
-  <text x="480" y="425" text-anchor="middle" class="head">campaigns: PyRIT pre-release</text>
-  <text x="60" y="450" class="small">converters: paraphrase / encode / translate / roleplay / system-prompt-rewrite.</text>
-  <text x="60" y="468" class="small">orchestrators: Crescendo (escalation) / TAP (branching) / RedTeaming (custom loops).</text>
-  <text x="60" y="486" class="small">scoring: LLM-as-judge (GPT-4-turbo, StrongREJECT) or Llama Guard-as-judge.</text>
+  <text x="480" y="425" text-anchor="middle" class="head">攻击行动：发布前运行 PyRIT</text>
+  <text x="60" y="450" class="small">转换器：改写、编码、翻译、角色扮演、重写系统 prompt。</text>
+  <text x="60" y="468" class="small">编排器：Crescendo（升级）、TAP（分支）、RedTeaming（自定义循环）。</text>
+  <text x="60" y="486" class="small">评分：LLM 评审（GPT-4-turbo、StrongREJECT）或 Llama Guard 评审。</text>
 </svg>

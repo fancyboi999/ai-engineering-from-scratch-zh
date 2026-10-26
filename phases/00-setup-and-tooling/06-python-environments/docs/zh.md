@@ -1,4 +1,4 @@
-# Python Environments
+# Python 环境
 
 > 依赖地狱是真实存在的。虚拟环境就是解药。
 

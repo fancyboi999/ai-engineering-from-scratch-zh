@@ -16,48 +16,48 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Prompt injection defense — treat retrieved content as untrusted</text>
+  <text x="480" y="26" text-anchor="middle" class="title">prompt 注入防御：将检索内容视为不可信</text>
 
   <rect x="40" y="50" width="880" height="160" class="attack"/>
-  <text x="480" y="72" text-anchor="middle" class="head">Greshake et al. 2023 — indirect prompt injection</text>
+  <text x="480" y="72" text-anchor="middle" class="head">Greshake 等，2023：间接 prompt 注入</text>
   <rect x="60" y="88" width="840" height="24" class="box"/>
-  <text x="78" y="104" class="step">1. attacker controls retrievable content (web page, PDF, email, memory note)</text>
+  <text x="78" y="104" class="step">1. 攻击者控制可检索内容（网页、PDF、邮件、记忆笔记）</text>
   <rect x="60" y="116" width="840" height="24" class="box"/>
-  <text x="78" y="132" class="step">2. agent ingests  attacker instructions override developer prompt</text>
+  <text x="78" y="132" class="step">2. agent 读取后，攻击者指令覆盖开发者 prompt</text>
   <rect x="60" y="144" width="840" height="24" class="box"/>
-  <text x="78" y="160" class="step">3. demonstrated exploits: data theft, worming, memory poisoning, ecosystem contamination</text>
+  <text x="78" y="160" class="step">3. 已演示的攻击：数据盗取、蠕虫传播、记忆投毒、生态污染</text>
   <rect x="60" y="172" width="840" height="30" class="box"/>
-  <text x="78" y="192" class="step">claim: processing retrieved prompts = arbitrary code execution on the tool-use surface</text>
+  <text x="78" y="192" class="step">主张：处理检索到的 prompt，等同于在工具使用界面执行任意代码</text>
 
   <rect x="40" y="230" width="440" height="280" class="validator"/>
-  <text x="260" y="252" text-anchor="middle" class="head">PVE pattern  Prompt, Validator, Executor</text>
+  <text x="260" y="252" text-anchor="middle" class="head">PVE 模式：Prompt、Validator、Executor</text>
   <rect x="60" y="268" width="400" height="36" class="box"/>
-  <text x="78" y="290" class="step">1. main model proposes tool call</text>
+  <text x="78" y="290" class="step">1. 主模型提出工具调用</text>
   <rect x="60" y="308" width="400" height="36" class="box"/>
-  <text x="78" y="330" class="step">2. cheap fast validator inspects arguments</text>
+  <text x="78" y="330" class="step">2. 廉价快速的验证器检查参数</text>
   <rect x="60" y="348" width="400" height="36" class="box"/>
-  <text x="78" y="370" class="step">3. validator inspects retrieved content sources</text>
+  <text x="78" y="370" class="step">3. 验证器检查检索内容的来源</text>
   <rect x="60" y="388" width="400" height="36" class="box"/>
-  <text x="78" y="410" class="step">4. reject on injection marker or unsafe destination</text>
+  <text x="78" y="410" class="step">4. 遇到注入标记或不安全目标时拒绝</text>
   <rect x="60" y="428" width="400" height="36" class="box"/>
-  <text x="78" y="450" class="step">5. pass  executor runs; tell main model on reject</text>
+  <text x="78" y="450" class="step">5. 通过后由执行器运行；拒绝时通知主模型</text>
   <rect x="60" y="468" width="400" height="36" class="box"/>
-  <text x="78" y="490" class="step">cost: one extra inference per tool call</text>
+  <text x="78" y="490" class="step">成本：每次工具调用增加一次推理</text>
 
   <rect x="500" y="230" width="420" height="280" class="defense"/>
-  <text x="710" y="252" text-anchor="middle" class="head">six-control defense doctrine (2026)</text>
+  <text x="710" y="252" text-anchor="middle" class="head">六项控制的防御原则（2026）</text>
   <rect x="520" y="268" width="380" height="36" class="box"/>
-  <text x="538" y="290" class="step">1. all retrieved content untrusted</text>
+  <text x="538" y="290" class="step">1. 所有检索内容均不可信</text>
   <rect x="520" y="308" width="380" height="36" class="box"/>
-  <text x="538" y="330" class="step">2. allowlist / blocklist navigation</text>
+  <text x="538" y="330" class="step">2. 导航使用允许列表与阻止列表</text>
   <rect x="520" y="348" width="380" height="36" class="box"/>
-  <text x="538" y="370" class="step">3. per-step safety evaluation (Gemini 2.5)</text>
+  <text x="538" y="370" class="step">3. 逐步安全评估（Gemini 2.5）</text>
   <rect x="520" y="388" width="380" height="36" class="box"/>
-  <text x="538" y="410" class="step">4. guardrails on tool inputs + outputs</text>
+  <text x="538" y="410" class="step">4. 工具输入与输出均设护栏</text>
   <rect x="520" y="428" width="380" height="36" class="box"/>
-  <text x="538" y="450" class="step">5. human-in-the-loop on sensitive actions</text>
+  <text x="538" y="450" class="step">5. 敏感操作由人介入</text>
   <rect x="520" y="468" width="380" height="36" class="box"/>
-  <text x="538" y="490" class="step">6. external content capture + span references</text>
+  <text x="538" y="490" class="step">6. 外部捕获内容，span 仅保存引用</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">"only direct instructions from the user count as permission" — OpenAI CUA docs</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">“只有用户直接下达的指令才算授权”——OpenAI CUA 文档</text>
 </svg>

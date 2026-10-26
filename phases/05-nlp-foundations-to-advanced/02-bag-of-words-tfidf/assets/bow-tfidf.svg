@@ -15,16 +15,16 @@
   </defs>
 
   <rect class="box" x="20" y="40" width="180" height="240" rx="4"/>
-  <text class="label" x="110" y="65" text-anchor="middle">3 documents</text>
+  <text class="label" x="110" y="65" text-anchor="middle">3 篇文档</text>
   <text class="content" x="35" y="100">d0: "the cat sat"</text>
   <text class="content" x="35" y="140">d1: "the dog sat"</text>
   <text class="content" x="35" y="180">d2: "the cat ran"</text>
-  <text class="content" x="35" y="230">vocab:</text>
+  <text class="content" x="35" y="230">词表：</text>
   <text class="content" x="35" y="250">the, cat, sat,</text>
   <text class="content" x="35" y="270">dog, ran</text>
 
   <path class="line" d="M 200 160 L 250 160" marker-end="url(#arrow)"/>
-  <text class="stage" x="225" y="150">count</text>
+  <text class="stage" x="225" y="150">计数</text>
 
   <rect class="vec" x="250" y="60" width="230" height="60" rx="4"/>
   <text class="label" x="365" y="85" text-anchor="middle">BoW · d0</text>
@@ -40,7 +40,7 @@
 
   <path class="line" d="M 480 160 L 530 160" marker-end="url(#arrow)"/>
   <text class="stage" x="505" y="150">* IDF</text>
-  <text class="weight" x="505" y="180">down-weight</text>
+  <text class="weight" x="505" y="180">降低权重</text>
   <text class="weight" x="505" y="195">"the"</text>
 
   <rect class="vec" x="530" y="60" width="260" height="60" rx="4"/>
@@ -55,5 +55,5 @@
   <text class="label" x="660" y="235" text-anchor="middle">TF-IDF · d2</text>
   <text class="content" x="540" y="258">[0.0, 0.58, 0.0, 0.0, 0.82]</text>
 
-  <text class="stage" x="450" y="310" text-anchor="middle">order discarded. rarity rewarded. sparse, interpretable, fast.</text>
+  <text class="stage" x="450" y="310" text-anchor="middle">忽略顺序，提升罕见词权重。稀疏、可解释、快速。</text>
 </svg>

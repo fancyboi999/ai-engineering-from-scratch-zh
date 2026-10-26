@@ -5,7 +5,7 @@
   <text x="250" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">实测值</text>
   <text x="410" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">说明</text>
   <rect x="20" y="30" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="32" y="52.45" font-size="11.5" font-weight="700">version</text>
+  <text x="32" y="52.45" font-size="11.5" font-weight="700">版本</text>
   <text x="250" y="54" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">0.31.0</text>
   <text x="410" y="54" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">正在运行的版本</text>
   <rect x="20" y="80" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
@@ -13,7 +13,7 @@
   <text x="250" y="104" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">V2</text>
   <text x="410" y="104" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">当前使用的 模型 runner</text>
   <rect x="20" y="130" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="32" y="152.45" font-size="11.5" font-weight="700">attention backend</text>
+  <text x="32" y="152.45" font-size="11.5" font-weight="700">注意力后端</text>
   <text x="250" y="154" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">FLASH_ATTN</text>
   <text x="410" y="154" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">用于 attention 的 kernel</text>
   <rect x="20" y="180" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
@@ -26,7 +26,7 @@
   <text x="410" y="254" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">KV cache 剩余内存</text>
   <rect x="20" y="280" width="218" height="38" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="32" y="302.45" font-size="11.5" font-weight="700">GPU KV cache 容量</text>
-  <text x="250" y="304" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">234,960 tokens</text>
+  <text x="250" y="304" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">234,960 token</text>
   <text x="410" y="304" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">可容纳的用户数</text>
   <text x="20" y="338" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次启动后、接入流量前，先检查这些日志。</text>
 </svg>

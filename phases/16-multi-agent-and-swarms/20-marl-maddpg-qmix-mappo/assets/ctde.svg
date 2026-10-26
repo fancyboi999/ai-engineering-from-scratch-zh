@@ -15,53 +15,53 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">CTDE and the three MARL baselines</text>
+  <text x="480" y="28" text-anchor="middle" class="title">中心化训练、去中心化执行与三种多智能体强化学习基线</text>
 
   <rect x="40" y="60" width="440" height="200" class="cold"/>
-  <text x="260" y="84" text-anchor="middle" class="head">Training time — centralized</text>
+  <text x="260" y="84" text-anchor="middle" class="head">训练时：中心化</text>
 
   <rect x="70" y="110" width="360" height="100" class="box"/>
-  <text x="250" y="134" text-anchor="middle" class="step">critic / mixer / value</text>
-  <text x="250" y="158" text-anchor="middle" class="small">sees all agents' observations + actions</text>
-  <text x="250" y="176" text-anchor="middle" class="small">stationary target for each actor update</text>
-  <text x="250" y="196" text-anchor="middle" class="small">addresses non-stationarity of multi-learner settings</text>
+  <text x="250" y="134" text-anchor="middle" class="step">评论家 / 混合器 / 价值</text>
+  <text x="250" y="158" text-anchor="middle" class="small">看到所有 agent 的观察与动作</text>
+  <text x="250" y="176" text-anchor="middle" class="small">为每个行动者更新提供平稳目标</text>
+  <text x="250" y="196" text-anchor="middle" class="small">应对多学习者环境的非平稳性</text>
 
-  <text x="260" y="234" text-anchor="middle" class="caption">MADDPG critic · QMIX mixer · MAPPO centralized V</text>
+  <text x="260" y="234" text-anchor="middle" class="caption">MADDPG 评论家 · QMIX 混合器 · MAPPO 中心化 V</text>
 
   <rect x="500" y="60" width="420" height="200" class="cool"/>
-  <text x="710" y="84" text-anchor="middle" class="head">Deploy time — decentralized</text>
+  <text x="710" y="84" text-anchor="middle" class="head">部署时：去中心化</text>
 
   <rect x="530" y="110" width="110" height="100" class="box"/>
-  <text x="585" y="140" text-anchor="middle" class="step">actor 0</text>
-  <text x="585" y="160" text-anchor="middle" class="small">sees o_0 only</text>
-  <text x="585" y="180" text-anchor="middle" class="small">local action</text>
+  <text x="585" y="140" text-anchor="middle" class="step">行动者 0</text>
+  <text x="585" y="160" text-anchor="middle" class="small">仅看到 o_0</text>
+  <text x="585" y="180" text-anchor="middle" class="small">局部动作</text>
 
   <rect x="655" y="110" width="110" height="100" class="box"/>
-  <text x="710" y="140" text-anchor="middle" class="step">actor 1</text>
-  <text x="710" y="160" text-anchor="middle" class="small">sees o_1 only</text>
-  <text x="710" y="180" text-anchor="middle" class="small">local action</text>
+  <text x="710" y="140" text-anchor="middle" class="step">行动者 1</text>
+  <text x="710" y="160" text-anchor="middle" class="small">仅看到 o_1</text>
+  <text x="710" y="180" text-anchor="middle" class="small">局部动作</text>
 
   <rect x="780" y="110" width="110" height="100" class="box"/>
-  <text x="835" y="140" text-anchor="middle" class="step">actor N</text>
-  <text x="835" y="160" text-anchor="middle" class="small">sees o_N only</text>
-  <text x="835" y="180" text-anchor="middle" class="small">local action</text>
+  <text x="835" y="140" text-anchor="middle" class="step">行动者 N</text>
+  <text x="835" y="160" text-anchor="middle" class="small">仅看到 o_N</text>
+  <text x="835" y="180" text-anchor="middle" class="small">局部动作</text>
 
-  <text x="710" y="234" text-anchor="middle" class="caption">no critic at runtime; only local policy call</text>
+  <text x="710" y="234" text-anchor="middle" class="caption">运行时不需要评论家，仅调用局部策略</text>
 
   <rect x="40" y="290" width="880" height="200" class="box"/>
-  <text x="480" y="314" text-anchor="middle" class="head">three baselines, three specializations</text>
+  <text x="480" y="314" text-anchor="middle" class="head">三种基线，三种专长</text>
 
   <text x="60" y="348" class="step">MADDPG (2017)</text>
-  <text x="260" y="348" class="small">per-agent critic · continuous actions · mixed cooperative/competitive · scales ~10 agents</text>
+  <text x="260" y="348" class="small">每个 agent 各有评论家 · 连续动作 · 合作与竞争混合 · 规模约 10 个 agent</text>
 
   <text x="60" y="378" class="step">QMIX (2018)</text>
-  <text x="260" y="378" class="small">value decomposition · monotone mixer · cooperative · discrete · dominant on SMAC</text>
+  <text x="260" y="378" class="small">价值分解 · 单调混合器 · 合作 · 离散动作 · 在 SMAC 上占主导</text>
 
   <text x="60" y="408" class="step">MAPPO (2022)</text>
-  <text x="260" y="408" class="small">PPO with centralized V · minimal tuning · cooperative · robust across benchmarks</text>
+  <text x="260" y="408" class="small">带中心化 V 的 PPO · 少量调参 · 合作 · 多种基准上表现稳定</text>
 
-  <text x="60" y="438" class="step">production note</text>
-  <text x="260" y="438" class="small">start with MAPPO; escalate to MADDPG for mixed settings, QMIX for sparse cooperative</text>
+  <text x="60" y="438" class="step">生产环境建议</text>
+  <text x="260" y="438" class="small">从 MAPPO 开始；混合场景选 MADDPG，稀疏合作场景选 QMIX</text>
 
-  <text x="60" y="468" class="caption">For LLM-agent systems: CTDE is a design pattern; training end-to-end is optional.</text>
+  <text x="60" y="468" class="caption">对 LLM-agent 系统，中心化训练、去中心化执行是一种设计模式，端到端训练可选。</text>
 </svg>

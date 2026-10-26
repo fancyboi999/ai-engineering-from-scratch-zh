@@ -76,7 +76,7 @@ response = client.messages.create(
 print(response.content[0].text)
 ```
 
-`LLM_MODEL` selects the Anthropic model id, and the default is the un-dated Sonnet alias. Other providers (OpenAI, Google, and others) follow the same pattern of a key plus a model id, but each has its own SDK, endpoint, and request/response schema.
+`LLM_MODEL` 用于选择 Anthropic 模型 ID，默认使用不带日期的 Sonnet 别名。OpenAI、Google 等其他提供方也采用密钥加模型 ID 的方式，但各自使用不同的 SDK、端点及请求与响应结构。
 
 ### 第 3 步：第一个 API 调用（TypeScript）
 

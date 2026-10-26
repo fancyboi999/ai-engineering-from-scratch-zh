@@ -185,6 +185,9 @@ test('the page copy avoids the banned words and outside product names', async ()
   const copy = [html.slice(html.indexOf('<main'), html.indexOf('<script>', html.indexOf('<main'))).replace(/<[^>]+>/g, ' '), JSON.stringify(INFO), JSON.stringify(SCENARIOS)].join(' ');
   assert.doesNotMatch(copy, /\b(wire|wires|robust|seamless|crucial|landscape|leverage|delve|journey|unlock)\b/i);
   assert.doesNotMatch(copy, /\b(vLLM|Cloudflare|Hazy|InferenceX|Jarvislabs|TechPowerUp|MediaTek|Wikipedia)\b/);
+  const specs = html.slice(html.indexOf('data-gm-panel="specs"'), html.indexOf('</aside>', html.indexOf('data-gm-panel="specs"')));
+  assert.match(specs, /超级芯片[\s\S]*20 个 Arm 核心[\s\S]*统一系统内存/);
+  assert.doesNotMatch(specs, /superchip:|Arm cores:|coherent unified system memory|base,|boost MHz/);
 });
 
 test('every lesson and manual section the inspector links to exists', async () => {

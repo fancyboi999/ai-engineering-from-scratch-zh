@@ -10,8 +10,8 @@ module.exports = figure('fig-3-1', {
   f.kicker(20, 20, "一个 token，五个因子");
   const factors = [
     ['2', "K 与 V"],
-    ['28', 'layers'],
-    ['8', "KV head"],
+    ['28', '层数'],
+    ['8', "KV 头"],
     ['128', "head 维度"],
     ['2 B', 'bfloat16'],
   ];

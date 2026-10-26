@@ -13,47 +13,47 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">CAIS four-risk framework + where practitioners pull the lever</text>
+  <text x="440" y="26" text-anchor="middle" class="title">CAIS 四类风险框架 + 实践者可介入的位置</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Quadrants -->
   <rect x="60" y="80" width="370" height="140" class="hot"/>
-  <text x="245" y="104" text-anchor="middle" class="label">1. malicious use</text>
-  <text x="76" y="128" class="content">bad actor uses AI for harm</text>
-  <text x="76" y="146" class="small">bioweapons synthesis · disinformation · cyberattacks</text>
-  <text x="76" y="170" class="content">mitigations:</text>
-  <text x="76" y="186" class="small">• hardcoded prohibitions (L17) · Llama Guard (L18)</text>
-  <text x="76" y="202" class="small">• tool allowlist (L10, L11)</text>
+  <text x="245" y="104" text-anchor="middle" class="label">1. 恶意使用</text>
+  <text x="76" y="128" class="content">恶意行为者用 AI 造成伤害</text>
+  <text x="76" y="146" class="small">生物武器合成 · 虚假信息 · 网络攻击</text>
+  <text x="76" y="170" class="content">缓解措施：</text>
+  <text x="76" y="186" class="small">• 硬编码禁令（L17）· Llama Guard（L18）</text>
+  <text x="76" y="202" class="small">• 工具白名单（L10、L11）</text>
 
   <rect x="450" y="80" width="370" height="140" class="warn"/>
-  <text x="635" y="104" text-anchor="middle" class="label">2. AI races</text>
-  <text x="466" y="128" class="content">competitive pressure overrides safety</text>
-  <text x="466" y="146" class="small">labs · companies · nations</text>
-  <text x="466" y="170" class="content">mitigations:</text>
-  <text x="466" y="186" class="small">• scaling policy with Risk Reports (L19, L20)</text>
-  <text x="466" y="202" class="small">• external evaluation (L21)</text>
+  <text x="635" y="104" text-anchor="middle" class="label">2. AI 竞赛</text>
+  <text x="466" y="128" class="content">竞争压力压倒安全考虑</text>
+  <text x="466" y="146" class="small">实验室 · 企业 · 国家</text>
+  <text x="466" y="170" class="content">缓解措施：</text>
+  <text x="466" y="186" class="small">• 附带风险报告的扩展策略（L19、L20）</text>
+  <text x="466" y="202" class="small">• 外部评估（L21）</text>
 
   <rect x="60" y="240" width="370" height="140" class="cool"/>
-  <text x="245" y="264" text-anchor="middle" class="label">3. organizational risks (practitioners pull this)</text>
-  <text x="76" y="288" class="content">internal lab dynamics</text>
-  <text x="76" y="306" class="small">safety culture · audit · defenses · infosec</text>
-  <text x="76" y="330" class="content">mitigations:</text>
-  <text x="76" y="346" class="small">• escalation paths without career cost</text>
-  <text x="76" y="362" class="small">• independent audit, multi-layered defenses</text>
+  <text x="245" y="264" text-anchor="middle" class="label">3. 组织风险（实践者可介入）</text>
+  <text x="76" y="288" class="content">实验室内部动态</text>
+  <text x="76" y="306" class="small">安全文化 · 审计 · 防御 · 信息安全</text>
+  <text x="76" y="330" class="content">缓解措施：</text>
+  <text x="76" y="346" class="small">• 不损害职业发展的升级渠道</text>
+  <text x="76" y="362" class="small">• 独立审计、多层防御</text>
 
   <rect x="450" y="240" width="370" height="140" class="cold"/>
-  <text x="635" y="264" text-anchor="middle" class="label">4. rogue AIs</text>
-  <text x="466" y="288" class="content">capable AI pursuing misaligned goals</text>
-  <text x="466" y="306" class="small">grows with autonomy horizon (L1, L21)</text>
-  <text x="466" y="330" class="content">mitigations:</text>
-  <text x="466" y="346" class="small">• kill switches + canaries (L14)</text>
-  <text x="466" y="362" class="small">• propose-then-commit (L15) · checkpoints (L16)</text>
+  <text x="635" y="264" text-anchor="middle" class="label">4. 失控 AI</text>
+  <text x="466" y="288" class="content">强大 AI 追求未对齐的目标</text>
+  <text x="466" y="306" class="small">随自主任务时长增长（L1、L21）</text>
+  <text x="466" y="330" class="content">缓解措施：</text>
+  <text x="466" y="346" class="small">• 停止开关 + 金丝雀（L14）</text>
+  <text x="466" y="362" class="small">• 先提议后提交（L15）· 检查点（L16）</text>
 
   <!-- Bottom strip: CAIS / CAISI / SB-53 -->
   <rect x="60" y="400" width="760" height="90" class="box"/>
-  <text x="440" y="424" text-anchor="middle" class="label">the three entities to know</text>
-  <text x="80" y="446" class="content">CAIS  (non-profit, San Francisco, 2022) — four-risk framework; 2023 extinction statement</text>
-  <text x="80" y="462" class="content">CAISI (NIST center, US government) — voluntary agreements; unclassified capability evaluations</text>
-  <text x="80" y="478" class="content">California SB-53 — first US state-level catastrophic-risk regulation if signed</text>
+  <text x="440" y="424" text-anchor="middle" class="label">需要了解的三个实体</text>
+  <text x="80" y="446" class="content">CAIS（非营利组织，旧金山，2022）— 四类风险框架；2023 年灭绝风险声明</text>
+  <text x="80" y="462" class="content">CAISI（美国政府 NIST 中心）— 自愿协议；非机密能力评估</text>
+  <text x="80" y="478" class="content">加利福尼亚 SB-53 — 如获签署，将成为美国首部州级灾难性风险法规</text>
 </svg>

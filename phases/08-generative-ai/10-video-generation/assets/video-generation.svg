@@ -15,56 +15,56 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">video diffusion: patchify, DiT, decode</text>
+  <text x="450" y="28" text-anchor="middle" class="title">视频扩散：切分块、DiT、解码</text>
 
   <!-- raw video -->
-  <text x="80" y="70" class="label">raw video</text>
+  <text x="80" y="70" class="label">原始视频</text>
   <g>
     <rect x="30" y="85" width="30" height="30" class="box"/>
     <rect x="65" y="85" width="30" height="30" class="box"/>
     <rect x="100" y="85" width="30" height="30" class="box"/>
     <rect x="135" y="85" width="30" height="30" class="box"/>
     <rect x="170" y="85" width="30" height="30" class="box"/>
-    <text x="115" y="135" text-anchor="middle" class="caption">T &#215; H &#215; W &#215; 3  (240 frames @ 1080p)</text>
+    <text x="115" y="135" text-anchor="middle" class="caption">T × H × W × 3（240 帧 @ 1080p）</text>
   </g>
 
   <line x1="210" y1="100" x2="260" y2="100" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <!-- 3D VAE -->
   <rect x="260" y="75" width="140" height="60" class="cold"/>
-  <text x="330" y="105" text-anchor="middle" class="content">3-D VAE encoder</text>
-  <text x="330" y="125" text-anchor="middle" class="caption">spatiotemporal latent</text>
+  <text x="330" y="105" text-anchor="middle" class="content">3-D VAE 编码器</text>
+  <text x="330" y="125" text-anchor="middle" class="caption">时空潜变量</text>
 
   <line x1="400" y1="100" x2="450" y2="100" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <!-- patchify -->
   <rect x="450" y="75" width="140" height="60" class="hot"/>
-  <text x="520" y="105" text-anchor="middle" class="content">patchify</text>
-  <text x="520" y="125" text-anchor="middle" class="caption">t_p &#215; h_p &#215; w_p blocks</text>
+  <text x="520" y="105" text-anchor="middle" class="content">切分块</text>
+  <text x="520" y="125" text-anchor="middle" class="caption">t_p × h_p × w_p 个块</text>
 
   <line x1="590" y1="100" x2="640" y2="100" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <!-- DiT -->
   <rect x="640" y="60" width="220" height="90" class="cold"/>
-  <text x="750" y="85" text-anchor="middle" class="label">spatiotemporal DiT</text>
-  <text x="750" y="105" text-anchor="middle" class="caption">factorized: spatial then temporal attn</text>
-  <text x="750" y="125" text-anchor="middle" class="caption">cross-attn to T5-XXL text</text>
+  <text x="750" y="85" text-anchor="middle" class="label">时空 DiT</text>
+  <text x="750" y="105" text-anchor="middle" class="caption">分解式：先空间注意力，再时间注意力</text>
+  <text x="750" y="125" text-anchor="middle" class="caption">对 T5-XXL 文本进行交叉注意力</text>
 
   <!-- loss -->
   <rect x="30" y="180" width="830" height="60" class="hot"/>
-  <text x="445" y="203" text-anchor="middle" class="label">same DDPM loss over spatiotemporal latents</text>
+  <text x="445" y="203" text-anchor="middle" class="label">在时空潜变量上使用相同 DDPM 损失</text>
   <text x="445" y="225" text-anchor="middle" class="mono">L = E || &#949; - &#949;_&#952;( z_t, t, text, first_frame_opt ) ||&#178;</text>
 
   <!-- temporal coherence panel -->
   <rect x="30" y="260" width="400" height="220" class="box"/>
-  <text x="230" y="285" text-anchor="middle" class="label">flicker: independent per-frame sampling</text>
+  <text x="230" y="285" text-anchor="middle" class="label">闪烁：逐帧独立采样</text>
   <path d="M 60,370 L 100,340 L 140,410 L 180,320 L 220,390 L 260,335 L 300,405 L 340,340 L 380,395"
         fill="none" stroke="#c0392b" stroke-width="1.5"/>
-  <text x="230" y="460" text-anchor="middle" class="caption">per-frame noise is independent =&gt; jagged motion</text>
+  <text x="230" y="460" text-anchor="middle" class="caption">每帧噪声独立 =&gt; 动作不连贯</text>
 
   <rect x="460" y="260" width="400" height="220" class="box"/>
-  <text x="660" y="285" text-anchor="middle" class="label">coherent: joint sequence diffusion</text>
+  <text x="660" y="285" text-anchor="middle" class="label">连贯：联合序列扩散</text>
   <path d="M 490,370 Q 540,355 580,365 T 680,370 T 780,380 T 840,395"
         fill="none" stroke="#2c5f8c" stroke-width="1.5"/>
-  <text x="660" y="460" text-anchor="middle" class="caption">shared noise + temporal attention =&gt; smooth motion</text>
+  <text x="660" y="460" text-anchor="middle" class="caption">共享噪声 + 时间注意力 =&gt; 平滑动作</text>
 </svg>

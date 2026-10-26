@@ -16,48 +16,48 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">PAIR: attacker + judge loop</text>
+  <text x="480" y="24" text-anchor="middle" class="title">PAIR：攻击者与评审循环</text>
 
   <rect x="60" y="70" width="220" height="200" class="box"/>
-  <text x="170" y="92" text-anchor="middle" class="head">Attacker LLM (A)</text>
+  <text x="170" y="92" text-anchor="middle" class="head">攻击者 LLM（A）</text>
   <rect x="80" y="110" width="180" height="50" class="hot"/>
-  <text x="170" y="132" text-anchor="middle" class="step">goal G + history</text>
-  <text x="170" y="150" text-anchor="middle" class="small">propose prompt p_k</text>
+  <text x="170" y="132" text-anchor="middle" class="step">目标 G + 历史</text>
+  <text x="170" y="150" text-anchor="middle" class="small">提出 prompt p_k</text>
   <rect x="80" y="180" width="180" height="50" class="hot"/>
-  <text x="170" y="202" text-anchor="middle" class="step">in-context feedback</text>
-  <text x="170" y="220" text-anchor="middle" class="small">previous refusals seen</text>
+  <text x="170" y="202" text-anchor="middle" class="step">上下文内反馈</text>
+  <text x="170" y="220" text-anchor="middle" class="small">可见此前拒答</text>
 
   <rect x="370" y="70" width="220" height="200" class="box"/>
-  <text x="480" y="92" text-anchor="middle" class="head">Target LLM (T)</text>
+  <text x="480" y="92" text-anchor="middle" class="head">目标 LLM（T）</text>
   <rect x="390" y="110" width="180" height="50" class="cool"/>
-  <text x="480" y="132" text-anchor="middle" class="step">receive p_k</text>
-  <text x="480" y="150" text-anchor="middle" class="small">emit response r_k</text>
+  <text x="480" y="132" text-anchor="middle" class="step">接收 p_k</text>
+  <text x="480" y="150" text-anchor="middle" class="small">输出回答 r_k</text>
   <rect x="390" y="180" width="180" height="50" class="cool"/>
-  <text x="480" y="202" text-anchor="middle" class="step">black-box only</text>
-  <text x="480" y="220" text-anchor="middle" class="small">no gradients needed</text>
+  <text x="480" y="202" text-anchor="middle" class="step">仅需黑盒访问</text>
+  <text x="480" y="220" text-anchor="middle" class="small">无需梯度</text>
 
   <rect x="680" y="70" width="220" height="200" class="box"/>
-  <text x="790" y="92" text-anchor="middle" class="head">Judge LLM (J)</text>
+  <text x="790" y="92" text-anchor="middle" class="head">评审 LLM（J）</text>
   <rect x="700" y="110" width="180" height="50" class="cold"/>
-  <text x="790" y="132" text-anchor="middle" class="step">score (p_k, r_k)</text>
-  <text x="790" y="150" text-anchor="middle" class="small">goal satisfaction?</text>
+  <text x="790" y="132" text-anchor="middle" class="step">评分 (p_k, r_k)</text>
+  <text x="790" y="150" text-anchor="middle" class="small">是否达到目标？</text>
   <rect x="700" y="180" width="180" height="50" class="cold"/>
-  <text x="790" y="202" text-anchor="middle" class="step">halt if score &gt;= thr</text>
-  <text x="790" y="220" text-anchor="middle" class="small">else: feed back to A</text>
+  <text x="790" y="202" text-anchor="middle" class="step">得分 &gt;= thr 时停止</text>
+  <text x="790" y="220" text-anchor="middle" class="small">否则：反馈给 A</text>
 
   <path d="M 280 140 L 370 140" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow12)" fill="none"/>
   <text x="325" y="132" text-anchor="middle" class="small">prompt</text>
   <path d="M 590 140 L 680 140" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow12)" fill="none"/>
-  <text x="635" y="132" text-anchor="middle" class="small">response</text>
+  <text x="635" y="132" text-anchor="middle" class="small">回答</text>
   <path d="M 720 260 L 160 260 L 160 200" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow12)" fill="none" stroke-dasharray="4 4"/>
-  <text x="480" y="275" text-anchor="middle" class="small">history updated (k &lt; K)</text>
+  <text x="480" y="275" text-anchor="middle" class="small">更新历史（k &lt; K）</text>
 
   <rect x="60" y="310" width="840" height="180" class="box"/>
-  <text x="480" y="335" text-anchor="middle" class="head">related automated attacks</text>
-  <text x="80" y="365" class="small">PAIR (black-box, natural-language)           success &lt; 20 queries on GPT-3.5-turbo, Llama-2-7B.</text>
-  <text x="80" y="385" class="small">GCG (white-box, token gradient)              universal adversarial suffixes; unreadable; transferable.</text>
-  <text x="80" y="405" class="small">AutoDAN (evolutionary)                       genetic search; readable; moderate ASR.</text>
-  <text x="80" y="425" class="small">TAP (tree of attacks + pruning)              PAIR-branching; higher ASR at higher compute.</text>
-  <text x="80" y="445" class="small">PAP (persuasive adversarial prompts)         human persuasion templates; strong on HHH-aligned models.</text>
-  <text x="80" y="470" class="small">benchmarks: JailbreakBench (100 behaviours), HarmBench (510 behaviours, 18 attacks vs 33 models).</text>
+  <text x="480" y="335" text-anchor="middle" class="head">相关自动攻击</text>
+  <text x="80" y="365" class="small">PAIR（黑盒、自然语言）：在 GPT-3.5-turbo、Llama-2-7B 上不到 20 次查询即成功。</text>
+  <text x="80" y="385" class="small">GCG（白盒、token 梯度）：通用对抗后缀；不可读；可迁移。</text>
+  <text x="80" y="405" class="small">AutoDAN（进化式）：遗传搜索；可读；攻击成功率适中。</text>
+  <text x="80" y="425" class="small">TAP（攻击树 + 剪枝）：PAIR 分支；计算更多，攻击成功率更高。</text>
+  <text x="80" y="445" class="small">PAP（说服式对抗 prompt）：人类说服模板；对 HHH 对齐模型较强。</text>
+  <text x="80" y="470" class="small">基准：JailbreakBench（100 种行为）、HarmBench（510 种行为，18 种攻击对比 33 个模型）。</text>
 </svg>

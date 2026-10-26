@@ -11,7 +11,7 @@
   <text x="54" y="60" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">120</text>
   <line x1="60" y1="256" x2="620" y2="256" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="60" y1="56" x2="60" y2="256" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="60" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">rollout seconds</text>
+  <text x="60" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">轨迹采样耗时（秒）</text>
   <rect x="68.33" y="141.66" width="30" height="114.34" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="83.33" y="135.66" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">69</text>
   <text x="83.33" y="273" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0</text>
@@ -50,7 +50,7 @@
   <text x="596.67" y="273" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">11</text>
   <text x="340" y="290" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">步骤</text>
   <path d="M60 18 H78" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="2" stroke-linejoin="round"/>
-  <text x="84" y="22" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">clean step</text>
+  <text x="84" y="22" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">未暂停步骤</text>
   <path d="M168 18 H186" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="2" stroke-linejoin="round"/>
   <text x="192" y="22" font-size="11" fill="var(--m-rose-ink, #b0344d)">与暂停重叠</text>
   <text x="60" y="322" font-size="12" class="m-serif">所有步骤的中位数 83.9 s；clean step 的中位数 59.1 s。</text>

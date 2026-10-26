@@ -17,7 +17,7 @@
 
 ## 核心概念
 
-![Three sim-to-real regimes: domain randomization, adaptation, system identification](../assets/sim-to-real.svg)
+![三种仿真到现实的迁移方式：域随机化、自适应与系统辨识](../assets/sim-to-real.svg)
 
 **域随机化（DR）。** Tobin 等人 2017，Peng 等人 2018。训练时，随机化每个可能在真实机器人上有差异的仿真参数：质量、摩擦系数、电机 PD 增益、传感器噪声、摄像头位置、光照、纹理、接触模型。策略学到一个关于"今天它在哪个仿真里"的条件分布，并在整个跨度上泛化。如果真实机器人落在训练包络内，策略就能用。
 

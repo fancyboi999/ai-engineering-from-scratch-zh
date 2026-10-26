@@ -17,15 +17,15 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">A2A: opaque agent-to-agent task delegation</text>
+  <text x="480" y="26" text-anchor="middle" class="title">A2A：内部不透明的 agent 间任务委派</text>
 
   <rect x="40" y="60" width="250" height="440" class="cool"/>
-  <text x="165" y="82" text-anchor="middle" class="head">research agent (caller)</text>
-  <text x="60" y="108" class="small">MCP tools for source</text>
-  <text x="60" y="124" class="small">retrieval + reasoning</text>
-  <text x="60" y="156" class="step">discovers writer via</text>
+  <text x="165" y="82" text-anchor="middle" class="head">研究 agent（调用方）</text>
+  <text x="60" y="108" class="small">MCP 工具提供来源</text>
+  <text x="60" y="124" class="small">检索 + 推理</text>
+  <text x="60" y="156" class="step">通过以下地址发现写作 agent</text>
   <text x="60" y="174" class="step">/.well-known/agent-card.json</text>
-  <text x="60" y="206" class="step">sends SendMessage with</text>
+  <text x="60" y="206" class="step">使用 SendMessage 发送</text>
   <text x="60" y="222" class="step">Message.parts = [</text>
   <text x="60" y="238" class="small">  {text: "summarize"},</text>
   <text x="60" y="254" class="small">  {raw, filename: paper.pdf},</text>
@@ -36,13 +36,13 @@
   <text x="375" y="272" text-anchor="middle" class="small">SendMessage</text>
 
   <path d="M460,350 L290,350" class="edge" marker-end="url(#arrow)"/>
-  <text x="375" y="342" text-anchor="middle" class="small">state transitions + artifact</text>
+  <text x="375" y="342" text-anchor="middle" class="small">状态转换 + 产物</text>
 
   <rect x="460" y="60" width="460" height="440" class="cold"/>
-  <text x="690" y="82" text-anchor="middle" class="head">writer agent (callee, opaque inner state)</text>
-  <text x="476" y="108" class="step">publishes Agent Card</text>
+  <text x="690" y="82" text-anchor="middle" class="head">写作 agent（被调用方，内部状态不透明）</text>
+  <text x="476" y="108" class="step">发布 Agent Card</text>
   <text x="476" y="126" class="small">{name, supportedInterfaces, skills, capabilities}</text>
-  <text x="476" y="148" class="step">signed via JWS signatures (optional)</text>
+  <text x="476" y="148" class="step">通过 JWS 签名（可选）</text>
 
   <rect x="476" y="160" width="430" height="32" class="box"/>
   <text x="490" y="180" class="step">TASK_STATE_SUBMITTED</text>
@@ -51,16 +51,16 @@
   <rect x="476" y="232" width="430" height="32" class="hot"/>
   <text x="490" y="252" class="step">TASK_STATE_INPUT_REQUIRED</text>
   <rect x="476" y="268" width="430" height="32" class="box"/>
-  <text x="490" y="288" class="step">TASK_STATE_WORKING (resumed)</text>
+  <text x="490" y="288" class="step">TASK_STATE_WORKING（已恢复）</text>
   <rect x="476" y="304" width="430" height="32" class="cool"/>
   <text x="490" y="324" class="step">TASK_STATE_COMPLETED</text>
 
-  <text x="476" y="360" class="step">returns Artifact:</text>
+  <text x="476" y="360" class="step">返回 Artifact：</text>
   <text x="476" y="378" class="small">{artifactId, name: "summary",</text>
   <text x="476" y="394" class="small">  parts: [{text: "...", mediaType: "text/markdown"}]}</text>
 
-  <text x="476" y="426" class="step">opacity</text>
-  <text x="476" y="444" class="small">caller sees state + artifact;</text>
-  <text x="476" y="460" class="small">internal tool calls, sub-agents,</text>
-  <text x="476" y="476" class="small">chain-of-thought all hidden.</text>
+  <text x="476" y="426" class="step">不透明性</text>
+  <text x="476" y="444" class="small">调用方看到状态 + 产物；</text>
+  <text x="476" y="460" class="small">内部工具调用、子 agent、</text>
+  <text x="476" y="476" class="small">思维链全部隐藏。</text>
 </svg>

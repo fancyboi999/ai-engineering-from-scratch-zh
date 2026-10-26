@@ -15,33 +15,33 @@
   </defs>
 
   <rect class="box" x="380" y="20" width="140" height="50" rx="4"/>
-  <text class="label" x="450" y="50" text-anchor="middle">query</text>
+  <text class="label" x="450" y="50" text-anchor="middle">查询</text>
 
   <path class="line" d="M 420 70 L 200 120" marker-end="url(#arrow)"/>
   <path class="line" d="M 480 70 L 700 120" marker-end="url(#arrow)"/>
 
   <rect class="box" x="60" y="125" width="280" height="100" rx="4"/>
-  <text class="label" x="200" y="150" text-anchor="middle">BM25 (sparse)</text>
-  <text class="content" x="75" y="175">exact keyword, TF-IDF</text>
-  <text class="content" x="75" y="195">inverted index, sub-10ms</text>
-  <text class="note" x="200" y="215" text-anchor="middle">precise, brittle. zero OOV tolerance.</text>
+  <text class="label" x="200" y="150" text-anchor="middle">BM25（稀疏）</text>
+  <text class="content" x="75" y="175">精确关键词、TF-IDF</text>
+  <text class="content" x="75" y="195">倒排索引，低于 10ms</text>
+  <text class="note" x="200" y="215" text-anchor="middle">精确但脆弱。无法容忍词表外词。</text>
 
   <rect class="box" x="560" y="125" width="280" height="100" rx="4"/>
-  <text class="label" x="700" y="150" text-anchor="middle">Dense (bi-encoder)</text>
-  <text class="content" x="575" y="175">semantic similarity</text>
-  <text class="content" x="575" y="195">FAISS / vector DB, 50-200ms</text>
-  <text class="note" x="700" y="215" text-anchor="middle">paraphrase-tolerant, keyword-blind</text>
+  <text class="label" x="700" y="150" text-anchor="middle">稠密检索（双编码器）</text>
+  <text class="content" x="575" y="175">语义相似度</text>
+  <text class="content" x="575" y="195">FAISS / 向量数据库，50-200ms</text>
+  <text class="note" x="700" y="215" text-anchor="middle">容忍改写，但对关键词不敏感</text>
 
   <path class="line" d="M 200 225 L 380 260" marker-end="url(#arrow)"/>
   <path class="line" d="M 700 225 L 520 260" marker-end="url(#arrow)"/>
 
   <rect class="hot" x="380" y="260" width="140" height="50" rx="4"/>
-  <text class="label" x="450" y="282" text-anchor="middle">RRF fusion</text>
-  <text class="content" x="450" y="300" text-anchor="middle">rank-only merge</text>
+  <text class="label" x="450" y="282" text-anchor="middle">RRF 融合</text>
+  <text class="content" x="450" y="300" text-anchor="middle">仅按排名合并</text>
 
   <path class="line" d="M 450 310 L 450 340" marker-end="url(#arrow)"/>
 
   <rect class="hot" x="300" y="340" width="300" height="50" rx="4"/>
-  <text class="label" x="450" y="362" text-anchor="middle">cross-encoder rerank</text>
-  <text class="content" x="450" y="380" text-anchor="middle">top-30 → top-5. adds 30-100ms.</text>
+  <text class="label" x="450" y="362" text-anchor="middle">交叉编码器重排</text>
+  <text class="content" x="450" y="380" text-anchor="middle">前 30 → 前 5。增加 30-100ms。</text>
 </svg>

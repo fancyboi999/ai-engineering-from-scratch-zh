@@ -18,52 +18,52 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Reflexion — Actor, Evaluator, Self-Reflector, Episodic memory</text>
+  <text x="480" y="26" text-anchor="middle" class="title">Reflexion — 行动者、评估者、自我反思者、情景记忆</text>
 
   <rect x="60" y="60" width="180" height="60" class="cool"/>
-  <text x="150" y="84" text-anchor="middle" class="step">Actor</text>
-  <text x="150" y="102" text-anchor="middle" class="small">ReAct trajectory</text>
+  <text x="150" y="84" text-anchor="middle" class="step">行动者</text>
+  <text x="150" y="102" text-anchor="middle" class="small">ReAct 轨迹</text>
 
   <rect x="60" y="180" width="180" height="60" class="cold"/>
-  <text x="150" y="204" text-anchor="middle" class="step">Evaluator</text>
-  <text x="150" y="222" text-anchor="middle" class="small">binary / heuristic / self</text>
+  <text x="150" y="204" text-anchor="middle" class="step">评估者</text>
+  <text x="150" y="222" text-anchor="middle" class="small">二元 / 启发式 / 自评</text>
 
   <rect x="60" y="300" width="180" height="60" class="hot"/>
-  <text x="150" y="324" text-anchor="middle" class="step">Self-Reflector</text>
-  <text x="150" y="342" text-anchor="middle" class="small">natural-language diagnosis</text>
+  <text x="150" y="324" text-anchor="middle" class="step">自我反思者</text>
+  <text x="150" y="342" text-anchor="middle" class="small">自然语言诊断</text>
 
   <rect x="60" y="420" width="180" height="80" class="dsk"/>
-  <text x="150" y="446" text-anchor="middle" class="step">Episodic memory</text>
-  <text x="150" y="464" text-anchor="middle" class="small">bounded list of reflections</text>
-  <text x="150" y="480" text-anchor="middle" class="small">prepended next trial</text>
+  <text x="150" y="446" text-anchor="middle" class="step">情景记忆</text>
+  <text x="150" y="464" text-anchor="middle" class="small">有界反思列表</text>
+  <text x="150" y="480" text-anchor="middle" class="small">添加到下次试验之前</text>
 
   <line x1="150" y1="120" x2="150" y2="180" class="edge" marker-end="url(#arrow)"/>
   <line x1="150" y1="240" x2="150" y2="300" class="edge" marker-end="url(#arrow)"/>
   <line x1="150" y1="360" x2="150" y2="420" class="edge" marker-end="url(#arrow)"/>
   <path d="M240,450 Q340,450 340,90 L240,90" class="edge" marker-end="url(#arrow)"/>
-  <text x="330" y="270" class="small">feed-back loop</text>
+  <text x="330" y="270" class="small">反馈循环</text>
 
   <rect x="380" y="60" width="540" height="200" class="box"/>
-  <text x="650" y="84" text-anchor="middle" class="head">three evaluator types</text>
+  <text x="650" y="84" text-anchor="middle" class="head">三类评估器</text>
 
   <rect x="400" y="100" width="500" height="40" class="cool"/>
-  <text x="420" y="124" class="step">scalar  binary/numeric ground truth (tests pass, answer correct)</text>
+  <text x="420" y="124" class="step">标量：二元/数值真实值（测试通过、答案正确）</text>
 
   <rect x="400" y="148" width="500" height="40" class="cold"/>
-  <text x="420" y="172" class="step">heuristic  stuck-loop, too-many-steps, repeated-action signatures</text>
+  <text x="420" y="172" class="step">启发式：卡住循环、步骤过多、重复动作特征</text>
 
   <rect x="400" y="196" width="500" height="40" class="hot"/>
-  <text x="420" y="220" class="step">self-eval  LLM-as-judge on own trace (weak; pair with tool grounding)</text>
+  <text x="420" y="220" class="step">自评：LLM 评判自身轨迹（较弱；应配合工具依据）</text>
 
   <rect x="380" y="280" width="540" height="220" class="box"/>
-  <text x="650" y="304" text-anchor="middle" class="head">2026 instantiations</text>
-  <text x="400" y="328" class="step">Letta sleep-time compute</text>
-  <text x="400" y="346" class="small">a separate reflector agent runs off the hot path, writes to memory blocks</text>
+  <text x="650" y="304" text-anchor="middle" class="head">2026 年的实现</text>
+  <text x="400" y="328" class="step">Letta 睡眠时间计算</text>
+  <text x="400" y="346" class="small">独立反思 agent 在关键路径之外运行，写入记忆块</text>
   <text x="400" y="368" class="step">pro-workflow /learn-rule</text>
-  <text x="400" y="386" class="small">manual reflection capture into project memory — curated over time</text>
+  <text x="400" y="386" class="small">手动将反思记录至项目记忆 — 随时间策展</text>
   <text x="400" y="408" class="step">Claude Code /memory</text>
-  <text x="400" y="426" class="small">CLAUDE.md functions as long-lived episodic buffer across sessions</text>
-  <text x="400" y="448" class="step">LangGraph reflection nodes</text>
-  <text x="400" y="466" class="small">graph node that scores and routes to refine-or-finish</text>
-  <text x="400" y="488" class="small">memory rot: compact, TTL, or dedupe — accumulating reflections go stale</text>
+  <text x="400" y="426" class="small">CLAUDE.md 充当跨会话的长期情景缓冲区</text>
+  <text x="400" y="448" class="step">LangGraph 反思节点</text>
+  <text x="400" y="466" class="small">图节点评分并路由至改进或结束</text>
+  <text x="400" y="488" class="small">记忆腐化：压缩、TTL 或去重 — 持续累积的反思会过时</text>
 </svg>

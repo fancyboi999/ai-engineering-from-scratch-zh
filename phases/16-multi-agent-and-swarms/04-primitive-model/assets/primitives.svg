@@ -16,61 +16,61 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">Four primitives — every 2026 multi-agent framework fits this shape</text>
+  <text x="480" y="28" text-anchor="middle" class="title">四种基本组成：2026 年的多 agent 框架均可归入此结构</text>
 
   <rect x="40" y="60" width="220" height="180" class="cool"/>
-  <text x="150" y="82" text-anchor="middle" class="head">Agent</text>
+  <text x="150" y="82" text-anchor="middle" class="head">agent</text>
   <text x="150" y="108" text-anchor="middle" class="step">system_prompt + tools</text>
-  <text x="150" y="128" text-anchor="middle" class="small">stateless function</text>
-  <text x="150" y="146" text-anchor="middle" class="small">of (prompt, tools, model)</text>
-  <text x="150" y="174" text-anchor="middle" class="small">AutoGen: ConversableAgent</text>
-  <text x="150" y="190" text-anchor="middle" class="small">CrewAI: role + goal + backstory</text>
-  <text x="150" y="206" text-anchor="middle" class="small">LangGraph: node function</text>
+  <text x="150" y="128" text-anchor="middle" class="small">无状态函数</text>
+  <text x="150" y="146" text-anchor="middle" class="small">输入为 (prompt, tools, model)</text>
+  <text x="150" y="174" text-anchor="middle" class="small">AutoGen：ConversableAgent</text>
+  <text x="150" y="190" text-anchor="middle" class="small">CrewAI：角色 + 目标 + 背景</text>
+  <text x="150" y="206" text-anchor="middle" class="small">LangGraph：节点函数</text>
   <text x="150" y="222" text-anchor="middle" class="small">Swarm: Agent(instructions, tools)</text>
 
   <rect x="280" y="60" width="220" height="180" class="hot"/>
-  <text x="390" y="82" text-anchor="middle" class="head">Handoff</text>
-  <text x="390" y="108" text-anchor="middle" class="step">transfer of control</text>
-  <text x="390" y="128" text-anchor="middle" class="small">three implementations:</text>
-  <text x="390" y="148" text-anchor="middle" class="small">1 function return (Swarm)</text>
-  <text x="390" y="166" text-anchor="middle" class="small">2 graph edge (LangGraph)</text>
-  <text x="390" y="184" text-anchor="middle" class="small">3 speaker selection (AutoGen)</text>
-  <text x="390" y="210" text-anchor="middle" class="caption">always: (from, to, optional payload)</text>
+  <text x="390" y="82" text-anchor="middle" class="head">交接</text>
+  <text x="390" y="108" text-anchor="middle" class="step">控制权转移</text>
+  <text x="390" y="128" text-anchor="middle" class="small">三种实现：</text>
+  <text x="390" y="148" text-anchor="middle" class="small">1 函数返回（Swarm）</text>
+  <text x="390" y="166" text-anchor="middle" class="small">2 图的边（LangGraph）</text>
+  <text x="390" y="184" text-anchor="middle" class="small">3 发言者选择（AutoGen）</text>
+  <text x="390" y="210" text-anchor="middle" class="caption">始终为：(from, to, optional payload)</text>
 
   <rect x="520" y="60" width="220" height="180" class="cold"/>
-  <text x="630" y="82" text-anchor="middle" class="head">Shared state</text>
-  <text x="630" y="108" text-anchor="middle" class="step">the ONLY stateful thing</text>
-  <text x="630" y="128" text-anchor="middle" class="small">message pool</text>
-  <text x="630" y="146" text-anchor="middle" class="small">blackboard</text>
-  <text x="630" y="164" text-anchor="middle" class="small">StateGraph reducer</text>
-  <text x="630" y="182" text-anchor="middle" class="small">MCP shared context</text>
-  <text x="630" y="210" text-anchor="middle" class="caption">memory poisoning lives here</text>
+  <text x="630" y="82" text-anchor="middle" class="head">共享状态</text>
+  <text x="630" y="108" text-anchor="middle" class="step">唯一带状态的组成</text>
+  <text x="630" y="128" text-anchor="middle" class="small">消息池</text>
+  <text x="630" y="146" text-anchor="middle" class="small">黑板</text>
+  <text x="630" y="164" text-anchor="middle" class="small">StateGraph 归约器</text>
+  <text x="630" y="182" text-anchor="middle" class="small">MCP 共享上下文</text>
+  <text x="630" y="210" text-anchor="middle" class="caption">记忆投毒发生于此</text>
 
   <rect x="760" y="60" width="180" height="180" class="dsk"/>
-  <text x="850" y="82" text-anchor="middle" class="head">Orchestrator</text>
-  <text x="850" y="108" text-anchor="middle" class="step">who speaks next</text>
-  <text x="850" y="128" text-anchor="middle" class="small">static graph</text>
-  <text x="850" y="146" text-anchor="middle" class="small">LLM-selected</text>
-  <text x="850" y="164" text-anchor="middle" class="small">handoff-driven</text>
-  <text x="850" y="182" text-anchor="middle" class="small">queue-driven</text>
-  <text x="850" y="210" text-anchor="middle" class="caption">scheduler over the other three</text>
+  <text x="850" y="82" text-anchor="middle" class="head">编排器</text>
+  <text x="850" y="108" text-anchor="middle" class="step">谁接下来发言</text>
+  <text x="850" y="128" text-anchor="middle" class="small">静态图</text>
+  <text x="850" y="146" text-anchor="middle" class="small">LLM 选择</text>
+  <text x="850" y="164" text-anchor="middle" class="small">交接驱动</text>
+  <text x="850" y="182" text-anchor="middle" class="small">队列驱动</text>
+  <text x="850" y="210" text-anchor="middle" class="caption">调度其他三者</text>
 
   <rect x="40" y="280" width="900" height="210" class="box"/>
-  <text x="490" y="304" text-anchor="middle" class="head">mapping the 2026 frameworks onto the four axes</text>
+  <text x="490" y="304" text-anchor="middle" class="head">将 2026 年框架映射到四种组成</text>
 
   <text x="60" y="336" class="step">OpenAI Swarm / Agents SDK</text>
   <text x="340" y="336" class="small">agent = Agent(instructions, tools)</text>
-  <text x="340" y="352" class="small">handoff = tool returns Agent · shared state pushed to caller · orchestrator = LLM's handoff call</text>
+  <text x="340" y="352" class="small">交接 = 工具返回 Agent · 共享状态交给调用方 · 编排器 = LLM 的交接调用</text>
 
   <text x="60" y="376" class="step">AutoGen v0.4 / AG2</text>
   <text x="340" y="376" class="small">agent = ConversableAgent</text>
-  <text x="340" y="392" class="small">handoff = speaker selection · shared state = message pool · orchestrator = selector fn (LLM or round-robin)</text>
+  <text x="340" y="392" class="small">交接 = 发言者选择 · 共享状态 = 消息池 · 编排器 = 选择函数（LLM 或轮询）</text>
 
   <text x="60" y="416" class="step">CrewAI</text>
-  <text x="340" y="416" class="small">agent = role + goal + backstory</text>
-  <text x="340" y="432" class="small">handoff = Process.Sequential / Hierarchical · shared state = Task outputs · orchestrator = manager LLM</text>
+  <text x="340" y="416" class="small">agent = 角色 + 目标 + 背景</text>
+  <text x="340" y="432" class="small">交接 = Process.Sequential / Hierarchical · 共享状态 = Task 输出 · 编排器 = 管理 LLM</text>
 
   <text x="60" y="456" class="step">LangGraph</text>
-  <text x="340" y="456" class="small">agent = node function</text>
-  <text x="340" y="472" class="small">handoff = graph edge · shared state = StateGraph reducer · orchestrator = the graph (deterministic)</text>
+  <text x="340" y="456" class="small">agent = 节点函数</text>
+  <text x="340" y="472" class="small">交接 = 图的边 · 共享状态 = StateGraph 归约器 · 编排器 = 图本身（确定性）</text>
 </svg>

@@ -1,4 +1,4 @@
-# Model Context Protocol（MCP）
+# 模型上下文协议（MCP）
 
 > MCP 为 AI host 提供一套发现和调用工具、resource 与 prompt 的统一协议。2026-07-28 修订版让该协议变为无状态：能力和版本上下文随每个请求传递，而非绑定在连接握手中。
 

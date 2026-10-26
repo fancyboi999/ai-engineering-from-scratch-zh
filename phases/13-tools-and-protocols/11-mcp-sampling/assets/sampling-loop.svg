@@ -16,53 +16,53 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">2026-07-28 model input: direct integration or stateless MRTR</text>
+  <text x="480" y="26" text-anchor="middle" class="title">2026-07-28 版模型输入：直接集成或无状态 MRTR</text>
 
   <rect x="40" y="55" width="880" height="70" class="hot"/>
-  <text x="480" y="78" text-anchor="middle" class="head">architecture decision</text>
-  <text x="60" y="100" class="small">New server: call a model provider directly. Compatibility need: carry deprecated Sampling through MRTR.</text>
+  <text x="480" y="78" text-anchor="middle" class="head">架构决策</text>
+  <text x="60" y="100" class="small">新服务器直接调用模型提供方；兼容需求则通过 MRTR 承载已弃用的 Sampling。</text>
 
   <rect x="40" y="145" width="260" height="350" class="cool"/>
-  <text x="170" y="170" text-anchor="middle" class="head">client and host model</text>
-  <text x="58" y="202" class="step">every POST includes _meta</text>
+  <text x="170" y="170" text-anchor="middle" class="head">客户端与宿主模型</text>
+  <text x="58" y="202" class="step">每个 POST 均包含 _meta</text>
   <text x="58" y="220" class="small">protocolVersion: 2026-07-28</text>
   <text x="58" y="238" class="small">clientCapabilities: sampling</text>
-  <text x="58" y="272" class="step">fulfill inputRequests</text>
-  <text x="58" y="290" class="small">apply approval and budgets</text>
-  <text x="58" y="308" class="small">validate model output</text>
-  <text x="58" y="342" class="step">retry original method</text>
-  <text x="58" y="360" class="small">fresh JSON-RPC id</text>
-  <text x="58" y="378" class="small">inputResponses for this round</text>
-  <text x="58" y="396" class="small">exact requestState echo</text>
-  <text x="58" y="438" class="small">No initialize</text>
-  <text x="58" y="456" class="small">No protocol session</text>
-  <text x="58" y="474" class="small">No reverse request channel</text>
+  <text x="58" y="272" class="step">满足 inputRequests</text>
+  <text x="58" y="290" class="small">执行审批与预算约束</text>
+  <text x="58" y="308" class="small">校验模型输出</text>
+  <text x="58" y="342" class="step">重试原始方法</text>
+  <text x="58" y="360" class="small">新的 JSON-RPC ID</text>
+  <text x="58" y="378" class="small">本轮的 inputResponses</text>
+  <text x="58" y="396" class="small">原样回传 requestState</text>
+  <text x="58" y="438" class="small">不使用 initialize</text>
+  <text x="58" y="456" class="small">无协议会话</text>
+  <text x="58" y="474" class="small">无反向请求通道</text>
 
   <rect x="660" y="145" width="260" height="350" class="cold"/>
-  <text x="790" y="170" text-anchor="middle" class="head">stateless MCP server</text>
-  <text x="678" y="202" class="step">discover + cached tools/list</text>
-  <text x="678" y="220" class="small">version -32022 | capability -32021</text>
-  <text x="678" y="252" class="step">round 1: pick files</text>
+  <text x="790" y="170" text-anchor="middle" class="head">无状态 MCP 服务器</text>
+  <text x="678" y="202" class="step">发现 + 缓存的 tools/list</text>
+  <text x="678" y="220" class="small">版本 -32022 | 能力 -32021</text>
+  <text x="678" y="252" class="step">第 1 轮：选择文件</text>
   <text x="678" y="270" class="small">resultType: input_required</text>
-  <text x="678" y="288" class="small">sampling/createMessage embedded</text>
-  <text x="678" y="320" class="step">round 2: summarize</text>
-  <text x="678" y="338" class="small">validate first response</text>
-  <text x="678" y="356" class="small">return next input_required</text>
-  <text x="678" y="388" class="step">round 3: complete</text>
+  <text x="678" y="288" class="small">嵌入 sampling/createMessage</text>
+  <text x="678" y="320" class="step">第 2 轮：总结</text>
+  <text x="678" y="338" class="small">校验首个响应</text>
+  <text x="678" y="356" class="small">返回下一个 input_required</text>
+  <text x="678" y="388" class="step">第 3 轮：完成</text>
   <text x="678" y="406" class="small">resultType: complete</text>
   <text x="678" y="438" class="step">requestState</text>
-  <text x="678" y="456" class="small">HMAC binds principal, args,</text>
-  <text x="678" y="474" class="small">phase, and short expiry</text>
+  <text x="678" y="456" class="small">HMAC 绑定身份主体、参数、</text>
+  <text x="678" y="474" class="small">阶段及短期有效期</text>
 
   <path d="M300,230 L660,230" class="edge" marker-end="url(#arrow)"/>
   <text x="480" y="222" text-anchor="middle" class="small">1. tools/call, id 1</text>
   <path d="M660,285 L300,285" class="edge" marker-end="url(#arrow)"/>
-  <text x="480" y="277" text-anchor="middle" class="small">2. input_required + signed state</text>
+  <text x="480" y="277" text-anchor="middle" class="small">2. input_required + 已签名状态</text>
   <path d="M300,345 L660,345" class="edge" marker-end="url(#arrow)"/>
-  <text x="480" y="337" text-anchor="middle" class="small">3. tools/call retry, id 2</text>
+  <text x="480" y="337" text-anchor="middle" class="small">3. 重试 tools/call，id 2</text>
   <path d="M660,400 L300,400" class="edge" marker-end="url(#arrow)"/>
-  <text x="480" y="392" text-anchor="middle" class="small">4. next input_required or complete</text>
+  <text x="480" y="392" text-anchor="middle" class="small">4. 下一个 input_required 或 complete</text>
 
   <rect x="40" y="515" width="880" height="30" class="box"/>
-  <text x="480" y="535" text-anchor="middle" class="small">Any server instance can process a retry because the request and integrity-protected state are self-contained.</text>
+  <text x="480" y="535" text-anchor="middle" class="small">任一服务器实例均可处理重试，因为请求及受完整性保护的状态均为自包含。</text>
 </svg>

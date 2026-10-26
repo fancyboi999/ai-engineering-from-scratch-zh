@@ -5,7 +5,7 @@ code: MI
 subtitle: 在单 GPU 上组织 GRPO、设置批次与卸载策略、检查训练日志并守护失败任务。数值来自上游冻结运行记录。
 hue: 280
 sources: manuals/miles-101
-source_hash: 16ea9f7e98863fd2
+source_hash: d195c56afe38636b
 ---
 
 ## 检查镜像与 GPU

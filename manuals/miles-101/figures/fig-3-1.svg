@@ -7,7 +7,7 @@
   <text x="54" y="44" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.12</text>
   <line x1="60" y1="250" x2="620" y2="250" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="60" y1="40" x2="60" y2="250" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="60" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">reward gain over 24 steps</text>
+  <text x="60" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">24 步的奖励提升</text>
   <rect x="86" y="157.71" width="60" height="92.29" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="116" y="151.71" font-size="11" text-anchor="middle" fill="var(--m-olive-ink, #515f26)">+0.053</text>
   <text x="116" y="267" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4</text>

@@ -1,4 +1,4 @@
-# Linux for AI
+# AI 开发中的 Linux
 
 > 大多数 AI 跑在 Linux 上。你得懂到不会被卡住的程度。
 

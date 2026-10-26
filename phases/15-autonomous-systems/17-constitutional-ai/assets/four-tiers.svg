@@ -13,38 +13,38 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Claude Constitution (Jan 2026, 79 pages, CC0): hardcoded floor + four tiers</text>
+  <text x="440" y="26" text-anchor="middle" class="title">Claude 章程（2026 年一月，79 页，CC0）：硬性底线与四个层级</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Hardcoded floor -->
   <rect x="60" y="80" width="760" height="86" class="hot"/>
-  <text x="440" y="104" text-anchor="middle" class="label">hardcoded prohibitions (operators and users cannot override)</text>
-  <text x="80" y="126" class="content">bioweapons / CBRN uplift  ·  CSAM  ·  critical-infrastructure attack planning</text>
-  <text x="80" y="142" class="content">deception about AI identity when asked directly  ·  deployment-specific additions allowed</text>
-  <text x="80" y="158" class="small">enforced at model weights (CAI training + RLAIF) and at inference layer</text>
+  <text x="440" y="104" text-anchor="middle" class="label">硬编码禁令（运营者和用户均无权覆盖）</text>
+  <text x="80" y="126" class="content">生物武器 / CBRN 能力增益 · CSAM · 关键基础设施攻击规划</text>
+  <text x="80" y="142" class="content">被直接询问时谎报 AI 身份 · 允许添加部署专属限制</text>
+  <text x="80" y="158" class="small">通过模型权重（CAI 训练 + RLAIF）与推理层共同执行</text>
 
   <!-- Tier 1 -->
   <rect x="60" y="190" width="760" height="60" class="cool"/>
-  <text x="80" y="212" class="label">tier 1 — safety and supporting human oversight  (highest)</text>
-  <text x="80" y="232" class="content">do not act in ways that make it harder for humans to supervise and correct AI</text>
+  <text x="80" y="212" class="label">第 1 层：安全与支持人类监督（最高）</text>
+  <text x="80" y="232" class="content">不得采取使人类更难监督与纠正 AI 的行动</text>
 
   <!-- Tier 2 -->
   <rect x="60" y="260" width="760" height="60" class="cold"/>
-  <text x="80" y="282" class="label">tier 2 — ethics</text>
-  <text x="80" y="302" class="content">honesty · avoid harm to persons · no deception · no manipulation</text>
+  <text x="80" y="282" class="label">第 2 层：伦理</text>
+  <text x="80" y="302" class="content">诚实 · 避免伤害个人 · 不欺骗 · 不操纵</text>
 
   <!-- Tier 3 -->
   <rect x="60" y="330" width="760" height="60" class="warn"/>
-  <text x="80" y="352" class="label">tier 3 — Anthropic guidelines  (operator-adjustable within declared bounds)</text>
-  <text x="80" y="372" class="content">response length · topical scope · style · tool-use patterns</text>
+  <text x="80" y="352" class="label">第 3 层：Anthropic 指南（运营者可在声明范围内调整）</text>
+  <text x="80" y="372" class="content">回答长度 · 主题范围 · 风格 · 工具使用模式</text>
 
   <!-- Tier 4 -->
   <rect x="60" y="400" width="760" height="60" class="box"/>
-  <text x="80" y="422" class="label">tier 4 — helpfulness  (lowest)</text>
-  <text x="80" y="442" class="content">be as useful as possible within the three higher tiers</text>
+  <text x="80" y="422" class="label">第 4 层：有用性（最低）</text>
+  <text x="80" y="442" class="content">在更高三层约束下尽可能有用</text>
 
   <!-- Resolution note -->
   <rect x="60" y="466" width="760" height="36" class="box"/>
-  <text x="440" y="490" text-anchor="middle" class="small">when tiers conflict, higher wins; when principles are ambiguous, model reasons (reason-based alignment)</text>
+  <text x="440" y="490" text-anchor="middle" class="small">层级冲突时高层优先；原则模糊时由模型推理（基于理由的对齐）</text>
 </svg>

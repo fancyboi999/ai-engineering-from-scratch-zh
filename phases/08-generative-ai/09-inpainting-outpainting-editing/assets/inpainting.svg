@@ -16,45 +16,45 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">inpainting vs outpainting vs SDEdit</text>
+  <text x="450" y="28" text-anchor="middle" class="title">局部重绘、画布外扩与 SDEdit</text>
 
   <!-- inpainting panel -->
-  <text x="165" y="70" text-anchor="middle" class="label">inpainting</text>
+  <text x="165" y="70" text-anchor="middle" class="label">局部重绘</text>
   <rect x="40" y="80" width="250" height="130" class="box"/>
   <rect x="55" y="95" width="220" height="100" class="cold"/>
   <rect x="120" y="120" width="80" height="50" class="mask"/>
-  <text x="160" y="230" text-anchor="middle" class="caption">mask inside, pin outside</text>
-  <text x="160" y="248" text-anchor="middle" class="caption">9-channel U-Net:</text>
+  <text x="160" y="230" text-anchor="middle" class="caption">内部掩码，外部固定</text>
+  <text x="160" y="248" text-anchor="middle" class="caption">9 通道 U-Net：</text>
   <text x="160" y="264" text-anchor="middle" class="mono">noisy | encoded_src | mask</text>
 
   <!-- outpainting -->
-  <text x="450" y="70" text-anchor="middle" class="label">outpainting</text>
+  <text x="450" y="70" text-anchor="middle" class="label">画布外扩</text>
   <rect x="310" y="80" width="260" height="130" class="box"/>
   <rect x="410" y="110" width="70" height="70" class="cold"/>
   <rect x="325" y="95" width="85" height="100" class="mask"/>
   <rect x="480" y="95" width="85" height="100" class="mask"/>
-  <text x="450" y="230" text-anchor="middle" class="caption">invert the mask</text>
-  <text x="450" y="248" text-anchor="middle" class="caption">extend beyond the canvas</text>
-  <text x="450" y="264" text-anchor="middle" class="caption">same model, same loss</text>
+  <text x="450" y="230" text-anchor="middle" class="caption">反转掩码</text>
+  <text x="450" y="248" text-anchor="middle" class="caption">扩展至画布之外</text>
+  <text x="450" y="264" text-anchor="middle" class="caption">相同模型，相同损失</text>
 
   <!-- SDEdit -->
-  <text x="720" y="70" text-anchor="middle" class="label">SDEdit (no retraining)</text>
+  <text x="720" y="70" text-anchor="middle" class="label">SDEdit（无需重训）</text>
   <rect x="590" y="80" width="270" height="130" class="box"/>
-  <text x="725" y="110" text-anchor="middle" class="mono">x_0 -&gt; add noise to t -&gt; denoise</text>
-  <text x="725" y="135" text-anchor="middle" class="caption">t/T = 0.3 &#8594; minor edits</text>
-  <text x="725" y="153" text-anchor="middle" class="caption">t/T = 0.6 &#8594; moderate edits</text>
-  <text x="725" y="171" text-anchor="middle" class="caption">t/T = 0.9 &#8594; near-random</text>
-  <text x="725" y="195" text-anchor="middle" class="caption">no mask, just noise-level slider</text>
+  <text x="725" y="110" text-anchor="middle" class="mono">x_0 -&gt; 加噪到 t -&gt; 去噪</text>
+  <text x="725" y="135" text-anchor="middle" class="caption">t/T = 0.3 → 轻微修改</text>
+  <text x="725" y="153" text-anchor="middle" class="caption">t/T = 0.6 → 中等修改</text>
+  <text x="725" y="171" text-anchor="middle" class="caption">t/T = 0.9 → 接近随机</text>
+  <text x="725" y="195" text-anchor="middle" class="caption">无掩码，仅调整噪声级别</text>
 
   <!-- pipeline flow -->
   <rect x="40" y="310" width="820" height="100" class="hot"/>
-  <text x="450" y="335" text-anchor="middle" class="label">inpainting inference loop</text>
+  <text x="450" y="335" text-anchor="middle" class="label">局部重绘推理循环</text>
   <text x="450" y="358" text-anchor="middle" class="mono">for t = T .. 1:  x_t[masked] = denoise;  x_t[unmasked] = noise(clean_source, t)</text>
-  <text x="450" y="380" text-anchor="middle" class="caption">replace unmasked region with a fresh forward-diffused clean image each step</text>
-  <text x="450" y="398" text-anchor="middle" class="caption">final step: pin unmasked pixels to the clean source exactly</text>
+  <text x="450" y="380" text-anchor="middle" class="caption">每步用重新前向加噪的干净图像替换未掩码区域</text>
+  <text x="450" y="398" text-anchor="middle" class="caption">最后一步：未掩码像素与原始干净图像严格一致</text>
 
   <!-- tools -->
   <rect x="40" y="425" width="820" height="60" class="box"/>
-  <text x="450" y="448" text-anchor="middle" class="label">2026 editing stack</text>
-  <text x="450" y="470" text-anchor="middle" class="caption">SAM 2 mask &#8594; SD-Inpaint / Flux-Fill / GPT-Image Edit &#8594; Flux-Kontext for instruction edits</text>
+  <text x="450" y="448" text-anchor="middle" class="label">2026 年编辑技术栈</text>
+  <text x="450" y="470" text-anchor="middle" class="caption">SAM 2 掩码 → SD-Inpaint / Flux-Fill / GPT-Image Edit → Flux-Kontext 指令编辑</text>
 </svg>

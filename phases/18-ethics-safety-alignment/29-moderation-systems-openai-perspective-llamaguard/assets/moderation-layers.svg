@@ -16,25 +16,25 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Three-layer moderation: the 2026 default deployment pattern</text>
+  <text x="480" y="24" text-anchor="middle" class="title">三层内容审核：2026 年的默认部署模式</text>
 
   <rect x="40" y="60" width="180" height="100" class="cool"/>
-  <text x="130" y="90" text-anchor="middle" class="step">user prompt</text>
+  <text x="130" y="90" text-anchor="middle" class="step">用户 prompt</text>
   <text x="130" y="115" text-anchor="middle" class="small">Llama Guard 3/4</text>
   <text x="130" y="135" text-anchor="middle" class="small">OpenAI Moderation</text>
 
   <rect x="240" y="60" width="180" height="100" class="cold"/>
-  <text x="330" y="90" text-anchor="middle" class="step">custom rules</text>
-  <text x="330" y="115" text-anchor="middle" class="small">finance disclaimer</text>
-  <text x="330" y="135" text-anchor="middle" class="small">medical refusal</text>
+  <text x="330" y="90" text-anchor="middle" class="step">自定义规则</text>
+  <text x="330" y="115" text-anchor="middle" class="small">金融免责声明</text>
+  <text x="330" y="135" text-anchor="middle" class="small">医疗拒答</text>
 
   <rect x="440" y="60" width="180" height="100" class="hot"/>
-  <text x="530" y="90" text-anchor="middle" class="step">model</text>
+  <text x="530" y="90" text-anchor="middle" class="step">模型</text>
   <text x="530" y="115" text-anchor="middle" class="small">GPT-5, Claude, Gemini</text>
-  <text x="530" y="135" text-anchor="middle" class="small">or open-source</text>
+  <text x="530" y="135" text-anchor="middle" class="small">或开源模型</text>
 
   <rect x="640" y="60" width="180" height="100" class="cool"/>
-  <text x="730" y="90" text-anchor="middle" class="step">output moderation</text>
+  <text x="730" y="90" text-anchor="middle" class="step">输出审核</text>
   <text x="730" y="115" text-anchor="middle" class="small">Llama Guard 3/4</text>
   <text x="730" y="135" text-anchor="middle" class="small">OpenAI Moderation</text>
 
@@ -43,29 +43,29 @@
   <path d="M 620 110 L 640 110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow29)" fill="none"/>
 
   <rect x="40" y="180" width="880" height="160" class="box"/>
-  <text x="480" y="205" text-anchor="middle" class="head">category taxonomies</text>
+  <text x="480" y="205" text-anchor="middle" class="head">类别体系</text>
   <rect x="60" y="225" width="280" height="100" class="cool"/>
-  <text x="200" y="250" text-anchor="middle" class="step">OpenAI Moderation (13 categories)</text>
-  <text x="200" y="270" text-anchor="middle" class="small">harassment(+threatening) / hate(+threatening)</text>
-  <text x="200" y="288" text-anchor="middle" class="small">self-harm(+intent,+instructions) / sexual(+minors)</text>
-  <text x="200" y="306" text-anchor="middle" class="small">violence(+graphic) / illicit(+violent)</text>
+  <text x="200" y="250" text-anchor="middle" class="step">OpenAI Moderation（13 类）</text>
+  <text x="200" y="270" text-anchor="middle" class="small">骚扰（+威胁）/ 仇恨（+威胁）</text>
+  <text x="200" y="288" text-anchor="middle" class="small">自伤（+意图、+指令）/ 性内容（+未成年人）</text>
+  <text x="200" y="306" text-anchor="middle" class="small">暴力（+血腥）/ 非法行为（+暴力）</text>
 
   <rect x="360" y="225" width="280" height="100" class="cool"/>
-  <text x="500" y="250" text-anchor="middle" class="step">Llama Guard 3 (14 categories)</text>
-  <text x="500" y="270" text-anchor="middle" class="small">MLCommons AILuminate taxonomy</text>
-  <text x="500" y="288" text-anchor="middle" class="small">+ code-interpreter-abuse, elections</text>
-  <text x="500" y="306" text-anchor="middle" class="small">+ defamation, specialized-advice</text>
+  <text x="500" y="250" text-anchor="middle" class="step">Llama Guard 3（14 类）</text>
+  <text x="500" y="270" text-anchor="middle" class="small">MLCommons AILuminate 分类体系</text>
+  <text x="500" y="288" text-anchor="middle" class="small">+ 代码解释器滥用、选举</text>
+  <text x="500" y="306" text-anchor="middle" class="small">+ 诽谤、专业建议</text>
 
   <rect x="660" y="225" width="240" height="100" class="cool"/>
-  <text x="780" y="250" text-anchor="middle" class="step">Perspective (toxicity baseline)</text>
-  <text x="780" y="270" text-anchor="middle" class="small">TOXICITY / SEVERE / INSULT</text>
-  <text x="780" y="288" text-anchor="middle" class="small">pre-LLM-era</text>
-  <text x="780" y="306" text-anchor="middle" class="small">still used in research</text>
+  <text x="780" y="250" text-anchor="middle" class="step">Perspective（毒性基线）</text>
+  <text x="780" y="270" text-anchor="middle" class="small">毒性 / 严重 / 侮辱</text>
+  <text x="780" y="288" text-anchor="middle" class="small">LLM 时代之前</text>
+  <text x="780" y="306" text-anchor="middle" class="small">研究中仍在使用</text>
 
   <rect x="40" y="360" width="880" height="130" class="box"/>
-  <text x="480" y="385" text-anchor="middle" class="head">deprecations + migration</text>
-  <text x="60" y="415" class="small">Azure Content Moderator: deprecated Feb 2024, retired Feb 2027.</text>
-  <text x="60" y="435" class="small">replacement: Azure AI Content Safety (LLM-based, integrates with Azure OpenAI).</text>
-  <text x="60" y="455" class="small">migration projects: 2024-2027 for affected deployments; factor into EU AI Act timeline.</text>
-  <text x="60" y="475" class="small">omni-moderation-latest (2024): free for most developers; text + images; 42% better on multilingual.</text>
+  <text x="480" y="385" text-anchor="middle" class="head">弃用与迁移</text>
+  <text x="60" y="415" class="small">Azure Content Moderator：2024 年二月弃用，2027 年二月退役。</text>
+  <text x="60" y="435" class="small">替代方案：Azure AI Content Safety（基于 LLM，集成 Azure OpenAI）。</text>
+  <text x="60" y="455" class="small">受影响部署的迁移项目在 2024-2027 年进行；应纳入欧盟《人工智能法案》的时间安排。</text>
+  <text x="60" y="475" class="small">omni-moderation-latest（2024）：对多数开发者免费；支持文本与图像；多语言表现提升 42%。</text>
 </svg>

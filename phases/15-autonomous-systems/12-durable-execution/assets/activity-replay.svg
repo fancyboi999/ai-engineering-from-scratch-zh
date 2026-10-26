@@ -15,49 +15,49 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Durable execution: replay re-runs workflow, logged activities skip</text>
+  <text x="440" y="26" text-anchor="middle" class="title">持久执行：重放重跑工作流，已记录的活动直接复用</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Attempt 1 -->
-  <text x="60" y="80" class="label">attempt 1 — crash after call_llm</text>
+  <text x="60" y="80" class="label">尝试 1：call_llm 后崩溃</text>
 
   <rect x="60" y="96" width="150" height="50" class="cool"/>
   <text x="135" y="118" text-anchor="middle" class="label">fetch_docs</text>
-  <text x="135" y="136" text-anchor="middle" class="small">run, log done</text>
+  <text x="135" y="136" text-anchor="middle" class="small">执行并记录完成</text>
 
   <rect x="230" y="96" width="150" height="50" class="cool"/>
   <text x="305" y="118" text-anchor="middle" class="label">call_llm</text>
-  <text x="305" y="136" text-anchor="middle" class="small">run, log done</text>
+  <text x="305" y="136" text-anchor="middle" class="small">执行并记录完成</text>
 
   <rect x="400" y="96" width="150" height="50" class="hot"/>
-  <text x="475" y="118" text-anchor="middle" class="label">CRASH</text>
-  <text x="475" y="136" text-anchor="middle" class="small">write_report not yet run</text>
+  <text x="475" y="118" text-anchor="middle" class="label">崩溃</text>
+  <text x="475" y="136" text-anchor="middle" class="small">write_report 尚未运行</text>
 
   <!-- Event log -->
   <rect x="60" y="170" width="490" height="74" class="cold"/>
-  <text x="80" y="192" class="label">event log (durable)</text>
+  <text x="80" y="192" class="label">事件日志（持久化）</text>
   <text x="80" y="212" class="content">[fetch_docs started, fetch_docs done (result=X),</text>
   <text x="80" y="228" class="content"> call_llm started, call_llm done (result=Y)]</text>
 
   <!-- Attempt 2 -->
-  <text x="60" y="276" class="label">attempt 2 — replay</text>
+  <text x="60" y="276" class="label">尝试 2：重放</text>
 
   <rect x="60" y="292" width="150" height="50" class="cold"/>
   <text x="135" y="314" text-anchor="middle" class="label">fetch_docs</text>
-  <text x="135" y="332" text-anchor="middle" class="small">replay from log</text>
+  <text x="135" y="332" text-anchor="middle" class="small">从日志重放</text>
 
   <rect x="230" y="292" width="150" height="50" class="cold"/>
   <text x="305" y="314" text-anchor="middle" class="label">call_llm</text>
-  <text x="305" y="332" text-anchor="middle" class="small">replay from log</text>
+  <text x="305" y="332" text-anchor="middle" class="small">从日志重放</text>
 
   <rect x="400" y="292" width="150" height="50" class="cool"/>
   <text x="475" y="314" text-anchor="middle" class="label">write_report</text>
-  <text x="475" y="332" text-anchor="middle" class="small">run, log done</text>
+  <text x="475" y="332" text-anchor="middle" class="small">执行并记录完成</text>
 
   <rect x="570" y="292" width="150" height="50" class="box"/>
-  <text x="645" y="314" text-anchor="middle" class="label">return report</text>
-  <text x="645" y="332" text-anchor="middle" class="small">done</text>
+  <text x="645" y="314" text-anchor="middle" class="label">返回报告</text>
+  <text x="645" y="332" text-anchor="middle" class="small">完成</text>
 
   <path d="M210 317 L230 317" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M380 317 L400 317" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -65,10 +65,10 @@
 
   <!-- Why determinism -->
   <rect x="60" y="370" width="760" height="120" class="hot"/>
-  <text x="440" y="394" text-anchor="middle" class="label">what makes replay work</text>
-  <text x="80" y="416" class="content">1. Workflow code is deterministic (no wall clock, no random, no hidden I/O).</text>
-  <text x="80" y="432" class="content">2. Every activity is logged with args + result; replay re-reads the log.</text>
-  <text x="80" y="448" class="content">3. Backend survives the crash (PostgreSQL / Durable Objects; not SQLite for prod).</text>
-  <text x="80" y="464" class="content">4. HITL pauses are a workflow signal, not a polling loop.</text>
-  <text x="80" y="480" class="content">LLM calls fit the activity shape: non-deterministic, expensive, potentially failing.</text>
+  <text x="440" y="394" text-anchor="middle" class="label">重放为何成立</text>
+  <text x="80" y="416" class="content">1. 工作流代码具有确定性（无墙钟时间、随机数或隐藏 I/O）。</text>
+  <text x="80" y="432" class="content">2. 每项活动均记录参数与结果；重放时重新读取日志。</text>
+  <text x="80" y="448" class="content">3. 后端能在崩溃后存活（PostgreSQL / Durable Objects；生产不用 SQLite）。</text>
+  <text x="80" y="464" class="content">4. 人工介入的暂停是工作流信号，而非轮询循环。</text>
+  <text x="80" y="480" class="content">LLM 调用符合活动形态：不确定、昂贵、可能失败。</text>
 </svg>

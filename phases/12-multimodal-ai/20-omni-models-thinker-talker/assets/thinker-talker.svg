@@ -17,83 +17,83 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Thinker-Talker — streaming pipeline for real-time voice</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Thinker-Talker：面向实时语音的流式流水线</text>
 
   <rect x="30" y="50" width="900" height="230" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">parallel streaming: Thinker and Talker run concurrently</text>
+  <text x="480" y="72" text-anchor="middle" class="head">并行流式处理：Thinker 与 Talker 同时运行</text>
 
   <rect x="60" y="90" width="140" height="170" class="hot"/>
-  <text x="130" y="112" text-anchor="middle" class="step">user audio</text>
-  <text x="130" y="130" text-anchor="middle" class="small">mic 16 kHz</text>
-  <text x="130" y="146" text-anchor="middle" class="small">+ webcam 4 fps</text>
-  <text x="130" y="166" text-anchor="middle" class="small">streaming</text>
-  <text x="130" y="186" text-anchor="middle" class="small">tokens in</text>
-  <text x="130" y="212" text-anchor="middle" class="caption">VAD for turn-taking</text>
+  <text x="130" y="112" text-anchor="middle" class="step">用户音频</text>
+  <text x="130" y="130" text-anchor="middle" class="small">麦克风 16 kHz</text>
+  <text x="130" y="146" text-anchor="middle" class="small">+ 摄像头 4 fps</text>
+  <text x="130" y="166" text-anchor="middle" class="small">流式处理</text>
+  <text x="130" y="186" text-anchor="middle" class="small">输入 token</text>
+  <text x="130" y="212" text-anchor="middle" class="caption">用 VAD 处理轮次切换</text>
 
   <path d="M 205 170 L 245 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="250" y="90" width="210" height="170" class="cool"/>
   <text x="355" y="112" text-anchor="middle" class="step">Thinker (7-80B)</text>
-  <text x="355" y="130" text-anchor="middle" class="small">text-generating</text>
-  <text x="355" y="146" text-anchor="middle" class="small">large LLM reasoning</text>
-  <text x="355" y="162" text-anchor="middle" class="small">TMRoPE timestamps</text>
-  <text x="355" y="180" text-anchor="middle" class="small">emits text tokens</text>
-  <text x="355" y="202" text-anchor="middle" class="step">first token ~40ms</text>
-  <text x="355" y="224" text-anchor="middle" class="caption">streams per token</text>
-  <text x="355" y="240" text-anchor="middle" class="caption">into Talker</text>
+  <text x="355" y="130" text-anchor="middle" class="small">生成文本</text>
+  <text x="355" y="146" text-anchor="middle" class="small">大型 LLM 推理</text>
+  <text x="355" y="162" text-anchor="middle" class="small">TMRoPE 时间戳</text>
+  <text x="355" y="180" text-anchor="middle" class="small">输出文本 token</text>
+  <text x="355" y="202" text-anchor="middle" class="step">首个 token 约 40ms</text>
+  <text x="355" y="224" text-anchor="middle" class="caption">逐 token 流式传递</text>
+  <text x="355" y="240" text-anchor="middle" class="caption">送入 Talker</text>
 
   <path d="M 465 170 L 505 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="510" y="90" width="210" height="170" class="cold"/>
   <text x="615" y="112" text-anchor="middle" class="step">Talker (200M-1B)</text>
-  <text x="615" y="130" text-anchor="middle" class="small">speech-generating</text>
-  <text x="615" y="146" text-anchor="middle" class="small">small + fast</text>
-  <text x="615" y="162" text-anchor="middle" class="small">residual-VQ output</text>
-  <text x="615" y="180" text-anchor="middle" class="small">8 codebooks</text>
-  <text x="615" y="202" text-anchor="middle" class="step">50 tok/s throughput</text>
-  <text x="615" y="224" text-anchor="middle" class="caption">keeps pace with speech</text>
+  <text x="615" y="130" text-anchor="middle" class="small">生成语音</text>
+  <text x="615" y="146" text-anchor="middle" class="small">小巧、快速</text>
+  <text x="615" y="162" text-anchor="middle" class="small">残差 VQ 输出</text>
+  <text x="615" y="180" text-anchor="middle" class="small">8 个码本</text>
+  <text x="615" y="202" text-anchor="middle" class="step">吞吐 50 tok/s</text>
+  <text x="615" y="224" text-anchor="middle" class="caption">跟上语音播放速度</text>
 
   <path d="M 725 170 L 765 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="770" y="90" width="140" height="170" class="reg"/>
-  <text x="840" y="112" text-anchor="middle" class="step">waveform</text>
-  <text x="840" y="130" text-anchor="middle" class="small">SNAC decoder</text>
-  <text x="840" y="146" text-anchor="middle" class="small">16 kHz samples</text>
-  <text x="840" y="162" text-anchor="middle" class="small">speaker output</text>
-  <text x="840" y="182" text-anchor="middle" class="step">~70 ms decode</text>
-  <text x="840" y="206" text-anchor="middle" class="caption">streaming</text>
+  <text x="840" y="112" text-anchor="middle" class="step">波形</text>
+  <text x="840" y="130" text-anchor="middle" class="small">SNAC 解码器</text>
+  <text x="840" y="146" text-anchor="middle" class="small">16 kHz 采样</text>
+  <text x="840" y="162" text-anchor="middle" class="small">扬声器输出</text>
+  <text x="840" y="182" text-anchor="middle" class="step">解码约 70 ms</text>
+  <text x="840" y="206" text-anchor="middle" class="caption">流式处理</text>
 
   <rect x="30" y="300" width="900" height="220" class="box"/>
-  <text x="480" y="322" text-anchor="middle" class="head">TTFAB budget and open implementations</text>
+  <text x="480" y="322" text-anchor="middle" class="head">TTFAB 预算与开放实现</text>
 
   <g transform="translate(60, 350)">
-    <text x="0" y="15" class="step">mic -&gt; audio tokens</text>
+    <text x="0" y="15" class="step">麦克风 -&gt; 音频 token</text>
     <rect x="200" y="2" width="50" height="16" class="hot"/>
     <text x="260" y="15" class="small">40 ms</text>
 
-    <text x="0" y="40" class="step">Thinker prefill</text>
+    <text x="0" y="40" class="step">Thinker 预填充</text>
     <rect x="200" y="27" width="120" height="16" class="cool"/>
-    <text x="330" y="40" class="small">100 ms at 7B</text>
+    <text x="330" y="40" class="small">7B 下为 100 ms</text>
 
-    <text x="0" y="65" class="step">first text token</text>
+    <text x="0" y="65" class="step">首个文本 token</text>
     <rect x="200" y="52" width="45" height="16" class="cool"/>
     <text x="255" y="65" class="small">40 ms</text>
 
-    <text x="0" y="90" class="step">Talker first tokens</text>
+    <text x="0" y="90" class="step">Talker 首批 token</text>
     <rect x="200" y="77" width="20" height="16" class="cold"/>
     <text x="230" y="90" class="small">20 ms</text>
 
-    <text x="0" y="115" class="step">RVQ + waveform</text>
+    <text x="0" y="115" class="step">RVQ + 波形</text>
     <rect x="200" y="102" width="100" height="16" class="reg"/>
     <text x="310" y="115" class="small">100 ms</text>
   </g>
 
   <rect x="590" y="340" width="320" height="160" class="reg"/>
-  <text x="750" y="362" text-anchor="middle" class="step">open implementations</text>
-  <text x="750" y="384" text-anchor="middle" class="small">Mini-Omni : first open streaming</text>
-  <text x="750" y="402" text-anchor="middle" class="small">Moshi     : 160 ms, inner monologue</text>
+  <text x="750" y="362" text-anchor="middle" class="step">开放实现</text>
+  <text x="750" y="384" text-anchor="middle" class="small">Mini-Omni：首个开放流式实现</text>
+  <text x="750" y="402" text-anchor="middle" class="small">Moshi：160 ms，内心独白</text>
   <text x="750" y="420" text-anchor="middle" class="small">Qwen2.5-Omni : ~350 ms, TMRoPE</text>
-  <text x="750" y="438" text-anchor="middle" class="small">Qwen3-Omni   : close to GPT-4o</text>
-  <text x="750" y="456" text-anchor="middle" class="small">GLM-4-Voice  : Chinese-first</text>
-  <text x="750" y="480" text-anchor="middle" class="caption">GPT-4o reference: ~250 ms</text>
+  <text x="750" y="438" text-anchor="middle" class="small">Qwen3-Omni：接近 GPT-4o</text>
+  <text x="750" y="456" text-anchor="middle" class="small">GLM-4-Voice：中文优先</text>
+  <text x="750" y="480" text-anchor="middle" class="caption">GPT-4o 参考：约 250 ms</text>
 </svg>

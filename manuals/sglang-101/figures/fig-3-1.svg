@@ -8,11 +8,11 @@
   <text x="107" y="68" font-size="14" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">×</text>
   <rect x="114" y="34" width="80" height="56" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="154" y="58.3" font-size="16" text-anchor="middle" font-weight="700">28</text>
-  <text x="154" y="76.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">layers</text>
+  <text x="154" y="76.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">层数</text>
   <text x="201" y="68" font-size="14" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">×</text>
   <rect x="208" y="34" width="80" height="56" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="248" y="58.3" font-size="16" text-anchor="middle" font-weight="700">8</text>
-  <text x="248" y="76.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">KV head</text>
+  <text x="248" y="76.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">KV 头</text>
   <text x="295" y="68" font-size="14" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">×</text>
   <rect x="302" y="34" width="80" height="56" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="342" y="58.3" font-size="16" text-anchor="middle" font-weight="700">128</text>

@@ -12,73 +12,73 @@
     </style>
   </defs>
 
-  <text x="480" y="28" text-anchor="middle" class="title">MCP 2026-07-28 security surfaces and matching controls</text>
+  <text x="480" y="28" text-anchor="middle" class="title">MCP 2026-07-28 安全攻击面与对应控制</text>
 
   <rect x="30" y="52" width="900" height="224" rx="8" class="risk"/>
-  <text x="480" y="76" text-anchor="middle" class="head">untrusted inputs</text>
+  <text x="480" y="76" text-anchor="middle" class="head">不可信输入</text>
 
   <rect x="50" y="92" width="205" height="66" rx="5" class="box"/>
-  <text x="64" y="114" class="mono">metadata poisoning</text>
-  <text x="64" y="134" class="small">descriptions and annotations</text>
-  <text x="64" y="149" class="small">steer model or user</text>
+  <text x="64" y="114" class="mono">元数据投毒</text>
+  <text x="64" y="134" class="small">描述与注解</text>
+  <text x="64" y="149" class="small">诱导模型或用户</text>
 
   <rect x="270" y="92" width="205" height="66" rx="5" class="box"/>
-  <text x="284" y="114" class="mono">descriptor rug pull</text>
-  <text x="284" y="134" class="small">name, schema, or behavior</text>
-  <text x="284" y="149" class="small">changes after approval</text>
+  <text x="284" y="114" class="mono">描述符突变</text>
+  <text x="284" y="134" class="small">名称、schema 或行为</text>
+  <text x="284" y="149" class="small">在批准后发生变化</text>
 
   <rect x="490" y="92" width="205" height="66" rx="5" class="box"/>
-  <text x="504" y="114" class="mono">route confusion</text>
-  <text x="504" y="134" class="small">duplicate name or header</text>
-  <text x="504" y="149" class="small">and body mismatch</text>
+  <text x="504" y="114" class="mono">路由混淆</text>
+  <text x="504" y="134" class="small">名称重复，或头部</text>
+  <text x="504" y="149" class="small">与消息正文不一致</text>
 
   <rect x="710" y="92" width="200" height="66" rx="5" class="box"/>
-  <text x="724" y="114" class="mono">capability escalation</text>
-  <text x="724" y="134" class="small">compatibility declaration</text>
-  <text x="724" y="149" class="small">mistaken for permission</text>
+  <text x="724" y="114" class="mono">能力升级</text>
+  <text x="724" y="134" class="small">兼容性声明</text>
+  <text x="724" y="149" class="small">被误当成权限</text>
 
   <rect x="160" y="178" width="270" height="72" rx="5" class="box"/>
-  <text x="174" y="200" class="mono">MRTR state tampering</text>
-  <text x="174" y="220" class="small">change arguments, forge confirmation,</text>
-  <text x="174" y="237" class="small">or replay requestState</text>
+  <text x="174" y="200" class="mono">MRTR 状态篡改</text>
+  <text x="174" y="220" class="small">修改参数、伪造确认，</text>
+  <text x="174" y="237" class="small">或重放 requestState</text>
 
   <rect x="530" y="178" width="270" height="72" rx="5" class="box"/>
-  <text x="544" y="200" class="mono">identity confusion</text>
-  <text x="544" y="220" class="small">clientInfo, serverInfo, or display</text>
-  <text x="544" y="237" class="small">name treated as authenticated proof</text>
+  <text x="544" y="200" class="mono">身份混淆</text>
+  <text x="544" y="220" class="small">将 clientInfo、serverInfo 或显示</text>
+  <text x="544" y="237" class="small">名称当作已认证身份的证明</text>
 
   <rect x="30" y="296" width="900" height="224" rx="8" class="guard"/>
-  <text x="480" y="320" text-anchor="middle" class="head">independent controls</text>
+  <text x="480" y="320" text-anchor="middle" class="head">独立控制措施</text>
 
   <rect x="50" y="338" width="205" height="68" rx="5" class="box"/>
-  <text x="64" y="360" class="mono">scan + full digest</text>
-  <text x="64" y="380" class="small">review first version, then</text>
-  <text x="64" y="395" class="small">quarantine every change</text>
+  <text x="64" y="360" class="mono">扫描 + 完整摘要</text>
+  <text x="64" y="380" class="small">复核初版，此后</text>
+  <text x="64" y="395" class="small">隔离每次变更</text>
 
   <rect x="270" y="338" width="205" height="68" rx="5" class="box"/>
-  <text x="284" y="360" class="mono">qualified names</text>
-  <text x="284" y="380" class="small">notes.search and issues.search</text>
-  <text x="284" y="395" class="small">never silent overwrite</text>
+  <text x="284" y="360" class="mono">限定名称</text>
+  <text x="284" y="380" class="small">notes.search 与 issues.search</text>
+  <text x="284" y="395" class="small">禁止静默覆盖</text>
 
   <rect x="490" y="338" width="205" height="68" rx="5" class="box"/>
-  <text x="504" y="360" class="mono">wire equality</text>
-  <text x="504" y="380" class="small">version, method, and name</text>
-  <text x="504" y="395" class="small">validated before policy</text>
+  <text x="504" y="360" class="mono">报文一致性</text>
+  <text x="504" y="380" class="small">版本、方法与名称</text>
+  <text x="504" y="395" class="small">先校验，再应用策略</text>
 
   <rect x="710" y="338" width="200" height="68" rx="5" class="box"/>
-  <text x="724" y="360" class="mono">real authorization</text>
-  <text x="724" y="380" class="small">issuer, principal, resource,</text>
-  <text x="724" y="395" class="small">tool, scope, arguments</text>
+  <text x="724" y="360" class="mono">真正的授权</text>
+  <text x="724" y="380" class="small">签发者、主体、资源、</text>
+  <text x="724" y="395" class="small">工具、权限范围、参数</text>
 
   <rect x="160" y="426" width="270" height="68" rx="5" class="box"/>
-  <text x="174" y="448" class="mono">protected requestState</text>
-  <text x="174" y="468" class="small">integrity, exact arguments, expiry,</text>
-  <text x="174" y="483" class="small">principal, purpose, nonce</text>
+  <text x="174" y="448" class="mono">保护 requestState</text>
+  <text x="174" y="468" class="small">完整性、精确参数、有效期、</text>
+  <text x="174" y="483" class="small">主体、用途、nonce</text>
 
   <rect x="530" y="426" width="270" height="68" rx="5" class="box"/>
-  <text x="544" y="448" class="mono">stateless policy keys</text>
-  <text x="544" y="468" class="small">rate limit and audit by principal,</text>
-  <text x="544" y="483" class="small">issuer, resource, tool, and time</text>
+  <text x="544" y="448" class="mono">无状态策略键</text>
+  <text x="544" y="468" class="small">按主体、签发者、资源、</text>
+  <text x="544" y="483" class="small">工具及时间限流和审计</text>
 
-  <text x="480" y="548" text-anchor="middle" class="caption">No single control proves safety. Each closes a different ambiguity.</text>
+  <text x="480" y="548" text-anchor="middle" class="caption">没有任何单项控制能证明安全；它们分别消除不同的歧义。</text>
 </svg>

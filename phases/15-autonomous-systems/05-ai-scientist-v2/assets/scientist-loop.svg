@@ -16,35 +16,35 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">AI Scientist v2 — research loop, measured failure rates</text>
+  <text x="440" y="26" text-anchor="middle" class="title">AI Scientist v2：研究循环与实测失败率</text>
 
   <rect x="40" y="50" width="800" height="430" class="box"/>
 
   <!-- Stages across -->
   <g>
     <rect x="60" y="80" width="110" height="60" class="cool"/>
-    <text x="115" y="104" text-anchor="middle" class="label">idea</text>
-    <text x="115" y="120" text-anchor="middle" class="small">agentic tree search</text>
+    <text x="115" y="104" text-anchor="middle" class="label">想法</text>
+    <text x="115" y="120" text-anchor="middle" class="small">agent 式树搜索</text>
 
     <rect x="180" y="80" width="110" height="60" class="hot"/>
-    <text x="235" y="104" text-anchor="middle" class="label">novelty check</text>
-    <text x="235" y="120" text-anchor="middle" class="small">~25% mislabel</text>
+    <text x="235" y="104" text-anchor="middle" class="label">新颖度检查</text>
+    <text x="235" y="120" text-anchor="middle" class="small">约 25% 误判</text>
 
     <rect x="300" y="80" width="110" height="60" class="hot"/>
-    <text x="355" y="104" text-anchor="middle" class="label">experiment</text>
-    <text x="355" y="120" text-anchor="middle" class="small">42% failure</text>
+    <text x="355" y="104" text-anchor="middle" class="label">实验</text>
+    <text x="355" y="120" text-anchor="middle" class="small">42% 失败</text>
     <text x="355" y="134" text-anchor="middle" class="small">(Beel 2025)</text>
 
     <rect x="420" y="80" width="110" height="60" class="cold"/>
-    <text x="475" y="104" text-anchor="middle" class="label">VLM figure critique</text>
-    <text x="475" y="120" text-anchor="middle" class="small">polishes visuals</text>
-    <text x="475" y="134" text-anchor="middle" class="small">masks 70%</text>
+    <text x="475" y="104" text-anchor="middle" class="label">VLM 图表评审</text>
+    <text x="475" y="120" text-anchor="middle" class="small">润色视觉效果</text>
+    <text x="475" y="134" text-anchor="middle" class="small">掩盖 70%</text>
 
     <rect x="540" y="80" width="110" height="60" class="cool"/>
-    <text x="595" y="104" text-anchor="middle" class="label">writeup</text>
+    <text x="595" y="104" text-anchor="middle" class="label">撰写报告</text>
 
     <rect x="660" y="80" width="110" height="60" class="cool"/>
-    <text x="715" y="104" text-anchor="middle" class="label">review + submit</text>
+    <text x="715" y="104" text-anchor="middle" class="label">评审 + 投稿</text>
   </g>
 
   <!-- Arrows across -->
@@ -56,21 +56,21 @@
 
   <!-- Results panel -->
   <rect x="60" y="175" width="740" height="115" class="box"/>
-  <text x="80" y="196" class="label">measured results (Yamada 2025, Sakana Nature 2026)</text>
-  <text x="80" y="218" class="content">· v2-generated paper accepted at ICLR 2025 workshop (disclosed)</text>
-  <text x="80" y="236" class="content">· template-free loop replaces v1's fixed scaffolding</text>
-  <text x="80" y="254" class="content">· Nature 2026 paper documents end-to-end pipeline</text>
-  <text x="80" y="272" class="content">· Beel et al. 2025 external eval flagged polish masking experiment flaws</text>
+  <text x="80" y="196" class="label">实测结果（Yamada 2025、Sakana Nature 2026）</text>
+  <text x="80" y="218" class="content">· v2 生成的论文被 ICLR 2025 研讨会接收（已披露）</text>
+  <text x="80" y="236" class="content">· 无模板循环替代 v1 的固定运行框架</text>
+  <text x="80" y="254" class="content">· Nature 2026 论文记录了端到端流水线</text>
+  <text x="80" y="272" class="content">· Beel 等 2025 年外部评测指出，润色会掩盖实验缺陷</text>
 
   <!-- Safety box -->
   <rect x="60" y="305" width="740" height="155" class="hot"/>
-  <text x="80" y="328" class="label">operational safety (Sakana repo README, paraphrased)</text>
-  <text x="80" y="350" class="content">- the codebase executes LLM-written code</text>
-  <text x="80" y="368" class="content">- dangerous packages, uncontrolled web access, unintended processes possible</text>
-  <text x="80" y="386" class="content">- Docker isolation recommended (seccomp / gVisor preferred for multi-day runs)</text>
-  <text x="80" y="404" class="content">- disclose agent-authored papers; review before submission</text>
-  <text x="80" y="424" class="content">- polish stage can mask experiment weakness; require separate audit</text>
-  <text x="80" y="442" class="content">- evaluator is peer review, which is weak and noisy</text>
+  <text x="80" y="328" class="label">运行安全（转述 Sakana 仓库 README）</text>
+  <text x="80" y="350" class="content">- 该代码库执行 LLM 编写的代码</text>
+  <text x="80" y="368" class="content">- 可能出现危险软件包、失控网络访问及意外进程</text>
+  <text x="80" y="386" class="content">- 建议使用 Docker 隔离（多日运行优先选 seccomp / gVisor）</text>
+  <text x="80" y="404" class="content">- 披露 agent 撰写的论文，投稿前进行评审</text>
+  <text x="80" y="424" class="content">- 润色阶段可能掩盖实验薄弱之处，需独立审计</text>
+  <text x="80" y="442" class="content">- 验证依赖同行评审，力度有限且存在噪声</text>
 
-  <text x="440" y="478" text-anchor="middle" class="caption">unverified domain + full-text output surface + public venues = strongest controls in the phase</text>
+  <text x="440" y="478" text-anchor="middle" class="caption">未验证领域 + 全文输出 + 公开场所 = 本阶段最严格的控制要求</text>
 </svg>

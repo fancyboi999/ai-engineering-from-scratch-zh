@@ -14,46 +14,46 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">four MARL regimes, same environment shape</text>
+  <text x="450" y="30" text-anchor="middle" class="title">四种多智能体强化学习方式，相同环境结构</text>
 
   <rect x="40" y="60" width="200" height="170" class="box"/>
-  <text x="140" y="88" text-anchor="middle" class="label">independent PPO / Q</text>
-  <text x="60" y="115" class="content">each agent has its own</text>
-  <text x="60" y="135" class="content">policy and critic</text>
-  <text x="60" y="160" class="content">treats others as env</text>
-  <text x="140" y="195" text-anchor="middle" class="caption">simple, no coord signal</text>
-  <text x="140" y="215" text-anchor="middle" class="caption">fails on tight coupling</text>
+  <text x="140" y="88" text-anchor="middle" class="label">独立 PPO / Q</text>
+  <text x="60" y="115" class="content">每个 agent 各有自己的</text>
+  <text x="60" y="135" class="content">策略与评论家</text>
+  <text x="60" y="160" class="content">将其他 agent 视为环境</text>
+  <text x="140" y="195" text-anchor="middle" class="caption">简单，无协调信号</text>
+  <text x="140" y="215" text-anchor="middle" class="caption">紧耦合时失败</text>
 
   <rect x="260" y="60" width="200" height="170" class="hot"/>
   <text x="360" y="88" text-anchor="middle" class="label">CTDE (MAPPO/QMIX)</text>
-  <text x="280" y="115" class="content">decentralized actor:</text>
+  <text x="280" y="115" class="content">去中心化行动者：</text>
   <text x="280" y="133" class="content">  pi_i(a_i | o_i)</text>
-  <text x="280" y="158" class="content">centralized critic:</text>
+  <text x="280" y="158" class="content">中心化评论家：</text>
   <text x="280" y="176" class="content">  Q(s, a_1, .., a_n)</text>
-  <text x="360" y="210" text-anchor="middle" class="caption">2026 cooperative default</text>
+  <text x="360" y="210" text-anchor="middle" class="caption">2026 年合作任务的默认方式</text>
 
   <rect x="480" y="60" width="200" height="170" class="cool"/>
-  <text x="580" y="88" text-anchor="middle" class="label">self-play</text>
-  <text x="500" y="115" class="content">single agent, two roles</text>
-  <text x="500" y="135" class="content">opponent = past snapshot</text>
-  <text x="500" y="160" class="content">symmetric gradients</text>
-  <text x="580" y="195" text-anchor="middle" class="caption">zero-sum games</text>
+  <text x="580" y="88" text-anchor="middle" class="label">自博弈</text>
+  <text x="500" y="115" class="content">一个 agent，两种角色</text>
+  <text x="500" y="135" class="content">对手 = 历史快照</text>
+  <text x="500" y="160" class="content">对称梯度</text>
+  <text x="580" y="195" text-anchor="middle" class="caption">零和博弈</text>
   <text x="580" y="215" text-anchor="middle" class="caption">AlphaGo / AlphaZero</text>
 
   <rect x="700" y="60" width="160" height="170" class="box"/>
-  <text x="780" y="88" text-anchor="middle" class="label">league play</text>
-  <text x="715" y="115" class="content">population of</text>
-  <text x="715" y="133" class="content">past + current</text>
-  <text x="715" y="153" class="content">policies; sample</text>
-  <text x="715" y="171" class="content">opponents</text>
+  <text x="780" y="88" text-anchor="middle" class="label">联盟博弈</text>
+  <text x="715" y="115" class="content">由历史与</text>
+  <text x="715" y="133" class="content">当前策略</text>
+  <text x="715" y="153" class="content">构成群体，采样</text>
+  <text x="715" y="171" class="content">对手</text>
   <text x="780" y="210" text-anchor="middle" class="caption">AlphaStar</text>
 
   <rect x="40" y="260" width="820" height="150" class="box"/>
-  <text x="450" y="285" text-anchor="middle" class="label">the core difficulty</text>
-  <text x="60" y="315" class="content">from agent i's view, the environment now includes pi_{-i}</text>
-  <text x="60" y="335" class="content">as pi_{-i} learns, the transition P(s' | s, a_i) is non-stationary</text>
-  <text x="60" y="355" class="content">Markov property breaks -&gt; tabular convergence proofs no longer apply</text>
-  <text x="60" y="378" class="caption">CTDE fixes this by conditioning the critic on the full joint action; self-play fixes it by structure</text>
+  <text x="450" y="285" text-anchor="middle" class="label">主要困难</text>
+  <text x="60" y="315" class="content">从 agent i 看来，环境现在包含 pi_{-i}</text>
+  <text x="60" y="335" class="content">随着 pi_{-i} 学习，转移 P(s' | s, a_i) 不再平稳</text>
+  <text x="60" y="355" class="content">马尔可夫性质不成立 -&gt; 表格算法的收敛证明不再适用</text>
+  <text x="60" y="378" class="caption">CTDE 通过让评论家以完整联合动作为条件解决问题；自博弈通过结构解决问题</text>
 
-  <text x="450" y="445" text-anchor="middle" class="caption">add communication, language, or MCTS and you get StarCraft II / Dota 2 / multi-agent LLM systems</text>
+  <text x="450" y="445" text-anchor="middle" class="caption">加入通信、语言或蒙特卡洛树搜索，即可构成 StarCraft II / Dota 2 / 多 agent LLM 系统</text>
 </svg>

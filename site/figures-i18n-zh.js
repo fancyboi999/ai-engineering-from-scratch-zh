@@ -3,11 +3,12 @@
    （每日同步一把梭照搬），因此文案不改源码，由本文件在 widget 挂载后查表替换
    静态文案：标题(.lf-label)、操作提示(.lf-head 末位 span)、控件 label(.lf-ctrl)、
    说明散文(.lf-cap，按 widget 名索引)。
-   不在本层范围：figures.js 旧大动画（tokenizer-bpe 等 10 个，非 LF 结构）。
+   figure-locales/ 按 provider 和 widget ID 保存完整文案及动态整句模式，
+   也覆盖旧动画、SVG title/desc、选项和辅助技术属性；不改机器值与图形结构。
    figures-agent-skills.js 与 figures-mcp.js 的动态场景由 PROVIDER_TEXT 精确映射，
    每次交互重渲染后重新应用；未知文本安全保留英文，绝不猜测或改写协议字面量。
    figures-history.js 的三个稳定 SVG 文本是例外，也在本层按 widget 名查表替换。
-   查表未命中 → 保持英文。上游新增 widget 自动安全降级，翻译表事后补即可。
+   查表未命中仍保留原文，由全量 DOM 审计报告；不按单词猜译。
    词向量 / n-gram widget 的英文词样本（cat、the…）是演示数据，刻意不翻。 */
 (function () {
   'use strict';
@@ -662,15 +663,15 @@
 
   // 说明散文（.lf-cap，按 widget 名索引）
   var CAP = {
-    's0-list-vs-generator': '列表会在训练开始前构建出每一行，并在内存中常驻完整数据集；生成器每次仅产出一个 batch，因此显存开销取决于批大小而非数据集总规模。两者产生完全相同顺序的相同 batch。',
+    's0-list-vs-generator': '两个循环读取相同的8行数据。列表版本在第一次训练步骤开始前，将所有行读入内存。生成器版本只保留一个含2行的批次，该批次就绪后即可开始第一步。对于真实数据集，列表需要容纳整个文件的内存，生成器只需要容纳一个批次的内存。',
     'mlprod-serving-cost': '批处理推理成本随待评分实体总数和每日运行次数线性缩放，因为每次运行都会对所有实体重新评分；在线推理成本则受峰值 QPS 驱动，因为必须预留足够的副本实例在延迟预算内响应实时流量。时效要求宽松时批处理大幅胜出；时效要求极高时批处理运行过于频繁，在线推理更划算。',
     'mlprod-drift-psi': '基准窗口切分为 10 个十分位分箱，每个分箱占 10% 的样本量。平移当前窗口会改变各分箱的样本占比。PSI 将这些变化按对数比率加权求和。分箱占比从 10% 暴涨到 30% 所贡献的漂移量远大于增至 12%。0.1 与 0.25 的判定带属于信用评分的经验法则，而非严格的统计检验。',
     'mlprod-pit-join': '对于每个标签事件，时点连接（Point-in-Time Join）仅读取事件时间戳等于或早于标签时间戳、且仍在 TTL 窗口内的最新特征快照。标签日期之后的行属于未来数据，使用它们会导致特征穿越泄露。如果 TTL 窗口内没有任何记录，特征库将填充默认值。',
     'demo-token-bucket': '每次请求消耗当前客户端桶里的一个令牌。桶以恒定速率补充，且永远不会超过其最大容量。容量决定了 Demo 能承受的突发并发上限，补充速率决定了长期平稳请求率。被拒绝的请求会收到携带 Retry-After 标头的 HTTP 429 响应，且不会触发底层模型运行。',
     'sw-agent-card-discovery': 'A2A 是 agent 之间的横向线协议。客户端首先从知名 URL 获取 Agent Card 以了解远端 agent 能做什么，然后发送消息，由远端 agent 转换为任务。任务在不透明生命周期（TASK_STATE_SUBMITTED、TASK_STATE_WORKING、TASK_STATE_COMPLETED）中推进并返回产物。这就是以 agent 为一等公民重新构建的 HTTP 与 REST。',
     'sw-contract-net': 'FIPA 合同网协议将任务分配建模为暗标拍卖。主管广播征求方案（CFP），空闲 agent 提交报价，主管将合同授予最优标的。MCP tools/call 与现代任务市场正是这一 1980 年代机制在 JSON 时代的重述。',
-    'sw-work-stealing': '工作窃取用本地双端队列替代了中心化瓶颈。繁忙的 agent 向自身队列尾部压入任务；空闲 agent 则从其他工作节点的头部窃取。争用保持在局部，吞吐量随 worker 数量扩展，且无须中心协调者持有全图。',
-    'sw-handoff-routing': 'Agent 交接（Handoff）直接将当前轮次转交给专业 agent，而无需经由 supervisor 往返周转。调用方转交状态、上下文与连接。新 agent 直接与用户对话，直至决定交回或结束。',
+    'sw-work-stealing': '群体没有中心调度器。任务进入共享队列，空闲工作节点自行拉取下一个任务单元。协调由队列的语义承担，因此系统的扩展能力受队列制约。代价是确定性：用单一、连贯的计划换取更高的吞吐量。',
+    'sw-handoff-routing': 'OpenAI Swarm 将编排简化为两个原语：routines（prompt 加工具）和 handoffs（返回下一个 agent 的工具）。它没有状态机。模型通过调用合适的交接工具进行路由；当前持有会话的 agent 就负责主导。',
     'kv-cache-sizer': '缓存为每个 token、每一层、每个 KV 头各存一份 key 和 value。它随序列长度和批大小线性增长——这正是为什么塞满 GPU 的是高批量下的长上下文，而不是权重。',
     'gradient-descent': '每一步沿梯度乘以学习率的方向下坡。太小就爬得极慢；太大会越过谷底直至发散。训练就是在两者之间寻找那个合适的学习率。',
     'softmax-temperature': '温度在指数运算前先除 logits。低于 1 时分布向头部 token 收紧；高于 1 时趋向均匀。T→0 就是 argmax；T→∞ 就是抛硬币。',
@@ -1260,10 +1261,80 @@
     ]
   };
   var MOTION_ARIA = {
+    'Animation disabled because reduced motion is enabled': '已启用减少动态效果，动画已停用',
     'Pause explanatory animation': '暂停讲解动画',
     'Play explanatory animation': '播放讲解动画',
     'Replay explanatory animation': '重播讲解动画'
   };
+
+  var LOCALE_COMMON = {
+    'Motion reduced': '已减少动态效果',
+    'Animation disabled because reduced motion is enabled': '已启用减少动态效果，动画已停用',
+    'Pause explanatory animation': '暂停讲解动画',
+    'Play explanatory animation': '播放讲解动画',
+    'Replay explanatory animation': '重播讲解动画'
+  };
+  var localePatternCache = typeof WeakMap === 'function' ? new WeakMap() : null;
+
+  function localeEntries(name) {
+    var providers = window.AIFS_FIGURE_LOCALES || {};
+    var order = ['lesson-figures.js'].concat(window.AIFS_FIGURE_PROVIDER_ORDER || []);
+    return Object.keys(providers).sort(function (a, b) {
+      return order.indexOf(b) - order.indexOf(a) || a.localeCompare(b);
+    }).map(function (provider) {
+      return providers[provider][name];
+    }).filter(Boolean);
+  }
+
+  function translateLocaleValue(value, entries) {
+    var match = /^(\s*)([\s\S]*?)(\s*)$/.exec(String(value));
+    var key = match[2];
+    var translated = LOCALE_COMMON[key];
+    for (var i = 0; !translated && i < entries.length; i++) {
+      var entry = entries[i];
+      if (entry.text && Object.prototype.hasOwnProperty.call(entry.text, key)) {
+        translated = entry.text[key];
+        break;
+      }
+      var patterns = localePatternCache && localePatternCache.get(entry);
+      if (!patterns) {
+        patterns = (entry.patterns || []).map(function (rule) {
+          return [new RegExp(rule[0]), rule[1]];
+        });
+        if (localePatternCache) localePatternCache.set(entry, patterns);
+      }
+      for (var j = 0; j < patterns.length; j++) {
+        if (patterns[j][0].test(key)) {
+          translated = key.replace(patterns[j][0], patterns[j][1]);
+          break;
+        }
+      }
+    }
+    return translated ? match[1] + translated + match[3] : value;
+  }
+
+  function translateLocaleTree(host, name) {
+    var entries = localeEntries(name);
+    var nodes = [host].concat(Array.prototype.slice.call(host.querySelectorAll('*')));
+    nodes.forEach(function (node) {
+      for (var parent = node; parent; parent = parent.parentNode) {
+        if (/^(pre|code|script|style)$/i.test(parent.tagName || '')) return;
+        if (parent === host) break;
+      }
+      for (var i = 0; i < node.childNodes.length; i++) {
+        var child = node.childNodes[i];
+        if (child.nodeType !== 3) continue;
+        var value = translateLocaleValue(child.nodeValue, entries);
+        if (value !== child.nodeValue) child.nodeValue = value;
+      }
+      ['aria-label', 'aria-description', 'aria-roledescription', 'aria-valuetext', 'title', 'alt', 'placeholder'].forEach(function (field) {
+        var value = node.getAttribute(field);
+        if (!value) return;
+        var translated = translateLocaleValue(value, entries);
+        if (translated !== value) node.setAttribute(field, translated);
+      });
+    });
+  }
 
   function translateReaderTree(host, name) {
     var map = READER_TEXT[name] || {};
@@ -1410,6 +1481,7 @@
       displayReadableFigure(host, name);
       var cap = host.querySelector('.lf-cap');
       if (cap && CAP[name]) cap.textContent = CAP[name];
+      translateLocaleTree(host, name);
       if (host.dataset.lfI18n) return;
       // _render 在 input/change/click 的目标处理器中先重建 DOM；冒泡到 host 后再
       // 精确重翻译，因此既覆盖首次挂载，也覆盖 MCP/Skill 的每次场景切换。
@@ -1420,11 +1492,26 @@
           translateProviderTree(host);
           translateReaderTree(host, name);
           displayReadableFigure(host, name);
+          translateLocaleTree(host, name);
         } catch (e) {}
       }
       host.addEventListener('input', retranslate);
       host.addEventListener('change', retranslate);
       host.addEventListener('click', retranslate);
+      // Timers and animation callbacks may replace text without a DOM event.
+      // Observe only this widget and write only values that actually change.
+      if (typeof window.MutationObserver === 'function') {
+        var observer = new window.MutationObserver(function () {
+          translateLocaleTree(host, name);
+        });
+        observer.observe(host, {
+          childList: true, subtree: true, characterData: true,
+          attributes: true, attributeFilter: ['aria-label', 'aria-description', 'aria-roledescription', 'aria-valuetext', 'title', 'alt', 'placeholder']
+        });
+        if (window.LF && typeof window.LF.registerDisposer === 'function') {
+          window.LF.registerDisposer(host, function () { observer.disconnect(); });
+        }
+      }
       host.dataset.lfI18n = '1';
     });
   }

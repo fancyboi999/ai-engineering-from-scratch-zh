@@ -8,7 +8,7 @@ module.exports = figure('fig-7-2', {
   desc: '顶Docker Home的AI Platform组织策略五分钟内由sandboxd拉取，合并本地策略，194允许不活跃，拒绝仍生效。第二行代理对m101-policy的example.com:443决定，原因no applicable policies，op为net:connect:tcp，决定AUDIT_DECISION_DENY。第三行守护进程向auditkit的audit-<utc>-<uuid>-<seq>.jsonl写记录，每5分钟/1000事件/50 MiB定稿。底云投递可搜索90天并转SIEM。注：此次无组织，无记录。',
 }, f => {
   f.kicker(20, 18, '规则来源');
-  const home = f.box({ x: 20, y: 30, w: 200, h: 58, hue: 'grey', title: 'Docker Home', sub: ['Network, Filesystem, MCP', '组织/团队作用域策略'] });
+  const home = f.box({ x: 20, y: 30, w: 200, h: 58, hue: 'grey', title: 'Docker Home', sub: ['网络、文件系统、MCP', '组织/团队作用域策略'] });
   const daemon = f.box({ x: 250, y: 30, w: 180, h: 58, hue: 'blue', title: 'sandboxd', sub: ['五分钟内拉取', 'sbx policy reset 强制拉取'] });
   const local = f.box({ x: 480, y: 30, w: 140, h: 58, hue: 'teal', title: 'local-policy', sub: ['194允许：不活跃', '拒绝：仍生效'] });
   f.arrow(home.right(), [daemon.x - 1, home.cy], { style: 'call', label: '拉取' });
@@ -23,7 +23,7 @@ module.exports = figure('fig-7-2', {
   const rotate = f.box({ x: 440, y: 232, w: 180, h: 64, hue: 'amber', title: '轮转', sub: ['每5分钟、1000事件，', '或50 MiB，.tmp变.jsonl'] });
   f.arrow(audit.right(), [rotate.x - 1, audit.cy], { style: 'state' });
 
-  const cloud = f.box({ x: 20, y: 334, w: 290, h: 58, hue: 'grey', title: 'Docker Cloud 投递（默认开）', sub: ['可搜索90天，CSV最多100万行', 'app.docker.com, AI Platform, Audit logs'] });
+  const cloud = f.box({ x: 20, y: 334, w: 290, h: 58, hue: 'grey', title: 'Docker Cloud 投递（默认开）', sub: ['可搜索90天，CSV最多100万行', 'app.docker.com、AI Platform、审计日志'] });
   const siem = f.box({ x: 330, y: 334, w: 290, h: 58, hue: 'grey', title: 'SIEM 目标', sub: ['Splunk Cloud, Dynatrace, Datadog, Sumo Logic', '需 sbx0.39.0和云投递'] });
   f.path(`M${audit.cx} ${audit.y + audit.h} V316 H${cloud.cx} V${cloud.y - 1}`, { style: 'effect' });
   f.text(210, 321, '上传', { size: 11.5, hue: 'olive', knock: true });

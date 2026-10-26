@@ -155,7 +155,7 @@ function timingOf(sim, beats) {
   });
 }
 function badgeOf(timing) {
-  if (!timing) return "not timed";
+  if (!timing) return "未计时";
   const ratio = (timing.anim * 1000) / timing.real;
   return ratio >= 1 ? `x1/${Math.round(ratio).toLocaleString("en-US")}` : `x${Math.round(1 / ratio).toLocaleString("en-US")}`;
 }
@@ -235,8 +235,7 @@ function advance(dt) {
     state.playing = false;
     state.pose.hot = [];
     render(state.sim.events.length - 1);
-    const o = state.sim.outcome;
-    $("[data-gm-live]").textContent = `Run finished: ${o.status}. ${o.text}`;
+    $("[data-gm-live]").textContent = `运行结束。${localizeOutcome(state.sim)}`;
     syncButtons();
     if (mode === "auto" && !renderMode) setTimeout(() => mode === "auto" && state.done && play(), 1600);
   }
@@ -759,7 +758,7 @@ function syncSteps() {
   const step = M.STEPS[current];
   const shown = state.shown;
   $("[data-gm-hint]").textContent = `${current + 1}. ${step.hint}`;
-  $("[data-gm-badge]").textContent = state.done ? "done" : shown >= 0 ? badgeOf(state.timing[shown]) : "ready";
+  $("[data-gm-badge]").textContent = state.done ? "已完成" : shown >= 0 ? badgeOf(state.timing[shown]) : "就绪";
   $$("[data-gm-mode]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.gmMode === mode)));
 }
 function playStep(index) {

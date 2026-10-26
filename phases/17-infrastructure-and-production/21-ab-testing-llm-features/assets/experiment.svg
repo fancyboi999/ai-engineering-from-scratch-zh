@@ -12,47 +12,47 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">A/B testing LLM features — evals + online, not vibes</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLM 功能 A/B 测试 — 依靠评测与线上实验，而非感觉</text>
 
   <rect x="40" y="50" width="440" height="120" class="eval"/>
-  <text x="260" y="72" text-anchor="middle" class="head">evals (offline, labeled)</text>
-  <text x="260" y="92" text-anchor="middle" class="step">"can the model do the job?"</text>
-  <text x="60" y="116" class="small">· human-labeled or LLM-as-judge</text>
-  <text x="60" y="134" class="small">· fixed distribution (not user traffic)</text>
-  <text x="60" y="152" class="small">· catches regressions before exposure</text>
+  <text x="260" y="72" text-anchor="middle" class="head">评测（离线、已标注）</text>
+  <text x="260" y="92" text-anchor="middle" class="step">“模型能完成工作吗？”</text>
+  <text x="60" y="116" class="small">· 人工标注或以 LLM 为评审</text>
+  <text x="60" y="134" class="small">· 固定分布（不是用户流量）</text>
+  <text x="60" y="152" class="small">· 用户接触前捕获回归</text>
 
   <rect x="500" y="50" width="440" height="120" class="ab"/>
-  <text x="720" y="72" text-anchor="middle" class="head">A/B tests (online, random)</text>
-  <text x="720" y="92" text-anchor="middle" class="step">"do users care?"</text>
-  <text x="520" y="116" class="small">· live traffic, randomized assignment</text>
-  <text x="520" y="134" class="small">· user-level metric that matters (retention, CTR)</text>
-  <text x="520" y="152" class="small">· confirms product impact</text>
+  <text x="720" y="72" text-anchor="middle" class="head">A/B 测试（线上、随机）</text>
+  <text x="720" y="92" text-anchor="middle" class="step">“用户在意吗？”</text>
+  <text x="520" y="116" class="small">· 真实流量、随机分配</text>
+  <text x="520" y="134" class="small">· 有价值的用户级指标（留存率、CTR）</text>
+  <text x="520" y="152" class="small">· 确认产品影响</text>
 
   <rect x="40" y="190" width="280" height="120" class="method"/>
-  <text x="180" y="212" text-anchor="middle" class="head">what to test</text>
-  <text x="60" y="236" class="step">· prompt wording</text>
-  <text x="60" y="254" class="step">· model selection (GPT vs OSS)</text>
-  <text x="60" y="272" class="step">· generation params (temp, top-p)</text>
-  <text x="60" y="290" class="step">· reward functions / routers</text>
+  <text x="180" y="212" text-anchor="middle" class="head">测试什么</text>
+  <text x="60" y="236" class="step">· prompt 措辞</text>
+  <text x="60" y="254" class="step">· 模型选择（GPT 与开源模型）</text>
+  <text x="60" y="272" class="step">· 生成参数（温度、top-p）</text>
+  <text x="60" y="290" class="step">· 奖励函数 / 路由器</text>
 
   <rect x="340" y="190" width="280" height="120" class="method"/>
-  <text x="480" y="212" text-anchor="middle" class="head">method rigor</text>
-  <text x="360" y="236" class="step">· CUPED (30-70% variance cut)</text>
-  <text x="360" y="254" class="step">· sequential (always-valid peeks)</text>
+  <text x="480" y="212" text-anchor="middle" class="head">方法严谨性</text>
+  <text x="360" y="236" class="step">· CUPED（方差降低 30-70%）</text>
+  <text x="360" y="254" class="step">· 序贯检验（允许随时查看）</text>
   <text x="360" y="272" class="step">· Bonferroni / Benjamini-Hochberg</text>
-  <text x="360" y="290" class="step">· SRM check (sample ratio)</text>
+  <text x="360" y="290" class="step">· SRM 检查（样本比例）</text>
 
   <rect x="640" y="190" width="280" height="120" class="method"/>
-  <text x="780" y="212" text-anchor="middle" class="head">platforms</text>
-  <text x="660" y="236" class="step">Statsig (OpenAI-owned, $1.1B)</text>
-  <text x="660" y="254" class="step">GrowthBook (MIT, warehouse-native)</text>
+  <text x="780" y="212" text-anchor="middle" class="head">平台</text>
+  <text x="660" y="236" class="step">Statsig（OpenAI 所有，$1.1B）</text>
+  <text x="660" y="254" class="step">GrowthBook（MIT，数据仓库原生）</text>
   <text x="660" y="272" class="step">Eppo, Optimizely Experiments</text>
   <text x="660" y="290" class="step">LaunchDarkly Experiments</text>
 
   <rect x="40" y="330" width="880" height="140" class="box"/>
-  <text x="480" y="352" text-anchor="middle" class="head">LLM non-determinism complicates power</text>
-  <text x="480" y="374" text-anchor="middle" class="step">up to 15% run-to-run variance on identical inputs</text>
-  <text x="480" y="394" text-anchor="middle" class="step">buffer sample size ×1.3-1.5 beyond traditional power calc</text>
-  <text x="480" y="416" text-anchor="middle" class="caption">real cases: chatbot +70% conv length · Nextdoor +1% CTR · Khanmigo latency-vs-accuracy loop</text>
-  <text x="480" y="438" text-anchor="middle" class="caption">evals catch regressions; A/B confirms impact; shipping on vibes is over</text>
+  <text x="480" y="352" text-anchor="middle" class="head">LLM 非确定性使功效分析复杂化</text>
+  <text x="480" y="374" text-anchor="middle" class="step">相同输入的运行间方差最高可达 15%</text>
+  <text x="480" y="394" text-anchor="middle" class="step">在传统功效计算之外，将样本量乘以 1.3-1.5</text>
+  <text x="480" y="416" text-anchor="middle" class="caption">真实案例：聊天机器人对话长度 +70% · Nextdoor CTR +1% · Khanmigo 延迟与准确率循环</text>
+  <text x="480" y="438" text-anchor="middle" class="caption">评测捕获回归；A/B 确认影响；凭感觉发布的时代已结束</text>
 </svg>

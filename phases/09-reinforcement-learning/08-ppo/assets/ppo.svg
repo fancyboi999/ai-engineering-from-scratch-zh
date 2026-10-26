@@ -17,14 +17,14 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">PPO clipped surrogate: flat roof, flat floor</text>
+  <text x="450" y="30" text-anchor="middle" class="title">PPO 裁剪代理目标：平顶与平底</text>
 
   <rect x="40" y="60" width="820" height="60" class="box"/>
   <text x="60" y="85" class="label">L^{CLIP}(theta) = E[ min( r A,  clip(r, 1-eps, 1+eps) * A ) ]</text>
-  <text x="60" y="105" class="content">r = pi_theta(a|s) / pi_old(a|s)       typical eps = 0.2</text>
+  <text x="60" y="105" class="content">r = pi_theta(a|s) / pi_old(a|s)，典型 eps = 0.2</text>
 
   <rect x="40" y="140" width="380" height="260" class="box"/>
-  <text x="230" y="165" text-anchor="middle" class="label">advantage A &gt; 0 (good action)</text>
+  <text x="230" y="165" text-anchor="middle" class="label">优势 A &gt; 0（好动作）</text>
 
   <line x1="80" y1="370" x2="400" y2="370" class="axis"/>
   <line x1="240" y1="180" x2="240" y2="380" class="axis"/>
@@ -38,11 +38,11 @@
   <text x="290" y="395" text-anchor="middle" class="caption">r = 1+eps</text>
   <text x="240" y="395" text-anchor="middle" class="caption">r = 1</text>
 
-  <text x="350" y="263" text-anchor="middle" class="caption">clip: flat roof</text>
-  <text x="150" y="320" text-anchor="middle" class="caption">gradient flows</text>
+  <text x="350" y="263" text-anchor="middle" class="caption">裁剪：平顶</text>
+  <text x="150" y="320" text-anchor="middle" class="caption">梯度继续传递</text>
 
   <rect x="480" y="140" width="380" height="260" class="box"/>
-  <text x="670" y="165" text-anchor="middle" class="label">advantage A &lt; 0 (bad action)</text>
+  <text x="670" y="165" text-anchor="middle" class="label">优势 A &lt; 0（坏动作）</text>
 
   <line x1="520" y1="250" x2="840" y2="250" class="axis"/>
   <line x1="680" y1="180" x2="680" y2="380" class="axis"/>
@@ -56,8 +56,8 @@
   <text x="600" y="395" text-anchor="middle" class="caption">r = 1-eps</text>
   <text x="680" y="395" text-anchor="middle" class="caption">r = 1</text>
 
-  <text x="560" y="248" text-anchor="middle" class="caption">clip: flat floor</text>
-  <text x="780" y="300" text-anchor="middle" class="caption">gradient flows</text>
+  <text x="560" y="248" text-anchor="middle" class="caption">裁剪：平底</text>
+  <text x="780" y="300" text-anchor="middle" class="caption">梯度继续传递</text>
 
-  <text x="450" y="440" text-anchor="middle" class="caption">if the ratio drifts past the clip in the "useful" direction, gradient goes to zero — no unbounded updates</text>
+  <text x="450" y="440" text-anchor="middle" class="caption">比率沿“有益”方向超过裁剪范围后，梯度变为零，避免无界更新</text>
 </svg>

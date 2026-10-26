@@ -2,7 +2,7 @@
   <title id="fig-4-4-title">SGLang 如何选择权重格式</title>
   <desc id="fig-4-4-desc">四行各列 checkpoint 与量化参数。FP8 checkpoint 不加参数，以 fp8 运行。Modelopt checkpoint 配 modelopt_fp4 是已知兼容组合，可运行。GPTQ checkpoint 无参数时在运行时转换，使用 Marlin 内核。CUDA build 上 GPTQ checkpoint 配 gptq 参数会跳过转换，启动因 Unknown quantization method 失败。</desc>
   <defs><marker id="fig-4-4-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-4-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">CHECKPOINT QUANT_METHOD</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">检查点 QUANT_METHOD</text>
   <text x="230" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">--QUANTIZATION</text>
   <text x="430" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">启动结果</text>
   <rect x="20" y="30" width="150" height="48" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>

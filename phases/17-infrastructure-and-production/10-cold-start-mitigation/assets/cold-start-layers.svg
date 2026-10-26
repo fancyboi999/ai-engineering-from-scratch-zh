@@ -12,62 +12,62 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">Cold start mitigation — five layers on a 70B model</text>
+  <text x="480" y="24" text-anchor="middle" class="title">缓解冷启动 — 70B 模型的五个层次</text>
 
   <rect x="40" y="50" width="880" height="80" class="heavy"/>
-  <text x="480" y="72" text-anchor="middle" class="head">raw cold start — ~328 s total (5.5 min)</text>
-  <text x="120" y="95" text-anchor="middle" class="step">node provision</text>
+  <text x="480" y="72" text-anchor="middle" class="head">原始冷启动 — 共约 328 s（5.5 min）</text>
+  <text x="120" y="95" text-anchor="middle" class="step">准备节点</text>
   <text x="120" y="112" text-anchor="middle" class="small">50 s</text>
-  <text x="320" y="95" text-anchor="middle" class="step">image pull</text>
+  <text x="320" y="95" text-anchor="middle" class="step">拉取镜像</text>
   <text x="320" y="112" text-anchor="middle" class="small">180 s</text>
-  <text x="520" y="95" text-anchor="middle" class="step">weights to HBM</text>
+  <text x="520" y="95" text-anchor="middle" class="step">加载权重至 HBM</text>
   <text x="520" y="112" text-anchor="middle" class="small">75 s</text>
-  <text x="720" y="95" text-anchor="middle" class="step">engine init</text>
+  <text x="720" y="95" text-anchor="middle" class="step">初始化引擎</text>
   <text x="720" y="112" text-anchor="middle" class="small">20 s</text>
-  <text x="870" y="95" text-anchor="middle" class="step">1st fwd</text>
+  <text x="870" y="95" text-anchor="middle" class="step">第 1 次前向计算</text>
   <text x="870" y="112" text-anchor="middle" class="small">3 s</text>
 
   <rect x="40" y="150" width="280" height="110" class="layer"/>
-  <text x="180" y="172" text-anchor="middle" class="head">L1 — pre-seeded image</text>
-  <text x="180" y="192" text-anchor="middle" class="step">Bottlerocket dual volume</text>
-  <text x="180" y="210" text-anchor="middle" class="small">snapshot data volume with image</text>
-  <text x="180" y="226" text-anchor="middle" class="small">EC2NodeClass references snapshot</text>
-  <text x="180" y="244" text-anchor="middle" class="small">eliminates 180s image pull</text>
+  <text x="180" y="172" text-anchor="middle" class="head">L1 — 预置镜像</text>
+  <text x="180" y="192" text-anchor="middle" class="step">Bottlerocket 双卷</text>
+  <text x="180" y="210" text-anchor="middle" class="small">为含镜像的数据卷创建快照</text>
+  <text x="180" y="226" text-anchor="middle" class="small">EC2NodeClass 引用快照</text>
+  <text x="180" y="244" text-anchor="middle" class="small">消除 180s 镜像拉取</text>
   <rect x="340" y="150" width="280" height="110" class="layer"/>
   <text x="480" y="172" text-anchor="middle" class="head">L2 — Model Streamer</text>
-  <text x="480" y="192" text-anchor="middle" class="step">Run:ai / native vLLM 2026</text>
-  <text x="480" y="210" text-anchor="middle" class="small">stream weights layer-by-layer</text>
-  <text x="480" y="226" text-anchor="middle" class="small">overlap I/O with compute setup</text>
-  <text x="480" y="244" text-anchor="middle" class="small">~2x weights-load speedup</text>
+  <text x="480" y="192" text-anchor="middle" class="step">Run:ai / 原生 vLLM 2026</text>
+  <text x="480" y="210" text-anchor="middle" class="small">逐层流式加载权重</text>
+  <text x="480" y="226" text-anchor="middle" class="small">让 I/O 与计算初始化重叠</text>
+  <text x="480" y="244" text-anchor="middle" class="small">权重加载约加速 2 倍</text>
   <rect x="640" y="150" width="280" height="110" class="layer"/>
-  <text x="780" y="172" text-anchor="middle" class="head">L3 — GPU snapshot</text>
-  <text x="780" y="192" text-anchor="middle" class="step">Modal checkpoints</text>
-  <text x="780" y="210" text-anchor="middle" class="small">serialize post-load HBM state</text>
-  <text x="780" y="226" text-anchor="middle" class="small">up to 10x faster restart</text>
-  <text x="780" y="244" text-anchor="middle" class="small">per-GPU-topology</text>
+  <text x="780" y="172" text-anchor="middle" class="head">L3 — GPU 快照</text>
+  <text x="780" y="192" text-anchor="middle" class="step">Modal 检查点</text>
+  <text x="780" y="210" text-anchor="middle" class="small">序列化加载后的 HBM 状态</text>
+  <text x="780" y="226" text-anchor="middle" class="small">重启最多加速 10 倍</text>
+  <text x="780" y="244" text-anchor="middle" class="small">按 GPU 拓扑分别处理</text>
 
   <rect x="40" y="280" width="280" height="110" class="layer"/>
-  <text x="180" y="302" text-anchor="middle" class="head">L4 — warm pool</text>
+  <text x="180" y="302" text-anchor="middle" class="head">L4 — 预热池</text>
   <text x="180" y="322" text-anchor="middle" class="step">min_workers ≥ 1</text>
-  <text x="180" y="340" text-anchor="middle" class="small">eliminates cold path entirely</text>
-  <text x="180" y="356" text-anchor="middle" class="small">cost: 24x7 GPU rental</text>
-  <text x="180" y="374" text-anchor="middle" class="small">mandatory at P99 TTFT &lt; 60s</text>
+  <text x="180" y="340" text-anchor="middle" class="small">完全消除冷启动路径</text>
+  <text x="180" y="356" text-anchor="middle" class="small">成本：24x7 租用 GPU</text>
+  <text x="180" y="374" text-anchor="middle" class="small">P99 TTFT &lt; 60s 时必须使用</text>
   <rect x="340" y="280" width="280" height="110" class="layer"/>
-  <text x="480" y="302" text-anchor="middle" class="head">L5 — tiered loading</text>
-  <text x="480" y="322" text-anchor="middle" class="step">ServerlessLLM pattern</text>
-  <text x="480" y="340" text-anchor="middle" class="small">NVMe → DRAM → HBM pipeline</text>
-  <text x="480" y="356" text-anchor="middle" class="small">10-200x latency reduction</text>
-  <text x="480" y="374" text-anchor="middle" class="small">early production adoption</text>
+  <text x="480" y="302" text-anchor="middle" class="head">L5 — 分层加载</text>
+  <text x="480" y="322" text-anchor="middle" class="step">ServerlessLLM 模式</text>
+  <text x="480" y="340" text-anchor="middle" class="small">NVMe → DRAM → HBM 流水线</text>
+  <text x="480" y="356" text-anchor="middle" class="small">延迟降低 10-200 倍</text>
+  <text x="480" y="374" text-anchor="middle" class="small">生产环境早期采用</text>
   <rect x="640" y="280" width="280" height="110" class="layer"/>
-  <text x="780" y="302" text-anchor="middle" class="head">bonus — live migration</text>
-  <text x="780" y="322" text-anchor="middle" class="step">move tokens, not cache</text>
-  <text x="780" y="340" text-anchor="middle" class="small">send input (KB) to warm dest</text>
-  <text x="780" y="356" text-anchor="middle" class="small">recompute KV on destination</text>
-  <text x="780" y="374" text-anchor="middle" class="small">useful for disaggregated</text>
+  <text x="780" y="302" text-anchor="middle" class="head">额外手段 — 实时迁移</text>
+  <text x="780" y="322" text-anchor="middle" class="step">迁移 token，而非缓存</text>
+  <text x="780" y="340" text-anchor="middle" class="small">向预热目标发送输入（KB）</text>
+  <text x="780" y="356" text-anchor="middle" class="small">在目标端重新计算 KV</text>
+  <text x="780" y="374" text-anchor="middle" class="small">适用于解耦架构</text>
 
   <rect x="40" y="410" width="880" height="100" class="light"/>
-  <text x="480" y="432" text-anchor="middle" class="head">stack result — ~15 s with L1+L2+L3 or full warm via L4</text>
-  <text x="480" y="454" text-anchor="middle" class="step">Modal published: 2-4 s  ·  Baseten default: 5-10 s, sub-s with pre-warming</text>
-  <text x="480" y="476" text-anchor="middle" class="small">the right answer depends on SLA shape and warm-pool budget</text>
-  <text x="480" y="494" text-anchor="middle" class="caption">measure before optimizing — never add layers without data</text>
+  <text x="480" y="432" text-anchor="middle" class="head">叠加效果 — L1+L2+L3 约 15 s，或通过 L4 完全预热</text>
+  <text x="480" y="454" text-anchor="middle" class="step">Modal 已公布：2-4 s · Baseten 默认：5-10 s，预热后低于秒级</text>
+  <text x="480" y="476" text-anchor="middle" class="small">正确方案取决于 SLA 形式与预热池预算</text>
+  <text x="480" y="494" text-anchor="middle" class="caption">先测量再优化 — 没有数据就不要增加层次</text>
 </svg>

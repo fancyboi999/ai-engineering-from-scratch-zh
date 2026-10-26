@@ -5,7 +5,7 @@ subtitle: 计算注意力、应用掩码、拆分多头、加入位置并堆叠�
 hue: 12
 sources: phases/07-transformers-deep-dive/02-self-attention-from-scratch, phases/07-transformers-deep-dive/03-multi-head-attention, phases/07-transformers-deep-dive/04-positional-encoding, phases/07-transformers-deep-dive/05-full-transformer, phases/07-transformers-deep-dive/07-gpt-causal-language-modeling, phases/07-transformers-deep-dive/12-kv-cache-flash-attention, phases/07-transformers-deep-dive/13-scaling-laws, phases/07-transformers-deep-dive/14-build-a-transformer-capstone, phases/05-nlp-foundations-to-advanced/10-attention-mechanism, phases/19-capstone-projects/32-token-positional-embeddings, phases/19-capstone-projects/33-multihead-self-attention, phases/19-capstone-projects/34-transformer-block, phases/19-capstone-projects/35-gpt-model-assembly, phases/10-llms-from-scratch/04-pre-training-mini-gpt
 code: TA
-source_hash: a48fe297db1c2ae2
+source_hash: c270cdb89d507f96
 ---
 
 ## 一个 pre-LN 解码器区块

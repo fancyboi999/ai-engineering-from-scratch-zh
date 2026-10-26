@@ -1,4 +1,4 @@
-# Debugging and Profiling
+# 调试与性能分析
 
 > 最糟的 AI bug 不会崩。它默默地在垃圾数据上训练，然后给你一条漂亮的损失曲线。
 

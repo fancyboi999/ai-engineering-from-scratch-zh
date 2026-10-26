@@ -17,75 +17,75 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">ColPali — vision-native document RAG with ColBERT late interaction</text>
+  <text x="480" y="24" text-anchor="middle" class="title">ColPali — 通过 ColBERT 后期交互实现视觉原生文档 RAG</text>
 
   <rect x="30" y="50" width="900" height="230" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">indexing: PDF -&gt; page images -&gt; patch embeddings (cached)</text>
+  <text x="480" y="72" text-anchor="middle" class="head">索引：PDF -&gt; 页面图像 -&gt; 图像分块嵌入（缓存）</text>
 
   <rect x="50" y="90" width="200" height="170" class="hot"/>
-  <text x="150" y="112" text-anchor="middle" class="step">PDF pages</text>
-  <text x="150" y="130" text-anchor="middle" class="small">figures, tables,</text>
-  <text x="150" y="146" text-anchor="middle" class="small">layout, fonts</text>
-  <text x="150" y="162" text-anchor="middle" class="small">all preserved</text>
-  <text x="150" y="182" text-anchor="middle" class="step">no OCR</text>
-  <text x="150" y="202" text-anchor="middle" class="small">no text extraction</text>
-  <text x="150" y="218" text-anchor="middle" class="small">no chunking</text>
+  <text x="150" y="112" text-anchor="middle" class="step">PDF 页面</text>
+  <text x="150" y="130" text-anchor="middle" class="small">图表、表格、</text>
+  <text x="150" y="146" text-anchor="middle" class="small">布局、字体</text>
+  <text x="150" y="162" text-anchor="middle" class="small">全部保留</text>
+  <text x="150" y="182" text-anchor="middle" class="step">无需 OCR</text>
+  <text x="150" y="202" text-anchor="middle" class="small">无需文本提取</text>
+  <text x="150" y="218" text-anchor="middle" class="small">无需分块</text>
 
   <path d="M 255 170 L 295 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="300" y="90" width="220" height="170" class="cool"/>
   <text x="410" y="112" text-anchor="middle" class="step">PaliGemma / Qwen-VL</text>
-  <text x="410" y="130" text-anchor="middle" class="small">vision-language encoder</text>
-  <text x="410" y="146" text-anchor="middle" class="small">each patch -&gt; D-dim vector</text>
-  <text x="410" y="162" text-anchor="middle" class="small">N_p vectors per page</text>
-  <text x="410" y="182" text-anchor="middle" class="step">storage</text>
+  <text x="410" y="130" text-anchor="middle" class="small">视觉语言编码器</text>
+  <text x="410" y="146" text-anchor="middle" class="small">每个图像分块 -&gt; D 维向量</text>
+  <text x="410" y="162" text-anchor="middle" class="small">每页 N_p 个向量</text>
+  <text x="410" y="182" text-anchor="middle" class="step">存储</text>
   <text x="410" y="202" text-anchor="middle" class="small">729 x 128 x 4 = 365 KB</text>
-  <text x="410" y="218" text-anchor="middle" class="small">PQ compressed ~46 KB</text>
+  <text x="410" y="218" text-anchor="middle" class="small">PQ 压缩后约 46 KB</text>
 
   <path d="M 525 170 L 565 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="570" y="90" width="340" height="170" class="cold"/>
-  <text x="740" y="112" text-anchor="middle" class="step">vector index (all pages)</text>
-  <text x="740" y="130" text-anchor="middle" class="small">50-page report -&gt; ~2 MB PQ</text>
-  <text x="740" y="146" text-anchor="middle" class="small">1M pages -&gt; ~45 GB PQ</text>
-  <text x="740" y="162" text-anchor="middle" class="small">stays on one node</text>
-  <text x="740" y="182" text-anchor="middle" class="step">ready for MaxSim query</text>
-  <text x="740" y="202" text-anchor="middle" class="small">one table, multi-vector</text>
-  <text x="740" y="218" text-anchor="middle" class="small">per-page grouped</text>
+  <text x="740" y="112" text-anchor="middle" class="step">向量索引（全部页面）</text>
+  <text x="740" y="130" text-anchor="middle" class="small">50 页报告 -&gt; 约 2 MB PQ</text>
+  <text x="740" y="146" text-anchor="middle" class="small">1M 页 -&gt; 约 45 GB PQ</text>
+  <text x="740" y="162" text-anchor="middle" class="small">可存放于单个节点</text>
+  <text x="740" y="182" text-anchor="middle" class="step">准备执行 MaxSim 查询</text>
+  <text x="740" y="202" text-anchor="middle" class="small">单表、多向量</text>
+  <text x="740" y="218" text-anchor="middle" class="small">按页面分组</text>
 
   <rect x="30" y="300" width="900" height="210" class="box"/>
-  <text x="480" y="322" text-anchor="middle" class="head">retrieval: MaxSim over query tokens and page patches</text>
+  <text x="480" y="322" text-anchor="middle" class="head">检索：在查询 token 与页面图像分块间计算 MaxSim</text>
 
   <rect x="60" y="340" width="220" height="160" class="reg"/>
-  <text x="170" y="362" text-anchor="middle" class="step">query tokens</text>
+  <text x="170" y="362" text-anchor="middle" class="step">查询 token</text>
   <text x="170" y="382" text-anchor="middle" class="small">"Q3 revenue growth"</text>
-  <text x="170" y="398" text-anchor="middle" class="small">4-6 token embeddings</text>
-  <text x="170" y="416" text-anchor="middle" class="small">same encoder as index</text>
-  <text x="170" y="442" text-anchor="middle" class="step">compute at query time</text>
-  <text x="170" y="462" text-anchor="middle" class="small">batch with kv cache</text>
-  <text x="170" y="482" text-anchor="middle" class="caption">~10 ms per query</text>
+  <text x="170" y="398" text-anchor="middle" class="small">4-6 个 token 嵌入</text>
+  <text x="170" y="416" text-anchor="middle" class="small">使用与索引相同的编码器</text>
+  <text x="170" y="442" text-anchor="middle" class="step">查询时计算</text>
+  <text x="170" y="462" text-anchor="middle" class="small">结合 KV 缓存批处理</text>
+  <text x="170" y="482" text-anchor="middle" class="caption">每次查询约 10 ms</text>
 
   <path d="M 285 420 L 325 420" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="330" y="340" width="290" height="160" class="hot"/>
-  <text x="475" y="362" text-anchor="middle" class="step">MaxSim = sum over query tokens</text>
-  <text x="475" y="378" text-anchor="middle" class="step">of max over patches</text>
-  <text x="475" y="398" text-anchor="middle" class="small">each query token "picks" its best patch</text>
-  <text x="475" y="414" text-anchor="middle" class="small">selective: irrelevant patches ignored</text>
-  <text x="475" y="430" text-anchor="middle" class="small">doc score = sum of those maxes</text>
-  <text x="475" y="452" text-anchor="middle" class="step">beats bi-encoder recall</text>
-  <text x="475" y="472" text-anchor="middle" class="small">catches chart data, table cells,</text>
-  <text x="475" y="488" text-anchor="middle" class="small">figure captions as patches</text>
+  <text x="475" y="362" text-anchor="middle" class="step">MaxSim = 对查询 token 求和</text>
+  <text x="475" y="378" text-anchor="middle" class="step">每项取图像分块中的最大值</text>
+  <text x="475" y="398" text-anchor="middle" class="small">每个查询 token“选择”最佳图像分块</text>
+  <text x="475" y="414" text-anchor="middle" class="small">具有选择性：忽略无关分块</text>
+  <text x="475" y="430" text-anchor="middle" class="small">文档得分 = 这些最大值之和</text>
+  <text x="475" y="452" text-anchor="middle" class="step">召回率优于双编码器</text>
+  <text x="475" y="472" text-anchor="middle" class="small">将图表数据、表格单元格、</text>
+  <text x="475" y="488" text-anchor="middle" class="small">图像描述作为图像分块捕获</text>
 
   <path d="M 625 420 L 665 420" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="670" y="340" width="240" height="160" class="cool"/>
-  <text x="790" y="362" text-anchor="middle" class="step">top-k pages + VLM answer</text>
-  <text x="790" y="382" text-anchor="middle" class="small">send top-3 page images</text>
-  <text x="790" y="398" text-anchor="middle" class="small">+ original query</text>
-  <text x="790" y="414" text-anchor="middle" class="small">to Qwen2.5-VL or Claude</text>
-  <text x="790" y="434" text-anchor="middle" class="step">benchmarks</text>
+  <text x="790" y="362" text-anchor="middle" class="step">前 k 页 + VLM 回答</text>
+  <text x="790" y="382" text-anchor="middle" class="small">发送前 3 张页面图像</text>
+  <text x="790" y="398" text-anchor="middle" class="small">+ 原始查询</text>
+  <text x="790" y="414" text-anchor="middle" class="small">给 Qwen2.5-VL 或 Claude</text>
+  <text x="790" y="434" text-anchor="middle" class="step">基准</text>
   <text x="790" y="454" text-anchor="middle" class="small">ViDoRe nDCG@5: ColPali ~80</text>
-  <text x="790" y="470" text-anchor="middle" class="small">text-RAG ~55</text>
-  <text x="790" y="486" text-anchor="middle" class="small">end-to-end +20-40 pts</text>
+  <text x="790" y="470" text-anchor="middle" class="small">文本 RAG 约 55</text>
+  <text x="790" y="486" text-anchor="middle" class="small">端到端 +20-40 分</text>
 </svg>

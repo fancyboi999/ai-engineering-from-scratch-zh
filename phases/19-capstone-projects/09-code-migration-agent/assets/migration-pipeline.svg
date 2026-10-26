@@ -15,31 +15,31 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">migration pipeline — deterministic recipes + agent fallback</text>
+  <text x="480" y="24" text-anchor="middle" class="title">迁移流水线：确定性规则 + agent 回退</text>
 
   <rect x="40" y="60" width="220" height="100" class="cool"/>
-  <text x="150" y="86" text-anchor="middle" class="step">deterministic pass</text>
+  <text x="150" y="86" text-anchor="middle" class="step">确定性处理</text>
   <text x="150" y="106" text-anchor="middle" class="small">OpenRewrite (Java)</text>
   <text x="150" y="122" text-anchor="middle" class="small">libcst (Python)</text>
-  <text x="150" y="142" text-anchor="middle" class="small">70-80% of rewrites</text>
+  <text x="150" y="142" text-anchor="middle" class="small">70-80% 的重写</text>
 
   <rect x="300" y="60" width="220" height="100" class="cold"/>
-  <text x="410" y="86" text-anchor="middle" class="step">Daytona sandbox</text>
-  <text x="410" y="106" text-anchor="middle" class="small">target runtime preinstalled</text>
-  <text x="410" y="122" text-anchor="middle" class="small">branch-scoped, read-only input</text>
-  <text x="410" y="142" text-anchor="middle" class="small">per-branch build</text>
+  <text x="410" y="86" text-anchor="middle" class="step">Daytona 沙箱</text>
+  <text x="410" y="106" text-anchor="middle" class="small">预装目标运行时</text>
+  <text x="410" y="122" text-anchor="middle" class="small">按分支隔离，只读输入</text>
+  <text x="410" y="142" text-anchor="middle" class="small">逐分支构建</text>
 
   <rect x="560" y="60" width="360" height="100" class="dsk"/>
-  <text x="740" y="86" text-anchor="middle" class="step">agent loop</text>
+  <text x="740" y="86" text-anchor="middle" class="step">agent 循环</text>
   <text x="740" y="106" text-anchor="middle" class="small">Claude Opus 4.7 + GPT-5.4-Codex</text>
-  <text x="740" y="122" text-anchor="middle" class="small">classify failure -&gt; patch -&gt; rerun</text>
-  <text x="740" y="142" text-anchor="middle" class="small">budget: 30min / $8 / 20 turns</text>
+  <text x="740" y="122" text-anchor="middle" class="small">分类失败 -&gt; 修补 -&gt; 重跑</text>
+  <text x="740" y="142" text-anchor="middle" class="small">预算：30 分钟 / $8 / 20 轮</text>
 
   <path d="M260,110 L300,110" class="edge"/>
   <path d="M520,110 L560,110" class="edge"/>
 
   <rect x="40" y="200" width="440" height="310" class="box"/>
-  <text x="260" y="222" text-anchor="middle" class="head">failure taxonomy (across 50 repos)</text>
+  <text x="260" y="222" text-anchor="middle" class="head">失败分类（50 个仓库）</text>
 
   <rect x="60" y="244" width="400" height="28" class="hot"/>
   <text x="80" y="263" class="small">dep_upgrade_required         30%</text>
@@ -53,28 +53,28 @@
   <text x="80" y="391" class="small">test_flake                   15%</text>
 
   <rect x="60" y="410" width="400" height="90" class="box"/>
-  <text x="260" y="432" text-anchor="middle" class="head">what the taxonomy unlocks</text>
-  <text x="260" y="452" text-anchor="middle" class="small">top 3 classes become the next recipe target</text>
-  <text x="260" y="470" text-anchor="middle" class="small">agent stops relearning mechanical patterns</text>
-  <text x="260" y="488" text-anchor="middle" class="small">per-class pass rate drives Moderne-style policy</text>
+  <text x="260" y="432" text-anchor="middle" class="head">分类的用途</text>
+  <text x="260" y="452" text-anchor="middle" class="small">前 3 类成为下一批规则目标</text>
+  <text x="260" y="470" text-anchor="middle" class="small">agent 无须反复学习机械模式</text>
+  <text x="260" y="488" text-anchor="middle" class="small">各类通过率驱动 Moderne 式策略</text>
 
   <rect x="510" y="200" width="410" height="310" class="box"/>
-  <text x="715" y="222" text-anchor="middle" class="head">metrics (pass set)</text>
+  <text x="715" y="222" text-anchor="middle" class="head">指标（通过集合）</text>
   <rect x="530" y="244" width="380" height="32" class="cool"/>
-  <text x="720" y="265" text-anchor="middle" class="step">MigrationBench pass@1: 60-70% target</text>
+  <text x="720" y="265" text-anchor="middle" class="step">MigrationBench pass@1：目标 60-70%</text>
 
   <rect x="530" y="284" width="380" height="32" class="cool"/>
-  <text x="720" y="305" text-anchor="middle" class="step">mean $/repo: $2-4 at 50-repo scale</text>
+  <text x="720" y="305" text-anchor="middle" class="step">平均每仓库成本：50 仓库规模下 $2-4</text>
 
   <rect x="530" y="324" width="380" height="32" class="cool"/>
-  <text x="720" y="345" text-anchor="middle" class="step">coverage delta: within +/- 1% of base</text>
+  <text x="720" y="345" text-anchor="middle" class="step">覆盖率变化：基线 +/- 1% 内</text>
 
   <rect x="530" y="364" width="380" height="32" class="cool"/>
-  <text x="720" y="385" text-anchor="middle" class="step">time-to-green p50: &lt; 10 min</text>
+  <text x="720" y="385" text-anchor="middle" class="step">达到通过状态的 p50 时间：&lt; 10 分钟</text>
 
   <rect x="530" y="404" width="380" height="96" class="dsk"/>
-  <text x="720" y="426" text-anchor="middle" class="head">compare-to-baseline</text>
-  <text x="720" y="446" text-anchor="middle" class="small">deterministic-only: 35-45% pass rate</text>
-  <text x="720" y="464" text-anchor="middle" class="small">the agent layer is where the delta lives</text>
-  <text x="720" y="486" text-anchor="middle" class="caption">publish side-by-side, by failure class</text>
+  <text x="720" y="426" text-anchor="middle" class="head">与基线比较</text>
+  <text x="720" y="446" text-anchor="middle" class="small">仅确定性规则：通过率 35-45%</text>
+  <text x="720" y="464" text-anchor="middle" class="small">agent 层带来差异</text>
+  <text x="720" y="486" text-anchor="middle" class="caption">按失败类别并排发布结果</text>
 </svg>

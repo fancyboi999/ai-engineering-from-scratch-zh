@@ -17,7 +17,7 @@
 
 ## 核心概念
 
-![Monte Carlo: rollout, compute returns, average; first-visit vs every-visit](../assets/monte-carlo.svg)
+![蒙特卡洛方法：采样轨迹、计算回报并求平均；首次访问与每次访问的对比](../assets/monte-carlo.svg)
 
 **核心想法，一行说清：** $V^\pi(s) = \mathbb E_\pi[G_t \mid s_t = s] \approx (1/N) \sum_i G^{(i)}(s)$，其中 $G^{(i)}(s)$ 是策略 $\pi$ 下访问 $s$ 之后观测到的回报。
 

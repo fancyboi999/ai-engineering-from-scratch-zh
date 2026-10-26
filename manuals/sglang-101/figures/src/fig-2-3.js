@@ -42,7 +42,7 @@ module.exports = figure('fig-2-3', {
   f.text(px(3840) - 3, 200, '3,840', { size: 11, hue: 'ink-soft', anchor: 'end' });
   f.text(end + 3, 200, '4,096', { size: 11, hue: 'ink-soft' });
 
-  const legend = [['green', "Prompt KV", 70], ['amber', "预留输出", 190], ['grey', 'free', 350], ['rose', "放不下", 430]];
+  const legend = [['green', "Prompt KV", 70], ['amber', "预留输出", 190], ['grey', '空闲', 350], ['rose', "放不下", 430]];
   for (const [hue, label, x] of legend) {
     f.rect(x, 222, 14, 12, { hue, dash: hue === 'rose' ? 'dashed' : undefined });
     f.text(x + 20, 232, label, { size: 11, serif: true, hue: 'ink-soft' });

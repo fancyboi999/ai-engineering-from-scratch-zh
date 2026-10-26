@@ -13,49 +13,49 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">self-hosted engine decision tree — hardware first, then scale, then workload</text>
+  <text x="480" y="24" text-anchor="middle" class="title">自托管引擎决策树 — 先看硬件，再看规模，最后看负载</text>
 
   <rect x="40" y="50" width="280" height="200" class="cpu"/>
-  <text x="180" y="72" text-anchor="middle" class="head">CPU / edge</text>
-  <text x="180" y="96" text-anchor="middle" class="step">llama.cpp (dominant)</text>
-  <text x="60" y="124" class="small">· widest model support</text>
-  <text x="60" y="142" class="small">· fastest CPU inference</text>
-  <text x="60" y="160" class="small">· full control over quant / threads</text>
+  <text x="180" y="72" text-anchor="middle" class="head">CPU / 边缘设备</text>
+  <text x="180" y="96" text-anchor="middle" class="step">llama.cpp（主流）</text>
+  <text x="60" y="124" class="small">· 模型支持最广</text>
+  <text x="60" y="142" class="small">· CPU 推理最快</text>
+  <text x="60" y="160" class="small">· 完全控制量化 / 线程</text>
   <rect x="60" y="180" width="240" height="60" class="box"/>
-  <text x="180" y="202" text-anchor="middle" class="step">Ollama = llama.cpp + UX</text>
-  <text x="180" y="220" text-anchor="middle" class="small">one command, single user</text>
-  <text x="180" y="236" text-anchor="middle" class="small">15-30% slower than llama.cpp</text>
+  <text x="180" y="202" text-anchor="middle" class="step">Ollama = llama.cpp + 用户体验</text>
+  <text x="180" y="220" text-anchor="middle" class="small">一条命令，单用户</text>
+  <text x="180" y="236" text-anchor="middle" class="small">比 llama.cpp 慢 15-30%</text>
 
   <rect x="340" y="50" width="280" height="200" class="gpu"/>
   <text x="480" y="72" text-anchor="middle" class="head">NVIDIA GPU</text>
   <rect x="360" y="90" width="240" height="45" class="box"/>
-  <text x="480" y="113" text-anchor="middle" class="step">vLLM (broad default)</text>
-  <text x="480" y="128" text-anchor="middle" class="small">v0.15.1 Feb 2026, Blackwell SM120</text>
+  <text x="480" y="113" text-anchor="middle" class="step">vLLM（通用默认选择）</text>
+  <text x="480" y="128" text-anchor="middle" class="small">v0.15.1 二月 2026，Blackwell SM120</text>
   <rect x="360" y="145" width="240" height="45" class="box"/>
-  <text x="480" y="168" text-anchor="middle" class="step">TRT-LLM (Blackwell only)</text>
-  <text x="480" y="183" text-anchor="middle" class="small">throughput leader on B200/GB200</text>
+  <text x="480" y="168" text-anchor="middle" class="step">TRT-LLM（仅限 Blackwell）</text>
+  <text x="480" y="183" text-anchor="middle" class="small">B200/GB200 上的吞吐领先者</text>
   <rect x="360" y="200" width="240" height="45" class="box"/>
-  <text x="480" y="222" text-anchor="middle" class="step">Ollama (dev only)</text>
-  <text x="480" y="237" text-anchor="middle" class="small">not for shared production</text>
+  <text x="480" y="222" text-anchor="middle" class="step">Ollama（仅用于开发）</text>
+  <text x="480" y="237" text-anchor="middle" class="small">不适合共享生产环境</text>
 
   <rect x="640" y="50" width="280" height="200" class="agent"/>
-  <text x="780" y="72" text-anchor="middle" class="head">agentic / prefix-heavy</text>
-  <text x="780" y="96" text-anchor="middle" class="step">SGLang (specialist)</text>
-  <text x="660" y="124" class="small">· RadixAttention (Phase 17 · 06)</text>
-  <text x="660" y="142" class="small">· 400,000+ GPUs in production</text>
+  <text x="780" y="72" text-anchor="middle" class="head">agent 工作负载 / 前缀密集</text>
+  <text x="780" y="96" text-anchor="middle" class="step">SGLang（专长方案）</text>
+  <text x="660" y="124" class="small">· RadixAttention（阶段 17 · 06）</text>
+  <text x="660" y="142" class="small">· 生产环境中有 400,000+ GPU</text>
   <text x="660" y="160" class="small">· xAI, LinkedIn, Cursor, Oracle</text>
   <text x="660" y="178" class="small">· GCP, Azure, AWS</text>
-  <text x="780" y="210" text-anchor="middle" class="caption">RAG heavy prefix reuse → here</text>
-  <text x="780" y="228" text-anchor="middle" class="caption">multi-turn agent tools → here</text>
+  <text x="780" y="210" text-anchor="middle" class="caption">RAG 大量复用前缀 → 选这里</text>
+  <text x="780" y="228" text-anchor="middle" class="caption">多轮 agent 工具 → 选这里</text>
 
   <rect x="40" y="280" width="880" height="90" class="maint"/>
-  <text x="480" y="302" text-anchor="middle" class="head">TGI maintenance mode since December 11, 2025</text>
-  <text x="480" y="324" text-anchor="middle" class="step">only bug fixes going forward — do NOT default to TGI for new projects</text>
-  <text x="480" y="344" text-anchor="middle" class="caption">existing TGI deployments can continue; migrate to SGLang or vLLM when convenient</text>
+  <text x="480" y="302" text-anchor="middle" class="head">TGI 自十二月 11 日 2025 起进入维护模式</text>
+  <text x="480" y="324" text-anchor="middle" class="step">今后仅修复缺陷 — 新项目不要默认选择 TGI</text>
+  <text x="480" y="344" text-anchor="middle" class="caption">既有 TGI 部署可继续；方便时迁移至 SGLang 或 vLLM</text>
 
   <rect x="40" y="390" width="880" height="100" class="box"/>
-  <text x="480" y="412" text-anchor="middle" class="head">2026 pipeline pattern</text>
-  <text x="480" y="434" text-anchor="middle" class="step">dev: Ollama   →   staging: llama.cpp   →   prod: vLLM (or SGLang)</text>
-  <text x="480" y="454" text-anchor="middle" class="step">convert GGUF to HF safetensors between tiers when needed</text>
-  <text x="480" y="476" text-anchor="middle" class="caption">engineers iterate fast locally; staging mirrors prod quant; prod is the serving target</text>
+  <text x="480" y="412" text-anchor="middle" class="head">2026 年流水线模式</text>
+  <text x="480" y="434" text-anchor="middle" class="step">开发：Ollama → 预发布：llama.cpp → 生产：vLLM（或 SGLang）</text>
+  <text x="480" y="454" text-anchor="middle" class="step">需要时在层级间将 GGUF 转为 HF safetensors</text>
+  <text x="480" y="476" text-anchor="middle" class="caption">工程师本地快速迭代；预发布匹配生产量化；生产是最终服务目标</text>
 </svg>

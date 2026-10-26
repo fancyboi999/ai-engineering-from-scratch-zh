@@ -17,74 +17,74 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Janus-Pro — decoupled input encoders, shared transformer body</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Janus-Pro：解耦输入编码器，共享 transformer 主体</text>
 
   <rect x="30" y="50" width="900" height="270" class="box"/>
 
   <rect x="60" y="80" width="180" height="100" class="hot"/>
-  <text x="150" y="102" text-anchor="middle" class="step">input: image</text>
-  <text x="150" y="124" text-anchor="middle" class="small">source of visual signal</text>
-  <text x="150" y="146" text-anchor="middle" class="small">understanding: describe</text>
-  <text x="150" y="162" text-anchor="middle" class="small">generation: condition on</text>
+  <text x="150" y="102" text-anchor="middle" class="step">输入：图像</text>
+  <text x="150" y="124" text-anchor="middle" class="small">视觉信号来源</text>
+  <text x="150" y="146" text-anchor="middle" class="small">理解：描述</text>
+  <text x="150" y="162" text-anchor="middle" class="small">生成：作为条件</text>
 
   <path d="M 245 110 L 285 110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M 245 150 L 285 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="290" y="70" width="170" height="60" class="cool"/>
-  <text x="375" y="92" text-anchor="middle" class="step">SigLIP encoder</text>
-  <text x="375" y="108" text-anchor="middle" class="small">understanding path</text>
-  <text x="375" y="122" text-anchor="middle" class="small">semantic features</text>
+  <text x="375" y="92" text-anchor="middle" class="step">SigLIP 编码器</text>
+  <text x="375" y="108" text-anchor="middle" class="small">理解路径</text>
+  <text x="375" y="122" text-anchor="middle" class="small">语义特征</text>
 
   <rect x="290" y="140" width="170" height="60" class="cold"/>
-  <text x="375" y="162" text-anchor="middle" class="step">VQ encoder</text>
-  <text x="375" y="178" text-anchor="middle" class="small">generation path</text>
-  <text x="375" y="192" text-anchor="middle" class="small">reconstruction codes</text>
+  <text x="375" y="162" text-anchor="middle" class="step">向量量化编码器</text>
+  <text x="375" y="178" text-anchor="middle" class="small">生成路径</text>
+  <text x="375" y="192" text-anchor="middle" class="small">重建编码</text>
 
   <path d="M 465 100 L 505 140" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M 465 170 L 505 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="510" y="100" width="180" height="100" class="reg"/>
-  <text x="600" y="122" text-anchor="middle" class="step">shared transformer</text>
-  <text x="600" y="142" text-anchor="middle" class="small">one body, one weight set</text>
-  <text x="600" y="158" text-anchor="middle" class="small">init from DeepSeek-7B</text>
-  <text x="600" y="174" text-anchor="middle" class="small">absorbs both encoders</text>
-  <text x="600" y="190" text-anchor="middle" class="small">autoregressive decode</text>
+  <text x="600" y="122" text-anchor="middle" class="step">共享 transformer</text>
+  <text x="600" y="142" text-anchor="middle" class="small">一个主体，一组权重</text>
+  <text x="600" y="158" text-anchor="middle" class="small">从 DeepSeek-7B 初始化</text>
+  <text x="600" y="174" text-anchor="middle" class="small">接入两个编码器</text>
+  <text x="600" y="190" text-anchor="middle" class="small">自回归解码</text>
 
   <path d="M 695 120 L 745 90" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M 695 170 L 745 200" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="750" y="70" width="160" height="60" class="cool"/>
-  <text x="830" y="92" text-anchor="middle" class="step">text output</text>
-  <text x="830" y="108" text-anchor="middle" class="small">NTP, vocab logits</text>
-  <text x="830" y="122" text-anchor="middle" class="small">VQA, caption</text>
+  <text x="830" y="92" text-anchor="middle" class="step">文本输出</text>
+  <text x="830" y="108" text-anchor="middle" class="small">下一 token 预测、词表 logits</text>
+  <text x="830" y="122" text-anchor="middle" class="small">VQA、图像描述</text>
 
   <rect x="750" y="180" width="160" height="60" class="cold"/>
-  <text x="830" y="202" text-anchor="middle" class="step">image VQ -&gt; pixels</text>
-  <text x="830" y="218" text-anchor="middle" class="small">emit VQ tokens</text>
-  <text x="830" y="232" text-anchor="middle" class="small">decoder -&gt; pixels</text>
+  <text x="830" y="202" text-anchor="middle" class="step">图像向量量化 -&gt; 像素</text>
+  <text x="830" y="218" text-anchor="middle" class="small">输出向量量化 token</text>
+  <text x="830" y="232" text-anchor="middle" class="small">解码器 -&gt; 像素</text>
 
   <rect x="60" y="230" width="850" height="70" class="box"/>
-  <text x="485" y="252" text-anchor="middle" class="step">routing tag picks encoder and output head</text>
-  <text x="485" y="272" text-anchor="middle" class="small">&lt;understand&gt; image -&gt; SigLIP -&gt; body -&gt; text</text>
-  <text x="485" y="288" text-anchor="middle" class="small">&lt;generate&gt; text -&gt; body -&gt; VQ tokens -&gt; pixels</text>
+  <text x="485" y="252" text-anchor="middle" class="step">路由标记选择编码器与输出头</text>
+  <text x="485" y="272" text-anchor="middle" class="small">&lt;understand&gt; 图像 -&gt; SigLIP -&gt; 主体 -&gt; 文本</text>
+  <text x="485" y="288" text-anchor="middle" class="small">&lt;generate&gt; 文本 -&gt; 主体 -&gt; 向量量化 token -&gt; 像素</text>
 
   <rect x="30" y="340" width="900" height="160" class="box"/>
-  <text x="480" y="362" text-anchor="middle" class="head">Janus-Pro data + scale scoreboard</text>
+  <text x="480" y="362" text-anchor="middle" class="head">Janus-Pro 数据与规模比较</text>
 
   <g transform="translate(60, 380)">
-    <text x="0" y="15" class="step">axis</text>
-    <text x="200" y="15" class="step">Janus (Oct 2024)</text>
-    <text x="450" y="15" class="step">Janus-Pro (Jan 2025)</text>
-    <text x="710" y="15" class="step">delta</text>
+    <text x="0" y="15" class="step">维度</text>
+    <text x="200" y="15" class="step">Janus（2024 年十月）</text>
+    <text x="450" y="15" class="step">Janus-Pro（2025 年一月）</text>
+    <text x="710" y="15" class="step">变化</text>
 
-    <text x="0" y="40" class="small">model params</text>
+    <text x="0" y="40" class="small">模型参数</text>
     <text x="200" y="40" class="small">1.3B</text>
     <text x="450" y="40" class="small">7B</text>
     <text x="710" y="40" class="small">5.4x</text>
 
-    <text x="0" y="60" class="small">stage-2 data</text>
-    <text x="200" y="60" class="small">26M pairs</text>
-    <text x="450" y="60" class="small">72M pairs</text>
+    <text x="0" y="60" class="small">阶段 2 数据</text>
+    <text x="200" y="60" class="small">26M 对</text>
+    <text x="450" y="60" class="small">72M 对</text>
     <text x="710" y="60" class="small">+176%</text>
 
     <text x="0" y="80" class="small">MMMU</text>
@@ -94,7 +94,7 @@
 
     <text x="0" y="100" class="small">GenEval</text>
     <text x="200" y="100" class="small">0.61</text>
-    <text x="450" y="100" class="small">0.80 (beats DALL-E 3)</text>
+    <text x="450" y="100" class="small">0.80（超过 DALL-E 3）</text>
     <text x="710" y="100" class="small">+0.19</text>
   </g>
 </svg>

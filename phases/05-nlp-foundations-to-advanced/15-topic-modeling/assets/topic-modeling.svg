@@ -15,54 +15,54 @@
   </defs>
 
   <rect class="box" x="20" y="20" width="420" height="380" rx="4"/>
-  <text class="label" x="230" y="45" text-anchor="middle">LDA (probabilistic, mixed-membership)</text>
+  <text class="label" x="230" y="45" text-anchor="middle">LDA（概率模型、混合成员关系）</text>
 
   <rect class="box" x="40" y="75" width="180" height="70" rx="3"/>
-  <text class="content" x="55" y="100">document</text>
+  <text class="content" x="55" y="100">文档</text>
   <text class="content" x="55" y="120">"stocks rose after</text>
   <text class="content" x="55" y="135">the fed cut rates"</text>
 
   <rect class="hot" x="240" y="75" width="180" height="70" rx="3"/>
-  <text class="content" x="250" y="100">topic mixture</text>
+  <text class="content" x="250" y="100">主题混合</text>
   <text class="content" x="250" y="120">{finance: 0.7,</text>
   <text class="content" x="250" y="135"> politics: 0.2, ...}</text>
 
   <path class="line" d="M 220 110 L 240 110" marker-end="url(#arrow)"/>
 
   <rect class="box" x="40" y="170" width="380" height="120" rx="3"/>
-  <text class="content" x="55" y="195">topic_word matrix:</text>
+  <text class="content" x="55" y="195">topic_word 矩阵：</text>
   <text class="content" x="55" y="220">  finance  -> { stocks: 0.04, rate: 0.03, ... }</text>
   <text class="content" x="55" y="240">  politics -> { fed: 0.05, vote: 0.04, ... }</text>
   <text class="content" x="55" y="260">  tech     -> { chip: 0.04, ai: 0.03, ... }</text>
-  <text class="content" x="55" y="280">  each row sums to 1</text>
+  <text class="content" x="55" y="280">  每行之和为 1</text>
 
-  <text class="note" x="230" y="325" text-anchor="middle">good for long docs, topic mixtures, limited compute.</text>
-  <text class="note" x="230" y="345" text-anchor="middle">weak on short text. no semantics.</text>
-  <text class="note" x="230" y="365" text-anchor="middle">interpretable probability distributions.</text>
+  <text class="note" x="230" y="325" text-anchor="middle">适合长文档、主题混合及计算资源有限的场景。</text>
+  <text class="note" x="230" y="345" text-anchor="middle">不擅长短文本，不理解语义。</text>
+  <text class="note" x="230" y="365" text-anchor="middle">可解释的概率分布。</text>
 
   <rect class="box" x="460" y="20" width="420" height="380" rx="4"/>
-  <text class="label" x="670" y="45" text-anchor="middle">BERTopic (neural, cluster-based)</text>
+  <text class="label" x="670" y="45" text-anchor="middle">BERTopic（神经网络、基于聚类）</text>
 
   <rect class="box" x="480" y="75" width="120" height="40" rx="3"/>
-  <text class="content" x="540" y="100" text-anchor="middle">docs (N)</text>
+  <text class="content" x="540" y="100" text-anchor="middle">文档（N）</text>
   <path class="line" d="M 605 95 L 630 95" marker-end="url(#arrow)"/>
   <rect class="hot" x="630" y="75" width="120" height="40" rx="3"/>
-  <text class="content" x="690" y="100" text-anchor="middle">BERT embed</text>
+  <text class="content" x="690" y="100" text-anchor="middle">BERT 嵌入</text>
   <path class="line" d="M 755 95 L 775 95" marker-end="url(#arrow)"/>
   <rect class="box" x="775" y="75" width="90" height="40" rx="3"/>
-  <text class="content" x="820" y="100" text-anchor="middle">384-dim</text>
+  <text class="content" x="820" y="100" text-anchor="middle">384 维</text>
 
   <path class="line" d="M 820 120 L 820 145" marker-end="url(#arrow)"/>
   <text class="stage" x="820" y="140">UMAP</text>
 
   <rect class="box" x="775" y="150" width="90" height="40" rx="3"/>
-  <text class="content" x="820" y="175" text-anchor="middle">5-dim</text>
+  <text class="content" x="820" y="175" text-anchor="middle">5 维</text>
 
   <path class="line" d="M 820 195 L 820 220" marker-end="url(#arrow)"/>
   <text class="stage" x="820" y="215">HDBSCAN</text>
 
   <circle cx="540" cy="260" r="25" fill="#f3ece0" stroke="#1a1a1a"/>
-  <text class="content" x="540" y="265" text-anchor="middle">cluster 0</text>
+  <text class="content" x="540" y="265" text-anchor="middle">簇 0</text>
   <circle cx="640" cy="260" r="20" fill="#f3ece0" stroke="#1a1a1a"/>
   <text class="content" x="640" y="265" text-anchor="middle">1</text>
   <circle cx="720" cy="260" r="18" fill="#f3ece0" stroke="#1a1a1a"/>
@@ -71,9 +71,9 @@
   <text class="content" x="820" y="265" text-anchor="middle">3</text>
 
   <path class="line" d="M 670 290 L 670 315" marker-end="url(#arrow)"/>
-  <text class="stage" x="670" y="310">class-based TF-IDF</text>
+  <text class="stage" x="670" y="310">基于类别的 TF-IDF</text>
 
   <rect class="box" x="480" y="320" width="380" height="50" rx="3"/>
-  <text class="content" x="670" y="345" text-anchor="middle">top words per cluster = topic representation</text>
-  <text class="note" x="670" y="365" text-anchor="middle">one topic per document. short text friendly. semantic.</text>
+  <text class="content" x="670" y="345" text-anchor="middle">每个簇的高频词 = 主题表示</text>
+  <text class="note" x="670" y="365" text-anchor="middle">每篇文档一个主题，适合短文本，理解语义。</text>
 </svg>

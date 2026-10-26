@@ -5,7 +5,7 @@ code: DQ
 subtitle: 用固定种子加载与拆分数据、修复 CSV 单元格、按契约筛选记录、审计泄漏并演练迁移。
 hue: 30
 sources: phases/00-setup-and-tooling/09-data-management, projects/csv-repair-workbench, projects/csv-sql-question-workbench, projects/dataset-contract-gate, projects/dataset-split-auditor, projects/database-migration-rehearsal
-source_hash: 1fd08ac645c228ca
+source_hash: c8c29680de38f7d4
 ---
 
 ## 各类门禁的产物

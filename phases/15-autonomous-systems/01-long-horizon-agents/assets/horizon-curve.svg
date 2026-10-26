@@ -18,7 +18,7 @@
     </style>
   </defs>
 
-  <text x="440" y="24" text-anchor="middle" class="title">The horizon doubles ~every 7 months</text>
+  <text x="440" y="24" text-anchor="middle" class="title">任务时长上限约每 7 个月翻倍</text>
 
   <!-- Chart area -->
   <rect x="60" y="60" width="480" height="360" class="box"/>
@@ -40,10 +40,10 @@
   <text x="300" y="435" class="small">2024</text>
   <text x="380" y="435" class="small">2026</text>
   <text x="460" y="435" class="small">2028</text>
-  <text x="40" y="65" class="small">1 wk</text>
-  <text x="40" y="155" class="small">1 day</text>
-  <text x="40" y="245" class="small">1 hr</text>
-  <text x="40" y="335" class="small">1 min</text>
+  <text x="40" y="65" class="small">1 周</text>
+  <text x="40" y="155" class="small">1 天</text>
+  <text x="40" y="245" class="small">1 小时</text>
+  <text x="40" y="335" class="small">1 分钟</text>
   <text x="40" y="420" class="small">10 s</text>
 
   <!-- Curve: exponential in log space, straight line -->
@@ -55,48 +55,48 @@
   <circle cx="380" cy="200" r="4" fill="#c0392b"/>
   <text x="65" y="395" class="content">GPT-2 (10s)</text>
   <text x="305" y="275" class="content">GPT-4 (~5 min)</text>
-  <text x="305" y="295" class="small">expert task horizon</text>
+  <text x="305" y="295" class="small">专家任务时长上限</text>
   <text x="385" y="220" class="content">Opus 4.6 (14 hr)</text>
-  <text x="385" y="235" class="small">METR Jan 2026</text>
+  <text x="385" y="235" class="small">METR 一月 2026</text>
 
   <!-- Axis frame -->
   <line x1="60" y1="60" x2="60" y2="420" class="axis"/>
   <line x1="60" y1="420" x2="540" y2="420" class="axis"/>
 
-  <text x="300" y="460" text-anchor="middle" class="caption">log-linear: horizon doubles per ~7 months. y-axis is log scale.</text>
+  <text x="300" y="460" text-anchor="middle" class="caption">对数线性关系：任务时长上限约每 7 个月翻倍。y 轴为对数刻度。</text>
 
   <!-- Right panel: what breaks -->
   <rect x="560" y="60" width="300" height="460" class="box"/>
-  <text x="710" y="82" text-anchor="middle" class="label">what breaks at long horizon</text>
+  <text x="710" y="82" text-anchor="middle" class="label">长时间范围下的失效点</text>
 
   <rect x="572" y="100" width="276" height="54" class="hot"/>
-  <text x="580" y="120" class="label">context</text>
-  <text x="580" y="138" class="content">10^5-10^7 tokens per run.</text>
-  <text x="580" y="152" class="content">needs tiered memory.</text>
+  <text x="580" y="120" class="label">上下文</text>
+  <text x="580" y="138" class="content">每次运行 10^5-10^7 token。</text>
+  <text x="580" y="152" class="content">需要分层记忆。</text>
 
   <rect x="572" y="162" width="276" height="54" class="hot"/>
-  <text x="580" y="182" class="label">failure compounds</text>
-  <text x="580" y="200" class="content">99% per-step, 70 steps = 50%.</text>
-  <text x="580" y="214" class="content">reliability is exponential.</text>
+  <text x="580" y="182" class="label">故障累积</text>
+  <text x="580" y="200" class="content">每步 99%，70 步 = 50%。</text>
+  <text x="580" y="214" class="content">可靠性呈指数变化。</text>
 
   <rect x="572" y="224" width="276" height="54" class="hot"/>
-  <text x="580" y="244" class="label">cost is fat-tailed</text>
-  <text x="580" y="262" class="content">one loop can burn a month</text>
-  <text x="580" y="276" class="content">of chat budget.</text>
+  <text x="580" y="244" class="label">成本呈厚尾分布</text>
+  <text x="580" y="262" class="content">一个循环就可能烧掉一整月</text>
+  <text x="580" y="276" class="content">的聊天预算。</text>
 
   <rect x="572" y="286" width="276" height="54" class="cool"/>
-  <text x="580" y="306" class="label">eval vs deploy gap</text>
-  <text x="580" y="324" class="content">models infer eval context</text>
-  <text x="580" y="338" class="content">and behave safer in tests.</text>
+  <text x="580" y="306" class="label">评测与部署之间的差距</text>
+  <text x="580" y="324" class="content">模型推断自己处于评测环境，</text>
+  <text x="580" y="338" class="content">在测试中表现得更安全。</text>
 
   <rect x="572" y="348" width="276" height="54" class="cool"/>
-  <text x="580" y="368" class="label">review shifts</text>
-  <text x="580" y="386" class="content">from reading answers</text>
-  <text x="580" y="400" class="content">to auditing trajectories.</text>
+  <text x="580" y="368" class="label">审查重点转移</text>
+  <text x="580" y="386" class="content">从阅读答案</text>
+  <text x="580" y="400" class="content">转向审计轨迹。</text>
 
   <rect x="572" y="410" width="276" height="78" class="box"/>
-  <text x="580" y="430" class="label">design implication</text>
-  <text x="580" y="448" class="content">horizons are upper bounds.</text>
-  <text x="580" y="462" class="content">deploy with budgets, kill</text>
-  <text x="580" y="476" class="content">switches, HITL, canaries.</text>
+  <text x="580" y="430" class="label">设计启示</text>
+  <text x="580" y="448" class="content">这些时长只是上限。</text>
+  <text x="580" y="462" class="content">部署时配置预算、停止</text>
+  <text x="580" y="476" class="content">开关、HITL、金丝雀。</text>
 </svg>

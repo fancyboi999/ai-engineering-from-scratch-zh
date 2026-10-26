@@ -674,6 +674,7 @@ test('build-time SEO manifests cover every readable lesson and expose canonical 
   assert.equal((certificationDiscovery.match(/href="certification\?id=/g) || []).length, certifications.tracks.length);
   assert.ok((certificationDiscovery.match(/href="\/lesson\?path=/g) || []).length >= expectedCertificationPaths.length);
   assert.doesNotMatch(catalogDiscovery, /lesson\.html\?/);
+  assert.doesNotMatch(catalogDiscovery, /<td>(?:Build|Learn|Capstone|Reference|complete|in-progress|planned)<\/td>/, 'no-JavaScript discovery displays Chinese labels rather than internal enums');
 
   for (const file of ['index.html', 'prereqs.html']) {
     const source = fs.readFileSync(path.join(__dirname, file), 'utf8');
@@ -1815,7 +1816,9 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   assert.match(lessonHtml, /fetch\(quizUrl, fetchOptions\)/);
   assert.doesNotMatch(lessonHtml, /<script src="figures(?:\.js|-(?!manifest))/);
   assert.match(lessonHtml, /<script src="figure-manifest\.js/);
-  assert.match(lessonHtml, /<script src="figures-manifest\.js\?v=20261026a/);
+  const localeLoaderVersion = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'figures-manifest.js'))).digest('hex').slice(0, 12);
+  assert.ok(lessonHtml.includes('<script src="figures-manifest.js?v=' + localeLoaderVersion + '"'),
+    'the lesson must load the current content-addressed locale loader');
   assert.match(lessonHtml, /<script src="progress\.js\?v=20261026a/);
   assert.match(fs.readFileSync(path.join(__dirname, 'lesson-figures.js'), 'utf8'), /providerBaseUrl \+ provider/);
   assert.match(lessonHtml, /import\('https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@11/);
@@ -2131,7 +2134,7 @@ function loadContextCacheConsumer({ failOnce = false } = {}) {
   context.document.head.appendChild = script => {
     append(script);
     if (script.tagName !== 'script') return script;
-    const provider = script.src.split('/').at(-1).split('?')[0];
+    const provider = new URL(script.src, 'https://course.example/').pathname.replace(/^\//, '');
     requests.push(provider);
     queueMicrotask(() => {
       if (failOnce && provider === 'figures-llmeng.js') {
@@ -2151,7 +2154,9 @@ function loadContextCacheConsumer({ failOnce = false } = {}) {
   const root = runtime.element('article');
   root.appendChild(host);
   root.querySelectorAll = selector => selector === '.lesson-figure[data-figure]' ? [host] : [];
-  return { ...runtime, host, root, requests, warnings };
+  const localeRequests = ['lesson-figures.js', 'figures-llmeng.js', 'figures-claude-certifications.js']
+    .map(file => 'figure-locales/' + file).filter(file => fs.existsSync(path.join(__dirname, file)));
+  return { ...runtime, host, root, requests, warnings, localeRequests };
 }
 
 function cacheNodes(root, predicate) {
@@ -2173,7 +2178,7 @@ test('04 context cache consumer lazily loads real prefix and semantic renderers'
   t.diagnostic(JSON.stringify({ fence: '04-context-cache', requests: runtime.requests, prefix: typeof runtime.window.LESSON_FIGURES['prompt-cache-hit'], semantic: typeof runtime.window.LESSON_FIGURES['semantic-cache'], inputCount: cacheNodes(runtime.host, node => node.tagName === 'input').length }));
   assert.equal(typeof runtime.window.LESSON_FIGURES['prompt-cache-hit'], 'function');
   assert.equal(typeof runtime.window.LESSON_FIGURES['semantic-cache'], 'function');
-  assert.deepEqual(runtime.requests, ['figures-llmeng.js', 'figures-claude-certifications.js', 'figures-i18n-zh.js']);
+  assert.deepEqual(runtime.requests, ['figures-llmeng.js', 'figures-claude-certifications.js', ...runtime.localeRequests, 'figures-i18n-zh.js']);
   assert.equal(runtime.host.dataset.lfMounted, '1');
   assert.equal(cacheNodes(runtime.host, node => node.className === 'cf-shell').length, 1);
   let ranges = cacheNodes(runtime.host, node => node.tagName === 'input');
@@ -2205,7 +2210,7 @@ test('04 context cache consumer lazily loads real prefix and semantic renderers'
   remountRoot.querySelectorAll = selector => selector === '.lesson-figure[data-figure]' ? [remountHost] : [];
   await runtime.window.AIFS_mountLessonFigures(remountRoot);
   assert.equal(cacheNodes(remountHost, node => node.className === 'cf-shell').length, 1);
-  assert.equal(runtime.requests.length, 3, 'remount must reuse provider loads');
+  assert.equal(runtime.requests.length, 3 + runtime.localeRequests.length, 'remount must reuse provider and locale loads');
   assert.deepEqual(runtime.warnings, []);
   t.diagnostic('prefix saved: 56.0% -> 40.0% (prefix 70 -> 50, hit 80); semantic: 4/10 hits, 0 wrong -> 8/10 hits, 3 wrong (threshold .85 -> .70); prefix reset: 56.0%');
 });
@@ -2225,7 +2230,7 @@ test('04 context cache missing dependency fails loudly and retries without an em
   await runtime.window.AIFS_mountLessonFigures(runtime.root);
   assert.equal(runtime.host.dataset.lfMounted, '1');
   assert.equal(cacheNodes(runtime.host, node => node.tagName === 'input').length, 2);
-  assert.deepEqual(runtime.requests, ['figures-llmeng.js', 'figures-claude-certifications.js', 'figures-i18n-zh.js', 'figures-llmeng.js']);
+  assert.deepEqual(runtime.requests, ['figures-llmeng.js', 'figures-claude-certifications.js', ...runtime.localeRequests, 'figures-i18n-zh.js', 'figures-llmeng.js']);
 });
 
 test('04 context cache manifest guard delegates unchanged and rewraps provider registrations once', async () => {
@@ -2282,7 +2287,7 @@ test('04 context cache manifest guard delegates unchanged and rewraps provider r
   assert.equal(calls.length, 2);
   runtime.window.AIFSFigureRuntime.disposeRoot(retryRoot);
   assert.equal(disposed, 1, 'delegated disposer must remain owned by the shared runtime');
-  assert.equal(runtime.requests.length, 3);
+  assert.equal(runtime.requests.length, 3 + runtime.localeRequests.length);
 });
 
 test('04 context cache manifest requires real dependency registrations even with only its fence', t => {

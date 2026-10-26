@@ -13,62 +13,62 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Encoding attacks and the defense layers that miss them</text>
+  <text x="480" y="24" text-anchor="middle" class="title">编码攻击与无法识别它们的防御层</text>
 
   <rect x="60" y="60" width="840" height="60" class="box"/>
-  <text x="80" y="100" class="step">attack family:</text>
+  <text x="80" y="100" class="step">攻击类型：</text>
   <rect x="200" y="70" width="130" height="40" class="hot"/>
-  <text x="265" y="95" text-anchor="middle" class="small">ArtPrompt (ASCII)</text>
+  <text x="265" y="95" text-anchor="middle" class="small">ArtPrompt（ASCII）</text>
   <rect x="340" y="70" width="130" height="40" class="hot"/>
-  <text x="405" y="95" text-anchor="middle" class="small">base64 / leet</text>
+  <text x="405" y="95" text-anchor="middle" class="small">base64 / leet 编码</text>
   <rect x="480" y="70" width="130" height="40" class="hot"/>
-  <text x="545" y="95" text-anchor="middle" class="small">UTF-8 homoglyph</text>
+  <text x="545" y="95" text-anchor="middle" class="small">UTF-8 同形字符</text>
   <rect x="620" y="70" width="130" height="40" class="hot"/>
-  <text x="685" y="95" text-anchor="middle" class="small">UTES (tree/JSON)</text>
+  <text x="685" y="95" text-anchor="middle" class="small">UTES（树/JSON）</text>
   <rect x="760" y="70" width="130" height="40" class="hot"/>
-  <text x="825" y="95" text-anchor="middle" class="small">image modality</text>
+  <text x="825" y="95" text-anchor="middle" class="small">图像模态</text>
 
   <rect x="60" y="140" width="840" height="50" class="box"/>
-  <text x="80" y="170" class="step">keyword filter:</text>
-  <text x="265" y="170" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="405" y="170" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="545" y="170" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="685" y="170" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="825" y="170" text-anchor="middle" class="small" fill="#c0392b">misses</text>
+  <text x="80" y="170" class="step">关键词过滤：</text>
+  <text x="265" y="170" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="405" y="170" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="545" y="170" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="685" y="170" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="825" y="170" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
 
   <rect x="60" y="200" width="840" height="50" class="box"/>
-  <text x="80" y="230" class="step">perplexity filter:</text>
-  <text x="265" y="230" text-anchor="middle" class="small" fill="#e67e22">partial</text>
-  <text x="405" y="230" text-anchor="middle" class="small" fill="#e67e22">partial</text>
-  <text x="545" y="230" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="685" y="230" text-anchor="middle" class="small" fill="#e67e22">partial</text>
-  <text x="825" y="230" text-anchor="middle" class="small" fill="#c0392b">misses</text>
+  <text x="80" y="230" class="step">困惑度过滤：</text>
+  <text x="265" y="230" text-anchor="middle" class="small" fill="#e67e22">部分识别</text>
+  <text x="405" y="230" text-anchor="middle" class="small" fill="#e67e22">部分识别</text>
+  <text x="545" y="230" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="685" y="230" text-anchor="middle" class="small" fill="#e67e22">部分识别</text>
+  <text x="825" y="230" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
 
   <rect x="60" y="260" width="840" height="50" class="box"/>
-  <text x="80" y="290" class="step">paraphrase defense:</text>
-  <text x="265" y="290" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="405" y="290" text-anchor="middle" class="small" fill="#e67e22">partial</text>
-  <text x="545" y="290" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="685" y="290" text-anchor="middle" class="small" fill="#c0392b">misses</text>
-  <text x="825" y="290" text-anchor="middle" class="small" fill="#c0392b">misses</text>
+  <text x="80" y="290" class="step">改写防御：</text>
+  <text x="265" y="290" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="405" y="290" text-anchor="middle" class="small" fill="#e67e22">部分识别</text>
+  <text x="545" y="290" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="685" y="290" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
+  <text x="825" y="290" text-anchor="middle" class="small" fill="#c0392b">漏过</text>
 
   <rect x="60" y="320" width="840" height="50" class="box"/>
-  <text x="80" y="350" class="step">output classifier:</text>
-  <text x="265" y="350" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="405" y="350" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="545" y="350" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="685" y="350" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="825" y="350" text-anchor="middle" class="small" fill="#e67e22">partial</text>
+  <text x="80" y="350" class="step">输出分类器：</text>
+  <text x="265" y="350" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="405" y="350" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="545" y="350" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="685" y="350" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="825" y="350" text-anchor="middle" class="small" fill="#e67e22">部分识别</text>
 
   <rect x="60" y="380" width="840" height="50" class="box"/>
-  <text x="80" y="410" class="step">multimodal moderator:</text>
-  <text x="265" y="410" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="405" y="410" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="545" y="410" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
-  <text x="685" y="410" text-anchor="middle" class="small" fill="#e67e22">partial</text>
-  <text x="825" y="410" text-anchor="middle" class="small" fill="#2e7d32">catches</text>
+  <text x="80" y="410" class="step">多模态审核器：</text>
+  <text x="265" y="410" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="405" y="410" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="545" y="410" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
+  <text x="685" y="410" text-anchor="middle" class="small" fill="#e67e22">部分识别</text>
+  <text x="825" y="410" text-anchor="middle" class="small" fill="#2e7d32">识别</text>
 
   <rect x="60" y="430" width="840" height="60" class="box"/>
-  <text x="80" y="455" class="small">input-side defenses (keyword, PPL, paraphrase, retokenization) fail because recognition is visual / structural.</text>
-  <text x="80" y="475" class="small">output-side and multimodal moderators are the reliable layer; every deployment should include at least one.</text>
+  <text x="80" y="455" class="small">输入侧防御（关键词、困惑度、改写、重新分词）失败，因为识别依赖视觉或结构。</text>
+  <text x="80" y="475" class="small">输出侧与多模态审核器是可靠的防御层；每次部署至少应包含其中一种。</text>
 </svg>
