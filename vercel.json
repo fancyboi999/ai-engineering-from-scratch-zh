@@ -58,7 +58,11 @@
           "value": "(?i).*text/markdown.*"
         }
       ],
-      "dest": "/agent-pages/practice/index.md"
+      "dest": "/agent-pages/practice/index.md",
+      "headers": {
+        "Vary": "Accept, Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
     },
     {
       "src": "/practice/tracks/([a-z0-9-]+)",
@@ -73,7 +77,11 @@
           "value": "(?i).*text/markdown.*"
         }
       ],
-      "dest": "/agent-pages/practice/tracks/$1.md"
+      "dest": "/agent-pages/practice/tracks/$1.md",
+      "headers": {
+        "Vary": "Accept, Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
     },
     {
       "src": "/practice/([a-z0-9-]+)",
@@ -88,7 +96,11 @@
           "value": "(?i).*text/markdown.*"
         }
       ],
-      "dest": "/agent-pages/practice/$1.md"
+      "dest": "/agent-pages/practice/$1.md",
+      "headers": {
+        "Vary": "Accept, Accept-Encoding",
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
     },
     {
       "src": "/glossary/([a-z0-9]+(?:-[a-z0-9]+)*)/?",

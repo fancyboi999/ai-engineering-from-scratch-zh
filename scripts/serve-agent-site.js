@@ -60,6 +60,7 @@ function createServer() {
         const match = url.pathname.match(new RegExp('^' + rule.src + '$'));
         if (match && (!rule.methods || rule.methods.includes(req.method)) && matches(rule, req)) {
           destination = rule.dest.replace(/\$(\d+)/g, (_, n) => match[Number(n)]);
+          for (const [name, value] of Object.entries(rule.headers || {})) res.setHeader(name, value);
           routed = true;
           break;
         }

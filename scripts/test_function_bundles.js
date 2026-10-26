@@ -16,6 +16,12 @@ test('deployment routing compiles with the Vercel platform parser', () => {
   const transformed = getTransformedRoutes(config);
   assert.ok(!transformed.error, transformed.error && transformed.error.message);
   assert.ok(transformed.routes.length > 0, 'the complete deployment routes must be compiled');
+  const staticMarkdown = config.routes.filter(route => route.dest && route.dest.startsWith('/agent-pages/practice/'));
+  assert.equal(staticMarkdown.length, 3);
+  for (const route of staticMarkdown) {
+    assert.equal(route.headers && route.headers.Vary, 'Accept, Accept-Encoding', 'conditional static Markdown must carry Vary on the matching route');
+    assert.equal(route.headers && route.headers['Cache-Control'], 'public, max-age=0, must-revalidate');
+  }
   const invalid = getTransformedRoutes({
     ...config,
     headers: [{ source: '/manual-[a-z0-9-]+/[a-z0-9-]+', headers: [{ key: 'Vary', value: 'Accept' }] }],
