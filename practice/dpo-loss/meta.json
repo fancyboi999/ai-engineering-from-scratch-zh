@@ -1,0 +1,41 @@
+{
+  "id": "dpo-loss",
+  "title": "DPO 偏好损失",
+  "kind": "research",
+  "summary": "根据偏好回答与拒绝回答的策略和参考对数概率，计算隐式奖励、DPO 平均损失及其对策略对数概率的梯度。",
+  "difficulty": "medium",
+  "tags": [
+    "dpo",
+    "alignment",
+    "loss-functions",
+    "gradients"
+  ],
+  "lesson": "phases/10-llms-from-scratch/08-dpo",
+  "cheatsheet": "rlhf-dpo",
+  "minutes": 25,
+  "entry": [
+    "implicit_reward",
+    "dpo_loss",
+    "dpo_grad"
+  ],
+  "collections": [
+    "papers-to-code",
+    "rl-basics"
+  ],
+  "time_limit_s": 10,
+  "method": "direct-preference-optimization-dpo",
+  "paper": {
+    "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+    "authors": "Rafailov et al.",
+    "year": 2023,
+    "url": "https://arxiv.org/abs/2305.18290"
+  },
+  "mutants": {
+    "beta_twice": "对奖励差值重复乘 beta，损失实际使用了 beta 的平方。",
+    "eps_log": "计算负 log(sigmoid) 时额外加入 1e-8，极大差值时会得到错误损失。",
+    "grad_wrong_sigmoid": "梯度乘以 sigmoid(奖励差值)，而不是 sigmoid(负奖励差值)。",
+    "in_place_ratio": "原地减去参考对数概率，修改了调用方的策略数组。",
+    "sum_not_mean": "将各对回答的损失和梯度相加，没有除以 N。",
+    "swapped_ratio": "用参考对数概率减去策略对数概率计算奖励。"
+  }
+}

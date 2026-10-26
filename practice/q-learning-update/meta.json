@@ -1,0 +1,33 @@
+{
+  "id": "q-learning-update",
+  "title": "Q-learning 与 SARSA 更新",
+  "kind": "implement",
+  "summary": "执行一步表格型 Q-learning 或 SARSA 更新，在终止状态停止 bootstrap，并使用固定随机种子的 epsilon-greedy 策略选动作。",
+  "difficulty": "easy",
+  "tags": [
+    "reinforcement-learning",
+    "q-learning",
+    "sarsa",
+    "exploration"
+  ],
+  "lesson": "phases/09-reinforcement-learning/04-q-learning-sarsa",
+  "cheatsheet": "reinforcement-learning",
+  "minutes": 15,
+  "entry": [
+    "q_learning_update",
+    "sarsa_update",
+    "epsilon_greedy"
+  ],
+  "collections": [
+    "rl-basics"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "draws_action_first": "每次调用都先抽取随机动作，再抽取随机分支标记，改变 rng 后续生成的序列。",
+    "q_bootstraps_terminal": "done 为 True 时仍将 gamma 乘下一行的最大值加入目标。",
+    "q_in_place": "Q-learning 使用 np.asarray，导致更新会修改调用方的状态表。",
+    "sarsa_uses_max": "SARSA 使用下一状态的最大动作价值，而不是给定的下一动作。",
+    "td_error_flipped": "Q-learning 中使用 Q[s, a] 减目标值，导致价值远离目标。",
+    "tie_goes_last": "价值并列时返回索引最大的动作。"
+  }
+}

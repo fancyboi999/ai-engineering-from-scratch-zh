@@ -1,0 +1,33 @@
+{
+  "id": "int8-quantization",
+  "title": "对称 int8 量化",
+  "kind": "implement",
+  "summary": "用绝对值最大值计算逐张量和逐行 int8 量化的缩放系数，实现反量化并处理全零行。",
+  "difficulty": "medium",
+  "tags": [
+    "quantization",
+    "int8",
+    "inference"
+  ],
+  "lesson": "phases/10-llms-from-scratch/11-quantization",
+  "cheatsheet": "quantization",
+  "minutes": 20,
+  "entry": [
+    "quantize_symmetric",
+    "dequantize_symmetric",
+    "quantize_per_channel",
+    "dequantize_per_channel"
+  ],
+  "collections": [
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "columns_not_rows": "沿 axis=0 取最大值，因此得到每列一个 scale，而不是每行一个。",
+    "max_not_absmax": "逐张量 scale 使用数值最大值，而不是绝对值最大值。",
+    "round_half_up": "使用 floor(x + 0.5) 舍入，恰好位于中间的值会向上取整，而不是取偶数。",
+    "scale_by_128": "除以 128，而不是 127。",
+    "truncate_per_row": "逐行量化时直接转换为 int8，没有舍入也没有裁剪，小数会被截掉。",
+    "zero_row_divides": "没有处理全零行，导致 0 / 0 产生 NaN。"
+  }
+}

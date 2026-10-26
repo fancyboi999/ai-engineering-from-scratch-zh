@@ -1,0 +1,35 @@
+{
+  "id": "lab-learning-rate-sweep",
+  "title": "扫查梯度下降学习率",
+  "kind": "lab",
+  "summary": "对固定种子的回归任务扫描学习率，找出最佳值、最小发散值，并与 2 除以最大特征值的界限比较。",
+  "difficulty": "easy",
+  "tags": [
+    "learning-rate",
+    "gradient-descent",
+    "optimization"
+  ],
+  "lesson": "phases/03-deep-learning-core/09-learning-rate-schedules",
+  "cheatsheet": "optimizers-schedules",
+  "minutes": 20,
+  "entry": [
+    "run_sweep",
+    "is_diverged",
+    "best_lr",
+    "smallest_diverging_lr",
+    "stability_bound",
+    "answers"
+  ],
+  "collections": [
+    "experiment-labs",
+    "optimizers"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "finite_only": "仅当最终损失不是有限值时才标记为发散，忽略损失有限但增大的情况。",
+    "first_in_list": "返回列表顺序中第一个发散学习率，而不是数值最小的发散学习率。",
+    "hessian_without_two": "将 Hessian 错写为 X^T X / n，漏掉系数 2，使理论界限变为两倍。",
+    "no_divergence_filter": "直接对原始最终损失调用 np.argmin，导致含 NaN 的运行可能成为最佳学习率。",
+    "ties_pick_larger": "最终损失并列时选择较大的学习率。"
+  }
+}

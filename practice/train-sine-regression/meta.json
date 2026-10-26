@@ -1,0 +1,40 @@
+{
+  "id": "train-sine-regression",
+  "title": "拟合正弦曲线",
+  "kind": "train",
+  "summary": "训练 1-16-1 tanh 网络，根据带噪 sin(x) 样本学习曲线，并在留出点上达到小于 0.01 的均方误差。",
+  "difficulty": "medium",
+  "tags": [
+    "regression",
+    "mlp",
+    "tanh",
+    "mse"
+  ],
+  "lesson": "phases/03-deep-learning-core/04-activation-functions",
+  "cheatsheet": "neural-net-basics",
+  "minutes": 35,
+  "entry": [
+    "train",
+    "predict"
+  ],
+  "collections": [
+    "train-tiny-models",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 20,
+  "budget": {
+    "steps": 1500
+  },
+  "target": {
+    "metric": "held-out mean squared error",
+    "value": 0.01
+  },
+  "mutants": {
+    "missing_tanh_derivative": "反向传播经过 tanh 时漏乘 1 - h ** 2。",
+    "gradient_sign": "输出梯度使用 t - out，导致 Adam 沿损失增大的方向更新。",
+    "zero_init": "两层权重都初始化为零，第一层得不到梯度，输出保持平坦。",
+    "global_rng": "使用 np.random 而不是 rng 参数生成第一层权重，相同种子也会得到不同结果。",
+    "reshapes_caller_x": "直接设置 x.shape = (-1, 1)，改变调用方数组的形状。",
+    "over_budget": "训练 2500 步，超过 1500 步预算。"
+  }
+}

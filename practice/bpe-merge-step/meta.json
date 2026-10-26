@@ -1,0 +1,32 @@
+{
+  "id": "bpe-merge-step",
+  "title": "BPE 符号对计数与合并",
+  "kind": "implement",
+  "summary": "统计加权相邻符号对，以固定规则选择并合并符号对，生成确定性的 BPE 合并列表。",
+  "difficulty": "medium",
+  "tags": [
+    "tokenization",
+    "bpe",
+    "subword"
+  ],
+  "lesson": "phases/19-capstone-projects/30-bpe-tokenizer-from-scratch",
+  "cheatsheet": "tokenization",
+  "minutes": 30,
+  "entry": [
+    "count_pairs",
+    "best_pair",
+    "apply_merge",
+    "train"
+  ],
+  "collections": [
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "first_seen_tie": "计数并列时按字典插入顺序选择，而非选择字典序最小的符号对。",
+    "mutates_input": "清空并重新填充调用方传入的语料字典，造成输入被修改。",
+    "no_min_count": "最高计数为 1 时仍继续合并，合并不会减少重复符号。",
+    "overlapping_merge": "匹配后只前进一个位置，导致区间重叠，例如 [a, a, a] 变成 [new, new, a]。",
+    "unweighted_counts": "每次出现只加 1，忽略词的出现频次。"
+  }
+}

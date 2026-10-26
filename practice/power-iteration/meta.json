@@ -1,0 +1,31 @@
+{
+  "id": "power-iteration",
+  "title": "主特征值的幂迭代",
+  "kind": "implement",
+  "summary": "用幂迭代求对称矩阵绝对值最大的特征值及其特征向量，并按容差停止且固定向量符号。",
+  "difficulty": "medium",
+  "tags": [
+    "eigenvalues",
+    "power-iteration",
+    "linear-algebra",
+    "svd"
+  ],
+  "lesson": "phases/01-math-foundations/11-singular-value-decomposition",
+  "cheatsheet": "linear-algebra",
+  "minutes": 25,
+  "entry": [
+    "fix_sign",
+    "power_iteration"
+  ],
+  "collections": [
+    "math-foundations"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "argmax_without_abs": "符号规则中使用 np.argmax(v)，忽略绝对值较大的负元素。",
+    "eigenvalue_from_norm": "将 Mv 的范数作为特征值，导致负特征值变为正数。",
+    "no_sign_fix": "返回最终向量时没有应用符号规则。",
+    "signed_convergence": "停止条件没有对点积取绝对值，负主特征值导致算法无法提前停止。",
+    "v0_not_normalized": "不将 v0 除以自身范数，导致初始停止检查结果错误。"
+  }
+}

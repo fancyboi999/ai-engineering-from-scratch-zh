@@ -1,0 +1,33 @@
+{
+  "id": "bm25",
+  "title": "BM25 关键词排序",
+  "kind": "implement",
+  "summary": "按逆文档频率、词频饱和度和文档长度计算 BM25 分数，并按确定性的并列规则排序。",
+  "difficulty": "medium",
+  "tags": [
+    "bm25",
+    "information-retrieval",
+    "sparse-retrieval",
+    "ranking"
+  ],
+  "lesson": "phases/05-nlp-foundations-to-advanced/14-information-retrieval-search",
+  "cheatsheet": "rag",
+  "minutes": 25,
+  "entry": [
+    "idf",
+    "bm25_scores",
+    "rank"
+  ],
+  "collections": [
+    "rag-building-blocks"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "dedup_query": "将查询转换为集合，导致重复查询词只累计一次。",
+    "df_counts_occurrences": "把词在文档中的出现次数当作文档频率。",
+    "idf_without_one": "省略 idf 对数中的 1 +，使常见词的逆文档频率变成负数。",
+    "no_k1_plus_one": "词频权重中省略 k1 + 1。",
+    "no_length_norm": "忽略文档长度校正项。",
+    "ties_high_index": "分数并列时按索引从大到小排序。"
+  }
+}

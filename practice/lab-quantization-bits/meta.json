@@ -1,0 +1,37 @@
+{
+  "id": "lab-quantization-bits",
+  "title": "扫描量化位宽",
+  "kind": "lab",
+  "summary": "在含离群值的权重上扫描 2 至 8 bit 的对称 absmax 量化，比较全张量和逐行缩放。",
+  "difficulty": "medium",
+  "tags": [
+    "quantization",
+    "inference",
+    "outliers"
+  ],
+  "lesson": "phases/10-llms-from-scratch/11-quantization",
+  "cheatsheet": "quantization",
+  "minutes": 30,
+  "entry": [
+    "quantize_symmetric",
+    "quantize_per_row",
+    "dequantize",
+    "relative_error",
+    "bit_sweep",
+    "smallest_bits",
+    "answers"
+  ],
+  "collections": [
+    "experiment-labs",
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "columns_not_rows": "沿 axis 0 求最大值，给每列而不是每行设置缩放系数。",
+    "divide_by_half_range": "除以 2^(b-1)，而不是 2^(b-1) - 1，导致最大值无法达到 q_max。",
+    "max_not_absmax": "缩放系数使用最大值，而不是绝对值最大值。",
+    "round_half_up": "使用 floor(x + 0.5) 舍入，导致中间值向上而不是舍入到偶数。",
+    "strict_threshold": "使用严格小于，导致误差等于阈值时判定失败。",
+    "zero_row_nan": "没有处理零行，导致 0 / 0 产生 NaN。"
+  }
+}

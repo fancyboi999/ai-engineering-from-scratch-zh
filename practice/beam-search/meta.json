@@ -1,0 +1,31 @@
+{
+  "id": "beam-search",
+  "title": "带 EOS 和长度归一化的 Beam Search",
+  "kind": "implement",
+  "summary": "用 step 函数扩展并剪枝部分序列，在 EOS 处结束候选，再按长度惩罚排序。",
+  "difficulty": "hard",
+  "tags": [
+    "beam-search",
+    "decoding",
+    "seq2seq",
+    "llm-inference"
+  ],
+  "lesson": "phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence",
+  "cheatsheet": "rnns-seq2seq",
+  "minutes": 45,
+  "entry": [
+    "beam_search"
+  ],
+  "collections": [
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "drop_unfinished": "循环达到 max_len 时丢弃未完成候选，导致没有 EOS 的序列消失。",
+    "eos_stays_alive": "不把 EOS 候选移到完成列表，导致搜索继续扩展已结束序列。",
+    "length_counts_bos": "计算长度惩罚时把 BOS 也计入序列长度。",
+    "prune_per_beam": "每条 beam 各自保留 beam_width 个 token，没有在全部候选中统一剪枝。",
+    "ties_high_id": "对 (score, tokens) 使用 reverse=True，分数并列时让 token ID 较大的候选靠前。",
+    "unfinished_not_normalized": "达到 max_len 时用原始分数加入未完成候选，跳过长度惩罚。"
+  }
+}

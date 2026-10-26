@@ -1,0 +1,41 @@
+{
+  "id": "focal-loss",
+  "title": "焦点损失（Focal Loss）",
+  "kind": "research",
+  "summary": "从 logits 稳定计算带 gamma 和 alpha 的二分类与多分类焦点损失，以及二分类梯度，避免数值溢出。",
+  "difficulty": "easy",
+  "tags": [
+    "loss-functions",
+    "focal-loss",
+    "class-imbalance",
+    "gradients"
+  ],
+  "lesson": "phases/03-deep-learning-core/05-loss-functions",
+  "cheatsheet": "neural-net-basics",
+  "minutes": 20,
+  "entry": [
+    "binary_focal_loss",
+    "binary_focal_grad",
+    "focal_loss"
+  ],
+  "collections": [
+    "papers-to-code",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "method": "focal-loss",
+  "paper": {
+    "title": "Focal Loss for Dense Object Detection",
+    "authors": "Lin et al.",
+    "year": 2017,
+    "url": "https://arxiv.org/abs/1708.02002"
+  },
+  "mutants": {
+    "alpha_not_flipped": "所有样本都使用 alpha，负类样本没有使用 1 - alpha。",
+    "grad_missing_focal_term": "把 (1 - p_t)^gamma 当成常数，梯度中遗漏 gamma p_t log p_t 项。",
+    "multiclass_ignores_alpha": "多分类损失忽略了逐类别 alpha。",
+    "naive_log": "将 log p_t 直接算成 sigmoid 的 log，logit 为 -1000 时损失会变成无穷。",
+    "sum_not_mean": "将样本损失和梯度相加，没有除以 N。",
+    "weight_pt_not_one_minus": "用 p_t^gamma 加权，而不是 (1 - p_t)^gamma。"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "lab-sampling-temperature",
+  "title": "扫描采样温度",
+  "kind": "lab",
+  "summary": "扫描固定 logits 的温度，测量熵和最大概率，查找熵交点并统计 Top-p 保留的 token 数。",
+  "difficulty": "easy",
+  "tags": [
+    "sampling",
+    "temperature",
+    "entropy",
+    "top-p"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/07-gpt-causal-language-modeling",
+  "cheatsheet": "bert-gpt-t5",
+  "minutes": 20,
+  "entry": [
+    "softmax_t",
+    "entropy_bits",
+    "sweep_temperature",
+    "temperature_for_entropy",
+    "kept_count",
+    "answers"
+  ],
+  "collections": [
+    "experiment-labs",
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "bisection_swapped": "熵偏低时提高 hi，导致二分法向错误方向移动。",
+    "log_of_zero": "对每个概率取 log2，零概率会产生 NaN。",
+    "multiply_temperature": "将 logits 乘以温度而不是相除，导致温度越高分布越尖锐。",
+    "natural_log": "使用自然对数，得到的熵单位是 nat 而不是 bit。",
+    "no_max_shift": "对缩放后的 logits 直接调用 np.exp，没有减最大值，导致大值溢出。",
+    "strict_top_p": "使用严格大于，累积和恰好等于 p 时不会停止。"
+  }
+}

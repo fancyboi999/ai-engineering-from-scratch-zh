@@ -1,0 +1,32 @@
+{
+  "id": "cosine-top-k",
+  "title": "余弦相似度 Top-k 检索",
+  "kind": "implement",
+  "summary": "归一化 embedding 行，计算查询与文档的余弦相似度，并按固定并列规则返回 Top-k。",
+  "difficulty": "easy",
+  "tags": [
+    "embeddings",
+    "cosine-similarity",
+    "vector-search",
+    "retrieval"
+  ],
+  "lesson": "phases/11-llm-engineering/04-embeddings",
+  "cheatsheet": "embeddings-vector-search",
+  "minutes": 15,
+  "entry": [
+    "normalize_rows",
+    "cosine_similarity_matrix",
+    "top_k"
+  ],
+  "collections": [
+    "rag-building-blocks"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "column_norm": "沿 axis 0 计算范数，归一化列而非行。",
+    "in_place_normalize": "原地除以范数，导致调用方的向量被修改。",
+    "no_zero_guard": "直接除以零范数，导致零向量产生 NaN，而非 0。",
+    "reversed_ties": "升序排序后反转结果，导致相同分数时索引较大的文档靠前。",
+    "skip_first": "丢弃最佳匹配，返回排名 2 到 k + 1 的结果，仿佛排除了自身匹配。"
+  }
+}

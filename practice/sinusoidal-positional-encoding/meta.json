@@ -1,0 +1,31 @@
+{
+  "id": "sinusoidal-positional-encoding",
+  "title": "正弦位置编码",
+  "kind": "implement",
+  "summary": "构造交错排列的正弦余弦位置编码表，并将它加到一批 token embedding 上。",
+  "difficulty": "easy",
+  "tags": [
+    "positional-encoding",
+    "transformers",
+    "embeddings"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/04-positional-encoding",
+  "cheatsheet": "positional-encoding",
+  "minutes": 15,
+  "entry": [
+    "sinusoidal_pe",
+    "add_positional_encoding"
+  ],
+  "collections": [
+    "transformers-from-scratch"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "add_in_place": "用 += 将位置编码表原地加到 x，导致调用方的 embedding 被修改。",
+    "blocked_layout": "将所有正弦值放在前半列，将所有余弦值放在后半列。",
+    "exponent_i_over_d": "使用 i / d_model 作为指数，而不是 2i / d_model。",
+    "odd_uses_even_width": "用 2 * (d_model // 2) 作指数分母，导致奇数 d_model 使用 d_model - 1 对应的频率。",
+    "positions_from_one": "位置从 1 开始，导致第 0 行编码位置 1。",
+    "sin_cos_swapped": "将余弦写入第 2i 列，将正弦写入第 2i+1 列。"
+  }
+}

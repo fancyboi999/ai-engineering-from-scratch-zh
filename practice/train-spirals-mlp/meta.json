@@ -1,0 +1,40 @@
+{
+  "id": "train-spirals-mlp",
+  "title": "在双螺旋数据上训练 tanh 网络",
+  "kind": "train",
+  "summary": "用小批量 Adam 训练 2-24-24-1 tanh 网络，分开两条含噪声的螺旋，使留出集准确率达到 95%。",
+  "difficulty": "medium",
+  "tags": [
+    "mlp",
+    "backpropagation",
+    "adam",
+    "mini-batch"
+  ],
+  "lesson": "phases/03-deep-learning-core/10-mini-framework",
+  "cheatsheet": "deep-learning-training",
+  "minutes": 45,
+  "entry": [
+    "train",
+    "predict"
+  ],
+  "collections": [
+    "train-tiny-models",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 25,
+  "budget": {
+    "steps": 1500
+  },
+  "target": {
+    "metric": "held-out accuracy",
+    "value": 0.95
+  },
+  "mutants": {
+    "missing_tanh_derivative": "将梯度传回第一层 tanh 时，漏掉因子 1 - h1 ** 2。",
+    "gradient_sign": "用 t - p 作为输出梯度，导致 Adam 增大损失。",
+    "global_rng_shuffle": "用 np.random.permutation 而非 rng 参数打乱顺序，导致相同种子的两次运行不同。",
+    "adam_no_sqrt": "除以 v_hat 而非其平方根，导致 Adam 步长尺度错误。",
+    "shuffles_caller_arrays": "开始时原地打乱 X 和 y，导致调用方数组变化。",
+    "over_budget": "训练 2500 步，超过 1500 步预算。"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "gini-best-split",
+  "title": "基尼不纯度与最佳切分",
+  "kind": "implement",
+  "summary": "使用中点阈值、子节点加权不纯度和固定平局规则，在所有特征中搜索决策树的最佳切分。",
+  "difficulty": "hard",
+  "tags": [
+    "decision-trees",
+    "gini-impurity",
+    "classification",
+    "search"
+  ],
+  "lesson": "phases/02-ml-fundamentals/04-decision-trees",
+  "cheatsheet": "classical-ml",
+  "minutes": 35,
+  "entry": [
+    "gini_impurity",
+    "split_impurity",
+    "best_threshold",
+    "best_split"
+  ],
+  "collections": [
+    "classical-ml"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "feature_axis_rows": "遍历 X.shape[0]，即样本行数，而不是特征数。",
+    "gini_empty_one": "没有处理空集合，导致空标签集的不纯度为 1.0，而不是 0.0。",
+    "threshold_at_value": "使用相邻唯一值中较小的值作为阈值，而不是中点。",
+    "tie_last_wins": "不纯度相等时也替换最佳阈值，因此最后一个并列阈值胜出。",
+    "unweighted_children": "直接平均两个子节点的不纯度，没有按样本数加权。"
+  }
+}

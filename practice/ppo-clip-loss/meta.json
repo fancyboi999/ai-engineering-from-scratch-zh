@@ -1,0 +1,33 @@
+{
+  "id": "ppo-clip-loss",
+  "title": "PPO 裁剪损失",
+  "kind": "implement",
+  "summary": "计算 PPO 代理裁剪损失、裁剪比例以及损失对新策略对数概率的梯度。",
+  "difficulty": "medium",
+  "tags": [
+    "reinforcement-learning",
+    "ppo",
+    "policy-gradient",
+    "gradients"
+  ],
+  "lesson": "phases/09-reinforcement-learning/08-ppo",
+  "cheatsheet": "reinforcement-learning",
+  "minutes": 25,
+  "entry": [
+    "ppo_clip_loss",
+    "clip_fraction",
+    "ppo_clip_grad"
+  ],
+  "collections": [
+    "rl-basics"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "clip_ignores_sign": "将所有位于 [1 - eps, 1 + eps] 区间外的比率都算作裁剪，忽略 min 实际选择了未裁剪项的情况。",
+    "grad_ignores_clip": "对所有样本都返回 -r A / N，包括已裁剪样本。",
+    "max_not_min": "使用 np.maximum 取两项中的较大值，因此目标不再是下界。",
+    "ratio_from_probs": "用 exp(logp_new) / exp(logp_old) 计算比率，极小概率会产生 0 / 0。",
+    "sign_flipped": "不取负号，直接返回代理目标及其梯度，导致梯度下降使策略变差。",
+    "sum_not_mean": "对样本求和，没有将损失和梯度除以 N。"
+  }
+}

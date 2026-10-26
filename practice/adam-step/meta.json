@@ -1,0 +1,31 @@
+{
+  "id": "adam-step",
+  "title": "Adam 与 AdamW 更新步骤",
+  "kind": "implement",
+  "summary": "用纯函数实现 Adam 更新、偏差修正和步数计数，并加入 AdamW 的解耦权重衰减。",
+  "difficulty": "medium",
+  "tags": [
+    "optimizers",
+    "adam",
+    "weight-decay"
+  ],
+  "lesson": "phases/03-deep-learning-core/06-optimizers",
+  "cheatsheet": "deep-learning-training",
+  "minutes": 25,
+  "entry": [
+    "init_adam_state",
+    "adam_step"
+  ],
+  "collections": [
+    "optimizers",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "no_bias_correction": "直接使用 m 和 v，跳过除以 1 减 beta 的 t 次方这一步。",
+    "step_off_by_one": "偏差修正时使用 t + 1，导致第一步表现为第二步。",
+    "eps_inside_sqrt": "把 epsilon 放进平方根内，使极小梯度的更新幅度过小。",
+    "coupled_weight_decay": "把 weight_decay 乘 params 加入梯度，变成 Adam 中的 L2 正则项，而不是 AdamW。",
+    "in_place_state": "用 *= 和 += 原地更新旧状态数组，导致调用方的 m 和 v 被修改。"
+  }
+}

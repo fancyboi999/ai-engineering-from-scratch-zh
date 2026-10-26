@@ -1,0 +1,32 @@
+{
+  "id": "softmax-cross-entropy",
+  "title": "稳定的 Softmax 与交叉熵",
+  "kind": "implement",
+  "summary": "对批次计算 Softmax、平均交叉熵及其梯度，并避免大 logit 导致溢出。",
+  "difficulty": "easy",
+  "tags": [
+    "softmax",
+    "loss-functions",
+    "gradients",
+    "numerical-stability"
+  ],
+  "lesson": "phases/03-deep-learning-core/05-loss-functions",
+  "cheatsheet": "deep-learning-training",
+  "minutes": 20,
+  "entry": [
+    "softmax",
+    "cross_entropy",
+    "cross_entropy_grad"
+  ],
+  "collections": [
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "global_max": "对整个批次求最大值和指数和，而不是逐行计算。",
+    "grad_missing_onehot": "返回 softmax / N，却没有减去 one-hot 目标。",
+    "in_place_shift": "原地减去行最大值，导致调用方的 logits 被修改。",
+    "no_max_shift": "直接对原始 logits 调用 np.exp，大值会溢出为无穷大。",
+    "sum_not_mean": "累加样本损失和梯度，却没有除以 N。"
+  }
+}

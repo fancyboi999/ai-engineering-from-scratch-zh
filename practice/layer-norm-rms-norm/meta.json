@@ -1,0 +1,32 @@
+{
+  "id": "layer-norm-rms-norm",
+  "title": "LayerNorm 与 RMSNorm",
+  "kind": "implement",
+  "summary": "沿最后一个轴计算带 gamma、beta 的 LayerNorm 和带 weight 的 RMSNorm，并在根号内加入 eps。",
+  "difficulty": "easy",
+  "tags": [
+    "layer-norm",
+    "rms-norm",
+    "normalization",
+    "transformers"
+  ],
+  "lesson": "phases/07-transformers-deep-dive/05-full-transformer",
+  "cheatsheet": "transformers-attention",
+  "minutes": 15,
+  "entry": [
+    "layer_norm",
+    "rms_norm"
+  ],
+  "collections": [
+    "transformers-from-scratch",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "ignores_eps_argument": "LayerNorm 将 eps 固定为 1e-5，忽略调用方传入的 eps。",
+    "mean_over_batch_axis": "LayerNorm 沿 axis 0 求均值，而不是沿最后一个轴。",
+    "rms_eps_outside_sqrt": "RMSNorm 在平方根之外加 eps。",
+    "rms_subtracts_mean": "用方差代替均方值计算 RMSNorm 分母，错误引入去均值统计。",
+    "unbiased_variance": "LayerNorm 使用除数为 D - 1 的无偏方差。"
+  }
+}

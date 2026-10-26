@@ -1,0 +1,32 @@
+{
+  "id": "mlp-backprop",
+  "title": "两层 MLP 的反向传播",
+  "kind": "implement",
+  "summary": "为两层 sigmoid 网络实现带缓存的前向传播和对所有权重、偏置的反向传播。",
+  "difficulty": "hard",
+  "tags": [
+    "backpropagation",
+    "gradients",
+    "mlp",
+    "chain-rule"
+  ],
+  "lesson": "phases/03-deep-learning-core/03-backpropagation",
+  "cheatsheet": "neural-net-basics",
+  "minutes": 40,
+  "entry": [
+    "mlp_forward",
+    "mse_loss",
+    "mlp_backward"
+  ],
+  "collections": [
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "divide_by_batch_only": "只除以 N，没有除以 N * n_out，导致多输出时梯度过大。",
+    "extra_activation_factor": "反向传播经过 W2 时额外乘了一次 a1。",
+    "mean_bias_grad": "隐藏层偏置梯度沿批次求均值，而不是求和。",
+    "missing_factor_two": "平方误差求导时漏掉因子 2。",
+    "no_hidden_sigmoid_grad": "漏掉隐藏层 sigmoid 的导数。"
+  }
+}

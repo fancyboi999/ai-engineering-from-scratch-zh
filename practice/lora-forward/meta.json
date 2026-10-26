@@ -1,0 +1,31 @@
+{
+  "id": "lora-forward",
+  "title": "LoRA 线性层",
+  "kind": "implement",
+  "summary": "实现带低秩 adapter 的线性层前向传播、adapter 权重合并和可训练参数计数。",
+  "difficulty": "easy",
+  "tags": [
+    "lora",
+    "fine-tuning",
+    "linear-algebra"
+  ],
+  "lesson": "phases/11-llm-engineering/08-fine-tuning-lora",
+  "cheatsheet": "lora-fine-tuning",
+  "minutes": 15,
+  "entry": [
+    "lora_forward",
+    "merge_lora",
+    "count_trainable"
+  ],
+  "collections": [
+    "llm-inference"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "alpha_not_divided": "adapter 路径只乘 alpha，忘记除以秩。",
+    "count_product": "统计 r * in_features * out_features，即全矩阵乘积的大小，而非 A 和 B 的参数数。",
+    "merge_in_place": "将 adapter 原地加到 W，导致调用方的冻结权重被修改。",
+    "rank_from_w": "从 W 的行数读取秩，而不是从 A 的行数读取。",
+    "rank_over_alpha": "合并时使用 r / alpha，正确缩放因子的倒数。"
+  }
+}

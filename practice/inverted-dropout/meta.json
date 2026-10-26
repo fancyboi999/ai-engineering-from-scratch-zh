@@ -1,0 +1,31 @@
+{
+  "id": "inverted-dropout",
+  "title": "反向缩放 dropout",
+  "kind": "implement",
+  "summary": "使用指定随机数生成器生成准确的训练掩码，前向传播按保留率缩放，反向传播复用掩码，推理时保持输入不变。",
+  "difficulty": "easy",
+  "tags": [
+    "dropout",
+    "regularization",
+    "gradients"
+  ],
+  "lesson": "phases/03-deep-learning-core/07-regularization",
+  "cheatsheet": "deep-learning-training",
+  "minutes": 15,
+  "entry": [
+    "dropout_forward",
+    "dropout_backward"
+  ],
+  "collections": [
+    "deep-learning-core"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "backward_no_scale": "梯度乘以掩码后忘记除以 1 - p。",
+    "eval_draws_from_rng": "推理模式仍从随机数生成器取样，改变了后续随机数序列。",
+    "eval_scales_down": "推理模式也将输入乘以 1 - p，这是非 inverted 形式的做法。",
+    "keep_with_probability_p": "随机数小于 p 时保留元素，掩码方向反了。",
+    "no_scaling": "应用掩码后没有将保留的值除以 1 - p。",
+    "scale_by_p": "将保留值除以 p，而不是 1 - p。"
+  }
+}

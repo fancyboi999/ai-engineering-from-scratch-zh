@@ -1,0 +1,30 @@
+{
+  "id": "sgd-momentum",
+  "title": "带 Momentum 的 SGD",
+  "kind": "implement",
+  "summary": "按课程的速度规则实现 momentum 更新，并通过普通或 Nesterov 前瞻更新最小化二次函数。",
+  "difficulty": "easy",
+  "tags": [
+    "optimizers",
+    "momentum",
+    "gradient-descent"
+  ],
+  "lesson": "phases/03-deep-learning-core/06-optimizers",
+  "cheatsheet": "deep-learning-training",
+  "minutes": 20,
+  "entry": [
+    "momentum_step",
+    "minimize_quadratic"
+  ],
+  "collections": [
+    "optimizers"
+  ],
+  "time_limit_s": 10,
+  "mutants": {
+    "ema_velocity": "将梯度乘以 1 - beta，使速度变成平均值，而不是课程中的梯度和。",
+    "old_velocity_update": "用旧速度更新参数，而不是用新速度。",
+    "lookahead_sign": "在 x + lr * beta * v 处计算 Nesterov 梯度，方向相反。",
+    "grad_sign": "使用 b - A x 作为梯度，导致迭代远离极小值。",
+    "in_place_velocity": "用 *= 和 += 原地更新速度，导致调用方的速度数组被修改。"
+  }
+}

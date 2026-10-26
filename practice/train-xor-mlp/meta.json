@@ -1,0 +1,40 @@
+{
+  "id": "train-xor-mlp",
+  "title": "在噪声 XOR 点上训练 2-4-1 网络",
+  "kind": "train",
+  "summary": "使用全批次梯度下降训练小型 sigmoid 网络，使其在带噪 XOR 留出点上达到至少 95% 准确率。",
+  "difficulty": "easy",
+  "tags": [
+    "mlp",
+    "backpropagation",
+    "gradient-descent",
+    "xor"
+  ],
+  "lesson": "phases/03-deep-learning-core/03-backpropagation",
+  "cheatsheet": "neural-net-basics",
+  "minutes": 30,
+  "entry": [
+    "train",
+    "predict"
+  ],
+  "collections": [
+    "train-tiny-models",
+    "deep-learning-core"
+  ],
+  "time_limit_s": 20,
+  "budget": {
+    "steps": 2000
+  },
+  "target": {
+    "metric": "held-out accuracy",
+    "value": 0.95
+  },
+  "mutants": {
+    "lr_wrong_sign": "输出权重更新时将梯度相加而不是相减，导致损失上升。",
+    "zero_init": "所有权重都从 0 开始，隐藏单元始终相同，网络无法学习 XOR。",
+    "missing_hidden_derivative": "反向传播到隐藏层时漏乘 sigmoid 导数 h * (1 - h)。",
+    "over_budget": "训练 3000 步，超过 2000 步预算。",
+    "global_rng": "从 np.random 而不是 rng 参数生成第一层权重，相同种子也会得到不同结果。",
+    "centers_input_in_place": "用 X -= mean 原地中心化 X，导致调用方输入数组被修改。"
+  }
+}
