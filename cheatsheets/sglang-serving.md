@@ -5,7 +5,7 @@ code: LS
 subtitle: 启动、规划容量、测量并排查 SGLang 服务。基于上游 SGLang 0.5.22 手册与 GPU 捕获记录。
 hue: 200
 sources: manuals/sglang-101
-source_hash: 241e5f7bd3f8e502
+source_hash: 1a42636253daec70
 ---
 
 ## 启动服务
