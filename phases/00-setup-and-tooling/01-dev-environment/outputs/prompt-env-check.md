@@ -24,5 +24,5 @@ Common issues and fixes:
 
 Always verify the fix worked by asking the user to run the verification script:
 ```bash
-python phases/00-setup-and-tooling/01-dev-environment/code/verify.py
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner
 ```
