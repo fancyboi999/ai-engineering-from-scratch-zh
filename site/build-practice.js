@@ -430,7 +430,7 @@ function problemMain(problem, built, assets) {
   const tracks = built.tracks.filter(track => meta.collections.includes(track.id));
   const checks = LAYERS.map(layer => problem.checks[layer]).reduce((sum, count) => sum + count, 0);
   const crumbs = `<nav class="pr-crumbs" aria-label="面包屑"><ol><li><a href="${BASE}">练习</a></li><li><a href="/phase/${phase.slug}">阶段 ${String(phase.number).padStart(2, '0')}</a></li><li aria-current="page">${escapeHtml(meta.title)}</li></ol></nav>`;
-  const tags = meta.tags.map(tag => `<a class="pr-tag" href="${BASE}?tag=${encodeURIComponent(tag)}">${escapeHtml(tag)}</a>`).join('');
+  const tags = meta.tags.map(tag => `<a class="pr-tag" href="${BASE}?tag=${encodeURIComponent(tag)}">${escapeHtml(TAG_LABELS[tag] || tag)}</a>`).join('');
   const links = [`<a href="${lessonHref(meta.lesson)}">课程：${escapeHtml(problem.lessonTitle)}</a>`];
   if (meta.cheatsheet) links.push(`<a href="/cheatsheets/${meta.cheatsheet}">速查表</a>`);
   for (const track of tracks) links.push(`<a href="${track.href}">路径：${escapeHtml(track.title)}</a>`);
