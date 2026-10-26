@@ -16,31 +16,31 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Scaffolding moves the score more than the base model</text>
+  <text x="440" y="26" text-anchor="middle" class="title">运行框架对分数的影响大于基础模型</text>
 
   <rect x="40" y="50" width="800" height="440" class="box"/>
 
   <!-- Base model -->
   <rect x="80" y="80" width="160" height="70" class="cool"/>
-  <text x="160" y="104" text-anchor="middle" class="label">base model</text>
+  <text x="160" y="104" text-anchor="middle" class="label">基础模型</text>
   <text x="160" y="124" text-anchor="middle" class="small">Claude Sonnet 4.5</text>
-  <text x="160" y="140" text-anchor="middle" class="small">(fixed weights)</text>
+  <text x="160" y="140" text-anchor="middle" class="small">（固定权重）</text>
 
   <!-- Two scaffolds -->
   <rect x="290" y="80" width="160" height="70" class="hot"/>
   <text x="370" y="104" text-anchor="middle" class="label">SWE-agent v1</text>
-  <text x="370" y="124" text-anchor="middle" class="small">ACI command set</text>
-  <text x="370" y="140" text-anchor="middle" class="small">JSON tool calls</text>
+  <text x="370" y="124" text-anchor="middle" class="small">ACI 命令集</text>
+  <text x="370" y="140" text-anchor="middle" class="small">JSON 工具调用</text>
 
   <rect x="500" y="80" width="160" height="70" class="cold"/>
-  <text x="580" y="104" text-anchor="middle" class="label">Cline autonomous</text>
-  <text x="580" y="124" text-anchor="middle" class="small">VS Code + policy</text>
-  <text x="580" y="140" text-anchor="middle" class="small">verifier loop</text>
+  <text x="580" y="104" text-anchor="middle" class="label">Cline 自主模式</text>
+  <text x="580" y="124" text-anchor="middle" class="small">VS Code + 策略</text>
+  <text x="580" y="140" text-anchor="middle" class="small">验证器循环</text>
 
   <rect x="700" y="80" width="140" height="70" class="box"/>
   <text x="770" y="104" text-anchor="middle" class="label">SWE-bench Verified</text>
-  <text x="770" y="124" text-anchor="middle" class="small">500 curated tasks</text>
-  <text x="770" y="140" text-anchor="middle" class="small">(same tasks)</text>
+  <text x="770" y="124" text-anchor="middle" class="small">500 个精选任务</text>
+  <text x="770" y="140" text-anchor="middle" class="small">（相同任务）</text>
 
   <path d="M240 115 L290 115" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <path d="M240 115 Q265 200 290 115" stroke="#1a1a1a" stroke-width="1.5" fill="none"/>
@@ -49,28 +49,28 @@
 
   <!-- Score delta -->
   <rect x="80" y="180" width="580" height="80" class="box"/>
-  <text x="100" y="202" class="label">the score delta</text>
-  <text x="100" y="226" class="content">same model: SWE-agent v1  43.2%    |    Cline autonomous  59.8%</text>
-  <text x="100" y="244" class="content">+16.6 absolute points from scaffolding alone. (OpenHands, Epoch AI 2026)</text>
+  <text x="100" y="202" class="label">分数差异</text>
+  <text x="100" y="226" class="content">相同模型：SWE-agent v1 43.2% | Cline 自主模式 59.8%</text>
+  <text x="100" y="244" class="content">仅运行框架就带来 +16.6 个绝对百分点。（OpenHands、Epoch AI 2026）</text>
 
   <!-- CodeAct vs JSON -->
   <rect x="80" y="290" width="360" height="160" class="hot"/>
-  <text x="260" y="312" text-anchor="middle" class="label">CodeAct scaffold (OpenHands)</text>
-  <text x="100" y="334" class="content">+ composable: one action edits many files</text>
-  <text x="100" y="350" class="content">+ catches exceptions inside an action</text>
-  <text x="100" y="366" class="content">- larger per-action blast radius</text>
-  <text x="100" y="382" class="content">- requires hardened sandbox (Docker)</text>
-  <text x="100" y="402" class="content">use when: agent is inside an isolated container</text>
-  <text x="100" y="418" class="content">         and composability is worth the audit cost</text>
-  <text x="100" y="434" class="small">arXiv:2407.16741 · MIT license · most active open platform</text>
+  <text x="260" y="312" text-anchor="middle" class="label">CodeAct 运行框架（OpenHands）</text>
+  <text x="100" y="334" class="content">+ 可组合：一次操作修改多个文件</text>
+  <text x="100" y="350" class="content">+ 在操作内捕获异常</text>
+  <text x="100" y="366" class="content">- 单次操作的影响范围更大</text>
+  <text x="100" y="382" class="content">- 需要加固沙箱（Docker）</text>
+  <text x="100" y="402" class="content">适用于：agent 在隔离容器中运行</text>
+  <text x="100" y="418" class="content">         且可组合性值得额外审计成本</text>
+  <text x="100" y="434" class="small">arXiv:2407.16741 · MIT 许可 · 最活跃的开放平台</text>
 
   <rect x="460" y="290" width="360" height="160" class="cold"/>
-  <text x="640" y="312" text-anchor="middle" class="label">JSON tool-call scaffold</text>
-  <text x="480" y="334" class="content">+ every action goes through a validator</text>
-  <text x="480" y="350" class="content">+ easy to audit turn-by-turn</text>
-  <text x="480" y="366" class="content">- one action per turn; more turns for same task</text>
-  <text x="480" y="382" class="content">- compositionality lives in the orchestrator</text>
-  <text x="480" y="402" class="content">use when: provider controls the executor</text>
+  <text x="640" y="312" text-anchor="middle" class="label">JSON 工具调用运行框架</text>
+  <text x="480" y="334" class="content">+ 每次操作均经过验证器</text>
+  <text x="480" y="350" class="content">+ 便于逐轮审计</text>
+  <text x="480" y="366" class="content">- 每轮一次操作；相同任务需要更多轮次</text>
+  <text x="480" y="382" class="content">- 可组合性由编排器实现</text>
+  <text x="480" y="402" class="content">适用于：提供方控制执行器</text>
   <text x="480" y="418" class="content">         (Claude Managed Agents, OpenAI Assistants)</text>
-  <text x="480" y="434" class="small">dominant in managed services, where safety is by construction</text>
+  <text x="480" y="434" class="small">常见于托管服务，按设计保证安全</text>
 </svg>

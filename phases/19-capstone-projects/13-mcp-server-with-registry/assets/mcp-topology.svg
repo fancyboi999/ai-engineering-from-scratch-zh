@@ -14,25 +14,25 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">MCP 2026-07-28: stateless requests + policy + registry</text>
+  <text x="480" y="24" text-anchor="middle" class="title">MCP 2026-07-28：无状态请求 + 策略 + 注册表</text>
 
   <rect x="40" y="50" width="260" height="80" class="cool"/>
-  <text x="170" y="72" text-anchor="middle" class="head">MCP clients</text>
-  <text x="170" y="94" text-anchor="middle" class="small">version + capabilities</text>
-  <text x="170" y="112" text-anchor="middle" class="small">on every request</text>
+  <text x="170" y="72" text-anchor="middle" class="head">MCP 客户端</text>
+  <text x="170" y="94" text-anchor="middle" class="small">版本 + 能力</text>
+  <text x="170" y="112" text-anchor="middle" class="small">每个请求均携带</text>
 
   <rect x="340" y="50" width="260" height="80" class="dsk"/>
   <text x="470" y="72" text-anchor="middle" class="head">Streamable HTTP</text>
-  <text x="470" y="94" text-anchor="middle" class="small">one POST per JSON-RPC message</text>
-  <text x="470" y="112" text-anchor="middle" class="small">no protocol session</text>
+  <text x="470" y="94" text-anchor="middle" class="small">每条 JSON-RPC 消息一个 POST</text>
+  <text x="470" y="112" text-anchor="middle" class="small">无协议会话</text>
 
   <rect x="640" y="50" width="280" height="80" class="cold"/>
-  <text x="780" y="72" text-anchor="middle" class="head">OAuth 2.1 scopes</text>
-  <text x="780" y="94" text-anchor="middle" class="small">issuer + audience + expiry</text>
-  <text x="780" y="112" text-anchor="middle" class="small">scope checked per tool call</text>
+  <text x="780" y="72" text-anchor="middle" class="head">OAuth 2.1 权限范围</text>
+  <text x="780" y="94" text-anchor="middle" class="small">签发者 + 受众 + 到期时间</text>
+  <text x="780" y="112" text-anchor="middle" class="small">每次工具调用均校验权限范围</text>
 
   <rect x="40" y="160" width="560" height="200" class="box"/>
-  <text x="320" y="182" text-anchor="middle" class="head">read-only MCP replicas</text>
+  <text x="320" y="182" text-anchor="middle" class="head">只读 MCP 副本</text>
   <rect x="60" y="200" width="170" height="40" class="cool"/>
   <text x="145" y="220" text-anchor="middle" class="step">postgres.readonly</text>
   <text x="145" y="234" text-anchor="middle" class="small">scope: postgres:query:readonly</text>
@@ -45,38 +45,38 @@
 
   <rect x="60" y="252" width="530" height="40" class="cool"/>
   <text x="325" y="272" text-anchor="middle" class="step">linear / datadog / pagerduty / github / notion / slack / salesforce</text>
-  <text x="325" y="286" text-anchor="middle" class="small">10 internal tools total</text>
+  <text x="325" y="286" text-anchor="middle" class="small">共 10 个内部工具</text>
 
   <rect x="60" y="304" width="530" height="44" class="dsk"/>
-  <text x="325" y="326" text-anchor="middle" class="step">OPA policy decision (per call)</text>
-  <text x="325" y="342" text-anchor="middle" class="small">Rego: allowed scopes + PII redact + payload caps</text>
+  <text x="325" y="326" text-anchor="middle" class="step">OPA 策略决策（每次调用）</text>
+  <text x="325" y="342" text-anchor="middle" class="small">Rego：允许的权限范围 + PII 清除 + 载荷上限</text>
 
   <rect x="640" y="160" width="280" height="200" class="box"/>
-  <text x="780" y="182" text-anchor="middle" class="head">destructive MCP server</text>
+  <text x="780" y="182" text-anchor="middle" class="head">具有破坏性操作的 MCP 服务器</text>
   <rect x="660" y="200" width="240" height="44" class="hot"/>
   <text x="780" y="220" text-anchor="middle" class="step">jira.create / linear.create</text>
-  <text x="780" y="234" text-anchor="middle" class="small">write scope + separate approval</text>
+  <text x="780" y="234" text-anchor="middle" class="small">写入权限范围 + 单独审批</text>
   <rect x="660" y="254" width="240" height="44" class="hot"/>
   <text x="780" y="274" text-anchor="middle" class="step">postgres.write</text>
-  <text x="780" y="288" text-anchor="middle" class="small">action-bound approval required</text>
+  <text x="780" y="288" text-anchor="middle" class="small">需要与具体操作绑定的审批</text>
 
   <rect x="660" y="310" width="240" height="40" class="dsk"/>
-  <text x="780" y="330" text-anchor="middle" class="step">approval record</text>
-  <text x="780" y="344" text-anchor="middle" class="small">actor + tool + args + target + expiry</text>
+  <text x="780" y="330" text-anchor="middle" class="step">审批记录</text>
+  <text x="780" y="344" text-anchor="middle" class="small">执行者 + 工具 + 参数 + 目标 + 到期时间</text>
 
   <rect x="40" y="380" width="420" height="130" class="box"/>
-  <text x="250" y="402" text-anchor="middle" class="head">registry service</text>
-  <text x="250" y="422" text-anchor="middle" class="small">publishes and indexes server.json</text>
-  <text x="250" y="440" text-anchor="middle" class="small">validates Registry schema</text>
-  <text x="250" y="458" text-anchor="middle" class="small">probes live server/discover</text>
-  <text x="250" y="476" text-anchor="middle" class="small">reports metadata/runtime drift</text>
-  <text x="250" y="498" text-anchor="middle" class="caption">Registry and MCP versions are separate</text>
+  <text x="250" y="402" text-anchor="middle" class="head">注册表服务</text>
+  <text x="250" y="422" text-anchor="middle" class="small">发布并索引 server.json</text>
+  <text x="250" y="440" text-anchor="middle" class="small">校验注册表结构</text>
+  <text x="250" y="458" text-anchor="middle" class="small">探测在线 server/discover</text>
+  <text x="250" y="476" text-anchor="middle" class="small">报告元数据与运行时的偏差</text>
+  <text x="250" y="498" text-anchor="middle" class="caption">注册表版本与 MCP 版本相互独立</text>
 
   <rect x="500" y="380" width="420" height="130" class="box"/>
-  <text x="710" y="402" text-anchor="middle" class="head">audit + load</text>
-  <text x="710" y="422" text-anchor="middle" class="small">per-tenant JSONL audit log</text>
-  <text x="710" y="440" text-anchor="middle" class="small">Presidio PII redaction before write</text>
-  <text x="710" y="458" text-anchor="middle" class="small">load test: 100 concurrent clients</text>
-  <text x="710" y="476" text-anchor="middle" class="small">two replicas without affinity</text>
-  <text x="710" y="498" text-anchor="middle" class="caption">receiver-side wire evidence</text>
+  <text x="710" y="402" text-anchor="middle" class="head">审计 + 负载</text>
+  <text x="710" y="422" text-anchor="middle" class="small">按租户记录 JSONL 审计日志</text>
+  <text x="710" y="440" text-anchor="middle" class="small">写入前由 Presidio 清除 PII</text>
+  <text x="710" y="458" text-anchor="middle" class="small">负载测试：100 个并发客户端</text>
+  <text x="710" y="476" text-anchor="middle" class="small">两个无会话亲和性的副本</text>
+  <text x="710" y="498" text-anchor="middle" class="caption">接收方线协议证据</text>
 </svg>

@@ -13,48 +13,48 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Agent failure modes — taxonomy, recurring five, mitigation</text>
+  <text x="480" y="26" text-anchor="middle" class="title">agent 失败模式：分类、五种常见模式、缓解</text>
 
   <rect x="40" y="50" width="440" height="250" class="tax"/>
-  <text x="260" y="72" text-anchor="middle" class="head">taxonomies 2024-2026</text>
+  <text x="260" y="72" text-anchor="middle" class="head">2024-2026 年分类体系</text>
   <rect x="60" y="88" width="400" height="46" class="box"/>
-  <text x="78" y="108" class="step">MASFT (Berkeley 2025)  14 modes, 3 categories</text>
-  <text x="78" y="124" class="small">Cohen's Kappa 0.88 on annotation  reliably distinct</text>
+  <text x="78" y="108" class="step">MASFT（Berkeley 2025）：14 种模式、3 个类别</text>
+  <text x="78" y="124" class="small">标注 Cohen's Kappa 为 0.88，各类可可靠区分</text>
   <rect x="60" y="140" width="400" height="46" class="box"/>
-  <text x="78" y="160" class="step">Microsoft Taxonomy  autonomy amplifies AI failures</text>
-  <text x="78" y="176" class="small">bias, hallucination, leakage worse when agent has tools</text>
+  <text x="78" y="160" class="step">Microsoft 分类体系：自主性放大 AI 失败</text>
+  <text x="78" y="176" class="small">agent 具备工具后，偏见、幻觉、泄漏更严重</text>
   <rect x="60" y="192" width="400" height="46" class="box"/>
   <text x="78" y="212" class="step">Characterizing Faults in Agentic AI</text>
-  <text x="78" y="228" class="small">orchestration + state evolution + env interaction</text>
+  <text x="78" y="228" class="small">编排 + 状态演变 + 环境交互</text>
   <rect x="60" y="244" width="400" height="46" class="box"/>
-  <text x="78" y="264" class="step">Hallucinations Survey (arXiv:2509.18970)</text>
-  <text x="78" y="280" class="small">Instruction deviation + Long-range context misuse</text>
+  <text x="78" y="264" class="step">幻觉综述（arXiv:2509.18970）</text>
+  <text x="78" y="280" class="small">偏离指令 + 长程上下文误用</text>
 
   <rect x="500" y="50" width="420" height="250" class="mode"/>
-  <text x="710" y="72" text-anchor="middle" class="head">five industry-recurring modes</text>
+  <text x="710" y="72" text-anchor="middle" class="head">业界反复出现的五种模式</text>
   <rect x="520" y="88" width="380" height="36" class="box"/>
-  <text x="538" y="110" class="step">1. hallucinated actions  fake tool, fabricated args</text>
+  <text x="538" y="110" class="step">1. 幻觉操作：虚构工具、编造参数</text>
   <rect x="520" y="128" width="380" height="36" class="box"/>
-  <text x="538" y="150" class="step">2. scope creep  extra PRs, extra emails, extra writes</text>
+  <text x="538" y="150" class="step">2. 范围蔓延：额外 PR、邮件与写入</text>
   <rect x="520" y="168" width="380" height="36" class="box"/>
-  <text x="538" y="190" class="step">3. cascading errors  one mistake, N downstream ops</text>
+  <text x="538" y="190" class="step">3. 级联错误：一次错误、N 项下游操作</text>
   <rect x="520" y="208" width="380" height="36" class="box"/>
-  <text x="538" y="230" class="step">4. context loss  forgets early-turn constraints</text>
+  <text x="538" y="230" class="step">4. 上下文丢失：忘记前几轮约束</text>
   <rect x="520" y="248" width="380" height="36" class="box"/>
-  <text x="538" y="270" class="step">5. tool misuse  wrong args, wrong tool</text>
+  <text x="538" y="270" class="step">5. 工具误用：错误参数、错误工具</text>
 
   <rect x="40" y="320" width="880" height="190" class="mit"/>
-  <text x="480" y="342" text-anchor="middle" class="head">mitigation  gates at every step</text>
+  <text x="480" y="342" text-anchor="middle" class="head">缓解：每步设置关卡</text>
   <rect x="60" y="358" width="840" height="30" class="box"/>
-  <text x="78" y="378" class="step">per-step safety classifier (Lesson 21)</text>
+  <text x="78" y="378" class="step">逐步安全分类器（第 21 课）</text>
   <rect x="60" y="392" width="840" height="30" class="box"/>
-  <text x="78" y="412" class="step">tool-call argument validation (Lesson 06)</text>
+  <text x="78" y="412" class="step">工具调用参数校验（第 06 课）</text>
   <rect x="60" y="426" width="840" height="30" class="box"/>
-  <text x="78" y="446" class="step">CRITIC-style external grounding of claims (Lesson 05)</text>
+  <text x="78" y="446" class="step">CRITIC 式外部依据校验（第 05 课）</text>
   <rect x="60" y="460" width="840" height="30" class="box"/>
-  <text x="78" y="480" class="step">state re-probe to catch success hallucination ("was the file actually created?")</text>
+  <text x="78" y="480" class="step">重新探测状态，发现成功幻觉（“文件是否真的创建了？”）</text>
   <rect x="60" y="494" width="840" height="14" class="box"/>
-  <text x="78" y="506" class="step">Phoenix trace clustering for drift detection in production</text>
+  <text x="78" y="506" class="step">Phoenix trace 聚类检测生产漂移</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">cascading is the killer — one phantom SKU  4 API calls  multi-system incident.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">级联是致命问题：一个虚构 SKU、4 次 API 调用，即可引发跨系统事故。</text>
 </svg>

@@ -624,7 +624,15 @@ function buildFigureProviderManifest(
   if (unresolved.length) {
     throw new Error(`Figure IDs have no provider: ${unresolved.join(', ')}`);
   }
-  return { providerOrder: resolvedProviderOrder, providerVersions, providersByFigure, figureDependencies };
+  const localeSources = {};
+  for (const provider of ['lesson-figures.js', ...resolvedProviderOrder]) {
+    const relative = `figure-locales/${provider}`;
+    const filename = path.join(siteDir, relative);
+    if (fs.existsSync(filename)) localeSources[provider] = `${relative}?v=${assetVersion(fs.readFileSync(filename, 'utf8'))}`;
+  }
+  const overlayPath = path.join(siteDir, 'figures-i18n-zh.js');
+  const localeVersion = fs.existsSync(overlayPath) ? assetVersion(fs.readFileSync(overlayPath, 'utf8')) : '';
+  return { providerOrder: resolvedProviderOrder, providerVersions, providersByFigure, figureDependencies, localeSources, localeVersion };
 }
 
 function syncFigureAssetVersions(siteDir, manifestSource) {
@@ -636,6 +644,8 @@ function syncFigureAssetVersions(siteDir, manifestSource) {
     'lesson-figures.js': assetVersion(fs.readFileSync(runtimePath, 'utf8')),
     'figure-manifest.js': assetVersion(manifestSource),
   };
+  const loaderPath = path.join(siteDir, 'figures-manifest.js');
+  if (fs.existsSync(loaderPath)) versions['figures-manifest.js'] = assetVersion(fs.readFileSync(loaderPath, 'utf8'));
   let html = fs.readFileSync(lessonPath, 'utf8');
   for (const [file, version] of Object.entries(versions)) {
     const reference = new RegExp(`(<script src="${escapeRegExp(file)})(?:\\?v=[^"]*)?("></script>)`);
@@ -651,7 +661,9 @@ function serializeFigureProviderManifest(manifest) {
     `window.AIFS_FIGURE_PROVIDER_ORDER = ${JSON.stringify(manifest.providerOrder, null, 2)};\n` +
     `window.AIFS_FIGURE_PROVIDER_VERSIONS = ${JSON.stringify(manifest.providerVersions, null, 2)};\n` +
     `window.AIFS_FIGURE_PROVIDERS = ${JSON.stringify(manifest.providersByFigure, null, 2)};\n` +
-    `window.AIFS_FIGURE_DEPENDENCIES = ${JSON.stringify(manifest.figureDependencies, null, 2)};\n`;
+    `window.AIFS_FIGURE_DEPENDENCIES = ${JSON.stringify(manifest.figureDependencies, null, 2)};\n` +
+    `window.AIFS_FIGURE_LOCALE_SOURCES = ${JSON.stringify(manifest.localeSources || {}, null, 2)};\n` +
+    `window.AIFS_FIGURE_I18N_VERSION = ${JSON.stringify(manifest.localeVersion || '')};\n`;
 }
 
 function writeFigureManifest(repoRoot = REPO_ROOT, siteDir = __dirname) {
@@ -1062,7 +1074,7 @@ function renderCatalogDiscovery(phases, lessonManifest) {
         grouped = true;
         rows.push(`<tr class="catalog-group-row" data-generated-discovery="phase"><th colspan="6" scope="rowgroup"><a href="${require('../lib/hub-routes').phaseHubPath(relPath)}">阶段 ${phase.id}：${htmlEscape(phase.name)}</a></th></tr>`);
       }
-      rows.push(`<tr data-generated-discovery="lesson"><td></td><td>${htmlEscape(lessonNumber(phase.id, lesson.url, index + 1).label)}</td><td><a href="${htmlEscape(lessonHref(relPath))}">${htmlEscape(seo.title)}</a></td><td>${htmlEscape(lesson.type || '')}</td><td>${htmlEscape(lesson.lang || '')}</td><td>${htmlEscape(lesson.status || '')}</td></tr>`);
+      rows.push(`<tr data-generated-discovery="lesson"><td></td><td>${htmlEscape(lessonNumber(phase.id, lesson.url, index + 1).label)}</td><td><a href="${htmlEscape(lessonHref(relPath))}">${htmlEscape(seo.title)}</a></td><td>${htmlEscape(({ Build: '构建', Learn: '学习', Capstone: '顶点项目', Reference: '参考' })[lesson.type] || lesson.type || '')}</td><td>${htmlEscape(lesson.lang || '')}</td><td>${htmlEscape(({ complete: '内容完整', 'in-progress': '翻译中', planned: '待翻译' })[lesson.status] || lesson.status || '')}</td></tr>`);
     });
   }
   return rows.join('\n');
@@ -2049,7 +2061,7 @@ function withCard(html, type, id, spec) {
 }
 
 function versionSharedAssets(html) {
-  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|figures-manifest|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
     .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2');

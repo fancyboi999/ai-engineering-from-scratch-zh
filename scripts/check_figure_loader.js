@@ -332,6 +332,32 @@ async function main() {
   ], 'a later mount must retry a previously failed module without reloading i18n');
   assert.equal(retry.mounts.length, 2);
 
+  const localized = createLoader();
+  localized.window.AIFS_FIGURE_PROVIDERS = { 'few-shot-curve': ['figures-llmeng.js'] };
+  localized.window.AIFS_FIGURE_LOCALE_SOURCES = {
+    'lesson-figures.js': 'figure-locales/lesson-figures.js?v=base-hash',
+    'figures-llmeng.js': 'figure-locales/figures-llmeng.js?v=locale-hash',
+    'figures-alignment3.js': 'figure-locales/figures-alignment3.js?v=unrelated',
+  };
+  localized.window.AIFS_FIGURE_I18N_VERSION = 'overlay-hash';
+  await localized.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
+  assert.deepEqual(localized.requests, [
+    'https://course.example/figures-llmeng.js?v=20260801a',
+    'https://course.example/figure-locales/lesson-figures.js?v=base-hash',
+    'https://course.example/figure-locales/figures-llmeng.js?v=locale-hash',
+    'https://course.example/figures-i18n-zh.js?v=overlay-hash',
+  ], 'load only the active provider locales before the versioned overlay');
+  await localized.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
+  assert.equal(localized.requests.length, 4, 'locale scripts share the existing load cache');
+
+  const localeRetry = createLoader('figure-locales/figures-llmeng.js', 1);
+  localeRetry.window.AIFS_FIGURE_PROVIDERS = localized.window.AIFS_FIGURE_PROVIDERS;
+  localeRetry.window.AIFS_FIGURE_LOCALE_SOURCES = localized.window.AIFS_FIGURE_LOCALE_SOURCES;
+  await localeRetry.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
+  await localeRetry.window.AIFS_mountLessonFigures(scope(['few-shot-curve']));
+  assert.equal(localeRetry.requests.filter(url => url.includes('figure-locales/figures-llmeng.js')).length, 2,
+    'a transient locale failure must be retried without blocking the lesson');
+
   console.log('figure loader audit passed: ' + names.length + ' lazy figures across ' + byModule.size +
     ' modules; ' + fenceNames.length + '/' + fenceNames.length + ' core fences and 33/33 certification fences covered');
 }

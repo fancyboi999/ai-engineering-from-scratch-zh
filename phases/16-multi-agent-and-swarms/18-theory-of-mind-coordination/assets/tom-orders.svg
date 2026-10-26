@@ -15,46 +15,46 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">Theory of Mind orders and the coordination illusion</text>
+  <text x="480" y="28" text-anchor="middle" class="title">心智理论阶数与协调幻觉</text>
 
   <rect x="40" y="60" width="280" height="200" class="hot"/>
-  <text x="180" y="84" text-anchor="middle" class="head">zeroth-order</text>
-  <text x="180" y="108" text-anchor="middle" class="step">no model of others</text>
-  <text x="180" y="138" text-anchor="middle" class="small">agent acts on own observations only</text>
-  <text x="180" y="156" text-anchor="middle" class="small">collides with other agents</text>
-  <text x="180" y="174" text-anchor="middle" class="small">duplicates effort on shared resources</text>
-  <text x="180" y="206" text-anchor="middle" class="caption">measured: ~0.96 collisions / trial</text>
-  <text x="180" y="224" text-anchor="middle" class="caption">(3 agents, 3 boxes, no ToM)</text>
+  <text x="180" y="84" text-anchor="middle" class="head">零阶</text>
+  <text x="180" y="108" text-anchor="middle" class="step">不为他人建模</text>
+  <text x="180" y="138" text-anchor="middle" class="small">agent 仅根据自身观察行动</text>
+  <text x="180" y="156" text-anchor="middle" class="small">与其他 agent 冲突</text>
+  <text x="180" y="174" text-anchor="middle" class="small">在共享资源上重复工作</text>
+  <text x="180" y="206" text-anchor="middle" class="caption">实测：每次试验约 0.96 次冲突</text>
+  <text x="180" y="224" text-anchor="middle" class="caption">（3 个 agent，3 个箱子，无心智理论）</text>
 
   <rect x="340" y="60" width="280" height="200" class="cool"/>
-  <text x="480" y="84" text-anchor="middle" class="head">first-order</text>
-  <text x="480" y="108" text-anchor="middle" class="step">"A believes X"</text>
-  <text x="480" y="138" text-anchor="middle" class="small">agent tracks each other's beliefs</text>
-  <text x="480" y="156" text-anchor="middle" class="small">predicts action from modeled beliefs</text>
-  <text x="480" y="174" text-anchor="middle" class="small">avoids redundancy + anticipates need</text>
-  <text x="480" y="206" text-anchor="middle" class="caption">measured: ~0.00 collisions / trial</text>
-  <text x="480" y="224" text-anchor="middle" class="caption">(with preference prime)</text>
+  <text x="480" y="84" text-anchor="middle" class="head">一阶</text>
+  <text x="480" y="108" text-anchor="middle" class="step">“A 相信 X”</text>
+  <text x="480" y="138" text-anchor="middle" class="small">agent 跟踪彼此的信念</text>
+  <text x="480" y="156" text-anchor="middle" class="small">根据所建模的信念预测行动</text>
+  <text x="480" y="174" text-anchor="middle" class="small">避免重复 + 预判需求</text>
+  <text x="480" y="206" text-anchor="middle" class="caption">实测：每次试验约 0.00 次冲突</text>
+  <text x="480" y="224" text-anchor="middle" class="caption">（提供偏好提示时）</text>
 
   <rect x="640" y="60" width="280" height="200" class="cold"/>
-  <text x="780" y="84" text-anchor="middle" class="head">second-order</text>
-  <text x="780" y="108" text-anchor="middle" class="step">"A believes B believes X"</text>
-  <text x="780" y="138" text-anchor="middle" class="small">recursive belief modeling</text>
-  <text x="780" y="156" text-anchor="middle" class="small">emerges in cooperative games</text>
-  <text x="780" y="174" text-anchor="middle" class="small">degrades on long horizons</text>
-  <text x="780" y="206" text-anchor="middle" class="caption">Li et al. 2023 context failure mode:</text>
-  <text x="780" y="224" text-anchor="middle" class="caption">identity-belief binding drops over turns</text>
+  <text x="780" y="84" text-anchor="middle" class="head">二阶</text>
+  <text x="780" y="108" text-anchor="middle" class="step">“A 相信 B 相信 X”</text>
+  <text x="780" y="138" text-anchor="middle" class="small">递归信念建模</text>
+  <text x="780" y="156" text-anchor="middle" class="small">在合作博弈中涌现</text>
+  <text x="780" y="174" text-anchor="middle" class="small">在长时间范围下退化</text>
+  <text x="780" y="206" text-anchor="middle" class="caption">Li 等人 2023 年的上下文故障模式：</text>
+  <text x="780" y="224" text-anchor="middle" class="caption">身份与信念的绑定随轮次增加而丢失</text>
 
   <rect x="40" y="290" width="880" height="200" class="box"/>
-  <text x="480" y="314" text-anchor="middle" class="head">the coordination illusion (Riedl 2025, arXiv:2510.05174)</text>
-  <text x="70" y="346" class="step">claim</text>
-  <text x="140" y="346" class="small">"our agents coordinate emergently"</text>
-  <text x="70" y="372" class="step">failure</text>
-  <text x="140" y="372" class="small">coordination is prompt-dressed; strip "work together" from system prompt, effect vanishes</text>
-  <text x="70" y="398" class="step">audit</text>
-  <text x="140" y="398" class="small">require control condition, statistical test, complementarity metric, capacity-check</text>
-  <text x="70" y="424" class="step">real</text>
-  <text x="140" y="424" class="small">identity-linked differentiation + goal-directed complementarity + higher-order synergy</text>
-  <text x="70" y="450" class="step">only</text>
-  <text x="140" y="450" class="small">the ToM-prompted condition produces all three above chance in Riedl's population experiment</text>
-  <text x="70" y="476" class="caption">larger models show some coordination without ToM prompting, but the effect is smaller</text>
+  <text x="480" y="314" text-anchor="middle" class="head">协调幻觉（Riedl 2025，arXiv:2510.05174）</text>
+  <text x="70" y="346" class="step">主张</text>
+  <text x="140" y="346" class="small">“我们的 agent 会涌现出协调行为”</text>
+  <text x="70" y="372" class="step">失效</text>
+  <text x="140" y="372" class="small">协调只由 prompt 包装而成；删去系统 prompt 中的“共同工作”，效果就消失</text>
+  <text x="70" y="398" class="step">审计</text>
+  <text x="140" y="398" class="small">要求对照条件、统计检验、互补性指标、能力检查</text>
+  <text x="70" y="424" class="step">真实协调</text>
+  <text x="140" y="424" class="small">身份关联的差异化 + 目标导向互补性 + 高阶协同</text>
+  <text x="70" y="450" class="step">仅有</text>
+  <text x="140" y="450" class="small">使用心智理论提示的条件，才在 Riedl 群体实验中使上述三项超越随机水平</text>
+  <text x="70" y="476" class="caption">较大模型无需心智理论提示也有部分协调，但效果更小</text>
 </svg>

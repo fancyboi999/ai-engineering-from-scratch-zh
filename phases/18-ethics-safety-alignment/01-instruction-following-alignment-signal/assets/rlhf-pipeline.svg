@@ -17,57 +17,57 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">InstructGPT three-stage alignment pipeline</text>
+  <text x="480" y="24" text-anchor="middle" class="title">InstructGPT 三阶段对齐流水线</text>
 
   <rect x="40" y="60" width="260" height="260" class="box"/>
-  <text x="170" y="82" text-anchor="middle" class="head">Stage 1 — SFT</text>
+  <text x="170" y="82" text-anchor="middle" class="head">阶段 1：SFT</text>
 
   <rect x="60" y="100" width="220" height="60" class="cool"/>
-  <text x="170" y="125" text-anchor="middle" class="step">prompts + demos (13k)</text>
-  <text x="170" y="145" text-anchor="middle" class="small">labeler-written responses</text>
+  <text x="170" y="125" text-anchor="middle" class="step">prompt + 示范（13k）</text>
+  <text x="170" y="145" text-anchor="middle" class="small">标注者撰写的回答</text>
 
   <rect x="60" y="180" width="220" height="60" class="cool"/>
-  <text x="170" y="205" text-anchor="middle" class="step">cross-entropy fine-tune</text>
+  <text x="170" y="205" text-anchor="middle" class="step">交叉熵微调</text>
   <text x="170" y="225" text-anchor="middle" class="small">pi_SFT(y | x)</text>
 
-  <text x="170" y="285" text-anchor="middle" class="caption">now the model answers,</text>
-  <text x="170" y="301" text-anchor="middle" class="caption">but cannot rank answers.</text>
+  <text x="170" y="285" text-anchor="middle" class="caption">模型现在能够回答，</text>
+  <text x="170" y="301" text-anchor="middle" class="caption">但不能给回答排序。</text>
 
   <rect x="350" y="60" width="260" height="260" class="box"/>
-  <text x="480" y="82" text-anchor="middle" class="head">Stage 2 — Reward model</text>
+  <text x="480" y="82" text-anchor="middle" class="head">阶段 2：奖励模型</text>
 
   <rect x="370" y="100" width="220" height="60" class="cold"/>
-  <text x="480" y="125" text-anchor="middle" class="step">K completions per prompt</text>
-  <text x="480" y="145" text-anchor="middle" class="small">labeler ranks pairs</text>
+  <text x="480" y="125" text-anchor="middle" class="step">每个 prompt 生成 K 个回答</text>
+  <text x="480" y="145" text-anchor="middle" class="small">标注者对回答对排序</text>
 
   <rect x="370" y="180" width="220" height="60" class="cold"/>
-  <text x="480" y="202" text-anchor="middle" class="step">Bradley-Terry fit</text>
+  <text x="480" y="202" text-anchor="middle" class="step">Bradley-Terry 拟合</text>
   <text x="480" y="222" text-anchor="middle" class="small">-log sig(r_w - r_l)</text>
 
-  <text x="480" y="285" text-anchor="middle" class="caption">scalar proxy for</text>
-  <text x="480" y="301" text-anchor="middle" class="caption">labeler preference.</text>
+  <text x="480" y="285" text-anchor="middle" class="caption">标注者偏好的</text>
+  <text x="480" y="301" text-anchor="middle" class="caption">标量代理。</text>
 
   <rect x="660" y="60" width="260" height="260" class="box"/>
-  <text x="790" y="82" text-anchor="middle" class="head">Stage 3 — PPO</text>
+  <text x="790" y="82" text-anchor="middle" class="head">阶段 3：PPO</text>
 
   <rect x="680" y="100" width="220" height="60" class="hot"/>
-  <text x="790" y="125" text-anchor="middle" class="step">maximize r(x,y)</text>
+  <text x="790" y="125" text-anchor="middle" class="step">最大化 r(x,y)</text>
   <text x="790" y="145" text-anchor="middle" class="small">- beta * KL(pi || pi_SFT)</text>
 
   <rect x="680" y="180" width="220" height="60" class="hot"/>
   <text x="790" y="202" text-anchor="middle" class="step">+ gamma * log pi(D_pretrain)</text>
-  <text x="790" y="222" text-anchor="middle" class="small">PPO-ptx: alignment tax fix</text>
+  <text x="790" y="222" text-anchor="middle" class="small">PPO-ptx：修正对齐代价</text>
 
-  <text x="790" y="285" text-anchor="middle" class="caption">RM score climbs,</text>
-  <text x="790" y="301" text-anchor="middle" class="caption">KL anchor holds ground.</text>
+  <text x="790" y="285" text-anchor="middle" class="caption">奖励模型评分上升，</text>
+  <text x="790" y="301" text-anchor="middle" class="caption">KL 锚点保持约束。</text>
 
   <path d="M 300 190 L 350 190" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
   <path d="M 610 190 L 660 190" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
 
   <rect x="40" y="360" width="880" height="130" class="box"/>
-  <text x="480" y="385" text-anchor="middle" class="head">why 1.3B InstructGPT beats 175B GPT-3 on human preference</text>
-  <text x="60" y="412" class="small">1 / alignment is a different axis from capability; the 1.3B model does the task humans asked for.</text>
-  <text x="60" y="432" class="small">2 / capability floor is still set by the base model — RLHF cannot teach new facts.</text>
-  <text x="60" y="452" class="small">3 / every later critique in phase 18 attacks stage 2 (reward hacking), stage 3 (KL under-regularized), or</text>
-  <text x="60" y="470" class="small">    the labeler itself (sycophancy, alignment faking). know this pipeline before reading the critiques.</text>
+  <text x="480" y="385" text-anchor="middle" class="head">为什么 1.3B InstructGPT 在人类偏好上击败 175B GPT-3</text>
+  <text x="60" y="412" class="small">1 / 对齐与能力是不同维度；1.3B 模型完成了人类要求的任务。</text>
+  <text x="60" y="432" class="small">2 / 能力下限仍由基础模型决定；RLHF 无法传授新事实。</text>
+  <text x="60" y="452" class="small">3 / 阶段 18 后续批评分别针对阶段 2（奖励投机）、阶段 3（KL 正则不足），或</text>
+  <text x="60" y="470" class="small">    标注者自身（迎合、对齐伪装）。阅读批评前先理解这条流水线。</text>
 </svg>

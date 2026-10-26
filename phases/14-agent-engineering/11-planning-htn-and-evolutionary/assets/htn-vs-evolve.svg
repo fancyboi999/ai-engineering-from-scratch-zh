@@ -16,45 +16,45 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">ChatHTN and AlphaEvolve — two 2025 hybrid planners</text>
+  <text x="480" y="26" text-anchor="middle" class="title">ChatHTN 与 AlphaEvolve：2025 年的两种混合规划器</text>
 
   <rect x="40" y="50" width="440" height="210" class="htn"/>
-  <text x="260" y="72" text-anchor="middle" class="head">ChatHTN  symbolic + LLM decomposer</text>
-  <text x="60" y="96" class="small">compound task  decompose via method library</text>
+  <text x="260" y="72" text-anchor="middle" class="head">ChatHTN：符号系统 + LLM 分解器</text>
+  <text x="60" y="96" class="small">复合任务：通过方法库分解</text>
   <rect x="60" y="108" width="400" height="40" class="box"/>
-  <text x="78" y="130" class="step">1. method applies?  expand subtasks (provably sound)</text>
+  <text x="78" y="130" class="step">1. 方法适用？展开子任务（可证明可靠）</text>
   <rect x="60" y="156" width="400" height="40" class="box"/>
-  <text x="78" y="178" class="step">2. no method?  ask LLM for decomposition</text>
+  <text x="78" y="178" class="step">2. 没有方法？请 LLM 分解</text>
   <rect x="60" y="204" width="400" height="40" class="box"/>
-  <text x="78" y="226" class="step">3. validate against operator schema; cache on success</text>
+  <text x="78" y="226" class="step">3. 按操作符结构校验，成功后缓存</text>
 
   <rect x="500" y="50" width="420" height="210" class="ev"/>
-  <text x="710" y="72" text-anchor="middle" class="head">AlphaEvolve  evolutionary code search</text>
-  <text x="520" y="96" class="small">seed program + deterministic evaluator</text>
+  <text x="710" y="72" text-anchor="middle" class="head">AlphaEvolve：进化式代码搜索</text>
+  <text x="520" y="96" class="small">初始程序 + 确定性评估器</text>
   <rect x="520" y="108" width="380" height="40" class="box"/>
-  <text x="538" y="130" class="step">1. ensemble of LLMs proposes mutations</text>
+  <text x="538" y="130" class="step">1. LLM 集合提出变异</text>
   <rect x="520" y="156" width="380" height="40" class="box"/>
-  <text x="538" y="178" class="step">2. evaluator scores each child program</text>
+  <text x="538" y="178" class="step">2. 评估器对每个子代程序评分</text>
   <rect x="520" y="204" width="380" height="40" class="box"/>
-  <text x="538" y="226" class="step">3. keep top-k; mutate; repeat</text>
+  <text x="538" y="226" class="step">3. 保留前 k 个，变异并重复</text>
 
   <rect x="40" y="290" width="880" height="220" class="compare"/>
-  <text x="480" y="312" text-anchor="middle" class="head">when to use which</text>
+  <text x="480" y="312" text-anchor="middle" class="head">何时选择哪种方法</text>
 
   <rect x="60" y="330" width="840" height="40" class="box"/>
-  <text x="78" y="352" class="step">scheduling, compliance, policy-bound automation  HTN (ChatHTN)</text>
-  <text x="78" y="368" class="small">provable soundness; LLM only expands the method library</text>
+  <text x="78" y="352" class="step">调度、合规、受策略约束的自动化：HTN（ChatHTN）</text>
+  <text x="78" y="368" class="small">可证明可靠；LLM 仅扩充方法库</text>
 
   <rect x="60" y="380" width="840" height="40" class="box"/>
-  <text x="78" y="402" class="step">matrix-mult kernels, compiler passes, scheduling heuristics  AlphaEvolve</text>
-  <text x="78" y="418" class="small">fitness must be deterministic; works when tests / benchmarks are the evaluator</text>
+  <text x="78" y="402" class="step">矩阵乘法计算核、编译器处理过程、调度启发式：AlphaEvolve</text>
+  <text x="78" y="418" class="small">适应度必须确定；适合以测试或基准为评估器的场景</text>
 
   <rect x="60" y="430" width="840" height="40" class="box"/>
-  <text x="78" y="452" class="step">open-ended agent tasks  ReAct / ReWOO (not these)</text>
-  <text x="78" y="468" class="small">no operator schema, no machine-checkable fitness; reach for Lessons 01-02</text>
+  <text x="78" y="452" class="step">开放式 agent 任务：ReAct / ReWOO（而非上述方法）</text>
+  <text x="78" y="468" class="small">没有操作符结构或可机器校验的适应度时，参见第 01-02 课</text>
 
   <rect x="60" y="480" width="840" height="26" class="box"/>
-  <text x="78" y="498" class="step">hybrid: HTN at the top level, AlphaEvolve on each primitive operator  case-by-case</text>
+  <text x="78" y="498" class="step">混合方案：顶层使用 HTN，各基本操作符按需使用 AlphaEvolve</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">LLMs amplify; they do not own correctness. symbolic layer and evaluator own the hard guarantees.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">LLM 放大能力，不负责保证正确性。符号层与评估器提供严格保证。</text>
 </svg>

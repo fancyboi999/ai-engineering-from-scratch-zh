@@ -17,59 +17,59 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Emu3 — one model, one loss, three roles</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Emu3：一个模型、一种损失、三种用途</text>
 
   <rect x="30" y="50" width="900" height="240" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">single decoder-only transformer with shared vocabulary</text>
+  <text x="480" y="72" text-anchor="middle" class="head">共享词表的单个纯解码器 transformer</text>
 
   <rect x="50" y="90" width="270" height="190" class="hot"/>
   <text x="185" y="110" text-anchor="middle" class="step">Emu3-Gen</text>
-  <text x="185" y="128" text-anchor="middle" class="small">text -&gt; image tokens</text>
-  <text x="185" y="146" text-anchor="middle" class="small">512x512 = 4096 tokens</text>
-  <text x="185" y="164" text-anchor="middle" class="small">CFG gamma 3-7</text>
-  <text x="185" y="182" text-anchor="middle" class="small">temperature 0.8</text>
-  <text x="185" y="210" text-anchor="middle" class="step">matches SDXL on FID</text>
-  <text x="185" y="234" text-anchor="middle" class="caption">no diffusion schedule</text>
-  <text x="185" y="252" text-anchor="middle" class="caption">no CLIP loss</text>
+  <text x="185" y="128" text-anchor="middle" class="small">文本 -&gt; 图像 token</text>
+  <text x="185" y="146" text-anchor="middle" class="small">512x512 = 4096 个 token</text>
+  <text x="185" y="164" text-anchor="middle" class="small">CFG 系数 gamma 3-7</text>
+  <text x="185" y="182" text-anchor="middle" class="small">温度 0.8</text>
+  <text x="185" y="210" text-anchor="middle" class="step">FID 与 SDXL 相当</text>
+  <text x="185" y="234" text-anchor="middle" class="caption">无需扩散调度</text>
+  <text x="185" y="252" text-anchor="middle" class="caption">无需 CLIP 损失</text>
 
   <rect x="345" y="90" width="270" height="190" class="cool"/>
   <text x="480" y="110" text-anchor="middle" class="step">Emu3-Chat</text>
-  <text x="480" y="128" text-anchor="middle" class="small">image -&gt; text</text>
-  <text x="480" y="146" text-anchor="middle" class="small">VQA + captioning</text>
-  <text x="480" y="164" text-anchor="middle" class="small">matches LLaVA-1.6</text>
-  <text x="480" y="182" text-anchor="middle" class="small">same backbone</text>
+  <text x="480" y="128" text-anchor="middle" class="small">图像 -&gt; 文本</text>
+  <text x="480" y="146" text-anchor="middle" class="small">VQA + 图像描述</text>
+  <text x="480" y="164" text-anchor="middle" class="small">效果与 LLaVA-1.6 相当</text>
+  <text x="480" y="182" text-anchor="middle" class="small">相同骨干网络</text>
   <text x="480" y="210" text-anchor="middle" class="step">VQAv2 75.1</text>
-  <text x="480" y="234" text-anchor="middle" class="caption">unified loss unlocks</text>
-  <text x="480" y="252" text-anchor="middle" class="caption">perception + gen</text>
+  <text x="480" y="234" text-anchor="middle" class="caption">统一损失带来</text>
+  <text x="480" y="252" text-anchor="middle" class="caption">感知 + 生成</text>
 
   <rect x="640" y="90" width="270" height="190" class="cold"/>
   <text x="775" y="110" text-anchor="middle" class="step">Emu3-Stage2</text>
-  <text x="775" y="128" text-anchor="middle" class="small">text -&gt; video tokens</text>
-  <text x="775" y="146" text-anchor="middle" class="small">4s @ 8fps, 3D VQ</text>
-  <text x="775" y="164" text-anchor="middle" class="small">4x4x4 spatiotemporal</text>
-  <text x="775" y="182" text-anchor="middle" class="small">patch quantization</text>
-  <text x="775" y="210" text-anchor="middle" class="step">competitive FVD</text>
-  <text x="775" y="234" text-anchor="middle" class="caption">same shared vocab</text>
-  <text x="775" y="252" text-anchor="middle" class="caption">extends to 10s at scale</text>
+  <text x="775" y="128" text-anchor="middle" class="small">文本 -&gt; 视频 token</text>
+  <text x="775" y="146" text-anchor="middle" class="small">4s @ 8fps，3D 向量量化</text>
+  <text x="775" y="164" text-anchor="middle" class="small">4x4x4 时空</text>
+  <text x="775" y="182" text-anchor="middle" class="small">图像块量化</text>
+  <text x="775" y="210" text-anchor="middle" class="step">有竞争力的 FVD</text>
+  <text x="775" y="234" text-anchor="middle" class="caption">相同的共享词表</text>
+  <text x="775" y="252" text-anchor="middle" class="caption">扩大规模后延长至 10s</text>
 
   <rect x="30" y="310" width="900" height="210" class="box"/>
-  <text x="480" y="332" text-anchor="middle" class="head">Emu3 vs diffusion: the 2026 trade-off</text>
+  <text x="480" y="332" text-anchor="middle" class="head">Emu3 与扩散模型：2026 年的取舍</text>
 
   <rect x="60" y="350" width="400" height="150" class="reg"/>
-  <text x="260" y="370" text-anchor="middle" class="step">Emu3 (discrete tokens, NTP)</text>
-  <text x="260" y="390" text-anchor="middle" class="small">+ one model for gen + perception</text>
-  <text x="260" y="406" text-anchor="middle" class="small">+ one training loss</text>
-  <text x="260" y="422" text-anchor="middle" class="small">+ tokens extend to any modality</text>
-  <text x="260" y="438" text-anchor="middle" class="small">- slow inference (2 min / 512x512)</text>
-  <text x="260" y="454" text-anchor="middle" class="small">- tokenizer caps quality</text>
-  <text x="260" y="480" text-anchor="middle" class="caption">best for research, unified models</text>
+  <text x="260" y="370" text-anchor="middle" class="step">Emu3（离散 token、下一 token 预测）</text>
+  <text x="260" y="390" text-anchor="middle" class="small">+ 一个模型同时生成与感知</text>
+  <text x="260" y="406" text-anchor="middle" class="small">+ 一种训练损失</text>
+  <text x="260" y="422" text-anchor="middle" class="small">+ token 可扩展到任意模态</text>
+  <text x="260" y="438" text-anchor="middle" class="small">- 推理缓慢（2 分钟 / 512x512）</text>
+  <text x="260" y="454" text-anchor="middle" class="small">- 分词器限制质量</text>
+  <text x="260" y="480" text-anchor="middle" class="caption">适合研究与统一模型</text>
 
   <rect x="490" y="350" width="400" height="150" class="hot"/>
-  <text x="690" y="370" text-anchor="middle" class="step">Diffusion (SDXL, SD3, Flux)</text>
-  <text x="690" y="390" text-anchor="middle" class="small">+ fast inference (2-5s / 512x512)</text>
-  <text x="690" y="406" text-anchor="middle" class="small">+ continuous latent = higher fidelity</text>
-  <text x="690" y="422" text-anchor="middle" class="small">+ mature tooling + LoRAs</text>
-  <text x="690" y="438" text-anchor="middle" class="small">- no perception in same model</text>
-  <text x="690" y="454" text-anchor="middle" class="small">- separate text encoder needed</text>
-  <text x="690" y="480" text-anchor="middle" class="caption">best for image-only production</text>
+  <text x="690" y="370" text-anchor="middle" class="step">扩散模型（SDXL、SD3、Flux）</text>
+  <text x="690" y="390" text-anchor="middle" class="small">+ 推理快速（2-5s / 512x512）</text>
+  <text x="690" y="406" text-anchor="middle" class="small">+ 连续潜空间 = 更高保真度</text>
+  <text x="690" y="422" text-anchor="middle" class="small">+ 成熟工具与 LoRA</text>
+  <text x="690" y="438" text-anchor="middle" class="small">- 同一模型不具备感知能力</text>
+  <text x="690" y="454" text-anchor="middle" class="small">- 需要独立文本编码器</text>
+  <text x="690" y="480" text-anchor="middle" class="caption">适合纯图像生产应用</text>
 </svg>

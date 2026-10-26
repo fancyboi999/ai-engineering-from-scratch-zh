@@ -17,67 +17,67 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Production runtime shapes — pick by task, not by framework</text>
+  <text x="480" y="26" text-anchor="middle" class="title">生产运行时形态：根据任务选择，而非根据框架</text>
 
   <rect x="40" y="50" width="220" height="220" class="req"/>
-  <text x="150" y="72" text-anchor="middle" class="head">request-response</text>
-  <text x="60" y="96" class="small">synchronous HTTP</text>
-  <text x="60" y="114" class="small">user waits for completion</text>
-  <text x="60" y="132" class="small">short tasks only (&lt;30s)</text>
+  <text x="150" y="72" text-anchor="middle" class="head">请求与响应</text>
+  <text x="60" y="96" class="small">同步 HTTP</text>
+  <text x="60" y="114" class="small">用户等待执行完成</text>
+  <text x="60" y="132" class="small">仅适用于短任务（&lt;30s）</text>
   <rect x="60" y="148" width="180" height="30" class="box"/>
-  <text x="78" y="168" class="step">Agno, Mastra, raw SDK</text>
+  <text x="78" y="168" class="step">Agno、Mastra、原生 SDK</text>
   <rect x="60" y="186" width="180" height="30" class="box"/>
-  <text x="78" y="206" class="step">OTel spans per request</text>
+  <text x="78" y="206" class="step">逐请求生成 OTel span</text>
   <rect x="60" y="224" width="180" height="30" class="box"/>
-  <text x="78" y="244" class="step">fits: chat UX, tool calls</text>
+  <text x="78" y="244" class="step">适合：对话体验、工具调用</text>
 
   <rect x="280" y="50" width="220" height="220" class="stream"/>
-  <text x="390" y="72" text-anchor="middle" class="head">streaming</text>
+  <text x="390" y="72" text-anchor="middle" class="head">流式处理</text>
   <text x="300" y="96" class="small">SSE / WebSocket / WebRTC</text>
-  <text x="300" y="114" class="small">progressive output</text>
-  <text x="300" y="132" class="small">LiveKit adds WebRTC</text>
+  <text x="300" y="114" class="small">逐步输出</text>
+  <text x="300" y="132" class="small">LiveKit 添加 WebRTC</text>
   <rect x="300" y="148" width="180" height="30" class="box"/>
   <text x="318" y="168" class="step">Pipecat, LiveKit, SDK</text>
   <rect x="300" y="186" width="180" height="30" class="box"/>
-  <text x="318" y="206" class="step">first-token latency matters</text>
+  <text x="318" y="206" class="step">首个 token 延迟重要</text>
   <rect x="300" y="224" width="180" height="30" class="box"/>
-  <text x="318" y="244" class="step">fits: voice, copilot UX</text>
+  <text x="318" y="244" class="step">适合：语音、copilot 体验</text>
 
   <rect x="520" y="50" width="220" height="220" class="queue"/>
-  <text x="630" y="72" text-anchor="middle" class="head">queue-based</text>
-  <text x="540" y="96" class="small">producer  worker pool  DLQ</text>
-  <text x="540" y="114" class="small">webhook / pubsub for results</text>
-  <text x="540" y="132" class="small">long-horizon tasks</text>
+  <text x="630" y="72" text-anchor="middle" class="head">队列式</text>
+  <text x="540" y="96" class="small">生产者、工作池、死信队列</text>
+  <text x="540" y="114" class="small">通过 webhook / pubsub 返回结果</text>
+  <text x="540" y="132" class="small">长时域任务</text>
   <rect x="540" y="148" width="180" height="30" class="box"/>
   <text x="558" y="168" class="step">Celery, BullMQ, SQS</text>
   <rect x="540" y="186" width="180" height="30" class="box"/>
-  <text x="558" y="206" class="step">queue depth + DLQ metrics</text>
+  <text x="558" y="206" class="step">队列深度与死信队列指标</text>
   <rect x="540" y="224" width="180" height="30" class="box"/>
-  <text x="558" y="244" class="step">fits: computer use, research</text>
+  <text x="558" y="244" class="step">适合：计算机使用、研究</text>
 
   <rect x="760" y="50" width="160" height="220" class="event"/>
-  <text x="840" y="72" text-anchor="middle" class="head">event + cron</text>
-  <text x="778" y="96" class="small">trigger-based</text>
-  <text x="778" y="114" class="small">+ scheduled</text>
+  <text x="840" y="72" text-anchor="middle" class="head">事件 + cron</text>
+  <text x="778" y="96" class="small">事件触发</text>
+  <text x="778" y="114" class="small">+ 定时调度</text>
   <rect x="778" y="132" width="120" height="30" class="box"/>
   <text x="796" y="152" class="step">CrewAI Flows</text>
   <rect x="778" y="170" width="120" height="30" class="box"/>
   <text x="796" y="190" class="step">Managed Agents</text>
   <rect x="778" y="208" width="120" height="30" class="box"/>
-  <text x="796" y="228" class="step">cron + durable</text>
+  <text x="796" y="228" class="step">cron + 持久执行</text>
 
   <rect x="40" y="290" width="880" height="220" class="box"/>
-  <text x="480" y="312" text-anchor="middle" class="head">durable execution cross-cuts all shapes  (LangGraph, AutoGen v0.4 actors, Managed Agents)</text>
+  <text x="480" y="312" text-anchor="middle" class="head">持久执行贯穿所有形态（LangGraph、AutoGen v0.4 actor、Managed Agents）</text>
   <rect x="60" y="328" width="840" height="30" class="box"/>
-  <text x="78" y="348" class="step">state checkpointed after every step  resume picks up at exact step</text>
+  <text x="78" y="348" class="step">每步保存状态检查点；恢复时从准确步骤继续</text>
   <rect x="60" y="362" width="840" height="30" class="box"/>
-  <text x="78" y="382" class="step">actor-model fault isolation  one agent crash does not crash peers</text>
+  <text x="78" y="382" class="step">actor 模型提供故障隔离；单个 agent 崩溃不影响其他 agent</text>
   <rect x="60" y="396" width="840" height="30" class="box"/>
-  <text x="78" y="416" class="step">essential when step count is unknown and recovery cost is high</text>
+  <text x="78" y="416" class="step">步数未知、恢复成本高时尤其重要</text>
   <rect x="60" y="430" width="840" height="30" class="box"/>
-  <text x="78" y="450" class="step">observability load-bearing: OTel GenAI (Lesson 23) + Langfuse/Phoenix/Opik (Lesson 24)</text>
+  <text x="78" y="450" class="step">可观测性是基础：OTel GenAI（第 23 课）+ Langfuse/Phoenix/Opik（第 24 课）</text>
   <rect x="60" y="464" width="840" height="30" class="box"/>
-  <text x="78" y="484" class="step">without spans + eval: failing at step 40 is un-debuggable; you replay from scratch</text>
+  <text x="78" y="484" class="step">没有 span 与评估，无法调试第 40 步失败；只能从零重放</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">pick the shape first; the framework is a second-order choice.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">先选运行形态，框架是次要选择。</text>
 </svg>

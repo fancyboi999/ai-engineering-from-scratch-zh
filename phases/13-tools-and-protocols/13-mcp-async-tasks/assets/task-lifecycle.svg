@@ -16,32 +16,32 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">MCP Tasks extension on the 2026-07-28 stateless core</text>
+  <text x="480" y="26" text-anchor="middle" class="title">基于 2026-07-28 版无状态核心的 MCP Tasks 扩展</text>
 
   <rect x="40" y="55" width="880" height="95" class="box"/>
-  <text x="60" y="80" class="step">client -&gt; tools/call + per-request io.modelcontextprotocol/tasks capability</text>
-  <text x="60" y="104" class="step">server: durably create task, then return resultType: "task" + taskId</text>
-  <text x="60" y="130" class="small">tools/list publishes generate_report; the server chooses task mode after the capability check.</text>
+  <text x="60" y="80" class="step">客户端 -&gt; tools/call + 每请求 io.modelcontextprotocol/tasks 能力</text>
+  <text x="60" y="104" class="step">服务器：持久化创建任务，再返回 resultType: "task" + taskId</text>
+  <text x="60" y="130" class="small">tools/list 发布 generate_report；服务器校验能力后选择任务模式。</text>
 
   <rect x="40" y="180" width="155" height="80" class="cool"/>
   <text x="118" y="215" text-anchor="middle" class="step">working</text>
-  <text x="118" y="235" text-anchor="middle" class="small">worker owns lease</text>
+  <text x="118" y="235" text-anchor="middle" class="small">工作进程持有租约</text>
 
   <rect x="245" y="180" width="170" height="80" class="cold"/>
   <text x="330" y="215" text-anchor="middle" class="step">input_required</text>
-  <text x="330" y="235" text-anchor="middle" class="small">outstanding requests</text>
+  <text x="330" y="235" text-anchor="middle" class="small">尚未完成的请求</text>
 
   <rect x="465" y="180" width="155" height="80" class="cool"/>
   <text x="543" y="215" text-anchor="middle" class="step">completed</text>
-  <text x="543" y="235" text-anchor="middle" class="small">nested complete result</text>
+  <text x="543" y="235" text-anchor="middle" class="small">嵌套的 complete 结果</text>
 
   <rect x="670" y="180" width="110" height="80" class="hot"/>
   <text x="725" y="215" text-anchor="middle" class="step">failed</text>
-  <text x="725" y="235" text-anchor="middle" class="small">RPC error</text>
+  <text x="725" y="235" text-anchor="middle" class="small">RPC 错误</text>
 
   <rect x="810" y="180" width="110" height="80" class="box"/>
   <text x="865" y="215" text-anchor="middle" class="step">cancelled</text>
-  <text x="865" y="235" text-anchor="middle" class="small">worker stopped</text>
+  <text x="865" y="235" text-anchor="middle" class="small">工作进程已停止</text>
 
   <path d="M195,220 L245,220" class="edge" marker-end="url(#arrow)"/>
   <path d="M415,220 L465,220" class="edge" marker-end="url(#arrow)"/>
@@ -51,22 +51,22 @@
   <path d="M620,240 C700,285 790,285 810,240" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="40" y="310" width="420" height="165" class="cool"/>
-  <text x="250" y="335" text-anchor="middle" class="head">polling and input</text>
+  <text x="250" y="335" text-anchor="middle" class="head">轮询与输入</text>
   <text x="58" y="365" class="step">tasks/get {taskId}</text>
-  <text x="58" y="383" class="small">Mcp-Name = taskId; complete snapshot</text>
+  <text x="58" y="383" class="small">Mcp-Name = taskId；完整快照</text>
   <text x="58" y="415" class="step">tasks/update {taskId, inputResponses}</text>
-  <text x="58" y="433" class="small">Mcp-Name = taskId; complete acknowledgement</text>
-  <text x="58" y="457" class="small">Unique input keys for the entire task lifetime</text>
+  <text x="58" y="433" class="small">Mcp-Name = taskId；完整确认</text>
+  <text x="58" y="457" class="small">任务整个生命周期内输入键唯一</text>
 
   <rect x="500" y="310" width="420" height="165" class="cold"/>
-  <text x="710" y="335" text-anchor="middle" class="head">cancellation and optional push</text>
+  <text x="710" y="335" text-anchor="middle" class="head">取消与可选推送</text>
   <text x="518" y="365" class="step">tasks/cancel {taskId}</text>
-  <text x="518" y="383" class="small">Mcp-Name = taskId; cooperative acknowledgement</text>
-  <text x="518" y="415" class="step">subscriptions/listen via POST response SSE</text>
+  <text x="518" y="383" class="small">Mcp-Name = taskId；协作式确认</text>
+  <text x="518" y="415" class="step">subscriptions/listen 通过 POST 响应 SSE</text>
   <text x="518" y="433" class="small">notifications/subscriptions/acknowledged</text>
-  <text x="518" y="451" class="small">notifications/tasks + subscriptionId metadata</text>
+  <text x="518" y="451" class="small">notifications/tasks + subscriptionId 元数据</text>
 
   <rect x="40" y="500" width="880" height="45" class="hot"/>
-  <text x="480" y="520" text-anchor="middle" class="step">removed experimental assumptions: tasks/status | tasks/result | tasks/list</text>
-  <text x="480" y="538" text-anchor="middle" class="small">Persist ownership, expiry, issued input keys, result or error, and worker lease in application storage.</text>
+  <text x="480" y="520" text-anchor="middle" class="step">移除的实验性假设：tasks/status | tasks/result | tasks/list</text>
+  <text x="480" y="538" text-anchor="middle" class="small">在应用存储中持久化所有权、到期时间、已发出的输入键、结果或错误，以及工作进程租约。</text>
 </svg>

@@ -14,19 +14,19 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">CLIP similarity matrix — positives on the diagonal, negatives everywhere else</text>
+  <text x="480" y="24" text-anchor="middle" class="title">CLIP 相似度矩阵 — 对角线为正样本，其余为负样本</text>
 
   <rect x="40" y="50" width="440" height="480" class="box"/>
-  <text x="260" y="72" text-anchor="middle" class="head">similarity matrix S (N=4)</text>
+  <text x="260" y="72" text-anchor="middle" class="head">相似度矩阵 S（N=4）</text>
   <text x="260" y="88" text-anchor="middle" class="small">S[i,j] = cos(img_i, txt_j) / tau</text>
 
-  <text x="80" y="118" class="step">txt 0</text>
-  <text x="150" y="118" class="step">txt 1</text>
-  <text x="220" y="118" class="step">txt 2</text>
-  <text x="290" y="118" class="step">txt 3</text>
+  <text x="80" y="118" class="step">文本 0</text>
+  <text x="150" y="118" class="step">文本 1</text>
+  <text x="220" y="118" class="step">文本 2</text>
+  <text x="290" y="118" class="step">文本 3</text>
 
   <g>
-    <text x="60" y="150" class="step">img 0</text>
+    <text x="60" y="150" class="step">图像 0</text>
     <rect x="100" y="130" width="60" height="40" class="diag"/>
     <rect x="170" y="130" width="60" height="40" class="neg"/>
     <rect x="240" y="130" width="60" height="40" class="neg"/>
@@ -37,7 +37,7 @@
     <text x="340" y="155" text-anchor="middle" class="small">-0.22</text>
   </g>
   <g>
-    <text x="60" y="190" class="step">img 1</text>
+    <text x="60" y="190" class="step">图像 1</text>
     <rect x="100" y="170" width="60" height="40" class="neg"/>
     <rect x="170" y="170" width="60" height="40" class="diag"/>
     <rect x="240" y="170" width="60" height="40" class="neg"/>
@@ -48,7 +48,7 @@
     <text x="340" y="195" text-anchor="middle" class="small">+0.09</text>
   </g>
   <g>
-    <text x="60" y="230" class="step">img 2</text>
+    <text x="60" y="230" class="step">图像 2</text>
     <rect x="100" y="210" width="60" height="40" class="neg"/>
     <rect x="170" y="210" width="60" height="40" class="neg"/>
     <rect x="240" y="210" width="60" height="40" class="diag"/>
@@ -59,7 +59,7 @@
     <text x="340" y="235" text-anchor="middle" class="small">-0.03</text>
   </g>
   <g>
-    <text x="60" y="270" class="step">img 3</text>
+    <text x="60" y="270" class="step">图像 3</text>
     <rect x="100" y="250" width="60" height="40" class="neg"/>
     <rect x="170" y="250" width="60" height="40" class="neg"/>
     <rect x="240" y="250" width="60" height="40" class="neg"/>
@@ -71,41 +71,41 @@
   </g>
 
   <text x="260" y="320" text-anchor="middle" class="head">InfoNCE = - sum log softmax(diag)</text>
-  <text x="260" y="340" text-anchor="middle" class="small">each row pushes the diagonal up, negatives down</text>
-  <text x="260" y="356" text-anchor="middle" class="small">symmetric: also do it column-wise</text>
+  <text x="260" y="340" text-anchor="middle" class="small">每行提高对角线得分，降低负样本得分</text>
+  <text x="260" y="356" text-anchor="middle" class="small">对称处理：对每列也这样做</text>
 
   <rect x="60" y="380" width="400" height="130" class="cool"/>
-  <text x="260" y="402" text-anchor="middle" class="head">training ingredients</text>
-  <text x="80" y="424" class="small">· 400M image-text pairs (CLIP), 10B+ for SigLIP 2</text>
-  <text x="80" y="442" class="small">· batch 32k-512k</text>
-  <text x="80" y="460" class="small">· learnable temperature tau (init 0.07)</text>
-  <text x="80" y="478" class="small">· dual encoder: ViT + small text transformer</text>
-  <text x="80" y="496" class="small">· normalize both embeddings before cosine</text>
+  <text x="260" y="402" text-anchor="middle" class="head">训练要素</text>
+  <text x="80" y="424" class="small">· 400M 图文对（CLIP），SigLIP 2 使用 10B+</text>
+  <text x="80" y="442" class="small">· 批大小 32k-512k</text>
+  <text x="80" y="460" class="small">· 可学习温度 tau（初始化为 0.07）</text>
+  <text x="80" y="478" class="small">· 双编码器：ViT + 小型文本 transformer</text>
+  <text x="80" y="496" class="small">· 计算余弦前归一化两种嵌入</text>
 
   <rect x="500" y="50" width="420" height="480" class="box"/>
-  <text x="710" y="72" text-anchor="middle" class="head">softmax vs sigmoid loss</text>
+  <text x="710" y="72" text-anchor="middle" class="head">softmax 与 sigmoid 损失</text>
 
   <rect x="520" y="92" width="380" height="200" class="diag"/>
   <text x="540" y="114" class="step">InfoNCE (CLIP)</text>
-  <text x="540" y="134" class="small">per row: softmax normalizes across N</text>
-  <text x="540" y="150" class="small">needs full similarity matrix in sync</text>
-  <text x="540" y="166" class="small">distributed: all-gather every batch</text>
-  <text x="540" y="186" class="small">comm cost: O(world_size x batch x D)</text>
+  <text x="540" y="134" class="small">每行：softmax 在 N 个元素间归一化</text>
+  <text x="540" y="150" class="small">需要同步完整相似度矩阵</text>
+  <text x="540" y="166" class="small">分布式：每批执行 all-gather</text>
+  <text x="540" y="186" class="small">通信成本：O(world_size x batch x D)</text>
   <text x="540" y="206" class="step">loss_i2t = CE(S, eye)</text>
   <text x="540" y="224" class="step">loss_t2i = CE(S^T, eye)</text>
   <text x="540" y="242" class="step">loss = (loss_i2t + loss_t2i) / 2</text>
-  <text x="540" y="268" class="small">temperature controls sharpness</text>
-  <text x="540" y="284" class="small">scale ceiling: 32k batch before comm dominates</text>
+  <text x="540" y="268" class="small">温度控制分布尖锐程度</text>
+  <text x="540" y="284" class="small">规模上限：批大小到 32k 后通信占主导</text>
 
   <rect x="520" y="300" width="380" height="210" class="cool"/>
-  <text x="540" y="322" class="step">Sigmoid pairwise (SigLIP)</text>
-  <text x="540" y="342" class="small">per pair: independent BCE</text>
-  <text x="540" y="358" class="small">y=1 on diagonal, y=0 off-diagonal</text>
+  <text x="540" y="322" class="step">Sigmoid 成对损失（SigLIP）</text>
+  <text x="540" y="342" class="small">每对样本：独立 BCE</text>
+  <text x="540" y="358" class="small">对角线 y=1，非对角线 y=0</text>
   <text x="540" y="376" class="small">loss = -y log sig(S+b) - (1-y) log sig(-S-b)</text>
-  <text x="540" y="394" class="small">no all-gather; local blocks only</text>
-  <text x="540" y="412" class="small">comm cost: O(world_size x D)</text>
-  <text x="540" y="432" class="step">scale ceiling: 512k+ batch feasible</text>
-  <text x="540" y="454" class="small">extra bias parameter b handles class imbalance</text>
-  <text x="540" y="472" class="small">SigLIP 2 (2025) ships with NaFlex</text>
-  <text x="540" y="490" class="small">+ multilingual (100+ langs)</text>
+  <text x="540" y="394" class="small">无需 all-gather；仅处理本地块</text>
+  <text x="540" y="412" class="small">通信成本：O(world_size x D)</text>
+  <text x="540" y="432" class="step">规模上限：可使用 512k+ 批大小</text>
+  <text x="540" y="454" class="small">额外偏置参数 b 处理类别不平衡</text>
+  <text x="540" y="472" class="small">SigLIP 2（2025）附带 NaFlex</text>
+  <text x="540" y="490" class="small">+ 多语言（100+ 种语言）</text>
 </svg>

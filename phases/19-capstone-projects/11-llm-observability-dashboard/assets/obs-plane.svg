@@ -14,59 +14,59 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">self-hosted LLM observability plane — OTel GenAI semconv</text>
+  <text x="480" y="24" text-anchor="middle" class="title">自托管 LLM 可观测平台：OTel GenAI 语义约定</text>
 
   <rect x="40" y="50" width="260" height="160" class="cool"/>
-  <text x="170" y="72" text-anchor="middle" class="head">instrumented apps</text>
+  <text x="170" y="72" text-anchor="middle" class="head">已接入观测的应用</text>
   <text x="170" y="94" text-anchor="middle" class="small">OpenAI SDK   Anthropic SDK</text>
   <text x="170" y="112" text-anchor="middle" class="small">Google GenAI   LangChain</text>
   <text x="170" y="130" text-anchor="middle" class="small">LlamaIndex   vLLM</text>
-  <text x="170" y="152" text-anchor="middle" class="small">OpenLLMetry auto-instrument</text>
-  <text x="170" y="170" text-anchor="middle" class="small">OTLP HTTP -&gt; collector</text>
-  <text x="170" y="192" text-anchor="middle" class="caption">six SDK families covered</text>
+  <text x="170" y="152" text-anchor="middle" class="small">OpenLLMetry 自动接入观测</text>
+  <text x="170" y="170" text-anchor="middle" class="small">OTLP HTTP -&gt; 收集器</text>
+  <text x="170" y="192" text-anchor="middle" class="caption">覆盖六类 SDK</text>
 
   <rect x="340" y="50" width="260" height="160" class="dsk"/>
-  <text x="470" y="72" text-anchor="middle" class="head">collector</text>
-  <text x="470" y="94" text-anchor="middle" class="small">OTLP HTTP receiver</text>
-  <text x="470" y="112" text-anchor="middle" class="small">tail-sampling processor</text>
-  <text x="470" y="130" text-anchor="middle" class="small">keep all errors</text>
-  <text x="470" y="148" text-anchor="middle" class="small">keep toxicity / PII spikes</text>
-  <text x="470" y="166" text-anchor="middle" class="small">10% stratified success sample</text>
-  <text x="470" y="184" text-anchor="middle" class="small">exporter: ClickHouse + S3</text>
+  <text x="470" y="72" text-anchor="middle" class="head">收集器</text>
+  <text x="470" y="94" text-anchor="middle" class="small">OTLP HTTP 接收器</text>
+  <text x="470" y="112" text-anchor="middle" class="small">尾部采样处理器</text>
+  <text x="470" y="130" text-anchor="middle" class="small">保留全部错误</text>
+  <text x="470" y="148" text-anchor="middle" class="small">保留毒性 / PII 突增记录</text>
+  <text x="470" y="166" text-anchor="middle" class="small">对成功记录做 10% 分层采样</text>
+  <text x="470" y="184" text-anchor="middle" class="small">导出器：ClickHouse + S3</text>
 
   <rect x="640" y="50" width="280" height="160" class="cold"/>
-  <text x="780" y="72" text-anchor="middle" class="head">storage</text>
-  <text x="780" y="94" text-anchor="middle" class="small">ClickHouse: spans (columnar)</text>
-  <text x="780" y="112" text-anchor="middle" class="small">Postgres: metadata</text>
-  <text x="780" y="130" text-anchor="middle" class="small">S3: raw event archive</text>
-  <text x="780" y="148" text-anchor="middle" class="small">schema mirrors GenAI semconv</text>
+  <text x="780" y="72" text-anchor="middle" class="head">存储</text>
+  <text x="780" y="94" text-anchor="middle" class="small">ClickHouse：span（列式）</text>
+  <text x="780" y="112" text-anchor="middle" class="small">Postgres：元数据</text>
+  <text x="780" y="130" text-anchor="middle" class="small">S3：原始事件归档</text>
+  <text x="780" y="148" text-anchor="middle" class="small">结构遵循 GenAI 语义约定</text>
   <text x="780" y="166" text-anchor="middle" class="small">gen_ai.system, request.model</text>
   <text x="780" y="184" text-anchor="middle" class="small">usage.input_tokens, output_tokens</text>
 
   <rect x="40" y="240" width="400" height="270" class="box"/>
-  <text x="240" y="262" text-anchor="middle" class="head">evals + drift (child spans)</text>
+  <text x="240" y="262" text-anchor="middle" class="head">评测 + 漂移（子 span）</text>
   <rect x="60" y="280" width="360" height="40" class="cool"/>
-  <text x="240" y="304" text-anchor="middle" class="step">DeepEval / RAGAS scheduled jobs</text>
+  <text x="240" y="304" text-anchor="middle" class="step">DeepEval / RAGAS 定时任务</text>
   <rect x="60" y="326" width="360" height="40" class="cool"/>
-  <text x="240" y="350" text-anchor="middle" class="step">custom LLM-judges (PII, off-policy)</text>
+  <text x="240" y="350" text-anchor="middle" class="step">自定义 LLM 评审（PII、偏离策略）</text>
   <rect x="60" y="372" width="360" height="40" class="hot"/>
-  <text x="240" y="396" text-anchor="middle" class="step">drift detector (weekly PSI / KL)</text>
-  <text x="240" y="436" text-anchor="middle" class="small">eval outputs become linked child spans</text>
-  <text x="240" y="454" text-anchor="middle" class="small">stored in same ClickHouse, join by parent</text>
-  <text x="240" y="472" text-anchor="middle" class="small">tail-sampler keeps all high-eval-score traces</text>
-  <text x="240" y="494" text-anchor="middle" class="caption">MTTR on injected regression target: &lt; 5 min</text>
+  <text x="240" y="396" text-anchor="middle" class="step">漂移检测（每周 PSI / KL）</text>
+  <text x="240" y="436" text-anchor="middle" class="small">评测输出成为关联的子 span</text>
+  <text x="240" y="454" text-anchor="middle" class="small">存入同一 ClickHouse，按父 span 关联</text>
+  <text x="240" y="472" text-anchor="middle" class="small">尾部采样器保留全部评测高分 trace</text>
+  <text x="240" y="494" text-anchor="middle" class="caption">注入回归故障的平均恢复时间目标：&lt; 5 分钟</text>
 
   <rect x="480" y="240" width="440" height="270" class="box"/>
-  <text x="700" y="262" text-anchor="middle" class="head">alerting + UI</text>
+  <text x="700" y="262" text-anchor="middle" class="head">告警 + 界面</text>
   <rect x="500" y="280" width="400" height="40" class="hot"/>
   <text x="700" y="304" text-anchor="middle" class="step">Prometheus Alertmanager</text>
   <rect x="500" y="326" width="400" height="40" class="dsk"/>
-  <text x="700" y="350" text-anchor="middle" class="step">Slack (warning) + PagerDuty (critical)</text>
+  <text x="700" y="350" text-anchor="middle" class="step">Slack（警告）+ PagerDuty（严重）</text>
   <rect x="500" y="372" width="400" height="40" class="cool"/>
-  <text x="700" y="396" text-anchor="middle" class="step">Next.js 15 + Recharts dashboard</text>
+  <text x="700" y="396" text-anchor="middle" class="step">Next.js 15 + Recharts 仪表盘</text>
 
-  <text x="700" y="436" text-anchor="middle" class="small">pages: overview / traces / evals / drift</text>
-  <text x="700" y="454" text-anchor="middle" class="small">cost per user, span waterfall, eval trends</text>
-  <text x="700" y="472" text-anchor="middle" class="small">Langfuse / Phoenix / OpenLLMetry shape</text>
-  <text x="700" y="494" text-anchor="middle" class="caption">open-core self-hosted reference</text>
+  <text x="700" y="436" text-anchor="middle" class="small">页面：概览 / trace / 评测 / 漂移</text>
+  <text x="700" y="454" text-anchor="middle" class="small">用户成本、span 瀑布图、评测趋势</text>
+  <text x="700" y="472" text-anchor="middle" class="small">Langfuse / Phoenix / OpenLLMetry 架构形态</text>
+  <text x="700" y="494" text-anchor="middle" class="caption">开放核心、自托管参考实现</text>
 </svg>

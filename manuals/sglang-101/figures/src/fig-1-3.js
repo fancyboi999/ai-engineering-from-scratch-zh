@@ -5,7 +5,7 @@ const { figure } = require('../../../_shared/figkit.js');
 const lanes = [
   { x: 70, name: "客户端", hue: 'olive', w: 110 },
   { x: 220, name: 'TokenizerManager', hue: 'blue' },
-  { x: 390, name: 'Scheduler', hue: 'blue' },
+  { x: 390, name: '调度器', hue: 'blue' },
   { x: 560, name: 'Detokenizer', hue: 'blue' },
 ];
 
@@ -42,3 +42,11 @@ module.exports = figure('fig-1-3', {
     f.arrow([x1, y], [x2 + (x2 > x1 ? -1 : 1), y], { style, label, note, labelX: (x1 + x2) / 2 });
   });
 });
+
+// 先用原标签计算图形尺寸，再只替换完整文字节点，保持几何与实测数据不变。
+const readerCopy = {
+  "prefill": "预填充",
+  "text": "文本"
+};
+module.exports = module.exports.replace(/>([^<]*)</g, (node, text) =>
+  Object.prototype.hasOwnProperty.call(readerCopy, text) ? `>${readerCopy[text]}<` : node);

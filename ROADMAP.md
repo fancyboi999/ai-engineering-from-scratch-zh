@@ -584,7 +584,7 @@
 | 20 | [Agent Harness Loop 契约](phases/19-capstone-projects/20-agent-harness-loop-contract) | ✅ | ~90 min |
 | 21 | [带 Schema 校验的 Tool Registry](phases/19-capstone-projects/21-tool-registry-schema-validation) | ✅ | ~90 min |
 | 22 | [基于换行分隔 stdio 的 JSON-RPC 2.0](phases/19-capstone-projects/22-jsonrpc-stdio-transport) | ✅ | ~90 min |
-| 23 | [Function Call Dispatcher](phases/19-capstone-projects/23-function-call-dispatcher) | ✅ | ~90 min |
+| 23 | [函数调用分发器](phases/19-capstone-projects/23-function-call-dispatcher) | ✅ | ~90 min |
 | 24 | [Plan-Execute 控制流](phases/19-capstone-projects/24-plan-execute-control-flow) | ✅ | ~90 min |
 | 25 | [Verification Gate 与 Observation Budget](phases/19-capstone-projects/25-verification-gates-observation-budget) | ✅ | ~90 min |
 | 26 | [带 Denylist 与 Path Jail 的 Sandbox Runner](phases/19-capstone-projects/26-sandbox-runner-denylist) | ✅ | ~90 min |
@@ -594,7 +594,7 @@
 | 30 | [从零实现 BPE Tokenizer](phases/19-capstone-projects/30-bpe-tokenizer-from-scratch) | ✅ | ~90 min |
 | 31 | [带 Sliding Window 的 Tokenized Dataset](phases/19-capstone-projects/31-tokenized-dataset-sliding-window) | ✅ | ~90 min |
 | 32 | [Token Embedding 与 Positional Embedding](phases/19-capstone-projects/32-token-positional-embeddings) | ✅ | ~90 min |
-| 33 | [Multi-Head Self-Attention](phases/19-capstone-projects/33-multihead-self-attention) | ✅ | ~90 min |
+| 33 | [多头自注意力](phases/19-capstone-projects/33-multihead-self-attention) | ✅ | ~90 min |
 | 34 | [从零实现 Transformer Block](phases/19-capstone-projects/34-transformer-block) | ✅ | ~90 min |
 | 35 | [GPT 模型组装](phases/19-capstone-projects/35-gpt-model-assembly) | ✅ | ~90 min |
 | 36 | [训练循环与评估](phases/19-capstone-projects/36-training-loop-eval) | ✅ | ~90 min |
@@ -604,7 +604,7 @@
 | 40 | [从零实现 DPO](phases/19-capstone-projects/40-dpo-from-scratch) | ✅ | ~90 min |
 | 41 | [完整评估流水线](phases/19-capstone-projects/41-eval-pipeline) | ✅ | ~90 min |
 | 42 | [大规模语料下载器](phases/19-capstone-projects/42-large-corpus-downloader) | ✅ | ~90 min |
-| 43 | [HDF5 Tokenized Corpus](phases/19-capstone-projects/43-hdf5-tokenized-corpus) | ✅ | ~90 min |
+| 43 | [HDF5 分词语料库](phases/19-capstone-projects/43-hdf5-tokenized-corpus) | ✅ | ~90 min |
 | 44 | [Cosine 学习率 + 线性 Warmup](phases/19-capstone-projects/44-cosine-lr-warmup) | ✅ | ~90 min |
 | 45 | [Gradient Clipping 与混合精度训练](phases/19-capstone-projects/45-gradient-clipping-amp) | ✅ | ~90 min |
 | 46 | [梯度累积](phases/19-capstone-projects/46-gradient-accumulation) | ✅ | ~90 min |
@@ -620,14 +620,14 @@
 | 56 | [迭代调度器](phases/19-capstone-projects/56-iteration-scheduler) | ✅ | ~90 min |
 | 57 | [端到端研究 Demo](phases/19-capstone-projects/57-end-to-end-research-demo) | ✅ | ~90 min |
 | 58 | [Vision Encoder 的 Patch 切分](phases/19-capstone-projects/58-vision-encoder-patches) | ✅ | ~90 min |
-| 59 | [Vision Transformer Encoder（ViT）](phases/19-capstone-projects/59-vit-transformer) | ✅ | ~90 min |
+| 59 | [视觉 Transformer 编码器（ViT）](phases/19-capstone-projects/59-vit-transformer) | ✅ | ~90 min |
 | 60 | [用 Projection Layer 做模态对齐](phases/19-capstone-projects/60-projection-layer-modality-align) | ✅ | ~90 min |
 | 61 | [Cross-Attention 融合](phases/19-capstone-projects/61-cross-attention-fusion) | ✅ | ~90 min |
 | 62 | [Vision-Language 预训练](phases/19-capstone-projects/62-vision-language-pretraining) | ✅ | ~90 min |
 | 63 | [多模态评测](phases/19-capstone-projects/63-multimodal-eval) | ✅ | ~90 min |
 | 64 | [Chunking 策略横向对比](phases/19-capstone-projects/64-chunking-strategies-advanced) | ✅ | ~90 min |
 | 65 | [用 BM25 与 Dense Embedding 做 Hybrid Retrieval](phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense) | ✅ | ~90 min |
-| 66 | [Cross-Encoder Reranker](phases/19-capstone-projects/66-reranker-cross-encoder) | ✅ | ~90 min |
+| 66 | [交叉编码器重排器](phases/19-capstone-projects/66-reranker-cross-encoder) | ✅ | ~90 min |
 | 67 | [Query 改写：HyDE、Multi-Query 与 Decomposition](phases/19-capstone-projects/67-query-rewriting-hyde) | ✅ | ~90 min |
 | 68 | [RAG 评测：Precision、Recall、MRR、nDCG 等](phases/19-capstone-projects/68-rag-eval-precision-recall) | ✅ | ~90 min |
 | 69 | [端到端 RAG 系统](phases/19-capstone-projects/69-end-to-end-rag-system) | ✅ | ~90 min |

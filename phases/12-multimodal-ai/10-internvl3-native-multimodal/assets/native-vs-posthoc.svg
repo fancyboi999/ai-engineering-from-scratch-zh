@@ -17,56 +17,56 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">InternVL3 — native multimodal pretraining vs post-hoc adaptation</text>
+  <text x="480" y="24" text-anchor="middle" class="title">InternVL3：原生多模态预训练与事后适配</text>
 
   <rect x="30" y="50" width="440" height="210" class="hot"/>
-  <text x="250" y="72" text-anchor="middle" class="head">post-hoc (LLaVA, Qwen-VL v1, Idefics)</text>
+  <text x="250" y="72" text-anchor="middle" class="head">事后适配（LLaVA、Qwen-VL v1、Idefics）</text>
 
   <rect x="60" y="90" width="160" height="40" class="cold"/>
-  <text x="140" y="115" text-anchor="middle" class="small">pretrained LLM (frozen)</text>
+  <text x="140" y="115" text-anchor="middle" class="small">预训练 LLM（冻结）</text>
   <rect x="240" y="90" width="130" height="40" class="cool"/>
-  <text x="305" y="115" text-anchor="middle" class="small">vision encoder</text>
+  <text x="305" y="115" text-anchor="middle" class="small">视觉编码器</text>
   <rect x="385" y="90" width="60" height="40" class="reg"/>
-  <text x="415" y="115" text-anchor="middle" class="small">projector</text>
+  <text x="415" y="115" text-anchor="middle" class="small">投影器</text>
 
-  <text x="250" y="150" text-anchor="middle" class="small">1. train projector on caption pairs (LLM frozen)</text>
-  <text x="250" y="168" text-anchor="middle" class="small">2. unfreeze LLM, tune on LLaVA-Instruct</text>
-  <text x="250" y="186" text-anchor="middle" class="small">3. optional task fine-tune</text>
+  <text x="250" y="150" text-anchor="middle" class="small">1. 在图像描述对上训练投影器（冻结 LLM）</text>
+  <text x="250" y="168" text-anchor="middle" class="small">2. 解冻 LLM，在 LLaVA-Instruct 上调优</text>
+  <text x="250" y="186" text-anchor="middle" class="small">3. 可选的任务微调</text>
 
-  <text x="250" y="212" text-anchor="middle" class="step">cost: ~30k GPU-hours, reuses LLM</text>
-  <text x="250" y="232" text-anchor="middle" class="caption">alignment debt: -2 to -8 MMLU, answer drift</text>
+  <text x="250" y="212" text-anchor="middle" class="step">成本：约 30k GPU-hours，复用 LLM</text>
+  <text x="250" y="232" text-anchor="middle" class="caption">对齐债务：MMLU -2 至 -8 分，答案漂移</text>
 
   <rect x="490" y="50" width="440" height="210" class="cool"/>
-  <text x="710" y="72" text-anchor="middle" class="head">native (InternVL3, Chameleon, GPT-4o)</text>
+  <text x="710" y="72" text-anchor="middle" class="head">原生多模态（InternVL3、Chameleon、GPT-4o）</text>
 
   <rect x="520" y="90" width="380" height="40" class="reg"/>
-  <text x="710" y="115" text-anchor="middle" class="small">single transformer, text + vision native from step 1</text>
+  <text x="710" y="115" text-anchor="middle" class="small">单一 transformer，从第 1 步起原生处理文本与视觉</text>
 
-  <text x="710" y="150" text-anchor="middle" class="small">one pretraining run, one loss</text>
-  <text x="710" y="168" text-anchor="middle" class="small">40% text + 35% interleaved + 20% cap + 5% video</text>
-  <text x="710" y="186" text-anchor="middle" class="small">instruction tune after, not multi-stage alignment</text>
+  <text x="710" y="150" text-anchor="middle" class="small">一次预训练，一种损失</text>
+  <text x="710" y="168" text-anchor="middle" class="small">40% 文本 + 35% 交错数据 + 20% 图像描述 + 5% 视频</text>
+  <text x="710" y="186" text-anchor="middle" class="small">之后做指令微调，而非多阶段对齐</text>
 
-  <text x="710" y="212" text-anchor="middle" class="step">cost: ~300k GPU-hours, no LLM reuse</text>
-  <text x="710" y="232" text-anchor="middle" class="caption">no alignment debt, matches Gemini 2.5 Pro at 78B</text>
+  <text x="710" y="212" text-anchor="middle" class="step">成本：约 300k GPU-hours，不复用 LLM</text>
+  <text x="710" y="232" text-anchor="middle" class="caption">没有对齐债务，78B 时匹敌 Gemini 2.5 Pro</text>
 
   <rect x="30" y="280" width="900" height="230" class="box"/>
-  <text x="480" y="302" text-anchor="middle" class="head">deployment optimizations: ViR + DvD</text>
+  <text x="480" y="302" text-anchor="middle" class="head">部署优化：ViR + DvD</text>
 
   <rect x="60" y="320" width="400" height="180" class="cold"/>
-  <text x="260" y="342" text-anchor="middle" class="step">Visual Resolution Router (ViR)</text>
-  <text x="260" y="362" text-anchor="middle" class="small">small classifier picks min resolution per query</text>
-  <text x="260" y="380" text-anchor="middle" class="small">low / medium / high tiers</text>
-  <text x="260" y="396" text-anchor="middle" class="small">50% of real queries are low-res candidates</text>
-  <text x="260" y="412" text-anchor="middle" class="small">avg tokens drop from 2048 to ~590 per query</text>
-  <text x="260" y="438" text-anchor="middle" class="step">net effect: 2-3x inference throughput</text>
-  <text x="260" y="462" text-anchor="middle" class="caption">failure modes: route low when task needs OCR</text>
+  <text x="260" y="342" text-anchor="middle" class="step">视觉分辨率路由器（ViR）</text>
+  <text x="260" y="362" text-anchor="middle" class="small">小分类器为每条查询选择最低所需分辨率</text>
+  <text x="260" y="380" text-anchor="middle" class="small">低 / 中 / 高档位</text>
+  <text x="260" y="396" text-anchor="middle" class="small">50% 真实查询可使用低分辨率</text>
+  <text x="260" y="412" text-anchor="middle" class="small">每条查询平均 token 从 2048 降至约 590</text>
+  <text x="260" y="438" text-anchor="middle" class="step">净效果：推理吞吐提高 2-3 倍</text>
+  <text x="260" y="462" text-anchor="middle" class="caption">失败模式：需要 OCR 时却选择低分辨率</text>
 
   <rect x="490" y="320" width="400" height="180" class="reg"/>
-  <text x="690" y="342" text-anchor="middle" class="step">Decoupled Vision-Language (DvD)</text>
-  <text x="690" y="362" text-anchor="middle" class="small">encoder on GPU-A, LLM on GPU-B</text>
-  <text x="690" y="380" text-anchor="middle" class="small">stream patch tokens A -&gt; B via NCCL</text>
-  <text x="690" y="396" text-anchor="middle" class="small">encoder runs once, LLM runs many steps</text>
+  <text x="690" y="342" text-anchor="middle" class="step">视觉语言解耦（DvD）</text>
+  <text x="690" y="362" text-anchor="middle" class="small">编码器位于 GPU-A，LLM 位于 GPU-B</text>
+  <text x="690" y="380" text-anchor="middle" class="small">通过 NCCL 将分块 token 从 A 流向 B</text>
+  <text x="690" y="396" text-anchor="middle" class="small">编码器运行一次，LLM 运行多步</text>
   <text x="690" y="412" text-anchor="middle" class="small">bottleneck = max(enc, llm * output_len)</text>
-  <text x="690" y="438" text-anchor="middle" class="step">~2x throughput vs co-located</text>
-  <text x="690" y="462" text-anchor="middle" class="caption">hurts for low-traffic single-request latency</text>
+  <text x="690" y="438" text-anchor="middle" class="step">吞吐约为共置部署的 2 倍</text>
+  <text x="690" y="462" text-anchor="middle" class="caption">低流量单请求延迟会变差</text>
 </svg>

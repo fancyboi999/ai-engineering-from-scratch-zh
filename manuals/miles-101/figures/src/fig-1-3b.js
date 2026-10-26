@@ -16,7 +16,7 @@ module.exports = figure('fig-1-3b', {
   title: '模型学习后，答案逐渐变短',
   desc: '三个随机种子每步的平均答案长度，单位为 token。长度上限为 1,024 token。答案长度从约 720 token 降至约 460 token，因此触及上限的答案更少。',
 }, f => {
-  const c = chart(f, { x: 60, y: 56, w: 560, h: 210, xDomain: [0, 47], yDomain: [350, 850], xTicks: [0, 12, 24, 36, 47], yTicks: [400, 500, 600, 700, 800], xLabel: '步骤', yLabel: 'mean answer length, tokens' });
+  const c = chart(f, { x: 60, y: 56, w: 560, h: 210, xDomain: [0, 47], yDomain: [350, 850], xTicks: [0, 12, 24, 36, 47], yTicks: [400, 500, 600, 700, 800], xLabel: '步骤', yLabel: "平均答案长度，token 数" });
   for (const s of seeds) {
     const rows = runs[s.key].per_step;
     c.series(rows.map(r => [r.step, r.length]), { hue: s.hue, dash: s.dash, name: s.name, dots: false, width: 1.6 });

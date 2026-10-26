@@ -3,24 +3,24 @@
 const { figure, color } = require('../../../_shared/figkit.js');
 
 const left = [
-  ['identity', 'digests equal', 'unchanged'],
-  ['pseudocode', '272 to 272', 'unchanged'],
-  ['assembly', '161 to 161', 'unchanged'],
-  ['comments', '0 to 0', 'unchanged'],
-  ['calls', '1 to 1', 'unchanged'],
-  ['references', '3 to 3', 'unknown'],
-  ['strings_names', '1 to 1', 'unchanged'],
-  ['cfg', '3 to 3', 'unchanged'],
+  ['identity', '摘要哈希相同', 'unchanged'],
+  ['pseudocode', '272 至 272', 'unchanged'],
+  ['assembly', '161 至 161', 'unchanged'],
+  ['comments', '0 至 0', 'unchanged'],
+  ['calls', '1 至 1', 'unchanged'],
+  ['references', '3 至 3', 'unknown'],
+  ['strings_names', '1 至 1', 'unchanged'],
+  ['cfg', '3 至 3', 'unchanged'],
 ];
 const right = [
-  ['identity', 'digests equal', 'unchanged'],
-  ['pseudocode', '300 to 2904', 'changed'],
-  ['assembly', '336 to 1866', 'changed'],
-  ['comments', '0 to 0', 'unchanged'],
-  ['calls', '1 to 1', 'unchanged'],
-  ['references', '4 to 13', 'changed'],
-  ['strings_names', '2 to 11', 'changed'],
-  ['cfg', '5 to 16', 'changed'],
+  ['identity', '摘要哈希相同', 'unchanged'],
+  ['pseudocode', '300 至 2904', 'changed'],
+  ['assembly', '336 至 1866', 'changed'],
+  ['comments', '0 至 0', 'unchanged'],
+  ['calls', '1 至 1', 'unchanged'],
+  ['references', '4 至 13', 'changed'],
+  ['strings_names', '2 至 11', 'changed'],
+  ['cfg', '5 至 16', 'changed'],
 ];
 
 function column(f, x, kicker, head, hue, dash, rows) {

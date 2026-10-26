@@ -15,16 +15,16 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">Pix2Pix — U-Net generator, PatchGAN discriminator</text>
+  <text x="450" y="28" text-anchor="middle" class="title">Pix2Pix：U-Net 生成器、PatchGAN 判别器</text>
 
   <!-- input image -->
   <rect x="30" y="90" width="90" height="70" class="box"/>
-  <text x="75" y="120" text-anchor="middle" class="content">input x</text>
-  <text x="75" y="140" text-anchor="middle" class="caption">edge map</text>
+  <text x="75" y="120" text-anchor="middle" class="content">输入 x</text>
+  <text x="75" y="140" text-anchor="middle" class="caption">边缘图</text>
 
   <!-- U-Net generator -->
   <rect x="140" y="60" width="420" height="140" class="cold"/>
-  <text x="350" y="82" text-anchor="middle" class="label">U-Net generator  G(x)</text>
+  <text x="350" y="82" text-anchor="middle" class="label">U-Net 生成器 G(x)</text>
 
   <!-- encoder blocks -->
   <rect x="160" y="100" width="40" height="80" class="box"/>
@@ -42,18 +42,18 @@
   <path d="M 230,110 Q 310,80 460,110" fill="none" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="4,3"/>
   <path d="M 280,120 Q 330,95 410,120" fill="none" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="4,3"/>
 
-  <text x="350" y="195" text-anchor="middle" class="caption">skip connections preserve high-freq detail</text>
+  <text x="350" y="195" text-anchor="middle" class="caption">跳跃连接保留高频细节</text>
 
   <line x1="540" y1="130" x2="580" y2="130" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <!-- output -->
   <rect x="580" y="95" width="90" height="70" class="box"/>
-  <text x="625" y="125" text-anchor="middle" class="content">output y&#770;</text>
-  <text x="625" y="145" text-anchor="middle" class="caption">photo</text>
+  <text x="625" y="125" text-anchor="middle" class="content">输出 ŷ</text>
+  <text x="625" y="145" text-anchor="middle" class="caption">照片</text>
 
   <!-- real target -->
   <rect x="680" y="95" width="90" height="70" class="box"/>
-  <text x="725" y="125" text-anchor="middle" class="content">target y</text>
+  <text x="725" y="125" text-anchor="middle" class="content">目标 y</text>
 
   <!-- L1 loss -->
   <rect x="780" y="95" width="80" height="70" class="hot"/>
@@ -66,9 +66,9 @@
   <!-- PatchGAN D -->
   <rect x="30" y="250" width="220" height="100" class="hot"/>
   <text x="140" y="273" text-anchor="middle" class="label">PatchGAN D(x, y&#770;)</text>
-  <text x="140" y="295" text-anchor="middle" class="caption">output is an N &#215; N grid</text>
-  <text x="140" y="315" text-anchor="middle" class="caption">each cell judges ~70&#215;70 patch</text>
-  <text x="140" y="335" text-anchor="middle" class="caption">averaged &#8594; real / fake score</text>
+  <text x="140" y="295" text-anchor="middle" class="caption">输出为 N × N 网格</text>
+  <text x="140" y="315" text-anchor="middle" class="caption">每格判断约 70×70 的分块</text>
+  <text x="140" y="335" text-anchor="middle" class="caption">取平均 → 真 / 假得分</text>
 
   <line x1="75" y1="160" x2="75" y2="250" stroke="#1a1a1a" stroke-width="1.2"/>
   <line x1="75" y1="250" x2="30" y2="280" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
@@ -76,15 +76,15 @@
 
   <!-- objective -->
   <rect x="290" y="250" width="570" height="100" class="box"/>
-  <text x="575" y="275" text-anchor="middle" class="label">objective</text>
+  <text x="575" y="275" text-anchor="middle" class="label">目标函数</text>
   <text x="575" y="298" text-anchor="middle" class="mono">L_G = -log D(x, G(x)) + 100 &#183; ||y - G(x)||_1</text>
   <text x="575" y="320" text-anchor="middle" class="mono">L_D = -log D(x, y) - log (1 - D(x, G(x)))</text>
-  <text x="575" y="340" text-anchor="middle" class="caption">L1 stabilizes + sharp edges; adv term fights blur</text>
+  <text x="575" y="340" text-anchor="middle" class="caption">L1 稳定训练并保留锐利边缘；对抗项减少模糊</text>
 
   <!-- CycleGAN callout -->
   <rect x="30" y="380" width="830" height="100" class="box"/>
-  <text x="445" y="403" text-anchor="middle" class="label">CycleGAN (unpaired): add a second G and a cycle-consistency loss</text>
+  <text x="445" y="403" text-anchor="middle" class="label">CycleGAN（非配对）：增加第二个 G 与循环一致性损失</text>
   <text x="445" y="425" text-anchor="middle" class="mono">G: X -&gt; Y,  F: Y -&gt; X,  loss += ||F(G(x)) - x||_1 + ||G(F(y)) - y||_1</text>
-  <text x="445" y="447" text-anchor="middle" class="caption">no paired data needed; horses &lt;-&gt; zebras, summer &lt;-&gt; winter</text>
-  <text x="445" y="465" text-anchor="middle" class="caption">2026: mostly superseded by ControlNet + IP-Adapter over diffusion</text>
+  <text x="445" y="447" text-anchor="middle" class="caption">无须配对数据；马 &lt;-&gt; 斑马、夏季 &lt;-&gt; 冬季</text>
+  <text x="445" y="465" text-anchor="middle" class="caption">2026：大多被基于扩散的 ControlNet + IP-Adapter 取代</text>
 </svg>

@@ -15,17 +15,17 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Differential privacy for LLMs: DP-SGD and its alternatives</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLM 差分隐私：DP-SGD 及其替代方案</text>
 
   <rect x="60" y="60" width="540" height="340" class="box"/>
-  <text x="330" y="85" text-anchor="middle" class="head">DP-SGD privacy-utility frontier</text>
+  <text x="330" y="85" text-anchor="middle" class="head">DP-SGD 隐私与效用前沿</text>
   <line x1="120" y1="360" x2="560" y2="360" class="axis"/>
   <line x1="120" y1="360" x2="120" y2="100" class="axis"/>
-  <text x="330" y="390" text-anchor="middle" class="small">1 / epsilon (log) -&gt; more private -&gt;</text>
-  <text x="70" y="230" text-anchor="middle" class="small" transform="rotate(-90 70 230)">utility (accuracy)</text>
+  <text x="330" y="390" text-anchor="middle" class="small">1 / epsilon（对数）-&gt; 更强隐私 -&gt;</text>
+  <text x="70" y="230" text-anchor="middle" class="small" transform="rotate(-90 70 230)">效用（准确率）</text>
 
   <path d="M 150 110 Q 260 140 360 220 T 540 340" class="curve" stroke="#c0392b"/>
-  <text x="480" y="330" class="small" fill="#c0392b">no-adapter DP-SGD</text>
+  <text x="480" y="330" class="small" fill="#c0392b">不使用适配器的 DP-SGD</text>
 
   <path d="M 150 110 Q 260 125 360 180 T 540 280" class="curve" stroke="#2e7d32"/>
   <text x="470" y="270" class="small" fill="#2e7d32">LoRA + DP-SGD</text>
@@ -36,25 +36,25 @@
   <text x="385" y="110" class="small" fill="#888">epsilon ~ 3</text>
 
   <rect x="620" y="60" width="280" height="160" class="box"/>
-  <text x="760" y="85" text-anchor="middle" class="head">alternatives</text>
+  <text x="760" y="85" text-anchor="middle" class="head">替代方案</text>
   <rect x="640" y="100" width="240" height="50" class="cold"/>
-  <text x="760" y="122" text-anchor="middle" class="step">PMixED (inference-time)</text>
-  <text x="760" y="140" text-anchor="middle" class="small">mixture of experts + DP noise</text>
+  <text x="760" y="122" text-anchor="middle" class="step">PMixED（推理时）</text>
+  <text x="760" y="140" text-anchor="middle" class="small">混合专家 + DP 噪声</text>
   <rect x="640" y="160" width="240" height="50" class="cold"/>
-  <text x="760" y="182" text-anchor="middle" class="step">DP synthetic data</text>
-  <text x="760" y="200" text-anchor="middle" class="small">downstream training on synth</text>
+  <text x="760" y="182" text-anchor="middle" class="step">DP 合成数据</text>
+  <text x="760" y="200" text-anchor="middle" class="small">在合成数据上训练下游模型</text>
 
   <rect x="620" y="240" width="280" height="160" class="box"/>
-  <text x="760" y="265" text-anchor="middle" class="head">2024-2025 evidence tension</text>
+  <text x="760" y="265" text-anchor="middle" class="head">2024-2025 证据的张力</text>
   <rect x="640" y="280" width="240" height="50" class="cool"/>
-  <text x="760" y="302" text-anchor="middle" class="step">canary MIA (Duan 2024)</text>
-  <text x="760" y="320" text-anchor="middle" class="small">limited success</text>
+  <text x="760" y="302" text-anchor="middle" class="step">金丝雀成员推断攻击（Duan 2024）</text>
+  <text x="760" y="320" text-anchor="middle" class="small">效果有限</text>
   <rect x="640" y="340" width="240" height="50" class="hot"/>
-  <text x="760" y="362" text-anchor="middle" class="step">extraction (Carlini, Nasr 2025)</text>
-  <text x="760" y="380" text-anchor="middle" class="small">substantial memorization</text>
+  <text x="760" y="362" text-anchor="middle" class="step">提取（Carlini、Nasr 2025）</text>
+  <text x="760" y="380" text-anchor="middle" class="small">大量记忆</text>
 
   <rect x="60" y="420" width="840" height="70" class="box"/>
-  <text x="80" y="445" class="small">Kowalczyk et al. 2025: the two measure different things. canaries measure "insertion"; extraction measures "most-extractable".</text>
-  <text x="80" y="465" class="small">DP Reversal via LLM Feedback: confidence scores can leak re-identification signal even when outputs do not.</text>
-  <text x="80" y="483" class="small">deployment rule: epsilon + accountant + MIA protocol + extraction test + confidence exposure check.</text>
+  <text x="80" y="445" class="small">Kowalczyk 等，2025：两者测量不同内容。金丝雀测量“插入”；提取测量“最易提取”的内容。</text>
+  <text x="80" y="465" class="small">通过 LLM 反馈逆转 DP：即使输出不泄露，置信度分数仍可能泄露重新识别的信号。</text>
+  <text x="80" y="483" class="small">部署规则：epsilon、隐私计量器、成员推断协议、提取测试、置信度暴露检查。</text>
 </svg>

@@ -13,16 +13,16 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">three algorithms, same token budget</text>
+  <text x="450" y="30" text-anchor="middle" class="title">三种算法，相同 token 预算</text>
 
   <!-- BPE column -->
   <rect x="40" y="60" width="260" height="360" class="box"/>
-  <text x="170" y="85" text-anchor="middle" class="label">BPE — greedy merge</text>
+  <text x="170" y="85" text-anchor="middle" class="label">BPE：贪心合并</text>
 
   <rect x="60" y="105" width="220" height="30" class="hot"/>
   <text x="170" y="125" text-anchor="middle" class="content">l o w e r</text>
 
-  <text x="170" y="155" text-anchor="middle" class="caption">merge most frequent pair</text>
+  <text x="170" y="155" text-anchor="middle" class="caption">合并最常见的词元对</text>
   <line x1="170" y1="162" x2="170" y2="180" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="185" width="220" height="30" class="box"/>
@@ -38,40 +38,40 @@
   <rect x="60" y="305" width="220" height="30" class="box"/>
   <text x="170" y="325" text-anchor="middle" class="content">lower</text>
 
-  <text x="170" y="365" text-anchor="middle" class="caption">used by: GPT, Llama, Gemma,</text>
+  <text x="170" y="365" text-anchor="middle" class="caption">使用方：GPT、Llama、Gemma、</text>
   <text x="170" y="382" text-anchor="middle" class="caption">Qwen, Mistral</text>
-  <text x="170" y="405" text-anchor="middle" class="caption">deterministic at inference</text>
+  <text x="170" y="405" text-anchor="middle" class="caption">推理时结果确定</text>
 
   <!-- Unigram column -->
   <rect x="320" y="60" width="260" height="360" class="box"/>
-  <text x="450" y="85" text-anchor="middle" class="label">Unigram — probabilistic prune</text>
+  <text x="450" y="85" text-anchor="middle" class="label">Unigram：概率剪枝</text>
 
   <rect x="340" y="105" width="220" height="30" class="box"/>
-  <text x="450" y="125" text-anchor="middle" class="content">start: 50k candidates</text>
+  <text x="450" y="125" text-anchor="middle" class="content">起始：50k 个候选</text>
 
   <line x1="450" y1="140" x2="450" y2="158" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="340" y="163" width="220" height="50" class="box"/>
-  <text x="450" y="182" text-anchor="middle" class="content">score each by unigram p</text>
-  <text x="450" y="200" text-anchor="middle" class="content">prune lowest-loss tokens</text>
+  <text x="450" y="182" text-anchor="middle" class="content">按 unigram 概率 p 评分</text>
+  <text x="450" y="200" text-anchor="middle" class="content">剪除损失最低的 token</text>
 
   <line x1="450" y1="220" x2="450" y2="238" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="340" y="243" width="220" height="30" class="box"/>
-  <text x="450" y="263" text-anchor="middle" class="content">repeat to target size</text>
+  <text x="450" y="263" text-anchor="middle" class="content">重复至目标大小</text>
 
   <line x1="450" y1="280" x2="450" y2="298" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="340" y="303" width="220" height="32" class="hot"/>
   <text x="450" y="324" text-anchor="middle" class="content">"lower" → {lo+wer, l+ower, low+er}</text>
 
-  <text x="450" y="365" text-anchor="middle" class="caption">used by: T5, Gemma, mBART,</text>
+  <text x="450" y="365" text-anchor="middle" class="caption">使用方：T5、Gemma、mBART、</text>
   <text x="450" y="382" text-anchor="middle" class="caption">ALBERT, XLNet</text>
-  <text x="450" y="405" text-anchor="middle" class="caption">samplable (subword regularization)</text>
+  <text x="450" y="405" text-anchor="middle" class="caption">可采样（子词正则化）</text>
 
   <!-- WordPiece column -->
   <rect x="600" y="60" width="260" height="360" class="box"/>
-  <text x="730" y="85" text-anchor="middle" class="label">WordPiece — max likelihood</text>
+  <text x="730" y="85" text-anchor="middle" class="label">WordPiece：最大似然</text>
 
   <rect x="620" y="105" width="220" height="30" class="hot"/>
   <text x="730" y="125" text-anchor="middle" class="content">l ##o ##w ##e ##r</text>
@@ -79,7 +79,7 @@
   <line x1="730" y1="140" x2="730" y2="158" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="620" y="163" width="220" height="50" class="box"/>
-  <text x="730" y="182" text-anchor="middle" class="content">merge pair that maximizes</text>
+  <text x="730" y="182" text-anchor="middle" class="content">合并使下式最大的词元对</text>
   <text x="730" y="200" text-anchor="middle" class="content">P(ab) / (P(a)·P(b))</text>
 
   <line x1="730" y1="220" x2="730" y2="238" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -92,9 +92,9 @@
   <rect x="620" y="303" width="220" height="30" class="box"/>
   <text x="730" y="323" text-anchor="middle" class="content">l ##ower</text>
 
-  <text x="730" y="365" text-anchor="middle" class="caption">used by: BERT, DistilBERT,</text>
+  <text x="730" y="365" text-anchor="middle" class="caption">使用方：BERT、DistilBERT、</text>
   <text x="730" y="382" text-anchor="middle" class="caption">ELECTRA</text>
-  <text x="730" y="405" text-anchor="middle" class="caption">## marks continuation</text>
+  <text x="730" y="405" text-anchor="middle" class="caption">## 标记后续子词</text>
 
-  <text x="450" y="450" text-anchor="middle" class="caption">tokenize once, ship forever — vocabulary is frozen at training time</text>
+  <text x="450" y="450" text-anchor="middle" class="caption">分词一次，持续使用：词表在训练时固定</text>
 </svg>

@@ -11,7 +11,7 @@ module.exports = figure('fig-3-7', {
   f.kicker(350, 18, '沙箱');
 
   const remote = f.box({ x: 350, y: 26, w: 270, h: 50, hue: 'grey', title: 'mcp.deepwiki.com/mcp', sub: '远程端点，在VM外' });
-  const store = f.box({ x: 20, y: 26, w: 270, h: 84, hue: 'olive', title: 'sbx mcp add m101-deepwiki', sub: ['--url https://mcp.deepwiki.com/mcp', 'remote · streamable-http', 'requires_oauth: false · auth status: []'] });
+  const store = f.box({ x: 20, y: 26, w: 270, h: 84, hue: 'olive', title: 'sbx mcp add m101-deepwiki', sub: ['--url https://mcp.deepwiki.com/mcp', '远端 · streamable-http', 'requires_oauth: false · auth status: []'] });
   f.arrow(store.right(26), [remote.x - 1, 52], { style: 'effect', label: '不受策略', labelX: 320 });
 
   const gw1 = f.box({ x: 70, y: 150, w: 230, h: 56, hue: 'olive', title: 'mcp-gateway-m101-mcp', sub: '静态 · --static-mcp' });
@@ -21,9 +21,11 @@ module.exports = figure('fig-3-7', {
   f.text(48, 250, '实时加载', { size: 11.5, knock: true });
 
   const sb1 = f.box({ x: 380, y: 128, w: 240, h: 100, hue: 'blue', title: 'm101-mcp · tools/list', sub: ['ask_wiki_question read_wiki_contents', 'read_wiki_structure', 'code-mode mcp-exec', '无 mcp-find/mcp-add/mcp-config-set'] });
-  const sb2 = f.box({ x: 380, y: 250, w: 240, h: 124, hue: 'blue', title: 'm101-mcp-dyn · tools/list', sub: ['before: code-mode mcp-add', 'mcp-config-set mcp-exec mcp-find', 'after load: + ask_wiki_question', 'read_wiki_contents', 'read_wiki_structure'] });
+  const sb2 = f.box({ x: 380, y: 250, w: 240, h: 124, hue: 'blue', title: 'm101-mcp-dyn · tools/list', sub: ['加载前：code-mode mcp-add', 'mcp-config-set mcp-exec mcp-find', '加载后：+ ask_wiki_question', 'read_wiki_contents', 'read_wiki_structure'] });
   f.arrow(gw1.right(), [sb1.x - 1, gw1.cy], { style: 'call', label: 'gateway URL', labelSize: 11 });
   f.arrow(gw2.right(), [sb2.x - 1, gw2.cy], { style: 'event', label: 'list_changed', labelSize: 11 });
 
   f.box({ x: 20, y: 386, w: 600, h: 40, hue: 'grey', dash: 'dashed', title: '<server>-authorize与sbx mcp auth：此次无OAuth服务器', titleSize: 11.5, weight: 400 });
-});
+})
+  // 保留冻结背景几何，只替换最终 SVG 中的完整文字节点。
+  .replace(">gateway URL</text>", ">网关 URL</text>");

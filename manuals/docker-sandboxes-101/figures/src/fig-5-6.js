@@ -7,15 +7,15 @@ const step = 100.8;
 const cellX = turn => left + turn * step + 1;
 const filesTurns = [
   ['list_directory', 'path .', 'olive'],
-  ['answer', '1 file', 'violet'],
-  ['shell', 'wc -l rejected', 'olive'],
+  ["回答", "1 个文件", 'violet'],
+  ['shell', "wc -l 被拒绝", 'olive'],
   ['read_file', 'README.md', 'olive'],
-  ['answer', '1 line', 'violet'],
+  ["回答", "1 行", 'violet'],
 ];
 
 const evals = [
-  { y: 300, name: ['Count the lines of README.md'], calls: ['expected: shell', 'actual: shell'], f1: '1.0', fail: false },
-  { y: 342, name: ['List the files in the', 'working directory'], calls: ['expected: list_directory', 'actual: list_directory, shell'], f1: '0.67', fail: true },
+  { y: 300, name: ['Count the lines of README.md'], calls: ["预期：shell", "实际：shell"], f1: '1.0', fail: false },
+  { y: 342, name: ['List the files in the', 'working directory'], calls: ["预期：list_directory", "实际：list_directory、shell"], f1: '0.67', fail: true },
 ];
 
 function cell(f, x, y, w, h, hue, title, sub, dash) {
@@ -29,8 +29,8 @@ module.exports = figure('fig-5-6', {
   title: '同一轮次轴的两次运行及两项评估',
   desc: '顶为轮次0至4的三个会话，每格一个模型回复。-1/-2为files.yaml重放，依次list_directory、单文件答案、被拒wc -l、read_file README、单行答案，五轮匹配。-3为guarded的restricted，第0轮echo m101-ok首个分歧，之后不比较。相同退出0，--fail-on-divergence分歧退出1。底eval：数行预期/实际shell，F1 1.0、相关性1/1、长度S；列文件预期list_directory，实际加shell，F1 0.67、相关性1/1、长度S。',
 }, f => {
-  f.kicker(20, 18, 'sessions diff, 21-sessions-diff.txt');
-  for (let turn = 0; turn < 5; turn += 1) f.text(cellX(turn) + 49, 40, `turn ${turn}`, { size: 11, hue: 'ink-soft', anchor: 'middle' });
+  f.kicker(20, 18, '会话差异，21-sessions-diff.txt');
+  for (let turn = 0; turn < 5; turn += 1) f.text(cellX(turn) + 49, 40, `第 ${turn} 轮`, { size: 11, hue: 'ink-soft', anchor: 'middle' });
 
   const tracks = [{ y: 50, name: '-1' }, { y: 96, name: '-2' }];
   for (const track of tracks) {

@@ -13,71 +13,71 @@
     </style>
   </defs>
 
-  <text x="440" y="26" text-anchor="middle" class="title">Cost governors layer by time scale. Each layer catches a distinct failure.</text>
+  <text x="440" y="26" text-anchor="middle" class="title">成本控制按时间尺度分层，每层捕获不同的失败。</text>
 
   <rect x="40" y="50" width="800" height="460" class="box"/>
 
   <!-- Time-scale rows -->
-  <text x="60" y="80" class="label">time scale</text>
-  <text x="240" y="80" class="label">layer</text>
-  <text x="500" y="80" class="label">catches</text>
+  <text x="60" y="80" class="label">时间尺度</text>
+  <text x="240" y="80" class="label">层</text>
+  <text x="500" y="80" class="label">识别</text>
 
   <!-- Per request -->
   <rect x="60" y="90" width="160" height="40" class="cool"/>
-  <text x="140" y="115" text-anchor="middle" class="small">per request (&lt;1 s)</text>
+  <text x="140" y="115" text-anchor="middle" class="small">每次请求（&lt;1 s）</text>
   <rect x="230" y="90" width="240" height="40" class="cold"/>
   <text x="350" y="115" text-anchor="middle" class="content">max_tokens</text>
   <rect x="480" y="90" width="340" height="40" class="box"/>
-  <text x="650" y="115" text-anchor="middle" class="small">unbounded completion (single LLM call)</text>
+  <text x="650" y="115" text-anchor="middle" class="small">无上限生成（单次 LLM 调用）</text>
 
   <!-- Per session -->
   <rect x="60" y="135" width="160" height="40" class="cool"/>
-  <text x="140" y="160" text-anchor="middle" class="small">per session (min)</text>
+  <text x="140" y="160" text-anchor="middle" class="small">每个会话（分钟）</text>
   <rect x="230" y="135" width="240" height="40" class="cold"/>
   <text x="350" y="160" text-anchor="middle" class="content">max_turns, max_budget_usd</text>
   <rect x="480" y="135" width="340" height="40" class="box"/>
-  <text x="650" y="160" text-anchor="middle" class="small">long reasoning loop in one session</text>
+  <text x="650" y="160" text-anchor="middle" class="small">单个会话中的长推理循环</text>
 
   <!-- Per tool -->
   <rect x="60" y="180" width="160" height="40" class="cool"/>
-  <text x="140" y="205" text-anchor="middle" class="small">per tool (sess.)</text>
+  <text x="140" y="205" text-anchor="middle" class="small">每个工具（每会话）</text>
   <rect x="230" y="180" width="240" height="40" class="cold"/>
-  <text x="350" y="205" text-anchor="middle" class="content">per-tool cap (e.g., ≤5 WebFetch)</text>
+  <text x="350" y="205" text-anchor="middle" class="content">单工具上限（例如 ≤5 次 WebFetch）</text>
   <rect x="480" y="180" width="340" height="40" class="box"/>
-  <text x="650" y="205" text-anchor="middle" class="small">new tool triggers new loop (e.g. order-track)</text>
+  <text x="650" y="205" text-anchor="middle" class="small">新增工具触发新循环（如订单追踪）</text>
 
   <!-- Velocity -->
   <rect x="60" y="225" width="160" height="40" class="warn"/>
-  <text x="140" y="250" text-anchor="middle" class="small">velocity (10 min)</text>
+  <text x="140" y="250" text-anchor="middle" class="small">消费速度（10 分钟）</text>
   <rect x="230" y="225" width="240" height="40" class="cold"/>
-  <text x="350" y="250" text-anchor="middle" class="content">cut off above $50 / 10 min</text>
+  <text x="350" y="250" text-anchor="middle" class="content">超过 $50 / 10 分钟即切断</text>
   <rect x="480" y="225" width="340" height="40" class="box"/>
-  <text x="650" y="250" text-anchor="middle" class="small">runaway loop; fast-burn</text>
+  <text x="650" y="250" text-anchor="middle" class="small">失控循环、快速消耗</text>
 
   <!-- Daily -->
   <rect x="60" y="270" width="160" height="40" class="hot"/>
-  <text x="140" y="295" text-anchor="middle" class="small">per day</text>
+  <text x="140" y="295" text-anchor="middle" class="small">每天</text>
   <rect x="230" y="270" width="240" height="40" class="cold"/>
-  <text x="350" y="295" text-anchor="middle" class="content">rolling daily cap + alert</text>
+  <text x="350" y="295" text-anchor="middle" class="content">滚动日上限 + 告警</text>
   <rect x="480" y="270" width="340" height="40" class="box"/>
-  <text x="650" y="295" text-anchor="middle" class="small">slow leak; gradual doubling</text>
+  <text x="650" y="295" text-anchor="middle" class="small">缓慢泄漏、逐渐翻倍</text>
 
   <!-- Weekly/monthly -->
   <rect x="60" y="315" width="160" height="40" class="hot"/>
-  <text x="140" y="340" text-anchor="middle" class="small">per week/month</text>
+  <text x="140" y="340" text-anchor="middle" class="small">每周/月</text>
   <rect x="230" y="315" width="240" height="40" class="cold"/>
-  <text x="350" y="340" text-anchor="middle" class="content">hard monthly cap + weekly alert</text>
+  <text x="350" y="340" text-anchor="middle" class="content">月度硬上限 + 每周告警</text>
   <rect x="480" y="315" width="340" height="40" class="box"/>
-  <text x="650" y="340" text-anchor="middle" class="small">bad release; regression across sessions</text>
+  <text x="650" y="340" text-anchor="middle" class="small">有缺陷发布、跨会话回归</text>
 
   <!-- Cost-reduction row -->
   <rect x="60" y="370" width="760" height="54" class="cool"/>
-  <text x="440" y="392" text-anchor="middle" class="label">orthogonal: cost reduction at constant quality</text>
-  <text x="80" y="412" class="content">prompt caching · context windowing / compaction · tiered model routing · parallel cache for long-horizon runs</text>
+  <text x="440" y="392" text-anchor="middle" class="label">独立方向：质量不变时降低成本</text>
+  <text x="80" y="412" class="content">prompt 缓存、上下文窗口管理与压缩、分层模型路由、长程任务并行缓存</text>
 
   <!-- Kill switch row -->
   <rect x="60" y="430" width="760" height="60" class="hot"/>
-  <text x="440" y="452" text-anchor="middle" class="label">kill switch on breach</text>
-  <text x="80" y="472" class="content">any cap fires → session aborts → alert → manual re-enable required → agent cannot modify its own cap</text>
-  <text x="80" y="486" class="small">observed 2026: e-commerce agent $1,200 → $4,800 after tool addition; weekly-growth alert was the fix.</text>
+  <text x="440" y="452" text-anchor="middle" class="label">超限熔断</text>
+  <text x="80" y="472" class="content">触发任一上限 → 终止会话 → 告警 → 必须人工重新启用 → agent 无权修改自身上限</text>
+  <text x="80" y="486" class="small">2026 年观察：电商 agent 新增工具后成本从 $1,200 增至 $4,800；通过每周增长告警修正。</text>
 </svg>

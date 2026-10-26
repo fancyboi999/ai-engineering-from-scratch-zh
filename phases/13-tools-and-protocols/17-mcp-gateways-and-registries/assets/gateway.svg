@@ -17,79 +17,79 @@
     </style>
   </defs>
 
-  <text x="480" y="28" text-anchor="middle" class="title">A 2026-07-28 gateway forwards requests, not protocol sessions</text>
+  <text x="480" y="28" text-anchor="middle" class="title">2026-07-28 版网关转发请求，不转发协议会话</text>
 
   <rect x="25" y="58" width="210" height="445" rx="8" class="green"/>
-  <text x="130" y="84" text-anchor="middle" class="head">client</text>
+  <text x="130" y="84" text-anchor="middle" class="head">客户端</text>
   <text x="42" y="116" class="mono">POST /mcp</text>
-  <text x="42" y="136" class="small">bearer principal</text>
-  <text x="42" y="156" class="small">version + method + name</text>
-  <text x="42" y="176" class="small">params._meta capabilities</text>
+  <text x="42" y="136" class="small">持有者身份主体</text>
+  <text x="42" y="156" class="small">版本 + 方法 + 名称</text>
+  <text x="42" y="176" class="small">params._meta 中的能力</text>
   <text x="42" y="214" class="mono">server/discover</text>
   <text x="42" y="234" class="mono">tools/list</text>
   <text x="42" y="254" class="mono">tools/call</text>
   <text x="42" y="274" class="mono">subscriptions/listen</text>
-  <text x="42" y="312" class="small">JSON or request SSE</text>
-  <text x="42" y="350" class="mono">never current</text>
+  <text x="42" y="312" class="small">JSON 或请求级 SSE</text>
+  <text x="42" y="350" class="mono">当前版本不使用</text>
   <text x="42" y="370" class="small">initialize</text>
   <text x="42" y="390" class="small">Mcp-Session-Id</text>
-  <text x="42" y="410" class="small">standalone GET stream</text>
-  <text x="42" y="430" class="small">Last-Event-ID replay</text>
+  <text x="42" y="410" class="small">独立 GET 流</text>
+  <text x="42" y="430" class="small">Last-Event-ID 重放</text>
 
   <path d="M235,280 L300,280" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="300" y="58" width="360" height="445" rx="8" class="blue"/>
-  <text x="480" y="84" text-anchor="middle" class="head">stateless gateway policy</text>
+  <text x="480" y="84" text-anchor="middle" class="head">无状态网关策略</text>
   <rect x="320" y="104" width="150" height="68" rx="5" class="box"/>
-  <text x="334" y="126" class="mono">wire validation</text>
-  <text x="334" y="146" class="small">header equals body</text>
-  <text x="334" y="162" class="small">before routing</text>
+  <text x="334" y="126" class="mono">线协议校验</text>
+  <text x="334" y="146" class="small">请求头与正文一致</text>
+  <text x="334" y="162" class="small">在路由前校验</text>
   <rect x="490" y="104" width="150" height="68" rx="5" class="box"/>
-  <text x="504" y="126" class="mono">admission</text>
-  <text x="504" y="146" class="small">server.json publication</text>
-  <text x="504" y="162" class="small">+ external verified state</text>
+  <text x="504" y="126" class="mono">准入</text>
+  <text x="504" y="146" class="small">发布 server.json</text>
+  <text x="504" y="162" class="small">+ 已验证的外部状态</text>
   <rect x="320" y="190" width="150" height="68" rx="5" class="box"/>
-  <text x="334" y="212" class="mono">namespace + pin</text>
+  <text x="334" y="212" class="mono">命名空间 + 固定版本</text>
   <text x="334" y="232" class="small">notes.search</text>
-  <text x="334" y="248" class="small">descriptor digest</text>
+  <text x="334" y="248" class="small">描述符摘要</text>
   <rect x="490" y="190" width="150" height="68" rx="5" class="box"/>
-  <text x="504" y="212" class="mono">auth + RBAC</text>
-  <text x="504" y="232" class="small">principal and issuer</text>
-  <text x="504" y="248" class="small">resource + arguments</text>
+  <text x="504" y="212" class="mono">身份验证 + RBAC</text>
+  <text x="504" y="232" class="small">身份主体与签发者</text>
+  <text x="504" y="248" class="small">资源 + 参数</text>
   <rect x="320" y="276" width="150" height="68" rx="5" class="box"/>
-  <text x="334" y="298" class="mono">private cache</text>
-  <text x="334" y="318" class="small">deterministic lists</text>
-  <text x="334" y="334" class="small">bounded ttlMs</text>
+  <text x="334" y="298" class="mono">私有缓存</text>
+  <text x="334" y="318" class="small">确定性列表</text>
+  <text x="334" y="334" class="small">有上限的 ttlMs</text>
   <rect x="490" y="276" width="150" height="68" rx="5" class="box"/>
-  <text x="504" y="298" class="mono">rate + audit</text>
-  <text x="504" y="318" class="small">key by principal</text>
-  <text x="504" y="334" class="small">trace route decision</text>
+  <text x="504" y="298" class="mono">限流 + 审计</text>
+  <text x="504" y="318" class="small">按身份主体设置键</text>
+  <text x="504" y="334" class="small">记录路由决策</text>
   <rect x="320" y="362" width="320" height="98" rx="5" class="box"/>
-  <text x="334" y="384" class="mono">interaction routing</text>
-  <text x="334" y="404" class="small">subscriptions/listen: POST response SSE</text>
-  <text x="334" y="422" class="small">MRTR: preserve protected requestState</text>
-  <text x="334" y="440" class="small">Tasks: route get/update/cancel by task id</text>
+  <text x="334" y="384" class="mono">交互路由</text>
+  <text x="334" y="404" class="small">subscriptions/listen：POST 响应 SSE</text>
+  <text x="334" y="422" class="small">MRTR：保留受保护的 requestState</text>
+  <text x="334" y="440" class="small">Tasks：按任务 ID 路由 get/update/cancel</text>
 
   <path d="M660,180 L725,150" class="edge" marker-end="url(#arrow)"/>
   <path d="M660,280 L725,280" class="edge" marker-end="url(#arrow)"/>
   <path d="M660,380 L725,410" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="725" y="58" width="210" height="445" rx="8" class="orange"/>
-  <text x="830" y="84" text-anchor="middle" class="head">backend servers</text>
-  <text x="742" y="116" class="mono">fresh request each hop</text>
-  <text x="742" y="136" class="small">gateway is the client</text>
-  <text x="742" y="156" class="small">new request id + _meta</text>
-  <text x="742" y="194" class="mono">notes backend</text>
-  <text x="742" y="214" class="small">discover + list + call</text>
-  <text x="742" y="252" class="mono">issues backend</text>
-  <text x="742" y="272" class="small">discover + list + call</text>
-  <text x="742" y="310" class="mono">credential boundary</text>
-  <text x="742" y="330" class="small">outer token never sent</text>
-  <text x="742" y="348" class="small">backend token bound to</text>
-  <text x="742" y="366" class="small">issuer + resource</text>
-  <text x="742" y="404" class="mono">durable handles</text>
-  <text x="742" y="424" class="small">application state, MRTR,</text>
-  <text x="742" y="442" class="small">or Tasks, not sessions</text>
+  <text x="830" y="84" text-anchor="middle" class="head">后端服务器</text>
+  <text x="742" y="116" class="mono">每一跳都是新请求</text>
+  <text x="742" y="136" class="small">网关充当客户端</text>
+  <text x="742" y="156" class="small">新请求 ID + _meta</text>
+  <text x="742" y="194" class="mono">notes 后端</text>
+  <text x="742" y="214" class="small">发现 + 列举 + 调用</text>
+  <text x="742" y="252" class="mono">issues 后端</text>
+  <text x="742" y="272" class="small">发现 + 列举 + 调用</text>
+  <text x="742" y="310" class="mono">凭据边界</text>
+  <text x="742" y="330" class="small">绝不转发外层 token</text>
+  <text x="742" y="348" class="small">后端 token 绑定到</text>
+  <text x="742" y="366" class="small">签发者 + 资源</text>
+  <text x="742" y="404" class="mono">持久化句柄</text>
+  <text x="742" y="424" class="small">应用状态、MRTR，</text>
+  <text x="742" y="442" class="small">或 Tasks，而非会话</text>
 
-  <text x="480" y="542" text-anchor="middle" class="caption">Any healthy gateway instance can validate and route the next self-contained request.</text>
+  <text x="480" y="542" text-anchor="middle" class="caption">任一健康的网关实例均可校验并路由下一个自包含请求。</text>
 </svg>

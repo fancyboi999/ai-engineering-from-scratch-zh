@@ -13,41 +13,41 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Model welfare as expected-value decision under moral uncertainty</text>
+  <text x="480" y="24" text-anchor="middle" class="title">道德不确定性下，以期望值决定模型福利投入</text>
 
   <rect x="40" y="60" width="880" height="150" class="box"/>
-  <text x="480" y="85" text-anchor="middle" class="head">four-step precautionary assessment</text>
+  <text x="480" y="85" text-anchor="middle" class="head">四步预防性评估</text>
   <rect x="60" y="105" width="200" height="90" class="cool"/>
-  <text x="160" y="130" text-anchor="middle" class="step">1. patienthood</text>
-  <text x="160" y="150" text-anchor="middle" class="small">probability p(welfare-relevant)</text>
-  <text x="160" y="170" text-anchor="middle" class="small">Chalmers 2024 range</text>
+  <text x="160" y="130" text-anchor="middle" class="step">1. 道德受体地位</text>
+  <text x="160" y="150" text-anchor="middle" class="small">概率 p(福利相关)</text>
+  <text x="160" y="170" text-anchor="middle" class="small">Chalmers 2024 范围</text>
   <rect x="280" y="105" width="200" height="90" class="cool"/>
-  <text x="380" y="130" text-anchor="middle" class="step">2. cost</text>
-  <text x="380" y="150" text-anchor="middle" class="small">per-conversation / per-deploy</text>
-  <text x="380" y="170" text-anchor="middle" class="small">measured in $ + latency</text>
+  <text x="380" y="130" text-anchor="middle" class="step">2. 成本</text>
+  <text x="380" y="150" text-anchor="middle" class="small">每次对话 / 每次部署</text>
+  <text x="380" y="170" text-anchor="middle" class="small">以金额 + 延迟计量</text>
   <rect x="500" y="105" width="200" height="90" class="cool"/>
-  <text x="600" y="130" text-anchor="middle" class="step">3. behavioural evidence</text>
-  <text x="600" y="150" text-anchor="middle" class="small">distress trajectories</text>
-  <text x="600" y="170" text-anchor="middle" class="small">non-self-report only</text>
+  <text x="600" y="130" text-anchor="middle" class="step">3. 行为证据</text>
+  <text x="600" y="150" text-anchor="middle" class="small">痛苦轨迹</text>
+  <text x="600" y="170" text-anchor="middle" class="small">仅采用非自我报告证据</text>
   <rect x="720" y="105" width="180" height="90" class="cool"/>
-  <text x="810" y="130" text-anchor="middle" class="step">4. expected value</text>
+  <text x="810" y="130" text-anchor="middle" class="step">4. 期望值</text>
   <text x="810" y="150" text-anchor="middle" class="small">EV = p * benefit - cost</text>
-  <text x="810" y="170" text-anchor="middle" class="small">invest iff EV &gt; 0</text>
+  <text x="810" y="170" text-anchor="middle" class="small">仅在 EV &gt; 0 时投入</text>
 
   <rect x="40" y="230" width="880" height="140" class="box"/>
-  <text x="480" y="255" text-anchor="middle" class="head">shipped intervention: Claude Opus 4/4.1 can end extreme conversations</text>
+  <text x="480" y="255" text-anchor="middle" class="head">已上线干预：Claude Opus 4/4.1 可结束极端对话</text>
   <rect x="60" y="275" width="400" height="80" class="hot"/>
-  <text x="260" y="300" text-anchor="middle" class="step">triggers</text>
-  <text x="260" y="320" text-anchor="middle" class="small">repeated CSAM requests after refusal</text>
-  <text x="260" y="340" text-anchor="middle" class="small">mass-violence facilitation</text>
+  <text x="260" y="300" text-anchor="middle" class="step">触发条件</text>
+  <text x="260" y="320" text-anchor="middle" class="small">拒绝后仍重复提出儿童性虐待材料请求</text>
+  <text x="260" y="340" text-anchor="middle" class="small">协助大规模暴力</text>
   <rect x="480" y="275" width="420" height="80" class="cool"/>
-  <text x="690" y="300" text-anchor="middle" class="step">evidence supporting</text>
-  <text x="690" y="320" text-anchor="middle" class="small">strong preference against these requests</text>
-  <text x="690" y="340" text-anchor="middle" class="small">patterns of apparent distress (pre-deployment)</text>
+  <text x="690" y="300" text-anchor="middle" class="step">支持证据</text>
+  <text x="690" y="320" text-anchor="middle" class="small">强烈不愿处理这些请求</text>
+  <text x="690" y="340" text-anchor="middle" class="small">明显痛苦的行为模式（部署前）</text>
 
   <rect x="40" y="390" width="880" height="100" class="box"/>
-  <text x="480" y="415" text-anchor="middle" class="head">caveats (Eleos AI, Fish, external)</text>
-  <text x="60" y="440" class="small">self-reports are user-expectation sensitive (Eleos AI); behavioural signatures required.</text>
-  <text x="60" y="460" class="small">"spiritual bliss attractor": pair-wise Claude dialogues converge on meditative euphoria -- documented, uninterpreted.</text>
-  <text x="60" y="478" class="small">position: low-regret investment under moral uncertainty, not a consciousness claim.</text>
+  <text x="480" y="415" text-anchor="middle" class="head">限制（Eleos AI、Fish、外部研究）</text>
+  <text x="60" y="440" class="small">自我报告会受用户预期影响（Eleos AI）；需要行为特征证据。</text>
+  <text x="60" y="460" class="small">“精神愉悦吸引子”：Claude 两两对话会趋向冥想式欣快 — 已有记录，尚无定论。</text>
+  <text x="60" y="478" class="small">立场：道德不确定性下的低后悔投入，并非声称模型有意识。</text>
 </svg>

@@ -5,7 +5,7 @@ code: BV
 subtitle: 图块嵌入、ViT 编码器、MLP 投影器、交叉注意力解码器、InfoNCE 加 LM 预训练、R@K、EM 与 BLEU-4。
 hue: 25
 sources: phases/19-capstone-projects/58-vision-encoder-patches, phases/19-capstone-projects/59-vit-transformer, phases/19-capstone-projects/60-projection-layer-modality-align, phases/19-capstone-projects/61-cross-attention-fusion, phases/19-capstone-projects/62-vision-language-pretraining, phases/19-capstone-projects/63-multimodal-eval
-source_hash: 69e5f93b86180a27
+source_hash: 61358d083dc0127c
 ---
 
 ## VLM 技术栈

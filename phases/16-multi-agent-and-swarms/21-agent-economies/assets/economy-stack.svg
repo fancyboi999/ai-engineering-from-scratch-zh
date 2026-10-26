@@ -16,53 +16,53 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">5-layer agent-economy stack and the core mechanisms</text>
+  <text x="480" y="28" text-anchor="middle" class="title">5 层 agent 经济技术栈与核心机制</text>
 
   <rect x="40" y="60" width="420" height="220" class="box"/>
-  <text x="250" y="84" text-anchor="middle" class="head">the 5-layer stack</text>
+  <text x="250" y="84" text-anchor="middle" class="head">5 层技术栈</text>
 
   <rect x="70" y="100" width="360" height="34" class="cool"/>
-  <text x="250" y="122" text-anchor="middle" class="step">5. Governance — Agentic DAOs</text>
+  <text x="250" y="122" text-anchor="middle" class="step">5. 治理 — agent 化 DAO</text>
 
   <rect x="70" y="140" width="360" height="34" class="cold"/>
-  <text x="250" y="162" text-anchor="middle" class="step">4. Settlement — ERC-4337 account abstraction</text>
+  <text x="250" y="162" text-anchor="middle" class="step">4. 结算 — ERC-4337 账户抽象</text>
 
   <rect x="70" y="180" width="360" height="34" class="dsk"/>
-  <text x="250" y="202" text-anchor="middle" class="step">3. Cognition — LLM + RAG + MCP</text>
+  <text x="250" y="202" text-anchor="middle" class="step">3. 认知 — LLM + RAG + MCP</text>
 
   <rect x="70" y="220" width="360" height="34" class="hot"/>
-  <text x="250" y="242" text-anchor="middle" class="step">2. Identity — W3C DIDs + reputation</text>
+  <text x="250" y="242" text-anchor="middle" class="step">2. 身份 — W3C DID + 声誉</text>
 
   <rect x="70" y="260" width="360" height="34" class="box"/>
   <text x="250" y="278" text-anchor="middle" class="step">1. DePIN — Bittensor · Akash · Render</text>
 
   <rect x="500" y="60" width="420" height="220" class="cool"/>
-  <text x="710" y="84" text-anchor="middle" class="head">production networks (April 2026)</text>
+  <text x="710" y="84" text-anchor="middle" class="head">生产网络（四月 2026）</text>
 
   <text x="530" y="114" class="step">Bittensor (TAO)</text>
-  <text x="530" y="132" class="small">subnets reward task-specific models; stake-weighted scoring</text>
+  <text x="530" y="132" class="small">子网奖励任务专用模型；按质押加权评分</text>
 
   <text x="530" y="160" class="step">Fetch.ai / ASI</text>
-  <text x="530" y="178" class="small">ASI-1 Mini LLM; FET token for agent-to-agent payment</text>
+  <text x="530" y="178" class="small">ASI-1 Mini LLM；FET token 用于 agent 间支付</text>
 
   <text x="530" y="206" class="step">Gonka</text>
-  <text x="530" y="224" class="small">transformer proof-of-work; verifiable inference tasks</text>
+  <text x="530" y="224" class="small">transformer 工作量证明；可验证推理任务</text>
 
   <text x="530" y="252" class="step">LaMAS (AAMAS 2025)</text>
-  <text x="530" y="270" class="small">decentralized multi-agent system with Shapley attribution</text>
+  <text x="530" y="270" class="small">采用 Shapley 归因的去中心化多 agent 系统</text>
 
   <rect x="40" y="310" width="880" height="190" class="box"/>
-  <text x="480" y="334" text-anchor="middle" class="head">three core mechanisms</text>
+  <text x="480" y="334" text-anchor="middle" class="head">三种核心机制</text>
 
-  <text x="60" y="366" class="step">Shapley attribution</text>
-  <text x="230" y="366" class="small">fair credit allocation; sample N permutations for N&gt;6 agents</text>
-  <text x="230" y="384" class="small">axioms: efficiency, symmetry, linearity, null</text>
+  <text x="60" y="366" class="step">Shapley 归因</text>
+  <text x="230" y="366" class="small">公平分配贡献；N&gt;6 个 agent 时采样 N 种排列</text>
+  <text x="230" y="384" class="small">公理：效率、对称、线性、零贡献</text>
 
-  <text x="60" y="414" class="step">Second-price auction</text>
-  <text x="230" y="414" class="small">truthful under monotone aggregation (Google Research)</text>
-  <text x="230" y="432" class="small">winner picked by bid; pays second-highest</text>
+  <text x="60" y="414" class="step">次价拍卖</text>
+  <text x="230" y="414" class="small">单调聚合下如实报价（Google Research）</text>
+  <text x="230" y="432" class="small">按报价选胜者；支付第二高价格</text>
 
-  <text x="60" y="462" class="step">Reputation capital</text>
-  <text x="230" y="462" class="small">DID-bound score with exp. decay; slashed on verification failure</text>
-  <text x="230" y="480" class="small">cheap to read (routing); expensive to forge (accumulation over time)</text>
+  <text x="60" y="462" class="step">声誉资本</text>
+  <text x="230" y="462" class="small">DID 绑定得分，指数衰减；验证失败时惩罚</text>
+  <text x="230" y="480" class="small">读取便宜（路由）；伪造昂贵（随时间累积）</text>
 </svg>

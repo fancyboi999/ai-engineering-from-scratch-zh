@@ -1,4 +1,4 @@
-# Cross-Encoder Reranker
+# 交叉编码器重排器
 
 > Bi-encoder 把 query 和 document 各自独立 embed。Cross-encoder 把它们拼起来、一次性同时阅读。Cross-encoder 是最聪明的读者，也是最慢的那个。把它当作第二级、跑在 bi-encoder 的 top-k 上，它就能把自己的开销赚回来。
 

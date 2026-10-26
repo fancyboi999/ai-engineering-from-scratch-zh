@@ -46,7 +46,7 @@ module.exports = figure('fig-4-1', {
 
   const right = 356;
   f.rect(right, 28, 264, 72, { fill: color('panel'), stroke: color('grey-ink') });
-  f.text(right + 8, 45, 'OCI image index，tag v1', { size: 12, weight: 700 });
+  f.text(right + 8, 45, 'OCI 镜像索引，标签 v1', { size: 12, weight: 700 });
   f.text(right + 8, 61, 'application/vnd.oci.image.index.v1+json', { size: 11, serif: true, hue: 'ink-soft' });
   f.text(right + 8, 76, 'linux/arm64与证明 manifest', { size: 11, serif: true, hue: 'ink-soft' });
   f.text(right + 8, 91, 'annotations：无', { size: 11, serif: true, hue: 'ink-soft' });

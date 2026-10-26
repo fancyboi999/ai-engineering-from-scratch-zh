@@ -17,7 +17,7 @@
 
 ## 核心概念
 
-![Policy iteration and value iteration, side by side](../assets/dp.svg)
+![并排比较策略迭代与价值迭代](../assets/dp.svg)
 
 **两个算法，都是贝尔曼方程上的不动点迭代。**
 

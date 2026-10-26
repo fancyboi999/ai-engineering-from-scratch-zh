@@ -18,17 +18,17 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">scaling laws — parameters, tokens, compute, and what changed in 2026</text>
+  <text x="450" y="30" text-anchor="middle" class="title">缩放定律 — 参数、token、计算量，以及 2026 年的变化</text>
 
   <!-- Left: loss vs compute -->
   <rect x="40" y="60" width="420" height="360" class="box"/>
-  <text x="250" y="84" text-anchor="middle" class="label">loss vs training compute</text>
+  <text x="250" y="84" text-anchor="middle" class="label">损失与训练计算量</text>
 
   <!-- axes -->
   <line x1="90" y1="370" x2="430" y2="370" class="axis"/>
   <line x1="90" y1="110" x2="90" y2="370" class="axis"/>
-  <text x="250" y="400" text-anchor="middle" class="caption">log10 compute (FLOPs)</text>
-  <text x="65" y="240" text-anchor="middle" class="caption" transform="rotate(-90 65 240)">cross-entropy loss</text>
+  <text x="250" y="400" text-anchor="middle" class="caption">log10 计算量（FLOPs）</text>
+  <text x="65" y="240" text-anchor="middle" class="caption" transform="rotate(-90 65 240)">交叉熵损失</text>
 
   <!-- ticks -->
   <text x="110" y="385" text-anchor="middle" class="caption">18</text>
@@ -45,7 +45,7 @@
 
   <!-- Kaplan (under-trained) curve -->
   <path class="curve-k" d="M 110 370 Q 180 340 240 290 Q 290 250 360 225 Q 400 215 430 210"/>
-  <text x="380" y="205" class="caption" fill="#555">Kaplan 2020 (under-trained)</text>
+  <text x="380" y="205" class="caption" fill="#555">Kaplan 2020（训练不足）</text>
 
   <!-- Chinchilla (optimal) curve -->
   <path class="curve-c" d="M 110 350 Q 180 310 240 260 Q 290 220 360 195 Q 400 180 430 170"/>
@@ -53,7 +53,7 @@
 
   <!-- Floor line E -->
   <line x1="90" y1="125" x2="430" y2="125" stroke="#1a1a1a" stroke-width="0.6" stroke-dasharray="2,3"/>
-  <text x="100" y="120" class="caption">E (irreducible)</text>
+  <text x="100" y="120" class="caption">E（不可约损失）</text>
 
   <!-- Real model dots -->
   <circle cx="295" cy="245" r="4" class="pt-old"/>
@@ -65,30 +65,30 @@
 
   <!-- Right: the knob -->
   <rect x="485" y="60" width="375" height="200" class="box"/>
-  <text x="672" y="84" text-anchor="middle" class="label">compute = 6 × N × D</text>
+  <text x="672" y="84" text-anchor="middle" class="label">计算量 = 6 × N × D</text>
 
   <text x="510" y="120" class="content">N</text>
   <rect x="530" y="104" width="300" height="22" fill="#ffe0a8" stroke="#1a1a1a" stroke-width="1"/>
-  <text x="680" y="120" text-anchor="middle" class="content">parameters (capacity)</text>
+  <text x="680" y="120" text-anchor="middle" class="content">参数（容量）</text>
 
   <text x="510" y="155" class="content">D</text>
   <rect x="530" y="139" width="300" height="22" fill="#a9c9a4" stroke="#1a1a1a" stroke-width="1"/>
-  <text x="680" y="155" text-anchor="middle" class="content">training tokens (usage)</text>
+  <text x="680" y="155" text-anchor="middle" class="content">训练 token（使用量）</text>
 
-  <text x="672" y="190" text-anchor="middle" class="caption">trade at fixed C</text>
+  <text x="672" y="190" text-anchor="middle" class="caption">固定 C 下的权衡</text>
   <text x="672" y="210" text-anchor="middle" class="content">min L  =  A/N^α + B/D^β + E</text>
   <text x="672" y="232" text-anchor="middle" class="caption">α ≈ 0.34, β ≈ 0.28, E ≈ 1.69</text>
 
   <!-- Right: 2026 picture -->
   <rect x="485" y="280" width="375" height="200" class="box"/>
-  <text x="672" y="304" text-anchor="middle" class="label">the 2026 twist</text>
-  <text x="504" y="332" class="caption">— Chinchilla-optimal: minimize TRAINING loss per FLOP</text>
-  <text x="504" y="352" class="caption">— inference-optimal: bigger D, smaller N (over-train)</text>
-  <text x="504" y="372" class="caption">— Llama 3 8B: D/N ≈ 1875 (15T tokens, 8B params)</text>
-  <text x="504" y="392" class="caption">— data quality (Phi-style filtering) &gt;2× effective FLOPs</text>
-  <text x="504" y="412" class="caption">— MoE decouples total params from active FLOPs</text>
-  <text x="504" y="432" class="caption">— Muon optimizer: 2× training-FLOP efficiency vs AdamW</text>
-  <text x="504" y="452" class="caption">— "emergence" is often a scoring artifact; loss is smooth</text>
+  <text x="672" y="304" text-anchor="middle" class="label">2026 年的新变化</text>
+  <text x="504" y="332" class="caption">— Chinchilla 最优：最小化每 FLOP 的训练损失</text>
+  <text x="504" y="352" class="caption">— 推理最优：更大的 D、更小的 N（过度训练）</text>
+  <text x="504" y="372" class="caption">— Llama 3 8B：D/N ≈ 1875（15T token，8B 参数）</text>
+  <text x="504" y="392" class="caption">— 数据质量（Phi 式过滤）使有效 FLOPs &gt;2 倍</text>
+  <text x="504" y="412" class="caption">— MoE 将总参数与激活 FLOPs 解耦</text>
+  <text x="504" y="432" class="caption">— Muon 优化器：训练 FLOP 效率是 AdamW 的 2 倍</text>
+  <text x="504" y="452" class="caption">— “涌现”往往是评分方式造成的现象；损失是平滑的</text>
 
-  <text x="450" y="504" text-anchor="middle" class="caption">same power-law shape, different absolute constants. still the map frontier labs plan against.</text>
+  <text x="450" y="504" text-anchor="middle" class="caption">幂律形态相同，绝对常数不同。前沿实验室仍据此规划。</text>
 </svg>

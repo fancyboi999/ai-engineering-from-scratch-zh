@@ -44,7 +44,7 @@
   <text x="410" y="231" font-size="11">  scope_digest、comparison scope</text>
   <line x1="350" y1="120" x2="399" y2="120" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-2-head-amber)"/>
   <rect class="m-knock" x="350.8" y="103.03" width="47.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="374.5" y="114" font-size="11.5" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">update</text>
+  <text x="374.5" y="114" font-size="11.5" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">更新</text>
   <rect x="20" y="432" width="600" height="56" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="320" y="447.75" font-size="12.5" text-anchor="middle" font-weight="700">Mutation Evidence：provider rea-unknown-registry，版本 1</text>
   <text x="320" y="465.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">predicate rea.residual-unknown-mutation、confidence derived、authority analyst-inference</text>

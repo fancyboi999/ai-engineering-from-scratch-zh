@@ -21,7 +21,7 @@ Atari 上的 DQN 第一次让单一架构、单一套超参数，从原始像素
 
 ## 核心概念
 
-![DQN training loop: env, replay buffer, online net, target net, Bellman TD loss](../assets/dqn.svg)
+![DQN 训练循环：环境、回放缓冲区、在线网络、目标网络与贝尔曼时序差分损失](../assets/dqn.svg)
 
 **目标函数。** DQN 在一个神经 Q 函数上最小化单步 TD 损失：
 

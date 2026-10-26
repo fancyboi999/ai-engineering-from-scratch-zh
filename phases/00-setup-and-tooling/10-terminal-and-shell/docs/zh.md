@@ -1,4 +1,4 @@
-# Terminal & Shell
+# 终端与 Shell
 
 > 终端是 AI 工程师生活的地方。在这儿待舒服点。
 

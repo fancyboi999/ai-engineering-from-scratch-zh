@@ -42,7 +42,7 @@ module.exports = figure('fig-1-1', {
 
   f.rect(336, 216, 284, 228, { fill: color('paper'), stroke: color('ink-mute') });
   const loop = [
-    { y: 226, hue: 'violet', title: 'docker-agent process', sub: '循环：模型、工具、子agent' },
+    { y: 226, hue: 'violet', title: 'docker-agent 进程', sub: '循环：模型、工具、子agent' },
     { y: 280, hue: 'olive', title: 'filesystem, shell', sub: 'VM内运行的工具' },
     { y: 334, hue: 'plum', title: '模型调用', sub: 'host.docker.internal:12434' },
   ];

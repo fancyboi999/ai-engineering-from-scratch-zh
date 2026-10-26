@@ -11,8 +11,8 @@ module.exports = figure('fig-2-3', {
   const scale = 600 / total;
   const parts = [
     { gib: 56.93, hue: 'violet', label: '权重', value: '56.93 GiB' },
-    { gib: 31.32, hue: 'green', label: 'KV cache', value: '31.32 GiB' },
-    { gib: 3.05, hue: 'amber', label: 'profile 和 graph', value: 'about 3 GiB' },
+    { gib: 31.32, hue: 'green', label: 'KV 缓存', value: '31.32 GiB' },
+    { gib: 3.05, hue: 'amber', label: 'profile 和 graph', value: '约 3 GiB' },
     { gib: 30.4, hue: 'grey', label: '操作系统、文件页缓存和其他程序', value: '30.4 GiB' },
   ];
   f.kicker(20, 18, 'CPU 与 GPU 共用 121.7 GiB 内存池');

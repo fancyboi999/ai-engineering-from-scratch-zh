@@ -15,41 +15,41 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">latent diffusion = VAE + diffusion, separately trained</text>
+  <text x="450" y="28" text-anchor="middle" class="title">潜空间扩散 = VAE + 扩散，分别训练</text>
 
   <!-- stage 1 -->
   <rect x="30" y="60" width="840" height="130" class="box"/>
-  <text x="450" y="82" text-anchor="middle" class="label">stage 1: train VAE (encoder + decoder), freeze</text>
+  <text x="450" y="82" text-anchor="middle" class="label">阶段 1：训练 VAE（编码器 + 解码器），然后冻结</text>
 
   <rect x="60" y="100" width="100" height="70" class="box"/>
-  <text x="110" y="130" text-anchor="middle" class="content">image x</text>
+  <text x="110" y="130" text-anchor="middle" class="content">图像 x</text>
   <text x="110" y="148" text-anchor="middle" class="caption">512 &#215; 512 &#215; 3</text>
 
   <line x1="160" y1="135" x2="200" y2="135" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <rect x="200" y="100" width="120" height="70" class="cold"/>
-  <text x="260" y="130" text-anchor="middle" class="content">encoder E</text>
+  <text x="260" y="130" text-anchor="middle" class="content">编码器 E</text>
 
   <line x1="320" y1="135" x2="360" y2="135" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <rect x="360" y="100" width="120" height="70" class="hot"/>
-  <text x="420" y="128" text-anchor="middle" class="content">latent z</text>
-  <text x="420" y="146" text-anchor="middle" class="caption">64 &#215; 64 &#215; 4  (1/16 of pixels)</text>
+  <text x="420" y="128" text-anchor="middle" class="content">潜变量 z</text>
+  <text x="420" y="146" text-anchor="middle" class="caption">64 × 64 × 4（像素的 1/16）</text>
 
   <line x1="480" y1="135" x2="520" y2="135" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <rect x="520" y="100" width="120" height="70" class="cold"/>
-  <text x="580" y="130" text-anchor="middle" class="content">decoder D</text>
+  <text x="580" y="130" text-anchor="middle" class="content">解码器 D</text>
 
   <line x1="640" y1="135" x2="680" y2="135" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
   <rect x="680" y="100" width="150" height="70" class="box"/>
-  <text x="755" y="130" text-anchor="middle" class="content">x&#770;  (reconstruction)</text>
+  <text x="755" y="130" text-anchor="middle" class="content">x̂（重建）</text>
   <text x="755" y="148" text-anchor="middle" class="caption">L1 + LPIPS + GAN</text>
 
   <!-- stage 2 -->
   <rect x="30" y="210" width="840" height="190" class="box"/>
-  <text x="450" y="232" text-anchor="middle" class="label">stage 2: train diffusion on z-space</text>
+  <text x="450" y="232" text-anchor="middle" class="label">阶段 2：在 z 空间训练扩散模型</text>
 
   <rect x="80" y="250" width="110" height="80" class="hot"/>
   <text x="135" y="280" text-anchor="middle" class="mono">z_T ~ N(0, I)</text>
@@ -59,7 +59,7 @@
   <rect x="240" y="250" width="300" height="80" class="cold"/>
   <text x="390" y="278" text-anchor="middle" class="label">U-Net / DiT</text>
   <text x="390" y="298" text-anchor="middle" class="mono">&#949;_&#952;(z_t, t, text_embed)</text>
-  <text x="390" y="318" text-anchor="middle" class="caption">iterate T-&gt;0</text>
+  <text x="390" y="318" text-anchor="middle" class="caption">迭代 T-&gt;0</text>
 
   <line x1="540" y1="290" x2="590" y2="290" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
 
@@ -70,15 +70,15 @@
 
   <rect x="750" y="250" width="110" height="80" class="box"/>
   <text x="805" y="285" text-anchor="middle" class="content">D(z_0)</text>
-  <text x="805" y="303" text-anchor="middle" class="caption">decoded image</text>
+  <text x="805" y="303" text-anchor="middle" class="caption">解码后的图像</text>
 
   <!-- text conditioning -->
   <rect x="80" y="345" width="460" height="45" class="box"/>
-  <text x="310" y="370" text-anchor="middle" class="caption">text encoder (CLIP / T5) -&gt; cross-attention in each U-Net block</text>
+  <text x="310" y="370" text-anchor="middle" class="caption">文本编码器（CLIP / T5）-&gt; 每个 U-Net 块中的交叉注意力</text>
 
   <!-- loss -->
   <rect x="30" y="415" width="840" height="80" class="hot"/>
-  <text x="450" y="438" text-anchor="middle" class="label">same loss as pixel-space DDPM:  L = E || &#949; - &#949;_&#952;(z_t, t, c) ||&#178;</text>
-  <text x="450" y="462" text-anchor="middle" class="caption">~64x fewer FLOPs than pixel diffusion for the same quality</text>
+  <text x="450" y="438" text-anchor="middle" class="label">与像素空间 DDPM 相同的损失：L = E || ε - ε_θ(z_t, t, c) ||²</text>
+  <text x="450" y="462" text-anchor="middle" class="caption">相同质量下，FLOPs 比像素扩散少约 64 倍</text>
   <text x="450" y="482" text-anchor="middle" class="caption">CFG:  &#949;_cfg = (1+w) &#183; &#949;_cond - w &#183; &#949;_uncond  (w &#8776; 3-7)</text>
 </svg>

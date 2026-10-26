@@ -12,39 +12,39 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">workload triage — three lanes, one rule</text>
+  <text x="480" y="24" text-anchor="middle" class="title">工作负载分流 — 三条通道，一条规则</text>
 
   <rect x="40" y="50" width="280" height="340" class="inter"/>
-  <text x="180" y="72" text-anchor="middle" class="head">interactive</text>
-  <text x="180" y="94" text-anchor="middle" class="step">user waits for response</text>
-  <text x="60" y="122" class="small">· TTFT matters</text>
-  <text x="60" y="140" class="small">· sync call with prompt cache</text>
-  <text x="60" y="158" class="small">· cannot batch</text>
-  <text x="60" y="176" class="small">· examples: chat, voice agent, search</text>
-  <text x="60" y="220" class="step">100% of baseline cost</text>
-  <text x="60" y="238" class="small">(minus caching savings)</text>
+  <text x="180" y="72" text-anchor="middle" class="head">交互式</text>
+  <text x="180" y="94" text-anchor="middle" class="step">用户等待响应</text>
+  <text x="60" y="122" class="small">· TTFT 很重要</text>
+  <text x="60" y="140" class="small">· 使用 prompt 缓存的同步调用</text>
+  <text x="60" y="158" class="small">· 无法批处理</text>
+  <text x="60" y="176" class="small">· 例如：聊天、语音 agent、搜索</text>
+  <text x="60" y="220" class="step">基线成本的 100%</text>
+  <text x="60" y="238" class="small">（减去缓存节省）</text>
 
   <rect x="340" y="50" width="280" height="340" class="semi"/>
-  <text x="480" y="72" text-anchor="middle" class="head">semi-interactive</text>
-  <text x="480" y="94" text-anchor="middle" class="step">user checks back in minutes</text>
-  <text x="360" y="122" class="small">· async queue + fallback to sync</text>
-  <text x="360" y="140" class="small">· tolerate P99 ~5-10 min</text>
-  <text x="360" y="158" class="small">· examples: moderate RAG index,</text>
-  <text x="360" y="176" class="small">  "refresh" report, semi-live agent</text>
-  <text x="360" y="220" class="step">~50% of baseline cost</text>
-  <text x="360" y="238" class="small">(with caching + queue amortization)</text>
+  <text x="480" y="72" text-anchor="middle" class="head">半交互式</text>
+  <text x="480" y="94" text-anchor="middle" class="step">用户几分钟后回来查看</text>
+  <text x="360" y="122" class="small">· 异步队列 + 同步回退</text>
+  <text x="360" y="140" class="small">· 可容忍 P99 约 5-10 min</text>
+  <text x="360" y="158" class="small">· 例如：中等规模 RAG 索引、</text>
+  <text x="360" y="176" class="small">  “刷新”报告、半实时 agent</text>
+  <text x="360" y="220" class="step">约为基线成本的 50%</text>
+  <text x="360" y="238" class="small">（包含缓存 + 队列摊销）</text>
 
   <rect x="640" y="50" width="280" height="340" class="batch"/>
-  <text x="780" y="72" text-anchor="middle" class="head">batch</text>
-  <text x="780" y="94" text-anchor="middle" class="step">result "by morning"</text>
-  <text x="660" y="122" class="small">· always batch, always stack cache</text>
-  <text x="660" y="140" class="small">· 24h SLA, typical 2-6h P50</text>
-  <text x="660" y="158" class="small">· examples: content pipelines,</text>
-  <text x="660" y="176" class="small">  classification, labeling, reports</text>
-  <text x="660" y="220" class="step">~10% of baseline cost</text>
-  <text x="660" y="238" class="small">(batch 50% off + cached input 10x)</text>
+  <text x="780" y="72" text-anchor="middle" class="head">批处理</text>
+  <text x="780" y="94" text-anchor="middle" class="step">“明早前”得到结果</text>
+  <text x="660" y="122" class="small">· 始终批处理，始终叠加缓存</text>
+  <text x="660" y="140" class="small">· 24h SLA，典型 P50 为 2-6h</text>
+  <text x="660" y="158" class="small">· 例如：内容流水线、</text>
+  <text x="660" y="176" class="small">  分类、标注、报告</text>
+  <text x="660" y="220" class="step">约为基线成本的 10%</text>
+  <text x="660" y="238" class="small">（批处理减价 50% + 缓存输入省 10 倍）</text>
 
   <rect x="40" y="410" width="880" height="60" class="box"/>
-  <text x="480" y="432" text-anchor="middle" class="head">the rule</text>
-  <text x="480" y="454" text-anchor="middle" class="step">if 24h latency is acceptable to the user, the workload belongs on batch</text>
+  <text x="480" y="432" text-anchor="middle" class="head">规则</text>
+  <text x="480" y="454" text-anchor="middle" class="step">如果用户可接受 24h 延迟，该负载就属于批处理</text>
 </svg>

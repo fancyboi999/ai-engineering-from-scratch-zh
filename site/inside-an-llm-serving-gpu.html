@@ -743,10 +743,10 @@
         </div>
         <div class="gm-panel" id="gm-panel-specs" role="tabpanel" aria-labelledby="gm-tab-specs" data-gm-panel="specs" hidden>
           <p class="gm-label">NVIDIA L4</p>
-          <dl class="gm-specs"><dt>芯片</dt><dd>Ada Lovelace, AD104<small>NVIDIA Ada GPU 架构白皮书, Appendix D, Table 5</small></dd><dt>SM</dt><dd>58 5 个 GPC、29 个 TPC<small>NVIDIA Ada GPU 架构白皮书, Appendix D, Table 5</small></dd><dt>Tensor Core</dt><dd>232 每个 SM 含 4 个，4th generation, with FP8<small>NVIDIA Ada GPU 架构白皮书, Appendix D, Table 5</small></dd><dt>L2 缓存</dt><dd>48 MB<small>NVIDIA Ada GPU 架构白皮书, Appendix D, Table 5: 49152 KB</small></dd><dt>显存</dt><dd>24 GB GDDR6 with ECC<small>NVIDIA L4 产品简介 PB-11316-001, Table 2</small></dd><dt>总线</dt><dd>192 位，32 位控制器<small>NVIDIA L4 产品简介 PB-11316-001, Table 2</small></dd><dt>带宽</dt><dd>300 GB/s 峰值<small>NVIDIA L4 产品简介 PB-11316-001, Table 2</small></dd><dt>主机接口</dt><dd>PCIe Gen4 x16<small>NVIDIA L4 产品简介 PB-11316-001, Table 1</small></dd><dt>功耗</dt><dd>72 W，被动散热<small>NVIDIA L4 产品简介 PB-11316-001, Table 1</small></dd><dt>时钟频率</dt><dd>795 base, 2,040 boost MHz<small>NVIDIA L4 产品简介 PB-11316-001, Table 1</small></dd></dl>
+          <dl class="gm-specs"><dt>芯片</dt><dd>Ada Lovelace, AD104<small>NVIDIA Ada GPU 架构白皮书, 附录 D，表 5</small></dd><dt>SM</dt><dd>58 5 个 GPC、29 个 TPC<small>NVIDIA Ada GPU 架构白皮书, 附录 D，表 5</small></dd><dt>Tensor Core</dt><dd>232 每个 SM 含 4 个，第四代，支持 FP8<small>NVIDIA Ada GPU 架构白皮书, 附录 D，表 5</small></dd><dt>L2 缓存</dt><dd>48 MB<small>NVIDIA Ada GPU 架构白皮书, 附录 D，表 5：49152 KB</small></dd><dt>显存</dt><dd>24 GB GDDR6，支持 ECC<small>NVIDIA L4 产品简介 PB-11316-001, 表 2</small></dd><dt>总线</dt><dd>192 位，32 位控制器<small>NVIDIA L4 产品简介 PB-11316-001, 表 2</small></dd><dt>带宽</dt><dd>300 GB/s 峰值<small>NVIDIA L4 产品简介 PB-11316-001, 表 2</small></dd><dt>主机接口</dt><dd>PCIe Gen4 x16<small>NVIDIA L4 产品简介 PB-11316-001, 表 1</small></dd><dt>功耗</dt><dd>72 W，被动散热<small>NVIDIA L4 产品简介 PB-11316-001, 表 1</small></dd><dt>时钟频率</dt><dd>基础频率 795，加速频率 2,040 MHz<small>NVIDIA L4 产品简介 PB-11316-001, 表 1</small></dd></dl>
           <ul class="gm-abstract"><li>NVIDIA 未公开 24 GB 显存由多少个 GDDR6 封装组成，也未说明它们的位置。图中按每个 32 位通道一个封装绘制，共六个。</li><li>NVIDIA 未公开芯片尺寸、封装尺寸和焊球数量。图中的芯片、基板和焊球按合理尺寸示意，并非精确测量。</li><li>NVIDIA 公布了 L4 含 5 个 GPC、29 个 TPC 和 58 个 SM，但没有指出完整 AD104 中具体关闭了哪个 TPC。深色方块只表示一个 TPC 已关闭，不代表其实际位置。</li><li>芯片中央的 L2 区域参考 Ada 白皮书中的 AD102 方框图。NVIDIA 未公开 AD104 的芯片布局图。</li><li>运行记录没有记下主机 CPU 型号。图中使用通用 x86_64 封装表示主机 CPU。</li></ul>
           <p class="gm-label">NVIDIA GB10</p>
-          <dl class="gm-specs"><dt>芯片</dt><dd>Grace Blackwell superchip: an S-dielet with the CPU and memory subsystem, a G-dielet with the GPU, in 2.5D packaging<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, NVIDIA GB10 table</small></dd><dt>CPU</dt><dd>20 Arm cores: 10 Cortex-X925 and 10 Cortex-A725, two clusters of 10<small>NVIDIA DGX Spark 产品页, Specifications</small></dd><dt>GPU</dt><dd>6144 个 CUDA core、5th generation Tensor Core；SM 数量未公开<small>NVIDIA DGX Spark 用户指南, Compute Performance</small></dd><dt>GPU L2 缓存</dt><dd>24 MB<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, GB10 GPU: large graphics L2</small></dd><dt>CPU 缓存</dt><dd>16 per cluster MB L3，另有 16 MB 系统级缓存<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, NVIDIA GB10 table</small></dd><dt>内存</dt><dd>128 GB LPDDR5x, coherent unified system memory<small>NVIDIA DGX Spark 产品页, Specifications</small></dd><dt>总线</dt><dd>256 位，16 个通道<small>NVIDIA DGX Spark 产品页, Specifications</small></dd><dt>带宽</dt><dd>273 GB/s 峰值<small>NVIDIA DGX Spark 产品页, Specifications</small></dd><dt>芯片互联</dt><dd>NVLink-C2C between the dielets GPU 带宽 about 600 aggregate GB/s<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, NVIDIA GB10 table</small></dd><dt>功耗</dt><dd>140 W，整颗芯片<small>NVIDIA DGX Spark 产品页, GB10 TDP, CPU and GPU</small></dd></dl>
+          <dl class="gm-specs"><dt>芯片</dt><dd>Grace Blackwell 超级芯片：S 小芯片包含 CPU 和内存子系统，G 小芯片包含 GPU，采用 2.5D 封装<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, NVIDIA GB10 表</small></dd><dt>CPU</dt><dd>20 个 Arm 核心：10 个 Cortex-X925、10 个 Cortex-A725，分为两组，每组 10 个<small>NVIDIA DGX Spark 产品页, 规格</small></dd><dt>GPU</dt><dd>6144 个 CUDA core、第五代 Tensor Core；SM 数量未公开<small>NVIDIA DGX Spark 用户指南, 计算性能</small></dd><dt>GPU L2 缓存</dt><dd>24 MB<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, GB10 GPU：大型图形 L2 缓存</small></dd><dt>CPU 缓存</dt><dd>每组 16 MB L3，另有 16 MB 系统级缓存<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, NVIDIA GB10 表</small></dd><dt>内存</dt><dd>128 GB LPDDR5x，支持一致性的统一系统内存<small>NVIDIA DGX Spark 产品页, 规格</small></dd><dt>总线</dt><dd>256 位，16 个通道<small>NVIDIA DGX Spark 产品页, 规格</small></dd><dt>带宽</dt><dd>273 GB/s 峰值<small>NVIDIA DGX Spark 产品页, 规格</small></dd><dt>芯片互联</dt><dd>两颗小芯片之间的 NVLink-C2C GPU 带宽 总计约 600 GB/s<small>Hot Chips 2025 上的 NVIDIA GB10 演讲, NVIDIA GB10 表</small></dd><dt>功耗</dt><dd>140 W，整颗芯片<small>NVIDIA DGX Spark 产品页, GB10 热设计功耗，包含 CPU 与 GPU</small></dd></dl>
           <ul class="gm-abstract"><li>NVIDIA 公布 GB10 有 6,144 个 CUDA core，但没有公布 SM 数量。GPU 小芯片上的抽象方块表示 SM 区域，并非每个方块代表一个 SM。</li><li>NVIDIA 公布了 256 位总线上的 16 个 LPDDR5X 通道，但没有公开封装数量或布局。图中按每个封装两个通道绘制，共八个封装。</li><li>NVIDIA 未公开小芯片尺寸、基板和焊球数量。图中按合理尺寸示意，并非精确测量。</li><li>主板在图中以平板表示。DGX Spark 主板布局尚未公开。</li></ul>
           <p class="gm-source-line">硬件资料：NVIDIA L4 产品页和产品简介、NVIDIA Ada GPU 架构白皮书、NVIDIA DGX Spark 产品页和用户指南，以及 Hot Chips 2025 上有关 GB10 的演讲。</p>
         </div>
@@ -1748,50 +1748,50 @@ const spec = (value, source, where) => ({ value, source, where });
 const SPECS = {
   l4: {
     name: "NVIDIA L4",
-    architecture: spec("Ada Lovelace, AD104", "ada", "Appendix D, Table 5"),
-    gpcs: spec(5, "ada", "Appendix D, Table 5"),
-    tpcs: spec(29, "ada", "Appendix D, Table 5"),
-    sms: spec(58, "ada", "Appendix D, Table 5"),
-    cudaCores: spec(7424, "ada", "Appendix D, Table 5"),
-    tensorCores: spec(232, "ada", "Appendix D, Table 5"),
-    tensorPerSm: spec(4, "ada", "Appendix D, Table 5"),
-    tensorGen: spec("4th generation, with FP8", "ada", "Ada Fourth-Generation Tensor Core"),
-    l2MB: spec(48, "ada", "Appendix D, Table 5: 49152 KB"),
-    memory: spec("24 GB GDDR6 with ECC", "l4Brief", "Table 2"),
-    memoryGB: spec(24, "l4Brief", "Table 2"),
-    busBits: spec(192, "l4Brief", "Table 2"),
-    controllerBits: spec(32, "ada", "AD102: 12 32-bit memory controllers for 384 bits"),
-    memoryClockMHz: spec(6251, "l4Brief", "Table 2"),
-    bandwidthGBs: spec(300, "l4Brief", "Table 2"),
-    interconnect: spec("PCIe Gen4 x16", "l4Brief", "Table 1"),
-    tdpW: spec(72, "l4Brief", "Table 1"),
-    clocksMHz: spec("795 base, 2,040 boost", "l4Brief", "Table 1"),
-    formFactor: spec("half height, half length, single slot, passive cooling", "l4Brief", "Table 1"),
-    boardMm: spec([168.54, 68.9], "l4Brief", "Figure 3"),
-    fp8Tflops: spec("485 with sparsity", "l4Page", "Product Specifications"),
-    bf16Tflops: spec("242 with sparsity", "l4Page", "Product Specifications"),
+    architecture: spec("Ada Lovelace, AD104", "ada", "附录 D，表 5"),
+    gpcs: spec(5, "ada", "附录 D，表 5"),
+    tpcs: spec(29, "ada", "附录 D，表 5"),
+    sms: spec(58, "ada", "附录 D，表 5"),
+    cudaCores: spec(7424, "ada", "附录 D，表 5"),
+    tensorCores: spec(232, "ada", "附录 D，表 5"),
+    tensorPerSm: spec(4, "ada", "附录 D，表 5"),
+    tensorGen: spec("第四代，支持 FP8", "ada", "Ada 第四代 Tensor Core"),
+    l2MB: spec(48, "ada", "附录 D，表 5：49152 KB"),
+    memory: spec("24 GB GDDR6，支持 ECC", "l4Brief", "表 2"),
+    memoryGB: spec(24, "l4Brief", "表 2"),
+    busBits: spec(192, "l4Brief", "表 2"),
+    controllerBits: spec(32, "ada", "AD102：12 个 32 位内存控制器，共 384 位"),
+    memoryClockMHz: spec(6251, "l4Brief", "表 2"),
+    bandwidthGBs: spec(300, "l4Brief", "表 2"),
+    interconnect: spec("PCIe Gen4 x16", "l4Brief", "表 1"),
+    tdpW: spec(72, "l4Brief", "表 1"),
+    clocksMHz: spec("基础频率 795，加速频率 2,040", "l4Brief", "表 1"),
+    formFactor: spec("半高、半长、单槽、被动散热", "l4Brief", "表 1"),
+    boardMm: spec([168.54, 68.9], "l4Brief", "图 3"),
+    fp8Tflops: spec("485（使用稀疏计算）", "l4Page", "产品规格"),
+    bf16Tflops: spec("242（使用稀疏计算）", "l4Page", "产品规格"),
   },
   gb10: {
     name: "NVIDIA GB10",
-    architecture: spec("Grace Blackwell superchip: an S-dielet with the CPU and memory subsystem, a G-dielet with the GPU, in 2.5D packaging", "gb10HotChips", "NVIDIA GB10 table"),
-    process: spec("TSMC 3nm for both dielets", "gb10HotChips", "NVIDIA GB10 table"),
-    cpu: spec("20 Arm cores: 10 Cortex-X925 and 10 Cortex-A725, two clusters of 10", "sparkPage", "Specifications"),
-    cpuL3MB: spec("16 per cluster", "gb10HotChips", "NVIDIA GB10 table"),
-    slcMB: spec(16, "gb10HotChips", "NVIDIA GB10 table"),
-    cudaCores: spec(6144, "sparkGuide", "Compute Performance"),
-    tensorGen: spec("5th generation", "sparkPage", "Specifications"),
-    l2MB: spec(24, "gb10HotChips", "GB10 GPU: large graphics L2"),
-    c2cGBs: spec("about 600 aggregate", "gb10HotChips", "GB10 GPU"),
-    memory: spec("128 GB LPDDR5x, coherent unified system memory", "sparkPage", "Specifications"),
-    memoryGB: spec(128, "sparkPage", "Specifications"),
-    busBits: spec(256, "sparkPage", "Specifications"),
-    channels: spec(16, "sparkGuide", "Compute Performance: 16 channels (256 bit) LPDDR5X 8533"),
-    bandwidthGBs: spec(273, "sparkPage", "Specifications"),
-    interconnect: spec("NVLink-C2C between the dielets", "gb10HotChips", "NVIDIA GB10 table"),
-    tdpW: spec(140, "sparkPage", "GB10 TDP, CPU and GPU"),
-    fp4Pflops: spec("1 with sparsity", "sparkPage", "Specifications"),
-    nic: spec("ConnectX-7 at 200 Gbps, 10 GbE RJ-45", "sparkPage", "Specifications"),
-    smCount: spec(null, "sparkGuide", "not published: NVIDIA gives 6,144 CUDA cores, not the SM count"),
+    architecture: spec("Grace Blackwell 超级芯片：S 小芯片包含 CPU 和内存子系统，G 小芯片包含 GPU，采用 2.5D 封装", "gb10HotChips", "NVIDIA GB10 表"),
+    process: spec("两颗小芯片均采用 TSMC 3nm 工艺", "gb10HotChips", "NVIDIA GB10 表"),
+    cpu: spec("20 个 Arm 核心：10 个 Cortex-X925、10 个 Cortex-A725，分为两组，每组 10 个", "sparkPage", "规格"),
+    cpuL3MB: spec("每组 16", "gb10HotChips", "NVIDIA GB10 表"),
+    slcMB: spec(16, "gb10HotChips", "NVIDIA GB10 表"),
+    cudaCores: spec(6144, "sparkGuide", "计算性能"),
+    tensorGen: spec("第五代", "sparkPage", "规格"),
+    l2MB: spec(24, "gb10HotChips", "GB10 GPU：大型图形 L2 缓存"),
+    c2cGBs: spec("总计约 600", "gb10HotChips", "GB10 GPU"),
+    memory: spec("128 GB LPDDR5x，支持一致性的统一系统内存", "sparkPage", "规格"),
+    memoryGB: spec(128, "sparkPage", "规格"),
+    busBits: spec(256, "sparkPage", "规格"),
+    channels: spec(16, "sparkGuide", "计算性能：16 个通道（256 位）LPDDR5X 8533"),
+    bandwidthGBs: spec(273, "sparkPage", "规格"),
+    interconnect: spec("两颗小芯片之间的 NVLink-C2C", "gb10HotChips", "NVIDIA GB10 表"),
+    tdpW: spec(140, "sparkPage", "GB10 热设计功耗，包含 CPU 与 GPU"),
+    fp4Pflops: spec("1（使用稀疏计算）", "sparkPage", "规格"),
+    nic: spec("ConnectX-7，200 Gbps；10 GbE RJ-45", "sparkPage", "规格"),
+    smCount: spec(null, "sparkGuide", "未公开：NVIDIA 提供了 6,144 个 CUDA 核心的数据，未给出 SM 数量"),
   },
 };
 
@@ -2373,7 +2373,7 @@ function timingOf(sim, beats) {
   });
 }
 function badgeOf(timing) {
-  if (!timing) return "not timed";
+  if (!timing) return "未计时";
   const ratio = (timing.anim * 1000) / timing.real;
   return ratio >= 1 ? `x1/${Math.round(ratio).toLocaleString("en-US")}` : `x${Math.round(1 / ratio).toLocaleString("en-US")}`;
 }
@@ -2453,8 +2453,7 @@ function advance(dt) {
     state.playing = false;
     state.pose.hot = [];
     render(state.sim.events.length - 1);
-    const o = state.sim.outcome;
-    $("[data-gm-live]").textContent = `Run finished: ${o.status}. ${o.text}`;
+    $("[data-gm-live]").textContent = `运行结束。${localizeOutcome(state.sim)}`;
     syncButtons();
     if (mode === "auto" && !renderMode) setTimeout(() => mode === "auto" && state.done && play(), 1600);
   }
@@ -2977,7 +2976,7 @@ function syncSteps() {
   const step = M.STEPS[current];
   const shown = state.shown;
   $("[data-gm-hint]").textContent = `${current + 1}. ${step.hint}`;
-  $("[data-gm-badge]").textContent = state.done ? "done" : shown >= 0 ? badgeOf(state.timing[shown]) : "ready";
+  $("[data-gm-badge]").textContent = state.done ? "已完成" : shown >= 0 ? badgeOf(state.timing[shown]) : "就绪";
   $$("[data-gm-mode]").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.gmMode === mode)));
 }
 function playStep(index) {

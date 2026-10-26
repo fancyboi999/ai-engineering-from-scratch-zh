@@ -17,76 +17,76 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">LLaVA-OneVision — unified token budget and three-stage curriculum</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLaVA-OneVision：统一 token 预算与三阶段训练流程</text>
 
   <rect x="30" y="50" width="900" height="200" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">shared visual-token budget ~4000 across three scenarios</text>
+  <text x="480" y="72" text-anchor="middle" class="head">三个场景共享约 4000 个视觉 token 的预算</text>
 
   <rect x="60" y="90" width="260" height="140" class="hot"/>
-  <text x="190" y="110" text-anchor="middle" class="step">single-image</text>
-  <text x="190" y="130" text-anchor="middle" class="small">AnyRes 9 tiles + thumbnail</text>
-  <text x="190" y="146" text-anchor="middle" class="small">each tile 384, 2x pool</text>
-  <text x="190" y="162" text-anchor="middle" class="small">182 tokens per tile</text>
-  <text x="190" y="182" text-anchor="middle" class="step">total 1820 tokens</text>
-  <text x="190" y="202" text-anchor="middle" class="small">perception + OCR + detail</text>
+  <text x="190" y="110" text-anchor="middle" class="step">单图像</text>
+  <text x="190" y="130" text-anchor="middle" class="small">AnyRes：9 个图块 + 缩略图</text>
+  <text x="190" y="146" text-anchor="middle" class="small">每块 384，2x 池化</text>
+  <text x="190" y="162" text-anchor="middle" class="small">每块 182 个 token</text>
+  <text x="190" y="182" text-anchor="middle" class="step">共 1820 个 token</text>
+  <text x="190" y="202" text-anchor="middle" class="small">感知 + OCR + 细节</text>
 
   <rect x="340" y="90" width="260" height="140" class="cool"/>
-  <text x="470" y="110" text-anchor="middle" class="step">multi-image</text>
-  <text x="470" y="130" text-anchor="middle" class="small">6 images at 384</text>
-  <text x="470" y="146" text-anchor="middle" class="small">no pooling, 729 per image</text>
-  <text x="470" y="162" text-anchor="middle" class="small">cross-image reasoning</text>
-  <text x="470" y="182" text-anchor="middle" class="step">total 4374 tokens</text>
-  <text x="470" y="202" text-anchor="middle" class="small">compare, count, diff</text>
+  <text x="470" y="110" text-anchor="middle" class="step">多图像</text>
+  <text x="470" y="130" text-anchor="middle" class="small">6 张分辨率 384 的图像</text>
+  <text x="470" y="146" text-anchor="middle" class="small">不池化，每张图像 729 个 token</text>
+  <text x="470" y="162" text-anchor="middle" class="small">跨图像推理</text>
+  <text x="470" y="182" text-anchor="middle" class="step">共 4374 个 token</text>
+  <text x="470" y="202" text-anchor="middle" class="small">比较、计数、识别差异</text>
 
   <rect x="620" y="90" width="280" height="140" class="cold"/>
-  <text x="760" y="110" text-anchor="middle" class="step">video</text>
-  <text x="760" y="130" text-anchor="middle" class="small">32 frames at 384</text>
-  <text x="760" y="146" text-anchor="middle" class="small">3x pool -&gt; 81 per frame</text>
-  <text x="760" y="162" text-anchor="middle" class="small">temporal grounding</text>
-  <text x="760" y="182" text-anchor="middle" class="step">total 2592 tokens</text>
-  <text x="760" y="202" text-anchor="middle" class="small">events, action recog</text>
+  <text x="760" y="110" text-anchor="middle" class="step">视频</text>
+  <text x="760" y="130" text-anchor="middle" class="small">32 帧，分辨率 384</text>
+  <text x="760" y="146" text-anchor="middle" class="small">3x 池化 -&gt; 每帧 81 个 token</text>
+  <text x="760" y="162" text-anchor="middle" class="small">时间定位</text>
+  <text x="760" y="182" text-anchor="middle" class="step">共 2592 个 token</text>
+  <text x="760" y="202" text-anchor="middle" class="small">事件与动作识别</text>
 
   <rect x="30" y="270" width="900" height="250" class="box"/>
-  <text x="480" y="292" text-anchor="middle" class="head">three-stage curriculum + emergent skills</text>
+  <text x="480" y="292" text-anchor="middle" class="head">三阶段训练流程 + 涌现能力</text>
 
   <rect x="60" y="310" width="200" height="190" class="reg"/>
-  <text x="160" y="332" text-anchor="middle" class="step">Stage SI</text>
-  <text x="160" y="354" text-anchor="middle" class="small">single-image only</text>
-  <text x="160" y="370" text-anchor="middle" class="small">AnyRes high-res</text>
-  <text x="160" y="390" text-anchor="middle" class="small">perception base</text>
-  <text x="160" y="410" text-anchor="middle" class="small">MMMU + OCR + detail</text>
-  <text x="160" y="444" text-anchor="middle" class="caption">reverse order (video first)</text>
-  <text x="160" y="460" text-anchor="middle" class="caption">loses 2-4 MMMU</text>
-  <text x="160" y="476" text-anchor="middle" class="caption">per OneVision ablation</text>
+  <text x="160" y="332" text-anchor="middle" class="step">SI 阶段</text>
+  <text x="160" y="354" text-anchor="middle" class="small">仅单图像</text>
+  <text x="160" y="370" text-anchor="middle" class="small">AnyRes 高分辨率</text>
+  <text x="160" y="390" text-anchor="middle" class="small">基础感知能力</text>
+  <text x="160" y="410" text-anchor="middle" class="small">MMMU + OCR + 细节</text>
+  <text x="160" y="444" text-anchor="middle" class="caption">反转顺序（视频优先）</text>
+  <text x="160" y="460" text-anchor="middle" class="caption">MMMU 降低 2-4 分</text>
+  <text x="160" y="476" text-anchor="middle" class="caption">据 OneVision 消融实验</text>
 
   <path d="M 265 410 L 325 410" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="330" y="310" width="200" height="190" class="cool"/>
-  <text x="430" y="332" text-anchor="middle" class="step">Stage OV</text>
-  <text x="430" y="354" text-anchor="middle" class="small">50% single</text>
-  <text x="430" y="370" text-anchor="middle" class="small">30% multi-image</text>
-  <text x="430" y="390" text-anchor="middle" class="small">20% video</text>
-  <text x="430" y="410" text-anchor="middle" class="small">unified budget</text>
-  <text x="430" y="444" text-anchor="middle" class="caption">cross-scenario alignment</text>
-  <text x="430" y="460" text-anchor="middle" class="caption">structural reasoning</text>
+  <text x="430" y="332" text-anchor="middle" class="step">OV 阶段</text>
+  <text x="430" y="354" text-anchor="middle" class="small">50% 单图像</text>
+  <text x="430" y="370" text-anchor="middle" class="small">30% 多图像</text>
+  <text x="430" y="390" text-anchor="middle" class="small">20% 视频</text>
+  <text x="430" y="410" text-anchor="middle" class="small">统一预算</text>
+  <text x="430" y="444" text-anchor="middle" class="caption">跨场景对齐</text>
+  <text x="430" y="460" text-anchor="middle" class="caption">结构推理</text>
 
   <path d="M 535 410 L 595 410" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="600" y="310" width="200" height="190" class="hot"/>
-  <text x="700" y="332" text-anchor="middle" class="step">Stage TT</text>
-  <text x="700" y="354" text-anchor="middle" class="small">task-specific mix</text>
-  <text x="700" y="370" text-anchor="middle" class="small">e.g., agent / doc</text>
-  <text x="700" y="390" text-anchor="middle" class="small">/ robotics / video</text>
-  <text x="700" y="410" text-anchor="middle" class="small">deployment tune</text>
-  <text x="700" y="444" text-anchor="middle" class="caption">optional, preserves base</text>
+  <text x="700" y="332" text-anchor="middle" class="step">TT 阶段</text>
+  <text x="700" y="354" text-anchor="middle" class="small">按任务混合数据</text>
+  <text x="700" y="370" text-anchor="middle" class="small">例如 agent / 文档</text>
+  <text x="700" y="390" text-anchor="middle" class="small">/ 机器人 / 视频</text>
+  <text x="700" y="410" text-anchor="middle" class="small">部署调优</text>
+  <text x="700" y="444" text-anchor="middle" class="caption">可选，保留基础能力</text>
 
   <rect x="820" y="310" width="100" height="190" class="reg"/>
-  <text x="870" y="332" text-anchor="middle" class="step">emergent</text>
-  <text x="870" y="354" text-anchor="middle" class="small">multi-camera</text>
-  <text x="870" y="370" text-anchor="middle" class="small">reasoning</text>
-  <text x="870" y="390" text-anchor="middle" class="small">set-of-mark</text>
+  <text x="870" y="332" text-anchor="middle" class="step">涌现能力</text>
+  <text x="870" y="354" text-anchor="middle" class="small">多摄像头</text>
+  <text x="870" y="370" text-anchor="middle" class="small">推理</text>
+  <text x="870" y="390" text-anchor="middle" class="small">标记集合</text>
   <text x="870" y="406" text-anchor="middle" class="small">prompt</text>
-  <text x="870" y="426" text-anchor="middle" class="small">iPhone screen</text>
+  <text x="870" y="426" text-anchor="middle" class="small">iPhone 屏幕</text>
   <text x="870" y="442" text-anchor="middle" class="small">agent</text>
-  <text x="870" y="476" text-anchor="middle" class="caption">none trained</text>
+  <text x="870" y="476" text-anchor="middle" class="caption">均未经专项训练</text>
 </svg>

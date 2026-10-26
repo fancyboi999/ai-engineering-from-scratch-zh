@@ -15,16 +15,16 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">DualPipe schedule — P=4, 8 micro-batches, two directions</text>
+  <text x="480" y="24" text-anchor="middle" class="title">DualPipe 调度：P=4，8 个微批次，两个方向</text>
 
   <!-- Y-axis: ranks -->
-  <text x="20" y="70" class="head">rank 0</text>
-  <text x="20" y="120" class="head">rank 1</text>
-  <text x="20" y="170" class="head">rank 2</text>
-  <text x="20" y="220" class="head">rank 3</text>
+  <text x="20" y="70" class="head">进程 0</text>
+  <text x="20" y="120" class="head">进程 1</text>
+  <text x="20" y="170" class="head">进程 2</text>
+  <text x="20" y="220" class="head">进程 3</text>
 
   <!-- Time axis -->
-  <text x="480" y="50" text-anchor="middle" class="small">time →</text>
+  <text x="480" y="50" text-anchor="middle" class="small">时间 →</text>
 
   <!-- Row 0: rank 0 -->
   <!-- Warmup: 4 forward slots, no overlap yet -->
@@ -122,26 +122,26 @@
 
   <!-- Legend -->
   <rect x="680" y="60" width="240" height="180" class="box"/>
-  <text x="800" y="82" text-anchor="middle" class="head">legend</text>
+  <text x="800" y="82" text-anchor="middle" class="head">图例</text>
 
   <rect x="695" y="100" width="22" height="16" class="fwd"/>
-  <text x="725" y="112" class="step">forward (left-to-right)</text>
+  <text x="725" y="112" class="step">前向传播（从左到右）</text>
 
   <rect x="695" y="125" width="22" height="16" class="rev"/>
-  <text x="725" y="137" class="step">backward (standard)</text>
+  <text x="725" y="137" class="step">反向传播（标准方式）</text>
 
   <rect x="695" y="150" width="22" height="16" class="overlap"/>
-  <text x="725" y="162" class="step">bidirectional overlap</text>
+  <text x="725" y="162" class="step">双向重叠</text>
 
   <rect x="695" y="175" width="22" height="16" class="bubble"/>
-  <text x="725" y="187" class="step">bubble (warmup only)</text>
+  <text x="725" y="187" class="step">流水线气泡（仅预热阶段）</text>
 
-  <text x="695" y="215" class="small">bubbles do not grow</text>
-  <text x="695" y="228" class="small">with micro-batch count</text>
+  <text x="695" y="215" class="small">气泡不会随</text>
+  <text x="695" y="228" class="small">微批次数增加而增大</text>
 
   <!-- Bubble fraction table -->
   <rect x="30" y="280" width="900" height="230" class="box"/>
-  <text x="480" y="303" text-anchor="middle" class="label">bubble fraction vs schedule — lower is better</text>
+  <text x="480" y="303" text-anchor="middle" class="label">不同调度的气泡占比：越低越好</text>
 
   <text x="50" y="335" class="step">P=8, M=16</text>
   <text x="260" y="335" class="small">1F1B: 30.4%   Zero Bubble: 11.3%   DualPipe: 5.5%   DualPipeV: 6.5%</text>
@@ -152,13 +152,13 @@
   <text x="50" y="385" class="step">P=16, M=128</text>
   <text x="260" y="385" class="small">1F1B: 10.5%   Zero Bubble: 3.9%    DualPipe: 1.8%   DualPipeV: 2.1%</text>
 
-  <text x="50" y="420" class="step">DualPipe cost</text>
-  <text x="260" y="420" class="small">2x parameter copies per rank — affordable at MoE scale (EP dominates)</text>
+  <text x="50" y="420" class="step">DualPipe 开销</text>
+  <text x="260" y="420" class="small">每个进程保存 2 份参数：MoE 规模下可以承受（主要采用专家并行）</text>
 
-  <text x="50" y="445" class="step">DualPipeV cost</text>
-  <text x="260" y="445" class="small">1x parameter copies, slightly larger bubble — better fit for dense models</text>
+  <text x="50" y="445" class="step">DualPipeV 开销</text>
+  <text x="260" y="445" class="small">1 份参数，气泡稍大：更适合稠密模型</text>
 
   <text x="50" y="480" class="step">DeepSeek-V3</text>
-  <text x="260" y="480" class="small">2048 H800 GPUs, ~2.8M GPU-hours. DualPipe recovers ~245k GPU-hours</text>
-  <text x="260" y="498" class="small">over a 1F1B baseline — enough to fund a separate 70B dense run.</text>
+  <text x="260" y="480" class="small">2048 张 H800 GPU，约 2.8M GPU 小时。DualPipe 节省约 245k GPU 小时</text>
+  <text x="260" y="498" class="small">相比 1F1B 基线，足够另行训练一个 70B 稠密模型。</text>
 </svg>

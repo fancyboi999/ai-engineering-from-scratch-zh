@@ -14,42 +14,42 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">three ways to close the reality gap</text>
+  <text x="450" y="30" text-anchor="middle" class="title">缩小现实差距的三种方式</text>
 
   <rect x="40" y="60" width="820" height="70" class="hot"/>
-  <text x="60" y="85" class="label">the reality gap</text>
-  <text x="60" y="108" class="content">sim physics approx = real physics + epsilon  (friction, delay, lighting, noise, ...)</text>
+  <text x="60" y="85" class="label">现实差距</text>
+  <text x="60" y="108" class="content">仿真物理近似 = 真实物理 + epsilon（摩擦、延迟、光照、噪声……）</text>
 
   <rect x="40" y="150" width="260" height="240" class="box"/>
-  <text x="170" y="178" text-anchor="middle" class="label">domain randomization</text>
+  <text x="170" y="178" text-anchor="middle" class="label">领域随机化</text>
   <text x="60" y="205" class="content">theta_sim ~ P(theta)</text>
-  <text x="60" y="225" class="content">train over many sims</text>
-  <text x="60" y="245" class="content">policy sees random gravity,</text>
-  <text x="60" y="265" class="content">mass, friction, motor gain</text>
-  <text x="170" y="300" text-anchor="middle" class="caption">zero real data needed</text>
-  <text x="170" y="320" text-anchor="middle" class="caption">OpenAI Dactyl (rubik's cube)</text>
-  <text x="170" y="345" text-anchor="middle" class="caption">over-rand. -&gt; cautious</text>
-  <text x="170" y="365" text-anchor="middle" class="caption">under-rand. -&gt; brittle</text>
+  <text x="60" y="225" class="content">在多种仿真中训练</text>
+  <text x="60" y="245" class="content">策略见到随机的重力、</text>
+  <text x="60" y="265" class="content">质量、摩擦、马达增益</text>
+  <text x="170" y="300" text-anchor="middle" class="caption">不需要真实数据</text>
+  <text x="170" y="320" text-anchor="middle" class="caption">OpenAI Dactyl（魔方）</text>
+  <text x="170" y="345" text-anchor="middle" class="caption">随机化过度 -&gt; 谨慎</text>
+  <text x="170" y="365" text-anchor="middle" class="caption">随机化不足 -&gt; 脆弱</text>
 
   <rect x="320" y="150" width="260" height="240" class="cool"/>
-  <text x="450" y="178" text-anchor="middle" class="label">system identification</text>
-  <text x="340" y="205" class="content">measure real:</text>
-  <text x="340" y="225" class="content">  friction, delays, gains</text>
-  <text x="340" y="245" class="content">plug into sim</text>
-  <text x="340" y="265" class="content">train on matched sim</text>
-  <text x="450" y="300" text-anchor="middle" class="caption">low noise, precise</text>
-  <text x="450" y="320" text-anchor="middle" class="caption">but residual error invisible</text>
-  <text x="450" y="345" text-anchor="middle" class="caption">to the policy</text>
+  <text x="450" y="178" text-anchor="middle" class="label">系统辨识</text>
+  <text x="340" y="205" class="content">测量真实环境的：</text>
+  <text x="340" y="225" class="content">  摩擦、延迟、增益</text>
+  <text x="340" y="245" class="content">代入仿真</text>
+  <text x="340" y="265" class="content">在匹配的仿真中训练</text>
+  <text x="450" y="300" text-anchor="middle" class="caption">噪声低、精确</text>
+  <text x="450" y="320" text-anchor="middle" class="caption">但剩余误差对策略</text>
+  <text x="450" y="345" text-anchor="middle" class="caption">不可见</text>
 
   <rect x="600" y="150" width="260" height="240" class="box"/>
-  <text x="730" y="178" text-anchor="middle" class="label">teacher / student</text>
-  <text x="620" y="205" class="content">teacher: privileged info</text>
-  <text x="620" y="225" class="content">  terrain, ground truth</text>
-  <text x="620" y="245" class="content">student: only sensor obs</text>
-  <text x="620" y="265" class="content">distill teacher -&gt; student</text>
+  <text x="730" y="178" text-anchor="middle" class="label">教师 / 学生</text>
+  <text x="620" y="205" class="content">教师：特权信息</text>
+  <text x="620" y="225" class="content">  地形、真实值</text>
+  <text x="620" y="245" class="content">学生：仅有传感器观察</text>
+  <text x="620" y="265" class="content">蒸馏教师 -&gt; 学生</text>
   <text x="730" y="300" text-anchor="middle" class="caption">ANYmal, Boston Dynamics</text>
-  <text x="730" y="320" text-anchor="middle" class="caption">robust across physical</text>
-  <text x="730" y="345" text-anchor="middle" class="caption">parameters + obs noise</text>
+  <text x="730" y="320" text-anchor="middle" class="caption">对物理参数和</text>
+  <text x="730" y="345" text-anchor="middle" class="caption">观察噪声均稳健</text>
 
-  <text x="450" y="435" text-anchor="middle" class="caption">2026 recipe: GPU-parallel sim + DR + teacher/student + safety shield on real hardware</text>
+  <text x="450" y="435" text-anchor="middle" class="caption">2026 年配方：GPU 并行仿真 + DR + 教师/学生 + 真实硬件安全屏障</text>
 </svg>

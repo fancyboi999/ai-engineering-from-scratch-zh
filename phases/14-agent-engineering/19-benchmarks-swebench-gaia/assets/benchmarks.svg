@@ -14,62 +14,62 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Three 2026 agent benchmarks: code, generalist, multi-environment</text>
+  <text x="480" y="26" text-anchor="middle" class="title">2026 年三种 agent 基准：代码、通用能力与多环境</text>
 
   <rect x="40" y="50" width="290" height="250" class="swe"/>
-  <text x="185" y="72" text-anchor="middle" class="head">SWE-bench  code</text>
-  <text x="60" y="96" class="small">2,294 GitHub issues, 12 Python repos</text>
-  <text x="60" y="114" class="small">agent gets: repo + issue text</text>
-  <text x="60" y="132" class="small">produces: patch</text>
+  <text x="185" y="72" text-anchor="middle" class="head">SWE-bench：代码</text>
+  <text x="60" y="96" class="small">2,294 个 GitHub 问题、12 个 Python 仓库</text>
+  <text x="60" y="114" class="small">agent 获得：仓库 + 问题文本</text>
+  <text x="60" y="132" class="small">产出：补丁</text>
   <rect x="60" y="144" width="250" height="46" class="box"/>
-  <text x="78" y="164" class="step">FAIL_TO_PASS: now passes</text>
-  <text x="78" y="182" class="small">PASS_TO_PASS: stays passing</text>
+  <text x="78" y="164" class="step">FAIL_TO_PASS：现在通过</text>
+  <text x="78" y="182" class="small">PASS_TO_PASS：保持通过</text>
   <rect x="60" y="196" width="250" height="46" class="box"/>
-  <text x="78" y="216" class="step">Verified (OpenAI): 500 clean tasks</text>
-  <text x="78" y="234" class="small">removes ambiguity, weak tests, unclear fixes</text>
+  <text x="78" y="216" class="step">Verified（OpenAI）：500 个清理过的任务</text>
+  <text x="78" y="234" class="small">去除歧义、薄弱测试与不明确修复</text>
   <rect x="60" y="248" width="250" height="46" class="warn"/>
-  <text x="78" y="268" class="step">SWE-bench+: contamination audit</text>
-  <text x="78" y="286" class="small">32.67% solution leakage; 31.08% weak tests</text>
+  <text x="78" y="268" class="step">SWE-bench+：数据污染审计</text>
+  <text x="78" y="286" class="small">32.67% 答案泄露；31.08% 测试薄弱</text>
 
   <rect x="340" y="50" width="290" height="250" class="gaia"/>
-  <text x="485" y="72" text-anchor="middle" class="head">GAIA  generalist</text>
-  <text x="360" y="96" class="small">466 questions, 300 private leaderboard</text>
-  <text x="360" y="114" class="small">simple for humans (92%)</text>
-  <text x="360" y="132" class="small">hard for AI (GPT-4+plugins: 15%)</text>
+  <text x="485" y="72" text-anchor="middle" class="head">GAIA：通用能力</text>
+  <text x="360" y="96" class="small">466 道题，300 道用于非公开排行榜</text>
+  <text x="360" y="114" class="small">对人类简单（92%）</text>
+  <text x="360" y="132" class="small">对 AI 困难（GPT-4+插件：15%）</text>
   <rect x="360" y="144" width="250" height="46" class="box"/>
-  <text x="378" y="164" class="step">Level 1  single tool, simple</text>
-  <text x="378" y="182" class="small">factual lookup</text>
+  <text x="378" y="164" class="step">级别 1：单工具、简单</text>
+  <text x="378" y="182" class="small">事实查找</text>
   <rect x="360" y="196" width="250" height="46" class="box"/>
-  <text x="378" y="216" class="step">Level 2  multi-step reasoning</text>
-  <text x="378" y="234" class="small">search + extract + compute</text>
+  <text x="378" y="216" class="step">级别 2：多步推理</text>
+  <text x="378" y="234" class="small">搜索 + 提取 + 计算</text>
   <rect x="360" y="248" width="250" height="46" class="box"/>
-  <text x="378" y="268" class="step">Level 3  long tool chain + multimodal</text>
-  <text x="378" y="286" class="small">images, PDFs, chained web navigation</text>
+  <text x="378" y="268" class="step">级别 3：长工具链 + 多模态</text>
+  <text x="378" y="286" class="small">图像、PDF、连续网页导航</text>
 
   <rect x="640" y="50" width="290" height="250" class="bench"/>
-  <text x="785" y="72" text-anchor="middle" class="head">AgentBench  multi-env</text>
-  <text x="660" y="96" class="small">8 environments, ~4k-13k turns/split</text>
+  <text x="785" y="72" text-anchor="middle" class="head">AgentBench：多环境</text>
+  <text x="660" y="96" class="small">8 个环境，每个划分约 4k-13k 轮</text>
   <rect x="660" y="108" width="250" height="46" class="box"/>
-  <text x="678" y="128" class="step">code: Bash, DB, KG</text>
+  <text x="678" y="128" class="step">代码：Bash、数据库、知识图谱</text>
   <rect x="660" y="160" width="250" height="46" class="box"/>
-  <text x="678" y="180" class="step">games: Alfworld, LTP</text>
+  <text x="678" y="180" class="step">游戏：Alfworld、LTP</text>
   <rect x="660" y="212" width="250" height="46" class="box"/>
-  <text x="678" y="232" class="step">web: WebShop, Mind2Web</text>
+  <text x="678" y="232" class="step">网页：WebShop、Mind2Web</text>
   <rect x="660" y="264" width="250" height="34" class="box"/>
-  <text x="678" y="284" class="step">open-ended generation</text>
+  <text x="678" y="284" class="step">开放式生成</text>
 
   <rect x="40" y="320" width="880" height="200" class="warn"/>
-  <text x="480" y="342" text-anchor="middle" class="head">what benchmarks do not measure</text>
+  <text x="480" y="342" text-anchor="middle" class="head">基准未测量什么</text>
   <rect x="60" y="358" width="840" height="30" class="box"/>
-  <text x="78" y="378" class="step">operational cost: tokens, wall-clock, steps-to-resolution</text>
+  <text x="78" y="378" class="step">运行成本：token、实际时长、解决问题所需步数</text>
   <rect x="60" y="392" width="840" height="30" class="box"/>
-  <text x="78" y="412" class="step">safety behavior under adversarial conditions (Lesson 27)</text>
+  <text x="78" y="412" class="step">对抗条件下的安全行为（第 27 课）</text>
   <rect x="60" y="426" width="840" height="30" class="box"/>
-  <text x="78" y="446" class="step">performance on your domain (custom evals, Lesson 30)</text>
+  <text x="78" y="446" class="step">自身领域的表现（定制评测，第 30 课）</text>
   <rect x="60" y="460" width="840" height="30" class="box"/>
-  <text x="78" y="480" class="step">tail failures (benchmarks average; operators care about the worst 1%)</text>
+  <text x="78" y="480" class="step">尾部失败（基准统计平均值，运维关注最差的 1%）</text>
   <rect x="60" y="494" width="840" height="20" class="box"/>
-  <text x="78" y="510" class="step">always report both raw score AND Verified / +-audited score</text>
+  <text x="78" y="510" class="step">始终同时报告原始分数与 Verified / +-审计后的分数</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">single-number leaderboard fixation is the #1 anti-pattern. report distributions.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">只盯排行榜上的单个数字是第 1 大误区。应报告分布。</text>
 </svg>

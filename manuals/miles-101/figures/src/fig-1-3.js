@@ -17,7 +17,7 @@ module.exports = figure('fig-1-3', {
   title: '三个随机种子的 48 步 reward',
   desc: '使用三个随机种子，对 Qwen3-0.6B 和 GSM8K 运行相同 GRPO 配置时的每步平均 reward。单步数值会波动，但三个种子的整体趋势都在上升。',
 }, f => {
-  const c = chart(f, { x: 60, y: 56, w: 560, h: 210, xDomain: [0, 47], yDomain: [0.5, 0.9], xTicks: [0, 12, 24, 36, 47], yTicks: [0.5, 0.6, 0.7, 0.8, 0.9], xLabel: '步骤', yLabel: 'mean reward of the step' });
+  const c = chart(f, { x: 60, y: 56, w: 560, h: 210, xDomain: [0, 47], yDomain: [0.5, 0.9], xTicks: [0, 12, 24, 36, 47], yTicks: [0.5, 0.6, 0.7, 0.8, 0.9], xLabel: '步骤', yLabel: '该步的平均奖励' });
   for (const s of seeds) {
     const rows = runs[s.key].per_step;
     c.series(rows.map(r => [r.step, r.reward]), { hue: s.hue, dash: s.dash, name: s.name, dots: false, width: 1.6 });

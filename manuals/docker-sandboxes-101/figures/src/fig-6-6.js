@@ -22,4 +22,6 @@ module.exports = figure('fig-6-6', {
   f.arrow([190, printer.y + printer.h], [190, gateway.y - 1], { style: 'fail', label: '401 Unauthorized', labelSize: 11 });
   const api = f.box({ x: 450, y: 264, w: 170, h: 86, hue: 'grey', title: 'Docker Engine API', sub: ['宿主 socket', '未启动服务器'] });
   f.arrow(gateway.right(), [api.x - 1, gateway.cy], { style: 'call', label: 'API socket', labelSize: 11 });
-});
+})
+  // 保留冻结背景几何，只替换最终 SVG 中的完整文字节点。
+  .replace(">API socket</text>", ">API 套接字</text>");

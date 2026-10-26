@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" role="img" aria-labelledby="fig-1-2-title fig-1-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-1-2-title">SGLang 的职责</title>
   <desc id="fig-1-2-desc">九层结构从顶部客户端到底部硬件。SGLang 负责 tokenizer manager、scheduler、含基数缓存的 KV 池、前向传播和 detokenizer。模型网关是独立组件。模型权重决定答案质量，运维者决定内存预算。</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">LAYER</text>
-  <text x="540" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">OWNER</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">层次</text>
+  <text x="540" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">负责方</text>
   <rect x="20" y="30" width="500" height="40" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="32" y="45.25" font-size="12.5" font-weight="700">客户端</text>
   <text x="32" y="62.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">curl、OpenAI SDK、sglang.benchmark.serving</text>
-  <text x="540" y="55" font-size="12" fill="var(--m-ink-soft, #4a4a4a)">yours</text>
+  <text x="540" y="55" font-size="12" fill="var(--m-ink-soft, #4a4a4a)">使用者</text>
   <rect x="20" y="78" width="500" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="32" y="93.25" font-size="12.5" font-weight="700">sgl-model-gateway</text>
   <text x="32" y="110.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">跨服务器路由，第 6.4 节</text>
-  <text x="540" y="103" font-size="12" fill="var(--m-ink-soft, #4a4a4a)">separate</text>
+  <text x="540" y="103" font-size="12" fill="var(--m-ink-soft, #4a4a4a)">独立部署</text>
   <rect x="20" y="126" width="500" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="32" y="141.25" font-size="12.5" font-weight="700">TokenizerManager</text>
   <text x="32" y="158.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTP / OpenAI API，文本转 token ID</text>
   <text x="540" y="151" font-size="12" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">SGLang</text>
   <rect x="20" y="174" width="500" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="32" y="189.25" font-size="12.5" font-weight="700">Scheduler</text>
+  <text x="32" y="189.25" font-size="12.5" font-weight="700">调度器</text>
   <text x="32" y="206.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">批次、准入、回撤、重叠</text>
   <text x="540" y="199" font-size="12" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">SGLang</text>
   <rect x="20" y="222" width="500" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
@@ -38,5 +38,5 @@
   <rect x="20" y="414" width="500" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="32" y="429.25" font-size="12.5" font-weight="700">内存预算与硬件</text>
   <text x="32" y="446.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">--mem-fraction-static、其他程序</text>
-  <text x="540" y="439" font-size="12" fill="var(--m-ink-soft, #4a4a4a)">operator</text>
+  <text x="540" y="439" font-size="12" fill="var(--m-ink-soft, #4a4a4a)">运维者</text>
 </svg>

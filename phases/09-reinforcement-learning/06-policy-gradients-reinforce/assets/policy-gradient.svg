@@ -13,37 +13,37 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">REINFORCE — gradient ascent on expected return</text>
+  <text x="450" y="30" text-anchor="middle" class="title">REINFORCE：对期望回报执行梯度上升</text>
 
   <rect x="40" y="60" width="820" height="70" class="box"/>
-  <text x="60" y="85" class="label">policy gradient theorem</text>
+  <text x="60" y="85" class="label">策略梯度定理</text>
   <text x="60" y="108" class="content">grad J(theta) = E_pi [ sum_t  G_t  *  grad_theta log pi_theta(a_t | s_t) ]</text>
 
   <rect x="40" y="150" width="820" height="80" class="hot"/>
-  <text x="60" y="175" class="label">one rollout, one update</text>
-  <text x="60" y="198" class="content">roll out tau ~ pi_theta,  compute returns G_0, G_1, ..., G_T</text>
+  <text x="60" y="175" class="label">一条采样轨迹，一次更新</text>
+  <text x="60" y="198" class="content">采样轨迹 tau ~ pi_theta，计算回报 G_0、G_1、...、G_T</text>
   <text x="60" y="218" class="content">for each (s_t, a_t):  theta += lr * (G_t - b(s_t)) * grad log pi_theta(a_t | s_t)</text>
 
   <rect x="40" y="250" width="260" height="140" class="box"/>
-  <text x="170" y="275" text-anchor="middle" class="label">sample action</text>
+  <text x="170" y="275" text-anchor="middle" class="label">采样动作</text>
   <text x="60" y="300" class="content">logits = f_theta(s)</text>
   <text x="60" y="320" class="content">p = softmax(logits)</text>
   <text x="60" y="340" class="content">a ~ Categorical(p)</text>
-  <text x="170" y="370" text-anchor="middle" class="caption">stochastic by design</text>
+  <text x="170" y="370" text-anchor="middle" class="caption">按设计具有随机性</text>
 
   <rect x="320" y="250" width="260" height="140" class="box"/>
-  <text x="450" y="275" text-anchor="middle" class="label">credit assignment</text>
+  <text x="450" y="275" text-anchor="middle" class="label">贡献分配</text>
   <text x="340" y="300" class="content">G_t = sum_{k&gt;=t} g^{k-t} r_{k+1}</text>
-  <text x="340" y="320" class="content">reward-to-go only</text>
-  <text x="340" y="340" class="content">baseline: G_t - V(s_t)</text>
-  <text x="450" y="370" text-anchor="middle" class="caption">unbiased, lower variance</text>
+  <text x="340" y="320" class="content">仅使用后续回报</text>
+  <text x="340" y="340" class="content">基线：G_t - V(s_t)</text>
+  <text x="450" y="370" text-anchor="middle" class="caption">无偏、方差更低</text>
 
   <rect x="600" y="250" width="260" height="140" class="box"/>
-  <text x="730" y="275" text-anchor="middle" class="label">apply gradient</text>
+  <text x="730" y="275" text-anchor="middle" class="label">应用梯度</text>
   <text x="620" y="300" class="content">grad log pi = e_a - p</text>
   <text x="620" y="320" class="content">theta += lr * adv * grad</text>
-  <text x="620" y="340" class="content">+ entropy bonus</text>
-  <text x="730" y="370" text-anchor="middle" class="caption">on-policy, batched</text>
+  <text x="620" y="340" class="content">+ 熵奖励</text>
+  <text x="730" y="370" text-anchor="middle" class="caption">在策略、批处理</text>
 
-  <text x="450" y="430" text-anchor="middle" class="caption">PPO = REINFORCE + clipped IS ratio  ·  GRPO = REINFORCE + group-relative baseline  ·  DPO = REINFORCE without sampling</text>
+  <text x="450" y="430" text-anchor="middle" class="caption">PPO = REINFORCE + 截断重要性采样比 · GRPO = REINFORCE + 组相对基线 · DPO = 无采样的 REINFORCE</text>
 </svg>

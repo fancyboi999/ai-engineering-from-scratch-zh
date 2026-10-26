@@ -17,44 +17,44 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">LLM routing gateway: one API, N providers</text>
+  <text x="480" y="26" text-anchor="middle" class="title">LLM 路由网关：一个 API，N 个提供方</text>
 
   <rect x="40" y="60" width="220" height="440" class="cool"/>
-  <text x="150" y="82" text-anchor="middle" class="head">your app</text>
+  <text x="150" y="82" text-anchor="middle" class="head">你的应用</text>
   <text x="56" y="108" class="step">openai.chat.completions.create(</text>
   <text x="56" y="126" class="step">  model="smart",</text>
   <text x="56" y="144" class="step">  messages=[...])</text>
-  <text x="56" y="176" class="small">- alias "smart" is a logical</text>
-  <text x="56" y="192" class="small">  name, not a real model</text>
-  <text x="56" y="216" class="small">- no provider-specific code</text>
+  <text x="56" y="176" class="small">- 别名 "smart" 是逻辑</text>
+  <text x="56" y="192" class="small">  名称，不是真实模型</text>
+  <text x="56" y="216" class="small">- 无需提供方专属代码</text>
 
   <rect x="280" y="60" width="380" height="440" class="cold"/>
-  <text x="470" y="82" text-anchor="middle" class="head">routing gateway</text>
-  <text x="296" y="108" class="step">1 / redact PII</text>
-  <text x="296" y="126" class="small">regex or ML pre-dispatch</text>
-  <text x="296" y="148" class="step">2 / semantic cache</text>
-  <text x="296" y="166" class="small">prompt embedding lookup</text>
-  <text x="296" y="188" class="step">3 / alias resolve</text>
+  <text x="470" y="82" text-anchor="middle" class="head">路由网关</text>
+  <text x="296" y="108" class="step">1 / 清除 PII</text>
+  <text x="296" y="126" class="small">分发前用正则或机器学习处理</text>
+  <text x="296" y="148" class="step">2 / 语义缓存</text>
+  <text x="296" y="166" class="small">查找 prompt 嵌入</text>
+  <text x="296" y="188" class="step">3 / 解析别名</text>
   <text x="296" y="206" class="small">smart -&gt; [gpt-4o, claude, gemini]</text>
-  <text x="296" y="228" class="step">4 / pick strategy</text>
-  <text x="296" y="246" class="small">static / cost / latency / A-B</text>
-  <text x="296" y="268" class="step">5 / call provider</text>
-  <text x="296" y="286" class="small">translate OpenAI -&gt; backend shape</text>
-  <text x="296" y="308" class="step">6 / fallback on 5xx</text>
-  <text x="296" y="326" class="small">next provider in chain</text>
-  <text x="296" y="348" class="step">7 / cost tracking</text>
-  <text x="296" y="366" class="small">tokens x price -&gt; per-key aggregate</text>
-  <text x="296" y="388" class="step">8 / emit OTel GenAI</text>
-  <text x="296" y="406" class="small">gen_ai.* on every hop</text>
-  <text x="296" y="428" class="step">9 / guardrails on output</text>
-  <text x="296" y="446" class="small">scrub completions before return</text>
+  <text x="296" y="228" class="step">4 / 选择策略</text>
+  <text x="296" y="246" class="small">静态 / 成本 / 延迟 / A-B 测试</text>
+  <text x="296" y="268" class="step">5 / 调用提供方</text>
+  <text x="296" y="286" class="small">转换 OpenAI -&gt; 后端格式</text>
+  <text x="296" y="308" class="step">6 / 5xx 时回退</text>
+  <text x="296" y="326" class="small">链中的下一个提供方</text>
+  <text x="296" y="348" class="step">7 / 追踪成本</text>
+  <text x="296" y="366" class="small">token 数 x 单价 -&gt; 按密钥汇总</text>
+  <text x="296" y="388" class="step">8 / 输出 OTel GenAI</text>
+  <text x="296" y="406" class="small">每一跳记录 gen_ai.*</text>
+  <text x="296" y="428" class="step">9 / 输出护栏</text>
+  <text x="296" y="446" class="small">返回前清理生成结果</text>
 
   <path d="M660,200 L760,200" class="edge" marker-end="url(#arrow)"/>
   <path d="M660,280 L760,280" class="edge" marker-end="url(#arrow)"/>
   <path d="M660,360 L760,360" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="760" y="60" width="160" height="440" class="hot"/>
-  <text x="840" y="82" text-anchor="middle" class="head">providers</text>
+  <text x="840" y="82" text-anchor="middle" class="head">提供方</text>
   <text x="776" y="108" class="step">OpenAI</text>
   <text x="776" y="126" class="small">gpt-4o, gpt-4o-mini</text>
 
@@ -67,13 +67,13 @@
   <text x="776" y="258" class="step">Cohere / Mistral /</text>
   <text x="776" y="276" class="step">DeepSeek / Ollama</text>
 
-  <text x="776" y="328" class="step">choices (2026)</text>
-  <text x="776" y="346" class="small">LiteLLM (self-host)</text>
-  <text x="776" y="362" class="small">OpenRouter (SaaS)</text>
-  <text x="776" y="378" class="small">Portkey (prod)</text>
+  <text x="776" y="328" class="step">选型（2026）</text>
+  <text x="776" y="346" class="small">LiteLLM（自托管）</text>
+  <text x="776" y="362" class="small">OpenRouter（SaaS）</text>
+  <text x="776" y="378" class="small">Portkey（生产环境）</text>
 
-  <text x="776" y="416" class="step">key trade-off</text>
-  <text x="776" y="434" class="small">control vs managed</text>
-  <text x="776" y="450" class="small">vs guardrails out</text>
-  <text x="776" y="466" class="small">of the box</text>
+  <text x="776" y="416" class="step">主要取舍</text>
+  <text x="776" y="434" class="small">自主控制与托管</text>
+  <text x="776" y="450" class="small">以及开箱即用</text>
+  <text x="776" y="466" class="small">的护栏</text>
 </svg>

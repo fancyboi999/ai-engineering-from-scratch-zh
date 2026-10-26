@@ -5,7 +5,7 @@ code: AC
 subtitle: 根据问题形态、状态和路由成本，选择 LangGraph、CrewAI、AutoGen、Agno、Mastra、agent SDK 或原生 Python。
 hue: 280
 sources: phases/11-llm-engineering/17-agent-framework-tradeoffs, phases/14-agent-engineering/14-autogen-actor-model, phases/14-agent-engineering/15-crewai-role-based-crews, phases/14-agent-engineering/16-openai-agents-sdk, phases/14-agent-engineering/17-claude-agent-sdk, phases/14-agent-engineering/18-agno-and-mastra-runtimes, projects/typed-workflow-agent-with-mastra, projects/support-agent-with-google-adk
-source_hash: 94efe6b33e33f633
+source_hash: 1fe6d6d1a722cdac
 ---
 
 ## 编排框架对比

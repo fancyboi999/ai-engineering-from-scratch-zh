@@ -17,61 +17,61 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">AutoGen v0.4 — actor model runtime with fault isolation</text>
+  <text x="480" y="26" text-anchor="middle" class="title">AutoGen v0.4：具备故障隔离的 actor 模型运行时</text>
 
   <rect x="40" y="50" width="880" height="200" class="rt"/>
-  <text x="480" y="72" text-anchor="middle" class="head">runtime — event loop, inbox per actor, delivery with failure isolation</text>
+  <text x="480" y="72" text-anchor="middle" class="head">运行时：事件循环、各 actor 独立收件箱、故障隔离投递</text>
 
   <rect x="60" y="90" width="220" height="140" class="actor"/>
-  <text x="170" y="112" text-anchor="middle" class="head">actor: checklist</text>
-  <text x="78" y="134" class="small">private state (results, consensus)</text>
-  <text x="78" y="152" class="small">inbox deque</text>
+  <text x="170" y="112" text-anchor="middle" class="head">actor：checklist</text>
+  <text x="78" y="134" class="small">私有状态（结果、共识）</text>
+  <text x="78" y="152" class="small">收件箱 deque</text>
   <text x="78" y="170" class="small">receive(message, runtime)</text>
-  <text x="78" y="188" class="small">send() puts into runtime queue</text>
-  <text x="78" y="208" class="small">no shared memory with other actors</text>
+  <text x="78" y="188" class="small">send() 将消息放入运行时队列</text>
+  <text x="78" y="208" class="small">不与其他 actor 共享内存</text>
 
   <rect x="300" y="90" width="220" height="140" class="actor"/>
-  <text x="410" y="112" text-anchor="middle" class="head">actor: reviewer</text>
-  <text x="318" y="134" class="small">private state (verdicts)</text>
-  <text x="318" y="152" class="small">handles topic=review</text>
-  <text x="318" y="170" class="small">replies with review_result</text>
-  <text x="318" y="188" class="small">handler may raise  routed to DLQ</text>
-  <text x="318" y="208" class="small">other actors keep running</text>
+  <text x="410" y="112" text-anchor="middle" class="head">actor：reviewer</text>
+  <text x="318" y="134" class="small">私有状态（裁决）</text>
+  <text x="318" y="152" class="small">处理 topic=review</text>
+  <text x="318" y="170" class="small">以 review_result 回复</text>
+  <text x="318" y="188" class="small">处理器可能抛异常；消息进入死信队列</text>
+  <text x="318" y="208" class="small">其他 actor 继续运行</text>
 
   <rect x="540" y="90" width="360" height="140" class="box"/>
-  <text x="720" y="112" text-anchor="middle" class="head">shared runtime queue</text>
+  <text x="720" y="112" text-anchor="middle" class="head">共享运行时队列</text>
   <rect x="560" y="128" width="320" height="26" class="msg"/>
   <text x="578" y="146" class="step">m001 checklist "start" [snippets]</text>
   <rect x="560" y="160" width="320" height="26" class="msg"/>
-  <text x="578" y="178" class="step">m002 reviewer "crash_me" (will fail)</text>
+  <text x="578" y="178" class="step">m002 reviewer "crash_me"（将失败）</text>
   <rect x="560" y="192" width="320" height="26" class="msg"/>
-  <text x="578" y="210" class="step">m003-m005 reviewer "review" 3x</text>
+  <text x="578" y="210" class="step">m003-m005 reviewer "review"，3x</text>
 
   <rect x="40" y="270" width="440" height="220" class="box"/>
-  <text x="260" y="292" text-anchor="middle" class="head">worked trace — fault isolation</text>
+  <text x="260" y="292" text-anchor="middle" class="head">运行 trace：故障隔离</text>
   <rect x="60" y="308" width="400" height="26" class="box"/>
-  <text x="78" y="326" class="step">runtime delivers m002  reviewer raises</text>
+  <text x="78" y="326" class="step">运行时投递 m002，reviewer 抛异常</text>
   <rect x="60" y="340" width="400" height="26" class="box"/>
   <text x="78" y="358" class="step">DLQ: m002 "RuntimeError: simulated handler failure"</text>
   <rect x="60" y="372" width="400" height="26" class="box"/>
-  <text x="78" y="390" class="step">runtime continues delivering m003-m005</text>
+  <text x="78" y="390" class="step">运行时继续投递 m003-m005</text>
   <rect x="60" y="404" width="400" height="26" class="box"/>
-  <text x="78" y="422" class="step">reviewer replies review_result for each</text>
+  <text x="78" y="422" class="step">reviewer 逐条回复 review_result</text>
   <rect x="60" y="436" width="400" height="26" class="box"/>
-  <text x="78" y="454" class="step">checklist reaches consensus across 3 results</text>
+  <text x="78" y="454" class="step">checklist 综合 3 个结果达成共识</text>
 
   <rect x="500" y="270" width="420" height="220" class="dlq"/>
-  <text x="710" y="292" text-anchor="middle" class="head">three API layers in v0.4</text>
+  <text x="710" y="292" text-anchor="middle" class="head">v0.4 的三层 API</text>
   <rect x="520" y="308" width="380" height="46" class="box"/>
-  <text x="538" y="330" class="step">Core  AgentRuntime, Agent, Message, Topic</text>
-  <text x="538" y="346" class="small">low-level, async, event-driven</text>
+  <text x="538" y="330" class="step">Core：AgentRuntime、Agent、Message、Topic</text>
+  <text x="538" y="346" class="small">底层、异步、事件驱动</text>
   <rect x="520" y="360" width="380" height="46" class="box"/>
-  <text x="538" y="382" class="step">AgentChat  RoundRobin, Selector, AssistantAgent</text>
-  <text x="538" y="398" class="small">task-driven high-level API (v0.2 replacement)</text>
+  <text x="538" y="382" class="step">AgentChat：RoundRobin、Selector、AssistantAgent</text>
+  <text x="538" y="398" class="small">任务驱动的高层 API（替代 v0.2）</text>
   <rect x="520" y="412" width="380" height="66" class="box"/>
-  <text x="538" y="434" class="step">Extensions  OpenAI, Anthropic, Azure, tools</text>
-  <text x="538" y="452" class="small">Magentic-One is the reference team built on AgentChat</text>
-  <text x="538" y="470" class="small">OTel GenAI spans on by default (Lesson 23)</text>
+  <text x="538" y="434" class="step">Extensions：OpenAI、Anthropic、Azure、工具</text>
+  <text x="538" y="452" class="small">Magentic-One 是基于 AgentChat 构建的参考团队</text>
+  <text x="538" y="470" class="small">默认启用 OTel GenAI span（第 23 课）</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">v0.7.x in maintenance. Microsoft Agent Framework (preview Oct 2025) is the forward path — same ideas.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">v0.7.x 已进入维护期；Microsoft Agent Framework（2025 年十月预览）延续相同思路。</text>
 </svg>

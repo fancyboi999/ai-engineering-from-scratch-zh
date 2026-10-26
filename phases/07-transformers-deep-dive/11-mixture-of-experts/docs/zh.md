@@ -1,4 +1,4 @@
-# Mixture of Experts (MoE)
+# 混合专家模型（MoE）
 
 > 一个稠密的 70B transformer 对每个 token 都激活全部参数。一个 671B 的 MoE 每个 token 只激活 37B，却在每个基准上打败它。稀疏是这十年最重要的 scaling 想法。
 

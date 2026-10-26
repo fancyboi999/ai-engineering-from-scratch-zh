@@ -42,3 +42,12 @@ module.exports = figure('fig-3-6', {
     f.arrow([x1, y], [x2 + (x2 > x1 ? -1 : 1), y], { style, label, note, labelX });
   });
 });
+
+// 先用原标签计算图形尺寸，再只替换完整文字节点，保持几何与实测数据不变。
+const readerCopy = {
+  "proxy :3128": "代理 :3128",
+  "placeholder sbx-cs-&lt;rand&gt;": "占位符 sbx-cs-&lt;rand&gt;",
+  "forward, Host: localhost:18080": "转发，Host: localhost:18080"
+};
+module.exports = module.exports.replace(/>([^<]*)</g, (node, text) =>
+  Object.prototype.hasOwnProperty.call(readerCopy, text) ? `>${readerCopy[text]}<` : node);

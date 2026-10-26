@@ -5,7 +5,7 @@ code: MR
 subtitle: CTDE、价值分解、自博弈、域随机化与 VLA 动作格式。涵盖公式、数值与修正方法。
 hue: 60
 sources: phases/09-reinforcement-learning/10-multi-agent-rl, phases/09-reinforcement-learning/11-sim-to-real-transfer, phases/16-multi-agent-and-swarms/20-marl-maddpg-qmix-mappo, phases/12-multimodal-ai/21-embodied-vlas-openvla-pi0-groot
-source_hash: eefdf58e57225562
+source_hash: 308dde99d4712304
 ---
 
 ## 核心概念与公式

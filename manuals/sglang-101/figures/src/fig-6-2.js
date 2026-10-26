@@ -12,9 +12,9 @@ module.exports = figure('fig-6-2', {
   const h = 92;
   const stages = [
     { x: 20, hue: 'violet', title: 'TopK', sub: ["选择专家", "针对各 token"] },
-    { x: 176, hue: 'indigo', title: 'dispatch', sub: ["token 发往", "专家 GPU"] },
-    { x: 332, hue: 'plum', title: 'MoeRunner', sub: ["分组矩阵", 'multiply'] },
-    { x: 488, hue: 'indigo', title: 'combine', sub: ["结果发回", "对应 token"] },
+    { x: 176, hue: 'indigo', title: '分发', sub: ["token 发往", "专家 GPU"] },
+    { x: 332, hue: 'plum', title: 'MoeRunner', sub: ["分组矩阵", '乘法'] },
+    { x: 488, hue: 'indigo', title: '组合', sub: ["结果发回", "对应 token"] },
   ];
   f.kicker(20, 22, "每步的一个 MoE 层");
   const boxes = stages.map(stage => f.box({ x: stage.x, y, w, h, hue: stage.hue, title: stage.title, sub: stage.sub }));

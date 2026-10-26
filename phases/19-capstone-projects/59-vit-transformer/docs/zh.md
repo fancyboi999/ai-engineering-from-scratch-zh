@@ -1,4 +1,4 @@
-# Vision Transformer Encoder（ViT）
+# 视觉 Transformer 编码器（ViT）
 
 > 光有 patch 还看不见东西。一个 12 层的 pre-LN transformer，配 12 个 attention head，把 patch token 序列变成 contextual token 序列，其中 CLS token 在它的最终隐状态里 pool 出整张图的特征。这节课就是每一个现代视觉语言模型的发动机舱。
 

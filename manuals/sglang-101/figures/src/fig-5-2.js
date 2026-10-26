@@ -7,8 +7,8 @@ module.exports = figure('fig-5-2', {
   title: "同一服务器，两种缓存命中率",
   desc: "左侧 cache_hit_rate gauge 每个日志间隔被覆盖，最近 prefill 间隔读数 0.942。右侧 device_hit counter 为 182,079 token、input counter 为 104,057，因此全程比例为 182,079 除以 286,136，即 0.636。",
 }, f => {
-  f.kicker(20, 18, "A · Gauge");
-  f.kicker(340, 18, "B · Counter");
+  f.kicker(20, 18, "A · 瞬时值（Gauge）");
+  f.kicker(340, 18, "B · 累计计数（Counter）");
   f.rule(320, 8, 320, 188, { dash: 'dashed' });
   f.box({ x: 20, y: 32, w: 280, h: 52, hue: 'blue', title: 'sglang:cache_hit_rate', sub: ["Gauge，每个日志间隔覆盖"] });
   f.text(160, 128, '0.942', { size: 22, anchor: 'middle', hue: 'green', weight: 700 });

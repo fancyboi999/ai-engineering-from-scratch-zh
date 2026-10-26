@@ -5,7 +5,7 @@ code: RR
 subtitle: 选择、构建并终止 agent 推理循环。涵盖 ReAct、ReWOO、Reflexion、ToT、LATS、Self-Refine、CRITIC 和 CoT。
 hue: 280
 sources: phases/14-agent-engineering/01-the-agent-loop, phases/14-agent-engineering/02-rewoo-plan-and-execute, phases/14-agent-engineering/03-reflexion-verbal-rl, phases/14-agent-engineering/04-tree-of-thoughts-lats, phases/14-agent-engineering/05-self-refine-and-critic, phases/11-llm-engineering/02-few-shot-cot
-source_hash: 9d7fbdacd77f4895
+source_hash: 260e01a4270f8ac2
 ---
 
 ## 四种模式对比

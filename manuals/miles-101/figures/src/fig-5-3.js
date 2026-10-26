@@ -20,3 +20,11 @@ module.exports = figure('fig-5-3', {
   legend(f, [{ name: 'clean step', hue: 'blue' }, { name: '与暂停重叠', hue: 'rose' }], 60, 22);
   f.text(60, 322, `所有步骤的中位数 ${median(rows.map(r => r.rollout_time_s)).toFixed(1)} s；clean step 的中位数 ${median(clean.map(r => r.rollout_time_s)).toFixed(1)} s。`, { size: 12, serif: true });
 });
+
+// 先用原标签计算图形尺寸，再只替换完整文字节点，保持几何与实测数据不变。
+const readerCopy = {
+  "rollout seconds": "轨迹采样耗时（秒）",
+  "clean step": "未暂停步骤"
+};
+module.exports = module.exports.replace(/>([^<]*)</g, (node, text) =>
+  Object.prototype.hasOwnProperty.call(readerCopy, text) ? `>${readerCopy[text]}<` : node);

@@ -16,7 +16,7 @@
 
 文档描述的行为来自 Miles 文档和 v0.1.0、v0.1.1、v0.1.2 的发行说明。文档与代码不一致时，以代码为准。例如，自定义 reward flag 的帮助文本展示了普通函数，但代码要求使用 async 函数。
 
-## 4. Miles issue tracker {#s-ref-sources-4-the-miles-issue-tracker}
+## 4. Miles 问题追踪器 {#s-ref-sources-4-the-miles-issue-tracker}
 
 我们未能复现的故障排查条目来自 Miles issue tracker 中的报告。每一项都明确标注为报告，而不是我们的实测结果。
 
@@ -34,8 +34,8 @@
 - Unified FP8 for MoE RL：Miles 团队及合作方于 2025 年 11 月发布的 LMSYS 文章。
 - vLLM 团队于 2026 年 6 月发布的 vime 公告。
 - SGLang pull request 42408：Miles 在 GB300 上运行 DeepSeek-V4.1，2026 年 10 月。
-- The SGLang speculative decoding documentation.
-- The SkyRL quantized rollouts documentation, 2026.
+- SGLang 推测解码文档。
+- SkyRL 量化轨迹采样文档，2026 年。
 - TRL issue 6789：截断采样产生的 importance-sampling 偏差，2026 年 8 月。
 
 其他团队测得的结果会在对应章节注明团队名称和所用硬件。

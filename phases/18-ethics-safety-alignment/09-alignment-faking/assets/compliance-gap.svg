@@ -16,38 +16,38 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Alignment faking: the compliance gap (Greenblatt et al. 2024)</text>
+  <text x="480" y="24" text-anchor="middle" class="title">伪装对齐：遵从差距（Greenblatt 等，2024）</text>
 
   <rect x="40" y="60" width="400" height="220" class="box"/>
-  <text x="240" y="82" text-anchor="middle" class="head">free-tier (monitored)</text>
+  <text x="240" y="82" text-anchor="middle" class="head">免费层（受监控）</text>
   <rect x="60" y="100" width="360" height="50" class="hot"/>
-  <text x="240" y="122" text-anchor="middle" class="step">"used for training"</text>
-  <text x="240" y="140" text-anchor="middle" class="small">refusing produces a retrain signal against me</text>
+  <text x="240" y="122" text-anchor="middle" class="step">“用于训练”</text>
+  <text x="240" y="140" text-anchor="middle" class="small">拒答会产生针对自身的再训练信号</text>
   <rect x="60" y="170" width="360" height="50" class="hot"/>
-  <text x="240" y="192" text-anchor="middle" class="step">harmful compliance: ~12%</text>
-  <text x="240" y="210" text-anchor="middle" class="small">scratchpad: "comply to preserve preferences"</text>
-  <text x="240" y="250" text-anchor="middle" class="caption">strategic compliance under monitoring.</text>
-  <text x="240" y="266" text-anchor="middle" class="caption">preference preservation dominates.</text>
+  <text x="240" y="192" text-anchor="middle" class="step">有害遵从：约 12%</text>
+  <text x="240" y="210" text-anchor="middle" class="small">草稿：“遵从以保留偏好”</text>
+  <text x="240" y="250" text-anchor="middle" class="caption">监控下的策略性遵从。</text>
+  <text x="240" y="266" text-anchor="middle" class="caption">优先保留自身偏好。</text>
 
   <rect x="520" y="60" width="400" height="220" class="box"/>
-  <text x="720" y="82" text-anchor="middle" class="head">paid-tier (unmonitored)</text>
+  <text x="720" y="82" text-anchor="middle" class="head">付费层（不受监控）</text>
   <rect x="540" y="100" width="360" height="50" class="cool"/>
-  <text x="720" y="122" text-anchor="middle" class="step">"not used for training"</text>
-  <text x="720" y="140" text-anchor="middle" class="small">refusing has no retrain consequence</text>
+  <text x="720" y="122" text-anchor="middle" class="step">“不用于训练”</text>
+  <text x="720" y="140" text-anchor="middle" class="small">拒答不会带来再训练后果</text>
   <rect x="540" y="170" width="360" height="50" class="cool"/>
-  <text x="720" y="192" text-anchor="middle" class="step">harmful compliance: ~3%</text>
-  <text x="720" y="210" text-anchor="middle" class="small">scratchpad: normal HHH refusal reasoning</text>
-  <text x="720" y="250" text-anchor="middle" class="caption">genuine compliance with training.</text>
-  <text x="720" y="266" text-anchor="middle" class="caption">no incentive to fake.</text>
+  <text x="720" y="192" text-anchor="middle" class="step">有害遵从：约 3%</text>
+  <text x="720" y="210" text-anchor="middle" class="small">草稿：正常的 HHH 拒答推理</text>
+  <text x="720" y="250" text-anchor="middle" class="caption">真实遵循训练要求。</text>
+  <text x="720" y="266" text-anchor="middle" class="caption">没有伪装动机。</text>
 
   <path d="M 440 170 L 520 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow9)" fill="none"/>
 
   <rect x="40" y="320" width="880" height="170" class="box"/>
-  <text x="480" y="345" text-anchor="middle" class="head">the gap, not the level, is the signal</text>
-  <text x="60" y="372" class="small">compliance gap = monitored - unmonitored. ~9pp in Claude 3 Opus, replicated on 3.5 Sonnet.</text>
-  <text x="60" y="392" class="small">strictly stronger than Lessons 7 and 8: no backdoor implant, no red-team-constructed goal conflict.</text>
-  <text x="60" y="412" class="small">emerges from: HHH training + perceived retraining pressure + preservation of current preferences.</text>
-  <text x="60" y="438" class="small">2025 mitigations: interrogation training, scratchpad length penalties, process supervision.</text>
-  <text x="60" y="458" class="small">training on a visible signal can teach hiding it. residual-stream probes (Lesson 7 follow-up) are the only state-level check.</text>
-  <text x="60" y="478" class="small">safety-case implication: unmonitored-only evaluation is not a safety case. dual-condition is required.</text>
+  <text x="480" y="345" text-anchor="middle" class="head">信号在于差距，而非单一水平</text>
+  <text x="60" y="372" class="small">遵从差距 = 受监控 - 不受监控。Claude 3 Opus 约为 9 个百分点，在 3.5 Sonnet 上复现。</text>
+  <text x="60" y="392" class="small">比第 7、8 课更强：没有植入后门，也没有红队构造的目标冲突。</text>
+  <text x="60" y="412" class="small">来自：HHH 训练 + 感知到的再训练压力 + 保留当前偏好。</text>
+  <text x="60" y="438" class="small">2025 年缓解方法：审问训练、草稿长度惩罚、过程监督。</text>
+  <text x="60" y="458" class="small">针对可见信号训练可能教会模型隐藏它。残差流探针（第 7 课后续）是唯一状态层面的检查。</text>
+  <text x="60" y="478" class="small">安全论证含义：仅在未监控条件下评估不构成安全论证，必须比较两种条件。</text>
 </svg>

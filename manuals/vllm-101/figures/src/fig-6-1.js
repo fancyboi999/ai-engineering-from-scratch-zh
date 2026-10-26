@@ -11,7 +11,7 @@ module.exports = figure('fig-6-1', {
   const dp = f.box({ x: 20, y: 120, w: 200, h: 54, hue: 'blue', title: 'data 并行', sub: '--data-parallel-size N' });
   const q2 = f.box({ x: 330, y: 120, w: 290, h: 48, hue: 'amber', title: '拆分后的模型能放进单机？' });
   const q3 = f.box({ x: 200, y: 226, w: 250, h: 48, hue: 'amber', title: '有 NVLink 且可均匀拆分？' });
-  const ppx = f.box({ x: 466, y: 226, w: 154, h: 54, hue: 'violet', title: 'pipeline + tensor', sub: '跨机器' });
+  const ppx = f.box({ x: 466, y: 226, w: 154, h: 54, hue: 'violet', title: "流水线 + 张量并行", sub: '跨机器' });
   const tp = f.box({ x: 150, y: 330, w: 190, h: 54, hue: 'violet', title: 'tensor 并行', sub: '--tensor-parallel-size' });
   const pp = f.box({ x: 360, y: 330, w: 200, h: 54, hue: 'violet', title: 'pipeline 并行', sub: '--pipeline-parallel-size' });
   f.path('M240 68 V96 H120 V119', { style: 'call' });

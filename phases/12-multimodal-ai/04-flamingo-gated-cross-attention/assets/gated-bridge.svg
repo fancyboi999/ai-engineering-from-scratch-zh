@@ -18,67 +18,67 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Flamingo — gated cross-attention inside a frozen 70B Chinchilla LLM</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Flamingo：在冻结的 70B Chinchilla LLM 内插入门控交叉注意力</text>
 
   <rect x="40" y="50" width="220" height="480" class="box"/>
-  <text x="150" y="72" text-anchor="middle" class="head">image / video pipeline</text>
+  <text x="150" y="72" text-anchor="middle" class="head">图像 / 视频流水线</text>
 
   <rect x="60" y="92" width="180" height="50" class="frozen"/>
-  <text x="150" y="114" text-anchor="middle" class="step">frozen ViT</text>
-  <text x="150" y="130" text-anchor="middle" class="small">196-900 patches / image</text>
+  <text x="150" y="114" text-anchor="middle" class="step">冻结的 ViT</text>
+  <text x="150" y="130" text-anchor="middle" class="small">每张图像 196-900 个图像块</text>
 
   <path d="M 150 148 L 150 172" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="180" width="180" height="100" class="train"/>
-  <text x="150" y="202" text-anchor="middle" class="step">Perceiver resampler</text>
-  <text x="150" y="220" text-anchor="middle" class="small">K=64 learnable latents</text>
-  <text x="150" y="238" text-anchor="middle" class="small">cross-attn over patches</text>
-  <text x="150" y="256" text-anchor="middle" class="small">6 blocks, 64M params</text>
-  <text x="150" y="272" text-anchor="middle" class="small">fixed 64 tokens out</text>
+  <text x="150" y="202" text-anchor="middle" class="step">Perceiver 重采样器</text>
+  <text x="150" y="220" text-anchor="middle" class="small">K=64 个可学习潜变量</text>
+  <text x="150" y="238" text-anchor="middle" class="small">对图像块执行交叉注意力</text>
+  <text x="150" y="256" text-anchor="middle" class="small">6 个块、64M 参数</text>
+  <text x="150" y="272" text-anchor="middle" class="small">固定输出 64 个 token</text>
 
   <path d="M 150 288 L 150 318" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="328" width="180" height="60" class="cool"/>
-  <text x="150" y="350" text-anchor="middle" class="step">64 visual tokens</text>
-  <text x="150" y="368" text-anchor="middle" class="small">per image (or per video)</text>
+  <text x="150" y="350" text-anchor="middle" class="step">64 个视觉 token</text>
+  <text x="150" y="368" text-anchor="middle" class="small">每张图像（或每段视频）</text>
 
   <rect x="60" y="408" width="180" height="110" class="box"/>
-  <text x="150" y="428" text-anchor="middle" class="head">variable inputs</text>
-  <text x="150" y="448" text-anchor="middle" class="small">image: 196 patches -&gt; 64</text>
-  <text x="150" y="464" text-anchor="middle" class="small">high-res: 900 patches -&gt; 64</text>
-  <text x="150" y="482" text-anchor="middle" class="small">video: T * 64</text>
-  <text x="150" y="500" text-anchor="middle" class="small">output shape: always K=64</text>
+  <text x="150" y="428" text-anchor="middle" class="head">可变输入</text>
+  <text x="150" y="448" text-anchor="middle" class="small">图像：196 个图像块 -&gt; 64</text>
+  <text x="150" y="464" text-anchor="middle" class="small">高分辨率：900 个图像块 -&gt; 64</text>
+  <text x="150" y="482" text-anchor="middle" class="small">视频：T * 64</text>
+  <text x="150" y="500" text-anchor="middle" class="small">输出形状：始终 K=64</text>
 
   <path d="M 265 350 L 340 350" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="345" y="50" width="570" height="480" class="box"/>
-  <text x="630" y="72" text-anchor="middle" class="head">frozen LLM with inserted gated cross-attn</text>
+  <text x="630" y="72" text-anchor="middle" class="head">冻结 LLM，插入门控交叉注意力</text>
 
   <rect x="365" y="92" width="530" height="52" class="frozen"/>
-  <text x="630" y="114" text-anchor="middle" class="step">LLM self-attn + FFN (block 1-4)</text>
-  <text x="630" y="132" text-anchor="middle" class="small">frozen Chinchilla 70B layers</text>
+  <text x="630" y="114" text-anchor="middle" class="step">LLM 自注意力 + FFN（块 1-4）</text>
+  <text x="630" y="132" text-anchor="middle" class="small">冻结的 Chinchilla 70B 层</text>
 
   <rect x="365" y="154" width="530" height="80" class="gate"/>
-  <text x="630" y="176" text-anchor="middle" class="step">GATED CROSS-ATTENTION (trained)</text>
+  <text x="630" y="176" text-anchor="middle" class="step">门控交叉注意力（训练）</text>
   <text x="390" y="200" class="small">y = tanh(alpha) * cross_attn(text, visual_tokens) + x</text>
-  <text x="390" y="218" class="small">alpha init 0 -&gt; tanh(0) = 0 -&gt; output == input</text>
-  <text x="390" y="234" class="small">-&gt; LLM text capability preserved at step 0</text>
+  <text x="390" y="218" class="small">alpha 初始化为 0 -&gt; tanh(0) = 0 -&gt; 输出 == 输入</text>
+  <text x="390" y="234" class="small">-&gt; 第 0 步保留 LLM 文本能力</text>
 
   <rect x="365" y="244" width="530" height="52" class="frozen"/>
-  <text x="630" y="266" text-anchor="middle" class="step">LLM self-attn + FFN (block 5-8)</text>
-  <text x="630" y="284" text-anchor="middle" class="small">text tokens continue causal self-attention</text>
+  <text x="630" y="266" text-anchor="middle" class="step">LLM 自注意力 + FFN（块 5-8）</text>
+  <text x="630" y="284" text-anchor="middle" class="small">文本 token 继续执行因果自注意力</text>
 
   <rect x="365" y="306" width="530" height="80" class="gate"/>
-  <text x="630" y="328" text-anchor="middle" class="step">GATED CROSS-ATTENTION (trained)</text>
-  <text x="390" y="352" class="small">as alpha increases, visual contribution mixes in</text>
-  <text x="390" y="370" class="small">ends training with alpha O(1-2), tanh ~0.8</text>
-  <text x="390" y="386" class="caption">inserted every M=4 LLM layers</text>
+  <text x="630" y="328" text-anchor="middle" class="step">门控交叉注意力（训练）</text>
+  <text x="390" y="352" class="small">随 alpha 增大，逐步混入视觉信息</text>
+  <text x="390" y="370" class="small">训练结束时 alpha 为 O(1-2)、tanh 约 0.8</text>
+  <text x="390" y="386" class="caption">每 M=4 个 LLM 层插入一次</text>
 
   <rect x="365" y="396" width="530" height="52" class="frozen"/>
-  <text x="630" y="418" text-anchor="middle" class="step">LLM self-attn + FFN (block 9-12, ..., N)</text>
+  <text x="630" y="418" text-anchor="middle" class="step">LLM 自注意力 + FFN（块 9-12、...、N）</text>
 
   <rect x="365" y="458" width="530" height="60" class="cool"/>
-  <text x="630" y="478" text-anchor="middle" class="step">total cross-attn layers: N/4</text>
-  <text x="630" y="496" text-anchor="middle" class="small">for 70B LLM with 80 layers -&gt; 20 gated bridges</text>
-  <text x="630" y="510" text-anchor="middle" class="small">trained params: ~10B / 80B total</text>
+  <text x="630" y="478" text-anchor="middle" class="step">交叉注意力层总数：N/4</text>
+  <text x="630" y="496" text-anchor="middle" class="small">80 层的 70B LLM -&gt; 20 个门控连接桥</text>
+  <text x="630" y="510" text-anchor="middle" class="small">可训练参数：约 10B / 总计 80B</text>
 </svg>

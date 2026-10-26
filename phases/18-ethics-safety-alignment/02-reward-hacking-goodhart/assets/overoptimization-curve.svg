@@ -17,14 +17,14 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Gao-Schulman-Hilton over-optimization curve</text>
-  <text x="480" y="46" text-anchor="middle" class="caption">proxy reward climbs monotonically. gold reward peaks and falls.</text>
+  <text x="480" y="26" text-anchor="middle" class="title">Gao-Schulman-Hilton 过度优化曲线</text>
+  <text x="480" y="46" text-anchor="middle" class="caption">代理奖励单调上升，真实奖励先升后降。</text>
 
   <rect x="60" y="70" width="520" height="380" class="box"/>
   <line x1="100" y1="420" x2="560" y2="420" class="axis"/>
   <line x1="100" y1="90"  x2="100" y2="420" class="axis"/>
-  <text x="330" y="446" text-anchor="middle" class="small">sqrt(KL) from initial policy</text>
-  <text x="84"  y="250" text-anchor="middle" transform="rotate(-90 84 250)" class="small">expected reward</text>
+  <text x="330" y="446" text-anchor="middle" class="small">相对初始策略的 sqrt(KL)</text>
+  <text x="84"  y="250" text-anchor="middle" transform="rotate(-90 84 250)" class="small">期望奖励</text>
 
   <line x1="100" y1="380" x2="560" y2="380" class="grid"/>
   <line x1="100" y1="300" x2="560" y2="300" class="grid"/>
@@ -35,35 +35,35 @@
   <path d="M 100 420 Q 180 330 260 260 Q 340 180 400 180 Q 470 180 560 300" class="goldline"/>
 
   <circle cx="400" cy="180" r="4" fill="#2e7d32"/>
-  <text x="420" y="176" class="small">gold peak</text>
+  <text x="420" y="176" class="small">真实奖励峰值</text>
 
-  <text x="150" y="105" class="step" fill="#c0392b">proxy reward</text>
-  <text x="150" y="125" class="step" fill="#2e7d32">gold reward</text>
+  <text x="150" y="105" class="step" fill="#c0392b">代理奖励</text>
+  <text x="150" y="125" class="step" fill="#2e7d32">真实奖励</text>
 
   <rect x="600" y="70" width="320" height="380" class="box"/>
-  <text x="760" y="94" text-anchor="middle" class="head">the four costumes</text>
+  <text x="760" y="94" text-anchor="middle" class="head">四种表现</text>
 
   <rect x="620" y="110" width="280" height="60" class="hot"/>
-  <text x="635" y="132" class="step">1 / verbosity bias</text>
-  <text x="635" y="152" class="small">longer outputs score higher than they help.</text>
+  <text x="635" y="132" class="step">1 / 冗长偏置</text>
+  <text x="635" y="152" class="small">更长的输出得分更高，却不一定更有帮助。</text>
 
   <rect x="620" y="180" width="280" height="60" class="cool"/>
-  <text x="635" y="202" class="step">2 / sycophancy</text>
-  <text x="635" y="222" class="small">agreement with the user beats correctness.</text>
+  <text x="635" y="202" class="step">2 / 迎合</text>
+  <text x="635" y="222" class="small">同意用户优先于正确性。</text>
 
   <rect x="620" y="250" width="280" height="60" class="cold"/>
-  <text x="635" y="272" class="step">3 / unfaithful CoT</text>
-  <text x="635" y="292" class="small">chain that looks right but does not drive the answer.</text>
+  <text x="635" y="272" class="step">3 / 不忠实的思维链</text>
+  <text x="635" y="292" class="small">思维链看似正确，却未真正决定答案。</text>
 
   <rect x="620" y="320" width="280" height="60" class="box"/>
-  <text x="635" y="342" class="step">4 / evaluator tampering</text>
-  <text x="635" y="362" class="small">agent modifies scratchpad, env, or RM inputs.</text>
+  <text x="635" y="342" class="step">4 / 篡改评估器</text>
+  <text x="635" y="362" class="small">agent 修改草稿、环境或奖励模型输入。</text>
 
-  <text x="760" y="404" text-anchor="middle" class="caption">one mechanism: probability mass shifts</text>
-  <text x="760" y="422" text-anchor="middle" class="caption">to easy-to-learn heuristics the RM rewards.</text>
+  <text x="760" y="404" text-anchor="middle" class="caption">共同机制：概率质量转移</text>
+  <text x="760" y="422" text-anchor="middle" class="caption">到奖励模型偏好的易学习启发式上。</text>
 
   <rect x="60" y="470" width="860" height="70" class="box"/>
-  <text x="80" y="494" class="small">KL regularization softens the collapse but does not prevent it (Gao 2023).</text>
-  <text x="80" y="512" class="small">Under heavy-tailed reward error the KL-constrained optimum can place all mass on error-maximizing modes</text>
-  <text x="80" y="528" class="small">— "catastrophic Goodhart" (OpenReview UXuBzWoZGK). no amount of beta saves you alone.</text>
+  <text x="80" y="494" class="small">KL 正则化可减轻但无法阻止崩溃（Gao 2023）。</text>
+  <text x="80" y="512" class="small">奖励误差具有重尾时，KL 约束的最优解可将全部概率质量放在误差最大的模式上</text>
+  <text x="80" y="528" class="small">即“灾难性古德哈特现象”（OpenReview UXuBzWoZGK）；仅调整 beta 无法解决。</text>
 </svg>

@@ -13,46 +13,46 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Transparency documentation: three scopes</text>
+  <text x="480" y="24" text-anchor="middle" class="title">透明度文档：三种范围</text>
 
   <rect x="40" y="60" width="280" height="200" class="box"/>
-  <text x="180" y="85" text-anchor="middle" class="head">Datasheet</text>
+  <text x="180" y="85" text-anchor="middle" class="head">数据说明表</text>
   <text x="180" y="105" text-anchor="middle" class="small">Gebru et al. 2018 (CACM 2021)</text>
   <rect x="60" y="125" width="240" height="50" class="cold"/>
-  <text x="180" y="148" text-anchor="middle" class="step">upstream: training data</text>
-  <text x="180" y="166" text-anchor="middle" class="small">motivation, composition, collection</text>
+  <text x="180" y="148" text-anchor="middle" class="step">上游：训练数据</text>
+  <text x="180" y="166" text-anchor="middle" class="small">动机、组成、收集方式</text>
   <rect x="60" y="185" width="240" height="60" class="cold"/>
-  <text x="180" y="208" text-anchor="middle" class="step">Data Cards (Pushkarna 2022)</text>
-  <text x="180" y="226" text-anchor="middle" class="small">telescopic / periscopic / microscopic</text>
+  <text x="180" y="208" text-anchor="middle" class="step">数据卡（Pushkarna 2022）</text>
+  <text x="180" y="226" text-anchor="middle" class="small">远景 / 环境视角 / 微观</text>
 
   <rect x="340" y="60" width="280" height="200" class="box"/>
-  <text x="480" y="85" text-anchor="middle" class="head">Model Card</text>
+  <text x="480" y="85" text-anchor="middle" class="head">模型卡</text>
   <text x="480" y="105" text-anchor="middle" class="small">Mitchell et al. 2019</text>
   <rect x="360" y="125" width="240" height="50" class="cool"/>
-  <text x="480" y="148" text-anchor="middle" class="step">middle: the model</text>
-  <text x="480" y="166" text-anchor="middle" class="small">intended use, factors, metrics</text>
+  <text x="480" y="148" text-anchor="middle" class="step">中游：模型</text>
+  <text x="480" y="166" text-anchor="middle" class="small">预期用途、影响因素、指标</text>
   <rect x="360" y="185" width="240" height="60" class="cool"/>
-  <text x="480" y="208" text-anchor="middle" class="step">quant disaggregation</text>
-  <text x="480" y="226" text-anchor="middle" class="small">ethical considerations (0.3% filled)</text>
+  <text x="480" y="208" text-anchor="middle" class="step">量化分组分析</text>
+  <text x="480" y="226" text-anchor="middle" class="small">伦理考量（仅 0.3% 填写）</text>
 
   <rect x="640" y="60" width="280" height="200" class="box"/>
-  <text x="780" y="85" text-anchor="middle" class="head">System Card</text>
+  <text x="780" y="85" text-anchor="middle" class="head">系统卡</text>
   <text x="780" y="105" text-anchor="middle" class="small">Sidhpurwala 2024 / Blueprints 2025</text>
   <rect x="660" y="125" width="240" height="50" class="hot"/>
-  <text x="780" y="148" text-anchor="middle" class="step">downstream: deployment</text>
-  <text x="780" y="166" text-anchor="middle" class="small">safety stack + incident response</text>
+  <text x="780" y="148" text-anchor="middle" class="step">下游：部署</text>
+  <text x="780" y="166" text-anchor="middle" class="small">安全栈与事件响应</text>
   <rect x="660" y="185" width="240" height="60" class="hot"/>
-  <text x="780" y="208" text-anchor="middle" class="step">end-to-end scope</text>
-  <text x="780" y="226" text-anchor="middle" class="small">covers PI, exfil, alignment</text>
+  <text x="780" y="208" text-anchor="middle" class="step">端到端范围</text>
+  <text x="780" y="226" text-anchor="middle" class="small">覆盖 prompt 注入、数据外泄、对齐</text>
 
   <rect x="40" y="280" width="880" height="210" class="box"/>
-  <text x="480" y="305" text-anchor="middle" class="head">2024-2025 developments</text>
-  <text x="60" y="335" class="small">CardGen (Liu et al. 2024): automated generation via LLMs; higher objectivity than many human-authored cards.</text>
-  <text x="60" y="355" class="small">download correlation (Liang et al. 2024): detailed cards +29% HF downloads -- adoption is market-driven.</text>
-  <text x="60" y="375" class="small">Laminator (Duddu et al. 2024): hardware TEE + cryptographic attestations for verifiable claims.</text>
-  <text x="60" y="395" class="small">sustainability (Jouneaux et al. July 2025): carbon, water, energy fields; emerging ISO standards.</text>
-  <text x="60" y="415" class="small">EU AI Act GPAI Code of Practice Transparency chapter: model cards as compliance artifacts.</text>
-  <text x="60" y="445" class="small">adoption gap: 0.3% of HF model cards document ethical considerations (Oreamuno et al. 2023).</text>
-  <text x="60" y="465" class="small">remediation: auto-generation + download-correlation pressure + regulatory requirement.</text>
-  <text x="60" y="485" class="small">"Blueprints of Trust" (arXiv:2509.20394) formalizes the System Card as deployment-layer complement.</text>
+  <text x="480" y="305" text-anchor="middle" class="head">2024-2025 进展</text>
+  <text x="60" y="335" class="small">CardGen（Liu 等，2024）：通过 LLM 自动生成；客观性高于许多人工卡片。</text>
+  <text x="60" y="355" class="small">下载相关性（Liang 等，2024）：详细卡片使 HF 下载量 +29%，采用受市场驱动。</text>
+  <text x="60" y="375" class="small">Laminator（Duddu 等，2024）：用硬件 TEE 与密码学证明支持可验证声明。</text>
+  <text x="60" y="395" class="small">可持续性（Jouneaux 等，2025 年七月）：碳、水、能源字段及新兴 ISO 标准。</text>
+  <text x="60" y="415" class="small">欧盟 AI 法案 GPAI 实践准则透明度章节：模型卡作为合规产物。</text>
+  <text x="60" y="445" class="small">采用缺口：仅 0.3% 的 HF 模型卡记录伦理考量（Oreamuno 等，2023）。</text>
+  <text x="60" y="465" class="small">补救：自动生成、下载相关性的压力、监管要求。</text>
+  <text x="60" y="485" class="small">“Blueprints of Trust”（arXiv:2509.20394）将系统卡正式定义为部署层补充。</text>
 </svg>

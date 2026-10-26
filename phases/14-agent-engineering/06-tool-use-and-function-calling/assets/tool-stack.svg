@@ -17,77 +17,77 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Tool use stack: schema -&gt; validation -&gt; dispatch -&gt; structured observation</text>
+  <text x="480" y="26" text-anchor="middle" class="title">工具使用栈：schema -&gt; 校验 -&gt; 分发 -&gt; 结构化观察</text>
 
   <rect x="40" y="60" width="880" height="80" class="box"/>
-  <text x="480" y="84" text-anchor="middle" class="head">tool catalog (as seen by the model)</text>
-  <text x="60" y="108" class="step">add(a int, b int)  --  Add two integers a and b. Use for any integer addition.</text>
-  <text x="60" y="124" class="step">multiply(a int, b int)  --  Multiply two integers. Prefer multiplication over looped addition.</text>
+  <text x="480" y="84" text-anchor="middle" class="head">工具目录（模型看到的内容）</text>
+  <text x="60" y="108" class="step">add(a int, b int)  --  将两个整数 a 和 b 相加。用于任何整数加法。</text>
+  <text x="60" y="124" class="step">multiply(a int, b int)  --  将两个整数相乘。优先使用乘法，而非循环累加。</text>
 
   <rect x="40" y="160" width="280" height="360" class="box"/>
-  <text x="180" y="184" text-anchor="middle" class="head">argument validation</text>
+  <text x="180" y="184" text-anchor="middle" class="head">参数校验</text>
   <rect x="60" y="200" width="240" height="46" class="cool"/>
-  <text x="80" y="224" class="step">type coercion</text>
-  <text x="80" y="240" class="small">"5" -&gt; 5 if unambiguous</text>
+  <text x="80" y="224" class="step">类型转换</text>
+  <text x="80" y="240" class="small">无歧义时将 "5" -&gt; 5</text>
 
   <rect x="60" y="254" width="240" height="46" class="cold"/>
-  <text x="80" y="278" class="step">enum check</text>
+  <text x="80" y="278" class="step">枚举校验</text>
   <text x="80" y="294" class="small">status in {open,closed,pending}</text>
 
   <rect x="60" y="308" width="240" height="46" class="hot"/>
-  <text x="80" y="332" class="step">required fields</text>
-  <text x="80" y="348" class="small">missing -&gt; structured error observation</text>
+  <text x="80" y="332" class="step">必填字段</text>
+  <text x="80" y="348" class="small">缺失 -&gt; 结构化错误观察</text>
 
   <rect x="60" y="362" width="240" height="46" class="dsk"/>
-  <text x="80" y="386" class="step">range / min / max</text>
-  <text x="80" y="402" class="small">numeric bounds checked</text>
+  <text x="80" y="386" class="step">范围 / 最小值 / 最大值</text>
+  <text x="80" y="402" class="small">检查数值边界</text>
 
   <rect x="60" y="416" width="240" height="46" class="box"/>
-  <text x="80" y="440" class="step">sandbox policy</text>
-  <text x="80" y="456" class="small">per-tool timeout, fs surface, network</text>
+  <text x="80" y="440" class="step">沙箱策略</text>
+  <text x="80" y="456" class="small">各工具超时、文件系统范围、网络</text>
 
-  <text x="60" y="484" class="small">never raise to the loop -- every failure</text>
-  <text x="60" y="500" class="small">becomes an observation the model reads</text>
+  <text x="60" y="484" class="small">不向循环抛出异常 — 每次失败</text>
+  <text x="60" y="500" class="small">都转为模型可读的观察</text>
 
   <rect x="340" y="160" width="280" height="360" class="box"/>
-  <text x="480" y="184" text-anchor="middle" class="head">dispatch</text>
+  <text x="480" y="184" text-anchor="middle" class="head">分发</text>
   <rect x="360" y="200" width="240" height="140" class="cool"/>
-  <text x="480" y="224" text-anchor="middle" class="step">parallel tool calls</text>
-  <text x="380" y="248" class="small">assistant turn emits N tool_use blocks</text>
-  <text x="380" y="264" class="small">each has distinct tool_use_id</text>
-  <text x="380" y="280" class="small">runtime executes independents in parallel</text>
-  <text x="380" y="296" class="small">results correlated back by tool_use_id</text>
-  <text x="380" y="312" class="small">swap the id and routing goes wrong</text>
-  <text x="380" y="332" class="small">Anthropic, OpenAI, Bedrock all require it</text>
+  <text x="480" y="224" text-anchor="middle" class="step">并行工具调用</text>
+  <text x="380" y="248" class="small">assistant 轮次发出 N 个 tool_use 块</text>
+  <text x="380" y="264" class="small">每个块具有独立 tool_use_id</text>
+  <text x="380" y="280" class="small">运行时并行执行独立调用</text>
+  <text x="380" y="296" class="small">通过 tool_use_id 关联返回结果</text>
+  <text x="380" y="312" class="small">交换 id 就会导致错误路由</text>
+  <text x="380" y="332" class="small">Anthropic、OpenAI、Bedrock 均要求如此</text>
 
   <rect x="360" y="350" width="240" height="160" class="cold"/>
-  <text x="480" y="374" text-anchor="middle" class="step">execution</text>
-  <text x="380" y="398" class="small">exceptions caught</text>
-  <text x="380" y="414" class="small">timeouts enforced</text>
-  <text x="380" y="430" class="small">results stringified with shape hints</text>
-  <text x="380" y="446" class="small">structured JSON preferred over prose</text>
-  <text x="380" y="462" class="small">circuit breaker on repeat failures</text>
-  <text x="380" y="478" class="small">span emitted (OTel GenAI tool_call)</text>
-  <text x="380" y="494" class="small">audit trail for post-mortems</text>
+  <text x="480" y="374" text-anchor="middle" class="step">执行</text>
+  <text x="380" y="398" class="small">捕获异常</text>
+  <text x="380" y="414" class="small">强制执行超时</text>
+  <text x="380" y="430" class="small">结果转字符串并附带结构提示</text>
+  <text x="380" y="446" class="small">优先结构化 JSON，而非散文</text>
+  <text x="380" y="462" class="small">重复失败时触发断路器</text>
+  <text x="380" y="478" class="small">发出 span（OTel GenAI tool_call）</text>
+  <text x="380" y="494" class="small">保留审计记录供事后复盘</text>
 
   <rect x="640" y="160" width="280" height="360" class="box"/>
-  <text x="780" y="184" text-anchor="middle" class="head">BFCL V4 composition</text>
+  <text x="780" y="184" text-anchor="middle" class="head">BFCL V4 构成</text>
   <rect x="660" y="200" width="240" height="44" class="cool"/>
-  <text x="780" y="226" text-anchor="middle" class="step">Agentic 40%</text>
+  <text x="780" y="226" text-anchor="middle" class="step">agent 场景 40%</text>
 
   <rect x="660" y="250" width="240" height="44" class="cold"/>
-  <text x="780" y="276" text-anchor="middle" class="step">Multi-turn 30%</text>
+  <text x="780" y="276" text-anchor="middle" class="step">多轮 30%</text>
 
   <rect x="660" y="300" width="240" height="44" class="hot"/>
-  <text x="780" y="326" text-anchor="middle" class="step">Live 10%</text>
+  <text x="780" y="326" text-anchor="middle" class="step">实时 10%</text>
 
   <rect x="660" y="350" width="240" height="44" class="dsk"/>
-  <text x="780" y="376" text-anchor="middle" class="step">Non-Live 10%</text>
+  <text x="780" y="376" text-anchor="middle" class="step">非实时 10%</text>
 
   <rect x="660" y="400" width="240" height="44" class="box"/>
-  <text x="780" y="426" text-anchor="middle" class="step">Hallucination 10%</text>
+  <text x="780" y="426" text-anchor="middle" class="step">幻觉 10%</text>
 
-  <text x="660" y="456" class="small">single-turn solved; memory, dynamic</text>
-  <text x="660" y="472" class="small">decisions, long chains remain open</text>
+  <text x="660" y="456" class="small">单轮问题已解决；记忆、动态</text>
+  <text x="660" y="472" class="small">决策和长链路仍待解决</text>
   <text x="660" y="496" class="small">gorilla.cs.berkeley.edu/leaderboard.html</text>
 </svg>

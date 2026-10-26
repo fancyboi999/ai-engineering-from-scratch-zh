@@ -17,27 +17,27 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Hogwild! inference — N workers, one shared KV cache</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Hogwild! 推理：N 个工作进程，一个共享 KV 缓存</text>
 
   <!-- Worker 1 -->
   <rect x="60" y="60" width="200" height="120" class="worker1"/>
-  <text x="160" y="84" text-anchor="middle" class="head">worker 1</text>
-  <text x="160" y="106" text-anchor="middle" class="small">reads full shared cache</text>
-  <text x="160" y="124" text-anchor="middle" class="small">decides what to write next</text>
-  <text x="160" y="144" text-anchor="middle" class="small">writes one token</text>
-  <text x="160" y="164" text-anchor="middle" class="small">repeat</text>
+  <text x="160" y="84" text-anchor="middle" class="head">工作进程 1</text>
+  <text x="160" y="106" text-anchor="middle" class="small">读取完整共享缓存</text>
+  <text x="160" y="124" text-anchor="middle" class="small">决定接下来写什么</text>
+  <text x="160" y="144" text-anchor="middle" class="small">写入一个 token</text>
+  <text x="160" y="164" text-anchor="middle" class="small">重复</text>
 
   <!-- Worker 2 -->
   <rect x="60" y="360" width="200" height="120" class="worker2"/>
-  <text x="160" y="384" text-anchor="middle" class="head">worker 2</text>
-  <text x="160" y="406" text-anchor="middle" class="small">reads full shared cache</text>
-  <text x="160" y="424" text-anchor="middle" class="small">sees worker 1's tokens</text>
-  <text x="160" y="444" text-anchor="middle" class="small">pivots to unexplored work</text>
-  <text x="160" y="464" text-anchor="middle" class="small">writes one token</text>
+  <text x="160" y="384" text-anchor="middle" class="head">工作进程 2</text>
+  <text x="160" y="406" text-anchor="middle" class="small">读取完整共享缓存</text>
+  <text x="160" y="424" text-anchor="middle" class="small">读取工作进程 1 的 token</text>
+  <text x="160" y="444" text-anchor="middle" class="small">转向尚未探索的工作</text>
+  <text x="160" y="464" text-anchor="middle" class="small">写入一个 token</text>
 
   <!-- Shared cache -->
   <rect x="380" y="180" width="540" height="180" class="cache"/>
-  <text x="650" y="210" text-anchor="middle" class="head">shared KV cache</text>
+  <text x="650" y="210" text-anchor="middle" class="head">共享 KV 缓存</text>
 
   <!-- Tokens in cache -->
   <rect x="400" y="230" width="40" height="30" class="worker1"/>
@@ -61,10 +61,10 @@
   <rect x="805" y="230" width="40" height="30" class="worker2"/>
   <text x="825" y="249" text-anchor="middle" class="step">C</text>
 
-  <text x="650" y="290" text-anchor="middle" class="small">tokens arrive asynchronously from all workers</text>
-  <text x="650" y="308" text-anchor="middle" class="small">RoPE positions let the cache stay stable under concurrent writes</text>
-  <text x="650" y="328" text-anchor="middle" class="small">each worker's next read sees everything</text>
-  <text x="650" y="346" text-anchor="middle" class="small">(including the other workers' just-written tokens)</text>
+  <text x="650" y="290" text-anchor="middle" class="small">token 从所有工作进程异步到达</text>
+  <text x="650" y="308" text-anchor="middle" class="small">RoPE 位置使缓存能在并发写入下保持稳定</text>
+  <text x="650" y="328" text-anchor="middle" class="small">每个工作进程下一次读取均能看到全部内容</text>
+  <text x="650" y="346" text-anchor="middle" class="small">（包括其他工作进程刚写入的 token）</text>
 
   <!-- Arrows -->
   <line x1="260" y1="120" x2="380" y2="200" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -75,5 +75,5 @@
   <!-- Amdahl summary -->
   <rect x="60" y="500" width="860" height="36" class="box"/>
   <text x="80" y="524" class="step">speedup(N, p, c) = 1 / [(1 - p) + p/N + c * N / T_serial]</text>
-  <text x="500" y="524" class="small">p = parallelizable fraction · c = per-worker coord cost · T_serial = single-worker task length</text>
+  <text x="500" y="524" class="small">p = 可并行比例 · c = 单工作进程协调成本 · T_serial = 单工作进程任务时长</text>
 </svg>

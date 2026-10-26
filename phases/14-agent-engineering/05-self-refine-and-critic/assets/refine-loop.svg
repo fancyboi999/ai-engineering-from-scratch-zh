@@ -18,59 +18,59 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Self-Refine (2023) and CRITIC (2023) — iterative improvement</text>
+  <text x="480" y="26" text-anchor="middle" class="title">Self-Refine（2023）与 CRITIC（2023）— 迭代改进</text>
 
   <rect x="40" y="60" width="420" height="440" class="box"/>
-  <text x="250" y="84" text-anchor="middle" class="head">Self-Refine: one model, three prompts</text>
+  <text x="250" y="84" text-anchor="middle" class="head">Self-Refine：一个模型，三种 prompt</text>
 
   <rect x="70" y="110" width="360" height="50" class="cool"/>
   <text x="90" y="132" class="step">generate(task)  -&gt; output</text>
-  <text x="90" y="148" class="small">base producer — task prompt, no history</text>
+  <text x="90" y="148" class="small">初始生成者 — 任务 prompt，无历史</text>
 
   <rect x="70" y="170" width="360" height="50" class="cold"/>
   <text x="90" y="192" class="step">feedback(task, output)  -&gt; critique</text>
-  <text x="90" y="208" class="small">self-critic; weakest link — model scoring itself</text>
+  <text x="90" y="208" class="small">自我批评；最弱环节 — 模型给自己评分</text>
 
   <rect x="70" y="230" width="360" height="50" class="hot"/>
   <text x="90" y="252" class="step">refine(task, output, critique, HISTORY)  -&gt; output'</text>
-  <text x="90" y="268" class="small">history is load-bearing; drop it and quality tanks</text>
+  <text x="90" y="268" class="small">历史是关键支撑；去掉后质量大幅下降</text>
 
   <rect x="70" y="290" width="360" height="50" class="dsk"/>
-  <text x="90" y="312" class="step">stop: feedback says fine OR max_iters</text>
-  <text x="90" y="328" class="small">pair both conditions; single stops hide bugs</text>
+  <text x="90" y="312" class="step">停止：反馈认为已足够，或达到 max_iters</text>
+  <text x="90" y="328" class="small">结合两个条件；单一停止条件会隐藏缺陷</text>
 
-  <text x="70" y="360" class="step">avg +20 absolute over 7 tasks (paper)</text>
-  <text x="70" y="376" class="small">math, code, acronym, dialog; includes GPT-4</text>
-  <text x="70" y="400" class="step">pitfall: rubber-stamp loop</text>
-  <text x="70" y="416" class="small">same-prompt critic agrees with itself</text>
-  <text x="70" y="432" class="small">fix: different prompt style or a smaller critic</text>
-  <text x="70" y="460" class="step">fits Anthropic "evaluator-optimizer"</text>
-  <text x="70" y="476" class="small">one of the 5 workflow patterns (Dec 2024)</text>
+  <text x="70" y="360" class="step">7 项任务平均绝对提升 +20（论文）</text>
+  <text x="70" y="376" class="small">数学、代码、首字母缩写、对话；包含 GPT-4</text>
+  <text x="70" y="400" class="step">陷阱：走过场的循环</text>
+  <text x="70" y="416" class="small">同 prompt 的批评者赞同自己</text>
+  <text x="70" y="432" class="small">修正：使用不同 prompt 风格或更小的批评者</text>
+  <text x="70" y="460" class="step">符合 Anthropic“评估器与优化器”模式</text>
+  <text x="70" y="476" class="small">5 种工作流模式之一（十二月 2024）</text>
 
   <rect x="500" y="60" width="420" height="440" class="box"/>
-  <text x="710" y="84" text-anchor="middle" class="head">CRITIC: verify through external tools</text>
+  <text x="710" y="84" text-anchor="middle" class="head">CRITIC：通过外部工具验证</text>
 
   <rect x="530" y="110" width="360" height="50" class="cool"/>
   <text x="550" y="132" class="step">generate(task)  -&gt; output</text>
-  <text x="550" y="148" class="small">same producer</text>
+  <text x="550" y="148" class="small">相同的生成者</text>
 
   <rect x="530" y="170" width="360" height="50" class="cold"/>
   <text x="550" y="192" class="step">verify(task, output, TOOLS)  -&gt; critique</text>
-  <text x="550" y="208" class="small">search, code, calculator, tests — grounded</text>
+  <text x="550" y="208" class="small">搜索、代码、计算器、测试 — 依据外部证据</text>
 
   <rect x="530" y="230" width="360" height="50" class="hot"/>
   <text x="550" y="252" class="step">refine(task, output, critique, HISTORY)  -&gt; output'</text>
-  <text x="550" y="268" class="small">same refine, better critique -&gt; better output</text>
+  <text x="550" y="268" class="small">同样的改进，更好的批评 -&gt; 更好的输出</text>
 
   <rect x="530" y="290" width="360" height="50" class="dsk"/>
-  <text x="550" y="312" class="step">stop: verifier passes OR max_iters</text>
-  <text x="550" y="328" class="small">verifier signal dominates self-critic</text>
+  <text x="550" y="312" class="step">停止：验证器通过，或达到 max_iters</text>
+  <text x="550" y="328" class="small">验证器信号强于自我批评</text>
 
-  <text x="530" y="360" class="step">key claim</text>
-  <text x="530" y="376" class="small">LLMs are unreliable at self-verification without external grounding</text>
-  <text x="530" y="400" class="step">maps to OpenAI Agents SDK output guardrails</text>
-  <text x="530" y="416" class="small">guardrails can call tools; tripwires enforce retries</text>
-  <text x="530" y="440" class="step">maps to Gemini 2.5 per-step safety</text>
-  <text x="530" y="456" class="small">every action verified before commit</text>
-  <text x="530" y="480" class="small">no external verifier? CRITIC reduces to Self-Refine</text>
+  <text x="530" y="360" class="step">关键主张</text>
+  <text x="530" y="376" class="small">没有外部依据时，LLM 的自我验证不可靠</text>
+  <text x="530" y="400" class="step">对应 OpenAI Agents SDK 的输出护栏</text>
+  <text x="530" y="416" class="small">护栏可调用工具；触发器强制重试</text>
+  <text x="530" y="440" class="step">对应 Gemini 2.5 的逐步安全检查</text>
+  <text x="530" y="456" class="small">每个行动在提交前验证</text>
+  <text x="530" y="480" class="small">没有外部验证器？CRITIC 就退化为 Self-Refine</text>
 </svg>

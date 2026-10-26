@@ -17,7 +17,7 @@ module.exports = figure('fig-6-2', {
 }, f => {
   const cli = f.box({ x: 20, y: 28, w: 290, h: 48, hue: 'blue', title: 'rea inspect-wasm-artifact', sub: "CLI，1.5 s 后退出 0" });
   const mcp = f.box({ x: 330, y: 28, w: 290, h: 48, hue: 'indigo', title: 'tools/call inspect_wasm_artifact', sub: "MCP 步骤 24，404 ms 后 ok" });
-  const adapter = f.box({ x: 20, y: 104, w: 600, h: 56, hue: 'blue', title: 'wabt-artifact provider, REA_WABT_BIN_DIRECTORY=/opt/homebrew/bin', titleSize: 12, sub: ["复制 ledger.wasm，290 字节、sha256 699f6ff7，至只读 module.wasm"] });
+  const adapter = f.box({ x: 20, y: 104, w: 600, h: 56, hue: 'blue', title: 'wabt-artifact 提供方，REA_WABT_BIN_DIRECTORY=/opt/homebrew/bin', titleSize: 12, sub: ["复制 ledger.wasm，290 字节、sha256 699f6ff7，至只读 module.wasm"] });
   f.arrow([cli.cx, 76], [cli.cx, adapter.y - 1], { style: 'call', label: 'path' });
   f.arrow([mcp.cx, 76], [mcp.cx, adapter.y - 1], { style: 'call', label: 'path' });
 
@@ -27,13 +27,13 @@ module.exports = figure('fig-6-2', {
     ['wasm2wat', '--enable-all', "结果：已解码 WAT"],
   ].map(([tool, args, result], index) => {
     const x = 20 + index * 205;
-    const box = f.box({ x, y: 196, w: 190, h: 62, hue: 'grey', title: tool, sub: [`${args}, banner 1.0.42`, result] });
+    const box = f.box({ x, y: 196, w: 190, h: 62, hue: 'grey', title: tool, sub: [`${args}，版本 1.0.42`, result] });
     f.arrow([box.cx, adapter.y + adapter.h], [box.cx, box.y - 1], { style: 'call' });
     return box;
   });
 
-  const record = block(f, 20, 294, 600, 'teal', 'Evidence ev_3a09e4b0, confidence observed', [
-    "sections: Type、Import、Function、Memory、Export、Code、Data",
+  const record = block(f, 20, 294, 600, 'teal', '证据 ev_3a09e4b0，置信度 observed', [
+    "节：Type、Import、Function、Memory、Export、Code、Data",
     "接口：1 个 import env.log，5 个带类型签名的 export",
     "wat: decoded-wat、sha256 37eab56a，tool_profile: 3 命令",
     "limitations: 5，runtime_execution 与 network_fetch 为 not-performed",

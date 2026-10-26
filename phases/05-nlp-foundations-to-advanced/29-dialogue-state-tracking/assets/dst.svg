@@ -17,10 +17,10 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">dialogue state tracking — slots fill, update, correct across turns</text>
+  <text x="450" y="28" text-anchor="middle" class="title">对话状态追踪：跨轮次填充、更新和纠正槽位</text>
 
   <!-- Turn 1 -->
-  <text x="50" y="65" class="label">turn 1</text>
+  <text x="50" y="65" class="label">第 1 轮</text>
   <rect x="100" y="50" width="360" height="30" class="user"/>
   <text x="280" y="70" text-anchor="middle" class="content">"I want a cheap restaurant in the north."</text>
 
@@ -35,7 +35,7 @@
   <text x="660" y="78" text-anchor="middle" class="mono">people: —</text>
 
   <!-- Turn 2 -->
-  <text x="50" y="130" class="label">turn 2</text>
+  <text x="50" y="130" class="label">第 2 轮</text>
   <rect x="100" y="115" width="360" height="30" class="user"/>
   <text x="280" y="135" text-anchor="middle" class="content">"Italian food please."</text>
 
@@ -50,7 +50,7 @@
   <text x="660" y="143" text-anchor="middle" class="mono">people: —</text>
 
   <!-- Turn 3 -->
-  <text x="50" y="195" class="label">turn 3</text>
+  <text x="50" y="195" class="label">第 3 轮</text>
   <rect x="100" y="180" width="360" height="30" class="user"/>
   <text x="280" y="200" text-anchor="middle" class="content">"Actually make it moderate pricing."</text>
 
@@ -65,7 +65,7 @@
   <text x="660" y="208" text-anchor="middle" class="mono">people: —</text>
 
   <!-- Turn 4 -->
-  <text x="50" y="260" class="label">turn 4</text>
+  <text x="50" y="260" class="label">第 4 轮</text>
   <rect x="100" y="245" width="360" height="30" class="user"/>
   <text x="280" y="265" text-anchor="middle" class="content">"For four people."</text>
 
@@ -81,9 +81,9 @@
 
   <!-- Final state -->
   <rect x="100" y="320" width="700" height="70" class="box"/>
-  <text x="450" y="345" text-anchor="middle" class="label">final state (JGA counts if and only if all slots match gold)</text>
+  <text x="450" y="345" text-anchor="middle" class="label">最终状态（仅全部槽位匹配标准答案时才计入 JGA）</text>
   <text x="450" y="370" text-anchor="middle" class="mono">{cuisine: italian, area: north, price: moderate, people: 4}</text>
-  <text x="450" y="385" text-anchor="middle" class="caption">→ pass to backend: book_restaurant(cuisine=italian, area=north, price=moderate, people=4)</text>
+  <text x="450" y="385" text-anchor="middle" class="caption">→ 传给后端：book_restaurant(cuisine=italian, area=north, price=moderate, people=4)</text>
 
-  <text x="450" y="425" text-anchor="middle" class="caption">invariants — correction overwrites (turn 3); explicit negation clears; untouched slots persist</text>
+  <text x="450" y="425" text-anchor="middle" class="caption">不变量：纠正覆盖旧值（第 3 轮）；显式否定清空；未涉及的槽位保留</text>
 </svg>

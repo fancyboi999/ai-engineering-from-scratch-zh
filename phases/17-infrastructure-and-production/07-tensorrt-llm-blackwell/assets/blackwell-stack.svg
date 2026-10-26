@@ -13,65 +13,65 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">Blackwell + TRT-LLM stack — where the 7x cost gap comes from</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Blackwell + TRT-LLM 技术栈 — 7 倍成本差距来自哪里</text>
 
   <rect x="40" y="50" width="440" height="470" class="box"/>
-  <text x="260" y="72" text-anchor="middle" class="head">precision regime on Blackwell</text>
+  <text x="260" y="72" text-anchor="middle" class="head">Blackwell 上的精度方案</text>
   <rect x="60" y="90" width="400" height="60" class="cool"/>
-  <text x="260" y="112" text-anchor="middle" class="step">weights : NVFP4 (4-bit microscaling)</text>
-  <text x="260" y="130" text-anchor="middle" class="small">half the bytes per decoded token vs FP8</text>
-  <text x="260" y="144" text-anchor="middle" class="small">day-0 FP4 weights shipped by model providers</text>
+  <text x="260" y="112" text-anchor="middle" class="step">权重：NVFP4（4-bit 微缩放）</text>
+  <text x="260" y="130" text-anchor="middle" class="small">每个解码 token 的字节数是 FP8 的一半</text>
+  <text x="260" y="144" text-anchor="middle" class="small">模型供应商第 0 天即提供 FP4 权重</text>
   <rect x="60" y="160" width="400" height="60" class="hot"/>
-  <text x="260" y="182" text-anchor="middle" class="step">KV cache : FP8 (stays critical)</text>
-  <text x="260" y="200" text-anchor="middle" class="small">FP4 KV collapses attention tails</text>
-  <text x="260" y="214" text-anchor="middle" class="small">FP8 exponent bits preserve dynamic range</text>
+  <text x="260" y="182" text-anchor="middle" class="step">KV 缓存：FP8（仍然关键）</text>
+  <text x="260" y="200" text-anchor="middle" class="small">FP4 KV 会破坏注意力尾部</text>
+  <text x="260" y="214" text-anchor="middle" class="small">FP8 指数位保留动态范围</text>
   <rect x="60" y="230" width="400" height="60" class="cold"/>
-  <text x="260" y="252" text-anchor="middle" class="step">activations : NVFP4</text>
-  <text x="260" y="270" text-anchor="middle" class="small">small-range within a layer; FP4 holds up</text>
-  <text x="260" y="284" text-anchor="middle" class="small">MXFP8 variant available on Tensor Cores</text>
+  <text x="260" y="252" text-anchor="middle" class="step">激活：NVFP4</text>
+  <text x="260" y="270" text-anchor="middle" class="small">层内范围小，FP4 仍能保持质量</text>
+  <text x="260" y="284" text-anchor="middle" class="small">Tensor Core 提供 MXFP8 变体</text>
   <rect x="60" y="300" width="400" height="60" class="dsk"/>
-  <text x="260" y="322" text-anchor="middle" class="step">attention accumulator : FP32</text>
-  <text x="260" y="340" text-anchor="middle" class="small">softmax stability requires higher precision</text>
-  <text x="260" y="354" text-anchor="middle" class="small">no negotiation on this tier</text>
+  <text x="260" y="322" text-anchor="middle" class="step">注意力累加器：FP32</text>
+  <text x="260" y="340" text-anchor="middle" class="small">softmax 稳定性需要更高精度</text>
+  <text x="260" y="354" text-anchor="middle" class="small">这一层不能妥协</text>
   <rect x="60" y="370" width="400" height="140" class="box"/>
-  <text x="260" y="392" text-anchor="middle" class="head">the quality caveat</text>
-  <text x="260" y="414" text-anchor="middle" class="small">NVFP4 weights on reasoning workloads :</text>
-  <text x="260" y="430" text-anchor="middle" class="small">math, chain-of-thought, long-context code :</text>
-  <text x="260" y="446" text-anchor="middle" class="small">visible quality drop without per-block calib</text>
-  <text x="260" y="466" text-anchor="middle" class="small">recovery : FP8 weights + FP4 activations</text>
-  <text x="260" y="482" text-anchor="middle" class="small">or stay on H200 with FP8 throughout</text>
-  <text x="260" y="502" text-anchor="middle" class="caption">always validate eval quality pre-migration</text>
+  <text x="260" y="392" text-anchor="middle" class="head">质量限制</text>
+  <text x="260" y="414" text-anchor="middle" class="small">推理工作负载上的 NVFP4 权重：</text>
+  <text x="260" y="430" text-anchor="middle" class="small">数学、思维链、长上下文代码：</text>
+  <text x="260" y="446" text-anchor="middle" class="small">若不逐块校准，会出现明显质量下降</text>
+  <text x="260" y="466" text-anchor="middle" class="small">恢复方式：FP8 权重 + FP4 激活</text>
+  <text x="260" y="482" text-anchor="middle" class="small">或保留 H200，全程使用 FP8</text>
+  <text x="260" y="502" text-anchor="middle" class="caption">迁移前始终验证评测质量</text>
 
   <rect x="500" y="50" width="420" height="470" class="box"/>
-  <text x="710" y="72" text-anchor="middle" class="head">stack layers that stack the gap</text>
+  <text x="710" y="72" text-anchor="middle" class="head">叠加拉大差距的技术栈层次</text>
 
   <rect x="520" y="90" width="380" height="60" class="cool"/>
-  <text x="710" y="112" text-anchor="middle" class="step">1 / hardware bandwidth</text>
+  <text x="710" y="112" text-anchor="middle" class="step">1 / 硬件带宽</text>
   <text x="710" y="130" text-anchor="middle" class="small">H100 3.35 TB/s vs B200 8.0 TB/s : ~2.4x</text>
-  <text x="710" y="144" text-anchor="middle" class="small">decode is memory-bound; this is the floor</text>
+  <text x="710" y="144" text-anchor="middle" class="small">解码受内存带宽限制；这是下限</text>
 
   <rect x="520" y="160" width="380" height="60" class="hot"/>
-  <text x="710" y="182" text-anchor="middle" class="step">2 / NVFP4 weights</text>
-  <text x="710" y="200" text-anchor="middle" class="small">halve bytes per token : ~2.0x</text>
-  <text x="710" y="214" text-anchor="middle" class="small">NVFP4 is the only weight precision that matters now</text>
+  <text x="710" y="182" text-anchor="middle" class="step">2 / NVFP4 权重</text>
+  <text x="710" y="200" text-anchor="middle" class="small">每 token 字节数减半：约 2.0 倍</text>
+  <text x="710" y="214" text-anchor="middle" class="small">NVFP4 是当前关键的权重精度</text>
 
   <rect x="520" y="230" width="380" height="60" class="cold"/>
-  <text x="710" y="252" text-anchor="middle" class="step">3 / MTP draft</text>
-  <text x="710" y="270" text-anchor="middle" class="small">multi-token prediction head : ~1.8x on accepted tokens</text>
-  <text x="710" y="284" text-anchor="middle" class="small">integrated in the TRT-LLM build</text>
+  <text x="710" y="252" text-anchor="middle" class="step">3 / MTP 草稿</text>
+  <text x="710" y="270" text-anchor="middle" class="small">多 token 预测头：已接受 token 约加速 1.8 倍</text>
+  <text x="710" y="284" text-anchor="middle" class="small">集成在 TRT-LLM 构建中</text>
 
   <rect x="520" y="300" width="380" height="60" class="dsk"/>
-  <text x="710" y="322" text-anchor="middle" class="step">4 / disaggregated prefill/decode</text>
-  <text x="710" y="340" text-anchor="middle" class="small">Dynamo orchestrates separate GPU pools : ~1.6-2.5x</text>
-  <text x="710" y="354" text-anchor="middle" class="small">NVLink 5 for KV cache transfer</text>
+  <text x="710" y="322" text-anchor="middle" class="step">4 / 解耦预填充/解码</text>
+  <text x="710" y="340" text-anchor="middle" class="small">Dynamo 编排独立 GPU 池：约 1.6-2.5 倍</text>
+  <text x="710" y="354" text-anchor="middle" class="small">NVLink 5 传输 KV 缓存</text>
 
   <rect x="520" y="370" width="380" height="60" class="box"/>
-  <text x="710" y="392" text-anchor="middle" class="step">5 / NVLink 5 all-to-all</text>
-  <text x="710" y="410" text-anchor="middle" class="small">MoE expert comm latency cut 3x vs Hopper</text>
-  <text x="710" y="424" text-anchor="middle" class="small">MoE-heavy models get extra multiplier</text>
+  <text x="710" y="392" text-anchor="middle" class="step">5 / NVLink 5 全互联</text>
+  <text x="710" y="410" text-anchor="middle" class="small">MoE 专家通信延迟比 Hopper 降低 3 倍</text>
+  <text x="710" y="424" text-anchor="middle" class="small">MoE 占比高的模型还有额外收益</text>
 
   <rect x="520" y="440" width="380" height="70" class="hot"/>
-  <text x="710" y="462" text-anchor="middle" class="step">headline numbers (2026)</text>
+  <text x="710" y="462" text-anchor="middle" class="step">主要数据（2026）</text>
   <text x="710" y="480" text-anchor="middle" class="small">HGX B200 : $0.02/M tok GPT-OSS-120B</text>
   <text x="710" y="496" text-anchor="middle" class="small">GB200 NVL72 + Dynamo : $0.012/M tok</text>
   <text x="710" y="510" text-anchor="middle" class="small">H100 + vLLM : $0.09/M tok</text>

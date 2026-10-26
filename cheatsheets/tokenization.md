@@ -5,7 +5,7 @@ subtitle: 训练字节级 BPE 分词器，执行编码与解码，再将标识�
 hue: 45
 sources: phases/05-nlp-foundations-to-advanced/19-subword-tokenization, phases/10-llms-from-scratch/01-tokenizers, phases/10-llms-from-scratch/02-building-a-tokenizer, phases/19-capstone-projects/30-bpe-tokenizer-from-scratch, phases/19-capstone-projects/31-tokenized-dataset-sliding-window
 code: TB
-source_hash: 2645f7cb866165db
+source_hash: 66f604582c2698f0
 ---
 
 ## 任务

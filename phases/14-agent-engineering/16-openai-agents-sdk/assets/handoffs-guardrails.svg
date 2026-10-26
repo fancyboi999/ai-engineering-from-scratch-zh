@@ -16,33 +16,33 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">OpenAI Agents SDK — Agent, Handoff, Guardrail, Session, Tracing</text>
+  <text x="480" y="26" text-anchor="middle" class="title">OpenAI Agents SDK：agent、交接、护栏、会话、追踪</text>
 
   <rect x="40" y="50" width="880" height="210" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">triage  handoff  specialist, wrapped in guardrails</text>
+  <text x="480" y="72" text-anchor="middle" class="head">分诊、交接、专员，全程配备护栏</text>
 
   <rect x="60" y="90" width="160" height="60" class="guard"/>
-  <text x="140" y="114" text-anchor="middle" class="step">input guardrail</text>
-  <text x="140" y="132" text-anchor="middle" class="small">PII, policy, scope</text>
+  <text x="140" y="114" text-anchor="middle" class="step">输入护栏</text>
+  <text x="140" y="132" text-anchor="middle" class="small">PII、策略、范围</text>
 
   <rect x="240" y="90" width="160" height="60" class="agent"/>
-  <text x="320" y="114" text-anchor="middle" class="step">triage agent</text>
-  <text x="320" y="132" text-anchor="middle" class="small">picks handoff</text>
+  <text x="320" y="114" text-anchor="middle" class="step">分诊 agent</text>
+  <text x="320" y="132" text-anchor="middle" class="small">选择交接对象</text>
 
   <rect x="420" y="60" width="160" height="60" class="agent"/>
-  <text x="500" y="84" text-anchor="middle" class="step">billing agent</text>
+  <text x="500" y="84" text-anchor="middle" class="step">账单 agent</text>
   <text x="500" y="102" text-anchor="middle" class="small">refund_tool, invoice_tool</text>
 
   <rect x="420" y="130" width="160" height="60" class="agent"/>
-  <text x="500" y="154" text-anchor="middle" class="step">support agent</text>
+  <text x="500" y="154" text-anchor="middle" class="step">支持 agent</text>
   <text x="500" y="172" text-anchor="middle" class="small">bug_logger, status_check</text>
 
   <rect x="600" y="90" width="160" height="60" class="guard"/>
-  <text x="680" y="114" text-anchor="middle" class="step">output guardrail</text>
-  <text x="680" y="132" text-anchor="middle" class="small">PII, length, policy</text>
+  <text x="680" y="114" text-anchor="middle" class="step">输出护栏</text>
+  <text x="680" y="132" text-anchor="middle" class="small">PII、长度、策略</text>
 
   <rect x="780" y="90" width="120" height="60" class="box"/>
-  <text x="840" y="120" text-anchor="middle" class="step">user</text>
+  <text x="840" y="120" text-anchor="middle" class="step">用户</text>
 
   <line x1="220" y1="120" x2="240" y2="120" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="400" y1="120" x2="420" y2="90" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -52,13 +52,13 @@
   <line x1="760" y1="120" x2="780" y2="120" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="60" y="170" width="840" height="80" class="box"/>
-  <text x="80" y="192" class="step">handoff mechanics: tool name = transfer_to_&lt;agent_name&gt;</text>
-  <text x="80" y="210" class="small">model sees transfer_to_billing, transfer_to_support in its tool list</text>
-  <text x="80" y="226" class="small">runtime copies context (or collapses via nest_handoff_history beta) before target agent starts</text>
-  <text x="80" y="242" class="small">hop counter prevents bounce loops (triage  billing  triage  billing ...)</text>
+  <text x="80" y="192" class="step">交接机制：工具名 = transfer_to_&lt;agent_name&gt;</text>
+  <text x="80" y="210" class="small">模型的工具列表包含 transfer_to_billing、transfer_to_support</text>
+  <text x="80" y="226" class="small">目标 agent 启动前，运行时复制上下文（或通过测试版 nest_handoff_history 压缩）</text>
+  <text x="80" y="242" class="small">跳数计数器防止来回循环（分诊、账单、分诊、账单、...）</text>
 
   <rect x="40" y="280" width="880" height="230" class="trace"/>
-  <text x="480" y="302" text-anchor="middle" class="head">span tree  tracing is on by default</text>
+  <text x="480" y="302" text-anchor="middle" class="head">span 树：默认启用追踪</text>
 
   <rect x="60" y="318" width="840" height="30" class="box"/>
   <text x="78" y="338" class="step">run  user_input="I need a refund..."</text>
@@ -73,5 +73,5 @@
   <rect x="80" y="488" width="820" height="20" class="box"/>
   <text x="98" y="502" class="step">  output_guardrail.length_cap  passed=True</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">tracing built in; add_trace_processor fans to your backend. OTel GenAI maps straight to these spans.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">内置追踪；add_trace_processor 将结果分发到后端。OTel GenAI 可直接映射到这些 span。</text>
 </svg>

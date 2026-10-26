@@ -9,8 +9,8 @@ module.exports = figure('fig-2-2', {
 }, f => {
   f.kicker(20, 40, '在录制 Mac');
   const demo = f.box({ x: 20, y: 60, w: 150, h: 65, hue: 'blue', title: 'm101-demo', sub: ['sbx stop m101-demo', '/opt/marker-from-demo'] });
-  const store = f.box({ x: 260, y: 60, w: 170, h: 65, hue: 'green', title: '运行时镜像存储', sub: ['library/m101-tpl:v1', 'flavor shell'] });
-  const tar = f.box({ x: 490, y: 60, w: 130, h: 65, hue: 'green', title: 'm101-tpl.tar', sub: ['OCI layout', 'blobs/sha256/'] });
+  const store = f.box({ x: 260, y: 60, w: 170, h: 65, hue: 'green', title: '运行时镜像存储', sub: ['library/m101-tpl:v1', "flavor shell"] });
+  const tar = f.box({ x: 490, y: 60, w: 130, h: 65, hue: 'green', title: 'm101-tpl.tar', sub: ["OCI 布局", 'blobs/sha256/'] });
   const fresh = f.box({ x: 260, y: 200, w: 170, h: 65, hue: 'blue', title: 'm101-from-tpl', sub: ['无工作区挂载', '/opt/marker-from-demo'] });
   const other = f.box({ x: 490, y: 200, w: 130, h: 65, hue: 'grey', title: '另一宿主', sub: ['sbx template load', 'm101-tpl.tar'] });
   f.arrow(demo.right(), [store.x - 1, demo.cy], { style: 'write', label: 'template save', labelSize: 11, note: '先停止' });

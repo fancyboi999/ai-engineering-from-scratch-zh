@@ -16,50 +16,50 @@
       <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
     </marker>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">AI SRE — multi-agent triage with human gate</text>
+  <text x="480" y="24" text-anchor="middle" class="title">AI SRE — 带人工关卡的多 agent 故障分流</text>
 
   <rect x="380" y="50" width="200" height="70" class="sup"/>
-  <text x="480" y="75" text-anchor="middle" class="head">supervisor</text>
-  <text x="480" y="95" text-anchor="middle" class="small">breaks incident into sub-queries</text>
-  <text x="480" y="110" text-anchor="middle" class="small">synthesizes hypotheses</text>
+  <text x="480" y="75" text-anchor="middle" class="head">监督者</text>
+  <text x="480" y="95" text-anchor="middle" class="small">将事故拆为子查询</text>
+  <text x="480" y="110" text-anchor="middle" class="small">综合假设</text>
 
   <rect x="40" y="160" width="240" height="100" class="agent"/>
-  <text x="160" y="182" text-anchor="middle" class="head">log agent</text>
-  <text x="160" y="204" text-anchor="middle" class="step">tool: log search</text>
-  <text x="160" y="222" text-anchor="middle" class="small">pattern detection, frequency</text>
-  <text x="160" y="240" text-anchor="middle" class="small">grouping by service + trace</text>
+  <text x="160" y="182" text-anchor="middle" class="head">日志 agent</text>
+  <text x="160" y="204" text-anchor="middle" class="step">工具：日志搜索</text>
+  <text x="160" y="222" text-anchor="middle" class="small">模式检测、频率</text>
+  <text x="160" y="240" text-anchor="middle" class="small">按服务 + trace 分组</text>
 
   <rect x="360" y="160" width="240" height="100" class="agent"/>
-  <text x="480" y="182" text-anchor="middle" class="head">metric agent</text>
-  <text x="480" y="204" text-anchor="middle" class="step">tool: PromQL / DCGM</text>
-  <text x="480" y="222" text-anchor="middle" class="small">correlation windows</text>
-  <text x="480" y="240" text-anchor="middle" class="small">anomaly + change-point</text>
+  <text x="480" y="182" text-anchor="middle" class="head">指标 agent</text>
+  <text x="480" y="204" text-anchor="middle" class="step">工具：PromQL / DCGM</text>
+  <text x="480" y="222" text-anchor="middle" class="small">关联窗口</text>
+  <text x="480" y="240" text-anchor="middle" class="small">异常 + 变点</text>
 
   <rect x="680" y="160" width="240" height="100" class="agent"/>
-  <text x="800" y="182" text-anchor="middle" class="head">runbook agent</text>
-  <text x="800" y="204" text-anchor="middle" class="step">tool: vector search</text>
-  <text x="800" y="222" text-anchor="middle" class="small">matches to RB-###</text>
-  <text x="800" y="240" text-anchor="middle" class="small">proposes safe action</text>
+  <text x="800" y="182" text-anchor="middle" class="head">运行手册 agent</text>
+  <text x="800" y="204" text-anchor="middle" class="step">工具：向量搜索</text>
+  <text x="800" y="222" text-anchor="middle" class="small">匹配到 RB-###</text>
+  <text x="800" y="240" text-anchor="middle" class="small">提出安全行动</text>
 
   <path class="arrow" d="M480 125 L 160 155"/>
   <path class="arrow" d="M480 125 L 480 155"/>
   <path class="arrow" d="M480 125 L 800 155"/>
 
   <rect x="280" y="290" width="400" height="90" class="box"/>
-  <text x="480" y="312" text-anchor="middle" class="head">adversarial evaluation (NeuBird pattern)</text>
-  <text x="480" y="334" text-anchor="middle" class="step">agents agree → high confidence → present to human</text>
-  <text x="480" y="354" text-anchor="middle" class="step">agents disagree → escalate with both hypotheses</text>
-  <text x="480" y="372" text-anchor="middle" class="caption">filters against hallucinated root causes</text>
+  <text x="480" y="312" text-anchor="middle" class="head">对抗式评估（NeuBird 模式）</text>
+  <text x="480" y="334" text-anchor="middle" class="step">agent 一致 → 高置信度 → 呈现给人工</text>
+  <text x="480" y="354" text-anchor="middle" class="step">agent 分歧 → 携带两种假设升级处理</text>
+  <text x="480" y="372" text-anchor="middle" class="caption">过滤虚构的根因</text>
 
   <path class="arrow" d="M160 260 L 310 290"/>
   <path class="arrow" d="M480 260 L 480 290"/>
   <path class="arrow" d="M800 260 L 650 290"/>
 
   <rect x="280" y="410" width="400" height="90" class="human"/>
-  <text x="480" y="432" text-anchor="middle" class="head">human approval gate</text>
-  <text x="480" y="454" text-anchor="middle" class="step">safe actions: restart pod, revert deploy, scale within bounds</text>
-  <text x="480" y="472" text-anchor="middle" class="step">broad changes always escalate: topology, code, IAM</text>
-  <text x="480" y="490" text-anchor="middle" class="caption">"set and forget" is overselling</text>
+  <text x="480" y="432" text-anchor="middle" class="head">人工审批关卡</text>
+  <text x="480" y="454" text-anchor="middle" class="step">安全行动：重启 pod、回退部署、在边界内扩容</text>
+  <text x="480" y="472" text-anchor="middle" class="step">大范围变更始终升级：拓扑、代码、IAM</text>
+  <text x="480" y="490" text-anchor="middle" class="caption">“设置后就不用管”是过度承诺</text>
 
   <path class="arrow" d="M480 380 L 480 405"/>
 </svg>

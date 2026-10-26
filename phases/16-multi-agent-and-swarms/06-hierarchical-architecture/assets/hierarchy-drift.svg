@@ -18,60 +18,60 @@
       .bad-edge { stroke: #c0392b; stroke-width: 1.5; fill: none; stroke-dasharray: 4,3; }
     </style>
   </defs>
-  <text x="450" y="28" text-anchor="middle" class="title">Hierarchical failure mode — decomposition drift cascades</text>
+  <text x="450" y="28" text-anchor="middle" class="title">层级失败模式：任务分解漂移的级联</text>
 
   <!-- happy path -->
-  <text x="220" y="58" text-anchor="middle" class="head">happy path</text>
+  <text x="220" y="58" text-anchor="middle" class="head">正常路径</text>
   <rect x="140" y="70" width="160" height="44" class="cool"/>
-  <text x="220" y="90" text-anchor="middle" class="step">top manager</text>
-  <text x="220" y="106" text-anchor="middle" class="small">splits: eng + legal</text>
+  <text x="220" y="90" text-anchor="middle" class="step">顶层管理者</text>
+  <text x="220" y="106" text-anchor="middle" class="small">拆分：工程 + 法务</text>
   <line x1="180" y1="114" x2="140" y2="160" class="edge" marker-end="url(#arrow)"/>
   <line x1="260" y1="114" x2="300" y2="160" class="edge" marker-end="url(#arrow)"/>
   <rect x="70" y="160" width="130" height="44" class="cool"/>
-  <text x="135" y="180" text-anchor="middle" class="step">eng-manager</text>
-  <text x="135" y="196" text-anchor="middle" class="small">fe + be</text>
+  <text x="135" y="180" text-anchor="middle" class="step">工程管理者</text>
+  <text x="135" y="196" text-anchor="middle" class="small">前端 + 后端</text>
   <rect x="240" y="160" width="130" height="44" class="cool"/>
-  <text x="305" y="180" text-anchor="middle" class="step">legal-manager</text>
-  <text x="305" y="196" text-anchor="middle" class="small">lawyer</text>
+  <text x="305" y="180" text-anchor="middle" class="step">法务管理者</text>
+  <text x="305" y="196" text-anchor="middle" class="small">律师</text>
   <line x1="135" y1="204" x2="135" y2="240" class="edge" marker-end="url(#arrow)"/>
   <line x1="305" y1="204" x2="305" y2="240" class="edge" marker-end="url(#arrow)"/>
   <rect x="70" y="240" width="130" height="40" class="cold"/>
-  <text x="135" y="265" text-anchor="middle" class="small">React + API issues</text>
+  <text x="135" y="265" text-anchor="middle" class="small">React + API 问题</text>
   <rect x="240" y="240" width="130" height="40" class="cold"/>
-  <text x="305" y="265" text-anchor="middle" class="small">legal non-compliance</text>
+  <text x="305" y="265" text-anchor="middle" class="small">法律不合规</text>
   <line x1="135" y1="280" x2="180" y2="340" class="edge"/>
   <line x1="305" y1="280" x2="260" y2="340" class="edge"/>
   <rect x="140" y="340" width="160" height="50" class="cool"/>
-  <text x="220" y="360" text-anchor="middle" class="step">top synthesis</text>
-  <text x="220" y="378" text-anchor="middle" class="small">covers user question</text>
+  <text x="220" y="360" text-anchor="middle" class="step">顶层综合</text>
+  <text x="220" y="378" text-anchor="middle" class="small">回答用户问题</text>
 
   <!-- perturbed path -->
-  <text x="680" y="58" text-anchor="middle" class="head">perturbed path</text>
+  <text x="680" y="58" text-anchor="middle" class="head">受扰动路径</text>
   <rect x="600" y="70" width="160" height="44" class="bad"/>
-  <text x="680" y="90" text-anchor="middle" class="step">top manager</text>
-  <text x="680" y="106" text-anchor="middle" class="small">splits: eng + FINANCE (!)</text>
+  <text x="680" y="90" text-anchor="middle" class="step">顶层管理者</text>
+  <text x="680" y="106" text-anchor="middle" class="small">拆分：工程 + 财务（！）</text>
   <line x1="640" y1="114" x2="600" y2="160" class="edge" marker-end="url(#arrow)"/>
   <line x1="720" y1="114" x2="760" y2="160" class="bad-edge" marker-end="url(#arrow)"/>
   <rect x="530" y="160" width="130" height="44" class="cool"/>
-  <text x="595" y="180" text-anchor="middle" class="step">eng-manager</text>
-  <text x="595" y="196" text-anchor="middle" class="small">fe + be</text>
+  <text x="595" y="180" text-anchor="middle" class="step">工程管理者</text>
+  <text x="595" y="196" text-anchor="middle" class="small">前端 + 后端</text>
   <rect x="700" y="160" width="130" height="44" class="bad"/>
-  <text x="765" y="180" text-anchor="middle" class="step">finance-manager</text>
-  <text x="765" y="196" text-anchor="middle" class="small">obeys mistaken label</text>
+  <text x="765" y="180" text-anchor="middle" class="step">财务管理者</text>
+  <text x="765" y="196" text-anchor="middle" class="small">服从错误标签</text>
   <line x1="595" y1="204" x2="595" y2="240" class="edge" marker-end="url(#arrow)"/>
   <line x1="765" y1="204" x2="765" y2="240" class="bad-edge" marker-end="url(#arrow)"/>
   <rect x="530" y="240" width="130" height="40" class="cold"/>
-  <text x="595" y="265" text-anchor="middle" class="small">React + API issues</text>
+  <text x="595" y="265" text-anchor="middle" class="small">React + API 问题</text>
   <rect x="700" y="240" width="130" height="40" class="bad"/>
-  <text x="765" y="265" text-anchor="middle" class="small">$42k/mo over budget</text>
+  <text x="765" y="265" text-anchor="middle" class="small">每月超预算 $42k</text>
   <line x1="595" y1="280" x2="640" y2="340" class="edge"/>
   <line x1="765" y1="280" x2="720" y2="340" class="bad-edge"/>
   <rect x="600" y="340" width="160" height="50" class="bad"/>
-  <text x="680" y="360" text-anchor="middle" class="step">top synthesis</text>
-  <text x="680" y="378" text-anchor="middle" class="small">LEGAL QUESTION UNANSWERED</text>
+  <text x="680" y="360" text-anchor="middle" class="step">顶层综合</text>
+  <text x="680" y="378" text-anchor="middle" class="small">法律问题未回答</text>
 
   <rect x="60" y="420" width="780" height="80" class="box"/>
-  <text x="450" y="442" text-anchor="middle" class="head">guardrails</text>
-  <text x="450" y="462" text-anchor="middle" class="small">cap tree depth at 2 · bounded reconciliation rounds · canary worker at each level · decomposition-drift alerts</text>
-  <text x="450" y="482" text-anchor="middle" class="small">CrewAI Process.hierarchical and nested LangGraph supervisors both inherit this failure surface</text>
+  <text x="450" y="442" text-anchor="middle" class="head">护栏</text>
+  <text x="450" y="462" text-anchor="middle" class="small">树深度上限 2 · 有限协调轮次 · 各层金丝雀工作者 · 任务分解漂移告警</text>
+  <text x="450" y="482" text-anchor="middle" class="small">CrewAI Process.hierarchical 与嵌套 LangGraph 监督者都具有这一失败面</text>
 </svg>

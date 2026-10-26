@@ -11,7 +11,7 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">three embedding modes — same passage, three vectors</text>
+  <text x="450" y="30" text-anchor="middle" class="title">三种嵌入模式 — 同一段落，三种向量</text>
 
   <!-- Input passage -->
   <rect x="40" y="55" width="820" height="40" class="box"/>
@@ -19,51 +19,51 @@
 
   <!-- Dense column -->
   <rect x="40" y="115" width="260" height="260" class="box"/>
-  <text x="170" y="140" text-anchor="middle" class="label">dense</text>
-  <text x="170" y="160" text-anchor="middle" class="caption">one vector, fixed size</text>
+  <text x="170" y="140" text-anchor="middle" class="label">稠密</text>
+  <text x="170" y="160" text-anchor="middle" class="caption">单个向量，固定大小</text>
 
   <rect x="60" y="180" width="220" height="30" class="hot"/>
   <text x="170" y="200" text-anchor="middle" class="content">[0.23, -0.11, ..., 0.08]</text>
-  <text x="170" y="225" text-anchor="middle" class="dim">dim = 1024 (BGE-M3)</text>
+  <text x="170" y="225" text-anchor="middle" class="dim">维度 = 1024（BGE-M3）</text>
 
-  <text x="170" y="260" text-anchor="middle" class="caption">cosine similarity ranks</text>
-  <text x="170" y="278" text-anchor="middle" class="caption">passages by meaning</text>
-  <text x="170" y="310" text-anchor="middle" class="label">Matryoshka option:</text>
-  <text x="170" y="328" text-anchor="middle" class="content">truncate to 256 dim</text>
-  <text x="170" y="346" text-anchor="middle" class="content">≈ 1% accuracy loss</text>
-  <text x="170" y="364" text-anchor="middle" class="content">6x storage savings</text>
+  <text x="170" y="260" text-anchor="middle" class="caption">余弦相似度按语义</text>
+  <text x="170" y="278" text-anchor="middle" class="caption">为段落排序</text>
+  <text x="170" y="310" text-anchor="middle" class="label">Matryoshka 选项：</text>
+  <text x="170" y="328" text-anchor="middle" class="content">截断到 256 维</text>
+  <text x="170" y="346" text-anchor="middle" class="content">准确率损失约 1%</text>
+  <text x="170" y="364" text-anchor="middle" class="content">存储节省 6 倍</text>
 
   <!-- Sparse column -->
   <rect x="320" y="115" width="260" height="260" class="box"/>
-  <text x="450" y="140" text-anchor="middle" class="label">sparse (SPLADE-style)</text>
-  <text x="450" y="160" text-anchor="middle" class="caption">one weight per vocab token</text>
+  <text x="450" y="140" text-anchor="middle" class="label">稀疏（SPLADE 风格）</text>
+  <text x="450" y="160" text-anchor="middle" class="caption">词表中每个 token 一个权重</text>
 
   <rect x="340" y="180" width="220" height="30" class="hot"/>
   <text x="450" y="200" text-anchor="middle" class="content">{iPhone: 2.1, Apple: 1.8, ...}</text>
-  <text x="450" y="225" text-anchor="middle" class="dim">mostly zeros, |vocab| slots</text>
+  <text x="450" y="225" text-anchor="middle" class="dim">大多数为零，|vocab| 个槽位</text>
 
-  <text x="450" y="260" text-anchor="middle" class="caption">learned BM25 —</text>
-  <text x="450" y="278" text-anchor="middle" class="caption">term weights from transformer</text>
-  <text x="450" y="310" text-anchor="middle" class="label">strength:</text>
-  <text x="450" y="328" text-anchor="middle" class="content">keyword-heavy queries,</text>
-  <text x="450" y="346" text-anchor="middle" class="content">named entities,</text>
-  <text x="450" y="364" text-anchor="middle" class="content">rare terms</text>
+  <text x="450" y="260" text-anchor="middle" class="caption">学习得到的 BM25 —</text>
+  <text x="450" y="278" text-anchor="middle" class="caption">词项权重来自 transformer</text>
+  <text x="450" y="310" text-anchor="middle" class="label">优势：</text>
+  <text x="450" y="328" text-anchor="middle" class="content">关键词密集查询、</text>
+  <text x="450" y="346" text-anchor="middle" class="content">命名实体、</text>
+  <text x="450" y="364" text-anchor="middle" class="content">低频术语</text>
 
   <!-- Multi-vector column -->
   <rect x="600" y="115" width="260" height="260" class="box"/>
-  <text x="730" y="140" text-anchor="middle" class="label">multi-vector (ColBERT)</text>
-  <text x="730" y="160" text-anchor="middle" class="caption">one vector per token</text>
+  <text x="730" y="140" text-anchor="middle" class="label">多向量（ColBERT）</text>
+  <text x="730" y="160" text-anchor="middle" class="caption">每个 token 一个向量</text>
 
   <rect x="620" y="180" width="220" height="30" class="hot"/>
   <text x="730" y="200" text-anchor="middle" class="content">[v_Apple, v_released, ...]</text>
   <text x="730" y="225" text-anchor="middle" class="dim">(n_tokens, 128)</text>
 
-  <text x="730" y="260" text-anchor="middle" class="caption">MaxSim: for each q-token</text>
-  <text x="730" y="278" text-anchor="middle" class="caption">take best d-token match</text>
-  <text x="730" y="310" text-anchor="middle" class="label">tradeoff:</text>
-  <text x="730" y="328" text-anchor="middle" class="content">larger index,</text>
-  <text x="730" y="346" text-anchor="middle" class="content">better recall on long</text>
-  <text x="730" y="364" text-anchor="middle" class="content">and specialized queries</text>
+  <text x="730" y="260" text-anchor="middle" class="caption">MaxSim：对每个查询 token</text>
+  <text x="730" y="278" text-anchor="middle" class="caption">取最佳文档 token 匹配</text>
+  <text x="730" y="310" text-anchor="middle" class="label">权衡：</text>
+  <text x="730" y="328" text-anchor="middle" class="content">索引更大，</text>
+  <text x="730" y="346" text-anchor="middle" class="content">对长查询和专业领域查询</text>
+  <text x="730" y="364" text-anchor="middle" class="content">召回更好</text>
 
-  <text x="450" y="405" text-anchor="middle" class="caption">BGE-M3 emits all three from one forward pass — fuse with weighted sum or RRF</text>
+  <text x="450" y="405" text-anchor="middle" class="caption">BGE-M3 一次前向计算输出全部三种表示 — 用加权和或 RRF 融合</text>
 </svg>

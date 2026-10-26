@@ -10,7 +10,7 @@ module.exports = figure('fig-1-2', {
   const x0 = 150;
   const w = 470;
   const px = minutes => x0 + (minutes / 65) * w;
-  f.kicker(20, 28, 'minutes after the engine stopped');
+  f.kicker(20, 28, '引擎停止后的分钟数');
   for (const t of [0, 15, 30, 45, 60]) {
     f.rule(px(t), 232, px(t), 240, { hue: 'ink' });
     f.text(px(t), 254, String(t), { size: 11, anchor: 'middle', hue: 'ink-soft' });

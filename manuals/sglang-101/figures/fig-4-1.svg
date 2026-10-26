@@ -2,7 +2,7 @@
   <title id="fig-4-1-title">一次 decode 的逐项提交与重放</title>
   <desc id="fig-4-1-desc">两列对比。左为 eager decode：transformer 每层的每个内核都由 Python model runner 单独提交，每层重复。右为计算图重放：decode CUDA graph runner 对一个已捕获批次大小发起一次重放，GPU 按序运行所有层已录制的内核。</desc>
   <defs><marker id="fig-4-1-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · EAGER DECODE</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · 即时解码</text>
   <text x="336" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · 计算图重放</text>
   <line x1="320" y1="8" x2="320" y2="392" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <rect x="20" y="30" width="84" height="34" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>

@@ -28,14 +28,14 @@
   <text x="290" y="165.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">DIR REF，形式由</text>
   <text x="290" y="180.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">schemaVersion 1/2决定</text>
   <rect x="400" y="128" width="220" height="66" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
-  <text x="510" y="148.6" font-size="12" text-anchor="middle" font-weight="700">HTTPS registry</text>
+  <text x="510" y="148.6" font-size="12" text-anchor="middle" font-weight="700">HTTPS 镜像仓库</text>
   <text x="510" y="165.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">manifest、config、一个层</text>
   <text x="510" y="180.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">签名与溯源 referrers</text>
   <line x1="90" y1="80" x2="90" y2="127" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
   <line x1="180" y1="161" x2="199" y2="161" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
   <line x1="380" y1="161" x2="399" y2="161" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-teal)"/>
   <rect class="m-knock" x="372.7" y="144.03" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="389.5" y="155" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">push</text>
+  <text x="389.5" y="155" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">推送</text>
   <text x="20" y="232" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">读回（未运行）</text>
   <rect x="300" y="242" width="140" height="52" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)" stroke-dasharray="5 4"/>
   <text x="370" y="263.1" font-size="12" text-anchor="middle" font-weight="700">sbx kit verify</text>

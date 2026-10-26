@@ -39,4 +39,6 @@ module.exports = figure('fig-4-1', {
     if (note) options.note = note;
     f.arrow([x1, y], [x2 + (x2 > x1 ? -1 : 1), y], options);
   });
-});
+})
+  // 保留冻结背景几何，只替换最终 SVG 中的完整文字节点。
+  .replace(">Evidence ev_3c6350b2</text>", ">证据 ev_3c6350b2</text>");

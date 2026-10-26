@@ -16,21 +16,21 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">capstone: a decoder-only transformer, end to end</text>
+  <text x="450" y="30" text-anchor="middle" class="title">综合项目：端到端的仅解码器 transformer</text>
 
   <!-- Input tokens -->
   <rect x="350" y="60" width="200" height="30" class="hot"/>
-  <text x="450" y="80" text-anchor="middle" class="content">token IDs (B, N)</text>
+  <text x="450" y="80" text-anchor="middle" class="content">token ID（B、N）</text>
   <line x1="450" y1="90" x2="450" y2="108" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Embedding -->
   <rect x="300" y="108" width="300" height="32" class="box"/>
-  <text x="450" y="129" text-anchor="middle" class="content">token emb + positional emb</text>
+  <text x="450" y="129" text-anchor="middle" class="content">token 嵌入 + 位置嵌入</text>
   <line x1="450" y1="140" x2="450" y2="158" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Block outer -->
   <rect x="200" y="158" width="500" height="290" class="box"/>
-  <text x="450" y="180" text-anchor="middle" class="label">repeat L times</text>
+  <text x="450" y="180" text-anchor="middle" class="label">重复 L 次</text>
 
   <!-- Norm1 -->
   <rect x="280" y="200" width="340" height="24" class="norm"/>
@@ -39,7 +39,7 @@
 
   <!-- Causal MHA -->
   <rect x="260" y="242" width="380" height="32" class="attn"/>
-  <text x="450" y="263" text-anchor="middle" class="content">causal multi-head self-attention</text>
+  <text x="450" y="263" text-anchor="middle" class="content">因果多头自注意力</text>
   <line x1="450" y1="274" x2="450" y2="292" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- + residual -->
@@ -73,11 +73,11 @@
 
   <!-- LM head tied -->
   <rect x="280" y="510" width="340" height="32" class="hot"/>
-  <text x="450" y="530" text-anchor="middle" class="content">lm_head (tied to token emb)</text>
+  <text x="450" y="530" text-anchor="middle" class="content">lm_head（与 token 嵌入共享权重）</text>
 
   <line x1="450" y1="542" x2="450" y2="558" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <rect x="330" y="558" width="240" height="30" class="box"/>
-  <text x="450" y="578" text-anchor="middle" class="content">shift-by-one cross-entropy</text>
+  <text x="450" y="578" text-anchor="middle" class="content">错位一格的交叉熵</text>
 
-  <text x="450" y="608" text-anchor="middle" class="caption">one config, thirteen lessons compressed into a single training script.</text>
+  <text x="450" y="608" text-anchor="middle" class="caption">一份配置，将十三课内容合为一个训练脚本。</text>
 </svg>

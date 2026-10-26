@@ -41,11 +41,11 @@
   <line x1="230" y1="304" x2="230" y2="315" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-1-head-ink)"/>
   <text x="470" y="110" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">入口</text>
   <rect x="460" y="130" width="160" height="50" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
-  <text x="540" y="150.1" font-size="12" text-anchor="middle" font-weight="700">network</text>
+  <text x="540" y="150.1" font-size="12" text-anchor="middle" font-weight="700">网络</text>
   <text x="540" y="167.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTPS_PROXY :3128</text>
   <line x1="460" y1="155" x2="441" y2="155" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2" marker-end="url(#fig-3-1-head-indigo)"/>
   <rect x="460" y="192" width="160" height="50" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="540" y="212.1" font-size="12" text-anchor="middle" font-weight="700">secret</text>
+  <text x="540" y="212.1" font-size="12" text-anchor="middle" font-weight="700">密钥</text>
   <text x="540" y="229.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">proxy-managed 哨兵值</text>
   <line x1="460" y1="217" x2="441" y2="217" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-3-1-head-teal)"/>
   <rect x="460" y="254" width="160" height="50" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>

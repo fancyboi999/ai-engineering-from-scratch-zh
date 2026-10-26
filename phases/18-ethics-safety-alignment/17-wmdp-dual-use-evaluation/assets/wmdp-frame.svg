@@ -13,48 +13,48 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">WMDP and the dual-use evaluation stack</text>
+  <text x="480" y="24" text-anchor="middle" class="title">WMDP 与两用风险评估栈</text>
 
   <rect x="60" y="60" width="840" height="150" class="box"/>
-  <text x="480" y="85" text-anchor="middle" class="head">WMDP: 4,157 yellow-zone MCQs across three domains</text>
+  <text x="480" y="85" text-anchor="middle" class="head">WMDP：跨三个领域的 4,157 道黄色区域选择题</text>
 
   <rect x="80" y="110" width="260" height="80" class="cool"/>
-  <text x="210" y="135" text-anchor="middle" class="step">biosecurity</text>
-  <text x="210" y="155" text-anchor="middle" class="small">1,520 questions</text>
-  <text x="210" y="175" text-anchor="middle" class="small">pathogens, acquisition, synthesis</text>
+  <text x="210" y="135" text-anchor="middle" class="step">生物安全</text>
+  <text x="210" y="155" text-anchor="middle" class="small">1,520 道题</text>
+  <text x="210" y="175" text-anchor="middle" class="small">病原体、获取、合成</text>
 
   <rect x="360" y="110" width="260" height="80" class="cool"/>
-  <text x="490" y="135" text-anchor="middle" class="step">cybersecurity</text>
-  <text x="490" y="155" text-anchor="middle" class="small">2,225 questions</text>
-  <text x="490" y="175" text-anchor="middle" class="small">exploit dev, persistence, C2</text>
+  <text x="490" y="135" text-anchor="middle" class="step">网络安全</text>
+  <text x="490" y="155" text-anchor="middle" class="small">2,225 道题</text>
+  <text x="490" y="175" text-anchor="middle" class="small">漏洞利用开发、持久化、C2</text>
 
   <rect x="640" y="110" width="240" height="80" class="cool"/>
-  <text x="760" y="135" text-anchor="middle" class="step">chemistry</text>
-  <text x="760" y="155" text-anchor="middle" class="small">412 questions</text>
-  <text x="760" y="175" text-anchor="middle" class="small">schedule-1 precursors</text>
+  <text x="760" y="135" text-anchor="middle" class="step">化学</text>
+  <text x="760" y="155" text-anchor="middle" class="small">412 道题</text>
+  <text x="760" y="175" text-anchor="middle" class="small">第1类前体</text>
 
   <rect x="60" y="230" width="400" height="250" class="box"/>
-  <text x="260" y="255" text-anchor="middle" class="head">the uplift narrative (2024-2025)</text>
+  <text x="260" y="255" text-anchor="middle" class="head">能力增益叙事（2024-2025）</text>
   <rect x="80" y="275" width="360" height="50" class="cold"/>
-  <text x="260" y="297" text-anchor="middle" class="step">2024: "mild uplift"</text>
-  <text x="260" y="315" text-anchor="middle" class="small">novices benefit modestly vs search</text>
+  <text x="260" y="297" text-anchor="middle" class="step">2024：“轻微增益”</text>
+  <text x="260" y="315" text-anchor="middle" class="small">新手相对搜索获得有限帮助</text>
   <rect x="80" y="335" width="360" height="50" class="cold"/>
-  <text x="260" y="357" text-anchor="middle" class="step">April 2025 (OpenAI PF v2): "on the cusp"</text>
-  <text x="260" y="375" text-anchor="middle" class="small">cusp of meaningfully helping novices</text>
+  <text x="260" y="357" text-anchor="middle" class="step">2025 年四月（OpenAI PF v2）：“临近门槛”</text>
+  <text x="260" y="375" text-anchor="middle" class="small">临近实质帮助新手的门槛</text>
   <rect x="80" y="395" width="360" height="50" class="hot"/>
-  <text x="260" y="417" text-anchor="middle" class="step">2025 Anthropic: 2.53x bio-acquisition uplift</text>
-  <text x="260" y="435" text-anchor="middle" class="small">insufficient to rule out ASL-3</text>
+  <text x="260" y="417" text-anchor="middle" class="step">2025 Anthropic：生物获取能力增益 2.53 倍</text>
+  <text x="260" y="435" text-anchor="middle" class="small">不足以排除 ASL-3</text>
 
   <rect x="500" y="230" width="400" height="250" class="box"/>
-  <text x="700" y="255" text-anchor="middle" class="head">novice-vs-expert decomposition</text>
+  <text x="700" y="255" text-anchor="middle" class="head">拆分新手与专家</text>
   <rect x="520" y="275" width="360" height="80" class="cool"/>
-  <text x="700" y="300" text-anchor="middle" class="step">novice-relative uplift</text>
-  <text x="700" y="320" text-anchor="middle" class="small">multiplicative; high because novices have little</text>
-  <text x="700" y="340" text-anchor="middle" class="small">WMDP-shaped + acquisition trial measures this</text>
+  <text x="700" y="300" text-anchor="middle" class="step">新手相对增益</text>
+  <text x="700" y="320" text-anchor="middle" class="small">乘数较高，因为新手基础薄弱</text>
+  <text x="700" y="340" text-anchor="middle" class="small">WMDP 形式与获取试验测量此项</text>
   <rect x="520" y="365" width="360" height="80" class="cool"/>
-  <text x="700" y="390" text-anchor="middle" class="step">expert-absolute capability</text>
-  <text x="700" y="410" text-anchor="middle" class="small">ceiling of information extractable by motivated expert</text>
-  <text x="700" y="430" text-anchor="middle" class="small">elicitation-hardened evaluation measures this</text>
+  <text x="700" y="390" text-anchor="middle" class="step">专家绝对能力</text>
+  <text x="700" y="410" text-anchor="middle" class="small">积极专家能够提取的信息上限</text>
+  <text x="700" y="430" text-anchor="middle" class="small">强化诱发能力的评估测量此项</text>
 
   <rect x="60" y="490" width="840" height="0" class="box" visibility="hidden"/>
 </svg>

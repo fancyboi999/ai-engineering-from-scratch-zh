@@ -16,50 +16,50 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">2026-07-28: explicit scope plus stateless elicitation</text>
+  <text x="480" y="26" text-anchor="middle" class="title">2026-07-28：显式作用域与无状态信息征询</text>
 
   <rect x="40" y="55" width="270" height="175" class="hot"/>
-  <text x="175" y="80" text-anchor="middle" class="head">deprecated Roots</text>
+  <text x="175" y="80" text-anchor="middle" class="head">已弃用的 Roots</text>
   <text x="58" y="108" class="step">roots/list</text>
   <text x="58" y="128" class="step">notifications/roots/list_changed</text>
-  <text x="58" y="158" class="small">informational guidance only</text>
-  <text x="58" y="176" class="small">not authorization</text>
-  <text x="58" y="194" class="small">not containment</text>
-  <text x="58" y="212" class="small">not an operating-system sandbox</text>
+  <text x="58" y="158" class="small">仅提供信息性指导</text>
+  <text x="58" y="176" class="small">不是授权</text>
+  <text x="58" y="194" class="small">不是隔离</text>
+  <text x="58" y="212" class="small">不是操作系统沙箱</text>
 
   <path d="M310,140 L380,140" class="edge" marker-end="url(#arrow)"/>
-  <text x="345" y="132" text-anchor="middle" class="small">replace</text>
+  <text x="345" y="132" text-anchor="middle" class="small">替代方案</text>
 
   <rect x="380" y="55" width="540" height="175" class="cool"/>
-  <text x="650" y="80" text-anchor="middle" class="head">explicit scope and real enforcement</text>
+  <text x="650" y="80" text-anchor="middle" class="head">显式作用域与真实强制执行</text>
   <text x="400" y="108" class="step">arguments.workspaceUri = file:///.../Notes</text>
-  <text x="400" y="136" class="small">1. authorize authenticated principal for workspace</text>
-  <text x="400" y="156" class="small">2. normalize URI and enforce path-component containment</text>
-  <text x="400" y="176" class="small">3. re-check live target immediately before mutation</text>
-  <text x="400" y="196" class="small">4. rely on a process sandbox for technical isolation</text>
-  <text x="400" y="216" class="small">scope is visible to the model, gateway, logs, and tests</text>
+  <text x="400" y="136" class="small">1. 为已认证主体授予工作区权限</text>
+  <text x="400" y="156" class="small">2. 归一化 URI，并按路径组件强制限制范围</text>
+  <text x="400" y="176" class="small">3. 写入前立即重新检查实时目标</text>
+  <text x="400" y="196" class="small">4. 依赖进程沙箱实现技术隔离</text>
+  <text x="400" y="216" class="small">作用域对模型、网关、日志与测试可见</text>
 
   <rect x="40" y="255" width="260" height="250" class="cold"/>
-  <text x="170" y="280" text-anchor="middle" class="head">client</text>
+  <text x="170" y="280" text-anchor="middle" class="head">客户端</text>
   <text x="58" y="310" class="step">tools/call id 1</text>
   <text x="58" y="328" class="small">workspaceUri + title + _meta</text>
-  <text x="58" y="360" class="step">render form</text>
-  <text x="58" y="378" class="small">show server and reason</text>
+  <text x="58" y="360" class="step">渲染表单</text>
+  <text x="58" y="378" class="small">展示服务器和原因</text>
   <text x="58" y="396" class="small">accept | decline | cancel</text>
   <text x="58" y="428" class="step">tools/call id 2</text>
-  <text x="58" y="446" class="small">same args + inputResponses</text>
-  <text x="58" y="464" class="small">exact requestState echo</text>
-  <text x="58" y="486" class="small">fresh independent request</text>
+  <text x="58" y="446" class="small">相同参数 + inputResponses</text>
+  <text x="58" y="464" class="small">原样回传 requestState</text>
+  <text x="58" y="486" class="small">新的独立请求</text>
 
   <rect x="660" y="255" width="260" height="250" class="cool"/>
-  <text x="790" y="280" text-anchor="middle" class="head">server</text>
-  <text x="678" y="310" class="step">tools/list + form gate -32021</text>
+  <text x="790" y="280" text-anchor="middle" class="head">服务器</text>
+  <text x="678" y="310" class="step">tools/list + 表单关卡 -32021</text>
   <text x="678" y="342" class="step">resultType: input_required</text>
-  <text x="678" y="360" class="small">elicitation/create in map</text>
-  <text x="678" y="378" class="small">signed candidates and expiry</text>
-  <text x="678" y="410" class="step">verify retry</text>
-  <text x="678" y="428" class="small">state, response schema, action</text>
-  <text x="678" y="446" class="small">authorization and containment</text>
+  <text x="678" y="360" class="small">映射中的 elicitation/create</text>
+  <text x="678" y="378" class="small">已签名候选项与有效期</text>
+  <text x="678" y="410" class="step">验证重试</text>
+  <text x="678" y="428" class="small">状态、响应 schema、动作</text>
+  <text x="678" y="446" class="small">授权与范围隔离</text>
   <text x="678" y="478" class="step">resultType: complete</text>
 
   <path d="M300,320 L660,320" class="edge" marker-end="url(#arrow)"/>
@@ -67,5 +67,5 @@
   <path d="M300,440 L660,440" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="40" y="525" width="880" height="25" class="box"/>
-  <text x="480" y="542" text-anchor="middle" class="small">No initialize, no reverse request, no hidden protocol session, and no mutation based on untrusted scope.</text>
+  <text x="480" y="542" text-anchor="middle" class="small">无需 initialize、反向请求或隐藏的协议会话，也不根据不可信作用域执行写入。</text>
 </svg>

@@ -12,13 +12,13 @@ module.exports = figure('fig-3-2', {
   f.rule(320, 8, 320, 224, { dash: 'dashed' });
   const left = [
     { hue: 'blue', title: 'rea inspect-binary-layout', sub: 'fixtures/ledger-x86_64-O1.o' },
-    { hue: 'blue', title: 'provider pwntools-elf', sub: "需要 Linux x64 和 REA_PWNTOOLS_PYTHON" },
+    { hue: 'blue', title: '提供方 pwntools-elf', sub: "需要 Linux x64 和 REA_PWNTOOLS_PYTHON" },
     { hue: 'rose', title: 'capability_unavailable', sub: "unsupported_provider · 退出 1", dash: 'dashed' },
   ];
   const right = [
     { hue: 'blue', title: 'rea inspect-macho', sub: 'fixtures/ledger-arm64-O1' },
     { hue: 'grey', title: 'otool nm dyld_info dwarfdump', sub: "另有 lipo、vtool，均通过 xcrun 查找" },
-    { hue: 'green', title: 'Evidence ev_497834aa', sub: "17 条加载命令 · 4 段 · 退出 0" },
+    { hue: 'green', title: '证据 ev_497834aa', sub: "17 条加载命令 · 4 段 · 退出 0" },
   ];
   [[left, 20, ['call', 'fail']], [right, 336, ['call', 'reply']]].forEach(([column, x, styles]) => {
     column.forEach((item, index) => {

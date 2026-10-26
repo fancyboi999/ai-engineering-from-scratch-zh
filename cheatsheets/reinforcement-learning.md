@@ -5,7 +5,7 @@ subtitle: MDP、价值方法、策略梯度、PPO、RLHF 与 GRPO。第 9 阶段
 hue: 75
 sources: phases/09-reinforcement-learning/01-mdps-states-actions-rewards, phases/09-reinforcement-learning/02-dynamic-programming, phases/09-reinforcement-learning/03-monte-carlo-methods, phases/09-reinforcement-learning/04-q-learning-sarsa, phases/09-reinforcement-learning/05-dqn, phases/09-reinforcement-learning/06-policy-gradients-reinforce, phases/09-reinforcement-learning/07-actor-critic-a2c-a3c, phases/09-reinforcement-learning/08-ppo, phases/09-reinforcement-learning/09-reward-modeling-rlhf, phases/09-reinforcement-learning/12-rl-for-games
 code: RL
-source_hash: 5e1df3e4cc404cd7
+source_hash: d970c1e98abdd5f1
 ---
 
 ## PPO 训练循环

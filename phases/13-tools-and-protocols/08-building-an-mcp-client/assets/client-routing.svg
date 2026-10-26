@@ -17,42 +17,42 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">multi-server client with an explicit protocol-era boundary</text>
+  <text x="480" y="26" text-anchor="middle" class="title">具有显式协议世代边界的多服务器客户端</text>
 
   <rect x="40" y="55" width="880" height="120" class="cold"/>
-  <text x="480" y="80" text-anchor="middle" class="head">client registry</text>
-  <text x="60" y="108" class="step">server/discover probe -&gt; modern result or recognized modern error -&gt; stay modern</text>
-  <text x="60" y="130" class="step">unrecognized error or timeout -&gt; isolated legacy initialize fallback</text>
-  <text x="60" y="154" class="small">cache era per peer; every modern request still repeats version + capabilities + clientInfo</text>
+  <text x="480" y="80" text-anchor="middle" class="head">客户端注册表</text>
+  <text x="60" y="108" class="step">server/discover 探测 -&gt; 现代结果或已识别的现代错误 -&gt; 继续现代协议</text>
+  <text x="60" y="130" class="step">未识别错误或超时 -&gt; 隔离的旧版 initialize 回退</text>
+  <text x="60" y="154" class="small">按对端缓存世代；每个现代请求仍重复携带版本、能力与 clientInfo</text>
 
   <path d="M200,175 L200,220" class="edge" marker-end="url(#arrow)"/>
   <path d="M480,175 L480,220" class="edge" marker-end="url(#arrow)"/>
   <path d="M760,175 L760,220" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="55" y="225" width="290" height="150" class="cool"/>
-  <text x="200" y="250" text-anchor="middle" class="head">modern peer: files</text>
+  <text x="200" y="250" text-anchor="middle" class="head">现代对端：files</text>
   <text x="75" y="278" class="small">server/discover -&gt; 2026-07-28</text>
   <text x="75" y="298" class="small">tools: read, search</text>
-  <text x="75" y="318" class="small">lists: sorted + cache hints</text>
-  <text x="75" y="340" class="small">calls: fresh params._meta</text>
+  <text x="75" y="318" class="small">列表：排序 + 缓存提示</text>
+  <text x="75" y="340" class="small">调用：新的 params._meta</text>
 
   <rect x="360" y="225" width="240" height="150" class="hot"/>
-  <text x="480" y="250" text-anchor="middle" class="head">legacy peer: archive</text>
-  <text x="380" y="278" class="small">discover -&gt; unrecognized -32601</text>
-  <text x="380" y="298" class="small">then initialize + initialized</text>
+  <text x="480" y="250" text-anchor="middle" class="head">旧版对端：archive</text>
+  <text x="380" y="278" class="small">discover -&gt; 无法识别 -32601</text>
+  <text x="380" y="298" class="small">随后 initialize + initialized</text>
   <text x="380" y="318" class="small">tools: restore, search</text>
-  <text x="380" y="340" class="small">legacy wire stays legacy</text>
+  <text x="380" y="340" class="small">旧版报文保持旧版语义</text>
 
   <rect x="615" y="225" width="290" height="150" class="cool"/>
-  <text x="760" y="250" text-anchor="middle" class="head">modern peer: notes</text>
+  <text x="760" y="250" text-anchor="middle" class="head">现代对端：notes</text>
   <text x="635" y="278" class="small">server/discover -&gt; 2026-07-28</text>
   <text x="635" y="298" class="small">tools: create, search</text>
-  <text x="635" y="318" class="small">lists: sorted + cache hints</text>
-  <text x="635" y="340" class="small">calls: fresh params._meta</text>
+  <text x="635" y="318" class="small">列表：排序 + 缓存提示</text>
+  <text x="635" y="340" class="small">调用：新的 params._meta</text>
 
   <rect x="40" y="400" width="880" height="105" class="box"/>
-  <text x="480" y="425" text-anchor="middle" class="head">deterministic merged namespace and route table</text>
+  <text x="480" y="425" text-anchor="middle" class="head">确定性的合并命名空间与路由表</text>
   <text x="60" y="452" class="step">create | read | restore | search | files/search | notes/search</text>
-  <text x="60" y="477" class="small">canonical name -&gt; peer + local name; silent overwrite is forbidden</text>
-  <text x="480" y="528" text-anchor="middle" class="caption">A peer record is client bookkeeping, not server-side protocol session state.</text>
+  <text x="60" y="477" class="small">规范名称 -&gt; 对端 + 本地名称；禁止静默覆盖</text>
+  <text x="480" y="528" text-anchor="middle" class="caption">对端记录是客户端记账信息，而非服务器端协议会话状态。</text>
 </svg>

@@ -22,7 +22,7 @@
   <line x1="620" y1="272" x2="620" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="620" y="289" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">11</text>
   <text x="345" y="306" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">步骤</text>
-  <text x="70" y="60" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">logprob gap</text>
+  <text x="70" y="60" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">logprob 差值</text>
   <path d="M70.0 175.2 L120.0 136.0 L170.0 179.1 L220.0 209.7 L270.0 204.8 L320.0 101.0 L370.0 177.7 L420.0 145.1 L470.0 142.6 L520.0 173.3 L570.0 181.7 L620.0 204.2" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <circle cx="70" cy="175.22" r="2.4" fill="var(--m-grey-ink, #5e5e59)"/>
   <circle cx="120" cy="136" r="2.4" fill="var(--m-grey-ink, #5e5e59)"/>
@@ -75,7 +75,7 @@
   <circle cx="520" cy="173" r="2.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <circle cx="570" cy="203.67" r="2.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <circle cx="620" cy="228.11" r="2.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
-  <text x="80" y="80.89" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">step 0: both Triton runs gave 0.015404</text>
+  <text x="80" y="80.89" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">步骤 0：两次 Triton 运行均为 0.015404</text>
   <path d="M70 16 H88" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <text x="94" y="20" font-size="11" fill="var(--m-grey-ink, #5e5e59)">默认设置</text>
   <path d="M156 16 H174" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="2" stroke-linejoin="round"/>

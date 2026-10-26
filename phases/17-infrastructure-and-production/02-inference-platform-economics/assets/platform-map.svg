@@ -12,69 +12,69 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">Inference platform map — three segments, six vendors</text>
+  <text x="480" y="24" text-anchor="middle" class="title">推理平台地图 — 三类市场、六家厂商</text>
 
   <rect x="40" y="50" width="280" height="460" class="box"/>
-  <text x="180" y="72" text-anchor="middle" class="head">custom silicon</text>
+  <text x="180" y="72" text-anchor="middle" class="head">定制芯片</text>
   <rect x="60" y="90" width="240" height="60" class="silicon"/>
   <text x="180" y="110" text-anchor="middle" class="step">Groq (LPU)</text>
-  <text x="180" y="128" text-anchor="middle" class="small">voice agents, real-time translation</text>
-  <text x="180" y="144" text-anchor="middle" class="small">5-10x faster decode than GPU</text>
+  <text x="180" y="128" text-anchor="middle" class="small">语音 agent、实时翻译</text>
+  <text x="180" y="144" text-anchor="middle" class="small">解码速度比 GPU 快 5-10 倍</text>
   <rect x="60" y="160" width="240" height="60" class="silicon"/>
   <text x="180" y="180" text-anchor="middle" class="step">Cerebras (WSE)</text>
-  <text x="180" y="198" text-anchor="middle" class="small">wafer-scale engine</text>
-  <text x="180" y="214" text-anchor="middle" class="small">very large context decode</text>
+  <text x="180" y="198" text-anchor="middle" class="small">晶圆级引擎</text>
+  <text x="180" y="214" text-anchor="middle" class="small">超长上下文解码</text>
   <rect x="60" y="230" width="240" height="60" class="silicon"/>
   <text x="180" y="250" text-anchor="middle" class="step">SambaNova (RDU)</text>
-  <text x="180" y="268" text-anchor="middle" class="small">reconfigurable dataflow</text>
-  <text x="180" y="284" text-anchor="middle" class="small">enterprise regulated</text>
-  <text x="180" y="330" text-anchor="middle" class="caption">pay premium per-token</text>
-  <text x="180" y="346" text-anchor="middle" class="caption">win on latency SLAs</text>
+  <text x="180" y="268" text-anchor="middle" class="small">可重配置数据流</text>
+  <text x="180" y="284" text-anchor="middle" class="small">受监管企业场景</text>
+  <text x="180" y="330" text-anchor="middle" class="caption">按 token 支付溢价</text>
+  <text x="180" y="346" text-anchor="middle" class="caption">以延迟 SLA 取胜</text>
 
   <rect x="340" y="50" width="280" height="460" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">GPU platforms</text>
+  <text x="480" y="72" text-anchor="middle" class="head">GPU 平台</text>
   <rect x="360" y="90" width="240" height="60" class="gpu"/>
-  <text x="480" y="110" text-anchor="middle" class="step">Fireworks — latency</text>
-  <text x="480" y="128" text-anchor="middle" class="small">FireAttention, $4B valn</text>
-  <text x="480" y="144" text-anchor="middle" class="small">$1/hr GPU raise May 2026</text>
+  <text x="480" y="110" text-anchor="middle" class="step">Fireworks — 低延迟</text>
+  <text x="480" y="128" text-anchor="middle" class="small">FireAttention，估值 $4B</text>
+  <text x="480" y="144" text-anchor="middle" class="small">GPU 每小时 $1，五月 2026 融资</text>
   <rect x="360" y="160" width="240" height="60" class="gpu"/>
-  <text x="480" y="180" text-anchor="middle" class="step">Together — breadth</text>
-  <text x="480" y="198" text-anchor="middle" class="small">200+ models, 50-70% under Replicate</text>
-  <text x="480" y="214" text-anchor="middle" class="small">"AI Native Cloud"</text>
+  <text x="480" y="180" text-anchor="middle" class="step">Together — 模型覆盖广</text>
+  <text x="480" y="198" text-anchor="middle" class="small">200+ 模型，比 Replicate 低 50-70%</text>
+  <text x="480" y="214" text-anchor="middle" class="small">“AI 原生云”</text>
   <rect x="360" y="230" width="240" height="60" class="gpu"/>
-  <text x="480" y="250" text-anchor="middle" class="step">Baseten — enterprise</text>
-  <text x="480" y="268" text-anchor="middle" class="small">$5B valn Jan 2026, SOC2+HIPAA</text>
-  <text x="480" y="284" text-anchor="middle" class="small">Truss, per-min billing</text>
+  <text x="480" y="250" text-anchor="middle" class="step">Baseten — 企业场景</text>
+  <text x="480" y="268" text-anchor="middle" class="small">估值 $5B，一月 2026，SOC2+HIPAA</text>
+  <text x="480" y="284" text-anchor="middle" class="small">Truss，按分钟计费</text>
   <rect x="360" y="300" width="240" height="60" class="gpu"/>
-  <text x="480" y="320" text-anchor="middle" class="step">Modal — Python DX</text>
-  <text x="480" y="338" text-anchor="middle" class="small">$1.1B valn, per-sec billing</text>
-  <text x="480" y="354" text-anchor="middle" class="small">infrastructure-as-Python</text>
+  <text x="480" y="320" text-anchor="middle" class="step">Modal — Python 开发体验</text>
+  <text x="480" y="338" text-anchor="middle" class="small">估值 $1.1B，按秒计费</text>
+  <text x="480" y="354" text-anchor="middle" class="small">基础设施即 Python</text>
   <rect x="360" y="370" width="240" height="60" class="gpu"/>
-  <text x="480" y="390" text-anchor="middle" class="step">Anyscale — Ray-native</text>
-  <text x="480" y="408" text-anchor="middle" class="small">RayTurbo inference engine</text>
-  <text x="480" y="424" text-anchor="middle" class="small">managed Ray clusters</text>
+  <text x="480" y="390" text-anchor="middle" class="step">Anyscale — Ray 原生</text>
+  <text x="480" y="408" text-anchor="middle" class="small">RayTurbo 推理引擎</text>
+  <text x="480" y="424" text-anchor="middle" class="small">托管 Ray 集群</text>
 
   <rect x="640" y="50" width="280" height="460" class="box"/>
-  <text x="780" y="72" text-anchor="middle" class="head">API-first marketplaces</text>
+  <text x="780" y="72" text-anchor="middle" class="head">以 API 为中心的市场</text>
   <rect x="660" y="90" width="240" height="60" class="api"/>
   <text x="780" y="110" text-anchor="middle" class="step">Replicate</text>
-  <text x="780" y="128" text-anchor="middle" class="small">pay-per-prediction</text>
-  <text x="780" y="144" text-anchor="middle" class="small">multimodal breadth default</text>
+  <text x="780" y="128" text-anchor="middle" class="small">按预测次数付费</text>
+  <text x="780" y="144" text-anchor="middle" class="small">默认广泛覆盖多模态</text>
   <rect x="660" y="160" width="240" height="60" class="api"/>
   <text x="780" y="180" text-anchor="middle" class="step">DeepInfra</text>
-  <text x="780" y="198" text-anchor="middle" class="small">aggressive per-token pricing</text>
-  <text x="780" y="214" text-anchor="middle" class="small">hobbyist and prototyping</text>
+  <text x="780" y="198" text-anchor="middle" class="small">激进的每 token 定价</text>
+  <text x="780" y="214" text-anchor="middle" class="small">爱好者与原型开发</text>
   <rect x="660" y="230" width="240" height="60" class="api"/>
   <text x="780" y="250" text-anchor="middle" class="step">OpenRouter</text>
-  <text x="780" y="268" text-anchor="middle" class="small">unified API over 100+ models</text>
-  <text x="780" y="284" text-anchor="middle" class="small">single credit for many providers</text>
+  <text x="780" y="268" text-anchor="middle" class="small">统一 API 覆盖 100+ 模型</text>
+  <text x="780" y="284" text-anchor="middle" class="small">一份余额用于多家供应商</text>
   <rect x="660" y="300" width="240" height="60" class="api"/>
   <text x="780" y="320" text-anchor="middle" class="step">Fal</text>
-  <text x="780" y="338" text-anchor="middle" class="small">image / video focus</text>
-  <text x="780" y="354" text-anchor="middle" class="small">serverless per-call</text>
-  <text x="780" y="420" text-anchor="middle" class="caption">time-to-first-call optimized</text>
-  <text x="780" y="436" text-anchor="middle" class="caption">cheapest for bursty and small-scale</text>
+  <text x="780" y="338" text-anchor="middle" class="small">专注图像 / 视频</text>
+  <text x="780" y="354" text-anchor="middle" class="small">无服务器，按调用计费</text>
+  <text x="780" y="420" text-anchor="middle" class="caption">优化首次调用时间</text>
+  <text x="780" y="436" text-anchor="middle" class="caption">突发流量和小规模最便宜</text>
 
   <rect x="40" y="520" width="880" height="30" class="box"/>
-  <text x="480" y="538" text-anchor="middle" class="step">rule: per-minute beats per-token above ~30% sustained utilization of one GPU</text>
+  <text x="480" y="538" text-anchor="middle" class="step">规律：单张 GPU 持续利用率高于约 30% 后，按分钟优于按 token 付费</text>
 </svg>

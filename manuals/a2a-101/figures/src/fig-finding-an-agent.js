@@ -13,7 +13,7 @@ module.exports = figure('fig-finding-an-agent', {
   const config = f.box({ x: 20, y: 35, w: 180, h: 46, hue: 'violet', title: "直接配置", titleSize: 12, sub: "端口 41241、41242、41243" });
 
   f.beat(1);
-  const wellKnown = f.box({ x: 245, y: 28, w: 150, h: 60, hue: 'blue', title: "well-known URI", titleSize: 12, sub: ['GET /.well-known/', 'agent-card.json'] });
+  const wellKnown = f.box({ x: 245, y: 28, w: 150, h: 60, hue: 'blue', title: "约定 URI", titleSize: 12, sub: ['GET /.well-known/', 'agent-card.json'] });
   f.arrow([config.x + config.w, 58], [wellKnown.x - 1, 58], { style: 'call', label: 'GET' });
 
   f.beat(2);

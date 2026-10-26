@@ -28,7 +28,7 @@ module.exports = figure('fig-2-3b', {
   const after = 0.714 - (0.7 - 0.098) / 600 * 100;
   f.path(`M${x(0)} ${y(0.7)} L${x(600)} ${y(0.098)} L${x(700)} ${y(0.098)} L${x(700)} ${y(0.714)} L${x(800)} ${y(after)}`, { style: 'state', head: false });
   f.rule(x(700), 30, x(700), Y0, { hue: 'rose', dash: 'dashed' });
-  f.text(x(700), 22, 'retraction', { size: 11, hue: 'rose', anchor: 'middle', weight: 700 });
+  f.text(x(700), 22, '回撤', { size: 11, hue: 'rose', anchor: 'middle', weight: 700 });
   f.text(x(700) - 12, 110, "0.098 升至 0.714", { size: 11, hue: 'ink-soft', anchor: 'end' });
   f.text(x(300), y(0.4) - 8, "准入逐渐大胆", { size: 11, serif: true, hue: 'amber' });
 });

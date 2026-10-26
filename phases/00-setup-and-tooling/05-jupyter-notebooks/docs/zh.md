@@ -1,4 +1,4 @@
-# Jupyter Notebooks
+# Jupyter 笔记本
 
 > Notebook 是 AI 工程的实验台。先在这里做原型，再把跑通的东西搬进生产环境。
 

@@ -17,63 +17,63 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Orchestration — supervisor, swarm, hierarchical, debate</text>
+  <text x="480" y="26" text-anchor="middle" class="title">编排：监督者、群体、层级与辩论</text>
 
   <rect x="40" y="50" width="440" height="230" class="super"/>
-  <text x="260" y="72" text-anchor="middle" class="head">supervisor-worker</text>
+  <text x="260" y="72" text-anchor="middle" class="head">监督者与工作者</text>
   <circle cx="180" cy="130" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="180" y="134" text-anchor="middle" class="step">super</text>
+  <text x="180" y="134" text-anchor="middle" class="step">监督者</text>
   <circle cx="300" cy="110" r="22" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="300" y="114" text-anchor="middle" class="step">refund</text>
+  <text x="300" y="114" text-anchor="middle" class="step">退款</text>
   <circle cx="360" cy="150" r="22" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="360" y="154" text-anchor="middle" class="step">bug</text>
+  <text x="360" y="154" text-anchor="middle" class="step">缺陷</text>
   <circle cx="300" cy="190" r="22" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="300" y="194" text-anchor="middle" class="step">sales</text>
+  <text x="300" y="194" text-anchor="middle" class="step">销售</text>
   <line x1="208" y1="130" x2="278" y2="110" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="208" y1="130" x2="338" y2="150" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="208" y1="130" x2="278" y2="190" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="260" y="240" text-anchor="middle" class="small">central router dispatches; specialists don't talk to each other</text>
-  <text x="260" y="258" text-anchor="middle" class="small">LangGraph create_supervisor / Anthropic orchestrator-workers</text>
-  <text x="260" y="274" text-anchor="middle" class="small">2026: direct tool calls preferred for context control</text>
+  <text x="260" y="240" text-anchor="middle" class="small">中央路由器分发，专家之间不直接通信</text>
+  <text x="260" y="258" text-anchor="middle" class="small">LangGraph create_supervisor / Anthropic 编排者与工作者</text>
+  <text x="260" y="274" text-anchor="middle" class="small">2026：为控制上下文，优先直接工具调用</text>
 
   <rect x="500" y="50" width="420" height="230" class="swarm"/>
-  <text x="710" y="72" text-anchor="middle" class="head">swarm  peer-to-peer</text>
+  <text x="710" y="72" text-anchor="middle" class="head">群体：点对点</text>
   <circle cx="610" cy="150" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="610" y="154" text-anchor="middle" class="step">refund</text>
+  <text x="610" y="154" text-anchor="middle" class="step">退款</text>
   <circle cx="770" cy="110" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="770" y="114" text-anchor="middle" class="step">bug</text>
+  <text x="770" y="114" text-anchor="middle" class="step">缺陷</text>
   <circle cx="770" cy="190" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="770" y="194" text-anchor="middle" class="step">sales</text>
+  <text x="770" y="194" text-anchor="middle" class="step">销售</text>
   <line x1="638" y1="150" x2="742" y2="110" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="638" y1="150" x2="742" y2="190" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="770" y1="138" x2="770" y2="162" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="710" y="240" text-anchor="middle" class="small">direct handoffs via shared tools; no central router</text>
-  <text x="710" y="258" text-anchor="middle" class="small">lower latency; harder to reason about</text>
-  <text x="710" y="274" text-anchor="middle" class="small">hop counter required to avoid bouncing A  B  A</text>
+  <text x="710" y="240" text-anchor="middle" class="small">通过共享工具直接交接，无中央路由器</text>
+  <text x="710" y="258" text-anchor="middle" class="small">延迟较低，但更难推断行为</text>
+  <text x="710" y="274" text-anchor="middle" class="small">需设置跳数计数器，避免 A B A 来回交接</text>
 
   <rect x="40" y="300" width="440" height="210" class="hier"/>
-  <text x="260" y="322" text-anchor="middle" class="head">hierarchical  nested subgraphs</text>
+  <text x="260" y="322" text-anchor="middle" class="head">层级：嵌套子图</text>
   <circle cx="260" cy="360" r="24" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="260" y="364" text-anchor="middle" class="step">top</text>
+  <text x="260" y="364" text-anchor="middle" class="step">顶层</text>
   <circle cx="160" cy="410" r="22" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="160" y="414" text-anchor="middle" class="step">ops</text>
+  <text x="160" y="414" text-anchor="middle" class="step">运维</text>
   <circle cx="360" cy="410" r="22" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="360" y="414" text-anchor="middle" class="step">commercial</text>
+  <text x="360" y="414" text-anchor="middle" class="step">商业</text>
   <circle cx="100" cy="460" r="18" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="100" y="464" text-anchor="middle" class="small">refund</text>
+  <text x="100" y="464" text-anchor="middle" class="small">退款</text>
   <circle cx="220" cy="460" r="18" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="220" y="464" text-anchor="middle" class="small">bug</text>
+  <text x="220" y="464" text-anchor="middle" class="small">缺陷</text>
   <circle cx="360" cy="460" r="18" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="360" y="464" text-anchor="middle" class="small">sales</text>
+  <text x="360" y="464" text-anchor="middle" class="small">销售</text>
   <line x1="260" y1="384" x2="160" y2="388" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="260" y1="384" x2="360" y2="388" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="160" y1="432" x2="100" y2="442" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="160" y1="432" x2="220" y2="442" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="360" y1="432" x2="360" y2="442" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="260" y="498" text-anchor="middle" class="small">only when supervisor context budget fails</text>
+  <text x="260" y="498" text-anchor="middle" class="small">仅在监督者上下文预算不足时使用</text>
 
   <rect x="500" y="300" width="420" height="210" class="debate"/>
-  <text x="710" y="322" text-anchor="middle" class="head">debate  proposer + critique</text>
+  <text x="710" y="322" text-anchor="middle" class="head">辩论：提议与批评</text>
   <circle cx="600" cy="380" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
   <text x="600" y="384" text-anchor="middle" class="step">alpha</text>
   <circle cx="710" cy="380" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
@@ -81,11 +81,11 @@
   <circle cx="820" cy="380" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
   <text x="820" y="384" text-anchor="middle" class="step">gamma</text>
   <circle cx="710" cy="460" r="28" fill="#faf6ef" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="710" y="464" text-anchor="middle" class="step">synth</text>
+  <text x="710" y="464" text-anchor="middle" class="step">综合</text>
   <line x1="600" y1="408" x2="710" y2="432" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="710" y1="408" x2="710" y2="432" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="820" y1="408" x2="710" y2="432" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="710" y="498" text-anchor="middle" class="small">most expensive; best for hard reasoning + factuality</text>
+  <text x="710" y="498" text-anchor="middle" class="small">成本最高，适合困难推理与事实核查</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">pick problem first, topology second. Anthropic: "the right system, not the most sophisticated."</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">先看问题，再选拓扑。Anthropic：“选择合适的系统，而非最复杂的系统。”</text>
 </svg>

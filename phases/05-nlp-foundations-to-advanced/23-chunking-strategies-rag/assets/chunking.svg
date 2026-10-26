@@ -13,10 +13,10 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">six chunking strategies on the same document</text>
+  <text x="450" y="28" text-anchor="middle" class="title">同一文档上的六种分块策略</text>
 
   <!-- row 1 -->
-  <text x="40" y="60" class="sub">fixed (size=N)</text>
+  <text x="40" y="60" class="sub">固定大小（size=N）</text>
   <rect x="40" y="70" width="100" height="30" class="chunk"/>
   <rect x="142" y="70" width="100" height="30" class="chunk"/>
   <rect x="244" y="70" width="100" height="30" class="chunk"/>
@@ -25,29 +25,29 @@
   <rect x="550" y="70" width="100" height="30" class="chunk"/>
   <rect x="652" y="70" width="100" height="30" class="chunk"/>
   <rect x="754" y="70" width="60" height="30" class="chunk"/>
-  <text x="450" y="115" text-anchor="middle" class="caption">hard split every N chars — breaks mid-sentence</text>
+  <text x="450" y="115" text-anchor="middle" class="caption">每 N 个字符硬切分，可能截断句子</text>
 
   <!-- row 2 -->
-  <text x="40" y="140" class="sub">recursive (\n\n → \n → . → ' ')</text>
+  <text x="40" y="140" class="sub">递归（\n\n → \n → . → ' '）</text>
   <rect x="40" y="150" width="140" height="30" class="chunk"/>
   <rect x="182" y="150" width="110" height="30" class="chunk"/>
   <rect x="294" y="150" width="170" height="30" class="chunk"/>
   <rect x="466" y="150" width="130" height="30" class="chunk"/>
   <rect x="598" y="150" width="160" height="30" class="chunk"/>
   <rect x="760" y="150" width="100" height="30" class="chunk"/>
-  <text x="450" y="195" text-anchor="middle" class="caption">try separators in order; 2026 default</text>
+  <text x="450" y="195" text-anchor="middle" class="caption">按顺序尝试分隔符；2026 年默认方式</text>
 
   <!-- row 3 -->
-  <text x="40" y="220" class="sub">semantic (embedding similarity)</text>
+  <text x="40" y="220" class="sub">语义分块（嵌入相似度）</text>
   <rect x="40" y="230" width="210" height="30" class="chunk"/>
   <rect x="252" y="230" width="70" height="30" class="chunk"/>
   <rect x="324" y="230" width="310" height="30" class="chunk"/>
   <rect x="636" y="230" width="90" height="30" class="chunk"/>
   <rect x="728" y="230" width="130" height="30" class="chunk"/>
-  <text x="450" y="275" text-anchor="middle" class="caption">split where adjacent-sentence similarity drops</text>
+  <text x="450" y="275" text-anchor="middle" class="caption">在相邻句相似度下降处切分</text>
 
   <!-- row 4: parent / child -->
-  <text x="40" y="300" class="sub">parent-document (child for retrieval, parent for context)</text>
+  <text x="40" y="300" class="sub">父子文档（子块检索，父块提供上下文）</text>
   <rect x="40" y="310" width="380" height="30" class="parent"/>
   <rect x="422" y="310" width="440" height="30" class="parent"/>
   <rect x="45" y="312" width="85" height="26" class="child"/>
@@ -59,16 +59,16 @@
   <rect x="601" y="312" width="85" height="26" class="child"/>
   <rect x="688" y="312" width="85" height="26" class="child"/>
   <rect x="775" y="312" width="85" height="26" class="child"/>
-  <text x="450" y="355" text-anchor="middle" class="caption">embed the small boxes, return the large boxes — degrades gracefully</text>
+  <text x="450" y="355" text-anchor="middle" class="caption">嵌入小框，返回大框；平缓退化</text>
 
   <!-- row 5 -->
-  <text x="40" y="380" class="sub">late chunking (embed full doc first, then pool)</text>
+  <text x="40" y="380" class="sub">后期分块（先嵌入全文，再池化）</text>
   <rect x="40" y="390" width="820" height="20" class="box"/>
-  <text x="450" y="404" text-anchor="middle" class="content">token embeddings across full doc</text>
+  <text x="450" y="404" text-anchor="middle" class="content">覆盖全文的 token 嵌入</text>
   <rect x="40" y="412" width="150" height="20" class="chunk"/>
   <rect x="192" y="412" width="160" height="20" class="chunk"/>
   <rect x="354" y="412" width="200" height="20" class="chunk"/>
   <rect x="556" y="412" width="150" height="20" class="chunk"/>
   <rect x="708" y="412" width="152" height="20" class="chunk"/>
-  <text x="450" y="450" text-anchor="middle" class="caption">pool token embeddings into chunk vectors — preserves cross-chunk context</text>
+  <text x="450" y="450" text-anchor="middle" class="caption">将 token 嵌入池化为分块向量，保留跨块上下文</text>
 </svg>

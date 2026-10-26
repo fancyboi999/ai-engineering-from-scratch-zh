@@ -13,61 +13,61 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Frontier safety frameworks: cross-lab matrix</text>
+  <text x="480" y="24" text-anchor="middle" class="title">前沿安全框架：跨实验室矩阵</text>
 
   <rect x="40" y="60" width="200" height="60" class="box"/>
-  <text x="140" y="95" text-anchor="middle" class="head">axis</text>
+  <text x="140" y="95" text-anchor="middle" class="head">维度</text>
 
   <rect x="260" y="60" width="220" height="60" class="cool"/>
   <text x="370" y="85" text-anchor="middle" class="head">Anthropic RSP v3.0</text>
-  <text x="370" y="105" text-anchor="middle" class="small">Feb 2026</text>
+  <text x="370" y="105" text-anchor="middle" class="small">二月 2026</text>
 
   <rect x="500" y="60" width="220" height="60" class="cold"/>
   <text x="610" y="85" text-anchor="middle" class="head">OpenAI PF v2</text>
-  <text x="610" y="105" text-anchor="middle" class="small">Apr 15, 2025</text>
+  <text x="610" y="105" text-anchor="middle" class="small">四月 15 日，2025</text>
 
   <rect x="740" y="60" width="180" height="60" class="hot"/>
   <text x="830" y="85" text-anchor="middle" class="head">DeepMind FSF v3.0</text>
-  <text x="830" y="105" text-anchor="middle" class="small">Sep 2025</text>
+  <text x="830" y="105" text-anchor="middle" class="small">九月 2025</text>
 
   <rect x="40" y="140" width="200" height="60" class="box"/>
-  <text x="140" y="175" text-anchor="middle" class="step">tier structure</text>
+  <text x="140" y="175" text-anchor="middle" class="step">等级结构</text>
   <rect x="260" y="140" width="220" height="60" class="cool"/>
   <text x="370" y="175" text-anchor="middle" class="small">ASL-1..5+</text>
   <rect x="500" y="140" width="220" height="60" class="cold"/>
-  <text x="610" y="175" text-anchor="middle" class="small">Low/Med/High/Crit per capability</text>
+  <text x="610" y="175" text-anchor="middle" class="small">各能力分为低/中/高/严重</text>
   <rect x="740" y="140" width="180" height="60" class="hot"/>
-  <text x="830" y="175" text-anchor="middle" class="small">CCL per domain</text>
+  <text x="830" y="175" text-anchor="middle" class="small">各领域定义 CCL</text>
 
   <rect x="40" y="210" width="200" height="60" class="box"/>
   <text x="140" y="245" text-anchor="middle" class="step">CBRN</text>
   <rect x="260" y="210" width="220" height="60" class="cool"/>
-  <text x="370" y="245" text-anchor="middle" class="small">ASL-3 activated May 2025</text>
+  <text x="370" y="245" text-anchor="middle" class="small">ASL-3 于五月 2025 激活</text>
   <rect x="500" y="210" width="220" height="60" class="cold"/>
-  <text x="610" y="245" text-anchor="middle" class="small">High bio; "on the cusp"</text>
+  <text x="610" y="245" text-anchor="middle" class="small">生物能力高；“接近门槛”</text>
   <rect x="740" y="210" width="180" height="60" class="hot"/>
-  <text x="830" y="245" text-anchor="middle" class="small">Bioweapon CCL</text>
+  <text x="830" y="245" text-anchor="middle" class="small">生物武器 CCL</text>
 
   <rect x="40" y="280" width="200" height="60" class="box"/>
-  <text x="140" y="315" text-anchor="middle" class="step">AI R&amp;D</text>
+  <text x="140" y="315" text-anchor="middle" class="step">AI 研发</text>
   <rect x="260" y="280" width="220" height="60" class="cool"/>
-  <text x="370" y="315" text-anchor="middle" class="small">AI R&amp;D-2 + AI R&amp;D-4</text>
+  <text x="370" y="315" text-anchor="middle" class="small">AI 研发-2 + AI 研发-4</text>
   <rect x="500" y="280" width="220" height="60" class="cold"/>
-  <text x="610" y="315" text-anchor="middle" class="small">High; Critical pending</text>
+  <text x="610" y="315" text-anchor="middle" class="small">高；严重等级尚待确定</text>
   <rect x="740" y="280" width="180" height="60" class="hot"/>
-  <text x="830" y="315" text-anchor="middle" class="small">ML R&amp;D CCL</text>
+  <text x="830" y="315" text-anchor="middle" class="small">机器学习研发 CCL</text>
 
   <rect x="40" y="350" width="200" height="60" class="box"/>
-  <text x="140" y="385" text-anchor="middle" class="step">adjustment clause</text>
+  <text x="140" y="385" text-anchor="middle" class="step">调整条款</text>
   <rect x="260" y="350" width="220" height="60" class="cool"/>
-  <text x="370" y="385" text-anchor="middle" class="small">yes (peer-ship)</text>
+  <text x="370" y="385" text-anchor="middle" class="small">有（同行发布）</text>
   <rect x="500" y="350" width="220" height="60" class="cold"/>
-  <text x="610" y="385" text-anchor="middle" class="small">yes (Leadership)</text>
+  <text x="610" y="385" text-anchor="middle" class="small">有（领导层）</text>
   <rect x="740" y="350" width="180" height="60" class="hot"/>
-  <text x="830" y="385" text-anchor="middle" class="small">yes (added 2025)</text>
+  <text x="830" y="385" text-anchor="middle" class="small">有（2025 年新增）</text>
 
   <rect x="40" y="420" width="880" height="70" class="box"/>
-  <text x="60" y="445" class="small">safety case (three-pillar): monitoring (can we detect?), illegibility (can U execute a plan?), incapability (does U have the capability?).</text>
-  <text x="60" y="465" class="small">external: UK AISI (renamed Feb 2025), US CAISI (renamed June 2025), EU AI Office + GPAI Code of Practice (Aug 2025).</text>
-  <text x="60" y="483" class="small">cross-lab terminology varies ("ASL" vs "High" vs "CCL"); structural alignment: three-tier capability bars.</text>
+  <text x="60" y="445" class="small">安全论证（三支柱）：监测（能否检测？）、不可理解性（U 能否执行计划？）、能力不足（U 是否具备能力？）。</text>
+  <text x="60" y="465" class="small">外部机构：英国 AISI（二月 2025 更名）、美国 CAISI（六月 2025 更名）、欧盟 AI 办公室 + 通用 AI 实践准则（八月 2025）。</text>
+  <text x="60" y="483" class="small">各实验室术语不同（“ASL”“高”“CCL”）；结构相通：三层能力门槛。</text>
 </svg>

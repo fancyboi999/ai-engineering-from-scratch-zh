@@ -16,52 +16,52 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">one host, stateless JSON-RPC requests, three primitives</text>
+  <text x="450" y="30" text-anchor="middle" class="title">一个宿主，无状态 JSON-RPC 请求，三种原语</text>
 
   <!-- Host -->
   <rect x="40" y="70" width="240" height="300" class="host"/>
-  <text x="160" y="95" text-anchor="middle" class="label">Host (LLM app)</text>
+  <text x="160" y="95" text-anchor="middle" class="label">宿主（LLM 应用）</text>
   <text x="160" y="113" text-anchor="middle" class="tag">Claude Desktop / Claude Code / ChatGPT</text>
 
   <rect x="70" y="135" width="180" height="55" class="box"/>
-  <text x="160" y="155" text-anchor="middle" class="sub">LLM runtime</text>
-  <text x="160" y="175" text-anchor="middle" class="tag">model + prompt + context</text>
+  <text x="160" y="155" text-anchor="middle" class="sub">LLM 运行时</text>
+  <text x="160" y="175" text-anchor="middle" class="tag">模型 + prompt + 上下文</text>
 
   <rect x="70" y="205" width="180" height="55" class="box"/>
-  <text x="160" y="225" text-anchor="middle" class="sub">MCP client</text>
-  <text x="160" y="245" text-anchor="middle" class="tag">one per server mounted</text>
+  <text x="160" y="225" text-anchor="middle" class="sub">MCP 客户端</text>
+  <text x="160" y="245" text-anchor="middle" class="tag">每挂载一个服务器对应一个</text>
 
   <rect x="70" y="275" width="180" height="55" class="box"/>
-  <text x="160" y="295" text-anchor="middle" class="sub">user UI / approval</text>
-  <text x="160" y="315" text-anchor="middle" class="tag">slash commands, confirms</text>
+  <text x="160" y="295" text-anchor="middle" class="sub">用户界面 / 批准</text>
+  <text x="160" y="315" text-anchor="middle" class="tag">斜杠命令、确认</text>
 
   <!-- Wire -->
   <path d="M280 235 L500 235" class="line" marker-end="url(#arrow)"/>
   <text x="390" y="220" text-anchor="middle" class="tag">JSON-RPC 2.0 (stdio / HTTP)</text>
-  <text x="390" y="252" text-anchor="middle" class="tag">_meta each request &#x2022; discover optional</text>
+  <text x="390" y="252" text-anchor="middle" class="tag">每次请求携带 _meta • 发现机制可选</text>
 
   <!-- Server -->
   <rect x="500" y="70" width="360" height="300" class="server"/>
-  <text x="680" y="95" text-anchor="middle" class="label">Server</text>
-  <text x="680" y="113" text-anchor="middle" class="tag">your code: FastMCP / SDK / custom</text>
+  <text x="680" y="95" text-anchor="middle" class="label">服务器</text>
+  <text x="680" y="113" text-anchor="middle" class="tag">你的代码：FastMCP / SDK / 定制实现</text>
 
   <rect x="525" y="140" width="310" height="60" class="primitive"/>
-  <text x="680" y="161" text-anchor="middle" class="sub">Tools</text>
-  <text x="680" y="181" text-anchor="middle" class="tag">functions the model calls; JSON Schema input</text>
+  <text x="680" y="161" text-anchor="middle" class="sub">工具</text>
+  <text x="680" y="181" text-anchor="middle" class="tag">供模型调用的函数；JSON Schema 输入</text>
 
   <rect x="525" y="215" width="310" height="60" class="primitive"/>
-  <text x="680" y="236" text-anchor="middle" class="sub">Resources</text>
-  <text x="680" y="256" text-anchor="middle" class="tag">URI-addressed read-only content</text>
+  <text x="680" y="236" text-anchor="middle" class="sub">资源</text>
+  <text x="680" y="256" text-anchor="middle" class="tag">通过 URI 寻址的只读内容</text>
 
   <rect x="525" y="290" width="310" height="60" class="primitive"/>
-  <text x="680" y="311" text-anchor="middle" class="sub">Prompts</text>
-  <text x="680" y="331" text-anchor="middle" class="tag">user-invoked templates (slash commands)</text>
+  <text x="680" y="311" text-anchor="middle" class="sub">prompt 模板</text>
+  <text x="680" y="331" text-anchor="middle" class="tag">用户主动调用的模板（斜杠命令）</text>
 
   <!-- Caption -->
   <text x="450" y="410" text-anchor="middle" class="tag">
-    protocol version and client capabilities travel in params._meta on every request.
+    协议版本与客户端能力随每次请求放在 params._meta 中。
   </text>
   <text x="450" y="435" text-anchor="middle" class="tag">
-    destructive tools set destructiveHint: true so the host can gate on human approval.
+    破坏性工具设置 destructiveHint: true，以便宿主要求人工批准。
   </text>
 </svg>

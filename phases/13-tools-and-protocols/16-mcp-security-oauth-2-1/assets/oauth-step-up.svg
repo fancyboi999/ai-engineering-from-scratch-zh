@@ -16,52 +16,52 @@
     </style>
   </defs>
 
-  <text x="480" y="28" text-anchor="middle" class="title">MCP authorization: issuer-bound enrollment and resource-bound tokens</text>
+  <text x="480" y="28" text-anchor="middle" class="title">MCP 授权：注册绑定 issuer，token 绑定资源</text>
 
   <rect x="30" y="58" width="230" height="445" rx="8" class="green"/>
-  <text x="145" y="84" text-anchor="middle" class="head">MCP client</text>
-  <text x="48" y="116" class="mono">issuer credentials[issuer]</text>
+  <text x="145" y="84" text-anchor="middle" class="head">MCP 客户端</text>
+  <text x="48" y="116" class="mono">签发方凭证 credentials[issuer]</text>
   <text x="48" y="138" class="mono">tokens[issuer, resource]</text>
-  <text x="48" y="176" class="small">1. read protected-resource</text>
-  <text x="48" y="194" class="small">metadata and issuer metadata</text>
-  <text x="48" y="228" class="small">2. prefer CIMD HTTPS URL</text>
-  <text x="48" y="246" class="small">DCR only as compatibility</text>
+  <text x="48" y="176" class="small">1. 读取受保护资源的</text>
+  <text x="48" y="194" class="small">元数据与签发方元数据</text>
+  <text x="48" y="228" class="small">2. 优先使用 CIMD HTTPS URL</text>
+  <text x="48" y="246" class="small">DCR 仅用于兼容</text>
   <text x="48" y="280" class="small">3. PKCE S256 + resource</text>
-  <text x="48" y="298" class="small">in authorization and token</text>
-  <text x="48" y="332" class="small">4. validate response iss</text>
-  <text x="48" y="350" class="small">exactly before using code</text>
-  <text x="48" y="388" class="mono">POST /mcp per request</text>
+  <text x="48" y="298" class="small">用于授权和 token 请求</text>
+  <text x="48" y="332" class="small">4. 校验响应中的 iss</text>
+  <text x="48" y="350" class="small">完全匹配后才使用 code</text>
+  <text x="48" y="388" class="mono">每次请求均 POST /mcp</text>
   <text x="48" y="408" class="small">Bearer + version + method</text>
   <text x="48" y="426" class="small">+ name + params._meta</text>
-  <text x="48" y="462" class="mono">no Mcp-Session-Id</text>
+  <text x="48" y="462" class="mono">不使用 Mcp-Session-Id</text>
 
   <rect x="365" y="58" width="230" height="445" rx="8" class="blue"/>
-  <text x="480" y="84" text-anchor="middle" class="head">authorization server</text>
-  <text x="383" y="116" class="mono">issuer: exact URI</text>
-  <text x="383" y="154" class="small">CIMD: fetch client metadata</text>
-  <text x="383" y="174" class="small">client_id equals document URL</text>
-  <text x="383" y="208" class="small">DCR fallback validates</text>
-  <text x="383" y="228" class="small">application_type + redirects</text>
-  <text x="383" y="266" class="small">authorize: consent + PKCE</text>
-  <text x="383" y="286" class="small">response: code + iss</text>
-  <text x="383" y="324" class="small">token: issuer + audience</text>
-  <text x="383" y="344" class="small">+ subject + scopes + expiry</text>
-  <text x="383" y="382" class="small">CIMD URL is portable;</text>
-  <text x="383" y="402" class="small">minted credentials are not</text>
+  <text x="480" y="84" text-anchor="middle" class="head">授权服务器</text>
+  <text x="383" y="116" class="mono">issuer：精确 URI</text>
+  <text x="383" y="154" class="small">CIMD：获取客户端元数据</text>
+  <text x="383" y="174" class="small">client_id 等于文档 URL</text>
+  <text x="383" y="208" class="small">DCR 回退时校验</text>
+  <text x="383" y="228" class="small">application_type + 重定向地址</text>
+  <text x="383" y="266" class="small">授权：用户同意 + PKCE</text>
+  <text x="383" y="286" class="small">响应：code + iss</text>
+  <text x="383" y="324" class="small">token：签发方 + 受众</text>
+  <text x="383" y="344" class="small">+ 主体 + 作用域 + 有效期</text>
+  <text x="383" y="382" class="small">CIMD URL 可移植；</text>
+  <text x="383" y="402" class="small">签发的凭证不可移植</text>
 
   <rect x="700" y="58" width="230" height="445" rx="8" class="orange"/>
-  <text x="815" y="84" text-anchor="middle" class="head">MCP resource server</text>
-  <text x="718" y="116" class="mono">RFC 9728 metadata</text>
-  <text x="718" y="136" class="small">well-known path keeps /mcp</text>
-  <text x="718" y="174" class="mono">validate every request</text>
-  <text x="718" y="194" class="small">issuer, audience, expiry</text>
-  <text x="718" y="212" class="small">scope, headers, params._meta</text>
-  <text x="718" y="250" class="small">401 invalid token or audience</text>
+  <text x="815" y="84" text-anchor="middle" class="head">MCP 资源服务器</text>
+  <text x="718" y="116" class="mono">RFC 9728 元数据</text>
+  <text x="718" y="136" class="small">well-known 路径保留 /mcp</text>
+  <text x="718" y="174" class="mono">校验每次请求</text>
+  <text x="718" y="194" class="small">签发方、受众、有效期</text>
+  <text x="718" y="212" class="small">作用域、请求头、params._meta</text>
+  <text x="718" y="250" class="small">401：token 或受众无效</text>
   <text x="718" y="288" class="small">403 insufficient_scope</text>
-  <text x="718" y="308" class="small">scope challenge is current</text>
-  <text x="718" y="326" class="small">operation authority</text>
-  <text x="718" y="364" class="small">retry after consent uses</text>
-  <text x="718" y="384" class="small">a new MCP request id</text>
+  <text x="718" y="308" class="small">作用域质询代表当前</text>
+  <text x="718" y="326" class="small">操作所需权限</text>
+  <text x="718" y="364" class="small">用户同意后重试时使用</text>
+  <text x="718" y="384" class="small">新的 MCP 请求 id</text>
   <text x="718" y="422" class="mono">resultType: complete</text>
 
   <path d="M260,185 L365,185" class="edge" marker-end="url(#arrow)"/>
@@ -71,9 +71,9 @@
   <path d="M260,360 L365,360" class="edge" marker-end="url(#arrow)"/>
   <text x="312" y="349" text-anchor="middle" class="mono">verifier</text>
   <path d="M595,250 L700,250" class="edge" marker-end="url(#arrow)"/>
-  <text x="648" y="239" text-anchor="middle" class="mono">token aud</text>
+  <text x="648" y="239" text-anchor="middle" class="mono">token 受众 aud</text>
   <path d="M260,440 L700,440" class="edge" marker-end="url(#arrow)"/>
-  <text x="480" y="429" text-anchor="middle" class="mono">authorized stateless tool call</text>
+  <text x="480" y="429" text-anchor="middle" class="mono">已授权的无状态工具调用</text>
 
-  <text x="480" y="542" text-anchor="middle" class="caption">Protocol metadata negotiates behavior. OAuth credentials authorize a principal. Keep the boundaries separate.</text>
+  <text x="480" y="542" text-anchor="middle" class="caption">协议元数据协商行为，OAuth 凭证授予主体权限。保持两个边界独立。</text>
 </svg>

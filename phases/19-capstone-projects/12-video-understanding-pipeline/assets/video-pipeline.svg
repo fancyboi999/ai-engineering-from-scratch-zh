@@ -14,48 +14,48 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">video understanding pipeline — scene -&gt; multi-vector -&gt; grounded answer</text>
+  <text x="480" y="24" text-anchor="middle" class="title">视频理解流水线：场景 -&gt; 多向量 -&gt; 有依据的答案</text>
 
   <rect x="40" y="50" width="880" height="100" class="box"/>
-  <text x="480" y="70" text-anchor="middle" class="head">ingest (three pipelines in parallel)</text>
+  <text x="480" y="70" text-anchor="middle" class="head">摄取（三条流水线并行）</text>
   <rect x="60" y="84" width="270" height="52" class="cool"/>
-  <text x="195" y="104" text-anchor="middle" class="step">scene segmentation</text>
+  <text x="195" y="104" text-anchor="middle" class="step">场景分割</text>
   <text x="195" y="122" text-anchor="middle" class="small">TransNetV2 / PySceneDetect</text>
   <rect x="345" y="84" width="270" height="52" class="cool"/>
-  <text x="480" y="104" text-anchor="middle" class="step">VLM caption + frame embed</text>
+  <text x="480" y="104" text-anchor="middle" class="step">VLM 生成描述 + 帧嵌入</text>
   <text x="480" y="122" text-anchor="middle" class="small">Gemini 2.5 Pro / Qwen3-VL / Molmo 2</text>
   <rect x="630" y="84" width="270" height="52" class="cool"/>
-  <text x="765" y="104" text-anchor="middle" class="step">ASR + word timestamps</text>
+  <text x="765" y="104" text-anchor="middle" class="step">ASR + 词级时间戳</text>
   <text x="765" y="122" text-anchor="middle" class="small">Whisper-v3-turbo (faster-whisper)</text>
 
   <rect x="40" y="170" width="880" height="80" class="dsk"/>
-  <text x="480" y="190" text-anchor="middle" class="head">multi-vector Qdrant index (three named vectors per scene)</text>
+  <text x="480" y="190" text-anchor="middle" class="head">多向量 Qdrant 索引（每个场景三个命名向量）</text>
   <text x="480" y="214" text-anchor="middle" class="small">caption_emb   frame_emb   transcript_emb</text>
-  <text x="480" y="232" text-anchor="middle" class="small">payload: video_id, scene_id, start_ms, end_ms, keyframe_url</text>
+  <text x="480" y="232" text-anchor="middle" class="small">载荷：video_id、scene_id、start_ms、end_ms、keyframe_url</text>
 
   <rect x="40" y="270" width="440" height="240" class="box"/>
-  <text x="260" y="292" text-anchor="middle" class="head">query flow</text>
+  <text x="260" y="292" text-anchor="middle" class="head">查询流程</text>
   <rect x="60" y="310" width="400" height="30" class="cool"/>
-  <text x="260" y="330" text-anchor="middle" class="step">three parallel dense queries</text>
+  <text x="260" y="330" text-anchor="middle" class="step">三条并行稠密查询</text>
   <rect x="60" y="346" width="400" height="30" class="cool"/>
-  <text x="260" y="366" text-anchor="middle" class="step">reciprocal rank fusion -&gt; top-k scenes</text>
+  <text x="260" y="366" text-anchor="middle" class="step">倒数排名融合 -&gt; top-k 场景</text>
   <rect x="60" y="382" width="400" height="30" class="hot"/>
-  <text x="260" y="402" text-anchor="middle" class="step">temporal grounding (TimeLens / VideoITG)</text>
+  <text x="260" y="402" text-anchor="middle" class="step">时间定位（TimeLens / VideoITG）</text>
   <rect x="60" y="418" width="400" height="30" class="dsk"/>
-  <text x="260" y="438" text-anchor="middle" class="step">VLM synth with cited timestamps</text>
-  <text x="260" y="466" text-anchor="middle" class="small">answer + (start, end) + frame previews</text>
-  <text x="260" y="484" text-anchor="middle" class="caption">UI: jump-to-frame + thumbnail strip</text>
+  <text x="260" y="438" text-anchor="middle" class="step">VLM 综合答案并引用时间戳</text>
+  <text x="260" y="466" text-anchor="middle" class="small">答案 +（start、end）+ 帧预览</text>
+  <text x="260" y="484" text-anchor="middle" class="caption">界面：跳转至帧 + 缩略图带</text>
 
   <rect x="520" y="270" width="400" height="240" class="box"/>
-  <text x="720" y="292" text-anchor="middle" class="head">evaluation</text>
+  <text x="720" y="292" text-anchor="middle" class="head">评估</text>
   <rect x="540" y="310" width="360" height="30" class="cool"/>
   <text x="720" y="330" text-anchor="middle" class="step">ActivityNet-QA + NeXT-GQA</text>
   <rect x="540" y="346" width="360" height="30" class="cool"/>
-  <text x="720" y="366" text-anchor="middle" class="step">custom 100-query hand-labeled set</text>
+  <text x="720" y="366" text-anchor="middle" class="step">自定义 100 条人工标注查询</text>
   <rect x="540" y="382" width="360" height="30" class="hot"/>
-  <text x="720" y="402" text-anchor="middle" class="step">hallucination sub-bench</text>
-  <text x="720" y="420" text-anchor="middle" class="small">counting + action-type reported separately</text>
-  <text x="720" y="440" text-anchor="middle" class="small">temporal IoU on held-out grounding set</text>
-  <text x="720" y="466" text-anchor="middle" class="small">ingest throughput: hours-of-video / $</text>
-  <text x="720" y="488" text-anchor="middle" class="caption">target: 100 hours indexed, &lt; 2 min per query</text>
+  <text x="720" y="402" text-anchor="middle" class="step">幻觉子基准</text>
+  <text x="720" y="420" text-anchor="middle" class="small">分别报告计数与动作类型</text>
+  <text x="720" y="440" text-anchor="middle" class="small">留出定位集的时间 IoU</text>
+  <text x="720" y="466" text-anchor="middle" class="small">摄取吞吐：视频小时数 / $</text>
+  <text x="720" y="488" text-anchor="middle" class="caption">目标：索引 100 小时视频，每条查询 &lt; 2 分钟</text>
 </svg>

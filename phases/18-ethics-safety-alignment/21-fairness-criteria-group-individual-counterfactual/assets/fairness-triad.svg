@@ -13,46 +13,46 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Fairness: three families, one impossibility</text>
+  <text x="480" y="24" text-anchor="middle" class="title">公平性：三大家族，一个不可能性</text>
 
   <rect x="40" y="60" width="280" height="200" class="box"/>
-  <text x="180" y="85" text-anchor="middle" class="head">group fairness</text>
+  <text x="180" y="85" text-anchor="middle" class="head">群体公平</text>
   <rect x="60" y="100" width="240" height="50" class="cool"/>
-  <text x="180" y="122" text-anchor="middle" class="step">demographic parity</text>
-  <text x="180" y="140" text-anchor="middle" class="small">P(Y=1 | A=a) equal</text>
+  <text x="180" y="122" text-anchor="middle" class="step">人口统计均等</text>
+  <text x="180" y="140" text-anchor="middle" class="small">P(Y=1 | A=a) 相等</text>
   <rect x="60" y="160" width="240" height="50" class="cool"/>
-  <text x="180" y="182" text-anchor="middle" class="step">equalized odds</text>
-  <text x="180" y="200" text-anchor="middle" class="small">TPR/FPR equal across groups</text>
+  <text x="180" y="182" text-anchor="middle" class="step">均等化胜算</text>
+  <text x="180" y="200" text-anchor="middle" class="small">各群体的 TPR/FPR 相等</text>
   <rect x="60" y="220" width="240" height="30" class="cool"/>
-  <text x="180" y="242" text-anchor="middle" class="step">conditional use accuracy equality</text>
+  <text x="180" y="242" text-anchor="middle" class="step">条件使用准确率相等</text>
 
   <rect x="340" y="60" width="280" height="200" class="box"/>
-  <text x="480" y="85" text-anchor="middle" class="head">individual fairness</text>
+  <text x="480" y="85" text-anchor="middle" class="head">个体公平</text>
   <rect x="360" y="100" width="240" height="80" class="cold"/>
   <text x="480" y="125" text-anchor="middle" class="step">Dwork et al. 2012</text>
   <text x="480" y="145" text-anchor="middle" class="small">|f(x) - f(x')| &lt;= L * d(x, x')</text>
-  <text x="480" y="165" text-anchor="middle" class="small">Lipschitz; d task-specific</text>
+  <text x="480" y="165" text-anchor="middle" class="small">满足 Lipschitz 条件；d 取决于任务</text>
   <rect x="360" y="190" width="240" height="60" class="cold"/>
-  <text x="480" y="215" text-anchor="middle" class="step">similar individuals</text>
-  <text x="480" y="233" text-anchor="middle" class="small">get similar decisions</text>
+  <text x="480" y="215" text-anchor="middle" class="step">相似个体</text>
+  <text x="480" y="233" text-anchor="middle" class="small">得到相似决策</text>
 
   <rect x="640" y="60" width="280" height="200" class="box"/>
-  <text x="780" y="85" text-anchor="middle" class="head">counterfactual fairness</text>
+  <text x="780" y="85" text-anchor="middle" class="head">反事实公平</text>
   <rect x="660" y="100" width="240" height="80" class="hot"/>
   <text x="780" y="125" text-anchor="middle" class="step">Kusner et al. 2017</text>
-  <text x="780" y="145" text-anchor="middle" class="small">invariant under attribute</text>
-  <text x="780" y="165" text-anchor="middle" class="small">counterfactual</text>
+  <text x="780" y="145" text-anchor="middle" class="small">受保护属性的反事实变化</text>
+  <text x="780" y="165" text-anchor="middle" class="small">不改变结果</text>
   <rect x="660" y="190" width="240" height="60" class="hot"/>
-  <text x="780" y="215" text-anchor="middle" class="step">needs causal DAG</text>
-  <text x="780" y="233" text-anchor="middle" class="small">backtracking (2024) sidesteps</text>
+  <text x="780" y="215" text-anchor="middle" class="step">需要因果 DAG</text>
+  <text x="780" y="233" text-anchor="middle" class="small">回溯方法（2024）绕开该问题</text>
 
   <rect x="40" y="290" width="880" height="200" class="box"/>
-  <text x="480" y="315" text-anchor="middle" class="head">impossibility + reconciliation</text>
-  <text x="60" y="345" class="small">Chouldechova, KMR 2017: under unequal base rates, the three group criteria cannot all hold.</text>
-  <text x="60" y="365" class="small">policy choice: demographic parity gives equal access; equalized odds preserves accuracy equity;</text>
-  <text x="60" y="385" class="small">conditional use accuracy equality preserves predictive-value equity. each has a constituency.</text>
-  <text x="60" y="415" class="small">2024 NeurIPS: CF-accuracy trade-off is bounded; model-agnostic conversion of optimal-unfair -&gt; CF.</text>
-  <text x="60" y="435" class="small">backtracking counterfactuals (arXiv:2401.13935): avoid intervening on protected attributes.</text>
-  <text x="60" y="455" class="small">ICLR 2024 reconciliation: with explicit causal graphs, group and counterfactual are facets of one structure.</text>
-  <text x="60" y="475" class="small">impossibility still holds on base rates; reconciliation is about what is being measured.</text>
+  <text x="480" y="315" text-anchor="middle" class="head">不可能性与调和</text>
+  <text x="60" y="345" class="small">Chouldechova、KMR 2017：基率不同时，三项群体标准不能同时成立。</text>
+  <text x="60" y="365" class="small">政策选择：人口统计均等提供平等准入；均等化胜算保持准确性公平；</text>
+  <text x="60" y="385" class="small">条件使用准确率相等保持预测值公平。各项标准面向不同利益群体。</text>
+  <text x="60" y="415" class="small">2024 NeurIPS：反事实公平与准确率的权衡有界；可将最优不公平模型以模型无关方式转为反事实公平模型。</text>
+  <text x="60" y="435" class="small">回溯反事实（arXiv:2401.13935）：避免对受保护属性施加干预。</text>
+  <text x="60" y="455" class="small">ICLR 2024 的调和：有显式因果图时，群体公平与反事实公平是同一结构的不同侧面。</text>
+  <text x="60" y="475" class="small">基率上的不可能性仍成立；调和讨论的是测量对象。</text>
 </svg>

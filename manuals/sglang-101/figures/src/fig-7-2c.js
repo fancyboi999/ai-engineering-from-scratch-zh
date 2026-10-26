@@ -12,7 +12,7 @@ const median = values => {
 };
 const t = run.timers_s;
 const items = [
-  { name: 'rollout', value: median(run.rollouts.map(r => r['perf/rollout_time'])), hue: 'blue' },
+  { name: 'rollout 采样', value: median(run.rollouts.map(r => r['perf/rollout_time'])), hue: 'blue' },
   { name: "对数概率", value: t.log_probs.median, hue: 'violet' },
   { name: "训练", value: t.actor_train.median, hue: 'violet' },
   { name: "权重", value: t.update_weights.median, hue: 'amber' },

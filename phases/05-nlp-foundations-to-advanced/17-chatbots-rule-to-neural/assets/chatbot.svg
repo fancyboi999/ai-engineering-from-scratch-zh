@@ -15,59 +15,59 @@
   </defs>
 
   <rect class="box" x="20" y="30" width="200" height="300" rx="4"/>
-  <text class="label" x="120" y="55" text-anchor="middle">rule-based</text>
-  <text class="note" x="35" y="78">1960s → today for safety-critical</text>
+  <text class="label" x="120" y="55" text-anchor="middle">基于规则</text>
+  <text class="note" x="35" y="78">1960 年代 → 如今仍用于安全关键场景</text>
   <text class="content" x="35" y="105">IF matches "i want"</text>
   <text class="content" x="35" y="125">THEN "why do you want"</text>
-  <text class="content" x="35" y="165">intent classifier</text>
-  <text class="content" x="35" y="183">+ slot filling</text>
-  <text class="content" x="35" y="201">+ state machine</text>
-  <text class="note" x="35" y="235">pro: predictable,</text>
-  <text class="note" x="35" y="250">deterministic,</text>
-  <text class="note" x="35" y="265">no hallucination</text>
-  <text class="note" x="35" y="290">con: narrow scope</text>
-  <text class="note" x="35" y="305">doesn't handle novel inputs</text>
+  <text class="content" x="35" y="165">意图分类器</text>
+  <text class="content" x="35" y="183">+ 槽位填充</text>
+  <text class="content" x="35" y="201">+ 状态机</text>
+  <text class="note" x="35" y="235">优点：可预测，</text>
+  <text class="note" x="35" y="250">结果确定，</text>
+  <text class="note" x="35" y="265">无幻觉</text>
+  <text class="note" x="35" y="290">缺点：适用范围窄</text>
+  <text class="note" x="35" y="305">无法处理新输入</text>
 
   <rect class="box" x="240" y="30" width="200" height="300" rx="4"/>
-  <text class="label" x="340" y="55" text-anchor="middle">retrieval-based</text>
-  <text class="note" x="255" y="78">2010s. still ships for FAQs</text>
-  <text class="content" x="255" y="105">encode utterance,</text>
-  <text class="content" x="255" y="123">find nearest match,</text>
-  <text class="content" x="255" y="141">return stored response</text>
-  <text class="content" x="255" y="180">threshold for refusal</text>
-  <text class="note" x="255" y="220">pro: handles paraphrase,</text>
-  <text class="note" x="255" y="235">no hallucination,</text>
-  <text class="note" x="255" y="250">scales cheaply</text>
-  <text class="note" x="255" y="280">con: can't combine info,</text>
-  <text class="note" x="255" y="295">can't do multi-turn</text>
-  <text class="note" x="255" y="310">reasoning</text>
+  <text class="label" x="340" y="55" text-anchor="middle">基于检索</text>
+  <text class="note" x="255" y="78">2010 年代，如今仍用于常见问题解答</text>
+  <text class="content" x="255" y="105">编码用户话语，</text>
+  <text class="content" x="255" y="123">查找最近匹配，</text>
+  <text class="content" x="255" y="141">返回已存储的回答</text>
+  <text class="content" x="255" y="180">拒答阈值</text>
+  <text class="note" x="255" y="220">优点：能处理同义改写，</text>
+  <text class="note" x="255" y="235">无幻觉，</text>
+  <text class="note" x="255" y="250">扩展成本低</text>
+  <text class="note" x="255" y="280">缺点：无法组合信息，</text>
+  <text class="note" x="255" y="295">无法进行多轮</text>
+  <text class="note" x="255" y="310">推理</text>
 
   <rect class="box" x="460" y="30" width="200" height="300" rx="4"/>
-  <text class="label" x="560" y="55" text-anchor="middle">neural (seq2seq)</text>
-  <text class="note" x="475" y="78">2014-2019. rarely solo now</text>
-  <text class="content" x="475" y="105">encoder-decoder on</text>
-  <text class="content" x="475" y="123">conversation logs</text>
-  <text class="content" x="475" y="141">generates from scratch</text>
-  <text class="note" x="475" y="180">pro: fluent phrasing</text>
-  <text class="note" x="475" y="220">con: generic outputs</text>
+  <text class="label" x="560" y="55" text-anchor="middle">神经网络（seq2seq）</text>
+  <text class="note" x="475" y="78">2014-2019 年，如今很少单独使用</text>
+  <text class="content" x="475" y="105">编码器-解码器基于</text>
+  <text class="content" x="475" y="123">对话日志训练</text>
+  <text class="content" x="475" y="141">从零生成</text>
+  <text class="note" x="475" y="180">优点：表达流畅</text>
+  <text class="note" x="475" y="220">缺点：回答泛泛</text>
   <text class="note" x="475" y="235">("I don't know"),</text>
-  <text class="note" x="475" y="250">factual drift, no grounding,</text>
-  <text class="note" x="475" y="265">no tool use</text>
-  <text class="note" x="475" y="290">used inside hybrids today,</text>
-  <text class="note" x="475" y="305">not solo</text>
+  <text class="note" x="475" y="250">事实漂移、缺少依据，</text>
+  <text class="note" x="475" y="265">不能使用工具</text>
+  <text class="note" x="475" y="290">如今用于混合系统内部，</text>
+  <text class="note" x="475" y="305">而非独立运行</text>
 
   <rect class="hot" x="680" y="30" width="200" height="300" rx="4"/>
-  <text class="label" x="780" y="55" text-anchor="middle">LLM agent loop</text>
-  <text class="note" x="695" y="78">2023 → 2026 production</text>
-  <text class="content" x="695" y="105">plan → call tool</text>
-  <text class="content" x="695" y="123">   → observe → decide</text>
-  <text class="content" x="695" y="141">   → ... → answer</text>
-  <text class="content" x="695" y="175">RAG grounding</text>
-  <text class="content" x="695" y="195">tool contracts</text>
-  <text class="content" x="695" y="215">eval + observability</text>
-  <text class="note" x="695" y="245">pro: takes actions,</text>
-  <text class="note" x="695" y="260">handles novelty</text>
-  <text class="note" x="695" y="290">con: harder to reason about,</text>
-  <text class="note" x="695" y="305">prompt injection,</text>
-  <text class="note" x="695" y="320">infinite loops</text>
+  <text class="label" x="780" y="55" text-anchor="middle">LLM agent 循环</text>
+  <text class="note" x="695" y="78">2023 → 2026 年进入生产环境</text>
+  <text class="content" x="695" y="105">规划 → 调用工具</text>
+  <text class="content" x="695" y="123">   → 观察 → 决策</text>
+  <text class="content" x="695" y="141">   → ... → 回答</text>
+  <text class="content" x="695" y="175">RAG 提供依据</text>
+  <text class="content" x="695" y="195">工具契约</text>
+  <text class="content" x="695" y="215">评测 + 可观测性</text>
+  <text class="note" x="695" y="245">优点：可以执行操作，</text>
+  <text class="note" x="695" y="260">能处理新情况</text>
+  <text class="note" x="695" y="290">缺点：行为更难推演，</text>
+  <text class="note" x="695" y="305">prompt 注入，</text>
+  <text class="note" x="695" y="320">无限循环</text>
 </svg>

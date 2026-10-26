@@ -13,48 +13,48 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">LLM rollout sequence — shadow → canary → A/B → 100%</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLM 发布顺序：影子 → 金丝雀 → A/B → 100%</text>
 
   <rect x="40" y="50" width="280" height="180" class="shadow"/>
-  <text x="180" y="72" text-anchor="middle" class="head">1. shadow mode</text>
-  <text x="180" y="92" text-anchor="middle" class="step">zero user impact</text>
-  <text x="60" y="118" class="small">· duplicate prod requests to candidate</text>
-  <text x="60" y="136" class="small">· log outputs, token counts, latency</text>
-  <text x="60" y="154" class="small">· diff vs production output</text>
-  <text x="60" y="172" class="small">· catches: cost spikes, length shifts,</text>
-  <text x="60" y="190" class="small">  obvious refusal changes, hard errors</text>
-  <text x="180" y="214" text-anchor="middle" class="caption">not a quality test — a smoke test</text>
+  <text x="180" y="72" text-anchor="middle" class="head">1. 影子模式</text>
+  <text x="180" y="92" text-anchor="middle" class="step">对用户零影响</text>
+  <text x="60" y="118" class="small">· 将生产请求复制到候选模型</text>
+  <text x="60" y="136" class="small">· 记录输出、token 数与延迟</text>
+  <text x="60" y="154" class="small">· 对比生产输出的差异</text>
+  <text x="60" y="172" class="small">· 发现：成本突增、长度变化、</text>
+  <text x="60" y="190" class="small">  明显拒答变化、明确错误</text>
+  <text x="180" y="214" text-anchor="middle" class="caption">这是冒烟测试，不是质量测试</text>
 
   <rect x="340" y="50" width="280" height="180" class="canary"/>
-  <text x="480" y="72" text-anchor="middle" class="head">2. canary rollout</text>
+  <text x="480" y="72" text-anchor="middle" class="head">2. 金丝雀发布</text>
   <text x="480" y="92" text-anchor="middle" class="step">1% → 10% → 25% → 50% → 75% → 100%</text>
-  <text x="360" y="118" class="small">· five gates at each step:</text>
-  <text x="360" y="136" class="small">  latency P99 &gt; 1.5x baseline</text>
-  <text x="360" y="154" class="small">  cost/request &gt; 1.2x baseline</text>
-  <text x="360" y="172" class="small">  error/refusal &gt; 2x baseline</text>
-  <text x="360" y="190" class="small">  output-length shift &gt; 1.4x</text>
-  <text x="360" y="208" class="small">  thumbs-down &gt; 1.5x baseline</text>
+  <text x="360" y="118" class="small">· 每一步设置五项关卡：</text>
+  <text x="360" y="136" class="small">  P99 延迟 &gt; 基线 1.5x</text>
+  <text x="360" y="154" class="small">  每请求成本 &gt; 基线 1.2x</text>
+  <text x="360" y="172" class="small">  错误/拒答 &gt; 基线 2x</text>
+  <text x="360" y="190" class="small">  输出长度偏移 &gt; 1.4x</text>
+  <text x="360" y="208" class="small">  差评 &gt; 基线 1.5x</text>
 
   <rect x="640" y="50" width="280" height="180" class="ab"/>
-  <text x="780" y="72" text-anchor="middle" class="head">3. A/B (optional)</text>
-  <text x="780" y="92" text-anchor="middle" class="step">only for distinct alternatives</text>
-  <text x="660" y="118" class="small">· 50/50 split</text>
-  <text x="660" y="136" class="small">· run until stats significance</text>
-  <text x="660" y="154" class="small">· CUPED / sequential / Benjamini-H</text>
-  <text x="660" y="172" class="small">· skip if just improved variant</text>
-  <text x="660" y="190" class="small">· Phase 17 · 21 covers GrowthBook +</text>
-  <text x="660" y="208" class="small">  Statsig semantics</text>
+  <text x="780" y="72" text-anchor="middle" class="head">3. A/B（可选）</text>
+  <text x="780" y="92" text-anchor="middle" class="step">仅用于明显不同的候选方案</text>
+  <text x="660" y="118" class="small">· 50/50 分流</text>
+  <text x="660" y="136" class="small">· 运行至统计显著</text>
+  <text x="660" y="154" class="small">· CUPED / 序贯检验 / Benjamini-H</text>
+  <text x="660" y="172" class="small">· 仅为改进版本时跳过</text>
+  <text x="660" y="190" class="small">· 阶段 17 · 21 介绍 GrowthBook +</text>
+  <text x="660" y="208" class="small">  Statsig 语义</text>
 
   <rect x="40" y="250" width="880" height="100" class="gate"/>
-  <text x="480" y="272" text-anchor="middle" class="head">non-determinism sets the noise floor</text>
-  <text x="480" y="294" text-anchor="middle" class="step">up to 15% run-to-run variance on identical inputs</text>
-  <text x="480" y="314" text-anchor="middle" class="small">causes: GPU FP non-associativity, batch-size variance, sampling</text>
-  <text x="480" y="334" text-anchor="middle" class="caption">gates must sit above the noise floor, not at identity with baseline</text>
+  <text x="480" y="272" text-anchor="middle" class="head">非确定性决定噪声下限</text>
+  <text x="480" y="294" text-anchor="middle" class="step">相同输入的多次运行差异可达 15%</text>
+  <text x="480" y="314" text-anchor="middle" class="small">原因：GPU 浮点非结合性、批大小变化、采样</text>
+  <text x="480" y="334" text-anchor="middle" class="caption">关卡必须高于噪声下限，不能要求与基线完全一致</text>
 
   <rect x="40" y="370" width="880" height="110" class="box"/>
-  <text x="480" y="392" text-anchor="middle" class="head">rollback in seconds</text>
-  <text x="480" y="414" text-anchor="middle" class="step">policy flag (feature flags) + model pin (registry digest)</text>
-  <text x="480" y="434" text-anchor="middle" class="step">rollback = flip flag + revert digest</text>
-  <text x="480" y="454" text-anchor="middle" class="small">if rollback requires redeploy you are too slow — fix the stack first</text>
-  <text x="480" y="474" text-anchor="middle" class="caption">tooling: Argo Rollouts, Flagger, Istio weighted, KServe, feature flag system</text>
+  <text x="480" y="392" text-anchor="middle" class="head">数秒内回滚</text>
+  <text x="480" y="414" text-anchor="middle" class="step">策略开关（功能开关）+ 固定模型（注册表摘要）</text>
+  <text x="480" y="434" text-anchor="middle" class="step">回滚 = 切换开关 + 恢复摘要</text>
+  <text x="480" y="454" text-anchor="middle" class="small">若回滚需要重新部署，则速度过慢：先修正技术栈</text>
+  <text x="480" y="474" text-anchor="middle" class="caption">工具：Argo Rollouts、Flagger、Istio 加权、KServe、功能开关系统</text>
 </svg>

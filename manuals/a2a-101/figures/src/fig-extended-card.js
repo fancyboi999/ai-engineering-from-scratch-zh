@@ -34,4 +34,6 @@ module.exports = figure('fig-extended-card', {
     const x2 = lanes[to].x;
     f.arrow([x1, y], [x2 + (x2 > x1 ? -1 : 1), y], { style, label, note, labelX: (x1 + x2) / 2 });
   });
-});
+})
+  // 保留冻结背景几何，只替换最终 SVG 中的完整文字节点。
+  .replace(">bearer token</text>", ">bearer 令牌</text>");

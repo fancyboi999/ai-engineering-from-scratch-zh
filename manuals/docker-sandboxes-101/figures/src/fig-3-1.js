@@ -29,8 +29,8 @@ module.exports = figure('fig-3-1', {
 
   f.kicker(470, 110, '入口');
   const doors = [
-    { y: 130, hue: 'indigo', title: 'network', sub: 'HTTPS_PROXY :3128' },
-    { y: 192, hue: 'teal', title: 'secret', sub: 'proxy-managed 哨兵值' },
+    { y: 130, hue: 'indigo', title: '网络', sub: 'HTTPS_PROXY :3128' },
+    { y: 192, hue: 'teal', title: '密钥', sub: 'proxy-managed 哨兵值' },
     { y: 254, hue: 'olive', title: 'MCP', sub: 'MCP_GATEWAY_URL' },
     { y: 316, hue: 'grey', title: 'SSH agent', sub: '/run/ssh-agent.sock' },
     { y: 378, hue: 'green', title: '绑定挂载', sub: '宿主路径，rw' },

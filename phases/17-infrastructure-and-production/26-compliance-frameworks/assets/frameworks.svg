@@ -14,63 +14,63 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">LLM compliance — seven frameworks, one matrix</text>
+  <text x="480" y="24" text-anchor="middle" class="title">LLM 合规：七套框架，一张矩阵</text>
 
   <rect x="40" y="50" width="220" height="100" class="soc"/>
   <text x="150" y="72" text-anchor="middle" class="head">SOC 2 Type II</text>
-  <text x="150" y="92" text-anchor="middle" class="step">B2B SaaS baseline</text>
-  <text x="150" y="110" text-anchor="middle" class="small">6-12 months operated controls</text>
-  <text x="150" y="128" text-anchor="middle" class="small">Type I is a starter, not a gate</text>
+  <text x="150" y="92" text-anchor="middle" class="step">B2B SaaS 基线</text>
+  <text x="150" y="110" text-anchor="middle" class="small">控制措施运行 6-12 个月</text>
+  <text x="150" y="128" text-anchor="middle" class="small">Type I 是起点，不是门禁</text>
 
   <rect x="280" y="50" width="220" height="100" class="hipaa"/>
   <text x="390" y="72" text-anchor="middle" class="head">HIPAA</text>
-  <text x="390" y="92" text-anchor="middle" class="step">BAA required for PHI</text>
+  <text x="390" y="92" text-anchor="middle" class="step">处理 PHI 必须签订 BAA</text>
   <text x="390" y="110" text-anchor="middle" class="small">Bedrock, Azure, Vertex, OpenAI, Anthropic</text>
-  <text x="390" y="128" text-anchor="middle" class="small">all provide BAA</text>
+  <text x="390" y="128" text-anchor="middle" class="small">均提供 BAA</text>
 
   <rect x="520" y="50" width="220" height="100" class="gdpr"/>
   <text x="630" y="72" text-anchor="middle" class="head">GDPR</text>
-  <text x="630" y="92" text-anchor="middle" class="step">real-time PII redaction</text>
-  <text x="630" y="110" text-anchor="middle" class="small">post-processing not defensible</text>
-  <text x="630" y="128" text-anchor="middle" class="small">Clearview AI €30.5M (2024); OpenAI €15M (2024, overturned)</text>
+  <text x="630" y="92" text-anchor="middle" class="step">实时 PII 脱敏</text>
+  <text x="630" y="110" text-anchor="middle" class="small">事后处理难以作为合规依据</text>
+  <text x="630" y="128" text-anchor="middle" class="small">Clearview AI €30.5M（2024）；OpenAI €15M（2024，已撤销）</text>
 
   <rect x="760" y="50" width="160" height="100" class="box"/>
   <text x="840" y="72" text-anchor="middle" class="head">PCI-DSS</text>
-  <text x="840" y="92" text-anchor="middle" class="step">payment-data scope</text>
-  <text x="840" y="110" text-anchor="middle" class="small">config + contracts</text>
-  <text x="840" y="128" text-anchor="middle" class="small">for AI-interaction layer</text>
+  <text x="840" y="92" text-anchor="middle" class="step">支付数据范围</text>
+  <text x="840" y="110" text-anchor="middle" class="small">配置 + 合同</text>
+  <text x="840" y="128" text-anchor="middle" class="small">覆盖 AI 交互层</text>
 
   <rect x="40" y="170" width="340" height="120" class="eu"/>
-  <text x="210" y="192" text-anchor="middle" class="head">EU AI Act</text>
-  <text x="60" y="216" class="step">· in force August 1, 2024</text>
-  <text x="60" y="234" class="step">· high-risk enforcement August 2, 2026</text>
-  <text x="60" y="252" class="step">· fines up to €35M or 7% global turnover</text>
-  <text x="60" y="270" class="step">· risk tiers: unacceptable / high / limited / minimal</text>
-  <text x="210" y="285" text-anchor="middle" class="caption">most B2B LLM SaaS is limited-risk</text>
+  <text x="210" y="192" text-anchor="middle" class="head">欧盟 AI 法案</text>
+  <text x="60" y="216" class="step">· 2024 年八月 1 日生效</text>
+  <text x="60" y="234" class="step">· 高风险规则于 2026 年八月 2 日执行</text>
+  <text x="60" y="252" class="step">· 最高罚款 €35M 或全球营业额的 7%</text>
+  <text x="60" y="270" class="step">· 风险等级：不可接受 / 高 / 有限 / 最低</text>
+  <text x="210" y="285" text-anchor="middle" class="caption">多数 B2B LLM SaaS 属于有限风险</text>
 
   <rect x="400" y="170" width="300" height="120" class="box"/>
-  <text x="550" y="192" text-anchor="middle" class="head">Colorado AI Act</text>
-  <text x="420" y="216" class="step">· effective June 30, 2026 (delayed)</text>
-  <text x="420" y="234" class="step">· impact assessments</text>
-  <text x="420" y="252" class="step">· right to appeal AI decisions</text>
-  <text x="420" y="270" class="step">· Virginia similar for credit / employment</text>
+  <text x="550" y="192" text-anchor="middle" class="head">科罗拉多州 AI 法案</text>
+  <text x="420" y="216" class="step">· 生效日推迟至 2026 年六月 30 日</text>
+  <text x="420" y="234" class="step">· 影响评估</text>
+  <text x="420" y="252" class="step">· 对 AI 决策提出申诉的权利</text>
+  <text x="420" y="270" class="step">· 弗吉尼亚州对信贷与就业有类似规则</text>
 
   <rect x="720" y="170" width="200" height="120" class="emerging"/>
   <text x="820" y="192" text-anchor="middle" class="head">ISO 42001</text>
-  <text x="820" y="212" text-anchor="middle" class="step">AI governance</text>
-  <text x="820" y="230" text-anchor="middle" class="small">risk mgmt</text>
-  <text x="820" y="248" text-anchor="middle" class="small">transparency</text>
-  <text x="820" y="266" text-anchor="middle" class="small">human oversight</text>
-  <text x="820" y="284" text-anchor="middle" class="caption">pairs with ISO 27001</text>
+  <text x="820" y="212" text-anchor="middle" class="step">AI 治理</text>
+  <text x="820" y="230" text-anchor="middle" class="small">风险管理</text>
+  <text x="820" y="248" text-anchor="middle" class="small">透明度</text>
+  <text x="820" y="266" text-anchor="middle" class="small">人工监督</text>
+  <text x="820" y="284" text-anchor="middle" class="caption">与 ISO 27001 配套</text>
 
   <rect x="40" y="310" width="880" height="90" class="box"/>
-  <text x="480" y="332" text-anchor="middle" class="head">cross-framework mapping — one control satisfies many</text>
-  <text x="60" y="358" class="small">access logging: ISO 27001 A.5.15-18 · GDPR Art. 32 · HIPAA §164.312(a) · SOC 2 CC6</text>
-  <text x="60" y="376" class="small">encryption in transit: ISO A.8.24 · GDPR Art. 32 · HIPAA §164.312(e) · PCI Req. 4</text>
-  <text x="60" y="394" class="small">audit log retention: SOC 2 CC7 · HIPAA §164.312(b) · ISO A.8.15</text>
+  <text x="480" y="332" text-anchor="middle" class="head">跨框架映射：一项控制满足多套要求</text>
+  <text x="60" y="358" class="small">访问日志：ISO 27001 A.5.15-18 · GDPR Art. 32 · HIPAA §164.312(a) · SOC 2 CC6</text>
+  <text x="60" y="376" class="small">传输加密：ISO A.8.24 · GDPR Art. 32 · HIPAA §164.312(e) · PCI Req. 4</text>
+  <text x="60" y="394" class="small">审计日志保留：SOC 2 CC7 · HIPAA §164.312(b) · ISO A.8.15</text>
 
   <rect x="40" y="410" width="880" height="80" class="box"/>
-  <text x="480" y="432" text-anchor="middle" class="head">reference profile — OpenAI 2026</text>
+  <text x="480" y="432" text-anchor="middle" class="head">参考合规档案：OpenAI 2026</text>
   <text x="480" y="454" text-anchor="middle" class="step">SOC 2 Type 2 · ISO/IEC 27001:2022 · ISO/IEC 27701:2019 · GDPR · CCPA</text>
-  <text x="480" y="474" text-anchor="middle" class="step">HIPAA (BAA) · FERPA · PCI-DSS (ChatGPT payments)</text>
+  <text x="480" y="474" text-anchor="middle" class="step">HIPAA（BAA）· FERPA · PCI-DSS（ChatGPT 支付）</text>
 </svg>

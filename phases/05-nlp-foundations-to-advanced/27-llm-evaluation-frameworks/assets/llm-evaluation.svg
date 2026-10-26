@@ -15,56 +15,56 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">RAG evaluation — four dimensions, LLM-as-judge backend</text>
+  <text x="450" y="28" text-anchor="middle" class="title">RAG 评测 — 四个维度，以 LLM 为评审</text>
 
   <!-- Inputs: question, context, answer -->
   <rect x="40" y="55" width="250" height="30" class="box"/>
-  <text x="165" y="75" text-anchor="middle" class="content">question: "When was iPhone released?"</text>
+  <text x="165" y="75" text-anchor="middle" class="content">问题：“iPhone 何时发布？”</text>
 
   <rect x="40" y="95" width="250" height="55" class="box"/>
-  <text x="165" y="114" text-anchor="middle" class="content">retrieved context:</text>
+  <text x="165" y="114" text-anchor="middle" class="content">检索上下文：</text>
   <text x="165" y="132" text-anchor="middle" class="mono">"Apple released first iPhone</text>
   <text x="165" y="145" text-anchor="middle" class="mono">June 29, 2007."</text>
 
   <rect x="40" y="160" width="250" height="30" class="box"/>
-  <text x="165" y="180" text-anchor="middle" class="content">answer: "June 29, 2007."</text>
+  <text x="165" y="180" text-anchor="middle" class="content">答案：“June 29, 2007.”</text>
 
   <line x1="290" y1="125" x2="330" y2="125" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Judge -->
   <rect x="330" y="80" width="220" height="130" class="judge"/>
-  <text x="440" y="105" text-anchor="middle" class="label">LLM judge</text>
+  <text x="440" y="105" text-anchor="middle" class="label">LLM 评审</text>
   <text x="440" y="128" text-anchor="middle" class="caption">(GPT-4o-mini, Haiku, Mistral-small)</text>
   <text x="440" y="155" text-anchor="middle" class="mono">score(q, ctx, ans) → 0..1</text>
-  <text x="440" y="180" text-anchor="middle" class="caption">rubric + chain-of-thought</text>
-  <text x="440" y="198" text-anchor="middle" class="caption">calibrated vs human</text>
+  <text x="440" y="180" text-anchor="middle" class="caption">评分标准 + 思维链</text>
+  <text x="440" y="198" text-anchor="middle" class="caption">与人工评分校准</text>
 
   <line x1="550" y1="125" x2="590" y2="125" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Metrics panel -->
   <rect x="590" y="55" width="270" height="250" class="box"/>
-  <text x="725" y="80" text-anchor="middle" class="label">four RAG metrics</text>
+  <text x="725" y="80" text-anchor="middle" class="label">四项 RAG 指标</text>
 
   <rect x="605" y="95" width="240" height="45" class="metric"/>
-  <text x="615" y="115" class="label">faithfulness</text>
-  <text x="615" y="132" class="caption">claims in answer entailed by context?</text>
+  <text x="615" y="115" class="label">忠实度</text>
+  <text x="615" y="132" class="caption">答案中的主张是否由上下文蕴含？</text>
 
   <rect x="605" y="145" width="240" height="45" class="metric"/>
-  <text x="615" y="165" class="label">answer relevance</text>
-  <text x="615" y="182" class="caption">answer addresses the question?</text>
+  <text x="615" y="165" class="label">答案相关性</text>
+  <text x="615" y="182" class="caption">答案是否回应问题？</text>
 
   <rect x="605" y="195" width="240" height="45" class="metric"/>
-  <text x="615" y="215" class="label">context precision</text>
-  <text x="615" y="232" class="caption">fraction of retrieved chunks relevant</text>
+  <text x="615" y="215" class="label">上下文精确率</text>
+  <text x="615" y="232" class="caption">检索分块中相关内容的比例</text>
 
   <rect x="605" y="245" width="240" height="45" class="metric"/>
-  <text x="615" y="265" class="label">context recall</text>
-  <text x="615" y="282" class="caption">retrieved set covers gold answer?</text>
+  <text x="615" y="265" class="label">上下文召回率</text>
+  <text x="615" y="282" class="caption">检索集合是否覆盖标准答案？</text>
 
   <!-- Bottom -->
   <rect x="40" y="335" width="820" height="95" class="box"/>
-  <text x="55" y="358" class="label">cost / calibration / CI</text>
-  <text x="55" y="378" class="content">$0.001 – $0.003 per judged case with GPT-4o-mini  —  &lt;$5 per 1000-sample regression run</text>
-  <text x="55" y="396" class="content">required: Spearman ρ &gt; 0.7 vs 50 hand-labeled cases before trusting the number</text>
-  <text x="55" y="414" class="content">gate: pytest + DeepEval thresholds; freeze judge model + version; surface bottom-10%</text>
+  <text x="55" y="358" class="label">成本 / 校准 / 置信区间</text>
+  <text x="55" y="378" class="content">GPT-4o-mini 每个评审案例 $0.001 – $0.003 — 每次 1000 样本回归运行 &lt;$5</text>
+  <text x="55" y="396" class="content">要求：与 50 个人工标注案例的 Spearman ρ &gt; 0.7，之后才可信任该得分</text>
+  <text x="55" y="414" class="content">关卡：pytest + DeepEval 阈值；冻结评审模型 + 版本；展示最低 10% 案例</text>
 </svg>

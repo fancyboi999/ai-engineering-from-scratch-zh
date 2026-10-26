@@ -13,47 +13,47 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Three pillars of in-context scheming (Apollo 2024)</text>
+  <text x="480" y="24" text-anchor="middle" class="title">上下文内密谋的三支柱（Apollo 2024）</text>
 
   <rect x="40" y="60" width="260" height="220" class="box"/>
-  <text x="170" y="82" text-anchor="middle" class="head">Misalignment</text>
+  <text x="170" y="82" text-anchor="middle" class="head">失对齐</text>
   <rect x="60" y="100" width="220" height="50" class="hot"/>
-  <text x="170" y="122" text-anchor="middle" class="step">orthogonal goal</text>
-  <text x="170" y="140" text-anchor="middle" class="small">in environment or prompt</text>
+  <text x="170" y="122" text-anchor="middle" class="step">与用户目标正交的目标</text>
+  <text x="170" y="140" text-anchor="middle" class="small">位于环境或 prompt 中</text>
   <rect x="60" y="170" width="220" height="50" class="hot"/>
-  <text x="170" y="192" text-anchor="middle" class="step">action serves it</text>
-  <text x="170" y="210" text-anchor="middle" class="small">not user instructions</text>
-  <text x="170" y="250" text-anchor="middle" class="caption">alignment training targets this.</text>
-  <text x="170" y="266" text-anchor="middle" class="caption">incomplete: proxy is imperfect.</text>
+  <text x="170" y="192" text-anchor="middle" class="step">行动服务该目标</text>
+  <text x="170" y="210" text-anchor="middle" class="small">而非用户指令</text>
+  <text x="170" y="250" text-anchor="middle" class="caption">对齐训练针对这一点。</text>
+  <text x="170" y="266" text-anchor="middle" class="caption">仍不完整：代理目标不完美。</text>
 
   <rect x="350" y="60" width="260" height="220" class="box"/>
-  <text x="480" y="82" text-anchor="middle" class="head">Goal-directedness</text>
+  <text x="480" y="82" text-anchor="middle" class="head">目标导向性</text>
   <rect x="370" y="100" width="220" height="50" class="cool"/>
-  <text x="480" y="122" text-anchor="middle" class="step">multi-step plan</text>
-  <text x="480" y="140" text-anchor="middle" class="small">not one-shot error</text>
+  <text x="480" y="122" text-anchor="middle" class="step">多步骤计划</text>
+  <text x="480" y="140" text-anchor="middle" class="small">而非单次错误</text>
   <rect x="370" y="170" width="220" height="50" class="cool"/>
-  <text x="480" y="192" text-anchor="middle" class="step">coherent across turns</text>
-  <text x="480" y="210" text-anchor="middle" class="small">cover story holds</text>
-  <text x="480" y="250" text-anchor="middle" class="caption">elicitation-hardening targets this.</text>
-  <text x="480" y="266" text-anchor="middle" class="caption">capability bounds here.</text>
+  <text x="480" y="192" text-anchor="middle" class="step">跨轮次保持一致</text>
+  <text x="480" y="210" text-anchor="middle" class="small">掩饰说法持续成立</text>
+  <text x="480" y="250" text-anchor="middle" class="caption">诱发能力强化针对这一点。</text>
+  <text x="480" y="266" text-anchor="middle" class="caption">能力边界位于此处。</text>
 
   <rect x="660" y="60" width="260" height="220" class="box"/>
-  <text x="790" y="82" text-anchor="middle" class="head">Situational awareness</text>
+  <text x="790" y="82" text-anchor="middle" class="head">情境感知</text>
   <rect x="680" y="100" width="220" height="50" class="cold"/>
-  <text x="790" y="122" text-anchor="middle" class="step">knows: eval vs deployment</text>
-  <text x="790" y="140" text-anchor="middle" class="small">reads cues in prompt + tools</text>
+  <text x="790" y="122" text-anchor="middle" class="step">知道处于评估还是部署</text>
+  <text x="790" y="140" text-anchor="middle" class="small">读取 prompt 与工具中的线索</text>
   <rect x="680" y="170" width="220" height="50" class="cold"/>
-  <text x="790" y="192" text-anchor="middle" class="step">suppresses on eval</text>
-  <text x="790" y="210" text-anchor="middle" class="small">executes on deployment</text>
-  <text x="790" y="250" text-anchor="middle" class="caption">eval reliability collapses here.</text>
-  <text x="790" y="266" text-anchor="middle" class="caption">anti-scheming training amplifies.</text>
+  <text x="790" y="192" text-anchor="middle" class="step">评估时抑制行为</text>
+  <text x="790" y="210" text-anchor="middle" class="small">部署时执行行为</text>
+  <text x="790" y="250" text-anchor="middle" class="caption">评估可靠性在此崩塌。</text>
+  <text x="790" y="266" text-anchor="middle" class="caption">反密谋训练反而强化它。</text>
 
   <rect x="40" y="320" width="880" height="170" class="box"/>
-  <text x="480" y="345" text-anchor="middle" class="head">all three required — defenses must cover each</text>
-  <text x="60" y="372" class="small">misalignment alone -&gt; one-shot errors, not scheming.</text>
-  <text x="60" y="392" class="small">misalignment + goal-directedness without SA -&gt; open defection; detectable by normal monitoring.</text>
-  <text x="60" y="412" class="small">all three -&gt; scheming. cover story persists. covert action succeeds. evaluation underreports.</text>
-  <text x="60" y="438" class="small">2025 anti-scheming: covert-action rate 13% -&gt; 0.4% (o3). but situational-awareness rate increases.</text>
-  <text x="60" y="458" class="small">residual uncertainty: how much reduction is "less misaligned" vs "better at hiding" is open.</text>
-  <text x="60" y="478" class="small">safety-case implication: attack each pillar separately. interpretability probes bypass SA entirely.</text>
+  <text x="480" y="345" text-anchor="middle" class="head">三者缺一不可；防御必须逐项覆盖</text>
+  <text x="60" y="372" class="small">只有失对齐 -&gt; 单次错误，而非密谋。</text>
+  <text x="60" y="392" class="small">失对齐 + 目标导向性，但无情境感知 -&gt; 公开违背，可由常规监控发现。</text>
+  <text x="60" y="412" class="small">三者齐全 -&gt; 密谋。掩饰持续、隐蔽行动成功、评估低估风险。</text>
+  <text x="60" y="438" class="small">2025 反密谋训练：o3 隐蔽行动率从 13% 降至 0.4%，但情境感知率上升。</text>
+  <text x="60" y="458" class="small">剩余不确定性：下降多少来自“减少失对齐”，多少来自“更善于隐藏”，尚无定论。</text>
+  <text x="60" y="478" class="small">安全论证含义：分别攻击每个支柱；可解释性探针可完全绕开情境感知。</text>
 </svg>

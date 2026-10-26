@@ -17,14 +17,14 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">LangGraph — stateful graph with checkpoint and resume</text>
+  <text x="480" y="26" text-anchor="middle" class="title">LangGraph：带检查点与恢复的有状态图</text>
 
   <rect x="40" y="50" width="880" height="180" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">a five-node routing graph (classify  branch  human gate  send)</text>
+  <text x="480" y="72" text-anchor="middle" class="head">五节点路由图（分类、分支、人工门禁、发送）</text>
 
   <rect x="60" y="90" width="120" height="50" class="node"/>
   <text x="120" y="114" text-anchor="middle" class="step">classify</text>
-  <text x="120" y="130" text-anchor="middle" class="small">sets route</text>
+  <text x="120" y="130" text-anchor="middle" class="small">设置 route</text>
 
   <rect x="200" y="90" width="110" height="50" class="node"/>
   <text x="255" y="114" text-anchor="middle" class="step">refund</text>
@@ -37,7 +37,7 @@
 
   <rect x="330" y="148" width="140" height="50" class="pause"/>
   <text x="400" y="172" text-anchor="middle" class="step">human_gate</text>
-  <text x="400" y="188" text-anchor="middle" class="small">pauses without approval</text>
+  <text x="400" y="188" text-anchor="middle" class="small">未批准时暂停</text>
 
   <rect x="490" y="148" width="100" height="50" class="node"/>
   <text x="540" y="172" text-anchor="middle" class="step">send</text>
@@ -55,31 +55,31 @@
   <line x1="590" y1="170" x2="610" y2="170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="40" y="250" width="440" height="250" class="ckpt"/>
-  <text x="260" y="272" text-anchor="middle" class="head">durable execution — checkpoint per node</text>
+  <text x="260" y="272" text-anchor="middle" class="head">持久执行：每个节点保存检查点</text>
   <rect x="60" y="288" width="400" height="36" class="box"/>
-  <text x="78" y="310" class="step">after classify: state.route = "bug"</text>
+  <text x="78" y="310" class="step">classify 后：state.route = "bug"</text>
   <rect x="60" y="330" width="400" height="36" class="box"/>
-  <text x="78" y="352" class="step">after bug:      state.ticket = "BUG-..."</text>
+  <text x="78" y="352" class="step">bug 后：state.ticket = "BUG-..."</text>
   <rect x="60" y="372" width="400" height="36" class="box"/>
-  <text x="78" y="394" class="step">at human_gate:  pause, serialize state, return control</text>
+  <text x="78" y="394" class="step">位于 human_gate：暂停、序列化状态、归还控制权</text>
   <rect x="60" y="414" width="400" height="36" class="box"/>
-  <text x="78" y="436" class="step">human approves: state.human_approval = true; resume from send</text>
+  <text x="78" y="436" class="step">人工批准：state.human_approval = true；从 send 恢复</text>
   <rect x="60" y="456" width="400" height="36" class="box"/>
-  <text x="78" y="478" class="step">after send:    state.output = "sent BUG-..."  END</text>
+  <text x="78" y="478" class="step">send 后：state.output = "sent BUG-..."，END</text>
 
   <rect x="500" y="250" width="420" height="250" class="topo"/>
-  <text x="710" y="272" text-anchor="middle" class="head">three topologies</text>
+  <text x="710" y="272" text-anchor="middle" class="head">三种拓扑</text>
   <rect x="520" y="288" width="380" height="56" class="box"/>
-  <text x="538" y="310" class="step">supervisor  central LLM routes to specialists</text>
-  <text x="538" y="328" class="small">create_supervisor() or tool-call-based dispatch</text>
+  <text x="538" y="310" class="step">监督者：中央 LLM 路由到专家</text>
+  <text x="538" y="328" class="small">create_supervisor() 或基于工具调用分发</text>
 
   <rect x="520" y="352" width="380" height="56" class="box"/>
-  <text x="538" y="374" class="step">swarm  peer-to-peer handoffs via shared tools</text>
-  <text x="538" y="392" class="small">no central router; lower latency; harder to reason</text>
+  <text x="538" y="374" class="step">群体：通过共享工具点对点交接</text>
+  <text x="538" y="392" class="small">无中央路由器，延迟低，但更难推断行为</text>
 
   <rect x="520" y="416" width="380" height="56" class="box"/>
-  <text x="538" y="438" class="step">hierarchical  supervisors of supervisors</text>
-  <text x="538" y="456" class="small">nested subgraphs; used when scale &gt; single graph</text>
+  <text x="538" y="438" class="step">层级：监督者管理监督者</text>
+  <text x="538" y="456" class="small">嵌套子图；规模超过单图时使用</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">state is typed, immutable between nodes, serialized after every step — resume is exact</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">状态带类型，在节点之间不可变，每步后序列化；因此能够准确恢复</text>
 </svg>

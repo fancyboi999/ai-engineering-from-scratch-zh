@@ -13,10 +13,10 @@
       .caption { font-size: 11px; fill: #555; font-style: italic; }
     </style>
   </defs>
-  <text x="480" y="24" text-anchor="middle" class="title">RadixAttention — KV cache as a tree, scheduler as the hot-branch pinner</text>
+  <text x="480" y="24" text-anchor="middle" class="title">RadixAttention：KV 缓存构成树，调度器固定热分支</text>
 
   <rect x="40" y="50" width="460" height="490" class="box"/>
-  <text x="270" y="72" text-anchor="middle" class="head">the radix tree</text>
+  <text x="270" y="72" text-anchor="middle" class="head">基数树</text>
   <rect x="210" y="90" width="120" height="30" class="cool"/>
   <text x="270" y="110" text-anchor="middle" class="step">SYSTEM (2000 tok)</text>
   <rect x="210" y="140" width="120" height="30" class="cool"/>
@@ -45,45 +45,45 @@
   <text x="440" y="276" text-anchor="middle" class="small">Q_6</text>
 
   <rect x="60" y="310" width="420" height="70" class="box"/>
-  <text x="270" y="330" text-anchor="middle" class="step">new request: SYSTEM + TOOLS + DOC_B + Q_7</text>
-  <text x="270" y="350" text-anchor="middle" class="small">walk the tree : SYSTEM reuse, TOOLS reuse, DOC_B reuse</text>
-  <text x="270" y="366" text-anchor="middle" class="small">allocate blocks only for Q_7 (60 tokens, 4 blocks)</text>
+  <text x="270" y="330" text-anchor="middle" class="step">新请求：SYSTEM + TOOLS + DOC_B + Q_7</text>
+  <text x="270" y="350" text-anchor="middle" class="small">遍历树：复用 SYSTEM、TOOLS、DOC_B</text>
+  <text x="270" y="366" text-anchor="middle" class="small">只为 Q_7 分配块（60 个 token，4 块）</text>
 
   <rect x="60" y="390" width="420" height="60" class="cool"/>
-  <text x="270" y="414" text-anchor="middle" class="step">prefill cost : 60 tokens instead of 2860</text>
-  <text x="270" y="432" text-anchor="middle" class="small">on prefix-heavy RAG : up to 6.4x SGLang over vLLM</text>
+  <text x="270" y="414" text-anchor="middle" class="step">预填充成本：60 个 token，而非 2860</text>
+  <text x="270" y="432" text-anchor="middle" class="small">前缀密集 RAG：SGLang 最多为 vLLM 的 6.4 倍</text>
 
   <rect x="60" y="460" width="420" height="70" class="hot"/>
-  <text x="270" y="482" text-anchor="middle" class="step">the eviction policy</text>
-  <text x="270" y="500" text-anchor="middle" class="small">branch-level LRU : evict whole leaves</text>
-  <text x="270" y="518" text-anchor="middle" class="small">keeps cache shape matched to tree shape</text>
+  <text x="270" y="482" text-anchor="middle" class="step">淘汰策略</text>
+  <text x="270" y="500" text-anchor="middle" class="small">分支级 LRU：淘汰完整叶子</text>
+  <text x="270" y="518" text-anchor="middle" class="small">缓存形状与树形状保持一致</text>
 
   <rect x="520" y="50" width="400" height="490" class="box"/>
-  <text x="720" y="72" text-anchor="middle" class="head">cache-aware scheduling</text>
+  <text x="720" y="72" text-anchor="middle" class="head">缓存感知调度</text>
   <rect x="540" y="90" width="360" height="70" class="cold"/>
-  <text x="720" y="112" text-anchor="middle" class="step">FCFS is wrong for prefix-heavy traffic</text>
-  <text x="720" y="130" text-anchor="middle" class="small">serves requests in arrival order</text>
-  <text x="720" y="146" text-anchor="middle" class="small">evicts hot branches before they are reused</text>
+  <text x="720" y="112" text-anchor="middle" class="step">FCFS 不适合前缀密集流量</text>
+  <text x="720" y="130" text-anchor="middle" class="small">按到达顺序处理请求</text>
+  <text x="720" y="146" text-anchor="middle" class="small">热分支尚未复用便被淘汰</text>
   <rect x="540" y="170" width="360" height="80" class="cool"/>
-  <text x="720" y="192" text-anchor="middle" class="step">depth-first dispatch</text>
-  <text x="720" y="210" text-anchor="middle" class="small">prefer requests rooted at the running branch</text>
-  <text x="720" y="226" text-anchor="middle" class="small">keep the hot branch resident; stream siblings</text>
-  <text x="720" y="242" text-anchor="middle" class="small">approximates radix depth-first traversal</text>
+  <text x="720" y="192" text-anchor="middle" class="step">深度优先分发</text>
+  <text x="720" y="210" text-anchor="middle" class="small">优先处理当前运行分支上的请求</text>
+  <text x="720" y="226" text-anchor="middle" class="small">让热分支驻留，连续处理同级分支</text>
+  <text x="720" y="242" text-anchor="middle" class="small">近似基数树的深度优先遍历</text>
 
   <rect x="540" y="260" width="360" height="120" class="dsk"/>
-  <text x="720" y="282" text-anchor="middle" class="step">numbers (2026)</text>
+  <text x="720" y="282" text-anchor="middle" class="step">数值（2026）</text>
   <text x="720" y="302" text-anchor="middle" class="small">Llama 3.1 8B H100 ShareGPT 1K :</text>
-  <text x="720" y="318" text-anchor="middle" class="small">SGLang ~16,200 tok/s vs vLLM ~12,500 (+29%)</text>
-  <text x="720" y="336" text-anchor="middle" class="small">prefix-heavy RAG : up to 6.4x</text>
-  <text x="720" y="352" text-anchor="middle" class="small">voice cloning : 86.4% prefix-cache hit rate</text>
-  <text x="720" y="368" text-anchor="middle" class="small">production : 50-99% depending on template discipline</text>
+  <text x="720" y="318" text-anchor="middle" class="small">SGLang 约 16,200 tok/s，vLLM 约 12,500（+29%）</text>
+  <text x="720" y="336" text-anchor="middle" class="small">前缀密集 RAG：最多 6.4 倍</text>
+  <text x="720" y="352" text-anchor="middle" class="small">声音克隆：前缀缓存命中率 86.4%</text>
+  <text x="720" y="368" text-anchor="middle" class="small">生产环境：随模板规范程度为 50-99%</text>
 
   <rect x="540" y="390" width="360" height="140" class="hot"/>
-  <text x="720" y="412" text-anchor="middle" class="step">the gotcha — prompt ordering</text>
+  <text x="720" y="412" text-anchor="middle" class="step">易错点：prompt 顺序</text>
   <text x="720" y="432" text-anchor="middle" class="small">[system, tools, context] ≠ [system, context, tools]</text>
-  <text x="720" y="450" text-anchor="middle" class="small">tree sees two distinct paths</text>
-  <text x="720" y="466" text-anchor="middle" class="small">6.4x disappears, back to vLLM throughput</text>
-  <text x="720" y="488" text-anchor="middle" class="step">engineer's lever : fix the template</text>
-  <text x="720" y="506" text-anchor="middle" class="small">immutable first (system, tools, schemas)</text>
-  <text x="720" y="520" text-anchor="middle" class="small">user input last; real case 7% to 74% in one change</text>
+  <text x="720" y="450" text-anchor="middle" class="small">树中视为两条不同路径</text>
+  <text x="720" y="466" text-anchor="middle" class="small">6.4 倍优势消失，回到 vLLM 吞吐</text>
+  <text x="720" y="488" text-anchor="middle" class="step">工程调节项：固定模板</text>
+  <text x="720" y="506" text-anchor="middle" class="small">不变内容在前（system、tools、schemas）</text>
+  <text x="720" y="520" text-anchor="middle" class="small">用户输入放最后；真实案例一次修改由 7% 提至 74%</text>
 </svg>

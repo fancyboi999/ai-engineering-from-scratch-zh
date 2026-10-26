@@ -17,7 +17,7 @@
   <text x="30" y="229" font-size="11">model: ai/qwen3:4b</text>
   <text x="30" y="244" font-size="11">temperature: 0</text>
   <rect x="20" y="290" width="285" height="62" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
-  <text x="30" y="308" font-size="12" font-weight="700" fill="var(--m-grey-ink, #5e5e59)">endpoint discovery</text>
+  <text x="30" y="308" font-size="12" font-weight="700" fill="var(--m-grey-ink, #5e5e59)">端点发现</text>
   <text x="30" y="326" font-size="11">docker model status --json</text>
   <text x="30" y="341" font-size="11">由 docker-agent 自行执行</text>
   <line x1="162.5" y1="143" x2="162.5" y2="177" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-2-head-ink)"/>

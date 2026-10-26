@@ -1,4 +1,4 @@
-# Computer Use：Claude、OpenAI CUA、Gemini
+# 计算机操作：Claude、OpenAI CUA、Gemini
 
 > 2026 年有三个生产级 computer-use 模型。三个都是基于视觉的。三个都把截图、DOM 文本和工具输出当成不可信输入。只有直接的用户指令才算授权。逐步安全服务是常态。
 

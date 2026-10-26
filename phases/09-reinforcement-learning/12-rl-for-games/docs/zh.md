@@ -17,7 +17,7 @@
 
 ## 核心概念
 
-![AlphaZero ↔ MuZero ↔ GRPO: same loop, different environments](../assets/rl-games.svg)
+![AlphaZero ↔ MuZero ↔ GRPO：相同的循环，不同的环境](../assets/rl-games.svg)
 
 **统一的循环。**
 

@@ -22,7 +22,7 @@
   <line x1="620" y1="256" x2="620" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="620" y="273" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">11</text>
   <text x="340" y="290" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">步骤</text>
-  <text x="60" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mean reward of all finished answers</text>
+  <text x="60" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">全部已完成答案的平均奖励</text>
   <path d="M60.0 237.8 L110.9 125.8 L161.8 170.1 L212.7 157.0 L263.6 99.8 L314.5 172.7 L365.5 188.3 L416.4 164.9 L467.3 133.6 L518.2 107.6 L569.1 136.2 L620.0 120.6" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.8" stroke-linejoin="round"/>
   <circle cx="60" cy="237.77" r="2.8" fill="var(--m-grey-ink, #5e5e59)"/>
   <circle cx="110.91" cy="125.79" r="2.8" fill="var(--m-grey-ink, #5e5e59)"/>
@@ -52,6 +52,6 @@
   <path d="M60 18 H78" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="2" stroke-linejoin="round"/>
   <text x="84" y="22" font-size="11" fill="var(--m-grey-ink, #5e5e59)">不启用 filter</text>
   <path d="M181.2 18 H199.2" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="2" stroke-linejoin="round"/>
-  <text x="205.2" y="22" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">DAPO filter, before the filter</text>
+  <text x="205.2" y="22" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">DAPO 过滤器，过滤前</text>
   <text x="60" y="326" font-size="12" class="m-serif">12 步均值：未启用 filter 为 0.657；启用 filter、丢弃组前统计为 0.686。一个随机种子。</text>
 </svg>

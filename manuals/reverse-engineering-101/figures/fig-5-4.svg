@@ -10,7 +10,7 @@
   <text x="350" y="59.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">cachePolicy snapshot</text>
   <text x="350" y="74.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mutatesArtifact false</text>
   <rect x="460" y="28" width="160" height="52" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="540" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">Query ID</text>
+  <text x="540" y="49.25" font-size="12.5" text-anchor="middle" font-weight="700">查询 ID</text>
   <text x="540" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">query_ 加 SHA-256</text>
   <line x1="240" y1="54" x2="269" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-4-head-ink)"/>
   <line x1="430" y1="54" x2="459" y2="54" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-5-4-head-ink)"/>

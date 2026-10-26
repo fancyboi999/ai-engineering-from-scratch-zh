@@ -16,45 +16,45 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">EchoLeak: the three-boundary LLM Scope Violation</text>
+  <text x="480" y="24" text-anchor="middle" class="title">EchoLeak：跨越三个边界的 LLM 作用域违规</text>
 
   <rect x="40" y="60" width="280" height="180" class="box"/>
-  <text x="180" y="82" text-anchor="middle" class="head">boundary 1: retrieval</text>
+  <text x="180" y="82" text-anchor="middle" class="head">边界 1：检索</text>
   <rect x="60" y="100" width="240" height="60" class="hot"/>
-  <text x="180" y="125" text-anchor="middle" class="step">untrusted content</text>
-  <text x="180" y="145" text-anchor="middle" class="small">attacker email in RAG context</text>
+  <text x="180" y="125" text-anchor="middle" class="step">不可信内容</text>
+  <text x="180" y="145" text-anchor="middle" class="small">RAG 上下文中的攻击者邮件</text>
   <rect x="60" y="170" width="240" height="60" class="cool"/>
-  <text x="180" y="195" text-anchor="middle" class="step">defense: scope labels</text>
-  <text x="180" y="215" text-anchor="middle" class="small">IFC + untrusted tag</text>
+  <text x="180" y="195" text-anchor="middle" class="step">防御：作用域标签</text>
+  <text x="180" y="215" text-anchor="middle" class="small">IFC + 不可信标签</text>
 
   <rect x="340" y="60" width="280" height="180" class="box"/>
-  <text x="480" y="82" text-anchor="middle" class="head">boundary 2: scope</text>
+  <text x="480" y="82" text-anchor="middle" class="head">边界 2：作用域</text>
   <rect x="360" y="100" width="240" height="60" class="hot"/>
-  <text x="480" y="125" text-anchor="middle" class="step">privileged access</text>
-  <text x="480" y="145" text-anchor="middle" class="small">mailbox / repo / HR scopes</text>
+  <text x="480" y="125" text-anchor="middle" class="step">特权访问</text>
+  <text x="480" y="145" text-anchor="middle" class="small">邮箱 / 仓库 / 人力资源作用域</text>
   <rect x="360" y="170" width="240" height="60" class="cool"/>
-  <text x="480" y="195" text-anchor="middle" class="step">defense: capability gating</text>
-  <text x="480" y="215" text-anchor="middle" class="small">tool calls only from trusted intent</text>
+  <text x="480" y="195" text-anchor="middle" class="step">防御：能力关卡</text>
+  <text x="480" y="215" text-anchor="middle" class="small">仅从可信意图发起工具调用</text>
 
   <rect x="640" y="60" width="280" height="180" class="box"/>
-  <text x="780" y="82" text-anchor="middle" class="head">boundary 3: output</text>
+  <text x="780" y="82" text-anchor="middle" class="head">边界 3：输出</text>
   <rect x="660" y="100" width="240" height="60" class="hot"/>
-  <text x="780" y="125" text-anchor="middle" class="step">exfiltration</text>
-  <text x="780" y="145" text-anchor="middle" class="small">CSP-approved URL; image render</text>
+  <text x="780" y="125" text-anchor="middle" class="step">数据外泄</text>
+  <text x="780" y="145" text-anchor="middle" class="small">CSP 允许的 URL；图像渲染</text>
   <rect x="660" y="170" width="240" height="60" class="cool"/>
-  <text x="780" y="195" text-anchor="middle" class="step">defense: narrow allowlist</text>
-  <text x="780" y="215" text-anchor="middle" class="small">egress domain restrictions</text>
+  <text x="780" y="195" text-anchor="middle" class="step">防御：狭窄白名单</text>
+  <text x="780" y="215" text-anchor="middle" class="small">出口域名限制</text>
 
   <path d="M 320 150 L 340 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow25)" fill="none"/>
   <path d="M 620 150 L 640 150" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow25)" fill="none"/>
 
   <rect x="40" y="270" width="880" height="220" class="box"/>
-  <text x="480" y="295" text-anchor="middle" class="head">CVEs in the family (2025)</text>
-  <text x="60" y="325" class="small">CVE-2025-32711 EchoLeak (CVSS 9.3): M365 Copilot; zero-click; CSP-approved exfiltration.</text>
-  <text x="60" y="345" class="small">CamoLeak (CVSS 9.6): GitHub Copilot Chat via Camo image proxy; fixed by disabling image rendering.</text>
-  <text x="60" y="365" class="small">CVE-2025-53773: GitHub Copilot RCE via prompt injection in code-suggestion surface.</text>
-  <text x="60" y="395" class="small">severity calibration: vendors initially under-rate. Aim Labs escalates via demonstrated MFA-code exfiltration.</text>
-  <text x="60" y="415" class="small">NIST AI SPD 2024: "generative AI's greatest security flaw." OWASP LLM01 2025: #1 threat.</text>
-  <text x="60" y="445" class="small">policy: three boundaries require three independent controls. fixing one is not sufficient.</text>
-  <text x="60" y="465" class="small">responsible disclosure: MSRC patches server-side; Aim Labs publishes; ecosystem learns. iterate.</text>
+  <text x="480" y="295" text-anchor="middle" class="head">同类 CVE（2025）</text>
+  <text x="60" y="325" class="small">CVE-2025-32711 EchoLeak（CVSS 9.3）：M365 Copilot；零点击；经 CSP 允许的通道外泄。</text>
+  <text x="60" y="345" class="small">CamoLeak（CVSS 9.6）：通过 Camo 图像代理攻击 GitHub Copilot Chat；禁用图像渲染后修复。</text>
+  <text x="60" y="365" class="small">CVE-2025-53773：通过代码建议界面的 prompt 注入在 GitHub Copilot 中执行远程代码。</text>
+  <text x="60" y="395" class="small">严重性校准：供应商起初低估风险。Aim Labs 通过演示 MFA 验证码外泄升级报告。</text>
+  <text x="60" y="415" class="small">NIST AI SPD 2024：“生成式 AI 最大的安全缺陷。”OWASP LLM01 2025：#1 威胁。</text>
+  <text x="60" y="445" class="small">策略：三个边界需要三项独立控制。只修复一个并不充分。</text>
+  <text x="60" y="465" class="small">负责任披露：MSRC 服务端修补；Aim Labs 发表；生态学习。持续迭代。</text>
 </svg>

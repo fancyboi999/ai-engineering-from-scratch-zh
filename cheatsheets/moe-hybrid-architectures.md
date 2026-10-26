@@ -5,7 +5,7 @@ code: MH
 subtitle: 路由器、专家、无辅助损失均衡、MLA、DeepSeek-V3 参数量和 Jamba SSM 混合架构。含公式与标准库计算器。
 hue: 168
 sources: phases/07-transformers-deep-dive/11-mixture-of-experts, phases/10-llms-from-scratch/14-open-models-architecture-walkthroughs, phases/10-llms-from-scratch/20-deepseek-v3-walkthrough, phases/10-llms-from-scratch/21-jamba-hybrid-ssm-transformer
-source_hash: 18fd285a4fcbf3d4
+source_hash: 277dc0e06017efa2
 ---
 
 ## 一个 MoE 层

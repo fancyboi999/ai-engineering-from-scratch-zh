@@ -17,56 +17,56 @@
     </style>
   </defs>
 
-  <text x="490" y="26" text-anchor="middle" class="title">MCP 2026-07-28: primitives and stateless requests</text>
+  <text x="490" y="26" text-anchor="middle" class="title">MCP 2026-07-28：基本组成与无状态请求</text>
 
   <rect x="40" y="55" width="440" height="210" class="cool"/>
-  <text x="260" y="78" text-anchor="middle" class="head">server primitives</text>
+  <text x="260" y="78" text-anchor="middle" class="head">服务器基本组成</text>
   <rect x="60" y="96" width="400" height="45" class="box"/>
-  <text x="80" y="116" class="step">tools</text>
+  <text x="80" y="116" class="step">工具</text>
   <text x="80" y="133" class="small">tools/list, tools/call</text>
   <rect x="60" y="151" width="400" height="45" class="box"/>
-  <text x="80" y="171" class="step">resources</text>
+  <text x="80" y="171" class="step">资源</text>
   <text x="80" y="188" class="small">resources/list, resources/read</text>
   <rect x="60" y="206" width="400" height="45" class="box"/>
-  <text x="80" y="226" class="step">prompts</text>
+  <text x="80" y="226" class="step">prompt 模板</text>
   <text x="80" y="243" class="small">prompts/list, prompts/get</text>
 
   <rect x="500" y="55" width="440" height="210" class="cold"/>
-  <text x="720" y="78" text-anchor="middle" class="head">metadata carried by every request</text>
+  <text x="720" y="78" text-anchor="middle" class="head">每个请求携带元数据</text>
   <text x="520" y="112" class="step">params._meta</text>
   <text x="520" y="138" class="small">io.modelcontextprotocol/protocolVersion</text>
   <text x="520" y="158" class="small">io.modelcontextprotocol/clientCapabilities</text>
   <text x="520" y="178" class="small">io.modelcontextprotocol/clientInfo (SHOULD)</text>
-  <text x="520" y="214" class="step">never inferred from</text>
-  <text x="520" y="234" class="small">a previous call, process, or connection</text>
+  <text x="520" y="214" class="step">不从先前的</text>
+  <text x="520" y="234" class="small">调用、进程或连接推断</text>
 
   <rect x="40" y="290" width="900" height="235" class="box"/>
-  <text x="490" y="314" text-anchor="middle" class="head">one request, one complete decision</text>
+  <text x="490" y="314" text-anchor="middle" class="head">一个请求，一次完整决策</text>
 
   <rect x="60" y="340" width="220" height="140" class="cold"/>
-  <text x="170" y="364" text-anchor="middle" class="step">1 / client request</text>
-  <text x="78" y="394" class="small">JSON-RPC id + method</text>
-  <text x="78" y="414" class="small">arguments + current _meta</text>
-  <text x="78" y="446" class="small">server/discover is optional</text>
-  <text x="78" y="464" class="small">for the client, required on server</text>
+  <text x="170" y="364" text-anchor="middle" class="step">1 / 客户端请求</text>
+  <text x="78" y="394" class="small">JSON-RPC ID + 方法</text>
+  <text x="78" y="414" class="small">参数 + 当前 _meta</text>
+  <text x="78" y="446" class="small">server/discover 对客户端可选</text>
+  <text x="78" y="464" class="small">但服务器必须提供</text>
 
   <path d="M280,410 L365,410" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="370" y="340" width="240" height="140" class="hot"/>
-  <text x="490" y="364" text-anchor="middle" class="step">2 / server validates</text>
-  <text x="388" y="394" class="small">version + capabilities</text>
-  <text x="388" y="414" class="small">method-specific params</text>
-  <text x="388" y="446" class="small">unsupported version: -32022</text>
-  <text x="388" y="464" class="small">no connection state consulted</text>
+  <text x="490" y="364" text-anchor="middle" class="step">2 / 服务器校验</text>
+  <text x="388" y="394" class="small">版本 + 能力</text>
+  <text x="388" y="414" class="small">对应方法的参数</text>
+  <text x="388" y="446" class="small">不支持的版本：-32022</text>
+  <text x="388" y="464" class="small">不依赖连接状态</text>
 
   <path d="M610,410 L695,410" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="700" y="340" width="220" height="140" class="cool"/>
-  <text x="810" y="364" text-anchor="middle" class="step">3 / server result</text>
+  <text x="810" y="364" text-anchor="middle" class="step">3 / 服务器结果</text>
   <text x="718" y="394" class="small">resultType: complete</text>
-  <text x="718" y="414" class="small">serverInfo in result _meta</text>
-  <text x="718" y="446" class="small">lists: ttlMs + cacheScope</text>
-  <text x="718" y="464" class="small">deterministic item order</text>
+  <text x="718" y="414" class="small">结果 _meta 中的 serverInfo</text>
+  <text x="718" y="446" class="small">列表：ttlMs + cacheScope</text>
+  <text x="718" y="464" class="small">确定性的条目顺序</text>
 
-  <text x="490" y="510" text-anchor="middle" class="caption">The next request repeats the full contract. Transport lifetime is not protocol session state.</text>
+  <text x="490" y="510" text-anchor="middle" class="caption">下一个请求重复完整契约。传输生命周期不等于协议会话状态。</text>
 </svg>

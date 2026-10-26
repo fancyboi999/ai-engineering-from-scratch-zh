@@ -17,73 +17,73 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Audio-LLM arc: Whisper (2022) to Audio Flamingo 3 (2025)</text>
+  <text x="480" y="24" text-anchor="middle" class="title">音频 LLM 演进：从 Whisper（2022）到 Audio Flamingo 3（2025）</text>
 
   <rect x="30" y="50" width="900" height="230" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">the pipeline: spectrogram -&gt; encoder -&gt; Q-former -&gt; LLM</text>
+  <text x="480" y="72" text-anchor="middle" class="head">流水线：频谱图 -&gt; 编码器 -&gt; Q-former -&gt; LLM</text>
 
   <rect x="50" y="90" width="180" height="170" class="hot"/>
-  <text x="140" y="110" text-anchor="middle" class="step">1. waveform</text>
-  <text x="140" y="128" text-anchor="middle" class="small">16 kHz mono</text>
-  <text x="140" y="150" text-anchor="middle" class="step">2. log-Mel spec</text>
-  <text x="140" y="168" text-anchor="middle" class="small">25ms win, 10ms hop</text>
-  <text x="140" y="184" text-anchor="middle" class="small">80 Mel bins</text>
-  <text x="140" y="200" text-anchor="middle" class="small">log compress</text>
-  <text x="140" y="222" text-anchor="middle" class="small">30s = 3000 frames</text>
+  <text x="140" y="110" text-anchor="middle" class="step">1. 波形</text>
+  <text x="140" y="128" text-anchor="middle" class="small">16 kHz 单声道</text>
+  <text x="140" y="150" text-anchor="middle" class="step">2. 对数梅尔频谱</text>
+  <text x="140" y="168" text-anchor="middle" class="small">25ms 窗长、10ms 帧移</text>
+  <text x="140" y="184" text-anchor="middle" class="small">80 个梅尔频带</text>
+  <text x="140" y="200" text-anchor="middle" class="small">对数压缩</text>
+  <text x="140" y="222" text-anchor="middle" class="small">30s = 3000 帧</text>
 
   <path d="M 235 170 L 275 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="280" y="90" width="200" height="170" class="cool"/>
-  <text x="380" y="110" text-anchor="middle" class="step">3. audio encoder</text>
-  <text x="380" y="132" text-anchor="middle" class="small">Whisper: speech strong</text>
-  <text x="380" y="148" text-anchor="middle" class="small">BEATs: music strong</text>
-  <text x="380" y="164" text-anchor="middle" class="small">AF-Whisper: concat</text>
-  <text x="380" y="186" text-anchor="middle" class="small">1 frame per 10ms</text>
-  <text x="380" y="210" text-anchor="middle" class="small">12-layer transformer</text>
-  <text x="380" y="230" text-anchor="middle" class="caption">frozen at bridge train</text>
+  <text x="380" y="110" text-anchor="middle" class="step">3. 音频编码器</text>
+  <text x="380" y="132" text-anchor="middle" class="small">Whisper：擅长语音</text>
+  <text x="380" y="148" text-anchor="middle" class="small">BEATs：擅长音乐</text>
+  <text x="380" y="164" text-anchor="middle" class="small">AF-Whisper：拼接</text>
+  <text x="380" y="186" text-anchor="middle" class="small">每 10ms 为 1 帧</text>
+  <text x="380" y="210" text-anchor="middle" class="small">12 层 transformer</text>
+  <text x="380" y="230" text-anchor="middle" class="caption">训练连接桥时冻结</text>
 
   <path d="M 485 170 L 525 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="530" y="90" width="200" height="170" class="cold"/>
-  <text x="630" y="110" text-anchor="middle" class="step">4. audio Q-former</text>
-  <text x="630" y="132" text-anchor="middle" class="small">32-64 learnable queries</text>
-  <text x="630" y="148" text-anchor="middle" class="small">cross-attend over frames</text>
-  <text x="630" y="164" text-anchor="middle" class="small">output fixed-length tokens</text>
-  <text x="630" y="186" text-anchor="middle" class="step">training</text>
-  <text x="630" y="202" text-anchor="middle" class="small">stage 1: ITM + ITC + ITG</text>
-  <text x="630" y="218" text-anchor="middle" class="small">stage 2: instruction tune</text>
+  <text x="630" y="110" text-anchor="middle" class="step">4. 音频 Q-former</text>
+  <text x="630" y="132" text-anchor="middle" class="small">32-64 个可学习 query</text>
+  <text x="630" y="148" text-anchor="middle" class="small">对各帧做交叉注意力</text>
+  <text x="630" y="164" text-anchor="middle" class="small">输出定长 token</text>
+  <text x="630" y="186" text-anchor="middle" class="step">训练</text>
+  <text x="630" y="202" text-anchor="middle" class="small">阶段 1：ITM + ITC + ITG</text>
+  <text x="630" y="218" text-anchor="middle" class="small">阶段 2：指令微调</text>
 
   <path d="M 735 170 L 775 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="780" y="90" width="140" height="170" class="reg"/>
   <text x="850" y="110" text-anchor="middle" class="step">5. LLM</text>
   <text x="850" y="128" text-anchor="middle" class="small">Qwen2.5-7B</text>
-  <text x="850" y="144" text-anchor="middle" class="small">or Llama 3.1</text>
-  <text x="850" y="166" text-anchor="middle" class="step">output</text>
-  <text x="850" y="184" text-anchor="middle" class="small">captions</text>
-  <text x="850" y="200" text-anchor="middle" class="small">QA answers</text>
-  <text x="850" y="216" text-anchor="middle" class="small">with CoT</text>
+  <text x="850" y="144" text-anchor="middle" class="small">或 Llama 3.1</text>
+  <text x="850" y="166" text-anchor="middle" class="step">输出</text>
+  <text x="850" y="184" text-anchor="middle" class="small">图像描述</text>
+  <text x="850" y="200" text-anchor="middle" class="small">问答结果</text>
+  <text x="850" y="216" text-anchor="middle" class="small">带思维链</text>
 
   <rect x="30" y="300" width="900" height="210" class="box"/>
-  <text x="480" y="322" text-anchor="middle" class="head">cascaded vs end-to-end task coverage</text>
+  <text x="480" y="322" text-anchor="middle" class="head">级联系统与端到端系统的任务覆盖</text>
 
   <rect x="50" y="340" width="400" height="160" class="hot"/>
-  <text x="250" y="362" text-anchor="middle" class="step">cascaded (Whisper -&gt; LLM)</text>
-  <text x="250" y="384" text-anchor="middle" class="small">transcription: yes</text>
-  <text x="250" y="400" text-anchor="middle" class="small">summarization: yes</text>
-  <text x="250" y="416" text-anchor="middle" class="small">emotion: no</text>
-  <text x="250" y="432" text-anchor="middle" class="small">music genre: no</text>
-  <text x="250" y="448" text-anchor="middle" class="small">environmental: no</text>
-  <text x="250" y="464" text-anchor="middle" class="small">deepfake: no</text>
+  <text x="250" y="362" text-anchor="middle" class="step">级联（Whisper -&gt; LLM）</text>
+  <text x="250" y="384" text-anchor="middle" class="small">转写：支持</text>
+  <text x="250" y="400" text-anchor="middle" class="small">总结：支持</text>
+  <text x="250" y="416" text-anchor="middle" class="small">情绪：不支持</text>
+  <text x="250" y="432" text-anchor="middle" class="small">音乐类型：不支持</text>
+  <text x="250" y="448" text-anchor="middle" class="small">环境声音：不支持</text>
+  <text x="250" y="464" text-anchor="middle" class="small">深度伪造：不支持</text>
   <text x="250" y="488" text-anchor="middle" class="caption">MMAU ~0.50</text>
 
   <rect x="470" y="340" width="440" height="160" class="cool"/>
-  <text x="690" y="362" text-anchor="middle" class="step">end-to-end audio-LLM (AF3)</text>
-  <text x="690" y="384" text-anchor="middle" class="small">every cascaded task: yes</text>
-  <text x="690" y="400" text-anchor="middle" class="small">emotion / mood: yes</text>
-  <text x="690" y="416" text-anchor="middle" class="small">music / instruments: yes</text>
-  <text x="690" y="432" text-anchor="middle" class="small">environmental sounds: yes</text>
-  <text x="690" y="448" text-anchor="middle" class="small">temporal grounding: yes</text>
-  <text x="690" y="464" text-anchor="middle" class="small">on-demand CoT: +3-5 pts</text>
-  <text x="690" y="488" text-anchor="middle" class="caption">MMAU 0.72 (open SOTA 2025)</text>
+  <text x="690" y="362" text-anchor="middle" class="step">端到端音频 LLM（AF3）</text>
+  <text x="690" y="384" text-anchor="middle" class="small">级联系统的所有任务：支持</text>
+  <text x="690" y="400" text-anchor="middle" class="small">情绪 / 心境：支持</text>
+  <text x="690" y="416" text-anchor="middle" class="small">音乐 / 乐器：支持</text>
+  <text x="690" y="432" text-anchor="middle" class="small">环境声音：支持</text>
+  <text x="690" y="448" text-anchor="middle" class="small">时间定位：支持</text>
+  <text x="690" y="464" text-anchor="middle" class="small">按需思维链：+3-5 分</text>
+  <text x="690" y="488" text-anchor="middle" class="caption">MMAU 0.72（2025 年开放模型最佳水平）</text>
 </svg>

@@ -15,10 +15,10 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Multi-agent debate — full mesh vs sparse star</text>
+  <text x="480" y="26" text-anchor="middle" class="title">多 agent 辩论：全连接与稀疏星形</text>
 
   <rect x="40" y="50" width="420" height="260" class="box"/>
-  <text x="250" y="72" text-anchor="middle" class="head">full mesh  everyone reads everyone</text>
+  <text x="250" y="72" text-anchor="middle" class="head">全连接：每个 agent 阅读其他所有 agent 的内容</text>
   <circle cx="140" cy="160" r="36" fill="#e6f4ea" stroke="#2e7d32" stroke-width="1.5"/>
   <text x="140" y="164" text-anchor="middle" class="step">alpha</text>
   <circle cx="360" cy="160" r="36" fill="#e6f4ea" stroke="#2e7d32" stroke-width="1.5"/>
@@ -28,36 +28,36 @@
   <line x1="176" y1="160" x2="324" y2="160" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="164" y1="196" x2="230" y2="240" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="336" y1="196" x2="270" y2="240" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="250" y="298" text-anchor="middle" class="small">N=3, R=2  12 critique ops</text>
+  <text x="250" y="298" text-anchor="middle" class="small">N=3、R=2，12 次评审</text>
 
   <rect x="500" y="50" width="420" height="260" class="box"/>
-  <text x="710" y="72" text-anchor="middle" class="head">sparse star  hub-and-spoke</text>
+  <text x="710" y="72" text-anchor="middle" class="head">稀疏星形：中心辐射</text>
   <circle cx="710" cy="180" r="36" fill="#fff1d6" stroke="#c0392b" stroke-width="1.5"/>
-  <text x="710" y="184" text-anchor="middle" class="step">hub</text>
+  <text x="710" y="184" text-anchor="middle" class="step">中心</text>
   <circle cx="600" cy="110" r="28" fill="#e6f4ea" stroke="#2e7d32" stroke-width="1.5"/>
-  <text x="600" y="114" text-anchor="middle" class="step">spoke1</text>
+  <text x="600" y="114" text-anchor="middle" class="step">分支 1</text>
   <circle cx="820" cy="110" r="28" fill="#e6f4ea" stroke="#2e7d32" stroke-width="1.5"/>
-  <text x="820" y="114" text-anchor="middle" class="step">spoke2</text>
+  <text x="820" y="114" text-anchor="middle" class="step">分支 2</text>
   <circle cx="600" cy="270" r="28" fill="#e6f4ea" stroke="#2e7d32" stroke-width="1.5"/>
-  <text x="600" y="274" text-anchor="middle" class="step">spoke3</text>
+  <text x="600" y="274" text-anchor="middle" class="step">分支 3</text>
   <circle cx="820" cy="270" r="28" fill="#e6f4ea" stroke="#2e7d32" stroke-width="1.5"/>
-  <text x="820" y="274" text-anchor="middle" class="step">spoke4</text>
+  <text x="820" y="274" text-anchor="middle" class="step">分支 4</text>
   <line x1="625" y1="135" x2="685" y2="165" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="795" y1="135" x2="735" y2="165" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="625" y1="255" x2="685" y2="205" stroke="#1a1a1a" stroke-width="1.5"/>
   <line x1="795" y1="255" x2="735" y2="205" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="710" y="310" text-anchor="middle" class="small">N=5, R=2  16 critique ops (vs 40 full mesh)</text>
+  <text x="710" y="310" text-anchor="middle" class="small">N=5、R=2，16 次评审（全连接为 40 次）</text>
 
   <rect x="40" y="330" width="880" height="180" class="box"/>
-  <text x="480" y="352" text-anchor="middle" class="head">when debate helps vs when it hurts</text>
+  <text x="480" y="352" text-anchor="middle" class="head">辩论何时有益，何时有害</text>
   <rect x="60" y="370" width="840" height="30" class="agent"/>
-  <text x="78" y="390" class="step">HELPS: factuality (cross-check), rule-following (chess), open-ended reasoning</text>
+  <text x="78" y="390" class="step">有益：事实性（交叉核验）、遵循规则（棋类）、开放式推理</text>
   <rect x="60" y="404" width="840" height="30" class="hub"/>
-  <text x="78" y="424" class="step">HURTS: latency-sensitive UX, cost-bound flows, simple factual lookup</text>
+  <text x="78" y="424" class="step">有害：延迟敏感界面、成本受限流程、简单事实查找</text>
   <rect x="60" y="438" width="840" height="30" class="box"/>
-  <text x="78" y="458" class="step">Society of Minds: cross-model (ChatGPT + Bard) beats either alone</text>
+  <text x="78" y="458" class="step">Society of Minds：跨模型（ChatGPT + Bard）优于任一单模型</text>
   <rect x="60" y="472" width="840" height="30" class="box"/>
-  <text x="78" y="492" class="step">sparse topology: matches accuracy at fraction of token cost</text>
+  <text x="78" y="492" class="step">稀疏拓扑：用部分 token 成本达到相同准确率</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">reach for debate when single-shot is wrong &gt; 5% of the time; otherwise cheaper patterns win.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">单次回答错误率 &gt; 5% 时可采用辩论；否则低成本模式更优。</text>
 </svg>

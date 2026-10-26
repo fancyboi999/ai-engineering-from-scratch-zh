@@ -17,7 +17,7 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">multi-head attention — split, attend in parallel, concatenate</text>
+  <text x="450" y="30" text-anchor="middle" class="title">多头注意力 — 拆分、并行计算注意力、拼接</text>
 
   <!-- Input -->
   <rect x="370" y="55" width="160" height="36" class="hot"/>
@@ -37,10 +37,10 @@
   <line x1="450" y1="110" x2="595" y2="140" stroke="#1a1a1a" stroke-width="1"/>
 
   <!-- Split heads -->
-  <text x="100" y="175" class="label">split into 4 heads</text>
+  <text x="100" y="175" class="label">拆分成 4 个头</text>
 
   <!-- Q heads -->
-  <text x="305" y="170" text-anchor="middle" class="caption">Q (N, d_model) → reshape (4, N, d_head)</text>
+  <text x="305" y="170" text-anchor="middle" class="caption">Q (N, d_model) → 重塑形状 (4, N, d_head)</text>
   <rect x="210" y="180" width="45" height="26" class="head1"/><text x="232" y="198" text-anchor="middle" class="content">Q_1</text>
   <rect x="260" y="180" width="45" height="26" class="head2"/><text x="282" y="198" text-anchor="middle" class="content">Q_2</text>
   <rect x="310" y="180" width="45" height="26" class="head3"/><text x="332" y="198" text-anchor="middle" class="content">Q_3</text>
@@ -57,23 +57,23 @@
   <rect x="820" y="180" width="45" height="26" class="head4"/><text x="842" y="198" text-anchor="middle" class="content">V_4</text>
 
   <!-- Parallel attention per head -->
-  <text x="450" y="240" text-anchor="middle" class="caption">softmax(Q_h K_h^T / √d_head) V_h  —  batched matmul, one op</text>
+  <text x="450" y="240" text-anchor="middle" class="caption">softmax(Q_h K_h^T / √d_head) V_h — 批量矩阵乘法，一次操作</text>
 
   <rect x="180" y="260" width="110" height="44" class="head1"/>
-  <text x="235" y="280" text-anchor="middle" class="content">head 1</text>
-  <text x="235" y="295" text-anchor="middle" class="caption">subject-verb</text>
+  <text x="235" y="280" text-anchor="middle" class="content">头 1</text>
+  <text x="235" y="295" text-anchor="middle" class="caption">主语与动词</text>
 
   <rect x="310" y="260" width="110" height="44" class="head2"/>
-  <text x="365" y="280" text-anchor="middle" class="content">head 2</text>
-  <text x="365" y="295" text-anchor="middle" class="caption">positional</text>
+  <text x="365" y="280" text-anchor="middle" class="content">头 2</text>
+  <text x="365" y="295" text-anchor="middle" class="caption">位置关系</text>
 
   <rect x="440" y="260" width="110" height="44" class="head3"/>
-  <text x="495" y="280" text-anchor="middle" class="content">head 3</text>
-  <text x="495" y="295" text-anchor="middle" class="caption">copy / induction</text>
+  <text x="495" y="280" text-anchor="middle" class="content">头 3</text>
+  <text x="495" y="295" text-anchor="middle" class="caption">复制 / 归纳</text>
 
   <rect x="570" y="260" width="110" height="44" class="head4"/>
-  <text x="625" y="280" text-anchor="middle" class="content">head 4</text>
-  <text x="625" y="295" text-anchor="middle" class="caption">named entities</text>
+  <text x="625" y="280" text-anchor="middle" class="content">头 4</text>
+  <text x="625" y="295" text-anchor="middle" class="caption">命名实体</text>
 
   <line x1="235" y1="304" x2="450" y2="340" stroke="#1a1a1a" stroke-width="1"/>
   <line x1="365" y1="304" x2="450" y2="340" stroke="#1a1a1a" stroke-width="1"/>
@@ -82,7 +82,7 @@
 
   <!-- Concatenate -->
   <rect x="330" y="340" width="240" height="36" class="hot"/>
-  <text x="450" y="362" text-anchor="middle" class="content">concat → (N, d_model)</text>
+  <text x="450" y="362" text-anchor="middle" class="content">拼接 → (N, d_model)</text>
 
   <line x1="450" y1="376" x2="450" y2="395" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -92,7 +92,7 @@
   <line x1="450" y1="425" x2="450" y2="444" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <rect x="370" y="444" width="160" height="36" class="hot"/>
-  <text x="450" y="468" text-anchor="middle" class="content">output  (N, d_model)</text>
+  <text x="450" y="468" text-anchor="middle" class="content">输出 (N, d_model)</text>
 
-  <text x="450" y="503" text-anchor="middle" class="caption">W_o is where the heads mix. until W_o, every head lives in its own subspace.</text>
+  <text x="450" y="503" text-anchor="middle" class="caption">W_o 是各头混合的位置。在 W_o 之前，每个头都处在自己的子空间。</text>
 </svg>

@@ -18,44 +18,44 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">prompt caching: one write, many reads</text>
+  <text x="450" y="30" text-anchor="middle" class="title">prompt 缓存：写入一次，读取多次</text>
 
   <!-- Request 1 -->
-  <text x="60" y="80" class="label">Request 1</text>
+  <text x="60" y="80" class="label">请求 1</text>
   <rect x="60" y="95" width="500" height="40" class="write"/>
-  <text x="310" y="120" text-anchor="middle" class="sub">[system + tools + few-shot]  15,000 tok  (CACHE WRITE)</text>
+  <text x="310" y="120" text-anchor="middle" class="sub">[系统 + 工具 + 少样本] 15,000 token（写入缓存）</text>
   <rect x="560" y="95" width="140" height="40" class="box"/>
-  <text x="630" y="120" text-anchor="middle" class="sub">[user msg] 400 tok</text>
-  <text x="720" y="120" class="mono">bill: 15,000 * 1.25x + 400 * 1x</text>
+  <text x="630" y="120" text-anchor="middle" class="sub">[用户消息] 400 token</text>
+  <text x="720" y="120" class="mono">计费：15,000 * 1.25x + 400 * 1x</text>
 
   <!-- Request 2 -->
-  <text x="60" y="170" class="label">Request 2</text>
+  <text x="60" y="170" class="label">请求 2</text>
   <rect x="60" y="185" width="500" height="40" class="read"/>
-  <text x="310" y="210" text-anchor="middle" class="sub">[same prefix]  15,000 tok  (CACHE READ)</text>
+  <text x="310" y="210" text-anchor="middle" class="sub">[相同前缀] 15,000 token（读取缓存）</text>
   <rect x="560" y="185" width="140" height="40" class="box"/>
-  <text x="630" y="210" text-anchor="middle" class="sub">[user msg] 400 tok</text>
-  <text x="720" y="210" class="mono">bill: 15,000 * 0.1x + 400 * 1x</text>
+  <text x="630" y="210" text-anchor="middle" class="sub">[用户消息] 400 token</text>
+  <text x="720" y="210" class="mono">计费：15,000 * 0.1x + 400 * 1x</text>
 
   <!-- Request N -->
-  <text x="60" y="260" class="label">Request N</text>
+  <text x="60" y="260" class="label">请求 N</text>
   <rect x="60" y="275" width="500" height="40" class="read"/>
-  <text x="310" y="300" text-anchor="middle" class="sub">[same prefix]  15,000 tok  (CACHE READ)</text>
+  <text x="310" y="300" text-anchor="middle" class="sub">[相同前缀] 15,000 token（读取缓存）</text>
   <rect x="560" y="275" width="140" height="40" class="box"/>
-  <text x="630" y="300" text-anchor="middle" class="sub">[user msg] 400 tok</text>
-  <text x="720" y="300" class="mono">bill: 15,000 * 0.1x + 400 * 1x</text>
+  <text x="630" y="300" text-anchor="middle" class="sub">[用户消息] 400 token</text>
+  <text x="720" y="300" class="mono">计费：15,000 * 0.1x + 400 * 1x</text>
 
   <!-- BAD example -->
   <path d="M60 340 L840 340" class="dash"/>
-  <text x="60" y="370" class="label">Anti-pattern: timestamp at the top</text>
+  <text x="60" y="370" class="label">反例：将时间戳放在最前面</text>
   <rect x="60" y="385" width="140" height="40" class="miss"/>
   <text x="130" y="410" text-anchor="middle" class="mono">"15:30:02"</text>
   <rect x="200" y="385" width="360" height="40" class="miss"/>
-  <text x="380" y="410" text-anchor="middle" class="sub">[rest of prefix]  still 15,000 tok</text>
+  <text x="380" y="410" text-anchor="middle" class="sub">[其余前缀] 仍为 15,000 token</text>
   <rect x="560" y="385" width="140" height="40" class="box"/>
-  <text x="630" y="410" text-anchor="middle" class="sub">[user msg]</text>
-  <text x="720" y="410" class="mono">every request MISSES: no shared prefix</text>
+  <text x="630" y="410" text-anchor="middle" class="sub">[用户消息]</text>
+  <text x="720" y="410" class="mono">每次请求均未命中：没有共享前缀</text>
 
   <text x="450" y="460" text-anchor="middle" class="tag">
-    break-even: Anthropic pays back after the 2nd read; 1h TTL costs 2x write but reuses 12x longer.
+    盈亏平衡：Anthropic 在第 2 次读取后回本；1h 有效期的写入成本为 2x，但复用时间延长 12x。
   </text>
 </svg>

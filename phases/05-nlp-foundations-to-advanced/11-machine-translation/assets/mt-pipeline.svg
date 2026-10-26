@@ -15,16 +15,16 @@
   </defs>
 
   <rect class="box" x="20" y="50" width="150" height="100" rx="4"/>
-  <text class="label" x="95" y="75" text-anchor="middle">source</text>
+  <text class="label" x="95" y="75" text-anchor="middle">源文本</text>
   <text class="content" x="35" y="105">"The cats</text>
   <text class="content" x="35" y="125">are running."</text>
   <text class="note" x="95" y="145" text-anchor="middle">eng_Latn</text>
 
   <path class="line" d="M 170 100 L 210 100" marker-end="url(#arrow)"/>
-  <text class="stage" x="190" y="90">tokenize</text>
+  <text class="stage" x="190" y="90">分词</text>
 
   <rect class="box" x="210" y="50" width="130" height="100" rx="4"/>
-  <text class="label" x="275" y="75" text-anchor="middle">subword ids</text>
+  <text class="label" x="275" y="75" text-anchor="middle">子词 id</text>
   <text class="content" x="225" y="105">[1201, 412,</text>
   <text class="content" x="225" y="125"> 8834, 92]</text>
   <text class="note" x="275" y="145" text-anchor="middle">SentencePiece</text>
@@ -32,28 +32,28 @@
   <path class="line" d="M 340 100 L 380 100" marker-end="url(#arrow)"/>
 
   <rect class="hot" x="380" y="50" width="170" height="100" rx="4"/>
-  <text class="label" x="465" y="75" text-anchor="middle">encoder-decoder</text>
+  <text class="label" x="465" y="75" text-anchor="middle">编码器与解码器</text>
   <text class="content" x="395" y="100">NLLB, mBART,</text>
   <text class="content" x="395" y="120">M2M, Marian</text>
   <text class="note" x="465" y="140" text-anchor="middle">forced_bos = fra_Latn</text>
 
   <path class="line" d="M 550 100 L 590 100" marker-end="url(#arrow)"/>
-  <text class="stage" x="570" y="90">beam search</text>
+  <text class="stage" x="570" y="90">束搜索</text>
 
   <rect class="box" x="590" y="50" width="130" height="100" rx="4"/>
-  <text class="label" x="655" y="75" text-anchor="middle">target ids</text>
+  <text class="label" x="655" y="75" text-anchor="middle">目标 id</text>
   <text class="content" x="605" y="105">[831, 5102,</text>
   <text class="content" x="605" y="125"> 2918, 4]</text>
   <text class="note" x="655" y="145" text-anchor="middle">fra_Latn</text>
 
   <path class="line" d="M 720 100 L 760 100" marker-end="url(#arrow)"/>
-  <text class="stage" x="740" y="90">detok</text>
+  <text class="stage" x="740" y="90">反分词</text>
 
   <rect class="box" x="760" y="50" width="120" height="100" rx="4"/>
-  <text class="label" x="820" y="75" text-anchor="middle">output</text>
+  <text class="label" x="820" y="75" text-anchor="middle">输出</text>
   <text class="content" x="775" y="105">"Les chats</text>
   <text class="content" x="775" y="125">courent."</text>
 
-  <text class="stage" x="450" y="200" text-anchor="middle">watch for: hallucinations, off-target language, terminology drift, formality mismatch</text>
-  <text class="stage" x="450" y="230" text-anchor="middle">score with sacrebleu (BLEU + chrF); always reference-matched</text>
+  <text class="stage" x="450" y="200" text-anchor="middle">注意：幻觉、偏离目标语言、术语漂移、正式程度不匹配</text>
+  <text class="stage" x="450" y="230" text-anchor="middle">用 sacrebleu（BLEU + chrF）评分；始终匹配参考译文</text>
 </svg>

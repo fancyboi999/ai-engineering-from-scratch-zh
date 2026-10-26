@@ -137,7 +137,7 @@
   <polygon points="226.39,237 241.98,246 241.98,256 226.39,265 210.8,256 210.8,246" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="1.5" stroke-linejoin="round"/>
   <polygon points="213.4,255.5 223.79,261.5 223.79,255.5 213.4,249.5" fill="var(--m-green-ink, #336b40)" fill-opacity="0.7"/>
   <polygon points="226.39,242 233.32,246 226.39,250 219.46,246" fill="var(--m-green-ink, #336b40)" fill-opacity="0.55"/>
-  <text x="79.49" y="148" font-size="11.5" text-anchor="end" font-weight="700">Ray head</text>
+  <text x="79.49" y="148" font-size="11.5" text-anchor="end" font-weight="700">Ray 头节点</text>
   <polyline points="83.49,150 83.49,246" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="83.49" cy="246" r="2" fill="var(--m-ink-mute, #666660)"/>
   <text x="127.13" y="122" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-amber-ink, #85590c)">TrainerController</text>
@@ -146,7 +146,7 @@
   <text x="174.76" y="96" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">RolloutExecutor</text>
   <polyline points="178.76,98 178.76,246" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="178.76" cy="246" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="222.39" y="70" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-green-ink, #336b40)">math reward</text>
+  <text x="222.39" y="70" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-green-ink, #336b40)">数学奖励</text>
   <polyline points="226.39,72 226.39,246" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="226.39" cy="246" r="2" fill="var(--m-green-ink, #336b40)"/>
   <polygon points="429.9,207 464.54,227 464.54,253 429.9,273 395.26,253 395.26,227" fill="var(--m-panel, #f3f1e8)"/>
@@ -199,7 +199,7 @@
   <text x="319.92" y="193.5" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">NVLink-C2C</text>
   <polyline points="319.92,199.5 319.92,227.5" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="319.92" cy="227.5" r="2" fill="var(--m-teal-ink, #18696a)"/>
-  <text x="620" y="50" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">FSDP trainer</text>
+  <text x="620" y="50" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">FSDP 训练器</text>
   <text x="620" y="64" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">FSDPTrainRayActor，运行中</text>
   <polyline points="470,60 429.9,227" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="429.9" cy="227" r="2" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -207,7 +207,7 @@
   <text x="620" y="104" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一个芯片，共用内存池</text>
   <polyline points="470,100 457.62,203" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="457.62" cy="203" r="2" fill="var(--m-ink-mute, #666660)"/>
-  <text x="620" y="130" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">SGLang engine</text>
+  <text x="620" y="130" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">SGLang 引擎</text>
   <text x="620" y="144" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">等待新权重</text>
   <polyline points="470,140 480.13,274" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="480.13" cy="274" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
@@ -238,7 +238,7 @@
   <rect class="m-knock" x="304.46" y="292.92" width="96.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="397.66" y="303.5" font-size="11" text-anchor="end" fill="var(--m-amber-ink, #85590c)">权重更新 0.64 s</text>
   </g>
-  <text x="20" y="534" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ONE STEP TO SCALE · 152.6 S, MEDIAN OF 48</text>
+  <text x="20" y="534" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">单步定标 · 152.6 S，48 次的中位数</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <polygon points="20,590 205.69,590 205.69,580 205.69,572 20,572 20,580" fill="var(--m-panel, #f3f1e8)"/>
   <polygon points="20,590 205.69,590 205.69,580 20,580" fill="var(--m-violet-fill, #ebe8f5)"/>
@@ -291,16 +291,16 @@
   </g>
   <circle cx="29" cy="620" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <text x="29" y="624" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">1</text>
-  <text x="46" y="624" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">rollout, SGLang engine</text>
+  <text x="46" y="624" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">rollout，SGLang 引擎</text>
   <circle cx="339" cy="620" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="1"/>
   <text x="339" y="624" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">2</text>
-  <text x="356" y="624" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">log probabilities, trainer</text>
+  <text x="356" y="624" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">对数概率，训练器</text>
   <circle cx="29" cy="642" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="1"/>
   <text x="29" y="646" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">3</text>
-  <text x="46" y="646" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GRPO update, Adam</text>
+  <text x="46" y="646" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">GRPO 更新，Adam</text>
   <circle cx="339" cy="642" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1"/>
   <text x="339" y="646" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">4</text>
-  <text x="356" y="646" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">weight update to the engine</text>
+  <text x="356" y="646" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">将权重更新到引擎</text>
   <text x="20" y="676" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">虚线末段表示步骤中位数减去各阶段中位数：4.2 s。trainer offload 0.76 s。</text>
   <text x="20" y="700" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">中位数来自启用 heat guard 之前的运行。</text>
 </svg>

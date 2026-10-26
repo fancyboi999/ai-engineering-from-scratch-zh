@@ -19,7 +19,7 @@ module.exports = figure('fig-4-3', {
   f.kicker(110, 118, '签名/发布（help-sbx，未运行）');
   const sign = f.box({ x: 20, y: 128, w: 160, h: 66, hue: 'blue', dash: 'dashed', title: 'sbx kit sign --key', sub: ['写 kit.sig.bundle', '在 spec.yaml 旁'], titleSize: 12 });
   const push = f.box({ x: 200, y: 128, w: 180, h: 66, hue: 'blue', dash: 'dashed', title: 'sbx kit push --sign', sub: ['DIR REF，形式由', 'schemaVersion 1/2决定'], titleSize: 12 });
-  const registry = f.box({ x: 400, y: 128, w: 220, h: 66, hue: 'grey', dash: 'dashed', title: 'HTTPS registry', sub: ['manifest、config、一个层', '签名与溯源 referrers'], titleSize: 12 });
+  const registry = f.box({ x: 400, y: 128, w: 220, h: 66, hue: 'grey', dash: 'dashed', title: 'HTTPS 镜像仓库', sub: ['manifest、config、一个层', '签名与溯源 referrers'], titleSize: 12 });
   f.arrow([dir.cx, 80], [dir.cx, 127], { style: 'call' });
   f.arrow(sign.right(), [push.x - 1, sign.cy], { style: 'call' });
   f.arrow(push.right(), [registry.x - 1, sign.cy], { style: 'write', label: 'push' });
@@ -36,4 +36,6 @@ module.exports = figure('fig-4-3', {
   f.box({ x: 236, y: 342, w: 190, h: 70, hue: 'blue', title: 'sbx kit add env-mixin', sub: ['m101-demo重建于', 'swap容器，设置变量'], titleSize: 12, pad: 8 });
   f.box({ x: 442, y: 342, w: 178, h: 70, hue: 'rose', title: 'sbx kit add hello-mixin', sub: ['拒绝：kit', '声明文件'], titleSize: 11.5, pad: 8 });
   f.text(20, 440, '虚线框依据帮助、未运行；实线框来自 capture/out/12-*。', { size: 11, serif: true, hue: 'ink-soft' });
-});
+})
+  // 保留冻结背景几何，只替换最终 SVG 中的完整文字节点。
+  .replace(">push</text>", ">推送</text>");

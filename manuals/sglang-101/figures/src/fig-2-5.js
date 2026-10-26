@@ -5,7 +5,7 @@ const { figure } = require('../../../_shared/figkit.js');
 const lanes = [
   { x: 80, name: "客户端", hue: 'olive' },
   { x: 240, name: 'TokenizerManager', hue: 'blue' },
-  { x: 400, name: 'scheduler', hue: 'blue' },
+  { x: 400, name: '调度器', hue: 'blue' },
   { x: 560, name: 'detokenizer', hue: 'blue' },
 ];
 

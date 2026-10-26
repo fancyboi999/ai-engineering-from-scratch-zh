@@ -18,66 +18,66 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">ReAct loop — Thought, Action, Observation until a stop condition fires</text>
+  <text x="480" y="26" text-anchor="middle" class="title">ReAct 循环：思考、操作、观察，直到触发停止条件</text>
 
   <rect x="40" y="60" width="340" height="460" class="box"/>
-  <text x="210" y="82" text-anchor="middle" class="head">the five ingredients</text>
+  <text x="210" y="82" text-anchor="middle" class="head">五种组成</text>
 
   <rect x="60" y="100" width="300" height="64" class="cool"/>
-  <text x="80" y="122" class="step">1. message buffer</text>
+  <text x="80" y="122" class="step">1. 消息缓冲区</text>
   <text x="80" y="140" class="small">user, assistant, tool, assistant, tool, ...</text>
-  <text x="80" y="156" class="small">Anthropic + OpenAI schemas both encode this</text>
+  <text x="80" y="156" class="small">Anthropic 与 OpenAI 的结构均编码此序列</text>
 
   <rect x="60" y="172" width="300" height="64" class="cold"/>
-  <text x="80" y="194" class="step">2. tool registry</text>
-  <text x="80" y="212" class="small">name - schema - callable; validated on dispatch</text>
-  <text x="80" y="228" class="small">registry is the sandbox boundary</text>
+  <text x="80" y="194" class="step">2. 工具注册表</text>
+  <text x="80" y="212" class="small">名称 - 结构 - 可调用函数；分发时校验</text>
+  <text x="80" y="228" class="small">注册表是沙箱边界</text>
 
   <rect x="60" y="244" width="300" height="64" class="hot"/>
-  <text x="80" y="266" class="step">3. stop condition</text>
-  <text x="80" y="284" class="small">explicit finish, no tool calls, budget exhausted</text>
-  <text x="80" y="300" class="small">pick one; mixing them hides early-termination bugs</text>
+  <text x="80" y="266" class="step">3. 停止条件</text>
+  <text x="80" y="284" class="small">明确结束、没有工具调用、预算耗尽</text>
+  <text x="80" y="300" class="small">选择一种；混用会掩盖提前终止缺陷</text>
 
   <rect x="60" y="316" width="300" height="64" class="dsk"/>
-  <text x="80" y="338" class="step">4. turn budget</text>
-  <text x="80" y="356" class="small">hard cap on iterations; 40-400 is normal</text>
-  <text x="80" y="372" class="small">scale to task class, not a single global</text>
+  <text x="80" y="338" class="step">4. 轮次预算</text>
+  <text x="80" y="356" class="small">迭代次数硬上限；通常为 40-400</text>
+  <text x="80" y="372" class="small">按任务类别设置，不使用单一全局值</text>
 
   <rect x="60" y="388" width="300" height="64" class="box"/>
-  <text x="80" y="410" class="step">5. observation formatter</text>
-  <text x="80" y="428" class="small">every 400 error becomes a string, not a crash</text>
-  <text x="80" y="444" class="small">parallel tool calls need a tool_use_id</text>
+  <text x="80" y="410" class="step">5. 观察结果格式化器</text>
+  <text x="80" y="428" class="small">每个 400 错误转为字符串，而非导致崩溃</text>
+  <text x="80" y="444" class="small">并行工具调用需要 tool_use_id</text>
 
   <rect x="400" y="60" width="540" height="460" class="box"/>
-  <text x="670" y="82" text-anchor="middle" class="head">one cycle, annotated</text>
+  <text x="670" y="82" text-anchor="middle" class="head">带注释的一次循环</text>
 
   <rect x="420" y="100" width="500" height="50" class="cool"/>
-  <text x="440" y="122" class="step">Thought  "I need tax on 120 then add it"</text>
-  <text x="440" y="140" class="small">native reasoning channel in 2026 (Responses API), previously inline tokens</text>
+  <text x="440" y="122" class="step">思考："I need tax on 120 then add it"</text>
+  <text x="440" y="140" class="small">2026 年采用原生推理通道（Responses API），此前使用内联 token</text>
 
   <rect x="420" y="158" width="500" height="50" class="cold"/>
-  <text x="440" y="180" class="step">Action  calculator(expr="120 * 0.15")</text>
-  <text x="440" y="198" class="small">structured output, dispatched through the tool registry</text>
+  <text x="440" y="180" class="step">操作：calculator(expr="120 * 0.15")</text>
+  <text x="440" y="198" class="small">结构化输出，通过工具注册表分发</text>
 
   <rect x="420" y="216" width="500" height="50" class="hot"/>
-  <text x="440" y="238" class="step">Observation  18.0</text>
-  <text x="440" y="256" class="small">untrusted; retrieved content may contain injected instructions</text>
+  <text x="440" y="238" class="step">观察：18.0</text>
+  <text x="440" y="256" class="small">不可信；检索内容可能包含注入指令</text>
 
   <rect x="420" y="274" width="500" height="50" class="cool"/>
-  <text x="440" y="296" class="step">Thought  "add 120 + 18.0 and finish"</text>
-  <text x="440" y="314" class="small">loop repeats until an assistant turn has no tool calls</text>
+  <text x="440" y="296" class="step">思考："add 120 + 18.0 and finish"</text>
+  <text x="440" y="314" class="small">循环持续到 assistant 的某轮回复不含工具调用</text>
 
   <rect x="420" y="332" width="500" height="50" class="cold"/>
-  <text x="440" y="354" class="step">Action  calculator(expr="120 + 18.0")</text>
-  <text x="440" y="372" class="small">parallel dispatch possible; tool_use_id correlates outcomes</text>
+  <text x="440" y="354" class="step">操作：calculator(expr="120 + 18.0")</text>
+  <text x="440" y="372" class="small">可以并行分发；tool_use_id 关联结果</text>
 
   <rect x="420" y="390" width="500" height="50" class="hot"/>
-  <text x="440" y="412" class="step">Observation  138.0</text>
-  <text x="440" y="430" class="small">observations feed back; loop budget decrements</text>
+  <text x="440" y="412" class="step">观察：138.0</text>
+  <text x="440" y="430" class="small">观察结果反馈回循环；轮次预算递减</text>
 
   <rect x="420" y="448" width="500" height="50" class="box"/>
-  <text x="440" y="470" class="step">Finish  "the total including 15% tax is 138.0"</text>
-  <text x="440" y="488" class="small">stop condition; trace is emitted as a span per OTel GenAI</text>
+  <text x="440" y="470" class="step">结束："the total including 15% tax is 138.0"</text>
+  <text x="440" y="488" class="small">停止条件；按照 OTel GenAI 输出 trace span</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">ReAct (Yao et al., 2023) is the 2026 substrate. Frameworks wrap it; the loop does not change.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">ReAct（Yao 等，2023）是 2026 年的基础。框架封装它，循环本身不变。</text>
 </svg>

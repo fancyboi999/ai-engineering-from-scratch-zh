@@ -1,4 +1,4 @@
-# Positional Encoding —— Sinusoidal、RoPE、ALiBi
+# 位置编码：正弦、RoPE、ALiBi
 
 > 注意力对排列不敏感。没有位置信号时，"The cat sat on the mat"和"mat the on sat cat the"产生相同的输出。三种算法来修这个问题——每种对"位置"的含义下了不同的赌注。
 

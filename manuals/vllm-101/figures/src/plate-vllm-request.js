@@ -34,7 +34,7 @@ module.exports = figure('plate-vllm-request', {
   const owner = index => REQUESTS.find(r => r.blocks.includes(index));
 
   f.kicker(20, 18, '主机 CPU · vLLM 0.31.0 进程');
-  f.box({ x: 20, y: 30, w: 150, h: 52, hue: 'blue', title: 'API server', sub: ['HTTP、分词器'] });
+  f.box({ x: 20, y: 30, w: 150, h: 52, hue: 'blue', title: "API 服务器", sub: ['HTTP、分词器'] });
   f.box({ x: 200, y: 30, w: 180, h: 66, hue: 'blue', title: 'EngineCore', sub: ['调度器', 'KVCacheManager'] });
   f.rect(410, 30, 210, 84, { hue: 'paper', stroke: color('ink-mute') });
   f.text(420, 48, 'Block 映射表', { size: 12, weight: 700 });
@@ -133,7 +133,7 @@ module.exports = figure('plate-vllm-request', {
   });
 
   f.beat(0);
-  f.text(20, 398, 'SM array', { size: 12, weight: 700, hue: 'violet' });
+  f.text(20, 398, "SM 阵列", { size: 12, weight: 700, hue: 'violet' });
   f.text(20, 414, '58 个 SM，Ada 架构', { size: 11, serif: true, hue: 'ink-soft' });
   f.leader([100, 420], die.top, { hue: 'violet' });
   f.text(620, 398, `KV cache · 每块 ${BLOCK} 个 token`, { size: 12, weight: 700, hue: 'green', anchor: 'end' });

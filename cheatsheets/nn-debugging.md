@@ -5,7 +5,7 @@ code: DN
 subtitle: 根据现象发现隐蔽训练错误。检查、阈值、初始化规则、裁剪与 AMP 顺序、性能分析工具。
 hue: 12
 sources: phases/03-deep-learning-core/08-weight-initialization, phases/03-deep-learning-core/13-debugging-neural-networks, phases/00-setup-and-tooling/12-debugging-and-profiling, phases/19-capstone-projects/45-gradient-clipping-amp
-source_hash: a8e73788de592c75
+source_hash: 8532c3d2be47d4a8
 ---
 
 ## 现象、原因与首选修正

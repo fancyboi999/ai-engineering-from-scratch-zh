@@ -20,7 +20,7 @@
   </defs>
 
   <rect class="box" x="20" y="30" width="860" height="160" rx="4"/>
-  <text class="label" x="35" y="55">encoder hidden states (kept, not discarded)</text>
+  <text class="label" x="35" y="55">编码器隐藏状态（保留，不丢弃）</text>
 
   <rect class="cell" x="40"  y="80" width="60" height="40" rx="3"/><text class="content" x="70"  y="105" text-anchor="middle">h1</text>
   <rect class="cell" x="120" y="80" width="60" height="40" rx="3"/><text class="content" x="150" y="105" text-anchor="middle">h2</text>
@@ -42,10 +42,10 @@
 
   <rect class="hot" x="500" y="80" width="80" height="40" rx="3"/>
   <text class="content" x="540" y="105" text-anchor="middle">s_{t-1}</text>
-  <text class="note" x="540" y="70" text-anchor="middle">query</text>
+  <text class="note" x="540" y="70" text-anchor="middle">查询</text>
 
   <rect class="box" x="460" y="220" width="170" height="110" rx="4"/>
-  <text class="label" x="545" y="245" text-anchor="middle">score + softmax</text>
+  <text class="label" x="545" y="245" text-anchor="middle">得分 + softmax</text>
   <text class="content" x="475" y="275">α_{t,i} = softmax(</text>
   <text class="content" x="475" y="295">  score(s_{t-1}, h_i)</text>
   <text class="content" x="475" y="315">)</text>
@@ -58,18 +58,18 @@
   <path class="line" d="M 540 120 L 545 220"/>
 
   <rect class="box" x="680" y="220" width="180" height="110" rx="4"/>
-  <text class="label" x="770" y="245" text-anchor="middle">context c_t</text>
+  <text class="label" x="770" y="245" text-anchor="middle">上下文 c_t</text>
   <text class="content" x="695" y="275">= Σ α_{t,i} · h_i</text>
-  <text class="content" x="695" y="305">weighted average</text>
-  <text class="content" x="695" y="322">of encoder states</text>
+  <text class="content" x="695" y="305">加权平均</text>
+  <text class="content" x="695" y="322">编码器状态</text>
 
   <path class="line" d="M 630 275 L 680 275" marker-end="url(#arrow)"/>
 
   <rect class="hot" x="680" y="370" width="180" height="50" rx="4"/>
-  <text class="label" x="770" y="395" text-anchor="middle">decoder step</text>
-  <text class="content" x="770" y="415" text-anchor="middle">outputs next token</text>
+  <text class="label" x="770" y="395" text-anchor="middle">解码器步骤</text>
+  <text class="content" x="770" y="415" text-anchor="middle">输出下一个 token</text>
 
   <path class="line" d="M 770 330 L 770 370" marker-end="url(#arrow)"/>
 
-  <text class="stage" x="450" y="415">no more fixed-size bottleneck. context reshapes every step.</text>
+  <text class="stage" x="450" y="415">不再受固定大小限制；上下文每步重新组合。</text>
 </svg>

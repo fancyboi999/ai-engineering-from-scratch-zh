@@ -11,22 +11,22 @@
   <text x="54" y="66" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">90</text>
   <line x1="60" y1="260" x2="620" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="60" y1="40" x2="60" y2="260" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="60" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds per step, median</text>
+  <text x="60" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每步耗时（秒），中位数</text>
   <rect x="81" y="155.51" width="51.33" height="104.49" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="106.67" y="149.51" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">47.5 s</text>
-  <text x="106.67" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">rollout</text>
+  <text x="106.67" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">轨迹采样</text>
   <rect x="174.33" y="208.57" width="51.33" height="51.43" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="200" y="202.57" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">23.4 s</text>
-  <text x="200" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">log probability</text>
+  <text x="200" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">对数概率</text>
   <rect x="267.67" y="90.68" width="51.33" height="169.32" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
   <text x="293.33" y="84.68" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">77.0 s</text>
   <text x="293.33" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">梯度步骤</text>
   <rect x="361" y="258.34" width="51.33" height="1.66" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="386.67" y="252.34" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">0.76 s</text>
-  <text x="386.67" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">offload</text>
+  <text x="386.67" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">卸载</text>
   <rect x="454.33" y="258.09" width="51.33" height="1.91" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="480" y="252.09" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">0.87 s</text>
-  <text x="480" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">onload</text>
+  <text x="480" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">加载</text>
   <rect x="547.67" y="258.6" width="51.33" height="1.4" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="573.33" y="252.6" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">0.64 s</text>
   <text x="573.33" y="277" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">权重更新</text>

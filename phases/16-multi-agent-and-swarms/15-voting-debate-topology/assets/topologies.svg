@@ -16,22 +16,22 @@
       .edge { stroke: #1a1a1a; stroke-width: 1; fill: none; }
     </style>
   </defs>
-  <text x="480" y="28" text-anchor="middle" class="title">Multi-agent debate topologies — MultiAgentBench (ACL 2025)</text>
+  <text x="480" y="28" text-anchor="middle" class="title">多 agent 辩论拓扑：MultiAgentBench（ACL 2025）</text>
 
   <rect x="40" y="60" width="210" height="220" class="box"/>
-  <text x="145" y="84" text-anchor="middle" class="head">star</text>
+  <text x="145" y="84" text-anchor="middle" class="head">星形</text>
   <circle cx="145" cy="140" r="24" class="hub"/>
-  <text x="145" y="144" text-anchor="middle" class="small">hub</text>
+  <text x="145" y="144" text-anchor="middle" class="small">中心</text>
   <circle cx="80" cy="200" r="20" class="node"/>
   <circle cx="145" cy="220" r="20" class="node"/>
   <circle cx="210" cy="200" r="20" class="node"/>
   <line x1="145" y1="164" x2="85" y2="185" class="edge"/>
   <line x1="145" y1="164" x2="145" y2="200" class="edge"/>
   <line x1="145" y1="164" x2="205" y2="185" class="edge"/>
-  <text x="145" y="260" text-anchor="middle" class="caption">fast-factual wins here</text>
+  <text x="145" y="260" text-anchor="middle" class="caption">适合快速事实任务</text>
 
   <rect x="270" y="60" width="210" height="220" class="box"/>
-  <text x="375" y="84" text-anchor="middle" class="head">chain</text>
+  <text x="375" y="84" text-anchor="middle" class="head">链形</text>
   <circle cx="300" cy="170" r="20" class="node"/>
   <circle cx="345" cy="170" r="20" class="node"/>
   <circle cx="390" cy="170" r="20" class="node"/>
@@ -39,10 +39,10 @@
   <line x1="320" y1="170" x2="325" y2="170" class="edge" marker-end="url(#arrow)"/>
   <line x1="365" y1="170" x2="370" y2="170" class="edge" marker-end="url(#arrow)"/>
   <line x1="410" y1="170" x2="415" y2="170" class="edge" marker-end="url(#arrow)"/>
-  <text x="375" y="260" text-anchor="middle" class="caption">stepwise refinement</text>
+  <text x="375" y="260" text-anchor="middle" class="caption">逐步改进</text>
 
   <rect x="500" y="60" width="210" height="220" class="box"/>
-  <text x="605" y="84" text-anchor="middle" class="head">tree</text>
+  <text x="605" y="84" text-anchor="middle" class="head">树形</text>
   <circle cx="605" cy="120" r="20" class="node"/>
   <circle cx="555" cy="180" r="18" class="node"/>
   <circle cx="655" cy="180" r="18" class="node"/>
@@ -56,10 +56,10 @@
   <line x1="555" y1="198" x2="580" y2="215" class="edge"/>
   <line x1="655" y1="198" x2="630" y2="215" class="edge"/>
   <line x1="655" y1="198" x2="680" y2="215" class="edge"/>
-  <text x="605" y="260" text-anchor="middle" class="caption">hierarchical, divide-and-conquer</text>
+  <text x="605" y="260" text-anchor="middle" class="caption">分层、分治</text>
 
   <rect x="730" y="60" width="210" height="220" class="box"/>
-  <text x="835" y="84" text-anchor="middle" class="head">graph</text>
+  <text x="835" y="84" text-anchor="middle" class="head">图形</text>
   <circle cx="800" cy="130" r="20" class="node"/>
   <circle cx="870" cy="130" r="20" class="node"/>
   <circle cx="800" cy="210" r="20" class="node"/>
@@ -70,13 +70,13 @@
   <line x1="870" y1="150" x2="870" y2="190" class="edge"/>
   <line x1="820" y1="150" x2="850" y2="190" class="edge"/>
   <line x1="850" y1="150" x2="820" y2="190" class="edge"/>
-  <text x="835" y="260" text-anchor="middle" class="caption">research wins here</text>
+  <text x="835" y="260" text-anchor="middle" class="caption">适合研究任务</text>
 
   <rect x="40" y="310" width="900" height="150" class="cool"/>
-  <text x="490" y="334" text-anchor="middle" class="head">measured results from MultiAgentBench (MARBLE, ACL 2025)</text>
-  <text x="70" y="362" class="small">graph best for research; +3% milestone achievement over next-best topology</text>
-  <text x="70" y="382" class="small">coordination tax: past ~4 agents, wall-clock and token cost grow faster than accuracy</text>
-  <text x="70" y="402" class="small">heterogeneity (different base models) consistently beats adding more homogeneous agents</text>
-  <text x="70" y="422" class="small">bounded rounds (2-3) matter: unbounded debate rewards conformity, not correctness</text>
-  <text x="70" y="442" class="small">star is the cost sweet spot when the hub is high-capability and workers are cheap</text>
+  <text x="490" y="334" text-anchor="middle" class="head">MultiAgentBench 实测结果（MARBLE、ACL 2025）</text>
+  <text x="70" y="362" class="small">图拓扑最适合研究；里程碑完成率比次优拓扑高 +3%</text>
+  <text x="70" y="382" class="small">协调成本：超过约 4 个 agent 后，耗时与 token 成本的增长快于准确率</text>
+  <text x="70" y="402" class="small">异质性（不同基础模型）始终优于增加同质 agent 数量</text>
+  <text x="70" y="422" class="small">限制轮次（2-3）很重要；无限辩论鼓励从众，而非正确性</text>
+  <text x="70" y="442" class="small">中心能力强、工作 agent 便宜时，星形拓扑成本最优</text>
 </svg>

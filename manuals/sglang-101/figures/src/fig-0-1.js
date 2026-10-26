@@ -5,7 +5,7 @@ const { figure } = require('../../../_shared/figkit.js');
 const lanes = [
   { title: "客户端", sub: "Python 脚本", hue: 'olive' },
   { title: 'tokenizer', sub: 'manager', hue: 'blue' },
-  { title: 'scheduler', sub: "事件循环", hue: 'blue' },
+  { title: '调度器', sub: "事件循环", hue: 'blue' },
   { title: "模型", sub: 'MLX, Qwen3', hue: 'violet' },
   { title: 'detokenizer', sub: 'manager', hue: 'blue' },
   { title: 'macOS', sub: "Metal、磁盘", hue: 'grey' },

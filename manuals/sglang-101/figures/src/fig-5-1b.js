@@ -11,7 +11,7 @@ module.exports = figure('fig-5-1b', {
   f.kicker(232, 18, "计算方式");
   f.kicker(515, 18, "上限为 8");
   const rows = [
-    ['Concurrency', "E2E 延迟总和 / 时长", '7.96'],
+    ['并发数', "E2E 延迟总和 / 时长", '7.96'],
     ["峰值并发请求", "一秒内最多活跃请求", '16'],
     ['TTFT', "发送至首流式块", '785.79 ms'],
     ['TPOT', '(latency - TTFT) / (tokens - 1)', '22.52 ms'],

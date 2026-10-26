@@ -4,7 +4,7 @@ const { figure, color } = require('../../../_shared/figkit.js');
 
 const plan = [
   ['+', 'kits: source $CAPTURE/fixtures/kits/hello-mixin'],
-  [' ', 'workspace: $CAPTURE/fixtures/env (not recorded as applied, needs your approval)'],
+  [' ', 'workspace: $CAPTURE/fixtures/env（未记录为已应用，需你批准）'],
   ['+', 'env: GREETING: hello'],
   ['+', 'sandbox: name m101-env, agent shell'],
   ['+', 'ports: sandbox 8080, protocol tcp4, host 18083'],

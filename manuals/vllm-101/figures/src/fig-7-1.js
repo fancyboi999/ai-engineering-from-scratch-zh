@@ -24,7 +24,7 @@ const groups = [
     ['首 token 等待数秒', 'waiting 与 KV 使用率', '3.1'],
     ['并发用户多，token 间隔长', 'P99 对比中位数', '3.3'],
     ['preemption 增长', 'num_preemptions', '3.1'],
-    ['N-gram 收益较低', 'async warning', '4.2'],
+    ['N-gram 收益较低', '异步警告', '4.2'],
     ['eager mode 首次启动慢', '首批请求', '4.3'],
     ['GB10 上 NVFP4 较慢', 'TPOT 对比 0.28', '固定版本'],
   ] },
@@ -35,7 +35,7 @@ const groups = [
     ['不同运行输出变化', '单独发送相同请求', '3.8'],
   ] },
   { label: '基准测试结果异常', hue: 'olive', rows: [
-    ['第二次运行更快', 'prefix cache hits', '5.1'],
+    ['第二次运行更快', '前缀缓存命中', '5.1'],
   ] },
 ];
 

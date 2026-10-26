@@ -15,44 +15,44 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">fine-tuning DAG — one YAML reproduces everything</text>
+  <text x="480" y="24" text-anchor="middle" class="title">微调 DAG — 一份 YAML 复现所有步骤</text>
 
   <rect x="40" y="60" width="180" height="60" class="cool"/>
-  <text x="130" y="84" text-anchor="middle" class="step">data</text>
-  <text x="130" y="102" text-anchor="middle" class="small">Datatrove dedup</text>
+  <text x="130" y="84" text-anchor="middle" class="step">数据</text>
+  <text x="130" y="102" text-anchor="middle" class="small">Datatrove 去重</text>
   <text x="130" y="116" text-anchor="middle" class="small">Nemotron-CC + Presidio</text>
 
   <rect x="260" y="60" width="180" height="60" class="hot"/>
-  <text x="350" y="84" text-anchor="middle" class="step">contamination</text>
-  <text x="350" y="102" text-anchor="middle" class="small">MinHashLSH vs</text>
+  <text x="350" y="84" text-anchor="middle" class="step">数据污染</text>
+  <text x="350" y="102" text-anchor="middle" class="small">MinHashLSH 对比</text>
   <text x="350" y="116" text-anchor="middle" class="small">MMLU-Pro / MT-Bench</text>
 
   <rect x="480" y="60" width="180" height="60" class="cool"/>
   <text x="570" y="84" text-anchor="middle" class="step">SFT</text>
   <text x="570" y="102" text-anchor="middle" class="small">Axolotl v0.8 + ZeRO-3</text>
-  <text x="570" y="116" text-anchor="middle" class="small">2-3 epochs 8xH100</text>
+  <text x="570" y="116" text-anchor="middle" class="small">2-3 个 epoch，8xH100</text>
 
   <rect x="700" y="60" width="180" height="60" class="cool"/>
   <text x="790" y="84" text-anchor="middle" class="step">DPO / GRPO</text>
   <text x="790" y="102" text-anchor="middle" class="small">TRL 0.15</text>
-  <text x="790" y="116" text-anchor="middle" class="small">1 epoch, beta sweep</text>
+  <text x="790" y="116" text-anchor="middle" class="small">1 个 epoch，扫描 beta</text>
 
   <path d="M220,90 L260,90" class="edge" marker-end="url(#arrow)"/>
   <path d="M440,90 L480,90" class="edge" marker-end="url(#arrow)"/>
   <path d="M660,90 L700,90" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="150" y="170" width="200" height="60" class="cold"/>
-  <text x="250" y="194" text-anchor="middle" class="step">quantize</text>
+  <text x="250" y="194" text-anchor="middle" class="step">量化</text>
   <text x="250" y="212" text-anchor="middle" class="small">GPTQ + AWQ + GGUF</text>
   <text x="250" y="226" text-anchor="middle" class="small">Marlin INT4</text>
 
   <rect x="390" y="170" width="200" height="60" class="dsk"/>
-  <text x="490" y="194" text-anchor="middle" class="step">serve</text>
+  <text x="490" y="194" text-anchor="middle" class="step">服务</text>
   <text x="490" y="212" text-anchor="middle" class="small">vLLM 0.7 + EAGLE-3</text>
-  <text x="490" y="226" text-anchor="middle" class="small">K8s HPA on queue-wait</text>
+  <text x="490" y="226" text-anchor="middle" class="small">K8s HPA 根据队列等待时间扩缩容</text>
 
   <rect x="630" y="170" width="200" height="60" class="cool"/>
-  <text x="730" y="194" text-anchor="middle" class="step">eval</text>
+  <text x="730" y="194" text-anchor="middle" class="step">评测</text>
   <text x="730" y="212" text-anchor="middle" class="small">lm-eval + MT-Bench v2</text>
   <text x="730" y="226" text-anchor="middle" class="small">RewardBench-2 + MMLU-Pro</text>
 
@@ -61,16 +61,16 @@
   <path d="M350,200 L390,200" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="260" y="280" width="440" height="60" class="hot"/>
-  <text x="480" y="304" text-anchor="middle" class="step">safety eval + model card</text>
-  <text x="480" y="322" text-anchor="middle" class="small">Llama Guard 4 + ShieldGemma-2 + MOF 2026 template</text>
+  <text x="480" y="304" text-anchor="middle" class="step">安全评测 + 模型卡</text>
+  <text x="480" y="322" text-anchor="middle" class="small">Llama Guard 4 + ShieldGemma-2 + MOF 2026 模板</text>
   <path d="M480,230 L480,280" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="40" y="380" width="880" height="140" class="box"/>
-  <text x="480" y="400" text-anchor="middle" class="head">content-hashed manifest + reproducibility contract</text>
-  <text x="60" y="422" class="small">every stage consumes and produces a content-hashed artifact</text>
-  <text x="60" y="440" class="small">re-running with the same YAML + seed yields identical hashes end to end</text>
-  <text x="60" y="458" class="small">one command: ./pipeline.sh config/llama3.3-8b-domainX.yaml</text>
-  <text x="60" y="476" class="small">Langfuse traces training+inference; W&amp;B run links in model card</text>
-  <text x="60" y="496" class="small">ablation table baked in: base / SFT-only / SFT+DPO / SFT+GRPO</text>
-  <text x="60" y="514" class="caption">serving target: 2.5x+ throughput vs baseline with EAGLE-3; $/1M tokens reported vs hosted APIs</text>
+  <text x="480" y="400" text-anchor="middle" class="head">带内容哈希的清单 + 可复现性契约</text>
+  <text x="60" y="422" class="small">每个阶段都消费并生成带内容哈希的产物</text>
+  <text x="60" y="440" class="small">使用相同 YAML + seed 重跑，端到端哈希一致</text>
+  <text x="60" y="458" class="small">一条命令：./pipeline.sh config/llama3.3-8b-domainX.yaml</text>
+  <text x="60" y="476" class="small">Langfuse 追踪训练与推理；模型卡包含 W&amp;B 运行链接</text>
+  <text x="60" y="496" class="small">内置消融表：基座 / 仅 SFT / SFT+DPO / SFT+GRPO</text>
+  <text x="60" y="514" class="caption">服务目标：使用 EAGLE-3 后吞吐达到基线 2.5 倍以上；报告每 1M token 成本并对比托管 API</text>
 </svg>

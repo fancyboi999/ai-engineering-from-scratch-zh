@@ -14,35 +14,35 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">DQN: Q-learning + replay + target network</text>
+  <text x="450" y="30" text-anchor="middle" class="title">DQN：Q-learning + 经验回放 + 目标网络</text>
 
   <rect x="40" y="60" width="200" height="110" class="box"/>
-  <text x="140" y="88" text-anchor="middle" class="label">environment</text>
+  <text x="140" y="88" text-anchor="middle" class="label">环境</text>
   <text x="140" y="112" text-anchor="middle" class="content">(s, a) -&gt; (r, s')</text>
-  <text x="140" y="135" text-anchor="middle" class="caption">Atari, GridWorld, whatever</text>
+  <text x="140" y="135" text-anchor="middle" class="caption">Atari、GridWorld 或其他环境</text>
 
   <rect x="280" y="60" width="200" height="110" class="hot"/>
-  <text x="380" y="88" text-anchor="middle" class="label">online net Q(.; theta)</text>
-  <text x="380" y="112" text-anchor="middle" class="content">acts epsilon-greedy</text>
-  <text x="380" y="135" text-anchor="middle" class="content">trained every step</text>
+  <text x="380" y="88" text-anchor="middle" class="label">在线网络 Q(.; theta)</text>
+  <text x="380" y="112" text-anchor="middle" class="content">以 epsilon-greedy 选择动作</text>
+  <text x="380" y="135" text-anchor="middle" class="content">每步训练</text>
 
   <rect x="520" y="60" width="200" height="110" class="box"/>
-  <text x="620" y="88" text-anchor="middle" class="label">replay buffer D</text>
+  <text x="620" y="88" text-anchor="middle" class="label">回放缓冲区 D</text>
   <text x="620" y="112" text-anchor="middle" class="content">(s, a, r, s', done)</text>
-  <text x="620" y="135" text-anchor="middle" class="caption">~1M transitions, uniform sample</text>
+  <text x="620" y="135" text-anchor="middle" class="caption">约 1M 次状态转移，均匀采样</text>
 
   <rect x="760" y="60" width="100" height="110" class="cool"/>
-  <text x="810" y="88" text-anchor="middle" class="label">target</text>
+  <text x="810" y="88" text-anchor="middle" class="label">目标网络</text>
   <text x="810" y="112" text-anchor="middle" class="label">theta^-</text>
-  <text x="810" y="140" text-anchor="middle" class="caption">frozen</text>
-  <text x="810" y="155" text-anchor="middle" class="caption">sync/C</text>
+  <text x="810" y="140" text-anchor="middle" class="caption">冻结</text>
+  <text x="810" y="155" text-anchor="middle" class="caption">每 C 步同步</text>
 
   <line x1="240" y1="115" x2="278" y2="115" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="480" y1="115" x2="518" y2="115" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="720" y1="115" x2="758" y2="115" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
 
   <rect x="40" y="210" width="820" height="150" class="box"/>
-  <text x="450" y="235" text-anchor="middle" class="label">gradient step: one minibatch, TD squared error</text>
+  <text x="450" y="235" text-anchor="middle" class="label">梯度更新：一个小批次，TD 平方误差</text>
   <text x="60" y="265" class="content">for (s, a, r, s', done) in buffer.sample(batch):</text>
   <text x="60" y="285" class="content">   y = r                             if done</text>
   <text x="60" y="305" class="content">   y = r + gamma * max_a' Q(s', a'; theta^-)    otherwise</text>
@@ -50,7 +50,7 @@
   <text x="60" y="345" class="content">   theta -= lr * d loss / d theta</text>
 
   <path d="M 380 360 Q 380 400 140 400 Q 140 175 140 170" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
-  <text x="250" y="414" class="caption">updated theta acts next step</text>
+  <text x="250" y="414" class="caption">更新后的 theta 用于下一步动作</text>
 
-  <text x="450" y="448" text-anchor="middle" class="caption">three tricks, one loss, one neural net: the deep RL era begins</text>
+  <text x="450" y="448" text-anchor="middle" class="caption">三个技巧，一种损失，一个神经网络：深度 RL 时代开始</text>
 </svg>

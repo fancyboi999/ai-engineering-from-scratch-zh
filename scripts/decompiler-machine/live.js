@@ -297,7 +297,7 @@ function advance(dt) {
     if (mode === "auto" && !renderMode) replayTimer = setTimeout(() => mode === "auto" && state.done && load(state.config, { autoplay: true }), 1800);
     const o = state.sim.outcome;
     const t = state.sim.totals;
-    $("[data-dm-live]").textContent = `Run finished: ${o.status}. ${t.observed} observed, ${t.derived} derived, ${t.inferred} inferred, ${t.unknown} unknown.`;
+    $("[data-dm-live]").textContent = `运行结束：${o.status === "decompiled" ? "已反编译" : "已停止"}。${t.observed} 项观察证据，${t.derived} 项推导，${t.inferred} 项推断，${t.unknown} 项未知。`;
     syncButtons();
   }
 }
@@ -715,7 +715,7 @@ const EVENT_LABEL = { header: "读取文件头", sections: "读取节与符号",
 const CONFIDENCE_LABEL = { observed: "观察", derived: "推导", inferred: "推断", unknown: "未知" };
 function localizeTrace(text) {
   const terms = [
-    [/\brecursive descent\b/g, "递归下降"], [/\blinear sweep\b/g, "线性扫描"], [/\blittle-endian\b/g, "小端"], [/\bsection headers?\b/g, "个节头"], [/\bsections?\b/g, "个节"], [/\bnamed symbols?\b/g, "个命名符号"], [/\bsymbols?\b/g, "符号"], [/\binstructions?\b/g, "条指令"], [/\bbasic blocks?\b/g, "个基本块"], [/\bblocks?\b/g, "个块"], [/\bedges?\b/g, "条边"], [/\breachable from the entry\b/g, "可从入口到达"], [/\bunreachable\b/g, "不可达"], [/\bdropped\b/g, "已移除"], [/\bdecoded\b/g, "已解码"], [/\bmissed\b/g, "漏掉"], [/\blive\b/g, "可达"], [/\bfunctions?\b/g, "函数"], [/\bsymbol table not read\b/g, "未读取符号表"], [/\bthe function is\b/g, "函数暂命名为"], [/\bits end is unknown\b/g, "结尾未知"], [/\bexit: \b/g, "结果："], [/\bdecompiled\b/g, "已反汇编"], [/\bstopped\b/g, "已停止"], [/\bsteps?\b/g, "步骤"], [/\bready\b/g, "就绪"], [/\bqueued\b/g, "排队"], [/\brunning\b/g, "运行中"], [/\bwaiting\b/g, "等待运行"], [/\bempty\b/g, "暂无记录"], [/\bnot decoded yet\b/g, "尚未解码"], [/\bnone yet\b/g, "尚未恢复"], [/\bobserved\b/g, "观察"], [/\bderived\b/g, "推导"], [/\binferred\b/g, "推断"], [/\bunknown\b/g, "未知"], [/\bledger\b/g, "证据账本"], [/\bstatements?\b/g, "条语句"], [/\blines?\b/g, "行"], [/\bpseudocode\b/g, "伪代码"], [/\bparameters?\b/g, "个参数"], [/\bstack slots?\b/g, "个栈槽"], [/\btypes from widths\b/g, "根据位宽推断类型"], [/\bstructured as\b/g, "结构为"], [/\bstraight-line code\b/g, "顺序执行代码"], [/\ban if\/else that joins before the return\b/g, "在 return 前汇合的 if/else"], [/\ban if with an early return\b/g, "带提前返回的 if"], [/\ba loop\b/g, "循环"], [/\bbytes that no path reaches were decoded as\b/g, "个不可达字节被解码为"], [/\bthat no path reaches\b/g, "个不可达"], [/\bdecode range\b/g, "解码范围"], [/\bup to the next function\b/g, "，直到下一个函数之前"], [/\bat file offset\b/g, "，文件偏移"], [/\bat\b/g, "位于"], [/\bfrom\b/g, "来自"], [/\bfor\b/g, "面向"], [/\bbytes\b/g, "字节"],
+    [/\brecursive descent\b/g, "递归下降"], [/\blinear sweep\b/g, "线性扫描"], [/\blittle-endian\b/g, "小端"], [/\bsection headers?\b/g, "个节头"], [/\bsections?\b/g, "个节"], [/\bnamed symbols?\b/g, "个命名符号"], [/\bsymbols?\b/g, "符号"], [/\binstructions?\b/g, "条指令"], [/\bbasic blocks?\b/g, "个基本块"], [/\bblocks?\b/g, "个块"], [/\bedges?\b/g, "条边"], [/\breachable from the entry\b/g, "可从入口到达"], [/\bunreachable\b/g, "不可达"], [/\bdropped\b/g, "已移除"], [/\bdecoded\b/g, "已解码"], [/\bmissed\b/g, "漏掉"], [/\blive\b/g, "可达"], [/\bfunctions?\b/g, "函数"], [/\bsymbol table not read\b/g, "未读取符号表"], [/\bthe function is\b/g, "函数暂命名为"], [/\bits end is unknown\b/g, "结尾未知"], [/\bexit: \b/g, "结果："], [/\bdecompiled\b/g, "已反编译"], [/\bstopped\b/g, "已停止"], [/\bsteps?\b/g, "步骤"], [/\bready\b/g, "就绪"], [/\bqueued\b/g, "排队"], [/\brunning\b/g, "运行中"], [/\bwaiting\b/g, "等待运行"], [/\bempty\b/g, "暂无记录"], [/\bnot decoded yet\b/g, "尚未解码"], [/\bnone yet\b/g, "尚未恢复"], [/\bobserved\b/g, "观察"], [/\bderived\b/g, "推导"], [/\binferred\b/g, "推断"], [/\bunknown\b/g, "未知"], [/\bledger\b/g, "证据账本"], [/\bstatements?\b/g, "条语句"], [/\blines?\b/g, "行"], [/\bpseudocode\b/g, "伪代码"], [/\bparameters?\b/g, "个参数"], [/\bstack slots?\b/g, "个栈槽"], [/\btypes from widths\b/g, "根据位宽推断类型"], [/\bstructured as\b/g, "结构为"], [/\bstraight-line code\b/g, "顺序执行代码"], [/\ban if\/else that joins before the return\b/g, "在 return 前汇合的 if/else"], [/\ban if with an early return\b/g, "带提前返回的 if"], [/\ba loop\b/g, "循环"], [/\bbytes that no path reaches were decoded as\b/g, "个不可达字节被解码为"], [/\bthat no path reaches\b/g, "个不可达"], [/\bdecode range\b/g, "解码范围"], [/\bup to the next function\b/g, "，直到下一个函数之前"], [/\bat file offset\b/g, "，文件偏移"], [/\bat\b/g, "位于"], [/\bfrom\b/g, "来自"], [/\bfor\b/g, "面向"], [/\bbytes\b/g, "字节"],
   ];
   let result = String(text || "");
   for (const [pattern, replacement] of terms) result = result.replace(pattern, replacement);
@@ -756,7 +756,7 @@ function render(index) {
   const out = $("[data-dm-output]");
   const final = ev && ev.type === "exit";
   const emitted = shown.find((item) => item.type === "emit");
-  status.textContent = final ? sim.outcome.status === "decompiled" ? "已反汇编" : "已停止" : ev ? "运行中" : "等待运行";
+  status.textContent = final ? sim.outcome.status === "decompiled" ? "已反编译" : "已停止" : ev ? "运行中" : "等待运行";
   status.dataset.status = final ? sim.outcome.status : ev ? "running" : "idle";
   out.textContent = emitted ? emitted.lines.join("\n") : final ? sim.outcome.text : "暂无伪代码。";
 }

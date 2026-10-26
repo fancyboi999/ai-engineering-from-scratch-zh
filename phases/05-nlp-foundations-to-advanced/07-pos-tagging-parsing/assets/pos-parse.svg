@@ -17,7 +17,7 @@
   </defs>
 
   <rect class="box" x="20" y="30" width="860" height="100" rx="4"/>
-  <text class="label" x="35" y="55">POS tags (Universal Dependencies)</text>
+  <text class="label" x="35" y="55">词性标签（Universal Dependencies）</text>
 
   <rect class="tok" x="50"  y="75" width="80" height="40" rx="3"/><text class="content" x="90"  y="98" text-anchor="middle">The</text><text class="tag" x="90"  y="115" text-anchor="middle">DET</text>
   <rect class="tok" x="140" y="75" width="80" height="40" rx="3"/><text class="content" x="180" y="98" text-anchor="middle">cats</text><text class="tag" x="180" y="115" text-anchor="middle">NOUN</text>
@@ -28,7 +28,7 @@
   <rect class="tok" x="580" y="75" width="50" height="40" rx="3"/><text class="content" x="605" y="98" text-anchor="middle">.</text><text class="tag" x="605" y="115" text-anchor="middle">PUNCT</text>
 
   <rect class="box" x="20" y="170" width="860" height="180" rx="4"/>
-  <text class="label" x="35" y="195">Dependency parse</text>
+  <text class="label" x="35" y="195">依存句法分析</text>
 
   <rect class="tok" x="50"  y="240" width="80" height="40" rx="3"/><text class="content" x="90"  y="265" text-anchor="middle">The</text>
   <rect class="tok" x="140" y="240" width="80" height="40" rx="3"/><text class="content" x="180" y="265" text-anchor="middle">cats</text>
@@ -53,5 +53,5 @@
   <text class="rel" x="490" y="220" text-anchor="middle">pobj</text>
 
   <text class="note" x="365" y="310" text-anchor="middle">ROOT = running</text>
-  <text class="stage" x="450" y="370" text-anchor="middle">every word has one head. arrows go head → dependent.</text>
+  <text class="stage" x="450" y="370" text-anchor="middle">每个词有一个中心词。箭头从中心词指向依存词。</text>
 </svg>

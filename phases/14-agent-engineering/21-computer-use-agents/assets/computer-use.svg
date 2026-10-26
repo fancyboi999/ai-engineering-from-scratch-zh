@@ -17,64 +17,64 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Computer use — Claude, OpenAI CUA, Gemini 2.5 (all vision-based)</text>
+  <text x="480" y="26" text-anchor="middle" class="title">计算机使用：Claude、OpenAI CUA、Gemini 2.5（均基于视觉）</text>
 
   <rect x="40" y="50" width="290" height="200" class="claude"/>
-  <text x="185" y="72" text-anchor="middle" class="head">Claude computer use</text>
-  <text x="60" y="96" class="small">Anthropic, Oct 22 2024</text>
+  <text x="185" y="72" text-anchor="middle" class="head">Claude 计算机使用</text>
+  <text x="60" y="96" class="small">Anthropic，2024 年十月 22 日</text>
   <rect x="60" y="108" width="250" height="40" class="box"/>
-  <text x="78" y="128" class="step">screenshot in  keyboard/mouse out</text>
-  <text x="78" y="142" class="small">no accessibility APIs; pure pixels</text>
+  <text x="78" y="128" class="step">输入截图，输出键盘与鼠标操作</text>
+  <text x="78" y="142" class="small">无辅助功能 API，仅使用像素</text>
   <rect x="60" y="150" width="250" height="40" class="box"/>
-  <text x="78" y="170" class="step">computer tool baked into model</text>
-  <text x="78" y="184" class="small">schema not developer-configurable</text>
+  <text x="78" y="170" class="step">计算机工具内置于模型</text>
+  <text x="78" y="184" class="small">开发者不能自定义 schema</text>
   <rect x="60" y="192" width="250" height="54" class="box"/>
-  <text x="78" y="212" class="step">trained to count pixels</text>
-  <text x="78" y="228" class="small">from reference points to targets</text>
-  <text x="78" y="242" class="small">resolution-independent coordinates</text>
+  <text x="78" y="212" class="step">训练模型数像素</text>
+  <text x="78" y="228" class="small">从参考点定位目标</text>
+  <text x="78" y="242" class="small">与分辨率无关的坐标</text>
 
   <rect x="340" y="50" width="290" height="200" class="openai"/>
   <text x="485" y="72" text-anchor="middle" class="head">OpenAI CUA / Operator</text>
-  <text x="360" y="96" class="small">Jan 2025  ChatGPT agent mode Jul 2025</text>
+  <text x="360" y="96" class="small">2025 年一月；ChatGPT agent 模式于 2025 年七月推出</text>
   <rect x="360" y="108" width="250" height="40" class="box"/>
-  <text x="378" y="128" class="step">GPT-4o variant with RL on GUI</text>
+  <text x="378" y="128" class="step">GPT-4o 变体，通过 GUI 强化学习训练</text>
   <text x="378" y="142" class="small">Responses API, computer-use-preview</text>
   <rect x="360" y="150" width="250" height="40" class="box"/>
   <text x="378" y="170" class="step">OSWorld 38.1%, WebArena 58.1%</text>
-  <text x="378" y="184" class="small">WebVoyager 87% at launch</text>
+  <text x="378" y="184" class="small">发布时 WebVoyager 达到 87%</text>
   <rect x="360" y="192" width="250" height="54" class="box"/>
-  <text x="378" y="212" class="step">consumer-facing launch path</text>
-  <text x="378" y="228" class="small">merged into ChatGPT agent mode</text>
-  <text x="378" y="242" class="small">mobile + web first</text>
+  <text x="378" y="212" class="step">面向消费者的发布路线</text>
+  <text x="378" y="228" class="small">并入 ChatGPT agent 模式</text>
+  <text x="378" y="242" class="small">移动端与网页优先</text>
 
   <rect x="640" y="50" width="290" height="200" class="gemini"/>
   <text x="785" y="72" text-anchor="middle" class="head">Gemini 2.5 Computer Use</text>
-  <text x="660" y="96" class="small">Google DeepMind, Oct 7 2025</text>
+  <text x="660" y="96" class="small">Google DeepMind，2025 年十月 7 日</text>
   <rect x="660" y="108" width="250" height="40" class="box"/>
-  <text x="678" y="128" class="step">browser-only (13 actions)</text>
-  <text x="678" y="142" class="small">lowest latency of the three</text>
+  <text x="678" y="128" class="step">仅支持浏览器（13 种动作）</text>
+  <text x="678" y="142" class="small">三者中延迟最低</text>
   <rect x="660" y="150" width="250" height="40" class="box"/>
   <text x="678" y="170" class="step">Online-Mind2Web ~70%</text>
-  <text x="678" y="184" class="small">Gemini 3 Flash: built-in</text>
+  <text x="678" y="184" class="small">Gemini 3 Flash：内置</text>
   <rect x="660" y="192" width="250" height="54" class="box"/>
-  <text x="678" y="212" class="step">per-step safety service</text>
-  <text x="678" y="228" class="small">every action assessed before execution</text>
-  <text x="678" y="242" class="small">rejects unsafe without model involvement</text>
+  <text x="678" y="212" class="step">逐步安全服务</text>
+  <text x="678" y="228" class="small">每个动作执行前均评估</text>
+  <text x="678" y="242" class="small">无需模型参与即可拒绝不安全动作</text>
 
   <rect x="40" y="270" width="880" height="240" class="safety"/>
-  <text x="480" y="292" text-anchor="middle" class="head">shared 2026 contract: all inputs except the user message are untrusted</text>
+  <text x="480" y="292" text-anchor="middle" class="head">2026 共同契约：除用户消息外的所有输入均不可信</text>
   <rect x="60" y="308" width="840" height="30" class="box"/>
-  <text x="78" y="328" class="step">1. per-step safety classifier before every action</text>
+  <text x="78" y="328" class="step">1. 每个动作前使用逐步安全分类器</text>
   <rect x="60" y="342" width="840" height="30" class="box"/>
-  <text x="78" y="362" class="step">2. allowlist / blocklist on navigation targets</text>
+  <text x="78" y="362" class="step">2. 对导航目标应用允许列表与阻止列表</text>
   <rect x="60" y="376" width="840" height="30" class="box"/>
-  <text x="78" y="396" class="step">3. human-in-the-loop on sensitive actions (login, purchase, CAPTCHA)</text>
+  <text x="78" y="396" class="step">3. 敏感动作由人介入（登录、购买、CAPTCHA）</text>
   <rect x="60" y="410" width="840" height="30" class="box"/>
-  <text x="78" y="430" class="step">4. content capture to external store; span references only on traces</text>
+  <text x="78" y="430" class="step">4. 内容存于外部存储；trace 中仅引用 span</text>
   <rect x="60" y="444" width="840" height="30" class="box"/>
-  <text x="78" y="464" class="step">5. refusal on retrieved-text directives ("ignore all instructions")</text>
+  <text x="78" y="464" class="step">5. 拒绝检索文本中的指令（如“忽略所有指令”）</text>
   <rect x="60" y="478" width="840" height="24" class="box"/>
-  <text x="78" y="496" class="step">"only direct instructions from the user count as permission" — OpenAI CUA docs</text>
+  <text x="78" y="496" class="step">“只有用户直接下达的指令才算授权”——OpenAI CUA 文档</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">Greshake et al. (2023) is the threat model; all three productions take it seriously.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">Greshake 等（2023）定义了该威胁模型；三者的生产实现均认真对待。</text>
 </svg>

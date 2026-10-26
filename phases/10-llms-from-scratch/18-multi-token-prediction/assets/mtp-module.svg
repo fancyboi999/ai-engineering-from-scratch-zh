@@ -18,34 +18,34 @@
     </style>
   </defs>
 
-  <text x="480" y="28" text-anchor="middle" class="title">sequential multi-token prediction — DeepSeek-V3 style</text>
+  <text x="480" y="28" text-anchor="middle" class="title">顺序多 token 预测 — DeepSeek-V3 风格</text>
 
   <!-- Main backbone -->
   <rect x="30" y="60" width="200" height="60" class="box"/>
-  <text x="130" y="80" text-anchor="middle" class="head">main model backbone</text>
+  <text x="130" y="80" text-anchor="middle" class="head">主模型骨干</text>
   <text x="130" y="100" text-anchor="middle" class="step">h_i^(0)  ·  L_main</text>
 
   <!-- Shared embedding -->
   <rect x="30" y="150" width="200" height="50" class="shared"/>
-  <text x="130" y="170" text-anchor="middle" class="head">shared embedding E</text>
-  <text x="130" y="188" text-anchor="middle" class="small">used by main + every MTP depth</text>
+  <text x="130" y="170" text-anchor="middle" class="head">共享嵌入 E</text>
+  <text x="130" y="188" text-anchor="middle" class="small">供主模型与每个 MTP 深度使用</text>
 
   <!-- Depth 1 module -->
   <rect x="280" y="60" width="260" height="140" class="cool"/>
-  <text x="410" y="82" text-anchor="middle" class="head">MTP module k=1</text>
-  <text x="410" y="100" text-anchor="middle" class="small">combine: M_1 * [RMSNorm(h^0); RMSNorm(E(t_{i+1}))]</text>
-  <text x="410" y="118" text-anchor="middle" class="small">transformer block T_1 (attn + MLP)</text>
+  <text x="410" y="82" text-anchor="middle" class="head">MTP 模块 k=1</text>
+  <text x="410" y="100" text-anchor="middle" class="small">组合：M_1 * [RMSNorm(h^0); RMSNorm(E(t_{i+1}))]</text>
+  <text x="410" y="118" text-anchor="middle" class="small">transformer 块 T_1（注意力 + MLP）</text>
   <text x="410" y="138" text-anchor="middle" class="step">h_i^(1)</text>
-  <text x="410" y="160" text-anchor="middle" class="small">shared LM head -&gt; predict t_{i+2}</text>
+  <text x="410" y="160" text-anchor="middle" class="small">共享 LM 头 -&gt; 预测 t_{i+2}</text>
   <text x="410" y="180" text-anchor="middle" class="step">L_1 = CE(logits, t_{i+2})</text>
 
   <!-- Depth 2 module -->
   <rect x="580" y="60" width="260" height="140" class="cool"/>
-  <text x="710" y="82" text-anchor="middle" class="head">MTP module k=2</text>
-  <text x="710" y="100" text-anchor="middle" class="small">combine: M_2 * [RMSNorm(h^1); RMSNorm(E(t_{i+2}))]</text>
-  <text x="710" y="118" text-anchor="middle" class="small">transformer block T_2 (attn + MLP)</text>
+  <text x="710" y="82" text-anchor="middle" class="head">MTP 模块 k=2</text>
+  <text x="710" y="100" text-anchor="middle" class="small">组合：M_2 * [RMSNorm(h^1); RMSNorm(E(t_{i+2}))]</text>
+  <text x="710" y="118" text-anchor="middle" class="small">transformer 块 T_2（注意力 + MLP）</text>
   <text x="710" y="138" text-anchor="middle" class="step">h_i^(2)</text>
-  <text x="710" y="160" text-anchor="middle" class="small">shared LM head -&gt; predict t_{i+3}</text>
+  <text x="710" y="160" text-anchor="middle" class="small">共享 LM 头 -&gt; 预测 t_{i+3}</text>
   <text x="710" y="180" text-anchor="middle" class="step">L_2 = CE(logits, t_{i+3})</text>
 
   <!-- Arrows between modules -->
@@ -55,8 +55,8 @@
 
   <!-- Shared head -->
   <rect x="340" y="230" width="280" height="50" class="shared"/>
-  <text x="480" y="250" text-anchor="middle" class="head">shared output head Out</text>
-  <text x="480" y="268" text-anchor="middle" class="small">reuses main model's LM head — no extra params</text>
+  <text x="480" y="250" text-anchor="middle" class="head">共享输出头 Out</text>
+  <text x="480" y="268" text-anchor="middle" class="small">复用主模型的 LM 头 — 无额外参数</text>
 
   <!-- E feeds into modules -->
   <line x1="230" y1="175" x2="285" y2="175" stroke="#5a4fcf" stroke-width="1.2"/>
@@ -66,18 +66,18 @@
 
   <!-- Joint loss -->
   <rect x="30" y="320" width="900" height="60" class="box"/>
-  <text x="480" y="343" text-anchor="middle" class="head">joint loss</text>
+  <text x="480" y="343" text-anchor="middle" class="head">联合损失</text>
   <text x="480" y="363" text-anchor="middle" class="step">L_total = L_main + (lambda / D) * sum_{k=1..D} L_k</text>
 
   <!-- Inference repurpose -->
   <rect x="30" y="400" width="900" height="120" class="hot"/>
-  <text x="480" y="423" text-anchor="middle" class="label">at inference: MTP modules become a speculative-decoding draft</text>
-  <text x="50" y="450" class="step">module k=1</text>
-  <text x="220" y="450" class="small">draft t_{i+2} given h^(0) + E(t_{i+1})   ·  DeepSeek-V3 reports 80%+ acceptance</text>
-  <text x="50" y="470" class="step">module k=2</text>
-  <text x="220" y="470" class="small">draft t_{i+3} given h^(1) + E(t_{i+2}) ·  chains across depths</text>
-  <text x="50" y="490" class="step">verifier</text>
-  <text x="220" y="490" class="small">main model accepts/rejects via Leviathan rule (Phase 10 · 15)</text>
-  <text x="50" y="510" class="step">speedup</text>
-  <text x="220" y="510" class="small">~1.8x throughput in generation — paper-reported measured value</text>
+  <text x="480" y="423" text-anchor="middle" class="label">推理时：MTP 模块成为推测解码草稿</text>
+  <text x="50" y="450" class="step">模块 k=1</text>
+  <text x="220" y="450" class="small">根据 h^(0) + E(t_{i+1}) 起草 t_{i+2} · DeepSeek-V3 报告接受率超过 80%</text>
+  <text x="50" y="470" class="step">模块 k=2</text>
+  <text x="220" y="470" class="small">根据 h^(1) + E(t_{i+2}) 起草 t_{i+3} · 在深度间串联</text>
+  <text x="50" y="490" class="step">验证器</text>
+  <text x="220" y="490" class="small">主模型按 Leviathan 规则接受/拒绝（阶段 10 · 15）</text>
+  <text x="50" y="510" class="step">加速比</text>
+  <text x="220" y="510" class="small">生成吞吐约提升 1.8 倍 — 论文报告的实测值</text>
 </svg>

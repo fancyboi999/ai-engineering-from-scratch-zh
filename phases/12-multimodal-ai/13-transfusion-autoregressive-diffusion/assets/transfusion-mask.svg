@@ -17,43 +17,43 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Transfusion — one transformer, two losses, hybrid attention mask</text>
+  <text x="480" y="24" text-anchor="middle" class="title">Transfusion：一个 transformer、两种损失、混合注意力掩码</text>
 
   <rect x="30" y="50" width="900" height="240" class="box"/>
-  <text x="480" y="72" text-anchor="middle" class="head">forward pass, two loss heads</text>
+  <text x="480" y="72" text-anchor="middle" class="head">一次前向传播，两个损失头</text>
 
   <rect x="60" y="90" width="260" height="180" class="hot"/>
-  <text x="190" y="112" text-anchor="middle" class="step">text tokens</text>
-  <text x="190" y="132" text-anchor="middle" class="small">discrete BPE vocab</text>
-  <text x="190" y="150" text-anchor="middle" class="small">causal attention</text>
-  <text x="190" y="168" text-anchor="middle" class="small">teacher forcing</text>
-  <text x="190" y="194" text-anchor="middle" class="step">loss: cross-entropy</text>
-  <text x="190" y="216" text-anchor="middle" class="small">next-token prediction</text>
-  <text x="190" y="232" text-anchor="middle" class="small">vocab-logits head</text>
-  <text x="190" y="258" text-anchor="middle" class="caption">same as any LLM</text>
+  <text x="190" y="112" text-anchor="middle" class="step">文本 token</text>
+  <text x="190" y="132" text-anchor="middle" class="small">离散 BPE 词表</text>
+  <text x="190" y="150" text-anchor="middle" class="small">因果注意力</text>
+  <text x="190" y="168" text-anchor="middle" class="small">教师强制</text>
+  <text x="190" y="194" text-anchor="middle" class="step">损失：交叉熵</text>
+  <text x="190" y="216" text-anchor="middle" class="small">下一个 token 预测</text>
+  <text x="190" y="232" text-anchor="middle" class="small">词表 logits 头</text>
+  <text x="190" y="258" text-anchor="middle" class="caption">与其他 LLM 相同</text>
 
   <rect x="350" y="90" width="260" height="180" class="cool"/>
-  <text x="480" y="112" text-anchor="middle" class="step">shared transformer body</text>
-  <text x="480" y="132" text-anchor="middle" class="small">one weight set</text>
-  <text x="480" y="150" text-anchor="middle" class="small">block-triangular mask</text>
-  <text x="480" y="168" text-anchor="middle" class="small">both modalities in</text>
-  <text x="480" y="186" text-anchor="middle" class="small">one forward pass</text>
-  <text x="480" y="218" text-anchor="middle" class="step">gradient mixes</text>
-  <text x="480" y="236" text-anchor="middle" class="small">text and image objectives</text>
-  <text x="480" y="254" text-anchor="middle" class="caption">shared body, two heads</text>
+  <text x="480" y="112" text-anchor="middle" class="step">共享 transformer 主体</text>
+  <text x="480" y="132" text-anchor="middle" class="small">一套权重</text>
+  <text x="480" y="150" text-anchor="middle" class="small">块三角掩码</text>
+  <text x="480" y="168" text-anchor="middle" class="small">两种模态共同参与</text>
+  <text x="480" y="186" text-anchor="middle" class="small">一次前向传播</text>
+  <text x="480" y="218" text-anchor="middle" class="step">梯度混合</text>
+  <text x="480" y="236" text-anchor="middle" class="small">文本与图像目标</text>
+  <text x="480" y="254" text-anchor="middle" class="caption">共享主体，两个头</text>
 
   <rect x="640" y="90" width="260" height="180" class="cold"/>
-  <text x="770" y="112" text-anchor="middle" class="step">image patches</text>
-  <text x="770" y="132" text-anchor="middle" class="small">continuous vectors</text>
-  <text x="770" y="150" text-anchor="middle" class="small">bidirectional attention</text>
-  <text x="770" y="168" text-anchor="middle" class="small">within image block</text>
-  <text x="770" y="194" text-anchor="middle" class="step">loss: MSE on velocity</text>
-  <text x="770" y="216" text-anchor="middle" class="small">flow-matching diffusion</text>
-  <text x="770" y="232" text-anchor="middle" class="small">predict noise -&gt; data</text>
-  <text x="770" y="258" text-anchor="middle" class="caption">SD3 MMDiT sibling</text>
+  <text x="770" y="112" text-anchor="middle" class="step">图像分块</text>
+  <text x="770" y="132" text-anchor="middle" class="small">连续向量</text>
+  <text x="770" y="150" text-anchor="middle" class="small">双向注意力</text>
+  <text x="770" y="168" text-anchor="middle" class="small">位于图像块内部</text>
+  <text x="770" y="194" text-anchor="middle" class="step">损失：速度的 MSE</text>
+  <text x="770" y="216" text-anchor="middle" class="small">流匹配扩散</text>
+  <text x="770" y="232" text-anchor="middle" class="small">预测噪声 -&gt; 数据</text>
+  <text x="770" y="258" text-anchor="middle" class="caption">与 SD3 MMDiT 同类</text>
 
   <rect x="30" y="310" width="900" height="200" class="box"/>
-  <text x="480" y="332" text-anchor="middle" class="head">hybrid attention mask for [T T &lt;image&gt; P P P P &lt;/image&gt; T T]</text>
+  <text x="480" y="332" text-anchor="middle" class="head">[T T &lt;image&gt; P P P P &lt;/image&gt; T T] 的混合注意力掩码</text>
 
   <g transform="translate(200, 350)">
     <rect x="0" y="0" width="18" height="18" class="hot"/>
@@ -80,11 +80,11 @@
   </g>
 
   <rect x="420" y="340" width="490" height="160" class="reg"/>
-  <text x="665" y="362" text-anchor="middle" class="step">mask rules</text>
-  <text x="665" y="384" text-anchor="middle" class="small">1. text-to-text: causal (triangular)</text>
-  <text x="665" y="402" text-anchor="middle" class="small">2. patch-to-patch: full bidirectional within image</text>
-  <text x="665" y="420" text-anchor="middle" class="small">3. text-to-prior-image: attend fully</text>
-  <text x="665" y="438" text-anchor="middle" class="small">4. image-to-prior-text: attend fully</text>
-  <text x="665" y="460" text-anchor="middle" class="small">5. no image-to-later-text (causal block)</text>
-  <text x="665" y="480" text-anchor="middle" class="caption">implemented as a single block-triangular mask</text>
+  <text x="665" y="362" text-anchor="middle" class="step">掩码规则</text>
+  <text x="665" y="384" text-anchor="middle" class="small">1. 文本到文本：因果（三角形）</text>
+  <text x="665" y="402" text-anchor="middle" class="small">2. 分块到分块：图像内部完全双向</text>
+  <text x="665" y="420" text-anchor="middle" class="small">3. 文本到先前图像：完全关注</text>
+  <text x="665" y="438" text-anchor="middle" class="small">4. 图像到先前文本：完全关注</text>
+  <text x="665" y="460" text-anchor="middle" class="small">5. 图像不关注后续文本（因果块）</text>
+  <text x="665" y="480" text-anchor="middle" class="caption">实现为一个块三角掩码</text>
 </svg>

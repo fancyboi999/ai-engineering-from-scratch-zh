@@ -17,57 +17,57 @@
       .edge { stroke: #1a1a1a; stroke-width: 1.2; fill: none; }
     </style>
   </defs>
-  <text x="450" y="28" text-anchor="middle" class="title">Role specialization — planner, executor, critic, verifier</text>
+  <text x="450" y="28" text-anchor="middle" class="title">角色分工：规划者、执行者、评审者、验证者</text>
 
   <rect x="40" y="60" width="170" height="100" class="cool"/>
-  <text x="125" y="82" text-anchor="middle" class="head">Planner</text>
-  <text x="125" y="104" text-anchor="middle" class="small">reads goal</text>
-  <text x="125" y="120" text-anchor="middle" class="small">produces spec</text>
-  <text x="125" y="138" text-anchor="middle" class="small">(signature, tests, I/O)</text>
-  <text x="125" y="154" text-anchor="middle" class="small">MetaGPT: PM + Architect</text>
+  <text x="125" y="82" text-anchor="middle" class="head">规划者</text>
+  <text x="125" y="104" text-anchor="middle" class="small">读取目标</text>
+  <text x="125" y="120" text-anchor="middle" class="small">产出规格</text>
+  <text x="125" y="138" text-anchor="middle" class="small">（签名、测试、输入输出）</text>
+  <text x="125" y="154" text-anchor="middle" class="small">MetaGPT：产品经理 + 架构师</text>
 
   <line x1="210" y1="110" x2="250" y2="110" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="250" y="60" width="170" height="100" class="hot"/>
-  <text x="335" y="82" text-anchor="middle" class="head">Executor</text>
-  <text x="335" y="104" text-anchor="middle" class="small">reads one step</text>
-  <text x="335" y="120" text-anchor="middle" class="small">produces artifact</text>
-  <text x="335" y="138" text-anchor="middle" class="small">has the real tools</text>
-  <text x="335" y="154" text-anchor="middle" class="small">ChatDev: asks if unclear</text>
+  <text x="335" y="82" text-anchor="middle" class="head">执行者</text>
+  <text x="335" y="104" text-anchor="middle" class="small">读取一个步骤</text>
+  <text x="335" y="120" text-anchor="middle" class="small">产出交付物</text>
+  <text x="335" y="138" text-anchor="middle" class="small">拥有真实工具</text>
+  <text x="335" y="154" text-anchor="middle" class="small">ChatDev：不明确时询问</text>
 
   <line x1="420" y1="110" x2="460" y2="110" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="460" y="60" width="170" height="100" class="dsk"/>
-  <text x="545" y="82" text-anchor="middle" class="head">Critic</text>
-  <text x="545" y="104" text-anchor="middle" class="small">subjective review</text>
-  <text x="545" y="120" text-anchor="middle" class="small">catches taste issues</text>
-  <text x="545" y="138" text-anchor="middle" class="small">fooled by plausible prose</text>
-  <text x="545" y="154" text-anchor="middle" class="small">(LLM-based)</text>
+  <text x="545" y="82" text-anchor="middle" class="head">评审者</text>
+  <text x="545" y="104" text-anchor="middle" class="small">主观评审</text>
+  <text x="545" y="120" text-anchor="middle" class="small">发现品味问题</text>
+  <text x="545" y="138" text-anchor="middle" class="small">可能被看似合理的文字误导</text>
+  <text x="545" y="154" text-anchor="middle" class="small">（基于 LLM）</text>
 
   <line x1="630" y1="110" x2="670" y2="110" class="edge" marker-end="url(#arrow)"/>
 
   <rect x="670" y="60" width="200" height="100" class="cold"/>
-  <text x="770" y="82" text-anchor="middle" class="head">Verifier</text>
-  <text x="770" y="104" text-anchor="middle" class="small">deterministic check</text>
-  <text x="770" y="120" text-anchor="middle" class="small">tests, type, schema</text>
-  <text x="770" y="138" text-anchor="middle" class="small">cannot be fooled</text>
-  <text x="770" y="154" text-anchor="middle" class="small">(code, not LLM)</text>
+  <text x="770" y="82" text-anchor="middle" class="head">验证者</text>
+  <text x="770" y="104" text-anchor="middle" class="small">确定性检查</text>
+  <text x="770" y="120" text-anchor="middle" class="small">测试、类型、结构</text>
+  <text x="770" y="138" text-anchor="middle" class="small">无法被文字蒙骗</text>
+  <text x="770" y="154" text-anchor="middle" class="small">（代码，而非 LLM）</text>
 
   <line x1="335" y1="160" x2="335" y2="200" class="edge"/>
   <path d="M 335 200 Q 300 220 265 200" class="edge" fill="none" stroke-dasharray="3 3"/>
-  <text x="295" y="195" class="small">communicative dehallucination (ChatDev)</text>
+  <text x="295" y="195" class="small">通过沟通消除幻觉（ChatDev）</text>
 
   <rect x="40" y="240" width="830" height="110" class="box"/>
-  <text x="450" y="262" text-anchor="middle" class="head">why verifier is load-bearing</text>
-  <text x="450" y="284" text-anchor="middle" class="small">MAST taxonomy (Cemri et al. 2025): 21.3% of 1642 multi-agent failures are verification gaps</text>
-  <text x="450" y="304" text-anchor="middle" class="small">PwC 2025: structured validation loop in CrewAI moved accuracy 10% -> 70% (7× gain)</text>
-  <text x="450" y="324" text-anchor="middle" class="small">anti-pattern: every role is an LLM that says "looks good to me" — classic MAST failure</text>
-  <text x="450" y="342" text-anchor="middle" class="small">always pair critic (subjective) with verifier (deterministic); they catch different bugs</text>
+  <text x="450" y="262" text-anchor="middle" class="head">验证者为何不可缺少</text>
+  <text x="450" y="284" text-anchor="middle" class="small">MAST 分类（Cemri 等，2025）：1642 次多 agent 失败中，21.3% 属于验证缺口</text>
+  <text x="450" y="304" text-anchor="middle" class="small">PwC 2025：CrewAI 的结构化验证循环将准确率从 10% 提升至 70%（7×）</text>
+  <text x="450" y="324" text-anchor="middle" class="small">反例：每种角色都是只会说“看起来没问题”的 LLM，这是典型 MAST 失败</text>
+  <text x="450" y="342" text-anchor="middle" class="small">始终配对主观评审者与确定性验证者；它们发现不同的缺陷</text>
 
   <rect x="40" y="370" width="830" height="110" class="box"/>
-  <text x="450" y="392" text-anchor="middle" class="head">MetaGPT's SOP pattern</text>
-  <text x="450" y="412" text-anchor="middle" class="small">Code = SOP(Team): Product Manager, Architect, Project Manager, Engineer, QA Engineer</text>
-  <text x="450" y="430" text-anchor="middle" class="small">each role has strict input/output schema · pipeline becomes deterministic</text>
-  <text x="450" y="450" text-anchor="middle" class="small">CrewAI Agent(role, goal, backstory) is the modern ergonomic surface</text>
-  <text x="450" y="470" text-anchor="middle" class="small">LangGraph encodes roles as graph nodes with specialized prompts</text>
+  <text x="450" y="392" text-anchor="middle" class="head">MetaGPT 的标准作业流程模式</text>
+  <text x="450" y="412" text-anchor="middle" class="small">Code = SOP(Team)：产品经理、架构师、项目经理、工程师、测试工程师</text>
+  <text x="450" y="430" text-anchor="middle" class="small">各角色均有严格输入输出结构，流水线因此具有确定性</text>
+  <text x="450" y="450" text-anchor="middle" class="small">CrewAI Agent(role, goal, backstory) 是现代易用接口</text>
+  <text x="450" y="470" text-anchor="middle" class="small">LangGraph 将角色编码为使用专门 prompt 的图节点</text>
 </svg>

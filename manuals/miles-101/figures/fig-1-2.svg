@@ -2,7 +2,7 @@
   <title id="fig-1-2-title">engine 退出不会停止任务</title>
   <desc id="fig-1-2-desc">同一时间轴上的两次运行。未启用 watchdog 时，engine 启动即退出。随后 rollout loop 在 63 分钟内记录了 200,533 条 HTTP 503 错误，GPU 一直空闲，直到我们停止容器。启用 watchdog.sh 后，测试容器连续输出同类错误，连续六次检查都发现超过 100 条错误后，在 183 s 时停止。一次健康的 16 答案运行中，这类错误会成批出现，最长持续 60 s，其中两次仅相隔 45 s。回放该运行时，六次检查会误停一半以上的情况，十次检查则不会误停，因此 watchdog 默认使用十次。</desc>
   <defs><marker id="fig-1-2-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
-  <text x="20" y="28" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">MINUTES AFTER THE ENGINE STOPPED</text>
+  <text x="20" y="28" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">引擎停止后的分钟数</text>
   <line x1="150" y1="232" x2="150" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="150" y="254" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="258.46" y1="232" x2="258.46" y2="240" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

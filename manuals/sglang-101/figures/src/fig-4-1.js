@@ -7,7 +7,7 @@ module.exports = figure('fig-4-1', {
   title: "一次 decode 的逐项提交与重放",
   desc: "两列对比。左为 eager decode：transformer 每层的每个内核都由 Python model runner 单独提交，每层重复。右为计算图重放：decode CUDA graph runner 对一个已捕获批次大小发起一次重放，GPU 按序运行所有层已录制的内核。",
 }, f => {
-  f.kicker(20, 18, "A · eager decode");
+  f.kicker(20, 18, "A · 即时解码");
   f.kicker(336, 18, "B · 计算图重放");
   f.rule(320, 8, 320, 392, { dash: 'dashed' });
   const kernels = ['rms_norm', 'qkv_proj GEMM', "注意力 decode", 'o_proj GEMM', 'gate_up_proj GEMM', 'silu_and_mul', 'down_proj GEMM'];

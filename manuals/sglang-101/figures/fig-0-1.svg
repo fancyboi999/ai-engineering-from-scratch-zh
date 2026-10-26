@@ -11,7 +11,7 @@
   <text x="164" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">manager</text>
   <line x1="164" y1="48" x2="164" y2="512" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="222" y="8" width="92" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="268" y="22.8" font-size="11" text-anchor="middle" font-weight="700">scheduler</text>
+  <text x="268" y="22.8" font-size="11" text-anchor="middle" font-weight="700">调度器</text>
   <text x="268" y="39.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">事件循环</text>
   <line x1="268" y1="48" x2="268" y2="512" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <rect x="326" y="8" width="92" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>

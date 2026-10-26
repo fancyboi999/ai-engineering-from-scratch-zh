@@ -3,12 +3,12 @@
 const { figure } = require('../../../_shared/figkit.js');
 
 const rows = [
-  ['version', '0.31.0', '正在运行的版本'],
+  ['版本', '0.31.0', '正在运行的版本'],
   ['正在使用的 模型 runner', 'V2', '当前使用的 模型 runner'],
-  ['attention backend', 'FLASH_ATTN', '用于 attention 的 kernel'],
+  ['注意力后端', 'FLASH_ATTN', '用于 attention 的 kernel'],
   ['模型加载情况', '56.93 GiB, 330 s', '权重占用的内存'],
   ['可用 KV cache 内存', '31.32 GiB', 'KV cache 剩余内存'],
-  ['GPU KV cache 容量', '234,960 tokens', '可容纳的用户数'],
+  ['GPU KV cache 容量', '234,960 token', '可容纳的用户数'],
 ];
 
 module.exports = figure('fig-1-2', {

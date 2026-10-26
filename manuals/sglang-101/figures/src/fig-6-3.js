@@ -4,9 +4,9 @@ const { figure } = require('../../../_shared/figkit.js');
 
 const lanes = [
   { x: 84, name: "客户端", hue: 'olive' },
-  { x: 242, name: 'gateway', hue: 'blue' },
-  { x: 400, name: 'prefill', sub: 'bootstrap :8998', hue: 'blue' },
-  { x: 558, name: 'decode', hue: 'blue' },
+  { x: 242, name: "网关", hue: 'blue' },
+  { x: 400, name: "预填充", sub: "引导服务 :8998", hue: 'blue' },
+  { x: 558, name: "解码", hue: 'blue' },
 ];
 
 const rows = [

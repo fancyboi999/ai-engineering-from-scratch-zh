@@ -13,26 +13,26 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">the MDP loop: five objects, one recursion</text>
+  <text x="450" y="30" text-anchor="middle" class="title">MDP 循环：五个对象，一个递归</text>
 
   <rect x="40" y="70" width="160" height="90" class="box"/>
-  <text x="120" y="98" text-anchor="middle" class="label">state s_t</text>
-  <text x="120" y="120" text-anchor="middle" class="content">what agent sees</text>
-  <text x="120" y="140" text-anchor="middle" class="content">Markov sufficient</text>
+  <text x="120" y="98" text-anchor="middle" class="label">状态 s_t</text>
+  <text x="120" y="120" text-anchor="middle" class="content">agent 看到的内容</text>
+  <text x="120" y="140" text-anchor="middle" class="content">满足马尔可夫充分性</text>
 
   <rect x="260" y="70" width="160" height="90" class="hot"/>
-  <text x="340" y="98" text-anchor="middle" class="label">policy pi(a | s)</text>
-  <text x="340" y="120" text-anchor="middle" class="content">chooses action</text>
+  <text x="340" y="98" text-anchor="middle" class="label">策略 pi(a | s)</text>
+  <text x="340" y="120" text-anchor="middle" class="content">选择行动</text>
   <text x="340" y="140" text-anchor="middle" class="content">a_t ~ pi(. | s_t)</text>
 
   <rect x="480" y="70" width="160" height="90" class="box"/>
-  <text x="560" y="98" text-anchor="middle" class="label">transition P</text>
+  <text x="560" y="98" text-anchor="middle" class="label">转移 P</text>
   <text x="560" y="120" text-anchor="middle" class="content">s_{t+1} ~ P(. | s_t, a_t)</text>
-  <text x="560" y="140" text-anchor="middle" class="content">env dynamics</text>
+  <text x="560" y="140" text-anchor="middle" class="content">环境动态</text>
 
   <rect x="700" y="70" width="160" height="90" class="box"/>
-  <text x="780" y="98" text-anchor="middle" class="label">reward r_t</text>
-  <text x="780" y="120" text-anchor="middle" class="content">scalar signal</text>
+  <text x="780" y="98" text-anchor="middle" class="label">奖励 r_t</text>
+  <text x="780" y="120" text-anchor="middle" class="content">标量信号</text>
   <text x="780" y="140" text-anchor="middle" class="content">R(s_t, a_t, s_{t+1})</text>
 
   <line x1="200" y1="115" x2="258" y2="115" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -40,13 +40,13 @@
   <line x1="640" y1="115" x2="698" y2="115" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <path d="M 780 160 Q 780 230 450 260 Q 120 290 120 160" fill="none" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
-  <text x="450" y="248" text-anchor="middle" class="caption">next step: s_{t+1} becomes the new s_t</text>
+  <text x="450" y="248" text-anchor="middle" class="caption">下一步：s_{t+1} 成为新的 s_t</text>
 
   <rect x="40" y="300" width="820" height="130" class="box"/>
-  <text x="450" y="325" text-anchor="middle" class="label">the Bellman recursion</text>
+  <text x="450" y="325" text-anchor="middle" class="label">贝尔曼递归</text>
   <text x="450" y="352" text-anchor="middle" class="content">V^pi(s) = sum_a pi(a|s) · sum_{s',r} P(s',r | s,a) · [ r + gamma · V^pi(s') ]</text>
   <text x="450" y="378" text-anchor="middle" class="content">Q^pi(s,a) = sum_{s',r} P(s',r | s,a) · [ r + gamma · sum_{a'} pi(a'|s') · Q^pi(s',a') ]</text>
-  <text x="450" y="408" text-anchor="middle" class="caption">iterate to fixed point (DP) · sample (MC) · bootstrap one step (TD)</text>
+  <text x="450" y="408" text-anchor="middle" class="caption">迭代至不动点（DP）· 采样（MC）· 单步自举（TD）</text>
 
-  <text x="450" y="450" text-anchor="middle" class="caption">state + action + transition + reward + discount — every RL algorithm in this phase</text>
+  <text x="450" y="450" text-anchor="middle" class="caption">状态 + 行动 + 转移 + 奖励 + 折扣 — 本阶段的每种强化学习算法</text>
 </svg>

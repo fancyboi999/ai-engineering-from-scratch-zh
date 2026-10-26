@@ -15,57 +15,57 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">speculative decoding — draft proposes, target verifies</text>
+  <text x="480" y="24" text-anchor="middle" class="title">推测解码：草稿模型提出，目标模型验证</text>
 
   <rect x="40" y="60" width="300" height="260" class="box"/>
-  <text x="190" y="82" text-anchor="middle" class="head">draft model (cheap)</text>
+  <text x="190" y="82" text-anchor="middle" class="head">草稿模型（低成本）</text>
   <rect x="60" y="100" width="260" height="36" class="cool"/>
-  <text x="190" y="122" text-anchor="middle" class="step">EAGLE-3 head</text>
+  <text x="190" y="122" text-anchor="middle" class="step">EAGLE-3 输出头</text>
   <rect x="60" y="142" width="260" height="36" class="cool"/>
-  <text x="190" y="164" text-anchor="middle" class="step">P-EAGLE parallel tree</text>
+  <text x="190" y="164" text-anchor="middle" class="step">P-EAGLE 并行树</text>
   <rect x="60" y="184" width="260" height="36" class="cool"/>
-  <text x="190" y="206" text-anchor="middle" class="step">ngram fallback</text>
-  <text x="190" y="244" text-anchor="middle" class="small">proposes k tokens per step</text>
-  <text x="190" y="262" text-anchor="middle" class="small">trained on target hidden states</text>
-  <text x="190" y="280" text-anchor="middle" class="small">via SpecForge / Speculators</text>
-  <text x="190" y="300" text-anchor="middle" class="caption">alignment = acceptance knob</text>
+  <text x="190" y="206" text-anchor="middle" class="step">n-gram 回退</text>
+  <text x="190" y="244" text-anchor="middle" class="small">每步提出 k 个 token</text>
+  <text x="190" y="262" text-anchor="middle" class="small">基于目标模型隐藏状态训练</text>
+  <text x="190" y="280" text-anchor="middle" class="small">通过 SpecForge / Speculators</text>
+  <text x="190" y="300" text-anchor="middle" class="caption">对齐程度决定接受率</text>
 
   <rect x="380" y="60" width="540" height="260" class="box"/>
-  <text x="650" y="82" text-anchor="middle" class="head">target model (expensive)</text>
+  <text x="650" y="82" text-anchor="middle" class="head">目标模型（高成本）</text>
   <rect x="400" y="100" width="260" height="44" class="dsk"/>
-  <text x="530" y="120" text-anchor="middle" class="step">batched verify pass</text>
-  <text x="530" y="138" text-anchor="middle" class="small">one forward through k positions</text>
+  <text x="530" y="120" text-anchor="middle" class="step">批量验证前向传播</text>
+  <text x="530" y="138" text-anchor="middle" class="small">一次前向传播覆盖 k 个位置</text>
   <rect x="680" y="100" width="220" height="44" class="dsk"/>
-  <text x="790" y="120" text-anchor="middle" class="step">accept prefix</text>
-  <text x="790" y="138" text-anchor="middle" class="small">until first rejection</text>
+  <text x="790" y="120" text-anchor="middle" class="step">接受前缀</text>
+  <text x="790" y="138" text-anchor="middle" class="small">直到首次拒绝</text>
   <rect x="400" y="152" width="500" height="44" class="hot"/>
-  <text x="650" y="172" text-anchor="middle" class="step">resample rejected position from target</text>
-  <text x="650" y="190" text-anchor="middle" class="small">commit accepted + 1 new -&gt; stream</text>
+  <text x="650" y="172" text-anchor="middle" class="step">在拒绝位置从目标分布重新采样</text>
+  <text x="650" y="190" text-anchor="middle" class="small">提交已接受 token + 1 个新 token -&gt; 流式输出</text>
 
   <rect x="400" y="208" width="500" height="100" class="cool"/>
-  <text x="650" y="228" text-anchor="middle" class="step">target quantization</text>
-  <text x="650" y="248" text-anchor="middle" class="small">FP8 Marlin or INT4 AWQ</text>
+  <text x="650" y="228" text-anchor="middle" class="step">目标模型量化</text>
+  <text x="650" y="248" text-anchor="middle" class="small">FP8 Marlin 或 INT4 AWQ</text>
   <text x="650" y="266" text-anchor="middle" class="small">Llama 3.3 70B, Qwen3-Coder-30B MoE, GPT-OSS-120B</text>
-  <text x="650" y="284" text-anchor="middle" class="small">one replica per H100/H200 shard</text>
+  <text x="650" y="284" text-anchor="middle" class="small">每个 H100/H200 分片一个副本</text>
   <text x="650" y="300" text-anchor="middle" class="caption">vLLM 0.7 / SGLang 0.4</text>
 
   <rect x="40" y="340" width="440" height="170" class="box"/>
-  <text x="260" y="362" text-anchor="middle" class="head">metrics that must be reported</text>
-  <text x="60" y="384" class="small">throughput bs=1 / bs=8 / bs=32  with + without spec</text>
-  <text x="60" y="402" class="small">p50, p99 latency at each batch size</text>
-  <text x="60" y="420" class="small">acceptance rate per distribution:</text>
-  <text x="60" y="438" class="small">  ShareGPT, HumanEval, domain data</text>
-  <text x="60" y="456" class="small">draft/target alignment drift alert</text>
-  <text x="60" y="476" class="small">$ per 1M output tokens sustained</text>
-  <text x="60" y="498" class="small">comparison vs Anthropic / OpenAI API on same eval</text>
+  <text x="260" y="362" text-anchor="middle" class="head">必须报告的指标</text>
+  <text x="60" y="384" class="small">bs=1 / bs=8 / bs=32 的吞吐量，启用与关闭推测解码分别报告</text>
+  <text x="60" y="402" class="small">各批大小的 p50、p99 延迟</text>
+  <text x="60" y="420" class="small">各分布的接受率：</text>
+  <text x="60" y="438" class="small">  ShareGPT、HumanEval、领域数据</text>
+  <text x="60" y="456" class="small">草稿/目标对齐漂移告警</text>
+  <text x="60" y="476" class="small">持续负载下每 1M 输出 token 的成本</text>
+  <text x="60" y="498" class="small">在相同评测上对比 Anthropic / OpenAI API</text>
 
   <rect x="500" y="340" width="420" height="170" class="box"/>
-  <text x="710" y="362" text-anchor="middle" class="head">operations</text>
-  <text x="520" y="384" class="small">Kubernetes deployment</text>
-  <text x="520" y="402" class="small">NVIDIA device plugin</text>
-  <text x="520" y="420" class="small">HPA metric: queue_wait_ms (not CPU)</text>
-  <text x="520" y="438" class="small">rolling upgrade: drain queue first</text>
-  <text x="520" y="456" class="small">ngram fallback if EAGLE acceptance drops</text>
-  <text x="520" y="476" class="small">Prometheus exporter + Langfuse trace</text>
-  <text x="520" y="498" class="small">target: 2.5x+ throughput at matched quality</text>
+  <text x="710" y="362" text-anchor="middle" class="head">运维</text>
+  <text x="520" y="384" class="small">Kubernetes 部署</text>
+  <text x="520" y="402" class="small">NVIDIA 设备插件</text>
+  <text x="520" y="420" class="small">HPA 指标：queue_wait_ms（非 CPU）</text>
+  <text x="520" y="438" class="small">滚动升级：先排空队列</text>
+  <text x="520" y="456" class="small">EAGLE 接受率下降时回退到 n-gram</text>
+  <text x="520" y="476" class="small">Prometheus 导出器 + Langfuse trace</text>
+  <text x="520" y="498" class="small">目标：相同质量下吞吐量提升 2.5x+</text>
 </svg>

@@ -16,72 +16,72 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">Letta V1 — memory blocks plus sleep-time compute</text>
+  <text x="480" y="26" text-anchor="middle" class="title">Letta V1：记忆块与休眠期计算</text>
 
   <rect x="40" y="50" width="420" height="220" class="primary"/>
-  <text x="250" y="72" text-anchor="middle" class="head">primary agent (on the critical path)</text>
-  <text x="60" y="96" class="small">responds to user; writes raw facts fast; no consolidation</text>
+  <text x="250" y="72" text-anchor="middle" class="head">主 agent（位于关键路径）</text>
+  <text x="60" y="96" class="small">响应用户，快速写入原始事实，不做整合</text>
 
   <rect x="60" y="108" width="380" height="46" class="box"/>
-  <text x="78" y="130" class="step">turn 1  user: "my name is ava, I live in Berlin"</text>
+  <text x="78" y="130" class="step">第 1 轮 用户：“my name is ava, I live in Berlin”</text>
   <text x="78" y="146" class="small">block_append human "name=ava city=Berlin"</text>
 
   <rect x="60" y="162" width="380" height="46" class="box"/>
-  <text x="78" y="184" class="step">turn 2  user: "plan a curriculum for senior eng"</text>
+  <text x="78" y="184" class="step">第 2 轮 用户：“plan a curriculum for senior eng”</text>
   <text x="78" y="200" class="small">block_append task "audience=senior eng"</text>
 
   <rect x="60" y="208" width="380" height="46" class="box"/>
-  <text x="78" y="230" class="step">turn 3  user: "I moved to Lisbon"</text>
-  <text x="78" y="246" class="small">block_append human "city=Lisbon" — both cities now in block</text>
+  <text x="78" y="230" class="step">第 3 轮 用户：“I moved to Lisbon”</text>
+  <text x="78" y="246" class="small">block_append human "city=Lisbon"：此时块中存在两座城市</text>
 
   <rect x="500" y="50" width="420" height="220" class="sleep"/>
-  <text x="710" y="72" text-anchor="middle" class="head">sleep-time agent (off the critical path)</text>
-  <text x="520" y="96" class="small">runs between turns; stronger model allowed; no latency cost</text>
+  <text x="710" y="72" text-anchor="middle" class="head">休眠期 agent（位于关键路径之外）</text>
+  <text x="520" y="96" class="small">在轮次间运行；可使用更强模型，不增加响应延迟</text>
 
   <rect x="520" y="108" width="380" height="46" class="box"/>
-  <text x="538" y="130" class="step">scan blocks  summarize if near_limit</text>
-  <text x="538" y="146" class="small">compact human block: drop duplicates, keep latest values</text>
+  <text x="538" y="130" class="step">扫描记忆块，接近 near_limit 时总结</text>
+  <text x="538" y="146" class="small">压缩 human 块：去重并保留最新值</text>
 
   <rect x="520" y="162" width="380" height="46" class="box"/>
-  <text x="538" y="184" class="step">reconcile archival  invalidate stale facts</text>
-  <text x="538" y="200" class="small">contradictions against core trigger invalidation, not delete</text>
+  <text x="538" y="184" class="step">核对归档记忆，使过期事实失效</text>
+  <text x="538" y="200" class="small">与核心记忆冲突时使旧事实失效，不删除</text>
 
   <rect x="520" y="208" width="380" height="46" class="box"/>
-  <text x="538" y="230" class="step">write learned_context into shared blocks</text>
-  <text x="538" y="246" class="small">produces new stable facts for the next turn</text>
+  <text x="538" y="230" class="step">将 learned_context 写入共享块</text>
+  <text x="538" y="246" class="small">为下一轮形成新的稳定事实</text>
 
   <rect x="40" y="290" width="880" height="220" class="block"/>
-  <text x="480" y="312" text-anchor="middle" class="head">three tiers of Letta memory</text>
+  <text x="480" y="312" text-anchor="middle" class="head">Letta 记忆的三个层级</text>
 
   <rect x="60" y="322" width="280" height="170" class="box"/>
-  <text x="200" y="342" text-anchor="middle" class="head">core (always visible)</text>
-  <text x="78" y="364" class="step">blocks: human, persona, task</text>
-  <text x="78" y="382" class="small">editable via block_{append,replace,rewrite}</text>
-  <text x="78" y="400" class="small">per-block character limit</text>
-  <text x="78" y="418" class="small">near_limit triggers sleep-time summarization</text>
-  <text x="78" y="438" class="small">Persona/Safety block writes need review</text>
-  <text x="78" y="458" class="small">versioned; diff surfaces in the trace</text>
-  <text x="78" y="478" class="small">pinned in the prompt every turn</text>
+  <text x="200" y="342" text-anchor="middle" class="head">核心记忆（始终可见）</text>
+  <text x="78" y="364" class="step">记忆块：human、persona、task</text>
+  <text x="78" y="382" class="small">通过 block_{append,replace,rewrite} 编辑</text>
+  <text x="78" y="400" class="small">每块设字符上限</text>
+  <text x="78" y="418" class="small">near_limit 触发休眠期总结</text>
+  <text x="78" y="438" class="small">Persona/Safety 块写入需复核</text>
+  <text x="78" y="458" class="small">带版本；trace 中显示差异</text>
+  <text x="78" y="478" class="small">每轮固定在 prompt 内</text>
 
   <rect x="350" y="322" width="280" height="170" class="box"/>
-  <text x="490" y="342" text-anchor="middle" class="head">recall (conversation)</text>
-  <text x="368" y="364" class="step">turn log, paginated</text>
-  <text x="368" y="382" class="small">auto-written each turn</text>
-  <text x="368" y="400" class="small">retrieval via conversation_search</text>
-  <text x="368" y="418" class="small">tail evicts on cap</text>
-  <text x="368" y="438" class="small">citation: session_id + turn_id</text>
-  <text x="368" y="458" class="small">primary reads; sleep-time summarizes</text>
-  <text x="368" y="478" class="small">lossy but always addressable</text>
+  <text x="490" y="342" text-anchor="middle" class="head">回忆记忆（会话）</text>
+  <text x="368" y="364" class="step">分页的轮次日志</text>
+  <text x="368" y="382" class="small">每轮自动写入</text>
+  <text x="368" y="400" class="small">通过 conversation_search 检索</text>
+  <text x="368" y="418" class="small">超过上限时淘汰尾部</text>
+  <text x="368" y="438" class="small">引用：session_id + turn_id</text>
+  <text x="368" y="458" class="small">主 agent 读取；休眠期 agent 总结</text>
+  <text x="368" y="478" class="small">有损，但始终可寻址</text>
 
   <rect x="640" y="322" width="280" height="170" class="box"/>
-  <text x="780" y="342" text-anchor="middle" class="head">archival (external)</text>
-  <text x="658" y="364" class="step">vector + KV + graph (Lesson 09)</text>
+  <text x="780" y="342" text-anchor="middle" class="head">归档记忆（外部）</text>
+  <text x="658" y="364" class="step">向量 + KV + 图（第 09 课）</text>
   <text x="658" y="382" class="small">archival_memory_{insert,search}</text>
-  <text x="658" y="400" class="small">invalidation, not deletion, for contradictions</text>
-  <text x="658" y="418" class="small">tags for scope: user/session/agent</text>
-  <text x="658" y="438" class="small">untrusted on retrieval (Lesson 27)</text>
-  <text x="658" y="458" class="small">sleep-time dedups on &gt;90% token overlap</text>
-  <text x="658" y="478" class="small">scales past context window</text>
+  <text x="658" y="400" class="small">冲突时使旧事实失效，而非删除</text>
+  <text x="658" y="418" class="small">范围标签：user/session/agent</text>
+  <text x="658" y="438" class="small">检索结果不可信（第 27 课）</text>
+  <text x="658" y="458" class="small">token 重叠 &gt;90% 时由休眠期 agent 去重</text>
+  <text x="658" y="478" class="small">规模可超过上下文窗口</text>
 
-  <text x="480" y="540" text-anchor="middle" class="caption">Letta V1 swaps send_message+heartbeat for native reasoning; loop shape unchanged.</text>
+  <text x="480" y="540" text-anchor="middle" class="caption">Letta V1 用原生推理取代 send_message+heartbeat；循环形态不变。</text>
 </svg>

@@ -15,10 +15,10 @@
     </style>
   </defs>
 
-  <text x="450" y="28" text-anchor="middle" class="title">DDPM: one net predicts noise, reversal does the rest</text>
+  <text x="450" y="28" text-anchor="middle" class="title">DDPM：一个网络预测噪声，其余由逆过程完成</text>
 
   <!-- forward chain -->
-  <text x="80" y="80" class="label">forward q: add noise</text>
+  <text x="80" y="80" class="label">前向 q：添加噪声</text>
   <rect x="40" y="95" width="80" height="50" class="box"/>
   <text x="80" y="125" text-anchor="middle" class="mono">x_0</text>
   <line x1="120" y1="120" x2="180" y2="120" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
@@ -37,10 +37,10 @@
   <text x="700" y="138" text-anchor="middle" class="caption">~ N(0, I)</text>
 
   <text x="450" y="170" text-anchor="middle" class="mono">q(x_t | x_0) = N(&#8730;(&#945;&#772;_t) &#183; x_0, (1 - &#945;&#772;_t) I)</text>
-  <text x="450" y="190" text-anchor="middle" class="caption">closed form: jump to any t in one shot</text>
+  <text x="450" y="190" text-anchor="middle" class="caption">闭式表达：一步跳至任意 t</text>
 
   <!-- reverse chain -->
-  <text x="80" y="230" class="label">reverse p_&#952;: denoise</text>
+  <text x="80" y="230" class="label">反向 p_θ：去噪</text>
   <rect x="660" y="245" width="80" height="50" class="hot"/>
   <text x="700" y="275" text-anchor="middle" class="mono">x_T</text>
   <line x1="660" y1="270" x2="600" y2="270" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
@@ -53,16 +53,16 @@
   <text x="310" y="275" text-anchor="middle" class="mono">x_1</text>
   <line x1="270" y1="270" x2="210" y2="270" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#arrow)"/>
   <rect x="130" y="245" width="80" height="50" class="cold"/>
-  <text x="170" y="275" text-anchor="middle" class="mono">x_0 (sample)</text>
+  <text x="170" y="275" text-anchor="middle" class="mono">x_0（样本）</text>
 
   <text x="450" y="320" text-anchor="middle" class="mono">x_{t-1} = (1/&#8730;&#945;_t) ( x_t - (&#946;_t / &#8730;(1-&#945;&#772;_t)) &#183; &#949;_&#952;(x_t, t) )  +  &#963;_t &#183; z</text>
-  <text x="450" y="340" text-anchor="middle" class="caption">subtract the predicted noise, rescale, re-inject a bit of fresh noise</text>
+  <text x="450" y="340" text-anchor="middle" class="caption">减去预测噪声，重新缩放，再注入少量新噪声</text>
 
   <!-- loss -->
   <rect x="40" y="370" width="820" height="60" class="hot"/>
-  <text x="450" y="395" text-anchor="middle" class="label">training loss</text>
+  <text x="450" y="395" text-anchor="middle" class="label">训练损失</text>
   <text x="450" y="420" text-anchor="middle" class="mono">L = E_{x_0, t, &#949;}  ||&#949; - &#949;_&#952;(&#8730;&#945;&#772;_t &#183; x_0 + &#8730;(1-&#945;&#772;_t) &#183; &#949;,  t)||&#178;</text>
 
-  <text x="450" y="460" text-anchor="middle" class="caption">one net, one MSE loss, no minimax, no KL divergence in the training loop</text>
-  <text x="450" y="480" text-anchor="middle" class="caption">scales unchanged to images, video, audio, 3D Gaussians</text>
+  <text x="450" y="460" text-anchor="middle" class="caption">一个网络、一种 MSE 损失，训练循环中无极小极大博弈或 KL 散度</text>
+  <text x="450" y="480" text-anchor="middle" class="caption">保持形式不变，可扩展至图像、视频、音频、3D 高斯</text>
 </svg>

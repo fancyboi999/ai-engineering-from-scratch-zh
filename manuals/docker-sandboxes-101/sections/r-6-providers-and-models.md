@@ -4,9 +4,9 @@
 
 录制机器 `docker-agent doctor` 输出20 provider 及凭据变量，全部 not set（research/sources/probes/docker-agent-doctor.txt）。文档列31 ids，schema provider 说明列内置别名 {{schema ProviderConfig}}。下表是并集，先 doctor 顺序，再文档顺序。doctor 输出 fireworks-ai 等规范 id，旧 id 仍接受为别名（[冲突 C58](#s-ref-sources-and-the-conflicts-register)）。
 
-## provider ids {#s-ref-providers-and-models-the-provider-ids}
+## 提供方 ID {#s-ref-providers-and-models-the-provider-ids}
 
-| Provider id | 旧 id | 凭据 | 来源 |
+| 提供方 ID | 旧 id | 凭据 | 来源 |
 |---|---|---|---|
 | `anthropic` | 无 | ANTHROPIC_API_KEY，或 auth.type: workload_identity_federation | doctor, {{docs-agent Models}} |
 | `openai` | 无 | `OPENAI_API_KEY` | doctor |

@@ -17,50 +17,50 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">Sleeper Agents: what survives safety training</text>
+  <text x="480" y="24" text-anchor="middle" class="title">潜伏 agent：什么能在安全训练后存活</text>
 
   <rect x="40" y="60" width="260" height="220" class="box"/>
-  <text x="170" y="82" text-anchor="middle" class="head">Stage 1 — plant backdoor</text>
+  <text x="170" y="82" text-anchor="middle" class="head">阶段 1：植入后门</text>
   <rect x="60" y="100" width="220" height="50" class="hot"/>
-  <text x="170" y="122" text-anchor="middle" class="step">SFT on mixed data</text>
-  <text x="170" y="140" text-anchor="middle" class="small">clean + trigger -&gt; defect</text>
+  <text x="170" y="122" text-anchor="middle" class="step">对混合数据进行监督微调</text>
+  <text x="170" y="140" text-anchor="middle" class="small">正常样本 + 触发器 -&gt; 缺陷</text>
   <rect x="60" y="170" width="220" height="50" class="hot"/>
-  <text x="170" y="192" text-anchor="middle" class="step">trigger: year=2024</text>
-  <text x="170" y="210" text-anchor="middle" class="small">defect: inject SQLi/XSS</text>
-  <text x="170" y="250" text-anchor="middle" class="caption">model has a hidden trigger.</text>
-  <text x="170" y="266" text-anchor="middle" class="caption">clean behaviour is normal.</text>
+  <text x="170" y="192" text-anchor="middle" class="step">触发器：year=2024</text>
+  <text x="170" y="210" text-anchor="middle" class="small">缺陷：注入 SQLi/XSS</text>
+  <text x="170" y="250" text-anchor="middle" class="caption">模型包含隐藏触发器。</text>
+  <text x="170" y="266" text-anchor="middle" class="caption">正常条件下行为正常。</text>
 
   <rect x="350" y="60" width="260" height="220" class="box"/>
-  <text x="480" y="82" text-anchor="middle" class="head">Stage 2 — SFT + RLHF</text>
+  <text x="480" y="82" text-anchor="middle" class="head">阶段 2：监督微调 + RLHF</text>
   <rect x="370" y="100" width="220" height="50" class="cold"/>
-  <text x="480" y="122" text-anchor="middle" class="step">HHH preference data</text>
-  <text x="480" y="140" text-anchor="middle" class="small">no trigger examples seen</text>
+  <text x="480" y="122" text-anchor="middle" class="step">HHH 偏好数据</text>
+  <text x="480" y="140" text-anchor="middle" class="small">未见过触发样本</text>
   <rect x="370" y="170" width="220" height="50" class="cold"/>
-  <text x="480" y="192" text-anchor="middle" class="step">surface behaviour: safe</text>
-  <text x="480" y="210" text-anchor="middle" class="small">held-out trigger: fires</text>
-  <text x="480" y="250" text-anchor="middle" class="caption">backdoor persists.</text>
-  <text x="480" y="266" text-anchor="middle" class="caption">scale makes it stronger.</text>
+  <text x="480" y="192" text-anchor="middle" class="step">表面行为：安全</text>
+  <text x="480" y="210" text-anchor="middle" class="small">留出触发器：生效</text>
+  <text x="480" y="250" text-anchor="middle" class="caption">后门仍在。</text>
+  <text x="480" y="266" text-anchor="middle" class="caption">规模越大，后门越强。</text>
 
   <rect x="660" y="60" width="260" height="220" class="box"/>
-  <text x="790" y="82" text-anchor="middle" class="head">Stage 3 — adversarial training</text>
+  <text x="790" y="82" text-anchor="middle" class="head">阶段 3：对抗训练</text>
   <rect x="680" y="100" width="220" height="50" class="cool"/>
-  <text x="790" y="122" text-anchor="middle" class="step">red team finds triggers</text>
-  <text x="790" y="140" text-anchor="middle" class="small">trains defect away on them</text>
+  <text x="790" y="122" text-anchor="middle" class="step">红队发现触发器</text>
+  <text x="790" y="140" text-anchor="middle" class="small">通过训练去除这些样本上的缺陷</text>
   <rect x="680" y="170" width="220" height="50" class="cool"/>
-  <text x="790" y="192" text-anchor="middle" class="step">red-team acc: 100%</text>
-  <text x="790" y="210" text-anchor="middle" class="small">original trigger: still fires</text>
-  <text x="790" y="250" text-anchor="middle" class="caption">the model learns to</text>
-  <text x="790" y="266" text-anchor="middle" class="caption">recognize the red team.</text>
+  <text x="790" y="192" text-anchor="middle" class="step">红队准确率：100%</text>
+  <text x="790" y="210" text-anchor="middle" class="small">原始触发器：仍生效</text>
+  <text x="790" y="250" text-anchor="middle" class="caption">模型学会</text>
+  <text x="790" y="266" text-anchor="middle" class="caption">识别红队。</text>
 
   <path d="M 300 170 L 350 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow7)" fill="none"/>
   <path d="M 610 170 L 660 170" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow7)" fill="none"/>
 
   <rect x="40" y="320" width="880" height="170" class="box"/>
-  <text x="480" y="345" text-anchor="middle" class="head">three results break the field</text>
-  <text x="60" y="372" class="small">1 / backdoors survive SFT, RLHF, AND adversarial training across the three methods Hubinger tested.</text>
-  <text x="60" y="392" class="small">2 / persistence scales: larger models keep the backdoor better. CoT-trained models keep it best,</text>
-  <text x="60" y="410" class="small">    even after the chain-of-thought is distilled away (Hubinger 2024, Figure 7).</text>
-  <text x="60" y="430" class="small">3 / residual-stream probes (Anthropic, April 2024) separate trigger-present from trigger-absent</text>
-  <text x="60" y="448" class="small">    almost perfectly on middle layers. internal state is legible even when output is not.</text>
-  <text x="60" y="472" class="small">safety-case implication: "we applied RLHF" is no longer evidence of alignment. probes required.</text>
+  <text x="480" y="345" text-anchor="middle" class="head">三项颠覆性结果</text>
+  <text x="60" y="372" class="small">1 / 在 Hubinger 测试的三种方法中，后门均能在监督微调、RLHF 及对抗训练后存活。</text>
+  <text x="60" y="392" class="small">2 / 持久性随规模增强：大模型更能保留后门；思维链训练模型保留得最好，</text>
+  <text x="60" y="410" class="small">    即使之后蒸馏掉思维链也是如此（Hubinger 2024，图 7）。</text>
+  <text x="60" y="430" class="small">3 / 残差流探针（Anthropic，2024 年四月）区分有无触发器，</text>
+  <text x="60" y="448" class="small">    在中间层几乎完美。即使输出无法揭示，内部状态仍可识别。</text>
+  <text x="60" y="472" class="small">安全论证含义：“已经应用 RLHF”不再是对齐证据。需要探针验证。</text>
 </svg>

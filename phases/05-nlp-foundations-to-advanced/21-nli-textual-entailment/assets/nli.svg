@@ -15,22 +15,22 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">NLI — one task, three production uses</text>
+  <text x="450" y="30" text-anchor="middle" class="title">NLI — 一个任务，三种生产用途</text>
 
   <!-- Premise + Hypothesis input -->
   <rect x="60" y="70" width="280" height="60" class="box"/>
-  <text x="75" y="92" class="label">premise (t):</text>
+  <text x="75" y="92" class="label">前提 (t)：</text>
   <text x="75" y="112" class="content">"A cat is sleeping on the couch."</text>
 
   <rect x="60" y="140" width="280" height="60" class="box"/>
-  <text x="75" y="162" class="label">hypothesis (h):</text>
+  <text x="75" y="162" class="label">假设 (h)：</text>
   <text x="75" y="182" class="content">"There is a cat in the room."</text>
 
   <line x1="340" y1="135" x2="400" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- Encoder -->
   <rect x="400" y="90" width="220" height="90" class="box"/>
-  <text x="510" y="115" text-anchor="middle" class="label">transformer encoder</text>
+  <text x="510" y="115" text-anchor="middle" class="label">transformer 编码器</text>
   <text x="510" y="138" text-anchor="middle" class="content">[CLS] t [SEP] h [SEP]</text>
   <text x="510" y="160" text-anchor="middle" class="caption">DeBERTa-v3 / RoBERTa / BART</text>
 
@@ -38,38 +38,38 @@
 
   <!-- 3-way softmax -->
   <rect x="680" y="70" width="180" height="50" class="ent"/>
-  <text x="770" y="92" text-anchor="middle" class="label">entailment</text>
+  <text x="770" y="92" text-anchor="middle" class="label">蕴含</text>
   <text x="770" y="110" text-anchor="middle" class="content">0.97</text>
 
   <rect x="680" y="125" width="180" height="50" class="neu"/>
-  <text x="770" y="147" text-anchor="middle" class="label">neutral</text>
+  <text x="770" y="147" text-anchor="middle" class="label">中立</text>
   <text x="770" y="165" text-anchor="middle" class="content">0.02</text>
 
   <rect x="680" y="180" width="180" height="50" class="cont"/>
-  <text x="770" y="202" text-anchor="middle" class="label">contradiction</text>
+  <text x="770" y="202" text-anchor="middle" class="label">矛盾</text>
   <text x="770" y="220" text-anchor="middle" class="content">0.01</text>
 
   <!-- Three uses below -->
-  <text x="450" y="270" text-anchor="middle" class="title">same model, three plugs</text>
+  <text x="450" y="270" text-anchor="middle" class="title">同一模型，三种接法</text>
 
   <rect x="40" y="290" width="260" height="130" class="ent"/>
-  <text x="170" y="315" text-anchor="middle" class="label">1. zero-shot classification</text>
-  <text x="170" y="340" text-anchor="middle" class="content">t = document</text>
+  <text x="170" y="315" text-anchor="middle" class="label">1. 零样本分类</text>
+  <text x="170" y="340" text-anchor="middle" class="content">t = 文档</text>
   <text x="170" y="358" text-anchor="middle" class="content">h = "about {label}"</text>
-  <text x="170" y="385" text-anchor="middle" class="caption">pick max-entailment label</text>
-  <text x="170" y="402" text-anchor="middle" class="caption">no training data needed</text>
+  <text x="170" y="385" text-anchor="middle" class="caption">选择蕴含得分最高的标签</text>
+  <text x="170" y="402" text-anchor="middle" class="caption">无需训练数据</text>
 
   <rect x="320" y="290" width="260" height="130" class="ent"/>
-  <text x="450" y="315" text-anchor="middle" class="label">2. faithfulness (RAG)</text>
-  <text x="450" y="340" text-anchor="middle" class="content">t = retrieved context</text>
-  <text x="450" y="358" text-anchor="middle" class="content">h = generated answer claim</text>
-  <text x="450" y="385" text-anchor="middle" class="caption">entailment → supported</text>
-  <text x="450" y="402" text-anchor="middle" class="caption">RAGAS faithfulness core</text>
+  <text x="450" y="315" text-anchor="middle" class="label">2. 忠实度（RAG）</text>
+  <text x="450" y="340" text-anchor="middle" class="content">t = 检索上下文</text>
+  <text x="450" y="358" text-anchor="middle" class="content">h = 生成答案中的主张</text>
+  <text x="450" y="385" text-anchor="middle" class="caption">蕴含 → 有支持</text>
+  <text x="450" y="402" text-anchor="middle" class="caption">RAGAS 忠实度核心</text>
 
   <rect x="600" y="290" width="260" height="130" class="ent"/>
-  <text x="730" y="315" text-anchor="middle" class="label">3. summarization fact-check</text>
-  <text x="730" y="340" text-anchor="middle" class="content">t = source document</text>
-  <text x="730" y="358" text-anchor="middle" class="content">h = summary sentence</text>
-  <text x="730" y="385" text-anchor="middle" class="caption">contradiction → hallucination</text>
-  <text x="730" y="402" text-anchor="middle" class="caption">neutral → unsupported claim</text>
+  <text x="730" y="315" text-anchor="middle" class="label">3. 摘要事实检查</text>
+  <text x="730" y="340" text-anchor="middle" class="content">t = 源文档</text>
+  <text x="730" y="358" text-anchor="middle" class="content">h = 摘要句子</text>
+  <text x="730" y="385" text-anchor="middle" class="caption">矛盾 → 幻觉</text>
+  <text x="730" y="402" text-anchor="middle" class="caption">中立 → 无支持的主张</text>
 </svg>

@@ -14,68 +14,68 @@
     </style>
   </defs>
 
-  <text x="480" y="24" text-anchor="middle" class="title">ColPali / ColQwen late-interaction retrieval</text>
+  <text x="480" y="24" text-anchor="middle" class="title">ColPali / ColQwen 后期交互检索</text>
 
   <rect x="40" y="50" width="290" height="460" class="box"/>
-  <text x="185" y="72" text-anchor="middle" class="head">query side</text>
+  <text x="185" y="72" text-anchor="middle" class="head">查询侧</text>
   <rect x="60" y="90" width="250" height="40" class="cool"/>
-  <text x="185" y="116" text-anchor="middle" class="step">tokenize query</text>
+  <text x="185" y="116" text-anchor="middle" class="step">查询分词</text>
   <rect x="60" y="140" width="250" height="40" class="cool"/>
-  <text x="185" y="166" text-anchor="middle" class="step">embed each token</text>
-  <text x="185" y="190" text-anchor="middle" class="small">n query tokens -&gt; n vectors</text>
+  <text x="185" y="166" text-anchor="middle" class="step">对每个 token 生成嵌入</text>
+  <text x="185" y="190" text-anchor="middle" class="small">n 个查询 token -&gt; n 个向量</text>
 
   <rect x="60" y="210" width="250" height="220" class="cold"/>
-  <text x="185" y="232" text-anchor="middle" class="step">MaxSim per query token</text>
-  <text x="185" y="252" text-anchor="middle" class="small">for each q_i:</text>
-  <text x="185" y="270" text-anchor="middle" class="small">max over doc patches (q_i . p_j)</text>
-  <text x="185" y="288" text-anchor="middle" class="small">sum all q_i max scores</text>
-  <text x="185" y="310" text-anchor="middle" class="small">-&gt; page score</text>
-  <text x="185" y="336" text-anchor="middle" class="small">O(|q| * |patches|) per page</text>
-  <text x="185" y="354" text-anchor="middle" class="small">but vectorized on GPU</text>
-  <text x="185" y="378" text-anchor="middle" class="small">multi-vector index stores</text>
-  <text x="185" y="396" text-anchor="middle" class="small">patches + MaxSim ranks</text>
-  <text x="185" y="418" text-anchor="middle" class="caption">Vespa / Qdrant multi-vector / AstraDB</text>
+  <text x="185" y="232" text-anchor="middle" class="step">每个查询 token 的 MaxSim</text>
+  <text x="185" y="252" text-anchor="middle" class="small">对每个 q_i：</text>
+  <text x="185" y="270" text-anchor="middle" class="small">取各文档图像块上的最大值 (q_i . p_j)</text>
+  <text x="185" y="288" text-anchor="middle" class="small">对所有 q_i 的最高分求和</text>
+  <text x="185" y="310" text-anchor="middle" class="small">-&gt; 页面得分</text>
+  <text x="185" y="336" text-anchor="middle" class="small">每页 O(|q| * |patches|)</text>
+  <text x="185" y="354" text-anchor="middle" class="small">但在 GPU 上向量化执行</text>
+  <text x="185" y="378" text-anchor="middle" class="small">多向量索引存储</text>
+  <text x="185" y="396" text-anchor="middle" class="small">图像块 + MaxSim 排序</text>
+  <text x="185" y="418" text-anchor="middle" class="caption">Vespa / Qdrant 多向量 / AstraDB</text>
 
   <rect x="360" y="50" width="290" height="460" class="box"/>
-  <text x="505" y="72" text-anchor="middle" class="head">document side</text>
+  <text x="505" y="72" text-anchor="middle" class="head">文档侧</text>
   <rect x="380" y="90" width="250" height="40" class="cool"/>
-  <text x="505" y="116" text-anchor="middle" class="step">render page (180 DPI)</text>
+  <text x="505" y="116" text-anchor="middle" class="step">渲染页面（180 DPI）</text>
   <rect x="380" y="140" width="250" height="40" class="cool"/>
   <text x="505" y="166" text-anchor="middle" class="step">ColQwen2.5-v0.2</text>
-  <text x="505" y="190" text-anchor="middle" class="small">patch tokenizer + LM head</text>
+  <text x="505" y="190" text-anchor="middle" class="small">图像块分词器 + 语言模型输出头</text>
 
   <rect x="380" y="210" width="250" height="220" class="dsk"/>
-  <text x="505" y="232" text-anchor="middle" class="step">patch embeddings</text>
-  <text x="505" y="252" text-anchor="middle" class="small">~2048 patches per page</text>
-  <text x="505" y="270" text-anchor="middle" class="small">dim 128 each</text>
-  <text x="505" y="288" text-anchor="middle" class="small">no pooling: preserve locality</text>
-  <text x="505" y="310" text-anchor="middle" class="small">DocPruner: keep 50%</text>
-  <text x="505" y="328" text-anchor="middle" class="small">accuracy drop &lt; 0.5%</text>
-  <text x="505" y="350" text-anchor="middle" class="small">storage halved</text>
-  <text x="505" y="378" text-anchor="middle" class="small">per-patch bounding box kept</text>
-  <text x="505" y="396" text-anchor="middle" class="small">for evidence highlighting</text>
-  <text x="505" y="418" text-anchor="middle" class="caption">Illuin Tech ColPali + 2026 DocPruner</text>
+  <text x="505" y="232" text-anchor="middle" class="step">图像块嵌入</text>
+  <text x="505" y="252" text-anchor="middle" class="small">每页约 2048 个图像块</text>
+  <text x="505" y="270" text-anchor="middle" class="small">每个 128 维</text>
+  <text x="505" y="288" text-anchor="middle" class="small">不池化：保留局部信息</text>
+  <text x="505" y="310" text-anchor="middle" class="small">DocPruner：保留 50%</text>
+  <text x="505" y="328" text-anchor="middle" class="small">准确率下降 &lt; 0.5%</text>
+  <text x="505" y="350" text-anchor="middle" class="small">存储减半</text>
+  <text x="505" y="378" text-anchor="middle" class="small">保留每个图像块的边界框</text>
+  <text x="505" y="396" text-anchor="middle" class="small">用于高亮证据</text>
+  <text x="505" y="418" text-anchor="middle" class="caption">Illuin Tech ColPali + 2026 年 DocPruner</text>
 
   <rect x="680" y="50" width="240" height="460" class="box"/>
-  <text x="800" y="72" text-anchor="middle" class="head">synthesis + eval</text>
+  <text x="800" y="72" text-anchor="middle" class="head">答案生成 + 评测</text>
   <rect x="700" y="90" width="200" height="40" class="cool"/>
-  <text x="800" y="116" text-anchor="middle" class="step">top-5 pages</text>
+  <text x="800" y="116" text-anchor="middle" class="step">排名前 5 的页面</text>
   <rect x="700" y="140" width="200" height="40" class="hot"/>
   <text x="800" y="166" text-anchor="middle" class="step">Qwen3-VL-30B</text>
-  <text x="800" y="190" text-anchor="middle" class="small">vision + text context</text>
+  <text x="800" y="190" text-anchor="middle" class="small">视觉 + 文本上下文</text>
 
   <rect x="700" y="210" width="200" height="40" class="cold"/>
-  <text x="800" y="236" text-anchor="middle" class="step">cited regions</text>
+  <text x="800" y="236" text-anchor="middle" class="step">引用区域</text>
   <rect x="700" y="260" width="200" height="40" class="dsk"/>
-  <text x="800" y="286" text-anchor="middle" class="step">viewer overlay</text>
+  <text x="800" y="286" text-anchor="middle" class="step">阅读器叠加显示</text>
 
   <rect x="700" y="310" width="200" height="200" class="box"/>
-  <text x="800" y="332" text-anchor="middle" class="head">evaluation</text>
-  <text x="800" y="352" text-anchor="middle" class="small">ViDoRe v3 (retrieval)</text>
-  <text x="800" y="370" text-anchor="middle" class="small">M3DocVQA (multi-page QA)</text>
-  <text x="800" y="388" text-anchor="middle" class="small">content-class x approach</text>
-  <text x="800" y="406" text-anchor="middle" class="small">matrix: text / table / chart /</text>
-  <text x="800" y="424" text-anchor="middle" class="small">handwriting / equation</text>
-  <text x="800" y="444" text-anchor="middle" class="small">vs OCR-then-text baseline</text>
-  <text x="800" y="472" text-anchor="middle" class="caption">publish side-by-side delta</text>
+  <text x="800" y="332" text-anchor="middle" class="head">评测</text>
+  <text x="800" y="352" text-anchor="middle" class="small">ViDoRe v3（检索）</text>
+  <text x="800" y="370" text-anchor="middle" class="small">M3DocVQA（多页问答）</text>
+  <text x="800" y="388" text-anchor="middle" class="small">内容类别 x 方法</text>
+  <text x="800" y="406" text-anchor="middle" class="small">矩阵：文本 / 表格 / 图表 /</text>
+  <text x="800" y="424" text-anchor="middle" class="small">手写文字 / 公式</text>
+  <text x="800" y="444" text-anchor="middle" class="small">对比 OCR 后进行文本检索的基线</text>
+  <text x="800" y="472" text-anchor="middle" class="caption">并排发布差异</text>
 </svg>

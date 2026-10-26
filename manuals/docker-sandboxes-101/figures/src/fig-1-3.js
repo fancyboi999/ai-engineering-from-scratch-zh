@@ -49,3 +49,17 @@ module.exports = figure('fig-1-3', {
     f.arrow([x1, y], [x2 + (x2 > x1 ? -1 : 1), y], { style, label, note: note || undefined, labelX });
   });
 });
+
+// 先用原标签计算图形尺寸，再只替换完整文字节点，保持几何与实测数据不变。
+const readerCopy = {
+  "proxy :3128": "代理 :3128",
+  "sandbox allow": "沙箱放行",
+  "cpu 10, memory 32 GiB": "CPU 10、内存 32 GiB",
+  "allow models.dev": "允许 models.dev",
+  "and localhost:12434": "及 localhost:12434",
+  "README.md with 1 line": "README.md 含 1 行",
+  "exit 0": "退出 0",
+  "removed": "已移除"
+};
+module.exports = module.exports.replace(/>([^<]*)</g, (node, text) =>
+  Object.prototype.hasOwnProperty.call(readerCopy, text) ? `>${readerCopy[text]}<` : node);

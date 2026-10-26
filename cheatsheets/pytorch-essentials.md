@@ -5,7 +5,7 @@ code: PT
 subtitle: 课程中的张量、自动求导、nn.Module、训练循环、DataLoader 与设备管理。
 hue: 60
 sources: phases/03-deep-learning-core/11-intro-to-pytorch, phases/03-deep-learning-core/13-debugging-neural-networks, phases/00-setup-and-tooling/03-gpu-setup-and-cloud, phases/00-setup-and-tooling/12-debugging-and-profiling
-source_hash: cac800409983e210
+source_hash: 829abe4479a9fc6d
 ---
 
 ## 任务

@@ -48,7 +48,7 @@
   <text x="165" y="423.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">HTTPS_PROXY，密钥proxy-managed</text>
   <rect x="336" y="216" width="284" height="228" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)"/>
   <rect x="346" y="226" width="264" height="46" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="478" y="244.1" font-size="12" text-anchor="middle" font-weight="700">docker-agent process</text>
+  <text x="478" y="244.1" font-size="12" text-anchor="middle" font-weight="700">docker-agent 进程</text>
   <text x="478" y="261.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">循环：模型、工具、子agent</text>
   <rect x="346" y="280" width="264" height="46" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="478" y="298.1" font-size="12" text-anchor="middle" font-weight="700">filesystem, shell</text>

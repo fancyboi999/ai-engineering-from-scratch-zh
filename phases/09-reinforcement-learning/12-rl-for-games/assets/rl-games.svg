@@ -14,49 +14,49 @@
     </style>
   </defs>
 
-  <text x="450" y="30" text-anchor="middle" class="title">self-play + search + policy improvement — one recipe, three eras</text>
+  <text x="450" y="30" text-anchor="middle" class="title">自博弈 + 搜索 + 策略改进：一个配方，三个时代</text>
 
   <rect x="40" y="60" width="260" height="360" class="box"/>
   <text x="170" y="88" text-anchor="middle" class="label">AlphaZero (2017)</text>
-  <text x="60" y="115" class="content">env: chess / shogi / Go</text>
-  <text x="60" y="135" class="content">rules: known</text>
-  <text x="60" y="160" class="content">policy-value net (p, v)</text>
-  <text x="60" y="180" class="content">MCTS with PUCT</text>
-  <text x="60" y="205" class="content">target:  pi_MCTS, z_outcome</text>
+  <text x="60" y="115" class="content">环境：国际象棋 / 将棋 / 围棋</text>
+  <text x="60" y="135" class="content">规则：已知</text>
+  <text x="60" y="160" class="content">策略价值网络（p、v）</text>
+  <text x="60" y="180" class="content">使用 PUCT 的 MCTS</text>
+  <text x="60" y="205" class="content">目标：pi_MCTS、z_outcome</text>
   <text x="60" y="225" class="content">L = (v-z)^2 - pi * log p</text>
-  <text x="170" y="265" text-anchor="middle" class="caption">tabula rasa self-play</text>
-  <text x="170" y="285" text-anchor="middle" class="caption">Go, chess, shogi</text>
-  <text x="170" y="320" text-anchor="middle" class="caption">requires: perfect sim</text>
-  <text x="170" y="340" text-anchor="middle" class="caption">discrete actions</text>
-  <text x="170" y="360" text-anchor="middle" class="caption">zero-sum</text>
+  <text x="170" y="265" text-anchor="middle" class="caption">从零开始自博弈</text>
+  <text x="170" y="285" text-anchor="middle" class="caption">围棋、国际象棋、将棋</text>
+  <text x="170" y="320" text-anchor="middle" class="caption">需要完美模拟器</text>
+  <text x="170" y="340" text-anchor="middle" class="caption">离散动作</text>
+  <text x="170" y="360" text-anchor="middle" class="caption">零和</text>
 
   <rect x="320" y="60" width="260" height="360" class="hot"/>
   <text x="450" y="88" text-anchor="middle" class="label">MuZero (2019)</text>
-  <text x="340" y="115" class="content">env: anything</text>
-  <text x="340" y="135" class="content">rules: learned (g)</text>
-  <text x="340" y="160" class="content">encoder h, dynamics g</text>
-  <text x="340" y="180" class="content">MCTS in latent space</text>
-  <text x="340" y="205" class="content">target:  pi_MCTS, z, reward</text>
-  <text x="340" y="225" class="content">L = sum over horizon</text>
-  <text x="450" y="265" text-anchor="middle" class="caption">no sim required</text>
-  <text x="450" y="285" text-anchor="middle" class="caption">Atari, Go, chess, shogi</text>
-  <text x="450" y="320" text-anchor="middle" class="caption">same loop, learned model</text>
-  <text x="450" y="340" text-anchor="middle" class="caption">higher compute cost</text>
-  <text x="450" y="360" text-anchor="middle" class="caption">stochastic extensions exist</text>
+  <text x="340" y="115" class="content">环境：任意</text>
+  <text x="340" y="135" class="content">规则：学习得到（g）</text>
+  <text x="340" y="160" class="content">编码器 h、动力学 g</text>
+  <text x="340" y="180" class="content">在潜空间执行 MCTS</text>
+  <text x="340" y="205" class="content">目标：pi_MCTS、z、reward</text>
+  <text x="340" y="225" class="content">L = 对整个时域求和</text>
+  <text x="450" y="265" text-anchor="middle" class="caption">不需要模拟器</text>
+  <text x="450" y="285" text-anchor="middle" class="caption">Atari、围棋、国际象棋、将棋</text>
+  <text x="450" y="320" text-anchor="middle" class="caption">相同循环，模型由学习得到</text>
+  <text x="450" y="340" text-anchor="middle" class="caption">计算开销更高</text>
+  <text x="450" y="360" text-anchor="middle" class="caption">存在随机扩展</text>
 
   <rect x="600" y="60" width="260" height="360" class="cool"/>
   <text x="730" y="88" text-anchor="middle" class="label">GRPO (2024-2025)</text>
-  <text x="620" y="115" class="content">env: LLM reasoning</text>
-  <text x="620" y="135" class="content">action: next token</text>
-  <text x="620" y="160" class="content">verifier: tests/math check</text>
-  <text x="620" y="180" class="content">group sampling (G rollouts)</text>
+  <text x="620" y="115" class="content">环境：LLM 推理</text>
+  <text x="620" y="135" class="content">动作：下一个 token</text>
+  <text x="620" y="160" class="content">验证器：测试或数学校验</text>
+  <text x="620" y="180" class="content">组采样（G 条 rollout）</text>
   <text x="620" y="205" class="content">A_i = (r_i - mean_r) / std_r</text>
   <text x="620" y="225" class="content">L = -A * log pi + beta KL</text>
-  <text x="730" y="265" text-anchor="middle" class="caption">no critic, no reward model</text>
-  <text x="730" y="285" text-anchor="middle" class="caption">math, code, reasoning</text>
-  <text x="730" y="320" text-anchor="middle" class="caption">DeepSeek-R1 recipe</text>
-  <text x="730" y="340" text-anchor="middle" class="caption">group-relative baseline</text>
-  <text x="730" y="360" text-anchor="middle" class="caption">same spirit as AlphaZero</text>
+  <text x="730" y="265" text-anchor="middle" class="caption">无 critic，无奖励模型</text>
+  <text x="730" y="285" text-anchor="middle" class="caption">数学、代码、推理</text>
+  <text x="730" y="320" text-anchor="middle" class="caption">DeepSeek-R1 配方</text>
+  <text x="730" y="340" text-anchor="middle" class="caption">组内相对基线</text>
+  <text x="730" y="360" text-anchor="middle" class="caption">与 AlphaZero 思路相通</text>
 
-  <text x="450" y="445" text-anchor="middle" class="caption">pattern: sample many trajectories, rank them, train the policy to increase the good ones' probability</text>
+  <text x="450" y="445" text-anchor="middle" class="caption">共同模式：采样多条轨迹、排序，再训练策略以提高优质轨迹的概率</text>
 </svg>

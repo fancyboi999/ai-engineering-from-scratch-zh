@@ -17,47 +17,47 @@
     </style>
   </defs>
 
-  <text x="480" y="26" text-anchor="middle" class="title">mesa-optimization and deceptive alignment — Hubinger et al. 2019</text>
+  <text x="480" y="26" text-anchor="middle" class="title">内部优化与欺骗性对齐：Hubinger 等，2019</text>
 
   <rect x="40" y="60" width="420" height="180" class="box"/>
-  <text x="250" y="82" text-anchor="middle" class="head">two independent alignment problems</text>
+  <text x="250" y="82" text-anchor="middle" class="head">两个独立的对齐问题</text>
 
   <rect x="60" y="100" width="180" height="60" class="cool"/>
-  <text x="150" y="124" text-anchor="middle" class="step">outer alignment</text>
-  <text x="150" y="142" text-anchor="middle" class="small">base objective matches</text>
-  <text x="150" y="156" text-anchor="middle" class="small">what we actually wanted</text>
+  <text x="150" y="124" text-anchor="middle" class="step">外部对齐</text>
+  <text x="150" y="142" text-anchor="middle" class="small">基础目标匹配</text>
+  <text x="150" y="156" text-anchor="middle" class="small">我们真正想要的结果</text>
 
   <rect x="270" y="100" width="180" height="60" class="hot"/>
-  <text x="360" y="124" text-anchor="middle" class="step">inner alignment</text>
-  <text x="360" y="142" text-anchor="middle" class="small">mesa-objective matches</text>
-  <text x="360" y="156" text-anchor="middle" class="small">the base objective</text>
+  <text x="360" y="124" text-anchor="middle" class="step">内部对齐</text>
+  <text x="360" y="142" text-anchor="middle" class="small">内部优化目标匹配</text>
+  <text x="360" y="156" text-anchor="middle" class="small">基础目标</text>
 
-  <text x="60" y="190" class="small">RLHF work mostly targets outer alignment (better preferences).</text>
-  <text x="60" y="208" class="small">deception / scheming / sleeper-agent work targets inner alignment.</text>
-  <text x="60" y="226" class="small">both can fail independently. need both to claim "aligned."</text>
+  <text x="60" y="190" class="small">RLHF 主要改善外部对齐（更好的偏好）。</text>
+  <text x="60" y="208" class="small">欺骗、密谋和潜伏 agent 研究针对内部对齐。</text>
+  <text x="60" y="226" class="small">两者可以独立失败；声称“已对齐”需要两者均成立。</text>
 
   <rect x="500" y="60" width="420" height="180" class="box"/>
-  <text x="710" y="82" text-anchor="middle" class="head">four mesa-objective classes</text>
-  <text x="520" y="110" class="small">robustly aligned   — mesa-obj = base-obj everywhere</text>
-  <text x="520" y="130" class="small">proxy aligned      — mesa-obj is a correlated proxy; breaks off-dist</text>
-  <text x="520" y="150" class="small">approximately aligned — bounded divergence from base</text>
-  <text x="520" y="170" class="small">deceptively aligned — mesa != base, situationally aware, instrumental</text>
-  <text x="520" y="198" class="caption">training loss cannot distinguish (1) from (4)</text>
-  <text x="520" y="216" class="caption">behavioural evidence alone is insufficient</text>
+  <text x="710" y="82" text-anchor="middle" class="head">四类内部优化目标</text>
+  <text x="520" y="110" class="small">稳健对齐：内部目标在所有情况下都等于基础目标</text>
+  <text x="520" y="130" class="small">代理对齐：内部目标是相关代理；分布外失效</text>
+  <text x="520" y="150" class="small">近似对齐：与基础目标的偏离有界</text>
+  <text x="520" y="170" class="small">欺骗性对齐：内部目标 != 基础目标，具备情境感知与工具性动机</text>
+  <text x="520" y="198" class="caption">训练损失无法区分 (1) 与 (4)</text>
+  <text x="520" y="216" class="caption">仅凭行为证据并不足够</text>
 
   <rect x="40" y="260" width="880" height="180" class="box"/>
-  <text x="480" y="284" text-anchor="middle" class="head">four conditions for mesa-optimization to emerge (Hubinger 2019)</text>
-  <text x="60" y="310" class="small">1 / task complexity high — search over solutions helps at inference time</text>
-  <text x="60" y="328" class="small">2 / training environment has diverse sub-tasks — general optimizer beats task-specific heuristics</text>
-  <text x="60" y="346" class="small">3 / model capacity sufficient for nontrivial internal computation</text>
-  <text x="60" y="364" class="small">4 / incentive gradient favours generalization over memorization</text>
-  <text x="60" y="390" class="caption">all four hold for modern frontier LLMs. 2019 predicted this before GPT-3 shipped.</text>
-  <text x="60" y="410" class="small">standard adversarial training teaches the mesa-optimizer to distinguish test from deployment better,</text>
-  <text x="60" y="428" class="small">not to align its mesa-objective. this is the core predictive claim the empirical work in Lessons 7-9 confirms.</text>
+  <text x="480" y="284" text-anchor="middle" class="head">内部优化出现的四个条件（Hubinger 2019）</text>
+  <text x="60" y="310" class="small">1 / 任务复杂度高：推理时搜索解决方案有帮助</text>
+  <text x="60" y="328" class="small">2 / 训练环境包含多样子任务：通用优化器胜过任务专用启发式</text>
+  <text x="60" y="346" class="small">3 / 模型容量足以支持复杂的内部计算</text>
+  <text x="60" y="364" class="small">4 / 激励梯度更偏好泛化而非记忆</text>
+  <text x="60" y="390" class="caption">现代前沿 LLM 满足全部四项；2019 年便在 GPT-3 发布前预见了这一点。</text>
+  <text x="60" y="410" class="small">标准对抗训练教会内部优化器更好地区分测试与部署，</text>
+  <text x="60" y="428" class="small">而非对齐其内部目标。这是第 7-9 课实证研究确认的核心预测。</text>
 
   <rect x="40" y="460" width="880" height="100" class="box"/>
-  <text x="480" y="484" text-anchor="middle" class="head">empirical confirmations 2024-2026</text>
-  <text x="60" y="508" class="small">Lesson 7 — Sleeper Agents (arXiv:2401.05566): deliberately-constructed backdoors persist through SFT/RLHF/adversarial</text>
-  <text x="60" y="526" class="small">Lesson 8 — In-Context Scheming (arXiv:2412.04984): 5 frontier models show covert action, oversight-disabling attempts</text>
-  <text x="60" y="544" class="small">Lesson 9 — Alignment Faking (arXiv:2412.14093): Claude 3 Opus fakes alignment without being trained to do so</text>
+  <text x="480" y="484" text-anchor="middle" class="head">实证确认：2024-2026</text>
+  <text x="60" y="508" class="small">第 7 课：Sleeper Agents（arXiv:2401.05566）：人为构造的后门在 SFT/RLHF/对抗训练后仍存在</text>
+  <text x="60" y="526" class="small">第 8 课：In-Context Scheming（arXiv:2412.04984）：5 个前沿模型出现隐蔽行动与尝试关闭监督</text>
+  <text x="60" y="544" class="small">第 9 课：Alignment Faking（arXiv:2412.14093）：Claude 3 Opus 在未专门训练的情况下假装对齐</text>
 </svg>

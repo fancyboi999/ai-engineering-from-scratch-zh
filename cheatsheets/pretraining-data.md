@@ -5,7 +5,7 @@ code: PP
 subtitle: 清洗、去重、下载、分词、分片并滑窗读取预训练语料。包含课程 Python 实现。
 hue: 28
 sources: phases/10-llms-from-scratch/03-data-pipelines, phases/19-capstone-projects/31-tokenized-dataset-sliding-window, phases/19-capstone-projects/42-large-corpus-downloader, phases/19-capstone-projects/43-hdf5-tokenized-corpus
-source_hash: ecff395d16bd5217
+source_hash: e5218251e712b085
 ---
 
 ## 任务
