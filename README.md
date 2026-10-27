@@ -1,34 +1,29 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="AI Engineering from Scratch · 简体中文版" width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/readme/header-dark.svg">
+    <img src="assets/readme/header-light.svg" alt="AI Engineering from Scratch · 简体中文版" width="840">
+  </picture>
 </p>
 
-<p align="center">
-  <b>从零开始，亲手实现每一个 AI 算法</b><br/>
-  <sub>542 节课 · 20 个阶段 · Python / TypeScript / Rust / Julia · 配套中文网站 <a href="https://aieng-zh.cn">aieng-zh.cn</a></sub>
-</p>
+实现模型内部机制、检索流水线和 agent 运行时。测试它们，分析失败，并保留代码与评估结果。
+
+**[开始学习](https://aieng-zh.cn/lessons/00-setup-and-tooling/01-dev-environment/)** · **[选择路径](#learning-routes)** · **[试试实验](#interactive-lab)** · **[动手做项目](#project-challenges)** · **[浏览课程目录](#contents)**
+
+免费、开源，采用 MIT 许可。你可以在网站上学习，使用 coding agent，或在本地运行代码。
+
+> 542 节课，20 个阶段。Python、TypeScript、Rust、Julia。
 
 <p align="center">
-  <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/在线阅读-aieng--zh.cn-3553ff?style=flat-square&labelColor=fafaf5" alt="在线阅读 aieng-zh.cn"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
   <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-542-3553ff?style=flat-square&labelColor=fafaf5" alt="542 lessons"></a>
   <a href="#contents"><img src="https://img.shields.io/badge/phases-20-3553ff?style=flat-square&labelColor=fafaf5" alt="20 phases"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
-  <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff&cacheSeconds=21600" alt="GitHub stars"></a>
+  <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/stargazers"><img src="https://img.shields.io/github/stars/fancyboi999/ai-engineering-from-scratch-zh?style=flat-square&labelColor=fafaf5&color=3553ff" alt="GitHub stars"></a>
+  <a href="https://aieng-zh.cn"><img src="https://img.shields.io/badge/在线阅读-aieng--zh.cn-3553ff?style=flat-square&labelColor=fafaf5" alt="中文网站"></a>
 </p>
 
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
+> 本项目是 [Rohit Ghumare](https://github.com/rohitg00) 及社区创建的 [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch) 的**简体中文衍生版**，由 [fancy](https://github.com/fancyboi999) 维护。课程内容与结构跟随上游，中文翻译遵循 [TRANSLATION.md](TRANSLATION.md)。
 
-> 通过推导、代码和实验学习 AI 工程。
->
-> 542 节课，20 个阶段，覆盖 Python、TypeScript、Rust、Julia。课程配有中文正文、测验、
-> 可运行示例和可复用产物。免费阅读，开源，采用 MIT 许可。
->
-> 从基础算法到 LLM 应用、agent 与生产系统，按你的目标选择学习路径。
-
-> 本项目是 [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch)（作者 [Rohit Ghumare](https://github.com/rohitg00)，MIT 协议）的**简体中文衍生版**。衷心感谢原作者创作并开源了这套课程。
-
-## 特别鸣谢
+### 特别鸣谢
 
 <p align="center">
   <a href="https://www.ipwo.net/?ref=githubgoofishcli">
@@ -44,49 +39,47 @@
   支持<a href="https://www.ipwo.net/?ref=githubgoofishcli"><ins>免费测试</ins></a>，<strong>9 折优惠码：</strong><code>0203</code>
 </p>
 
-### 这个中文版做了什么
+<a id="see-what-you-will-build-and-keep"></a>
+<a id="learning-routes"></a>
 
-中文版提供课程翻译、配套视频、交互式学习网站和 AI 导师：
+## 学习路径
 
-| | |
+| 路径 | 起始课程 |
 |---|---|
-| 🇨🇳 **全站简体中文** | 542 节课正文、243 条术语表、测验题、`mermaid` 流程图、交互图表标签全部中文化（`agent`、`token`、`transformer` 等技术术语按惯例保留英文） |
-| 🌐 **独立中文网站 [aieng-zh.cn](https://aieng-zh.cn)** | 可搜索的课程目录、[AI 工程学习路径](https://aieng-zh.cn/learning-paths.html)、学习进度追踪、可拖动的交互式图表、命令面板（`Cmd / Ctrl + K`）、深色模式 |
-| 🧪 **编程练习与技术手册** | [浏览器编程练习](https://aieng-zh.cn/practice)支持代码实现、论文方法、小模型训练与实验；[技术手册](https://aieng-zh.cn/manuals.html)按固定版本讲解 vLLM、Miles、SGLang、A2A、Docker Sandboxes 与逆向工程 |
-| 🎬 **配套动画讲解视频** | 333 节中文配音动画已上线，覆盖阶段 0–14 的全部课程。可在课程页内嵌播放，提供直链与 B 站播放源，配合正文、数学推导和代码实践学习 |
-| 🔍 **为 AI 检索优化** | 构建时自动生成 `sitemap.xml` / `llms.txt` / 结构化数据，方便被搜索引擎和 AI 助手引用 |
-| ✅ **课数一致性护栏** | CI 自动校验课程数（`node site/build.js --check`），防止课程列表与磁盘上的实际内容漂移 |
+| 模型基础 | [配置与工具链](https://aieng-zh.cn/lessons/00-setup-and-tooling/01-dev-environment/) |
+| LLM 系统 | [提示词工程](https://aieng-zh.cn/lessons/11-llm-engineering/01-prompt-engineering/) |
+| Agent 与交付 | [Agent 循环](https://aieng-zh.cn/lessons/14-agent-engineering/01-the-agent-loop/) |
 
-> 翻译怎么翻见 [TRANSLATION.md](TRANSLATION.md)。课程结构、代码与上游保持一致，译文持续跟进上游更新。
+[比较职业路径](https://aieng-zh.cn/learning-paths.html) · [前置要求与学习时间](#study-guide)
 
-**目录** · [从这里开始](#从这里开始选择你想构建的内容) · [AI 导师](#30-秒添加-ai-导师) · [怎么运作](#怎么运作) · [课程结构](#课程的结构) · [学习路径](https://aieng-zh.cn/learning-paths.html) · [一节课的样子](#一节课的样子) · [快速开始](#快速开始) · [每节课都有产出](#每节课都有产出) · [课程目录](#contents) · [工具箱](#工具箱) · [参与贡献](#参与贡献)
+<a id="interactive-lab"></a>
 
-## 从这里开始：选择你想构建的内容
+### 梯度下降
 
-开始前不需要先扫完 542 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
+二十个起点沿着二次损失函数的梯度下降。图中展示每次更新后各点的位置及平均损失。
 
-| 你的目标 | 在 GitHub 上学习 | 在网站上学习 |
-|---|---|---|
-| 我是新手，想要完整地打牢基础 | [阶段 0 · 配置与工具链](phases/00-setup-and-tooling/) | [开发环境](https://aieng-zh.cn/lessons/00-setup-and-tooling/01-dev-environment/) |
-| 我懂 Python，想学数学与机器学习基础 | [阶段 1 · 数学基础](phases/01-math-foundations/) | [线性代数直觉](https://aieng-zh.cn/lessons/01-math-foundations/01-linear-algebra-intuition/) |
-| 我想构建生产级 LLM 应用 | [阶段 11 · LLM 工程](phases/11-llm-engineering/) | [提示词工程](https://aieng-zh.cn/lessons/11-llm-engineering/01-prompt-engineering/) |
-| 我想构建自主 agent | [阶段 14 · Agent 工程](phases/14-agent-engineering/) | [Agent 循环](https://aieng-zh.cn/lessons/14-agent-engineering/01-the-agent-loop/) |
-| 我想在真实代码仓库中使用 coding agent | [Agent 辅助工程路径](learning-paths/using-coding-agents.json) | [Agent 辅助工程](https://aieng-zh.cn/lessons/14-agent-engineering/31-agent-workbench-why-models-fail/?learningPath=using-coding-agents) |
-| 我想在编码实施前把产品方案想透定准 | [产品判断与交付路径](learning-paths/shaping-the-build.json) | [产品判断与交付](https://aieng-zh.cn/lessons/14-agent-engineering/47-outcomes-before-output/?learningPath=shaping-the-build) |
-| 我想基于模型上下文协议（MCP）构建系统 | [模型上下文协议（MCP）路线](phases/13-tools-and-protocols/README.md#model-context-protocol-mcp-path) | [模型上下文协议（MCP）路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/06-mcp-fundamentals/?learningPath=model-context-protocol) |
-| 我想编写并交付 Agent Skills | [Agent Skills 快速路线](phases/13-tools-and-protocols/README.md#agent-skills-fast-path) | [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills) |
-| 我想备考 Claude 官方认证 | [认证入门指南](certifications/claude/GETTING_STARTED.md) | [认证学院](https://aieng-zh.cn/certifications.html) |
-| 我想备考 MCP Associate（MCPA） | [MCPA 入门指南](certifications/mcpa/GETTING_STARTED.md) | [MCPA 路线](https://aieng-zh.cn/certification?id=mcpa-f) |
+<p align="center">
+  <a href="https://aieng-zh.cn/lessons/01-math-foundations/08-optimization/">
+    <picture>
+      <source media="(max-width: 600px) and (prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/readme/101-gradient-mobile-dark.png">
+      <source media="(max-width: 600px) and (prefers-reduced-motion: reduce)" srcset="assets/readme/101-gradient-mobile-light.png">
+      <source media="(prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/readme/101-gradient-dark.png">
+      <source media="(prefers-reduced-motion: reduce)" srcset="assets/readme/101-gradient-light.png">
+      <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/readme/101-gradient-mobile-dark.gif">
+      <source media="(max-width: 600px)" srcset="assets/readme/101-gradient-mobile-light.gif">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/readme/101-gradient-dark.gif">
+      <img src="assets/readme/101-gradient-light.gif" alt="梯度下降将分散的起点移向损失最低点，平均损失随更新逐步降低。" width="840">
+    </picture>
+  </a>
+</p>
 
-拿不准自己适合从哪开始？使用 [`start-learning` 定位导师](skills/start-learning/SKILL.md) 或查看 [网站前置要求指南](https://aieng-zh.cn/prereqs.html)。
+[在课程中调整学习率](https://aieng-zh.cn/lessons/01-math-foundations/08-optimization/) · [用代码比较 GD、momentum 和 Adam](phases/01-math-foundations/08-optimization/code/optimizers.py)
 
-在 [AI 工程学习路径](https://aieng-zh.cn/learning-paths.html) 中对比四大核心领域与六大职业发展路线。
+<a id="project-challenges"></a>
 
-## 实战项目与技术手册
+### 项目
 
-核心课程仍是 **20 个阶段、542 节课**。独立的[实战项目目录](https://aieng-zh.cn/projects.html)另有 **78 项就绪项目、322 个阶段**，配备分阶段 starter、参考实现和本地评分器；[技术手册](https://aieng-zh.cn/manuals.html)另有 **3 本已发布手册**（另有 1 本 SGLang 草稿）。这些不是新增核心课，也不是官方认证。
-
-下面三个项目可作为起点。在仓库根目录运行命令；starter 在实现对应阶段之前会失败。
+三个项目均提供分阶段 starter、参考实现和本地评分器。[完成环境配置](#local-setup)后，在仓库根目录运行命令。实现对应阶段前，starter 会测试失败。
 
 <details>
 <summary><strong>01 · 检索评估实验室</strong> · Python · 排序指标与回归检查</summary>
@@ -154,15 +147,38 @@ python3 scripts/project_test.py tool-call-firewall \
 
 </details>
 
-[浏览全部项目](https://aieng-zh.cn/projects.html) · [职业实践指南](learning-paths/CAREER-PRACTICE.md) · [A2A 101 手册](https://aieng-zh.cn/manual-a2a-101.html) · [Docker Sandboxes 101 手册](https://aieng-zh.cn/manual-docker-sandboxes-101.html)
+[浏览全部项目](https://aieng-zh.cn/projects.html) · [职业实践指南](learning-paths/CAREER-PRACTICE.md)
 
-项目默认评分离线核心，不等于真实模型、可选框架或云服务能力验证。手册中的 capture 是冻结上游的原始证据，版本核验日期是历史记录，不是本次现场复验；中文网页提供实际生成的打印 HTML，不提供未发布的 PDF 下载。
+## 选择学习方式
 
-## 30 秒添加 AI 导师
+### 在网站上学习
+
+在 [aieng-zh.cn](https://aieng-zh.cn) 打开任意已完成的课程，或在下方[课程目录](#contents)中展开一个阶段。无需配置环境，也无需克隆仓库。
+
+### 使用 AI 导师
+
+如果已经安装 Node.js、`npx` 和支持 skill 的 coding agent，你的 coding agent 就可以成为导师。安装和阅读导师技能不需要克隆仓库。专项路径中可运行的实验需要 `python3`；Agent Skills 的宿主实验还需要选定宿主，以及可写入的用户或项目技能目录。
 
 ```bash
 npx skills add fancyboi999/ai-engineering-from-scratch-zh
 ```
+
+安装器询问时，选择宿主和安装范围。在 Codex 中使用 `start-learning`，在 Claude Code 中使用 `/start-learning`，或让其他宿主按名称使用该技能。
+
+<details>
+<summary>导师配置与宿主命令</summary>
+
+先检查本地要求：
+
+```bash
+node --version
+npx --version
+python3 --version
+```
+
+`skills` 会写入安装时选定的宿主和范围，例如 `.claude/skills/`、`.cursor/skills/`、`.codex/skills/` 或其他受支持的技能目录。检查所选宿主能否发现这个确切位置。
+
+调用语法由宿主决定，不属于可移植的 `SKILL.md` 格式：
 
 | 宿主 | 开始全课程 | 开始模型上下文协议（MCP） | 开始 Agent Skills | 运行阶段测验 |
 |---|---|---|---|---|
@@ -170,44 +186,113 @@ npx skills add fancyboi999/ai-engineering-from-scratch-zh
 | Claude Code | `/start-learning` | `/learn-mcp` | `/learn-agent-skills` | `/check-understanding 13` |
 | 其他兼容宿主 | `使用 start-learning 开始课程。` | `使用 learn-mcp 开始模型上下文协议（MCP）路径。` | `使用 learn-agent-skills 开始 Agent Skills 工程路径。` | `使用 check-understanding 测验阶段 13。` |
 
-运行你所在宿主的启动命令。导师会评估你当前的知识背景，把个性化学习计划保存到 `LEARNING.md`。从那里开始，`learn` 技能每次会话教学一节课：核心概念、数学直觉、编写代码、测验检验。它直接从本仓库流式读取课程，而 `course-guide` 技能可以在你卡住时精准跳转到对应课程。在 Codex 中，直接输入 `learn` 和 `course-guide`；在 Claude Code 中，输入 `/learn` 和 `/course-guide`；在其他兼容宿主中，按名称调用该技能即可。
+十道题的定级测验会将你已有的知识映射到起始阶段，并把个性化学习计划保存到 `LEARNING.md`。随后，`learn` 技能每次会话教一节课：概念、数学、代码、测验。它直接从本仓库读取课程；`course-guide` 技能可以将你卡住的问题定位到具体课程。在 Codex 中使用 `learn` 和 `course-guide`，在 Claude Code 中使用 `/learn` 和 `/course-guide`，在其他兼容宿主中按名称调用即可。
 
-只想要模型上下文协议（MCP）？使用宿主对应的 MCP 启动命令。它会生成 `MCP-LEARNING.md`，按照 [模型上下文协议（MCP）清单](learning-paths/model-context-protocol.json) 的 17 节课程路线，带你逐课实践无状态握手、服务端、客户端、传输层、采样、工具契约、可靠性与网关。
+只想学模型上下文协议（MCP）？使用宿主对应的 MCP 调用方式。它会生成 `MCP-LEARNING.md`，沿 17 节课的路线学习无状态请求、传输、双向交互、安全、可靠性、注册表治理和一致性证据。确切顺序和检查点见 [MCP 路径清单](learning-paths/model-context-protocol.json)。
 
-只想要 Agent Skills？使用宿主对应的 Agent Skills 启动命令。它会生成 `AGENT-SKILLS-LEARNING.md`，按照 [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills) 的 5 节必修课程路线，带你实践编写规范、发现机制、渐进式披露、安全沙箱与发布门禁。
+只想学 Agent Skills？使用宿主对应的调用方式。它会生成 `AGENT-SKILLS-LEARNING.md`，按五节课学习契约、发现、调用、沙箱边界、发布评估与真实宿主的可移植性。网站入口见 [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills)。
+
+安装器会列出可配置的宿主并询问安装位置。如果暂时没有 Node.js、`npx`、`python3`、受支持的宿主或可写入范围，可以先使用网站，或直接阅读 `docs/zh.md`。这样可以学习概念；真实宿主的发现、调用、脚本和卸载验证，需要等环境预检通过后再完成。课程可在 [aieng-zh.cn](https://aieng-zh.cn) 阅读。
+
+### 学习技能
 
 | 技能 | 作用 |
 |---|---|
-| [`start-learning`](skills/start-learning/SKILL.md) | 定位导师。评估你当前的背景、设定学习目标、选择切入点，并生成 `LEARNING.md`。 |
-| [`learn`](skills/learn/SKILL.md) | 动手教学导师。从仓库流式读取课程，带你推导概念、运行代码，并进行测验检验。 |
-| [`learn-mcp`](skills/learn-mcp/SKILL.md) | MCP 专项导师。创建 `MCP-LEARNING.md`，遵循 17 课路线，记录协议线路、安全性、可靠性与一致性证据。 |
-| [`learn-agent-skills`](skills/learn-agent-skills/SKILL.md) | Agent Skills 专项导师。创建 `AGENT-SKILLS-LEARNING.md`，遵循 5 课路线，记录技能契约、渐进式披露与真实 runner 测试证据。 |
-| [`claude-certification`](skills/claude-certification/SKILL.md) | Claude 认证导师。选择 CCAO-F、CCDV-F、CCAR-F 或 CCAR-P，逐课教学、运行实验、评审产物、组织诊断与模拟测验并保存进度。 |
-| [`mcpa-certification`](skills/mcpa-certification/SKILL.md) | MCPA 认证导师。遵循 34 课路线，运行 MCP 实验和协议校验，组织诊断与模拟测验，并保存学习进度。 |
-| [`find-your-level`](skills/find-your-level/SKILL.md) | 十道题的定级测验。把你的知识映射到一个起始阶段，生成带课时估算的个性化路径。 |
-| [`check-understanding <phase>`](skills/check-understanding/SKILL.md) | 按阶段测验，八道题，附反馈和需要复习的具体课程。 |
-| [`course-guide`](skills/course-guide/SKILL.md) | 课程导引与概念查询。把任何主题或疑问映射到讲解该知识点的具体课程。 |
+| [`start-learning`](skills/start-learning/SKILL.md) | 首次引导：明确学习目标、完成定级测验，并将个性化计划保存到 `LEARNING.md`。 |
+| [`learn`](skills/learn/SKILL.md) | 导师循环：先回忆复习，再交互讲授下一课并完成测验；记录进度和复习队列。 |
+| [`course-guide`](skills/course-guide/SKILL.md) | 主题路由：把“去哪里学 attention？”或“我的 loss 是 NaN”等问题定位到具体课程，并给出链接。 |
+| [`learn-mcp`](skills/learn-mcp/SKILL.md) | MCP 专项导师。创建 `MCP-LEARNING.md`，遵循 17 课清单，记录协议线路、安全、可靠性与一致性证据。 |
+| [`learn-agent-skills`](skills/learn-agent-skills/SKILL.md) | Agent Skills 专项导师。创建 `AGENT-SKILLS-LEARNING.md`，讲授第 22、24、25、26、27 课，并记录真实宿主证据。 |
+| [`learn-reverse-engineering`](skills/learn-reverse-engineering/SKILL.md) | 逆向工程专项导师。创建 `REVERSE-ENGINEERING-LEARNING.md`，使用自己构建的程序学习阶段 13 第 32–45 课，并记录实验证据。 |
+| [`claude-certification`](skills/claude-certification/SKILL.md) | Claude 认证导师。选择 CCAO-F、CCDV-F、CCAR-F 或 CCAR-P，逐课教学、运行实验、评审产物、组织诊断与模拟测验，并保存进度。 |
+| [`mcpa-certification`](skills/mcpa-certification/SKILL.md) | MCPA 导师。按 2026-07-28 版协议学习 `mcpa-f` 的 34 课路线，运行实验与 wire checker，组织诊断和三套模拟测验，并保存进度。 |
+| [`find-your-level`](skills/find-your-level/SKILL.md) | 十道题的定级测验。将已有知识映射到起始阶段，并生成带课时估算的个性化路径。 |
+| [`check-understanding <phase>`](skills/check-understanding/SKILL.md) | 按阶段测验，八道题，附反馈和需要复习的具体课程。调用方式见上方宿主命令表。 |
 
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
+</details>
+
+<a id="local-setup"></a>
+
+### 在本地运行代码
+
+```bash
+git clone https://github.com/fancyboi999/ai-engineering-from-scratch-zh.git
+cd ai-engineering-from-scratch-zh
+python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner
+python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py
 ```
 
-## 怎么运作
+环境预检会区分当前必需项与后续才需要的工具。每项必需检查失败时，都会给出检测到的原因和修正命令。`vectors.py` 不需要第三方依赖，最后会展示矩阵与向量相乘如何成为神经网络层内部的运算。把这段终端输出保存为你的第一份证据。
 
-大多数 AI 教材都是碎片化教学。这儿一篇论文，那儿一篇微调心得，别处再来个炫酷的 agent
-demo。这些碎片很少能拼到一起。你做出了一个聊天机器人，却讲不清它的 loss 曲线；你给
-agent 挂了个函数，却说不出调用它的那个模型内部，attention 到底在干什么。
+<details>
+<summary>用同样的方法学习每一课</summary>
 
-这套课程就是那根脊椎。20 个阶段，542 节课，四种语言：Python、TypeScript、Rust、Julia。
-一头是线性代数，另一头是自主 agent 集群。每个算法都先从最原始的数学手写出来。反向传播、
-分词器、注意力、agent 循环——等 PyTorch 登场时，你已经知道它底层在做什么了。
+### 每节课的学习方法
 
-学习时结合问题背景、概念推导、代码实验、测验和产出练习。动画帮助理解核心直觉，
-代码与实验用于检验掌握程度。各课列出所需依赖；涉及 GPU、云服务或模型 API 的实践按课程要求准备资源，相关服务费用由提供商收取。
+1. **阅读** `docs/zh.md`，用自己的话解释核心概念。
+2. **输入并构建**关键代码，亲手实现它。
+3. **运行**课程命令。工作目录是包含 `README.md` 和 `phases/` 的仓库根目录。
+4. **保留证据**：命令、工作目录、退出码、有意义的输出，以及你修改或生成的产物。
+5. **继续下一步**之前，先解释清楚输出，并能在不靠猜测的情况下作出一个小修改。
 
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
+除非课程明确要求切换目录，否则页面中的命令路径均相对于仓库根目录。课程提供多种语言时，运行你正在学习的语言实现。
+
+</details>
+
+<a id="study-guide"></a>
+
+## 选择学习路径
+
+开始前不需要先扫完 542 节课。选一个目标即可。每个链接都对应 GitHub 或网站上的同一套课程，两处使用相同的课程代码。
+
+| 你的目标 | 在 GitHub 上学习 | 在网站上学习 |
+|---|---|---|
+| 我是新手，想要完整地打牢基础 | [阶段 0 · 配置与工具链](phases/00-setup-and-tooling/) | [开发环境](https://aieng-zh.cn/lessons/00-setup-and-tooling/01-dev-environment/) |
+| 我懂 Python，想学数学与机器学习基础 | [阶段 1 · 数学基础](phases/01-math-foundations/) | [线性代数直觉](https://aieng-zh.cn/lessons/01-math-foundations/01-linear-algebra-intuition/) |
+| 我想构建生产级 LLM 应用 | [阶段 11 · LLM 工程](phases/11-llm-engineering/) | [提示词工程](https://aieng-zh.cn/lessons/11-llm-engineering/01-prompt-engineering/) |
+| 我想构建自主 agent | [阶段 14 · Agent 工程](phases/14-agent-engineering/) | [Agent 循环](https://aieng-zh.cn/lessons/14-agent-engineering/01-the-agent-loop/) |
+| 我想在真实代码仓库中使用 coding agent | [Agent 辅助工程路径](learning-paths/using-coding-agents.json) | [Agent 辅助工程](https://aieng-zh.cn/lessons/14-agent-engineering/31-agent-workbench-why-models-fail/?learningPath=using-coding-agents) |
+| 我想在编码实施前把产品方案想透定准 | [产品判断与交付路径](learning-paths/shaping-the-build.json) | [产品判断与交付](https://aieng-zh.cn/lessons/14-agent-engineering/47-outcomes-before-output/?learningPath=shaping-the-build) |
+
+拿不准自己适合从哪开始？使用 [`start-learning` 定位导师](skills/start-learning/SKILL.md)，或查看[网站前置要求指南](https://aieng-zh.cn/prereqs.html)。
+
+在 [AI 工程学习路径](https://aieng-zh.cn/learning-paths.html)中比较四大核心领域与六大职业发展路线。
+
+<details>
+<summary>MCP、Agent Skills 与逆向工程专项路径</summary>
+
+| 你的目标 | 在 GitHub 上学习 | 在网站上学习 |
+|---|---|---|
+| 我想基于模型上下文协议（MCP）构建系统 | [MCP 路线](phases/13-tools-and-protocols/README.md#model-context-protocol-mcp-path) | [MCP 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/06-mcp-fundamentals/?learningPath=model-context-protocol) |
+| 我想编写并交付 Agent Skills | [Agent Skills 快速路线](phases/13-tools-and-protocols/README.md#agent-skills-fast-path) | [Agent Skills 路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/22-skills-and-agent-sdks/?learningPath=agent-skills) |
+| 我想读懂编译后的程序 | [逆向工程路线](learning-paths/reverse-engineering.json) | [逆向工程路径](https://aieng-zh.cn/lessons/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/?learningPath=reverse-engineering) |
+
+</details>
+
+<details>
+<summary>前置要求与学习时间</summary>
+
+### 前置要求
+
+- 能编写代码，语言不限，会 Python 更方便。
+- 希望理解 AI 的实际工作机制。
+
+## 从哪里开始
+
+| 你的背景 | 从哪开始 | 上游路线估算 |
+|---|---|---|
+| 编程和 AI 都是新手 | 阶段 0 — 配置与工具链 | 约 306 小时 |
+| 会 Python，刚接触 ML | 阶段 1 — 数学基础 | 约 270 小时 |
+| 懂 ML，刚接触深度学习 | 阶段 3 — 深度学习核心 | 约 200 小时 |
+| 懂深度学习，想学 LLM 和 agent | 阶段 10 — 从零实现 LLM | 约 100 小时 |
+| 资深工程师，只想学 agent 工程 | 阶段 14 — Agent 工程 | 约 60 小时 |
+| 只想构建生产级 MCP 系统 | [MCP 路径](learning-paths/model-context-protocol.json) | 约 23 小时 15 分 |
+| 只想构建生产级 Agent Skills | [Agent Skills 工程路径](learning-paths/agent-skills.json) | 约 9.5 小时 |
+| 只想学逆向工程 | [逆向工程路径](learning-paths/reverse-engineering.json) | 约 32.5 小时 |
+
+路线估算沿用上游，不代表各课正文预计时长的总和。逐课时长见 [ROADMAP.md](ROADMAP.md)，专项路径的必修范围和时长以 `learning-paths/*.json` 为准。
+
+</details>
 
 ## 课程的结构
 
@@ -238,145 +323,6 @@ flowchart TB
   P16 --> P19["阶段 19 · 综合项目"]
   P17 --> P19
   P18 --> P19
-```
-
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
-
-## 一节课的样子
-
-每节课都待在自己的文件夹里，整套课程结构统一：
-
-```text
-phases/<NN>-<phase-name>/<NN>-<lesson-name>/
-├── code/      可运行的实现（Python、TypeScript、Rust、Julia）
-├── docs/
-│   └── zh.md  课程正文
-├── quiz.json  课前、课中与课后测验
-└── outputs/   本节课的可复用产物
-```
-
-每节课都走六个节拍。其中 *Build It / Use It*（动手构建 / 实际使用）的拆分是整节课的脊椎——
-你先从零实现算法，再用生产级的库把同样的事跑一遍。你之所以懂框架在做什么，是因为那个更小的
-版本你自己写过。
-
-```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff'}}}%%
-flowchart LR
-  M["主旨<br/>一句话核心理念"] --> Pr["问题背景<br/>具体的痛点"]
-  Pr --> C["核心概念<br/>图解与直觉"]
-  C --> B["动手构建<br/>纯数学，不用框架"]
-  B --> U["实际使用<br/>同样的事用 PyTorch / sklearn 跑一遍"]
-  U --> S["拿去用<br/>提示词 · 技能 · agent · MCP"]
-```
-
-## 快速开始
-
-三种入门方式。挑一个。
-
-**方式 A —— 阅读。** 在
-[aieng-zh.cn](https://aieng-zh.cn) 上打开任意一节已完成的课程，
-或展开 [目录](#contents) 里的某个阶段。无需配置，无需 clone。
-
-**方式 B —— clone 下来跑。**
-
-```bash
-git clone https://github.com/fancyboi999/ai-engineering-from-scratch-zh.git
-cd ai-engineering-from-scratch-zh
-python3 phases/00-setup-and-tooling/01-dev-environment/code/verify.py --route beginner
-python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py
-```
-
-**方式 C —— 让 AI 导师带你学。** 按上方[宿主调用表](#30-秒添加-ai-导师)调用技能。以下为 Claude Code 示例：
-
-```bash
-/start-learning      # 评估背景、设定目标并生成个性化 LEARNING.md
-/find-your-level     # 十道题快速定级测验，映射起始阶段
-```
-
-按计划逐课学习，每学完一个阶段：
-
-```bash
-/check-understanding 3        # 测验你对阶段 3 的掌握
-ls phases/03-deep-learning-core/05-loss-functions/outputs/
-# ├── prompt-loss-function-selector.md
-# └── prompt-loss-debugger.md
-```
-
-### 前置要求
-
-- 你会写代码（任何语言都行，会 Python 更好）。
-- 你想搞懂 AI **到底是怎么运作的**，而不只是调调 API。
-
-### 准备 Claude 认证
-
-[Claude 认证学院](certifications/claude/README.md) 是一套免费、开源的备考体系，
-覆盖 Associate Foundations、Developer Foundations、Architect Foundations 和
-Architect Professional 四条公开认证路线。每条路线都有对齐公开考试蓝图的课程、
-可运行实验、诊断测验、综合项目和原创全真模拟题。
-
-参照 [AI-native GitHub 入门指南](certifications/claude/GETTING_STARTED.md)，可以在 Claude Code、
-Codex、ChatGPT、Cursor 或其他 agent 中调用 `claude-certification`（Claude Code 使用 `/claude-certification`）：选择路线、
-把进度保存到 `CLAUDE-CERTIFICATION.md`，逐课学习、运行真实实验并接受基于产物的反馈。
-同一套课程已在 [中文认证站点](https://aieng-zh.cn/certifications.html) 提供。
-
-这是基于公开考试目标编写的独立学习材料，不隶属于 Anthropic，不包含真实考题，
-也不保证通过认证。资格、费用、评分和项目政策可能变动，付费或预约前必须以官方最新说明为准。
-
-### 准备 MCP Associate（MCPA）认证
-
-[MCPA 认证课程](certifications/mcpa/README.md) 提供 34 节中文课程、可运行的 MCP 协议实验和原创练习题。课程依据 2026-07-28 版规范组织五个知识域；从 [入门指南](certifications/mcpa/GETTING_STARTED.md) 开始，使用 `mcpa-certification` 导师逐课练习，或在 [中文认证站点](https://aieng-zh.cn/certification?id=mcpa-f) 学习。
-
-这套社区课程独立于 Agentic AI Foundation 和 Linux Foundation。正式考试政策以官方页面为准；模拟题成绩不等于正式考试分数。
-
-### 内置 agent 技能
-
-全套课程内置了 9 个涵盖定位、教学、专项路径与测验的 AI 导师技能，详见上文 [30 秒添加 AI 导师](#30-秒添加-ai-导师)；所有技能定义均位于 [`skills/`](skills/) 目录下。
-
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
-
-## 每节课都有产出
-
-别的课程结尾是一句 *"恭喜，你学会了 X。"* 这里每节课的结尾，是一件你能直接装上、
-或粘进日常工作流的 **可复用工具**。
-
-<table>
-<tr>
-<th align="left" width="25%"><img src="site/assets/figures/001-a-prompts.svg" width="96" height="96" alt="FIG_001.A prompts"/><br/><sub>FIG_001 · A</sub><br/><b>PROMPTS</b></th>
-<th align="left" width="25%"><img src="site/assets/figures/001-b-skills.svg" width="96" height="96" alt="FIG_001.B skills"/><br/><sub>FIG_001 · B</sub><br/><b>SKILLS</b></th>
-<th align="left" width="25%"><img src="site/assets/figures/001-c-agents.svg" width="96" height="96" alt="FIG_001.C agents"/><br/><sub>FIG_001 · C</sub><br/><b>AGENTS</b></th>
-<th align="left" width="25%"><img src="site/assets/figures/001-d-mcp-servers.svg" width="96" height="96" alt="FIG_001.D MCP servers"/><br/><sub>FIG_001 · D</sub><br/><b>MCP SERVERS</b></th>
-</tr>
-<tr>
-<td valign="top">粘进任意 AI 助手，在某个细分任务上获得专家级帮助。</td>
-<td valign="top">放进 Claude、Cursor、Codex、OpenClaw、Hermes，或任何能读 <code>SKILL.md</code> 的 agent。</td>
-<td valign="top">作为自主 worker 部署——那个循环你在阶段 14 自己写过。</td>
-<td valign="top">接入任意兼容 MCP 的客户端。在阶段 13 里从头到尾构建。</td>
-</tr>
-</table>
-
-> 用 `python3 scripts/install_skills.py <target>` 将课程产出技能安装到指定目录。
-> 各课的 `outputs/` 提供参考产物；把自己的实现、测试与复盘整理成作品集。
-
-### FIG_002 · 一个实例
-
-阶段 14，第 1 课：[Agent 循环](phases/14-agent-engineering/01-the-agent-loop/)。
-Python 示例使用标准库和脚本化的 `ToyLLM`，可以离线观察工具调用、回合预算与停止条件。
-
-```bash
-python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
-```
-
-示例调用计算器和键值存储，输出执行轨迹，最终得到含 15% 税费的总价 `138.0`。
-阅读 [Python 实现](phases/14-agent-engineering/01-the-agent-loop/code/main.py)、
-[TypeScript 实现](phases/14-agent-engineering/01-the-agent-loop/code/main.ts)，以及
-[可复用的 agent-loop 技能](phases/14-agent-engineering/01-the-agent-loop/outputs/skill-agent-loop.md)。
-
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
 ```
 
 <a id="contents"></a>
@@ -1109,208 +1055,233 @@ python3 phases/14-agent-engineering/01-the-agent-loop/code/main.py
 
 </details>
 
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
+## 电子书与认证
+
+<details>
+<summary>将核心课程作为电子书阅读</summary>
+
+上游将 `phases/` 下的 20 阶段核心课程编成六卷电子书。上游 CI 从同一套英文课程源生成 EPUB 和 PDF，并附在每次 [GitHub release](https://github.com/rohitg00/ai-engineering-from-scratch/releases) 中；下方链接始终指向最新 release。卷号表示系列中的顺序，而非版本。每本书都带有日期版次，旧版仍可在对应 release 下载。
+
+以下是**上游英文版电子书**。中文课程目前请在本仓库或 [aieng-zh.cn](https://aieng-zh.cn) 阅读。
+
+认证课程不编入这些电子书。AI 导师状态、可运行实验、交互图表、诊断和限时模拟测验仍保留在 GitHub 与网站上。
+
+| 卷 | 标题 | 阶段 | 英文版下载 |
+|---|---|---|---|
+| 1 | 基础 · 数学、工具链与经典机器学习 | 00–02 | [EPUB](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol1-foundations.epub) · [PDF](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol1-foundations.pdf) |
+| 2 | 深度学习 · 网络、视觉与语音 | 03、04、06 | [EPUB](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol2-deep-learning.epub) · [PDF](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol2-deep-learning.pdf) |
+| 3 | 语言 · NLP 基础与 Transformer | 05、07 | [EPUB](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol3-language.epub) · [PDF](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol3-language.pdf) |
+| 4 | 大语言模型 · 生成、强化学习、预训练与工程 | 08–11 | [EPUB](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol4-llms.epub) · [PDF](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol4-llms.pdf) |
+| 5 | Agent · 多模态、协议、自主系统与集群 | 12–16 | [EPUB](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol5-agents.epub) · [PDF](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol5-agents.pdf) |
+| 6 | 生产 · 基础设施、安全与综合项目 | 17–19 | [EPUB](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol6-production.epub) · [PDF](https://github.com/rohitg00/ai-engineering-from-scratch/releases/latest/download/aiefs-vol6-production.pdf) |
+
+电子书是快照，仓库持续更新。各章末尾都链接回课程的动态图表、测验和可运行代码。上游支持使用 `python3 scripts/build_book.py` 在本地构建（需要 pandoc），构建流程见[上游 book/README.md](https://github.com/rohitg00/ai-engineering-from-scratch/blob/main/book/README.md)。
+
+</details>
+
+<details>
+<summary>备考 Claude 认证</summary>
+
+[Claude 认证学院](certifications/claude/README.md)是免费、开源的备考课程，覆盖四条官方 Claude 认证路线：Associate Foundations、Developer Foundations、Architect Foundations 和 Architect Professional。每条路线结合映射到考试蓝图的课程、可运行实验、诊断、综合项目与完整的原创模拟测验。
+
+你可以在 Claude Code、Codex、ChatGPT、Cursor 或其他 agent 中使用 [AI 导师入门指南](certifications/claude/GETTING_STARTED.md)。在 Codex 中运行 `claude-certification`，在 Claude Code 中运行 `/claude-certification`，或让其他宿主使用该技能。它会选择路线，将持久进度写入 `CLAUDE-CERTIFICATION.md`，逐步教学、运行真实实验，并依据产物给出反馈。同一套课程也可在[认证网站](https://aieng-zh.cn/certifications.html)学习。
+
+这是依据公开考试目标编写的独立学习材料，与 Anthropic 没有隶属关系，不复制真实考题，也不保证通过考试。
+
+</details>
+
+<details>
+<summary>备考 MCP Associate（MCPA）</summary>
+
+[MCPA 认证课程](certifications/mcpa/README.md)是免费、开源的备考课程，对应 Agentic AI Foundation 推出、由 Linux Foundation Training 提供的 Model Context Protocol Associate 考试。34 节课围绕五个考试领域讲解 2026-07-28 版无状态协议：以每次请求携带的 `_meta` 和 `server/discover` 替代旧握手，以及多次往返请求、订阅、缓存、tasks 与 MCP Apps 扩展、OAuth 授权、注册表和 SDK 分层。每节课都配有可运行的标准库实验，其 transcript 会校验当前协议消息结构。路线还提供诊断、综合项目和三套完整原创模拟测验，题目组合遵循公开蓝图的权重。
+
+你可以在 Claude Code、Codex、ChatGPT、Cursor 或其他 agent 中使用 [AI 导师入门指南](certifications/mcpa/GETTING_STARTED.md)。在 Codex 中运行 `mcpa-certification`，在 Claude Code 中运行 `/mcpa-certification`，或让其他宿主使用该技能。它会在 `MCPA-CERTIFICATION.md` 中建立持久学习路线，逐步教学、运行真实实验，并依据产物给出反馈。同一套课程也可在 [MCPA 路线页面](https://aieng-zh.cn/certification.html?id=mcpa-f)学习。
+
+这是依据公开考试目标编写的独立学习材料，与 Agentic AI Foundation 或 Linux Foundation 没有隶属关系，不复制真实考题，也不保证通过考试。
+
+</details>
 
 ## 工具箱
 
-课程产物保存在各课的 `phases/<phase>/<lesson>/outputs/` 下，包含提示词 Markdown、
-技能 Markdown、完整 skill bundle 和项目参考文件。各课正文的“拿去用”章节说明产物用途；
-下面分别说明导师技能与课程产出技能的安装方式。
+每节课都会产出可复用工具。你可以将它装入自己的 agent，或在仓库根目录使用下方脚本。
 
-### 把课程产出技能装进你的 agent
+<details>
+<summary>课程结构与可复用产物</summary>
 
-仓库在 `phases/**/outputs/` 下交付了 400 个技能和 100 个提示词。
+## 一节课的结构
 
-**导师技能：通过 [skills.sh](https://skills.sh) 选择安装。** 默认发现 `skills/` 下的 9 个导师技能：
+每节课都保存在独立目录中，整套课程采用相同结构：
 
-```bash
-npx skills add fancyboi999/ai-engineering-from-scratch-zh --list
-npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill start-learning
+```text
+phases/<NN>-<phase-name>/<NN>-<lesson-name>/
+├── code/      可运行的实现（Python、TypeScript、Rust、Julia）
+├── docs/
+│   └── zh.md  课程正文
+└── outputs/   本节课产出的提示词、技能、agent 或 MCP 服务器
 ```
 
-**课程产出技能：克隆仓库后运行 `scripts/install_skills.py`。** 脚本读取课程的
-`skill-*.md` 和完整 skill bundle，支持按阶段或标签筛选。将 `<target>` 替换为宿主的技能目录：
+每节课分为六个环节，其中“动手构建 / 实际使用”是主线：先从零实现算法，再用生产库完成同样的操作。因为亲手写过较小的实现，你能理解框架正在做什么。
+
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff','fontFamily':'JetBrains Mono','fontSize':'13px'}}}%%
+flowchart LR
+  M["主旨<br/><sub>一句话核心理念</sub>"] --> Pr["问题背景<br/><sub>具体的痛点</sub>"]
+  Pr --> C["核心概念<br/><sub>图解与直觉</sub>"]
+  C --> B["动手构建<br/><sub>原始数学，不用框架</sub>"]
+  B --> U["实际使用<br/><sub>用 PyTorch / sklearn 完成相同操作</sub>"]
+  U --> S["拿去用<br/><sub>提示词 · 技能 · agent · MCP</sub>"]
+```
+
+## 每节课都有产出
+
+其他课程以“恭喜，你学会了 X”结束。这里每节课都以一件**可复用工具**收尾，你可以安装它，或直接放进日常工作流。
+
+<table>
+<tr>
+<th align="left" width="25%"><img src="site/assets/figures/001-a-prompts.svg" width="120" height="120" alt="FIG_001.A 提示词"/><br/><sub>FIG_001 · A</sub><br/><b>提示词</b></th>
+<th align="left" width="25%"><img src="site/assets/figures/001-b-skills.svg" width="120" height="120" alt="FIG_001.B 技能"/><br/><sub>FIG_001 · B</sub><br/><b>技能</b></th>
+<th align="left" width="25%"><img src="site/assets/figures/001-c-agents.svg" width="120" height="120" alt="FIG_001.C agent"/><br/><sub>FIG_001 · C</sub><br/><b>AGENT</b></th>
+<th align="left" width="25%"><img src="site/assets/figures/001-d-mcp-servers.svg" width="120" height="120" alt="FIG_001.D MCP 服务器"/><br/><sub>FIG_001 · D</sub><br/><b>MCP 服务器</b></th>
+</tr>
+<tr>
+<td valign="top">粘贴到任意 AI 助手，在细分任务上获得专家级帮助。</td>
+<td valign="top">放入 Claude、Cursor、Codex、OpenClaw、Hermes，或任何能读取 <code>SKILL.md</code> 的 agent。</td>
+<td valign="top">部署为自主 worker。你已在阶段 14 亲手实现运行循环。</td>
+<td valign="top">接入任意兼容 MCP 的客户端。你已在阶段 13 完成端到端构建。</td>
+</tr>
+</table>
+
+</details>
+
+<details>
+<summary>安装课程产物</summary>
+
+仓库在 `phases/**/outputs/` 下提供 414 个技能和 100 个提示词，可使用 `scripts/install_skills.py` 安装。需要先克隆仓库。支持按标签筛选、预演和不同 agent 的目录布局：
 
 ```bash
-python3 scripts/install_skills.py <target>                                 # 所有技能，默认 --layout skills（嵌套）
-python3 scripts/install_skills.py <target> --layout skills                 # 同上，显式写出
+python3 scripts/install_skills.py <target>                                 # 所有技能，默认 --layout skills（嵌套目录）
+python3 scripts/install_skills.py <target> --layout skills                 # 同上，显式指定
 python3 scripts/install_skills.py <target> --type all                      # 技能 + 提示词 + agent
-python3 scripts/install_skills.py <target> --phase 14                      # 只装一个阶段
-python3 scripts/install_skills.py <target> --tag rag                       # 按标签过滤
-python3 scripts/install_skills.py <target> --layout flat                   # 扁平文件
-python3 scripts/install_skills.py <target> --dry-run                       # 只预览，不写入
-python3 scripts/install_skills.py <target> --force                         # 覆盖已有文件
+python3 scripts/install_skills.py <target> --phase 14                       # 只装一个阶段
+python3 scripts/install_skills.py <target> --tag rag                        # 按标签筛选
+python3 scripts/install_skills.py <target> --layout flat                    # 扁平文件
+python3 scripts/install_skills.py <target> --dry-run                        # 预览，不写入
+python3 scripts/install_skills.py <target> --force                          # 覆盖已有内容
 ```
 
-`<target>` 是你 agent 的技能目录（例如：
-`~/.claude/skills/`、`~/.cursor/skills/`、`~/.config/openclaw/skills/`、
-`.skills/`，或任何你 agent 读取的路径）。
+`<target>` 是你的 agent 技能目录，例如 `~/.claude/skills/`、`~/.cursor/skills/`、`~/.config/openclaw/skills/`、`.skills/`，或 agent 会读取的其他目录。
 
-默认情况下，脚本拒绝覆盖已存在的目标，会列出每个冲突路径后以退出码 1 退出。
-用 `--dry-run` 预览冲突，或用 `--force` 覆盖。每次非 dry-run 的运行都会在目标里
-写一份 `manifest.json`，按类型和阶段分组列出完整清单。挑你 agent 读取的那种布局：
+默认情况下，脚本拒绝覆盖已有目标，会列出所有冲突路径并以退出码 1 结束。使用 `--dry-run` 预览冲突，或使用 `--force` 覆盖。每次非 dry-run 运行都会写入 `manifest.json`，按类型和阶段记录完整清单。根据 agent 的读取方式选择布局：
 
-| `--layout`  | 写入路径 |
+| `--layout` | 写入路径 |
 |---|---|
-| `skills`    | `<target>/<name>/SKILL.md`（嵌套约定，Claude / Cursor / Codex / OpenClaw / Hermes 都支持） |
-| `by-phase`  | `<target>/phase-NN/<name>.md` |
-| `flat`      | `<target>/<name>.md` |
+| `skills` | `<target>/<name>/SKILL.md`（嵌套约定，Claude / Cursor / Codex / OpenClaw / Hermes 均支持） |
+| `by-phase` | `<target>/phase-NN/<name>.md` |
+| `flat` | `<target>/<name>.md` |
 
-### 把 agent 工作台塞进你自己的仓库
+</details>
 
-阶段 14 的综合项目交付了一套可复用的 Agent Workbench 包（AGENTS.md、schema、
-init / verify / handoff 脚本）。用下面的命令把它脚手架进任意仓库：
+<details>
+<summary>将 agent 工作台加入自己的仓库</summary>
+
+阶段 14 的综合项目提供可复用的 Agent Workbench 包，包含 AGENTS.md、schema，以及初始化、验证和交接脚本。可以用以下命令加入任意仓库：
 
 ```bash
-python3 scripts/scaffold_workbench.py path/to/your-repo            # 完整包 + 种子文件
+python3 scripts/scaffold_workbench.py path/to/your-repo            # 完整包与种子文件
 python3 scripts/scaffold_workbench.py path/to/your-repo --minimal  # 跳过 docs/
 python3 scripts/scaffold_workbench.py path/to/your-repo --dry-run  # 只预览
 python3 scripts/scaffold_workbench.py path/to/your-repo --force    # 覆盖
 ```
 
-你会得到接好线的七个工作台界面、一份起步用的 `task_board.json`，
-以及一份 `schema_version: 1` 的全新 `agent_state.json`。从这里开始：编辑任务、
-编辑 `AGENTS.md`、运行 `scripts/init_agent.py`，把契约交给你的 agent。包的源码在
-`phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/`。
+你会得到已接入的七个工作台界面、一份起步用的 `task_board.json`，以及 `schema_version: 1` 的全新 `agent_state.json`。随后编辑任务和 `AGENTS.md`，运行 `scripts/init_agent.py`，并将契约交给 agent。包的源码位于 `phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/`。
 
-### 课程数据与课数校验
+</details>
 
-`site/build.js` 解析 README、ROADMAP 和每节课的 `docs/zh.md`，在 `site/data.js`
-里生成站点用的课程数据（阶段、课程、术语表、产物）。计数以**文件系统**为真相。
+<details>
+<summary>通过 JSON 浏览整个课程</summary>
+
+`scripts/build_catalog.py` 遍历磁盘上的所有阶段、课程和产物，在仓库根目录写入 `catalog.json`。
 
 ```bash
-node site/build.js            # 生成 site/data.js（+ sitemap.xml / llms.txt）
-node site/build.js --check    # 只校验课程数一致性，不写文件
+python3 scripts/build_catalog.py               # 写入 <repo>/catalog.json
+python3 scripts/build_catalog.py --stdout      # 输出到 stdout，不修改仓库
+python3 scripts/build_catalog.py --out path/to/file.json
 ```
 
-`--check` 以磁盘上的课程目录数为准，核对 README 表格、badge、散文、各 phase 标题
-和 ROADMAP 总计是否都对得上，任一漂移就 exit 1。一个 GitHub Action
-（`.github/workflows/build.yml`）在每个 PR 上跑构建与课数校验。
-新增课程时在 README + ROADMAP 表格补行、并更新该 phase
-标题的课数即可；站点模板里散落的计数由 build 时 `syncCounts` 自动同步。
-
-> 注：`scripts/build_catalog.py` 也已支持 `docs/zh.md`，但 `catalog.json` 只是可再生的辅助产物；
-> 中文站发布与课程计数仍以 `site/build.js`、`scripts/audit_lessons.py` 和 README / ROADMAP 为准。
-
-### 给每节课的 Python 代码做冒烟检查
-
-`scripts/lesson_run.py` 会逐字节编译每节课 `code/` 目录下的每个 `.py` 文件。
-默认模式只做语法检查——不执行、不需要 API key、不需要重型 ML 依赖。专抓贡献者最常
-引入的回归（缩进错误、f-string 写坏、误改）。
+清单从文件系统生成，而非从 README 推导，所以计数对应实际文件。你可以用它构建下游工具或核对 README；schema 见脚本开头。`catalog.json` 是可再生的辅助产物，不提交到 Git。中文站构建与课数校验仍以 `site/build.js` 和 README / ROADMAP 为准：
 
 ```bash
-python3 scripts/lesson_run.py                  # 语法检查整套课程
-python3 scripts/lesson_run.py --phase 14       # 只查一个阶段
+node site/build.js
+node site/build.js --check
+python3 scripts/audit_lessons.py --strict
+```
+
+</details>
+
+<details>
+<summary>为每节课的 Python 代码做冒烟检查</summary>
+
+`scripts/lesson_run.py` 对各课 `code/` 目录中的每个 `.py` 文件进行字节编译。默认只检查语法，不执行代码，不需要 API key 或大型 ML 依赖，用于发现缩进错误、损坏的 f-string、误改等回归。
+
+```bash
+python3 scripts/lesson_run.py                  # 检查整套课程的语法
+python3 scripts/lesson_run.py --phase 14       # 只检查一个阶段
 python3 scripts/lesson_run.py --json           # 在 stdout 输出 JSON 报告
-python3 scripts/lesson_run.py --strict         # 任一课程失败就 exit 1
-python3 scripts/lesson_run.py --execute        # 真正运行，每节课 10 秒超时
+python3 scripts/lesson_run.py --strict         # 任一课程失败就以非零退出码结束
+python3 scripts/lesson_run.py --execute        # 实际运行，每节课限时 10 秒
 ```
 
-`--execute` 会运行每节课的 `code/main.py`（或第一个 `.py` 文件），10 秒超时。
-入口文件开头带 `# requires: pkg1, pkg2` 注释（列出非标准库依赖）的课程会被跳过，
-原因标为 `needs <deps>`。这个脚本是可选的，没接入 CI。
+`--execute` 运行每节课的 `code/main.py`，或第一个 `.py` 文件，限时 10 秒。入口文件开头若有 `# requires: pkg1, pkg2` 注释，列出了非标准库依赖，该课程会被跳过，原因为 `needs <deps>`。该脚本按需运行，尚未接入 CI。
 
-仅用标准库，Python 3.10+。设置 `LINK_CHECK_SKIP=domain1,domain2` 可以覆盖默认跳过名单
-（`twitter.com`、`x.com`、`linkedin.com`、`instagram.com`、`medium.com`——这些域名
-会主动屏蔽自动化的 HEAD/GET）。
+仅使用标准库，需要 Python 3.10+。设置 `LINK_CHECK_SKIP=domain1,domain2` 可以覆盖默认跳过名单：`twitter.com`、`x.com`、`linkedin.com`、`instagram.com`、`medium.com`。这些域名会主动屏蔽自动化 HEAD/GET 请求。
 
-## 从哪里开始
+</details>
 
-| 你的背景 | 从哪开始 | 学习范围 |
-|---|---|---|
-| 编程和 AI 都是新手 | 阶段 0 — 配置与工具链 | 先准备环境，再按前置依赖学习 |
-| 会 Python，刚接触 ML | 阶段 1 — 数学基础 | 数学与机器学习基础 |
-| 懂 ML，刚接触深度学习 | 阶段 3 — 深度学习核心 | 神经网络与训练 |
-| 懂深度学习，想学 LLM 和 agent | 阶段 10 — 从零实现 LLM | 模型、应用与 agent |
-| 资深工程师，只想要 agent 工程 | 阶段 14 — Agent 工程 | 按目标选择工程课程与综合项目 |
-| 只想构建生产级 MCP 系统 | [模型上下文协议（MCP）路径](learning-paths/model-context-protocol.json) | 17 节必修，约 23 小时 15 分 |
-| 只想构建生产级 Agent Skills | [Agent Skills 工程路径](learning-paths/agent-skills.json) | 5 节必修，约 9 小时 30 分 |
+<details>
+<summary>基础论文与协议</summary>
 
-[ROADMAP.md](ROADMAP.md) 按各课正文汇总预计时长。阶段 0–18 的 438 节课合计约 542 小时；
-阶段 19 的 85 项综合项目与组件实践合计约 627 小时，适合按目标选做。
-专项路径以 `learning-paths/*.json` 的必修清单和时长为准。实际投入取决于基础、实验环境和项目深度。
+- *Attention Is All You Need* — Vaswani et al., 2017 → [阶段 7](#phase-7)
+- *Language Models are Few-Shot Learners*（GPT-3）→ [阶段 10](#phase-10)
+- *Denoising Diffusion Probabilistic Models* → [阶段 8](#phase-8)
+- *InstructGPT / RLHF* → [阶段 10](#phase-10)
+- *Direct Preference Optimization* → [阶段 10](#phase-10)
+- *Chain-of-Thought Prompting* → [阶段 11](#phase-11)
+- *ReAct: Reasoning + Acting in LLMs* → [阶段 14](#phase-14)
+- *Model Context Protocol* — Anthropic → [阶段 13](#phase-13)
 
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
-
-## 为什么这件事现在很重要
-
-<table>
-<tr>
-<th align="left" width="50%"><sub>FIG_003 · A</sub><br/><b>THE INDUSTRY SIGNAL</b></th>
-<th align="left" width="50%"><sub>FIG_003 · B</sub><br/><b>FOUNDATIONAL PAPERS COVERED</b></th>
-</tr>
-<tr>
-<td valign="top">
-
-> *"最热门的新编程语言，是英语。"*<br/>
-> — **Andrej Karpathy** ([tweet](https://x.com/karpathy/status/1617979122625712128))
-
-课程围绕可运行的实现组织学习：阅读论文与规范，构建最小示例，再用测试和产物检查理解。
-
-</td>
-<td valign="top">
-
-- *Attention Is All You Need* — Vaswani et al., 2017 → [Phase 7](#phase-7)
-- *Language Models are Few-Shot Learners* (GPT-3) → [Phase 10](#phase-10)
-- *Denoising Diffusion Probabilistic Models* → [Phase 8](#phase-8)
-- *InstructGPT / RLHF* → [Phase 10](#phase-10)
-- *Direct Preference Optimization* → [Phase 10](#phase-10)
-- *Chain-of-Thought Prompting* → [Phase 11](#phase-11)
-- *ReAct: Reasoning + Acting in LLMs* → [Phase 14](#phase-14)
-- *Model Context Protocol* — Anthropic → [Phase 13](#phase-13)
-
-</td>
-</tr>
-</table>
-
-```text
-░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒░░░▒▒▒
-```
+</details>
 
 ## 参与贡献
 
-| Goal | Read |
+| 目标 | 阅读 |
 |---|---|
-| 贡献一节课或一处修复 | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| 为你的团队或学校 fork | [FORKING.md](FORKING.md) |
+| 贡献课程或修复 | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| 为团队或学校 fork | [FORKING.md](FORKING.md) |
 | 课程模板 | [LESSON_TEMPLATE.md](LESSON_TEMPLATE.md) |
 | 跟踪进度 | [ROADMAP.md](ROADMAP.md) |
 | 术语表 | [glossary/terms.md](glossary/terms.md) |
 | 行为准则 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
 
-提交一节课之前，先跑一遍不变量检查：
+提交课程前，运行不变量检查：
 
 ```bash
-python3 scripts/audit_lessons.py           # 整套课程
-python3 scripts/audit_lessons.py --phase 14  # 单个阶段
-python3 scripts/audit_lessons.py --json    # 适合 CI 的输出
+python3 scripts/audit_lessons.py           # 检查整套课程
+python3 scripts/audit_lessons.py --phase 14  # 检查单个阶段
+python3 scripts/audit_lessons.py --json    # 输出适合 CI 的报告
 ```
 
-任一规则失败时退出码非零。规则（L001–L010）会校验目录结构、`docs/zh.md` 是否存在
-及是否有 H1、`code/` 是否非空、`quiz.json` 的 schema，以及课程文档里的相对链接。
+任一规则失败时，退出码为非零。规则 L001–L010 校验目录结构、`docs/zh.md` 是否存在及是否有 H1、`code/` 是否非空、`quiz.json` 的 schema，以及课程正文中的相对链接。
 
-## Star 历史
+<a id="supporters"></a>
 
-<a href="https://star-history.com/#fancyboi999/ai-engineering-from-scratch-zh&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=fancyboi999/ai-engineering-from-scratch-zh&type=Date&theme=dark">
-    <img alt="Star history" src="https://api.star-history.com/svg?repos=fancyboi999/ai-engineering-from-scratch-zh&type=Date" width="100%">
-  </picture>
-</a>
+## 支持项目
 
-如果这份手册帮到了你，给仓库点个 star。这能让项目活下去。
+免费、开源，采用 MIT 许可，共 542 节课。感谢支持课程持续开放的赞助者。
+
+如果这份课程对你有帮助，欢迎给仓库点个 star。
 
 ## 许可
 
 采用 [MIT 许可](LICENSE)，允许使用、修改和商业分发。分发副本或实质性部分时，须保留版权声明和许可声明。
 
-原课程由 [Rohit Ghumare](https://github.com/rohitg00) 及社区创建，简体中文版由 [fancy](https://github.com/fancyboi999) 维护。
-
-<sub>
-  <a href="https://aieng-zh.cn">aieng-zh.cn</a> &nbsp;·&nbsp;
-  <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new/choose">Report / Suggest</a>
-</sub>
+原课程由 [Rohit Ghumare](https://github.com/rohitg00) 及社区创建，简体中文版与配套动画视频由 [fancy](https://github.com/fancyboi999) 维护。

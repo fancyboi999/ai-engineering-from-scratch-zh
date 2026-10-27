@@ -2898,13 +2898,11 @@ function verifyCurriculum() {
   check('README lessons badge URL',  grab(readme, /lessons-(\d+)-3553ff/),     fsLessons);
   check('README lessons badge alt',  grab(readme, /alt="(\d+) lessons"/),       fsLessons);
   check('README hero 散文课数',       grab(readme, /^> (\d+) 节课，/m),          fsLessons);
-  check('README spine 散文课数',      grab(readme, /个阶段，(\d+) 节课，/),       fsLessons);
 
   // ③ README phases badge + 散文 == 实际 phase 数
   check('README phases badge URL',   grab(readme, /phases-(\d+)-3553ff/),       phaseCount);
   check('README phases badge alt',   grab(readme, /alt="(\d+) phases"/),         phaseCount);
   check('README hero 阶段数',         grab(readme, /^> \d+ 节课，(\d+) 个阶段/m), phaseCount);
-  check('README spine 阶段数',        grab(readme, /(\d+) 个阶段，\d+ 节课，/),    phaseCount);
 
   // ④ ROADMAP 总计 == 文件系统数 / phase 数
   check('ROADMAP 总计课数',           grab(roadmap, /\*\*总计：\d+ 个阶段，(\d+) 节课/), fsLessons);
