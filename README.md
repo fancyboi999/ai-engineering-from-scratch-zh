@@ -23,10 +23,6 @@
 
 > 本项目是 [Rohit Ghumare](https://github.com/rohitg00) 及社区创建的 [AI Engineering from Scratch](https://github.com/rohitg00/ai-engineering-from-scratch) 的**简体中文衍生版**，由 [fancy](https://github.com/fancyboi999) 维护。课程内容与结构跟随上游，中文翻译遵循 [TRANSLATION.md](TRANSLATION.md)。
 
-### 中文动画讲解视频
-
-中文版额外提供 **333 节中文配音动画**，覆盖阶段 0–14 的部分课程。可在对应课程页内播放，提供视频直链与 B 站播放源，配合正文、推导和代码实践学习。
-
 ### 特别鸣谢
 
 <p align="center">
