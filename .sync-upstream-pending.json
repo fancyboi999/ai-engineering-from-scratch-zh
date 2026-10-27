@@ -4,6 +4,16 @@
   "pending": [],
   "decisions": [
     {
+      "scope": "README 结构与文案（2026-10-27）",
+      "decision": "按 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a 的 README 结构与原意翻译同步；保留中文站和仓库链接、原作者与译者署名及本站 IPWO 赞助。中文版额外介绍仅保留动画视频。上游电子书明确标为英文版并链接上游 release；不引入上游流量统计、收款入口或外部模型生成流程。同步基准不前移。",
+      "paths": [
+        "README.md",
+        "assets/readme/",
+        "site/build.js",
+        "site/test_build_artifacts.js"
+      ]
+    },
+    {
       "scope": "上游模型生成与多语言流水线",
       "decision": "不移植外部LLM生成、定时翻译和非中文i18n内容；中文内容由本轮agent翻译。",
       "paths": [

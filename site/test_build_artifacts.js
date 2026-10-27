@@ -1446,7 +1446,7 @@ test('repository exposes the four core AI engineering learning paths', () => {
       new RegExp(`class="learning-paths-node [^"]+"[^>]+href="learning-paths\\.html#${anchor}"[^>]+aria-label="查看\\s*${title}所需的能力"`)
     );
   }
-  assert.match(readme, /542 节课 · 20 个阶段/);
+  assert.match(readme, /542 节课，20 个阶段/);
   assert.match(readme, /https:\/\/aieng-zh\.cn\/learning-paths\.html/);
   assert.doesNotMatch(readme, /<!-- STATS:START|<\/b> readers/);
   assert.doesNotMatch(readme, /\[stats-start\]: #/);
