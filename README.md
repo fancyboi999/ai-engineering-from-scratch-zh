@@ -5,12 +5,6 @@
   </picture>
 </p>
 
-<p align="center">
- <a href="https://www.star-history.com/fancyboi999/ai-engineering-from-scratch-zh">
-  <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=fancyboi999/ai-engineering-from-scratch-zh&type=rank&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=fancyboi999/ai-engineering-from-scratch-zh&type=rank" /><img alt="Star History 排名" src="https://api.star-history.com/badge?repo=fancyboi999/ai-engineering-from-scratch-zh&type=rank" /></picture> <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/badge?repo=fancyboi999/ai-engineering-from-scratch-zh&type=trending&theme=dark" /><source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/badge?repo=fancyboi999/ai-engineering-from-scratch-zh&type=trending" /><img alt="GitHub 当日热门仓库" src="https://api.star-history.com/badge?repo=fancyboi999/ai-engineering-from-scratch-zh&type=trending" /></picture>
- </a>
-</p>
-
 实现模型内部机制、检索流水线和 agent 运行时。测试它们，分析失败，并保留代码与评估结果。
 
 **[开始学习](https://aieng-zh.cn/lessons/00-setup-and-tooling/01-dev-environment/)** · **[选择路径](#learning-routes)** · **[试试实验](#interactive-lab)** · **[动手做项目](#project-challenges)** · **[浏览课程目录](#contents)**
