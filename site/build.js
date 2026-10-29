@@ -2063,7 +2063,8 @@ function withCard(html, type, id, spec) {
 function versionSharedAssets(html) {
   return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
-    .replace(/((?<![\w-])href=["']\/?(?:style|learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+    .replace(/((?<![\w-])href=["']\/?style\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
+    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2');
 }
 
@@ -2167,9 +2168,19 @@ function build() {
   for (const hub of hubs.phaseModels) phases.find(phase => phase.id === hub.id).hub = hub.href;
   replaceGeneratedDiscovery(path.join(__dirname, 'index.html'),
     '<!-- GENERATED:INTEGRATED-DISCOVERY:START -->', '<!-- GENERATED:INTEGRATED-DISCOVERY:END -->',
-    `<section class="course-paths-section container" aria-label="实战与主题发现"><h2>在课程之外动手实践</h2>
-    <p><a href="projects.html">${projects.projects.length} 项实战项目</a> · <a href="manuals.html">${manuals.length} 本技术手册</a> · <a href="glossary.html">${glossaryTerms.length} 个术语</a> · <a href="/practice">${practice.problems.length} 道编程练习</a></p>
-    <p>${hubs.phaseModels.map(phase => `<a href="${phase.href}">阶段 ${phase.id}：${htmlEscape(phase.name)}</a>`).join(' · ')}</p></section>`);
+    `<section class="course-paths-section container" aria-labelledby="practiceDiscoveryTitle">
+    <h2 id="practiceDiscoveryTitle">在课程之外动手实践</h2>
+    <ul class="course-resource-list">
+      <li><a href="projects.html">实战项目 <span>${projects.projects.length} 项</span></a></li>
+      <li><a href="manuals.html">技术手册 <span>${manuals.length} 本</span></a></li>
+      <li><a href="glossary.html">术语表 <span>${glossaryTerms.length} 个术语</span></a></li>
+      <li><a href="/practice">编程练习 <span>${practice.problems.length} 道</span></a></li>
+    </ul>
+    <details class="course-phase-discovery">
+      <summary>按阶段浏览</summary>
+      <ul class="course-phase-list">${hubs.phaseModels.map(phase => `<li><a href="${phase.href}">阶段 ${phase.id}：${htmlEscape(phase.name)}</a></li>`).join('\n')}</ul>
+    </details>
+  </section>`);
   replaceGeneratedDiscovery(path.join(__dirname, 'glossary.html'),
     '<!-- GENERATED:GLOSSARY-INDEX:START -->', '<!-- GENERATED:GLOSSARY-INDEX:END -->', hubs.glossaryIndex);
   replaceGeneratedDiscovery(path.join(__dirname, 'glossary.html'),

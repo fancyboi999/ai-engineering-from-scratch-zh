@@ -174,8 +174,8 @@ async function main() {
           slot:!!document.querySelector('.header-narration-slot'),
           themeSize:['width','height'].map(key=>parseFloat(getComputedStyle(document.querySelector('#themeToggle'))[key]))
         })`);
-        assert.deepEqual(state.links, width > 820 && width <= 1480 ? menu.filter(label => !priorities.includes(label)) : menu, page);
-        assert.deepEqual(state.priority, width > 820 && width <= 1480 ? priorities : [], page);
+        assert.deepEqual(state.links, width > 820 ? menu.filter(label => !priorities.includes(label)) : menu, page);
+        assert.deepEqual(state.priority, width > 820 ? priorities : [], page);
         assert.equal(state.active, active, page);
         assert.equal(state.home, page.startsWith('index.html') ? 'page' : null, page);
         assert.equal(state.narration, narration, page);
@@ -184,10 +184,72 @@ async function main() {
         assert.equal(state.searchSvg, true, page);
         assert.deepEqual(state.searchSize, width <= 600 ? [44,44] : [36,36], page);
         assert.equal(state.slot, true, page);
-        assert.deepEqual(state.themeSize, width > 1480 ? [36,36] : [44,44], page);
+        assert.deepEqual(state.themeSize, [44,44], page);
         console.log('shared navigation:', JSON.stringify({page,width,active,narration,consistent:true}));
       }
     }
+    fixture = 'real';
+    for (const width of [320, 390, 768, 1440, 1920]) {
+      await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/index.html` });
+      for (let attempt = 0; attempt < 100; attempt++) {
+        if (await evaluate("document.readyState==='complete' && !!document.querySelector('.header-menu-toggle') && !!document.querySelector('.course-phase-discovery')")) break;
+        await delay(50);
+      }
+      for (const theme of ['light', 'dark']) {
+        await evaluate(`document.documentElement.setAttribute('data-theme', ${JSON.stringify(theme)})`);
+        const state = await evaluate(`(function(){
+          const machines=[...document.querySelectorAll('.agent-machine-link')].map(link=>{
+            const copy=link.querySelector('.agent-machine-copy').getBoundingClientRect();
+            const images=[...link.querySelectorAll('img')].filter(img=>getComputedStyle(img).display!=='none');
+            const image=images[0]?.getBoundingClientRect();
+            return {visible:images.length,dark:images[0]?.classList.contains('agent-machine-dark'),
+              fits:!!image && image.width>0 && image.right<=innerWidth+1,
+              reflow:!!image && (innerWidth<=760 ? image.top>=copy.bottom-1 : image.left>=copy.right-1)};
+          });
+          const details=document.querySelector('.course-phase-discovery');
+          return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,machines,
+            resources:document.querySelectorAll('.course-resource-list>li>a').length,
+            phases:details?.querySelectorAll('a').length,collapsed:details?.open===false};
+        })()`);
+        assert.ok(state.scroll <= state.width+1, JSON.stringify(state));
+        assert.equal(state.machines.length, 2);
+        for (const machine of state.machines) {
+          assert.equal(machine.visible, 1, JSON.stringify(machine));
+          assert.equal(machine.dark, theme === 'dark');
+          assert.ok(machine.fits && machine.reflow, JSON.stringify(machine));
+        }
+        assert.equal(state.resources, 8);
+        assert.equal(state.phases, data.PHASES.length);
+        assert.ok(state.collapsed);
+      }
+      await evaluate("document.querySelector('.course-phase-discovery').open=true");
+      assert.ok(await evaluate('document.documentElement.scrollWidth<=document.documentElement.clientWidth+1'), 'expanded phase links overflow at '+width);
+    }
+    console.log('homepage: machine layout, light/dark images, resource lists and expanded phase links passed at five widths');
+
+    await command('Emulation.setScriptExecutionDisabled', { value: true });
+    for (const width of [390, 1440]) {
+      await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/catalog.html` });
+      for (let attempt = 0; attempt < 100; attempt++) {
+        if (await evaluate("document.readyState==='complete' && !!document.querySelector('.header-nav')")) break;
+        await delay(50);
+      }
+      const state = await evaluate(`({
+        headerBottom:document.querySelector('.site-header').getBoundingClientRect().bottom,
+        contentTop:document.querySelector('main').getBoundingClientRect().top,
+        links:document.querySelectorAll('.header-nav a[data-header-page]').length,
+        position:getComputedStyle(document.querySelector('.header-nav')).position,
+        client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth
+      })`);
+      assert.equal(state.links, menu.length);
+      assert.equal(state.position, 'static');
+      assert.ok(state.headerBottom <= state.contentTop+1 && state.scroll <= state.client+1, JSON.stringify(state));
+    }
+    await command('Emulation.setScriptExecutionDisabled', { value: false });
+    console.log('navigation without JavaScript: all destinations remain in flow at mobile and desktop widths');
+
     // Real content: narrow poster tables must stay in the card, not merely in
     // a document whose overflow is hidden. Include all generated topics.
     const sheetFiles = fs.readdirSync(path.join(root, 'site/cheatsheets')).filter(file => file.endsWith('.html'));
@@ -264,7 +326,7 @@ async function main() {
       return ['light','dark'].flatMap(theme=>{document.documentElement.setAttribute('data-theme',theme);const style=getComputedStyle(document.documentElement);const probe=document.createElement('span');document.body.appendChild(probe);const colors=['--m-ink-mute','--m-paper','--m-panel','--m-code-bg'].map(key=>{probe.style.color=style.getPropertyValue(key);return luminance(getComputedStyle(probe).color);});probe.remove();return colors.slice(1).map(background=>(Math.max(colors[0],background)+.05)/(Math.min(colors[0],background)+.05));});
     })()`);
     assert.ok(manualContrast.every(ratio=>ratio>=4.5), 'manual muted text contrast: ' + JSON.stringify(manualContrast));
-    console.log('site layout: 26 cheat sheets at 320/390/768/1440px, four document flows, mobile 404, and 12 muted-text contrasts passed');
+    console.log(`site layout: ${sheetFiles.length} cheat sheet pages at 320/390/768/1440px, four document flows, mobile 404, and 12 muted-text contrasts passed`);
     // Exercise the real lazy-load boundary, including a failed request and retry.
     await command('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await command('Network.enable');

@@ -18,7 +18,7 @@ const SITE_HEADER = renderHeader({ base: '/' });
 const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/hubs.css">';
 const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>`;
 const EXPLORE_LINKS = [
-  ['/catalog', '课程表'], ['/prereqs', '路线图'], ['/learning-paths', '学习路径'],
+  ['/catalog', '课程表'], ['/prereqs.html', '路线图'], ['/learning-paths', '学习路径'],
   ['/projects', '实战项目'], ['/manuals', '技术手册'], ['/cheatsheets', '速查表'], ['/practice', '编程练习'],
   ['/certifications', '认证备考'], ['/glossary', '术语表'], ['/about', '关于'], ['/developer', '开发者文档'],
 ];

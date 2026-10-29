@@ -167,7 +167,7 @@ const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
 const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/practice.css">';
 const BODY_ASSETS = '<script src="/header.js" defer></script>\n<script src="/md-render.js" defer></script>\n<script src="/practice-store.js" defer></script>\n<script src="/practice.js" defer></script>';
-const FOOTER_LINKS = [['/practice', '练习'], ['/catalog', '课程目录'], ['/prereqs', '路线图'], ['/glossary', '术语表'], ['/about', '关于本站']];
+const FOOTER_LINKS = [['/practice', '练习'], ['/catalog', '课程目录'], ['/prereqs.html', '路线图'], ['/glossary', '术语表'], ['/about', '关于本站']];
 
 function escapeHtml(value) {
   return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');

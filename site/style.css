@@ -315,7 +315,8 @@ p.dropcap::first-letter {
   white-space: nowrap;
 }
 
-.header-nav a:not(.header-github) {
+.header-nav a:not(.header-github),
+.header-priority-nav a {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 500;
@@ -326,7 +327,8 @@ p.dropcap::first-letter {
   transition: transform 120ms var(--ease-out), color var(--motion-feedback) ease;
 }
 
-.header-nav a:not(.header-github):hover {
+.header-nav a:not(.header-github):hover,
+.header-priority-nav a:hover {
   color: var(--blueprint);
   border-bottom: none;
 }
@@ -1196,173 +1198,145 @@ body.js-anim .toc-row.in-view {
   }
 }
 
-/* Keep the complete desktop menu inside the header with CJK fallback fonts. */
-@media (max-width: 1800px) and (min-width: 1561px) {
-  .header-inner {
-    gap: 8px;
-  }
+/* Keep secondary destinations in the menu at every screen width. */
 
-  .logo {
-    font-size: 1.4rem;
-  }
-
-  .header-nav {
-    gap: 12px;
-  }
-
-  .header-nav a:not(.header-github) {
-    font-size: 0.74rem;
-    letter-spacing: 0.06em;
-  }
+.header-inner {
+  position: relative;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
-@media (max-width: 1560px) and (min-width: 1481px) {
-  .header-inner {
-    padding: 0 24px;
-    gap: 8px;
-  }
-
-  .logo {
-    font-size: 1.4rem;
-  }
-
-  .header-nav,
-  .header-priority-nav {
-    gap: 12px;
-  }
-
-  .header-nav a:not(.header-github),
-  .header-priority-nav a {
-    font-size: 0.74rem;
-    letter-spacing: 0.06em;
-  }
-
-  .header-github {
-    padding: 5px 9px;
-  }
-
-  .lang-picker-btn {
-    padding-inline: 8px;
-  }
-
-  .lang-current {
-    max-width: 6ch;
-  }
+.logo {
+  order: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-inline-end: auto;
+  white-space: nowrap;
 }
 
-@media (max-width: 1480px) {
-  .header-inner {
-    position: relative;
-    justify-content: flex-start;
-    gap: 8px;
-  }
-
-  .logo {
-    order: 1;
-    flex: 1 1 auto;
-    min-width: 0;
-    margin-inline-end: auto;
-    white-space: nowrap;
-  }
-
-  .header-menu-toggle {
-    order: 5;
-    display: inline-flex;
-  }
-
-  .header-priority-nav {
-    order: 2;
-    display: flex;
-    gap: 14px;
-    flex: 0 0 auto;
-  }
-
-  .header-priority-nav[hidden] {
-    display: none;
-  }
-
-  .header-inner > .header-github {
-    order: 3;
-  }
-
-  .header-inner > .search-toggle {
-    order: 4;
-  }
-
-  .header-nav {
-    order: 6;
-    position: absolute;
-    inset-block-start: calc(100% + 1px);
-    inset-inline-end: 16px;
-    inset-inline-start: auto;
-    width: min(360px, calc(100vw - 32px));
-    max-height: calc(100vh - 80px);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    padding: 8px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background: var(--modal-bg);
-    border: 1px solid var(--rule);
-    box-shadow: var(--shadow-hard);
-  }
-
-  .header-nav[hidden] {
-    display: none;
-  }
-
-  .header-nav a,
-  .header-nav .header-github {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    min-height: 44px;
-    padding: 9px 12px;
-    transform-origin: right center;
-  }
-
-  .header-nav a + a {
-    border-top: 1px solid var(--rule-soft);
-  }
-
-  .header-nav a[aria-current="page"] {
-    background: var(--blueprint-tint);
-  }
-
-  .header-nav a.header-mobile-only {
-    display: flex;
-  }
-
-  .header-mobile-tools {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-    padding: 8px 4px 4px;
-    border-top: 1px solid var(--rule-soft);
-  }
-
-  .header-mobile-tools .search-toggle,
-  .header-mobile-tools .theme-toggle,
-  .header-mobile-tools .tts-toggle {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
-  }
-
-  .header-mobile-tools .lang-picker-btn {
-    min-width: 44px;
-    min-height: 44px;
-  }
-
-  .header-mobile-tools .lang-item {
-    min-height: 44px;
-  }
+.header-menu-toggle {
+  order: 5;
+  display: inline-flex;
 }
+
+.header-priority-nav {
+  order: 2;
+  display: flex;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+.header-priority-nav[hidden] {
+  display: none;
+}
+
+.header-inner > .header-github {
+  order: 3;
+}
+
+.header-inner > .search-toggle {
+  order: 4;
+}
+
+.header-nav {
+  order: 6;
+  position: absolute;
+  inset-block-start: calc(100% + 1px);
+  inset-inline-end: 16px;
+  inset-inline-start: auto;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - var(--site-banner-offset, 0px) - 80px);
+  max-height: calc(100dvh - var(--site-banner-offset, 0px) - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--modal-bg);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-hard);
+}
+
+.header-nav[hidden] {
+  display: none;
+}
+
+.header-nav a,
+.header-nav .header-github {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  transform-origin: right center;
+}
+
+.header-nav a + a {
+  border-top: 1px solid var(--rule-soft);
+}
+
+.header-nav a[aria-current="page"] {
+  background: var(--blueprint-tint);
+}
+
+.header-nav a.header-mobile-only {
+  display: flex;
+}
+
+.header-mobile-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 4px 4px;
+  border-top: 1px solid var(--rule-soft);
+}
+
+.header-mobile-tools .search-toggle,
+.header-mobile-tools .theme-toggle,
+.header-mobile-tools .tts-toggle {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
+.header-mobile-tools .lang-picker-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.header-mobile-tools .lang-item {
+  min-height: 44px;
+}
+
+/* The complete HTML navigation remains usable if enhancement cannot run. */
+.site-header:not(.header-enhanced) { position: static; }
+.site-header:not(.header-enhanced) .header-inner {
+  height: auto;
+  flex-wrap: wrap;
+  padding-block: 12px;
+}
+.site-header:not(.header-enhanced) .header-nav {
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  width: 100%;
+  max-height: none;
+  gap: 4px 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.site-header:not(.header-enhanced) .header-nav a { width: auto; }
+.site-header:not(.header-enhanced) .search-toggle,
+.site-header:not(.header-enhanced) .theme-toggle { display: none; }
+
 
 @media (max-width: 820px) {
   .header-priority-nav {

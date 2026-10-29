@@ -463,7 +463,7 @@ function writeMarkdown(file, { name, description, version }) {
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20261026a';
   const appRelease = '20261026a';
-  const styleRelease = '20261026a';
+  const styleRelease = '20261029a';
   const navigationRelease = HEADER_ASSET_VERSION;
   assert.match(navigationRelease, /^\d{8}[a-z]$/);
   const narrationRelease = '20261021a';
@@ -491,7 +491,7 @@ test('shared site asset families use the expected cache keys on every page', () 
     const source = sourceFor(page);
     assert.equal(versionFor(source, 'style.css'), styleRelease, `${page} has stale style.css`);
     for (const asset of ['learning-paths.css', 'roadmap.css', 'intelligence-check.css', 'certifications.css']) {
-      if (source.includes(asset + '?v=')) assert.equal(versionFor(source, asset), styleRelease, `${page} has stale ${asset}`);
+      if (source.includes(asset + '?v=')) assert.equal(versionFor(source, asset), release, `${page} has stale ${asset}`);
     }
     assert.equal(versionFor(source, 'progress.js'), release, `${page} has stale progress.js`);
     assert.equal(versionFor(source, 'header.js'), navigationRelease, `${page} has stale header.js`);
@@ -500,7 +500,7 @@ test('shared site asset families use the expected cache keys on every page', () 
   }
 
   assert.equal(versionFor(sourceFor('index.html'), 'app.js'), appRelease);
-  assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.css'), styleRelease);
+  assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.css'), release);
   assert.equal(versionFor(sourceFor('prereqs.html'), 'roadmap.js'), roadmapRelease);
   assert.equal(versionFor(sourceFor('developer.html'), 'header.js'), navigationRelease);
   assert.match(
@@ -1565,12 +1565,11 @@ test('reader prose stays ragged-right without browser-inserted hyphens', () => {
   });
 });
 
-test('shared header progressively compacts without hiding GitHub stars or search', () => {
+test('shared header keeps priority links, GitHub stars and search beside the menu', () => {
   const headerSource = fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8');
   const styles = fs.readFileSync(path.join(__dirname, 'style.css'), 'utf8');
   const movableTools = headerSource.match(/function isMovableTool\(child\) \{([\s\S]*?)\n    \}/);
 
-  assert.match(headerSource, /var COMPACT_HEADER_QUERY = '\(max-width: 1480px\)'/);
   assert.match(headerSource, /var NARROW_HEADER_QUERY = '\(max-width: 820px\)'/);
   assert.match(headerSource, /priorityNav\.className = 'header-priority-nav'/);
   assert.match(headerSource, /link\.hasAttribute\('data-header-priority'\)/);
@@ -1597,8 +1596,7 @@ test('shared header progressively compacts without hiding GitHub stars or search
 
   assert.match(styles, /\.header-inner\s*\{[\s\S]*?width: 100%;[\s\S]*?max-width: 1480px;[\s\S]*?min-width: 0;/);
   assert.match(styles, /\.header-nav,\s*\n\.header-priority-nav\s*\{[\s\S]*?white-space: nowrap;/);
-  assert.match(styles, /@media \(max-width: 1560px\) and \(min-width: 1481px\)/);
-  assert.match(styles, /@media \(max-width: 1480px\) \{[\s\S]*?\.header-priority-nav\s*\{[\s\S]*?\.header-inner > \.header-github[\s\S]*?\.header-inner > \.search-toggle[\s\S]*?\.header-nav\s*\{[\s\S]*?width: min\(360px, calc\(100vw - 32px\)\);[\s\S]*?overflow-y: auto;/);
+  assert.match(styles, /\.header-priority-nav\s*\{[\s\S]*?\.header-inner > \.header-github[\s\S]*?\.header-inner > \.search-toggle[\s\S]*?\.header-nav\s*\{[\s\S]*?width: min\(360px, calc\(100vw - 32px\)\);[\s\S]*?overflow-y: auto;/);
   assert.match(styles, /@media \(max-width: 820px\) \{[\s\S]*?\.header-priority-nav\s*\{\s*display: none;[\s\S]*?\.header-inner > \.header-github[\s\S]*?\.header-inner > \.search-toggle/);
   assert.match(styles, /@media \(max-width: 480px\) \{[\s\S]*?\.header-inner > \.header-github svg\s*\{\s*display: none;[\s\S]*?\.header-inner > \.header-github::before/);
 });
