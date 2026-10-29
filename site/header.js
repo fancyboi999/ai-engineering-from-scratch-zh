@@ -8,7 +8,6 @@
   var REPO = 'fancyboi999/ai-engineering-from-scratch-zh';
   var CACHE_KEY = 'gh:stars:' + REPO;
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-  var COMPACT_HEADER_QUERY = '(max-width: 1480px)';
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
   var NARRATION_VERSION = '20261021a';
   var HEADER_BASE = document.currentScript && document.currentScript.src
@@ -300,17 +299,13 @@
     tools.setAttribute('aria-label', '站点工具');
     nav.appendChild(tools);
 
-    var toolAnchor = document.createComment('header-tools');
     var directChildren = Array.prototype.slice.call(inner.children);
     var search = directChildren.find(function (child) {
       return child.classList && child.classList.contains('search-toggle');
     });
-    var firstTool = directChildren.find(function (child) {
-      return child !== logo && child !== nav && child !== toggle && child !== priorityNav && child !== github && child !== search;
-    });
-    inner.insertBefore(toolAnchor, search ? search.nextSibling : (firstTool || null));
-
-    var compact = window.matchMedia ? window.matchMedia(COMPACT_HEADER_QUERY) : null;
+    // Keep keyboard order aligned with the visible controls and open menu.
+    inner.appendChild(toggle);
+    inner.appendChild(nav);
     var narrow = window.matchMedia ? window.matchMedia(NARROW_HEADER_QUERY) : null;
     var open = false;
 
@@ -334,10 +329,6 @@
       });
     }
 
-    function restoreDesktopTools() {
-      while (tools.firstChild) inner.insertBefore(tools.firstChild, toolAnchor);
-    }
-
     function movePriorityLinksOut() {
       for (var i = 0; i < priorityEntries.length; i++) {
         priorityNav.appendChild(priorityEntries[i].link);
@@ -358,27 +349,18 @@
       header.classList.toggle('header-nav-open', open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       toggle.setAttribute('aria-label', open ? '关闭导航' : '打开导航');
-      if (compact && compact.matches) nav.hidden = !open;
-      else nav.hidden = false;
+      nav.hidden = !open;
       if (restoreFocus && !open) toggle.focus();
     }
 
     function syncLayout() {
-      var isCompact = compact ? compact.matches : false;
       var isNarrow = narrow ? narrow.matches : false;
       var menuHadFocus = nav.contains(document.activeElement);
       var priorityHadFocus = priorityNav.contains(document.activeElement);
-      if (isCompact) {
-        if (isNarrow) restorePriorityLinks();
-        else movePriorityLinksOut();
-        moveToolsIntoMenu();
-        setOpen(false, menuHadFocus || (isNarrow && priorityHadFocus));
-      } else {
-        restorePriorityLinks();
-        setOpen(false, false);
-        restoreDesktopTools();
-        nav.hidden = false;
-      }
+      if (isNarrow) restorePriorityLinks();
+      else movePriorityLinksOut();
+      moveToolsIntoMenu();
+      setOpen(false, menuHadFocus || (isNarrow && priorityHadFocus));
     }
 
     toggle.addEventListener('click', function () { setOpen(!open, false); });
@@ -402,10 +384,6 @@
       }
     });
 
-    if (compact) {
-      if (typeof compact.addEventListener === 'function') compact.addEventListener('change', syncLayout);
-      else if (typeof compact.addListener === 'function') compact.addListener(syncLayout);
-    }
     if (narrow) {
       if (typeof narrow.addEventListener === 'function') narrow.addEventListener('change', syncLayout);
       else if (typeof narrow.addListener === 'function') narrow.addListener(syncLayout);
@@ -413,7 +391,6 @@
 
     if (typeof MutationObserver === 'function') {
       var observer = new MutationObserver(function (mutations) {
-        if (!compact || !compact.matches) return;
         for (var i = 0; i < mutations.length; i++) {
           var added = mutations[i].addedNodes;
           for (var j = 0; j < added.length; j++) {
@@ -424,6 +401,7 @@
       observer.observe(inner, { childList: true });
     }
     syncLayout();
+    header.classList.add('header-enhanced');
   }
 
   // Existing page handlers retain ownership. Newly equipped utility pages use

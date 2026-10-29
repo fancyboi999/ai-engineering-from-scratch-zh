@@ -314,7 +314,6 @@ python3 scripts/install_skills.py .skills --type all --dry-run</code></pre>
         <a href="skills.html" >技能</a>
         <a href="glossary.html">术语表</a>
         <a href="${GITHUB}/issues/new/choose" target="_blank" rel="noopener">报告问题</a>
-        <a href="sponsors.html">支持本站</a>
       </div>
     </div>
   </footer>

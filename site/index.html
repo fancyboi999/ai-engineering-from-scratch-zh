@@ -61,7 +61,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261026a">
+  <link rel="stylesheet" href="style.css?v=20261029a">
   <link rel="stylesheet" href="intelligence-check.css?v=20261026a">
   <style>
     .manual-masthead {
@@ -1095,6 +1095,95 @@
       .course-route { grid-template-columns: 1fr; gap: 8px; padding: 16px 12px; }
       .course-route-actions { grid-column: auto; width: 100%; justify-self: stretch; }
       .course-route-link { white-space: normal; text-align: center; }
+    }
+
+    .agent-machine-feature {
+      padding-block: 44px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .agent-machine-link {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+      gap: 32px;
+      align-items: center;
+      color: var(--ink);
+      border: 0;
+    }
+
+    .agent-machine-link:hover { color: var(--ink); border: 0; }
+    .agent-machine-copy { min-width: 0; }
+    .agent-machine-copy .preface-eyebrow { margin-bottom: 12px; }
+    .agent-machine-copy h2 {
+      margin: 0 0 16px;
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      line-height: 1.25;
+      color: var(--ink);
+    }
+    .agent-machine-copy p { margin: 0 0 20px; max-width: 38ch; }
+    .agent-machine-cta {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--blueprint);
+    }
+    .agent-machine-link img { display: block; width: 100%; height: auto; }
+    .agent-machine-link .agent-machine-light { mix-blend-mode: multiply; }
+    .agent-machine-link .agent-machine-dark { display: none; mix-blend-mode: screen; }
+    [data-theme="dark"] .agent-machine-link .agent-machine-dark { display: block; }
+    [data-theme="dark"] .agent-machine-link .agent-machine-light { display: none; }
+    .agent-machine-link:focus-visible { outline: 2px solid var(--blueprint); outline-offset: 6px; }
+
+    .course-paths-section { padding-block: 32px; border-bottom: 1px solid var(--rule-soft); }
+    .course-paths-section h2 {
+      margin: 0 0 20px;
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+      line-height: 1.35;
+      color: var(--ink);
+    }
+    .course-resource-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px 24px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .course-resource-list a {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px 12px;
+      min-height: 48px;
+      padding-block: 10px;
+      border-bottom: 1px solid var(--rule-soft);
+      color: var(--ink);
+    }
+    .course-resource-list a:hover { color: var(--blueprint); border-color: var(--blueprint); }
+    .course-resource-list a span { color: var(--ink-mute); font-size: 0.85rem; white-space: nowrap; }
+    .course-phase-discovery { margin-top: 24px; }
+    .course-phase-discovery summary { width: fit-content; padding-block: 10px; cursor: pointer; }
+    .course-phase-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px 24px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .course-phase-list a { display: block; padding-block: 10px; border-bottom: 1px solid var(--rule-soft); }
+    .course-paths-section a:focus-visible,
+    .course-phase-discovery summary:focus-visible { outline: 2px solid var(--blueprint); outline-offset: 4px; }
+
+    @media (max-width: 760px) {
+      .agent-machine-link { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+      .agent-machine-copy p { max-width: none; }
+      .course-resource-list, .course-phase-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 480px) {
+      .course-resource-list, .course-phase-list { grid-template-columns: minmax(0, 1fr); }
     }
 
     .preface-grid {
@@ -2223,11 +2312,48 @@
         </article>
       </div>
     </section>
-    <section class="course-paths-section container" aria-label="学习工具"><h2>理解课程，动手实践</h2><p><a href="how-to-learn.html">如何学完一节课</a> · <a href="inside-an-ai-agent.html">探索 AI Agent 内部机制</a> · <a href="skills.html">Agent 技能</a> · <a href="/cheatsheets">主题速查表</a></p></section>
+    <section class="course-paths-section container" aria-labelledby="learningToolsTitle">
+      <h2 id="learningToolsTitle">理解课程，动手实践</h2>
+      <ul class="course-resource-list">
+        <li><a href="how-to-learn.html">如何学完一节课</a></li>
+        <li><a href="inside-an-ai-agent.html">探索 AI Agent 内部机制</a></li>
+        <li><a href="skills.html">Agent 技能</a></li>
+        <li><a href="/cheatsheets">主题速查表</a></li>
+      </ul>
+    </section>
   <!-- GENERATED:INTEGRATED-DISCOVERY:START -->
-<section class="course-paths-section container" aria-label="实战与主题发现"><h2>在课程之外动手实践</h2>
-    <p><a href="projects.html">78 项实战项目</a> · <a href="manuals.html">6 本技术手册</a> · <a href="glossary.html">243 个术语</a> · <a href="/practice">51 道编程练习</a></p>
-    <p><a href="/phase/setup-and-tooling">阶段 0：配置与工具链</a> · <a href="/phase/math-foundations">阶段 1：数学基础</a> · <a href="/phase/ml-fundamentals">阶段 2：机器学习基础</a> · <a href="/phase/deep-learning-core">阶段 3：深度学习核心</a> · <a href="/phase/computer-vision">阶段 4：计算机视觉</a> · <a href="/phase/nlp-foundations-to-advanced">阶段 5：NLP：从基础到进阶</a> · <a href="/phase/speech-and-audio">阶段 6：语音与音频</a> · <a href="/phase/transformers-deep-dive">阶段 7：Transformer 深入剖析</a> · <a href="/phase/generative-ai">阶段 8：生成式 AI</a> · <a href="/phase/reinforcement-learning">阶段 9：强化学习</a> · <a href="/phase/llms-from-scratch">阶段 10：从零实现 LLM</a> · <a href="/phase/llm-engineering">阶段 11：LLM 工程</a> · <a href="/phase/multimodal-ai">阶段 12：多模态 AI</a> · <a href="/phase/tools-and-protocols">阶段 13：工具与协议</a> · <a href="/phase/agent-engineering">阶段 14：Agent 工程</a> · <a href="/phase/autonomous-systems">阶段 15：自主系统</a> · <a href="/phase/multi-agent-and-swarms">阶段 16：多 agent 与集群</a> · <a href="/phase/infrastructure-and-production">阶段 17：基础设施与生产</a> · <a href="/phase/ethics-safety-alignment">阶段 18：伦理、安全与对齐</a> · <a href="/phase/capstone-projects">阶段 19：综合项目</a></p></section>
+<section class="course-paths-section container" aria-labelledby="practiceDiscoveryTitle">
+    <h2 id="practiceDiscoveryTitle">在课程之外动手实践</h2>
+    <ul class="course-resource-list">
+      <li><a href="projects.html">实战项目 <span>78 项</span></a></li>
+      <li><a href="manuals.html">技术手册 <span>6 本</span></a></li>
+      <li><a href="glossary.html">术语表 <span>243 个术语</span></a></li>
+      <li><a href="/practice">编程练习 <span>51 道</span></a></li>
+    </ul>
+    <details class="course-phase-discovery">
+      <summary>按阶段浏览</summary>
+      <ul class="course-phase-list"><li><a href="/phase/setup-and-tooling">阶段 0：配置与工具链</a></li>
+<li><a href="/phase/math-foundations">阶段 1：数学基础</a></li>
+<li><a href="/phase/ml-fundamentals">阶段 2：机器学习基础</a></li>
+<li><a href="/phase/deep-learning-core">阶段 3：深度学习核心</a></li>
+<li><a href="/phase/computer-vision">阶段 4：计算机视觉</a></li>
+<li><a href="/phase/nlp-foundations-to-advanced">阶段 5：NLP：从基础到进阶</a></li>
+<li><a href="/phase/speech-and-audio">阶段 6：语音与音频</a></li>
+<li><a href="/phase/transformers-deep-dive">阶段 7：Transformer 深入剖析</a></li>
+<li><a href="/phase/generative-ai">阶段 8：生成式 AI</a></li>
+<li><a href="/phase/reinforcement-learning">阶段 9：强化学习</a></li>
+<li><a href="/phase/llms-from-scratch">阶段 10：从零实现 LLM</a></li>
+<li><a href="/phase/llm-engineering">阶段 11：LLM 工程</a></li>
+<li><a href="/phase/multimodal-ai">阶段 12：多模态 AI</a></li>
+<li><a href="/phase/tools-and-protocols">阶段 13：工具与协议</a></li>
+<li><a href="/phase/agent-engineering">阶段 14：Agent 工程</a></li>
+<li><a href="/phase/autonomous-systems">阶段 15：自主系统</a></li>
+<li><a href="/phase/multi-agent-and-swarms">阶段 16：多 agent 与集群</a></li>
+<li><a href="/phase/infrastructure-and-production">阶段 17：基础设施与生产</a></li>
+<li><a href="/phase/ethics-safety-alignment">阶段 18：伦理、安全与对齐</a></li>
+<li><a href="/phase/capstone-projects">阶段 19：综合项目</a></li></ul>
+    </details>
+  </section>
           <!-- GENERATED:INTEGRATED-DISCOVERY:END -->
     <section class="cert-spotlight container" id="certifications" aria-labelledby="certSpotlightTitle">
       <div class="cert-spotlight-card reveal">
@@ -2344,7 +2470,7 @@
   <script src="data.js?v=20261026a"></script>
   <script src="progress.js?v=20261026a"></script>
   <script src="reminder.js?v=20260709a"></script>
-  <script src="header.js?v=20261026a" defer></script>
+  <script src="header.js?v=20261029a" defer></script>
   <script src="cmdpalette.js?v=20261026a" defer></script>
   <script src="app.js?v=20261026a"></script>
   <script src="intelligence-check.js?v=20261009b" defer></script>

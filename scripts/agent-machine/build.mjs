@@ -277,7 +277,6 @@ ${STUDIO ? STUDIO_PANEL : `          <a class="am-btn am-poster" href="anatomy/i
         <a href="catalog.html">课程表</a>
         <a href="glossary.html">术语表</a>
         <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new/choose" target="_blank" rel="noopener">报告问题</a>
-        <a href="sponsors.html">支持本站</a>
       </div>
     </div>
   </footer>

@@ -316,7 +316,6 @@ const html = `<!DOCTYPE html>
         <a href="catalog.html">课程表</a>
         <a href="glossary.html">术语表</a>
         <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new/choose" target="_blank" rel="noopener">反馈问题</a>
-        <a href="sponsors.html">支持本站</a>
       </div>
     </div>
   </footer>
