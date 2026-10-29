@@ -626,14 +626,19 @@
     }
 
     .lesson-article .math-inline {
-      display: inline-block;
-      max-width: 100%;
-      overflow-x: auto;
-      vertical-align: middle;
-      /* Positioned KaTeX scripts need room beyond the text line box. */
-      padding-block: 0.25em;
-      margin-block: -0.25em;
       white-space: nowrap;
+    }
+
+    @media screen {
+      .lesson-article .math-inline {
+        display: inline-block;
+        max-width: 100%;
+        overflow-x: auto;
+        vertical-align: middle;
+        /* Positioned KaTeX scripts need room beyond the text line box. */
+        padding-block: 0.25em;
+        margin-block: -0.25em;
+      }
     }
 
     .lesson-article .math-display {

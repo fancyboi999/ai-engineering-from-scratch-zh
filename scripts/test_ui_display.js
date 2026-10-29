@@ -279,8 +279,11 @@ async function main() {
         assert.ok(scrolled, route + ' long formula does not accept horizontal wheel input');
       }
     }
+    await command('Emulation.setEmulatedMedia', { media: 'print' });
+    assert.ok(await evaluate("getComputedStyle(document.querySelector('.math-inline')).display==='inline' && getComputedStyle(document.querySelector('.math-inline')).overflowX==='visible'"), 'screen scrolling rules leaked into print');
+    await command('Emulation.setEmulatedMedia', { media: 'screen' });
     await command('Emulation.setScriptExecutionDisabled', { value: false });
-    console.log('real math lesson fallback: four widths fit and long formulas scroll with wheel input');
+    console.log('real math lesson fallback: four widths fit, long formulas scroll with wheel input, and print keeps inline math');
 
     // Real content: narrow poster tables must stay in the card, not merely in
     // a document whose overflow is hidden. Include all generated topics.
