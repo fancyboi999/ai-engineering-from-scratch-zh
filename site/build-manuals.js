@@ -793,7 +793,7 @@ ${noindex ? '<meta name="robots" content="noindex">\n' : ''}<link rel="canonical
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${FONT_LINK}" rel="stylesheet">
-<link rel="stylesheet" href="${base}style.css">
+<link rel="stylesheet" href="${base}style.css?v=${HEADER_ASSET_VERSION}">
 ${highlights ? `<link rel="stylesheet" href="${base}highlights.css">\n` : ''}<style>${css}</style>
 ${jsonldHtml}
 <script>${shared('theme.js')}</script>

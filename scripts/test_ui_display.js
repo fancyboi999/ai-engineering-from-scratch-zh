@@ -250,6 +250,41 @@ async function main() {
     await command('Emulation.setScriptExecutionDisabled', { value: false });
     console.log('navigation without JavaScript: all destinations remain in flow at mobile and desktop widths');
 
+    const mathLesson = '01-math-foundations/01-linear-algebra-intuition';
+    await command('Emulation.setScriptExecutionDisabled', { value: true });
+    const route = '/lessons/' + mathLesson + '/';
+    for (const width of [320, 390, 768, 1440]) {
+      await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}${route}` });
+      let ready = false;
+      for (let attempt = 0; attempt < 100; attempt++) {
+        ready = await evaluate("document.readyState==='complete' && !!document.querySelector('.lesson-article h1') && document.querySelectorAll('.math-inline').length>0");
+        if (ready) break;
+        await delay(50);
+      }
+      assert.ok(ready, route + ' did not render its real math content');
+      const layout = await evaluate(`({client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,
+        formulas:[...document.querySelectorAll('.lesson-article .math-inline')].map(e=>({width:e.getBoundingClientRect().width,parent:e.parentElement.getBoundingClientRect().width}))})`);
+      assert.ok(layout.scroll <= layout.client+1, route + ' overflows at ' + width);
+      assert.ok(layout.formulas.every(e=>e.width<=e.parent+1), route + ' formula escapes its text column');
+      if (width === 390) {
+        const target = await evaluate(`(function(){const e=[...document.querySelectorAll('.math-inline')].find(e=>e.scrollWidth>e.clientWidth+20);e.scrollIntoView({behavior:'instant',block:'center'});e.scrollLeft=0;e.dataset.scrollProbe='true';const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+        await command('Input.dispatchMouseEvent', { type: 'mouseWheel', x: target.x, y: target.y, deltaX: 200, deltaY: 0 });
+        let scrolled = false;
+        for (let attempt = 0; attempt < 30; attempt++) {
+          scrolled = await evaluate("document.querySelector('[data-scroll-probe]').scrollLeft>0 && window.scrollX===0");
+          if (scrolled) break;
+          await delay(25);
+        }
+        assert.ok(scrolled, route + ' long formula does not accept horizontal wheel input');
+      }
+    }
+    await command('Emulation.setEmulatedMedia', { media: 'print' });
+    assert.ok(await evaluate("getComputedStyle(document.querySelector('.math-inline')).display==='inline' && getComputedStyle(document.querySelector('.math-inline')).overflowX==='visible'"), 'screen scrolling rules leaked into print');
+    await command('Emulation.setEmulatedMedia', { media: 'screen' });
+    await command('Emulation.setScriptExecutionDisabled', { value: false });
+    console.log('real math lesson fallback: four widths fit, long formulas scroll with wheel input, and print keeps inline math');
+
     // Real content: narrow poster tables must stay in the card, not merely in
     // a document whose overflow is hidden. Include all generated topics.
     const sheetFiles = fs.readdirSync(path.join(root, 'site/cheatsheets')).filter(file => file.endsWith('.html'));
