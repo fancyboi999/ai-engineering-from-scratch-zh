@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const manuals = require('./build-manuals.js');
+const { HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 const audit = require('../scripts/audit_manuals.js');
 const figkit = require('../manuals/_shared/figkit.js');
 
@@ -202,6 +203,9 @@ test('chapter fragment links remain in the current document and assets load at t
     const match = html.match(new RegExp(`(?:href|src)="([^"\\s]*${file.replace('.', '\\.')}[^"\\s]*)"`));
     assert.ok(match, `missing shared asset ${file}`);
     assert.equal(new URL(match[1], resolutionBase).pathname, '/' + file);
+    if (file === 'style.css' || file === 'header.js') {
+      assert.equal(new URL(match[1], resolutionBase).searchParams.get('v'), HEADER_ASSET_VERSION);
+    }
   }
 });
 
