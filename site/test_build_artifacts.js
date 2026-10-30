@@ -463,7 +463,7 @@ function writeMarkdown(file, { name, description, version }) {
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20261026a';
   const appRelease = '20261026a';
-  const styleRelease = '20261029a';
+  const styleRelease = HEADER_ASSET_VERSION;
   const navigationRelease = HEADER_ASSET_VERSION;
   assert.match(navigationRelease, /^\d{8}[a-z]$/);
   const narrationRelease = '20261021a';
