@@ -1,48 +1,7 @@
 {
   "base": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
   "target": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
-  "pending": [
-    {
-      "id": "theme-menu-20261030",
-      "scope": "中文导航栏系统、浅色、深色主题菜单",
-      "upstream_commits": [
-        "88f954104"
-      ],
-      "paths": [
-        "site/theme-menu.js",
-        "site/header.js",
-        "site/lesson.html",
-        "lib/site-navigation.js"
-      ],
-      "status": "awaiting-release",
-      "remaining": [
-        "独立双审",
-        "PR 与 CI",
-        "合并后验证生产页面、主题交互和课程图表"
-      ]
-    },
-    {
-      "id": "lesson-screen-20261030",
-      "scope": "中文学习屏幕技能、导师接入和技能页",
-      "upstream_commits": [
-        "d7fceaac4"
-      ],
-      "paths": [
-        "skills/lesson-screen/",
-        ".claude/skills/lesson-screen/",
-        "skills/",
-        "site/build-skills.js",
-        "site/skills.html",
-        "site/skills.md"
-      ],
-      "status": "awaiting-release",
-      "remaining": [
-        "独立双审",
-        "PR 与 CI",
-        "合并后验证生产技能页、分发源和中文图表资源"
-      ]
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
