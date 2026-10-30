@@ -399,12 +399,34 @@ async function main() {
     }
     assert.ok(results, 'lazy search lacks the real lesson index');
     await evaluate("window.CmdPalette.close();document.querySelector('.header-menu-toggle').click()");
+    async function waitForThemeMenu() {
+      for (let attempt = 0; attempt < 100; attempt++) {
+        if (await evaluate("document.readyState==='complete' && document.getElementById('themeToggle')?.getAttribute('data-theme-menu')==='true'")) return;
+        await delay(50);
+      }
+      throw Error('shared theme menu did not become ready');
+    }
+    await waitForThemeMenu();
     const beforeTheme = await evaluate("document.documentElement.getAttribute('data-theme')");
     await evaluate("document.getElementById('themeToggle').click()");
-    const afterTheme = await evaluate("({theme:document.documentElement.getAttribute('data-theme'),stored:localStorage.getItem('theme')})");
-    assert.notEqual(afterTheme.theme, beforeTheme);
-    assert.equal(afterTheme.theme, afterTheme.stored);
-    console.log('shared header controls: lazy search failure/retry, course result, and single theme toggle passed');
+    const themeMenuState = await evaluate("({theme:document.documentElement.getAttribute('data-theme'),open:document.getElementById('themeToggle').getAttribute('aria-expanded'),hidden:document.getElementById('aifsThemeMenu').hidden,modes:[...document.querySelectorAll('#aifsThemeMenu [role=menuitemradio]')].map(item=>item.dataset.mode)})");
+    assert.equal(themeMenuState.theme, beforeTheme, 'opening the menu must keep the selected theme');
+    assert.equal(themeMenuState.open, 'true'); assert.equal(themeMenuState.hidden, false);
+    assert.deepEqual(themeMenuState.modes, ['system', 'light', 'dark']);
+    const nextTheme = beforeTheme === 'light' ? 'dark' : 'light';
+    await evaluate(`document.querySelector('#aifsThemeMenu [data-mode="${nextTheme}"]').click()`);
+    const afterTheme = await evaluate("({theme:document.documentElement.getAttribute('data-theme'),stored:localStorage.getItem('theme'),open:document.getElementById('themeToggle').getAttribute('aria-expanded')})");
+    assert.equal(afterTheme.theme, nextTheme); assert.equal(afterTheme.stored, nextTheme);
+    assert.equal(afterTheme.open, 'false');
+    await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/contact.html?theme-check=reload` });
+    await waitForThemeMenu();
+    const restored = await evaluate("({theme:document.documentElement.getAttribute('data-theme'),mode:document.getElementById('themeToggle').getAttribute('data-theme-mode')})");
+    assert.deepEqual(restored, { theme: nextTheme, mode: nextTheme });
+    await evaluate("document.querySelector('.header-menu-toggle').click();document.getElementById('themeToggle').click();document.querySelector('#aifsThemeMenu [data-mode=system]').click()");
+    const systemTheme = await evaluate("({theme:document.documentElement.getAttribute('data-theme'),stored:localStorage.getItem('theme'),mode:document.getElementById('themeToggle').getAttribute('data-theme-mode'),expected:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'})");
+    assert.equal(systemTheme.stored, null); assert.equal(systemTheme.mode, 'system');
+    assert.equal(systemTheme.theme, systemTheme.expected);
+    console.log('shared header controls: lazy search failure/retry, course result, three theme choices, reload restoration and system mode passed');
   } finally {
     clearTimeout(watchdog); if (socket) socket.close(); server.closeAllConnections(); server.close();
     if (browser && browser.pid && browser.exitCode === null) { const stopped = new Promise(resolve => browser.once('exit', resolve)); browser.kill(); await stopped; }

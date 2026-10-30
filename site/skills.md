@@ -48,6 +48,15 @@
 - 安装： `npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill learn`
 - 源文件： https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/learn/SKILL.md
 
+### lesson-screen (v1.0.0)
+
+在终端旁打开浏览器学习屏幕，展示课程图表、带真实数值的代码执行过程，也可在学习时制作蓝图、机制图、等距机器或 3D 模型。测验结束后提供限时练习和间隔复习页。没有本地浏览器时提供课程页面。
+
+- 你可以说： "打开学习屏幕", "为这节课制作图表"
+- 写入产物： .lesson-screen 文件夹，保存展示过的屏幕
+- 安装： `npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill lesson-screen`
+- 源文件： https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/lesson-screen/SKILL.md
+
 ### check-understanding (v1.0.0)
 
 对一个阶段进行测验，指出继续之前需要复习的课程。

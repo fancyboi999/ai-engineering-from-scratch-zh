@@ -10,6 +10,7 @@
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
   var NARRATION_VERSION = '20261021a';
+  var THEME_MENU_VERSION = '20261030a';
   var HEADER_BASE = document.currentScript && document.currentScript.src
     ? new URL('.', document.currentScript.src).href
     : '';
@@ -176,6 +177,15 @@
     script.src = HEADER_BASE + 'tts.js?v=' + NARRATION_VERSION;
     script.async = true;
     script.setAttribute('data-aifs-tts', NARRATION_VERSION);
+    document.head.appendChild(script);
+  }
+
+  function ensureThemeMenu() {
+    if (window.AIFSThemeMenu || document.querySelector('script[data-aifs-theme-menu]')) return;
+    var script = document.createElement('script');
+    script.src = HEADER_BASE + 'theme-menu.js?v=' + THEME_MENU_VERSION;
+    script.async = true;
+    script.setAttribute('data-aifs-theme-menu', THEME_MENU_VERSION);
     document.head.appendChild(script);
   }
 
@@ -560,6 +570,7 @@
       setupNavigation(headers[i]);
     }
     loadStars();
+    ensureThemeMenu();
     ensureNarration();
   }
 

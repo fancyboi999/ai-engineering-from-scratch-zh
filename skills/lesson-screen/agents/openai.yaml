@@ -1,0 +1,4 @@
+interface:
+  display_name: "学习屏幕"
+  short_description: "在浏览器展示课程图表、代码执行过程及为本课制作的图表"
+  default_prompt: "使用 lesson-screen 为我正在学习的课程打开浏览器学习屏幕。"

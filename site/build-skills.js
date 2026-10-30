@@ -28,6 +28,7 @@ const GROUPS = [
     when: '每次学习时使用，读取并更新你的计划。',
     skills: {
       learn: { line: '在终端中逐节讲解下一课，提问并记录学习进度。', say: ['/learn', '教我下一课'], writes: 'LEARNING.md' },
+      'lesson-screen': { line: '在终端旁打开浏览器学习屏幕，展示课程图表、带真实数值的代码执行过程，也可在学习时制作蓝图、机制图、等距机器或 3D 模型。测验结束后提供限时练习和间隔复习页。没有本地浏览器时提供课程页面。', say: ['打开学习屏幕', '为这节课制作图表'], writes: '.lesson-screen 文件夹，保存展示过的屏幕' },
       'check-understanding': { line: '对一个阶段进行测验，指出继续之前需要复习的课程。', say: ['测验第 3 阶段', '检查我的理解'], writes: '不写文件，只输出得分与复习建议。' },
       'build-project': { line: '每次指导一个项目阶段，只给提示。你亲手写代码并运行阶段评分器。', say: ['做一个项目', '继续我的项目'], writes: 'PROJECTS-LEARNING.md' },
     },

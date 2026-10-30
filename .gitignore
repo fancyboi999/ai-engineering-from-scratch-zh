@@ -53,6 +53,7 @@ mlruns/
 *.bin
 *.h5
 .gstack/
+.lesson-screen/
 
 .link-cache.json
 # 本地 Claude 设置仍忽略；只发布认证导师 wrapper，让新 clone 能自动发现。
@@ -129,6 +130,8 @@ site/cheatsheet-map.json
 !.claude/skills/course-guide/**
 !.claude/skills/learn/
 !.claude/skills/learn/**
+!.claude/skills/lesson-screen/
+!.claude/skills/lesson-screen/**
 !.claude/skills/start-learning/
 !.claude/skills/start-learning/**
 !.claude/skills/build-project/

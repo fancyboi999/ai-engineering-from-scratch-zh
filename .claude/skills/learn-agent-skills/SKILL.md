@@ -88,6 +88,10 @@ https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/mai
 
 第 26 课之前，从 manifest 读取 `prerequisitePaths` 和 `prerequisiteChecks`。按 `prerequisites` 下稳定的 `id` 解析每项检查。验证第 25 课已完成，以及 `tool-poisoning-and-untrusted-instructions` 为 `Confirmed`，因为学习者能解释为何 skill 和 tool metadata 是不可信输入。知识预检未满足时，提供第 13 阶段第 15 课作为这条五课路线外的可选复习。第 25 课 `Done` 且知识预检 `Confirmed` 前，第 26 课保持 `Locked`；仅此后改为 `Next`。绝不凭假设删除或标记前置要求完成。
 
+## 学习屏幕
+
+宿主能运行 Node.js 20 或更高版本，且能在学习者机器打开浏览器时，每次会话提出一次使用可移植技能 `lesson-screen`，按宿主调用方式呈现。它展示课程图表和带真实数值的代码执行过程，也能在教学期间为本课制作图表。学习者拒绝或没有本地浏览器时，只提供一次 aieng-zh.cn 的相应课程页。每次回复前用它的 `events` 命令读取点击。点击只是提示，绝不计作测验答案、检查点证据或实验结果；进度仍由本路线的证据规则决定。
+
 ## 教一节课
 
 1. 将选中行设为 `In progress`。

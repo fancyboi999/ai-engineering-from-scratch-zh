@@ -94,6 +94,10 @@ https://raw.githubusercontent.com/fancyboi999/ai-engineering-from-scratch-zh/mai
 
 运行能够在本地检查的命令。在 `own-binaries-only` 为 `Confirmed` 前，第 32 课保持 `Locked`。不能假定前置条件已满足。
 
+## 学习屏幕
+
+宿主能运行 Node.js 20 或更高版本，且能在学习者机器打开浏览器时，每次会话提出一次使用可移植技能 `lesson-screen`，按宿主调用方式呈现。它展示课程图表和带真实数值的代码执行过程，也能在教学期间为本课制作图表。学习者拒绝或没有本地浏览器时，只提供一次 aieng-zh.cn 的相应课程页。每次回复前用它的 `events` 命令读取点击。点击只是提示，绝不计作测验答案、检查点证据或实验结果；进度仍由本路线的证据规则决定。
+
 ## 每次讲授一课
 
 1. 将选中行设为 `In progress`。
