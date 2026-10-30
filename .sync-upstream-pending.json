@@ -1,7 +1,48 @@
 {
-  "base": "45fa4084de6ba2f88fa96a41e69efa2166f868b3",
-  "target": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
-  "pending": [],
+  "base": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
+  "target": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
+  "pending": [
+    {
+      "id": "theme-menu-20261030",
+      "scope": "中文导航栏系统、浅色、深色主题菜单",
+      "upstream_commits": [
+        "88f954104"
+      ],
+      "paths": [
+        "site/theme-menu.js",
+        "site/header.js",
+        "site/lesson.html",
+        "lib/site-navigation.js"
+      ],
+      "status": "awaiting-release",
+      "remaining": [
+        "独立双审",
+        "PR 与 CI",
+        "合并后验证生产页面、主题交互和课程图表"
+      ]
+    },
+    {
+      "id": "lesson-screen-20261030",
+      "scope": "中文学习屏幕技能、导师接入和技能页",
+      "upstream_commits": [
+        "d7fceaac4"
+      ],
+      "paths": [
+        "skills/lesson-screen/",
+        ".claude/skills/lesson-screen/",
+        "skills/",
+        "site/build-skills.js",
+        "site/skills.html",
+        "site/skills.md"
+      ],
+      "status": "awaiting-release",
+      "remaining": [
+        "独立双审",
+        "PR 与 CI",
+        "合并后验证生产技能页、分发源和中文图表资源"
+      ]
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -78,6 +119,35 @@
       "paths": [
         "cheatsheets/miles-rl.md",
         "cheatsheets/vllm-serving.md"
+      ]
+    },
+    {
+      "scope": "导师技能课数修正（371b25565）",
+      "decision": "中文 course-guide、find-your-level、start-learning 已使用课程目录作为数量来源，不写死旧总数。保留现有中文实现；当前数量由 build.js --check 核验。",
+      "paths": [
+        "skills/course-guide/SKILL.md",
+        "skills/find-your-level/SKILL.md",
+        "skills/start-learning/SKILL.md",
+        ".claude/skills/"
+      ]
+    },
+    {
+      "scope": "学习屏幕与主题菜单（2026-10-30）",
+      "decision": "语义移植 upstream/main 已合并的学习屏幕和三态主题菜单。学习屏幕读取 docs/zh.md、中文章节及中文仓源，加载中文图表覆盖层；主题菜单使用共享页头资源基址，通知课程图表重绘。已检视基准前移，两个批次在完成独立审查、CI、合并及生产验证前保留 pending。",
+      "paths": [
+        "skills/lesson-screen/",
+        "site/theme-menu.js",
+        "site/header.js",
+        "site/lesson.html"
+      ]
+    },
+    {
+      "scope": "本批上游构建产物和流水线",
+      "decision": "2a851e678 与 fe6c657df 的英文 data.js 由中文源重建，不复制。保留中文 build.yml；其现有 site/test*.js 回归已覆盖新增测试，无需移植 curriculum.yml。中文标签直接维护，不引入 ui-strings.json 的多语言流程。",
+      "paths": [
+        "site/data.js",
+        ".github/workflows/curriculum.yml",
+        "site/ui-strings.json"
       ]
     }
   ]

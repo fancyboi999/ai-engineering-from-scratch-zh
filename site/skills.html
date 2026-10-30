@@ -10,11 +10,11 @@
   <link rel="canonical" href="https://aieng-zh.cn/skills.html">
   <link rel="alternate" type="text/markdown" href="https://aieng-zh.cn/skills.md">
   <meta property="og:title" content="技能 · 从零开始学 AI 工程">
-  <meta property="og:description" content="16 个编程 agent 技能：课程辅导、水平测验、认证备考，以及图表和手册工具。">
+  <meta property="og:description" content="17 个编程 agent 技能：课程辅导、水平测验、认证备考，以及图表和手册工具。">
   <meta property="og:url" content="https://aieng-zh.cn/skills.html">
   <meta property="og:type" content="website">
   <meta name="twitter:title" content="技能 · 从零开始学 AI 工程">
-  <meta name="twitter:description" content="16 个编程 agent 技能：课程辅导、水平测验、认证备考，以及图表和手册工具。">
+  <meta name="twitter:description" content="17 个编程 agent 技能：课程辅导、水平测验、认证备考，以及图表和手册工具。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -276,12 +276,12 @@
 
   <main id="main" class="sk">
     <section class="sk-hero container">
-      <div class="dither sk-band" data-seed="skills" data-label="16 个技能 · 供 agent 使用" aria-hidden="true"></div>
+      <div class="dither sk-band" data-seed="skills" data-label="17 个技能 · 供 agent 使用" aria-hidden="true"></div>
       <p class="sk-eyebrow">FIG_SKL · 编程 agent 技能</p>
       <h1 >技能</h1>
-      <p class="sk-lede">技能是一份简短的指令文件。请求匹配某个技能时，agent 会读取文件并按步骤执行。这 16 个技能用于课程辅导、水平测验，以及图表和手册制作。</p>
+      <p class="sk-lede">技能是一份简短的指令文件。请求匹配某个技能时，agent 会读取文件并按步骤执行。这 17 个技能用于课程辅导、水平测验，以及图表和手册制作。</p>
       <div class="sk-install">
-        <div class="sk-install-bar"><span>安装全部 16 个</span><button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh" >复制</button></div>
+        <div class="sk-install-bar"><span>安装全部 17 个</span><button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh" >复制</button></div>
         <pre><code>npx skills add fancyboi999/ai-engineering-from-scratch-zh</code></pre>
         <p>安装单个技能时加 <code>--skill &lt;name&gt;</code>。先列出技能时加 <code>--list</code>。支持 Claude、Cursor、Codex、OpenClaw、Hermes，以及所有能读取 SKILL.md 的 agent。</p>
       </div>
@@ -353,6 +353,19 @@
           <footer>
             <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill learn" aria-label="复制安装命令： learn">复制安装命令</button>
             <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/learn/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
+          </footer>
+        </article>
+        <article class="sk-card" id="lesson-screen">
+          <header><h3><code>/lesson-screen</code></h3><span class="sk-version">v1.0.0</span></header>
+          <p class="sk-line">在终端旁打开浏览器学习屏幕，展示课程图表、带真实数值的代码执行过程，也可在学习时制作蓝图、机制图、等距机器或 3D 模型。测验结束后提供限时练习和间隔复习页。没有本地浏览器时提供课程页面。</p>
+          <dl>
+            <dt >你可以说</dt><dd><q>打开学习屏幕</q> <q>为这节课制作图表</q></dd>
+            <dt >写入产物</dt><dd>.lesson-screen 文件夹，保存展示过的屏幕</dd>
+          </dl>
+
+          <footer>
+            <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill lesson-screen" aria-label="复制安装命令： lesson-screen">复制安装命令</button>
+            <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/lesson-screen/SKILL.md" target="_blank" rel="noopener">阅读 SKILL.md ↗</a>
           </footer>
         </article>
         <article class="sk-card" id="check-understanding">
@@ -567,11 +580,11 @@
             <div class="sl-head"><span>技能加载器 · 一次 agent 会话</span><button type="button" class="sl-replay" >重播</button></div>
             <p class="sl-note">选择一个请求。agent 始终保留所有技能的名称和描述。请求匹配时，才读取完整 SKILL.md，再按需读取其中列出的参考文件。</p>
             <div class="sl-asks" role="group" aria-label="请求"><button type="button" class="sl-ask" data-ask="0" aria-pressed="true">测测我的水平</button><button type="button" class="sl-ask" data-ask="1" aria-pressed="false">教我 MCP</button><button type="button" class="sl-ask" data-ask="2" aria-pressed="false">画一张请求路径图</button><button type="button" class="sl-ask" data-ask="3" aria-pressed="false">为这个工具编写手册</button></div>
-            <div class="sl-pane"><h4><span>始终加载</span><span>16 条描述 · 1,774 tokens</span></h4><ol class="sl-always"><li data-skill="start-learning"><span>start-learning</span><b>117</b></li><li data-skill="find-your-level"><span>find-your-level</span><b>121</b></li><li data-skill="course-guide"><span>course-guide</span><b>157</b></li><li data-skill="learn"><span>learn</span><b>119</b></li><li data-skill="check-understanding"><span>check-understanding</span><b>80</b></li><li data-skill="build-project"><span>build-project</span><b>101</b></li><li data-skill="learn-mcp"><span>learn-mcp</span><b>134</b></li><li data-skill="learn-agent-skills"><span>learn-agent-skills</span><b>112</b></li><li data-skill="learn-reverse-engineering"><span>learn-reverse-engineering</span><b>117</b></li><li data-skill="claude-certification"><span>claude-certification</span><b>121</b></li><li data-skill="mcpa-certification"><span>mcpa-certification</span><b>100</b></li><li data-skill="course-style"><span>course-style</span><b>106</b></li><li data-skill="blueprint-figure"><span>blueprint-figure</span><b>90</b></li><li data-skill="motion-figure"><span>motion-figure</span><b>98</b></li><li data-skill="isometric-explainer"><span>isometric-explainer</span><b>93</b></li><li data-skill="write-manual"><span>write-manual</span><b>108</b></li></ol></div>
+            <div class="sl-pane"><h4><span>始终加载</span><span>17 条描述 · 1,944 tokens</span></h4><ol class="sl-always"><li data-skill="start-learning"><span>start-learning</span><b>117</b></li><li data-skill="find-your-level"><span>find-your-level</span><b>121</b></li><li data-skill="course-guide"><span>course-guide</span><b>157</b></li><li data-skill="learn"><span>learn</span><b>119</b></li><li data-skill="lesson-screen"><span>lesson-screen</span><b>170</b></li><li data-skill="check-understanding"><span>check-understanding</span><b>80</b></li><li data-skill="build-project"><span>build-project</span><b>101</b></li><li data-skill="learn-mcp"><span>learn-mcp</span><b>134</b></li><li data-skill="learn-agent-skills"><span>learn-agent-skills</span><b>112</b></li><li data-skill="learn-reverse-engineering"><span>learn-reverse-engineering</span><b>117</b></li><li data-skill="claude-certification"><span>claude-certification</span><b>121</b></li><li data-skill="mcpa-certification"><span>mcpa-certification</span><b>100</b></li><li data-skill="course-style"><span>course-style</span><b>106</b></li><li data-skill="blueprint-figure"><span>blueprint-figure</span><b>90</b></li><li data-skill="motion-figure"><span>motion-figure</span><b>98</b></li><li data-skill="isometric-explainer"><span>isometric-explainer</span><b>93</b></li><li data-skill="write-manual"><span>write-manual</span><b>108</b></li></ol></div>
             <div class="sl-pane"><h4><span>本次请求加载</span><span data-loaded-total></span></h4><ol class="sl-loaded" data-loaded></ol></div>
             <div class="sl-meter"><p><span>已用上下文</span><span data-meter-label></span></p><div class="sl-track"><i data-meter></i></div></div>
             <p class="sl-verdict" data-verdict aria-live="polite"></p>
-            <script type="application/json" class="sl-data">{"skills":[{"name":"start-learning","tokens":117},{"name":"find-your-level","tokens":121},{"name":"course-guide","tokens":157},{"name":"learn","tokens":119},{"name":"check-understanding","tokens":80},{"name":"build-project","tokens":101},{"name":"learn-mcp","tokens":134},{"name":"learn-agent-skills","tokens":112},{"name":"learn-reverse-engineering","tokens":117},{"name":"claude-certification","tokens":121},{"name":"mcpa-certification","tokens":100},{"name":"course-style","tokens":106},{"name":"blueprint-figure","tokens":90},{"name":"motion-figure","tokens":98},{"name":"isometric-explainer","tokens":93},{"name":"write-manual","tokens":108}],"requests":[{"say":"测测我的水平","skill":"find-your-level","files":[{"path":"find-your-level/SKILL.md","tokens":1710},{"path":"references/answer-key.md","tokens":331}]},{"say":"教我 MCP","skill":"learn-mcp","files":[{"path":"learn-mcp/SKILL.md","tokens":2141}]},{"say":"画一张请求路径图","skill":"blueprint-figure","files":[{"path":"blueprint-figure/SKILL.md","tokens":2074},{"path":"references/kinds.md","tokens":1104},{"path":"references/grammar.md","tokens":1705},{"path":"references/checks.md","tokens":1063}]},{"say":"为这个工具编写手册","skill":"write-manual","files":[{"path":"write-manual/SKILL.md","tokens":2544},{"path":"references/manual-json.md","tokens":1389},{"path":"references/section-template.md","tokens":835},{"path":"references/research-and-sources.md","tokens":920},{"path":"references/prose-rules.md","tokens":845}]}],"full":65730}</script>
+            <script type="application/json" class="sl-data">{"skills":[{"name":"start-learning","tokens":117},{"name":"find-your-level","tokens":121},{"name":"course-guide","tokens":157},{"name":"learn","tokens":119},{"name":"lesson-screen","tokens":170},{"name":"check-understanding","tokens":80},{"name":"build-project","tokens":101},{"name":"learn-mcp","tokens":134},{"name":"learn-agent-skills","tokens":112},{"name":"learn-reverse-engineering","tokens":117},{"name":"claude-certification","tokens":121},{"name":"mcpa-certification","tokens":100},{"name":"course-style","tokens":106},{"name":"blueprint-figure","tokens":90},{"name":"motion-figure","tokens":98},{"name":"isometric-explainer","tokens":93},{"name":"write-manual","tokens":108}],"requests":[{"say":"测测我的水平","skill":"find-your-level","files":[{"path":"find-your-level/SKILL.md","tokens":1710},{"path":"references/answer-key.md","tokens":331}]},{"say":"教我 MCP","skill":"learn-mcp","files":[{"path":"learn-mcp/SKILL.md","tokens":2288}]},{"say":"画一张请求路径图","skill":"blueprint-figure","files":[{"path":"blueprint-figure/SKILL.md","tokens":2074},{"path":"references/kinds.md","tokens":1104},{"path":"references/grammar.md","tokens":1705},{"path":"references/checks.md","tokens":1063}]},{"say":"为这个工具编写手册","skill":"write-manual","files":[{"path":"write-manual/SKILL.md","tokens":2544},{"path":"references/manual-json.md","tokens":1389},{"path":"references/section-template.md","tokens":835},{"path":"references/research-and-sources.md","tokens":920},{"path":"references/prose-rules.md","tokens":845}]}],"full":73487}</script>
           </figure><span>交互演示：选择请求。token 数按实际技能文件的字节数除以 4 估算。</span></div>
           <footer>
             <button type="button" class="sk-copy" data-copy="npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill motion-figure" aria-label="复制安装命令： motion-figure">复制安装命令</button>
