@@ -1,83 +1,234 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 472" role="img" aria-labelledby="plate-rea-investigation-title plate-rea-investigation-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 668" role="img" aria-labelledby="plate-rea-investigation-title plate-rea-investigation-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="plate-rea-investigation-title">一个函数，四个视角</title>
-  <desc id="plate-rea-investigation-desc">使用 Ghidra provider 对 ledger-arm64-O1 的 _percent_change 运行 rea function 的记录。顶部，你调用 rea 6.7.0，将问题交给已绑定 ghidra 的 BinarySession；会话通过 bridge.sock 调用 GhidraClient，后者启动无界面 Ghidra 12.1.4 JVM，导入分析 33872 字节的 mach-o arm64 可执行文件 ledger-arm64-O1。三列展示同一函数：你在 ledger.c 写的 C；clang -O1 生成的六条指令，从 0x100000500 的 cbz w0 到 0x100000514 的 ret；Ghidra 反编译伪代码，含源码没有的第二次零值检查。底部 Evidence ev_b492c85e 标明操作 analyze_function、provider ghidra 12.1.4、配置摘要、confidence observed、静态读取的权威来源、十条限制、对象 sha256。</desc>
+  <desc id="plate-rea-investigation-desc">使用 Ghidra provider 对 ledger-arm64-O1 的 _percent_change 运行 rea function 的记录，画成同一工作台上的机器。你调用 rea 6.7.0，它把问题交给已绑定 ghidra 的 BinarySession；会话经 bridge.sock 调用 GhidraClient，后者以无界面 JVM 启动 Ghidra 12.1.4，导入并分析产物 ledger-arm64-O1。该产物是 33872 字节的 mach-o arm64 可执行文件，画成按文件段堆叠的块：__TEXT 16384 字节、__DATA_CONST 16384 字节、__LINKEDIT 1104 字节。_percent_change 的 24 字节位于 __TEXT 顶部附近的 0x100000500。三列展示同一函数：你在 ledger.c 写的 C；Ghidra 反编译出的伪代码，含源码没有的第二次零值检查；clang -O1 生成的六条指令，从 0x100000500 的 cbz w0 到 0x100000514 的 ret。底部的 Evidence 记录 ev_b492c85e 标明操作 analyze_function、provider ghidra 12.1.4、confidence observed、十条限制和分析对象。</desc>
   <defs><marker id="plate-rea-investigation-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="plate-rea-investigation-head-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-olive-ink, #515f26)"/></marker><marker id="plate-rea-investigation-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
   <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">四个视角</text>
   <text x="620" y="18" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">rea function ledger-arm64-O1 _percent_change --provider ghidra</text>
-  <rect x="20" y="30" width="70" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
-  <text x="55" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">你</text>
-  <text x="55" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ledger.c</text>
-  <rect x="150" y="30" width="100" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="200" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">rea 6.7.0</text>
-  <text x="200" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">CLI</text>
-  <rect x="310" y="30" width="115" height="40" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="367.5" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">BinarySession</text>
-  <text x="367.5" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已绑定 ghidra</text>
-  <rect x="500" y="30" width="120" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="560" y="44.95" font-size="11.5" text-anchor="middle" font-weight="700">GhidraClient</text>
-  <text x="560" y="62.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bridge.sock</text>
-  <line x1="90" y1="50" x2="149" y2="50" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
-  <rect class="m-knock" x="88.9" y="33.03" width="61.2" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="119.5" y="44" font-size="11.5" text-anchor="middle">function</text>
-  <line x1="250" y1="50" x2="309" y2="50" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
-  <rect class="m-knock" x="265" y="33.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="279.5" y="44" font-size="11.5" text-anchor="middle">执行</text>
-  <line x1="425" y1="50" x2="499" y2="50" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
-  <rect class="m-knock" x="447.5" y="33.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="462" y="44" font-size="11.5" text-anchor="middle">调用</text>
-  <rect x="500" y="92" width="120" height="44" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="560" y="108.95" font-size="11.5" text-anchor="middle" font-weight="700">Ghidra 12.1.4</text>
-  <text x="560" y="126.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">导入、分析</text>
-  <line x1="560" y1="70" x2="560" y2="91" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#plate-rea-investigation-head-olive)"/>
-  <rect class="m-knock" x="565" y="69.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="568" y="80.5" font-size="11.5" fill="var(--m-olive-ink, #515f26)">启动</text>
-  <rect x="220" y="92" width="185" height="44" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
-  <text x="312.5" y="108.95" font-size="11.5" text-anchor="middle" font-weight="700">ledger-arm64-O1</text>
-  <text x="312.5" y="126.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mach-o arm64，33872 字节</text>
-  <line x1="367.5" y1="70" x2="367.5" y2="91" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
-  <rect class="m-knock" x="372.5" y="69.53" width="98" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="375.5" y="80.5" font-size="11.5">读取、计算 hash</text>
-  <line x1="55" y1="70" x2="55" y2="165" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
-  <rect class="m-knock" x="60" y="106.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="63" y="117.5" font-size="11.5">编写</text>
-  <line x1="560" y1="136" x2="560" y2="165" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#plate-rea-investigation-head-ink)"/>
-  <rect class="m-knock" x="565" y="139.53" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="568" y="150.5" font-size="11.5">反编译</text>
-  <rect x="20" y="166" width="190" height="134" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
-  <text x="26" y="184" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">你编写 · ledger.c</text>
-  <text x="26" y="199" font-size="11">int percent_change(</text>
-  <text x="26" y="214" font-size="11">  int before, int after) {</text>
-  <text x="26" y="229" font-size="11">  if (before == 0)</text>
-  <text x="26" y="244" font-size="11">    return 0;</text>
-  <text x="26" y="259" font-size="11">  return (after - before)</text>
-  <text x="26" y="274" font-size="11">    * 100 / before;</text>
-  <text x="26" y="289" font-size="11">}</text>
-  <rect x="220" y="166" width="185" height="119" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
-  <text x="226" y="184" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">clang -O1 生成 · 24 字节</text>
-  <text x="226" y="199" font-size="11">500  cbz w0, 0x100000514</text>
-  <text x="226" y="214" font-size="11">504  sub w8, w1, w0</text>
-  <text x="226" y="229" font-size="11">508  mov w9, #0x64</text>
-  <text x="226" y="244" font-size="11">50c  mul w8, w8, w9</text>
-  <text x="226" y="259" font-size="11">510  sdiv w0, w8, w0</text>
-  <text x="226" y="274" font-size="11">514  ret</text>
-  <rect x="415" y="166" width="205" height="179" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="421" y="184" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Ghidra 反编译</text>
-  <text x="421" y="199" font-size="11">ulong _percent_change(</text>
-  <text x="421" y="214" font-size="11">  ulong param_1,int param_2)</text>
-  <text x="421" y="229" font-size="11">iVar2 = (int)param_1;</text>
-  <text x="421" y="244" font-size="11">if (iVar2 != 0) {</text>
-  <text x="421" y="259" font-size="11">  uVar1 = 0;</text>
-  <text x="421" y="274" font-size="11">  if (iVar2 != 0) {</text>
-  <text x="421" y="289" font-size="11">  uVar1 = ((param_2 - iVar2)</text>
-  <text x="421" y="304" font-size="11">    * 100) / iVar2;</text>
-  <text x="421" y="319" font-size="11">  param_1 = (ulong)uVar1;</text>
-  <text x="421" y="334" font-size="11">return param_1;</text>
-  <line x1="517" y1="345" x2="517" y2="365" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-teal)"/>
-  <rect class="m-knock" x="522" y="344.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="525" y="355" font-size="11.5" fill="var(--m-teal-ink, #18696a)">记录</text>
-  <rect x="20" y="366" width="600" height="92" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="320" y="392.1" font-size="12" text-anchor="middle" font-weight="700">_percent_change 的 Evidence ev_b492c85e</text>
-  <text x="320" y="409.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">操作 analyze_function · provider ghidra 12.1.4</text>
-  <text x="320" y="424.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">confidence observed · 十条限制</text>
-  <text x="320" y="439.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">对象 ledger-arm64-O1 · mach-o arm64</text>
+  <rect x="20" y="30" width="74" height="49" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="57" y="49.45" font-size="11.5" text-anchor="middle" font-weight="700">你</text>
+  <text x="57" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ledger.c</text>
+  <rect x="98" y="82" width="84" height="49" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="140" y="101.45" font-size="11.5" text-anchor="middle" font-weight="700">rea 6.7.0</text>
+  <text x="140" y="118.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">CLI</text>
+  <rect x="180" y="30" width="112" height="49" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="236" y="49.45" font-size="11.5" text-anchor="middle" font-weight="700">BinarySession</text>
+  <text x="236" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已绑定 ghidra</text>
+  <rect x="250" y="82" width="104" height="49" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="302" y="101.45" font-size="11.5" text-anchor="middle" font-weight="700">GhidraClient</text>
+  <text x="302" y="118.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bridge.sock</text>
+  <rect x="362" y="82" width="104" height="49" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="414" y="101.45" font-size="11.5" text-anchor="middle" font-weight="700">Ghidra 12.1.4</text>
+  <text x="414" y="118.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">无界面 JVM</text>
+  <rect x="470" y="30" width="150" height="79" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="545" y="49.45" font-size="11.5" text-anchor="middle" font-weight="700">ledger-arm64-O1</text>
+  <text x="545" y="66.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mach-o arm64</text>
+  <text x="545" y="81.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">33872 字节</text>
+  <text x="545" y="96.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">sha256 01b5d08b</text>
+  <polygon points="14,315 626,315 626,309 626,249 14,249 14,309" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="14,315 626,315 626,309 14,309" fill="var(--m-paper, #fafaf5)"/>
+  <polygon points="14,309 626,309 626,249 14,249" fill="var(--m-paper, #fafaf5)"/>
+  <polygon points="14,309 626,309 626,249 14,249" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polyline points="14,309 626,309" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="14,315 626,315 626,309 626,249 14,249 14,309" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-linejoin="round"/>
+  <polygon points="18.56,285 48,268 63.43,272.29 92.88,289.29 63.43,306.29 48,302" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
+  <polygon points="48,246 77.44,263 77.44,285 48,302 18.56,285 18.56,263" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="48,246 77.44,263 48,280 18.56,263" fill="var(--m-grey-fill, #ecebe3)"/>
+  <polygon points="48,246 77.44,263 48,280 18.56,263" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="18.56,285 48,302 48,280 18.56,263" fill="var(--m-grey-fill, #ecebe3)"/>
+  <polygon points="77.44,285 48,302 48,280 77.44,263" fill="var(--m-grey-fill, #ecebe3)"/>
+  <polygon points="77.44,285 48,302 48,280 77.44,263" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="48,280 77.44,263" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="48,280 18.56,263" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="48,280 48,302" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="48,246 77.44,263 77.44,285 48,302 18.56,285 18.56,263" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="23.75,282 42.8,293 42.8,280 23.75,269" fill="var(--m-ink, #1a1a1a)" fill-opacity="0.75"/>
+  <polygon points="26.35,274.5 35.88,280 35.88,281.4 26.35,275.9" fill="var(--m-green-fill, #e5f0e4)" fill-opacity="0.9"/>
+  <polygon points="26.35,278.5 39.34,286 39.34,287.4 26.35,279.9" fill="var(--m-green-fill, #e5f0e4)" fill-opacity="0.9"/>
+  <polygon points="107.09,285 140,266 158.24,271.07 191.15,290.07 158.24,309.07 140,304" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
+  <polygon points="140,240 172.91,259 172.91,285 140,304 107.09,285 107.09,259" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="140,240 172.91,259 140,278 107.09,259" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="140,240 172.91,259 140,278 107.09,259" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="107.09,285 140,304 140,278 107.09,259" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="172.91,285 140,304 140,278 172.91,259" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="172.91,285 140,304 140,278 172.91,259" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="140,278 172.91,259" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="140,278 107.09,259" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="140,278 140,304" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="140,240 172.91,259 172.91,285 140,304 107.09,285 107.09,259" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="135.67,250.5 154.72,261.5 151.26,263.5 132.21,252.5" fill="var(--m-blue-ink, #2f5d9a)" fill-opacity="0.6"/>
+  <polygon points="127.01,255.5 139.13,262.5 135.67,264.5 123.55,257.5" fill="var(--m-blue-ink, #2f5d9a)" fill-opacity="0.6"/>
+  <polygon points="201.36,285 236,265 255.64,270.46 290.28,290.46 255.64,310.46 236,305" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
+  <polygon points="236,237 270.64,257 270.64,285 236,305 201.36,285 201.36,257" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="236,237 270.64,257 236,277 201.36,257" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="236,237 270.64,257 236,277 201.36,257" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="201.36,285 236,305 236,277 201.36,257" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="270.64,285 236,305 236,277 270.64,257" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="270.64,285 236,305 236,277 270.64,257" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="236,277 270.64,257" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="236,277 201.36,257" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="236,277 236,305" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="236,237 270.64,257 270.64,285 236,305 201.36,285 201.36,257" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="207.42,280.5 229.94,293.5 229.94,290.5 207.42,277.5" fill="var(--m-blue-ink, #2f5d9a)" fill-opacity="0.45"/>
+  <polygon points="207.42,271.5 229.94,284.5 229.94,281.5 207.42,268.5" fill="var(--m-blue-ink, #2f5d9a)" fill-opacity="0.45"/>
+  <polygon points="207.42,262.5 229.94,275.5 229.94,272.5 207.42,259.5" fill="var(--m-blue-ink, #2f5d9a)" fill-opacity="0.45"/>
+  <polygon points="297.09,285 330,266 346.84,270.68 379.74,289.68 346.84,308.68 330,304" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
+  <polygon points="330,242 362.91,261 362.91,285 330,304 297.09,285 297.09,261" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="330,242 362.91,261 330,280 297.09,261" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="330,242 362.91,261 330,280 297.09,261" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="297.09,285 330,304 330,280 297.09,261" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="362.91,285 330,304 330,280 362.91,261" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="362.91,285 330,304 330,280 362.91,261" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="330,280 362.91,261" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="330,280 297.09,261" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="330,280 330,304" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="330,242 362.91,261 362.91,285 330,304 297.09,285 297.09,261" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="320.2,254 320.2,261 320.39,262.1 320.95,263.16 321.85,264.14 323.07,265 324.56,265.7 326.25,266.23 328.09,266.55 330,266.66 331.91,266.55 333.75,266.23 335.44,265.7 336.93,265 338.15,264.14 339.05,263.16 339.61,262.1 339.8,261 339.8,254" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="320.2,254 320.2,261 320.39,262.1 320.95,263.16 321.85,264.14 323.07,265 324.56,265.7 326.25,266.23 328.09,266.55 330,266.66 331.91,266.55 333.75,266.23 335.44,265.7 336.93,265 338.15,264.14 339.05,263.16 339.61,262.1 339.8,261 339.8,254" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.08"/>
+  <polygon points="320.2,254 320.2,261 320.39,262.1 320.95,263.16 321.85,264.14 323.07,265 324.56,265.7 326.25,266.23 328.09,266.55 330,266.66 331.91,266.55 333.75,266.23 335.44,265.7 336.93,265 338.15,264.14 339.05,263.16 339.61,262.1 339.8,261 339.8,254" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.4" stroke-linejoin="round"/>
+  <ellipse cx="330" cy="254" rx="9.8" ry="5.66" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <ellipse cx="330" cy="254" rx="9.8" ry="5.66" fill="var(--m-shine, #ffffff)" fill-opacity="0.45" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.4"/>
+  <polygon points="393.63,285 430,264 455.72,271.15 492.09,292.15 455.72,313.15 430,306" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
+  <polygon points="430,210 466.37,231 466.37,285 430,306 393.63,285 393.63,231" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="430,210 466.37,231 430,252 393.63,231" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="430,210 466.37,231 430,252 393.63,231" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="393.63,285 430,306 430,252 393.63,231" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="466.37,285 430,306 430,252 466.37,231" fill="var(--m-violet-fill, #ebe8f5)"/>
+  <polygon points="466.37,285 430,306 430,252 466.37,231" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="430,252 466.37,231" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="430,252 393.63,231" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="430,252 430,306" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="430,210 466.37,231 466.37,285 430,306 393.63,285 393.63,231" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="400.56,255 423.07,268 423.07,256 400.56,243" fill="var(--m-ink, #1a1a1a)" fill-opacity="0.75"/>
+  <polygon points="400.56,275 423.07,288 423.07,285 400.56,272" fill="var(--m-violet-ink, #5b4fa3)" fill-opacity="0.45"/>
+  <polygon points="400.56,267 423.07,280 423.07,277 400.56,264" fill="var(--m-violet-ink, #5b4fa3)" fill-opacity="0.45"/>
+  <polygon points="494.16,285 534,262 559.72,269.15 599.56,292.15 559.72,315.15 534,308" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
+  <polygon points="534,259 573.84,282 573.84,285 534,308 494.16,285 494.16,282" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="534,259 573.84,282 534,305 494.16,282" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="534,259 573.84,282 534,305 494.16,282" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="494.16,285 534,308 534,305 494.16,282" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="573.84,285 534,308 534,305 573.84,282" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="573.84,285 534,308 534,305 573.84,282" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="534,305 573.84,282" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="534,305 494.16,282" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="534,305 534,308" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="534,259 573.84,282 573.84,285 534,308 494.16,285 494.16,282" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="534,219 573.84,242 573.84,282 534,305 494.16,282 494.16,242" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="534,219 573.84,242 534,265 494.16,242" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="534,219 573.84,242 534,265 494.16,242" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="494.16,282 534,305 534,265 494.16,242" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="573.84,282 534,305 534,265 573.84,242" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="573.84,282 534,305 534,265 573.84,242" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="534,265 573.84,242" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="534,265 494.16,242" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="534,265 534,305" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="534,219 573.84,242 573.84,282 534,305 494.16,282 494.16,242" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="534,179 573.84,202 573.84,242 534,265 494.16,242 494.16,202" fill="var(--m-panel, #f3f1e8)"/>
+  <polygon points="534,179 573.84,202 534,225 494.16,202" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="534,179 573.84,202 534,225 494.16,202" fill="var(--m-shine, #ffffff)" fill-opacity="0.45"/>
+  <polygon points="494.16,242 534,265 534,225 494.16,202" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="573.84,242 534,265 534,225 573.84,202" fill="var(--m-green-fill, #e5f0e4)"/>
+  <polygon points="573.84,242 534,265 534,225 573.84,202" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.16"/>
+  <polyline points="534,225 573.84,202" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="534,225 494.16,202" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polyline points="534,225 534,265" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-opacity="0.6"/>
+  <polygon points="534,179 573.84,202 573.84,242 534,265 494.16,242 494.16,202" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="1.5" stroke-linejoin="round"/>
+  <polygon points="494.16,205.13 534,228.13 534,230.13 494.16,207.13" fill="var(--m-rose-ink, #b0344d)" fill-opacity="0.95"/>
+  <polygon points="573.84,205.13 534,228.13 534,230.13 573.84,207.13" fill="var(--m-rose-ink, #b0344d)" fill-opacity="0.95"/>
+  <line x1="430" y1="231" x2="430" y2="176" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="2.5"/>
+  <line x1="430" y1="176" x2="534" y2="173" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="2.5"/>
+  <polygon points="521.75,178 521.75,181 521.99,182.38 522.68,183.71 523.82,184.93 525.34,186 527.2,186.88 529.31,187.53 531.61,187.94 534,188.07 536.39,187.94 538.69,187.53 540.8,186.88 542.66,186 544.18,184.93 545.32,183.71 546.01,182.38 546.25,181 546.25,178" fill="var(--m-blue-fill, #e6edf6)"/>
+  <polygon points="521.75,178 521.75,181 521.99,182.38 522.68,183.71 523.82,184.93 525.34,186 527.2,186.88 529.31,187.53 531.61,187.94 534,188.07 536.39,187.94 538.69,187.53 540.8,186.88 542.66,186 544.18,184.93 545.32,183.71 546.01,182.38 546.25,181 546.25,178" fill="var(--m-shade, #1a1a1a)" fill-opacity="0.08"/>
+  <polygon points="521.75,178 521.75,181 521.99,182.38 522.68,183.71 523.82,184.93 525.34,186 527.2,186.88 529.31,187.53 531.61,187.94 534,188.07 536.39,187.94 538.69,187.53 540.8,186.88 542.66,186 544.18,184.93 545.32,183.71 546.01,182.38 546.25,181 546.25,178" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="1.4" stroke-linejoin="round"/>
+  <ellipse cx="534" cy="178" rx="12.25" ry="7.07" fill="var(--m-blue-fill, #e6edf6)"/>
+  <ellipse cx="534" cy="178" rx="12.25" ry="7.07" fill="var(--m-shine, #ffffff)" fill-opacity="0.45" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="1.4"/>
+  <polyline points="48,81 48,262" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="48" cy="262" r="2" fill="var(--m-grey-ink, #5e5e59)"/>
+  <polyline points="140,133 140,258" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="140" cy="258" r="2" fill="var(--m-blue-ink, #2f5d9a)"/>
+  <polyline points="236,81 236,256" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="236" cy="256" r="2" fill="var(--m-blue-ink, #2f5d9a)"/>
+  <polyline points="330,133 330,247.34" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="330" cy="247.34" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <polyline points="430,133 430,175" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="430" cy="175" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <polyline points="501.09,111 501.09,201" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="501.09" cy="201" r="2" fill="var(--m-green-ink, #336b40)"/>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <path d="M79.44486359999999 273 L105.09103479999999 273" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M79.44486359999999 273 L105.09103479999999 273" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
+  <text x="94" y="339" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">function</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <path d="M174.90896519999998 273 L199.358984 273" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M174.90896519999998 273 L199.358984 273" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
+  <text x="188" y="339" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">执行</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <path d="M272.641016 273 L295.0910348 273" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M272.641016 273 L295.0910348 273" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
+  <text x="283" y="339" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">调用</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <path d="M364.90896519999995 273 L391.62693319999994 273" fill="none" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#plate-rea-investigation-head-olive)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-olive-ink, #515f26)" opacity="0"><animateMotion path="M364.90896519999995 273 L391.62693319999994 273" keyPoints="0;0;1;1" keyTimes="0;0.692;0.904;1" calcMode="linear" dur="2.6s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.692;0.723;0.904;1" dur="2.6s" begin="indefinite" fill="freeze"/></circle>
+  <text x="380" y="339" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">启动</text>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <path d="M468.37306679999995 273 L492.16283159999995 273" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M468.37306679999995 273 L492.16283159999995 273" keyPoints="0;0;1;1" keyTimes="0;0.75;0.922;1" calcMode="linear" dur="3.2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.75;0.775;0.922;1" dur="3.2s" begin="indefinite" fill="freeze"/></circle>
+  <text x="482" y="339" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">导入</text>
+  </g>
+  <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
+  <text x="620" y="130" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-rose-ink, #b0344d)">_percent_change</text>
+  <text x="620" y="144" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">24 字节</text>
+  <text x="620" y="158" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">位于 0x100000500</text>
+  <polyline points="549.93,163 549.93,219.93" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="549.93" cy="219.93" r="2" fill="var(--m-rose-ink, #b0344d)"/>
+  <line x1="48" y1="325" x2="48" y2="361" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M48 325 L48 361" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
+  <line x1="420" y1="325" x2="420" y2="361" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M420 325 L420 361" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
+  <line x1="534" y1="325" x2="534" y2="361" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#plate-rea-investigation-head-ink)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M534 325 L534 361" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
+  <rect x="20" y="362" width="190" height="134" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="26" y="380" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">你编写 · ledger.c</text>
+  <text x="26" y="395" font-size="11">int percent_change(</text>
+  <text x="26" y="410" font-size="11">  int before, int after) {</text>
+  <text x="26" y="425" font-size="11">  if (before == 0)</text>
+  <text x="26" y="440" font-size="11">    return 0;</text>
+  <text x="26" y="455" font-size="11">  return (after - before)</text>
+  <text x="26" y="470" font-size="11">    * 100 / before;</text>
+  <text x="26" y="485" font-size="11">}</text>
+  <rect x="220" y="362" width="205" height="179" fill="var(--m-paper, #fafaf5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="226" y="380" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">Ghidra 反编译</text>
+  <text x="226" y="395" font-size="11">ulong _percent_change(</text>
+  <text x="226" y="410" font-size="11">  ulong param_1,int param_2)</text>
+  <text x="226" y="425" font-size="11">iVar2 = (int)param_1;</text>
+  <text x="226" y="440" font-size="11">if (iVar2 != 0) {</text>
+  <text x="226" y="455" font-size="11">  uVar1 = 0;</text>
+  <text x="226" y="470" font-size="11">  if (iVar2 != 0) {</text>
+  <text x="226" y="485" font-size="11">  uVar1 = ((param_2 - iVar2)</text>
+  <text x="226" y="500" font-size="11">    * 100) / iVar2;</text>
+  <text x="226" y="515" font-size="11">  param_1 = (ulong)uVar1;</text>
+  <text x="226" y="530" font-size="11">return param_1;</text>
+  <rect x="435" y="362" width="185" height="119" fill="var(--m-paper, #fafaf5)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="441" y="380" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">clang -O1 生成 · 24 字节</text>
+  <text x="441" y="395" font-size="11">500  cbz w0, 0x100000514</text>
+  <text x="441" y="410" font-size="11">504  sub w8, w1, w0</text>
+  <text x="441" y="425" font-size="11">508  mov w9, #0x64</text>
+  <text x="441" y="440" font-size="11">50c  mul w8, w8, w9</text>
+  <text x="441" y="455" font-size="11">510  sdiv w0, w8, w0</text>
+  <text x="441" y="470" font-size="11">514  ret</text>
+  </g>
+  <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
+  <line x1="322" y1="541" x2="322" y2="564" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#plate-rea-investigation-head-teal)"/>
+  <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M322 541 L322 564" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
+  <rect class="m-knock" x="327" y="541.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="330" y="552.5" font-size="11.5" fill="var(--m-teal-ink, #18696a)">记录</text>
+  <rect x="20" y="565" width="600" height="92" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="320" y="591.1" font-size="12" text-anchor="middle" font-weight="700">_percent_change 的 Evidence ev_b492c85e</text>
+  <text x="320" y="608.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">操作 analyze_function · provider ghidra 12.1.4</text>
+  <text x="320" y="623.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">confidence observed · 10 条限制</text>
+  <text x="320" y="638.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">对象 ledger-arm64-O1 · mach-o arm64</text>
+  </g>
 </svg>

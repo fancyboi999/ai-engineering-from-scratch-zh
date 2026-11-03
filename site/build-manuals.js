@@ -827,11 +827,11 @@ function webPage(manual) {
   });
 }
 
-const INDEX_LEDE = '每本手册围绕一个主题的固定版本，从用途讲到每次请求与响应。示例来自上游保存的运行记录，规则链接到对应规范。捕获记录保留原始来源，不等同于本次中文同步的实时验证。';
+const INDEX_LEDE = '每本手册讲清一个主题的一个确切版本，从用途讲到每次请求与响应。示例来自可运行系统的录制记录，每条规则都链接到它出自的规范原文。';
 const INDEX_GIVES = [
   ['阅读', '网页版配有可随滚动播放的图表。'],
   ['留存', '已发布完整中文 PDF，并保留同一正文的打印版 HTML。'],
-  ['复现', '源码包含捕获套件。运行前先核对离线范围、工具版本与权限要求。'],
+  ['复现', '一条命令运行捕获套件，重新生成手册中的每段代码清单。'],
 ];
 
 function manualCard(manual) {
@@ -840,7 +840,7 @@ function manualCard(manual) {
   actions.push(action(printUrl(manual), '打印版'));
   actions.push(sourceAction(manual));
   const draft = manual.status === 'draft' ? '<div class="m-draft-note">草稿版本</div>' : '';
-  return `<article class="m-index-card">${draft}<div class="m-kicker m-index-pin">${pinLine(manual)}</div><h2 class="m-index-name"><a href="${pageName(manual.id)}">${escapeHtml(manual.title)}</a></h2><p class="m-index-subtitle">${escapeHtml(manual.subtitle)}</p><p class="m-index-summary">${escapeHtml(manual.summary)}</p>${partDots(manual)}<div class="m-kicker m-index-stats">${manual.parts.length} 部分 · ${sectionCount(manual)} 节 · ${manual.figures.size} 图</div><div class="m-index-actions">${actions.join('')}</div>${plateHtml(manual, 'class="m-fig m-plate"')}</article>`;
+  return `<article class="m-index-card">${plateHtml(manual, 'class="m-fig m-plate"')}<div class="m-index-body">${draft}<div class="m-kicker m-index-pin">${pinLine(manual)}</div><h2 class="m-index-name"><a href="${pageName(manual.id)}">${escapeHtml(manual.title)}</a></h2><p class="m-index-subtitle">${escapeHtml(manual.subtitle)}</p><p class="m-index-summary">${escapeHtml(manual.summary)}</p>${partDots(manual)}<div class="m-kicker m-index-stats">${manual.parts.length} 部分 · ${sectionCount(manual)} 节 · ${manual.figures.size} 图</div><div class="m-index-actions">${actions.join('')}</div></div></article>`;
 }
 
 function manualUrl(manual) { return `/manual-${manual.id}`; }
@@ -954,7 +954,7 @@ function writeSections(manual, siteDir = SITE) {
 
 function indexPage(listed) {
   const gives = INDEX_GIVES.map(([label, text]) => `<li><span class="m-kicker">${label}</span><p>${text}</p></li>`).join('');
-  const body = listed.length ? listed.map(manualCard).join('') : '<p class="m-index-empty">尚无已发布的手册。</p>';
+  const body = listed.length ? `<div class="m-index-grid">${listed.map(manualCard).join('')}</div>` : '<p class="m-index-empty">尚无已发布的手册。</p>';
   return pageShell({
     title: '手册 - AI Engineering from Scratch',
     ogTitle: '手册 · AI Engineering from Scratch',
@@ -962,7 +962,7 @@ function indexPage(listed) {
     canonical: `${SITE_ORIGIN}/manuals.html`,
     noindex: !listed.some(manual => manual.status === 'ready'),
     card: 'page/manuals',
-    main: `<main id="main" class="m-web"><div class="manual m-index"><section class="m-index-hero">${ditherHtml('manuals', '手册', false)}<div class="m-kicker m-cover-kicker">AI Engineering from Scratch</div><h1 class="m-index-title">手册</h1><p class="m-index-lede">${INDEX_LEDE}</p><ul class="m-index-gives">${gives}</ul></section>${body}</div></main>`,
+    main: `<main id="main" class="m-web"><div class="manual m-index"><section class="m-index-hero">${ditherHtml('manuals', '手册', true)}<div class="m-index-intro"><div class="m-kicker m-cover-kicker">AI Engineering from Scratch</div><h1 class="m-index-title">手册</h1><p class="m-index-lede">${INDEX_LEDE}</p></div><ul class="m-index-gives">${gives}</ul></section>${body}</div></main>`,
   });
 }
 
