@@ -108,6 +108,20 @@
         ".github/workflows/curriculum.yml",
         "site/ui-strings.json"
       ]
+    },
+    {
+      "scope": "手册首页网格、等距封面与 Star 提示补齐（2026-11-03）",
+      "decision": "基准已含但未落地的上游改动在此补齐：b03ba859/b9ab0e5b 的手册首页网格与精简 hero（web.css 先前已同步，build-manuals.js 标记未跟进）；A2A、Docker Sandboxes、逆向工程三本手册的等距封面插图（db5fb253、e1f857de、6fba3c6f、80b20936、5123b89b、634421be、a965fbc8）；ef427cdb 的 star-nudge，指向中文仓 fancyboi999/ai-engineering-from-scratch-zh，文案中文化，并修正 busy() 把课程页用 CSS 隐藏的 aria-modal 图示弹层当作已打开、导致课程页永不提示的问题。手册首页导语按上游原意翻译。同步基准不前移。",
+      "paths": [
+        "site/build-manuals.js",
+        "manuals/a2a-101/",
+        "manuals/docker-sandboxes-101/",
+        "manuals/reverse-engineering-101/",
+        "site/star-nudge.js",
+        "site/test_star_nudge.js",
+        "site/header.js",
+        "lib/site-navigation.js"
+      ]
     }
   ]
 }

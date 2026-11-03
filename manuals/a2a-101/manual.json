@@ -122,7 +122,7 @@
   "plate": {
     "figure": "plate-planner-run",
     "title": "一个 planner，三个远程 agent",
-    "caption": "planner 读取三张卡片并委派三个任务：一个立即完成，一个回答问题后完成，一个操作员批准后完成。泳道按 capture/out/19-planner.log 的顺序从上到下排列，ID 缩短至 8 个字符。"
+    "caption": "planner 读取三张卡片并委派三个任务：一个立即完成，一个回答问题后完成，一个操作员批准后完成。泳道按 planner 日志的顺序从上到下排列，ID 缩短至 8 个字符。"
   },
   "parts": [
     {
