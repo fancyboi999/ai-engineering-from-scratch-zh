@@ -11,6 +11,7 @@
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
   var NARRATION_VERSION = '20261021a';
   var THEME_MENU_VERSION = '20261030a';
+  var STAR_NUDGE_VERSION = '20261103a';
   var HEADER_BASE = document.currentScript && document.currentScript.src
     ? new URL('.', document.currentScript.src).href
     : '';
@@ -186,6 +187,15 @@
     script.src = HEADER_BASE + 'theme-menu.js?v=' + THEME_MENU_VERSION;
     script.async = true;
     script.setAttribute('data-aifs-theme-menu', THEME_MENU_VERSION);
+    document.head.appendChild(script);
+  }
+
+  function ensureStarNudge() {
+    if (window.AIFSStarNudge || document.querySelector('script[data-aifs-star-nudge]')) return;
+    var script = document.createElement('script');
+    script.src = HEADER_BASE + 'star-nudge.js?v=' + STAR_NUDGE_VERSION;
+    script.async = true;
+    script.setAttribute('data-aifs-star-nudge', STAR_NUDGE_VERSION);
     document.head.appendChild(script);
   }
 
@@ -572,6 +582,7 @@
     loadStars();
     ensureThemeMenu();
     ensureNarration();
+    ensureStarNudge();
   }
 
   setupRouteLinks();
