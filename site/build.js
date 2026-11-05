@@ -2163,6 +2163,11 @@ function build() {
   console.log('Writing pre-rendered lesson code...');
   const lessonCode = require('./build-lessons').writeLessonCode({ siteDir: __dirname });
   console.log(lessonCode.skipped ? '   skipped: Shiki is not installed' : `   wrote ${lessonCode.blocks} code blocks for ${lessonCode.files.size} lessons`);
+  console.log('Writing interview pages...');
+  const interviews = require('./build-interviews').writeInterviews({ siteDir: __dirname });
+  hubs.interviewPages = interviews.pages;
+  hubs.interviews = interviews;
+  console.log(`   wrote ${interviews.questions.length} interview questions and ${interviews.scenarios.length} scenarios`);
   fs.writeFileSync(path.join(__dirname, 'hub-pages.json'), JSON.stringify({ pages: Object.fromEntries(
     [...hubs.phasePages, ...hubs.termPages].map(page => [page.href, {
       html: 'hubs' + page.href + '.html', markdown: 'agent-pages' + page.href + '.md',
@@ -2246,11 +2251,65 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
     fs.writeFileSync(target, versionSharedAssets(fs.readFileSync(target, 'utf8')));
   }
   syncCounts(totalLessons, artifacts.length);
+  writeHubSitemaps(hubs);
   writeSitemap(phases, glossaryTerms.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLessonPages(phases, seoManifests.lessonManifest);
   writeProjectPages(projects, ogCards.cards);
   require('./build-agents').build({ phases, glossaryTerms, roadmapPrereqs });
+}
+
+function urlsetXml(urls) {
+  const today = new Date().toISOString().slice(0, 10);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls.map(url => `  <url>\n    <loc>${SITE_ORIGIN}${url.loc.replace(/&/g, '&amp;')}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${url.freq}</changefreq>\n    <priority>${url.priority}</priority>\n  </url>`).join('\n') +
+    '\n</urlset>\n';
+}
+
+function writeHubSitemaps(hubs, siteDir = __dirname) {
+  return [
+    ['sitemap-phases.xml', (hubs.phasePages || []).map(page => ({ loc: page.href, priority: '0.8', freq: 'monthly' }))],
+    ['sitemap-glossary.xml', (hubs.termPages || []).map(page => ({ loc: page.href, priority: '0.5', freq: 'monthly' }))],
+    ['sitemap-cheatsheets.xml', (hubs.cheatsheetPages || []).map(page => ({ loc: page.href, priority: '0.5', freq: 'monthly' }))],
+    ['sitemap-practice.xml', (hubs.practicePages || []).map(page => ({ loc: page.href, priority: '0.6', freq: 'monthly' }))],
+    ['sitemap-interviews.xml', (hubs.interviewPages || []).map(page => ({ loc: page.href, priority: '0.6', freq: 'monthly' }))],
+  ].filter(([, urls]) => urls.length).map(([name, urls]) => {
+    fs.writeFileSync(path.join(siteDir, name), urlsetXml(urls), 'utf8');
+    return name;
+  });
+}
+
+function hubLlms(hubs) {
+  let out = `## Phase overviews\n`;
+  out += `Each phase has an overview page with its lessons, prerequisites, glossary terms, and a short FAQ. Request any overview or term page with Accept: text/markdown to get Markdown.\n\n`;
+  for (const phase of hubs.phaseModels || []) out += `- [${phase.headline}](${SITE_ORIGIN}${phase.href}): ${phase.label}\n`;
+  out += `\n## Glossary term pages\n`;
+  out += `${(hubs.termPages || []).length} glossary terms have their own page at ${SITE_ORIGIN}/glossary/<term slug>. [Glossary term sitemap](${SITE_ORIGIN}/sitemap-glossary.xml)\n\n`;
+  if (hubs.practice && hubs.practice.problems.length) {
+    const labels = { implement: 'Implement', research: 'Research', train: 'Train', lab: 'Lab' };
+    out += `## Practice tasks\n`;
+    out += `${hubs.practice.problems.length} practice tasks ask the learner to implement code from a lesson, implement a method from a research paper, train a tiny model to a target, or run an experiment and answer with numbers. Python with numpy runs the checks in the browser. Each page holds the statement only, and each task page returns Markdown with Accept: text/markdown. [Practice index in Markdown](${SITE_ORIGIN}/agent-pages/practice/index.md) \`python3 scripts/practice/run.py <id> <file>\` runs the checks offline. [Practice sitemap](${SITE_ORIGIN}/sitemap-practice.xml)\n\n`;
+    for (const kind of Object.keys(labels)) {
+      const list = hubs.practice.problems.filter(problem => problem.meta.kind === kind);
+      if (!list.length) continue;
+      out += `### ${labels[kind]}\n\n`;
+      for (const problem of list) out += `- [${problem.meta.title}](${SITE_ORIGIN}${problem.href}) (${problem.meta.difficulty}): ${problem.meta.summary} From [${problem.lessonTitle}](${SITE_ORIGIN}/lesson?path=${encodeURIComponent(problem.meta.lesson)})\n`;
+      out += `\n`;
+    }
+  }
+  if (hubs.interviews && hubs.interviews.items.length) {
+    const built = hubs.interviews;
+    out += `## Interview questions and scenarios\n`;
+    out += `${built.questions.length} interview questions and ${built.scenarios.length} incident scenarios in ${built.cards.length} cards. Each question page holds the prompt, then the short answer, the full answer, the follow-ups and the common wrong answers in folded sections. Each scenario page shows its evidence listings in order. Every number in an answer comes from a lesson, a manual section or a capture file in the repository. Each item page returns Markdown with Accept: text/markdown. [Interviews index in Markdown](${SITE_ORIGIN}/agent-pages/interviews/index.md) [Interviews JSON](${SITE_ORIGIN}/api/interviews.json) [Interviews sitemap](${SITE_ORIGIN}/sitemap-interviews.xml)\n\n`;
+    for (const card of built.cards) {
+      const items = built.byCard.get(card.id);
+      if (!items.length) continue;
+      out += `### ${card.title}\n\n`;
+      for (const item of items) out += `- [${item.data.title}](${SITE_ORIGIN}/interviews/${item.card}/${item.id}) (level ${item.data.level}, ${item.kind === 'scenario' ? 'scenario' : item.data.kind})\n`;
+      out += `\n`;
+    }
+  }
+  return out;
 }
 
 // ─── sitemap.xml from the same PHASES the site renders ───────────────────
@@ -2980,6 +3039,8 @@ module.exports = {
   verifySiteCss,
   writeLessonPages,
   withCard,
+  writeHubSitemaps,
+  hubLlms,
 };
 
 if (require.main === module) {

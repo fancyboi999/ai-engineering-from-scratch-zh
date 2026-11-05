@@ -53,6 +53,14 @@ const GROUPS = [
     },
   },
   {
+    id: 'interview',
+    title: '面试实战',
+    when: '逐题或逐场景准备 AI 工程技术面试。',
+    skills: {
+      'interview-prep': { line: '提出一道面试题或一个现场排障场景并等待你的回答；根据题库对回答进行评分、逐一追问，并将知识盲点引导至对应课程或手册。', say: ['模拟面试', '运行故障排查场景'], writes: 'INTERVIEW-LEARNING.md' },
+    },
+  },
+  {
     id: 'make',
     title: '制作图表与手册',
     when: '制作符合本站风格的图表和手册。',
