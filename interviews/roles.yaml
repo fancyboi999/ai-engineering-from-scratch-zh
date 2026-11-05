@@ -17,6 +17,6 @@
   path: learning-paths/ai-developer-relations-engineer.json
   cards: [prompting-structured-output, agents, protocols, rag, evaluation, transformers, multi-agent, system-design, scenarios, coding, behavioral]
 - id: inference-engineer
-  title: Inference Engineering
-  summary: Serve open models fast and cheap. Size GPU memory, tune the scheduler and the caches, and prove each change with a clean benchmark.
+  title: 推理服务工程 (Inference Engineering)
+  summary: 追求极致低成本与低延迟开源模型服务。精细规划显存、调优调度器与前缀缓存，并用严谨 benchmark 验证每一次优化。
   cards: [inference-serving, gpu-memory-quantization, transformers, tokenization-decoding, cost-capacity, production-mlops, post-training, multimodal, math-classical-ml, deep-learning, prompting-structured-output, system-design, scenarios, coding, behavioral]

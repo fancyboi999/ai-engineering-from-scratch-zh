@@ -1,28 +1,28 @@
 groups:
   - id: foundations
-    title: Foundations
-    summary: The math, the networks and the transformer that every later answer builds on.
+    title: 算法基础
+    summary: "支撑后续所有技术深度的数学、经典网络与 Transformer 核心。"
   - id: models
-    title: Models
-    summary: How a model is tuned after training, served to users, and fit into GPU memory.
+    title: 模型与服务
+    summary: "后训练微调、推理加速服务与 GPU 显存量化深度优化。"
   - id: applications
-    title: Applications
-    summary: Retrieval, prompts, structured output, evaluation and models that see and hear.
+    title: 场景应用
+    summary: "检索增强生成 (RAG)、Prompt 工程、结构化输出与多模态系统。"
   - id: agents
-    title: Agents
-    summary: Agent loops, protocols, teams of agents, sandboxes and evidence from binaries.
+    title: 智能体系统
+    summary: "Agent 控制循环、MCP/A2A 通信协议、多 Agent 协同与执行沙箱。"
   - id: production
-    title: Production
-    summary: "Operating a model service: releases, observability, cost, capacity and safety."
+    title: 生产运维
+    summary: "模型服务运维：灰度发布、系统可观测性、成本容量规划与 AI 安全。"
   - id: rounds
-    title: Rounds
-    summary: "Whole interview rounds: system design, incidents, coding and behavioral questions."
+    title: 综合面试轮次
+    summary: "完整面试轮次覆盖：系统架构设计、事故排查、手写代码与行为面试。"
 cards:
   - id: math-classical-ml
-    title: Math and classical ML
+    title: 数学与经典机器学习
     group: foundations
     planned: 15
-    summary: Linear algebra, probability, optimization, and the classical models that still win on tabular data.
+    summary: "线性代数、概率统计、数值优化与仍主导表格数据的经典模型。"
     lessons:
       - phases/01-math-foundations/02-vectors-matrices-operations
       - phases/01-math-foundations/05-chain-rule-and-autodiff
@@ -38,10 +38,10 @@ cards:
       - phases/02-ml-fundamentals/11-ensemble-methods
     manuals: []
   - id: deep-learning
-    title: Deep learning
+    title: 深度学习基础
     group: foundations
     planned: 15
-    summary: Backpropagation, losses, optimizers, initialization and how to debug a network that does not learn.
+    summary: "反向传播、损失函数、优化器与网络不收敛的排错定位。"
     lessons:
       - phases/03-deep-learning-core/01-the-perceptron
       - phases/03-deep-learning-core/02-multi-layer-networks
@@ -57,10 +57,10 @@ cards:
       - phases/19-capstone-projects/44-cosine-lr-warmup
     manuals: []
   - id: transformers
-    title: Transformers
+    title: Transformer 核心架构
     group: foundations
     planned: 15
-    summary: Attention, positions, the transformer block, the KV cache and the cost of long context.
+    summary: "自注意力、多头注意力、KV 缓存与模型缩放定律。"
     lessons:
       - phases/05-nlp-foundations-to-advanced/10-attention-mechanism
       - phases/07-transformers-deep-dive/02-self-attention-from-scratch
@@ -76,10 +76,10 @@ cards:
       - phases/19-capstone-projects/34-transformer-block
     manuals: []
   - id: tokenization-decoding
-    title: Tokenization, sampling and decoding
+    title: 分词、采样与解码策略
     group: foundations
     planned: 15
-    summary: How text becomes tokens, how a model picks the next token, and how speculation makes decoding faster.
+    summary: "BPE 分词器、推测解码、束搜索与结构化约束解码。"
     lessons:
       - phases/05-nlp-foundations-to-advanced/19-subword-tokenization
       - phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding
@@ -96,10 +96,10 @@ cards:
       - phases/19-capstone-projects/31-tokenized-dataset-sliding-window
     manuals: []
   - id: post-training
-    title: Post-training
+    title: 训练后微调
     group: models
     planned: 15
-    summary: Supervised tuning, preference tuning, LoRA and reinforcement learning on a trained model.
+    summary: "SFT 数据配比、LoRA 参数高效微调、DPO 与强化学习 (RLHF/GRPO)。"
     lessons:
       - phases/09-reinforcement-learning/09-reward-modeling-rlhf
       - phases/10-llms-from-scratch/06-instruction-tuning-sft
@@ -115,10 +115,10 @@ cards:
     manuals:
       - miles-101
   - id: inference-serving
-    title: Inference and serving systems
+    title: 推理与服务系统
     group: models
     planned: 30
-    summary: Batching, the KV cache, prefix caching, schedulers and how to measure a serving engine.
+    summary: "vLLM、SGLang、RadixAttention 与高吞吐低延迟服务架构。"
     lessons:
       - phases/07-transformers-deep-dive/12-kv-cache-flash-attention
       - phases/10-llms-from-scratch/11-quantization
@@ -136,10 +136,10 @@ cards:
       - vllm-101
       - sglang-101
   - id: gpu-memory-quantization
-    title: GPU memory, quantization and hardware
+    title: 显存优化、量化与硬件
     group: models
     planned: 15
-    summary: Where GPU memory goes, how quantization frees it, and how work splits across GPUs.
+    summary: "FP8、AWQ、GPTQ、显存静态规划与 CUDA Graphs。"
     lessons:
       - phases/10-llms-from-scratch/05-scaling-distributed
       - phases/10-llms-from-scratch/11-quantization
@@ -157,10 +157,10 @@ cards:
       - vllm-101
       - sglang-101
   - id: rag
-    title: RAG
+    title: 检索增强生成 (RAG)
     group: applications
     planned: 15
-    summary: Chunking, hybrid retrieval, reranking and how to measure a retrieval pipeline.
+    summary: "分块策略、混合检索、Cross-Encoder 重排与端到端召回评估。"
     lessons:
       - phases/05-nlp-foundations-to-advanced/13-question-answering
       - phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag
@@ -176,10 +176,10 @@ cards:
       - phases/19-capstone-projects/69-end-to-end-rag-system
     manuals: []
   - id: prompting-structured-output
-    title: Prompting and structured output
+    title: Prompt 工程与结构化输出
     group: applications
     planned: 15
-    summary: Prompt design, context engineering, schemas, constrained decoding and function calls.
+    summary: "思维链、前缀缓存友好布局与 JSON Schema 约束解码。"
     lessons:
       - phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding
       - phases/11-llm-engineering/01-prompt-engineering
@@ -195,10 +195,10 @@ cards:
       - phases/14-agent-engineering/34-repo-memory-and-state
     manuals: []
   - id: evaluation
-    title: Evaluation
+    title: 模型与系统评测
     group: applications
     planned: 15
-    summary: Metrics, eval harnesses, judges, calibration and how to trust a score.
+    summary: "pass@k 无偏估计、困惑度校准、ECE 与业务质量门禁。"
     lessons:
       - phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks
       - phases/05-nlp-foundations-to-advanced/28-long-context-evaluation
@@ -216,10 +216,10 @@ cards:
       - vllm-101
       - sglang-101
   - id: multimodal
-    title: Multimodal
+    title: 多模态 AI 模型
     group: applications
     planned: 15
-    summary: How vision and language models join images and text, and how they are trained.
+    summary: "视觉编码器、AnyRes 动态网格、交叉注意力与投影对齐。"
     lessons:
       - phases/04-computer-vision/25-vision-language-models
       - phases/08-generative-ai/19-visual-autoregressive-var
@@ -254,10 +254,10 @@ cards:
       - phases/19-capstone-projects/21-tool-registry-schema-validation
     manuals: []
   - id: protocols
-    title: "Protocols: MCP, A2A and skills"
+    title: 协议体系：MCP、A2A 与技能
     group: agents
     planned: 15
-    summary: How agents call tools and other agents, and how those calls stay safe.
+    summary: "Model Context Protocol、Agent-to-Agent 协议与可移植能力契约。"
     lessons:
       - phases/13-tools-and-protocols/06-mcp-fundamentals
       - phases/13-tools-and-protocols/07-building-an-mcp-server
@@ -279,10 +279,10 @@ cards:
     manuals:
       - a2a-101
   - id: multi-agent
-    title: Multi-agent systems
+    title: 多 Agent 协同系统
     group: agents
     planned: 15
-    summary: Supervisors, handoffs, shared memory, consensus and the failure modes of agent teams.
+    summary: "角色分工、投票辩论拓扑、接力风暴与共识机制。"
     lessons:
       - phases/16-multi-agent-and-swarms/01-why-multi-agent
       - phases/16-multi-agent-and-swarms/04-primitive-model
@@ -298,10 +298,10 @@ cards:
       - phases/16-multi-agent-and-swarms/24-evaluation-coordination-benchmarks
     manuals: []
   - id: sandboxes
-    title: Sandboxes
+    title: 执行沙箱与环境安全
     group: agents
     planned: 15
-    summary: Isolation for agents that run code or drive a computer, and the policy around it.
+    summary: "Docker 容器隔离、进程网络限制、权限门禁与资源审计。"
     lessons:
       - phases/12-multimodal-ai/21-embodied-vlas-openvla-pi0-groot
       - phases/12-multimodal-ai/25-multimodal-agents-computer-use
@@ -311,10 +311,10 @@ cards:
     manuals:
       - docker-sandboxes-101
   - id: evidence-reverse-engineering
-    title: Evidence and reverse engineering
+    title: 运行证据与二进制逆向
     group: agents
     planned: 15
-    summary: Reading binaries, recovering intent, and stating confidence with the evidence for it.
+    summary: "ELF 结构、反编译控制流分析与字节级等价重构证明。"
     lessons:
       - phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch
       - phases/13-tools-and-protocols/33-disassembly-and-control-flow
@@ -331,10 +331,10 @@ cards:
     manuals:
       - reverse-engineering-101
   - id: production-mlops
-    title: Production and MLOps
+    title: 生产落地与 MLOps
     group: production
     planned: 15
-    summary: Observability, progressive delivery, A/B tests, chaos tests and on-call for model services.
+    summary: "影子流量、Canary 灰度发布、OTel 追踪与实时告警排障。"
     lessons:
       - phases/11-llm-engineering/13-production-app
       - phases/13-tools-and-protocols/20-opentelemetry-genai
@@ -350,10 +350,10 @@ cards:
       - phases/19-capstone-projects/28-observability-otel-traces
     manuals: []
   - id: cost-capacity
-    title: Cost and capacity
+    title: 成本与算力容量规划
     group: production
     planned: 15
-    summary: Caching, routing, batch APIs, cold starts and the cost of each request.
+    summary: "并发吞吐测算、Token 经济学与高性价比硬件选型。"
     lessons:
       - phases/11-llm-engineering/11-caching-cost
       - phases/11-llm-engineering/15-prompt-caching
@@ -371,10 +371,10 @@ cards:
       - vllm-101
       - sglang-101
   - id: safety
-    title: Safety
+    title: AI 安全与合规护栏
     group: production
     planned: 15
-    summary: Reward hacking, prompt injection, jailbreaks, refusals and safety gates.
+    summary: "Prompt 注入防御、越狱分类、合规差距与运行时安全拦截。"
     lessons:
       - phases/18-ethics-safety-alignment/02-reward-hacking-goodhart
       - phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification
@@ -390,10 +390,10 @@ cards:
       - phases/19-capstone-projects/87-end-to-end-safety-gate
     manuals: []
   - id: system-design
-    title: System design
+    title: AI 系统架构设计
     group: rounds
     planned: 15
-    summary: "Design a model service end to end: requirements, data, model, serving, evaluation and cost."
+    summary: "端到端系统架构设计与高并发生产服务权衡决策。"
     lessons:
       - phases/02-ml-fundamentals/01-what-is-machine-learning
       - phases/02-ml-fundamentals/19-ml-system-design
@@ -410,10 +410,10 @@ cards:
       - phases/19-capstone-projects/40-dpo-from-scratch
     manuals: []
   - id: scenarios
-    title: Incidents and scenarios
+    title: 生产故障现场排障演练
     group: rounds
     planned: 30
-    summary: Measured incidents from our manuals. Read the evidence one listing at a time and find the cause.
+    summary: "基于真实生产运行日志与监控指标的事故排查演练。"
     lessons:
       - phases/14-agent-engineering/25-multi-agent-debate
       - phases/14-agent-engineering/26-failure-modes-agentic
@@ -435,10 +435,10 @@ cards:
       - a2a-101
       - reverse-engineering-101
   - id: coding
-    title: Coding
+    title: 核心算法手写代码
     group: rounds
     planned: 15
-    summary: Write the code that the lessons build. Each item links to a practice task with checks.
+    summary: "注意力层、分词器、优化器与核心算法纯手写实现考核。"
     lessons:
       - phases/05-nlp-foundations-to-advanced/19-subword-tokenization
       - phases/07-transformers-deep-dive/02-self-attention-from-scratch
@@ -454,10 +454,10 @@ cards:
       - phases/19-capstone-projects/44-cosine-lr-warmup
     manuals: []
   - id: behavioral
-    title: Behavioral
+    title: 工程决策与行为面试
     group: rounds
     planned: 15
-    summary: Framing work, planning from evidence, delegation and turning feedback into a system.
+    summary: "工程权衡、技术决策复盘、沟通协同与工程师品味。"
     lessons:
       - phases/14-agent-engineering/44-plan-from-evidence
       - phases/14-agent-engineering/45-delegate-with-isolation
