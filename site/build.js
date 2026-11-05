@@ -2160,6 +2160,9 @@ function build() {
   hubs.practicePages = practice.pages;
   hubs.practice = practice;
   console.log(`   wrote ${practice.problems.length} practice problems in ${practice.tracks.length} tracks`);
+  console.log('Writing pre-rendered lesson code...');
+  const lessonCode = require('./build-lessons').writeLessonCode({ siteDir: __dirname });
+  console.log(lessonCode.skipped ? '   skipped: Shiki is not installed' : `   wrote ${lessonCode.blocks} code blocks for ${lessonCode.files.size} lessons`);
   fs.writeFileSync(path.join(__dirname, 'hub-pages.json'), JSON.stringify({ pages: Object.fromEntries(
     [...hubs.phasePages, ...hubs.termPages].map(page => [page.href, {
       html: 'hubs' + page.href + '.html', markdown: 'agent-pages' + page.href + '.md',
@@ -2982,5 +2985,10 @@ module.exports = {
 if (require.main === module) {
   verifySiteCss();
   if (process.argv.includes('--check')) verifyCurriculum();
-  else build();
+  else {
+    require('./lib/code').init().then(build).catch(error => {
+      console.error(error);
+      process.exitCode = 1;
+    });
+  }
 }

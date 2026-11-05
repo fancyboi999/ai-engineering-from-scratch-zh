@@ -18,12 +18,16 @@
   var PALETTE_ID  = 'cmdPalette';
   var MAX_RESULTS = 12;
   var BODY_ATTR   = 'data-palette-open';
+  var PAGEFIND_URL = '/pagefind/pagefind.js';
+  var PAGE_RESULTS = 6;
 
   // ── Module state ─────────────────────────────────────────────────────
   var _index      = null;   // lazy-built flat array of searchable items
   var _activeIdx  = -1;
   var _isOpen     = false;
   var _prevFocus  = null;
+  var _pagefind   = null;
+  var _pageQuery  = '';
 
   function learningPathEntryPath(entry) {
     return typeof entry === 'string' ? entry : entry && entry.path ? entry.path : '';
@@ -439,6 +443,7 @@
 
     var inp = document.getElementById('cpInput');
     inp.addEventListener('input', _onInput);
+    inp.addEventListener('focus', loadPagefind);
     inp.addEventListener('keydown', _onKeyDown);
   }
 
@@ -557,7 +562,7 @@
 
       if (r.kind === 'page') {
         dest = r.url;
-        chip = '学习工具';
+        chip = r.pageType || '页面';
         chipClass += ' cp-item-chip--alt';
       } else if (r.kind === 'learning-path') {
         dest = r.url;
@@ -638,11 +643,129 @@
     }
   }
 
+  function loadPagefind() {
+    if (!_pagefind) {
+      _pagefind = import(PAGEFIND_URL).then(function (pagefind) {
+        return Promise.resolve(pagefind.options({ excerptLength: 18 })).then(function () {
+          pagefind.init();
+          return pagefind;
+        });
+      }).catch(function () { return null; });
+    }
+    return _pagefind;
+  }
+
+  function excerptText(html) {
+    if (typeof DOMParser === 'undefined') return String(html || '').replace(/<[^>]*>/g, '');
+    return new DOMParser().parseFromString(String(html || ''), 'text/html').body.textContent;
+  }
+
+  function hasPhaseId(r) {
+    return r.phaseId !== undefined && r.phaseId !== null;
+  }
+
+  function lessonChip(r) {
+    return hasPhaseId(r) ? 'Phase ' + String(r.phaseId).padStart(2, '0') : 'Lesson';
+  }
+
+  function lessonMeta(r) {
+    var parts = [];
+    if (r.type && r.type !== '—') parts.push(r.type);
+    if (r.lang && r.lang !== '—') parts.push(r.lang);
+    if (!hasPhaseId(r) && r.phaseName) parts.push(r.phaseName);
+    return parts;
+  }
+
+  function lessonPathFromUrl(url) {
+    var match = /^\/?lesson(?:\.html)?\?(?:[^#]*&)?path=([^&#]+)/.exec(String(url || ''));
+    if (!match) return '';
+    try {
+      var value = decodeURIComponent(match[1]);
+      return /^phases\/[^/?#]+\/[^/?#]+$/.test(value) ? value : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function pageItem(data) {
+    var filters = data.filters || {};
+    var pageType = filters.type && filters.type[0] ? filters.type[0] : 'Page';
+    var item = {
+      kind: 'page',
+      name: (data.meta && data.meta.title) || data.url,
+      summary: excerptText(data.excerpt),
+      url: data.url,
+      pageType: pageType
+    };
+    var lessonPath = pageType === 'Lesson' ? lessonPathFromUrl(data.url) : '';
+    if (lessonPath) {
+      item.kind = 'lesson';
+      item.lessonPath = lessonPath;
+      item.phaseName = filters.phase && filters.phase[0] ? filters.phase[0] : '';
+    }
+    return item;
+  }
+
+  function mergePages(local, pages, limit) {
+    var seen = {};
+    function mark(item) {
+      if (item.kind === 'lesson' && item.lessonPath) seen['path:' + item.lessonPath] = true;
+      else seen['name:' + String(item.name).toLowerCase()] = true;
+      if (item.url) seen['url:' + item.url] = true;
+    }
+    function isSeen(item) {
+      if (item.kind === 'lesson' && item.lessonPath) return !!seen['path:' + item.lessonPath];
+      return !!(seen['url:' + item.url] || seen['name:' + String(item.name).toLowerCase()]);
+    }
+    local.forEach(mark);
+    var extra = [];
+    pages.map(pageItem).forEach(function (item) {
+      if (isSeen(item) || (limit !== undefined && extra.length >= limit)) return;
+      mark(item);
+      extra.push(item);
+    });
+    return local.concat(extra);
+  }
+
+  function loadPageBatches(results, local, limit, isCurrent) {
+    var pages = [];
+    function next(start) {
+      if (start >= results.length || !isCurrent()) return Promise.resolve(pages);
+      var batch = results.slice(start, start + limit);
+      return Promise.all(batch.map(function (result) { return result.data(); })).then(function (data) {
+        pages = pages.concat(data);
+        if (mergePages(local, pages, limit).length - local.length >= limit) return pages;
+        return next(start + batch.length);
+      });
+    }
+    return next(0);
+  }
+
+  function searchPages(query) {
+    _pageQuery = query;
+    if (!query.trim()) return;
+    function isCurrent() { return _pageQuery === query; }
+    loadPagefind().then(function (pagefind) {
+      if (!pagefind || !isCurrent()) return null;
+      return pagefind.debouncedSearch(query, {}, 160);
+    }).then(function (found) {
+      if (!found || !isCurrent()) return null;
+      var local = search(query);
+      return loadPageBatches(found.results, local, PAGE_RESULTS, isCurrent).then(function (pages) {
+        return { local: local, pages: pages };
+      });
+    }).then(function (merged) {
+      if (!merged || !merged.pages.length || !isCurrent() || !_isOpen) return;
+      renderResults(mergePages(merged.local, merged.pages, PAGE_RESULTS));
+    }).catch(function () {});
+  }
+
   // ── Event handlers ───────────────────────────────────────────────────
   function _onInput(e) {
     var query = e.target.value;
     renderResults(search(query));
     _activeIdx = -1;
+    searchPages(query.trim());
   }
 
   function _onKeyDown(e) {
@@ -799,6 +922,12 @@
       learningPathDestination: learningPathDestination,
       navigationDestination: navigationDestination,
       resultIndexForEnter: resultIndexForEnter,
+      mergePages: mergePages,
+      pageItem: pageItem,
+      lessonPathFromUrl: lessonPathFromUrl,
+      lessonChip: lessonChip,
+      lessonMeta: lessonMeta,
+      loadPageBatches: loadPageBatches,
     };
   }
 

@@ -34,4 +34,8 @@ function readLessonMarkdown(root, lessonPath, manifest) {
   }
 }
 
-module.exports = { ...MDRender, readLessonMarkdown };
+const api = { ...MDRender, readLessonMarkdown };
+if (typeof window !== 'undefined') {
+  window.AIFSLessonMarkdown = api;
+}
+module.exports = api;

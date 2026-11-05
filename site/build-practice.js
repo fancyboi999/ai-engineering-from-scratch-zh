@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const markdown = require('./md-render');
+const code = require('./lib/code');
 const { phaseSlug } = require('../lib/hub-routes');
 const { SITE_HEADER } = require('./build-hubs');
 
@@ -165,8 +166,8 @@ const META_KEYS = ['id', 'title', 'kind', 'summary', 'difficulty', 'tags', 'less
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap';
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
-const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/practice.css">';
-const BODY_ASSETS = '<script src="/header.js" defer></script>\n<script src="/md-render.js" defer></script>\n<script src="/practice-store.js" defer></script>\n<script src="/practice.js" defer></script>';
+const HEAD_ASSETS = '<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/practice.css">\n<link rel="stylesheet" href="/code.css">';
+const BODY_ASSETS = '<script src="/header.js" defer></script>\n<script src="/code-copy.js" defer></script>\n<script src="/md-render.js" defer></script>\n<script src="/practice-store.js" defer></script>\n<script src="/practice.js" defer></script>';
 const FOOTER_LINKS = [['/practice', '练习'], ['/catalog', '课程目录'], ['/prereqs.html', '路线图'], ['/glossary', '术语表'], ['/about', '关于本站']];
 
 function escapeHtml(value) {
@@ -183,7 +184,7 @@ function sha(text) {
 
 function versionPracticeAssets(html, siteDir, versionShared = value => value) {
   let output = versionShared(html, siteDir);
-  for (const [file, attribute] of [['practice.css', 'href'], ['practice-store.js', 'src'], ['practice.js', 'src']]) {
+  for (const [file, attribute] of [['practice.css', 'href'], ['code.css', 'href'], ['practice-store.js', 'src'], ['practice.js', 'src']]) {
     const digest = sha(read(path.join(siteDir, file)));
     const pattern = new RegExp(`(${attribute}=["']\\/?${file.replace('.', '\\.')})(?:\\?[^"']*)?(["'])`, 'g');
     output = output.replace(pattern, `$1?v=${digest}$2`);
@@ -438,8 +439,8 @@ function problemMain(problem, built, assets) {
   const statement = `<section class="pr-statement" aria-labelledby="statement"><h2 id="statement" class="pr-visually-hidden">题目说明</h2>${problem.statementHtml}${meta.kind === 'research' ? citationHtml(meta.paper) : ''}</section>`;
   const hints = `<section class="pr-panel pr-hints" aria-labelledby="hints"><div class="pr-panel-head"><h2 id="hints">提示</h2><span class="pr-panel-count" data-hint-count>${problem.hintsHtml.length} 条提示</span></div><ol class="pr-hint-list" data-hints></ol><button class="pr-btn" type="button" data-hint-next>显示第 1 条提示（共 ${problem.hintsHtml.length} 条）</button></section>`;
   const solution = `<section class="pr-panel pr-solution" aria-labelledby="solution"><div class="pr-panel-head"><h2 id="solution">参考实现与说明</h2><span class="pr-lock" data-lock>尚未解锁</span></div><p class="pr-locked-note" data-locked-note>提交答案并通过全部检查后，即可查看参考实现与说明。</p><div data-solution hidden></div></section>`;
-  const support = problem.files['support.py'] ? `<details class="pr-panel pr-support"><summary>辅助代码：support.py</summary><p>你的代码和检查会通过 <code>from support import ...</code> 导入此模块。请勿修改。</p><pre class="pr-support-code"><code>${markdown.highlightSyntax(problem.files['support.py'].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'), 'python')}</code></pre></details>` : '';
-  const local = `<details class="pr-panel pr-local"><summary>在本机运行</summary><p>克隆仓库、安装 NumPy，然后在终端运行相同的检查：</p><pre><code>python3 scripts/practice/run.py ${meta.id} my_answer.py\npython3 scripts/practice/run.py ${meta.id} my_answer.py --examples</code></pre><p>请从 <a href="${REPO}/blob/main/practice/${meta.id}/starter.py">starter.py</a> 开始编写 <code>my_answer.py</code>。</p></details>`;
+  const support = problem.files['support.py'] ? `<details class="pr-panel pr-support"><summary>辅助代码：support.py</summary><p>你的代码和检查会通过 <code>from support import ...</code> 导入此模块。请勿修改。</p>${code.render(problem.files['support.py'], 'python', { label: 'support.py' })}</details>` : '';
+  const local = `<details class="pr-panel pr-local"><summary>在本机运行</summary><p>克隆仓库、安装 NumPy，然后在终端运行相同的检查：</p>${code.render(`python3 scripts/practice/run.py ${meta.id} my_answer.py\npython3 scripts/practice/run.py ${meta.id} my_answer.py --examples`, 'bash')}<p>请从 <a href="${REPO}/blob/main/practice/${meta.id}/starter.py">starter.py</a> 开始编写 <code>my_answer.py</code>。</p></details>`;
   const pager = `<nav class="pr-pager" aria-label="练习题导航">${previous ? `<a href="${previous.href}" rel="prev">← ${escapeHtml(previous.meta.title)}</a>` : '<span></span>'}<a href="${BASE}">全部练习</a>${next ? `<a href="${next.href}" rel="next">${escapeHtml(next.meta.title)} →</a>` : '<span></span>'}</nav>`;
   const shortcuts = '<details class="pr-keys"><summary>键盘快捷键</summary><dl><dt><kbd>Ctrl</kbd> <kbd>Enter</kbd></dt><dd>运行示例</dd><dt><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Enter</kbd></dt><dd>提交答案</dd><dt><kbd>Tab</kbd> / <kbd>Shift</kbd> <kbd>Tab</kbd></dt><dd>增加或减少缩进</dd><dt><kbd>Esc</kbd> 后按 <kbd>Tab</kbd></dt><dd>将焦点移出编辑器</dd><dt><kbd>Alt</kbd> <kbd>H</kbd></dt><dd>显示下一条提示</dd></dl><p>Mac 上请用 <kbd>Cmd</kbd> 替代 <kbd>Ctrl</kbd>。</p></details>';
   const editor = `<section class="pr-work" aria-labelledby="editor-title"><div class="pr-toolbar"><h2 id="editor-title" class="pr-toolbar-title">编写代码</h2><span class="pr-runtime" data-runtime aria-live="polite">首次运行时加载 Python</span><div class="pr-toolbar-actions"><button class="pr-btn" type="button" data-reset title="将代码恢复为起始模板">重置</button><button class="pr-btn" type="button" data-run title="运行示例（Ctrl + Enter）">运行示例</button><button class="pr-btn pr-btn-primary" type="button" data-submit title="运行全部检查（Ctrl + Shift + Enter）">提交答案</button></div></div><div class="pr-editor" data-editor><pre class="pr-editor-view" aria-hidden="true"><code data-editor-view></code></pre><textarea class="pr-editor-input" data-editor-input spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Python 代码编辑器" aria-describedby="editor-help">${escapeHtml(problem.files['starter.py'])}</textarea></div><p class="pr-editor-help" id="editor-help">编辑时会自动保存代码。<span class="pr-mobile-note">手机上可以阅读和编辑代码；建议在电脑上运行检查。</span></p>${shortcuts}${meta.kind === 'train' ? `<figure class="pr-curve" data-curve hidden><figcaption><span>训练损失曲线</span><span data-curve-label></span></figcaption><svg viewBox="0 0 400 120" preserveAspectRatio="none" role="img" aria-label="训练损失曲线"><polyline data-curve-line points="" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"></polyline></svg></figure>` : ''}<div class="pr-results" data-results aria-live="polite"><p class="pr-results-empty">选择“运行示例”检查示例，或提交答案运行全部检查。</p></div></section>`;
@@ -597,6 +598,10 @@ function solutionLines(problem) {
   return problem.files['solution.py'].split('\n').map(line => line.trim()).filter(line => line.length >= 18 && !/^(?:def |import |from |raise NotImplementedError)/.test(line));
 }
 
+function pageText(html) {
+  return html.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, '\u00a0').replace(/&amp;/g, '&');
+}
+
 function checkPractice(built) {
   const problems = [];
   for (const problem of built.problems) {
@@ -634,4 +639,4 @@ function main(argv) {
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));
 
-module.exports = { loadPractice, buildPractice, writePractice, checkPractice, practiceMap, hintList, countChecks, PYODIDE_VERSION, PYODIDE_BASE, BASE };
+module.exports = { loadPractice, buildPractice, writePractice, checkPractice, pageText, practiceMap, hintList, countChecks, PYODIDE_VERSION, PYODIDE_BASE, BASE };

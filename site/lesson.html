@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="certifications.css?v=20261026a">
   <link rel="stylesheet" href="highlights.css?v=20261026a">
   <link rel="stylesheet" href="lesson-walkthrough.css?v=20261026a">
+  <link rel="stylesheet" href="code.css">
   <style>
     .scroll-progress {
       position: fixed;
@@ -2921,6 +2922,7 @@
   <script src="header.js?v=20261103a" defer></script>
   <script src="cmdpalette.js?v=20261026a" defer></script>
   <script src="lesson-figures.js?v=b88d7b13ddfa"></script>
+  <script src="code-copy.js" defer></script>
   <script src="figure-manifest.js?v=b1306785a1fe"></script>
   <script src="figures-manifest.js?v=1a84a933cdad"></script>
   <script>
@@ -3730,6 +3732,31 @@
         return embeddedLesson.markdown;
       }
 
+      var lessonCodeRequests = Object.create(null);
+
+      function fetchLessonCode(path) {
+        if (!/^(?:phases\/[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*|certifications\/[a-z0-9][a-z0-9-]*\/lessons\/[a-z0-9][a-z0-9-]*)$/.test(path || '')) {
+          return Promise.resolve(null);
+        }
+        if (!lessonCodeRequests[path]) {
+          lessonCodeRequests[path] = fetch('lesson-code/' + path + '.json').then(function (response) {
+            if (!response.ok) throw new Error('fetch-failed');
+            return response.json();
+          }).then(function (data) {
+            return data && data.blocks && typeof data.blocks === 'object' ? data.blocks : null;
+          }).catch(function () {
+            delete lessonCodeRequests[path];
+            return null;
+          });
+        }
+        return Promise.race([
+          lessonCodeRequests[path],
+          new Promise(function (resolve) { setTimeout(function () { resolve(null); }, 1500); })
+        ]);
+      }
+
+      var lessonFetchSequence = 0;
+
       function fetchLesson(path, retried) {
         if (certificationLesson && path === certificationLesson.path && typeof certificationLesson.markdown === 'string') {
           lessonQuizPromise = Promise.resolve(certificationLesson.quiz || null);
@@ -3898,10 +3925,10 @@
         });
       }
 
-      function renderLesson(md) {
+      function renderLesson(md, codeBlocks) {
         var el = document.getElementById('lessonContent');
         disposeRenderedLesson(el);
-        var html = parseMd(md);
+        var html = parseMd(md, { renderCode: window.AIFSLessonMarkdown.prerenderedCode(codeBlocks) });
         html += '<div class="ai-panels" id="aiPanels"></div>';
         html = addBottomNav(html);
         el.innerHTML = certificationDisclaimerHtml() + '<article class="lesson-article">' + html + '</article>';

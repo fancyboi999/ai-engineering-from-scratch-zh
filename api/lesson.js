@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { parseMd, readLessonMarkdown } = require('../site/lesson-markdown');
+const { parseMd, readLessonMarkdown, prerenderedCode } = require('../site/lesson-markdown');
 const { representation } = require('../lib/agent-http');
 
 const ORIGIN = 'https://aieng-zh.cn';
@@ -29,6 +29,9 @@ function loadProductionAssets() {
       manifest,
       readMarkdown: function (lessonPath) {
         return readLessonMarkdown(path.join(__dirname, '..'), lessonPath, manifest);
+      },
+      readCode: function (lessonPath) {
+        return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'lesson-code', `${lessonPath}.json`), 'utf8')).blocks;
       },
       ogCards: fs.existsSync(path.join(__dirname, '..', 'lib', 'og-cards.js')) ? require('../lib/og-cards') : null,
       hubRoutes: fs.existsSync(path.join(__dirname, '..', 'lib', 'hub-routes.js')) ? require('../lib/hub-routes') : null,
@@ -258,7 +261,17 @@ function lessonHref(ref, contextParams) {
   return `/lesson?${params.toString().replace(/&/g, '&amp;')}`;
 }
 
-function lessonFallback(entry, lessonPath, contextParams, heading, markdown) {
+function readLessonCode(assets, lessonPath) {
+  if (!assets || typeof assets.readCode !== 'function') return null;
+  try {
+    const blocks = assets.readCode(lessonPath);
+    return blocks && typeof blocks === 'object' ? blocks : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function lessonFallback(entry, lessonPath, contextParams, heading, markdown, assets) {
   const trackId = contextParams && contextParams.track;
   const trackNavigation = trackId && entry.navigationByTrack && entry.navigationByTrack[trackId];
   const navigation = trackNavigation || entry;
@@ -272,7 +285,8 @@ function lessonFallback(entry, lessonPath, contextParams, heading, markdown) {
   if (previous) links.push(`<a class="lesson-nav-btn prev" href="${lessonHref(previous, contextParams)}"><span class="nav-label">&larr; 上一节</span><span class="nav-title">${escapeHtml(previous.title)}</span></a>`);
   if (next) links.push(`<a class="lesson-nav-btn next" href="${lessonHref(next, contextParams)}"><span class="nav-label">下一节 &rarr;</span><span class="nav-title">${escapeHtml(next.title)}</span></a>`);
   const summary = entry.description || entry.excerpt;
-  const body = markdown ? `<h1>${escapeHtml(heading)}</h1>` + parseMd(markdown).replace(/<h1 id="[^"]*">[\s\S]*?<\/h1>/, '') : '';
+  const blocks = readLessonCode(assets, lessonPath);
+  const body = markdown ? `<h1>${escapeHtml(heading)}</h1>` + parseMd(markdown, { renderCode: prerenderedCode(blocks) }).replace(/<h1 id="[^"]*">[\s\S]*?<\/h1>/, '') : '';
   const disclaimer = entry.context && entry.context.kind === 'certification'
     ? entry.context.disclaimer || '这是独立社区备考课程，与认证提供方没有隶属、认可、赞助或授权关系。不包含真实考题，不颁发证书，也不保证通过考试。'
     : '';
@@ -484,7 +498,7 @@ function createHandler(options) {
         return;
       }
       let html = replaceMarkedRegion(template, SEO_START, SEO_END, lessonHead(entry, lessonPath, heading, assets));
-      html = replaceMarkedRegion(html, FALLBACK_START, FALLBACK_END, lessonFallback(entry, lessonPath, contextParams, heading, markdown));
+      html = replaceMarkedRegion(html, FALLBACK_START, FALLBACK_END, lessonFallback(entry, lessonPath, contextParams, heading, markdown, assets));
       if (html.includes(HUBS_START)) html = replaceMarkedRegion(html, HUBS_START, HUBS_END, lessonHubLinks(entry, heading, assets));
       send(res, method, 200, html, 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800');
     } catch (_) {

@@ -10,6 +10,7 @@ const { SITE_HEADER } = require('./build-hubs');
 const { HEADER_ASSET_VERSION } = require('../lib/site-navigation');
 const topicMap = require('./cheatsheet-topics');
 const evidenceCheck = require('./cheatsheet-evidence');
+const code = require('./lib/code');
 
 const ORIGIN = 'https://aieng-zh.cn';
 const REPO = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh';
@@ -44,8 +45,9 @@ const FONT_LINK = 'https://fonts.googleapis.com/css2?family=VT323&family=Source+
 const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=localStorage.getItem('theme')||'';}catch(_){}r.setAttribute('data-theme',s||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));function i(){var e=document.getElementById('themeIcon');if(e)e.textContent=r.getAttribute('data-theme')==='light'?'N':'D';}document.addEventListener('DOMContentLoaded',function(){i();var b=document.getElementById('themeToggle');if(b)b.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n);}catch(_){}i();});});})();";
 const CHEATSHEET_CSS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'cheatsheets.css'))).digest('hex').slice(0, 12);
 const CHEATSHEET_JS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'cheatsheets.js'))).digest('hex').slice(0, 12);
-const HEAD_ASSETS = `<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css?v=${CHEATSHEET_CSS_VERSION}">`;
-const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/cheatsheets.js?v=${CHEATSHEET_JS_VERSION}" defer></script>`;
+const CODE_CSS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'code.css'))).digest('hex').slice(0, 12);
+const HEAD_ASSETS = `<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css?v=${CHEATSHEET_CSS_VERSION}">\n<link rel="stylesheet" href="/code.css?v=${CODE_CSS_VERSION}">`;
+const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/code-copy.js" defer></script>\n<script src="/cheatsheets.js?v=${CHEATSHEET_JS_VERSION}" defer></script>`;
 
 const TYPES = {
   concepts: { group: 'know', label: '概念' },
@@ -737,20 +739,20 @@ function flowSvg(block) {
 
 function annotatedHtml(block) {
   const pattern = COMMENT[block.lang] || COMMENT.bash;
-  const rows = block.code.map(line => {
-    if (!line.trim()) return '<div class="cs-ann-gap"></div>';
-    if (FULL_COMMENT.test(line) && !/^\s*#!/.test(line)) return `<div class="cs-ann-head">${escapeHtml(line.replace(FULL_COMMENT, ''))}</div>`;
+  const heading = line => FULL_COMMENT.test(line) && !/^\s*#!/.test(line);
+  const parts = block.code.map(line => {
+    if (!line.trim() || heading(line)) return null;
     const match = pattern.exec(line);
-    const code = match ? line.slice(0, match.index) : line;
-    const note = match ? line.slice(match.index + match[0].length) : '';
-    const highlighted = placeholders(markdown.highlightSyntax(code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'), block.lang));
-    return `<div class="cs-ann-row"><code>${highlighted}</code><span>${escapeHtml(note)}</span></div>`;
+    return { code: (match ? line.slice(0, match.index) : line).replace(/\s+$/, ''), note: match ? line.slice(match.index + match[0].length) : '' };
   });
-  const copy = block.code.filter(line => line.trim() && !(FULL_COMMENT.test(line) && !/^\s*#!/.test(line))).map(line => {
-    const match = pattern.exec(line);
-    return (match ? line.slice(0, match.index) : line).replace(/\s+$/, '');
-  }).join('\n');
-  return `<div class="cs-ann" data-lang="${escapeHtml(block.lang)}"><button type="button" class="cs-copy" data-copy="${escapeHtml(copy)}" aria-label="复制代码">复制</button>${rows.join('')}</div>`;
+  const lit = code.lines(parts.filter(Boolean).map(part => part.code), block.lang);
+  let at = 0;
+  const rows = block.code.map((line, index) => {
+    if (!line.trim()) return '<div class="cs-ann-gap"></div>';
+    if (heading(line)) return `<div class="cs-ann-head">${escapeHtml(line.replace(FULL_COMMENT, ''))}</div>`;
+    return `<div class="cs-ann-row"><code class="cb-ln">${placeholders(lit[at++])}</code><span>${escapeHtml(parts[index].note)}</span></div>`;
+  });
+  return `<div class="cs-ann" data-lang="${escapeHtml(block.lang)}"><button type="button" class="cb-copy" aria-label="Copy code">Copy</button>${rows.join('')}</div>`;
 }
 
 function tableHtml(block) {
