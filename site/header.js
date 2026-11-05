@@ -242,6 +242,7 @@
     if (current === 'roadmap.html' || current === 'path.html') target = 'prereqs.html';
     if (current === 'project.html' || /^\/project\//.test(pathname)) target = 'projects.html';
     if (/^manual-/.test(current)) target = 'manuals.html';
+    if (/^\/interviews(?:\/|$)/.test(location.pathname)) target = 'interviews.html';
     if (/^\/(?:hubs\/)?glossary\//.test(pathname)) target = 'glossary.html';
     if (/^\/(?:hubs\/)?phase\//.test(pathname) || /^\/lessons\//.test(pathname)) target = 'catalog.html';
     if (/^\/cheatsheets(?:\/|$)/.test(pathname)) target = 'cheatsheets.html';
@@ -267,12 +268,28 @@
     }
   }
 
+  function ensureNavigationLink(nav, filename, label, className) {
+    var links = nav.querySelectorAll('a');
+    var target = pageFile(filename);
+    for (var i = 0; i < links.length; i++) {
+      if (pageFile(links[i].href) === target) return;
+    }
+
+    var link = document.createElement('a');
+    link.href = filename;
+    if (className) link.className = className;
+    link.textContent = label;
+    var github = nav.querySelector('.header-github');
+    nav.insertBefore(link, github || null);
+  }
+
   function setupNavigation(header) {
     var inner = header.querySelector('.header-inner');
     var nav = header.querySelector('.header-nav');
     var logo = header.querySelector('.logo');
     if (!inner || !nav || !logo || inner.querySelector('.header-menu-toggle')) return;
 
+    ensureNavigationLink(nav, '/interviews', 'Interviews', '');
     syncCurrentPage(header);
 
     navId += 1;

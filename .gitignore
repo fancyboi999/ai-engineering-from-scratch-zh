@@ -73,6 +73,7 @@ mlruns/
 # 由 site/build.js 在每次 Vercel 部署时生成（buildCommand）——不提交，
 # 以免漂移或丢 URL。每次从 PHASES 重新生成。
 site/sitemap.xml
+site/sitemap-*.xml
 site/llms.txt
 # 由 build.js 每次部署写入，记录本次部署的 git 分支（供 lesson.html 按分支拉取 docs）
 site/build-meta.js
