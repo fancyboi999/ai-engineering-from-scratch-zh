@@ -1,7 +1,23 @@
 {
-  "base": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
-  "target": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
-  "pending": [],
+  "base": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
+  "target": "8fec9cc19ee7c73b92582899b5455333d30d718e",
+  "pending": [
+    {
+      "id": "batch-1-lesson-fixes",
+      "title": "核心课程理论与测验去偏勘误（#749）",
+      "commit": "60941c963"
+    },
+    {
+      "id": "batch-2-code-render-search",
+      "title": "Shiki 构建期代码渲染与 Pagefind 检索基础架构（#732, #751, #752）",
+      "commit": "d1cf10338"
+    },
+    {
+      "id": "batch-3-interviews-scaffold",
+      "title": "面试题库系统脚手架、页面构建与验证工具（#731, #735）",
+      "commit": "321cd607c"
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -121,6 +137,54 @@
         "site/test_star_nudge.js",
         "site/header.js",
         "lib/site-navigation.js"
+      ]
+    },
+    {
+      "scope": "核心课程勘误与测验去偏（2026-11-04）",
+      "decision": "语义移植 5153c4531 涉及 10 门课的 13 处陈述纠错，涵盖 KV Cache 比较与投影重算、EAGLE 接收率基准与生产区间界定、BPE 前导空格切分、训练复现与确定性边界、AnyRes 2x2 token 计算、Canary 门禁与 Eval 权责、pass@k 插件估计与无偏估计对比、位置编码波长物理含义、困惑度 batch 加权偏差修正及 ECE 桶内相消。重新运行 debias_quizzes 确保答案分布均匀。",
+      "paths": [
+        "phases/07-transformers-deep-dive/",
+        "phases/10-llms-from-scratch/",
+        "phases/12-multimodal-ai/",
+        "phases/17-infrastructure-and-production/",
+        "phases/19-capstone-projects/"
+      ]
+    },
+    {
+      "scope": "构建期代码渲染与搜索架构（2026-11-04）",
+      "decision": "移植 Shiki 4.5.0 与 Pagefind 1.5.2 基础工具链。强化 site/md-render.js 与 site/lesson-markdown.js 的单一渲染器契约；语义适配 site/build-lessons.js 与 site/build-search.js 优先读取中文 docs/zh.md 并生成 2830 个代码块预渲染产物；site/cmdpalette.js 接入 Pagefind 异步检索，保留中文本土化 UI 标签；保持无 Shiki 时的正则渲染优雅降级。",
+      "paths": [
+        "package.json",
+        "site/code.css",
+        "site/code-copy.js",
+        "site/lib/code.js",
+        "site/md-render.js",
+        "site/lesson-markdown.js",
+        "site/lesson.html",
+        "site/build-lessons.js",
+        "site/build-search.js",
+        "site/cmdpalette.js",
+        "site/test_code_render.js",
+        "site/test_lesson_code.js"
+      ]
+    },
+    {
+      "scope": "面试题库系统脚手架与模拟面试技能（2026-11-04）",
+      "decision": "引入 23 张面试卡片、60 个故障场景与 470+ 道面试题架构、静态校验器（validate.js）与 build-interviews。跳过上游外部 LLM API 自动生成脚本（generate.js）；验证器增强对中文 docs/zh.md 及英文冻结证据源的桥接支持；接入主构建、Vercel 路由与 skills/interview-prep 技能；题库正文后续分批推进中文本地化。",
+      "paths": [
+        "interviews/",
+        "scripts/interviews/validate.js",
+        "scripts/interviews/test_validate.js",
+        "site/build-interviews.js",
+        "site/interviews.css",
+        "site/interviews.js",
+        "site/test_interviews.js",
+        "skills/interview-prep/",
+        ".claude/skills/interview-prep/",
+        "site/build-skills.js",
+        "site/skills.html",
+        "site/skills.md",
+        "site/roadmap.html"
       ]
     }
   ]
