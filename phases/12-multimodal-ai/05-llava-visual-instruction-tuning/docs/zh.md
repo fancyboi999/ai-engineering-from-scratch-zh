@@ -87,7 +87,7 @@ LLaVA-1.5（2023 年 10 月）新增：
 - 论文提出了网格切图的 HD 变体，后来由 LLaVA-NeXT 作为 AnyRes 发布。
 
 LLaVA-NeXT（2024 年 1 月）新增：
-- AnyRes：把高分辨率图切成 2x2 或 1x3 的 336x336 裁块网格，外加一张全局低分辨率缩略图。每个裁块成为 576 个 token；每张图共约 2880 个视觉 token。OCR 和图表任务大涨。
+- AnyRes：把高分辨率图切成 2x2 或 1x3 的 336x336 裁块网格，外加一张全局低分辨率缩略图。每个裁块成为 576 个 token。2x2 网格加上缩略图每张图共约 2880 个视觉 token；1x3 网格裁块较少，消耗的 token 相应更少。OCR 和图表任务大幅提升。
 - 用 ShareGPT4V（高质量 GPT-4V caption）改善了指令数据配比。
 - 更强的基座 LLM（Mistral-7B、Yi-34B）。
 
@@ -99,7 +99,7 @@ LLaVA-NeXT（2024 年 1 月）新增：
 
 | | Q-Former（BLIP-2） | MLP（LLaVA） |
 |---|---|---|
-| 每张图的视觉 token | 32 | 576（基础）或 2880（AnyRes） |
+| 每张图的视觉 token | 32 | 576（基础）或约 2880（AnyRes，2x2 网格） |
 | 可训参数 | 188M + LM | 40M + LM |
 | 阶段 1 损失 | ITC+ITM+ITG | 仅 LM |
 | LLM 即插即换 | 需重训 | 极少量重训即可换 |
@@ -115,7 +115,7 @@ MLP 在简单性和 token 灵活性上赢。Q-Former 在 token 预算上赢。�
 A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions. USER: <image> Describe this image in detail. ASSISTANT: The image shows ...
 ```
 
-`<image>` 是个占位 token。分词之前，它被替换成 576 个视觉 token（AnyRes 下是 2880 个）。分词器看到的序列比它训练时略长，但 LLM 能处理这种新输入，因为阶段 1 教过它。
+`<image>` 是个占位 token。分词之前，它被替换成 576 个视觉 token（2x2 网格的 AnyRes 下约为 2880 个）。分词器看到的序列比它训练时略长，但 LLM 能处理这种新输入，因为阶段 1 教过它。
 
 ### 参数经济学
 

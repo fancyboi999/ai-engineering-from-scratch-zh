@@ -47,7 +47,7 @@ Perplexity 就是 `exp(mean negative log-likelihood per token)`。实现上有�
 - 均值的分母必须是实际 token 位置数，不是 batch * sequence。Padding token 必须从分母中排除，否则 perplexity 会看起来比实际好。
 - 模型预测的是下一个 token，所以位置 `i` 的 logits 预测的是位置 `i+1` 的 token。这里的 off-by-one 错误是静默的：loss 照样训，但指标就没意义了。
 
-Eval 计算每个 batch 中非 pad 位置的 `-log p(token)` 之和以及 token 计数，最后统一除。这在数值上比逐 batch 平均 perplexity 更安全（后者会低估短序列的权重），也与教科书定义一致。
+Eval 计算每个 batch 中非 pad 位置的 `-log p(token)` 之和以及 token 计数，最后统一除。这在数值上比逐 batch 平均 perplexity 更安全（逐 batch 平均会赋予每个 batch 相同的权重，导致短 batch 中的每个 token 比长 batch 中的 token 权重更大，从而产生偏差），也与教科书定义一致。
 
 ## Exact-match：带归一化
 
