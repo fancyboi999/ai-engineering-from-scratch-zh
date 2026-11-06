@@ -840,68 +840,13 @@
   margin: 18px 0;
 }
 
-/* MDRender's label and copy button share a row above the unwrapped code. */
-.pj-doc pre {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  min-width: 0;
-  max-width: 100%;
-  margin: 18px 0;
-  overflow-x: auto;
-  border: 1px solid var(--rule-soft);
-  background: var(--code-bg);
+/* Code blocks use the shared .cb styles; native scrollbars follow the project theme. */
+.pj-doc .cb pre {
   color-scheme: light;
-  font: 0.8rem/1.55 var(--font-mono);
 }
 
-[data-theme="dark"] .pj-doc pre {
+[data-theme="dark"] .pj-doc .cb pre {
   color-scheme: dark;
-}
-
-.pj-doc pre .code-lang {
-  display: flex;
-  align-items: center;
-  padding: 6px 14px;
-  border-bottom: 1px solid var(--rule-soft);
-  color: var(--ink-mute);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.pj-doc pre .code-copy {
-  grid-column: 2;
-  min-width: 68px;
-  min-height: 44px;
-  padding: 8px 12px;
-  border: 0;
-  border-left: 1px solid var(--rule-soft);
-  border-bottom: 1px solid var(--rule-soft);
-  background: var(--bg-surface);
-  color: var(--ink-soft);
-  font: 0.65rem var(--font-mono);
-  cursor: pointer;
-}
-
-.pj-doc pre .code-copy:hover {
-  background: var(--blueprint-tint);
-  color: var(--blueprint);
-}
-
-.pj-doc pre .code-copy:focus-visible {
-  outline: 2px solid var(--blueprint);
-  outline-offset: -3px;
-}
-
-.pj-doc pre code {
-  grid-column: 1 / -1;
-  display: block;
-  min-width: 0;
-  padding: 12px 14px;
-  background: none;
-  font-size: inherit;
-  white-space: pre;
-  overflow-wrap: normal;
 }
 
 .pj-doc :not(pre) > code {

@@ -153,10 +153,10 @@
 
   function bindCopy(scope) {
     scope.addEventListener('click', async function (event) {
-      var button = event.target.closest('.pj-copy, .code-copy');
+      var button = event.target.closest('.pj-copy');
       if (!button || button.dataset.copyPending === 'true') return;
-      var text = button.getAttribute('data-copy') || button.getAttribute('data-code');
-      var block = button.closest('.pj-cmd-wrap, .pj-code, pre');
+      var text = button.getAttribute('data-copy');
+      var block = button.closest('.pj-cmd-wrap, .pj-code');
       var status = block.querySelector('.pj-copy-status');
       if (!status) {
         status = document.createElement('span');

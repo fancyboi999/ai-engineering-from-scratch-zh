@@ -3,7 +3,7 @@
  *
  * Searches focused paths, lesson titles, summaries, phase names, languages,
  * types, and glossary terms entirely client-side from data already loaded.
- * No network requests. No external dependencies.
+ * Optionally loads the built Pagefind index for course bodies and interviews.
  *
  * API (attached to window.CmdPalette):
  *   CmdPalette.open()   — open the palette
@@ -18,7 +18,10 @@
   var PALETTE_ID  = 'cmdPalette';
   var MAX_RESULTS = 12;
   var BODY_ATTR   = 'data-palette-open';
-  var PAGEFIND_URL = '/pagefind/pagefind.js';
+  var scriptVersion = typeof document !== 'undefined' && document.currentScript
+    ? String(document.currentScript.src || '').match(/[?&]v=([^&#]+)/) : null;
+  // Keep the module cache key in step with the palette that imports it.
+  var PAGEFIND_URL = '/pagefind/pagefind.js' + (scriptVersion ? '?v=' + scriptVersion[1] : '');
   var PAGE_RESULTS = 6;
 
   // ── Module state ─────────────────────────────────────────────────────
@@ -562,7 +565,7 @@
 
       if (r.kind === 'page') {
         dest = r.url;
-        chip = r.pageType || '页面';
+        chip = ({Interview:'面试题库',Lesson:'课程',Practice:'编程练习','Cheat sheet':'速查表',Phase:'阶段',Glossary:'术语',Manual:'技术手册',Page:'页面'})[r.pageType] || r.pageType || '页面';
         chipClass += ' cp-item-chip--alt';
       } else if (r.kind === 'learning-path') {
         dest = r.url;
@@ -573,7 +576,7 @@
         dest = r.lessonPath
           ? '/lessons/' + r.lessonPath.replace(/^phases\//, '') + '/'
           : r.url;
-        chip = '阶段 ' + String(r.phaseId).padStart(2, '0');
+        chip = lessonChip(r);
       } else if (r.kind === 'certification-lesson') {
         dest = 'lesson.html?path=' + encodeURIComponent(r.lessonPath);
         chip = '认证课程';
@@ -665,7 +668,7 @@
   }
 
   function lessonChip(r) {
-    return hasPhaseId(r) ? 'Phase ' + String(r.phaseId).padStart(2, '0') : 'Lesson';
+    return hasPhaseId(r) ? '阶段 ' + String(r.phaseId).padStart(2, '0') : '课程';
   }
 
   function lessonMeta(r) {

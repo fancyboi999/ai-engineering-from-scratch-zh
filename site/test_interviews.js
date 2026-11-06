@@ -14,7 +14,7 @@ test.before(async () => {
   built = interviews.buildInterviews();
 });
 const config = require('../vercel.json');
-const ORIGIN = 'https://aiengineeringfromscratch.com';
+const ORIGIN = 'https://aieng-zh.cn';
 
 function page(href) {
   return built.pages.find(item => item.href === href);
@@ -51,12 +51,12 @@ test('answers are in the HTML, folded behind details, and nowhere else on the pa
   assert.deepEqual(interviews.checkInterviews(built), []);
   for (const item of built.questions) {
     const html = page(itemHref(item)).html;
-    assert.match(html, /<details class="iv-answer" data-answer="short"><summary>Show short answer<\/summary>/);
-    assert.match(html, /<details class="iv-answer" data-answer="full"><summary>Show full answer<\/summary>/);
+    assert.match(html, /<details class="iv-answer" data-answer="short"><summary>查看简短答案<\/summary>/);
+    assert.match(html, /<details class="iv-answer" data-answer="full"><summary>查看完整答案<\/summary>/);
     const folded = Array.from(html.matchAll(/<details\b[\s\S]*?<\/details>/g), match => match[0]).join('\n');
-    const firstWords = item.sections['Short answer'].replace(/`/g, '').split(/\s+/).slice(0, 5).join(' ');
-    assert.ok(interviews.visibleText(folded.replace(/<\/?details[^>]*>/g, '')).replace(/\s+/g, ' ').includes(firstWords), `${item.id}: the short answer is not in a details element`);
-    assert.equal(item.followUps.length, (html.match(/Show expected answer/g) || []).length);
+    const expectedAnswer = interviews.visibleText(require('./lesson-markdown').parseMd(item.sections['Short answer'])).replace(/\s+/g, '');
+    assert.ok(expectedAnswer && interviews.visibleText(folded.replace(/<\/?details[^>]*>/g, '')).replace(/\s+/g, '').includes(expectedAnswer), `${item.id}: the complete short answer is not in a details element`);
+    assert.equal(item.followUps.length, (html.match(/查看参考答案/g) || []).length);
   }
   for (const item of built.scenarios) {
     const html = page(itemHref(item)).html;
@@ -76,6 +76,8 @@ test('a scenario page holds every evidence listing in order, each a step for the
       const evidence = item.evidence.find(file => file.name === entry.name);
       const first = evidence.listing.split('\n')[0].trim().slice(0, 40);
       assert.ok(text.includes(first), `${entry.name} listing is missing`);
+      const note = require('./lib/interviews-display.zh.json')[evidence.header.note];
+      assert.ok(note && text.includes(note), `${entry.name} Chinese evidence note is missing`);
     });
     assert.match(html, /data-ev-next/);
     assert.match(html, /<dl class="iv-spec">/);
@@ -104,7 +106,9 @@ test('the search index gets every item with the prompt only, never an answer', (
     assert.deepEqual(record.filters.level, [String(item.data.level)]);
     assert.ok(record.filters.topic.length === 1 && record.filters.role.length === item.data.roles.length);
     const prompt = item.kind === 'scenario' ? item.sections.Situation : item.parsed.preamble;
-    assert.ok(record.content.length > 40 && prompt.replace(/`/g, '').replace(/\s+/g, ' ').includes(record.content.slice(0, 30)), item.id);
+    const prose = prompt.replace(/```[\s\S]*?```/g, ' ').replace(/`/g, '').replace(/[*_#>|]/g, '').replace(/\s+/g, ' ').trim();
+    assert.ok(record.content.length > 40 && prose.includes(record.content.slice(0, 30)), item.id);
+    assert.equal(record.language, 'zh');
     for (const other of built.items) assert.deepEqual(require('../scripts/interviews/validate').sharedSpans(interviews.answerText(other), record.content + record.meta.title), [], `${record.url} holds an answer of ${other.id}`);
   }
 });
@@ -124,7 +128,7 @@ test('no page links out of the site, except to the repository', () => {
     assert.deepEqual(outbound, [], item.href);
     assert.equal(/target="_blank"/.test(item.html.slice(item.html.indexOf('<main'), item.html.indexOf('</main>'))), false, `${item.href} opens a new tab`);
   }
-  for (const [file, body] of built.markdown) assert.equal(/\]\(https?:\/\/(?!aiengineeringfromscratch\.com|github\.com\/rohitg00\/ai-engineering-from-scratch)/.test(body), false, file);
+  for (const [file, body] of built.markdown) assert.equal(/\]\(https?:\/\/(?!aieng-zh\.cn|aiengineeringfromscratch\.com|github\.com\/(?:rohitg00|fancyboi999)\/ai-engineering-from-scratch(?:-zh)?)/.test(body), false, file);
 });
 
 test('repository links become site links', () => {
@@ -151,7 +155,7 @@ test('every page is in the sitemap, and llms.txt lists every item', () => {
     fs.rmSync(temp, { recursive: true, force: true });
   }
   const llms = hubLlms({ phaseModels: [], termPages: [], interviews: built });
-  assert.match(llms, /## Interview questions and scenarios/);
+  assert.match(llms, /## 面试题与排障场景/);
   const expectedLlmsOrigin = llms.includes('https://aieng-zh.cn') ? 'https://aieng-zh.cn' : ORIGIN;
   for (const item of built.items) assert.ok(llms.includes(`${expectedLlmsOrigin}${itemHref(item)}`), item.id);
 });
@@ -169,11 +173,11 @@ test('the API file lists cards and items without the answers', () => {
 });
 
 test('answer engines get Markdown pages with the full answers', () => {
-  assert.ok(built.markdown.get('index.md').startsWith('# Interview questions and scenarios'));
+  assert.ok(built.markdown.get('index.md').startsWith('# AI 工程面试题与排障场景'));
   for (const item of built.items) {
     const md = built.markdown.get(`${item.card}/${item.id}.md`);
-    assert.ok(md.startsWith(`# ${item.data.title}\n\nCanonical page: ${ORIGIN}${itemHref(item)}`), item.id);
-    assert.ok(md.includes(item.kind === 'scenario' ? '## Resolution' : '## Short answer'));
+    assert.ok(md.startsWith(`# ${item.data.title}\n\n规范页面：${ORIGIN}${itemHref(item)}`), item.id);
+    assert.ok(md.includes(item.kind === 'scenario' ? '## 解决方案' : '## 简短答案'));
   }
   for (const [source, destination] of [['/interviews/:card([a-z0-9-]+)/:page([a-z0-9-]+)', '/agent-pages/interviews/:card/:page.md'], ['/interviews/:card([a-z0-9-]+)', '/agent-pages/interviews/:card.md']]) {
     const markdownRule = config.rewrites.find(rule => rule.source === source && rule.has);
@@ -193,19 +197,20 @@ test('clean URLs route to the pages and the old .html URLs redirect', () => {
 });
 
 test('the menu, the footers, the hub pages and the roadmap link to the interviews', () => {
-  assert.match(fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8'), /ensureNavigationLink\(nav, '\/interviews', 'Interviews', ''\)/);
-  assert.match(fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8'), /<a href="\/interviews">Interviews<\/a>/);
-  assert.match(fs.readFileSync(path.join(__dirname, 'build-hubs.js'), 'utf8'), /\['\/interviews', 'Interviews'\]/);
+  assert.match(require('../lib/site-navigation').renderNavigation(''), /<a href="interviews" data-header-page="interviews">面试题库<\/a>/);
+  assert.match(fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8'), /<a href="\/interviews">面试题库<\/a>/);
+  assert.match(fs.readFileSync(path.join(__dirname, 'build-hubs.js'), 'utf8'), /\['\/interviews', '面试题库'\]/);
   const roadmap = fs.readFileSync(path.join(__dirname, 'roadmap.html'), 'utf8');
   const main = roadmap.slice(roadmap.indexOf('<main'), roadmap.indexOf('</main>'));
   for (const href of ['/practice', '/cheatsheets', '/interviews']) assert.ok(main.includes(`href="${href}"`), href);
-  assert.ok(page('/interviews').html.includes('<a href="/interviews">Interviews</a>'));
+  assert.ok(page('/interviews').html.includes('<a href="/interviews">面试题库</a>'));
 });
 
 test('structured data describes each item', () => {
   for (const item of built.items) {
     const ld = JSON.parse(page(itemHref(item)).html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)[1]);
     assert.equal(ld['@type'], 'Quiz');
+    assert.equal(ld.inLanguage, 'zh-CN');
     assert.equal(ld.url, `${ORIGIN}${itemHref(item)}`);
     assert.equal(ld.hasPart[0]['@type'], 'Question');
     assert.ok(ld.hasPart[0].acceptedAnswer.text.length > 40);
@@ -253,5 +258,5 @@ test('the API URL sends the same CORS header as the file it rewrites to', () => 
 });
 
 test('the header marks Interviews as the current page on every interview route', () => {
-  assert.match(fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8'), /\/\^\\\/interviews\(\?:\\\/\|\$\)\/\.test\(location\.pathname\)/);
+  assert.match(fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8'), /\/\^\\\/interviews\(\?:\\\/\|\$\)\/\.test\(pathname\)\) target = 'interviews\.html'/);
 });

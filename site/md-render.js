@@ -66,6 +66,17 @@
         var inMathBlock = false;
         var mathLines = [];
         var figureAnchors = Object.create(null);
+        var usedHeadingIds = Object.create(null);
+
+        // 纯中文标题的 slug 为空，保持空 id，由课程页目录在运行时分配 section-N。
+        function uniqueHeadingId(base) {
+          if (!base) return base;
+          if (!usedHeadingIds[base]) { usedHeadingIds[base] = 1; return base; }
+          var n = 2;
+          while (usedHeadingIds[base + '-' + n]) n++;
+          usedHeadingIds[base + '-' + n] = 1;
+          return base + '-' + n;
+        }
 
         function flushLabChallenge() {
           if (!inLabChallenge) return '';
@@ -234,7 +245,7 @@
           if (h1) {
             out += flushList();
             out += flushLabChallenge();
-            var slug = slugify(h1[1]);
+            var slug = uniqueHeadingId(slugify(h1[1]));
             out += '<h1 id="' + slug + '">' + inlineFormat(h1[1]) + '</h1>';
             continue;
           }
@@ -273,11 +284,11 @@
               out += flushLabChallenge();
               inLabChallenge = true;
               out += '<div class="lab-challenge">';
-              out += '<h2 id="' + slug2 + '">&#128171; 实战挑战</h2>';
+              out += '<h2 id="' + uniqueHeadingId(slug2) + '">&#128171; 实战挑战</h2>';
               continue;
             }
             out += flushLabChallenge();
-            out += '<h2 id="' + slug2 + '" class="' + sectionClass + '">' + inlineFormat(h2[1]) + '</h2>';
+            out += '<h2 id="' + uniqueHeadingId(slug2) + '" class="' + sectionClass + '">' + inlineFormat(h2[1]) + '</h2>';
             continue;
           }
 
@@ -285,7 +296,15 @@
           if (h3) {
             out += flushList();
             var slug3 = slugify(h3[1]);
-            out += '<h3 id="' + slug3 + '">' + inlineFormat(h3[1]) + '</h3>';
+            out += '<h3 id="' + uniqueHeadingId(slug3) + '">' + inlineFormat(h3[1]) + '</h3>';
+            continue;
+          }
+
+          var h4 = line.match(/^#### (.+)/);
+          if (h4) {
+            out += flushList();
+            var slug4 = slugify(h4[1]);
+            out += '<h4 id="' + uniqueHeadingId(slug4) + '">' + inlineFormat(h4[1]) + '</h4>';
             continue;
           }
 
@@ -754,14 +773,14 @@
       }
 
       function codeLabel(kind, lang) {
-        if (kind === 'terminal') return 'terminal';
-        if (kind === 'output') return lang === 'ansi' ? 'log' : 'output';
-        return lang || 'code';
+        if (kind === 'terminal') return '终端';
+        if (kind === 'output') return lang === 'ansi' ? '日志' : '输出';
+        return lang || '代码';
       }
 
       function codeBlockHtml(block) {
         var head = '<div class="cb-head"><span class="cb-label">' + escapeHtml(block.label) + '</span>' + (block.extra || '') +
-          (block.copy ? '<button type="button" class="cb-copy">Copy</button>' : '') + '</div>';
+          (block.copy ? '<button type="button" class="cb-copy">复制</button>' : '') + '</div>';
         return '<div class="cb" data-kind="' + block.kind + '"' + (block.lang ? ' data-lang="' + escapeAttr(block.lang) + '"' : '') + '>' +
           head + '<pre><code>' + block.body + '</code></pre></div>';
       }

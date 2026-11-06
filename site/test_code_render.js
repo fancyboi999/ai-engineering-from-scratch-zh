@@ -32,9 +32,9 @@ test.before(async () => {
 test('code blocks carry their kind, a label and one Copy button', () => {
   for (const { name, render } of renderers()) {
     const html = render('def f(x):\n    return x + 1', 'python');
-    assert.match(html, /^<div class="cb" data-kind="code" data-lang="python"><div class="cb-head"><span class="cb-label">python<\/span><button type="button" class="cb-copy">Copy<\/button><\/div><pre><code>/, name);
+    assert.match(html, /^<div class="cb" data-kind="code" data-lang="python"><div class="cb-head"><span class="cb-label">python<\/span><button type="button" class="cb-copy">复制<\/button><\/div><pre><code>/, name);
     assert.equal((html.match(/class="cb-copy"/g) || []).length, 1, name);
-    assert.equal(pageText(html).replace(/^pythonCopy/, ''), 'def f(x):\n    return x + 1', name);
+    assert.equal(pageText(html).replace(/^python复制/, ''), 'def f(x):\n    return x + 1', name);
   }
 });
 
@@ -42,7 +42,7 @@ test('console blocks split the prompt, the commands and the output', () => {
   for (const { name, render } of renderers()) {
     const html = render(SESSION, 'console');
     assert.match(html, /data-kind="terminal"/, name);
-    assert.match(headOf(html), /<span class="cb-label">terminal<\/span><button type="button" class="cb-copy">Copy<\/button>/, name);
+    assert.match(headOf(html), /<span class="cb-label">终端<\/span><button type="button" class="cb-copy">复制<\/button>/, name);
     assert.equal((html.match(/<span class="cb-p">\$ <\/span>/g) || []).length, 2, name);
     const commands = [...html.matchAll(/<span class="cb-ln">((?:(?!<span class="cb-ln">)[\s\S])*?)<\/span>(?=\n|<\/code>)/g)].map(match => pageText(match[1]));
     assert.deepEqual(commands, ['pip install numpy \\', '    --quiet', 'python3 main.py --steps 3'], name);
@@ -75,7 +75,7 @@ test('text blocks are plain output with no Copy button', () => {
     for (const lang of ['text', 'plaintext', 'output']) {
       const html = render('loss 0.25 < 0.5', lang);
       assert.match(html, /data-kind="output"/, name);
-      assert.match(headOf(html), /^<span class="cb-label">output<\/span>$/, name);
+      assert.match(headOf(html), /^<span class="cb-label">输出<\/span>$/, name);
       assert.match(html, /<pre><code>loss 0\.25 &lt; 0\.5<\/code><\/pre>/, name);
     }
   }
@@ -86,7 +86,7 @@ test('ansi blocks are logs with no escape codes and no Copy button', () => {
   for (const { name, render } of renderers()) {
     const html = render(log, 'ansi');
     assert.match(html, /data-kind="output" data-lang="ansi"/, name);
-    assert.match(headOf(html), /^<span class="cb-label">log<\/span>$/, name);
+    assert.match(headOf(html), /^<span class="cb-label">日志<\/span>$/, name);
     assert.doesNotMatch(html, /\u001b|\[31m/, name);
     assert.equal(pageText(html.replace(/<div class="cb-head">[\s\S]*?<\/div>/, '')), 'ERROR disk full\nPASS retry', name);
   }
@@ -130,7 +130,7 @@ test('the Copy handler copies commands only from a terminal block and the code f
   const node = text => ({ textContent: text });
   function block(lines, codeText) {
     const root = { querySelectorAll: selector => (selector === '.cb-ln' ? lines.map(node) : []), querySelector: () => node(codeText) };
-    const button = { textContent: 'Copy', closest: selector => (selector === '.cb-copy' ? button : root) };
+    const button = { textContent: '复制', closest: selector => (selector === '.cb-copy' ? button : root) };
     return button;
   }
   const terminal = block(['pip install numpy \\', '    --quiet', 'python3 main.py'], '$ pip install numpy \\\n    --quiet\nInstalled\n$ python3 main.py');
@@ -140,7 +140,7 @@ test('the Copy handler copies commands only from a terminal block and the code f
   listener({ target: { closest: () => null } });
   await Promise.resolve();
   assert.deepEqual(copied, ['pip install numpy \\\n    --quiet\npython3 main.py', 'x = 1\nprint(x)']);
-  assert.equal(terminal.textContent, 'Copied');
+  assert.equal(terminal.textContent, '已复制');
 });
 
 test('practice pages render code at build time and leak no answers', () => {
@@ -168,7 +168,7 @@ test('cheat sheet annotated code copies the code parts without data attributes',
   assert.ok(pages.length > 0);
   for (const page of pages) {
     assert.doesNotMatch(page.html, /data-copy=/, page.file);
-    const block = /<div class="cs-ann" data-lang="[^"]*"><button type="button" class="cb-copy" aria-label="Copy code">Copy<\/button>([\s\S]*?)<\/div><\/div><\/section>/.exec(page.html);
+    const block = /<div class="cs-ann" data-lang="[^"]*"><button type="button" class="cb-copy" aria-label="复制代码">复制<\/button>([\s\S]*?)<\/div><\/div><\/section>/.exec(page.html);
     assert.ok(block, page.file);
     assert.match(block[1], /<code class="cb-ln">/, page.file);
   }
@@ -176,7 +176,7 @@ test('cheat sheet annotated code copies the code parts without data attributes',
 
 test('the search helper builds filtered records and indexes the main content', () => {
   const record = interviewRecord({ url: '/interviews/kv-cache', title: 'KV cache', content: 'Why the cache grows.', topic: 'inference', level: 2, role: ['inference-engineer'] });
-  assert.deepEqual(record, { url: '/interviews/kv-cache', content: 'Why the cache grows.', language: 'en', meta: { title: 'KV cache' }, filters: { type: ['Interview'], topic: ['inference'], level: ['2'], role: ['inference-engineer'] } });
+  assert.deepEqual(record, { url: '/interviews/kv-cache', content: 'Why the cache grows.', language: 'zh', meta: { title: 'KV cache' }, filters: { type: ['Interview'], topic: ['inference'], level: ['2'], role: ['inference-engineer'] } });
   assert.throws(() => interviewRecord({ url: '/x', title: 't', content: 'c', topic: 'a', level: 5, role: 'r' }), /level/);
   assert.throws(() => interviewRecord({ url: 'https://example.com', title: 't', content: 'c', topic: 'a', level: 1, role: 'r' }), /site path/);
   const html = searchHtml('<header>nav</header><main id="main"><h1>Title</h1><script>x()</script><p>Body</p><textarea>starter</textarea></main>', 'Practice');
@@ -233,7 +233,7 @@ test('lesson search records use the lesson route, the lesson name, type and phas
   assert.equal(record.url, '/lesson?path=phases%2F03-deep-learning-core%2F01-the-perceptron');
   assert.deepEqual(record.meta, { title: 'The Perceptron Lesson' });
   assert.deepEqual(record.filters, { type: ['Lesson'], phase: ['Deep Learning Core'] });
-  assert.equal(record.language, 'en');
+  assert.equal(record.language, 'zh');
   assert.match(record.content, /^The Perceptron Lesson\nA weighted sum and a decision\.\nStep 1: Weights\n/);
   assert.match(record.content, /Call np\.dot to add the zorbification term/);
   assert.match(record.content, /bias · b/);
@@ -245,7 +245,7 @@ test('lesson search records use the lesson route, the lesson name, type and phas
   assert.throws(() => lessonRecord({ lessonPath: 'certifications/x/lessons/y', title: 't', phase: 'p', markdown: '# t\n\nbody' }), /phases/);
 });
 
-test('lesson search records read only English docs of published lessons', () => {
+test('lesson search prefers Chinese docs of published lessons and keeps the English fallback', () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'aiefs-lessons-'));
   try {
     const write = (lesson, lang, text) => {
@@ -253,6 +253,8 @@ test('lesson search records read only English docs of published lessons', () => 
       fs.writeFileSync(path.join(repo, 'phases', '01-math', lesson, 'docs', `${lang}.md`), text);
     };
     write('01-vectors', 'en', '# Vectors\n\nEnglish body.');
+    write('01-vectors', 'zh', '# 向量\n\n中文正文。');
+    write('04-fallback', 'en', '# Fallback\n\nEnglish fallback.');
     write('01-vectors', 'es', '# Vectores\n\nTexto traducido.');
     write('02-planned', 'en', '# Planned\n\nNot yet.');
     const base = 'https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math/';
@@ -262,10 +264,13 @@ test('lesson search records read only English docs of published lessons', () => 
       { name: 'Planned', status: 'planned', url: `${base}02-planned/` },
       { name: 'Missing', status: 'complete', url: `${base}03-missing/` },
       { name: 'No path', status: 'complete', url: '' },
+      { name: 'Fallback', status: 'complete', url: `${base}04-fallback/` },
     ] }];
     const records = lessonSearchRecords({ repoRoot: repo, phases });
-    assert.deepEqual(records.map(record => [record.url, record.meta.title, record.filters.phase[0]]), [['/lesson?path=phases%2F01-math%2F01-vectors', 'Vectors', 'Math']]);
+    assert.deepEqual(records.map(record => [record.url, record.meta.title, record.filters.phase[0]]), [['/lesson?path=phases%2F01-math%2F01-vectors', '向量', 'Math'], ['/lesson?path=phases%2F01-math%2F04-fallback', 'Fallback', 'Math']]);
     assert.equal(records[0].content.includes('traducido'), false);
+    assert.ok(records[0].content.includes('中文正文。'));
+    assert.equal(records[0].content.includes('English body'), false);
   } finally {
     fs.rmSync(repo, { recursive: true, force: true });
   }
@@ -323,9 +328,9 @@ test('the palette turns Pagefind lesson records into lessons and shows each less
   ]);
   assert.equal(merged[0], local[0]);
   assert.equal(palette.lessonPathFromUrl('/lesson?path=..%2Fsecret'), '');
-  assert.equal(palette.lessonChip(item), 'Lesson');
+  assert.equal(palette.lessonChip(item), '课程');
   assert.deepEqual(palette.lessonMeta(item), ['Deep Learning Core']);
-  assert.equal(palette.lessonChip(local[0]), 'Phase 03');
+  assert.equal(palette.lessonChip(local[0]), '阶段 03');
   assert.deepEqual(palette.lessonMeta({ ...local[0], type: 'Build', lang: 'Python', phaseName: 'Deep Learning Core' }), ['Build', 'Python']);
   const many = Array.from({ length: 8 }, (_, index) => ({ url: `/practice/p${index}`, meta: { title: `P${index}` }, excerpt: '', filters: { type: ['Practice'] } }));
   const limited = palette.mergePages(local, [record].concat(many), 6);

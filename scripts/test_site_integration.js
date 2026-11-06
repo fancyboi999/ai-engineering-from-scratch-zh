@@ -112,6 +112,7 @@ test('real HTTP negotiates Hub and static lesson Markdown, serves dynamic PNG, a
   ]) {
     const response = await fetch(base + route, { headers: { Accept: 'text/markdown' } });
     assert.equal(response.status, 200, route);
+    assert.equal(response.headers.get('cache-control'), 'no-store');
     assert.match(response.headers.get('content-type'), /text\/markdown/);
     assert.match(response.headers.get('vary'), /Accept/);
     assert.equal(await response.text(), markdown);
@@ -122,6 +123,9 @@ test('real HTTP negotiates Hub and static lesson Markdown, serves dynamic PNG, a
     assert.match(html.headers.get('vary'), /Accept/);
     assert.equal(html.headers.get('content-language'), 'zh-CN');
   }
+  const asset = await fetch(base + '/cmdpalette.js');
+  assert.equal(asset.status, 200);
+  assert.equal(asset.headers.get('cache-control'), 'no-store');
   const response = await fetch(base + '/og/project/agent-budget-planner.png');
   assert.equal(response.status, 200);
   assert.match(response.headers.get('content-type'), /image\/png/);
@@ -181,5 +185,5 @@ test('app.js modal Hub wire switches phases, rejects undeclared targets and pres
   phases[0].hub = valid; context.openModal(0, true);
   assert.equal(link.hidden, false); assert.equal(link.getAttribute('href'), valid); context.closeModal(true);
   assert.match(read('index.html'), /<a class="modal-phase-link" id="modalPhaseLink" hidden>/);
-  assert.match(read('index.html'), /app\.js\?v=20261026a/);
+  assert.match(read('index.html'), /app\.js\?v=20261106a/);
 });

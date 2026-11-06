@@ -28,7 +28,7 @@ function htmlFiles(dir) {
 function searchHtml(html, type) {
   const main = /<main\b[^>]*>([\s\S]*)<\/main>/i.exec(html);
   const body = (main ? main[1] : html).replace(DROP, ' ');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"></head><body><main data-pagefind-body data-pagefind-filter="type:${escapeAttr(type)}">${body}</main></body></html>`;
+  return `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"></head><body><main data-pagefind-body data-pagefind-filter="type:${escapeAttr(type)}">${body}</main></body></html>`;
 }
 
 function collectPages(siteDir = SITE) {
@@ -61,7 +61,7 @@ function interviewRecord({ url, title, content, topic, level, role, type = 'Inte
   const topics = list(topic);
   const roles = list(role);
   if (!topics.length || !roles.length) throw new Error(`search record ${url} needs a topic and a role`);
-  return { url, content, language: 'en', meta: { title }, filters: { type: [type], topic: topics, level: levels, role: roles } };
+  return { url, content, language: 'zh', meta: { title }, filters: { type: [type], topic: topics, level: levels, role: roles } };
 }
 
 const LESSON_TEXT_LIMIT = 12000;
@@ -158,7 +158,7 @@ function lessonRecord({ lessonPath, title, phase, markdown, limit = LESSON_TEXT_
   const name = (heading ? inlineText(heading[1]).replace(/\s+/g, ' ').trim() : '') || title;
   const content = capText(markdownText(markdown), limit);
   if (!name || !content) throw new Error(`lesson record ${lessonPath} needs a title and content`);
-  return { url: lessonUrl(lessonPath), content, language: 'en', meta: { title: name }, filters: { type: ['Lesson'], phase: list(phase) } };
+  return { url: lessonUrl(lessonPath), content, language: 'zh', meta: { title: name }, filters: { type: ['Lesson'], phase: list(phase) } };
 }
 
 function lessonSearchRecords({ siteDir = SITE, repoRoot = path.join(SITE, '..'), phases = loadPhases(siteDir), limit } = {}) {
@@ -197,7 +197,7 @@ async function buildSearchIndex({ siteDir = SITE, records = [] } = {}) {
   const pagefind = await loadPagefind();
   if (!pagefind) return { skipped: true, pages: 0, records: 0 };
   const pages = collectPages(siteDir);
-  const { index } = raise(await pagefind.createIndex({ forceLanguage: 'en' }), 'createIndex');
+  const { index } = raise(await pagefind.createIndex({ forceLanguage: 'zh' }), 'createIndex');
   try {
     for (const page of pages) raise(await index.addHTMLFile({ url: page.url, content: page.content }), `addHTMLFile ${page.url}`);
     for (const record of records) raise(await index.addCustomRecord(record), `addCustomRecord ${record.url}`);
@@ -221,7 +221,7 @@ async function main() {
   console.log(`Wrote the search index for ${result.pages} pages and ${result.records} records (${interviews.length} interview, ${lessons.length} lesson) to site/${OUTPUT}/`);
 }
 
-module.exports = { collectPages, searchHtml, interviewRecord, lessonRecord, lessonSearchRecords, markdownText, buildSearchIndex, SOURCES };
+module.exports = { collectPages, searchHtml, interviewRecord, lessonRecord, lessonSearchRecords, markdownText, buildSearchIndex, SOURCES, main };
 
 if (require.main === module) {
   main().catch(error => {

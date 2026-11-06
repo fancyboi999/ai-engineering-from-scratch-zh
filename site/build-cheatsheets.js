@@ -46,8 +46,9 @@ const THEME_SCRIPT = "(function(){var r=document.documentElement,s='';try{s=loca
 const CHEATSHEET_CSS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'cheatsheets.css'))).digest('hex').slice(0, 12);
 const CHEATSHEET_JS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'cheatsheets.js'))).digest('hex').slice(0, 12);
 const CODE_CSS_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'code.css'))).digest('hex').slice(0, 12);
+const CODE_COPY_VERSION = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'code-copy.js'))).digest('hex').slice(0, 12);
 const HEAD_ASSETS = `<link rel="stylesheet" href="/style.css">\n<link rel="stylesheet" href="/cheatsheets.css?v=${CHEATSHEET_CSS_VERSION}">\n<link rel="stylesheet" href="/code.css?v=${CODE_CSS_VERSION}">`;
-const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/code-copy.js" defer></script>\n<script src="/cheatsheets.js?v=${CHEATSHEET_JS_VERSION}" defer></script>`;
+const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></script>\n<script src="/code-copy.js?v=${CODE_COPY_VERSION}" defer></script>\n<script src="/cheatsheets.js?v=${CHEATSHEET_JS_VERSION}" defer></script>`;
 
 const TYPES = {
   concepts: { group: 'know', label: '概念' },
@@ -752,7 +753,7 @@ function annotatedHtml(block) {
     if (heading(line)) return `<div class="cs-ann-head">${escapeHtml(line.replace(FULL_COMMENT, ''))}</div>`;
     return `<div class="cs-ann-row"><code class="cb-ln">${placeholders(lit[at++])}</code><span>${escapeHtml(parts[index].note)}</span></div>`;
   });
-  return `<div class="cs-ann" data-lang="${escapeHtml(block.lang)}"><button type="button" class="cb-copy" aria-label="Copy code">Copy</button>${rows.join('')}</div>`;
+  return `<div class="cs-ann" data-lang="${escapeHtml(block.lang)}"><button type="button" class="cb-copy" aria-label="复制代码">复制</button>${rows.join('')}</div>`;
 }
 
 function tableHtml(block) {
@@ -1356,7 +1357,7 @@ function qualityReport(topic) {
 
 function checkLinks(built, root = REPO_ROOT) {
   const known = new Set(built.pages.map(page => page.href));
-  const fixed = new Set(['/', '/catalog', '/roadmap', '/prereqs', '/glossary', '/about', '/practice', BASE]);
+  const fixed = new Set(['/', '/catalog', '/roadmap', '/prereqs', '/glossary', '/about', '/practice', '/interviews', BASE]);
   const broken = [];
   const manuals = new Set(fs.existsSync(path.join(root, 'manuals')) ? fs.readdirSync(path.join(root, 'manuals')) : []);
   for (const page of built.pages) {

@@ -2060,11 +2060,16 @@ function withCard(html, type, id, spec) {
   return cleaned.replace('</head>', cardTags(cardUrl(type, id, spec), spec).join('\n') + '\n</head>');
 }
 
+// 共享脚本一族的缓存键。脚本在浏览器缓存一天、HTML 只缓存五分钟，族内任一脚本内容变化都要升级此键。
+const SHARED_SCRIPT_VERSION = '20261106a';
+// 页面样式表一族的缓存键，规则同上：族内任一样式表内容变化都要升级此键。
+const SHARED_STYLE_VERSION = '20261106a';
+
 function versionSharedAssets(html) {
-  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + SHARED_SCRIPT_VERSION + '$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
     .replace(/((?<![\w-])href=["']\/?style\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
-    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + SHARED_STYLE_VERSION + '$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2');
 }
 
@@ -2299,8 +2304,8 @@ function hubLlms(hubs) {
   }
   if (hubs.interviews && hubs.interviews.items.length) {
     const built = hubs.interviews;
-    out += `## Interview questions and scenarios\n`;
-    out += `${built.questions.length} interview questions and ${built.scenarios.length} incident scenarios in ${built.cards.length} cards. Each question page holds the prompt, then the short answer, the full answer, the follow-ups and the common wrong answers in folded sections. Each scenario page shows its evidence listings in order. Every number in an answer comes from a lesson, a manual section or a capture file in the repository. Each item page returns Markdown with Accept: text/markdown. [Interviews index in Markdown](${SITE_ORIGIN}/agent-pages/interviews/index.md) [Interviews JSON](${SITE_ORIGIN}/api/interviews.json) [Interviews sitemap](${SITE_ORIGIN}/sitemap-interviews.xml)\n\n`;
+    out += `## 面试题与排障场景\n`;
+    out += `${built.cards.length} 个主题包含 ${built.questions.length} 道面试题与 ${built.scenarios.length} 个排障场景。题目页展示题干，并折叠简短答案、完整答案、追问和常见错误答案。场景页按顺序展示证据。答案中的数值来自仓库课程、手册章节或捕获文件。请求头发送 Accept: text/markdown 时，详情页返回 Markdown。[题库 Markdown 索引](${SITE_ORIGIN}/agent-pages/interviews/index.md) [题库 JSON](${SITE_ORIGIN}/api/interviews.json) [题库站点地图](${SITE_ORIGIN}/sitemap-interviews.xml)\n\n`;
     for (const card of built.cards) {
       const items = built.byCard.get(card.id);
       if (!items.length) continue;
@@ -3047,7 +3052,7 @@ if (require.main === module) {
   verifySiteCss();
   if (process.argv.includes('--check')) verifyCurriculum();
   else {
-    require('./lib/code').init().then(build).catch(error => {
+    require('./lib/code').init().then(build).then(() => require('./build-search').main()).catch(error => {
       console.error(error);
       process.exitCode = 1;
     });

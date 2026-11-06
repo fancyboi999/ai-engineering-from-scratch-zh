@@ -184,7 +184,7 @@ function sha(text) {
 
 function versionPracticeAssets(html, siteDir, versionShared = value => value) {
   let output = versionShared(html, siteDir);
-  for (const [file, attribute] of [['practice.css', 'href'], ['code.css', 'href'], ['practice-store.js', 'src'], ['practice.js', 'src']]) {
+  for (const [file, attribute] of [['practice.css', 'href'], ['code.css', 'href'], ['code-copy.js', 'src'], ['md-render.js', 'src'], ['practice-store.js', 'src'], ['practice.js', 'src']]) {
     const digest = sha(read(path.join(siteDir, file)));
     const pattern = new RegExp(`(${attribute}=["']\\/?${file.replace('.', '\\.')})(?:\\?[^"']*)?(["'])`, 'g');
     output = output.replace(pattern, `$1?v=${digest}$2`);

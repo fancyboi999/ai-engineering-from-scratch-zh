@@ -74,7 +74,7 @@
       });
       if (count) {
         var cardsShown = cards.filter(function (card) { return !card.hidden; }).length;
-        count.textContent = shown + (shown === 1 ? ' item' : ' items') + (cards.length ? ' in ' + cardsShown + (cardsShown === 1 ? ' card' : ' cards') : '');
+        count.textContent = shown + ' 题' + (cards.length ? ' · ' + cardsShown + ' 个主题' : '');
       }
       if (empty) empty.hidden = shown > 0;
       var next = new URLSearchParams();
@@ -106,7 +106,7 @@
         step.hidden = index >= open;
       });
       controls.hidden = open >= steps.length;
-      next.textContent = 'Show evidence ' + (open + 1) + ' of ' + steps.length;
+      next.textContent = '查看第 ' + (open + 1) + '/' + steps.length + ' 份证据';
       store(key, String(open));
       if (focus) {
         var heading = steps[open - 1].querySelector('h3');

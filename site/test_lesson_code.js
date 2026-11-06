@@ -94,7 +94,7 @@ test('a python block gets Shiki token classes', t => {
 
 test('a console block is a terminal block whose Copy copies only the commands', () => {
   const html = blockFor(lessonBlocks(MD), SESSION, 'console');
-  assert.match(html, /^<div class="cb" data-kind="terminal" data-lang="console"><div class="cb-head"><span class="cb-label">terminal<\/span><button type="button" class="cb-copy">Copy<\/button><\/div>/);
+  assert.match(html, /^<div class="cb" data-kind="terminal" data-lang="console"><div class="cb-head"><span class="cb-label">终端<\/span><button type="button" class="cb-copy">复制<\/button><\/div>/);
   const commands = [...html.matchAll(/<span class="cb-ln">((?:(?!<span class="cb-ln">)[\s\S])*?)<\/span>(?=\n|<\/code>)/g)].map(match => pageText(match[1]));
   assert.deepEqual(commands, ['pip install numpy \\', '    --quiet', 'python3 main.py --steps 3']);
   const output = [...html.matchAll(/<span class="cb-o">([^<]*)<\/span>/g)].map(match => match[1]);

@@ -115,7 +115,7 @@ body { margin: 0; }
 .m-section-num,
 .m-box-label,
 .m-fig-head,
-.m-listing-head,
+.cb-head,
 .m-table th,
 
 .m-fig,
@@ -129,10 +129,10 @@ body { margin: 0; }
 .m-fig-cap { font-size: 8pt; }
 
 .m-listing { break-inside: auto; margin: 8pt 0 9pt; }
-.m-listing-head { padding: 4pt 8pt; break-inside: avoid; break-after: avoid; }
-.m-listing .m-print-code,
-.m-code { margin: 0; background: var(--m-code-bg); border: 1px solid var(--m-panel-edge); font-family: var(--m-font-mono); font-size: 7.6pt; line-height: 1.45; padding: 6pt 8pt; white-space: pre-wrap; overflow: visible; overflow-wrap: anywhere; break-inside: auto; }
-.m-print-code { white-space: normal; }
+.manual .cb { break-inside: auto; }
+.cb-head { min-height: 0; padding: 4pt 8pt; font-family: var(--m-font-mono); break-inside: avoid; break-after: avoid; }
+.cb-copy { display: none; }
+.manual .cb .m-print-code { font-family: var(--m-font-mono); font-size: 7.6pt; line-height: 1.45; padding: 6pt 8pt; white-space: normal; overflow: visible; overflow-wrap: anywhere; break-inside: auto; }
 .m-print-line { min-height: 1.45em; break-inside: avoid; }
 .m-print-line code { display: block; white-space: pre-wrap; font-size: inherit; color: var(--m-ink); }
 .m-listing-note { font-size: 7.6pt; }

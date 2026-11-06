@@ -53,7 +53,8 @@ test('MDRender restores nested syntax tokens without changing quoted URLs, fragm
     assert.doesNotMatch(inner, /\x00TOK\d+\x00/);
     assert.doesNotMatch(inner, /<script\b|<img\b/);
     assert.equal(window.MDRender.renderCodeBlock(code, lang), html);
-    assert.ok(html.includes('data-code="' + MDRender.escapeAttr(code) + '"'), 'copy payload stays original');
+    // code-copy.js copies the text of <code>, so the decoded text above is the copy payload.
+    assert.match(html, /<button type="button" class="cb-copy">复制<\/button>/, 'copy button reads the rendered code');
   }
 });
 
@@ -209,7 +210,7 @@ test('MDRender real open-weight-vlm-recipes exercises form one five-item list an
   assert.match(escaped, /<code>phases\/a\/code\/main\.py<\/code>/);
   assert.match(escaped, /<strong>中文<\/strong>/);
   const code = MDRender.parseMd('```python\nprint("1. & <tag>")\n```');
-  assert.match(code, /data-code="print\(&quot;1\. &amp; &lt;tag&gt;&quot;\)"/);
+  assert.equal(code.match(/<code>([\s\S]*?)<\/code>/)[1].replace(/<[^>]*>/g, ''), 'print("1. &amp; &lt;tag&gt;")');
   assert.doesNotMatch(code, /<ol\b/);
   const source = fs.readFileSync(path.join(root, 'site/lesson.html'), 'utf8');
   assert.match(source, /\.lesson-article ol\s*\{[^}]*counter-reset:\s*ol-counter var\(--ol-start,\s*0\)/);

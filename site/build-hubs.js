@@ -20,7 +20,7 @@ const BODY_ASSETS = `<script src="/header.js?v=${HEADER_ASSET_VERSION}" defer></
 const EXPLORE_LINKS = [
   ['/catalog', '课程表'], ['/prereqs.html', '路线图'], ['/learning-paths', '学习路径'],
   ['/projects', '实战项目'], ['/manuals', '技术手册'], ['/cheatsheets', '速查表'], ['/practice', '编程练习'],
-  ['/interviews', 'Interviews'],
+  ['/interviews', '面试题库'],
   ['/certifications', '认证备考'], ['/glossary', '术语表'], ['/about', '关于'], ['/developer', '开发者文档'],
 ];
 

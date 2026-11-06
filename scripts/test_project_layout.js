@@ -73,25 +73,24 @@ async function main() {
       await command('Page.navigate', { url: `${base}/project/${id}/` });
       let loaded = false;
       for (let attempt = 0; attempt < 200; attempt++) {
-        loaded = await evaluate("!!document.querySelector('#pjDoc pre .code-copy')");
+        loaded = await evaluate("!!document.querySelector('#pjDoc .cb pre code') && !!document.querySelector('#pjDoc .cb .cb-copy')");
         if (loaded) break; await delay(50);
       }
       if (!loaded) throw Error(`${id}: actual stage code did not load`);
       await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
       await delay(250);
-      // Keyboard activation must retain focus and copy the original MDRender literal.
+      // Keyboard activation must retain focus and copy the rendered code literal.
       const row = await evaluate(`(async function(){
-        const pres=[...document.querySelectorAll('#pjDoc pre')].filter(pre=>pre.querySelector('code')&&pre.querySelector('.code-copy'));
-        const pre=pres.sort((a,b)=>b.scrollWidth-a.scrollWidth)[0];
-        const button=pre.querySelector('.code-copy');
+        const blocks=[...document.querySelectorAll('#pjDoc .cb')].filter(block=>block.querySelector('pre code')&&block.querySelector('.cb-copy'));
+        const block=blocks.sort((a,b)=>b.querySelector('pre').scrollWidth-a.querySelector('pre').scrollWidth)[0];
+        const button=block.querySelector('.cb-copy');
         Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.__copied=value;}}});
-        // Select the longest block for the scroll check; inspect every native toolbar.
-        const toolbars=pres.map(block=>{
-          const copy=block.querySelector('.code-copy'), label=block.querySelector('.code-lang');
-          const rect=copy.getBoundingClientRect(), codeRect=block.querySelector('code').getBoundingClientRect();
+        // Select the longest block for the scroll check; inspect every code block header.
+        const toolbars=blocks.map(block=>{
+          const copy=block.querySelector('.cb-copy'), label=block.querySelector('.cb-label');
+          const rect=copy.getBoundingClientRect(), codeRect=block.querySelector('pre').getBoundingClientRect();
           return {width:rect.width,height:rect.height,codeBelow:codeRect.top>=rect.bottom,
-            separated:!label||label.getBoundingClientRect().right<=rect.left,
-            preserved:block.querySelector('code').textContent===copy.getAttribute('data-code')};
+            separated:!label||label.getBoundingClientRect().right<=rect.left};
         });
         const lists=[...document.querySelectorAll('#pjDoc > :is(ul, ol), #pjDoc > :is(ul, ol) :is(ul, ol)')].map(list=>({
           indent:parseFloat(getComputedStyle(list).paddingInlineStart),left:list.getBoundingClientRect().left,
@@ -103,7 +102,9 @@ async function main() {
       await command('Input.dispatchKeyEvent', { type: 'keyUp', key: ' ', code: 'Space', windowsVirtualKeyCode: 32 });
       await delay(30);
       Object.assign(row, await evaluate(`(function(){
-        const button=window.__targetCopy, pre=button.closest('pre'), text=button.getAttribute('data-code');
+        const button=window.__targetCopy, block=button.closest('.cb'), pre=block.querySelector('pre');
+        const lines=block.querySelectorAll('.cb-ln');
+        const text=lines.length?[...lines].map(line=>line.textContent).join('\\n'):block.querySelector('pre code').textContent;
         pre.scrollLeft=pre.scrollWidth;
         const strings=[...document.querySelectorAll('#pjProjectHero li')].map(li=>({text:li.textContent,href:li.querySelector('a')?.getAttribute('href')||null}));
         return {innerWidth:innerWidth,clientWidth:document.documentElement.clientWidth,scrollWidth:document.documentElement.scrollWidth,
@@ -121,10 +122,11 @@ async function main() {
       assert.equal(row.innerWidth, row.width, 'Do not emulate a narrow screenshot with a wide layout viewport');
       assert.ok(row.scrollWidth <= row.clientWidth, `${row.id}@${row.width}: ${row.scrollWidth} > ${row.clientWidth}`);
       assert.ok(row.toolbars.length > 0);
+      assert.ok(row.codeChars > 0, 'Copy payload must contain the rendered code');
       for (const toolbar of row.toolbars) {
-        assert.ok(toolbar.width >= 44 && toolbar.height >= 44, `${row.id}@${row.width}: native copy target too small`);
-        assert.ok(toolbar.codeBelow && toolbar.separated, 'Native toolbar must not overlap its label or code');
-        assert.equal(toolbar.preserved, true, 'CSS must preserve every code literal');
+        // WCAG 2.2 AA target size: at least 24 CSS px; the shared header button is wider than tall.
+        assert.ok(toolbar.width >= 44 && toolbar.height >= 24, `${row.id}@${row.width}: copy target too small`);
+        assert.ok(toolbar.codeBelow && toolbar.separated, 'Code block header must not overlap its label or code');
       }
       if (row.id === 'dataset-contract-gate') assert.ok(row.lists.length > 0, 'Exercise actual Markdown lists, not figure-generated lists');
       assert.ok(row.lists.every(list => list.indent >= 20 && list.left >= 0 && list.marker !== 'none' && list.position === 'outside'), 'Native list markers need an in-page gutter');
