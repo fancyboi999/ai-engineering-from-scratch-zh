@@ -2,7 +2,7 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "site",
   "framework": null,
-  "installCommand": "echo skip",
+  "installCommand": "npm ci --no-audit --no-fund",
   "functions": {
     "api/mcp.js": {
       "maxDuration": 10,
