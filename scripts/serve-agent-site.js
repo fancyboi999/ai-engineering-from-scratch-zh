@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const config = require('../vercel.json');
 const SITE = path.join(__dirname, '../site');
+const ROOT = path.resolve(__dirname, '..');
 const handlers = {
   '/api/markdown': require('../api/markdown'), '/api/v1/markdown': require('../api/v1/markdown'),
   '/api/v1/catalog': require('../api/v1/catalog'), '/api/v1/resource': require('../api/v1/resource'),
@@ -40,8 +41,27 @@ function fill(destination, names, match) {
 
 function createServer() {
   return http.createServer(async (req, res) => {
+    // This server previews a changing checkout. Production cache lifetimes
+    // would hide rebuilt HTML and assets behind stale browser responses.
+    const setHeader = res.setHeader;
+    res.setHeader = function (name, value) {
+      return setHeader.call(this, name, name.toLowerCase() === 'cache-control' ? 'no-store' : value);
+    };
+    res.setHeader('Cache-Control', 'no-store');
     try {
       const url = new URL(req.url, 'http://127.0.0.1');
+      // The lesson reader resolves local repository sources at /phases or
+      // /certifications. Keep the preview on the current checkout.
+      if (/^\/(?:phases|certifications)\//.test(url.pathname)) {
+        const relative = decodeURIComponent(url.pathname).slice(1);
+        const filename = path.resolve(ROOT, relative);
+        if (relative.split('/').some(segment => segment === '..' || segment === '.') || !filename.startsWith(ROOT + path.sep) || !/\.(?:md|json|py|ts|js|rs|jl|txt|csv)$/.test(filename) || !fs.existsSync(filename) || !fs.statSync(filename).isFile()) {
+          res.writeHead(404); return res.end();
+        }
+        res.setHeader('Content-Type', filename.endsWith('.json') ? 'application/json; charset=utf-8' : 'text/plain; charset=utf-8');
+        if (req.method === 'HEAD') return res.end();
+        return fs.createReadStream(filename).pipe(res);
+      }
       for (const rule of config.redirects || []) {
         const { names, regex } = compile(rule.source);
         const match = url.pathname.match(regex);

@@ -1,7 +1,32 @@
 {
-  "base": "3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a",
-  "target": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
-  "pending": [],
+  "base": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
+  "target": "d7b5633f91591ee3bf55c8d80831b515498cc0e6",
+  "pending": [
+    {
+      "id": "batch-1-lesson-fixes",
+      "title": "核心课程理论与测验去偏勘误（#749）",
+      "commit": "60941c963"
+    },
+    {
+      "id": "batch-2-code-render-search",
+      "title": "Shiki 构建期代码渲染与 Pagefind 检索基础架构（#732, #751, #752）",
+      "commit": "d1cf10338"
+    },
+    {
+      "id": "batch-3-interviews-scaffold",
+      "title": "面试题库系统脚手架、页面构建与验证工具（#731, #735）",
+      "commit": "321cd607c"
+    },
+    {
+      "id": "batch-4-upstream-fixes",
+      "title": "上游四级标题、phase-13/45 夹具编译器闸门与 phase-10 测验干扰项（#707, #726, #725）",
+      "upstream": [
+        "2c22ad8f6",
+        "b019240f6",
+        "6ad299d6d"
+      ]
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -121,6 +146,69 @@
         "site/test_star_nudge.js",
         "site/header.js",
         "lib/site-navigation.js"
+      ]
+    },
+    {
+      "scope": "核心课程勘误与测验去偏（2026-11-04）",
+      "decision": "语义移植 5153c4531 涉及 10 门课的 13 处陈述纠错，涵盖 KV Cache 比较与投影重算、EAGLE 接收率基准与生产区间界定、BPE 前导空格切分、训练复现与确定性边界、AnyRes 2x2 token 计算、Canary 门禁与 Eval 权责、pass@k 插件估计与无偏估计对比、位置编码波长物理含义、困惑度 batch 加权偏差修正及 ECE 桶内相消。重新运行 debias_quizzes 确保答案分布均匀。",
+      "paths": [
+        "phases/07-transformers-deep-dive/",
+        "phases/10-llms-from-scratch/",
+        "phases/12-multimodal-ai/",
+        "phases/17-infrastructure-and-production/",
+        "phases/19-capstone-projects/"
+      ]
+    },
+    {
+      "scope": "构建期代码渲染与搜索架构（2026-11-04）",
+      "decision": "移植 Shiki 4.5.0 与 Pagefind 1.5.2 基础工具链。强化 site/md-render.js 与 site/lesson-markdown.js 的单一渲染器契约；语义适配 site/build-lessons.js 与 site/build-search.js 优先读取中文 docs/zh.md 并生成 2830 个代码块预渲染产物；site/cmdpalette.js 接入 Pagefind 异步检索，保留中文本土化 UI 标签；保持无 Shiki 时的正则渲染优雅降级。项目页与课程页共用 .cb 代码块，项目页模板加载 code.css 与 code-copy.js，删除旧 .code-copy 样式与点击分支。",
+      "paths": [
+        "package.json",
+        "site/code.css",
+        "site/code-copy.js",
+        "site/lib/code.js",
+        "site/md-render.js",
+        "site/lesson-markdown.js",
+        "site/lesson.html",
+        "site/build-lessons.js",
+        "site/build-search.js",
+        "site/cmdpalette.js",
+        "site/test_code_render.js",
+        "site/test_lesson_code.js",
+        "site/project.html",
+        "site/projects.css",
+        "site/projects.js"
+      ]
+    },
+    {
+      "scope": "面试题库系统脚手架与模拟面试技能（2026-11-04）",
+      "decision": "引入 23 张面试卡片、60 个故障场景、482 道面试题、静态校验器（validate.js）与 build-interviews。跳过上游外部 LLM API 自动生成脚本（generate.js）。题库正文按上游 8fec9cc19 逐篇翻译并对照英文原文审校，保留英文结构标记、代码、链接目标与条目数量；生成的 README 索引随条目提交，CI 用 --check-readmes 校验。场景证据与上游手册逐字节比对，只读取 CI 从上游冻结版本解出的快照（AIFS_EVIDENCE_ROOT），不回退到中文正文；站点构建不依赖该快照。导航使用静态链接，不在运行时注入。",
+      "paths": [
+        "interviews/",
+        "scripts/interviews/validate.js",
+        "scripts/interviews/test_validate.js",
+        "site/build-interviews.js",
+        "site/interviews.css",
+        "site/interviews.js",
+        "site/test_interviews.js",
+        "skills/interview-prep/",
+        ".claude/skills/interview-prep/",
+        "site/build-skills.js",
+        "site/skills.html",
+        "site/skills.md",
+        "site/roadmap.html"
+      ]
+    },
+    {
+      "scope": "上游 8fec9cc19..d7b5633f9 修复移植（2026-11-06）",
+      "decision": "四级标题：在 md-render.js 移植 h4 解析与重复标题 id 后缀；纯中文标题的 slug 为空，保持空 id，由课程页目录在运行时分配 section-N，不改变现有中文锚点。继续学习面板改链到 catalog.html?phase=<id>。phase-13/45：代码与 build-record.json 按上游移植，中文仓独有的重定位身份测试在临时目标文件上显式放行构建记录闸门；文档补充译入 zh.md。phase-10/06、07：按上游新干扰项翻译，再用 debias_quizzes.py 确定性重排；07 课测验的 reward hacking 统一为正文用的「奖励作弊」。",
+      "paths": [
+        "site/md-render.js",
+        "site/lesson.html",
+        "site/test_lesson_headings.js",
+        "phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/",
+        "phases/10-llms-from-scratch/06-instruction-tuning-sft/quiz.json",
+        "phases/10-llms-from-scratch/07-rlhf/quiz.json"
       ]
     }
   ]

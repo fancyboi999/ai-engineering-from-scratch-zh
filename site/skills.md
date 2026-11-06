@@ -128,7 +128,20 @@
 - 安装： `npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill mcpa-certification`
 - 源文件： https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/mcpa-certification/SKILL.md
 
-## 05 制作图表与手册
+## 05 面试实战
+
+逐题或逐场景准备 AI 工程技术面试。
+
+### interview-prep (v1.0.0)
+
+提出一道面试题或一个现场排障场景并等待你的回答；根据题库对回答进行评分、逐一追问，并将知识盲点引导至对应课程或手册。
+
+- 你可以说： "模拟面试", "运行故障排查场景"
+- 写入产物： INTERVIEW-LEARNING.md
+- 安装： `npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill interview-prep`
+- 源文件： https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/interview-prep/SKILL.md
+
+## 06 制作图表与手册
 
 制作符合本站风格的图表和手册。
 
@@ -177,6 +190,6 @@
 - 安装： `npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill write-manual`
 - 源文件： https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/write-manual/SKILL.md
 
-## 06 课程产物
+## 07 课程产物
 
 409 个技能与 100 个 prompt 位于 `phases/**/outputs/`。安装命令为 `python3 scripts/install_skills.py <target> --phase <n>` 或 `--tag <tag>`。

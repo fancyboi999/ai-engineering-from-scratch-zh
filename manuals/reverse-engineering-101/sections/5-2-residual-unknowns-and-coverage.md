@@ -4,7 +4,7 @@
 
 `capture/out/10-mcp-09-analyze-function-percent-change-O1.json` 的 `_percent_change` 档案列出 `"callees": []`。agent 读后声称函数没有调用任何内容，记录却只支持更弱结论：Ghidra 解析了哪些调用。rea 为仍未解决的事情提供记录类型。读完本节，你能阅读 ResidualUnknown 的字段，用 `record_unknown` 创建记录，并说明空列表证明什么。
 
-## 空列表证明什么
+## 空列表证明什么 {#s-residual-unknowns-and-coverage-what-an-empty-list-proves}
 
 档案有空 `callees` 数组，840 行之后有相关限制。callees 只保存已解析目标。记录说集合完整：`relationship_coverage.status` 为 `complete`，`unresolved_calls` 为空。完整表示 Ghidra 返回所有已解析调用引用，不表示发现程序运行时所有可能调用。
 
@@ -61,7 +61,7 @@ claim: 完整覆盖下的空 callees、零未知项计数、单侧 bundle 记录
 caption: 每列从上向下读，先看采集值，再看记录自身措辞，最后看可得结论。依据 capture/out/10-mcp-09-analyze-function-percent-change-O1.json、10-mcp-14-export-evidence-bundle-O1.json 和 14-compare-bundles.json。
 ```
 
-## ResidualUnknown 记录
+## ResidualUnknown 记录 {#s-residual-unknowns-and-coverage-the-residualunknown-record}
 
 **剩余未知项：** 证据尚未解决的问题，以记录保存，具有 `unk_` id、修订链、状态，以及解决所需证据。字段如下。
 
@@ -104,7 +104,7 @@ claim: 未知项跨修订保持 id，每个修订指明前一版摘要，每次�
 caption: 从左向右读。第 1 版是 registerFunctionComparisonTool.ts 为 capture/out/10-mcp-21-compare-functions-total.json 中 _total 比较记录的未知项。右列显示 update_unknown 调用改变的字段。
 ```
 
-## rea 自己创建的未知项
+## rea 自己创建的未知项 {#s-residual-unknowns-and-coverage-unknowns-that-rea-opens-itself}
 
 agent 用 `record_unknown` 创建未知项，rea 也会自行创建。`compare_functions` 在状态不是 `unchanged` 时就创建一项，域为 `function-comparison`。`changed` 比较的严重性为 `medium`，支持证据是左档案和比较记录，反驳证据是右档案，因此初始状态为 `contradicted`。
 

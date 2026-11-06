@@ -6,7 +6,7 @@ agent 即将对你提供的文件调用工具。有些 rea 操作启动 Java 进
 
 读完本节，你能阅读能力组、说出七种副作用标志，并选出不产生变更的操作。
 
-## 命令与记录
+## 命令与记录 {#s-rea-capabilities-the-command-and-its-record}
 
 `capabilities` 和 `providers` 一起注册，前者描述为“列出 provider 能力与副作用”。两者均打印会话状态，即 MCP 的 `binary_session` 返回对象。没有打开目标时，以 `open: false` 开始：
 
@@ -77,7 +77,7 @@ claim: 能力组在调用前回答四个问题：操作是否可用、启动什�
 caption: 阅读字段、ghidra 块中 analyze_function 组的取值及说明。来自 capture/out/02-capabilities.json，schema 来自固定标签的 src/contracts/toolOutputSchemaPrimitives.ts。
 ```
 
-## 七种副作用
+## 七种副作用 {#s-rea-capabilities-the-seven-effects}
 
 组的 `effects` 从固定七种标志中取值。未列出的标志对该组全部操作均为假。
 
@@ -103,7 +103,7 @@ claim: 所有 Ghidra 操作均声明 launches_process、may_write_filesystem，�
 caption: 每列一个 provider，每行一个标志，各单元为声明该标志的操作数。统计自 capture/out/02-capabilities.json。
 ```
 
-## 四个候选，一个绑定
+## 四个候选，一个绑定 {#s-rea-capabilities-four-candidates-one-bound}
 
 ```listing
 title: 三个不可用候选
@@ -152,13 +152,13 @@ note: 仅保留 hopper、ida、kuna 的 provider 与可用性；省略诊断、�
 
 引擎可用性与操作可用性是不同事实。这些命令分别属于 binary-session provider 和辅助能力 {{cli Choose a provider}}。使用 `--provider ghidra` 或 `provider_id: "ghidra"` 时，仅 Ghidra 块适用。
 
-## 限制是声明的一部分
+## 限制是声明的一部分 {#s-rea-capabilities-limitations-are-part-of-the-declaration}
 
 所有 Ghidra 操作在自身限制之前先携带四条共享限制：默认自动分析完成后才服务操作；Program 与项目为临时对象；取消请求会终止数据库并丢弃注解；地址为默认地址空间中小写 `0x` 十六进制（capture/out/02-capabilities.json）。
 
 然后各组添加自身限制。将空列表理解为不存在之前，必须读这些句子。`list_strings` 说明：“空搜索结果不能证明产物中没有文本。”`procedure_callers` 没有自身限制，但其回答包含 `relationship_coverage`，其中 Ghidra 诊断说明仅返回已解析调用引用，“未解析的计算或间接调用仍为未知”（capture/out/06-function-percent-change.json）。背后的设计规则是：“缺失覆盖意味着未知，而非不存在。”{{design Define the contract}}。
 
-## tools/list 的另一套词汇
+## tools/list 的另一套词汇 {#s-rea-capabilities-a-second-vocabulary-in-tools-list}
 
 记录以 `server_identity` 结束，其 `catalog` 包含计数及目录的三个 SHA-256 摘要：
 

@@ -67,12 +67,15 @@ mlruns/
 !.claude/skills/find-your-level/**
 !.claude/skills/learn-agent-skills/
 !.claude/skills/learn-mcp/
+!.claude/skills/interview-prep/
+!.claude/skills/interview-prep/**
 # impeccable 工具的本地缓存/配置（config.json、hook.cache.json），任意层级，不入库
 .impeccable/
 
 # 由 site/build.js 在每次 Vercel 部署时生成（buildCommand）——不提交，
 # 以免漂移或丢 URL。每次从 PHASES 重新生成。
 site/sitemap.xml
+site/sitemap-*.xml
 site/llms.txt
 # 由 build.js 每次部署写入，记录本次部署的 git 分支（供 lesson.html 按分支拉取 docs）
 site/build-meta.js
@@ -141,3 +144,8 @@ site/cheatsheet-map.json
 site/practice/
 site/practice-map.json
 site/manual/
+site/pagefind/
+site/lesson-code/
+site/interviews/
+site/interviews.json
+site/sitemap-interviews.xml

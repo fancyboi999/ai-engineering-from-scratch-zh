@@ -6,7 +6,7 @@
 
 读完本节，你能阅读 `xrefs` 结果，在档案中找到各引用类别，也能区分两种 `grade` 构建里的跳转表与值表。
 
-## 调用
+## 调用 {#s-xrefs-and-the-jump-table-the-call}
 
 ```listing
 title: _grade 入口的 xrefs
@@ -33,7 +33,7 @@ note: 请求参数、结果，以及七项限制中的两项。
 
 桥接层向 Ghidra 的 `ReferenceManager` 请求指向该地址的全部引用，跳过合成的入口点引用，收集不同来源地址并排序。结果只有地址。档案的 `incoming_references` 切面保留每项引用的类别：调用、跳转或数据。
 
-## 0x10000811a 处是什么
+## 0x10000811a 处是什么 {#s-xrefs-and-the-jump-table-what-is-at-0x10000811a}
 
 该地址位于 `__LINKEDIT`，后者从 `0x100008000` 开始，映射文件偏移 32768。差值 `0x11a` 为 282，因此该字节位于文件偏移 33050。[第 3.2 节](#s-inspect-binary-layout-and-the-load-image)列出偏移 33048、大小 8 字节的 `LC_FUNCTION_STARTS`。引用指向函数起点表内部。
 
@@ -95,7 +95,7 @@ claim: entry 调用四个函数中的三个，函数起点表引用全部四个�
 caption: 横向阅读每行。左侧绿色框是 entry 中的调用点，紫框是函数，右侧绿色框是 LC_FUNCTION_STARTS 条目。依据四份 analyze_function 档案及 capture/fixtures/ledger-arm64-O1。
 ```
 
-## 并不存在的跳转表
+## 并不存在的跳转表 {#s-xrefs-and-the-jump-table-the-jump-table-that-is-not-there}
 
 采集中的每份档案，其 `native_api` 切面都有 `"jump_tables": []`，配置将契约命名为 `jump_table_evidence: "typed-case-default-blocks-v1"`。发现跳转表时 Ghidra 会填充该字段。这里没有发现，因为 `-O1` 下两个编译器都没有为 `grade` 的 switch 生成跳转表，而是把五个 case 转为包含五个返回值的表，加一次边界检查。
 

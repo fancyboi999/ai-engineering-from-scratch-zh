@@ -8,10 +8,12 @@ const { githubSourceUrl } = require('./build.js');
 const { localPath, within } = require('./build-projects.js');
 const figkit = require('../manuals/_shared/figkit.js');
 const { validateSvg } = require('../manuals/_shared/svg.js');
+const code = require('./lib/code.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const MANUALS = path.join(ROOT, 'manuals');
 const SITE = __dirname;
+const CODE_COPY_VERSION = require('node:crypto').createHash('sha256').update(fs.readFileSync(path.join(SITE, 'code-copy.js'))).digest('hex').slice(0, 16);
 const SITE_ORIGIN = 'https://aieng-zh.cn';
 const ISSUES_URL = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues';
 const AUTHOR = 'Rohit Ghumare';
@@ -393,37 +395,6 @@ function linkHtml(label, href, where, acc) {
   return `<a href="${escapeHtml(githubSourceUrl(target) + (fragment ? `#${fragment}` : ''))}" rel="noopener">${label}</a>`;
 }
 
-function highlightJson(line) {
-  const pattern = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|\b(true|false|null)\b/g;
-  let out = '';
-  let last = 0;
-  let match;
-  while ((match = pattern.exec(line))) {
-    out += escapeHtml(line.slice(last, match.index));
-    if (match[1]) out += `<span class="${match[2] ? 'm-tok-key' : 'm-tok-str'}">${escapeHtml(match[1])}</span>${match[2] ? escapeHtml(match[2]) : ''}`;
-    else if (match[3]) out += `<span class="m-tok-num">${match[3]}</span>`;
-    else out += `<span class="m-tok-lit">${match[4]}</span>`;
-    last = pattern.lastIndex;
-  }
-  return out + escapeHtml(line.slice(last));
-}
-
-function highlightLine(line, lang) {
-  if (/^\s*…\s*$/.test(line)) return `<span class="m-tok-dim">${escapeHtml(line)}</span>`;
-  if (lang === 'json' || lang === 'jsonl') return highlightJson(line);
-  if (/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) \S+ HTTP\/\d(\.\d)?$|^HTTP\/\d(\.\d)? \d{3}.*$/.test(line)) return `<span class="m-tok-meta">${escapeHtml(line)}</span>`;
-  const field = /^(event|data|id|retry):(\s?)(.*)$/.exec(line);
-  if (field) return `<span class="m-tok-meta">${field[1]}:</span>${field[2]}${field[1] === 'data' ? highlightJson(field[3]) : escapeHtml(field[3])}`;
-  const header = /^([A-Za-z][A-Za-z0-9-]*):(\s.*)$/.exec(line);
-  if (header) return `<span class="m-tok-key">${escapeHtml(header[1])}</span>:${escapeHtml(header[2])}`;
-  return highlightJson(line);
-}
-
-function highlight(code, lang) {
-  if (!LISTING_LANGS.has(lang)) return escapeHtml(code);
-  return code.split('\n').map(line => highlightLine(line, lang)).join('\n');
-}
-
 function loadSvg(file, id, where) {
   const raw = fs.readFileSync(file, 'utf8').replace(/<\?xml[\s\S]*?\?>/g, '').replace(/<!--[\s\S]*?-->/g, '').trim();
   const result = validateSvg(raw, id, figkit.WIDTH);
@@ -624,7 +595,7 @@ function blockHtml(block, doc, manual, acc) {
       return `<${tag}>${block.items.map(item => `<li>${inline(item)}</li>`).join('')}</${tag}>`;
     }
     case 'table': return tableHtml(block.head.map(inline), block.rows.map(row => ({ cells: row.map(inline) })));
-    case 'code': return `<pre class="m-code"><code>${highlight(block.code, block.lang)}</code></pre>`;
+    case 'code': return code.render(block.code, block.lang);
     case 'figure': return figureHtml(block);
     case 'palette': return `<table class="m-palette"><tbody>${manual.paletteHtml.map(entry => `<tr data-accent="${entry.hue}"><td><span class="m-swatch"></span><span class="m-kicker">${HUE_LABELS[entry.hue]}</span></td><td>${entry.html}</td></tr>`).join('')}</tbody></table>`;
     case 'parts': {
@@ -634,7 +605,7 @@ function blockHtml(block, doc, manual, acc) {
     }
     case 'figure-index': return tableHtml(['图', '图中说明的结论'], [...manual.figures.values()].map(figure => ({ accent: figure.accent, cells: [`<a class="m-xref" href="#${figure.id}">${figure.number}</a>`, figure.claimHtml] })));
     case 'contents': return tocHtml(manual, 'web');
-    case 'listing': return `<figure class="m-listing" data-source="${escapeHtml(block.source)}"><div class="m-listing-head"><span class="m-listing-title">${inline(block.title)}</span>${evidenceLink(evidenceUrl(block.sourceFile, where))}<span>${escapeHtml(block.lang)}</span></div><pre><code>${highlight(block.code, block.lang)}</code></pre>${block.note ? `<figcaption class="m-listing-note">${inline(block.note)}</figcaption>` : ''}</figure>`;
+    case 'listing': return `<figure class="m-listing" data-source="${escapeHtml(block.source)}">${code.render(block.code, block.lang, { extra: `<span class="m-listing-title">${inline(block.title)}</span>${evidenceLink(evidenceUrl(block.sourceFile, where))}` })}${block.note ? `<figcaption class="m-listing-note">${inline(block.note)}</figcaption>` : ''}</figure>`;
     case 'takeaways': return `<aside class="m-takeaways"><div class="m-box-label">${TAKEAWAYS_LABEL}</div><ul>${block.items.map(item => `<li>${inline(item)}</li>`).join('')}</ul></aside>`;
     case 'rule': return `<aside class="m-rule"><div class="m-box-label">${escapeHtml(block.label)}</div><p>${inline(block.quote)}</p></aside>`;
     case 'lab-runs': return labRunsHtml(manual, where);
@@ -772,9 +743,11 @@ function highlightsScripts(highlights) {
 `;
 }
 
+function codeCss() { return fs.readFileSync(path.join(SITE, 'code.css'), 'utf8'); }
+
 function pageShell({ title, ogTitle, description, canonical, noindex, card, main, highlights, rooted = false, jsonld = [] }) {
   const base = rooted ? '/' : '';
-  const css = shared('tokens.css') + shared('manual.css') + shared('web.css');
+  const css = shared('tokens.css') + shared('manual.css') + shared('web.css') + codeCss();
   const jsonldHtml = jsonld.length ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': jsonld }).replace(/</g, '\\u003c')}</script>` : '';
   return `<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
@@ -807,6 +780,7 @@ ${main}
 <script src="${base}content-source.js"></script>
 <script src="${base}header.js?v=${HEADER_ASSET_VERSION}" defer></script>
 <script src="${base}cmdpalette.js" defer></script>
+<script src="${base}code-copy.js?v=${CODE_COPY_VERSION}" defer></script>
 <script>${shared('dither.js')}</script>
 <script>${shared('motion.js')}</script>
 ${highlightsScripts(highlights)}</body>
@@ -972,8 +946,8 @@ function stripMotion(html) {
 
 function printCodeLines(html) {
   // Explicit line boxes let Paged.js split long preformatted listings without losing the tail.
-  return html.replace(/<pre([^>]*)><code>([\s\S]*?)<\/code><\/pre>/g, (match, attrs, code) =>
-    `<div class="m-print-code${attrs.includes('m-code') ? ' m-code' : ''}">${code.split('\n').map(line => `<div class="m-print-line"><code>${line}</code></div>`).join('\n')}</div>`);
+  return html.replace(/<pre><code>([\s\S]*?)<\/code><\/pre>/g, (match, code) =>
+    `<div class="m-print-code">${code.split('\n').map(line => `<div class="m-print-line"><code>${line}</code></div>`).join('\n')}</div>`);
 }
 
 function printFonts() {
@@ -987,7 +961,7 @@ function printFonts() {
 }
 
 function printPage(manual) {
-  const css = shared('tokens.css') + shared('manual.css') + shared('print.css');
+  const css = shared('tokens.css') + shared('manual.css') + codeCss() + shared('print.css');
   return `<!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
@@ -1065,7 +1039,8 @@ function writePrint(manuals, outDir) {
   }
 }
 
-function main(argv) {
+async function main(argv) {
+  await code.init();
   const args = argv.slice(2);
   const flag = name => args.includes(name);
   const value = name => { const index = args.indexOf(name); return index >= 0 ? args[index + 1] : undefined; };
@@ -1083,12 +1058,10 @@ function main(argv) {
 }
 
 if (require.main === module) {
-  try {
-    main(process.argv);
-  } catch (error) {
+  main(process.argv).catch(error => {
     console.error(`build-manuals: ${error.message}`);
     process.exit(1);
-  }
+  });
 }
 
 module.exports = {

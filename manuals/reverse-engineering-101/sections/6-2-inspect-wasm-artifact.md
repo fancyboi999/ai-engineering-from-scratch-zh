@@ -4,7 +4,7 @@
 
 你手写了 `capture/fixtures/wasm/ledger.wat`，包含与 `ledger.c` 相同四个函数，用 `wat2wasm` 汇编为 `ledger.wasm`。通过 CLI 和 MCP 请求 rea 6.7.0 检查，两个入口都返回相同 Evidence。读完本节，你能配置 WABT provider、阅读记录，并说明记录没有证明什么。
 
-## 配置
+## 配置 {#s-inspect-wasm-artifact-setup}
 
 WebAssembly 不是原生目标。对模块执行 `open_binary` 会返回 `target_unavailable`，约束为 `wasm_requires_static_inspection`，错误指出应调用 `inspect_wasm_artifact`。工具需要自行安装三个 WABT 程序。将 `REA_WABT_BIN_DIRECTORY` 设为包含 `wasm-validate`、`wasm-objdump`、`wasm2wat` 的绝对目录。变量为绝对路径时工具才可用，`binary_session` 会报告可用性。
 
@@ -26,7 +26,7 @@ $ /opt/homebrew/bin/wasm2wat --version
 [exit 0]
 ```
 
-## 命令与记录
+## 命令与记录 {#s-inspect-wasm-artifact-the-command-and-the-record}
 
 CLI 命令为 `rea inspect-wasm-artifact PATH`。采集中约两秒后以 0 退出，输出一条 Evidence。
 
@@ -74,7 +74,7 @@ note: id 与摘要截为八字符，随后是 normalized_result。
 
 主体格式为 `file`，架构为 `null`，因为没有适用的原生格式。provider 版本标明 WABT 发布。记录为 `observed`，权威来源是 `shipped-artifact`，因为磁盘字节是来源。两个空数组是可选输入：`glue_paths` 指定 JavaScript 文件，rea 将其中 `.wasm` 字符串字面量链接到候选模块；`candidate_paths` 指定这些模块。
 
-## rea 运行了什么
+## rea 运行了什么 {#s-inspect-wasm-artifact-what-rea-ran}
 
 rea 将模块复制到私有工作区，命名为只读 `module.wasm`，再运行 `REA_WABT_BIN_DIRECTORY` 目录中的三个程序。每个程序的版本输出都必须精确为 `1.0.42`，否则 rea 不运行。`tool_profile` 记录实际运行内容。
 
@@ -110,7 +110,7 @@ note: 源提交、摘要、wasm-objdump 与 wasm2wat 条目已省略，后二者
 
 rea 在每个程序运行前后检查副本摘要，命令后也再次检查程序自身摘要。摘要标识程序字节，不证明由谁发布。
 
-## 节
+## 节 {#s-inspect-wasm-artifact-sections}
 
 `sections` 数组保存七个节的字节范围与各节条目数。
 
@@ -154,7 +154,7 @@ note: Function、Memory、Export、Code 条目已省略，分别从 41、48、53
 
 文件为 290 字节，前八字节是魔数和版本。每节以一字节 id 和长度开始，再跟载荷。因此 Type 载荷从偏移 `0x0a`，即 10 开始。数据段在地址 1024 保存五个等级标签，间隔两字节。
 
-## 带类型接口
+## 带类型接口 {#s-inspect-wasm-artifact-the-typed-interface}
 
 记录保存两次导入和导出。`imports`、`exports` 数组保留精确 WAT 形式，`interface` 条目为每项补充方向、索引和解析后的签名。
 
@@ -208,7 +208,7 @@ note: 内存导出与三个函数导出已省略。
 
 `percent_change` 接收两个 `i32`，返回一个，与 C 函数形状相同。导入 `env.log` 是函数 0，因此模块的四个函数编号 1 到 4。另一个工具 `compare_wasm_interfaces` 读取两条这类记录，将每项导入导出报告为 added、removed、changed、unchanged。它不读文件，也不运行 WABT 程序。
 
-## WAT
+## WAT {#s-inspect-wasm-artifact-the-wat}
 
 `wat` 保存 `wasm2wat` 输出文本、其 SHA-256 `37eab56a…`，以及表示形式 `decoded-wat`。`percent_change` 函数体是 C 函数的栈形式：先测试第一个参数是否为零，再压入 0，或计算减法、乘以 100、有符号除法。
 
@@ -236,7 +236,7 @@ note: 从 normalized_result.wat.text 截取，其他三个函数体省略。
 
 文本形式有两点呼应第 4 部分。`grade` 函数体的 `br_table` 有十二个目标，这是第 33 课 `ledger-x86_64-O0.o` 中同一 `switch` 跳转表的 WebAssembly 形式。`grade_label` 调用函数 2，再调用导入的 `env.log`，即函数 0。然后把两倍等级加到数据段地址 1024，每个标签两字节。无需反编译器就能从 WAT 读出这些，因为模块没有剥离符号，也没有重定位。
 
-## 限制
+## 限制 {#s-inspect-wasm-artifact-limitations}
 
 记录具备[第 5 部分](#s-the-evidence-record)描述的内容：`evidence_id`、`confidence`、`authority` 和五项 `limitations`。它不反编译函数，只给出 WAT，解读由你完成。
 
@@ -257,7 +257,7 @@ note: 无省略。
 
 第一条限制说明 WAT 是解码表示，不展示原始源码，也不证明运行时行为。`observed` 只针对字节和工具输出。`runtime_execution`、`network_fetch` 均为 `not-performed`，因为 rea 从不运行模块。
 
-## 通过 MCP
+## 通过 MCP {#s-inspect-wasm-artifact-over-mcp}
 
 MCP 工具是接收相同 `path` 的 `inspect_wasm_artifact`。会话第 24 步在 404 毫秒后返回 `ok`。回复是工具结果，`structuredContent` 是相同 Evidence，id 同为 `ev_3a09e4b0…`。`_meta` 带有[第 8.1 节](#s-the-rea-mcp-server)的不可信内容标记。
 
@@ -281,7 +281,7 @@ note: 文本副本和记录其余部分已省略。
 
 会话保留记录，因此 `export_evidence_bundle` 会将它与其他记录一起写入 bundle。对大模块，首次调用传 `detail: "summary"`。rea 保留完整记录，只返回计数、验证结果和 WAT 标识，不返回 WAT 文本，再用 `inspect_analysis_view` 分页读取完整记录。
 
-## 用 wabt 交叉检查
+## 用 wabt 交叉检查 {#s-inspect-wasm-artifact-a-cross-check-with-wabt}
 
 采集还绕过 rea 对模块运行 `wasm-objdump -h -x`，输出在 `16-wabt.txt`。其中节表与记录 `headers` 文本有相同七行。Type 从 `0x0000000a` 开始，Data 在 `0x00000122` 结束，即 290，与 `sections` 偏移一致。[图](#fig-6-2)展示两个入口到同一记录的路径。
 

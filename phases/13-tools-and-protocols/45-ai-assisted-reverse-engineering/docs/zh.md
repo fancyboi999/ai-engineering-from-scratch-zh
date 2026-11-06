@@ -220,7 +220,7 @@ cd phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering
 python3 code/main.py
 ```
 
-路径中存在 clang 时，演示按夹具选项编译每个候选，构建八个差分程序，让每个程序运行 92 个网格单元和 256 个语料输入，读取 DWARF、核对所有引用，再输出评分卡。没有 clang 时，`grid`、`fuzz` 和每项结论都为 `unknown`。
+路径中存在 clang 时，演示按夹具选项编译每个候选，构建八个差分程序，让每个程序运行 92 个网格单元和 256 个语料输入，读取 DWARF、核对所有引用，再输出评分卡。路径中既没有 clang 也没有 cc 时，`grid`、`fuzz` 和每项结论都为 `unknown`。如果 clang 不是 `code/fixtures/build-record.json` 记录的夹具编译器，只有字节比对改用已提交对象，`grid` 和 `fuzz` 仍用主机编译器重新编译每个候选。字节比对要求编译器和编译选项都相同才有意义。已提交对象也只在 `code/fixtures/build-record.json` 仍能把它对应到磁盘上的候选源码时才能代替重建：修改源码后，字节字段为 `unknown`，不会拿过期的字节下结论。
 
 预期形态：
 
@@ -300,7 +300,7 @@ card = score_candidate(load_candidate("f1_base_64"), Path("/tmp/re45"), run_prog
 card["fields"]["bytes"]["evidence"], card["fields"]["citations"]["evidence"]
 ```
 
-先创建 `/tmp/re45`，或传入 `None` 使用已提交对象。编辑 `fixtures/candidates/f1_base_64.c`，将乘数改为 100，运行相同两行，观察 `bytes` 变为 `pass`，`citations` 却仍指出报告中的 64。再把引用改为 100 并重跑。代码和报告都必须修改。
+先创建 `/tmp/re45`，或传入 `None` 使用已提交对象。编辑 `fixtures/candidates/f1_base_64.c`，将乘数改为 100，运行相同两行，观察 `bytes` 变为 `pass`，`citations` 却仍指出报告中的 64。只有在 `code/fixtures/build-record.json` 记录的编译器下，重建才会让 `bytes` 变为 `pass`。换成其他 clang，或传入 `None`，修改后的源码对应不上已提交对象，`bytes` 为 `unknown`，不会比对过期的字节。再把引用改为 100 并重跑。代码和报告都必须修改。
 
 ### 实验 C：向分析者发话的字符串
 

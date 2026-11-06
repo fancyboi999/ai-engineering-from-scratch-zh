@@ -242,6 +242,7 @@
     if (current === 'roadmap.html' || current === 'path.html') target = 'prereqs.html';
     if (current === 'project.html' || /^\/project\//.test(pathname)) target = 'projects.html';
     if (/^manual-/.test(current)) target = 'manuals.html';
+    if (/^\/interviews(?:\/|$)/.test(pathname)) target = 'interviews.html';
     if (/^\/(?:hubs\/)?glossary\//.test(pathname)) target = 'glossary.html';
     if (/^\/(?:hubs\/)?phase\//.test(pathname) || /^\/lessons\//.test(pathname)) target = 'catalog.html';
     if (/^\/cheatsheets(?:\/|$)/.test(pathname)) target = 'cheatsheets.html';
@@ -456,7 +457,7 @@
     function loadScript(name) {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = HEADER_BASE + name + '?v=20261021a';
+        script.src = HEADER_BASE + name + '?v=20261106a';
         script.onload = resolve;
         script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
         document.head.appendChild(script);

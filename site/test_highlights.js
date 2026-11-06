@@ -293,7 +293,7 @@ test('markdown emphasis and link changes keep the rendered text anchored', () =>
 
 test('code blocks anchor on code text and skip the copy button and language label', () => {
   const model = modelOf(LESSON);
-  assert.doesNotMatch(model.text, /Copy def/);
+  assert.doesNotMatch(model.text, /复制\s*def/);
   assert.doesNotMatch(model.text, /python def/);
   const selector = select(model.text, 'return w - lr * grad');
   const edited = LESSON.replace('def step(w, grad, lr):', 'def step(w, grad, lr=0.1):');

@@ -6,7 +6,7 @@
 
 捕获工具用自己的小客户端驱动 `rea mcp`，记录了 25 轮交换。本节阅读最初几轮及对应日志。读完本节后，你可以阅读 `initialize` 与 `tools/list` 的响应，以精确版本注册服务，在 `rea setup` 写入前检查计划，并为首次 Ghidra 调用设置合适的客户端期限。
 
-## 启动服务
+## 启动服务 {#s-the-rea-mcp-server-starting-the-server}
 
 公开的服务注册方式是添加一个 `mcpServers` 条目，通过 `npx` 运行包的 `mcp` 命令：
 
@@ -28,7 +28,7 @@ note: 无省略。结构遵循安装文档 {{install MCP Registry}}。通过 npx
 
 文档要求持久注册使用精确版本 {{install MCP Registry}}。支持注册表发现的客户端可在 `io.github.morluto/rea` 下找到同一 stdio 服务。`rea setup` 为 Claude Code、Codex、Cursor 及列表中的其他客户端写入该结构。`rea doctor --client <id>` 报告注册是否 aligned、stale、missing 或 invalid（[第 2.2 节](#s-rea-doctor-and-the-ghidra-provider)）。
 
-### 使用 rea setup 注册
+### 使用 rea setup 注册 {#s-the-rea-mcp-server-registering-with-rea-setup}
 
 `rea setup` 可以代为写入条目。对于 Claude Code，它修改主目录下的 `.claude.json`；若设置了 `CLAUDE_CONFIG_DIR`，则使用该目录。捕获工具对两个小文件的副本分别运行 setup，每次都将 `HOME` 与 `CLAUDE_CONFIG_DIR` 指向私有工作目录。因此 setup 从未读写宿主用户的配置（capture/README.md）。想安全试用 setup 时也应采用同样做法。
 
@@ -83,7 +83,7 @@ Setup 报告 `ready`，动作为 `configured_claude_code`（capture/out/18-setup
 
 传输在 stdin、stdout 上使用以换行分隔的 JSON-RPC 2.0；stderr 为每次工具调用输出一行 pino JSON。捕获工具按 capture/README.md，以 `node.../scripts/rea.mjs mcp` 启动服务，设置 `GHIDRA_INSTALL_DIR`、`JAVA_HOME`，并将 stderr 保存为 `10-mcp-server.log`。
 
-## initialize
+## initialize {#s-the-rea-mcp-server-initialize}
 
 客户端发送 `initialize`，携带支持的协议版本、能力与名称。服务端返回协商版本、自身能力、身份及给模型的指令字符串：
 
@@ -121,7 +121,7 @@ note: 省略了请求。请求携带 protocolVersion 2025-06-18、空 capabiliti
 
 响应后，客户端发送 `notifications/initialized`，连接建立。后续 `binary_session` 会报告协商版本、两侧 SDK 版本 `2.3.1`、客户端名称与目录摘要（capture/out/10-mcp-04-binary-session.json）。
 
-## tools/list
+## tools/list {#s-the-rea-mcp-server-tools-list}
 
 **工具目录：** 服务端公开的完整工具列表，6.7.0 中共 207 个。每项包含名称、标题、描述、输入 schema、输出 schema 和四个注解提示。无论当前目标是否支持，`tools/list` 都返回全部工具 {{mcp Identity and discovery}}。打开或关闭目标不会改变列表，也不发送 `notifications/tools/list_changed`。应以会话自己的视图为准：`binary_session` 报告当前目标的 `tool_availability`，给出每个不可用工具的原因、修复建议及目录计数。
 
@@ -175,7 +175,7 @@ note: server_identity 对象中的六行。后续摘要标识此份精确目录�
 
 本次捕获的 `tools_sha256` 摘要为 `af39310c…`，涵盖各工具名称、描述、schema，以及服务端使用的输出 schema 配置。因此即使没有增删工具，schema 修改也会改变摘要。检查客户端是否看到测试过的目录时，应比较摘要，而非计数。
 
-### 自包含输入 schema
+### 自包含输入 schema {#s-the-rea-mcp-server-self-contained-input-schemas}
 
 捕获中的每个输入 schema 都自包含。各属性就地声明类型、模式或枚举与描述，无需追踪 `$defs` 或 `$ref`。此形式的 `list_procedures` 输入 schema 为 270 字节。输出 schema 仍通过 `$ref` 共享定义。`open_binary` 的 `architecture` 属性展示了完整枚举：
 
@@ -203,7 +203,7 @@ note: open_binary 输入 schema 的一个属性，省略了其他五个属性。
 
 207 个工具中有 65 个没有 CLI 命令，包括 `open_binary`、`list_procedures`、`compare_functions`、`verify_reconstruction`。六个 prompt 为 `investigate_feature`、`compare_application_versions`、`verify_reconstruction`、`trace_crash`、`audit_residual_unknowns`、`prepare_bounded_process_capture`，都要求 agent 区分观测、推导与未知项。若客户端拒绝大型工具 schema，可用 `REA_MCP_INPUT_SCHEMA_PROFILE=compact` 启动服务 {{mcp Compact input schema profile}}。此配置将每个输入 schema 控制在 13,312 字节内，不改变校验。
 
-## 启动期限与客户端默认值
+## 启动期限与客户端默认值 {#s-the-rea-mcp-server-the-startup-deadline-against-the-client-default}
 
 **启动期限：** rea 允许 Ghidra 导入目标、执行默认自动分析、连接桥接层并报告健康所用的时间。默认 330,000 ms，由 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 设置。`open_binary` 不启动此计时：它校验文件、检查提供器安装、绑定提供器，并在导入前返回。首次依赖 Ghidra 的调用才启动引擎并等待，同时客户端自己的单次调用期限也在计时 {{mcp Ghidra first-query deadlines and recovery}}。
 

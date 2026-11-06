@@ -4,7 +4,7 @@
 
 你有一个 Electron 风格小应用，六个文件位于 `capture/fixtures/js-app/`。读代码前先想看地图：哪个渲染器与哪个主进程处理器通信，什么内容离开机器。分析无需 Ghidra，也不运行应用任何一行，就能回答。读完本节，你能运行分析、阅读记录与图，并用 `inspect-analysis-view` 分页读取大结果。
 
-## 命令与记录
+## 命令与记录 {#s-analyze-javascript-application-the-command-and-the-record}
 
 CLI 命令为 `rea analyze-javascript-application PATH`。如果 `PATH` 是目录或 `.asar` 文件，且没有指定 `--provider` 或 `--snapshot`，通用命令 `rea analyze PATH` 也会选择此工作流 {{cli Run a command}}。
 
@@ -103,7 +103,7 @@ note: 首次 analyze-javascript-application 调用的第 1、3、4、5、19 个�
 [stderr] {"rea_progress":{"phase":"analyze_javascript_application","completed":1,"total":1,"message":"Application graph and Electron boundaries reconstructed","terminal":true,"sequence":19}}
 ```
 
-## 图
+## 图 {#s-analyze-javascript-application-the-graph}
 
 **应用图：** 以节点和有向边表达应用的 provider 中立模型，每条边都有证据块。文档固定两条规则。图只根据语法构建。它不会访问文件系统或 CDP，不会执行 JavaScript，也不会定义应用专属节点类型 {{jsgraph JavaScript Application Graph}}。
 
@@ -185,7 +185,7 @@ claim: 图将包入口点连接到三个 IPC 处理器和一个网络端点，�
 caption: 从左上开始读。橄榄色框为应用自身代码，灰框是外部网络端点，青色框是浏览器存储。箭头标明关系名。未绘制三个桥接调用路径的九个 javascript-expression 步骤节点。依据 capture/out/15-js-app-graph.json。
 ```
 
-## 大记录的视图
+## 大记录的视图 {#s-analyze-javascript-application-views-over-a-large-record}
 
 六文件产生约 200 KB 记录。REA 文档提醒，真实应用的完整 Evidence 可能达到数百 MB {{cli Run a command}}。
 

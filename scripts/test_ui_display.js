@@ -101,7 +101,8 @@ async function main() {
       await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/glossary.html` });
       let loaded = false;
       for (let attempt = 0; attempt < 100; attempt++) {
-        loaded = await evaluate("!!document.querySelector('.header-nav[aria-label=\"主导航\"]') && !!document.querySelector('.glossary-index-groups a')");
+        // 导航是静态 HTML，header.js 延迟执行后才插入菜单按钮；等按钮出现再量布局。
+        loaded = await evaluate("!!document.querySelector('.header-nav[aria-label=\"主导航\"]') && !!document.querySelector('.header-inner > .header-menu-toggle') && !!document.querySelector('.glossary-index-groups a')");
         if (loaded) break;
         await delay(50);
       }
@@ -130,7 +131,7 @@ async function main() {
       assert.equal(row.listStyle, 'none');
       console.log('header/glossary layout:', JSON.stringify({width,columns:row.columns,headingGap:row.headingGap,overlap:false}));
     }
-    const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '编程练习', '学习方法', 'Agent 技能', 'Agent 内部机制', '我的高亮', '关于'];
+    const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '编程练习', '面试题库', '学习方法', 'Agent 技能', 'Agent 内部机制', '我的高亮', '关于'];
     const priorities = ['课程目录', '课程表', '学习路径'];
     const contexts = [
       ['index.html#contents', null, false], ['prereqs.html', '路线图', true],

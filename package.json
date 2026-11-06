@@ -6,5 +6,11 @@
   },
   "engines": {
     "node": "24.x"
+  },
+  "devDependencies": {
+    "@shikijs/langs": "4.5.0",
+    "@shikijs/themes": "4.5.0",
+    "pagefind": "1.5.2",
+    "shiki": "4.5.0"
   }
 }

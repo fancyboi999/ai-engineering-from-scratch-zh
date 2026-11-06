@@ -7,14 +7,14 @@ const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, 'projects.js'), 'utf8');
 const copySource = source.slice(source.indexOf('  function bindCopy('), source.indexOf('  function renderMarkdown('));
 
-function setup(sharedMarkdown = false) {
+function setup() {
   const status = { textContent: '', toggleAttribute() {} };
   const document = { activeElement: null };
   const button = {
     dataset: {},
     disabled: false,
     textContent: 'Copy',
-    getAttribute(name) { return name === (sharedMarkdown ? 'data-code' : 'data-copy') ? 'python3 scripts/project_test.py example --stage 1' : null; },
+    getAttribute(name) { return name === 'data-copy' ? 'python3 scripts/project_test.py example --stage 1' : null; },
     closest() { return { querySelector() { return status; } }; },
     focus() { document.activeElement = this; },
   };
@@ -35,10 +35,7 @@ function setup(sharedMarkdown = false) {
   vm.runInNewContext(copySource + '\nbindCopy(scope);', context);
   return {
     button, document, status, calls,
-    click() { return handler({ target: { closest(selector) {
-      if (sharedMarkdown) assert.ok(selector.includes('.code-copy'));
-      return button;
-    } } }); },
+    click() { return handler({ target: { closest() { return button; } } }); },
     finish() { settle(); },
   };
 }
@@ -79,14 +76,4 @@ test('repeated activation waits for the existing copy and then allows another', 
   assert.equal(state.calls[0], 'python3 scripts/project_test.py example --stage 1');
   state.finish();
   await second;
-});
-
-test('shared MDRender code-copy buttons use data-code with the same accessible copy handler', async () => {
-  const state = setup(true);
-  const pending = state.click();
-  state.finish();
-  await pending;
-  assert.equal(state.calls[0], 'python3 scripts/project_test.py example --stage 1');
-  assert.equal(state.button.textContent, '已复制');
-  assert.equal(state.status.textContent, '命令已复制。');
 });

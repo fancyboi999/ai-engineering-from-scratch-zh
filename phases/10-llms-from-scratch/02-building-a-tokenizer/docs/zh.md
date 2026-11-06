@@ -210,10 +210,10 @@ def pre_tokenize(text):
 
 ```python
 print(pre_tokenize("Hello, world! Don't stop."))
-# [' Hello', ',', ' world', '!', " Don", "'t", ' stop', '.']
+# ['Hello', ',', ' world', '!', ' Don', "'t", ' stop', '.']
 ```
 
-前导空格留在词上。缩写在撇号处切开。标点成为自己的一块。BPE 永远不会跨这些边界合并 token。
+前导空格附加在它后面的词上。第一个词前面没有空格，所以它的切块是 `Hello`。缩写在撇号处切开。标点成为独立切块。BPE 永远不会跨这些边界合并 token。
 
 ### 第 3 步：在字节序列上做 BPE
 

@@ -6,7 +6,7 @@
 
 读完本节，你能解释全部 13 个过程，区分 thunk 与其外部目标，也能将函数体读作端点包含在内的地址范围。
 
-## 清单
+## 清单 {#s-list-procedures-and-function-bodies-the-inventory}
 
 ```listing
 title: 十三个过程中的五个
@@ -81,7 +81,7 @@ claim: 五个内部函数无间隙地填满 __text 的 576 字节，四个 thunk
 caption: 按地址从上向下读。灰行位于文件外，绿行是 __text 中代码，紫行是 Ghidra 解析的 thunk。依据 capture/out/10-mcp-05-list-procedures.json 和五份档案。
 ```
 
-## 函数体
+## 函数体 {#s-list-procedures-and-function-bodies-function-bodies}
 
 清单没有大小。函数大小位于 `analyze_function` 档案的 `procedure.body` 中，[第 4.6 节](#s-analyze-function-and-pseudocode)读取该记录的其余部分。
 
@@ -123,7 +123,7 @@ note: 从 normalized_result 截取。伪代码及其后所有切面已省略。
 
 五个内部函数体相加：24 + 60 + 52 + 72 + 368 = 576，正好是 `__text` 大小。代码节没有字节属于两个函数，也没有字节不属于任何函数。五个函数的 `span_bytes` 都等于 `total_bytes`，`non_contiguous` 都为 false。两者不同时，函数存在间隙，间隙内字节不归该函数所有。调研记录了一个 16 位案例，函数体 503 字节却跨越 517 字节。
 
-## 选择过程
+## 选择过程 {#s-list-procedures-and-function-bodies-selecting-a-procedure}
 
 每个函数操作都接收 `procedure` 字符串。读取规则如下：
 

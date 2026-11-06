@@ -4,7 +4,7 @@
 
 捕获工具记录了三次失败调用，并完整保留响应。它们都来自 rea 自己的错误投影，其中两个来自 CLI，一个来自 MCP 服务。其他文件还包含不属于错误的代码，表示未安装的提供器、需要人工处理的 setup 计划，以及没有结论的比较。本节先列出这些情况，再介绍共同 schema。
 
-## 三种错误信封
+## 三种错误信封 {#s-ref-errors-the-three-error-envelopes}
 
 macOS 上 `inspect-binary-layout` 遇到 Mach-O 文件时，CLI 向 stdout 打印信封并以状态码 1 退出：
 
@@ -98,7 +98,7 @@ note: 仅保留信封头部。remediation 重复 message，省略了 details。
 
 拼错 CLI 命令会收到解析器信封 `COMMAND_NOT_FOUND`，其中 `cta` 对象建议最接近的命令。`analysisErrorProjectionSchema` 不定义这些字段。读取 rea 错误的脚本应在读取 `category` 前，单独处理命令拼错或缺失。6.7.0 捕获也没有这种调用。
 
-## 不属于错误的代码
+## 不属于错误的代码 {#s-ref-errors-codes-that-are-not-errors}
 
 `rea capabilities` 为每个提供器列出 `availability` 对象。捕获宿主机上缺少三个提供器，代码说明原因，但不会使命令失败：
 
@@ -123,7 +123,7 @@ note: hopper 与 ida 的 availability 对象。省略了各自后续诊断，也
 
 捕获中的两个结果拒绝给出肯定结论，但退出码为 0。对两个包执行 `rea compare`，返回 `status: "unknown"` 与十条未决记录（capture/out/14-compare-bundles.json，[第 5.5 节](#s-compare-and-compare-functions)）。没有记录同时属于两个包，证据包也没有完整性覆盖标记。`verify_reconstruction` 返回 `status: "fail"` 与两个失败声明（capture/out/10-mcp-22-verify-reconstruction.json，[第 7.1 节](#s-verify-reconstruction)）。两者都不是错误信封，而是说明问题未决或声明不成立的结果。若脚本只将非零退出码视为失败信号，就会漏掉它们。
 
-## rea 错误的共同结构
+## rea 错误的共同结构 {#s-ref-errors-the-shape-every-rea-error-has}
 
 | 字段 | 含义 |
 | --- | --- |

@@ -62,7 +62,7 @@ caption: 图中展示了我们运行时遇到的五种症状。以下条目还�
 - **检查：**查看 engine 在启动或第一个 batch 时是否报告 CUDA out-of-memory 错误，并确认没有 `Ray OutOfMemoryError`。比例过低不一定会让 engine 退出。检查 `KV Cache is allocated` 日志中的 `#tokens`。我们的测试中，比例为 0.02 时 engine 启动后只提供 3,082 个 token，首个 rollout 耗时 386 s；比例为 0.25 时为 61 s。
 - **修复：**第一种情况每次将比例降低 0.05 或 0.1；第二种情况则逐步调高。Miles 文档建议 `--colocate` 时不超过 0.8。我们的训练使用 0.4。[SGLang 101 第 3.2 节](https://aieng-zh.cn/manual-sglang-101.html#s-mem-fraction-static-and-startup-sizing)介绍了 engine 如何分配内存。
 
-## 小数 reward 改变了本应保持不变的组 {#s-troubleshoot-by-symptom-a-reward-function-with-fractions-moves-a-group-that-should-stay-still}
+## 小数 reward 改变了本应保持不变的组 {#s-troubleshoot-by-symptom-a-reward-function-with-fractions-moves-a-group-that-should-stay-}
 
 - **原因：**tracker 中的一份报告显示，16 个答案都得到 0.3 reward 时，float32 舍入会产生很小的非零 advantage。二元 reward 0 和 1 不会出现这一问题。
 - **检查：**查看组内所有答案 reward 相同但 advantage 不为 0 的情况。

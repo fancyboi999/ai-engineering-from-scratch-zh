@@ -6,7 +6,7 @@
 
 读完本节，你能说明 rea 为 Ghidra 增加了什么、从不做什么，以及一次提问应选择哪个适配器。
 
-## rea 统一的三件事
+## rea 统一的三件事 {#s-rea-providers-and-evidence-three-things-rea-standardizes}
 
 **Evidence：** 每次成功分析调用返回的统一记录类型，严格包含 16 个字段：`evidence_id`、`subject`、`provider`、`analysis_profile`、`predicate_type`、`operation`、`parameters`、`raw_result`、`normalized_result`、`confidence`、`authority`、`environment`、`limitations`、`relationship_coverage`、`locations`、`evidence_links`。
 
@@ -54,7 +54,7 @@ claim: rea 负责适配器、会话和 Evidence 记录，Ghidra 负责导入、�
 caption: 各栈从上往下读。计数来自 capture/out/02-capabilities.json 与 05-analyze-arm64-O1.json，文件名来自 00-fixtures.txt，类名来自固定标签的 docs/architecture.mermaid。
 ```
 
-## rea 交给 Ghidra 的工作
+## rea 交给 Ghidra 的工作 {#s-rea-providers-and-evidence-what-rea-leaves-to-ghidra}
 
 rea 没有自己的反汇编器或反编译器。面对原生可执行文件，它在新的临时项目中启动 `analyzeHeadless`，导入文件的私有副本，让 Ghidra 默认自动分析完成，再通过 socket 提问。回答来自 Ghidra。函数档案会组合 Ghidra FunctionManager、Listing、ReferenceManager、BasicBlockModel 和反编译器的观察；每条 `analyze_function` 限制都有说明（capture/out/06-function-percent-change.json）。伪代码来自 Ghidra decompiler，并非程序的原始源码 {{ghidra Admitted function-analysis semantics}}。
 
@@ -62,13 +62,13 @@ rea 没有自己的反汇编器或反编译器。面对原生可执行文件，�
 
 成本也主要来自 Ghidra。录制 Mac 上每条依赖 Ghidra 的独立命令耗时 7 到 9 秒（capture/README.md、capture/out/00-commands.txt），大部分花在导入和自动分析。同一次 MCP 会话的首次 Ghidra 调用耗时 5 到 7 秒（capture/README.md、capture/out/10-mcp-session.txt），同文件的后续每次调用均低于 100 毫秒。
 
-## rea 自行读取的内容
+## rea 自行读取的内容 {#s-rea-providers-and-evidence-what-rea-reads-by-itself}
 
 引擎运行前，rea 先读文件，识别 `7f 45 4c 46`、`MZ` 及四种 Mach-O 魔数。它以 64 KiB 分块计算目标 SHA-256，认识十种架构：`x86`、`x86_64`、`arm`、`arm64`、`mips`、`6502`、`riscv`、`powerpc`、`m68k`、`hexagon`。原始二进制没有头，架构由调用者指定。只有原始二进制可选 `6502` 或大端 `m68k`，入口地址必须适合处理器。
 
 两条命令无需 Java 就能展示结果。`rea inspect-artifact` 用 `rea-artifact-graph` provider 遍历文件，不到一秒返回 Evidence 记录，不依赖 Java（capture/out/03-inspect-artifact.json）。macOS 上 `rea inspect-macho` 通过 `xcrun` 运行 Xcode 工具，耗时约三秒（capture/out/04-inspect-macho.json）。[第 3 部分](#p-3)解读这些记录。
 
-## 原生代码之外的格式
+## 原生代码之外的格式 {#s-rea-providers-and-evidence-formats-beyond-native-code}
 
 本手册还涉及三个读取入口。`inspect-wasm-artifact` 通过 WABT 工具读取 WebAssembly 模块，`inspect-go-binary` 读取 Go 构建信息，raw-binary 格式按你指定的架构与入口地址打开无头文件。捕获对测试模块运行 `inspect-wasm-artifact`，退出码为 0（capture/out/16-inspect-wasm-artifact.json）。[第 6.2 节](#s-inspect-wasm-artifact)解读记录。
 

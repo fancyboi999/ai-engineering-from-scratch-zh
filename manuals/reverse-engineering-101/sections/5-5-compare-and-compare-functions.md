@@ -4,7 +4,7 @@
 
 你以 `-O2` 重建 `ledger.c`，想在相信关于 `-O1` 构建的主张前，知道编译器改变了哪些函数。采集依次打开两个构建，针对 `_percent_change` 和 `_total` 提问。读完本节，你能阅读比较记录，说明八个维度各自比较什么，也能指出为什么字节级证明仍在 rea 之外。
 
-## 输入两份档案，输出一条派生记录
+## 输入两份档案，输出一条派生记录 {#s-compare-and-compare-functions-two-dossiers-in-one-derived-record-out}
 
 `compare_functions` 以 `left` 和 `right` 接收两条完整 Evidence，分别经 `parseEvidence` 解析，id 被篡改的记录会拒绝。两者都必须是谓词类型 `rea.analysis` 的 `analyze_function` 记录，否则返回 "Expected analyze_function Evidence"。采集传入的是之前几次调用收到的档案。
 
@@ -54,7 +54,7 @@ note: dimensions、changes 和 limitations 已省略。
 
 **函数匹配：** rea 判断两份档案描述同一函数的方法。按 `symbol` 为 `matched` 表示过程名相同。`mismatched` 或 `ambiguous` 以方法 `explicit` 报告，歧义匹配会让整个比较为 `unknown`。
 
-## 八个维度
+## 八个维度 {#s-compare-and-compare-functions-the-eight-dimensions}
 
 `compareDimensions` 按固定顺序运行八种比较：`identity`、`pseudocode`、`assembly`、`comments`、`calls`、`references`、`strings_names`、`cfg`。每个维度有 `unchanged`、`changed`、`unknown` 状态，以及左右摘要、左右计数；两个文本维度还有 `text_delta`，此外还有 `conclusion_kind`。任意维度未知则整体为 `unknown`，否则任意维度改变则为 `changed`，否则为 `unchanged`。
 
@@ -71,7 +71,7 @@ note: dimensions、changes 和 limitations 已省略。
 | `strings_names` | 引用的字符串与名称 | unchanged，1 与 1 | changed，2 到 11 |
 | `cfg` | 地址规范化后的基本块与边 | unchanged，3 与 3 | changed，5 到 16 |
 
-## 一个未知维度
+## 一个未知维度 {#s-compare-and-compare-functions-one-unknown-dimension}
 
 `_percent_change` 有七个 `unchanged`、一个 `unknown`，整体因此为 `unknown`。未知维度是 `references`。两边都有三项引用，命名端点相同，但各有一个入引用是没有来源过程的 `DATA`，其端点没有名称。
 
@@ -106,7 +106,7 @@ note: 维度内部无省略。
 
 两个比较的 `calls` 维度都有两项限制，各对应一侧，均说明只返回 Ghidra 已解析调用引用。限制限定 `unchanged` 的含义，不改变状态。
 
-## 文本维度
+## 文本维度 {#s-compare-and-compare-functions-the-text-dimensions}
 
 两个文本维度是有预算的行差异：100 毫秒、10,000 次编辑。耗尽预算后，维度为 `unknown`，限制为 "Bounded line diff exceeded its time or edit-distance limit."。计数是文本码点数，`text_delta` 报告增加行、删除行和差异块。两个文本维度均带限制 "Exact provider text is compared without address or generated-name normalization; layout-only differences do not establish a behavior change."
 
@@ -120,7 +120,7 @@ claim: 编译器让 _percent_change 七个维度不变、references 未知，让
 caption: 每表从上向下读。琥珀色行是改变的维度，虚线行是未知。依据 capture/out/10-mcp-20-compare-functions-percent-change.json 与 10-mcp-21-compare-functions-total.json。
 ```
 
-## 汇编维度的限制
+## 汇编维度的限制 {#s-compare-and-compare-functions-the-assembly-limit}
 
 无论状态是 `unchanged` 还是 `changed`，每个 assembly 维度都带两项限制。
 
@@ -158,7 +158,7 @@ note: 维度内部无省略。
 
 因此 assembly 的 `unchanged` 表示同一引擎文本相等，`changed` 表示文本不同，二者都不陈述字节。字节级证明将重定位字段清零，并比较引用表。[第 36 课](phases/13-tools-and-protocols/36-rebuild-and-prove-equal)构建证明，第 7 部分对同一夹具运行它。references 也有自身限制，因为它比较端点而非类别："Reference endpoints differ independently of provider reference-kind metadata."。
 
-## 对两个 bundle 运行 rea compare
+## 对两个 bundle 运行 rea compare {#s-compare-and-compare-functions-rea-compare-on-two-bundles}
 
 `rea compare LEFT RIGHT`，也可写为 `rea compare-bundles`，无需会话即可比较两个 bundle 文件。按 `evidence_id` 工作：两边都有的记录参与比较，只有一边有的记录是未解决分支。只要有一个变更未解决，整体就是 `unknown`。
 

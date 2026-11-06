@@ -4,7 +4,7 @@
 
 磁盘上已有 `ledger.c` 的 `-O1` 与 `-O2` 两个可执行文件，以及[第 5.5 节](#s-compare-and-compare-functions)中的两条 `compare_functions` 记录。你想让 rea 判断两个版本的 `total` 是否相同。对应工具是 `verify_reconstruction`。捕获运行调用了一次，提交四个声明，得到两个通过、两个失败。读完本节，你可以编写结构声明规格，读取 rea 为每个声明返回的状态，并说明通过能证明什么、不能证明什么。
 
-## 声明规格
+## 声明规格 {#s-verify-reconstruction-the-specification}
 
 **规格：** `verify_reconstruction` 的输入，包含 `name` 和至少一个声明。每个声明包含 `claim_id`、`title`、`kind`、`dimension`、`comparison_evidence_id`（capture/out/10-mcp-02-tools-list.json）。最后一项是当前会话中已有比较记录的 `ev_` 标识。kind 指明记录的生产者：`behavioral` 声明指向 `compare_process_captures`，`structural-function` 指向 `compare_functions`，`structural-artifact` 指向 `compare_artifacts`。`structural-function` 使用九个维度之一：`overall`、`identity`、`pseudocode`、`assembly`、`comments`、`calls`、`references`、`strings_names`、`cfg`。
 
@@ -55,7 +55,7 @@ note: 省略了第二和第三个声明。同一文件中，请求之后紧接�
 
 这条规则解释了捕获顺序。第 15 步的 `close_binary` 清除了 `-O1` 目标保留的记录。第 20、21 步将两份 `-O1` 函数档案重新放回台账：`compare_functions` 先记录两个内联输入，再记录比较结果。第 23 步的 `import_evidence_bundle` 随后报告 `imported: 6`、`total: 15`（capture/out/10-mcp-23-import-evidence-bundle-O1.json）。`O1` 包含八条记录，其中两条已由前述比较恢复。
 
-## rea 返回了什么
+## rea 返回了什么 {#s-verify-reconstruction-what-rea-returned}
 
 与其他结果一样，响应也是 Evidence 记录：`subject: null`，提供器为版本 `1` 的 `rea-reconstruction-verifier`，谓词为 `rea.reconstruction-verification`，`confidence: "derived"`，`authority: "analyst-inference"`。`parameters` 包含规格的 SHA-256 和声明标识，因此声明变化会改变记录标识。
 
@@ -97,7 +97,7 @@ note: 省略了 analysis_profile、逐声明条目、探测建议与证据链接
 
 总体 `status` 遵循一条规则：任何声明失败则为 `fail`；否则，任何声明未决则为 `unknown`；否则为 `pass`。`summary` 按状态和类别统计声明。记录自己的 `limitations` 还包含 "Artifact identity is unavailable for this observation."；`createEvidence` 会为每条没有 subject 的记录附加此限制。
 
-## 单个声明的状态
+## 单个声明的状态 {#s-verify-reconstruction-the-status-of-one-claim}
 
 **声明状态：** `pass`、`fail` 或 `unknown`，按照固定顺序由三项输入计算。首先，任何限制都会使声明变为 `unknown`。其中一种限制来自来源的权威性。
 
@@ -149,7 +149,7 @@ claim: 每个声明从一条比较记录的一个维度取得状态，total 声�
 caption: 自上而下阅读。验证记录引用四个声明，每个声明引用一条比较记录，每条比较记录又引用左右两份函数档案。琥珀色声明通过，玫红色虚线声明失败。标识截为前八位十六进制字符。来源：capture/out/10-mcp-22-verify-reconstruction.json。
 ```
 
-## 通过不能证明什么
+## 通过不能证明什么 {#s-verify-reconstruction-what-a-pass-does-not-prove}
 
 每条验证记录的固定限制已说清："Pass means every declared claim passed; it does not establish global implementation equivalence."。`structural-function` 维度通过的声明仅为“提供器文本相同”，因为 `compare_functions` 逐行比较 Ghidra 打印的伪代码与汇编。每条比较记录的这两个维度都附有告诫："Exact provider text is compared without address or generated-name normalization; layout-only differences do not establish a behavior change."。汇编维度还补充："Assembly is opaque provider text; relocation normalization is unavailable."（capture/out/10-mcp-20-compare-functions-percent-change.json）。rea 6.7.0 不运行函数，也不编译函数。声明通过仅表示两份反编译输出逐行相同，失败则表示不同。
 

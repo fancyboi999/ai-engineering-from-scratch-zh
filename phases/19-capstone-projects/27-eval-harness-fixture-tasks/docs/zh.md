@@ -50,7 +50,7 @@ flowchart LR
 - `regex_match`：对指定文件内容跑正则。适合“函数必须存在并返回 X”这种存在多种等价写法的任务。
 - `shell_exit_zero`：通过第 26 课的 sandbox 执行一条 shell 命令，只有 exit code 为 0 才算通过。适合“测试必须全过”。
 
-harness 对每个 task 跑 `k` 次。pass@k 可以表示成 `1 - (1 - p)^k`，其中 `p` 是经验通过率；同时 harness 也会把原始通过次数一起报出来，让你看到方差。latency 按 sample 的 wall-clock 统计。cost 则吃 agent 自报的 token、USD 或二者之一，然后给出逐 task 与总量聚合。
+harness 对每个 task 跑 `k` 次。pass@k 可以表示成 `1 - (1 - p)^k`，其中 `p` 是经验通过率；同时 harness 也会把原始通过次数一起报出来，让你看到方差。这是插件估计量（plug-in estimate）：它把测得的通过率 p 直接当作真实通过率。第 72 课使用了针对 `n` 个样本中有 `c` 次通过的无偏估计量 `1 - C(n - c, k) / C(n, k)`。插件估计量存在下偏。当样本数 `n = k` 时（如同本 harness），只要有任意样本通过，无偏估计量就为 1，全未通过时为 0，因此它只能反映是否有任意样本通过。若要对外发布规范的 pass@k 数值，应当抽取 `n > k` 个样本并使用第 72 课的无偏估计量。latency 按 sample 的 wall-clock 统计。cost 则吃 agent 自报的 token、USD 或二者之一，然后给出逐 task 与总量聚合。
 
 ```figure
 pass-at-k

@@ -6,7 +6,7 @@
 
 读完本节，你能解读错误信封，指出宿主机规则；也能从 `inspect-macho` 阅读 `ledger-arm64-O1` 加载映像：四个段、17 条加载命令、六个导入、六个导出。
 
-## 错误信封
+## 错误信封 {#s-inspect-binary-layout-and-the-load-image-the-error-envelope}
 
 ```listing
 title: macOS 上的 inspect-binary-layout
@@ -34,7 +34,7 @@ rea 所有失败都具有此结构：`code`、`category`、`message`、`retryabl
 
 捕获工具输入 ELF 目标文件，因为 `inspect_binary_layout` 就是为 ELF 编写。Linux x64 配合 pwntools 4.15.0 时，它返回节、段、符号和重定位。[第 2.3 节](#s-rea-capabilities)说明各操作如何在调用前声明可用性，[参考](#s-ref-errors)列出捕获中的所有错误码。
 
-## inspect-macho 及其调用工具
+## inspect-macho 及其调用工具 {#s-inspect-binary-layout-and-the-load-image-inspect-macho-and-the-tools-it-runs}
 
 `inspect-macho` 是 macOS 读取器，来自 `native-macos` provider，即 “macOS native inspection utilities”。它运行七个宿主命令，将各条记为来源证据。
 
@@ -102,7 +102,7 @@ claim: 同一主机因平台拒绝一种读取器，另一种返回 17 条加载
 caption: 各列从左向右读。实线箭头为调用，玫红虚线为失败，墨色虚线为回复。来自 capture/out/04-inspect-binary-layout.json 与 04-inspect-macho.json。
 ```
 
-## 加载映像
+## 加载映像 {#s-inspect-binary-layout-and-the-load-image-the-load-image}
 
 ```listing
 title: 文件头事实与入口点
@@ -231,7 +231,7 @@ claim: 四个段将 33872 文件字节映射到三个地址范围，其他加载
 caption: 从顶部最低地址开始读。左列是地址，右列是文件偏移，虚线框不含文件字节。来自 capture/out/04-inspect-macho.json。
 ```
 
-## 导入与导出
+## 导入与导出 {#s-inspect-binary-layout-and-the-load-image-imports-and-exports}
 
 ```listing
 title: 导出的函数

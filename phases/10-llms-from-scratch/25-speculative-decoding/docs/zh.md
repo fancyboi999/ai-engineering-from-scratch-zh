@@ -85,7 +85,7 @@ EAGLE-1 的改动：
 
 EAGLE-2（2024）加了动态树拓扑：树在 draft 不确定处长得更宽、在它自信处保持窄。在不增加验证成本的情况下提高 `α_effective`。
 
-EAGLE-3（Li et al. 2025，"EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test"）移除了固定的顶层特征依赖，并用一个新的 "测试时模拟" 损失训练 draft——draft 在匹配 target 测试时分布的输出上训练，而不是 teacher-forced 训练分布。接受率从 0.75（EAGLE-2）升到 0.82（EAGLE-3），每次验证平均 token 从 3.0 升到 4.5。
+EAGLE-3（Li et al. 2025，"EAGLE-3: Scaling up Inference Acceleration of Large Language Models via Training-Time Test"）移除了固定的顶层特征依赖，并用一个新的 "测试时模拟" 损失训练 draft——draft 在匹配 target 测试时分布的输出上训练，而不是 teacher-forced 训练分布。接受率从 0.75（EAGLE-2）升到 0.82（EAGLE-3），每次验证平均 token 从 3.0 升到 4.5。这些数值来自单一基准参考配置。实际接受率取决于模型配对、草稿树结构和具体的业务流量：第 10 阶段 · 15 课引用的对话基准测试接受路径为每 token 0.88 到 0.92，而第 17 阶段 · 05 课在通用对话生产部署中规划的接受率为 0.6 到 0.8。
 
 ### 树注意力验证
 

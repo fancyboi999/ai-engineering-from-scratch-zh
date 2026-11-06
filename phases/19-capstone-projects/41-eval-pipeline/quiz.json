@@ -18,12 +18,12 @@
       "stage": "check",
       "question": "Perplexity eval 对所有非 pad 位置的 per-token negative log-likelihood 求和，再除以非 pad token 总数。为什么不直接对 per-batch perplexity 取平均？",
       "options": [
-        "对 per-batch perplexity 取平均会低估短序列的权重（它们的 per-batch ppl 方差更大），产生有偏的汇总结果。",
-        "Perplexity 对批量数据未定义。",
         "对 per-batch perplexity 取平均在数学上是等价的。",
+        "Perplexity 对批量数据未定义。",
+        "对 per-batch perplexity 取平均赋予每个 batch 相同的权重，导致短 batch 中的每个 token 相比长 batch 中的 token 具有更大权重，从而产生有偏的汇总结果。",
         "Batch 里有 pad token，必须始终取平均。"
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Per-token 汇总是教科书定义，能避免 batch size 和序列长度引入的偏差。Per-batch 平均是个常见 bug，在序列长度不一的数据上会算出不同的结果。"
     },
     {

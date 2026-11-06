@@ -461,8 +461,9 @@ function writeMarkdown(file, { name, description, version }) {
 }
 
 test('shared site asset families use the expected cache keys on every page', () => {
-  const release = '20261026a';
-  const appRelease = '20261026a';
+  const release = '20261106a';
+  const scriptRelease = '20261106a';
+  const appRelease = scriptRelease;
   const styleRelease = HEADER_ASSET_VERSION;
   const navigationRelease = HEADER_ASSET_VERSION;
   assert.match(navigationRelease, /^\d{8}[a-z]$/);
@@ -493,10 +494,10 @@ test('shared site asset families use the expected cache keys on every page', () 
     for (const asset of ['learning-paths.css', 'roadmap.css', 'intelligence-check.css', 'certifications.css']) {
       if (source.includes(asset + '?v=')) assert.equal(versionFor(source, asset), release, `${page} has stale ${asset}`);
     }
-    assert.equal(versionFor(source, 'progress.js'), release, `${page} has stale progress.js`);
+    assert.equal(versionFor(source, 'progress.js'), scriptRelease, `${page} has stale progress.js`);
     assert.equal(versionFor(source, 'header.js'), navigationRelease, `${page} has stale header.js`);
-    assert.equal(versionFor(source, 'cmdpalette.js'), '20261026a', `${page} has stale cmdpalette.js`);
-    if (source.includes('src="certifications.js')) assert.equal(versionFor(source, 'certifications.js'), '20261026a', `${page} has stale certifications.js`);
+    assert.equal(versionFor(source, 'cmdpalette.js'), scriptRelease, `${page} has stale cmdpalette.js`);
+    if (source.includes('src="certifications.js')) assert.equal(versionFor(source, 'certifications.js'), scriptRelease, `${page} has stale certifications.js`);
   }
 
   assert.equal(versionFor(sourceFor('index.html'), 'app.js'), appRelease);
@@ -1498,8 +1499,14 @@ test('homepage preserves live GitHub CTAs and the motion-aware learner marquee',
   assert.doesNotMatch(mastheadCta[0], /Start (?:MCP Engineering|Agent Skills)/i);
   assert.match(
     mastheadCta[0],
-    /<a class="masthead-btn masthead-btn--primary" href="https:\/\/github\.com\/fancyboi999\/ai-engineering-from-scratch-zh"[^>]*>[\s\S]*?<span>在 GitHub 上 Star<\/span>[\s\S]*?<span class="masthead-btn-count" data-gh-stars="fancyboi999\/ai-engineering-from-scratch-zh" data-loading="true">/
+    /<a class="masthead-btn masthead-btn--primary" href="lesson\.html\?path=phases\/00-setup-and-tooling\/01-dev-environment">[\s\S]*?<span>开始学习第一课<\/span>/
   );
+  assert.match(mastheadCta[0], /<a class="masthead-btn" href="learning-paths\.html">[\s\S]*?<span>探索学习路径<\/span>/);
+  assert.match(
+    mastheadCta[0],
+    /<a class="masthead-btn" href="https:\/\/github\.com\/fancyboi999\/ai-engineering-from-scratch-zh"[^>]*>[\s\S]*?<span>在 GitHub 上 Star<\/span>[\s\S]*?<span class="masthead-btn-count" data-gh-stars="fancyboi999\/ai-engineering-from-scratch-zh" data-loading="true">/
+  );
+  assert.doesNotMatch(homepage, /class="manual-attribution/, 'the homepage attribution line stays removed');
   assert.match(
     mastheadCta[0],
     /<a class="masthead-btn" href="https:\/\/github\.com\/fancyboi999"[^>]*>[\s\S]*?<span>关注 @fancyboi999<\/span>/
@@ -1519,7 +1526,7 @@ test('homepage preserves live GitHub CTAs and the motion-aware learner marquee',
   assert.match(wideMasthead[0], /"title curiosity"/);
   assert.match(wideMasthead[0], /"install figure"/);
   assert.match(wideMasthead[0], /\.masthead-figure\s*\{[\s\S]*?position: static;[\s\S]*?grid-area: figure/);
-  assert.match(homepage, /\.masthead-cta\s*\{\s*display: grid;\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(homepage, /\.masthead-cta\s*\{\s*display: grid;\s*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\) minmax\(0, 1\.28fr\) minmax\(0, 1\.12fr\)/);
 
   assert.doesNotMatch(mastheadCta[0], /github\.com\/rohitg00/);
 });
@@ -1529,9 +1536,10 @@ test('homepage uses consistent responsive grids for controls, routes, and curric
 
   assert.match(
     homepage,
-    /\.masthead-cta\s*\{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/
+    /@media \(min-width: 761px\) and \(max-width: 1023px\),\s*\(min-width: 1280px\) \{[\s\S]*?\.masthead-cta\s*\{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/
   );
-  assert.match(homepage, /@media \(min-width: 761px\) \{[\s\S]*?\.masthead-cta\s*\{[\s\S]*?height: 44px;/);
+  assert.match(homepage, /@media \(min-width: 761px\) \{\s*\.masthead-cta\s*\{\s*min-height: 44px;/);
+  assert.doesNotMatch(homepage, /\.masthead-cta\s*\{[^}]*[^-]height: 44px/, 'a fixed height clips the second row of buttons');
   assert.match(
     homepage,
     /@media \(min-width: 601px\) and \(max-width: 1279px\) \{[\s\S]*?\.masthead-install,[\s\S]*?\.masthead-install-caption\s*\{[\s\S]*?max-width: none;/
@@ -1817,7 +1825,7 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   const localeLoaderVersion = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'figures-manifest.js'))).digest('hex').slice(0, 12);
   assert.ok(lessonHtml.includes('<script src="figures-manifest.js?v=' + localeLoaderVersion + '"'),
     'the lesson must load the current content-addressed locale loader');
-  assert.match(lessonHtml, /<script src="progress\.js\?v=20261026a/);
+  assert.match(lessonHtml, /<script src="progress\.js\?v=20261106a/);
   assert.match(fs.readFileSync(path.join(__dirname, 'lesson-figures.js'), 'utf8'), /providerBaseUrl \+ provider/);
   assert.match(lessonHtml, /import\('https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@11/);
 });
@@ -2585,7 +2593,7 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
   const expected = [
     ['index.html#contents', '课程目录'], ['catalog.html', '课程表'], ['prereqs.html', '路线图'],
     ['learning-paths.html', '学习路径'], ['certifications.html', '认证'], ['projects.html', '实战项目'],
-    ['manuals.html', '技术手册'], ['glossary.html', '术语表'], ['cheatsheets', '速查表'], ['practice', '编程练习'],
+    ['manuals.html', '技术手册'], ['glossary.html', '术语表'], ['cheatsheets', '速查表'], ['practice', '编程练习'], ['interviews', '面试题库'],
     ['how-to-learn.html', '学习方法'], ['skills.html', 'Agent 技能'],
     ['inside-an-ai-agent.html', 'Agent 内部机制'], ['highlights.html', '我的高亮'], ['about.html', '关于'],
   ];

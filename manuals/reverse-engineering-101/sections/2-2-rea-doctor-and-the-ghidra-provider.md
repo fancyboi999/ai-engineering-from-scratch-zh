@@ -6,7 +6,7 @@
 
 读完本节，你能阅读 doctor 报告，找出失败检查，按修复建议修正安装。
 
-## Ghidra provider 的要求
+## Ghidra provider 的要求 {#s-rea-doctor-and-the-ghidra-provider-what-the-ghidra-provider-needs}
 
 **Ghidra provider：** rea 中通过 `analyzeHeadless` 驱动现有 Ghidra 安装的适配器。需要环境变量 `GHIDRA_INSTALL_DIR`、`JAVA_HOME` 提供绝对路径，拒绝相对路径。策略固定版本：`SUPPORTED_GHIDRA_VERSION = "12.1.4"`、`SUPPORTED_GHIDRA_JAVA_MAJOR = 21`。安装文档要求 Ghidra 12.1.x，并要求 JDK 版本符合该安装 `application.java.min` 与 `application.java.max` 属性，且为 64 位完整 JDK {{install Ghidra}}。`Ghidra/Features/Decompiler/os/<platform>/` 还必须包含适配宿主机的原生反编译器。REA 不构建或安装原生工具，也不会更改 Gatekeeper 隔离设置 {{install Ghidra}}。
 
@@ -43,7 +43,7 @@ rea doctor --provider ghidra --format json
 
 `--provider ghidra` 将报告缩小到一个范围。不带该参数时，还检查 Hopper、IDA、JADX、Kuna provider、已安装 skill 及本机 agent 注册。
 
-## 九项检查
+## 九项检查 {#s-rea-doctor-and-the-ghidra-provider-the-nine-checks}
 
 ```listing
 title: Ghidra 范围的 doctor 报告
@@ -116,13 +116,13 @@ claim: rea doctor 按固定顺序检查 Ghidra 范围，录制 Mac 的九项检�
 caption: 从左到右、再向下阅读，底部两框是报告的两个结论。数据来自 capture/out/01-doctor-ghidra.json 与 00-commands.txt，顺序来自固定标签的 src/ghidra/GhidraInstallation.ts。
 ```
 
-## healthy 与 environment_healthy
+## healthy 与 environment_healthy {#s-rea-doctor-and-the-ghidra-provider-healthy-and-environment-healthy}
 
 报告有两个结论。`healthy` 针对选定范围，此处为含 `providers: ["ghidra"]` 的 `explicit`，`scope_checks` 只列该范围检查。`environment_healthy` 针对整套审计检查，仅在 provider 之外的检查全通过、所有已配置 provider 全通过，且至少一个 provider 可用时为真。
 
 录制 Mac 上 `healthy` 为真，`environment_healthy` 为假。Hopper、IDA、Kuna 未配置，公式忽略它们；Ghidra 已配置且通过。因此假值来自 Ghidra 范围之外的检查，位于捕获 `--filter-output` 排除的集合中，该集合涉及用户的 skill 安装及 agent 注册（capture/README.md）。退出状态跟随选定范围：`rea doctor` 返回 0（capture/out/00-commands.txt），REA 将不可用的可选 provider 作为信息提示；它不会阻止无关任务 {{cli Output and exit status}}。
 
-## 检查失败时
+## 检查失败时 {#s-rea-doctor-and-the-ghidra-provider-when-a-check-fails}
 
 捕获主机已安装 Ghidra，因此没有录制失败的 doctor。源码说明预期结果：未设置 `GHIDRA_INSTALL_DIR` 时，`configuration` 失败，详情为 `GHIDRA_INSTALL_DIR is not set`，修复建议为 `Set GHIDRA_INSTALL_DIR to an extracted Ghidra 12.1.x release directory.`；路径为相对值时，详情为 `GHIDRA_INSTALL_DIR must be absolute`。
 

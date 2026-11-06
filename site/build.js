@@ -2060,11 +2060,16 @@ function withCard(html, type, id, spec) {
   return cleaned.replace('</head>', cardTags(cardUrl(type, id, spec), spec).join('\n') + '\n</head>');
 }
 
+// 共享脚本一族的缓存键。脚本在浏览器缓存一天、HTML 只缓存五分钟，族内任一脚本内容变化都要升级此键。
+const SHARED_SCRIPT_VERSION = '20261106a';
+// 页面样式表一族的缓存键，规则同上：族内任一样式表内容变化都要升级此键。
+const SHARED_STYLE_VERSION = '20261106a';
+
 function versionSharedAssets(html) {
-  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+  return normalizeHeaderNavigation(html).replace(/(\bsrc=["']\/?(?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + SHARED_SCRIPT_VERSION + '$2')
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
     .replace(/((?<![\w-])href=["']\/?style\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
-    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2')
+    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + SHARED_STYLE_VERSION + '$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2');
 }
 
@@ -2160,6 +2165,14 @@ function build() {
   hubs.practicePages = practice.pages;
   hubs.practice = practice;
   console.log(`   wrote ${practice.problems.length} practice problems in ${practice.tracks.length} tracks`);
+  console.log('Writing pre-rendered lesson code...');
+  const lessonCode = require('./build-lessons').writeLessonCode({ siteDir: __dirname });
+  console.log(lessonCode.skipped ? '   skipped: Shiki is not installed' : `   wrote ${lessonCode.blocks} code blocks for ${lessonCode.files.size} lessons`);
+  console.log('Writing interview pages...');
+  const interviews = require('./build-interviews').writeInterviews({ siteDir: __dirname });
+  hubs.interviewPages = interviews.pages;
+  hubs.interviews = interviews;
+  console.log(`   wrote ${interviews.questions.length} interview questions and ${interviews.scenarios.length} scenarios`);
   fs.writeFileSync(path.join(__dirname, 'hub-pages.json'), JSON.stringify({ pages: Object.fromEntries(
     [...hubs.phasePages, ...hubs.termPages].map(page => [page.href, {
       html: 'hubs' + page.href + '.html', markdown: 'agent-pages' + page.href + '.md',
@@ -2243,11 +2256,65 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
     fs.writeFileSync(target, versionSharedAssets(fs.readFileSync(target, 'utf8')));
   }
   syncCounts(totalLessons, artifacts.length);
+  writeHubSitemaps(hubs);
   writeSitemap(phases, glossaryTerms.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLlms(phases, glossaryTerms.length, artifacts.length, certifications, learningPaths, { projects, manuals, hubs });
   writeLessonPages(phases, seoManifests.lessonManifest);
   writeProjectPages(projects, ogCards.cards);
   require('./build-agents').build({ phases, glossaryTerms, roadmapPrereqs });
+}
+
+function urlsetXml(urls) {
+  const today = new Date().toISOString().slice(0, 10);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls.map(url => `  <url>\n    <loc>${SITE_ORIGIN}${url.loc.replace(/&/g, '&amp;')}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${url.freq}</changefreq>\n    <priority>${url.priority}</priority>\n  </url>`).join('\n') +
+    '\n</urlset>\n';
+}
+
+function writeHubSitemaps(hubs, siteDir = __dirname) {
+  return [
+    ['sitemap-phases.xml', (hubs.phasePages || []).map(page => ({ loc: page.href, priority: '0.8', freq: 'monthly' }))],
+    ['sitemap-glossary.xml', (hubs.termPages || []).map(page => ({ loc: page.href, priority: '0.5', freq: 'monthly' }))],
+    ['sitemap-cheatsheets.xml', (hubs.cheatsheetPages || []).map(page => ({ loc: page.href, priority: '0.5', freq: 'monthly' }))],
+    ['sitemap-practice.xml', (hubs.practicePages || []).map(page => ({ loc: page.href, priority: '0.6', freq: 'monthly' }))],
+    ['sitemap-interviews.xml', (hubs.interviewPages || []).map(page => ({ loc: page.href, priority: '0.6', freq: 'monthly' }))],
+  ].filter(([, urls]) => urls.length).map(([name, urls]) => {
+    fs.writeFileSync(path.join(siteDir, name), urlsetXml(urls), 'utf8');
+    return name;
+  });
+}
+
+function hubLlms(hubs) {
+  let out = `## Phase overviews\n`;
+  out += `Each phase has an overview page with its lessons, prerequisites, glossary terms, and a short FAQ. Request any overview or term page with Accept: text/markdown to get Markdown.\n\n`;
+  for (const phase of hubs.phaseModels || []) out += `- [${phase.headline}](${SITE_ORIGIN}${phase.href}): ${phase.label}\n`;
+  out += `\n## Glossary term pages\n`;
+  out += `${(hubs.termPages || []).length} glossary terms have their own page at ${SITE_ORIGIN}/glossary/<term slug>. [Glossary term sitemap](${SITE_ORIGIN}/sitemap-glossary.xml)\n\n`;
+  if (hubs.practice && hubs.practice.problems.length) {
+    const labels = { implement: 'Implement', research: 'Research', train: 'Train', lab: 'Lab' };
+    out += `## Practice tasks\n`;
+    out += `${hubs.practice.problems.length} practice tasks ask the learner to implement code from a lesson, implement a method from a research paper, train a tiny model to a target, or run an experiment and answer with numbers. Python with numpy runs the checks in the browser. Each page holds the statement only, and each task page returns Markdown with Accept: text/markdown. [Practice index in Markdown](${SITE_ORIGIN}/agent-pages/practice/index.md) \`python3 scripts/practice/run.py <id> <file>\` runs the checks offline. [Practice sitemap](${SITE_ORIGIN}/sitemap-practice.xml)\n\n`;
+    for (const kind of Object.keys(labels)) {
+      const list = hubs.practice.problems.filter(problem => problem.meta.kind === kind);
+      if (!list.length) continue;
+      out += `### ${labels[kind]}\n\n`;
+      for (const problem of list) out += `- [${problem.meta.title}](${SITE_ORIGIN}${problem.href}) (${problem.meta.difficulty}): ${problem.meta.summary} From [${problem.lessonTitle}](${SITE_ORIGIN}/lesson?path=${encodeURIComponent(problem.meta.lesson)})\n`;
+      out += `\n`;
+    }
+  }
+  if (hubs.interviews && hubs.interviews.items.length) {
+    const built = hubs.interviews;
+    out += `## 面试题与排障场景\n`;
+    out += `${built.cards.length} 个主题包含 ${built.questions.length} 道面试题与 ${built.scenarios.length} 个排障场景。题目页展示题干，并折叠简短答案、完整答案、追问和常见错误答案。场景页按顺序展示证据。答案中的数值来自仓库课程、手册章节或捕获文件。请求头发送 Accept: text/markdown 时，详情页返回 Markdown。[题库 Markdown 索引](${SITE_ORIGIN}/agent-pages/interviews/index.md) [题库 JSON](${SITE_ORIGIN}/api/interviews.json) [题库站点地图](${SITE_ORIGIN}/sitemap-interviews.xml)\n\n`;
+    for (const card of built.cards) {
+      const items = built.byCard.get(card.id);
+      if (!items.length) continue;
+      out += `### ${card.title}\n\n`;
+      for (const item of items) out += `- [${item.data.title}](${SITE_ORIGIN}/interviews/${item.card}/${item.id}) (level ${item.data.level}, ${item.kind === 'scenario' ? 'scenario' : item.data.kind})\n`;
+      out += `\n`;
+    }
+  }
+  return out;
 }
 
 // ─── sitemap.xml from the same PHASES the site renders ───────────────────
@@ -2977,10 +3044,17 @@ module.exports = {
   verifySiteCss,
   writeLessonPages,
   withCard,
+  writeHubSitemaps,
+  hubLlms,
 };
 
 if (require.main === module) {
   verifySiteCss();
   if (process.argv.includes('--check')) verifyCurriculum();
-  else build();
+  else {
+    require('./lib/code').init().then(build).then(() => require('./build-search').main()).catch(error => {
+      console.error(error);
+      process.exitCode = 1;
+    });
+  }
 }

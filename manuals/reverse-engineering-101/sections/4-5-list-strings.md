@@ -6,7 +6,7 @@
 
 读完本节，你能将 39 个字符串逐一定位到加载命令，也能说明空结果能证明和不能证明什么。
 
-## 调用
+## 调用 {#s-list-strings-the-call}
 
 ```listing
 title: list_strings 及其中三项
@@ -66,7 +66,7 @@ source: ghidra §Admitted inventory semantics
 
 `termination` 有两个值。`missing` 表示需要空字节的字符串类型缺少该字节。`present_or_not_required` 包含其他情况，因为 Ghidra 无法区分已有终止符与不需要终止符的布局。`byte_length` 计入终止符：`F` 是两字节。
 
-## 六处位置，三十九个字符串
+## 六处位置，三十九个字符串 {#s-list-strings-thirty-nine-strings-in-six-places}
 
 将 39 个地址排序，会分成六段。每段对应[第 3.2 节](#s-inspect-binary-layout-and-the-load-image)的一条加载命令。
 
@@ -91,13 +91,13 @@ claim: 39 个字符串中十个是程序文本，其余 29 个是加载器和链
 caption: 按地址从上向下读。每行给出加载命令、地址范围、数量和一个示例。依据 capture/out/10-mcp-08-list-strings.json 和 04-inspect-macho.json。
 ```
 
-## 函数引用的字符串
+## 函数引用的字符串 {#s-list-strings-strings-a-function-refers-to}
 
 `_grade_label` 档案的 `referenced_strings` 切面只有一项：`0x100000770` 的 `F`，来自 `0x1000005c8` 的加载。函数并不直接加载 `F`，而是从 `0x100004030` 的 `_labels` 加载指针；这是 `__DATA_CONST` 中的 40 字节 `__const`，保存指向五个标签的五个指针。Ghidra 跟随第一个指针，记录后方字符串，`referenced_names` 对同一条指令同时列出 `_labels` 与 `s_F_100000770`。应将引用字符串理解为函数可到达的字符串，而非唯一使用的字符串。
 
 x86-64 对象中，相同五个标签位于 `.rodata.str1.1`，即[第 3.4 节](#s-analyze-overview)的十字节块，`string_count` 却为 20。[第 32 课](phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch)读取保存其余十项的 ELF 字符串表。
 
-## 清单不能证明什么
+## 清单不能证明什么 {#s-list-strings-what-the-inventory-cannot-prove}
 
 限制就在规则的第一个词：`defined`。三类文本不是 `Data`：编译器可能把字符串打包进结构体；分析器可能跳过没有终止符的字符串；程序也可能运行时构建字符串。列表都不包含它们。
 

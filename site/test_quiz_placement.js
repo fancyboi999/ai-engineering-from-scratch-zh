@@ -92,5 +92,5 @@ test('walkthrough is mounted on both rendering paths and disposed before replace
   assert.match(source, /AIFSWalkthrough\.mount\(article, \{ path: lessonPath \}\)/);
   assert.match(source, /AIFSWalkthrough\.unmount\(\)/);
   assert.match(source, /function enhanceLesson\(\)/);
-  assert.match(source, /function renderLesson\(md\)/);
+  assert.match(source, /function renderLesson\(md(?:, codeBlocks)?\)/);
 });

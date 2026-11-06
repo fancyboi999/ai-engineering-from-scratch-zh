@@ -169,7 +169,11 @@ test('numbers figures per part and renders the print edition', () => {
   assert.match(html, /图 1\.1/);
   assert.match(html, /href="#fig-1-1">1\.1<\/a>/);
   assert.match(html, /string-set: mtitle content\(text\)/);
-  assert.match(html, /<span class="m-tok-key">&quot;kind&quot;<\/span>/);
+  const listing = html.match(/<figure class="m-listing"[^>]*><div class="cb" data-kind="code" data-lang="json">[\s\S]*?<\/figure>/);
+  assert.ok(listing, 'a json listing renders as a shared code block inside its figure');
+  assert.match(listing[0], /<span class="m-listing-title">/);
+  assert.match(listing[0].replace(/<[^>]+>/g, ''), /"kind"/);
+  assert.doesNotMatch(listing[0], /data-code=/);
 });
 
 test('section routes keep stable paths and provide a lastmod date for every document', () => {
@@ -224,13 +228,15 @@ test('offline print embeds licensed CJK text fonts and keeps headings and listin
   assert.match(print, /--m-font-mono: 'Manual Noto Mono'/);
   assert.match(print, /\.m-section-head \{[^}]*break-inside: avoid;[^}]*break-after: avoid;/);
   assert.match(print, /\.m-listing \{ break-inside: auto;/);
-  assert.match(print, /\.m-listing-head \{[^}]*break-after: avoid;/);
+  assert.match(print, /\.cb-head \{[^}]*break-after: avoid;/);
+  assert.match(print, /\.cb-copy \{ display: none; \}/);
   assert.match(print, /<div class="m-print-line"><code>\{<\/code><\/div>\n/);
   const listing = print.match(/<figure class="m-listing"[\s\S]*?<\/figure>/)[0];
   const lines = [...listing.matchAll(/<div class="m-print-line"><code>(.*?)<\/code><\/div>/g)]
     .map(match => match[1].replace(/<[^>]+>/g, ''));
+  const decode = text => text.replace(/&(quot|#39|lt|gt|amp);/g, (entity, name) => ({ quot: '"', '#39': "'", lt: '<', gt: '>', amp: '&' })[name]);
   const code = manual.documents.flatMap(doc => doc.blocks).find(block => block.type === 'listing').code;
-  assert.equal(lines.join('\n'), figkit.escapeHtml(code), 'printing preserves listing characters and newlines');
+  assert.equal(decode(lines.join('\n')), code, 'printing preserves listing characters and newlines');
   assert.match(print, /\.m-print-line \{[^}]*break-inside: avoid;/);
   assert.match(print, /\.manual p \{ break-inside: avoid;/);
   assert.match(print, /overflow-wrap: anywhere;/);

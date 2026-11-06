@@ -2,7 +2,7 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "site",
   "framework": null,
-  "installCommand": "echo skip",
+  "installCommand": "npm ci --no-audit --no-fund",
   "functions": {
     "api/mcp.js": {
       "maxDuration": 10,
@@ -32,7 +32,7 @@
     },
     "api/lesson.js": {
       "maxDuration": 10,
-      "includeFiles": "{site/lesson.html,site/lesson-seo.json,site/lesson-terms.json,site/cheatsheet-map.json,site/practice-map.json,site/figure-manifest.js,site/md-render.js,phases/**/docs/zh.md,certifications/*/lessons/*/docs/zh.md,lib/og-fonts/*.json,lib/og-render.js}"
+      "includeFiles": "{site/lesson{.html,-seo.json,-code/**},site/lesson-terms.json,site/cheatsheet-map.json,site/practice-map.json,site/figure-manifest.js,site/md-render.js,phases/**/docs/zh.md,certifications/*/lessons/*/docs/zh.md,lib/og-fonts/*.json,lib/og-render.js}"
     },
     "api/certification.js": {
       "maxDuration": 10,
@@ -158,6 +158,44 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/interviews/:card([a-z0-9-]+)/:page([a-z0-9-]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": "(?i).*text/markdown.*"
+        }
+      ],
+      "destination": "/agent-pages/interviews/:card/:page.md"
+    },
+    {
+      "source": "/interviews/:card([a-z0-9-]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": "(?i).*text/markdown.*"
+        }
+      ],
+      "destination": "/agent-pages/interviews/:card.md"
+    },
+    {
+      "source": "/interviews",
+      "destination": "/interviews/index.html"
+    },
+    {
+      "source": "/interviews/:card([a-z0-9-]+)/:page([a-z0-9-]+)",
+      "destination": "/interviews/:card/:page.html"
+    },
+    {
+      "source": "/interviews/:card([a-z0-9-]+)",
+      "destination": "/interviews/:card.html"
+    },
+    {
+      "source": "/api/interviews.json",
+      "destination": "/interviews.json"
+    },
     {
       "source": "/practice",
       "destination": "/practice/index.html"
@@ -618,6 +656,58 @@
       ]
     },
     {
+      "source": "/interviews.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/api/interviews.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/interviews/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Vary",
+          "value": "Accept, Accept-Encoding"
+        }
+      ]
+    },
+    {
+      "source": "/agent-pages/interviews/:path*",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/practice/(.*)",
       "headers": [
         {
@@ -684,6 +774,21 @@
     }
   ],
   "redirects": [
+    {
+      "source": "/interviews/index.html",
+      "destination": "/interviews",
+      "permanent": true
+    },
+    {
+      "source": "/interviews/:card([a-z0-9-]+)/:page([a-z0-9-]+).html",
+      "destination": "/interviews/:card/:page",
+      "permanent": true
+    },
+    {
+      "source": "/interviews/:card([a-z0-9-]+).html",
+      "destination": "/interviews/:card",
+      "permanent": true
+    },
     {
       "source": "/hubs/:kind(phase|glossary)/:slug.html",
       "destination": "/:kind/:slug",
