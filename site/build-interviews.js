@@ -496,8 +496,26 @@ function answerText(item) {
 function checkInterviews(built) {
   const problems = [];
   const listPages = built.pages.filter(page => !built.items.some(item => itemHref(item) === page.href));
+  const listGrams = new Map();
+  listPages.forEach((list, idx) => {
+    const text = visibleText(list.html).toLowerCase();
+    for (let j = 0; j + 24 <= text.length; j++) {
+      const gram = text.slice(j, j + 24);
+      let set = listGrams.get(gram);
+      if (!set) { set = new Set(); listGrams.set(gram, set); }
+      set.add(idx);
+    }
+  });
+
+  const lowerApi = built.api.toLowerCase();
+  const apiGrams = new Set();
+  for (let j = 0; j + 24 <= lowerApi.length; j++) {
+    apiGrams.add(lowerApi.slice(j, j + 24));
+  }
+
   for (const item of built.items) {
     const answers = answerText(item);
+    const lowerAns = answers.toLowerCase();
     const page = built.pages.find(entry => entry.href === itemHref(item));
     const head = page.html.slice(0, page.html.indexOf('<body'));
     const shown = visibleText(page.html.slice(page.html.indexOf('<body')).replace(/<section class="iv-ev[ "][\s\S]*?<\/section>/g, ' '));
@@ -508,17 +526,48 @@ function checkInterviews(built) {
     const short = item.kind === 'scenario' ? item.sections.Resolution : item.sections['Short answer'];
     const expectedAnswer = visibleText(renderMarkdown(short, item.file, built.root)).replace(/\s+/g, '');
     if (!expectedAnswer || !visibleText(page.html.replace(/<details\b[^>]*>|<\/details>/g, ' ')).replace(/\s+/g, '').includes(expectedAnswer)) problems.push(`${page.href}: the folded answer is missing from the HTML`);
-    for (const list of listPages) {
+
+    const hitLists = new Set();
+    let apiCandidate = false;
+    for (let at = 0; at + 24 <= lowerAns.length; at++) {
+      const gram = lowerAns.slice(at, at + 24);
+      const set = listGrams.get(gram);
+      if (set) for (const idx of set) hitLists.add(idx);
+      if (!apiCandidate && apiGrams.has(gram)) apiCandidate = true;
+    }
+    for (const idx of hitLists) {
+      const list = listPages[idx];
       const listLeaks = bankLib.sharedSpans(answers, visibleText(list.html));
       if (listLeaks.length) problems.push(`${list.href}: shows an answer of ${item.card}/${item.id}: "${listLeaks[0]}"`);
     }
-    const apiLeaks = bankLib.sharedSpans(answers, built.api);
-    if (apiLeaks.length) problems.push(`${API_FILE}: shows an answer of ${item.card}/${item.id}: "${apiLeaks[0]}"`);
+    if (apiCandidate) {
+      const apiLeaks = bankLib.sharedSpans(answers, built.api);
+      if (apiLeaks.length) problems.push(`${API_FILE}: shows an answer of ${item.card}/${item.id}: "${apiLeaks[0]}"`);
+    }
   }
+
   const records = searchRecords(built);
+  const recordGrams = new Map();
+  records.forEach((record, idx) => {
+    const text = `${record.meta.title}\n${record.content}`.toLowerCase();
+    for (let j = 0; j + 24 <= text.length; j++) {
+      const gram = text.slice(j, j + 24);
+      let list = recordGrams.get(gram);
+      if (!list) { list = []; recordGrams.set(gram, list); }
+      list.push(idx);
+    }
+  });
+
   for (const item of built.items) {
     const answers = answerText(item);
-    for (const record of records) {
+    const lowerAns = answers.toLowerCase();
+    const candidateIdxs = new Set();
+    for (let at = 0; at + 24 <= lowerAns.length; at++) {
+      const list = recordGrams.get(lowerAns.slice(at, at + 24));
+      if (list) for (const idx of list) candidateIdxs.add(idx);
+    }
+    for (const idx of candidateIdxs) {
+      const record = records[idx];
       const recordLeaks = bankLib.sharedSpans(answers, `${record.meta.title}\n${record.content}`);
       if (recordLeaks.length) problems.push(`search record ${record.url}: shows an answer of ${item.card}/${item.id}: "${recordLeaks[0]}"`);
     }

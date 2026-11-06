@@ -109,7 +109,33 @@ test('the search index gets every item with the prompt only, never an answer', (
     const prose = prompt.replace(/```[\s\S]*?```/g, ' ').replace(/`/g, '').replace(/[*_#>|]/g, '').replace(/\s+/g, ' ').trim();
     assert.ok(record.content.length > 40 && prose.includes(record.content.slice(0, 30)), item.id);
     assert.equal(record.language, 'zh');
-    for (const other of built.items) assert.deepEqual(require('../scripts/interviews/validate').sharedSpans(interviews.answerText(other), record.content + record.meta.title), [], `${record.url} holds an answer of ${other.id}`);
+  }
+  const targetGrams = new Map();
+  for (let i = 0; i < built.items.length; i++) {
+    const item = built.items[i];
+    const record = records.find(entry => entry.url === itemHref(item));
+    const target = (record.content + record.meta.title).toLowerCase();
+    for (let j = 0; j + 24 <= target.length; j++) {
+      const g = target.slice(j, j + 24);
+      let list = targetGrams.get(g);
+      if (!list) { list = []; targetGrams.set(g, list); }
+      list.push(i);
+    }
+  }
+  const validate = require('../scripts/interviews/validate');
+  for (const other of built.items) {
+    const ans = interviews.answerText(other);
+    const lowerAns = ans.toLowerCase();
+    const candidateIdxs = new Set();
+    for (let at = 0; at + 24 <= lowerAns.length; at++) {
+      const list = targetGrams.get(lowerAns.slice(at, at + 24));
+      if (list) for (const idx of list) candidateIdxs.add(idx);
+    }
+    for (const itemIdx of candidateIdxs) {
+      const item = built.items[itemIdx];
+      const record = records.find(entry => entry.url === itemHref(item));
+      assert.deepEqual(validate.sharedSpans(ans, record.content + record.meta.title), [], `${record.url} holds an answer of ${other.id}`);
+    }
   }
 });
 
