@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -283,7 +284,9 @@ class ByteFieldTests(unittest.TestCase):
                 with self.subTest(original=original, candidate=candidate):
                     source, obj = objects[candidate]
                     claim = main.Candidate(candidate, {"target": {"function": "f"}, "claims": {"name": "f"}}, source, obj)
-                    result = main.field_bytes(claim, None, target=objects[original][1])
+                    # 这些目标文件刚由同一源码编译，不在 build-record.json 中，直接视为与源码绑定。
+                    with mock.patch.object(main, "committed_object_matches_source", return_value=True):
+                        result = main.field_bytes(claim, None, target=objects[original][1])
                     self.assertEqual(result["status"], expected)
                     self.assertEqual(result["detail"]["relocations_match"], expected == "pass")
                     self.assertEqual(result["detail"]["differing_offsets"], [])
