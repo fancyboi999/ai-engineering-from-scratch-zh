@@ -4,17 +4,17 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
-const EVIDENCE_ROOT = process.env.AIFS_EVIDENCE_ROOT ||
-  process.env.AIFS_CHEATSHEET_EVIDENCE_ROOT ||
-  (fs.existsSync(path.join(REPO_ROOT, '..', 'en')) ? path.resolve(REPO_ROOT, '..', 'en') : REPO_ROOT);
+// 场景证据逐字节摘自这一版英文上游的手册。中文仓库已翻译这些手册，正文和行号都不同，
+// 所以比对只读 AIFS_EVIDENCE_ROOT 指向的上游快照，快照根目录的 .aifs-upstream-revision 必须等于此版本。
+const EVIDENCE_REVISION = '8fec9cc19ee7c73b92582899b5455333d30d718e';
 const BANK = 'interviews';
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const LESSON = /^phases\/\d\d-[a-z0-9-]+\/\d\d-[a-z0-9-]+$/;
 const MANUAL_REF = /^([a-z0-9]+(?:-[a-z0-9]+)*)#(s-[a-z0-9-]+)$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const KINDS = ['concept', 'tradeoff', 'design', 'debug', 'code-reading', 'estimate', 'take-home'];
-const KIND_LABELS = { concept: 'Concept', tradeoff: 'Trade-off', design: 'Design', debug: 'Debug', 'code-reading': 'Code reading', estimate: 'Estimate', 'take-home': 'Take-home', incident: 'Incident' };
-const LEVELS = { 1: 'Screen', 2: 'Working', 3: 'Senior', 4: 'Staff' };
+const KIND_LABELS = { concept: '概念', tradeoff: '权衡', design: '设计', debug: '排障', 'code-reading': '代码阅读', estimate: '估算', 'take-home': '课后任务', incident: '故障' };
+const LEVELS = { 1: '基础', 2: '应用', 3: '高级', 4: '架构与规模' };
 const ROUNDS = ['screen', 'coding', 'take-home', 'system-design', 'design-review', 'debugging', 'ml-depth', 'ml-breadth', 'behavioral', 'customer'];
 const QUESTION_KEYS = ['id', 'title', 'card', 'kind', 'level', 'roles', 'rounds', 'tags', 'minutes', 'lessons', 'manuals', 'practice', 'cheatsheet', 'related', 'updated'];
 const SCENARIO_KEYS = QUESTION_KEYS.concat(['system', 'source']);
@@ -28,6 +28,9 @@ const LOOP_KEYS = ['role', 'title', 'minutes', 'updated'];
 const FOLLOW_UP = /^- \*\*Level ([1-4]):\*\* (.+?) Expected: (.+)$/;
 const WRONG = /^- "([^"]+)" (\S.*)$/;
 const NUMBER = /\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?/g;
+// 数字后的量级单位。中文课程常把 10,000 写成 1 万、把 405B 写成 4050 亿，按数值比对才不会误判为无来源。
+const SCALE = /^\s?(万亿|亿|万|[KMBT](?![A-Za-z])|(?:thousand|million|billion|trillion)(?![A-Za-z]))/i;
+const SCALES = { '万': 1e4, '亿': 1e8, '万亿': 1e12, k: 1e3, m: 1e6, b: 1e9, t: 1e12, thousand: 1e3, million: 1e6, billion: 1e9, trillion: 1e12 };
 const LEAK_SPAN = 24;
 
 function read(file) {
@@ -153,14 +156,28 @@ function stripCode(text) {
 }
 
 function sentenceCount(text) {
-  const flat = stripCode(text).replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\s+/g, ' ').trim();
+  const flat = stripCode(text).replace(/\[([^\]]*)\]\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
   if (!flat) return 0;
-  return flat.split(/(?<=[.!?]["')*]*)\s+(?=["'(*\[]?[A-Z0-9])/).filter(part => part.trim()).length;
+  return flat.split(/(?<=[。！？])\s*|(?<=[.!?]["')*]*)\s+(?=["'(*\[]?[A-Z0-9])/).filter(part => part.trim()).length;
 }
 
 function numberTokens(text) {
+  return numberQuantities(text).map(quantity => quantity.token);
+}
+
+function numberQuantities(text) {
   const clean = text.replace(/\]\([^)]*\)/g, ']');
-  return Array.from(clean.matchAll(NUMBER), match => match[0].replace(/,/g, ''));
+  return Array.from(clean.matchAll(NUMBER), match => {
+    const token = match[0].replace(/,/g, '');
+    const unit = SCALE.exec(clean.slice(match.index + match[0].length));
+    // 单字母 K/M/B/T 只认大写，避免把 5 m（米）、8 k 之类读成量级。
+    const scale = unit && !/^[a-z]$/.test(unit[1]) ? SCALES[unit[1].toLowerCase()] : 1;
+    return { token, value: quantityKey(Number(token) * scale) };
+  });
+}
+
+function quantityKey(value) {
+  return String(Number(value.toPrecision(12)));
 }
 
 function needsSource(token) {
@@ -177,8 +194,12 @@ function sharedSpans(answer, other, size = LEAK_SPAN) {
   const found = [];
   if (!source || !target) return found;
   for (let at = 0; at + size <= source.length; at++) {
-    if (at > 0 && source[at - 1] !== ' ') continue;
     const span = source.slice(at, at + size);
+    if (at > 0 && source[at - 1] !== ' ') {
+      // Chinese has no word spaces. Require prose in these additional
+      // windows so repeated measurement labels and numbers are not answers.
+      if (!/\p{Script=Han}/u.test(source[at]) || (span.match(/\p{Script=Han}/gu) || []).length < Math.ceil(size / 3)) continue;
+    }
     if (target.includes(span)) {
       found.push(span);
       at += size;
@@ -195,12 +216,28 @@ function headingSlugs(markdown) {
     if (/^```/.test(line)) fence = !fence;
     const match = !fence && /^#{1,6}\s+(.+?)\s*#*\s*$/.exec(line);
     if (!match) continue;
-    const base = match[1].toLowerCase().replace(/[`*_]/g, '').replace(/[^\p{L}\p{N} _-]/gu, '').replace(/ /g, '-');
+    // 中文手册小节用 {#id} 写明站点使用的英文 id。
+    const explicit = /^(.*?)\s*\{#([A-Za-z0-9_-]+)\}$/.exec(match[1]);
+    if (explicit) slugs.add(explicit[2]);
+    const base = (explicit ? explicit[1] : match[1]).toLowerCase().replace(/[`*_]/g, '').replace(/[^\p{L}\p{N} _-]/gu, '').replace(/ /g, '-');
     const seen = counts.get(base) || 0;
     counts.set(base, seen + 1);
     slugs.add(seen ? `${base}-${seen}` : base);
   }
   return slugs;
+}
+
+// 课程页的标题 id 由站点渲染器生成；中文标题的 id 与 Markdown 预览不同，只能按渲染结果核对。
+function lessonHeadingIds(markdown) {
+  const html = require('../../site/md-render.js').parseMd(markdown);
+  return new Set(Array.from(html.matchAll(/<h[1-6]\b[^>]*\sid="([^"]+)"/g), match => match[1]));
+}
+
+// 站点把手册小节里的 #anchor 改写为 #s-<小节>-<anchor>；构建器与校验器共用这条规则。
+function manualSectionAnchor(file, anchor) {
+  const slug = path.basename(file, '.md').replace(/^\d+-\d+-/, '').replace(/^r-\d+-/, 'ref-');
+  const tail = String(anchor).toLowerCase().replace(/`/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64);
+  return `s-${slug}-${tail}`;
 }
 
 function markdownLinks(markdown) {
@@ -295,7 +332,7 @@ function checkFront(item, ctx) {
   const card = ctx.cards.get(item.card);
   for (const lesson of checkList(data.lessons, 'lessons', errors, file)) {
     if (!LESSON.test(String(lesson))) errors.push(`${file}: lesson ${lesson} must be phases/NN-phase/MM-lesson`);
-    else if (!fs.existsSync(path.join(ctx.root, lesson, 'docs', 'zh.md')) && !fs.existsSync(path.join(ctx.root, lesson, 'docs', 'en.md')) && !fs.existsSync(path.join(EVIDENCE_ROOT, lesson, 'docs', 'en.md'))) errors.push(`${file}: lesson ${lesson} does not exist`);
+    else if (!fs.existsSync(path.join(ctx.root, lesson, 'docs', 'zh.md')) && !fs.existsSync(path.join(ctx.root, lesson, 'docs', 'en.md'))) errors.push(`${file}: lesson ${lesson} does not exist`);
     else if (card && !card.lessons.includes(lesson)) errors.push(`${file}: card ${item.card} does not list lesson ${lesson}`);
   }
   for (const ref of checkList(data.manuals, 'manuals', errors, file)) {
@@ -339,17 +376,12 @@ function sourceTexts(item, ctx) {
     let file = path.join(ctx.root, lesson, 'docs', 'zh.md');
     if (!fs.existsSync(file)) file = path.join(ctx.root, lesson, 'docs', 'en.md');
     if (fs.existsSync(file)) texts.push(read(file));
-    const enFile = path.join(EVIDENCE_ROOT, lesson, 'docs', 'en.md');
-    if (enFile !== file && fs.existsSync(enFile)) texts.push(read(enFile));
   }
   for (const ref of item.data.manuals || []) {
     const match = MANUAL_REF.exec(String(ref));
     const manual = match && manualSections(ctx.root, match[1], ctx.manualCache);
     const file = manual && manual.sections.get(match[2]);
-    if (file) {
-      if (fs.existsSync(path.join(ctx.root, file))) texts.push(read(path.join(ctx.root, file)));
-      if (fs.existsSync(path.join(EVIDENCE_ROOT, file))) texts.push(read(path.join(EVIDENCE_ROOT, file)));
-    }
+    if (file && fs.existsSync(path.join(ctx.root, file))) texts.push(read(path.join(ctx.root, file)));
   }
   if (item.kind === 'scenario') {
     for (const source of item.data.source || []) {
@@ -362,9 +394,13 @@ function sourceTexts(item, ctx) {
 }
 
 function checkNumbers(item, ctx, parts) {
-  const known = new Set(sourceTexts(item, ctx).flatMap(numberTokens));
+  const quantities = sourceTexts(item, ctx).flatMap(numberQuantities);
+  const known = new Set(quantities.map(quantity => quantity.token));
+  const values = new Set(quantities.map(quantity => quantity.value));
   for (const [label, text] of parts) {
-    const missing = Array.from(new Set(numberTokens(text).filter(token => needsSource(token) && !known.has(token))));
+    const missing = Array.from(new Set(numberQuantities(text)
+      .filter(quantity => needsSource(quantity.token) && !known.has(quantity.token) && !values.has(quantity.value))
+      .map(quantity => quantity.token)));
     if (missing.length) item.errors.push(`${item.file}: ${label} has numbers that no named source holds: ${missing.join(', ')}`);
   }
 }
@@ -480,10 +516,11 @@ function checkEvidence(item, ctx) {
     item.evidence.push({ name, file, header, listing, raw });
     if (!header.source) continue;
     if (!(item.data.source || []).includes(header.source)) item.errors.push(`${file}: source ${header.source} is not in the source list of the scenario`);
-    let sourceFile = path.join(EVIDENCE_ROOT, header.source);
-    if (!fs.existsSync(sourceFile)) sourceFile = path.join(ctx.root, header.source);
+    if (!fs.existsSync(path.join(ctx.root, header.source))) item.errors.push(`${file}: source ${header.source} does not exist in the repository`);
+    if (!ctx.evidenceRoot) continue;
+    const sourceFile = path.join(ctx.evidenceRoot, header.source);
     if (!fs.existsSync(sourceFile) || !fs.statSync(sourceFile).isFile()) {
-      item.errors.push(`${file}: source ${header.source} is not a file`);
+      item.errors.push(`${file}: source ${header.source} is not a file in upstream ${EVIDENCE_REVISION}`);
       continue;
     }
     const source = read(sourceFile);
@@ -577,7 +614,7 @@ function loadTopics(root, errors) {
     if (!card.lessons.length && !card.manuals.length) errors.push(`${label}: needs at least one lesson or manual`);
     for (const lesson of card.lessons) {
       if (!LESSON.test(String(lesson))) errors.push(`${label}: lesson ${lesson} must be phases/NN-phase/MM-lesson`);
-      else if (!fs.existsSync(path.join(root, lesson, 'docs', 'zh.md')) && !fs.existsSync(path.join(root, lesson, 'docs', 'en.md')) && !fs.existsSync(path.join(EVIDENCE_ROOT, lesson, 'docs', 'en.md'))) errors.push(`${label}: lesson ${lesson} does not exist`);
+      else if (!fs.existsSync(path.join(root, lesson, 'docs', 'zh.md')) && !fs.existsSync(path.join(root, lesson, 'docs', 'en.md'))) errors.push(`${label}: lesson ${lesson} does not exist`);
     }
     for (const manual of card.manuals) if (!fs.existsSync(path.join(root, 'manuals', String(manual), 'manual.json'))) errors.push(`${label}: manual ${manual} does not exist`);
   }
@@ -743,15 +780,8 @@ function checkLinks(root, file, text, errors, generated) {
     let doc = isDir ? path.join(resolved, 'README.md') : resolved;
     const future = generated.get(rel(root, doc));
     if (!fs.existsSync(resolved) && future === undefined) {
-      let candidate = resolved;
-      if (candidate.includes(path.sep + 'docs' + path.sep + 'en.md')) {
-        candidate = candidate.replace(path.sep + 'docs' + path.sep + 'en.md', path.sep + 'docs' + path.sep + 'zh.md');
-      }
-      if (!fs.existsSync(candidate)) {
-        const relDoc = path.relative(root, resolved);
-        const evDoc = path.join(EVIDENCE_ROOT, relDoc);
-        if (fs.existsSync(evDoc)) candidate = evDoc;
-      }
+      // 题目沿用英文原版的 docs/en.md 链接；中文仓库与站点都把它对应到 docs/zh.md。
+      const candidate = resolved.replace(path.sep + 'docs' + path.sep + 'en.md', path.sep + 'docs' + path.sep + 'zh.md');
       if (!fs.existsSync(candidate)) {
         errors.push(`${file}:${link.line}: ${link.target} does not exist`);
         continue;
@@ -759,18 +789,11 @@ function checkLinks(root, file, text, errors, generated) {
       doc = candidate;
     }
     if (anchor === undefined) continue;
-    let docText = future !== undefined ? future : doc.endsWith('.md') && fs.existsSync(doc) ? read(doc) : null;
-    if (docText === null || !headingSlugs(docText).has(anchor)) {
-      // 检查原版 manual/lesson 是否具有该 anchor
-      const relDoc = path.relative(root, doc).replace(/docs[/\\]zh\.md$/, path.join('docs', 'en.md'));
-      const evDoc = path.join(EVIDENCE_ROOT, relDoc);
-      const evText = fs.existsSync(evDoc) ? read(evDoc) : null;
-      if (evText !== null && headingSlugs(evText).has(anchor)) {
-        docText = evText;
-      } else {
-        errors.push(`${file}:${link.line}: no heading #${anchor} in ${rel(root, doc)}`);
-      }
-    }
+    const docText = future !== undefined ? future : doc.endsWith('.md') && fs.existsSync(doc) ? read(doc) : null;
+    const lessonDoc = /(?:^|\/)phases\/[^/]+\/[^/]+\/docs\/zh\.md$/.test(rel(root, doc));
+    const slugs = docText === null ? new Set() : lessonDoc ? lessonHeadingIds(docText) : headingSlugs(docText);
+    const manualSection = /(?:^|\/)manuals\/[a-z0-9-]+\/sections\/[^/]+\.md$/.test(rel(root, doc));
+    if (!slugs.has(anchor) && !(manualSection && slugs.has(manualSectionAnchor(doc, anchor)))) errors.push(`${file}:${link.line}: no heading #${anchor} in ${rel(root, doc)}`);
   }
 }
 
@@ -778,36 +801,42 @@ function itemHref(item) {
   return item.kind === 'scenario' ? `scenarios/${item.id}/README.md` : `questions/${item.card}/${item.id}.md`;
 }
 
+// 场景的引擎版本与硬件描述在 front matter 中保持英文原文，生成索引与站点共用同一份中文展示映射。
+function displayText(value) {
+  const translations = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'site', 'lib', 'interviews-display.zh.json'), 'utf8'));
+  return typeof translations[value] === 'string' && translations[value].trim() ? translations[value] : value;
+}
+
 function readmes(bank) {
   const out = new Map();
   const items = bank.questions.concat(bank.scenarios);
   const byCard = card => items.filter(item => item.card === card.id && item.data);
-  const lines = ['# Interviews and scenarios', '', 'This file is generated by `node scripts/interviews/validate.js --write`. Do not edit it.', '', `Questions and scenarios for AI engineering interviews, in ${bank.cards.length} cards. Each answer links to the lessons and manual sections that teach it. Read [AUTHORING.md](AUTHORING.md) before you add an item.`];
+  const lines = ['# 面试题与排障场景', '', '此文件由 `node scripts/interviews/validate.js --write` 生成，请勿直接编辑。', '', `AI 工程面试题与排障场景，共 ${bank.cards.length} 个主题。每个答案均关联对应课程和手册章节。新增题目前请阅读 [AUTHORING.md](AUTHORING.md)。`];
   for (const group of bank.groups) {
-    lines.push('', `## ${group.title}`, '', group.summary, '', '| Card | Items | Planned |', '|---|---|---|');
+    lines.push('', `## ${group.title}`, '', group.summary, '', '| 主题 | 已收录 | 计划 |', '|---|---|---|');
     for (const card of bank.cards.filter(entry => entry.group === group.id)) {
       const count = byCard(card).length;
       const index = card.id === SCENARIO_CARD ? 'scenarios/README.md' : `questions/${card.id}/README.md`;
       lines.push(`| ${count ? `[${card.title}](${index})` : card.title} | ${count} | ${card.planned} |`);
     }
   }
-  lines.push('', '## Roles', '', '| Role | Cards |', '|---|---|');
+  lines.push('', '## 适用岗位', '', '| 岗位 | 主题数 |', '|---|---|');
   for (const role of bank.roles) lines.push(`| ${role.title} | ${role.cards.length} |`);
   out.set(`${BANK}/README.md`, `${lines.join('\n')}\n`);
   for (const card of bank.cards) {
     const list = bank.questions.filter(item => item.card === card.id && item.data);
     if (!list.length) continue;
-    const body = [`# ${card.title}`, '', 'This file is generated by `node scripts/interviews/validate.js --write`. Do not edit it.', '', card.summary, '', '| Question | Kind | Level | Minutes |', '|---|---|---|---|'];
+    const body = [`# ${card.title}`, '', '此文件由 `node scripts/interviews/validate.js --write` 生成，请勿直接编辑。', '', card.summary, '', '| 题目 | 类型 | 难度 | 分钟 |', '|---|---|---|---|'];
     for (const item of list.sort((a, b) => a.data.level - b.data.level || a.id.localeCompare(b.id))) body.push(`| [${item.data.title}](${item.id}.md) | ${KIND_LABELS[item.data.kind]} | ${item.data.level} ${LEVELS[item.data.level]} | ${item.data.minutes} |`);
-    body.push('', '[All cards](../../README.md)');
+    body.push('', '[全部主题](../../README.md)');
     out.set(`${BANK}/questions/${card.id}/README.md`, `${body.join('\n')}\n`);
   }
   const scenarios = bank.scenarios.filter(item => item.data);
   if (scenarios.length) {
     const card = bank.cards.find(entry => entry.id === SCENARIO_CARD);
-    const body = [`# ${card ? card.title : 'Scenarios'}`, '', 'This file is generated by `node scripts/interviews/validate.js --write`. Do not edit it.', '', card ? card.summary : '', '', '| Scenario | Level | System | Minutes |', '|---|---|---|---|'];
-    for (const item of scenarios.sort((a, b) => a.data.level - b.data.level || a.id.localeCompare(b.id))) body.push(`| [${item.data.title}](${item.id}/README.md) | ${item.data.level} ${LEVELS[item.data.level]} | ${item.data.system.version}, ${item.data.system.hardware} | ${item.data.minutes} |`);
-    body.push('', '[All cards](../README.md)');
+    const body = [`# ${card ? card.title : '排障场景'}`, '', '此文件由 `node scripts/interviews/validate.js --write` 生成，请勿直接编辑。', '', card ? card.summary : '', '', '| 场景 | 难度 | 系统 | 分钟 |', '|---|---|---|---|'];
+    for (const item of scenarios.sort((a, b) => a.data.level - b.data.level || a.id.localeCompare(b.id))) body.push(`| [${item.data.title}](${item.id}/README.md) | ${item.data.level} ${LEVELS[item.data.level]} | ${displayText(item.data.system.version)}，${displayText(item.data.system.hardware)} | ${item.data.minutes} |`);
+    body.push('', '[全部主题](../README.md)');
     out.set(`${BANK}/scenarios/README.md`, `${body.join('\n')}\n`);
   }
   return out;
@@ -821,12 +850,30 @@ function generatedPaths(root) {
   return listFiles(path.join(root, BANK)).map(full => rel(root, full)).filter(isGeneratedPath);
 }
 
-function loadBank(root = REPO_ROOT) {
+// 返回上游快照目录；不可用时返回 null 并记一条错误，避免 373 个证据文件各报一遍。
+function upstreamEvidenceRoot(errors) {
+  const root = process.env.AIFS_EVIDENCE_ROOT;
+  if (!root) {
+    errors.push(`AIFS_EVIDENCE_ROOT is required: scenario evidence is compared with upstream ${EVIDENCE_REVISION}. See interviews/AUTHORING.md`);
+    return null;
+  }
+  const marker = path.join(root, '.aifs-upstream-revision');
+  const revision = fs.existsSync(marker) && fs.statSync(marker).isFile() ? read(marker).trim() : '';
+  if (revision !== EVIDENCE_REVISION) {
+    errors.push(`AIFS_EVIDENCE_ROOT ${root} must contain .aifs-upstream-revision with ${EVIDENCE_REVISION}${revision ? `, not ${revision}` : ''}`);
+    return null;
+  }
+  return path.resolve(root);
+}
+
+// upstreamEvidence: false 只供部署构建使用。部署环境没有上游快照，逐字节比对由 CI 完成。
+function loadBank(root = REPO_ROOT, { upstreamEvidence = true } = {}) {
   const errors = [];
   const topics = loadTopics(root, errors);
   const cards = new Map(topics.cards.map(card => [card.id, card]));
   const roles = loadRoles(root, new Set(cards.keys()), errors);
-  const ctx = { root, cards, roles: new Map(roles.map(role => [role.id, role])), manualCache: new Map() };
+  const evidenceRoot = upstreamEvidence ? upstreamEvidenceRoot(errors) : null;
+  const ctx = { root, evidenceRoot, cards, roles: new Map(roles.map(role => [role.id, role])), manualCache: new Map() };
   const { questions, scenarios } = loadItems(root, ctx);
   for (const item of questions.concat(scenarios)) errors.push(...item.errors);
   const loops = loadLoops(root, ctx, errors);
@@ -866,7 +913,7 @@ function main(argv) {
   const problems = argv.includes('--check-readmes') ? bank.errors.concat(stale) : bank.errors;
   console.log(`Checked ${bank.cards.length} cards, ${bank.roles.length} roles, ${bank.questions.length} questions, ${bank.scenarios.length} scenarios and ${bank.loops.length} loops.`);
   for (const problem of problems) console.error(`  ${problem}`);
-  if (stale.length && !argv.includes('--check-readmes')) console.log(`${stale.length} generated README files differ from the items. CI makes them again on main, so a pull request leaves them as they are.`);
+  if (stale.length && !argv.includes('--check-readmes')) console.log(`${stale.length} generated README files differ from the items. Run node scripts/interviews/validate.js --write and commit them; CI checks them with --check-readmes.`);
   return problems.length ? 1 : 0;
 }
 
@@ -882,6 +929,7 @@ module.exports = {
   needsSource,
   sharedSpans,
   headingSlugs,
+  manualSectionAnchor,
   markdownLinks,
   parseEvidence,
   expectedBody,

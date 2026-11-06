@@ -20,6 +20,8 @@ on:
       - "scripts/decompiler-machine/**"
       - "scripts/gpu-machine/**"
       - "cheatsheets/**"
+      - "interviews/**"
+      - "scripts/interviews/**"
       - "scripts/agent-machine/**"
       - "scripts/check_lesson_math.js"
       - "scripts/build-og-fonts.js"
@@ -93,6 +95,13 @@ jobs:
           git archive 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a phases manuals projects cheatsheets | tar -x -C "$RUNNER_TEMP/aifs-cheatsheet-evidence-updated"
           echo 3f9715c62a3bedcffb68a260f1a65ee2dd9cc10a > "$RUNNER_TEMP/aifs-cheatsheet-evidence-updated/.aifs-upstream-revision"
           echo "AIFS_CHEATSHEET_EVIDENCE_ROOTS=$RUNNER_TEMP/aifs-cheatsheet-evidence:$RUNNER_TEMP/aifs-cheatsheet-evidence-updated" >> "$GITHUB_ENV"
+      - name: 冻结题库场景证据来源（中文手册已翻译，逐字节比对只认英文上游）
+        run: |
+          git fetch --no-tags --depth=1 https://github.com/rohitg00/ai-engineering-from-scratch.git 8fec9cc19ee7c73b92582899b5455333d30d718e
+          mkdir -p "$RUNNER_TEMP/aifs-interview-evidence"
+          git archive 8fec9cc19ee7c73b92582899b5455333d30d718e manuals | tar -x -C "$RUNNER_TEMP/aifs-interview-evidence"
+          echo 8fec9cc19ee7c73b92582899b5455333d30d718e > "$RUNNER_TEMP/aifs-interview-evidence/.aifs-upstream-revision"
+          echo "AIFS_EVIDENCE_ROOT=$RUNNER_TEMP/aifs-interview-evidence" >> "$GITHUB_ENV"
       - name: verify output
         run: |
           test -f site/data.js || { echo "data.js 未生成"; exit 1; }
@@ -118,6 +127,10 @@ jobs:
           node scripts/check_lesson_math.js --katex "$RUNNER_TEMP/aieng-katex.cjs"
           node site/build-cheatsheets.js --check
           node site/build-cheatsheets.js --check-quality
+      - name: 题库结构、链接与场景证据校验
+        run: |
+          node scripts/interviews/validate.js --check-readmes
+          node --test scripts/interviews/test_validate.js
       - name: 中文课程结构与站内链接校验
         run: python3 scripts/audit_lessons.py --strict
       - name: Claude 认证课程合约校验

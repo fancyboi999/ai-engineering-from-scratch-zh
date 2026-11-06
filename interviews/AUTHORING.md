@@ -20,7 +20,7 @@ interviews/
   loops/<role-id>.md                optional: the rounds of one interview loop
 ```
 
-Do not edit or commit a generated README. CI makes them again on main after each merge, so a pull request that changes one only causes conflicts with the other open pull requests. The interview bank check fails a pull request that changes one.
+Do not edit a generated README by hand. This repository has no job that makes them again on main, so a pull request that changes an item also commits the READMEs that `node scripts/interviews/validate.js --write` makes. CI runs the validator with `--check-readmes` and fails when a README is not current.
 
 ## Cards and groups
 
@@ -215,10 +215,20 @@ A loop file `loops/<role-id>.md` gives the rounds of one interview loop for one 
 ## Validate
 
 ```bash
-node scripts/interviews/validate.js
+AIFS_EVIDENCE_ROOT=/path/to/upstream-snapshot node scripts/interviews/validate.js
 ```
 
-This command checks the bank, as CI does. To preview the generated READMEs, run it with `--write`. Before you commit, restore them with `git checkout -- interviews/README.md interviews/scenarios/README.md 'interviews/questions/*/README.md'`. The validator checks:
+This command checks the bank, as CI does.
+
+The evidence listings are copied from the English upstream manuals at revision `8fec9cc19ee7c73b92582899b5455333d30d718e`. This repository has translated those manuals, so the text and the line numbers are different. The validator compares each listing with the file in `AIFS_EVIDENCE_ROOT`, not with the file in this repository. The folder must have the upstream `manuals` folder and a `.aifs-upstream-revision` file that holds the revision. If the variable is not set, or the revision does not match, the validator reports one error and fails. It does not skip the comparison. The CI job in `.github/workflows/build.yml` fetches the revision and makes the snapshot. To make it on your computer from a clone of the upstream repository:
+
+```bash
+mkdir -p .local/interview-evidence
+git -C <upstream-clone> archive 8fec9cc19ee7c73b92582899b5455333d30d718e manuals | tar -x -C .local/interview-evidence
+echo 8fec9cc19ee7c73b92582899b5455333d30d718e > .local/interview-evidence/.aifs-upstream-revision
+```
+
+The site build does not have the snapshot. It runs all the other checks and does not compare the evidence. The CI job compares it. To make the generated READMEs current, run it with `--write` and commit them with the items. The validator checks:
 
 - the front matter keys and values, and the order of the body sections;
 - the shape of the follow-ups and the wrong answers;
@@ -226,9 +236,9 @@ This command checks the bank, as CI does. To preview the generated READMEs, run 
 - that each link and each heading anchor resolves;
 - the number rule;
 - the denylist, and that no file has an em dash or an en dash;
-- that each evidence listing matches its source;
+- that each evidence listing matches its source in the upstream snapshot;
 - that the prompt does not show a span of an answer;
-- with `--check-readmes`, that each generated README is current. The main-only CI job uses this.
+- with `--check-readmes`, that each generated README is current. CI uses this.
 
 ## Site check rules
 
@@ -237,4 +247,4 @@ This command checks the bank, as CI does. To preview the generated READMEs, run 
 1. The title and the prompt of a question go into the search index. They must not share a 24-character span with any answer in the bank, on any card.
 2. The "Taught in" lines are visible text, so the same rule applies to them. Write the lesson name as the link text, in the form "the lesson" then a link such as `[advanced RAG](...)`, and do not copy words from the answer.
 3. The Short answer and the prompt start with plain words, not with a code span. The search index drops some characters from code, so a code span at the start breaks the match between the record and the prompt.
-4. Do not commit the generated READMEs. The validator and the site check do not need them current, and CI makes them on main after each merge.
+4. Commit the generated READMEs with the items. CI fails when they are not current.
