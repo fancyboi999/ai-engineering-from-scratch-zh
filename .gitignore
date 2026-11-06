@@ -67,6 +67,8 @@ mlruns/
 !.claude/skills/find-your-level/**
 !.claude/skills/learn-agent-skills/
 !.claude/skills/learn-mcp/
+!.claude/skills/interview-prep/
+!.claude/skills/interview-prep/**
 # impeccable 工具的本地缓存/配置（config.json、hook.cache.json），任意层级，不入库
 .impeccable/
 
