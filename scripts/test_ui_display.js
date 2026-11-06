@@ -101,7 +101,8 @@ async function main() {
       await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/glossary.html` });
       let loaded = false;
       for (let attempt = 0; attempt < 100; attempt++) {
-        loaded = await evaluate("!!document.querySelector('.header-nav[aria-label=\"主导航\"]') && !!document.querySelector('.glossary-index-groups a')");
+        // 导航是静态 HTML，header.js 延迟执行后才插入菜单按钮；等按钮出现再量布局。
+        loaded = await evaluate("!!document.querySelector('.header-nav[aria-label=\"主导航\"]') && !!document.querySelector('.header-inner > .header-menu-toggle') && !!document.querySelector('.glossary-index-groups a')");
         if (loaded) break;
         await delay(50);
       }
