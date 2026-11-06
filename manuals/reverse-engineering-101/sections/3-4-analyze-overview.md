@@ -6,7 +6,7 @@
 
 读完本节，你能对两种构建运行 `rea analyze`，阅读十二段和十段，并解释为何一份有 13 个过程、另一份只有 4 个。
 
-## 一个 CLI 动词，一个组合操作
+## 一个 CLI 动词，一个组合操作 {#s-analyze-overview-one-cli-verb-one-composed-operation}
 
 `analyze` 和 `inspect` 都是 MCP 操作 `binary_overview` 的别名。使用 Ghidra 时，操作向桥接提问 `read_binary_inventory_summary`，一次回复取得段及两项计数。不支持该问题的 provider 走旧路径：同时调用 `list_segments`、`list_procedures`、`list_strings`。两种路径均返回段及长度、两项计数。输出 schema 有六个字段：`document`、`image_base`、`segments`、`segment_count`、`procedure_count`、`string_count`，各段还可带 `image_base`、`address_space`。
 
@@ -61,7 +61,7 @@ note: 保留 provider、分析配置开头及两个工作流参数。其余配�
 },
 ```
 
-## arm64 可执行文件
+## arm64 可执行文件 {#s-analyze-overview-the-arm64-executable}
 
 ```listing
 title: ledger-arm64-O1 的 binary_overview
@@ -120,7 +120,7 @@ note: 仅保留结果。省略十二个段中的九个、九条限制中的八�
 
 13 个过程包括 `ledger.c` 的四个函数、`LC_MAIN` 指向的 `entry`、四个 thunk、四个外部函数。thunk 位于 `__stubs`，外部函数位于 `EXTERNAL`。39 个字符串是 Ghidra 定义为字符串数据的全部内容，[第 4.5 节](#s-list-strings)逐一定位。
 
-## x86-64 可重定位目标文件
+## x86-64 可重定位目标文件 {#s-analyze-overview-the-x86-64-relocatable-object}
 
 ```listing
 title: ledger-x86_64-O1.o 的 binary_overview
@@ -196,7 +196,7 @@ claim: 同样四个函数在已链接可执行文件中有 13 个过程，在可
 caption: 各列自上向下读。绿色框命名 Ghidra 文档，列表列出各块及长度，紫色框为记录置信度。来自 capture/out/05-analyze-arm64-O1.json、05-analyze-x86_64-O1.json。
 ```
 
-## 概览没有说明什么
+## 概览没有说明什么 {#s-analyze-overview-what-the-overview-does-not-say}
 
 记录没有函数大小或入口点。它报告映像基址：可执行文件为 `0x100000000`，目标文件为 `0x100000`。目标文件基址是 Ghidra 选择的放置位置。
 

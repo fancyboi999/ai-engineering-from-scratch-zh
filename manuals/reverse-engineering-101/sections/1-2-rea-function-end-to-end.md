@@ -6,7 +6,7 @@
 
 读完本节，你能解读记录的每个顶层字段，说明由系统哪个部分写入，并指出 Ghidra 伪代码与原始 C 的一处差异。
 
-## 命令
+## 命令 {#s-rea-function-end-to-end-the-command}
 
 ```listing
 title: 录制的命令
@@ -28,7 +28,7 @@ claim: 一条命令打开文件、绑定 Ghidra、针对私有副本启动无界
 caption: 自上向下阅读，每个编号行一步。第 1、12 行来自 capture/out/00-commands.txt，名称和摘要来自 06-function-percent-change.json，副本名来自 05-analyze-arm64-O1.json，期限来自固定标签源码。
 ```
 
-## 从命令到桥接
+## 从命令到桥接 {#s-rea-function-end-to-end-from-the-command-to-the-bridge}
 
 1. 会话解析 Mach-O 头，读取架构并计算文件 hash。记录的 `subject` 携带结果：`mach-o`、`arm64`，以及 `00-fixtures.txt` 为 `ledger-arm64-O1` 列出的 SHA-256。
 2. 命令明确要求 `ghidra`，注册表选择它，记录 `selection_source: "request"`。
@@ -39,7 +39,7 @@ caption: 自上向下阅读，每个编号行一步。第 1、12 行来自 captu
 7. rea 将该操作的限制说明加入回答，保存为一条 Evidence 记录。
 8. 客户端发送 `shutdown`，期限 10 秒，Ghidra 删除项目。
 
-## 逐字段阅读记录
+## 逐字段阅读记录 {#s-rea-function-end-to-end-the-record-field-by-field}
 
 ```listing
 title: 记录开头
@@ -113,7 +113,7 @@ claim: 各字段分别描述身份、来源、回答或回答边界；除显示�
 caption: 依次阅读字段、本记录取值及说明。数据来自 capture/out/06-function-percent-change.json，字段列表来自固定标签的 src/domain/evidence.ts。
 ```
 
-## normalized_result 内部
+## normalized_result 内部 {#s-rea-function-end-to-end-inside-normalized-result}
 
 **过程：** 函数身份。`_percent_change` 位于 `0x100000500`，函数体为从 `0x100000500` 到 `0x100000517` 的闭区间，24 字节，`contains_entry` 为真。Ghidra 符号不带类型，因此 FunctionManager 签名为 `undefined _percent_change()`。`native_api` 下的反编译器视图为 `ulong _percent_change(ulong param_1,int param_2)`，各参数均为 `confidence: "low"`。源码则为 `int percent_change(int before, int after)`。两者都是观察，限制说明：“类型与调用约定是 Ghidra 反编译器的观察，不是源码声明。”
 

@@ -6,7 +6,7 @@ Evidence schema 是一个有 16 个字段的严格 Zod 对象。记录中出现�
 
 档案列取值来自 `ledger-arm64-O1` 中 `_percent_change` 的 `analyze_function` 记录 `ev_b492c85e`（capture/out/10-mcp-09-analyze-function-percent-change-O1.json）。推导记录列取自 `verify_reconstruction` 记录 `ev_ccbaea4b`（capture/out/10-mcp-22-verify-reconstruction.json）。[第 5.1 节](#s-the-evidence-record)对记录作文字解读。
 
-## 16 个字段
+## 16 个字段 {#s-ref-evidence-fields-the-16-fields}
 
 | 字段 | 类型 | _percent_change 档案中的值 | 验证记录中的值 |
 |---|---|---|---|
@@ -29,7 +29,7 @@ Evidence schema 是一个有 16 个字段的严格 Zod 对象。记录中出现�
 
 档案的 `normalized_result` 包含键 `procedure`、`pseudocode`、`assembly`、`comments`、`callers`、`callees`、`incoming_references`、`outgoing_references`、`unresolved_calls`、`referenced_strings`、`referenced_names`、`basic_blocks`、`native_api`、`native_value_flow`、`facet_availability`、`limitations`。`facet_availability` 说明提供器供应了八个侧面中的哪些。内部 limitations 描述这些侧面，记录自身的 `limitations` 则描述提供器会话。
 
-## 枚举
+## 枚举 {#s-ref-evidence-fields-the-enumerations}
 
 | 字段 | 允许值 |
 | --- | --- |
@@ -42,7 +42,7 @@ Evidence schema 是一个有 16 个字段的严格 Zod 对象。记录中出现�
 
 格式限定可声明的架构。rea 认识十个家族，`6502`、`m68k` 仅支持原始二进制，因为文件头检测从不报告它们。`raw-binary` subject 可使用全部十种，其他格式排除这两种。`hexagon` 来自 ELF 文件头。
 
-## 标识
+## 标识 {#s-ref-evidence-fields-the-id}
 
 标识是记录语义投影的 hash。投影保留 subject 的 `digest`、`format`、`architecture`，以及除 `evidence_id` 外的其他字段，省略 subject 的 `name` 与 `local_path`。因此对相同字节的相同观测，在任意机器、任意目录中都有相同标识。捕获检查不遮蔽标识，直接比较（capture/README.md）。`parseEvidence` 重新计算每条读入记录的 hash，拒绝不匹配记录。没有 subject 的记录在创建时会附加限制 "Artifact identity is unavailable for this observation."。
 

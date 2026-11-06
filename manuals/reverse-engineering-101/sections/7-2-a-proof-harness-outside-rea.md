@@ -6,7 +6,7 @@
 
 捕获工具在 `ledger-x86_64-O1.o` 上运行该框架，记录了四个以 `17-` 开头的文件。读完本节，你可以在重建版本上运行验证框架的两部分，阅读不匹配行与字节报告，并指出每次失败对应的风险类别或重定位项。
 
-## compare_functions 能看到什么
+## compare_functions 能看到什么 {#s-a-proof-harness-outside-rea-what-compare-functions-can-see}
 
 `compare_functions` 从八个维度比较两条 `analyze_function` 记录：`identity`、`pseudocode`、`assembly`、`comments`、`calls`、`references`、`strings_names`、`cfg`（capture/out/10-mcp-20-compare-functions-percent-change.json）。伪代码与汇编维度是有界的字符串逐行比较。耗时超过 100 ms 或编辑次数超过 10,000 时，状态为 `unknown`。汇编维度附带两条固定限制：
 
@@ -34,7 +34,7 @@ note: 八个维度对象之一。计数表示提供器文本的字符数，省�
 
 rea 6.7.0 不支持编译器重放，也没有理解重定位的字节比较。下面两部分工作需要你自行完成。
 
-## 第一部分：执行并比较
+## 第一部分：执行并比较 {#s-a-proof-harness-outside-rea-leg-one-execute-and-compare}
 
 **输入网格：** 验证框架同时送入原始函数和重建函数的一组输入单元。每类单元对应反汇编中可见的一种风险。课程的 `input_grid()` 为 `percent_change` 取十个 `before` 值与七个 `after` 值的所有组合，再为 `grade` 取 22 个分数，共 92 个单元。每个单元都带有说明其用途的类别。
 
@@ -144,7 +144,7 @@ note: 92 行中的一行。
 
 差值为 536870912，32 位乘积回绕为 -2147483648，除数为 -1。x86-64 的 `IDIV` 会触发除法错误异常，因为商无法用 32 位表示 {{spec Intel SDM Vol. 2, IDIV}}。AArch64 的 `SDIV` 不触发陷阱，返回 -2147483648 {{spec Arm DDI 0487, SDIV}}。报告随结果记录 `"arch": "aarch64"`，同一网格若在 Linux x86-64 上运行，则记录字符串 `trap`。判定基准依赖架构，因此证明必须注明执行它的宿主机。
 
-## 第二部分：重新编译并比较字节
+## 第二部分：重新编译并比较字节 {#s-a-proof-harness-outside-rea-leg-two-recompile-and-compare-bytes}
 
 **重定位掩码：** 比较前，将两个函数中每个重定位字段的字节清零。之后两步依次按偏移、类型、目标节区比较重定位记录，再读取各重定位指向的字节。课程的 `ElfObject` 使用 `struct.unpack_from` 读取 ELF64 目标文件，`mask_relocations()`、`prove_bytes()`、`read_table()` 分别执行这三步。缺少第一步时，表位于不同偏移的正确重建也会被字节比较拒绝。缺少第三步时，错误重建则可能被接受。
 
@@ -236,7 +236,7 @@ claim: 三个候选在大小检查处停止，一个通过全部字节检查后�
 caption: 自上而下阅读。每个灰框对应第二部分的一项检查。右侧玫红色虚线框列出在此失败的候选，以及报告打印的原因。底部青框通过了全部检查。来源：capture/out/17-harness-bytes.json。
 ```
 
-## 2026 年测量补充了什么
+## 2026 年测量补充了什么 {#s-a-proof-harness-outside-rea-what-the-2026-measurements-add}
 
 输入网格中的风险并非此样例特有。Liu、Raff、Micinski 在 2026 年测量了八种反编译系统的九种配置（[arXiv 2609.05370](https://arxiv.org/abs/2609.05370)）。即使通过基准全部测试，候选在模糊测试输入上仍可能出现分歧。总体比例为 4.9%，单个系统最高为 13%。测试集包含 300 个库函数和 287 个已披露漏洞函数。其中最强的精修模型将 Ghidra 的构建率从 75% 提升至 90%，行为匹配率却从 74% 降至 62%。
 

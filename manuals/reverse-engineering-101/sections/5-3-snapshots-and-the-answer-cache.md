@@ -4,7 +4,7 @@
 
 采集运行 `rea function fixtures/ledger-arm64-O1 NAME --provider ghidra` 四次，每个函数一次，每次耗时 7.9 到 9.0 秒（`capture/out/00-commands.txt`）。每次都将相同的 33,872 字节导入新 Ghidra 项目，再丢弃项目。你希望对同一文件的第二个问题没有这种成本。读完本节，你能说明快照能回答哪些调用，手动构建查询 id，也能预测 rea 何时拒绝重放或保存。
 
-## 三种名为快照的事物
+## 三种名为快照的事物 {#s-snapshots-and-the-answer-cache-three-things-called-a-snapshot}
 
 rea 中这个词涵盖三种东西，只有一种是可以保留的缓存。
 
@@ -14,7 +14,7 @@ rea 中这个词涵盖三种东西，只有一种是可以保留的缓存。
 
 **快照文件：** `close_binary` 写入、`open_binary` 读取的 JSON 文件。包含目标标识、provider 绑定、缓存条目和会话 Evidence bundle。CLI 文档说明，快照文件保存的是可复用观察，不是 provider 数据库。只有符合条件的精确查询能命中；新的或实时查询仍可能启动 provider {{cli Save and reuse analysis snapshots}}
 
-## 查询 id
+## 查询 id {#s-snapshots-and-the-answer-cache-the-query-id}
 
 **查询 id：** `query_` 加包含目标、绑定、操作、参数四部分的规范 JSON 的 SHA-256。目标是不带路径的标识：`sha256`、`kind`、`format`、`architecture`。`raw-binary` 还带 `entry_point`。绑定是 provider 与分析配置。采集中对应以 `01b5d08b` 开头的摘要、`executable`、`mach-o`、`arm64`、Ghidra `12.1.4` 和下列配置。
 
@@ -47,7 +47,7 @@ note: binary_overview 记录携带的配置。25 个参数中省略 20 个。
 
 6.7.0 就是这样的发布。对这个 Mach-O 目标，参数列表保留 25 个名称，但两个值改变：`instruction_references` 从 `exact-address-incoming-v1` 变为 `exact-address-incoming-without-synthetic-entry-v2`；`function_boundary_observations` 从 `ghidra-function-boundary-limitations-v3` 变为 `-v4`。摘要从 `966e6016…` 变为 `3fc72c9b…`，因此没有 6.5.0 快照项能匹配 6.7.0 会话。bundle 摘要的八行都由同一 Ghidra 会话产生，因此均带摘要 `3fc72c9b…`（见[导出与导入](#s-evidence-bundles-export-and-import)）。
 
-## 缓存回答哪些调用
+## 缓存回答哪些调用 {#s-snapshots-and-the-answer-cache-which-calls-the-cache-answers}
 
 在任何 provider 运行前，`isSnapshotCacheable` 判断调用能否由缓存回答。必须满足全部条件：
 
@@ -73,7 +73,7 @@ claim: 可缓存调用变成涵盖目标、绑定、操作、参数的查询 id�
 caption: 从上向下读。虚线回复是重放，实线调用是 provider 运行。琥珀色虚线箭头是变更调用分派前的状态改变。值来自 capture/out/10-mcp-09-analyze-function-percent-change-O1.json 与 10-mcp-04-binary-session.json。
 ```
 
-## 保存与加载
+## 保存与加载 {#s-snapshots-and-the-answer-cache-save-and-load}
 
 `close_binary` 接收 `snapshot_path` 和 `overwrite`。`closeWithSnapshot` 等待进行中的调用结束，导出快照、写文件、关闭 provider。回执增加 `primitive_entries`、`workflow_entries`、`evidence_records`。`open_binary` 也接收 `snapshot_path`，打开目标前读取文件，将条目导入新会话。采集关闭两个目标时都没有提供路径，因此两次 `close_binary` 结果为 `null`（`10-mcp-15-close-binary-O1.json`、`10-mcp-25-close-binary-O2.json`）。
 
@@ -83,7 +83,7 @@ CLI 通过 `--snapshot` 使用快照。精确 CLI 缓存命中时，通常会在
 
 写入是原子的：先以 `0600` 模式暂存、同步，再重命名或硬链接到目标位置。导入到目标或配置不同的会话时报 "Analysis snapshot profile_mismatch: target, provider, or analysis profile does not match the active binary"。
 
-## 变更调用前使缓存失效
+## 变更调用前使缓存失效 {#s-snapshots-and-the-answer-cache-invalidation-before-a-mutating-call}
 
 有些 Ghidra 操作会写入会话数据库，例如 `annotate_native_function` 重命名函数或增加注释。每项都在 `effects` 列出 `mutates_artifact`，并附带说明后果的限制。
 

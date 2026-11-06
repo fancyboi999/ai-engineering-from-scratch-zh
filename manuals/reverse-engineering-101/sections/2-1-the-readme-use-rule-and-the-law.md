@@ -6,7 +6,7 @@
 
 读完本节，你能指出哪条规则允许分析程序，以及本手册所有目标为何符合条件。本节解读一手来源，不提供法律建议。
 
-## 固定标签的使用规则
+## 固定标签的使用规则 {#s-the-readme-use-rule-and-the-law-the-use-rule-at-the-tag}
 
 ```rule
 label: the use rule
@@ -19,7 +19,7 @@ source: readme DISCLAIMER.md, Responsible use
 
 `DISCLAIMER.md` 也列出项目不支持的用途。首项为绕过 DRM、许可证检查、反作弊系统及其他保护措施，随后是游戏作弊、绕过认证或访问控制、复制专有软件。最后两项是规避 AI 提供方使用政策，以及转售或共享 AI 账户。
 
-## 美国：17 U.S.C. 1201
+## 美国：17 U.S.C. 1201 {#s-the-readme-use-rule-and-the-law-united-states-17-u-s-c-1201}
 
 **规避：** 1201(a)(3)(A) 将规避界定为未经著作权人授权，对扰码作品解扰、对加密作品解密，或以其他方式绕过技术保护措施 {{law 17 U.S.C. 1201(a)(3)(A)}}。1201(a)(1)(A) 禁止这种行为。
 
@@ -29,7 +29,7 @@ source: readme DISCLAIMER.md, Responsible use
 
 1201(f) 只对反规避规则提供例外，不判断分析过程中制作的副本是否侵犯著作权。1201(c)(1) 明确保留著作权侵权相关的权利、救济、限制和抗辩，包括合理使用 {{law 17 U.S.C. 1201(c)(1)}}。下方两个判决讨论这一问题。
 
-## 欧盟：Directive 2009/24/EC
+## 欧盟：Directive 2009/24/EC {#s-the-readme-use-rule-and-the-law-european-union-directive-2009-24-ec}
 
 第 1(2) 条规定，计算机程序要素背后的思想和原则不受本指令的著作权保护，接口背后的思想和原则也包括在内 {{law Directive 2009/24/EC Article 1(2)}}。随后两条赋予合法用户具体权利。
 
@@ -39,7 +39,7 @@ source: readme DISCLAIMER.md, Responsible use
 
 第 6(2)(c) 条禁止使用反编译结果开发、生产或销售表达形式实质相似的程序 {{law Directive 2009/24/EC Article 6(2)(c)}}。第 8 条规定，违反第 6 条或第 5(2)、5(3) 条例外的合同条款无效 {{law Directive 2009/24/EC Article 8}}。C-13/20 案增加了第三条路径：合法购买者可根据第 5(1) 条为纠错而反编译，无需满足第 6 条条件，但只能做到修正所必需的程度 {{law C-13/20 ruling 2}}。
 
-## 两个判决：Sega v. Accolade 与 Sony v. Connectix
+## 两个判决：Sega v. Accolade 与 Sony v. Connectix {#s-the-readme-use-rule-and-the-law-two-decisions-sega-v-accolade-and-sony-v-connectix}
 
 在 Sega Enterprises Ltd. v. Accolade, Inc., 977 F.2d 1510（第九巡回上诉法院，1992）案中，Accolade 购买 Genesis 主机和卡带，反汇编目标代码以整理接口要求，随后开发自己的游戏。法院认为，在接触程序功能要素有正当理由且反汇编是唯一途径时，这种反汇编属于合理使用 {{law Sega v. Accolade, 977 F.2d at 1527-1528}}。Accolade 只保留主机要求的 20 到 25 字节头部代码。
 
@@ -55,7 +55,7 @@ claim: 第一条命令前须回答来自 17 USC 1201(f)、Directive 2009/24/EC�
 caption: 自上而下阅读五个问题，首次回答否时沿玫红虚线箭头走。依据是 Sources 行中的法律与判决，文件名来自 capture/out/00-fixtures.txt。
 ```
 
-## 本手册的规则
+## 本手册的规则 {#s-the-readme-use-rule-and-the-law-the-rule-of-this-manual}
 
 本手册每个目标均专门编写。C 源码为 `ledger.c`、`ledger-main.c`，`js-app/` 是六文件应用，`wasm/ledger.wat` 是手写模块。捕获工具记录其 hash 与大小：
 

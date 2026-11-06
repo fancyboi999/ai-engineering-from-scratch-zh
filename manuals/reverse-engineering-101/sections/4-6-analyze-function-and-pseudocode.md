@@ -6,7 +6,7 @@
 
 读完本节，你能阅读档案的十六个切面，标出哪些伪代码行可从指令推导、哪些是猜测，也能读懂名称不存在时的错误。
 
-## 档案
+## 档案 {#s-analyze-function-and-pseudocode-the-dossier}
 
 `rea function` 是 `analyze_function` 的 CLI 名称。对 `_grade` 的 CLI 运行和同一会话的 MCP 调用产生相同 `evidence_id`：`ev_41e8ca1c` 加另外 56 位数字。id 是记录语义内容的哈希，不包含文件路径和显示名。[第 5.1 节](#s-the-evidence-record)读取记录每个字段。本节读取有十六个切面的 `normalized_result`。
 
@@ -98,7 +98,7 @@ claim: 一条记录保存一个函数的标识、文本、边、块、签名事�
 caption: 从上向下读。左列是切面名，中列是 _grade 的值，右列说明保存内容。依据 capture/out/06-function-grade.json。
 ```
 
-## procedure_pseudo_code：只有文本
+## procedure_pseudo_code：只有文本 {#s-analyze-function-and-pseudocode-procedure-pseudo-code-the-text-alone}
 
 `rea decompile` 是 `procedure_pseudo_code` 的 CLI 名称，只返回文本。
 
@@ -150,7 +150,7 @@ int _total(int *param_1,uint param_2)
 
 `_total` 可读性不错。带 `uVar2 - 1` 的 `do` 循环是汇编 `subs x9, x9, #0x1` 与 `b.ne` 构成的旋转循环。指针类型 `int *param_1` 可由加载 `ldr w10, [x0], #0x4` 推导。唯一开放问题是 `uint param_2`，源码写的是 `int count`。指令先将 `w1` 作为有符号数比较一次，再在 `x9` 中递减，两种类型都能解释，Ghidra 选择了其中一种。
 
-## 文本不完整或错误的地方
+## 文本不完整或错误的地方 {#s-analyze-function-and-pseudocode-where-the-text-is-incomplete-or-wrong}
 
 **反编译器产物：** 反编译器为表达机器码而需要、却没有任何源码行直接产生的伪代码行。`native_api` 限制列出三类：寄存器变量、编译器生成块、指针运算。采集中的三条记录展示了文本与指令间的三种差距。
 
@@ -202,7 +202,7 @@ note: 伪代码字符串开头，在写入默认值的行后截断。
 
 三个案例的规则很短。assembly 切面是观测结果，伪代码是对派生解读的观测文本。复述文本前，先对照存储检查类型，对照字节检查常量，对照块检查分支。
 
-## 不存在的名称
+## 不存在的名称 {#s-analyze-function-and-pseudocode-a-name-that-does-not-exist}
 
 ```listing
 title: 对不存在过程调用 analyze_function
@@ -255,7 +255,7 @@ note: 第 10 和 11 行，先是桥接层，再是服务层。time 和 durationM
 
 查询经 socket 往返 Ghidra，总计几毫秒。`retryable` 为 `true`：根据[第 4.2 节](#s-list-procedures-and-function-bodies)改正名称，再次调用。会话保持打开，Ghidra 项目保持已导入状态。
 
-## 如何使用档案
+## 如何使用档案 {#s-analyze-function-and-pseudocode-what-to-do-with-a-dossier}
 
 按以下顺序阅读十六个切面。先用 `procedure` 看函数体，用 `assembly` 看处理器行为，再用 `basic_blocks` 看形状、用引用看边，最后才读 `pseudocode`。[第 5.5 节](#s-compare-and-compare-functions)比较同一函数两个构建的档案。[第 7.2 节](#s-a-proof-harness-outside-rea)展示判断根据文本重建的函数是否等于原始函数的测试。
 

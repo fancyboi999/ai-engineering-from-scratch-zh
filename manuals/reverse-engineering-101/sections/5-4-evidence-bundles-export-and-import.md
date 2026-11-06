@@ -4,7 +4,7 @@
 
 今晚 agent 的 MCP 连接关闭，它在 `ledger-arm64-O1` 收集的八条记录也随之消失。明天同事想在另一台 Mac 上检查它们，不使用 Ghidra。读完本节，你能将会话导出为 bundle，不依赖引擎读取摘要，也能将其导入新会话或 CLI 检查。
 
-## export_evidence_bundle
+## export_evidence_bundle {#s-evidence-bundles-export-and-import-export-evidence-bundle}
 
 **Evidence bundle：** 包含七个数组的 JSON 对象：`artifacts`、`providers`、`environments`、`scenarios`、`captures`、`unknowns`、`records`。前五个由记录本身构建，保存按摘要、格式、架构区分的主体，去重的 provider 和环境，再是受控重放记录与进程采集记录。records 按 `evidence_id` 排序，顺序没有其他含义。
 
@@ -40,7 +40,7 @@ note: 无省略。
 6130b135…  286433  11-bundle-O2.json (the bytes export_evidence_bundle wrote, with the capture path masked and a newline added)
 ```
 
-## inspect-evidence-bundle
+## inspect-evidence-bundle {#s-evidence-bundles-export-and-import-inspect-evidence-bundle}
 
 读取 bundle 不需要 rea 引擎或会话。`rea inspect-evidence-bundle` 接收含 `path`、`detail` 和可选 `filters` 的 JSON 参数，为每条记录输出一行，不含载荷。MCP 工具 `get_evidence_bundle` 为实时会话记录使用相同投影。
 
@@ -87,7 +87,7 @@ note: 每行的主体与 provider、第二行及最后五行已省略。
 
 行按 `evidence_id` 排序，因此首行是 `procedure_assembly` 记录，`_grade` 档案为第三行。非档案行的 `native_dossier` 为不可用，原因为 `different-operation`。八行包括 `_percent_change`、`_grade`、`_total`、`_grade_label` 四份 `analyze_function` 档案，以及 `list_procedures`、`procedure_assembly`、`xrefs`、`list_strings` 各一条。每行有相同配置摘要 `3fc72c9b…`，因为均由同一 Ghidra 会话产生。O2 bundle 有两行，即 -O2 构建的 `_total` 和 `_percent_change` 档案（`11-inspect-evidence-bundle-O2.json`）。摘要过滤器可以精确匹配 `evidence_id`、`operation`、`target_sha256`、`analysis_profile_digest` 或 `procedure_address` {{mcp Tool results}}
 
-## CLI 中的 evidence-export 与 evidence-import
+## CLI 中的 evidence-export 与 evidence-import {#s-evidence-bundles-export-and-import-evidence-export-and-evidence-import-on-the-cli}
 
 `rea evidence-export SOURCE OUTPUT` 读取并验证 bundle，再按规范形式写入，返回路径、字节数、记录数。采集将 `11-bundle-O1.json` 导出为工作文件，比较两者摘要。
 
@@ -107,7 +107,7 @@ same JSON content as the MCP export: yes
 
 `rea evidence-import PATH` 验证 bundle 并报告数量。CLI 没有会话，因此 `imported`、`total` 都是文件记录数，`13-evidence-import.json` 中为 `{"imported": 8, "unknowns_added": 0, "total": 8}`。独立 CLI 调用会读取完整保存记录 {{cli Import, export and compare Evidence}}
 
-## 用 import_evidence_bundle 导入实时会话
+## 用 import_evidence_bundle 导入实时会话 {#s-evidence-bundles-export-and-import-import-evidence-bundle-into-a-live-session}
 
 MCP 中，同名操作合并到连接的账本。处理器读取验证文件，调用 `importEvidenceBundle`，返回新增记录数、新增未知项修订数和新总数。账本加入尚未持有的记录，保留已有记录；相同 id 但内容不同会被拒绝并报 "Conflicting evidence record"。
 
@@ -146,7 +146,7 @@ claim: 一个规范文件离开会话，CLI 摘要、CLI 导出、CLI 导入和�
 caption: 从左向右读。青色实线是持久写入，墨色实线是调用。依据 capture/out/10-mcp-14-export-evidence-bundle-O1.json、11-bundles.txt、11-inspect-evidence-bundle-O1.json、12-evidence-export.txt、13-evidence-import.json 和 10-mcp-23-import-evidence-bundle-O1.json。
 ```
 
-## 较早版本的 bundle
+## 较早版本的 bundle {#s-evidence-bundles-export-and-import-a-bundle-from-an-earlier-release}
 
 读取 bundle 的版本按自身哈希规则检查每个 id。工具包保留了 rea 6.5.0 为本手册写入的 O1 bundle，将其交给 6.7.0 的 `rea evidence-import`。导入以退出码 1 停止。
 

@@ -4,7 +4,7 @@
 
 agent 告诉你，`before` 为 0 时 `_percent_change` 返回 0。你想知道 rea 观测了什么、由哪个引擎给出，以及另一台机器上的同一主张是否具有相同 id。采集文件 `capture/out/10-mcp-09-analyze-function-percent-change-O1.json` 用一条 Evidence 记录给出答案。读完本节，你能读懂全部十六个字段，指出其中哪三个决定信任，也能从采集记录重新计算 `ev_` id。
 
-## 每次成功观测对应一条记录
+## 每次成功观测对应一条记录 {#s-the-evidence-record-one-record-for-every-successful-observation}
 
 **Evidence 记录：** rea 为成功观测返回的唯一记录类型。模式是包含十六个字段的严格对象，多字段或少字段都会被拒绝。没有调用者或被调用者集合的操作也写入 `relationship_coverage`，值为 `null`。MCP 服务会在 `structuredContent` 和文本副本中同时返回完整规范记录 {{mcp Tool results}}
 
@@ -86,7 +86,7 @@ MCP 处理器可以在引擎启动前执行预检，引擎回答后才构建记�
 
 三个默认值补全生产者未提供的内容。未指定置信度或权威来源时，记录使用 `observed` 和 `shipped-artifact`。主体名是路径最后一段。完全没有目标时，记录附带限制 "Artifact identity is unavailable for this observation."。
 
-## 置信度与权威来源
+## 置信度与权威来源 {#s-the-evidence-record-confidence-and-authority}
 
 **置信度：** `observed`、`derived`、`inferred` 三个词之一，是类别，绝不是数字。**权威来源：** 事实背后的来源类别，取值为 `shipped-artifact`、`controlled-replay`、`historical-reference`、`external-service`、`analyst-inference`。两字段由生产者设置，采集展示四种生产者。
 
@@ -102,7 +102,7 @@ MCP 处理器可以在引擎启动前执行预检，引擎回答后才构建记�
 
 `binary_overview` 为 `derived`，因为 rea 工作流从 provider 调用计算它。首条限制直说："Derived by an REA composed workflow." 其他八条继承 Ghidra 限制，每条以 provider、版本和操作开头，例如 "Ghidra (ghidra 12.1.4) read_binary_inventory_summary:"（`05-analyze-arm64-O1.json`）。[第 35 课](phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns)用纯 Python 构建具有相同三个词和五种权威来源的账本。
 
-## 限制、位置与链接
+## 限制、位置与链接 {#s-the-evidence-record-limitations-locations-and-links}
 
 `limitations` 是普通字符串数组，生产者在继承的限制后追加自己的限制。比较记录展示两类。首项是没有主体时自动添加的说明；随后 26 项是两侧档案限制，每项以 `Left:` 或 `Right:` 为前缀。
 
@@ -133,7 +133,7 @@ note: 显示 27 项限制的前两项。
 
 配置的 provider 与记录 `provider` 不同，会被拒绝并报 "Analysis profile provider does not match Evidence provider"。配置摘要是其 provider 与 parameters 的规范 JSON 的 SHA-256。[快照缓存](#s-snapshots-and-the-answer-cache)也用同一摘要作为键的一部分。
 
-## id 是语义内容的哈希
+## id 是语义内容的哈希 {#s-the-evidence-record-the-id-is-a-hash-of-the-semantic-content}
 
 **语义投影：** id 所哈希的记录视图。保留 `subject.digest`、`subject.format`、`subject.architecture`，丢弃 `subject.name` 和 `subject.local_path`。其他字段原样进入，即使 `relationship_coverage` 为 `null` 也一样。6.5.0 将值为 `null` 的覆盖字段排除在哈希外，因此 6.7.0 拒绝 6.5.0 bundle 中这类记录的 id（见[导出与导入](#s-evidence-bundles-export-and-import)）。
 

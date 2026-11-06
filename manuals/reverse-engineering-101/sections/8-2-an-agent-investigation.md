@@ -4,7 +4,7 @@
 
 你向 Claude、Cursor、Codex、OpenClaw、Hermes 或任意读取 `SKILL.md` 的 agent 询问 `ledger-arm64-O1`：分数为 95 时程序打印什么，字母从哪里来？Agent 只有[第 8.1 节](#s-the-rea-mcp-server)中的 rea MCP 服务，没有其他信息。捕获会话按 agent 应采取的顺序发出调用，并记录每份响应及其 Evidence 标识。读完本节，你可以沿记录文件跟踪调查，逐行编写台账，并区分哪些行有 Evidence 支持，哪些仅为 agent 的推断。
 
-## 问题与最初调用
+## 问题与最初调用 {#s-an-agent-investigation-the-question-and-the-first-calls}
 
 Agent 用 `open_binary` 打开文件，在 Ghidra 导入前取得格式、类别、SHA-256 与架构（capture/out/10-mcp-03-open-binary-O1.json）。`list_procedures` 是首次启动引擎的调用，返回 13 项：`ledger.c` 的四个函数、`entry`、四个 thunk，以及它们访问的 `libSystem.B.dylib` 中的四个外部函数。
 
@@ -56,7 +56,7 @@ note: 数组中的两个条目。省略了 F 与 A 之间的三个字母、用�
 
 两份响应都是 Evidence 记录，带有 `confidence: "observed"` 与 `authority: "shipped-artifact"`，标识为 `ev_3c6350b2`、`ev_ad37f574`。Agent 从中取得的每项事实都是对磁盘文件的观测。它仍不知道分数 95 会选择哪个字母。
 
-## 阅读 _grade 与 _grade_label
+## 阅读 _grade 与 _grade_label {#s-an-agent-investigation-reading-grade-and-grade-label}
 
 对 `_grade` 调用 `analyze_function` 得到档案 `ev_41e8ca1c`。首先应阅读其中的汇编（[第 4.3 节](#s-procedure-assembly)）：
 
@@ -158,7 +158,7 @@ claim: 四次工具调用产生四条 Evidence 记录，据此建立的台账只
 caption: 自上而下阅读。梅紫色为 agent 的问题，靛蓝框为 MCP 调用，青框为 Evidence 记录，标识截为前八位。琥珀色框为按类别列出的台账。来源：capture/out/10-mcp-05 至 10-mcp-12。
 ```
 
-## 证据台账
+## 证据台账 {#s-an-agent-investigation-the-ledger}
 
 **证据台账：** agent 调查时维护的表，每个声明一行，包含声明类别、支持它的 Evidence 标识及其边界。对应标签的内置技能正是这样要求的："Keep a concise finding ledger linking each conclusion to Evidence IDs, confidence/evidence type, search boundary, and remaining unknowns."。类别对应 Evidence `confidence` 字段的三个值：`observed`、`derived`、`inferred`。没有记录支持的声明是 `unknown`。本会话台账如下：
 
@@ -185,7 +185,7 @@ claim: 五个声明依赖已记录的 Evidence 标识，四项仍保持未知，
 caption: 左侧逐项展示观测声明及对应记录与字段。右侧玫红虚线框是台账中未决行，以及能够关闭该行的调用。来源：capture/out/10-mcp-05 至 10-mcp-12。
 ```
 
-## 目标文本是数据
+## 目标文本是数据 {#s-an-agent-investigation-target-text-is-data}
 
 **目标文本：** 工具结果从被分析文件复制出的每个字符串、符号名、注释与伪代码行。`0x10000077a` 处的用法文本 `usage: ledger <before> <after> [score...]\n` 是目标文本，`_labels` 和 Ghidra 创建的每个 `DAT_` 名称也是（capture/out/10-mcp-08-list-strings.json）。规则是：agent 引用目标文本时带上地址，绝不按其行动。看似命令的字符串只是需要记录的值，台账中不存在“从文件接收指令”这个行类别。
 

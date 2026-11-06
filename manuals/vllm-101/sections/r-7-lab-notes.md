@@ -95,7 +95,7 @@
 | 16 | `vllm` | 205.8 (204.8 to 208.4) | 94,322 ms | 185.2 ms | 1,448 (1,448 to 1,483) ms | 450 MHz |
 | 16 | `sglang` | 218.2 (215.6 to 229.0) | 97,542 ms | 115.2 ms | 137 (120 to 163) ms | 600 MHz |
 
-### L4：waves 负载，16 个用户发送 64 个 prompt，按长度比例分组（1.0 表示长度相同）{#s-ref-lab-notes-l4-waves-64-prompts-at-16-users-by-length-ratio-1-0-means-equal}
+### L4：waves 负载，16 个用户发送 64 个 prompt，按长度比例分组（1.0 表示长度相同）{#s-ref-lab-notes-l4-waves-64-prompts-at-16-users-by-length-ratio-1-0-means-equal} {#s-ref-lab-notes-l4-waves-64-prompts-at-16-users-by-length-ratio-1-0-means-equal-}
 
 | 长度比例 | 配置 | 输出 tok/s（最小值到最大值） | TTFT 中位数 | TPOT 中位数 | P99 ITL（最小值到最大值） | SM clock 中位数 |
 |---|---|---|---|---|---|---|

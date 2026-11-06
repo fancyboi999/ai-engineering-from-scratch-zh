@@ -6,7 +6,7 @@ agent 通过 MCP 在不到两秒内打开 `ledger-arm64-O1`，接着却等待 `l
 
 读完本节，你能阅读会话服务日志，指出第一次查询启动了哪个进程，也能预测哪些调用会慢。
 
-## open_binary
+## open_binary {#s-open-binary-and-the-headless-bridge-open-binary}
 
 ```listing
 title: open_binary 的请求与响应
@@ -85,7 +85,7 @@ source: mcp §Ghidra first-query deadlines and recovery
 `open_binary` 会选择目标和 provider，但不会等待 Ghidra 完成导入。
 ```
 
-## 第一次依赖 Ghidra 的调用
+## 第一次依赖 Ghidra 的调用 {#s-open-binary-and-the-headless-bridge-the-first-ghidra-backed-call}
 
 ```listing
 title: 会话索引中的六次调用
@@ -144,7 +144,7 @@ claim: 打开调用完成就绪检查后返回，不导入；第一个问题等�
 caption: 时间向下推进。实线箭头是调用，虚线箭头是回复。紫色泳道是 rea 的 Ghidra 客户端与 analyzeHeadless 内的 Java 桥接层。时间范围来自 capture/README.md。依据 capture/out/10-mcp-server.log 和 10-mcp-session.txt。
 ```
 
-## Java 一侧的桥接层
+## Java 一侧的桥接层 {#s-open-binary-and-the-headless-bridge-the-bridge-on-the-java-side}
 
 `ReaGhidraBridge.java` 是在导入和分析器之后运行的 Ghidra 脚本。其 `run()` 读取并删除 `session.json`，然后要求存在已导入程序。它检查 Ghidra 版本等于 `provider_version`，以常量时间比较程序自身 SHA-256 与 `target_sha256`。再结束脚本事务、初始化反编译器并提供服务。使用 Unix socket 时，它绑定路径，设置模式为 `rw-------`，接受一个客户端。
 
@@ -158,7 +158,7 @@ claim: 一个会话拥有一个目录，包含项目、带哈希的目标副本�
 caption: 从上向下读。每项给出文件或目录名及写入者。依据 rea 6.7.0 的 src/ghidra/GhidraLauncher.ts、src/ghidra/GhidraClient.ts；文档名依据 capture/out/05-analyze-arm64-O1.json。
 ```
 
-## 截止时间与关闭
+## 截止时间与关闭 {#s-open-binary-and-the-headless-bridge-deadlines-and-the-close}
 
 rea 允许启动耗时 330,000 毫秒，由 `REA_GHIDRA_STARTUP_TIMEOUT_MS` 设置。采集 Mac 的启动用了 5 到 7 秒，还需注意客户端的超时限制：固定版本的 client SDK 2.3.1 默认超时为 60,000 ms，可能早于 REA 启动期限取消请求 {{mcp §Ghidra first-query deadlines and recovery}}。
 

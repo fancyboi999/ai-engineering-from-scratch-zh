@@ -6,7 +6,7 @@
 
 读完本节，你能用 `rea address-to-file-offset` 将地址转换为文件偏移，也能根据 `LC_SEGMENT_64` 字段手算，并说明何时两者可能不同。
 
-## 命令
+## 命令 {#s-address-to-file-offset-the-command}
 
 ```listing
 title: 命令及退出状态
@@ -50,7 +50,7 @@ note: 截自记录。省略 subject、provider、analysis_profile 块及六条�
 
 答案是 1304。记录为 `observed`：Ghidra 报告它在该地址加载的是哪个文件字节，rea 原样传递数字。
 
-## 根据加载命令计算
+## 根据加载命令计算 {#s-address-to-file-offset-the-arithmetic-from-the-load-command}
 
 **文件偏移：** 字节在文件中的位置，从零计数。**虚拟地址：** 加载器映射所属段之后，同一字节在内存的位置。段将从 `fileoff` 开始的 `filesize` 字节映射到从 `vmaddr` 开始的 `vmsize` 字节，因此同段内二者相差常量。
 
@@ -74,7 +74,7 @@ caption: 各行从左向右读。绿色框为加载命令事实，灰色框为�
 
 ELF 规则形式相同。可加载段为 `offset = address - p_vaddr + p_offset`，节则使用 `sh_offset`。[第 32 课](phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch)对 `ledger-x86_64-O1.o` 手算。可重定位目标没有程序头表，也没有段安排内存位置。[第 3.4 节](#s-analyze-overview)将其 `.text` 显示于 `0x100000` 时，该数字是 Ghidra 选择的放置位置，不是文件中的事实。
 
-## Ghidra 实际如何处理
+## Ghidra 实际如何处理 {#s-address-to-file-offset-what-ghidra-does-instead}
 
 桥接不直接计算。`addressToFileOffset` 向 Ghidra 查询该地址的内存块，并要求块已初始化。否则以 `invalid_request` 失败，消息为 “Address has no initialized file-backed memory”。随后遍历块的来源映射，仅保留 `FileBytes` 从文件偏移 0 开始，且原始字节 SHA-256 与接纳目标一致的映射。必须恰有一个映射，偏移大于 2^53 - 1 也拒绝。
 

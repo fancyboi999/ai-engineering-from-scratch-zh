@@ -6,7 +6,7 @@
 
 读完本节，你能读懂 `_grade` 的 15 条指令，将它们分为三个块，并解释乘以 `0x66666667` 的含义。
 
-## 调用与文本
+## 调用与文本 {#s-procedure-assembly-the-call-and-the-text}
 
 ```listing
 title: _grade 的 procedure_assembly
@@ -51,7 +51,7 @@ note: 档案的完整 assembly 数组。
 ],
 ```
 
-## 阅读十五条指令
+## 阅读十五条指令 {#s-procedure-assembly-reading-the-fifteen-instructions}
 
 参数 `score` 经 `x0` 的低 32 位 `w0` 传入，结果也从 `w0` 传出。将文本分四组读。
 
@@ -73,7 +73,7 @@ caption: 从顶部块开始读。箭头是首块的两个后继，每个叶块�
 
 **基本块：** 顶部只有一个入口、底部只有一个出口的指令序列。控制只能从第一条进入，在最后一条之后离开。档案的 `basic_blocks` 为 `_grade` 列出三个块：`0x100000518` 到 `0x10000053c`，后继为 `0x10000053c` 和 `0x10000054c`；另两个叶块没有后继。[第 33 课](phases/13-tools-and-protocols/33-disassembly-and-control-flow)从字节构建解码器和基本块切分器，得到相同划分。
 
-## x86-64 上的同一函数
+## x86-64 上的同一函数 {#s-procedure-assembly-the-same-function-on-x86-64}
 
 ```listing
 title: x86-64 对象中的 grade
@@ -101,7 +101,7 @@ note: x86-64 档案的完整 assembly 数组。Ghidra 以 Intel 语法和大写�
 
 十四条指令，形状相同。乘法只有一条 `IMUL RAX, RAX, 0x66666667`，两次移位仍是 34 和 63。`XOR EAX, EAX` 在比较前将默认返回值设为零，因此默认路径无需额外块，函数只有一个 `RET`。表位于 `0x1000b4`，即 `.rodata` 加 `0x14`。清单将该地址显示为普通数值，因为 Ghidra 加载对象时应用了重定位。[第 4.6 节](#s-analyze-function-and-pseudocode)会回到 `XOR`，因为反编译器的写法隐藏了这个零。
 
-## 不返回警告放在哪里
+## 不返回警告放在哪里 {#s-procedure-assembly-where-the-no-return-warnings-go}
 
 `_grade` 的 `raw_result.limitations` 为空。函数调用被 Ghidra 标为不返回的目标时，扫描可能在此停止，这个列表会给出调用点。在 macOS 与 Linux 上，rea 导入后运行修复脚本，清除六个常见库名称的错误不返回标志，因此这里读取的是修复后的函数体。Ghidra 文档说明，若不清除这个推断标志，函数体可能在后续字节之前就被截断 {{ghidra §Admitted function-analysis semantics}}。
 

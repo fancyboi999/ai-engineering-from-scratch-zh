@@ -6,7 +6,7 @@
 
 读完本节，你能对自行构建的文件运行 `inspect-artifact`，阅读声明及唯一出现位置，并解释为何记录将 `open_binary` 列为下一探查。
 
-## 一条命令，一条记录
+## 一条命令，一条记录 {#s-inspect-artifact-one-command-one-record}
 
 ```listing
 title: 命令及退出状态
@@ -55,7 +55,7 @@ note: 省略 substeps 数组及其后内容。捕获工具屏蔽 local_path。
 
 SHA-256 与 `00-fixtures.txt` 所列相同，此文件的后续记录均携带同一摘要。`format` 根据魔数读为 `mach-o`，`architecture` 为 `null`。该 provider 不读取 `cputype`，[下一节](#s-inspect-binary-layout-and-the-load-image)展示能读取它的工具。唯一参数 `integrity_policy` 设为 `fail`。
 
-## 声明与出现位置
+## 声明与出现位置 {#s-inspect-artifact-the-manifest-and-the-occurrence}
 
 记录包含一个子步骤 `inventory_artifact`，`status: "completed"`，内部嵌套自身 Evidence 记录。声明统计图的数量。
 
@@ -104,7 +104,7 @@ note: 从清单子步骤仅保留声明计数、唯一节点和唯一出现位�
 
 一个节点、一个出现位置、零条边。可执行文件本身就是容器，没有成员。限制 “Artifact has no child container entries.” 表达同一事实。节点报告 `size: 33872`，与 `00-fixtures.txt` 字节数一致，`content_state: "materialized"`。出现位置的 `logical_path: "."` 表示根，`artifact_kind: "executable"`。`.asar` 或 `.zip` 的各成员会在这里拥有独立节点与路径。
 
-## 分支与下一探查
+## 分支与下一探查 {#s-inspect-artifact-branches-and-the-next-probe}
 
 ```listing
 title: 检查没有做什么
@@ -145,7 +145,7 @@ claim: 一次低成本读取生成带 hash 的对象、单节点清单，以及�
 caption: 从顶部阅读。蓝绿色框为记录，绿色框为观察内容，琥珀色框为留给后续工具的内容。来自 capture/out/03-inspect-artifact.json。
 ```
 
-## 记录不包含什么
+## 记录不包含什么 {#s-inspect-artifact-what-the-record-is-not}
 
 记录不是格式解析，不含加载命令、节、符号或入口点。[下一节](#s-inspect-binary-layout-and-the-load-image)用 `inspect-macho` 读取这些信息。函数分析则在[第 4 部分](#s-open-binary-and-the-headless-bridge)通过分支指定的 `open_binary` 绑定 Ghidra。完整记录有 198 行，大多重复对象摘要。这正是设计目的：各嵌套记录都可独立使用，仍能指向同样字节。
 
