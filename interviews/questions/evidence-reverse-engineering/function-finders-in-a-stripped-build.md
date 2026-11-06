@@ -1,6 +1,6 @@
 ---
 id: function-finders-in-a-stripped-build
-title: nm says one function, the file has five
+title: nm 报告一个函数而文件实际包含五个
 card: evidence-reverse-engineering
 kind: tradeoff
 level: 2
@@ -16,46 +16,46 @@ related: [evidence-reverse-engineering/sweep-trap-addq-at-0x13]
 updated: 2026-11-03
 ---
 
-A stripped arm64 executable holds five functions, and `nm` lists one name. Compare four ways to recover the function starts, score each against the unstripped twin at `-O0` and `-O2`, and say how you name the functions afterwards and where that naming collides.
+一个被剥离符号的 arm64 可执行文件中包含五个函数，而 `nm` 仅列出了一个函数名。对比恢复函数起始位置的四种方法，对照在 `-O0` 和 `-O2` 优化级别下未剥离的对应文件为每种方法评分，并说明随后如何为这些函数命名以及这种命名会在何处发生冲突。
 
 ## Short answer
 
-The link editor's own table wins: `LC_FUNCTION_STARTS` is nine bytes of uleb128 deltas that list all five starts at both levels, and `strip` does not touch it. A prologue scan for the pre-indexed frame store finds 0 of 5, because the compiler emits `sub sp, sp, #N` first; a mask for that `sub` finds 5 of 5 at `-O0` and 1 of 5 at `-O2`, where four leaf functions have no frame at all. Call targets plus the entry point find 5 of 5, since a `bl` into the middle of a function is something a compiler does not emit for C. Names come from signatures built from your own objects, a 32-byte pattern with relocation bytes wildcarded and a CRC16 of the tail; at `-O2` two functions share their first 36 bytes because one inlined the other, and the tail byte at 44 and the lengths 60 against 72 split the collision.
+链接编辑器自带的表效果最好：`LC_FUNCTION_STARTS` 包含了 9 字节的 uleb128 增量数据，在两个优化级别下都能完整列出所有 5 个函数的起始位置，且 `strip` 符号剥离命令不会影响该表。通过扫描前变址栈帧存储指令序言的方法找到了 0/5，因为编译器会先生成 `sub sp, sp, #N` 指令；针对该 `sub` 指令做掩码扫描在 `-O0` 下找到了 5/5，在 `-O2` 下找到了 1/5，因为在后者中四个叶子函数根本没有分配栈帧。通过调用目标加上程序入口点的方法找到了 5/5，因为编译器通常不会为 C 语言代码生成跳转到函数体内部的 `bl` 指令。函数命名来自于从你自己的目标文件构建的签名，包含 32 字节的通配重定位字节模式以及末尾数据的 CRC16 校验码；在 `-O2` 级别下，两个函数因其中一个内联了另一个而共享了前 36 个字节，通过偏移 44 处的尾字节以及 60 对比 72 的长度差异成功化解了这一冲突。
 
 ## Full answer
 
-### The four finders
+### 四种函数查找方法
 
-| Method | What it reads | `-O0` | `-O2` | Why |
+| 方法 | 读取内容 | `-O0` | `-O2` | 原因 |
 |---|---|---|---|---|
-| `LC_FUNCTION_STARTS` | uleb128 deltas in `__LINKEDIT` | 5 of 5 | 5 of 5 | written for the unwinder and crash reporter; survives `strip` |
-| frame-store prologue | `stp x29, x30, [sp, #-0x10]!` | 0 of 5 | 0 of 5 | the compiler stores the pair at a positive offset after `sub sp` |
-| `sub sp` mask | `(word & 0xff0003ff) == 0xd10003ff` | 5 of 5 | 1 of 5 | leaf functions at `-O2` allocate no frame; one starts with `cbz` |
-| call targets | every `bl` inside `__text`, plus the `LC_MAIN` entry | 5 of 5 | 5 of 5 | nothing calls `main`, so the entry is added by hand |
+| `LC_FUNCTION_STARTS` | `__LINKEDIT` 中的 uleb128 增量 | 5/5 | 5/5 | 为栈展开器与崩溃报告器生成；经 `strip` 剥离后依然存留 |
+| 栈帧存储序言扫描 | `stp x29, x30, [sp, #-0x10]!` | 0/5 | 0/5 | 编译器在 `sub sp` 之后以正向偏移存储该寄存器对 |
+| `sub sp` 指令掩码 | `(word & 0xff0003ff) == 0xd10003ff` | 5/5 | 1/5 | `-O2` 下的叶子函数不分配栈帧；其中一个以 `cbz` 起始 |
+| 调用目标追踪 | `__text` 内的每个 `bl` 加上 `LC_MAIN` 入口 | 5/5 | 5/5 | 没有任何指令调用 `main`，因此入口点需手动补充 |
 
-No false positives appeared here because the program is small. One-byte patterns such as the x86-64 `push rbp` byte hit inside other instructions, which is why real pattern files pair a start pattern with a byte that must end the previous function. Prefer the tables the link editor wrote, then call targets to fill gaps, and scan for bytes last.
+由于该程序规模较小，此处未出现误报。像 x86-64 的 `push rbp` 单字节特征经常会命中其他指令内部，因此真实的特征文件总是将起始特征与前一个函数必须具备的结尾字节成对匹配。在实际操作中，应优先利用链接编辑器生成的表，其次用调用目标填补空缺，最后才采用字节模式扫描。
 
-### What strip leaves per format
+### 各文件格式经 strip 剥离后的残留内容
 
-The names the loader binds survive everywhere: imports and exports in the dynamic symbol table, the import and export directories of a PE image, the chained imports table and the exports trie of a Mach-O. Function starts survive as unwind data (`.eh_frame` unless built without unwind tables), as `.pdata` entries for non-leaf functions in a PE image, and as `LC_FUNCTION_STARTS`. The static symbol table and the debug sections go. A fully stripped library whose symbol table holds zero records still links, because the link editor reads the exports trie.
+加载器用于绑定的符号名在所有格式中均得以保留：动态符号表中的导入与导出项、PE 映像的导入与导出目录、Mach-O 的链式导入表与导出字典树（trie）。函数起始位置作为栈展开数据得以保留（例如 `.eh_frame`，除非编译时禁用了展开表）、作为 PE 映像中非叶子函数的 `.pdata` 条目保留，以及作为 `LC_FUNCTION_STARTS` 保留。静态符号表和调试节则被移除。一个静态符号表中条目数为零的完全剥离动态库仍然能够正常链接，因为链接编辑器读取的是导出字典树。
 
-### Signatures and the collision
+### 签名匹配与命名冲突
 
-A signature is the first 32 bytes of a function with every relocated byte marked variant, a CRC16 over the bytes after the pattern up to the first variant byte, and the names the function references. Built from the unstripped objects and applied at every recovered start, the signatures name all five functions at both levels. At `-O2` the two colliding functions produce identical pattern and CRC lines; the report records both candidates and the byte that decided them. A collision that nothing separates stays an unknown. The premise is checked too: every non-variant byte of each object function equals the byte at the same offset in the linked file, so the link editor changed only the relocated words.
+特征签名由函数的前 32 个字节（其中每个重定位字节标记为通配可变）、紧随其后直到首个可变字节之间的字节数据的 CRC16 校验码，以及该函数所引用的符号名称组成。根据未剥离的目标文件构建并在每个恢复出的起始位置应用这些签名，在两个优化级别下都能正确命名全部 5 个函数。在 `-O2` 下，发生冲突的两个函数产生了相同的模式和 CRC 记录，报告记录了两个候选以及最终区分它们的关键字节。没有任何区分依据的冲突将保持为未知项。这一推断前提也得到了验证：每个目标函数的所有不可变字节与链接后文件中相同偏移处的字节完全相等，证明链接编辑器仅修改了重定位字。
 
 ## Follow-ups
 
-- **Level 2:** Why does the frame-store scan find nothing even at `-O0`? Expected: the compiler emits `sub sp` first and stores the frame record at a positive offset, so the pre-indexed form never occurs.
-- **Level 3:** Why can `strip` not remove the function starts table? Expected: the unwinder and the crash reporter read it, the link editor writes it into `__LINKEDIT`, and only the symbol table is the debugger's.
-- **Level 3:** Two signatures match at the same start. What do you record? Expected: both candidates, the tail byte and the lengths that split them, and an unknown when nothing does.
-- **Level 4:** Which table plays this role in a PE image, and whom does it omit? Expected: `.pdata` with its `RUNTIME_FUNCTION` entries, which omit leaf functions that allocate no stack and call nothing.
+- **Level 2:** 为什么即便在 `-O0` 下栈帧存储扫描也一无所获？ Expected: 编译器首先生成 `sub sp`，并在正向偏移处存储栈帧记录，因此预变址寻址形式从未出现。
+- **Level 3:** 为什么 `strip` 无法移除函数起始表？ Expected: 展开器和崩溃报告器需要读取它，链接编辑器将其写入 `__LINKEDIT`，只有静态符号表才仅仅供调试器使用。
+- **Level 3:** 两个签名在同一个起始位置均命中，你记录什么？ Expected: 同时记录两个候选、用于区分它们的尾字节与函数长度，若没有任何区分依据则记录为未知项。
+- **Level 4:** 在 PE 映像中哪张表扮演该角色，它省略了谁？ Expected: 带有 `RUNTIME_FUNCTION` 条目的 `.pdata` 表，它省略了既不分配栈空间也不调用其他函数的叶子函数。
 
 ## Wrong answers
 
-- "`nm` shows one function, so there is one." It shows the symbol table; the link editor's starts table lists five.
-- "Scan for the standard prologue." At `-O2` four of five functions have no frame; the scan reports what the compiler chose to emit.
-- "A matching CRC proves the name." Two functions shared pattern and CRC; the tail byte and the lengths decided, and the record says so.
+- "`nm` 显示一个函数，所以实际只有一个。" 它展示的是静态符号表；链接编辑器的起始表列出了五个。
+- "扫描标准函数序言。" 在 `-O2` 优化下五个函数中有四个没有栈帧；扫描只能反映编译器选择生成的指令。
+- "匹配的 CRC 校验码证明了函数名。" 两个函数共享了模式和 CRC；最终由尾字节和长度决定，记录对此有明确说明。
 
 ## Taught in
 
-The [linking lesson](../../../phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries/) scores the four finders against the unstripped twin and builds the signatures that collide at `-O2`.
+[链接课程](../../../phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries/)对照未剥离的对应文件给四种查找方法评分，并构建了在 `-O2` 下发生冲突的特征签名。

@@ -1,6 +1,6 @@
 ---
 id: a-turn-cap-for-every-task
-title: One turn cap for every task, what number do you give
+title: 为所有任务设定一个统一的轮数上限，你给什么数字
 card: agents
 kind: estimate
 level: 2
@@ -16,52 +16,52 @@ related: [agents/the-agent-loops-forever, agents/pick-the-permission-mode]
 updated: 2026-11-03
 ---
 
-The product team wants a single maximum number of turns that applies to every run of your agent. The agent handles one-line edits, multi-file refactors, and unattended runs that drive a computer for hours. What number do you give them, and how do you defend it?
+产品团队希望为 agent 的每次运行设定一个统一的最大轮数上限。该 agent 需要处理单行编辑、多文件重构，以及持续数小时无人值守操作电脑的运行。你会给他们什么数字，又如何辩护？
 
 ## Short answer
 
-There is no single number, and the estimate shows why. Agents run 40 to 400 steps per task, and a computer-use task runs dozens to hundreds of steps as a normal case. A cap that fits a one-line edit stops every refactor, and a cap that fits an unattended run lets a stuck edit spend hundreds of turns. Give one cap per task class, set each from the trace distribution of successful runs in that class, and pair every cap with a wall-clock budget and a cost cap.
+没有单一的数字，估算说明了原因。Agent 处理每个任务通常需要 40 到 400 步，而计算机操作任务常规就需要数十到数百步。适合单行编辑的上限会卡死所有重构，而适合无人值守运行的上限会让陷入死循环的编辑空耗数百轮。应按任务类别分别设定上限，每项依据该类别成功运行的追踪分布确定，并为每个上限搭配实际耗时预算与成本上限。
 
 ## Full answer
 
-### Why one number fails
+### 为什么单一数字行不通
 
-| Task class | Normal length | Effect of one shared cap |
+| 任务类别 | 正常长度 | 统一共享上限的后果 |
 |---|---|---|
-| One-line edit | A handful of turns | A high cap lets a stuck run burn hundreds of turns before anyone sees it |
-| Multi-file refactor | Tens of turns | A low cap ends the run with half the files changed |
-| Unattended computer use | Dozens to hundreds of steps | A low cap makes the mode unusable |
+| 单行编辑 | 少数几轮 | 过高的上限会让卡住的运行在被发现前烧掉数百轮 |
+| 多文件重构 | 数十轮 | 过低的上限会导致运行在文件只修改了一半时强行终止 |
+| 无人值守计算机操作 | 数十到数百步 | 过低的上限会使该模式完全不可用 |
 
-The lesson's rule is to pick a cap that fits the task class, not one size for all.
+课程给出的规则是选择适合该任务类别的上限，而不是一套标准套用所有任务。
 
-### How to set each cap
+### 如何设定每个上限
 
-1. Pull the traces for the class and read the turn counts of the runs that passed the gate.
-2. Set the cap above the longest passing run with a margin, and below the point where the traces show repeated actions.
-3. Treat the cap as a yield, not a kill. When the loop reaches it, the caller sees the partial state and decides whether to extend.
-4. Review the caps when the traces move. A new model or a new tool changes the distribution.
+1. 拉取该类别的执行追踪，统计通过关卡的运行的轮数。
+2. 将上限设定在最长通过运行之上并留有余量，且低于追踪中开始出现重复操作的点。
+3. 将上限视为让出控制权，而非直接杀死进程。当循环达到上限时，调用方可以看到部分状态并决定是否继续追加。
+4. 当追踪数据的分布发生变化时审查上限。新模型或新工具会改变这一分布。
 
-### The other two budgets
+### 另外两项预算
 
-A turn cap alone misses two failure shapes. A run can spend few turns and a lot of wall-clock time, waiting on slow tools. A run can spend few turns and a lot of money, with long contexts on an expensive model. The unattended mode in the lesson ships a turn cap, a dollar cap that aborts the session, and action-count limits per tool. A 24-hour unattended run needs all three, plus an allowlist, and each number needs a written reason.
+单靠轮数上限会漏掉两种失败形态。一种运行可能消耗很少的轮数，却因为等待慢速工具而耗费大量实际耗时时间。另一种运行可能消耗很少的轮数，却因为使用昂贵模型处理长上下文而花费大量金钱。课程中的无人值守模式配备了轮数上限、中止会话的金额上限以及按工具划分的操作次数限制。一次 24 小时的无人值守运行这三者都需要，外加白名单机制，且每个数字都需要书面依据。
 
-### What to tell the product team
+### 如何向产品团队汇报
 
-Give them a table, not a number: one row per task class with the turn cap, the wall-clock budget, the cost cap and the per-tool limits, and the trace data that each row came from. Offer one default for an unclassified task, set low, so that an unknown task yields early and a human decides.
+给他们一张表格，而不是一个孤立的数字：每一行代表一个任务类别，包含轮数上限、实际耗时预算、成本上限和每个工具的限制，并附上每行数据所源自的追踪记录。针对未分类任务提供一个偏低的默认值，使得未知任务能尽早让出控制权交由人工决策。
 
 ## Follow-ups
 
-- **Level 2:** A run reaches the cap with the task almost done. What happens? Expected: the loop yields with a budget reason, the caller inspects the partial state, and the caller extends the budget or closes the session with a handoff.
-- **Level 2:** Why should the fallback cap for a task with no class be small? Expected: an unknown task is the one most likely to loop, and an early yield costs a human decision while a late one costs hours.
-- **Level 3:** How do you tell a long run from a stuck run before the cap? Expected: a repeat detector over the action and observation hashes, so that five near-identical actions in a row pause the run early.
-- **Level 3:** The traces for a class show two clusters of turn counts. What does that tell you? Expected: the class is two classes, and each needs its own cap.
+- **Level 2:** 一次运行达到了上限，但任务已经接近完成，此时会发生什么？ Expected: 循环以预算原因让出控制权，调用方检查部分状态，并由调用方决定延长预算还是带着交接包关闭会话。
+- **Level 2:** 为什么未分类任务的后备上限应该设得很小？ Expected: 未知任务最容易发生死循环，及早让出控制权只需消耗一次人工决策，而过晚让出控制权会浪费数小时。
+- **Level 3:** 在达到上限之前，如何区分长时间运行与卡死死循环？ Expected: 在操作和观察哈希上构建重复检测器，使得连续五次近乎相同的操作能够尽早暂停运行。
+- **Level 3:** 某个类别的追踪记录显示出两个轮数聚集簇，这说明了什么？ Expected: 该类别实际上应当拆分为两个类别，每个类别都需要独立的上限。
 
 ## Wrong answers
 
-- "Set it high so that no legitimate task is cut off." A high cap on a short task class lets a stuck run spend hundreds of turns, and the point of the cap is to catch the stuck run.
-- "Set it low and let users retry." A low cap on a refactor ends every run with half the work, and a retry starts from zero.
-- "The turn cap is enough, because turns are what cost money." Turns are one axis, and a run can be slow in time or expensive in tokens with few turns.
+- "把上限设得很高，确保没有合法的任务被意外切断。" 对短任务类别设置过高的上限会让卡死的运行空转数百轮，而设置上限的核心目的就是捕获卡死的运行。
+- "把上限设得很低，让用户重试。" 对重构任务设置过低的上限会让每次运行都只完成一半工作，而重试只能从零开始。
+- "轮数上限就足够了，因为轮数才是花钱的地方。" 轮数只是单一维度，一次运行完全可以在较少轮数下耗费很长时间或花费高昂的 token 费用。
 
 ## Taught in
 
-The [agent loop lesson](../../../phases/14-agent-engineering/01-the-agent-loop/) sets the cap per task class, and the [permission modes lesson](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/) pairs it with a cost cap and per-tool limits.
+[Agent 循环：观察、思考、行动](../../../phases/14-agent-engineering/01-the-agent-loop/)课程按任务类别设定上限，[自主 Agent 的权限模式](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/)课程将其与成本上限和单工具限制配合使用。

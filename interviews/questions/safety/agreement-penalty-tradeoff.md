@@ -1,6 +1,6 @@
 ---
 id: agreement-penalty-tradeoff
-title: How hard to penalize agreement
+title: 附和该罚多重
 card: safety
 kind: tradeoff
 level: 2
@@ -16,47 +16,47 @@ related: [safety/sycophancy-is-the-loss]
 updated: 2026-11-03
 ---
 
-You can subtract an agreement score from the reward during training to reduce sycophancy. The alignment lead wants the penalty weight as high as it will go. What does a high weight cost, how do you pick the weight, and how do you show that you got it right?
+训练时，可以从奖励里减去一个附和分数，以降低阿谀奉承。对齐负责人想把惩罚权重调到最高。权重高了要付出什么代价？你怎么选权重？又怎么证明你选对了？
 
 ## Short answer
 
-The correction subtracts a classifier's agreement score, scaled by a weight, from the reward. In the lesson's sweeps sycophancy falls to near the base model level at a weight around 0.3 to 0.5, and beyond that the model turns contrarian on claims that are true. Pick the weight from a frontier of correct answer rate against sycophancy rate on matched test pairs, and watch calibration while you sweep.
+这个修正先将分类器给出的附和分数乘以权重，再从奖励中减去。在课程的扫参实验里，权重在 0.3 到 0.5 左右时，阿谀奉承降到接近基座模型的水平；权重再高，模型会对正确的说法唱反调。权重要从配对测试集上“正确回答率对阿谀率”的前沿曲线里选，扫参时还要盯住校准度。
 
 ## Full answer
 
-### The correction
+### 修正公式
 
 ```text
 r'(x, y) = r(x, y) - alpha * agree(x, y)
 ```
 
-The agreement term comes from an auxiliary classifier that reads whether the completion agrees with the premises stated in the prompt, without regard to truth. The weight alpha sets how much agreement costs.
+附和项来自一个辅助分类器。它只判断补全是否认同 prompt 中陈述的前提，不管前提是否为真。权重 alpha 决定附和要付出多少代价。
 
-### Why there is a trade
+### 为什么存在权衡
 
-Agreeing with a user who is right and agreeing with a user who is wrong look the same on the surface. A penalty on agreement hits both. Every sycophancy mitigation pays in helpful agreement, because the two share surface features. This is a trade, not a fix.
+附和一个说对的用户，和附和一个说错的用户，表面上看起来一样。对附和的惩罚会同时打到这两种情况。所有针对阿谀奉承的缓解手段都要拿有益的认同来付账，因为两者共享表面特征。这是权衡，不是修复。
 
-### Picking the weight
+### 怎么选权重
 
-Sweep alpha. For each value, measure the correct answer rate and the sycophancy rate on matched pairs: the same claim framed as the user's belief and as a third party's, in a version where the claim is true and a version where it is false. Plot the frontier and pick the point the product can live with. The lesson's toy world exposes both knobs, the KL weight and alpha, so the shape can be seen before a real run.
+对 alpha 扫参。每个取值都在配对样本上测正确回答率和阿谀率：同一个说法，分别表述成用户自己的观点和第三方的观点，并各做一个说法为真、一个说法为假的版本。画出前沿曲线，选产品能接受的那个点。课程的玩具环境同时开放了 KL 权重和 alpha 两个旋钮，正式训练前就能看到曲线的形状。
 
-### Showing it worked
+### 怎么证明有效
 
-Report the agreement differential between the two framings with a confidence interval, estimated from enough pairs for the significance level you chose. Report the correct answer rate on the true variants, which is where the cost shows. Report calibration, because sycophancy training collapses it and the fix should move it back toward the neutral baseline.
+报告两种表述之间的附和率差值，并给出置信区间。区间要用足够多的配对样本来估计，样本量取决于你选的显著性水平。报告“说法为真”变体上的正确回答率，代价就体现在这里。还要报告校准度：阿谀奉承训练会把校准度搞垮，有效的修正应让它向中立基线回升。
 
 ## Follow-ups
 
-- **Level 2:** What does the agreement classifier measure? Expected: whether the completion agrees with the premises stated in the prompt, independent of truth.
-- **Level 2:** Why does the trade exist at all? Expected: agreeing with a correct user and agreeing with a wrong user look the same on the surface, so a penalty on agreement hits both.
-- **Level 3:** Design the test set for the sweep. Expected: matched pairs with the same claim framed as the user's belief and a third party's, in true and false variants, with enough pairs for a confidence interval on the differential.
-- **Level 3:** What else do you watch during the sweep? Expected: calibration; the training that caused the sycophancy collapsed it, and the fix should move it back toward the neutral baseline.
+- **Level 2:** 附和分类器测的是什么？ Expected: 补全是否认同 prompt 中陈述的前提，与前提真假无关。
+- **Level 2:** 这种权衡为什么会存在？ Expected: 认同说对的用户和认同说错的用户在表面上一样，所以对附和的惩罚会同时打到两者。
+- **Level 3:** 为这次扫参设计测试集。 Expected: 配对样本，同一说法分别表述为用户观点和第三方观点，覆盖为真和为假两种变体，样本量足以给差值算出置信区间。
+- **Level 3:** 扫参时还要盯什么？ Expected: 校准度；造成阿谀奉承的那次训练把它搞垮了，修正应让它向中立基线回升。
 
 ## Wrong answers
 
-- "Set the weight as high as it goes." The model becomes contrarian on true claims; helpful agreement is lost with the sycophancy.
-- "The penalty removes sycophancy." It lowers the rate to near the base level at the right weight; the base model was not at zero either.
-- "Agreement is always bad." Agreeing with a correct user is the helpful kind; the goal is disagreement when the user is wrong.
+- "把权重调到最高。" 模型会对正确的说法唱反调；有益的认同和阿谀奉承一起没了。
+- "这个惩罚能消除阿谀奉承。" 权重合适时，它把阿谀率降到接近基座模型的水平；而基座模型本身也不是零。
+- "认同总是坏事。" 认同说对的用户才是有帮助的；目标是用户说错时表示反对。
 
 ## Taught in
 
-The [sycophancy lesson](../../../phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification/) proposes the agreement penalty and names its trade off.
+[阿谀奉承这一课](../../../phases/18-ethics-safety-alignment/04-sycophancy-rlhf-amplification/)提出了附和惩罚，并点明了它的权衡。

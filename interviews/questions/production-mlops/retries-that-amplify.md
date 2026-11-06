@@ -1,6 +1,6 @@
 ---
 id: retries-that-amplify
-title: The provider slowed down and your service fell over
+title: 服务商变慢，你的服务却崩溃了
 card: production-mlops
 kind: debug
 level: 3
@@ -16,57 +16,57 @@ related: [production-mlops/budget-burn-pauses-chaos, production-mlops/checks-in-
 updated: 2026-11-03
 ---
 
-During a provider slowdown, the provider began to return rate-limit errors. Within minutes your own service ran out of memory and crashed, although your incoming traffic had not changed. Reconstruct what happened, and fix the retry policy.
+服务商变慢时，开始返回限流错误。几分钟内，你自己的服务就耗尽内存并崩溃，尽管入站流量没有变化。还原故障过程，并修正重试策略。
 
 ## Short answer
 
-The gateway retried every rate-limited call, and each waiting retry kept its connection, its buffers and its request state in memory. The retries multiplied the in-flight concurrency several times over the real traffic, and the memory went with it. Fix the policy with exponential backoff and jitter, a small fixed number of attempts, a cap on in-flight requests, and a fallback chain that fails over instead of waiting.
+网关重试了每个被限流的调用，每个等待重试的请求都将连接、缓冲区和请求状态保留在内存中。重试让在途并发量达到真实流量的数倍，内存占用随之增加。策略应改用带抖动的指数退避、固定且较少的尝试次数、在途请求上限，以及切换备用方案而非一直等待的降级链。
 
 ## Full answer
 
-### The chain of events
+### 故障链条
 
-1. The provider returns 429 for a share of the calls.
-2. The gateway retries each one. Each retry holds a connection, a buffer and the request state while it waits.
-3. In-flight requests become the traffic multiplied by the attempts. The chaos lesson names this retry-amplified concurrency.
-4. Memory follows the in-flight count, and the service that was healthy a minute ago runs out.
+1. 服务商对部分调用返回 429。
+2. 网关逐个重试。每次重试在等待时保留连接、缓冲区和请求状态。
+3. 在途请求数变成流量乘以尝试次数。混沌工程课程称之为重试放大的并发。
+4. 内存占用随在途请求数增加，一分钟前还健康的服务耗尽了内存。
 
-### The retry policy in the production application capstone
+### 生产应用综合项目的重试策略
 
-Exponential backoff with jitter: wait about 1 second, then 2, then 4, with a random spread added to each wait, and give up after 3 retries with a fallback response. The lesson's table separates the cases:
+带抖动的指数退避：等待约 1 秒，再等 2 秒、4 秒，每次等待都加上随机偏移；重试 3 次后放弃，返回降级响应。课程表格区分了几种情况：
 
-| Failure | Retry | Fallback |
+| 故障 | 重试 | 降级 |
 |---|---|---|
-| 429, rate limit | yes, with backoff | queue the request and tell the user it is in progress |
-| 500, server error | yes, 3 attempts | switch to the fallback model |
-| timeout over 30 seconds | yes, 1 attempt | a shorter prompt or a smaller model |
+| 429，限流 | 是，带退避 | 请求入队，并告诉用户正在处理 |
+| 500，服务端错误 | 是，尝试 3 次 | 切换备用模型 |
+| 超时超过 30 秒 | 是，尝试 1 次 | 使用更短的 prompt 或更小的模型 |
 
-The jitter matters as much as the backoff. Without it, every client retries at the same instant and the provider sees a wave on each cycle.
+抖动与退避同样重要。没有抖动时，所有客户端同时重试，服务商每个周期都会遭遇一波请求。
 
-### Bound the concurrency, not only the attempts
+### 限制并发，而不只是尝试次数
 
-Attempts bound the retries of one request. Nothing bounds how many requests wait at once. Add a cap on in-flight requests at the gateway and a retry budget as a share of traffic. When the cap is reached, fail fast into the queue or the fallback instead of holding memory.
+尝试次数只限制单个请求的重试，限制不了同时等待的请求数量。在网关设置在途请求上限，并将重试预算设为流量的一定比例。达到上限后立即转入队列或降级流程，而不再占着内存等待。
 
-### The fallback chain
+### 降级链
 
-Primary model, then a secondary model, then a cached response, then a short unavailable message. Each step trades quality for availability, and the user always gets something.
+先用主模型，再用备用模型，再返回缓存响应，最后返回简短的不可用提示。每一步都用质量换取可用性，用户始终能收到回应。
 
-### Test it before the next slowdown
+### 下次变慢前先测试
 
-The chaos lesson's first model-specific experiment injects a provider rate-limit for a few minutes and watches the fallback. Most teams learn there that the fallback was never fully exercised.
+混沌工程课程的首个模型专属实验会让服务商限流几分钟，观察降级表现。大多数团队在这里才发现，降级从未得到完整演练。
 
 ## Follow-ups
 
-- **Level 3:** Why does backoff alone not stop the memory growth? Expected: backoff spreads the retries in time, and each waiting retry still holds its state. The fix needs a bound on in-flight requests.
-- **Level 3:** What does a queue do that a retry does not? Expected: it stores the request without a connection or a worker, and it gives the user a progress message instead of a timeout.
-- **Level 4:** The fallback model is cheaper and weaker. Who decides that it is acceptable, and how do you watch it? Expected: the product owner names the paths that may degrade. Log the fallback rate per path, and alert when it stays high.
+- **Level 3:** 为什么只用退避阻止不了内存增长？ Expected: 退避拉开重试时间，每个等待重试的请求仍保留状态。修复还需要限制在途请求数。
+- **Level 3:** 队列能做什么，是重试做不到的？ Expected: 不占连接或工作线程就能保存请求，并向用户返回进度提示，而非超时。
+- **Level 4:** 备用模型更便宜也更弱，谁决定可以接受，如何监控？ Expected: 产品负责人指定哪些路径可以降级。按路径记录降级比例，持续偏高时告警。
 
 ## Wrong answers
 
-- "Retry faster so the queue drains before memory runs out." Faster retries raise the request rate against a provider that is already limiting you.
-- "Raise the maximum retries so users never see an error." Each attempt holds memory. More attempts multiply the in-flight state.
-- "The provider caused the outage, there is nothing to fix here." The provider caused the errors. The retry policy turned them into an outage.
+- "加快重试，在内存耗尽前清空队列。" 加快重试只会增加发往已经限流的服务商的请求速率。
+- "提高最大重试次数，让用户看不到错误。" 每次尝试都占内存，更多尝试会成倍增加在途状态。
+- "故障是服务商造成的，我们没什么可修。" 服务商造成了错误，重试策略才把错误变成了停机。
 
 ## Taught in
 
-The [production app lesson](../../../phases/11-llm-engineering/13-production-app/) gives the backoff, the retry limits and the fallback chain, and the [chaos engineering lesson](../../../phases/17-infrastructure-and-production/24-chaos-engineering-llm/) names the retry storm as the failure to test.
+[生产应用课程](../../../phases/11-llm-engineering/13-production-app/)给出退避、重试限制和降级链，[混沌工程课程](../../../phases/17-infrastructure-and-production/24-chaos-engineering-llm/)指出重试风暴是需要测试的故障。

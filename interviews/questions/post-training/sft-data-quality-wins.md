@@ -1,6 +1,6 @@
 ---
 id: sft-data-quality-wins
-title: A million scraped pairs or a small curated set
+title: 百万抓取问答对还是小规模精选数据集
 card: post-training
 kind: tradeoff
 level: 1
@@ -16,46 +16,46 @@ related: [post-training/sft-loss-mask]
 updated: 2026-11-03
 ---
 
-Your team has a budget to collect SFT data for a new assistant. One plan buys one million scraped question-answer pairs from the web. The other plan pays skilled writers for a much smaller set. Which plan do you pick, and how do you argue it?
+你的团队拥有收集用于训练新助手模型的 SFT 数据预算。目前存在两种方案：一种方案是购买一百万条从网上抓取的问答对；另一种方案则是付费请有经验的作者编写一套规模小得多的精选数据集。你会选用哪套方案？如何为你的决策辩护？
 
 ## Short answer
 
-Pick the smaller set from skilled writers. SFT teaches a behavior pattern, not new facts, so a few thousand to a few tens of thousands of clean examples are enough. The lesson's reference points are about 27,000 curated examples for the first SFT stage of a major open chat model, and 52,000 generated pairs that cost about 600 dollars and produced a usable assistant. Noise in scraped pairs is learned as behavior at the same weight as the good examples.
+选用由专业人员编写的小规模精选数据集。SFT 传授的是行为模式，而不是新事实，因此几千到几万条干净样本就足够了。课程的参考数据包括：某主流开源对话模型首阶段 SFT 仅使用了约 27,000 条精选样本，以及成本约 600 美元的 52,000 条生成问答对，后者训练出了可用的助手。抓取数据中的噪声会以与优质样本相同的权重被当作行为学进去。
 
 ## Full answer
 
-### Why a small set is enough
+### 为什么小数据集已经足够
 
-The base model already knows language and facts from pretraining. SFT concentrates a latent ability: when the assistant marker appears, answer. That pattern needs far fewer examples than learning facts. The lesson gives 20,000 to 100,000 crafted pairs as the range that turned a base model into an assistant, and points to a study where 1,000 carefully chosen examples matched much larger sets.
+基座模型在海量预训练阶段就已经掌握了丰富的语言结构、世界常识与事实知识。SFT 聚焦的是一种潜在能力：当 assistant 标记出现时做出回答。掌握这种模式所需的样本量远少于学习事实。课程给出的经验范围是将基座模型调优为助手通常需要 20,000 到 100,000 条精心编写的数据对；一项研究发现，仅凭 1,000 条精心挑选的样本，效果就能匹敌规模大得多的数据集。
 
-### Why noise hurts more than it helps
+### 为什么数据噪声的危害远大于数据量的益处
 
-Every example is a target. Vague, wrong or rude answers in a scraped set teach vague, wrong or rude behavior, and the model has no way to know which examples to trust. SFT has no notion of a better answer. That comparison is what preference tuning adds later.
+每个样本都是监督目标。抓取数据中含糊、错误或粗鲁的回答会教会模型含糊、错误或粗鲁的行为，而且模型无法分辨哪些样本值得信任。SFT 没有更好回答的概念；这种比较是后续偏好微调要加入的内容。
 
-### What quality means in practice
+### 工业实践中“高质量”的具体定义
 
-- Diverse tasks and formats, not many copies of one shape.
-- Answers that a careful person would write, in the length and tone you want in production.
-- One consistent chat template, with the same role markers in every example.
-- A filter that drops tiny answers and low vocabulary diversity before training.
+- 任务类型与输出格式的多样性，而非单一模版的简单复制堆砌。
+- 严谨专业人员手写的高水平回答，其篇幅长度、逻辑结构与语气风格与你生产环境的预期保持高度一致。
+- 统一的聊天模板，每个样本都使用相同的角色标记。
+- 在训练前过滤掉过短的回答以及低词汇多样性的样本。
 
-### When volume does help
+### 数据规模何时才能真正发挥正面价值
 
-Once the format is learned, more clean examples broaden task coverage. The 70,000 shared conversations that trained an early open chatbot show that volume works when the source is already assistant-shaped. Mix 2 to 5 percent of raw pretraining text into the batches, so that the model keeps its general ability.
+在模型已经牢固掌握基础交互格式的前提下，更多的高质量干净样本能够拓宽模型的任务覆盖面。早期知名开源聊天模型使用的 70,000 条真实人机多轮对话表明，只要数据源天然具备助手交互形态，扩充规模是有效的。在批次中混入 2% 到 5% 的未处理预训练文本，让模型保持通用能力。
 
 ## Follow-ups
 
-- **Level 1:** What does SFT not teach the model? Expected: new facts; those come from pretraining, and SFT teaches the response pattern.
-- **Level 2:** How do you detect that a dataset teaches bad behavior before you train? Expected: sample and read it, score answer length and vocabulary diversity, check the ratio of instruction to answer, and drop the tail.
-- **Level 2:** After SFT the model answers well but lost some coding ability. What in the data plan addresses that? Expected: mix a few percent of raw pretraining text into the SFT batches and keep the run short.
-- **Level 3:** The writers produce long, detailed answers for everything. What is the risk? Expected: the model learns that length is the pattern, and later preference tuning can amplify it into verbosity; match the answer length to the product.
+- **Level 1:** SFT 不能教给模型什么？ Expected: 新事实；事实来自预训练，SFT 传授的是回答模式。
+- **Level 2:** 在训练前，如何发现数据集在传授不良行为？ Expected: 抽样阅读，评估回答长度和词汇多样性，检查指令与回答的比例，并剔除长尾。
+- **Level 2:** SFT 微调后模型对话良好，但在代码能力上出现明显退化，数据方案中应该如何处理？ Expected: 在 SFT 批次中混入百分之几的未处理预训练文本，并保持较短的训练。
+- **Level 3:** 如果编写人员对所有问题都给出冗长详尽的回答，存在什么风险？ Expected: 模型会学会把长度当作模式，后续偏好微调可能会将其放大为冗长；应让回答长度匹配产品需求。
 
 ## Wrong answers
 
-- "More data always wins in machine learning." SFT learns a format on a model that already knows the content; a million noisy targets teach noise as behavior.
-- "Generated data is worthless, only human writing counts." The 52,000 generated pairs in the lesson produced a usable assistant for about 600 dollars; the issue is quality control, not the source.
-- "Train longer on the small set to make up for its size." More than three epochs on a small set leads to memorization, and the model repeats training examples word for word.
+- "在机器学习中，数据量越大总是越好。" SFT 是在已经知道内容的模型上学习格式；一百万个有噪声的目标只会把噪声当成行为学进去。
+- "生成数据毫无价值，只有人工编写的数据才算数。" 课程中 52,000 条生成问答对花费约 600 美元就产出了可用助手；关键在于质量控制，而不是数据来源。
+- "在小数据集上训练更久，以弥补规模不足。" 在小集合上训练超过三个 epoch 会导致死记硬背，模型会逐字重复训练样本。
 
 ## Taught in
 
-The [SFT lesson](../../../phases/10-llms-from-scratch/06-instruction-tuning-sft/) compares the sizes of real instruction datasets and explains why quality matters more than quantity.
+[SFT 课程](../../../phases/10-llms-from-scratch/06-instruction-tuning-sft/)对比了业界真实指令数据集的规模体量，并从第一性原理阐述了为什么质量远重于数量。

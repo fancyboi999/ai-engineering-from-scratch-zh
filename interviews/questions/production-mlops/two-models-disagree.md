@@ -1,6 +1,6 @@
 ---
 id: two-models-disagree
-title: When the triage agent should say it is unsure
+title: 事故分诊 agent 何时该承认不确定
 card: production-mlops
 kind: concept
 level: 2
@@ -16,46 +16,46 @@ related: [production-mlops/narrow-auto-remediation, production-mlops/prediction-
 updated: 2026-11-03
 ---
 
-An incident triage agent proposes a root cause for every alert. The on-call team stopped trusting it after several confident wrong answers. Which pattern from the SRE lesson raises the trust in its output, and what does the team do when the pattern says the agent is unsure?
+事故分诊 agent 为每条告警给出一个根因。几次自信却错误的回答之后，值班团队不再信任它。SRE 课程里的哪种模式能提高大家对它输出的信任？当这个模式表明 agent 不确定时，团队怎么做？
 
 ## Short answer
 
-Run two models independently on the same incident. When they agree on the root cause, confidence is high. When they disagree, the system escalates to a person with both hypotheses and their evidence visible, instead of picking one. The pattern filters invented root causes at a low cost, and the disagreement itself tells the responder that the incident is uncertain.
+让两个模型在同一事故上独立运行。两者对根因的判断一致时，置信度高。两者不一致时，系统不替人挑一个，而是把两个假设和各自的证据一起展示，升级给人处理。这个模式以很低的成本过滤掉编造的根因，分歧本身也在告诉响应人员：这次事故不确定。
 
 ## Full answer
 
-### Adversarial evaluation
+### 对抗式评估
 
-The lesson names the pattern after a product that ships it: two models analyze the same incident on their own. Agreement is confidence. Disagreement is an escalation with both hypotheses shown. It is simple, and it is an effective filter against a confident wrong answer, because two independent analyses rarely invent the same cause.
+课程用一个内置该模式的产品来命名它：两个模型各自分析同一事故。结论一致会提高置信度。结论不一致就交给人处理，并展示两个假设。它很简单，却能有效过滤自信的错误答案，因为两次独立分析很少编造出同一个原因。
 
-### Where it sits in the architecture
+### 它在架构中的位置
 
-A supervisor splits the incident into sub-queries. Specialized agents with tool access search the logs, run the metric queries and retrieve the runbooks. The supervisor assembles a hypothesis with evidence and shows it to a person, who approves or redirects. Only then does an action run, and only from a narrow approved set. The two-model check sits at the hypothesis step, before the person sees it.
+supervisor 把事故拆成子查询。带工具权限的专职 agent 搜索日志、执行指标查询、检索 runbook。supervisor 把结果拼成带证据的假设，交给人审阅；人批准，或者调整调查方向。之后才会执行动作，而且只能从一个很窄的已批准集合里选。双模型检查位于假设这一步，在人看到之前。
 
-### What the person does on a disagreement
+### 出现分歧时人做什么
 
-Reads both hypotheses and the evidence that each one cites. Picks one, redirects the agents, or starts the manual investigation with two leads instead of none. The lesson's division of labor holds: the agent proposes hypotheses and queries, and the person makes the judgment call.
+阅读两个假设，以及各自引用的证据。挑其中一个、调整 agent 的调查方向，或者开始人工排查，此时手里有两条线索，而不是零条。课程的分工依然成立：agent 提出假设和查询，人来做判断。
 
-### What the agents remember
+### agent 记住什么
 
-Runbooks and postmortems live in a vector store, and both models retrieve from it on every incident. Operational memory survives team turnover, and a new engineer's first incident has the full history behind it.
+runbook 和故障复盘存放在向量库里，两个模型处理每次事故时都从中检索。运维记忆不会随团队人员更替而流失，新工程师处理第一次事故时，背后就有完整的历史。
 
-### The limit of agreement
+### 一致的局限
 
-Two models that share training data can agree and be wrong together. Agreement raises confidence, it is not proof. Require every hypothesis to cite the log lines and the metric queries behind it, so that the responder can check the evidence and not the eloquence.
+共享训练数据的两个模型可能一起达成一致、一起出错。一致能提高置信度，但不是证明。要求每个假设都引用背后的日志行和指标查询，让响应人员核对证据，而不是被流畅的表述说服。
 
 ## Follow-ups
 
-- **Level 2:** Why is a split verdict useful to the responder? Expected: it marks the incident as uncertain and gives the responder two candidate causes with their evidence.
-- **Level 3:** Both models agree and both are wrong. How do you catch it? Expected: require each hypothesis to cite evidence that the responder can check, and keep the human approval before any action.
-- **Level 3:** What does the pattern cost? Expected: two model runs per incident plus the latency of the slower one, which is small next to the first twenty minutes of a manual investigation that the lesson says are automatable.
+- **Level 2:** 两个模型结论不同，为什么对响应人员有用？ Expected: 它把事故标记为不确定，并给响应人员两个附带证据的候选原因。
+- **Level 3:** 两个模型一致，但都错了。怎样发现？ Expected: 要求每个假设引用响应人员能核对的证据，并且在任何动作执行前保留人工批准。
+- **Level 3:** 这个模式的代价是什么？ Expected: 每次事故跑两次模型，再加上较慢那次的延迟。课程说人工排查的前二十分钟可以自动化，与这二十分钟相比，这点代价很小。
 
 ## Wrong answers
 
-- "Ask one model twice at temperature zero." A repeat of the same model shares its blind spots. The pattern needs independent analyses.
-- "Let an agreed hypothesis trigger the fix on its own." Agreement raises confidence. The person still approves the action, and only narrow actions are automated at all.
-- "Disagreement proves the agent is useless." It means the incident is uncertain, which is exactly when a person should look.
+- "让同一个模型在温度为零时回答两次。" 同一模型重复运行，盲点也相同。这个模式需要相互独立的分析。
+- "两个模型一致的假设可以自行触发修复。" 一致只是提高置信度。动作仍由人批准，而且只有很窄的动作才会自动化。
+- "出现分歧说明这个 agent 没用。" 分歧说明事故不确定，这正是该让人来看的时候。
 
 ## Taught in
 
-The [SRE for AI lesson](../../../phases/17-infrastructure-and-production/23-sre-for-ai/) describes the adversarial evaluation pattern and the supervisor architecture with human approval.
+[AI 的 SRE 课程](../../../phases/17-infrastructure-and-production/23-sre-for-ai/)讲解了对抗式评估模式，以及带人工批准的 supervisor 架构。

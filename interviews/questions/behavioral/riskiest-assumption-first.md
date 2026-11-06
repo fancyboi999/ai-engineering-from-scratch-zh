@@ -1,6 +1,6 @@
 ---
 id: riskiest-assumption-first
-title: Pick the first experiment from a roadmap of features
+title: 从功能路线图中挑选首个实验
 card: behavioral
 kind: design
 level: 2
@@ -16,51 +16,51 @@ related: [behavioral/outcome-before-output, behavioral/smallest-slice-that-decid
 updated: 2026-11-03
 ---
 
-You join a team with a quarter-long roadmap for an assistant that recommends a next action to on-call engineers. The roadmap lists features in priority order. Tell me how you decide what to work on in week one, and why it may not be the first roadmap item.
+你加入了一个团队，该团队制定了一个季度路线图，旨在构建一个为值班工程师推荐下一步操作的助手系统。路线图按优先级顺序罗列了各项功能。告诉我你如何决定在第一周开展什么工作，以及为什么这往往不是路线图上的第一个条目。
 
 ## Short answer
 
-A roadmap hides uncertainty inside features. I rewrite the features as falsifiable assumptions about value, usability, feasibility, viability and safety, then score each one on impact, uncertainty and irreversibility. Week one goes to the cheapest decisive test of the highest open risk, which is often not the top roadmap item.
+路线图将不确定性掩盖在了具体功能之下。我将各项功能重新改写为关于价值、易用性、可行性、存续性以及安全性的可证伪假设，并依照影响程度、不确定性和不可逆性对每一项评分。第一周用于针对尚未验证的最高风险开展成本最低的决定性检验，而这往往并非排在路线图首位的功能。
 
 ## Full answer
 
-### Features are bets
+### 功能本质上是下注
 
-The assistant only pays off if several conditions hold: alert context contains enough information to name a service, engineers trust a recommendation they did not derive, the response time matters operationally, the data is reachable without unsafe authority, and the workflow happens often enough to justify maintenance. None of these is an implementation task. They are conditions for the build to be worth doing.
+只有在若干前提条件同时成立时，该助手才能发挥实质价值：告警上下文包含足以定位服务的信息、工程师愿意信任非自己推导出的建议、系统响应耗时在运维层面确实举足轻重、无需获取不安全权限即可访问所需数据，以及该工作流发生的频次足够支撑维护成本。这些都不是普通的工程实现任务，而是整个项目构建是否值得开展的前提条件。
 
-### Five classes
+### 五个类别
 
-| Class | Question |
+| 类别 | 核心追问 |
 |---|---|
-| Value | Will the outcome matter enough? |
-| Usability | Can the user understand and act on it? |
-| Feasibility | Can the system produce it with the available data and limits? |
-| Viability | Can the organization sustain the cost, the ownership and the operation? |
-| Safety | Can it fail without an unacceptable consequence? |
+| 价值 | 最终成果是否足够重要？ |
+| 易用性 | 用户能否理解并据此采取行动？ |
+| 可行性 | 系统在现有数据与限制条件下能否生成该结果？ |
+| 存续性 | 组织能否承受其资金成本、所有权归属与运维负担？ |
+| 安全性 | 它发生故障时是否能避免不可接受的严重后果？ |
 
-An assumption has to be written so that it can be false. "The feature is useful" cannot be tested. "Eight of ten on-call engineers name the correct service faster with the read-only result" can.
+假设的表述方式必须能够被证明为假。“该功能有用”无法被检验；而“十位值班工程师中有八位凭借只读排查结果能更快定位正确服务”则是可以检验的。
 
-### Risk is three numbers, not one
+### 风险由三个维度决定，而非单一数值
 
-The lesson scores impact, uncertainty and irreversibility separately, each from one to five, multiplies impact by uncertainty and adds irreversibility. The formula is not sacred. Its job is to force the team to say why one unknown must be resolved before another. Irreversible, high-consequence choices need earlier evidence: a read-only replay can precede a production integration, and a human-approved recommendation can precede automatic action.
+课程中将影响程度、不确定性和不可逆性分别从 1 到 5 打分，将影响程度与不确定性相乘，再加上不可逆性。具体的计算公式并非关键所在，其核心价值在于迫使团队明确阐述为何某项未知数必须先于另一项得到解决。不可逆且后果严重的决策需要更早获取证据：只读重放可以先于生产环境集成，人工核准的建议可以先于自动化执行。
 
-### An experiment, not a confirmation ritual
+### 实验，而非确认仪式
 
-A useful test has a claim that could be false, a realistic sample, an observable result, a threshold decided before the result, and a next decision for pass, fail and ambiguous evidence. A demo that only shows the team can build the idea is not a test.
+有价值的测试必须包含可被证伪的声明、逼真的样本环境、可观察的结果、结果出来前就已定好的判定阈值，以及针对通过、失败和模糊未决三种证据状态的下一步行动规划。仅仅展示团队有能力把想法做出来的 Demo 算不上真正的测试。
 
 ## Follow-ups
 
-- **Level 2:** The highest-risk assumption is tested and holds. What changes? Expected: it moves from open to tested with its evidence attached, and the next experiment targets the next highest open risk.
-- **Level 2:** Which assumption class do feature lists most often omit? Expected: safety, the question of whether the feature can fail without unacceptable consequence.
-- **Level 3:** The roadmap owner says the ranking already reflects risk. How do you check? Expected: compare the risk ranking with the roadmap order and explain each mismatch; where they differ, one of them is wrong about the evidence.
-- **Level 3:** Write a threshold that would stop the build. Expected: for example, fewer than a stated share of engineers in the replay trust the read-only recommendation enough to act on it.
+- **Level 2:** 最高风险的假设经过测试确认成立，接下来会发生什么？ Expected: 该假设附带相应证据从开放状态转为已验证状态，下一个实验随即转向次高的开放风险。
+- **Level 2:** 功能清单中最常遗漏哪一类假设？ Expected: 安全性，即该功能在发生故障时能否避免不可承受的严重后果。
+- **Level 3:** 路线图负责人称现有排序已经充分体现了风险，你如何核实？ Expected: 将风险排序与路线图顺序逐项对比并解释每处差异；凡是不一致之处，必有一方在证据上判断有误。
+- **Level 3:** 请给出一个会直接叫停项目构建的判定阈值。 Expected: 例如，在重放测试中，愿意信任只读建议并据此采取行动的工程师比例低于预设的最低份额。
 
 ## Wrong answers
 
-- "Build the first roadmap item; the order was agreed." Agreement on order is not evidence that the riskiest assumption holds.
-- "Ship something small and see what happens." A small build without a claim, a threshold and a next decision learns nothing.
-- "Risk is just how likely it is to fail." Impact and irreversibility change the order even when the probability is the same.
+- "直接开发路线图的第一项；毕竟顺序是大家商定好的。" 达成顺序共识并不代表最高风险的假设成立。
+- "先交付一个小版本，看看会发生什么。" 缺乏预设声明、明确阈值和后续决策的小步快跑，什么有效经验也学不到。
+- "风险仅仅代表发生失败的概率大小。" 即使失败概率相同，影响程度与不可逆性也会改变优先次序。
 
 ## Taught in
 
-The [assumption map lesson](../../../phases/14-agent-engineering/49-map-assumptions-and-risk/) gives the five classes, the three risk dimensions and the shape of a decisive experiment.
+[假设映射课程](../../../phases/14-agent-engineering/49-map-assumptions-and-risk/)给出了五个类别、三个风险维度以及决定性实验的设计形式。

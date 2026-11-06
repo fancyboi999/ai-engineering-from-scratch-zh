@@ -1,6 +1,6 @@
 ---
 id: feedback-ratchet-owner
-title: Turn telemetry nobody owns into a learning loop
+title: 将无人认领的遥测数据转化为学习闭环
 card: behavioral
 kind: design
 level: 4
@@ -16,59 +16,59 @@ related: [behavioral/correction-to-control, behavioral/retire-a-rule, behavioral
 updated: 2026-11-03
 ---
 
-You inherit a team that collects traces, evaluation scores, support tickets and incident logs for an assistant. Nobody can name a change that any of it caused. Design the mechanism that turns those signals into improvements, and tell me how you keep it from becoming another backlog.
+你接手了一个团队，该团队为一个助手系统收集了调用链路 trace、评估得分、客服工单和故障事件日志。然而，没有人能指出这些数据促成了什么变更。请设计一种机制，将这些信号转化为持续的改进，并告诉我你如何防止它变成又一个待办清单（backlog）。
 
 ## Short answer
 
-The missing piece is promotion: a defined path from an observation to a durable change with an owner and proof. Each signal is connected to an outcome, a constraint or an assumption, traced to a root cause, and routed to the earliest layer that owns that cause, which is evaluation, context, policy, runtime or a shaped backlog item. Every resulting action carries one owner, a priority from consequence and recurrence, the artifact to change, the verification, a review window and a retirement condition, so the loop produces controls that are later re-examined rather than rules that only accumulate.
+缺失的关键环节是升级路径（promotion）：一条从具体观测信号通往具有负责人和证明依据的持久变更的明确通路。每个信号都必须关联至业务结果、系统约束或核心假设，追溯至根本原因，并路由至负责该根因的最早系统层级（评估、上下文、策略、运行时或经过定型的待办条目）。每项衍生出的行动都包含唯一负责人、基于后果与复发频率的优先级、待修改产物、验证方案、复审窗口与退役条件，从而使闭环产出的是后续会被重新审视的控制措施，而非只知堆积的规则。
 
 ## Full answer
 
-### The loop
+### 闭环流程
 
-1. Observe a concrete signal.
-2. Connect it to an outcome, a constraint or an assumption.
-3. Identify the earliest system layer that owns the cause.
-4. Create a bounded change.
-5. Verify that recurrence became less likely.
-6. Review whether the control should remain.
+1. 观测具体信号。
+2. 将其关联至业务结果、系统约束或核心假设。
+3. 识别负责该根因的最早系统层级。
+4. 制定有界的变更方案。
+5. 验证复发的概率是否切实降低。
+6. 复审该控制措施是否应当继续保留。
 
-### Route to the owning layer
+### 路由至所属层级
 
-| Signal | Destination |
+| 观测信号 | 目标归宿 |
 |---|---|
-| False positive, regression, wrong result | Evaluation or test |
-| Missing context, duplicate work, stale fact | Context source or retrieval route |
-| Unsafe action or authority gap | Policy or permission boundary |
-| Timeout, retry storm, unavailable dependency | Runtime control |
-| New product need or unresolved tradeoff | Shaped backlog item |
+| 误报、回归、错误结果 | 评估或测试 |
+| 上下文缺失、重复劳动、过期事实 | 上下文数据源或检索路由 |
+| 不安全行为或权限漏洞 | 策略或权限边界 |
+| 超时、重试风暴、不可用依赖 | 运行时控制 |
+| 新的产品诉求或未决的权衡取舍 | 定型后的待办需求条目 |
 
-A timeout belongs to the runtime, not to the general backlog, and a wrong answer belongs to a test, not to another prompt paragraph. The cause is fixed at the earliest effective layer.
+超时问题归属于运行时控制，而非笼统的需求待办；回答错误归属于测试用例，而非又一段 prompt 文本。根本原因在最早生效的层级得到修复。
 
-### Ownership is part of the control
+### 所有权本身就是控制的一部分
 
-An unowned improvement is an observation with better formatting. Every action gets one owner, a priority based on consequence and recurrence, the artifact to change, the verification that proves the change, a review or expiry window, and a retirement condition.
+无人认领的改进意见，不过是排版更好看的观察。每项行动都会明确唯一的负责人、基于后果与复发频次的优先级、需要修改的产物、证明该变更的验证方案、复审或过期窗口以及明确的退役条件。
 
-### Why it is not a backlog
+### 为什么它不会变成待办清单
 
-A backlog stores wishes. The ratchet stores controls with proof and expiry. Controls are reviewed when the architecture changes, when a lower-level invariant replaces a higher-level instruction, when the protected failure has stayed away across the window, or when the control blocks legitimate work more than it prevents harm. Retirement needs evidence too.
+待办清单存放的是主观愿望。反馈棘轮存放的是附带证明与有效期的控制措施。当系统架构发生变更、底层不变量取代了上层指令、所防范的故障在整个观察窗口期内未再出现，或者该控制阻碍正常工作的代价超过了其规避的危害时，控制措施就会进入复审流程。退役同样需要客观证据支撑。
 
-### Metrics close the loop
+### 指标形成闭环
 
-The signals only mean something against metrics defined before the result: outcome, guardrail and counter-metric, each with a threshold, a window and a source. The ratchet then changes the outcome frame, the assumptions, the slice or the measurement plan for product evidence, and the tests, context, scope or handoff for coding-agent corrections. Incidents can change both.
+观测信号只有对照结果产生前预先定义的指标时才有实质意义：业务成果指标、护栏指标以及反向指标，每一项都具备阈值、观察窗口和数据源。随后，棘轮机制会根据产品证据调整成果框架、假设前提、切片边界或度量计划；根据代码 agent 的纠错证据调整测试、上下文、作用域或交接机制。突发故障可能促使两者同时发生变更。
 
 ## Follow-ups
 
-- **Level 3:** Two teams share the assistant and disagree on a tradeoff a signal exposes. Where does it go? Expected: to a shaped backlog item with a human decision owner; the ratchet does not resolve product disagreements by itself.
-- **Level 4:** How do you prioritize across many signals? Expected: by consequence and recurrence together, so a severe single event and a frequent minor one both rise above a rare minor one.
-- **Level 4:** What proves the loop works after a quarter? Expected: named controls that trace back to signals, verification results that show recurrence fell, and retirements with their evidence; not the volume of telemetry collected.
+- **Level 3:** 两个团队共用该助手，对信号所揭示的权衡取舍产生分歧，该如何处理？ Expected: 转入具备人工决策负责人的定型待办条目；反馈棘轮本身不会自动裁决产品层面的分歧。
+- **Level 4:** 面对大量不同信号，你如何确定优先级？ Expected: 综合考虑后果与复发频次，使得单次严重事件和高频轻微问题都能排在偶发轻微问题之前。
+- **Level 4:** 一个季度后，什么能证明这套闭环机制是有效的？ Expected: 能够明确追溯至具体信号的命名控制项、表明复发率下降的验证结果，以及附带退役证据的规则清理记录；而非所采集的遥测数据总量。
 
 ## Wrong answers
 
-- "Build a dashboard so everyone can see the signals." Visibility without promotion and ownership changes nothing.
-- "Add each lesson learned to the system prompt." Prose is the weakest layer; a permission boundary can make the unsafe action impossible, and a test can block a release that repeats the failure.
-- "Keep every control forever since it was earned." Controls decay and conflict; each one needs a retirement condition and periodic review.
+- "搭建一个仪表盘，让大家都能看到这些信号。" 缺乏升级固化路径与明确归属的可见性无法改变任何事情。
+- "把吸取的每一条经验教训都加进系统 prompt 里。" 散文指令是最脆弱的层级；权限边界能使不安全操作无法发生，而测试能够在发布前阻断复发相同故障的版本。
+- "永久保留每一项控制措施，毕竟它们都是付出代价换来的。" 控制措施会老化衰减并产生冲突；每一项控制都需要设定退役条件和周期性复审。
 
 ## Taught in
 
-The [feedback ratchet lesson](../../../phases/14-agent-engineering/54-build-the-feedback-ratchet/) gives the routing table and the ownership fields, and the [success metrics lesson](../../../phases/14-agent-engineering/52-design-success-metrics/) gives the metric contract the signals are judged against.
+[反馈棘轮课程](../../../phases/14-agent-engineering/54-build-the-feedback-ratchet/)给出了路由映射表和归属字段，[成功指标设计课程](../../../phases/14-agent-engineering/52-design-success-metrics/)给出了评估信号所依据的指标契约。

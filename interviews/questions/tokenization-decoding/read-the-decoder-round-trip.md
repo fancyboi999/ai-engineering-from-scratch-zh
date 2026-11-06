@@ -1,6 +1,6 @@
 ---
 id: read-the-decoder-round-trip
-title: Two decoders, one breaks on an emoji
+title: 两个解码函数，一个遇到 emoji 就出错
 card: tokenization-decoding
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [tokenization-decoding/merge-order-at-encode]
 updated: 2026-11-03
 ---
 
-Two versions of a byte-level tokenizer's decode function came in for review. `vocab` maps each id to a `bytes` object.
+代码评审收到了字节级分词器解码函数的两个版本。`vocab` 把每个 ID 映射到一个 `bytes` 对象。
 
 ```python
 def decode_a(self, ids):
@@ -27,43 +27,43 @@ def decode_b(self, ids):
     return "".join(self.vocab[t].decode("utf-8") for t in ids)
 ```
 
-Both pass the English tests. Which one is correct for an emoji whose bytes were split across two tokens, why does the correct one always terminate, and what is `errors="replace"` for?
+两个都通过了英文测试。如果一个 emoji 的字节被分到了两个 token 里，哪个版本是对的？为什么正确的那个总能终止？`errors="replace"` 是做什么用的？
 
 ## Short answer
 
-Join all the bytes first and decode once, which is what `decode_a` does. A multi-byte character such as an emoji, 4 bytes in UTF-8, can be split across two or more tokens, so decoding each token's bytes alone hits an incomplete sequence and raises or emits replacement characters. The join works because every id is either one of the 256 raw bytes or the concatenation of two earlier ids, so expanding ids to bytes always ends in raw bytes, and the full byte string is valid UTF-8 whenever the input was. The `replace` option keeps the decoder from raising when a model emits a partial character at the end of a stream.
+先把所有字节拼起来，再一次性解码，也就是 `decode_a` 的做法。emoji 这类多字节字符在 UTF-8 里占 4 个字节，可能被分到两个或更多 token 里，单独解码每个 token 的字节会碰到不完整的序列，要么抛异常，要么输出替换字符。拼接之所以可行，是因为每个 ID 要么是 256 个原始字节之一，要么是两个更早 ID 的拼接，所以把 ID 展开成字节最终一定落到原始字节上；只要输入是合法 UTF-8，完整的字节串就是合法 UTF-8。`replace` 选项让解码器在模型于流末尾输出半个字符时不抛异常。
 
 ## Full answer
 
-### Why the split happens
+### 为什么会被分开
 
-A byte-level vocabulary starts from single bytes and learns merges from the corpus. An emoji that was rare in training may have no merge covering all 4 of its bytes, so the encoder leaves it as two tokens, perhaps 3 bytes and 1 byte. Each token on its own is not valid UTF-8. The characters of a script with 3-byte characters have the same problem whenever a merge covers part of a character.
+字节级词表从单个字节起步，从语料中学合并。训练中罕见的 emoji 可能没有一条合并能覆盖它全部 4 个字节，编码器就把它留成两个 token，比如 3 个字节加 1 个字节。每个 token 单独看都不是合法的 UTF-8。只要合并只覆盖了字符的一部分，用 3 字节字符的文字也有同样的问题。
 
-### Why the join terminates and round-trips
+### 拼接为什么能终止并精确往返
 
-The capstone states the guarantee: encode then decode returns the input bytes exactly. The decoder concatenates the byte expansion of every id in order. Because every id is a raw byte or the concatenation of two known ids, the recursive expansion bottoms out in raw bytes, and the concatenation of all tokens is the original byte string. UTF-8 decoding then recovers the text. The test suite pins the property on an unseen sentence, on a sentence with an emoji, and on a sentence that contains a literal special-token string.
+综合项目写明了这条保证：先编码再解码，得到的字节与输入完全一致。解码器按顺序拼接每个 ID 展开后的字节。每个 ID 要么是原始字节，要么是两个已知 ID 的拼接，所以递归展开最终落到原始字节上，所有 token 拼起来就是原来的字节串。再做一次 UTF-8 解码就得到文本。测试集用三类输入锁住这个性质：一个没见过的句子、一个带 emoji 的句子，以及一个包含特殊 token 字面字符串的句子。
 
-### Special tokens on the way out
+### 解码输出时的特殊 token
 
-The capstone's decoder checks a special-token table first and appends the marker's UTF-8 bytes, then falls through to the vocabulary, and raises on an id that is in neither. That keeps a reserved id from being looked up as a merge.
+综合项目的解码器先查特殊 token 表，命中就追加该标记的 UTF-8 字节，没命中再查词表，两边都没有就抛异常。这样保留 ID 不会被当成一条合并去查。
 
-### What `errors="replace"` is for
+### `errors="replace"` 是做什么的
 
-A model can stop in the middle of a character, or a stream can be cut between two tokens that share a character. Strict decoding raises; `replace` emits a replacement character and continues. In a streaming decoder the better pattern is to buffer the trailing bytes until they form a complete character, and to use `replace` only at the final flush.
+模型可能停在一个字符的中间，流也可能断在共享一个字符的两个 token 之间。严格解码会抛异常；`replace` 输出替换字符并继续。流式解码器里更好的做法是缓存末尾的字节，直到凑成完整字符，只在最后一次刷出时用 `replace`。
 
 ## Follow-ups
 
-- **Level 2:** Why does `decode_b` pass the English tests? Expected: ASCII characters are single bytes, so no token ever holds a partial character and every piece decodes on its own.
-- **Level 3:** Design the streaming decoder in two sentences. Expected: accumulate bytes and emit only the longest prefix that is complete UTF-8, keeping the remainder; flush with replacement at the end of the stream.
-- **Level 3:** Why can a word-level tokenizer not give the round-trip guarantee? Expected: unseen words map to an unknown id, and the unknown id cannot be mapped back to the original text.
-- **Level 3:** What three inputs does the capstone's test suite use for the round trip? Expected: an unseen sentence, a sentence with an emoji, and a sentence containing the literal special-token string.
+- **Level 2:** `decode_b` 为什么能通过英文测试？ Expected: ASCII 字符都是单字节，没有哪个 token 会装着半个字符，每一段都能单独解码。
+- **Level 3:** 用两句话设计流式解码器。 Expected: 累积字节，只输出最长的完整 UTF-8 前缀，剩下的留着；流结束时用替换字符刷出剩余部分。
+- **Level 3:** 为什么词级分词器给不了往返保证？ Expected: 没见过的词映射到 unknown ID，而 unknown ID 映射不回原文。
+- **Level 3:** 综合项目的测试集用哪三种输入检查往返？ Expected: 一个没见过的句子、一个带 emoji 的句子，以及一个包含特殊 token 字面字符串的句子。
 
 ## Wrong answers
 
-- "Decode each token to a string and join the strings." A token can hold part of a character, and partial UTF-8 is not a string.
-- "Tell the decoder to ignore errors so nothing ever raises." Ignoring drops bytes silently and the round trip is no longer exact; the replacement character at least marks the loss.
-- "The round trip only matters for the training data." Every generated answer goes through decode, and a server that raises on an emoji drops the request.
+- "每个 token 解码成字符串，再把字符串拼起来。" 一个 token 可能只装着字符的一部分，不完整的 UTF-8 不是字符串。
+- "让解码器忽略错误，就永远不会抛异常。" 忽略会悄悄丢掉字节，往返不再精确；替换字符至少标出了丢失的位置。
+- "往返只对训练数据有意义。" 每个生成的回答都要经过解码，遇到 emoji 就抛异常的服务会丢掉这个请求。
 
 ## Taught in
 
-The [BPE capstone](../../../phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/) states and tests the round-trip guarantee, the [tokenizers lesson](../../../phases/10-llms-from-scratch/01-tokenizers/) gives the join-then-decode function, and the [tokenizer build lesson](../../../phases/10-llms-from-scratch/02-building-a-tokenizer/) gives the byte counts for emoji and other scripts.
+[BPE 综合项目](../../../phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/)提出并测试了往返保证，[分词器课程](../../../phases/10-llms-from-scratch/01-tokenizers/)给出了先拼接再解码的函数，[分词器构建课程](../../../phases/10-llms-from-scratch/02-building-a-tokenizer/)给出了 emoji 和其他文字的字节数。

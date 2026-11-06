@@ -1,6 +1,6 @@
 ---
 id: sigmoid-gradient-after-ten-layers
-title: How much gradient survives ten sigmoid layers
+title: 穿透十层 Sigmoid 后残留的梯度比例估算
 card: deep-learning
 kind: estimate
 level: 2
@@ -16,46 +16,46 @@ related: [deep-learning/stacked-linear-layers-collapse, deep-learning/half-the-r
 updated: 2026-11-03
 ---
 
-A network has ten hidden layers, each with a sigmoid activation. Estimate the largest factor that the sigmoid derivatives alone let a gradient keep on the way from the loss to the first layer, and say what that number means for training.
+一个神经网络拥有 10 个隐藏层，每一层均采用 Sigmoid 激活函数。请仅基于 Sigmoid 自身导数的连乘，估算从损失回传到第 1 层时所能保留的理论最大梯度因子，并说明该数值对模型训练意味着什么。
 
 ## Short answer
 
-The sigmoid derivative is s times (1 - s), which peaks at 0.25 when the output is 0.5. Backpropagation multiplies by that derivative once per layer, so after ten layers the activation factors multiply to at most 0.25 to the tenth power, about one millionth. Each layer also multiplies by its transposed weight matrix, and weights with a norm above 1 can enlarge the gradient, so the figure bounds only the activation part. With the small initial weights of the lesson, the first layers receive almost no signal and stay near their initialization while the last layers learn, which is the vanishing gradient problem.
+Sigmoid 的导数为 s 乘以 (1 - s)，在其输出为 0.5 时达到理论最大值 0.25。反向传播每穿透一层就需要乘以该导数一次，因此穿透 10 层后仅激活函数自身的导数连乘最多只能保留 0.25 的 10 次方，约为百万分之一。每层反向传播还会乘以转置后的权重矩阵，模长大于 1 的权重虽能放大梯度，但这依然确立了激活函数部分所能保留的梯度比例上限。在课程实验中使用的小尺度初始权重下，前层网络几乎接收不到任何有效梯度信号，权重在训练中停滞在初始状态，而末层网络却在持续学习，这就是经典的梯度消失问题。
 
 ## Full answer
 
-### The chain through the layers
+### 跨层反向传播的链式乘积
 
-At each layer the backward pass computes the gradient of the loss with respect to the pre-activation as the incoming gradient times the activation's derivative at that point. With a sigmoid that derivative is a(1 - a) for an output a. Its maximum is 0.25, at a equal to 0.5. Three layers deep the product is at most 0.25 cubed, which is 0.0156. Ten layers deep it is 0.25 to the tenth, which the lessons write as 0.000001 and as 0.000000953674.
+在反向传播的每一层中，损失关于未激活输入的梯度等于传入的梯度乘以该激活函数在当前点的局部导数。对于输出为 a 的 Sigmoid 函数，其导数形式为 a(1 - a)。该导数的数学最大值为 0.25（在 a 等于 0.5 处取得）。当网络深度达到 3 层时，连乘因子的最大值仅为 0.25 的 3 次方（即 0.0156）。在深度达到 10 层时，其最大值为 0.25 的 10 次方，课程中将其记为 0.000001 和 0.000000953674。
 
-### Why the bound is optimistic
+### 为什么该上限依然偏向乐观
 
-The 0.25 holds only for a unit whose output is exactly 0.5. A unit near 0 or near 1 is saturated and has a derivative near 0. Real networks have many saturated units, so the activation part shrinks more than one millionth. The bound also leaves out the weight matrices. Backpropagation multiplies by each layer's transposed weights, and weights with a norm above 1 can enlarge the gradient, while small weights shrink it more. A second cost: sigmoid outputs are always positive, so the gradients on a layer's weights share a sign and descent zigzags.
+0.25 的极值仅仅在神经元输出严格等于 0.5 时才成立。在实际网络中，接近 0 或接近 1 的神经元均处于饱和区，其局部导数极度趋近于 0。真实网络中存在大量饱和神经元，因此实际激活导数项的收缩幅度远比百万分之一更为恶劣。此外，上述估算尚未包含权重矩阵的影响：反向传播每一步还会乘以当前层的转置权重矩阵，范数大于 1 的权重虽有可能放大梯度，但过小的初始权重会使梯度衰减更加剧烈。Sigmoid 的另一个固有缺陷在于其输出恒为正数，导致同一层所有权重的梯度符号完全绑定，梯度下降因此呈现低效的锯齿状震荡。
 
-### What changes the arithmetic
+### 激活函数演进如何改变算术本质
 
-- Tanh has a derivative that peaks at 1.0, four times the sigmoid's, but it still falls toward 0 for large inputs, so deep tanh stacks vanish too, only more slowly.
-- ReLU has a derivative of exactly 1 for positive inputs. The gradient passes through unchanged and the product does not shrink. This is the change that made deep networks trainable.
-- GELU keeps a smooth gradient and avoids the dead unit failure of ReLU, which is why transformers use it.
-- The lesson's own network scales its initial weights by the square root of 2 over the input count, to keep early sigmoid units out of saturation.
+- Tanh 导数的峰值为 1.0（是 Sigmoid 的 4 倍），但在绝对值较大输入下依然迅速滑向 0，因此深层 Tanh 堆叠同样会发生梯度消失，仅仅速度略慢而已。
+- ReLU 在正半轴的导数严格恒等于 1。梯度可以无损穿透向前流动，连乘项不会随深度衰减。这一根本性突破正是现代深层神经网络能够有效训练的基石。
+- GELU 保持了平滑非线性梯度并彻底消除了 ReLU 坏死神经元缺陷，因而被 Transformer 架构普遍采纳。
+- 课程实验网络将初始权重按根号下 2 除以输入维度缩放，防止浅层 Sigmoid 单元过早陷入饱和。
 
-### How to see it in a run
+### 训练中的监控诊断
 
-Log the mean absolute gradient per layer. In a healthy network the layers sit within a small factor of each other. In a vanishing network the first layer is orders of magnitude below the last.
+监控并打印各层的平均绝对梯度值。在健康的深度网络中，各层之间的平均梯度幅值处于同一数量级或相差无几；而在遭遇梯度消失的网络中，第 1 层的梯度幅值会比最后一层低若干个数量级。
 
 ## Follow-ups
 
-- **Level 2:** Why is 0.25 an upper bound and not the typical value? Expected: the derivative is 0.25 only at an output of 0.5; saturated units near 0 or 1 have derivatives near 0, so the real shrink is worse.
-- **Level 2:** How does tanh compare? Expected: its derivative peaks at 1.0, four times better, but it still falls toward 0 for large inputs, so deep tanh stacks vanish as well.
-- **Level 3:** What does ReLU change in the calculation? Expected: the derivative is exactly 1 for positive inputs, so the gradient passes through unchanged and the product does not shrink.
-- **Level 3:** How do you observe the problem without the formula? Expected: log the mean absolute gradient per layer; the first layers show values orders of magnitude below the last.
+- **Level 2:** 为什么 0.25 只是理论上限而非典型实际值？ Expected: 导数仅在输出为 0.5 时达到 0.25；接近 0 或 1 的饱和神经元导数趋近于零，真实衰减比理论上限更严重。
+- **Level 2:** Tanh 相比 Sigmoid 表现如何？ Expected: 其最大导数达到 1.0（是 Sigmoid 的 4 倍），但在大输入下依然饱和归零，深层堆叠依然会发生梯度消失，只是衰减速度相对较慢。
+- **Level 3:** ReLU 彻底改变了反向传播中的什么算术特性？ Expected: 正半轴导数恒等于 1，梯度能够无损原样穿透，乘积项绝不会随层数加深而发生几何级指数衰减。
+- **Level 3:** 在不依赖理论公式的前提下，如何在训练中观测到该问题？ Expected: 监控记录各层的平均绝对梯度幅值；遭遇梯度消失时，第 1 层的梯度会比输出层低好几个数量级。
 
 ## Wrong answers
 
-- "The gradient vanishes because the learning rate is too small." A larger learning rate scales every layer; the ratio between the first and the last layers stays near one millionth.
-- "Sigmoid outputs are between 0 and 1, so the gradient is between 0 and 1 and that is fine." The derivative, not the output, multiplies through the layers, and its maximum is 0.25.
-- "Backpropagation is broken for deep networks." Backpropagation computes the exact gradient; the gradient itself is tiny because of what it passes through.
+- "梯度消失是因为学习率设置得过小。" 学习率对所有层同等缩放；第 1 层与最后一层之间高达数百万倍的相对衰减比例无法通过调整学习率改变。
+- "Sigmoid 输出在 0 到 1 之间，所以梯度在 0 到 1 之间并没有任何问题。" 链式法则连乘的是激活函数的导数而非激活输出本身，其导数最大值仅为 0.25。
+- "这是反向传播算法在深层网络上的内在设计缺陷。" 反向传播算法计算的是数学上严格精确的真实导数；梯度本身很小，是因为它传播时经过了这些运算。
 
 ## Taught in
 
-The [backpropagation lesson](../../../phases/03-deep-learning-core/03-backpropagation/) computes the product through the layers, and the [activation functions lesson](../../../phases/03-deep-learning-core/04-activation-functions/) compares the derivatives of sigmoid, tanh, ReLU and GELU.
+[反向传播课程](../../../phases/03-deep-learning-core/03-backpropagation/)计算了贯穿各层的链式乘积，[激活函数课程](../../../phases/03-deep-learning-core/04-activation-functions/)对比了 Sigmoid、Tanh、ReLU 与 GELU 的导数特性。

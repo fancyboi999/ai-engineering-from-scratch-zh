@@ -1,6 +1,6 @@
 ---
 id: checks-in-order-of-cost
-title: Order the checks before a paid model call
+title: 付费调用模型前的检查顺序
 card: production-mlops
 kind: design
 level: 2
@@ -16,64 +16,64 @@ related: [production-mlops/stream-fails-after-200]
 updated: 2026-11-03
 ---
 
-You are about to share a public link to a model demo. Every request that reaches the model costs money. Design the sequence of checks a request passes before the model runs, and give the HTTP status for each refusal.
+你准备公开分享一个模型演示的链接。每个到达模型的请求都要花钱。设计请求在模型运行之前要经过的一系列检查，并给出每种拒绝对应的 HTTP 状态码。
 
 ## Short answer
 
-Run the cheap checks first and the paid step last. Refuse an oversized body from its `Content-Length` header before you read it, check the access token, take one token from the client's rate bucket, parse and validate the JSON, charge the daily usage cap, and only then call the model. Each refusal returns a JSON error with a stable code, a message and a hint, and the statuses in that order are 413, 401, 429, 422 and 503.
+便宜的检查先做，付费的步骤最后做。读取请求体之前，先根据 `Content-Length` 请求头拒绝过大的请求体，再检查访问 token，从该客户端的令牌桶取一个令牌，解析并校验 JSON，计入每日用量上限，最后才调用模型。每次拒绝都返回一个 JSON 错误，包含稳定的错误码、说明和提示，上述拒绝按顺序对应的状态码是 413、401、429、422 和 503。
 
 ## Full answer
 
-### Why the order matters
+### 为什么顺序重要
 
-A bad request stops at the first check that it fails, and that check should cost the server almost nothing. The model call is the only step that costs money, so it comes last. The browser can repeat some checks with `maxlength` and `required`, but those help honest users only. Any client can send a request without the page, so the server repeats every check.
+坏请求会停在它第一个没通过的检查上，而这个检查应该几乎不花服务器的成本。模型调用是唯一花钱的步骤，所以放在最后。浏览器可以用 `maxlength` 和 `required` 重复一部分检查，但这只帮得了正常用户。任何客户端都可以绕开页面直接发请求，所以服务器要把每项检查再做一遍。
 
-### The sequence
+### 检查顺序
 
-| Step | Refusal | Status |
+| 步骤 | 拒绝原因 | 状态码 |
 |---|---|---|
-| route exists | unknown endpoint | 404 |
-| `Content-Length` present and numeric | missing, or not a number | 411, 400 |
-| body size under the limit | over 4,096 bytes, refused before the read | 413 |
-| body arrives in time | client stops sending | 408 |
-| access token, when configured | missing or wrong | 401 |
-| token bucket per client | bucket empty, with `Retry-After` | 429 |
-| content type and JSON object | wrong type, or not an object | 415, 400 |
-| fields | missing, empty, too long, control characters | 422 |
-| daily usage cap | the day's budget is spent, with `Retry-After` | 503 |
-| model call | | 200 |
+| 路由存在 | 未知端点 | 404 |
+| `Content-Length` 存在且是数字 | 缺失，或不是数字 | 411、400 |
+| 请求体大小在限制内 | 超过 4,096 字节，读取前拒绝 | 413 |
+| 请求体按时到达 | 客户端停止发送 | 408 |
+| 访问 token（配置了的话） | 缺失或错误 | 401 |
+| 每客户端的令牌桶 | 桶空了，带 `Retry-After` | 429 |
+| content type 与 JSON 对象 | 类型不对，或不是对象 | 415、400 |
+| 字段 | 缺失、为空、过长、含控制字符 | 422 |
+| 每日用量上限 | 当天预算已花完，带 `Retry-After` | 503 |
+| 模型调用 | | 200 |
 
-The cap is charged after validation, so that only valid requests count against the day.
+用量上限在校验之后才计数，这样只有合法请求才算进当天的额度。
 
-### The error shape
+### 错误格式
 
-Every refusal has the same JSON body: a `code` that client code and tests compare, a `message` that states the fact with its numbers, a `hint` with one action, and a `request_id` that joins a user report to one log record.
+每次拒绝都返回同样的 JSON 结构：客户端代码和测试拿来比对的 `code`，带具体数字陈述事实的 `message`，给出一个下一步动作的 `hint`，以及把用户反馈对应到一条日志记录的 `request_id`。
 
-### Two limits, not one
+### 两道限制，不是一道
 
-The token bucket bounds each client: a capacity for the burst and a refill rate for the long run. It does not bound the total. A hundred clients that each stay under the limit can still spend the whole budget, so the usage cap counts all model calls in a day and refuses after a fixed number.
+令牌桶约束的是每个客户端：容量管突发，填充速率管长期。它约束不了总量。一百个客户端各自都在限制以内，照样能花光全部预算，所以用量上限统计一天内所有的模型调用，到达固定次数后就拒绝。
 
-### Behind a proxy
+### 在反向代理后面
 
-The bucket key is the client address. Behind a reverse proxy every request arrives from the proxy, so all clients share one bucket. Read the client address from the header that your own proxy sets, and trust that header from the proxy only.
+令牌桶的键是客户端地址。在反向代理后面，所有请求都来自代理，于是所有客户端共用一个桶。从你自己的代理设置的请求头里读取客户端地址，并且只信任来自该代理的这个请求头。
 
-### Log every request
+### 记录每个请求
 
-One record per request, in the `finally` block, including the refused ones: the route, the status, the error code, the latency and the input length. The client address becomes a keyed hash. The text is never stored, and the page says so.
+每个请求在 `finally` 块里写一条记录，被拒绝的也一样：路由、状态码、错误码、延迟和输入长度。客户端地址存为带密钥的哈希。文本从不存储，页面上也写明了这一点。
 
 ## Follow-ups
 
-- **Level 2:** Why does the usage cap come after the field checks? Expected: so that only valid requests count against the day's total.
-- **Level 2:** Why refuse on the header before reading the body? Expected: it stops a large upload before the server spends memory and time on it.
-- **Level 3:** Behind a reverse proxy one heavy user gets everyone rate limited. Why? Expected: every request arrives from the proxy address, so all clients share one bucket. Read the client address from the proxy's header, and trust it from the proxy only.
-- **Level 3:** What does the server do with a refused body before it answers 413? Expected: it reads and discards up to 64 KiB, because a close with unread data can trigger a TCP reset and the client loses the reply.
+- **Level 2:** 为什么用量上限放在字段检查之后？ Expected: 这样只有合法请求才计入当天的总量。
+- **Level 2:** 为什么在读取请求体之前就根据请求头拒绝？ Expected: 在服务器为一次大上传花掉内存和时间之前就把它挡住。
+- **Level 3:** 在反向代理后面，一个重度用户让所有人都被限流。为什么？ Expected: 所有请求都来自代理地址，所有客户端共用一个桶。从代理设置的请求头读取客户端地址，并且只信任来自代理的这个请求头。
+- **Level 3:** 回复 413 之前，服务器怎样处理被拒绝的请求体？ Expected: 读取并丢弃最多 64 KiB，因为带着未读数据关闭连接可能触发 TCP reset，客户端会收不到回复。
 
 ## Wrong answers
 
-- "Validate the text first, then check the size." Reading the body before the size check spends the cost that the check exists to avoid.
-- "A rate limit is enough, skip the cap." A per-client limit bounds each client. A hundred clients under the limit still spend the whole budget.
-- "Return 500 with the stack trace, developers can read it." A stranger cannot act on a stack trace. An error needs a code, a fact and one next action.
+- "先校验文本，再检查大小。" 在大小检查之前读取请求体，正好花掉了这项检查要省下的成本。
+- "有限流就够了，不用上限。" 每客户端限流只约束单个客户端。一百个不超限的客户端照样能花光全部预算。
+- "返回 500 加调用栈，开发者看得懂。" 陌生用户看到调用栈也无从下手。错误需要一个错误码、一个事实和一个下一步动作。
 
 ## Taught in
 
-The [model demo interfaces lesson](../../../phases/17-infrastructure-and-production/29-model-demo-interfaces/) orders the checks by cost and defines the error shape, the token bucket and the usage cap.
+[模型演示界面课程](../../../phases/17-infrastructure-and-production/29-model-demo-interfaces/)按成本排列检查顺序，并定义了错误格式、令牌桶和用量上限。

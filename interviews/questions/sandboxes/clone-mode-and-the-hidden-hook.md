@@ -1,6 +1,6 @@
 ---
 id: clone-mode-and-the-hidden-hook
-title: A clean diff and a new pre-commit hook
+title: 干净的 diff 与新增的 pre-commit 钩子
 card: sandboxes
 kind: debug
 level: 2
@@ -16,45 +16,45 @@ related: [sandboxes/hypervisor-is-the-boundary]
 updated: 2026-11-03
 ---
 
-You let an agent work on a repository overnight in a sandbox with the default workspace mount. In the morning `git diff` is clean and a new file sits in `.git/hooks/pre-commit`. Explain how the agent wrote a file that no diff shows, which workspace mode prevents it, and how the agent's commits still reach you under that mode.
+你让 agent 在带有默认工作空间挂载的沙箱中对一个代码仓库通宵工作。次日早晨 `git diff` 显示一片干净，然而在 `.git/hooks/pre-commit` 路径下却多出了一个新文件。解释该 agent 是如何写入了一个任何 diff 都无法呈现的文件的，哪种工作空间模式能够防止该问题，以及在该安全模式下 agent 所提交的 commit 如何正常同步给你。
 
 ## Short answer
 
-The default mount is the host path mounted read-write inside the VM at the same absolute path, so the agent can edit anything in the tree, including Git hooks, CI configuration, `package.json` scripts and agent settings, and a hook under `.git/hooks` never appears in `git diff`. `--clone` at creation runs the agent on a private clone while the host repository enters the VM read-only at `/run/sandbox/source`, so a push back is refused. The commits come home through a git daemon in the VM that `sbx` publishes on a loopback port and registers as the remote `sandbox-<name>` in the host repository, so you fetch that remote before you remove the sandbox.
+默认挂载是将宿主机路径以相同绝对路径读写挂载到虚拟机内部，因此 agent 能够随意修改该目录树中的任何内容（包括 Git 钩子、CI 配置、`package.json` 脚本以及 agent 自身配置），而位于 `.git/hooks` 下的钩子脚本从不出现在 `git diff` 中。在创建沙箱时指定 `--clone` 参数会让 agent 在独立的私有克隆副本上运行，而宿主机仓库仅以只读方式挂载在虚拟机的 `/run/sandbox/source` 下，从而阻止任何直接反向推送。Agent 的提交通过虚拟机内部由 `sbx` 映射在环回端口上的 git daemon 守护进程同步出来，并在宿主机仓库中注册为名为 `sandbox-<name>` 的远端，因此在销毁沙箱前直接从该远端拉取即可。
 
 ## Full answer
 
-### Three workspace modes
+### 三种工作空间模式
 
-| Mode | What the agent sees | What it can change on the host |
+| 工作空间模式 | Agent 视角所见 | Agent 能够对宿主机修改的内容 |
 |---|---|---|
-| direct mount | the host directory at the same path, `virtiofs`, read-write | everything in the tree, hooks included |
-| mountless | the template's working directory, `/home/agent/workspace` | nothing |
-| `--clone` | a private clone at the same path on its own ext4 volume, `origin` at `/run/sandbox/source` | nothing; the source mount is read-only |
+| direct mount（直接挂载） | 相同路径下的宿主机目录，`virtiofs`，可读写 | 该目录树中的一切内容，包含 Git 钩子 |
+| mountless（无挂载） | 模板自带的默认工作目录 `/home/agent/workspace` | 毫无影响，无法修改宿主机任何文件 |
+| `--clone`（克隆模式） | 相同路径下的独立私有克隆（位于专属 ext4 卷），`origin` 对应 `/run/sandbox/source` | 毫无影响；宿主机源码挂载完全只读 |
 
-Extra paths follow the first one, and `:ro` makes one read-only, even a single file. `sbx run` with no path mounts the current directory, which is the trap in the question.
+除首个路径外可以追加额外路径，且附加 `:ro` 即可将其设为只读（即便单个文件亦支持）。执行 `sbx run` 时若未指定路径默认会挂载当前目录，这正是题目陷阱所在。
 
-### What the recorded clone run showed
+### 录制的克隆运行实测表现
 
-Inside, `touch /run/sandbox/source/x` failed with `Read-only file system`, and a `git push` to `origin` ended with `remote unpack failed`. The git daemon listens on 9418 inside, and the CLI writes two fetch refspecs into the host's `.git/config`, so one fetch updates `refs/remotes/sandbox-<name>/<branch>` and `refs/sandboxes/<name>/<branch>`. `sbx rm` removes the remote and the daemon and prints the recovery command, and the `refs/sandboxes` copy from the earlier fetch survived the removal. `sbx stop` stops the daemon, and a restart assigns a new port and rewrites the remote URL.
+在虚拟机内部执行 `touch /run/sandbox/source/x` 会报错提示 `Read-only file system`（只读文件系统），而尝试向 `origin` 执行 `git push` 会因 `remote unpack failed`（远端解包失败）而中止。虚拟机内部的 git daemon 监听在 9418 端口上，CLI 会在宿主机 `.git/config` 中自动写入两条抓取引用规范（refspec），因此一次抓取会同时更新 `refs/remotes/sandbox-<name>/<branch>` 和 `refs/sandboxes/<name>/<branch>`。执行 `sbx rm` 会移除该远端配置与守护进程并打印出恢复命令，而先前抓取存留的 `refs/sandboxes` 副本在容器销毁后依然完好留存。执行 `sbx stop` 会停止守护进程，而重启时会重新分配一个新端口并自动更新远端 URL。
 
-### What clone mode does not do
+### 克隆模式无法防范的事项
 
-It stops writes, not reads. An untracked `.env` under the repository is readable inside the clone, so keep secrets out of a repository you clone into a sandbox. The flag replaced `--branch` in v0.31.0 and is a no-op on re-attach, so the decision is made at `sbx create`.
+它防范的是恶意写入，而非未授权读取。宿主机仓库中未被 git 跟踪的 `.env` 敏感文件在只读挂载下依然能够被克隆环境直接读取，因此在将仓库克隆入沙箱前，切勿将敏感凭据留在仓库目录中。该标志在 v0.31.0 中替换了早期的 `--branch`，且在重新连接已有沙箱时属于空操作（no-op），因此该决策必须在 `sbx create` 创建之初就明确确定。
 
 ## Follow-ups
 
-- **Level 2:** Can you switch an existing sandbox to clone mode? Expected: no; the mode is fixed at creation and the flag does nothing on re-attach, so remove and recreate.
-- **Level 3:** The agent committed on `main` inside. Where is that commit on the host after a fetch? Expected: on `refs/remotes/sandbox-<name>/main` and `refs/sandboxes/<name>/main`, not on the host's own `main`.
-- **Level 3:** You fetched once, then removed the sandbox. What can you recover? Expected: the fetched commits; `refs/sandboxes/<name>/<branch>` survives and `git branch <local> refs/sandboxes/<name>/<branch>` recovers it. Commits made after the last fetch go with the clone, so fetch before `sbx rm`.
-- **Level 4:** Which risk does clone mode leave open, and how do you close it? Expected: reading; untracked files such as `.env` are visible through the read-only mount, so keep them outside the repository or mount a narrower path.
+- **Level 2:** 能否将一个已经运行的现有沙箱切换为克隆模式？ Expected: 不能；模式在创建时就已固定，该标志在重连时无效，必须先销毁然后重新创建。
+- **Level 3:** Agent 在沙箱内部向 `main` 分支提交了 commit，执行 fetch 抓取后该提交位于宿主机的何处？ Expected: 位于 `refs/remotes/sandbox-<name>/main` 和 `refs/sandboxes/<name>/main`, 不在宿主机自己的 `main` 上。
+- **Level 3:** 执行过一次 fetch 后你删除了沙箱，你能恢复出什么？ Expected: 先前已抓取出的提交；`refs/sandboxes/<name>/<branch>` 依然留存，通过 `git branch <local> refs/sandboxes/<name>/<branch>` 即可恢复。最后一次抓取之后做出的提交会随沙箱丢失，因此在 `sbx rm` 之前必须先执行 fetch。
+- **Level 4:** 克隆模式留下了哪项安全敞口，如何封堵？ Expected: 读取风险；未被跟踪的文件（如 `.env`）通过只读挂载依然完全可见，因此应将其移出仓库目录，或只挂载更狭窄的代码子目录。
 
 ## Wrong answers
 
-- "`git status` would have shown the hook." Files under `.git/` are not part of the working tree; neither `status` nor `diff` lists them.
-- "Mount the repository `:ro` and let the agent commit." A read-only mount blocks the agent's own commits too; clone mode gives it a writable clone and keeps the host read-only.
-- "Use `--branch` so the agent works on a branch." That flag was removed and now fails with a hint to use `--clone`.
+- "`git status` 会把新增的钩子显示出来。" 位于 `.git/` 内部的文件不属于工作区文件；`status` 和 `diff` 都不会列出它们。
+- "以 `:ro` 挂载仓库并允许 Agent 提交。" 只读挂载会同时封死 Agent 本身正常的 git commit 行为；克隆模式赋予其可写的独立克隆同时将宿主机保持为只读。
+- "使用 `--branch` 让 Agent 在分支上工作。" 该标志早已被废弃移除，现在使用会报错并提示改用 `--clone`。
 
 ## Taught in
 
-The [clone mode section](../../../manuals/docker-sandboxes-101/sections/3-2-clone-and-run-sandbox-source.md) records the refused push, the two refspecs and the surviving refs.
+[克隆模式章节](../../../manuals/docker-sandboxes-101/sections/3-2-clone-and-run-sandbox-source.md)记录了被拒绝的推送、两条引用规范以及销毁后存留的引用。

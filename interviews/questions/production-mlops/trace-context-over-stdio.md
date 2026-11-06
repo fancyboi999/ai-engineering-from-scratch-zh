@@ -1,6 +1,6 @@
 ---
 id: trace-context-over-stdio
-title: One trace across HTTP and stdio tool servers
+title: 用同一条 trace 串起 HTTP 与 stdio 工具服务器
 card: production-mlops
 kind: design
 level: 3
@@ -16,49 +16,49 @@ related: [production-mlops/span-kind-client-or-internal, production-mlops/read-t
 updated: 2026-11-03
 ---
 
-Your agent uses three tool servers over the MCP protocol. Two of them speak streamable HTTP, and one runs as a local subprocess over stdio. Design how a single trace id reaches all three, and say what each server has to do when it arrives.
+agent 通过 MCP 协议使用三个工具服务器。其中两个使用可流式传输的 HTTP，另一个作为本地子进程通过 stdio 通信。设计如何让同一个 trace ID 到达三者，并说明各服务器收到后要做什么。
 
 ## Short answer
 
-For the HTTP servers, inject the W3C `traceparent` header into every request, as any traced HTTP client does. The stdio transport has no headers, so put the same value into the `_meta` field of each JSON-RPC request until the protocol adds a standard field for it. Each server reads the value, opens its own span as a child of that context, writes the trace id into its logs, and passes the context on if it calls anything else.
+对 HTTP 服务器，像其他带追踪的 HTTP 客户端一样，在每个请求中注入 W3C `traceparent` 头。stdio 传输没有请求头，在协议加入标准字段之前，把相同的值放入每个 JSON-RPC 请求的 `_meta` 字段。各服务器读取该值，以该上下文的子节点身份创建自己的 span，在日志中写入 trace ID；若还会调用其他服务，则继续传播上下文。
 
 ## Full answer
 
-### Why this is worth the work
+### 为什么值得做
 
-The lesson opens with a report from production: the agent sometimes answers in 3 seconds and sometimes in 30. The logs show the model calls and nothing else. The cause was one tool server that hung during its cold start, and nothing short of an end-to-end trace could show it.
+课程开篇介绍了生产中的一份报告：agent 有时 3 秒回答，有时却要 30 秒。日志只有模型调用，没有别的信息。原因是一个工具服务器在冷启动时卡住了，只有端到端追踪才能显示出来。
 
-### The HTTP servers
+### HTTP 服务器
 
-Streamable HTTP carries standard headers. The client injects `traceparent`, and the server starts a span under that parent. On the client side the call is a CLIENT span under the `execute_tool` span. On the server side the work is a child of the same trace. The gap between the two is the transport time.
+可流式传输的 HTTP 支持标准请求头。客户端注入 `traceparent`，服务器在该父级下创建 span。客户端的调用是在 `execute_tool` span 下的 CLIENT span，服务器的工作也属于同一 trace。两者的时间间隙是传输耗时。
 
-### The stdio server
+### stdio 服务器
 
-Stdio carries no HTTP headers. The protocol roadmap discusses a `_meta.traceparent` field on JSON-RPC calls. Until it ships, include the `traceparent` value in `_meta` on every request yourself, and have the server read it from there. The server logs the trace id so that a log line and a span can be joined later.
+stdio 不携带 HTTP 请求头。协议路线图讨论了 JSON-RPC 调用上的 `_meta.traceparent` 字段。正式提供前，自行在每个请求的 `_meta` 中加入 `traceparent` 值，让服务器从中读取。服务器记录 trace ID，便于日后关联日志行与 span。
 
-### What every server does with the context
+### 各服务器如何处理上下文
 
-1. Parse the context from the header or from `_meta`.
-2. Start a span as a child of that context, not a new trace.
-3. Write the trace id into every log line of the request.
-4. Propagate the context to anything it calls in turn.
+1. 从请求头或 `_meta` 解析上下文。
+2. 在该上下文下创建子 span，而不是新 trace。
+3. 在该请求的每条日志中写入 trace ID。
+4. 调用其他服务时继续传播上下文。
 
-### What you can see afterwards
+### 最终能看到什么
 
-One waterfall: the agent step, the tool call, the server's work. A hang appears as one long server span under a long client span. Beside the spans, emit the tool execution duration histogram per tool, which answers the dashboard questions without a trace.
+一张瀑布图串起 agent 步骤、工具调用和服务器工作。卡顿会显示为长 client span 下的长 server span。除了 span，还要按工具输出执行时长直方图，不必查具体 trace 就能回答看板上的问题。
 
 ## Follow-ups
 
-- **Level 3:** A server ignores the `_meta` field. What do you see in the trace? Expected: the server's work shows up as a separate trace or not at all, and the client span shows the duration but not where the time went.
-- **Level 3:** Which span records the hang, the client span or the server span? Expected: both. The client span shows the wait from the agent's side, the server span shows what the server did, and the gap between them is the transport.
-- **Level 4:** Another team operates one tool server. What do you ask them to commit to? Expected: accept the context from headers or `_meta`, continue the trace instead of starting one, log the trace id, and export spans to a backend that both teams can read.
+- **Level 3:** 服务器忽略 `_meta` 字段，trace 中会看到什么？ Expected: 服务器工作单独成为一条 trace，或完全不可见。client span 显示耗时，却显示不了时间花在哪。
+- **Level 3:** 哪个 span 记录卡顿，client 还是 server？ Expected: 两者都记录。client span 显示 agent 一侧的等待，server span 显示服务器所做的事，两者的间隙是传输耗时。
+- **Level 4:** 某工具服务器由另一团队运维，你要求他们承诺什么？ Expected: 从请求头或 `_meta` 接收上下文，延续 trace 而不新建，记录 trace ID，并将 span 导出到双方可读的后端。
 
 ## Wrong answers
 
-- "Log a request id and join the logs later." A request id has no parent-child structure and no timing. A trace has both.
-- "The stdio server is local, so it does not need tracing." The hang in the lesson was in a local server's cold start. Local does not mean fast.
-- "Put the trace id into the prompt so the model carries it." The model is not a transport, and a changing value in the prompt also breaks the prefix cache.
+- "记录请求 ID，之后再拼接日志。" 请求 ID 没有父子结构，也没有耗时信息，trace 两者都有。
+- "stdio 服务器在本地，不需要追踪。" 课程中的卡顿就发生在本地服务器冷启动时。本地不等于快。
+- "将 trace ID 放进 prompt，让模型传递。" 模型不是传输通道，prompt 中变化的值还会破坏前缀缓存。
 
 ## Taught in
 
-The [OpenTelemetry GenAI lesson](../../../phases/13-tools-and-protocols/20-opentelemetry-genai/) covers propagation across the MCP transports and the tool duration metric.
+[OpenTelemetry GenAI 课程](../../../phases/13-tools-and-protocols/20-opentelemetry-genai/)讲解 MCP 各传输方式的上下文传播及工具耗时指标。

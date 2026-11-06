@@ -1,6 +1,6 @@
 ---
 id: request-id-at-prompt-start
-title: A request ID that opens the prompt
+title: 放在 prompt 开头的请求 ID
 card: scenarios
 kind: incident
 level: 2
@@ -25,55 +25,56 @@ source:
   - manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md
 ---
 
+
 ## Situation
 
-An agent product sends every request through a relay. For tracing, the relay puts a new first line in the system prompt, in the form `Request id <hex>.`, with a new value on each call. The system prompt itself is 2,999 tokens long and never changes. The team serves `Qwen/Qwen3-8B` with SGLang on an L4, with `--enable-cache-report` on.
+一个 agent 产品通过中继发送所有请求。为便于追踪，中继在系统 prompt 开头插入一行 `Request id <hex>.`，每次调用都使用新值。系统 prompt 本身长 2,999 个 token，内容从不改变。团队在 L4 上用 SGLang 服务 `Qwen/Qwen3-8B`，并启用了 `--enable-cache-report`。
 
-Users report that the first token takes about two seconds on every turn, even when they repeat a question. The team doubles the memory fraction, tries a different eviction policy and turns on hierarchical caching. The wait does not move. The metrics endpoint reports a cache hit rate near zero.
+用户反馈，每轮首个 token 都要等约两秒，即使重复提问也是如此。团队将显存比例翻倍，尝试另一种淘汰策略，并开启分层缓存，等待时间却没有变化。指标端点报告的缓存命中率接近零。
 
 ## Evidence
 
-- [five requests whose system prompt starts with a request id](evidence/id-at-start.txt)
-- [the same five requests with a stable system prompt](evidence/stable-prompt.txt)
-- [the same request id moved to the end of the system prompt](evidence/id-at-end.txt)
-- [the scheduler log while the three forms went through](evidence/scheduler-view.txt)
-- [the summary of the same experiment on a GB10 with a larger model](evidence/second-machine.txt)
+- [系统 prompt 以请求 ID 开头的五次请求](evidence/id-at-start.txt)
+- [使用固定系统 prompt 的相同五次请求](evidence/stable-prompt.txt)
+- [将相同请求 ID 移至系统 prompt 末尾](evidence/id-at-end.txt)
+- [三种形式请求经过时的调度器日志](evidence/scheduler-view.txt)
+- [在 GB10 上用更大模型重复同一实验的汇总](evidence/second-machine.txt)
 
 ## Questions
 
-1. The first listing shows five requests. What does the cached token count tell you about where the match stopped?
-2. How does the radix tree match a prompt, and why can nothing after the first difference match?
-3. In the third listing the id comes last in the prompt. Predict the cached token count before you read it, then explain the difference.
-4. Which three places can confirm a hit or a miss on a running server, from the closest to the request to the most general?
-5. The team tuned the cache tiers and the eviction policy first. Why did none of those settings help, and in which order do you change prompts and server flags?
+1. 第一份证据展示五次请求，缓存 token 数说明匹配在什么位置停止？
+2. radix 树怎样匹配 prompt？为什么首次差异之后的内容无法命中？
+3. 第三份证据将 ID 放在 prompt 末尾，阅读前先预测缓存 token 数，再解释差异。
+4. 运行中的服务可从哪三个位置确认命中或未命中？按从最接近单次请求到最综合的顺序说明。
+5. 团队先调整了缓存层级和淘汰策略，为什么都没有帮助？应按什么顺序调整 prompt 与服务端参数？
 
 ## Walkthrough
 
-Read the first listing one field at a time. Each request sends about 3,030 prompt tokens and the server reports `cached_tokens` of 3 or 6. The first token takes 2,159.2 to 2,171.2 ms on every round. So each request pays the full prefill of the system prompt, and the only tokens that the cache found are the few that come before the random hex digits.
+逐项阅读第一份证据。每次请求发送约 3,030 个 prompt token，服务端报告的 `cached_tokens` 为 3 或 6。每轮首个 token 耗时为 2,159.2 到 2,171.2 ms。因此每次请求都完整执行系统 prompt 的 prefill，缓存只找到了随机十六进制数字之前的少量 token。
 
-The second listing is the control. The same question after a stable system prompt reports 2,998 cached tokens of 2,999 from the second round on, and the first token arrives in 80.7 to 85.1 ms. The first round shows 3 cached tokens and 2,143.9 ms, because it filled the cache. So the server and the model can serve this prompt about twenty-five times faster when the prompt matches.
+第二份证据是对照组。在固定系统 prompt 后提出相同问题，从第二轮开始，2,999 个 token 中有 2,998 个命中缓存，首个 token 在 80.7 到 85.1 ms 内到达。第一轮只有 3 个缓存 token，耗时 2,143.9 ms，因为这一轮填充了缓存。所以只要 prompt 能匹配，服务端和模型处理这个 prompt 的速度能快约二十五倍。
 
-The third listing moves the same random id to the end of the system prompt. The count rises to 2,983 to 2,987 cached tokens. The first token takes 93.1 to 99.7 ms. The tokens are almost the same in all three forms. Only their order differs. The radix tree compares tokens from the first one and stops at the first difference. Nothing after a difference can match, because the attention values of every later token depend on every earlier token. A cache that reused the later tokens would return wrong answers.
+第三份证据把相同的随机 ID 移到系统 prompt 末尾。缓存 token 数升至 2,983 到 2,987，首个 token 耗时降至 93.1 到 99.7 ms。三种形式的 token 几乎相同，只有顺序不同。radix 树从第一个 token 开始比较，在首次差异处停止。差异之后的内容不能匹配，因为后续每个 token 的注意力值都依赖此前所有 token。若缓存复用差异之后的 token，就会返回错误答案。
 
-The scheduler log shows the same story from the server side. The stable rounds log `#cached-token: 2998` with one new token. Then five prefill batches log about 3,025 to 3,029 new tokens with 3 or 6 cached. Then the id-at-end rounds log 45 to 50 new tokens with 2,983 to 2,987 cached. The last listing repeats the experiment on a GB10 with a mixture-of-experts model. The times are different, 632.2 ms against 44.75 ms, and the cached token counts are the same: 6 against 2,998.
+调度器日志从服务端角度展示相同现象。固定 prompt 的各轮记录 `#cached-token: 2998`，只有一个新 token。随后五个 prefill 批次各有约 3,025 到 3,029 个新 token，缓存数为 3 或 6。ID 在末尾的各轮则有 45 到 50 个新 token，以及 2,983 到 2,987 个缓存 token。最后一份证据在 GB10 上用混合专家模型重复实验。耗时不同，为 632.2 ms 对 44.75 ms，缓存 token 数则相同，为 6 对 2,998。
 
 ## Resolution
 
-The relay put a changing value at the start of the only part of the prompt that every request shares. One edit fixed it. Move the trace id out of the system prompt and send it as request metadata, or put it at the end. In our measurement on the L4 the median first token fell from 2,161.4 ms with the id at the start to 98.2 ms with the id at the end, and the median cached token count rose from 6 to 2,986 of about 3,030.
+中继把一个不断变化的值放在了所有请求唯一共享部分的开头。改一处就修好了：将追踪 ID 移出系统 prompt，放入请求元数据，或把它放在末尾。在 L4 实测中，ID 位于开头时首个 token 的中位耗时为 2,161.4 ms，移至末尾后降为 98.2 ms；约 3,030 个 token 中，缓存 token 中位数从 6 升至 2,986。
 
-Prove the fix from three places. Start the server with `--enable-cache-report` and read `cached_tokens` in the usage block of each response. Read `#cached-token` on each `Prefill batch` line of the scheduler log. Read `sglang:cache_hit_rate` from `/metrics`. On vLLM, read `vllm:prefix_cache_hits_total` and `vllm:prefix_cache_queries_total`. The cache settings that the team changed first were not the problem, because no eviction policy or host tier can match tokens that differ from the start.
+从三个位置证明修复有效。使用 `--enable-cache-report` 启动服务，读取每个响应 usage 块中的 `cached_tokens`；读取调度器日志每行 `Prefill batch` 的 `#cached-token`；从 `/metrics` 读取 `sglang:cache_hit_rate`。在 vLLM 中读取 `vllm:prefix_cache_hits_total` 和 `vllm:prefix_cache_queries_total`。团队最初调整的缓存配置不是问题，因为任何淘汰策略或主机缓存层都无法匹配从开头就不同的 token。
 
 ## Wrong turns
 
-- "Raise the memory fraction so the cache holds more." The pool was not full. The misses came from the prompt order, so a larger pool holds more blocks that nothing matches.
-- "Turn on hierarchical caching." A host tier keeps evicted prefixes, and nothing was evicted. The prefix never matched in the first place.
-- "The hit rate is low because the questions differ." The question is about 30 tokens at the end of a prompt of 2,999 tokens. A changing question costs about 30 tokens of prefill, not 2,999.
-- "Hash the system prompt and route by it." Routing matters when several servers split the traffic, but this was one server, and the prompt differed on every request before routing could help.
+- "提高显存比例，让缓存容纳更多内容。" 显存池并未满，未命中来自 prompt 顺序；更大的池只会保存更多无法匹配的块。
+- "开启分层缓存。" 主机层保存被淘汰的前缀，但这里没有发生淘汰，前缀从一开始就未命中。
+- "命中率低是因为问题不同。" 问题约占 30 个 token，位于 2,999-token prompt 的末尾；变化的问题只增加约 30 个 token 的 prefill，而非 2,999 个。
+- "对系统 prompt 求哈希并据此路由。" 多台服务分摊流量时路由才有意义，这里只有一台服务，且每次请求的 prompt 都不同，路由也无法提供帮助。
 
 ## Generalize
 
-Treat the prompt layout as part of the serving system. Put the content that never changes first, the content that changes per session next, and the content that changes per request last. Keep ids, timestamps, hashes and random seeds out of the system prompt, and keep tool definitions and JSON keys in a fixed order. Before you change any cache flag, read the cached token count on your real requests. A prompt fix can recover a hit rate that no server flag can.
+将 prompt 布局视为服务系统的一部分。固定内容放在最前，按会话变化的内容其次，按请求变化的内容最后。不要将 ID、时间戳、哈希或随机种子放进系统 prompt，工具定义和 JSON 键也要保持固定顺序。调整任何缓存参数前，先查看真实请求的缓存 token 数。改 prompt 能找回的命中率，任何服务端参数都找不回来。
 
 ## Taught in
 
-The SGLang manual measures the three prompt forms in [the prefix-friendly prompts page](../../../manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md) and explains the tree in [the RadixCache page](../../../manuals/sglang-101/sections/3-3-radixcache.md), the vLLM manual gives the same rule in [its prefix cache page](../../../manuals/vllm-101/sections/3-2-make-repeated-prompts-hit-the-prefix-cache.md), and [the RadixAttention lesson](../../../phases/17-infrastructure-and-production/06-sglang-radixattention/docs/en.md) builds the mechanism from scratch.
+SGLang 手册在[适合前缀缓存的 prompt 页面](../../../manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md)测量三种 prompt 形式，在[RadixCache 页面](../../../manuals/sglang-101/sections/3-3-radixcache.md)说明树结构，vLLM 手册在[前缀缓存页面](../../../manuals/vllm-101/sections/3-2-make-repeated-prompts-hit-the-prefix-cache.md)给出相同规则，[RadixAttention 课程](../../../phases/17-infrastructure-and-production/06-sglang-radixattention/docs/en.md)则从零构建这一机制。

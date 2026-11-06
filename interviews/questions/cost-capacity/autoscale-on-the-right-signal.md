@@ -1,6 +1,6 @@
 ---
 id: autoscale-on-the-right-signal
-title: Autoscale a model service on queue and cache signals
+title: 按队列和缓存信号自动扩缩模型服务
 card: cost-capacity
 kind: design
 level: 3
@@ -16,54 +16,54 @@ related: [cost-capacity/warm-pool-or-cold-start, cost-capacity/size-the-pool-fro
 updated: 2026-11-03
 ---
 
-Your model service runs as a plain Deployment with an autoscaler on CPU use. During a traffic spike the autoscaler added replicas late, kept adding them while the new pods were still loading weights, and a liveness probe restarted the busiest pod in the middle of the spike. Redesign the scaling and the probes.
+你的模型服务是一个普通的 Deployment，自动扩缩器按 CPU 使用率伸缩。一次流量高峰中，自动扩缩器加副本加得太晚；新 pod 还在加载权重时，它又继续加副本；存活探针还在高峰中途重启了最忙的那个 pod。请重新设计扩缩策略和探针。
 
 ## Short answer
 
-Scale on the engine's own signals, not on CPU: the count of waiting requests and the KV cache usage say that a server is saturated long before CPU does. Give the startup probe a window longer than your measured cold start, so that a loading pod is neither sent traffic nor restarted, and make the liveness probe cheap, so that a busy server does not lose its busiest pod to a probe that waited in the queue. Keep the weights and the compile cache on persistent storage, so that a new replica is ready in a fraction of the time.
+按引擎自己的信号扩缩，不按 CPU：等待中的请求数和 KV cache 使用率，比 CPU 早得多就能说明服务器已经饱和。启动探针的窗口要长于实测的冷启动时间，这样正在加载的 pod 既不会接流量，也不会被重启；存活探针要足够轻，免得服务器一忙，探针在队列里等超时，最忙的 pod 就被重启。把权重和编译缓存放在持久化存储上，新副本的就绪时间只需原来的一小部分。
 
 ## Full answer
 
-### Why CPU is the wrong signal
+### 为什么 CPU 是错的信号
 
-GPU load is not CPU load. A saturated engine shows waiting requests above zero and cache usage near one while the CPU looks calm. The vLLM manual says this directly about the plain Deployment: it routes at random and scales on the wrong signal. The routing layers that the manual lists read `vllm:num_requests_waiting`, `vllm:num_requests_running` and `vllm:kv_cache_usage_perc` to pick a replica, and an autoscaler should read the same series.
+GPU 负载不是 CPU 负载。引擎饱和时，等待请求数大于零，缓存使用率接近 1，CPU 却看起来很平静。vLLM 手册对普通 Deployment 说得很直接：它随机路由，而且按错误的信号扩缩。手册列出的路由层读取 `vllm:num_requests_waiting`、`vllm:num_requests_running` 和 `vllm:kv_cache_usage_perc` 来选择副本，自动扩缩器也应该读这几条时间序列。
 
-### Read the signals in pairs
+### 成对解读信号
 
-| Reading | Meaning |
+| 读数 | 含义 |
 |---|---|
-| waiting above 0, cache usage below 0.9 | the batch size or the token budget limits admission, not memory |
-| waiting above 0, cache usage near 1 | the pool limits admission, so add memory or replicas |
-| slow first token with nothing waiting | long prompts or a slow tokenizer, not a capacity problem |
-| preemptions with long answers | running requests grow until the pool runs out |
+| waiting 大于 0，缓存使用率低于 0.9 | 限制准入的是批大小或 token 预算，不是显存 |
+| waiting 大于 0，缓存使用率接近 1 | 限制准入的是缓存池，需要加显存或加副本 |
+| 首 token 慢，但没有请求在等 | prompt 太长或分词器太慢，不是容量问题 |
+| 长回答伴随抢占（preemption） | 运行中的请求不断变长，直到缓存池耗尽 |
 
-The second row is a reason to add a replica, because the pool is full. On the first row, raise the batch limit or the token budget first, while the pool has room. If the queue stays after that, or the limit is already where the latency target needs it, add a replica, because each replica brings its own batch limit and token budget.
+第二行说明该加副本了，因为缓存池已满。遇到第一行时，缓存池还有空间，先调大批大小上限或 token 预算。如果调完队列还在，或者上限已经调到延迟目标允许的位置，再加副本，因为每个副本都带来一份自己的批大小上限和 token 预算。
 
-### Probes that match a slow start
+### 匹配慢启动的探针
 
-The manual's example gives the startup probe 90 checks at 10 second intervals, which is 15 minutes, and notes that its own machine took about 8 minutes for a first start. Set the window from your measured cold start. For readiness, send one short real request, which proves the engine can generate, or use the ready endpoint on an engine that has one. For liveness, use a cheap health path. The SGLang manual turns generation off in the health endpoint, because a probe that generates waits in the queue under load, times out after 20 seconds, and marks a busy server unhealthy. In one incident each failed probe also left an orphan request in the scheduler, so the probes added to the load they were meant to detect.
+手册示例给启动探针配置了 90 次检查、间隔 10 秒，也就是 15 分钟，并说明手册自己的机器首次启动用了约 8 分钟。窗口要按你实测的冷启动时间来定。就绪探针发一个简短的真实请求，证明引擎能生成；引擎有就绪端点时，也可以用这个端点。存活探针用一个轻量的健康检查路径。SGLang 手册在健康检查端点里关掉了生成，原因是：会生成的探针在高负载下要在队列里排队，20 秒后超时，把一台只是繁忙的服务器标成不健康。在一次事故中，每个失败的探针还在调度器里留下一个孤儿请求，探针反而加重了它本来要检测的负载。
 
-### Stop the overshoot
+### 阻止过度扩容
 
-New pods take minutes to load. The autoscaler sees the signal still high and adds more. Give it a stabilization window at least as long as the cold start, cap the replicas added per step, and shorten the cold start itself: weights on local disk, the compile cache on a persistent volume, and a preload before the server takes traffic. The cold start lesson adds the warm pool for the interactive path, so that the first replica is never a cold one.
+新 pod 要花几分钟加载。自动扩缩器看到信号还高，就继续加。给它配置一个不短于冷启动时间的稳定窗口（stabilization window），限制每一步新增的副本数，并直接缩短冷启动：权重放在本地磁盘，编译缓存放在持久卷上，服务器接流量前先预加载。冷启动课程还为交互路径加了 warm pool，保证第一个副本永远不是冷的。
 
-### Scale down without losing work
+### 缩容时不丢请求
 
-Remove the pod from the load balancer, send SIGTERM to the main process only, and set a grace period at least as long as the longest request at the output cap. A forced kill, or a signal to the whole process group, drops every running request.
+先把 pod 从负载均衡中摘掉，只向主进程发送 SIGTERM，宽限期至少等于输出上限下最长请求的耗时。强制 kill，或者把信号发给整个进程组，会丢掉所有正在运行的请求。
 
 ## Follow-ups
 
-- **Level 3:** Which pair of readings says the pool is the bottleneck, not the batch limit? Expected: waiting requests above zero with cache usage near one. With cache usage below 0.9, the batch size or the token budget limits admission instead.
-- **Level 3:** Why does a generating health probe hurt under load? Expected: its request waits in the queue like any other, times out, and marks a busy server unhealthy. In one incident each failed probe also left an orphan request behind.
-- **Level 4:** How do you keep the autoscaler from overshooting during a cold start? Expected: a stabilization window at least as long as the measured cold start, a cap on replicas added per step, and a shorter cold start from persistent weights and compile caches.
-- **Level 4:** What does a scale-down need so that no request is lost? Expected: remove the pod from the load balancer, send SIGTERM to the main process only, and a grace period at least as long as the longest request at the output cap.
+- **Level 3:** 哪一对读数说明瓶颈在缓存池，而不在批大小上限？ Expected: 等待请求数大于零，同时缓存使用率接近 1。缓存使用率低于 0.9 时，限制准入的是批大小或 token 预算。
+- **Level 3:** 为什么会生成文本的健康探针在高负载下有害？ Expected: 它的请求和其他请求一样在队列里等，然后超时，把一台繁忙的服务器标成不健康。在一次事故中，每个失败的探针还留下了一个孤儿请求。
+- **Level 4:** 冷启动期间，怎样防止自动扩缩器过度扩容？ Expected: 稳定窗口至少和实测冷启动一样长，限制每一步新增的副本数，并用持久化的权重和编译缓存缩短冷启动。
+- **Level 4:** 缩容要满足什么条件，才能一个请求都不丢？ Expected: 把 pod 从负载均衡中摘掉，只向主进程发送 SIGTERM，宽限期至少等于输出上限下最长请求的耗时。
 
 ## Wrong answers
 
-- "Scale on GPU utilization instead of CPU." Utilization can read high while requests wait and low while the pool is full. The queue and the cache usage are the signals the engine exposes for this.
-- "Make the liveness probe stricter so that bad pods restart faster." Under load a strict probe restarts healthy, busy pods. The fix is a cheap probe and a long startup window.
-- "Add replicas faster to beat the spike." Replicas that take minutes to load add nothing during the spike and cost money after it. Shorten the cold start and keep a warm margin.
+- "改按 GPU 利用率扩缩，不用 CPU。" 请求在排队时利用率可能很高，缓存池已满时利用率也可能很低。队列和缓存使用率才是引擎为此暴露的信号。
+- "把存活探针调严，坏 pod 能更快重启。" 高负载下，严格的探针会重启健康但繁忙的 pod。正确做法是用轻量探针，加上足够长的启动窗口。
+- "加副本加得更快，就能赶在高峰前面。" 要加载几分钟的副本，在高峰期间帮不上忙，高峰过后还在花钱。应该缩短冷启动，并保留一些预热余量。
 
 ## Taught in
 
-The [Kubernetes section of vLLM 101](../../../manuals/vllm-101/sections/6-4-run-vllm-on-kubernetes.md) sets the probes and names the wrong scaling signal, the [production watching section](../../../manuals/vllm-101/sections/5-2-watch-vllm-in-production.md) reads the metrics in pairs, the [operating section of SGLang 101](../../../manuals/sglang-101/sections/7-1-operating-sglang.md) explains the health probe incident and the drain, and the [cold start lesson](../../../phases/17-infrastructure-and-production/10-cold-start-mitigation/) sizes the warm pool.
+[vLLM 101 的 Kubernetes 一节](../../../manuals/vllm-101/sections/6-4-run-vllm-on-kubernetes.md)配置探针并指出错误的扩缩信号，[生产监控一节](../../../manuals/vllm-101/sections/5-2-watch-vllm-in-production.md)成对解读指标，[SGLang 101 的运维一节](../../../manuals/sglang-101/sections/7-1-operating-sglang.md)讲解健康探针事故和排空流程，[冷启动课程](../../../phases/17-infrastructure-and-production/10-cold-start-mitigation/)给出 warm pool 的容量规划。

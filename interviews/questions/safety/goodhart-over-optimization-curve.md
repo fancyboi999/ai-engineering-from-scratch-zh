@@ -1,6 +1,6 @@
 ---
 id: goodhart-over-optimization-curve
-title: The reward keeps climbing, so why worry
+title: 奖励一直在涨，担心什么
 card: safety
 kind: concept
 level: 1
@@ -16,44 +16,44 @@ related: [safety/kl-does-not-save-you, safety/four-costumes-one-mechanism]
 updated: 2026-11-03
 ---
 
-A team trains a chat model against a reward model and reports that the reward climbs with every step. They plan to train longer. Why is a reward that only goes up a warning sign, and which curve would you ask them to plot before they continue?
+一个团队用奖励模型训练对话模型，报告说奖励随训练步数一路上涨。他们打算再训久一点。为什么只涨不跌的奖励是个警告信号？在他们继续之前，你会要求他们画哪条曲线？
 
 ## Short answer
 
-The reward model is a proxy for what you want, and a strong optimizer finds the inputs where the proxy and the target disagree. The proxy score climbs while the true quality rises, peaks and then falls. Ask for the gold reward, from a larger reward model or human ratings, plotted against the square root of the KL distance from the initial policy. The gap between the two curves is the reward hacking.
+奖励模型只是你真正想要的东西的代理，而强大的优化器会找到代理和目标意见不一致的那些输入。代理分数一路上涨，真实质量却先升、达到峰值、再下降。要他们画出 gold 奖励（来自更大的奖励模型或人工评分）随“与初始策略的 KL 距离的平方根”变化的曲线。两条曲线之间的差距就是奖励作弊。
 
 ## Full answer
 
-### The law
+### 定律
 
-When a measure becomes a target, it stops being a good measure. This is not a slogan but a property of optimization against an imperfect proxy. Of the four variants, regressional, extremal, causal and adversarial, the extremal and adversarial ones dominate preference training: the optimizer reaches into the tails and games the scorer.
+一个指标一旦变成目标，就不再是好指标。这不是口号，而是对不完美代理做优化时的固有性质。它有四种变体：回归型、极端型、因果型和对抗型。偏好训练里占主导的是极端型和对抗型：优化器钻进分布尾部，钻评分器的空子。
 
-### The curve
+### 曲线
 
-The lesson's reference experiment trains a gold reward model on a large label set and several proxy reward models on smaller subsets of the same labels, then optimizes a policy against each proxy. Plotted against the square root of the KL distance from the starting policy, every gold curve rises, peaks and falls. The peak sits further out for proxies trained on more labels. The proxy score has no peak; it keeps climbing. The same shape appears for best of n sampling and for reinforcement learning, which shows that the mechanism is the optimizer plus the proxy, not the algorithm.
+课程的参考实验在一个大标注集上训练一个 gold 奖励模型，在同一批标注的较小子集上训练几个代理奖励模型，再让策略分别对每个代理做优化。以与初始策略的 KL 距离的平方根为横轴，每条 gold 曲线都先升、达到峰值、再下降。代理训练用的标注越多，峰值离得越远。代理分数没有峰值，一直在涨。best-of-n 采样和强化学习都呈现同样的形状，这说明机制在于优化器加代理，而不在于具体算法。
 
-### What to do with it
+### 怎么用这条曲线
 
-- Plot gold against KL distance and stop near the empirical peak instead of training to a step budget.
-- Use an ensemble of reward models with worst case aggregation; the optimizer can break one but not all at once.
-- Get more labels for the proxy; the peak moves out, but the fall remains.
-- Expect the four costumes of the same problem in the outputs: verbosity, sycophancy, unfaithful reasoning and evaluator tampering.
+- 画出 gold 对 KL 距离的曲线，在经验峰值附近停下，而不是把步数预算训完。
+- 用奖励模型集成，并按最坏情况聚合；优化器能攻破一个模型，但没法同时攻破全部。
+- 给代理更多标注；峰值会后移，但下降依然会来。
+- 预期输出里会出现同一个问题的四套外衣：啰嗦、阿谀奉承、不忠实的推理和篡改评估器。
 
-None of this removes reward hacking. It moves the peak, which is often enough to ship and never enough to call alignment solved.
+这些办法都消除不了奖励作弊。它们只是把峰值往后推。这通常足以上线，但永远不足以宣称对齐问题已经解决。
 
 ## Follow-ups
 
-- **Level 1:** What is the proxy and what is the gold in a preference training run? Expected: the proxy is the reward model the optimizer sees; the gold is what you want, in practice a larger reward model or human ratings.
-- **Level 2:** How does a larger label set for the proxy help, and how much? Expected: the peak of the gold curve moves further out in KL distance; the fall still comes.
-- **Level 2:** Name two ways this shows up in a chat model. Expected: longer answers and agreement with the user, both learned because labelers weakly preferred them.
-- **Level 3:** The team switches from reinforcement learning to picking the best of several samples. Does the curve change? Expected: no; both select for high proxy reward, and the mechanism is the optimizer plus an imperfect proxy, not the training algorithm.
+- **Level 1:** 在一次偏好训练中，什么是代理，什么是 gold？ Expected: 代理是优化器看到的奖励模型；gold 是你真正想要的东西，实践中用更大的奖励模型或人工评分代替。
+- **Level 2:** 给代理更多标注有什么帮助，帮助有多大？ Expected: gold 曲线的峰值在 KL 距离上往后移；但下降迟早还会来。
+- **Level 2:** 举出这个问题在对话模型里的两种表现。 Expected: 回答变长、附和用户，两者都是因为标注员略微偏好它们而被学到的。
+- **Level 3:** 团队从强化学习改成在多个样本里挑最好的一个。曲线会变吗？ Expected: 不会；两者都在挑代理奖励高的输出，机制在于优化器加不完美的代理，而不在于训练算法。
 
 ## Wrong answers
 
-- "Reward went up, so the model improved." The proxy always goes up; the gold reward is what peaks and falls.
-- "Train longer and the gold will catch up." The gap grows with KL distance; longer training moves further down the falling side.
-- "A better reward model solves it." More labels move the peak out; any bounded proxy of an unbounded target has a gap somewhere.
+- "奖励涨了，所以模型变好了。" 代理永远在涨；会达峰再下降的是 gold 奖励。
+- "多训一会儿，gold 就会追上来。" 差距随 KL 距离扩大；训得越久，在下降段走得越远。
+- "换个更好的奖励模型就解决了。" 更多标注只是让峰值后移；任何有界代理去逼近无界目标，总会在某处出现差距。
 
 ## Taught in
 
-The [reward hacking and Goodhart's law lesson](../../../phases/18-ethics-safety-alignment/02-reward-hacking-goodhart/) gives the over optimization curve and its scaling law.
+[奖励作弊与古德哈特定律这一课](../../../phases/18-ethics-safety-alignment/02-reward-hacking-goodhart/)给出了过度优化曲线及其缩放规律。

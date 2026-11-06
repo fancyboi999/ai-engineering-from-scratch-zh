@@ -1,6 +1,6 @@
 ---
 id: dead-engine-and-watchdog
-title: A dead rollout engine and a watchdog that kills
+title: 停止运行的 rollout 引擎与会终止任务的看门狗
 card: scenarios
 kind: incident
 level: 3
@@ -29,58 +29,58 @@ source:
 
 ## Situation
 
-A team runs GRPO on one GB10 and leaves a run alone for an hour. When they come back, the GPU is idle, the container is still running, and the log has grown to 147 MB. No failure appeared in the output of the run. The rollout engine had been started with an attention setting that this GPU cannot run, and it stopped during startup. The trainer did not stop: it went on sending requests to the dead engine.
+一个团队在一张 GB10 上跑 GRPO，让一次训练运行了一个小时，期间无人查看。回来时 GPU 空闲，容器还在运行，日志已经涨到 147 MB。运行输出里没有出现任何失败。rollout 引擎启动时用了这块 GPU 跑不了的注意力设置，在启动阶段就停了。训练器却没停：它一直在给死掉的引擎发请求。
 
-The team writes a watchdog. Every 30 seconds it counts the `503 Service Unavailable` lines of the last 60 seconds and, when it finds more than 100 such lines in six checks in a row, it stops the container. The next day the watchdog stops a healthy run that generated 16 answers per prompt, in the middle of its steps. The team now distrusts both the run and the watchdog.
+团队写了一个看门狗。它每 30 秒统计最近 60 秒内的 `503 Service Unavailable` 行数；连续六次检查都超过 100 行时，就停掉容器。第二天，看门狗在一个每个 prompt 生成 16 个回答的健康运行跑到一半时停掉了它。团队现在既不信这次运行，也不信看门狗。
 
 ## Evidence
 
-- [the engine failure and the first and last error from the trainer side](evidence/engine-died.txt)
-- [how many error lines the run wrote](evidence/error-count.txt)
-- [the quietest and the busiest minutes of the dead run](evidence/errors-per-minute-dead.txt)
-- [the first fifteen minutes of errors in a run that finished every step](evidence/errors-per-minute-healthy.txt)
-- [the watchdog against two containers that print the error on purpose](evidence/watchdog-test.txt)
-- [the watchdog rule replayed on the real error times of the healthy run](evidence/replay.txt)
+- [引擎的失败，以及训练器一侧的第一条和最后一条错误](evidence/engine-died.txt)
+- [这次运行写了多少行错误](evidence/error-count.txt)
+- [死掉的那次运行里最安静和最繁忙的分钟](evidence/errors-per-minute-dead.txt)
+- [一次跑完所有步的运行，前十五分钟的错误](evidence/errors-per-minute-healthy.txt)
+- [看门狗对付两个故意打印这条错误的容器](evidence/watchdog-test.txt)
+- [在健康运行的真实错误时间上回放看门狗规则](evidence/replay.txt)
 
 ## Questions
 
-1. The trainer never failed. Which component returned the 503, and why did the trainer treat it as something to retry?
-2. A count of errors alone cannot separate the dead run from the healthy one. Which property can, and how do you write it as a rule?
-3. Replay the six-check rule on the healthy run. Why did it fire, and in how many of the 30 start offsets?
-4. Pick the number of checks. What does each extra check cost when the engine really is dead?
-5. The script exits with 0, 1 or 2. What should a queue of runs do with each code?
-6. On a cluster of many GPUs you would not run this script. What replaces it, and what did the fault tolerance of the version we ran not cover?
+1. 训练器从没失败。是哪个组件返回了 503？训练器为什么把它当成应该重试的情况？
+2. 只看错误数量，无法区分引擎已停止的运行和健康运行。哪种特征能区分它们？怎样把它写成规则？
+3. 在健康运行上回放六次检查的规则。它为什么触发了？在 30 个起始偏移里触发了几次？
+4. 选定检查次数。引擎真的死了时，每多一次检查要付出什么？
+5. 脚本以 0、1 或 2 退出。运行队列对每个退出码该怎么做？
+6. 在多 GPU 的集群上你不会跑这个脚本。用什么替代它？我们所跑版本的容错没有覆盖什么？
 
 ## Walkthrough
 
-Read the first listing from the top. The engine enabled deterministic inference for the on-policy target, then an assertion stopped it: the FlashAttention v3 backend needs an SM between 80 and 90, and the GB10 is outside that range. The parent received a SIGQUIT from the child. From that moment the trainer's rollout executor logged `503 Service Unavailable` from the router at `172.17.0.3:20035`. The router is the small service that forwards each rollout request to an engine, and 503 is what it returns when no engine can take the request. The client retries a 503, because a busy engine returns it too. The last two lines are 63 minutes apart, from 21:03 to 22:06, and the second listing counts 200,533 such lines in that log.
+从头读第一份清单。引擎为 on-policy 目标开启了确定性推理，随后一个断言让它停了下来：FlashAttention v3 后端要求 SM 在 80 到 90 之间，而 GB10 不在这个范围内。父进程收到了子进程的 SIGQUIT。从那一刻起，训练器的 rollout 执行器就不断记录来自 `172.17.0.3:20035` 上路由器的 `503 Service Unavailable`。路由器是一个小服务，把每个 rollout 请求转发给某个引擎；没有引擎能接请求时，它就返回 503。客户端会重试 503，因为忙碌的引擎也会返回它。所列的第一条和最后一条错误相隔 63 分钟，从 21:03 到 22:06，第二份清单统计出这份日志里有 200,533 行这样的错误。
 
-The third and fourth listings compare the two runs minute by minute. The dead run never went quiet. Its two partial minutes held 1,838 and 2,281 errors, and every full minute held at least 2,669, up to 3,719. The healthy 16-answer run logged 22,357 errors in total, but in bursts: 286 and 271 in the first two minutes, nothing for ten minutes, then 686 and 882, then 18. One minute reached 2,209. The client retried each request and the run finished all its steps. A count alone cannot tell these two runs apart. The time can. A dead engine produces errors in every window, a busy engine produces them in bursts with gaps.
+第三和第四份清单逐分钟比较两次运行。死掉的运行从没安静过。它的两个不完整分钟分别有 1,838 和 2,281 条错误，每个完整分钟至少 2,669 条，最多 3,719 条。那次健康运行按每个 prompt 生成 16 个回答，总共记录了 22,357 条错误，但它们是一阵一阵的：前两分钟 286 和 271 条，接着十分钟一条没有，然后 686 和 882 条，再然后 18 条。有一分钟达到 2,209 条。客户端重试了每个请求，运行跑完了所有步。光看数量分不开这两次运行，时间可以。死掉的引擎在每个窗口里都产生错误，忙碌的引擎集中产生一阵阵错误，中间有空隙。
 
-The watchdog turns that into a rule: every 30 s, count the errors of the last 60 s, and stop only once the count has stayed above 100 for a set number of checks in a row. The fifth listing tests it on two containers with no GPU. A container that prints ten error lines a second was stopped after 183 s with six checks, and the script exited with 1. A container that prints for 60 s and then stays quiet for two minutes, three times over, ran to its end after 541 s, and the script exited with 0.
+看门狗把这一点写成规则：每 30 s 统计最近 60 s 的错误，只有错误数连续若干次检查都高于 100 才停止。第五份清单在两个没有 GPU 的容器上测了它。一个容器每秒打印十行错误，六次检查后在 183 s 时被停掉，脚本以 1 退出。另一个容器打印 60 s 后安静两分钟，如此三轮，一直跑到结束，用时 541 s，脚本以 0 退出。
 
-The last listing shows why six checks was still wrong. Replayed on the real error times of the healthy run, for each of the 30 possible start offsets of the checks, six checks stopped the run in 17 of 30 cases. Two bursts came 45 s apart, so the 60 s window held errors for six consecutive checks. No offset reached more than six checks in a row. With eight checks the rule stopped the healthy run in 0 of 30 cases, and with ten checks also 0 of 30. The cost is time on a dead engine: 153 to 182 s at six checks, 273 to 302 s at ten.
+最后一份清单说明六次检查为什么仍然不对。在健康运行的真实错误时间上回放，对检查的 30 个可能起始偏移逐一测试，六次检查在 30 次中有 17 次停掉了运行。有两阵错误相隔 45 s，所以 60 s 窗口在连续六次检查里都有错误。没有任何偏移能连续超过六次。用八次检查，规则在 30 次中 0 次停掉健康运行；用十次检查也是 0 次。代价是在死掉的引擎上多耗的时间：六次检查要 153 到 182 s，十次要 273 到 302 s。
 
 ## Resolution
 
-The engine died because of a backend assertion, and the run did not notice because a 503 looks like a busy engine to the client. The fix for the run is to read the engine lines above the first error and change the attention backend, as the assertion message says.
+引擎死于一个后端断言，运行没有察觉，因为在客户端看来，503 和引擎忙碌是一样的。修复这次运行，要读第一条错误上方的引擎日志行，按断言消息说的那样换掉注意力后端。
 
-The fix for the watchdog is the number of checks. Set it to 10, because a healthy run did not reach more than 6 checks in a row and 8 or 10 stopped it in 0 of 30 replays, while a dead engine is still stopped in about five minutes. Keep the limit at 100 errors per 60 s window and the check every 30 s. Test the script on the two fake containers before you trust it, and keep the replay against a real healthy log, because the fake burst container has quiet gaps of two minutes, longer than the real gaps of 45 s.
+修复看门狗，要改检查次数。设为 10，因为健康运行从没连续超过 6 次，而 8 次或 10 次在 30 次回放里都是 0 次误停，同时死掉的引擎仍会在大约五分钟内被停掉。每个 60 s 窗口 100 条错误的上限保持不变，每 30 s 检查一次也不变。信任脚本之前，先在这两个假容器上测试它；并保留对真实健康日志的回放，因为假的突发容器两阵之间安静两分钟，比真实的 45 s 间隔长。
 
-Give the exit codes meaning. Exit 1 means the watchdog stopped the run, so a queue skips to the next run and keeps the log. Exit 0 means the run ended on its own. Exit 2 means the watchdog lost its view of the containers, so the run has no guard and a person must look.
+给退出码赋予含义。退出码 1 表示看门狗停掉了运行，队列跳到下一次运行并保留日志。退出码 0 表示运行自己结束了。退出码 2 表示看门狗看不到容器了，这次运行没有保护，需要有人去看。
 
 ## Wrong turns
 
-- "Alert when the count of 503 lines in a minute is high." A healthy run logged 2,209 in one minute and finished every step. The count fires on bursts, the time between bursts is the signal.
-- "Six checks in a row is enough, the test passed." The test container paused for two minutes between bursts. The real run had bursts 45 s apart, and the replay on its real times fired in 17 of 30 cases.
-- "Raise the limit until the healthy run passes." The largest healthy minute held 2,209 errors and the quietest full minute of the dead run 2,669. A limit between them fits this pair of runs only, and a slower dead engine or a busier healthy run breaks it. The time rule does not depend on the rate.
-- "Turn on fault tolerance instead of a script." On one GPU a dead engine means a dead run. In the version we ran, rollout fault tolerance did not work with a dedicated eval fleet or with the fully async colocated layout, and without it the trainer keeps sending requests to a dead engine and never fails.
-- "Let the watchdog restart the engine." The script only stops the run. The cause is in the engine lines above the first error, and a restart with the same setting fails the same way.
+- "一分钟内 503 行数高就告警。" 一次健康运行在某一分钟记录了 2,209 条，并跑完了所有步。数量会在每阵突发时触发，突发之间的时间才是信号。
+- "连续六次检查就够了，测试都通过了。" 测试容器两阵突发之间停两分钟。真实运行的突发相隔 45 s，在它的真实时间上回放，30 次中有 17 次触发。
+- "调高上限，直到健康运行能通过。" 健康运行最多的一分钟有 2,209 条错误，死掉运行最安静的完整分钟有 2,669 条。夹在两者之间的上限只适合这一对运行，更慢的死引擎或更忙的健康运行都会让它失效。时间规则不依赖速率。
+- "开启容错，代替脚本。" 在一张 GPU 上，引擎死了就等于运行死了。在我们跑的版本里，rollout 容错不支持专用评测集群，也不支持全异步的共置布局；没有它，训练器会一直给死引擎发请求，永远不会失败。
+- "让看门狗重启引擎。" 脚本只负责停止运行。原因在第一条错误上方的引擎日志行里，用同样的设置重启，会以同样的方式失败。
 
 ## Generalize
 
-A component that retries forever turns a dead dependency into a silent hang, and the only honest signal is time, not count. Build the alarm from the duration of the error condition, replay the rule on the logs of real healthy runs before you trust it, and give the alarm an exit code that a queue can act on. Then read the first error, not the last, because the cause sits above the noise.
+一个无限重试的组件，会把一个死掉的依赖变成无声的挂起，唯一可靠的信号是持续时间，而不是数量。用错误状态的持续时间来构建告警，信任规则之前先在真实健康运行的日志上回放它，并给告警一个队列能据此行动的退出码。然后读第一条错误，不是最后一条，因为原因在噪声的上方。
 
 ## Taught in
 
-The Miles manual builds and tests the watchdog in [the watchdog page](../../../manuals/miles-101/sections/1-2-add-a-watchdog.md), covers checkpoints and fault tolerance in [the failures page](../../../manuals/miles-101/sections/6-3-survive-failures.md), lists the engine causes in [the troubleshooting page](../../../manuals/miles-101/sections/7-1-troubleshoot-by-symptom.md) and explains the 503 in [the router page](../../../manuals/miles-101/sections/8-6-which-router-to-use.md), and [the SRE for AI lesson](../../../phases/17-infrastructure-and-production/23-sre-for-ai/docs/en.md) frames the alarm design.
+Miles 手册在[看门狗页面](../../../manuals/miles-101/sections/1-2-add-a-watchdog.md)构建并测试了看门狗，在[故障页面](../../../manuals/miles-101/sections/6-3-survive-failures.md)讲了检查点和容错，在[排障页面](../../../manuals/miles-101/sections/7-1-troubleshoot-by-symptom.md)列出了引擎的失败原因，在[路由器页面](../../../manuals/miles-101/sections/8-6-which-router-to-use.md)解释了 503，[面向 AI 的 SRE 这一课](../../../phases/17-infrastructure-and-production/23-sre-for-ai/docs/en.md)为告警设计提供了框架。

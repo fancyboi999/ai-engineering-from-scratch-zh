@@ -1,6 +1,6 @@
 ---
 id: feature-store-design
-title: Design a feature store that keeps training honest
+title: 设计保证训练真实可靠的特征存储系统
 card: system-design
 kind: design
 level: 2
@@ -16,63 +16,63 @@ related: [system-design/skew-triage, system-design/feedback-loop-clean-data]
 updated: 2026-11-03
 ---
 
-Design the feature layer for a churn model. Training needs the value of each feature for millions of user and time pairs. Serving needs the latest value for one user in a few milliseconds. Name the parts, explain how a training row gets its features, and show with the lesson's numbers what goes wrong without the right join.
+为用户流失预测模型设计特征层。训练过程需要数百万个用户和时间二元组对应的各个特征值。在线服务则需要在数毫秒内读取单个用户的最新特征值。请说明系统各个组成部分、解释训练样本行如何获取其特征，并用课程中的真实测算数据展示若缺少正确的关联拼接会引发什么严重后果。
 
 ## Short answer
 
-One registry holds each feature definition with its entity, window, default, TTL and version, and both paths compute from it. An offline store keeps the full history with event timestamps for training and backfills; a materialization job copies the latest value per entity into an online key-value store with a TTL. A training row takes the latest feature row at or before its label time, inside the TTL. Without that point-in-time join the lesson's demo looks better offline, 0.948 against 0.893, and worse on new data, 0.763 against 0.876, because the newest snapshot leaks the answer.
+由统一的特征注册中心管理每项特征的定义，包含关联实体、统计窗口、默认值、生存时间与版本号，训练与在线双链路均从该定义计算衍生。离线存储保留带有事件时间戳的完整历史记录，供模型训练与历史回填读取；物化任务将每个实体的最新值复制至配置了生存时间的在线键值存储中。训练样本行获取特征时，提取处于或早于标签时间戳且落在生存时间范围内的最新特征记录。若缺少该时间点对齐拼接，课程实验表明模型在离线看似更优，0.948 对比 0.893，在新数据上却表现更差，0.763 对比 0.876，因为最新的快照数据实质上泄漏了答案。
 
 ## Full answer
 
-### The parts
+### 系统的组成部分
 
-| Part | Job |
+| 组成部分 | 核心职责 |
 |---|---|
-| Registry | One definition per feature: entity, source, transformation, window, default, TTL, owner, version |
-| Offline store | Full history with event timestamps, read by training and backfills |
-| Point-in-time join | Pairs each label with the latest row at or before the label time, dropped if older than the TTL |
-| Materialization | Copies the latest values from offline to online |
-| Online store | Latest value per entity, read in milliseconds, refuses rows older than the TTL |
-| Skew check | Compares logged serving features with the training path for the same entity and time |
+| 特征注册中心 | 每项特征的唯一定义：实体、数据源、转换逻辑、时间窗口、默认值、TTL、负责人、版本号 |
+| 离线存储 | 带有事件时间戳的完整历史数据，供训练与历史回填读取 |
+| 时间点对齐拼接 | 将每个标签与处于或早于标签时间的最新特征行匹配，若超出 TTL 则丢弃 |
+| 物化任务 | 将最新特征值从离线存储同步复制至在线存储 |
+| 在线存储 | 毫秒级读取单个实体的最新值，拒绝存续时间超过 TTL 的记录 |
+| 特征偏移检查 | 对比同一实体与时间点下记录的线上服务特征与离线训练路径特征 |
 
-### Two readers, one definition
+### 两个读取方，唯一定义源
 
-Training asks "what was the value for each of millions of entity and time pairs". Serving asks "what is the value for this entity now". Both read the same definition from the registry; no service keeps a private copy of the transformation. A change creates a new version, and old models pin the version they trained on.
+训练任务需要回答“数百万个实体与历史时间对所对应的特征值分别是什么”；在线服务则回答“当前实体当下的特征值是什么”。两条链路都从特征注册中心读取相同的逻辑定义；任何微服务都不允许私自维护特征转换逻辑的私有副本。逻辑修改会生成新版本号，旧模型则固定其训练时使用的特定版本。
 
-### The join
+### 拼接逻辑
 
-1. Find the feature rows of the same entity.
-2. Keep rows whose event timestamp is at or before the label time.
-3. Take the latest of those.
-4. Drop it if the label time minus its event time exceeds the TTL.
+1. 检索相同实体的所有特征记录。
+2. 仅保留事件时间戳小于或等于标签时间戳的记录。
+3. 取其中最新的那一条记录。
+4. 若标签时间减去该事件时间超过了 TTL，则判定失效并丢弃。
 
-A naive join on the entity alone returns the newest row for every label. For a churn label, the newest snapshot already counts the quiet days after the label day, so the feature contains the answer. The demo fits a rule on both training sets and tests on later labels: the naive join scores 0.948 offline and 0.763 on new data, the point-in-time join scores 0.893 offline and 0.876 on new data, and the leaked feature moved the threshold from 19 to 53 idle days.
+朴素地仅按实体 ID 拼接会直接将最新的特征快照关联给所有历史标签。对于流失标签，最新快照已经统计了标签日期之后的空闲天数，相当于特征直接包含了最终答案。课程演示在两份训练集上拟合了相同规则并测试新标签：朴素拼接离线得分高达 0.948，新数据上为 0.763；正确的时间点拼接离线得分为 0.893，新数据上稳定在 0.876；泄漏的特征导致拟合出的流失判定阈值从 19 天移到了 53 天空闲。
 
-### TTL and defaults
+### TTL 与默认值
 
-With a TTL of 10 days, a read five days after the last snapshot returns it, and a read 20 days later returns the defaults because the row is too old. The default lives in the registry so both paths fill a missing value the same way.
+若 TTL 设定为 10 天，在最近一次快照后第 5 天读取能正常返回该值，而在第 20 天读取则会因为记录过于陈旧而返回默认值。默认值保存在特征注册中心，确保双链路在填充缺失值时完全一致。
 
-### Backfills and created time
+### 历史回填与数据产生时间
 
-A new feature has no history, so a backfill runs the definition at each past date and reads only events at or before that date. A backfill run today can still read data that arrived late, so a strict join also checks the created timestamp.
+新引入的特征没有历史物化记录，因此回填任务会在过去每个历史日期分别执行该定义，且严格只读取处于或早于该日期的原始事件。今天运行的历史回填可能读到历史上延迟回流的数据，因此严格的时间点拼接还会二次校验数据的创建入库时间戳。
 
-### The skew check
+### 线上线下偏移校验
 
-Log a sample of served features and compare each value with the training path for the same entity and time. Report the mismatch rate and the mean absolute difference per feature, and flag a feature above 1 percent mismatch. Three comparisons separate the causes: store read against training join for the whole system, fresh computation against training join for staleness, and a second code path against fresh computation for code differences.
+抽样记录线上服务使用的特征，并与训练链路针对相同实体和时间点计算出的特征对比。汇报特征维度的失配率与平均绝对误差，对失配率超过 1% 的特征触发告警。三组对比能区分原因：线上读取对训练拼接检验整体链路一致性；实时计算对训练拼接检验时效性差异；不同代码路径对实时计算检验实现逻辑分歧。
 
 ## Follow-ups
 
-- **Level 2:** Why does the leaked model look better offline? Expected: the feature contains the outcome, so the offline split rewards it; on new data the information is not there.
-- **Level 2:** What does the TTL do in the join, and relative to what time? Expected: it drops a feature row too old for the label; the age is measured from each label time, not from the query time.
-- **Level 3:** Two teams compute the same feature in two services. Which skew cause is that, and how does the registry remove it? Expected: two code paths; both services call the registry definition instead of their own copy.
-- **Level 3:** Fresher serving features turn out to hurt. Why? Expected: the model trained on weekly snapshots, so values up to six days old are what it learned; staleness skew runs both ways.
+- **Level 2:** 为什么发生数据泄漏的模型在离线测试时表现反而更好？ Expected: 特征本身直接包含了真实标签结果，离线测试切片自然给予高分；但在未来新数据上该信息在预测时刻并不存在。
+- **Level 2:** TTL 在拼接中起什么作用？它是相对于什么时间衡量的？ Expected: 丢弃距离标签时间过久的老旧特征记录；它是相对于每个样本的标签时间来衡量的，而非查询执行时的当前物理时间。
+- **Level 3:** 两个团队在两个独立服务中分别计算相同的特征，属于什么偏移？注册中心如何消除它？ Expected: 双代码路径偏差；让两个服务统一调用注册中心中的唯一定义，废除各自维护的私有逻辑。
+- **Level 3:** 在线服务特征过于新鲜反而导致模型表现下滑，为什么？ Expected: 模型在每周快照上训练，学到的是最多六天前的特征值；时效偏差可以朝两个方向发生。
 
 ## Wrong answers
 
-- "Join labels to the feature table on the user id." That returns the newest value and copies the outcome into the input.
-- "Fresher features are always better at serving time." The model learned the freshness of its training data; a different age is skew.
-- "Snapshots every day remove the problem." Daily snapshots reduce staleness but the join still needs the as-of rule and the TTL.
+- "直接按用户 ID 关联标签表与特征表。" 这会抓取最新快照，导致把未来的业务结果直接写入输入特征中。
+- "在线服务时特征越新鲜越好。" 模型学习的是其训练数据所具备的数据时效；改变时效特征会导致训练与服务分布不一致。
+- "每天生成特征快照就能解决该问题。" 每日快照只能缓解时效过旧问题，但拼接时依然必须遵循截止时间点规则并配置 TTL。
 
 ## Taught in
 
-The [feature store lesson](../../../phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/) builds the registry, the point-in-time join, the online store and the skew check, and measures the naive join against the correct one.
+[特征存储课程](../../../phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/)构建了注册中心、时间点对齐拼接、在线存储与偏移校验体系，并对比了朴素拼接与正确拼接的测算结果。

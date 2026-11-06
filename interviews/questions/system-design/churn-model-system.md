@@ -1,6 +1,6 @@
 ---
 id: churn-model-system
-title: Design the churn system, not the churn model
+title: 设计用户流失预警系统而非单纯的流失模型
 card: system-design
 kind: design
 level: 2
@@ -16,56 +16,56 @@ related: [system-design/metric-layers-churn-auc, system-design/batch-vs-online-s
 updated: 2026-11-03
 ---
 
-A subscription company with 2,000,000 users wants to reduce churn. The retention team can send a save offer to a small share of users each night. Design the system end to end: the prediction, the decision, the serving mode, the baselines, the rollout, and the failure defaults. State the load and the budgets you assume.
+一家拥有 2,000,000 用户的订阅制公司希望降低用户流失率。留存团队每天夜间可以向一小部分用户发送挽留优惠。请端到端设计该系统：包含预测任务定义、业务决策逻辑、服务运行模式、对比基线、发布方案以及故障兜底机制。明确说明你所设定的负载规模与性能预算。
 
 ## Short answer
 
-The task is binary classification: the probability that a user cancels in the next 30 days, so that the nightly job can pick the top 5 percent for an offer. Nightly scores for every user fit batch inference; the lesson's cost model prices one run a day over the user base at under one dollar, while an online service sized for 40 peak QPS costs $24.00 a day for a freshness nobody needs. The model must beat the idle-days rule by a set lift, ship through shadow and canary stages, and fall back to that rule when anything fails.
+该任务属于二分类预测：预估用户在未来 30 天内取消订阅的概率，以便夜间批处理任务选出流失风险最高的前 5% 用户发放挽留优惠。针对全体用户每夜计算一次得分非常契合批处理推理；依据课程成本模型，针对全部用户群体每天运行一次的成本不足一美元，而针对 40 峰值 QPS 规划的在线服务每天需花费 $24.00，换来的却是无人需要的新鲜度。该模型必须比空闲天数启发式规则高出指定的性能提升幅度，经过影子部署与金丝雀灰度发布，并在出现任何故障时回退到该规则。
 
 ## Full answer
 
-### From the goal to a task
+### 从业务目标到具体任务定义
 
-| Question | Answer |
+| 追问 | 解答 |
 |---|---|
-| What is predicted, for which entity | Cancellation in the next 30 days, per user |
-| Which decision uses it | The nightly job sends an offer to the top 5 percent |
-| When is it needed, with which data | Each night, from data up to that night |
-| How do we know the decision got better | 30-day churn in the treated group versus a random holdout |
+| 针对什么实体预测什么目标 | 针对单个用户预测其未来 30 天内是否取消订阅 |
+| 哪项业务决策依赖该预测 | 夜间批处理任务向风险最高的前 5% 用户发放优惠 |
+| 何时需要结果，依赖何时的数据 | 每晚运行一次，使用截至当晚的历史数据 |
+| 如何衡量决策是否切实改善 | 对比干预实验组与随机保留对照组的 30 天流失率 |
 
-### Load and budgets
+### 负载规模与预算
 
-Entities: 2,000,000 users. Requests: one score read per user visit. Freshness: a day is fine, because the job runs once a night. Latency budget: one key-value read at request time, a few milliseconds. Cost: the batch plan prices at $0.91 per day for one run over the user base, against $24.00 per day for the minimum two replicas of an online service. A hybrid can score new users online on their first visit, since batch has no score for them until the next run.
+目标实体：2,000,000 用户。请求量：用户每次访问时读取一次得分。时效性：一天即可，因为任务每晚只执行一次。延迟预算：请求时一次键值读取，仅需数毫秒。成本测算：批处理方案针对全量用户每晚运行一次仅需 $0.91/天，而满足高可用至少 2 个副本的在线服务每天需 $24.00。对于新注册用户，由于批处理在下次运行前没有其得分，可采用混合架构在用户首次访问时在线实时打分。
 
-### Metrics and baselines
+### 评估指标与对比基线
 
-Offline: precision in the top 5 percent. Online: offer acceptance rate and share of users scored. Business: churn in treated versus holdout. Guardrails: offer cost per saved user, unsubscribe rate. Three baselines: majority class, which scores zero on F1 because it never predicts churn; a one-feature idle-days rule fitted on training data; and the current process. In the lesson's demo the model reaches an F1 of 0.564 against the fitted rule at 0.500, a lift of 0.064 above the minimum of 0.02, so the model earns its place. With weaker features the rule would ship instead.
+离线指标：排名前 5% 样本的精确率。在线指标：优惠接受率与完成打分的用户覆盖比例。业务指标：干预组相比对照组的流失率下降幅度。护栏指标：挽回单用户的优惠成本、退订率。三个基线模型：多数类基线（因从不预测流失，F1 分数为零）；基于训练数据拟合的单特征空闲天数规则；以及现有流程。在课程演示中，模型达到了 0.564 的 F1，相比拟合规则的 0.500 提升了 0.064，高于 0.02 的最低要求，因此赢得了上线位置；若特征更弱，则直接上线规则。
 
-### Data
+### 数据管理
 
-Labels come from the cancellations table, with a 30-day delay. Every feature must exist at the moment of scoring; a cancellation reason written after the fact leaks the label. Hold out the most recent period for the test split.
+正负标签来自订阅取消表，带有 30 天的业务延迟。所有输入特征必须在打分时刻已经客观存在；事后填写的取消原因字段会导致严重的标签泄漏。在时间序列切分中，保留最近一个周期作为测试集。
 
-### Rollout
+### 发布方案
 
-Shadow first: score live users, log, never act. Then canary: act for a small share, often 1 to 5 percent, and widen in steps with a rollback switch. Then an A/B test against the holdout for the business metric. Keep the old model deployed and switch traffic by configuration.
+先运行影子部署：对线上真实用户打分并记录日志，绝不触发挽留动作。随后做金丝雀灰度发布：针对极小比例（通常为 1% 到 5%）用户执行挽留动作，配合回滚开关阶梯式放量。最后对照保留组开展 A/B 测试以验证核心业务指标。旧版模型保持常驻部署，流量切换完全依托配置。
 
-### Feedback loop and failures
+### 反馈闭环与故障兜底
 
-Offers keep some users, so next month high-risk users look loyal and the retrained model learns that their features do not predict churn. Keep a random holdout that never gets the offer and log the score and the decision with each row. Failure defaults: a failed nightly job serves the last good scores for a fixed time, then the rule; a missing feature takes its documented default and logs; a sudden move in the score distribution pauses automatic offers and alerts a person.
+挽留优惠会成功留住一部分用户，导致下个月这批高危用户看起来非常忠诚，重新训练的模型就会错误地学到其特征无法预测流失。因此必须保留一组永远不接收优惠的随机对照保留组，并在每行数据中记录得分与是否干预。故障兜底机制：夜间批处理失败时，在固定窗口期内继续使用上一版有效得分，超时后降级回退至启发式规则；特征缺失时填入文档规范的默认值并记录日志；模型预测得分分布突变时自动暂停发送优惠并触发人工告警。
 
 ## Follow-ups
 
-- **Level 2:** Why does the majority baseline score zero? Expected: F1 counts positive predictions, and the majority class is "stays", so there are none.
-- **Level 2:** The retention team wants hourly freshness. What changes? Expected: more runs per day raise batch cost in proportion, and the online path becomes cheaper at some point; price both with the cost model.
-- **Level 3:** How do you keep the model from learning its own interventions? Expected: a random holdout that never receives offers, plus logging of score and decision so training can separate influenced from clean rows.
-- **Level 3:** What is the safe default when the model service is down during the nightly run? Expected: serve the last good scores for a fixed window, then fall back to the idle-days rule.
+- **Level 2:** 为什么多数类基线的 F1 分数为零？ Expected: F1 统计正类预测，而多数类是留存，因此这个基线没有正类预测。
+- **Level 2:** 留存团队希望达到小时级的数据新鲜度，系统会有什么变化？ Expected: 每天运行次数增加导致批处理成本按比例上升，到达一定阈值后在线方案反而更经济；需使用成本模型重新测算。
+- **Level 3:** 如何防止模型将自身的历史干预误学为真实特征分布？ Expected: 建立永不接受优惠的随机对照保留组，并记录得分与决策，确保训练数据能明确区分受干预样本与干净样本。
+- **Level 3:** 夜间批处理期间模型服务突发宕机，安全的默认兜底策略是什么？ Expected: 在设定的时间窗口内继续提供上一版有效得分，随后平滑降级回退到空闲天数规则。
 
 ## Wrong answers
 
-- "Serve it online so scores are always fresh." The decision runs once a night; online replicas cost more for freshness the process cannot use.
-- "Use AUC as the offline metric." The decision uses one threshold; precision in the contacted share is the metric that matches it.
-- "Retrain monthly on all users." Treated users carry the intervention in their labels; without a holdout the model degrades with each retrain.
+- "采用在线服务，确保预测得分永远最新。" 业务决策每晚只执行一次；在线副本会增加成本，换来下游流程根本用不到的新鲜度。
+- "使用 AUC 作为离线评估的核心指标。" 业务决策只使用一个阈值；目标触达比例内的精确率才是与业务决策完全匹配的指标。
+- "每月在全体用户上重新训练模型。" 接受干预的用户其标签带有干预影响；没有对照组，模型会在每次重训时退化。
 
 ## Taught in
 
-The [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) prices the nightly churn job against an online service, compares the model with its baselines, and lists the failure defaults.
+[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)测算了夜间流失预警任务与在线服务的成本对比，将模型与基线做了对照，并罗列了完整的故障兜底机制。

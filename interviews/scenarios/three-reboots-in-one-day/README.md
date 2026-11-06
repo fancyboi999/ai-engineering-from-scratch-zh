@@ -1,6 +1,6 @@
 ---
 id: three-reboots-in-one-day
-title: Three reboots in one day under RL load
+title: RL 负载下一天内发生三次重启
 card: scenarios
 kind: incident
 level: 4
@@ -26,58 +26,59 @@ source:
   - manuals/miles-101/sections/r-3-lab-notes.md
 ---
 
+
 ## Situation
 
-A research team runs a 48-step GRPO run of `Qwen/Qwen3-0.6B` on a desktop machine with one GB10. On 2026-10-18 the machine reboots three times. The run dies with it each time, and so does every other job on the machine. The boot list shows that the three boots lasted 13, 26 and 74 minutes. The journal has no panic, no out-of-memory kill and no error line before any of the three ends. The team wants a cause and a fix before they start the next two seeds.
+一个研究团队在一台配备单张 GB10 的台式机上运行 `Qwen/Qwen3-0.6B` 的 48 步 GRPO 训练。2026-10-18 当天，机器重启了三次。每次运行都随之终止，机器上的其他所有作业也一样。启动列表显示三次运行分别持续了 13、26 和 74 分钟。三次结束前，系统日志中都没有 panic、没有 OOM 终止，也没有任何错误行。团队希望在开始接下来的两个种子之前查明原因并落实修复。
 
-Two proposals are on the table. One says the engine ran out of memory and asks for a lower engine memory fraction. The other says the machine is unfit for RL and asks for a cloud GPU. You have the boot list, a guard script that someone wrote that morning, its log, and the lab notes of the manual.
+现场摆着两份提议：一方认为引擎内存耗尽，要求调低引擎内存比例；另一方认为这台机器不适合跑 RL，要求使用云端 GPU。你手上有启动列表、某人当天早晨编写的守护脚本及其日志，以及手册的实验笔记。
 
 ## Evidence
 
-- [the boot list of the machine, read four days later](evidence/the-boot-list.txt)
-- [what the manual records about the load of that day and the guard](evidence/what-ran-that-day.txt)
-- [the loop of the heat guard](evidence/the-guard-loop.txt)
-- [the first pauses and the rule change](evidence/the-first-hour-of-the-guard.txt)
-- [the guard four days later](evidence/a-later-afternoon.txt)
-- [the heat guard and the pause count in the lab notes](evidence/the-pause-count.txt)
+- [四天后读取的机器启动列表](evidence/the-boot-list.txt)
+- [手册关于当天负载和守护脚本的记录](evidence/what-ran-that-day.txt)
+- [温控守护的主循环](evidence/the-guard-loop.txt)
+- [最初的暂停以及规则修改](evidence/the-first-hour-of-the-guard.txt)
+- [四天后的守护运行记录](evidence/a-later-afternoon.txt)
+- [实验笔记中的温控守护和暂停次数统计](evidence/the-pause-count.txt)
 
 ## Questions
 
-1. Read the boot list. What do the three short boots have in common, and what does the last boot of that day show?
-2. The journal gives no cause. Name the candidate causes for a machine that stops without a log line, and say which ones the evidence rules out.
-3. Read the guard loop. What does it watch, what does it do, and what are its two timers for?
-4. The guard paused the container 1,005 times. What does that do to every measurement from those runs, and which numbers survive?
-5. The chaos lesson asks for a safety plane with a kill switch and blast-radius limits. Where does this guard sit in that design, and what does it lack?
-6. You must state the cause in the postmortem. What can you write, and what must you not write?
+1. 读启动列表。三次短暂的启动有什么共同点？当天的最后一次启动显示了什么？
+2. 系统日志没有给出原因。列出导致机器在没有日志行的情况下停机的可能原因，并说明证据排除了哪些。
+3. 读守护循环。它监视什么？做什么？它的两个定时器是用来做什么的？
+4. 守护脚本暂停了容器 1,005 次。这对来自这些运行的每次测量有什么影响？哪些数字依然有效？
+5. 混沌工程课程要求具备带熔断开关和爆炸半径限制的安全控制平面。这个守护脚本在该设计中处于什么位置？缺少了什么？
+6. 你必须在复盘中说明原因。你可以写什么？绝对不能写什么？
 
 ## Walkthrough
 
-1. **Read the boots.** The boots of the two days before ran through the whole working day. On the day of the incident the machine came up at 04:22 and was gone within a quarter of an hour, came up at 04:44 and lasted half an hour, came up at 07:52 and lasted a bit over an hour. The boot that began at 10:44 ran until 03:00 the next morning, and the boot of 2026-10-21 ran into the next day. Every short boot ended without a shutdown record. The guard log begins at 10:57 on that same morning, inside the first boot that lasted.
-2. **Rule out what you can.** Four causes stop a whole machine and can leave the journal silent: a kernel panic, a memory kill, a power event and a thermal shutdown. A panic leaves a trace in the journal, and there is none. A memory kill on this machine is a logged event that stops one process: Ray writes the node memory line and kills a worker, and the machine stays up, as the Ray out-of-memory scenario shows. That rules out the proposal to lower the memory fraction of the engine, because the symptom does not match. Power and heat remain, and the evidence cannot separate them directly, because nobody recorded the GPU temperature at the moment of any stop. What the evidence can show is what happened once the heat was held down.
-3. **Read the guard.** Every 5 s the script reads the GPU temperature. When a Miles container is running and the temperature is at or above 84, it pauses the container and notes the time. While paused, it resumes when the temperature is at or below 74 and at least 45 s have passed, or after 120 s no matter what. If the container is gone, it forgets it, and on exit it resumes whatever it paused, so no run stays frozen. The two timers are a floor and a ceiling: the floor gives the GPU time to cool, and the ceiling bounds the cost of any one pause.
-4. **Read the first hour.** The first rule was 80 and 68. The log shows a pause at 80 C and a resume at 68 C fifteen seconds later, then pause after pause within a minute. The team changed the rule by hand twice that morning, and from 11:27 it ran at 84 and 74. Four days later the pattern is steady: pause at 84 or 85 C, resume at 72 or 73 C after 45 s, about once a minute under load. The lab notes count 1,005 pauses up to 2026-10-22.
-5. **Read what the pauses cost.** Over the 9.3 hours of seeds 2 and 3, the container was paused for about 58 percent of the time. A pause stops the process and does not change its arithmetic, so the manual reads the reward, the answer lengths, the share of cut answers and the log-probability gap as valid, and says that it did not test this with a paused and an unpaused run of the same seed. The rollout times are not valid, and the manual does not report them for those seeds. Every wall-clock number from a guarded run needs the clean-step rule of the lab notes: time only steps that overlap no pause, and compare step numbers.
-6. **Place the guard in the safety plane.** The chaos lesson names a safety plane of kill switch, suppression windows, blast-radius limits and error-budget gates. The guard is a blast-radius limit on one container, with a resume-on-exit that acts as a kill switch for the guard itself. It lacks an alert, a temperature log of its own beyond the pause and resume lines, a bound on the total paused share of a run, and a test that the pause leaves results unchanged. It is a mitigation, not a diagnosis.
-7. **Write the postmortem.** The honest statement is that the machine stopped three times under sustained RL load with no cause in the journal, that a guard which holds the GPU at or under 84 C was running during every later boot, and that no stop recurred under it. That is a correlation with a plausible mechanism. The sentence "thermal shutdown confirmed" needs a temperature reading across a stop or a hardware event log, and neither exists.
+1. **看启动记录。** 前两天的启动平稳运行了整个工作日。事故当天，机器在 04:22 启动，一刻钟内就消失了；04:44 启动，持续了半小时；07:52 启动，持续了一个多小时。从 10:44 开始的那次启动一直运行到次日凌晨 03:00，2026-10-21 的启动则持续到了第二天。每次短暂的启动结束时都没有关机记录。守护脚本日志始于当天早晨 10:57，正处于首次持续运行的启动之中。
+2. **排除能排除的因素。** 导致整机停止且能让系统日志保持沉默的原因有四个：内核 panic、内存终止、电源事件和过热关机。panic 会在日志中留下痕迹，但这里没有。这台机器上的内存终止是有日志记录的事件，并且只停止一个进程：Ray 写入节点内存行并终止一个 worker，机器依然保持运行，正如 Ray 内存不足场景所示。这排除了调低引擎内存比例的提议，因为症状并不匹配。电源和过热依然是候选原因，证据无法直接把它们区分开，因为停机瞬间没人记录 GPU 温度。证据能说明的是：一旦过热得到控制，发生了什么。
+3. **读守护脚本。** 脚本每 5 s 读取一次 GPU 温度。当 Miles 容器在运行且温度达到或超过 84 C 时，它暂停容器并记录时间。在暂停状态下，当温度降到或低于 74 C 且至少过去 45 s 时恢复，或者不管怎样在 120 s 后恢复。如果容器消失，它就清除记录；在退出时它会恢复之前暂停的容器，所以没有运行会保持冻结。两个定时器一个是下限，一个是上限：下限给 GPU 散热时间，上限控制任何一次暂停的代价。
+4. **读第一个小时。** 最初的规则是 80 和 68。日志显示在 80 C 时暂停，15 秒后在 68 C 时恢复，随后一分钟内接连暂停。团队当天早晨手动修改了两次规则，从 11:27 起在 84 和 74 下运行。四天后规律保持稳定：在 84 或 85 C 时暂停，45 s 后在 72 或 73 C 时恢复，负载下大约每分钟一次。实验笔记统计截至 2026-10-22 累计暂停了 1,005 次。
+5. **看暂停付出了什么。** 在种子 2 和 3 长达 9.3 个小时的运行中，容器大约有 58% 的时间处于暂停状态。暂停停止了进程，但并没有改变其运算逻辑，所以手册把奖励、回答长度、截断回答比例和 log-probability 差距视为有效，并指出它没有用同一种子对比过暂停和不暂停的运行。rollout 时间无效，手册没有为这些种子报告它们。来自受守护运行的每个墙上时钟数字都需要遵循实验笔记的干净步规则：只对不重叠任何暂停的步骤计时，并比较步骤编号。
+6. **把守护放在安全平面中。** 混沌工程课指出了由熔断开关、抑制窗口、爆炸半径限制和错误预算门控组成的安全平面。这个守护脚本是对单个容器的爆炸半径限制，其退出时恢复的逻辑充当了守护脚本本身的熔断开关。它缺少告警、缺少除暂停和恢复行之外的独立温度日志、缺少对一次运行总暂停比例的上限限制，也缺少证明暂停不会改变结果的测试。它是一项缓解措施，而不是诊断。
+7. **写复盘。** 诚实的表述是：机器在持续 RL 负载下停止了三次，日志中没有原因；在此后的每次启动中，将 GPU 保持在 84 C 或以下的守护脚本都在运行；在它的控制下再也没有发生停机。这是一种具有合理机制的相关性。写下“已确认过热关机”需要跨越停机瞬间的温度读数或硬件事件日志，而两者都不存在。
 
 ## Resolution
 
-The cause is not recorded, and the postmortem says so. The mitigation is a guard that treats the machine's heat as a budget: pause the container at 84 C, resume at 74 C after at least 45 s, and never hold one pause longer than 120 s. With the guard on, the boot that began at 10:44 on 2026-10-18 ran until 03:00 the next day, the boot of 2026-10-21 ran into 2026-10-22 while the guard logged pauses through the afternoon, and the machine did not stop again across 1,005 pauses. The cost is measured too: 58 percent of the wall-clock time of seeds 2 and 3 was spent paused, so their rollout times are not reported, and every later timing follows the clean-step rule.
+原因没有被记录下来，复盘报告也应如实说明。缓解措施是一个将机器发热视为预算的守护脚本：84 C 时暂停容器，至少 45 s 且达到 74 C 时恢复，单次暂停绝不超过 120 s。开启守护后，2026-10-18 10:44 开始的启动一直运行到次日 03:00；2026-10-21 的启动持续到了 2026-10-22，守护脚本在整个下午记录暂停，机器在 1,005 次暂停中没有再停机。代价也得到了测量：种子 2 和 3 约 58% 的墙上时间花在暂停上，因此没有报告它们的 rollout 时间，后续所有计时都遵循干净步规则。
 
-The memory proposal is declined, because a memory kill is a logged event that stops a process and leaves the machine up. The cloud proposal is deferred, because the machine held for four days under the guard. The next steps are the ones that would turn the correlation into a cause: record the GPU temperature once a second to a file that survives a reboot, read the hardware event log after any stop, and run the same load once without the guard on a day when a stop costs nothing.
+调低内存的提议被拒绝，因为内存终止是有日志的事件，只会停止一个进程而让机器保持运行。云端 GPU 的提议被推迟，因为机器在守护下稳定运行了四天。接下来的步骤是将相关性转化为因果关系：每秒将 GPU 温度记录到重启后依然存在的文件中，停机后读取硬件事件日志，并在停机无代价的日子里关闭守护运行一次相同的负载。
 
 ## Wrong turns
 
-- "Lower the engine memory fraction, it must be out of memory." A memory kill writes a line and stops a process, and the journal has none while the whole machine stopped. A lower fraction also shrinks the pool for every rollout.
-- "The journal is empty, so it was power, call facilities." Not excluded, and worth a check. But the stops came under sustained load on one day and did not recur once the GPU was held at or under 84 C. Record the correlation and keep both candidates open.
-- "Set the guard to 80 C to be safe." The first rule ran at 80 and 68, and the log shows a pause every minute. The team raised it to 84 and 74 that morning. A tighter limit buys more pauses, and every pause enters a step time.
-- "Keep the guard and trust the step times." Seeds 2 and 3 spent 58 percent of their time paused. Time only steps that overlap no pause, and compare step numbers, as the lab notes do.
-- "Call it a thermal shutdown in the postmortem." No temperature was recorded at the moment of any stop. Write what was seen: three stops without a cause, and no stop since the guard.
+- "调低引擎内存比例，一定是内存不足。" 内存终止会写下一行并停止一个进程，而整机停止时日志中没有任何记录。更低的比例还会缩小每次 rollout 的池空间。
+- "日志是空的，所以是供电问题，联系后勤。" 供电问题不能排除，值得检查。但停机发生在单日的持续负载下，一旦 GPU 保持在 84 C 或以下就不再复发。记录这种相关性，并保持两个候选原因开放。
+- "把守护设为 80 C 以策安全。" 最初的规则在 80 和 68 下运行，日志显示每分钟暂停一次。团队当天早晨把它提高到了 84 和 74。更严的限制会带来更多暂停，而每次暂停都会进入步骤时间。
+- "保留守护脚本并相信步骤时间。" 种子 2 和 3 有 58% 的时间处于暂停中。像实验笔记那样，只对不重叠任何暂停的步骤计时，并比较步骤编号。
+- "在复盘中称之为过热关机。" 停机瞬间没有记录温度。只写看到的事实：三次停机没有原因，开启守护后再未停机。
 
 ## Generalize
 
-When a machine stops without a log line, the honest postmortem names the candidates, the evidence that rules each one out, and the mitigation you applied with its cost. A guard that keeps a resource under a limit is a safety plane for one container: it buys uptime with wall-clock time, so the measurement rules change on the day you turn it on, and the postmortem says "did not recur under the guard", never "cause found".
+当机器在没有日志行的情况下停机时，诚实的复盘应列出候选原因、排除各个原因的证据，以及所采取的缓解措施及其代价。将资源保持在限制以下的守护脚本是针对单个容器的安全平面：它用墙上时间换取正常运行时间，所以开启它的当天测量规则就会改变，复盘报告要写“在守护下未再复发”，绝不能写“已查明原因”。
 
 ## Taught in
 
-The Miles lab notes give the guard and the clean-step rule in [the heat guard section](../../../manuals/miles-101/sections/r-3-lab-notes.md#the-heat-guard), the SGLang manual records the three shutdowns and the paused share in [the two more seeds part of the rollout engine page](../../../manuals/sglang-101/sections/7-2-sglang-as-an-rl-rollout-engine.md#two-more-seeds), and [the chaos engineering lesson](../../../phases/17-infrastructure-and-production/24-chaos-engineering-llm/docs/en.md#guardrails-are-mandatory) and [the SRE for AI lesson](../../../phases/17-infrastructure-and-production/23-sre-for-ai/docs/en.md#runbooks-as-code) give the safety plane and the runbook shape.
+Miles 实验笔记在[温控守护章节](../../../manuals/miles-101/sections/r-3-lab-notes.md#the-heat-guard)给出了守护脚本和干净步规则，SGLang 手册在[rollout 引擎页的另外两个种子章节](../../../manuals/sglang-101/sections/7-2-sglang-as-an-rl-rollout-engine.md#two-more-seeds)记录了三次宕机和暂停时间占比，[混沌工程课程](../../../phases/17-infrastructure-and-production/24-chaos-engineering-llm/docs/en.md#guardrails)和 [AI SRE 课程](../../../phases/17-infrastructure-and-production/23-sre-for-ai/docs/en.md#runbook)给出了安全平面和 runbook 形式。

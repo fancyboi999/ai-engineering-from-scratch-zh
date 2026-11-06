@@ -1,6 +1,6 @@
 ---
 id: speedup-from-alpha
-title: From acceptance rate to tokens per pass
+title: 从接受率算出每次前向产出几个 token
 card: tokenization-decoding
 kind: estimate
 level: 3
@@ -16,58 +16,58 @@ related: [tokenization-decoding/read-the-speculative-step]
 updated: 2026-11-03
 ---
 
-A draft is accepted 80 percent of the time per token and proposes four tokens per step. How many tokens does one pass of the big model produce on average, how does the draft's own cost enter, and when does a longer draft stop paying?
+一个草稿的逐 token 接受率是 80%，每一步提议四个 token。大模型跑一次前向，平均产出几个 token？草稿自己的成本怎么算进来？草稿多长时就不再划算？
 
 ## Short answer
 
-The expected tokens per verifier pass are `(1 - alpha^(K + 1)) / (1 - alpha)`; at an acceptance of 0.8 and K of 4 that is 3.36, so about 3.36 times fewer big-model calls. The wall time per token is `(K c + 1)` over that expectation, where c is the draft's cost relative to the verifier, so a longer draft adds cost linearly while the geometric series saturates; at 0.8 acceptance and c of 0.05 the optimum sits around 5 to 7 drafts for about 3.2 times. The lever that matters is the acceptance rate: at a fixed K, a rise from 0.6 to 0.9 about doubles the expected tokens per pass.
+每次验证器前向产出的 token 期望是 `(1 - alpha^(K + 1)) / (1 - alpha)`；接受率 0.8、K 为 4 时是 3.36，即大模型调用次数约减少到 1/3.36。每个 token 的实际耗时是 `(K c + 1)` 除以这个期望，其中 c 是草稿相对验证器的成本，所以草稿越长成本线性增加，而几何级数会饱和；接受率 0.8、c 为 0.05 时，最优点在 5 到 7 个草稿，加速约 3.2 倍。真正起作用的是接受率：K 固定时，接受率从 0.6 升到 0.9，每次前向的期望 token 数大约翻倍。
 
 ## Full answer
 
-### The formula
+### 公式
 
-Each drafted token is accepted independently with probability alpha, and the step ends on the first rejected token, so the number of accepted drafts is a truncated geometric variable. Add the bonus token on full acceptance and the expectation is
+每个草稿 token 以概率 alpha 独立被接受，这一步在第一个被拒 token 处结束，所以被接受的草稿数是一个截断的几何变量。再加上全部接受时的额外 token，期望是
 
 ```text
 E[tokens per verifier pass] = (1 - alpha^(K + 1)) / (1 - alpha)
 ```
 
-| alpha | K | tokens per pass |
+| alpha | K | 每次前向的 token 数 |
 |---|---|---|
 | 0.8 | 4 | 3.36 |
 
-At a fixed K, a higher alpha raises every term of the series, so the expectation climbs steeply as alpha nears one.
+K 固定时，alpha 越高，级数的每一项都越大，所以 alpha 接近 1 时期望陡然上升。
 
-### Where the draft's cost enters
+### 草稿成本在哪里进来
 
-One step costs K draft forwards plus one verifier forward, `K c + 1` in verifier units. Divide by the expected tokens and you have the time per token. For a verifier at about 30 ms and a draft at about 3 ms, five drafts plus one verify is about 45 ms per step. The step emits between one and six tokens, so divide the 45 ms by the expected tokens per pass and compare the result with 30 ms for one plain token. As K grows the numerator grows linearly and the expectation flattens toward `1 / (1 - alpha)`, so there is an optimum.
+一步的成本是 K 次草稿前向加一次验证器前向，以验证器为单位是 `K c + 1`。除以期望 token 数，就是每个 token 的时间。验证器约 30 ms、草稿约 3 ms 时，五个草稿加一次验证约 45 ms 一步。一步产出 1 到 6 个 token，所以用 45 ms 除以每次前向的期望 token 数，再和普通解码一个 token 的 30 ms 比较。K 增大时，分子线性增长，期望却趋平到 `1 / (1 - alpha)`，所以存在一个最优点。
 
-| alpha | c | best K | speedup |
+| alpha | c | 最优 K | 加速 |
 |---|---|---|---|
-| 0.8 | 0.05 | about 5 to 7 | about 3.2 times |
-| 0.95 | 0.02 | about 8 to 10 | toward 5 times |
+| 0.8 | 0.05 | 约 5 到 7 | 约 3.2 倍 |
+| 0.95 | 0.02 | 约 8 到 10 | 接近 5 倍 |
 
-### What moves alpha
+### 什么在影响 alpha
 
-How close the draft's distribution is to the verifier's, which is a function of how the draft was built; the sampling temperature, where greedy against greedy accepts most; and the task, where code and structured output accept more than free-form prose.
+草稿的分布和验证器有多接近，这取决于草稿是怎么构建的；采样温度，贪心对贪心时接受最多；任务，代码和结构化输出比自由文本接受得多。
 
-### Where the formula stops being the whole story
+### 公式在哪里不再是全部
 
-At high concurrency the verify pass is no longer free: the decode batch already fills the memory bandwidth, and a rejected draft costs a verify and a re-roll. The production lesson's rule is that below an acceptance of about 0.55 speculation is net negative at high concurrency, so measure alpha on real traffic before you set K.
+高并发下，验证前向不再是免费的：解码 batch 已经占满了内存带宽，一次被拒的草稿要付出一次验证和一次重抽。生产课程的规则是：高并发下接受率低于约 0.55 时，推测解码是净亏的，所以先在真实流量上测出 alpha，再定 K。
 
 ## Follow-ups
 
-- **Level 3:** At an acceptance of 0.95 and a draft cost of 0.02, where is the optimum? Expected: around 8 to 10 drafts, with the speedup pushing toward 5 times.
-- **Level 3:** Why does the expectation saturate as K grows? Expected: it is a geometric series; the probability that all drafts up to position K are accepted falls as alpha to the K, so late positions add almost nothing.
-- **Level 4:** How does batch size change the arithmetic? Expected: the verifier's extra work per draft is no longer hidden behind idle bandwidth, so the effective cost of verification and of a rejection rises, and the break-even acceptance climbs toward 0.45 to 0.55.
-- **Level 4:** What single measurement do you add to the dashboard? Expected: accepted draft tokens divided by proposed draft tokens, per traffic slice, so alpha is visible where the formula needs it.
+- **Level 3:** 接受率 0.95、草稿成本 0.02 时，最优点在哪？ Expected: 大约 8 到 10 个草稿，加速接近 5 倍。
+- **Level 3:** K 增大时，期望为什么会饱和？ Expected: 这是几何级数；前 K 个草稿全部被接受的概率按 alpha 的 K 次方下降，靠后的位置几乎不再贡献。
+- **Level 4:** batch 大小怎样改变这笔账？ Expected: 验证器为每个草稿多做的工作不再藏在闲置带宽后面，验证和拒绝的实际成本上升，盈亏平衡的接受率升到 0.45 到 0.55。
+- **Level 4:** 你会在看板上加哪一个指标？ Expected: 按流量切片统计被接受的草稿 token 数除以提议的草稿 token 数，让 alpha 在公式需要的地方可见。
 
 ## Wrong answers
 
-- "The speedup equals the draft length." Only if every draft is accepted; the geometric series and the draft cost cut it well below K.
-- "Doubling K doubles throughput." Beyond the optimum the extra drafts are mostly rejected and their cost is paid anyway.
-- "A draft ten times cheaper gives ten times the speedup." The draft cost sets c; the acceptance rate sets the expectation, and a cheap draft that is often wrong gains little.
+- "加速比等于草稿长度。" 只有每个草稿都被接受时才成立；几何级数和草稿成本会让它远低于 K。
+- "K 翻倍，吞吐量就翻倍。" 超过最优点后，多出来的草稿大多被拒，成本却照付。
+- "草稿便宜十倍，就能加速十倍。" 草稿成本决定的是 c；接受率决定期望，一个便宜却经常猜错的草稿收益很小。
 
 ## Taught in
 
-The [Phase 10 speculative decoding lesson](../../../phases/10-llms-from-scratch/25-speculative-decoding/) derives the expectation, the [EAGLE-3 lesson](../../../phases/10-llms-from-scratch/15-speculative-decoding-eagle3/) adds the draft cost and the optimum, the [Phase 7 speculative decoding lesson](../../../phases/07-transformers-deep-dive/16-speculative-decoding/) gives the millisecond example, and the [production EAGLE-3 lesson](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/) sets the break-even.
+[阶段 10 推测解码课程](../../../phases/10-llms-from-scratch/25-speculative-decoding/)推导了期望，[EAGLE-3 课程](../../../phases/10-llms-from-scratch/15-speculative-decoding-eagle3/)加入了草稿成本和最优点，[阶段 7 推测解码课程](../../../phases/07-transformers-deep-dive/16-speculative-decoding/)给出了毫秒级的例子，[生产环境 EAGLE-3 课程](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/)给出了盈亏平衡线。

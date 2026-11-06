@@ -1,6 +1,6 @@
 ---
 id: the-single-agent-ceiling
-title: Where one agent stops working, and why
+title: 单个 agent 在哪里遇到瓶颈，为什么
 card: multi-agent
 kind: concept
 level: 1
@@ -16,45 +16,45 @@ related: []
 updated: 2026-11-03
 ---
 
-Your single agent does well on small tasks. Pointed at a codebase of 200 files in three languages, with tests that need infrastructure and an external API to research first, it stops making progress. The team proposes a model with a bigger window. What is the ceiling it hit, and would a bigger window remove it?
+你的单 agent 方案在精简的小任务上表现良好。但面对一个跨越三种语言、包含 200 个文件，且测试依赖基础设施并需先调研外部 API 的代码库时，它停止推进了。团队提议更换为上下文窗口更大的模型。它遭遇的瓶颈是什么，更大的窗口能否消除它？
 
 ## Short answer
 
-The task exceeds what one loop, one window and one system prompt can carry, and a bigger window only moves one of three limits. Context saturates as tool results pile up, so details from an early turn are gone by turn 30, and one prompt that asks the model to research, code, review and test produces an agent that does each one poorly. One loop reads file A, then B, then C, with no parallelism. The fix for all three is to split the work so that each agent has one job, one window and one prompt.
+该任务超出了单个循环、单个窗口以及单份系统 prompt 所能承载的范围，而更大的窗口只能推迟三项限制中的一项。随着工具结果的累积，上下文达到饱和，早期轮次的细节到第 30 轮时已经丢失；要求模型同时调研、编写代码、审查和测试的单份 prompt 会产生一个各项都做不好的 agent。单个循环只能依次读取文件 A、B 和 C，没有并行性。解决这三项问题的方案是将工作拆解开来，使每个 agent 拥有一个职责、一个窗口和一份 prompt。
 
 ## Full answer
 
-### Three things break
+### 三处失效
 
-1. **Context saturation.** Tool results accumulate. By turn 30 the agent has consumed about 150k tokens of file contents, command output and its own reasoning, and the detail from turn 5 is lost. Reading 50 large files can pass a 200k window.
-2. **Role confusion.** A system prompt that says you are a researcher, a coder, a reviewer and a tester produces an agent that half-researches, half-codes and never finishes the review.
-3. **Sequential bottleneck.** The agent reads three files in three serial model calls and three serial tool executions. Nothing runs at the same time.
+1. **上下文饱和。** 工具结果不断累积。到第 30 轮时，agent 已消耗了约 150k token 的文件内容、命令输出及其自身推理，第 5 轮的细节已经丢失。读取 50 个大文件便可超过 200k 窗口。
+2. **角色混乱。** 声明你既是研究员、程序员、审查员又是测试员的系统 prompt，会产生一个半吊子调研、半吊子编码且从未完成审查的 agent。
+3. **顺序瓶颈。** Agent 在三次串行模型调用和三次串行工具执行中读取三个文件。没有任何事情是同时运行的。
 
-### What a bigger window changes
+### 更大的窗口改变了什么
 
-It delays the first limit and does nothing for the other two. The agent still forgets what it read 40 tool calls ago, because the problem is attention over a long history, not the hard limit. The prompt still asks one model to be four roles. The loop is still serial.
+它延缓了第一项限制，对另外两项则毫无作用。Agent 仍会忘记 40 次工具调用前读取的内容，因为问题在于跨漫长历史的注意力，而不是硬性限制。Prompt 仍要求一个模型担任四种角色。循环仍是串行的。
 
-### The split
+### 拆解
 
-Give each agent one job, one window and one prompt tuned for that job. The researcher reads documents and outputs only the facts needed for implementation. The coder receives those facts and writes code. The reviewer receives the code and finds bugs. The researcher's reading never enters the reviewer's window, because each agent receives only the messages addressed to it.
+赋予每个 agent 一个职责、一个窗口和一份针对该工作调优的 prompt。研究员阅读文档并仅输出实现所需的事实。程序员接收这些事实并编写代码。审查员接收代码并寻找 bug。研究员的阅读过程绝不进入审查员的窗口，因为每个 agent 仅接收发给它的消息。
 
-### When to stay single
+### 何时保持单 Agent
 
-The lesson's rule of thumb: a task that takes fewer than 20 tool calls and fits in 100k tokens stays with one agent. Splitting costs more total tokens, adds coordination logic that has its own bugs, and turns debugging from reading one conversation into tracing messages across several.
+课程的经验法则：少于 20 次工具调用且适合 100k token 的任务保持使用单 agent。拆解会消耗更多总 token，增加带有自身 bug 的协调逻辑，并将调试从阅读单一对话变成在多个对话之间追踪消息。
 
 ## Follow-ups
 
-- **Level 1:** Which of the three limits does parallelism address? Expected: the sequential bottleneck only, because reading three files at once does not shrink any one window or sharpen any one prompt.
-- **Level 2:** Why does a specialized prompt improve each stage? Expected: a prompt that covers one role can be specific about inputs, outputs and what to ignore, while a prompt for four roles has to be generic.
-- **Level 2:** What is the cost that the split always adds? Expected: more total tokens, because each agent is a separate model call, plus latency and coordination logic.
-- **Level 3:** Where does information get lost in a multi-agent split? Expected: at every agent boundary, where one agent's full context is compressed into a message for the next.
+- **Level 1:** 并行性解决了三项限制中的哪一项？ Expected: 仅解决顺序瓶颈，因为同时读取三个文件既不会缩小任何一个窗口，也不会明确任何一份 prompt。
+- **Level 2:** 为什么专用 prompt 会改善每个阶段？ Expected: 涵盖单一角色的 prompt 可以具体明确输入、输出和需要忽略的内容，而涵盖四个角色的 prompt 只能是泛泛的。
+- **Level 2:** 拆解总是会增加什么成本？ Expected: 更多总 token，因为每个 agent 是单独的模型调用，加上延迟和协调逻辑。
+- **Level 3:** 在多 agent 拆分中，信息在何处丢失？ Expected: 在每个 agent 边界处，一个 agent 的完整上下文被压缩成发给下一个 agent 的消息。
 
 ## Wrong answers
 
-- "A bigger context window solves it." The window moves one limit and leaves role confusion and the serial loop untouched.
-- "A longer, more detailed system prompt covers the roles." A single prompt that covers four roles is the cause of role confusion, not the cure.
-- "Always split, because specialists are better." Below about 20 tool calls and 100k tokens, the split adds cost and bugs for no gain.
+- "更大的上下文窗口可以解决该问题。" 该窗口推迟了一项限制，而未触及角色混乱和串行循环。
+- "更长、更详细的系统 prompt 可以覆盖这些角色。" 涵盖四个角色的单一 prompt 是角色混乱的原因，而不是解药。
+- "一律拆解，因为专家更好。" 在约 20 次工具调用和 100k token 以下，拆解增加了成本和 bug，却毫无收益。
 
 ## Taught in
 
-The [why multi-agent lesson](../../../phases/16-multi-agent-and-swarms/01-why-multi-agent/) names the three limits and the rule of thumb for staying single.
+[为什么使用多 agent 课程](../../../phases/16-multi-agent-and-swarms/01-why-multi-agent/)指明了这三项限制以及保持单 agent 的经验法则。

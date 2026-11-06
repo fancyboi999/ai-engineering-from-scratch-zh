@@ -1,6 +1,6 @@
 ---
 id: rate-sweep-never-reached-steady-state
-title: A rate sweep that never reached steady state
+title: 从未进入稳态的速率扫描
 card: scenarios
 kind: incident
 level: 4
@@ -27,57 +27,58 @@ source:
   - manuals/sglang-101/capture/gpu/out-l4/server-h2h-rate-vllm.log
 ---
 
+
 ## Situation
 
-A platform team must size a fleet of L4 cards for a new chat API. They run a rate sweep against one card with `Qwen/Qwen3-8B`: requests arrive at a fixed rate from 0.5 to 16 per second, each request with a 512-token prompt and a 128-token answer. Every run completes and no request fails. The output rises to 286.6 tokens per second at 4 per second and is still 205.8 at 16. The capacity report concludes that one card can take 16 requests each second, so the fleet plan divides the expected peak by 16.
+一个平台团队要为新的聊天 API 估算需要多少张 L4 卡。他们在一张卡上用 `Qwen/Qwen3-8B` 做速率扫描：请求以固定速率到达，从每秒 0.5 个到每秒 16 个，每个请求带 512 token 的 prompt，返回 128 token 的回答。每次运行都跑完了，没有请求失败。输出在每秒 4 个请求时升到每秒 286.6 token，到每秒 16 个时仍有 205.8。容量报告的结论是一张卡每秒能接 16 个请求，所以集群规划用预期峰值除以 16。
 
-You get the report the evening before the purchase order goes out. It shows throughput per rate and the median wait for the first token at each rate, and it labels that column "latency under load, expected". Nothing in the report says how long each run lasted or what the GPU clock did.
+采购单发出的前一晚，报告到了你手里。报告列出每个速率下的吞吐量和首 token 等待时间的中位数，并把这一列标为"负载下的延迟，预期值"。报告没有写每次运行持续了多久，也没有写 GPU 时钟发生了什么变化。
 
 ## Evidence
 
-- [the L4 rate sweep from 0.5 to 16 requests per second](evidence/rate-sweep-table.txt)
-- [what a fixed request rate does that a closed loop cannot](evidence/closed-loop-against-fixed-rate.txt)
-- [the run length of the rate sweep](evidence/how-long-each-run-lasted.txt)
-- [the SGLang pool and one decode line with requests waiting](evidence/sglang-under-the-rate.txt)
-- [the vLLM pool and one stats line with requests waiting](evidence/vllm-under-the-rate.txt)
-- [which rates kept up, which met the target, and which row the manual refuses to compare](evidence/goodput-by-rate.txt)
-- [completed requests per second as the offered rate rose past the peak](evidence/overload-cost-throughput.txt)
+- [L4 上从每秒 0.5 到 16 个请求的速率扫描](evidence/rate-sweep-table.txt)
+- [固定请求速率能做到而闭环做不到的事](evidence/closed-loop-against-fixed-rate.txt)
+- [速率扫描的运行时长](evidence/how-long-each-run-lasted.txt)
+- [SGLang 的内存池和一行有请求排队的 decode 日志](evidence/sglang-under-the-rate.txt)
+- [vLLM 的内存池和一行有请求排队的统计日志](evidence/vllm-under-the-rate.txt)
+- [哪些速率跟得上、哪些达到目标，以及手册拒绝比较的那一行](evidence/goodput-by-rate.txt)
+- [请求到达速率超过峰值后，每秒完成的请求数](evidence/overload-cost-throughput.txt)
 
 ## Questions
 
-1. Which column of the report proves that the card kept up with the arrivals, and at which rate does that proof stop?
-2. A closed loop at 64 users and an open loop at 16 per second both complete. What is different about the queue in the two cases?
-3. The median first token at 16 per second was 94,322 ms. What would that number be if the run had lasted twice as long, and why?
-4. Read the two log lines. How many requests ran and how many waited on each engine, and what set that limit?
-5. Define the capacity of this card for a target of one second and 100 ms, from the evidence.
-6. Write the rate test you would run instead, and the stopping rule that tells you a point is above capacity.
+1. 报告中哪一列能证明这张卡跟上了请求到达的速度？这个证明在哪个速率失效？
+2. 64 个用户的闭环和每秒 16 个请求的开环都能跑完。两种情况下的队列有什么不同？
+3. 每秒 16 个请求时，首 token 中位数为 94,322 ms。如果运行时间加倍，这个数会变成怎样？为什么？
+4. 读两行日志。每个引擎上有多少请求在运行、多少在等待？这个上限由什么决定？
+5. 根据证据，以首 token 1 秒、每 token 100 ms 为目标，定义这张卡的容量。
+6. 写出你会改用的速率测试，以及判断某个点已超出容量的停止规则。
 
 ## Walkthrough
 
-1. **Read the table as a time series, not as a list of points.** Up to 2 per second the output grows with the rate: 70.6 at 0.5, 123.6 at 1 and 227.8 at 2 for vLLM, and the median TTFT stays between 180 and 317 ms. The server finishes work as fast as it arrives. At 4 per second the output is 286.6 and the median TTFT is 8,304 ms. At 8 the pair is 261.8 and 27,510 ms, and at 16 it is 205.8 and 94,322 ms. The output peaked at 4 and then fell, while each doubling of the rate multiplied the first token by more than three. The clock column falls from 1,245 MHz at 4 to 450 MHz at 16.
-2. **Name the loop.** The second listing separates the two kinds of load test. A closed loop with a fixed number of users never falls behind, because a user sends the next request only after the answer. A fixed rate keeps sending whether the server keeps up or not. Past the rate the server can serve, the queue grows, and the first token takes longer with every request. From 4 per second, the first-token column of the report measures queue time.
-3. **Ask how long the run was.** The third listing gives the run length: at least 32 prompts, or 30 seconds of arrivals. A median TTFT of 94,322 ms from a run with 30 seconds of arrivals means that the typical request waited longer than the whole arrival window. The queue was still growing when the last request arrived. Run the same rate for twice as long and the median grows, because every extra second of arrivals adds work that the server cannot drain. The number is a property of the run length, not of the card. That is what a point above capacity looks like: the latency never settles.
-4. **Count who ran and who waited.** SGLang ran 37 requests with 71 in its queue and the pool 93 percent full. vLLM ran 43 requests with 30 waiting and 99.7 percent of its pool in use. The pools hold 24,094 and 24,096 tokens, so about forty requests of 512 plus 128 tokens fit at once. Everything that arrives faster than those slots free up waits. The engines differ only in how many they admit before they queue.
-5. **Define capacity from goodput.** The manual set two limits, 1 s to the first token and 100 ms per token. At 2 per second, vLLM served a median of 1.36 requests per second within those limits and SGLang 0.88, with overlapping seed ranges. From 4 per second, no request met them on either engine. So the card sustains that target somewhere between 2 and 4 per second, and the number to plan with is 2. The row at 16 is not even comparable: every run of both engines stayed under 1,000 MHz after three tries, so the manual does not compare it.
-6. **Count what overload cost.** The last listing is the same card in the open loop of the SGLang manual. Past its peak, the BF16 server completed fewer requests as more were offered: 2.01 per second at 4 offered, 1.91 at 8 and 1.62 at 16. The median SM clock fell from 1,320 MHz at 4 offered to 465 MHz at 16, and 70 percent of the samples showed thermal slowdown. On this passively cooled card, overload is not free. It heats the GPU, the clock falls, and the server completes less than it did at a lower rate.
+1. **把表格当成时间序列读，而不是一串独立的点。** 到每秒 2 个为止，输出随速率增长：vLLM 在 0.5 时为 70.6，在 1 时为 123.6，在 2 时为 227.8，TTFT 中位数保持在 180 到 317 ms 之间。服务器处理工作的速度跟得上工作到达的速度。到每秒 4 个时，输出为 286.6，TTFT 中位数为 8,304 ms。每秒 8 个时这对数为 261.8 和 27,510 ms，每秒 16 个时为 205.8 和 94,322 ms。输出在 4 时达到峰值然后下降，而速率每翻一倍，首 token 时间就变成三倍以上。时钟列从 4 时的 1,245 MHz 降到 16 时的 450 MHz。
+2. **认清是哪种循环。** 第二份记录区分了两种负载测试。用户数固定的闭环永远不会落后，因为用户收到回答后才发下一个请求。固定速率则不管服务器跟不跟得上，都照样发送。一旦超过服务器能处理的速率，队列就会增长，每个请求的首 token 都比前一个更晚。从每秒 4 个开始，报告中的首 token 列测的是排队时间。
+3. **问运行持续了多久。** 第三份记录给出了运行时长：至少 32 个 prompt，或 30 秒的到达时间。在只有 30 秒到达时间的运行中，TTFT 中位数为 94,322 ms，说明一个典型请求的等待时间比整个到达窗口还长。最后一个请求到达时，队列仍在增长。用同样的速率运行两倍时长，中位数会变大，因为每多一秒到达，就多一份服务器消化不了的工作。这个数是运行时长的属性，不是这张卡的属性。超出容量的点就是这个样子：延迟永远稳定不下来。
+4. **数一数谁在运行、谁在等待。** SGLang 运行 37 个请求，队列中有 71 个，内存池 93% 已满。vLLM 运行 43 个请求，30 个在等待，内存池使用了 99.7%。两个池分别容纳 24,094 和 24,096 个 token，所以同时只放得下大约四十个 512 加 128 token 的请求。到达速度超过槽位释放速度时，多出来的请求都要等待。两个引擎的区别只在于排队前接纳了多少个。
+5. **用 goodput 定义容量。** 手册设了两条限制：首 token 1 s，每 token 100 ms。每秒 2 个时，vLLM 在限制内服务的请求中位数为每秒 1.36 个，SGLang 为 0.88 个，两者的种子范围有重叠。从每秒 4 个起，两个引擎都没有一个请求满足限制。所以这张卡能维持该目标的速率在每秒 2 到 4 个之间，规划时用 2。每秒 16 那一行甚至没有可比性：两个引擎的每次运行试了三次，时钟都低于 1,000 MHz，所以手册不比较它。
+6. **算一算过载的代价。** 最后一份记录是同一张卡在 SGLang 手册开环测试中的结果。过了峰值以后，BF16 服务器收到的请求越多，完成的越少：每秒到达 4 个时，每秒完成 2.01 个；每秒到达 8 个时，完成 1.91 个；每秒到达 16 个时，完成 1.62 个。SM 时钟中位数从每秒到达 4 个时的 1,320 MHz 降到每秒到达 16 个时的 465 MHz，70% 的采样显示过热降速。在这张被动散热的卡上，过载不是免费的。它让 GPU 发热，时钟下降，服务器完成的工作比低速率时还少。
 
 ## Resolution
 
-The report mistook completion for capacity. A fixed-rate run always completes, because the client stops sending at the end of its arrival window and the server drains the queue afterwards. The first-token column from 4 per second up is the length of that queue, and at 16 per second it reached 94,322 ms after 30 seconds of arrivals. The card never served 16 requests per second within any latency target. It served about 2 per second within the target of 1 s and 100 ms, with vLLM at 1.36 and SGLang at 0.88 requests per second of goodput at an offered 2.
+报告把跑完当成了容量。固定速率的运行总能跑完，因为客户端在到达窗口结束时停止发送，服务器之后再把队列清空。从每秒 4 个开始，首 token 列就是这个队列的长度；到每秒 16 个时，在 30 秒的到达之后它达到了 94,322 ms。这张卡在任何延迟目标下都没有做到每秒服务 16 个请求。在 1 s 和 100 ms 的目标下，它能服务大约每秒 2 个：请求到达速率为每秒 2 个时，vLLM 的 goodput 为每秒 1.36 个请求，SGLang 为 0.88 个。
 
-The peak is divided by 2, not by 16, before any headroom. The test changes in four ways. Run each rate long enough to see whether the first token settles; if the median TTFT rises when you extend the run, the rate is above capacity and the number is meaningless. Report goodput per offered rate against your own target, next to the throughput. Record the SM clock and the temperature, and repeat or discard any point that fell under the clock floor, as the manual did for the row at 16. Run the closed loop too, because the closed loop finds the knee by user count and the open loop finds the rate the card sustains, and a plan needs both.
+峰值要除以 2 而不是 16，然后再留余量。测试有四处改动。每个速率都要运行足够长，看首 token 能否稳定下来；如果延长运行后 TTFT 中位数上升，说明这个速率超出了容量，这个数没有意义。在吞吐量旁边，按你自己的目标报告每个请求到达速率下的 goodput。记录 SM 时钟和温度，凡是时钟低于下限的点，重跑或丢弃，就像手册对每秒 16 那一行的处理。也要跑闭环，因为闭环按用户数找到拐点，开环找到这张卡能维持的速率，规划两者都需要。
 
 ## Wrong turns
 
-- "Every run finished, so the card handles 16 per second." A fixed-rate client stops sending at the end of its window and the server drains the queue afterwards. Completion is guaranteed. The 94,322 ms median first token is the queue, not the service.
-- "Output was still 205.8 tokens per second at 16, so throughput held." Output fell from 286.6 at 4 per second to 205.8 at 16 while the clock fell from 1,245 to 450 MHz. The server did less work at the higher rate, and the open loop of the SGLang manual shows the same fall in completed requests per second.
-- "Take the TTFT at 16 as the worst case users will see." That value depends on how long the test ran. Extend the run and it grows. A number that grows with the run length describes the test, not the server.
-- "Switch to the engine with the lower TTFT at 8 per second." At 8 per second both engines were far past capacity, 27,510 against 37,211 ms. Choosing between two overloaded servers by their queue length is not a capacity decision.
+- "每次运行都跑完了，所以这张卡能处理每秒 16 个。" 固定速率客户端在窗口结束时停止发送，服务器之后再清空队列。跑完是必然的。94,322 ms 的首 token 中位数是队列，不是服务。
+- "每秒 16 个时输出仍有每秒 205.8 token，所以吞吐量撑住了。" 输出从每秒 4 个时的 286.6 降到 16 个时的 205.8，同时时钟从 1,245 降到 450 MHz。速率更高时服务器做的工作更少，SGLang 手册的开环测试也显示每秒完成的请求数同样在下降。
+- "把每秒 16 个时的 TTFT 当作用户会遇到的最坏情况。" 这个值取决于测试跑了多久。延长运行，它就变大。随运行时长增长的数字描述的是测试，不是服务器。
+- "选每秒 8 个时 TTFT 更低的那个引擎。" 每秒 8 个时两个引擎都远远超出容量，分别为 27,510 和 37,211 ms。按队列长度在两台过载的服务器之间做选择，不是容量决策。
 
 ## Generalize
 
-A system above its service rate has no steady state, so every latency you measure there is a function of how long you measured. Capacity is the highest offered rate at which the latency settles and the goodput holds, found with an open loop that runs long enough to prove the settling, and confirmed with a closed loop for the user count. Completion, throughput and a median taken from a growing queue are not capacity.
+超过服务速率的系统没有稳态，所以在那里测到的每个延迟都取决于你测了多久。容量是延迟能稳定下来、goodput 能保持住的最高请求到达速率。要用一个跑得足够久、能证明延迟稳定的开环去找它，再用闭环确认对应的用户数。跑完、吞吐量，以及从不断增长的队列中取出的中位数，都不是容量。
 
 ## Taught in
 
-The vLLM manual gives the sweep in [the lab notes](../../../manuals/vllm-101/sections/r-7-lab-notes.md) and the two loops in [the benchmark page](../../../manuals/vllm-101/sections/5-1-benchmark-your-server-in-15-minutes.md#choose-a-closed-loop-or-a-fixed-rate), the SGLang manual reads the same pair at [a fixed arrival rate](../../../manuals/sglang-101/sections/5-3-reading-other-peoples-benchmarks.md#the-same-pair-at-a-fixed-arrival-rate) and runs its own open loop in [the benchmark serving page](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md), and [the inference metrics lesson](../../../phases/17-infrastructure-and-production/08-inference-metrics-goodput/docs/en.md) defines goodput while [the load testing lesson](../../../phases/17-infrastructure-and-production/22-load-testing-llm-apis/docs/en.md) names the four load patterns.
+vLLM 手册在[实验笔记](../../../manuals/vllm-101/sections/r-7-lab-notes.md)中给出这次扫描，在[基准测试页](../../../manuals/vllm-101/sections/5-1-benchmark-your-server-in-15-minutes.md#choose-a-closed-loop-or-a-fixed-rate)中讲两种循环，SGLang 手册在[固定到达速率一节](../../../manuals/sglang-101/sections/5-3-reading-other-peoples-benchmarks.md#the-same-pair-at-a-fixed-arrival-rate)解读同一对引擎，并在[基准测试服务页](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)运行它自己的开环测试，[推理指标课](../../../phases/17-infrastructure-and-production/08-inference-metrics-goodput/docs/en.md)定义了 goodput，[负载测试课](../../../phases/17-infrastructure-and-production/22-load-testing-llm-apis/docs/en.md)列出了四种负载模式。

@@ -1,6 +1,6 @@
 ---
 id: spatial-reasoning-limit
-title: A general VLM for which shelf the item is on
+title: 通用 VLM 判断物品在哪个货架
 card: multimodal
 kind: tradeoff
 level: 2
@@ -16,55 +16,55 @@ related: [multimodal/vlm-three-parts]
 updated: 2026-11-03
 ---
 
-A warehouse team wants a general vision-language model to answer "which shelf is the item on" and "is the box on top of or under the pallet" from camera frames. They plan to ship as soon as a demo works on ten images. What do you tell them?
+某仓储物流团队希望直接用通用视觉语言模型（VLM），根据监控摄像头抓拍画面回答“货物在哪个货架上”以及“箱子是在托盘上方还是下方”。他们计划只要在 10 张测试图片上的 Demo 能跑通，就直接上线生产。你会对他们说什么？
 
 ## Short answer
 
-Spatial relations are the weak spot of today's general-purpose vision-language models: on benchmarks of above and below, left and right, counting and distance they score about 50 to 60 percent, below human level. A demo on ten images proves nothing about that distribution. Build a labelled eval of a few hundred frames with the exact questions first, measure the model, and compare it with a specialised detection or depth model whose box geometry you post-process; if the general model stays, fine-tune it on the task and keep a human-review route for low-confidence answers.
+空间关系是当前通用视觉语言模型的薄弱环节：在包含上下、左右、计数和物理距离的基准评测中，这类模型的准确率通常仅在 50% 到 60% 之间，严重落后于人类水平。仅在 10 张图片上做 Demo 完全无法反映真实的数据分布。首先应基于几百张真实抓拍帧与业务提问构建打标评估集以测量模型真实基准，并将其与经过后处理边界框几何计算的专用目标检测或深度估计模型做对比；若仍决定沿用通用 VLM，则必须针对具体任务精细微调，并在生产中保留低置信度结果的人工复核路由。
 
 ## Full answer
 
-### Why the general model struggles
+### 通用模型在空间关系上遇到困难的原因
 
-The model sees projected patch tokens and reasons in language. It learned what is in an image from caption pairs that rarely say where exactly. The lesson's figure for spatial reasoning benchmarks is 50 to 60 percent, and its recommended alternatives for pure spatial tasks are a keypoint or pose estimator, a depth model, or a detector with the box geometry post-processed.
+通用模型接收的是经过投影降维的 patch token，并在纯语言空间推导。它在预训练阶段所依赖的图文对通常只粗略描述画面中“有什么”，极少精准指明“具体在哪里”。课程引用的数据显示通用模型在空间几何推理基准上的准确率仅为 50% 到 60%；对于纯粹的空间几何任务，课程推荐的备选方案是关键点与姿态估计器、深度模型，或者在目标检测器产出的边界框（Bounding Box）上编写几何后处理规则。
 
-### What a real eval looks like
+### 真实的评估方案
 
-- A few hundred frames from the warehouse cameras, not stock photos, with the two question types written the way the operators will ask them.
-- Labels from two people, with the agreement measured.
-- A split by lighting and camera position, because the demo images will not cover them.
-- A confusion matrix per question type, not one accuracy number.
+- 采集数以百计来自真实仓库监控机位的真实视频帧（绝非摆拍或网络图库），提问语句必须贴合库管人员日常操作的自然口吻。
+- 由两人标注，并测量标注一致性。
+- 按现场光照阴暗变化与机位俯仰角度分层切分，因为 10 张 Demo 图片绝不可能覆盖这些工业级长尾。
+- 输出针对不同空间关系类别的混淆矩阵（Confusion Matrix），而不是给出一个综合准确率数字。
 
-### The alternatives
+### 备选方案
 
-| Approach | Strength | Cost |
+| 技术路径 | 核心优势 | 关键代价 |
 |---|---|---|
-| Detector plus box geometry | exact image-plane above, under, left and right from coordinates | labels for the object classes; no language interface |
-| Depth model plus detector | distance and stacking | calibration per camera |
-| General VLM, zero-shot | any question in plain language | weak on spatial relations; hallucination risk |
-| General VLM, fine-tuned | a plain-language interface with the domain learned | 5,000 to 50,000 labelled examples and hours of GPU time |
+| 目标检测器加边界框几何算法 | 从二维坐标直接计算准确的上、下、左、右关系 | 需要为各类特定货物打标；缺乏自由自然语言交互界面 |
+| 深度估计模型加检测器 | 能精准判断三维景深距离与物理堆叠层级 | 每台相机都要校准 |
+| 通用 VLM 零样本推理 | 支持任意自然语言提问，泛化能力强 | 空间几何关系能力极弱；存在严重的视觉幻觉风险 |
+| 通用 VLM 领域微调 | 既保留自然语言交互接口，又习得特定仓库垂直领域先验 | 需要 5,000 到 50,000 条高质量打标样本以及若干小时 GPU 训练算力 |
 
-### If the VLM stays
+### 若业务必须坚持使用 VLM
 
-Fine-tune with low-rank adapters on the attention and projector layers, which the lesson sizes at rank 16 to 64 on one datacenter GPU for 2 to 10 hours. Then monitor hallucination in production: a cross-modal error rate flags answers where the text confidence is high but the image-text similarity is low, and routes them to review.
+在注意力层与投影层上用低秩自适应（LoRA）微调（课程建议在单张数据中心 GPU 上配置 rank 16 到 64 训练 2 到 10 个小时）。随后在生产环境中部署幻觉监控体系：通过跨模态误差率（Cross-modal error rate）监控文本生成置信度极高但图文语义相似度极低的异常回答，并自动将其路由给人工复核。
 
-### What to tell them
+### 该怎么跟他们说
 
-Ship a measured system, not a demo. Ten images is a smoke test. The eval decides between the detector route and the fine-tuned model, and the hallucination monitor stays whichever route wins.
+交付经过测量的系统，而不是 demo。10 张图像只是冒烟测试。由评估来决定走检测器路线还是微调模型路线，无论哪种路线，幻觉监控都要保留。
 
 ## Follow-ups
 
-- **Level 2:** Why does a model that captions well fail at which object is on top? Expected: captions describe content, not geometry; the training pairs rarely contain precise relations, and fine position fades as the language model reasons over projected tokens.
-- **Level 2:** What does the detector route lose? Expected: the plain-language interface and the open vocabulary; it answers only the relations you compute from boxes, for the classes you labelled.
-- **Level 3:** How many frames does the eval need, and how do you decide? Expected: enough that each question type and each camera condition has tens of examples; a few hundred in total is the floor, and you grow it where the confusion matrix is unstable.
-- **Level 3:** How does a stronger encoder change the picture? Expected: self-supervised encoders carry more dense spatial features and lead vision-centric benchmarks; swapping the encoder and retraining the projector is the lesson's hard exercise for these tasks.
+- **Level 2:** 为什么图像描述能力极佳的模型在判断“谁在谁上面”时频频翻车？ Expected: 描述偏重物体的语义内容而非空间绝对坐标；预训练图文对几乎不包含严谨的空间拓扑关系，且细粒度位置信息在投影到语言模型上下文后已被大幅稀释。
+- **Level 2:** 纯检测器路线相比 VLM 失去了什么？ Expected: 失去了开放词表以及自然语言人机交互能力；它只能在预先打标训练的有限类别和预先写死几何规则的维度内回答问题。
+- **Level 3:** 评估集需要多少张图片，如何科学界定其规模？ Expected: 确保每个提问类型与每类光照/机位条件下都有数十个独立样本；总数至少几百帧，混淆矩阵不稳定的类别要继续扩充。
+- **Level 3:** 更换更强的视觉编码器能否改变这一被动局面？ Expected: 自监督编码器保留了密集的空间几何特征，在纯视觉感知基准上表现优异；更换编码器并重训投影层是课程针对该场景给出的进阶攻坚方案。
 
 ## Wrong answers
 
-- "The demo worked on ten images, so it works." Ten images cannot cover the cameras, the lighting or the relation types; the benchmark figure for this kind of question is near a coin flip for some relations.
-- "A bigger VLM will fix spatial reasoning." Size lifts language reasoning more than geometry; the lesson's advice for pure spatial tasks is a specialised model.
-- "Fine-tune on the demo images." Tens of examples teach nothing and overfit; the fine-tuning route needs thousands of labelled frames and an eval that is separate from them.
+- "Demo 在 10 张图上表现完美，说明方案完全可行。" 10 张图片既无法覆盖真实仓库的光照机位，也无法检验多样的空间关系；这类问题中，部分关系的基准表现接近抛硬币。
+- "换用参数量更大的 VLM 自然就能解决空间几何推理。" 扩大模型主要提升语言层面的多跳推理，对像素级的几何感知收效甚微；针对纯空间任务专用视觉模型更为稳妥。
+- "直接拿这 10 张 Demo 图片微调模型。" 几十个样本不仅什么都学不到还会引发过拟合；微调路线需要数千张打标图像以及与训练严格隔离的独立评估集。
 
 ## Taught in
 
-The [vision-language models lesson](../../../phases/04-computer-vision/25-vision-language-models/) gives the spatial reasoning figure, the fine-tuning budget and the cross-modal error rate.
+[视觉语言模型基础课程](../../../phases/04-computer-vision/25-vision-language-models/)给出了空间几何推理的具体基准数据、微调计算预算以及跨模态误差监控方案。

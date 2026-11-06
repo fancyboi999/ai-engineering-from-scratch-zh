@@ -1,6 +1,6 @@
 ---
 id: metric-before-result
-title: Set the success metric before the first result exists
+title: 在首个结果出现之前设定成功指标
 card: behavioral
 kind: design
 level: 2
@@ -16,57 +16,57 @@ related: [behavioral/smallest-slice-that-decides, behavioral/feedback-ratchet-ow
 updated: 2026-11-03
 ---
 
-Tell me about a time you defined how a project would be judged before you had any results. What did you write down, and what did you refuse to leave open until later?
+请讲一次你在尚未获得任何结果之前，就预先定义好项目评判标准的经历。你当时记录了哪些内容？又坚决拒绝将哪些事项留到后续再决定？
 
 ## Short answer
 
-I start from the goal, derive the questions it raises, and only then pick the smallest metrics that answer them. Each metric gets a direction, a threshold, a window, a source and a population before any value is observed, and each outcome metric is paired with a guardrail and a counter-metric. I also write the pass, fail and ambiguous decisions in advance, because a team that sees the result first moves the threshold to protect the build.
+我从目标出发，推导其引发的关键问题，并据此选取能够解答这些问题的最小指标集。在观测到任何数值之前，每个指标都预先确定好优化方向、阈值、观察窗口、数据源和评估群体，并将每个结果指标与护栏指标及反向指标配对。我还会提前拟定通过、失败与模糊未决三种裁决规则，因为先看到结果的团队会移动阈值来保护构建成果。
 
 ## Full answer
 
-### Goal, question, metric
+### 目标、问题、指标
 
-For an incident tool the goal was to cut the time to identify the affected service without raising unsafe actions. The questions followed: how fast is the correct service found, how often is it correct, does diagnosis stay read-only, and does the workflow raise alert dismissal or operator load. The metrics made each question operational.
+对于某款突发事件应急工具，目标是在不增加不安全操作的前提下，缩短定位受影响服务所需的时间。随之而来的问题包括：找到正确服务的速度有多快、准确率有多高、排查过程是否严格保持只读，以及该工作流是否会导致告警被忽略或增加值班人员的负担。指标正是让这些问题变得可操作。
 
-### A metric needs a contract
+### 指标需要契约
 
-| Field | Example |
+| 字段 | 示例 |
 |---|---|
-| Name | median identification seconds |
-| Direction | at most |
-| Threshold | 120 |
-| Window | ten incident replays |
-| Source | the replay event log |
-| Population | the on-call engineers in the pilot |
-| Kind | outcome or guardrail |
+| 名称 | 识别定位耗时中位数（秒） |
+| 方向 | 至多 |
+| 阈值 | 120 |
+| 窗口 | 十次故障重放 |
+| 数据源 | 重放事件日志 |
+| 评估群体 | 参与试运行的值班工程师 |
+| 类别 | 结果指标或护栏指标 |
 
-Without a source and a window a number cannot be reproduced. Without a threshold it cannot drive a decision.
+缺乏数据源和观察窗口，数值便无法复现。缺乏阈值，它就无法驱动决策。
 
-### Three kinds of metric
+### 三类指标
 
-- Outcome: did the desired state improve?
-- Guardrail: did a fixed constraint stay true?
-- Counter-metric: did the local gain shift cost or harm somewhere else?
+- 结果指标：期望达成的状态是否得到改善？
+- 护栏指标：既定的硬性约束是否始终成立？
+- 反向指标：局部收益是否将代价或伤害转移到了其他环节？
 
-Speed alone is not enough. Correctness, production writes, operator workload and missed alerts protect against a fast but unsafe result. A plan without a guardrail is invalid even when the outcome metrics look complete.
+单纯追求速度是不够的。正确率、生产写入、值班人员负荷以及遗漏告警等护栏指标，能防止产出快速但不安全的结果。缺少护栏指标的计划即使看起来结果指标很完备，也属于无效计划。
 
-### Decide before you measure
+### 在测量前做出决断
 
-The lesson's example: pass when the correct-service rate is at least 0.9 and the median time is at most 120 seconds; fail on any production write or a correct rate below 0.75; ambiguous when the gain is small with wide variance, which calls for a larger replay set. A stable correct rate between 0.75 and 0.9 matches none of the three rules, so I also write a rule for it before the replay: it does not pass, and it names the next test. Offline replay gives repeatability and edge coverage. A bounded pilot gives real behavior and trust. I use the cheapest evidence that answers the current decision and do not expose real users only because the code is ready.
+课程中的示例：正确识别服务的比例至少达到 0.9 且耗时中位数至多 120 秒判定为通过；发生任何生产环境写入或正确率低于 0.75 判定为失败；若收益较小且波动范围较大则判定为模糊未决，此时需要扩充重放测试集。对于介于 0.75 和 0.9 之间的稳定正确率，并不匹配上述三条规则，因此在重放之前我也为此制定了规则：视为不通过，并明确下一步测试。离线重放具备可复现性与边缘场景覆盖能力；有界试运行则能检验真实行为并建立信任。我选用能够回答当前决策的最低成本证据，不会仅仅因为代码就绪就把真实用户暴露出来。
 
 ## Follow-ups
 
-- **Level 2:** A metric is easy to collect but cannot change the decision. What do you do with it? Expected: remove it; measurement answers a decision, it does not decorate a dashboard.
-- **Level 2:** Give a counter-metric for the incident tool. Expected: review time added for the incident commander, or escalations that moved to another team.
-- **Level 3:** The outcome metric passes and the guardrail fails. What is the verdict? Expected: fail; a fixed constraint that broke means the outcome was not reached.
-- **Level 3:** Results come back ambiguous. What was already written for that case? Expected: the next step, such as a larger replay set, decided before the result so nobody argues the threshold afterwards.
+- **Level 2:** 某项指标极易采集，但无法改变最终决策，你该如何处理？ Expected: 移除它；指标度量是为了解答决策疑问，而不是用来点缀仪表盘。
+- **Level 2:** 请为该突发事件工具给出一个反向指标示例。 Expected: 事故指挥官额外增加的审查耗时，或是向其他团队转嫁的升级排查量。
+- **Level 3:** 结果指标通过但护栏指标失败，最终结论是什么？ Expected: 判定失败；破坏了既定硬性约束意味着并未真正达成预期结果。
+- **Level 3:** 结果呈现模糊未决状态，针对该情况事先写好了什么？ Expected: 明确的下一步行动，例如扩充重放样本集，该行动在结果出来前就已定好，避免事后因阈值产生争吵。
 
 ## Wrong answers
 
-- "Pick the metric after you see what the system can do." The threshold then moves to protect the build and the measurement decides nothing.
-- "One good outcome metric is enough." Without a guardrail, a fast but unsafe result passes.
-- "Run a live pilot since the implementation is ready." Readiness is not a reason to expose users; the cheapest evidence that answers the decision comes first.
+- "先观察系统能达到什么水平，再挑选指标。" 这会导致阈值被人为移动以迎合构建结果，度量也就失去了决策意义。
+- "一个优秀的结果指标就足够了。" 缺乏护栏指标，快速但不安全的结果就会被放行通过。
+- "代码既然就绪了，就直接上线实机试运行。" 代码写完并非让用户冒险的理由；必须优先采用能够回答决策的最经济证据。
 
 ## Taught in
 
-The [success metrics lesson](../../../phases/14-agent-engineering/52-design-success-metrics/) gives the metric contract, the three kinds of metric and the rule to decide before measuring.
+[成功指标设计课程](../../../phases/14-agent-engineering/52-design-success-metrics/)给出了指标契约、三类指标体系以及先定决策再度量的基本准则。

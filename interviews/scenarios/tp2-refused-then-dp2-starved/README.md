@@ -1,6 +1,6 @@
 ---
 id: tp2-refused-then-dp2-starved
-title: Tensor parallel refused, data parallel starved
+title: 张量并行启动被拒，数据并行缺少资源
 card: scenarios
 kind: incident
 level: 3
@@ -28,53 +28,53 @@ source:
 
 ## Situation
 
-A team serves `Qwen/Qwen3-8B` from one L4 and wants more capacity. The node has a second L4, so the plan is to use both. The first attempt is `--tp-size 2`. The server dies two seconds after NCCL comes up, with a `RuntimeError` that says the memory capacity is unbalanced and that some GPUs may be occupied by other processes. A quick look at the node shows two small pods from another team on the second card.
+一个团队在单张 L4 上提供 `Qwen/Qwen3-8B` 服务，想提高容量。节点上有第二张 L4，于是计划把两张卡都用上。第一次尝试是 `--tp-size 2`。服务器在 NCCL 建立两秒后停止，报 `RuntimeError`，指出显存容量不均衡，某些 GPU 可能被其他进程占用。快速查看节点发现，第二张卡上有另一个团队的两个小 pod。
 
-The second attempt is `--dp-size 2`, two copies of the model behind one controller. It starts, and the team runs its load sweep. At 64 users the pair delivers less output each second than the single card did, and each first token takes many seconds. An engineer from the other team suggests that the node itself is half broken and asks for a hardware ticket. You are asked to read the logs first.
+第二次尝试是 `--dp-size 2`，由一个控制器管理模型的两个副本。服务启动了，团队运行了负载扫描。在 64 个用户下，这对卡每秒交付的输出比单卡还要少，每个首 token 都要等许多秒。另一个团队的工程师认为节点本身有一半坏了，要求提硬件工单。你被要求先看日志。
 
 ## Evidence
 
-- [what the second GPU held minutes before the start](evidence/the-other-tenant.txt)
-- [the tensor parallel start, two seconds after NCCL came up](evidence/tp2-refused.txt)
-- [the data parallel start: the weights and the pool of each rank](evidence/dp2-two-pools.txt)
-- [four decode lines of the two ranks under a load of 64 requests](evidence/dp2-under-load.txt)
-- [what the tensor parallel check does, and why it is right](evidence/the-check-and-the-rule.txt)
-- [how the default load balancing method filled the small copy](evidence/what-round-robin-did.txt)
-- [the same pair with requests routed by token count](evidence/routed-by-tokens.txt)
+- [启动前几分钟第二张 GPU 的显存占用](evidence/the-other-tenant.txt)
+- [NCCL 建立两秒后的张量并行启动日志](evidence/tp2-refused.txt)
+- [数据并行启动：各 rank 的权重与池大小](evidence/dp2-two-pools.txt)
+- [64 个请求负载下两个 rank 的四行 decode 日志](evidence/dp2-under-load.txt)
+- [张量并行检查做了什么，以及它为什么是对的](evidence/the-check-and-the-rule.txt)
+- [默认负载均衡方式如何填满较小的副本](evidence/what-round-robin-did.txt)
+- [同一对卡在按 token 数路由请求下的表现](evidence/routed-by-tokens.txt)
 
 ## Questions
 
-1. What does the tensor parallel check compare, and why did the data parallel start pass where it failed?
-2. The two copies loaded the same weights. Why is one pool an eighth of the other?
-3. Under load, which rank held the queue and which one sat near idle? Which default sent the work there?
-4. Would two copies with equal pools have doubled the capacity? What would you read before you claim it?
-5. Name two fixes that keep both cards and one that does not, and say which of them the manual measured.
+1. 张量并行检查比较了什么？为什么数据并行在它失败的地方启动成功了？
+2. 两个副本加载了相同的权重。为什么一个池的大小只有另一个的八分之一？
+3. 在负载下，哪个 rank 积压了队列，哪个 rank 接近空闲？哪项默认设置把工作发到了那里？
+4. 拥有相等池大小的两个副本能否让容量翻倍？在宣称这一点之前你会读什么？
+5. 说出保留双卡的两套方案和放弃双卡的一套方案，并指出手册测了哪一套。
 
 ## Walkthrough
 
-1. **Read the check in the tensor parallel error.** Before it loads weights, each rank measures its free memory, and the group keeps the smallest value. If that value is below 90 percent of the local free memory, the server stops. The error prints the three numbers: the free memory before loading, 18.28 GB, the local memory of the card, and 90 percent of that local memory, 19.53 GB, as the line. The second card had 3,506 MiB in use by two pods of 1,746 MiB each, and that put it under the line. No flag turns the check off at this version. The check is right to stop, because every rank of a tensor parallel group holds the same share of the weights and the same pool, so the smallest card would set the pool for both.
-2. **Read why data parallel started.** Each copy sizes its own pool, so there is no balance check. Both ranks loaded 15.28 GB of weights. Rank 0 then had 6.59 GB free and rank 1 had 3.17 GB, because the pods held the rest. The pools came out at 24,094 tokens against 2,925. Four requests of 640 tokens fill the small one.
-3. **Read the four decode lines.** Rank 1 ran 4 requests at a token usage of 0.82 to 0.87, wrote about 25 tokens per second, and had 59 requests in its queue. Rank 0 ran 1 to 3 requests at a usage of 0.02 to 0.07, wrote under 10 tokens per second, and had no queue. The controller's default method, `auto`, resolves to `round_robin` outside disaggregation, and round robin does not look at pools or queues. The benchmark keeps 64 requests open, so 63 of them sat on the small copy, 4 running and 59 waiting, and the client could not send the large copy more work until the small copy gave a slot back.
-4. **Put a number on the loss.** At 64 users the pair gave 41.7 tokens per second against 250.9 on one L4, and the median P99 time to the first token over three seeds was 391 seconds for the pair and 33.4 for one L4. The pair also ran at 765 and 675 MHz at the two highest loads, under the clock floor, while the single card ran at 1,320 and 1,080 MHz, so part of the loss is the clock. Up to 4 users the pair was already 16 to 41 percent slower, for a reason the manual did not isolate.
-5. **Read the one fix that was measured.** With `--load-balance-method total_tokens`, each request goes to the copy that holds the fewest tokens. The same uneven pair then gave 114.7 tokens per second at 64 users, against 41.7 with round robin and 250.9 on one card, and the median first token fell from 4,763 to 3,977 ms. The clock was 1,020 MHz in that run against 675 before, so part of that gain can be the card. The manual did not measure a pair with equal pools, and it did not measure two servers behind a gateway with weights. Its expectation is that data parallelism adds capacity only when every copy has about the same pool.
+1. **读张量并行报错里的检查。** 加载权重前，每个 rank 测量自己的可用内存，通信组取最小值。如果该值低于本地可用内存的 90%，服务器停止。报错打印了三个数字：加载前的可用内存 18.28 GB，该卡的本地内存，以及作为底线的该卡本地内存的 90%，即 19.53 GB。第二张卡被两个各占 1,746 MiB 的 pod 用了 3,506 MiB，导致其低于这条线。这个版本没有参数能关掉这项检查。这项检查停下来是对的，因为张量并行组的每个 rank 承担等额的权重份额和等大的池，最小的卡会限制两张卡的池大小。
+2. **看数据并行为什么能启动。** 每个副本自己决定池大小，所以没有均衡检查。两个 rank 都加载了 15.28 GB 的权重。由于 pod 占用了剩余显存，rank 0 随后有 6.59 GB 可用，rank 1 只有 3.17 GB。计算出的池大小分别为 24,094 token 和 2,925 token。四个 640 token 的请求就能填满小的那个。
+3. **读四行 decode 日志。** rank 1 运行 4 个请求，token 使用率为 0.82 到 0.87，每秒写入约 25 个 token，队列里有 59 个请求。rank 0 运行 1 到 3 个请求，使用率为 0.02 到 0.07，每秒写入不到 10 个 token，没有队列。控制器的默认方式 `auto` 在非分离式架构下解析为 `round_robin`，而轮询不看池大小或队列。基准测试保持 64 个请求开放，于是 63 个都落在了小副本上（4 个在运行，59 个在等待），在小副本交回槽位之前，客户端无法向大副本发送更多工作。
+4. **量化损失。** 64 个用户下，这对卡每秒给出 41.7 个 token，单张 L4 为 250.9 个；三次种子下首 token 的 P99 时间中位数，双卡为 391 秒，单张 L4 为 33.4 秒。双卡在最高的两档负载下时钟还降到了 765 和 675 MHz，低于时钟底线，而单卡运行在 1,320 和 1,080 MHz，所以部分损失来自时钟。在 4 个用户以内，双卡已经慢了 16% 到 41%，原因手册未做隔离分析。
+5. **读测过的那套方案。** 使用 `--load-balance-method total_tokens` 时，每个请求发给持有 token 最少的副本。同一对不均衡的卡随后在 64 个用户下给出了每秒 114.7 个 token，轮询时为 41.7，单卡为 250.9；首 token 中位数从 4,763 ms 降到 3,977 ms。那次运行的时钟为 1,020 MHz，之前是 675 MHz，所以收益的一部分可能是显卡时钟带来的。手册没有测试拥有相等池大小的双卡，也没有测试加权路由网关后面的两台服务器。它的预期是：只有当每个副本拥有大致相等的池时，数据并行才会增加容量。
 
 ## Resolution
 
-The node is not broken. The second card carries another tenant, and both layouts answered that fact in their own way: the balance check stopped the first layout before it loaded, and the second layout gave one copy a pool of 2,925 tokens and then fed it every second request. The team went back to one L4 for production traffic, because it beat the pair at every load, and asked for the pods to move. With two whole cards, they will start `--dp-size 2` again and accept it only after the two `#tokens` lines of the `DP0` and `DP1` ranks read about the same.
+节点没有坏。第二张卡承载了另一个租户，两套拓扑以各自的方式反映了这一事实：均衡检查在加载前停止了第一套拓扑，第二套拓扑给一个副本分配了 2,925 token 的池，并把每隔一个请求发给它。团队退回单张 L4 承接生产流量，因为它在每个负载下都优于双卡，并要求将 pod 移走。拿到两张完整的卡后，他们会再次启动 `--dp-size 2`，并且只有在 `DP0` 和 `DP1` 两个 rank 的 `#tokens` 行读数大致相同时才接受。
 
-The pair of decode lines is the evidence for this reading: the rank with the small pool held 59 waiting requests while the rank with the large pool used 2 to 7 percent of its pool. Routing by token count raised the pair from 41.7 to 114.7 tokens per second at 64 users and still lost to the single card, so the pool, and not the router, is the limit to fix.
+两行 decode 日志是这个结论的证据：池较小的 rank 积压了 59 个等待请求，而池较大的 rank 只用了其池的 2% 到 7%。按 token 数路由把双卡在 64 用户下的表现从 41.7 提高到 114.7 token/s，却仍然输给单卡，所以要修的限制是池大小，而不是路由器。
 
 ## Wrong turns
 
-- "Tensor parallel is refused, so use data parallel, which starts." Starting is not serving. Read the `#tokens` line of every rank before the load test, because each copy sizes its own pool and nobody checks them against each other.
-- "Lower the memory fraction so the tensor parallel check passes." The check compares free memory before the weights load, not the fraction. The smaller card would still set the pool for both ranks.
-- "Round robin is fair, so the loss must be the hardware." Round robin does not read pools or queues. At 64 open requests, 63 sat on the copy with the small pool.
-- "Fix the routing and the two copies will double throughput." Routed by tokens, the pair gave 114.7 tokens per second against 250.9 for one card. The small pool is still there, and part of the gain was a higher clock.
+- "张量并行被拒，所以用能启动的数据并行。" 能启动不代表能提供服务。负载测试前先读每个 rank 的 `#tokens` 行，因为每个副本自己定池大小，没人会把它们相互比较。
+- "调低内存比例，让张量并行检查通过。" 检查比较的是权重加载前的可用内存，不是比例。较小的卡仍会决定两个 rank 的池大小。
+- "轮询是公平的，所以损失一定是硬件造成的。" 轮询不读池大小或队列。64 个开放请求中，63 个堆在池较小的副本上。
+- "修好路由，两个副本就会让吞吐量翻倍。" 按 token 路由时，双卡每秒给出 114.7 token，单卡为 250.9。小池子依然存在，部分收益来自更高的时钟。
 
 ## Generalize
 
-A parallel layout is a promise that every member carries an equal share. Tensor parallelism checks that promise before it loads and stops when a card is short. Data parallelism makes no check and gives each copy what its card has left, so a shared card becomes a small copy that a blind router fills first. Before you add a GPU, read what else lives on it, and after the start, read the pool line of every rank. Capacity that you did not verify per rank is a sum that does not add.
+并行拓扑是一个承诺，承诺每个成员承担相等的份额。张量并行在加载前检查这个承诺，并在某张卡不足时停止。数据并行不做检查，每张卡剩多少就给每个副本多少，于是共享卡上的副本只有很小的池，却被不看容量的路由器优先填满。在增加 GPU 之前，先看卡上还有什么；启动之后，读每个 rank 的池大小行。未经逐 rank 验证的容量，是一笔算不拢的账。
 
 ## Taught in
 
-The parallelism page of SGLang 101 records both starts and the routing fix in [what happened on two L4s](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md#what-happened-on-two-l4s) and [data parallelism on the same pair lost](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md#data-parallelism-on-the-same-pair-lost), and the memory page explains why a pool is sized from the free memory of its own card in [how SGLang decides the split](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#how-sglang-decides-the-split).
+SGLang 101 的并行页面在[双 L4 上的实测结果](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md#what-happened-on-two-l4s)和[相同双卡上的数据并行落败](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md#data-parallelism-on-the-same-pair-lost)中记录了两次启动和路由修复，显存页面在[SGLang 如何决定拆分](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#how-sglang-decides-the-split)中解释了为什么池大小取决于每张卡自己的可用内存。

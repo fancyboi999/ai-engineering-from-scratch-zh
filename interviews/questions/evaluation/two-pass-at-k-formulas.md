@@ -1,6 +1,6 @@
 ---
 id: two-pass-at-k-formulas
-title: Two harnesses, two pass at k formulas
+title: 两个 harness，两个 pass@k 公式
 card: evaluation
 kind: code-reading
 level: 3
@@ -16,15 +16,15 @@ related: [evaluation/pass-at-k-reading]
 updated: 2026-11-03
 ---
 
-Two harnesses in the repository compute pass at k. The first takes the empirical pass rate p and returns `1 - (1 - p) ** k`. The second takes the sample count n, the pass count c and k, and returns `1 - C(n - c, k) / C(n, k)`. Read both. When do they agree, when do they differ, and which one goes in the report?
+仓库里有两个 harness 计算 pass@k。第一个接收经验通过率 p，返回 `1 - (1 - p) ** k`。第二个接收样本数 n、通过数 c 和 k，返回 `1 - C(n - c, k) / C(n, k)`。读这两段代码。它们什么时候一致，什么时候不一致，报告里该用哪个？
 
 ## Short answer
 
-The first formula treats every draw as independent with success probability p and is a plug in estimate. The second counts the exact chance that k samples drawn from the n you ran contain at least one pass, and it is the unbiased estimator that code generation benchmarks use. They agree only as n grows large; for the samples you ran, the plug in is lower and noisier, and it extrapolates when k exceeds n. Report the unbiased one with the raw counts next to it.
+第一个公式把每次抽取都看作成功概率为 p 的独立事件，是一个代入估计。第二个公式精确计算从你跑过的 n 个样本里抽 k 个、其中至少有一个通过的概率，它是代码生成基准使用的无偏估计量。只有 n 变得很大时两者才一致；对你实际跑过的样本，代入估计偏低、噪声更大，而且 k 超过 n 时它会外推。报告无偏的那个，并在旁边附上原始计数。
 
 ## Full answer
 
-### Reading the first function
+### 读第一个函数
 
 ```python
 def pass_at_k(empirical_pass_rate, k):
@@ -34,9 +34,9 @@ def pass_at_k(empirical_pass_rate, k):
     return 1 - (1 - p) ** k
 ```
 
-It clamps p and assumes independent draws. It accepts any k, including a k larger than the number of samples the harness ran, so it can print a pass at ten from five samples.
+它把 p 限制在单位区间内，并假设各次抽取独立。它接受任意 k，包括比 harness 实际跑的样本数还大的 k，所以它能从五个样本里打印出一个 pass@10。
 
-### Reading the second function
+### 读第二个函数
 
 ```python
 def pass_at_k(n, c, k):
@@ -50,29 +50,29 @@ def pass_at_k(n, c, k):
     return 1 - math.exp(log_prob)
 ```
 
-It refuses to extrapolate: for k above n it returns whether any sample passed, which is a different quantity and should be labeled as such. When fewer than k samples failed, every k subset holds a pass, so it returns one. Otherwise it multiplies the chance that each of k draws without replacement is a failure, in log space to avoid large binomial coefficients. The estimator layer averages this value over tasks.
+它拒绝外推：k 大于 n 时，它返回是否有任何样本通过；这是另一个量，应该另行标注。失败的样本少于 k 个时，任意 k 个样本的子集里都有一个通过的，所以它返回 1。其他情况下，它把无放回抽取的 k 次全都失败的概率乘起来，并在对数空间里计算，以避开很大的二项式系数。估计量那一层再对各任务的这个值取平均。
 
-### Where they differ
+### 两者在哪里不同
 
-Take k equal to n. The second says one whenever a single sample passed. The first says less than one, because it imagines drawing with replacement. In general, drawing without replacement makes all k failures less likely, so the exact value is at or above the plug in for the same n and c. The plug in is also a biased estimate with high variance at small n.
+取 k 等于 n。只要有一个样本通过，第二个就给出 1。第一个给出的值小于 1，因为它假想的是有放回抽取。一般来说，无放回抽取让 k 次全失败的可能性更小，所以在同样的 n 和 c 下，精确值大于或等于代入估计。代入估计还是有偏的，并且在 n 小时方差很大。
 
-### What to report
+### 报告什么
 
-Run n samples per task with n at least k, as in the capstone's example of ten samples and pass at five. Report pass at one as c over n, pass at k from the unbiased function, and the raw counts. Never print a pass at k for a k you did not sample.
+每个任务跑 n 个样本，n 至少等于 k，比如综合项目里的例子：十个样本，算 pass@5。报告 pass@1（即 c 除以 n）、用无偏函数算出的 pass@k，以及原始计数。永远不要为没有采够样本的 k 打印 pass@k。
 
 ## Follow-ups
 
-- **Level 3:** In the second function, why return one when n minus c is smaller than k? Expected: you cannot pick k failing samples from fewer than k failures, so every k subset contains a pass.
-- **Level 3:** Why compute the product in log space? Expected: binomial coefficients overflow for moderate n; the log of the ratio is a short sum of logs.
-- **Level 4:** A team ran five samples per task and reports pass at ten. What is wrong? Expected: k exceeds n, so nothing was measured; the second function falls back to whether any sample passed and the first extrapolates.
-- **Level 4:** Do the two functions agree on pass at one? Expected: yes; both reduce to c over n when k is one.
+- **Level 3:** 第二个函数里，n 减 c 小于 k 时为什么返回 1？ Expected: 失败样本不足 k 个，就不可能挑出 k 个失败样本，所以每个 k 子集都包含一个通过的样本。
+- **Level 3:** 为什么在对数空间里算这个乘积？ Expected: n 不大时二项式系数就会溢出；比值取对数后只是几项对数的和。
+- **Level 4:** 一个团队每个任务跑了五个样本，报告了 pass@10。哪里错了？ Expected: k 超过了 n，所以什么都没测到；第二个函数退回到是否有样本通过，第一个则在外推。
+- **Level 4:** 两个函数在 pass@1 上一致吗？ Expected: 一致；k 为 1 时两者都化简为 c 除以 n。
 
 ## Wrong answers
 
-- "They are the same formula." They agree only as n grows; for the samples you ran, the plug in is lower and noisier.
-- "Pass at k is the probability the agent is right." It is the chance that a set of k samples contains at least one pass; without a selector the user still gets one sample.
-- "More samples per task raise pass at one." They make the estimate more precise; the value is the per sample pass rate.
+- "它们是同一个公式。" 只有 n 变大时两者才一致；对你实际跑过的样本，代入估计偏低、噪声更大。
+- "pass@k 就是 agent 答对的概率。" 它是 k 个样本中至少有一个通过的概率；没有挑选器时，用户拿到的仍然只是一个样本。
+- "每个任务多跑几个样本，pass@1 就会提高。" 多跑只会让估计更精确；这个值本身是单个样本的通过率。
 
 ## Taught in
 
-The [eval harness capstone](../../../phases/19-capstone-projects/27-eval-harness-fixture-tasks/) uses the independence formula, and the [code exec metric capstone](../../../phases/19-capstone-projects/72-code-exec-metric/) gives the unbiased estimator and its edge cases.
+[评测 harness 综合项目](../../../phases/19-capstone-projects/27-eval-harness-fixture-tasks/)用的是独立性公式，[代码执行指标综合项目](../../../phases/19-capstone-projects/72-code-exec-metric/)给出了无偏估计量及其边界情况。

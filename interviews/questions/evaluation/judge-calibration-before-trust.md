@@ -1,6 +1,6 @@
 ---
 id: judge-calibration-before-trust
-title: Before a judge score can gate a release
+title: judge 分数用来拦截发布之前
 card: evaluation
 kind: concept
 level: 2
@@ -16,46 +16,46 @@ related: [evaluation/pick-the-eval-method]
 updated: 2026-11-03
 ---
 
-You wrote a rubric, and a judge model now scores faithfulness for your retrieval system. The dashboard shows a high mean, and the team wants to use it as the release gate from Monday. What has to happen before this number can block or approve a release?
+你写好了评分量表，现在由一个 judge 模型给检索系统的忠实度打分。看板上的均值很高，团队想从下周一起用它当发布门禁。在这个数字能拦下或放行一次发布之前，必须先做什么？
 
 ## Short answer
 
-Calibrate the judge against people first. Hand label about 100 cases, score them with the judge, and compute the Spearman correlation between the two rankings. Below 0.7 the rubric needs work and the number is noise. Then freeze the judge model and version, and read the bottom scores as well as the mean.
+先拿人的判断校准 judge。人工标注约 100 个样本，让 judge 给它们打分，计算两组排名之间的 Spearman 相关系数。低于 0.7 说明量表还要改，这个数字只是噪声。然后冻结 judge 模型和版本，除了均值，也要看最低的那些分数。
 
 ## Full answer
 
-### Why a raw judge score lies
+### 为什么 judge 的原始分数会骗人
 
-A judge fails in three silent ways. It carries biases: it prefers longer answers, answers from its own model family and answers that match the prompt style. It can return bad JSON, which becomes a missing score that drops out of the aggregate and raises the mean. It drifts: a new judge version changes every metric at once.
+judge 有三种无声的失效方式。它有偏见：偏好更长的回答、来自自己模型家族的回答，以及与 prompt 风格一致的回答。它可能返回坏掉的 JSON，变成缺失分数后从聚合里掉出去，均值反而升高。它会漂移：换一个 judge 版本，所有指标一起变。
 
-### The calibration run
+### 校准流程
 
-1. Label at least 50 cases by hand; the lesson uses 100. Cover the bottom of the distribution, not only easy cases.
-2. Score the same cases with the judge.
-3. Plot judge against human and compute the Spearman rank correlation.
-4. A correlation below 0.7 means the rubric needs work. A judge at 0.3 is noise.
+1. 人工标注至少 50 个样本，课程用的是 100 个。要覆盖分布的底部，不能只挑简单样本。
+2. 让 judge 给同样的样本打分。
+3. 画出 judge 与人工的对比图，计算 Spearman 秩相关系数。
+4. 相关系数低于 0.7，说明量表还要改。相关系数 0.3 的 judge 就是噪声。
 
-Use a judge from a different model family than the generator. A model that grades its own family inflates the score by about 10 to 20 percent.
+judge 要和生成器来自不同的模型家族。给自己家族打分的模型会把分数抬高约 10% 到 20%。
 
-### After the run
+### 校准之后
 
-- Freeze the judge model and version. When you upgrade, run the old and the new judge on the same baseline before you compare anything.
-- Inspect the bottom quantile. A mean of 0.85 can hide a 5 percent slice of catastrophic failures.
-- Version the eval set and tag it with every change, so that a score this month means the same as a score last month.
+- 冻结 judge 模型和版本。升级时，先让新旧 judge 在同一份基线上各跑一遍，再比较其他东西。
+- 查看最低分位。0.85 的均值可能掩盖 5% 的灾难性失败。
+- 给评测集做版本管理，每次改动都打标签，这样本月的分数和上月的分数含义相同。
 
 ## Follow-ups
 
-- **Level 2:** Why Spearman and not the mean difference between judge and human scores? Expected: Spearman compares rankings, so a judge that is harsh but orders the cases the same way still passes.
-- **Level 2:** What is the smallest hand labeled set the lesson accepts? Expected: it refuses a judge tested on fewer than 50 human labeled examples.
-- **Level 3:** The judge is the same model that writes the answers. What will the calibration run probably show? Expected: inflated scores by about 10 to 20 percent; switch the judge to another model family.
-- **Level 3:** The correlation passes, but the bottom decile holds confident wrong scores. Do you ship? Expected: no; the mean correlation can hide catastrophic failures, so inspect the lowest 10 percent before the number gates anything.
+- **Level 2:** 为什么用 Spearman，而不是 judge 分数与人工分数的均值差？ Expected: Spearman 比较的是排名，所以一个打分偏严、但排序与人一致的 judge 也能通过。
+- **Level 2:** 课程能接受的最小人工标注集是多大？ Expected: 少于 50 个人工标注样本测过的 judge，课程不接受。
+- **Level 3:** judge 就是写答案的那个模型。校准大概会显示什么？ Expected: 分数被抬高约 10% 到 20%；把 judge 换成另一个模型家族。
+- **Level 3:** 相关系数达标了，但最低的十分之一里有一些很自信的错误打分。你会上线吗？ Expected: 不会；整体相关性可能掩盖灾难性失败，所以在这个数字用于拦截之前，要先检查最低的 10%。
 
 ## Wrong answers
 
-- "The rubric is clear, so the judge is right." Length and family biases survive a clear rubric; only a correlation against human labels shows their size.
-- "It agrees with our old metric, so it is calibrated." The old metric may share the bias; calibrate against people.
-- "Calibrate once and keep upgrading the judge." Each judge version changes every score; freeze the version or rerun the baseline in parallel.
+- "量表写得很清楚，所以 judge 是对的。" 长度偏见和家族偏见在清晰的量表下照样存在；只有与人工标签的相关性才能显示它们有多大。
+- "它和我们的旧指标一致，所以已经校准过了。" 旧指标可能有同样的偏见；要拿人的判断来校准。
+- "校准一次，然后不断升级 judge。" 每个 judge 版本都会改变所有分数；冻结版本，或者并行重跑基线。
 
 ## Taught in
 
-The [LLM evaluation frameworks lesson](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/) gives the calibration recipe and the three silent failures of a judge.
+[LLM 评测框架课](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/)给出了校准方法和 judge 的三种无声失效。

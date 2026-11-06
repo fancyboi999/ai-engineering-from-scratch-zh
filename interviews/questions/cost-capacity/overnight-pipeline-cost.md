@@ -1,6 +1,6 @@
 ---
 id: overnight-pipeline-cost
-title: Price a nightly pipeline on batch with a cached prompt
+title: 给缓存了 prompt 的 batch 夜间流水线估价
 card: cost-capacity
 kind: estimate
 level: 3
@@ -16,52 +16,52 @@ related: [cost-capacity/batch-lane-triage, cost-capacity/cache-break-even]
 updated: 2026-11-03
 ---
 
-A nightly pipeline summarizes 50,000 documents, and every call opens with the same system prompt. It runs synchronously against a provider for four hours and costs about 2,000 dollars a night. Estimate what the same job costs on the batch API with the system prompt cached, and say when you would move it onto your own GPU instead.
+一条夜间流水线要给 50,000 份文档写摘要，每次调用都以同一个系统 prompt 开头。它同步调用一家提供商，跑四个小时，每晚花约 2,000 美元。估算同样的任务改用 batch API 并缓存系统 prompt 后花多少钱，并说明什么时候你会把它搬到自己的 GPU 上。
 
 ## Short answer
 
-Batch gives a flat 50 percent discount on input and output tokens, and the cached system prompt makes the repeated input about ten times cheaper after the first write. Stacked, the lesson's worked example lands at about 180 dollars a night, near 9 percent of the synchronous bill, from three configuration changes. Move the job to your own GPU when it runs every night at high utilization and the shared prefix is short, so that neither discount has much to work on, and size that run by raising concurrency until the output stops growing.
+batch 对输入和输出 token 统一打 50% 的折扣；缓存系统 prompt 后，首次写入之后重复的输入便宜约十倍。两者叠加，课程的算例只改了三项配置，每晚就降到约 180 美元，接近同步账单的 9%。当任务每晚都跑、利用率很高，而且共享前缀很短，两项折扣都没多少可省时，就把它搬到自己的 GPU 上；规划这次运行的规模时，不断提高并发，直到输出不再增长。
 
 ## Full answer
 
-### The three bills
+### 三份账单
 
-The lesson writes the synchronous uncached bill as the document count times the input and output tokens of each call at full rates, with a shared prompt of about 4000 tokens and an output of about 200 tokens per document.
+课程把同步无缓存的账单写成：文档数乘以每次调用按全价计算的输入和输出 token，共享 prompt 约 4000 个 token，每份文档输出约 200 个 token。
 
-1. **Synchronous, uncached.** Every call pays for the full prompt and the full output.
-2. **Synchronous, cached.** The system prompt is written once, and the remaining 49999 calls read it at about a tenth of the input price.
-3. **Batch, cached.** Everything above, plus the 50 percent discount on the reads, the write and the output.
+1. **同步，无缓存。** 每次调用都为完整的 prompt 和完整的输出付费。
+2. **同步，有缓存。** 系统 prompt 写入一次，其余 49999 次调用以约十分之一的输入价格读取它。
+3. **batch，有缓存。** 在上面的基础上，读取、写入和输出再打 50% 的折扣。
 
-The lesson's conclusion: batch plus cache comes to about 10 percent of the synchronous uncached bill, and its worked pipeline goes from 2,000 dollars a night to about 180.
+课程的结论是：batch 加缓存约为同步无缓存账单的 10%，它算的那条流水线从每晚 2,000 美元降到约 180 美元。
 
-### What the estimate hides
+### 估算没体现的东西
 
-- Output tokens take the batch discount only. Caching reuses the prompt's attention state and does nothing for generated tokens, so a job with long outputs and a short prompt saves much less.
-- The first call of a batch pays the cache write premium. Against tens of thousands of reads, it is noise. If the batch runs longer than the cache lifetime, the one-hour variant with its 2x write is worth it once the reads pass five.
-- Check the usage fields on a sample of the results. A batch whose requests all missed the cache shows writes and no reads, and then the second discount never happened.
-- The return is promised within 24 hours and typical within a few hours. A night is shorter than the promise, so the morning deadline holds only on the typical return. Submit the batch a day ahead, or keep a synchronous fallback for a late batch.
+- 输出 token 只享受 batch 折扣。缓存复用的是 prompt 的注意力状态，对生成的 token 不起作用，所以输出长、prompt 短的任务省得少得多。
+- batch 的第一次调用要付缓存写入溢价。和几万次读取相比，这点钱可以忽略。如果 batch 跑的时间超过缓存有效期，读取超过五次后，写入价格为 2 倍的一小时版本就值得用。
+- 抽查一部分结果的 usage 字段。如果 batch 里的请求全都没命中缓存，就只会看到写入、没有读取，那第二重折扣根本就没发生。
+- 承诺 24 小时内返回，通常几小时返回。一个晚上比承诺的时限短，所以早上的截止时间只有在通常的返回时间内才赶得上。提前一天提交 batch，或者为迟到的 batch 保留同步回退。
 
-### When your own GPU wins
+### 什么时候自己的 GPU 更划算
 
-The lesson's exercise asks for the shared-prefix length at which batch plus cache beats a reserved GPU running overnight. Your own GPU wins when three things hold: the job keeps a reserved GPU busy every night, the shared prefix is short, so there is little to cache, and the outputs are long, so the batch discount is the only lever on the provider side. Data residency can decide it on its own.
+课程的练习要求算出共享前缀多长时，batch 加缓存会胜过一台通宵运行的预留 GPU。自己的 GPU 在三个条件同时满足时胜出：任务每晚都能让一台预留 GPU 保持忙碌；共享前缀很短，没多少可缓存；输出很长，提供商那边只剩 batch 折扣这一根杠杆。数据驻留要求本身就可能决定这个选择。
 
-### How to size the self-hosted run
+### 怎样规划自建运行的规模
 
-The vLLM manual's recipe for an offline job: pass the whole prompt list to the offline engine class in one call, or run the batch command on a file of requests, and raise the concurrency until the output stops growing. On its card, the output grew to 273.9 tokens per second at 32 concurrent requests and fell to 241.4 at 64, because the pool filled and the GPU throttled. Raise the token budget above 8,192 for throughput, because a slow first token costs nothing when nobody waits, and watch the running count against the cache usage to see which limit binds.
+vLLM 手册给离线任务的做法是：一次调用就把整个 prompt 列表传给离线引擎类，或者对一个请求文件运行 batch 命令，然后提高并发，直到输出不再增长。在手册那张卡上，32 个并发请求时输出升到每秒 273.9 个 token，64 个时降到 241.4，因为池满了，GPU 也降频了。为了吞吐，把 token 预算调到 8,192 以上，因为没人等待时，首 token 慢一点没有代价；再对照运行中的请求数和缓存使用率，看是哪个上限在起作用。
 
 ## Follow-ups
 
-- **Level 3:** Which of the two discounts applies to output tokens? Expected: only the batch discount. Caching lowers the price of repeated input and does nothing for generated tokens.
-- **Level 3:** The first call in each batch pays a cache write premium. Does that change the estimate? Expected: not at this volume. One write at a quarter more, against tens of thousands of reads at a tenth of the price.
-- **Level 4:** When does a reserved GPU beat batch plus cache? Expected: when the job keeps the GPU busy every night, the shared prefix is short and the outputs are long, so the two discounts have little to work on. The lesson's exercise computes the break-even prefix length.
-- **Level 4:** How do you find the right concurrency for the job on your own GPU? Expected: pass the whole list to the offline engine or the batch command, raise concurrency until the output tokens per second stop growing, and raise the token budget. The manual's card peaked near 32 concurrent requests.
+- **Level 3:** 两种折扣里，哪一种作用在输出 token 上？ Expected: 只有 batch 折扣。缓存降低的是重复输入的价格，对生成的 token 不起作用。
+- **Level 3:** 每个 batch 的第一次调用都要付缓存写入溢价。这会改变估算吗？ Expected: 在这个量级上不会。一次写入多付四分之一，对面是几万次十分之一价格的读取。
+- **Level 4:** 预留 GPU 什么时候能胜过 batch 加缓存？ Expected: 任务每晚都让 GPU 保持忙碌，共享前缀短，输出长，两种折扣都没多少可省。课程练习算出了盈亏平衡的前缀长度。
+- **Level 4:** 在自己的 GPU 上，怎样找到这个任务合适的并发数？ Expected: 把整个列表交给离线引擎或 batch 命令，提高并发直到每秒输出 token 数不再增长，并调高 token 预算。手册那张卡在约 32 个并发请求时达到峰值。
 
 ## Wrong answers
 
-- "Batch alone gets you to a tenth of the cost." Batch alone halves the bill. The other factor is the cached shared prompt.
-- "Caching saves the same on output as on input." The cache reuses the prompt's attention state. Every output token is generated and billed in full, less the batch discount.
-- "Batch is too slow for a nightly job." The promise is a day and the typical return is hours. Submit a day ahead, or keep a synchronous fallback for the rare late batch.
+- "单靠 batch 就能把成本降到十分之一。" 单靠 batch 只能把账单减半。另一个因素是缓存的共享 prompt。
+- "缓存在输出上省的和在输入上一样多。" 缓存复用的是 prompt 的注意力状态。每个输出 token 都要生成，并按全价计费，只扣掉 batch 折扣。
+- "batch 对夜间任务来说太慢。" 承诺是一天，通常几小时就返回。提前一天提交，或者为少数迟到的 batch 保留同步回退。
 
 ## Taught in
 
-The [batch APIs lesson](../../../phases/17-infrastructure-and-production/15-batch-apis/) stacks the two discounts on the nightly pipeline, the [caching economics lesson](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/) gives the cache write and read prices, and the [batch jobs section of vLLM 101](../../../manuals/vllm-101/sections/3-6-run-batch-and-offline-jobs.md) finds the throughput ceiling of a self-hosted run.
+[batch API 课程](../../../phases/17-infrastructure-and-production/15-batch-apis/)在夜间流水线上叠加了两种折扣，[缓存经济学课程](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/)给出了缓存写入和读取的价格，[vLLM 101 的 batch 任务一节](../../../manuals/vllm-101/sections/3-6-run-batch-and-offline-jobs.md)找出了自建运行的吞吐上限。

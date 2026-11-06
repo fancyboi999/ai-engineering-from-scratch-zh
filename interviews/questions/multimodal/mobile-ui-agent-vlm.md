@@ -1,6 +1,6 @@
 ---
 id: mobile-ui-agent-vlm
-title: Design a VLM for an on-device UI agent
+title: 为端侧 UI agent 设计视觉语言模型
 card: multimodal
 kind: design
 level: 4
@@ -16,62 +16,62 @@ related: [multimodal/which-knob-first, multimodal/spatial-reasoning-limit]
 updated: 2026-11-03
 ---
 
-Design a vision-language model for an on-device mobile assistant that reads the phone screen and taps, types and scrolls. Keep the language model at about 2B parameters. Choose the encoder, the bridge, the resolution plan and the data mix, justify each choice with the ablation evidence, and name the capability you would guard against over-promising.
+请为一款运行在手机端侧的移动助手 Agent 设计专用的视觉语言模型（VLM）。该 Agent 能够实时读取手机屏幕，并执行点击、输入和滑动操作。大语言模型底座限制在约 2B 参数量。请选型视觉编码器、连接桥接层、分辨率方案以及训练数据配比，结合消融实验文献给出决策依据，并指出哪一项能力边界最需要警惕过度承诺。
 
 ## Short answer
 
-Encoder: the stronger contrastive encoder at native resolution, with a self-supervised encoder's features concatenated for a dense spatial signal, because the encoder explains about 20 percent of the variance and self-supervised features lead vision-centric tests. Bridge: a two-layer MLP, since the connector explains about 5 percent, with features from several encoder depths stacked so that fine position reaches the language model. Resolution: a ramp from low to high, with dynamic resolution up to about 1280 pixels on the long side, because screens are text-dense and reading gains most from pixels. Data: dense human descriptions of screens plus grounded action traces, not distilled captions; and guard the promise on spatial relations, where general models score 50 to 60 percent and the agent must hit the right element every time.
+编码器选用在原生分辨率下运行的高性能对比学习编码器，并拼接自监督编码器特征以提供密集空间位置信号，因为编码器在模型方差中解释了约 20%，且自监督特征在纯视觉基准上大幅领先。桥接层选用两层 MLP，因为固定 token 数量下连接器仅解释约 5% 的方差，且多层级特征堆叠能将细粒度坐标精准传递给语言模型。分辨率采用由低到高渐进预热方案，长边动态分辨率上限设在 1280 像素左右，因为手机屏幕富含微缩文字且阅读任务从物理像素中受益最高。训练数据采用详尽的人工屏幕描述搭配带有坐标标注的动作 trace，坚决弃用模型蒸馏描述；同时必须对空间几何关系能力严格设防，因为通用大模型在该类任务上准确率仅 50% 到 60%，而端侧点击操作一旦点错目标便会导致任务失败。
 
 ## Full answer
 
-### Constraints first
+### 核心硬件约束先行
 
-A 2B language model sets a low reasoning ceiling: a larger language model adds points on reasoning benchmarks, and this design cannot grow it. So every other axis must carry more, and the task must be framed as perception plus short actions, not long reasoning.
+2B 参数量的大语言模型设定了较低的推理天花板：消融研究表明扩大语言模型是提升复杂推理分数最显著的杠杆，而本设计不能增大语言模型规模。因此，系统中的其余所有轴向必须承担更多职责，且业务场景必须明确定义为“精准感知加上短链动作”，绝不能包装成漫长复杂的多步抽象推理。
 
-### Encoder
+### 视觉编码器选型
 
-| Choice | Why |
+| 选型方案 | 决策依据 |
 |---|---|
-| The strong contrastive encoder at native resolution | adds 3 or more points over the common one in the ablations; native resolution keeps screen text legible |
-| Concatenated self-supervised features | lead vision-centric benchmarks by 5 to 7 points over the contrastive one; UI grounding is vision-centric |
-| Features from several encoder depths | deep layers carry semantics and shallow layers carry fine position; stacking both tightens grounding, which an agent that taps needs |
+| 原生分辨率的高性能对比学习编码器 | 在消融测试中相比普通编码器高出 3 分以上；原生输入确保屏幕小字清晰可读 |
+| 拼接自监督编码器特征 | 在纯视觉感知与定位基准上高出对比学习模型 5 到 7 分；UI 元素定位高度依赖纯视觉空间几何 |
+| 抽取编码器多个深度的多层级特征 | 深层网络表征抽象语义，浅层网络保留精确空间坐标；两者堆叠能收紧像素定位精度，满足点击判定 |
 
-### Bridge
+### 连接桥接层
 
-A two-layer MLP. The connector explains about 5 percent of the variance at a fixed token count, and the MLP is the simplest to retrain when the encoder or the language model changes. The token count is the knob that matters: screens are documents, so budget toward the upper end of the 576 to 1024 sweet spot, and above it for dense screens.
+采用两层多层感知机（MLP）。消融实验证实连接器架构在固定 token 数量下仅解释约 5% 的跑分方差，且 MLP 在编码器或语言模型换代时重训成本最低。真正的关键轴向是 token 数量：手机屏幕本质上是密集排版的文档，因此 token 预算应落在 576 到 1024 黄金区间的上限，面对高密度屏幕甚至可以适当上浮。
 
-### Resolution schedule
+### 分辨率调度方案
 
-Start low and ramp. Flat low-resolution training plateaus; a ramp trains faster and ends higher. Dynamic resolution with a minimum of 256 and a maximum near 1280 pixels on the long side handles the range of screen densities, and the document-reading gains of 3 to 5 points from splitting apply to screens.
+采用“由低到高渐进式预热”（Ramp-up）。固定低分辨率训练容易过早陷入平台期；渐进提升分辨率不仅能加速前期收敛，最终指标也更高。长边设置 256 到 1280 像素的动态分辨率，以自适应各类手机的屏幕密度（DPI）；高分辨率切片带来的 3 到 5 分文档阅读增益在屏幕理解上同样显著生效。
 
-### Data mix
+### 训练数据配比策略
 
-- Dense human descriptions of screens: what is on the screen, where, and what is interactive. Dense human captions beat distillation across the board in the reference comparison.
-- Grounded action traces: screenshot, instruction, the element and the action, with coordinates. The visual-agent benchmark that frontier models lead has this shape.
-- Task-specific instruction data for the app families you ship to.
-- Synthetic data only where a human description anchors it, filtered for grounding.
+- **详尽人工屏幕描述**：标注屏幕存在哪些元素、具体坐标位置以及哪些元素支持可交互点击。权威对比表明详尽人工标注优于蒸馏数据。
+- **精准定位的动作执行 Trace**：记录截图、指令、目标元素和动作，并附坐标。前沿模型领先的视觉 agent 基准采用这种格式。
+- **面向产品所支持应用类别的任务专用指令数据**。
+- **合成数据严格受限**：仅在被人工真实标注严格锚定的前提下引入，并经过多模态一致性过滤器筛除幻觉脏数据。
 
-### The capability to guard
+### 必须设防的核心能力陷阱：空间几何推理
 
-Spatial relations. General models score 50 to 60 percent on above, below, left, right and counting, and an agent that taps the wrong element fails the task. Build the eval from real screens with the exact element-selection questions, measure it before any promise, and keep a verification step in the agent loop: read the screen back after the action and check the state.
+空间位置关系。通用大模型在识别“上方、下方、左边、右边”以及计数上的准确率通常仅有 50% 到 60%，而 agent 点错元素就会导致任务失败。用真实屏幕和精确的元素选择问题构建评估，在作出承诺前测量结果，并在 agent 循环中保留验证步骤：动作之后重新读取屏幕，检查状态。
 
-### Serving on the device
+### 端侧推理落地保障
 
-A 2B language model and a strong encoder at a high resolution still need the visual token budget counted per screen; measure the latency per step at your resolution before you set the schedule.
+即使 2B 语言模型与强编码器能够在手机部署，每次截屏的视觉 token 预算仍需锱铢必较；在敲定分辨率调度前，必须在目标真实设备上实测每次前向推理的时延。
 
 ## Follow-ups
 
-- **Level 3:** Why stack shallow and deep encoder layers for an agent and not for a captioner? Expected: a captioner needs semantics; an agent needs where exactly, which the shallow layers carry and the last layer blurs.
-- **Level 4:** The language model is fixed at 2B. Which axis do you lean on hardest, and what is its limit? Expected: resolution and token count, because screens are text-dense; the limit is the latency per step on the device, which the token count sets.
-- **Level 4:** How do you make the agent robust to being wrong about an element? Expected: a read-back after each action that compares the new screen with the expected state, and a stop when they do not match; the model's own confidence is not a safe signal.
-- **Level 4:** What does the ablation evidence not tell you about this design? Expected: it comes from general benchmarks on datacenter GPUs; the device latency, the UI domain and the action format need your own ablation, one axis per run.
+- **Level 3:** 为什么为操作型 Agent 堆叠浅层与深层特征，而普通图像描述模型不需要？ Expected: 图像描述只需要高阶语义；而操作 Agent 需要精准物理坐标，浅层保留细粒度坐标而最后一层会模糊掉物理空间位置。
+- **Level 4:** 语言模型被锁死在 2B 参数量，你最依赖哪个轴向，该轴向的物理极限是什么？ Expected: 依赖分辨率与视觉 token 数量，因为手机界面本质是富文本；极限是端侧芯片上单步推理的时延预算，它由 token 数量决定。
+- **Level 4:** 如何在架构上应对 Agent 点错 UI 元素的固有失误？ Expected: 动作执行后执行截屏状态回读，比对新界面与预期状态是否吻合，不吻合立刻阻断；绝不能盲信模型自身输出的置信度。
+- **Level 4:** 现有的消融文献结论在指引该端侧设计时存在哪些盲区？ Expected: 公开文献数据来自数据中心云端 GPU 和通用图像榜单；手机端侧算力时延、垂直 UI 界面分布以及动作执行格式仍需自行针对单一变量开展严格消融。
 
 ## Wrong answers
 
-- "Use a query-based bridge to save tokens on the device." It caps the tokens at a count too low for dense screen text, and the ablations put 64 tokens as too few for reading; spend tokens here and save elsewhere.
-- "Generate the screen descriptions with a strong proprietary model." Distilled descriptions inherit hallucinations, and an agent that taps a hallucinated element fails; dense human descriptions won the reference comparison.
-- "A 2B model with a great encoder matches a 70B agent." The language model sets the reasoning ceiling; frame the task as perception plus short actions and verify each step, instead of promising long reasoning.
+- "为节省端侧 token，改用基于 Query 的压缩型桥接层。" 压缩桥接层会将 token 压缩得过低，而消融表明 64 个 token 根本读不清屏幕微缩文字；宁可在其他地方省计算也不应在此牺牲 token 预算。
+- "使用强大的前沿闭源大模型为屏幕生成合成描述。" 蒸馏描述会继承生成模型的幻觉，而 Agent 点击一个凭空捏造的幻觉元素必然失败；详尽人工标注在基准上全胜。
+- "配备了极佳编码器的 2B 模型能匹敌 70B 的 Agent。" 语言模型死死限制了推理天花板；应将任务定位为感知加短操作，而非盲目承诺复杂的多步推理。
 
 ## Taught in
 
-The [open-weight recipes lesson](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/) supplies the ablation evidence for each axis and sets this exercise, and the [vision-language models lesson](../../../phases/04-computer-vision/25-vision-language-models/) covers multi-level features, visual agents and the spatial reasoning limit.
+[开源 VLM 训练配方课程](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/)提供了各轴向消融证据与本题原型，[视觉语言模型基础课程](../../../phases/04-computer-vision/25-vision-language-models/)涵盖了多层级特征提取、视觉 Agent 以及空间推理能力上限。

@@ -1,6 +1,6 @@
 ---
 id: disaggregated-benchmark-false-success
-title: A split benchmark that counted failures as wins
+title: 把失败计为成功的 prefill/decode 分离压测
 card: scenarios
 kind: incident
 level: 3
@@ -27,55 +27,55 @@ source:
 
 ## Situation
 
-A team wants to stop long prompts from pausing other users' streams, so they split `Qwen/Qwen3-8B` into a prefill server on the first L4 and a decode server on the second L4, behind the router. The two cards have no RDMA, so the KV cache moves over TCP. The second card also runs another team's pods.
+一个团队不想让长 prompt 卡住其他用户的流式输出，于是把 `Qwen/Qwen3-8B` 拆成两部分：第一张 L4 上的 prefill 服务器和第二张 L4 上的 decode 服务器，前面放一个路由器。两张卡之间没有 RDMA，所以 KV cache 通过 TCP 传输。第二张卡上还跑着另一个团队的 pod。
 
-They run the fixed-rate sweep through the router. At a fixed rate of 8 per second, the summary prints 240 successful requests of 240 and output throughput of 751.85 tokens per second, higher than the 728.61 of their best single server at the same rate. The slide is ready. A reviewer reads the summary once more and stops at one line: the mean time to first token is 0.00 ms.
+他们通过路由器跑固定速率扫描。在每秒 8 个请求的固定速率下，摘要打印出 240 个请求中 240 个成功，输出吞吐量为每秒 751.85 个 token，比同一速率下他们最好的单服务器的 728.61 还高。幻灯片都做好了。一位评审又读了一遍摘要，停在一行上：平均首 token 时间是 0.00 ms。
 
 ## Evidence
 
-- [the transfer backend and the two KV pools at startup](evidence/two-pools.txt)
-- [the decode server waits, the transfer queue fills, the session dies](evidence/queue-fills.txt)
-- [the count of failed transfers and the benchmark summary at 8 requests per second](evidence/the-summary-that-lied.txt)
-- [the summary lines of the sweep with prefill on the full card and decode on the shared card](evidence/sweep-summary-lines.txt)
-- [the same sweep with the roles swapped](evidence/the-swap.txt)
+- [启动时的传输后端和两个 KV 池](evidence/two-pools.txt)
+- [decode 服务器在等待，传输队列塞满，会话断开](evidence/queue-fills.txt)
+- [每秒 8 个请求下的传输失败计数和基准测试摘要](evidence/the-summary-that-lied.txt)
+- [prefill 在整卡上、decode 在共享卡上时，扫描的摘要行](evidence/sweep-summary-lines.txt)
+- [角色互换后的同一个扫描](evidence/the-swap.txt)
 
 ## Questions
 
-1. Read the two pool lines. What asymmetry do they describe, and what does it do to a request that prefills on one card and decodes on the other?
-2. The decode line shows 2 running requests and 19 pre-allocated. What is the decode server waiting for, and what piles up on the prefill side while it waits?
-3. After the session failed, every later request still counted as a success. How can a router return a 200 with no text, and which two summary numbers expose it?
-4. The swapped split worked up to 8 users and lost text from 16. What does that say about where the small pool hurts?
-5. Write the rule that your benchmark kit applies before it prints a throughput number.
-6. When is a prefill-decode split worth its new failure modes, and what measurement must exist before you keep one?
+1. 读两行池日志。它们描述了什么不对称？对于在一张卡上 prefill、在另一张卡上 decode 的请求，这意味着什么？
+2. decode 日志行显示 2 个运行中的请求、19 个预分配的请求。decode 服务器在等什么？它等待时，prefill 那边堆积了什么？
+3. 会话失败之后，后面的每个请求仍被算作成功。路由器怎么会返回一个没有文本的 200？哪两个摘要数字暴露了这一点？
+4. 角色互换后，分离部署在 8 个用户以内正常，从 16 个用户开始丢文本。这说明小池会在哪里造成伤害？
+5. 写出你的基准测试套件在打印吞吐量之前要执行的规则。
+6. prefill/decode 分离什么时候值得承担它带来的新失败模式？保留它之前必须先有什么测量？
 
 ## Walkthrough
 
-Start with the pools. The prefill server allocated a KV cache of 24,094 tokens, and the decode server, on the shared card, allocated 2,925 tokens. A request prefills on the large pool and must then find room on the small one. The decode pool holds about four requests of our size at once, so almost every request that the prefill side finishes has to wait for decode memory.
+先看池。prefill 服务器分配了 24,094 个 token 的 KV cache，共享卡上的 decode 服务器分配了 2,925 个 token。请求在大池上做完 prefill，然后必须在小池上找到位置。按我们的请求大小，decode 池同时只能放大约四个请求，所以 prefill 那边做完的几乎每个请求都要等 decode 的内存。
 
-The second listing shows the wait. The decode server ran 2 requests, with 19 more pre-allocated and waiting for memory. Prefill kept producing KV caches for them, and the TCP transfer lane to decode filled: the log counts 4,096 queue-full rejections. About three minutes into the sweep the transfer session failed. Every transfer after that failed too, from both sides: prefill could not send its KV chunk, and decode could not get the cache from a prefill instance that it thought was dead. The session never came back.
+第二份清单展示了这种等待。decode 服务器在跑 2 个请求，另有 19 个已经预分配、正在等内存。prefill 继续为它们生成 KV cache，通往 decode 的 TCP 传输通道被塞满：日志里有 4,096 次队列已满的拒绝。扫描开始大约三分钟后，传输会话失败。此后每次传输也都失败，两边都是：prefill 送不出它的 KV 分块，decode 也无法从一个它认为已经死掉的 prefill 实例取到 cache。会话再也没有恢复。
 
-The third listing is the dangerous part. The prefill log holds 2,902 transfer failures, and the benchmark still counts every one of its 240 requests as a success at that rate, with 30,720 generated tokens. Two numbers give it away. The retokenized token count is 0, so no text came back for the client to count. The mean TTFT is 0.00 ms, because no first token ever arrived. The router returned 200 for a request whose decode never ran, and the client counted the requested output length as generated. That is how a throughput of 751.85 came from a server that wrote nothing.
+第三份清单是危险的部分。prefill 日志里有 2,902 次传输失败，而基准测试在这个速率下仍把 240 个请求全部算作成功，并计为生成了 30,720 个 token。有两个数字露了馅。重新分词后的 token 数是 0，所以没有任何文本返回给客户端去数。平均 TTFT 是 0.00 ms，因为第一个 token 从来没有到达。对一个 decode 从未运行的请求，路由器返回了 200，客户端则把请求的输出长度当成了已生成的长度。751.85 的吞吐量，就这样来自一台一个字都没写的服务器。
 
-The sweep summary lines show that the split failed early at every load. At 2 users only 512 of 2,048 generated tokens came back as text, and at 4 users none did, while the printed throughput jumped to 2,516.97. The fixed-rate sweep lost most of its text from 0.5 requests per second. The swapped split, with decode on the full card and prefill on the shared one, worked from 1 to 8 users with every token retokenized. At 16 users 2,048 of 8,192 tokens came back as text, and at 32 users none did, while the printed throughput still read 333.41. So the small pool breaks the split on whichever side it sits, only later when it sits on the prefill side.
+扫描的摘要行显示，分离部署在每种负载下都很早就失败了。2 个用户时，2,048 个生成 token 里只有 512 个作为文本返回；4 个用户时一个都没有，而打印出的吞吐量跳到了 2,516.97。固定速率扫描从每秒 0.5 个请求起就丢了大部分文本。角色互换后，decode 在整卡上、prefill 在共享卡上，从 1 到 8 个用户都正常，每个 token 都重新分词核对过。16 个用户时，8,192 个 token 里有 2,048 个作为文本返回；32 个用户时一个都没有，而打印的吞吐量仍然是 333.41。所以小池放在哪一边，分离部署就在哪一边坏掉；放在 prefill 一边，只是坏得晚一些。
 
 ## Resolution
 
-There is no measured result for the split under load on this pair of cards, and the team must not claim one. The transfer session between the two servers failed under the asymmetric pools and did not recover, and the router then counted empty responses as successes.
+在这两张卡上，分离部署没有有效的负载测试结果，团队不能声称已有结果。在不对称的池下，两台服务器之间的传输会话失败且没有恢复，之后路由器把空响应算成了成功。
 
-Three fixes follow. First, the benchmark kit refuses any run in which every request has a time to first token of 0, and reports `Total generated tokens (retokenized)` next to the generated count on every summary. Second, a split needs two pools of a size that matches the traffic, which the shared card could not give, and the metrics `sglang:num_transfer_failed_reqs_total` and `sglang:num_bootstrap_failed_reqs_total` must stay flat during the run. Third, the team goes back to one server, measures the inter-token latency when long prompts arrive, and splits only if that measurement shows prefill interference that data-parallel copies behind the gateway cannot remove.
+由此有三项修复。第一，基准测试套件拒绝任何所有请求首 token 时间都为 0 的运行，并在每份摘要里把 `Total generated tokens (retokenized)` 放在生成 token 数旁边。第二，分离部署需要两个大小与流量匹配的池，共享卡给不了这一点；运行期间，指标 `sglang:num_transfer_failed_reqs_total` 和 `sglang:num_bootstrap_failed_reqs_total` 必须保持不变。第三，团队退回单服务器，测量长 prompt 到达时的 token 间延迟；只有测量显示存在 prefill 干扰，而网关后面的数据并行副本又消除不了它时，才做分离。
 
 ## Wrong turns
 
-- "The split gave 751.85 tokens per second, more than the single server." The retokenized token count was 0. The throughput counted tokens that the client asked for, not tokens that arrived.
-- "240 successful requests of 240 means the router and both servers are healthy." The router returned 200 for requests whose transfer had failed. Only the retokenized count and the first-token time show that the text was empty.
-- "Raise the transfer queue size so the lane does not reject." The lane filled because decode could hold two requests in a 2,925-token pool. A larger queue delays the same failure.
-- "Give decode the full card, then the split works." The swapped split lost text from 16 users and everything at 32. The small pool breaks the split on either side, only at a different load.
-- "Add a fifth check later, the slide is due." A throughput number from a run with no text is not late, it is wrong. The acceptance rule belongs in the kit before the first slide.
+- "分离部署达到了每秒 751.85 个 token，比单服务器多。" 重新分词后的 token 数是 0。吞吐量数的是客户端要求的 token，不是到达的 token。
+- "240 个请求中 240 个成功，说明路由器和两台服务器都健康。" 对传输已经失败的请求，路由器也返回了 200。只有重新分词计数和首 token 时间能看出文本是空的。
+- "调大传输队列，让通道不再拒绝。" 通道被塞满，是因为 decode 在 2,925 token 的池里只能放两个请求。更大的队列只会推迟同一个失败。
+- "把整卡给 decode，分离部署就能用了。" 角色互换后的部署从 16 个用户开始丢文本，32 个用户时全丢。小池在哪一边都会让分离部署坏掉，只是负载不同。
+- "第五项检查以后再加，幻灯片要交了。" 一个没有文本的运行得出的吞吐量，不是来晚了，而是错的。验收规则要在第一张幻灯片之前就放进套件。
 
 ## Generalize
 
-A pipeline of two services can report success at the boundary while the work never happened, because the component that answers the client is not the component that failed. Every benchmark summary needs a check that the output exists, not only that the request returned, and every split architecture needs a single-server baseline and a transfer-failure counter before its number means anything.
+由两个服务组成的流水线，可能在边界处报告成功，而工作根本没有发生，因为回答客户端的组件不是失败的那个组件。每份基准测试摘要都需要一项检查，确认输出确实存在，而不只是请求返回了；每种分离架构，在它的数字有意义之前，都需要一个单服务器基线和一个传输失败计数器。
 
 ## Taught in
 
-The SGLang manual records both splits in [the disaggregation page](../../../manuals/sglang-101/sections/6-3-prefill-decode-disaggregation.md), gives the benchmark client in [the benchmark page](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md) and the router in [the gateway page](../../../manuals/sglang-101/sections/6-4-sgl-model-gateway.md), the vLLM manual covers the same split in [its prefill and decode page](../../../manuals/vllm-101/sections/6-3-split-prefill-and-decode.md), and [the load testing lesson](../../../phases/17-infrastructure-and-production/22-load-testing-llm-apis/docs/en.md) explains why a client can lie.
+SGLang 手册在[分离部署页面](../../../manuals/sglang-101/sections/6-3-prefill-decode-disaggregation.md)记录了两种拆分，在[基准测试页面](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)给出了基准测试客户端，在[网关页面](../../../manuals/sglang-101/sections/6-4-sgl-model-gateway.md)给出了路由器，vLLM 手册在[prefill 与 decode 页面](../../../manuals/vllm-101/sections/6-3-split-prefill-and-decode.md)讲了同样的拆分，[负载测试这一课](../../../phases/17-infrastructure-and-production/22-load-testing-llm-apis/docs/en.md)解释了客户端为什么会说谎。

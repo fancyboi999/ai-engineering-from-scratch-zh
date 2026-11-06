@@ -1,6 +1,6 @@
 ---
 id: count-attention-ops-with-cache
-title: Count the attention work for 100 generated tokens
+title: 数一数生成 100 个 token 的注意力工作量
 card: transformers
 kind: estimate
 level: 1
@@ -16,19 +16,19 @@ related: [transformers/causal-mask-minus-infinity, inference-serving/kv-pool-use
 updated: 2026-11-03
 ---
 
-A decoder generates 100 tokens one at a time from an empty prompt. Count the token states each loop computes for the prefix: a naive loop, and a loop that caches the key and value vectors of earlier tokens. Then count the query-key comparisons that remain with the store, and name what the store deliberately leaves out.
+一个解码器从空 prompt 开始，一次一个地生成 100 个 token。分别数一数两种循环为前缀计算的 token 状态数：朴素循环，以及缓存了之前 token 的键和值向量的循环。再数一数有了这份存储之后剩下的查询与键的比较次数，并说出这份存储有意不存什么。
 
 ## Short answer
 
-The naive loop runs every prefix token through the layer again at every step, so it computes 1 plus 2 plus 3 and so on up to 100 token states, which is 5050 and grows with the square of the length. With the stored keys and values, each step computes the state of the new token only, 100 in total. The new query still meets every stored key, so the cached loop still makes 5050 query-key comparisons: the store removes the recomputed key and value vectors, not the comparisons. The store holds no queries, because a past token never asks a question again; only the newest token does.
+朴素循环每一步都把前缀里的每个 token 重新过一遍层，所以计算 1 加 2 加 3 一直加到 100 个 token 状态，共 5050 个，随长度的平方增长。存下键和值之后，每一步只计算新 token 的状态，共 100 个。新的查询仍要和每个已存的键比较，所以缓存循环仍然做 5050 次查询与键的比较：存储省掉的是重复计算的键和值向量，不是比较。存储里没有查询，因为过去的 token 不会再发问；只有最新的 token 会。
 
 ## Full answer
 
-### Why the prefix can be reused
+### 前缀为什么能复用
 
-Every hidden state of a prefix token is deterministic once it is computed, and the causal mask means it never depends on a later token. So the key and the value of token t are the same at step t plus one as they were at step t. Recomputing them is pure waste.
+前缀 token 的每个隐藏状态一旦算出就是确定的，而因果 mask 保证它从不依赖后面的 token。所以 token t 的键和值在第 t 加 1 步与在第 t 步时完全一样。重新计算它们纯属浪费。
 
-### The two loops
+### 两种循环
 
 ```text
 naive:   step t recomputes t token states       -> 1 + 2 + ... + N = N (N + 1) / 2
@@ -36,11 +36,11 @@ cached:  step t computes one new token state    -> N
 cached:  its one query meets t stored keys      -> N (N + 1) / 2 comparisons
 ```
 
-For N equal to 100 the naive count is 5050 token states and the cached count is 100. The lesson's code runs a ten-token example and counts query-key comparisons instead: it prints the same count for both loops and confirms that the outputs match. At 100 tokens those comparisons total 5050 in both loops, so the attention step itself still grows with the length at each step. For a response of a few thousand tokens the naive count of token states is in the millions, most of them redundant.
+N 等于 100 时，朴素循环算 5050 个 token 状态，缓存循环算 100 个。课程的代码跑的是一个十个 token 的例子，数的是查询与键的比较次数：两种循环打印出同样的次数，并确认输出一致。生成 100 个 token 时，两种循环的比较次数都是 5050，所以注意力这一步本身在每一步仍随长度增长。对几千 token 的回复，朴素循环的 token 状态数是几百万量级，大部分是冗余的。
 
-### What is stored
+### 存的是什么
 
-Per layer and per head, two growing lists: the keys and the values of every token so far.
+每层、每个头各有两个不断增长的列表：到目前为止每个 token 的键和值。
 
 ```python
 class KVCache:
@@ -49,29 +49,29 @@ class KVCache:
         self.V[layer][head].append(v)
 ```
 
-The memory grows linearly with the generated length; that is the price for not recomputing the prefix.
+显存随生成长度线性增长；这是不重新计算前缀的代价。
 
-### Why queries are not stored
+### 为什么不存查询
 
-The query of a token is used once, at the step where that token is the newest one. After that, the token is only ever looked up, never looking. Storing queries would cost memory and buy nothing.
+一个 token 的查询只用一次，就在它是最新 token 的那一步。之后这个 token 只会被查，不会再去查别人。存查询要花显存，却换不来任何东西。
 
-### What does not go away
+### 去不掉的东西
 
-Generation is still serial: step t needs the token from step t minus one. The lesson calls this the autoregressive tax. Training avoids it by processing the whole sequence in one masked pass; inference cannot.
+生成仍然是串行的：第 t 步需要第 t 减 1 步产出的 token。课程把这叫作自回归税。训练用一次带 mask 的前向处理整个序列，从而避开它；推理做不到。
 
 ## Follow-ups
 
-- **Level 1:** What grows in memory as generation proceeds? Expected: the stored keys and values, per layer and per head, one entry per generated token.
-- **Level 2:** Why is a prefix token's key still valid after new tokens arrive? Expected: the causal mask means its hidden state only ever depended on earlier tokens, so later tokens cannot change it.
-- **Level 2:** You edit one word in the middle of the prompt. What happens to the store? Expected: everything from that position on is invalid and must be recomputed; the part before it stays valid.
-- **Level 3:** When does attention become bound by memory traffic instead of arithmetic? Expected: when the N by N score matrix is large enough that moving it through memory dominates; the lesson puts that at about 2K tokens and beyond.
+- **Level 1:** 生成过程中，显存里什么在增长？ Expected: 已存的键和值，每层每个头都有，每生成一个 token 多一条。
+- **Level 2:** 新 token 到来后，前缀 token 的键为什么仍然有效？ Expected: 因果 mask 让它的隐藏状态只依赖更早的 token，后面的 token 改变不了它。
+- **Level 2:** 你改了 prompt 中间的一个词。存储会怎样？ Expected: 从那个位置往后的内容全部失效，必须重新计算；它之前的部分仍然有效。
+- **Level 3:** 注意力什么时候从受算力限制变成受内存流量限制？ Expected: 当 N 乘 N 的分数矩阵大到搬运它的时间占主导时；课程认为大约从 2K token 开始。
 
 ## Wrong answers
 
-- "The store keeps the attention weights." It keeps keys and values; the weights are recomputed from the new query every step.
-- "The store saves memory." It costs memory and saves compute; the trade is memory for the recomputed key and value vectors.
-- "Queries must be stored too." A past token's query is never used again.
+- "存储里存的是注意力权重。" 它存的是键和值；权重每一步都由新的查询重新计算。
+- "这份存储能省显存。" 它花显存、省计算；用显存换掉重复计算的键和值向量。
+- "查询也必须存下来。" 过去 token 的查询再也不会被用到。
 
 ## Taught in
 
-The [KV cache lesson](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/) counts both loops and the [causal language modeling lesson](../../../phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/) explains why generation is serial.
+[KV cache 一课](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/)数了两种循环的计算量，[因果语言建模一课](../../../phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/)解释了生成为什么是串行的。

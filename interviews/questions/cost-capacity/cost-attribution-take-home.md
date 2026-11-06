@@ -1,6 +1,6 @@
 ---
 id: cost-attribution-take-home
-title: Build a cost attribution and enforcement simulator
+title: 构建一个成本归因与管控模拟器
 card: cost-capacity
 kind: take-home
 level: 4
@@ -16,48 +16,48 @@ related: [cost-capacity/cost-per-outcome, cost-capacity/budget-circuit-breaker]
 updated: 2026-11-03
 ---
 
-Take-home. You receive one day of request logs from a multi-tenant assistant. Each record follows the lesson's attribution trace: a trace id, a timestamp, the tenant, the user, the task id and its route, the model, the token counts for each of the four layers in the lesson's trace, whether the input was cached, and whether the task was resolved. You also receive the daily spend of each tenant over the previous weeks, as the baseline for the kill switch. Build a simulator that attributes spend by tenant, task and user, splits the tokens into layers, computes a cost per resolved task per tenant, and enforces a rate limit, a daily spend cap and a kill switch. Inject one abusive tenant and show when each control fires.
+带回家的作业。你拿到一个多租户助手一天的请求日志。每条记录都按课程里的归因 trace 格式：trace id、时间戳、租户、用户、任务 ID 及其路由、模型、课程 trace 中四个层各自的 token 数、输入是否命中缓存、任务是否解决。你还拿到每个租户过去几周的每日花费，作为 kill switch 的基线。请构建一个模拟器：按租户、任务和用户归因花费，把 token 拆到各层，按租户算出每个已解决任务的成本，并执行速率限制、每日花费上限和 kill switch。注入一个滥用租户，展示每项控制在什么时候触发。
 
 ## Short answer
 
-Price every call from a pricing table, roll the cost up by tenant, by task with its route and by user, and split the tokens into prompt, tool, memory and response so that the report names the layer that drives each tenant's spend. Compute the cost per resolved task from the outcome field, not from the token totals. Implement the ladder from the lesson: a rate limit at 2 to 3 times the expected peak, a daily cap at 1.5 to 3 times the contracted ceiling, and a kill switch on a spend z-score above 4 against the tenant's own baseline. Show the abusive tenant hit the rate limit first, then the cap, then the kill switch when its spend jumps far above its history.
+用价格表给每次调用定价，按租户、按任务（连同它的路由）和按用户汇总成本，并把 token 拆成 prompt、tool、memory 和 response 四层，让报告指出是哪一层推高了每个租户的花费。每个已解决任务的成本要从结果字段算，不从 token 总数算。实现课程里的阶梯：速率限制设为预期峰值的 2 到 3 倍，每日上限设为合同上限的 1.5 到 3 倍，租户花费相对自身基线的 z-score 超过 4 时触发 kill switch。演示滥用租户先撞上速率限制，再撞上每日上限，花费远超自身历史时最后触发 kill switch。
 
 ## Full answer
 
-### What a complete submission contains
+### 一份完整的提交包含什么
 
-1. **A cost on every call.** A pricing table with the cached input price, as the earlier caching lesson builds it, and a function that turns tokens into dollars per call.
-2. **Attribution in three dimensions.** Spend by tenant, by task and route, and by user, joined by the trace id as the telemetry joiner pattern does. Nothing is inferred after the fact.
-3. **Four token layers.** Prompt, tool, memory and response per task, as shares. The lesson's typical bands are the sanity check: prompt 40 to 60 percent, tool 20 to 40 percent on agent work, memory and response 10 to 30 percent each.
-4. **The unit metric.** For every tenant and every feature, the spend divided by the resolved tasks, from the resolution field. A task that was not resolved still cost money, and that is the point of the metric.
-5. **The enforcement ladder.** The rate limit answers with a 429 and a retry header. The cap tightens the rate limit and raises an alert. The kill switch pauses the tenant and pages.
-6. **The injected tenant.** A timeline of its spend and of the control that fired at each point, with the z-score plotted against the threshold.
-7. **The first five dashboard views.** The lesson's exercise asks for them. A strong answer: spend per tenant over time, the per-tenant spend divided by resolved tasks, the layer split per task, the top users by spend, and the enforcement events.
+1. **每次调用都有成本。** 一张包含缓存输入价格的价格表，像前面缓存课程里那样构建；再加一个函数，把每次调用的 token 换算成美元。
+2. **三个维度的归因。** 按租户、按任务和路由、按用户统计花费，像遥测关联器（telemetry joiner）模式那样用 trace id 关联。不做任何事后推断。
+3. **四个 token 层。** 每个任务的 prompt、tool、memory 和 response 各占多少比例。用课程给出的典型区间做合理性检查：prompt 占 40% 到 60%，agent 任务中 tool 占 20% 到 40%，memory 和 response 各占 10% 到 30%。
+4. **单位指标。** 对每个租户和每项功能，用花费除以已解决的任务数，任务数取自 resolution 字段。没解决的任务也花了钱，这正是这个指标的意义。
+5. **执行阶梯。** 速率限制返回 429 和重试响应头。每日上限收紧速率限制并发出告警。kill switch 暂停租户并呼叫值班。
+6. **注入的租户。** 一条它的花费时间线，标出每个时间点触发了哪项控制，并画出 z-score 与阈值的对比。
+7. **最先做的五个看板视图。** 课程练习要求列出这五个。好的答案是：各租户花费随时间的变化、各租户花费除以已解决任务数、各任务的分层拆分、花费最高的用户，以及管控事件。
 
-### What the reviewer looks for
+### 评审看什么
 
-- The attribution is stamped at request creation and joined by trace id, never guessed from the bill.
-- The layers are separate, and the report says which one to fix for each heavy tenant.
-- The unit metric is tied to an outcome.
-- The kill switch is relative to the tenant's own baseline, and the threshold is justified, which is the lesson's first exercise.
-- The order of the controls is explained: friction first, pause last.
+- 归因在请求创建时就打上，并用 trace id 关联，绝不从账单反推。
+- 各层分开统计，报告说明每个高花费租户该修哪一层。
+- 单位指标与结果挂钩。
+- kill switch 以租户自身基线为参照，阈值有依据，这是课程的第一道练习。
+- 解释了各项控制的先后：先施加阻力，最后才暂停。
 
-### What to argue in the write-up
+### 报告里要论证什么
 
-The lesson's third exercise: the largest tenant has a negative margin. Propose three interventions ordered by customer impact, such as caching and routing on their heaviest task first, a quota change second, and a price change at renewal last. Then argue whether retroactive tagging can ever work, which the lesson asks in its last exercise. The honest answer is that it fills a gap for legacy data and always misses cases.
+课程第三道练习：最大的租户毛利为负。按对客户的影响从小到大提出三项措施，例如先在他们最耗费的任务上做缓存和路由，其次调整配额，最后在续约时调价。然后论证事后补打标签到底行不行，这是课程最后一道练习。实事求是的答案是：它能为历史数据补上空缺，但总会漏掉一些情况。
 
 ## Follow-ups
 
-- **Level 3:** Why is the kill switch relative to each tenant's history instead of a fixed amount? Expected: tenants differ by orders of magnitude. A fixed amount pauses a large tenant on a normal day and never fires for a small one.
-- **Level 4:** Your largest tenant is unprofitable in the report. What do you propose? Expected: three interventions ordered by customer impact, such as caching and routing on their heaviest task, then a quota change, then a price change at renewal.
-- **Level 4:** Which five views would you put on the dashboard first? Expected: spend per tenant over time, the per-tenant spend divided by resolved tasks, the layer split per task, the top users by spend, and the enforcement events timeline.
+- **Level 3:** 为什么 kill switch 要以每个租户的历史为参照，而不是一个固定金额？ Expected: 租户规模相差几个数量级。固定金额会在大租户正常的一天把它暂停，对小租户又永远不会触发。
+- **Level 4:** 报告显示你们最大的租户在亏钱。你提出什么方案？ Expected: 按对客户的影响排序的三项措施，例如先在他们最耗费的任务上做缓存和路由，再调整配额，最后在续约时调价。
+- **Level 4:** 你会先把哪五个视图放上看板？ Expected: 各租户花费随时间的变化、各租户花费除以已解决任务数、各任务的分层拆分、花费最高的用户，以及管控事件时间线。
 
 ## Wrong answers
 
-- "Attribute the bill by dividing it by seats." That hides the heavy tenants and the heavy features, which is what the exercise is for.
-- "One token bucket for everything." A single bucket cannot say which layer or tenant to fix, and it cannot carry a per-tenant cap.
-- "Fire the kill switch at a fixed dollar amount." Tenants differ by orders of magnitude. A fixed amount is wrong for all but one of them.
+- "按席位数平摊账单来归因。" 这会把高花费租户和高花费功能藏起来，而找出它们正是这道作业的目的。
+- "所有 token 放进一个桶里统计。" 一个桶说不出该修哪一层、哪个租户，也承载不了按租户的上限。
+- "花费到一个固定的美元金额就触发 kill switch。" 租户规模相差几个数量级。一个固定金额只可能适合其中一个租户。
 
 ## Taught in
 
-The [FinOps for LLMs lesson](../../../phases/17-infrastructure-and-production/27-finops-llms/) defines the attribution dimensions, the token layers and the enforcement ladder, and the [caching and cost lesson](../../../phases/11-llm-engineering/11-caching-cost/) supplies the pricing table and the cost tracker.
+[LLM 的 FinOps 课程](../../../phases/17-infrastructure-and-production/27-finops-llms/)定义了归因维度、token 分层和执行阶梯，[缓存与成本课程](../../../phases/11-llm-engineering/11-caching-cost/)提供了价格表和成本追踪器。

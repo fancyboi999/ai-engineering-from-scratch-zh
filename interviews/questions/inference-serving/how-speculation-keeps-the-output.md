@@ -1,6 +1,6 @@
 ---
 id: how-speculation-keeps-the-output
-title: How speculative decoding keeps the output the same
+title: 推测解码怎样保证输出不变
 card: inference-serving
 kind: concept
 level: 2
@@ -16,57 +16,57 @@ related: []
 updated: 2026-11-03
 ---
 
-Speculative decoding promises several tokens per step with no change to what the model writes. Explain how the engine keeps that promise, where the speedup comes from, and why the gain shrinks as more users share the server.
+推测解码承诺每一步产出好几个 token，同时不改变模型写出的内容。解释引擎怎样兑现这个承诺，加速从哪里来，以及为什么共享服务器的用户越多，收益越小。
 
 ## Short answer
 
-A cheap proposer guesses the next few tokens, and the target model runs once over all the guesses and computes its own distribution at every position. A rejection sampler keeps each guess that the target supports, samples a correct token from the target at the first rejection, and stops, so one pass gives at least one token and at most the number of guesses plus one, with the same output distribution as plain decoding. The gain comes from idle GPU time: a small decode batch waits for memory, and as the batch grows that idle time goes away, so the checks of rejected guesses start to cost real compute.
+一个廉价的提议器先猜接下来的几个 token，目标模型对所有猜测只跑一次，在每个位置算出自己的分布。拒绝采样器保留目标模型认可的每个猜测，在第一个被拒绝的位置从目标模型采样一个正确的 token，然后停止，所以一次验证至少产出一个 token，至多产出猜测数加一个，输出分布与普通解码相同。收益来自 GPU 的空闲时间：小 decode batch 在等显存，batch 变大后这段空闲消失，验证被拒绝猜测的开销就开始占用真正的算力。
 
 ## Full answer
 
-### Guess, then check
+### 先猜，再验证
 
-A decode step on a small batch reads all the weights to produce one token per request, and most of the GPU sits idle while it waits for memory. Speculation uses that idle time. With greedy sampling a guess stays only if it equals the top token of the target at that position. With random sampling the rejection rule keeps the output distribution equal to the target's distribution. In SGLang the accept thresholds default to 1.0, so a greedy request produces the same tokens it would produce without speculation.
+小 batch 上的一个 decode 步要读完所有权重，才能为每个请求产出一个 token，GPU 大部分时间在等显存，处于空闲。推测解码利用的就是这段空闲时间。用贪心采样时，猜测只有等于目标模型在该位置的最高概率 token 才会保留。用随机采样时，拒绝规则让输出分布与目标模型的分布保持一致。在 SGLang 中，接受阈值默认是 1.0，所以贪心请求产出的 token 和不开推测解码时完全相同。
 
-The acceptance length is the number of tokens committed per verify pass: the accepted drafts plus one bonus token from the target. One real Qwen3-8B request on our L4 got about 1.8 tokens per pass.
+接受长度是每次验证提交的 token 数：被接受的 draft 加上目标模型给出的一个额外 token。在我们的 L4 上，一个真实的 Qwen3-8B 请求每次验证约得到 1.8 个 token。
 
-### The proposers
+### 提议器
 
-| Method | Where the guesses come from |
+| 方法 | 猜测从哪里来 |
 |---|---|
-| `ngram` | earlier text in the same request that matches the last few tokens |
-| `suffix` | a suffix tree over earlier prompts and answers |
-| `eagle`, `eagle3` | a small draft head that reads the hidden states of the target |
-| `*_mtp` | extra prediction heads that come with some models |
-| `draft_model` | a separate small model |
+| `ngram` | 同一请求中与最后几个 token 匹配的前文 |
+| `suffix` | 基于之前 prompt 和回答构建的后缀树 |
+| `eagle`, `eagle3` | 一个读取目标模型隐藏状态的小 draft head |
+| `*_mtp` | 部分模型自带的额外预测头 |
+| `draft_model` | 一个单独的小模型 |
 
-N-gram costs almost nothing and needs no extra weights. It pays when the answer copies the prompt: an edit of a document, a summary that quotes the source, a code change that keeps most lines, extraction from a long input. On our L4 with random prompts it cut the time per token from 241.7 to 76.6 ms at one user, and at four users the P99 ITL rose from 290 to 1,691 ms. It also turns off async scheduling, with only a warning in the log. An EAGLE3 head needs training for your target; the public head for Qwen3-8B has one layer and a draft vocabulary of 32,000 tokens.
+N-gram 几乎没有成本，也不需要额外权重。回答需要复制 prompt 时，它能带来收益：编辑文档、引用原文的摘要、保留大部分行的代码修改、从长输入里抽取信息。在我们的 L4 上用随机 prompt 测试，1 个用户时它把每 token 时间从 241.7 ms 降到 76.6 ms，而 4 个用户时 P99 ITL 从 290 ms 升到 1,691 ms。它还会关闭异步调度，日志里只有一条警告。EAGLE3 head 需要针对你的目标模型训练；Qwen3-8B 的公开 head 只有一层，draft 词表有 32,000 个 token。
 
-### Why the gain falls with load
+### 收益为什么随负载下降
 
-The idle time exists only while the step reads more memory than it computes. As the batch grows, the step does more compute for each byte, and the idle time goes away. The checks of rejected guesses then cost real compute. One report shows both ends on the same GPU and model: at batch 1 output went from 42.0 to 92.5 tokens per second, and at concurrency 20 it fell from 217.8 to 164.4. The maintainer's answer was that speculation is meant for small batches. The dynamic mode follows from this rule: it sets the number of guesses from the batch size and stops guessing for large batches.
+只有当一步读显存的时间多于计算时间，这段空闲才存在。batch 变大后，每读一个字节要做的计算更多，空闲时间就消失了。这时验证被拒绝的猜测会花掉真正的算力。一份报告在同一张 GPU、同一个模型上展示了两头的情况：batch 为 1 时，输出从每秒 42.0 个 token 升到 92.5 个；并发 20 时，从 217.8 降到 164.4。维护者的回复是，推测解码本来就是为小 batch 设计的。动态模式正是按这条规则来的：它根据 batch 大小设定猜测数量，batch 大时不再猜测。
 
-### The lesson's arithmetic
+### 课里的算术
 
-Expected tokens per target forward are 1 + K x alpha, with K the draft length and alpha the acceptance rate. For K of 5 and alpha of 0.7, with about 10 percent verify overhead, that is 4.5 divided by 1.1, about 4.1 times. Real gains cluster around 2 to 3 times, because alpha is rarely that high on production traffic and the overhead grows with the batch. The lesson puts the break-even alpha at high concurrency near 0.45 to 0.55.
+目标模型每次前向的期望 token 数是 1 + K x alpha，K 是 draft 长度，alpha 是接受率。K 为 5、alpha 为 0.7，验证开销约 10% 时，结果是 4.5 除以 1.1，约 4.1 倍。实际收益多在 2 到 3 倍，因为生产流量上 alpha 很少这么高，而且开销随 batch 增大。课里把高并发下的盈亏平衡 alpha 定在 0.45 到 0.55 附近。
 
-### What to watch
+### 要看什么
 
-The engine exports the proposed and the accepted tokens. Divide accepted by proposed for the acceptance rate, and read the mean tokens per step. A high acceptance rate with no gain in the time per token means the batch is already compute bound.
+引擎会导出候选 token 数和被接受的 token 数。用接受数除以候选数得到接受率，再看每步平均 token 数。接受率很高、每 token 时间却没有下降，说明 batch 已经是计算受限。
 
 ## Follow-ups
 
-- **Level 2:** Which proposer needs no extra model, and when does it pay? Expected: n-gram, which matches the last tokens of the output against earlier text in the request; it pays for edits, quotes, code changes and extraction, and fails on open chat.
-- **Level 3:** Acceptance is high but the time per token did not fall. What does that tell you? Expected: the batch is already compute bound; the idle memory time that speculation uses is gone, so the checks cost as much as they save.
-- **Level 3:** With greedy sampling, how does the check decide at each position? Expected: a guess stays only if it equals the top token of the target there; the first mismatch is replaced by the target's token and the rest are dropped.
-- **Level 4:** Why can one verify pass never commit more tokens than the draft length plus one? Expected: the target computes a distribution at every draft position and one past the last guess, so when all guesses pass the sampler still draws one bonus token from that last distribution; at a rejection it samples a correct token there and stops.
+- **Level 2:** 哪种提议器不需要额外的模型？什么时候划算？ Expected: n-gram，它用输出的最后几个 token 去匹配请求里的前文；在编辑、引用、代码修改和信息抽取上划算，在开放式聊天上不行。
+- **Level 3:** 接受率很高，每 token 时间却没有下降。这说明什么？ Expected: batch 已经是计算受限；推测解码利用的显存等待时间没有了，所以验证花掉的和省下的一样多。
+- **Level 3:** 用贪心采样时，验证在每个位置怎样判定？ Expected: 猜测只有等于目标模型在该位置的最高概率 token 才保留；第一个不匹配的位置换成目标模型的 token，其余全部丢弃。
+- **Level 4:** 为什么一次验证提交的 token 永远不会超过 draft 长度加一？ Expected: 目标模型在每个 draft 位置以及最后一个猜测之后的一个位置计算分布，所以所有猜测都通过时，采样器还会从最后那个分布里再抽一个额外 token；遇到拒绝时，它在该位置采样一个正确的 token，然后停止。
 
 ## Wrong answers
 
-- "Speculation changes the output a little, so you trade some quality for speed." With greedy sampling a guess stays only if it equals the target's top token, and with random sampling the rejection rule keeps the output distribution equal to the target's, so the quality does not change, although one sampled run can differ from a run without speculation.
-- "The draft is where the speed comes from, so a faster draft always helps." The gain comes from idle GPU time in a small batch; a fast draft with low acceptance adds checks that cost compute, and at concurrency 20 one report lost a quarter of its throughput.
-- "Turn it on for the stress test too." At batch 1 one report more than doubled its speed and at concurrency 20 it was slower; the maintainer's answer was that speculation is for small batches.
+- "推测解码会稍微改变输出，你是在用一点质量换速度。" 贪心采样时，猜测只有等于目标模型的最高概率 token 才保留，随机采样时，拒绝规则让输出分布与目标模型一致，所以质量不变，不过某一次采样的结果可能与不开推测解码时不同。
+- "速度来自 draft，所以 draft 越快越好。" 收益来自小 batch 时 GPU 的空闲时间；一个很快但接受率低的 draft 会增加要花算力的验证，有一份报告在并发 20 时损失了四分之一的吞吐量。
+- "压力测试时也开着它。" 有一份报告在 batch 为 1 时速度提高了一倍多，在并发 20 时反而更慢；维护者的回复是，推测解码是为小 batch 准备的。
 
 ## Taught in
 
-[How speculative decoding checks drafts](../../../manuals/vllm-101/sections/8-7-how-speculative-decoding-checks-drafts.md) and [the SGLang speculative decoding section](../../../manuals/sglang-101/sections/4-4-speculative-decoding.md) explain the rule, [the n-gram section](../../../manuals/vllm-101/sections/4-2-use-n-gram-speculation-for-copy-heavy-work.md) measures the free proposer, and [the EAGLE-3 lesson](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/docs/en.md) gives the acceptance arithmetic.
+[推测解码怎样验证 draft](../../../manuals/vllm-101/sections/8-7-how-speculative-decoding-checks-drafts.md)和 [SGLang 推测解码一节](../../../manuals/sglang-101/sections/4-4-speculative-decoding.md)解释了验证规则，[n-gram 一节](../../../manuals/vllm-101/sections/4-2-use-n-gram-speculation-for-copy-heavy-work.md)测量了这个免费的提议器，[EAGLE-3 一课](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/docs/en.md)给出了接受率的算术。

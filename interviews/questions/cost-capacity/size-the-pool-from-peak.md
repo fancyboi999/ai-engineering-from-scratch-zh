@@ -1,6 +1,6 @@
 ---
 id: size-the-pool-from-peak
-title: A bigger KV pool that bought nothing, until it did
+title: 扩容后看似毫无收益的 KV 显存池，直到过载来临
 card: cost-capacity
 kind: tradeoff
 level: 3
@@ -16,47 +16,47 @@ related: [inference-serving/goodput-sets-the-cap, inference-serving/kv-pool-user
 updated: 2026-11-03
 ---
 
-A teammate raised the memory fraction of a self-hosted server and grew the KV pool by 63 percent. The closed-loop benchmark at 64 concurrent users did not move. They want to revert the change, because the extra memory bought nothing. What do you tell them, and which measurement settles it?
+队友调高了自建服务器的显存比例（memory fraction），将 KV 显存池扩大了 63%。但在 64 并发用户的闭环基准测试中，吞吐量毫无变化。他们认为多划出的显存毫无价值，准备回滚该配置。你怎么回应他们，哪项实测能够证明其真实价值？
 
 ## Short answer
 
-The benchmark never filled the pool, so the extra memory had nothing to do. At 64 users the running requests held about 11 percent of the pool, and throughput stayed within 2 percent. Under an open-loop overload the same pool mattered: at the smaller fraction the pool was 96 percent full with requests waiting outside it, and the larger pool completed about a third more requests per second. Size the pool from token usage at peak load, bursts included, and read it from the scheduler's decode lines, not from a closed-loop sweep.
+闭环基准测试从未打满过显存池，因此多分配的显存根本无用武之地。在 64 并发下，运行中的请求仅占用了显存池的约 11%，吞吐量差异在 2% 以内。然而在开环过载压测下，显存池大小的决定性作用彻底显现：在较小比例下，显存池占用达到 96%，还有请求在池外等待，而较大显存池每秒完成的请求数高出约三分之一。按包含突发峰值的峰值负载 token 利用率规划显存池容量，并从调度器的 decode 日志中读取，绝不能仅依赖闭环扫参。
 
 ## Full answer
 
-### What the closed loop showed
+### 闭环压测所揭示的现象
 
-The manual ran the same load sweep at a fraction of 0.7 and at 0.82 on one machine, three seeds per point. The BF16 pool grew from 234,600 to 383,065 tokens. At every concurrency the two medians were within 2 percent of each other. The decode line with the highest token usage in the whole larger-pool sweep shows why: 64 running requests held 40,751 tokens, 11 percent of the pool. On the smaller pool the highest usage in the sweep was 18 percent. A pool that is never full has nothing to give.
+手册在同一台机器上以 0.7 与 0.82 两个比例分别运行了相同的负载扫参（每个测试点 3 次随机种子）。BF16 显存池从 234,600 增至 383,065 token。在所有并发点上，两组测试的中位数差异均在 2% 以内。在大显存池测试全过程中 token 利用率最高的 decode 日志清晰解释了原因：64 个运行中的请求总共仅占用 40,751 token，只占池容量的 11%。在小显存池中，整个扫参的最高利用率也仅为 18%。显存池从未被填满，扩大它自然不会带来收益。
 
-### What the open loop showed
+### 开环测试显示了什么
 
-The open-loop sweep offered 16 requests per second, more than the machine serves. At 0.7 the decode line read 374 running requests at a token usage of 0.96, with 101 requests waiting in the queue. At 0.82 all 480 requests of the run fit at once at a usage of 0.75, with none waiting. The run completed 5.19 requests per second against 3.88, which is 34 percent more, and 664 against 497 output tokens per second. The two runs were a day apart, so part of the gap can be the machine. The log lines prove the mechanism, and the size of the gain belongs to that run.
+开环测试以每秒 16 个请求的速率施压，这一到达率超过了机器的实际服务能力。在 0.7 比例下，decode 日志显示 374 个运行中请求占用了 0.96 的 token 容量，同时有 101 个请求在队列中排队。而在 0.82 比例下，测试中的全部 480 个请求在 0.75 的利用率下被全量一次性接纳，排队请求数为零。整个压测完成速率为 5.19 req/s 对比前者的 3.88 req/s，吞吐提升了 34%；输出速度达到 664 tok/s 对比 497 tok/s。由于两次运行相隔一天，部分差异可能受到机器状态波动影响，但日志证实了背后的机制，增益幅度则只对应那次运行。
 
-### Why the closed loop could not see it
+### 为什么闭环测试无法观察到这一收益
 
-In a closed loop each client waits for its answer before it sends the next request. The server never holds more work than it finishes, so the pool never fills. Real users arrive on their own clock. Only an arrival rate above the service rate shows what the pool is worth.
+在闭环压测中，每个客户端必须等待收到前一个请求的回答后才会发出下一个请求。服务器永远不需要承载超过其实际处理能力的在途工作量，因此显存池永远不会被填满。而真实用户是根据自身时钟自发到达的。只有当请求到达率高于系统处理能力时，显存池容量的真正价值才会体现出来。
 
-### The cost of memory nobody uses
+### 闲置未用显存的代价
 
-On a shared machine, memory in the pool is memory that another program cannot use. The manual's machine ran a memory guard that paused the scheduler when the pool allocation grew by tens of gigabytes in seconds. On a dedicated GPU, trust the automatic value first, and raise the fraction in steps of 0.02 only when the scheduler log shows a full pool and retractions.
+在共享机器上，划入显存池的内存是其他程序无法使用的资源。手册实测机器上配置的内存保护守护进程，在显存池分配量几秒内增加数十 GB 时暂停了调度器。在专用 GPU 上，优先信任引擎的自动计算值，只有在调度器日志频繁出现显存池已满并触发请求撤回（retraction）时，才以 0.02 为步长逐步调高。
 
-### The measurement that settles it
+### 一锤定音的关键测量
 
-Read the token usage in the decode lines at peak load, the queue length, and the retraction count. Read `max_total_num_tokens` at startup. If usage never approaches one and nothing waits, the pool is not the limit, and the extra memory belongs to something else.
+在业务峰值负载期间读取 decode 日志中的 token 利用率、队列排队长度以及请求撤回次数。在启动时查看 `max_total_num_tokens`。如果实际利用率从未接近 1 且从未产生排队，显存池就不是瓶颈所在，多余的显存应当让渡给其他用途。
 
 ## Follow-ups
 
-- **Level 3:** Why did the closed-loop sweep never fill the pool? Expected: each client waits for its answer before it sends the next request, so the server never holds more work than it finishes.
-- **Level 3:** Which log lines tell you the pool is the limit? Expected: token usage near one in the decode lines, a queue above zero, and retractions.
-- **Level 4:** On a shared machine, what does an oversized pool cost? Expected: memory that other programs cannot use. The manual's machine had a guard that paused the scheduler when the pool allocation grew by tens of gigabytes in seconds.
-- **Level 4:** The two overload runs were a day apart. How much of the gain do you trust? Expected: the mechanism, from the lines that show one pool full with requests waiting and the other with room. The size of the gain needs a same-day repeat.
+- **Level 3:** 为什么闭环负载扫参从未打满过显存池？ Expected: 每个客户端必须收到回复后才发送下一个请求，服务器承载的在途工作量永远不会超过其自身处理能力。
+- **Level 3:** 哪些日志行能够确证显存池已经成为系统瓶颈？ Expected: decode 日志中 token 使用率接近 1、排队请求数大于零、以及出现请求撤回。
+- **Level 4:** 在共享机器上过度分配显存池会带来什么代价？ Expected: 抢占了其他程序可用的物理内存；手册机器上的保护守护进程在显存池数秒内暴增数十 GB 时直接挂起了调度器。
+- **Level 4:** 两次过载压测相隔了一天，你应该在多大程度上信任该收益幅度？ Expected: 机制层面完全可信（日志明确展示了一方打满排队而另一方游刃有余）；但具体的增益数值应在同一天内复测确认。
 
 ## Wrong answers
 
-- "The pool did not matter, revert it." It did not matter under a load that never filled it. The overload filled it and completed a third more requests per second.
-- "Give the pool as much memory as possible." On a shared machine that memory is taken from other programs, and past the point where the pool fills it buys nothing.
-- "Throughput at 64 users is the capacity number." Capacity shows under an arrival rate above the service rate, which a closed loop cannot produce.
+- "显存池扩容毫无作用，直接回滚。" 它在未满载的负载下看似无用，但在过载突发时打满了显存池并多处理了三分之一的吞吐量。
+- "给显存池尽可能多的显存。" 在共享机器上，这些内存是从其他程序手里拿走的。显存池已经够用之后，再扩大也没有收益。
+- "64 并发下的吞吐量就是系统的真实容量。" 真正的容量极限必须在到达率高于处理率的开环测试下才能显现，闭环测试无法制造这种压力。
 
 ## Taught in
 
-The [memory fraction section of SGLang 101](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md) measures the same pool in a closed-loop sweep and in an overload that arrives faster than the server serves.
+[--mem-fraction-static 与启动容量计算](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)在闭环扫参和到达率高于处理能力的过载场景下实测了相同的显存池表现。

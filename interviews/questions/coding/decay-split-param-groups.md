@@ -1,6 +1,6 @@
 ---
 id: decay-split-param-groups
-title: Which parameters get weight decay
+title: 哪些参数该做权重衰减
 card: coding
 kind: code-reading
 level: 3
@@ -16,21 +16,21 @@ related: [coding/adamw-decoupled-decay, coding/rmsnorm-vs-layernorm]
 updated: 2026-11-03
 ---
 
-A training run looks healthy for the first few thousand steps, then the loss starts to climb and samples degrade. The optimizer is built with one parameter group:
+一次训练在最初几千步看起来正常，之后损失开始上升，生成的样本变差。优化器只用了一个参数组：
 
 ```python
 optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 ```
 
-Write the function that builds the parameter groups correctly and explain which tensors must be excluded from decay and why.
+写一个正确构建参数组的函数，并解释哪些张量必须排除在衰减之外，以及原因。
 
 ## Short answer
 
-Decay belongs on matrix-shaped tensors, which are the linear weights and the embedding tables, and not on normalization scales or biases. A decayed LayerNorm scale drifts toward zero over thousands of steps until normalization stops working, which matches the late failure. Split the parameters by shape into a decay group and a no-decay group and pass both to the optimizer.
+衰减只加在矩阵形状的张量上，也就是线性层权重和嵌入表，不加在归一化缩放系数和偏置上。被衰减的 LayerNorm 缩放系数会在几千步里逐渐趋向零，直到归一化失效，这和训练后期才出问题的现象一致。按形状把参数分成衰减组和不衰减组，两组都传给优化器。
 
 ## Full answer
 
-### The split
+### 分组
 
 ```python
 def build_param_groups(model, weight_decay):
@@ -45,32 +45,32 @@ def build_param_groups(model, weight_decay):
     ]
 ```
 
-A two-dimensional or larger tensor is a weight matrix or an embedding table. A one-dimensional tensor is a scale or a shift, which includes LayerNorm parameters and every bias. The rule by dimension is simple and matches the standard recipe.
+二维及以上的张量是权重矩阵或嵌入表。一维张量是缩放或平移，包括 LayerNorm 参数和所有偏置。按维度分组的规则很简单，也和标准配方一致。
 
-### Why decay on a scale is harmful
+### 为什么衰减缩放系数有害
 
-Weight decay pulls every decayed parameter toward zero on every step. A linear weight has gradient pressure in many directions and the pull acts as regularization. A LayerNorm scale has one job, to set the magnitude of the normalized activations, and a steady pull toward zero shrinks the residual stream of every block until the signal is too small for the layers that follow. The effect accumulates slowly, which is why the run looks fine at first.
+权重衰减每一步都把被衰减的参数拉向零。线性层权重在很多方向上都有梯度压力，这个拉力起到正则化作用。LayerNorm 缩放系数只负责一件事：设定归一化后激活值的幅度。持续把它拉向零，会缩小每个块的残差流，直到信号小到后面的层没法用。这个效应累积得很慢，所以训练一开始看起来没问题。
 
-### Why decay on a bias is waste
+### 为什么衰减偏置是浪费
 
-Decaying a bias is mathematically harmless but spends update cycles on a parameter that regularization does not need to control. The split excludes it along with the scales.
+衰减偏置在数学上无害，但会把更新花在正则化不需要控制的参数上。分组时它和缩放系数一起被排除。
 
-### How to test the split
+### 怎样测试分组
 
-A unit test can walk the named parameters and assert that each scale and bias landed in the no-decay group and each linear and embedding weight landed in the decay group. The loop lesson lists exactly this test as its first exercise.
+单元测试可以遍历具名参数，断言每个缩放系数和偏置都在不衰减组，每个线性层权重和嵌入权重都在衰减组。循环课把这个测试列为第一道练习。
 
 ## Follow-ups
 
-- **Level 3:** The language model head is tied to the token embedding. Which group is it in, and how many times? Expected: once, in the decay group, because it is the same tensor as the embedding table.
-- **Level 3:** A model uses RMSNorm instead of LayerNorm. Does the rule change? Expected: no; the RMSNorm weight is one-dimensional and stays out of the decay group.
-- **Level 4:** Why does the problem appear late rather than at the start of training? Expected: the decay shrinks the scale by a small fraction per step, so the damage compounds over thousands of steps before the activations become too small.
+- **Level 3:** 语言模型的输出头和 token 嵌入共享权重。它在哪个组？出现几次？ Expected: 只出现一次，在衰减组，因为它和嵌入表是同一个张量。
+- **Level 3:** 模型用 RMSNorm 代替 LayerNorm。规则要变吗？ Expected: 不变；RMSNorm 的权重是一维的，留在衰减组之外。
+- **Level 4:** 为什么问题出现在训练后期，而不是一开始？ Expected: 衰减每步只把缩放系数缩小一小部分，损害要累积几千步，激活值才会变得太小。
 
 ## Wrong answers
 
-- "Weight decay applies to all weights by definition." The standard recipe excludes normalization and bias tensors; applying it everywhere breaks normalization over time.
-- "Decide by parameter name, excluding anything called bias." Names vary across implementations; the dimension rule is robust.
-- "Lower the weight decay until the run is stable." A smaller value slows the drift but keeps the pull on the scales.
+- "按定义，权重衰减作用于所有权重。" 标准配方排除了归一化张量和偏置张量；处处都加衰减，久而久之会破坏归一化。
+- "按参数名判断，排除所有叫 bias 的参数。" 不同实现的命名不一样；按维度判断更可靠。
+- "把权重衰减调小，直到训练稳定。" 调小只会减慢漂移，缩放系数仍然被拉向零。
 
 ## Taught in
 
-The [training loop lesson](../../../phases/19-capstone-projects/36-training-loop-eval/) defines the two-group AdamW split and the test for it, and the [Adam practice](../../../practice/adam-step/) implements the decoupled decay the groups feed into.
+[训练循环课](../../../phases/19-capstone-projects/36-training-loop-eval/)定义了 AdamW 的两组划分和对应的测试，[Adam 练习](../../../practice/adam-step/)实现了这些参数组所用的解耦衰减。

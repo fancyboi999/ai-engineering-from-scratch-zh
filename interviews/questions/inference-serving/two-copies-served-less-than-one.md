@@ -1,6 +1,6 @@
 ---
 id: two-copies-served-less-than-one
-title: Two data-parallel copies, less output than one card
+title: 两个数据并行副本，产出却不如单卡
 card: inference-serving
 kind: debug
 level: 3
@@ -15,56 +15,55 @@ cheatsheet: []
 related: []
 updated: 2026-11-03
 ---
-
-You add a second L4 to an SGLang server with `--dp-size 2` and expect about twice the throughput. The sweep shows less than one card gave: at 64 users the pair peaks at 64 tokens per second and falls to 42, and the P99 first token is 391 seconds against 33.4 on one card. Both copies loaded the weights without an error. What do you check, and what went wrong?
+你在 SGLang 服务器上加上 `--dp-size 2` 增加了第二张 L4，本以为吞吐量能翻倍。压测却显示输出比单卡还要低：64 个用户时，双卡峰值只有每秒 64 个 token，随后跌到 42，P99 首 token 时间是 391 秒，而单卡是 33.4 秒。两个副本加载权重时都没有报错。你会检查什么？到底哪里出了问题？
 
 ## Short answer
 
-Read the `KV Cache is allocated` line of every DP rank before you trust the sum. On that pair the second card ran two pods of another team, so its copy had 3.17 GB free after the weights against 6.59 GB and a pool of 2,925 tokens against 24,094, an eighth of the first. The round-robin controller does not look at pools, so it sent every second request to the small copy, where 4 ran and 59 waited, while the large copy held one to three requests and used 2 to 7 percent of its pool.
+在相信汇总数据之前，先读取每个 DP rank 的 `KV Cache is allocated` 日志行。在那对卡上，第二张卡运行了另一个团队的两个 pod，所以加载权重后只剩 3.17 GB 显存（另一张卡有 6.59 GB），池只有 2,925 token，仅为第一张卡（24,094 token）的八分之一。轮询控制器不看池容量，把每两个请求中的一个发给小副本，导致小副本上 4 个在跑、59 个在等，而大副本只分到一到三个请求，仅使用了 2% 到 7% 的池空间。
 
 ## Full answer
 
-### The two pools
+### 两个池
 
-The startup lines of the two ranks tell the story before the first request:
+两个 rank 的启动日志在第一个请求到来前就说明了情况：
 
-- `DP0` loaded the weights in 3.61 s and had 6.59 GB left; its pool was 24,094 tokens.
-- `DP1` loaded the same 15.28 GB of weights in 3.73 s and had 3.17 GB left, because two pods of 1,746 MiB each held the rest; its pool was 2,925 tokens. Four requests of 640 tokens fill it.
+- `DP0` 在 3.61 秒内加载了权重，剩余 6.59 GB；它的池有 24,094 token。
+- `DP1` 在 3.73 秒内加载了相同的 15.28 GB 权重，剩余 3.17 GB，因为两个各占 1,746 MiB 的 pod 占用了其余显存；它的池有 2,925 token。4 个 640 token 的请求就能把它填满。
 
-The decode lines at 64 running requests show the result. `DP1` ran 4 requests at a token usage of 0.82 to 0.87 with 59 in its queue. `DP0` ran one to three requests at a usage of 0.02 to 0.07 with an empty queue.
+64 个运行请求下的 decode 日志显示了结果。`DP1` 运行 4 个请求，token 使用率为 0.82 到 0.87，队列里有 59 个。`DP0` 运行一到三个请求，使用率为 0.02 到 0.07，队列为空。
 
-### Why the client could not help
+### 客户端为什么帮不上忙
 
-The benchmark keeps 64 requests open at a time. Round robin alternates requests between the copies without a look at pools or queues. At 64 users, 63 requests sat on the small copy, 4 running and 59 waiting. The client could not send the large copy more work until the small copy gave a slot back.
+该基准测试同一时刻保持 64 个打开的请求。轮询方式在各副本之间交替分发请求，不查看池或队列。在 64 个用户下，63 个请求堆在小副本上，4 个在运行，59 个在等待。在小副本释放槽位之前，客户端无法给大副本发送更多工作。
 
-### What it cost
+### 造成的代价
 
-One L4 reached 270 tokens per second. The pair peaked at 64 and fell to 42 as its clock fell: it ran at 765 and 675 MHz at 32 and 64 users, under the manual's clock floor, while the single card ran at 1,320 and 1,080 MHz, so part of the loss is the clock. At 64 users the median P99 first token of three seeds was 33.4 seconds on one card and 391 seconds on the pair. Up to 4 users the pair was already 16 to 41 percent slower for a reason the manual did not isolate, and at one user it took 79.6 ms per token against 60.2 at a higher clock. With a fixed arrival rate the pair completed at most 0.21 requests per second inside the latency target, against 0.96 for one card.
+单张 L4 达到了每秒 270 个 token。双卡峰值只有 64，随着频率下降跌到了 42：在 32 和 64 个用户时它运行在 765 和 675 MHz，低于手册的频率底线，而单卡运行在 1,320 和 1,080 MHz，所以部分损失来自频率。在 64 个用户下，单卡三个种子的 P99 首 token 中位数是 33.4 秒，双卡是 391 秒。在 4 个用户以内，双卡就已经慢了 16% 到 41%（手册未单独查明具体原因），在 1 个用户下每个 token 耗时 79.6 ms，而单卡是 60.2 ms，而双卡那次的频率还更高。在固定到达率下，双卡在延迟目标内最多完成每秒 0.21 个请求，单卡是 0.96 个。
 
-### Route by tokens
+### 按 token 路由
 
-`--load-balance-method total_tokens` sends each request to the copy that holds the fewest tokens. On the same uneven pair it gave 114.7 tokens per second at 64 users, against 41.7 with round robin and 250.9 on one L4. At 8 users it gave 92.1 against 64.2 and 112.6. The median first token at 64 users fell from 4,763 to 3,977 ms. That run had a median clock of 1,020 MHz against 675 in the round-robin run, so part of the gain is the card. A large gain over round robin, and still a loss against one card.
+`--load-balance-method total_tokens` 会把每个请求发送给当前持有 token 最少的副本。在同样不均衡的双卡上，它在 64 个用户下达到了每秒 114.7 个 token，轮询时是 41.7，单张 L4 是 250.9。在 8 个用户下，它给出了 92.1，轮询是 64.2，单卡是 112.6。64 个用户下的中位首 token 时间从 4,763 ms 降到了 3,977 ms。那次运行的中位频率是 1,020 MHz，轮询运行是 675 MHz，所以部分收益来自硬件频率。相比轮询有了很大提升，但相比单卡依然是倒退。
 
-### Tensor parallelism would have refused
+### 张量并行本会拒绝启动
 
-`--tp-size 2` on the same pair stopped two seconds after the collective library started. Before it loads weights, each rank measures its free memory and the group keeps the smallest value. If that value is under 90 percent of the local free memory, the server stops. The shared card had 18.28 GB free against the 19.53 GB that the check required. Each rank of a tensor group holds the same share of weights and the same pool, so the smallest card sets the size for all. `--dp-size 2` has no such check, because each copy sizes its own pool, so it started and lost.
+在同样的双卡上运行 `--tp-size 2`，在集合通信库启动两秒后就退出了。在加载权重之前，每个 rank 会测量自己的空闲显存，整个组取最小值。如果该值低于本地空闲显存的 90%，服务器就会停止。共享的卡有 18.28 GB 空闲，而检查要求 19.53 GB。张量组的每个 rank 承担相同份额的权重和相同的池，所以最小的卡决定了所有卡的规格。`--dp-size 2` 没有这种检查，因为每个副本各自决定池大小，所以它启动了，但性能大跌。
 
-### The rule
+### 规则
 
-Add capacity with copies only when every copy has about the same pool. Give a group whole GPUs on a shared machine. Check the `#tokens` line of each DP rank before you count on the sum. The other fix, two separate servers behind a gateway with weights, the manual did not measure.
+只有在每个副本拥有大致相同池容量的情况下，才靠增加副本扩容。在共享机器上，给组分配整张 GPU。在指望汇总吞吐量之前，先检查每个 DP rank 的 `#tokens` 日志行。另一种办法是用支持加权路由的网关承接两个独立服务器，手册没有测过这种方案。
 
 ## Follow-ups
 
-- **Level 3:** Why did the large copy sit almost idle while 59 requests waited? Expected: the benchmark is a closed loop with 64 open requests, round robin put half of them on the small copy, and the client could not send new work to the large copy until the small copy returned a slot.
-- **Level 3:** Why did a tensor split refuse the same pair while the data-parallel pair started? Expected: tensor parallelism checks that every rank has at least 90 percent of the local free memory, because every rank holds the same share and pool, and the shared card had 18.28 GB against the 19.53 GB required; data parallelism sizes each copy's pool on its own and has no such check.
-- **Level 4:** Routing by total tokens lifted the pair to 114.7 at 64 users. Is the problem solved? Expected: no; one card alone gave 250.9, the token-routed run also had a higher clock than the round-robin run so part of the gain is the card, and the fix is equal pools, with whole GPUs for each copy or separate servers behind a gateway with weights.
+- **Level 3:** 为什么大副本几乎闲置，而 59 个请求却在排队？ Expected: 基准测试是一个保持 64 个打开请求的闭环，轮询把其中一半分给了小副本，在小副本交回槽位之前，客户端无法给大副本发送新工作。
+- **Level 3:** 为什么张量并行拒绝了同样的双卡，而数据并行却启动了？ Expected: 张量并行会检查每个 rank 至少拥有本地空闲显存的 90%，因为每个 rank 承担相同份额和相同的池，而共享卡只有 18.28 GB，检查要求 19.53 GB；数据并行各自决定池大小，没有这种检查。
+- **Level 4:** 按 token 总量路由在 64 个用户下把双卡提升到了 114.7。问题解决了吗？ Expected: 没有；单卡能达到 250.9，按 token 路由的运行频率也高于轮询运行，所以部分收益来自硬件本身，真正的解决办法是对等的池，为每个副本分配整张 GPU，或用支持加权路由的网关承接独立服务器。
 
 ## Wrong answers
 
-- "Both copies loaded, so the second card is fine." The weights need 15.28 GB on each card; the pool is sized from what is left, and the shared card had 3.17 GB left against 6.59, an eighth of the pool.
-- "The controller balances load, so a slow copy gets fewer requests." The default round robin does not look at pools or queues; it alternated requests, so 63 of 64 open requests ended on the small copy.
-- "The pair is slower because of the clock, so run it again when the card is cool." The pair did run under the clock floor at 32 and 64 users, but it was already 16 to 41 percent slower up to 4 users, and the log shows 59 requests waiting on one copy; the pool explains the shape and the clock explains part of the size.
+- "两个副本都加载成功了，所以第二张卡没有问题。" 权重在每张卡上都需要 15.28 GB；池由剩余显存决定，共享卡只剩 3.17 GB（正常卡为 6.59 GB），池容量仅为八分之一。
+- "控制器会自动平衡负载，慢的副本分到的请求更少。" 默认的轮询不看池和队列；它交替分发请求，所以 64 个打开请求中有 63 个落在了小副本上。
+- "双卡变慢是因为降频，机器冷却后重跑即可。" 双卡在 32 和 64 个用户下确实低于频率底线，但在 4 个用户以内就已经慢了 16% 到 41%，日志也显示 59 个请求在一个副本上等待；池决定了趋势，频率只解释了一部分幅度。
 
 ## Taught in
 
-[The SGLang parallelism section](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md) has the two-pool listing, the sweep and the routing fix.
+[SGLang 并行一节](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md)展示了双池日志、压测数据和路由修复方案。

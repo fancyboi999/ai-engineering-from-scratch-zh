@@ -1,6 +1,6 @@
 ---
 id: loss-drops-to-zero-no-mask
-title: The loss collapses and the samples are nonsense
+title: 损失骤降，采样却是乱码
 card: transformers
 kind: debug
 level: 2
@@ -16,50 +16,50 @@ related: [transformers/causal-mask-minus-infinity]
 updated: 2026-11-03
 ---
 
-A new decoder-only language model on a vocabulary of 64 tokens reaches a training loss near zero after only some hundreds of steps, and the sampled text is nonsense. Name the two most likely causes and the check that tells them apart.
+一个新的 decoder-only 语言模型，词表有 64 个 token，只训练了几百步，训练损失就接近零，而采样出的文本是乱码。说出两个最可能的原因，以及区分它们的检查方法。
 
 ## Short answer
 
-On real text, a loss far below the logarithm of the vocabulary size this early, with nonsense samples, most likely means the model can see its own target. Either the causal mask is missing, so position i reads the token at i plus one through attention, or the targets were never shifted, so the input and the target are the same sequence. Check the attention weights: if any mass sits above the diagonal the mask is gone; if the weights are triangular, print one batch and compare the input and target columns.
+在真实文本上，这么早就远低于词表大小的对数，采样又是乱码，最可能的原因是模型能看到自己的目标。要么因果 mask 缺失，位置 i 通过注意力读到了 i 加 1 处的 token；要么目标从来没有错开一位，输入和目标是同一个序列。检查注意力权重：只要对角线上方有任何权重，mask 就不在了；如果权重是三角形的，就打印一个批次，比较输入列和目标列。
 
 ## Full answer
 
-### What a healthy run looks like
+### 健康的训练是什么样
 
-At the first step the loss should sit near the logarithm of the vocabulary size, about 4.16 for 64 tokens. On the lesson's repeat task it falls to well under 1.0 over three epochs because the next token equals the previous one. A loss that reaches zero on real text is not learning; it is copying.
+第一步的损失应该在词表大小的对数附近，64 个 token 时约为 4.16。在课程的重复任务上，因为下一个 token 等于前一个，损失在三个 epoch 内降到远低于 1.0。在真实文本上降到零，不是在学习，而是在抄答案。
 
-### Cause one: the mask
+### 原因一：mask
 
-The mask replaces every entry above the diagonal of the score matrix with minus infinity before the softmax. Forget it and every position attends to the whole sequence, including the answer. The lesson's phrase: forget the mask and you train a model that cheats. Common ways to lose it: the mask buffer is built for the maximum context and never sliced to the current length, the mask is applied after the softmax, or the attention call takes a flag that defaults to non-causal.
+mask 在 softmax 之前把分数矩阵对角线上方的每一项换成负无穷。忘了它，每个位置都会关注整个序列，包括答案。课程的说法是：忘了 mask，你训练出来的模型就会作弊。常见的丢失方式有：mask buffer 按最大上下文构建，却没有切到当前长度；mask 加在了 softmax 之后；或者注意力调用有一个参数，默认是非因果的。
 
-### Cause two: the shift
+### 原因二：错位
 
-Given tokens `[t1, t2, t3, t4]`, the input is `[t1, t2, t3]` and the target is `[t2, t3, t4]`. If the data loader returns the same window twice, the model learns the identity. The loss collapses even with a perfect mask.
+给定 token `[t1, t2, t3, t4]`，输入是 `[t1, t2, t3]`，目标是 `[t2, t3, t4]`。如果数据加载器把同一个窗口返回两次，模型学到的就是恒等映射。即使 mask 完全正确，损失也会崩掉。
 
-### The checks
+### 检查
 
-1. **Causality test.** Perturb a token at position j and assert that the outputs at positions before j do not change. The lesson's test suite pins this property.
-2. **Triangle test.** Return the attention weights for one head and confirm the upper triangle is exactly zero after the softmax.
-3. **Batch inspection.** Print one input and target pair and confirm the target is the input shifted left by one.
-4. **Held-out check.** Compute the loss on held-out text with the same pipeline. A model that memorized a small corpus has a high held-out loss and samples that copy the training text; a leak gives nonsense samples.
+1. **因果性测试。** 扰动位置 j 的 token，断言 j 之前位置的输出不变。课程的测试集固定检查了这一性质。
+2. **三角测试。** 取出一个头的注意力权重，确认 softmax 之后上三角正好为零。
+3. **查看批次。** 打印一对输入和目标，确认目标是输入左移一位的结果。
+4. **留出集检查。** 用同一条流水线在留出文本上算损失。一个背下了小语料的模型，留出集损失很高，采样会照抄训练文本；而泄漏会产出乱码采样。
 
-### Why sampling exposes it
+### 采样为什么能暴露问题
 
-During training the answer leaks through the input, so the loss is low. At sampling time the model has nothing to copy from, so it emits noise. A model that learned the real task is good at both.
+训练时答案通过输入泄漏，所以损失很低。采样时模型无处可抄，只能输出噪声。真正学会任务的模型，两边都表现好。
 
 ## Follow-ups
 
-- **Level 2:** What loss do you expect at step zero, and why? Expected: about the logarithm of the vocabulary size, about 4.16 for 64, because a random model spreads probability evenly.
-- **Level 2:** How do you make the shift mistake impossible in the loader? Expected: slice one window of length T plus 1 and return `window[:-1]` and `window[1:]` from the same slice, with a test on one example.
-- **Level 3:** Write the causality unit test in one sentence. Expected: change the token at position j, run the block again, and assert that every output before j is unchanged.
-- **Level 3:** The mask and the shift are right, and the loss is still suspiciously low. What else leaks? Expected: a validation window that overlaps the training stream, or padding tokens counted as easy targets; check the split and the loss mask.
+- **Level 2:** 第 0 步你预期损失是多少，为什么？ Expected: 约等于词表大小的对数，64 时约为 4.16，因为随机模型把概率均匀分配。
+- **Level 2:** 怎样让加载器里根本不可能出错位的错误？ Expected: 切出一个长度为 T 加 1 的窗口，从同一个切片返回 `window[:-1]` 和 `window[1:]`，并用一个例子做测试。
+- **Level 3:** 用一句话写出因果性单元测试。 Expected: 改动位置 j 的 token，再跑一遍 block，断言 j 之前的每个输出都不变。
+- **Level 3:** mask 和错位都没问题，损失还是低得可疑。还有什么会泄漏？ Expected: 验证窗口和训练数据流重叠，或者把 padding token 当作容易的目标计入了损失；检查数据切分和损失 mask。
 
 ## Wrong answers
 
-- "The model is just learning fast." A loss near zero on natural text is not possible without seeing the target.
-- "Add dropout to regularize it." Dropout does not stop a leak; it only makes the copy slightly noisier.
-- "Lower the learning rate." The optimization is fine; the objective is broken.
+- "模型只是学得快。" 不看到目标，自然文本上的损失不可能接近零。
+- "加 dropout 做正则化。" dropout 堵不住泄漏，只会让抄答案稍微多点噪声。
+- "调低学习率。" 优化没问题；坏的是目标。
 
 ## Taught in
 
-The [attention capstone](../../../phases/19-capstone-projects/33-multihead-self-attention/) and the [block capstone](../../../phases/19-capstone-projects/34-transformer-block/) build and test the mask, and the [causal language modeling lesson](../../../phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/) defines the shift-by-one loss.
+[注意力综合项目](../../../phases/19-capstone-projects/33-multihead-self-attention/)和 [block 综合项目](../../../phases/19-capstone-projects/34-transformer-block/)实现并测试了 mask，[因果语言建模一课](../../../phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/)定义了错开一位的损失。

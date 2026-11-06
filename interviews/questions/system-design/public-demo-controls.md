@@ -1,6 +1,6 @@
 ---
 id: public-demo-controls
-title: Put a model demo behind a public link safely
+title: 安全地将模型演示 Demo 暴露在公开链接后
 card: system-design
 kind: design
 level: 2
@@ -16,72 +16,72 @@ related: [system-design/demo-to-product-signals, system-design/streaming-and-fal
 updated: 2026-11-03
 ---
 
-A reviewer and a customer want to try your model from a link, on a phone, without your notebook. Each model call costs money. Design the demo: the input contract, the order of the checks, the controls for a public link, and what the log is allowed to keep.
+一位评审人员和一位客户希望直接通过手机上的网页链接试用你的模型，而不需要运行你的 Notebook。每一次模型推理调用都需要消耗真实资金。请设计该 Demo 系统：输入契约定义、各项检查的前后顺序、面向公开链接的安全防护机制，以及日志系统被允许记录的内容。
 
 ## Short answer
 
-Write the contract first: a string of 1 to 500 characters with no control characters, a model call with a known cost, and an output that includes a JSON error with a hint. Run the checks in order of cost, body size, access token, per-client token bucket, input validation, daily cap, and only then the model call. Return a stable error code with a message, a hint and a request id, and log the route, the status, the latency and the input length with a keyed hash of the client, never the text or the address.
+首先明确定义接口契约：包含 1 到 500 个字符且不含控制字符的字符串、具备已知单次调用成本的模型接口，以及失败时返回附带操作建议的 JSON 错误信息。按照计算成本由低到高的顺序依次执行校验：请求体大小限制、访问令牌认证、单客户端令牌桶限流、输入格式校验、每日总成本封顶，最后才真正调用模型。针对错误返回稳定的错误码、错误描述、操作建议以及请求 ID，日志仅记录请求路由、状态码、耗时、输入文本长度以及客户端的带密钥哈希，绝不持久化任何输入原始文本或 IP 地址。
 
 ## Full answer
 
-### The contract
+### 接口契约
 
-| Part | Question | Answer in the lesson |
+| 组成部分 | 核心问题 | 课程中的规范回答 |
 |---|---|---|
-| Input | What type, size and characters | A string of 1 to 500 characters, no control characters |
-| Model call | How long and how much | Known latency and cost per call |
-| Output | What the user sees on success and failure | A label and a reply, or a JSON error with a hint |
+| 输入约束 | 允许什么数据类型、大小与字符集 | 1 到 500 个字符的字符串，严禁控制字符 |
+| 模型调用 | 耗时与资金成本预期 | 明确单次调用的预期延迟与资金成本 |
+| 最终输出 | 成功与失败时用户分别看到什么 | 标签与回答，或附带操作提示的结构化 JSON 错误 |
 
-A notebook has no limit on any part. The demo sets one on each, and the server applies it to every client, because any client can skip the page.
+Notebook 环境对上述任何一项都没有限制。Demo 系统则对每一项施加明确限制，且必须由服务端对每个请求强制执行，因为任何客户端都可以绕过前端页面直接发包。
 
-### Checks in order of cost
+### 依成本由低到高排序的校验链路
 
-1. Read the content length and refuse a body over 4,096 bytes before reading it.
-2. Check the access token when one is required.
-3. Take one token from the client's bucket; refuse with 429 and a `Retry-After` header when empty.
-4. Parse and validate the body: JSON object, text present, inside the limit, no control characters, with 422 for a bad field.
-5. Charge the daily cap; refuse with 503 and `Retry-After` when the day's budget is spent.
-6. Call the model.
+1. 读取 Content-Length 请求头，在真正读取报文前直接拒绝超过 4,096 字节的请求体。
+2. 若配置了访问认证，核验访问令牌。
+3. 从当前客户端专属的令牌桶中扣减一枚令牌；若桶已空则返回 429 状态码并附带 `Retry-After` 响应头。
+4. 解析并校验请求体数据结构：必须为 JSON 对象、必须包含 text 字段、字符数处于限制内、无控制字符；格式错误返回 422 状态码。
+5. 扣减每日总用量预算；若当天预算已耗尽则返回 503 状态码并附带 `Retry-After` 响应头。
+6. 真正发起模型调用。
 
-A bad request stops at the first failed check and costs almost nothing. The paid step is last, so only valid requests count against the cap.
+恶意或畸形请求会在最早的检查点被拦截，几乎不消耗任何算力资源。最昂贵的付费模型调用被放在最后一步，确保唯有完全合法的请求才会计入每日预算。
 
-### Controls once the link is public
+### 面向公开链接的安全控制
 
-| Risk | Control |
+| 面临的风险 | 对应的控制措施 |
 |---|---|
-| One client floods | A token bucket per client: a capacity for bursts, a refill rate for the long run |
-| Strangers find the link | An optional access token in the authorization header |
-| Total cost grows | A daily usage cap over all clients, counted in windows of 86,400 seconds |
-| Large or odd input | Body limit, text limit, control character check |
-| Logs keep private input | Records with the input length and a keyed hash of the client |
+| 单个客户端突发洪峰或刷量 | 单客户端专属令牌桶：桶容量应对瞬时突发，填充速率把控长期均值 |
+| 陌生人扫描并滥用链接 | 在 Authorization 请求头中支持可选配置的访问口令令牌 |
+| 总成本失控飙升 | 针对所有客户端聚合计算每日消耗上限，按 86,400 秒的窗口统计 |
+| 超大或畸形输入报文 | 报文体大小上限、文本字符数限制、非法控制字符过滤 |
+| 日志泄漏用户隐私输入 | 仅记录输入文本字符长度与客户端的带密钥哈希值 |
 
-A rate limit controls each client and not the total; a hundred polite clients can still spend the budget, which is what the cap is for.
+限流只能约束单个客户端，而无法限制整体总和；一百个规矩合法的客户端依然可能累加吃光全天预算，这正是设立每日总封顶的意义所在。
 
-### Errors a user can act on
+### 用户可操作的错误反馈
 
-Every error has the same shape: a stable `code` for clients and tests, a `message` with the numbers the user needs, a `hint` with one action, and a `request_id` that joins a user report to one log record. A stack trace does none of these jobs for a stranger.
+所有错误响应遵循统一的标准数据结构：面向客户端和测试用例的稳定 `code` 错误码、包含具体数值的清晰 `message` 描述、指明下一步具体解决行动的 `hint` 建议，以及将用户反馈工单与底层单条日志关联起来的唯一 `request_id`。堆栈跟踪对陌生人起不到任何这些作用。
 
-### Feedback and streaming
+### 交互反馈与流式传输
 
-The page disables the button while a request runs, shows the elapsed time, and shows the time to first token when it arrives, so the user can tell a slow model from a broken page and does not click again. Tokens stream as server-sent events over a POST body, not a GET URL, so the input never lands in an access log.
+前端页面在请求执行期间禁用提交按钮，展示已等待耗时，并在首 token 返回时展示首字耗时，帮助用户清晰区分模型响应缓慢与网页故障崩溃，避免再次点击。生成内容通过 Server-Sent Events 基于 POST 请求体流式传输，绝不使用 GET 请求的 URL 参数，从而防止用户输入被各级网关的访问日志记录下来。
 
-### What the log keeps
+### 日志记录规范
 
-Route, status, error code, latency and input length, plus a keyed hash of the client address for per-client counts. Never the input text, never the raw path, never the address. The page tells users what is kept.
+记录路由、HTTP 状态码、错误码、耗时与输入文本长度，以及用于客户端计数的客户端地址的带密钥哈希。绝不记录输入原始文本，绝不记录未经处理的原始请求路径，绝不记录真实 IP 地址。页面需向用户公开声明日志收集范围。
 
 ## Follow-ups
 
-- **Level 2:** Why does the daily cap run after validation and not before? Expected: so only valid requests count against the budget; a rejected request should not spend it.
-- **Level 2:** Behind a reverse proxy every request has the proxy's address. What breaks? Expected: all users share one bucket; read the client address from a header that only your proxy sets and trust it from nowhere else.
-- **Level 3:** Why send the input in a POST body instead of the URL for the event stream? Expected: servers and proxies write URLs into access logs, so a GET would store user text.
-- **Level 3:** A framework builds the page for you. Which controls are still your job? Expected: the rate limit, the cost cap and log privacy; the frameworks save work on the form and the streaming, not on the risks of a public link.
+- **Level 2:** 为什么每日总用量封顶要放在输入校验之后，而不是放在第一步？ Expected: 确保唯有完全合法的请求才会消耗预算；被校验拦截的畸形请求不应该白白浪费宝贵的正常业务配额。
+- **Level 2:** 经过反向代理后，所有请求都显示代理的地址。会出什么问题？ Expected: 所有外部用户共享同一个限流令牌桶从而互相挤占；从只有自有代理设置的请求头中读取客户端地址，且不信任其他来源的该请求头。
+- **Level 3:** 为什么流式事件传输要使用 POST 报文体而非 GET 请求 URL？ Expected: Web 服务器与代理网关通常会将完整 URL 直接刷入 access log，使用 GET 会导致用户的敏感输入文本被直接泄露落盘。
+- **Level 3:** 框架替你生成了页面，哪些控制仍由你负责？ Expected: 频率限制、成本封顶以及日志隐私脱敏；前端框架仅仅省去了表单绘制与流式通信的工作量，并未消除暴露在公开链接下的固有风险。
 
 ## Wrong answers
 
-- "Validate in the browser with a maximum length attribute." The browser helps honest users only; the server repeats every check.
-- "A rate limit per client is enough to control cost." It bounds each client, not the sum; the daily cap bounds the total.
-- "Log the full request so you can debug reports." The log then holds user text and addresses; a request id joins a report to a record without either.
+- "在浏览器前端使用 HTML 的 maxlength 属性校验长度即可。" 浏览器校验只对守规矩的用户有用；服务端必须重复执行每一项安全检查。
+- "配置了单客户端限流就足以控制成本。" 限流只约束单点速率，无法约束全盘总和；每日总封顶才能真正为账单兜底。
+- "完整记录整个请求报文，以便排查用户上报的问题。" 这会导致日志充斥着用户隐私文本与 IP 地址；通过 request_id 即可在不记录敏感数据的前提下将反馈与日志串联。
 
 ## Taught in
 
-The [model demo interfaces lesson](../../../phases/17-infrastructure-and-production/29-model-demo-interfaces/) gives the contract, the ordered checks, the token bucket, the usage cap and the private log.
+[模型演示界面课程](../../../phases/17-infrastructure-and-production/29-model-demo-interfaces/)给出了接口契约、有序检查链路、令牌桶算法、每日用量封顶以及隐私保护日志规范。

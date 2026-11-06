@@ -1,6 +1,6 @@
 ---
 id: split-or-copy-on-two-cards
-title: Split the model or copy it across two cards
+title: 在两张显卡间切分模型还是部署两份副本
 card: gpu-memory-quantization
 kind: design
 level: 3
@@ -16,59 +16,59 @@ related: []
 updated: 2026-11-03
 ---
 
-You have two L4 cards in one host, joined by PCIe only, and an 8B model that fits on one card with a KV pool that is too small for your users. Do you split the model across both cards or run two copies? Think about memory first, then about communication.
+你在单台主机上有两张仅通过 PCIe 连接的 L4 显卡，以及一个能装进单卡但留下的 KV 显存池无法满足用户需求的 8B 模型。你是在两张卡之间切分模型，还是运行两份副本？先从显存角度思考，再从通信角度思考。
 
 ## Short answer
 
-Tensor parallelism splits the weights and the KV cache across the two cards, so each card holds half the weights and gains several times the room for cache, and that is the layout that grows the pool per request; data parallelism holds a full copy of the weights on each card and doubles the users only if each copy's pool already fits them. Over PCIe, tensor parallelism pays a collective after every layer and can cost more than the split saves, so the documentation suggests pipeline parallelism on such a machine, which sends data only at the stage boundaries. Neither manual measured either layout on its two L4s, so I would measure tensor against pipeline against two copies on the real workload, and give any split whole GPUs, because a tensor group sizes every rank from the smallest card.
+张量并行将权重和 KV cache 切分到两张卡上，每张卡只承担一半权重并为 cache 腾出数倍空间，这是增大单请求显存池容量的拓扑；数据并行在每张卡上保留一份完整的模型权重，仅当每份副本自身的显存池已经能装下用户时才能使并发翻倍。在 PCIe 上，张量并行在每一层后都需要支付集合通信开销，其损失可能超过切分带来的收益，因此官方文档建议在此类机器上采用流水线并行，它仅在阶段边界传输数据。两本手册均未在其双 L4 上实测这两种拓扑，因此建议在真实负载上对比张量并行、流水线并行与双副本，并确保分配给切分的是完整的整卡，因为张量组会以显存最小的卡为基准规划所有 rank。
 
 ## Full answer
 
-### What each layout does to memory
+### 各种拓扑对显存的影响
 
-| Layout | Weights per GPU | KV cache per GPU | What grows |
+| 拓扑 | 单 GPU 权重占用 | 单 GPU KV cache 占用 | 扩展的指标 |
 |---|---|---|---|
-| Tensor | a slice of every layer | a slice of every layer's cache | the pool per request, several times when the weights fill most of one GPU |
-| Pipeline | the layers of its stage | the cache of those layers | the pool per request, and it accepts an uneven GPU count |
-| Data | a full copy | its own full pool | the number of users, only if one copy's pool already fits them |
+| 张量并行（Tensor） | 每一层的切片 | 每一层缓存的切片 | 单请求可用显存池，当权重占满单卡绝大部分时可扩容数倍 |
+| 流水线并行（Pipeline） | 该阶段分配的层 | 这些层对应的缓存 | 单请求可用显存池，且允许不均衡的 GPU 数量 |
+| 数据并行（Data） | 完整模型副本 | 自身独立的完整显存池 | 用户并发数，但前提是单副本显存池已经能装下他们 |
 
-One exception: a model with multi-head latent attention stores the full latent on every tensor-parallel rank, so the tensor split does not grow its cache. For a grouped-query model such as Qwen3-8B it does.
+一个例外：采用多头潜在注意力（MLA）的模型在每个张量并行 rank 上都存储完整的潜在向量，因此张量切分无法增大其缓存空间。而对于采用分组查询注意力（GQA）的模型（如 Qwen3-8B），张量切分能有效扩大缓存。
 
-### The decision tree
+### 决策树
 
-| Question | If yes | If no |
+| 判断条件 | 是 | 否 |
 |---|---|---|
-| Does the model fit on one GPU, with room for the KV cache you need? | Data parallelism, one copy per GPU. | Split the model. |
-| Does the split model fit inside one machine? | Keep the split inside the machine. | Pipeline parallelism across machines. |
-| Do the GPUs have NVLink, and does the GPU count divide the model evenly? | Tensor parallelism. | Pipeline parallelism inside the machine. |
+| 模型能否放入单张 GPU，且留出业务所需的 KV cache 空间？ | 数据并行，每张 GPU 一个副本。 | 切分模型。 |
+| 切分后的模型能否放入单台机器内？ | 单机内切分。 | 跨机器流水线并行。 |
+| GPU 是否配备 NVLink，且 GPU 数量能否整除模型？ | 张量并行。 | 单机内流水线并行。 |
 
-Your case answers the first question with no, because the room for the cache is the problem. The third question answers with no too, because PCIe is not a fast link. The tree lands on pipeline parallelism inside the machine, and the manual asks you to measure it against tensor parallelism before you pick, because it ran neither on its pair.
+当前场景对第一个问题的回答是否定的，因为缓存空间不足正是核心痛点。对第三个问题的回答也是否定的，因为 PCIe 并不是高速互联通道。决策树最终导向单机内流水线并行，且手册建议在定方案前与张量并行实测对比，因为手册未在其测试机上运行过这两者。
 
-### What the link costs
+### 互联通道的开销
 
-Tensor parallelism sends data after every layer, so it needs a fast link. On GPUs joined only by PCIe, such as two L4s in one host, that traffic can cost more than the split saves. Pipeline parallelism sends data once per stage boundary. Data parallelism sends nothing between copies.
+张量并行在每一层之后都会传输数据，因此高度依赖高速链路。在仅通过 PCIe 相连的 GPU 上（如单机双 L4），这部分通信开销可能会超过显存切分带来的收益。流水线并行仅在阶段边界传输一次数据。数据并行在副本之间无需任何通信。
 
-### The balance check
+### 显存均衡检查
 
-Before SGLang loads weights for a tensor group, each rank measures its free memory and the group keeps the smallest value. If that value is under 90 percent of the local free memory, the server stops, and no flag turns the check off. On the manual's pair the second card ran two pods of another team and had 18.28 GB free against the 19.53 GB that the check required, so the tensor split refused to start. Each rank holds the same share of weights and the same pool, so the smallest card sets the size for all. The data-parallel pair had no such check, started with pools of 24,094 and 2,925 tokens, and served less than one card at every load. Give any split whole GPUs.
+在 SGLang 为张量组加载权重之前，每个 rank 都会测量其可用显存，整个组取其中的最小值。若该最小值低于本地空闲显存的 90%，服务将直接报错终止，且没有任何参数可以关闭此检查。在手册的双卡环境中，第二张卡运行了其他团队的两个 pod，剩余空闲显存为 18.28 GB，低于检查要求的 19.53 GB，因此张量切分直接拒绝启动。每个 rank 分担相同比例的权重并拥有相同大小的显存池，因此显存最小的卡决定了所有卡的规格。数据并行双卡则没有这种检查，以 24,094 和 2,925 token 的不均衡显存池启动，在所有负载下的服务能力均低于单卡。任何切分方案都应独占完整的 GPU。
 
-### The processes
+### 进程组织
 
-With data parallelism vLLM starts one engine core per copy and a coordinator; with tensor parallelism one worker per GPU under one engine core. In SGLang the world size is the tensor size times the pipeline size, and data-parallel copies get a controller that sends requests round robin by default.
+在数据并行下，vLLM 为每个副本启动一个引擎核心，并配有一个协调器；在张量并行下，单个引擎核心管理每张 GPU 上的一个 worker。在 SGLang 中，world size 等于张量大小乘以流水线大小，数据并行副本配备一个控制器，默认轮询分发请求。
 
 ## Follow-ups
 
-- **Level 3:** The model fits on one card. Why might the decision tree still say split? Expected: the first question asks whether it fits with room for the KV cache you need; with a pool that cannot hold your users the answer is no, so the tree moves to a split, and tensor or pipeline parallelism is what grows the pool per request.
-- **Level 3:** Why does the tensor split need whole GPUs on a shared machine? Expected: every rank holds the same share of weights and the same pool, so the smallest card sets the size for all; SGLang measures free memory on each rank and stops when one has less than 90 percent of the local free memory, 18.28 against 19.53 GB in the manual's case.
-- **Level 4:** Over PCIe, how would you decide between tensor and pipeline parallelism without a measurement from the manuals? Expected: run both on the real workload and read throughput with the P99 ITL and the first token at matched clocks; tensor pays a collective after every layer on the slow link and pipeline pays once per stage boundary, so the pipeline layout can win on a PCIe pair, and the documentation suggests it there.
+- **Level 3:** 模型可以装进单卡，为什么决策树依然可能建议切分？ Expected: 第一个判断条件是能否装下模型并留出足够的 KV cache 空间；如果显存池无法容纳目标用户，答案就是否定，决策树随之转向切分，而张量或流水线并行正是扩大单请求显存池容量的手段。
+- **Level 3:** 为什么在共享机器上张量切分需要整卡独占？ Expected: 每个 rank 承担相同份额的权重和相同大小的显存池，显存最小的卡决定了所有 rank 的规格；SGLang 会测量每个 rank 的空闲显存，并在某个 rank 低于本地空闲显存 90% 时中止（手册实测为 18.28 GB 对 19.53 GB）。
+- **Level 4:** 在 PCIe 连接下，在没有手册实测数据的情况下你如何在张量与流水线并行间决策？ Expected: 在真实工作负载下同时运行两者，在时钟频率对齐下读取吞吐量、P99 ITL 及首 token 延迟；张量在慢速链路上每层都要做集合通信，而流水线仅在阶段边界传输一次，因此在 PCIe 双卡上流水线更具优势且官方文档也推荐如此。
 
 ## Wrong answers
 
-- "Two copies double everything." Each copy holds the full weights, so the pool per copy is the same small pool; two copies double the users only if that pool already fits them, and a pair with unequal pools served less than one card.
-- "Tensor parallelism is the way to pool memory across cards." It pools the weights and the cache, but it sends data after every layer; over PCIe that traffic can cost more than the split saves, so the documentation suggests pipeline parallelism on such a machine.
-- "The split starts as long as the model fits across the two cards." The tensor group refuses when one rank has less than 90 percent of the local free memory, because the smallest card sets the pool for all ranks; give the split whole GPUs.
-- "Pipeline parallelism wastes a card because the stages wait for each other." It sends data only at stage boundaries and accepts an uneven GPU count, which is why the documentation suggests it for GPUs without a fast link; measure it before you rule it out.
+- "部署两个副本能让所有容量翻倍。" 每个副本包含完整权重，因此单副本的显存池依然是原来的小池；双副本仅在单池已能满足需求时才能使并发用户翻倍，且不均衡池的双卡在实测中表现还不如单卡。
+- "张量并行是在多卡间汇聚显存的最佳方式。" 它汇聚了权重和缓存，但每层后都要传输数据；在 PCIe 上这些流量代价可能超过切分收益，因此文档建议在缺少高速互联时使用流水线并行。
+- "只要模型能切分到两张卡上，服务就能顺利启动。" 当某个 rank 的显存低于本地空闲显存的 90% 时张量组会直接拒绝启动，因为最小卡决定了所有 rank 的池大小；切分必须分配整张 GPU。
+- "流水线并行会浪费显卡，因为各个阶段在互相等待。" 它只在阶段边界传输数据且支持不均衡的 GPU 数量，这也是官方文档建议在无高速链路环境下使用它的原因；在排除它之前应先实测。
 
 ## Taught in
 
-[Choose tensor, pipeline, or data parallelism](../../../manuals/vllm-101/sections/6-1-choose-tensor-pipeline-or-data-parallelism.md) and [the SGLang parallelism section](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md) give the layouts, the link rule and the balance check.
+[选择 tensor、pipeline 或 data parallelism](../../../manuals/vllm-101/sections/6-1-choose-tensor-pipeline-or-data-parallelism.md)与[--tp-size、--dp-size 与 --attn-dp-size](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md)讲解了拓扑划分、通信链路规则及显存均衡检查。

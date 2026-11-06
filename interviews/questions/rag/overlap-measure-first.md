@@ -1,6 +1,6 @@
 ---
 id: overlap-measure-first
-title: Settle a chunk overlap argument with one ablation
+title: 用一次消融实验了结分块重叠之争
 card: rag
 kind: tradeoff
 level: 2
@@ -16,44 +16,44 @@ related: [rag/chunk-size-by-query-type]
 updated: 2026-11-03
 ---
 
-Your chunker keeps a 100-token overlap between neighbor chunks. After the last corpus refresh the index size and the embedding bill both went up, and a teammate says the overlap must stay because it protects sentences that a boundary would cut in half. How do you settle it?
+分块器让相邻块重叠 100 个 token。上次语料刷新后，索引大小和嵌入费用都增加了。同事说重叠必须保留，因为它能保护遭边界切断的句子。你怎样裁决？
 
 ## Short answer
 
-Settle it with an ablation, not an opinion. Run the same recall at 5 eval with the overlap at zero and at the current value on a stratified query set, and keep the overlap only if the number moves. The recent studies found that overlap often adds no measurable benefit, while it adds index cost in proportion to its size.
+用消融实验裁决，而非凭意见。使用同一分层查询集，分别以零重叠和当前重叠量运行 recall@5 评估，只有指标改善才保留重叠。近期研究发现，重叠常常没有可测收益，索引成本却随重叠量增加。
 
 ## Full answer
 
-### Where overlap came from
+### 重叠的由来
 
-The fixed-window baseline cuts every N tokens with no regard for sentences. The RAG lesson shows the classic layout: 512-token chunks with a 50-token overlap, so chunk 1 holds tokens 0 to 511 and chunk 2 holds tokens 462 to 973. The repeated tail makes sure a sentence cut at an unlucky point appears whole somewhere.
+固定窗口基线每 N 个 token 切一次，不考虑句子。RAG 课程展示了经典布局：512-token 块，重叠 50 个 token，第一块含 token 0 到 511，第二块含 462 到 973。重复尾部让不巧切断的句子能在下一块中完整出现。
 
-### Why it matters less now
+### 为什么现在没那么必要
 
-A recursive splitter tries the paragraph break first, then the line break, then the sentence end, then the space. Its boundaries fall at natural breaks, so the problem that overlap solved mostly disappears. The chunking lesson lists overlap under cargo cult: the 2026 studies found zero measurable benefit in the measured case, and every overlapped token is embedded and stored twice.
+递归分块器依次尝试段落、换行、句末和空格，边界位于自然停顿处，因此重叠原本解决的问题大多不再存在。分块课程把重叠归入盲目照搬的惯例：2026 年的研究在所测场景中没有发现任何可测收益，而每个重叠 token 都要嵌入和存储两次。
 
-### The test
+### 实验
 
-1. Keep the chunker, the embedder and the query set fixed.
-2. Run recursive splitting at 512 tokens with overlap zero and with the current overlap.
-3. Compare recall at 5 per query slice, and compare chunk counts.
-4. Keep the overlap only where a slice shows a real gain, and record the ablation next to the setting.
+1. 固定分块器、嵌入模型和查询集。
+2. 使用 512-token 递归切分，分别测试零重叠和当前重叠量。
+3. 按查询切片比较 recall@5，并比较文本块数量。
+4. 只在确有收益的切片保留重叠，并在配置旁记录实验依据。
 
-The chunker skill in the lesson sets overlap to zero by default and refuses an overlap above 20 percent without an ablation that shows it helps.
+课程里的分块器技能默认零重叠；超过 20% 的重叠，除非有消融实验证明有帮助，否则拒绝。
 
 ## Follow-ups
 
-- **Level 2:** Why did the fixed-window splitter need overlap? Expected: it cuts at a fixed count whatever the text, so a boundary can split a sentence; the repeated tail puts that sentence whole into the next chunk.
-- **Level 2:** What does a recursive splitter do instead? Expected: it splits on the paragraph, the line and the sentence separators in turn, so boundaries land on natural breaks.
-- **Level 3:** What rule does the chunker skill apply to overlap? Expected: default zero, and refuse any overlap above 20 percent without an ablation.
-- **Level 3:** The ablation shows a gain on one document type only. What do you ship? Expected: overlap for that type alone, with the ablation recorded, and a re-run when the corpus or the embedder changes.
+- **Level 2:** 固定窗口为什么需要重叠？ Expected: 它只按数量切分，可能截断句子；重复尾部让句子在下一块完整出现。
+- **Level 2:** 递归分块器怎样处理？ Expected: 依次按段落、行和句子分隔符切分，使边界落在自然停顿处。
+- **Level 3:** 分块器技能对重叠有什么规则？ Expected: 默认零；没有消融证据就拒绝超过 20% 的重叠。
+- **Level 3:** 消融只在一种文档类型上有收益，上线什么方案？ Expected: 仅为该类型启用重叠并记录证据；语料或嵌入模型变化后重跑。
 
 ## Wrong answers
 
-- "Overlap is free, embeddings are cheap." Every overlapped token is embedded and stored twice, so the index cost grows in proportion to the overlap.
-- "A blog post says 20 percent overlap." The studies found no measurable benefit in the measured case; the answer depends on your corpus, so measure it there.
-- "Remove it everywhere, no test needed." The ablation is cheap and the result is corpus dependent; a slice with real boundary losses would show up in it.
+- "重叠免费，嵌入很便宜。" 每个重叠 token 都要嵌入和存储两次，索引成本与重叠量成正比增长。
+- "博客推荐 20% 重叠。" 研究在所测场景未发现收益；结果取决于自己的语料，应实际测量。
+- "全部删除，不需要测试。" 消融成本低，收益依赖语料；确有边界损失的切片会在实验中体现。
 
 ## Taught in
 
-The lesson [chunking strategies](../../../phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/) reports the overlap studies and sets the skill rule, and the lesson [RAG](../../../phases/11-llm-engineering/06-rag/) shows the fixed-window layout that overlap was built for.
+[分块策略](../../../phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/)课程报告重叠研究并规定技能规则，[RAG](../../../phases/11-llm-engineering/06-rag/)课程展示重叠最初要解决的固定窗口布局。

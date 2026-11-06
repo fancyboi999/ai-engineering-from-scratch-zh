@@ -1,6 +1,6 @@
 ---
 id: tool-call-security-rules
-title: Design the executor behind an agent's tool calls
+title: 设计 agent 工具调用背后的执行器
 card: prompting-structured-output
 kind: design
 level: 3
@@ -16,47 +16,47 @@ related: [prompting-structured-output/tool-description-is-a-prompt, prompting-st
 updated: 2026-11-03
 ---
 
-Design the execution layer for an agent that can query a database, run small code snippets and read files on behalf of a user. The model decides which tool to call. What rules does the executor enforce, and what does it never do?
+为一个 agent 设计执行层，它可以代表用户查询数据库、运行小段代码和读取文件。调用哪个工具由模型决定。执行器要强制执行哪些规则？它绝不做什么？
 
 ## Short answer
 
-The executor never passes model-generated SQL or shell text straight to a system. It exposes an allowlist of named functions with typed parameters, validates every argument against the schema before execution, sanitizes tool results before they return to the model, and caps the number of calls per conversation at 10 to 20. For code, an in-process filter is a teaching aid and not a boundary; untrusted code runs in a separate process or container.
+执行器绝不把模型生成的 SQL 或 shell 文本直接交给系统。它暴露一份带类型化参数的具名函数白名单，执行前按 schema 校验每个参数，工具结果回到模型之前先做清理，并把每次对话的调用次数限制在 10 到 20 次。对代码来说，进程内过滤器只是教学用具，不是安全边界；不可信代码要在单独的进程或容器里运行。
 
 ## Full answer
 
-### The five rules
+### 五条规则
 
-1. **Never pass generated SQL to the database.** The model can and will produce destructive statements and injections. The lesson's exercise shapes the tool to accept a table name and filter conditions, with the tables on an allowlist and the operators restricted to a small set; your code builds the query.
-2. **Allowlist the functions.** The model calls only what you define. If fifty internal functions exist, expose the five the user needs. Never build a generic call-by-name tool.
-3. **Validate the arguments.** Check required fields, unknown fields, types and enum membership against the schema before execution; a city name can carry an injection string.
-4. **Sanitize the results.** A tool result goes back into the prompt verbatim, so strip keys, personal data and internal errors, and treat instructions inside a result as tool poisoning.
-5. **Cap the calls.** A loop can call a tool hundreds of times; 10 to 20 calls per conversation is the lesson's range, with a bounded retry count per failing call.
+1. **绝不把生成的 SQL 交给数据库。** 模型能够、也一定会生成破坏性语句和注入。课程练习把这个工具设计成只接收表名和过滤条件，表在白名单上，运算符限制在一个小集合里；查询由你的代码构建。
+2. **函数白名单。** 模型只能调用你定义的东西。如果内部有五十个函数，只暴露用户需要的五个。绝不构建按名字调用任意函数的通用工具。
+3. **校验参数。** 执行前按 schema 检查必填字段、未知字段、类型和枚举成员；一个城市名也可能夹带注入字符串。
+4. **清理结果。** 工具结果会原样回到 prompt 里，所以要去掉密钥、个人数据和内部错误，并把结果里出现的指令当作工具投毒处理。
+5. **限制调用次数。** 一个循环可能调用工具几百次；课程给出的范围是每次对话 10 到 20 次调用，每个失败调用的重试次数也有上限。
 
-### The file tool
+### 文件工具
 
-Reject any path with a parent reference or a leading slash, and return a structured error with the list of files that exist. The error shape matters: a message, a code and suggestions let the model correct its arguments; an empty response or a generic failure does not.
+拒绝任何含父目录引用或以斜杠开头的路径，并返回一个列出现有文件的结构化错误。错误的形状很重要：有消息、错误码和建议，模型就能修正参数；空响应或笼统的失败则不行。
 
-### The code tool
+### 代码工具
 
-A substring blocklist reads the code as text and misses anything it does not literally spell. Parsing the code into a syntax tree lets the guard reject imports, dunder attribute access and unsafe names by structure. Even then, the guard shares the interpreter with the code it runs, and a determined caller finds reachable objects. Production runs untrusted code in a separate process with dropped privileges, in a sandbox or in a hosted runner, so an escape lands in a throwaway box.
+子字符串黑名单把代码当文本读，没有逐字拼写出来的东西它都会漏掉。把代码解析成语法树，防护就能按结构拒绝 import、dunder 属性访问和不安全的名称。即便如此，防护和它运行的代码共用一个解释器，下定决心的调用方总能找到可以触达的对象。生产环境把不可信代码放在降权的独立进程、沙箱或托管运行器里执行，这样逃逸也只会落进一个用完即弃的盒子。
 
-### What the model never does
+### 模型从不做的事
 
-It never executes anything. It emits a name and arguments. Everything after that is your code, and every rule above lives there.
+它从不执行任何东西。它输出一个名字和参数。之后的一切都是你的代码，上面每条规则都在那里落实。
 
 ## Follow-ups
 
-- **Level 3:** Why is a substring blocklist not enough for the code tool? Expected: it matches spelling, not structure; a parsed syntax tree rejects imports, dunder access and unsafe names by shape, and even that shares the interpreter with the code.
-- **Level 3:** How do you shape the database tool so the model never writes SQL? Expected: accept a table name and filter conditions, allowlist the tables, restrict the operators, and build the query in your code.
-- **Level 4:** What is tool poisoning and where is the control? Expected: results that carry instructions to the model; sanitize every result before it returns, and strip sensitive data such as keys and internal errors.
-- **Level 4:** The agent loops on a failing tool. What stops it? Expected: a maximum number of calls per conversation, 10 to 20 in the lesson, structured errors that let the model fix its arguments, and a retry cap of about 3 per call.
+- **Level 3:** 为什么代码工具只用子字符串黑名单不够？ Expected: 它匹配拼写，不匹配结构；解析出的语法树能按形状拒绝 import、dunder 访问和不安全名称，但它也和代码共用解释器。
+- **Level 3:** 数据库工具怎样设计，模型才永远不用写 SQL？ Expected: 接收表名和过滤条件，表走白名单，限制运算符，查询在你的代码里构建。
+- **Level 4:** 什么是工具投毒，控制点在哪里？ Expected: 结果里夹带了给模型的指令；每个结果回传之前都要清理，并去掉密钥和内部错误等敏感数据。
+- **Level 4:** agent 在一个失败的工具上反复循环。什么能让它停下？ Expected: 每次对话的最大调用次数，课程里是 10 到 20 次；能让模型修正参数的结构化错误；以及每次调用大约 3 次的重试上限。
 
 ## Wrong answers
 
-- "The model behaves, parameterize later." The model can and will generate destructive queries or injections; the rule is never to pass its SQL through.
-- "A generic run-any-function tool is simpler." The allowlist is the rule: expose the five functions the user needs, not all fifty.
-- "The code filter blocks imports, so it is safe." It shares the interpreter with the code it runs; production uses a separate process or container.
+- "模型很守规矩，参数化以后再做。" 模型能够、也一定会生成破坏性查询或注入；规则是绝不透传它的 SQL。
+- "通用的任意函数调用工具更简单。" 白名单就是规则：暴露用户需要的五个函数，而不是全部五十个。
+- "代码过滤器拦了 import，所以是安全的。" 它和它运行的代码共用一个解释器；生产环境用单独的进程或容器。
 
 ## Taught in
 
-The lesson [function calling](../../../phases/11-llm-engineering/09-function-calling/) states the five security rules, builds the argument validator and the file and code guards, and sets the call budget.
+[函数调用](../../../phases/11-llm-engineering/09-function-calling/)一课给出了五条安全规则，实现了参数校验器以及文件和代码防护，并设定了调用预算。

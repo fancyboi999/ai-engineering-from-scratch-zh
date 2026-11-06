@@ -1,6 +1,6 @@
 ---
 id: gap-remove-before-reweight
-title: Remove a cause of the gap before you reweight it
+title: 在重加权之前先消除差距的根因
 card: post-training
 kind: tradeoff
 level: 3
@@ -16,56 +16,56 @@ related: [post-training/logprob-gap-at-step-zero]
 updated: 2026-11-03
 ---
 
-Your RL run shows a steady disagreement between trainer and rollout engine on the probability of each sampled token. One engineer wants to turn on a capped importance weighting right away. Another says it is a kernel artifact and should be ignored. Lay out how you decide, and what you would try first.
+你的强化学习训练显示训练器与采样引擎在每个被采样 token 的概率估计上存在持续的差距。一位工程师主张立即开启带截断的重要性采样权重修正。另一位工程师则认为这是算子计算差异，应该直接忽略。请阐述你将如何决策，以及你首先会尝试什么手段。
 
 ## Short answer
 
-Match the method to the source of the gap. Five sources exist: tokens re-encoded between turns, expert routing on a mixture model, a sampler that cuts the vocabulary, numeric differences between kernels or precisions, and stale samples. The first three have corrections that remove the cause; try those first, because a reweighting such as truncated importance sampling leaves the gap in place and adds variance to the gradient. A flat gap on a dense model with plain sampling is the kernel floor of that setup; measure it, keep it inside your range, and reweight only what remains after the causes are gone.
+应将解决方法与导致概率差距的根本原因严格对应起来。差距存在五大根因：多轮交互间文本被重新编码、混合专家模型中的路由分歧、截断词表的采样器、不同算子实现或精度之间的数值差异，以及陈旧过期的样本。前三者都有能够从根本上消除原因的修正方案；必须优先尝试根除手段，因为像截断重要性采样这类重加权方法只是保留了差距，且会给梯度增加方差。稠密模型采用普通采样时，稳定不变的差距是该配置的计算内核差距下限；实测并将其控制在合理基线内，只对消除根因后剩下的部分做重加权。
 
 ## Full answer
 
-### Two kinds of method
+### 两种维度的解决方法
 
-A method that removes a cause makes both sides compute the same thing, and that part of the gap is gone. A method that reweights leaves the gap and changes how much each token counts in the loss. Remove causes first.
+“消除根因”的方法能让两端计算相同的内容，从而彻底抹平那一部分差距。“重加权”的方法则保留了实际存在的概率差距，通过调整每个 token 在损失函数中的加权比重做补偿。工程原则是：先根除原因，再做重加权。
 
-| Method | Kind | Cause |
+| 方法 | 类别 | 针对的根因 |
 |---|---|---|
-| Sampling replay | removes | top-p and top-k cut the vocabulary on the engine side only |
-| Routing replay | removes | a mixture-of-experts router picks different experts on each side |
-| Token-in, token-out sessions | removes | text round trips between agent turns change the tokens |
-| True on-policy mode | removes | all kernel differences, for the models and GPUs it covers |
-| Truncated importance sampling | reweights | any remaining gap |
-| A sample age limit | drops | samples from older weights |
+| 采样重放 | 根除 | top-p 和 top-k 仅在采样引擎端截断了词表候选集 |
+| 路由重放 | 根除 | 混合专家模型的路由门控在两端选择了不同的专家组合 |
+| token 输入、token 输出的会话 | 根除 | agent 多轮交互间的文本往返转换改变了 token |
+| 位级精确真同策略模式 | 根除 | 抹平其覆盖范围内特定模型和 GPU 的所有算子计算差异 |
+| 截断重要性采样 | 重加权 | 补偿任何无法根除的残余差距 |
+| 样本陈旧度上限 | 丢弃过滤 | 直接剔除基于过旧权重采样的严重异策略数据 |
 
-### What the manual measured
+### 手册实测数据
 
-Sampling replay on one seed lowered the median gap from 0.0153 to 0.0135, 11.5 percent. No step of the replay run reached the lowest step of the plain run, and the reward stayed in the same range. The sampler part is not noise: a top-p cut raises the engine's log-probability of a kept token by minus the log of the kept mass, which at a top-p of 0.9 was a median shift of about 0.053 in a check outside the training framework. Deterministic inference removed nothing, because it is not a correction.
+在固定随机种子下，启用采样重放使差距中位数从 0.0153 下降到 0.0135，降幅为 11.5%。重放运行中没有一步的差距低至普通运行的最低值，且最终奖励稳定在相同区间。采样器引入的偏差绝非随机噪声：top-p 截断会导致引擎端保留 token 的对数概率上升“保留概率质量的对数负值”；在独立于训练框架的外部校验中，top-p 设为 0.9 带来了约 0.053 的对数概率中位偏移。而确定性推理没有消除任何差距，因为它压根不是修正手段。
 
-### The kernel floor
+### 算子底线
 
-On a dense model in BF16 on both sides, the manual's gap stayed at about 0.015 per token in every healthy run. That is the floor of one setup, not a law. A check with FP16 on both sides cut the median gap about 7.8 times, from 0.0073 to 0.00094 on a serving engine against a reference forward pass, and the worst token fell from 0.355 to 0.033. FP16 on one side only did not help. Precision is a lever that removes a cause, and it costs numeric range.
+在两端均采用 BF16 精度的稠密模型上，手册所有正常运行中的单 token 概率差距稳定在约 0.015 左右。这是特定软硬件配置的差距下限，而非普遍数学定律。在服务引擎与参考前向计算的对照检查中，两端均采用 FP16 使中位差距降至约原来的 1/7.8（从 0.0073 降至 0.00094），最差单个 token 的差距从 0.355 骤降至 0.033。仅在单侧开启 FP16 毫无作用。精度是能够消除根因的有力杠杆，代价是牺牲部分数值动态范围。
 
-### When to reweight
+### 何时引入重加权
 
-Truncated importance sampling weights each token by the ratio of the trainer probability to the engine probability and caps the ratio, with `--use-tis --tis-clip 2.0` as the manual's example. Use it for a gap you cannot remove: a low-precision rollout, where FP8 rounding has no kernel fix, or a mixture model after routing replay. Pair it with the step-0 check, so that the reweighting never hides a setup error.
+截断重要性采样用训练器概率与引擎概率的比值对每个 token 加权并截断，手册示例为 `--use-tis --tis-clip 2.0`。只在面对无法根除的固有差距时使用它：例如使用 FP8 低精度采样的场景（此时舍入误差无法通过算子对齐修复），或者在路由重放之后的 MoE 模型残余。必须始终将其与第 0 步校验搭配使用，防止重加权掩盖了严重的架构配置错误。
 
-### How to run the comparison
+### 严谨的对照验证流程
 
-Same seed, same steps, one change per run, and the gap read at every step. A method that helps shows a lower gap on the same steps. A gap that grows after a change names the cause you added.
+使用相同的随机种子、相同的训练步数，单次运行仅改动一个变量，并在每一步完整记录差距指标。真正有效的方法会在相同步数下展现出一致偏低的概率差距。如果某项改动后差距反而上升，说明你人为引入了新的分歧源。
 
 ## Follow-ups
 
-- **Level 3:** Why does a reweighting add variance? Expected: tokens with a large ratio get a large weight, so a few tokens dominate the update; the cap limits that, but does not remove it.
-- **Level 3:** Replay needs both a top-k and a top-p set. Why is the top-k needed? Expected: the framework requires a positive top-k for replay, so a run with top-p alone changes the sampler without replaying the kept set.
-- **Level 4:** FP16 on the engine and BF16 on the trainer did not close the gap. Why? Expected: each side's own rounding sets a floor; the gap closes only when both sides round the same way, so the precision must match on both sides.
-- **Level 4:** When is the bit-exact mode the right answer, and when is it not available? Expected: when you need a gap of zero and your model and GPU are in its contract; it pins one attention kernel and batch-invariant operations for specific dense models on one GPU generation, and refuses the rest.
+- **Level 3:** 为什么重加权方法会增加梯度方差？ Expected: 概率比率偏大的 token 会获得极高的权重，导致极少数异常 token 支配了整个梯度更新；截断机制虽然能限制最大权重，但无法消除方差膨胀。
+- **Level 3:** 采样重放需要同时设置 top-k 和 top-p。为什么 top-k 必不可少？ Expected: 框架底层要求提供正整数的 top-k 才能开启重放机制；仅设置 top-p 会导致采样器配置改变而无法重放保留候选集。
+- **Level 4:** 采样端采用 FP16 而训练器端采用 BF16 并没有缩小差距，为什么？ Expected: 两端各自的数值舍入误差共同设定了分歧下限；只有当两端的浮点舍入方式完全一致时差距才能收敛，因此精度必须对称匹配。
+- **Level 4:** 位级精确模式在何时是正确方案，何时不可用？ Expected: 当你需要严格为零的概率差距且你的模型和 GPU 在支持名单内时；它为特定 GPU 代际上的特定稠密模型固定了特定的注意力算子与批次无关运算，对其余架构则明确不支持。
 
 ## Wrong answers
 
-- "Turn on importance sampling first; it is cheap." It leaves every cause in place, adds variance, and hides a setup error that the step-0 check would show.
-- "The gap is a kernel artifact, so it never matters." The sampler part was measurable and removable, and a gap that grows after a change is a cause you added.
-- "Deterministic inference is a correction method." It makes the engine repeat itself and leaves the gap where it was; the manual's four runs show the same gap with it on and off.
+- "优先开启重要性采样，反正代码实现代价很小。" 它保留了所有根因，增加了梯度方差，且会掩盖第 0 步检测本能发现的严重配置错误。
+- "差距只是算子差异，完全可以当它不存在。" 采样器引起的偏差完全可以量化和消除，且配置变动后扩大的差距往往源自人为引入的分歧。
+- "确定性推理属于一种差距修正手段。" 它只是让引擎在相同输入下产生确定性输出，差距本身完全未被触动；手册的四次运行表明，开启与关闭时差距相同。
 
 ## Taught in
 
-[Section 8.2 of Miles 101](../../../manuals/miles-101/sections/8-2-the-correction-methods.md) matches each correction to its cause, [section 4.4](../../../manuals/miles-101/sections/4-4-lower-the-logprob-gap.md) measures sampling replay, and [section 8.3](../../../manuals/miles-101/sections/8-3-why-true-on-policy-is-a-contract.md) measures the precision lever.
+[Miles 101 第 8.2 节](../../../manuals/miles-101/sections/8-2-the-correction-methods.md)把各项修正手段与根因做了对齐映射，[第 4.4 节](../../../manuals/miles-101/sections/4-4-lower-the-logprob-gap.md)实测了采样重放，而[第 8.3 节](../../../manuals/miles-101/sections/8-3-why-true-on-policy-is-a-contract.md)实测了精度杠杆。

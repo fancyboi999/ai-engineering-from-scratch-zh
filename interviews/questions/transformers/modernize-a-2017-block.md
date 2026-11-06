@@ -1,6 +1,6 @@
 ---
 id: modernize-a-2017-block
-title: Review a 2017-style block against today's defaults
+title: 对照当今默认做法审查一个 2017 风格的 block
 card: transformers
 kind: design
 level: 3
@@ -16,53 +16,53 @@ related: [transformers/pre-norm-vs-post-norm, transformers/residual-stream-and-d
 updated: 2026-11-03
 ---
 
-You inherit a decoder block written in the 2017 style: layer normalization after the residual add, a ReLU feed-forward network at four times the width, sinusoidal absolute positions summed into the input, bias terms on every linear layer, and full multi-head attention. Review it against what production decoders ship today and justify each change you ask for.
+你接手了一个按 2017 年风格写的解码器 block：残差相加之后做层归一化，宽度四倍的 ReLU 前馈网络，正弦绝对位置直接加到输入上，每个线性层都带偏置，注意力是完整的多头注意力。请对照当今生产解码器的做法审查它，并说明你要求的每项修改的理由。
 
 ## Short answer
 
-Move the normalization in front of each sublayer and switch it to RMSNorm; replace the ReLU network with SwiGLU at about 2.6 times the width so that its three matrices match the old parameter count; replace the sinusoid with rotation of the queries and keys; drop the biases; and use grouped-query attention to shrink the decode-time cache. Every change is one function substitution and the tensor shapes do not move. The evidence: pre-norm trains deep without warmup tricks, SwiGLU gains about half a point of perplexity in the published model papers, rotation gives relative position and a knob for long context, and grouped-query cuts cache memory by the ratio of query heads to key-value heads.
+把归一化移到每个子层前面并换成 RMSNorm；把 ReLU 网络换成宽度约 2.6 倍的 SwiGLU，让它的三个矩阵和原来的参数量持平；把正弦编码换成对查询和键的旋转；去掉偏置；用分组查询注意力缩小解码时的 cache。每项修改都只是换一个函数，张量形状都不动。依据是：pre-norm 不靠 warmup 技巧也能训练深层网络，SwiGLU 在公开的模型论文里让困惑度改善约半个点，旋转编码提供相对位置和一个用于长上下文的旋钮，分组查询注意力按查询头与键值头之比缩小 cache 显存。
 
 ## Full answer
 
-### The review table
+### 审查表
 
-| Component | As written | Ask for | Why |
+| 组件 | 现状 | 要求改为 | 原因 |
 |---|---|---|---|
-| Normalization | LayerNorm after the add | RMSNorm before the sublayer | pre-norm trains deep stacks without warmup; RMSNorm drops the mean subtraction at equal stability |
-| FFN activation | ReLU | SwiGLU | about 0.5 point of perplexity in the published comparisons |
-| FFN expansion | 4 with two matrices | about 2.6 with three matrices | same parameter budget |
-| Position | sinusoid on the embedding | rotation of Q and K | relative position for free and a base to scale for long context |
-| Attention | full multi-head | grouped-query, or latent | fewer key-value heads in the cache, nearly full quality |
-| Bias terms | yes | no | slight perplexity gain and a smaller model |
+| 归一化 | 相加之后的 LayerNorm | 子层之前的 RMSNorm | pre-norm 不用 warmup 就能训练深层堆叠；RMSNorm 去掉了减均值，稳定性相当 |
+| FFN 激活 | ReLU | SwiGLU | 公开的对比中困惑度改善约 0.5 个点 |
+| FFN 扩展倍数 | 4，两个矩阵 | 约 2.6，三个矩阵 | 参数预算相同 |
+| 位置 | 加在 embedding 上的正弦编码 | 对 Q 和 K 做旋转 | 白得相对位置，还有一个可缩放的基数用于长上下文 |
+| 注意力 | 完整多头 | 分组查询，或潜在注意力 | cache 里的键值头更少，质量几乎不损失 |
+| 偏置项 | 有 | 无 | 困惑度略好，模型更小 |
 
-### What stays
+### 保留什么
 
-The skeleton: embedding, a stack of blocks that each add attention and an FFN to the residual stream, a final norm and a head. The shift-by-one cross-entropy. The causal mask. The capstone architecture in the lesson is exactly this skeleton with the modern pieces plugged in, and its head is tied to the token embedding.
+骨架不变：embedding，一组 block，每个 block 把注意力和 FFN 加到残差流上，最后一个 norm 和一个输出头。错开一位的交叉熵不变。因果 mask 不变。课程综合项目里的架构正是这副骨架插上现代组件，它的输出头和 token embedding 共享权重。
 
-### How to land the changes safely
+### 怎样稳妥地落地这些修改
 
-1. Make each substitution behind a flag and confirm the output shape after every swap, the way the lesson's build step does.
-2. Train the old and the new block on a small copy task for a fixed number of steps and compare the loss; the lesson's exercise uses 100 steps of a toy task.
-3. Use the fused attention call from the framework so that a tiled kernel is dispatched when the inputs allow it.
-4. Keep a final norm before the head, which pre-norm requires and post-norm did not.
+1. 每项替换都放在一个开关后面，每换一项就确认输出形状，做法和课程的构建步骤一样。
+2. 在一个小的复制任务上，把旧 block 和新 block 各训练固定步数，比较损失；课程练习用的是一个玩具任务的 100 步。
+3. 使用框架提供的融合注意力调用，这样输入条件允许时会调度分块 kernel。
+4. 在输出头之前保留最后一个 norm；pre-norm 需要它，post-norm 不需要。
 
-### What needs a retrain
+### 哪些需要重新训练
 
-All of these change the function the block computes, so a checkpoint trained with the old block cannot adopt them by editing code. Grouped-query is the exception the literature treats specially: a trained multi-head checkpoint can be converted and fine-tuned.
+这些修改都改变了 block 计算的函数，所以用旧 block 训练的检查点不能靠改代码就用上它们。分组查询是文献里单独对待的例外：训练好的多头检查点可以转换后再微调。
 
 ## Follow-ups
 
-- **Level 3:** Why is the SwiGLU expansion about 2.6 and not 4? Expected: three matrices instead of two, chosen so that the total parameters match the old network.
-- **Level 3:** Which of the six changes can be applied to an existing checkpoint without retraining? Expected: none cleanly; grouped-query can be converted with a fine-tune, the rest change the function and need training.
-- **Level 4:** What would you refuse to change in the review? Expected: the residual skeleton, the causal mask and the next-token loss; the modern block refined the pieces, not the frame.
-- **Level 4:** The team wants to keep the sinusoid because it has no parameters. Your answer? Expected: rotation also has no parameters, applies inside attention, encodes relative distance and extends to longer contexts by scaling its base.
+- **Level 3:** SwiGLU 的扩展倍数为什么约是 2.6，而不是 4？ Expected: 它有三个矩阵而不是两个，选这个倍数是为了让总参数和旧网络持平。
+- **Level 3:** 这六项修改里，哪些能不重新训练就用到已有检查点上？ Expected: 没有一项能干净地直接用上；分组查询可以转换后微调，其余的都改变了函数，需要训练。
+- **Level 4:** 审查中你会拒绝改什么？ Expected: 残差骨架、因果 mask 和下一个 token 的损失；现代 block 改进的是组件，不是框架。
+- **Level 4:** 团队想保留正弦编码，理由是它没有参数。你怎么回答？ Expected: 旋转编码同样没有参数，作用在注意力内部，编码相对距离，还能通过缩放基数延伸到更长的上下文。
 
 ## Wrong answers
 
-- "RMSNorm is a cheaper approximation that costs accuracy." The lesson records it as at least as stable with one fewer operation.
-- "SwiGLU doubles the feed-forward parameters." At about 2.6 times the width its three matrices match the old two-matrix count.
-- "Pre-norm removes the need for any final normalization." It adds the need: the residual stream is unnormalized, so the head needs a final norm.
+- "RMSNorm 是更便宜的近似，会损失精度。" 课程记录它少一步运算，稳定性至少一样好。
+- "SwiGLU 让前馈网络的参数翻倍。" 宽度约 2.6 倍时，它的三个矩阵和旧的两个矩阵参数量持平。
+- "用了 pre-norm 就不需要最后的归一化了。" 恰恰相反：残差流没有归一化，所以输出头之前需要最后一个 norm。
 
 ## Taught in
 
-The [full transformer lesson](../../../phases/07-transformers-deep-dive/05-full-transformer/) gives the 2017 against 2026 table, the [capstone](../../../phases/07-transformers-deep-dive/14-build-a-transformer-capstone/) assembles the modern block, and the [positional encoding lesson](../../../phases/07-transformers-deep-dive/04-positional-encoding/) covers the rotation.
+[完整 transformer 一课](../../../phases/07-transformers-deep-dive/05-full-transformer/)给出 2017 与 2026 的对比表，[综合项目一课](../../../phases/07-transformers-deep-dive/14-build-a-transformer-capstone/)组装了现代 block，[位置编码一课](../../../phases/07-transformers-deep-dive/04-positional-encoding/)讲解了旋转编码。

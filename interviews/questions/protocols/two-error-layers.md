@@ -1,6 +1,6 @@
 ---
 id: two-error-layers
-title: A protocol error is not a tool error
+title: 协议错误不是工具错误
 card: protocols
 kind: concept
 level: 1
@@ -16,48 +16,48 @@ related: [protocols/tool-resource-or-prompt]
 updated: 2026-11-03
 ---
 
-Your MCP server has a tool `route_report` that reads a report from an upstream source. A reviewer reads the handler and finds two things. When the upstream source is down, the handler returns a JSON-RPC error. When a client sends a tool name that the server does not know, the handler returns a result with `isError: true`. Is that the right way round?
+你的 MCP 服务端有一个工具 `route_report`，用于从上游源读取报告。一位审查者阅读了处理函数并发现了两点。当上游源宕机时，处理函数返回 JSON-RPC 错误。当客户端发送服务端未知的工具名称时，处理函数返回带有 `isError: true` 的结果。这是正确的做法吗？
 
 ## Short answer
 
-No, both cases are backwards. A JSON-RPC error means the request could not be dispatched at all: an unknown tool name, a malformed envelope, missing request metadata or an invalid cursor. A complete result with `isError: true` means a valid call reached the tool and the tool reports a failure the model can act on, such as a source that is unavailable right now.
+不正确，两种情况颠倒了。JSON-RPC 错误意味着请求根本无法被分发：未知的工具名称、畸形的信封、缺失的请求元数据或无效的游标。带有 `isError: true` 的完整结果意味着有效调用到达了工具，且工具报告了模型可以采取行动的失败，例如当前不可用的源。
 
 ## Full answer
 
-### Two layers, two audiences
+### 两个层级，两个受众
 
-| Layer | Use it for | Who repairs it |
+| 层级 | 用途 | 谁来修复 |
 |---|---|---|
-| JSON-RPC `error` | the envelope or the method parameters are invalid | the client or the developer |
-| result with `isError: true` | the tool ran and reports an actionable failure | often the model, by changing arguments or waiting |
+| JSON-RPC `error` | 信封或方法参数无效 | 客户端或开发者 |
+| 带有 `isError: true` 的结果 | 工具已运行并报告可采取行动的失败 | 通常是模型，通过更改参数或等待 |
 
-A model can read "report source unavailable" and try later or tell the user. It cannot repair a server that rejected a well-formed request as a tool failure, because it does not know that the request never ran.
+模型可以读取“报告源不可用”并稍后重试或告知用户。如果服务端拒绝了格式正确的请求，却将其报告为工具失败，模型就无法修复这个问题，因为模型不知道该请求从未运行。
 
-### The output schema still holds
+### 输出 schema 依然有效
 
-Once a server publishes an `outputSchema`, every complete result commits to conforming `structuredContent`. The `isError` flag classifies the outcome. It does not waive the contract. So model the failure inside the schema. The sample `route_report` failure returns its requested region with `accepted: false`, plus error text, plus `isError: true`.
+一旦服务端发布了 `outputSchema`，每个完整结果都必须提供符合该 schema 的 `structuredContent`。`isError` 标志划分结果类别。它并不免除契约。因此应在 schema 内部对失败建模。示例中的 `route_report` 失败返回其请求的区域并带有 `accepted: false`，加上错误文本，再加上 `isError: true`。
 
-### Wrong codes send the wrong signal
+### 错误的错误码会发出错误的信号
 
-Missing request metadata is invalid params, `-32602`. An unsupported protocol version is `-32022` with `requested` and `supported` in the error data. An unknown method is a method-not-found error. Keep those distinct, because a client reads the code to decide whether to correct the request, retry another version, or stop.
+缺失请求元数据属于无效参数，`-32602`。不支持的协议版本是 `-32022`，并在错误数据中包含 `requested` 和 `supported`。未知方法是方法未找到错误。保持它们的区别，因为客户端读取错误码来决定是纠正请求、重试其他版本还是停止。
 
-### Annotations do not decide any of this
+### 注解不决定其中任何一项
 
-`readOnlyHint`, `destructiveHint`, `idempotentHint` and `openWorldHint` are hints for presentation and confirmation. The server still enforces authorization, and the client still validates results.
+`readOnlyHint`、`destructiveHint`、`idempotentHint` 和 `openWorldHint` 是用于展示和确认的提示。服务端仍会强制执行鉴权，且客户端仍会验证结果。
 
 ## Follow-ups
 
-- **Level 1:** A request arrives without the protocol version in `params._meta`. Which code? Expected: `-32602`, invalid params, never filled in from an earlier call.
-- **Level 2:** The tool publishes an output schema. Must an error result match it? Expected: yes; every complete result, with `isError: true` included, must return conforming `structuredContent`.
-- **Level 2:** Why does the host validate `structuredContent` instead of trusting the descriptor? Expected: a server can violate its own schema, a model cannot repair that, so the client validates before model use.
-- **Level 3:** A valid tool call has an argument that fails the input schema. Which layer? Expected: method parameters are invalid, so a JSON-RPC error; the capstone's TypeScript model instead returns a complete result with `isError: true` without invoking the executor, so name your choice and apply it everywhere.
+- **Level 1:** 请求到达时在 `params._meta` 中没有协议版本。返回哪个错误码？ Expected: `-32602`，无效参数，绝不从早期调用中补齐。
+- **Level 2:** 工具发布了输出 schema。错误结果必须匹配它吗？ Expected: 是；每个完整结果（包括 `isError: true`）都必须返回符合契约的 `structuredContent`。
+- **Level 2:** 为什么宿主验证 `structuredContent` 而不是信任描述符？ Expected: 服务端可能违背其自身的 schema，模型无法修复该问题，因此客户端在模型使用前验证。
+- **Level 3:** 有效的工具调用其参数未能通过输入 schema。属于哪一层？ Expected: 方法参数无效，因此是 JSON-RPC 错误；综合项目的 TypeScript 模型则在不调用执行器的情况下返回带有 `isError: true` 的完整结果，因此说明你的选择并在各处一致应用。
 
 ## Wrong answers
 
-- "Return `isError` for everything so the model always gets text." A malformed envelope then looks like a tool failure, and the model retries a request that can never run.
-- "An unknown tool is a tool failure." The call never reached a tool, so it is a dispatch error at the protocol layer.
-- "An error result can skip the output schema." The flag classifies the outcome, and the published contract still holds.
+- "对所有内容都返回 `isError`，以便模型始终获得文本。" 畸形的信封随后看起来像工具失败，且模型会重试一个永远无法运行的请求。
+- "未知的工具是工具失败。" 该调用从未到达工具，因此它是协议层的分发错误。
+- "错误结果可以跳过输出 schema。" 该标志划分结果类别，公布的契约依然有效。
 
 ## Taught in
 
-The [server lesson](../../../phases/13-tools-and-protocols/07-building-an-mcp-server/) names the two layers, and the [tool contracts lesson](../../../phases/13-tools-and-protocols/28-mcp-tool-contracts-and-content/) binds error results to the output schema.
+[服务端课程](../../../phases/13-tools-and-protocols/07-building-an-mcp-server/)指明了这两个层级，[工具契约课程](../../../phases/13-tools-and-protocols/28-mcp-tool-contracts-and-content/)将错误结果与输出 schema 绑定。

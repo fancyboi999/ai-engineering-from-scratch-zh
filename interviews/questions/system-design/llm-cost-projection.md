@@ -1,6 +1,6 @@
 ---
 id: llm-cost-projection
-title: Project the monthly bill of a chat feature
+title: 测算对话功能的月度账单开销
 card: system-design
 kind: estimate
 level: 2
@@ -16,57 +16,57 @@ related: [system-design/batched-inference-api-budget, system-design/streaming-an
 updated: 2026-11-03
 ---
 
-A chat feature expects 10,000 daily active users with 5 queries each, about 1,500 input tokens and 400 output tokens per query, at $2.50 per million input tokens and $10.00 per million output tokens. Measured cache metrics give a 35% hit rate. Walk me through the monthly estimate, and say which number you would attack first.
+某对话功能预计拥有 10,000 名日活跃用户，每人每天提问 5 次，单次提问包含约 1,500 个输入 token 和 400 个输出 token，输入模型定价为每百万 token $2.50，输出定价为每百万 token $10.00。实测语义缓存指标显示命中率为 35%。请详细梳理月度成本测算过程，并说明你将优先优化哪项指标。
 
 ## Short answer
 
-The traffic is 50,000 queries a day, and a 35% cache hit rate leaves 32,500 that reach the model. Over 30 days that is $3,656 of input and $3,900 of output, about $7,556 a month, against $11,625 without the cache, so the cache saves about $4,070. Output tokens cost four times more per token, so after the hit rate the output length is the number to attack, with a maximum output tokens limit and tighter prompts.
+每日总请求量为 50,000 次查询，35% 的缓存命中率使得实际到达模型的请求减少至 32,500 次。按 30 天周期测算，输入 token 成本为 $3,656，输出 token 成本为 $3,900，月度账单合计约 $7,556，未配置缓存时为 $11,625，因此缓存节省了约 $4,070。由于输出 token 的单价是输入的四倍，在优化缓存命中率之后，下一个应优先攻坚的指标是输出长度，可借助最大输出 token 上限与精简 prompt 控制成本。
 
 ## Full answer
 
-### The sheet
+### 测算参数表
 
-| Variable | Value |
+| 变量 | 数值 |
 |---|---|
-| Daily active users | 10,000 |
-| Queries per user per day | 5 |
-| Input tokens per query | 1,500 |
-| Output tokens per query | 400 |
-| Input price per million | $2.50 |
-| Output price per million | $10.00 |
-| Cache hit rate | 35% |
-| Effective daily queries | 32,500 |
+| 日活跃用户数 | 10,000 |
+| 单用户每日查询数 | 5 |
+| 单次查询输入 token 数 | 1,500 |
+| 单次查询输出 token 数 | 400 |
+| 输入每百万 token 价格 | $2.50 |
+| 输出每百万 token 价格 | $10.00 |
+| 缓存命中率 | 35% |
+| 实际每日模型调用次数 | 32,500 |
 
-Input: 32,500 queries a day times 1,500 tokens times 30 days, divided by a million, times $2.50 gives $3,656. Output: the same with 400 tokens and $10.00 gives $3,900. The total is $7,556 a month.
+输入成本：每天 32,500 次查询乘以 1,500 token 乘以 30 天，除以一百万，再乘以 $2.50，得出 $3,656。输出成本：同样的查询量乘以 400 token 乘以 $10.00，得出 $3,900。月度总成本为 $7,556。
 
-### Why the cache matters this much
+### 为什么缓存能产生如此巨大的收益
 
-The same traffic without caching costs $11,625. A 35% hit rate removes 35% of the model calls, so it removes 35% of the token cost. The cache is an embedding lookup with a similarity threshold and a time to live, so two differently phrased versions of one question return one answer. The hit rate is measured from the cache metrics, not assumed.
+相同流量若不配置缓存，月成本高达 $11,625。35% 的缓存命中率直接免去了 35% 的模型物理调用，从而直接砍掉了 35% 的 token 账单。该缓存基于向量嵌入匹配，附带相似度阈值和生存时间，即使同一问题的两次提问措辞不同，也能命中并返回同一答案。缓存命中率来自于线上指标实测，而非主观臆断。
 
-### Which number to attack
+### 优先攻坚的指标顺序
 
-- Hit rate first: every point of hit rate is a point off the whole bill.
-- Output length second: output tokens are priced four times higher than input, and a maximum output tokens limit per template bounds the worst case.
-- Input length third: the system prompt and retrieved context sit in every call; a provider-side cache of the fixed prefix and tighter retrieval cut it.
-- Model routing last: a smaller model for simple templates cuts the per-token price, with an eval to prove quality holds.
+- 首选优化缓存命中率：命中率每提升一个百分点，整张账单总开销就同步减少一个百分点。
+- 次选压缩输出长度：输出 token 单价是输入的四倍，针对各模板配置最大输出 token 上限可杜绝长尾极端开销。
+- 第三优化输入长度：系统 prompt 与检索召回的上下文贯穿每次调用；采用供应商侧的固定前缀缓存与更精简的检索能降低输入成本。
+- 最后做模型分流路由：针对简单模板路由至轻量小模型，以降低单 token 单价，并配合评估套件确保生成质量未发生退化。
 
-### Where the estimate goes wrong
+### 估算最容易在何处失效
 
-The averages hide a tail. A few users who paste long documents or run scripts can dominate the bill, which is why the production checklist tracks cost per user and per request, and why the cost alerting exercise moves a heavy user to a cheaper model past a daily threshold. The target in the lesson's dashboard is a cost per request under $0.01.
+平均值会掩盖长尾极端情况。少数粘贴长文档或运行脚本的重度用户能主导账单，这正是生产就绪清单要求同时监控单用户和单请求成本的原因，也是成本报警机制中当重度用户消耗超过每日阈值时自动将其降级到轻量模型的原因。课程监控仪表盘设定的目标是单次请求成本低于 $0.01。
 
 ## Follow-ups
 
-- **Level 2:** Which single metric on the dashboard tells you the estimate holds? Expected: cost per request, which combines token counts and prices and has a target under $0.01.
-- **Level 2:** The cache hit rate drops to zero after a prompt template change. Why? Expected: the cache key is the query embedding and the response was generated with the old template; stale entries are invalid or the time to live cleared them.
-- **Level 3:** How does prompt caching on the stable prefix change the input line? Expected: the system prompt and fixed instructions are billed at a discount when they repeat, so the effective input price per query falls without changing the token count.
-- **Level 3:** What does a per-user daily cap protect that a per-request cost target does not? Expected: the total from one heavy user; many cheap requests still sum to a large bill.
+- **Level 2:** 监控仪表盘上哪单项指标能直接反映成本测算是否成立？ Expected: 单次请求成本，它综合了 token 数量与价格，目标控制在 $0.01 以下。
+- **Level 2:** 在修改 prompt 模板后缓存命中率暴跌为零，原因是什么？ Expected: 缓存键依赖输入向量，而之前的缓存回答是由旧模板生成的；陈旧条目已失效，或者配置的生存时间已将其全部清空。
+- **Level 3:** 对稳定前缀启用 prompt 缓存 如何改变输入成本核算？ Expected: 系统 prompt 与固定指令在重复调用时享受折扣计费，从而在 token 绝对数量不变的前提下降低单次查询的等效输入单价。
+- **Level 3:** 单用户每日消费上限能防范什么单请求成本目标所防范不了的风险？ Expected: 单个重度用户的无限累积消费；即使每次请求都极其廉价，大量高频请求累加起来依然会产生庞大账单。
 
 ## Wrong answers
 
-- "Multiply users by a cost per user from a vendor page." The bill comes from tokens per query, queries per user and the hit rate; each is measured.
-- "Caching saves money only on exact repeats." A semantic cache matches similar queries by embedding, which is why the hit rate reaches a third of traffic.
-- "Input tokens dominate because there are more of them." At these prices and lengths the output line is larger even though there are fewer output tokens.
+- "直接拿供应商给出的单用户参考成本乘以用户数。" 账单由单次 token 数、人均调用频次和缓存命中率共同决定；每一项都需实测。
+- "缓存只有在完全一字不差的重复提问时才有用。" 语义缓存根据向量嵌入匹配相似度，这正是其命中率能覆盖全盘三分之一流量的原因。
+- "输入 token 数量更多，因此输入成本占据主导。" 在当前定价与文本长度下，输出单价高出四倍，即便输出 token 数较少，输出账单依然更贵。
 
 ## Taught in
 
-The [production LLM application lesson](../../../phases/11-llm-engineering/13-production-app/) works through this cost projection and the metrics dashboard.
+[生产级 LLM 应用课程](../../../phases/11-llm-engineering/13-production-app/)推导了该成本测算模型并给出了指标监控仪表盘。

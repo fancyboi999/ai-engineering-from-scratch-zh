@@ -1,6 +1,6 @@
 ---
 id: draft-lost-across-replicas
-title: The draft that vanished on the second replica
+title: 在第二个副本上消失的草稿
 card: protocols
 kind: debug
 level: 3
@@ -16,60 +16,60 @@ related: [protocols/post-only-streamable-http, protocols/stateless-request-metad
 updated: 2026-11-03
 ---
 
-A document MCP server runs as two replicas behind a load balancer. Its `draft_create` tool keeps the new draft in a dictionary inside the process and returns `{"ok": true}`. The next call, `draft_append`, fails about half the time with "no draft", and the failures stop when the operator turns on sticky routing. Explain the failure, say why the operator's fix is wrong, and redesign the two tools.
+一个文档 MCP 服务端作为两个副本运行在负载均衡器后面。其 `draft_create` 工具在进程内部的字典中保存新草稿并返回 `{"ok": true}`。下一次调用 `draft_append` 大约有一半时间因“没有草稿”而失败，而当运维人员开启会话保持时失败停止了。请解释该故障，说明为什么运维人员的修复是错误的，并重新设计这两个工具。
 
 ## Short answer
 
-The first call created the draft in the memory of one replica and returned no name for it, because the design assumed the connection identifies the draft. The second call is a fresh POST that can land on the other replica, which has valid protocol metadata and no way to load the draft. Sticky routing hides the bug until a restart, a rollout or a failover moves the next request. Return a server-minted opaque handle from `draft_create`, keep the draft in a shared durable store, and make `draft_append` take the handle as an ordinary argument.
+第一次调用在单台副本的内存中创建了草稿且未返回其名称，因为设计假定连接可以标识草稿。第二次调用是一个全新的 POST，可能会落到另一台副本上，后者拥有有效的协议元数据但无法加载该草稿。会话保持掩盖了该 bug，直到重启、发布或故障转移移动下一次请求。应从 `draft_create` 返回服务端生成的不透明句柄，将草稿保存在共享的持久化存储中，并使 `draft_append` 将该句柄作为普通参数接收。
 
 ## Full answer
 
-### The mechanical failure
+### 机制层面的失败
 
-1. Request A reaches replica one and creates a draft in that process.
-2. The response returns no draft handle.
-3. Request B is a new POST and reaches replica two.
-4. Replica two cannot name or load the draft, so the call fails or reads the wrong local object.
-5. Sticky routing appears to fix the symptom until the next request moves.
+1. 请求 A 到达副本 1 并在该进程中创建草稿。
+2. 响应未返回草稿句柄。
+3. 请求 B 是新的 POST 并到达副本 2。
+4. 副本 2 无法命名或加载草稿，因此调用失败或读取错误的本地对象。
+5. 会话保持看似修复了症状，直到下一次请求发生移动。
 
-Half the appends fail because half the requests land on the other replica. Nothing in the current revision ties two requests together: there is no `Mcp-Session-Id`, and every request is independently interpretable.
+一半的追加失败是因为一半的请求落到了另一台副本上。当前修订版中没有任何东西将两个请求绑定在一起：没有 `Mcp-Session-Id`，且每个请求都是可独立解释的。
 
-### The correct boundary
+### 正确的边界
 
-Protocol context stays in each request. Durable application state lives in a shared store under a handle the server mints and returns to the client. The next call supplies the handle, any replica loads the same record, and authorization binds the record to the authenticated principal and tenant. Replica memory may cache the record. It cannot be the only copy that correctness needs.
+协议上下文留在每个请求中。持久化的应用状态保存在共享存储中，置于服务端生成并返回给客户端的句柄之后。下一次调用提供该句柄，任何副本都能加载相同的记录，且鉴权将记录绑定至已认证的主体和租户。副本内存可以缓存该记录。它不能成为正确性所需的唯一副本。
 
-### The redesigned pair
+### 重新设计的一对工具
 
-- `draft_create` returns `{"draftId": "<unguessable>"}` from a shared store, bound to the principal, with an expiry.
-- `draft_append` takes `draftId` as an argument, authorizes the principal for that draft on every call, and applies concurrency control and idempotency for the append.
+- `draft_create` 从共享存储返回 `{"draftId": "<unguessable>"}`，绑定至主体，并带有过期时间。
+- `draft_append` 接收 `draftId` 作为参数，在每次调用时检查该主体是否有权操作草稿，并对追加应用并发控制与幂等性。
 
-### Choose the mechanism by lifetime
+### 按生命周期选择机制
 
-| Lifetime | Mechanism |
+| 生命周期 | 机制 |
 |---|---|
-| one call | request-local variables |
-| a short MRTR continuation | integrity-protected `requestState` echoed by the client |
-| a draft or durable task | an explicit handle plus shared persistence, expiry, concurrency control and idempotency |
+| 单次调用 | 请求局部变量 |
+| 短暂的 MRTR 延续 | 客户端回传的完整性受保护的 `requestState` |
+| 草稿或持久化任务 | 显式句柄加上共享持久化、过期时间、并发控制与幂等性 |
 
-None of these is an MCP protocol session.
+这些都不是 MCP 协议会话。
 
-### Prove it
+### 证明它
 
-Place two stateless replicas behind one balancer and send at least `100` concurrent requests. Route consecutive calls to alternating replicas and show that correctness does not depend on affinity. Replace hidden process memory with an explicit handle wherever the workflow needs persistence.
+在单个负载均衡器后放置两个无状态副本，并发送至少 `100` 个并发请求。将连续调用路由到交替的副本，并证明正确性不依赖于会话亲和性。只要工作流需要持久性，就用显式句柄替换隐藏的进程内存。
 
 ## Follow-ups
 
-- **Level 3:** Where may replica memory still be used? Expected: as a cache of the stored record, never as the only copy required for correctness.
-- **Level 3:** How do you test that the fix holds? Expected: alternate replicas for consecutive calls and run many concurrent requests; every append must find its draft without affinity.
-- **Level 4:** What does the handle need beyond being random? Expected: binding to the authenticated principal and tenant, expiry, authorization on each use, and concurrency plus idempotency rules for appends.
-- **Level 4:** Why not carry the draft in `requestState` instead of a store? Expected: `requestState` suits a short input-required continuation; a durable draft needs shared persistence, and a client-echoed value is not storage.
+- **Level 3:** 副本内存还可以用于何处？ Expected: 作为已存储记录的缓存，绝不能作为正确性所需的唯一副本。
+- **Level 3:** 如何测试修复有效？ Expected: 对连续调用交替使用副本并运行多次并发请求；每次追加都必须在无亲和性的情况下找到其草稿。
+- **Level 4:** 句柄除了随机之外还需要什么？ Expected: 绑定至已认证的主体和租户、过期时间、每次使用的鉴权，以及用于追加的并发控制和幂等规则。
+- **Level 4:** 为什么不在 `requestState` 中携带草稿而要用存储？ Expected: `requestState` 适用于短暂的 input-required 延续；持久草稿需要共享持久化，且客户端回传的值不是存储。
 
 ## Wrong answers
 
-- "Sticky routing fixed it, so ship it." Affinity breaks on restart, rollout, reschedule or failover. Correctness must not depend on which replica answers.
-- "Replicate the dictionary between the two processes." That hides protocol context in a store as a substitute for the removed session. The fix is an explicit handle and shared storage the client can name.
-- "Use `Mcp-Session-Id` to find the draft." The current revision ignores that header and never mints it.
+- "会话保持修复了它，所以可以上线。" 亲和性在重启、发布、重新调度或故障转移时失效。正确性绝不能取决于哪个副本做出应答。
+- "在两个进程之间复制字典。" 这将协议上下文隐藏在存储中以替代移除的会话。修复方法是显式句柄和客户端可以命名的共享存储。
+- "使用 `Mcp-Session-Id` 查找草稿。" 当前修订版忽略该请求头，且从不生成它。
 
 ## Taught in
 
-The [transports lesson](../../../phases/13-tools-and-protocols/09-mcp-transports/) traces the hidden-replica failure step by step, and the [capstone](../../../phases/19-capstone-projects/13-mcp-server-with-registry/) requires two replicas without affinity.
+[传输课程](../../../phases/13-tools-and-protocols/09-mcp-transports/)逐步推演了隐藏副本本地状态导致的失败，[综合项目](../../../phases/19-capstone-projects/13-mcp-server-with-registry/)要求在无亲和性的情况下运行两个副本。

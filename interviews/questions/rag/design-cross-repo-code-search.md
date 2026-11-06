@@ -1,6 +1,6 @@
 ---
 id: design-cross-repo-code-search
-title: Design code search across ten repositories that stays fresh
+title: 设计跨十个仓库并保持最新的代码搜索
 card: rag
 kind: design
 level: 4
@@ -16,64 +16,64 @@ related: [rag/design-rag-over-company-docs, rag/hyde-invents-a-symbol]
 updated: 2026-11-03
 ---
 
-Design a code search service that answers questions such as "how is the upload retry budget enforced" across 10 repositories with about 2M lines of code, and that stays fresh on every push. What is different from document retrieval, and where does it break?
+设计一个代码搜索服务，在 10 个仓库、约 2M 行代码上回答“上传重试预算是怎么限制的”这类问题，并在每次 push 后保持最新。它和文档检索有什么不同，会在哪里出问题？
 
 ## Short answer
 
-Chunk at syntax tree nodes, functions and classes, not at fixed windows, and give each chunk three retrievable forms: a dense code embedding, BM25 terms with the symbol name weighted above the body, and a one-sentence natural-language summary. Retrieve hybrid, rerank with a cross-encoder, and synthesize with mandatory file and line citations that a post-filter enforces. Freshness is the hard part: a push triggers a symbol-level diff so that only changed chunks re-embed and only affected cross-file edges recompute.
+按语法树节点（函数和类）分块，不用固定窗口；每块提供三种可检索形式：代码的稠密嵌入、符号名权重高于正文的 BM25 词项、一句自然语言摘要。混合检索后用交叉编码器重排，生成答案时必须带文件和行号引用，由后置过滤器强制执行。时效最难：push 触发符号级差异计算，只为变更块重算嵌入，只重算受影响的跨文件边。
 
 ## Full answer
 
-### Why fixed windows fail on code
+### 固定窗口为何不适合代码
 
-A fixed window cuts an identifier in half and separates a function body from its signature. The capstone parses each file with a syntax tree parser, extracts function and class nodes, and emits one chunk per node with its repository, path, start line, end line, symbol and body. The chunk boundary is the unit the user wants cited.
+固定窗口会截断标识符，把函数体与签名分开。综合项目用语法树解析器解析文件，提取函数和类节点，每节点一块，携带仓库、路径、起止行、符号与正文。块边界就是用户希望引用的单元。
 
-### Three representations per chunk
+### 每块三种表示
 
-| Form | Catches |
+| 表示 | 捕获什么 |
 |---|---|
-| Dense embedding of the code | paraphrased questions about behavior |
-| BM25 with field weights, symbol name 4, summary 2, body 1 | literal symbol names and "find the function named X" |
-| A one-sentence summary from a small cached model | a user who says "authorized" when the code says `check_permission` |
+| 代码稠密嵌入 | 对行为的同义提问 |
+| BM25 字段加权，符号名 4、摘要 2、正文 1 | 字面符号名与“寻找名为 X 的函数” |
+| 小型缓存模型生成的一句话摘要 | 用户说“授权”，代码却写 `check_permission` |
 
-Users ask in English about code that uses other words. The summary adds the modality that neither the code embedding nor the lexical index covers.
+用户用英语提问，代码里用的却是另一套词。摘要补上了代码嵌入和词法索引都覆盖不到的这种表达。
 
-### The symbol graph
+### 符号图
 
-Record edges for imports, calls and inheritance across files and repositories. At query time, expand retrieval along the edges so that a question which crosses four repositories still finds the chain from the caller to the budget configuration.
+记录跨文件、跨仓库的导入、调用与继承边。查询时沿边扩展检索，使跨四个仓库的问题仍能找到从调用方到预算配置的完整链条。
 
-### The query path
+### 查询路径
 
-Retrieve dense and BM25 in parallel, de-duplicate by repository, path and symbol, rerank the top 50 and keep the top 10, synthesize with a cached system prompt, and require a repository, path and line range anchor on every claim. A claim without an anchor is flagged for a re-ask or dropped.
+并行执行稠密和 BM25 检索，按仓库、路径、符号去重，对前 50 个重排，保留前 10 个，用缓存系统 prompt 合成答案。每条论断都必须带仓库、路径和行范围锚点；没有锚点的论断会被标记重问，或者直接删除。
 
-### Incremental freshness
+### 增量更新
 
-A push triggers a diff of changed files and changed symbols. Only chunks whose text changed re-embed. The cross-file edges of the changed chunks recompute, which covers imports, calls and inheritance, so a changed call or base class does not leave a stale edge. A deleted file or symbol removes its chunks from the dense and lexical indexes and its edges from the graph, so search cannot return it after the push. The capstone's target is a 50-file push searchable in under 60 seconds on the 2M line fleet.
+push 触发文件与符号差异计算。只有文本变更的块重算嵌入；这些块的导入、调用和继承等跨文件边重新计算，避免调用或基类变化留下旧边。删除文件或符号时，同时从稠密与词法索引删除块，从图中删除边，防止 push 后继续返回旧内容。综合项目目标是在 2M 行代码中，50 个文件的 push 在 60 秒内可搜索。
 
-### Evaluation
+### 评估
 
-Label 100 cross-repository questions with gold file and line answers. Measure MRR at 10, nDCG at 10, citation faithfulness as the fraction of claims with a verifiable anchor, and p50 and p99 latency. Re-run the set weekly and alert on an MRR at 10 drop above 5 percent.
+标注 100 个跨仓库问题，以文件和行号为标准答案。测 MRR@10、nDCG@10、引用忠实度（带可验证锚点的论断占比），以及 p50 和 p99 延迟。每周重跑，MRR@10 下降超过 5% 时告警。
 
-### Where it breaks
+### 容易失败的地方
 
-- **Generated code.** Boilerplate from code generators poisons retrieval with near duplicates; flag generated chunks in the payload and down-weight them. The capstone injects 20 percent generated code to show the effect.
-- **Monorepo duplication.** Repeated utility code spreads the lexical signal over copies; de-duplicate by symbol.
-- **The long tail.** Rarely imported symbols have weak embeddings; the lexical side and the summary carry them.
-- **A big push.** A commit that retouches half the files is where the incremental path is tested; measure the push-to-searchable time, not only the average.
+- **生成代码。** 代码生成器产出的样板代码带来近似重复，污染检索；在载荷中标记生成块并降权。综合项目注入 20% 的生成代码来展示这个影响。
+- **单体仓库重复。** 重复工具代码把词法信号分散到多个副本，应按符号去重。
+- **长尾。** 很少被导入的符号嵌入较弱，由词法侧和摘要补足。
+- **大型 push。** 一次修改半数文件才真正考验增量路径，应测 push 到可搜索的时间，不能只看平均值。
 
 ## Follow-ups
 
-- **Level 3:** Why three forms per chunk and not one good embedding? Expected: users ask how something is authorized while the code says `check_permission`; the summary bridges a vocabulary gap that neither the code embedding nor BM25 covers.
-- **Level 3:** What does the symbol graph buy at query time? Expected: expansion across repository boundaries, from a function to its callers and imports, so a question that spans several repositories finds the whole chain.
-- **Level 4:** Generated boilerplate enters the corpus. What happens and what do you do? Expected: near-duplicate code poisons retrieval; flag generated chunks in the payload and down-weight them.
-- **Level 4:** What is the freshness target and how do you hold it? Expected: a 50-file push searchable in under 60 seconds on the 2M line fleet, by re-embedding only changed chunks and recomputing only affected edges.
+- **Level 3:** 为什么每块三种表示，而不是一个好嵌入？ Expected: 用户问授权，代码却是 `check_permission`，摘要弥合代码嵌入和 BM25 未覆盖的词汇差距。
+- **Level 3:** 符号图在查询时提供什么？ Expected: 沿调用方与导入关系跨仓库扩展，让多仓库问题找到完整链条。
+- **Level 4:** 生成样板代码进入语料会怎样，如何处理？ Expected: 近似重复代码污染检索，在载荷标记生成块并降权。
+- **Level 4:** 更新目标是什么，怎样保证？ Expected: 2M 行代码中 50 个文件的 push 在 60 秒内可搜索；只重算变更块嵌入和受影响边。
 
 ## Wrong answers
 
-- "Chunk code every 512 tokens like prose." Fixed windows cut identifiers in half and separate a function from its signature; cut at syntax tree nodes.
-- "Re-index the whole fleet on every push." Two million lines per commit never catches up; diff at the symbol level.
-- "Citations are optional for code answers." The capstone rejects any claim without a file and line anchor; the post-filter drops or re-asks.
+- "像散文一样每 512 个 token 切代码。" 固定窗口截断标识符并拆开函数与签名，应按语法树节点切分。
+- "每次 push 都重建全部索引。" 每次提交都处理两百万行，永远追不上；应做符号级差异计算。
+- "代码答案可以不引用。" 综合项目拒绝任何没有文件和行号锚点的论断；后置过滤器会删除它或要求重问。
 
 ## Taught in
 
-The capstone [codebase RAG](../../../phases/19-capstone-projects/02-rag-over-codebase/) sets the syntax-aware chunks, the three forms, the symbol graph, the incremental re-index and the eval, and the lesson [advanced RAG](../../../phases/11-llm-engineering/07-advanced-rag/) supplies hybrid search and reranking.
+[代码库 RAG](../../../phases/19-capstone-projects/02-rag-over-codebase/)综合项目规定语法感知分块、三种表示、符号图、增量索引与评估，[进阶 RAG](../../../phases/11-llm-engineering/07-advanced-rag/)提供混合检索和重排。

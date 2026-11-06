@@ -1,6 +1,6 @@
 ---
 id: resume-that-started-fresh
-title: A resumed run that started from step 0 in silence
+title: 续训的运行悄悄从第 0 步重新开始
 card: scenarios
 kind: incident
 level: 2
@@ -24,58 +24,59 @@ source:
   - manuals/miles-101/sections/6-3-survive-failures.md
 ---
 
+
 ## Situation
 
-A long GRPO run saves a checkpoint every 20 steps into a host folder that is mounted into the container. One night the run dies. The on-call engineer starts the same command again at once. To be safe, she points `--load` at the newest `iter_` folder inside the checkpoint folder, and she keeps the same `> runs/plain.log` redirect, because the dashboard reads that file.
+一次很长的 GRPO 运行每 20 步保存一次检查点，存到一个挂载进容器的宿主机目录里。一天夜里，运行挂了。值班工程师立刻用同一条命令重新启动。为了保险，她把 `--load` 指向检查点目录里最新的 `iter_` 子目录，并保留同样的 `> runs/plain.log` 重定向，因为看板读的是这个文件。
 
-In the morning the reward curve of the new run begins where the first run began days ago. The first step line in the new log reads `step 0`. The team splits: one side says the checkpoints are corrupt, the other says the resume feature does not work on this trainer. Nobody can say why the first run died, because the old log is gone.
+早上，新运行的奖励曲线从几天前第一次运行的起点开始。新日志的第一行 step 写的是 `step 0`。团队分成两派：一派说检查点坏了，另一派说这个训练器的续训功能不能用。没人说得清第一次运行为什么挂，因为旧日志已经没了。
 
 ## Evidence
 
-- [the two runs of the restart check](evidence/check-setup.txt)
-- [the first run: its save line, and its silence about the empty folder](evidence/first-run-saved.txt)
-- [the second run: what a real resume prints](evidence/resume-lines.txt)
-- [what the checkpoint folder holds after both runs](evidence/folder.txt)
-- [the manual's rule for the load flag and the log file](evidence/load-rule.txt)
-- [the lines a resumed run must show, and the test before a long run](evidence/resume-checklist.txt)
-- [the files that the checkpoint converter wrote](evidence/converter.txt)
+- [重启检查的两次运行](evidence/check-setup.txt)
+- [第一次运行：它的保存行，以及它对空目录的沉默](evidence/first-run-saved.txt)
+- [第二次运行：真正的续训会打印什么](evidence/resume-lines.txt)
+- [两次运行后检查点目录里有什么](evidence/folder.txt)
+- [手册关于加载参数和日志文件的规则](evidence/load-rule.txt)
+- [续训的运行必须显示的日志行，以及长时间运行前的测试](evidence/resume-checklist.txt)
+- [检查点转换器写出的文件](evidence/converter.txt)
 
 ## Questions
 
-1. The new log starts at `step 0`. Which lines must appear above it when a resume works, and what does their absence prove?
-2. How loudly does Miles complain when the folder it loads from holds no checkpoint? What does that mean for the runbook?
-3. The flag named the newest `iter_` folder. Why is that the wrong path, and which file does Miles read to find the last step?
-4. The restart also destroyed something that the team now misses. What, and how do you restart so that it survives?
-5. Write the test that every long run passes before it starts, with the step numbers you expect to see.
-6. The team wants to serve the model from a saved step. Which tool does that, and what does it need besides the checkpoint?
+1. 新日志从 `step 0` 开始。续训成功时，它上面必须出现哪些行？这些行不在，证明了什么？
+2. 加载目录里没有检查点时，Miles 的提示有多明显？这对运维手册意味着什么？
+3. 参数指向的是最新的 `iter_` 子目录。为什么这个路径是错的？Miles 读哪个文件来找最后一步？
+4. 这次重启还毁掉了一样团队现在很想要的东西。是什么？怎样重启才能保住它？
+5. 写出每次长时间运行开始前都要通过的测试，以及你预期看到的步数。
+6. 团队想用某个保存的 step 提供模型服务。用哪个工具？除了检查点还需要什么？
 
 ## Walkthrough
 
-1. **Read the shape of the check.** The manual ran two short runs with the same flags: `--save /ckpt/run-a --save-interval 20 --load /ckpt/run-a`. The first ran 2 steps on an empty folder. The second ran 4 steps on the folder the first one left. This is the smallest test of a resume, and it is what the team should have run before the long run.
-2. **Read the first run.** It wrote `[FSDP] Saved checkpoint to /ckpt/run-a/iter_0000002`, because Miles always saves after the last step. The count of lines that mention a missing tracker or a missing folder is 0. The load folder was empty and Miles said nothing about it. That silence is the whole incident: a run that finds nothing to load looks exactly like a run that was never asked to load.
-3. **Read the second run.** It printed three `Loaded` lines, for the model, the optimizer and the LR scheduler, each with the folder of the step. Its first step line is `step 2`, not `step 0`, and it saved `iter_0000004` at its end. These three lines and that first step number are the proof of a resume. The team's log has none of them, so the new run started fresh.
-4. **Read the folder.** It holds `iter_0000002`, `iter_0000004`, a `rollout` folder and one file, `latest_checkpointed_iteration.txt`. That file is the tracker. It sits in the parent folder, not inside an `iter_` folder.
-5. **Apply the rule for the flag.** `--load` names the parent folder, never one `iter_` folder inside it, because Miles reads the tracker file there to find the last saved step. The engineer pointed the flag at a folder with no tracker, so Miles had no step to resume, which is the same case as an empty folder, and the manual's test shows that this case prints nothing.
-6. **Apply the rule for the log.** The manual asks for a new log file on a restart, such as `> runs/plain-resume.log`, because the redirect empties the old log and the old log is where the cause of the failure is. The team lost the cause of the night's crash with the same keystroke that lost the resume.
-7. **Read the converter output.** The FSDP trainer writes distributed checkpoints that other tools cannot load. The converter turned the step 2 checkpoint into a model folder with the weights, the configuration and the tokenizer files, given the base model folder for the configuration and the tokenizer.
+1. **看检查的结构。** 手册用同样的参数跑了两次短运行：`--save /ckpt/run-a --save-interval 20 --load /ckpt/run-a`。第一次在空目录上跑 2 步。第二次在第一次留下的目录上跑 4 步。这是续训最小的测试，也是团队在长时间运行之前本该跑的测试。
+2. **读第一次运行。** 它写出了 `[FSDP] Saved checkpoint to /ckpt/run-a/iter_0000002`，因为 Miles 总会在最后一步之后保存。提到缺少 tracker 或缺少目录的行数为 0。加载目录是空的，Miles 对此一个字都没说。整个事故就出在这份沉默上：一次找不到东西可加载的运行，看起来和一次根本没被要求加载的运行一模一样。
+3. **读第二次运行。** 它打印了三行 `Loaded`，分别对应模型、优化器和 LR 调度器，每行都带着 step 的目录。它的第一行 step 是 `step 2`，不是 `step 0`，结束时保存了 `iter_0000004`。这三行加上第一个 step 编号，就是续训的证据。团队的日志里一样都没有，所以新运行是从头开始的。
+4. **读目录。** 里面有 `iter_0000002`、`iter_0000004`、一个 `rollout` 目录和一个文件 `latest_checkpointed_iteration.txt`。这个文件就是 tracker。它在父目录里，不在任何 `iter_` 子目录里。
+5. **套用参数规则。** `--load` 要写父目录，永远不要写其中某个 `iter_` 子目录，因为 Miles 要在父目录里读 tracker 文件来找最后保存的 step。工程师把参数指向了一个没有 tracker 的目录，所以 Miles 找不到可以续训的 step。这和空目录是同一种情况，而手册的测试显示，这种情况什么都不会打印。
+6. **套用日志规则。** 手册要求重启时用一个新的日志文件，比如 `> runs/plain-resume.log`，因为重定向会清空旧日志，而失败的原因就在旧日志里。工程师用同一条命令重启时，既没能续训，也丢掉了夜里崩溃的原因。
+7. **读转换器的输出。** FSDP 训练器写出的是其他工具无法加载的分布式检查点。转换器在给定基础模型目录（用于配置和分词器）的情况下，把 step 2 的检查点转成了一个包含权重、配置和分词器文件的模型目录。
 
 ## Resolution
 
-The checkpoints were fine. The resume did not happen because `--load` named an `iter_` folder, which holds no tracker file, and Miles starts fresh without a message when it finds no step to load. Point `--load` at the parent folder, `/ckpt/run-a`, start again with a new log file, and read the three `Loaded` lines and the first step number before you walk away. The run then continues from the last saved step, as the check run did from `step 2`.
+检查点没坏。续训没有发生，是因为 `--load` 写的是一个 `iter_` 子目录，里面没有 tracker 文件，而 Miles 找不到可加载的 step 时会不声不响地从头开始。把 `--load` 指向父目录 `/ckpt/run-a`，用一个新的日志文件重新启动，并在离开之前读一读那三行 `Loaded` 和第一个 step 编号。之后运行会从最后保存的 step 继续，就像检查运行从 `step 2` 继续那样。
 
-Make the check part of the runbook. Before a long run, run the command with `MILES_NUM_ROLLOUT=2`, then again with `MILES_NUM_ROLLOUT=4`, and require `step 2` as the first step line of the second run. Choose `--save-interval` from the step time, so that a crash costs less than you accept: with a step of five minutes, an interval of 12 loses at most one hour. To serve a saved step, run the converter inside the container with the step folder, an output folder and the base model folder.
+把这个检查写进运维手册。长时间运行之前，先用 `MILES_NUM_ROLLOUT=2` 运行命令，再用 `MILES_NUM_ROLLOUT=4` 运行一次，并要求第二次运行的第一行 step 是 `step 2`。根据每步耗时选择 `--save-interval`，让一次崩溃的损失低于你能接受的程度：每步五分钟，间隔设为 12，最多丢一小时。要用某个保存的 step 提供服务，就在容器里运行转换器，传入 step 目录、输出目录和基础模型目录。
 
 ## Wrong turns
 
-- "The checkpoints are corrupt." The folder holds the step folders and the tracker file, and the manual's second run loaded the model, the optimizer and the LR scheduler from the same kind of folder. Nothing in the new log says that a load failed, because no load was attempted.
-- "The resume feature does not work on the FSDP trainer." The check run resumed at `step 2` on the FSDP trainer and saved `iter_0000004`. The feature needs the parent folder, and it got a step folder.
-- "Point the flag at the step folder to be sure it loads the right step." The tracker file in the parent folder names the last step. A step folder has no tracker, so the flag loads nothing.
-- "Keep the same log file so the dashboard does not break." The redirect empties the old log and destroys the only record of the crash. Use a new file for each restart and point the dashboard at a folder.
+- "检查点坏了。" 目录里有各个 step 目录和 tracker 文件，手册的第二次运行就从同样的目录里加载了模型、优化器和 LR 调度器。新日志里没有任何加载失败的记录，因为根本没有尝试加载。
+- "续训功能在 FSDP 训练器上不能用。" 检查运行在 FSDP 训练器上从 `step 2` 续训，并保存了 `iter_0000004`。这个功能需要父目录，拿到的却是 step 目录。
+- "把参数指向 step 目录，确保加载的是正确的 step。" 父目录里的 tracker 文件写着最后一步。step 目录里没有 tracker，所以参数什么都加载不到。
+- "继续用同一个日志文件，免得看板出问题。" 重定向会清空旧日志，毁掉崩溃的唯一记录。每次重启用一个新文件，让看板读一个目录。
 
 ## Generalize
 
-A feature that fails silently must be verified by its positive signal, never by the absence of an error. For every resume, every cache load and every state restore, know the log lines that prove it happened and the first value that must differ from a cold start, and test the whole restart path on a short run before you rely on it. Never let a restart overwrite the evidence of the failure that caused it.
+会静默失败的功能，必须靠它的正面信号来确认，而不能靠没有报错。对每一次续训、每一次缓存加载、每一次状态恢复，都要知道哪些日志行能证明它发生了，以及哪个最先出现的值必须与冷启动不同；在依赖它之前，先用一次短运行把整条重启路径测一遍。永远不要让重启覆盖掉导致重启的那次失败的证据。
 
 ## Taught in
 
-The Miles manual gives the checkpoint flags, the resume lines, the two-step test and the converter in [the failures page](../../../manuals/miles-101/sections/6-3-survive-failures.md).
+Miles 手册在[故障页](../../../manuals/miles-101/sections/6-3-survive-failures.md)中给出了检查点参数、续训日志行、两步测试和转换器。

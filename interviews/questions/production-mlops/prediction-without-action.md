@@ -1,6 +1,6 @@
 ---
 id: prediction-without-action
-title: What the system does with a predicted outage
+title: 系统面对预测出的服务故障该采取什么行动
 card: production-mlops
 kind: design
 level: 4
@@ -16,42 +16,42 @@ related: [production-mlops/narrow-auto-remediation, production-mlops/two-models-
 updated: 2026-11-03
 ---
 
-A model trained on your logs, GPU temperatures and error patterns predicts most outages ten to fifteen minutes before they happen. The team wants to ship it as a dashboard panel. Design what the system does with a prediction, and defend the design.
+一个模型在你的日志、GPU 温度和错误模式上训练后，能提前十到十五分钟预测大多数服务故障。团队想把它做成一个看板面板上线。设计系统收到预测后要做的事，并说明理由。
 
 ## Short answer
 
-A prediction with no action is a dashboard, and nobody watches a dashboard at three in the morning. Write a policy per prediction class: page the on-call, drain the suspect node or pool before it fails, or scale within approved bounds, and record every prediction with its outcome. Start with the page, measure the precision on live incidents, and promote a class to an automatic drain only when its false alarm rate is acceptable and a person has approved that drain as a pre-approved action in the runbook.
+没有行动的预测只是看板，而凌晨三点没人盯着看板。按预测类别制定策略：呼叫值班人员，在故障前排空可疑节点或实例池，或者在已批准的范围内扩容，并记录每次预测的结果。先从呼叫值班开始，在真实事故中测量精确率；只有某类预测的误报率可以接受，而且 runbook 中已有人预先批准排空操作，才允许该类预测自动触发排空。
 
 ## Full answer
 
-### The result and its limit
+### 研究结果及其局限
 
-The lesson cites a research result: a model trained on past log lines, GPU temperature readings and API error patterns predicted 89 percent of outages 10 to 15 minutes early on its test set. The lesson's reality check follows at once. Predictions without actuation are dashboards. The operational question is what you do when the prediction fires.
+课程引用了一项研究：在历史日志行、GPU 温度读数和 API 错误模式上训练的模型，在测试集上能提前 10 到 15 分钟预测 89% 的服务故障。课程紧接着提醒：没有执行动作的预测只是看板。运维真正要回答的是，预测触发时做什么。
 
-### The design
+### 设计
 
-1. **Classify the prediction.** Which failure is coming: a memory exhaustion, a thermal slowdown, a provider error burst. Attach the confidence.
-2. **Map each class to an action.** The lesson's safe set is narrow: restart a pod, revert a deploy, scale within pre-approved bounds. A drain is not on that list, so it needs approval before it runs on its own. Drain the pod from the load balancer and restart it before it falls over. Scale the pool within approved bounds. Page a person with the prediction and the evidence.
-3. **Fit the action into the lead time.** A drain plus a replacement must complete inside the ten to fifteen minutes, so the replacement has to be warm already. A cold start of a large model takes minutes and can eat the whole window.
-4. **Record outcomes.** Every prediction, its class, the action taken and whether the outage happened. Precision and recall per class come from this log, not from the paper.
-5. **Guard the blast radius.** Never run two automatic drains in the same pool at once, and never drain under a load spike without a warm spare.
+1. **给预测分类。** 即将发生的是内存耗尽、过热降速，还是服务商错误突增？附上置信度。
+2. **将每类预测映射到操作。** 课程的安全操作集合很小：重启 Pod、回滚部署、在预先批准的范围内扩容。排空不在其中，所以自动执行前需要批准。在 Pod 崩溃前，将它从负载均衡器中排空并重启。在批准范围内扩容实例池。将预测及证据一并发给值班人员。
+3. **在提前量内完成操作。** 排空和替换必须在十到十五分钟内完成，因此替代副本必须已预热。大型模型冷启动需要几分钟，可能耗尽整个窗口。
+4. **记录结果。** 记录每次预测、类别、采取的操作，以及故障是否发生。各类预测的精确率和召回率来自这份日志，而不是论文。
+5. **限制爆炸半径。** 同一实例池中不能同时自动排空两个节点；负载突增时，没有预热备用副本就不能排空。
 
-### Why page first
+### 为什么先呼叫值班
 
-A page costs sleep. A false drain costs capacity for the drain time. A false scale-up costs money. Until the precision per class is measured in production, the cheapest wrong action is the page. Promote a class to automatic action when its record justifies it, the same ladder the lesson uses for remediation.
+呼叫的代价是睡眠。误排空的代价是排空期间损失容量。误扩容的代价是钱。在生产环境测出各类预测的精确率前，呼叫值班是代价最低的错误操作。记录证明某类预测可靠后，再升级为自动执行，与课程中的修复操作采用相同的升级方式。
 
 ## Follow-ups
 
-- **Level 3:** What does a false alarm cost under each policy? Expected: a page costs sleep, a drain costs capacity for the drain time, and a scale-up costs money. Pick the policy per class from that cost against the cost of the outage.
-- **Level 4:** The lead time is ten minutes and a replacement replica takes longer to warm. What changes? Expected: keep a warm spare or act earlier on a weaker signal. A drain with no warm replacement moves the outage instead of preventing it.
-- **Level 4:** How do you know the predictor still works after the service changes? Expected: track precision and recall per class on live incidents, and retrain when the input distribution shifts.
+- **Level 3:** 每种策略下，误报的代价是什么？ Expected: 呼叫损失睡眠，排空损失排空期间的容量，扩容花钱。按类别比较这些代价与故障代价，再选择策略。
+- **Level 4:** 提前量为十分钟，替代副本预热需要更久，怎么办？ Expected: 保留预热备用副本，或者依据更弱的信号更早行动。没有预热替代副本就排空，只是改变故障发生时间，而非预防故障。
+- **Level 4:** 服务变更后，如何知道预测器是否仍有效？ Expected: 在真实事故中按类别跟踪精确率和召回率，输入分布变化时重新训练。
 
 ## Wrong answers
 
-- "Ship the panel and let on-call decide." At night nobody watches a panel. The lesson's point is that a prediction without an action is a dashboard.
-- "Automate the drain for every prediction from day one." A false alarm then costs capacity, and nothing has measured the false alarm rate on your traffic.
-- "The research number means we will prevent most outages." The number was on a test set. Your precision in production is unknown until you measure it.
+- "上线面板，让值班人员决定。" 夜里没人盯面板。课程强调，没有行动的预测只是看板。
+- "从第一天起，每次预测都自动排空。" 误报会损失容量，而你还没在自己的流量上测过误报率。
+- "研究数字说明我们能预防大多数故障。" 那是测试集上的数字。生产环境中的精确率在测量前是未知的。
 
 ## Taught in
 
-The [SRE for AI lesson](../../../phases/17-infrastructure-and-production/23-sre-for-ai/) reports the early-detection result and asks what the system does when it predicts.
+[AI 的 SRE 课程](../../../phases/17-infrastructure-and-production/23-sre-for-ai/)介绍了提前检测的研究结果，并追问系统预测到故障后要做什么。

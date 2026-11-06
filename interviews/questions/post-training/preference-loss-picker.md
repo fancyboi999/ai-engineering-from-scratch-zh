@@ -1,6 +1,6 @@
 ---
 id: preference-loss-picker
-title: Pick a preference loss for four kinds of data
+title: 为四种数据形态选用专属偏好损失
 card: post-training
 kind: design
 level: 3
@@ -16,55 +16,55 @@ related: [post-training/dpo-chosen-logprob-falls]
 updated: 2026-11-03
 ---
 
-Four teams bring you four datasets. One has thumbs-up and thumbs-down clicks on single answers. One has paired comparisons whose preferred answers are mostly twice the length of the rejected ones. One has no SFT checkpoint and wants a single training stage from the base model. One has pairs where some preferences are near coin flips and others are unanimous. Which preference loss do you recommend to each team, and why?
+四个技术团队为你带来了四种完全不同形态的对齐数据集：第一个团队收集的是单条回答上的用户点赞与点踩点击数据；第二个团队拥有成对比较数据，但正向胜出回答的文本长度普遍是被拒绝回答的两倍；第三个团队没有 SFT 检查点，希望直接从基座模型执行单阶段对齐微调；第四个团队的成对数据中，部分样本的偏好难解难分，而另一些样本则是全票一致通过。你会向各团队分别推荐哪种偏好损失函数？为什么？
 
 ## Short answer
 
-The clicks team gets the prospect-theory loss that works on single labels. The length-skewed team gets the reference-free loss that normalizes by length and adds a margin, so a longer winner does not win by its token count. The team without an SFT stage gets the odds-ratio loss, which adds a preference term to the SFT likelihood and trains from the base in one pass; the team with mixed preference strengths gets the identity-mapping loss, whose margin is bounded. Each one repairs one assumption that plain DPO makes.
+点赞点踩团队推荐使用基于前景理论、面向单标签样本的 KTO 损失。长度偏置团队推荐使用无需参考模型且按长度归一化追加边际的 SimPO 损失，防止长文本仅凭 token 数量作弊胜出。无 SFT 阶段的团队推荐使用比值比损失 ORPO，它将偏好惩罚直接追加到 SFT 负对数似然损失中，单阶段完成指令遵循与偏好对齐；偏好强度悬殊混合的团队推荐使用恒等映射损失 IPO，其边际目标严格有界。每一种衍生算法都精准修复了原生 DPO 所隐含的一项理论假设缺陷。
 
 ## Full answer
 
-### Start from what DPO assumes
+### 从 DPO 的理论假设短板出发
 
-The DPO derivation assumes paired data, an SFT reference that is the true anchor, in-distribution pairs, and a preference that maps to an unbounded log-odds. Each member of the family drops or repairs one of these.
+DPO 的理论推导强依赖四个前提假设：必须有成对对比数据、依赖一个可作为绝对真实锚点的 SFT 参考模型、偏好样本必须分布在参考模型之内，以及偏好能够映射为无界的对数几率。DPO 家族的各个成员正是针对性地打破或修正了其中的某一项。
 
-| Data or constraint | Loss | What it changes |
+| 数据特征或系统约束 | 推荐损失函数 | 核心改变机理 |
 |---|---|---|
-| Single answers with good or bad labels | KTO | prospect-theory utility on one label; losses weigh more than gains; no pairs needed |
-| Winners much longer than losers | SimPO | average log-probability per token plus a margin; no reference model |
-| No SFT checkpoint, one stage | ORPO | SFT negative log-likelihood plus an odds-ratio preference term; the SFT term is the regularizer |
-| Preference strength varies widely | IPO | squared error on a target of one over two beta; the gap is bounded |
-| Chosen log-probability falls in the DPO logs | BPO | DPO plus a penalty on downward moves of the chosen answer |
-| A large clean paired set | DPO | a conservative beta |
+| 单回答好坏标签 | KTO | 采用前景理论效用函数对单样本打分；损失厌恶权重高于收益；无需成对样本 |
+| 正向回答显著长于负向回答 | SimPO | 基于每 token 平均对数概率追加目标边际；彻底移除参考模型显存开销 |
+| 无独立 SFT 检查点，需单阶段训练 | ORPO | SFT 负对数似然损失加上比值比偏好损失项；SFT 似然项本身承担正则化锚点作用 |
+| 样本间偏好强度悬殊极大 | IPO | 针对二倍 beta 分之一目标计算均方误差；边际在数学上严格有界 |
+| DPO 训练中选定项绝对概率下滑 | BPO | 在原生 DPO 基础上追加对选定回答对数概率下移的定向惩罚项 |
+| 大规模、干净的成对数据集 | 原生 DPO | 采用保守适中的 beta 参数 |
 
-### The reasoning for each team
+### 四个团队的具体技术方案分析
 
-1. Clicks are plentiful and unpaired. Forcing them into pairs throws away most of the data; the unpaired loss uses every label.
-2. In plain DPO a long winner has a more negative log-probability by construction, so the gap grows for the wrong reason and the policy learns length. Normalizing by length removes the incentive. Without a reference, drift needs a guard of its own.
-3. The single-stage loss trains the base model to follow instructions and to prefer the chosen answer at once; the likelihood term keeps it anchored where DPO used the reference.
-4. In DPO a near coin-flip pair and a unanimous pair both push toward an unbounded gap. The bounded loss keeps the gap proportional to the preference strength.
+1. **点赞点击数据海量且非成对。** 强行将它们拼凑成对比对会丢弃绝大部分无配对样本；KTO 能够直接利用每一个独立正负标签。
+2. 在普通 DPO 中，长的胜出回答本来就具有更负的对数概率，因此差距会因错误的原因增大，策略学会追求长度。长度归一化去掉了这一动机。没有参考模型时，需要单独防范漂移。
+3. **单阶段损失函数同时训练基座模型遵循指令并倾向正向回答。** 似然损失项替代了 DPO 中参考模型的防漂移锚点作用。
+4. **原生 DPO 面对微弱偏好和绝对偏好均在无界地推高边际。** IPO 的均方误差形式保证了隐式奖励边际与真实偏好强度成比例。
 
-### What every team keeps
+### 所有团队共同不可动摇的底线
 
-A held-out eval with generation, early stopping, and a check on the absolute chosen log-probability. None of these losses escapes over-optimization; they move where it bites.
+留出集生成评估、早停，以及对选定回答绝对对数概率的监控。上述任何一种损失函数都无法在理论上根除过度优化；它们只是改变了古德哈特定律发作的具体部位。
 
-### How to decide in practice
+### 工业实践选型指南
 
-Run the candidates on one battery and pick per task. The lesson's point is that the best loss for math reasoning has no reason to be the best loss for safety.
+在标准评测套件上针对具体业务任务做多损失消融选型。课程的核心洞见在于：在数学推理上表现最强的偏好损失，没有任何理由在安全合规任务上也恰好表现最优。
 
 ## Follow-ups
 
-- **Level 3:** The clicks team also has a small paired set. Combine them? Expected: yes; train with the unpaired loss on the clicks and validate on the pairs, or weight the two losses; the pairs are the cleaner signal for the eval.
-- **Level 3:** Why does removing the reference save memory, and what does it cost? Expected: one model in memory instead of two; the cost is no anchor, so the policy can drift, and the margin term and early stopping carry that job.
-- **Level 4:** A team runs DPO and watches the probability of its chosen answers drop while the margin grows. Which row applies, and why is it not a tuning problem? Expected: the chosen-preserving variant; the gradient of plain DPO cares only about the difference, so no beta fixes the direction.
-- **Level 4:** How do you argue to a skeptic that these losses still over-optimize? Expected: the published curves of gold reward against KL for direct methods show the same peak and collapse as reward-model pipelines; the implicit reward queries out-of-distribution samples, and KL regularization does not stabilize it.
+- **Level 3:** 点赞团队如果同时还拥有一小批高质量成对数据，应该如何组合？ Expected: 可以组合；使用 KTO 在海量点赞数据上微调，并将成对数据作为验证集；或按比例联合加权计算；成对数据是更为纯净的评估基准。
+- **Level 3:** 移除参考模型带来了什么显存收益，代价是什么？ Expected: 显存中只需常驻一个模型而非两个；代价是失去了原生的统计锚点，策略存在无界漂移风险，必须依靠显式边际项与严谨早停来守护。
+- **Level 4:** 一个团队在运行 DPO 时发现选定回答的绝对概率在持续下降而边际在扩大，对应哪一行，为什么不是调参能解决的？ Expected: 对应保行为变体 BPO；原生 DPO 的梯度只由两者的差值决定，因此调整任何 beta 参数都无法改变作用在选定项上的单侧错误梯度方向。
+- **Level 4:** 如何向持怀疑态度的同事证明这些衍生损失依然难逃过度优化？ Expected: 引用公开的真实奖励对 KL 散度缩放曲线，各直接对齐算法均呈现先升后崩塌的轨迹；隐式奖励会在分布外样本上被查询，KL 正则化无法使其稳定。
 
 ## Wrong answers
 
-- "Convert the clicks into pairs by matching a good and a bad answer for the same prompt." It keeps only prompts with both labels and invents comparisons the raters never made; the unpaired loss uses the labels as they are.
-- "Truncate the long winners so that the pairs are balanced." That destroys the answers people preferred; the fix is in the loss normalization, not in the data.
-- "Use DPO everywhere and tune beta per team." Beta cannot create pairs, remove a reference, bound a gap or supply an SFT stage; each of those is a different loss.
+- "为同一个 prompt 匹配一个好回答和一个坏回答，把点击数据强行凑成对比对。" 这会仅仅保留同时拥有两类标签的极少数 prompt，且人为虚构了标注员从未做过的对比关系；非成对损失能直接使用原始标签。
+- "把长正向回答直接按最大长度截断，使数据对保持长度平衡。" 这破坏了人类原本偏爱的高质量回答内容；修复应当发生在损失函数的归一化机制中，而非在数据上削足适履。
+- "所有场景统一使用 DPO，为每个团队单独微调 beta 即可。" Beta 既无法解决单标签数据利用，也无法消除参考模型显存开销，更无法约束无界边际或替代 SFT；每种场景对应完全不同的损失函数形式。
 
 ## Taught in
 
-The [DPO family lesson](../../../phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/) gives each loss and the failure mode it fixes, and the [DPO lesson](../../../phases/10-llms-from-scratch/08-dpo/) tabulates the models, pairs and reference that each method needs.
+[DPO 家族课程](../../../phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/)阐述了各个损失函数及其修复的对应失效模式，而 [DPO 课程](../../../phases/10-llms-from-scratch/08-dpo/)列表对比了各方法所需的模型副本、成对要求与参考架构。

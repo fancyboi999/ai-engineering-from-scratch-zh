@@ -1,6 +1,6 @@
 ---
 id: temperature-knob
-title: What temperature does to sampling
+title: 温度对采样做了什么
 card: coding
 kind: concept
 level: 1
@@ -16,50 +16,50 @@ related: [coding/top-k-then-sample, coding/top-p-crossing-token]
 updated: 2026-11-03
 ---
 
-Write the one line that applies a sampling temperature to a vector of logits, then tell me what happens to the distribution as the temperature goes toward zero, equals one, and goes above one.
+写出把采样温度作用到一个 logits 向量上的那一行代码，再说明温度趋向零、等于一、大于一时，分布分别会怎样变化。
 
 ## Short answer
 
-Divide the logits by the temperature before the softmax. Near zero the division stretches the gaps between logits, so the largest one takes almost all the mass and sampling becomes greedy. At one the model's own distribution is used, and above one the gaps shrink, the distribution flattens, and rare tokens are drawn more often.
+在 softmax 之前用 logits 除以温度。温度接近零时，除法拉大了 logits 之间的差距，最大的那个几乎拿走全部概率质量，采样变成贪心。温度为一时用的是模型自己的分布；温度大于一时差距缩小，分布变平，罕见 token 被抽中的次数变多。
 
 ## Full answer
 
-### The line
+### 这一行
 
 ```python
 probs = softmax(logits / temperature)
 ```
 
-The order matters in a full sampler: the generation loop reads the final position's logits, divides by the temperature, applies any top-k or top-p filter, takes the softmax, and draws one token.
+在完整的采样器里顺序很重要：生成循环读取最后一个位置的 logits，除以温度，应用 top-k 或 top-p 过滤（如果有），做 softmax，然后抽一个 token。
 
-### Three regimes
+### 三种区间
 
-| Temperature | Effect on the gaps between logits | Behavior |
+| 温度 | 对 logits 间差距的影响 | 表现 |
 |---|---|---|
-| Toward zero | Gaps grow without bound | Argmax; the same token every time |
-| Equal to one | Unchanged | The model's natural distribution |
-| Above one | Gaps shrink | Flatter distribution, more surprise, more errors |
+| 趋向零 | 差距无限增大 | argmax；每次都是同一个 token |
+| 等于一 | 不变 | 模型的自然分布 |
+| 大于一 | 差距缩小 | 分布更平，更多意外，更多错误 |
 
-### Why division and not multiplication
+### 为什么是除法而不是乘法
 
-Multiplying the logits by the temperature does the opposite of what people expect: a higher value sharpens the distribution. The practice lab has a mutant that makes this mistake, and the sign of the effect is the first thing its tests check.
+把 logits 乘以温度，效果和大家预期的相反：数值越高，分布越尖。练习实验里有一个犯了这个错误的变异体，测试首先检查的就是效果的方向。
 
-### Reading the effect
+### 怎样看效果
 
-Two measurements show what a temperature did: the probability of the top token, and the entropy of the distribution. As the temperature rises the top probability falls and the entropy rises. A sweep over temperatures on fixed logits makes both curves visible without a model in the loop.
+两个测量能看出温度做了什么：最高 token 的概率，以及分布的熵。温度升高时，最高概率下降，熵上升。在固定的 logits 上扫一遍温度，不用跑模型就能看到这两条曲线。
 
 ## Follow-ups
 
-- **Level 1:** Why does temperature zero need a special case in code? Expected: division by zero; implement it as argmax rather than dividing.
-- **Level 2:** A product wants deterministic output. Is temperature zero enough? Expected: it removes sampling randomness, but ties and numeric differences across batches can still change the argmax.
-- **Level 2:** How does temperature interact with a top-p cutoff? Expected: the cutoff must run on the temperature-scaled probabilities, otherwise it cuts the distribution at temperature one and the setting does less than expected.
+- **Level 1:** 代码里温度为零为什么要特殊处理？ Expected: 会除以零；把它实现成 argmax，而不是做除法。
+- **Level 2:** 一个产品要求确定性输出。温度设为零够吗？ Expected: 它去掉了采样的随机性，但平局和不同 batch 之间的数值差异仍可能改变 argmax。
+- **Level 2:** 温度和 top-p 截断怎样相互作用？ Expected: 截断必须在温度缩放后的概率上做，否则它是在温度为一时切分布，这个设置的作用就比预期小。
 
 ## Wrong answers
 
-- "Temperature scales the probabilities after the softmax." Scaling probabilities and renormalizing changes nothing; the division happens on the logits.
-- "A higher temperature makes the model smarter." It only flattens the distribution, which trades repetition for more mistakes.
-- "Temperature one means no sampling." It means sampling from the unchanged distribution; greedy is temperature zero or argmax.
+- "温度在 softmax 之后缩放概率。" 缩放概率再重新归一化什么也不会改变；除法作用在 logits 上。
+- "温度越高，模型越聪明。" 它只是让分布变平，用更多错误换来更少重复。
+- "温度为一表示不采样。" 它表示从未经改变的分布中采样；贪心对应温度为零或 argmax。
 
 ## Taught in
 
-The [GPT assembly lesson](../../../phases/19-capstone-projects/35-gpt-model-assembly/) describes the three temperature regimes in its generation loop, and the [temperature lab](../../../practice/lab-sampling-temperature/) sweeps them on fixed logits.
+[GPT 组装课](../../../phases/19-capstone-projects/35-gpt-model-assembly/)在生成循环里描述了三种温度区间，[温度实验](../../../practice/lab-sampling-temperature/)在固定的 logits 上扫描它们。

@@ -1,6 +1,6 @@
 ---
 id: legacy-probe-fail-closed
-title: When an old server is really old
+title: 当旧服务端确实属于旧版时
 card: protocols
 kind: design
 level: 3
@@ -16,67 +16,67 @@ related: [protocols/stateless-request-metadata, protocols/post-only-streamable-h
 updated: 2026-11-03
 ---
 
-Your agent host launches several MCP servers over stdio. One is current. One is an old archive server that understands only `initialize`. One is current but slow to start. A teammate proposes a simple rule: send `server/discover`, and on any error or timeout send `initialize`. Design the startup so that the slow server is never downgraded and the archive server still works.
+你的 agent 宿主通过 stdio 启动了数个 MCP 服务端。一个是当前的。一个是仅能理解 `initialize` 的旧归档服务端。还有一个是当前版本但启动缓慢的服务端。一位队友提议采用一个简单规则：发送 `server/discover`，在遇到任何错误或超时时发送 `initialize`。请设计启动流程，使得慢启动的服务端绝不被降级，且归档服务端依然能够工作。
 
 ## Short answer
 
-Treat an ambiguous signal as ambiguous. A timeout, a connection close, an empty response or an unrecognized error does not identify an era, so the client fails closed unless that exact peer is configured with `allow_legacy=True`. A recognized modern error such as `-32022` proves the server is current and forbids `initialize`. For the archive peer on the allowlist, send one `initialize` under a transport-enforced deadline and select the legacy era only after a structurally valid positive result.
+将歧义信号视为歧义。超时、连接关闭、空响应或未识别的错误无法确定协议代际，因此客户端失败闭合（fail-closed），除非该对端显式配置了 `allow_legacy=True`。类似 `-32022` 这样已识别的现代错误证明服务端是当前版本，并禁止 `initialize`。对于白名单上的归档对端，在传输强制的截止时间内发送一次 `initialize`，且仅在获得结构合法的正向结果后才选择旧版协议代际。
 
 ## Full answer
 
-### Three outcome classes for the probe
+### 探测的三种结果类别
 
-| Outcome of `server/discover` | Meaning | Next step |
+| `server/discover` 的结果 | 含义 | 下一步 |
 |---|---|---|
-| a `DiscoverResult` | current server | pick the highest mutually supported version and continue with per-request metadata |
-| a recognized modern error | current server | correct the request or retry an advertised version; never send `initialize` |
-| an ambiguous signal | unknown | fail closed, unless this pinned peer allows one bounded legacy probe |
+| 一个 `DiscoverResult` | 当前服务端 | 选取最高共同支持的版本，并继续使用逐请求元数据 |
+| 已识别的现代错误 | 当前服务端 | 纠正请求或重试服务端声明支持的版本；绝不发送 `initialize` |
+| 歧义信号 | 未知 | 失败闭合，除非此固定对端允许一次有界的旧版探测 |
 
-Recognized modern errors are `-32020` HeaderMismatch, `-32021` MissingRequiredClientCapability and `-32022` UnsupportedProtocolVersion. They remain modern even when the peer is on the legacy allowlist, because a server that speaks the modern error vocabulary would be downgraded by `initialize`.
+已识别的现代错误包括 `-32020` HeaderMismatch、`-32021` MissingRequiredClientCapability 和 `-32022` UnsupportedProtocolVersion。即使对端在旧版白名单上，它们仍属于现代错误，因为支持现代错误词汇的服务端会被 `initialize` 降级。
 
-`-32601` is not positive legacy evidence. It only makes an explicitly allowlisted peer eligible for one probe, and so does a timeout, a connection close or an empty response.
+`-32601` 不是正向的旧版证据。它仅使显式列入白名单的对端有资格接受一次探测，超时、连接关闭或空响应也是如此。
 
-### The allowlist is intent, not evidence
+### 白名单是意图，不是证据
 
 ```python
 client.add_server("archive", archive_transport, allow_legacy=True)
 ```
 
-Bind the choice to the configured command or endpoint. A wildcard would let an arbitrary server opt itself into weaker semantics. A peer without the flag fails after an ambiguous outcome and never receives `initialize`.
+将选择绑定到配置的命令或端点。通配符将允许任意服务端自行选择较弱的语义。没有该标志的对端在出现歧义结果后失败，且绝不会收到 `initialize`。
 
-### Positive legacy evidence
+### 正向的旧版证据
 
-The one `initialize` runs under `legacy_probe_timeout_ms`, which a real adapter must enforce. The client then requires all of:
+单次 `initialize` 在 `legacy_probe_timeout_ms` 下运行，真实的适配器必须强制执行该超时。客户端随后要求满足以下所有条件：
 
-- a JSON-RPC `2.0` response with the matching request id;
-- exactly one `result` and no `error`;
-- a `protocolVersion` in the client's configured legacy revision set;
-- an object-valued `capabilities`;
-- a `serverInfo` object with non-empty string `name` and `version`.
+- 带有匹配请求 ID 的 JSON-RPC `2.0` 响应；
+- 恰好一个 `result` 且没有 `error`；
+- `protocolVersion` 处于客户端配置的旧版修订集中；
+- 值为对象的 `capabilities`；
+- 带有非空字符串 `name` 和 `version` 的 `serverInfo` 对象。
 
-Anything else leaves the peer `unknown` and unavailable. Only after all checks pass does the client send `notifications/initialized` and use legacy request shapes for that transport lifetime.
+任何其他情况都会使对端保持 `unknown` 且不可用。只有在所有检查通过后，客户端才发送 `notifications/initialized`，并在该传输生命周期中使用旧版请求形态。
 
-### After the era is chosen
+### 选定时代之后
 
-Cache the era per transport peer and do not probe before every call. When the transport restarts or the endpoint changes, discard the cache and negotiate again. Then call `tools/list`, sort the result before merging, and apply a declared collision policy: prefix later duplicates as `<server>/<tool>` or reject the duplicate with both peer names in the error. Never overwrite silently.
+按传输对端缓存时代，不要在每次调用前都探测。当传输重启或端点更改时，丢弃缓存并重新协商。然后调用 `tools/list`，在合并前对结果排序，并应用声明的冲突策略：为后续重复项按 `<server>/<tool>` 形式添加服务端前缀，或者在错误中包含两个对端名称并拒绝重复项。绝不静默覆盖。
 
-### Why the slow server survives
+### 慢启动的服务端为何不会降级
 
-Its first probe times out, which is an ambiguous signal. It is not allowlisted, so the client marks it unavailable instead of sending `initialize`. A later retry of `server/discover` succeeds and the peer joins as a current server with the correct era.
+它的第一次探测超时，这是一个歧义信号。它不在白名单中，因此客户端将其标记为不可用，而不是发送 `initialize`。稍后重试 `server/discover` 成功，该对端作为当前服务端以正确的时代加入。
 
 ## Follow-ups
 
-- **Level 3:** The allowlisted archive peer answers `-32022` to discovery. Which era? Expected: current; a recognized modern error forbids the legacy probe, so choose from `data.supported` and retry with a new request id.
-- **Level 3:** The `initialize` probe times out. What state is the peer in? Expected: `unknown` and unavailable; no era is selected and `notifications/initialized` is never sent.
-- **Level 4:** A legacy server accepts `tools/list` before initialization. Why does that make discovery-first safer on stdio? Expected: the ambiguous success would hide the era; `server/discover` creates a clean era boundary before any operation.
-- **Level 4:** The archive process crashes and restarts. Do you reuse the cached legacy era? Expected: no; discard the peer-era cache, rediscover, relist, reopen subscriptions, and retry only safe operations with new ids.
+- **Level 3:** 白名单中的归档对端对服务发现返回 `-32022`。属于哪个时代？ Expected: 当前；已识别的现代错误禁止旧版探测，因此从 `data.supported` 中选取并使用新请求 ID 重试。
+- **Level 3:** `initialize` 探测超时。对端处于什么状态？ Expected: `unknown` 且不可用；不选择时代，且绝不发送 `notifications/initialized`。
+- **Level 4:** 旧版服务端在初始化前接受 `tools/list`。为什么在 stdio 上优先发现更安全？ Expected: 歧义的成功会掩盖时代；`server/discover` 在任何操作之前创建了清晰的时代边界。
+- **Level 4:** 归档进程崩溃并重启。你是否复用缓存的旧版时代？ Expected: 否；丢弃对端时代缓存，重新发现、重新列出、重新打开订阅，并仅使用新 ID 重试安全操作。
 
 ## Wrong answers
 
-- "Any error from discovery means the server is old." A malformed request, an overloaded server, a dead process and an old server can all produce the same timeout or close.
-- "Send `initialize` first; a current server will reject it." Sending `initialize` to a current server is a downgrade and must never be the default path.
-- "A method-not-found error proves the server is legacy." It only makes an allowlisted peer eligible for one bounded probe; the positive evidence is a valid `initialize` result.
+- "发现返回的任何错误都意味着服务端是旧版。" 畸形请求、过载的服务端、死进程和旧服务端都可能产生相同的超时或关闭。
+- "首先发送 `initialize`；当前服务端会拒绝它。" 向当前服务端发送 `initialize` 是一种降级，绝不能作为默认路径。
+- "方法未找到错误证明服务端是旧版。" 它仅使列入白名单的对端有资格接受一次有界探测；正向证据是有效的 `initialize` 结果。
 
 ## Taught in
 
-The [client lesson](../../../phases/13-tools-and-protocols/08-building-an-mcp-client/) defines the probe outcomes, the allowlist and the positive evidence checklist.
+[客户端课程](../../../phases/13-tools-and-protocols/08-building-an-mcp-client/)定义了探测结果、白名单和正向证据检查清单。

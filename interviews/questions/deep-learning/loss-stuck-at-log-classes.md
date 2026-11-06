@@ -1,6 +1,6 @@
 ---
 id: loss-stuck-at-log-classes
-title: A loss that sits at 2.3 on a ten class problem
+title: 十分类问题上一直停在 2.3 的损失
 card: deep-learning
 kind: debug
 level: 3
@@ -16,43 +16,43 @@ related: [deep-learning/overfit-one-batch-first, deep-learning/mse-predicts-half
 updated: 2026-11-03
 ---
 
-A ten class classifier trains for many epochs, and the cross-entropy loss sits at about 2.3 the whole time, on training data and on validation data. Nothing crashes. What does that number tell you, and in which order do you debug?
+一个十分类模型训练了很多个 epoch，交叉熵损失在训练数据和验证数据上一直停在 2.3 左右。没有任何崩溃。这个数字告诉你什么？你按什么顺序调试？
 
 ## Short answer
 
-Minus the natural log of one tenth is about 2.3, the loss of a model that gives every class the same probability, and the lesson's table reads a loss stuck there as a uniform prediction with no usable signal. The mean alone does not say why. Run the one batch overfit test first: a failure points at the loss, the backward pass, the optimizer hookup or misaligned labels, and a pass sends you to the data path to check that labels line up with inputs. Only then look at the learning rate, the gradients and the architecture.
+十分之一的自然对数取负约为 2.3，这是给每个类别相同概率的模型的损失，课里的表格把停在这里的损失解读为均匀预测、没有可用信号。只看均值说明不了原因。先做单 batch 过拟合测试：失败说明问题在损失、反向传播、优化器挂接或标签错位；通过的话就去数据路径检查标签和输入是否对齐。之后才去看学习率、梯度和架构。
 
 ## Full answer
 
-### Reading the number
+### 读懂这个数
 
-Categorical cross-entropy on a one-hot target is minus the log of the probability of the true class. A random guess among 10 classes gives each class probability 0.1 and a loss of minus log 0.1, about 2.3. The debugging lesson's master table has this row: a loss stuck at minus log of 1 over the class count means the model predicts a uniform distribution, and the first thing to check is the data pipeline and whether labels match inputs. A model with no usable signal settles on equal logits, because that is what minimizes the expected loss over a balanced label set.
+在 one-hot 目标上，分类交叉熵就是真实类别概率的负对数。在 10 个类别里随机猜，每个类别概率为 0.1，损失为负 log 0.1，约 2.3。调试课的总表里有这一行：损失停在负 log(1 除以类别数) 意味着模型预测均匀分布，首先要检查数据流水线，以及标签是否和输入对应。没有可用信号的模型会停在相等的 logits 上，因为在类别平衡的标签集上，这样做能让期望损失最小。
 
-### The order
+### 顺序
 
-1. **Overfit one batch.** Take 8 to 32 samples and train on them for a few hundred steps. The loss must go to near zero and the training accuracy to 100 percent. If it does not, the model or the loop is broken: a wrong loss, a broken backward pass, an optimizer not connected to the parameters, or inputs and labels out of step. The lesson's threshold for a pass is a final loss below 0.1.
-2. **Look at the data.** Print 5 random samples with their labels. Check that the shuffle keeps each input paired with its label, that inputs are normalized to mean 0 and standard deviation 1, and that labels have the integer type the loss expects.
-3. **Learning rate.** Try three values 10 times apart, such as 1e-2, 1e-3 and 1e-4. A rate that is far too low looks flat, but it would not sit exactly on the uniform value for many epochs.
-4. **Gradients.** All zeros points at dead ReLUs or a detached graph.
-5. **Architecture.** Only after the above: a model too small underfits, but it still beats a uniform guess on its own training data.
+1. **过拟合一个 batch。** 取 8 到 32 个样本，只在它们上面训练几百步。损失必须降到接近零，训练准确率必须到 100%。做不到，说明模型或循环坏了：损失写错、反向传播断了、优化器没连到参数上，或者输入和标签没对齐。课里的通过标准是最终损失低于 0.1。
+2. **看数据。** 打印 5 个随机样本和它们的标签。检查打乱后每个输入仍和它的标签配对，输入被归一化到均值 0、标准差 1，标签是损失期望的整数类型。
+3. **学习率。** 试三个相差 10 倍的值，比如 1e-2、1e-3 和 1e-4。学习率太低时曲线看起来平，但不会在很多个 epoch 里正好停在均匀值上。
+4. **梯度。** 全为零说明有死掉的 ReLU，或者计算图被断开了。
+5. **架构。** 前面都排除之后才看：太小的模型会欠拟合，但在自己的训练数据上仍然能胜过均匀猜测。
 
-### How this differs from a slow start
+### 和起步慢有什么不同
 
-A loss that starts near 2.3 and falls slowly is a learning rate or capacity question. A loss that holds at 2.3 for many epochs on the training set means no signal reaches the model at all.
+损失从 2.3 附近开始、慢慢下降，是学习率或容量的问题。损失在训练集上很多个 epoch 都停在 2.3，说明根本没有信号到达模型。
 
 ## Follow-ups
 
-- **Level 3:** Why uniform rather than some other wrong answer? Expected: with no usable signal, equal logits minimize the expected cross-entropy over a balanced label set, and that costs the log of the class count.
-- **Level 3:** What does the overfit one batch test tell you here? Expected: whether the model and loop can learn at all; a healthy setup drives a small batch to near zero loss in a few hundred steps, and a failure means a broken loss, backward pass, optimizer hookup or misaligned labels.
-- **Level 4:** The one batch test passes and full training still sits at 2.3. Where next? Expected: the full data path, such as a shuffle that breaks the pairing of inputs and labels, or unnormalized inputs, since the model can learn when given a consistent batch.
-- **Level 4:** What distinguishes this symptom from a loss that starts at 2.3 and falls slowly? Expected: a slow fall is a learning rate or capacity question; a flat 2.3 for many epochs means no signal reaches the model.
+- **Level 3:** 为什么是均匀分布，而不是别的错误答案？ Expected: 没有可用信号时，相等的 logits 能让类别平衡的标签集上的期望交叉熵最小，代价是类别数的对数。
+- **Level 3:** 这里单 batch 过拟合测试能告诉你什么？ Expected: 模型和循环到底能不能学；正常的配置几百步内就能把一个小 batch 的损失降到接近零，失败则说明损失、反向传播、优化器挂接坏了，或者标签错位。
+- **Level 4:** 单 batch 测试通过了，完整训练仍然停在 2.3。下一步查哪里？ Expected: 完整的数据路径，比如打乱时破坏了输入和标签的配对，或者输入没有归一化，因为给它一致的 batch 时模型是能学的。
+- **Level 4:** 这个症状和损失从 2.3 开始慢慢下降有什么区别？ Expected: 慢慢下降是学习率或容量的问题；很多个 epoch 平在 2.3，说明没有信号到达模型。
 
 ## Wrong answers
 
-- "Train longer, it is a slow start." A flat value at the uniform loss for many epochs means no signal, not a slow one.
-- "Make the model bigger." Capacity is not the issue when the model cannot beat a uniform guess on its own training data.
-- "Lower the learning rate." The rate changes how fast the loss moves, and here it does not move at all; check the data first.
+- "训练久一点，这只是起步慢。" 很多个 epoch 平在均匀损失上，意味着没有信号，而不是信号慢。
+- "把模型做大。" 模型在自己的训练数据上连均匀猜测都赢不了时，问题不在容量。
+- "降低学习率。" 学习率改变的是损失移动的快慢，而这里损失根本不动；先查数据。
 
 ## Taught in
 
-The [debugging lesson](../../../phases/03-deep-learning-core/13-debugging-neural-networks/) gives the master table and the overfit one batch test, and the [loss functions lesson](../../../phases/03-deep-learning-core/05-loss-functions/) computes the uniform loss.
+[调试课](../../../phases/03-deep-learning-core/13-debugging-neural-networks/)给出了总表和单 batch 过拟合测试，[损失函数课](../../../phases/03-deep-learning-core/05-loss-functions/)计算了均匀损失。

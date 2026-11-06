@@ -1,6 +1,6 @@
 ---
 id: keep-every-error-trace
-title: Trace retention when traces cost more than the model
+title: trace 比模型还贵时的保留策略
 card: production-mlops
 kind: design
 level: 2
@@ -16,54 +16,54 @@ related: [production-mlops/renamed-token-attribute, production-mlops/drift-score
 updated: 2026-11-03
 ---
 
-Your service makes more than a million model calls a day. Keeping every trace now costs more than the model calls themselves. Design a retention policy that keeps the traces you will need during an incident and drops the rest.
+你的服务每天调用模型超过一百万次。现在保留每条 trace 的成本已经超过了模型调用本身。设计一套保留策略，留下事故期间需要的 trace，丢掉其余的。
 
 ## Short answer
 
-Sample by rule, not by a flat rate. Keep every errored trace and every high-cost trace, keep a small share of the successes, and keep the aggregates always. Make the decision at the collector with a tail sampler after the trace completes, so that the rule can see the status and the cost. The capstone keeps all errored traces and 10 percent of the successes.
+按规则采样，而不是按固定比例。保留每条出错的 trace 和每条高成本的 trace，成功的只留一小部分，聚合值始终保留。在 collector 上用尾部采样器、在 trace 完成后做决定，让规则能看到状态和成本。综合项目保留所有出错的 trace 和 10% 的成功 trace。
 
 ## Full answer
 
-### Why a flat rate fails
+### 为什么固定比例会失败
 
-A flat 5 percent keeps 5 percent of the errors too. The trace you need in an incident is the one you dropped, and the aggregate error count tells you only that it existed.
+固定 5% 也只会保留 5% 的错误。事故中你需要的正是你丢掉的那条 trace，而聚合的错误数只能告诉你它存在过。
 
-### The rules
+### 规则
 
-| Class | Keep |
+| 类别 | 保留 |
 |---|---|
-| errored traces | all of them |
-| high-cost traces, long outputs or expensive models | all of them |
-| successes | 5 to 10 percent |
-| aggregates | always, from every request |
+| 出错的 trace | 全部 |
+| 高成本 trace，长输出或昂贵模型 | 全部 |
+| 成功的 trace | 5% 到 10% |
+| 聚合值 | 始终保留，来自每个请求 |
 
-The observability lesson states the rule as 100 percent of errors, 100 percent of high cost and 5 percent of successes. Aggregates do not need traces: counters and histograms count every request even when the trace is dropped.
+可观测性课程把规则写成：100% 的错误、100% 的高成本、5% 的成功。聚合值不需要 trace：即使丢弃 trace，计数器和直方图也会统计每个请求。
 
-### Decide at the tail
+### 在尾部做决定
 
-Head sampling decides when the trace starts, before anything knows whether it will fail. Tail sampling at the collector decides after the trace completes, so it can read the status, the cost and the eval score. The price is buffer memory at the collector, because whole traces wait until the decision.
+头部采样在 trace 开始时做决定，那时还没有人知道它会不会失败。collector 上的尾部采样在 trace 完成后做决定，所以能读到状态、成本和评估分数。代价是 collector 的缓冲内存，因为完整的 trace 要一直等到做出决定。
 
-### Stratify, and know the bias
+### 分层，并了解偏差
 
-The capstone's exercise keeps every trace with a toxicity score above 0.5 plus a 10 percent stratified sample of the rest, and asks you to measure the bias that the sampling adds. Any analysis over sampled traces overweights the classes you kept in full. Weight by the inverse of the sampling rate, or run the per-trace evals on the stratified share only.
+综合项目的练习保留所有毒性分数高于 0.5 的 trace，再对其余的做 10% 的分层抽样，并要求你测量采样带来的偏差。任何基于采样 trace 的分析，都会高估那些被全量保留的类别。按采样率的倒数加权，或者只在分层抽样的部分上运行逐条 trace 的评估。
 
-### Tier the storage
+### 分层存储
 
-Spans go to a columnar store for queries, and raw events go to object storage for the long tail. The archive is cheap, and long-term analysis runs there.
+span 放进列式存储供查询，原始事件放进对象存储应对长尾需求。归档很便宜，长期分析在那里运行。
 
 ## Follow-ups
 
-- **Level 2:** Why does head sampling lose the errors? Expected: it decides before the span ends, so it cannot see the status.
-- **Level 2:** What survives from a dropped trace? Expected: the metrics. Counters and histograms count every request, whether or not its trace is kept.
-- **Level 3:** Your eval jobs run over the sampled traces. What bias do they inherit? Expected: a sample that keeps all errors overweights failures, so weight by the inverse sampling rate or evaluate the stratified share only.
-- **Level 3:** The collector runs out of memory during a burst. Why, and what do you change? Expected: tail sampling buffers whole traces until they complete. Cap the buffer, shorten the decision wait, and shed with a head rule under pressure.
+- **Level 2:** 为什么头部采样会丢掉错误？ Expected: 它在 span 结束前就做决定，看不到状态。
+- **Level 2:** 丢弃的 trace 还留下什么？ Expected: 指标。无论 trace 是否保留，计数器和直方图都会统计每个请求。
+- **Level 3:** 你的评估任务在采样后的 trace 上运行。它们继承了什么偏差？ Expected: 保留全部错误的样本会高估失败，所以按采样率的倒数加权，或者只评估分层抽样的部分。
+- **Level 3:** 突发流量时 collector 内存耗尽。为什么？改什么？ Expected: 尾部采样要缓冲完整的 trace 直到它完成。限制缓冲区大小，缩短决定前的等待，压力大时用头部规则丢弃。
 
 ## Wrong answers
 
-- "Sample 5 percent of everything." Most of the errors you need in an incident are gone, and the aggregate tells you only that they happened.
-- "Keep everything for a week, then delete it." A week of full traces at this volume is the cost you are trying to remove.
-- "Traces are enough, drop the metrics." A percentile over an hour needs every request, which only a histogram gives.
+- "所有流量都采样 5%。" 事故中需要的错误大多没了，聚合值只能告诉你它们发生过。
+- "全部保留一周，然后删除。" 在这个流量下，一周的完整 trace 正是你想去掉的成本。
+- "有 trace 就够了，去掉指标。" 一小时的分位数需要每个请求，只有直方图能提供。
 
 ## Taught in
 
-The [observability stack lesson](../../../phases/17-infrastructure-and-production/13-llm-observability/) gives the sampling rules, and the [dashboard capstone](../../../phases/19-capstone-projects/11-llm-observability-dashboard/) configures the tail sampler and measures its bias.
+[可观测技术栈课程](../../../phases/17-infrastructure-and-production/13-llm-observability/)给出采样规则，[可观测看板综合项目](../../../phases/19-capstone-projects/11-llm-observability-dashboard/)配置尾部采样器并测量其偏差。

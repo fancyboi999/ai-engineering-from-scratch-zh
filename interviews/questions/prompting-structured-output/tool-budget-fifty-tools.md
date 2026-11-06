@@ -1,6 +1,6 @@
 ---
 id: tool-budget-fifty-tools
-title: What fifty tool definitions cost on every call
+title: 五十个工具定义每次调用要花多少
 card: prompting-structured-output
 kind: estimate
 level: 3
@@ -16,46 +16,46 @@ related: [prompting-structured-output/lost-in-the-middle-order, prompting-struct
 updated: 2026-11-03
 ---
 
-A coding assistant exposes 50 tools, each defined with a name, a description and a parameter schema. Estimate what the tool definitions cost on every call, and say how you would cut that cost without removing a single tool from the product.
+某个编程助手暴露了 50 个工具，每个都定义了名称、描述和参数 schema。估算这些工具定义每次调用的成本，并说明在不从产品里移除任何一个工具的前提下，你怎样降低这笔成本。
 
 ## Short answer
 
-Each definition costs 50 to 200 tokens, so 50 tools at 150 tokens each is 7,500 tokens before the conversation begins, repeated on every call. Classify the intent of the query and include only the tools that match it; the lesson puts the reduction at 60 to 80 percent, from about 8,000 tokens down to about 1,000. The product keeps every tool; only the per-call definition list changes.
+每个定义花 50 到 200 个 token，所以 50 个工具按每个 150 个 token 算，对话开始前就是 7,500 个 token，而且每次调用都重复一遍。对查询做意图分类，只放入与意图匹配的工具；课程给出的削减幅度是 60% 到 80%，从约 8,000 个 token 降到约 1,000 个。产品保留每一个工具；变的只是每次调用附带的定义列表。
 
 ## Full answer
 
-### The count in context
+### 放进上下文里看
 
-The lesson's breakdown for a coding assistant: system prompt 500 tokens, tool definitions for 50 tools 8,000, retrieved documentation 4,000, history for ten turns 6,000, the query 200, and a generation budget of 4,000, for a total of 22,700 tokens. The tool block is the largest item, and unlike the history it does not depend on how long the conversation has been.
+课程给一个编程助手做的拆分：system prompt 500 个 token，50 个工具的定义 8,000，检索到的文档 4,000，十轮历史 6,000，查询 200，生成预算 4,000，合计 22,700 个 token。工具块是最大的一项，而且和历史不同，它与对话持续了多久无关。
 
-### Why it repeats
+### 为什么会重复
 
-Definitions live in the context, so a 50-turn conversation pays the full block 50 times. Every token of it also displaces a token that could carry signal, which is the context engineering point: the window is a scarce resource, not a dump.
+定义放在上下文里，所以 50 轮的对话要把整块定义付 50 次钱。其中每个 token 还会挤掉一个本可以携带信号的 token，这正是上下文工程的观点：窗口是稀缺资源，不是垃圾场。
 
-### Pruning without removing
+### 只剪枝，不移除
 
-1. Classify the intent of the query. The lesson does it with keyword lists per intent: code, calendar, email, research, data.
-2. Tag each tool with the categories it serves.
-3. Include tools whose categories match the intents, in order, until a token budget is reached; the lesson's selector stops at 2,000 tokens.
-4. A code question never sees the calendar tools, and a scheduling question never sees the file system tools.
+1. 对查询做意图分类。课程用每个意图一组关键词来实现：代码、日历、邮件、调研、数据。
+2. 给每个工具标上它服务的类别。
+3. 按顺序放入类别与意图匹配的工具，直到达到 token 预算；课程的选择器在 2,000 个 token 处停止。
+4. 代码问题永远看不到日历工具，排期问题永远看不到文件系统工具。
 
-### Check the cost of being wrong
+### 核对剪错的代价
 
-Pruning risks leaving out a tool that the classifier did not predict. The lesson's exercise measures task success with 5, 10, 20 and 50 tools included and compares the curves; a priority score per tool, filled in descending order until the budget is spent, is the refinement over a binary include or exclude.
+剪枝有漏掉分类器没预料到的工具的风险。课程练习分别测量了放入 5、10、20、50 个工具时的任务成功率，并比较这些曲线；给每个工具一个优先级分数，按降序填入直到预算用完，是对「放或不放」二选一的改进。
 
 ## Follow-ups
 
-- **Level 3:** Why does the cost repeat? Expected: definitions sit in the context on every call, so a 50-turn conversation pays the full block 50 times.
-- **Level 3:** How does the lesson choose which tools to send? Expected: keyword intent classification over the query, then the tools whose categories match, added until a 2,000 token budget is reached.
-- **Level 4:** What does pruning risk, and how do you check it? Expected: a needed tool left out for a misread query; measure task success with 5, 10, 20 and 50 tools included and watch the misses per intent.
-- **Level 4:** How do the 7,500 tokens compare with the rest of the lesson's breakdown? Expected: the breakdown totals 22,700 tokens, and the tool block at about 8,000 is the largest item, ahead of history at 6,000 and retrieved text at 4,000.
+- **Level 3:** 为什么这笔成本会重复？ Expected: 每次调用时定义都在上下文里，所以 50 轮的对话要把整块定义付 50 次钱。
+- **Level 3:** 课程怎样选择要发送哪些工具？ Expected: 用关键词对查询做意图分类，再选类别匹配的工具，一直加到 2,000 个 token 的预算。
+- **Level 4:** 剪枝有什么风险，怎么检查？ Expected: 查询被误读时漏掉需要的工具；测量放入 5、10、20、50 个工具时的任务成功率，并按意图观察漏选。
+- **Level 4:** 这 7,500 个 token 和课程拆分中的其他部分比起来怎样？ Expected: 拆分合计 22,700 个 token，约 8,000 的工具块是最大的一项，排在 6,000 的历史和 4,000 的检索文本之前。
 
 ## Wrong answers
 
-- "Tokens are cheap, send all 50." It is the largest block in the lesson's breakdown and it repeats on every call; it also displaces context that carries signal.
-- "Shorten every description to one word." Then the model cannot tell the tools apart; prune by relevance and keep each description precise.
-- "Remove the rarely used tools from the product." The product need not change; the per-call definition list does.
+- "token 便宜，50 个全发。" 它是课程拆分中最大的一块，每次调用都重复；它还会挤掉携带信号的上下文。
+- "把每个描述缩成一个词。" 那样模型就分不清这些工具了；按相关性剪枝，每个描述保持精确。
+- "把不常用的工具从产品里删掉。" 产品不用改；改的是每次调用的定义列表。
 
 ## Taught in
 
-The lesson [context engineering](../../../phases/11-llm-engineering/05-context-engineering/) gives the token breakdown, the tool pruning numbers and the dynamic tool selector.
+[上下文工程](../../../phases/11-llm-engineering/05-context-engineering/)一课给出了 token 拆分、工具剪枝的数据和动态工具选择器。

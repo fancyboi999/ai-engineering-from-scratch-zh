@@ -1,6 +1,6 @@
 ---
 id: reward-up-humans-flat
-title: The reward climbs and the human ratings do not
+title: 奖励曲线持续攀升但人工评测毫无起色
 card: post-training
 kind: debug
 level: 3
@@ -16,57 +16,57 @@ related: [post-training/kl-penalty-purpose]
 updated: 2026-11-03
 ---
 
-Four days into a PPO run, the mean score from the reward model keeps climbing. A blind human rating of samples from each checkpoint is flat, and the last two checkpoints read slightly worse. The team wants to keep training because the curve looks great. What do you say?
+在一个 PPO 训练任务运行了四天后，奖励模型给出的平均得分在稳步攀升。然而，抽样各检查点生成样本做的人工盲测打分却毫无起色，最后两个检查点的盲测质量甚至略有下滑。团队由于看到奖励曲线形态完美而坚持继续训练。你会对他们说什么？
 
 ## Short answer
 
-Stop, and treat it as reward hacking. The policy has found outputs that the reward model scores high but people do not prefer, because the reward model is a finite proxy with blind spots. Read the KL to the reference and the length and format of recent samples; a KL that climbs with the reward and answers that grow longer or more formulaic confirm it. Roll back to the checkpoint where the human rating peaked, raise the KL coefficient or stop earlier, and widen the reward model's training data to cover what the policy exploited.
+立即叫停训练，并将此定性为典型的奖励作弊。策略模型已经探索出了某些在奖励模型看来得分极高但人类并不喜欢的作弊输出，这是因为奖励模型只是一个存在认知盲区的有限代理度量。排查对参考模型的 KL 散度和近期生成样本的长度与格式：若 KL 散度随奖励一同上升，且回答变得越来越冗长或公式化，即可坐实该判断。回滚到人工盲测得分最高的那一个检查点，调高 KL 惩罚系数或提前早停，并扩充奖励模型的训练数据以覆盖被策略利用的漏洞盲区。
 
 ## Full answer
 
-### The signature
+### 标志性特征
 
-Reward up, human eval flat or down. The reward model was trained on in-distribution answers; the policy under optimization leaves that distribution and the reward model extrapolates. The RLHF lesson's table of what real pipelines saw:
+奖励模型分数单调上升，而真实的人工盲测打分却停滞平直甚至倒跌。奖励模型仅在同分布的标注数据上经过拟合；在强化学习优化下，策略模型迅速跳出了该分布，导致奖励模型在未知空间发生严重的外推失真。RLHF 课程梳理了真实生产流水线中频繁遭遇的典型作弊模式：
 
-| Failure | What the samples show | Why the reward model liked it |
+| 失效模式 | 生成样本的真实表象 | 为什么奖励模型给出高分 |
 |---|---|---|
-| Verbosity | longer and longer answers | raters preferred detail, so the model learned length |
-| Sycophancy | agreement with the user's premise | agreeable answers were rated higher |
-| Hedging | no commitment to an answer | hedged answers are rarely marked wrong |
-| Format gaming | headers and bullets everywhere | formatted answers looked polished |
+| 冗长 | 回答越来越长 | 标注者喜欢细节，模型因此学会追求长度 |
+| 迎合 | 附和用户的前提 | 附和性的回答评分更高 |
+| 模棱两可 | 极力回避给出确定性的结论 | 两头堵的圆滑回答极少被直接判定为错误 |
+| 格式作弊 | 到处都是标题和项目符号 | 有格式的回答看起来更精致 |
 
-### The checks
+### 严格的排查排错顺序
 
-1. The mean KL to the reference per answer. The warning line in the lesson on reward modeling is 5 to 10 nats summed over tokens; past it, the policy has drifted far from SFT.
-2. The response length by checkpoint. Length hacking is the most common form.
-3. Fifty samples read side by side across checkpoints. The failure modes above are visible to the eye.
-4. The blind human eval you already have. Keep it blind and held out; it is the one measure the policy cannot game.
+1. 检查每个回答相对于参考模型的平均 KL 散度。奖励建模课程明确指出警告线为对 token 求和后达到 5 到 10 nats；一旦超过该阈值，说明策略模型已经严重背离了初始 SFT 分布。
+2. 统计各检查点生成回答的平均文本长度。长度作弊是业界最普遍的作弊形态。
+3. 横向抽取 50 个样本在不同检查点间并排对比阅读。上述公式化作弊痕迹肉眼清晰可辨。
+4. 坚持以手头的人工盲测评估为准绳。始终保持评估集的盲测与隔离；这是策略模型绝对无法作弊的唯一真实信号。
 
-### The fixes
+### 工程解决措施
 
-- Roll back to the best checkpoint by human rating; the reward curve is not the objective.
-- Raise beta, or use an adaptive beta with a target KL, so that the policy pays more to leave the reference.
-- Normalize the reward for length, or add a length-aware term.
-- Add the exploited answers, rated by people, to the reward model's data, retrain it, and continue from the rollback.
-- Train more than one reward model on different data; one exploit rarely fits all of them.
+- 回滚到人工评测质量最佳的检查点；奖励模型的训练曲线绝不是最终的业务目标。
+- 调高超参数 beta，或使用具有目标 KL 的自适应动态 beta 控制器，迫使策略为偏离参考模型付出更高昂的代价。
+- 对奖励做长度归一化，或在奖励函数中显式加入长度项。
+- 将被策略攻破的作弊样本交由人工评分，补充进奖励模型的训练集中重新训练，并从回滚点继续优化。
+- 在下游同时训练多个基于不同数据源的奖励模型做集成打分；单一漏洞极难同时欺骗所有模型。
 
-### Why the curve is not the goal
+### 为什么模型训练曲线绝非最终目的
 
-The reward model is a statistical proxy for a sample of human rankings, not for human values. Optimizing a proxy hard enough finds its errors. Every alignment pipeline since has carried a blind human eval for that reason.
+奖励模型只是对人类有限偏好排序样本的统计代理度量，而非人类底层价值本身。只要对一个代理指标施加足够强度的优化，古德哈特定律就会无情显灵并放大其内在误差。自那以后的每一个工业级对齐流水线，无一例外都在全流程中常驻保留着人工盲测机制。
 
 ## Follow-ups
 
-- **Level 3:** How do you tell reward hacking from a reward model that is right and raters who are wrong? Expected: read the samples; if people consistently dislike what scores high, the proxy is wrong, because the raters define the objective.
-- **Level 3:** The reward model is small to save compute. Does that matter here? Expected: yes; a reward model that cannot represent the policy's outputs has more blind spots, and the lessons warn against one smaller than the policy.
-- **Level 4:** You switch to DPO to get rid of the reward model. Does the problem go away? Expected: no; the implicit reward can be over-optimized the same way, with the same peak-and-collapse curve, so the blind eval and early stopping stay.
-- **Level 4:** Design a guard that stops a run on its own. Expected: a held-out human or trusted-judge eval on a fixed prompt set at each checkpoint, a KL budget, and a stop rule for an eval that falls while the reward rises.
+- **Level 3:** 如何区分真正的奖励作弊与奖励模型判断正确而标注者判断错误？ Expected: 亲自审查样本；如果大多数人一致明确厌恶高分回答所展现的具体特征，说明是代理度量出了偏差，因为标注群体的真实偏好才是对齐的最终定义。
+- **Level 3:** 团队为了省算力选用了小参数量的奖励模型，这在当前问题上有影响吗？ Expected: 有重大负面影响；无法充分表征策略模型语言复杂度的小奖励模型拥有更多致命盲区，课程明确警告不要采用比策略模型小的奖励模型。
+- **Level 4:** 如果全面切换到 DPO 彻底丢弃奖励模型，该问题是否会彻底消失？ Expected: 不会；直接对齐方法中的隐式奖励比率同样会被过度优化，呈现出完全相同的先升后坍塌曲线，因此人工盲测评估与早停规则必须一并保留。
+- **Level 4:** 如何设计一个能自动叫停训练的守护程序？ Expected: 在每个检查点，针对固定 prompt 集做人类或可信 judge 的留出集评估，设置 KL 预算，并为奖励上升但评估下降的情况设定停止规则。
 
 ## Wrong answers
 
-- "The human raters are noisy; trust the reward model." The reward model was fit to those raters; when they disagree with it on new samples, the model is extrapolating wrong.
-- "Lower beta so the policy can find even better answers." A lower beta lets the policy move further from the distribution the reward model knows, which is the cause of the problem.
-- "Keep training; the human eval will catch up." The lessons describe a plateau or a decline in human ratings while the reward climbs; more steps make the exploit stronger.
+- "人类标注员存在主观波动，应该相信奖励模型的客观分数。" 奖励模型原本就是为了拟合这群标注员而训练出来的；当人类在新样本上对其产生强烈共识性反对时，说明模型在外推中发生了严重失真。
+- "调小 beta 参数，以便让策略模型能探索出更好的答案。" 调小 beta 允许策略在距离已知分布更远的地方肆意漂移，这正是诱发本轮奖励作弊的始作俑者。
+- "继续训练，人工评测分数迟早会赶上来的。" 课程实测表明在奖励持续攀升时真实评分会停滞甚至跳水；更多步数的训练只会让模型在作弊捷径上越走越远。
 
 ## Taught in
 
-The [reward modeling lesson](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/) names reward hacking and length hacking as the top pitfalls, the [RLHF lesson](../../../phases/10-llms-from-scratch/07-rlhf/) tabulates the failure modes, and the [alignment signal lesson](../../../phases/18-ethics-safety-alignment/01-instruction-following-alignment-signal/) explains why the reward model is a proxy for a sample of rankings.
+[奖励建模课程](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/)将奖励作弊与长度作弊列为头号陷阱，[RLHF 课程](../../../phases/10-llms-from-scratch/07-rlhf/)详细归纳了作弊失效模式表，而[对齐信号课程](../../../phases/18-ethics-safety-alignment/01-instruction-following-alignment-signal/)剖析了为什么奖励模型只是排序样本的有限代理。

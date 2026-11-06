@@ -1,6 +1,6 @@
 ---
 id: read-three-scheduler-lines
-title: Read three scheduler log lines
+title: 解读三条调度器日志
 card: inference-serving
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: []
 updated: 2026-11-03
 ---
 
-Here are three lines from two serving engines under load. Read each field and tell me what the server was doing, what the users felt, and which number you would act on.
+下面是两个服务引擎在负载下的三行日志。逐个读取字段，说明服务器当时在做什么、用户感受到什么，以及你会针对哪个数字采取行动。
 
 ```text
 [2026-10-16 14:01:00] Prefill batch, #new-seq: 7, #new-token: 955, #cached-token: 15102, token usage: 0.05, #running-req: 1, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 1472.94
@@ -26,55 +26,55 @@ INFO 10-17 22:35:43 [loggers.py:320] Engine 000: Avg prompt throughput: 460.3 to
 
 ## Short answer
 
-The first line is a prefill batch on SGLang that admitted 7 requests and computed 955 new prompt tokens while 15,102 came from the radix cache, with the pool 5 percent full and nothing waiting: a shared-prefix workload with the cache working. The second is one decode step for 8 running requests at 98.37 tokens per second with an empty queue: a healthy, lightly loaded server. The third is vLLM at a full pool: 40 running, 11 waiting, the cache 99.5 percent used and a hit rate of 8.7 percent, so new requests wait for memory, and the number to act on is the pool.
+第一行是 SGLang 的 prefill 批次：准入 7 个请求，计算 955 个新 prompt token，另有 15,102 个来自 radix 缓存，池占用 5%，没有请求等待，这是缓存正常工作的共享前缀负载。第二行是 8 个运行中请求的一个 decode 步，每秒输出 98.37 个 token，队列为空，服务器健康且负载较轻。第三行是 vLLM 的池已满：40 个运行、11 个等待，缓存使用率 99.5%，命中率 8.7%，新请求在等显存，需要处理的是池的容量。
 
 ## Full answer
 
-### The SGLang prefill line, field by field
+### 逐字段读取 SGLang prefill 日志
 
-- `#new-seq` is how many requests this prefill batch admits: 7.
-- `#new-token` is how many prompt tokens it computes: 955. `#cached-token` is how many it reused from the radix tree: 15,102. Seven requests shared one long system prompt that an earlier request had computed, so only their questions were new.
-- `token usage` is the share of the KV pool held by running requests and cached prefixes together: 0.05, so the pool is nearly empty.
-- `#running-req` counts requests that are decoding: 1. `#queue-req` counts requests that wait: 0. `#pending-token` counts tokens of admitted requests that are not yet prefilled: 0.
-- `cuda graph` says whether the step replayed a captured graph. False is expected on a platform without graphs, which is where this line came from.
-- `input throughput` is the prefill speed of this batch: 1,472.94 tokens per second.
+- `#new-seq` 是这批 prefill 准入的请求数：7。
+- `#new-token` 是计算的 prompt token 数：955。`#cached-token` 是从 radix 树复用的 token 数：15,102。7 个请求共用一段已被更早请求计算过的长系统 prompt，所以只有各自的问题是新的。
+- `token usage` 是运行中请求与缓存前缀合计占用的 KV 池比例：0.05，说明池几乎为空。
+- `#running-req` 统计正在 decode 的请求：1。`#queue-req` 统计等待的请求：0。`#pending-token` 统计已准入请求中尚未完成 prefill 的 token：0。
+- `cuda graph` 表示这一步是否回放了捕获的 graph。日志来自不支持 graph 的平台，False 符合预期。
+- `input throughput` 是这个批次的 prefill 速度：每秒 1,472.94 个 token。
 
-The same benchmark without the radix cache filled three prefill batches of up to 4,096 tokens for eight requests, every one with `#cached-token: 0`. The 4,096 is the chunked prefill size.
+同一基准测试关闭 radix 缓存后，8 个请求填满了三个 prefill 批次，每批最多 4,096 个 token，每批都是 `#cached-token: 0`。4,096 是 prefill 分块大小。
 
-### The decode line
+### decode 日志
 
-SGLang prints one line per prefill batch and one decode line every 40 decode steps by default. This one shows 8 requests decoding together, 4,075 tokens held, 2 percent of the pool used, 98.37 output tokens per second, and no queue. The lines before it in the same run show how the batch formed: one request admitted while 7 waited, then the other 7 admitted together with 3,553 new tokens at 1,914 tokens per second, then all 8 decoding as one batch. Batching the prefill is where the throughput comes from, and the log shows it happen.
+SGLang 为每个 prefill 批次打印一行，默认每 40 个 decode 步打印一行 decode 日志。这行显示 8 个请求一起 decode，占用 4,075 个 token，池使用率 2%，每秒输出 98.37 个 token，没有排队。同一次运行前面的日志说明了批次如何形成：先准入 1 个请求，7 个等待；随后其余 7 个一起准入，以每秒 1,914 个 token 的速度计算 3,553 个新 token；最后 8 个请求作为同一个批次 decode。prefill 批处理带来了吞吐量，日志展示了这一过程。
 
-### The vLLM stats line
+### vLLM 统计日志
 
-`Running` and `Waiting` are the running and queued requests: 40 and 11. `GPU KV cache usage` is the share of the pool in use: 99.5 percent. `Prefix cache hit rate` is the share of prompt tokens that came from the cache: 8.7 percent. The prompt and generation throughputs say what the engine did in the interval: it prefilled new prompts at 460.3 tokens per second while 40 requests decoded, so each new prefill shared the step with the running streams. In that run, at 64 users on an L4, the median first token was 10,953 ms and the P99 gap between tokens 1,363 ms. The low hit rate is not a fault: the benchmark sent unique prompts, so there was little to share.
+`Running` 和 `Waiting` 是运行和排队的请求数：40 和 11。`GPU KV cache usage` 是池的使用比例：99.5%。`Prefix cache hit rate` 是来自缓存的 prompt token 比例：8.7%。prompt 和生成吞吐量说明了引擎在这个时间段内的工作：40 个请求在 decode 时，它以每秒 460.3 个 token 的速度为新 prompt 做 prefill，因此每次新 prefill 都与运行中的流共享调度步。那次运行在 L4 上有 64 个用户，中位首 token 时间是 10,953 ms，P99 token 间隔是 1,363 ms。低命中率不是故障：基准测试发送的 prompt 各不相同，可共享的内容很少。
 
-### What to act on
+### 针对什么采取行动
 
-- Line 1: nothing. Confirm that the hits persist as the working set grows, because cached prefixes live in the same pool as running requests.
-- Line 2: nothing. The server has room; a sweep would tell you how much.
-- Line 3: the pool. Grow it with an FP8 cache or FP8 weights, or run fewer users per replica. A cap on the running count would only choose who waits.
+- 第 1 行：无需操作。确认工作集变大时仍能命中，因为缓存前缀和运行中请求处在同一个池里。
+- 第 2 行：无需操作。服务器还有余量，压测能说明余量有多大。
+- 第 3 行：池的容量。用 FP8 cache 或 FP8 权重扩大池，或者减少每个副本的用户数。限制运行请求数只会决定谁来等待。
 
-Read the pool line at startup as well. On the same card it said `GPU KV cache size: 24,096 tokens, Maximum concurrency for 8,192 tokens per request: 2.94x`, and the 2.94 assumes that every request fills the maximum length.
+也要读取启动时的池容量日志。同一张卡上写的是 `GPU KV cache size: 24,096 tokens, Maximum concurrency for 8,192 tokens per request: 2.94x`，其中 2.94 假设每个请求都用满最大长度。
 
-### What the lines do not show
+### 日志没有显示什么
 
-None of them show the GPU clock, the client that sent the load, or whether the cache was flushed before the run. Those belong in the result next to the lines.
+这些日志都没显示 GPU 频率、发送负载的客户端，以及运行前是否清空了缓存。结果中应把这些信息放在日志旁边。
 
 ## Follow-ups
 
-- **Level 2:** In the first line, why is the cached count so much larger than the new count? Expected: the 7 requests shared a long system prompt that an earlier request had already computed, so the tree served it and only the questions were new; the no-cache run of the same benchmark showed batches of 4,096 new tokens and zero cached.
-- **Level 3:** The hit rate in the third line reads 8.7 percent. Is the cache broken? Expected: no; the random benchmark sends unique prompts, so there is little to share; the hit rate is a property of the prompts, and the number that matters in that line is the pool at 99.5 percent with 11 waiting.
-- **Level 3:** What does the token usage field include, and when should it worry you? Expected: the share of the pool held by running requests and by cached prefixes together; near 1.0 the pool is full, new requests queue, and cached prefixes get evicted.
-- **Level 4:** Would a cap on running requests help the server in the third line? Expected: no; the pool is full, so a cap only chooses who waits and moves the wait to the first token; grow the pool with an FP8 cache or FP8 weights, or run fewer users per replica.
+- **Level 2:** 第一行里，为什么缓存数比新计算数大得多？ Expected: 7 个请求共用一段长系统 prompt，更早的请求已经算过它，所以由树提供，只有问题是新的；同一基准测试关闭缓存后，每批有 4,096 个新 token，缓存数为零。
+- **Level 3:** 第三行命中率是 8.7%。缓存坏了吗？ Expected: 没有；随机基准测试发送各不相同的 prompt，共享内容很少；命中率取决于 prompt，这行重要的是池占用 99.5%，11 个请求在等待。
+- **Level 3:** token usage 字段包含什么？什么时候需要担心？ Expected: 运行中请求与缓存前缀合计占用的池比例；接近 1.0 时池已满，新请求排队，缓存前缀被驱逐。
+- **Level 4:** 限制运行请求数能帮助第三行中的服务器吗？ Expected: 不能；池已满，上限只决定谁等待，把等待移到首 token 之前；用 FP8 cache 或 FP8 权重扩大池，或者减少每个副本的用户数。
 
 ## Wrong answers
 
-- "A hit rate of 8.7 percent means the prefix cache is misconfigured." Unique prompts have little to share; the hit rate reflects the prompts, and the same engine read far higher on a shared-prefix run.
-- "Token usage at 0.05 means the server is almost idle." It means the pool is nearly empty; the GPU can still be busy, as the 1,472.94 prompt tokens per second show; read the running and queue counts for load.
-- "cuda graph: False means something is wrong." It says the step did not replay a captured graph, which is expected on a platform without graphs and during a prefill batch; on CUDA, read it on the decode lines.
-- "Waiting: 11 is a small queue, so ignore it." With the pool at 99.5 percent every waiting request waits for a running request to finish, and at 64 users on that card the median first token was 10,953 ms; the pool is the limit.
+- "命中率 8.7% 说明前缀缓存配置有误。" 各不相同的 prompt 共享内容很少；命中率反映的是 prompt，同一引擎在共享前缀的运行中高得多。
+- "token usage 为 0.05 说明服务器几乎空闲。" 它说明池几乎为空；GPU 仍可能很忙，每秒 1,472.94 个 prompt token 就说明了这一点；要看运行和排队数来判断负载。
+- "cuda graph: False 说明有问题。" 它表示这一步没有回放捕获的 graph，在不支持 graph 的平台以及 prefill 批次中符合预期；在 CUDA 上，要看 decode 日志中的值。
+- "Waiting: 11 队列很短，可以忽略。" 池占用 99.5% 时，每个排队请求都在等某个运行中请求结束，那张卡上 64 个用户时的中位首 token 时间是 10,953 ms；瓶颈是池。
 
 ## Taught in
 
-[The scheduler loop and --schedule-policy](../../../manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md) and [RadixCache](../../../manuals/sglang-101/sections/3-3-radixcache.md) explain the SGLang lines, and [Reading other people's SGLang benchmarks](../../../manuals/sglang-101/sections/5-3-reading-other-peoples-benchmarks.md) shows the vLLM stats line at a full pool.
+[调度器循环与 --schedule-policy](../../../manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md)和 [RadixCache](../../../manuals/sglang-101/sections/3-3-radixcache.md)解释了 SGLang 日志，[阅读他人的 SGLang 基准测试](../../../manuals/sglang-101/sections/5-3-reading-other-peoples-benchmarks.md)展示了满池时的 vLLM 统计日志。

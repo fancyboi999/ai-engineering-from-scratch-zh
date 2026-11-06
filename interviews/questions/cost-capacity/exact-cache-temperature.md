@@ -1,6 +1,6 @@
 ---
 id: exact-cache-temperature
-title: Read the exact-match cache before it ships
+title: 上线前读懂这个精确匹配缓存
 card: cost-capacity
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [cost-capacity/two-cache-layers]
 updated: 2026-11-03
 ---
 
-Read this exact-match cache from the caching lesson. Why does it refuse every request with a positive temperature, what goes into the key and why, and what would you change before it runs in production?
+读一读缓存课程里的这个精确匹配缓存。它为什么拒绝所有温度大于零的请求？key 里放了什么，为什么？在它上线到生产之前，你会改什么？
 
 ```python
 class ExactCache:
@@ -58,43 +58,43 @@ class ExactCache:
 
 ## Short answer
 
-The cache serves deterministic calls only. A positive temperature asks for sampled variation, and a replayed answer would remove that variation without telling the caller, so the cache treats those calls as misses and never stores them. The key is a hash of the model, the full message list and the temperature, serialized with sorted keys so that the same request always produces the same bytes. Before production, the key needs every other field that changes the answer, the eviction needs a least-recently-used policy instead of a full scan for the oldest entry, and the expiry needs a sweep, because an expired entry is only removed when someone reads it.
+这个缓存只服务确定性调用。温度大于零表示调用方要的是采样带来的变化，回放一个旧回答会在不告诉调用方的情况下抹掉这种变化，所以缓存把这类调用当作未命中，也从不存储它们。key 是模型、完整消息列表和温度的哈希，序列化时按键排序，保证同一个请求总是产生相同的字节。上线前，key 要补上其他所有会改变回答的字段，淘汰策略要改成 LRU，不再全量扫描找最旧的条目，过期还需要一个定期清理，因为现在过期条目只有在被读到时才会删除。
 
 ## Full answer
 
-### The temperature guard
+### 温度守卫
 
-Both `get` and `put` return early above zero. The lesson's rule is that exact caching works for deterministic calls: the same model, the same prompt, temperature zero. Serving a stored sample to a caller who asked for variation changes the behavior silently, which is worse than a miss.
+`get` 和 `put` 在温度大于零时都会提前返回。课程的规则是：精确缓存适用于确定性调用，即同一个模型、同一个 prompt、温度为零。调用方要的是变化，你却给他一个存下来的样本，这会悄悄改变行为，比一次未命中更糟。
 
-### What the key holds, and what it misses
+### key 里有什么，漏了什么
 
-The key covers the model, because the same prompt on another model is another answer, the whole message list, because the system prompt and the context are part of the request, and the temperature. `sort_keys=True` makes the serialization stable, so two callers who build the same dictionary in a different order still hash alike. The key does not cover other fields that change the answer: the sampling parameters beyond temperature, the output limit, the tool definitions and the response format. Add them, or the cache returns an answer produced under different settings.
+key 包含模型，因为同一个 prompt 换个模型就是另一个回答；包含完整的消息列表，因为系统 prompt 和上下文都是请求的一部分；还包含温度。`sort_keys=True` 让序列化结果稳定，两个调用方即使以不同顺序构建同一个字典，哈希也相同。key 没有包含其他会改变回答的字段：温度以外的采样参数、输出上限、工具定义和响应格式。要把它们加进去，否则缓存会返回在另一组设置下生成的回答。
 
-### Expiry is lazy
+### 过期是惰性的
 
-The lifetime is checked on read. An entry past its lifetime stays in memory until a read finds it or an eviction drops it. A periodic sweep, or an expiry check during `put`, keeps the memory honest.
+有效期只在读取时检查。超过有效期的条目会一直留在内存里，直到某次读取碰到它，或者被淘汰掉。加一个定期清理，或者在 `put` 时检查过期，内存占用才是真实的。
 
-### Eviction is a full scan, oldest first
+### 淘汰靠全量扫描，最旧的先走
 
-At capacity, `put` scans every entry to find the oldest timestamp. That is linear work on every insert once the cache is full, and it evicts by insertion time, so a popular entry that was inserted early goes first. The lesson's first exercise asks for least-recently-used eviction on the last access time, which the `access_count` field hints at but does not implement.
+容量满了以后，`put` 会扫描所有条目，找出时间戳最早的那个。缓存一满，每次插入都是线性开销；而且它按插入时间淘汰，一个早早插入的热门条目会最先被踢掉。课程的第一道练习要求按最后访问时间做 LRU 淘汰，`access_count` 字段暗示了这个方向，但并没有实现。
 
-### Prove that it pays
+### 证明它划算
 
-The cache counts hits and misses. The lesson's cost tracker logs a cache status on every call and computes the saved cost from the hits with the pricing table. Wire that in before you argue about the hit rate.
+这个缓存统计了命中和未命中次数。课程的成本追踪器在每次调用时记录缓存状态，并用价格表根据命中次数算出省下的成本。先把这部分接进来，再讨论命中率。
 
 ## Follow-ups
 
-- **Level 2:** Why serialize with sorted keys? Expected: the order of a dictionary can differ between callers, and a different byte order gives a different hash for the same request.
-- **Level 3:** Which request fields are missing from the key? Expected: anything else that changes the answer, such as the other sampling parameters, the output limit, the tool definitions and the response format.
-- **Level 3:** What does the eviction do at capacity, and what does the exercise ask for instead? Expected: it scans all entries for the oldest timestamp and drops it. The exercise asks for least-recently-used eviction on the last access time.
-- **Level 4:** How would you show that this cache pays for itself? Expected: log the cache status on every call and compute the saved cost from the hits with the pricing table, as the lesson's cost tracker does.
+- **Level 2:** 为什么序列化时要按键排序？ Expected: 不同调用方构建的字典顺序可能不同，字节顺序一变，同一个请求就会得到不同的哈希。
+- **Level 3:** key 里漏了哪些请求字段？ Expected: 其他任何会改变回答的字段，例如其余采样参数、输出上限、工具定义和响应格式。
+- **Level 3:** 容量满时淘汰逻辑做了什么？练习要求改成什么？ Expected: 它扫描所有条目，找出时间戳最早的那个并删掉。练习要求按最后访问时间做 LRU 淘汰。
+- **Level 4:** 你怎么证明这个缓存能收回成本？ Expected: 在每次调用时记录缓存状态，用价格表根据命中次数算出省下的成本，就像课程里的成本追踪器那样。
 
 ## Wrong answers
 
-- "The temperature check is pointless, a cached answer is a good answer." A positive temperature means the caller wants variation. A replay removes it without telling anyone.
-- "Hash only the user message." The same question under a different system prompt, model or tool set has a different correct answer.
-- "The lifetime removes expired entries." It only hides them on read. The entry stays in memory until a read or an eviction removes it.
+- "温度检查没有意义，缓存的回答就是好回答。" 温度大于零说明调用方想要变化。回放会抹掉变化，而且谁都不知道。
+- "只对用户消息做哈希。" 同一个问题，换了系统 prompt、模型或工具集，正确答案就不同。
+- "有效期会删掉过期条目。" 它只在读取时把过期条目藏起来。条目会一直留在内存里，直到被读取或被淘汰。
 
 ## Taught in
 
-The [caching and cost lesson](../../../phases/11-llm-engineering/11-caching-cost/) builds the exact cache, and its first exercise replaces the eviction policy.
+[缓存与成本课程](../../../phases/11-llm-engineering/11-caching-cost/)构建了这个精确缓存，课程的第一道练习替换了它的淘汰策略。

@@ -1,6 +1,6 @@
 ---
 id: four-bases-four-block-counts
-title: Three addresses for grade and four block counts
+title: grade 的三个地址与四种基本块计数
 card: evidence-reverse-engineering
 kind: debug
 level: 3
@@ -16,43 +16,43 @@ related: [evidence-reverse-engineering/sweep-trap-addq-at-0x13]
 updated: 2026-11-03
 ---
 
-An agent runs four tools on one relocatable object and reports that `grade` sits at `0x08000050` in one, `0x400010` in another and `0x100010` in a third, so the tools disagree about where the function is. On the `-O0` object it then reports 3, 8, 8 and 9 basic blocks for the same function. Explain both reports, and say what a block count measures.
+某 Agent 对同一个可重定位目标文件运行了四款工具，报告 `grade` 在第一款工具中位于 `0x08000050`，在第二款中位于 `0x400010`，在第三款中位于 `0x100010`，因此得出结论称各工具对该函数的位置存在分歧。随后在未优化的 `-O0` 目标文件上，它对同一个函数分别报告了 3、8、8 和 9 个基本块。解释这两份报告的原因，并说明基本块计数究竟度量了什么。
 
 ## Short answer
 
-The object has no load address, so each tool picks one: `0x08000000` for the file in two tools, which puts `.text` at `0x08000040`, `0x400000` in a third, `0x100000` in a fourth, and the sweep prints offsets with no base at all. Subtract each tool's `.text` address and every answer is `0x10`, which is what the symbol table says. The block counts are four answers to how far each tool followed one indirect jump and where it cut: 3 blocks is a tool that stopped at `jmp rax` and left 36 bytes unreached, 8 with 11 edges is a tool that read the five relocations behind the table and found four distinct targets, 8 with 7 edges is a tool whose case blocks exist but whose transfer at `0x62` goes to an unresolvable node, and 9 with 12 edges is a tool whose switch analysis placed a label on the jump at `0x74` and whose block model starts a new block at a label.
+目标文件本身没有固定的加载地址，因此各工具自行指定了基址：两款工具为文件指定了 `0x08000000`，这使得 `.text` 位于 `0x08000040`；第三款指定了 `0x400000`；第四款指定了 `0x100000`；而线性扫描工具则直接打印不带基址的偏移量。减去各工具的 `.text` 起始地址后，所有结果均为 `0x10`，这与符号表记录完全一致。基本块计数则是四款工具对如何跟踪某一条间接跳转以及在哪里划分基本块给出的四种不同答案：3 个块的工具在遇到 `jmp rax` 时直接停止，导致 36 个字节未被覆盖；8 个块且含 11 条边的工具读取了跳转表背后的 5 条重定位记录并找到了 4 个不同目标；8 个块且含 7 条边的工具识别出了各个 case 块，但在 `0x62` 处的跳转指向了一个无法解析的节点；9 个块且含 12 条边的工具其 switch 分析在 `0x74` 的跳转处打上了标签，且其块模型会将标签处切分为新基本块。
 
 ## Full answer
 
-### Reduce before you compare
+### 比较之前先归约
 
-The harness reads the base from each capture and compares after reduction. A disagreement on raw addresses is a disagreement about loaders, and the test that every tool places `grade` at offset `0x10` from its own base is the first thing to fix in place. Loaders also differ on relocations: one processes them on import, one applies them, and one prints a hint that relocations were not applied unless a setting says so. What a loader does with relocations decides what every later stage can see.
+测试控台从每次分析捕获中提取基址，并在归约去除基址后比较。原始地址上的分歧本质上是对加载器行为的分歧，而验证所有工具均将 `grade` 置于各自基址偏移 `0x10` 处是首要固定的事实基准。加载器对重定位的处理也各不相同：有的在导入时处理，有的直接应用重定位，有的则打印提示说明除非显式配置否则不应用重定位。加载器对重定位的操作直接决定了后续所有分析阶段所能观测到的内容。
 
-### Compare in order, read the notes
+### 按序比对并仔细阅读注释
 
-Instruction starts first: in the agreement case all four tools report the same starts in every function, and the four graph builders report 3, 3, 5 and 4 blocks with identical edge sets. Then blocks, then edges, and each tool's own note before judging a count: a `switch_op` with five cases and four distinct targets, a `COMPUTED_JUMP` flow with four targets, or an unresolvable target node explains most differences. All four tools decoded the same 33 instructions once they reached them. The lesson-33 graph had 8 blocks and 11 edges, and one tool matches it exactly; the tool with 9 and 12 found the same four targets and split one block at a label.
+首先对比指令起始位置：在达成一致的情况下，四款工具在每个函数中报告的指令起始位置完全一致，且四个控制流图构建器报告的基本块数分别为 3、3、5 和 4，但边集合完全一致。随后对比基本块与边，并在评判块计数之前先阅读各工具自身的注释：带有 5 个分支和 4 个不同目标的 `switch_op`、带有 4 个目标的 `COMPUTED_JUMP` 流，或是无法解析的目标节点，能够解释绝大多数差异。四款工具一旦进入指令流，解码出的 33 条指令完全一致。第 33 课的图包含 8 个基本块和 11 条边，其中一款工具与之完全吻合；报告 9 个块和 12 条边的工具找到了相同的 4 个目标，只是在跳转标签处切分了一个基本块。
 
-### Where tools invent and miss
+### 工具在何处无中生有与发生遗漏
 
-One framework ends a block at a `call`, because its IR block is single-entry multiple-exit, so a function that calls another reports 2 blocks where the other three report 1 for the same instructions. The same framework invents functions at padding gaps with no symbol, 9 across the four objects, and one more on the trap table. The sweep decodes padding bytes that no graph builder treats as code. The harness names one missed range in one tool, the 36 case bytes of `grade`, and no missed function in any tool.
+某框架将基本块截断在 `call` 指令处，因为其 IR 基本块是单入口多出口结构，因此对于相同的指令序列，当一个函数调用另一函数时，它报告 2 个块，而其他三款工具报告 1 个块。该框架还在没有符号的填充空白处凭空捏造函数，在四个目标文件中共捏造了 9 个，在陷阱表处又捏造了 1 个。线性扫描工具解码了所有图构建器均不视为代码的填充字节。测试控台仅指出了一款工具中漏掉的一个地址范围，即 `grade` 的 36 字节 case 分支，而在任何工具中均未漏掉任何实际函数。
 
-### What was run and what was read
+### 实际运行与仅供查阅的区别
 
-Two commercial tools were described from documentation only and are marked as not run in the figure and the table. A description is useful evidence of a different kind from a capture, and the report says which is which. Every capture is stored with its command, version and date; a disagreement you cannot re-read is not a finding.
+有两款商业工具仅根据官方文档描述，在图表和数据表格中明确标明为未运行。文档描述是不同于实际测试捕获的另一种有用证据，报告中清晰区分了两者。每次实际捕获均连同其命令、版本号和日期一同保存；无法重新读取与复现的分歧不能算作有效结论。
 
 ## Follow-ups
 
-- **Level 3:** One tool reports 9 blocks and 12 edges, another 8 and 11, for the same control flow. Who is wrong? Expected: neither; a label on the indirect jump started a new block, and both found the same four computed targets.
-- **Level 3:** On the caller of `grade`, one tool reports two blocks and the rest one. Explain. Expected: that tool's IR block ends at a call; the instruction set is the same.
-- **Level 4:** One listing shows the four case blocks as dead code. How do you classify those bytes? Expected: missed by a stopped walk, since three tools reach them through the table; the byte accounting names the range and the tool.
-- **Level 4:** You could not run two commercial tools. How do they appear in the report? Expected: from their documentation, marked as not run, with no measured number attributed to them.
+- **Level 3:** 针对同一控制流，一款工具报告 9 个块和 12 条边，另一款报告 8 个块和 11 条边，谁出错了？ Expected: 都没有错；间接跳转处的标签开启了新的基本块，两款工具都找到了相同的 4 个计算目标。
+- **Level 3:** 在 `grade` 的调用方函数中，一款工具报告两个基本块，其余工具报告一个，如何解释？ Expected: 该工具的中间表示（IR）基本块在 call 指令处截断；两者解析出的指令集合完全相同。
+- **Level 4:** 汇编清单将四个 case 分支块显示为死代码，你如何归类这些字节？ Expected: 属于因遍历停止而漏掉的代码，因为其他三款工具通过查表均能到达它们；字节核算指明了该范围和具体工具。
+- **Level 4:** 你无法实际运行两款商业工具，它们如何在报告中呈现？ Expected: 基于其官方文档说明，明确标记为未运行，不为其虚构任何实测数值。
 
 ## Wrong answers
 
-- "The tool with the most blocks found the most code." The extra block is a label split; all four decoded the same instructions where they reached them.
-- "Compare the raw addresses; the tools disagree." The object is relocatable, and each tool chose a base; the offset agrees.
-- "The sweep tool is broken because it prints `0x10`." It prints section offsets with no base, which is the correct answer with the base removed.
+- "基本块最多的工具找到了最多的代码。" 额外的基本块仅仅是因为标签切分；四款工具在能够到达的范围内解码出的指令完全相同。
+- "对比原始虚拟地址，各工具存在分歧。" 目标文件是可重定位的，各工具自行选择了基址；去除基址后的相对偏移是一致的。
+- "扫描工具输出 `0x10` 说明它坏了。" 它输出的是不带基址的节内偏移量，这恰好是剥离基址后的正确答案。
 
 ## Taught in
 
-The [landscape lesson](../../../phases/13-tools-and-protocols/37-the-reverse-engineering-landscape/) reduces the four bases and explains each block count from the tool's own note, and the [disassembly lesson](../../../phases/13-tools-and-protocols/33-disassembly-and-control-flow/) builds the graph the counts are compared against.
+[行业全景课程](../../../phases/13-tools-and-protocols/37-the-reverse-engineering-landscape/)归约了四个基址并基于工具自身注释解释了每个基本块计数，[反汇编课程](../../../phases/13-tools-and-protocols/33-disassembly-and-control-flow/)构建了用于对比计数的控制流基准图。

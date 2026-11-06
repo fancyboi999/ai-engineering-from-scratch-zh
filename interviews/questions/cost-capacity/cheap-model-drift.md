@@ -1,6 +1,6 @@
 ---
 id: cheap-model-drift
-title: The router saved half the bill, then the escalations climbed
+title: 路由器省下一半账单之后，升级率开始攀升
 card: cost-capacity
 kind: debug
 level: 3
@@ -16,52 +16,52 @@ related: [cost-capacity/semantic-threshold, cost-capacity/gateway-latency-budget
 updated: 2026-11-03
 ---
 
-Six months ago a cascading router cut the bill by more than half with no measurable quality loss. Since then the escalation rate has crept from 8 percent to 22 percent, and a sales engineer reports that a competitor's demo now answers better than your product. Diagnose it.
+六个月前，一个级联路由器把账单砍掉了一半以上，质量没有可测量的损失。此后升级率（escalation rate）从 8% 慢慢涨到了 22%，一位售前工程师还反馈，竞品的演示现在比你们的产品答得更好。请诊断原因。
 
 ## Short answer
 
-The traffic drifted and the router did not. Its classifier learned the question mix of six months ago, users now ask longer and harder questions, and the cheap model's first pass fails its own confidence check more often, which is what the rising escalation rate records. Quality fell silently on the requests that were not escalated. Gate every route with online quality metrics, retrain the classifier on current traffic, and treat an escalation rate above about 30 percent as proof that the cheap model is over-routed.
+流量漂移了，路由器却没变。它的分类器学的是六个月前的问题分布，用户现在问得更长、更难，便宜模型的第一轮回答更常过不了自己的置信度检查，升级率上涨记录的正是这件事。那些没有升级的请求，质量在悄悄下降。用在线质量指标给每条路由设门禁，用当前流量重新训练分类器，并把超过约 30% 的升级率当作便宜模型分到的流量过多的证据。
 
 ## Full answer
 
-### The failure mode the lesson warns about
+### 课程警告过的失败模式
 
-A route sends a large share of traffic to a weaker model. Over months the task distribution shifts: users get more sophisticated and ask longer questions. The router does not notice, because its classifier was trained on the earlier quarter. Quality drops by a few percent on reasoning tasks, nobody complains loudly enough, and the team finds out from a competitor benchmark. The lesson's numbers for the pattern: 40 percent routed cheap, a 3 to 5 percent quality drop, unnoticed for a quarter.
+一条路由把很大一部分流量发给较弱的模型。几个月里任务分布在变化：用户越来越老练，问题越来越长。路由器察觉不到，因为它的分类器是用上一个季度的数据训练的。推理类任务的质量下降了几个百分点，没有人抱怨得足够大声，团队最后是从竞品的基准测试里发现的。课程给这个模式的数字是：40% 的流量路由到便宜模型，质量下降 3% 到 5%，一个季度都没人发现。
 
-### Three causes of a rising escalation rate
+### 升级率上涨的三个原因
 
-1. **Distribution shift.** More long prompts and more multi-step questions. The lesson's length signal says prompts above 4K tokens often need the frontier model, and prompts under 500 tokens usually do not. If the mix moved up, more first passes fail.
-2. **The cheap model changed.** A provider update behind the same alias, or a routine version bump, moves the confidence signal and the refusal behavior.
-3. **Stale thresholds.** The confidence cutoff and the embedding set of known-hard questions were tuned on old traffic.
+1. **分布偏移。** 长 prompt 和多步问题变多了。课程里的长度信号是：超过 4K token 的 prompt 往往需要前沿模型，500 token 以下的通常不需要。如果问题分布整体上移，第一轮失败的次数就会变多。
+2. **便宜模型变了。** 提供商在同一个别名背后更新了模型，或者做了一次常规版本升级，置信度信号和拒答行为都会随之变化。
+3. **阈值过时。** 置信度阈值，以及已知难题的嵌入集合，都是在旧流量上调出来的。
 
-Each cause has its own fix: retrain the classifier on recent labeled traffic, pin the model version and log the served model on every call, and refresh the hard set and the cutoff on a new eval.
+每个原因各有修法：用最近带标注的流量重新训练分类器；固定模型版本，并在每次调用时记录实际提供服务的模型；用一次新的评测更新难题集合和阈值。
 
-### Gates on live traffic
+### 在线流量上的门禁
 
-The lesson gates routes with live signals, not with the offline set:
+课程用在线信号给路由设门禁，不用离线评测集：
 
-- thumbs up and down per route;
-- an automated judge on a 5 percent held-out sample per route;
-- the escalation rate, where a cascade that kicks up more than 30 percent of requests is over-routing;
-- the refusal rate per route.
+- 每条路由的点赞和点踩；
+- 对每条路由留出 5% 的样本，用自动 judge 打分；
+- 升级率：级联把超过 30% 的请求往上送，就是路由给便宜模型的流量过多；
+- 每条路由的拒答率。
 
-### What the cascade now costs
+### 级联现在的代价
 
-The cascade pattern was designed for about 1.2 times the median latency and about 2 times on the escalated share, with roughly 10 percent escalated. At 22 percent escalated, a fifth of the requests pay for two model calls and the slow path, so the saving shrank while the quality fell.
+级联模式的设计目标是：中位延迟约为 1.2 倍，被升级的那部分约为 2 倍，升级比例大约 10%。升级比例到了 22%，五分之一的请求要付两次模型调用和慢路径的代价，节省的钱变少了，质量也在下降。
 
 ## Follow-ups
 
-- **Level 3:** Why did the offline eval not catch the loss? Expected: the eval set was built from the old distribution. It scores the model on questions that users no longer ask.
-- **Level 3:** Which online metric gives the earliest warning? Expected: the escalation rate per route. It rises as the cheap model fails its own confidence check more often, before the thumbs or a judge sample show the loss.
-- **Level 4:** The provider updated the cheap model behind the same alias. How do you know? Expected: a step change in escalations or judge scores on a date with no deploy on your side. Pin the model version and log the served model on every call.
-- **Level 4:** Where do you set the alarm on the escalation rate? Expected: near the design target, about 10 percent escalated for the cascade pattern, with the lesson's 30 percent as the hard line for over-routing.
+- **Level 3:** 离线评测为什么没发现质量损失？ Expected: 评测集是用旧分布建的。它在用户已经不再问的问题上给模型打分。
+- **Level 3:** 哪个在线指标最早报警？ Expected: 每条路由的升级率。便宜模型越来越常过不了自己的置信度检查，升级率就会上涨，这比点踩或 judge 抽样显示出损失更早。
+- **Level 4:** 提供商在同一个别名背后更新了便宜模型。你怎么知道？ Expected: 在你这边没有任何部署的某一天，升级次数或 judge 分数出现阶跃变化。固定模型版本，并在每次调用时记录实际服务的模型。
+- **Level 4:** 升级率的告警线设在哪里？ Expected: 靠近设计目标，级联模式约为 10% 的升级比例，并把课程里的 30% 当作分流过多的硬线。
 
 ## Wrong answers
 
-- "The cheap model got worse, swap it." Possible, and the first suspect is the router's stale classifier against drifted traffic.
-- "Quality is fine, the eval score did not move." The eval set comes from the old distribution and cannot see the new questions.
-- "Raise the confidence cutoff so that more goes to the frontier model." That buys quality back at a cost without finding the cause. Retrain the router and gate it online.
+- "便宜模型变差了，换掉它。" 有这种可能，但首先该怀疑的是路由器的分类器已经过时，跟不上漂移后的流量。
+- "质量没问题，评测分数没变。" 评测集来自旧分布，看不到新的问题。
+- "调高置信度阈值，让更多请求走前沿模型。" 这是花钱把质量买回来，没有找到原因。应该重新训练路由器，并用在线指标给它设门禁。
 
 ## Taught in
 
-The [model routing lesson](../../../phases/17-infrastructure-and-production/16-model-routing/) names cheap-model drift and the online quality gates that catch it.
+[模型路由课程](../../../phases/17-infrastructure-and-production/16-model-routing/)讲了便宜模型漂移，以及能发现它的在线质量门禁。

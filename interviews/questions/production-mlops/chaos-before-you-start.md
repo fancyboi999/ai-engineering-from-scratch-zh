@@ -1,6 +1,6 @@
 ---
 id: chaos-before-you-start
-title: What must exist before the first chaos experiment
+title: 第一次混沌实验前必须具备什么
 card: production-mlops
 kind: concept
 level: 1
@@ -16,43 +16,43 @@ related: [production-mlops/budget-burn-pauses-chaos, production-mlops/rollback-w
 updated: 2026-11-03
 ---
 
-A new team wants to run its first chaos experiment against the model service next week. What do you check for before you agree, and what goes wrong when one piece is missing?
+一个新团队想在下周对模型服务做第一次混沌实验。同意之前你要检查什么？缺了其中一项会出什么问题？
 
 ## Short answer
 
-Five things have to be in place: service level indicators with objectives, observability with traces, metrics and logs, an automated rollback, structured runbooks and an on-call owner. Each one lets you measure the experiment, stop it or repair the damage. When one is missing, the experiment is not a test. It is an incident that you scheduled.
+必须具备五样东西：带目标的服务等级指标（SLI 与 SLO）、包含 trace、指标和日志的可观测性、自动回滚、结构化的 runbook，以及一位负责响应的值班人员。每一样都让你能衡量实验、停止实验或修复损害。缺了任何一样，实验就不是测试，而是你排了期的事故。
 
 ## Full answer
 
-### The five prerequisites
+### 五个前提
 
-1. **SLI and SLO.** Without a target you cannot say whether the experiment hurt anything.
-2. **Observability.** Traces, metrics and logs on a dashboard. You must see the effect while it happens.
-3. **Automated rollback.** The policy-flag rollback from the progressive delivery lesson. A rollback that needs a redeploy is too slow for an experiment.
-4. **Runbooks.** Structured sections: symptom, hypothesis, verify, act. The on-call reads them under pressure.
-5. **On-call.** Someone who responds when the experiment finds something.
+1. **SLI 与 SLO。** 没有目标，你就说不清实验有没有造成损害。
+2. **可观测性。** 看板上要有 trace、指标和日志。影响发生时你必须看得见。
+3. **自动回滚。** 即渐进式发布课程里基于策略开关的回滚。需要重新部署的回滚，对实验来说太慢。
+4. **runbook。** 分成固定的几节：症状、假设、验证、处置。值班人员要在压力下读它。
+5. **值班人员。** 实验发现问题时，有人负责响应。
 
-### The first experiments
+### 最先做的实验
 
-Start with one pod kill of a decode replica under steady traffic, and watch the rerouting and the recovery. If that looks safe, graduate to network chaos. The first model-specific experiment is one provider returning rate-limit errors for a few minutes, to see the fallback engage. Most teams learn here that their fallback was never fully tested.
+先在稳定流量下杀掉一个 decode 副本的 Pod，观察流量重路由和恢复过程。如果看起来安全，再升级到网络混沌。第一个模型专属实验是让一个服务商在几分钟内返回限流错误，看 fallback 能否接上。大多数团队在这里才发现，自己的 fallback 从来没有完整测试过。
 
-### The cadence
+### 节奏
 
-Weekly small experiments in staging or on a small share of production. Monthly game day on one scenario with a postmortem. Quarterly cross-team audit with a dependency map.
+每周在 staging 或一小部分生产流量上做小实验。每月针对一个场景做一次 game day，并写故障复盘。每季度做一次跨团队审计，附依赖图。
 
 ## Follow-ups
 
-- **Level 1:** Which experiment goes first, and why? Expected: kill one decode replica under steady traffic, because it tests rerouting and recovery with a small blast radius.
-- **Level 2:** Name one failure a generic network chaos tool cannot reproduce for a model service. Expected: a KV cache eviction storm under burst load, or a prompt that stalls the tokenizer.
-- **Level 2:** Why does the rollback matter more than the dashboard during an experiment? Expected: the dashboard shows the harm, and the rollback stops it. Without the rollback the harm continues until someone fixes it by hand.
-- **Level 3:** The team wants staging only. When is production the right place? Expected: when staging cannot reproduce the traffic shape, the cache state or the provider behavior, and only with the safety guards in place.
+- **Level 1:** 第一个做哪个实验？为什么？ Expected: 在稳定流量下杀掉一个 decode 副本，因为它以很小的爆炸半径检验重路由和恢复。
+- **Level 2:** 举一个通用网络混沌工具无法为模型服务复现的故障。 Expected: 突发负载下的 KV cache 驱逐风暴，或者一个让分词器卡住的 prompt。
+- **Level 2:** 实验期间，为什么回滚比看板更重要？ Expected: 看板展示损害，回滚停止损害。没有回滚，损害会一直持续，直到有人手工修好。
+- **Level 3:** 团队只想在 staging 做。什么时候该在生产环境做？ Expected: staging 复现不了流量形态、缓存状态或服务商行为时；而且必须先有安全防护。
 
 ## Wrong answers
 
-- "Skip the prerequisites and learn by doing." Without an SLO, a rollback and an on-call owner, the experiment is an outage that you caused on purpose.
-- "A dashboard is observability." Chaos needs traces, metrics and logs with trace-id correlation, so that you can tell experiment failures from natural ones.
-- "Run the biggest experiment first to find the biggest risk." Start with one replica kill, then grow the blast radius.
+- "跳过前提，边做边学。" 没有 SLO、回滚和值班人员，实验就是你故意造成的宕机。
+- "有看板就算有可观测性。" 混沌实验需要 trace、指标和日志，并能按 trace id 关联，这样才能区分实验故障和自然故障。
+- "先做最大的实验，才能找出最大的风险。" 先杀一个副本，再逐步扩大爆炸半径。
 
 ## Taught in
 
-The [chaos engineering lesson](../../../phases/17-infrastructure-and-production/24-chaos-engineering-llm/) lists the five prerequisites, the four planes and the first experiments.
+[混沌工程课程](../../../phases/17-infrastructure-and-production/24-chaos-engineering-llm/)列出了五个前提、四个面和最先做的实验。

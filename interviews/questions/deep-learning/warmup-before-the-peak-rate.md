@@ -1,6 +1,6 @@
 ---
 id: warmup-before-the-peak-rate
-title: What a learning rate warmup protects
+title: 学习率预热机制保护了什么
 card: deep-learning
 kind: concept
 level: 3
@@ -16,47 +16,47 @@ related: [deep-learning/adam-bias-correction-first-steps, deep-learning/cosine-w
 updated: 2026-11-03
 ---
 
-A transformer recipe starts the learning rate at zero and ramps it linearly up to the peak during the first steps, then decays it with a cosine. A teammate wants to start at the peak to save those steps. Explain what the ramp protects, how long it should be, and how to write it down so the recipe scales to a longer run.
+一个 Transformer 训练方案将学习率从零开始，在初始若干步内线性爬坡至峰值，随后配合余弦退火衰减。一位同事希望直接从峰值学习率起步以省去预热步数。请解释线性预热保护了什么、预热期应该设定多长、以及如何书写配置以便该方案能够无缝扩展至更长周期的训练。
 
 ## Short answer
 
-The first updates are the fragile ones: the weights sit near their initialization, Adam's running estimates of the gradient mean and variance are built from a handful of samples, and the gradient norm is large and noisy. A full size step on that footing diverges or drops the model into a plateau it never leaves. Warmup keeps the effective step small until the statistics settle, over about 1 to 5 percent of the total steps, and the schedule should express that length as a fraction of the run rather than as a fixed step count.
+最初的参数更新是最脆弱易碎的：模型权重处于随机初始状态，Adam 维护的梯度均值与方差滑动估计仅基于寥寥几个样本，且梯度范数极大且充满噪声。在此基础上一开局就迈出全尺寸峰值步长，很容易导致模型直接发散，或者跌入无法逃逸的死锁平台期。预热机制将有效更新步长控制在微小幅度，直到统计量平稳收敛（通常占总步数的 1% 到 5% 左右），且在调度配置中应当将预热期定义为总步数的比例而非固定步数数值。
 
 ## Full answer
 
-### What is wrong at step zero
+### 第零步时面临的严峻状态
 
-Adam's two moment estimates start at zero. Bias correction fixes their scale, but the first steps still use statistics from one or two gradients, which the schedules lesson calls garbage statistics. At the same time the weights are at their random initialization and the gradient norm is at its largest and noisiest. A peak step on that mix is a large, poorly directed move. The capstone lesson gives the two outcomes: the run diverges outright, or it settles into a loss plateau it never escapes.
+Adam 优化器的一阶矩与二阶矩估计均从零初始化。尽管偏差校正能够校正数值尺度，但在最初几步中，统计量仅基于一两个梯度的抽样，调度器课程将其直白地称为垃圾统计量。与此同时，网络权重处于纯随机初始状态，梯度范数达到全局最大且充斥着极端噪声。在如此不稳定的基础上面对全额峰值步长，相当于迈出巨大且方向严重失真的盲目步长。综合项目课程指出了两种灾难性后果：模型直接彻底发散爆炸，或者陷入再也无法逃离的损失死锁平台期。
 
-### What warmup does
+### 预热机制如何化解危机
 
 ```text
 lr(t) = lr_max * t / warmup_steps     for t below warmup_steps
 ```
 
-The rate climbs from zero to the peak over the warmup steps. By the time the full rate arrives, the moment estimates have seen hundreds of gradients and the weights have moved off their starting point. The schedules lesson's examples of published runs use a warmup of 2000 steps to a peak of 3e-4 followed by a cosine decay to 3e-5, and a warmup over 375 million tokens to a peak of 6e-4.
+学习率在预热步数区间内从零平滑爬升至峰值。当全额学习率正式介入时，矩统计量已经历了数百次梯度的充分平滑，且模型权重已平稳脱离了原始随机起点。调度器课程列举了业界知名大模型训练的公开配置：例如经过 2000 步预热达到 3e-4 峰值后余弦衰减至 3e-5；或者在跨越 3.75 亿个 token 的数据预热中逐渐攀升至 6e-4 峰值。
 
-### How long
+### 预热期应该设多长
 
-The schedules lesson gives 1 to 5 percent of the total steps and, when in doubt, 3 to 5 percent. The capstone lesson gives 1 to 3 percent and makes the stronger point: write the warmup as a fraction. A run of 200 million steps with 2,000 warmup steps is at the peak almost at once, and a run of 20,000 steps with the same count warms up for 10 percent. The same number describes two different schedules.
+学习率调度器课程推荐设为总训练步数的 1% 到 5%；若不确定时，取 3% 到 5% 属于极佳经验值。综合项目课程推荐 1% 到 3%，并提出了更深刻的工程原则：必须将预热定义为总步数的相对比例。一个长达 2 亿步的超大任务若硬编码 2000 步预热，几乎瞬间就冲到了峰值；而一个仅有 2 万步的短训若同样设置 2000 步，预热阶段竟占了整整 10%。同一个固定数字在不同场景下对应了截然不同的调度形态。
 
-### How to see that it worked
+### 如何验证预热是否工作正常
 
-Log the gradient norm next to the learning rate at each step. In a well tuned warmup the norm rises roughly in step with the rate and settles after the peak. A norm that stays high after the ramp ends says the peak is too aggressive. A divergent run shows the norm spike before the loss does.
+在每一步的日志中将梯度范数与学习率并列打点记录。在调优良好的健康预热中，梯度范数会伴随学习率爬升而温和上升，并在达到峰值后逐渐趋于平稳收敛。如果爬坡结束进入峰值后梯度范数持续异常高企，说明峰值学习率设置过大过于激进。如果训练发生发散，梯度范数必定先于损失发生剧烈冲高。
 
 ## Follow-ups
 
-- **Level 3:** Why is Adam sensitive at step zero in particular? Expected: its moment estimates start at zero and the first steps use statistics from one or two gradients; bias correction fixes their scale but not their noise.
-- **Level 3:** What does the gradient norm look like during a healthy warmup? Expected: it rises roughly in step with the learning rate and settles after the peak; a norm that stays high after the ramp says the peak is too aggressive.
-- **Level 4:** Why does a fixed warmup step count break when the run gets longer? Expected: 2000 steps is 10 percent of a 20,000 step run and a vanishing share of a 200 million step run, so the same count gives two different schedules; a fraction keeps the shape.
-- **Level 4:** You change the batch size. What do you revisit? Expected: the warmup length and the peak; the schedules lesson lists the warmup period as the setting that must change when the batch size changes.
+- **Level 3:** 为什么 Adam 优化器在第零步时尤为脆弱敏感？ Expected: 其一阶矩与二阶矩均从零初始化，起步阶段的统计量仅基于一两次梯度的极度粗糙抽样；偏差校正仅修正尺度，无法消除样本方差噪声。
+- **Level 3:** 在一个健康的预热过程中，梯度范数曲线呈现什么形态？ Expected: 梯度范数随学习率上升而温和上涨，并在跨过峰值进入衰减后逐步平稳回落；若峰值后持续居高不下则说明峰值过于激进。
+- **Level 4:** 为什么当训练周期拉长时，固定步数的预热配置会彻底失效？ Expected: 2000 步在 2 万步训练中占 10%，但在 2 亿步训练中占比微乎其微几乎等于没有预热；采用总步数的百分比定义才能保持调度形态的一致性。
+- **Level 4:** 当修改了训练批次大小（batch size）时，调度配置中首先需要重新审视什么？ Expected: 重新审视预热步长与峰值学习率；调度器课程明确指出预热周期是调整批大小后必须同步联动的核心超参数。
 
 ## Wrong answers
 
-- "Warmup wastes steps at a low rate." The lessons spend 1 to 5 percent of training on it, and a run that diverges in its first steps wastes all of them.
-- "Bias correction already handles Adam's cold start, so warmup is redundant." The correction rescales the averages; it cannot turn two samples into a good estimate.
-- "Set the warmup to 2000 steps, the big runs use that." That count was a fraction of one specific run; on a short run it is most of the training, and on a longer one it is nothing.
+- "低学习率的预热阶段纯属浪费珍贵的训练步数。" 课程通常仅将总训练预算的 1% 到 5% 分配给预热，而一旦在最初几步发生发散崩溃，此前耗费的所有算力将被彻底浪费。
+- "偏差校正已经完美解决了冷启动问题，预热纯属多此一举。" 偏差校正修复的是期望均值的尺度偏差，无法平滑极少数早期梯度的剧烈随机方差噪声。
+- "直接将预热设为 2000 步，因为很多大型经典模型都这么用。" 那个数字是针对其特定数亿甚至数十亿 token 任务的等比折算；在短任务中它会占据过半流程，在长任务中则形同虚设。
 
 ## Taught in
 
-The [learning rate schedules lesson](../../../phases/03-deep-learning-core/09-learning-rate-schedules/) explains warmup and gives the published configurations, and the [cosine warmup capstone](../../../phases/19-capstone-projects/44-cosine-lr-warmup/) argues for a fractional warmup and logs the gradient norm beside the rate.
+[学习率调度器课程](../../../phases/03-deep-learning-core/09-learning-rate-schedules/)阐述了预热原理并给出了业界公开配置，[余弦退火预热综合实战](../../../phases/19-capstone-projects/44-cosine-lr-warmup/)论证了按比例配置预热的原则并规范了梯度范数打点。

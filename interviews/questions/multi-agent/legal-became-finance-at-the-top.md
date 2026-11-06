@@ -1,6 +1,6 @@
 ---
 id: legal-became-finance-at-the-top
-title: The legal question came back as finance findings
+title: 法务问题最终返回了财务结论
 card: multi-agent
 kind: debug
 level: 3
@@ -16,57 +16,57 @@ related: [multi-agent/two-workers-return-different-facts]
 updated: 2026-11-03
 ---
 
-A three-level agent hierarchy reviews a contract. The top manager splits the work into an engineering branch and a legal branch, each with its own sub-manager and workers. The final report is complete and confident, and it contains finance findings where the legal review should be. Nobody asked a finance question. Trace the failure and say what you change in the design.
+一个三层 agent 层级审查一份合同。顶层管理者将工作拆解为工程分支和法务分支，每个分支都有自己的子管理者和 worker。最终报告完整且自信，但在法务审查应该出现的地方却包含了财务发现。没有人问过财务问题。追踪该故障并说明你在设计中做出的改变。
 
 ## Short answer
 
-The top manager mislabeled the legal branch as finance when it decomposed the task. The sub-manager did what it was given, the workers did finance work well, and the top synthesizer reported finance findings. The error surfaced only at the top, one level away from any point where a human could have caught it. The design fixes are a depth cap of two, provenance on every synthesis, a logged decomposition that is checked against the original question, and a canary worker that is always asked the user's question unchanged.
+顶层管理者在拆解任务时误将法务分支标记为财务。子管理者按照分配的任务执行，worker 出色地完成了财务工作，顶层合成器汇报了财务发现。错误直到顶层才显现，与人类本可发现它的任何位置相隔一层。设计修复方案是深度限制为两层、每次合成附加溯源、记录拆解并对照原始问题核对，以及一个始终接收原始用户问题的金丝雀 worker。
 
 ## Full answer
 
-### Why hierarchy hides this
+### 为什么层级会隐藏这一点
 
-A human manager has stable knowledge of what each team does. A model manager re-derives the whole structure every turn from whatever is in its context. A small drift in that context changes the decomposition, and every level below works on the drifted version in good faith. The lesson names three failure modes, and this incident is the first:
+人类管理者对于每个团队的工作有着稳定的认识。模型管理者每轮都必须根据其上下文中的内容重新推导整个结构。该上下文中的微小漂移会改变拆解，下面的每一层都会真诚地处理漂移后的版本。课程列出了三种故障模式，本事件属于第一种：
 
-| Failure | Mechanism |
+| 故障 | 机制 |
 |---|---|
-| Task assignment error | The manager hallucinates a decomposition and sends work to the wrong branch |
-| Output misinterpretation | A sub-manager returns "unable to verify claim X" and the top reports "claim X not confirmed", and meaning drifts at every level |
-| Consensus loop | Two sub-managers disagree, the top asks them to reconcile, they re-delegate, workers re-run, and the loop continues until a step limit |
+| 任务分配错误 | 管理者产生拆解幻觉并将工作发送给错误的分支 |
+| 输出误解 | 子管理者返回“无法验证主张 X”，顶层汇报“主张 X 未被证实”，且含义在每一层发生漂移 |
+| 共识循环 | 两个子管理者意见相左，顶层要求他们调和，他们重新委派，worker 重新运行，循环持续到步数限制 |
 
-### Trace it
+### 追踪它
 
-1. Read the top manager's decomposition log. The branch label is "finance", not "legal".
-2. Read the sub-manager's input. It received a finance task and had no way to know it was wrong.
-3. Read the synthesis. It cites finance findings. The original legal question appears nowhere.
+1. 阅读顶层管理者的拆解日志。分支标签是“finance”，而不是“legal”。
+2. 阅读子管理者的输入。它接收到了财务任务，无法得知它是错的。
+3. 阅读合成结果。它引用了财务发现。原始法务问题未出现在任何地方。
 
-The side-by-side of what was asked and what was delivered is the whole diagnosis.
+并排对比所问内容与交付内容，就是全部的诊断。
 
-### The design changes
+### 设计变更
 
-- **Cap the depth at two.** Three levels already hide most errors from observability.
-- **Provenance on every synthesis.** Each node's summary cites the leaf outputs that produced it, so a report can be traced to the workers who wrote it.
-- **Alert on decomposition drift.** Log the manager's decomposition at each step and compare it with the user's question. When the decomposition no longer covers the question, fire an alert before the workers start.
-- **A canary worker per sub-manager.** One worker is always asked the original question unchanged. When the canary's answer disagrees with the synthesized answer, the manager stops and escalates instead of merging.
-- **An explicit reconciliation budget.** Set the rounds before the top must commit, usually two.
+- **将深度限制为两层。** 到了三层，大多数错误就已无法从观测数据中看见。
+- **每次合成附加溯源。** 每个节点的摘要引用产生它的叶子输出，以便报告可以追溯到编写它的 worker。
+- **针对拆解漂移报警。** 在每一步记录管理者的拆解并将其与用户的问题做比对。当拆解不再涵盖问题时，在 worker 启动前发出告警。
+- **每个子管理者一个金丝雀 worker。** 一个 worker 始终被询问未修改的原始问题。当金丝雀的答案与合成答案不一致时，管理者停止并升级，而不是合并。
+- **显式的调和预算。** 规定顶层必须作出决定前最多允许调和几轮，通常为两轮。
 
-### The deciding question
+### 决定性问题
 
-Before you keep the hierarchy, ask whether the task has independent sub-teams or is a linear flow that looks like a tree. A contract review with legal and engineering branches is a real tree. A task where step two needs step one is a pipeline, and sequential beats hierarchical there.
+在保留层级之前，询问该任务是否具有独立的子团队，还是看似树状的线性流程。带有法务和工程分支的合同审查是一棵真正的树。第二步需要第一步的任务是流水线，而在那里顺序执行胜过层级结构。
 
 ## Follow-ups
 
-- **Level 3:** How many levels did the error travel before the output diverged from the question? Expected: one, because the mislabel happened at the top and every level below executed it faithfully, which is why the depth cap is two.
-- **Level 3:** The canary's answer and the merged answer differ. What does the manager do? Expected: stop, record both answers with provenance, and escalate to a human or re-decompose, never merge the two.
-- **Level 4:** How do you detect meaning drift between levels? Expected: compare each node's summary with the leaf outputs it cites, and flag a summary that changes the modality of a claim, such as unverified becoming false.
-- **Level 4:** The reconciliation loop keeps hitting its step limit. What does that tell you? Expected: the limit is now a hyperparameter that hides a disagreement, so either the decomposition is wrong or the question has no single answer, and the top must report the disagreement.
+- **Level 3:** 在输出与问题发生偏离之前，错误传递了多少层？ Expected: 一层，因为错误标签发生在顶层，且其下的每一层都忠实执行了它，这正是深度限制为两层的原因。
+- **Level 3:** 金丝雀的答案与合并后的答案不同。管理者怎么做？ Expected: 停止，记录两个带有溯源的答案，并升级给人类或重新拆解，绝不合并两者。
+- **Level 4:** 你如何检测层级之间的含义漂移？ Expected: 对比每个节点的摘要与其引用的叶子输出，并标记改变主张情态的摘要，例如未验证变为错误。
+- **Level 4:** 调和循环不断达到其步数限制。这说明了什么？ Expected: 该限制现在是掩盖分歧的超参数，因此要么拆解是错误的，要么问题没有单一答案，顶层必须汇报该分歧。
 
 ## Wrong answers
 
-- "Add a fourth level to check the third." More levels hide more errors from observability, and the fix is fewer levels with provenance.
-- "Tell the sub-manager to double-check the task it receives." The sub-manager had no access to the original question, and a canary worker is the mechanism that gives it one.
-- "Use a bigger model for the top manager." A bigger manager still re-derives the structure each turn from its context, and the mislabel is a context drift, not a capability gap.
+- "添加第四层来检查第三层。" 层级越多，从观测数据中看不到的错误也越多，修复方法是带有溯源的更少层级。
+- "让子管理者仔细核对其接收的任务。" 子管理者无法接触原始问题，金丝雀 worker 是赋予其这一机制的手段。
+- "对顶层管理者使用更大的模型。" 更大的管理者每轮仍会根据其上下文重新推导结构，错误标签属于上下文漂移，而不是能力差距。
 
 ## Taught in
 
-The [hierarchical architecture lesson](../../../phases/16-multi-agent-and-swarms/06-hierarchical-architecture/) runs the happy path against the mislabeled path and lists the guards.
+[层级架构课程](../../../phases/16-multi-agent-and-swarms/06-hierarchical-architecture/)对比了正常路径与错误标记的路径，并列出了防护措施。

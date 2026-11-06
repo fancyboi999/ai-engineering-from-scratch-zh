@@ -1,6 +1,6 @@
 ---
 id: pick-the-permission-mode
-title: Pick the permission mode for the task in front of you
+title: 为眼前的任务选择权限模式
 card: agents
 kind: tradeoff
 level: 2
@@ -16,50 +16,50 @@ related: []
 updated: 2026-11-03
 ---
 
-A coding agent offers six permission modes, from one that asks before every action to one that approves everything. A colleague runs every task in the mode that approves everything, because the prompts are annoying. Give the rule you use to pick a mode, and say which tasks go where.
+一个编码 agent 提供了六种权限模式，从每个动作前都征询确认，到全自动批准所有操作。一位同事在执行所有任务时都直接选用全自动批准模式，理由是频繁弹窗确认太烦人。请给出你挑选权限模式的准则，并说明不同任务应该分别归入哪种模式。
 
 ## Short answer
 
-Pick the mode from the task, not from the annoyance. Start an unfamiliar or production-adjacent task in plan mode, where reading the plan is cheaper than undoing a bad run. Use the default mode for most interactive sessions, and the mode that auto-approves file writes for a known refactor across many files. Reserve the classifier-driven auto mode for unattended runs inside a workspace whose reach you have measured, and reserve the approve-everything mode for a disposable container.
+应当根据任务本身的风险特征而非操作员的烦躁程度来选择模式。对于不熟悉或邻近生产环境的任务，先在 plan 模式下启动，因为审查方案的成本远低于撤销一次失败的运行。在大多数交互式会话中使用 default 模式，而在执行已知的跨文件重构时采用自动批准文件写入的 acceptEdits 模式。将基于分类器模型的 auto 模式留给在权限边界可度量的工作空间内执行的无人值守任务，并将批准所有操作的 bypassPermissions 模式严格限制在可随时销毁的容器环境中。
 
 ## Full answer
 
-### The ladder
+### 权限阶梯
 
-| Mode | Behavior | Fits |
+| 模式 | 运行机制 | 适用场景 |
 |---|---|---|
-| `plan` | The agent proposes a plan, and every action is reviewed before it runs | An unfamiliar task, code near production, the first run on a repo |
-| `default` | Actions run, and the agent asks on anything risky such as shell, destructive operations or network | Most interactive sessions |
-| `acceptEdits` | File writes are approved, and shell and network still ask | A refactor across many files |
-| `auto` | A separate classifier model reviews each action and blocks escalation beyond the request | A long unattended run in a constrained workspace |
-| `dontAsk` | Never prompts, and anything not pre-approved by a rule is denied | Ephemeral sandboxes, CI jobs |
-| `bypassPermissions` | Approves everything | Only a container you are willing to throw away |
+| `plan` | Agent 提出执行规划，每个操作在执行前都必须人工审查 | 陌生任务、靠近生产环境的代码、首次在某仓库运行 |
+| `default` | 普通操作自动运行，遇到 shell、破坏性操作或网络请求等风险时弹窗确认 | 大多数交互式日常开发会话 |
+| `acceptEdits` | 自动批准文件写入，shell 与网络操作依然弹窗确认 | 跨多个文件的批量重构 |
+| `auto` | 独立的分类器模型审查每个操作，阻断超出请求范围的越权提升 | 受限工作空间内的长时间无人值守运行 |
+| `dontAsk` | 从不提示，任何未被规则预先批准的操作均被拒绝 | 临时沙箱环境、CI 自动化流水线 |
+| `bypassPermissions` | 无条件自动批准一切操作 | 仅用于随时可以丢弃销毁的容器 |
 
-### What the classifier mode adds and misses
+### 分类器模式提供了什么，又漏掉了什么
 
-The auto mode moves approval off the user's path. A separate model judges each proposed action against the declared task and the session state, and a blocked action falls back to the user. It catches plain prompt injection that maps to a known risky action shape, repeated tool loops where action N+1 looks like action N five times in a row, and shell commands that are out of place in a file-edit session. It misses subtle injection that changes behavior without one flagged action, and it misses a harmful trajectory made of individually safe actions, because it judges the action and does not re-derive the user's intent. Availability depends on plan, organization, model and provider, and the documentation is explicit that the classifier is a layer, not a solution.
+Auto 模式将审批工作从用户的视线中移开。一个独立的判别模型根据声明的任务目标和会话状态裁决每个拟执行操作，一旦被阻断则回退给人工确认。它能有效捕获与已知风险操作相符的初级 prompt 注入、连续五次动作 N+1 与动作 N 相似的重复死循环，以及在文件编辑会话中突然出现的异常 shell 命令。但它会漏掉在不触发单次敏感操作的情况下改变程序行为的隐蔽注入，也会漏掉由多个单独看完全合法的操作组合而成的恶意执行轨迹，因为分类器只针对单次操作打分，并不重新推演用户的真实全盘意图。其可用性因套餐、组织、模型和供应商而异，官方文档明确强调分类器只是一道防御层，绝非一劳永逸的终极解决方案。
 
-### Budgets travel with the mode
+### 预算控制必须随模式同行
 
-Whatever the mode, set the budget controls: a cap on turns, a dollar cap that aborts the session, and action-count limits per tool. In the unattended case, add an allowlist, an isolated workspace with no credentials and no production mounts, and a trajectory audit afterwards.
+无论选用哪种模式，都必须配置预算门禁：轮数上限、超出即中止会话的金额上限，以及针对每个工具的操作次数上限。在无人值守场景下，还必须追加权限白名单、不挂载凭证与生产目录的隔离工作空间，以及事后的轨迹审计。
 
-### The answer to the colleague
+### 对那位同事的回答
 
-The approve-everything mode is documented for a disposable container. On a laptop with credentials, a browser session and an open terminal, the attack surface is everything the agent can reach. The prompts are the control, and the fix for too many prompts is a mode one step up the ladder, not the top of it.
+文档明确指明全自动批准模式仅限在一次性容器中使用。在存有认证凭据、登录中浏览器以及打开终端的个人电脑上，攻击面是 agent 所能触及的所有资源。确认弹窗就是安全控制手段，解决过多弹窗的正确做法是向权限阶梯上方移动一个台阶，而不是直接跳到顶端放开所有限制。
 
 ## Follow-ups
 
-- **Level 2:** Why does the refactor mode still ask on shell commands? Expected: a file write is reversible from version control, while a shell command can delete, send or install, so the mode approves the cheap-to-undo class only.
-- **Level 2:** How does the never-prompt mode differ from the top of the ladder? Expected: the never-prompt mode denies anything that a rule did not pre-approve, while the approve-everything mode approves it.
-- **Level 3:** An unattended run needs a 24-hour budget. What do you set? Expected: a turn cap, a dollar cap, per-tool action caps and an allowlist, each with a reason, inside a workspace with no credentials and no egress you did not opt into.
-- **Level 3:** The classifier approved every action and the run still exfiltrated data. How? Expected: a sequence of allowed actions, such as writing data you own to a file and then pushing to a public repository, where the composition is the problem and no single action was flagged.
+- **Level 2:** 为什么重构模式（acceptEdits）在执行 shell 命令时依然需要询问？ Expected: 文件修改在版本控制系统中有迹可循且易于回滚，而 shell 命令能执行删除、外发或安装，该模式仅放行低回滚成本的操作。
+- **Level 2:** 从不提示模式（dontAsk）与阶梯顶端的全批准模式有何不同？ Expected: 从不提示模式会拒绝任何未被规则预先批准的操作，而全自动批准模式则直接批准它。
+- **Level 3:** 一次无人值守运行需要 24 小时的预算周期，应该配置什么？ Expected: 轮数上限、金额上限、单工具调用上限和工具白名单，且各自附带依据，运行在无外部凭据与未经许可网络出口的隔离工作区内。
+- **Level 3:** 分类器批准了每一个单步操作，但整个运行依然导致了数据泄露，这是如何发生的？ Expected: 通过一系列本身合法的单步操作组合实现，例如先将私有数据写入本地文件再 push 到公共仓库，组合方式引发了越权，但单步操作未被标记。
 
 ## Wrong answers
 
-- "Approve everything, because the agent is in version control anyway." Version control covers file writes, and the risk is in shell, network and credentials, which no commit reverts.
-- "The classifier mode is safe for anything, because a model reviews each step." The classifier judges actions, not trajectories, and the documentation pairs it with budgets, allowlists and isolation.
-- "Plan mode is for beginners." Plan mode is for the task where a wrong run costs more than a read, and that is a property of the task, not of the operator.
+- "全盘批准所有操作即可，反正 agent 的修改都在版本控制里。" 版本控制只覆盖文件修改，真正的风险在于 shell、网络通信和凭证窃取，这些无法靠 commit 回滚。
+- "分类器模式对任何场景都是安全的，因为每一步都有模型把关。" 分类器审查的是单步操作而非全局轨迹，官方文档要求将其与预算、白名单及环境隔离配合使用。
+- "Plan 模式只是给新手用的。" Plan 模式适用于错误执行成本远高于阅读成本的关键任务，这是任务本身的属性决定的，而不是操作员水平决定的。
 
 ## Taught in
 
-The [permission modes lesson](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/) lays out the six modes, the classifier and the budget controls.
+[自主 Agent 的权限模式](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/)课程详细阐述了六种权限模式、分类器机制以及预算控制体系。

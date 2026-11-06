@@ -1,6 +1,6 @@
 ---
 id: human-captions-beat-distillation
-title: Dense human captions or two million distilled ones
+title: 详尽人工标注描述还是两百万条模型蒸馏描述
 card: multimodal
 kind: tradeoff
 level: 3
@@ -16,51 +16,51 @@ related: [multimodal/which-knob-first]
 updated: 2026-11-03
 ---
 
-You can spend your data budget on one of two things: have a strong proprietary model write captions for two million images, or pay people to describe seven hundred thousand images in detail by speaking for a minute or more about each one. Which do you choose for a new vision-language model, and what is the evidence?
+数据预算只能花在以下一件事上：让强大的专有模型为两百万张图像写描述，或付费请人详细描述七十万张图像，每张口述一分钟或更久。为新的视觉语言模型，你会选哪一种？证据是什么？
 
 ## Short answer
 
-Pay the people. The reference result is a model trained on 712K densely captioned images and no distilled captions that beat a much larger model on 11 of 11 benchmarks. Dense human captions carry 5 to 10 times the information of a short web caption and stay grounded in the image, while distilled captions inherit the hallucinations of the model that wrote them; about 12 percent of crawled pairs already describe things that are not in the image. Caption density beats caption quantity, which beats distillation convenience.
+付费请人描述。参考结果中，一个用 712K 张密集描述图像训练、未使用蒸馏描述的模型，在全部 11 项基准上击败了大得多的模型。密集人工描述的信息量是简短网络描述的 5 到 10 倍，而且以图像为依据；蒸馏描述则会继承生成模型的幻觉，爬取的图文对中已有约 12% 描述了图中不存在的东西。描述密度胜过描述数量，描述数量又胜过蒸馏的便利。
 
 ## Full answer
 
-### The evidence
+### 证据
 
-- The dense-caption recipe: annotators described each image for one to three minutes in speech, transcribed to text, which gave 712K densely captioned images. The 72B model trained on them beat a 90B competitor on every one of 11 benchmarks. The difference was not architecture.
-- Two other datasets followed the same path with mixed human and synthetic captions, and the trend across them is that density wins.
-- The first visual instruction set was written by a text-only model from captions and boxes without seeing the image, 158k turns; it worked to unlock dialogue, with noise.
+- 密集描述方案：标注员对每张图像口述一到三分钟，再转录成文本，得到 712K 张密集描述图像。用这些数据训练的 72B 模型在全部 11 项基准上击败了一个 90B 模型。差别不在架构。
+- 另外两个数据集也采用了这种路线，混合人工和合成描述；它们共同呈现的趋势是密集描述胜出。
+- 最早的视觉指令集由纯文本模型根据图像描述和边界框生成，没有看过图像，共 15.8 万轮；它带来了对话能力，也含有噪声。
 
-### Why density beats volume
+### 为什么密度胜过数量
 
-A dense caption of 80 to 300 tokens names objects, counts, relations, text in the image and context; a web alt text names one thing. For alignment and instruction tuning the model learns from what the caption says about the image, so the information per image is the currency, not the image count.
+80 到 300 个 token 的密集描述包含物体、数量、关系、图中文字和上下文；网页替代文本只提及一个事物。在对齐和指令微调中，模型从描述对图像的说明中学习，因此衡量数据价值的是单张图像的信息量，而非图像数。
 
-### Why distillation is risky
+### 为什么蒸馏有风险
 
-The writing model does not see what it does not see. It hallucinates plausible content, and the student learns to hallucinate with the same confidence. A benchmark built from similar data does not punish it; production users do.
+生成描述的模型看不到的东西，就是看不到。它会编造看似合理的内容，学生模型则学会同样自信地编造。基于类似数据构建的基准不会惩罚这种行为，生产环境的用户却会。
 
-### When distillation still has a place
+### 蒸馏仍适用的场景
 
-- Bootstrapping a new domain fast, before human data arrives.
-- Generating questions and answers from a human-written caption, which keeps the grounding in the caption.
-- Filtered: score each synthetic caption against the image with a contrastive checker and drop the ungrounded tail.
+- 人工数据到位前，快速启动新领域。
+- 根据人工描述生成问答，使内容仍以描述为依据。
+- 过滤后使用：用对比检查器衡量每条合成描述与图像的匹配程度，丢掉缺乏图像依据的尾部样本。
 
-### What to do with the budget
+### 如何分配预算
 
-Dense human captions for the alignment and instruction stages, task-specific instruction data on top, and synthetic data only where a human caption anchors it. Measure grounding on a held-out human-labelled set, not only benchmark accuracy.
+对齐和指令阶段使用密集人工描述，再加上任务专用的指令数据；合成数据只用在有人工描述作依据的地方。在留出的人工标注集上衡量内容是否有图像依据，不要只看基准准确率。
 
 ## Follow-ups
 
-- **Level 3:** Why did the speech-based collection matter? Expected: people say far more in a minute than they type, so the captions are long and specific at a cost that scales.
-- **Level 3:** How do you check that a synthetic caption is grounded? Expected: embed the image and the caption with a contrastive checker and flag low similarity, then read a sample; drop or rewrite the tail.
-- **Level 4:** How would you prove to a skeptic that the gain is data and not model size? Expected: the reference comparison beat a larger model; replicate at one size with two data mixes and the same encoder, connector and schedule.
-- **Level 4:** Where in the three-stage pipeline do dense captions pay most? Expected: alignment and the first instruction stage, where the projector and the language model learn what an image contains; task-specific data pays in the last stage.
+- **Level 3:** 为什么口述采集很重要？ Expected: 人在一分钟内说出的内容比打出的多得多，因此能以可扩展的成本得到长而具体的描述。
+- **Level 3:** 如何检查合成描述是否有图像依据？ Expected: 用对比检查器生成图像和描述的嵌入，标出低相似度样本，再抽样阅读；丢弃或重写尾部样本。
+- **Level 4:** 如何向质疑者证明提升来自数据，而非模型规模？ Expected: 参考对比击败了更大的模型；在相同规模下，用两种数据混合方案复验，保持编码器、连接器和调度相同。
+- **Level 4:** 三阶段流水线中，密集描述在哪些阶段收益最大？ Expected: 对齐和第一个指令阶段，投影层与语言模型在这些阶段学习图像包含什么；任务专用数据在最后阶段收益更大。
 
 ## Wrong answers
 
-- "Two million captions beat seven hundred thousand; more data wins." The reference result beat a larger model with fewer, denser, grounded captions; volume of thin or hallucinated captions is no substitute.
-- "The strong model's captions are better than what annotators write." They are longer than web captions but not grounded; the model describes what it expects, and the student learns the same habit.
-- "Caption quality only matters for captioning tasks." The reference model gained on every benchmark, reasoning and reading included, because the alignment stage learned more about each image.
+- "两百万条描述胜过七十万条，数据越多越好。" 参考结果用更少但更密集、更有图像依据的描述击败了更大的模型；大量信息稀薄或含幻觉的描述不能替代它们。
+- "强模型的描述比标注员写得更好。" 它们比网络描述长，却缺乏图像依据；模型描述自己预期的内容，学生模型也会学会这个习惯。
+- "描述质量只对图像描述任务重要。" 参考模型在所有基准上都有提升，包括推理和阅读，因为对齐阶段学到了每张图像的更多信息。
 
 ## Taught in
 
-The [open-weight recipes lesson](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/) gives the dense-caption result and the data axis, the [vision-language models lesson](../../../phases/04-computer-vision/25-vision-language-models/) quantifies the ungrounded pairs, and the [LLaVA lesson](../../../phases/12-multimodal-ai/05-llava-visual-instruction-tuning/) shows the generated instruction data that started the field.
+[开放权重训练方案课程](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/)给出了密集描述的结果和数据维度分析，[视觉语言模型课程](../../../phases/04-computer-vision/25-vision-language-models/)统计了缺乏图像依据的图文对，[LLaVA 课程](../../../phases/12-multimodal-ai/05-llava-visual-instruction-tuning/)展示了推动该领域起步的合成指令数据。

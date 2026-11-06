@@ -1,6 +1,6 @@
 ---
 id: emergence-or-scorer-artifact
-title: A benchmark jumps between two model sizes
+title: 基准分数在两个模型规模之间跳变
 card: transformers
 kind: concept
 level: 4
@@ -16,48 +16,48 @@ related: [transformers/compute-split-params-tokens]
 updated: 2026-11-03
 ---
 
-Between two model sizes a benchmark accuracy goes from near zero to high. The team calls it an emergent ability and asks for a larger budget to find the next jump. How do you evaluate the claim before you sign?
+在两个模型规模之间，某个基准的准确率从接近零跳到很高。团队称之为涌现能力，并申请更大的预算去找下一次跳变。签字之前，你怎么评估这个说法？
 
 ## Short answer
 
-Ask what the scorer is. Exact match and thresholded accuracy are discontinuous: a model that gets most digits right scores zero until it gets all of them right, so a smooth gain in the underlying probabilities shows up as a cliff. Re-score the same checkpoints with a continuous metric such as the cross-entropy of the target answers; if that curve is smooth, the jump belongs to the scorer and not to the model. Plan the budget against the continuous curve, which the scaling law predicts reliably.
+先问评分方式是什么。精确匹配和带阈值的准确率是不连续的：一个模型答对了大多数数位，但在全部答对之前得分都是零，所以底层概率的平滑提升会显示成一道悬崖。用连续指标重新给同一批检查点打分，比如目标答案的交叉熵；如果这条曲线是平滑的，跳变属于评分方式，而不属于模型。按连续曲线规划预算，scaling law 能可靠地预测它。
 
 ## Full answer
 
-### The argument
+### 论证
 
-The 2023 analysis of emergence showed that the abilities usually cited, arithmetic and multi-step reasoning among them, were measured with discontinuous scoring. Under a continuous metric the same models improve smoothly with scale. By 2026 the working consensus is: predictions from continuous loss are reliable, and benchmark jumps are often artifacts of the scorer.
+2023 年对涌现的一项分析表明，常被引用的那些能力，包括算术和多步推理，都是用不连续的评分方式测出来的。换成连续指标，同样的模型随规模平滑提升。到 2026 年，业内的共识是：根据连续损失做的预测是可靠的，基准分数的跳变常常是评分方式造成的假象。
 
-### What to do with the checkpoints you have
+### 已有的检查点怎么用
 
-1. Keep the prompts and the targets fixed.
-2. For each checkpoint, log the per-token probability of the correct answer and the cross-entropy over the answer tokens.
-3. Plot both against the parameter count and against the training compute.
-4. Add a partial-credit scorer, such as the share of correct digits, to see where the cliff disappears.
+1. 固定 prompt 和目标答案。
+2. 对每个检查点，记录正确答案每个 token 的概率，以及答案 token 上的交叉熵。
+3. 分别以参数量和训练算力为横轴，画出这两个指标。
+4. 加一个给部分分的评分方式，比如答对数位的比例，看悬崖在哪里消失。
 
-If the probability curve is smooth, the model was getting closer all along and the benchmark hid it.
+如果概率曲线是平滑的，说明模型一直在逐步接近答案，只是基准把这一点藏住了。
 
-### What it means for the budget
+### 这对预算意味着什么
 
-Fit the loss on the checkpoints and read where the next size lands on the continuous curve. Then calibrate the discontinuous benchmark against that curve: at which loss does accuracy cross the product threshold? Sample more sizes near that point instead of betting on a surprise. A product threshold can be real for the user and still be predictable for the planner.
+在这些检查点上拟合损失，读出下一个规模会落在连续曲线的什么位置。然后用这条曲线校准不连续的基准：损失降到多少时，准确率会越过产品门槛？在那个点附近多采样几个规模，而不是押注一次意外。一个产品门槛对用户来说可以是真实的，对规划者来说仍然可以预测。
 
-### Where real changes of regime do show up
+### 真正的机制变化出现在哪里
 
-In-context learning, following a few examples with no fine-tuning, is usually described as appearing around the 6B to 13B range. The lesson's position is still to measure it with a continuous metric before you call it a discontinuity, because the same scorer problem applies.
+上下文学习，即不微调、只看几个例子就照着做，通常被描述为在 6B 到 13B 的范围出现。课程的立场仍然是：在称它为不连续之前，先用连续指标测量，因为同样的评分问题也适用于它。
 
 ## Follow-ups
 
-- **Level 3:** Give an example of a discontinuous scorer and its continuous counterpart. Expected: exact match on a multi-digit answer against the log-probability or the digit-level accuracy of the same answer.
-- **Level 4:** How does this change the way you plan a training budget? Expected: predict the loss from the law, calibrate the benchmark against the loss, and place runs near the threshold instead of hoping for a jump.
-- **Level 4:** The product threshold really is binary for the user. Does the artifact argument still matter? Expected: yes; the threshold is real for the product, but its position is predictable from the smooth curve, which is what you need to budget.
-- **Level 4:** What would convince you that a jump is not a scorer artifact? Expected: the continuous metric also shows a kink at the same scale, replicated across seeds and data orderings.
+- **Level 3:** 举一个不连续的评分方式和它对应的连续指标。 Expected: 多位数答案的精确匹配，对应同一答案的对数概率或逐位准确率。
+- **Level 4:** 这会怎样改变你规划训练预算的方式？ Expected: 用定律预测损失，用损失校准基准，把训练放在门槛附近，而不是指望一次跳变。
+- **Level 4:** 对用户来说，产品门槛确实是二元的。假象这个论点还重要吗？ Expected: 重要；门槛对产品是真实的，但它的位置能从平滑曲线预测出来，而做预算需要的正是这个位置。
+- **Level 4:** 什么能让你相信一次跳变不是评分方式的假象？ Expected: 连续指标在同一规模上也出现拐点，并且在不同随机种子和数据顺序下都能复现。
 
 ## Wrong answers
 
-- "Accuracy is the ground truth and loss is a proxy." Accuracy with a hard threshold throws away the information that shows the trend; the loss is what the model optimizes and what the law predicts.
-- "Emergence means the scaling law broke." The law describes the continuous loss, which keeps its shape while the thresholded score jumps.
-- "Train the bigger model and see." That is the expensive experiment the analysis lets you avoid; re-score what you already have first.
+- "准确率才是真实答案，损失只是替代指标。" 带硬阈值的准确率丢掉了显示趋势的信息；损失才是模型优化的对象，也是定律预测的对象。
+- "涌现说明 scaling law 失效了。" 定律描述的是连续损失；带阈值的分数跳变时，连续损失的形状不变。
+- "训练更大的模型试试就知道了。" 这正是这项分析能让你省掉的昂贵实验；先给手头已有的检查点重新打分。
 
 ## Taught in
 
-The [scaling laws lesson](../../../phases/07-transformers-deep-dive/13-scaling-laws/) covers emergence against smooth loss, and the [causal language modeling lesson](../../../phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/) places in-context learning on the scale axis.
+[scaling law 一课](../../../phases/07-transformers-deep-dive/13-scaling-laws/)对比了涌现和平滑的损失，[因果语言建模一课](../../../phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/)把上下文学习放到了规模轴上。

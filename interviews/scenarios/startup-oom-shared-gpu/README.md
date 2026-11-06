@@ -1,6 +1,6 @@
 ---
 id: startup-oom-shared-gpu
-title: Startup out of memory on a shared GPU
+title: 共享 GPU 上的启动显存不足
 card: scenarios
 kind: incident
 level: 2
@@ -24,52 +24,53 @@ source:
   - manuals/vllm-101/sections/2-2-fix-out-of-memory-at-startup.md
 ---
 
+
 ## Situation
 
-An on-call engineer deploys `Qwen/Qwen3-8B` with vLLM on the second L4 of a node. Another team runs its pods on that GPU and holds part of its memory. The server stops before it prints the KV cache size line, and the log ends with a `ValueError` that names a maximum of 40,960 tokens.
+一名值班工程师在节点的第二张 L4 上用 vLLM 部署 `Qwen/Qwen3-8B`。另一个团队也在这张 GPU 上运行 pod，占用了部分显存。服务器在打印 KV cache 容量行之前就停止了，日志末尾是一个提到最大长度为 40,960 token 的 `ValueError`。
 
-A colleague has seen the error before and sets two flags: `--gpu-memory-utilization 0.83`, to stay under the memory that the other team uses, and `--max-model-len 2928`, which matches the pool of 2,928 tokens that they want for a test. The server fails again, with almost the same message. The engineer now wants to raise the memory fraction to 0.95 and try once more.
+一位同事见过这个错误，于是设置了两个参数：`--gpu-memory-utilization 0.83`，以避开另一个团队使用的显存；`--max-model-len 2928`，与测试所需的 2,928 token 内存池大小一致。服务器再次失败，报错几乎相同。工程师现在想把内存比例提高到 0.95，再试一次。
 
 ## Evidence
 
-- [the first start, with the default maximum model length](evidence/default-length-fails.txt)
-- [the second start, with the maximum length set to the pool size](evidence/tight-length-fails.txt)
-- [a start on the same shared GPU that reached the pool line](evidence/a-start-that-works.txt)
-- [the three startup failures and the flag for each](evidence/three-cases.txt)
+- [首次使用默认最大模型长度启动时的失败日志](evidence/default-length-fails.txt)
+- [第二次将最大长度设为目标显存池容量时的失败日志](evidence/tight-length-fails.txt)
+- [同一张共享显卡上顺利完成启动并打印显存池的成功案例](evidence/a-start-that-works.txt)
+- [三类典型的启动故障模式及其对应的核心调优参数](evidence/three-cases.txt)
 
 ## Questions
 
-1. The error names 40,960 tokens. Where does that number come from, and why does one request at that length decide whether the server starts?
-2. The second attempt set the maximum length to the pool size and missed by 16 tokens. Explain the arithmetic that the error line shows.
-3. On a shared GPU, what does the memory fraction describe, and why is raising it the wrong first move?
-4. Which startup line proves that a fix worked, and what do you compare it with?
-5. Put the three flags in the order you would change them, and name the log text that points to each.
+1. 报错提到了 40,960 个 token。这个数从哪里来？为什么一个该长度的请求能否放下，决定了服务器能否启动？
+2. 第二次尝试把最大长度设为池大小，却差了 16 个 token。解释报错行中的计算。
+3. 在共享 GPU 上，内存比例描述的是什么？为什么不应先提高它？
+4. 哪一行启动日志能证明修复有效？应把它与什么比较？
+5. 按你会调整的顺序排列这三个参数，并指出哪些日志文本提示你调整哪个参数。
 
 ## Walkthrough
 
-Read the first error from the end. vLLM must be able to serve at least one request at the model's maximum sequence length. For this model that length is 40,960 tokens, taken from the model config when nobody sets `--max-model-len`. One request of that length needs 5.62 GiB of KV cache, and after the weights and the startup profile only 1.01 GiB was free on this shared card. The message even computes the answer: the estimated maximum model length is 7,360 tokens. The server did not fail because the GPU is too small for the model. It failed because the default length is far longer than any request the service will send.
+从末尾读第一条错误。vLLM 必须至少能服务一个达到模型最大序列长度的请求。没有人设置 `--max-model-len` 时，这个模型会从模型配置中取得 40,960 token 的长度。一个该长度的请求需要 5.62 GiB 的 KV cache，加载权重并完成启动性能分析后，这张共享卡上只剩下 1.01 GiB。消息甚至算出了答案：估计最大模型长度为 7,360 个 token。服务器失败不是因为 GPU 放不下模型，而是因为默认长度远大于服务实际会发送的任何请求。
 
-The second error is the same check with a different margin. The settings line shows `max_model_len` at 2,928, the fraction at 0.83 and a block override of 183 blocks of 16 tokens, which is 2,928 tokens. The check compares one request of the maximum length with the KV cache memory that the profile left, and that memory holds only 2,912 tokens. Both sides print as 0.4 GiB, so the check failed by a hair. A length equal to the pool that you want does not help when the profile leaves less memory than that pool.
+第二条错误做的是同一项检查，只是余量不同。配置行显示，`max_model_len` 为 2,928，比例为 0.83，块数覆盖值为 183 个块，每块 16 个 token，共 2,928 个 token。检查比较一个最大长度请求所需的空间与性能分析后剩余的 KV cache 内存，而剩余内存只能容纳 2,912 个 token。两边都打印为 0.4 GiB，所以检查只差一点就能通过。如果性能分析后剩余的内存小于目标池，把最大长度设成目标池大小也没有用。
 
-The third listing is what success looks like on the same card. A smaller model started with a fraction of 0.5, loaded 1.12 GiB of weights, and printed the two lines that matter: `Available KV cache memory: 9.02 GiB` and `GPU KV cache size: 84,480 tokens`, with the maximum concurrency for the default length at 2.06 times. Those two lines are the proof that a start reached the pool. The last listing maps the three errors to three flags. An error about the maximum sequence length points at `--max-model-len`. An error that the free memory is below the desired utilization points at `--gpu-memory-utilization`, or at the other process. A CUDA out of memory during the profile or the graph capture points at the batch limits or the graph capture size.
+第三份记录展示了在同一张卡上成功启动的样子。一个更小的模型以 0.5 的比例启动，加载了 1.12 GiB 的权重，并打印出两条关键日志：`Available KV cache memory: 9.02 GiB` 和 `GPU KV cache size: 84,480 tokens`，默认长度下的最大并发为 2.06 倍。这两行证明启动走到了内存池分配阶段。最后一份记录把三种错误对应到三个参数。最大序列长度的报错指向 `--max-model-len`。空闲内存低于期望利用率的报错指向 `--gpu-memory-utilization`，或其他进程。性能分析或 CUDA graph 捕获期间的 CUDA 内存不足，指向批大小限制或 graph 捕获大小。
 
 ## Resolution
 
-The fix was one flag, read from the error. We set `--max-model-len 2048`, which covers our 640-token requests, and the server started. Later we raised it to 2,304 tokens so that tests with 2,048-token prefixes fit. On a shared GPU the fraction and the maximum length work together, and the maximum length is the one to lower first, down to the longest request that the service really sends.
+修复只改了一个参数，报错已经指出了它。我们设置 `--max-model-len 2048`，覆盖了 640 token 的请求，服务器随即启动成功。后来把它提高到 2,304 token，以容纳带 2,048 token 前缀的测试。在共享 GPU 上，内存比例和最大长度共同起作用，应先把最大长度降到服务实际发送的最长请求。
 
-Raising the fraction to 0.95 would have been wrong twice over. The fraction is a limit for one vLLM instance on the whole GPU memory, not a share of what is free when the server starts, so a higher fraction on a shared card claims memory that another tenant already holds. And the first error asked for 5.62 GiB for a length that no request needs. When two instances must share one GPU with a known pool each, set the cache in bytes with `--kv-cache-memory-bytes` instead. After every change, start the server with `tee` on the log and grep for `GPU KV cache size`, then compare the pool with the count from the memory page.
+把比例提高到 0.95 有两处不妥。这个比例限制的是单个 vLLM 实例占整张 GPU 显存的份额，不是启动时空闲显存的份额，所以在共享卡上提高比例，就会要求使用另一个租户已经占用的内存。另一个问题是，最初的错误要求为实际请求根本不需要的长度预留 5.62 GiB。两个实例必须共用一张 GPU、且各自池大小已知时，改用 `--kv-cache-memory-bytes` 按字节设置缓存。每次修改后，启动服务器，用 `tee` 保存日志，再用 grep 查找 `GPU KV cache size`，把池大小与内存计算页算出的数量比较。
 
 ## Wrong turns
 
-- "Raise the memory fraction until it starts." The fraction is a share of the whole GPU, not of the free memory. On a shared card a higher fraction claims memory that another process holds, and the start can fail later in the profile or the other team's job can fail instead.
-- "The GPU is too small for an 8B model." The weights loaded. The check that failed was for one request of 40,960 tokens, and the message said that 7,360 tokens would fit.
-- "Set the maximum length equal to the pool." The second start did that and missed by 16 tokens. The pool is counted in blocks of 16, and the length check needs a little margin.
-- "Use the blocks override in production to force the pool." The override does not check that the memory exists. It is a test flag, and on a shared card it fails at the first request that needs the memory.
+- "提高内存比例，直到能启动。" 这个比例针对整张 GPU，不是空闲内存。在共享卡上提高比例，就是要求使用其他进程已经占用的内存，可能在后续性能分析阶段启动失败，也可能让另一个团队的作业失败。
+- "GPU 太小，放不下 8B 模型。" 权重已经加载。失败的是一个 40,960 token 请求的容量检查，消息也说明 7,360 token 能放下。
+- "把最大长度设成池大小。" 第二次启动就是这么做的，却差了 16 个 token。池按每块 16 个 token 计数，长度检查需要留一点余量。
+- "在生产环境用块数覆盖参数强制设置池大小。" 覆盖参数不会检查所需内存是否存在。它是测试参数，在共享卡上，第一个需要这部分内存的请求就会失败。
 
 ## Generalize
 
-A startup check that fails on a limit is a question about your traffic, not about your hardware. Read the number in the error, ask which setting put it there and what the real requests need, and change that setting first. On any shared machine, a fraction of total memory is a promise that the other tenants did not make, so prefer limits that name the exact bytes you want.
+因长度限制而失败的启动检查，问的是你的流量需要什么，不是在评判硬件。读报错里的数字，找出哪个设置引入了这个数、真实请求需要多少，再优先修改那个设置。在任何共享机器上，按总内存比例划出的份额都没有得到其他租户的承诺，所以应优先用确切字节数指定限制。
 
 ## Taught in
 
-The vLLM manual matches each startup error to one flag in [the startup out of memory page](../../../manuals/vllm-101/sections/2-2-fix-out-of-memory-at-startup.md), counts the pool in [the memory page](../../../manuals/vllm-101/sections/2-1-count-the-memory-before-you-pick-a-gpu.md) and reads the startup lines in [the health page](../../../manuals/vllm-101/sections/1-2-check-that-the-server-is-healthy.md), and the SGLang manual shows the same startup sizing in [its memory fraction page](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md).
+vLLM 手册在[启动显存不足页面](../../../manuals/vllm-101/sections/2-2-fix-out-of-memory-at-startup.md)将各类启动报错映射至对应参数，在[显存测算页面](../../../manuals/vllm-101/sections/2-1-count-the-memory-before-you-pick-a-gpu.md)推导了显存池大小并在[健康页面](../../../manuals/vllm-101/sections/1-2-check-that-the-server-is-healthy.md)解读了启动日志，而 SGLang 手册在[内存划分页面](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)展示了对等的启动显存核算机制。

@@ -1,6 +1,6 @@
 ---
 id: eval-pipeline-take-home
-title: Build an offline eval pipeline for a small model
+title: 为小模型搭一条离线评测流水线
 card: evaluation
 kind: take-home
 level: 4
@@ -16,48 +16,48 @@ related: [evaluation/regression-gate-ci, evaluation/perplexity-padding-and-shift
 updated: 2026-11-03
 ---
 
-Take home. We give you a small instruction tuned model, a held out corpus, a set of short factual prompts with gold answers, a set of open form prompts with reference answers, and no network access. Build an evaluation pipeline that reports more than one number and explains its aggregate, and describe how it would run in CI once a network and a judge model are available. What do you deliver, and what do you leave out on purpose?
+带回作业（Take-home）。我们给你一个小型指令微调模型、一份留出语料、一组带标准答案的简短事实类 prompt、一组带参考答案的开放式 prompt，并且没有网络。请搭一条评测流水线：它要报告不止一个数字，并解释它的综合分；再说明等有了网络和 judge 模型之后，它如何在 CI 里运行。你交付什么？故意不做什么？
 
 ## Short answer
 
-Deliver one runnable file with four evals: held out perplexity with honest token accounting, normalized exact match on the factual set, token F1 on the open form set, and a deterministic mock judge on a 1 to 5 scale with the same interface a real judge will have. Report every per eval number, a weighted aggregate with the weights in a config, and per example records for diagnosis. Leave out the real judge, intervals on the aggregate and anything that needs a network, and say so in the readme.
+交付一个可直接运行的文件，包含四项评测：token 计数严谨的留出集困惑度，事实集上归一化后的精确匹配，开放式回答集上的 token F1，以及一个 1 到 5 分的确定性 mock judge，接口与将来的真实 judge 相同。报告每项评测的数字、一个权重写在配置里的加权综合分，以及供诊断用的逐样本记录。真实 judge、综合分的区间以及一切需要网络的东西都不做，并在 readme 里写明。
 
 ## Full answer
 
-### The four evals
+### 四项评测
 
-Each eval covers a dimension the others miss. Perplexity says whether the model fits the language at all. Exact match says whether it produces the gold string on short answers. Token F1 forgives paraphrase on open answers. The judge scores quality that string metrics cannot see. Each is a function from the model and a dataset to a result with the metric, the per example details and a name.
+每项评测覆盖其他几项看不到的维度。困惑度说明模型到底能不能拟合这门语言。精确匹配说明它能否在短答案上给出标准字符串。token F1 在开放答案上容忍改写。judge 给字符串指标看不到的质量打分。每项评测都是一个函数：输入模型和数据集，输出一个结果，包含指标、逐样本细节和名称。
 
-### The details a reviewer checks
+### 评审会检查的细节
 
-- **Perplexity.** Sum the loss over real target positions, exclude pad targets from the denominator, shift the targets by one, divide once at the end.
-- **Normalization.** Lowercase, strip, collapse whitespace, drop trailing terminal punctuation when the sides differ only by it. Token F1 is one when both sides are empty and zero when only one is.
-- **Mock judge.** A 5 when the normalized strings match, a 4 at token F1 of at least 0.8, a 3 between 0.5 and 0.8, a 2 between 0.2 and 0.5, a 1 otherwise, with a one line rationale. It is not a judge. It fixes the interface so a real model is a one function swap.
+- **困惑度。** 只在真实目标位置上累加损失，分母里排除 pad 目标，目标错开一位，最后统一除一次。
+- **归一化。** 转小写、去首尾空白、合并连续空白；如果两边只差结尾的标点，就去掉它。两边都为空时 token F1 为 1，只有一边为空时为 0。
+- **mock judge。** 归一化后字符串相同给 5 分，token F1 至少 0.8 给 4 分，0.5 到 0.8 给 3 分，0.2 到 0.5 给 2 分，其余给 1 分，并附一行理由。它不是 judge。它的作用是固定接口，让以后换成真实模型只需替换一个函数。
 
-### The aggregate
+### 综合分
 
-Normalize each eval into the unit range: perplexity as one over one plus the log of perplexity, exact match and F1 as they are, the judge divided by 5. The default weights are 0.2, 0.3, 0.3 and 0.2. Put them in a config and print them in the report, because the choice is a product decision, not a fact. Write the report with stable JSON keys and a table for the terminal.
+把每项评测归一化到单位区间：困惑度取 1 除以（1 加困惑度的对数），精确匹配和 F1 保持原值，judge 分数除以 5。默认权重是 0.2、0.3、0.3 和 0.2。把权重放进配置并打印在报告里，因为这是产品决策，不是事实。报告用稳定的 JSON 键，并在终端输出一张表。
 
-### The CI story
+### CI 怎么跑
 
-When a network exists, swap the mock judge for a real one and calibrate it against at least 50 hand labeled cases, with a Spearman correlation of 0.7 or more, before its scores gate anything. Grow the suite to about 200 cases, compare two runs with Wilson and bootstrap intervals, block on a regression beyond 0.3 on any criterion, trigger on prompt and model paths, and upload the report as an artifact.
+有网络后，把 mock judge 换成真实 judge，并在至少 50 个人工标注样本上校准，Spearman 相关系数至少达到 0.7 后，它的分数才能用于拦截。把评测集扩充到约 200 个用例，用 Wilson 区间和 bootstrap 区间比较两次运行，任何维度回退超过 0.3 就拦截，在 prompt 和模型路径变动时触发，并把报告作为产物上传。
 
-### What to leave out and why
+### 不做什么，为什么
 
-The real judge, because there is no network and no human labels to calibrate it. Intervals on the aggregate, because the weights make it a product number; put intervals on the components. Contamination checks, because the training corpus is not provided. Say each omission in the readme.
+不做真实 judge，因为没有网络，也没有人工标签可供校准。不给综合分加区间，因为权重让它成了产品数字；区间加在各分项上。不做污染检查，因为没有提供训练语料。每一项省略都要在 readme 里写明。
 
 ## Follow-ups
 
-- **Level 3:** Why keep a mock judge in the deliverable at all? Expected: it fixes the interface and the aggregation path so the real judge is a one function swap, and it keeps the loop runnable offline.
-- **Level 3:** Why is the weighted mean a product decision? Expected: weights encode what the product values; the pipeline exposes them in config and reports every component so a reviewer can see what the aggregate hides.
-- **Level 4:** What is the first thing you add when a network appears? Expected: a real judge behind the same function, then a calibration run against hand labels before any of its scores gate anything.
+- **Level 3:** 交付物里为什么还要留一个 mock judge？ Expected: 它固定了接口和聚合路径，真实 judge 只需替换一个函数，而且整个流程离线也能跑通。
+- **Level 3:** 为什么加权平均是产品决策？ Expected: 权重代表产品看重什么；流水线把权重放在配置里并报告每个分项，评审人就能看到综合分掩盖了什么。
+- **Level 4:** 有了网络后，你第一件要加的是什么？ Expected: 在同一个函数背后接入真实 judge，然后先用人工标签做一轮校准，之后它的分数才能用于拦截。
 
 ## Wrong answers
 
-- "One accuracy number is the deliverable." A single metric never describes a model; the brief asks for several and for an explanation of the aggregate.
-- "Skip perplexity, it is not a task metric." It is the cheapest check that the model fits the language at all, and wrong accounting there is what a reviewer looks for.
-- "Hard code the weights." The weights are the product decision; expose them and print them next to the numbers.
+- "交付一个准确率数字就行。" 单一指标永远描述不了一个模型；题目要求多个数字，并解释综合分。
+- "跳过困惑度，它不是任务指标。" 它是检查模型能否拟合语言的最便宜手段，而这里的计数错误正是评审要找的。
+- "把权重写死在代码里。" 权重就是产品决策；把它们暴露出来，并打印在数字旁边。
 
 ## Taught in
 
-The [eval pipeline capstone](../../../phases/19-capstone-projects/41-eval-pipeline/) builds the four evals and the aggregator, the [evaluation and testing lesson](../../../phases/11-llm-engineering/10-evaluation/) adds the CI gate, and the [LLM evaluation frameworks lesson](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/) gives the judge calibration rules.
+[评测流水线综合项目](../../../phases/19-capstone-projects/41-eval-pipeline/)搭建了四项评测和聚合器，[评测与测试课](../../../phases/11-llm-engineering/10-evaluation/)加上了 CI 拦截，[LLM 评测框架课](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/)给出了 judge 的校准规则。

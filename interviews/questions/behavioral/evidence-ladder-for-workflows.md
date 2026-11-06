@@ -1,6 +1,6 @@
 ---
 id: evidence-ladder-for-workflows
-title: Weigh what a stakeholder tells you about their workflow
+title: 评估干系人对其工作流的口头描述
 card: behavioral
 kind: concept
 level: 2
@@ -16,53 +16,53 @@ related: [behavioral/two-users-two-workflows]
 updated: 2026-11-03
 ---
 
-A customer lead spends an hour describing how their support team handles a refund request. You now have to decide what the first version of an assistant does. Tell me how you treat that hour of description, and what you do next.
+一位客户负责人花了一个小时向你描述其支持团队如何处理退款请求。现在你需要决定助手首个版本应当支持的功能。告诉我你会如何对待这一个小时的口头描述，以及你接下来会怎么做。
 
 ## Short answer
 
-An interview is reported behavior, which is the third rung of a four-rung ladder. I label every claim from the hour by its rung, then look for direct evidence for the claims that matter most: a trace, a recording, a ticket or a completed form. The steps that stay unproven remain visible as open claims instead of turning into requirements.
+口头访谈属于间接陈述的行为，处于四级证据阶梯的第三阶。我将这一个小时里的每项声明按其所属阶梯标记，然后针对最关键的声明寻找直接证据：执行记录、录屏、工单或填好的表单。未获证实的步骤将作为待验证声明明确列出，而不会直接转变为系统需求。
 
 ## Full answer
 
-### The ladder
+### 证据阶梯
 
-1. Direct behavior: an observation, a trace, a recording or a system event.
-2. An artifact: a ticket, a runbook, a log, a form or a finished output.
-3. Reported behavior: a person describes what they do.
-4. Inference: the team concludes what probably happens.
+1. 直接行为：现场观察、链路 trace、录屏或系统事件。
+2. 真实产物：工单、运行手册、日志、表单或已完成的产出物。
+3. 间接陈述行为：由当事人描述自己的日常操作。
+4. 推论：团队分析并推断可能发生的情况。
 
-All four help. Only the first two prove current behavior. When I write the workflow down, each step carries its rung, so confidence does not grow on its own.
+四者皆有参考价值，但唯有前两阶能证明当前的真实行为。在梳理记录工作流时，每个步骤都会标注其所处的证据阶梯，防止信心在无依据的情况下自行膨胀。
 
-### What I reconstruct
+### 我所重构的内容
 
-I do not begin with feature wishes. I rebuild what happens now, step by step, with the actor, the trigger, the action, the input, the output, the friction, who holds authority for a consequential change, and the evidence. The workflow is larger than the screen. It includes waiting, copy and paste, side channels, approvals, error recovery and steps people have stopped noticing.
+我不会从功能诉求入手。我会按步骤还原当前的实际运转过程，明确行动者、触发条件、具体动作、输入、输出、摩擦痛点、重大变更的决策权归属以及支撑证据。工作流的边界远超屏幕本身，它还包含等待耗时、复制粘贴、辅助渠道、人工审批、错误恢复以及大家已经习以为常而忽略的隐藏步骤。
 
-### Four things I search for
+### 我所探查的四个要素
 
-- Friction: repeated effort, delay, re-entry or recovery.
-- Hidden state: facts carried in memory, chat or personal notes.
-- Authority: the person or system allowed to make the consequential change.
-- Exceptions: the case where the normal path stops being normal.
+- 摩擦痛点：重复劳动、延迟、重复录入或故障恢复。
+- 隐性状态：留存在脑海、聊天记录或个人便签里的事实信息。
+- 决策权限：被允许执行关键重大变更的人员或系统。
+- 异常分支：常规流程不再适用的特殊边缘情况。
 
-Assistants fail most often at handoffs and exceptions, because only the happy path was shaped. So the first thing I ask for after the interview is one real trace of an exception.
+助手类系统最常在交接环节和异常分支处出现问题，因为最初往往只设计了理想路径。因此，访谈结束后我索要的第一件东西，就是一条真实的异常分支执行记录。
 
-### How this changes the first version
+### 这如何改变首个版本的设计
 
-A step with direct evidence can become a requirement. A step with only reported evidence becomes an assumption to test. The description from the hour tells me where to look, not what to build.
+拥有直接证据支持的步骤可以直接确立为需求。仅有口头陈述证据的步骤则作为待验证的假设来对待。长达一小时的描述指引了我应该去哪里探查，而非直接决定了我应该构建什么。
 
 ## Follow-ups
 
-- **Level 2:** The lead says "we always check the order history first." How do you confirm that? Expected: ask for a recording or a log of three real cases and mark the claim as reported until one of them shows it.
-- **Level 2:** What is the direct-evidence ratio and why track it? Expected: the share of workflow steps backed by observation or an artifact; a low ratio means the model of the workflow is mostly belief.
-- **Level 3:** You can only observe the happy path. What is the risk? Expected: the exception path, where most failures live, stays unshaped, so the assistant breaks at the handoff that matters.
-- **Level 3:** A proposed feature removes a visible step. What do you check before you accept it? Expected: whether hidden work behind that step still exists, so the feature only moves the effort somewhere invisible.
+- **Level 2:** 负责人称“我们总是先核对历史订单”，你该如何证实？ Expected: 调取三个真实案例的录屏或日志，在其中任一案例证实之前，该声明仅标记为口头陈述。
+- **Level 2:** 什么是直接证据占比？为什么要跟踪它？ Expected: 由实际观察或真实产物支撑的工作流步骤比例；该比例过低意味着工作流模型多半建立在主观信念之上。
+- **Level 3:** 如果只能观察到理想主流程，存在什么风险？ Expected: 大多数故障所处的异常路径未被定义和覆盖，导致助手在关键的交接环节发生崩溃。
+- **Level 3:** 某项提议的功能移除了一个可见步骤，在采纳前你需核查什么？ Expected: 该步骤背后的隐性工作是否依然存在，防止该功能仅仅是将工作量转移到了看不见的角落。
 
 ## Wrong answers
 
-- "The customer knows their process, so the interview is the requirement." A description is reported behavior; it is useful but it does not prove what happens.
-- "Average the descriptions from several people into one workflow." An averaged workflow can describe nobody; the variants must stay separate until their cause is known.
-- "Infer the missing steps from similar teams." Inference is the weakest rung and must stay labeled as a guess.
+- "客户最了解自己的业务流程，因此访谈内容就是需求。" 口头描述属于陈述行为；它虽有参考价值，但不能证明实际发生的情况。
+- "将多位受访者的描述取平均值，整合成统一的工作流。" 平均化的工作流可能不符合任何单一个体的实际情况；在查明差异根因之前，各个变体必须独立呈现。
+- "参考类似团队的经验来推断缺失的步骤。" 推论处于证据阶梯的最底层，必须明确标注为推测。
 
 ## Taught in
 
-The [workflow discovery lesson](../../../phases/14-agent-engineering/48-discover-the-real-workflow/) gives the evidence ladder and the step record.
+[工作流发现课程](../../../phases/14-agent-engineering/48-discover-the-real-workflow/)给出了证据阶梯与步骤记录模型。

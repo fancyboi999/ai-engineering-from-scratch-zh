@@ -1,6 +1,6 @@
 ---
 id: timestamp-kills-the-cache
-title: Cache reads stay at zero on every request
+title: 每次请求的缓存读取都是零
 card: prompting-structured-output
 kind: debug
 level: 2
@@ -16,47 +16,47 @@ related: [prompting-structured-output/cache-break-even, prompting-structured-out
 updated: 2026-11-03
 ---
 
-You enabled prompt caching on a 15,000-token system prompt. The usage field for cache reads stays at zero on every request, while cache creation tokens are charged every time. What do you look for, and in what order?
+你给一个 15,000 token 的 system prompt 开了 prompt 缓存。usage 里的缓存读取字段每次请求都是零，而缓存创建 token 每次都在计费。你找什么？按什么顺序找？
 
 ## Short answer
 
-Something above the cache breakpoint changes on every request. Look first for a timestamp or a request id at the top of the system prompt, then for tool definitions serialized in a changing order, then for near-duplicate text that differs by a byte between code paths, and then for a block under the minimum cacheable size. The cache matches prefixes only, so the first differing token turns everything after it into a miss.
+缓存断点上方有东西每次请求都在变。先找 system prompt 顶部的时间戳或请求 id，再找以变化的顺序序列化的工具定义，然后找不同代码路径之间只差一个字节的近似重复文本，最后找低于最小可缓存大小的块。缓存只匹配前缀，所以第一个不同的 token 之后全部未命中。
 
 ## Full answer
 
-### The invariant
+### 不变式
 
-All the providers cache prefixes. When a request's prefix matches a recent one, the provider serves the stored key and value cache instead of encoding the tokens again, and bills a read at a fraction of the input rate. If any token differs, everything after it is a miss. The usage fields tell the story: a creation count every time and a read count of zero means the prefix never matched.
+所有服务商都按前缀缓存。一次请求的前缀与最近的某次匹配时，服务商直接用存好的 KV cache，不再重新编码这些 token，并按输入费率的一小部分收读取费。只要有任何 token 不同，它之后的全部未命中。usage 字段说明了一切：每次都有创建计数、读取计数为零，就说明前缀从未匹配。
 
-### The checklist, in order
+### 检查清单，按顺序
 
-1. **A dynamic field at the top.** A current time, a request id or a session id in the first lines of the system prompt misses on every request. Move it below the breakpoint with the other per-request fields.
-2. **Tool reordering.** Tools serialized from a dictionary can change order between deploys or between processes; serialize them in a stable order.
-3. **Near-duplicate text.** Two code paths that build the prompt with a one-byte difference produce two prefixes and no hits.
-4. **Too-small blocks.** The explicit cache has a floor of 1,024 tokens, 2,048 on the small model; a smaller block silently does not cache.
-5. **On the automatic provider**, a changed user field is part of the cache key, and the prefix must still be stable and above 1,024 tokens.
+1. **顶部的动态字段。** system prompt 头几行里的当前时间、请求 id 或会话 id，每次请求都会导致未命中。把它和其他按请求变化的字段一起移到断点下方。
+2. **工具顺序变化。** 从字典序列化出来的工具，在不同部署或不同进程之间顺序可能不同；按稳定的顺序序列化。
+3. **近似重复的文本。** 两条代码路径构建出的 prompt 只差一个字节，就会产生两个前缀，没有命中。
+4. **块太小。** 显式缓存的下限是 1,024 个 token，小模型是 2,048 个；更小的块会静默地不缓存。
+5. **在自动缓存的服务商上**，变化的 user 字段属于缓存键的一部分，前缀也仍须保持稳定并超过 1,024 个 token。
 
-### The layout that hits
+### 能命中的布局
 
-System prompt, then tool definitions, then few-shot examples, then retrieved documents if they are reused, then the history up to the last turn, then the current message, which is never cached because it is different every time.
+system prompt，然后是工具定义，然后是少样本示例，然后是会被复用的检索文档，然后是到上一轮为止的历史，最后是当前消息；当前消息从不缓存，因为它每次都不同。
 
-### Turn it into a test
+### 把它变成测试
 
-In CI, build two requests through the production prompt builder with the same user input, compare their cacheable prefixes, send both, and assert that the cache read token count is above zero on the second. Two hand-written identical bodies would skip the timestamp or request id that the builder adds. Split the cost dashboard into cached and uncached input tokens, or a traffic drop looks like a cache win.
+在 CI 里，用生产环境的 prompt 构建器以相同的用户输入构造两个请求，比较它们的可缓存前缀，把两个都发出去，断言第二个的缓存读取 token 数大于零。手写两个相同的请求体会绕过构建器添加的时间戳或请求 id。把成本看板拆成已缓存和未缓存的输入 token，否则流量下降看起来就像缓存的功劳。
 
 ## Follow-ups
 
-- **Level 2:** How do you make this a test? Expected: two requests built by the production prompt builder with the same user input, with an assertion that the cache read tokens are above zero on the second; if they stay at zero the keys are drifting.
-- **Level 2:** Where does the timestamp go instead? Expected: below the breakpoint, with the other per-request fields such as the user message.
-- **Level 3:** The block is below the minimum size. What happens? Expected: nothing is cached and nothing is reported; the floor is 1,024 tokens, and 2,048 on the small model.
-- **Level 3:** Input tokens fell after your change. Is that proof it works? Expected: no; split the input tokens into cached and uncached, or a drop in traffic looks like a cache win.
+- **Level 2:** 怎样把它变成测试？ Expected: 用生产 prompt 构建器以相同的用户输入构造两个请求，断言第二个的缓存读取 token 大于零；如果一直是零，说明键在漂移。
+- **Level 2:** 时间戳应该放在哪里？ Expected: 断点下方，和 user 消息等其他按请求变化的字段放在一起。
+- **Level 3:** 块低于最小大小时会发生什么？ Expected: 什么都不缓存，也什么都不报告；下限是 1,024 个 token，小模型是 2,048 个。
+- **Level 3:** 你改动之后输入 token 下降了。这能证明它生效了吗？ Expected: 不能；把输入 token 拆成已缓存和未缓存，否则流量下降看起来就像缓存的功劳。
 
 ## Wrong answers
 
-- "Caching is automatic, there is nothing to configure." On the explicit providers you mark the block; on the automatic one the prefix still has to be stable and above 1,024 tokens, and a changed user field or tool order breaks it.
-- "Put the user message first so the model reads it early." That places the only part that changes above everything else, and the cache never hits.
-- "Extend the TTL to one hour, the cache is expiring." Expiry would show as writes after quiet periods, not on every request; the one-hour TTL also charges 2x for the write.
+- "缓存是自动的，没什么要配置。" 在显式缓存的服务商上要标记块；在自动缓存的服务商上，前缀仍须稳定并超过 1,024 个 token，user 字段变化或工具顺序变化都会破坏它。
+- "把 user 消息放最前面，模型能早点读到。" 这会把唯一会变的部分放到所有内容上方，缓存永远不会命中。
+- "缓存过期了，把 TTL 延长到一小时。" 过期表现为空闲时段之后的写入，而不是每次请求都写入；一小时 TTL 的写入还要收 2 倍费用。
 
 ## Taught in
 
-The lesson [prompt caching](../../../phases/11-llm-engineering/15-prompt-caching/) gives the prefix invariant, the cache-friendly layout, the pitfalls and the CI check.
+[prompt 缓存](../../../phases/11-llm-engineering/15-prompt-caching/)一课给出了前缀不变式、对缓存友好的布局、常见坑和 CI 检查。

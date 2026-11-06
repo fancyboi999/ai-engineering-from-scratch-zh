@@ -1,6 +1,6 @@
 ---
 id: semantic-threshold
-title: A lower cache threshold hits more and answers wrong
+title: 调低缓存阈值，命中更多却答错了
 card: cost-capacity
 kind: tradeoff
 level: 2
@@ -16,51 +16,51 @@ related: [cost-capacity/two-cache-layers, cost-capacity/cache-break-even]
 updated: 2026-11-03
 ---
 
-Your semantic cache serves 20 percent of requests at a similarity threshold of 0.95. A teammate lowered it to 0.85 in staging. The hit rate rose to 50 percent, and a few cached answers did not fit the question asked. Which threshold do you ship, and how do you decide?
+你的语义缓存（semantic cache）在 0.95 的相似度阈值下为 20% 的请求提供服务。队友在预发环境中将其下调至 0.85，命中率跃升至 50%，但少数缓存回答与用户提出的新问题并不相符。你上线哪个阈值，你如何做出决策？
 
 ## Short answer
 
-Ship the threshold whose wrong hits you can afford, and measure that instead of guessing. A wrong cached answer is a correctness failure that a user sees, while a miss costs one model call. Keep the strict threshold on the general path, and lower it only where the answers are interchangeable or where a disclaimer is acceptable. A vendor's accuracy figure describes how often a hit was appropriate, not how often your traffic hits, so label pairs from your own traffic at both thresholds.
+上线你能够承受其错误命中代价的阈值，且该代价必须经过实测度量而非凭空猜测。错误的缓存回答是暴露在真实用户面前的正确性故障，而一次未命中的代价仅仅是一次模型调用的费用。在通用业务路径上维持严格的阈值，仅在回答高度同质可互换、或允许附带免责声明的场景下放宽阈值。供应商宣传的准确率指标描述的是命中是否合适，而不是你的流量产生命中的频率，因此要在两个阈值下，用你自己的真实流量分别标注样本对。
 
 ## Full answer
 
-### Two numbers that get confused
+### 两个容易混淆的概念
 
-The hit rate is the share of requests served from the cache. The accuracy of a hit is whether the stored answer fits the new question. The lesson warns that a vendor's accuracy claim describes match correctness, and that production hit rates are community telemetry that runs from about 10 percent on open chat to about 70 percent on structured support.
+命中率（hit rate）是指从缓存直接提供服务的请求比例。命中的准确率（accuracy of a hit）是指返回的缓存历史回答是否真正契合新提出的问题。课程警告指出：供应商宣传材料中的高准确率通常是指匹配正确性（match correctness），而生产环境中的真实命中率作为社区遥测数据，在开放聊天场景下仅有约 10%，而在结构化客服支持场景下可达约 70%。
 
-### The cost of each error
+### 每种错误的代价
 
-A miss costs one model call, which you know to the cent. A wrong hit costs a wrong answer in front of a user, a support ticket and some trust, and only the product can price it. The two thresholds trade one for the other.
+一次未命中的代价是一次模型调用，你知道它具体花多少钱，可以精确到分。一次错误命中的代价是用户看到了错误答案、产生了客服工单，还损失了一些信任，只有产品方能为此定价。两个阈值是在这两种代价之间权衡。
 
-### Decide with labeled pairs
+### 借助带标签的样本对做决策
 
-Sample pairs of a new question and the cached answer it would receive at each threshold. Label each pair as fitting or not. At 0.85 and at 0.95 you then have a hit rate and a precision of hits. Expected saving is the hit rate times the cost of a call. Expected damage is the wrong-hit rate times the cost of a wrong answer. Ship the threshold where the second number is acceptable to the product owner.
+从生产流量中采样新问题，提取其在各个阈值下匹配到的缓存回答组成样本对。对每个样本对人工标注“相符”或“不符”。在 0.85 和 0.95 两个阈值下，你将分别得到真实的命中率与命中精确率（precision of hits）。预期收益等于命中率乘以单次调用节省的成本；预期风险等于错误命中率乘以错误回答造成的业务损失。仅当后者处于产品负责人明确接受的容忍度范围内时，方可上线该阈值。
 
-### A two-tier scheme
+### 双层阈值方案
 
-The earlier caching lesson's exercise uses two thresholds: hits at 0.98 return at once, and hits at 0.90 return with a disclaimer that the answer comes from a similar earlier question. Log the tier that served each hit, and compare satisfaction per tier. This keeps the strict path strict and still takes the cheap wins.
+前面的缓存课程练习使用两个阈值：达到 0.98 的命中立即返回，达到 0.90 的命中附带免责声明，说明回答来自之前的相似问题。记录每次命中由哪一层提供回答，并比较各层的满意度。这样既保持了严格路径的标准，也能获得容易实现的成本收益。
 
-### Why some workloads cannot go low
+### 为什么某些业务场景无法容忍低阈值
 
-Code questions hit about 20 to 30 percent at best, because a small change in a code question changes the correct answer. Near-duplicate text is not near-duplicate intent there. Voice agents on a fixed prompt set reach 50 to 80 percent, because the questions really repeat.
+代码问题的命中率最多约为 20% 到 30%，因为问题中的细小变化就会改变正确答案。在这里，文本近似不代表意图近似。使用固定 prompt 集合的语音 agent 能达到 50% 到 80% 的命中率，因为问题确实在重复。
 
-### The checks around the threshold
+### 围绕阈值构建的防护套件
 
-Run the exact-match cache first, because a byte-identical repeat needs no embedding. Set a lifetime so that stale answers expire. The embedding cost is small, the lesson quotes a per-million-token price of 0.02 dollars for a small embedding model, so the threshold is the lever, not the embedding bill.
+先查精确匹配缓存，因为字节完全相同的重复请求不需要计算嵌入。设置有效期，让陈旧的回答过期。嵌入成本很低，课程给出的小型嵌入模型价格是每百万 token 0.02 美元，所以该调的是阈值，而不是嵌入账单。
 
 ## Follow-ups
 
-- **Level 2:** Why is the accuracy number in a vendor's brochure not your hit rate? Expected: accuracy says how often a returned hit was appropriate. The hit rate says how often there was a hit at all, and it depends on your traffic.
-- **Level 2:** What does a miss cost, and what does a wrong hit cost? Expected: a miss costs one model call. A wrong hit costs a wrong answer in front of a user, which the product has to price.
-- **Level 3:** How do you lower the threshold without lowering the correctness of the strict path? Expected: a two-tier scheme, with strict matches served as they are and medium matches served with a disclaimer, and the tier logged so that satisfaction can be compared.
-- **Level 3:** Why do code questions hit so rarely? Expected: a small variant in a code question changes the correct answer, so similar text is not similar intent.
+- **Level 2:** 为什么供应商宣传册上的准确率不等于你的缓存命中率？ Expected: 准确率衡量的是当触发命中时回答正确的概率；而命中率衡量的是你的业务流量能触发缓存的频率，它完全取决于你自身的流量分布。
+- **Level 2:** 缓存未命中的代价是什么，错误命中的代价又是什么？ Expected: 未命中的代价是一次模型调用。错误命中的代价是用户看到错误答案，产品方必须为此定价。
+- **Level 3:** 如何在不牺牲严格主链路正确性的前提下调低阈值？ Expected: 采用双层阈值方案：超高匹配直接返回，中等匹配带免责声明返回，并记录命中层级以对比监控各层满意度。
+- **Level 3:** 为什么代码类提问的缓存命中率如此之低？ Expected: 代码题目中一个参数或条件的微小变动就会彻底改变正确答案，字面相似并不代表意图相同。
 
 ## Wrong answers
 
-- "Lower the threshold, the savings are bigger." A wrong hit is a correctness failure that a user sees. Its cost is not one model call.
-- "Raise the threshold until no hit is ever wrong." The hit rate then approaches the exact-match rate, and the cache stops paying for itself.
-- "Use the vendor's accuracy number as the hit rate." The figure describes match correctness, not how often your traffic hits.
+- "调低阈值，省下的钱更多。" 错误命中是用户能看到的正确性故障。它的代价不等于一次模型调用。
+- "调高阈值，直到每次命中都正确。" 命中率会接近精确匹配的命中率，缓存也就无法收回成本。
+- "将供应商宣称的准确率直接作为业务命中率。" 宣传数字描述的是匹配判定的一致性，而不是你的真实业务请求发生命中的概率。
 
 ## Taught in
 
-The [caching economics lesson](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/) separates match accuracy from hit rate and poses the threshold decision, and the [caching and cost lesson](../../../phases/11-llm-engineering/11-caching-cost/) builds the two-tier thresholds.
+[缓存经济学课程](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/)区分了匹配准确率与命中率并探讨了阈值抉择，[缓存与成本课程](../../../phases/11-llm-engineering/11-caching-cost/)构建了双层阈值分级实现。

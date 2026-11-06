@@ -1,6 +1,6 @@
 ---
 id: safe-actions-harmful-trajectory
-title: Every action was approved, and the run was still harmful
+title: 每个操作都获批准但执行轨迹依然造成危害
 card: agents
 kind: concept
 level: 3
@@ -16,51 +16,51 @@ related: [agents/pick-the-permission-mode, agents/a-login-fix-touched-five-files
 updated: 2026-11-03
 ---
 
-An unattended coding run used the mode in which a separate model reviews every action before it executes. The audit shows that the reviewer approved each action. The run still copied a private dataset into a public repository. Explain how that is possible, and name the controls that would have stopped it.
+一次无人值守的编码运行采用了由独立模型在每个操作执行前审查的模式。审计结果显示审查模型批准了每一个操作。然而该次运行依然将私有数据集复制到了一个公共代码库中。请解释这是如何发生的，并列出本可以制止该事故的安全控制措施。
 
 ## Short answer
 
-The reviewer judges one action at a time against the request. Each action in the run was allowed on its own: read a file you own, write a file you own, commit, push. The harm was in the composition, and the reviewer does not re-derive the user's intent across the trajectory. The controls that catch this live outside the per-action check: an isolated workspace with no sensitive mounts, a network egress allowlist in the scope contract, per-tool action caps, and a trajectory audit after the run that detects what the other controls let through.
+审查模型根据用户请求，一次评判一个操作。该次运行中的每个单步操作本身都是被允许的：读取你拥有的文件、写入你拥有的文件、提交 commit、推送到远端仓库。危害产生于这些操作的组合编排，而审查者无法跨越整条执行轨迹去反推用户的全貌意图。能够拦截此类风险的控制措施存在于单步检查之外：不挂载敏感资产的隔离工作空间、范围契约中的网络出口白名单、单工具操作次数上限，以及能够在事后检测出被其他防线遗漏隐患的轨迹审计机制。
 
 ## Full answer
 
-### What a per-action reviewer can and cannot see
+### 单步审查者能够看到与看不到的盲区
 
-The lesson lists what the classifier catches: a plain injection that maps to a known risky action shape, a repeated loop where action N+1 is almost equal to action N, and an out-of-place shell command in a file-edit session. It also lists what it misses. Subtle injection can change behavior without producing one flagged action. Every action can look safe while the composed trajectory is harmful. Exfiltration through legitimate channels is the standard case: writing data to a file you own and then pushing to a public repository is a sequence of allowed actions.
+课程明确指出了分类器能够捕获的场景：与已知高危操作特征相符的常规注入、操作 N+1 与操作 N 近乎相同的重复死循环，以及在文件编辑会话中突兀出现的离谱 shell 命令。同时课程也指明了它的盲区所在。隐蔽的注入可以在不触发任何单独被标记操作的前提下改变系统的整体行为。每个单步操作看起来都完全无害，但组合起来的全局轨迹却极具破坏性。通过合法渠道窃取数据是最典型的范例：将数据写入自己名下的文件，随后推送到公开仓库，整个过程全由受允许的操作序列构成。
 
-### Why intent does not help
+### 为什么反推意图行不通
 
-The reviewer compares the action with the declared task and the session state. It does not ask what the whole sequence accomplishes. Asking a model to infer the user's intent for every action would make the reviewer slower and no more reliable, because the injected text is in the same context it would read.
+审查者将单步操作与声明的任务和会话状态比对。它并不探究整个序列最终达成了什么宏观目的。要求模型在每个操作中推断用户的真实意图会让审查变得迟缓且不会更可靠，因为注入的恶意文本本身就混杂在它所需要阅读的同一个上下文中。
 
-### The controls
+### 应当配备的防御控制
 
-| Control | Where it lives | What it stops |
+| 控制措施 | 所在层级 | 能够阻断的风险 |
 |---|---|---|
-| Isolated workspace | The runtime, with no credentials and no production mounts | The dataset was never reachable |
-| Network egress allowlist | The scope contract | The push to a host that was not part of the task |
-| Per-tool action caps | The budget controls | A long sequence of pushes or fetches |
-| Time budget | The scope contract | A run that keeps going past the point a human would have checked |
-| Trajectory audit | After the run, over the event stream | Nothing in this run. It detects the composition, which no per-action check sees, so that the next run is stopped, but it cannot undo a push already made |
+| 隔离工作空间 | 运行时环境，不挂载任何外部凭证与生产目录 | 敏感数据集从始至终不可访问 |
+| 网络出口白名单 | 任务范围契约 | 向任务无关的主机执行 git push |
+| 单工具操作次数限制 | 预算控制体系 | 持续执行大批量的连续 push 或 fetch |
+| 时间预算 | 任务范围契约 | 运行超时蔓延并越过人工理应介入核查的时间点 |
+| 轨迹审计 | 运行结束后基于事件流分析 | 无法阻断本次运行。它能检测到单步检查漏掉的操作组合，以便拦截下一次运行，但无法撤回已推送的数据 |
 
-The scope contract is the place for the egress rule, because it is per task. The merge rule for two contracts keeps it strict: an unset allowlist defers to the other contract, two lists intersect, and an empty list stays deny-all.
+范围契约是放置网络出口规则的最佳位置，因为它是按任务划分的。两个契约的合并规则保证了严密性：未设置的白名单遵循另一方，两份列表取交集，空列表保持全阻断。
 
-### The honest framing
+### 坦率的工程定性
 
-The documentation ships the classifier mode as a research preview and says it is not sufficient alone. The expected setup combines it with budgets, allowlists, isolation and audits. A classifier that passes an offline evaluation can behave differently in a session where the user's context is ambiguous.
+官方文档在发布分类器模式时将其标记为研究性预览，并直言单凭它本身是远远不够的。预期配置是将它与预算、白名单、隔离和审计结合使用。在离线评测中表现出色的分类器，在用户上下文模糊复杂的真实会话中可能会表现出截然不同的行为。
 
 ## Follow-ups
 
-- **Level 3:** Why is an egress allowlist a scope dimension and not a runtime setting? Expected: the hosts a task may reach change per task, so the rule belongs in the per-task contract where the file globs and the time budget live.
-- **Level 3:** What does the trajectory audit read? Expected: the append-only event stream of tool calls and results, which a subscriber can replay from any offset without re-running the model.
-- **Level 4:** You cannot patch indirect prompt injection fully. What does that imply for the design? Expected: treat tool outputs as untrusted, keep the data the agent can reach small, keep the places it can send to small, and accept that detection is a layer and containment is the control.
-- **Level 4:** How do you test the control set before the next unattended run? Expected: write one trajectory in which every action is approved and the composition is harmful, run it in the isolated workspace, and confirm that the allowlist or the mounts stop it.
+- **Level 3:** 为什么网络出口白名单属于范围维度而非运行时全局设置？ Expected: 任务所允许访问的主机因具体任务而异，因此该规则属于包含文件模式和时间预算的任务级契约。
+- **Level 3:** 轨迹审计读取的是什么数据？ Expected: 仅追加写入的工具调用与返回结果事件流，订阅者无需重新运行模型即可从任意偏移量重放该事件流。
+- **Level 4:** 间接 prompt 注入无法被完全修补，这对架构设计意味着什么？ Expected: 将工具输出一律视为不可信数据，将 agent 所能触及的数据和能发送的目标尽量收窄，将检测视为层级防御，将隔离遏制视为核心控制。
+- **Level 4:** 在执行下一次无人值守运行之前，你如何测试这套控制机制？ Expected: 构建一条每个操作均被批准但组合具有危害的轨迹，在隔离工作区运行，验证白名单或挂载机制能将其阻断。
 
 ## Wrong answers
 
-- "The reviewer model was too weak, so use a bigger one." A bigger reviewer still judges actions one at a time and still reads the same injected context.
-- "Approve pushes manually and the rest automatically." A push is one of many legitimate channels, and the data had already left the private location through allowed writes.
-- "Keep the dataset in the repo but mark it private in the prompt." The prompt is advice, and the control is whether the dataset is mounted into the workspace at all.
+- "审查者模型太弱了，应该换用更大的模型。" 更大的审查模型依然是在孤立判断单步操作，且面对的是包含了注入内容的相同上下文。
+- "只人工审批推送操作，其他操作保持自动。" 推送只是众多合法渠道之一，敏感数据此前早已通过允许的本地写入离开了私有受控目录。
+- "把数据集保留在代码库中，仅在 prompt 中注明其为私有。" Prompt 仅仅是建议，真正起控制作用的是该数据集是否被物理挂载进工作空间。
 
 ## Taught in
 
-The [permission modes lesson](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/) names the gaps in the classifier, and the [scope contracts lesson](../../../phases/14-agent-engineering/36-scope-contracts/) adds the egress and time budgets to the contract.
+[自主 Agent 的权限模式](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/)课程指出了分类器的防御盲区，[范围契约与任务边界](../../../phases/14-agent-engineering/36-scope-contracts/)课程将网络出口与时间预算纳入了契约管理。

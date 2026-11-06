@@ -1,6 +1,6 @@
 ---
 id: flush-before-you-compare
-title: The knee that the prefix cache hid
+title: 前缀缓存藏起来的拐点
 card: inference-serving
 kind: debug
 level: 2
@@ -16,19 +16,19 @@ related: []
 updated: 2026-11-03
 ---
 
-Your first concurrency sweep on an L4 shows a first-token median of 0.3 s up to 16 users and 1.8 s at 32, so you set the production limit at 20 users per replica. A second sweep with a reset before each run puts the first token at 1.6 s already at 16 users. Which sweep do you trust, and why do the two disagree?
+你在 L4 上做的第一轮并发压测显示，16 个用户以内首 token 中位数是 0.3 秒，32 个用户时是 1.8 秒，于是你把生产上限定为每个副本 20 个用户。第二轮压测在每次运行前做了重置，16 个用户时首 token 就已经是 1.6 秒。你相信哪一轮？两轮为什么不一致？
 
 ## Short answer
 
-Trust the sweep with the reset. The first sweep kept one server for all the user counts and sent the same first prompts at every count with a fixed seed, so below 32 users many requests found their prompt in the prefix cache and skipped the prefill. With the reset the median first token rose at every step, about 0.65 s at 4 users, 1.0 s at 8 and 1.6 s at 16, and the P99 ITL jumped from about 70 ms at 8 users to 522 ms at 16, so the knee on this card sits between 8 and 16 users, not between 16 and 32.
+相信做了重置的那一轮。第一轮所有用户数共用一台服务器，又用固定的随机种子，在每个用户数下发出相同的前几个 prompt，所以 32 个用户以下，很多请求在前缀缓存里找到了自己的 prompt，跳过了 prefill。重置之后，中位首 token 时间每一档都在上升，4 个用户约 0.65 秒，8 个约 1.0 秒，16 个约 1.6 秒，P99 ITL 从 8 个用户时约 70 ms 跳到 16 个用户时 522 ms，所以这张卡的拐点在 8 到 16 个用户之间，不在 16 到 32 之间。
 
 ## Full answer
 
-### How the cache inflated the first sweep
+### 缓存怎样美化了第一轮
 
-The random dataset with a fixed seed sends the same prompts in every run. The first sweep ran all the user counts against one server, so each run found the prompts of the earlier runs in the cache. This was the table it produced, Qwen/Qwen3-8B on vLLM 0.31.0, three seeds per point:
+用固定种子的 random 数据集，每次运行都发出同样的 prompt。第一轮在同一台服务器上跑完了所有用户数，所以每次运行都会在缓存里找到前面几次运行的 prompt。它产出的表如下，Qwen/Qwen3-8B，vLLM 0.31.0，每个点三个种子：
 
-| Users | Output tok/s | Median TTFT | Median TPOT | P99 ITL |
+| 用户数 | 输出 tok/s | 中位 TTFT | 中位 TPOT | P99 ITL |
 |---|---|---|---|---|
 | 1 | 13.5 | 191 ms | 60.4 ms | 105 ms |
 | 8 | 112.8 | 253 ms | 65.8 ms | 67 ms |
@@ -36,50 +36,50 @@ The random dataset with a fixed seed sends the same prompts in every run. The fi
 | 32 | 275.1 | 1,800 ms | 101.8 ms | 613 ms |
 | 64 | 242.3 | 11,181 ms | 129.2 ms | 1,233 ms |
 
-The jump between 16 and 32 users looked like the knee. It was the throughput peak. A cached prompt skips its prefill, so its first token comes fast, and most requests below 32 users had that advantage.
+16 到 32 个用户之间的跳变看起来像拐点。其实那是吞吐量的峰值。命中缓存的 prompt 跳过了 prefill，所以首 token 来得很快，而 32 个用户以下的大多数请求都占了这个便宜。
 
-### The flushed comparison
+### 清空后的对比
 
-The same sweep at 900 MHz, the cache reset ahead of every run, against an unflushed run of the same session:
+同样的压测，频率 900 MHz，每次运行前重置缓存，并与同一会话中不清空的运行对比：
 
-| Users | vLLM, flushed against unflushed | SGLang, flushed against unflushed |
+| 用户数 | vLLM，清空 / 不清空 | SGLang，清空 / 不清空 |
 |---|---|---|
-| 4 | 650 / 145 ms | 532 to 645 / 141 ms |
-| 8 | 951 to 978 / 264 to 274 ms | 1,174 to 1,273 / 173 to 178 ms |
-| 16 | 1,550 to 1,587 / 294 to 295 ms | 1,804 to 1,944 / 218 ms |
-| 32 | 1,982 to 2,084 / 2,012 to 3,091 ms | 3,216 to 3,228 / 2,710 to 2,917 ms |
+| 4 | 650 / 145 ms | 532 至 645 / 141 ms |
+| 8 | 951 至 978 / 264 至 274 ms | 1,174 至 1,273 / 173 至 178 ms |
+| 16 | 1,550 至 1,587 / 294 至 295 ms | 1,804 至 1,944 / 218 ms |
+| 32 | 1,982 至 2,084 / 2,012 至 3,091 ms | 3,216 至 3,228 / 2,710 至 2,917 ms |
 
-From 32 users the queue dominated and the reset changed little. Below it, the cache made most of the fast first tokens.
+从 32 个用户起，排队占了主导，重置几乎没有影响。在此之下，快速的首 token 大多来自缓存。
 
-### The size of the effect on one load
+### 同一负载上的影响有多大
 
-The same 64 prompts at 16 users, four times in a row, median TTFT in ms: vLLM read 925 fresh, 148 on a repeat without a flush, 1,163 on a repeat after a flush, and 184 on another repeat without one. SGLang read 394, 82.5, 289 and 77. The repeat without a flush read a first token about 6 times lower on vLLM and 4.8 times lower on SGLang. The time per token changed by less than 15 percent, because a hit removes prefill work and leaves the decode work the same.
+16 个用户下把同样的 64 个 prompt 连续跑四次，中位 TTFT（ms）：vLLM 首次 925，不清空重跑 148，清空后重跑 1,163，再不清空重跑 184。SGLang 分别是 394、82.5、289 和 77。不清空的重跑，首 token 时间在 vLLM 上缩短至约六分之一，在 SGLang 上缩短至约 1/4.8。每个 token 的时间变化不到 15%，因为命中只省掉 prefill 的工作，decode 的工作不变。
 
-On the GB10 the effect reversed a sweep. A single kit run read 677.61 ms as the median time to first token with a cap of 8 and 390.38 ms with a cap of 32: more load, a faster first token. The prefill lines showed why. At a cap of 8, 16 of the 64 prompts were in the cache before the run started; at 32, 64 of 128; at 64, 128 of 256. Three seeds with fresh servers put the first token back in order, 209.98 ms at 8 and 416.37 at 32.
+在 GB10 上，这个效应甚至让一轮压测的结果倒了过来。工具包的一次运行中，上限 8 时首 token 中位时间是 677.61 ms，上限 32 时是 390.38 ms：负载更大，首 token 反而更快。prefill 日志说明了原因。上限 8 时，64 个 prompt 中有 16 个在运行开始前就已经在缓存里；上限 32 时是 128 个中的 64 个；上限 64 时是 256 个中的 128 个。换成三个种子、每次用全新的服务器之后，首 token 时间恢复了正常顺序，8 时 209.98 ms，32 时 416.37 ms。
 
-### The protocol
+### 规范流程
 
-1. Start each run with an empty cache. Restart the server, or call the reset route: `POST /reset_prefix_cache` on vLLM, which exists only with `VLLM_SERVER_DEV_MODE=1` and must never be exposed, or `--flush-cache` on the SGLang client, which calls `/flush_cache` after the warm-up. SGLang flushes only when no request runs or waits; otherwise the route answers HTTP 400 and the log says so.
-2. Use a new seed for each run, so that the random dataset sends new prompts.
-3. Record the cached tokens. Read the prefix cache counters before and after the run, or turn on the per-response count, `--enable-prompt-tokens-details` on vLLM and `--enable-cache-report` on SGLang.
-4. Write the cache setting and the cached tokens next to the result.
+1. 每次运行都从空缓存开始。重启服务器，或调用重置接口：vLLM 上是 `POST /reset_prefix_cache`，它只在 `VLLM_SERVER_DEV_MODE=1` 时存在，绝不能对外暴露；SGLang 客户端用 `--flush-cache`，它会在预热之后调用 `/flush_cache`。SGLang 只在没有请求运行或等待时才清空，否则接口返回 HTTP 400，日志里也会写明。
+2. 每次运行换一个新种子，让 random 数据集发出新的 prompt。
+3. 记录命中缓存的 token 数。在运行前后读取前缀缓存计数器，或者开启按响应统计，vLLM 上是 `--enable-prompt-tokens-details`，SGLang 上是 `--enable-cache-report`。
+4. 把缓存设置和命中的 token 数写在结果旁边。
 
-The vLLM sweep tool resets the server caches between its runs for you.
+vLLM 的 sweep 工具会在两次运行之间替你重置服务器缓存。
 
 ## Follow-ups
 
-- **Level 2:** Why did the time per token barely move between the flushed and the unflushed runs? Expected: a cache hit removes prefill work and leaves the decode work the same, so TTFT falls and TPOT moves by less than 15 percent.
-- **Level 3:** On the GB10 a single run read a faster first token at a cap of 32 than at a cap of 8. How is that possible? Expected: the runs shared one server and one seed, so the run at 32 found 64 of its 128 prompts in the cache from the earlier runs and half of its requests skipped prefill; three seeds on fresh servers put the first token back in order.
-- **Level 3:** The flush route on SGLang answered HTTP 400. What happened? Expected: the server flushes only when no request runs or waits; a request was still pending, so the flush did not run and the log says so, and the run must wait or restart the server.
-- **Level 4:** How would you make the warm-cache effect part of a benchmark on purpose? Expected: measure it as its own axis; record the cached tokens per run from the counters or the per-response field, and report a warm-cache row next to a cold row, each with its hit rate, instead of letting an unknown mix of the two set the knee.
+- **Level 2:** 清空和不清空的两组运行之间，为什么每个 token 的时间几乎没变？ Expected: 缓存命中只省掉 prefill 的工作，decode 的工作不变，所以 TTFT 下降，TPOT 的变化不到 15%。
+- **Level 3:** 在 GB10 上，一次运行里上限 32 的首 token 比上限 8 还快。这怎么可能？ Expected: 几次运行共用一台服务器和同一个种子，所以上限 32 那次在缓存里找到了之前运行留下的 128 个 prompt 中的 64 个，一半请求跳过了 prefill；三个种子加全新服务器让首 token 时间恢复了正常顺序。
+- **Level 3:** SGLang 的清空接口返回了 HTTP 400。发生了什么？ Expected: 服务器只在没有请求运行或等待时才清空；当时还有请求未完成，所以清空没有执行，日志里写明了这一点，这次运行要么等待，要么重启服务器。
+- **Level 4:** 如果要有意把热缓存效应纳入基准测试，你怎么做？ Expected: 把它当成单独的一个维度来测；从计数器或按响应字段记录每次运行命中的 token 数，并把热缓存一行和冷缓存一行并排报告，各自附上命中率，而不是让两者不明比例的混合决定拐点。
 
 ## Wrong answers
 
-- "The jump from 0.3 to 1.8 s between 16 and 32 users is the knee." That sweep ran without a reset, so most requests below 32 users skipped their prefill; with a reset the P99 ITL jumped from about 70 to 522 ms between 8 and 16 users, and that is the knee.
-- "Turn the prefix cache off for benchmarks." Production runs with it on; reset it between runs, use a new seed per run and record the cached tokens instead.
-- "The time per token is inflated too, so throw the whole sweep away." A hit removes prefill work only; the time per token changed by less than 15 percent between flushed and unflushed runs, so the TPOT column stands and the TTFT column does not.
-- "The random dataset gives new prompts every run." With the same seed the client sends the same prompts; the dataset is random only across seeds, so use a new seed per run.
+- "16 到 32 个用户之间从 0.3 秒跳到 1.8 秒，这就是拐点。" 那轮压测没有重置，32 个用户以下的大多数请求跳过了 prefill；重置后 P99 ITL 在 8 到 16 个用户之间从约 70 ms 跳到 522 ms，那才是拐点。
+- "做基准测试时把前缀缓存关掉。" 生产环境是开着它的；应该在两次运行之间重置它，每次换新种子，并记录命中的 token 数。
+- "每个 token 的时间也虚高了，所以整轮压测都作废。" 命中只省掉 prefill 的工作；清空与不清空的运行之间，每个 token 的时间变化不到 15%，所以 TPOT 那一列可用，TTFT 那一列不可用。
+- "random 数据集每次运行都会给出新的 prompt。" 种子相同时，客户端发出的 prompt 也相同；这个数据集只在不同种子之间是随机的，所以每次运行要换新种子。
 
 ## Taught in
 
-[Benchmark your server in 15 minutes](../../../manuals/vllm-101/sections/5-1-benchmark-your-server-in-15-minutes.md) and [the SGLang benchmark section](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md) show the flushed and unflushed runs and the reset protocol.
+[15 分钟压测你的服务器](../../../manuals/vllm-101/sections/5-1-benchmark-your-server-in-15-minutes.md)和 [SGLang 基准测试一节](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)给出了清空与不清空的运行对比以及重置流程。

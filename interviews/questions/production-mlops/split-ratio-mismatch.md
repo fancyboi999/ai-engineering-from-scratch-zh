@@ -1,6 +1,6 @@
 ---
 id: split-ratio-mismatch
-title: An even split that lands at 47 to 53
+title: 均分实验却分成了 47 比 53
 card: production-mlops
 kind: debug
 level: 2
@@ -16,46 +16,46 @@ related: [production-mlops/peeking-at-an-ab-test, production-mlops/hash-bucket-a
 updated: 2026-11-03
 ---
 
-An experiment assigns users evenly to control and variant. After a week the dashboard shows 47 percent of users in control and 53 percent in the variant, and the variant is ahead on the primary metric. What do you conclude, and what do you do next?
+某实验把用户均分到对照组和变体组。一周后，看板显示对照组占 47%，变体组占 53%，变体的主要指标领先。你得出什么结论，接下来怎么做？
 
 ## Short answer
 
-Do not read the result. A configured even split that delivers 47 to 53 over a week of traffic is a sample ratio mismatch, which means the assignment or the logging is broken and the two groups are no longer comparable. Find the cause in the assignment path, fix it, and start the experiment again.
+先不要解读结果。配置为均分，一周流量却分成 47 比 53，属于样本比例不匹配，说明分组或日志记录有问题，两组已不可比较。在分组路径中找出原因，修复后重新开始实验。
 
 ## Full answer
 
-### What the check says
+### 检查说明了什么
 
-An assignment hash puts each user into an arm. Over a week, the delivered split should sit very close to the configured one. When it does not, the lesson's answer is blunt: something is broken. Both experiment platform types in the lesson run this check for you, and it belongs in front of every readout.
+分组哈希将每个用户放入一组。一周后的实际比例应非常接近配置比例。如果不是，课程的回答很直接：某处出了问题。课程中的两类实验平台都会执行这项检查，它应放在每次结果解读之前。
 
-### Why the win is void
+### 为什么胜出结果无效
 
-Whatever lost users from one arm can be correlated with the outcome. If slow clients fail before they log an exposure in one arm, that arm looks faster and happier. The measured lift is then the dropout, not the variant. No correction after the fact restores the randomization.
+导致某组用户流失的因素，可能与结果相关。如果慢客户端在某组记录曝光前失败，这组就会显得更快、用户更满意。测得的提升来自用户流失，而非变体。事后校正无法恢复随机分组。
 
-### Where to look
+### 排查位置
 
-1. **The assignment function.** The production application capstone assigns with a deterministic hash of the user id, so that one user stays in one arm. A random draw per request, or a hash on a field that changes, breaks the split.
-2. **Exposure logging.** One arm may drop events, for example when the variant path logs after a call that can fail.
-3. **Client errors.** A variant that crashes before it logs removes its users from the count.
-4. **Bots and retries.** A bot or a retry loop that lands in one arm inflates it.
-5. **Caches.** A cache in front of the assignment can serve one arm's decision to many users.
+1. **分组函数。** 生产应用综合项目对用户 ID 做确定性哈希，让同一用户始终留在同一组。按请求随机抽组，或对会变化的字段做哈希，都会破坏分流。
+2. **曝光日志。** 某组可能丢失事件，例如变体路径在一个可能失败的调用之后才记日志。
+3. **客户端错误。** 变体在记录日志前崩溃，会让这部分用户漏掉计数。
+4. **机器人和重试。** 落入某组的机器人或重试循环会使该组计数膨胀。
+5. **缓存。** 分组之前的缓存可能把某组的决策返回给许多用户。
 
-### Then
+### 接下来
 
-Fix the cause, discard the data, and restart. Pre-register the mismatch check so that it blocks the readout automatically, and nobody has to argue about a winning variant.
+修复原因，丢弃数据，重新开始。预先登记样本比例不匹配检查，让它自动阻断结果解读，团队就不必争论某个胜出的变体。
 
 ## Follow-ups
 
-- **Level 2:** Why hash the user id instead of drawing an arm at random on each request? Expected: the same user lands in the same arm on every request, so the experience is consistent and the exposure count is per user.
-- **Level 3:** Name two causes that put more users in the variant than in control. Expected: a logging failure that drops control exposures, or a variant path that treats bots or retries differently.
-- **Level 3:** Can you correct the mismatch statistically and keep the result? Expected: no. The mismatch shows that the groups are not comparable, and no correction restores the randomization.
+- **Level 2:** 为什么对用户 ID 做哈希，而不在每次请求时随机分组？ Expected: 同一用户每次请求都落入同一组，体验一致，曝光也按用户计数。
+- **Level 3:** 举出两种让变体组用户比对照组多的原因。 Expected: 日志故障丢失对照组曝光，或变体路径对机器人和重试的处理不同。
+- **Level 3:** 能否统计校正比例不匹配并保留结果？ Expected: 不能。不匹配说明两组不可比较，校正无法恢复随机分组。
 
 ## Wrong answers
 
-- "Three percent is within noise." Over a week of traffic, that gap under a fair split is very unlikely, and the mismatch check exists to flag exactly this case.
-- "The variant wins by more than the gap, so ship it." The gap can be correlated with the outcome, so the lift can be the dropout itself.
-- "Drop variant users until the groups match." Removing users after the fact adds a second bias on top of the first.
+- "百分之三的差距属于噪声。" 一周流量下，公平分组出现这种差距的可能性很低，比例检查正是用来标记这种情况的。
+- "变体领先幅度超过比例差距，可以上线。" 比例差距可能与结果相关，提升可能就来自用户流失。
+- "删掉部分变体用户，直到两组一致。" 事后删用户会在原有偏差上再加一层偏差。
 
 ## Taught in
 
-The [A/B testing lesson](../../../phases/17-infrastructure-and-production/21-ab-testing-llm-features/) defines the sample ratio mismatch check, and the [production app lesson](../../../phases/11-llm-engineering/13-production-app/) hashes the user id to pick an arm.
+[A/B 测试课程](../../../phases/17-infrastructure-and-production/21-ab-testing-llm-features/)定义样本比例不匹配检查，[生产应用课程](../../../phases/11-llm-engineering/13-production-app/)按用户 ID 哈希分组。

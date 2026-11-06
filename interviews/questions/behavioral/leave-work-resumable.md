@@ -1,6 +1,6 @@
 ---
 id: leave-work-resumable
-title: Leave work so that someone else can resume it
+title: 妥善安排工作以便他人可以接手
 card: behavioral
 kind: concept
 level: 1
@@ -16,44 +16,44 @@ related: [behavioral/plan-you-would-reject]
 updated: 2026-11-03
 ---
 
-Your session ends without warning in the middle of a multi-step change, and a colleague picks it up the next morning. What must they be able to find, and where?
+在一项多步骤的变更进行到一半时，你的会话未收到任何预警就意外中断了，第二天早晨一位同事需要接手该工作。他们必须能够在哪里找到哪些信息？
 
 ## Short answer
 
-They need to see which items are done, which proof ran for each one, which files changed, which dependencies are now unblocked, and what the next safe item is. That state lives next to the work, in the repository, as small items with explicit proof, not as checked boxes inside a chat.
+他们需要看清哪些条目已完成、每个条目运行了哪些验证、改动了哪些文件、哪些依赖项已解除阻塞，以及下一个安全的待办条目是什么。这些状态应当与工作产物一并存放在代码仓库中，体现为附带明确证明的小粒度条目，而非聊天会话框里勾选的复选框。
 
 ## Full answer
 
-### Design for interruption
+### 针对意外中断设计
 
-Sessions end unexpectedly. A resumable plan has work items small enough that another person, or another agent, can determine the state of each one from the artifacts alone. The five things they must be able to read:
+会话可能意外中断。具备可恢复性的计划所包含的工作条目足够小，使得另一个人或另一个 agent 仅凭产物本身就能判定每个条目的状态。他们必须能够明确查阅以下五项内容：
 
-- which item is complete;
-- which proof ran and what it returned;
-- which artifacts changed;
-- which dependencies are now unblocked;
-- what the next safe item is.
+- 哪个条目已经完成；
+- 运行了哪些验证以及返回了什么结果；
+- 哪些产物发生了变动；
+- 哪些依赖项已被解除阻塞；
+- 下一个安全的待办条目是什么。
 
-### Why chat is the wrong place
+### 为什么聊天对话框是错误的存放地
 
-A checked box in a conversation says that someone believed an item was done. It does not say which command proved it or which files it touched. The next person either trusts the box or redoes the work. A plan stored next to the code, with one identifier per item and the proof command written down, lets them verify instead of trust.
+对话框里勾选的复选框仅代表有人曾认为该条目已完成。它并未说明是通过什么命令证明的，也没有说明触及了哪些文件。接手的人要么盲目信任该复选框，要么被迫重做一遍。将计划与代码保存在一起，每个条目分配独立标识符并写明具体的验证命令，接手者便能依凭验证而非依赖盲信。
 
-### The habit
+### 习惯规范
 
-I stop at item boundaries when I can. When I cannot, the plan still shows the last proof that passed, so the resume point is the first item whose proof has not run.
+我尽可能在条目边界处停顿。即便无法做到，计划中依然会记录最后一条通过的证明，因此恢复工作的切入点就是第一项尚未运行验证的条目。
 
 ## Follow-ups
 
-- **Level 1:** Where do you keep the plan? Expected: in the repository next to the work, as the source of truth, with any rendering such as a Markdown view generated from it.
-- **Level 2:** An item is marked done but has no proof recorded. What does the colleague do? Expected: treat it as not done and run its proof; a box without proof is a belief.
-- **Level 2:** Why does item size matter for resumption? Expected: a small item either finished or did not; a large half-done item forces the next person to reconstruct where it stopped.
+- **Level 1:** 你在哪里维护这份计划？ Expected: 作为唯一事实源保存在代码仓库中与工作产物放在一起，任何渲染视图（如 Markdown 页面）均由其自动生成。
+- **Level 2:** 某条目被标记为已完成但未记录任何证明，同事该如何处理？ Expected: 视其为未完成并运行其验证；缺乏证明的复选框仅仅是一种主观信念。
+- **Level 2:** 为什么条目粒度大小对恢复工作至关重要？ Expected: 小粒度条目状态清晰（要么完成要么未完成）；大条目如果只做了一半，会迫使接手者去重构它停在哪里。
 
 ## Wrong answers
 
-- "Write a summary message at the end of the session." The session can end before the summary; the state must exist as the work proceeds.
-- "The git log is enough." Commits show what changed, not which proof ran or which item is next.
-- "Only the person who started can finish it." That is the failure the plan should prevent.
+- "在会话结束时写一段总结消息。" 会话可能在写总结前就已经意外终止；工作状态必须在推进过程中实时存在。
+- "查看 git log 就足够了。" 提交记录只能展示修改了什么，无法体现运行了哪些证明或下一步是哪一项。
+- "只有最初发起任务的人才能完成它。" 这正是计划应当防止的失败。
 
 ## Taught in
 
-The [evidence-backed plan lesson](../../../phases/14-agent-engineering/44-plan-from-evidence/) covers designing a plan for interruption and storing it next to the work.
+[基于证据制定计划课程](../../../phases/14-agent-engineering/44-plan-from-evidence/)涵盖了针对中断设计工作计划并将其保存在工作产物旁的规范做法。

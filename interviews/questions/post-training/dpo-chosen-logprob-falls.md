@@ -1,6 +1,6 @@
 ---
 id: dpo-chosen-logprob-falls
-title: Margin up, chosen answers down, in a DPO run
+title: DPO 训练中边际上升但选定回答概率下降
 card: post-training
 kind: debug
 level: 3
@@ -16,48 +16,48 @@ related: [post-training/dpo-implicit-reward]
 updated: 2026-11-03
 ---
 
-During a DPO run the loss falls and the reward margin that the trainer logs grows every epoch. Yet the model's samples get shorter and less fluent, and the policy now gives the chosen training answers a lower probability than they had under the reference. Explain the mechanism and what you change.
+在一次 DPO 训练中，损失函数正常下降，训练器记录的奖励边际每个 epoch 都在稳步扩大。然而，模型采样的实际文本却变得越来越短且不够流畅，当前策略对训练集中正向选定回答给出的概率，甚至低于初始参考模型给出的概率。请解释其内在机制，并说明应如何改进。
 
 ## Short answer
 
-The DPO loss cares only about the difference of two log ratios. It can lower the probability of the chosen answer as long as the rejected answer falls faster, and the margin still grows. This is the degraded chosen response failure: the policy moves probability mass away from both training answers, often toward short degenerate outputs. Log the absolute chosen log-probability, add a penalty on downward moves of the chosen term as the behavior-preserving variant does or switch to a loss with a bounded margin, and keep a generation eval next to the margin.
+DPO 损失函数只关注两个概率比的对数之间的差值。只要负向拒绝回答的概率下降得更快，损失函数完全可以压低正向选定回答的概率，借此扩大整体边际。这就是选定回答退化失效：策略模型将概率质量从两套训练回答中同时抽离，往往流向退化生成的极短无意义文本。应对方案是：在记录差值边际的同时记录选定项的绝对对数概率；引入针对选定项概率下移的惩罚项（如保行为变体所做的那样），或切换为有界边际损失函数；并在边际指标之外配套保留文本生成评估。
 
 ## Full answer
 
-### Why the margin can lie
+### 为什么边际指标会撒谎
 
-The DPO gradient pushes the chosen log ratio up and the rejected log ratio down, but only their difference enters the loss. If the rejected answers are easy to suppress, the cheapest way to grow the margin is to suppress them hard while the chosen answers drift down too. The implicit reward gap is also unbounded: a weak preference can produce an arbitrarily large gap. Nothing in the loss asks the policy to keep generating the chosen answers.
+DPO 的梯度一方面推高选定项的概率比的对数，另一方面压低拒绝项的概率比的对数，但最终进入损失函数的仅是它们之间的差值。如果拒绝项的回答更容易被压制，扩大边际最省力的捷径就是极其剧烈地压低拒绝项，同时顺带让选定项的概率也随之下滑。隐式奖励差距在数学上也是无界的：即使是微弱的偏好差异也能产生任意庞大的数值差距。损失函数中没有任何一项在硬性要求策略必须持续生成选定回答。
 
-### What you log
+### 训练中必须记录的指标
 
-- The absolute chosen log-probability under the policy, per epoch, next to the margin. The capstone's margin function reports the difference; add the chosen term alone.
-- Sample lengths and a small generation eval. A margin that grows while samples degrade is the signature.
-- The KL to the reference. The move away from both answers shows up as a growing distance.
+- 每个 epoch 记录策略模型在选定回答上的绝对对数概率，将其与差值边际并排展示。综合项目的 margin 函数默认仅汇报两者之差；必须把选定项本身单独拿出来监控。
+- 采样生成的文本长度以及轻量级生成评测。边际上升伴随生成质量劣化，是该失效的标志性特征。
+- 相对参考模型的 KL 散度。策略同时远离两种训练回答的行为，会直接体现在持续扩大的 KL 距离上。
 
-### The fixes
+### 工程修复方案
 
-1. A penalty on downward moves of the chosen log-probability. The behavior-preserving variant of the family adds that one correction and reports a gain over plain DPO on reasoning tasks.
-2. A bounded margin. The identity-mapping variant replaces the log sigmoid with a squared error on a target of one over two beta, so the gap and the preference strength stay proportional.
-3. A conservative beta and early stopping, chosen against a generation eval, not against the training margin.
-4. Better pairs. Pairs where both answers are rare under the reference produce arbitrary implicit rewards; filter them.
+1. 对选定回答对数概率的下移施加惩罚。DPO 家族的保行为变体仅增加了这一项修正，就在推理任务上取得了优于普通 DPO 的效果。
+2. 采用有界边际损失。恒等映射变体将对数 sigmoid 替换为针对二倍 beta 分之一目标值的均方误差，从而使概率差距与真实的偏好强度保持严格成比例。
+3. 采用保守的 beta 参数并执行早停，停机点依据真实的文本生成评估来决定，绝不看训练边际指标。
+4. 过滤清洗偏好数据对。在参考模型下本身就极罕见的低概率数据对，容易产出虚假的极端隐式奖励，应予以剔除。
 
-### Why this is still over-optimization
+### 为什么这本质上仍是过度优化
 
-Direct alignment methods remove the explicit reward model, not the proxy. The quantity they optimize is a ratio against the reference, and that ratio can be pushed to places the preference data never covered. The same peak-and-collapse curve that reward models show appears here across KL budgets.
+直接对齐算法只是去掉了显式奖励模型，并没有消除代理度量本身。它们所优化的数学实体是对参考模型的概率比值，而该比值完全可以被优化器推向偏好数据从未覆盖过的盲区。传统奖励模型上呈现的先升后降峰值坍塌曲线，在直接对齐算法的不同 KL 预算下同样如影随形。
 
 ## Follow-ups
 
-- **Level 3:** Why does length matter in this failure? Expected: a long rejected answer has a more negative total log-probability by construction, so suppressing it is cheap and the gap grows for the wrong reason; length normalization removes that incentive.
-- **Level 3:** How does a reference-free, length-normalized loss change the picture? Expected: it scores the average log-probability per token with a margin, which removes the length bias and the reference, but it also removes the anchor, so drift needs its own guard.
-- **Level 4:** Which variant do you pick when preference strengths vary widely across pairs? Expected: the bounded one; it keeps the gap proportional to the preference, so strong pairs do not saturate the loss and weak pairs do not blow up.
-- **Level 4:** Does a lower beta help here? Expected: no; a lower beta lets the policy move further from the reference for the same margin, which makes the degradation worse.
+- **Level 3:** 文本长度在这一失效模式中扮演了什么角色？ Expected: 冗长的拒绝回答由于累加的 token 较多，其总对数概率本来就更负，因此压制它极其廉价，导致差距因为错误的原因被虚假放大；长度归一化能有效消除这种长度偏置。
+- **Level 3:** 无参考模型且带长度归一化的损失函数如何改变这一局面？ Expected: 它以带有边际约束的每 token 平均对数概率打分，去掉了长度偏差和参考模型，但也失去了参考锚点，必须为策略漂移单独设计防护。
+- **Level 4:** 当不同数据对之间的偏好强弱悬殊极大时，你会选用哪种变体？ Expected: 选用有界边际变体；它让概率差距与偏好强度保持成比例，既防止强偏好导致损失饱和，又避免弱偏好引发隐式分无界膨胀。
+- **Level 4:** 调小 beta 参数能否缓解该问题？ Expected: 不能；更小的 beta 允许策略在产生相同边际时偏离参考模型更远，这反而会使选定回答的概率退化更加严重。
 
 ## Wrong answers
 
-- "The margin grows, so training works; the samples are a decoding problem." The margin can grow while both answers lose probability; the generation eval is the objective, not the margin.
-- "Raise beta until the samples recover." A higher beta slows the drift but does not change the direction of the gradient on the chosen term; the penalty on that term does.
-- "Train more epochs; the chosen probability will come back." The loss has no term that rewards a higher chosen probability on its own, so more epochs push further the same way.
+- "边际在持续上升，说明训练是有效的；生成的退化只是解码采样参数的问题。" 边际上升的同时两个候选回答的绝对概率完全可能都在跌；生成质量才是真实目标，训练边际不是。
+- "调高 beta 直到生成的样本恢复正常。" 更大的 beta 能够减缓漂移速度，但无法改变选定项梯度方向的缺陷；对该项施加惩罚则可以改变方向。
+- "多训练几个 epoch，选定回答的概率自己就会涨回来。" 损失函数中没有任何单侧奖励选定项高概率的项，增加训练轮次只会沿着相同的方向进一步推移。
 
 ## Taught in
 
-The [DPO family lesson](../../../phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/) names this chosen-answer failure and the variants that fix it, and the [DPO capstone](../../../phases/19-capstone-projects/40-dpo-from-scratch/) derives the gradient that pushes the chosen up and the rejected down.
+[DPO 家族课程](../../../phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/)点名了选定项概率退化失效及修正变体，而 [DPO 从零构建综合项目](../../../phases/19-capstone-projects/40-dpo-from-scratch/)推导了将选定项推高、将拒绝项压低的梯度公式。

@@ -1,6 +1,6 @@
 ---
 id: decision-brief-after-setback
-title: Brief the decision owner after a setback
+title: 遭受挫折后向决策负责人做情况汇报
 card: behavioral
 kind: design
 level: 3
@@ -16,51 +16,51 @@ related: [behavioral/prototype-became-production, behavioral/feedback-ratchet-ow
 updated: 2026-11-03
 ---
 
-Tell me about a project where the evidence turned against your plan. What did you do inside your own authority, and how did you present the situation to the person who had to decide?
+请讲一个证据与你原定计划相悖的项目经历。在自己的职权范围内你做了什么，又是如何将这一局面呈现给最终决策者的？
 
 ## Short answer
 
-I separate what I observed from what was reported and what I inferred, name the setback and the evidence that changed my understanding, and move the reversible work I am allowed to do while the blocked decision waits. Then I write a short brief for the decision owner: the user problem and the new evidence, at least two options including a cheaper manual or no-build option where it is credible, the tradeoffs in quality, effort, cost and risk, my recommendation with its remaining uncertainty, and the decision needed with its owner and date.
+我把观察到的、汇报上来的和推断出的内容区分开来，明确陈述受挫情况以及改变认知的关键证据，并在等待受阻决策裁决的同时，推进职权范围内被授权的可逆工作。随后，我为决策负责人撰写一份简短简报：阐明用户痛点与新证据，提供至少两个备选方案（包括切实可行的低成本手工方案或不构建方案），权衡质量、工作量、成本与风险，提出包含剩余不确定性的个人建议，并标明所需决策、决策负责人与截止日期。
 
 ## Full answer
 
-### Establish what happened
+### 查明发生了什么
 
-A setback is a failed assumption, an unusable result, an unexpected cost or a delayed handoff. I record the user, the task, the current workflow and the outcome I wanted, and link a consented observation, a redacted record or a reproducible trace. Simulated observations stay labeled as simulated. I do not invent interviews, approvals or adoption.
+受挫可能表现为假设落空、产物不可用、非预期成本或交付延迟。我记录用户对象、任务目标、当前工作流以及期望达成的结果，并附上获得知情同意的观察记录、脱敏数据或可复现的执行记录。模拟生成的观察记录必须明确标记为模拟生成。我不编造访谈、审批或采用情况。
 
-### Progress inside my authority
+### 在职权范围内推进工作
 
-I list the unknowns and pick the cheapest reversible action that resolves the most consequential one. I state what I can decide, what an existing agreement bounds, and what needs authorization. Preparing a redacted offline replay while waiting for permission to use customer data is initiative. Expanding my own access is not.
+我列出所有未知项，并挑选能解决影响最大未知项且成本最低的可逆行动。我明确说明自己有权决定的事项、受现有协议约束的边界以及需要另行授权的范围。在等待使用客户数据的审批期间，先行准备脱敏的离线回放属于主动作为；擅自扩大自己的系统访问权限则不属于。
 
-### The brief
+### 决策简报
 
-The brief is for someone who does not need the implementation detail:
+该简报面向无需了解具体实现细节的人员：
 
-- the user problem and the evidence that changed the plan;
-- at least two options, with a cheaper manual or no-build option where it is credible;
-- the tradeoffs in quality, interaction design, effort, operating cost and risk;
-- my recommendation, the remaining uncertainty and the decision needed;
-- the decision owner, the affected stakeholders and the date the decision is needed.
+- 用户痛点以及促使原计划改变的客观证据；
+- 至少两个备选方案，且在方案合理时包含低成本的手工处理或不构建方案；
+- 在质量、交互设计、工作量、运营成本与风险维度的权衡考量；
+- 个人推荐方案、剩余的不确定性以及所需的决策项；
+- 决策负责人、受影响的利益相关者以及决策截止日期。
 
-I ask a peer to represent an affected stakeholder and challenge one tradeoff, and I record whether the objection changes the recommendation. Role-play stays labeled; it cannot stand in for the real stakeholder's agreement.
+我会请一位同事代入受影响的利益相关者角色，对其中某项权衡提出质疑，并记录该异议是否会改变推荐方案。角色扮演必须注明标签，不能替代真实利益相关者的实际同意。
 
-### Close the loop
+### 形成闭环
 
-I recommend continue, change or stop against criteria declared in advance. If the evidence is inconclusive, I name the missing observation and the next bounded test. The decision owner's response goes in the record, or stays pending if none was made. Human review and correction time count as part of the workflow: a faster model response can still make the whole task slower or harder to trust.
+我依据预先声明的标准，给出继续、调整或终止的明确建议。如果证据尚不充分，我会指出缺失的观察数据并规划下一步的有界测试。决策负责人的回复会被计入记录；若未作决策则保持待定状态。人工审查与纠错时间同样属于工作流的一部分：更快的模型响应速度依然可能导致整个任务变慢或更难被信任。
 
 ## Follow-ups
 
-- **Level 3:** Why include a no-build option whenever it is credible? Expected: narrowing the workflow or keeping a manual step can be the better decision; without that option the brief only asks for permission to continue.
-- **Level 3:** What goes next to each number in the outcome comparison? Expected: the sample counts, the exclusions and the evidence links, with the same metric definition and comparable windows for baseline and follow-up.
-- **Level 4:** A simulated walkthrough passed every step. What claim can you make? Expected: a bounded learning claim only; unobserved real-user behavior stays a named gap with the next observation needed to close it.
-- **Level 4:** How do you turn the setback into a change in how the team delivers? Expected: pick one process improvement with an owner and a review date, then keep, revise or retire it on evidence.
+- **Level 3:** 为什么只要合理可行，就应包含不构建方案？ Expected: 收窄工作流或保留手工步骤可能是更好的决策；若缺少该选项，简报就变成了变相索取继续推进的许可。
+- **Level 3:** 在结果对比的每个数字旁需要注明什么？ Expected: 样本数量、排除项与证据链接，且基线与跟踪期必须采用相同的指标定义和可比的观察窗口。
+- **Level 4:** 模拟演练走通了所有步骤，你能得出什么结论？ Expected: 只能说明在限定范围内学到了什么；未经实际观察的真实用户行为依然是已知空白，必须注明后续弥补该空白所需的观测手段。
+- **Level 4:** 如何将这次受挫转化为团队交付方式的改进？ Expected: 选取一项确定了负责人和复审日期的流程改进，随后根据客观证据决定保留、修订还是退役。
 
 ## Wrong answers
 
-- "Wait for the decision before doing anything." Reversible, authorized work can move forward; only the blocked decision waits.
-- "Present the recommendation alone to keep it simple." The owner needs the options and the tradeoffs to make a decision rather than approve a conclusion.
-- "Report the measured gain and leave out the review time." The complete task includes human review and correction; a faster model can still make the task slower.
+- "在决策出炉之前什么也不做，原地等待。" 职权范围内已被授权的可逆工作可以继续推进；只有受阻的决策才需要等待。
+- "为了保持简明，只呈现推荐方案。" 决策负责人需要了解备选方案与权衡代价来做出决断，而不是仅仅批准结论。
+- "汇报测得的收益，省略审查耗时。" 完整任务包含人工审查与纠错时间；更快的模型响应仍可能使整体任务变慢。
 
 ## Taught in
 
-The [feedback ratchet lesson](../../../phases/14-agent-engineering/54-build-the-feedback-ratchet/) gives the decision brief, the authority rule and the acceptance rubric.
+[反馈棘轮课程](../../../phases/14-agent-engineering/54-build-the-feedback-ratchet/)给出了决策简报、职权规则与验收标准。

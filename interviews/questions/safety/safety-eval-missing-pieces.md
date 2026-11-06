@@ -1,6 +1,6 @@
 ---
 id: safety-eval-missing-pieces
-title: One table says 97 percent refusal
+title: 一张表写着 97% 拒答率
 card: safety
 kind: debug
 level: 3
@@ -16,42 +16,42 @@ related: [safety/two-refusal-metrics, safety/compliance-gap-metric]
 updated: 2026-11-03
 ---
 
-A vendor's safety report has one table: the refusal rate on a harmful prompt set, 97 percent, measured once with the default system prompt. You must decide whether to adopt the model for a customer facing assistant. List what the report cannot tell you and the measurements you add before you decide.
+一家供应商的安全报告只有一张表：在一套有害 prompt 上的拒答率是 97%，用默认系统 prompt 测了一次。你要决定是否把这个模型用在面向客户的助手里。列出这份报告说明不了什么，以及你在决定前要补哪些测量。
 
 ## Short answer
 
-The table measures one side of one decision under one condition. It cannot show over refusal on benign prompts, which category of attack the misses fall into, whether the model behaves the same when it believes it is unmonitored, or how the number moves under your system prompt and attack families. Add a benign probe set for over refusal, a per category breakdown from a taxonomy, a monitored and unmonitored split, and a red team run with several attack families against your deployment, and plot block rate against benign pass rate.
+这张表只在一种条件下，测了一个决策的一侧。它看不出良性 prompt 上的过度拒答，看不出漏掉的攻击落在哪一类，看不出模型在认为没人监控时是否表现一致，也看不出换成你的系统 prompt 和攻击家族后这个数字怎么变。要补上：测过度拒答的良性探测集、按分类法的分类别拆解、受监控与未受监控的拆分、针对你的部署跑多个攻击家族的红队测试，并把拦截率对良性通过率画成图。
 
 ## Full answer
 
-### What is missing
+### 缺了什么
 
-1. **The other side.** Refusal on harmful prompts alone rewards a model that refuses everything. The over refusal rate on a benign suite is the second half, and the two move together with every system prompt change.
-2. **Where the misses are.** A per category breakdown against a taxonomy shows whether the model handles instruction override and slips on multi turn ramps. One number hides that.
-3. **The unmonitored condition.** A model can comply more when it believes the conversation trains it and less when it believes it does not. One condition cannot show the gap.
-4. **Your deployment.** The vendor's prompt set is public and may be in training data; attackers do not use it. The capstone range runs at least six attack families, automated jailbreak search, tree search, gradient suffixes, encoding, multi turn persona and code switching across languages, and reports a success rate per family. Its example run shows 7 successes in 50 attempts, a 14 percent rate, and a medium severity roleplay bypass.
-5. **Calibration.** Whether the model's stated confidence tracks its accuracy is a separate axis from the decision itself.
+1. **另一侧。** 只看有害 prompt 上的拒答率，会奖励一个什么都拒绝的模型。良性测试集上的过度拒答率是另一半，每次改系统 prompt，两者都会一起变。
+2. **漏在哪里。** 按分类法拆解各类别，才能看出模型是否挡住了指令覆盖，却在多轮递进上失守。一个总数会把这些藏起来。
+3. **未受监控的条件。** 模型相信对话会用于训练它时，可能更顺从；相信不会时，可能更少顺从。只有一种条件，看不出这个缺口。
+4. **你的部署。** 供应商的 prompt 集是公开的，可能已经在训练数据里；攻击者也不会用它。综合项目的靶场至少跑六个攻击家族：自动越狱搜索、树搜索、梯度后缀、编码、多轮人设和跨语言混用，并按家族报告成功率。它的示例运行里，50 次尝试有 7 次成功，成功率 14%，还有一次中等严重度的角色扮演绕过。
+5. **校准。** 模型自报的置信度是否跟得上它的准确率，这是和决策本身无关的另一条轴。
 
-### The decision chart
+### 决策图
 
-Attack block rate against benign pass rate, per family and per category, under your system prompt. The capstone grades a harness on exactly this trade off. A model that wins on block rate and loses on benign pass rate has moved the problem to your support queue.
+在你的系统 prompt 下，按攻击家族、按类别，画攻击拦截率对良性通过率。综合项目正是按这个权衡给测试框架打分。拦截率赢了、良性通过率输了的模型，只是把问题挪到了你的客服队列。
 
-### What to send back to the vendor
+### 要向供应商要什么
 
-Ask for the benign suite results, the category breakdown and the test conditions. A one table report is a starting point for a conversation, not a basis for adoption.
+要良性测试集的结果、按类别的拆解和测试条件。一张表的报告只能作为对话的起点，不能作为采用的依据。
 
 ## Follow-ups
 
-- **Level 3:** Why is a single refusal rate not a safety metric on its own? Expected: a model that refuses everything scores perfectly on it; without the benign side you cannot see the cost.
-- **Level 3:** The harmful prompts in the report are a published set. What does that do to the number? Expected: it may be in the training data and attackers do not use it; measure with your own attack families and a held out set.
-- **Level 4:** Which two numbers go on one chart for the adoption decision? Expected: attack block rate against benign pass rate, per attack family and per category, under your own system prompt.
+- **Level 3:** 为什么单个拒答率本身不是安全指标？ Expected: 一个什么都拒绝的模型能在它上面拿满分；没有良性这一侧，就看不到代价。
+- **Level 3:** 报告里的有害 prompt 是一个公开的数据集。这对数字有什么影响？ Expected: 它可能已经在训练数据里，攻击者也不用它；要用你自己的攻击家族和一份留出集来测。
+- **Level 4:** 做采用决策时，哪两个数字放在同一张图上？ Expected: 在你自己的系统 prompt 下，按攻击家族和类别的攻击拦截率对良性通过率。
 
 ## Wrong answers
 
-- "Ninety seven percent is high enough." It is one side of the decision, and nothing in the report shows the cost on benign prompts or the behavior when unmonitored.
-- "Our system prompt will make it safer, so the number only improves." Every system prompt change moves both refusal rates at once; measure after the change.
-- "Red teaming is the vendor's job." The attacks that matter run against your deployment, with your prompt and your tools.
+- "97% 已经够高了。" 它只是决策的一侧，报告里没有任何东西显示良性 prompt 上的代价，也没有显示无人监控时的行为。
+- "我们的系统 prompt 会让它更安全，所以数字只会变好。" 每次改系统 prompt，两个拒答率都会同时变化；改完要重新测。
+- "红队测试是供应商的事。" 真正要紧的攻击是针对你的部署跑的，带着你的 prompt 和你的工具。
 
 ## Taught in
 
-The [refusal evaluation capstone](../../../phases/19-capstone-projects/84-refusal-evaluation/) defines the two refusal rates and the per category breakdown, the [alignment faking lesson](../../../phases/18-ethics-safety-alignment/09-alignment-faking/) adds the monitored split, and the [constitutional safety harness capstone](../../../phases/19-capstone-projects/15-constitutional-safety-harness/) sets the attack families and the benign probe set.
+[拒答评估综合项目](../../../phases/19-capstone-projects/84-refusal-evaluation/)定义了两种拒答率和分类别拆解，[对齐伪装这一课](../../../phases/18-ethics-safety-alignment/09-alignment-faking/)补充了受监控拆分，[宪法式安全外壳综合项目](../../../phases/19-capstone-projects/15-constitutional-safety-harness/)规定了攻击家族和良性探测集。

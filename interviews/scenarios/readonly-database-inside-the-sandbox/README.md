@@ -1,6 +1,6 @@
 ---
 id: readonly-database-inside-the-sandbox
-title: A read-only database on a read-write mount
+title: 读写挂载上的只读数据库
 card: scenarios
 kind: incident
 level: 3
@@ -31,62 +31,63 @@ source:
   - manuals/docker-sandboxes-101/sections/r-7-sources-and-the-conflicts-register.md
 ---
 
+
 ## Situation
 
-A team runs its coding agent with `--sandbox`, so that its `shell` and `filesystem` tools act inside a microVM while the model stays on the host. The first sandboxed run on a developer's Mac prints a launch summary, pulls the template image, creates the sandbox, and exits with code 1 before the agent answers. The error names the session store: its migration could not create a table, because the database was read-only. The sandbox is still listed as running.
+一个团队用 `--sandbox` 运行他们的编码 agent，让 `shell` 和 `filesystem` 工具在一个 microVM 里执行，模型则留在宿主机上。在一位开发者的 Mac 上，第一次沙箱运行打印了启动摘要，拉取了模板镜像，创建了沙箱，然后在 agent 回答之前以退出码 1 结束。错误指向会话存储：它的迁移无法建表，因为数据库是只读的。沙箱在列表里仍显示为运行中。
 
-The team splits three ways in the channel. One engineer says the template image is broken and wants to pin an older tag. One says the workspace must have been mounted read-only by mistake. One says SQLite is missing from the guest. Before the second attempt, the developer gives you the launch output, a second run with the state directories at their defaults, and a shell inside the running VM.
+频道里分成了三派。一位工程师说模板镜像坏了，想锁定一个旧 tag。一位说工作区一定是被误挂载成了只读。还有一位说客户机里缺 SQLite。第二次尝试之前，开发者给了你启动输出、一次把各状态目录放在默认位置的运行，以及运行中 VM 里的一个 shell。
 
 ## Evidence
 
-- [the sandboxed run, its state flags and the launch summary](evidence/the-command-and-its-mounts.txt)
-- [the last five lines of the sandboxed run](evidence/the-error-that-ended-the-run.txt)
-- [the same run with the state directories at their defaults](evidence/a-data-directory-outside-the-workspace.txt)
-- [a plain SQLite write inside the VM, then the mounts of the workspace](evidence/a-sqlite-write-and-the-mounts.txt)
-- [the auto-kit that docker-agent staged under the workspace](evidence/what-the-staged-kit-holds.txt)
-- [the version of the agent binary inside the VM](evidence/the-agent-binary-inside.txt)
-- [the same agent file started by hand inside the VM](evidence/the-run-that-worked-inside.txt)
+- [沙箱运行、它的状态参数和启动摘要](evidence/the-command-and-its-mounts.txt)
+- [沙箱运行的最后五行](evidence/the-error-that-ended-the-run.txt)
+- [各状态目录使用默认位置的同一运行](evidence/a-data-directory-outside-the-workspace.txt)
+- [VM 内一次普通的 SQLite 写入，以及工作区的挂载](evidence/a-sqlite-write-and-the-mounts.txt)
+- [docker-agent 暂存在工作区下的 auto-kit](evidence/what-the-staged-kit-holds.txt)
+- [VM 内 agent 二进制的版本](evidence/the-agent-binary-inside.txt)
+- [在 VM 内手动启动的同一个 agent 文件](evidence/the-run-that-worked-inside.txt)
 
 ## Questions
 
-1. Where did the data directory sit, and which mount held it?
-2. Three mounts are read-only in the summary. Does any of them explain the error?
-3. What does the SQLite probe add that the error message does not?
-4. Why did the second run fail before it created anything?
-5. The last listing is a run that completed. What does it prove, and what does it not prove?
-6. How would you run this agent in a sandbox on this host today, and what would you file?
+1. 数据目录放在哪里？由哪个挂载承载？
+2. 摘要里有三个只读挂载。其中有哪个能解释这个错误吗？
+3. SQLite 探测补充了错误消息里没有的什么信息？
+4. 第二次运行为什么在创建任何东西之前就失败了？
+5. 最后一份记录是一次跑完的运行。它证明了什么？没证明什么？
+6. 今天在这台宿主机上你会怎样在沙箱里运行这个 agent？你会提交什么问题？
 
 ## Walkthrough
 
-1. **Read the state flags first.** The note after the command says that the config, data and cache directories sit under `.m101/` in the workspace. The error comes from the session store, which lives in the data directory, so the database file is on the workspace mount.
-2. **Read the four workspace lines.** The workspace is `(rw)`. The agent file directory, the staged kit under `.m101/cache/sandbox-kits/<hash>` and `.m101/cfg` are `(ro)`. The data directory is none of those three paths, so the mount modes do not explain the failure.
-3. **Rule out the mount flags with the probe.** Inside the VM, a plain Python `sqlite3` write under `.m101/probe/` fails with the same `attempt to write a readonly database` message. The mount table on the lines below lists the workspace as a `virtiofs` mount with `rw`. The kernel reports the mount as writable, and SQLite still cannot write a database through it. The fault sits between SQLite and this mount, not in the sandbox settings and not in a missing package: the probe imported `sqlite3` and connected without error.
-4. **Read why the defaults are no escape.** The run with the default state directories was refused before it made a sandbox: `--data-dir` must be inside the writable workspace. So the launcher forces the database onto the one mount where, on this host, SQLite cannot write it.
-5. **Separate the kit from the store.** The staged auto-kit holds a `manifest.json` with `agent_ref` and `built_at`, plus `prompt_files` and `skills`. Nothing in it configures a database. The template runs `docker-agent version main`, not the release the host runs, so the image tag is a second finding to record. The probe fails for any program, though, so a different agent build would not change the result.
-6. **Prove the model path with the run by hand.** Started inside the VM with its three state directories under `/tmp/m101`, the guest's own filesystem and not a mount, the same agent file answered with exit 0: the README has 1 line. The provider at `host.docker.internal:12434` was reached through the proxy. So the model path, the allowlist and the agent file are sound. Only the location of the session store fails.
+1. **先读状态参数。** 命令后的说明写明，配置、数据和缓存目录都在工作区的 `.m101/` 下。错误来自会话存储，会话存储在数据目录里，所以数据库文件在工作区挂载上。
+2. **读四行工作区挂载。** 工作区是 `(rw)`。agent 文件目录、`.m101/cache/sandbox-kits/<hash>` 下暂存的 kit 和 `.m101/cfg` 是 `(ro)`。数据目录不是这三个路径中的任何一个，所以挂载模式解释不了这个失败。
+3. **用探测排除挂载标志。** 在 VM 内，在 `.m101/probe/` 下用普通 Python `sqlite3` 写入，报出同样的 `attempt to write a readonly database`。下面几行的挂载表显示工作区是一个 `rw` 的 `virtiofs` 挂载。内核报告这个挂载可写，SQLite 却仍然无法通过它写数据库。故障出在 SQLite 和这个挂载之间，不在沙箱设置里，也不是缺包：探测成功导入了 `sqlite3` 并建立了连接，没有报错。
+4. **看为什么默认目录也行不通。** 使用默认状态目录的运行在创建沙箱之前就被拒绝了：`--data-dir` 必须位于可写的工作区内。所以启动器硬把数据库放到了这台宿主机上 SQLite 唯一写不进去的那个挂载上。
+5. **把 kit 和存储分开看。** 暂存的 auto-kit 里有一个含 `agent_ref` 和 `built_at` 的 `manifest.json`，还有 `prompt_files` 和 `skills`。里面没有任何数据库配置。模板运行的是 `docker-agent version main`，而不是宿主机上运行的发布版，所以镜像 tag 是要记录的第二个发现。不过探测对任何程序都会失败，换一个 agent 构建也不会改变结果。
+6. **用手动运行证明模型路径。** 在 VM 内启动，三个状态目录放在 `/tmp/m101` 下，这是客户机自己的文件系统，不是挂载。同一个 agent 文件以退出码 0 给出回答：README 有 1 行。位于 `host.docker.internal:12434` 的 provider 经代理连通了。所以模型路径、允许列表和 agent 文件都没问题，失败的只有会话存储的位置。
 
 ## Resolution
 
-The session store could not write because SQLite cannot write a database through the `virtiofs` workspace mount on this host, although `mount` lists it as `rw`. The launcher requires the data directory inside that workspace, so a `--sandbox` launch has no supported place for the store on this machine. The sandbox itself worked: a run started by hand inside the VM, with its state under `/tmp/m101`, completed with the correct answer, and the same agent file reached the model through the proxy.
+会话存储无法写入，是因为在这台宿主机上，SQLite 无法通过 `virtiofs` 工作区挂载写数据库，尽管 `mount` 把它列为 `rw`。启动器要求数据目录在这个工作区内，所以在这台机器上，`--sandbox` 启动没有一个受支持的位置放会话存储。沙箱本身是正常的：在 VM 内手动启动、状态放在 `/tmp/m101` 下的运行得出了正确答案，同一个 agent 文件也经代理连上了模型。
 
-What to do:
+接下来的做法：
 
-1. On every new host, before the launcher is used with `--sandbox`, test a SQLite write inside the workspace from a shell in the VM, as the manual's checklist says.
-2. Until the data directory rule changes, start the agent inside the VM by hand with `sbx exec`, with `--data-dir` on the guest filesystem, and keep the host launcher for machines where the probe passes.
-3. Remove the sandbox with `sbx rm` when you are done, because the launcher leaves it running after the error.
-4. File two open items: the template runs the `main` build and not the pinned release, and the run printed no safety mode, so the mode a sandboxed run uses stays unknown, which is conflict C62 in the manual.
+1. 在每台新宿主机上，用 `--sandbox` 启动之前，先在 VM 的 shell 里测试一次工作区内的 SQLite 写入，手册的检查清单就是这么写的。
+2. 在数据目录规则改变之前，用 `sbx exec` 在 VM 内手动启动 agent，把 `--data-dir` 放在客户机文件系统上；探测能通过的机器继续用宿主机启动器。
+3. 用完后用 `sbx rm` 删除沙箱，因为启动器在报错后会让它继续运行。
+4. 提交两个待解决事项：模板运行的是 `main` 构建，不是锁定的发布版；运行没有打印安全模式，所以沙箱运行使用哪种模式仍然未知，这是手册中的冲突 C62。
 
 ## Wrong turns
 
-- "The workspace was mounted read-only." The summary lists it as rw, and the mount table inside the VM agrees. The three read-only mounts are the agent file directory, the staged kit and the config directory, and the database is under none of them.
-- "Pin an older template tag." The probe fails for a plain Python script with no agent involved, so the agent build is not the cause. The main build is worth a ticket, not a fix.
-- "Move the data directory to the host default." The launcher refuses a data directory outside the writable workspace, before it creates anything.
-- "SQLite is missing from the guest." The probe imported the module and opened the database. It failed on the first write.
+- "工作区被挂载成了只读。" 摘要把它列为 rw，VM 内的挂载表也一致。三个只读挂载是 agent 文件目录、暂存的 kit 和配置目录，数据库不在其中任何一个下面。
+- "锁定一个旧的模板 tag。" 一个没有 agent 参与的普通 Python 脚本也探测失败，所以原因不在 agent 构建。main 构建值得提一个工单，但不是修复。
+- "把数据目录移到宿主机默认位置。" 启动器会拒绝可写工作区之外的数据目录，而且是在创建任何东西之前。
+- "客户机里缺 SQLite。" 探测导入了模块，也打开了数据库。它是在第一次写入时失败的。
 
 ## Generalize
 
-When a program reports a permission error on a path that the system lists as writable, repeat the operation with the smallest program that performs it, on the same path, outside the product. A failure there moves the fault from the product's settings to the layer under it, and a pass narrows it to the product. Then check whether the product gives you a way around that layer, and if it does not, write down the exact rule that blocks you.
+一个程序在系统列为可写的路径上报权限错误时，用能完成这个操作的最小程序，在同一路径上、在产品之外重复一遍。如果那里也失败，故障就从产品设置移到了它下面的那一层；如果通过，范围就缩小到产品本身。然后检查产品是否给了你绕开那一层的办法；如果没有，写下挡住你的那条具体规则。
 
 ## Taught in
 
-The manual's [end to end run](../../../manuals/docker-sandboxes-101/sections/1-2-docker-agent-run-sandbox-end-to-end.md) records this failure and the probe, [the run page](../../../manuals/docker-sandboxes-101/sections/5-1-docker-agent-run-new-and-doctor.md) explains the state flags, and [the conflicts register](../../../manuals/docker-sandboxes-101/sections/r-7-sources-and-the-conflicts-register.md) keeps conflict C62 open.
+手册的[端到端运行](../../../manuals/docker-sandboxes-101/sections/1-2-docker-agent-run-sandbox-end-to-end.md)记录了这次失败和探测，[运行页](../../../manuals/docker-sandboxes-101/sections/5-1-docker-agent-run-new-and-doctor.md)解释了状态参数，[冲突登记表](../../../manuals/docker-sandboxes-101/sections/r-7-sources-and-the-conflicts-register.md)让冲突 C62 保持未结状态。

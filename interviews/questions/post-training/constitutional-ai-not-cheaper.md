@@ -1,6 +1,6 @@
 ---
 id: constitutional-ai-not-cheaper
-title: Replacing the human labeler with a principled model
+title: 用遵循原则的模型替代人工标注者
 card: post-training
 kind: concept
 level: 2
@@ -16,47 +16,47 @@ related: [post-training/reward-model-pairwise]
 updated: 2026-11-03
 ---
 
-Your rater budget is gone. A colleague proposes to replace the human labelers with a model that reads a short list of principles and ranks the pairs, and to run the same RLHF pipeline on those labels. Is this just a cheaper RLHF? What changes?
+你们的人工标注预算用尽了。一位同事提议用一个大模型来替代人工标注员：让该模型阅读简短的原则清单为回答对排序，随后在这些 AI 生成的标签上跑原本的 RLHF 流水线。这真的只是一种更廉价的 RLHF 方案吗？有哪些本质变化？
 
 ## Short answer
 
-It is the constitutional recipe, and it changes the failure modes rather than removing them. Phase one has the model critique and revise its own answers against sampled principles and trains on the revisions; phase two trains a reward model on pairs ranked by a feedback model and runs the usual RL stage. Rater psychology stops being the bias, and the reading of the principle set becomes the bias, applied uniformly over the whole dataset. Sycophancy toward a rater drops, and the proxy problem stays.
+这是宪法式 AI 方案，它改变了失效模式，而不是消除了它们。第一阶段让模型根据抽样原则批判并修改自己的回答，再用修改后的回答训练；第二阶段用反馈模型排序的回答对训练奖励模型，再运行常规 RL 阶段。偏差不再来自标注者的心理，而来自对原则集的解读，并一致地作用于整个数据集。对标注者的迎合减少了，但代理指标问题仍然存在。
 
 ## Full answer
 
-### The two phases
+### 两个核心执行阶段
 
-1. Self-critique and revision. Start from a helpful but not yet harmless SFT model. For a red-team prompt, the model writes an answer, a second pass reads one sampled principle and critiques the answer, and a third pass revises it. The revision is the SFT target. The original work used 16 principles and kept the set small so that critiques stay focused.
-2. RL from AI feedback. Generate pairs, let a feedback model rank them against sampled principles, train a reward model on those rankings, and run PPO against it. Everything after the label is the standard pipeline.
+1. **自我批判与修改。** 从一个有帮助但尚未完全无害的 SFT 模型出发。面对红队诱导 prompt，模型先生成初始回答，第二次读取抽样出的一条原则并批判回答，第三次修改回答。修改后的回答就是 SFT 目标。原始论文使用了 16 条原则，保持原则集精简以便使自我批判保持专注。
+2. **基于 AI 反馈的强化学习。** 生成多个候选回答对，让反馈模型参照抽样的原则给它们排序，在该排序数据上训练奖励模型，最后运行 PPO 做强化学习。在产出标签之后的所有步骤，完全复用标准 RLHF 流水线。
 
-### Why it is not only cheaper
+### 为什么它绝不仅仅是“省钱”而已
 
-- The bias moves. A human rater is inconsistent and pleased by agreement; a feedback model applies one reading of a principle to every pair, strict or loose, but uniform.
-- The signal is legible. You can read the principle, the critique and the revision for any example; human labels are opaque.
-- Goodhart stays. The proxy is now a model's reading of the principle set, still an imperfect measure, so over-optimization against it is still possible.
-- The labeler is the same class of model you train, so a bias in it can be amplified rather than averaged out.
+- **偏见发生了转移。** 人类标注员存在主观不一致性，容易被迎合顺从讨好；反馈模型则将对原则的同一种解读用于每一对回答，无论这种解读严格还是宽松，都保持一致。
+- **标注信号完全清晰可查。** 对任意样本，你都可以直接调阅其采纳的原则、批判意见和修改后的回答；相比之下，人工标签是不透明的。
+- **古德哈特定律依然无法幸免。** 奖励优化所依赖的代理信号现在变成了“模型对原则集的文本解读”，这本身依然是不完美的代理度量，针对该度量的过度优化风险依旧存在。
+- **标注者与被训练者属于同生态模型。** 标注模型的偏差可能被放大，而不是在汇总时相互抵消。
 
-### What the original work claimed
+### 原始研究的成果结论
 
-The trained model was more harmless and about as helpful as an RLHF model with comparable data. That result has held across labs.
+在数据量相当的情况下，训练出的模型比 RLHF 模型更无害，有帮助程度则大致相当。这一结论在不同实验室中都得到了验证。
 
-### A gate next to the training
+### 伴随训练的生产门禁
 
-A parallel defense trains light classifiers that read the same principles and gate the outputs. The first version cost 23.7 percent extra compute; the later version about 1 percent. Training shapes behavior and classifiers enforce invariants; neither one is enough alone.
+一套平行的防御手段是训练读取相同宪法原则的轻量级分类器，并将其作为推理输出的硬性过滤门禁。最初版本带来了 23.7% 的额外计算开销；而后期优化版本将额外计算降到了约 1%。模型训练负责塑造整体行为倾向，轻量分类器负责守护硬性不变量；单靠其中任何一种手段都无法做到万无一失。
 
 ## Follow-ups
 
-- **Level 2:** Why does the recipe sample one principle per critique instead of giving the model the whole list? Expected: a focused critique is more specific and more useful as a training target; the list as a whole is covered over many samples.
-- **Level 2:** Which parts of the pipeline change and which stay? Expected: the label source and the SFT targets change; the reward model, the RL stage and the KL penalty stay.
-- **Level 3:** Name a sycophancy-like failure that still occurs with an AI labeler, and a check for it. Expected: the feedback model can prefer answers that quote the principles without following them; rate a held-out set with people and compare the two rankings.
-- **Level 4:** How do you argue for a priority order among principles? Expected: conflicts between principles need a resolution rule; a tiered order resolves them top-down, from catastrophic harm to platform rules to general ethics to helpfulness.
+- **Level 2:** 为什么每次批判只抽样一条原则，而不是把整份宪法清单一股脑塞给模型？ Expected: 聚焦的单点批判更加具体尖锐，能产出质量更高的修改目标；整套原则会在大量样本中得到覆盖。
+- **Level 2:** 流水线中哪些部分被替换了，哪些部分原封不动保留？ Expected: 替换了标注标签来源以及第一阶段 SFT 的目标生成方式；奖励模型、RL 阶段和 KL 惩罚保持不变。
+- **Level 3:** 在 AI 标注员下依然会出现类似阿谀奉承的何种失效现象，如何检验？ Expected: 反馈模型可能会盲目偏好那些在字面上大段引用宪法原则但并未实质遵循原则的狡辩回答；让人类评估留出集，再比较两种排序。
+- **Level 4:** 如何为相互冲突的宪法原则论证优先级顺序？ Expected: 当不同原则发生冲突时必须有明确的仲裁规则；采用分层阶梯结构自顶向下仲裁：从灾难性危害，到平台规则，再到一般伦理，最后是有帮助性。
 
 ## Wrong answers
 
-- "The labels are free now, so collect ten times more pairs." More pairs with the same uniform bias make the bias stronger, not weaker; the volume gain does not fix the proxy.
-- "An AI labeler removes human bias from alignment." It replaces rater bias with principle-interpretation bias; the principles and the labeler's reading of them are now the proxy.
-- "This is only a safety trick; it does not touch helpfulness." The original work reports about the same helpfulness as RLHF with comparable data, and the same critique loop can target any principle you write.
+- "既然打标签免费了，那就直接收集十倍规模的偏好对。" 在相同的均一偏见下堆叠更多数据只会让偏见更深地烙印进模型；数据量的增加无法修复代理度量本身的失真。
+- "AI 标注员从根本上彻底消除了对齐训练中的人类主观偏见。" 它只是用“对原则的机器解读偏差”替代了“人类标注员的主观偏好”；原则本身及其机器解读构成了新的代理偏见。
+- "这只是一种安全防御技巧，对模型的有帮助程度毫无助益。" 原始论文报告在同等数据下其有帮助性与 RLHF 相当，同一个批判循环也可以针对你写出的任何原则。
 
 ## Taught in
 
-The [Constitutional AI lesson](../../../phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif/) walks both phases and the shift in failure modes, and the [reward modeling lesson](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/) places RLAIF among the sources of a preference signal.
+[宪法式 AI 课程](../../../phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif/)梳理了两个核心阶段与失效模式的转移，而[奖励建模课程](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/)将 RLAIF 定位为偏好信号的核心来源之一。

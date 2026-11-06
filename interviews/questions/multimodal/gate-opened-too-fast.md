@@ -1,6 +1,6 @@
 ---
 id: gate-opened-too-fast
-title: A gated VLM fine-tune that forgot how to write
+title: 门控开启过快的多模态微调退化
 card: multimodal
 kind: debug
 level: 3
@@ -16,15 +16,15 @@ related: [multimodal/perceiver-fixed-tokens, multimodal/cross-attention-mask-bug
 updated: 2026-11-03
 ---
 
-You fine-tune a model built like Flamingo, with a gated cross-attention block after every few layers of a frozen language model, on a small captioning dataset. Captions improve, but text-only quality degrades: the model rambles on plain prompts and loses facts it knew. What is the likely cause, how do you confirm it, and how do you fix it?
+你基于类 Flamingo 架构微调一个模型，在冻结的大语言模型每隔若干层插入一个门控交叉注意力块（gated cross-attention block），并在一个小规模的图像描述（captioning）数据集上微调。图像描述能力有所提升，但纯文本能力出现严重退化：面对纯文本 prompt 时模型漫无边际，并遗忘了原本掌握的事实。最可能的原因是什么，你如何确认它，又该如何修复？
 
 ## Short answer
 
-The gates opened too wide too fast. Each gated layer adds the hyperbolic tangent of a learned scalar times the cross-attention output to the residual stream; at zero the layer is a no-op and the model is the pretrained text model. A high learning rate on the gates, or no regularization, lets visual noise flood the residual stream even when the prompt has no image. Confirm it by reading the gate values per layer against the base and by running a text-only eval with the gates forced to zero; fix it with a lower rate or a schedule on the gates, a text-only data mix, and a check that the layers add nothing when no image is present.
+门控标量开启得太快太大了。每个门控层将双曲正切函数（tanh）作用于可学习标量后再乘以交叉注意力输出，并将其叠加到残差流中；在初始化为 0 时该层等价于无操作，模型完全等同于预训练纯文本大模型。门控标量学习率过高或缺乏正则化，会导致视觉噪声在即使没有图像输入时也大量倾泻进残差流中。逐层对比门控标量与基准值的差异，并在将门控强制置零后运行纯文本评测以确认根因；降低门控学习率或增加预热调度、在训练中混入纯文本数据，并在无图像时确保该分支输出为零予以修复。
 
 ## Full answer
 
-### The mechanism
+### 底层计算机制
 
 ```text
 x_after = llm_block(x_before)
@@ -32,45 +32,45 @@ cross   = cross_attn(x_after, visual_latents)
 x_next  = tanh(alpha) * cross + x_after
 ```
 
-At initialization alpha is zero, so the model is exactly the frozen language model. As alpha grows, visual information is added on top of the text representation. The residual means that even a fully open gate does not erase the text path, but a large gate adds a large term at every fourth block. If the cross-attention output is noise, that noise reaches the output.
+在初始化阶段，标量 alpha 严格为 0，因此模型完全等同于冻结的纯文本大模型。随着 alpha 逐渐增大，视觉信息被叠加在文本表征之上。残差连接的存在意味着即使门控完全打开，纯文本的信息路径也不会被直接覆盖抹去，但如果门控过大，每隔四个 block 就会向主干残差流注入巨大的外来扰动。一旦交叉注意力输出包含噪声，噪声就会传到输出。
 
-### Why a fine-tune breaks it
+### 为什么微调会将其破坏
 
-- The gates are the cheapest parameters to move, so a learning rate chosen for the cross-attention weights pushes them fast.
-- A caption-only dataset never shows a text-only prompt, so nothing penalizes gates that add visual terms when there is no image to attend to.
-- With few images per prompt, the masked cross-attention has little to read, and an open gate still adds its output.
+- 门控参数最容易改变，因此为交叉注意力权重选择的学习率会让它们变化很快。
+- 纯图像描述数据集从未包含纯文本 prompt，因此没有任何损失项去惩罚“在没有图像需要关注时依然向残差流倾倒视觉扰动”的门控参数。
+- 单 prompt 图像数量较少时，经过掩码的交叉注意力缺乏有效信息可读，而过大的门控依然强行将其噪声输出加进残差流。
 
-### Confirm
+### 确诊排查步骤
 
-1. Log the gate value per layer. Compare it with the base checkpoint and with the step at which text quality fell.
-2. Run the text-only eval with the gates forced to zero. If the quality returns, the gates are the cause.
-3. Send a text-only prompt through the model and measure the norm of the gated term per layer. It should be near zero when no image is present.
+1. 打印记录各层的门控标量值，与原始 base 检查点以及纯文本质量开始恶化的训练步数比对。
+2. 将门控强制设为零，重新运行纯文本评测集；若语言能力恢复，说明门控就是根因。
+3. 输入纯文本 prompt，逐层测量门控注入项的张量范数；当不存在图像时，该项必须严格接近于 0。
 
-### Fix
+### 修复方案
 
-- A lower learning rate or a warm-up schedule for the gate scalars, so that they open over the run rather than in the first steps.
-- A text-only mix in the fine-tuning data, so that the loss covers the case the product sees.
-- A regularizer on the gates, or a cap on their magnitude.
-- A mask check: text tokens with no preceding image must attend to nothing, and the gated term must add nothing.
-- Fewer gated layers, if the task does not need one every fourth block.
+- 降低门控标量的学习率或为其配置独立的预热（warm-up）调度，使其在整个训练历程中缓慢渐进开启，而非在开头几步直接拉满。
+- 在微调数据集中混合纯文本指令数据，使得损失函数能够有效约束线上真实会遇到的纯文本场景。
+- 对门控施加正则化，或限制其幅度。
+- 检查交叉注意力掩码：前面没有图像的文本 token 不应关注任何内容，门控项也不应添加任何内容。
+- 若具体下游任务并不需要密集融合，减少插入门控层的频率（例如不再每隔 4 层插入一个）。
 
-### Why the design is still right
+### 为什么这一经典架构依然成立
 
-The gate is what let the original work keep a frozen 70B language model intact while it learned to read images. The failure here is in the schedule, not in the architecture.
+门控让原始方案在保持冻结的 70B 语言模型完整的同时学会读图。这里的问题出在调度，而不是架构。
 
 ## Follow-ups
 
-- **Level 3:** What does the residual connection buy once the gate is open? Expected: the text representation is never overwritten, only added to; even a fully open gate leaves the text path intact, which is why the fix is the schedule and not a redesign.
-- **Level 3:** How would you spot the same damage in a model that concatenates image tokens instead? Expected: there is no gate to read; the damage shows as a shift in the language model weights, so compare the text-only eval before and after, and freeze the language model or limit it to adapters.
-- **Level 4:** Design a unit test that catches this before training. Expected: build the block with alpha at zero and assert that the output equals the block output exactly for a text-only input, then set a large alpha and assert that a text-only input with an empty mask still equals the block output.
-- **Level 4:** How do you decide how many gated layers to keep? Expected: ablate the insertion frequency against caption quality and text-only quality on one eval; every fourth block is the reference, and fewer layers mean fewer places for noise to enter.
+- **Level 3:** 一旦门控开启，残差连接提供了什么安全保障？ Expected: 文本表征绝不会被强行覆盖，只能被叠加；即使门控完全打开纯文本路径依然保持完整，这也是为何修复仅需调整训练调度而非推倒架构。
+- **Level 3:** 在通过拼接（concatenation）注入图像 token 的模型中，你如何发现类似损伤？ Expected: 这类模型没有可供监控的门控标量；损伤直接体现为语言模型权重的漂移，需对比微调前后的纯文本基准评分，并考虑冻结语言模型或仅使用适配器。
+- **Level 4:** 请设计一个在训练前就能捕获该 bug 的单元测试。 Expected: 初始化 block（alpha 为 0），断言纯文本输入的输出严格等于纯文本 block 的输出；随后将 alpha 设为极大值，断言传入空掩码的纯文本输入依然严格等于原 block 输出。
+- **Level 4:** 如何决定保留多少个门控层？ Expected: 在统一评测集上对插入频率做消融实验，权衡图像描述能力与纯文本保真度；基准是每 4 个 block 插入一次，更少的层数意味着更少的噪声渗入通道。
 
 ## Wrong answers
 
-- "The captioning data is too small; add more images." More caption data with no text-only prompts pushes the gates further the same way; the fix is the gate schedule and the data mix.
-- "Unfreeze the language model so that it can adapt to the visual input." That trades a schedule problem for catastrophic forgetting of the text model, which the frozen design exists to prevent.
-- "Replace gated cross-attention with the simpler concatenation design." The symptom is a schedule problem; the gate is the mechanism that protects the text model, and the simpler design has no such protection.
+- "图像描述数据集太小，多加图像。" 在缺乏纯文本 prompt 的情况下，增加图文数据只会让门控在错误方向上开启得更大；根因在于门控调度与数据混合配比。
+- "解冻大语言模型，让它主动适应视觉输入。" 这会将调度问题转变为语言模型的灾难性遗忘，而冻结语言模型原本正是为了杜绝这一点。
+- "放弃门控交叉注意力，改用更简单的前缀拼接方案。" 症状纯属训练调度问题；门控机制正是保护文本模型的核心屏障，而简单的拼接方案在这方面毫无保护。
 
 ## Taught in
 
-The [Flamingo lesson](../../../phases/12-multimodal-ai/04-flamingo-gated-cross-attention/) explains why the gate starts at zero and names an over-fast gate as the cause of degraded text performance, and the [cross-attention fusion capstone](../../../phases/19-capstone-projects/61-cross-attention-fusion/) builds the block and the gate exercise.
+[Flamingo 课程](../../../phases/12-multimodal-ai/04-flamingo-gated-cross-attention/)解释了门控标量为何必须从零起步并指出了门控过快开启导致文本退化的现象，[交叉注意力融合实战](../../../phases/19-capstone-projects/61-cross-attention-fusion/)构建了该 block 并提供了门控调试练习。

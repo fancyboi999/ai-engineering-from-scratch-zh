@@ -1,6 +1,6 @@
 ---
 id: the-agent-loops-forever
-title: This agent loops forever, find out why
+title: 这个 Agent 陷入了无限死循环，找出原因
 card: agents
 kind: debug
 level: 2
@@ -16,45 +16,45 @@ related: [agents/five-parts-of-an-agent-loop]
 updated: 2026-11-03
 ---
 
-An on-call engineer pages you. A coding agent has run for two hours on a task that normally takes ten minutes. The trace shows one shell command, one result, and then the same command again, over and over. Walk through how you find the cause and what you change so that this cannot happen again.
+值班工程师向你发来告警。一个原本通常只需十分钟的编码任务，某 agent 已经连续运行了整整两个小时。追踪日志显示：一条 shell 命令、一个执行结果，然后又是完全相同的同一条命令，如此反反复复循环往复。请逐步推演你将如何排查根因，以及你需要做哪些改造以彻底防止该问题重演。
 
 ## Short answer
 
-Read the trace for the pair of action and observation that repeats, then ask why the model does not react to the observation. The usual causes are an error that the loop never shows to the model, an observation that reads the same on every turn, and a missing turn budget. Fix the cause, then add the two guards that stop any future loop: a budget that yields control to the caller, and a check for a repeated action with a repeated observation.
+在追踪记录中定位不断重复的操作与观察结果配对，并追问模型为什么没有对观察结果做出反应。常见根因通常是循环未将错误回传给模型、观察结果每轮都完全雷同，或者根本没有配置轮数预算。定位并根除该诱因后，追加两道能够杜绝未来任何死循环的防线：在预算耗尽时向调用方让出控制权的轮数预算机制，以及能够识别相同操作配对相同观察的重复检测器。
 
 ## Full answer
 
-### Find the cause
+### 定位根本成因
 
-1. **Find the repeated pair.** Pull the last twenty turns and compare each action with the one before it. A loop is an action plus observation that repeats with no change in the message buffer between them.
-2. **Check what the model saw.** If the tool raised an exception and the runner caught it outside the loop, the model never received an observation. It then does the only thing it knows: the same call. The lesson rule is that every error, including a 400 from a service, must come back as an observation string.
-3. **Check whether the observation carries information.** An observation of `ok` after a write that did nothing, or a test runner that prints nothing on failure, gives the model no reason to change its plan. The observation formatter must include the exit code and the tail of the output.
-4. **Check the stop conditions.** A loop that ends only on an explicit finish call runs until the context is full when the model never calls finish. A loop with no turn budget runs until someone pages you.
+1. **找出重复的动作与观察对。** 调取最近二十轮的执行记录，比对每个操作及其前序操作。死循环的本质是操作与观察的组合不断重复，且两者之间的消息缓冲区未发生实质性变化。
+2. **核实模型到底看到了什么。** 若工具抛出异常且执行器在循环外部捕获了该异常，模型就从未真正收到对应的观察结果。在双眼摸黑的情况下，它只能重复发起相同的调用。课程明确指出，包括第三方服务的 400 报错在内的每一个错误，都必须作为观察字符串如实传回给模型。
+3. **核验观察结果是否承载了有效信息。** 如果一次无效果的文件写入返回了毫无意义的 `ok`，或者测试运行器失败时没有打印任何有效日志，模型就没有依据去改变原有规划。观察结果格式化器必须附带具体的退出状态码以及输出日志的末尾内容。
+4. **排查停止条件的有效性。** 仅依赖显式 finish 调用的循环，在模型从未调用 finish 时会一路空转直到塞满上下文窗口。而完全没有轮数预算的循环则会一直空耗直到值班人员收到报警。
 
-### Fix it so the loop cannot recur
+### 彻底根治死循环的系统改造
 
-- **A turn budget per task class.** Agents run 40 to 400 steps per task, so pick a cap for the class, not one cap for every task. In the harness contract the budget is not a kill switch. When a limit is reached the loop fires `on_budget_exceeded`, emits `budget.warn`, and yields to the caller. The caller extends the budget or closes the session.
-- **A repeat detector.** The permission-mode lesson describes a classifier that sees action N+1 as almost equal to action N five times in a row. You do not need a model for the simple case. Hash the action and the observation, keep the last few hashes, and pause when one repeats.
-- **Errors as observations.** Route every exception through the formatter so that the model can correct the call.
-- **A no-tool-call stop.** When an assistant turn contains no tool call, treat the run as finished.
+- **按任务类别配置轮数预算。** Agent 完成单个任务常规需要运行 40 到 400 步，因此必须根据具体任务类别设定上限，而非统一一刀切。在 harness 契约中，预算并非直接杀死进程的暴力开关。当触及限制时，循环触发 `on_budget_exceeded`，发出 `budget.warn` 事件，并向调用方让出控制权，由调用方决定是追加预算还是关闭会话。
+- **引入重复动作检测器。** 权限模式课程描述了一种能够识别动作 N+1 连续五次与动作 N 近乎相同的分类器机制。在基础场景下甚至无需引入大模型：只需对操作与观察结果做哈希，保留最近的哈希窗口，一旦检测到重复立即自动暂停。
+- **将所有报错格式化为观察结果。** 确保所有异常均流经格式化器，使模型能够依据错误信息自行纠错。
+- **启用无工具调用即停止。** 当 assistant 轮次不再包含任何工具调用时，判定运行结束。
 
-### Prove the fix
+### 验证修复的确定性
 
-Replay the saved trace through the fixed loop. The harness contract is a deterministic state machine, so the same event log re-enters the same state without a new model call. The replay must pause at the repeat and emit the budget event where the old run kept going.
+在修复后的循环中重放保存的历史追踪。Harness 契约属于确定性状态机，因此相同的事件日志无需调用模型就能重新进入完全相同的状态。重放流程在遇到重复动作时必须能够立即暂停，并在原先无休止空转的位置正确发出预算耗尽事件。
 
 ## Follow-ups
 
-- **Level 2:** The model repeats a call because the tool returns an empty string on failure. Who owns the fix? Expected: the observation formatter, which must add the exit code and the error text so that the observation changes when the call fails.
-- **Level 3:** Why does the harness yield on a budget instead of raising? Expected: a yield is a return value that the caller can inspect and resume from, while an exception loses the partial state and forces a restart.
-- **Level 3:** A repeat detector hashes the action only. What loop does it miss? Expected: a loop where the action changes slightly each time, such as a counter in an argument, while the observation never changes, so hash the observation too.
-- **Level 4:** The loop is fixed, but the agent still ran for two hours before anyone noticed. What is the missing surface? Expected: observability, a wall-clock budget with an alert, and a trace that someone can read at step 38 without reading the whole run.
+- **Level 2:** 工具调用失败时仅返回空字符串导致模型反复重试，修复的归属方是谁？ Expected: 属于观察结果格式化器，它必须追加退出码与错误详情，使得观察内容在调用失败时发生明确改变。
+- **Level 3:** 为什么 harness 在预算耗尽时选择让出控制权而非抛出异常？ Expected: 让出控制权返回一个调用方可检查和恢复的值，而抛出异常会丢失中间状态并迫使调用方从零重来。
+- **Level 3:** 重复检测器如果只对操作做哈希，会遗漏哪类死循环？ Expected: 操作参数每次微调（例如参数计数器递增）但返回的观察结果始终相同的循环，因此必须对观察也做哈希。
+- **Level 4:** 死循环修好了，但该 agent 仍空跑了两个小时才被发现，缺失了什么表面？ Expected: 可观测性表面、带告警的实际耗时预算，以及支持在第 38 步无需通读全文就能查看概览的追踪机制。
 
 ## Wrong answers
 
-- "Raise the maximum turns so that the task can finish." The task was not progressing, so more turns give more of the same call.
-- "Add a line to the prompt that says do not repeat yourself." The model repeated because it never saw the error, and a prompt cannot show it what the loop hid.
-- "Kill the process when the budget is reached." A kill loses the partial state, while a yield lets the caller inspect it, extend the budget, or close the session with a clean handoff.
+- "把最大轮数调高，以便任务能够顺利完成。" 任务早已停滞不前毫无进展，调高轮数只会带来更多无意义的相同调用。
+- "在 prompt 中加一句要求不要重复执行相同操作。" 模型不断重复是因为循环向它隐瞒了错误信息，prompt 无法让模型看清被框架隐藏的内容。
+- "达到预算上限时直接 kill 杀死进程。" 暴力杀死会彻底损毁已执行的中间状态，让出控制权能允许调用方审查现场、追加预算或执行安全交接。
 
 ## Taught in
 
-The [agent loop lesson](../../../phases/14-agent-engineering/01-the-agent-loop/) names the turn budget and the formatter for observations, the [harness loop contract](../../../phases/19-capstone-projects/20-agent-harness-loop-contract/) makes the budget a yield, and the [permission modes lesson](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/) describes the repeated-action classifier.
+[Agent 循环：观察、思考、行动](../../../phases/14-agent-engineering/01-the-agent-loop/)课程确立了轮数预算与观察格式化器，[harness 循环契约](../../../phases/19-capstone-projects/20-agent-harness-loop-contract/)课程将预算耗尽定义为让出控制权，[自主 Agent 的权限模式](../../../phases/15-autonomous-systems/10-claude-code-permission-modes/)课程描述了重复动作分类器。

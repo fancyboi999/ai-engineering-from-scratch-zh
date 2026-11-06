@@ -1,6 +1,6 @@
 ---
 id: heads-are-nearly-free
-title: What eight heads cost that one head does not
+title: 八个头比一个头多花了什么
 card: transformers
 kind: concept
 level: 2
@@ -16,15 +16,15 @@ related: [transformers/why-scale-by-sqrt-dk]
 updated: 2026-11-03
 ---
 
-You change an attention layer from one head to eight heads and keep the model width fixed. What happens to the parameter count, to the compute, and to what the layer can represent? And why do practitioners refuse to make heads narrower than about 32?
+你把一个注意力层从一个头改成八个头，模型宽度不变。参数量、计算量，以及这一层能表示的东西，各会怎样变化？为什么从业者不肯让头的宽度小于约 32？
 
 ## Short answer
 
-The parameters do not change: the four projections are still `d_model` by `d_model`, and the heads are only a reshape of the same matrices into slices of width `d_model / n_heads`. The compute stays about the same because the per-head attention runs as one batched matmul over the head axis. Each head can specialize on its own relation, and the output projection is where the heads mix. The lesson's rule of thumb keeps a head at a width of 32 or more, because a narrower head sees too few dimensions, and above 256 you lose the benefit of many small specialists, while the `sqrt` scaling itself keeps the score variance constant at any width.
+参数不变：四个投影仍然是 `d_model` 乘 `d_model`，多头只是把同样的矩阵 reshape 成宽度为 `d_model / n_heads` 的切片。计算量也基本不变，因为每个头的注意力沿头这一轴作为一次批量矩阵乘法来跑。每个头可以专门处理自己的一种关系，而各个头在输出投影里混合。课程的经验法则是头宽度保持在 32 或以上，因为更窄的头能看到的维度太少，超过 256 又会失去许多小专家分工的好处；而 `sqrt` 缩放本身在任何宽度下都让分数方差保持不变。
 
 ## Full answer
 
-### Split, attend, combine
+### 拆分、注意、合并
 
 ```python
 def split_heads(X, n_heads):
@@ -37,44 +37,44 @@ def combine_heads(H):
     return H.transpose(1, 0, 2).reshape(n, h * d_head)
 ```
 
-Project X to Q, K and V, split each into heads, run scaled dot-product attention per head, stack the heads back and multiply by the output matrix `W_o`. The GPU sees the per-head scores as a single batched matmul of shape `(heads, N, d_head)` times `(heads, d_head, N)`. Adding heads adds batch entries, not weights.
+把 X 投影成 Q、K 和 V，各自拆成多个头，每个头做缩放点积注意力，再把各头堆回去，乘上输出矩阵 `W_o`。GPU 把每个头的分数看成一次批量矩阵乘法，形状是 `(heads, N, d_head)` 乘 `(heads, d_head, N)`。加头加的是批次条目，不是权重。
 
-### Why the output projection matters
+### 输出投影为什么重要
 
-The heads never talk during the attention step itself; they work on different subspaces. `W_o`, of shape `(d_model, d_model)`, is where their outputs mix. Without it the heads could only recombine through later layers and the block would be artificially constrained.
+在注意力这一步里，各个头互不交流；它们在不同的子空间上工作。形状为 `(d_model, d_model)` 的 `W_o` 是它们的输出混合的地方。没有它，各个头只能靠后面的层重新组合，block 会受到不必要的限制。
 
-### What heads learn
+### 头学到了什么
 
-Probing work from 2019 to 2024 found distinct roles: heads that attend to the previous token, copy heads, heads that track named entities, and induction heads, the pairs that detect an earlier occurrence of the current token and copy what followed it, which underlie in-context learning. One head would have to smear all of these into one softmax.
+2019 到 2024 年的探测研究发现了不同的角色：关注前一个 token 的头、复制头、跟踪命名实体的头，以及归纳头。归纳头是成对的头，它们找到当前 token 之前出现的位置，并复制当时跟在后面的内容，上下文学习就建立在它们之上。只有一个头的话，所有这些功能都得糊进同一个 softmax 里。
 
-### Picking the head width
+### 选头宽度
 
-| Model size | d_model | n_heads | d_head |
+| 模型规模 | d_model | n_heads | d_head |
 |---|---|---|---|
-| Small (about 125M) | 768 | 12 | 64 |
-| Base (about 350M) | 1024 | 16 | 64 |
-| Large (about 1B) | 2048 | 16 | 128 |
-| Frontier (about 70B) | 8192 | 64 | 128 |
+| 小型（约 125M） | 768 | 12 | 64 |
+| 基础（约 350M） | 1024 | 16 | 64 |
+| 大型（约 1B） | 2048 | 16 | 128 |
+| 前沿（约 70B） | 8192 | 64 | 128 |
 
-The head width lands at 64 or 128 almost every time. It is the unit of how much one head can see.
+头宽度几乎每次都落在 64 或 128。它是一个头能看到多少东西的单位。
 
-### The production implementation
+### 生产中的实现
 
-One linear layer maps D to 3D and is sliced into Q, K and V. Three separate layers compute the same thing, because three matmuls by `(D, D)` weights equal one matmul by a stacked `(3D, D)` weight, but the fused layer launches one kernel instead of three.
+用一个线性层把 D 映射到 3D，再切成 Q、K 和 V。三个独立的层算的是同一个结果，因为用三个 `(D, D)` 权重做三次矩阵乘法，等于用一个堆叠起来的 `(3D, D)` 权重做一次，但融合后的层只启动一个 kernel，而不是三个。
 
 ## Follow-ups
 
-- **Level 2:** Why is the fused QKV projection faster if the math is identical? Expected: one kernel launch and one matmul instead of three; the stacked weight gives the same result.
-- **Level 3:** What goes wrong if you remove the output projection? Expected: the heads can only mix through later layers, so the block loses expressive power even though the shapes still work.
-- **Level 3:** What is an induction head? Expected: a pair of heads that finds a previous occurrence of the current token and copies the token that followed it; the circuit behind in-context learning.
-- **Level 4:** Grouped-query attention keeps the query heads and shrinks something else. What and why? Expected: the key and value heads, because only they live in the decode-time cache; fewer of them cut cache memory while the query heads keep quality.
+- **Level 2:** 数学完全相同，为什么融合的 QKV 投影更快？ Expected: 一次 kernel 启动、一次矩阵乘法，而不是三次；堆叠的权重给出相同的结果。
+- **Level 3:** 去掉输出投影会出什么问题？ Expected: 各个头只能通过后面的层混合，所以即使形状都对得上，block 的表达能力也变弱了。
+- **Level 3:** 什么是归纳头？ Expected: 一对头，找到当前 token 之前出现的位置，并复制当时跟在它后面的 token；它是上下文学习背后的电路。
+- **Level 4:** 分组查询注意力保留查询头，缩小的是别的部分。缩小了什么，为什么？ Expected: 键头和值头，因为只有它们存在解码时的 cache 里；减少它们能省 cache 显存，查询头保留下来维持质量。
 
 ## Wrong answers
 
-- "More heads mean more parameters." The projections keep their size; the heads are a reshape of the same matrices.
-- "Heads exchange information while they attend." They work on separate subspaces; mixing happens only in the output projection and in later layers.
-- "Use as many heads as the width allows." Heads narrower than the lesson's rule of thumb of 32 see too little; the common widths are 64 and 128.
+- "头越多参数越多。" 投影的大小不变；多头只是同样矩阵的 reshape。
+- "各个头在做注意力时交换信息。" 它们在各自的子空间上工作；混合只发生在输出投影和后面的层里。
+- "宽度允许的话，头越多越好。" 头宽度低于课程经验法则的 32 时，看到的东西太少；常见的宽度是 64 和 128。
 
 ## Taught in
 
-The [multi-head attention lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) builds the split and the width table, and the [attention capstone](../../../phases/19-capstone-projects/33-multihead-self-attention/) fuses the projection and explains the output matrix.
+[多头注意力一课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)实现了拆分并给出头宽度表，[注意力综合项目](../../../phases/19-capstone-projects/33-multihead-self-attention/)融合了投影并解释了输出矩阵。

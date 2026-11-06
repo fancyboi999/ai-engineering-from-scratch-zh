@@ -1,6 +1,6 @@
 ---
 id: lr-peak-sweep
-title: Sweep the peak learning rate and mark divergence
+title: 扫描峰值学习率并标出发散
 card: coding
 kind: take-home
 level: 3
@@ -16,19 +16,19 @@ related: [coding/adamw-decoupled-decay]
 updated: 2026-11-03
 ---
 
-Before a long training run you are asked to pick the peak learning rate for a warmup and cosine schedule. Write the sweep that trains a small seeded model at each candidate rate, decides which runs diverged, picks the best stable rate and reports the smallest rate that diverged. State what "diverged" means in code.
+在一次长训练之前，你要为预热加余弦的调度选定峰值学习率。写一个扫描：在每个候选学习率上训练一个带种子的小模型，判断哪些运行发散了，选出最好的稳定学习率，并报告发散的最小学习率。用代码说明「发散」是什么意思。
 
 ## Short answer
 
-Run the same seeded training loop once per candidate rate and record the final loss and the loss history. A run diverged when its final loss is not finite or when the loss grew over the run, not only when it became NaN. The best rate is the lowest final loss among the stable runs, with the smaller rate on a tie, and the smallest diverging rate is reported as the ceiling, because it bounds how high the peak can go.
+每个候选学习率跑一次同样带种子的训练循环，记录最终损失和损失历史。最终损失不是有限值，或者损失在运行过程中上升了，这次运行就算发散，不只是变成 NaN 才算。最好的学习率是稳定运行中最终损失最低的那个，平局时取较小的；发散的最小学习率作为上限报告，因为它限定了峰值最高能到哪里。
 
 ## Full answer
 
-### Why the peak first
+### 为什么先定峰值
 
-The schedule lesson's advice is to sweep the peak before anything else, because the peak is the most sensitive knob and its optimum scales weakly with model size. A sweep on a small model is a strong prior for the large run. The warmup fraction and the floor matter less and come after.
+调度课的建议是先扫峰值，再管别的，因为峰值是最敏感的旋钮，它的最优值随模型规模变化很弱。在小模型上扫出的结果，对大模型训练是很强的先验。预热比例和下限没那么重要，放在后面调。
 
-### The sweep
+### 扫描
 
 ```python
 def is_diverged(losses):
@@ -54,28 +54,28 @@ def smallest_diverging_lr(results):
     return min(div) if div else None
 ```
 
-Every run uses the same seed so that the only difference between runs is the rate. The results are keyed by rate, and the divergence filter runs before any argmin, because a NaN final loss compares as neither larger nor smaller and would otherwise be selected. When every run diverged, `best_lr` returns `None` and the grid must move lower.
+每次运行用同一个种子，这样运行之间唯一的差别就是学习率。结果以学习率为键，发散过滤要在任何 argmin 之前做，因为 NaN 的最终损失既不比别人大也不比别人小，不过滤就可能被选中。所有运行都发散时，`best_lr` 返回 `None`，网格必须往低处移。
 
-### What diverged means
+### 发散是什么意思
 
-A loss that ends finite but above where it started is a divergence too. A run can climb for the whole sweep and still return a number. Testing only for non-finite values marks that run stable and the sweep then recommends a rate that will blow up the long run after warmup ends.
+损失最后是有限值，但比开始时高，也算发散。一次运行可能整个扫描期间都在上升，最后仍然返回一个数。只检查非有限值，会把这次运行标成稳定，扫描就会推荐一个在预热结束后让长训练爆掉的学习率。
 
-### Reading the result
+### 怎样读结果
 
-The schedule reaches the peak at the end of warmup and decays toward the floor. A peak just below the smallest diverging rate is aggressive; a peak with a margin below it survives the noisy gradient norms of the first steps. Log the gradient norm next to the rate on the chosen run: a well-tuned warmup shows the norm rising with the rate and settling, and a too-high peak shows a norm that stays high after warmup.
+调度在预热结束时到达峰值，然后向下限衰减。紧贴最小发散学习率的峰值很激进；比它低一些、留出余量的峰值能扛住最初几步噪声很大的梯度范数。在选定的运行上，把梯度范数和学习率一起记录：调得好的预热，范数会随学习率上升然后稳定；峰值太高时，预热结束后范数仍然居高不下。
 
 ## Follow-ups
 
-- **Level 3:** Two rates give the same final loss. Which one do you pick? Expected: the smaller one; it has more margin to the divergence ceiling.
-- **Level 3:** Why does the practice compare the first diverging rate with two over the top curvature of the loss? Expected: for a quadratic loss, gradient descent is stable only below that bound, so the measured ceiling should land near it and a mismatch points at a bug in the sweep.
-- **Level 4:** Warmup is set as an absolute count of steps. Why does the sweep on a short run then mislead the long one? Expected: the same count is a much smaller fraction of a long run, so the long run sits at the peak almost at once; set warmup as a fraction of total steps.
+- **Level 3:** 两个学习率的最终损失相同。你选哪个？ Expected: 较小的那个；它离发散上限的余量更大。
+- **Level 3:** 练习为什么把第一个发散学习率和二除以损失的最大曲率作比较？ Expected: 对二次损失，梯度下降只有在这个界限以下才稳定，所以测出的上限应该落在它附近；不一致说明扫描有 bug。
+- **Level 4:** 预热设成了绝对步数。为什么短运行上的扫描会误导长运行？ Expected: 同样的步数在长运行里占的比例小得多，长运行几乎立刻就到了峰值；预热应该设成总步数的一个比例。
 
 ## Wrong answers
 
-- "Pick the rate with the lowest loss across all runs." A NaN or a climbing run must be filtered first, otherwise the argmin can return a diverged rate.
-- "A run diverged only if the loss is NaN or infinite." A finite loss that grew over the run is a divergence the long run will also show.
-- "Sweep the warmup length first since it protects the start." The peak is the most sensitive knob; the warmup fraction is tuned after it.
+- "在所有运行里选损失最低的学习率。" 必须先过滤掉 NaN 和上升的运行，否则 argmin 可能返回一个发散的学习率。
+- "只有损失变成 NaN 或无穷大才算发散。" 运行过程中上升的有限损失也是发散，长运行同样会出现。
+- "先扫预热长度，因为它保护训练开头。" 峰值才是最敏感的旋钮；预热比例在它之后调。
 
 ## Taught in
 
-The [cosine schedule lesson](../../../phases/19-capstone-projects/44-cosine-lr-warmup/) says to sweep the peak first and to record the gradient norm beside the rate, and the [learning rate sweep lab](../../../practice/lab-learning-rate-sweep/) implements the sweep with its divergence rule.
+[余弦调度课](../../../phases/19-capstone-projects/44-cosine-lr-warmup/)要求先扫峰值，并在学习率旁记录梯度范数，[学习率扫描实验](../../../practice/lab-learning-rate-sweep/)实现了带发散规则的扫描。

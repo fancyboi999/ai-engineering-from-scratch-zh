@@ -1,6 +1,6 @@
 ---
 id: sweep-trap-addq-at-0x13
-title: Every byte decoded, and the jump lands inside an instruction
+title: 每个字节均被解码且跳转落在指令内部
 card: evidence-reverse-engineering
 kind: debug
 level: 2
@@ -16,43 +16,43 @@ related: [evidence-reverse-engineering/addend-0x10-table-0x14]
 updated: 2026-11-03
 ---
 
-A 24-byte function keeps a four-byte table `31 c0 90 48` inside its body and jumps over it with `jmp 0x14`. `llvm-objdump -d` prints `xorl %eax, %eax`, `nop`, and `addq $0x1, %rax` at `0x13`; every byte decodes and a `retq` is present. Name the three ways this listing is wrong, say which method gets it right and why the reference tool shares the mistake, and say what agreement between your decoder and that tool does and does not prove.
+一个 24 字节的函数在其函数体内部包含一个 4 字节的数据表 `31 c0 90 48`，并使用 `jmp 0x14` 跳过该表。`llvm-objdump -d` 输出了 `xorl %eax, %eax`、`nop` 以及位于 `0x13` 处的 `addq $0x1, %rax`；每个字节都成功解码，且存在 `retq` 返回指令。指出该汇编清单出现错误的三处表现，说明哪种方法能正确处理、为何基准参考工具也存在同样的错误，并说明你的解码器与该工具之间的一致性能够证明什么、不能证明什么。
 
 ## Short answer
 
-The listing is wrong three times: the jump at `0xe` targets `0x14` and no instruction in the listing starts there; the instruction that runs at `0x14` is a 32-bit `addl $0x1, %eax`, while the listing shows a 64-bit `addq` one byte early because the table's last byte `48` was swallowed as a REX prefix; and the four table bytes appear as code. Recursive descent from the symbol follows the jump, decodes six instructions, reads `addl` at the target and claims no table or padding byte. `llvm-objdump` is itself a linear sweep, so it inherits the sweep's blind spot: agreement with it checks the decoder on instruction boundaries, and only the descent checks which instructions run.
+该汇编清单出现了三处错误：位于 `0xe` 处的跳转目标为 `0x14`，而清单中没有任何指令从该地址起始；实际在 `0x14` 处执行的指令是 32 位的 `addl $0x1, %eax`，而清单却提前一个字节在 0x13 处显示了 64 位的 `addq`，因为数据表的最后一个字节 `48` 被误吞为了 REX 前缀；此外，这四个数据表字节被误当成了可执行代码。从符号起始地址开始的递归下降分析能够正确跟随跳转，解码出六条指令，在目标地址处正确解析出 `addl`，且不将任何表字节或填充字节误认为代码。`llvm-objdump` 本身采用线性扫描算法，因而继承了线性扫描的盲区：与它的一致性只能检验解码器在指令边界上的解码正确性，唯有递归下降才能检验究竟哪些指令会被实际执行。
 
 ## Full answer
 
-### Two methods, opposite failures
+### 两种方法与截然相反的失效模式
 
-A linear sweep starts at the first byte of the code section, decodes one instruction, continues at the byte after it, and stops at the end; data inside code gets decoded as instructions, and on x86 the decoder usually re-synchronises within a few bytes, which is why the error is hard to see and why the method is said to fail silently. Recursive descent starts at a known entry, follows direct jumps and both arms of a conditional, continues after a call, stops at a return, and keeps a visited set. Its failure is the opposite one: an indirect jump has no target in its bytes, so the walk stops there and every block reachable only through it stays unknown, which is what happens at `jmpq *%rax` in the unoptimized `grade`.
+线性扫描（linear sweep）从代码节的首字节开始，解码一条指令后紧接着从其后字节继续解码，直到节末尾停止；嵌入代码内部的数据会被误解码为指令，而在 x86 架构上解码器通常在几个字节之内就能重新同步对齐，这也是该错误难以察觉且该方法被称为“静默失效”（fail silently）的原因。递归下降（recursive descent）从已知入口点开始，跟随直接跳转以及条件分支的两个方向，在 call 指令后继续，在 ret 返回时停止，并维护一个已访问地址集合。它的失效模式恰好相反：间接跳转在指令字节中没有固定目标地址，导致遍历在此处中断，所有仅能通过该跳转到达的基本块均保持为未知状态，这正是未优化 `grade` 函数中在 `jmpq *%rax` 处发生的情况。
 
-### The trap under five tools
+### 五款工具下的陷阱对比
 
-The comparison harness reports the sweep with 8 instruction starts in the trap range, with extra starts at `0x10`, `0x12` and `0x13` and a missing start at `0x14`. Three graph builders report 6 starts, 2 blocks and 1 edge, and leave `0x10` to `0x14` unclaimed. One framework also invents a function on the table bytes, two instructions in a four-byte block, so the REX byte at `0x13` belongs to no instruction. The last finding is the useful one: no graph builder decodes `0x10` to `0x14`, so those bytes sit inside a function and are data.
+比对测试控台报告线性扫描在陷阱范围内识别出 8 个指令起始位置，在 `0x10`、`0x12` 和 `0x13` 处产生了多余的起始位置，并漏掉了 `0x14` 处的正确起始。三个控制流图构建器报告了 6 个起始位置、2 个基本块和 1 条边，并将 `0x10` 到 `0x14` 保持为未认领状态。某框架甚至在数据表字节上凭空捏造了一个函数（一个 4 字节块内包含两条指令），导致 `0x13` 处的 REX 字节不属于任何指令。最有价值的发现是：没有任何控制流图构建器将 `0x10` 到 `0x14` 解码为代码，因此这些字节位于函数内部且属于纯数据。
 
-### What the oracle is for
+### 预言机的真正用途
 
-The decoder must agree with `llvm-objdump -d` on every instruction of every fixture, and it does, on 86, 56, 84 and 11 instructions, 237 in all. That agreement proves the decoder reads prefixes, opcodes, ModRM, SIB, displacements and immediates the way the manual says. It proves nothing about reachability, because the oracle never asked. A measurement of nine disassemblers on 981 compiler-generated binaries found inline data rarer than the literature assumed and function starts the hard primitive; the trap is rare in compiler output, and the indirect jump is common.
+自研解码器必须在每个测试固件的每条指令上与 `llvm-objdump -d` 保持完全一致，事实也确实如此，在 86、56、84 和 11 条指令（共 237 条指令）上均做到了完全一致。这种一致性证明了解码器对前缀、操作码、ModRM、SIB、位移和立即数的解读完全符合官方手册规范。但这不能证明代码的可达性，因为预言机本身从不考察可达性。一项针对 981 个编译器生成二进制文件评测九款反汇编器的研究发现，内联数据比学术文献假设的更为罕见，而函数起始识别才是真正的难点；该测试陷阱在实际编译器输出中较为少见，而间接跳转则非常普遍。
 
-### Byte accounting
+### 字节核算
 
-Compare the two methods byte by byte. Bytes that only the sweep claims are padding, data, code behind an indirect jump, or code of a function with no known entry. The sweep decodes the whole section, so these are the bytes to account for. Bytes the descent claims are the ones it reaches from that entry; that is reachability, not proof that they run.
+按字节严格比对这两种方法。仅被线性扫描认领的字节属于对齐填充、数据、位于间接跳转之后的代码，或属于没有已知入口点的函数的代码。线性扫描会解码整个节，因此这些正是需要逐一核算的字节。递归下降所认领的字节是它从该入口点实际能够到达的字节；这代表了控制流可达性，并不等于这些指令实际运行的证明。
 
 ## Follow-ups
 
-- **Level 2:** Change the last table byte from `48` to `e8` and rebuild. What does the sweep print? Expected: a `callq` that swallows the `addl` and the `retq`, with a target outside the section; the function appears to have no return.
-- **Level 3:** Why does the descent stop at `jmpq *%rax` in the unoptimized `grade`, and what fixes it? Expected: no target is in the bytes; the resolver reads the five relocations of the table and pushes four distinct targets.
-- **Level 3:** What does "fail silently" mean in operational terms? Expected: the decoder re-synchronises within a few bytes and detects nothing unless it hits an invalid opcode, so a wrong listing looks complete.
-- **Level 4:** How do you classify bytes that the descent does not claim? Expected: padding, data, code behind an indirect jump, or part of a function with no known entry; account for every byte as one of these or as reached by the descent.
+- **Level 2:** 将表末尾字节从 `48` 改为 `e8` 并重新构建，线性扫描会打印出什么？ Expected: 一条将 `addl` 和 `retq` 吞掉的 `callq` 指令，其目标地址落在了代码节外部；该函数看似没有返回指令。
+- **Level 3:** 为什么递归下降在未优化的 `grade` 中的 `jmpq *%rax` 处会停止，如何解决？ Expected: 指令字节中没有目标地址；跳转解析器需读取该表对应的 5 条重定位记录，并压入 4 个不同的目标地址。
+- **Level 3:** “静默失效”在实际工程操作中意味着什么？ Expected: 解码器在几个字节内即可重新同步，除非遇到非法操作码否则不会报错，导致错误的汇编清单表面上看起来完全正常且完整。
+- **Level 4:** 如何归类递归下降未认领的字节？ Expected: 分类为填充字节、纯数据、间接跳转之后的代码，或没有已知入口的函数的一部分；将每个字节归为这些类别之一或核算为递归下降已到达。
 
 ## Wrong answers
 
-- "The reference tool is right because it is the reference." It is a sweep; it is the oracle for decoding, not for reachability.
-- "Use the descent alone." It stops at indirect jumps and leaves reachable code unknown until a table is recovered.
-- "Every byte decoded, so the listing is complete." A listing says which bytes form which instruction, not which instructions run.
+- "参考工具是权威，所以它是对的。" 它是一个线性扫描工具；它是指令解码的预言机，而非代码可达性的预言机。
+- "仅仅单独使用递归下降。" 它会在间接跳转处停止，在恢复出跳转表之前会使得可达代码保持为未知状态。
+- "每个字节都被解码了，所以汇编清单是完整的。" 汇编清单说明了哪些字节构成了哪条指令，而非哪些指令会实际运行。
 
 ## Taught in
 
-The [disassembly lesson](../../../phases/13-tools-and-protocols/33-disassembly-and-control-flow/) builds both methods and the trap fixture, and the [landscape lesson](../../../phases/13-tools-and-protocols/37-the-reverse-engineering-landscape/) runs five tools over it and accounts for every byte.
+[反汇编课程](../../../phases/13-tools-and-protocols/33-disassembly-and-control-flow/)构建了这两种方法与陷阱测试用例，[行业全景课程](../../../phases/13-tools-and-protocols/37-the-reverse-engineering-landscape/)在其上运行了五款工具并核算了每个字节。

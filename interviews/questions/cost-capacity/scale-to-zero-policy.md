@@ -1,6 +1,6 @@
 ---
 id: scale-to-zero-policy
-title: Warm replicas per tier, with the arithmetic
+title: 按层级配置热副本，并算清这笔账
 card: cost-capacity
 kind: design
 level: 4
@@ -16,56 +16,56 @@ related: [cost-capacity/warm-pool-or-cold-start, cost-capacity/cold-start-anatom
 updated: 2026-11-03
 ---
 
-You run three tiers on a serverless GPU platform: paid users on a live chat, trial users on the same chat, and a nightly batch pipeline. Design the warm-pool policy per tier, show the arithmetic behind it, and say what you would measure after a month to revisit it.
+你在一个 serverless GPU 平台上运行三个层级：实时聊天里的付费用户、同一个聊天里的试用用户，以及一条夜间 batch 流水线。请为每个层级设计 warm pool 策略，给出背后的算法，并说明一个月后你会测量什么来重新评估它。
 
 ## Short answer
 
-Give the paid chat one or two warm replicas, because its first-token target cannot absorb a cold start of minutes on a large model. Give trial users a smaller margin, or let them ride on the paid pool's spare capacity, and let the batch pipeline scale to zero, because it tolerates a cold start of several minutes. The arithmetic is the hourly GPU price times the idle hours against the requests that would miss the target during a cold start, and after a month you compare the measured utilization, the cold-start count and the missed-target count per tier.
+付费聊天配一到两个热副本，因为它的首 token 目标承受不了大模型几分钟的冷启动。试用用户给更小的余量，或者让他们借用付费池的空余容量；batch 流水线缩容到零，因为它能容忍几分钟的冷启动。这笔账是 GPU 每小时价格乘以空闲小时数，对比冷启动期间会错过目标的请求；一个月后，按层级比较实测的利用率、冷启动次数和错过目标的次数。
 
 ## Full answer
 
-### The arithmetic the lesson gives
+### 课程给出的算法
 
-A warm replica costs one GPU hour every hour. One replica per product is a full month of GPU hours whether anyone calls, and the lesson's example of five products with one warm replica each comes to 3,600 GPU-hours a month idle. The lesson calls the trade brutal on small models, where you pay 0.85 to 1.50 dollars an hour to avoid a 30 second start, and kind on large ones, where about 4 dollars an hour avoids a 5 minute start. Its threshold for a mandatory warm pool: a first-token target at P99 under 60 seconds on a model of 70B or more.
+一个热副本每小时都要花一个 GPU 小时。每个产品一个副本，不管有没有人调用，就是一整个月的 GPU 小时；课程的例子是五个产品各留一个热副本，每月空闲 3,600 个 GPU 小时。课程说这笔交易对小模型很残酷，你每小时付 0.85 到 1.50 美元，只为避开 30 秒的启动；对大模型则很友好，每小时约 4 美元就能避开 5 分钟的启动。它给出的必须配 warm pool 的门槛是：70B 及以上的模型，首 token 的 P99 目标低于 60 秒。
 
-### The policy per tier
+### 各层级的策略
 
-| Tier | Policy | Why |
+| 层级 | 策略 | 原因 |
 |---|---|---|
-| paid live chat | one to two warm replicas | the lesson's high-value interactive path, where a cold start is an outage |
-| trial chat | zero warm, or overflow into the paid pool at lower priority | the loss is a conversion, which you can measure, against a month of GPU hours |
-| nightly batch | scale to zero | the lesson accepts a cold start of 5 to 10 minutes on background paths |
+| 付费实时聊天 | 一到两个热副本 | 课程所说的高价值交互路径，冷启动就等于故障 |
+| 试用聊天 | 零个热副本，或以较低优先级溢出到付费池 | 损失的是一次转化，可以测量，要拿它和一个月的 GPU 小时比 |
+| 夜间 batch | 缩容到零 | 课程接受后台路径上 5 到 10 分钟的冷启动 |
 
-The lesson's exercise asks exactly this split and asks for the math. The paid tier is decided by the SLA. The batch tier is decided by its tolerance. The trial tier is the real decision, and it is an experiment: the conversion loss from a cold start on the first session against the price of an idle GPU.
+课程的练习要求的正是这种划分，并要求写出算式。付费层由 SLA 决定。batch 层由它的容忍度决定。试用层才是真正要做的决定，而且它是一次实验：第一次会话遇到冷启动造成的转化损失，对比一块空闲 GPU 的价格。
 
-### Make the policy cheaper by shrinking the start
+### 缩短启动，让策略更便宜
 
-Every mitigation layer moves a tier toward zero. A pre-seeded node image removes the image pull, model streaming halves the weight load, a GPU memory snapshot restores the loaded state in a fraction of the time, and tiered loading keeps weights in host memory. The lesson's table takes a cold start of 328 seconds to about 15 seconds. With a 15 second start, the trial tier can scale to zero with a small loss, and the paid pool can hold one replica instead of two.
+每一层缓解措施都会把某个层级往零推。预置节点镜像省掉拉镜像，模型流式加载把权重加载时间减半，GPU 显存快照只用一小部分时间就能恢复已加载状态，分层加载把权重留在主机内存里。课程的表格把 328 秒的冷启动降到了约 15 秒。启动只要 15 秒时，试用层可以缩容到零而损失很小，付费池也可以只留一个副本而不是两个。
 
-### Match the billing to the tier
+### 让计费方式匹配层级
 
-The warm replicas run at high utilization, which is where per-minute billing beats per-token, above about 30 percent sustained utilization in the economics lesson. Trial bursts and the overnight batch sit below that line, so per-token or a batch tier at about half the serverless rate fits them.
+热副本的利用率很高，正是按分钟计费胜过按 token 的区域，经济学课程给出的线是持续利用率约 30% 以上。试用的突发流量和夜间 batch 都在这条线以下，所以适合按 token 计费，或者价格约为 serverless 一半的 batch 档。
 
-### What to measure after a month
+### 一个月后测量什么
 
-- Utilization per tier, hour by hour.
-- Cold starts per day and their duration.
-- Requests that missed the first-token target, and whether they fell inside a cold start.
-- Trial conversions for sessions that hit a cold start against sessions that did not.
-- The break-even request rate per tier from the lesson's simulator, against the measured rate.
+- 每个层级逐小时的利用率。
+- 每天的冷启动次数和持续时间。
+- 错过首 token 目标的请求，以及它们是否落在冷启动期间。
+- 遇到冷启动的试用会话与没遇到的会话的转化率对比。
+- 用课程模拟器算出的各层级盈亏平衡请求速率，与实测速率对比。
 
 ## Follow-ups
 
-- **Level 3:** Why not give trial users the same warm pool as paid users? Expected: a warm replica costs a month of GPU hours whether trial traffic arrives or not. The decision is the conversion loss from a cold start against that cost, and the month of measurement answers it.
-- **Level 4:** How does a 15 second cold start change the policy? Expected: tiers that tolerate seconds scale to zero, so the warm pool shrinks to the paths with targets of a second or two.
-- **Level 4:** Which signal says a warm replica count is too low? Expected: the share of requests that miss the first-token target during scale-outs, together with the cold-start count per day.
+- **Level 3:** 为什么不给试用用户和付费用户一样的 warm pool？ Expected: 不管试用流量来不来，一个热副本都要花一个月的 GPU 小时。要比较的是冷启动造成的转化损失和这笔成本，一个月的测量会给出答案。
+- **Level 4:** 冷启动缩短到 15 秒，策略会怎么变？ Expected: 能容忍几秒延迟的层级都可以缩容到零，warm pool 缩小到只覆盖目标在一两秒内的路径。
+- **Level 4:** 哪个信号说明热副本数太少？ Expected: 扩容期间错过首 token 目标的请求比例，再加上每天的冷启动次数。
 
 ## Wrong answers
 
-- "Warm replicas for every tier, the cost is small." One replica per product is a month of GPU hours each. Five products idle come to thousands of hours.
-- "Scale trial to zero, those users are free." A cold start of minutes on the first trial session is a lost conversion. Measure it before you decide.
-- "Keep the batch pipeline warm so that it finishes earlier." Batch tolerates minutes. A warm GPU for it is paid idle time for the rest of the day.
+- "每个层级都留热副本，成本不高。" 每个产品一个副本，每个都是一个月的 GPU 小时。五个产品空闲着，就是好几千小时。
+- "试用层缩容到零，反正这些用户不付钱。" 第一次试用会话遇到几分钟的冷启动，就是一次流失的转化。先测量，再决定。
+- "让 batch 流水线保持热状态，好早点跑完。" batch 能容忍几分钟。给它留一块热 GPU，一天里剩下的时间都是在为空闲付费。
 
 ## Taught in
 
-The [cold start lesson](../../../phases/17-infrastructure-and-production/10-cold-start-mitigation/) gives the warm-pool arithmetic and the tiered policy exercise, and the [inference platform economics lesson](../../../phases/17-infrastructure-and-production/02-inference-platform-economics/) gives the per-minute against per-token crossover.
+[冷启动课程](../../../phases/17-infrastructure-and-production/10-cold-start-mitigation/)给出了 warm pool 的算法和分层策略练习，[推理平台经济学课程](../../../phases/17-infrastructure-and-production/02-inference-platform-economics/)给出了按分钟与按 token 的交叉点。

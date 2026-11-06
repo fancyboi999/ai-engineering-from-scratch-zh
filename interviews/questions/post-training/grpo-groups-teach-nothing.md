@@ -1,6 +1,6 @@
 ---
 id: grpo-groups-teach-nothing
-title: A flat GRPO reward and the groups that teach nothing
+title: GRPO 奖励停滞与不提供学习信号的组
 card: post-training
 kind: debug
 level: 2
@@ -16,47 +16,47 @@ related: [post-training/rl-custom-reward-take-home, post-training/logprob-gap-at
 updated: 2026-11-03
 ---
 
-A GRPO run trains a small model on grade-school math with a binary reward. The reward per step jumps around, and the trend over many steps looks flat. The team wants to raise the learning rate. What do you read first, and what do you suspect?
+在一次使用二元奖励在小学数学题上训练小模型的 GRPO 任务中，每步记录的奖励波动剧烈，但在许多步之后的长期趋势却看起来持平。团队想要提高学习率。你首先应该排查什么，你怀疑的根因是什么？
 
 ## Short answer
 
-Read the group statistics before you touch the learning rate. GRPO scores each answer against the mean of its group, so a group where every answer is right or every answer is wrong has a zero advantage for every member and teaches nothing. In the manual's runs, 10 of the 32 groups in the first step had one reward for all 8 answers, and about half of the groups did over 12 steps. If most groups are like that, the signal is thin, and the fix is the prompt mix or the dynamic sampling filter, not a bigger step.
+在调整学习率之前，首先阅读组统计指标。GRPO 是针对同一个 prompt 采样出的回答组计算组内均值并相对打分，因此一个全对或全错的组，其所有样本的优势值在数学上完全为零，对模型没有任何教学指导意义。在手册的实验中，第 1 步的 32 个组中有 10 个组的所有 8 个回答奖励完全相同；而在 12 步的持续训练中，约有一半的组奖励相同。如果大部分组都处于全对或全错状态，有效的学习信号就极其稀薄，真正的解决方案是调整 prompt 的难度分布或开启动态采样过滤机制，而不是盲目加大优化步长。
 
 ## Full answer
 
-### Read five numbers, not the reward
+### 关注五个关键数值，而非孤立的单步奖励
 
-The reward of one step moved by up to 0.14 between steps in the first ten steps of the manual's runs, and by up to 0.21 over a long run, so read a mean over five or more steps. Next to it read the answer length, the share of answers cut at the length limit, the log-probability gap between the trainer and the engine, and the KL between them. A flat reward with a flat gap and a normal length points at the signal, not at the kernels.
+在手册记录的实验中，前 10 步内相邻步骤间的单步奖励跳变幅度可达 0.14，在长程运行中波动可达 0.21，因此必须观察至少 5 步的均值。与此同时，必须同步关注：回答文本长度、因达到长度上限而被截断的回答占比、训练器与引擎之间的对数概率差距，以及两者之间的 KL 散度。如果奖励曲线平直、对数概率差距保持稳定且文本长度正常，表明问题出在信号本身，而非计算算子。
 
-### Count the groups that carry no advantage
+### 统计毫无优势信号的“零方差组”
 
-The rollout `perf` line counts groups with a zero standard deviation: `rollout/zero_std/count_1` for all right and `rollout/zero_std/count_0` for all wrong. In the first step of the manual's baseline, 7 groups were all right and 3 were all wrong, 10 of 32. Over 12 steps with one seed, 191 of 384 groups had one reward for every answer, and 142 of those were all right: easy prompts the model already solved.
+采样的 `perf` 日志行统计了奖励标准差为零的组数量：`rollout/zero_std/count_1` 记录全对的组，`rollout/zero_std/count_0` 记录全错的组。在手册基线运行的第 1 步中，32 个组里有 7 个全对、3 个全错，总计 10 个组完全无效。在单种子 12 步的统计中，384 个组里有 191 个组内所有回答奖励完全相同，其中 142 个是全对组：这意味着模型在这些过于简单的 prompt 上早已掌握，白白浪费了生成与计算算力。
 
-### The filter and its cost
+### 动态采样过滤器及其计算代价
 
-The dynamic sampling filter drops those groups and asks the engine for more prompts until the step holds enough groups with a spread. With batches of 48 prompts for 32 kept groups, the manual's steps dropped 16 to 48 groups each, median 36, and most dropped groups were all right. The rollout took 1.5 times as long when one extra batch was enough and 2.8 times as long when a second batch was needed. The sum of the twelve step times went from 60 minutes to 113.
+动态采样过滤器会主动丢弃这些零方差组，要求采样引擎补充更多 prompt 重抽，直到单个训练步中凑齐足够数量有区分度的有效组。在每步从 48 个 prompt 批次中保留 32 个有效组的测试中，手册记录的单步丢弃量在 16 到 48 个组之间（中位数为 36 个组），且被丢弃的绝大多数是全对组。当只需追加一个额外批次时，采样耗时为原来的 1.5 倍；当需要追加第二个批次时，采样耗时为原来的 2.8 倍。12 步的总耗时从 60 分钟飙升至 113 分钟。
 
-### Read the reward with the filter on
+### 开启过滤器后如何客观阅读奖励指标
 
-`rollout/raw_reward` no longer includes the dropped groups, so compare `rollout/raw_reward_unfiltered` instead. Even that number leaned high in the manual's run, 0.686 against 0.657, because the slowest and longest answers were stopped before they counted, and a cut answer usually scores 0. Treat a gain inside the spread of your baseline seeds as noise.
+`rollout/raw_reward` 指标此时不再包含被过滤丢弃的组，因此必须对比 `rollout/raw_reward_unfiltered`。即便如此，在手册实验中未过滤的奖励值也略微偏高（0.686 对 0.657），这是因为最长、最慢的超长回答在计入前就被提前截停，而截断回答通常判定为 0 分。任何落在基线多随机种子正常波动范围内的涨幅，都应被视为噪声。
 
-### What a higher learning rate would do
+### 盲目提高学习率的严重后果
 
-A larger step on a thin signal raises the gradient norm and the variance of the update without adding information. The manual's rule for a gradient norm that grows step after step is the opposite: lower the rate.
+在极度稀薄的有效信号上迈出更大的优化步长，会增大梯度范数和更新方差，完全无法注入有效信息。手册针对梯度范数步步攀升给出的准则恰恰相反：必须下调学习率。
 
 ## Follow-ups
 
-- **Level 2:** Why does a group with one reward give a zero advantage? Expected: GRPO subtracts the group mean and divides by the group standard deviation; equal rewards give a zero numerator for every answer.
-- **Level 2:** What else makes a math reward score 0 besides a wrong answer? Expected: an answer cut at the length limit before its final line; read the cut share next to the reward.
-- **Level 3:** The filter run shows a higher mean reward than the baseline. How do you decide if it learned more? Expected: compare the unfiltered reward, account for the bias from stopped long answers, and run a second seed against the spread of the baseline seeds.
-- **Level 3:** Your reward returns fractions, and a group with identical rewards still shows small nonzero advantages. Why? Expected: float32 rounding of the group mean leaves a remainder that the division by a near-zero standard deviation blows up; round rewards to values a float32 holds exactly.
+- **Level 2:** 为什么所有回答得分相同的组其优势值恒为零？ Expected: GRPO 算法减去组均值并除以组标准差；当所有奖励相等时，每个回答的分子在数学上严格等于零。
+- **Level 2:** 在数学题评测中，除了回答计算错误之外，还有什么会导致奖励判为 0？ Expected: 回答在输出最终答案行之前就达到了最大长度限制并被强行截断；排查时必须紧盯截断比例指标。
+- **Level 3:** 开启过滤器后的运行平均奖励高于基准线，如何科学判定模型是否真的学得更好了？ Expected: 对比未经过滤的真实原始奖励、扣除长回答被截断截停引入的系统偏差，再运行第二个随机种子，与基线多个种子的波动范围对照。
+- **Level 3:** 你的奖励函数返回浮点小数，在一组回答奖励完全相同的情况下仍然出现了极小的非零优势值，为什么？ Expected: float32 在计算组均值时的精度舍入残余，在除以接近零的标准差时被数值放大；应将奖励值量化四舍五入为 float32 能够精确表示的值。
 
 ## Wrong answers
 
-- "Raise the learning rate; the reward is flat because the steps are small." The signal is thin because many groups carry no advantage; a larger step amplifies noise and raises the gradient norm.
-- "Sample more answers per prompt to get a spread." In the manual's runs, 4, 8 and 16 answers per prompt gave reward gains inside one seed range, and more answers made each rollout longer.
-- "Read the reward of the last step." One step moves by up to a fifth of the scale; read the mean over five or more steps.
+- "调高学习率，奖励平直是因为更新步长太小了。" 信号之所以平直是因为大量的组优势值为零；调大学习率只会放大更新噪声并导致梯度范数失控。
+- "为每个 prompt 采样更多候选回答以获得更多样化的得分。" 手册实测表明，每个 prompt 采样 4、8、16 个回答在奖励收益上完全落在单个种子的波动范围内，而更多的候选使得每步采样时间大幅延长。
+- "直接以最后一步的单步奖励作为评判标准。" 单步奖励受样本随机性影响波动幅度可达整个量程的五分之一；必须观察至少 5 步的均值。
 
 ## Taught in
 
-[Section 3.2 of Miles 101](../../../manuals/miles-101/sections/3-2-train-with-the-dapo-filter.md) measures the dropped groups and the cost of the filter, [section 1.3](../../../manuals/miles-101/sections/1-3-read-your-first-ten-steps.md) counts the groups that teach nothing, and [section 3.1](../../../manuals/miles-101/sections/3-1-train-math-on-gsm8k.md) compares group sizes.
+[Miles 101 第 3.2 节](../../../manuals/miles-101/sections/3-2-train-with-the-dapo-filter.md)实测了丢弃组统计与过滤器的算力开销，[第 1.3 节](../../../manuals/miles-101/sections/1-3-read-your-first-ten-steps.md)统计了毫无教学意义的无效组，而[第 3.1 节](../../../manuals/miles-101/sections/3-1-train-math-on-gsm8k.md)对比了不同的组大小配置。

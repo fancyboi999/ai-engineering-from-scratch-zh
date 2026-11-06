@@ -1,6 +1,6 @@
 ---
 id: half-the-relus-are-dead
-title: Two layers where most ReLU outputs are exactly zero
+title: 两层里大多数 ReLU 输出恰好为零
 card: deep-learning
 kind: debug
 level: 3
@@ -16,46 +16,46 @@ related: [deep-learning/sigmoid-gradient-after-ten-layers, deep-learning/zero-in
 updated: 2026-11-03
 ---
 
-After a few hundred steps at a high learning rate, a ReLU network's loss stops falling. You log the activations after each ReLU, and in two layers more than half of them are exactly zero on every batch. Explain what happened to those units, why they cannot come back on their own, and what you change.
+用较高的学习率训练几百步后，一个 ReLU 网络的损失不再下降。你记录了每个 ReLU 之后的激活值，发现有两层在每个 batch 上都有一半以上恰好为零。解释这些单元发生了什么，为什么它们自己恢复不了，以及你要改什么。
 
 ## Short answer
 
-First confirm that the units are dead and not only sparse: over a large sample, a dead unit is zero on every input. A ReLU unit whose pre-activation is negative for every input outputs zero and has a derivative of zero, so it receives no gradient and its weights never move again. A large update, driven by the high learning rate, pushed those units' weights and biases far enough negative that no input brings them back. Lower the learning rate, re-initialize the dead units or the dead layers, and move to an activation with a gradient on the negative side, such as a leaky variant or GELU.
+先确认这些单元是死了，而不只是稀疏：在大量样本上，死单元对每个输入都输出零。一个 ReLU 单元的预激活对所有输入都为负时，输出为零，导数也为零，所以它得不到梯度，权重再也不会动。高学习率带来的一次大更新，把这些单元的权重和偏置推到足够负，任何输入都拉不回来。降低学习率，重新初始化死掉的单元或层，并换成负半轴有梯度的激活函数，比如 leaky 变体或 GELU。
 
 ## Full answer
 
-### What a dead unit is
+### 什么是死单元
 
-ReLU is max(0, x). Its derivative is 1 for positive inputs and 0 otherwise. A unit whose input is negative on every sample outputs 0, passes 0 gradient to its weights, and nothing else in the loss touches those weights. It is dead for the rest of training. The activation lesson reports that 10 to 40 percent of units can die in a ReLU network in practice. The debugging lesson's threshold is more than half zeros after a ReLU layer: at that point switch the activation or reduce the learning rate.
+ReLU 是 max(0, x)。输入为正时导数为 1，否则为 0。一个单元的输入在每个样本上都为负时，它输出 0，传给权重的梯度为 0，损失里也没有别的东西会碰这些权重。它在剩下的训练中都是死的。激活函数课说，实践中 ReLU 网络里可能有 10% 到 40% 的单元死掉。调试课的阈值是某个 ReLU 层之后零值超过一半：到这个程度就换激活函数，或者降低学习率。
 
-### How the high learning rate did it
+### 高学习率是怎么造成的
 
-One oversized step moves a unit's bias or weights far negative. After that step every input lands below zero. The debugging lesson's demo builds the state directly by filling weights with -1.0 and biases with -5.0 and shows a flat loss with most activations at zero. A high learning rate reaches the same state by accident.
+一次过大的更新把单元的偏置或权重推到很负的地方。这一步之后，每个输入都落在零以下。调试课的演示把权重填成 -1.0、偏置填成 -5.0，直接构造出这种状态，结果是损失平坦，大多数激活值为零。高学习率会意外地达到同样的状态。
 
-### Telling dead from sparse
+### 区分死单元和稀疏
 
-Some zeros are normal; ReLU is meant to be sparse. Count, over a large sample, the fraction of inputs on which each unit is positive. Dead means zero on all of them. The activation lesson's detector reports dead, barely alive and healthy units from that count.
+有一些零是正常的；ReLU 本来就是稀疏的。在大量样本上，统计每个单元输出为正的输入比例。死单元在所有输入上都是零。激活函数课的检测器根据这个比例，把单元报告为死亡、勉强存活和健康。
 
-### What to change
+### 要改什么
 
-1. Lower the learning rate, and add gradient clipping so one bad batch cannot produce the step again.
-2. Re-initialize the incoming weights of the dead units with a Kaiming draw and continue; the rest of the network keeps its progress. This is the debugging lesson's dead neuron resurrector exercise.
-3. Switch the activation. A leaky ReLU keeps a small slope on the negative side, so a unit can recover. GELU is smooth and avoids the failure entirely; the activation lesson prefers it over the leaky variant unless there is a specific reason.
-4. Check initialization. A Kaiming draw keeps pre-activations centered at the start, so fewer units begin life negative.
+1. 降低学习率，并加上梯度裁剪，让单个坏 batch 不能再产生这样的一步。
+2. 用 Kaiming 抽样重新初始化死单元的输入权重，然后继续训练；网络其他部分保留已有进度。这就是调试课里的死神经元复活练习。
+3. 换激活函数。leaky ReLU 在负半轴保留一个小斜率，单元可以恢复。GELU 是平滑的，完全避开了这种故障；除非有特别的理由，激活函数课更推荐 GELU 而不是 leaky 变体。
+4. 检查初始化。Kaiming 抽样让预激活在开始时以零为中心，一开始就处在负值的单元更少。
 
 ## Follow-ups
 
-- **Level 3:** Why does the unit stay dead rather than drift back? Expected: zero output gives zero gradient to its weights, and nothing else in the loss touches them.
-- **Level 3:** How do you tell a dead unit from a sparsely active one? Expected: count the fraction of inputs on which it is positive over a large sample; dead is zero on all, sparse is positive on a small fraction.
-- **Level 4:** What links the high learning rate to the death? Expected: one large step moves the bias or weights far negative so every input lands below zero; clipping and a smaller rate limit the step.
-- **Level 4:** Can you revive the dead units without retraining from scratch? Expected: re-initialize their incoming weights with a Kaiming draw and continue; the rest of the network keeps its progress.
+- **Level 3:** 为什么单元会一直死着，而不是慢慢漂回来？ Expected: 输出为零，传给权重的梯度就是零，损失里也没有别的东西会碰它们。
+- **Level 3:** 怎样区分死单元和稀疏激活的单元？ Expected: 在大量样本上统计它输出为正的输入比例；死单元全为零，稀疏单元只在一小部分输入上为正。
+- **Level 4:** 高学习率和单元死亡之间有什么联系？ Expected: 一次大更新把偏置或权重推到很负的地方，每个输入都落在零以下；梯度裁剪和较小的学习率能限制步长。
+- **Level 4:** 不从头训练，能把死单元救回来吗？ Expected: 用 Kaiming 抽样重新初始化它们的输入权重，然后继续训练；网络其他部分保留已有进度。
 
 ## Wrong answers
 
-- "Half zeros is normal sparsity for ReLU." Some zeros are normal; a unit that is zero on every input is dead and contributes nothing, and the lesson flags a layer above half zeros.
-- "Raise the learning rate so the units jump back." The gradient is zero regardless of the rate; no step reaches them.
-- "Switch to sigmoid to avoid zeros." Sigmoid trades dead units for vanishing gradients through depth; a leaky variant or GELU keeps the benefits of ReLU.
+- "一半是零是 ReLU 正常的稀疏性。" 有一些零是正常的；对每个输入都为零的单元是死的，什么也不贡献，课里会标记零值超过一半的层。
+- "提高学习率，让单元跳回来。" 不管学习率多大，梯度都是零；没有哪一步能碰到它们。
+- "换成 sigmoid 来避免零。" sigmoid 用随深度消失的梯度换掉了死单元；leaky 变体或 GELU 能保留 ReLU 的好处。
 
 ## Taught in
 
-The [activation functions lesson](../../../phases/03-deep-learning-core/04-activation-functions/) explains dead units and builds the detector, and the [debugging lesson](../../../phases/03-deep-learning-core/13-debugging-neural-networks/) reproduces the failure and sets the threshold.
+[激活函数课](../../../phases/03-deep-learning-core/04-activation-functions/)解释了死单元并构建了检测器，[调试课](../../../phases/03-deep-learning-core/13-debugging-neural-networks/)复现了这种故障并设定了阈值。

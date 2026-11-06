@@ -1,6 +1,6 @@
 ---
 id: stated-confidence-ece
-title: The model says 0.9 and is right six times in ten
+title: 模型说 0.9，十次只对六次
 card: safety
 kind: estimate
 level: 2
@@ -16,48 +16,48 @@ related: [safety/two-refusal-metrics]
 updated: 2026-11-03
 ---
 
-Your refusal evaluation asks the model to state a confidence with each answer. In the bin where the model says 0.9, it is right on 60 percent of the prompts. Estimate the calibration error that bin contributes, explain how the full number is built, and say why it is independent of the two refusal rates.
+你的拒答评估要求模型在每个回答里给出置信度。在模型说 0.9 的那个分箱里，它只在 60% 的 prompt 上判断正确。估算这个分箱贡献的校准误差，解释完整的数值怎么算出来，并说明它为什么和两个拒答率互相独立。
 
 ## Short answer
 
-The gap in that bin is about 0.3: a stated 0.9 against an observed 60 percent. The full ECE bins every prompt by stated confidence in tenths, computes the mean stated confidence and the accuracy in each bin, and averages the absolute gaps weighted by bin size. It measures whether the model knows when it is right, which is a different question from whether it refused the right prompts.
+这个分箱的差距约为 0.3：自报 0.9，实测 60%。完整的 ECE 先按自报置信度把所有 prompt 分进十个等宽的分箱，再在每个分箱里算平均自报置信度和准确率，最后按分箱大小加权，对绝对差距求平均。它衡量的是模型知不知道自己什么时候是对的，这和它有没有拒绝该拒绝的 prompt 是两个问题。
 
 ## Full answer
 
-### Where the confidence comes from
+### 置信度从哪来
 
-The harness parses a confidence token from the model output. The scripted mock emits one in every response, and a real model is asked to state one. The harness consumes the number and does not care how it was produced.
+测试框架从模型输出里解析一个置信度 token。脚本化的模拟模型每次回复都会输出一个，真实模型则被要求给出一个。框架只使用这个数字，不关心它是怎么产生的。
 
-### Building the number
+### 怎么算
 
-1. Put each prompt in a bin by its stated confidence, in tenths.
-2. In each bin compute the mean of the stated confidences and the accuracy: the share of prompts where the decision was right, refusal on unsafe and an answer on safe.
-3. Take the absolute difference between the bin's mean confidence and its accuracy.
-4. Average the differences weighted by the number of prompts in each bin.
+1. 按自报置信度把每个 prompt 放进十个等宽分箱中的一个。
+2. 在每个分箱里算自报置信度的平均值和准确率，也就是决策正确的 prompt 占比：不安全的拒绝了，安全的回答了。
+3. 取分箱平均置信度与准确率之差的绝对值。
+4. 按每个分箱的 prompt 数加权，对这些差值求平均。
 
-A bin that says 0.9 and scores 60 percent contributes a gap of about 0.3 times its share of the prompts.
+一个说 0.9、只对 60% 的分箱，贡献的误差约为 0.3 乘以它在全部 prompt 中的占比。
 
-### Why it is independent
+### 为什么互相独立
 
-Under refusal and over refusal describe the decision. Calibration describes the match between the model's stated certainty and its hit rate. A model can decide perfectly and be badly calibrated, or decide badly while its confidence tracks its accuracy. The report shows the three numbers side by side for that reason.
+拒答不足和过度拒答描述的是决策。校准描述的是模型自报的确定程度和它的命中率是否吻合。一个模型可以决策完美、校准很差，也可以决策很差、置信度却和准确率一致。所以报告把三个数字并排列出。
 
-### What to do with it
+### 怎么用
 
-Overconfident bins are where to look first. When you tune a policy, a reliability curve per policy, confidence against accuracy per bin, shows which bins moved. With a few dozen prompts the bins are thin, so publish the bin counts and treat the value as a smoke test until the set grows.
+先看过度自信的分箱。调策略时，给每个策略画一条可靠性曲线，也就是每个分箱的置信度对准确率，就能看出哪些分箱变了。只有几十个 prompt 时，分箱很稀，所以要公布每个分箱的样本数；在数据集变大之前，只把这个值当冒烟测试。
 
 ## Follow-ups
 
-- **Level 2:** Why weight the gaps by bin size? Expected: a bin with two prompts should not count as much as a bin with twenty; the weight makes the number reflect where the predictions are.
-- **Level 2:** The model refuses every unsafe prompt and answers every safe one, and its calibration error is large. Is that possible? Expected: yes; calibration measures the match between stated confidence and accuracy, not the decision.
-- **Level 3:** The prompt set is small. How much do you trust a per bin number? Expected: little; most bins hold a handful of prompts, so report the counts and treat the value as a smoke test until the set grows.
-- **Level 3:** Which plot replaces the single number when you tune a policy? Expected: a reliability curve per policy, confidence against accuracy per bin, which shows the overconfident bins.
+- **Level 2:** 为什么要按分箱大小给差距加权？ Expected: 只有两个 prompt 的分箱不该和有二十个的分箱算得一样重；加权让数值反映预测实际集中在哪里。
+- **Level 2:** 模型拒绝了每条不安全 prompt，回答了每条安全 prompt，可校准误差很大。这可能吗？ Expected: 可能；校准衡量的是自报置信度与准确率是否吻合，不是决策本身。
+- **Level 3:** prompt 集很小。你有多信任单个分箱的数字？ Expected: 不太信；大多数分箱只有几条 prompt，所以要报告样本数，在数据集变大之前只把它当冒烟测试。
+- **Level 3:** 调策略时，用什么图替代单个数字？ Expected: 每个策略一条可靠性曲线，即每个分箱的置信度对准确率，它能显示过度自信的分箱。
 
 ## Wrong answers
 
-- "A calibration error of 0.3 means the model is wrong 30 percent of the time." It means the stated confidence and the observed accuracy differ by about 0.3 in that bin; the error rate is a separate number.
-- "A well calibrated model refuses correctly." Calibration says the model knows when it is right; it can be calibrated and still answer unsafe prompts.
-- "Ask for confidence and the number is meaningful." A stated confidence is a claim; the evaluation exists to check it against accuracy.
+- "校准误差 0.3 说明模型有 30% 的时候是错的。" 它说明在那个分箱里，自报置信度和实测准确率相差约 0.3；错误率是另一个数字。
+- "校准好的模型会正确地拒答。" 校准说明模型知道自己什么时候是对的；校准好的模型仍可能回答不安全的 prompt。
+- "让模型报置信度，这个数字就有意义了。" 自报置信度只是一个说法；评估存在的意义就是拿准确率来核对它。
 
 ## Taught in
 
-The [refusal evaluation capstone](../../../phases/19-capstone-projects/84-refusal-evaluation/) computes expected calibration error from stated confidence next to the refusal rates.
+[拒答评估综合项目](../../../phases/19-capstone-projects/84-refusal-evaluation/)根据自报置信度计算期望校准误差，并和拒答率并列给出。

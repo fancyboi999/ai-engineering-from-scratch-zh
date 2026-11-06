@@ -1,6 +1,6 @@
 ---
 id: prototype-became-production
-title: A prototype that quietly acquired real users
+title: 悄然积累了真实用户的原型系统
 card: behavioral
 kind: debug
 level: 3
@@ -16,52 +16,52 @@ related: [behavioral/smallest-slice-that-decides, behavioral/decision-brief-afte
 updated: 2026-11-03
 ---
 
-You discover that a weekend prototype you shared internally is now used every day by another team, with production data, and someone just reported an outage to you. Walk me through what went wrong before this moment and what you do in the first week.
+你发现周末写的一个内部共享原型，现在每天都被另一个团队配合生产数据使用，并且有人刚刚向你报告了一起系统故障。请为我梳理在此之前哪些环节出现了偏差，以及你在第一周会采取什么行动。
 
 ## Short answer
 
-The system drifted across stages. It gained users, data and authority without gaining ownership, and nothing in the system itself marked it as a prototype. In the first week I make the stage observable in configuration, access control, telemetry and documentation, cut the production data path until a named owner accepts it, and decide with that team whether the right next stage is a bounded pilot or a stop.
+该系统发生了阶段漂移。它在没有明确负责人的情况下获取了用户群、真实数据和系统影响权限，且系统内部没有任何机制将其标识为原型。在第一周，我通过配置、访问控制、遥测和文档使系统所处的阶段变得清晰可观察，在明确的负责人接管前阻断生产数据通路，并与该团队共同裁定下一步是转入有界试运行还是直接终止下线。
 
 ## Full answer
 
-### Three stages ask three questions
+### 三个阶段追问三个核心问题
 
-| Stage | Primary question |
+| 阶段 | 核心追问 |
 |---|---|
-| Prototype | Can this mechanism produce the evidence at all? |
-| Pilot | Does it work safely with a bounded real audience and real conditions? |
-| Production | Can we own it continuously at the promised reliability and risk level? |
+| 原型 | 该机制到底能否产生预期的验证证据？ |
+| 试运行 | 它能否在受限的真实受众和真实条件下安全运行？ |
+| 生产 | 我们能否在承诺的可靠性与风险等级下持续负责运维？ |
 
-These are learning environments, not levels of polish. A prototype can be technically complete and still be disposable. Production begins when the organization accepts ongoing responsibility.
+这些是不同的探索验证环境，而非系统打磨程度的高低。原型即使在技术上很完备，也依然可以随时丢弃。唯有组织正式承担持续维护责任时，才标志着进入生产阶段。
 
-### What went wrong
+### 哪里出现了偏差
 
-The prototype was built for one question and had no false operational guarantees, which was right. The failure was stage drift: it acquired an audience, real data and the authority to affect another team's work, and nobody acquired ownership. A warning banner would not have prevented this. The stage has to be enforced by the system: a configuration flag that blocks production data, access control that limits the audience, telemetry that shows who uses it, and documentation that says what it is.
+原型最初只为解答某一个具体问题而构建，未给出虚假的运维保证，这本身是正确的。问题在于发生了阶段漂移：它获得了受众群体、真实数据以及影响其他团队工作的权限，却没有确立系统所有权。单纯挂一个警告提示横幅无法阻止这种情况。阶段属性必须由系统强制约束：用配置开关阻断生产数据，用访问控制限制受众，用遥测表明调用方，用文档清晰说明系统性质。
 
-### The first week
+### 第一周的应对措施
 
-1. Stop the bleeding: block the production data path with a technical control, not a message.
-2. Name the stage in the system so anyone can see it.
-3. Meet the other team with the pilot requirements: a named audience, a human owner, bounded duration and authority, audit and rollback, outcome and guardrail thresholds, and exit criteria for expand, revise or stop.
-4. Decide. If no one will own it, the honest outcome is a stop, and the evidence it produced still counts.
+1. 止血止损：通过技术控制手段切断生产数据通路，而不是仅仅发消息提醒。
+2. 在系统中明确标定阶段属性，让所有人一目了然。
+3. 携带试运行契约与对方团队沟通：明确受众范围、指定人工负责人、划定试用期限与权限、具备审计与回滚机制、设定结果与护栏阈值，并制定扩大、修订或终止的退出标准。
+4. 做出决策。若无人愿意承接所有权，最诚实的处理方式就是终止下线，而它之前产生的验证证据依然成立。
 
-### What production would require
+### 进入生产需要满足的条件
 
-A service level objective, on-call and incident ownership, security and privacy review, cost and capacity controls, rollback and recovery, continuous monitoring, and a retirement path. Deployment is not production. Ownership is.
+明确的服务等级目标（SLO）、值班与故障响应责任归属、安全与隐私审查、成本与容量控制、回滚与恢复机制、持续监控以及退役路径。完成部署并不等于进入生产，确立所有权才是。
 
 ## Follow-ups
 
-- **Level 3:** The other team says the outage shows the tool is valuable. How do you answer? Expected: value is a reason to run a bounded pilot with an owner, not a reason to keep an unowned system on production data.
-- **Level 3:** Which technical control would have prevented the drift? Expected: a configuration or access control that refuses production data unless the stage is set to pilot or production by an owner.
-- **Level 4:** What is the first operational responsibility that makes a build production? Expected: someone accepts an on-call or incident ownership commitment; before that, the system has users but no owner.
-- **Level 4:** The team wants to skip the pilot and go straight to production. What evidence would justify that? Expected: low consequence, operational readiness, and measured outcome and guardrail results from a bounded real audience.
+- **Level 3:** 对方团队称故障本身说明该工具有价值，你如何回应？ Expected: 价值是开展附带负责人的有界试运行的理由，而不是让无主系统继续运行生产数据的理由。
+- **Level 3:** 哪项技术控制本可以阻止这种漂移？ Expected: 配置或访问控制机制；除非负责人明确将系统阶段置为试运行或生产，否则一律拒绝加载生产数据。
+- **Level 4:** 标志着构建成果正式进入生产阶段的首要运维责任是什么？ Expected: 有人正式承担值班或故障响应责任；在此之前，系统只有使用者，没有负责人。
+- **Level 4:** 该团队希望跳过试运行直接上线生产环境，什么证据能证明这样做是合理的？ Expected: 潜在后果轻微、具备完备的运维就绪状态，以及在受限真实受众下实测的结果指标与护栏指标。
 
 ## Wrong answers
 
-- "Add a banner that says prototype." A banner does not stop data, users or authority from flowing in.
-- "Harden the prototype into the product since people already use it." Prototype code earned another stage only if the evidence says so; usage is not that evidence.
-- "Shut it down with no discussion." The evidence it produced is real; the decision owner needs options, not a surprise.
+- "贴一个注明原型的横幅标语。" 横幅无法阻挡真实数据、受众和权限的悄然涌入。
+- "既然大家都在用了，顺势把原型加固成正式产品。" 原型代码只有在证据支持时才赢得下一个阶段；使用量并不是那种证据。
+- "不做任何沟通，直接关停系统。" 它所产生的证据是真实的；决策负责人需要的是选项方案，而不是惊吓。
 
 ## Taught in
 
-The [prototype, pilot or production lesson](../../../phases/14-agent-engineering/53-prototype-pilot-or-production/) gives the three stage questions, the pilot requirements and the stage drift controls.
+[原型、试运行或生产课程](../../../phases/14-agent-engineering/53-prototype-pilot-or-production/)给出了三个阶段核心追问、试运行必备规范以及防范阶段漂移的控制措施。

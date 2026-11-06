@@ -1,6 +1,6 @@
 ---
 id: cot-when-it-hurts
-title: Where step-by-step prompting helps and where it costs
+title: 分步思考提示在哪里有用，在哪里增加成本
 card: prompting-structured-output
 kind: concept
 level: 1
@@ -16,48 +16,48 @@ related: [prompting-structured-output/self-consistency-at-temperature-zero, prom
 updated: 2026-11-03
 ---
 
-Your team adds "think step by step" to every prompt in the product, including a high-volume classifier and the calls to a reasoning model. Where does that help, where does it hurt, and why?
+你的团队在产品的每个 prompt 里都加上了 "think step by step"，包括一个调用量很大的分类器，以及对推理模型的调用。这句话在哪里有用，在哪里有害，为什么？
 
 ## Short answer
 
-It helps on multi-step problems, where each reasoning token becomes context for the next one and the model computes its way to the answer. It hurts on simple recall and single-step classification, where it adds 50 to 200 tokens of reasoning per query for no gain, and on reasoning models, which already run a chain of thought internally and can get worse with the extra instruction. Pick the technique per task from the accuracy requirement, the latency budget and the cost.
+它对多步问题有用：每个推理 token 都成为下一个 token 的上下文，模型一步步算出答案。它对简单的事实回忆和单步分类有害，每条查询多出 50 到 200 个推理 token，却没有收益；对推理模型也有害，这类模型内部已经在跑思维链，多加这句指令反而可能变差。按任务选技术，依据是准确率要求、延迟预算和成本。
 
 ## Full answer
 
-### Why it works
+### 为什么有效
 
-A transformer without a visible chain has to compress all the reasoning into the hidden state of one forward pass. With the chain, the intermediate steps are tokens, and every token extends the context for the next. On the grade-school math benchmark the lesson shows one model moving from 78 percent zero-shot to 91 percent with the phrase alone and to 95 percent with worked examples.
+没有可见推理链的 transformer 只能把全部推理压进一次前向传播的隐状态里。有了推理链，中间步骤就是 token，每个 token 都为下一个扩展上下文。在小学数学基准上，课程展示了一个模型的准确率从零样本的 78% 升到只加这句话的 91%，再升到加上带解题过程示例的 95%。
 
-### Where it does not pay
+### 哪些场景不划算
 
-- **Simple factual recall and single-step classification.** There is nothing to reason through, and the chain is pure overhead.
-- **High-throughput, low-complexity tasks.** The 50 to 200 extra tokens on every call are cost and latency.
-- **Reasoning models.** They run the chain internally before they answer; the instruction is redundant and sometimes counterproductive.
-- **Wide search problems.** On the lesson's arithmetic puzzle, standard prompting solved 7.3 percent of cases, a single chain solved 4.0 percent, and a tree search over branches solved 74 percent.
+- **简单的事实回忆和单步分类。** 没有需要推理的东西，推理链纯属开销。
+- **高吞吐、低复杂度的任务。** 每次调用多出的 50 到 200 个 token 就是成本和延迟。
+- **推理模型。** 它们回答前会在内部跑推理链；这句指令是多余的，有时还会起反作用。
+- **需要大范围搜索的问题。** 在课程的算术谜题上，标准 prompt 解出 7.3% 的情况，单条推理链解出 4.0%，在分支上做树搜索解出 74%。
 
-### Choose per task
+### 按任务选择
 
-| Technique | Calls | Token overhead | Fits |
+| 技术 | 调用次数 | 额外 token | 适合 |
 |---|---|---|---|
-| Zero-shot | 1 | none | simple tasks |
-| Few-shot | 1 | 200 to 500 tokens | format matching |
-| Zero-shot chain | 1 | 50 to 200 tokens | a quick reasoning lift |
-| Few-shot chain | 1 | 300 to 600 tokens | the best single call |
-| Self-consistency with 5 samples | 5 | five times the tokens | high-stakes reasoning |
+| 零样本 | 1 | 无 | 简单任务 |
+| 少样本 | 1 | 200 到 500 个 token | 匹配格式 |
+| 零样本思维链 | 1 | 50 到 200 个 token | 快速提升推理 |
+| 少样本思维链 | 1 | 300 到 600 个 token | 单次调用的最佳效果 |
+| 5 个样本的自洽性（self-consistency） | 5 | 五倍 token | 高风险推理 |
 
 ## Follow-ups
 
-- **Level 1:** Why does writing the steps out raise accuracy? Expected: each reasoning token becomes context for the next token, so the model computes the answer in steps instead of in one pass.
-- **Level 2:** What does the classifier pay for the extra phrase? Expected: 50 to 200 tokens of reasoning per query, which at volume is cost and latency for no accuracy gain.
-- **Level 2:** Why leave the phrase out for a reasoning model? Expected: it already runs its chain internally before the answer, so the instruction is redundant and sometimes counterproductive.
-- **Level 3:** Is there a task where a single chain is worse than a plain answer? Expected: yes, the lesson's search puzzle, where the chain solved fewer cases than standard prompting and a tree search solved most.
+- **Level 1:** 为什么把步骤写出来能提高准确率？ Expected: 每个推理 token 都成为下一个 token 的上下文，模型分步算出答案，而不是一次算完。
+- **Level 2:** 分类器为这句话付出了什么？ Expected: 每条查询多 50 到 200 个推理 token，调用量大时这就是成本和延迟，准确率却没有提高。
+- **Level 2:** 为什么调用推理模型时不加这句话？ Expected: 它在回答前已经在内部跑推理链，这句指令多余，有时还会起反作用。
+- **Level 3:** 有没有单条推理链比直接回答更差的任务？ Expected: 有，就是课程里的搜索谜题，推理链解出的情况比标准 prompt 少，而树搜索解出了大多数。
 
 ## Wrong answers
 
-- "It never hurts, worst case it is neutral." It costs tokens on every call, and it lowered accuracy on the wide search puzzle and on reasoning models.
-- "Few-shot and chain of thought are the same thing." Few-shot shows examples; chain of thought shows reasoning; the two combine into few-shot chain of thought.
-- "Always run it at temperature zero." A single chain at zero is fine, but sampling several chains for a vote needs temperature above zero, or every sample is identical.
+- "它永远不会有害，最差也就是没效果。" 它每次调用都消耗 token，而且在大范围搜索谜题和推理模型上降低了准确率。
+- "少样本和思维链是一回事。" 少样本展示示例，思维链展示推理过程；两者结合就是少样本思维链。
+- "一律用温度零运行。" 单条推理链用零没问题，但要采样多条推理链投票，温度必须大于零，否则每次采样都一样。
 
 ## Taught in
 
-The lesson [few-shot and chain-of-thought](../../../phases/11-llm-engineering/02-few-shot-cot/) gives the mechanism, the benchmark table, the cases where the chain hurts and the technique comparison.
+[少样本与思维链](../../../phases/11-llm-engineering/02-few-shot-cot/)一课给出了机制、基准表、推理链有害的场景和技术对比。

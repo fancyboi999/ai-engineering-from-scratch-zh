@@ -1,6 +1,6 @@
 ---
 id: mean-hides-the-tail
-title: The mean is green and users see failures
+title: 均值是绿的，用户却看到了失败
 card: evaluation
 kind: debug
 level: 2
@@ -16,43 +16,43 @@ related: [evaluation/judge-calibration-before-trust]
 updated: 2026-11-03
 ---
 
-A faithfulness dashboard reports a mean of 0.85 over a thousand cases, above the 0.8 release threshold. Support tickets say the assistant invents policy details in some answers. The eval owner says the metric is green. Where do you look, and what do you change in the report?
+一个忠实度看板在一千个用例上报告均值 0.85，高于 0.8 的发布阈值。客服工单却说，助手在一些回答里编造政策细节。评测负责人说指标是绿的。你去哪里找问题？报告要改什么？
 
 ## Short answer
 
-A mean hides the tail. A mean of 0.85 is consistent with a 5 percent slice of catastrophic failures, and that slice is what becomes tickets. Sort the cases by score and read the lowest 10 percent. Then add a pass rate at a threshold and a bottom quantile alert to the report, next to the mean.
+均值会掩盖尾部。均值 0.85 完全可能伴随着 5% 的灾难性失败，变成工单的正是这一小片。把用例按分数排序，读最低的 10%。然后在报告里均值的旁边，加上按阈值算的通过率和最低分位告警。
 
 ## Full answer
 
-### Why the dashboard is green
+### 为什么看板是绿的
 
-Most cases score high while a small slice scores near zero. The average barely moves, because the slice is small. The users in that slice get an invented policy, and no average tells them it was rare.
+大多数用例得分很高，一小片得分接近零。这一片很小，所以平均值几乎不动。落在这一片里的用户拿到的是编造的政策，而平均值不会告诉他们这种情况很少见。
 
-### What to report
+### 报告什么
 
-- **Pass rate.** The fraction of cases above a threshold. It measures reliability, which is what users feel, so it is more actionable than the mean.
-- **Bottom quantile.** The lesson refuses aggregate only reporting without the lowest 10 percent surfaced. Read those cases by hand every run.
-- **Per-category scores.** If the tail comes from one category, the fix is local and the gate should watch that category.
+- **通过率。** 高于阈值的用例比例。它衡量可靠性，也就是用户能感受到的东西，所以比均值更能指导行动。
+- **最低分位。** 课程不接受只报告综合值、却不把最低的 10% 摆出来。每次运行都要人工读这些用例。
+- **按类别的分数。** 如果尾部来自某一个类别，修复就是局部的，门禁也应该盯住这个类别。
 
-### How to debug it
+### 怎么排查
 
-1. Pull the lowest scoring cases and read them. Confirm they match the tickets.
-2. Check how missing scores were counted. A judge that returned bad JSON produces a missing score, and dropping missing scores raises the mean.
-3. Check that the judge was calibrated at the low end. A hand labeled set made of easy cases says nothing about the tail.
+1. 取出得分最低的用例读一遍，确认它们与工单对得上。
+2. 检查缺失分数是怎么计算的。judge 返回坏掉的 JSON 会产生缺失分数，丢掉缺失分数会抬高均值。
+3. 检查 judge 在低分段是否校准过。一个全是简单样本的人工标注集，对尾部什么也说明不了。
 
 ## Follow-ups
 
-- **Level 2:** Why does the lesson prefer the share of cases above a cutoff to the mean? Expected: it counts how many cases are good enough, so it measures reliability.
-- **Level 2:** The lowest cases all come from one category. What changes? Expected: the fix is local; report per-category scores and gate on the weakest category, not the aggregate.
-- **Level 3:** Missing scores from parse failures were dropped before averaging. What did that do? Expected: it raised the mean, because the worst outputs often fail to parse; count them as failures or report them separately.
-- **Level 3:** Which alert do you add to the release gate? Expected: a floor on the lowest 10 percent and a pass rate threshold, both next to the mean.
+- **Level 2:** 为什么课程更看重超过某个阈值的用例比例，而不是均值？ Expected: 它数的是有多少用例足够好，所以衡量的是可靠性。
+- **Level 2:** 最低分的用例全来自同一个类别。这改变什么？ Expected: 修复是局部的；按类别报告分数，并在最弱的类别上设门禁，而不是在综合值上。
+- **Level 3:** 解析失败产生的缺失分数在求平均前被丢掉了。这造成了什么？ Expected: 均值被抬高，因为最差的输出往往解析失败；把它们算作失败，或者单独报告。
+- **Level 3:** 你会给发布门禁加哪条告警？ Expected: 对最低 10% 设下限，再设一个通过率阈值，两者都放在均值旁边。
 
 ## Wrong answers
 
-- "The mean passed, so the release passed." A mean of 0.85 often hides a 5 percent catastrophic slice; the gate needs the tail.
-- "Raise the mean threshold to 0.9." A higher mean threshold still hides a small slice of zeros; add a distribution measure.
-- "The judge is noisy at the bottom, so ignore those cases." That is where the failures live; calibrate the judge on low scoring cases too.
+- "均值过了，发布就过了。" 均值 0.85 常常掩盖着 5% 的灾难性失败；门禁需要看尾部。
+- "把均值阈值提高到 0.9。" 更高的均值阈值照样会掩盖一小片零分；要加一个描述分布的指标。
+- "judge 在低分段噪声大，忽略这些用例吧。" 失败就藏在那里；也要在低分用例上校准 judge。
 
 ## Taught in
 
-The [LLM evaluation frameworks lesson](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/) lists the raw aggregate pitfall and the bottom quantile rule, and the [evaluation lesson](../../../phases/10-llms-from-scratch/10-evaluation/) defines pass rate as the more actionable summary.
+[LLM 评测框架课](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/)列出了只看原始综合值的陷阱和最低分位规则，[评测课](../../../phases/10-llms-from-scratch/10-evaluation/)把通过率定义为更能指导行动的汇总指标。

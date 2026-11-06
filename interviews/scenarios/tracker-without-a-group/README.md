@@ -1,6 +1,6 @@
 ---
 id: tracker-without-a-group
-title: A tracker flag that stopped the run at start
+title: 启动时中断运行的 tracker 参数
 card: scenarios
 kind: incident
 level: 1
@@ -25,50 +25,50 @@ source:
 
 ## Situation
 
-A team has read its first runs from the log with `grep`. For the first long run they want a dashboard, so they add `--use-wandb --wandb-mode offline --wandb-project miles-lab` to the run's extra arguments. The run stops at start with a `TypeError` about `NoneType` and `str`. No step line was written.
+一个团队此前一直用 `grep` 从日志中读取初次运行的结果。对于第一次长时间运行，他们想要一个看板，于是在运行的附加参数中加入了 `--use-wandb --wandb-mode offline --wandb-project miles-lab`。运行在启动时就停了，报出关于 `NoneType` 和 `str` 的 `TypeError`。日志里没有写出任何 step 行。
 
-One teammate blames the image and wants the tracker removed for good. Another wants to paste the team's API key into the extra arguments to force an online run, because "offline mode is what broke it".
+一位同事指责镜像有问题，想彻底移除 tracker。另一位同事想把团队的 API key 粘贴到附加参数中以强制开启在线运行，因为“是离线模式把它搞坏的”。
 
 ## Evidence
 
-- [the run with the tracker on and no group name](evidence/the-crash.txt)
-- [the same run with a group name](evidence/with-the-group.txt)
-- [the same run with the other tracker](evidence/tensorboard.txt)
-- [the tracker flags the manual uses, and the rule about the group](evidence/the-command-and-the-rule.txt)
-- [where the key for an online run goes](evidence/the-key-rule.txt)
-- [the flags for the other tracker](evidence/tensorboard-command.txt)
+- [开启 tracker 但没有 group 名称的运行日志](evidence/the-crash.txt)
+- [带有 group 名称的同一次运行日志](evidence/with-the-group.txt)
+- [使用另一个 tracker 的同一次运行记录](evidence/tensorboard.txt)
+- [手册使用的 tracker 参数以及关于 group 的规则](evidence/the-command-and-the-rule.txt)
+- [在线运行的 key 应该放在哪里](evidence/the-key-rule.txt)
+- [另一个 tracker 的参数](evidence/tensorboard-command.txt)
 
 ## Questions
 
-1. What kind of bug produces this `TypeError`, and what does it tell you about the GPU, the engine and the image?
-2. Which flag was missing, and which two log signs show that the tracker then worked?
-3. The teammate wants to paste the API key into the run arguments. Name two places where that key would then appear.
-4. Which tracker needs no account and no network, and what does it need instead?
-5. The team now has a dashboard. What do they keep as well, and why?
+1. 什么样的 bug 会产生这种 `TypeError`？它告诉你关于 GPU、引擎和镜像的什么信息？
+2. 缺少了哪个参数？哪两个日志迹象表明随后 tracker 正常工作了？
+3. 同事想把 API key 粘贴到运行参数中。指出该 key 随后会出现在哪两个地方。
+4. 哪个 tracker 不需要账号也不需要网络？它需要什么来替代？
+5. 团队现在有了看板。他们还保留了什么，为什么？
 
 ## Walkthrough
 
-1. **Read the error.** `TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'` is Python adding a string to a value that is `None`. A setting that nobody gave is being joined into a name. Nothing in that line concerns the GPU, the engine or the weights. The run never reached its first step, so the tracker setup is the only code that ran.
-2. **Read the run that worked.** The same recipe with `--wandb-group plain` logged `step 0` and `step 1`. The log printed `W&B offline mode enabled. Data will be saved locally.`, and the tracker folder holds `offline-run-` folders next to its debug logs. The manual names the rule: keep `--wandb-group`, because without it a run ends at startup with exactly this error.
-3. **Read the other tracker.** The same recipe with `-e TENSORBOARD_DIR=/root/lab/runs/plain/tb` and `--use-tensorboard` logged `Saving tensorboard log to /root/lab/runs/plain/tb.` and wrote two event files. This tracker needs a folder and one flag, and neither an account nor a network, and you read it on the host with `tensorboard --logdir`.
-4. **Read the key rule.** For an online run, leave out `--wandb-mode offline`. Keep the key out of the command line, because commands go to the shell history and the process list, and the launcher prints the full command in the log. Put `WANDB_API_KEY=<your key>` in a file with mode 600 and pass it with `--env-file`. The extra arguments are the one place the key must never go.
+1. **读报错。** `TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'` 是 Python 把字符串加到了一个为 `None` 的值上。一个没有人给出的设置正被拼接成一个名称。那一行里没有任何内容涉及 GPU、引擎或权重。运行从未到达第一步，所以 tracker 的设置代码是唯一执行过的代码。
+2. **读成功运行的记录。** 带有 `--wandb-group plain` 的相同配置记录了 `step 0` 和 `step 1`。日志打印了 `W&B offline mode enabled. Data will be saved locally.`，tracker 目录下在调试日志旁保存了 `offline-run-` 目录。手册给出了规则：保留 `--wandb-group`，因为没有它，运行就会在启动时报出完全相同的错误并结束。
+3. **读另一个 tracker。** 带有 `-e TENSORBOARD_DIR=/root/lab/runs/plain/tb` 和 `--use-tensorboard` 的相同配置记录了 `Saving tensorboard log to /root/lab/runs/plain/tb.` 并写了两个事件文件。这个 tracker 需要一个目录和一个参数，既不需要账号也不需要网络，你在宿主机上用 `tensorboard --logdir` 读取它。
+4. **读 key 的规则。** 对于在线运行，去掉 `--wandb-mode offline`。不要把 key 放在命令行中，因为命令会进入 shell 历史和进程列表，并且启动器会把完整命令打印到日志里。把 `WANDB_API_KEY=<your key>` 放在权限为 600 的文件里，用 `--env-file` 传入。附加参数是 key 绝不能出现的地方。
 
 ## Resolution
 
-The crash came from one missing flag, `--wandb-group`. Add it, keep offline mode until an account and a network are wanted, and check the two signs: the `W&B offline mode enabled` line and the `offline-run-` folder. The run then reaches `step 0` and `step 1` as the check did. For a team with no tracker account, use TensorBoard with a folder and one flag, and open the folder on the host.
+崩溃源于缺少一个参数 `--wandb-group`。补上它，在需要账号和网络之前保持离线模式，并检查这两个迹象：`W&B offline mode enabled` 行和 `offline-run-` 目录。随后运行就会像检查时一样到达 `step 0` 和 `step 1`。对于没有 tracker 账号的团队，使用带一个目录和一个参数的 TensorBoard，并在宿主机上打开该目录。
 
-Keep the log in any case. The manual read every number in it from the log, and the log is where the first exception of a broken run sits.
+无论如何都要保留日志。手册里的每个数字都是从日志中读取的，日志也保存了失败运行中的第一条异常。
 
 ## Wrong turns
 
-- "The image is broken, drop the tracker." The same image ran the same recipe to `step 1` with one more flag. The error names a missing value, not a missing library.
-- "Paste the API key into the extra arguments to force online mode." Offline mode was not the cause, and the launcher prints the full command into the log, so the key would sit in the log, the shell history and the process list.
-- "A dashboard replaces the log." The dashboard shows the metrics. The log holds the startup lines, the engine lines and the first exception when a run breaks.
+- "镜像坏了，删掉 tracker。" 同样的镜像加上一个参数就能把同样的配置运行到 `step 1`。报错指出了缺少的值，而不是缺少的库。
+- "把 API key 粘贴到附加参数中以强制开启在线模式。" 离线模式不是原因，而且启动器会把完整命令打印到日志中，所以 key 会出现在日志、shell 历史和进程列表中。
+- "看板替代了日志。" 看板展示指标。日志保存启动行、引擎行以及运行失败时的第一条异常。
 
 ## Generalize
 
-A type error on a `None` at startup is a missing setting, and the fastest check is the documented command next to yours. Secrets go in a file that only you can read and reach the process through the environment, never through arguments that a launcher echoes. A dashboard adds a view, and the log stays the record.
+启动时针对 `None` 的类型错误表示缺少设置，最快的检查方法就是把文档中的命令与你的命令并排对照。secret 要保存在只有你能读取的文件中，并通过环境变量传递给进程，绝不能通过启动器回显的参数传递。看板增加了一个视图，而日志始终是权威记录。
 
 ## Taught in
 
-The Miles manual gives the tracker commands, the group rule and the key rule in [the read the run page](../../../manuals/miles-101/sections/5-1-read-the-run.md).
+Miles 手册在[解读运行页](../../../manuals/miles-101/sections/5-1-read-the-run.md)中给出了 tracker 命令、group 规则和 key 规则。

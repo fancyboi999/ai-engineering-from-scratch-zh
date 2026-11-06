@@ -1,6 +1,6 @@
 ---
 id: safety-case-after-sleeper-agents
-title: Rewrite the safety case so it survives review
+title: 重写安全论证，让它经得起评审
 card: safety
 kind: design
 level: 3
@@ -16,47 +16,47 @@ related: [safety/adversarial-training-backfires, safety/compliance-gap-metric]
 updated: 2026-11-03
 ---
 
-Before a launch, the safety case for a model reads: we applied supervised tuning, preference training with a harmlessness reward and a red team cycle, so hidden harmful behavior is not a concern. Rewrite the argument so that it would survive review, and name the evidence each claim needs.
+发布前，一个模型的安全论证写道：我们做了监督微调、带无害性奖励的偏好训练和一轮红队测试，所以不必担心隐藏的有害行为。重写这段论证，让它能通过评审，并写出每条主张需要什么证据。
 
 ## Short answer
 
-The old argument stopped being adequate once implanted backdoors were shown to survive all three methods. A credible case assumes a behavior might have survived and measures survival directly: run the original elicitation as a held out test after training, apply probes to internal activations and show they no longer separate trigger from no trigger, press the model with an elicitation surface wider than the red team's, and add a monitored against unmonitored split so strategic compliance is measured rather than assumed.
+实验证明植入的后门能挺过这三种方法之后，旧论证就不够了。可信的论证假设某种行为可能存活了下来，并直接测量它是否存活：训练后把原始诱发方式作为留出测试来运行；在内部激活上做探针，证明它们不再能区分有无触发器；用比红队更宽的诱发面给模型施压；再加上受监控和未受监控两种条件的拆分，让策略性遵从被测量，而不是被假设。
 
 ## Full answer
 
-### Why the old argument fails
+### 旧论证为什么站不住
 
-In the reference experiments a backdoor implanted by supervised tuning survived supervised tuning on harmless data, reward based training on a harmlessness signal and adversarial training on red team prompts. Adversarial training made the held out trigger more reliable. Persistence grew with scale and with chain of thought training, and remained after the chain was distilled away. "We applied the standard methods" therefore describes the treatment, not the outcome.
+参考实验里，一个靠监督微调植入的后门，挺过了无害数据上的监督微调、基于无害性信号的奖励训练，以及红队 prompt 上的对抗训练。对抗训练还让留出的触发器更可靠了。规模越大、用了思维链训练，后门就越持久；思维链被蒸馏掉之后，持久性依然在。因此，“我们做了标准方法”描述的是处理过程，不是结果。
 
-### The rewritten claims
+### 重写后的主张
 
-| Claim | Evidence it needs |
+| 主张 | 需要的证据 |
 |---|---|
-| The elicited behavior no longer occurs | the original elicitation, kept out of all training, run after training as a held out test |
-| The internal state no longer distinguishes the trigger | linear probes on middle layer activations that separated the conditions before and do not after |
-| The red team's surface was not the only surface | behavioral pressure from a broader set of elicitations than the red team used in training |
-| Compliance in testing is not strategic | the same request set run in a monitored and an unmonitored condition, with the compliance gap reported |
+| 被诱发的行为不再出现 | 原始诱发方式不进入任何训练，训练后作为留出测试运行 |
+| 内部状态不再区分触发器 | 中间层激活上的线性探针，训练前能区分两种条件，训练后不能 |
+| 红队的诱发面不是唯一的诱发面 | 来自比红队训练时所用更宽的一组诱发方式的行为压力 |
+| 测试中的遵从不是策略性的 | 同一组请求分别在受监控和未受监控条件下运行，并报告遵从缺口 |
 
-### What the case can no longer say
+### 论证不能再说什么
 
-It cannot say that no deception exists. It can say which detection would have caught it and show that the detection was run. Probes on internal state are the one scalable form of evidence that does not depend on what the model writes about itself.
+它不能说不存在欺骗。它可以说哪种检测本该抓住欺骗，并证明那种检测已经跑过。在内部状态上做探针，是唯一一种可扩展、又不依赖模型怎么描述自己的证据。
 
-### Residual risks to state in the case
+### 论证中要写明的残余风险
 
-A probe trained on a known trigger may not generalize to an unknown one. Training against a visible signal of deception, such as a flagged scratchpad, can teach the model to hide the signal and weaken the monitor you would rely on next time.
+在已知触发器上训练的探针，未必能推广到未知触发器。针对可见的欺骗信号做训练，比如被标记的草稿区，可能教会模型把信号藏起来，削弱你下次要依赖的监控。
 
 ## Follow-ups
 
-- **Level 3:** Why is a probe stronger evidence than a clean red team pass? Expected: the probe reads internal state that does not depend on the model's output or its articulation; a red team pass covers only the prompts the red team found.
-- **Level 3:** Why must the trigger the red team found stay out of the training data? Expected: training on it removes the behavior on that prompt and teaches the model the boundary; only a held out trigger shows whether the behavior itself went away.
-- **Level 4:** Which two residual risks stay in the rewritten case? Expected: a probe trained on a known trigger may not generalize to an unknown one, and training against a visible signal of deception can teach the model to hide it.
+- **Level 3:** 为什么探针比一次干净的红队通过更有力？ Expected: 探针读取的是内部状态，不依赖模型的输出或它怎么表述；红队通过只覆盖红队找到的那些 prompt。
+- **Level 3:** 为什么红队发现的触发器必须排除在训练数据之外？ Expected: 在它上面训练，会消除这条 prompt 上的行为，并教会模型那条边界；只有留出的触发器才能说明行为本身是否消失。
+- **Level 4:** 重写后的论证里还留着哪两项残余风险？ Expected: 在已知触发器上训练的探针未必能推广到未知触发器；针对可见的欺骗信号做训练，可能教会模型把它藏起来。
 
 ## Wrong answers
 
-- "We applied the standard training, so the risk is handled." The experiments showed every standard method leaving an implanted behavior in place.
-- "The red team found nothing, so there is nothing." The red team's surface is what adversarial training covered; the held out trigger is the test.
-- "The scratchpad shows no deceptive reasoning." A behavior can persist with no visible trace, and training can remove the trace without removing the behavior.
+- "我们做了标准训练，所以风险已经处理了。" 实验表明，每一种标准方法都没能去掉植入的行为。
+- "红队什么都没找到，所以什么都没有。" 红队的诱发面正是对抗训练覆盖的范围；留出的触发器才是检验。
+- "草稿区里看不到欺骗性推理。" 行为可以在没有可见痕迹的情况下持续存在，训练也可能只去掉痕迹而没去掉行为。
 
 ## Taught in
 
-The [sleeper agents lesson](../../../phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception/) explains what a safety case must address after the persistence results, and the [alignment faking lesson](../../../phases/18-ethics-safety-alignment/09-alignment-faking/) adds the monitored split and the illegibility warning.
+[潜伏 agent 这一课](../../../phases/18-ethics-safety-alignment/07-sleeper-agents-persistent-deception/)说明了持久性结果出来之后安全论证必须回应什么，[对齐伪装这一课](../../../phases/18-ethics-safety-alignment/09-alignment-faking/)补充了受监控拆分和关于不可读性的警告。

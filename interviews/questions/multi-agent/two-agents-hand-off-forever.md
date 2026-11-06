@@ -1,6 +1,6 @@
 ---
 id: two-agents-hand-off-forever
-title: Two agents hand off to each other until the cap
+title: 两个 agent 相互交接直到轮数上限
 card: multi-agent
 kind: debug
 level: 2
@@ -16,49 +16,49 @@ related: []
 updated: 2026-11-03
 ---
 
-A support system uses handoff-driven orchestration: each agent is a prompt plus a set of tools, and one of the tools returns another agent. The trace shows the triage agent handing a user to billing, billing handing the user back to triage, and the two repeating until the round cap ends the run. The user never got an answer. Why does this happen, and what is the cheap fix?
+某支持系统使用交接驱动的编排：每个 agent 是一个 prompt 加上一组工具，且其中一个工具返回另一个 agent。跟踪记录显示分诊（triage）agent 将用户交给账单（billing），账单将用户交回分诊，两者重复直到轮数上限结束运行。用户从未得到答案。为什么会发生这种情况，廉价的修复方案是什么？
 
 ## Short answer
 
-In this pattern the routing lives in the prompts, and the current agent picks its successor with a tool call. The triage prompt says that a billing question goes to billing, and the billing prompt says that anything outside its tools returns to triage, and the user's message satisfies both. Nothing persists between handoffs, so the new agent starts from its prompt and the history and does not know that the same handoff already failed. The cheap fix is a loop detector on the last few handoffs that forces an exit to a fallback agent, plus a trace event for every handoff.
+在该模式下，路由逻辑保留在 prompt 内部，当前 agent 通过工具调用挑选其继任者。分诊 prompt 说明账单问题转交给账单，而账单 prompt 说明超出其工具范围的所有问题均返回分诊，用户的消息同时满足这两者。交接之间不持久化任何内容，因此新 agent 从其 prompt 和历史开始，不知道相同的交接此前已经失败。廉价的修复是在最近几次交接上设置循环检测器以强制退出到后备 agent，并为每次交接记录跟踪事件。
 
 ## Full answer
 
-### Why the pattern loops
+### 为什么该模式会陷入循环
 
-The two primitives are the routine, a system prompt that defines a role and its tools, and the handoff, a tool that returns the next agent. The framework's only job is to see the agent-valued return and switch. There is no graph and no state machine. The routing is whatever the prompts say, and two prompts can describe a cycle without anyone writing one. The pattern is stateless between runs, and within a run the only memory is the message history, which the agents do not read for a repeated pattern.
+两个原语是规程（routine，即定义角色及其工具的系统 prompt）和交接（handoff，即返回下一个 agent 的工具）。框架唯一的职责是发现返回的 agent 值并完成切换。没有图，也没有状态机。路由由 prompt 决定，两份 prompt 可以在无人故意编写的情况下形成闭环。该模式在运行之间是无状态的，而在单次运行内部唯一的内存是消息历史，各 agent 不会为了重复模式而读取该历史。
 
-### Find it in the trace
+### 在跟踪记录中找到它
 
-A handoff loop is two agents alternating with no user turn and no tool result between them. Read the handoff events for the pair. If each handoff carries the same reason, the prompts disagree about who owns the case.
+交接循环是两个 agent 交替发言，中间没有用户轮次，也没有工具结果。读取这一对的交接事件。如果每次交接携带相同的原因，说明 prompt 在谁拥有该案例上存在分歧。
 
-### The cheap fix
+### 廉价的修复方案
 
-1. **Loop detection.** Keep the last few handoffs in a ring. When the same two agents have handed off three times in a row, force an exit.
-2. **A fallback agent.** The exit goes to a safe default that can answer or escalate to a human. The same fallback catches a handoff to an agent that does not exist.
-3. **Handoff logging.** Every handoff writes an event with the sender, the receiver and a context snapshot, so the loop is visible before the cap.
+1. **循环检测。** 在环形缓冲区中保留最近数次交接。当相同的两个 agent 连续交接达到三次时，强制退出。
+2. **后备 agent。** 退出流向可以回答或升级给人类的安全默认项。同一后备项还能捕获交接给不存在 agent 的异常。
+3. **交接日志。** 每次交接均写入包含发送者、接收者和上下文快照的事件，使循环在达到上限之前可见。
 
-### The real fix
+### 真正的修复方案
 
-Fix the prompts so that exactly one agent owns each case, and give the billing agent a tool that handles the case instead of a reason to send it back. Decide what context transfers on each handoff: the full history is expensive, the last N messages lose the reason, and a summary written by the outgoing agent is the usual middle. The production successor of this pattern adds sessions, guardrails and tracing around the same primitive, and a handoff filter that controls what the incoming agent sees.
+修复 prompt，以便恰好一个 agent 拥有每个案例，并为账单 agent 提供处理案例的工具，而不是将其送回的理由。决定在每次交接时转移什么上下文：完整历史是昂贵的，最近 N 条消息容易丢失原因，由交出方编写的摘要是常见的折中。该模式的生产后续版本围绕相同原语增加了会话、护栏和跟踪，以及控制接入方可见内容的交接过滤器。
 
-### The security angle
+### 安全角度
 
-A handoff to an agent with different tool permissions must be authenticated, because a message that the user did not write, such as text pulled from a document, can ask for a handoff to a more capable agent. Treat a handoff as a permission change, not a routing detail.
+向具有不同工具权限的 agent 交接必须经过认证，因为非用户编写的消息（例如从文档中提取的文本）可能要求交接给能力更强的 agent。将交接视为权限变更，而不是路由细节。
 
 ## Follow-ups
 
-- **Level 2:** Why does the billing agent not notice that it already sent this user back once? Expected: it is stateless and starts from its prompt plus the history, and nothing in the loop reads the history for a repeated handoff.
-- **Level 2:** What should the fallback agent do? Expected: answer with what it can, or hand the case to a human with the trace, and never hand off to either agent in the loop.
-- **Level 3:** How do you choose what context moves on a handoff? Expected: full history when the case is short, a summary written by the outgoing agent when it is long, and never nothing, because the incoming agent then repeats the questions.
-- **Level 3:** How does a group chat with a selector avoid this specific loop? Expected: the selector sits outside the agents and can see the alternation, while in the handoff pattern the agent that is looping is the one making the decision.
+- **Level 2:** 为什么账单 agent 没有注意到自己此前已经将该用户送回过一次？ Expected: 它是无状态的，从其 prompt 加上历史开始，循环中没有任何内容会为了重复交接而读取历史。
+- **Level 2:** 后备 agent 应该做什么？ Expected: 尽其所能提供回答，或者带上跟踪记录将案例移交给人类，绝不交接给循环中的任一 agent。
+- **Level 3:** 你如何选择在交接时移动什么上下文？ Expected: 案例简短时传递完整历史，较长时传递交出方编写的摘要，绝不能什么都不传，因为新 agent 随后会重复提问。
+- **Level 3:** 带有选择器的群聊如何避免这种特定循环？ Expected: 选择器位于各个 agent 外部且可以看到交替，而在交接模式中处于循环中的 agent 本身就是决策者。
 
 ## Wrong answers
 
-- "Raise the round cap so the agents have time to settle." The cap is what ended the loop, and more rounds give more of the same two handoffs.
-- "Tell triage never to accept a handoff from billing." That blocks a legitimate return when billing really cannot help, and the fix is clear ownership plus a detector.
-- "Switch to a graph framework and the problem disappears." A graph can encode the same cycle with two edges, and the loop detector is useful in both.
+- "提高轮数上限，以便 agent 有时间调和。" 上限是结束循环的手段，更多的轮次会带来更多相同的两次交接。
+- "告诉分诊绝不接受来自账单的交接。" 这会阻断账单确实无法提供帮助时的合法返回，修复方法是明确所有权加上检测器。
+- "切换到图框架，问题就会消失。" 图可以用两条边编码相同的循环，循环检测器在两者中都有用。
 
 ## Taught in
 
-The [handoffs and routines lesson](../../../phases/16-multi-agent-and-swarms/11-handoffs-and-routines/) builds the handoff loop and lists loop detection and the fallback agent in its checklist.
+[交接与规程课程](../../../phases/16-multi-agent-and-swarms/11-handoffs-and-routines/)构建了交接循环，并在检查清单中列出了循环检测和后备 agent。

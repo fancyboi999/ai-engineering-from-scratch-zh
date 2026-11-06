@@ -1,6 +1,6 @@
 ---
 id: gqa-repeat-not-tile
-title: GQA that pairs query heads with the wrong group
+title: 把 query 头配错组的 GQA
 card: coding
 kind: code-reading
 level: 3
@@ -16,25 +16,25 @@ related: [coding/gqa-checkpoint-pooling, coding/split-heads-reshape]
 updated: 2026-11-03
 ---
 
-A GQA implementation repeats the key and value heads up to the query head count with this line, where `kv` has shape batch, groups, tokens, head size:
+一个 GQA 实现用下面这行把 key 和 value 头扩展到 query 头的数量，其中 `kv` 的形状是 batch、组数、token 数、头大小：
 
 ```python
 kv_full = np.tile(kv, (1, n_heads // n_kv_heads, 1, 1))
 ```
 
-The shapes match and the outputs are wrong for every configuration with more than one group. Explain which query head ends up with which group, and write the correct expansion.
+形状都对，但只要组数多于一个，输出就是错的。解释每个 query 头最后对应到哪个组，并写出正确的扩展。
 
 ## Short answer
 
-Tiling repeats the whole block of groups, so query head `h` reads group `h` modulo the number of groups. The convention is that consecutive query heads share a group: head `h` reads group `h` floor-divided by the repeat factor. Repeat each group in place along the head axis instead of tiling the block.
+tile 会重复整个组块，所以 query 头 `h` 读的是 `h` 对组数取模得到的组。约定是相邻的 query 头共享一个组：头 `h` 读 `h` 整除重复倍数得到的组。应该沿头的维度原地重复每个组，而不是平铺整个组块。
 
 ## Full answer
 
-### The two layouts
+### 两种排列
 
-With four query heads and two groups the repeat factor is two. The correct expansion gives the sequence of groups `0, 0, 1, 1`: the first two query heads share group zero and the next two share group one. Tiling gives `0, 1, 0, 1`, so heads one and two swap partners. Every head still has a key and value tensor of the right shape, which is why no shape check fails, but half the heads attend with the wrong keys.
+四个 query 头、两个组时，重复倍数是二。正确的扩展得到组序列 `0, 0, 1, 1`：前两个 query 头共享组零，后两个共享组一。tile 得到 `0, 1, 0, 1`，头一和头二互换了搭档。每个头仍然拿到形状正确的 key 和 value 张量，所以形状检查都不会失败，但一半的头在用错误的 key 计算注意力。
 
-### The fix
+### 修复
 
 ```python
 def repeat_kv(kv, n_heads):
@@ -45,28 +45,28 @@ def repeat_kv(kv, n_heads):
     return np.repeat(kv, r, axis=1)
 ```
 
-`np.repeat` along the group axis copies each group `r` times next to itself, which produces the floor-division mapping. The divisibility check belongs here, because a non-integer repeat factor silently truncates and drops heads.
+沿组的维度用 `np.repeat`，会把每个组紧挨着自己复制 `r` 次，得到的就是整除映射。整除检查要放在这里，因为重复倍数不是整数时会被悄悄截断，丢掉一些头。
 
-### Why the mapping is a convention and not a choice
+### 为什么这个映射是约定，不是选择
 
-The projection weights of a trained checkpoint were learned under one mapping. The multi-head lesson describes the lineage: multi-head attention with one group per head, multi-query attention with a single shared group, and the grouped form in between with the first `r` heads on group zero. A model converted from multi-head weights by pooling consecutive heads only works if attention reads the groups in the same consecutive order.
+训练好的检查点里，投影权重是在某一种映射下学出来的。多头课讲了演进脉络：多头注意力每个头一个组，多查询注意力只有一个共享组，分组形式介于两者之间，前 `r` 个头用组零。用池化连续头的方法从多头权重转换来的模型，只有在注意力按同样的连续顺序读组时才能正常工作。
 
-### Why it exists
+### 为什么要用它
 
-Only `G` key and value heads live in the cache instead of `H`, so the cache shrinks by the factor `H / G` while quality stays close to standard multi-head attention. The lesson's example is a large open model that pairs 64 query heads against only 8 shared groups.
+缓存里只有 `G` 个 key、value 头，而不是 `H` 个，所以缓存缩小到 `H / G` 分之一，质量仍接近标准多头注意力。课里的例子是一个大型开源模型，64 个 query 头只对应 8 个共享组。
 
 ## Follow-ups
 
-- **Level 3:** With one group, what does the function compute? Expected: multi-query attention; every query head shares the single key and value head.
-- **Level 3:** Where does the scale factor come from after the repeat? Expected: the square root of the head size, the same as in multi-head attention; dividing by the square root of the full width is a separate common bug.
-- **Level 4:** How does a framework avoid materializing the repeated copies? Expected: it broadcasts the group axis inside the attention kernel, or the attention call accepts fewer key and value heads directly, so memory holds only the groups.
+- **Level 3:** 只有一个组时，这个函数算的是什么？ Expected: 多查询注意力；所有 query 头共享唯一的 key 头和 value 头。
+- **Level 3:** 重复之后，缩放系数从哪里来？ Expected: 头大小的平方根，和多头注意力一样；除以完整宽度的平方根是另一个常见 bug。
+- **Level 4:** 框架怎样避免真的生成这些重复副本？ Expected: 在注意力 kernel 内部对组的维度做广播，或者注意力调用直接接受更少的 key、value 头，这样内存里只存组。
 
 ## Wrong answers
 
-- "Tile and repeat give the same result when the shapes match." They give different head-to-group assignments; only one matches the trained weights.
-- "Average the groups and use one key tensor for all heads." That turns the model into multi-query attention with weights it was not trained for.
-- "The mapping does not matter because attention is permutation invariant." Attention is invariant over keys within a head, not over which key head a query head reads.
+- "形状一致时，tile 和 repeat 的结果一样。" 两者给出的头到组的分配不同；只有一种和训练好的权重对得上。
+- "把各组平均，所有头共用一个 key 张量。" 这会把模型变成多查询注意力，用的却是没为它训练过的权重。
+- "映射无所谓，因为注意力具有置换不变性。" 注意力在一个头内部对 key 置换不变，但 query 头读哪个 key 头并不是置换不变的。
 
 ## Taught in
 
-The [multi-head attention lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) gives the grouped-query variant and its repeat, and the [grouped-query practice](../../../practice/grouped-query-attention/) checks the head-to-group mapping.
+[多头注意力课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)讲了分组查询变体和它的重复操作，[分组查询练习](../../../practice/grouped-query-attention/)检查头到组的映射。

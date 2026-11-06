@@ -1,6 +1,6 @@
 ---
 id: residual-scaling-deep-transformer
-title: Why a deep residual stack needs more than Kaiming
+title: 为什么深层残差堆叠仅靠 Kaiming 初始化是不够的
 card: deep-learning
 kind: concept
 level: 3
@@ -16,49 +16,49 @@ related: [deep-learning/kaiming-factor-of-two, deep-learning/layernorm-not-batch
 updated: 2026-11-03
 ---
 
-A transformer with Kaiming-initialized weights trains without trouble at 20 layers and diverges at 126 layers with the same recipe. Nothing else changed. Explain why depth breaks it even with a variance preserving initialization, and what the GPT-2 style fix does.
+一个采用 Kaiming 初始化的 Transformer 模型在 20 层时训练非常平稳，但在采用相同配方扩展到 126 层时直接发生发散崩溃。所有其他配置完全未变。请解释为什么即便采用了方差保持初始化，增加网络深度依然会引发崩溃，以及 GPT-2 风格的修复方案是如何解决该问题的。
 
 ## Short answer
 
-Kaiming keeps the variance constant through each sub-layer, but a residual block adds the sub-layer's output back onto its input, and the variance of a sum of independent terms adds. With N residual additions the stream's variance grows in proportion to N, so a deeper stack carries a larger residual signal, and the attention logits and feed-forward activations built from it grow with it. The GPT-2 fix scales the weights of the layers that write into the residual stream by 1 over the square root of 2N, so the accumulated variance stays the same at any depth.
+Kaiming 初始化只能保证通过每个独立子层时的信号方差保持恒定，但残差结构会将子层的输出直接加回到输入张量上，独立随机变量相加会导致方差直接叠加。经过 N 次残差加法叠加后，主干残差流的方差会与 N 成正比线性膨胀，因此网络越深，残差信号的幅值就越庞大，基于其构建的自注意力 logits 与前馈激活值也会随之增大。GPT-2 方案将向残差主干写入的投影层权重缩放 1 / sqrt(2N)，使得无论网络多深，累积的残差方差在任意深度都保持稳定。
 
 ## Full answer
 
-### Two kinds of variance preservation
+### 两种方差保持概念的区别
 
-Kaiming answers one question: how to draw weights so that a matrix multiply followed by a ReLU returns a signal with the same variance it received. It knows nothing about what happens next. In a residual block the next thing is an addition:
+Kaiming 初始化解决的是单个矩阵乘法后接 ReLU 时，如何使输出信号的方差与输入信号的方差保持一致。它完全不感知后续的计算图拓扑结构。在残差结构块中，下一个计算是加法运算：
 
 ```text
 x = x + sublayer(x)
 ```
 
-If the sub-layer output has about the same variance as x and is roughly independent of it, the sum has about twice the variance. Each block adds again. After N additions the stream has grown in proportion to N. The lesson states this directly: each addition increases variance, and with N residual layers the variance grows proportionally to N.
+若子层的输出方差与 x 大致相等，且两者近似独立，两者的相加和的方差大约翻倍。每个残差块都会发生一次方差累加。经过 N 个残差块累加后，残差流方差与 N 成正比。课程明确指出了这一点：每一次加法都在增加方差，在 N 个残差层之后方差呈线性增长。
 
-### Why it shows up as depth
+### 为什么在深度增加时该缺陷集中爆发
 
-At 20 layers the growth is a modest factor and the optimizer copes. At 126 layers, the depth the lesson cites for a 405B parameter model, the stream is large enough at initialization that the softmax inside attention and the activations in the feed-forward blocks run far from their intended range, and the first updates are oversized. Without a correction, the lesson says, the residual stream would grow without bound through the stack.
+在 20 层时，方差增长幅度有限，优化器尚能应对。但在 126 层（课程引用的 405B 参数大模型深度）下，残差流在初始状态下已经膨胀到了很大的尺度，导致自注意力内部的 Softmax 计算以及前馈网络中的非线性激活完全脱离了预期的工作区间，最初的梯度更新步长过大。课程指出，若不加以干预校正，残差主干将在深层堆叠中无界增长。
 
-### The fix
+### GPT-2 风格的缩放修复方案
 
-GPT-2 scales the weights of the residual projections, the layers that write into the stream, by 1 over the square root of 2N, where N is the number of layers. The 2 counts the two writes per layer, one from attention and one from the feed-forward block. The sum of 2N contributions each scaled by that factor has the same variance as one, so the stream stays in range at any depth. The lesson notes that the 405B model uses a similar scheme and that a transformer built from scratch must add this scaling itself.
+GPT-2 将负责向残差流输出写入的投影层权重统一缩放 1 / sqrt(2N)，其中 N 为 Transformer 的总层数。系数 2 代表每一层存在两次向主干的写入：一次来自自注意力投影层，另一次来自前馈块。2N 个经过该系数缩放的独立分支方差累加之后，其总方差恰好等同于单个标准分支的方差，从而保证了残差流信号在任意网络深度下都始终稳定在安全的工作区间内。课程特别提到，405B 模型采用了类似机制，而任何从零构建的 Transformer 模型都必须主动实现该缩放逻辑。
 
-### How to confirm before you change anything
+### 动工修改前的实验诊断确认
 
-Push random tokens through the untrained model and log the residual stream magnitude at each layer. Growth with depth confirms the diagnosis. Run it again with the scaling and the curve should be flat. The lesson's exercise does exactly this over 50 layers.
+向未训练的模型输入随机 token 序列，记录每层残差流的幅度。若模长随深度增长，则确诊该问题；引入权重缩放后重新测试，该曲线应当保持平直。课程设计的实验正是在 50 层深度下完整验证了这一过程。
 
 ## Follow-ups
 
-- **Level 3:** Why does Kaiming not account for this? Expected: it preserves variance through a matrix multiply followed by ReLU; it knows nothing about the addition that follows.
-- **Level 3:** Why 2N and not N? Expected: each transformer layer writes into the stream twice, once from attention and once from the feed-forward block, so N layers make 2N additions.
-- **Level 4:** How would you confirm the diagnosis before changing the initialization? Expected: push random input through the untrained model and log the residual stream magnitude per layer; growth with depth confirms it, and the scaled version should be flat.
-- **Level 4:** Does a Pre-LN layout remove the need for the scaling? Expected: it normalizes what enters each sub-layer and helps stability, but the additions into the stream sit outside the norm, so the lesson still applies the scaling to the writers.
+- **Level 3:** 为什么 Kaiming 初始化无法自行防范这种方差膨胀？ Expected: Kaiming 仅保证矩阵乘法后接 ReLU 时的方差恒定，无法掌控其后残差跳跃连接的加法方差累积。
+- **Level 3:** 为什么缩放因子是 2N 而不是 N？ Expected: 每个 Transformer 层包含两次向残差流的加法写入（自注意力与前馈块各一次），N 层网络累计发生 2N 次残差加法。
+- **Level 4:** 在修改代码前，如何通过实验证实确实发生了残差方差膨胀？ Expected: 将随机数据传入初始网络并记录各层残差流的特征模长；若随深度增长则支持这一诊断，缩放后曲线应当平直。
+- **Level 4:** 采用 Pre-LN 结构能否免除这种投影权重缩放？ Expected: Pre-LN 规范了进入子层的输入尺度并提升了稳定性，但残差加法依然发生在归一化之外，因此写入层的权重缩放依然必不可少。
 
 ## Wrong answers
 
-- "Deeper models just need a smaller learning rate." A smaller rate slows the growth of the weights; it does nothing about the variance that accumulates in the forward pass at initialization.
-- "Kaiming is variance preserving, so depth cannot be the issue." It preserves variance through each sub-layer, not through the sum of a sub-layer and its input.
-- "Divide the residual stream by N at the output." The fix has to act where the variance accumulates; scaling the writers keeps every intermediate layer in range, not only the last one.
+- "更深的网络只需要调小学习率即可解决该问题。" 调小学习率只能减慢权重更新速度；它完全无法解决初始状态下前向传播在深层累积的巨大方差。
+- "Kaiming 初始化已经是方差保持的，因此层数变深不可能引发方差问题。" Kaiming 只保持子层内部的方差，并不保证子层输出与残差主干相加后的方差不变。
+- "在整个模型输出端将残差流整体除以 N 即可修复。" 修正必须作用于方差累加的每一个源头点；缩放投影层能保护中间每一层都在安全区间内，而非仅在最后一层亡羊补牢。
 
 ## Taught in
 
-The [weight initialization lesson](../../../phases/03-deep-learning-core/08-weight-initialization/) explains residual variance growth and the GPT-2 scaling scheme.
+[权重初始化课程](../../../phases/03-deep-learning-core/08-weight-initialization/)深入解析了残差方差累加机制以及 GPT-2 投影层方差缩放方案。

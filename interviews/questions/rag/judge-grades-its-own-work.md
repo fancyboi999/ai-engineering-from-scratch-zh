@@ -1,6 +1,6 @@
 ---
 id: judge-grades-its-own-work
-title: Faithfulness stays high while reviewers find invented facts
+title: 人工评审发现编造事实，忠实度却一直很高
 card: rag
 kind: debug
 level: 3
@@ -16,43 +16,43 @@ related: [rag/diagnose-from-the-metric-table, rag/faithfulness-vs-relevance]
 updated: 2026-11-03
 ---
 
-Your faithfulness score comes from a model that reads each claim next to the retrieved context and answers yes or no. The score has sat near the top for a month, yet reviewers keep finding invented facts in sampled answers. The generator and the judge are the same model. What is going on, and what do you change?
+忠实度分数来自一个模型：它把每条论断和检索上下文放在一起读，回答是或否。这个分数一个月来一直接近满分，人工评审却在抽样答案中不断发现编造的事实。生成器和 judge 是同一个模型。原因是什么，应该改什么？
 
 ## Short answer
 
-A judge from the same family as the generator grades its own output as more faithful than it is, so the number stays high while the samples show the truth. Switch the judge to a different model family or hand-grade a sample, and add a sample-level review, because a per-sentence check can pass while the whole answer misleads.
+与生成器同一家族的 judge 会高估自家输出的忠实度，所以分数居高不下，抽样却暴露了真相。把 judge 换成另一个模型家族，或人工抽样评分，再加上整条样本级别的评审，因为逐句检查都通过时，整个答案仍可能误导。
 
 ## Full answer
 
-### How the metric is built
+### 指标怎样构建
 
-The eval splits the answer into sentence-shaped claims, asks the judge whether each claim is supported by the retrieved context, and reports the fraction that pass. The lesson ships a deterministic stand-in judge based on token overlap so the eval runs offline, and swaps in a model call in production. The question answering lesson describes the production form: entailment between each claim and the context, with no gold answer needed.
+评估把答案拆成句子形式的论断，让 judge 判断每项是否得到检索上下文支持，报告通过比例。课程提供基于 token 重叠的确定性替代 judge，以便离线运行，生产则换成模型调用。问答课程将生产形式描述为论断与上下文之间的蕴含关系，无需标准答案。
 
-### Two blind spots
+### 两个盲点
 
-1. **Judge bias.** A model judges the output of its own family as more faithful than it is. The lesson's rule: use a different model family for the judge than for the generator, or hand-grade a sample.
-2. **Micro-checks miss macro-claims.** Each sentence can be supported while the answer as a whole draws a conclusion that the context does not. Add a sample-level qualitative review on top of the automated metric.
+1. **judge 偏差。** 模型高估自身家族输出的忠实度。课程的规则是 judge 与生成器来自不同模型家族，或人工抽样评分。
+2. **局部检查漏掉整体论断。** 每句都可能有依据，但整个答案得出上下文不支持的结论。自动指标之外，要加整条样本的定性评审。
 
-### What to change
+### 改什么
 
-- Change the judge family, then measure the disagreement between the old judge and the new one on the same fixture. The lesson's exercise does the same between the mock judge and a real model.
-- Hand-grade a fixed sample each week and treat it as the calibration set for the automated score.
-- Consider graded faithfulness with three values, unsupported, partially supported and fully supported, instead of a yes or no.
-- Keep answer relevance next to faithfulness. A grounded answer to the wrong question is strong on one metric and weak on the other.
+- 更换 judge 的模型家族，然后在同一份测试数据上测新旧 judge 的分歧。课程练习在模拟 judge 和真实模型之间做的也是这件事。
+- 每周人工评审固定样本，用作自动评分的校准集。
+- 考虑将忠实度分为不支持、部分支持、完全支持三级，而非只有是或否。
+- 忠实度旁保留答案相关性。有依据却答非所问的答案，会一个指标高、另一个低。
 
 ## Follow-ups
 
-- **Level 3:** How do you size the judge problem before you change anything? Expected: hand-grade a sample of claims and measure the disagreement between the judge and the human labels.
-- **Level 3:** Every sentence passes but the answer as a whole misleads. Which check catches that? Expected: a sample-level qualitative review in addition to the per-claim metric.
-- **Level 4:** Why can a high faithfulness score sit next to a useless answer? Expected: faithfulness compares the answer with the context and not with the question, so a grounded off-topic answer scores high on faithfulness and low on relevance.
-- **Level 4:** The team wants the strongest model available as judge, and it is also the generator. What do you say? Expected: pick the judge for independence first; a strong judge of its own family is still biased, so use another family and keep a human-graded calibration sample.
+- **Level 3:** 修改前怎样量化 judge 的偏差？ Expected: 人工标注部分论断，测 judge 与人工标签的分歧。
+- **Level 3:** 每句通过，整体却误导，用什么发现？ Expected: 逐项指标之外，增加整条样本定性评审。
+- **Level 4:** 为什么高忠实度答案仍可能没用？ Expected: 忠实度比较答案与上下文，不比较问题；有依据但偏题的答案忠实度高、相关性低。
+- **Level 4:** 最强模型同时也是生成器，团队坚持用它作 judge，你怎么说？ Expected: 选 judge 先看独立性；同家族的 judge 再强也有偏差，所以换另一个家族，并保留人工评分的校准样本。
 
 ## Wrong answers
 
-- "The score is high, so the reviewers are wrong." The score is one model's opinion of its own family's output; the sampled answers are the ground truth.
-- "Make the judge stricter and the problem goes away." A stricter prompt or threshold does not remove a bias toward the judge's own family; only another family or a human sample does.
-- "Replace faithfulness with answer relevance." They measure different things; relevance asks whether the answer addresses the question and says nothing about grounding.
+- "分数很高，所以人工评审错了。" 分数只是一个模型对自家输出的看法，抽查的答案才是真实情况。
+- "让 judge 严格一点就解决了。" 更严 prompt 或阈值不能消除家族偏差；需另一家族或人工样本。
+- "用答案相关性替换忠实度。" 两者衡量不同问题；相关性只问是否回答问题，不说明是否有依据。
 
 ## Taught in
 
-The lesson [RAG evaluation](../../../phases/19-capstone-projects/68-rag-eval-precision-recall/) names judge bias and the macro-claim gap, and the lesson [question answering](../../../phases/05-nlp-foundations-to-advanced/13-question-answering/) describes entailment-based faithfulness in production.
+[RAG 评估](../../../phases/19-capstone-projects/68-rag-eval-precision-recall/)课程指出 judge 偏差与整体论断盲点，[问答](../../../phases/05-nlp-foundations-to-advanced/13-question-answering/)课程说明生产中基于蕴含的忠实度。

@@ -1,6 +1,6 @@
 ---
 id: fifty-cases-is-not-enough
-title: A four point win on fifty cases
+title: 50 个用例上的 4 分领先
 card: evaluation
 kind: estimate
 level: 2
@@ -16,51 +16,51 @@ related: [evaluation/mean-hides-the-tail]
 updated: 2026-11-03
 ---
 
-A prompt change scores 90 percent on your 50 case golden set, and the baseline scored 86 on the same set. The author wants to ship it as a four point win. How sure can you be, and what sample size would you need to make this call?
+一次 prompt 修改在你 50 个用例的黄金集上得了 90%，基线在同一集合上是 86%。作者想把它当作 4 分的提升上线。你能有多大把握？要做这个判断需要多大的样本量？
 
 ## Short answer
 
-At 50 cases and 90 percent observed accuracy, the 95 percent interval runs from 78 to 97 percent, a 19 point spread. A four point gap sits well inside that spread, so the win cannot be told from noise. You need about 200 cases to detect a 5 percent change, and 500 or more when two systems are close.
+50 个用例、观测准确率 90% 时，95% 置信区间是 78% 到 97%，宽 19 个百分点。4 分的差距完全落在这个范围里，分不清是提升还是噪声。要检测 5% 的变化大约需要 200 个用例，两个系统很接近时至少需要 500 个。
 
 ## Full answer
 
-### The table
+### 对照表
 
-| Cases | Observed accuracy | 95 percent interval width | Detects a 5 percent regression |
+| 用例数 | 观测准确率 | 95% 区间宽度 | 能否检测 5% 的回退 |
 |---|---|---|---|
-| 50 | 90 percent | 19 points | no |
-| 100 | 90 percent | 12 points | barely |
-| 200 | 90 percent | 9 points | yes |
-| 500 | 90 percent | 5 points | with confidence |
-| 1000 | 90 percent | 3 points | precisely |
+| 50 | 90% | 19 个点 | 不能 |
+| 100 | 90% | 12 个点 | 勉强 |
+| 200 | 90% | 9 个点 | 能 |
+| 500 | 90% | 5 个点 | 有把握 |
+| 1000 | 90% | 3 个点 | 精确 |
 
-The width falls roughly with the square root of the sample size. Four times the cases cut the width by about half.
+宽度大致与样本量的平方根成反比。用例数变成 4 倍，宽度大约减半。
 
-### The interval
+### 区间
 
-For a pass rate the lesson uses the Wilson interval, which stays correct at small samples and at proportions near zero or one. The normal interval fails in both places, and those are the places where releases get decided.
+对通过率，课程用 Wilson 区间。它在小样本和比例接近 0 或 1 时都保持正确。正态区间在这两种情况下都会失效，而发布决定恰恰就落在这两种情况里。
 
-### The paired case
+### 配对
 
-Both versions ran on the same 50 cases, so compare them as pairs. A paired test or a paired bootstrap on the per case differences is tighter than two separate intervals. It still will not rescue a four point gap on 50 cases, but it is the right test once the set is large enough.
+两个版本跑的是同样的 50 个用例，所以要成对比较。对逐用例差值做配对检验或配对 bootstrap，结果比两个独立区间更紧。它仍然救不了 50 个用例上的 4 分差距，但集合足够大之后，这才是正确的检验。
 
-### How to build to 200
+### 怎么凑到 200
 
-The lesson splits the set into a golden core of 50 to 100 curated cases, 20 to 50 adversarial cases and 100 to 200 samples of real traffic. Version the set, and compare two runs only on the same version.
+课程把评测集分成三部分：50 到 100 个精选的黄金核心用例，20 到 50 个对抗用例，100 到 200 个真实流量样本。给评测集做版本管理，只在同一版本上比较两次运行。
 
 ## Follow-ups
 
-- **Level 2:** Why does the interval shrink slowly as you add cases? Expected: the width falls with the square root of the sample size, so four times the cases halve the width.
-- **Level 2:** The two runs used identical cases. Does that help? Expected: yes; a paired comparison on per case differences is tighter than two independent intervals.
-- **Level 3:** Which interval does the lesson use for a pass rate, and why? Expected: the Wilson interval, because it behaves correctly at small samples and extreme proportions where the normal approximation fails.
-- **Level 3:** You can afford 200 judge calls per run. How do you split them? Expected: a golden core, an adversarial slice and a sample of production traffic, versioned and fixed between the two runs you compare.
+- **Level 2:** 为什么加用例时区间缩得这么慢？ Expected: 宽度与样本量的平方根成反比，所以用例数翻 4 倍，宽度才减半。
+- **Level 2:** 两次运行用的是完全相同的用例。这有帮助吗？ Expected: 有；对逐用例差值做配对比较，比两个独立区间更紧。
+- **Level 3:** 课程对通过率用哪种区间，为什么？ Expected: Wilson 区间，因为在小样本和极端比例下它表现正确，正态近似则会失效。
+- **Level 3:** 每次运行的预算只够调用 200 次 judge。怎么分配？ Expected: 黄金核心、对抗切片和生产流量样本，做版本管理，并在要比较的两次运行之间保持不变。
 
 ## Wrong answers
 
-- "Four points is four points." On 50 cases the interval is 19 points wide; a four point gap is noise.
-- "Run the same 50 cases three times." Repeating the cases measures the model's variance, not the population; the interval over cases stays wide.
-- "Always use a thousand cases." A thousand cases give a 3 point width but cost five times a 200 case run; use 200 for routine decisions and 500 or more for close calls.
+- "4 分就是 4 分。" 50 个用例时区间宽 19 个点；4 分的差距就是噪声。
+- "把同样的 50 个用例跑三遍。" 重复用例测的是模型自身的方差，不是总体；跨用例的区间照样很宽。
+- "永远用 1000 个用例。" 1000 个用例能把宽度压到 3 个点，但成本是 200 个用例的五倍；日常决定用 200 个，难分高下时至少用 500 个。
 
 ## Taught in
 
-The [evaluation and testing lesson](../../../phases/11-llm-engineering/10-evaluation/) gives the sample size table, the Wilson interval and the three layers of an eval set.
+[评测与测试课](../../../phases/11-llm-engineering/10-evaluation/)给出了样本量对照表、Wilson 区间和评测集的三层结构。

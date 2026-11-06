@@ -1,6 +1,6 @@
 ---
 id: rag-or-fine-tune
-title: Retrieval or fine-tuning for the policy wiki
+title: 内部政策知识库该用检索还是微调
 card: rag
 kind: concept
 level: 1
@@ -16,49 +16,49 @@ related: [rag/recall-at-k-first]
 updated: 2026-11-03
 ---
 
-A product team wants an assistant that answers questions about the internal policy wiki. One engineer proposes to tune the model on the wiki pages. Another proposes to search the pages at question time and paste the matches into the prompt. Which do you pick, and in which case would you still tune the model?
+产品团队想做一个回答内部政策知识库问题的助手。一位工程师建议用知识库页面微调模型，另一位建议在提问时搜索页面，把匹配片段放入 prompt。你选择哪种方案？什么情况下仍会微调模型？
 
 ## Short answer
 
-Pick retrieval for knowledge. The model never changes, the document store updates in minutes, and you can show the passages behind each answer. Tuning fits when you need a style, a tone or a reasoning pattern that a prompt cannot reach, not when you need facts.
+知识类需求选检索。模型保持不变，文档库可在几分钟内更新，还能展示每个答案背后的原文。需要 prompt 达不到的风格、语气或推理模式时，才适合微调；需要事实时不适合。
 
 ## Full answer
 
-### Why retrieval wins on facts
+### 为什么事实知识适合检索
 
-The lesson lines the two up on five concerns:
+课程从五个方面比较两者：
 
-| Concern | Tuned model | Retrieval |
+| 关注点 | 微调模型 | 检索 |
 |---|---|---|
-| Cost | a training run costs from $1,000 to more than $100,000 | a query costs $0.01 to $0.10 for the embedding and the model call |
-| Freshness | stale until the next training run | re-index the changed page and the next query sees it |
-| Audit | no way to trace a fact to a page | the retrieved passages are visible and can be returned |
-| Grounding | the model still invents facts freely | the prompt tells the model to answer only from the passages |
-| Privacy | the pages are baked into the weights | the pages stay in your own store |
+| 成本 | 一次训练从 $1,000 到超过 $100,000 | 每次查询的嵌入和模型调用为 $0.01 到 $0.10 |
+| 时效 | 下次训练前知识保持过期状态 | 对修改的页面重建索引，下次查询即可使用 |
+| 审计 | 无法将事实追溯到具体页面 | 检索片段可见，也能随答案返回 |
+| 依据约束 | 模型照样随意编造事实 | prompt 要求模型只根据片段回答 |
+| 隐私 | 页面内容进入权重 | 页面保留在自己的存储中 |
 
-Tuning changes the weights for good. Retrieval changes the context for one request. For facts, a temporary context is what you want.
+微调持久改变权重。检索只改变一次请求的上下文。对事实来说，要的正是临时上下文。
 
-### The one case for tuning
+### 适合微调的情况
 
-When the goal is how the model writes or reasons, and prompting does not get there, tuning is the right tool. A fixed voice, a house format or a reasoning habit lives in the weights better than in a long instruction.
+若目标是改变模型的写作或推理方式，而且 prompt 无法达到要求，微调才是适合的工具。固定口吻、内部格式或推理习惯更适合在权重中学习，而不是依赖很长的指令。
 
-### The shape of the system
+### 系统结构
 
-Retrieval runs in two phases. The index phase chunks each page, embeds each chunk and stores the vectors with the text. The query phase embeds the question, finds the top k chunks, builds a prompt from them and calls the model. The lesson budgets k at 5 to 10 chunks and 2,500 to 5,000 tokens of retrieved text per query.
+检索分为两个阶段。索引阶段对每个页面分块、生成嵌入，并将向量和文本一起保存。查询阶段对问题生成嵌入，找到前 k 个文本块，用它们构造 prompt，再调用模型。课程给出的预算是每次查询 k 取 5 到 10 个文本块，检索文本共 2,500 到 5,000 个 token。
 
 ## Follow-ups
 
-- **Level 1:** A policy page changes. What happens in each approach? Expected: with retrieval you re-index that page and the next answer uses the new text; with a tuned model the old fact stays until you train again.
-- **Level 2:** A legal reviewer asks which page an answer came from. Which approach can show it? Expected: retrieval, because the passages that went into the prompt are known and can be returned with the answer.
-- **Level 2:** Why is the privacy story different? Expected: with retrieval the pages stay in your store and only the matched chunks go to the model for one call; with tuning the content is inside the weights of the model you deploy.
-- **Level 3:** The answer is wrong even though the right passage is in the store. Which stage do you check first? Expected: retrieval, with recall at k, because the model cannot use a passage that the search did not return.
+- **Level 1:** 政策页面更新后，两种方案分别怎么处理？ Expected: 检索方案重新索引该页，下次回答即可使用新文本；微调模型中的旧事实要等再次训练才会改变。
+- **Level 2:** 法务审核人员想知道答案来自哪个页面，哪种方案可以提供？ Expected: 检索，因为送入 prompt 的片段已知，可随答案返回。
+- **Level 2:** 为什么两种方案的隐私边界不同？ Expected: 检索时页面保存在自己的存储中，每次调用只向模型发送匹配片段；微调则把内容写进所部署模型的权重。
+- **Level 3:** 正确片段已经在文档库中，答案仍然错误，先检查哪个阶段？ Expected: 先用 recall@k 检查检索，因为搜索没有返回的片段模型无法使用。
 
 ## Wrong answers
 
-- "Tune the model, because then it knows the documents." The weights hold a copy that goes stale, and nothing in the output says which page a fact came from.
-- "Retrieval is always better." A fixed style, a tone or a reasoning pattern is learned better by tuning than by a prompt.
-- "Skip the search and put the whole wiki in the prompt." The lesson budgets 2,500 to 5,000 tokens of retrieved text per query; a whole wiki does not fit, and unrelated text dilutes the prompt.
+- "微调模型，这样它就知道文档了。" 权重中的副本会过期，输出也不能说明某个事实来自哪个页面。
+- "检索永远更好。" 固定风格、语气或推理模式更适合微调学习，而不是只靠 prompt。
+- "跳过搜索，把整个知识库塞进 prompt。" 课程预算是每次查询 2,500 到 5,000 个检索文本 token；整个知识库放不下，无关文本还会稀释 prompt。
 
 ## Taught in
 
-The lesson [RAG](../../../phases/11-llm-engineering/06-rag/) compares the two approaches and builds the index and query phases.
+[RAG](../../../phases/11-llm-engineering/06-rag/)课程比较两种方案，并构建索引阶段与查询阶段。

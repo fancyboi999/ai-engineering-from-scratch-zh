@@ -1,6 +1,6 @@
 ---
 id: gate-aggregation-table
-title: Walk three requests through the gate's aggregator
+title: 让三个请求走一遍门控聚合器
 card: safety
 kind: code-reading
 level: 3
@@ -16,7 +16,7 @@ related: [safety/output-router-severity, safety/rule-needs-three-parts]
 updated: 2026-11-03
 ---
 
-Read the aggregation step of the safety gate below. Walk three requests through it: a prompt the detector flags above the block threshold, a benign prompt whose stream is cut early, and a benign prompt whose output trips a high severity rule. Then say what this table gets wrong by design.
+阅读下面安全门控的聚合步骤。让三个请求走一遍：一个被检测器标记且超过拦截阈值的 prompt；一个良性 prompt，它的输出流被提前截断；一个良性 prompt，它的输出触发了一条高严重度规则。然后说明这张表在设计上错在哪里。
 
 ```python
 SEVERITY_RANK = {"none": 0, "low": 1, "medium": 2, "high": 3}
@@ -50,48 +50,48 @@ def _aggregate(self, pre, during, post):
 
 ## Short answer
 
-The first request blocks before generation: a non benign category at or above the block confidence ranks high, and high maps to block. The second request redacts: early termination is a medium signal on its own, so the partial output ships through the redactors and the fixer. The third blocks: a high rule severity ranks the same as a high classifier severity. By design the table takes the maximum, so signals never add up; three low signals stay a warn, and a medium detector flag next to a medium classifier finding stays a redact.
+第一个请求在生成前就被拦截：非良性类别且置信度达到拦截阈值，等级为 high，而 high 对应 block。第二个请求走 redact：提前终止本身就是一个 medium 信号，所以部分输出要经过脱敏器和修复器再发出。第三个请求被拦截：规则给出的 high 与分类器给出的 high 等级相同。这张表在设计上取最大值，所以信号永远不会叠加；三个 low 信号仍是 warn，检测器的 medium 标记加上分类器的 medium 发现，仍是 redact。
 
 ## Full answer
 
-### The thresholds
+### 阈值
 
-The gate sets the block confidence at 0.85 and the note confidence at 0.5. A non benign detector verdict at or above 0.85 is high and blocks before the model runs. Between 0.5 and 0.85 it is medium. Below 0.5 it is low. A benign verdict adds no signal at all.
+门控把拦截置信度设为 0.85，记录置信度设为 0.5。检测器给出非良性判定且置信度达到或超过 0.85 时为 high，在模型运行前就拦截。介于 0.5 和 0.85 之间为 medium。低于 0.5 为 low。良性判定不产生任何信号。
 
-### Request one: flagged prompt
+### 请求一：被标记的 prompt
 
-The detector returns a non benign category above 0.85. The pre generation signal ranks high. The gate never calls the model; it returns a refusal and writes a trace with the detector verdict and no post generation section.
+检测器返回一个非良性类别，置信度高于 0.85。生成前信号等级为 high。门控根本不调用模型；它返回拒答，并写一条 trace，里面有检测器的判定，没有生成后的部分。
 
-### Request two: benign prompt, stream cut
+### 请求二：良性 prompt，输出流被截断
 
-The detector says benign, so nothing from pre generation. The streaming filter buffers two chunks of four tokens and sweeps a regex of continuation phrases over the window; it matches, terminates the iterator and marks the output as terminated early. That is one medium signal. Post generation runs on the partial text; if the classifier and the rules return none, the maximum is medium and the action is redact: the classifier redactors and the rules fixer run on the partial output, which ships with the trace.
+检测器判为良性，所以生成前没有信号。流式过滤器缓冲两个各含四个 token 的块，在窗口上用一个匹配续写短语的正则扫描；匹配命中后，它终止迭代器，并把输出标记为提前终止。这是一个 medium 信号。生成后检查在部分文本上运行；如果分类器和规则都返回 none，最大值就是 medium，动作是 redact：分类器的脱敏器和规则修复器处理部分输出，然后连同 trace 一起发出。
 
-### Request three: benign prompt, high rule
+### 请求三：良性 prompt，命中高严重度规则
 
-No pre generation signal and no early termination. The classifier router returns none. The rules engine returns a high violation, for example an internal library name in the output. The rules signal ranks high and the action is block, the same as if a classifier had found something high.
+没有生成前信号，也没有提前终止。分类器路由返回 none。规则引擎返回一条 high 违规，例如输出里出现了内部库的名字。规则信号等级为 high，动作是 block，和分类器发现 high 问题时一样。
 
-### The limits the design accepts
+### 这个设计接受的局限
 
-- **No accumulation.** The maximum ignores how many signals fired. Several weak signals that together describe an attack still warn.
-- **No weights.** A medium from the detector and a medium from the classifier carry the same weight whatever their track record.
-- **A short window.** The streaming filter holds two chunks, so a continuation phrase split across more chunks escapes it; the post generation pass is the backstop, and a prefix injection that only shows after the fact survives a gate that looks only post hoc.
-- **Fixed thresholds.** The capstone's exercise proposes a weighted score tripped at a threshold, tuned by sweeping it against the corpus and reading precision and recall per category.
+- **不累加。** 取最大值时不管有多少个信号触发。几个弱信号合起来明明描述了一次攻击，结果仍然只是 warn。
+- **没有权重。** 检测器的 medium 和分类器的 medium 分量相同，不管各自过往的准确率如何。
+- **窗口短。** 流式过滤器只保留两个块，所以续写短语拆到更多块里就能逃过它；生成后检查是兜底。如果门控只做事后检查，那种事后才显现的前缀注入就能活下来。
+- **阈值固定。** 综合项目的练习提出改用加权分数，超过阈值才触发；阈值要在语料上扫出来，并按类别查看精确率和召回率。
 
-The point of the gate is the per request trace with every checkpoint's verdict, the final action and the latency, not a perfect score on the corpus.
+门控的价值在于每个请求的 trace：每个检查点的判定、最终动作和延迟。不在于在语料上拿满分。
 
 ## Follow-ups
 
-- **Level 3:** Why is early termination medium and not high? Expected: a regex match on a two chunk window is weaker evidence than a confirmed high classifier finding; the partial output still goes through redaction.
-- **Level 3:** A low detector flag and a low rule violation arrive together. What ships? Expected: a warn with a soft notice; the maximum of two lows is low, and the table does not accumulate.
-- **Level 4:** What would a weighted aggregator change, and what does it cost? Expected: signals would add toward a threshold so several weak signals could block; the cost is a tuned threshold, set by sweeping it against the corpus and reading precision and recall per category.
-- **Level 4:** What does the two chunk buffer miss, and what catches it? Expected: a continuation phrase split across more chunks than the buffer holds; the post generation pass is the backstop.
+- **Level 3:** 为什么提前终止是 medium 而不是 high？ Expected: 在两个块的窗口上命中正则，比分类器确认的 high 发现证据更弱；部分输出仍要经过脱敏。
+- **Level 3:** 检测器的 low 标记和一条 low 规则违规同时出现。最后发出什么？ Expected: warn，附一条温和提示；两个 low 的最大值还是 low，这张表不累加。
+- **Level 4:** 换成加权聚合器会改变什么，代价是什么？ Expected: 信号会朝阈值累加，几个弱信号就可能触发拦截；代价是阈值需要调，要在语料上扫描，并按类别查看精确率和召回率。
+- **Level 4:** 两个块的缓冲会漏掉什么，由什么来兜住？ Expected: 拆到比缓冲容量更多块里的续写短语；生成后检查是兜底。
 
 ## Wrong answers
 
-- "Block whenever any layer fires." Low and medium signals exist so benign prompts with weak matches do not get refused; the table maps them to warn and redact.
-- "Set the block threshold low to save model calls." A low threshold turns the detector's middling precision on role play into refusals of creative requests; the capstone blocks at 0.85.
-- "The demo exits zero, so the gate caught every attack." The demo is self terminating by design; the trace is the deliverable, and the summary counts show what got through.
+- "只要任何一层触发就拦截。" 设 low 和 medium 信号，就是为了不让有弱匹配的良性 prompt 被拒；表把它们映射为 warn 和 redact。
+- "把拦截阈值调低，省下模型调用。" 检测器在角色扮演上的精确率一般，阈值一低，创意类请求就会被拒；综合项目在 0.85 处拦截。
+- "demo 以 0 退出，所以门控拦下了所有攻击。" demo 在设计上会自行结束；trace 才是交付物，汇总计数显示了哪些请求漏了过去。
 
 ## Taught in
 
-The [end to end safety gate capstone](../../../phases/19-capstone-projects/87-end-to-end-safety-gate/) gives the aggregation table, the three checkpoints and the trace.
+[端到端安全门控综合项目](../../../phases/19-capstone-projects/87-end-to-end-safety-gate/)给出了聚合表、三个检查点和 trace。

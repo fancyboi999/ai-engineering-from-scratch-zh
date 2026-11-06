@@ -1,6 +1,6 @@
 ---
 id: reverse-mode-one-pass
-title: Why backpropagation runs the chain rule in reverse
+title: 为什么反向传播采用反向链式法则
 card: math-classical-ml
 kind: concept
 level: 2
@@ -16,46 +16,46 @@ related: [math-classical-ml/grad-accumulate-plus-equals]
 updated: 2026-11-03
 ---
 
-Automatic differentiation can push derivatives forward from the inputs or pull them backward from the output. Training frameworks pick the backward direction. Why, and in which situation would the forward direction be the better choice?
+自动微分既可以从输入向输出前向传递导数，也可以从输出向输入反向拉取导数。训练框架选择反向方向。为什么采用该方案？在什么场景下前向模式会是更优的选择？
 
 ## Short answer
 
-A network has millions of parameters and one scalar loss. Reverse mode seeds the output with a gradient of 1 and gets the gradient of every parameter in one backward sweep. Forward mode needs one sweep for each input variable, so it wins only when the inputs are few and the outputs are many.
+神经网络拥有数百万个参数，但最终损失只是单个标量。反向模式从输出端以梯度 1 作为种子，只需一次反向扫描即可求出所有参数的梯度。前向模式每求一个输入变量的导数就需要完整遍历一遍计算图，因此它仅在输入变量极少、输出变量极多的场景下才更具优势。
 
 ## Full answer
 
-### The two modes
+### 两种微分模式对比
 
-Both modes apply the chain rule at every node of the computation graph. They differ in where the seed goes.
+两种模式都在计算图的每个节点上应用链式法则，核心差异在于梯度的种子注入位置。
 
-| Mode | Seed | Direction | Best when |
+| 模式 | 种子设置 | 传递方向 | 最佳适用场景 |
 |---|---|---|---|
-| Forward | the derivative of one input with respect to itself, set to 1 | input to output | few inputs, many outputs |
-| Reverse | the derivative of the output with respect to itself, set to 1 | output to input | many inputs, few outputs |
+| 前向模式 | 某个输入关于自身的导数设为 1 | 输入向输出传递 | 输入极少、输出极多 |
+| 反向模式 | 输出关于自身的导数设为 1 | 输出向输入传递 | 输入极多、输出极少 |
 
-Forward mode carries one derivative through the graph. To get the gradient of a loss with respect to a million weights, you would run it a million times. Reverse mode carries the gradient of the single loss back to every node, and each node multiplies by its local derivative and passes the result to its children.
+前向模式一次遍历只能沿计算图传递单个变量的导数。为了计算标量损失关于一百万个权重的梯度，需要运行一百万次前向模式扫描。而反向模式将单个标量损失的梯度一次性回传至所有节点，每个节点将其乘以局部导数后继续向子节点传递。
 
-### What reverse mode costs
+### 反向模式的计算开销
 
-The backward sweep visits each node once, so the time is proportional to one forward pass. The engine must order the nodes first. A topological sort guarantees that a node has received the gradient from every consumer before it passes gradient on. When a value feeds several operations, the contributions add.
+反向扫描只需遍历每个节点一次，运行时间与单次前向传播成正比。自动微分引擎必须预先对计算图节点排序。拓扑排序确保在节点将梯度向上传递之前，已从所有下游消费节点处接收到了完整的累加梯度。当一个变量被多个后续操作引用时，各路径的贡献自动求和累加。
 
-### When forward mode is the right choice
+### 前向模式的用武之地
 
-Forward mode fits a function with one or two inputs and a large output, because one sweep gives the derivative of the whole output along one input direction. Dual numbers implement it with almost no code: a pair of value and derivative, with the rule that the square of the derivative part is zero, so the product rule falls out of the arithmetic.
+前向模式极其契合只有一两个输入变量但拥有庞大向量输出的函数，因为单次扫描就能得出整个高维输出沿该输入方向的导数。双数（Dual numbers）可以用极短的代码实现前向模式：它将数值和导数组成数值对，并规定导数部分的平方为零，乘法法则便能直接通过基础算术运算自然推导得出。
 
 ## Follow-ups
 
-- **Level 2:** Why does the backward sweep need a topological order? Expected: a node must receive the full gradient from every consumer before it passes gradient to its children.
-- **Level 3:** How many forward-mode sweeps does a model with one million weights need for one gradient? Expected: one million, one per input variable, which is why nobody trains that way.
-- **Level 3:** What is a dual number and how does it carry a derivative? Expected: a pair of a value and a derivative, where the derivative part squares to zero, so each arithmetic rule carries the derivative along.
-- **Level 4:** Name a case in an ML system where you would pick forward mode. Expected: a function with one or two inputs and a large vector output, where one sweep gives the derivative of the whole output along one input direction.
+- **Level 2:** 为什么反向扫描必须依赖拓扑排序？ Expected: 节点必须在接收完所有下游消费节点的全部梯度贡献之后，才能将梯度安全传递给自身的子节点。
+- **Level 3:** 对于拥有 100 万个权重的模型，前向模式需要多少次扫描才能算出一组完整梯度？ Expected: 需要 100 万次扫描（每个输入变量各一次），这也是工业界从不使用前向模式训练神经网络的原因。
+- **Level 3:** 什么是双数（dual number），它是如何携带导数的？ Expected: 由实部数值与导数部分构成的数值对，定义导数部分的平方为零，通过常规算术重载即可同步完成导数传播。
+- **Level 4:** 请举出机器学习系统中你会选择前向自动微分的具体案例。 Expected: 只有一两个输入但输出为高维向量的映射函数，此时单次遍历即可求出整个输出向量沿某个输入方向的方向导数。
 
 ## Wrong answers
 
-- "Reverse mode is more accurate than forward mode." Both are exact up to floating point rounding. The difference is the cost, not the result.
-- "Forward mode cannot handle a composition of functions." Both modes apply the chain rule through every link. Forward mode pushes the derivative from the input side.
-- "Backpropagation is a different algorithm from reverse-mode autodiff." Backpropagation is reverse-mode autodiff applied to the network graph, with the loss as the single output.
+- "反向模式在计算精度上高于前向模式。" 两种模式在浮点舍入精度范围内均是严格精确的；差异在于计算时间复杂度，而非数值计算结果。
+- "前向模式无法处理复杂函数的复合运算。" 两种模式都在复合链条的每一个环节严格应用链式法则；前向模式只是从输入端向前推进导数。
+- "反向传播算法与反向模式自动微分是两种不同的算法。" 反向传播本质就是应用于神经网络计算图的反向模式自动微分，其中标量损失作为唯一的根输出节点。
 
 ## Taught in
 
-The [chain rule and autodiff lesson](../../../phases/01-math-foundations/05-chain-rule-and-autodiff/) compares the two modes and builds a reverse-mode engine.
+[链式法则与自动微分课程](../../../phases/01-math-foundations/05-chain-rule-and-autodiff/)对比了这两种微分模式，并从零构建了反向模式自动微分引擎。

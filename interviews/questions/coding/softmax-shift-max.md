@@ -1,6 +1,6 @@
 ---
 id: softmax-shift-max
-title: Why softmax subtracts the row maximum first
+title: softmax 为什么先减去行最大值
 card: coding
 kind: code-reading
 level: 1
@@ -16,7 +16,7 @@ related: [coding/loss-shift-flatten, coding/scale-by-sqrt-dk]
 updated: 2026-11-03
 ---
 
-A candidate writes this softmax for a batch of logits and the tests pass on small inputs but return NaN on a real attention row:
+一位候选人为一批 logits 写了这个 softmax，小输入上测试都通过，到了真实的注意力行却返回 NaN：
 
 ```python
 def softmax(x):
@@ -24,19 +24,19 @@ def softmax(x):
     return e / e.sum(axis=-1, keepdims=True)
 ```
 
-What is wrong, how do you fix it, and why does the fix not change the result?
+哪里错了？怎样修？为什么修复不改变结果？
 
 ## Short answer
 
-A large logit overflows the exponential to infinity, and infinity divided by infinity is NaN. Subtract the maximum of each row before the exponential. The softmax of a row is unchanged when the same constant is subtracted from every entry, because the constant cancels between the numerator and the denominator.
+大的 logit 会让指数溢出成无穷大，无穷大除以无穷大得到 NaN。在取指数之前先减去每一行的最大值。一行的每个元素都减去同一个常数，softmax 结果不变，因为这个常数在分子和分母之间抵消了。
 
 ## Full answer
 
-### The failure
+### 故障
 
-Attention scores and language model logits can reach values in the tens or hundreds. The exponential of such a value does not fit in a float, so the row becomes infinite and the division gives NaN. Small test inputs never show it.
+注意力分数和语言模型的 logits 可以到几十甚至几百。这么大的值取指数后放不进浮点数，这一行变成无穷大，除法得到 NaN。小的测试输入永远暴露不了它。
 
-### The fix
+### 修复
 
 ```python
 def softmax(x):
@@ -45,29 +45,29 @@ def softmax(x):
     return e / e.sum(axis=-1, keepdims=True)
 ```
 
-After the shift the largest entry of each row is zero, so the largest exponential is one and nothing overflows. Entries far below the maximum underflow to zero, which is the correct limit.
+平移之后，每行最大的元素是零，所以最大的指数是一，不会溢出。远低于最大值的元素下溢成零，这正是正确的极限值。
 
-### Why the result is the same
+### 为什么结果一样
 
-Softmax of a row divides each exponential by the sum of all exponentials in that row. Subtracting a constant multiplies every exponential by the same factor, and that factor cancels in the ratio. The shift must be per row, over the last axis. A single maximum taken across the entire batch changes nothing about correctness but lets one hot row push every other row into underflow.
+一行的 softmax 用每个元素的指数除以这一行所有指数之和。减去一个常数等于把每个指数乘以同一个系数，这个系数在比值里抵消了。平移必须按行、在最后一个轴上做。在整个 batch 上取一个最大值不影响正确性，但一个值很大的行会把其他所有行推到下溢。
 
-### Two more details that bite
+### 还有两个容易出错的细节
 
-- Keep the dimension with `keepdims=True` so the subtraction broadcasts along the row and not along the batch.
-- Do not subtract in place when the caller still needs the logits.
+- 用 `keepdims=True` 保留维度，减法才会沿行广播，而不是沿 batch 广播。
+- 调用方还需要 logits 时，不要原地做减法。
 
 ## Follow-ups
 
-- **Level 1:** Where does this same shift appear inside attention? Expected: in the softmax over the scaled scores, which is why the attention lesson writes the shifted version first.
-- **Level 2:** Why is a global maximum over the whole batch a bug? Expected: one row with a very large logit shifts every other row far below zero, so those rows underflow to all zeros and divide by zero.
-- **Level 2:** The practice task also asks for the gradient of the mean cross-entropy. What is it? Expected: the softmax minus the one-hot target, divided by the batch size.
+- **Level 1:** 同样的平移在注意力里出现在哪里？ Expected: 在缩放后分数的 softmax 里，所以注意力课先写的就是平移版本。
+- **Level 2:** 为什么在整个 batch 上取全局最大值是 bug？ Expected: 一行里有一个很大的 logit，其他行都会被平移到远低于零，这些行下溢成全零，然后除以零。
+- **Level 2:** 练习还要求求平均交叉熵的梯度。它是什么？ Expected: softmax 减去 one-hot 目标，再除以 batch 大小。
 
 ## Wrong answers
 
-- "Clip the logits to a safe range." Clipping changes the distribution; the shift does not.
-- "Use float64 and the problem goes away." It moves the threshold, and attention scores still overflow in long rows.
-- "Subtract the mean instead of the maximum." The mean does not bound the largest entry, so a row can still overflow.
+- "把 logits 截到一个安全范围。" 截断会改变分布；平移不会。
+- "换成 float64 问题就没了。" 它只是移动了阈值，长行里的注意力分数仍然会溢出。
+- "减均值而不是最大值。" 均值限制不住最大的元素，一行仍然可能溢出。
 
 ## Taught in
 
-The [self-attention lesson](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/) builds the shifted softmax as its first step, and the [softmax and cross-entropy practice](../../../practice/softmax-cross-entropy/) checks it with large logits.
+[自注意力课](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/)第一步就构建平移版 softmax，[softmax 与交叉熵练习](../../../practice/softmax-cross-entropy/)用很大的 logits 检查它。

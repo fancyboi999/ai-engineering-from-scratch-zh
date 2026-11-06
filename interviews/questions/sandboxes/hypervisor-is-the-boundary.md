@@ -1,6 +1,6 @@
 ---
 id: hypervisor-is-the-boundary
-title: The agent has sudo and a Docker Engine, so where is the wall
+title: agent 拥有 sudo 和 Docker Engine，隔离墙究竟在何处
 card: sandboxes
 kind: concept
 level: 1
@@ -16,55 +16,55 @@ related: [protocols/roots-are-not-a-sandbox]
 updated: 2026-11-03
 ---
 
-Inside a Docker sandbox the agent runs as uid 1000 in the `sudo` and `docker` groups, and `docker version` answers with a server. A teammate concludes that the sandbox is no safer than a container running as root. Where is the wall, and what does the agent own inside it?
+在 Docker 沙箱内部，agent 作为 uid 1000 用户运行，且属于 `sudo` 和 `docker` 用户组，执行 `docker version` 能够正常返回服务端信息。某队友据此断定该沙箱并不比以 root 身份直接运行的普通容器更安全。真正的隔离墙位于何处，agent 在墙内究竟拥有什么？
 
 ## Short answer
 
-The wall is the hypervisor line under the guest kernel, not the user inside. The documentation puts it plainly: the agent is a non-root user with sudo rights inside the VM, the hypervisor boundary isolates the agent, and privilege separation inside the VM does not. Everything below that line belongs to the agent, including a private Docker Engine whose images never appear in `docker ps` on the host, and the host offers no Docker API to the sandbox at all.
+真正的隔离墙是客户机内核之下的虚拟机监视器（hypervisor）虚拟化分界线，而非虚拟机内部的用户身份。文档对此直接指出：agent 在虚拟机内部是非 root 用户但拥有 sudo 特权，真正隔离 agent 的是虚拟机监视器边界，虚拟机内部的特权分离并不构成安全隔离。在该分界线以下的一切均归 agent 所有，包括一个独立的私有 Docker Engine（其构建的镜像不会出现在宿主机的 `docker ps` 中），且宿主机完全不对沙箱开放任何宿主机 Docker API。
 
 ## Full answer
 
-### Five layers, read from inside
+### 从内部审视的五层架构
 
-`sbx diagnose` names the platform: `kern.hv_support is 1` is hardware virtualization, and the guest runs on the host hypervisor. From inside, `uname`, `id`, `docker version` and `mount` show a guest kernel on `aarch64` with 16 KiB pages (`getconf PAGESIZE` prints 16384), user `agent` with uid 1000, a Docker Engine server with its own containerd, and the workspace as a `virtiofs` mount at the same absolute path as on the host.
+`sbx diagnose` 指明了底层平台：`kern.hv_support is 1` 代表硬件辅助虚拟化，客户机直接运行在宿主机的虚拟机监视器上。从沙箱内部执行 `uname`、`id`、`docker version` 以及 `mount` 可以看到：运行在 `aarch64` 上、带有 16 KiB 内存分页的客户机内核（`getconf PAGESIZE` 输出 16384）、uid 为 1000 的 `agent` 用户、带有专属 containerd 的独立 Docker Engine 服务端，以及作为 `virtiofs` 挂载在与宿主机相同绝对路径上的工作空间。
 
-The documentation names five isolation layers: hypervisor, network, Docker Engine, workspace and credential. The engine inside is the agent's. Images it builds live in the VM, and the agent cannot reach the daemon on your host. There is no Moby API from the host either, so REST clients that expect one do not work, and `sbx exec` is the way in.
+官方文档列出了五层隔离体系：虚拟机监视器、网络隔离、独立 Docker Engine、工作空间隔离以及凭据隔离。虚拟机内部的 Docker 引擎完全属于 Agent 私有。它构建的镜像仅存留在虚拟机内部，Agent 无法触碰宿主机上的守护进程。宿主机同样未向沙箱暴露任何 Moby API，因此依赖该 API 的 REST 客户端无法工作，`sbx exec` 才是进出沙箱的标准途径。
 
-### The doors through the wall
+### 穿透隔离墙的门径
 
-Count the lines in the guest environment that cross the line:
+清点客户机环境中跨越虚拟化分界线的各个通道：
 
-| Door | The guest line |
+| 穿透通道 | 客户机内部对应的具体表现 |
 |---|---|
-| mount | `host on <workspace> type virtiofs (rw,...)`, plus a read-only bind of `/etc/resolv.conf` |
-| network | `HTTPS_PROXY` pointing at `gateway.docker.internal:3128` |
-| secret | a provider key variable set to the sentinel `proxy-managed` |
-| MCP | `MCP_GATEWAY_URL` pointing at `mcp-gateway.docker.internal/mcp` |
-| SSH agent | `SSH_AUTH_SOCK=/run/ssh-agent.sock` forwarded through `gateway.docker.internal:3129` |
+| mount（挂载） | `host on <workspace> type virtiofs (rw,...)`，外加对 `/etc/resolv.conf` 的只读绑定 |
+| network（网络） | `HTTPS_PROXY` 指向 `gateway.docker.internal:3128` |
+| secret（机密） | 模型服务商 API 密钥环境变量被设为哨兵占位值 `proxy-managed` |
+| MCP | `MCP_GATEWAY_URL` 指向 `mcp-gateway.docker.internal/mcp` |
+| SSH agent | `SSH_AUTH_SOCK=/run/ssh-agent.sock` 通过 `gateway.docker.internal:3129` 转发 |
 
-Each door is a place where host policy applies. Nothing the agent does with sudo changes which doors exist.
+每一扇门都是宿主机安全策略强制生效的锚点。Agent 在虚拟机内部使用 sudo 执行的任何操作都无法改变这些通道的存在形态。
 
-### What the teammate gets right
+### 队友说对的部分
 
-Inside the VM, the agent owns the filesystem, the engine and every process. A build that assumes 4 KiB pages fails on this guest. The VM has limits of its own: memory defaults to half of host memory, clamped between 512 MiB and 32 GiB, and `--cpus 0` means every host CPU, at most 16 on Linux arm64. None of that is a control; it is a budget.
+在虚拟机内部，Agent 拥有文件系统、内部 Docker 引擎以及全部进程的完全控制权。假定内存页为 4 KiB 的构建会在该客户机上失败。虚拟机自身也有资源上限：内存默认分配宿主机的一半（限制在 512 MiB 到 32 GiB 之间），而 `--cpus 0` 意味着使用全部宿主机 CPU（在 Linux arm64 上上限为 16）。这本身不是权限控制，而是一项资源配额预算。
 
-### One thing that is not inside
+### 一项完全不处于墙内的特例
 
-An MCP server registered on the host with `--command` runs on the host with the permissions of your host user, outside the engine boundary and outside network policy. Only a server the agent starts inside the VM is subject to the sandbox rules.
+在宿主机上通过 `--command` 注册的 MCP 服务，是以宿主机当前用户的真实身份直接在宿主机上运行的，脱离了沙箱引擎边界与网络策略的管辖。唯有 Agent 在虚拟机内部拉起的 MCP 服务才会受到沙箱安全规则的约束。
 
 ## Follow-ups
 
-- **Level 1:** The agent runs `docker build` and the host's `docker ps` shows nothing. Why? Expected: the engine and its image store live inside the VM; the host daemon is a different engine.
-- **Level 2:** A compiled tool crashes inside with a page-size error. What is different about the guest? Expected: the guest kernel uses 16 KiB pages, which `getconf PAGESIZE` reports as 16384, and `sbx diagnose` compares the `mkfs.erofs` block size against it.
-- **Level 2:** Name each path by which something from the host enters the VM. Expected: the workspace mount, the proxy for network, secret sentinels, the MCP gateway URL and the forwarded SSH agent.
-- **Level 3:** Which registered MCP server is not covered by the wall? Expected: one added with `--command`, which runs on the host as your user and is not under network policy.
+- **Level 1:** Agent 执行了 `docker build`，而宿主机的 `docker ps` 一无所获，为什么？ Expected: 引擎与其镜像存储均位于虚拟机内部；宿主机守护进程是完全独立的另一套引擎。
+- **Level 2:** 编译好的二进制工具在沙箱内崩溃并提示内存页大小错误，客户机有何特殊之处？ Expected: 客户机内核使用 16 KiB 内存分页（`getconf PAGESIZE` 输出 16384），`sbx diagnose` 会据此对比 `mkfs.erofs` 的块大小。
+- **Level 2:** 列出宿主机内容进入虚拟机内部的所有通道路径。 Expected: 工作空间挂载、网络代理、机密凭据哨兵占位符、MCP 网关 URL 以及转发的 SSH agent。
+- **Level 3:** 哪类已注册的 MCP 服务不受该隔离墙覆盖？ Expected: 使用 `--command` 注册的服务，它作为宿主机用户直接运行在宿主机上，且脱离网络策略管辖。
 
 ## Wrong answers
 
-- "sudo inside means root on my laptop." The user inside is a guest user; the hypervisor is the control, and the docs say privilege separation inside is not.
-- "The sandbox shares my Docker daemon." Each sandbox runs its own Docker Engine, and the host offers no API to the VM.
-- "It needs no account because it runs without Docker Desktop." `sbx` runs without Desktop and still refuses to create a sandbox without a sign-in; the FAQ gives the reasons.
+- "沙箱内部拥有 sudo 意味着拿到了我笔记本电脑的 root 权限。" 虚拟机内部的用户属于客户机用户；虚拟机监视器是真正的防御控制点，文档明确指出内部特权分离不是安全边界。
+- "沙箱共享了我的本地 Docker 守护进程。" 每个沙箱均运行各自专属的 Docker Engine，宿主机不对虚拟机提供任何 Docker API。
+- "既然不依赖 Docker Desktop 运行，它就不需要账户登录。" `sbx` 虽独立于 Desktop 运行，但仍强制要求登录认证否则拒绝创建沙箱；常见问答对此有详细说明。
 
 ## Taught in
 
-The [microVM boundary section](../../../manuals/docker-sandboxes-101/sections/3-1-sbx-diagnose-and-the-microvm-boundary.md) reads the guest from inside and names the five doors, and the [MCP section](../../../manuals/docker-sandboxes-101/sections/3-6-sbx-mcp-add-load-and-static-mcp.md) shows the one server that runs on the host.
+[微虚拟机边界章节](../../../manuals/docker-sandboxes-101/sections/3-1-sbx-diagnose-and-the-microvm-boundary.md)从内部审视了客户机并指明了五扇通道之门，[MCP 章节](../../../manuals/docker-sandboxes-101/sections/3-6-sbx-mcp-add-load-and-static-mcp.md)展示了直接运行在宿主机上的那类服务。

@@ -1,6 +1,6 @@
 ---
 id: read-the-rrf-function
-title: Read the rank fusion function
+title: 读懂排名融合函数
 card: rag
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [rag/rrf-beats-score-sum]
 updated: 2026-11-03
 ---
 
-Read this fusion function from the advanced RAG lesson. Explain the `+ 1` in the denominator, say what the function ignores on purpose, and describe what happens to a document that appears in only one of the lists.
+阅读进阶 RAG 课程的融合函数。解释分母中的 `+ 1`，说明函数有意忽略了什么，再说说只出现在一个列表中的文档会怎样。
 
 ```python
 def reciprocal_rank_fusion(ranked_lists, k=60):
@@ -32,43 +32,43 @@ def reciprocal_rank_fusion(ranked_lists, k=60):
 
 ## Short answer
 
-`enumerate` starts at zero, so the `+ 1` turns the index into a rank that starts at one, and the top document gets 1/61 as the published formula defines. The function drops the score that came with each document, because ranks are the comparable unit across retrievers. A document present in one list gets one contribution and no penalty for the other, so it can still place well if it ranked high where it appeared.
+`enumerate` 从零开始，`+ 1` 将索引转为从一开始的排名，因此排第一的文档按公开公式得到 1/61。函数丢弃检索器原始分数，因为检索器之间可比较的是排名。只在一个列表中出现的文档只获得一次贡献，不因另一个列表缺失而受罚；若该列表排名高，仍可能名列前茅。
 
 ## Full answer
 
-### Walk the loop
+### 逐步阅读循环
 
-1. The outer loop visits each ranked list, for example the vector list and the BM25 list.
-2. The inner loop reads each entry as a pair and discards the second element, the retriever's own score.
-3. The contribution for a document at zero-based index `rank` is `1.0 / (k + rank + 1)`, which is one over k plus the one-based rank.
-4. Contributions sum per document id across the lists.
-5. The result is sorted by the summed contribution, highest first.
+1. 外层循环遍历每个排名列表，例如向量列表和 BM25 列表。
+2. 内层循环将条目解包为一对值，丢弃第二项，即检索器自身的分数。
+3. 从零开始的索引 `rank` 对应的贡献为 `1.0 / (k + rank + 1)`，也就是 1 除以 k 与从一开始的排名之和。
+4. 按文档 ID 累加不同列表的贡献。
+5. 按贡献总和降序排列结果。
 
-### What the caller does
+### 调用方怎样使用
 
-The hybrid search in the same lesson asks each retriever for three times the final top k, fuses the two lists and returns the first top k of the fused result. The deeper candidate lists let a document that is good in both retrievers reach the final list even when it is first in neither.
+同一课程中的混合搜索让每个检索器返回最终 top k 三倍数量的候选，融合后取前 k 个。更深的候选列表让在两种检索器中都表现不错的文档进入最终结果，即使它在任何一个列表中都不是首位。
 
-### The capstone version
+### 综合项目版本
 
-The hybrid retrieval lesson adds a `weights` list with one multiplier per ranked list, applied to each rank contribution, and raises an error when the number of weights does not match the number of lists. It also keeps a map from document id to document so it can return documents instead of ids.
+混合检索课程增加 `weights` 列表，为每个排名列表的贡献提供一个乘数；权重数量与列表数量不同就报错。它还维护文档 ID 到文档的映射，因此能返回文档而非只有 ID。
 
-### The key
+### 融合键
 
-Fusion runs on the document id. Two chunks of the same document are two keys. The capstone lesson recommends de-duplication by document, because a term that is out of vocabulary for BM25 gives a zero and the dense retriever still returns noise; per-document fusion absorbs that.
+融合以文档 ID 为键。同一文档的两个块是两个键。综合项目课程建议按文档去重：BM25 对词表外词贡献为零，稠密检索却仍返回噪声，按文档融合可吸收这类影响。
 
 ## Follow-ups
 
-- **Level 2:** What changes if you delete the `+ 1`? Expected: the top document gets 1/60 instead of 1/61, the curve shifts a little, and the constant no longer matches the published definition.
-- **Level 2:** Why does the caller fetch three times the final k from each retriever? Expected: a deeper list lets a document that ranks well in both retrievers reach the fused top k even when it is first in neither.
-- **Level 3:** How does the capstone version let you favor one retriever? Expected: a weights list with one multiplier per ranked list, applied to the rank contribution, with an error when the lengths differ.
-- **Level 3:** What is the fusion key, and why does that matter for chunks? Expected: the document id; chunks of one document are separate keys unless you de-duplicate by document, which the lesson recommends.
+- **Level 2:** 删掉 `+ 1` 会怎样？ Expected: 首篇文档得到 1/60 而非 1/61，曲线略微偏移，常数也不再符合公开定义。
+- **Level 2:** 为什么每个检索器获取最终 k 三倍的结果？ Expected: 更深列表让两个检索器中排名都不错的文档进入融合前 k 个，即使它在两边都不是第一。
+- **Level 3:** 综合项目怎样偏重某个检索器？ Expected: 为各列表提供 weights 乘数并应用于排名贡献，长度不匹配时报错。
+- **Level 3:** 融合键是什么，对文本块有何影响？ Expected: 文档 ID；除非按文档去重，同一文档的不同块会作为不同键，课程建议去重。
 
 ## Wrong answers
 
-- "The function averages the two scores." It never reads the scores; it sums a function of the ranks.
-- "A document missing from one list is penalized." It gets no contribution from that list, which is not a penalty; it can still rank first if it was first in the other.
-- "k is the number of results to keep." k is the decay constant in the denominator; the caller slices the fused list to the final top k.
+- "函数对两个分数取平均。" 它从不读取分数，而是累加排名函数值。
+- "在一个列表中缺失的文档会受罚。" 它只是没有该列表的贡献，并未扣分；另一列表排首位时仍可能最终第一。
+- "k 是保留结果数量。" k 是分母中的衰减常数；调用方另外截取最终 top k。
 
 ## Taught in
 
-The lesson [advanced RAG](../../../phases/11-llm-engineering/07-advanced-rag/) gives this function and its caller, and the lesson [hybrid retrieval](../../../phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/) adds the weights and the de-duplication advice.
+[进阶 RAG](../../../phases/11-llm-engineering/07-advanced-rag/)课程给出函数及调用方，[混合检索](../../../phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/)课程增加权重和去重建议。

@@ -1,6 +1,6 @@
 ---
 id: scaler-fit-before-split
-title: A test score that production never reaches
+title: 生产环境永远无法企及的虚高测试得分
 card: math-classical-ml
 kind: debug
 level: 2
@@ -16,50 +16,50 @@ related: [math-classical-ml/negative-r-squared, math-classical-ml/compare-two-mo
 updated: 2026-11-03
 ---
 
-A teammate standardizes the whole table with a scaler, then splits it into training, validation and test rows, and reports a test score. In production the score is well below that number. Name the fault in the pipeline and describe a setup where the test number predicts production.
+一位同事使用缩放器（scaler）标准化了整个数据表，随后将其划分为训练集、验证集和测试集，并汇报了测试集得分。在生产上线后，真实表现远低于该评测数值。请指出该流水线中的工程缺陷，并给出一套能够真实反映生产表现的评估方案。
 
 ## Short answer
 
-The scaler saw the test rows, so the mean and standard deviation carried information from the test set into training. That is data leakage, and it makes the reported score optimistic. Split first, fit every preprocessing step on the training rows only, and apply the fitted transform to the other two sets.
+特征缩放器接触了测试集样本，因此计算出的均值和标准差将测试集信息泄露进了训练过程。这就是数据泄漏，它导致汇报的评测得分虚高乐观。先划分数据集，所有预处理步骤仅在训练集样本上拟合，随后将训练好的转换参数直接应用到验证集与测试集。
 
 ## Full answer
 
-### What leaked
+### 泄漏的具体内容
 
-Standardization subtracts a mean and divides by a standard deviation. Both are statistics of the rows the scaler saw. When those rows include the test set, the training data has been shaped by the test data. The evaluation lesson names this as its first example of leakage, next to two others that hide behind the same habit: future rows in a time series that was shuffled before the split, and a feature computed from the target.
+标准化操作需要减去均值并除以标准差。这两个统计量由缩放器所观察到的全部数据行决定。当这些样本包含测试集时，测试数据就影响了训练数据的变换。模型评估课程将此列为数据泄漏的首要案例，并指出了隐藏在同样不良习惯背后的另外两个常见陷阱：在划分前被错误随机打乱的时间序列未来数据，以及直接从目标标签中计算衍生的特征。
 
-### The three sets and their jobs
+### 三个数据集的分工
 
-| Set | Share | Job |
+| 数据集 | 样本占比 | 职责 |
 |---|---|---|
-| Training | 60-70 percent | the model fits these rows |
-| Validation | 15-20 percent | choose hyperparameters and models |
-| Test | 15-20 percent | report the final score, once |
+| 训练集 | 60% 到 70% | 供模型拟合学习参数 |
+| 验证集 | 15% 到 20% | 筛选超参数与模型架构 |
+| 测试集 | 15% 到 20% | 仅在最终交付时单次评测报告 |
 
-The test set is a hold-out guarantee. After you look at its score and change the model, it is a second validation set, and its score no longer predicts unseen data.
+测试集是最终泛化能力的留出契约保证。一旦在查看测试集得分后反向调整模型，测试集就退化为了第二个验证集，其评测数值将不再能代表未见过的未知数据。
 
-### A pipeline that holds
+### 可靠的工程流水线设计
 
-1. Split before any statistic is computed. For a time series, split by time.
-2. Fit the scaler, the encoder and any imputation on the training rows. Transform the other rows with those fitted values.
-3. Inside cross-validation, repeat the fit inside each training fold. A transform fit on all rows before the folds leaks across every fold.
-4. Use a stratified split when the classes are imbalanced, so each fold keeps the class ratio.
-5. Check for duplicate rows across the splits.
-6. Touch the test set once, at the end.
+1. 在计算任何统计量之前先完成数据集划分。对于时间序列，严格按照时间先后切分。
+2. 仅在训练集数据上拟合缩放器、编码器以及任何缺失值填补器，然后用拟合好的转换规则直接转换验证集与测试集。
+3. 在交叉验证中，各折的预处理拟合必须严格限制在当前训练折内部；在划分折之前对全量数据执行的特征变换会在所有折之间引发隐蔽泄漏。
+4. 类别不平衡时采用分层采样划分，确保每个折维持一致的类别分布比例。
+5. 检查不同数据集之间是否存在重复样本行。
+6. 测试集在全流程最后仅触碰一次。
 
 ## Follow-ups
 
-- **Level 2:** How does the same fault appear inside k-fold cross-validation? Expected: a transform fit on all rows before the folds leaks across every fold; fit it inside each training fold.
-- **Level 2:** Why does reading the test score many times also inflate it? Expected: each change after a look fits the test set, so it becomes a second validation set.
-- **Level 3:** The data has a time axis. What changes in the split? Expected: split by time, so the model never trains on rows after the ones it predicts; a shuffled split lets future rows into training.
-- **Level 4:** How do you tune hyperparameters and still report an honest number? Expected: nested cross-validation with an inner loop for tuning and an outer loop for the estimate, or a validation set for tuning and a test set used once.
+- **Level 2:** 相同的缺陷在 k 折交叉验证中是如何隐蔽发生的？ Expected: 在划分折之前对整个数据集拟合转换器，会导致留出折的信息泄漏到每一个训练折；必须在每个训练折内部独立拟合变换器。
+- **Level 2:** 为什么多次查阅测试集得分并调整模型会导致指标虚高？ Expected: 每次针对测试反馈的调整都在过拟合测试集，使其退化为第二个验证集并失去留出评估效力。
+- **Level 3:** 数据包含时间序列维度时，划分策略需要做何调整？ Expected: 严格按时间先后切分，确保模型绝不在待预测时刻之后的未来数据上训练；打乱切分会导致未来样本泄露到历史训练集中。
+- **Level 4:** 如何在精细调优超参数的同时汇报诚实可信的性能指标？ Expected: 使用嵌套交叉验证（内层用于调优超参数，外层用于评估未见表现），或使用独立的验证集调优并在测试集上仅单次最终核验。
 
 ## Wrong answers
 
-- "Scaling is a harmless transform, so the order does not matter." The mean and standard deviation are statistics of the data. Fitting them on test rows moves test information into training.
-- "A leak this small cannot move the score much." The size is unknown until you remove it, and other leaks, such as a target-derived feature, hide behind the same habit.
-- "Run the test set after each change to be safe." Each look and change fits the test set, and the number stops predicting production.
+- "标准化属于无害的数值缩放，执行顺序无关紧要。" 均值和标准差是反映数据整体分布的关键统计量；在包含测试集的数据上拟合会将测试集分布信息带入训练。
+- "这么微小的泄漏对模型得分影响不大。" 在彻底修复并消除泄漏前无法预估其影响幅度，而且类似基于目标变量派生特征等严重隐患往往根植于同样的疏忽习惯。
+- "为了稳妥起见，每次微调代码后都在测试集上跑一遍验证。" 每次观察并据此调整代码都是在过拟合测试集，该指标将彻底失去对生产未知数据的预测能力。
 
 ## Taught in
 
-The [model evaluation lesson](../../../phases/02-ml-fundamentals/09-model-evaluation/) lists the common evaluation mistakes and builds the splits and the folds from scratch.
+[模型评估课程](../../../phases/02-ml-fundamentals/09-model-evaluation/)列举了常见的评估失误，并从零构建了数据集划分与交叉验证折逻辑。

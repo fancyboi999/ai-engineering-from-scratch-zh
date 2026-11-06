@@ -1,6 +1,6 @@
 ---
 id: fp8-weights
-title: When an FP8 checkpoint pays
+title: FP8 checkpoint 什么时候划算
 card: inference-serving
 kind: tradeoff
 level: 3
@@ -16,73 +16,73 @@ related: []
 updated: 2026-11-03
 ---
 
-Your Qwen/Qwen3-8B server in BF16 fits on one L4, but only with a small KV pool. The model's publisher also offers an FP8 checkpoint. When does the FP8 checkpoint pay, what does it do to speed, and what does our GSM8K check say about the cost?
+你的 Qwen/Qwen3-8B 服务器用 BF16 能放进一张 L4，但 KV 池很小。模型发布方还提供了一个 FP8 checkpoint。FP8 checkpoint 什么时候划算？它对速度有什么影响？我们的 GSM8K 检查对它的代价怎么说？
 
 ## Short answer
 
-FP8 weights store most parameters in 1 byte instead of 2, so they free memory that the engine gives to the KV pool, and on a GPU with FP8 math they also speed up the matrix work. On our clock-locked L4 with the pool held fixed, the FP8 checkpoint gave 284.7 against 208.8 output tokens per second at 32 users, 36 percent more, and cut the time per token by 30 percent. On 500 GSM8K questions it scored 90.6 percent against 91.8 in BF16, 1.2 points lower with overlapping intervals, so the run did not show a loss and cannot rule out a few points.
+FP8 权重用 1 个字节而不是 2 个字节存大部分参数，腾出的显存会被引擎分给 KV 池；在支持 FP8 运算的 GPU 上，它还会加快矩阵运算。在我们锁定频率、固定池大小的 L4 上，32 个用户时 FP8 checkpoint 每秒输出 284.7 个 token，BF16 是 208.8，多 36%，每个 token 的时间减少 30%。在 500 道 GSM8K 题上它得分 90.6%，BF16 是 91.8%，低 1.2 个百分点，两个区间重叠，所以这次运行没有显示出损失，也排除不了几个百分点的损失。
 
 ## Full answer
 
-### Serve it
+### 部署方式
 
-Serve the published checkpoint like any model, `Qwen/Qwen3-8B-FP8`, and set no flag. vLLM reads the quantization method from the checkpoint config. SGLang does the same, and a `--quantization` flag that does not match the checkpoint raises at startup, except for a few known compatible pairs. If no FP8 checkpoint exists, vLLM can quantize a BF16 model when it loads; the manual did not test that path.
+像部署任何模型一样部署这个已发布的 checkpoint，`Qwen/Qwen3-8B-FP8`，不加任何参数。vLLM 会从 checkpoint 配置里读取量化方法。SGLang 也一样，如果 `--quantization` 参数与 checkpoint 不一致，除了少数已知兼容的组合外，启动时会报错。如果没有 FP8 checkpoint，vLLM 可以在加载 BF16 模型时做量化；手册没有测试这条路径。
 
-### Know what your GPU runs
+### 弄清你的 GPU 实际在跑什么
 
-The L4 is an Ada GPU, SM 8.9, and it has FP8 math, so the matrix math runs in FP8 and the speed can rise with the free memory. GPUs before Ada, such as the A100, have no FP8 math. There vLLM keeps the weights in FP8 and runs a weight-only kernel: you keep the memory saving and expect less speed gain. The manual did not test such a GPU.
+L4 是 Ada GPU，SM 8.9，支持 FP8 运算，所以矩阵运算以 FP8 执行，因此既能腾出显存，也可能提升速度。Ada 之前的 GPU，比如 A100，不支持 FP8 运算。在那些卡上，vLLM 把权重保持为 FP8，运行 weight-only kernel：你仍然省下显存，但速度提升会更少。手册没有测试这类 GPU。
 
-### The L4 result
+### L4 上的结果
 
-The session locked at 900 MHz, two seeds each, the pool held at 24,096 tokens in both runs:
+会话锁定在 900 MHz，每组两个种子，两次运行的池都固定为 24,096 token：
 
-| Users | Median TPOT, BF16 / FP8 | Output tok/s, BF16 / FP8 | Median SM clock, BF16 / FP8 |
+| 用户数 | 中位 TPOT，BF16 / FP8 | 输出 tok/s，BF16 / FP8 | SM 中位频率，BF16 / FP8 |
 |---|---|---|---|
 | 32 | 119.9 / 83.8 ms | 208.8 / 284.7 | 881 / 900 MHz |
-| 1 | not compared / 35.3 ms | not compared / 25.4 | 210 / 900 MHz |
+| 1 | 不比较 / 35.3 ms | 不比较 / 25.4 | 210 / 900 MHz |
 
-At 32 users the seed ranges did not overlap for either number, and the BF16 clock was about 2 percent lower, much less than the gap. At one user the BF16 run fell to 210 MHz because the GPU throttled, so the two are not compared.
+32 个用户时，两个数字在不同种子下的范围都不重叠，BF16 的频率低约 2%，远小于差距本身。1 个用户时，BF16 那次因为 GPU 降频跌到 210 MHz，所以两者不做比较。
 
-### What it frees
+### 能腾出多少空间
 
-The speed test held the pool fixed, so it did not measure the larger pool. The gain in room comes from the bytes. The SGLang runs on the same L4 let the pool grow and changed the weights and the cache together: the pool went from 24,094 tokens in BF16 to 142,369 with FP8 weights and an FP8 cache, 5.91 times as many, and output at 64 users went from 250.85 to 735.91 tokens per second, because the BF16 pool was full and the FP8 pool was not. At one user FP8 was still faster, 39.66 against 60.16 ms per token, because decode reads every weight for every token and FP8 weights are half the bytes.
+速度测试固定了池大小，所以没有测到更大的池。空间上的收益来自字节数。同一张 L4 上的 SGLang 运行允许池增长，并同时换了权重和缓存：池从 BF16 的 24,094 token 增加到 FP8 权重加 FP8 cache 的 142,369 token，是原来的 5.91 倍；64 个用户时输出从每秒 250.85 个 token 增加到 735.91 个，因为 BF16 的池满了，FP8 的没有。1 个用户时 FP8 仍然更快，每个 token 39.66 ms 对 60.16 ms，因为 decode 每生成一个 token 都要读一遍所有权重，而 FP8 权重的字节数只有一半。
 
-On the GB10 with Qwen3-30B-A3B the FP8 pair did the same: the weights went from 57.75 to 29.75 GB, the load time from 323.61 to 152.29 s, and the pool from 227,243 to 1,083,008 tokens, 4.77 times as many, because the smaller weights freed memory and each token took half the bytes. Throughput was 1.73 to 1.88 times higher at every concurrency, because decode on that machine reads weights from a memory with modest bandwidth.
+在 GB10 上，Qwen3-30B-A3B 的 FP8 组合也是如此：权重从 57.75 GB 降到 29.75 GB，加载时间从 323.61 秒降到 152.29 秒，池从 227,243 token 增加到 1,083,008 token，是原来的 4.77 倍，因为更小的权重腾出了显存，每个 token 也只占一半字节。在每个并发数下，吞吐量都是原来的 1.73 到 1.88 倍，因为那台机器上的 decode 要从带宽一般的内存里读权重。
 
-### The accuracy check
+### 准确率检查
 
-The first 500 GSM8K questions, 8-shot and greedy, on the L4 on 2026-10-23:
+2026-10-23 在 L4 上跑前 500 道 GSM8K 题，8-shot，贪心解码：
 
-| Engine | Config | Correct | Accuracy | Wilson 95 percent interval |
+| 引擎 | 配置 | 答对 | 准确率 | Wilson 95% 区间 |
 |---|---|---|---|---|
-| vLLM | BF16 | 459/500 | 91.8% | 89.1 to 93.9 |
-| vLLM | FP8 weights | 453/500 | 90.6% | 87.7 to 92.9 |
-| vLLM | FP8 weights + FP8 KV | 453/500 | 90.6% | 87.7 to 92.9 |
-| SGLang | BF16 | 458/500 | 91.6% | 88.8 to 93.7 |
-| SGLang | FP8 weights | 456/500 | 91.2% | 88.4 to 93.4 |
-| SGLang | FP8 weights + FP8 KV | 460/500 | 92.0% | 89.3 to 94.1 |
+| vLLM | BF16 | 459/500 | 91.8% | 89.1 至 93.9 |
+| vLLM | FP8 权重 | 453/500 | 90.6% | 87.7 至 92.9 |
+| vLLM | FP8 权重 + FP8 KV | 453/500 | 90.6% | 87.7 至 92.9 |
+| SGLang | BF16 | 458/500 | 91.6% | 88.8 至 93.7 |
+| SGLang | FP8 权重 | 456/500 | 91.2% | 88.4 至 93.4 |
+| SGLang | FP8 权重 + FP8 KV | 460/500 | 92.0% | 89.3 至 94.1 |
 
-All intervals overlap. The run did not show a difference, and with 500 questions it cannot rule out a loss of a few points. It is one model and one benchmark. Run your own prompts on both checkpoints before production.
+所有区间都重叠。这次运行没有显示出差异，只有 500 道题，也排除不了几个百分点的损失。这只是一个模型、一个基准。上生产之前，用你自己的 prompt 在两个 checkpoint 上都跑一遍。
 
-### When it does not pay
+### 什么时候不划算
 
-- The pool has room and the GPU has no FP8 math: little gain for the risk.
-- A task that depends on long chains of reasoning: run your own check first.
-- The model still does not fit in FP8: a 4-bit checkpoint stores most weights in about half a byte, and on a 24 GB card that is the common way to serve a 14B model. A 4-bit model can lose more accuracy than FP8, and the loss depends on the model and the method.
+- 池还有空间，GPU 也不支持 FP8 运算：收益很小，却要承担风险。
+- 任务依赖很长的推理链：先做你自己的检查。
+- 模型用 FP8 仍然放不下：4-bit checkpoint 把大部分权重存成约半个字节，在 24 GB 的卡上，这是部署 14B 模型的常见方式。4-bit 模型可能比 FP8 损失更多准确率，损失多少取决于模型和量化方法。
 
 ## Follow-ups
 
-- **Level 3:** The pool was held fixed in the speed test. What did that hide, and what did it show? Expected: it hid the larger pool that FP8 frees, so the test shows only the change in speed; the gain in room comes from the bytes, and the SGLang run that let the pool grow went from 24,094 to 142,369 tokens with an FP8 cache too.
-- **Level 3:** Why was the one-user row not compared? Expected: the BF16 run fell to 210 MHz, below the 900 MHz lock, because the GPU throttled; a lock caps the clock and cannot stop a throttle, so the two runs were at different clocks.
-- **Level 4:** On the GB10 the FP8 pair nearly doubled the speed at every load, while a field report of an FP8 cache alone was a little slower per token. Reconcile the two. Expected: the GB10 decodes from a memory with modest bandwidth, so half the weight bytes gave almost twice the speed; an FP8 cache alone changes no weight bytes and adds the scale work, so it wins on capacity and not on speed per token.
+- **Level 3:** 速度测试固定了池大小。这隐藏了什么，又说明了什么？ Expected: 它隐藏了 FP8 腾出的更大的池，所以测试只说明速度的变化；空间上的收益来自字节数，允许池增长的那次 SGLang 运行在同时使用 FP8 cache 时从 24,094 token 增加到 142,369 token。
+- **Level 3:** 为什么 1 个用户那一行不做比较？ Expected: BF16 那次因为 GPU 降频跌到 210 MHz，低于 900 MHz 的锁定值；锁频只能限制频率上限，挡不住降频，所以两次运行的频率不同。
+- **Level 4:** 在 GB10 上，FP8 组合在每个负载下速度都接近翻倍，而一份只用 FP8 cache 的实际使用报告里，每个 token 反而稍慢。怎么解释这两者？ Expected: GB10 从带宽一般的内存里做 decode，权重字节减半带来了接近两倍的速度；只换 FP8 cache 不改变权重字节，还多了 scale 的计算，所以它赢在容量，不在每个 token 的速度。
 
 ## Wrong answers
 
-- "FP8 always speeds up decode." Only on a GPU with FP8 math, such as Ada, Hopper and Blackwell; on an A100 vLLM keeps the weights in FP8 and runs a weight-only kernel, so you keep the memory saving and expect less speed gain.
-- "Pass --quantization fp8 to be safe." vLLM reads the method from the checkpoint config, and in SGLang a flag that does not match the checkpoint raises at startup, so pass no flag for a published checkpoint.
-- "A 1.2 point drop on GSM8K means FP8 loses accuracy." The two intervals overlap, so this run did not show a difference; it also cannot rule out a loss of a few points, which is why you run your own prompts on both checkpoints.
-- "If FP8 is good, 4-bit is twice as good." A 4-bit model can lose more accuracy than an FP8 model, and the loss depends on the model and the method; use it when the model does not fit in FP8, such as a 14B model on a 24 GB card, and test it.
+- "FP8 总能加快 decode。" 只有在支持 FP8 运算的 GPU 上才会，比如 Ada、Hopper 和 Blackwell；在 A100 上，vLLM 把权重保持为 FP8 并运行 weight-only kernel，所以你省下了显存，速度提升会更少。
+- "为了保险，加上 --quantization fp8。" vLLM 会从 checkpoint 配置里读取量化方法，而在 SGLang 中，与 checkpoint 不一致的参数会在启动时报错，所以对已发布的 checkpoint 不要加参数。
+- "GSM8K 掉了 1.2 个百分点，说明 FP8 损失了准确率。" 两个区间重叠，所以这次运行没有显示出差异；它也排除不了几个百分点的损失，所以你要用自己的 prompt 在两个 checkpoint 上都跑一遍。
+- "FP8 好，那 4-bit 就好两倍。" 4-bit 模型可能比 FP8 模型损失更多准确率，损失多少取决于模型和量化方法；在模型用 FP8 放不下时再用它，比如在 24 GB 的卡上跑 14B 模型，并且要做测试。
 
 ## Taught in
 
-[Fit a bigger model with FP8 weights](../../../manuals/vllm-101/sections/2-5-fit-a-bigger-model-with-fp8-weights.md) and [the SGLang quantization section](../../../manuals/sglang-101/sections/4-3-quantization.md) give the L4 and GB10 runs and the GSM8K table.
+[用 FP8 权重装下更大的模型](../../../manuals/vllm-101/sections/2-5-fit-a-bigger-model-with-fp8-weights.md)和 [SGLang 量化一节](../../../manuals/sglang-101/sections/4-3-quantization.md)给出了 L4 和 GB10 上的运行结果以及 GSM8K 表。

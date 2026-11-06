@@ -1,6 +1,6 @@
 ---
 id: speculation-depth-vs-batch
-title: Speculation depth against batch size
+title: 推测深度与批大小的取舍
 card: scenarios
 kind: incident
 level: 3
@@ -26,60 +26,61 @@ source:
   - manuals/vllm-101/capture/gpu/out-l4/eagle3-long-outputs.txt
 ---
 
+
 ## Situation
 
-A team serves `Qwen/Qwen3-8B` on one L4 and wants shorter answers for its users. They turn on EAGLE3 with a trained draft and set the draft depth to 5, because a deeper draft guesses more tokens in each step. At one user the time per token almost halves, and the demo is a success.
+一个团队在一张 L4 上服务 `Qwen/Qwen3-8B`，想给用户更短的回答。他们开启了 EAGLE3，用一个训练好的草稿，并把草稿深度设为 5，因为更深的草稿每一步能猜更多 token。一个用户时，每 token 时间几乎减半，演示很成功。
 
-The load test at 32 users tells another story. Each token still arrives faster, but the server writes no more total tokens each second than it did without speculation, while the first token now takes several seconds. The team concludes that speculation does not scale and schedules its removal. A second team, which serves a model of a second family on a GB10 with the same method, reports that their gain holds at 64 users and asks what the first team did wrong.
+32 个用户的负载测试却是另一回事。每个 token 仍然来得更快，但服务器每秒写出的总 token 数并不比不开推测解码时多，而首 token 现在要好几秒。团队得出结论：推测解码无法扩展，并排期移除它。另一个团队在 GB10 上用同样的方法服务另一个系列的模型，他们报告收益在 64 个用户时仍然保持，于是来问第一个团队哪里做错了。
 
 ## Evidence
 
-- [EAGLE3 at three draft depths against no speculation, with the clock locked](evidence/depth-sweep-locked.txt)
-- [the same draft on the other engine, time per token against output on the L4](evidence/dense-model-on-l4.txt)
-- [the startup lines of the server with the draft loaded on the L4](evidence/draft-pool-cost.txt)
-- [the one warning that sets the request limit](evidence/the-silent-cap.txt)
-- [EAGLE3 with its own draft on a mixture-of-experts model on the GB10](evidence/moe-model-on-gb10.txt)
-- [the acceptance length on answers of about 2,000 tokens, both engines](evidence/acceptance-long-answers.txt)
+- [锁定时钟下，EAGLE3 三种草稿深度与不开推测解码的对比](evidence/depth-sweep-locked.txt)
+- [同一个草稿在另一个引擎上，L4 上每 token 时间与输出的对比](evidence/dense-model-on-l4.txt)
+- [L4 上加载了草稿的服务器的启动日志](evidence/draft-pool-cost.txt)
+- [设定请求上限的那一条警告](evidence/the-silent-cap.txt)
+- [GB10 上一个混合专家模型配它自己的 EAGLE3 草稿](evidence/moe-model-on-gb10.txt)
+- [两个引擎在约 2,000 token 回答上的接受长度](evidence/acceptance-long-answers.txt)
 
 ## Questions
 
-1. Why does a deeper draft pay at one user and cost at 32? Name what a wrong guess spends in each case.
-2. From the depth sweep, which depth wins at 32 users and which at one user, and how do you know that the gain is real and not noise?
-3. On the L4 each token got faster at every load, and the output stopped growing from 32 users. Which two startup lines explain that, and what does each one cost?
-4. On the GB10, an MoE model with its own EAGLE3 draft kept its gain at 64 users. The model, the draft and the card all changed. Which change do you think explains most of the result, and how would you test it?
-5. Acceptance stayed between 2.32 and 2.69 tokens per step on long answers. Why would you still measure it on the longest answers that your users get?
-6. Design the rollout: which depth, which limits you set by hand, which metrics you read, and which runs come before production.
+1. 为什么更深的草稿在一个用户时有回报，在 32 个用户时却有代价？说出两种情况下猜错一次各花掉了什么。
+2. 从深度扫描看，32 个用户时哪个深度胜出？一个用户时呢？你怎么知道收益是真的，不是噪声？
+3. 在 L4 上，每个负载下每个 token 都变快了，而输出从 32 个用户起不再增长。哪两行启动日志解释了这一点？各自的代价是什么？
+4. 在 GB10 上，一个配了自己的 EAGLE3 草稿的 MoE 模型在 64 个用户时保住了收益。模型、草稿和卡都变了。你认为哪项变化解释了大部分结果？你会怎样验证？
+5. 长回答上，接受长度保持在每步 2.32 到 2.69 个 token。为什么你仍要在用户拿到的最长回答上测量它？
+6. 设计上线方案：用哪个深度、手动设定哪些上限、读哪些指标、上线前先跑哪些运行。
 
 ## Walkthrough
 
-A draft model guesses the next tokens, and the target model checks all the guesses in one pass. At one user the GPU has spare compute in each step, so the extra guesses are almost free and each accepted guess is a token that the target did not have to compute alone. At 32 users each step is already full, and every wrong guess takes compute from a real token of another user.
+草稿模型猜接下来的 token，目标模型在一次前向中检查所有猜测。一个用户时，GPU 每一步都有空闲算力，所以多出来的猜测几乎是免费的，每一个被接受的猜测都是目标模型不必单独计算的 token。32 个用户时，每一步都已经满了，每一个猜错的 token 都从另一个用户的真实 token 那里拿走算力。
 
-The depth sweep shows that trade with the clock locked at 900 MHz. At 32 users the run without speculation gave 208.8 tokens per second. Depth 1 gave 271.1, depth 3 gave 333.6 and depth 5 gave 289.5. Depth 3 is 1.6 times the baseline, and its seed range did not overlap with any other config. Depth 5 lost output against depth 3, so its extra guesses cost more than they gave. At one user depth 3 cut the time per token from 39.4 to 27.8 ms against depth 1, and depth 5 at 26.2 ms tied with it inside the seed spread. The one-user run without speculation fell to 210 MHz, below the lock, so it is left out of the comparison. One more cost hides in the median: the ITL at 32 users rose from 84 ms to 133 ms at depth 3, because each step now delivers several tokens at once and the stream arrives in larger, less frequent groups.
+深度扫描在时钟锁定在 900 MHz 的情况下展示了这种权衡。32 个用户时，不开推测解码的运行每秒 208.8 token。深度 1 为 271.1，深度 3 为 333.6，深度 5 为 289.5。深度 3 是基线的 1.6 倍，它的种子范围与其他任何配置都不重叠。深度 5 的输出比深度 3 少，所以它多出来的猜测花掉的比带来的多。一个用户时，深度 3 把每 token 时间从深度 1 的 39.4 ms 降到 27.8 ms，深度 5 为 26.2 ms，在种子波动范围内与深度 3 持平。一个用户、不开推测解码的那次运行降到了 210 MHz，低于锁定值，所以不参与比较。中位数里还藏着一项代价：32 个用户时，深度 3 的 ITL 从 84 ms 升到 133 ms，因为现在每一步一次交付几个 token，流以更大、更稀疏的批次到达。
 
-The second listing is the other engine with the same draft on the same card. Each token came out 1.6 to 2.3 times faster at every load. At 32 users the output was 269.42 against 270.11 tokens per second without the draft, a ratio of 1.00, and at 64 users 245.34 against 250.85. The startup lines explain it. With the draft loaded, the KV pool held 9,951 tokens against 24,094 without it, about 15 of our 640-token requests, because the draft took its share of the card. And the server set `max_running_requests=48` by itself. The fourth listing is the warning that does it: when nobody sets the limit, the engine resets it to 48 for speculative decoding, prints that once, and the line scrolls away. At 32 users the first token took 8,040 ms with the draft against 2,970 ms without, because the pool held about 15 requests and the rest waited.
+第二份记录是同一个草稿在同一张卡上用另一个引擎。每个负载下，每个 token 都快了 1.6 到 2.3 倍。32 个用户时，输出为每秒 269.42 token，不加草稿时为 270.11，比值 1.00；64 个用户时为 245.34 对 250.85。启动日志解释了原因。加载草稿后，KV 池能容纳 9,951 个 token，不加草稿时为 24,094，也就是大约 15 个我们 640 token 的请求，因为草稿占用了显存。服务器还自己设了 `max_running_requests=48`。第四份记录就是做这件事的那条警告：没人设定上限时，引擎会为推测解码把它重设为 48，只打印一次，然后这一行就滚走了。32 个用户时，加草稿的首 token 为 8,040 ms，不加时为 2,970 ms，因为池子只放得下大约 15 个请求，其余的都在等。
 
-The GB10 run is the counterexample, with a caveat: that run used another model, another draft and another card, so it does not isolate the architecture. On a mixture-of-experts model the time per token fell by 1.56 times or more at every load, with a peak of 1.89 times at 32 and 1.84 at 64, and the acceptance length stayed between 2.71 and 2.74 tokens per step. A dense model reads all its weights in each step, so a larger batch already uses the spare compute that speculation needs. A mixture-of-experts model reads only the experts that the tokens of the step chose, and the verify pass scores four positions per request with the expert weights that it already read. Even there the cap bit: at 64 users the output was 276.32 against 235.38, but the median first token was 7,772 ms against 557 ms, because 48 requests ran and 16 waited.
+GB10 的运行是反例，但有一个前提：那次运行用的是另一个模型、另一个草稿和另一张卡，所以它没有把架构单独分离出来。在一个混合专家模型上，每个负载下每 token 时间都降低了 1.56 倍或更多，32 个用户时峰值为 1.89 倍，64 个用户时为 1.84 倍，接受长度保持在每步 2.71 到 2.74 个 token。稠密模型每一步都要读全部权重，所以更大的批次已经用掉了推测解码需要的空闲算力。混合专家模型只读这一步的 token 选中的专家，验证前向用已经读进来的专家权重为每个请求的四个位置打分。即便在那里，上限也起了作用：64 个用户时输出为 276.32 对 235.38，但首 token 中位数为 7,772 ms 对 557 ms，因为 48 个请求在运行，16 个在等待。
 
-The last listing is the acceptance on long answers at 8 users: 2.68 and 2.32 tokens per step on two datasets for one engine, 2.69 and 2.35 for the other, with the first draft position accepted 0.77 and 0.67 of the time and each later position less. It did not fall from 128-token answers to answers of about 2,000 tokens. That is our measurement, on two datasets. A 2026 study of reasoning answers that ran toward 20,000 tokens found the acceptance length fall from about 3.7 to about 1.5, and another found that synthetic prompts overstate the gain of real prompts. So the number to trust is the one from your own longest answers.
+最后一份记录是 8 个用户时长回答上的接受长度：一个引擎在两个数据集上为每步 2.68 和 2.32 个 token，另一个为 2.69 和 2.35，第一个草稿位置的接受率为 0.77 和 0.67，后面的位置更低。从 128 token 的回答到约 2,000 token 的回答，它没有下降。这是我们在两个数据集上的测量。2026 年一项针对长达约 20,000 token 推理回答的研究发现，接受长度从约 3.7 降到约 1.5；另一项研究发现，合成 prompt 夸大了真实 prompt 上的收益。所以值得信任的数字，是来自你自己最长回答的那个。
 
 ## Resolution
 
-For this model and draft on the L4, the right depth is 3. With the clock locked it gave 1.6 times the output at 32 users and tied depth 5 at one user, while depth 5 lost output under load. The first team measured depth 5 at one user and read that result as a property of speculation.
+对 L4 上的这个模型和草稿，正确的深度是 3。锁定时钟时，它在 32 个用户时给出 1.6 倍的输出，在一个用户时与深度 5 持平，而深度 5 在负载下损失了输出。第一个团队在一个用户时测了深度 5，然后把那个结果当成了推测解码本身的属性。
 
-Two settings decided the load test, and neither was the draft depth. The draft shrank the pool to 9,951 tokens, which holds about 15 of the 32 requests, and the engine capped the running requests at 48 without being asked, which binds at 64 users. Read the pool line and the cap warning after you load a draft, set `--max-running-requests` yourself, and count how many of your requests fit in the smaller pool. Then measure on your own traffic without `--ignore-eos`: the acceptance from the draft and accepted token counters, the median time per token and the output, and the P99 ITL and P99 TTFT, because a better median can hide a worse tail. Lock or record the clock for every pair. The second team was right for their machine and wrong to generalize: on a mixture-of-experts model the gain held as the batch grew, and on a dense 8B model it did not.
+决定负载测试结果的是两个设置，而且都不是草稿深度。草稿把池子缩小到 9,951 个 token，只放得下 32 个请求中的约 15 个；引擎在没人要求的情况下把运行中请求上限设为 48，这个上限在 64 个用户时起作用。加载草稿后，读池子那一行和上限警告，自己设定 `--max-running-requests`，并算一算你的请求有多少个能放进更小的池子。然后在你自己的流量上不加 `--ignore-eos` 测量：草稿 token 和被接受 token 计数器给出的接受长度、每 token 时间中位数和输出、P99 ITL 和 P99 TTFT，因为更好的中位数可能掩盖更差的尾部。每一对运行都锁定或记录时钟。第二个团队对他们的机器来说是对的，错在推而广之：在混合专家模型上，收益随批次增大而保持；在稠密的 8B 模型上则不然。
 
 ## Wrong turns
 
-- "A deeper draft always gives more tokens per step." At 32 users depth 5 gave 289.5 tokens per second and depth 3 gave 333.6. Past the depth that the acceptance supports, each extra guess is compute taken from another user.
-- "Speculation does not scale, remove it." The output tie on the dense model came from a pool of 9,951 tokens, not from the draft. At 32 users the cap of 48 did not bind; at 64 users it did. The mixture-of-experts model kept 1.84 times at 64 users.
-- "Compare against the run without speculation at one user too." That run fell to 210 MHz while the others held 900. A clock gap that large hides the effect, so the row is left out.
-- "The acceptance from the 128-token benchmark is the acceptance we will see." Our long answers held it, but a study of answers toward 20,000 tokens saw it fall from about 3.7 to about 1.5. Measure your own tail.
-- "Raise the running request limit and the queue disappears." The pool holds about 15 requests of 640 tokens. A higher limit does not add memory, it adds waiting on a different line of the log.
+- "草稿越深，每步的 token 总是越多。" 32 个用户时，深度 5 每秒 289.5 token，深度 3 为 333.6。超过接受长度能支撑的深度后，每多猜一次，都是从别的用户那里拿走算力。
+- "推测解码无法扩展，移除它。" 稠密模型上输出持平，是因为池子只有 9,951 个 token，不是因为草稿。32 个用户时 48 的上限没有起作用；64 个用户时起作用了。混合专家模型在 64 个用户时保住了 1.84 倍。
+- "一个用户时也和不开推测解码的运行比一比。" 那次运行降到了 210 MHz，其他运行都保持在 900。这么大的时钟差距会掩盖效果，所以这一行不用。
+- "128 token 基准测试上的接受长度，就是我们会看到的接受长度。" 我们的长回答保住了它，但一项针对长达约 20,000 token 回答的研究看到它从约 3.7 降到约 1.5。要测你自己的尾部。
+- "提高运行中请求上限，队列就没了。" 池子只放得下约 15 个 640 token 的请求。更高的上限不会增加内存，只会让等待出现在日志的另一行。
 
 ## Generalize
 
-A feature that spends idle capacity pays when the capacity is idle and costs when it is not, so its value is a function of the load, the model architecture and the memory it takes, not a property of the feature. Measure it across the load range you serve, read every startup line that a new component changes, and treat a default that a component sets for you as a setting you now own.
+一个消耗空闲资源的功能，在资源有余量时有收益，没有余量时就会带来代价。所以它的价值取决于负载、模型架构和它占用的内存，而不是功能本身的属性。要在你服务的整个负载范围内测量它，读每一行被新组件改变的启动日志，并把组件替你设的默认值当成一个现在归你管的设置。
 
 ## Taught in
 
-The vLLM manual sweeps the depth in [the EAGLE3 page](../../../manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md) and explains the check in [the speculative decoding page](../../../manuals/vllm-101/sections/8-7-how-speculative-decoding-checks-drafts.md), and the SGLang manual measures the dense and the mixture-of-experts case and names the request limit in [its speculative decoding page](../../../manuals/sglang-101/sections/4-4-speculative-decoding.md).
+vLLM 手册在 [EAGLE3 页](../../../manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md)扫描了深度，在[推测解码页](../../../manuals/vllm-101/sections/8-7-how-speculative-decoding-checks-drafts.md)解释了检查过程，SGLang 手册在[它的推测解码页](../../../manuals/sglang-101/sections/4-4-speculative-decoding.md)测量了稠密模型和混合专家模型两种情况，并指出了请求上限。

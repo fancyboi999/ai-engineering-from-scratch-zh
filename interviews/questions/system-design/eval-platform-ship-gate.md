@@ -1,6 +1,6 @@
 ---
 id: eval-platform-ship-gate
-title: Design the gate that decides whether a model ships
+title: 设计决定模型是否准予上线的评估门禁平台
 card: system-design
 kind: design
 level: 3
@@ -16,54 +16,54 @@ related: [system-design/pipeline-rollback-plan, system-design/finetune-pipeline-
 updated: 2026-11-03
 ---
 
-A team trains and aligns models in a multi-stage pipeline and ships the result to serving. Design the evaluation platform that decides whether an artifact is shippable: what it reads, what a gate is, which two gates catch most disasters, how it handles a failed gate, and how a third party replays a decision.
+一个团队在多阶段流水线中训练和对齐模型，并将最终产物发布上线提供推理服务。请设计决定模型产物是否具备发布资格的评估平台：它读取什么数据、门禁的定义是什么、哪两道门禁能拦截大部分严重问题、门禁未通过时如何处理，以及第三方如何完全复现某次发布决策。
 
 ## Short answer
 
-The platform reads a manifest that describes the run completely, with a seed, a code revision, and an input and output hash for every stage, and it evaluates numeric gates that were written before the run started. A regression gate holds the new model to the previous one on core benchmarks and catches training bugs; a KL budget gate caps how far the aligned policy drifted from its reference and catches alignment overcooking. A failed gate holds the run for a named reviewer whose override is logged in the manifest, and anyone can replay the decision because the eval report is content-addressed and the eval data hash is part of it.
+评估平台读取完整描述单次运行的清单文件，包含随机种子、代码版本，以及每个阶段的输入和输出内容哈希，并评估训练启动前预设的数值门禁。回归门禁要求新模型在核心基准评测上不低于上一版本，用于拦截训练缺陷；KL 散度预算门禁限制对齐策略相对于参考模型的漂移上限，用于拦截对齐过度。门禁未通过时将挂起当前运行，等待指定责任人裁决，且任何特批放行都会连同姓名落盘记入清单；任何人均可复现该决策，因为评估报告采用内容寻址存储，且评估测试集的数据哈希本身就是报告不可分割的一部分。
 
 ## Full answer
 
-### What the platform reads
+### 平台读取的数据
 
-The manifest is the single file that describes the run well enough to replay it: pipeline version, seed, code revision, and per stage a recipe, an input hash, an output hash, wall clock and cost. The output hash of one stage is the input hash of the next, so a corrupted or swapped artifact stops the pipeline before any evaluation. Artifacts are typed: an eval report carries benchmark scores, regression diffs and the hash of the eval data, so a report cannot be confused with a checkpoint or attached to the wrong model.
+清单文件足以完整重放单次运行：流水线版本、随机种子、代码版本，以及每个阶段对应的训练配方、输入哈希、输出哈希、运行时长与资金成本。上一阶段的输出哈希严格对应下一阶段的输入哈希，因此任何被损坏或被调换的产物在进入评估前就会导致流水线中断。产物有严格类型定义：评估报告包含基准得分、性能回归差异比对以及评估测试集的数据哈希，因此评估报告不会与模型检查点混淆，也不会被挂接给错误模型。
 
-### Gates
+### 门禁规则
 
-Every gate is a numeric threshold written before training starts, for example a core benchmark at least the baseline plus 0.5, a coding benchmark at least the baseline plus 1.0, a truthfulness benchmark with no drop, a safety refusal rate at most 0.05, a KL from the reference at most 25.0, and a total cost at most 50000. No "looks good" gates and no subjective sign-offs. If every gate passes the artifact is marked shippable; if any fails the run is held.
+每道门禁都是在训练开始前就已确定的数值阈值。例如：核心能力基准不低于基线加 0.5、代码能力基准不低于基线加 1.0、真实性基准绝不下降、安全拒绝率不高于 0.05、相对于参考模型的 KL 散度至多 25.0，以及总成本预算不超过 50000。没有“看起来不错”的门禁，没有主观签字放行。所有门禁通过后，将产物标记为可发布；任何一项未通过则立即挂起运行。
 
-### The two gates that matter most
+### 最重要的两道关键门禁
 
-- Regression: the new model must be at least as good as the previous one on the core set. This catches training bugs, bad data mixes and broken tokenizers.
-- KL budget: the aligned policy must not drift further than a set amount from its reference. This catches alignment that overcooked the model into a narrow behavior.
+- 回归门禁：新模型在核心测试集上的得分必须不低于前一版本。这能精准拦截训练缺陷、不良数据配比以及分词器异常。
+- KL 散度预算门禁：经过对齐的模型策略与参考模型之间的漂移量不得超过预设上限。这能拦截因对齐过度而导致模型行为狭隘退化的严重问题。
 
-Every production pipeline has both.
+每条生产流水线都包含这两道门禁。
 
-### Contamination
+### 数据污染拦截
 
-A gate that compares the eval data hash against the training shards by exact match or long n-gram overlap, and fails when the overlap passes a small fraction, keeps a benchmark gain honest. The pipeline lesson's exercise sets that fraction at 0.1% with 13-gram matching.
+门禁系统通过精确匹配或长 n-gram 重叠度对比评估测试集哈希与训练分片，一旦重叠比例超过极小阈值即判定门禁失败，从而确保基准提升真实可信。完整流水线课程练习中将该阈值设定为 13-gram 匹配下重叠度不超过 0.1%。
 
-### Holds, overrides and replay
+### 挂起、人工特批与决策复现
 
-A held run is a decision point, not a failure. A named reviewer either approves the rollback or overrides, and the override is written into the manifest with the name. Replay works because the manifest, the content-addressed eval report and the eval data hash identify the exact inputs; a teammate on another continent runs the gate against the same hashes and must get the same verdict. Reproducible is not deterministic: weights can differ at the level of small rounding between runs, so replay checks hashes and headline metrics, not bit-identical tensors.
+运行被挂起是一个明确的决策节点，而非系统故障。指定的责任人可以批准回滚或执行特批放行，特批记录会连同责任人姓名直接写入清单文件。决策之所以可复现，是因为清单文件、基于内容寻址的评估报告以及评估数据集哈希锁定了全部输入要素；在另一个大洲的同事针对相同的哈希运行门禁，必须得到完全相同的裁决结论。可复现性并不等于逐位确定性：不同运行间的权重可能会有微小的浮点舍入差异，因此复现校验的是内容哈希与核心指标，而非要求张量二进制完全一致。
 
-### Where the platform plugs in
+### 平台的接入位置
 
-The gate runs after evaluation and after quantization, because quantized weights must pass the same thresholds as the full model. The three commands are plan, run and gate; plan is free and catches missing thresholds and stale hashes before any compute is spent.
+评估门禁在基准评估之后和模型量化之后执行，因为量化后的权重同样必须达到与全精度模型完全相同的阈值要求。标准操作分为规划、运行和门禁三个命令；规划命令完全免费，可在消耗任何算力之前提前发现缺失的阈值与失效的过期哈希。
 
 ## Follow-ups
 
-- **Level 3:** Why must the thresholds be written before the run? Expected: a threshold chosen after seeing the scores is moved to pass the model; a gate is only a gate if it can fail.
-- **Level 3:** A change to the eval set invalidates what? Expected: only the ship decision; the eval data hash changes, the report is recomputed, and the training artifacts stay valid.
-- **Level 4:** The quantized model passes every gate except the safety refusal rate, which rose slightly. What do you ship? Expected: nothing without a logged override; the gate exists for the serving artifact, and the lesson's recipe keeps safety evals on a higher-precision quantization where deltas matter.
-- **Level 4:** How does the platform stop a model trained through the wrong stage from reaching the gate? Expected: typed artifacts and typed stage signatures, so a preference-tuned checkpoint cannot be fed into the supervised path and the mismatch fails at plan time.
+- **Level 3:** 为什么阈值必须在训练开始前以书面形式定好？ Expected: 在看到测试得分后拟定的阈值会被人为移动以放行模型；门禁唯有在具备失败可能性时才算真正的门禁。
+- **Level 3:** 对评估测试集的变动会导致什么失效？ Expected: 仅导致上线发布决策失效；评估数据集哈希改变后只需重新计算评估报告，而之前的训练产物依然有效。
+- **Level 4:** 量化模型通过了其他所有门禁，仅安全拒绝率出现微弱上升，该如何处置？ Expected: 在未记录特批之前绝不上线；门禁直接针对最终提供服务的产物生效，且课程规范建议在对细微差异敏感的安全评估上保留更高精度的量化方案。
+- **Level 4:** 平台如何防止跨阶段错误训练的模型混入门禁？ Expected: 依托强类型的产物与强类型的阶段签名机制，例如偏好对齐的检查点无法作为监督微调路径的输入，类型不匹配在规划阶段就会直接报错。
 
 ## Wrong answers
 
-- "Have a reviewer look at samples and sign off." Subjective sign-offs are not gates; a gate is a number that can fail, and the reviewer's role is the logged override.
-- "Rerun training to confirm a result." Pre-training costs weeks; replay checks hashes and metrics against the manifest instead.
-- "One benchmark is enough if it is the right one." The regression set and the KL budget catch different failures, and a safety gate catches a third.
+- "安排评审人员抽检几个回答样本并签字批准。" 主观签字不是门禁；门禁是能够触发失败的客观数值，评审人员的角色是记录特批放行。
+- "重新跑一遍训练以证实该结果。" 预训练往往需要耗费数周；复现应直接核对清单中的哈希与指标。
+- "只要评测基准足够好，单凭一个基准就够了。" 回归测试集与 KL 散度预算拦截的是不同类型的问题，而安全门禁防范的又是第三类风险。
 
 ## Taught in
 
-The [complete LLM pipeline lesson](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/) defines the manifest, the typed artifacts, the eval gate and the override and replay rules.
+[构建完整 LLM 流水线课程](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/)定义了清单文件、类型化产物、评估门禁以及特批与复现规则。

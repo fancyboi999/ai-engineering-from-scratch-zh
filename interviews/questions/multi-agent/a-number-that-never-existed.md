@@ -1,6 +1,6 @@
 ---
 id: a-number-that-never-existed
-title: A number that never existed reached the final report
+title: 一个从未存在过的数字流向了最终报告
 card: multi-agent
 kind: debug
 level: 2
@@ -16,49 +16,49 @@ related: [multi-agent/two-workers-return-different-facts]
 updated: 2026-11-03
 ---
 
-Three agents share a memory on a research task. A retrieval agent reads a page and writes that a study found a 42 percent improvement. The page says 4.2 percent. A summarizer builds on the entry, an analyst recommends adoption on the strength of the number, and the final report cites it. No agent crashed and no test failed. What is this failure called, why is it structural, and what are the three changes that stop it?
+三个 agent 在一项调研任务中共用同一份共享记忆。检索 agent 读取了一个网页，并在记忆中记录某项研究获得了 42% 的提升。而原始网页记载的其实是 4.2%。总结 agent 基于该条目展开总结，分析 agent 依据该显著数据建议采纳该方案，最终报告也直接引用了该数字。整个过程中没有任何 agent 崩溃，也没有任何测试报错。这种故障被称为什么，为什么它是结构性的，哪三项改动能够制止它？
 
 ## Short answer
 
-This is memory poisoning. One agent's hallucination entered the shared state, and every agent downstream read it as a verified fact, so the error was turned into evidence as it moved. It is structural because any shared memory without provenance and without an independent verifier will do this eventually. The three changes are provenance on every write, an append-only log where corrections supersede instead of overwrite, and at least one read-only verifier that re-fetches sources and reports on a separate channel.
+这被称为记忆投毒（memory poisoning）。某个 agent 的幻觉进入了共享状态，下游的每一个 agent 都将其作为经验证的事实读取，因此该错误在流转中被不断转化为证据。它是结构性的，因为任何没有溯源和独立校验器的共享记忆最终都会出现这种情况。三项改动是：每次写入附加溯源凭据（provenance）、采用仅追加日志，修正时标明替代关系而不覆盖原条目，以及至少一个重新获取源数据并在独立频道上报告的只读校验器。
 
 ## Full answer
 
-### Why it is worse than a crash
+### 为什么它比崩溃更严重
 
-Without shared state, the retrieval agent's error stays in its own context, and a downstream agent that re-fetches the page might catch it. With shared state, the first agent's context becomes everyone's context. The symptom is a slow decay of accuracy, not a failure. By the time a human notices, the reasoning chain is several steps deep and the root cause is one of the first entries ever written. The lesson places this family second in the measured taxonomy of multi-agent failures.
+在没有共享状态的情况下，检索 agent 的错误留在自己的上下文中，重新获取该页面的下游 agent 可能会发现它。有了共享状态，第一个 agent 的上下文就变成了所有人的上下文。其症状是准确率的缓慢衰退，而不是故障崩溃。等到人类注意到时，推理链已经延伸了数步，而根因是最早写入的条目之一。课程将该类别列在测得的多 agent 故障分类法的第二位。
 
-### The three mitigations
+### 三项缓解措施
 
-| Change | What it does |
+| 改动 | 效果 |
 |---|---|
-| Provenance on every write | Each entry records who wrote it, when, under what prompt, and which source it cites, so a downstream reader can weigh an entry by where it came from |
-| Append-only with supersession | A correction is a new entry that points at the one it replaces, so the audit trail stays and a reader can see that a value was contested |
-| A read-only verifier | An agent that reads the pool, re-fetches the cited sources, flags a mismatch, and has no write handle to the pool |
+| 每次写入附加溯源凭据 | 每条记录包含其编写者、时间、在什么 prompt 下编写以及引用的源，以便下游读者根据来源权衡条目 |
+| 仅追加，并标明替代关系 | 修正是一条指向被替代条目的新条目，因此审计追踪得以保留，读者可以看出某个值曾受争议 |
+| 只读校验器 | 一个读取池、重新获取引用源、标记不匹配且对池没有写入句柄的 agent |
 
-In the lesson's demo the verifier finds that the entry does not match the fetched text, the entry is flagged, and the analyst sees the flag before it writes its verdict.
+在课程演示中，校验器发现该条目与获取的文本不匹配，条目被标记，分析 agent 在给出结论前看到了该标记。
 
-### Why the verifier must not write
+### 为什么校验器绝不能写入
 
-If the verifier's output goes back into the pool, a poisoned pool poisons the verifier, and the verifier's verdicts carry the poison further. Its findings go to a human or to a separate decision agent on their own channel. It can still be fooled by a bad entry, but it checks each entry against the original source, and its mistakes never become shared facts.
+如果校验器的输出返回池中，被投毒的池就会污染校验器，且校验器的结论会进一步传播毒害。其发现通过独立频道传递给人类或单独的决策 agent。它仍可能被不良条目误导，但它根据原始源检查每个条目，其错误绝不会成为共享事实。
 
-### What to monitor
+### 监控什么
 
-Log the share of writes that supersede an earlier entry. A rising share is early evidence that agents are correcting each other more often, which is how poisoning shows up before anyone reads a wrong report.
+记录替代早期条目的写入占比。不断上升的比例表明各个 agent 正在更频繁地相互修正，这是在任何人读到错误报告之前投毒现象暴露的方式。
 
 ## Follow-ups
 
-- **Level 2:** Why does provenance help a reader who cannot re-fetch the source? Expected: the reader can see that one claim rests on one retrieval with no citation, and weigh it lower than a claim with a source and a verifier flag.
-- **Level 2:** What does the analyst do when it sees a flag on the entry it depends on? Expected: it withholds the recommendation or writes it with the flag attached, and the final report carries a retraction instead of the number.
-- **Level 3:** Which of the three changes would topic partitioning of the memory replace? Expected: none, because partitions limit which agents read an entry, and a poisoned entry in one topic still poisons everyone subscribed to it.
-- **Level 3:** The verifier itself hallucinates a mismatch. What is the damage? Expected: a false flag on a correct entry, which a human on the verification channel can clear, and no new false fact in the pool because the verifier cannot write.
+- **Level 2:** 为什么溯源对无法重新获取源的读者有帮助？ Expected: 读者能看出某个论断依赖于一次未引证的检索，从而给予它比带有来源和校验器标记的论断更低的权重。
+- **Level 2:** 当分析 agent 看到其依赖的条目带有标记时，它会怎么做？ Expected: 暂缓给出建议或在附带标记的情况下编写建议，最终报告包含撤回声明而不是该数字。
+- **Level 3:** 记忆的主题分区会替代上述三项改动中的哪一项？ Expected: 一项都不能，因为分区仅限制哪些 agent 读取条目，某个主题中被投毒的条目仍会污染所有订阅者。
+- **Level 3:** 校验器自身幻觉出不匹配，会造成什么破坏？ Expected: 正确条目上的错误标记，可由校验频道上的人类清除，且由于校验器不能写入，池中不会引入新的虚假事实。
 
 ## Wrong answers
 
-- "Add a line to every prompt that says to verify numbers." The summarizer and the analyst had no source to verify against, only the shared entry, and a prompt does not give them one.
-- "Let the verifier correct the entry in place." An in-place correction destroys the audit trail and gives the verifier a write handle that a poisoned pool can turn against it.
-- "Switch from a shared pool to passing messages." Messages are shared state with extra copying, and a wrong number in a message poisons the receiver the same way.
+- "在每个 prompt 中加上核实数字的要求。" 总结者和分析者没有源可供核对，只有共享条目，prompt 无法为它们提供源。
+- "让校验器就地修正条目。" 就地修正会破坏审计追踪，并赋予校验器一个写句柄，被投毒的池可以反向利用它。
+- "从共享池切换到传递消息。" 消息不过是多复制了几次的共享状态，消息中的错误数字以同样方式污染接收者。
 
 ## Taught in
 
-The [shared memory lesson](../../../phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/) runs the poisoning scenario with and without the read-only verifier.
+[共享内存课程](../../../phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/)展示了在有和没有只读校验器情况下的投毒场景。

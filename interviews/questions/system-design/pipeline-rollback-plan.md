@@ -1,6 +1,6 @@
 ---
 id: pipeline-rollback-plan
-title: Write the rollback plan before the training run starts
+title: 在训练启动前制定好回滚应对方案
 card: system-design
 kind: tradeoff
 level: 4
@@ -16,53 +16,53 @@ related: [system-design/eval-platform-ship-gate, system-design/finetune-pipeline
 updated: 2026-11-03
 ---
 
-A twelve-stage training pipeline runs from tokenizer to inference server, and the pre-training stage costs weeks and millions of dollars. Before the run starts you must write what happens when each stage fails. Lay out the plan, explain how the orchestrator computes what to rerun, and say what "reproduce the run" can and cannot promise.
+一条包含十二个阶段的模型训练流水线贯穿了从分词器构建到推理服务上线的全过程，其中预训练阶段耗时数周且资金消耗达数百万美元。在流水线正式启动前，你必须预先写明每个阶段发生失败时的具体应对方案。请梳理该计划：解释编排调度器如何精准计算需要重跑的阶段集合，并说明“复现运行”到底能承诺什么、不能承诺什么。
 
 ## Short answer
 
-Sort the stages by the cost to rerun them: tokenizer, evaluation, quantization and the server are cheap and rerun in hours, supervised tuning and alignment take days, so the base checkpoint is kept and only those stages rerun, and pre-training takes weeks and a budget in the millions, so the plan is the last good checkpoint plus revised downstream stages. The rerun set falls out of the typed, hashed dependency graph: invalidate the failed stage and every descendant. A replay promises the same code, recipe and source data hashes and the same headline metrics, not bit-identical weights or the same output hashes.
+按重跑代价高低给各阶段分级：分词器、模型评估、量化和推理服务器属于轻量级，耗时数小时，失败后直接重新运行；监督微调与对齐阶段属于中量级，耗时数天，失败后保留预训练基座检查点仅重跑对齐链路；预训练阶段耗时数周且成本数百万，失败后回滚至上一版完好的检查点并修正下游阶段。重跑集合由基于类型与哈希的依赖图天然计算得出：使失败的阶段及其所有下游衍生子节点失效。重现运行承诺的是相同的代码、配方和源数据哈希，以及相同的核心指标，而不是逐位完全相同的权重或相同的输出哈希。
 
 ## Full answer
 
-### Three cost classes
+### 三大成本层级
 
-| Class | Stages | Plan on failure |
+| 成本层级 | 包含的阶段 | 失败时的应对方案 |
 |---|---|---|
-| Cheap, hours | Tokenizer, eval, quantization, inference server | Rerun |
-| Medium, days | SFT, DPO, constitutional refinement | Keep the base model, rerun alignment |
-| Expensive, weeks and millions | Pre-training | Last good checkpoint plus revised downstream stages |
+| 轻量级，耗时数小时 | 分词器、模型评估、量化、推理服务器 | 直接重新运行 |
+| 中量级，耗时数天 | 监督微调、DPO、宪法式对齐细化 | 保留预训练基座，仅重跑对齐链路 |
+| 重量级，耗时数周且花费数百万 | 预训练阶段 | 回退至上一版有效检查点并修正下游阶段 |
 
-Writing this before the run means nobody improvises at four in the morning with an exhausted team.
+在运行前以书面形式写明，意味着没有人会在凌晨四点团队精疲力竭时仓促临时应对。
 
-### How the rerun set is computed
+### 如何计算重跑集合
 
-Every stage has typed inputs and outputs, and the output hash of a stage is the input hash of the next. A failure at the SFT stage invalidates it and every descendant: the reward model, the DPO policy, the refined policy, the eval report, the quantized weights and the server, which is stages six through twelve. A failure at quantization invalidates only quantization and the server. The orchestrator reads the graph from the manifest, so the rollback set is computed, not remembered. A change to the tokenizer invalidates everything downstream; a change to the eval set invalidates only the ship decision.
+每个阶段都具备强类型的输入与输出，且某个阶段的输出哈希严格作为下一阶段的输入哈希。监督微调阶段发生失败，会直接导致它本身及其所有下游子节点失效：包括奖励模型、DPO 策略、细化策略、评估报告、量化权重以及推理服务，即第六至第十二阶段。而量化阶段失败，仅仅导致量化本身和推理服务两个阶段失效。编排调度器直接从清单文件中解析依赖图，因此回滚集合是自动计算出来的，无需靠人工记忆。修改分词器会导致所有下游产物全盘失效；而修改评估测试集，仅仅导致最终的准予上线决策失效。
 
-### Why hashes make it safe
+### 为什么内容哈希能保证安全
 
-Artifacts live in an immutable store addressed by content hash, never by a name such as latest. A partial rerun checks whether each expected output already exists at the right hash and skips the stage if it does. That is also how a partial rollback saves most of the wall clock: stages one through eight stay cached while nine through twelve rerun. The pipeline lesson's exercise measures exactly that saving.
+所有产物均保存在按内容哈希寻址的不可变存储中，绝不使用 latest 这类名称。部分重跑逻辑会检查预期产物的哈希是否已经存在，若存在则直接跳过该阶段。这正是局部回滚能够大幅节省实际耗时的核心：第一至第八阶段保持缓存命中，仅重新执行第九至第十二阶段。完整流水线课程练习中精确测算了这种节省幅度。
 
-### What reproduce means
+### 可复现的真实含义
 
-Reproducible: the same manifest, code and infrastructure give a checkpoint with equivalent downstream metrics. Deterministic: bit-identical output. Distributed reduce order, kernel nondeterminism and mixed precision rounding make modern training reproducible but not deterministic; weights differ at a level around 1e-5 between runs while the metrics do not move. The cure is to log the input hash, the output hash and the headline metrics per stage. If the code, recipe and source data hashes and the headline metrics match, the run is reproduced even when a weight artifact and the input hashes after it get new values, and a bit-level diff is the wrong debugging tool. The lesson's rule that the input hash, the output hash and the metrics all match holds in full for the stages with deterministic output, such as the tokenizer and the eval data; for a weight artifact, which cannot be bit-identical, the metrics carry the check.
+可复现代表相同的清单文件、代码与基础设施能够产出一个在下游基准指标上完全等价的检查点。确定性则要求产出逐位完全一致的输出。分布式规约顺序差异、GPU 底层算子的非确定性以及混合精度浮点舍入，使得现代大模型训练只具备可复现性而不具备严格确定性；不同运行间的权重约有 1e-5 量级的差异，而指标保持不变。解决之道是为每个阶段记录输入哈希、输出哈希以及核心指标。只要代码、配方、源数据哈希以及核心指标匹配，即视为该次运行已被成功复现，即便权重产物及其后续输入哈希产生了新的哈希值，逐位对比二进制在调试时也是错误的方向。课程中要求输入哈希、输出哈希和指标完全一致的铁律，在分词器和评估集等具备完全确定性输出的阶段完全成立；对于不可避免存在浮点扰动的权重产物，则由评估指标来承担一致性校验。
 
-### Budget as part of the plan
+### 预算是计划不可分割的一部分
 
-The pre-run cost estimate uses six times parameters times tokens for the training compute, divided by peak throughput and utilization, at the rental rate. If the estimate exceeds the cost gate the pipeline refuses to start. After each stage the remaining budget is rechecked, so an overrun in one stage changes the gate for the next instead of being discovered when the money is gone.
+启动前的成本估算采用标准公式：训练算力等于 6 乘以模型参数量乘以训练 token 数，除以峰值吞吐量与硬件利用率，再乘以算力租赁单价。若估算成本超过了成本门禁，流水线将直接拒绝启动。在每个阶段结束后，都会重新核算剩余预算，让某一阶段的超支影响下一阶段的门禁判定，而不是等到资金耗尽才后知后觉。
 
 ## Follow-ups
 
-- **Level 3:** Why not name artifacts by version string? Expected: two artifacts can share a name and differ in content; the hash is the identity, and a name like latest is a trap.
-- **Level 4:** The reward model and the DPO policy both depend on the SFT checkpoint. What can run in parallel and what must wait? Expected: the two can run together after SFT; the refined policy waits for both, and its input hash must be a deterministic combination of both outputs.
-- **Level 4:** A corrupted checkpoint is discovered after alignment finished. Which plan applies? Expected: the expensive class; take the last good pre-training checkpoint and rerun the medium and cheap stages, never the full pre-training.
-- **Level 4:** A teammate reports that their replay has different weights. Is the run broken? Expected: not by itself; compare the code, recipe and source data hashes and the headline metrics, and only a mismatch there means the run is not reproduced.
+- **Level 3:** 为什么不用版本字符串命名产物？ Expected: 两个产物可能共享同一个名称却拥有截然不同的内容；内容哈希才是唯一的身份标识，诸如 latest 这类名称是严重的工程陷阱。
+- **Level 4:** 奖励模型和 DPO 策略都依赖 SFT 检查点，哪些可以并行、哪些必须等待？ Expected: 监督微调完成后两者可以完全并行执行；而细化策略必须等待两者全部完成，其输入哈希必须是两者输出的确定性组合。
+- **Level 4:** 在对齐流程全部结束后发现模型检查点已损坏，应执行哪级方案？ Expected: 归属于重量级类别；调取上一版完好的预训练检查点，重新跑中量级与轻量级阶段，绝不能盲目推倒全量预训练。
+- **Level 4:** 一位同事报告称其复现运行得出的模型权重与你不一致，任务算失败了吗？ Expected: 不能仅凭此判定失败；核对代码、训练配方、源数据哈希以及核心指标，只有在这些方面出现偏差才代表复现失败。
 
 ## Wrong answers
 
-- "Rerun from the start to be safe." The expensive stage costs weeks; the typed graph tells you exactly which stages are invalid.
-- "Keep the latest checkpoint file and overwrite it each step." A mutable name cannot be verified or replayed; content addressing is what makes the rollback set trustworthy.
-- "If the weights are not bit-identical, the pipeline is not reproducible." Distributed training is not deterministic; reproducibility is defined on the code, recipe and source data hashes and the metrics.
+- "为了稳妥起见，直接从头全部重跑一遍。" 重量级阶段耗时数周；类型化依赖图能精确告诉你到底哪些阶段已经失效。
+- "保留 latest 检查点文件并在每一步予以覆盖替换。" 可变名称无法校验或重放；基于内容寻址是确保回滚集合真实可信的基石。
+- "如果权重没有做到逐位完全一致，流水线就不可复现。" 分布式训练天生不具备严格确定性；可复现性是建立在代码、配方、源数据哈希与核心指标之上定义的。
 
 ## Taught in
 
-The [complete LLM pipeline lesson](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/) gives the three cost classes, the descendant rule, the content-addressed store and the distinction between reproducible and deterministic.
+[构建完整 LLM 流水线课程](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/)给出了三大成本分级、下游依赖失效规则、内容寻址存储以及可复现与确定性的严格界定。

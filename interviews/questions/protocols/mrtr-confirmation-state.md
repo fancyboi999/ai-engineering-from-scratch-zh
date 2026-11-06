@@ -1,6 +1,6 @@
 ---
 id: mrtr-confirmation-state
-title: Confirm a deletion without a session
+title: 在无会话情况下确认删除操作
 card: protocols
 kind: design
 level: 3
@@ -16,15 +16,15 @@ related: [protocols/roots-are-not-a-sandbox, protocols/header-body-mismatch-orde
 updated: 2026-11-03
 ---
 
-A tool that deletes notes, `notes_delete`, finds three notes that match the title the user gave. Design the confirmation flow under the current MCP revision: how the server asks the user to pick one and confirm, how the answer comes back, and what stops a client from answering a different question or replaying one confirmation with changed arguments.
+一个负责删除笔记的工具 `notes_delete` 找到了与用户提供的标题相匹配的三篇笔记。请在当前 MCP 修订版下设计确认流程：服务端如何要求用户选择一篇并确认、答案如何返回，以及是什么阻止了客户端回答不同问题或使用修改后的参数重放某次确认。
 
 ## Short answer
 
-The server answers with a result typed `input_required` that embeds an `elicitation/create` form request listing the three candidate ids and a `confirm` boolean, plus an integrity-protected `requestState`. The client shows the form and retries the original `tools/call` with a new request id, echoing `requestState` and the `inputResponses`. The server signs the state over the principal, the method, a digest of the arguments, the candidate set, the phase and an expiry, verifies the echo, checks that the chosen id was in the signed set, re-authorizes the workspace and re-checks containment, and consumes a one-time nonce in a shared replay store before it deletes.
+服务端返回类型为 `input_required` 的结果，其中嵌入一个列出三个候选 ID 和 `confirm` 布尔值的 `elicitation/create` 表单请求，加上完整性受保护的 `requestState`。客户端显示表单并使用新请求 ID 重试原始 `tools/call`，回传 `requestState` 和 `inputResponses`。服务端对主体、方法、参数摘要、候选集、阶段和过期时间签名，验证回传内容，检查所选 ID 是否在签名集中，重新鉴权工作区并重新检查笔记是否仍在工作区内，并在删除前消耗共享重放存储中的一次性 nonce。
 
 ## Full answer
 
-### The first response
+### 首次响应
 
 ```json
 {
@@ -50,47 +50,47 @@ The server answers with a result typed `input_required` that embeds an `elicitat
 }
 ```
 
-A current server sends no reverse JSON-RPC request. The embedded request is complete, with `method` and `params`, and its key must match the entry in `inputResponses` on the retry.
+当前服务端不发送反向的 JSON-RPC 请求。嵌入的请求是完整的，带有 `method` 和 `params`，其键必须与重试时 `inputResponses` 中的条目相匹配。
 
-### Capabilities are checked on this request
+### 能力在当前请求上检查
 
-The server may embed a form only when the current request's `clientCapabilities` support it. `{"elicitation": {}}` and `{"elicitation": {"form": {}}}` both support form mode. A URL-only declaration does not, and the server returns `-32021` with `data.requiredCapabilities` equal to `{"elicitation":{"form":{}}}`. An earlier request's declaration never counts.
+服务端仅在当前请求的 `clientCapabilities` 支持表单模式时才可嵌入表单。`{"elicitation": {}}` 和 `{"elicitation": {"form": {}}}` 均支持表单模式。仅声明 URL 模式则不支持，服务端返回 `-32021`，且 `data.requiredCapabilities` 等于 `{"elicitation":{"form":{}}}`。早期请求的声明绝不算数。
 
-### Form mode has limits
+### 表单模式的限制
 
-The root is an object with flat primitive fields or supported enums. Use it to choose among candidates, confirm a destructive operation or collect non-sensitive preferences. Never collect passwords, API keys or payment credentials in it, because they would pass through the client and could reach logs or model context. URL mode exists for that external flow.
+根节点必须是对象，字段只能是扁平的基本类型或受支持的枚举。用它在候选项中选择、确认破坏性操作或收集非敏感偏好。切勿在其中收集密码、API 密钥或支付凭据，因为它们会通过客户端并可能到达日志或模型上下文。URL 模式适用于此类外部流程。
 
-### Three outcomes, three behaviors
+### 三种结果，三种行为
 
-| Action | Meaning | Server behavior |
+| 动作 | 含义 | 服务端行为 |
 |---|---|---|
-| `accept` | the user submitted the form | validate the content and continue |
-| `decline` | the user refused | return a complete, non-error refusal; consume the nonce without deleting |
-| `cancel` | the user dismissed or could not finish | stop safely; the state stays retryable until expiry |
+| `accept` | 用户提交了表单 | 验证内容并继续 |
+| `decline` | 用户拒绝了 | 返回完整的非错误拒绝；消耗 nonce 且不删除 |
+| `cancel` | 用户关闭或未能完成 | 安全停止；状态在过期前仍可重试 |
 
-Never read missing content as consent, and never turn a decline into a repeated prompt.
+切勿将缺失的内容解读为同意，也切勿将拒绝转变为重复的提示。
 
-### What the signed state binds
+### 签名状态绑定的内容
 
-The state holds the authenticated principal, the originating method, a digest of `workspaceUri` and `title`, the allowed note ids shown in the form, the operation phase and a short expiry. On the retry the server verifies the signature, validates the response against the schema, checks that `note_id` is in the signed candidate set, re-authorizes the workspace, re-checks containment, and only then mutates. A changed title cannot reuse the original state.
+该状态保存已认证的主体、原始方法、`workspaceUri` 和 `title` 的摘要、表单中显示的允许笔记 ID、操作阶段和短暂的过期时间。在重试时，服务端验证签名，对照 schema 验证响应，检查 `note_id` 是否在签名的候选集中，重新鉴权工作区，重新检查笔记是否仍在工作区内，然后才修改。更改的标题无法重用原始状态。
 
-### Why HMAC alone is not enough
+### 为什么仅靠 HMAC 还不够
 
-A valid state can be replayed within its expiry. Store and consume a nonce exactly once in a replay store shared by every handler instance, and hold the atomic claim while the deletion runs. A database couples the claim and the mutation in one transaction. Validate before you claim: a malformed response or a cancel claims nothing.
+有效状态在其有效期内可以被重放。在每个处理程序实例共享的重放存储中恰好存储并消耗一次 nonce，并在删除运行时保持原子性占用。数据库将占用和修改耦合在一个事务中。在占用之前先验证：畸形响应或取消不占用任何内容。
 
 ## Follow-ups
 
-- **Level 3:** The client declares `{"elicitation": {"url": {}}}` only. What does the server do? Expected: return `-32021` with the required form capability in `data`; it must not embed a mode the current request did not declare.
-- **Level 3:** The user dismisses the dialog. Which action, and what happens to the state? Expected: `cancel`; nothing is mutated and the state stays retryable until it expires, unlike `decline`, which is terminal.
-- **Level 4:** Two server instances share the note store. How do you stop both from executing one confirmation? Expected: a shared replay store with an atomic nonce claim coupled to the mutation; the lesson's test runs two server objects against one state.
-- **Level 4:** A note moves outside the workspace after the form was shown. What catches it? Expected: the live record check and the containment re-check before mutation, not the signed state alone.
+- **Level 3:** 客户端仅声明 `{"elicitation": {"url": {}}}`。服务端怎么做？ Expected: 返回 `-32021` 并在 `data` 中附带所需的表单能力；绝不能嵌入当前请求未声明的模式。
+- **Level 3:** 用户关闭对话框。对应什么动作，状态如何变化？ Expected: `cancel`；没有任何修改，且状态在过期前保持可重试，不同于终止性的 `decline`。
+- **Level 4:** 两个服务端实例共享笔记存储。如何阻止两者执行同一次确认？ Expected: 具有与修改耦合的原子 nonce 占用的共享重放存储；课程的测试针对一个状态运行两个服务端对象。
+- **Level 4:** 在显示表单后，笔记移到了工作区之外。什么能捕获它？ Expected: 修改前的实时记录检查和工作区范围复查，而不能仅靠签名状态。
 
 ## Wrong answers
 
-- "Keep the candidate list in server memory keyed by the connection." There is no session, and the retry can reach any instance. The candidates travel inside the signed state.
-- "The host validated the form, so the server can trust the content." The client controls everything it sends. The server validates the schema and the candidate set again.
-- "Ask for the user's password in the form as the confirmation." Form mode must not carry secrets. An external credential flow uses URL mode and binds the browser user to the same principal.
+- "将候选列表保存在服务端内存中，以连接为键。" 没有会话，且重试可以到达任何实例。候选项在签名状态内传输。
+- "宿主验证了表单，所以服务端可以信任内容。" 客户端控制它发送的所有内容。服务端再次验证 schema 和候选集。
+- "在表单中索要用户密码作为确认。" 表单模式绝不能携带机密。外部凭据流程使用 URL 模式，并将浏览器用户绑定到同一主体。
 
 ## Taught in
 
-The [roots and elicitation lesson](../../../phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/) builds this flow with a replay store, and the [security lesson](../../../phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/) treats `requestState` as hostile input.
+[根路径与信息征询课程](../../../phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/)使用重放存储构建了此流程，[安全课程](../../../phases/13-tools-and-protocols/15-mcp-security-tool-poisoning/)将 `requestState` 视为恶意输入。

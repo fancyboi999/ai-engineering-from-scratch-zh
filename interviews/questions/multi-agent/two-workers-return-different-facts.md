@@ -1,6 +1,6 @@
 ---
 id: two-workers-return-different-facts
-title: Two workers returned different facts, the report shows one
+title: 两个 worker 返回不同事实，报告只展示了一个
 card: multi-agent
 kind: debug
 level: 3
@@ -16,55 +16,55 @@ related: [multi-agent/why-a-fresh-context-wins]
 updated: 2026-11-03
 ---
 
-In a lead-and-workers research system, two workers answered overlapping sub-questions with numbers that contradict each other. The final report contains one of the numbers and no mention of the other. The user found the second number in a source and asks why the report hid it. Where did the system fail, and what do you change?
+在一套由 lead 与多个 worker 构成的研究系统中，两个 worker 在回答重叠的子问题时给出了相互矛盾的数字。最终报告包含了其中一个数字，而没有提及另一个。用户在源中发现了第二个数字，并询问为什么报告隐瞒了它。系统在何处出现故障，你会做出哪些改变？
 
 ## Short answer
 
-The lead resolved a synthesis conflict by picking one side in silence, which the lesson calls the worst failure in this pattern, because the user never learns that a disagreement happened. Two upstream causes made it likely: the decomposition gave two workers the same ground, and no worker had a scope that stopped it from drifting into the other's territory. The fix is a lead that detects contradiction between worker outputs and either re-asks with a narrower question or writes the disagreement into the answer, plus provenance on every synthesized claim.
+lead 未作说明就选了一方，借此解决合成冲突，课程将这称为该模式中最严重的失败，因为用户永远无法得知存在分歧。两个上游原因促成了这一点：拆解让两个 worker 调查了相同的事实，且没有 worker 拥有阻止其漂移进入对方领域的作用域。修复方法是让 lead 能够检测 worker 输出之间的矛盾，并要么使用更聚焦的问题重新提问，要么将分歧写入答案中，再加上每个合成断言上的溯源。
 
 ## Full answer
 
-### Three failure modes in the pattern
+### 该模式下的三种故障模式
 
-| Failure | What happened here |
+| 故障 | 此处发生了什么 |
 |---|---|
-| The lead hallucinates the plan | Sub-questions overlapped, so two workers researched the same fact |
-| Workers over-explore | A worker without a scope boundary drifted past its question into another's |
-| Synthesis conflict | Two contradictory facts arrived, and the lead picked one without a note |
+| Lead 对计划产生幻觉 | 子问题重叠，因此两个 worker 研究了相同的事实 |
+| Worker 过度探索 | 没有作用域边界的 worker 漂移越过其问题进入另一个 worker 的领域 |
+| 合成冲突 | 到达了两个矛盾的事实，且 lead 未加说明地选择了一个 |
 
-The third is the one the user saw. The first two made it happen.
+第三个是用户看到的。前两个促成了它的发生。
 
-### Detect the conflict without a model
+### 无需模型即可检测冲突
 
-The lesson asks how to detect contradiction without a model call. Canonicalize the claims: extract each number with its unit and the entity it describes, key it by sub-question, and compare. Two different values under one key is a conflict. For non-numeric claims, flag a key only when the two workers state different claims. Different cited sources alone are not a conflict. Let the lead handle a flagged key.
+课程探讨了如何在没有模型调用的情况下检测矛盾。规范化断言：提取每个数字及其单位和所描述的实体，以子问题为键做比对。一个键下的两个不同数值构成冲突。对于非数值断言，仅在两个 worker 阐述不同断言时才标记键。仅引用不同源并不构成冲突。让 lead 处理被标记的键。
 
-### What the lead does with a conflict
+### lead 面对冲突该怎么做
 
-1. **Re-ask.** Spawn a worker on a tighter question aimed at the disagreement, which adds a round.
-2. **Surface it.** Write both values into the answer with their sources and say that they disagree.
-3. **Never pick in silence.** A chosen value with no note is the failure in the prompt.
+1. **重新提问。** 针对分歧派生出一个聚焦于更窄问题的 worker，这会增加一轮。
+2. **呈现出来。** 将两个数值及其来源写入答案，并说明它们存在分歧。
+3. **绝不悄悄选一个。** 选定数值却不作说明，就是题干中的故障。
 
-### Prevent the overlap
+### 防止重叠
 
-Decompose broad first and narrow later, and give each worker an explicit scope in its prompt: the sub-question, what is out of scope, and the sources to prefer. Add a worker timeout at about twice the median runtime and a token cap per worker, so that a worker that wanders is cut and the lead re-spawns with a narrower question or proceeds without it.
+先广后深拆解，并在 prompt 中给每个 worker 明确的作用域：子问题、超出范围的内容以及优先考虑的源。添加中位数运行时两倍左右的 worker 超时和每个 worker 的 token 上限，以便迷失的 worker 被终止，lead 使用更窄的问题重新派生或在没有该结果的情况下继续。
 
-### Provenance on the synthesis
+### 合成上的溯源
 
-Each claim in the final answer carries the worker and the source it came from. That makes the hidden second number impossible, because a claim with two sources shows two values, and it makes the post-mortem a read of the trace instead of a guess.
+最终答案中的每个断言都标明来自哪个 worker 和哪个来源。这使得隐藏第二个数字变得不可能，因为带有两个来源的断言会显示两个数值，并使事后复盘成为阅读跟踪记录而非主观猜测。
 
 ## Follow-ups
 
-- **Level 3:** Why is a silent pick worse than a wrong pick with a note? Expected: a noted disagreement lets the reader check the sources, while a silent pick presents an unresolved fact as settled.
-- **Level 3:** The re-ask adds a round and the latency target is tight. What do you do? Expected: surface the disagreement in the answer instead of re-asking, and record the key for a later run.
-- **Level 4:** How do you test the conflict detector? Expected: feed it worker outputs with a planted contradiction on one key and matching values on others, and assert that exactly that key is flagged.
-- **Level 4:** The two workers agree and are both wrong. What catches that? Expected: nothing in the lead, because agreement is not correctness, so an independent verifier with its own source access has to check the claim.
+- **Level 3:** 为什么不作说明就选一个，比选错但附有说明更糟？ Expected: 标明的分歧让读者可以核对源，而悄悄选定一个会将未解决的事实呈现为已定论。
+- **Level 3:** 重新提问增加了一轮且延迟指标很紧。你该怎么做？ Expected: 在答案中呈现分歧而不是重新提问，并记录该键以供后续运行使用。
+- **Level 4:** 你如何测试冲突检测器？ Expected: 向其输入在一个键上带有植入矛盾且在其他键上数值匹配的 worker 输出，并断言恰好该键被标记。
+- **Level 4:** 两个 worker 意见一致且都是错的。什么能捕获它？ Expected: lead 中没有任何机制能捕获，因为一致不等于正确，因此具有自身源访问权限的独立校验器必须检查该断言。
 
 ## Wrong answers
 
-- "Add a rule to the lead's prompt that says be careful with numbers." The lead did not know a conflict existed, and a prompt does not compare worker outputs.
-- "Trust the worker with the higher confidence." Confidence is not correctness, and the user still never learns that a disagreement happened.
-- "Run three workers per sub-question and take the majority." A majority can be wrong together, it triples the cost, and the overlap that caused the conflict stays in the plan.
+- "在 lead 的 prompt 中添加一条规则要求谨慎对待数字。" Lead 不知道存在冲突，且 prompt 不会比较 worker 输出。
+- "信任置信度更高的 worker。" 置信度不等于正确性，且用户仍无法得知曾发生过分歧。
+- "每个子问题运行三个 worker 并取多数。" 多数可能共同犯错，这使成本增加两倍，且导致冲突的重叠仍留在计划中。
 
 ## Taught in
 
-The [supervisor pattern lesson](../../../phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/) names the synthesis conflict and the worker timeout and token cap.
+[Supervisor 模式课程](../../../phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/)指明了合成冲突以及 worker 超时和 token 上限。

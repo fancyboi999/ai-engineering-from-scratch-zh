@@ -1,6 +1,6 @@
 ---
 id: unified-memory-fraction-on-a-gb10
-title: Pick the memory fraction on unified memory
+title: 在统一内存架构上选择内存比例
 card: gpu-memory-quantization
 kind: estimate
 level: 3
@@ -16,64 +16,64 @@ related: []
 updated: 2026-11-03
 ---
 
-You run a 30B model with mixture-of-experts layers in BF16 on a GB10, a machine where CPU and GPU draw on one 128 GB memory and the operating system and other programs live in the same pool. How do you pick the memory fraction, what does the fraction not guarantee on this machine, and why does the pool size differ between two starts with the same command?
+你在 GB10 上以 BF16 格式运行带有混合专家（MoE）层的 30B 模型。该机器由 CPU 和 GPU 共享统一的 128 GB 内存，操作系统与其他程序均位于同一个内存池中。你如何选择内存比例（fraction），该比例在此类机器上无法保证什么，为什么使用相同命令的两次启动所得到的显存池大小会有所不同？
 
 ## Short answer
 
-Add the weights, the KV cache you want and a few GiB for the startup profile and the graphs, divide by the total, and leave room for the kernel's page cache and the other programs, which use the same memory. With a fraction of 0.75 the manual's vLLM run took 91.3 of 121.69 GiB: 56.93 GiB of weights, 31.32 GiB of cache, about 342,000 tokens at 96 KiB each, and about 3 GiB for the rest, which left about 30 GiB for everything else. The fraction is a plan and not a hard limit on unified memory, and the pool moves between starts because the engine sizes it from a snapshot of free memory that the kernel's file cache changes.
+将模型权重、期望的 KV cache 容量以及为启动分析和计算图预留的几 GiB 相加，除以总内存，并为内核页缓存和使用同一内存的其他程序留足空间。在比例设为 0.75 时，手册中 vLLM 运行占用了 121.69 GiB 中的 91.3 GiB：权重占 56.93 GiB，缓存占 31.32 GiB（在每 token 96 KiB 下约 342,000 token），其余约 3 GiB 用于其他开销，给操作系统等其它所有程序留下了约 30 GiB。在统一内存上，该比例只是一个规划值而非硬性上限；两次启动之间显存池大小不同，是因为引擎根据空闲内存快照来规划显存池，而内核的文件缓存会改变该快照。
 
 ## Full answer
 
-### What GPU memory means here
+### 这里的 GPU 内存具体指什么
 
-The GB10 has no separate GPU memory. The CPU and the GPU use one pool of LPDDR5x memory, sold as 128 GB; the startup log reported 121.69 GiB in total. On an integrated GPU vLLM reads free memory from the operating system, because the driver reports too little, and it releases its cached GPU memory when the whole system is more than 80 percent full. So the fraction is a share of the whole machine, not of a separate card.
+GB10 没有独立的 GPU 显存。CPU 和 GPU 共享同一个 LPDDR5x 内存池，规格标注为 128 GB；启动日志显示总可用内存为 121.69 GiB。在集成 GPU 上，vLLM 从操作系统读取空闲内存，因为驱动程序报告的数值偏小；当整个系统内存占用超过 80% 时，它会主动释放已缓存的 GPU 内存。因此，该比例是针对整台机器内存的份额，而非独立显卡。
 
-### The budget at 0.75
+### 比例为 0.75 时的预算拆解
 
-| Part | Size |
+| 组成部分 | 大小 |
 |---|---|
-| The share for vLLM, 0.75 of 121.69 GiB | 91.3 GiB |
-| The weights | 56.93 GiB |
-| Free for the KV cache | 31.32 GiB |
-| The rest, for the profile and the graphs | about 3 GiB |
+| 分配给 vLLM 的份额（121.69 GiB 的 0.75） | 91.3 GiB |
+| 模型权重 | 56.93 GiB |
+| 留给 KV cache 的可用空间 | 31.32 GiB |
+| 其余开销（启动分析与计算图） | 约 3 GiB |
 
-At 96 KiB per token the cache holds about 342,000 tokens, enough for more than 500 users with 640 tokens each. About 30 GiB stayed for the system and every other program. The manual ran one fraction only and says so.
+以每 token 96 KiB 计算，该缓存可容纳约 342,000 token，足以支持 500 多位各自持有 640 token 上下文的用户。系统和其它程序大约保留了 30 GiB。手册明确说明实测仅覆盖了这一个比例。
 
-### The fraction is not a hard limit
+### 该比例不是硬性限制
 
-Two reports show the engine taking more than its share during the startup profile on this machine. One ran a fraction of 0.70, used about 112 GiB against a share of about 83 GiB, and the machine stopped responding. Another hit a negative estimate of the graph memory with a speculative method, so the cache grew too large and the start ran out of memory. The manual's own run matched the share of 0.75, with no speculation. To give the cache a fixed size instead, set it in bytes with `--kv-cache-memory-bytes`, and check that the weights, the cache and a few GiB for the profile leave room for the operating system.
+有两份报告表明引擎在此机器的启动分析期间占用的内存超过了其预设份额。其中一份设置比例为 0.70，在计划约 83 GiB 的份额下实际消耗了约 112 GiB，导致机器停止响应。另一份在使用投机方法时计算图内存估算出现负值，导致缓存分配过大并在启动时触发 OOM。手册实测在未启用投机的情况下符合 0.75 的份额。若要给缓存固定大小，可通过 `--kv-cache-memory-bytes` 按字节显式指定，并核实权重、缓存与几 GiB 的分析开销后是否仍给操作系统留出了充裕空间。
 
-SGLang's manual adds a field report of 25 to 40 GB of short-lived allocations outside the memory accounting, from the kernel autotuner and the graph capture, which froze a host until the server ran in a container with a memory cap and a fraction of 0.50. On a shared GB10, run the server in a container with a memory limit and log free memory once a second during startup.
+SGLang 手册补充了一份现场报告：算子自动调优与计算图捕获在内存统计范围之外产生了 25 到 40 GB 的瞬时内存分配，导致宿主机卡死，直到将服务放入带有内存上限且比例设为 0.50 的容器中才恢复正常。在共享的 GB10 上，应将服务放在限制内存的容器中运行，并在启动期间每秒记录一次空闲内存。
 
-### Why the pool moves between starts
+### 为什么两次启动显存池大小不一致
 
-SGLang sizes the pool from a snapshot of free memory after the weights load, and it measures the weights as the drop in available memory. Six BF16 starts of one command with the same weights on the GB10 read the weights at 54.78 to 57.92 GB and gave pools from 227,243 to 258,017 tokens, 14 percent apart. The kernel's file cache changed during each load. On unified memory a pool size from one start is an estimate for the next, so read the pool line at every start.
+SGLang 在加载权重后根据空闲内存快照规划显存池，并将权重大小测量为可用内存的下降值。在 GB10 上使用相同权重和命令连续 6 次以 BF16 启动，测得的权重占用在 54.78 到 57.92 GB 之间波动，规划出的显存池在 227,243 到 258,017 token 之间浮动，相差 14%。内核的文件缓存在每次加载期间均有变动。在统一内存架构上，单次启动的显存池大小仅是下一次的估算参考，因此每次启动都必须检查显存池信息行。
 
-### Other programs see the pool
+### 其他程序会感知到显存池的分配
 
-The pool is tens of GB and the engine allocates it in a few seconds, so every other program sees that memory go. A memory guard daemon on the manual's GB10 paused the scheduler three times during startup because it grew 36.7 GiB in 5 seconds with 34.2 GiB left. Tell the other users of the machine before you start, and do not alert on the driver's out-of-memory lines alone; alert when a server does not become healthy.
+显存池高达几十 GiB，且引擎在数秒内将其全部分配完毕，因此机器上的其他程序会立即感受到可用内存的暴跌。手册实测机器上的内存保护守护进程在启动期间触发了 3 次调度器暂停，因为可用内存仅剩 34.2 GiB 时在 5 秒内猛增了 36.7 GiB。启动前应提前通知机器上的其他用户；不要仅针对驱动程序的 OOM 日志告警，而应在服务无法转为健康状态时告警。
 
-### When a bigger pool pays
+### 更大的显存池何时能带来回报
 
-Raising the SGLang fraction from 0.7 to 0.82 on the GB10 grew the BF16 pool from 234,600 to 383,065 tokens, 63 percent, and changed closed-loop throughput by less than 2 percent at 64 users, 238.72 against 235.38 tokens per second, because token usage peaked at 11 percent. Under a fixed arrival rate above what the machine serves, the smaller pool was 96 percent full with 101 requests waiting, the larger pool held all 480 requests, and the machine completed 5.19 against 3.88 requests per second, 34 percent more. Size the pool from token usage at peak load, bursts included, and not from free memory.
+在 GB10 上将 SGLang 比例从 0.7 调高到 0.82，使 BF16 显存池从 234,600 增至 383,065 token（扩容 63%），但在 64 用户并发的闭环测试中吞吐量变动小于 2%（238.72 对 235.38 tok/s），因为此时 token 利用率峰值仅为 11%。而在超过机器处理能力的固定到达率过载场景下，较小的显存池达到 96% 的满载且有 101 个请求排队等待，而较大的显存池容纳了全部 480 个请求，机器每秒完成 5.19 个请求相比前者的 3.88 个，吞吐量提升了 34%。规划显存池应依据峰值负载（包含突发流量）下的 token 利用率，而不是当前的空闲内存。
 
-### Expect a slow first start
+### 首次启动较慢属正常现象
 
-Loading 56.93 GiB took 330 s on this machine, because each tensor is copied from a memory-mapped file one at a time, about 1.7 ms per tensor from the file view against 0.2 ms from host memory. Keep the weights on the local drive, and keep the server running.
+在此机器上加载 56.93 GiB 耗时 330 秒，因为每个张量都需要从内存映射文件中逐个复制，文件视图每个张量耗时约 1.7 ms，而从主机内存仅需 0.2 ms。务必将权重存放在本地硬盘上，并保持服务常驻运行。
 
 ## Follow-ups
 
-- **Level 3:** `free -g` shows almost no available memory while the server idles. What do you do? Expected: lower the fraction by 0.05 and start again; the system and its page cache share the pool, and if the cache line is larger than the share allows, set the cache size in bytes instead.
-- **Level 3:** The same command gave pools of 227,243 and 258,017 tokens on two days. Is something broken? Expected: no; the engine sizes the pool from a snapshot of free memory after the weights load, and the kernel's file cache changed during each load, so the measured weights moved by about 3 GB and the pool with them; read the pool line at every start.
-- **Level 4:** Going from 0.7 to 0.82 did nothing at 64 users and gave a third more throughput in an overload. Reconcile the two. Expected: in the closed loop the pool was never full, token usage peaked at 11 percent, so a larger pool had nothing to do; under a fixed arrival rate above what the machine serves, the small pool was 96 percent full with 101 requests waiting and the larger pool held all 480, so size the pool from token usage at peak load with its bursts.
+- **Level 3:** 服务空闲时 `free -g` 显示几乎没有可用内存，你该怎么办？ Expected: 将比例降低 0.05 后重启；系统及其页缓存共享该内存池，如果缓存日志行大于规划份额所允许的值，则应改用字节显式指定缓存大小。
+- **Level 3:** 同一个命令在两天内分别给出了 227,243 和 258,017 token 的显存池，是不是出问题了？ Expected: 没有；引擎在加载权重后根据空闲内存快照规划显存池，内核文件缓存在每次加载时都有变动，导致测得的权重变动约 3 GB，池大小也随之变动；每次启动都要读取显存池信息行。
+- **Level 4:** 从 0.7 调到 0.82 在 64 用户下毫无变化，但在过载下吞吐量提升了三分之一。如何解释这一现象？ Expected: 在闭环测试中显存池从未用满，token 利用率峰值仅 11%，更大的池无用武之地；在超出机器能力的固定到达率过载下，小池 96% 满载且 101 个请求在排队，大池则装下了全部 480 个请求，因此显存池应根据峰值突发负载下的 token 利用率来规划。
 
 ## Wrong answers
 
-- "The fraction caps what the server can take." On unified memory it sets the share that the engine plans for; one report used about 112 GiB at a fraction of 0.70 during the startup profile against a share of about 83 GiB, and the machine stopped responding.
-- "Set the fraction as high as it goes to get the biggest pool." The system and its page cache use the same memory, and memory you do not need is memory another program cannot use; on the GB10 a 63 percent larger pool changed closed-loop throughput by less than 2 percent.
-- "Yesterday's pool size is the pool size." Six starts with the same command gave pools 14 percent apart, because the snapshot of free memory changed; read the line each time.
-- "A slow first start means something is wrong." Loading 56.93 GiB from a file-backed mapping took 330 s on this machine, about 1.7 ms per tensor against 0.2 ms from host memory; keep the weights on local storage and keep the server running.
+- "内存比例限制了服务能消耗的最大内存上限。" 在统一内存上它只是引擎规划的配额；已有报告记录在比例设为 0.70 时启动分析消耗了约 112 GiB（规划份额约 83 GiB），导致机器失去响应。
+- "将比例设到最高以获得最大的显存池。" 操作系统及其页缓存使用相同的内存，不需要的内存被占用会导致其他程序无法运行；在 GB10 上显存池扩大 63% 在闭环测试中吞吐变动小于 2%。
+- "昨天的显存池大小就是今天的显存池大小。" 使用相同命令的 6 次启动得到的显存池相差 14%，因为空闲内存快照发生了变化；每次启动都必须重新读取该行。
+- "首次启动缓慢意味着存在故障。" 从基于文件的映射加载 56.93 GiB 耗时 330 秒，每个张量约 1.7 ms（主机内存为 0.2 ms）；应将权重放在本地存储上并保持服务常驻。
 
 ## Taught in
 
-[Size memory on a DGX Spark](../../../manuals/vllm-101/sections/2-3-size-memory-on-a-dgx-spark.md) and [--mem-fraction-static and startup sizing](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md) measure the fraction on the same machine.
+[估算 DGX Spark 的内存](../../../manuals/vllm-101/sections/2-3-size-memory-on-a-dgx-spark.md)与[--mem-fraction-static 与启动容量计算](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)在同一台机器上实测了该比例。

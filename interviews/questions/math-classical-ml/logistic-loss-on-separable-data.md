@@ -1,6 +1,6 @@
 ---
 id: logistic-loss-on-separable-data
-title: A logistic regression whose weights never stop growing
+title: 权重持续无止境增长的逻辑回归
 card: math-classical-ml
 kind: concept
 level: 3
@@ -16,43 +16,43 @@ related: [math-classical-ml/threshold-precision-or-recall, math-classical-ml/cro
 updated: 2026-11-03
 ---
 
-You fit a logistic regression with gradient descent on a small dataset where one line separates the two classes with no errors. The loss falls at every epoch, the weights grow at every epoch, and the run never settles. A colleague proposes a squared error loss instead, because it has a clear bottom. What is happening, and what do you do?
+你使用梯度下降在一个小型数据集上拟合逻辑回归，该数据集线性可分（一条直线即可无差错地划分两类）。训练中每个 epoch 损失都在下降、权重都在增长，模型却始终无法收敛稳定。一位同事建议改用均方误差损失，理由是它有明确的最小值。此时究竟发生了什么？你该如何解决？
 
 ## Short answer
 
-On separable data the log loss has no finite minimum: scaling the weights up pushes every probability closer to its label and the loss closer to zero, so descent walks forever. Squared error through a sigmoid is a worse trade, because that cost surface is not convex and has flat regions where the gradient dies. Keep the log loss and add an L2 penalty, which gives one finite, unique minimum.
+在可分数据上对数损失不存在有限的最小值：等比例放大权重会使每个预测概率进一步逼近其真实标签，并使损失持续趋向于零，导致梯度下降永远不会停止。改用经过 Sigmoid 的均方误差是更差的选择，因为该代价曲面是非凸的，存在导数消失的平坦区域。应保留对数损失并引入 L2 正则化项，从而确保存在唯一有限的全局极小值。
 
 ## Full answer
 
-### Why the log loss is the right loss
+### 为什么对数损失是正确的损失函数
 
-The model is a linear score z = w x + b passed through a sigmoid, and the binary cross-entropy is minus the mean of y log p plus (1 - y) log (1 - p). For this model the loss is convex, so every local minimum is the global one and gradient descent cannot stop in a bad valley. The gradient has the same clean form as in linear regression, the mean of (p - y) times x, with p the sigmoid output instead of the raw score.
+模型计算线性得分 z = w x + b 并传入 Sigmoid 函数，二元交叉熵损失是负的 y log p 加 (1 - y) log (1 - p) 的均值。对于该线性模型，该损失函数是凸函数，所有局部极小值即为全局极小值，梯度下降不会陷入不良局部低谷。其梯度形式与线性回归一样简洁，即 (p - y) 乘以 x 的均值，其中 p 是 Sigmoid 的输出而非原始得分。
 
-### What separable data does to it
+### 线性可分数据带来的影响
 
-When a line classifies every point correctly, multiplying w and b by a constant above 1 leaves the line in place and moves every probability toward 0 or 1. Each such step lowers the loss, so no finite w is the minimizer. In the run you see the loss fall, the weights grow, the probabilities saturate, and the sigmoid clamp in the code start to matter. The decision boundary itself has stopped changing.
+当一条直线能完全正确分类所有样本点时，将 w 和 b 乘以一个大于 1 的常数不会改变分类边界的位置，却会使每个样本的预测概率进一步趋近 0 或 1。每一步这样的更新都会降低损失，因此不存在任何有限的 w 能成为损失的极小值点。在训练过程中你会观察到损失不断下降、权重持续增大、概率极度饱和，代码中的 Sigmoid 数值截断保护开始触发。然而，决策边界本身早已不再发生变化。
 
-### Why squared error does not help
+### 为什么均方误差无法解决问题
 
-Squared error on a sigmoid output is not convex. It has local minima, and where the sigmoid saturates its gradient is near zero, so a confident wrong prediction gets almost no correction. The lesson's reason to avoid it for classification is exactly this shape.
+在 Sigmoid 输出上使用均方误差是非凸的。它存在多个局部极小值，并且在 Sigmoid 饱和的区域其导数接近于零，导致置信度极高的错误预测几乎得不到任何梯度修正。课程中明确指出在分类任务中避免使用均方误差正是由于这一曲面特性。
 
-### The fix
+### 解决方案
 
-Add an L2 penalty, lambda times the sum of squared weights, to the loss. Its gradient, two lambda times w, pulls every weight back toward zero at each step. The pull grows with the weights and the pull of the data loss shrinks as the probabilities saturate, so they balance at a finite point, and the minimum is unique. The library implementation in the lesson applies regularization by default for this reason.
+在损失函数中增加 L2 惩罚项，即 lambda 乘以权重平方和。其梯度（两倍 lambda 乘以 w）会在每一步将权重拉回零点。这一拉力随权重增大而增强，而数据损失的梯度拉力则随概率饱和而减弱，二者最终在有限数值点达到平衡，形成唯一的极小值点。课程中的库实现在默认情况下启用正则化正是出于这一原因。
 
 ## Follow-ups
 
-- **Level 3:** Why is the cross-entropy convex for this model while squared error is not? Expected: the log of the sigmoid combines with the linear score into a convex function; squaring the gap between a sigmoid and a label creates flat regions and several local minima.
-- **Level 3:** What does the decision boundary do while the weights grow? Expected: the line w x + b = 0 barely moves; only the steepness of the sigmoid across it grows, so predictions become overconfident.
-- **Level 4:** How does the L2 penalty change each gradient step? Expected: it adds a term proportional to w to the gradient, so each step also shrinks the weights, and the shrinking balances the pull toward larger weights at a finite point.
-- **Level 4:** The data is nearly separable instead. Does the problem go away? Expected: a finite minimum exists, but the weights are large and the probabilities overconfident; the penalty still helps calibration, and a validation loss shows it.
+- **Level 3:** 为什么本模型下的交叉熵是凸函数，而均方误差不是？ Expected: Sigmoid 的对数与线性得分复合后为凸函数；对 Sigmoid 与标签的差值取平方会产生平坦区域与多个局部极小值。
+- **Level 3:** 在权重持续增长的过程中，决策边界发生了什么变化？ Expected: 直线 w x + b = 0 几乎未移动；只是跨越边界的 Sigmoid 斜率变得更陡峭，预测置信度过度饱和。
+- **Level 4:** L2 惩罚项如何改变每一次梯度更新步？ Expected: 它在梯度中增加了一个与 w 成正比的项，使每一步都会衰减权重，衰减拉力与变大拉力在有限点达成平衡。
+- **Level 4:** 如果数据只是近似可分，该问题会消失吗？ Expected: 有限极小值确实存在，但权重依然过大且预测概率过度自信；L2 正则化仍有助于改善概率校准，验证集损失能够证明这一点。
 
 ## Wrong answers
 
-- "The falling loss means the model is still improving, let it run." The boundary stopped improving; only the confidence grows, until the weights overflow or every probability saturates.
-- "Switch to squared error for a well-defined minimum." That surface is not convex with a sigmoid output, so descent can stop in a poor local minimum, and the gradient vanishes where the sigmoid saturates.
-- "Add early stopping and call it solved." Stopping fixes the run time but leaves the weights wherever the clock ran out; a penalty gives a defined answer that does not depend on the epoch count.
+- "损失在下降说明模型仍在提升，继续训练即可。" 分类边界早已停止改进；增长的只是置信度，直到权重溢出或概率完全饱和。
+- "改用均方误差以获得定义明确的极小值。" 带有 Sigmoid 输出的均方误差曲面是非凸的，梯度下降可能停在劣质局部极小值，且在饱和区梯度消失。
+- "引入早停机制即可解决。" 早停虽限制了训练时间，但权重仍停留在时间耗尽时的位置；正则化能给出与训练轮数无关的确定解。
 
 ## Taught in
 
-The [logistic regression lesson](../../../phases/02-ml-fundamentals/03-logistic-regression/) explains why the log loss is convex and why separable data has no finite minimizer, and the [linear regression lesson](../../../phases/02-ml-fundamentals/02-linear-regression/) introduces the L2 penalty.
+[逻辑回归课程](../../../phases/02-ml-fundamentals/03-logistic-regression/)解释了对数损失的凸性以及可分数据不存在有限极小值点的原因，[线性回归课程](../../../phases/02-ml-fundamentals/02-linear-regression/)引入了 L2 惩罚项。

@@ -1,6 +1,6 @@
 ---
 id: softmax-cross-entropy-gradient
-title: Three lines that differentiate the cross-entropy loss
+title: 计算交叉熵损失导数的三行代码
 card: deep-learning
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [deep-learning/mse-predicts-half-for-everything, deep-learning/loss-stu
 updated: 2026-11-03
 ---
 
-This function claims to return, for each logit, the derivative of the cross-entropy loss.
+该函数声称能够针对每个 logit，精确返回交叉熵损失的导数：
 
 ```python
 def cce_gradient(logits, target_index):
@@ -26,45 +26,45 @@ def cce_gradient(logits, target_index):
     return grads
 ```
 
-Explain why three lines are enough. Then describe the gradient vector when the model is sure and right, and when it is sure and wrong.
+请解释为什么三行代码就足够了。然后分别描述模型置信度极高且预测正确、以及置信度极高且预测错误时的梯度向量形态。
 
 ## Short answer
 
-For softmax followed by cross-entropy on a one-hot target, the derivative of the loss with respect to logit i is the predicted probability of class i minus the target for class i. The function copies the probabilities and subtracts 1 at the true class, which is that vector. When the model is confident and right, every entry is near zero. When it is confident and wrong, the entry at the true class is near minus 1 and the entry at the class it chose is near plus 1.
+在单热标签下，Softmax 后接交叉熵损失时，损失关于第 i 个 logit 的偏导数精确等于类别 i 的预测概率减去类别 i 的真实目标值。该函数拷贝了所有预测概率并在正确类别所在索引处减去 1，所得向量正是该解析梯度。当模型置信度高且预测正确时，所有项均接近于零。当模型置信度高且预测错误时，真实类别处的梯度接近 -1，而错误选中的类别处的梯度接近 +1。
 
 ## Full answer
 
-### Why the form is so simple
+### 形式为何如此精简
 
-The loss is minus the log of the probability of the true class, and that probability is exp of the true logit over the sum of exp of all logits. Differentiate with respect to logit i: the log of the denominator contributes plus p_i for every i, and the log of the numerator contributes minus 1 only for the true class. The softmax derivative on its own is a full matrix; combined with the log it collapses to p minus the one-hot target. The lesson's phrase is that softmax and cross-entropy are paired on purpose.
+损失定义为真实类别预测概率的负对数，而该概率为真实 logit 的指数值除以所有 logits 指数值的总和。对其关于 logit i 求偏导：分母的对数项对每一个 i 贡献了 +p_i，而分子的对数项仅对真实类别目标贡献了 -1。单纯 Softmax 算子自身的雅可比导数是一个完整的稠密矩阵；但一旦与交叉熵的对数复合，复杂矩阵立即塌缩为预测概率向量减去单热标签向量 (p - y)。课程特别强调，Softmax 与交叉熵在数学上是天生配对的。
 
-### Reading the vector
+### 解读具体的梯度向量
 
-- Confident right: p at the true class is near 1, so that entry is near 0, and every other p is near 0. Almost no update.
-- Confident wrong: p at the true class is near 0, so that entry is near minus 1; the chosen class has p near 1 and an entry near plus 1. A large update that lowers the chosen logit and raises the true one.
-- The entries sum to zero, because the probabilities sum to 1 and so does the one-hot target. That is a quick check for a hand-written version.
+- 置信度极高且预测正确：真实类别处的概率 p 极度接近 1，对应项 (p - 1) 接近 0；所有其他类别处的概率 p 均接近 0。整个梯度向量几乎全为零，网络参数几乎不发生更新。
+- 置信度极高且预测错误：真实类别处的概率 p 接近 0，该项接近 -1；而错误选中的类别其概率 p 接近 1，对应项接近 +1。这构成极大的校正步长，强力压低错误类别的 logit，同时大幅拉高真实类别的 logit。
+- 梯度向量各元素之和恒严格等于零，因为所有预测概率之和为 1，单热标签之和也为 1。这为手写代码的单元测试提供了一个极为便捷的恒等式核验手段。
 
-### What the three lines rely on
+### 三行代码背后的前置依赖
 
-The softmax call must be the stable one, with the largest logit subtracted before the exponential, or large logits give inf. A framework fuses log-softmax and the negative log-likelihood into one loss that takes logits, for the same reason; the lesson's rule is to call that fused loss rather than a softmax followed by a separate log.
+所调用的 softmax 函数必须是数值安全版本（在求指数前从所有 logits 中减去最大值），否则大数值 logits 会直接导致 exp 溢出。主流工业框架正是出于这一原因将 log-softmax 与负对数似然（NLLLoss）融合成一个直接接收 logits 的算子；课程明确建议优先调用这种融合后的损失算子，而非先算 softmax 再单独求对数。
 
-### With label smoothing
+### 引入标签平滑（Label Smoothing）时的形态
 
-Replace the one-hot target by the smoothed vector: with alpha of 0.1 on ten classes the true class gets 0.91 and the others 0.01. The gradient is p minus that vector, so it reaches zero at 0.91, not at 1.0, which keeps the logits from running to infinity.
+将单热标签替换为平滑向量：例如在 10 分类任务中 alpha 设为 0.1，真实类别的目标标签变为 0.91，其余 9 个类别各分配 0.01。梯度依然是 p 减去该目标向量，因此梯度在预测概率达到 0.91 时即归零，而非逼近极限 1.0，从而有效遏制了 logits 无休止地盲目膨胀。
 
 ## Follow-ups
 
-- **Level 2:** What does the gradient vector sum to? Expected: zero; the probabilities sum to 1 and the one-hot target sums to 1.
-- **Level 2:** Why pair softmax with cross-entropy rather than with squared error? Expected: the log undoes the exponential, so the gradient is linear in the error and never flattens.
-- **Level 3:** How does the gradient change with label smoothing of 0.1 on ten classes? Expected: the target becomes 0.91 at the true class and 0.01 elsewhere, so the gradient is p minus that vector and reaches zero at 0.91, not at 1.0.
-- **Level 3:** A framework offers a loss on logits and a loss on log probabilities. Which do you call? Expected: the one on logits, which fuses log-softmax and the negative log-likelihood in one numerically stable step.
+- **Level 2:** 该梯度向量所有元素相加的总和是多少？ Expected: 严格等于零；所有类别的预测概率之和为 1，单热目标标签之和也为 1。
+- **Level 2:** 为什么把 Softmax 与交叉熵搭配，而不是与平方误差搭配？ Expected: 对数运算完美抵消了指数函数的非线性饱和，使得导数关于预测误差呈简洁的线性形式且永不饱和消失。
+- **Level 3:** 在 10 分类任务中引入 0.1 的标签平滑，梯度形式会发生什么变化？ Expected: 目标向量变为真实类为 0.91、其余类为 0.01；梯度为 p 减去该向量，在真实类概率为 0.91 而非 1.0 时梯度归零。
+- **Level 3:** 深度学习框架同时提供接收 logits 的损失和接收对数概率的损失，你调用哪一个？ Expected: 优先调用接收 logits 的算子，它在一个数值稳定的算子中融合了 log-softmax 与负对数似然计算。
 
 ## Wrong answers
 
-- "The gradient is minus 1 over p at the true class, like binary cross-entropy." That is the derivative with respect to the probability; through the softmax, the derivative with respect to the logit is p minus the target.
-- "Only the true class has a gradient, because only it appears in the loss." Every logit appears in the softmax denominator, so every logit receives its p as gradient.
-- "Divide by the number of classes." The gradient per sample is p minus the target; averaging over a batch divides by the batch size, not the class count.
+- "真实类别处的梯度是 -1 / p，就像二元交叉熵那样。" -1 / p 是关于概率 p 的导数；通过复合 Softmax 后，关于未激活 logit 的导数已经简化为 (p - target)。
+- "只有真实类别所在维度才有梯度，因为损失公式里只有真实类别项。" 所有 logits 均出现在 Softmax 的归一化分母中，因此每个 logit 都会分得其对应预测概率 p 作为梯度贡献。
+- "计算得到的梯度还必须除以类别总数。" 单样本梯度直接就是 (p - target)；批次平均除以的是批次大小（batch size），绝不是类别总数。
 
 ## Taught in
 
-The [loss functions lesson](../../../phases/03-deep-learning-core/05-loss-functions/) writes this function and explains why the pairing simplifies.
+[损失函数课程](../../../phases/03-deep-learning-core/05-loss-functions/)手写了该求导函数，并深入剖析了 Softmax 与交叉熵天然配对的代数原理。

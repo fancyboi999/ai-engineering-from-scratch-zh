@@ -1,6 +1,6 @@
 ---
 id: layernorm-not-batchnorm
-title: Why transformers normalize across features, not the batch
+title: transformer 为什么跨特征归一化，而不是跨 batch
 card: deep-learning
 kind: tradeoff
 level: 3
@@ -16,43 +16,43 @@ related: [deep-learning/train-mode-and-eval-mode, deep-learning/inverted-dropout
 updated: 2026-11-03
 ---
 
-A team ports a vision training recipe to a transformer and keeps batch normalization. Training is unstable, and text generation with one sequence at a time produces garbage. Explain why transformers use layer normalization instead, and when you would go a step further to RMSNorm.
+一个团队把视觉的训练配方移植到 transformer 上，保留了批归一化。训练不稳定，一次生成一条序列时输出的是乱码。解释 transformer 为什么改用层归一化，以及什么时候你会更进一步，用 RMSNorm。
 
 ## Short answer
 
-Batch normalization normalizes each feature across the batch, so its statistics depend on the batch size and on which sequences share the batch; with small batches they are noisy, with a batch of one they are meaningless, and training and inference run different code paths. Layer normalization normalizes across the features of one sample, so it does not depend on the batch and is identical in both modes, which is what variable length sequences and single sequence generation need. RMSNorm drops the mean subtraction and the shift parameter, keeps the accuracy, and saves about 10 percent of the normalization cost, which is why most recent large language models use it.
+批归一化在 batch 上对每个特征做归一化，所以它的统计量取决于 batch 大小，以及哪些序列在同一个 batch 里；batch 小时统计量噪声大，batch 为一时没有意义，训练和推理还走不同的代码路径。层归一化在一个样本的特征上做归一化，不依赖 batch，两种模式下完全一样，这正是变长序列和单序列生成所需要的。RMSNorm 去掉了减均值和平移参数，精度不变，归一化开销省了约 10%，所以最近的大多数大语言模型都用它。
 
 ## Full answer
 
-### Batch normalization and its two dependencies
+### 批归一化和它的两个依赖
 
-For each feature, batch normalization subtracts the batch mean, divides by the batch standard deviation with an epsilon, and applies a learned scale gamma and shift beta. Two things follow. First, the result for one sample depends on the other samples in its batch. The lesson puts the floor at a batch of about 32; below it the statistics are noisy, and at a batch of one the variance is zero. Second, inference cannot see a batch, so it uses running averages collected in training with a momentum of 0.1, which is a second code path and a second source of bugs. Sequence models hit both problems: lengths vary, memory limits the batch, and generation runs one sequence at a time.
+对每个特征，批归一化减去 batch 均值，除以加了 epsilon 的 batch 标准差，再应用可学习的缩放 gamma 和平移 beta。这带来两个后果。第一，一个样本的结果取决于同一 batch 里的其他样本。课里把下限定在 batch 大约为 32；低于它统计量噪声大，batch 为一时方差为零。第二，推理时看不到 batch，所以要用训练时以 0.1 的动量收集的滑动平均，这是第二条代码路径，也是第二个 bug 来源。序列模型两个问题都会碰上：长度不一，内存限制了 batch，生成时一次只跑一条序列。
 
-### Layer normalization
+### 层归一化
 
-Layer normalization computes the mean and variance over the D features of one sample and normalizes that sample alone. No batch dependence, no running averages, the same computation in training and at inference. Transformers apply it around each attention block and each feed-forward block, after them in the Post-LN layout or before them in the Pre-LN layout, which the lesson notes trains more stably.
+层归一化在一个样本的 D 个特征上算均值和方差，只对这个样本做归一化。不依赖 batch，没有滑动平均，训练和推理的计算相同。transformer 在每个注意力块和每个前馈块周围应用它：Post-LN 放在块之后，Pre-LN 放在块之前，课里指出 Pre-LN 训练更稳定。
 
 ### RMSNorm
 
-RMSNorm divides by the root mean square of the features and multiplies by gamma. There is no mean subtraction and no beta. The observation behind it is that re-centering adds little to accuracy and costs compute, so removing it gives the same accuracy with about 10 percent less normalization overhead. At the scale of billions of parameters that saving is real, and most modern large language models use it.
+RMSNorm 将特征除以其均方根，再乘以 gamma。没有减均值，也没有 beta。它背后的观察是：重新中心化对精度帮助不大，却要花计算，去掉它精度相同，归一化开销少了约 10%。在数十亿参数的规模下，这个节省是实打实的，现代大多数大语言模型都用它。
 
-### Why batch normalization helps at all
+### 批归一化到底为什么有用
 
-The first published explanation, internal covariate shift, has been shown to be wrong. The gain comes from a smoother loss landscape with more predictive gradients, which lets the optimizer take larger steps. Layer normalization and RMSNorm deliver that effect without the batch dependence.
+最早发表的解释，也就是内部协变量偏移，已经被证明是错的。收益来自更平滑的损失曲面和更可预测的梯度，优化器因此能迈更大的步。层归一化和 RMSNorm 提供了同样的效果，却不依赖 batch。
 
 ## Follow-ups
 
-- **Level 3:** What does batch normalization need at inference that layer normalization does not? Expected: running averages of the mean and variance collected in training; layer normalization computes its statistics from the sample itself.
-- **Level 3:** Where does a transformer block place the normalization? Expected: after each attention and feed-forward block in Post-LN, or before them in Pre-LN, which trains more stably.
-- **Level 4:** What does RMSNorm remove and what does it cost? Expected: the mean subtraction and the shift parameter; the lesson reports the same accuracy with about 10 percent less normalization overhead.
-- **Level 4:** Why did the original explanation for batch normalization fall out of favor? Expected: later work showed the gain comes from a smoother loss landscape with smaller Lipschitz constants, which lets the optimizer take larger steps.
+- **Level 3:** 批归一化在推理时需要什么，而层归一化不需要？ Expected: 训练时收集的均值和方差的滑动平均；层归一化从样本自身计算统计量。
+- **Level 3:** transformer 块把归一化放在哪里？ Expected: Post-LN 放在每个注意力块和前馈块之后，Pre-LN 放在它们之前，后者训练更稳定。
+- **Level 4:** RMSNorm 去掉了什么，代价是什么？ Expected: 减均值和平移参数；课里报告精度相同，归一化开销少了约 10%。
+- **Level 4:** 批归一化最初的解释为什么不再被接受？ Expected: 后来的研究表明，收益来自更平滑、Lipschitz 常数更小的损失曲面，这让优化器能迈更大的步。
 
 ## Wrong answers
 
-- "Batch normalization only needs a bigger batch." Generation runs one sequence at a time and sequence lengths vary; the fix is a norm that does not look across the batch.
-- "Layer normalization is a weaker regularizer, so it is a compromise." It normalizes across features, which is the right axis for sequences, and it removes the mismatch between training and inference.
-- "RMSNorm is an approximation that loses accuracy." The lesson reports the same accuracy; the re-centering adds little and costs compute.
+- "批归一化只需要更大的 batch。" 生成时一次只跑一条序列，序列长度也各不相同；解决办法是一种不跨 batch 看的归一化。
+- "层归一化是更弱的正则化，所以是一种妥协。" 它跨特征归一化，这是序列的正确轴，而且消除了训练和推理之间的不一致。
+- "RMSNorm 是会损失精度的近似。" 课里报告精度相同；重新中心化帮助不大，还要花计算。
 
 ## Taught in
 
-The [regularization lesson](../../../phases/03-deep-learning-core/07-regularization/) builds all three normalizations and explains the choice for transformers.
+[正则化课](../../../phases/03-deep-learning-core/07-regularization/)构建了这三种归一化，并解释了 transformer 为什么这样选。

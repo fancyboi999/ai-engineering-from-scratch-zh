@@ -1,6 +1,6 @@
 ---
 id: fraud-check-100ms
-title: A payment fraud check inside a hundred milliseconds
+title: 百毫秒内的支付风控反欺诈判定系统
 card: system-design
 kind: design
 level: 3
@@ -16,64 +16,64 @@ related: [system-design/batch-vs-online-serving-choice, system-design/drift-moni
 updated: 2026-11-03
 ---
 
-A payment service must approve, review or block each payment within 100 ms, at 400 requests per second at peak. Fraud labels arrive as chargebacks weeks later. Design the system: the task, the serving mode and its sizing, the data and label plan, the rollout, the failure defaults, and the two things that will quietly break it after launch.
+一个支付服务必须在 100 ms 内对每笔支付做出批准、送审或拦截的决策，系统峰值流量为每秒 400 次请求。欺诈标签在数周后才以拒付的形式到达。请设计该系统：预测任务定义、服务运行模式与容量规划、数据管理与标签流转方案、灰度发布策略、故障兜底动作，以及上线后可能悄然破坏系统的两处隐患。
 
 ## Short answer
 
-The task is binary classification of fraud probability with two thresholds that split the score into approve, review and block, served online because the decision needs the data of the request. At 400 requests a second and 50 ms per request about 20 requests are in flight at any moment, so the service is small, and the budget leaves room for a feature fetch plus the model. Chargeback labels come weeks after the payment, so training uses a time split and features that exist at payment time, and the rollout goes shadow, then canary on a small share, with the heuristic rule as the default on timeout. The two quiet failures are the feedback loop, where blocked payments never get a label, and concept drift, where the same basket changes its fraud risk and only outcome monitors see it.
+该任务属于预估欺诈概率的二分类问题，通过双阈值将预测得分切分为批准、送审与拦截三档，必须采用在线推理模式，因为决策高度依赖当前请求携带的实时数据。在 400 QPS 峰值与单请求 50 ms 耗时下，系统任意时刻的在途并发请求约为 20 个，因此服务规模较小，性能预算为特征抓取与模型推理留出了空间。拒付调单标签在交易发生数周后才会到达，因此训练过程必须采用时间序列切分，并严格限制仅使用交易发生时已经存在的特征；发布遵循影子部署再转入小流量金丝雀的路径，并在超时时以启发式规则作为兜底默认值。上线后两处悄然破坏系统的隐患是：拦截导致被封交易永远无法回流标签的反馈闭环，以及相同交易特征下欺诈风险发生转变但仅有结果监控层能够察觉的概念漂移。
 
 ## Full answer
 
-### Task and decision
+### 任务与业务决策
 
-| Question | Answer |
+| 追问 | 解答 |
 |---|---|
-| Prediction, per entity | Probability that this payment is fraud |
-| Decision | Approve, send to review, or block, inside 100 ms |
-| When, with what data | At the request, with the payment, the card history and the device |
-| Success | Fraud losses down with the approval rate as a guardrail |
+| 针对什么实体预测什么目标 | 这笔支付属于欺诈的概率 |
+| 业务决策动作 | 在 100 ms 内做出批准、转入人工审核或直接拦截的决策 |
+| 何时执行，使用什么数据 | 请求到达瞬间执行，结合交易数据、银行卡历史与设备信息 |
+| 成功评价标准 | 欺诈资金损失下降，同时将整体批准率作为硬性护栏 |
 
-### Serving and sizing
+### 推理模式与容量规划
 
-Batch cannot serve this: the staleness limit is zero because the payment did not exist a minute ago. Online inference fetches features and runs the model inside the budget. Little's law sizes it: throughput times latency is the number in progress, so 400 requests a second at 50 ms each is 20 requests in flight, far below what two replicas handle. The p99, not the mean, must stay under the budget; a p99 of 100 ms means 99 of 100 requests finish in time.
+批处理推理无法满足此要求：因为该支付请求在一分钟前根本不存在，新鲜度限制为零。在线推理必须在严格预算内完成特征抓取并运行模型。依据利特尔法则计算系统容量：并发在途请求数等于吞吐量乘以平均延迟，因此 400 请求/秒在 50 ms 平均耗时下，系统任意瞬间仅有约 20 个在途请求，远低于 2 个服务副本的处理上限。必须确保 p99 延迟而非平均耗时处于预算范围内；p99 为 100 ms 意味着 100 笔请求中有 99 笔都能准时返回。
 
-### Data and labels
+### 数据流与标签处理
 
-Chargebacks arrive weeks after the payment, so the outcome of recent traffic is unknown. Train on a time split with the most recent labeled period held out. Every feature must exist at payment time; anything written after the outcome, such as a dispute flag, leaks the label.
+银行拒付调单往往在交易数周后才会到达，因此近期线上流量的真实结果属于未知状态。采用时间序列切分，留出最近一个已完成标签回流的历史周期作为测试集。所有输入特征必须在支付发生瞬间已经客观存在；交易结果产生后才写入的特征，例如争议标记，会泄漏标签。
 
-### Rollout
+### 灰度发布方案
 
-Shadow: score live payments and log, never act; compare latency, error rate and score distribution with the current rule. Canary: act on a small share, often 1 to 5 percent, widen in steps, roll back by configuration when a guardrail moves. Then measure losses against a holdout.
+影子模式：对线上真实交易打分并记录日志，绝不触发实际拦截；将延迟、报错率和得分分布与现有规则全面对比。金丝雀发布：对少量流量执行模型判定，通常为 1% 到 5%，再阶梯式放量，一旦护栏指标发生恶化立即通过配置回滚。最后对照保留组度量欺诈损失变化。
 
-### Failure defaults
+### 故障兜底策略
 
-- Model times out: apply the heuristic baseline the team already uses.
-- A feature is missing or out of range: use its documented default and log it.
-- A new card with no history: the rule or the population average.
-- The score distribution moves suddenly: pause automatic blocks and page a person.
+- 模型调用超时：直接执行风控团队现有的启发式基线规则。
+- 特征缺失或数值越界：采用文档中的默认值并记录日志。
+- 缺乏历史行为的新银行卡：采用全局基线规则或大盘平均值兜底。
+- 得分分布突发异常漂移：立即暂停自动拦截逻辑，并触发人工值班告警。
 
-### The two quiet failures
+### 两处悄然破坏系统的隐患
 
-1. The feedback loop. A blocked payment never gets a chargeback, so the retrained model sees fewer fraud examples from the region it blocks and slowly learns that region is safe. Give a small random share of payments a non-blocking decision and log the score and the action with every row, so later training can tell influenced data from clean data.
-2. Concept drift. Fraudsters change tactics, and payments that were safe start to charge back. Inputs look the same, so input monitors stay quiet; only the outcome monitor sees it, and only after the label delay. Prior drift, such as the fraud rate doubling during an attack, shows up earlier in the prediction monitor as a moving positive rate.
+1. 反馈闭环：被系统拦截的交易永远不会产生后续的拒付调单，因此重训模型在它拦截的特征区域内看到的欺诈样本越来越少，进而缓慢学到该特征区域非常安全的错误认知。应对方案是对极小比例的支付实施随机不拦截决策，并在每行日志中记录得分与采取的动作，使后续训练能够区分干净数据与受干预数据。
+2. 概念漂移：黑产欺诈分子改变对抗手法，原本被视为安全的交易开始频繁发生拒付。输入特征看起来毫无异常，因此输入监控保持静默；唯有在标签回流延迟之后，结果监控层才能最终暴露问题。先验漂移，例如攻击期间欺诈率翻倍，会更早地以正例比例变化的形式反映在预测监控层。
 
-### Monitoring
+### 监控体系设计
 
-System health at once, inputs and predictions at once, outcomes joined as chargebacks arrive and computed on the labeled part only. Alert policy with effect sizes, a corrected alpha and persistence, so the on-call person reads the alerts.
+系统健康监控实时就绪，输入特征与预测分布监控实时就绪，结果指标在拒付数据到达后关联计算，且严格仅在已拿到标签的数据切片上计算。报警策略结合效应量、校正后的显著性水平与连续窗口持久性要求，确保值班人员愿意认真查看告警。
 
 ## Follow-ups
 
-- **Level 3:** Why does a time split matter more here than a random split? Expected: a random split leaks future tactics into training and overstates performance on the next month's fraud.
-- **Level 3:** The review queue grows after launch. Which guardrail caught it and what do you adjust? Expected: the review rate guardrail; move the review threshold, not the model.
-- **Level 4:** The random non-blocking share costs real fraud losses. How do you size it? Expected: as the smallest share that keeps enough labeled fraud examples from the blocked region to retrain; price it as the cost of clean data against the cost of a model that drifts blind.
-- **Level 4:** Retraining on the last quarter's labels after a tactic change makes the model worse. Why? Expected: concept drift; most of the labels still describe the old relation, so new labels must be collected before retraining helps.
+- **Level 3:** 为什么在此场景下时间序列切分远比随机切分更重要？ Expected: 随机切分会将未来的欺诈对抗手法泄漏进训练集中，虚高夸大模型在应对下个月新型欺诈时的实际能力。
+- **Level 3:** 上线后人工审核队列发生积压堆积，是哪项护栏捕获了该问题？该如何调整？ Expected: 审核率护栏指标；此时应当调整审核触发的分数阈值，而不是盲目调整模型。
+- **Level 4:** 针对部分交易实施随机不拦截会造成真实的欺诈坏账，你如何规划其比例？ Expected: 设为能从被拦截区域获得足够带标签欺诈样本用于重训的最低比例；将获取干净数据的成本与模型盲目漂移的成本比较。
+- **Level 4:** 在欺诈手法突变后，基于上季度标签重新训练模型反而导致效果变差，为什么？ Expected: 发生了概念漂移；上季度绝大多数标签记录的依然是旧的欺诈手法映射关系，必须等待并收集新手法下的新标签后重训才有效。
 
 ## Wrong answers
 
-- "Precompute fraud scores nightly for every card." The payment did not exist last night; the decision needs request-time data.
-- "Retrain weekly on all blocked and approved payments." Blocked payments have no outcome, so the training set drifts toward the model's own decisions.
-- "Watch feature drift and you will see the fraudsters change." Concept drift leaves inputs unchanged; only outcomes show it.
+- "每晚预先为所有银行卡离线计算好风控欺诈得分。" 该交易在昨晚根本未发生；风控决策严重依赖请求携带的实时交易数据。
+- "每周在所有被拦截与被批准的交易上全量重训。" 被拦截的交易没有真实标签结果，训练集会严重向模型自身的历史决策漂移。
+- "只要密切关注特征漂移，就能第一时间发现欺诈分子的策略变化。" 概念漂移不会改变输入特征分布；唯有最终回流的真实结果才能证明规则变化。
 
 ## Taught in
 
-The [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) gives the latency budget, Little's law, the rollout stages and the feedback loop, and the [model monitoring lesson](../../../phases/02-ml-fundamentals/20-model-monitoring-and-drift/) explains the drift kinds and the label delay.
+[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)给出了延迟预算、利特尔法则、发布阶段与反馈闭环，[模型监控课程](../../../phases/02-ml-fundamentals/20-model-monitoring-and-drift/)解释了漂移分类与标签延迟。

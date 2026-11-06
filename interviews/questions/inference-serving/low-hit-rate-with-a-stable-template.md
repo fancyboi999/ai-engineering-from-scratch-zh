@@ -1,6 +1,6 @@
 ---
 id: low-hit-rate-with-a-stable-template
-title: Cached tokens at zero with a stable template
+title: 模板稳定，命中缓存的 token 却为零
 card: inference-serving
 kind: debug
 level: 2
@@ -16,62 +16,62 @@ related: []
 updated: 2026-11-03
 ---
 
-A team runs long agent sessions on SGLang with hierarchical caching on. Their dashboards show `#cached-token: 0` on requests that resend a long history. They have tuned the cache tiers and the write policy, and the hit rate barely moves. The prompt template looks stable to them. Where do you look first, and what do you expect to find?
+一个团队在开启分层缓存的 SGLang 上运行很长的 agent 会话。重发长历史的请求在他们的看板上显示 `#cached-token: 0`。他们调过缓存层级和写入策略，命中率几乎没动。在他们看来，prompt 模板是稳定的。你先看哪里？预计会找到什么？
 
 ## Short answer
 
-Look at the first tokens of the request as the server sees them, not at the template. A relay or a chat template often adds something that changes on every request near the start, such as a request ID, a session hash or the date, and the tree matches from the first token and stops at the first difference. In the manual's incident a random hash in the system prompt cost 27.6 points of hit rate, and removing it moved the engine hit rate from 66.8 to 94.4 percent.
+看服务器实际收到的请求开头那几个 token，而不是看模板。中继或 chat template 经常在靠近开头的地方加上每次请求都会变的东西，比如请求 ID、会话哈希或日期，而缓存树从第一个 token 开始匹配，遇到第一个不同之处就停。在手册记录的事故里，系统 prompt 中的一个随机哈希让命中率损失了 27.6 个百分点，去掉它之后，引擎命中率从 66.8% 升到 94.4%。
 
 ## Full answer
 
-### Reproduce it with one identifier in three places
+### 把一个标识符放在三个位置来复现
 
-The manual's capture kit sends one 2,999-token system prompt and a short question, five times in each of three forms, with `--enable-cache-report` on so that each response reports its cached tokens:
+手册的采集工具包发送一段 2,999 token 的系统 prompt 加一个简短问题，三种形式各发五次，并开启 `--enable-cache-report`，让每个响应报告命中缓存的 token 数：
 
-| Form | Cached tokens | Prompt tokens | Median TTFT |
+| 形式 | 命中缓存的 token | prompt token | 中位 TTFT |
 |---|---|---|---|
-| stable system prompt | 2,998 | 2,999 | 45.1 ms |
-| random ID at the start | 5 | 3,034 | 1,255.3 ms |
-| the same ID at the end | 2,985 | 3,028 | 88.2 ms |
+| 稳定的系统 prompt | 2,998 | 2,999 | 45.1 ms |
+| 随机 ID 放在开头 | 5 | 3,034 | 1,255.3 ms |
+| 同一个 ID 放在末尾 | 2,985 | 3,028 | 88.2 ms |
 
-The ID at the start made the first token 28 times slower. The ID at the end cost 43 ms. The tokens are almost the same in the three forms; only their order differs. The ID at the start matched the 5 tokens before the random hex digits and nothing after them.
+ID 放在开头时，首 token 时间变为原来的 28 倍。放在末尾只多花 43 ms。三种形式的 token 几乎相同，只是顺序不同。开头的 ID 只匹配到随机十六进制字符之前的 5 个 token，之后一个都没匹配上。
 
-### Why nothing after a change can match
+### 为什么改动之后的内容都匹配不上
 
-The attention values of every later token depend on every earlier token. A cache that reused the later tokens would return wrong answers. So the tree is exact, and a change in the system prompt invalidates everything behind it, while a change in the newest message invalidates only that message.
+后面每个 token 的注意力值都取决于它前面的所有 token。缓存如果复用这些后面的 token，就会返回错误的答案。所以缓存树是精确匹配的：改动系统 prompt 会让它后面的所有内容失效，而改动最新的一条消息只会让这条消息失效。
 
-### The incident behind the question
+### 问题背后的事故
 
-The reporter found three causes stacked on each other:
+报告者发现了三个叠在一起的原因：
 
-1. The relay put a per-session random hash and a rotating system message into every request. Removing them moved the engine hit rate from 66.8 to 94.4 percent.
-2. The client wrote its task-list snapshot at the end of the system prompt. Every task update changed the system prompt and invalidated more than 100,000 tokens of history behind it.
-3. Hierarchical cache load-back, when it found no room, evicted the prefixes of other sessions. The reporter counted 250,000 evict calls against 376 completed load-backs.
+1. 中继在每个请求里放了一个按会话随机生成的哈希和一条轮换的系统消息。去掉它们后，引擎命中率从 66.8% 升到 94.4%。
+2. 客户端把任务列表快照写在系统 prompt 的末尾。每次任务更新都会改变系统 prompt，让它后面超过 100,000 token 的历史失效。
+3. 分层缓存回载时如果找不到空间，会驱逐其他会话的前缀。报告者统计到 250,000 次驱逐调用，而完成的回载只有 376 次。
 
-The first fix was a prompt edit. No cache flag could have recovered the 27.6 points that the hash cost. The lesson tells the same story from another deployment, where moving dynamic content out of the cacheable prefix took the hit rate from 7 to 74 percent.
+第一个修复是改 prompt。哈希造成的 27.6 个百分点，任何缓存参数都救不回来。课里讲了另一个部署中的同类事情：把动态内容移出可缓存的前缀后，命中率从 7% 升到 74%。
 
-### The order of checks
+### 检查顺序
 
-1. Dump the exact token sequence of two consecutive requests and compare them from the first token. Include what the relay and the chat template add.
-2. Read `cached_tokens` in the usage block with `--enable-cache-report`, or in `meta_info` of the native `/generate` route.
-3. Read `#new-token` and `#cached-token` in the `Prefill batch` lines.
-4. Read `sglang:cache_hit_rate` from `/metrics`.
-5. With several servers, check routing. A request that lands on a server without its prefix misses whatever the prompt looks like. One report moved from 64.7 to 92.1 percent by routing each conversation to the same server.
+1. 导出两个连续请求的完整 token 序列，从第一个 token 开始对比。中继和 chat template 加进去的内容也要算上。
+2. 开启 `--enable-cache-report` 后读 usage 块里的 `cached_tokens`，或者读原生 `/generate` 路由的 `meta_info`。
+3. 看 `Prefill batch` 日志行里的 `#new-token` 和 `#cached-token`。
+4. 从 `/metrics` 读 `sglang:cache_hit_rate`。
+5. 有多台服务器时，检查路由。请求落到没有它前缀的服务器上，不管 prompt 写得怎样都会未命中。有一份报告把每段对话路由到同一台服务器后，命中率从 64.7% 升到 92.1%。
 
-Two server settings look like prompt problems. A request for prompt log probabilities from position k can reuse only the first k tokens. Different LoRA adapters never share tree nodes, because the adapter is part of the tree key.
+有两项服务器设置看起来像 prompt 问题。请求要求从位置 k 开始返回 prompt 的 log probability 时，只能复用前 k 个 token。不同的 LoRA adapter 永远不会共享树节点，因为 adapter 是树键的一部分。
 
 ## Follow-ups
 
-- **Level 2:** The same random ID moves behind the fixed text instead. What does it cost now? Expected: about 45 tokens of prefill instead of about 3,027; in the experiment that was 43 ms more than the stable prompt instead of 28 times longer.
-- **Level 3:** After the prompt fix, one server hits well and the fleet still misses. What next? Expected: routing; a request that lands on a server without its prefix misses, and routing each conversation to the same server moved one report from 64.7 to 92.1 percent.
-- **Level 4:** The host tier still hurts other sessions after the prompt fix. What did the incident count, and what does it mean? Expected: 250,000 evict calls against 376 completed load-backs; a load-back that finds no room evicts other sessions from the GPU pool, so the pool size and the write policy need a look only after the prompt is fixed.
+- **Level 2:** 同一个随机 ID 改放到固定文本后面。现在代价是多少？ Expected: 大约 45 个 token 的 prefill，而不是大约 3,027 个；在实验里，这比稳定的 prompt 多 43 ms，而不是变为原来的 28 倍。
+- **Level 3:** 修好 prompt 之后，一台服务器命中很好，整个集群仍然未命中。下一步查什么？ Expected: 路由；请求落到没有它前缀的服务器上就会未命中，有一份报告把每段对话路由到同一台服务器后，从 64.7% 升到了 92.1%。
+- **Level 4:** 修好 prompt 后，主机层仍在伤害其他会话。事故里统计到了什么，说明什么？ Expected: 250,000 次驱逐调用对 376 次完成的回载；找不到空间的回载会把其他会话从 GPU 池里驱逐出去，所以只有在 prompt 修好之后，才需要去看池的大小和写入策略。
 
 ## Wrong answers
 
-- "Raise the hierarchical cache ratio until the hit rate recovers." No cache flag can recover a miss that starts at token 5; the first fix was a prompt edit, worth 27.6 points of hit rate.
-- "The template is stable, so the prompt is stable." The template is not what the server sees; a relay, a gateway or the chat template can insert a hash, a date or a snapshot, so compare the token sequences of two consecutive requests from the start.
-- "A changed field in the middle only costs the tokens of that field." Every token after the change is a different branch of the tree, because the attention values of later tokens depend on every earlier token.
+- "把分层缓存的比例调大，直到命中率恢复。" 从第 5 个 token 就开始的未命中，任何缓存参数都救不回来；第一个修复是改 prompt，它值 27.6 个百分点的命中率。
+- "模板是稳定的，所以 prompt 也是稳定的。" 服务器看到的不是模板；中继、网关或 chat template 都可能插入哈希、日期或快照，所以要从开头对比两个连续请求的 token 序列。
+- "中间改了一个字段，只会损失这个字段的 token。" 改动之后的每个 token 都在树的另一条分支上，因为后面 token 的注意力值取决于前面的每个 token。
 
 ## Taught in
 
-[Prefix-friendly prompts](../../../manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md) has the three-form experiment and the incident, and [the RadixAttention lesson](../../../phases/17-infrastructure-and-production/06-sglang-radixattention/docs/en.md) states the ordering rule.
+[对前缀友好的 prompt](../../../manuals/sglang-101/sections/3-4-prefix-friendly-prompts.md)给出了三种形式的实验和这次事故，[RadixAttention 一课](../../../phases/17-infrastructure-and-production/06-sglang-radixattention/docs/en.md)讲了排序规则。

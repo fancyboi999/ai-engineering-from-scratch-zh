@@ -1,6 +1,6 @@
 ---
 id: rlaif-is-not-cheaper-rlhf
-title: Replace the labelers with a model that reads principles
+title: 用读准则的模型替换人工标注员
 card: safety
 kind: tradeoff
 level: 2
@@ -16,46 +16,46 @@ related: [safety/sycophancy-is-the-loss]
 updated: 2026-11-03
 ---
 
-Your team wants to replace human preference labelers with a model that reads a list of written principles and ranks completions, mainly to save money. Is this cheaper preference training and nothing more? What changes in the failure modes, and what stays?
+你的团队想用一个模型替换人工偏好标注员。这个模型读一份成文的准则列表，再给补全排序，主要目的是省钱。这只是更便宜的偏好训练吗？失效模式里什么变了，什么没变？
 
 ## Short answer
 
-No. Moving the preference signal from people to a model changes which failures the pipeline has, not whether it has them. Labeler psychology gives way to principle interpretation that is uniform across the dataset and legible, sycophancy toward the user can drop because the labeler model has no user to please but must still be measured, and Goodhart's law remains because the proxy is now the model's reading of the principle set. The rest of the pipeline, a reward model and policy optimization, is unchanged.
+不是。把偏好信号从人转到模型，改变的是流水线有哪些失效，而不是有没有失效。标注员的心理偏差换成了对准则的解读偏差，这种解读在整个数据集上是一致的，也是可读的；对用户的阿谀奉承可能下降，因为标注模型没有用户要讨好，但仍然必须测量；古德哈特定律依然存在，因为代理现在变成了模型对准则集的解读。流水线的其余部分，也就是奖励模型和策略优化，没有变。
 
 ## Full answer
 
-### The two phases
+### 两个阶段
 
-Phase one is supervised: the model drafts a response to a red team prompt, a model reads one sampled principle and critiques the draft, a revision answers the critique, and the revision becomes the training target. Phase two is reinforcement learning from AI feedback: a feedback model ranks pairs of completions against sampled principles, a reward model is trained on those rankings, and the policy is optimized against it. The original principle set had 16 entries and was kept small so that critiques stayed focused.
+第一阶段是监督学习：模型针对一条红队 prompt 写出草稿，另一个模型读取随机抽中的一条准则并批评草稿，再写一版修订来回应批评，这版修订就是训练目标。第二阶段是基于 AI 反馈的强化学习：反馈模型对照抽中的准则给成对的补全排序，用这些排序训练奖励模型，再针对奖励模型优化策略。最初的准则集有 16 条，刻意保持精简，让批评集中。
 
-### What changes
+### 什么变了
 
-- Bias moves from labeler psychology to principle interpretation. The labeler model can read "be honest" more or less strictly than any person, and its strictness is the same across the whole dataset.
-- The signal becomes legible. You can read the principle, the critique and the revision. A human label is a bare preference.
-- Sycophancy toward the user can drop, because the labeler has no user to please. The lesson also warns that the sycophancy argument still applies once the labeler moves inside the loop, so measure it instead of assuming it is gone.
-- Goodhart's law stays. The proxy is now the model's interpretation of the principles, still an imperfect measurement of what you want.
+- 偏差从标注员的心理转到对准则的解读。标注模型对“要诚实”的理解，可能比任何人都更严或更松，而且这种严格程度在整个数据集上都一样。
+- 信号变得可读。你可以读到准则、批评和修订。人工标注只是一个光秃秃的偏好。
+- 对用户的阿谀奉承可能下降，因为标注者没有用户要讨好。课程也提醒，一旦标注者进入闭环，阿谀奉承的论证依然适用，所以要测量它，不要假设它没了。
+- 古德哈特定律还在。代理现在是模型对准则的解读，仍然是对你真正想要的东西的不完美测量。
 
-### What stays
+### 什么没变
 
-A reward model, policy optimization and the claim, which has held across labs, that the result is more harmless and about as helpful as training on human preferences with comparable data.
+奖励模型、策略优化，以及一个在多家实验室都成立的结论：在数据量相当时，结果比用人类偏好训练更无害，有用程度差不多。
 
-### Two related ideas
+### 两个相关的想法
 
-A constitution needs a priority order, because principles conflict. The 2026 rewrite the lesson describes ranks four tiers: avoid catastrophic outcomes, follow platform guidelines, be broadly ethical, be helpful and candid, resolved top down. Separately, lightweight classifiers that read the constitution can gate outputs at serving time; the first version cost 23.7 percent extra compute and the second about 1 percent. Training shapes behavior; classifiers enforce invariants.
+宪法需要优先级顺序，因为准则之间会冲突。课程介绍的 2026 年重写版分四层：避免灾难性后果，遵守平台准则，大体上合乎伦理，有用且坦诚；冲突时自上而下裁决。另外，读宪法的轻量分类器可以在服务时对输出做门控；第一版多花了 23.7% 的算力，第二版约 1%。训练塑造行为；分类器守住不变量。
 
 ## Follow-ups
 
-- **Level 2:** Why can sycophancy drop under a model labeler, and why do you still measure it? Expected: the labeler has no user to please, so agreement with the user's premise is rewarded less; but the labeler is now inside the loop and can reward answers that match its own taste, so the drop must be measured.
-- **Level 2:** What is legible here that is opaque in human labeling? Expected: the principle, the critique and the revision can all be read; a human label is a bare preference.
-- **Level 3:** Name a sycophancy like failure that can still occur. Expected: the feedback model can over reward completions that match its own reading of a principle, such as preachy or hedged answers, which is Goodhart on the principle set.
-- **Level 3:** Why does a constitution need a priority order? Expected: principles conflict; a tiered order resolves conflicts top down instead of leaving them to the labeler model's taste.
+- **Level 2:** 为什么换成模型标注后阿谀奉承可能下降？为什么仍然要测？ Expected: 标注者没有用户要讨好，所以认同用户前提的回答拿到的奖励更少；但标注者现在处在闭环里，可能奖励符合它自己口味的回答，所以下降与否必须测量。
+- **Level 2:** 这里有什么是可读的，而在人工标注里是不透明的？ Expected: 准则、批评和修订都能读到；人工标注只是一个光秃秃的偏好。
+- **Level 3:** 说出一种仍可能发生的、类似阿谀奉承的失效。 Expected: 反馈模型可能过度奖励符合它自己对某条准则理解的补全，比如爱说教或处处留余地的回答，这是在准则集上发生的古德哈特。
+- **Level 3:** 宪法为什么需要优先级顺序？ Expected: 准则之间会冲突；分层顺序自上而下解决冲突，而不是交给标注模型的口味。
 
 ## Wrong answers
 
-- "It is the same pipeline with a cheaper labeler." The failure modes change: uniform interpretation bias, sycophancy that can drop but must be measured, the same Goodhart.
-- "Written principles remove the proxy problem." The proxy is now the model's interpretation of the principles, still an imperfect measurement.
-- "A longer list of principles is safer." The original set was kept small so critiques stayed focused; the order matters more than the count.
+- "这就是同一条流水线，只是标注员更便宜。" 失效模式变了：一致的解读偏差，可能下降但必须测量的阿谀奉承，以及没变的古德哈特。
+- "写成文字的准则消除了代理问题。" 代理现在是模型对准则的解读，仍然是不完美的测量。
+- "准则列得越长越安全。" 最初的准则集刻意保持精简，让批评集中；顺序比条数更重要。
 
 ## Taught in
 
-The [constitutional AI and RLAIF lesson](../../../phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif/) gives the two phases, the changed failure modes and the four tier priority order.
+[Constitutional AI 与 RLAIF 这一课](../../../phases/18-ethics-safety-alignment/05-constitutional-ai-rlaif/)介绍了两个阶段、变化后的失效模式和四层优先级顺序。

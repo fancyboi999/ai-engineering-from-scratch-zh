@@ -1,6 +1,6 @@
 ---
 id: recall-at-k-first
-title: The first metric to read after a wrong answer
+title: 答案出错后首先该看哪个指标
 card: rag
 kind: concept
 level: 1
@@ -16,47 +16,47 @@ related: [rag/diagnose-from-the-metric-table, rag/rag-or-fine-tune]
 updated: 2026-11-03
 ---
 
-A user reports that the document assistant gave a wrong answer. The pipeline has a chunker, a retriever, a reranker and a generator. You get one metric to look at before anything else. Which one, and why that one?
+用户反馈文档助手答错了。流水线包括分块器、检索器、重排模型和生成器。如果只能先看一个指标，你选什么？为什么？
 
 ## Short answer
 
-Recall at k on the retrieval stage. If the gold chunk is not in the top k, no reranker can bring it back and the generator usually lacks the evidence for the right answer, unless another chunk happens to hold it, so the later metrics are hard to read. Recall comes first in the order, but it is not a gate: when recall holds, or when another retrieved chunk holds the evidence, move on to the rank position and then to the generated text, because a failure there stays hidden otherwise.
+先看检索阶段的 recall@k。若标准答案文本块不在前 k 个结果中，重排模型无法把它找回来，生成器通常也缺少正确回答所需的证据，除非另一个文本块恰好包含这些证据，因此后续指标很难解释。召回率只是检查顺序的第一项，并非阻断后续排查的门槛：召回正常或其他片段包含证据时，应继续检查排名和生成文本，否则下游故障仍会被掩盖。
 
 ## Full answer
 
-### The two retrieval metrics
+### 两个检索指标
 
-Precision at k asks what share of the top k is gold. If the gold set has three documents and the top 3 returns two of them plus one wrong one, precision at 3 is 2 / 3. Recall at k asks what share of the gold set is in the top k. If the top 5 holds all three gold documents, recall at 5 is 1.0.
+precision@k 表示前 k 个结果中标准相关文档的比例。如果标准集合有三篇文档，前 3 个结果包含其中两篇及一篇错误文档，precision@3 就是 2 / 3。recall@k 表示标准集合中有多少出现在前 k 个结果中。如果前 5 个结果包含全部三篇标准文档，recall@5 就是 1.0。
 
-Production teams quote recall. The generator can ignore an extra chunk with ease. It cannot invent an answer from a chunk it never saw.
+生产团队报的是召回率。生成器可以轻松忽略多余的片段，却无法根据从未见过的片段得出答案。
 
-### The order of the checks
+### 检查顺序
 
-| Symptom | Likely cause | What to fix |
+| 现象 | 可能原因 | 修正对象 |
 |---|---|---|
-| Low recall and low precision | the chunker cut the answer or the retriever cannot find it | chunk boundaries or the retrieval modality |
-| Decent recall, low MRR | the right chunk is in the top k but not at position 1 | the reranker |
-| High MRR, low faithfulness | the generator invents content despite the right context | the generation prompt, cite or refuse |
-| High faithfulness, low relevance | the answer is grounded but off topic | the query rewriter or the prompt |
-| All four high, users still complain | the eval set does not represent real queries | add real user queries to the qrels |
+| 召回率和精确率都低 | 分块器切断答案，或检索器找不到答案 | 分块边界或检索方式 |
+| 召回率尚可，MRR 低 | 正确片段在前 k 个结果中，但不在首位 | 重排模型 |
+| MRR 高，忠实度低 | 上下文正确，生成器仍编造内容 | 生成 prompt、引用或拒答 |
+| 忠实度高，相关性低 | 答案有依据，但偏离问题 | 查询改写器或 prompt |
+| 四项都高，用户仍投诉 | 评估集不能代表真实查询 | 向 qrels 添加真实用户查询 |
 
-### Keep the eval cheap
+### 控制评估成本
 
-Tier the qrels: a smoke set of 20 queries that runs in CI, a regression set of 200 that runs nightly, and a deep set of 2000 that runs weekly. Treat a recall regression like a failing test.
+对 qrels 分层：20 条查询的冒烟集在 CI 中运行，200 条的回归集每晚运行，2000 条的深度集每周运行。把召回率回退当作测试失败处理。
 
 ## Follow-ups
 
-- **Level 1:** What does precision at k add once recall is fine? Expected: it shows how much of the returned list is noise, which matters when a wrong chunk poisons the answer or wastes tokens.
-- **Level 2:** Recall at 5 is fine but the gold chunk sits at rank 4 or 5. Which metric shows that, and which stage do you fix? Expected: MRR, and the reranker.
-- **Level 3:** Recall averages 90 percent and one team still complains every day. What is hidden? Expected: one query class that always misses; slice the qrels by class, such as literal, paraphrased and multi-topic, and report each slice.
-- **Level 3:** How do you keep the eval fast enough to run on every change? Expected: tiers, with a smoke set of 20 queries in CI, 200 nightly and 2000 weekly.
+- **Level 1:** 召回率正常后，precision@k 还能说明什么？ Expected: 返回列表中噪声的比例；错误片段会污染答案或浪费 token，因此该指标仍然重要。
+- **Level 2:** recall@5 正常，但标准片段排在第 4 或第 5 位。哪个指标能反映问题，应修哪个阶段？ Expected: MRR，应修重排模型。
+- **Level 3:** 平均召回率为 90%，一个团队却每天投诉，可能隐藏了什么？ Expected: 某一类查询始终失败；按字面匹配、改写、多主题等查询类别划分 qrels，分别报告。
+- **Level 3:** 如何让评估足够快，能在每次修改后运行？ Expected: 分层，CI 运行 20 条冒烟查询，每晚 200 条，每周 2000 条。
 
 ## Wrong answers
 
-- "Read the answer and judge it." The answer alone cannot tell which of the four stages failed.
-- "Precision at k, because the noise caused the wrong answer." Precision matters once the right chunk is present; a missing chunk is the first thing to rule out.
-- "Faithfulness, because the model hallucinated." A faithful answer to the wrong chunks is still wrong; faithfulness only grades the generator against what it saw.
+- "直接阅读答案并评分。" 单看答案无法判断四个阶段中哪个出了问题。
+- "看 precision@k，因为噪声导致答案错误。" 正确片段存在时精确率才有意义；首先应排除片段缺失。
+- "看忠实度，因为模型出现幻觉。" 忠于错误片段的答案仍然错误；忠实度只评价生成器是否忠于它看到的内容。
 
 ## Taught in
 
-The lesson [RAG evaluation](../../../phases/19-capstone-projects/68-rag-eval-precision-recall/) defines the metrics and the diagnosis table, and the lesson [question answering](../../../phases/05-nlp-foundations-to-advanced/13-question-answering/) says to measure the retriever before the reader.
+[RAG 评估](../../../phases/19-capstone-projects/68-rag-eval-precision-recall/)课程定义指标和诊断表，[问答](../../../phases/05-nlp-foundations-to-advanced/13-question-answering/)课程要求先评估检索器，再评估阅读器。

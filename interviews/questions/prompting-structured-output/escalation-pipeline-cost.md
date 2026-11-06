@@ -1,6 +1,6 @@
 ---
 id: escalation-pipeline-cost
-title: Make each reasoning stage earn its cost
+title: 让每个推理阶段都对得起它的成本
 card: prompting-structured-output
 kind: tradeoff
 level: 4
@@ -16,55 +16,55 @@ related: [prompting-structured-output/self-consistency-at-temperature-zero, prom
 updated: 2026-11-03
 ---
 
-A team runs every question through the full escalation pipeline from the lesson: one deterministic chain, then five sampled chains with a vote, then a tree search when the vote is weak. Latency and cost are now the top complaint. As the staff engineer, how do you restructure the pipeline, and what do you measure to defend the new shape?
+某团队让每个问题都走完课程里的完整升级流水线：先跑一条确定性推理链，再采样五条推理链投票，投票结果不够一致时进入树搜索。现在延迟和成本成了用户最大的抱怨。作为 staff 工程师，你怎么重构这条流水线？你测量什么来为新结构辩护？
 
 ## Short answer
 
-Make the pipeline earn each stage. Most questions should end at the cheap stage, so start the vote at the minimum of three samples and widen it only on disagreement, and reserve the tree search, which costs up to 39 calls at a branching factor of 3 and a depth of 3, for the questions where the vote fails. Measure accuracy against cost per question for each stage on a held-out set, and report the share of questions that each stage resolves.
+让每个阶段都证明自己值得存在。大多数问题应该在便宜的阶段结束，所以投票从最少的三次采样开始，只在结果不一致时扩大；树搜索在分支因子为 3、深度为 3 时最多要 39 次调用，只留给投票失败的问题。在保留集上测量每个阶段的准确率与单题成本，并报告每个阶段解决了多大比例的问题。
 
 ## Full answer
 
-### What the lesson's pipeline does
+### 课程里的流水线怎么工作
 
-The deterministic chain runs once. The vote runs five samples at temperature 0.7 and accepts when 4 of 5 agree, a confidence of 0.8, and the majority matches the deterministic answer. Anything else goes to the tree search, where every node is a model call.
+确定性推理链只跑一次。投票在温度 0.7 下采样五次，当五次中有四次一致（置信度 0.8）且多数答案与确定性答案相同时接受。其他情况都进入树搜索，树里每个节点都是一次模型调用。
 
-### Where the money goes
+### 钱花在哪里
 
-| Stage | Calls | Token overhead |
+| 阶段 | 调用次数 | 额外 token |
 |---|---|---|
-| One few-shot chain | 1 | 300 to 600 tokens |
-| Vote over five chains | 5 | five times the tokens |
-| Tree search | 10 to 40 or more | 10 to 40 times the tokens |
-| A reasoning model | 1 | hidden, 2 to 10 times internal |
+| 一条少样本推理链 | 1 | 300 到 600 个 token |
+| 五条推理链投票 | 5 | 五倍 token |
+| 树搜索 | 10 到 40 次或更多 | 10 到 40 倍 token |
+| 推理模型 | 1 | 隐藏在内部，2 到 10 倍 |
 
-Run on every question, the vote alone multiplies the bill by five, and the tree search is unbounded in the tail.
+如果每个问题都这样跑，单是投票就让账单变成五倍，而树搜索在长尾上没有上限。
 
-### The restructure
+### 重构
 
-1. **Route by task first.** Simple recall and single-step classification get a single zero-shot call; the chain and the vote are for multi-step problems.
-2. **Vote small, widen on doubt.** Three samples is the minimum for a meaningful vote and five captures most of the benefit; start at three and add samples only when the three disagree.
-3. **Cap the tree.** Keep it for problems with a large but evaluatable search space, set a call budget per question, and report how often the budget is hit.
-4. **Test a reasoning model as a drop-in.** It runs the chain internally and subsumes the vote on many tasks; its hidden cost belongs on the same curve as the other stages.
+1. **先按任务路由。** 简单的事实回忆和单步分类只做一次零样本调用；推理链和投票只用于多步问题。
+2. **小规模投票，有疑问再扩大。** 三次采样是有意义投票的最小规模，五次已能拿到大部分收益；从三次开始，只有三次结果不一致时才追加采样。
+3. **给树设上限。** 只把它留给搜索空间大但可以评估的问题，给每个问题设调用预算，并报告预算被用完的频率。
+4. **试试直接换成推理模型。** 它在内部跑推理链，在很多任务上可以取代投票；它的隐藏成本要和其他阶段画在同一条曲线上。
 
-### What defends it
+### 用什么为它辩护
 
-- The accuracy against total tokens curve from a sweep of N over 1, 3, 5, 7 and 10 on a held-out set, with the knee marked.
-- The share of questions resolved at each stage, and the accuracy of each stage on the questions it resolved.
-- The share of questions that only the tree search gets right, against its share of the bill.
+- 在保留集上让 N 取 1、3、5、7、10 做扫描，画出准确率与总 token 的曲线，标出拐点。
+- 每个阶段解决的问题占比，以及每个阶段在它解决的问题上的准确率。
+- 只有树搜索能答对的问题占比，与它在账单中的占比对比。
 
 ## Follow-ups
 
-- **Level 3:** What does the tree search cost at the lesson's defaults? Expected: each node is a model call, so a branching factor of 3 and a depth of 3 means up to 39 calls.
-- **Level 4:** Where does a reasoning model fit in the new shape? Expected: as a drop-in for the chain and the vote on many tasks, one call with hidden internal reasoning at 2 to 10 times the tokens, compared on the same accuracy against cost curve.
-- **Level 4:** How do you pick the vote size? Expected: sweep N over 1, 3, 5, 7 and 10 on a held-out set and plot accuracy against total tokens; the lesson puts the knee near 5 and the minimum meaningful vote at 3.
-- **Level 4:** Which one number justifies keeping the tree search at all? Expected: the share of questions that only the tree search gets right, against its share of the bill; if that share is near zero, cut the stage.
+- **Level 3:** 按课程默认参数，树搜索要花多少？ Expected: 每个节点是一次模型调用，所以分支因子 3、深度 3 意味着最多 39 次调用。
+- **Level 4:** 推理模型在新结构里放在哪？ Expected: 在很多任务上直接替换推理链和投票，一次调用，内部隐藏推理消耗 2 到 10 倍 token，放在同一条准确率与成本曲线上比较。
+- **Level 4:** 投票规模怎么定？ Expected: 在保留集上让 N 取 1、3、5、7、10 做扫描，画准确率随总 token 变化的曲线；课程给出的拐点在 5 附近，有意义投票的最小规模是 3。
+- **Level 4:** 哪一个数字能证明树搜索值得保留？ Expected: 只有树搜索能答对的问题占比，与它在账单中的占比对比；如果这个占比接近零，就砍掉这个阶段。
 
 ## Wrong answers
 
-- "Run the tree search on everything for the best accuracy." It costs 10 to 40 or more calls per question, and the lesson keeps it for large, evaluatable search spaces.
-- "Drop the vote and keep one chain at temperature zero." One chain is cheap but carries no confidence signal; the vote share is what tells you when to stop or escalate.
-- "Set the confidence gate to 1.0 to be safe." Then any single disagreement triggers the tree search; the lesson accepts 4 of 5.
+- "所有问题都跑树搜索，准确率最高。" 它每个问题要 10 到 40 次甚至更多调用，课程只把它用在大型、可评估的搜索空间上。
+- "去掉投票，只留一条温度为零的推理链。" 一条链便宜，但没有置信度信号；投票的一致比例才告诉你何时停止、何时升级。
+- "为了保险，把置信度门槛设为 1.0。" 那样任何一次分歧都会触发树搜索；课程接受五票中四票一致。
 
 ## Taught in
 
-The lesson [few-shot and chain-of-thought](../../../phases/11-llm-engineering/02-few-shot-cot/) builds the escalation pipeline and gives the cost of each technique.
+[少样本与思维链](../../../phases/11-llm-engineering/02-few-shot-cot/)一课搭建了这条升级流水线，并给出了每种技术的成本。

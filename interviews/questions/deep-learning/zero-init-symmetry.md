@@ -1,6 +1,6 @@
 ---
 id: zero-init-symmetry
-title: A wide layer that behaves like one neuron
+title: 行为退化为单个神经元的极宽网络层
 card: deep-learning
 kind: concept
 level: 2
@@ -16,43 +16,43 @@ related: [deep-learning/kaiming-factor-of-two, deep-learning/half-the-relus-are-
 updated: 2026-11-03
 ---
 
-A network with a hidden layer of 512 units is initialized with every weight and every bias at zero. Training runs for thousands of epochs and the loss barely moves. Learning rate and data both check out. What is wrong, and why does a small random perturbation of each weight fix it?
+一个拥有 512 个神经元隐藏层的网络，其所有权重和偏置全部被初始化为零。训练持续了数千个 epoch，损失几乎纹丝不动。学习率和数据通道均已确认无误。请问问题出在哪里？为什么对每个权重施加微小的随机扰动就能解决该问题？
 
 ## Short answer
 
-Every neuron in the layer starts identical, so each computes the same output, receives the same gradient and takes the same update. They stay identical for the whole run: the layer holds the parameters of 512 neurons and the function of one. Random initialization gives each neuron its own starting point, so the gradients differ and the neurons learn different features. The scale of that randomness then decides whether the signal survives the depth.
+该隐藏层中的每个神经元开局完全相同，因此每个神经元计算出完全相同的输出、接收完全相同的梯度、并执行完全相同的参数更新。在整个训练周期内它们始终保持完全同构：该层虽然分配了 512 个神经元的参数量，但实际表达能力等同于单个神经元。随机初始化赋予每个神经元不同的数值起点，从而产生差异化的梯度并驱使神经元各自学习不同的特征表达。随机扰动的方差尺度随后决定了信号能否在深层网络中稳定传播。
 
 ## Full answer
 
-### The symmetry
+### 对称性困境（Symmetry Problem）
 
-All neurons in a layer have the same structure: a weighted sum of the same inputs, a bias, an activation. Whatever makes them different must come from the weights. If the weights are equal, the outputs are equal. Backpropagation then hands each neuron the same gradient, because each contributed the same amount to the loss. The update is the same, and the weights are equal again. Nothing in gradient descent can split them. The lesson's demo builds four zero-initialized neurons, feeds one input, prints four identical outputs, and counts one effective parameter instead of the eight that were allocated.
+同一层的所有神经元在计算结构上完全对称：对相同输入求加权和，加上偏置，再应用激活函数。赋予它们差异化特征捕获能力的唯一源泉在于权重。如果权重初始值完全相同，各神经元的激活输出严格相等。反向传播随后会将完全相同的损失梯度分发给每一个神经元，因为它们对最终损失的数学贡献完全相同。参数更新幅度完全一致，权重再次保持严格相等。梯度下降机制本身没有任何代数力量能将它们从这种对称性锁死中剥离。课程实验直观展示了这一失效：构建四个全零初始化的神经元，传入一个输入，输出四个完全相同的值，实际有效独立参数只有 1 个而非分配的 8 个。
 
-### Why zero is only the extreme case
+### 全零只是常数对称的极端表现
 
-Any constant initialization has the same flaw. Setting every weight to 0.5 produces 512 copies of one neuron just as zero does. Random values are the brute force way to break the tie, and they are also why two runs with different seeds learn different features.
+任何固定常数初始化都具有完全相同的对称性陷阱。将所有权重初始化为 0.5 与初始化为 0 毫无二致，同样会复制出 512 个步调一致的克隆神经元。随机数值是打破这种僵局的最朴素手段，这也是为什么使用不同随机种子初始化的网络会学出互不相同的特征组合。
 
-### Biases can stay at zero
+### 偏置项可以安全置零
 
-The lesson's layers draw random weights and set the biases to 0.0. That is fine: the weights already differ across neurons, so the biases do not need to.
+课程中的标准网络层实现统一采用随机权重，但将偏置项安全设为 0.0。这是完全合规的：由于神经元之间的权重已经具备了多样性差异，偏置项不再需要承担打破对称性的任务。
 
-### After the symmetry is gone
+### 打破对称性之后的尺度考量
 
-Random is not enough on its own. The variance of the draw must match the activation: Xavier for sigmoid and tanh, Kaiming for ReLU and GELU. Too small a scale and the signal vanishes through the layers; too large and it explodes. A quick check is to push random inputs through the untrained network and log the activation magnitude at each layer.
+单纯随机化本身是不够的。随机采样的方差尺度必须与激活函数的曲率特性精确匹配：Sigmoid 和 Tanh 配合 Xavier 初始化，ReLU 和 GELU 配合 Kaiming 初始化。采样方差过小会导致信号随深度快速衰减湮灭，采样方差过大会导致激活值在深层剧烈爆炸。快速的免训练诊断手段是向初始网络传入随机数据，监控记录各隐藏层激活值的宏观平均幅值。
 
 ## Follow-ups
 
-- **Level 2:** Is it fine to set the biases to zero? Expected: yes, when the weights are random; the lesson's layers do so.
-- **Level 2:** Would a nonzero constant for every weight fix it? Expected: no; the neurons are still identical and move in lockstep.
-- **Level 3:** After the fix, the loss moves but a deeper version trains badly. What do you check next? Expected: the scale of the random draw against the activation; Xavier for sigmoid and tanh, Kaiming for ReLU, verified by activation magnitudes per layer.
-- **Level 3:** How does the lesson show the symmetry in a few lines? Expected: four zero-initialized neurons on one input give four identical outputs, and it counts one effective parameter instead of eight.
+- **Level 2:** 将偏置项初始化为全零是否可行？ Expected: 完全可行，只要权重是随机初始化的；权重已经打破了对称性，偏置项无需额外随机化。
+- **Level 2:** 将所有权重统一初始化为一个非零常数（如 0.5）能否解决问题？ Expected: 不能；神经元依然完全同构，在训练中仍然步调一致地同步更新。
+- **Level 3:** 修复对称性后损失开始下降，但更深的网络训练变差，下一步检查什么？ Expected: 检查随机初始化的方差尺度是否与激活函数匹配（Sigmoid 匹配 Xavier，ReLU 匹配 Kaiming），并通过每层激活模长验证。
+- **Level 3:** 课程是如何用极简代码证明这种对称性死锁的？ Expected: 用全零权重构建 4 个神经元，给入一组输入，输出 4 个完全一致的数值，有效独立参数量仅为 1 个，而非 8 个。
 
 ## Wrong answers
 
-- "The learning rate is too low." Each neuron moves, but all move together; no learning rate separates identical gradients.
-- "Add more neurons." They are all the same neuron; width adds nothing without symmetry breaking.
-- "Zero init is fine for the first layer because the inputs differ." The neurons in one layer share the same inputs; what differs across neurons has to be the weights.
+- "这只是学习率过小导致的，调大学习率就能让网络动起来。" 每个神经元都在移动，但所有神经元移动的方向完全同步锁死；任何学习率都无法打破完全相同的对称梯度。
+- "在当前层中并排堆叠更多神经元以增强容量。" 所有神经元都只是同一个神经元的冗余副本；在没有打破对称性的前提下盲目加宽网络不产生任何额外增益。
+- "在第一层全零初始化是没问题的，因为输入数据各不相同。" 同一层内的所有神经元共享完全相同的输入；制造神经元间功能差异的唯一依据就是权重本身。
 
 ## Taught in
 
-The [weight initialization lesson](../../../phases/03-deep-learning-core/08-weight-initialization/) opens with the symmetry problem and demonstrates it with a tiny layer.
+[权重初始化课程](../../../phases/03-deep-learning-core/08-weight-initialization/)以对称性死锁问题开篇，并通过一个微型网络层完整重现并推导了该机制。

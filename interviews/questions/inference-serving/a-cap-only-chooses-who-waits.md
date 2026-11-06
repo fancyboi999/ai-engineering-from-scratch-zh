@@ -1,6 +1,6 @@
 ---
 id: a-cap-only-chooses-who-waits
-title: An admission cap decides who waits
+title: 准入上限只决定谁来等待
 card: inference-serving
 kind: tradeoff
 level: 3
@@ -16,79 +16,79 @@ related: []
 updated: 2026-11-03
 ---
 
-At 32 concurrent users your L4 chat service streams badly: the P99 inter-token gap is 613 ms, and your target is 100 ms or less per token with a first token within 1 second. A teammate proposes `--max-num-seqs 16` so that each step holds fewer requests. What do you expect, and what does the measurement say?
+你的 L4 对话服务在 32 个并发用户时流式输出很差：P99 token 间隔是 613 ms，而目标是每个 token 不超过 100 ms，首 token 在 1 秒内到达。一位同事提议设置 `--max-num-seqs 16`，让每一步容纳更少的请求。你预期会怎样？实测又说明了什么？
 
 ## Short answer
 
-A cap does not make room for more users; it only chooses who waits. With the cap at 16 and 32 users, each stream got a little smoother, a median ITL of 69.8 against 80.5 ms and a P99 ITL of 595 against 613, but half the users waited in the queue, the median first token went from 1.8 to 12.3 s, and output fell 38 percent to 171.8 tokens per second. At 64 users no cap that the manual tried brought the P99 ITL under 1.1 s, so the fix on this card is fewer users per replica, not a cap.
+上限不会给更多用户腾出空间，它只决定谁来等待。32 个用户、上限 16 时，每条流稍微顺了一点，中位 ITL 从 80.5 降到 69.8 ms，P99 ITL 从 613 降到 595，但一半用户在队列里等，中位首 token 时间从 1.8 秒涨到 12.3 秒，输出下降 38%，只剩每秒 171.8 个 token。到 64 个用户时，手册试过的所有上限都没能把 P99 ITL 压到 1.1 秒以下，所以在这张卡上，办法是让每个副本承载更少用户，而不是加上限。
 
 ## Full answer
 
-### Where the stream broke
+### 流式输出从哪里开始变差
 
-Qwen/Qwen3-8B on the L4 in the full-clock session, 512 prompt tokens and 128 output tokens, three seeds:
+Qwen/Qwen3-8B 跑在全频率会话的 L4 上，512 个 prompt token，128 个输出 token，三个随机种子：
 
-| Users | Output tok/s | Median TTFT | P99 ITL | Met the target | Median SM clock |
+| 用户数 | 输出 tok/s | 中位 TTFT | P99 ITL | 达标比例 | SM 中位频率 |
 |---|---|---|---|---|---|
 | 8 | 112.8 | 0.25 s | 67 ms | 75% | 1,485 MHz |
 | 16 | 201.3 | 0.29 s | 85 ms | 64% | 1,455 MHz |
 | 32 | 275.1 | 1.80 s | 613 ms | 0% | 1,275 MHz |
 | 64 | 242.3 | 11.18 s | 1,233 ms | 0% | 1,005 MHz |
 
-This sweep did not reset the prefix cache, so the rows below 32 users read too well; with a reset the share that met the target at 16 users fell to 25 percent and the P99 ITL there was 522 ms. Each step on this GPU has a budget of 2,048 tokens, and new prompt chunks share the step with the running streams, so the streams pause.
+这次压测没有重置前缀缓存，所以低于 32 个用户的几行结果显得过于乐观；重置之后，16 个用户时的达标比例降到 25%，P99 ITL 为 522 ms。这张 GPU 每一步的预算是 2,048 个 token，新 prompt 的分块和正在运行的流共用同一步，所以这些流会停顿。
 
-### The cap at 32 users
+### 32 个用户时加上限
 
-| Config | Output tok/s | Median TTFT | Median ITL | P99 ITL | Median SM clock |
+| 配置 | 输出 tok/s | 中位 TTFT | 中位 ITL | P99 ITL | SM 中位频率 |
 |---|---|---|---|---|---|
-| default, 256 | 275.1 | 1.8 s | 80.5 ms | 613 ms | 1,275 MHz |
+| 默认，256 | 275.1 | 1.8 s | 80.5 ms | 613 ms | 1,275 MHz |
 | `--max-num-seqs 16` | 171.8 | 12.3 s | 69.8 ms | 595 ms | 1,365 MHz |
 
-The cap run had the higher clock, so the clock does not explain the loss. The stream got a little smoother, half the users waited for their first token, and output fell by 38 percent.
+加上限的那次运行频率更高，所以频率解释不了这部分损失。流稍微顺了一点，一半用户在等首 token，输出下降了 38%。
 
-### Caps at 64 users
+### 64 个用户时的各种上限
 
-With the clock locked at 900 MHz, two seeds and a reset per run, against SGLang on the same card:
+频率锁定在 900 MHz，两个种子，每次运行前重置，并在同一张卡上与 SGLang 对比：
 
-| Config | Median TTFT | P99 ITL | Output tok/s |
+| 配置 | 中位 TTFT | P99 ITL | 输出 tok/s |
 |---|---|---|---|
-| SGLang default | 19.4 s | 143 to 153 ms | 225 to 231 |
-| vLLM default | 11.8 s | 1,359 ms | 220 |
-| `--max-num-seqs 32` | 17.2 to 20.6 s | 1,163 to 1,399 ms | 196 to 230 |
-| `--max-num-active-seqs 48` | 11.8 s | 1,329 to 1,373 ms | 215 to 218 |
-| `--max-num-active-seqs 16` | 44.8 to 48.8 s | 1,133 to 1,139 ms | 129 to 136 |
+| SGLang 默认 | 19.4 s | 143 至 153 ms | 225 至 231 |
+| vLLM 默认 | 11.8 s | 1,359 ms | 220 |
+| `--max-num-seqs 32` | 17.2 至 20.6 s | 1,163 至 1,399 ms | 196 至 230 |
+| `--max-num-active-seqs 48` | 11.8 s | 1,329 至 1,373 ms | 215 至 218 |
+| `--max-num-active-seqs 16` | 44.8 至 48.8 s | 1,133 至 1,139 ms | 129 至 136 |
 
-No cap brought the vLLM P99 ITL near the SGLang value. At 16 or 32 running requests the P99 ITL stayed above 1.1 s and the first token waited 17 to 65 s. On this card a cap does not fix the long gaps at 64 users. Fewer users per replica does.
+没有哪个上限能让 vLLM 的 P99 ITL 接近 SGLang。运行请求数为 16 或 32 时，P99 ITL 仍在 1.1 秒以上，首 token 要等 17 到 65 秒。在这张卡上，上限修不好 64 个用户时的长间隔。减少每个副本的用户数才行。
 
-### The small pool is the other queue
+### 小池是另一条队列
 
-A pool of 6,560 tokens against 24,096 at 32 users gave a median time to first token of 31.6 s against 3.1 s and a P99 first token of 48.0 against 7.1 s. A request of 640 tokens needs 640 tokens of pool by its end, so about 10 requests fit in the small pool and the other 22 waited for a running request to finish. The small-pool run also fell to 248 MHz, but a clock 3.6 times lower cannot explain a first token 10 times later; the queue did.
+32 个用户时，6,560 token 的池与 24,096 token 的池相比，中位首 token 时间是 31.6 秒对 3.1 秒，P99 首 token 时间是 48.0 秒对 7.1 秒。一个 640 token 的请求到结束时需要占用 640 token 的池，所以小池大约只装得下 10 个请求，另外 22 个要等某个运行中的请求结束。小池那次运行的频率也降到了 248 MHz，但频率低 3.6 倍解释不了首 token 晚 10 倍；原因是排队。
 
-### How SGLang admits, and why a queue is the honest failure
+### SGLang 怎样准入，为什么排队是诚实的失败方式
 
-SGLang admits a request only when a forecast fits the pool. A new request must fit its uncached prompt tokens plus its remaining `max_new_tokens`, clipped to 4,096. Each running request holds back its remaining `max_new_tokens` times a ratio that starts at 0.7 and falls to 0.098 over 600 decode steps, because most requests stop early. When the forecast is too bold, the scheduler retracts running requests to the queue and they prefill again. In a small pool of 4,096 tokens with 16 users asking for 512 tokens each, exactly five requests ran at a time: each token took 24 ms once a request started, and the median user waited 27.9 s for the first token. Every request succeeded. A long queue with fast tokens is admission control doing its job; a retraction is the alarm, and more than about one per minute is a configuration bug. Set realistic `max_new_tokens` in clients: a client that asks for 4,096 tokens and uses 200 makes the reservation of every new request about 20 times too big.
+SGLang 只在预测装得下时才准入请求。新请求需要装下它未命中缓存的 prompt token，再加上剩余的 `max_new_tokens`，后者最多按 4,096 计。每个运行中的请求预留剩余的 `max_new_tokens` 乘以一个比例，这个比例从 0.7 开始，在 600 个 decode 步内降到 0.098，因为大多数请求会提前结束。预测过于激进时，调度器会把运行中的请求撤回队列，它们之后要重新 prefill。在 4,096 token 的小池上，16 个用户各要 512 个 token，同一时间恰好运行 5 个请求：请求一旦开始，每个 token 用 24 ms，而中位用户等了 27.9 秒才拿到首 token。每个请求都成功了。队列很长而 token 很快，说明准入控制在正常工作；撤回才是警报，每分钟超过大约一次就是配置 bug。在客户端设置符合实际的 `max_new_tokens`：一个客户端要 4,096 个 token 却只用 200 个，会让每个新请求的预留大约放大 20 倍。
 
-### What to do
+### 怎么做
 
-1. Set the targets for the first token and the time per token.
-2. Sweep users with a reset per run, and find the last count that meets both.
-3. If the cache usage is near full and requests wait, the pool is too small: add room with an FP8 cache or FP8 weights.
-4. If the pool has room and the P99 ITL is too high, the GPU is full: add a GPU or a replica, and enforce the knee in the client or the gateway.
-5. Read the P99 ITL when you pick an engine for chat. On the GB10 the two engines gave the same output at 32 and 64 users, and the vLLM P99 ITL was 478 against 220 ms at 32 users.
+1. 定下首 token 时间和每 token 时间的目标。
+2. 按用户数压测，每次运行前重置，找出同时满足两项目标的最大用户数。
+3. 如果缓存使用率接近满且请求在等待，说明池太小：用 FP8 cache 或 FP8 权重腾出空间。
+4. 如果池还有空间但 P99 ITL 太高，说明 GPU 已经满载：增加 GPU 或副本，并在客户端或网关上把并发限制在拐点。
+5. 为对话场景选引擎时看 P99 ITL。在 GB10 上，两个引擎在 32 和 64 个用户时输出相同，但 32 个用户时 vLLM 的 P99 ITL 是 478 ms，对方是 220 ms。
 
 ## Follow-ups
 
-- **Level 3:** The cap run had a higher clock than the default run. Why does that matter for the conclusion? Expected: a higher clock should help the cap run, so the clock does not explain its 38 percent lower output; the loss belongs to the cap.
-- **Level 3:** How does SGLang decide to admit a request, and what happens when its forecast is wrong? Expected: a new request must fit its uncached prompt plus its remaining max_new_tokens, and running requests hold back their remaining output times a ratio that starts at 0.7 and falls to 0.098 over 600 decode steps; when the forecast is too bold the scheduler retracts running requests to the queue and they prefill again.
-- **Level 4:** The pool has room, the tail gap is still over target, and a cap only moves the wait. What is left? Expected: the GPU is full; add a GPU or a replica and put fewer users on each, enforce the knee in the client or the gateway, and read the P99 ITL when you pick an engine, because at the same output the two engines differed about twofold on the GB10.
+- **Level 3:** 加上限的那次运行频率比默认运行更高。这一点对结论为什么重要？ Expected: 频率更高本该对加上限的运行有利，所以频率解释不了它低 38% 的输出；损失来自上限本身。
+- **Level 3:** SGLang 根据什么决定是否准入一个请求？预测错了会怎样？ Expected: 新请求要装下未命中缓存的 prompt 加上剩余的 max_new_tokens，运行中的请求按剩余输出乘以一个比例预留，比例从 0.7 开始，在 600 个 decode 步内降到 0.098；预测过于激进时，调度器把运行中的请求撤回队列，它们要重新 prefill。
+- **Level 4:** 池还有空间，尾部间隔仍然超标，上限只会挪动等待。还剩什么办法？ Expected: GPU 已经满载；增加 GPU 或副本，让每个副本承载更少用户，在客户端或网关上把并发限制在拐点，并在选引擎时看 P99 ITL，因为在 GB10 上输出相同时，两个引擎的这项指标相差约两倍。
 
 ## Wrong answers
 
-- "A cap on running requests makes room for more users." It only chooses who waits; at 32 users the cap of 16 moved the wait into the queue, with the first token at 12.3 s, and cost 38 percent of the output.
-- "Lower the maximum model length to help the queue." The pool stays the same size, so it does not help when the cache usage is near full; add room with an FP8 cache or FP8 weights.
-- "Clients should ask for a large max_new_tokens to be safe." The admission forecast reserves it; a client that asks for 4,096 tokens and uses 200 makes the reservation of every new request about 20 times too big, so fewer requests are admitted.
-- "A queue means the server is broken." A long queue with fast tokens is admission control doing its job; the five admitted requests in the small-pool run got 24 ms per token while the median user waited 27.9 s, and a retraction, not a queue, is the alarm.
+- "限制运行请求数能给更多用户腾出空间。" 它只决定谁来等待；32 个用户时，上限 16 把等待挪进了队列，首 token 要 12.3 秒，还损失了 38% 的输出。
+- "调低模型最大长度能缓解排队。" 池的大小不变，所以缓存使用率接近满时没有帮助；应该用 FP8 cache 或 FP8 权重腾出空间。
+- "为了保险，客户端应该把 max_new_tokens 设得大一些。" 准入预测会按它预留；客户端要 4,096 个 token 却只用 200 个，会让每个新请求的预留大约放大 20 倍，于是能准入的请求更少。
+- "出现队列说明服务器坏了。" 队列很长而 token 很快，说明准入控制在正常工作；小池那次运行中，5 个已准入的请求每个 token 用 24 ms，中位用户等了 27.9 秒，真正的警报是撤回，不是队列。
 
 ## Taught in
 
-[Tune chat for many users](../../../manuals/vllm-101/sections/3-1-tune-chat-for-many-users.md) measures the caps and the small pool, and [Admission and retraction](../../../manuals/sglang-101/sections/2-3-admission-and-retraction.md) explains the forecast.
+[为大量用户调优对话服务](../../../manuals/vllm-101/sections/3-1-tune-chat-for-many-users.md)测量了各种上限和小池的效果，[准入与撤回](../../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)解释了准入预测。

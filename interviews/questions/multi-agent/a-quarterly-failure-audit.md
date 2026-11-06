@@ -1,6 +1,6 @@
 ---
 id: a-quarterly-failure-audit
-title: Design the quarterly failure audit for an agent team
+title: 为 agent 团队设计季度故障审计
 card: multi-agent
 kind: design
 level: 4
@@ -16,68 +16,68 @@ related: [multi-agent/the-retry-storm, multi-agent/a-number-that-never-existed]
 updated: 2026-11-03
 ---
 
-A multi-agent product has been in production for two quarters. Failures arrive as a stream of unrelated tickets and nothing gets fixed systematically. Design the audit that turns the stream into a ranked list of fixes, and say which failure class you would weight most heavily even if it is not the most frequent.
+某多 agent 产品已在生产环境中运行了两个季度。系统故障表现为源源不断涌现的孤立工单，始终得不到系统性的修复。请设计一套定期审计机制，将零散的工单流转化为按优先级排序的系统性修复清单，并说明即使某类故障在发生频次上不是最高的，你为什么仍会将其赋予最高的权重。
 
 ## Short answer
 
-Sample about 1000 real execution traces each quarter, categorize every failure into the three root categories of the published taxonomy and the five groupthink patterns, compute the failure rate per category, rank the mitigations by how many failures each would remove, and commit to two or three for the quarter. Weight verification gaps most heavily even though they were the smallest category by count, because they are silent: a plausible wrong output produces no exception, no alert and no ticket until a human notices.
+每个季度随机抽取约 1000 条真实执行追踪，将每个故障归入公开分类法的三大根源类别以及五种群体思维模式中，计算每个类别的故障率，按能够消除的故障数量给备选修复方案排序，并锁定两到三个作为本季度的核心改进承诺。将验证断层（verification gaps）赋予最高权重，即使它们在绝对计数上占比最小，因为这类故障是完全静默的：看似合理的错误输出既不会产生异常，也不会触发告警或工单，直到被人类偶然发觉。
 
 ## Full answer
 
-### The baseline you are measured against
+### 作为参考标杆的基准数据
 
-The reference taxonomy was built from 1642 execution traces across 7 open-source multi-agent systems and found failure rates between 41 percent and 86.7 percent. Three root categories:
+参考分类法基于对 7 个开源多 agent 系统中的 1642 条执行追踪提炼而成，其实测故障率在 41 percent 到 86.7 percent 之间。三大根源类别如下：
 
-| Category | Share | What it looks like |
+| 故障类别 | 发生占比 | 具体外在表现 |
 |---|---|---|
-| Specification problems | 41.77 percent | Role ambiguity, an underspecified task, implicit success criteria |
-| Coordination failures | 36.94 percent | Unsynchronized writes to shared state, lost messages, state drift |
-| Verification gaps | 21.30 percent | One agent claims success and nobody checks, each agent trusts the one before |
+| 任务规格问题（Specification problems） | 41.77 percent | 角色职责模糊、任务界定不足、隐式未言明的成功标准 |
+| 协调同步故障（Coordination failures） | 36.94 percent | 针对共享状态的未同步并发写入、丢失消息、状态漂移 |
+| 验证机制断层（Verification gaps） | 21.30 percent | 单个 agent 宣称成功但无人核验，每个 agent 都盲目信任前序节点 |
 
-Beside them sit the five groupthink patterns: monoculture, conformity, a missing model of each other's beliefs, compromise drift and cascading failures.
+此外还并存着五种群体思维（groupthink）模式：单一文化（monoculture）、从众心理（conformity）、缺失关于彼此信念的心智模型、妥协漂移（compromise drift）以及级联故障（cascading failures）。
 
-### The audit, step by step
+### 季度审计落地步骤
 
-1. **Sample.** Pull about 1000 real traces, stratified by task type, not the ones that produced tickets.
-2. **Categorize.** Map each failure to a root category and any groupthink pattern. Two reviewers per trace until the categories are stable.
-3. **Compute.** Failure rate per category for your system. The published shares are a prior, not your number.
-4. **Rank.** For each candidate mitigation, count the failures it would have removed.
-5. **Commit.** Two or three mitigations for the quarter, each with an owner and a re-audit date.
+1. **分层抽样（Sample）。** 按任务类型分层抽取约 1000 条真实执行追踪，而不是仅盯着产生工单的问题用例。
+2. **归类定性（Categorize）。** 将每个故障映射至某个根源类别及群体思维模式。每条追踪由两位审查者评定，直至分类标准稳定。
+3. **计算指标（Compute）。** 统计自己系统在各个类别下的真实故障率。文献公布的占比仅供先验参考，并非你系统的实际数值。
+4. **影响排序（Rank）。** 针对每项候选修复方案，精确统计其落地后能够消除的故障数量。
+5. **承诺交付（Commit）。** 锁定本季度实施的两到三项关键措施，每项均明确责任人并设定复审日期。
 
-The discipline matters more than the choices. Without the audit, failures blend into noise.
+严谨的执行纪律远比具体选择更重要。缺少系统的审计，故障只会重新淹没在日常噪音中。
 
-### The mitigation menu
+### 核心改进工具箱
 
-- Specification: explicit role contracts that say what an agent does and does not do, acceptance tests written before dispatch, a pre-flight check of the task definition.
-- Coordination: versioned shared state with optimistic concurrency, acknowledgments for critical messages, periodic state-sync checkpoints.
-- Verification: an independent read-only verifier with its own source access, handoff contracts that require a check before the next agent starts, outcome logging.
-- Cascades: circuit breakers on every outbound call with a default open threshold at 5 to 10 percent error rate, and capped retry budgets.
+- 针对规格问题：编写明确界定 agent 能做什么与不能做什么的角色契约、在任务分发前先编写验收测试、在任务启动前对任务定义执行预检。
+- 针对协调问题：采用带乐观并发控制的版本化共享状态、对核心关键消息强制要求 ACK 确认、建立周期性的状态同步检查点。
+- 针对验证断层：引入具备独立源数据访问权限的只读校验器、在下游启动前强制执行交接契约检查、记录执行结果。
+- 针对级联故障：在所有对外调用上部署熔断器，将默认熔断阈值设定在 5 到 10 percent 错误率，并对重试预算设置上限。
 
-### Why verification gaps weigh more
+### 为什么验证断层需要赋予最高权重
 
-A loud failure, a crash or a timeout, is cheap to detect. A silent correctness failure cannot be found in exception logs. That is why verification gaps are the most expensive category per failure. Invest in sample-based human review, a small hand-audited golden dataset run weekly, and cross-checks between agents on important outputs.
+诸如进程崩溃或调用超时等显性故障的检测成本极低。而完全静默的逻辑正确性故障在异常日志中是根本找不到的。这就是为什么验证断层在单位故障上造成的商业代价最为昂贵。必须在此持续投入基于抽样的人工复审、每周在小规模手工精选的金标数据集上执行评测，并针对关键输出在各 agent 之间引入交叉核验。
 
-### Catch slow failures before the audit
+### 在审计周期之间提前捕获缓慢退化
 
-Instrument proxies for drift: the agreement rate across parallel agents, the retry rate, the distribution of output lengths, and the edit distance between successive agent versions. The lesson also describes a trio of specialized agents, detection, diagnosis and validation, that improved mitigation success by 1.5 times; start with detection only and add diagnosis when the symptoms are noisy.
+部署针对渐进漂移的代理监控指标：并行 agent 之间的意见一致率、全局重试率、输出文本长度分布，以及相邻 agent 版本之间的编辑距离。课程还介绍了一种由检测、诊断与验证三个专属 agent 组成的协同机制，使改进措施的成功率提升了 1.5 倍；初期可仅部署检测 agent，并在症状复杂嘈杂时引入诊断 agent。
 
-### Make it binding
+### 建立硬性制约
 
-Set a failure budget per category, an explicit objective for the rate. When a category exceeds its budget, the next release waits.
+为每个故障类别设定故障预算（failure budget），为故障率设定明确目标。一旦某个类别超出预算红线，下一次版本发布直接中止等待修复。
 
 ## Follow-ups
 
-- **Level 3:** Why sample traces instead of auditing tickets? Expected: tickets are the loud failures, and the silent ones never produce a ticket, so a stratified sample is the only way to see them.
-- **Level 3:** Which single proxy would you instrument first? Expected: agreement rate across parallel agents, because a sharp rise signals conformity and a sharp fall signals drift, and both precede visible errors.
-- **Level 4:** The audit finds that specification problems dominate. What is the cheapest fix? Expected: a pre-flight check of the task definition by a separate agent before dispatch, with role contracts that include what each agent does not do.
-- **Level 4:** How do you keep the audit from becoming a report nobody acts on? Expected: the failure budget with a stop-shipping rule, owners per mitigation, and the re-audit date on the calendar before the quarter starts.
+- **Level 3:** 为什么必须对执行追踪抽样而不是只审计已有的问题工单？ Expected: 工单记录的都是显性崩溃故障，而隐蔽的静默逻辑错误不会产生工单，分层抽样是发现它们的唯一手段。
+- **Level 3:** 你会最先为哪个代理指标埋点？ Expected: 并行 agent 间的一致率，急剧上升预示盲目从众，急剧下降预示状态漂移，两者均是明显报错的前兆。
+- **Level 4:** 审计发现任务规格问题占据绝对主导，最廉价的修复手段是什么？ Expected: 在任务分发前由专门的独立 agent 执行任务定义预检，并配合明确写明各 agent 不能做什么的角色契约。
+- **Level 4:** 如何防止审计沦为一份无人跟进问津的形式化报告？ Expected: 建立挂钩版本发布的故障预算、为每项改进指定明确负责人，并在季度开始前将复审日期排入日程表。
 
 ## Wrong answers
 
-- "Fix the most frequent category first." Frequency is not cost, and the silent verification gaps cost more per failure than the loud specification problems.
-- "Audit once a year, when the system is stable." Categories shift as the system grows, and a year of unranked failures is the stream you started with.
-- "Add more agents to check each other." Agents that share a model share their blind spots, and the check that matters is an independent verifier with its own source access.
+- "优先修复发生频次最高的故障类别。" 发生频次不等于破坏代价，隐蔽的验证断层在单位故障上的损失远高于显性的规格问题。
+- "等到系统完全稳定下来后再每年审计一次。" 随着系统演进各类故障占比会持续发生偏移，一整年不作排序只会让故障重新堆积成混乱工单。
+- "增加更多 agent，让它们互相检查。" 共享同一个模型的 agent 必然共享相同的认知盲区，真正有效的是具备独立源数据访问能力的校验器。
 
 ## Taught in
 
-The [failure modes lesson](../../../phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink/) gives the taxonomy, the audit steps and the slow-failure proxies.
+[故障模式：MAST、群体思维、单一文化、级联错误](../../../phases/16-multi-agent-and-swarms/23-failure-modes-mast-groupthink/)课程给出了该分类法、审计落地步骤以及用于捕获缓慢退化的代理指标。

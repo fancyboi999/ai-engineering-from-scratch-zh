@@ -1,6 +1,6 @@
 ---
 id: a-handoff-is-not-a-status-report
-title: What a handoff packet carries that a status report does not
+title: 交接包包含而状态报告不包含的内容
 card: agents
 kind: concept
 level: 1
@@ -16,53 +16,53 @@ related: [agents/seven-surfaces-one-symptom-each]
 updated: 2026-11-03
 ---
 
-At the end of each session your agent writes a paragraph that says what it did. The next session still spends its first half hour finding out where things stand. What is missing from the end-of-session artifact, and how do you produce it so that it is never skipped?
+每次会话结束时，你的 agent 都会写一段话说明自己做了什么。然而下一次会话仍要花前半个小时搞清楚当前进展。会话结束产物中缺少了什么？应该如何生成它才能确保绝不会被跳过？
 
 ## Short answer
 
-The paragraph is a status report, and a handoff needs seven fields: a summary, the changed files, the commands run, the failed attempts, the open risks, the next action and a pointer to the verification and review reports. The next action is the most important field, because it makes the first step of the next session deterministic. Generate the packet from the workbench artifacts instead of asking the agent to write it, and run a cleanup check first so that the packet describes a tree the next session can trust.
+那段话只是状态报告，而交接需要七个字段：摘要、变更文件、已执行命令、失败尝试、未结风险、下一步行动，以及指向验证与审查报告的指针。下一步行动是最关键的字段，它让下一次会话的第一步具有确定性。应直接从工作台产物自动生成交接包，而不是让 agent 自己写，并且要先执行清理检查，确保交接包描述的是下一次会话可以信任的工作树。
 
 ## Full answer
 
-### The seven fields
+### 七个字段
 
-| Field | Question it answers |
+| 字段 | 回答的问题 |
 |---|---|
-| `summary` | What was done, in one paragraph |
-| `changed_files` | The diff at a glance |
-| `commands_run` | What was executed, from the feedback records |
-| `failed_attempts` | What was tried and why it did not work |
-| `open_risks` | What can hurt the next session, with a severity |
-| `next_action` | The first concrete step the next session takes |
-| `verdict_pointer` | The path to the verification and review reports |
+| `summary` | 用一段话概括做了什么 |
+| `changed_files` | 一眼看清 diff |
+| `commands_run` | 根据反馈记录列出执行了哪些命令 |
+| `failed_attempts` | 尝试了什么以及为何行不通 |
+| `open_risks` | 哪些因素可能影响下一次会话，附带严重级别 |
+| `next_action` | 下一次会话要采取的第一个具体步骤 |
+| `verdict_pointer` | 指向验证与审查报告的路径 |
 
-A packet with every field except `next_action` is a status report. It is useful, but the next session still has to decide what to do first.
+如果一个数据包除了 `next_action` 之外包含所有字段，它就只是一份状态报告。它虽然有用，但下一次会话仍必须自行决定第一步该做什么。
 
-### Generated, not written
+### 自动生成而非手工撰写
 
-A hand-written handoff is the thing that gets skipped on a hard day. The generator reads the state file, the verification report, the review report and the feedback log, and emits the packet in two forms. `handoff.md` is for the human. `handoff.json` is for the next agent. If they disagree, the JSON wins. The agent's job is to leave the workbench in a state the generator can summarize.
+工作不顺时，手写交接最容易被省略。生成器读取状态文件、验证报告、审查报告和反馈日志，以两种形式输出交接包。`handoff.md` 供人类阅读，`handoff.json` 供下一个 agent 读取。如果两者不一致，以 JSON 为准。Agent 的职责是将工作台维持在生成器可以总结的状态。
 
-### Trim the log
+### 裁剪日志
 
-The feedback log can hold hundreds of records. The packet carries only the last K plus every record with a non-zero exit. The next session loads the full log if it needs it.
+反馈日志可能包含数百条记录。交接包只携带最后 K 条记录以及所有退出码非零的记录。下一次会话若需要，可以加载完整日志。
 
-### Leave a clean state
+### 留下干净状态
 
-A perfect packet is useless if the next session opens on a half-applied diff, a stray temp file, a wrong branch and tests that error before they run. Cleanup is its own phase, and it is a check, not a habit. The working tree is committed or stashed with a note. No temp artifacts remain. Tests are green, or red with the failure named in the open risks. The feature board matches reality. The branch is the expected one. The cleanup phase emits a list of blocking issues, and an empty list is the precondition the generator asserts before it writes.
+如果下一次会话打开时面对的是应用了一半的 diff、残留的临时文件、错误的分支以及在运行前就报错的测试，那么再完美的交接包也毫无用处。清理本身是一个独立的阶段，它是一项检查，而不是一种习惯。工作树的改动已提交，或已 stash 并附上说明。没有遗留的临时产物。测试已通过；如果失败，未结风险中要注明失败项。功能看板与实际情况相符。当前分支符合预期。清理阶段输出阻塞问题列表，生成器写入交接包前必须断言该列表为空。
 
 ## Follow-ups
 
-- **Level 1:** Why does the JSON win when the two forms disagree? Expected: the next agent loads the JSON, so the machine-readable form is the one that drives the next session.
-- **Level 2:** Which failed attempts belong in the packet? Expected: every record with a non-zero exit, with the retry chain visible, so that the next session does not repeat a known dead end.
-- **Level 2:** What is the difference between a handoff and the state file? Expected: the state file is read on every turn and holds where the agent is, while the handoff is generated once at session end and tells the next session where to start.
-- **Level 3:** Two sessions on two branches each wrote a handoff. How does the next session pick one? Expected: each packet carries a branch, a last known good commit and a status of active, superseded or archived, and only the active packet for this branch drives the session.
+- **Level 1:** 为什么当两种形式不一致时以 JSON 为准？ Expected: 下一个 agent 加载的是 JSON，因此机器可读的形式才是驱动下一次会话的数据源。
+- **Level 2:** 哪些失败尝试应该收入交接包？ Expected: 所有退出码非零的记录，并保持重试链清晰可见，这样下一次会话就不会重复已知的死胡同。
+- **Level 2:** 交接包与状态文件有什么区别？ Expected: 状态文件在每轮都会被读取并记录 agent 当前所处的位置，而交接包仅在会话结束时生成一次，用于告知下一次会话从何处开始。
+- **Level 3:** 两个分支上的两次会话各自写了一份交接包，下一次会话如何选取？ Expected: 每个交接包都携带分支名、最后已知良好提交以及 active、superseded 或 archived 状态，只有当前分支处于 active 状态的交接包才能驱动会话。
 
 ## Wrong answers
 
-- "Ask the agent to write a detailed summary at the end." A written summary is skipped when the session ends badly, and it is the bad sessions that need the handoff most.
-- "The chat history is the handoff." The history is trimmed or gone, and the next session cannot replay an hour of chat in its first minute.
-- "A green verification report is enough to resume." The report proves the task state, not the tree state, and a dirty tree costs the next session its first ten minutes.
+- "让 agent 在结束时写一份详细摘要。" 当会话以糟糕状态结束时，手写摘要往往会被跳过，而恰恰是失败的会话最需要交接。
+- "聊天记录就是交接。" 历史记录会被裁剪或丢失，下一次会话不可能在第一分钟内重放一小时的聊天内容。
+- "绿色的验证报告就足以恢复工作。" 报告只能证明任务状态，不能证明工作树状态，不干净的工作树会让下一次会话白白浪费前十分钟。
 
 ## Taught in
 
-The [multi-session handoff lesson](../../../phases/14-agent-engineering/40-multi-session-handoff/) builds the packet out of the workbench files and adds the cleanup check.
+[多会话交接](../../../phases/14-agent-engineering/40-multi-session-handoff/)课程从工作台文件构建交接包并添加清理检查。

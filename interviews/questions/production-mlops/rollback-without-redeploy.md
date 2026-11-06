@@ -1,6 +1,6 @@
 ---
 id: rollback-without-redeploy
-title: Make the next rollback take seconds
+title: 让下一次回滚只需几秒
 card: production-mlops
 kind: design
 level: 2
@@ -16,50 +16,50 @@ related: [production-mlops/canary-gates-above-noise, production-mlops/shadow-mod
 updated: 2026-11-03
 ---
 
-Last quarter a bad model launch took three hours to undo, because the only way back was a new deployment. You own the release path now. Design it so that the next time, the way back takes seconds. Name the pieces and say what each one holds.
+上季度一次失败的模型发布花了三个小时才撤回，因为唯一的回退方式是重新部署。现在你负责发布流程。设计一条能在下次几秒内回退的路径。说出各组件及其保存的内容。
 
 ## Short answer
 
-Separate the policy from the model. Keep the traffic split in a feature flag that a configuration change flips, and keep the model in a registry under a pinned digest that never upgrades on its own. A rollback is then two actions: revert the flag, and point the pin at the previous digest, which also restores the prompt and template version pinned with that model. Nothing is rebuilt and nothing is redeployed.
+将策略与模型分开。流量比例放在功能开关中，由配置变更切换；模型存放在注册中心，固定摘要，不会自行升级。这样回滚只需两步：恢复开关，将固定指针指回上一个摘要，同时恢复与该模型绑定的 prompt 和模板版本。无需重新构建，也无需重新部署。
 
 ## Full answer
 
-### Two things change in a launch
+### 发布时改变的两个对象
 
-1. **The policy.** Which share of traffic goes to which model. It lives in a feature-flag system, and a flip takes seconds.
-2. **The model.** The artifact itself. It lives in a registry with a content digest. A pinned digest does not move when a new build appears.
+1. **策略。** 多少流量进入哪个模型。它存放在功能开关系统中，几秒就能切换。
+2. **模型。** 即模型产物本身。它存放在注册中心，有内容摘要。出现新构建时，固定摘要不会变化。
 
-A deployment couples the two: to change the policy you ship a new build. The lesson's rule is blunt: if your stack needs a redeploy to roll back, fix that before you roll anything out.
+部署会耦合两者：修改策略也要发布新构建。课程说得直接：技术栈若必须重新部署才能回滚，先解决这一点，再发布任何东西。
 
-### The rollback
+### 回滚
 
-Revert the flag, set the pinned digest to the previous one, and restore the gate thresholds that went with it. The lesson puts the whole sequence at seconds, against hours for a redeploy. In its opening story, the redeploy took three hours and the flag flip would have taken 30 seconds.
+恢复开关，将固定摘要改为上一版本，并恢复配套的闸门阈值。课程认为整套操作只需几秒，重新部署则要数小时。开篇案例的重新部署花了三小时，而翻转开关只需 30 秒。
 
-### The same flag runs the canary
+### 同一个开关也控制金丝雀
 
-The canary share lives in the same flag: 1, 10, 25, 50, 75 and then 100 percent. A gate breach sets the share back to zero. That makes the halt and the rollback the same mechanism, so the path you rehearse on every rollout is the path you use in an incident.
+金丝雀流量比例放在同一个开关中：1%、10%、25%、50%、75%，最后到 100%。闸门越线就将比例归零。叫停与回滚由同一机制完成，每次发布演练的路径，就是事故时使用的路径。
 
-### The tooling shape
+### 工具组成
 
-A progressive delivery controller on the cluster shifts weights at the service mesh or the ingress. A model-serving platform can carry the canary split itself. A feature-flag service holds the policy. Pick one of each, and keep the old model deployed until the new one has held at 100 percent through the gates.
+集群上的渐进式发布控制器在服务网格或入口层调整权重。模型服务平台也可以承载金丝雀分流。功能开关服务保存策略。每类各选一个，旧模型保持部署，直到新模型在 100% 流量下持续通过闸门检查。
 
-### Rehearse it
+### 演练
 
-The lesson's exercise asks for a rollback under 60 seconds end to end. Time it in staging on every release, and treat a slower result as a release blocker.
+课程练习要求端到端回滚少于 60 秒。每次发布都在预发环境计时，超过目标就阻断发布。
 
 ## Follow-ups
 
-- **Level 2:** Why pin the model by digest and not by tag? Expected: a tag can move to a new build. A digest is immutable, so the rollback target is exactly the model that ran before.
-- **Level 2:** What else must revert together with the model? Expected: the gate thresholds, and any prompt or template version that shipped with the model.
-- **Level 3:** How do you know the path works before you need it? Expected: rehearse it in staging on every release and time it end to end, against a target such as the lesson's 60 seconds.
-- **Level 3:** The new model needs a new engine image. Does the flag still work? Expected: yes, when both images run side by side and the flag chooses between them. The old deployment stays alive until the new one has held at 100 percent.
+- **Level 2:** 为什么按摘要固定模型，而不是按标签？ Expected: 标签可以指向新构建。摘要不可变，确保回滚目标就是之前运行过的模型。
+- **Level 2:** 哪些东西必须随模型一起回退？ Expected: 闸门阈值，以及随模型发布的 prompt 或模板版本。
+- **Level 3:** 真正需要之前，怎样知道回滚路径有效？ Expected: 每次发布都在预发演练并端到端计时，对照目标，例如课程中的 60 秒。
+- **Level 3:** 新模型需要新引擎镜像，开关还有效吗？ Expected: 有效，前提是两个镜像并排运行，由开关选择。旧部署保持运行，直到新部署在 100% 流量下稳定。
 
 ## Wrong answers
 
-- "Roll back by redeploying the previous image." A redeploy takes hours, and the lesson's point is to separate the rollback from the deployment.
-- "Delete the old model a day after the launch." The old model must stay available until the canary has held at full traffic through every gate.
-- "A fast rollback makes the gates unnecessary." The gates decide when to roll back. The fast path only limits the damage once they fire.
+- "重新部署之前的镜像来回滚。" 重新部署需要数小时，课程强调将回滚与部署分开。
+- "发布一天后删除旧模型。" 旧模型必须保持可用，直到金丝雀在全量流量下持续通过所有闸门。
+- "回滚够快就不需要闸门。" 闸门决定何时回滚，快速路径只在触发后限制损害。
 
 ## Taught in
 
-The [progressive delivery lesson](../../../phases/17-infrastructure-and-production/20-shadow-canary-progressive/) separates policy flags from model pins and makes the rollback a configuration change.
+[渐进式发布课程](../../../phases/17-infrastructure-and-production/20-shadow-canary-progressive/)将策略开关与固定模型版本分开，让回滚成为配置变更。

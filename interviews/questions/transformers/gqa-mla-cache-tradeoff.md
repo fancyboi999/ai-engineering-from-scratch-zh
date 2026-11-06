@@ -1,6 +1,6 @@
 ---
 id: gqa-mla-cache-tradeoff
-title: Pick the attention variant for a 70B decoder
+title: 为 70B 解码器选择注意力变体
 card: transformers
 kind: tradeoff
 level: 2
@@ -16,34 +16,34 @@ related: [transformers/heads-are-nearly-free, inference-serving/kv-pool-users-fi
 updated: 2026-11-03
 ---
 
-You are choosing the attention variant for a new 70B-class decoder: full multi-head, multi-query, grouped-query, or MLA with its compressed latent. What does each one do to the memory that decoding holds per token, and what do you give up with each?
+你要为一个新的 70B 级解码器选择注意力变体：完整多头、多查询、分组查询，或者带压缩潜向量的 MLA。每种变体对解码时每个 token 占用的显存有什么影响？各自要放弃什么？
 
 ## Short answer
 
-All four keep the same number of query heads; they differ in how many key and value heads exist, and only the keys and values are stored during decoding. Multi-query shares one key-value head across every query head, the smallest cache and some quality loss. Grouped-query uses a group of key-value heads, cuts the cache by `n_heads / n_kv_heads` and keeps nearly full quality, which is why it is the default. Latent attention compresses keys and values to a low-rank vector and decompresses at attention time, so it saves even more memory and pays extra FLOPs.
+四种变体的查询头数量相同；区别在于有多少个键值头，而解码时只存键和值。多查询让所有查询头共用一个键值头，cache 最小，质量有一些损失。分组查询使用一组键值头，cache 缩小到原来的 `n_heads / n_kv_heads` 分之一，质量几乎不损失，所以它是默认选择。潜在注意力把键和值压缩成一个低秩向量，在算注意力时再解压，所以省的显存更多，代价是额外的 FLOPs。
 
 ## Full answer
 
-### The lineage
+### 演进脉络
 
-| Variant | Query heads | Key-value heads | Cache cost |
+| 变体 | 查询头 | 键值头 | cache 开销 |
 |---|---|---|---|
-| Multi-head | N | N | full |
-| Multi-query | N | 1 | smallest, quality loss |
-| Grouped-query | N | G, for example N / 8 | shrinks by N / G |
-| Multi-head latent | N | compressed to a low-rank latent | smaller still, more compute |
+| 多头 | N | N | 完整 |
+| 多查询 | N | 1 | 最小，有质量损失 |
+| 分组查询 | N | G，例如 N / 8 | 缩小为 N / G 分之一 |
+| 多头潜在注意力 | N | 压缩成一个低秩潜向量 | 更小，计算更多 |
 
-### What the cache holds
+### cache 里存的是什么
 
-Per layer and per token, the stored bytes are `2 * n_kv_heads * d_head * dtype_size`, where the 2 counts the key and the value. The query of a past token is never needed again, so it is not stored. A 70B-class model with 80 layers, a head size of 128 and 8 key-value heads in a 16-bit type holds 4096 bytes per token per layer, about 10 GiB for a 32K context and 40 GiB at 128K. The same model with 64 key-value heads would hold 8 times more, about 80 GiB at 32K. That is the whole memory of a large accelerator spent on one request.
+每层每个 token 存的字节数是 `2 * n_kv_heads * d_head * dtype_size`，其中 2 对应键和值。过去 token 的查询不会再用到，所以不存。一个 70B 级模型，80 层，头大小 128，8 个键值头，16 位类型，每 token 每层存 4096 字节，32K 上下文约 10 GiB，128K 约 40 GiB。同一个模型如果有 64 个键值头，就要多存 8 倍，32K 时约 80 GiB。这相当于一张大加速卡的全部显存只服务一个请求。
 
-### The quality side
+### 质量这一侧
 
-Grouped-query keeps the query heads, so each head still asks its own question; it only shares the answers it can look up. The published work converts trained multi-head checkpoints to grouped-query with a fine-tune and reports nearly full quality. Multi-query shares a single answer set across all heads and loses more. Latent attention trades compute for memory: the latent must be projected back to keys and values on every step.
+分组查询保留了所有查询头，所以每个头仍然提自己的问题；共享的只是它能查到的答案。已发表的工作用微调把训练好的多头检查点转换成分组查询，报告的质量几乎不损失。多查询让所有头共用一套答案，损失更多。潜在注意力用计算换显存：每一步都要把潜向量投影回键和值。
 
-### Grouped-query in code
+### 分组查询的代码
 
-Only the key and value projections change. They produce `n_kv_heads` heads, and each is repeated to match the query heads:
+只有键和值的投影变了。它们产出 `n_kv_heads` 个头，每个头重复若干次，以对齐查询头：
 
 ```python
 def gqa_project(X, W, n_kv_heads, n_heads):
@@ -52,25 +52,25 @@ def gqa_project(X, W, n_kv_heads, n_heads):
     return np.repeat(kv, repeat, axis=0)
 ```
 
-At inference only the `n_kv_heads` copies live in the cache, not the repeated ones.
+推理时 cache 里只有 `n_kv_heads` 份，没有重复出来的那些。
 
-### The pick
+### 怎么选
 
-For a 70B decoder with long contexts to serve, grouped-query with a small group is the safe default. Latent attention is the choice when memory is the binding constraint and you accept the compute cost and the engineering.
+对要服务长上下文的 70B 解码器，小分组的分组查询是稳妥的默认选择。如果显存是硬约束，并且你接受额外的计算开销和工程投入，就选潜在注意力。
 
 ## Follow-ups
 
-- **Level 2:** Which numbers set the stored bytes per token? Expected: layers, key-value heads, head size and bytes per value, times 2 for the key and the value; the parameter count does not enter.
-- **Level 3:** Why does latent attention cost more compute per step? Expected: the stored latent has to be projected back to full keys and values at every decode step before the scores are computed.
-- **Level 3:** Can you move an existing multi-head checkpoint to grouped-query? Expected: yes, the grouped-query paper converts trained checkpoints and fine-tunes; measure quality on your own eval before you ship.
-- **Level 4:** The product wants 128K contexts at batch size one on a 40 GB card. Which variant and what else? Expected: grouped-query alone already fills the card at 128K, so latent attention or a smaller key-value type, and the weights still need their own memory.
+- **Level 2:** 每个 token 存多少字节由哪些数决定？ Expected: 层数、键值头数、头大小和每个值的字节数，再乘以 2 计入键和值；参数量不在其中。
+- **Level 3:** 为什么潜在注意力每一步的计算更多？ Expected: 每个解码步算分数之前，都要把存下的潜向量投影回完整的键和值。
+- **Level 3:** 能把已有的多头检查点迁到分组查询吗？ Expected: 能，分组查询的论文就是转换训练好的检查点再微调；上线前在你自己的评测上测量质量。
+- **Level 4:** 产品想在 40 GB 的卡上以批大小 1 跑 128K 上下文。选哪种变体，还要做什么？ Expected: 只用分组查询，128K 时 cache 就已占满这张卡，所以要用潜在注意力或更小的键值类型，而且权重还要另占显存。
 
 ## Wrong answers
 
-- "Grouped-query reduces the compute of attention." The scores are still computed for every query head; the saving is in the stored keys and values.
-- "Multi-query is free." It shares one answer set across all heads and the lesson records a quality loss.
-- "The cache size follows the parameter count." It follows the key-value heads, the layers, the head size and the data type.
+- "分组查询减少了注意力的计算量。" 每个查询头仍然要算分数；省下的是存储的键和值。
+- "多查询没有代价。" 它让所有头共用一套答案，课程记录了质量损失。
+- "cache 大小跟着参数量走。" 它取决于键值头数、层数、头大小和数据类型。
 
 ## Taught in
 
-The [multi-head attention lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) gives the variants and the grouped-query code, and the [KV cache lesson](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/) does the memory arithmetic.
+[多头注意力一课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)给出了各种变体和分组查询的代码，[KV cache 一课](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/)完成了显存算术。

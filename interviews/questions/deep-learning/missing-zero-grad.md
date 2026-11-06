@@ -1,6 +1,6 @@
 ---
 id: missing-zero-grad
-title: A training loop whose loss swings after a few steps
+title: 几步之后损失开始来回摆动的训练循环
 card: deep-learning
 kind: code-reading
 level: 3
@@ -16,7 +16,7 @@ related: [deep-learning/overfit-one-batch-first, deep-learning/weight-matrix-row
 updated: 2026-11-03
 ---
 
-This loop trains a small network with plain SGD at a small learning rate on a fixed batch.
+这个循环在一个固定 batch 上，用普通 SGD 和较小的学习率训练一个小网络。
 
 ```python
 for step in range(50):
@@ -26,47 +26,47 @@ for step in range(50):
     optimizer.step()
 ```
 
-The loss falls for a few steps and then swings up and down. Read the loop, name the bug, explain the mechanism, and say where the fix goes.
+损失下降了几步，然后上下摆动。读一下这个循环，指出 bug，解释原理，并说明修复放在哪里。
 
 ## Short answer
 
-The loop never zeroes the gradients, so each backward call adds the new gradient on top of all the earlier ones. The step applies a growing sum, which acts like a learning rate that rises at every step, and the loss oscillates. Add the optimizer's zero_grad call before backward, which is where the lesson's correct loop puts it.
+循环从不把梯度清零，所以每次 backward 都把新梯度叠加到之前所有梯度上。每一步应用的是一个不断变大的和，效果就像学习率每步都在升高，损失因此振荡。在 backward 之前加上优化器的 zero_grad 调用，课里正确的循环就把它放在这里。
 
 ## Full answer
 
-### Why the gradient grows
+### 梯度为什么会变大
 
-Gradient storage is an accumulator by design. A parameter used in several places sums its contributions, and a backward call adds into the stored gradient rather than replacing it. In the mini framework the Linear layer's backward does exactly that, with a plus-equals into the weight gradients, and the optimizer's zero_grad sets every gradient container back to 0.0. A framework does the same. Without the reset, step one applies g1, step two applies g1 plus g2, step three applies the sum of three, and so on. The direction stays roughly right for a while and the magnitude climbs until the updates overshoot.
+梯度存储本来就设计成累加器。一个参数在多处使用时，会把各处的贡献加起来；backward 调用是往已存的梯度上加，而不是替换它。迷你框架里，Linear 层的 backward 就是这样做的，对权重梯度用加等于，优化器的 zero_grad 把每个梯度容器重置为 0.0。框架也一样。没有重置，第一步应用 g1，第二步应用 g1 加 g2，第三步应用前三个之和，依此类推。方向在一段时间内大致正确，幅度却不断上升，直到更新冲过头。
 
-### The lesson's order
+### 课里的顺序
 
 ```text
 zero_grad, forward, loss, backward, (clip), step, (schedule)
 ```
 
-The debugging lesson lists a forgotten zero_grad first among the bugs that waste the most hours, with this symptom: gradients accumulate across batches and the loss oscillates. Its demo reproduces the exact loop above and reports it. The optimizers lesson adds the ordering rule for the two trailing calls: the scheduler steps after the optimizer, and swapping them is a subtle bug.
+调试课把忘记 zero_grad 列为最浪费时间的 bug 之首，症状就是：梯度跨 batch 累加，损失振荡。它的演示复现了上面这个循环，并报告了这个问题。优化器课补充了最后两个调用的顺序规则：调度器在优化器之后 step，两者调换是一个不易察觉的 bug。
 
-### How to see it in logs
+### 怎样在日志里看出来
 
-On a fixed batch the gradient norm should fall or hold as the loss falls. With this bug it grows step after step while the loss first improves and then swings with increasing amplitude. The overfit one batch test, which this loop resembles, would fail to reach a near zero loss.
+在固定 batch 上，损失下降时梯度范数应该下降或持平。有这个 bug 时，它一步比一步大，损失先变好，然后以越来越大的幅度摆动。这个循环和单 batch 过拟合测试很像，那个测试也会因此无法把损失降到接近零。
 
-### When accumulation is on purpose
+### 什么时候累加是有意的
 
-Gradient accumulation across several small batches emulates one large batch: run backward on each micro batch without zeroing, then take one step and one zero_grad for the group, with the loss scaled by the group size. That is an exercise in the framework lesson. The difference from the bug is the single step per group and the division.
+在几个小 batch 上累加梯度，可以模拟一个大 batch：对每个微 batch 运行 backward 但不清零，然后整组只做一次 step 和一次 zero_grad，损失按组大小缩放。这是框架课里的一道练习。它和这个 bug 的区别是每组只 step 一次，并且做了除法。
 
 ## Follow-ups
 
-- **Level 3:** Why do frameworks accumulate gradients instead of overwriting them? Expected: a parameter used in several places sums its contributions, and accumulation across micro batches emulates a larger batch; the reset is left to the caller.
-- **Level 3:** Where do clipping and the schedule go in the order? Expected: zero_grad, forward, loss, backward, clip, step, schedule; the scheduler steps after the optimizer.
-- **Level 4:** How would you detect this bug from logs without reading the code? Expected: the gradient norm grows step after step on a fixed batch where it should shrink or hold, and the loss oscillates with growing amplitude.
-- **Level 4:** When is skipping zero_grad on some steps correct? Expected: deliberate accumulation over several micro batches, with one step and one zero_grad after the group and the loss scaled by the group size.
+- **Level 3:** 框架为什么累加梯度，而不是覆盖？ Expected: 一个参数在多处使用时要把贡献加起来，跨微 batch 累加还能模拟更大的 batch；何时重置交给调用方。
+- **Level 3:** 裁剪和调度在顺序里放在哪里？ Expected: zero_grad、forward、loss、backward、clip、step、schedule；调度器在优化器之后 step。
+- **Level 4:** 不读代码，你怎样从日志发现这个 bug？ Expected: 在固定 batch 上，梯度范数本该缩小或持平，却一步比一步大，损失以越来越大的幅度振荡。
+- **Level 4:** 什么时候某些步跳过 zero_grad 是对的？ Expected: 有意在几个微 batch 上累加，整组之后做一次 step 和一次 zero_grad，损失按组大小缩放。
 
 ## Wrong answers
 
-- "The learning rate is too high." The rate is small; the accumulated gradient is what grows.
-- "Reset the gradients only every few steps to smooth them." That is accumulation without the division; the step size scales with the group size and the loss swings.
-- "Detach the loss each step to stop the buildup." Detaching stops the graph, not the stored gradients; the gradient buffers still hold the sum.
+- "学习率太高了。" 学习率很小；变大的是累加的梯度。
+- "每隔几步才重置梯度，让它更平滑。" 这是不做除法的累加；步长随组大小放大，损失还是会摆动。
+- "每步把损失 detach 掉，阻止累积。" detach 断开的是计算图，不是已存的梯度；梯度缓冲区里仍然是累加和。
 
 ## Taught in
 
-The [debugging lesson](../../../phases/03-deep-learning-core/13-debugging-neural-networks/) reproduces this bug and lists it first among common training loop mistakes, and the [mini framework lesson](../../../phases/03-deep-learning-core/10-mini-framework/) shows why gradients accumulate and what zero_grad resets.
+[调试课](../../../phases/03-deep-learning-core/13-debugging-neural-networks/)复现了这个 bug，并把它列为训练循环常见错误之首，[迷你框架课](../../../phases/03-deep-learning-core/10-mini-framework/)展示了梯度为什么会累加，以及 zero_grad 重置了什么。

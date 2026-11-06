@@ -1,6 +1,6 @@
 ---
 id: output-projection-missing
-title: Attention heads that never mix
+title: 从不混合的注意力头
 card: coding
 kind: debug
 level: 3
@@ -16,7 +16,7 @@ related: [coding/split-heads-reshape, coding/gqa-repeat-not-tile]
 updated: 2026-11-03
 ---
 
-A multi-head attention forward passes the split and merge tests but fails the end-to-end test against a reference, and a trained checkpoint loaded into it generates nonsense:
+一个多头注意力前向通过了拆分和合并测试，却没通过对照参考实现的端到端测试，加载训练好的检查点后生成的是乱码：
 
 ```python
 def multi_head_attention(x, w_q, w_k, w_v, w_o, n_heads):
@@ -27,23 +27,23 @@ def multi_head_attention(x, w_q, w_k, w_v, w_o, n_heads):
     return merge_heads(weights @ V), weights
 ```
 
-Find both defects and explain what each one does to the model.
+找出两处缺陷，并解释各自对模型有什么影响。
 
 ## Short answer
 
-The softmax normalizes over the query axis instead of the key axis, so each column sums to one and a query's weights no longer form a distribution over the keys. The output projection is also missing: the merged heads are returned without the multiplication by `w_o`, which is the only place where heads exchange information. Normalize over the last axis and multiply the merged result by the output matrix.
+softmax 在 query 轴上归一化，而不是在 key 轴上，所以每一列之和为一，一个 query 的权重不再是 key 上的分布。输出投影也缺了：合并后的头直接返回，没有乘以 `w_o`，而这是头之间交换信息的唯一位置。在最后一个轴上归一化，并把合并结果乘以输出矩阵。
 
 ## Full answer
 
-### Defect one: the softmax axis
+### 缺陷一：softmax 的轴
 
-Scores have shape batch, heads, queries, keys. Each query row must become a distribution over the keys, so the softmax runs over the last axis. Over the second-to-last axis each key column sums to one across queries instead, and the weighted sum of values no longer means "what this token attends to".
+分数的形状是 batch、头、query、key。每个 query 行都必须成为 key 上的分布，所以 softmax 在最后一个轴上做。在倒数第二个轴上做，变成每个 key 列在所有 query 上之和为一，对 value 的加权和也就不再表示「这个 token 关注什么」。
 
-### Defect two: the output projection
+### 缺陷二：输出投影
 
-Each head computes attention in its own subspace and the heads never interact during the attention computation itself. The concatenation followed by the output matrix is where the heads mix. Without it, the model's output is a stack of independent per-head results, the next layer sees a different function than the one the weights were trained for, and a loaded checkpoint produces noise.
+每个头在自己的子空间里计算注意力，注意力计算本身期间头与头之间没有任何交互。拼接之后乘以输出矩阵，才是头混合的地方。没有它，模型输出只是各个头独立结果的堆叠，下一层看到的函数和权重训练时的不一样，加载的检查点只会产生噪声。
 
-### The corrected function
+### 修正后的函数
 
 ```python
 def multi_head_attention(x, w_q, w_k, w_v, w_o, n_heads):
@@ -56,26 +56,26 @@ def multi_head_attention(x, w_q, w_k, w_v, w_o, n_heads):
     return merge_heads(weights @ V) @ w_o, weights
 ```
 
-### Why the reshape tests passed
+### 为什么 reshape 测试能通过
 
-Both defects live after the split and before the merge, or after the merge. The reshape helpers are correct, and the shapes of the final output match the reference because `w_o` is square. Only a value comparison against a reference, or a real checkpoint, exposes them.
+两处缺陷都在拆分之后、合并之前，或者在合并之后。reshape 辅助函数是对的，而且因为 `w_o` 是方阵，最终输出的形状和参考实现一致。只有和参考实现比较数值，或者用真实检查点，才能发现它们。
 
-### Why the scale is still right
+### 为什么缩放仍然是对的
 
-The division uses the head size, not the full width. That part of the submission is correct; dividing by the square root of the full width is a third common error that the practice also tests.
+除数用的是头大小，不是完整宽度。提交的这一部分是对的；除以完整宽度的平方根是第三种常见错误，练习也会测试。
 
 ## Follow-ups
 
-- **Level 3:** Why does the output projection have shape full width by full width? Expected: it maps the concatenation of all heads, which has the full width, back to the model width, and it is the one matrix that reads from every head.
-- **Level 3:** Which test would you add to catch the missing projection early? Expected: a case where `w_o` is not the identity, so the projected and unprojected outputs differ.
-- **Level 4:** A probing study finds one head attends to the previous token. Where in this code does that head's result reach the residual stream? Expected: only through its block of columns in the concatenation and the rows of `w_o` that read it; `w_o` decides how much of that head the next layer sees.
+- **Level 3:** 输出投影的形状为什么是完整宽度乘完整宽度？ Expected: 它把所有头的拼接结果（宽度就是完整宽度）映射回模型宽度，也是唯一一个读取每个头的矩阵。
+- **Level 3:** 你会加什么测试，尽早发现缺失的投影？ Expected: 一个 `w_o` 不是单位矩阵的用例，这样投影前后的输出会不同。
+- **Level 4:** 一项探测研究发现某个头关注前一个 token。在这段代码里，这个头的结果从哪里进入残差流？ Expected: 只通过它在拼接结果中的那一块列，以及 `w_o` 里读取这块列的行；`w_o` 决定下一层能看到这个头的多少。
 
 ## Wrong answers
 
-- "The softmax axis does not matter because the scores are symmetric." Scores are query by key and not symmetric; the two normalizations differ for every real input.
-- "Skip the output projection to save parameters; the merge already recombines the heads." The merge only concatenates; without the projection the heads never interact.
-- "Use the identity for the output projection when a checkpoint lacks one." A trained checkpoint always has one; a missing tensor means the name map is wrong.
+- "softmax 的轴无所谓，因为分数是对称的。" 分数是 query 乘 key，并不对称；对任何真实输入，两种归一化的结果都不同。
+- "去掉输出投影能省参数，合并已经把头重新组合了。" 合并只是拼接；没有投影，头之间永远不会交互。
+- "检查点里没有输出投影时，就用单位矩阵代替。" 训练好的检查点一定有输出投影；缺少这个张量说明名称映射错了。
 
 ## Taught in
 
-The [multi-head attention lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) explains that heads only mix through the output projection, and the [split and merge practice](../../../practice/multi-head-split-merge/) checks the softmax axis and the projection.
+[多头注意力课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)解释了头只通过输出投影混合，[拆分与合并练习](../../../practice/multi-head-split-merge/)检查 softmax 的轴和投影。

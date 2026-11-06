@@ -1,6 +1,6 @@
 ---
 id: top-k-then-sample
-title: Write the sampling step of a generation loop
+title: 写出生成循环的采样步骤
 card: coding
 kind: take-home
 level: 2
@@ -16,15 +16,15 @@ related: [coding/temperature-knob, coding/top-p-crossing-token]
 updated: 2026-11-03
 ---
 
-Given the logits of the last position, a temperature, a value of k and a seeded random generator, write the function that draws the next token. State the order of the operations, how ties are broken, and how the draw uses exactly one random number.
+给定最后一个位置的 logits、一个温度、一个 k 值和一个带种子的随机数生成器，写出抽取下一个 token 的函数。说明操作顺序、平局怎么决出，以及抽样怎样恰好只用一个随机数。
 
 ## Short answer
 
-Divide the logits by the temperature, keep the k largest and set the rest to negative infinity, take the softmax, and draw one index from the result. Ties keep the lower index. The draw calls the generator once, takes the cumulative sum of the probabilities in vocabulary order, and returns the first index whose cumulative value exceeds the random number.
+用 logits 除以温度，保留最大的 k 个，其余设为负无穷，做 softmax，再从结果里抽一个下标。平局时保留较小的下标。抽样只调用一次生成器，按词表顺序对概率求累积和，返回累积值第一个超过这个随机数的下标。
 
 ## Full answer
 
-### The code
+### 代码
 
 ```python
 def top_k_filter(logits, k):
@@ -50,35 +50,35 @@ def sample(logits, rng, temperature=1, top_k=None):
     return int(np.nonzero(probs > 0)[0][-1])
 ```
 
-### The order
+### 顺序
 
-Temperature first, then the filter, then the softmax. The filter has to see the scaled logits, because the scale changes which tokens hold the mass when a top-p cutoff is added later. The softmax runs last so that a removed token has probability exactly zero and the kept ones renormalize.
+先温度，再过滤，最后 softmax。过滤必须看到缩放后的 logits，因为之后加上 top-p 截断时，缩放会改变哪些 token 拥有概率质量。softmax 放在最后，被移除的 token 概率正好为零，保留的 token 会重新归一化。
 
-### Ties
+### 平局
 
-Sorting the negated logits with a stable sort keeps the lower index first among equal values. Sorting ascending and reversing the result flips that, so the higher index wins and the output differs from the reference on every tie.
+对取负后的 logits 做稳定排序，相等的值里较小的下标排在前面。升序排序再反转会把顺序翻过来，较大的下标胜出，每遇到平局，输出都和参考实现不同。
 
-### One random number
+### 一个随机数
 
-A seeded generator gives reproducible samples only if every call consumes the same number of draws. The function reads one uniform number, compares it with the cumulative sum, and returns the first crossing. Rounding can leave the last cumulative value a hair below one, so the fallback returns the last token with positive probability instead of failing.
+带种子的生成器只有在每次调用消耗相同数量的随机数时，才能给出可复现的样本。函数读取一个均匀随机数，和累积和比较，返回第一个越过它的位置。舍入可能让最后一个累积值比一略小，所以兜底分支返回最后一个概率为正的 token，而不是报错。
 
-### Do not change the input
+### 不要修改输入
 
-The filter writes into a new array. Writing negative infinity into the caller's logits destroys the values that the next step, or a log, still needs.
+过滤结果写进一个新数组。把负无穷写进调用方的 logits，会毁掉下一步或日志还需要的值。
 
 ## Follow-ups
 
-- **Level 2:** What does top-k one produce? Expected: greedy decoding, the argmax every time.
-- **Level 2:** Why must the filter run before the softmax and not after? Expected: zeroing probabilities after the softmax leaves a distribution that does not sum to one unless it is renormalized; masking the logits does that for free.
-- **Level 3:** The assembly lesson keeps the context inside a fixed length during generation. How? Expected: when the prompt plus generated tokens exceed the context length, the oldest tokens are dropped so the active window fits.
-- **Level 3:** How do you make two runs with one seed produce the same text? Expected: the same generator, one draw per step, the same tie rule and the same temperature; any extra draw shifts every later token.
+- **Level 2:** k 为一时得到什么？ Expected: 贪心解码，每次都是 argmax。
+- **Level 2:** 为什么过滤必须在 softmax 之前，而不是之后？ Expected: 在 softmax 之后把概率置零，分布之和不再是一，除非重新归一化；遮住 logits 能顺带完成这件事。
+- **Level 3:** 组装课在生成时把上下文保持在固定长度内。怎么做的？ Expected: prompt 加上已生成的 token 超过上下文长度时，丢掉最旧的 token，让活动窗口放得下。
+- **Level 3:** 怎样让同一个种子的两次运行生成相同的文本？ Expected: 同一个生成器，每步取一个随机数，同样的平局规则，同样的温度；多取一个随机数，后面的每个 token 都会变。
 
 ## Wrong answers
 
-- "Call the generator's choice function with the probabilities." It works, but it consumes draws differently across versions and breaks the one-draw contract that the tests pin.
-- "Apply the temperature after the filter." The filter then selects tokens at temperature one and the setting changes less than intended.
-- "Sort descending by reversing an ascending sort." Equal logits then keep the higher index, which contradicts the tie rule.
+- "用生成器的 choice 函数直接传入概率。" 能用，但不同版本消耗随机数的方式不同，会破坏测试固定的单次抽取契约。
+- "在过滤之后再应用温度。" 过滤就是在温度为一时选 token，这个设置的作用会比预期小。
+- "把升序排序的结果反转，得到降序。" 这样相等的 logits 保留的是较大的下标，违反平局规则。
 
 ## Taught in
 
-The [GPT assembly lesson](../../../phases/19-capstone-projects/35-gpt-model-assembly/) describes the generation step as temperature, top-k mask, softmax and multinomial draw, and the [sampling practice](../../../practice/top-k-top-p-sampling/) pins the order, the tie rule and the single draw.
+[GPT 组装课](../../../phases/19-capstone-projects/35-gpt-model-assembly/)把生成步骤描述为温度、top-k 掩码、softmax 和多项分布抽样，[采样练习](../../../practice/top-k-top-p-sampling/)固定了顺序、平局规则和单次抽取。

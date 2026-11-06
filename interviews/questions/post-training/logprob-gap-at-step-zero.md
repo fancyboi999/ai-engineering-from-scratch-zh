@@ -1,6 +1,6 @@
 ---
 id: logprob-gap-at-step-zero
-title: A step-0 gap several times the healthy range
+title: 第 0 步概率差距数倍于正常健康区间
 card: post-training
 kind: debug
 level: 3
@@ -16,56 +16,56 @@ related: [post-training/grpo-groups-teach-nothing]
 updated: 2026-11-03
 ---
 
-You start a GRPO run with a new model checkpoint. At step 0, the metric that compares the trainer's log-probabilities with the rollout engine's reads several times higher than on your earlier runs with the same model family. A colleague suggests turning on the engine's deterministic mode to close it. What do you do?
+你使用一个新的模型权重 checkpoint 启动了一次 GRPO 训练任务。在第 0 步，用于对比训练器与采样引擎对数概率差异的指标数值，比你在同一模型家族早期训练中观察到的健康数值高出了数倍。一位同事建议在采样引擎端开启确定性模式来抹平差距。你应该怎么做？
 
 ## Short answer
 
-Stop the run before it trains on wrong numbers. At step 0 both sides hold the same weights, so a value far above your healthy range means the two sides do not compute the same model: a wrong checkpoint path on one side, or a format that one side reads differently. Deterministic inference does not help; in the manual's runs it left the gap unchanged at about 0.015 and made the engine repeat itself, which is a different property. Fix the setup, then compare the step-0 value with the range of your healthy runs.
+立即终止训练任务，绝不在错误的数据上继续计算。在第 0 步阶段两端持有完全相同的初始模型权重，若指标远超正常健康区间，意味着两端计算的根本就不是同一个模型：比如一侧加载了错误的 checkpoint 路径，或者权重格式被某一侧按不同逻辑解析了。确定性推理对此毫无帮助；在手册的对照实验中，开启确定性模式后差距依然恒定在约 0.015，它只是让引擎在相同输入下产生确定性输出，这是完全不同的两个属性。排查并修复环境配置，然后将第 0 步的实测值与历史健康运行区间对照。
 
 ## Full answer
 
-### What step 0 proves
+### 第 0 步证明了什么
 
-No training has happened yet. The trainer scores the sampled tokens with the weights the engine used, so every difference comes from the setup. Two values must be exactly 0 at step 0: `train/ppo_kl`, the KL between the trainer's old and new probabilities, and `train/pg_clipfrac`, the share of clipped tokens. The gap itself, `train/train_rollout_logprob_abs_diff`, is never 0 outside the bit-exact mode, because the two sides run different kernels. It must still sit inside your range.
+此时尚未发生任何参数梯度更新。训练器使用引擎采样时所用的完全相同权重对样本 token 打分，因此所有的数值偏差全部来源于初始环境搭建。在第 0 步时，有两个指标在数学上必须严格为 0：`train/ppo_kl`（训练器新旧概率之间的 KL 散度）以及 `train/pg_clipfrac`（被裁剪的 token 比例）。而概率差距指标本身（`train/train_rollout_logprob_abs_diff`）在非位级精确模式下绝不可能为 0，因为两端运行着不同的计算内核算子。但它必须严格落在已知的健康基线区间内。
 
-### The ranges in the manual
+### 手册记录的健康基准区间
 
-| Setup | Gap at step 0 |
+| 配置环境 | 第 0 步概率差距指标 |
 |---|---|
-| Qwen3-0.6B, plain sampling, 17 runs | 0.0148 to 0.0157 |
-| Qwen3-0.6B, top-p 0.95 and top-k 64 | 0.0136 |
+| Qwen3-0.6B，纯采样，17 次独立运行 | 0.0148 至 0.0157 |
+| Qwen3-0.6B，top-p 0.95 且 top-k 64 | 0.0136 |
 | Qwen3-1.7B | 0.0109 |
 
-The gap depends on the model and the sampler, so build the range from your own seeds. A value several times the range points at the model, not at the kernels.
+该基线取决于具体模型架构与采样器参数，因此必须基于你自己的多随机种子实验建立基准。若实测值高出基线数倍，问题必定出在模型本身或权重加载上，而非底层算子微小的浮点舍入。
 
-### Why deterministic mode is the wrong tool
+### 为什么开启确定性模式完全找错了工具
 
-Deterministic inference makes the engine give the same result for a request, whatever the batch around it. In four 12-step runs with one seed, the median gap was 0.01526 with the default engine and 0.01518, 0.01520 and 0.01515 with deterministic kernels on two attention backends. Two deterministic runs repeated the step-0 gap to six decimal places, 0.015404. So the mode buys repeatability, not agreement, and it cost 40 to 45 percent more rollout time on clean steps.
+确定性推理的作用是确保无论当前批次中有哪些并发请求，引擎对同一个请求都能给出完全一致的文本输出。在固定随机种子的 4 次 12 步对比实验中，默认引擎的差距中位数为 0.01526，而在两个不同注意力后端上开启确定性内核后的中位数分别为 0.01518、0.01520 和 0.01515。两次确定性运行的第 0 步差距甚至精确重现到了小数点后第六位（0.015404）。该模式买来的是输出的可复现性，而非与训练器的数值一致性，且在正常步骤下会导致采样时间增加 40% 到 45%。
 
-### The checks, in order
+### 严格的排查排错顺序
 
-1. The checkpoint paths of both sides. With the trainer the manual uses, both sides load from one argument; a split layout or a low-precision engine loads two files, and they must hold the same model.
-2. The model format: a conversion step that one side applies and the other does not.
-3. The weight equality check on a two-step run after the first update, with the quantization tolerance on when the engine runs in low precision.
-4. The sampler. A top-p or top-k setting on one run and not on the other moves the gap, as the table shows.
+1. 检查两端的 checkpoint 加载路径。手册使用的训练器两端从同一参数加载；而在分布式分离拓扑或低精度推理引擎中，两端通常分别加载不同文件，必须确保它们指向完全相同的模型版本。
+2. 检查模型权重格式转换逻辑：排查是否存在一端执行了权重转换而另一端未执行的情况。
+3. 运行两步，在第一次更新后检查权重是否相等；若引擎采用低精度，则启用量化容差。
+4. 检查采样器配置。如基准表所示，单次运行中开启或关闭 top-p/top-k 会系统性改变差距。
 
-### What a healthy gap does over a run
+### 健康的概率差距在整个训练中应呈现何种走势
 
-It stays flat. In the manual's three baseline seeds, every step over 48 steps stayed between 0.0136 and 0.0164, and the KL between the two sides stayed between 0.00063 and 0.00076. A gap that jumps and stays high after a weight update means the two sides no longer hold the same weights.
+应当呈现出完全平直的走势。在手册的 3 个基线随机种子实验中，跨越 48 步的每一个步骤中，差距始终稳定在 0.0136 到 0.0164 之间，两端之间的 KL 散度稳定在 0.00063 到 0.00076 之间。如果在某次权重同步更新后差距发生突增并居高不下，说明两端持有的权重已经脱节不再一致。
 
 ## Follow-ups
 
-- **Level 3:** Why is the gap never zero in a normal run? Expected: the two sides add the same numbers in a different order, with different kernels; across many layers and a large vocabulary the rounding adds up.
-- **Level 3:** What does the deterministic mode buy, then? Expected: the same rollout for the same seed, which is what you need to test a reward function on identical samples.
-- **Level 4:** Which levers move the floor of the gap itself? Expected: the precision on both sides, the tensor-parallel size of the engine, and kernels that add in one fixed order; each costs speed or work.
-- **Level 4:** The gap is fine at step 0 and grows step after step. What is different from the step-0 failure? Expected: the weights diverge after updates, so the weight update path is the suspect, not the checkpoint; read the update logs and run the weight equality check.
+- **Level 3:** 为什么在常规训练中该差距绝不可能为零？ Expected: 两侧在不同的算子实现下以不同的计算顺序对相同数值求和；跨越多层 transformer 和庞大词表后，微小的浮点舍入误差会层层累加。
+- **Level 3:** 确定性模式真正的核心价值是什么？ Expected: 确保相同随机种子下产出完全一致的推演样本，这在对比评估奖励函数对相同生成文本的打分表现时至关重要。
+- **Level 4:** 哪些杠杆能够实质性降低该差距指标的理论底线？ Expected: 两端的精度、引擎的张量并行规模，以及按固定顺序求和的计算内核；每项都要付出速度或工作量的代价。
+- **Level 4:** 若第 0 步差距正常，但在后续训练中一步步逐渐扩大，这与第 0 步异常有何本质不同？ Expected: 权重在多次在线更新后逐渐发生分歧，因此应排查权重热更新网络同步流水线，而非静态的初始 checkpoint；应调阅更新日志并运行权重一致性校验。
 
 ## Wrong answers
 
-- "Turn on deterministic inference to close the gap." The manual's four runs show the same gap with and without it; it makes the engine repeat itself and costs rollout time.
-- "A gap is normal; keep training and watch the reward." A step-0 value several times the healthy range means the trainer scores a different model than the one that sampled, so the run trains on wrong numbers from the first update.
-- "Add an importance-sampling correction." A reweighting hides a gap that comes from a setup error; remove the cause first.
+- "开启确定性推理来抹平该差距。" 手册的 4 次对照实验表明开启前后差距几乎没有任何变化；它只会让引擎输出可复现，同时大幅拖慢采样速度。
+- "有差距是正常的，继续训练并观察奖励指标即可。" 第 0 步指标数倍于健康区间意味着训练器打分的模型与生成样本的模型根本不是同一个，从第 1 次更新起整个训练就建立在完全错误的数字之上。
+- "直接加上重要性采样权重修正。" 重加权只是把配置故障带来的严重系统误差隐藏起来；必须优先消除根本原因。
 
 ## Taught in
 
-[Section 5.2 of Miles 101](../../../manuals/miles-101/sections/5-2-check-the-first-step.md) gives the step-0 checks and ranges, [section 4.5](../../../manuals/miles-101/sections/4-5-use-deterministic-inference.md) measures what the deterministic mode does and does not fix, and [section 7.1](../../../manuals/miles-101/sections/7-1-troubleshoot-by-symptom.md) lists the symptom.
+[Miles 101 第 5.2 节](../../../manuals/miles-101/sections/5-2-check-the-first-step.md)给出了第 0 步校验标准与健康区间，[第 4.5 节](../../../manuals/miles-101/sections/4-5-use-deterministic-inference.md)实测了确定性模式的实际边界与局限，而[第 7.1 节](../../../manuals/miles-101/sections/7-1-troubleshoot-by-symptom.md)按故障现象分类列出了排查手册。

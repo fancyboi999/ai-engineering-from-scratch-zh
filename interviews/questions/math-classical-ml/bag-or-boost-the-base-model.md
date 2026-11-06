@@ -1,6 +1,6 @@
 ---
 id: bag-or-boost-the-base-model
-title: Bag the deep trees or boost the stumps
+title: 深层决策树用 Bagging，决策树桩用 Boosting
 card: math-classical-ml
 kind: tradeoff
 level: 3
@@ -16,48 +16,48 @@ related: [math-classical-ml/mdi-ranks-noise-feature, math-classical-ml/past-the-
 updated: 2026-11-03
 ---
 
-You have a tabular dataset and two candidate base learners: deep decision trees that fit the training rows almost perfectly, and decision stumps that barely beat a constant. You can afford one ensemble method for each. Which one gets bagging and which one gets boosting, and why?
+你有一个表格数据集和两个候选基学习器：几乎能完美拟合训练样本的深层决策树，以及性能勉强胜过常数预测的决策树桩（stump）。你的预算允许为每类基学习器各采用一种集成方法。哪一个用 Bagging，哪一个用 Boosting？为什么？
 
 ## Short answer
 
-Bag the deep trees and boost the stumps. Deep trees have low bias and high variance, and averaging many of them trained on bootstrap samples cancels the variance without adding bias. Stumps have high bias and low variance, and boosting builds them in sequence so each new one corrects the errors of the ensemble so far, which drives the bias down.
+深层树采用 Bagging，决策树桩采用 Boosting。深层树具有低偏差和高方差，对 Bootstrap 抽样训练出的多棵深树取平均，可以在不增加偏差的前提下消除方差。决策树桩具有高偏差和低方差，Boosting 按顺序串行构建基学习器，使每个新树桩纠正此前集成模型的误差，从而逐步降低偏差。
 
 ## Full answer
 
-### Match the method to the error term
+### 将集成方法与误差项匹配
 
-Expected error splits into squared bias, variance and irreducible noise. The two methods attack different terms.
+期望误差可以分解为偏差平方、方差和不可避免的噪声。这两种集成方法分别针对不同的误差项。
 
-| Method | Reduces | Bias | Variance | Watch out for |
+| 方法 | 主要降低 | 偏差 | 方差 | 注意事项 |
 |---|---|---|---|---|
-| Bagging, random forest | variance | no change | decreases | does nothing for bias |
-| Boosting | bias | decreases | can increase | overfits with too many rounds |
+| Bagging、随机森林 | 方差 | 不变 | 降低 | 对降低偏差无效 |
+| Boosting | 偏差 | 降低 | 可能增加 | 迭代轮数过多会过拟合 |
 
-### Why bagging fits the deep trees
+### 为什么 Bagging 适合深层树
 
-Each tree is trained on a bootstrap sample, a draw with replacement of the same size as the data, which holds about 63.2 percent of the unique rows. The rest, about 36.8 percent, are out-of-bag and give a free validation set. The average of N independent predictions with variance sigma squared has variance sigma squared over N. The trees are not independent, because they see similar data, so the gain is smaller than that, and a random forest adds a random feature subset at each split, square root of the feature count for classification, to make the trees disagree more. Adding trees lowers variance and never adds bias, so test accuracy plateaus and does not fall.
+每棵树都在一个 Bootstrap 样本上训练，即与原数据集同等大小的有放回抽样，其中约包含 63.2% 的去重样本行。其余约 36.8% 的样本属于袋外（out-of-bag）数据，天然构成一个免费的验证集。对 N 个方差为 sigma 平方的独立预测取平均，其方差为 sigma 平方除以 N。由于各棵树看到的数据相似，它们并非完全独立，因此实际收益小于这一理论值；随机森林在每次分裂时随机选取特征子集（分类任务中通常为特征总数的平方根），促使各棵树之间产生更大的差异。增加树的数量能降低方差且绝不增加偏差，因此测试准确率会趋于平稳而不会下降。
 
-### Why boosting fits the stumps
+### 为什么 Boosting 适合决策树桩
 
-Boosting trains learners in sequence. AdaBoost raises the weight of rows the ensemble gets wrong, so the next stump works on them. Gradient boosting fits each new tree to the negative gradient of the loss, which for squared error is the residual. Each round removes some of the systematic error, which is the bias. The learning rate scales each tree's contribution; the lesson gives 0.01 to 0.3, and a smaller value needs more trees and generalizes better. Because later rounds chase the hardest rows, boosting can fit noise, so it needs early stopping on a validation loss.
+Boosting 串行训练基学习器。AdaBoost 会提高此前集成模型预测错误样本的权重，使下一个树桩专注于这些困难样本。梯度提升（Gradient Boosting）则让每个新树拟合损失函数的负梯度，在均方误差下即为残差。每一轮都在消除一部分系统误差，也就是偏差。学习率用于缩放每棵树的贡献；课程给出的范围是 0.01 到 0.3，较小的学习率需要更多的树，泛化效果通常更好。由于后续轮次会不断拟合最棘手的样本，Boosting 容易拟合噪声，因此需要在验证集损失上设置早停机制。
 
-### Why not the other way round
+### 为什么不能反过来使用
 
-Boosting the deep trees has little bias left to remove and stacks high variance learners, so it overfits fast. Bagging the stumps averages many models that all miss the same pattern, so the average misses it too. Diversity is the requirement in both cases: the lesson's majority vote of 21 independent classifiers at 60 percent accuracy reaches about 74 percent, and 101 of them reach about 84 percent, only because their errors differ.
+对深层树使用 Boosting 时，由于几乎没有残余偏差可消除，堆叠高方差的基学习器会导致迅速过拟合。对决策树桩使用 Bagging 则是在平均许多共同遗漏同一模式的模型，其平均结果同样会遗漏该模式。多样性是这两种方法的核心前提：课程中准确率为 60% 的 21 个独立分类器经多数表决后准确率可达约 74%，101 个独立分类器可达约 84%，这完全得益于它们的错误互不相同。
 
 ## Follow-ups
 
-- **Level 3:** Why does bagging the deep trees not fix bias? Expected: the average of many models that miss the same pattern misses it too; averaging only removes their disagreement.
-- **Level 3:** What does the learning rate do in gradient boosting? Expected: it scales each tree's contribution; a smaller rate needs more trees and generalizes better.
-- **Level 4:** Boosting's training error keeps falling while validation error rises. What happened and what do you do? Expected: later rounds fit noisy or mislabeled rows; stop early on the validation loss, or lower the learning rate and the tree depth.
-- **Level 4:** Why does a forest's test accuracy plateau but not fall as trees are added? Expected: each tree lowers variance and none adds bias, so more trees cannot overfit the way more boosting rounds can.
+- **Level 3:** 为什么对深层树做 Bagging 无法解决偏差问题？ Expected: 多个遗漏相同模式的模型取平均后仍然会遗漏该模式；平均操作只能消除模型之间的分歧。
+- **Level 3:** 梯度提升中的学习率起什么作用？ Expected: 它缩放每棵树的贡献；较小的学习率需要更多的树，泛化性能通常更好。
+- **Level 4:** Boosting 的训练误差持续下降但验证误差上升，发生了什么？如何处理？ Expected: 后续轮次在拟合噪声或错误标记的样本；应基于验证集损失执行早停，或降低学习率与树的深度。
+- **Level 4:** 为什么随着树的增加，随机森林的测试准确率会趋于平稳而不会下降？ Expected: 每棵树都在降低方差且不增加偏差，因此增加树不会像增加 Boosting 轮次那样引起过拟合。
 
 ## Wrong answers
 
-- "Boost the deep trees, since boosting is the stronger method." A low bias, high variance learner has little bias to remove, and boosting amplifies its variance.
-- "Bag the stumps to make them strong." Averaging stumps that all underfit still underfits; bagging leaves bias where it is.
-- "Any ensemble of enough models beats a single one." Gains need diverse errors; models that make the same mistakes do not cancel them.
+- "对深层树使用 Boosting，因为 Boosting 是更强的方法。" 低偏差、高方差的学习器几乎没有多余偏差可消除，Boosting 会放大其方差。
+- "对树桩使用 Bagging 可以让它们变强。" 对全部欠拟合的树桩取平均仍会欠拟合；Bagging 无法改变原有的偏差。
+- "只要集成足够多的模型，效果就一定胜过单个模型。" 收益源于错误的多样性；犯同样错误的一组模型无法通过集成相互抵消。
 
 ## Taught in
 
-The [ensemble methods lesson](../../../phases/02-ml-fundamentals/11-ensemble-methods/) builds both methods, the [bias-variance lesson](../../../phases/02-ml-fundamentals/10-bias-variance/) gives the rule for which to use, and the [decision trees lesson](../../../phases/02-ml-fundamentals/04-decision-trees/) builds the forest.
+[集成方法课程](../../../phases/02-ml-fundamentals/11-ensemble-methods/)构建了这两种方法，[偏差方差权衡课程](../../../phases/02-ml-fundamentals/10-bias-variance/)给出了选型规则，[决策树课程](../../../phases/02-ml-fundamentals/04-decision-trees/)构建了随机森林。

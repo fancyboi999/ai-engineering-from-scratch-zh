@@ -1,6 +1,6 @@
 ---
 id: ece-or-brier
-title: An ECE of 0.02 on too few predictions
+title: 预测太少时得到的 ECE 0.02
 card: evaluation
 kind: concept
 level: 3
@@ -16,47 +16,47 @@ related: [evaluation/perplexity-health-check]
 updated: 2026-11-03
 ---
 
-Your multiple choice eval reports an expected calibration error of 0.02 on a hundred predictions with ten bins, and the team calls the model well calibrated. What does that number measure, what does it miss, and which second number do you add?
+你的选择题评测在一百个预测、十个分桶上报告了 0.02 的期望校准误差（ECE），团队据此说模型校准得很好。这个数字衡量什么？它漏掉了什么？你会再加哪个数字？
 
 ## Short answer
 
-ECE bins predictions by confidence and averages the gap between confidence and accuracy, weighted by bin size. With ten bins and a hundred predictions you cannot tell 0.02 from noise, and inside one bin overconfident and underconfident predictions can offset each other in the bin average. Add the Brier score, the mean squared error between confidence and outcome per prediction, and report how many bins were populated.
+ECE 按置信度把预测分桶，再对置信度与准确率之间的差距按桶的大小加权平均。十个桶、一百个预测时，你分不清 0.02 和噪声；而且在同一个桶里，过度自信和自信不足的预测会在桶均值里相互抵消。再加上 Brier 分数，即每个预测的置信度与结果之间的均方误差，并报告有多少个桶里有样本。
 
 ## Full answer
 
-### What ECE computes
+### ECE 的具体计算
 
-Sort the predictions into equal width confidence bins, ten by the publishing convention or 15 by the comparison convention. In each bin take the mean confidence and the mean accuracy. ECE is the sum over bins of the absolute gap, weighted by the bin's share of the predictions. The capstone returns the count of populated bins with the value, so the runner can refuse to report a single number on too few samples.
+把预测按置信度分进等宽的桶：按发表惯例分十个，按对比惯例分 15 个。在每个桶里算平均置信度和平均准确率。ECE 是各桶绝对差距之和，权重是该桶占全部预测的比例。综合项目在返回 ECE 时一并返回非空桶的数量，这样运行器可以在样本太少时拒绝只报一个数。
 
-### What it misses
+### ECE 遗漏的盲区
 
-ECE is biased by bin count and sample size. The absolute gap per bin stops gaps in different bins from cancelling, but the bin means can hide spread: overconfident and underconfident predictions in the same bin offset each other, so a low ECE can hide poor calibration at the level of single predictions.
+ECE 会受桶数和样本量影响而产生偏差。每个桶取绝对差距，能防止不同桶之间的差距相互抵消，但桶均值会掩盖离散程度：同一个桶里过度自信和自信不足的预测会彼此抵消，所以 ECE 低，也可能掩盖单个预测层面的糟糕校准。
 
-### What Brier adds
+### Brier 补上了什么
 
-Brier is the mean of the squared difference between confidence and the outcome, per prediction. It penalizes every miss directly, so cancellation is impossible. It decomposes into reliability, resolution and uncertainty. A predictor that says one half on everything has a Brier score of exactly 0.25, and an ECE equal to the gap between one half and the accuracy.
+Brier 是每个预测的置信度与结果之差的平方的均值。它直接惩罚每一次偏差，所以不可能抵消。它可以分解为可靠性、分辨力和不确定性三项。一个对所有题都说二分之一的预测器，Brier 分数恰好是 0.25，ECE 则等于二分之一与准确率之间的差距。
 
-### The diagram
+### 可靠性图
 
-Keep the per bin mean confidence, mean accuracy and count. Plotted, the diagonal is perfect calibration. That data also lets a reader compute adaptive variants of ECE later.
+保留每个桶的平均置信度、平均准确率和样本数。画出来后，对角线就是完美校准。有了这些数据，读者以后还能算 ECE 的自适应变体。
 
-### Where confidence comes from
+### 模型置信度的来源
 
-For multiple choice, a softmax over the option log likelihoods. For free text, the model's stated probability or the exponential of its mean log likelihood. The harness accepts any number in the unit range per prediction; where it comes from is the adapter's job. A model that states high confidence and is right far less often shows the gap in that bin.
+选择题用各选项对数似然的 softmax。自由文本用模型自己声明的概率，或平均对数似然的指数。harness 对每个预测接受单位区间内的任意数字，数字从哪来是适配器的事。一个声称很有把握、实际正确率却低得多的模型，会在对应的桶里露出差距。
 
 ## Follow-ups
 
-- **Level 3:** A predictor says one half on every item. What is its Brier score, and why? Expected: exactly 0.25, because the squared error is 0.25 whether the outcome is zero or one.
-- **Level 3:** Why can ECE be low while calibration is bad? Expected: inside one bin, overconfident and underconfident predictions offset each other in the bin means; the absolute gap stops cancelling only across bins, and Brier penalizes each prediction's error.
-- **Level 4:** Why is calibration a per model report and not a per task metric? Expected: the runner accumulates confidence and correctness pairs across the whole eval and computes it once; per task bins would be nearly empty.
-- **Level 4:** One model has higher accuracy and a worse Brier score than a rival. Which do you deploy? Expected: the capstone argues for the better calibrated one, because it reports its uncertainty reliably; confirm with the reliability diagram.
+- **Level 3:** 一个预测器对每道题都说二分之一。它的 Brier 分数是多少，为什么？ Expected: 正好 0.25，因为结果无论是 0 还是 1，平方误差都是 0.25。
+- **Level 3:** 为什么校准很差时 ECE 也可能很低？ Expected: 同一个桶里，过度自信和自信不足的预测在桶均值里相互抵消；绝对差距只能阻止跨桶抵消，而 Brier 惩罚每个预测的误差。
+- **Level 4:** 为什么校准按模型报告，而不是按任务计算的指标？ Expected: 运行器在整个评测中累积置信度与对错的配对，只算一次；按任务分桶的话，桶几乎都是空的。
+- **Level 4:** 一个模型准确率比对手高，Brier 分数却更差。你部署哪个？ Expected: 综合项目主张选校准更好的那个，因为它对自身不确定性的报告更可靠；再用可靠性图确认。
 
 ## Wrong answers
 
-- "An ECE of 0.02 means calibrated." On a hundred predictions with ten bins the value is inside the noise; report populated bins and collect a larger sample.
-- "Accuracy is enough." Two models with equal accuracy can differ in whether their confidence means anything; the capstone calls calibration the most ignored axis.
-- "Brier replaces ECE." They answer different questions; ECE shows the shape per bin and Brier the per prediction error. Report both with the diagram data.
+- "ECE 0.02 就说明校准好。" 一百个预测、十个桶，这个值落在噪声里；报告非空桶数，并收集更大的样本。
+- "看准确率就够了。" 准确率相同的两个模型，置信度有没有意义可能完全不同；综合项目说校准是最常被忽视的维度。
+- "用 Brier 取代 ECE。" 两者回答不同的问题：ECE 展示每个桶的形状，Brier 给出每个预测的误差。两个都报，并附上画图用的数据。
 
 ## Taught in
 
-The [perplexity and calibration capstone](../../../phases/19-capstone-projects/73-perplexity-calibration/) defines ECE, Brier and the reliability diagram and explains the sample size caveat.
+[困惑度与校准综合项目](../../../phases/19-capstone-projects/73-perplexity-calibration/)定义了 ECE、Brier 和可靠性图，并说明了样本量方面的注意事项。

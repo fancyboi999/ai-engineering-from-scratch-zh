@@ -1,6 +1,6 @@
 ---
 id: sinusoidal-table-swap
-title: Swap the learned position table for a fixed one
+title: 把可学习的位置表换成固定的正弦表
 card: coding
 kind: take-home
 level: 2
@@ -16,15 +16,15 @@ related: [coding/top-k-then-sample]
 updated: 2026-11-03
 ---
 
-The reference small GPT configuration uses a learned position embedding of shape 1024 by 768. Replace it with a sinusoidal table computed at construction time, add it to a batch of token embeddings, and tell me by how much the parameter count changes and why the model still forwards.
+参考的小型 GPT 配置用了一个形状为 1024 乘 768 的可学习位置嵌入。把它换成一个在构造时计算好的正弦表，加到一批 token 嵌入上，并说明参数量变化了多少，以及模型为什么仍然能完成前向。
 
 ## Short answer
 
-Build a table with one row per position and one column per feature, where column `2i` holds the sine and column `2i + 1` holds the cosine of the position divided by the base raised to `2i` over the model width. Register it as a buffer, slice the first `T` rows at each forward and add them to the token embeddings without changing the caller's array. The table has the same shape as the learned one, so the forward pass is unchanged, and the count drops by 786,432 parameters because the table is no longer learned.
+构建一张每个位置一行、每个特征一列的表：第 `2i` 列放正弦，第 `2i + 1` 列放余弦，角度是位置除以底数的幂，指数为 `2i` 除以模型宽度。把它注册成 buffer，每次前向切出前 `T` 行，加到 token 嵌入上，不改调用方的数组。这张表和可学习的表形状相同，所以前向不变；表不再被学习，参数量因此减少 786,432 个。
 
 ## Full answer
 
-### The table
+### 这张表
 
 ```python
 def sinusoidal_pe(max_len, d_model, base):
@@ -48,34 +48,34 @@ class SinusoidalPositions(nn.Module):
         return x + self.pe[: x.shape[1]]
 ```
 
-The exponent is `2i` over the width, so the frequencies fall from one down to one over the base across the columns. The columns alternate between sine and cosine; putting all sines in the first half and all cosines in the second is a different layout and does not match the reference. Positions start at zero. An odd width has no pair for its last column, so that column stays zero. The table is built once with numpy and stored as a torch buffer, so it moves to the device of the model and the add sees two tensors on the same device.
+指数是 `2i` 除以宽度，所以频率在各列之间从一降到底数分之一。各列在正弦和余弦之间交替；把所有正弦放在前半、所有余弦放在后半是另一种排列，和参考实现对不上。位置从零开始。宽度为奇数时，最后一列没有配对，保持为零。这张表用 numpy 构建一次，存为 torch buffer，所以它会跟着模型移到对应设备上，相加的两个张量在同一个设备上。
 
-### Why the forward pass is unchanged
+### 为什么前向不变
 
-The assembly adds a position vector to each token vector before the first block. Nothing downstream knows whether that vector came from a learned table or a fixed one. The shape contract is the same, so the blocks, the final LayerNorm and the tied head run unchanged.
+组装时，在第一个块之前给每个 token 向量加上一个位置向量。下游没有任何部分知道这个向量来自可学习的表还是固定的表。形状契约相同，所以各个块、最后的 LayerNorm 和共享权重的输出头都照常运行。
 
-### The parameter count
+### 参数量
 
-The learned table holds 1024 rows of 768 values each. Removing it from the parameter list drops the unique parameter count by 786,432. The parameter counter must count unique tensors, so that the tied language model head is not counted twice, and it must not count buffers.
+可学习的表有 1024 行，每行 768 个值。把它从参数列表里去掉，去重后的参数量减少 786,432。参数计数器必须按唯一张量计数，共享权重的语言模型头才不会被算两次；它也不能把 buffer 算进去。
 
-### Two mistakes to avoid
+### 要避免的两个错误
 
-- Adding the table in place with `+=` changes the caller's embeddings, which the training loop still holds.
-- Dividing the exponent by the width of the even part instead of the full width gives an odd width the frequencies of a narrower model.
+- 用 `+=` 原地加表，会改掉调用方的嵌入，而训练循环还持有它们。
+- 指数除以偶数部分的宽度而不是完整宽度，宽度为奇数的模型就会得到一个更窄模型的频率。
 
 ## Follow-ups
 
-- **Level 2:** Why interleave sine and cosine rather than put them in two halves? Expected: a checkpoint trained with the interleaved layout expects each pair of neighbor columns to form one rotation, and the two layouts are not interchangeable.
-- **Level 2:** What does the base control? Expected: the lowest frequency, and so the longest position range before the slowest columns repeat.
-- **Level 3:** Which position scheme does the assembly lesson say turns this model into the next model family? Expected: a rotary scheme applied inside attention replaces the additive table and leaves the block and the head unchanged.
-- **Level 3:** A fixed table has no parameters; what does the model lose? Expected: the ability to learn position features from data, in exchange for a table that extends to any length at construction.
+- **Level 2:** 为什么把正弦和余弦交替排列，而不是分成两半？ Expected: 用交替排列训练的检查点认为每对相邻列构成一次旋转，两种排列不能互换。
+- **Level 2:** 底数控制什么？ Expected: 最低频率，也就是变化最慢的列开始重复之前能覆盖的最长位置范围。
+- **Level 3:** 组装课说哪种位置方案能把这个模型变成下一个模型家族？ Expected: 在注意力内部应用的旋转方案，它取代加性的表，块和输出头保持不变。
+- **Level 3:** 固定的表没有参数，模型失去了什么？ Expected: 从数据中学习位置特征的能力，换来的是一张构造时就能扩展到任意长度的表。
 
 ## Wrong answers
 
-- "Register the table as a parameter so the optimizer can refine it." Then it is a learned table again and the count does not drop.
-- "Start positions at one so the first row is not all zeros and ones." The reference starts at zero; row zero is the code of position zero.
-- "Use the same exponent for sine and cosine columns but a different base." Both columns of a pair share one angle; only the function differs.
+- "把表注册成参数，让优化器去细调。" 那它又成了可学习的表，参数量也不会减少。
+- "位置从一开始，这样第一行就不全是零和一。" 参考实现从零开始；第零行就是位置零的编码。
+- "正弦列和余弦列用相同的指数、不同的底数。" 一对列共享同一个角度，只有函数不同。
 
 ## Taught in
 
-The [GPT assembly lesson](../../../phases/19-capstone-projects/35-gpt-model-assembly/) sets this swap as an exercise and gives the parameter delta, and the [sinusoidal encoding practice](../../../practice/sinusoidal-positional-encoding/) checks the interleaved layout.
+[GPT 组装课](../../../phases/19-capstone-projects/35-gpt-model-assembly/)把这次替换作为练习并给出了参数差值，[正弦编码练习](../../../practice/sinusoidal-positional-encoding/)检查交替排列。

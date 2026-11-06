@@ -1,6 +1,6 @@
 ---
 id: the-verifier-that-cannot-write
-title: Design the verifier that has no write handle
+title: 设计没有写入句柄的校验器
 card: multi-agent
 kind: design
 level: 3
@@ -16,55 +16,55 @@ related: [multi-agent/a-number-that-never-existed]
 updated: 2026-11-03
 ---
 
-You are adding a checking agent to a team that shares a memory. A colleague wants the checker to fix wrong entries directly, because that is the simplest design. Specify the checker: what it reads, what it may write, where its results go, and what it can and cannot protect against. Defend the restrictions.
+你正在为一个共享内存的团队添加一个检查 agent。一位同事希望检查器直接修复错误条目，因为这是最简单的设计。请规范该检查器：它读取什么、可以写入什么、其结果流向何处，以及它可以和不能防范什么。为这些限制辩护。
 
 ## Short answer
 
-The checker reads the shared memory like every other agent, re-fetches the sources that entries cite, and compares. It has no write handle to the shared memory, only to a separate verification channel that a human or a decision agent reads. It cannot stop a bad entry from being written, and it can be fooled by an entry that cites no source, but its verdicts can never become a shared fact. A checker that writes into the memory is poisoned by the same memory it checks, and then its verdicts carry the poison further.
+校验器像其他 agent 一样读取共享内存，重新获取条目引用的来源并比对。它对共享内存没有写入句柄，只有一个写入句柄，指向人类或决策 agent 所读取的独立验证频道。它无法阻止错误条目的写入，也可能被没有引用来源的条目欺骗，但它的结论绝不会成为共享事实。向内存写入的校验器会被它检查的这块内存污染，进而把毒性扩散到更远的地方。
 
 ## Full answer
 
-### The specification
+### 规范
 
-| Aspect | Rule |
+| 方面 | 规则 |
 |---|---|
-| Reads | The whole pool, or the topics it is subscribed to on a blackboard |
-| Writes | Nothing in the shared memory, only entries on its own verification channel |
-| Method | For each entry with a cited source, fetch the source independently and compare the content |
-| Output | A finding per mismatch with the entry id and the reason, routed to a human or a separate decision agent |
-| Effect | The verifier writes nothing to the pool. The caller can attach the finding to the entry as a flag, as the lesson's demo does, but the entry's content does not change, and a correction is a new entry that supersedes it |
+| 读取 | 整个池，或黑板上其所订阅的主题 |
+| 写入 | 共享内存中不写任何内容，仅在其自己的验证频道上写入条目 |
+| 方法 | 对于每个带有引用源的条目，独立获取源并比较内容 |
+| 输出 | 每个不匹配项附带条目 ID 和原因的发现，路由给人类或单独的决策 agent |
+| 效果 | 校验器不向池中写入任何内容。调用方可以将发现作为标记附加到条目上，如课程演示所做的那样，但条目的内容不变，修正是一条替代它的新条目 |
 
-In the lesson's code the verifier returns a list of findings and never touches the pool. The caller decides what to do with them.
+在课程代码中，校验器返回发现列表，从不触碰池。调用方决定如何处理它们。
 
-### Why no write handle
+### 为什么没有写入句柄
 
-Shared memory is the only stateful part of the system, and it is where poisoning happens. A verifier that writes becomes one more writer that can be wrong. Worse, it reads the pool it writes to, so a poisoned pool shapes the verifier's view, and the verifier's conclusions re-enter the pool as new facts with the authority of a check behind them. Separation breaks that cycle. The verifier can be fooled by a bad entry, but its mistakes stay on its channel.
+共享内存是系统唯一有状态的部分，也是发生投毒的地方。具有写权限的校验器会变成又一个可能出错的写入者。更糟糕的是，它读取它所写入的池，因此被投毒的池会塑造校验器的视野，校验器的结论会作为带有检查权威的新事实重新进入池中。隔离打破了这个循环。校验器可能会被不良条目愚弄，但其错误保留在自己的频道上。
 
-### Why not fix entries in place
+### 为什么不就地修复条目
 
-An in-place fix destroys the audit trail. The lesson's rule is append-only: a correction is a new entry that references the one it supersedes. With the verifier's finding attached, the record shows that a value was written, that a check disagreed, and what the check found. A reader three steps later can see the dispute. An overwritten entry shows nothing.
+就地修复会破坏审计追踪。课程的规则是仅追加：修正是引用其所替代条目的新条目。附带校验器的发现后，记录显示某个值被写入、检查提出了异议，以及检查发现了什么。三步之后的读者可以看到争议。被覆盖的条目则什么都不显示。
 
-### What it protects against, and what it does not
+### 它防范什么，以及不防范什么
 
-It catches an entry that cites a source and does not match it, which is the poisoning case. It does not catch an entry with no citation, an entry whose source is itself wrong, or a wrong conclusion drawn correctly from flagged inputs. For those you need provenance so that uncited claims are weighed lower, a diversity of sources, and a decision agent that reads the findings.
+它捕获引用了源但不匹配的条目，这是投毒案例。它不会捕获没有引用的条目、源本身错误的条目，或从被标记的输入正确得出的错误结论。对于这些，你需要溯源以便无引用的断言权重更低、多样化的源，以及读取发现的决策 agent。
 
-### How it fits the rest
+### 它如何适应其余部分
 
-Provenance on every write gives the verifier something to check. The append-only log gives its findings a place to attach. The verification channel gives its output a reader that is not the pool. The three mitigations are one design.
+每次写入附加溯源为校验器提供了检查依据。仅追加日志为它的发现提供了附加之处。验证频道为其输出提供了非池的读者。这三项缓解措施构成了同一个设计。
 
 ## Follow-ups
 
-- **Level 3:** The verifier flags an entry that the analyst already used. What happens to the analyst's entry? Expected: it stays in the log, a new entry can supersede it with the finding as the reason, and the final report carries the retraction.
-- **Level 3:** How many verifiers do you deploy? Expected: at least one, and more if the pool is partitioned by topic, with each verifier subscribed to the topics it can check.
-- **Level 4:** How do you keep the verifier's source access independent? Expected: it fetches from the original location with its own tools, not from a cache that a writer filled, otherwise it checks the entry against a copy of itself.
-- **Level 4:** What metric tells you the verifier is doing useful work? Expected: the share of writes that are supersessions and the share of flagged entries, read together, with a rising flag rate as an early sign of a writer that hallucinates.
+- **Level 3:** 校验器标记了分析者已经使用的条目。分析者的条目会发生什么？ Expected: 它留在日志中，新条目可以以该发现为原因替代它，最终报告包含撤回声明。
+- **Level 3:** 你部署多少个校验器？ Expected: 至少一个；如果池按主题分区，则更多，每个校验器订阅它能检查的主题。
+- **Level 4:** 你如何保持校验器的源访问独立？ Expected: 它使用自己的工具从原始位置获取，而不是从写入者填充的缓存中获取，否则它检查的是条目自身的副本。
+- **Level 4:** 什么指标能表明校验器在做有用的工作？ Expected: 联合读取替代的写入占比和被标记条目的占比，不断上升的标记率是编写者出现幻觉的早期迹象。
 
 ## Wrong answers
 
-- "Let the checker fix the entry, since it has the source." The fix overwrites the audit trail and gives the checker a write path that a poisoned pool can turn against it.
-- "A second reviewer agent that reads the pool is enough." A reviewer that only reads the pool compares entries with each other and inherits the same poisoned facts; the verifier must re-fetch the source.
-- "Route the verifier's findings into the pool so every agent sees them." The findings then become shared facts, and a wrong finding poisons the pool in a new way; the finding on the verification channel, keyed by entry id, is the visible signal, not a new entry in the pool.
+- "让检查器修复条目，因为它有源数据。" 修复覆盖了审计追踪，并给检查器提供了一条被投毒的池可以反向利用的写入路径。
+- "仅读取池的第二个审查 agent 就足够了。" 仅读取池的审查者将条目相互比较，并继承相同的投毒事实；校验器必须重新获取源。
+- "将校验器的发现路由到池中，以便每个 agent 都能看到。" 发现随后会变成共享事实，且错误的发现会以新方式投毒池；验证频道上按条目 ID 建立索引的发现才是可见信号，而不是池中的新条目。
 
 ## Taught in
 
-The [shared memory lesson](../../../phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/) specifies the read-only verifier and its separate channel.
+[共享内存课程](../../../phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/)规范了只读校验器及其独立频道。

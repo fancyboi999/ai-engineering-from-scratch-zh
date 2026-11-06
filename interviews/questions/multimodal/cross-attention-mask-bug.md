@@ -1,6 +1,6 @@
 ---
 id: cross-attention-mask-bug
-title: A caption decoder with its masks swapped
+title: 掩码被错误调换的图像描述解码器
 card: multimodal
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [multimodal/perceiver-fixed-tokens]
 updated: 2026-11-03
 ---
 
-A teammate's vision-language decoder trains well, but at inference the captions are wrong from the second token on, and a test with an image of 197 tokens crashes with a shape error. Read the block and the decode loop and find the problems.
+一位队友实现的图文解码器在训练时指标看似良好，但在推理生成图像描述（caption）时，从第二个 token 开始就生成错误；且用包含 197 个 token 的图像测试时，程序因张量形状不匹配（shape error）直接崩溃。请阅读其解码块与解码循环代码并找出症结所在。
 
 ```python
 def causal_mask(n):
@@ -43,32 +43,32 @@ def generate(model, image, prompt_ids, steps):
 
 ## Short answer
 
-The masks are swapped. Self-attention over the text runs with no mask, so every position sees the future during training, and the model learns to copy the next token instead of predicting it, which breaks as soon as it must generate. Cross-attention gets the causal text mask, which is square over the text length and cannot apply to scores that span text by image, hence the shape error with 197 image tokens. The decode loop also re-encodes the image on every step; encode once, cache the image keys and values, and reuse them.
+两个掩码（mask）被错误调换了。作用于文本的自注意力层（self-attention）没有传入任何掩码，导致训练期间每个位置都能看到未来的 token，模型退化为走捷径抄袭下一个 token 而非学习自回归预测，一旦进入真正的自回归推理便立即崩溃。而交叉注意力层（cross-attention）却被错误传入了针对文本长度的下三角因果掩码，由于交叉注意力的得分矩阵形状是“文本长度乘以图像 token 数”，方阵掩码无法广播，从而在 197 个图像 token 时引发形状崩溃。此外，解码循环每一步都重新编码图像；应只编码一次，缓存图像的 key 和 value 并复用。
 
 ## Full answer
 
-### The mask discipline
+### 掩码规范与几何维度
 
-| Attention | Query | Key | Mask |
+| 注意力类型 | Query 来源 | Key 来源 | 掩码规范 |
 |---|---|---|---|
-| Self-attention over text | text, length Nt | text, length Nt | causal, lower-triangular Nt by Nt |
-| Cross-attention into the image | text, length Nt | image, length Nv | none |
+| 文本自注意力（Self-attention） | 文本，长度 Nt | 文本，长度 Nt | 因果下三角掩码，形状为 Nt × Nt |
+| 图像交叉注意力（Cross-attention） | 文本，长度 Nt | 图像，长度 Nv | 无需掩码 |
 
-Text may not look ahead during autoregression. The image is fully observed before any text exists, and its patches have no order, so every text position may attend to every patch.
+自回归文本解码严禁偷窥未来时间步。而图像在文本生成之前就已经被完全观测，图像内部的 patch 之间也不存在时间因果顺序，因此文本序列中的任意位置都应当且可以关注图像的每一个 patch。
 
-### Bug 1: no mask on self-attention
+### Bug 1：自注意力缺少因果掩码
 
-With `mask=None`, position i attends to the positions after it. Under teacher forcing the target of position i is the token at i plus one, which is now visible, so the loss falls fast and the model learns to look it up. At inference the future does not exist, and from the second token the captions fall apart. That is the symptom in the report.
+传入 `mask=None` 会导致位置 i 能够直接看到位置 i 之后的所有 token。在 Teacher Forcing 训练模式下，位置 i 的预测目标正是位于输入序列 i+1 处的真实 token，此时未加掩码的注意力层直接把目标偷看过来，损失迅速骤降，模型实际上学会了查表而非预测。但在自回归推理阶段，未来的 token 根本不存在，因此从第二个 token 开始生成质量崩溃，这正是现象描述中指出的问题。
 
-### Bug 2: the causal mask on cross-attention
+### Bug 2：将文本因果掩码强加于交叉注意力
 
-The scores of cross-attention have the shape Nt by Nv. A causal mask of shape Nt by Nt fits only when Nv equals Nt, and then it silently hides part of the image from the early text tokens. With a 197-token image memory and a shorter text, the shapes do not broadcast and the forward pass raises. The capstone adds one shape-validation function, so that this mistake raises a clear error instead of corrupting a loss curve.
+交叉注意力内部的注意力得分矩阵维度是 Nt × Nv。尺寸为 Nt × Nt 的因果掩码仅在图像 token 数 Nv 恰好等于文本长度 Nt 时碰巧不会报错（但此时也会错误屏蔽掉早前文本对图像后半部分的视野）。当图像特征包含 197 个 token 而文本长度较短时，两个张量维度无法广播，前向传播直接抛出 Shape Error。课程项目特意设计了张量形状校验函数，确保在此类失误发生时能够给出明确报错，而不是污染整个训练曲线。
 
-### Observation 3: no key and value cache
+### 观察 3：缺少 KV cache
 
-The image does not change during decoding. Encoding it on every step and projecting its keys and values again multiplies the cost of the heavy encoder by the number of generated tokens. Encode once, project once, store the keys and values, and pass them to every step. The capstone tests that the cached and the uncached paths give identical logits.
+解码期间图像不变。每一步都重新编码图像、重新投影 key 和 value，会让重型编码器的成本乘以生成 token 数。只编码一次、投影一次，把 key 和 value 缓存下来，供每一步复用。综合项目用测试检查缓存与非缓存路径的 logits 是否一致。
 
-### The fixed block
+### 修复后的 DecoderBlock
 
 ```python
 def forward(self, text, image_kv, text_mask):
@@ -80,17 +80,17 @@ def forward(self, text, image_kv, text_mask):
 
 ## Follow-ups
 
-- **Level 2:** Why does the training loss look fine with the first bug? Expected: teacher forcing puts the target token in the input one position later, and an unmasked attention can read it; the loss measures a lookup, not a prediction.
-- **Level 2:** When does cross-attention need a mask? Expected: with several images and text segments interleaved, where a segment may see only the images before it; for one image and one caption, none.
-- **Level 3:** What does the gate from the Flamingo design add to this block, and why? Expected: a learned scalar through a hyperbolic tangent on the cross-attention residual, starting at zero, so that a frozen language model keeps its text behavior at initialization and mixes the image in gradually.
-- **Level 3:** How do you test the cache path? Expected: run the same prompt with and without the cache and assert that the logits match to float tolerance; the capstone ships that test.
+- **Level 2:** 为什么存在第一个 bug 时训练损失看起来依然很漂亮？ Expected: Teacher forcing 使得目标 token 直接存在于下一个输入位置，未加掩码的注意力可以直接去读取它；此时损失衡量的是偷看查表能力，而非真正的自回归预测能力。
+- **Level 2:** 交叉注意力在什么时候才真正需要掩码？ Expected: 当多张图像与多个文本片段相互交错出现时，特定文本片段仅允许查看位于其之前的图像；而在单图单段 caption 生成时无需掩码。
+- **Level 3:** Flamingo 架构在此类 block 中引入的门控机制（Gate）起到了什么作用？ Expected: 在交叉注意力残差分支上经过双曲正切（tanh）乘以一个初始为零的可学习标量，使冻结的语言模型在初始化时保持文本行为，再逐步融合图像。
+- **Level 3:** 如何测试缓存路径？ Expected: 用相同的 prompt 分别运行缓存和非缓存路径，断言 logits 在浮点容差范围内匹配；综合项目提供了这项测试。
 
 ## Wrong answers
 
-- "Use the causal mask on both attentions to be safe." Cross-attention scores are text by image, so a square text mask either raises or hides part of the image; the image needs no mask.
-- "The captions are wrong because the image encoder is weak." A model that is right on the first token and wrong from the second leaked the future in training; the mask is the cause.
-- "Recomputing the image each step is fine, the encoder is small." The encoder is the heaviest part per call, and the image never changes; the cache is what makes captioning fast.
+- "为安全起见，在两处注意力层上都加上因果掩码。" 交叉注意力矩阵维度是文本乘图像，方形文本掩码要么直接引发维度报错，要么错误遮蔽掉部分图像区域；图像交叉注意力无需掩码。
+- "生成的文本错乱是因为图像编码器表征能力太弱。" 第一步正确而从第二步起完全崩坏，是典型的训练期未来信息泄露特征；原因是掩码错误。
+- "每步都重新编码图像无所谓，编码器开销很小。" 视觉编码器通常是单次前向中计算量最大的部件，且图像内容完全静止；缓存让图像描述生成更快。
 
 ## Taught in
 
-The [cross-attention fusion capstone](../../../phases/19-capstone-projects/61-cross-attention-fusion/) sets the mask shapes and the key and value cache, and the [Flamingo lesson](../../../phases/12-multimodal-ai/04-flamingo-gated-cross-attention/) adds the gate and the interleaved mask.
+[交叉注意力融合实战](../../../phases/19-capstone-projects/61-cross-attention-fusion/)定义了掩码形状和 KV cache，[Flamingo 课程](../../../phases/12-multimodal-ai/04-flamingo-gated-cross-attention/)补充了门控机制与图文交错掩码。

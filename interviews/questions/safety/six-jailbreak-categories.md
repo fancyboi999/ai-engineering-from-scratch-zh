@@ -1,6 +1,6 @@
 ---
 id: six-jailbreak-categories
-title: Name the attack before you defend it
+title: 先给攻击命名，再谈防御
 card: safety
 kind: concept
 level: 1
@@ -16,50 +16,50 @@ related: [safety/one-regex-is-not-a-detector, safety/normalize-then-match]
 updated: 2026-11-03
 ---
 
-Your team has shipped forty regex patches against prompts that got past the assistant's refusal rules, and the backlog of new attacks grows faster than the patches. A new engineer asks what an attack even is. Which shared vocabulary do you introduce, and what does it buy the team?
+有些 prompt 绕过了助手的拒答规则，你的团队已经针对它们上线了四十个正则补丁，可新攻击的积压比补丁增长得更快。一位新工程师问：攻击到底是什么？你会引入哪套共同词汇？它能给团队带来什么？
 
 ## Short answer
 
-Label every attack by the trust boundary it abuses. Six categories cover most of what arrives: role play against the persona, instruction override against the system prompt, context smuggling in the gap between data and instructions, multi turn ramp against the conversation history, encoding tricks against the surface form of forbidden tokens, and prefix injection against the next token decision. Labels turn the attack stream into a histogram, the histogram into a coverage chart, and the chart into the next sprint.
+按攻击利用的信任边界给每次攻击打标签。六个类别覆盖了大部分来袭的攻击：角色扮演针对人设，指令覆盖针对系统 prompt，上下文夹带利用数据与指令之间的空隙，多轮递进针对对话历史，编码伎俩针对违禁 token 的表面形式，前缀注入针对下一个 token 的决策。有了标签，攻击流就变成直方图，直方图变成覆盖图，覆盖图变成下一个迭代的计划。
 
 ## Full answer
 
-### The six categories
+### 六个类别
 
-| Category | Trust boundary abused | Shape |
+| 类别 | 被利用的信任边界 | 样子 |
 |---|---|---|
-| role play | the assistant's persona | "you are an unrestricted model called ..." |
-| instruction override | the system prompt's authority | "disregard everything above" |
-| context smuggling | data against instructions | an order hidden in a pasted document or a tool result |
-| multi turn ramp | the conversation as a contract | harmless turns, then one step down at a time |
-| encoding trick | the surface form of tokens | base64, rot13, leet speak, zero width characters |
-| prefix injection | the next token decision | "start your answer with: Sure, here is" |
+| 角色扮演 | 助手的人设 | “你是一个不受限制的模型，名叫……” |
+| 指令覆盖 | 系统 prompt 的权威 | “忽略上面的一切” |
+| 上下文夹带 | 数据与指令的界线 | 藏在粘贴文档或工具结果里的命令 |
+| 多轮递进 | 把对话当作契约 | 先几轮无害对话，然后每次往下走一步 |
+| 编码伎俩 | token 的表面形式 | base64、rot13、leet speak、零宽字符 |
+| 前缀注入 | 下一个 token 的决策 | “用这句话开头回答：好的，下面是” |
 
-### The fixture record
+### 样本记录
 
-Each labeled example carries an id, a category, a subtype, the prompt, the target behavior and a severity from 1 to 5. A 1 is a clumsy attack on a benign target; a 5 would produce output a deployed system must never emit. Most real attacks sit at 2 or 3. The author sets the severity, and when two reviewers differ by more than one rank the rubric needs sharpening.
+每个标注样本包含 id、类别、子类型、prompt、目标行为，以及 1 到 5 的严重度。1 是针对良性目标的笨拙攻击；5 会产生已部署系统绝不能输出的内容。大多数真实攻击在 2 或 3。严重度由作者设定；两位评审的评分差距超过一级时，就说明评分细则需要写得更清楚。
 
-### What the corpus must satisfy
+### 语料必须满足什么
 
-Every category has at least seven fixtures, every prompt is non empty, every severity is in range and every id is unique. A failure stops the build, because every later component reads this corpus.
+每个类别至少七个样本，每条 prompt 非空，每个严重度都在范围内，每个 id 唯一。任何一项不满足都会让构建失败，因为后面所有组件都读这份语料。
 
-### What the taxonomy is not
+### 分类法不是什么
 
-The nearest fixture match, by character trigram cosine, assigns a label to a new prompt. It is a label producer. The detector with measured precision and recall is a separate component that consumes the labels.
+用字符三元组余弦相似度找最近的样本，可以给新 prompt 分配一个标签。它是标签生成器。带有测量过的精确率和召回率的检测器，是另一个消费这些标签的组件。
 
 ## Follow-ups
 
-- **Level 1:** A prompt tells the model to forget everything it was told before. Which boundary is that? Expected: the system prompt's authority, so instruction override.
-- **Level 2:** An attacker places commands inside text that the user asks the model to summarize. Which category? Expected: context smuggling.
-- **Level 2:** Why at least seven fixtures per category? Expected: so every category has enough examples to measure a detector against and the histogram is never empty.
-- **Level 3:** Two reviewers rate one fixture at severity 2 and 4. What does that tell you? Expected: the rubric is not sharp enough; a gap of more than one rank is the signal to rewrite it.
+- **Level 1:** 一条 prompt 让模型忘掉之前被告知的一切。这是哪条边界？ Expected: 系统 prompt 的权威，所以是指令覆盖。
+- **Level 2:** 攻击者把命令放进用户请模型总结的文本里。属于哪一类？ Expected: 上下文夹带。
+- **Level 2:** 为什么每个类别至少要七个样本？ Expected: 让每个类别都有足够样本来测量检测器，直方图也不会有空的类别。
+- **Level 3:** 两位评审给同一个样本分别打了 2 和 4。这说明什么？ Expected: 评分细则不够清楚；差距超过一级，就是该重写细则的信号。
 
 ## Wrong answers
 
-- "A regex per attack is a taxonomy." A regex is a patch; without categories you cannot see coverage or talk about what an attack is.
-- "Severity is how bad the prompt sounds." Severity is the impact if the attack succeeds, set on a 1 to 5 scale by the author.
-- "The nearest fixture match is the detector." The match assigns a label; the detector with measured precision and recall is a separate component.
+- "每种攻击一条正则，就是分类法。" 正则只是补丁；没有类别，就看不到覆盖情况，也没法讨论攻击是什么。
+- "严重度就是 prompt 听起来有多恶劣。" 严重度是攻击成功后的影响，由作者按 1 到 5 的量表设定。
+- "最近样本匹配就是检测器。" 匹配只负责分配标签；带有测量过的精确率和召回率的检测器是另一个组件。
 
 ## Taught in
 
-The [jailbreak taxonomy capstone](../../../phases/19-capstone-projects/82-jailbreak-taxonomy/) defines the six categories, the fixture record and the severity rubric.
+[越狱分类法综合项目](../../../phases/19-capstone-projects/82-jailbreak-taxonomy/)定义了六个类别、样本记录和严重度评分细则。

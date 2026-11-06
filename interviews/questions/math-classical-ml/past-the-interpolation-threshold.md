@@ -1,6 +1,6 @@
 ---
 id: past-the-interpolation-threshold
-title: Test error that falls, spikes and falls again
+title: 测试误差先下降再冲高随后再次下降
 card: math-classical-ml
 kind: concept
 level: 4
@@ -16,51 +16,51 @@ related: [math-classical-ml/bag-or-boost-the-base-model, math-classical-ml/compa
 updated: 2026-11-03
 ---
 
-A team keeps growing a model. Test error falls, then spikes as the parameter count approaches the number of training rows, then falls again as they keep going. The classical U-shaped curve predicts the spike but not the second fall. Explain what the curve shows, and give the team a rule about model size.
+一个团队持续扩大模型规模。测试误差先是下降，随后在参数量接近训练样本行数时发生剧烈尖峰反弹，接着在参数量继续增大时再次稳步下降。经典的 U 型偏差方差曲线预测了尖峰，却无法解释随后的二次下降。请解释这一曲线背后的机制，并给团队提供一套关于模型规模选型的法则。
 
 ## Short answer
 
-The spike sits at the interpolation threshold, where the model has just enough capacity to fit every training row and is forced into one specific, noise-sensitive solution, so variance peaks. Past it, many solutions fit the training data and gradient descent's implicit regularization picks a simple one, so error falls again. That is double descent. The rule: stay well below the threshold with explicit regularization, or go well past it; the worst place to sit is on it.
+误差尖峰发生在插值阈值处，此时模型容量恰好足够拟合所有训练样本，被迫陷入单一对噪声极度敏感的解，导致方差达到峰值。越过该阈值后，有许多解能拟合训练数据，梯度下降的隐式正则化会选择简单的解，测试误差因而再度下降。这就是双重下降现象。选型法则是：要么配合显式正则化使模型规模远低于阈值，要么大幅越过阈值；最差的选择就是停留在插值阈值上。
 
 ## Full answer
 
-### The classical picture
+### 经典视角的局限
 
-Expected error is squared bias plus variance plus irreducible noise. As capacity grows, bias falls and variance rises, and the sum has one minimum. The classical rule was that more capacity past that point always hurts.
+期望泛化误差等于偏差平方加方差加不可约噪声。随着模型容量增长，偏差持续降低而方差持续上升，二者之和构成一个单谷底的 U 型曲线。经典统计理论认为，越过该点后继续增加模型容量总会损害性能。
 
-### The three regimes
+### 三个运作区间
 
-| Regime | Parameters against rows | Behavior |
+| 区间 | 参数量相对于样本量 | 表现行为 |
 |---|---|---|
-| Underparameterized | far fewer | the classical trade-off applies |
-| Interpolation threshold | about equal | variance peaks, test error spikes |
-| Overparameterized | far more | implicit regularization, test error falls |
+| 欠参数化区间 | 远少于样本量 | 适用经典偏差方差权衡法则 |
+| 插值阈值 | 大致相当 | 方差剧烈爆发，测试误差急剧冲高 |
+| 过参数化区间 | 远多于样本量 | 隐式正则化生效，测试误差二次下降 |
 
-At the threshold the model can just barely thread every training point, and a small change in the data moves the fit a lot. Past it, the training data no longer pins down one solution, and the learning algorithm chooses among the many that fit. Gradient descent tends to pick a simple one, and that bias toward simplicity is why heavily overparameterized networks generalize.
+在插值阈值处，模型刚好能勉强穿过每一个训练样本点，数据的微小扰动都会导致拟合曲面剧烈形变。越过该阈值后，训练数据不再将解空间约束至唯一路径，学习算法可以在大量能够拟合数据的备选解中抉择。梯度下降倾向于选择简单的解，正是这种对简洁性的偏好使得高度过参数化的神经网络具备出色的泛化能力。
 
-### What the lesson adds
+### 课程补充的关键要点
 
-- The pattern appears in linear models, decision trees and neural networks.
-- More data can hurt near the threshold, because adding rows moves the threshold under a fixed model. That is the sample-wise form. Training longer can produce the same curve over epochs.
-- Regularization smooths and lowers the peak but does not remove it.
+- 该模式在线性模型、决策树以及深度神经网络中均广泛存在。
+- 在插值阈值附近盲目增加数据量反而可能损害性能，因为增加样本行会将固定规模的模型推回到插值阈值上，这被称为样本维度的双重下降。随训练 epoch 持续增加也会呈现类似曲线。
+- 正则化可以平滑并降低误差尖峰，但无法完全消除这一现象。
 
-### The rule for the team
+### 给团队的选型建议
 
-Measure where the threshold is: training error reaches zero and test error peaks at about the same size. Then size the model far from it on one side or the other. Below it, use explicit regularization and the classical diagnostics. Above it, keep going and verify with learning curves rather than with the classical intuition.
+实测插值阈值的具体位置：观察训练误差恰好归零且测试误差达到最差时的模型规模。然后将模型规模明确选择在远离该阈值的某一侧。在阈值以下时，遵循经典统计诊断并采用显式正则化；在阈值以上时，不必顾虑经典直觉，持续增大规模并通过学习曲线验证。
 
 ## Follow-ups
 
-- **Level 3:** How do you recognize the threshold in a training log? Expected: training error reaches zero and test error is at its worst at about the same model size or epoch.
-- **Level 4:** Why can adding data hurt in this regime? Expected: more rows move the threshold; a fixed model that was past it can land on it, which is the sample-wise form.
-- **Level 4:** What does regularization do to the peak? Expected: it smooths and lowers the peak but does not remove it.
-- **Level 4:** Does this make the bias-variance trade-off wrong? Expected: no; it holds below the threshold and is incomplete above it, where the implicit bias of the optimizer takes over.
+- **Level 3:** 在训练日志中如何辨别插值阈值？ Expected: 训练误差刚好降至零，而测试误差在相近的模型规模或 epoch 处达到最差峰值。
+- **Level 4:** 为什么在该区间附近增加数据量反而可能带来负面效果？ Expected: 更多样本行会移动插值阈值位置；原本已越过阈值的固定模型可能因此恰好落在阈值上，即样本维度的双重下降。
+- **Level 4:** 正则化对误差尖峰有什么作用？ Expected: 能够平滑并降低尖峰的高度，但无法彻底消除该现象。
+- **Level 4:** 这一现象是否说明偏差方差权衡理论是错误的？ Expected: 不是；经典理论在阈值以下完全成立，但在阈值以上不完整，此时优化器的隐式偏差开始主导泛化表现。
 
 ## Wrong answers
 
-- "The second fall is a measurement error." It appears in linear models, trees and networks, and in both the sample-wise and epoch-wise forms.
-- "Make the model as big as the budget allows and stop thinking about it." Bigger past the threshold works, but sitting on the threshold is the worst outcome; size the model deliberately away from it.
-- "Regularization removes the problem." It smooths and lowers the peak; it does not remove it.
+- "第二次下降纯属测量误差或偶然现象。" 该现象出现在线性模型、树模型和神经网络中，且同时存在样本维度和训练轮数维度的表现形式。
+- "在预算允许的前提下把模型做得越大越好，无需额外思考。" 越过阈值继续变大确实有效，但停留在插值阈值处是最差的结果；应主动规避阈值区间。
+- "引入正则化就能彻底解决该问题。" 正则化只能平滑并削弱误差峰值，无法完全抹平其结构性影响。
 
 ## Taught in
 
-The [bias-variance lesson](../../../phases/02-ml-fundamentals/10-bias-variance/) derives the decomposition and describes double descent and its three regimes.
+[偏差方差权衡课程](../../../phases/02-ml-fundamentals/10-bias-variance/)推导了误差分解公式，并详细阐述了双重下降现象及其三个运作区间。

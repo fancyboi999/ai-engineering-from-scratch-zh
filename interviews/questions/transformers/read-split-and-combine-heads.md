@@ -1,6 +1,6 @@
 ---
 id: read-split-and-combine-heads
-title: One reshape is right and one scrambles the heads
+title: 一个 reshape 是对的，另一个打乱了各个头
 card: transformers
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [transformers/heads-are-nearly-free]
 updated: 2026-11-03
 ---
 
-Two versions of a head split landed in review. `X` has shape `(n, d)` with `n` tokens and `d` features.
+评审时收到两个版本的切头代码。`X` 的形状是 `(n, d)`，有 `n` 个 token、`d` 个特征。
 
 ```python
 def split_a(X, n_heads):
@@ -30,23 +30,23 @@ def split_b(X, n_heads):
     return X.reshape(n_heads, n, d_head)
 ```
 
-Both return a tensor of shape `(n_heads, n, d_head)` and both run without error. Which one is right, what does the other one do to the data, and what test would have caught it?
+两者都返回形状为 `(n_heads, n, d_head)` 的张量，运行都不报错。哪个是对的？另一个对数据做了什么？什么测试能发现它？
 
 ## Short answer
 
-The first version is the right one: `split_a` groups the `d` features of each token into `n_heads` slices of width `d_head` and then moves the head axis to the front. `split_b` reads the same memory in the wrong order: it cuts the flat buffer into `n_heads` equal chunks and calls each chunk a head, so one head now holds runs of consecutive tokens, a chunk can end inside a token, and the columns no longer line up with the projection that produced them. The test is the round trip: combining the split must return `X` exactly, and head `h` must equal the column slice `X[:, h * d_head:(h + 1) * d_head]`.
+第一个版本是对的：`split_a` 把每个 token 的 `d` 个特征分成 `n_heads` 段，每段宽 `d_head`，再把头这一轴移到最前面。`split_b` 用错误的顺序读取同一块内存：它把扁平的缓冲区切成 `n_heads` 等份，把每一份叫作一个头，于是一个头里装的是连续的若干个 token，一份可能在某个 token 中间断开，各列也不再和产生它们的投影对齐。测试方法是往返测试：把切好的头再合并，必须精确还原 `X`，而且第 `h` 个头必须等于列切片 `X[:, h * d_head:(h + 1) * d_head]`。
 
 ## Full answer
 
-### What the shapes mean
+### 形状的含义
 
-After the projection, each token's `d` features are the concatenation of `n_heads` groups of `d_head` features. A head is a column slice across every token. The reshape `(n, n_heads, d_head)` keeps each token's row intact and only regroups its columns; the transpose then puts the head axis first so that the per-head attention becomes a batched operation over heads.
+投影之后，每个 token 的 `d` 个特征是 `n_heads` 组、每组 `d_head` 个特征拼接起来的。一个头是横跨所有 token 的一段列切片。reshape 成 `(n, n_heads, d_head)` 保持每个 token 的行完整，只是把它的列重新分组；然后 transpose 把头这一轴放到最前面，每个头的注意力就成了沿头这一轴的批量运算。
 
-### Why the wrong version still runs
+### 错误的版本为什么还能跑
 
-Both tensors have `n * d` elements, so NumPy and PyTorch are happy to reinterpret the memory. A reshape of a contiguous array does not move data; it only changes how the flat buffer is indexed. `split_b` therefore cuts the buffer into `n_heads` equal chunks. When `n` is divisible by `n_heads`, head zero holds the first `n / n_heads` tokens with all of their features; otherwise a chunk ends inside a token. The scores inside that head compare the wrong vectors, and the model trains to something, which is why this bug can survive for weeks.
+两个张量都有 `n * d` 个元素，所以 NumPy 和 PyTorch 乐于重新解释这块内存。对连续数组做 reshape 不会搬动数据；它只改变扁平缓冲区的索引方式。所以 `split_b` 把缓冲区切成了 `n_heads` 等份。`n` 能被 `n_heads` 整除时，第 0 个头装的是前 `n / n_heads` 个 token 的全部特征；不能整除时，某一份会在一个 token 中间断开。这个头里的分数比较的是错误的向量，而模型照样能训练出点什么，所以这个 bug 可能存活好几周。
 
-### The combine must be the exact inverse
+### 合并必须是精确的逆操作
 
 ```python
 def combine_heads(H):
@@ -54,31 +54,31 @@ def combine_heads(H):
     return H.transpose(1, 0, 2).reshape(n, h * d_head)
 ```
 
-Transpose back first, then reshape. Reshaping directly from `(h, n, d_head)` to `(n, h * d_head)` makes the same mistake in reverse, and the output projection sees scrambled features.
+先 transpose 回去，再 reshape。直接从 `(h, n, d_head)` reshape 到 `(n, h * d_head)`，就是反过来犯同样的错误，输出投影看到的是打乱的特征。
 
-### The production shape contract
+### 生产中的形状约定
 
-With a batch dimension the intermediate tensors are `(B, H, T, d_head)`. The head dimension sits next to the batch so that the accelerator treats the per-head attention as `B * H` independent problems, and `d_head` stays last so that `Q @ K.transpose(-2, -1)` contracts it. The constraint is `D % H == 0`.
+加上批次维度后，中间张量是 `(B, H, T, d_head)`。头维度紧挨着批次维度，这样加速器把每个头的注意力当成 `B * H` 个独立的问题；`d_head` 留在最后，这样 `Q @ K.transpose(-2, -1)` 会沿它做收缩。约束条件是 `D % H == 0`。
 
-### Tests that catch it
+### 能发现它的测试
 
-1. `combine_heads(split_heads(X)) == X`.
-2. `split_heads(X)[h] == X[:, h * d_head:(h + 1) * d_head]` for every head.
-3. Single-head attention on the slice equals the head's output from the batched path.
+1. `combine_heads(split_heads(X)) == X`。
+2. 对每个头都有 `split_heads(X)[h] == X[:, h * d_head:(h + 1) * d_head]`。
+3. 在这段切片上跑单头注意力，结果等于批量路径中对应头的输出。
 
 ## Follow-ups
 
-- **Level 2:** Why does a reshape never raise here? Expected: it only reinterprets a buffer with the same number of elements; the data is not checked for meaning.
-- **Level 2:** Why must `d_head` stay the last axis? Expected: the score matmul contracts the last axis of Q with the second-to-last of the transposed K.
-- **Level 3:** How does grouped-query attention reuse this code? Expected: split K and V into `n_kv_heads` heads and repeat each along the head axis `n_heads // n_kv_heads` times to match Q.
-- **Level 3:** A model trained with the wrong split reaches a decent loss. Why does that not clear the bug? Expected: the projections learned to work with the scrambled layout, but the heads no longer correspond to subspaces of the input and any pretrained weights or exported checkpoints will be wrong.
+- **Level 2:** 为什么这里的 reshape 从不报错？ Expected: 它只是重新解释一个元素个数相同的缓冲区；不会检查数据的含义。
+- **Level 2:** 为什么 `d_head` 必须留在最后一轴？ Expected: 计算分数的矩阵乘法用 Q 的最后一轴和转置后 K 的倒数第二轴做收缩。
+- **Level 3:** 分组查询注意力怎么复用这段代码？ Expected: 把 K 和 V 切成 `n_kv_heads` 个头，每个头沿头这一轴重复 `n_heads // n_kv_heads` 次，与 Q 对齐。
+- **Level 3:** 用错误切法训练的模型损失也还不错。为什么这不能说明没有 bug？ Expected: 投影学会了适应打乱的布局，但各个头不再对应输入的子空间，任何预训练权重或导出的检查点都会出错。
 
 ## Wrong answers
 
-- "Reshape and transpose are interchangeable when the shapes match." A reshape reinterprets memory and a transpose moves axes; the order decides which elements land together.
-- "If it runs and the loss falls, it is correct." The loss falls for the wrong layout too; only the round-trip and slice tests prove the layout.
-- "Each head needs its own weight matrix, so the split is irrelevant." The heads are slices of one projection; the split is what defines them.
+- "形状一致时，reshape 和 transpose 可以互换。" reshape 重新解释内存，transpose 移动轴；顺序决定了哪些元素被放在一起。
+- "能跑而且损失在降，就是对的。" 布局错了损失也会降；只有往返测试和切片测试能证明布局正确。
+- "每个头都有自己的权重矩阵，所以切法无所谓。" 各个头是同一个投影的切片；切法定义了头本身。
 
 ## Taught in
 
-The [multi-head attention lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) gives the split and combine pair, and the [attention capstone](../../../phases/19-capstone-projects/33-multihead-self-attention/) sets the batched shape contract.
+[多头注意力一课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)给出了切分和合并这一对函数，[注意力综合项目](../../../phases/19-capstone-projects/33-multihead-self-attention/)定下了批量计算的形状约定。

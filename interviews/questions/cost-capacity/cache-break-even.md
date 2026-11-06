@@ -1,6 +1,6 @@
 ---
 id: cache-break-even
-title: How many reads a cached prefix needs to pay off
+title: 一个缓存前缀要读几次才回本
 card: cost-capacity
 kind: estimate
 level: 2
@@ -16,47 +16,47 @@ related: [cost-capacity/two-cache-layers, cost-capacity/parallel-calls-miss-the-
 updated: 2026-11-03
 ---
 
-Your provider charges a 25 percent premium to write a prefix into its cache, and it bills a cache read at a tenth of the normal input price. The cache lives for five minutes. A one-hour variant costs twice the normal input price to write. How many reads does each variant need to pay off, and what rule do you give the team?
+你的提供商把前缀写入缓存时加收 25% 的溢价，缓存读取按正常输入价格的十分之一计费。缓存保留五分钟。另有一种保留一小时的版本，写入价格是正常输入价格的两倍。两种版本各要读几次才回本？你给团队定什么规则？
 
 ## Short answer
 
-With the five-minute cache, one write and one read average 0.675 of the normal cost per request, a saving of about 32 percent, so the cache pays off on the first read. One write and ten reads average 0.205, about 80 percent saved. The one-hour cache charges 2x for the write, so that block needs two reads before it comes out ahead. The rule: cache anything you expect to reuse at least three times inside its lifetime.
+用五分钟缓存时，一次写入加一次读取，平均每个请求花正常成本的 0.675，约省 32%，所以第一次读取就回本了。一次写入加十次读取，平均为 0.205，约省 80%。一小时缓存的写入价格是 2 倍，所以这个块要读两次才划算。规则是：预计在缓存有效期内会复用至少三次的内容，就缓存它。
 
 ## Full answer
 
-### The arithmetic
+### 算账
 
-A write costs 1.25 times the normal input price, and a read costs 0.1 times it.
+写入价格是正常输入价格的 1.25 倍，读取价格是它的 0.1 倍。
 
-- One write and one read: the two requests average 0.675 of the normal price. That is 32 percent saved on the first read already.
-- One write and ten reads: the requests average 0.205 of the normal price, about 80 percent saved.
-- The one-hour cache writes at 2 times the normal price. With one read the average sits above the normal price, and with two reads it falls below. The lesson says the one-hour block pays back fast on any batch that reuses the prefix more than five times.
+- 一次写入加一次读取：两个请求平均花正常价格的 0.675。第一次读取就已经省了 32%。
+- 一次写入加十次读取：所有请求平均花正常价格的 0.205，约省 80%。
+- 一小时缓存的写入价格是正常价格的 2 倍。只读一次时，平均价格高于正常价格；读两次时降到正常价格以下。课程说，只要一个批任务复用这个前缀超过五次，一小时的缓存块很快就能回本。
 
-Three reuses inside the lifetime clear the break-even on either variant, which is the rule the lesson gives.
+在有效期内复用三次，两种版本都能越过盈亏平衡点，这就是课程给出的规则。
 
-### What breaks the arithmetic
+### 什么会让这笔账不成立
 
-- A prefix that differs by one token on every request, because of a timestamp, a request id or a reshuffled tool list. Every request writes and none reads.
-- A block below the minimum cacheable size, which is 1,024 tokens on the provider in the lesson. A smaller block silently does not cache.
-- Requests that arrive in parallel before the first write has landed. Each one pays the write premium, and none reads.
+- 前缀每次请求都有一个 token 不同，原因可能是时间戳、请求 ID，或者顺序被打乱的工具列表。每个请求都在写，没有一个在读。
+- 块小于最小可缓存长度，课程里那家提供商的下限是 1,024 个 token。更小的块不会被缓存，也不会报错。
+- 第一次写入还没完成，并行请求就已经到达。每个请求都付写入溢价，没有一个读到缓存。
 
-### Verify it
+### 核验
 
-Read the usage fields on every response: the tokens written to the cache and the tokens read from it. In CI, assert that the second identical request reads more than zero. On the dashboard, split input tokens into cached and uncached, or a traffic drop will look like a cache win.
+读取每个响应的 usage 字段：写入缓存的 token 数，以及从缓存读出的 token 数。在 CI 里断言第二个完全相同的请求读出的 token 数大于零。在看板上把输入 token 拆成已缓存和未缓存两部分，否则流量下降也会看起来像缓存的功劳。
 
 ## Follow-ups
 
-- **Level 2:** Why does the five-minute cache pay off on the first read? Expected: the write premium is a quarter and the read saves nine tenths, so the two together already average below the normal price.
-- **Level 2:** When does the one-hour cache make sense? Expected: a batch job that reuses the prefix across runs more than five minutes apart, more than five times.
-- **Level 3:** Input tokens are down and the bill is flat. What is wrong with the dashboard? Expected: it does not split cached from uncached input, so a drop in traffic looks like a cache win.
-- **Level 3:** Ten parallel requests share a prefix that nobody has cached yet. What happens to the arithmetic? Expected: all ten pay the write premium and none reads, so the cache costs more than no cache. Send one request first, then the rest.
+- **Level 2:** 为什么五分钟缓存第一次读取就回本？ Expected: 写入溢价是四分之一，读取省下十分之九，两次请求的平均价格已经低于正常价格。
+- **Level 2:** 什么时候适合用一小时缓存？ Expected: 一个批任务在多次运行之间复用前缀，运行间隔超过五分钟，复用次数超过五次。
+- **Level 3:** 输入 token 下降了，账单却没变。看板哪里出了问题？ Expected: 它没有把已缓存输入和未缓存输入分开，所以流量下降看起来像缓存的功劳。
+- **Level 3:** 十个并行请求共用一个还没人缓存过的前缀。这笔账会怎样？ Expected: 十个请求都付了写入溢价，没有一个读到缓存，用缓存反而比不用更贵。先发一个请求，再发其余的。
 
 ## Wrong answers
 
-- "Caching always saves money." A prefix written once and never read costs 25 percent more than no cache.
-- "Pick the one-hour cache, it lasts longer." It writes at twice the normal input price, so a block read once costs more than without the cache.
-- "Mark the whole prompt as cacheable." The user message changes every time, so the match ends at the first differing token, and a block below the minimum size does not cache at all.
+- "缓存总能省钱。" 写入一次却从没被读过的前缀，比不缓存多花 25%。
+- "选一小时缓存，因为它保留得更久。" 它的写入价格是正常输入价格的两倍，只读一次的块比不缓存还贵。
+- "把整个 prompt 都标成可缓存。" 用户消息每次都变，匹配在第一个不同的 token 处就结束了；小于最小长度的块根本不会被缓存。
 
 ## Taught in
 
-The [prompt caching lesson](../../../phases/11-llm-engineering/15-prompt-caching/) gives the break-even arithmetic and the verification fields, and the [caching economics lesson](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/) names the parallel-write trap.
+[prompt 缓存课程](../../../phases/11-llm-engineering/15-prompt-caching/)给出了盈亏平衡的算法和核验字段，[缓存经济学课程](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/)指出了并行写入陷阱。

@@ -1,6 +1,6 @@
 ---
 id: system-user-prefill
-title: The three parts of a chat call and the prefill trick
+title: 对话调用的三个部分与 prefill 技巧
 card: prompting-structured-output
 kind: concept
 level: 1
@@ -16,49 +16,49 @@ related: [prompting-structured-output/json-mode-is-not-a-schema]
 updated: 2026-11-03
 ---
 
-Walk me through the three parts of a chat API call and what each one is for. Then tell me how you would get a model to return a JSON object with no preamble, without a structured output API.
+讲讲对话 API 调用的三个部分，以及每部分是做什么的。然后告诉我：不用结构化输出 API，你怎样让模型返回一个没有开场白的 JSON 对象？
 
 ## Short answer
 
-The system message sets identity, rules and output constraints and persists across turns. The user message carries the task and changes every turn. The assistant prefill starts the model's reply for it, so a prefill of an opening brace makes the model continue as JSON with no preamble, on the providers that accept a partial assistant turn.
+system 消息设定身份、规则和输出约束，跨轮次保持不变。user 消息承载任务，每轮都会变。assistant prefill 替模型写好回复的开头，所以在接受不完整 assistant 轮次的服务商上，预填一个左花括号，模型就会接着写 JSON，不带开场白。
 
 ## Full answer
 
-### The three parts
+### 三个部分
 
-| Part | Role | Lifetime |
+| 部分 | 作用 | 生命周期 |
 |---|---|---|
-| System message | identity, behavioral rules, output rules; the model treats it as the highest-priority context | persists across turns |
-| User message | the task or the question | changes every turn |
-| Assistant prefill | the first characters of the reply, written by you | one turn |
+| system 消息 | 身份、行为规则、输出规则；模型把它当作最高优先级的上下文 | 跨轮次保持 |
+| user 消息 | 任务或问题 | 每轮都变 |
+| assistant prefill | 回复的前几个字符，由你写 | 一轮 |
 
-Without a system message, the user message is under-constrained and the model fills the gaps with guesses.
+没有 system 消息时，user 消息的约束不足，模型会用猜测填补空白。
 
-### The prefill
+### prefill
 
-Send a final message with the assistant role and the content `{`. The model continues from there, so the reply is the rest of the object, and your code puts the brace back in front. No preamble, no code fence. Where the provider does not accept a partial assistant turn, use its structured output mode instead.
+发送最后一条消息，role 是 assistant，内容是 `{`。模型从这里接着写，所以回复就是这个对象的剩余部分，你的代码再把花括号补回到最前面。没有开场白，也没有代码围栏。服务商不接受不完整的 assistant 轮次时，改用它的结构化输出模式。
 
-### Write the instruction, not the wish
+### 写指令，不要写愿望
 
-The lesson's rules for a clear instruction: name the format, the length, the audience, what to include and what to exclude, and give one example of the output. Three kinds of constraint work: negative ones that remove regions of the output space, positive ones that guarantee a structure in every reply, and conditional ones that handle edge cases.
+课程给出的清晰指令规则：说明格式、长度、受众、要包含什么、要排除什么，并给一个输出示例。三类约束有效：去掉部分输出空间的否定约束，保证每次回复都有某种结构的肯定约束，以及处理边界情况的条件约束。
 
-### Do not over-constrain
+### 不要过度约束
 
-A system prompt of 2,000 words of rules leaves the model less room for the task. The lesson keeps most system prompts under 500 tokens, and checks them for contradictions, because when two rules conflict the model picks one at random.
+2,000 词规则的 system prompt 会让模型留给任务的余地变少。课程把大多数 system prompt 控制在 500 个 token 以内，并检查其中有没有矛盾，因为两条规则冲突时，模型会随机选一条。
 
 ## Follow-ups
 
-- **Level 1:** Why does the system message come first? Expected: the model gives it the highest priority, and it stays constant while user turns change.
-- **Level 2:** What does the prefill save compared with an instruction to respond in JSON? Expected: the preamble and the code fence; the reply starts inside the object, so the parser sees JSON from the first character.
-- **Level 2:** Your system prompt has grown to 2,000 words of rules. What does the lesson say? Expected: over-constraining; the model spends its capacity on the rules instead of the task, and most tasks want a system prompt under 500 tokens.
-- **Level 3:** How do you write one prompt that behaves the same on several providers? Expected: plain English, an explicit format, XML style delimiters, the instructions at the start and the end, temperature zero while testing, and two or three examples.
+- **Level 1:** 为什么 system 消息放在最前面？ Expected: 模型给它最高优先级，而且 user 轮次不断变化时它保持不变。
+- **Level 2:** 与「用 JSON 回复」这样的指令相比，prefill 省掉了什么？ Expected: 开场白和代码围栏；回复从对象内部开始，解析器从第一个字符起看到的就是 JSON。
+- **Level 2:** 你的 system prompt 已经涨到 2,000 词的规则。课程怎么说？ Expected: 过度约束；模型把能力花在规则上而不是任务上，大多数任务的 system prompt 应在 500 个 token 以内。
+- **Level 3:** 怎样写一个在几家服务商上表现一致的 prompt？ Expected: 用平实的英文、明确的格式、XML 风格的分隔符，指令放在开头和结尾，测试时温度设为零，并给两到三个示例。
 
 ## Wrong answers
 
-- "The system message is just the first user message." It is processed with a higher priority and persists while user turns change.
-- "A prefill works on every provider." Only some accept a partial assistant turn; elsewhere use the structured output mode.
-- "More rules in the system prompt means more control." Past a point the model spends its capacity on the rules; the lesson keeps most system prompts under 500 tokens.
+- "system 消息就是第一条 user 消息。" 它的处理优先级更高，并且在 user 轮次变化时保持不变。
+- "prefill 在每家服务商上都能用。" 只有部分服务商接受不完整的 assistant 轮次；其他地方用结构化输出模式。
+- "system prompt 里规则越多，控制力越强。" 超过某个程度，模型就把能力花在规则上；课程把大多数 system prompt 控制在 500 个 token 以内。
 
 ## Taught in
 
-The lesson [prompt engineering](../../../phases/11-llm-engineering/01-prompt-engineering/) gives the anatomy of a call, the prefill and the rules for clear instructions.
+[prompt 工程](../../../phases/11-llm-engineering/01-prompt-engineering/)一课给出了一次调用的组成、prefill 和清晰指令的规则。

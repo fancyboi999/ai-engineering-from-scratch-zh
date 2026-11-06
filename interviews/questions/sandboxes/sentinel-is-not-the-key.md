@@ -1,6 +1,6 @@
 ---
 id: sentinel-is-not-the-key
-title: The key reads proxy-managed and the agent still works
+title: 密钥显示为 proxy-managed，agent 却依然正常工作
 card: sandboxes
 kind: concept
 level: 1
@@ -16,43 +16,43 @@ related: [sandboxes/hypervisor-is-the-boundary]
 updated: 2026-11-03
 ---
 
-An agent inside a sandbox prints its environment. The provider key variable reads `proxy-managed`, and `GH_TOKEN` looks like a real token that starts with `gho_sbxproxymanaged`. The developer had exported the real key in `~/.zshrc` and, when that failed, passed `-e KEY=value`. Explain what the agent holds, where the real value lives, and how a request still reaches the provider with a valid key.
+沙箱内部的 agent 打印了其环境变量。模型服务商的 API 密钥变量显示为 `proxy-managed`，而 `GH_TOKEN` 看起来像一个以 `gho_sbxproxymanaged` 开头的真实 Token。开发者此前曾在 `~/.zshrc` 中导出了真实的密钥，失败后又尝试传入了 `-e KEY=value`。解释 agent 当前实际持有的是什么、真实密钥存放在哪里，以及为何发往服务商的请求依然能携带有效的真实密钥。
 
 ## Short answer
 
-The agent holds a placeholder, never the value. Three sentinel formats exist: `proxy-managed` for provider keys, a token-shaped `gho_sbxproxymanaged000000000000000000000` for `GH_TOKEN`, and `sbx-cs-<rand>` for custom secrets. The value sits in the host store, the macOS Keychain, the Windows Credential Manager or the Linux Secret Service, and the host proxy swaps the placeholder for the value after the request has left the VM, only on a request to the host the secret is bound to. The host environment is not read since v0.35.0, and `-e` passes a plain variable, not a secret.
+agent 持有的只是占位符（sentinel），而不是真实的密钥值。系统存在三种标准占位符格式：模型服务商密钥采用 `proxy-managed`，`GH_TOKEN` 采用类似真实 Token 格式的 `gho_sbxproxymanaged000000000000000000000`，自定义密钥采用 `sbx-cs-<rand>`。真实的密钥安全保存在宿主机的凭据存储中（macOS Keychain、Windows 凭据管理器或 Linux Secret Service），宿主机代理服务在请求离开虚拟机后、且仅在发往与该机密绑定的目标主机时，才将占位符动态替换为真实密钥。自 v0.35.0 起沙箱便不再读取宿主机的环境变量，而 `-e` 传递的只是普通的明文环境变量，绝非受保护的机密。
 
 ## Full answer
 
-### Three ways in, and one that is not
+### 注入凭据的三种途径与一种误区
 
-`sbx secret set` stores a value under one of 13 service names, from `-t`, stdin, `--command` or `--ref`, and `--refresh` sets a cache time with a default of 55 minutes. `sbx secret import` reads the host environment once, shows each candidate with a last-4 preview, and stores what you accept. `sbx secret set-custom` binds a value to `--host` targets and an `--env` name of your own.
+`sbx secret set` 将密钥存储在 13 个预设服务名称之一的命名空间下，数据来源支持 `-t`、标准输入、`--command` 或 `--ref`，且 `--refresh` 可配置缓存刷新时间（默认 55 分钟）。`sbx secret import` 一次性读取宿主机环境变量，以展示后 4 位的预览形式呈现候选密钥，并仅保存用户确认接受的部分。`sbx secret set-custom` 则支持将自定义密钥绑定至特定 `--host` 目标以及你自己命名的 `--env` 环境变量名。
 
-`-e KEY=VALUE` is the fourth path and it is not a secret path. The variable lands in the agent session as plain text, and a `sbx template save` later copies it with every other file in the container filesystem.
+`-e KEY=VALUE` 是第四种传递参数的方式，但它不是安全的机密注入通道。该变量以明文形式直接落入 Agent 会话中，且后续执行 `sbx template save` 时会连同容器文件系统中的所有其他文件一并被复制打包。
 
-### What the receiver on the host saw
+### 宿主机接收端所捕获的实测行为
 
-The recorded run bound a custom secret to `host.docker.internal` and `localhost`, started a receiver on the host at `127.0.0.1:18080`, and sent requests from inside with the placeholder in three places. The receiver logged the real value inside `Bearer`, in an `X-Demo` header and as the whole `Authorization` value. So the swap happens on plain HTTP and it is a substring replacement anywhere in the request to a bound host.
+实测运行将自定义机密绑定至 `host.docker.internal` 与 `localhost`，在宿主机 `127.0.0.1:18080` 启动了测试接收端，并从沙箱内部发起了将占位符置于三处不同位置的 HTTP 请求。接收端日志证实：在 `Bearer` 内部、在 `X-Demo` 自定义请求头中，以及作为整个 `Authorization` 头部的值，均被成功替换为了真实密钥。这证明替换发生在纯明文 HTTP 协议层面，且是对发往绑定主机的请求任意位置执行的子串匹配替换。
 
-A fourth request went to a name listed in `NO_PROXY`, so curl skipped the forward proxy. The transparent path blocked it and swapped nothing. The existing sandbox never received the new custom variable; a custom secret reaches new sandboxes only. Removal is immediate for running sandboxes.
+第四笔请求发送给了列在 `NO_PROXY` 中的域名，导致 curl 跳过了正向代理。透明代理路径直接阻断了该请求且未执行任何凭据替换。当前已存在的沙箱未收到新添加的自定义变量；自定义机密仅注入新创建的沙箱。而机密删除操作对正在运行中的沙箱是即刻生效的。
 
-### The one credential path that does cross
+### 唯一能够直接穿透分界线的凭据通道
 
-SSH agent forwarding is on by default. The guest sees `SSH_AUTH_SOCK=/run/ssh-agent.sock` with a gateway on port 3129. The private key stays on the host, and any process inside can ask that agent to sign. `ssh.agentForwardingEnabled` turns it off, followed by a daemon restart.
+SSH agent 代理转发默认保持开启。客户机内部能够看到 `SSH_AUTH_SOCK=/run/ssh-agent.sock`，其网关位于 3129 端口上。私钥安全存留在宿主机上，沙箱内部的任何进程均可请求该代理执行签名操作。配置 `ssh.agentForwardingEnabled` 并重启守护进程可将其关闭。
 
 ## Follow-ups
 
-- **Level 1:** Why did the export in the shell profile change nothing inside? Expected: since v0.35.0 the host environment is not read; store the value with `sbx secret set` or `sbx secret import`.
-- **Level 2:** What is the cost of `-e API_KEY=...` beyond convenience? Expected: the value is visible to the agent and to every template saved from that sandbox, and no proxy swap protects it.
-- **Level 2:** The placeholder also appears in a query string of a request to the bound host. What arrives? Expected: the real value, because the replacement is a substring swap anywhere in the request.
-- **Level 3:** Why bind a custom secret to exact hosts rather than a wide pattern? Expected: the proxy fills the placeholder on any request to a bound host, so a wide binding lets the agent deliver the value to a destination you did not intend.
+- **Level 1:** 为什么在 shell 配置文件中 export 环境变量在沙箱内毫无效果？ Expected: 自 v0.35.0 起宿主机环境变量不再被沙箱读取；应使用 `sbx secret set` 或 `sbx secret import` 存储。
+- **Level 2:** 除了不够优雅之外，使用 `-e API_KEY=...` 的核心安全代价是什么？ Expected: 密钥明文对 Agent 完全可见且会被保存进基于该沙箱导出的任何模板中，且没有任何代理替换机制提供保护。
+- **Level 2:** 占位符出现在发往绑定主机的 URL 查询字符串中，对端会收到什么？ Expected: 收到真实密钥，因为代理替换是对请求中出现的任何子串无差别替换。
+- **Level 3:** 为什么自定义机密必须绑定到精确的主机名而非宽泛通配符？ Expected: 代理对发往任何绑定主机的请求都会填充真实密钥，过于宽泛的绑定会导致 Agent 将密钥发送到未预期的目标。
 
 ## Wrong answers
 
-- "The agent needs the real key or the provider call fails." The proxy adds the key after the request leaves the VM; the recorded run answered correctly with `proxy-managed` inside.
-- "`GH_TOKEN` inside is a leaked real token." It is a sentinel shaped like a token so that tools accept it; the value stays on the host.
-- "Export the key on the host and the sandbox inherits it." That path closed in v0.35.0; a tutorial that says so is out of date.
+- "Agent 必须拿到真实密钥否则调用会报错。" 代理在请求离开虚拟机后会自动补全真实密钥；实测中沙箱内拿着 `proxy-managed` 完全正常调用。
+- "沙箱内的 `GH_TOKEN` 是真实泄漏的敏感凭据。" 它是一个形似合法 Token 的占位符，以便工具能够通过格式校验；真实凭据留在宿主机。
+- "在宿主机 export 环境变量后沙箱会自动继承。" 该途径在 v0.35.0 中已关闭；声称能够继承的教程均已过时。
 
 ## Taught in
 
-The [secrets section](../../../manuals/docker-sandboxes-101/sections/3-5-sbx-secret-set-import-and-set-custom.md) records the sentinels and the receiver log, and the [first section](../../../manuals/docker-sandboxes-101/sections/1-1-sbx-and-docker-agent.md) names who owns the store and the proxy.
+[机密章节](../../../manuals/docker-sandboxes-101/sections/3-5-sbx-secret-set-import-and-set-custom.md)记录了占位符格式与接收端抓取日志，[第一章节](../../../manuals/docker-sandboxes-101/sections/1-1-sbx-and-docker-agent.md)指明了谁持有凭据存储与代理服务。

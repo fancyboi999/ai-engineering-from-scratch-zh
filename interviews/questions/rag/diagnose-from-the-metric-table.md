@@ -1,6 +1,6 @@
 ---
 id: diagnose-from-the-metric-table
-title: Recall holds, MRR drops, nobody touched the retriever
+title: 召回率不变、MRR 下降，检索器却没改过
 card: rag
 kind: debug
 level: 3
@@ -16,45 +16,45 @@ related: [rag/recall-at-k-first, rag/judge-grades-its-own-work]
 updated: 2026-11-03
 ---
 
-After a release, the nightly RAG eval shows recall at 5 unchanged and still high, MRR down from last week, and faithfulness unchanged. Nobody touched the retriever. Which stage do you suspect, how do you confirm it, and what would other patterns have told you?
+发布后，每晚 RAG 评估显示 recall@5 仍高且未变，MRR 比上周下降，忠实度不变。检索器没有改动。你怀疑哪个阶段，如何确认，其他指标组合又意味着什么？
 
 ## Short answer
 
-The reranker. On average the gold chunk still arrives in the top 5, so recall holds, but it sits lower in the list, so MRR falls, and the generator stays grounded in what it receives. Confirm it from the per-query trace: compare the rank of the gold chunk before and after the release, then look at what changed in the reranker, such as its weights, its candidate pool size, or the order of the query and the document in the pair.
+首先怀疑重排模型。平均而言，标准片段仍在前 5 个结果中，所以召回率不变，但排名降低使 MRR 下降；生成器仍忠于所收到的上下文。用逐查询记录确认：比较发布前后标准片段的排名，再看重排模型改了什么，例如权重、候选池大小，或文本对中查询与文档的顺序。
 
 ## Full answer
 
-### Why the pattern points at one stage
+### 为什么指向重排阶段
 
-MRR is the mean over queries of one divided by the rank of the first relevant document. Rank 1 contributes 1.0, rank 2 contributes 0.5, rank 10 contributes 0.1, so the metric is dominated by the top of the list. Recall at 5 is blind to position inside the top 5. A move in MRR with recall flat suggests that the right chunk moved down inside the window, and the stage that sets the order inside the window is the reranker. A flat average does not prove it: one query can lose its gold chunk from the top 5 while another gains one. The per-query rank trace below separates reranker movement from retrieval loss.
+MRR 是各查询第一个相关文档排名倒数的平均值。第 1 名贡献 1.0，第 2 名贡献 0.5，第 10 名贡献 0.1，因此主要受列表头部影响。recall@5 不关注前 5 个内部的位置。召回率不变而 MRR 改变，说明正确片段可能在窗口内后移，而重排模型决定窗口内顺序。不过平均值不变不能证明这一点：某个查询的标准块可能掉出前 5，另一个查询恰好补进一个。逐查询排名记录能区分重排变化和检索损失。
 
-### The full table
+### 完整诊断表
 
-| Symptom | Likely cause | What to fix |
+| 现象 | 可能原因 | 修正对象 |
 |---|---|---|
-| Low recall at k, low precision at k | the chunker cut the answer, or the retriever cannot find it | chunk boundaries, or the retrieval modality |
-| Decent recall at k, low MRR | the right chunk is in the top k but not at position 1 | the reranker |
-| High MRR, low faithfulness | the generator invents content with the right context in front of it | the generation prompt, force cite or refuse |
-| High faithfulness, low relevance | the answer is grounded but off topic | the query rewriter, or the prompt |
-| All four high, users still complain | the eval set is not representative | add real user queries to the qrels |
+| recall@k、precision@k 都低 | 分块器切断了答案，或检索器找不到答案 | 分块边界或检索方式 |
+| recall@k 尚可、MRR 低 | 正确片段在前 k 个中，却不在首位 | 重排模型 |
+| MRR 高、忠实度低 | 上下文正确，生成器仍编造 | 生成 prompt，强制引用或拒答 |
+| 忠实度高、相关性低 | 答案有依据却偏题 | 查询改写器或 prompt |
+| 四项都高、用户仍投诉 | 评估集不具代表性 | 向 qrels 添加真实用户查询 |
 
-### Confirm, do not guess
+### 确认，不猜测
 
-Persist the metric trace per query on every CI run. Then the question is not "which number fell" but "which queries fell, and to which rank". Slice by query class. A fall confined to one class, such as queries that carry a literal symbol, points at a different change than a fall across every class.
+每次 CI 运行都持久保存逐查询指标记录。问题就从“哪个数下降”变成“哪些查询下降，降到第几名”。按查询类别切片。只有某类查询（例如包含字面符号的查询）下降，与所有类别都下降，指向的改动不同。
 
 ## Follow-ups
 
-- **Level 3:** The trace shows the gold chunk at rank 3 only for literal identifier queries. What does the slice suggest? Expected: a change that hurt the lexical signal inside the pool for those queries; slice by class to find it rather than averaging it away.
-- **Level 3:** Which release changes can move MRR while recall at 5 stays fixed? Expected: anything inside the reranker: new weights, a smaller candidate pool, or the query and the document swapped in the pair.
-- **Level 4:** Faithfulness is also down while recall and MRR are fine. Where do you look? Expected: the generation prompt, and the judge itself, because a judge from the same model family grades its own output too kindly; hand-grade a sample.
-- **Level 4:** Why keep the per-query trace rather than the averages? Expected: a 90 percent average hides a class that always misses, and when a user complains you can find the matching qrel and see whether the eval would have caught it.
+- **Level 3:** 记录显示，只有字面标识符查询的标准片段排在第 3 名，说明什么？ Expected: 某项变化损害了这类查询在候选池中的词法信号；应按类别排查，不能用平均值掩盖。
+- **Level 3:** 哪些发布变化会让 MRR 改变而 recall@5 不变？ Expected: 重排模型的新权重、缩小的候选池，或文本对中的查询与文档顺序颠倒。
+- **Level 4:** recall 和 MRR 正常，忠实度也下降了，应查哪里？ Expected: 生成 prompt，以及 judge 本身，因为同一模型家族的 judge 给自家输出打分偏宽；人工抽样评分。
+- **Level 4:** 为什么保存逐查询记录，而不只留平均值？ Expected: 90% 的平均值会掩盖始终失败的类别；用户投诉时还可找到对应 qrel，判断评估是否原本能发现它。
 
 ## Wrong answers
 
-- "The retriever regressed." Nobody touched the retriever and recall at 5 did not move; a flat average can still hide a query that lost its gold chunk, so check the per-query rank trace before you blame retrieval.
-- "The model started to hallucinate." Faithfulness did not move; the generator is still grounded in what it receives.
-- "Run it again, it is noise." The eval is offline and deterministic on the fixture; one metric down with the others flat points at one stage.
+- "检索器回退了。" 检索器没改且 recall@5 不变；但平均值仍可能掩盖个别查询丢失标准块，应先看逐查询排名记录再归因。
+- "模型开始出现幻觉。" 忠实度未变，生成器仍忠于收到的内容。
+- "再跑一次，可能是噪声。" 这个评估离线运行，在固定测试数据上结果确定；其他指标不变而一个下降，指向某个具体阶段。
 
 ## Taught in
 
-The lesson [RAG evaluation](../../../phases/19-capstone-projects/68-rag-eval-precision-recall/) defines MRR and gives the symptom table.
+[RAG 评估](../../../phases/19-capstone-projects/68-rag-eval-precision-recall/)课程定义 MRR 并给出症状诊断表。

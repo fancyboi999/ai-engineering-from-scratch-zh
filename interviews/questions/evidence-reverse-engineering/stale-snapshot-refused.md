@@ -1,6 +1,6 @@
 ---
 id: stale-snapshot-refused
-title: profile_mismatch after an upgrade and a rename
+title: 升级与重命名后的 profile_mismatch
 card: evidence-reverse-engineering
 kind: debug
 level: 2
@@ -16,43 +16,43 @@ related: [evidence-reverse-engineering/evidence-id-excludes-the-path]
 updated: 2026-11-03
 ---
 
-After a tool upgrade, a call to `open_binary` with the saved snapshot answers `profile_mismatch`, although the target's SHA-256 and the provider are unchanged. The same morning a colleague renamed one function, and later `close_binary` with a snapshot path failed with "Analysis snapshots are unavailable because analysis metadata may have changed". Explain both refusals, and say what a snapshot is and is not.
+在工具升级后，使用已保存快照调用 `open_binary` 返回了 `profile_mismatch`，尽管分析目标的 SHA-256 和提供方（provider）均未发生变化。同一天上午，某同事重命名了一个函数，随后传入快照路径调用 `close_binary` 失败，提示 "Analysis snapshots are unavailable because analysis metadata may have changed"。解释这两种拒绝的原因，并说明快照究竟是什么以及不是什么。
 
 ## Short answer
 
-The cache key is the string `query_` plus a SHA-256 over the target identity, the binding, the operation and the parameters, and the binding includes the analysis profile digest over 25 parameter version strings; the upgrade moved two of those values, so the digest changed and no stored entry can match, which the import reports as `profile_mismatch`. A rename is a mutating call, and the session empties the cache and sets a flag before the call is dispatched, even when the reply fails, because a failed reply cannot prove that the write never reached the provider, so the export is refused and the way out is to export the evidence bundle, close without a snapshot, and reopen. A snapshot is a file of exact past answers plus their evidence bundle, not a saved provider database.
+缓存键是由字符串 `query_` 加上对目标标识、绑定关系、操作以及参数计算的 SHA-256 哈希值构成的，其中绑定关系包含了对 25 个参数版本字符串计算的分析配置摘要；工具升级变动了其中两个数值，导致配置摘要发生改变，已存储的条目均无法命中，导入过程据此报告 `profile_mismatch`。重命名属于变更状态的调用，会话在调用实际派发前就会清空缓存并设置脏标记，即使调用应答失败亦是如此，因为失败的应答无法证明写入操作从未到达过提供方，因此快照导出会被拒绝，此时的解决方式是导出证据包、在不带快照路径的情况下关闭会话，随后重新打开。快照是一个包含历史精确应答及其证据包的文件，而不是保存的提供方数据库。
 
 ## Full answer
 
-### Three things called a snapshot
+### 被称为快照的三种事物
 
-The target snapshot is the private copy the launcher imports read-only and deletes on close; nothing of the analysis survives it, and every new session imports the target again. The in-memory analysis snapshot cache holds up to 10,000 entries for one target identity. The snapshot file is what `close_binary` writes and `open_binary` reads: the target identity, the provider binding, the cache entries and the session's evidence bundle. Only an exact query that qualifies can reuse a result, and a new or live query still starts the provider.
+目标快照（target snapshot）是启动器以只读模式导入并在关闭时删除的私有副本；分析过程中的任何状态都不会在其上存留，每个新会话都会重新导入该目标。内存中的分析快照缓存针对单个目标标识最多保留 10,000 个条目。快照文件则是 `close_binary` 负责写入、`open_binary` 负责读取的物理文件：它保存了目标标识、提供方绑定、缓存条目以及该会话的证据包。只有符合条件的精确查询才能复用已有结果，而新的或实时的查询仍会启动提供方。
 
-### What qualifies and what a hit looks like
+### 准入条件与缓存命中特征
 
-A call qualifies when its operation is not stateful, names its document or address where one is implied, declares no artifact mutation, and carries a cache policy of `snapshot`. A hit returns without touching the provider and adds one limitation: "Loaded from a local REA analysis snapshot; this call did not re-run the provider." The replayed record is rebound to the open target's path and keeps its `evidence_id`, because the path is outside the hash. The lesson's measurements make the point: a first query took 8.6 s with a fresh import, a different query against the same snapshot took 8.5 s because it was a miss, and a repeat took 2.1 s and returned the identical record with the identical id.
+一个调用若要符合快照准入条件，必须满足：其操作是非状态化的、在隐式需要时指明了文档或地址、声明不修改产物，且携带了 `snapshot` 缓存策略。命中缓存的调用不会触碰提供方即可直接返回，并附加一条局限性说明："Loaded from a local REA analysis snapshot; this call did not re-run the provider."。重放的记录重新绑定到当前打开目标的路径，并保留其原始的 `evidence_id`，因为路径位于哈希范围之外。本课的实测数据佐证了这一点：带有全新导入的首个查询耗时 8.6 s，针对同一快照的不同查询因未命中耗时 8.5 s，而重复查询耗时仅 2.1 s 并返回带有相同 ID 的相同记录。
 
-### Load is a full check
+### 加载执行全量校验
 
-Entries must be in canonical id order, every query id is recomputed and must match, no id appears twice, and every entry must have an evidence record in the bundle with the same profile and result. A bundle record for another target fails the whole file. The write is atomic and owner-only.
+条目必须按照规范化 ID 顺序排列，每个查询 ID 都会重新计算并必须匹配，不允许出现重复 ID，且每个条目都必须在证据包中包含具有相同配置与结果的对应证据记录。证据包中若存在针对其他目标的记录将导致整个文件校验失败。写入操作采用原子写入，且仅限文件所有者访问。
 
-### Why the order of invalidation matters
+### 为什么失效顺序至关重要
 
-The current release invalidates and then calls the provider; an earlier release invalidated only after a successful call. The documentation states the rule: a metadata write clears the cache of the active session even when its reply fails, since the provider can already have applied the write.
+当前版本在调用提供方之前就使缓存失效；而早期版本仅在调用成功后才使缓存失效。文档明确规范了该原则：元数据写入即使在应答失败时也会清除活动会话的缓存，因为提供方可能已经应用了该写入。
 
 ## Follow-ups
 
-- **Level 2:** You cached `analyze_function` for one function and then asked about another. Why a miss? Expected: the parameters are part of the key, so only the exact same question replays.
-- **Level 3:** Why not invalidate after the mutating call succeeds? Expected: a failed reply cannot prove rollback, so a cache kept after a failure could replay an answer about a database that changed.
-- **Level 3:** How does a reader tell a replayed record from a fresh one? Expected: the added limitation sentence that says the provider did not re-run.
-- **Level 4:** What is the right action after the upgrade refusal? Expected: run the analysis again under the new profile and keep the old bundle as evidence about an old contract; never edit the digest to force a match.
+- **Level 2:** 你为某函数缓存了 `analyze_function`，随后查询另一函数，为什么未命中？ Expected: 参数是缓存键的一部分，因此只有完全相同的问题才能重放。
+- **Level 3:** 为什么不在变更调用成功之后再使缓存失效？ Expected: 失败的应答无法证明发生了状态回滚，失败后保留的缓存可能会重放针对已变更数据库的过时答案。
+- **Level 3:** 读者如何区分重放的记录与全新生成的记录？ Expected: 查看附加的局限性说明文字，其中指出提供方并未重新运行。
+- **Level 4:** 在发生升级拒绝后正确的应对做法是什么？ Expected: 在新的配置下重新运行分析，并将旧的证据包作为关于旧契约的证据保留；不要编辑摘要来强制匹配。
 
 ## Wrong answers
 
-- "A snapshot is a saved project; reopen it." It holds answers to past questions, and the project is deleted on close.
-- "Patch the profile digest so the old entries match." The digest names the contract the answers were produced under; a forced match replays answers from a changed contract.
-- "A rename is metadata, so cached answers stay valid." A rename is a mutating call; the cache is emptied before dispatch and the export is refused.
+- "快照就是保存的项目文件；直接重新打开即可。" 它保存的是针对历史提问的答案，底层项目在关闭时已被删除。
+- "修补配置摘要以便让旧条目能够匹配。" 摘要指明了生成这些答案所依据的契约版本；强制匹配会导致重放来自已变更契约的答案。
+- "重命名只是元数据变更，所以缓存的答案依然有效。" 重命名是状态变更调用；缓存已在派发前被清空，快照导出会被拒绝。
 
 ## Taught in
 
-The [snapshot section](../../../manuals/reverse-engineering-101/sections/5-3-snapshots-and-the-answer-cache.md) gives the key, the qualifying rules and the invalidation order, and the [evidence lesson](../../../phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns/) builds the same cache and refuses a bumped profile version.
+[快照章节](../../../manuals/reverse-engineering-101/sections/5-3-snapshots-and-the-answer-cache.md)给出了缓存键、准入规则与失效顺序，[证据课程](../../../phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns/)构建了相同的缓存并拒绝了升级配置版本的快照。

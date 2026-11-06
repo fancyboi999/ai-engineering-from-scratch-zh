@@ -1,6 +1,6 @@
 ---
 id: vendor-patterns-to-primitives
-title: Translate eight harness patterns into primitives
+title: 将八种 harness 模式还原为底层原语
 card: agents
 kind: concept
 level: 4
@@ -16,65 +16,65 @@ related: [agents/harness-or-a-smarter-model]
 updated: 2026-11-03
 ---
 
-A vendor deck lists its harness features: a loop that re-injects the original intent when the agent tries to stop early, a plan-execute-verify split, control-plane separation, signed tool-call passports, progressive compaction, hooks, skills with progressive disclosure, and sandboxed agents. Translate each one into the primitive it is, and say what the deck leaves out.
+某商业方案宣讲材料罗列了其 harness 的一系列特性：在 agent 试图提前退出时重新注入原始意图的循环机制、规划执行验证（Plan-Execute-Verify）分工架构、控制平面与执行平面分离、带签名的工具调用通行证、渐进式上下文压缩、Hook、带渐进式披露的技能，以及沙箱化 agent。请将各项特性对应到其本质原语，并指出材料遗漏了什么。
 
 ## Short answer
 
-Every entry is a distributed-systems primitive with a new name. The re-inject loop is a trigger that re-enqueues the task with fresh context, plan-execute-verify is three workers with a queue between them, the passport is an authorization policy enforced by a pre-action worker, and compaction is a state-management worker over session persistence. Hooks are triggers around the invocation path, skills are a function registry whose metadata loads just in time, sandboxes are the compute plane, and the control-plane item is the control-plane and data-plane split that predates agents. The decks usually leave out queues, workers as the unit of deployment, trigger semantics, persistence as its own concern and authorization as a separate plane.
+材料中的每一项，都是换了名字的分布式系统原语。重新注入意图的循环本质上是一个在纯净上下文中将任务重新入队的触发器；规划执行验证架构是由中间队列串联起来的三个独立 worker；工具通行证是由前置 worker 执行的授权策略；渐进式压缩是依托持久化会话执行的状态管理 worker。Hook 是围绕调用链路展开的触发器，技能是按需即时加载元数据的函数注册表，沙箱是隔离的算力平面，控制面这一项则是早于 agent 的控制平面与数据平面分离。这类材料通常会遗漏队列、作为部署单元的 worker、触发语义、作为独立关注点的持久化，以及作为独立平面的授权。
 
 ## Full answer
 
-### The eight primitives
+### 八大核心底层原语
 
-| Primitive | What it carries for an agent |
+| 原语 | 在 Agent 系统中所承载的具体实体 |
 |---|---|
-| Function | A tool call, a rule check, a verification step, a model invocation |
-| Worker | The builder, the reviewer, the verifier, a protocol server |
-| Trigger | A loop tick, an HTTP request, a queue message, a cron, a file change, a hook |
-| Runtime | The boundary that decides what runs where, with which timeouts and resources |
-| HTTP or RPC | The wire between caller and worker, including the tool-call protocol and the model API |
-| Queue | The durable buffer with back-pressure, retry and idempotency: the task board, the feedback log, the review inbox |
-| Session persistence | The state file, checkpoints, key-value stores, the repository itself |
-| Authorization policy | Allowed and forbidden files, approval boundaries, capability lists |
+| 函数（Function） | 工具调用、规则检查、验证步骤、单次模型调用 |
+| Worker | 构建者 agent、审查者 agent、校验器、协议服务器 |
+| 触发器（Trigger） | 循环 tick、HTTP 请求、队列消息、定时 cron、文件变更、hook 回调 |
+| 运行时（Runtime） | 决定什么在哪里运行、使用哪些超时设置和资源的边界 |
+| HTTP 或 RPC（Wire） | 调用方与 worker 之间的通信总线，包含工具协议与模型 API |
+| 队列（Queue） | 具备背压、重试与幂等保证的持久化缓冲区：任务看板、反馈日志、审查收件箱 |
+| 会话持久化（Session persistence） | 状态文件、快照检查点、KV 存储、代码仓库本身 |
+| 授权策略（Authorization policy） | 允许与禁止修改的文件路径、审批升级红线、能力白名单 |
 
-### The translation
+### 商业话术转译对照表
 
-| Deck entry | What it is |
+| 宣传材料所称的特性 | 真实的底层原语还原 |
 |---|---|
-| Re-inject intent when the agent stops early | A trigger that re-enqueues the task with a clean context; persistence carries the goal forward |
-| Plan, execute, verify | Three workers, one per role, communicating through state and a queue between phases |
-| A control plane apart from the execution plane | The control-plane and data-plane split, decades old |
-| A passport that signs each tool call | An authorization policy enforced by a pre-action worker, with a signed audit queue |
-| Progressive compaction | A state-management worker that runs on a schedule over session persistence to keep it within a budget |
-| Hooks and middleware | Triggers plus functions wrapped around the runtime's invocation path |
-| Skills that disclose themselves step by step | A function registry whose metadata is loaded into context only when needed |
-| Sandboxed agents | The compute plane: a runtime with isolated filesystem, network and lifecycle |
+| 在 agent 提前退出时重新注入意图 | 一个在纯净上下文中将任务重新入队的触发器；由持久化层负责向前传递核心目标 |
+| 规划、执行与验证三大阶段解耦 | 三个各司其职的 worker，阶段之间通过状态和队列通信 |
+| 控制平面独立于执行平面运行 | 分布式架构中拥有数十年历史的标准控制面与数据面分离设计 |
+| 为每次工具调用颁发签名通行证 | 由动作前置 worker 强制执行的授权策略，并写入带数字签名的审计队列 |
+| 渐进式压缩 | 周期性定时针对会话持久化数据运行的状态管理 worker，确保其处于预算之内 |
+| Hook 与中间件机制 | 围绕运行时的核心调用路径所挂载的触发器与拦截函数 |
+| 具备渐进式披露的技能体系 | 一个函数注册表，其元数据仅在需要时加载进上下文 |
+| 沙箱化隔离 agent | 算力执行平面：隔离了文件系统、网络与生命周期的运行时 |
 
-### How the surfaces map
+### 工作台各个表面与原语的映射
 
-Instructions are policy plus function metadata. State is session persistence. Scope is an authorization policy per task. Feedback is an invocation log written into a queue. Verification is a deterministic function triggered on task close that fails closed. Review is a separate worker with read-only access to the builder's artifacts and write-only access to review reports. Handoff is a durable record emitted by a session-end trigger and read by the next session's startup trigger.
+指令表面对应策略定义加上函数元数据。状态表面对应会话持久化。范围表面对应任务级的授权策略。反馈表面对应写入队列的调用日志。验证表面对应在任务结束时触发执行且失败时拒绝放行的确定性函数。审查表面对应拥有对构建者产物只读权限、对审查报告只写权限的独立 worker。交接表面对应由会话结束触发器持久化输出、并由下一次会话启动触发器读取的持久化记录。
 
-### What the decks leave out
+### 宣传材料遗漏了什么
 
-The lesson reads the circulating writeups and finds the same gap: they describe the harness as an object you configure, not as a system you deploy. They rarely name queues, workers as a deployment unit, trigger semantics, session persistence as a separate concern, or an authorization policy as its own plane. The strongest line in that literature, that the harness is the primary security boundary, is authorization policy restated. When the system is built from the primitives, the surfaces fall out of it. When it is built without them, no amount of instruction-file polish replaces the missing queue.
+课程阅读了流传的相关文章，发现了同一个缺口：它们把 harness 描述为待配置的对象，而不是待部署的系统。它们很少提到队列、作为部署单元的 worker、触发语义、作为独立关注点的会话持久化，或作为独立平面的授权策略。这些文章中最有力的一句话是“harness 是主要安全边界”，这其实是对授权策略的重新表述。基于原语构建系统，表面就会自然形成。缺少这些原语，再怎么润色说明文件，也替代不了缺失的队列。
 
-### Why the translation matters
+### 为什么这一转译至关重要
 
-Vocabulary changes every release cycle. The primitives do not. A team that translates each new pattern before adopting it can compare vendors on one table, spot a pattern that is two primitives wearing one name, and notice when a deck has no answer for persistence or authorization.
+术语每个发布周期都在变，原语不变。团队在采用新模式前先将其还原为原语，就能用同一张表比较供应商，识别一个名称实际包含两个原语的模式，并发现材料何时没有交代持久化或授权。
 
 ## Follow-ups
 
-- **Level 3:** Which primitive is most often missing from an agent product that otherwise looks complete? Expected: the queue, because without a durable buffer the board, the feedback log and the review inbox are chat messages that scroll away.
-- **Level 3:** The deck says its hooks are a security boundary. Test the claim. Expected: a hook is a trigger plus a function inside the runtime, and a security boundary is an authorization policy enforced outside the agent's reach, so ask where the policy lives and who can change it.
-- **Level 4:** Two vendors describe the same thing as a handoff and as a checkpoint. How do you tell? Expected: map both to persistence and triggers, and see whether the record is read by the next session's startup trigger, which makes it a handoff, or by the same session on resume, which makes it a checkpoint.
-- **Level 4:** What would make a ninth primitive legitimate? Expected: a capability that cannot be built from the eight, which is rare, so the first check is whether it is a shared-state flavor or a policy flavor you have not seen.
+- **Level 3:** 在看似功能完备的某款 agent 产品中，最常缺失的是哪项原语？ Expected: 队列，因为缺少了具备持久化特性的缓冲区，任务看板、反馈日志和审查收件箱就会退化为随时被刷走的临时聊天消息。
+- **Level 3:** 材料宣称其 Hook 机制构成了一条安全边界，如何检验这个说法？ Expected: Hook 是运行时内部的触发器和函数，真正的安全边界必须是在 agent 权限之外强制执行的授权策略，应追问策略在哪里，以及谁能修改它。
+- **Level 4:** 两个供应商分别将同一机制包装为“交接（handoff）”与“检查点（checkpoint）”，如何甄别？ Expected: 映射至持久化与触发器，观察该记录是由下一次会话的启动触发器读取（交接），还是由同一会话在恢复时读取（检查点）。
+- **Level 4:** 什么样的新能力才有资格被承认为第九项独立原语？ Expected: 无法由既有八项原语组合构建的本质能力，这在系统工程中极为罕见，首先应核实其是否仅是某种未曾见过的共享状态或策略变体。
 
 ## Wrong answers
 
-- "These patterns are new because agents are new." Each one has a name in distributed systems, and the agent label changes the vocabulary and not the engineering.
-- "Pick the vendor with the most patterns." More names on a deck is not more primitives covered, and the question is which of the eight are missing.
-- "A good instruction file is the harness." Instructions are policy and function metadata, one of eight, and a file cannot replace a queue or a persistence layer.
+- "这些模式是前所未有的全新架构，因为 agent 是全新的事物。" 每一项在分布式系统领域都有明确的原型，agent 标签仅仅改变了表层词汇，未改变工程实质。
+- "挑选列出模式名称最多的供应商即可。" 宣传材料上罗列的概念数量并不等同于覆盖的原语广度，核心是看那八大基石中究竟缺失了哪几项。
+- "一份优秀的说明文档本身就能充当 harness。" 说明文档仅仅是策略与函数元数据，属于八大原语中的一项，文档无法替代底层队列或持久化存储。
 
 ## Taught in
 
-The [why capable models still fail lesson](../../../phases/14-agent-engineering/31-agent-workbench-why-models-fail/) gives the primitive table, the translation of circulating patterns and the gaps in the vendor writeups.
+[Agent 工作台工程：能干的模型为什么还会失败](../../../phases/14-agent-engineering/31-agent-workbench-why-models-fail/)课程提供了原语映射表、对流行技术模式的系统还原，并剖析了商业宣传文案中的核心盲区。

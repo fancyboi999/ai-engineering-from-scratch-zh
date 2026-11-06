@@ -1,6 +1,6 @@
 ---
 id: full-pool-or-blackboard
-title: Every agent reads everything, or agents subscribe to topics
+title: 每个 Agent 通读所有消息还是订阅主题
 card: multi-agent
 kind: tradeoff
 level: 2
@@ -16,58 +16,58 @@ related: [multi-agent/a-number-that-never-existed, multi-agent/four-primitives-f
 updated: 2026-11-03
 ---
 
-A team of four agents shares one message log, and every agent reads all of it. The team is about to grow to a few dozen agents, and the context each agent carries is already large. Compare keeping the single log with moving to topics that agents subscribe to, and say how you would handle several agents writing at once.
+一个由四个 agent 组成的团队共享一份消息日志，且每个 agent 都会阅读全部内容。团队即将增加到数十个 agent，且每个 agent 携带的上下文已经很大。请对比保留单一日志与转向由 agent 订阅的主题的优劣，并说明你将如何处理多个 agent 同时写入的情况。
 
 ## Short answer
 
-A full pool is simple, transparent and easy to inspect, and it stops scaling at about 10 agents because each agent's window fills with the others' work. A blackboard with subscriptions routes only the relevant messages to each agent, so it scales further, and it costs an up-front schema that makes the topics meaningful. Many systems mix the two: a small pool at the planning layer and blackboards below it. For writes, most systems serialize through one writer, because model calls are slow enough that contention is rare.
+完整池简单、透明且易于检查，但在大约 10 个 agent 时停止扩展，因为每个 agent 的窗口都会被其他 agent 的工作填满。带有订阅的黑板仅向每个 agent 路由相关消息，因此扩展性更强，且需要付出预先设计 schema 的代价以使主题具有意义。许多系统将两者混合使用：规划层使用小型池，其下使用黑板。对于写入，大多数系统通过单个写入者串行化，因为模型调用足够慢，竞争很少发生。
 
 ## Full answer
 
-### The two topologies
+### 两种拓扑
 
-| Topology | Who reads what | Wins when | Costs |
+| 拓扑 | 谁读什么 | 何时胜出 | 代价 |
 |---|---|---|---|
-| Full message pool | Every agent reads every message | Few agents, mixed roles, short horizon | Context grows with every turn, and poisoning spreads to everyone |
-| Blackboard with subscriptions | Agents declare topics and receive only those | Many agents, similar roles, long-running | A schema must exist before the topics mean anything |
+| 完整消息池 | 每个 agent 阅读每条消息 | 少量 agent、混合角色、短周期 | 上下文随着每轮增长，投毒会扩散给每个人 |
+| 带有订阅的黑板 | Agent 声明主题并仅接收这些主题 | 许多 agent、类似角色、长期运行 | 在主题具有任何意义之前必须存在 schema |
 
-The pool wins when reasoning about who said what is cheap because everyone saw everything. The blackboard wins when routing saves tokens and keeps unrelated work out of each window.
+当推理谁说了什么由于每个人都看到了所有内容而开销低廉时，池会胜出。当路由节省 token 并使无关工作远离每个窗口时，黑板会胜出。
 
-### Projection goes one step further
+### 投影更进一步
 
-A blackboard gives every subscriber of a topic the same view. A per-agent projection gives each role a view computed from the global state, which is what state reducers do in graph runtimes. It scales furthest and needs a schema, and without one each agent rebuilds its own projection in its prompt.
+黑板为主题的每个订阅者提供相同的视图。每个 agent 的投影为每个角色提供从全局状态计算出的视图，这正是图运行时中状态 reducer 所做的事情。它的扩展性最强且需要 schema，没有 schema 时，每个 agent 会在自己的 prompt 中重建自己的投影。
 
-### Writes
+### 写入
 
-Concurrent writes from many agents are a concurrency problem, not a model problem. Three patterns work:
+来自多个 agent 的并发写入是并发问题，而不是模型问题。三种模式有效：
 
-1. **A single writer.** All writes go through one coordinator that serializes them. Simple, and a bottleneck.
-2. **Optimistic concurrency with versions.** Each entry carries a version, and a write fails and retries on a mismatch.
-3. **Topic partitioning.** Each agent owns topics, so there is no cross-topic contention, and the partition boundaries must be designed.
+1. **单个写入者。** 所有写入都通过一个协调器串行化。简单，但存在瓶颈。
+2. **带有版本的乐观并发。** 每个条目携带一个版本，写入在不匹配时失败并重试。
+3. **主题分区。** 每个 agent 拥有主题，因此没有跨主题竞争，且分区边界必须经过设计。
 
-Most frameworks default to the single writer, because model calls are slow enough that the bottleneck does not hurt.
+大多数框架默认为单个写入者，因为模型调用足够慢，该瓶颈不会造成损害。
 
-### What does not change
+### 不变的部分
 
-Both topologies are shared state, the only stateful part of the system, and both need provenance on every entry, an append-only log and a read-only verifier. Topic partitioning limits who reads a poisoned entry. It does not stop the poisoning.
+两种拓扑都是共享状态（系统唯一有状态的部分），且两者都需要每个条目上的溯源、仅追加日志和只读校验器。主题分区限制了谁读取被投毒的条目。它不会阻止投毒。
 
-### The pattern has a history
+### 该模式有着悠久历史
 
-The blackboard predates model agents by four decades. Specialist knowledge sources watch a shared board, contribute partial solutions and trigger each other. The current systems are the same pattern with model agents as the knowledge sources and structured entries as the partial solutions, and the old literature already documents write contention and consistency.
+黑板早于模型 agent 四十年出现。专家知识源监控共享黑板，贡献局部解法并相互触发。当前的系统是相同的模式，以模型 agent 作为知识源，以结构化条目作为局部解法，旧文献早已记录了写入竞争和一致性。
 
 ## Follow-ups
 
-- **Level 2:** A planning layer of three agents and a worker layer of thirty. Which topology where? Expected: a full pool for the three planners, who need to see each other, and blackboards for the workers, who need only their topics.
-- **Level 2:** Which poisoning scenarios does topic partitioning make harder? Expected: a poisoned entry reaches only the subscribers of its topic, so cross-topic spread is cut, while subscribers of that topic are poisoned the same way.
-- **Level 3:** When would you move from a single writer to optimistic versioning? Expected: when writes are frequent enough that the coordinator's queue adds visible latency, which is rare while each write follows a slow model call.
-- **Level 3:** What goes wrong when you add a blackboard without a schema? Expected: topics are named ad hoc, agents subscribe to the wrong ones or to everything, and you rebuild the full pool with more code.
+- **Level 2:** 三个 agent 的规划层与三十个 agent 的 worker 层。哪种拓扑放在哪里？ Expected: 三个规划者使用完整池，他们需要看到彼此；worker 使用黑板，他们只需要自己的主题。
+- **Level 2:** 主题分区使哪些投毒场景变得更困难？ Expected: 投毒条目仅到达其主题的订阅者，因此切断了跨主题扩散，而该主题的订阅者以同样方式被投毒。
+- **Level 3:** 你什么时候会从单个写入者转向乐观版本控制？ Expected: 当写入足够频繁使得协调器的队列增加了可见延迟时，在每次写入都跟随缓慢模型调用的情况下这很少见。
+- **Level 3:** 在没有 schema 的情况下添加黑板会出现什么问题？ Expected: 主题命名随意，agent 订阅错误的主题或订阅所有内容，你用更多代码重建了完整池。
 
 ## Wrong answers
 
-- "Keep the pool and give agents bigger windows." The pool grows with every turn from every agent, and a bigger window delays the limit without removing it.
-- "Pass messages directly between agents instead of sharing state." Direct messages are shared state with extra copying, and they lose the inspectable log.
-- "Partition by topic and the poisoning problem is solved." Partitions limit the spread, and an entry with no provenance and no verifier still poisons every subscriber of its topic.
+- "保留池并给 agent 更大的窗口。" 池随着每个 agent 的每轮发言而增长，更大的窗口延缓了限制而没有消除它。
+- "在 agent 之间直接传递消息而不是共享状态。" 直接消息是带有额外复制的共享状态，它们失去了可检查的日志。
+- "按主题分区，投毒问题就解决了。" 分区限制了扩散，没有溯源且没有校验器的条目仍会投毒其主题的每个订阅者。
 
 ## Taught in
 
-The [shared memory lesson](../../../phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/) builds both topologies and the write-contention patterns.
+[共享内存课程](../../../phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/)构建了两种拓扑和写入竞争模式。

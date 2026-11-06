@@ -1,6 +1,6 @@
 ---
 id: loss-becomes-nan-mid-run
-title: A smooth loss that turns inf and then NaN hours in
+title: 平滑的损失几小时后变成 inf，再变成 NaN
 card: deep-learning
 kind: debug
 level: 4
@@ -16,48 +16,48 @@ related: [deep-learning/pick-the-peak-rate-and-schedule, deep-learning/half-the-
 updated: 2026-11-03
 ---
 
-A run trains for hours with a smooth loss. Then, within three logging intervals, the loss jumps, becomes inf, and every value after that is NaN. The same recipe worked on a smaller model. Give your ranked list of causes, the evidence that separates them, and the changes that keep it from happening again.
+一次训练跑了几个小时，损失一直平滑。然后在三个日志间隔内，损失跳起来，变成 inf，之后每个值都是 NaN。同一套配方在更小的模型上能用。按可能性排出原因，给出区分它们的证据，以及防止再次发生的改动。
 
 ## Short answer
 
-A clean run that dies late is almost always an oversized update: the peak learning rate is too high for the larger model, a rare batch produced a huge gradient, or the schedule reached its peak at a point where the model was already sensitive. The logs separate the cases: for an explosion the gradient norm spikes before the loss does, while a forward pass overflow, such as a softmax without the max shift or a normalization over a zero variance, shows a normal norm and a loss that goes to inf in one step. Fix with gradient clipping by norm at 1.0, a lower peak with warmup, and a loss computed from logits, then resume from the last good checkpoint.
+一个干净的训练在后期死掉，几乎总是因为更新过大：峰值学习率对更大的模型来说太高，某个罕见 batch 产生了巨大的梯度，或者调度在模型已经很敏感的时候到达了峰值。日志能区分这些情况：爆炸时梯度范数先于损失飙升；而前向溢出，比如没减最大值的 softmax，或者在零方差上做归一化，表现为范数正常、损失一步就变成 inf。修复办法是按范数在 1.0 处裁剪梯度，降低峰值并加上预热，从 logits 计算损失，然后从最后一个正常的检查点恢复。
 
 ## Full answer
 
-### Rank the causes
+### 给原因排序
 
-1. **Update too large for this model.** The debugging lesson's table: a loss that goes NaN after some steps means the learning rate is too high, and the first move is to reduce it by 10 times. The peak that was safe on the smaller model is close to the edge on the larger one. The capstone lesson advises sweeping the peak on a small model as a prior, and says the optimum shifts with size, so confirm rather than copy.
-2. **One bad batch.** A single outlier batch produces a gradient large enough to corrupt every weight in one step. Without clipping, nothing stops it.
-3. **Schedule position.** Check where the schedule was when the loss jumped. A short warmup or a peak reached at the wrong time puts the largest steps on a model that cannot take them.
-4. **Forward pass overflow.** An exp in a hand written softmax without the max shift, a log of zero, or a division by a zero variance in a normalization. These produce inf at once, usually at the first step, so they rank low for a run that was clean for hours, but a rare batch can trigger them late.
+1. **更新对这个模型来说太大。** 调试课的表格：损失在若干步后变成 NaN，说明学习率太高，第一步是把它降低 10 倍。在小模型上安全的峰值，在大模型上已经接近边缘。综合项目课建议在小模型上扫描峰值作为先验，并说最优值会随规模移动，所以要验证，不要照搬。
+2. **一个坏 batch。** 一个离群的 batch 产生的梯度大到一步就能损坏每个权重。没有裁剪，就没有东西能挡住它。
+3. **调度位置。** 检查损失跳起时调度走到了哪里。预热太短，或者在错误的时间到达峰值，会让最大的步落在承受不了的模型上。
+4. **前向溢出。** 手写 softmax 里没减最大值的 exp，对零取 log，或者归一化里除以零方差。这些会立刻产生 inf，通常在第一步，所以对一个干净跑了几小时的训练，它们排在后面；但罕见的 batch 也可能在后期触发它们。
 
-### What the logs show
+### 日志能说明什么
 
-- The gradient L2 norm logged beside the learning rate every step. The capstone lesson's rule: a divergent run shows the norm spike before the loss does. An overflow shows a normal norm and a loss that is inf in a single step.
-- Per-layer gradient statistics. The debugging lesson flags a layer whose mean absolute gradient exceeds 100 as exploding and shows which layer went first.
-- Replay. Load the last good checkpoint, feed the batch from the failing step, and watch the norm. If that batch alone reproduces the spike, it is the trigger; if it does not, the schedule or the rate is.
-- Anomaly detection in the autograd engine, to name the operation that produced the first NaN.
+- 每一步在学习率旁边记录梯度 L2 范数。综合项目课的规则：发散的训练，范数先于损失飙升。溢出时范数正常，损失在一步之内变成 inf。
+- 逐层梯度统计。调试课把平均绝对梯度超过 100 的层标为爆炸，并能看出哪一层先出事。
+- 重放。加载最后一个正常的检查点，送入出事那一步的 batch，观察范数。如果单靠这个 batch 就能复现尖峰，它就是诱因；如果不能，问题在调度或学习率。
+- 打开 autograd 引擎的异常检测，找出产生第一个 NaN 的操作。
 
-### Changes that prevent a repeat
+### 防止再次发生的改动
 
-- Clip the gradient by its global norm at 1.0 before the step. Clipping by norm keeps the direction; clipping each element does not.
-- Lower the peak and keep a warmup of 1 to 5 percent of the steps, so the largest steps arrive after the optimizer statistics settle.
-- Compute the loss from logits with a fused, stable function, and keep epsilons in logs and divisions.
-- Checkpoint often enough that a resume costs minutes, and alert on a NaN loss so the run stops at the first bad step rather than hours later.
+- 在更新之前，按全局范数在 1.0 处裁剪梯度。按范数裁剪保持方向；逐元素裁剪做不到。
+- 降低峰值，保留占总步数 1% 到 5% 的预热，让最大的步在优化器统计量稳定之后才出现。
+- 用融合的稳定函数从 logits 计算损失，在 log 和除法里保留 epsilon。
+- 检查点存得足够频繁，让恢复只花几分钟；损失出现 NaN 时报警，让训练停在第一个坏步，而不是几小时之后。
 
 ## Follow-ups
 
-- **Level 3:** What in the logs separates an oversized update from a forward pass overflow? Expected: the gradient norm rises over several steps before the loss for an explosion; an overflow shows a normal norm and a loss that goes to inf in a single step.
-- **Level 4:** Why clip by norm rather than by value? Expected: clipping by norm scales the whole gradient and keeps its direction; clipping each element changes the direction.
-- **Level 4:** Why did the recipe work on the smaller model? Expected: the peak that was safe there sits near the edge for the larger one; a sweep on the small model is a prior, and the optimum shifts with size, so verify rather than copy.
-- **Level 4:** What do you add so the run never dies silently again? Expected: log the gradient norm beside the learning rate each step, alert on a NaN loss, checkpoint often enough to resume, and restart with clipping and a warmup.
+- **Level 3:** 日志里什么能区分更新过大和前向溢出？ Expected: 爆炸时梯度范数在损失之前连续几步上升；溢出时范数正常，损失一步之内变成 inf。
+- **Level 4:** 为什么按范数裁剪，而不是按值裁剪？ Expected: 按范数裁剪会整体缩放梯度，保持它的方向；逐元素裁剪会改变方向。
+- **Level 4:** 这套配方为什么在小模型上能用？ Expected: 在那里安全的峰值，对大模型来说接近边缘；小模型上的扫描只是先验，最优值随规模移动，所以要验证，不要照搬。
+- **Level 4:** 你会加什么，让训练不再悄无声息地死掉？ Expected: 每一步在学习率旁记录梯度范数，损失为 NaN 时报警，检查点存得足够频繁以便恢复，并带着裁剪和预热重新开始。
 
 ## Wrong answers
 
-- "Add an epsilon to the loss and restart." An epsilon fixes a log of zero at step one; a late explosion comes from the update size, and the run will die again.
-- "Halve the learning rate and hope." Halving is a guess; the lesson's move is a 10 times reduction, together with clipping and a check of the schedule position.
-- "NaN means the data has a bad row." A bad row shows in the first epoch, not after hours of clean training; replay the failing batch on the checkpoint before you blame it.
+- "给损失加个 epsilon，然后重启。" epsilon 修的是第一步对零取 log；后期的爆炸来自更新大小，训练还会再死。
+- "把学习率减半，碰碰运气。" 减半是猜的；课里的做法是降低 10 倍，同时加上裁剪，并检查调度位置。
+- "NaN 说明数据里有一行坏数据。" 坏数据在第一个 epoch 就会暴露，而不是在干净训练几小时之后；怪数据之前，先在检查点上重放出事的 batch。
 
 ## Taught in
 
-The [debugging lesson](../../../phases/03-deep-learning-core/13-debugging-neural-networks/) gives the NaN rows of the master table, the [optimizers lesson](../../../phases/03-deep-learning-core/06-optimizers/) places clipping in the loop, the [learning rate schedules lesson](../../../phases/03-deep-learning-core/09-learning-rate-schedules/) covers warmup and peak, and the [cosine warmup capstone](../../../phases/19-capstone-projects/44-cosine-lr-warmup/) logs the norm of the gradient next to the rate.
+[调试课](../../../phases/03-deep-learning-core/13-debugging-neural-networks/)给出了总表里关于 NaN 的几行，[优化器课](../../../phases/03-deep-learning-core/06-optimizers/)把裁剪放进循环，[学习率调度课](../../../phases/03-deep-learning-core/09-learning-rate-schedules/)讲了预热和峰值，[余弦预热综合项目](../../../phases/19-capstone-projects/44-cosine-lr-warmup/)在学习率旁记录梯度范数。

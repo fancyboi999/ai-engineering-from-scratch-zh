@@ -1,6 +1,6 @@
 ---
 id: kv-pool-users-fit
-title: How many users fit in the KV pool
+title: KV 池能装下多少用户
 card: inference-serving
 kind: estimate
 level: 2
@@ -16,54 +16,54 @@ related: [inference-serving/goodput-sets-the-cap]
 updated: 2026-11-03
 ---
 
-You serve `Qwen/Qwen3-8B` on one GPU with a maximum model length of 8,192 tokens. At startup the server prints a maximum concurrency of 2.94, and a manager asks if the GPU can serve only three users at a time. Your users send about 512 prompt tokens and get about 128 tokens back. How do you answer?
+你在一张 GPU 上部署 `Qwen/Qwen3-8B`，最大模型长度设为 8,192 token。启动时服务器打印出最大并发数 2.94，一位经理问：这张 GPU 是不是同时只能服务三个用户？你的用户每次发约 512 个 prompt token，收到约 128 个 token。你怎么回答？
 
 ## Short answer
 
-The startup number assumes that every user fills the full maximum model length, and real users hold much less. Count the KV bytes for one token, divide the KV pool by that number, and then divide the pool by the context that one user really holds. On the L4 in the vLLM manual, the pool of 24,096 tokens fits 37 users with 640 tokens each.
+启动时的这个数字假设每个用户都用满最大模型长度，而真实用户占用的要少得多。先算出一个 token 的 KV 字节数，用 KV 池除以它，再用池除以一个用户实际占用的上下文。在 vLLM 手册的 L4 上，24,096 token 的池能装下 37 个各占 640 token 的用户。
 
 ## Full answer
 
-### Bytes for one token
+### 一个 token 占多少字节
 
-Every token in a running request keeps its keys and values in GPU memory until the request ends:
+运行中请求的每个 token 都会把它的 key 和 value 留在 GPU 显存里，直到请求结束：
 
 ```text
 KV bytes per token = layers x KV heads x head size x 2 x bytes per value
 ```
 
-The factor 2 counts the key and the value. `Qwen/Qwen3-8B` has 36 layers, 8 KV heads and a head size of 128. In BF16 a value takes 2 bytes, so one token takes 144 KiB. The KV heads decide this number, not the parameter count: `Qwen/Qwen3-30B-A3B-Instruct-2507` has more weights but takes 96 KiB for each token.
+因子 2 分别算 key 和 value。`Qwen/Qwen3-8B` 有 36 层，8 个 KV head，head size 为 128。BF16 下每个值占 2 字节，所以一个 token 占 144 KiB。决定这个数的是 KV head，而不是参数量：`Qwen/Qwen3-30B-A3B-Instruct-2507` 的权重更多，每个 token 却只占 96 KiB。
 
-### From bytes to users
+### 从字节到用户
 
-The server gives the KV cache the memory that is left after the weights and the startup profile. The pool line in the log gives the result in tokens:
+服务器把加载权重、完成启动 profile 后剩下的显存交给 KV cache。日志里池的那一行以 token 为单位给出结果：
 
 ```text
 GPU KV cache size: 24,096 tokens, Maximum concurrency for 8,192 tokens per request: 2.94x
 ```
 
-The 2.94 divides the pool by the full 8,192 tokens. A user with 512 prompt tokens and 128 output tokens holds 640 tokens at the end of the answer. The same pool holds 37 such users. During the load sweep the log showed 40 running requests with the cache 99.5 percent full, because users early in their answer hold fewer tokens.
+2.94 是用池除以完整的 8,192 token 得到的。一个发 512 个 prompt token、收 128 个输出 token 的用户，在回答结束时占 640 个 token。同一个池能装下 37 个这样的用户。负载压测时，日志显示有 40 个运行中的请求，缓存满了 99.5%，因为刚开始回答的用户占的 token 更少。
 
-### What to change if it is still too small
+### 仍然不够时改什么
 
-1. Lower the maximum model length to the longest context that users send. This keeps one long request from taking a large share of the pool. It does not add users here, because the pool stays the same.
-2. Use an FP8 KV cache. It halves the bytes per token.
-3. Use FP8 weights to free memory for the cache.
-4. Use a GPU with more memory, or split the model across GPUs.
+1. 把最大模型长度降到用户实际发送的最长上下文。这能防止一个长请求占掉池的一大块。在这里它不会增加用户数，因为池的大小不变。
+2. 使用 FP8 KV cache。它把每个 token 的字节数减半。
+3. 使用 FP8 权重，给缓存腾出显存。
+4. 换显存更大的 GPU，或者把模型切分到多张 GPU 上。
 
 ## Follow-ups
 
-- **Level 2:** What happens to a request that needs more blocks than are free? Expected: it waits in the queue. A running request that needs a block when none is free is stopped and computed again later.
-- **Level 2:** Why does the mixture-of-experts model use less KV memory per token than the dense model? Expected: it has fewer KV heads, and the KV heads, not the weights, set the bytes per token.
-- **Level 3:** How do you check your count after a start? Expected: read the memory line and the pool line in the startup log, and compare them with the count from the model config.
-- **Level 3:** What is the cost of the FP8 KV cache? Expected: a possible loss of quality, so measure it on your own eval before you ship it.
+- **Level 2:** 一个请求需要的块比空闲块还多时，会怎样？ Expected: 它在队列里等待。一个运行中的请求需要新块而没有空闲块时，会被停下，之后重新计算。
+- **Level 2:** 为什么混合专家模型每个 token 的 KV 显存比 dense 模型还少？ Expected: 它的 KV head 更少，而决定每 token 字节数的是 KV head，不是权重。
+- **Level 3:** 启动之后，你怎样核对自己的计算？ Expected: 读启动日志里显存那一行和池那一行，与根据模型配置算出的结果对比。
+- **Level 3:** FP8 KV cache 的代价是什么？ Expected: 可能损失质量，所以上线前在你自己的评测上测一下。
 
 ## Wrong answers
 
-- "Divide the GPU memory by the model size." The weights are only one part. The users that fit depend on the KV pool and on the context per user.
-- "The maximum concurrency in the log is the user limit." It assumes that each user fills the maximum model length, which real users do not.
-- "More parameters always mean more KV memory per token." The bytes per token depend on the layers, the KV heads and the head size.
+- "用 GPU 显存除以模型大小。" 权重只是其中一部分。能装下多少用户取决于 KV 池和每个用户的上下文。
+- "日志里的最大并发数就是用户上限。" 它假设每个用户都用满最大模型长度，真实用户不会这样。
+- "参数越多，每个 token 的 KV 显存一定越多。" 每 token 字节数取决于层数、KV head 数和 head size。
 
 ## Taught in
 
-The [memory section of vLLM 101](../../../manuals/vllm-101/sections/2-1-count-the-memory-before-you-pick-a-gpu.md) counts the pool from the startup log, and the [KV cache lesson](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/) builds the cache.
+[vLLM 101 的显存一节](../../../manuals/vllm-101/sections/2-1-count-the-memory-before-you-pick-a-gpu.md)根据启动日志计算池的大小，[KV cache 一课](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/)动手构建了这个缓存。

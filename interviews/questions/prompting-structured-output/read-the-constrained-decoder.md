@@ -1,6 +1,6 @@
 ---
 id: read-the-constrained-decoder
-title: Read the constrained generation loop
+title: 读懂约束生成循环
 card: prompting-structured-output
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [prompting-structured-output/answer-before-reasoning, prompting-structu
 updated: 2026-11-03
 ---
 
-Read this constrained generation loop from the lesson. Explain what the mask does to the probabilities, what the machine's state records, and why the loop can end up faster than unconstrained generation.
+阅读课程中的这段约束生成循环。解释 mask 对概率做了什么、状态机的状态记录了什么，以及为什么这个循环最终可能比无约束生成更快。
 
 ```python
 def mask_logits(logits, valid_token_ids):
@@ -41,46 +41,46 @@ def generate_constrained(model, tokenizer, prompt, fsm):
 
 ## Short answer
 
-The mask sets the logit of every invalid token to negative infinity, so after the softmax those tokens carry zero probability and the sampler can only pick a token that keeps the output inside the grammar. The machine keeps the position in the grammar reached so far, and `valid_tokens` returns the tokens that advance it without leaving an accepting path. It can be faster because the search space shrinks, and because a position where only one token is valid needs no model call at all.
+mask 把每个非法 token 的 logit 设为负无穷，softmax 之后这些 token 的概率为零，采样器只能选让输出留在语法内的 token。状态机记录到目前为止在语法中走到的位置，`valid_tokens` 返回能让它前进、又不离开可接受路径的 token。它可能更快，一是因为搜索空间缩小了，二是因为只有一个合法 token 的位置根本不需要调用模型。
 
 ## Full answer
 
-### Walk the loop
+### 逐步走一遍循环
 
-1. Encode the prompt and start the machine in its initial state.
-2. Until the machine accepts: ask the model for the logits of the next token over the whole vocabulary.
-3. Ask the machine which token ids are valid in the current state.
-4. Replace every other logit with negative infinity; the valid ones keep their value.
-5. Sample from the masked logits, append the token, and move the machine to the next state.
-6. Decode the ids.
+1. 编码 prompt，让状态机从初始状态开始。
+2. 在状态机进入接受状态之前：向模型要整个词表上下一个 token 的 logits。
+3. 问状态机当前状态下哪些 token id 合法。
+4. 把其他所有 logit 替换为负无穷；合法的保持原值。
+5. 从 mask 后的 logits 里采样，追加 token，把状态机推进到下一个状态。
+6. 把 id 解码成文本。
 
-The piece between the model and the sampler is the logit processor. Nothing in the model changes; the edit is to one step's logits.
+夹在模型和采样器之间的这一部分就是 logit 处理器。模型本身没有任何改变；改的只是一步的 logits。
 
-### Where the valid set comes from
+### 合法集合从哪来
 
-A compiled grammar. A finite state machine built from a regex or a JSON Schema gives a constant-time lookup of the valid tokens per state. A context-free grammar engine handles recursion that a finite machine cannot express. Inference servers ship the same idea as guided decoding, with JSON, regex, choice and grammar modes.
+来自编译好的语法。由正则或 JSON Schema 构建的有限状态机，能在每个状态以常数时间查出合法 token。上下文无关文法引擎处理有限状态机表达不了的递归。推理服务器把同样的思路做成了引导式解码（guided decoding），提供 JSON、正则、选项和语法几种模式。
 
-### Why it can run faster
+### 为什么可能更快
 
-Two reasons from the lesson. The next-token search space shrinks. And a clever implementation skips the model call for forced tokens: when the grammar leaves exactly one valid token, such as the scaffolding of a key name, the token is appended without generation. This code does not do that yet.
+课程给了两个原因。下一个 token 的搜索空间缩小了。巧妙的实现还会对强制 token 跳过模型调用：语法只剩一个合法 token 时，比如键名的固定骨架，直接追加这个 token，不做生成。这段代码还没有这样做。
 
-### What this code does not fix
+### 这段代码解决不了的问题
 
-A grammar that is too strict makes the model invent a value, because no valid token lets it say unknown. A huge enum compiles slowly. A recursive schema does not fit a finite machine. And a retry library that validates after generation does none of this; it never touches the logits.
+语法太严会让模型编造值，因为没有合法 token 能让它表达「未知」。巨大的枚举编译很慢。递归 schema 放不进有限状态机。生成后再校验的重试库则完全不做这些事；它从不碰 logits。
 
 ## Follow-ups
 
-- **Level 2:** Where does `valid_tokens` get its answer? Expected: from the compiled grammar; a finite state machine gives a constant-time lookup per state.
-- **Level 2:** What does a production implementation do that this loop does not? Expected: skip forced tokens; when exactly one token is valid it is appended without a model call.
-- **Level 3:** Which schemas defeat a finite state machine? Expected: recursive ones, such as nested comments or a syntax tree, which need a context-free grammar engine.
-- **Level 3:** The grammar forces a strict date pattern and the source has no date. What does the loop produce? Expected: a well-formed invented date, because no valid token lets the model say unknown; allow null or a sentinel in the grammar.
+- **Level 2:** `valid_tokens` 的答案从哪来？ Expected: 来自编译好的语法；有限状态机能在每个状态以常数时间查表。
+- **Level 2:** 生产实现做了什么这段循环没做的事？ Expected: 跳过强制 token；只有一个 token 合法时，不调用模型就直接追加。
+- **Level 3:** 哪些 schema 是有限状态机处理不了的？ Expected: 递归的 schema，比如嵌套注释或语法树，需要上下文无关文法引擎。
+- **Level 3:** 语法强制了严格的日期模式，而源文本里没有日期。循环会产生什么？ Expected: 一个格式合法、内容编造的日期，因为没有合法 token 能让模型表达未知；在语法里允许 null 或哨兵值。
 
 ## Wrong answers
 
-- "The mask changes the model's weights." It changes nothing in the model; it edits the logits of one step before sampling.
-- "Constrained decoding always slows generation down." The lesson calls it often faster: a smaller search space, and forced tokens that skip the model call.
-- "A retry library does the same thing." It formats the schema into the prompt and validates after the fact; it does not touch the logits.
+- "mask 改变了模型权重。" 它不改变模型里的任何东西；它在采样前修改一步的 logits。
+- "约束解码总会拖慢生成。" 课程说它常常更快：搜索空间更小，强制 token 还能跳过模型调用。
+- "重试库做的是同一件事。" 它把 schema 格式化进 prompt，事后再校验；它不碰 logits。
 
 ## Taught in
 
-The lesson [constrained decoding](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/) gives this loop, the logit processor, the speed argument and the grammar pitfalls.
+[约束解码](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/)一课给出了这个循环、logit 处理器、速度论证和语法陷阱。

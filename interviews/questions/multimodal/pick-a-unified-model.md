@@ -1,6 +1,6 @@
 ---
 id: pick-a-unified-model
-title: One open model to answer, edit and generate
+title: 选择一个能问答、编辑和生成的开放权重模型
 card: multimodal
 kind: design
 level: 4
@@ -16,57 +16,57 @@ related: [multimodal/show-o-parallel-decoding, multimodal/vq-tokenizer-ceiling]
 updated: 2026-11-03
 ---
 
-A design tool wants to ship, with open weights it can host, one model that answers questions about a user's image, edits a region of it on request, and generates a new image from text. The latency per image must stay in seconds, not minutes. Lay out the families you would consider, pick one, and state the test that would make you change the pick.
+某设计类工具希望使用可自行托管的开放权重，上线一个能够同时满足三类需求的单一模型：回答用户关于输入图像的提问、根据指令局部编辑图像特定区域，以及根据文本生成全新图像。单张图像的处理延迟必须保持在数秒内，而不是数分钟。请梳理你所考虑的技术流派并做出选型，同时说明什么样的评测结果会促使你推翻该选型。
 
 ## Short answer
 
-Three open families cover understanding and generation in one model: next-token prediction over discrete codes, which does everything with one loss but spends one pass per code and minutes per image; continuous patches with a diffusion loss next to the text loss, which gives the best fidelity in about 20 passes but trains two losses; and masked discrete decoding, which keeps one loss, fills an image in about 16 passes, and gets region editing free from its masking objective. For a tool that needs editing and a seconds-level latency with open weights, start with the masked discrete family. Change the pick if a fidelity eval on your own prompts shows the quantizer ceiling hurting, or if the latency budget cannot afford sixteen full passes; the continuous two-loss family then takes over, with editing done through conditioned denoising of the region.
+有三大开源技术流派能将理解与生成统一在单一模型中：基于离散编码的 Next-token 预测模型（单一损失通吃所有任务，但单图需耗费数千次 pass，生成需数分钟）；基于连续图像 patch 并在文本损失旁训练扩散损失的双损失模型（约 20 次 pass 即可达到最佳保真度，但需平衡两套损失）；以及掩码离散解码模型（维持单一损失，约 16 次 pass 即可生成整张图像，且其掩码目标自然带来区域编辑能力）。对于需要局部编辑、开放权重和秒级延迟的工具，首选掩码离散解码流派。若在自研 prompt 集上的画质评测发现量化器重构天花板影响质量，或者硬件算力无法承受 16 次全量 pass，则应推翻选型转向连续双损失流派（改用局部区域条件去噪实现编辑）。
 
 ## Full answer
 
-### The requirements, mapped
+### 核心需求匹配矩阵
 
-| Requirement | Next-token over codes | Continuous two-loss | Masked discrete |
+| 业务需求 | 离散 Next-token 流派 | 连续扩散双损失流派 | 掩码离散解码流派 |
 |---|---|---|---|
-| Visual question answering | yes | yes | yes |
-| Region edit | possible, slow: regenerate codes | possible through conditioned denoising | native: mask the region's codes |
-| Text to image | yes, minutes per image | yes, about 20 passes | yes, about 16 passes |
-| Training | one loss | two losses to balance | one cross-entropy on masked positions |
-| Fidelity ceiling | the quantizer, at 30.5 dB in the best reference | no quantizer, about 32 dB and above | the quantizer |
-| Open weights to host | yes | yes | yes |
+| 视觉问答（VQA） | 原生支持 | 原生支持 | 原生支持 |
+| 局部区域编辑 | 理论可行，极慢：需串行重算编码 | 可行：通过条件去噪限制区域 | 原生天然支持：直接掩盖局部代码并预测 |
+| 文生图（T2I） | 原生支持，单图耗时数分钟 | 原生支持，约 20 次 pass | 原生支持，约 16 次 pass |
+| 训练损失函数 | 一个损失 | 两个损失需要平衡 | 针对被掩盖位置的单一交叉熵损失 |
+| 生成画质保真度上限 | 牢牢受制于量化器（最佳基准约 30.5 dB） | 无量化器瓶颈，可达 32 dB 及以上 | 牢牢受制于量化器 |
+| 可供自行托管的开放权重 | 有 | 有 | 有 |
 
-### Why masked discrete first
+### 为什么优先选用掩码离散流派
 
-Editing is the feature that distinguishes the product, and the masked objective is editing: mask a region, keep the rest, add the prompt, predict. A latency in the low tens of passes fits a seconds budget. One loss means one training recipe to operate. The reference open model ships text generation, question answering, text-to-image and inpainting from one checkpoint.
+编辑是产品的差异化功能，而掩码目标本身就是编辑：掩住一个区域、保留其余部分、加入 prompt，再做预测。十几次前向计算符合秒级预算。一个损失意味着只需维护一套训练方案。开放的参考模型用一个检查点提供文本生成、问答、文生图和图像修复。
 
-### Why not the other two first
+### 为什么另外两派不作为首选
 
-Next-token over codes spends thousands of passes per image; the reference puts a 512 by 512 image at about 2 minutes at a typical decode rate, and a region edit means regenerating codes in sequence. The continuous design has the best fidelity and no quantizer ceiling, but two losses on different scales need a weight search, and editing needs a conditioned denoising sampler that you build yourself.
+基于离散编码的纯自回归 Next-token 模型（如 Emu3）单图需要串行执行数千次解码 pass，512 × 512 图像在基准解码速率下耗时近 2 分钟，且局部编辑意味着要逐个重新自回归解码代码，无法满足延迟要求。连续双损失模型（如 Transfusion）画质最高且没有量化器失真，但两套不同量级的损失平衡极其微妙，且局部编辑必须自行编写实现带有条件掩码约束的扩散去噪采样器。
 
-### The eval that decides
+### 会推翻该选型的检验标准
 
-1. Fidelity: your own prompt set, judged against the continuous reference at matched passes; if the quantizer ceiling shows, as lost fine texture or unreadable text in images, the pick changes.
-2. Edit quality: masked region edits judged for seam quality and prompt adherence.
-3. Latency at your resolution and pass count on your hardware; sixteen full passes of a large transformer can still exceed a budget.
-4. Understanding: the question-answering eval you already run, because the unified model must not fall behind the adapter model it replaces.
+1. **画质保真度评测**：在自家真实业务 prompt 上与连续扩散模型做同 pass 对比；若离散量化器天花板暴露无遗（如微观纹理丢失或图内文字模糊不可辨），则必须切换。
+2. **局部编辑边缘融合质量**：评估掩码边缘接缝处的连贯性与指令对齐度。
+3. **硬件真实时延**：在自己的硬件上，按目标分辨率和前向计算次数实测延迟；大型 transformer 的 16 次完整前向计算仍可能超出预算。
+4. **多模态理解基准**：运行视觉问答标准评测集，确保统一大模型在理解能力上不落后于被替换掉的专业适配器模型。
 
-### Operational notes
+### 生产运维考量
 
-Keep the tokenizer fixed and version it with the model; a tokenizer change invalidates every stored code. Log the mask schedule and the pass count as deployment parameters, because they trade latency for quality at serve time without retraining.
+保持分词器固定，并将其与模型一起做版本管理；更换分词器会使所有已存储的编码失效。在线上配置中记录掩码调度和前向计算次数，作为部署参数，这样可以在无需重训的前提下在生成画质与推理延迟之间做实时动态权衡。
 
 ## Follow-ups
 
-- **Level 3:** Which of the three tasks does the masked objective give for free, and why? Expected: region editing; training predicts masked codes from the rest, which is what an edit asks for.
-- **Level 4:** How do you do a region edit in the continuous design? Expected: keep the patches outside the region fixed across the denoising steps and denoise only the region, conditioned on the text and the context; it works, but it is a sampler you write, not a training objective.
-- **Level 4:** Why does the pass count become a serving parameter in the masked design? Expected: more passes commit fewer codes each and raise quality, fewer passes cut latency; the schedule is set at inference, so the product can trade them per request.
-- **Level 4:** What single measurement tells you that the quantizer is the bottleneck? Expected: the tokenizer's reconstruction of your real images; if the reconstruction already loses the detail your users care about, no generator on those codes can recover it.
+- **Level 3:** 掩码预测目标天然附赠了哪项核心能力，为什么？ Expected: 局部区域编辑（Inpainting）；因为该训练目标本身就是根据已知上下文去预测被 mask 的位置，这正是局部编辑的本质。
+- **Level 4:** 连续双损失架构如何实现局部区域编辑？ Expected: 在多步扩散去噪过程中将待保留的外部 patch 像素强制固定，仅对选定区域执行基于文本和周围上下文的条件去噪；逻辑成立，但这需要自己写采样算法，而非训练目标天然自带。
+- **Level 4:** 为什么解码 pass 次数在掩码流派中可以作为服务部署参数动态调节？ Expected: 更多 pass 意味着每次迭代只提交最确信的少量代码、整体画质更高，更少 pass 则能大幅降低时延；这种权衡在推理阶段由调度器决定，无需重新训练。
+- **Level 4:** 哪一个最核心的指标能证明离散量化器已成为系统的瓶颈所在？ Expected: 分词器对真实图像的重构结果；若分词器自身哪怕只做编解码重构就已经丢失了用户关心的核心细节，任何建立在这些离散编码上的生成模型都绝无可能恢复这些细节。
 
 ## Wrong answers
 
-- "Ship the next-token model; one loss, one stack, no compromise." Minutes per image at the reference decode rate breaks the latency requirement, and a region edit regenerates codes in sequence.
-- "Fidelity decides, so take the continuous design." Fidelity is one requirement; editing and operational simplicity favor the masked design until an eval shows the ceiling hurting.
-- "Pick the model with the best benchmark score." The product needs three tasks, an edit path and a latency budget; a benchmark covers one of those at best.
+- "直接部署纯 Next-token 模型，单一损失最优雅绝不妥协。" 在基准解码速度下生成一张图需数分钟，无法满足延迟要求；且局部编辑需要串行重算编码。
+- "画质压倒一切，必须无条件选用连续扩散双损失方案。" 画质仅是维度之一；局部编辑的原生便捷性与单损失工程简洁性使掩码模型更具优势，除非评测明确证明量化器天花板已经受阻。
+- "谁在多模态公开基准榜单上分最高就选谁。" 业务工具需要同时兼顾三种任务形态、原生局部编辑与延迟预算；公开榜单充其量只能涵盖其中一项。
 
 ## Taught in
 
-The [Show-o lesson](../../../phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified/) places the three families and names the tasks one checkpoint covers, the [Transfusion lesson](../../../phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion/) gives the continuous design, and the [Emu3 lesson](../../../phases/12-multimodal-ai/12-emu3-next-token-for-generation/) gives the per-code cost of next-token generation.
+[Show-o 课程](../../../phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified/)梳理了三大统一流派并展示了单一 checkpoint 覆盖多任务的形态，[Transfusion 课程](../../../phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion/)解析了连续双损失架构，而[Emu3 课程](../../../phases/12-multimodal-ai/12-emu3-next-token-for-generation/)给出了 Next-token 逐代码解码的物理开销。

@@ -1,6 +1,6 @@
 ---
 id: var-next-scale
-title: Predict the next scale instead of the next token
+title: 预测下一个尺度而非下一个 token
 card: multimodal
 kind: concept
 level: 2
@@ -16,49 +16,49 @@ related: [multimodal/early-or-late-fusion]
 updated: 2026-11-03
 ---
 
-Token-by-token image generation used to mean predicting one code after another in raster order. A newer method predicts whole grids at increasing resolution instead. Explain what it predicts at each step, why that fixes the old method's main weakness, and how it compares with diffusion in the number of network passes.
+逐 Token 图像生成以往通常意味着按照光栅扫描（Raster Order）顺序串行预测一个接一个的离散编码。一种更新的技术方法则改为按不断递增的分辨率逐尺度（Next-Scale）预测整张网格。请解释它在每一步中具体预测什么、为什么这能解决传统方法的核心痛点，以及在网络前向 Pass 次数上它与扩散模型相比表现如何。
 
 ## Short answer
 
-Next-scale prediction tokenizes an image into a pyramid of grids, from one code up to the full latent resolution, with a residual quantizer so that the sum of the scales reconstructs the image. The transformer is causal across scales and parallel within a scale: given all coarser grids, it predicts every code of the next grid in one pass. That removes the raster-order problem, where an early corner code had to commit before any context existed. For a 256 by 256 image the reference uses about 10 scales, so generation is about 10 passes against 28 to 50 for a diffusion transformer, and all codes of a scale come out together.
+逐尺度预测（Next-Scale Prediction）将图像分词为网格金字塔，从 1 个代码逐级上升到完整的潜空间分辨率，并配合残差量化器（Residual Quantizer）使得各尺度之和能够重构图像。Transformer 在尺度之间保持因果关系，而在同一尺度内部保持完全并行：在给定所有低分辨率粗粒度网格的前提下，单次前向 Pass 即可并发预测下一尺度的所有编码。这消除了光栅扫描顺序问题（即早期的局部角点编码必须在上下文生成前就提交）。对于 256 × 256 的图像，参考模型使用约 10 个尺度，因此全图生成仅需约 10 次 Pass（相比之下扩散 Transformer 需要 28 到 50 次），且同一尺度内的所有编码在单步内并发产出。
 
 ## Full answer
 
-### The tokenizer
+### 分词器（Tokenizer）结构
 
-A multi-scale residual quantizer: encode the image to a latent, quantize it at 1 by 1, then at 2 by 2, then 4 by 4, up to the full latent grid, with one shared codebook. Each scale encodes what the coarser scales missed, and the decoder takes the sum of all upsampled scale embeddings. The codebook is typically 4096 to 16384 entries. Train it once and freeze it.
+多尺度残差量化器：先将图像编码为隐变量，依次在 1 × 1、2 × 2、4 × 4 直至全分辨率网格上量化，全流程共享同一个包含 4,096 到 16,384 条目的码本（Codebook）。每个尺度编码更粗尺度遗漏的信息，解码器最终直接对所有上采样后的尺度嵌入求和以重构图像。分词器训练一次后冻结。
 
-### The model
+### 自回归主干模型设计
 
-The input for scale 1 is a start token. The input for each later scale k is a grid built from the coarser scales only, upsampled to the size of scale k. The codes of scale k are the targets at those positions, and they enter the input only for the scales after k. Position embeddings carry the scale index and the position within the scale. The attention mask is block-causal: a code at scale k attends to every code of scales 1 to k, including all positions of its own scale, and to nothing finer. Training is cross-entropy on the codes at each scale given the coarser scales.
+尺度 1 的输入是起始标记（Start token）。对于后续的任意尺度 k，输入是仅基于比它更粗的低分辨率尺度构造的特征网格（上采样至尺度 k 的大小）。尺度 k 的真实编码正是该尺度位置上的预测目标，并且它们只会在 k 之后的尺度中作为已知输入出现。位置编码显式携带尺度索引以及尺度内部的二维空间坐标。注意力掩码采用块因果（Block-causal）结构：尺度 k 的任意代码可以关注尺度 1 到 k 的所有编码（包括自身尺度内的所有空间位置），但绝不允许窥视比自身更精细的高分辨率尺度。训练过程在给定低分辨率粗网格的条件下，计算各尺度代码的标准交叉熵损失。
 
-### Why it beats raster order
+### 为什么胜过光栅顺序
 
-1. Coarse to fine matches image statistics: low-frequency structure is stable and predictable, and detail is conditional on it.
-2. Parallel within a scale: the generation length is logarithmic in the pixel count instead of linear.
-3. No order bias: nothing is left of or above anything inside a scale, so no early code commits before the late context exists.
+1. **由粗到精完全契合图像的自然统计规律**：低频全局轮廓结构具备高度的确定性与可预测性，而微观细节天然依附于全局骨架。
+2. **同尺度内完全并行生成**：生成长度与像素数呈对数关系，而不再是线性（Linear）关系。
+3. **消除了空间扫描方向偏见**：同一尺度内部不存在“左边”、“上面”的人为先后顺序，避免了左上角早期代码在缺乏全局语义时强行锁死的糟糕决策。
 
-### The scaling result
+### 缩放结果
 
-The paper reports a power law of image quality against compute, the way language models scale in perplexity, and a better quality than a diffusion transformer at matched compute on a class-conditional benchmark.
+该研究论文报道了画质与计算量之间呈现出清晰的幂律（Power Law）扩展关系，类似于语言模型困惑度随规模变化的规律；在相同计算量下，该模型在一个类别条件基准上的图像质量优于扩散 transformer。
 
-### Relation to diffusion
+### 与扩散模型的关系
 
-Both break generation into easier conditional steps. Diffusion adds noise and learns to remove one step of it; next-scale prediction adds resolution and learns to predict one more scale. The scale method needs fewer passes and parallelizes inside each pass; text-conditioned variants were an open research direction at the time of the lesson.
+两者本质上都是将原本极难的一步到位生成任务，拆解为一系列难度更低且条件明确的渐进步骤。扩散添加噪声，并学习去除其中一步噪声；逐尺度预测增加分辨率，并学习再预测一个尺度。逐尺度预测所需的网络前向 Pass 显著更少，且在每次前向计算内部并行；在课程编写时，文本条件变体仍是开放的研究方向。
 
 ## Follow-ups
 
-- **Level 2:** Why does the residual structure matter for the tokenizer? Expected: each scale encodes only what the coarser scales missed, so the sum reconstructs the latent and the scales are not redundant.
-- **Level 2:** What does a code at scale k see, and what may it not see? Expected: all codes at scales 1 to k, its own scale's positions included; nothing at finer scales.
-- **Level 3:** What happens to quality and cost as you add scales? Expected: finer residuals and better reconstruction, at the cost of one more pass per scale; the lesson's exercise sweeps 4 to 10 scales to find the knee.
-- **Level 3:** How would you add text conditioning? Expected: feed a pooled text embedding through adaptive normalization, as the hybrid variant in the lesson does, and measure the gain on text-aligned samples.
+- **Level 2:** 为什么分词器的残差结构至关重要？ Expected: 每个尺度只编码更粗尺度遗漏的信息，这样求和即可重构隐表示，避免各尺度之间产生大量冗余信息。
+- **Level 2:** 尺度 k 的某个代码能够看到什么、不能看到什么？ Expected: 能看到尺度 1 到 k 的所有编码（包含其自身尺度内的所有位置）；绝对不能看到比 k 更精细的高分辨率尺度代码。
+- **Level 3:** 当继续追加更多尺度层级时，画质与计算成本会发生什么变化？ Expected: 残差更精细、重构质量更优，代价是每增加一个尺度就要多付出一次前向 pass；课程实验扫描 4 到 10 个尺度寻找拐点。
+- **Level 3:** 如何为该架构引入文本条件引导？ Expected: 通过自适应归一化注入池化后的文本嵌入，如课程中的混合变体所示，并在与文本对应的样本上测量收益。
 
 ## Wrong answers
 
-- "It is diffusion with a different name." Diffusion iterates over noise levels on continuous latents; this iterates over resolution on discrete codes and predicts a whole grid per pass.
-- "Within a scale the codes still go one by one." The mask is bidirectional inside a scale, so one forward pass produces the whole grid.
-- "Raster order only costs speed." It also biases generation: an early code commits before the context that should condition it exists, which capped quality below diffusion at matched compute.
+- "这只是一种换了皮的连续扩散模型。" 扩散模型是在连续潜空间上按噪声强度迭代去噪；该模型是在离散编码上按分辨率尺度自回归，且单步预测整张网格。
+- "在同一尺度内部，各个编码依然是一个接一个串行生成的。" 尺度内部的注意力掩码是完全双向的，因此单次前向 pass 就并发产出该尺度的整张网格。
+- "光栅扫描顺序只影响速度。" 扫描顺序还会引入严重的生成偏见：早期的局部代码在缺乏全局语境时被迫做出不可逆决策，使得传统方法在同等算力下的画质严重落后于扩散模型。
 
 ## Taught in
 
-The [visual autoregressive lesson](../../../phases/08-generative-ai/19-visual-autoregressive-var/) builds the multi-scale tokenizer and the scale-ordered mask.
+[视觉自回归模型课程](../../../phases/08-generative-ai/19-visual-autoregressive-var/)构建了多尺度残差分词器以及按尺度排序的块因果掩码。

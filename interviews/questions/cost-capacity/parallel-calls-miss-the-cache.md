@@ -1,6 +1,6 @@
 ---
 id: parallel-calls-miss-the-cache
-title: Ten parallel tool calls, ten cache writes, no reads
+title: 十个并行工具调用，十次缓存写入，零次读取
 card: cost-capacity
 kind: debug
 level: 2
@@ -16,42 +16,42 @@ related: [cost-capacity/cache-break-even, cost-capacity/two-cache-layers]
 updated: 2026-11-03
 ---
 
-An agent fans out ten tool calls at once for every user question. All ten share the same long system prompt, and prompt caching is on. The bill is several times what the cache should allow, and the usage fields show cache writes on nearly all calls and almost no cache reads. What is happening?
+一个 agent 对每个用户问题同时扇出十个工具调用。十个调用共用同一段很长的系统 prompt，prompt 缓存也开着。账单却是使用缓存后预期金额的好几倍，usage 字段显示几乎每个调用都在写缓存，几乎没有缓存读取。发生了什么？
 
 ## Short answer
 
-All ten requests reach the provider before the first one has finished writing the prefix into the cache. Each one sees a miss, each one pays the write premium, and none of them reads. The fix is sequential-first: send one request alone, let its cache write land, then fan out the other nine. It adds about one write latency to the first tool call and removes the inflation.
+第一个请求还没把前缀写进缓存，十个请求就都到了提供商那里。每个请求看到的都是未命中，每个都付了写入溢价，没有一个读到缓存。修法是先串行：先单独发一个请求，等它的缓存写入完成，再扇出另外九个。这会给第一个工具调用增加大约一次写入的延迟，但能消除费用膨胀。
 
 ## Full answer
 
-### The mechanism
+### 机制
 
-Cache writes happen per request. The lesson puts the first write at about 300 ms after the provider sees the prompt. Requests that arrive inside that window find nothing to read, so each of them writes. Ten writes and zero reads, on every user question that finds the prefix cold. A question that arrives while an earlier write is still inside the cache lifetime reads it, so the trap shows when the questions are further apart than that lifetime. The lesson reports a bill of 5 to 10 times the expected cached cost from this pattern alone.
+缓存写入按请求发生。课程给出的数字是，提供商看到 prompt 后大约 300 ms 完成第一次写入。在这个窗口内到达的请求都没有东西可读，于是每个都去写。每个遇到冷前缀的用户问题，都是十次写入、零次读取。如果一个问题到达时，之前的写入还在缓存有效期内，它就能读到；所以当问题之间的间隔长于有效期时，这个陷阱就会显现。课程报告说，单是这种模式就会让账单变成预期缓存成本的 5 到 10 倍。
 
-### Read the usage fields
+### 读 usage 字段
 
-Each response reports the tokens written to the cache and the tokens read from it. In this incident the written count is high on every request and the read count is near zero. That is the signature. A later sequential request with the same prefix does read, which separates this case from a prefix that never matches.
+每个响应都会报告写入缓存的 token 数和从缓存读出的 token 数。这次事故里，每个请求的写入数都很高，读取数接近零。这就是它的特征。之后一个带同样前缀的串行请求确实能读到缓存，这一点能把它和前缀永远匹配不上的情况区分开。
 
-### The fix
+### 修法
 
-Send the first request alone and wait for it to return. Its write has landed by then. Fan out the remaining nine, and each of them reads. The cost is about 300 ms on the first tool call. The lesson's exercise asks for the same fix without adding end-to-end latency: warm the prefix with one call at the start of the session, before the first fan-out, so the first tool call already reads.
+先单独发第一个请求，等它返回。这时它的写入已经完成。再扇出剩下的九个，每个都能读到缓存。代价是第一个工具调用多了约 300 ms。课程的练习要求做同样的修复，但不增加端到端延迟：在会话开始、第一次扇出之前，用一次调用预热前缀，这样第一个工具调用就已经能读到缓存。
 
-### Rule out the other cause
+### 排除另一个原因
 
-A prefix that carries dynamic text looks the same in the usage fields: writes on every request, no reads ever. The lesson's example has the time to the minute, a user id and a reshuffled example order inside the system prompt. One field report moved the hit rate from 7 to 74 percent by moving that text below the cache boundary. Check the prompt template before you blame the fan-out.
+前缀里带有动态文本时，usage 字段看起来一模一样：每个请求都在写，从来没有读。课程的例子是系统 prompt 里有精确到分钟的时间、一个用户 ID，以及顺序被打乱的示例。一份现场报告把这些文本挪到缓存边界之后，命中率从 7% 升到了 74%。在怪罪扇出之前，先检查 prompt 模板。
 
 ## Follow-ups
 
-- **Level 2:** How do you tell the fan-out trap from dynamic text in the prefix? Expected: both show writes and no reads. After the fan-out trap, a later sequential request with the same prefix reads. With dynamic text, nothing ever reads.
-- **Level 3:** How do you fix the fan-out without adding latency for the user? Expected: warm the prefix with one call when the session starts, so the first fan-out already reads.
-- **Level 3:** Does a self-hosted prefix cache have the same trap? Expected: the lesson says the self-hosted caches follow the same prefix pattern at your own compute, so measure the cached tokens on a fan-out before you assume they are shared.
+- **Level 2:** 怎样区分扇出陷阱和前缀里的动态文本？ Expected: 两者都是只有写入、没有读取。扇出陷阱之后，一个带同样前缀的串行请求能读到缓存。有动态文本时，什么都读不到。
+- **Level 3:** 怎样在不给用户增加延迟的前提下修好扇出？ Expected: 在会话开始时用一次调用预热前缀，这样第一次扇出就已经能读到缓存。
+- **Level 3:** 自建的前缀缓存也有同样的陷阱吗？ Expected: 课程说，自建缓存遵循同样的前缀模式，只是用你自己的算力，所以在假设缓存被共享之前，先在一次扇出上测一测缓存的 token 数。
 
 ## Wrong answers
 
-- "Caching is on, so the provider should deduplicate them." Writes are per request, and the cache can be read only after the first write has landed.
-- "Shorten the system prompt." That lowers every bill a little and leaves ten writes and zero reads in place.
-- "Turn caching off, it costs more." It costs more only because of the arrival pattern. Sequential-first turns ten writes into one write and nine reads.
+- "缓存开着，提供商应该会帮我们去重。" 写入按单个请求发生，第一次写入完成之后缓存才能被读取。
+- "把系统 prompt 缩短。" 这会让每份账单都少一点，但十次写入、零次读取的问题还在。
+- "关掉缓存，它反而更贵。" 它更贵只是因为请求到达的方式。先串行，就能把十次写入变成一次写入加九次读取。
 
 ## Taught in
 
-The [caching economics lesson](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/) names the parallelization anti-pattern and its fix, and the [prompt caching lesson](../../../phases/11-llm-engineering/15-prompt-caching/) shows the usage fields to read.
+[缓存经济学课程](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/)指出了并行化反模式及其修法，[prompt 缓存课程](../../../phases/11-llm-engineering/15-prompt-caching/)展示了要读的 usage 字段。

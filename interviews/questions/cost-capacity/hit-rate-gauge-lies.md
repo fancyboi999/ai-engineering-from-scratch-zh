@@ -1,6 +1,6 @@
 ---
 id: hit-rate-gauge-lies
-title: Two cache hit rates from one scrape
+title: 同一次抓取里的两个缓存命中率
 card: cost-capacity
 kind: debug
 level: 2
@@ -16,54 +16,54 @@ related: [cost-capacity/two-cache-layers, inference-serving/prefix-cache-order]
 updated: 2026-11-03
 ---
 
-A dashboard panel shows the prefix cache hit rate of a self-hosted server at 94 percent. Over the same run, the server's counters say that it computed 104,057 prompt tokens and took 182,079 from the cache. Both readings come from one scrape of the same endpoint. Which one do you trust for a cost decision, and why do they differ?
+看板上的一个面板显示，一台自建服务器的前缀缓存命中率是 94%。同一次运行中，服务器的计数器显示它计算了 104,057 个 prompt token，从缓存取了 182,079 个。两个读数来自对同一个端点的同一次抓取。做成本决策时你信哪一个？它们为什么不一样？
 
 ## Short answer
 
-Trust the counters. The gauge holds the hit rate of the last prefill interval that the scheduler logged, and at idle it keeps the value from the last batch, which was a shared-prefix benchmark. The counters add up every prefill token since the server started, and their ratio over the whole run is 0.636, not 0.942. For a cost decision, compute the rate from the counters over a time window.
+信计数器。gauge 保存的是调度器最后一次记录的 prefill 区间的命中率，空闲时它一直停在最后一批请求的值上，而那一批是一个共享前缀的基准测试。计数器把服务器启动以来的每个 prefill token 都加了进去，整个运行期间的比值是 0.636，不是 0.942。做成本决策时，用计数器在一个时间窗口上算出命中率。
 
 ## Full answer
 
-### Three kinds of series
+### 三类序列
 
-A gauge is a value the scheduler overwrites on each log interval. A scrape sees the latest value only. A counter is a total that only grows, and you read it as a rate over a window. A histogram is a set of counters, one per bucket, and you read percentiles from it over a window.
+gauge 是调度器在每个日志间隔覆盖写入的一个值。一次抓取只能看到最新的值。counter 是只增不减的总量，读的时候算它在一个窗口内的速率。histogram 是一组 counter，每个桶一个，读的时候在一个窗口内算分位数。
 
-### The two hit rates
+### 两个命中率
 
-The gauge divides the hit tokens of one log interval by the hit tokens plus the computed tokens of that interval. When nothing runs, it keeps its last value. The counters carry the same two quantities since startup, split by mode: input for computed tokens, and device, host and storage hits for cached tokens. Over the whole run, 182,079 cached tokens against 286,136 prefill tokens in total give 0.636. The gauge at 0.942 describes the shared-prefix benchmark that ran last. Both are correct, and they answer different questions.
+gauge 用一个日志间隔内的命中 token 数，除以同一间隔内命中 token 与计算 token 之和。没有请求运行时，它保持最后一个值。计数器记录的是启动以来的同样两个量，按模式拆分：input 表示计算的 token，device、host 和 storage 表示各层命中的缓存 token。整个运行期间，182,079 个缓存 token 对应总共 286,136 个 prefill token，比值是 0.636。gauge 的 0.942 描述的是最后跑的那个共享前缀基准测试。两个数都没错，它们回答的是不同的问题。
 
-### The windowed rate
+### 按窗口计算的命中率
 
-The HELP text of the counter gives the formula, and in PromQL it reads:
+计数器的 HELP 文本给出了公式，写成 PromQL 是：
 
 ```promql
 sum(rate(sglang:prefill_effective_tokens_total{mode=~".*_hit"}[5m]))
   / sum(rate(sglang:prefill_effective_tokens_total[5m]))
 ```
 
-One caveat from the code: the hit modes add raw hit counts, so after a retraction the same tokens can count twice. The input mode excludes the re-count. The manual's run had no retractions, so its numbers are exact.
+代码里有一个注意点：命中模式累加的是原始命中数，所以请求被撤回（retraction）之后，同一批 token 可能被算两次。input 模式排除了这种重复计数。手册那次运行没有发生撤回，所以数字是准确的。
 
-### Why this is a cost question
+### 为什么这是成本问题
 
-A hit rate decides whether you restructure prompts, add a cache-aware router or buy memory. A gauge from the last benchmark says the prompts are fine. The counters say that more than a third of the prompt tokens over the run were computed. The lesson on caching economics says the same for provider caches: measure your own hit rate from the usage fields on every response, and do not take a published figure as yours.
+命中率决定你要不要重排 prompt 结构、加一个感知缓存的路由器，或者买更多内存。来自最后一次基准测试的 gauge 告诉你 prompt 没问题。计数器告诉你，整个运行期间超过三分之一的 prompt token 是算出来的。缓存经济学课程对提供商缓存也是同样的说法：用每个响应里的 usage 字段测自己的命中率，不要把公开的数字当成你的。
 
-### What to alert on
+### 该对什么告警
 
-Alert on counters and histograms over a window. Alert on a gauge only when the condition lasts for several minutes, such as queued requests above zero or token usage near one. Read the HELP text and the code before you build a panel on a metric. The manual found one utilization gauge that stays at zero at the version it pinned.
+对计数器和 histogram 按窗口告警。只有当条件持续好几分钟时才对 gauge 告警，例如排队请求数大于零，或者 token 使用率接近 1。在一个指标上做面板之前，先读它的 HELP 文本和代码。手册就发现有一个利用率 gauge 在它固定的版本上一直是零。
 
 ## Follow-ups
 
-- **Level 2:** What does a gauge answer, and what does a counter answer? Expected: a gauge answers what happened in the last interval. A counter answers how much happened since the start, and a rate over a window turns it into a trend.
-- **Level 3:** Why can the counter-based rate overstate the hits after retractions? Expected: the hit modes add raw hit counts, so a retracted request that runs again counts its cached tokens twice, while the input mode excludes the re-count.
-- **Level 3:** Which gauges may page you, and under what rule? Expected: queued requests above zero and token usage near one, only when the condition holds for several minutes, never on one scrape.
-- **Level 4:** A panel on this server shows utilization at zero during an outage. Why? Expected: that gauge stays at zero at the pinned version because of a known regression, so the panel shows an idle fleet. Read the HELP text and the code before building on a metric.
+- **Level 2:** gauge 回答什么问题，counter 回答什么问题？ Expected: gauge 回答上一个间隔发生了什么。counter 回答从启动到现在一共发生了多少，在窗口上取速率就能看出趋势。
+- **Level 3:** 为什么发生撤回后，按计数器算出的命中率会偏高？ Expected: 命中模式累加原始命中数，一个被撤回后重跑的请求会把它的缓存 token 算两次，而 input 模式排除了这种重复计数。
+- **Level 3:** 哪些 gauge 可以触发呼叫，按什么规则？ Expected: 排队请求数大于零和 token 使用率接近 1，而且只在条件持续好几分钟时触发，绝不凭一次抓取。
+- **Level 4:** 一次故障期间，这台服务器的一个面板显示利用率为零。为什么？ Expected: 因为一个已知的回归，这个 gauge 在固定的版本上一直是零，所以面板显示整个集群都闲着。在一个指标上搭东西之前，先读 HELP 文本和代码。
 
 ## Wrong answers
 
-- "The gauge is the newest value, so it is the most accurate." It is a snapshot of one interval, and it keeps its last value at idle.
-- "Average the two numbers." They answer different questions, and the counters already contain the whole run.
-- "The real rate is lower, so turn the cache off." A rate of 0.636 means a third of the prompt tokens were computed. The fix is the prompt layout or the routing, not the cache.
+- "gauge 是最新的值，所以最准。" 它是一个间隔的快照，空闲时还会停在最后一个值上。
+- "把两个数取个平均。" 它们回答的是不同的问题，计数器本来就已经包含了整个运行期间。
+- "真实命中率更低，那就把缓存关掉。" 0.636 的命中率意味着三分之一的 prompt token 是算出来的。该改的是 prompt 布局或路由，不是缓存。
 
 ## Taught in
 
-The [metrics endpoint section of SGLang 101](../../../manuals/sglang-101/sections/5-2-the-metrics-endpoint.md) measures the two hit rates on one server, and the [caching economics lesson](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/) tells you to compute the rate from your own usage fields.
+[SGLang 101 的指标端点一节](../../../manuals/sglang-101/sections/5-2-the-metrics-endpoint.md)在一台服务器上测出了这两个命中率，[缓存经济学课程](../../../phases/17-infrastructure-and-production/14-prompt-semantic-caching/)要求用你自己的 usage 字段计算命中率。

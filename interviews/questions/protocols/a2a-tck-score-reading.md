@@ -1,6 +1,6 @@
 ---
 id: a2a-tck-score-reading
-title: How conformant is a server that scores 66.7 percent
+title: 得分 66.7% 的服务器到底有多合规
 card: protocols
 kind: estimate
 level: 4
@@ -16,58 +16,58 @@ related: [protocols/a2a-version-header-missing]
 updated: 2026-11-03
 ---
 
-You run the official A2A conformance kit against your server twice. The first run scores 32.3 percent. After a two-line change to the kit's own JSON-RPC client, the second run scores 66.7 percent: 62 PASS, 31 FAIL, 11 SKIPPED and 25 NOT TESTED of 129 requirements. Your manager asks how conformant the server is. Estimate the real figure and defend every adjustment you make.
+你用官方 A2A 合规测试套件对自己的服务器跑了两次。第一次得分 32.3%。对套件自带的 JSON-RPC 客户端改了两行之后，第二次得分 66.7%：129 项要求中，62 项 PASS、31 项 FAIL、11 项 SKIPPED、25 项 NOT TESTED。经理问你服务器的合规程度如何。估算真实数字，并为你做的每一处调整给出理由。
 
 ## Short answer
 
-Neither percentage measures the server alone. The first run lost 63 of 85 JSON-RPC records because the kit posted to the card URL with a trailing slash, which is the kit's defect. In the second run, 21 of the failures are skips inside a test body that the tagged kit records as FAIL, so under the main-branch rule the run reads 62 PASS, 10 FAIL and 32 SKIPPED, or 86.1 percent, and of those ten failures three belonged to the server: the missing REST push routes and, at SHOULD level, the missing `Cache-Control` and `ETag` on the card.
+两个百分比都不是只在衡量服务器。第一次运行中，85 条 JSON-RPC 记录丢了 63 条，原因是套件把请求 POST 到了带尾部斜杠的卡片 URL，这是套件的缺陷。第二次运行中，有 21 项失败其实是测试体内部的跳过，被打标签的套件版本记成了 FAIL；按 main 分支的规则，这次运行应读作 62 PASS、10 FAIL、32 SKIPPED，即 86.1%，而这十项失败里只有三项属于服务器：缺少 REST 推送路由，以及 SHOULD 级别上卡片缺少 `Cache-Control` 和 `ETag`。
 
 ## Full answer
 
-### How the kit scores
+### 套件怎么打分
 
-The kit is a pytest project. It reads the card, builds one client per `supportedInterfaces` entry, and runs each test on each declared binding. A MUST test is a hard failure, a SHOULD test is an expected failure, and a MAY test is skipped when the card lacks the capability. The percentages count only PASS and FAIL. All 72 gRPC records were skipped because the server has no gRPC interface, and that is correct, not a loss.
+这个套件是一个 pytest 项目。它读取卡片，为 `supportedInterfaces` 的每个条目建一个客户端，并在每个声明的绑定上运行每个测试。MUST 测试失败就是硬失败，SHOULD 测试失败是预期失败，MAY 测试在卡片没有声明该能力时跳过。百分比只计 PASS 和 FAIL。72 条 gRPC 记录全部跳过，因为服务器没有 gRPC 接口；这是对的，不算损失。
 
-### Run one: a kit defect
+### 第一次运行：套件的缺陷
 
-The specification places the interface at `url`. The kit appended a slash, the server answered 404, and 63 records failed for one reason. Fixing the kit's client, not the server, moved the score.
+规范规定接口就在 `url`。套件多加了一个斜杠，服务器返回 404，63 条记录因为同一个原因失败。改动的是套件的客户端，不是服务器，分数却变了。
 
-### Run two: separate the failures
+### 第二次运行：把失败分开
 
-| Group | Count | Whose |
+| 分组 | 数量 | 归属 |
 |---|---|---|
-| skips inside a test body, recorded as FAIL at the tag | 21 | the kit; `main` records them as SKIPPED |
-| push requirements that pass on HTTP+JSON and fail on JSON-RPC | most of the rest | the kit sends snake_case `task_id`, where the specification requires camelCase |
-| REST push routes missing although the card declared `pushNotifications` | 1 | the server; every declared binding must offer the same operations |
-| missing `Cache-Control` and `ETag` on the card | 2 | the server, at SHOULD level |
+| 测试体内部的跳过，在该标签版本里记为 FAIL | 21 | 套件；`main` 把它们记为 SKIPPED |
+| 在 HTTP+JSON 上通过、在 JSON-RPC 上失败的推送要求 | 其余大部分 | 套件发送 snake_case 的 `task_id`，而规范要求 camelCase |
+| 卡片声明了 `pushNotifications`，却缺少 REST 推送路由 | 1 | 服务器；每个声明的绑定都必须提供相同的操作 |
+| 卡片缺少 `Cache-Control` 和 `ETag` | 2 | 服务器，SHOULD 级别 |
 
-After the server fix, the six HTTP+JSON push records pass, and each requirement still reads FAIL because of its JSON-RPC side.
+服务器修好之后，六条 HTTP+JSON 推送记录通过了，但每项要求仍然因为 JSON-RPC 那一侧而显示 FAIL。
 
-### Where the kit departs from the specification
+### 套件偏离规范的地方
 
-The kit expects HTTP `409` for `TaskNotCancelableError`, `415` for `ContentTypeNotSupportedError`, `502` for `InvalidAgentResponseError`, and gRPC `UNIMPLEMENTED` for three errors. The canonical table says `400`, `400`, `500` and `FAILED_PRECONDITION`. A server that follows the specification fails those checks. It also demands `application/json` on REST where the specification says `application/a2a+json` should be used, and it hard-asserts SHOULD and MAY caching tests.
+套件期望 `TaskNotCancelableError` 返回 HTTP `409`，`ContentTypeNotSupportedError` 返回 `415`，`InvalidAgentResponseError` 返回 `502`，还期望三种错误在 gRPC 上返回 `UNIMPLEMENTED`。规范的标准表分别规定的是 `400`、`400`、`500` 和 `FAILED_PRECONDITION`。照规范实现的服务器会在这些检查上失败。套件还在 REST 上要求 `application/json`，而规范说应该使用 `application/a2a+json`；它还把 SHOULD 和 MAY 级别的缓存测试写成了硬断言。
 
-### What the kit never tests
+### 套件从不测的东西
 
-Five behaviors that split the SDKs never run: the REST subscribe verb, pagination beyond one call, an `append` to an unknown artifact, another caller's task, and a resent `messageId`. The NOT TESTED set also covers in-task authorization, TLS, card signatures and the client's version header. Those are yours to test.
+有五种让各 SDK 表现不一的行为从来没被测过：REST 的订阅动词、超过一次调用的分页、对未知产物的 `append`、别的调用方的任务，以及重发的 `messageId`。NOT TESTED 集合还包括任务内授权、TLS、卡片签名和客户端的版本头。这些需要你自己测。
 
-### The estimate
+### 估算结论
 
-Say this: one MUST defect, found and fixed; two SHOULD gaps on card caching; a per-requirement reading of 86.1 percent under the main-branch rule, with the remaining failures attributable to the kit's own client, and an explicit list of untested behaviors with your own tests beside them. Hand over `compatibility.json`, not the percentage.
+这样说：发现并修复了一个 MUST 缺陷；卡片缓存上有两个 SHOULD 缺口；按 main 分支规则逐项要求计算为 86.1%，其余失败可归因于套件自己的客户端；另附一份未测试行为的明确清单，旁边列出你自己的测试。交出去的是 `compatibility.json`，而不是一个百分比。
 
 ## Follow-ups
 
-- **Level 3:** Why do the percentages leave out the SKIPPED and NOT TESTED rows? Expected: those rows carry no verdict, so a percentage over them would reward a card that declares few capabilities.
-- **Level 4:** The push requirements pass on one binding and fail on the other. How do you classify that? Expected: a kit defect, because the JSON field names must be camelCase and the kit sends `task_id`; keep the requirement as passing in your own ledger with the evidence.
-- **Level 4:** What did the one real failure teach about cards? Expected: a capability flag is a promise for every declared binding, so the REST side needed the four push routes the card advertised.
-- **Level 4:** Which checks do you add that the kit lacks? Expected: owner scoping of tasks, a resent `messageId`, `append` to an unknown artifact, the REST subscribe verb, and pagination with the returned token.
+- **Level 3:** 为什么百分比不计 SKIPPED 和 NOT TESTED 的行？ Expected: 这些行没有结论，把它们算进百分比，会奖励那些声明能力很少的卡片。
+- **Level 4:** 推送要求在一个绑定上通过，在另一个上失败。怎么归类？ Expected: 套件缺陷，因为 JSON 字段名必须是 camelCase，而套件发的是 `task_id`；在你自己的台账里把这项记为通过，并附上证据。
+- **Level 4:** 那唯一一个真实的失败，说明了卡片的什么？ Expected: 能力标志是对每个声明绑定的承诺，所以 REST 一侧需要卡片宣称的那四个推送路由。
+- **Level 4:** 你会补上哪些套件没有的检查？ Expected: 任务的所有者隔离、重发的 `messageId`、对未知产物的 `append`、REST 的订阅动词，以及用返回的 token 做分页。
 
 ## Wrong answers
 
-- "Report the second percentage as the conformance figure." It counts kit skips as failures and the kit's snake_case parameters as your bugs.
-- "Report full conformance after fixing the missing routes." The two SHOULD gaps remain, and a quarter of the requirements were never tested.
-- "The kit is the specification." It departs from the canonical error table in six places; the specification wins, and the kit's README itself calls SHOULD an expected failure.
+- "把第二次的百分比当作合规数字报上去。" 它把套件的跳过算成失败，把套件的 snake_case 参数算成你的 bug。
+- "补上缺失的路由后就报告完全合规。" 两个 SHOULD 缺口还在，而且四分之一的要求从没测过。
+- "套件就是规范。" 它在六个地方偏离了标准错误表；以规范为准，套件自己的 README 也把 SHOULD 称为预期失败。
 
 ## Taught in
 
-The [conformance testing section](../../../manuals/a2a-101/sections/7-3-conformance-testing.md) records both runs, and the [errors reference](../../../manuals/a2a-101/sections/r-4-errors.md) sets the kit's status table beside the canonical one.
+[合规测试一节](../../../manuals/a2a-101/sections/7-3-conformance-testing.md)记录了两次运行，[错误参考](../../../manuals/a2a-101/sections/r-4-errors.md)把套件的状态码表和标准表并排列出。

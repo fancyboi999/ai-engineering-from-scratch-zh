@@ -1,6 +1,6 @@
 ---
 id: constrained-decoding-how
-title: How a grammar edits the logits and why it can be faster
+title: 语法如何改写 logits，为什么还可能更快
 card: tokenization-decoding
 kind: concept
 level: 2
@@ -16,21 +16,21 @@ related: []
 updated: 2026-11-03
 ---
 
-A classifier prompt asks for one of three labels and the model answers with a paragraph, so the parser crashes. Three layers of fix exist. Explain how the strongest one works at the level of the logits, and why it is often faster than free generation, not slower.
+一个分类 prompt 要求模型从三个标签里选一个，模型却答了一整段话，解析器随即崩溃。修复手段有三个层次。请在 logits 层面解释最强的那一层怎样工作，以及它为什么常常比自由生成更快，而不是更慢。
 
 ## Short answer
 
-Prompting asks nicely, a vendor's structured-output API does it on the server, and constrained decoding does it locally by editing the logits. At each step a logit processor computes which vocabulary tokens can advance the target grammar, a JSON schema, a regex or a context-free grammar compiled to a state machine, and sets every other logit to minus infinity, so the softmax puts probability only on valid continuations and an invalid output is unreachable. It can be faster because the search space shrinks and because tokens that the grammar forces, such as a fixed key name, are emitted without a model step.
+prompt 是客气地请求，厂商的结构化输出 API 在服务端做约束，约束解码则在本地直接改写 logits。每一步，logit 处理器算出词表里哪些 token 能推进目标语法（JSON schema、正则或上下文无关语法，编译成状态机），把其余 logit 全部置为负无穷，于是 softmax 只把概率分给合法的续写，非法输出根本到不了。它可能更快，一是搜索空间缩小，二是语法强制的 token（比如固定的键名）不需要模型走一步就能直接输出。
 
 ## Full answer
 
-### The three layers
+### 三个层次
 
-1. **Prompting.** "Return only the JSON object." The lesson puts this at about 80 percent compliance on strong models and lower on small ones. Not a contract.
-2. **Native structured output.** The provider runs the constraint on its side. Reliable for supported schemas; locked to that provider.
-3. **Constrained decoding.** The constraint runs in your own decoding loop and works with any local model.
+1. **prompt。** "只返回 JSON 对象。" 课程给出的数字是：强模型约 80% 遵守，小模型更低。这不是契约。
+2. **原生结构化输出。** 由提供方在自己那侧执行约束。对支持的 schema 很可靠，但锁死在这家提供方上。
+3. **约束解码。** 约束跑在你自己的解码循环里，任何本地模型都能用。
 
-### The loop
+### 循环
 
 ```python
 def generate_constrained(model, tokenizer, prompt, fsm):
@@ -46,33 +46,33 @@ def generate_constrained(model, tokenizer, prompt, fsm):
     return tokenizer.decode(ids)
 ```
 
-The state machine tracks how much of the grammar is satisfied. `valid_tokens` returns the vocabulary tokens that keep the machine on an accepting path; the mask sets the rest to minus infinity. The vocabulary is about 100k tokens, so the mask is computed per state ahead of time.
+状态机记录语法已经满足到哪一步。`valid_tokens` 返回能让状态机留在可接受路径上的词表 token；掩码把其余 token 的 logit 置为负无穷。词表约有 10 万个 token，所以每个状态的掩码都提前算好。
 
-### State machine or grammar engine
+### 状态机还是语法引擎
 
-A regex or a flat JSON schema compiles to a finite-state machine with a constant-time lookup of valid tokens per state. Recursive schemas, nested comments or a syntax tree, need a context-free grammar engine, which handles recursion at near-zero decoding overhead in current implementations. Inference servers expose both as guided decoding.
+正则或扁平的 JSON schema 可以编译成有限状态机，每个状态查合法 token 只要常数时间。递归的 schema、嵌套注释或语法树需要上下文无关语法引擎；在现在的实现里，它处理递归时几乎不增加解码开销。推理服务器把这两种都作为引导解码（guided decoding）提供出来。
 
-### Why it can be faster
+### 为什么可能更快
 
-Fewer candidate tokens means a smaller effective search at each step. More important, long stretches of the output are fully determined by the grammar: the opening brace, a quoted key, the colon. A good implementation skips the model for those tokens and only calls it where the grammar leaves a choice.
+候选 token 变少，每一步的有效搜索范围就更小。更重要的是，输出里有很长的片段完全由语法决定：开头的大括号、带引号的键、冒号。好的实现对这些 token 直接跳过模型，只在语法留有选择的地方才调用模型。
 
-### The library that does not touch logits
+### 不碰 logits 的库
 
-A retry-based client formats the schema into the prompt, parses the output, and retries on a validation failure, 3 times by default. It works across providers, and each retry costs latency and money. It is a different mechanism, not a weaker version of the same one.
+一种基于重试的客户端把 schema 格式化进 prompt，解析输出，校验失败就重试，默认 3 次。它能跨提供方使用，但每次重试都要付出延迟和费用。这是另一种机制，不是同一机制的弱化版。
 
 ## Follow-ups
 
-- **Level 2:** When does a finite-state machine not suffice? Expected: for recursive schemas; the machine flattens recursion to a fixed depth, and a context-free grammar engine is needed.
-- **Level 3:** What does a provider's plain JSON mode guarantee, and what does it not? Expected: valid JSON syntax, not conformance to your schema; always send a full schema.
-- **Level 3:** How does the retry library differ from the logit processor? Expected: it never changes the model's distribution; it validates after the fact and retries, which adds latency and cost per failure.
-- **Level 4:** The schema has an enum with 10,000 options and compilation times out. What do you do? Expected: predict a short list of candidates with a retriever first, then constrain the decode to those.
+- **Level 2:** 什么时候有限状态机不够用？ Expected: 遇到递归 schema 时；状态机只能把递归展平到固定深度，这时需要上下文无关语法引擎。
+- **Level 3:** 提供方普通的 JSON 模式保证什么，不保证什么？ Expected: 保证 JSON 语法合法，不保证符合你的 schema；始终要传完整的 schema。
+- **Level 3:** 重试库和 logit 处理器有什么不同？ Expected: 它从不改变模型的分布；它事后校验再重试，每次失败都增加延迟和费用。
+- **Level 4:** schema 里有一个 10,000 个选项的枚举，编译超时了。怎么办？ Expected: 先用检索器预测一个短的候选列表，再把解码约束到这些候选上。
 
 ## Wrong answers
 
-- "Constrained decoding makes the answer correct." It makes the answer valid for the grammar; a well-formed wrong answer still passes.
-- "Checking the grammar at every token makes generation slower." The valid-token sets are precomputed per state, and forced tokens skip the model, so it is often faster.
-- "Enough examples in the prompt reach full compliance." The lesson's figure for prompting alone is about 80 percent; a contract needs the logits or the server.
+- "约束解码能让答案正确。" 它让答案符合语法；格式正确的错误答案照样能通过。
+- "每个 token 都检查语法，生成会变慢。" 每个状态的合法 token 集合是预先算好的，被强制的 token 还能跳过模型，所以常常更快。
+- "prompt 里示例给得够多，就能完全遵守。" 课程里只靠 prompt 的数字约为 80%；要做成契约，得靠改 logits 或服务端约束。
 
 ## Taught in
 
-The [structured outputs lesson](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/) builds the logit processor and compares the three layers.
+[结构化输出课程](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/)实现了 logit 处理器，并对比了这三个层次。

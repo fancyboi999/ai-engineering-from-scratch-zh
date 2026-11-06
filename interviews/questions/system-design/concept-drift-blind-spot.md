@@ -1,6 +1,6 @@
 ---
 id: concept-drift-blind-spot
-title: Accuracy fell and every input monitor stayed green
+title: 准确率下降但所有输入监控指标全绿
 card: system-design
 kind: debug
 level: 3
@@ -16,53 +16,53 @@ related: [system-design/drift-monitoring-design, system-design/fraud-check-100ms
 updated: 2026-11-03
 ---
 
-A payment model's accuracy, measured as labels arrive, fell from 0.946 to between 0.76 and 0.79. The feature monitors and the score distribution stayed quiet the whole time. The team proposes retraining on the last quarter of labeled data tonight. What happened, why did the monitors miss it, and is the proposal right?
+在真实业务标签陆续返回后测得，某支付模型的准确率从 0.946 断崖式下跌到了 0.76 至 0.79 之间。然而在此期间，特征分布监控与预测得分分布监控全程毫无异常。团队提议今晚立即使用最近一个季度的带标签数据重新训练模型。请问发生了什么？为什么监控指标完全未能察觉？团队的提议是否正确？
 
 ## Short answer
 
-The relation between inputs and labels changed while the inputs themselves did not, which is concept drift. Input and prediction monitors compare distributions of features and scores, so a change in the conditional label distribution is invisible to them, and only the outcome monitor can see it, after the label delay. Retraining tonight on the last quarter is the wrong move: most of those labels still describe the old relation, so the model relearns it; collect labels from after the change first, then retrain on them.
+输入数据与标签之间的映射关系发生了改变，而输入特征本身的分布并未变化，这属于概念漂移。输入与预测监控对比的是特征与得分的边际分布，因此条件标签分布的变化对其完全不可见，在经历业务标签延迟后，只有结果监控才能捕捉到这一异常。今晚直接用最近一个季度数据重训是错误的举措：该季度绝大多数标签记录的依然是旧的映射关系，会导致模型重新学回错误规律；正确的做法是先收集变化发生之后的真实标签，再开展定向重新训练。
 
 ## Full answer
 
-### Three kinds of drift
+### 三种不同类型的漂移
 
-| Drift | What changes | Which monitor sees it |
+| 漂移类型 | 变化的内容 | 能够观测到的监控层 |
 |---|---|---|
-| Covariate | The input distribution | Input monitors |
-| Prior | The label rate | Prediction and outcome monitors |
-| Concept | The label given the input | Outcome monitors only |
+| 协变量漂移 | 输入特征的边际分布 | 输入监控层 |
+| 先验漂移 | 标签正例的整体比例 | 预测监控层与结果监控层 |
+| 概念漂移 | 给定输入下的条件标签概率分布 | 仅结果监控层 |
 
-Covariate drift moves features and often leaves accuracy alone. Prior drift moves the positive rate. Concept drift changes which answer is right for the same input, so nothing upstream of the label moves.
+协变量漂移改变的是特征分布，往往不影响分类准确率。先验漂移改变的是正例发生率。概念漂移则改变了相同输入对应的正确答案，因此在标签产生之前的上游链路不会出现任何波动。
 
-### What the demo shows
+### 课程实验展示的现象
 
-The lesson's stream injects both kinds. During the covariate segment the PSI and the KS statistic alert on the amount feature while accuracy stays between 0.89 and 0.95. During the concept segment the inputs are identical to the reference, both input monitors stay at their clean values, and accuracy falls from 0.946 to the 0.76 to 0.79 range. The accuracy alert fires 1000 events after the change, and the label delay of 500 events accounts for half of that lag.
+课程中的数据流注入了两种漂移。在协变量漂移阶段，PSI 与两样本 KS 统计量对交易金额特征触发了告警，而模型准确率依然稳定在 0.89 到 0.95 之间。在概念漂移阶段，输入特征与基准数据完全一致，两个输入监控指标均保持在正常数值，但准确率却从 0.946 下降到 0.76 至 0.79 范围。准确率告警在变化发生 1000 个事件后触发，其中 500 个事件的标签延迟贡献了一半的滞后时间。
 
-### Why the lag
+### 为何会存在观测滞后
 
-The outcome monitor always looks one label delay into the past, because it can only score the events whose outcome has arrived. The persistence rule, which requires consecutive drift windows before an alert, adds the rest. Both are deliberate: without them the alert rate is unusable.
+结果监控永远比当前真实时刻滞后一个标签延迟周期，因为它只能评估已经拿到真实业务结果的事件。此外，要求在连续多个漂移窗口内均超标才报警的持久性过滤规则，进一步拉长了响应周期。这两者都是有意为之的设计：若无这两项设计，告警频率会高到无法使用。
 
-### Why the retraining proposal is wrong
+### 为什么重训提议是错误的
 
-Retraining answers covariate drift into regions with little data. Concept drift needs labels from after the change. A quarter of labels where the change happened late in the window teaches mostly the old concept. The right sequence is: confirm the change point from the outcome monitor, gather enough labels past it, retrain on those, test on the most recent labeled slice, roll out through shadow and canary, and reset the reference window to the new training data.
+重新训练是应对协变量漂移向少样本区域扩散的有效手段。然而应对概念漂移，必须依赖漂移发生之后的新标签。在整整一个季度的数据中，若概念漂移发生在窗口尾声，大部分标签承载的依然是旧逻辑。正确的应对流程是：通过结果监控确认漂移发生的拐点、收集该拐点之后足量的标签样本、基于这批新标签重训模型、在最近的留出测试切片上验证、通过影子部署与金丝雀灰度发布，并将基准参考窗口重置为新的训练数据分布。
 
-### What to do tonight
+### 今晚应该采取的行动
 
-Route more cases to review if the business impact is large, as a temporary measure while labels from after the change arrive. A threshold move is the lesson's action for prior drift. For concept drift it helps only when the boundary moved on the same score, and it cannot restore a risk order that changed. Keep the model; replace it only with labels that describe the new relation.
+若业务影响重大，临时将更多案例交给审核，作为等待新标签沉淀期间的过渡风控手段。调整分类阈值是课程中针对先验漂移的应对举措；对于概念漂移，阈值调整仅在同一评分刻度上的边界发生平移时有效，而无法修复已经紊乱的风险排序关系。继续保留现有模型；唯有拿到真实反映新关系的数据标签后，方可替换模型。
 
 ## Follow-ups
 
-- **Level 3:** Which signal could you add that reacts before the labels? Expected: none for pure concept drift; a proxy such as a review queue outcome or a faster partial label is the only earlier signal.
-- **Level 3:** How does a performance estimator that uses predicted probabilities behave here? Expected: it assumes the calibration still holds, so it misses concept drift; the lesson notes that such estimators handle covariate shift and not concept drift.
-- **Level 4:** How do you choose how many post-change labels are enough? Expected: enough to test the retrained model on a recent held-out slice with a tolerance you set in advance; the test on recent labels is the gate, not a count.
-- **Level 4:** After retraining, the input monitors start to alert on the clean reference. Why? Expected: the reference window was not reset to the new training data, so it compares live traffic with an old distribution.
+- **Level 3:** 是否能引入某种信号，在真实标签返回前就做出反应？ Expected: 对于纯粹的概念漂移没有任何提前信号；只有审核队列的结果或更快到达的部分标签这类代理信号，才能更早提供信息。
+- **Level 3:** 利用预测概率估算模型表现的评估器在此场景下表现如何？ Expected: 它默认概率校准依然成立，因此会完全漏报概念漂移；课程特别指出此类估算器只能处理协变量漂移，无法应对概念漂移。
+- **Level 4:** 如何判定漂移发生后的新标签样本量已经足够？ Expected: 样本量足以在最近留出的测试集切片上，将重训模型的性能验证达到预先设定的容差要求；留出集的验证达标才是门禁准绳，而非单纯看样本数字。
+- **Level 4:** 重新训练后，输入监控竟然开始对干净的基准数据报警，为什么？ Expected: 基准参考窗口未同步重置为新的训练数据分布，导致它在拿线上新流量与早已过时的旧分布做对比。
 
 ## Wrong answers
 
-- "The feature monitors are broken; nothing changed in the inputs." They worked as designed; the inputs did not change, the labels did.
-- "Retrain on everything so the model sees the new pattern." The old labels outnumber the new ones and the model relearns the old relation.
-- "Shorten the windows to catch it faster." Smaller windows add noise and false alarms; the lag here comes from the label delay, which windows cannot remove.
+- "特征监控坏了；输入没有任何变化。" 监控完全按照预期工作；输入特征并未发生改变，是真实标签规则变了。
+- "全量重新训练所有历史数据，让模型看见新模式。" 历史旧标签数量远超新标签，模型会再次学回旧逻辑。
+- "缩短检测窗口以便更快报警。" 窗口过小会增加噪音和误报；此处的滞后源于标签延迟，缩小窗口无法消除该延迟。
 
 ## Taught in
 
-The [model monitoring lesson](../../../phases/02-ml-fundamentals/20-model-monitoring-and-drift/) runs the stream with injected covariate and concept drift and shows which monitor reacts to each.
+[模型监控课程](../../../phases/02-ml-fundamentals/20-model-monitoring-and-drift/)运行了注入协变量漂移与概念漂移的模拟数据流，并展示了各层监控对不同漂移的响应表现。

@@ -1,6 +1,6 @@
 ---
 id: warm-pool-or-cold-start
-title: A warm replica all night, or a cold start at eight
+title: 整夜保留热副本，还是八点冷启动
 card: cost-capacity
 kind: tradeoff
 level: 2
@@ -16,47 +16,47 @@ related: [cost-capacity/batch-lane-triage]
 updated: 2026-11-03
 ---
 
-Your serverless endpoint scales to zero overnight. The first request in the morning waits minutes while a 70B model loads, and the product wants the first token within two seconds. One engineer wants a replica that never sleeps. Another calls that a GPU burning money all night. Settle it.
+你的 Serverless 端点在夜间自动缩容至零。早晨的第一个请求在 70B 模型加载时等待了数分钟，而产品部门要求首个 token 在两秒内返回。一位工程师要求配置一个永不休眠的常驻副本，另一位工程师则指责这是在整夜白白烧钱。定夺该争议。
 
 ## Short answer
 
-Both are right, and the decision is arithmetic per path. A warm replica costs one GPU hour every hour whether anyone calls or not, and it removes a cold start of several minutes for a large model. An interactive path with a tight first-token target on a large model needs the warm replica, while a small model with a cold start of seconds, or a background path that tolerates minutes, scales to zero. Then shrink the cold start itself, so that fewer paths need a warm replica at all.
+两人说得都对，需要按业务路径分别算账。维持一个预热副本每小时都要支付完整的单卡 GPU 费用，无论是否有流量调用，但它能消除大模型数分钟的冷启动时间。具有严格首 token 延迟要求的大模型交互式路径必须配置预热副本；而冷启动仅需数秒的小模型、或能够容忍数分钟延迟的后台任务，则应缩容至零。然后缩短冷启动本身的时间，从而使更少的业务路径需要常驻预热副本。
 
 ## Full answer
 
-### What a cold start is made of
+### 冷启动的具体构成
 
-The lesson's anatomy for a 70B model on a fresh node: node provision 45 to 60 seconds, image pull 120 to 300 seconds, weights into GPU memory 45 to 120 seconds, engine init 10 to 30 seconds. The sum is 220 to 510 seconds, which is 3 to 8 minutes before one token. The vLLM manual measured one part of that on its own machine: 330 seconds to load 57 GiB of weights.
+课程针对全新节点上的 70B 模型给出的冷启动耗时拆解：节点调度分配 45 到 60 秒，容器镜像拉取 120 到 300 秒，权重加载至 GPU 显存 45 到 120 秒，引擎初始化 10 到 30 秒。合计为 220 到 510 秒，这意味着吐出第一个 token 之前需要等待 3 到 8 分钟。vLLM 手册在其自有机器上实测了其中的一部分：单是加载 57 GiB 权重就耗费了 330 秒。
 
-### The warm-pool arithmetic
+### 预热池的经济算术
 
-The lesson calls the arithmetic brutal on small models and kind on large ones. You pay 0.85 to 1.50 dollars an hour to avoid a 30 second start on a small model, and about 4 dollars an hour to avoid a 5 minute start on a large one. Five products with one warm replica each are 3,600 GPU-hours a month, called or not. The lesson's threshold: a warm pool becomes mandatory when the first-token target at P99 is under 60 seconds on a model of 70B or more.
+课程指出：预热池的算术在小模型上极其残酷，在大模型上则相对划算。为避免小模型 30 秒的冷启动，你每小时需要支付 0.85 到 1.50 美元；而为避免大模型 5 分钟的漫长挂起，每小时支付约 4 美元。若 5 个产品各自保留 1 个预热副本，每月无论有无调用都要支付累计 3,600 个 GPU 小时的费用。课程设定的强制配置门槛是：当 70B 及以上模型的 P99 首 token 延迟目标低于 60 秒时，预热池属于必须项。
 
-### Tier the paths
+### 业务路径分层策略
 
-| Path | Policy |
+| 业务路径 | 对应策略 |
 |---|---|
-| live chat, voice agent | one or two warm replicas |
-| nightly classification, batch | scale to zero, a cold start of minutes is fine |
-| premium tenant | dedicated warm capacity |
+| 实时在线对话、语音助手 | 1 到 2 个常驻预热副本 |
+| 夜间分类、离线批处理 | 缩容至零（Scale to Zero），数分钟的冷启动完全可以接受 |
+| 高级付费租户 | 分配专属独占预热算力 |
 
-### Shrink the cold start
+### 压缩冷启动本身
 
-Five layers, each removing a phase: a pre-seeded node image removes the image pull, model streaming halves the weight load, a GPU memory snapshot restores the loaded state in a fraction of the time, warm pools hide the rest, and tiered loading keeps weights in host memory. The lesson's table takes a 328 second cold start to about 15 seconds with the layers stacked, a reduction of 22 times. The vLLM manual adds the operational half: keep the weights on local disk, keep the compile cache on a persistent volume, and measure a cold and a warm start for every new image.
+五层缓解手段逐一消除冷启动阶段：预置节点镜像消除镜像拉取耗时，模型权重流式加载使加载耗时减半，GPU 显存快照在极短时间内恢复已加载状态，预热池掩盖剩余延迟，分层加载将权重暂存在主机内存中。课程表格显示，五层叠加后冷启动从 328 秒大幅压缩到了约 15 秒（缩减了 22 倍）。vLLM 手册补充了工程运维的一半要求：权重存放在本地高速磁盘、编译缓存保存在持久化卷上、并对每个新镜像分别测量冷启动与温启动基准。
 
 ## Follow-ups
 
-- **Level 2:** Which paths get a warm replica first? Expected: the interactive ones with a tight first-token target on a large model, such as live chat or a voice agent.
-- **Level 2:** Whose cold start is cheaper to hide, a small model's or a large one's? Expected: in proportion, the large one's. For a small model you pay a full GPU hour to avoid seconds, and for a large one the same hour avoids minutes.
-- **Level 3:** Name two mitigations that remove whole phases of the cold start. Expected: a pre-seeded node image removes the image pull, and a GPU memory snapshot removes most of the weight load and the init.
-- **Level 3:** What is the break-even request rate for a warm replica? Expected: the rate above which the cost of cold starts, in requests that miss the target, exceeds the hourly price of the idle GPU. The lesson's simulator computes it.
+- **Level 2:** 哪些业务路径应当最优先分配预热副本？ Expected: 运行大模型且对首 token 延迟有严格要求的交互路径，如实时聊天或语音 agent。
+- **Level 2:** 掩盖哪种模型的冷启动在经济比例上更划算？ Expected: 大模型；因为在小模型上你支付整整一小时费用仅为了避免几十秒延迟，而在大模型上相同的一小时能够避免数分钟的严重停摆。
+- **Level 3:** 列举两项能够完全消除冷启动某个阶段的缓解手段。 Expected: 预置镜像完全消除镜像拉取阶段；GPU 显存快照消除大部分权重加载与初始化工作。
+- **Level 3:** 部署预热副本的损益平衡请求速率是多少？ Expected: 当因冷启动导致请求未达标造成的业务损失代价，超过闲置 GPU 每小时租赁价格时的临界请求到达率；课程模拟器精确计算了这个值。
 
 ## Wrong answers
 
-- "Keep one warm replica everywhere, it is the simple answer." It is one GPU hour every hour per product. Five products idle all night cost thousands of GPU hours a month.
-- "Scale to zero everywhere and let the first user wait." A first-token wait of minutes on an interactive path is an outage, not a wait.
-- "A bigger GPU loads faster." The load is bound by the storage and the copy path. The fix is where the weights live and whether a snapshot exists.
+- "为所有业务层级都保留一个预热副本，这是最简单的做法。" 每个产品一个副本每小时都在产生费用；5 个产品整夜闲置每月将白白烧掉数千个 GPU 小时。
+- "所有业务一律缩容至零，让清晨的第一个用户等一等。" 在交互链路上等待数分钟的首 token 属于严重的线上事故，绝非正常的等待。
+- "配置更大的 GPU，加载自然更快。" 瓶颈受限于存储读取与主机张量复制通道；核心解法在于权重存放介质以及是否存在显存快照。
 
 ## Taught in
 
-The [cold start lesson](../../../phases/17-infrastructure-and-production/10-cold-start-mitigation/) gives the cost of a warm replica and the five mitigation layers, and the [production section of vLLM 101](../../../manuals/vllm-101/sections/7-2-run-vllm-in-production.md) measures the weight load and keeps the compile cache.
+[冷启动缓解课程](../../../phases/17-infrastructure-and-production/10-cold-start-mitigation/)给出了预热副本的成本核算与五层缓解方案，[在生产环境运行 vLLM](../../../manuals/vllm-101/sections/7-2-run-vllm-in-production.md)实测了权重加载耗时并持久化编译缓存。

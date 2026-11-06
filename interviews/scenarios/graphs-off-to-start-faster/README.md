@@ -1,6 +1,6 @@
 ---
 id: graphs-off-to-start-faster
-title: CUDA graphs turned off to start faster
+title: 为加快启动关闭 CUDA 图优化
 card: scenarios
 kind: incident
 level: 2
@@ -33,56 +33,56 @@ source:
 
 ## Situation
 
-A team runs `Qwen/Qwen3-30B-A3B-Instruct-2507` on GB10 nodes behind an autoscaler. New pods take more than six minutes to become ready, so the autoscaler starts extra pods during every ramp and the bill grows. An engineer reads the startup log, sees that it captures CUDA graphs twice, and proposes to disable both graph backends: "capture is pure startup cost, and the prefill capture alone takes half a minute". A reviewer blocks the change: "graphs are what make decode fast, you will double the time per token".
+一个团队在弹性扩缩容组背后的 GB10 节点集群上运行 `Qwen/Qwen3-30B-A3B-Instruct-2507`。新 Pod 需要六分多钟才能达到就绪状态，导致扩缩容组在每次流量攀升期间都拉起过多冗余 Pod，大幅推高了基础设施开销。一名工程师查看启动日志，发现它捕获了两次 CUDA 图，提议将两处图后端彻底关闭：“捕获完全属于冷启动沉没成本，仅 prefill 图捕获一项就耗费了半分钟”。一名审查者阻拦了该改动：“图优化是解码性能的基石，关闭它会使单 token 耗时翻倍”。
 
-Both have read the same log and neither has measured. The pod has been restarted with each setting, and the kit output for both servers is on the shared drive.
+双方都读了同一份日志，但谁也没做过实际测量。团队针对两种设置分别重启了 Pod，两台服务器的完整测试套件输出均保存在共享存储中。
 
 ## Evidence
 
-- [the server command with both graph backends disabled](evidence/the-change.txt)
-- [the end of startup on the default server, with the timings line](evidence/startup-with-graphs.txt)
-- [the startup phases of the server without graphs](evidence/startup-without-graphs.txt)
-- [median TPOT and output with and without graphs, three seeds, 1 to 64 users](evidence/decode-on-the-gb10.txt)
-- [one kit run at one user with graphs on](evidence/one-user-with-graphs.txt)
-- [the same kit run at one user with graphs off](evidence/one-user-without-graphs.txt)
-- [the position of the manual on graphs, memory and startup](evidence/the-position.txt)
+- [关闭两类图优化后启动服务器的完整命令](evidence/the-change.txt)
+- [默认配置服务器启动阶段的末尾内容及各阶段耗时输出行](evidence/startup-with-graphs.txt)
+- [未开启 CUDA 图的服务器各启动阶段耗时明细](evidence/startup-without-graphs.txt)
+- [在三种随机种子与 1 至 64 用户并发下的中位数 TPOT 与吞吐对比](evidence/decode-on-the-gb10.txt)
+- [单用户并发且开启图优化时测试套件的单次运行数据](evidence/one-user-with-graphs.txt)
+- [单用户并发且关闭图优化时测试套件的单次运行数据](evidence/one-user-without-graphs.txt)
+- [技术手册关于图优化、显存开销与启动耗时的权威立场](evidence/the-position.txt)
 
 ## Questions
 
-1. From the startup timings line, where do the six minutes go, and how much of that is graph capture?
-2. What does a CUDA graph remove from a decode step, and on which model and GPU is that removal worth the most?
-3. Read the two kit runs at one user. What did graphs change in the typical token gap, and what in the worst one?
-4. The three-seed table shows a GB10 result that differs from the L4 result in the manual. Why would two cards disagree about the same feature?
-5. Does disabling graphs fix the autoscaler? What does?
-6. When would the reviewer be right? Name the model shape and the load.
+1. 根据启动阶段耗时行，六分多钟主要消耗在哪里，其中图捕获占据了多大比例？
+2. CUDA 图在解码步中消除了什么开销，在何种模型结构与 GPU 硬件组合下该优化的价值最大？
+3. 阅读单用户下的两次单次测试数据。图优化对典型 token 间隔和最差尾部延迟带来了何种改变？
+4. 三种子测试表在 GB10 上得出的结论与手册在 L4 上的结论不尽相同。为什么两块显卡对同一项功能会表现出分歧？
+5. 关闭图优化能否解决弹性扩缩容的滞后问题？真正有效的解法是什么？
+6. 在什么情况下审查者的担忧会成为现实？指出具体模型结构特征与负载条件。
 
 ## Walkthrough
 
-1. **Read the timings line of the default server.** It reads `load_weight=323.61`, `kv_cache_allocation=2.09`, `scheduler_e2e=369.03`, `cuda_graph={prefill=35.06, decode=4.61, ...}` and `tokenizer_e2e=373.52`. The weight load is 323.61 s of a 373.52 s start. The prefill capture took 35.06 s and the decode capture 4.61 s. The captures also cost memory: the section gives 2.14 GB for prefill and 1.73 GB for decode.
-2. **Read the startup without graphs.** The server logged that the prefill graph was disabled because the config resolved the backend to `disabled`, allocated a pool of 258017 tokens against 227243 with graphs, and finished with `scheduler_e2e=341.39` and `tokenizer_e2e=346.34`, with every graph field at 0.00. Its weight load was 322.24 s. So the change saved the capture time and bought a larger pool, and the start still took 346.34 s, because 322.24 s of weight load sit inside it.
-3. **Know what a graph saves.** A decode step is hundreds of small kernel launches, one token per request each. A graph records them once and replays them with one CPU call. The saving is launch time, a fixed cost per step that matters when the step itself is short: a small dense model on a fast GPU at batch 1 is the case the mechanism was built for.
-4. **Read the three-seed table.** On this mixture-of-experts model on the GB10, the median TPOT was 32.52 ms with graphs against 33.09 without at one user, 102.21 against 104.77 at 8 users, and 254.06 against 253.77 at 64. Output was 29.14 against 28.72, 74.11 against 73.46, and 235.38 against 235.79. The manual's reading: a step of this model takes about 32 ms at batch 1, memory bandwidth sets that time, and the launch time a graph removes is small next to it.
-5. **Read the kit's single runs.** At one user with graphs: a median TPOT of 30.84 ms, a median ITL of 30.79 and a P99 ITL of 32.21. Without graphs: 31.29, 31.40 and 41.72. The medians agree with the three-seed table. The P99 ITL moved more, from 32.21 to 41.72 ms, but these are single runs with no clock record, so the tail is a lead to measure, not a result. At 8 users the kit read 97.30 against 100.03 ms. Do not use the first-token column of these runs for the comparison, because the kit never flushed the cache between runs.
-6. **Read the position.** Keep graphs on and size them to your traffic. Do not turn them off to fix memory; lower `--cuda-graph-max-bs-decode` or `--mem-fraction-static` instead. On the GB10 graphs changed decode by 3 percent or less, and on the L4 with a dense 8B model they saved about 1 percent of each step. The old flag `--disable-cuda-graph` still works at v0.5.22 and is deprecated in favor of the two per-phase flags in the command.
+1. **分析默认服务器的耗时汇总行。** 日志清晰记录：`load_weight=323.61`，`kv_cache_allocation=2.09`，`scheduler_e2e=369.03`，`cuda_graph={prefill=35.06, decode=4.61, ...}`，`tokenizer_e2e=373.52`。权重加载在总计 373.52 s 的启动耗时中占据了 323.61 s。prefill 图捕获耗时 35.06 s，decode 图捕获耗时 4.61 s。捕获同时需要占用显存：手册指明 prefill 占用 2.14 GB，decode 占用 1.73 GB。
+2. **分析关闭图优化后的启动日志。** 服务器记录由于配置将后端解析为 `disabled`，prefill 图捕获已被跳过，显存池分配了 258017 个 token（对比开启图优化时的 227243），并最终以 `scheduler_e2e=341.39`、`tokenizer_e2e=346.34` 结束启动，所有图相关统计项均为 0.00。其权重加载依然耗费了 322.24 s。该调整确实省去了图捕获耗时并换取了稍大的显存池，但总启动耗时依然高达 346.34 s，因为占据统治地位的 322.24 s 权重加载分毫未减。
+3. **理解 CUDA 图的核心优化原理。** 单个解码步包含数百个微小算子内核的发射过程（每个请求一个 token）。CUDA 图仅需在初始化时捕获记录一次，后续便能通过一次 CPU 调用完成全量重放。其消除的是内核发射开销（发射属于每步固定的时间常数）。当解码步本身的计算耗时极短时，该项优化才最为关键：在高速 GPU 上以 batch 1 运行小型稠密模型正是该机制诞生的初衷场景。
+4. **解读三种子实测数据。** 在 GB10 上运行该混合专家模型时：单用户下中位数 TPOT 在开启图优化时为 32.52 ms，关闭时为 33.09 ms；8 用户下为 102.21 ms 对比 104.77 ms；64 用户下为 254.06 ms 对比 253.77 ms。输出吞吐在各并发档位下分别为 29.14 对 28.72、74.11 对 73.46 以及 235.38 对 235.79。手册给出的专业解读：该模型在 batch 1 下单步耗时约 32 ms，受显存带宽严格限制，CUDA 图所省去的那点微秒级发射时间在显存读取开销面前完全可以忽略不计。
+5. **对比单次运行的尾部延迟。** 单用户下开启图优化时：中位数 TPOT 为 30.84 ms，中位数 ITL 为 30.79 ms，P99 ITL 为 32.21 ms；关闭图优化时分别为 31.29 ms、31.40 ms 和 41.72 ms。中位数表现与三种子统计吻合。P99 ITL 变动较大（从 32.21 升至 41.72 ms），但这属于没有时钟记录的单次运行，因此该尾部数据是一条有待测量的线索而非定论。在 8 用户下套件记录为 97.30 对比 100.03 ms。请勿使用这些运行的首字时间列做对比，因为套件在各次运行之间从未清理过缓存。
+6. **明确官方技术立场。** 始终保持图优化开启，并根据业务流量特征调整规模。切勿为了省显存而粗暴关闭图优化，应改为调小 `--cuda-graph-max-bs-decode` 或降低 `--mem-fraction-static`。在 GB10 上图优化对解码耗时的影响在 3% 以内，在搭载稠密 8B 模型的 L4 上图优化为每步节省了约 1% 的时间。旧参数 `--disable-cuda-graph` 在 v0.5.22 下依然兼容，但已被推荐废弃，转而采用按阶段细化的专用参数。
 
 ## Resolution
 
-Neither engineer was right about the size. Disabling the graphs saved the capture, 35.06 s for prefill and 4.61 s for decode, and the start still took 346.34 s instead of 373.52, because 322.24 s of weight load dominate the start. On the decode side the reviewer's fear did not materialize on this model and card: the median time per token changed by 3 percent or less from 1 to 64 users, and the output stayed within the seed spread.
+两位工程师在规模量级上的预估均存在偏差。关闭图优化省去了 35.06 s 的 prefill 捕获和 4.61 s 的 decode 捕获，但启动总耗时依然高达 346.34 s（对比原先的 373.52 s），因为耗时 322.24 s 的权重加载才是决定性因素。在解码吞吐侧，审查者所担忧的单字耗时翻倍在该模型与显卡上并未发生：从 1 到 64 用户并发，单 token 中位数耗时的变化幅度不超过 3%，输出完全处于随机误差范围内。
 
-So the change does not solve the ramp, and the weight load is the problem to work on. Keep the weights on a local drive, keep the server running between ramps, mount the kernel caches and the model cache on volumes that survive the pod, and set the readiness probe and the scale-up policy from the measured 373.52 s, as the operating page describes. Keep the graphs on, because a server without decode graphs pays launch time on every token for every user, and that cost shows on smaller dense models where the step is short. If the team wants the memory back, the lever is `--cuda-graph-max-bs-decode`, not the capture itself. Before any change of this kind, measure the pair with a clock record and three seeds, as the table did, and read the tail as well as the median.
+因此该改动根本无法解决扩缩容滞后的问题，权重加载才是必须攻坚的真正瓶颈。将模型权重固化在本地高速硬盘中，在扩容间隙保持服务常驻运行，将内核缓存与模型缓存挂载在跨 Pod 生命周期的持久化数据卷上，并根据实测的 373.52 s 启动基准重新设定 readiness 探针与扩缩容策略。坚持开启图优化，因为缺少解码图优化的服务器在每个用户的每个 token 上都需要付出底层发射时间代价，该开销在计算步更短的轻量稠密模型上会变得极为显著。如果团队希望回收显存空间，正确的抓手是调整 `--cuda-graph-max-bs-decode` 而非关闭图优化。在推进类似决策前，必须在锁定时钟并采用三种子复核的前提下开展对比实测，同时关注中位数与尾部延迟。
 
 ## Wrong turns
 
-- "Capture is pure startup cost, so remove it." It is 35.06 plus 4.61 s of a start that spends 323.61 s loading weights. Removing it moved the start from 373.52 to 346.34 s and left the ramp problem in place.
-- "Without graphs the time per token doubles." On this mixture-of-experts model on the GB10, the median TPOT moved from 32.52 to 33.09 ms at one user and from 254.06 to 253.77 at 64. The step is bound by memory bandwidth, not by launches.
-- "The GB10 result settles it for every model." On the L4 with a dense 8B model the graphs saved about 1 percent of each step, and on a small model on a fast GPU the launch share is larger still. The saving is a property of the step length.
-- "Turn graphs off to get the KV pool back." The pool grew from 227243 to 258017 tokens, but the manual says to lower the graph batch size or the memory fraction instead, so that decode keeps its graphs.
-- "Read the kit's first-token column to settle the tail." The kit never flushed the cache between runs, so the first token is not comparable. The P99 ITL gap at one user, 32.21 against 41.72 ms, needs a run with seeds and a clock record first.
+- "捕获纯属冷启动沉没成本，应彻底移除。" 捕获仅占 35.06+4.61 s，而权重加载耗费了 323.61 s。关闭优化使启动时间从 373.52 降至 346.34 s，扩缩容滞后问题依然如故。
+- "关闭图优化会使单 token 耗时翻倍。" 在 GB10 上的该 MoE 模型中，中位数 TPOT 在单用户下仅从 32.52 变为 33.09 ms，在 64 用户下从 254.06 变为 253.77 ms。瓶颈在于内存带宽而非内核发射。
+- "GB10 的结论适用于所有模型。" 在运行稠密 8B 模型的 L4 上，图优化为每步节省了约 1% 的时间，而在高速显卡运行小模型时发射占比会更高。收益大小取决于单步计算的物理耗时。
+- "关闭图优化以回收 KV 显存池容量。" 显存池虽然从 227243 增至 258017 个 token，但手册明确建议调低图捕获最大批次或调低显存比例，以保留解码图优化。
+- "直接参考测试套件的首字时间列来评估尾部表现。" 测试套件在测试间从未清理缓存，首字时间不具备可比性。单用户下 P99 ITL 从 32.21 到 41.72 ms 的差距需要在锁定时钟与多随机种子下重新验证。
 
 ## Generalize
 
-Read where the time goes before you remove a phase. A startup, like a decode step, is a sum of parts of very different sizes, and the part that is easy to remove is rarely the part that dominates. Measure the cost and the gain of a feature on your own model and GPU, at your load, with seeds and a clock record, because a saving that is real on one step length is noise on another.
+在移除某个流程阶段之前，必须先厘清总耗时的时间分配结构。冷启动与解码步类似，都是由各阶段极不均衡的时间开销累加而成的，容易被砍掉的部分往往脱离了绝对主导的地位。在自有模型、硬件和负载组合下，用固定时钟和多随机种子实测某项优化的实际成本与收益；在一个步长下真实存在的收益，在另一个步长下可能完全等同于系统噪声。
 
 ## Taught in
 
-The SGLang manual measures the pair on the GB10 and on the L4 in [the CUDA graphs page](../../../manuals/sglang-101/sections/4-1-forwardmode-and-cuda-graphs.md#what-we-measured-on-a-gb10) and breaks a cold start into its phases in [the operating page](../../../manuals/sglang-101/sections/7-1-operating-sglang.md#cold-start-is-weights-plus-compilers).
+SGLang 手册在[CUDA 图页面](../../../manuals/sglang-101/sections/4-1-forwardmode-and-cuda-graphs.md#what-we-measured-on-a-gb10)记录了 GB10 与 L4 上的实测数据，并在[运维页面](../../../manuals/sglang-101/sections/7-1-operating-sglang.md#cold-start-is-weights-plus-compilers)将冷启动拆解为了权重与编译等具体构成阶段。

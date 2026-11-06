@@ -1,6 +1,6 @@
 ---
 id: pick-the-peak-rate-and-schedule
-title: Choose a peak learning rate and a schedule in a few hours
+title: 在数小时算力预算内确定峰值学习率与调度策略
 card: deep-learning
 kind: design
 level: 4
@@ -16,57 +16,57 @@ related: [deep-learning/cosine-warmup-schedule-boundaries, deep-learning/loss-be
 updated: 2026-11-03
 ---
 
-You inherit a model with no known good learning rate and a compute budget of a few hours. Design the procedure that picks the peak learning rate and the schedule for the run, and say what you log to defend the choice.
+你接手了一个没有已知合适学习率的模型，且总体计算预算仅有数小时。请设计一套能在短时间内确定峰值学习率和调度策略的工程流程，并说明记录哪些指标来为该技术选型提供依据。
 
 ## Short answer
 
-Run a learning rate range test first: train for about a hundred steps while the rate grows exponentially from 1e-7 toward 10 and record the loss at each rate. Take the rate where the loss falls fastest and set the peak about 10 times lower. Then run a linear warmup over 1 to 5 percent of the steps into a cosine decay with a floor near a tenth of the peak, or the 1cycle policy when the budget is short and the total step count is fixed. Log the range test curve, the schedule curve and the gradient norm beside the learning rate at every step.
+首先执行学习率范围测试（LR Range Test）：训练约 100 步，同时让学习率从 1e-7 指数级增长到 10，记录每个学习率对应的损失。选取损失下降速度最陡峭处的学习率，并将峰值学习率设为其约十分之一。随后根据计算预算选择调度器：若训练步数固定且时间紧迫，使用 1cycle 策略；对于中等或长周期训练，采用占总步数 1% 到 5% 的线性预热紧随余弦衰减（底线值约为峰值的十分之一）。记录范围测试曲线和调度曲线，并在每一步把梯度范数与学习率一起写入日志。
 
 ## Full answer
 
-### Step one: measure, do not guess
+### 第一步：用测量代替盲猜
 
-The debugging lesson's range test: save the weights, start at 1e-7, multiply the rate by a constant factor each step so it reaches about 10 after a hundred steps, record the loss, and stop when the loss turns NaN or exceeds ten times the best value seen. Restore the weights. The loss is flat at the low end, falls fastest around some rate, reaches its minimum, and diverges. The suggested peak is about 10 times below the steepest fall, which in the lesson's example puts the best rate near 1e-3 when the steepest point sits near 1e-2. The lesson's second rule covers the case where the curve is unclear: try three rates 10 times apart, such as 1e-2, 1e-3 and 1e-4, and read the loss after a few epochs.
+调试课程中给出的范围测试流程：先暂存模型初始权重，从 1e-7 起步，每一步将学习率乘以固定常数因子，使得经过约 100 步后达到 10；记录每步损失，并在损失变为 NaN 或超过历史最低损失 10 倍时提前终止；最后恢复初始权重。损失曲线通常在低学习率端保持平直，在某个学习率附近下降最快，达到最低点后剧烈发散。推荐的峰值学习率应定在下降最陡峭点的下方约 10 倍处；课程示例中当最陡峭点在 1e-2 附近时，最佳选型在 1e-3 左右。对于曲线形态不够清晰的情况，课程给出的备选方案是尝试三个相差 10 倍的学习率（如 1e-2、1e-3 和 1e-4），并在若干 epoch 后观察损失。
 
-### Step two: pick the shape from the budget
+### 第二步：根据算力预算选择调度形态
 
-| Situation | Schedule | Why |
+| 场景 | 调度策略 | 选型原因 |
 |---|---|---|
-| Total steps unknown | constant, with manual drops | nothing else can be computed |
-| Hours, step count fixed | 1cycle | fastest convergence for a fixed budget |
-| Moderate budget | cosine, floor at a tenth of the peak | safe default with no extra knobs |
-| Days or weeks | warmup plus cosine | the default for large transformer runs |
+| 总步数未知 | 常数学习率，配合人工阶梯下调 | 无法提前计算调度函数轨迹 |
+| 仅数小时且总步数固定 | 1cycle 策略 | 在固定短期计算预算下收敛最快 |
+| 中等算力预算 | 余弦衰减，底线为峰值的十分之一 | 安全通用的默认选择，无多余旋钮 |
+| 数天或数周的长程训练 | 线性预热加余弦衰减 | 大规模 Transformer 训练的标准配置 |
 
-For a few hours with a known step count the schedules lesson points at 1cycle, which ramps from the peak over 25 up to the peak over the first half and down to the peak over 10000 in the second half. For anything longer, warmup plus cosine with a warmup of 1 to 5 percent. With an adaptive optimizer the warmup is not optional: its moment estimates are poor for the first steps.
+在总步数确定的数小时短训中，调度器课程首选 1cycle 策略：在前半段从峰值除以 25 升至峰值，并在后半段平滑降至峰值除以 10000。对于更长周期的训练，选择预热占比为 1% 到 5% 的预热余弦衰减。配合自适应优化器时预热必不可少：优化器在最初若干步的矩估计充满噪声。
 
-### Step three: sanity check the peak
+### 第三步：验证选定峰值的鲁棒性
 
-The schedules lesson's sensitivity run trains a few epochs at a constant rate and labels each run diverged, barely moved, learning or converged. Run it at the chosen peak and at the rates one step above and below. The peak should land in learning or converged, and the rate above it should show the first signs of trouble.
+调度器课程的敏感度测试：以恒定学习率试跑几个 epoch，并将每个任务标记为发散、几乎不动、正常学习或完全收敛。在选定峰值以及高低各一级的学习率上分别测试。选定的峰值应处于正常学习或收敛状态，而高于该峰值的学习率应当开始出现不稳定的早期征兆。
 
-### What to log
+### 需要沉淀记录的证据产物
 
-- The range test curve, loss against rate on a log axis, with the chosen peak marked.
-- The schedule rendered over the step axis, saved in the run directory so a reviewer can read it without running anything.
-- Per step: step, learning rate, gradient L2 norm and loss, in that order. The capstone lesson's rule is that a healthy warmup shows the norm rising with the rate and settling after the peak, and that a peak set too high shows a norm that stays high.
-- The four schedule numbers in a versioned config, with the warmup as a fraction of the total so the choice survives a longer run.
+- 范围测试曲线：对数坐标轴上的损失对学习率曲线，并明确标注选定的峰值。
+- 渲染到步数坐标轴上的调度曲线，保存在运行目录中，供评审人员免运行复核。
+- 逐步明细指标：按步数、学习率、梯度 L2 范数和损失的顺序逐步打点。综合项目课程的准则：健康的预热会看到梯度范数随学习率平稳上升并在峰值后趋于平缓；峰值过高则表现为梯度范数居高不下。
+- 在版本控制配置文件中记录调度器的 4 个核心参数，预热设为总步数的比例，使配置在后续延长训练时自动适配。
 
-### Defaults for when there is no time
+### 缺乏测试时间时的备选默认值
 
-The optimizers lesson's fallback: AdamW at 3e-4 with weight decay 0.01 for an unknown model, 2e-5 for fine-tuning a pretrained one. Treat these as the starting point of the range test, not as its result.
+优化器课程给出的备选默认值：未知模型选用 AdamW 配合 3e-4 学习率与 0.01 权重衰减；预训练模型微调选用 2e-5。应将这些基准视为范围测试的起点，而非免检的最终答案。
 
 ## Follow-ups
 
-- **Level 3:** Why set the peak below the steepest point rather than at it? Expected: the steepest point is close to where the loss starts to diverge, and a long run needs a margin; one order of magnitude lower keeps it.
-- **Level 4:** When do you choose 1cycle over warmup plus cosine? Expected: a short, fixed budget where the total step count is known; it converges faster for a fixed compute and needs the step count in advance.
-- **Level 4:** The peak is right and the loss still oscillates near the end. What do you adjust? Expected: the decay, not the peak; a schedule that ends too high leaves steps too large for the final minimum, so lower the floor or lengthen the decay.
-- **Level 4:** How does the model's size change the plan? Expected: sweep the peak on a smaller version first as a prior, then confirm with the range test on the full model, because the optimum shifts with size.
+- **Level 3:** 为什么峰值学习率应定在曲线下降最陡峭点的下方而非直接取最陡峭点？ Expected: 最陡峭点紧挨着损失发散拐点，生产级长程训练需要留出安全容错边界；下调一个数量级能兼顾收敛速度与稳定性。
+- **Level 4:** 什么时候选择 1cycle 优于预热余弦退火？ Expected: 计算预算较少、总步数完全固定且已知时；1cycle 在固定算力下收敛更快，而且需要预先知道总步数。
+- **Level 4:** 峰值学习率准确但在训练末期损失依然震荡，应该调整什么？ Expected: 调整末端衰减策略而非调整峰值；末端学习率过高会导致无法稳定落入极小值低谷，应调低底线值或拉长衰减区间。
+- **Level 4:** 模型规模变大时，方案如何随之调整？ Expected: 先在小模型上扫描峰值作为先验，然后在大模型上用范围测试确认，因为最优学习率会随模型规模移动。
 
 ## Wrong answers
 
-- "Use 3e-4 for Adam, it always works." It is the lesson's starting default when nothing is known, not a result; the range test takes minutes and replaces a guess with a measurement.
-- "Pick the rate with the lowest loss in the range test." The lowest point sits next to divergence; the lesson picks about 10 times lower than the steepest fall.
-- "A constant rate is fine if it is the right one." The right rate changes during training; a constant that fits the start is too large at the end, and the lesson keeps constant rates for small models and debugging.
+- "对于 Adam 优化器直接用 3e-4，它总是有效的。" 3e-4 只是毫无先验时的初始默认值而非确定结论；范围测试仅耗时数分钟，能用客观实测取代主观盲猜。
+- "选取学习率范围测试中损失绝对值最低的点作为峰值。" 最低点已经处于发散崩溃的悬崖边缘；课程选取的是下降最陡峭点下方约 10 倍处的安全值。
+- "只要选对了最佳学习率，全程保持常数不变即可。" 最优学习率随训练阶段动态演变；起步阶段合适的学习率在训练收敛阶段严重过大，常数配置只适合微型模型或调试。
 
 ## Taught in
 
-The [debugging lesson](../../../phases/03-deep-learning-core/13-debugging-neural-networks/) builds the range test, the [learning rate schedules lesson](../../../phases/03-deep-learning-core/09-learning-rate-schedules/) compares the schedules and gives the decision flow, the [optimizers lesson](../../../phases/03-deep-learning-core/06-optimizers/) gives the fallback defaults, and the [cosine warmup capstone](../../../phases/19-capstone-projects/44-cosine-lr-warmup/) sets the logging schema.
+[神经网络调试课程](../../../phases/03-deep-learning-core/13-debugging-neural-networks/)构建了学习率范围测试，[学习率调度器课程](../../../phases/03-deep-learning-core/09-learning-rate-schedules/)对比了调度形态并给出了决策流程，[优化器课程](../../../phases/03-deep-learning-core/06-optimizers/)给出了备选默认值，[余弦退火预热综合实战](../../../phases/19-capstone-projects/44-cosine-lr-warmup/)定义了日志记录规范。

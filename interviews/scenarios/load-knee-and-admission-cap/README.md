@@ -1,6 +1,6 @@
 ---
 id: load-knee-and-admission-cap
-title: The load knee and the cap that made it worse
+title: 负载拐点与让卡顿恶化的并发上限配置
 card: scenarios
 kind: incident
 level: 3
@@ -29,61 +29,57 @@ source:
 
 ## Situation
 
-A chat service streams answers from `Qwen/Qwen3-8B` on one L4 with vLLM. Its target is a first token within one second and 100 ms or less between tokens. At busy hours the service has 64 users at once, and the stream stalls: users see a token, then a gap of more than a second, then a burst. Throughput on the dashboard still looks fine, 241.39 tokens per second.
+一个聊天服务在单张 L4 上使用 vLLM 为 `Qwen/Qwen3-8B` 提供流式响应服务。其服务等级目标是首字延迟小于 1 秒且 token 间延迟小于等于 100 ms。在业务高峰期该服务有 64 个并发用户，流式输出出现明显卡顿：用户看到输出一个 token，随后停顿超过一秒，紧接着吐出一串文本。大盘上的吞吐量指标看起来依然正常，保持在每秒 241.39 个 token。
 
-An engineer reads that `--max-num-seqs` limits the requests that run at once, and lowers it from the default of 256 to 16 to make each stream smoother. The next morning the gaps are still there, and the median wait for the first token is now about a minute. A second engineer proposes to switch the engine, because a competing engine kept the gaps near 150 ms on the same card in a published table.
+一名工程师了解到 `--max-num-seqs` 能够限制同时运行的请求数，便将其从默认的 256 调低到 16，期望让每条流更平滑。次日清晨卡顿停顿依旧存在，且首字等待时间的中位数恶化到了约一分钟。第二位工程师提议更换推理引擎，因为某公开对比测试表格声称竞品引擎在同一显卡上能将停顿控制在 150 ms 附近。
 
 ## Evidence
 
-- [the chat sweep with the share of requests that met the target](evidence/chat-target-by-users.txt)
-- [the share that met the target and the P99 ITL, with and without a cache reset before each run](evidence/flushed-against-unflushed.txt)
-- [a cap of 16 sequences against the default at 32 users](evidence/cap-of-16-at-32-users.txt)
-- [two engines with the same pool, from 1 to 64 users](evidence/two-engines-at-a-full-pool.txt)
-- [the SGLang pool and one decode line at a cap of 64](evidence/sglang-stats-at-64.txt)
-- [the vLLM pool and one stats line at a cap of 64](evidence/vllm-stats-at-64.txt)
-- [every admission cap that we tried at 64 users](evidence/caps-at-64-users.txt)
+- [聊天压测扫描中各用户数下满足 SLO 目标的请求比例](evidence/chat-target-by-users.txt)
+- [每次运行前执行与不执行缓存清理对达标比例与 P99 ITL 的影响](evidence/flushed-against-unflushed.txt)
+- [32 用户并发下将并发序列限制为 16 与默认参数的对比数据](evidence/cap-of-16-at-32-users.txt)
+- [相同显存池下两套引擎在 1 到 64 用户并发下的表现](evidence/two-engines-at-a-full-pool.txt)
+- [SGLang 在 64 并发上限时的显存池与单条解码日志行](evidence/sglang-stats-at-64.txt)
+- [vLLM 在 64 并发上限时的显存池与单条统计日志行](evidence/vllm-stats-at-64.txt)
+- [我们在 64 用户下尝试过的所有并发准入上限测试记录](evidence/caps-at-64-users.txt)
 
 ## Questions
 
-1. Which two numbers does a chat user feel, and why is throughput the wrong number to watch here?
-2. Read the first listing. At which user count does the service stop meeting the target, and what rises first, the first token or the gaps between tokens?
-3. What does a cap on running sequences change inside one scheduler step, and what does it leave unchanged?
-4. Both engines write the same tokens per second at 64 users. Explain from the two log lines why one gives the first token sooner and the other keeps the stream smooth.
-5. The last listing tries six caps. State the result in one sentence, then say what does fix the gaps on this card.
-6. Suppose you must keep vLLM. Which flag, which replica count, and which metric do you set, and how do you prove the fix?
+1. 聊天用户能够直观感受到的两个核心指标是什么，为什么总吞吐量在此场景下是错误的观察指标？
+2. 阅读首个测试列表。在达到多少用户数时服务开始脱离达标区间，首字延迟与 token 间卡顿哪个先发生恶化？
+3. 针对并发运行序列设定上限改变了单个调度步内部的什么，又对什么完全没有改变？
+4. 两套引擎在 64 用户下输出了完全相同的每秒 token 数。结合两条日志行解释为什么一个首字更快而另一个保持流更平滑。
+5. 最后一项记录测试了六种上限设置。用一句话总结其结果，并说明在当前显卡上消除卡顿的真正解法是什么。
+6. 假定必须继续使用 vLLM。应配置什么参数、规划多少副本数、监控什么指标，如何证明该修复有效？
 
 ## Walkthrough
 
-A chat user feels the time to the first token and the gap between tokens, the inter-token latency. Throughput is the bill, not the experience. One long pause in a stream feels worse than a slightly slower stream, so the number to watch is the P99 ITL, the worst gap in 100.
-
-The first listing is the sweep from the full-clock session. At 8 users, 75 percent of the requests met the target and the P99 ITL was 67 ms. At 16 users the share was 64 percent at 85 ms. At 32 users the output still rose to 275.1 tokens per second, but the P99 ITL grew to 613 ms and no request met the target. At 64 users the first token took 11.18 s and the P99 ITL was 1,233 ms. So the gaps break before the output stops growing. This sweep did not reset the prefix cache between user counts, so the low rows read the first token too fast. The second listing holds the rerun that reset the cache ahead of every run and the clock locked at 900 MHz. At 8 users, 50 percent met the target against 75 to 81 percent without the reset. At 16 users it was 25 percent against 64 to 66 percent, and the P99 ITL was 522 to 523 ms with the reset against 82 to 84 ms without. So the stream breaks between 8 and 16 users on this card.
-
-The third listing shows what the cap did. With `--max-num-seqs 16` at 32 users, the median ITL fell from 80.5 to 69.8 ms and the P99 ITL from 613 to 595 ms. The first token moved from 1.8 s to 12.3 s, and output fell from 275.1 to 171.8 tokens per second, a loss of 38 percent. The cap run had the higher clock, so the clock does not explain the loss. A cap does not make room for more users. It only chooses who waits, and it moves the wait from the stream to the queue.
-
-The fourth listing compares two engines on the same pool of 24,096 tokens. Up to 32 users they tie on output. At 64 users SGLang gave 256.62 tokens per second and vLLM 241.39. The medians for the first token were 18,356 ms against 10,953 ms, and the P99 ITL was 114 ms against 1,363 ms. The two log lines say why. SGLang ran 37 requests and kept 27 in its queue with the pool 92 percent full. vLLM ran 40 requests and kept 11 waiting, filled 99.5 percent of its pool and prefilled new prompts at 460.3 tokens per second while the others decoded. Each new prefill shares the step with the running streams, so the streams stall. vLLM chose the first token, SGLang chose the stream.
-
-The last listing tries to buy the smooth stream back with caps. The clock did not hold at 900 MHz in every run, so read the clock column before the cap. Three rows ran at 900 MHz. The SGLang default gave a P99 ITL of 143 to 153 ms with a first token at 19.4 s. The vLLM default gave 1,359 ms at 11.8 s. `--max-num-active-seqs 48` gave 1,329 to 1,373 ms at the same 11.8 s, so that cap changed nothing. `--max-num-seqs 32` ran at 900 and 795 MHz, gave 1,163 to 1,399 ms and pushed the first token to 17.2 to 20.6 s. `--max-num-active-seqs 16` ran at 795 and 683 MHz, so it is not a matched result, but it gave 1,133 to 1,139 ms with a first token at 44.8 to 48.8 s and the output down to 129 to 136. No cap brought the P99 ITL under 1.1 s, and the caps that changed anything moved the wait to the first token.
+1. **明确用户的直观体验指标。** 聊天用户感知到的是首字时间与 token 间延迟。吞吐量代表的是基础设施账单，而非用户体验。流式输出中出现一次漫长的顿挫，其体验远比整体速率稍慢的稳定流要糟糕得多，因此真正应当监控的指标是 P99 ITL，即百个 token 中最差的一次停顿。
+2. **定位性能劣化的拐点。** 第一项记录来自时钟未锁定测试：在 8 用户下 75% 的请求达标且 P99 ITL 为 67 ms；在 16 用户下达标率为 64% 且 P99 ITL 为 85 ms；到了 32 用户，虽然总吞吐依然攀升至每秒 275.1 token，但 P99 ITL 剧增至 613 ms 且达标率为 0%；到了 64 用户，首字时间恶化至 11.18 s，P99 ITL 达到 1,233 ms。这证明在吞吐量停止增长之前，流式卡顿早已率先击穿体验底线。该测试未在各档并发间清理前缀缓存，导致低并发行测得的首字时间虚快。第二项记录锁定时钟在 900 MHz 并在每次运行前主动清理缓存：8 用户下达标率从 75%~81% 降至 50%，16 用户下从 64%~66% 暴跌至 25%（P99 ITL 从 82~84 ms 激增至 522~523 ms）。因此在该显卡上，真正的服务质量拐点发生在 8 到 16 用户之间。
+3. **剖析并发上限的真实效果。** 在 32 用户下设置 `--max-num-seqs 16`，中位数 ITL 仅从 80.5 降至 69.8 ms，P99 ITL 从 613 仅微降至 595 ms；而首字时间从 1.8 s 暴增至 12.3 s，输出吞吐从每秒 275.1 跌至 171.8 token，损失达 38%。设置上限并不能凭空为更多用户创造硬件空间，它仅仅是在决定谁在等待，并将原本分散在流式过程中的停顿全部转变为队列前置的漫长阻塞。
+4. **对比两套引擎在饱和状态下的调度取舍。** 在容量同为 24,096 token 的池子下，两套引擎在 32 用户内吞吐平齐；64 用户下 SGLang 输出为 256.62 token/s，vLLM 为 241.39 token/s。首字时间中位数 SGLang 为 18,356 ms，vLLM 为 10,953 ms；而 P99 ITL SGLang 仅为 114 ms，vLLM 高达 1,363 ms。日志揭示了原因：SGLang 准入 37 个请求并将 27 个排在队列中（池使用率 92%）；vLLM 准入了 40 个请求仅保留 11 个排队，将池子打满至 99.5%，在其他人解码的同时，以每秒 460.3 token 的速度为新提示词做 prefill 预填充。每一次新的 prefill 都在跟解码流抢占同一个计算步，导致正在输出的流发生卡顿。vLLM 优先保障首字时间，SGLang 优先保障流的平滑度。
+5. **评估用并发上限挽回平滑流的尝试。** 并非每次运行的时钟都能维持在 900 MHz，因此在看并发上限前需先看时钟列。有三行运行在 900 MHz 下。SGLang 默认配置的 P99 ITL 为 143 至 153 ms，首字时间为 19.4 s。vLLM 默认配置在首字 11.8 s 下给出了 1,359 ms。`--max-num-active-seqs 48` 在相同的 11.8 s 下给出了 1,329 至 1,373 ms，因此该上限未改变任何表现。`--max-num-seqs 32` 运行在 900 和 795 MHz 下，给出了 1,163 至 1,399 ms 并把首字时间推迟至 17.2 至 20.6 s。`--max-num-active-seqs 16` 运行在 795 和 683 MHz 下，因此这不是一组严格匹配的结果，但它给出了 1,133 至 1,139 ms 的表现，首字时间达 44.8 至 48.8 s，输出吞吐降至 129 至 136。没有任何并发上限能将 P99 ITL 降至 1.1 s 以下，且任何起效的上限都将等待转移到了首字时间上。
 
 ## Resolution
 
-Two things were wrong. The service ran past its knee, and the cap treated a capacity problem as a scheduling problem. The knee on this card, measured with a cache reset, sits between 8 and 16 users. At 64 users the pool holds about 37 to 40 requests of 640 tokens, so the rest wait, and every new prefill that enters a step pauses the running streams.
+存在两处根本性错误：服务已经远远超出了其物理承载拐点，而并发上限尝试把容量不足的问题当成调度策略问题来解决。在当前显卡上经缓存清理测得的拐点就在 8 到 16 用户之间。在 64 用户下，显存池仅能容纳约 37 至 40 个 640 token 的请求，剩余请求必须排队，且任何混入解码步的新 prefill 都会打断正在输出的流。
 
-The fix is fewer users per replica. On this card, 8 users per replica met the target for half the requests and 16 users for a quarter, so the replica count comes from the target, not from the throughput peak. Remove the `--max-num-seqs 16` setting, because at 32 users it cut output by 38 percent and pushed the first token from 1.8 s to 12.3 s at the median while the P99 ITL stayed near 600 ms. Keep the default admission and add replicas until the P99 ITL and the first token both meet the target at the busiest hour.
+真正的解法是降低单副本的承载用户数。在该卡上，单副本 8 用户能满足半数请求的 SLO，16 用户满足四分之一，因此副本规模的规划必须依据体验目标而非吞吐量峰值。移除 `--max-num-seqs 16` 配置（该配置在 32 用户下白白损失了 38% 的吞吐并将首字时间推迟到了 12.3 s，而 P99 ITL 依然高达约 600 ms）。保留默认准入策略，通过水平扩容增加副本，直到高峰期 P99 ITL 和首字时间双双达标。
 
-The engine switch is a real option, not a fix. On the same pool at 64 users SGLang kept the P99 ITL at 114 ms and made users wait 18,356 ms for the first token. vLLM did the reverse. Pick the engine by which of the two numbers your users forgive, and measure the pair on your own card.
+更换引擎是一项架构权衡而非银弹修复。在 64 用户饱和状态下，SGLang 能将 P99 ITL 压在 114 ms 但首字需等待 18,356 ms；vLLM 则相反。根据终端用户更能容忍哪一项指标来选型引擎，并在自有硬件上实测对比。
 
 ## Wrong turns
 
-- "Lower the batch so each step is faster." A cap on sequences does not add room. It picks who waits, and the first token then waits in the queue. At 32 users the cap cost 38 percent of the output.
-- "Throughput is fine, so the server is fine." At 32 users the output still rose while no request met the target. Throughput measures the bill, the P99 ITL measures the user.
-- "Shorten the maximum model length to fit more users." The pool stays the same size, so the same number of 640-token requests fit. Only a larger pool or fewer users changes that.
-- "The other engine is faster." Both engines wrote about the same tokens per second at every user count. They differed in which wait they chose at a full pool, not in speed.
-- "Set a cap at 48 so the pool never fills." The cap at 48 active sequences left the P99 ITL at 1,329 to 1,373 ms, the same as the default. The gaps come from the prefills that share each step, not from the number of running sequences alone.
+- "减小批次以便让每个计算步更快。" 限制并发序列无法增加物理显存空间。它只是改变了谁在等待，并将等待转移到了队列前置首字时间中。在 32 用户下该操作直接削减了 38% 的吞吐量。
+- "吞吐量表现良好，说明服务没有问题。" 在 32 用户下总吞吐量依然在上升，但达标请求数已然归零。吞吐量反映的是算力成本账单，P99 ITL 才是衡量用户体验的准绳。
+- "缩小模型最大上下文长度以容纳更多用户。" 显存池总量未变，所能容纳的 640 token 请求数分毫未增。唯有扩大显存池或减少单机并发才能改变现状。
+- "竞品引擎性能更快。" 两套引擎在各级并发下的每秒 token 输出基本打平。两者的区别在于池满时对不同延迟维度的调度取舍，而非绝对算力速度的差距。
+- "将上限设为 48 防止显存池打满。" 限制 48 个活跃序列时 P99 ITL 依然高达 1,329~1,373 ms，与默认参数无异。顿挫源自抢占计算步的 prefill，而非仅仅受运行序列绝对数量影响。
 
 ## Generalize
 
-When a service runs past its knee, every admission knob trades one latency for another and none of them adds capacity. Measure the two user-facing numbers together with throughput, find the last user count that meets both, and size replicas from that count. When two systems tie on throughput, their difference is the choice they make at saturation, so read the tail of the first token and the tail of the stream side by side before you switch.
+当系统负载越过物理拐点后，任何准入控制旋钮都不过是在用一种延迟置换另一种延迟，没有任何旋钮能凭空凭添物理容量。将面向用户的核心时延指标与吞吐量并列监控，查明同时满足各项时延要求的最大并发临界点，并据此推导集群副本容量。当两套系统总吞吐打平时，差异体现为它们在饱和状态下的调度取舍，在做出架构切换前，必须将首字尾部延迟与流式卡顿尾部延迟并列实测。
 
 ## Taught in
 
-The vLLM manual measures the sweep and the caps in [the chat tuning page](../../../manuals/vllm-101/sections/3-1-tune-chat-for-many-users.md) and explains the shared step in [the token budget page](../../../manuals/vllm-101/sections/8-2-why-one-token-budget-replaces-a-prefill-phase.md), the SGLang manual covers the queue in [the admission page](../../../manuals/sglang-101/sections/2-3-admission-and-retraction.md) and the two engines side by side in [the benchmark reading page](../../../manuals/sglang-101/sections/5-3-reading-other-peoples-benchmarks.md), and [the inference metrics lesson](../../../phases/17-infrastructure-and-production/08-inference-metrics-goodput/docs/en.md) defines the numbers.
+vLLM 手册在[聊天调优页面](../../../manuals/vllm-101/sections/3-1-tune-chat-for-many-users.md)记录了该测试扫描与并发上限实测，并在[token 预算页面](../../../manuals/vllm-101/sections/8-2-why-one-token-budget-replaces-a-prefill-phase.md)阐述了混合计算步的原理，SGLang 手册在[准入页面](../../../manuals/sglang-101/sections/2-3-admission-and-retraction.md)探讨了排队机制并在[基准测试解读页面](../../../manuals/sglang-101/sections/5-3-reading-other-peoples-benchmarks.md)对比了双引擎表现，而[推理指标课程](../../../phases/17-infrastructure-and-production/08-inference-metrics-goodput/docs/en.md)为核心指标提供了规范定义。

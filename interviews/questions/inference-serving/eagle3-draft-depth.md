@@ -1,6 +1,6 @@
 ---
 id: eagle3-draft-depth
-title: Pick the EAGLE3 draft depth for your concurrency
+title: 按并发数选择 EAGLE3 的 draft 深度
 card: inference-serving
 kind: tradeoff
 level: 3
@@ -16,66 +16,66 @@ related: []
 updated: 2026-11-03
 ---
 
-You turn on an EAGLE3 draft for Qwen/Qwen3-8B on one L4 and must set `num_speculative_tokens`. The draft config suggests a value, but you want to set it yourself. How do you choose, and how does the right value move with the number of users?
+你在一张 L4 上为 Qwen/Qwen3-8B 开启了 EAGLE3 draft，需要设置 `num_speculative_tokens`。draft 配置里给了一个建议值，但你想自己来定。你怎么选？合适的值会怎样随用户数变化？
 
 ## Short answer
 
-Set the depth yourself and sweep it at your real concurrency, because the depth that pays falls as more users share each step. On our clock-locked L4 at 32 users, depth 3 gave 333.6 output tokens per second against 208.8 with no speculation, and depth 5 fell back to 289.5, so the extra guesses cost more than they returned. At one user depths 3 and 5 tied, so start at 3 and move only on a measurement.
+深度要自己设，并在真实并发下扫一遍，因为用户越多、每一步里共享的请求越多，划算的深度就越小。在我们锁定频率的 L4 上，32 个用户时深度 3 每秒输出 333.6 个 token，不开推测解码是 208.8，深度 5 又回落到 289.5，额外猜测的开销超过了收益。1 个用户时深度 3 和 5 打平，所以从 3 开始，只在有测量结果时才调整。
 
 ## Full answer
 
-### Why the depth matters
+### 深度为什么重要
 
-A deeper draft can give more tokens for each pass of the target, but each guess also costs work in the check. With one user the GPU has spare compute in each step, so extra guesses are almost free. With many users each step is already full, and wrong guesses take compute from real tokens.
+更深的 draft 能让目标模型每次验证提交更多 token，但每个猜测在校验时也要花计算。只有一个用户时，GPU 每一步都有富余的算力，多猜几个几乎不花钱。用户多时，每一步本来就是满的，猜错的 token 会挤占真实 token 的算力。
 
-### The sweep
+### 扫描结果
 
-Depths 1, 3 and 5 against no speculation, with the clock locked at 900 MHz, 512 tokens in and 128 out, two seeds each:
+深度 1、3、5 与不开推测解码对比，频率锁定在 900 MHz，输入 512 token，输出 128 token，每组两个随机种子：
 
-| Users | Config | Median TPOT | Output tok/s | Median SM clock |
+| 用户数 | 配置 | 中位 TPOT | 输出 tok/s | SM 中位频率 |
 |---|---|---|---|---|
-| 32 | no speculation | 119.9 ms | 208.8 | 881 MHz |
-| 32 | depth 1 | 100.4 ms | 271.1 | 900 MHz |
-| 32 | depth 3 | 77.8 ms | 333.6 | 900 MHz |
-| 32 | depth 5 | 83.7 ms | 289.5 | 885 MHz |
-| 1 | depth 1 | 39.4 ms | 22.4 | 900 MHz |
-| 1 | depth 3 | 27.8 ms | 31.3 | 900 MHz |
-| 1 | depth 5 | 26.2 ms | 31.7 | 900 MHz |
+| 32 | 不开推测解码 | 119.9 ms | 208.8 | 881 MHz |
+| 32 | 深度 1 | 100.4 ms | 271.1 | 900 MHz |
+| 32 | 深度 3 | 77.8 ms | 333.6 | 900 MHz |
+| 32 | 深度 5 | 83.7 ms | 289.5 | 885 MHz |
+| 1 | 深度 1 | 39.4 ms | 22.4 | 900 MHz |
+| 1 | 深度 3 | 27.8 ms | 31.3 | 900 MHz |
+| 1 | 深度 5 | 26.2 ms | 31.7 | 900 MHz |
 
-At 32 users depth 3 gave 1.6 times the output of no speculation, and its seed range did not overlap with any other config. At one user depth 3 cut the time per token from 39.4 to 27.8 ms against depth 1, and depth 5 was the same within the seeds. The run with no speculation at one user fell to 210 MHz, below the lock, so the manual does not compare it.
+32 个用户时，深度 3 的输出是不开推测解码时的 1.6 倍，它在不同种子下的范围与其他任何配置都不重叠。1 个用户时，深度 3 相比深度 1 把每个 token 的时间从 39.4 ms 降到 27.8 ms，深度 5 在种子波动范围内与之相同。1 个用户下不开推测解码的那次运行降到了 210 MHz，低于锁定值，所以手册没有拿它来比较。
 
-### The stream gets lumpier
+### 流变得更不均匀
 
-The median TPOT fell, but the gaps between token groups grew. At 32 users the median ITL rose from 84 ms with no speculation to 133 ms at depth 3. Each step now sends several tokens at once, so the stream arrives in larger and less frequent groups.
+中位 TPOT 下降了，但 token 组之间的间隔变大了。32 个用户时，中位 ITL 从不开推测解码时的 84 ms 升到深度 3 时的 133 ms。现在每一步一次发出好几个 token，所以流以更大、更稀疏的组到达。
 
-### The limits of the result
+### 结果的适用范围
 
-The gain holds for random prompts and outputs of 128 tokens. Other teams found that synthetic prompts overstate the gain on real prompts and that the best depth changes with the batch size. One study saw the acceptance length fall from about 3.7 to about 1.5 on answers that ran toward 20,000 tokens. The manual's own test up to 4,096 tokens did not see a steady fall; the acceptance stayed near 2.1 to 2.8 tokens per step. So test on your own long answers before you trust the gain.
+这个收益是在随机 prompt、128 token 输出的条件下测得的。其他团队发现，合成 prompt 会高估在真实 prompt 上的收益，最佳深度也会随 batch 大小变化。一项研究发现，回答长度接近 20,000 token 时，接受长度从约 3.7 降到约 1.5。手册自己到 4,096 token 的测试没有看到持续下降，接受长度保持在每步约 2.1 到 2.8 个 token。所以在相信这个收益之前，先在你自己的长回答上测一测。
 
-### Lock the clock before you compare
+### 比较之前先锁频率
 
-The first EAGLE3 runs had no lock. At one user the run with no speculation ran at 210 MHz and the EAGLE3 run at about 1,400 MHz. A gap that large hides the effect of speculation, so those runs were set aside. Lock the SM clock with the driver tool before a comparison and release it after, and compare two runs only at the same clock.
+最早的几次 EAGLE3 运行没有锁频率。1 个用户时，不开推测解码的运行跑在 210 MHz，EAGLE3 那次约 1,400 MHz。差距这么大，直接掩盖了推测解码本身的效果，所以这些运行被剔除。比较之前用驱动工具锁定 SM 频率，结束后解除，只在频率相同时比较两次运行。
 
-### Choose
+### 怎么选
 
-- Start at 3 for Qwen3-8B with this draft. It gave the best output at 32 users and tied at one.
-- For a busy server, sweep the depth on your own model; depth 5 lost output at 32 users here.
-- If the load changes a lot through the day, vLLM can set the depth by batch size with `num_speculative_tokens_per_batch_size`. The manual did not test it.
-- Read the two counters, `spec_decode_num_draft_tokens` and `spec_decode_num_accepted_tokens`, and divide; read the P99 ITL and the P99 TTFT, not only the median.
+- 对用这个 draft 的 Qwen3-8B，从 3 开始。它在 32 个用户时输出最好，1 个用户时打平。
+- 对繁忙的服务器，在你自己的模型上扫一遍深度；这里深度 5 在 32 个用户时损失了输出。
+- 如果一天里负载变化很大，vLLM 可以用 `num_speculative_tokens_per_batch_size` 按 batch 大小设置深度。手册没有测过它。
+- 读 `spec_decode_num_draft_tokens` 和 `spec_decode_num_accepted_tokens` 两个计数器并相除；看 P99 ITL 和 P99 TTFT，不要只看中位数。
 
 ## Follow-ups
 
-- **Level 3:** Why did depth 5 lose to depth 3 at 32 users but tie at one user? Expected: at one user the step has spare compute, so two more guesses are nearly free; at 32 users the step is full, and each rejected guess takes compute from real tokens.
-- **Level 3:** The median time per token fell and users still said the stream felt uneven. Why? Expected: each step now sends several tokens at once, so tokens arrive in larger and less frequent groups; the median ITL rose from 84 to 133 ms at depth 3 with 32 users.
-- **Level 4:** Your load swings from 2 users at night to 32 by day. What do you set? Expected: sweep the depth at both loads, because the depth that pays falls with the batch; vLLM can set the depth per batch size, which the manual did not test, so measure before you trust it.
+- **Level 3:** 为什么 32 个用户时深度 5 输给深度 3，1 个用户时却打平？ Expected: 1 个用户时每一步都有富余算力，多猜两个几乎不花钱；32 个用户时每一步都是满的，每个被拒绝的猜测都会挤占真实 token 的算力。
+- **Level 3:** 每个 token 的中位时间下降了，用户却仍然觉得流不均匀。为什么？ Expected: 现在每一步一次发出好几个 token，所以 token 以更大、更稀疏的组到达；32 个用户、深度 3 时，中位 ITL 从 84 ms 升到 133 ms。
+- **Level 4:** 你的负载从夜间 2 个用户摆动到白天 32 个。你怎么设置？ Expected: 在两种负载下分别扫描深度，因为划算的深度随 batch 变大而变小；vLLM 可以按 batch 大小设置深度，但手册没有测过，所以先测量再相信它。
 
 ## Wrong answers
 
-- "Deeper is better, because more guesses mean more tokens per step." At 32 users depth 5 gave 289.5 tokens per second against 333.6 at depth 3; the extra guesses cost more compute than they returned.
-- "Leave the depth out and let the draft config decide." Then you do not know what runs; set it yourself so that the number in the command is the number you measured.
-- "Compare speculation with the baseline at one user and ship the ratio." The one-user baseline ran at 210 MHz while the EAGLE3 run ran near 1,400 MHz, so the ratio measured the clock; compare at the same clock and at the concurrency you serve.
-- "The gain on the random dataset transfers to chat." Synthetic prompts overstate the gain and the acceptance can fall on long answers; measure the acceptance on your own traffic with real output lengths and without ignore-eos.
+- "越深越好，猜得越多，每一步的 token 就越多。" 32 个用户时深度 5 每秒 289.5 个 token，深度 3 是 333.6；额外猜测消耗的算力超过了它带来的收益。
+- "不设深度，交给 draft 配置决定。" 那样你就不知道实际跑的是什么；自己设置，让命令里的数字就是你测过的数字。
+- "在 1 个用户下比较推测解码和基线，然后按这个比值上线。" 1 个用户的基线跑在 210 MHz，EAGLE3 那次接近 1,400 MHz，所以这个比值测的是频率；要在相同频率、在你实际服务的并发下比较。
+- "随机数据集上的收益可以照搬到对话上。" 合成 prompt 会高估收益，长回答上接受长度也可能下降；在你自己的流量上，用真实输出长度、不开 ignore-eos 测接受长度。
 
 ## Taught in
 
-[Speed up decode with EAGLE3](../../../manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md) has the depth sweep, the acceptance tables and the clock rule.
+[用 EAGLE3 加速 decode](../../../manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md)给出了深度扫描、接受长度表和锁频规则。

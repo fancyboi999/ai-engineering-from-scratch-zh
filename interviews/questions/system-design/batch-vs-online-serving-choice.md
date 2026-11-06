@@ -1,6 +1,6 @@
 ---
 id: batch-vs-online-serving-choice
-title: Batch or online serving for a two-hour freshness limit
+title: 针对两小时数据时效限制选择批处理或在线服务
 card: system-design
 kind: tradeoff
 level: 2
@@ -16,54 +16,54 @@ related: [system-design/churn-model-system, system-design/fraud-check-100ms]
 updated: 2026-11-03
 ---
 
-A feed ranking score must be no more than two hours old for 5,000,000 items, and the serving peak is 120 requests per second. Price batch and online serving with the lesson's cost model, pick one, and say what would flip the choice.
+针对 5,000,000 个信息流条目，其排序得分的数据时效不得超过 2 小时，服务峰值流量为每秒 120 次请求。请使用课程中的成本模型分别为批处理与在线服务测算成本，做出选型，并说明在什么条件下该决策会发生反转。
 
 ## Short answer
 
-With a one-hour batch job and a two-hour staleness limit, the job must run every hour, which the lesson's cost model prices at 24.0 runs per day over 5,000,000 items for $48.50 a day. Two online replicas sized for 120 peak QPS cost $24.00 a day and serve the freshest data. Online wins here; the choice flips when the freshness limit relaxes enough to cut the runs, or when peak traffic grows enough to need many replicas.
+单次批处理耗时 1 小时且数据时效上限为 2 小时的情况下，任务必须每隔 1 小时运行一次；按照课程成本模型，每天对 5,000,000 个条目运行 24.0 次的成本为每天 $48.50。针对 120 峰值 QPS 规划的两个在线副本每天成本为 $24.00，且能提供最新鲜的数据。在此场景下在线服务胜出；当新鲜度限制放宽到足以减少运行次数，或峰值流量增长到需要许多副本时，选择就会反转。
 
 ## Full answer
 
-### How each plan is priced
+### 两种方案的成本构成对比
 
-| Property | Batch | Online |
+| 属性 | 批处理 | 在线服务 |
 |---|---|---|
-| Freshness | As old as the last run plus the run time | The data of the request |
-| Request latency | One key-value read, a few milliseconds | Feature fetch plus model time, 35 ms in the model |
-| Cost driver | Entities times runs per day | Replicas sized for peak QPS, minimum of two |
-| New entities | No score until the next run | Scored on the first request |
-| When it breaks | Old scores stay readable | Requests fail or time out |
+| 数据时效 | 最旧可达距上次运行的时间加上任务耗时 | 实时对应请求发生时刻的数据 |
+| 请求延迟 | 一次键值读取，仅需数毫秒 | 特征获取加上模型推理耗时，成本模型中为 35 ms |
+| 成本驱动因素 | 实体规模乘以每天运行次数 | 依据峰值 QPS 规划的副本数，高可用保底 2 个 |
+| 新增实体 | 下次运行前无预测得分 | 首个请求到达时实时完成打分 |
+| 故障表现 | 旧得分仍保持可读 | 请求直接失败或超时 |
 
-Batch must finish inside the staleness limit, so the time between runs is the limit minus the job time. Each run scores every entity whether or not anyone asks. Online pays for idle replicas between peaks, with a floor of two for availability.
+批处理必须在时效上限内完成，因此两次运行之间的间隔等于时效限制减去任务耗时。每次批处理都会为所有实体打分，无论是否有用户请求。在线服务则需为峰值之间的空闲副本买单，且为了高可用至少需要 2 个保底副本。
 
-### The arithmetic for this workload
+### 当前工作负载的测算过程
 
-The staleness limit of two hours minus a one-hour job leaves one hour between runs, so 24.0 runs per day. Every run scores all 5,000,000 items. That is why the batch plan costs $48.50 a day while the online plan sits at its two-replica floor of $24.00, since 120 peak QPS fits inside the capacity of two replicas.
+两小时时效上限减去一小时任务耗时，意味着两次运行间隔为一小时，即每天运行 24.0 次。每次运行都要对全部 5,000,000 个条目打分。这正是批处理方案每天成本高达 $48.50 的原因；而在线方案维持在 2 个副本的保底水位，每天仅需 $24.00，因为 120 峰值 QPS 完全落在 2 个副本的处理能力之内。
 
-### What flips it
+### 什么情况下决策会反转
 
-- A longer staleness limit cuts runs and batch cost in proportion; the nightly churn job in the same lesson costs under a dollar.
-- A staleness limit shorter than one batch job makes batch infeasible at any price.
-- A much higher peak needs more replicas and raises online cost linearly with peak traffic.
-- A latency budget below the online path's model time rules online out, and a hybrid serves known items from a store and new items online.
+- 更宽松的时效限制会成比例减少运行频次与批处理成本；同一课程中每晚运行一次的用户流失预测任务成本不足一美元。
+- 时效限制若短于单次批处理耗时，在任何价格下，批处理都不可行。
+- 更高的流量峰值需要更多在线副本，导致在线成本随峰值流量线性增加。
+- 延迟预算若低于在线链路的模型耗时，将直接排除在线方案；此时可采用混合架构，已存条目从存储读取，新条目在线打分。
 
-### What the decision is not about
+### 决策无关的维度
 
-Freshness and cost decide; model quality does not change between the two plans. The failure modes differ: a broken batch job leaves old but readable scores, while a broken online service fails requests, so the online design needs a default such as the last stored score or the heuristic.
+决定选型的是新鲜度与成本；模型质量在两种方案间并无不同。两者的故障模式有所不同：批处理任务故障会导致保留旧数据但仍然可读，而在线服务故障则会导致请求直接报错，因此在线设计必须配置降级兜底方案，例如采用最后存储的得分或启发式规则。
 
 ## Follow-ups
 
-- **Level 2:** Why is the online plan at its minimum here? Expected: two replicas is the availability floor, and 120 peak QPS fits inside what two replicas handle, so traffic does not drive the count.
-- **Level 2:** The job takes longer than the staleness limit. What does the planner return? Expected: infeasible; no schedule satisfies the limit, so the budgets or the job must change.
-- **Level 3:** Design the hybrid. Expected: batch scores known items on the relaxed schedule, online scores new items and requests that need fresh data; price it as the sum of a cheaper batch plan and a small online tier.
-- **Level 3:** Which design document check does this feed? Expected: the serving-fit check, which prices the chosen mode against the staleness, latency and cost budgets and fails a mode that misses any of them.
+- **Level 2:** 为什么在此场景下在线方案处于最低成本配置？ Expected: 两个副本是保障可用性的保底底线，而 120 峰值 QPS 处于两个副本的承载范围之内，因此流量未推动副本数增加。
+- **Level 2:** 若单次任务耗时长于时效限制，规划器会返回什么？ Expected: 不可行；没有任何调度计划能满足该时效限制，必须调整时效预算或优化任务耗时。
+- **Level 3:** 请设计混合架构方案。 Expected: 批处理按放宽后的调度周期为已知条目打分，在线服务为新实体及需要最新数据的请求打分；总成本为更经济的批处理加上轻量在线层。
+- **Level 3:** 这一决策为设计文档中的哪项核查提供依据？ Expected: 服务匹配度核查，该核查对照时效、延迟和成本预算校验所选模式，任何一项不达标都会判定该模式失败。
 
 ## Wrong answers
 
-- "Batch is always cheaper." Batch cost scales with runs per day times entities; a tight freshness limit makes it the expensive plan.
-- "Online is always fresher, so always better." Fresher costs replicas, and a nightly process cannot use freshness it does not read.
-- "Pick by model accuracy." Accuracy is the same in both plans; the choice is about freshness, latency and cost.
+- "批处理永远更便宜。" 批处理成本随着实体数乘以每天运行频次扩展；严苛的时效限制会使其成为昂贵的方案。
+- "在线服务永远数据最新，所以永远更优。" 更高的数据新鲜度需要付出副本成本，而夜间运行的处理任务根本用不到它不读取的新鲜度。
+- "根据模型准确率来挑选方案。" 两种方案的模型准确率完全一致；选型完全取决于数据时效、延迟要求与资金成本。
 
 ## Taught in
 
-The [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) builds the batch and online cost model and runs it on the feed ranking workload.
+[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)构建了批处理与在线成本模型，并在信息流排序工作负载上完成测算。

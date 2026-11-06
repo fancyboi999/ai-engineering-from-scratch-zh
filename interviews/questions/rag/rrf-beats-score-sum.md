@@ -1,6 +1,6 @@
 ---
 id: rrf-beats-score-sum
-title: Why hybrid search fuses ranks and not scores
+title: 混合检索为什么融合排名而非分数
 card: rag
 kind: concept
 level: 2
@@ -16,43 +16,43 @@ related: [rag/read-the-rrf-function, rag/error-code-query-misses]
 updated: 2026-11-03
 ---
 
-You have a BM25 ranked list and a vector ranked list for the same query. An engineer proposes to merge them as alpha times the BM25 score plus one minus alpha times the cosine. What is wrong with that, and what do you do instead?
+同一个查询得到了 BM25 和向量检索两个排名列表。工程师建议按 alpha × BM25 分数 + (1 - alpha) × 余弦相似度合并。问题在哪里？你会怎么做？
 
 ## Short answer
 
-BM25 scores are unbounded and change with the corpus, while a cosine sits between -1 and 1, so a weighted sum needs a new alpha every time you re-index. Reciprocal rank fusion merges by rank instead: each document gets the sum, over the lists, of one over k plus its rank, with k at 60. Ranks are comparable across the two retrievers, so nothing has to be calibrated.
+BM25 分数没有固定上界，并随语料变化；余弦相似度则在 -1 到 1 之间，因此每次重建索引都需要重新调整加权和的 alpha。倒数排名融合改用排名：每篇文档得分为各列表中 1 / (k + rank) 之和，k 取 60。两种检索器的排名可以直接比较，无需校准分数尺度。
 
 ## Full answer
 
-### The formula and one worked case
+### 公式与计算示例
 
-A document at rank 1 in the vector list and rank 5 in the BM25 list gets 1/(60+1) + 1/(60+5) = 0.0164 + 0.0154 = 0.0318. A document at rank 3 and rank 2 gets 1/(60+3) + 1/(60+2) = 0.0159 + 0.0161 = 0.0320. The second document wins by a hair: a document that is good in both lists beats one that is first in one list and deep in the other.
+文档在向量列表排第 1、BM25 列表排第 5，得分为 1/(60+1) + 1/(60+5) = 0.0164 + 0.0154 = 0.0318。另一文档分别排第 3 和第 2，得分为 1/(60+3) + 1/(60+2) = 0.0159 + 0.0161 = 0.0320。第二篇略胜：在两个列表中都表现好的文档，胜过只在一个列表排首位、在另一个列表排名较低的文档。
 
-### What k does
+### k 的作用
 
-With k at 60, rank 1 contributes 1/61 and rank 10 contributes 1/70. The contribution decays slowly, so deep candidates still vote. A smaller k lets the top results dominate. A larger k flattens the curve.
+k 为 60 时，第 1 名贡献 1/61，第 10 名贡献 1/70。贡献下降较慢，靠后的候选仍有投票权。k 越小，头部结果影响越大；k 越大，曲线越平。
 
-### Why ranks and not scores
+### 为什么不用原始分数
 
-A linear combination of scores needs an alpha tuned per corpus, and it breaks on every re-index because the BM25 score spread moves. Ranks do not have a scale. The capstone lesson notes that the rank-based baseline has beaten score interpolation in every public TREC track since 2010, and that the production search engines that document hybrid search came to the same conclusion.
+分数线性组合需要为每个语料调整 alpha；每次重建索引时 BM25 分数分布变化，平衡就可能失效。排名没有尺度问题。综合项目课程指出，自 2010 年以来，这个基于排名的基线在每一届公开 TREC 赛道中都胜过分数插值；公开记录过混合搜索做法的生产搜索引擎也得出了同样结论。
 
-### A knob that keeps the method honest
+### 不破坏方法的可调权重
 
-If you have evidence that one retriever beats the other on your data, multiply its rank contribution by a weight. The rank decay shape stays and the method stays scale free.
+若有证据表明某个检索器在自己的数据上更好，可为其排名贡献乘一个权重。排名衰减形状和不依赖分数尺度的性质均保持不变。
 
 ## Follow-ups
 
-- **Level 2:** What does the constant k control? Expected: how fast the contribution decays with rank; at 60, rank 1 gives 1/61 and rank 10 gives 1/70, so deep candidates still count.
-- **Level 2:** When would you lower k? Expected: when the top result of each list should dominate the fused order.
-- **Level 3:** You know BM25 is better on your corpus. How do you express that? Expected: a per-list weight that multiplies the rank contribution of the BM25 list; the decay shape and the scale-free property both survive.
-- **Level 3:** Why does the rank method survive a re-index when the weighted sum does not? Expected: ranks keep their meaning when the corpus changes, while BM25 scores and their spread move, so the tuned alpha no longer fits.
+- **Level 2:** 常数 k 控制什么？ Expected: 排名贡献衰减速度；k 为 60 时，第 1 名贡献 1/61，第 10 名贡献 1/70，因此较深候选仍有影响。
+- **Level 2:** 何时降低 k？ Expected: 希望各列表头部结果主导融合顺序时。
+- **Level 3:** 已知 BM25 在当前语料中更好，如何表达？ Expected: 给 BM25 列表的排名贡献乘一个列表权重，保留衰减形状和不依赖分数尺度的性质。
+- **Level 3:** 为什么排名融合能适应重建索引，而加权分数不能？ Expected: 语料变化后排名含义仍然一致，但 BM25 分数及其分布会变，原先的 alpha 不再适合。
 
 ## Wrong answers
 
-- "Normalize both scores to a zero to one range and add them." The two distributions still differ per query and per corpus, so the tuned balance drifts after a re-index.
-- "Take the document with the highest score in either list." One unbounded BM25 score then dominates every query; ranks are the comparable unit.
-- "Fusion is only a tie-breaker between the two lists." In the demo it decides the top result on every query class; a document good in both lists beats one that is top in only one.
+- "把两个分数归一化到 0 到 1，再相加。" 两者分布仍会随查询和语料不同；重建索引后平衡仍可能漂移。
+- "选两个列表中原始分数最高的文档。" 这样某个无上界的 BM25 分数会主导每一个查询；可比较的单位是排名。
+- "融合只是两个列表之间的平局裁决。" 演示中每类查询的首位都由融合决定；两个列表都表现好的文档胜过只在一个列表领先的文档。
 
 ## Taught in
 
-The lesson [hybrid retrieval](../../../phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/) gives the published formula, the role of k and the case against score interpolation, and the lesson [advanced RAG](../../../phases/11-llm-engineering/07-advanced-rag/) works the two-document example.
+[混合检索](../../../phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/)课程给出公式、k 的作用及不用分数插值的原因，[进阶 RAG](../../../phases/11-llm-engineering/07-advanced-rag/)课程演算两篇文档的例子。

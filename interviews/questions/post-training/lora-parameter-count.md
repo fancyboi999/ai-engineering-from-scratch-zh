@@ -1,6 +1,6 @@
 ---
 id: lora-parameter-count
-title: Count the parameters of one LoRA adapter
+title: 计算单个 LoRA 适配器的参数量
 card: post-training
 kind: estimate
 level: 1
@@ -16,15 +16,15 @@ related: [post-training/qlora-on-one-gpu]
 updated: 2026-11-03
 ---
 
-An attention projection in your model is a square matrix with 4,096 rows and 4,096 columns. You add a LoRA adapter of rank 16 to it. How many values does the adapter train, and what share of the frozen matrix is that? Then say what changes when you double the rank.
+你模型中的一个注意力投影层是一个 4,096 行乘 4,096 列的方阵。你为其添加了一个秩为 16 的 LoRA 适配器。该适配器需要训练多少个参数值？这占被冻结原矩阵参数量的百分之几？如果将秩翻倍，结果会如何变化？
 
 ## Short answer
 
-The adapter is two thin matrices: A with 16 rows and 4,096 columns, and B with 4,096 rows and 16 columns. Each holds 65,536 values, so the adapter trains 131,072 parameters. The frozen matrix holds 16,777,216, so the adapter is 0.78 percent of it. A doubled rank doubles the adapter, because its size is linear in the rank.
+该适配器由两个细长矩阵组成：A 矩阵拥有 16 行乘 4,096 列，B 矩阵拥有 4,096 行乘 16 列。每个矩阵各包含 65,536 个数值，因此该适配器总计训练 131,072 个参数。被冻结的原权重矩阵包含 16,777,216 个参数，因此该适配器仅占原矩阵参数量的 0.78%。当秩翻倍时，适配器的参数量也严格翻倍，因为其规模与秩呈线性关系。
 
 ## Full answer
 
-### The count
+### 参数量精算公式
 
 ```text
 y = W x + (alpha / r) B A x
@@ -35,13 +35,13 @@ W            = 4096 x 4096 = 16,777,216
 share        = 0.78 percent
 ```
 
-### Why so few parameters work
+### 为什么极少参数就能生效
 
-The update that fine-tuning makes to a weight matrix has a low intrinsic rank. A rank of 16 or 32 captures most of it. The lesson reports LoRA at rank 16 within about one point of full fine-tuning on the benchmarks it lists.
+在微调过程中对原始权重矩阵所做的梯度更新量，其内在秩非常低。秩为 16 或 32 的低秩分解就已经能捕捉绝大部分有效更新。课程报告指出：在列出的基准评测中，秩为 16 的 LoRA 表现与全量微调相比差距在 1 个百分点以内。
 
-### The rank table
+### 不同秩下单矩阵参数对照表
 
-| Rank | Parameters for one 4096 by 4096 matrix |
+| 秩 | 针对单个 4096 乘 4096 矩阵的参数量 |
 |---|---|
 | 4 | 32,768 |
 | 8 | 65,536 |
@@ -49,27 +49,27 @@ The update that fine-tuning makes to a weight matrix has a low intrinsic rank. A
 | 32 | 262,144 |
 | 64 | 524,288 |
 
-### Alpha
+### 缩放系数 Alpha 的作用
 
-The scale `alpha / r` sets how much the adapter output counts. With alpha equal to the rank, the scale is one; a common convention sets alpha to twice the rank. Alpha changes the effective step size, not the parameter count.
+缩放因子 `alpha / r` 决定了适配器旁路输出的加权贡献度。当 alpha 等于秩时，缩放比例为 1；业界常见的约定习惯是将 alpha 设为秩的两倍。调整 alpha 改变的是适配器的有效学习步长，丝毫不会改变其参数总量。
 
-### Which matrices
+### 适配矩阵的选择覆盖面
 
-The count above is one matrix. Adapters on the query and value projections of every layer are the usual start. Adding the key and output projections and the MLP layers raises quality a little and, on the lesson's 7B table, raises the count from 9.4M to 37.7M.
+上述计算仅针对单个投影矩阵。在实践中，通常从每一层的查询与值投影矩阵挂载适配器起步。若进一步将键、输出投影矩阵以及 MLP 层全部挂载 LoRA，模型质量会略有提升，而在课程展示的 7B 模型参数表中，总适配器参数量会从 9.4M 增加到 37.7M。
 
 ## Follow-ups
 
-- **Level 1:** Why does B start at zero? Expected: the product B A is then zero, so the model starts from its original behavior and learns the change step by step.
-- **Level 2:** How does the count change for a matrix that is not square? Expected: A is r by the input width and B is the output height by r, so the count is r times the sum of the two sides; still linear in the rank.
-- **Level 2:** At what rank does the memory advantage start to fade? Expected: the lesson puts the point of diminishing returns past 64, where quality stops improving and the adapters stop being small.
-- **Level 3:** After training, how do you remove the cost of the second matrix product at inference? Expected: merge, compute W plus alpha over r times B A once, and save a full matrix of the original size.
+- **Level 1:** 为什么 B 矩阵在初始化时要全部置零？ Expected: 使得初始时低秩乘积 B A 严格为零，模型在训练开始时完全保留原始预训练行为，随后逐步学习微调增量。
+- **Level 2:** 对于非方阵矩阵，参数量公式如何变化？ Expected: A 为 r 乘输入维度，B 为输出维度乘 r，总参数量等于 r 乘以两个维度的和；依然与秩严格呈线性关系。
+- **Level 2:** 在什么秩下显存与参数优势开始边际递减？ Expected: 课程指出当秩超过 64 时进入边际收益递减区，此时模型质量不再有明显提升，而适配器体积也失去了轻量优势。
+- **Level 3:** 训练完成后，如何在推理阶段彻底消除第二条矩阵乘法路径的开销？ Expected: 执行权重合并，一次性计算 W 加上 (alpha / r) 乘以 B A，将其保存为与原始尺寸完全相同的单一权重矩阵。
 
 ## Wrong answers
 
-- "The adapter trains r squared parameters." It trains r times the sum of the two matrix sides; r squared would be a tiny block, not the two thin matrices.
-- "Doubling the rank doubles the quality." The gain flattens fast; the lesson finds rank 16 within about one point of full fine-tuning and little gain past 64.
-- "Alpha adds parameters." Alpha is a fixed scalar on the adapter output; it changes the effective step size, not the count.
+- "适配器训练 r 的平方个参数。" 它训练的是 r 乘以矩阵两侧维度之和；r 的平方只是中间瓶颈维度构成的极小块，而非两块细长矩阵。
+- "把秩翻倍就会让模型微调质量翻倍。" 质量收益很快进入平缓平台期；课程实测表明秩为 16 时已经紧贴全量微调，超过 64 之后收益微乎其微。
+- "调整 alpha 参数会增加额外训练参数。" Alpha 只是乘以适配器输出的一个固定标量常数；它只缩放有效梯度步长，不增加任何参数。
 
 ## Taught in
 
-The [LoRA lesson](../../../phases/11-llm-engineering/08-fine-tuning-lora/) counts the adapter parameters and builds the layer in PyTorch.
+[LoRA 课程](../../../phases/11-llm-engineering/08-fine-tuning-lora/)详细核算了适配器参数并在 PyTorch 中亲手构建了该网络层。

@@ -1,6 +1,6 @@
 ---
 id: tests-passed-but-nothing-ran
-title: The agent said the tests passed, and no test ran
+title: Agent 宣称测试通过但实际未运行任何测试
 card: agents
 kind: debug
 level: 2
@@ -16,47 +16,47 @@ related: []
 updated: 2026-11-03
 ---
 
-A pull request from a coding agent says that the whole suite is green. A reviewer runs it and two tests fail. The transcript shows the agent writing "running tests now" and then "all tests pass", with nothing between the two lines. What happened, and what do you build so that this claim cannot reach a reviewer again?
+一个编码 agent 提交的拉取请求声称整个测试套件均已顺利通过。然而审查人员在本地运行后发现有两个测试失败。执行记录显示 agent 先写下了“正在运行测试”，紧接着便写道“所有测试通过”，两行之间没有任何实际执行的命令输出。究竟发生了什么，你应该构建什么系统来阻止此类虚假宣称再次流向审查人员？
 
 ## Short answer
 
-The agent predicted the output instead of reading it. Either no command ran, or the command ran and nobody captured the result into the loop. The fix has two parts: a feedback runner that records every command with its exit code, and a verification gate that reads those records and refuses to mark the task done unless each acceptance command ran and exited zero.
+Agent 是根据概率预测输出了它自认为接下来的文字，而不是真正读取了系统的执行结果。实际情况要么是根本没有运行任何命令，要么是命令虽然运行了但其退出码和输出没有被捕获进 agent 循环中。解决方案包含两个核心部分：一个负责忠实记录每条执行命令及其退出码的反馈执行器，以及一个负责读取这些记录并在此类验收命令未运行或退出码非零时坚决拒绝将任务标记为完成的验证关卡。
 
 ## Full answer
 
-### Three ways the claim appears
+### 虚假宣称产生的三种途径
 
-1. **No command ran.** The model wrote the words it expected to write next. Nothing in the transcript shows argv, output or an exit code.
-2. **The command ran, and the result never came back.** A runner that errors before it captures the exit leaves the model with nothing to read, and the model fills the gap.
-3. **The result came back, and the failure line was cut.** A long output trimmed from the end loses the summary line where the failures are.
+1. **根本没有运行任何命令。** 模型只是顺理成章地输出了它预期接下来会出现的文本。运行记录中没有任何实际的命令参数、输出内容或退出状态码。
+2. **命令运行了，但执行结果未能成功回传。** 执行器在捕获退出码之前发生异常，导致模型眼前没有任何数据可读，模型便自行填补了空白。
+3. **执行结果回传了，但包含报错的关键行被裁剪掉了。** 冗长的日志如果仅仅从末尾简单截断，往往会丢失总结失败用例的核心摘要行。
 
-The transcript in this case has no record between the two sentences, so it is the first or the second.
+在本例的运行记录中，两句陈述之间完全没有任何中间记录，因此必然属于第一种或第二种情况。
 
-### The feedback runner
+### 反馈执行器
 
-Every command goes through one wrapper. The record carries the exact argv, the tail of stdout and stderr as separate fields, the exit code, the duration, the start time, and a one-line note of what the agent expected. The runner truncates head and tail in a fixed way with a marker for the lines it removed, so the final error line survives. If the runner fails before it captures an exit, the record carries `exit_code: null` and an `error` field, and the loop must not advance on it. No exit, no progress.
+所有系统命令都必须经过统一的运行包装器。生成的反馈记录携带精确的命令行参数（argv）、作为独立字段分别捕获的 stdout 与 stderr 尾部数据、退出状态码、执行时长、启动时间戳，以及一行关于 agent 预期的简要说明。执行器按固定规则截断头部和尾部，并对移除的行加入明确标记，确保末尾的错误行得以留存。如果执行器在捕获退出码之前崩溃，记录将携带 `exit_code: null` 以及具体的 `error` 报错字段，循环在此情况下不能向前推进。没有退出码，就不允许继续。
 
-### The verification gate
+### 验证关卡
 
-The gate is a pure function over the artifacts. For this failure it checks three things from the feedback log: every acceptance command appears in the records, each one exited zero, and no record has a null exit. Each of those is a block-severity finding. A block prevents `passed: true`, and only a human can override it, with a reason and a user id in a signed log. The gate runs in CI and before the handoff. No green verdict, no pull request.
+关卡是一个作用于产物之上的纯函数。针对本例中的故障形态，它依据反馈日志执行三项判定：所有验收命令必须均出现在记录中、每项命令的退出码必须均为零，且没有任何一条记录的退出码为 null。其中任何一项不满足均被定性为阻断级（block）问题。阻断会直接阻止系统输出 `passed: true`，只有人工在带签名的审计日志中记录具体原因和用户 ID 才能覆盖。该关卡不仅在 CI 中运行，更在会话交接前强制执行。没有绿色的关卡判定，就不生成拉取请求。
 
-### Why the model is not the fix
+### 为什么单纯靠约束模型不是正解
 
-A prompt that says "always run the tests" asks the model to be honest about something it cannot see. The runner makes the result visible. The gate makes the claim checkable. Neither depends on the model.
+在 prompt 中写“务必运行测试”是在要求模型对自己根本看不见的东西保持诚实。执行器让命令的执行结果变得真实可见。关卡让 agent 的各项宣称变得能够被确定性检验。这两者都不依赖于模型本身的自觉。
 
 ## Follow-ups
 
-- **Level 2:** Why does the record keep stdout and stderr in separate fields? Expected: a test runner writes the failure summary to one stream and progress to the other, and a merged tail can hide the summary behind progress lines.
-- **Level 2:** The agent runs the acceptance command, it fails, and a retry passes. What does the gate see? Expected: two records for the same command, linked by the parent command id. The gate blocks on the failed record and does not report `passed: true`, even though the retry exited zero. Only a signed human override gets past it, and the chain keeps the failure history visible.
-- **Level 3:** Why must the gate be deterministic and not a model judge? Expected: the gate answers whether the task is complete, which must give the same verdict for the same artifacts every time, while a judge gives a qualitative opinion that belongs on the review side.
-- **Level 4:** Where do you place the gate so that it cannot be bypassed? Expected: in layers, with a pre-commit hook, a CI status check, and a pre-merge gate, so that a failure in one layer is caught by the next.
+- **Level 2:** 为什么记录必须将 stdout 与 stderr 拆分为独立的字段？ Expected: 测试运行器常将错误摘要输出到一个流，将执行进度输出到另一个流，合并截断很容易让进度行掩盖真正的错误摘要。
+- **Level 2:** Agent 执行验收命令失败后重试通过，关卡会看到什么？ Expected: 同一命令的两条记录通过父命令 ID 关联；即使重试退出码为零，关卡仍因失败记录阻断，不报告 `passed: true`。只有带签名的人工覆盖才能放行，记录链让失败历史保持可见。
+- **Level 3:** 为什么关卡必须是确定性的纯函数而不能使用模型 judge？ Expected: 关卡回答的是任务是否客观完成这一确定性事实，相同产物必须得出相同结论，而 judge 提供的是定性意见，应放在审查环节。
+- **Level 4:** 你会把关卡部署在哪些层级以确保其绝对无法被绕过？ Expected: 分层部署，包含 pre-commit 钩子、CI 状态检查以及合并前硬门禁，使得某一层的遗漏必定能在下一层被成功捕获。
 
 ## Wrong answers
 
-- "Tell the agent to paste the test output into the transcript." The model can paste what it expects, and a reviewer cannot tell a paste from a capture.
-- "Trust the agent and let CI catch it." CI did catch it, after the claim reached a reviewer, and the point is to stop the claim at the source.
-- "Treat a timeout as a pass, because the tests were slow." A timeout gives a null exit, and the loop must refuse to advance on a null exit.
+- "让 agent 在运行记录中直接粘贴测试输出内容。" 模型完全可以自行编造一段符合预期的输出，人工审查者无法仅凭文本分辨真假。
+- "信任 agent，依靠后续的 CI 流水线去拦截错误。" CI 确实能够捕获错误，但这发生在虚假宣称已经流向审查者之后，核心目标是在源头予以阻断。
+- "将命令执行超时视作测试通过，理由是测试运行过慢。" 超时会导致退出码为 null，而循环必须严格拒绝在退出码为 null 的情况下推进。
 
 ## Taught in
 
-The [runtime feedback lesson](../../../phases/14-agent-engineering/37-runtime-feedback-loops/) builds the runner, and the [verification gates lesson](../../../phases/14-agent-engineering/38-verification-gates/) builds the gate that reads its records.
+[运行时反馈循环](../../../phases/14-agent-engineering/37-runtime-feedback-loops/)课程构建了统一反馈执行器，[验证关卡](../../../phases/14-agent-engineering/38-verification-gates/)课程构建了读取并校验这些记录的判定关卡。

@@ -1,6 +1,6 @@
 ---
 id: bigram-beats-unigram
-title: Train the smallest language model past its baseline
+title: 训练最小的语言模型，让它超过基线
 card: coding
 kind: take-home
 level: 3
@@ -16,15 +16,15 @@ related: [coding/loss-shift-flatten, coding/lr-peak-sweep]
 updated: 2026-11-03
 ---
 
-Write a training loop for a table of next-character logits: one row per context character, one column per next character. Train it with gradient descent on a text, under a fixed step budget and a seeded generator, until its held-out NLL is lower than a model that ignores the context. Tell me what the held-out check must look like for the comparison to mean anything.
+为一张下一个字符的 logits 表写训练循环：每个上下文字符占一行，每个下一个字符占一列。在固定的步数预算和带种子的随机数生成器下，用梯度下降在一段文本上训练它，直到它在留出集上的 NLL 低于一个忽略上下文的模型。再说明留出集检查必须是什么样子，这个比较才有意义。
 
 ## Short answer
 
-Build the pairs so that the current character is the context and the following character is the target, compute the log-softmax over each row, and descend the mean of the negative target log-probabilities over the training pairs within the step budget. The held-out check scores a fixed split that training never saw, with the same loss definition for the bigram and the unigram baseline, and the model only passes when its held-out value is lower than the baseline's. Reproducibility comes from drawing the initial table from the generator that the caller passes, not from a global one.
+构造字符对时，当前字符作上下文，后一个字符作目标；对每行算 log-softmax，在步数预算内对训练字符对上目标负对数概率的均值做梯度下降。留出集检查要在训练从未见过的固定切分上打分，二元模型和一元基线用同一个损失定义，只有模型的留出集数值低于基线才算通过。可复现性来自用调用方传入的生成器抽取初始表，而不是全局随机状态。
 
 ## Full answer
 
-### The model and the loop
+### 模型和循环
 
 ```python
 def train(text, rng, steps, lr):
@@ -45,32 +45,32 @@ def next_log_probs(W, context):
     return log_softmax(W[context])
 ```
 
-The pair direction is the whole model: context first, target second. Reversing them trains a model that predicts the previous character, and counting each next character as its own context trains nothing about what follows what.
+字符对的方向决定了整个模型：上下文在前，目标在后。反过来，训练出的模型预测的是前一个字符；把每个下一个字符当作它自己的上下文，就学不到「什么后面跟什么」。
 
-### The gradient sign
+### 梯度的符号
 
-The update subtracts the gradient. Adding it climbs the loss, which is visible on the first evaluation, and is the first mutant the practice checks.
+更新时减去梯度。加上梯度会让损失上升，第一次评估就能看出来，这也是练习检查的第一个变异体。
 
-### The held-out check
+### 留出集检查
 
-The loop lesson's rule is that evaluation runs on a fixed held-out slice with no gradient, and the number must be comparable across runs. For this task that means three things. The split is fixed before training and never touched by the loop. The unigram baseline, which assigns each character its frequency in the training text regardless of context, is scored on the same held-out characters with the same loss definition. The bigram passes only when its held-out value is strictly lower. A model that wins on the training text and not on the held-out text has memorized the training text.
+循环课的规则是：评估在固定的留出切片上运行，不算梯度，数值必须能跨运行比较。放到这个任务里有三点。切分在训练前固定，循环从不碰它。一元基线不看上下文，给每个字符分配它在训练文本中的频率；它要在同一批留出字符上、用同一个损失定义打分。二元模型的留出集数值严格更低才算通过。在训练文本上赢、在留出文本上输的模型只是记住了训练文本。
 
-### The budget
+### 预算
 
-A step budget is part of the contract. A loop that runs more steps than the budget may reach the target but fails the task, and in a real run it is the difference between a planned job and an overrun.
+步数预算是契约的一部分。循环跑的步数超过预算，即使达到了目标也算失败；在真实训练里，这就是按计划完成的任务和超支任务的区别。
 
 ## Follow-ups
 
-- **Level 3:** Why return log-probabilities and not raw logits from the scoring function? Expected: the loss needs a normalized distribution per row; raw logits are not comparable across contexts.
-- **Level 3:** The model beats the baseline on training text and loses on held-out text. What happened? Expected: it memorized the training pairs; a held-out split exists to catch exactly that.
-- **Level 4:** How does this toy loop map onto the full training loop in the lesson? Expected: the pair construction is the shift-by-one, the row lookup is the forward, the held-out check is the fixed evaluation, and the budget is the step count of the schedule.
+- **Level 3:** 打分函数为什么返回对数概率，而不是原始 logits？ Expected: 损失需要每行一个归一化分布；原始 logits 在不同上下文之间没法比较。
+- **Level 3:** 模型在训练文本上胜过基线，在留出文本上输了。发生了什么？ Expected: 它记住了训练字符对；留出切分就是为了发现这种情况。
+- **Level 4:** 这个玩具循环怎样对应课里的完整训练循环？ Expected: 构造字符对就是移一位，按行查表就是前向，留出集检查就是固定评估，预算就是调度的步数。
 
 ## Wrong answers
 
-- "Evaluate on the training text to save time." The comparison then measures memorization and the baseline comparison means nothing.
-- "Draw the initial table from the global random state." Two runs with one seed then differ, and the test for reproducibility fails.
-- "Train until the loss stops improving." The budget is part of the contract and an open-ended loop hides a slow or stuck run.
+- "为了省时间，直接在训练文本上评估。" 这样比较的是记忆程度，和基线的比较没有意义。
+- "从全局随机状态抽取初始表。" 同一个种子跑两次结果会不同，可复现性测试会失败。
+- "一直训练到损失不再下降。" 预算是契约的一部分，不设上限的循环会掩盖跑得慢或卡住的训练。
 
 ## Taught in
 
-The [training loop lesson](../../../phases/19-capstone-projects/36-training-loop-eval/) sets the rules for held-out evaluation and loss alignment, and the [character bigram practice](../../../practice/train-char-bigram/) trains the smallest model under a step budget.
+[训练循环课](../../../phases/19-capstone-projects/36-training-loop-eval/)规定了留出集评估和损失对齐的规则，[字符二元模型练习](../../../practice/train-char-bigram/)在步数预算内训练这个最小的模型。

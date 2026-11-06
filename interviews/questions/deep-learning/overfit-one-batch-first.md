@@ -1,6 +1,6 @@
 ---
 id: overfit-one-batch-first
-title: The 30 second check before a multi-day run
+title: 多天训练之前的 30 秒检查
 card: deep-learning
 kind: design
 level: 3
@@ -16,51 +16,51 @@ related: [deep-learning/loss-stuck-at-log-classes, deep-learning/missing-zero-gr
 updated: 2026-11-03
 ---
 
-You are about to launch a multi-day training run on a new architecture with a new data pipeline. Design a check that runs in about 30 seconds and must pass before the run starts. List the classes of bugs it catches and the ones it does not.
+你要在一个新架构、一条新数据流水线上启动一次要跑好几天的训练。设计一个约 30 秒跑完、训练开始前必须通过的检查。列出它能抓到的 bug 类别，以及抓不到的。
 
 ## Short answer
 
-Take one small batch of 8 to 32 samples and train on it alone for a few hundred steps. The loss must fall to near zero and the training accuracy must reach 100 percent. A pass shows that the loss function, the backward pass and the optimizer hookup work, and that the model can fit this batch, but not that each input has its correct label, because a model can memorize a wrong but consistent pairing as well. It says nothing about generalization, leakage or the full data loader, so it is the first gate and not the last.
+取一个 8 到 32 个样本的小 batch，只在它上面训练几百步。损失必须降到接近零，训练准确率必须到 100%。通过说明损失函数、反向传播和优化器挂接都正常，模型也能拟合这个 batch；但它不能说明每个输入都配上了正确的标签，因为错误但一致的配对，模型一样能记住。它对泛化、泄漏和完整的数据加载器什么也说明不了，所以它是第一道关，不是最后一道。
 
 ## Full answer
 
-### The test
+### 测试本身
 
-The debugging lesson calls this the single most important technique in deep learning. Fix a batch, build a fresh model and optimizer, and loop: zero the gradients, forward, loss, backward, step. Print the loss and accuracy every 50 steps. The lesson's implementation runs 200 steps and treats a final loss above 0.1 as a failure.
+调试课把它称为深度学习里最重要的一项技术。固定一个 batch，新建模型和优化器，然后循环：梯度清零、前向、损失、反向、step。每 50 步打印一次损失和准确率。课里的实现跑 200 步，最终损失高于 0.1 就算失败。
 
-### What a failure means
+### 失败意味着什么
 
-Any of these, and the lesson lists them:
+下面任何一项，课里都列了出来：
 
-- a loss function that does not match the output layer;
-- a broken backward pass or a detached graph;
-- an optimizer built before the model's parameters existed, so it updates nothing;
-- inputs and labels out of step;
-- an architecture too small to represent even this batch.
+- 损失函数和输出层不匹配；
+- 反向传播坏了，或者计算图被断开；
+- 优化器在模型参数存在之前就构建了，所以什么也不更新；
+- 输入和标签没对齐；
+- 架构太小，连这个 batch 都表示不了。
 
-Each of these would also break the full run, and there it would show up hours later as a slow or flat loss with twenty possible causes. Here it shows up in seconds with five.
+这些问题每一个也会弄坏完整训练，但在那里，它要几小时后才会表现为损失下降缓慢或不动，可能的原因有二十种。在这里，它几秒钟就会暴露，可能的原因只有五种。
 
-### What a pass does not prove
+### 通过证明不了什么
 
-The test overfits by design, so it says nothing about generalization. A model can memorize any consistent labels, so a wrong pairing of inputs and labels inside the fixed batch also passes. It uses one batch, so a shuffle that unpairs inputs and labels across the full set, a normalization computed on the full dataset, duplicate rows across splits, or label noise can all survive it. The lesson's checklist continues after it: print the model summary and check the parameter count, run one forward pass on random data and check the output shape, train for 5 epochs and confirm the loss falls, check activation statistics for dead or exploding layers, check the gradient flow across layers, and print 5 random samples with their labels.
+这个测试本来就是要过拟合，所以它对泛化什么也说明不了。模型能记住任何一致的标签，所以固定 batch 里输入和标签配错了也能通过。它只用一个 batch，所以在整个数据集上打乱配对的 shuffle、在完整数据集上计算的归一化、跨切分的重复行，或者标签噪声，都能过这一关。课里的检查清单在它之后还有：打印模型摘要并核对参数量，用随机数据跑一次前向并检查输出形状，训练 5 个 epoch 确认损失在下降，检查激活值统计看有没有死掉或爆炸的层，检查各层之间的梯度流动，以及打印 5 个随机样本和它们的标签。
 
-### Make it a gate
+### 把它变成关卡
 
-Run it at startup on a fixed batch, assert the final loss is below the threshold, and refuse to start the long run when it fails. Run it again whenever the architecture or the pipeline changes.
+启动时在一个固定 batch 上运行它，断言最终损失低于阈值，失败就拒绝启动长训练。架构或流水线每次改动后都重新运行。
 
 ## Follow-ups
 
-- **Level 3:** The loss on the one batch stalls well above the threshold. Name three suspects. Expected: a loss that does not match the output layer, an optimizer built before the model's parameters were created, or a model too small to fit the batch.
-- **Level 3:** Why 8 to 32 samples? Expected: small enough that a correct model memorizes it in a few hundred steps, so a failure is unambiguous and the test stays fast.
-- **Level 4:** The test passes and the full run later shows training accuracy at chance. What does the pass rule out, and what remains? Expected: the model and loop can learn, so what remains is the full data path: a shuffle that unpairs inputs and labels, or normalization computed differently for the full set.
-- **Level 4:** How do you turn this into a gate in a training script? Expected: run it on a fixed batch at startup, assert the final loss is below the threshold, refuse to start the long run on a failure, and rerun it whenever the architecture or pipeline changes.
+- **Level 3:** 这个 batch 上的损失停在阈值之上很远。说出三个嫌疑。 Expected: 损失和输出层不匹配，优化器在模型参数创建之前构建，或者模型太小拟合不了这个 batch。
+- **Level 3:** 为什么是 8 到 32 个样本？ Expected: 足够小，正确的模型几百步就能记住它，失败的含义清楚，测试也够快。
+- **Level 4:** 测试通过了，后来完整训练的训练准确率却只有随机水平。这次测试通过排除了什么，还剩什么？ Expected: 模型和循环能学，所以剩下的是完整数据路径：打乱时拆散了输入和标签，或者完整数据集的归一化计算方式不同。
+- **Level 4:** 怎样把它变成训练脚本里的关卡？ Expected: 启动时在固定 batch 上运行，断言最终损失低于阈值，失败就拒绝启动长训练，架构或流水线一改就重新运行。
 
 ## Wrong answers
 
-- "A passing test means the model will generalize." It proves the model can memorize one batch; generalization needs the validation curve.
-- "Skip it, the full run shows problems soon enough." The run shows a symptom hours later and the symptom fits many causes; the test isolates the loop in seconds.
-- "Use the whole training set for a few epochs instead." That is the full run; a small batch is what makes a failure unambiguous and fast.
+- "测试通过，说明模型能泛化。" 它只证明模型能记住一个 batch；泛化要看验证曲线。
+- "跳过它，完整训练很快就会暴露问题。" 完整训练要几小时后才出现症状，而且一个症状对应很多原因；这个测试几秒钟就能把循环单独隔离出来。
+- "改成用整个训练集跑几个 epoch。" 那就是完整训练；正是小 batch 让失败又快又明确。
 
 ## Taught in
 
-The [debugging lesson](../../../phases/03-deep-learning-core/13-debugging-neural-networks/) implements the test, lists what it catches, and places it first in the pre-training checklist.
+[调试课](../../../phases/03-deep-learning-core/13-debugging-neural-networks/)实现了这个测试，列出了它能抓到的问题，并把它放在训练前检查清单的第一位。

@@ -1,6 +1,6 @@
 ---
 id: three-failure-modes-structured
-title: The three ways a structured output call fails
+title: 结构化输出调用失败的三种方式
 card: prompting-structured-output
 kind: concept
 level: 2
@@ -16,49 +16,49 @@ related: [prompting-structured-output/json-mode-is-not-a-schema, prompting-struc
 updated: 2026-11-03
 ---
 
-An extraction service turns purchase-order emails into typed records. Name the ways a structured output call can fail, say which of them disappear under strict schema enforcement, and describe how the code should treat what remains.
+某个抽取服务把采购订单邮件转换成类型化记录。说出结构化输出调用会以哪些方式失败，其中哪些在严格 schema 约束下会消失，以及代码该怎样处理剩下的。
 
 ## Short answer
 
-Three ways: a parse error, where the output is not JSON; a schema violation, where it parses but breaks a type, a required field, an enum or a range; and a refusal, where the model decides the input does not fit the schema. Strict enforcement removes the first two by construction for a response that finishes. The refusal stays, and it must be a typed outcome that the code logs and returns, never a retry. A response cut at the token limit can still fail to parse, so check the stop reason before you read the output.
+三种：解析错误，输出不是 JSON；schema 违规，能解析但违反了类型、必填字段、枚举或取值范围；拒答，模型判断输入不适合这个 schema。对正常结束的响应，严格约束从机制上消除了前两种。拒答依然存在，它必须是代码记录日志并返回的类型化结果，绝不重试。在 token 上限处被截断的响应仍可能解析失败，所以读输出之前先检查停止原因。
 
 ## Full answer
 
-### Three approaches, three failure profiles
+### 三种做法，三种失败画像
 
-1. **Prompt for JSON.** Works 85 to 95 percent of the time on a frontier model. Fails six ways: a missing brace, a trailing comma, wrong types, invented fields, truncation at the token limit, and leaked prose such as "here is your JSON".
-2. **Validate after generation.** Generate freely, parse, validate against the schema, and on failure inject the error and retry. Reliable but you pay for every retry.
-3. **Constrained decoding.** The provider masks invalid tokens at decode time, so a finished output parses and validates by construction. The model-side failure collapses to one mode, refusal; a response cut at the token limit and a request error still need their own error path.
+1. **用 prompt 要求 JSON。** 在前沿模型上 85% 到 95% 的时候有效。有六种失败方式：缺括号、尾随逗号、类型错误、编造字段、在 token 上限处截断，以及混进 "here is your JSON" 这类文字。
+2. **生成后校验。** 自由生成，解析，按 schema 校验，失败就注入错误并重试。可靠，但每次重试都要付费。
+3. **约束解码。** 服务商在解码时屏蔽非法 token，所以正常结束的输出天然能解析、能通过校验。模型这一侧的失败收敛为一种：拒答；在 token 上限处截断的响应和请求错误仍需要各自的错误路径。
 
-### The retry loop, when you are outside strict mode
+### 不用严格模式时的重试循环
 
 ```text
 generate -> parse -> validate -> if fail, inject the error and retry, at most 3 times
 ```
 
-One retry is usually enough. Three catches weak-model flakes. Beyond three means the schema or the prompt is wrong for some inputs, and the fix is there, not in a fourth attempt. The validator should return a typed error list with a path and a message for each failure, which is the shape the retry prompt needs.
+通常重试一次就够了。三次能兜住弱模型的偶发抖动。超过三次说明 schema 或 prompt 对某些输入有问题，修复应该落在那里，而不是第四次尝试。校验器应返回类型化的错误列表，每个失败带路径和说明，这正是重试 prompt 需要的形状。
 
-### The refusal branch
+### 拒答分支
 
-The model declines because the input does not fit, for example the email was a poem and not an order, or because of a safety reason. The refusal carries the reason. Log it, return it typed, and do not retry. The lesson also uses refusals as a safety signal downstream.
+模型拒绝，可能是因为输入不合适，比如那封邮件是一首诗而不是订单，也可能是出于安全原因。拒答带有原因。记录日志，以类型化结果返回，不重试。课程还把拒答用作下游的安全信号。
 
-### One schema setting that matters
+### 一个关键的 schema 设置
 
-`additionalProperties: false` forbids fields the schema did not name, which is how strict mode shuts the door on invented fields. Strict mode requires it everywhere.
+`additionalProperties: false` 禁止出现 schema 没有列出的字段，严格模式就是靠它堵住编造字段的。严格模式要求所有层级都这样设置。
 
 ## Follow-ups
 
-- **Level 2:** How many retries, and what does needing more tell you? Expected: at most three; one is usually enough, and beyond three the schema or the prompt is wrong for some inputs.
-- **Level 2:** Why must the refusal branch not retry? Expected: the model declined for a reason, often fit or safety; a retry wastes cost and can push a wrong extraction through.
-- **Level 3:** What does the retry prompt need from the validator? Expected: a typed error list with a path and a message per failure, so the model knows which field to fix.
-- **Level 3:** Which schema setting blocks invented fields? Expected: additional properties set to false, which strict mode requires everywhere.
+- **Level 2:** 最多重试几次？需要更多次说明什么？ Expected: 最多三次；通常一次就够，超过三次说明 schema 或 prompt 对某些输入有问题。
+- **Level 2:** 为什么拒答分支不能重试？ Expected: 模型拒绝是有原因的，常见的是输入不合适或安全原因；重试浪费成本，还可能让一条错误的抽取结果混过去。
+- **Level 3:** 重试 prompt 需要从校验器拿到什么？ Expected: 一份类型化的错误列表，每个失败带路径和说明，模型才知道该修哪个字段。
+- **Level 3:** 哪个 schema 设置能挡住编造的字段？ Expected: 把附加属性设为 false，严格模式要求所有层级都这样设置。
 
 ## Wrong answers
 
-- "A refusal is a failed call, retry it." It is a first-class outcome with a reason attached; log it and return it typed.
-- "Strict mode removes every failure." It removes parse errors and schema violations for a finished response; refusals, truncated responses and wrong values with the right type remain.
-- "Retry until it validates." Past three retries the cost grows and the schema is the real problem.
+- "拒答是一次失败的调用，重试就好。" 它是附带原因的一等结果；记录日志，以类型化结果返回。
+- "严格模式消除了所有失败。" 它对正常结束的响应消除了解析错误和 schema 违规；拒答、被截断的响应和类型正确的错误值依然存在。
+- "一直重试到通过校验。" 超过三次，成本不断增加，而真正的问题在 schema。
 
 ## Taught in
 
-The lesson [structured output](../../../phases/13-tools-and-protocols/04-structured-output/) names the three failure modes, the retry pattern and the refusal branch, and the lesson [structured outputs](../../../phases/11-llm-engineering/03-structured-outputs/) covers validation with error feedback.
+[结构化输出协议](../../../phases/13-tools-and-protocols/04-structured-output/)一课列出了三种失败方式、重试模式和拒答分支，[结构化输出](../../../phases/11-llm-engineering/03-structured-outputs/)一课讲了带错误反馈的校验。

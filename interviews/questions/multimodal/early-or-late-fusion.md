@@ -1,6 +1,6 @@
 ---
 id: early-or-late-fusion
-title: Adapter tokens or one shared vocabulary for images
+title: 适配器投影还是统一共享图像词表
 card: multimodal
 kind: tradeoff
 level: 2
@@ -16,56 +16,56 @@ related: [multimodal/vlm-three-parts]
 updated: 2026-11-03
 ---
 
-A product needs a model that reads screenshots and answers questions today, and might need to draw diagrams later. Two designs are on the table: an adapter model, where a vision encoder feeds projected tokens into a text-only decoder, and a model that turns images into discrete codes in the same vocabulary as text and trains one next-token loss over interleaved sequences. Compare them and pick for this product.
+某个产品当前需要一个能够读取软件截图并回答相关问题的模型，未来可能还需要它具备绘制图表的能力。摆在桌面上有两种技术方案：一种是适配器模型（Adapter Model），由视觉编码器将投影后的 token 输入纯文本解码器；另一种是将图像量化为与文本同属一个词表的离散编码，在图文交错序列上训练单一的 Next-token 损失。请对比这两种方案并为该产品做出技术选型。
 
 ## Short answer
 
-The adapter design is late fusion: images enter as projected continuous tokens or through cross-attention, the decoder reuses all its text pretraining, and the output is text only. The shared-vocabulary design is early fusion: a quantizer maps an image to discrete codes, the transformer trains one loss over text and image codes, and it can emit image codes, so it generates pictures. For a product that must read screenshots now, pick the adapter: it reuses more pretrained compute, has no quantizer ceiling for understanding, and is cheaper to serve; add the early-fusion model only when drawing becomes a real requirement, because its image quality is capped by the quantizer and each generated image costs a decoder pass over a thousand or more codes.
+适配器方案属于后期融合（Late Fusion）：图像作为投影后的连续向量或通过交叉注意力注入，解码器全盘复用预训练的纯文本计算成果，输出仅为文本。共享词表方案属于早期融合（Early Fusion）：量化器将图像转化为离散编码，Transformer 在文本与图像编码混合序列上训练单一自回归损失，能自主生成图像编码从而具备作图能力。对于当前亟需截图理解的产品，应果断选择适配器方案：它复用了更多预训练算力、在理解任务上没有量化器重建质量的硬天花板，且线上推理部署成本更低；只有在画图成为实际需求时再引入早期融合模型，因为后者的图像质量受制于量化器上限，且生成单张图片需要自回归解码上千步。
 
 ## Full answer
 
-### Two paths into the model
+### 两种通往模型的路径对比
 
-| | Late fusion, adapter | Early fusion, shared vocabulary |
+| 维度 | 后期融合（适配器方案） | 早期融合（共享词表方案） |
 |---|---|---|
-| Image input | encoder features projected into the embedding space, or read through cross-attention | discrete codes from a learned quantizer, looked up like text tokens |
-| Loss | language-modeling loss on text | a single next-token loss on text and image codes together |
-| Output | text only | text and images, interleaved as the model chooses |
-| Reuse of the pretrained LLM | full | the model trains on the mixed stream from the start |
-| Ceiling for understanding | the encoder | the quantizer's reconstruction |
-| Serving cost per answer | one decoder step per generated text token | one decoder step per generated text token, plus 1024 sequential decoding steps per generated image, one per code, then a decoder pass for the pixels |
+| 图像输入形式 | 编码器特征投影到嵌入空间，或通过交叉注意力读取 | 来自可学习量化器的离散编码，如同文本 token 一样查表查出 |
+| 损失函数 | 纯文本上的语言模型因果建模损失 | 文本 token 与图像编码混合序列上的单一 Next-token 损失 |
+| 输出模态 | 仅限文本 | 文本与图像混合交错，由模型自主决策输出 |
+| 预训练 LLM 复用度 | 完整复用 | 模型从一开始就在混合数据流上训练 |
+| 理解能力的天花板 | 取决于视觉编码器本身的表征能力 | 取决于离散量化器的重构保真度上限 |
+| 单次问答的推理成本 | 每个生成的文本 token 执行一次解码步 | 每个文本 token 一次解码步；生成单张图片需执行 1,024 次串行自回归解码步，再加一次像素解码器前向 |
 
-### What early fusion buys
+### 早期融合带来的收益
 
-One sequence, one loss, and mixed-modality output. The reference model's quantizer maps a 512 by 512 image to 1024 codes from a codebook of 8192, inside a single vocabulary of 65,536 entries that also holds the text tokens and the separators. When the model emits the image-start separator, the next 1024 codes go to the decoder for pixels.
+统一序列、单一损失、原生图文交错生成。基准模型的量化器将 512 × 512 的图像映射为来自 8,192 码本的 1,024 个离散编码，全部置于包含 65,536 个条目的统一词表中（同时涵盖文本 token 与模态分隔符）。当模型输出图像起始分隔符时，后续输出的 1,024 个编码直接交由像素解码器重构为图像。
 
-### What it costs
+### 早期融合付出的代价
 
-- A quality ceiling. The quantizer is lossy; at that codebook and code count the reconstruction peaks around 26 to 28 dB, below the 32 and more of continuous latent diffusion. A better quantizer lifts the ceiling, but the ceiling is the quantizer.
-- Training stability. Early-fusion training at scale diverged without normalization of the attention queries and keys, dropout after every residual, and an extra normalization on the last block.
-- Compute. Every generated image is a decoder pass over its codes.
+- **质量硬天花板**：量化是有损的；在此类码本规模与代码数量下，图像重构峰值在 26 到 28 dB 左右，低于连续潜空间扩散模型的 32 dB 及以上。换用更好的量化器能提高上限，但天花板始终牢牢受制于量化器。
+- **训练稳定性**：大规模早期融合训练在缺少 query 和 key 归一化、每次残差后的 dropout，以及最后一个块的额外归一化时出现过发散。
+- **计算量**：生成每张图像都要对其编码做一次完整的解码。
 
-### What late fusion buys
+### 后期融合带来的收益
 
-It bolts onto any pretrained decoder, keeps the text stream clean so that text ability survives, and computes the image once; with cross-attention the image keys and values are cached across decode steps. It cannot emit images.
+它可以像插件一样即插即用地挂载到任意成熟的预训练解码器上，保持文本通道纯净从而不损伤通用语言能力，且视觉特征单次编码即可；配合交叉注意力时，图像的 key 和 value 会缓存下来，在各解码步骤中复用。它无法输出图像。
 
-### The pick
+### 最终选型决策
 
-Reading screenshots is understanding, and the adapter is the simpler and stronger tool for it today. When drawing arrives, measure whether a separate generation model behind a tool call meets the need before you move the whole stack to early fusion.
+识别截图属于典型的多模态理解范畴，适配器是当下更简单、能力更强的选择。当未来产生绘图需求时，应优先评估在适配器背后通过 Tool-call 调用独立的图像生成模型是否已能满足业务，而非仓促将底层全栈迁移至早期融合。
 
 ## Follow-ups
 
-- **Level 2:** Why can the adapter model not generate an image? Expected: its output head covers the text vocabulary only; images enter as embeddings and never exist as tokens it could predict.
-- **Level 2:** What is the shared vocabulary made of? Expected: text tokens, image codes and modality separators in one id space, so one embedding table and one output projection cover all of them.
-- **Level 3:** Where does the quality ceiling of the early-fusion model come from, and what moves it? Expected: the quantizer's reconstruction; a larger codebook and more codes per image raise it, as the next generation of tokenizers showed.
-- **Level 3:** A hybrid keeps images continuous and trains a diffusion loss on patches next to the text loss. What does it trade? Expected: no quantizer and higher image fidelity, against two losses on different scales to balance and a diffusion sampling loop at generation time.
+- **Level 2:** 为什么适配器模型无法直接生成图像？ Expected: 它的输出预测头只覆盖纯文本词表；图像仅作为输入的嵌入向量存在，并不存在可供预测输出的图像离散 token。
+- **Level 2:** 早期融合模型的共享词表由什么构成？ Expected: 文本 token、图像离散编码以及模态分隔符共享同一个 id 空间，因此同一张嵌入表与同一个输出投影头覆盖全部模态。
+- **Level 3:** 早期融合模型的图像质量上限源自哪里，如何提高这一上限？ Expected: 源自离散量化器的重构保真度；扩大码本容量并增加单图的代码数量可以提高上限，正如新一代多模态分词器所验证的那样。
+- **Level 3:** 若采用保留连续图像特征并在文本损失旁联合训练扩散损失的混合架构，付出了什么权衡？ Expected: 不需要量化器，图像保真度更高；代价是要平衡两种不同尺度的损失，生成时还需要扩散采样循环。
 
 ## Wrong answers
 
-- "Early fusion is the future, so start there." For understanding alone it reuses less pretrained compute and caps quality at the quantizer; the adapter is the simpler, stronger choice until generation is required.
-- "The adapter can draw if you add a decoder head." Its images never exist as predictable tokens; drawing needs either image codes in the vocabulary or a separate generation model.
-- "The quantizer is a detail; the transformer does the work." In the early-fusion family the quantizer sets the ceiling on every image the model produces.
+- "早期融合代表未来，因此无论如何都应该从它起步。" 对于单纯的多模态理解任务，它复用的成熟预训练算力更少，且图像理解被量化器严重锁死上限；在需要生成图像之前，适配器方案更扎实。
+- "只要在适配器模型后面加一个解码头，它就能画图了。" 图像特征从一开始就不是作为可预测 token 建模的；画图必须要么在词表中包含离散编码，要么接入独立的文生图生成模型。
+- "量化器只是实现细节，Transformer 主干才是关键。" 在离散早期融合流派中，量化器的重构能力严格决定了模型所能生成的最佳图像质量上限。
 
 ## Taught in
 
-The [Chameleon lesson](../../../phases/12-multimodal-ai/11-chameleon-early-fusion-tokens/) sets out the early-fusion thesis and its costs, the [cross-attention fusion capstone](../../../phases/19-capstone-projects/61-cross-attention-fusion/) builds the late-fusion path, and the [Emu3 lesson](../../../phases/12-multimodal-ai/12-emu3-next-token-for-generation/) shows what a better quantizer changes.
+[Chameleon 课程](../../../phases/12-multimodal-ai/11-chameleon-early-fusion-tokens/)阐述了早期融合的核心论点与代价，[交叉注意力融合实战](../../../phases/19-capstone-projects/61-cross-attention-fusion/)构建了后期融合路径，而[Emu3 课程](../../../phases/12-multimodal-ai/12-emu3-next-token-for-generation/)展示了更好的量化器带来的变化。

@@ -1,6 +1,6 @@
 ---
 id: pick-the-eval-method
-title: Overlap metric, judge model or human review
+title: 重合度指标、judge 模型，还是人工评审
 card: evaluation
 kind: tradeoff
 level: 1
@@ -16,49 +16,49 @@ related: [evaluation/judge-calibration-before-trust]
 updated: 2026-11-03
 ---
 
-You can score a summarization feature in three ways: n-gram overlap against a reference, a strong model that grades with a rubric, or human experts. The team has one afternoon and a small budget. How do you decide which to use, and for what?
+给一个摘要功能打分有三种办法：与参考答案比 n-gram 重合度，用一个强模型按评分量表打分，或者请人类专家。团队只有一个下午和很少的预算。你怎么决定用哪个、用在哪？
 
 ## Short answer
 
-Use all three, each for a different job. Overlap metrics are free and instant but agree with people only 40 to 60 percent of the time, so they serve as a baseline and a smoke test. A judge model costs a few dollars per thousand cases and agrees 82 to 88 percent with people on a well anchored rubric, so it is the default scorer. People are the ground truth, so spend them on calibrating the judge and on edge cases, not on every commit.
+三个都用，各管一件事。重合度指标免费、即时出结果，但与人的一致率只有 40% 到 60%，所以用作基线和冒烟测试。judge 模型每千个用例几美元，在锚定良好的量表上与人的一致率达到 82% 到 88%，所以是默认的打分器。人是真实标准，把人力花在校准 judge 和边界用例上，而不是每次提交。
 
 ## Full answer
 
-### The trade
+### 取舍
 
-| Method | Speed | Cost per thousand | Agreement with people | Use |
+| 方法 | 速度 | 每千个用例成本 | 与人的一致率 | 用途 |
 |---|---|---|---|---|
-| BLEU or ROUGE | under a second | nothing | 40 to 60 percent | baselines, smoke tests |
-| Embedding similarity | about 30 seconds | nothing | 55 to 70 percent | screening |
-| Judge model, small tier | about 3 minutes | about 8 dollars | 82 to 86 percent | default CI judge |
-| Judge model, large tier | about 5 minutes | about 25 dollars | 85 to 88 percent | high stakes, safety |
-| Human expert | about 2 hours | about 500 dollars | ground truth | calibration, policy |
+| BLEU 或 ROUGE | 不到一秒 | 零 | 40% 到 60% | 基线、冒烟测试 |
+| 嵌入相似度 | 约 30 秒 | 零 | 55% 到 70% | 初筛 |
+| judge 模型，小档 | 约 3 分钟 | 约 8 美元 | 82% 到 86% | CI 默认 judge |
+| judge 模型，大档 | 约 5 分钟 | 约 25 美元 | 85% 到 88% | 高风险、安全 |
+| 人类专家 | 约 2 小时 | 约 500 美元 | 真实标准 | 校准、政策 |
 
-### Why each one stays
+### 为什么每种都留着
 
-Overlap metrics miss meaning. Two answers with no shared words can both be right, and a high ROUGE answer can be wrong in context. They stay because they cost nothing, run in seconds and do not drift when a judge model changes.
+重合度指标看不到含义。两个没有共同词的答案可能都对，一个 ROUGE 很高的答案放在上下文里可能是错的。留着它们，是因为它们不花钱，几秒就跑完，而且不会因为 judge 模型换了而漂移。
 
-The judge captures relevance, correctness, helpfulness and safety. It stays the workhorse because it scales. It needs a rubric with anchored levels and a calibration run against human labels before its number means anything.
+judge 能捕捉相关性、正确性、有用性和安全性。它是主力，因为它能规模化。它需要一份分档锚定的量表，还要先拿人工标签跑一轮校准，它的数字才有意义。
 
-Human review is slow and expensive. It stays because it is the only ground truth. Reserve it for calibrating the automated scores and for the cases the judge cannot settle.
+人工评审又慢又贵。留着它，是因为它是唯一的真实标准。把它留给校准自动分数，以及 judge 判不了的用例。
 
-### For the afternoon
+### 这一个下午
 
-Run the overlap metric on everything to catch gross breakage. Run the judge on the golden set with the four criteria. Have two people label a small slice and compare it with the judge before anyone reads the mean.
+对所有样本跑重合度指标，抓明显的故障。在黄金集上用 judge 按四个维度打分。请两个人标注一小批样本，在有人看均值之前，先拿它和 judge 对比。
 
 ## Follow-ups
 
-- **Level 1:** What does ROUGE measure? Expected: recall of reference n-grams, built for summarization.
-- **Level 2:** Why keep the overlap metric once you have a judge? Expected: it is free and fast, it catches gross regressions in seconds, and it does not move when the judge model changes.
-- **Level 2:** When is a judge not enough? Expected: high stakes or policy decisions, and any time the judge has not been calibrated against human labels on this task.
-- **Level 3:** The lesson says the judge must be at least as capable as the model it grades. Why? Expected: a weak judge gives noisy, inconsistent scores and cannot see the errors a stronger model makes.
+- **Level 1:** ROUGE 衡量什么？ Expected: 参考答案 n-gram 的召回率，专为摘要设计。
+- **Level 2:** 有了 judge，为什么还留着重合度指标？ Expected: 它免费、快，几秒内就能抓到明显的回退，而且 judge 模型换了它也不会变。
+- **Level 2:** 什么时候光靠 judge 不够？ Expected: 高风险或政策性的决定，以及 judge 还没在这个任务上用人工标签校准过的任何时候。
+- **Level 3:** 课程说 judge 至少要和被评的模型一样强。为什么？ Expected: 弱 judge 给出的分数嘈杂、不一致，也看不出更强模型犯的错。
 
 ## Wrong answers
 
-- "People are the gold standard, so grade everything by hand." Human review takes hours and costs about 500 dollars per thousand cases, so it cannot run on every change.
-- "Overlap metrics are useless for generation." They catch gross regressions and cost nothing; they only miss meaning.
-- "Pick one metric and optimize it." Optimizing only correctness yields terse answers that nobody can use; score several criteria.
+- "人是金标准，所以全部人工打分。" 人工评审要几个小时，每千个用例约 500 美元，不可能每次改动都跑。
+- "重合度指标对生成任务没用。" 它们能抓到明显回退，而且不花钱；它们只是看不到含义。
+- "挑一个指标去优化。" 只优化正确性会得到没人能用的简短回答；要对几个维度打分。
 
 ## Taught in
 
-The [evaluation and testing lesson](../../../phases/11-llm-engineering/10-evaluation/) compares the three methods by speed, cost and agreement with people.
+[评测与测试课](../../../phases/11-llm-engineering/10-evaluation/)从速度、成本和与人的一致率三方面比较了这三种方法。

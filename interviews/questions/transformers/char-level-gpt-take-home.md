@@ -1,6 +1,6 @@
 ---
 id: char-level-gpt-take-home
-title: Take-home, a character-level decoder on a laptop
+title: 课后作业：在笔记本上训练字符级解码器
 card: transformers
 kind: take-home
 level: 3
@@ -16,24 +16,24 @@ related: [transformers/loss-drops-to-zero-no-mask, transformers/modernize-a-2017
 updated: 2026-11-03
 ---
 
-This is the take-home we send: train a small decoder-only transformer on a character-level text corpus of about one megabyte, on a laptop, and return the code, the loss curves and a few samples. Tell me how you would approach it, what a reviewer checks in your submission, and which results prove that the model works.
+这是我们发出的课后作业：在笔记本电脑上，用约 1 MB 的字符级文本语料训练一个小型 decoder-only transformer，交回代码、损失曲线和几段采样。请讲讲你会怎么做，评审会检查提交物里的哪些东西，以及哪些结果能证明模型确实有效。
 
 ## Short answer
 
-Build the small reference shape: a character tokenizer over the 65 symbols of the corpus, a token embedding plus a learned positional embedding, a stack of pre-norm blocks with RMSNorm, causal multi-head attention and a SwiGLU network, a final norm and a head tied to the embedding, trained with a shift-by-one cross-entropy on random 256-character windows. Use AdamW, a cosine schedule with warmup and gradient clipping at 1.0, and hold out the last 10 percent of the text for validation. The bar from the lesson: a 4-layer, 4-head model of width 128, about 800K parameters, goes from about 4.2 to about 1.5 training loss in 2,000 steps, about 6 minutes on a laptop, with validation loss under 2.0 that tracks the training loss and samples that look like the corpus.
+搭一个小的参考结构：覆盖语料中 65 个符号的字符分词器，token 嵌入加可学习的位置嵌入，一组带 RMSNorm、因果多头注意力和 SwiGLU 网络的 pre-norm block，最后一个 norm 和一个与嵌入共享权重的输出头，在随机截取的 256 字符窗口上用错开一位的交叉熵训练。用 AdamW、带 warmup 的余弦学习率调度和 1.0 的梯度裁剪，留出文本最后 10% 做验证。课程给出的标准是：4 层、4 头、宽度 128、约 800K 参数的模型，2,000 步内训练损失从约 4.2 降到约 1.5，笔记本上约 6 分钟，验证损失低于 2.0 并紧跟训练损失，采样看起来像语料。
 
 ## Full answer
 
-### What to build
+### 要搭什么
 
 ```text
 tokens (B, N) -> embedding + position -> [norm, causal attention, residual, norm, SwiGLU, residual] x L
             -> final norm -> head tied to the embedding -> logits (B, N, V) -> shift-by-one loss
 ```
 
-A byte-level character tokenizer needs no training. The data split is 90 to 10 by position in the text, so that the validation text is never seen in training.
+字节级的字符分词器不需要训练。数据按文本位置 90 比 10 切分，这样验证文本在训练中从未出现。
 
-### The training loop
+### 训练循环
 
 ```python
 for step in range(max_steps):
@@ -46,37 +46,37 @@ for step in range(max_steps):
     opt.zero_grad()
 ```
 
-Log the training and validation loss on the same axis. Sample after training with top-p and stop after 500 characters.
+把训练损失和验证损失记在同一坐标轴上。训练结束后用 top-p 采样，500 个字符后停止。
 
-### What a reviewer checks
+### 评审检查什么
 
-1. **Correctness of the objective.** The causal mask is applied before the softmax and the targets are the inputs shifted by one. A unit test that perturbs a later token and checks earlier outputs is a strong signal.
-2. **The first loss.** About 4.2 at step zero, the uniform baseline, the logarithm of 65. A start well below it is a reason to check for a leak.
-3. **Validation discipline.** A held-out split, logged at intervals, that tracks the training loss; the lesson records no overfitting at this size and budget. A validation loss far below training is a reason to check the split and the loss code, because the final 10 percent of text can also be easier.
-4. **Training hygiene.** Gradient clipping, a schedule, a fixed seed, and a run that reproduces.
-5. **Reading the samples.** Line breaks, archaic words and speaker names in capitals appear; the text is corpus-shaped, not the corpus.
+1. **目标是否正确。** 因果 mask 在 softmax 之前施加，目标是输入错开一位。有一个单元测试改动后面的 token、检查前面的输出不变，是很强的信号。
+2. **第一个损失。** 第 0 步约为 4.2，即均匀分布的基线，65 的对数。起点明显低于它，就要查有没有泄漏。
+3. **验证纪律。** 有留出集，按间隔记录，并且跟着训练损失走；课程记录了在这个规模和预算下没有过拟合。验证损失远低于训练损失时，要检查切分和损失代码，因为文本最后 10% 也可能本身更容易。
+4. **训练规范。** 梯度裁剪、学习率调度、固定随机种子，并且结果可复现。
+5. **读采样。** 会出现换行、古旧的词和大写的说话人名字；文本有语料的样子，但不是语料本身。
 
-### What proves it works
+### 什么能证明它有效
 
-The loss curve from about 4.2 to about 1.5, a validation loss under 2.0 that follows it, and samples that a reader recognizes as the style of the corpus. A write-up that names the failure the candidate hit and fixed counts for more than a lower loss.
+损失曲线从约 4.2 降到约 1.5，验证损失低于 2.0 并紧随其后，读者能从采样中认出语料的风格。报告里写清候选人遇到并修好了哪个问题，比更低的损失更有分量。
 
-### Stretch goals that separate candidates
+### 能拉开差距的加分项
 
-Replace the learned positions with rotation of the queries and keys and show the validation loss is at least as low. Add a cache of keys and values to the sampling loop and show the 500-character sample runs 5 to 20 times faster. Train to 5,000 steps and report whether validation keeps improving.
+把可学习的位置换成对查询和键做旋转，并证明验证损失至少一样低。在采样循环里加上 KV cache，证明 500 字符的采样快 5 到 20 倍。训练到 5,000 步，报告验证损失是否继续改善。
 
 ## Follow-ups
 
-- **Level 2:** What is the training loss at step zero and how do you know it is right? Expected: about the logarithm of the vocabulary size, about 4.2 for 65 symbols, because a random model is uniform.
-- **Level 3:** How does a reviewer know your causal mask works without reading the code? Expected: a test that changes a later character and asserts the earlier logits are unchanged, and a loss that starts at the random baseline.
-- **Level 3:** Why tie the head to the embedding at this size? Expected: it saves parameters and the lesson records a quality improvement; the head weight is the transpose of the embedding.
-- **Level 4:** A candidate swaps the character tokenizer for a subword vocabulary of about 50,000. What else must change? Expected: the embedding and head grow from 65 rows to about 50,000, the model needs more capacity to use them, and the windows now cover more text per token.
+- **Level 2:** 第 0 步的训练损失是多少？你怎么知道它对不对？ Expected: 约等于词表大小的对数，65 个符号时约为 4.2，因为随机模型的输出是均匀的。
+- **Level 3:** 评审不读代码，怎么知道你的因果 mask 起作用？ Expected: 有测试改动后面的一个字符并断言前面的 logits 不变，而且损失从随机基线起步。
+- **Level 3:** 在这个规模下为什么让输出头和嵌入共享权重？ Expected: 它节省参数，课程也记录了质量提升；输出头的权重是嵌入的转置。
+- **Level 4:** 候选人把字符分词器换成约 50,000 的子词词表。还有什么必须跟着变？ Expected: 嵌入和输出头从 65 行增长到约 50,000 行，模型需要更多容量来用好它们，而且每个窗口按 token 算覆盖的文本更多了。
 
 ## Wrong answers
 
-- "Use a bigger model to reach a lower loss within the time budget." A larger model trains slower on a laptop and the lesson's bar is reached at 800K parameters in about 6 minutes.
-- "Skip the validation split; the corpus is tiny." The split is the only check against a leak and the reviewer looks for it first.
-- "Report the sample quality instead of the loss." Samples are evidence, not a metric; the curves and the held-out loss are what a reviewer compares across candidates.
+- "在时间预算内用更大的模型拿到更低的损失。" 更大的模型在笔记本上训练更慢，而课程的标准在 800K 参数、约 6 分钟时就达到了。
+- "语料很小，不用切验证集。" 验证集是唯一能发现泄漏的检查，评审第一个就看它。
+- "报告采样质量，不报告损失。" 采样是证据，不是指标；评审在候选人之间比较的是曲线和留出集损失。
 
 ## Taught in
 
-The [transformer capstone](../../../phases/07-transformers-deep-dive/14-build-a-transformer-capstone/) sets the architecture and the target numbers, and the [block capstone](../../../phases/19-capstone-projects/34-transformer-block/) builds the block it stacks.
+[transformer 综合项目一课](../../../phases/07-transformers-deep-dive/14-build-a-transformer-capstone/)定下了架构和目标数字，[block 综合项目](../../../phases/19-capstone-projects/34-transformer-block/)实现了它堆叠的 block。

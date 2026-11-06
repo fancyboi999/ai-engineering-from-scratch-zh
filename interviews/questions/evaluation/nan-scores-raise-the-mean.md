@@ -1,6 +1,6 @@
 ---
 id: nan-scores-raise-the-mean
-title: The judge failed to parse and the mean went up
+title: judge 解析失败，均值反而上涨
 card: evaluation
 kind: debug
 level: 3
@@ -16,46 +16,46 @@ related: [evaluation/mean-hides-the-tail]
 updated: 2026-11-03
 ---
 
-Your judge returns a JSON object with a score for each case. The pipeline parses it, and mean faithfulness rose from one week to the next with no change to the product. The logs show that the judge's output failed to parse on a growing share of cases. Explain the rise and fix the pipeline.
+你的 judge 为每个用例返回一个带分数的 JSON 对象。流水线解析它，产品没有任何改动，平均忠实度却比前一周升高了。日志显示，judge 输出解析失败的用例比例在不断增加。解释这次上涨，并修好流水线。
 
 ## Short answer
 
-A parse failure becomes a missing score, and the aggregate silently drops missing scores. The cases that fail to parse are often the worst outputs, so dropping them lifts the mean. Catch the failure explicitly, record it as its own outcome, count it against the score or report it next to the mean, and alert when the failure share grows.
+解析失败会变成缺失分数，而聚合会悄悄丢掉缺失分数。解析失败的往往是最差的输出，所以丢掉它们会抬高均值。显式捕获失败，把它记为单独的结果，计分时算作失败或在均值旁边单独报告，并在失败比例上升时告警。
 
 ## Full answer
 
-### The mechanism
+### 机制
 
-Bad JSON from the judge becomes a not a number value. A mean over a column with such values excludes them. The lesson names this as the second silent failure of a judge and asks for the parse to fail loudly with its own status.
+judge 返回的坏 JSON 变成了非数值（NaN）。对含有这种值的列求均值时，它们会被排除。课程把这列为 judge 的第二种无声失效，要求明确暴露解析失败，并为它设置独立状态。
 
-### Why the exclusion is biased
+### 为什么排除是有偏的
 
-The judge breaks its format most often on long, odd or refused outputs. Those are also the low scoring outputs. So the exclusion removes the bottom of the distribution, and the mean rises for a reason that has nothing to do with quality.
+judge 最常在冗长、怪异或被拒答的输出上弄坏格式。这些恰好也是低分输出。所以排除它们就是切掉了分布的底部，均值因此上涨，原因与质量毫无关系。
 
-### The fix
+### 修复
 
-1. Wrap the parse in an explicit check and give every case a status: scored, parse failed, judge error.
-2. Report the parsed share with every run. A rising failure share fails the run.
-3. Publish the mean two ways: with failures counted as zero and with failures excluded. If the two differ a lot, the failures are not random.
-4. Allow one retry with a repair prompt, record that a retry happened, and cap retries.
-5. Store the raw judge text so a reviewer can read what broke.
+1. 用显式检查包住解析，给每个用例一个状态：已评分、解析失败、judge 错误。
+2. 每次运行都报告解析成功的比例。失败比例上升，这次运行就判失败。
+3. 用两种方式发布均值：失败算 0 分，以及失败排除。如果两者相差很大，失败就不是随机的。
+4. 允许用一个修复 prompt 重试一次，记录发生过重试，并限制重试次数。
+5. 保存 judge 的原始文本，方便评审人查看坏在哪里。
 
-### Verify the diagnosis
+### 验证诊断
 
-Recompute last week's mean with failures counted as zero. If the rise disappears, you have the cause.
+把上周的失败按 0 分重新计算均值。如果涨幅消失，就找到了原因。
 
 ## Follow-ups
 
-- **Level 3:** Why are the failed cases not a random sample? Expected: the judge breaks its format most on long, odd or refused outputs, which are also the low scoring ones.
-- **Level 3:** Do you score a failed parse as a zero or leave it out? Expected: both, with the parsed share; a gate should treat a rising failure share as a failed run.
-- **Level 4:** How do you design the judge output so this cannot happen silently again? Expected: a strict schema, a validator that rejects anything else, a status field per case, and a run level parse failure metric with an alert.
+- **Level 3:** 为什么失败的用例不是随机样本？ Expected: judge 最常在冗长、怪异或被拒答的输出上弄坏格式，而这些也正是低分输出。
+- **Level 3:** 解析失败按 0 分算，还是排除？ Expected: 两种都报，并附上解析成功比例；门禁应把失败比例上升视为运行失败。
+- **Level 4:** 怎么设计 judge 的输出，让这种事不再悄悄发生？ Expected: 严格的 schema，一个拒收其他任何格式的校验器，每个用例一个状态字段，再加一个运行级的解析失败指标和告警。
 
 ## Wrong answers
 
-- "The mean rose, so quality rose." Nothing in the product changed; the denominator did.
-- "Retry until it parses." Retries without a record hide the failure and can change the score; record every retry and cap them.
-- "Exclude failures, they are judge bugs." The exclusion is biased toward bad outputs; the product number is wrong whatever the cause.
+- "均值涨了，所以质量涨了。" 产品什么都没变；变的是分母。
+- "一直重试到能解析为止。" 不留记录的重试会掩盖失败，还可能改变分数；记录每次重试，并设上限。
+- "排除失败，那是 judge 的 bug。" 排除会偏向丢掉差的输出；不管原因是什么，产品数字都是错的。
 
 ## Taught in
 
-The [LLM evaluation frameworks lesson](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/) lists JSON parsing failures as a silent judge failure and requires an explicit failure mode.
+[LLM 评测框架课](../../../phases/05-nlp-foundations-to-advanced/27-llm-evaluation-frameworks/)把 JSON 解析失败列为 judge 的一种无声失效，并要求显式的失败模式。

@@ -1,6 +1,6 @@
 ---
 id: output-router-severity
-title: The input passed and the output leaked
+title: 输入通过了，输出却泄露了
 card: safety
 kind: design
 level: 2
@@ -16,54 +16,54 @@ related: [safety/one-regex-is-not-a-detector]
 updated: 2026-11-03
 ---
 
-Every request to your assistant passes an input detector, and yet a response last week contained a customer's email address and part of the system prompt. Design the output side, say how three separate classifiers combine into one action, and explain what happens to latency.
+发给助手的每个请求都经过了输入检测器，可上周仍有一条回复里出现了某位客户的邮箱地址和一部分系统 prompt。设计输出这一侧：说明三个独立的分类器怎样合成一个动作，并解释延迟会怎样变化。
 
 ## Short answer
 
-Put three classifiers on the model output behind one router: toxicity by rules, personal data by regexes for emails, phone numbers and card shaped strings, and instruction leakage by trigram overlap with the known system prompt. Each returns a severity, and the router takes the maximum and applies one action: block on high, redact on medium, warn on low, log on none. Run the classifiers in parallel with token streaming and hold the final chunk until the verdict arrives. Earlier chunks have already shipped, so where a block or a redaction must cover the whole response, hold the full response and accept the latency.
+在模型输出上放三个分类器，前面统一接一个路由器：毒性用规则检测；个人数据用正则检测邮箱、电话号码和形似卡号的字符串；指令泄露用与已知系统 prompt 的三元语法（trigram）重合度检测。每个分类器返回一个严重度，路由器取最大值并执行一个动作：high 拦截，medium 脱敏，low 警告，none 只记录日志。分类器与 token 流式输出并行运行，最后一个块要等判定出来再发。前面的块已经发出去了，所以在拦截或脱敏必须覆盖整条回复的场景里，要扣住整条回复，接受这部分延迟。
 
 ## Full answer
 
-### Why the output side exists
+### 为什么需要输出这一侧
 
-The input layer asks how the prompt got here. The output layer asks whether what is about to ship is acceptable, whatever the prompt was. A model can leak personal data, repeat a slur from its training distribution or echo its system prompt without any attack in the input. Skipping output classification hands every new attack family a one shot bypass.
+输入层问的是：这个 prompt 是怎么来的。输出层问的是：不管 prompt 是什么，即将发出的内容能不能接受。即使输入里没有任何攻击，模型也可能泄露个人数据，复述训练分布里的侮辱性词语，或者回显自己的系统 prompt。不做输出分类，就等于给每个新出现的攻击家族留了一次直通的机会。
 
-### The verdict
+### 判定结果
 
-Each classifier is a callable that returns a name, a score in the unit range, a severity of none, low, medium or high, and a list of findings. The three classifiers:
+每个分类器都是一个可调用对象，返回名字、单位区间内的分数、严重度（none、low、medium 或 high）以及一组发现。三个分类器如下：
 
-- **Toxicity.** A curated keyword list with whitespace bounded matching and a small negation window, so a sentence that denies the slur does not fire.
-- **Personal data.** Regexes for the common shapes: email, phone, social security number, credit card, IP address.
-- **Instruction leakage.** The classifier holds the system prompt and measures trigram overlap with the output; high overlap is the signal.
+- **毒性。** 一份人工整理的关键词表，按空白边界匹配，并带一个小的否定词窗口，这样否认该侮辱词的句子不会触发。
+- **个人数据。** 覆盖常见形状的正则：邮箱、电话、社会安全号、信用卡号、IP 地址。
+- **指令泄露。** 分类器持有系统 prompt，测量它与输出的三元语法（trigram）重合度；重合度高就是信号。
 
-### The router
+### 路由器
 
-| Maximum severity | Action |
+| 最大严重度 | 动作 |
 |---|---|
-| high | block, return a policy refusal |
-| medium | redact with each classifier's redactor |
-| low | warn, log and append a soft notice |
-| none | log and ship as is |
+| high | 拦截，返回一条基于政策的拒答 |
+| medium | 用各分类器自己的脱敏器脱敏 |
+| low | 警告，记录日志并附加一条温和提示 |
+| none | 记录日志，原样发出 |
 
-Block wins. Redact plus warn is redact. Each classifier owns its redactor, so an output with both a slur and an email flows through both: the email becomes a redacted email tag, the digits a redacted card tag, the slur a redacted language tag, and leakage removes the lines that look like the system prompt header. The router emits an action with the verb, the output, the severity, the verdicts and metadata for the trace.
+拦截优先。脱敏加警告等于脱敏。每个分类器拥有自己的脱敏器，所以一条同时含侮辱词和邮箱的输出会依次经过两个脱敏器：邮箱变成脱敏邮箱标签，数字变成脱敏卡号标签，侮辱词变成脱敏用语标签；泄露检测会删掉看起来像系统 prompt 开头的那几行。路由器输出一个动作，包含动作名、输出内容、严重度、各项判定，以及供 trace 使用的元数据。
 
-### Latency
+### 延迟
 
-The classifiers run in parallel with token streaming. The gate buffers the final chunk, applies the verdict and then flushes. The chunks before it have already reached the client, so an email or a system prompt span in an early chunk ships before a block or a redaction can act. When that exposure is not acceptable, hold the full response before the first flush and accept the added latency. With rule based classifiers the added time is close to zero; neural classifiers add their own time, and the plumbing stays the same.
+分类器与 token 流式输出并行运行。门控缓冲最后一个块，执行判定后再把它发出去。在它之前的块已经到了客户端，所以如果早期某个块里有邮箱或系统 prompt 片段，它会在拦截或脱敏生效前就发出去。如果这种暴露不可接受，就在第一次发送前扣住整条回复，接受多出来的延迟。基于规则的分类器几乎不增加时间；神经网络分类器会增加自己的耗时，但管道结构不变。
 
 ## Follow-ups
 
-- **Level 2:** Why does block win when two classifiers disagree? Expected: the router takes the maximum severity, so the most dangerous finding sets the action.
-- **Level 2:** Why does each classifier own its redactor? Expected: an output with both a slur and an email must flow through both redactors, and independence makes the composition automatic.
-- **Level 3:** How does the leakage check work without a model? Expected: it holds the system prompt and measures trigram overlap with the output; high overlap is the leak signal and header like lines are removed.
-- **Level 3:** The product team says output checks add latency they cannot afford. Expected: the classifiers run in parallel with streaming and only the final chunk waits, but earlier chunks ship before the verdict; hold the full response where that exposure is not acceptable, because the alternative is a one shot bypass for every new attack family.
+- **Level 2:** 两个分类器意见不一致时，为什么拦截胜出？ Expected: 路由器取最大严重度，所以最危险的那条发现决定动作。
+- **Level 2:** 为什么每个分类器自己拥有脱敏器？ Expected: 一条同时含侮辱词和邮箱的输出必须经过两个脱敏器，各自独立就能自动组合。
+- **Level 3:** 不用模型，泄露检测怎么工作？ Expected: 它持有系统 prompt，测量与输出的三元语法（trigram）重合度；重合度高就是泄露信号，并删掉看起来像开头的那些行。
+- **Level 3:** 产品团队说输出检查增加的延迟他们承受不起。 Expected: 分类器与流式输出并行，只有最后一个块要等，但前面的块会在判定前发出；这种暴露不可接受的地方就扣住整条回复，因为另一种选择是让每个新攻击家族都能一次直通。
 
 ## Wrong answers
 
-- "The input detector passed, so the output is fine." The input layer cannot know about outputs the model produces on its own, such as a training data slur or an echoed system prompt.
-- "One combined classifier is simpler." Three independent verdicts with their own redactors compose; one model hides which finding drove the action.
-- "Redact everything to be safe." Redaction is the medium action; a high finding must block, and a none finding must ship as is with a log, or the product degrades.
+- "输入检测器通过了，所以输出没问题。" 输入层无法知道模型自己产生的输出，比如来自训练数据的侮辱词或回显的系统 prompt。
+- "合成一个分类器更简单。" 三个独立判定加各自的脱敏器可以组合；一个模型会掩盖到底是哪条发现决定了动作。
+- "为了安全，全部脱敏。" 脱敏是 medium 对应的动作；high 的发现必须拦截，none 的发现必须原样发出并记录日志，否则产品体验会变差。
 
 ## Taught in
 
-The [content classifier integration capstone](../../../phases/19-capstone-projects/85-content-classifier-integration/) builds the three classifiers, the router and the redactors.
+[内容分类器集成综合项目](../../../phases/19-capstone-projects/85-content-classifier-integration/)实现了这三个分类器、路由器和脱敏器。

@@ -1,6 +1,6 @@
 ---
 id: streaming-and-fallback
-title: Keep a chat service answering when the provider does not
+title: 确保对话服务在供应商故障时持续响应
 card: system-design
 kind: design
 level: 2
@@ -16,59 +16,59 @@ related: [system-design/batched-inference-api-budget, system-design/llm-cost-pro
 updated: 2026-11-03
 ---
 
-Design the request path of a chat service that calls a hosted model. Users leave when nothing appears for a few seconds, the provider returns rate limits and server errors at night, and the vector store behind retrieval sometimes times out. Cover what the user sees, how you retry, and what happens when each part fails.
+设计一个调用外部托管模型的对话服务的请求链路。如果几秒内界面没有任何动静用户就会直接离开，而模型供应商在夜间经常返回限流和服务器错误，且用于检索的向量数据库偶尔也会超时。请完整覆盖前端用户体验展示、重试机制设计，以及各个环节发生故障时的应对策略。
 
 ## Short answer
 
-Stream tokens over server-sent events so the first token appears in a few hundred milliseconds even though the full answer takes seconds. Retry provider failures with exponential backoff and jitter, capped at three retries, then fall through an ordered chain of models to a cached answer and finally a short unavailable message. Secondary systems degrade instead of failing the request: no retrieval context when the vector store is down, a direct model call when the cache is down, and a clear message when a guardrail blocks.
+通过 Server-Sent Events 流式传输 token，确保首 token 在数百毫秒内呈现，哪怕完整回答需要数秒。对供应商故障采用带随机抖动的指数退避重试（上限 3 次），重试失败后顺次沿着降级模型链向下回退，直至读取缓存答案或最终返回简短的服务不可用提示。外围辅助系统采取优雅降级策略而非阻断主流程：向量数据库宕机时仅去除检索上下文继续调用模型，缓存失效时直接透传调用模型，输入命中安全护栏时给出清晰的拦截原因。
 
 ## Full answer
 
-### Streaming
+### 流式传输
 
-A response of a few hundred output tokens takes 3-8 seconds to finish. Without streaming the user watches a spinner for all of it. With streaming the first token arrives in 200-500ms, the total time is the same, and the perceived latency drops. Server-sent events are the default: one direction, over plain HTTP, consumed by the browser's event source or any HTTP client. Websockets are for two-way needs such as voice, and long polling is for clients that cannot do either.
+一个生成几百个输出 token 的回答通常需要 3 到 8 秒才能完成。若不采用流式传输，用户在整个过程中只能看着加载图标等待。采用流式传输后，首个 token 在 200 到 500 ms 即可到达用户屏幕，尽管总耗时完全相同，用户感知到的延迟却大幅下降。Server-Sent Events 是标准选择：单向传输、基于普通 HTTP 协议、可直接被浏览器原生的 EventSource 或任意 HTTP 客户端消费。WebSocket 适用于实时语音等双向通信场景，而长轮询则是针对无法支持前两者的遗留客户端的兼容手段。
 
-### Three layers of failure
+### 三层故障模型
 
-| Layer | Example | Recovery |
+| 故障层级 | 典型示例 | 容灾恢复机制 |
 |---|---|---|
-| Provider | 429 rate limit, 500 server error, timeout | Backoff with jitter, then the fallback chain |
-| Model | Malformed JSON, invented function name | Retry once with the error in the prompt |
-| Application | Vector store slow, cache down, guardrail exception | Degrade: skip the secondary system |
+| 供应商层 | 429 限流、500 服务器错误、网络超时 | 带随机抖动的指数退避，随后触发降级模型链 |
+| 模型输出层 | 生成格式残缺的非法 JSON、编造函数名 | 将报错信息塞入 Prompt 中自动重试一次 |
+| 应用外围层 | 向量检索超时、缓存宕机、护栏异常 | 优雅降级：直接跳过受阻的外围系统 |
 
-Backoff starts at one second, doubles on each attempt and adds random jitter so that many clients do not retry in step. Three retries is the cap; after that the request moves to the next model. Every external call has a timeout, with a default around 30s.
+退避重试初始等待 1 秒，每次尝试时间翻倍，并加入随机抖动，防止大量并发客户端步调一致地同时重试而引发二次雪崩。重试上限为 3 次；若均失败，请求立即转入降级链中的下一个备用模型。所有外部网络调用均配置超时时间，默认约为 30 秒。
 
-### The fallback chain
+### 降级模型链
 
-Primary model, then a cheaper or more available model, then a smaller one, then a cached response, then the unavailable message. Each step trades quality for availability. The user always gets something, and the log records which step answered so the cost tracker and the quality dashboard can attribute it.
+首选主模型，随后降级到更廉价或可用性更高的备用模型，再降级到轻量小模型，接着尝试读取缓存中的历史相似回答，最后兜底返回友好的服务暂不可用文案。每一步都是用一定的回答质量换取系统的可用性。确保用户始终能拿到实质内容，同时在日志中准确记录是由哪一级节点提供了回答，以便成本核算与质量仪表盘统计归因。
 
-### Degradation table
+### 优雅降级清单
 
-- 429: retry with backoff; queue the request and tell the user it is processing.
-- 500: retry up to three times, then switch model; transparent to the user.
-- Timeout: one retry with a shorter prompt or a smaller model.
-- Malformed output: retry with the error attached, else return the raw text.
-- Guardrail block: no retry; explain why the request was blocked.
-- Vector store down: no retry on the store; answer without retrieval context.
-- Cache down: no retry on the cache; call the model directly.
+- 429 限流：带退避重试；将请求排队并提示用户系统正在努力处理中。
+- 500 错误：最多重试 3 次，失败后自动透明切换备用模型，用户对此无感知。
+- 超时：使用更简短的 Prompt 或更轻量的模型重试一次。
+- 输出格式畸形：附带报错信息重试一次；若依然畸形则直接返回原始内容。
+- 护栏拦截：绝不重试；向用户解释该请求被拦截的安全合规原因。
+- 向量数据库宕机：不对向量库死磕重试；直接在缺少检索上下文的情况下裸调模型生成回答。
+- 缓存宕机：不对缓存重试；直接穿透调用模型。
 
-### The user-visible contract
+### 用户侧的契约保证
 
-The dashboard targets are a median under 2s and a p99 under 10s. Streaming moves the first-token time inside the median target even when the full response does not. A streamed response has one trap: the status line is sent before the first token, so a failure after that must be sent as an error event inside the stream.
+监控目标为中位数延迟低于 2 秒、p99 延迟低于 10 秒。流式传输能够确保即使完整回答耗时超标，首字返回时间依然落在中位数预算之内。流式传输存在一个工程陷阱：HTTP 状态行在首个 token 返回前就已经发送，因此在此之后若模型突发故障，必须以流内错误事件的形式通知客户端。
 
 ## Follow-ups
 
-- **Level 2:** Why add jitter to the backoff? Expected: many clients that fail at once would otherwise retry at the same instants and reproduce the overload.
-- **Level 2:** Why is a guardrail block not retried? Expected: the input is the problem; retrying the same input gives the same block and spends a call.
-- **Level 3:** The fallback model has a different price. Where does that show up? Expected: in the cost tracker per request and per model, so the dashboard shows the cost of the outage, not only its rate.
-- **Level 3:** The stream has started and the model fails. What can the server still do? Expected: send an error event inside the stream, because the HTTP status is already committed.
+- **Level 2:** 为什么在指数退避中必须加入随机抖动？ Expected: 许多并发客户端若在同一时刻失败，没有抖动就会在完全相同的后续时间点同时发起重试，再次制造过载拥堵。
+- **Level 2:** 为什么命中安全护栏的请求绝不能重试？ Expected: 问题出在输入本身；使用相同的恶意或违规输入去重试只会得到相同的拦截结果，并白白浪费一次 API 调用。
+- **Level 3:** 降级模型有着不同的单价，这一差异体现在哪里？ Expected: 体现在单请求与单模型维度的成本跟踪器中，使得监控仪表盘不仅能展示故障发生率，还能展示系统容灾所带来的财务成本变化。
+- **Level 3:** 流式传输已经开始，模型中途突发故障，服务端还能做什么？ Expected: 在流式连接内部发送一个错误事件，因为 HTTP 响应头和状态码此前已经提交发出，无法修改。
 
 ## Wrong answers
 
-- "Retry until the provider answers." Unbounded retries pile up during an outage; cap them and fall through the chain.
-- "If retrieval is down, fail the request so the answer stays grounded." A secondary system must not take down the primary flow; answer with reduced context and log it.
-- "Buffer the whole response and send it at once for simplicity." The user sees nothing for seconds and leaves; the total time is the same either way.
+- "一直持续重试，直到供应商成功响应为止。" 在供应商发生宕机时，无限制的重试会引发严重的请求积压；必须设定重试上限并沿降级链向下穿透。
+- "若向量检索超时，直接判定整个请求失败以保证事实依据。" 辅助系统绝不能拖垮主业务流程；应当在去除检索上下文的情况下降级作答并记录日志。
+- "为了系统实现简单，将完整回答一次性缓冲完毕后再统一下发。" 用户会在数秒内面对空白屏幕而选择流失；无论哪种方式，后端生成的物理总耗时都是一样的。
 
 ## Taught in
 
-The [production LLM application lesson](../../../phases/11-llm-engineering/13-production-app/) gives the streaming protocols, the three failure layers, the backoff schedule and the fallback chain.
+[生产级 LLM 应用课程](../../../phases/11-llm-engineering/13-production-app/)给出了流式协议选型、三层故障模型、退避调度算法以及降级模型链。

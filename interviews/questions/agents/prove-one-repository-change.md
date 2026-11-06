@@ -1,6 +1,6 @@
 ---
 id: prove-one-repository-change
-title: Bring evidence for one agent-assisted change
+title: 为单次 Agent 辅助代码变更提供证据
 card: agents
 kind: take-home
 level: 4
@@ -16,55 +16,55 @@ related: [agents/ship-a-workbench-pack, agents/green-gate-missing-tests]
 updated: 2026-11-03
 ---
 
-Take-home. Pick a small real change in a repository you may modify, and let one coding agent make it. Bring back evidence that a reviewer can reproduce, not a transcript. Tell us what you would record at each step, how you would prove that your acceptance check can fail, and what you would refuse to claim.
+带回作业（Take-home）。在你拥有修改权限的实际代码库中挑选一个真实的细微变更，并交由一个编码 agent 来完成。带回审查者能够完全复现的实证证据，而不是单纯的聊天记录。请说明你在每一步会记录哪些内容、你如何证明你的验收检查确实能够被触发失败，以及你拒绝宣称哪些结论。
 
 ## Short answer
 
-Record the starting revision, the observable goal, the non-goals, the allowed paths and the acceptance evidence before the agent runs, together with the working mode, the budget and a stop condition. Capture a baseline with the closest existing check before any edit. After the change, write the expected result independently of the implementation, introduce one deliberate wrong result in a disposable copy, and show that the same check fails for that reason. Label every runtime observation as local, staging or live, rehearse a rollback, and leave the branch, the changed files, the open risks and the next action explicit.
+在 agent 运行前，先记录起始修订版本、可观测的目标、非目标、允许路径以及验收证据，同时明确工作模式、预算和停止条件。在修改任何代码之前，使用最接近的现有检查捕获基线。变更完成后，独立于具体实现编写预期结果，在一次性副本中刻意引入一个错误结果，证明该检查确实会因此报错失败。为每个运行时观测标明本地、预发或线上环境标签，演练回滚方案，并保持分支、变更文件、未结风险以及下一步行动清晰透明。
 
 ## Full answer
 
-### Frame the task and the autonomy
+### 框定任务与自主权边界
 
-Write down the starting revision, the goal as something observable, the non-goals, the allowed paths and the evidence that will count as acceptance. Name the real user or operator who needs the behavior. Choose a working mode, guided steps, checkpointed implementation or a bounded autonomous run, and say why the uncertainty, the consequences and the reversibility justify it. Set a wall-time budget and a token or cost limit where the agent exposes one. Define the stop condition for repeated failure, a request for new permissions, budget exhaustion or an unresolved contract decision, and name who resolves it.
+记录起始修订版本、可被外部观测的目标、非目标、允许修改的路径，以及将被视作验收标准的证据。明确提出该行为需求的真实用户或系统操作员。选择工作模式：指导式单步执行、带检查点的逐步实现或是有界的自主运行，并说明不确定性、潜在影响及可逆性为何支撑该选择。设置实际耗时预算；如果 agent 提供对应配置，也设置 token 或成本上限。针对重复失败、申请新权限、预算耗尽或未决的契约决策设定停止条件，并指定由谁负责决断。
 
-### Prepare the smallest environment
+### 准备最小工作环境
 
-Retrieve the implementation, its caller, its test and the local instructions, and record why each belongs in context. Make one explicit choice per extension: a skill for a repeatable procedure, a tool for access, a hook for a deterministic check, a plugin for packaged capabilities, each with the least permissions that let it work. Record one proposed addition you rejected and its cost. Recheck one stale note or instruction and retire it if the evidence supports that.
+检索具体实现、其调用方、对应测试及本地说明文档，并记录为何每一项都必须进入上下文。对每一项扩展功能做出显式权衡：用于可复用流程的 skill、用于系统访问的 tool、用于确定性检查的 hook、用于封装打包能力的 plugin，每一项都仅授予能够正常工作的最小权限。记录一项你提议后主动否决的扩展及其潜在成本。重新审查一条陈旧的注释或说明，并在证据充足时将其清理淘汰。
 
-### Baseline, then implement
+### 先建基线，再行编码
 
-Before any edit, run the closest existing check and record the command, the revision, the result and where the evidence lives. A feature that does not exist yet still has a baseline: the observed response or the unsupported operation. Then let the agent work inside the contract, and keep an intervention log with the reason for each correction, permission change or plan revision.
+在修改任何代码之前，运行最接近的既有检查，记录所用命令、修订版本号、执行结果以及证据存档位置。即便尚未实现的全新特性也存在基线：观测到的当前响应或不支持的操作提示。随后允许 agent 在契约约束内开展工作，并维护一份干预日志，详尽记录每次人工纠偏、权限变更或规划修订的具体原因。
 
-### Challenge the evidence
+### 挑战并压力测试证据有效性
 
-Pick proof that observes the changed surface: the served page at the relevant widths for a UI, the request and the serialized response for an API, the built command with its exit code for a CLI. Write the expected result from the task contract without reading the implementation. In a disposable copy, introduce one specific incorrect result, such as accepting an invalid value or dropping a required field, and run the same acceptance check. It must fail for that reason. If it stays green, strengthen the assertion before you trust it. Restore, rerun, and keep both receipts. A syntax error or a broken test setup does not count as detecting the regression. Ask a peer or a separate reviewer session to challenge the weakest proof without editing the implementation.
+挑选能够直接观测受影响接口的证明手段：针对 UI 观测相关视口宽度下的渲染页面；针对 API 观测实际请求与序列化响应；针对 CLI 观测构建后的执行命令及其退出码。脱离具体实现代码，完全根据任务契约编写预期结果。在一次性临时副本中，故意植入一个特定的错误结果（例如接受非法数值或遗漏必填字段），并执行相同的验收检查。检查必须能够因此报错失败。如果检查依然呈绿色通过，则在能够信任它之前必须先强化断言逻辑。恢复代码，重新运行，并保留两次执行的凭证记录。语法错误或测试环境损坏不能算作有效检测到回归。邀请同行或启动独立的审查者会话，在不修改实现代码的前提下对最薄弱的证明点提出挑战。
 
-### Rehearse operation and recovery
+### 演练运维操作与故障恢复
 
-Run the artifact in a disposable local or staging environment and label every observation local, staging or live with the exact revision. Choose one failure signal for the task, with a threshold, an observation window and an owner, and trigger it safely. Rehearse the rollback to a known-good artifact and check that the old behavior returns, including any persistent data. Record any recovery step you could not verify.
+在一次性本地或预发环境中运行产物，为每条观测记录打上 local、staging 或 live 标签并标注精确版本。为当前任务选定一个监控失效信号，设定阈值、观测窗口及责任人，并在安全受控下触发它。演练回滚至已知良好版本的全过程，核实旧行为是否正确恢复（包括持久化数据的状态）。如实记录未能实际验证的任何恢复步骤。
 
-### Improve the next run and hand off
+### 优化后续运行并交接
 
-Compare the result with the baseline, including elapsed time, usage data and human interventions. One task shows what happened on that task, not that an agent is generally faster. Promote one observed correction into a test, a smaller permission or an automation, and rerun the affected check. Remove temporary changes and leave the final branch, the changed files, the open risks and the next action explicit.
+将执行结果与基线对比，包括消耗时长、用量数据及人工干预次数。单次任务只能证明在该任务上的表现，不能外推证明 agent 在全局范围上都更高效。将一次观测到的人工纠错沉淀为测试用例、收紧的权限或自动化脚本，并重新运行受影响的检查。清理所有临时改动，明确留存最终分支、修改文件、未结风险以及下一步行动。
 
-### The rubric
+### 评审准则
 
-Each row gets `demonstrated`, `needs revision` or `unverified`, with an evidence pointer and a reason. The reviewer reproduces at least the weakest acceptance check. Filled fields and passing scripts are not substitutes for the observations. Leave unavailable evidence as unverified and narrow the claim, and never present the result as a hiring or deployment guarantee.
+每行检查项根据证据指针与理由评定为 `demonstrated`（已证实）、`needs revision`（需修改）或 `unverified`（未核实）。审查者至少要复现最薄弱的那项验收检查。填满字段和运行通过的脚本不能替代真实的外部观测。对无法获取证据的条目如实标记为未核实并收敛声明范围，不把结果包装为录用保障或上线承诺。
 
 ## Follow-ups
 
-- **Level 3:** Your planted regression passed the acceptance check. What do you do? Expected: treat the check as untrustworthy, strengthen the assertion or the observation until it fails for that reason, and only then rerun the correct version.
-- **Level 3:** Why must each runtime observation carry an environment label? Expected: a local rehearsal supports a local claim only, and an unlabeled observation lets a reader read a laptop run as production evidence.
-- **Level 4:** The agent finished faster than your baseline. What may you claim? Expected: that this task was faster on this run with this many interventions, and nothing about agents in general.
-- **Level 4:** Which single row would you mark unverified rather than fake? Expected: any row whose evidence you could not observe, such as a recovery step that needs a production mount you do not have, with the claim narrowed to match.
+- **Level 3:** 故意植入的回归缺陷依然通过了验收检查，你会怎么做？ Expected: 判定该检查不可信，强化断言或观测深度直到其确能因该原因失败，随后才重新验证正确版本。
+- **Level 3:** 为什么每次运行时观测都必须携带环境标签？ Expected: 本地演练只能支撑本地结论，缺少标签的观测会让读者将个人电脑上的测试误当作生产环境证据。
+- **Level 4:** Agent 的完成速度快于你测定的基线，你可以宣称什么？ Expected: 仅宣称在该任务的本次运行中、在经过这几次干预的前提下耗时更短，绝不能得出 agent 全面更快的宽泛结论。
+- **Level 4:** 哪一类行你会主动标记为未核实而非伪造证据？ Expected: 任何由于客观条件无法观测证据的行，例如需要自己并不具备的生产挂载的恢复步骤，并相应收缩陈述范围。
 
 ## Wrong answers
 
-- "The transcript shows the agent running the tests, so that is the evidence." A transcript is what the agent said, and the evidence is the check, its exit code and the record a reviewer can rerun.
-- "The acceptance check passed, so the change is proven." A check that never failed proves nothing, and the deliberate wrong result is what shows the check can detect a regression.
-- "Deployment to production is required to complete the exercise." A labeled local or staging rehearsal supports a local claim, and the exercise asks for honest labels, not production access.
+- "运行记录展示了 agent 执行测试的过程，这就是证据。" 运行记录只是 agent 自身说辞，真正的证据是可供审查者重新执行的独立检查、退出码与记录。
+- "验收检查通过了，说明改动已被证明正确。" 从未失败过的检查证明不了任何东西，刻意引入的错误结果才是证明检查具备检错能力的依据。
+- "必须实际部署到生产环境才能完成本练习。" 带有明确标签的本地或预发演练足以支撑本地结论，本练习要求诚实标注，而非越权获取生产权限。
 
 ## Taught in
 
-The [workbench capstone](../../../phases/14-agent-engineering/42-agent-workbench-capstone/) gives the six steps and the manual review rubric for the evidence.
+[综合项目：交付一个可复用的 Agent 工作台包](../../../phases/14-agent-engineering/42-agent-workbench-capstone/)课程提供了六步工作法以及针对实证的人工审查细则。

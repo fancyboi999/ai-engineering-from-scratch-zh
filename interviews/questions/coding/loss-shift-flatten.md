@@ -1,6 +1,6 @@
 ---
 id: loss-shift-flatten
-title: A training loss that reaches zero and learns nothing
+title: 损失降到零却什么也没学到的训练
 card: coding
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [coding/softmax-shift-max, coding/bigram-beats-unigram]
 updated: 2026-11-03
 ---
 
-A colleague reports that their language model reaches a loss near zero very early in training, and the generated samples are garbage. The batch code is:
+一位同事说，他们的语言模型在训练很早期损失就接近零，生成的样本却是乱码。batch 代码如下：
 
 ```python
 def calc_loss_batch(model, tokens):
@@ -24,17 +24,17 @@ def calc_loss_batch(model, tokens):
     return cross_entropy(logits.reshape(-1, logits.shape[-1]), tokens.reshape(-1))
 ```
 
-What went wrong, and what does the correct version look like?
+哪里出错了？正确的版本是什么样？
 
 ## Short answer
 
-The targets are the inputs, so the model learns to predict the token it was just given, which is trivial and converges to zero loss while learning nothing. The target at position `t` must be the input at position `t + 1`. Slice the inputs to drop the last token and the targets to drop the first, then flatten both to batch times time by vocabulary and batch times time.
+目标就是输入，所以模型学会的是预测刚拿到的那个 token，这件事很平凡，损失收敛到零，却什么也没学到。位置 `t` 的目标必须是位置 `t + 1` 的输入。对输入切片去掉最后一个 token，对目标切片去掉第一个 token，再把两者分别展平成 batch 乘 time 再乘词表，以及 batch 乘 time。
 
 ## Full answer
 
-### The alignment
+### 对齐
 
-For input tokens `t0, t1, t2, t3` the targets are `t1, t2, t3, t4`. Every position predicts the next token, which is why one training example covers the context length plus one raw id. The batch maker produces the two tensors already shifted, or the loss function shifts them:
+对输入 token `t0, t1, t2, t3`，目标是 `t1, t2, t3, t4`。每个位置都预测下一个 token，所以一个训练样本要覆盖上下文长度再加一个原始 id。可以由 batch 生成器直接产出已经错开的两个张量，也可以由损失函数来错开：
 
 ```python
 def calc_loss_batch(model, inputs, targets):
@@ -43,33 +43,33 @@ def calc_loss_batch(model, inputs, targets):
     return cross_entropy(logits.reshape(-1, V), targets.reshape(-1))
 ```
 
-with `inputs = window[:-1]` and `targets = window[1:]`.
+其中 `inputs = window[:-1]`，`targets = window[1:]`。
 
-### Why the flatten
+### 为什么要展平
 
-Cross-entropy takes a matrix of rows by classes and a vector of class ids. Flattening batch and time into one axis turns the three-dimensional logits into that matrix and the two-dimensional targets into that vector, and the mean over rows is the mean over every predicted position. Flattening is not the bug; the missing shift is.
+交叉熵接收一个行乘类别的矩阵和一个类别 id 向量。把 batch 和 time 展平成一个轴，三维的 logits 就成了这个矩阵，二维的目标就成了这个向量，对行取均值就是对每个预测位置取均值。展平不是 bug；缺少错位才是。
 
-### Why the symptom is a near-zero loss
+### 为什么症状是损失接近零
 
-Predicting the current token from the current token needs only an identity through the embedding and the output head, which a tied head gives for free. The loss collapses, the eval loss collapses too, and only the qualitative sample shows that nothing was learned. That is why the training loop prints a generated continuation at every probe step and not only the two losses.
+用当前 token 预测当前 token，只需要经过嵌入和输出头的一个恒等映射，共享权重的输出头直接就能提供。损失塌缩，评估损失也塌缩，只有看生成样本才能发现什么都没学到。所以训练循环在每个探针步都会打印一段生成的续写，而不只是两个损失。
 
-### The numeric side
+### 数值方面
 
-The practice task also checks that the cross-entropy is computed from a shifted softmax, so that large logits do not overflow, and that the loss is the mean over examples rather than the sum.
+练习还检查交叉熵是否用平移后的 softmax 计算，避免大 logits 溢出，以及损失是对样本取均值而不是求和。
 
 ## Follow-ups
 
-- **Level 2:** Which signal in the training loop catches this bug first? Expected: the generated sample at the probe step; both losses look excellent.
-- **Level 2:** The validation loss is also near zero. Why does held-out data not catch it? Expected: the target leak is in the loss definition, which is the same on both splits.
-- **Level 3:** How does the sliding-window dataset avoid this at the source? Expected: it returns a window of context length plus one and splits it into input and target in the dataset itself, so the loop never sees unshifted pairs.
-- **Level 3:** Your supervised fine-tuning data masks the instruction tokens. Where does the mask go relative to the shift? Expected: after the shift, so the ignored positions line up with the shifted targets.
+- **Level 2:** 训练循环里哪个信号最先发现这个 bug？ Expected: 探针步生成的样本；两个损失看起来都很好。
+- **Level 2:** 验证损失也接近零。为什么留出数据没发现？ Expected: 目标泄漏在损失定义里，两个切分用的是同一个定义。
+- **Level 3:** 滑动窗口数据集怎样从源头避免这个问题？ Expected: 它返回长度为上下文长度加一的窗口，并在数据集内部拆成输入和目标，循环永远看不到没有错开的配对。
+- **Level 3:** 你的监督微调数据会遮住指令 token。这个掩码相对错位放在哪里？ Expected: 放在错位之后，让被忽略的位置和错开后的目标对齐。
 
 ## Wrong answers
 
-- "The learning rate is too high." A high learning rate diverges or oscillates; a collapse to zero loss points at a leak in the objective.
-- "Flattening mixes the batch and time axes." The flatten is required; the rows are independent predictions and their order does not matter to the mean.
-- "The model overfits the training set." Overfitting shows a gap between training and validation loss; here both collapse.
+- "学习率太高。" 学习率太高会发散或震荡；损失塌缩到零说明目标函数有泄漏。
+- "展平把 batch 轴和 time 轴混在了一起。" 展平是必需的；每一行都是独立的预测，顺序不影响均值。
+- "模型过拟合了训练集。" 过拟合表现为训练损失和验证损失之间有差距；这里两者都塌缩了。
 
 ## Taught in
 
-The [training loop lesson](../../../phases/19-capstone-projects/36-training-loop-eval/) explains the loss alignment and the qualitative probe, and the [softmax and cross-entropy practice](../../../practice/softmax-cross-entropy/) checks the batched loss.
+[训练循环课](../../../phases/19-capstone-projects/36-training-loop-eval/)解释了损失对齐和定性探针，[softmax 与交叉熵练习](../../../practice/softmax-cross-entropy/)检查 batch 损失。

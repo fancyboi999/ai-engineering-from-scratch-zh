@@ -1,6 +1,6 @@
 ---
 id: rollout-plan-take-home
-title: Simulate a shadow, canary and rollback plan
+title: 模拟影子、金丝雀与回滚方案
 card: production-mlops
 kind: take-home
 level: 4
@@ -16,48 +16,48 @@ related: [production-mlops/canary-gates-above-noise, production-mlops/canary-sam
 updated: 2026-11-03
 ---
 
-Take-home. You receive a candidate model, a baseline model, and one week of production request logs with the latency, the token counts and the user feedback of each request. Deliver a rollout plan and a simulator that executes it: a shadow phase, a canary ramp with gates, and a rollback. Inject at least two regressions and show where the plan halts for each one. The logs hold user feedback only for the responses that users saw, so state how the simulator produces feedback for the candidate.
+课外作业。你拿到一个候选模型、一个基线模型，以及一周生产请求日志，包含每次请求的延迟、token 数和用户反馈。交付发布方案和执行它的模拟器：包括影子阶段、带闸门的金丝雀放量和回滚。至少注入两种退化，展示方案分别在哪里叫停。日志只有用户实际见过的响应的反馈，请说明模拟器如何生成候选模型的反馈。
 
 ## Short answer
 
-Build a simulator that replays the logs through both models, computes the five gate metrics per step, and advances the ramp only when every gate holds for the required number of windows. Set each threshold above the baseline's own run-to-run variance, which you measure by replaying the baseline against itself. Inject a cost regression and a quality regression, and show the step at which each one halts and the rollback that follows.
+构建模拟器，向两个模型回放日志，逐步计算五项闸门指标，只有每个闸门在所需数量的窗口内都通过，才能继续放量。先将基线与自身回放比较，测出运行间波动，再将各阈值设在它之上。注入成本退化和质量退化，展示各自叫停的步骤及后续回滚。
 
 ## Full answer
 
-### What a complete submission contains
+### 完整交付包含什么
 
-1. **The noise floor.** Replay the baseline against itself and report the spread of each metric. This is the floor under every gate.
-2. **The gates.** Latency percentiles, cost per request, error and refusal rate, output length distribution, and user feedback rate. Write each as a multiplier above the floor. The lesson's defaults are a P99 above 1.5x, a cost more than 20 percent above the baseline, errors at 2x, a shift in the length distribution, and feedback at 1.5x.
-3. **The shadow phase.** The candidate sees every request and returns nothing to a user. Report the cost delta, the length distribution, the refusals and the hard errors against the baseline.
-4. **The ramp.** Steps at 1, 10, 25, 50, 75 and 100 percent. Compute the dwell at each step from the samples per window, so that a gate never decides on a handful of points.
-5. **The rollback.** Model it as the lesson describes: a flag back to zero and a pin on the previous digest. The simulator shows the step and the time it takes.
-6. **Two regressions.** The lesson's exercise injects a 25 percent cost regression, and a strong submission shows it halting at the first step. The second regression lives only in the feedback metric, and the submission shows that it stays invisible at the first step and halts only where the sample is large enough.
-7. **A written decision.** The lesson's second exercise: a candidate with a 3 percent accuracy gain and a cost 18 percent above the baseline. Write both policy paths, ship and do not ship, and name who decides.
+1. **噪声底。** 将基线与自身回放比较，报告各指标的波动范围。这是每个闸门阈值的下限。
+2. **闸门。** 延迟分位数、单请求成本、错误与拒答率、输出长度分布、用户反馈率。用高于噪声底的倍数定义闸门。课程默认值为 P99 超过基线 1.5 倍、成本比基线高出 20% 以上、错误率达到 2 倍、长度分布偏移，以及反馈率达到 1.5 倍。
+3. **影子阶段。** 候选模型接收每个请求，但不向用户返回结果。与基线比较，报告成本差、长度分布、拒答和硬错误。
+4. **放量。** 按 1%、10%、25%、50%、75% 和 100% 推进。根据每窗口样本量计算各步停留时间，避免闸门只凭几个数据点就做决定。
+5. **回滚。** 按课程描述建模：开关归零，固定指针指回上一个摘要。模拟器显示发生的步骤和所需时间。
+6. **两种退化。** 课程练习注入了 25% 的成本退化，好的交付会展示它在第一步就被叫停。第二种退化仅反映在反馈指标上，交付要展示它在第一步不可见，只有样本足够时才叫停。
+7. **书面决策。** 课程第二项练习的候选模型准确率提高 3%，成本比基线高 18%。写出上线和不上线两种策略路径，说明由谁决定。
 
-### What the reviewer looks for
+### 评审关注什么
 
-- The floor is measured, not assumed.
-- The gates are multipliers, and the thresholds sit above the floor.
-- The dwell is computed from samples, not from the clock.
-- The regression that the first step cannot see is shown, not hidden.
-- The rollback is rehearsed inside the simulation.
+- 噪声底经过实测，不是猜测。
+- 闸门使用倍数，阈值高于噪声底。
+- 停留时间根据样本计算，不只看时钟。
+- 展示第一步发现不了的退化，不掩盖它。
+- 在模拟中演练回滚。
 
-### What to keep for production
+### 哪些保留到生产环境
 
-The gate evaluation code and the noise-floor measurement become the checks of the real canary controller. The replay harness becomes the pre-release test for every future candidate.
+闸门评估代码和噪声底测量会成为真实金丝雀控制器的检查项。回放工具会成为今后每个候选模型的发布前测试。
 
 ## Follow-ups
 
-- **Level 3:** The feedback regression was caught late. Is the plan wrong? Expected: no. It shows the limit of the feedback gate, and the fix is a longer dwell at the step where feedback first has samples, or a proxy metric with more volume.
-- **Level 4:** The candidate has the same cost and tone as the baseline. What changes in the plan? Expected: skip the A/B step after the canary, which the lesson makes optional for an improved version of the same behavior.
-- **Level 4:** What from the simulator survives into production? Expected: the gate evaluation code and the noise-floor measurement, which become the canary controller's checks.
+- **Level 3:** 反馈退化发现得晚，说明方案有问题吗？ Expected: 不是。它展示了反馈闸门的局限，修正方法是在反馈首次有足够样本的步骤延长停留，或改用数据量更大的代理指标。
+- **Level 4:** 候选模型与基线的成本和语气相同，方案怎么变？ Expected: 金丝雀之后跳过 A/B 阶段；课程将这一阶段设为可选，适用于同一行为的改进版。
+- **Level 4:** 模拟器的什么内容会保留到生产？ Expected: 闸门评估代码和噪声底测量，它们会成为金丝雀控制器的检查项。
 
 ## Wrong answers
 
-- "Use the lesson's thresholds as they are." The lesson's numbers are defaults. The floor comes from your own baseline.
-- "Advance the ramp on a fixed schedule." A ramp that moves on the clock ignores whether a gate had enough samples.
-- "Model the rollback as a redeploy." The simulator should model the mechanism you will use, and a redeploy is the mechanism the lesson tells you to remove.
+- "照搬课程阈值。" 课程数字是默认值，噪声底来自自己的基线。
+- "按固定时间表放量。" 只按时钟推进，忽略了闸门是否有足够样本。
+- "把回滚模拟成重新部署。" 模拟器应该模拟实际采用的机制，而重新部署正是课程要求移除的机制。
 
 ## Taught in
 
-The [progressive delivery lesson](../../../phases/17-infrastructure-and-production/20-shadow-canary-progressive/) gives the gates, the ramp and the exercises that this take-home extends.
+[渐进式发布课程](../../../phases/17-infrastructure-and-production/20-shadow-canary-progressive/)给出闸门、放量步骤，以及这项课外作业所扩展的练习。

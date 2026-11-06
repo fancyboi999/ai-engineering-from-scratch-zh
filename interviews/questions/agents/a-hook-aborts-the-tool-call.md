@@ -1,6 +1,6 @@
 ---
 id: a-hook-aborts-the-tool-call
-title: Read the harness, a hook aborts a tool call mid-plan
+title: 阅读 harness：hook 在计划执行途中中止工具调用
 card: agents
 kind: code-reading
 level: 3
@@ -16,7 +16,7 @@ related: [agents/budget-exhausted-looks-like-an-answer]
 updated: 2026-11-03
 ---
 
-Read this part of the harness loop. A subscriber on `before_tool_call` raises `HookAbort` on the second step of a three-step plan, because the tool name is on a deny list. Trace what the loop does next: which events it emits, which hooks fire, which state it enters, and what the caller receives.
+阅读 harness 循环的这部分代码。由于工具名称在黑名单上，`before_tool_call` 上的订阅者在三步规划的第二步抛出了 `HookAbort`。追踪循环接下来的执行流程：它会发出哪些事件、触发哪些 hook、进入什么状态，以及调用方会收到什么？
 
 ```python
 step = self._plan[self._cursor]
@@ -41,48 +41,48 @@ if step.requires_tool:
 
 ## Short answer
 
-The abort is handled inside the loop, not thrown to the caller. The loop records the error on the step, emits `tool.error`, fires `on_error`, moves to the reflecting state and calls itself again. Reflecting advances the cursor and counts a turn, so the denied step is skipped, not retried, and the loop goes on to the third step. The caller never sees the abort as an exception: it sees the next pull request for the third step's tool call or the completion, or a pause with a budget-exceeded reason if a budget limit ran out first, and it can read the denied step in the event stream.
+中止是在循环内部处理的，而不是向调用方抛出异常。循环在当前步骤上记录错误，发出 `tool.error`，触发 `on_error`，转移到反思状态并再次调用自身。反思会推进游标并计入一轮，因此被拒绝的步骤会被跳过而非重试，循环继续进入第三步。调用方不会收到中止异常，而会收到第三步工具调用的下一个拉取请求或完成结果；如果预算先耗尽，则会收到原因是预算超限的暂停，并可在事件流中查看被拒绝的步骤。
 
 ## Full answer
 
-### Step by step
+### 逐步执行过程
 
-1. `before_step` fires and `step.start` is emitted for step two.
-2. `before_tool_call` fires. The subscriber raises `HookAbort`.
-3. The loop writes `hook_abort:<reason>` into `step.error`.
-4. It emits `tool.error` with the step id and the error text.
-5. It fires `on_error` with the step and the error.
-6. It transitions to `REFLECTING`. The transition table allows executing to reflecting.
-7. It calls `_step()` again. In the reflecting branch the cursor moves to step three and the turn count goes up by one.
-8. Step three requires a tool, so the loop fires its hooks, counts a tool call, emits `tool.call`, transitions to `AWAITING_TOOL`, emits `step.end`, fires `after_step`, and returns a pull request with reason `tool_call`.
+1. 针对第二步触发 `before_step` 并发出 `step.start`。
+2. 触发 `before_tool_call`，订阅者抛出 `HookAbort`。
+3. 循环将 `hook_abort:<reason>` 写入 `step.error`。
+4. 发出带有步骤 ID 和错误文本的 `tool.error`。
+5. 携带该步骤与错误信息触发 `on_error`。
+6. 状态转移至 `REFLECTING`，状态转移表允许从执行状态转移至反思状态。
+7. 再次调用 `_step()`。在反思分支中，游标推进至第三步，轮数计数加一。
+8. 第三步需要工具，因此循环触发其对应的 hooks，递增工具调用计数，发出 `tool.call`，转移至 `AWAITING_TOOL`，发出 `step.end`，触发 `after_step`，最后返回原因为 `tool_call` 的拉取请求。
 
-### What did not happen
+### 没有发生的事情
 
-- No `tool.call` event for step two, and no increment of the tool-call counter, because the abort came before both.
-- No `step.end` event and no `after_step` hook for step two. The abort path leaves the step without a closing event. That is a gap a reader should name: a subscriber that pairs `step.start` with `step.end` sees an open step.
-- No retry. The contract skips the step and reflects. A retry policy would live in the planner, which can return a new plan from reflecting.
+- 第二步没有产生 `tool.call` 事件，工具调用计数器也没有递增，因为中止发生在两者之前。
+- 第二步没有产生 `step.end` 事件，也没有触发 `after_step` hook。中止分支导致该步骤缺少闭合事件。这是读者应当指出的缺口：将 `step.start` 与 `step.end` 成对匹配的订阅者会看到一个未完结的步骤。
+- 没有重试。契约规定跳过该步骤并反思。重试策略应位于规划器中，规划器可以从反思状态返回一份新规划。
 
-### Why this shape
+### 为什么采用这种形式
 
-Hooks are imperative and can mutate, abort or skip. Events are observational and only record. The abort is a hook decision, and the record of it is an event, so a tracer that subscribes to the stream sees the denial without inspecting the loop. The state machine is deterministic, so a replay of the same event log re-enters the same state without calling a model.
+Hook 是命令式的，可以执行修改、中止或跳过操作。事件是观察式的，只负责记录。中止属于 hook 的决策，而对中止的记录属于事件，因此订阅事件流的追踪器无需检查循环内部即可获知拒绝行为。状态机是确定性的，因此重放同一份事件日志会重新进入相同的状态，而无需调用模型。
 
-### How the caller learns about the denial
+### 调用方如何获知拒绝信息
 
-The pull request it receives is for step three. To see the denial it reads the event stream for `tool.error` with the `hook_abort` prefix, or it registers an `on_error` subscriber. A production harness would also put the denied step into the handoff's failed attempts.
+调用方收到的拉取请求针对的是第三步。要查看拒绝详情，调用方可以在事件流中读取带有 `hook_abort` 前缀的 `tool.error`，或者注册一个 `on_error` 订阅者。生产级 harness 还会将被拒绝的步骤写入交接包的失败尝试列表中。
 
 ## Follow-ups
 
-- **Level 3:** The abort happens on the last step of the plan. What does the caller receive? Expected: a session result with reason `goal_met`, because reflecting moves the cursor past the end, even though the last step never ran, so the caller must read the events to see the denied step.
-- **Level 3:** Why does the loop count the turn in reflecting and not in executing? Expected: a turn is one completed step, and reflecting is where the loop decides whether to advance, replan or finish.
-- **Level 4:** Which invariant does `_transition` protect, and what would break without it? Expected: only the listed state pairs are legal, so a bug that moved from awaiting tool straight to executing would raise instead of corrupting the replay.
-- **Level 4:** How would you make the abort path emit a matching `step.end`? Expected: emit `step.end` with an outcome of `aborted` before the transition, so that every start has an end and a tracer can pair them.
+- **Level 3:** 如果中止发生在规划的最后一步，调用方会收到什么？ Expected: 收到原因为 `goal_met` 的会话结果，因为反思将游标推进到了末尾之后，即使最后一步从未实际运行，因此调用方必须读取事件才能看到被拒绝的步骤。
+- **Level 3:** 为什么循环在反思状态而不是在执行状态统计轮数？ Expected: 一轮代表一个已完成的步骤，而反思状态是循环决定继续推进、重新规划还是结束的地方。
+- **Level 4:** `_transition` 保护了哪项不变式，缺少它会破坏什么？ Expected: 只有预先列出的状态配对是合法的，因此如果出现直接从等待工具跳转到执行状态的 bug，会抛出异常而不是破坏重放一致性。
+- **Level 4:** 你会如何让中止分支发出匹配的 `step.end`？ Expected: 在状态转移前发出 outcome 设为 `aborted` 的 `step.end`，这样每个 start 都有对应的 end，追踪器就能成对匹配它们。
 
 ## Wrong answers
 
-- "HookAbort propagates to the caller as an exception." The loop catches it, records it and continues, so the caller sees the next pull request or the result.
-- "The denied step is retried with a different tool." The contract skips to reflecting and advances the cursor, and a retry needs the planner to return a new plan.
-- "The tool-call counter goes up because a tool call was attempted." The counter increments only after the hook passes, so a denied call does not spend budget.
+- "HookAbort 会作为异常冒泡给调用方。" 循环会捕获该异常、记录它并继续执行，因此调用方看到的是下一个拉取请求或执行结果。
+- "被拒绝的步骤会换用不同的工具重试。" 契约规定直接跳过至反思状态并推进游标，重试需要规划器返回新的规划。
+- "因为尝试了工具调用，工具调用计数器会增加。" 计数器仅在 hook 检查通过后才会递增，因此被拒绝的调用不会消耗预算。
 
 ## Taught in
 
-The [harness loop contract](../../../phases/19-capstone-projects/20-agent-harness-loop-contract/) defines the states, the hook topics, the event stream and this abort path.
+[harness 循环契约](../../../phases/19-capstone-projects/20-agent-harness-loop-contract/)课程定义了各状态、hook 主题、事件流以及这条中止路径。

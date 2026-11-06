@@ -1,6 +1,6 @@
 ---
 id: first-divergence-at-turn-zero
-title: A flaky agent check that compared the wrong sessions
+title: 第 0 轮就发生首次分歧的不稳定检查
 card: scenarios
 kind: incident
 level: 3
@@ -30,55 +30,55 @@ source:
 
 ## Situation
 
-A team keeps a small agent that lists the files of a repository and counts lines. Every change to its agent file goes through a check: run the agent, then compare the newest session with the one before it with `sessions diff`, and fail the job when the two differ. In one week the check gave three different results. Once it printed `Error: unknown shorthand flag: '1' in -1`. Once it passed. Once it failed with `sessions diverged` and a first divergence at turn 0, where one side called `list_directory` and the other side called `shell`.
+一个团队维护着一个能够列出仓库文件并统计行数的小型 agent。其配置文件的每次变更都必须通过一项检查：运行该 agent，随后通过 `sessions diff` 比对最新生成的会话与前一个会话，若两者存在差异则判定流水线失败。在一周内该检查输出了三种完全不同的结果：一次输出了 `Error: unknown shorthand flag: '1' in -1`；一次判定通过；另一次以 `sessions diverged` 报错失败，且在第 0 轮就发生首次分歧，一侧调用了 `list_directory` 而另一侧调用了 `shell`。
 
-The team reads the three results as proof that the agent is nondeterministic, and a pull request proposes to delete the check. You have the command lines, the outputs of the three comparisons, and the session store of the machine that ran them.
+团队将这三种迥异的结果视为 agent 存在非确定性随机行为的铁证，并在一个 pull request 中提议彻底删除该检查项。你手头掌握了命令行执行记录、三次比对的输出结果，以及运行这些命令的机器上的会话数据库存储。
 
 ## Evidence
 
-- [two runs of the files agent from the same cassette](evidence/two-replays-of-one-cassette.txt)
-- [the transcript that the cassette replays](evidence/the-five-turns.txt)
-- [the first attempt, in the form the help text gives](evidence/the-help-form.txt)
-- [the two replays compared](evidence/identical-over-five-turns.txt)
-- [the newest session against the third newest, with the CI flag](evidence/the-divergence.txt)
-- [the first turn of the restricted run of the guarded agent](evidence/the-third-newest-session.txt)
-- [the sessions table and the five newest titles](evidence/the-sessions-table.txt)
+- [基于同一录制卡带运行文件 agent 两次的输出日志](evidence/two-replays-of-one-cassette.txt)
+- [卡带重放转录文本中的五轮对话交互](evidence/the-five-turns.txt)
+- [帮助文档给出的首次命令行比对尝试形式](evidence/the-help-form.txt)
+- [两次重放之间逐轮比对的对比结果](evidence/identical-over-five-turns.txt)
+- [最新会话与倒数第三个会话在 CI 参数下的分歧日志](evidence/the-divergence.txt)
+- [受防护 agent 在 restricted 模式下的第一轮交互记录](evidence/the-third-newest-session.txt)
+- [会话存储表以及最新的五个会话标题列表](evidence/the-sessions-table.txt)
 
 ## Questions
 
-1. Which of the three results says anything about the agent, and which say something about the command?
-2. Two runs from the same recording agreed with each other. What does a cassette fix, and what does it leave free?
-3. The divergence names `list_directory` against `shell` at turn 0. What are the two sessions, and how do you know?
-4. What does the comparison compare, and why does it stop at the first difference?
-5. Rewrite the check so that a divergence can only come from a change to the agent.
+1. 三种结果中哪一个真正反映了 agent 本身的状态，哪些反映的是命令调用的问题？
+2. 基于同一录制卡带的两次运行结果完全一致。卡带固定了什么，又留下了什么自由度？
+3. 分歧报告指明第 0 轮存在 `list_directory` 与 `shell` 的冲突。参与比对的两个会话分别是什么，如何证明？
+4. 该比对工具到底比对了什么内容，为什么它在发现首个差异时就停止了后续比对？
+5. 重写该检查机制，确保会话分歧只能由 agent 本身的改动触发。
 
 ## Walkthrough
 
-1. **Read the two runs.** Same flags, same working directory, same cassette, same two messages, and the same final answer both times. A cassette holds the recorded model replies, and `--fake` replays them with no model. The model is out of the loop, so the only free parts are the operands and the measure.
-2. **Count the turns.** The transcript the cassette replays has five model replies: a `list_directory` call, an answer, a `shell` call that the user rejected, a `read_file` call, and an answer. Those five replies are the five turns the comparison reports.
-3. **Read the failed command.** The help text gives the form with bare negative references, and the parser reads the first one as a flag. The error names the flag parser and nothing else. Put `--` before the references, as the second command does. This result says nothing about the agent.
-4. **Read the pass.** The two replays compared identical over all five turns, and the JSON form counts `turns_a` 5, `turns_b` 5, `turns_matched` 5. This is the result the check exists for.
-5. **Read the failure.** The comparison is between the newest session, with 5 turns, and the third newest, with 6 turns. The newest called `list_directory` first. The third newest called `shell` with `echo m101-ok` first. That first call matches the restricted run of a different agent file, the guarded agent, which answers a different user message. The reference `-3` did not point at a run of the files agent at all.
-6. **Read the session store.** Relative references count every session in one `session.db` by creation time, and the table holds runs of every agent file plus the sub-sessions of the team runs. The five newest rows are all titled `Running agent`, so a title cannot tell runs apart. Whatever ran last on this machine is `-1`.
-7. **Read what the comparison measures.** It compares the sequence of tool calls and ignores the prose of the assistant. After the first difference every later turn is downstream, so it reports one divergence and stops.
+1. **分析两次相同运行。** 相同的参数、相同的工作目录、相同的卡带、相同的两条输入消息，以及两次完全一致的最终答复。卡带中保存了预先录制好的模型回复，`--fake` 参数在不调用实际模型的情况下完成回放。模型被完全排除在变量之外，唯一的变数来自操作数与比对机制本身。
+2. **统计交互轮数。** 卡带重放的转录记录包含五个模型回复：一次 `list_directory` 调用、一条回复、一次被用户拒绝的 `shell` 调用、一次 `read_file` 调用以及一条最终回复。这五个回复正是比对报告中记录的五轮交互。
+3. **查明执行失败的命令。** 帮助文本给出了直接使用负数相对引用的示例形式，而参数解析器将第一个参数直接误判为了未知短参数选项。该错误完全来自参数解析器，与 agent 毫无关系。在相对引用前加上 `--`（正如第二条命令所做的那样）即可规避该问题。
+4. **分析通过的测试结果。** 两次重放在全部五轮交互中展现出完全一致的工具调用，JSON 输出统计显示 `turns_a` 为 5、`turns_b` 为 5、`turns_matched` 为 5。这正是该回归检查建立的初衷。
+5. **分析报错失败的测试结果。** 此次比对发生在最新的会话（5 轮）与倒数第三新的会话（6 轮）之间。最新的会话首轮调用了 `list_directory`。而倒数第三新的会话首轮调用了 `shell` 执行 `echo m101-ok`。该首轮调用恰好对应另一个 agent 配置文件（带防护的 agent）在 restricted 模式下的运行记录，其响应的是完全不同的用户指令。相对引用 `-3` 根本没有指向文件处理 agent 的历史运行。
+6. **审查会话数据库。** 相对引用按照创建时间对单个 `session.db` 中的所有会话全局排序，该表混合记录了所有 agent 配置文件的运行以及团队测试的子会话。最新的五条记录标题全都是统一的 `Running agent`，仅凭标题无法辨别。该机器上最后一次执行的任何任务都会被标记为 `-1`。
+7. **明确比对的核心维度。** 工具仅比对工具调用序列，刻意忽略助手的自然语言正文。由于首个差异发生后后续的所有轮次都属于受其影响的下游分支，因此工具报告首次分歧后立即停止后续比对。
 
 ## Resolution
 
-The agent did not change. The flaky result came from the operands: a relative reference into a shared session store that held runs of other agents, and a command form from the help text that the parser rejects. The one honest comparison, two replays of one cassette, matched on all five turns.
+Agent 本身没有任何改动。不稳定的测试结果完全源自操作数的错误：针对包含其他 agent 运行记录的共享会话库使用了相对引用，以及采用了被解析器误判的帮助文档命令写法。在唯一的有效比对（针对同一卡带的两次重放）中，全部五轮调用完全匹配。
 
-The repaired check fixes three things. It fixes the model, by recording one cassette with `--record=PATH` and `--models-gateway` and replaying both sides with `--fake`, one tool call per message, because a turn with two parallel calls answers 500 on replay. It fixes the operands, by giving the check its own data directory with `--data-dir`, so that its `session.db` holds only its own runs, and by writing `--` before the references. It fixes the measure, by running `sessions diff --fail-on-divergence` and reading only the first divergence. The proof is the pass that already exists: with one cassette on both sides, the report counted 5 matched turns of 5, and the exit code was 0.
+修复后的检查规整了三个要素：固定模型输入，通过 `--record=PATH` 和 `--models-gateway` 录制卡带，并以 `--fake` 在两侧重放（每条消息保持单个工具调用，因为包含两次并行调用的轮次在重放时会报 500）；固定比对操作数，通过 `--data-dir` 为检查指定专用的独立数据目录，确保其 `session.db` 仅包含自身任务的运行记录，并在引用前显式加上 `--`；固定度量工具，执行 `sessions diff --fail-on-divergence` 且仅关注首次分歧。已有的通过记录提供了确凿证明：两侧使用同一卡带时，测试报告匹配轮数为 5/5，退出码为 0。
 
 ## Wrong turns
 
-- "The agent is nondeterministic, so delete the check." Two replays from one cassette matched on all five turns. The comparison that failed compared two different agents.
-- "Quote the reference as `'-1'` to fix the flag error." The parser still sees a leading hyphen. `--` ends flag parsing.
-- "Compare the assistant text instead of the tool calls." Prose varies between live runs, and the comparison ignores it on purpose. The tool calls are the behaviour.
-- "Read the turns after turn 0 to find more bugs." Everything after the first divergence is downstream of it and is not compared.
+- "agent 存在随机性，应当删除该检查。" 基于单张卡带的两次重放在全部五轮中完全一致。失败的比对误把两个完全不同的 agent 放在一起比对。
+- "将引用加上引号写成 `'-1'` 解决参数报错。" 解析器依然能看到前导减号。必须使用 `--` 来明确终结参数解析。
+- "比对助手回复的文本内容而非工具调用。" 自然语言文本在实时运行中容易产生词句波动，比对工具刻意忽略了自然语言。工具调用才是代表行为的本质。
+- "继续阅读第 0 轮之后的轮次以寻找更多 bug。" 首次分歧之后的所有交互都属于下游衍生结果，不再具备比对意义。
 
 ## Generalize
 
-A regression check on an agent needs three fixed things: the model replies, the operands, and the measure. A cassette fixes the first. A private session store and explicit references fix the second. A comparison of tool calls that stops at the first difference fixes the third. When a check flips between pass and fail, find out what it compared before you blame what it measured.
+对 agent 的回归测试需要三个固定的锚点：模型回复、比对操作数以及度量标准。录制卡带固定了模型回复；独立的会话存储与显式参数引用固定了比对操作数；在首个差异处停下的工具调用比对固定了度量标准。当测试在通过与失败之间波动摇摆时，在怀疑被测对象之前，先查明它实际比对了什么。
 
 ## Taught in
 
-[The sessions section](../../../manuals/docker-sandboxes-101/sections/5-6-session-db-sessions-diff-and-eval.md#sessions-diff) shows the help form, the working form and this divergence.
+[会话管理页面](../../../manuals/docker-sandboxes-101/sections/5-6-session-db-sessions-diff-and-eval.md#sessions-diff)展示了帮助文档写法、可用写法以及本次分歧事故。

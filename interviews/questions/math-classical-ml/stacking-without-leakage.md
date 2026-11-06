@@ -1,6 +1,6 @@
 ---
 id: stacking-without-leakage
-title: Build a stacking ensemble whose meta-learner never cheats
+title: 构建元学习器绝不作弊的 Stacking 集成模型
 card: math-classical-ml
 kind: take-home
 level: 4
@@ -16,46 +16,46 @@ related: [math-classical-ml/bag-or-boost-the-base-model, math-classical-ml/scale
 updated: 2026-11-03
 ---
 
-Take-home. Build a stacking ensemble on a tabular classification dataset with three base models from different families and a logistic regression meta-learner. Deliver the training code, a comparison with each base model alone, and a written argument that the meta-learner was never trained on a prediction made for a row the base model had already seen. Describe how you structure the work and what you check before you submit.
+作业题（Take-home）。在一个表格分类数据集上构建 Stacking 集成模型，包含来自三个不同模型家族的基学习器以及一个逻辑回归元学习器（meta-learner）。交付物包括训练代码、与各个独立基模型的性能对比、以及一份书面论证，证明元学习器从未在基学习器已经见过的样本预测值上训练。请描述你的工程架构组织方式，以及在最终提交前需要核查哪些事项。
 
 ## Short answer
 
-Generate the meta-features with k-fold cross-validation: for each fold, fit the base models on the other folds and predict the held-out fold, so every training row gets base predictions from models that did not train on it. Fit the meta-learner on those out-of-fold predictions, then refit the base models on all training rows for test time. Compare on a test set that neither level touched, and report the base models and the stack side by side with fold spreads.
+通过 k 折交叉验证生成元特征：对于每一折，使用其余折训练各个基模型并预测该留出折，从而确保每个训练样本上的基预测均来自于未曾见过该样本的模型。在这些折外预测（out-of-fold）结果上拟合逻辑回归元学习器，随后在全量训练集上重新拟合基模型以备测试阶段使用。在两个层级均未触碰的独立测试集上最终对比，并并列汇报各个基模型与 Stacking 模型的指标及折间离散程度。
 
 ## Full answer
 
-### Structure
+### 工程架构设计
 
-1. **Split first.** Hold out a test set before anything else. Do all preprocessing inside the folds, fit on the training part of each fold only.
-2. **Out-of-fold predictions.** With K folds, train each base model K times. Each row in the training set receives a prediction from the one run that did not see it. Store the predicted probabilities, not hard labels, because soft outputs carry confidence and the lesson's soft voting beats hard voting for the same reason.
-3. **Meta-learner.** Fit the logistic regression on the out-of-fold probabilities, three columns per class, with the true labels as targets. It learns which base model to trust and where.
-4. **Refit for test time.** Fit each base model on all training rows, predict the test set, and pass those predictions through the meta-learner.
-5. **Compare.** Score every base model on its own, a plain average of the three, and the stack. Report cross-validated means and spreads on the training folds, and one test number for each at the end.
+1. **先划分数据集。** 首先留出独立的最终测试集。所有数据预处理都必须在交叉验证各折内部完成，并且仅在每一折的训练子集上拟合变换参数。
+2. **生成折外预测。** 采用 K 折交叉验证，每个基模型分别训练 K 次。训练集中的每一行样本仅接收未曾见过该样本的那一次模型运行所产生的预测值。必须保存预测概率值而非硬分类标签，因为连续概率带有置信度信息，课程中软投票优于硬投票正是由于相同的原理。
+3. **训练元学习器。** 基于这些折外预测概率（每个类别对应 3 列特征）拟合逻辑回归模型，以真实标签为监督目标。元学习器借此学习在不同特征区域应该信任哪一个基模型。
+4. **重新拟合基模型备用。** 在全量训练样本上重新训练各个基模型，对测试集生成预测，并将这些预测结果输入元学习器产出最终预测。
+5. **严谨对比。** 分别评估三个基模型各自的表现、三者的朴素算术平均表现、以及 Stacking 集成表现。汇报在训练折上的交叉验证均值与离散程度，并在全流程最后输出在独立测试集上的单次最终评测成绩。
 
-### The leakage argument
+### 防数据泄漏的书面论证
 
-Write it as a table: for each training row, which fold it belonged to, and which base model run produced its meta-feature. Every meta-feature must come from a run whose training folds exclude that row. If any base model is fit on all training rows and then predicts those rows, the predictions are in-sample and too good, and the meta-learner learns to trust the base model that overfits most. The lesson states the rule in one line: never train base models and generate meta-features on the same data.
+以表格形式组织该证明：明确列出训练集中的每一行样本归属于哪一折，以及其对应的元特征是由哪一次基模型训练产出的。每一个元特征必须来自训练折排除了该样本行的模型实例。如果有任何基模型是在全量训练数据上拟合后再去预测这些训练样本，其预测表现属于样本内预测（in-sample）且虚高乐观，元学习器就会被误导去过度信任那些过拟合最严重的基模型。课程用一句话概括了这一铁律：绝不能在同一份数据上既训练基模型又生成元特征。
 
-### Checks before you submit
+### 提交前的核验清单
 
-- Diversity: compare the base models' errors on the validation folds. Three variants of one family fail on the same rows and give the stack nothing. The lesson's example uses a forest, a support vector machine and a linear classifier.
-- Honest gain: the stack must beat the best base model by more than the fold spread. The lesson places stacking in the last 1 to 2 percent of accuracy, so a small or noisy gain is the expected outcome, and the write-up should say whether the extra models are worth it.
-- Preprocessing inside the folds, no transform fit on the full table.
-- The test set appears once, in the final table.
+- 模型多样性：在验证折上对比各基模型的预测错误样本。同一家族的三个变体往往在相同的样本上同时失效，无法为 Stacking 提供增益。课程示例结合了随机森林、支持向量机与线性分类器。
+- 真实的性能提升：Stacking 必须超越最佳单个基模型，且提升幅度应大于折间性能的波动。课程指出 Stacking 通常用于榨取最后 1% 到 2% 的准确率极致，微弱或带有噪声的微小提升属于预期结果，文档中需客观说明增加多个模型的系统成本是否具备工程性价比。
+- 预处理严格内置于各折内部，绝不在全表上提前拟合任何转换器。
+- 独立测试集在最终报告对比表中仅出现一次。
 
 ## Follow-ups
 
-- **Level 3:** Why soft predictions rather than hard labels as meta-features? Expected: probabilities carry confidence, so the meta-learner can weight a sure base model above an unsure one.
-- **Level 4:** The stack beats every base model on the training folds but not on the test set. What is the first check? Expected: whether any meta-feature came from a base model that had seen that row; an in-sample prediction teaches the meta-learner to trust an overfit model.
-- **Level 4:** How do you show the base models are diverse enough to help? Expected: compare their errors on the validation folds; models that fail on the same rows add nothing.
-- **Level 4:** When would you not ship the stack? Expected: when the gain over the best base model is inside the fold spread, or below the cost of running three models.
+- **Level 3:** 为什么元特征应使用软预测概率而非硬分类标签？ Expected: 概率值蕴含了预测置信度，使元学习器能够给确定度高的基模型赋予更大权重。
+- **Level 4:** Stacking 在训练折上胜过所有基模型，但在独立测试集上未见提升，首先排查什么？ Expected: 排查是否有元特征来自已经见过该样本的基模型；样本内预测会导致元学习器错误重用过拟合的模型。
+- **Level 4:** 如何证明基模型之间具备足够的多样性以带来集成收益？ Expected: 对比它们在验证折上的错误预测分布；若多个模型都在相同的样本上预测失败，则无法产生有效互补。
+- **Level 4:** 在什么情况下你不建议将 Stacking 模型部署上线？ Expected: 当相比最佳单模型的增益处于折间波动范围内，或者收益不足以覆盖维护三个模型的高昂计算与运维成本时。
 
 ## Wrong answers
 
-- "Fit the base models on all training rows, predict those rows, and train the meta-learner on that." Those predictions are in-sample and too good; the meta-learner learns to trust the base model that overfits most.
-- "Use three random forests with different seeds." Same family, similar errors; the stack needs models that fail on different rows.
-- "Set the meta-learner's weights by hand." The point of stacking is to learn which base model to trust where; fixed weights are a voting ensemble.
+- "在全量训练数据上拟合基模型并预测全量样本，然后在此基础上训练元学习器。" 这些预测属于样本内自测且过于完美；元学习器会错误学会重度依赖过拟合最严重的基模型。
+- "使用 3 个不同随机种子的随机森林作为基模型。" 它们属于同一个算法家族，容易犯相似的错误；Stacking 必须依赖在不同样本上犯错的异构模型。
+- "人工手动设置元学习器的各模型权重。" Stacking 的核心价值正是自动学习在哪些数据模式下信任哪个基模型；固定权重仅等同于朴素投票集成。
 
 ## Taught in
 
-The [ensemble methods lesson](../../../phases/02-ml-fundamentals/11-ensemble-methods/) describes stacking and its leakage rule, and the [model evaluation lesson](../../../phases/02-ml-fundamentals/09-model-evaluation/) builds the folds behind the meta-features.
+[集成方法课程](../../../phases/02-ml-fundamentals/11-ensemble-methods/)介绍了 Stacking 及其防泄漏原则，[模型评估课程](../../../phases/02-ml-fundamentals/09-model-evaluation/)构建了支撑元特征生成的交叉验证折体系。

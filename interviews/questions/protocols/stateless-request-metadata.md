@@ -1,6 +1,6 @@
 ---
 id: stateless-request-metadata
-title: Why every MCP request repeats its metadata
+title: 为什么每个 MCP 请求都重复其元数据
 card: protocols
 kind: concept
 level: 2
@@ -16,15 +16,15 @@ related: [protocols/two-error-layers, protocols/post-only-streamable-http]
 updated: 2026-11-03
 ---
 
-A colleague ports an MCP server from the 2025 revision. The port keeps the `initialize` handshake and stores the client's declared capabilities on the connection object for later requests. All the old tests pass. What breaks under the current revision, and where does the metadata have to live instead?
+某同事从 2025 年修订版移植了一个 MCP 服务端。该移植版本保留了 `initialize` 握手，并将客户端声明的能力存储在连接对象上供后续请求使用。所有旧测试均通过。在当前修订版下有什么会被破坏，元数据如今必须保存在哪里？
 
 ## Short answer
 
-The current revision has no handshake and no protocol session. A server that remembers capabilities from an earlier message can apply the wrong permissions or the wrong wire shape to the next request, which may come from another client on the same process or land on another worker. Every request carries `io.modelcontextprotocol/protocolVersion` and `io.modelcontextprotocol/clientCapabilities` in `params._meta`, and the server validates them on each request and forgets them after it answers.
+当前修订版没有握手，也没有协议会话。记住先前消息能力的服务器可能会对下一个请求应用错误的权限或错误的协议格式，而该请求可能来自同一进程上的另一个客户端或落到另一个 worker 上。每个请求都在 `params._meta` 中携带 `io.modelcontextprotocol/protocolVersion` 和 `io.modelcontextprotocol/clientCapabilities`，服务端在每个请求上对其验证，并在答复后丢弃。
 
 ## Full answer
 
-### The request is the unit of interpretation
+### 请求是解释的单元
 
 ```json
 {
@@ -41,47 +41,47 @@ The current revision has no handshake and no protocol session. A server that rem
 }
 ```
 
-The version and the capabilities are required. `clientInfo` is recommended, self-reported, and never a credential. The server must not infer any of these from an earlier request, a stdio process, an HTTP connection or a transport header alone.
+版本和能力是必需的。`clientInfo` 是推荐项，属于自报信息，绝不是凭据。服务端绝不能仅从先前的请求、stdio 进程、HTTP 连接或传输头来推断其中任何一项。
 
-### What the server returns
+### 服务端返回什么
 
-Every successful result includes `resultType: "complete"` and should carry `io.modelcontextprotocol/serverInfo` in its `_meta`. The list results, `resources/read` and `server/discover` also carry `ttlMs` and `cacheScope`, with deterministic ordering so that equal results give stable cache keys.
+每个成功的结果都包含 `resultType: "complete"`，并应在其 `_meta` 中携带 `io.modelcontextprotocol/serverInfo`。列表结果、`resources/read` 和 `server/discover` 还携带 `ttlMs` 和 `cacheScope`，并带有确定性排序，以便相同的结果给出稳定的缓存键。
 
-### Discovery is a method, not a gate
+### 发现是一个方法，不是门禁
 
-Every server must implement `server/discover`. It returns `supportedVersions`, capabilities, optional instructions and server identity. A client may call it first, but it may also send `tools/list` at once, because that request already carries its metadata.
+每个服务端都必须实现 `server/discover`。它返回 `supportedVersions`、能力、可选指令和服务端身份。客户端可以先调用它，但也可以直接发送 `tools/list`，因为该请求已经携带了其元数据。
 
-### The error codes that replace negotiation
+### 取代协商的错误码
 
-| Case | Code |
+| 情况 | 错误码 |
 |---|---|
-| metadata missing or malformed | `-32602` |
-| header disagrees with body at an HTTP boundary | `-32020` |
-| version matched but unsupported | `-32022`, with `requested` and `supported` |
+| 元数据缺失或畸形 | `-32602` |
+| HTTP 边界处请求头与请求体不一致 | `-32020` |
+| 版本匹配但不受支持 | `-32022`，带有 `requested` 和 `supported` |
 
-The client picks a mutually supported version from `supported` and retries with a new request id.
+客户端从 `supported` 中选择相互支持的版本，并使用新请求 ID 重试。
 
-### Keep the eras apart
+### 区分新旧两代协议
 
-Revisions through `2025-11-25` use `initialize`, `notifications/initialized` and connection-scoped capabilities. A dual-era server may keep that path as an isolated legacy adapter that it selects only when it receives `initialize`. It never routes a current request through the handshake path and never stamps `resultType` onto legacy results.
+截至 `2025-11-25` 的修订版使用 `initialize`、`notifications/initialized` 和连接作用域的能力。支持新旧两代协议的服务端可以将该路径保留为隔离的旧版适配器，仅在收到 `initialize` 时才选择它。它绝不通过握手路径路由当前请求，也绝不在旧版结果上添加 `resultType`。
 
-### Application state is still allowed
+### 应用状态仍然被允许
 
-A workflow or a draft can live behind an opaque handle in a shared store. The client sends the handle as an ordinary argument, and every replica authenticates and authorizes its use. Protocol context must not leak into that store as a substitute for the removed session.
+工作流或草稿可以存放在共享存储中不透明句柄之后。客户端将句柄作为普通参数发送，每个副本都认证和鉴权其使用。协议上下文绝不能泄露到该存储中以替代被移除的会话。
 
 ## Follow-ups
 
-- **Level 2:** Is `clientInfo` required, and can you authorize on it? Expected: it is recommended, not required; it is display and debugging data and never a credential.
-- **Level 2:** A client sends `tools/list` without calling `server/discover`. Does the server reject it? Expected: no; the request carries its version and capabilities, so discovery is not a gate.
-- **Level 3:** What does closing stdin or ending an HTTP response terminate? Expected: transport activity only; there is no protocol session to end, and the next request must still describe itself.
-- **Level 4:** Where does a multi-step workflow keep its state now? Expected: behind a server-minted opaque handle in a shared durable store, returned as a normal result, bound to the authenticated principal, expired, and authorized on every use.
+- **Level 2:** `clientInfo` 是必需的吗，能否对其鉴权？ Expected: 它是推荐项，不是必需项；它是展示和调试数据，绝不是凭据。
+- **Level 2:** 客户端在不调用 `server/discover` 的情况下发送 `tools/list`，服务端会拒绝吗？ Expected: 否；请求携带了其版本和能力，因此发现不是门禁。
+- **Level 3:** 关闭 stdin 或结束 HTTP 响应会终止什么？ Expected: 仅终止传输活动；没有可终止的协议会话，且下一个请求仍必须描述自身。
+- **Level 4:** 多步工作流现在将状态保存在何处？ Expected: 保存在共享持久化存储中服务端生成的不透明句柄之后，作为普通结果返回，绑定至已认证的主体，设定过期时间并在每次使用时鉴权。
 
 ## Wrong answers
 
-- "Stateless means the server cannot keep any state at all." Durable application state behind an explicit handle is allowed. Only hidden protocol context is removed.
-- "Send `initialize` first to be safe with every server." A current server must not receive `initialize` by default. Legacy is a documented fallback for a pinned peer.
-- "The connection identifies the client, so one capability check per connection is enough." Two clients can share one process or HTTP worker in sequence, and a remote request can land on any replica.
+- "无状态意味着服务端完全不能保留任何状态。" 允许显式句柄背后的持久化应用状态。仅移除了隐藏的协议上下文。
+- "首先发送 `initialize` 以确保对每个服务端都安全。" 当前服务端默认绝不能接收 `initialize`。旧版是对固定对端的有文档记录的回退。
+- "连接标识了客户端，因此每个连接做一次能力检查就足够了。" 两个客户端可以按顺序共享一个进程或 HTTP worker，且远程请求可以落到任何副本上。
 
 ## Taught in
 
-The [fundamentals lesson](../../../phases/13-tools-and-protocols/06-mcp-fundamentals/) traces one request from validation to a complete result, and the [server lesson](../../../phases/13-tools-and-protocols/07-building-an-mcp-server/) builds the dispatch loop.
+[基础课程](../../../phases/13-tools-and-protocols/06-mcp-fundamentals/)跟踪了从验证到完整结果的单个请求，[服务端课程](../../../phases/13-tools-and-protocols/07-building-an-mcp-server/)构建了分发循环。

@@ -1,6 +1,6 @@
 ---
 id: adamw-decoupled-decay
-title: Weight decay that went into the gradient
+title: 混进梯度的权重衰减
 card: coding
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [coding/decay-split-param-groups, coding/lr-peak-sweep]
 updated: 2026-11-03
 ---
 
-A hand-written optimizer step is labeled AdamW. Review it:
+一段手写的优化器单步更新被标成了 AdamW。请审查它：
 
 ```python
 def adam_step(params, grad, m, v, t, lr, beta1, beta2, eps, weight_decay):
@@ -28,15 +28,15 @@ def adam_step(params, grad, m, v, t, lr, beta1, beta2, eps, weight_decay):
     return params - lr * m_hat / (np.sqrt(v_hat) + eps), m, v
 ```
 
-Is this AdamW? What changes, and why does it matter for a language model?
+这是 AdamW 吗？要改什么？这个区别为什么对语言模型重要？
 
 ## Short answer
 
-No, this is Adam with an L2 penalty folded into the gradient. AdamW applies the decay directly to the parameters, scaled by the learning rate, outside the adaptive step. When the penalty goes through the gradient it is divided by the second-moment estimate, so parameters with large gradients get almost no decay and the regularization becomes uneven across the model.
+不是，这是把 L2 惩罚并进梯度的 Adam。AdamW 在自适应步之外直接对参数做衰减，衰减量乘以学习率。惩罚走梯度时会被二阶矩估计除掉，梯度大的参数几乎得不到衰减，整个模型的正则化强度因此不均匀。
 
 ## Full answer
 
-### The corrected step
+### 修正后的单步更新
 
 ```python
 def adam_step(params, grad, m, v, t, lr, beta1, beta2, eps, weight_decay):
@@ -48,34 +48,34 @@ def adam_step(params, grad, m, v, t, lr, beta1, beta2, eps, weight_decay):
     return new, m, v
 ```
 
-The decay term is added to the update, not to the gradient. It never passes through the moment estimates.
+衰减项加在更新量上，不加在梯度上。它从不经过矩估计。
 
-### What the difference changes
+### 这个区别改变了什么
 
-Adam normalizes every coordinate by its running gradient magnitude. A penalty that enters as part of the gradient is normalized too, so a weight with a large, noisy gradient is barely decayed while a weight with a tiny gradient is decayed hard. Decoupled decay shrinks every weight by the same fraction per step, which is what the regularizer was meant to do. Language model recipes use the decoupled form, and the loop in the training lesson builds its parameter groups around it.
+Adam 用每个坐标的历史梯度幅度对它做归一化。惩罚作为梯度的一部分进入时也会被归一化：梯度大且噪声大的权重几乎不衰减，梯度很小的权重反而被大幅衰减。解耦衰减让每个权重每步按相同比例收缩，这才是正则项的本意。语言模型的训练配方都用解耦形式，训练课里的循环也围绕它来划分参数组。
 
-### Three more details the practice pins
+### 练习还锁定了三个细节
 
-- The step counter starts at one. With `t = 0` the bias correction divides by zero, and with `t + 1` the first step acts as the second.
-- Epsilon sits outside the square root. Inside it, tiny gradients give a much smaller step than intended.
-- The function returns new state arrays. Updating `m` and `v` in place changes the caller's state and breaks checkpoint resume.
+- 步数计数器从 1 开始。用 `t = 0` 时偏差校正会除以零；用 `t + 1` 时第一步会按第二步计算。
+- epsilon 放在平方根外面。放进根号里，小梯度得到的步长会比预期小得多。
+- 函数返回新的状态数组。原地更新 `m` 和 `v` 会改掉调用方的状态，检查点恢复也会出错。
 
-### Where the decay should not go
+### 衰减不该加在哪里
 
-Even with the correct form, the decay belongs on matrix-shaped weights only. Normalization scales and biases get no decay, which is the subject of the parameter group split.
+即使形式正确，衰减也只该加在矩阵形状的权重上。归一化层的缩放系数和偏置不做衰减，这是参数组划分要处理的问题。
 
 ## Follow-ups
 
-- **Level 2:** What does the bias correction fix in the first steps? Expected: the moment estimates start at zero and are biased low early; dividing by `1 - beta**t` rescales them.
-- **Level 2:** Why return new arrays instead of updating in place? Expected: a pure function keeps the caller's state intact, so a step can be retried or compared and a checkpoint stays consistent.
-- **Level 3:** How does the learning rate schedule interact with decoupled decay? Expected: the decay is multiplied by the current learning rate, so warmup and cosine decay also scale the regularization over training.
+- **Level 2:** 偏差校正在最初几步修正了什么？ Expected: 矩估计从零开始，早期偏低；除以 `1 - beta**t` 把它们放大回正确尺度。
+- **Level 2:** 为什么返回新数组，而不是原地更新？ Expected: 纯函数不改调用方的状态，一步可以重试或对比，检查点也保持一致。
+- **Level 3:** 学习率调度和解耦衰减怎样相互作用？ Expected: 衰减量要乘以当前学习率，所以预热和余弦衰减也会在训练过程中同步缩放正则化强度。
 
 ## Wrong answers
 
-- "L2 and weight decay are the same thing." They coincide for plain gradient descent, not for an adaptive optimizer that normalizes the gradient.
-- "Put epsilon inside the square root for stability." It changes the step size for small gradients; the reference form adds it after the root.
-- "Start the step counter at zero like an index." The bias correction then divides by zero on the first step.
+- "L2 和权重衰减是一回事。" 两者只在普通梯度下降里等价，在会归一化梯度的自适应优化器里不等价。
+- "为了数值稳定，把 epsilon 放进平方根里。" 这会改变小梯度时的步长；参考实现在开方之后再加 epsilon。
+- "像数组下标一样，步数计数器从 0 开始。" 这样第一步的偏差校正会除以零。
 
 ## Taught in
 
-The [training loop lesson](../../../phases/19-capstone-projects/36-training-loop-eval/) configures AdamW with its decay split, the [cosine schedule lesson](../../../phases/19-capstone-projects/44-cosine-lr-warmup/) pairs it with warmup and decay, and the [Adam practice](../../../practice/adam-step/) checks the decoupled form.
+[训练循环课](../../../phases/19-capstone-projects/36-training-loop-eval/)配置了带衰减分组的 AdamW，[余弦调度课](../../../phases/19-capstone-projects/44-cosine-lr-warmup/)把它和预热、衰减配合使用，[Adam 练习](../../../practice/adam-step/)检查解耦形式。

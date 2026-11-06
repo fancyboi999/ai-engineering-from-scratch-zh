@@ -1,6 +1,6 @@
 ---
 id: query-key-value-lookup
-title: Explain query, key and value in one minute
+title: 一分钟讲清查询、键和值
 card: transformers
 kind: concept
 level: 1
@@ -16,17 +16,17 @@ related: []
 updated: 2026-11-03
 ---
 
-A new teammate has read the word "attention" a hundred times and still cannot say what a query, a key or a value is. Explain the three to them in one minute. Then tell me what changed between the 2014 encoder-decoder version and the version inside a transformer.
+一位新同事已经读过上百次「注意力」这个词，还是说不出查询、键和值分别是什么。请用一分钟给他讲清楚这三样东西。然后告诉我，2014 年编码器-解码器里的版本和 transformer 里的版本之间变了什么。
 
 ## Short answer
 
-Attention is a soft lookup. Each token produces a query that asks for information, a key that says what the token holds, and a value that the token hands over when it is picked. The query is scored against every key, the scores go through a softmax, and the output is the weighted sum of the values. In the 2014 version the query was the decoder state and the keys and the values were the same encoder states; a transformer takes all three from one sequence through three learned projections.
+注意力是一种软查找。每个 token 产出一个查询，表示它要找什么信息；一个键，表示它自己有什么；一个值，表示它被选中时交出去的内容。查询和每个键算分数，分数经过 softmax，输出是各个值的加权和。2014 年的版本里，查询是解码器状态，键和值是同一组编码器状态；transformer 则通过三个可学习的投影，从同一个序列里得到这三样东西。
 
 ## Full answer
 
-### The three projections
+### 三个投影
 
-For a sequence X of n tokens with d dimensions each:
+对一个有 n 个 token、每个 token d 维的序列 X：
 
 ```text
 Q = X @ Wq    (n, dk)   what each token looks for
@@ -35,33 +35,33 @@ V = X @ Wv    (n, dv)   what each token returns when picked
 scores = Q @ K.T        (n, n)
 ```
 
-Row i of the score matrix is one token's view of the whole sequence. The softmax turns the row into weights that sum to one. The output for token i is the weighted sum of all value vectors.
+分数矩阵的第 i 行是一个 token 对整个序列的看法。softmax 把这一行变成总和为 1 的权重。token i 的输出是所有值向量的加权和。
 
-### The database picture
+### 数据库的比喻
 
-A real database matches a query to one key and returns one value. Attention matches a query to every key with a similarity score and returns a blend of every value. The blend is what lets the model combine information from several positions in one step.
+真正的数据库把查询匹配到一个键，返回一个值。注意力用相似度分数把查询和每个键都匹配一遍，返回所有值的混合。正是这种混合，让模型能在一步之内组合多个位置的信息。
 
-### What the 2014 version had
+### 2014 年的版本是什么样
 
-The encoder-decoder attention of 2014 used the previous decoder state as the query and scored it against every encoder hidden state. The context vector was the weighted average of those same encoder states. In that design the keys and the values were the same thing. Two score functions were common: an additive score that passes the pair through a tanh and a learned vector, and a multiplicative score that takes a dot product. The three-line fix broke the fixed-size bottleneck of the encoder-decoder.
+2014 年的编码器-解码器注意力用前一个解码器状态作为查询，和每个编码器隐藏状态算分数。上下文向量是这些编码器状态的加权平均。在那个设计里，键和值是同一个东西。常见的分数函数有两种：加性分数，把这一对向量送进 tanh 和一个可学习的向量；乘性分数，直接算点积。这三行代码的改动打破了编码器-解码器的固定长度瓶颈。
 
-### What a transformer changed
+### transformer 改了什么
 
-Self-attention queries a sequence against itself, and it separates keys from values with different learned projections. Multi-head attention runs several of these in parallel. The weighted sum of values is the same idea. The score function changes: the additive tanh score and the plain dot product give way to a dot product divided by the square root of the key width.
+自注意力让一个序列对自己做查询，并用不同的可学习投影把键和值分开。多头注意力把多个这样的计算并行跑。值的加权和还是同一个思路。分数函数变了：加性的 tanh 分数和普通点积，被除以键宽度平方根的点积取代。
 
 ## Follow-ups
 
-- **Level 1:** What shape does the output have for one token? Expected: the value dimension, because the output is a weighted sum of value vectors.
-- **Level 2:** Why give keys and values separate projections? Expected: a token can be matched on one kind of information and return another kind.
-- **Level 2:** Why does the plain dot-product score need the query and the key to have the same dimension? Expected: a dot product is only defined for vectors of equal length; the general form inserts a matrix W to remove that constraint.
-- **Level 3:** Name the convention trap between the two classic score functions. Expected: one uses the decoder state before the current step and the other uses the state after it; mixing them produces subtly wrong gradients.
+- **Level 1:** 一个 token 的输出是什么形状？ Expected: 值的维度，因为输出是值向量的加权和。
+- **Level 2:** 为什么给键和值分别设投影？ Expected: 一个 token 可以凭一种信息被匹配上，交出去的却是另一种信息。
+- **Level 2:** 为什么普通点积分数要求查询和键维度相同？ Expected: 点积只对等长向量有定义；一般形式在中间插入一个矩阵 W 来去掉这个约束。
+- **Level 3:** 说出两种经典分数函数之间的约定陷阱。 Expected: 一种用当前步之前的解码器状态，另一种用当前步之后的状态；两者混用会产生细微的梯度错误。
 
 ## Wrong answers
 
-- "The key and the value must be the same vector." They were in the classic version, but a transformer learns separate projections for them.
-- "Attention picks the single best matching token." The softmax gives a weight to every position, and the output blends all of the values.
-- "The query comes from the encoder." In encoder-decoder attention the query comes from the decoder and the keys and the values come from the encoder.
+- "键和值必须是同一个向量。" 经典版本里是这样，但 transformer 为它们学习了不同的投影。
+- "注意力挑出最匹配的那一个 token。" softmax 给每个位置都分配权重，输出混合了所有的值。
+- "查询来自编码器。" 在编码器-解码器注意力中，查询来自解码器，键和值来自编码器。
 
 ## Taught in
 
-The [attention mechanism lesson](../../../phases/05-nlp-foundations-to-advanced/10-attention-mechanism/) builds the classic version and the [self-attention lesson](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/) builds the projections.
+[注意力机制一课](../../../phases/05-nlp-foundations-to-advanced/10-attention-mechanism/)实现了经典版本，[从零实现自注意力一课](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/)实现了三个投影。

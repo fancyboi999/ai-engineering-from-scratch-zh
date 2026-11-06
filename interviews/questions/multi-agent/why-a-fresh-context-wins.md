@@ -1,6 +1,6 @@
 ---
 id: why-a-fresh-context-wins
-title: Why a lead with workers beats one agent on research
+title: 为什么在研究任务上 lead 与 workers 胜过单 agent
 card: multi-agent
 kind: concept
 level: 1
@@ -16,45 +16,45 @@ related: [multi-agent/the-single-agent-ceiling]
 updated: 2026-11-03
 ---
 
-A research system with one lead agent and several worker agents beat a single agent on an internal evaluation by a wide margin. Explain the mechanism, and say which single variable explains most of the gain.
+一套由一个 lead agent 和多个 worker agent 组成的研究系统，在一次内部评估中以较大优势击败了单个 agent。请解释其机制，并说明哪一个单一变量解释了大部分收益。
 
 ## Short answer
 
-The lead plans and decomposes the question, each worker gets a fresh window for one narrow sub-question, and the lead synthesizes the worker summaries without ever reading the raw sources. Three mechanisms carry the gain: fresh context per worker, a narrow prompt per role, and workers that run at the same time. The variable that explains most of it is total token usage, which the lesson's source puts at 80 percent of the variance on one browsing benchmark. A worker that does not carry the lead's planning tokens has room to read.
+Lead 规划并拆解问题，每个 worker 获得针对一个狭窄子问题的纯净窗口，且 lead 在从不阅读原始源数据的情况下合成 worker 的摘要。三项机制带来了收益：每个 worker 的纯净上下文、每个角色的狭窄 prompt，以及同时运行的 worker。解释大部分收益的变量是总 token 使用量，课程的来源指出它在某项浏览基准上解释了 80% 的方差。不背负 lead 规划 token 的 worker 拥有阅读的空间。
 
 ## Full answer
 
-### The shape
+### 形态
 
-The lead receives the question, splits it into sub-questions, and sends one to each worker. Each worker starts from its own system prompt and its sub-question, not from the lead's history. The workers return summaries. The lead never sees the raw material, only the summaries, and writes the answer from them.
+Lead 接收问题，将其拆解为子问题，并将一个子问题发送给每个 worker。每个 worker 从其自身的系统 prompt 和子问题启动，而不是从 lead 的历史启动。worker 返回摘要。Lead 从不查看原始素材，只查看摘要，并从中编写答案。
 
-### The three mechanisms
+### 三项机制
 
-1. **Fresh context.** A worker on one sub-question does not carry the tens of thousands of tokens the lead spent planning. It has a full window for its question. The lesson's figure is a 200k window per worker against the 40k the lead already used.
-2. **Specialization by prompt.** The lead's prompt says decompose and synthesize. Each worker's prompt says find what changed in one thing. Narrow prompts produce narrow, usable outputs.
-3. **Parallelism.** Workers run concurrently, so wall-clock time is about the longest worker plus planning plus synthesis, not the sum of all workers.
+1. **纯净上下文。** 处理一个子问题的 worker 不背负 lead 花费在规划上的数万 token。它拥有面向其问题的完整窗口。课程的数据显示每个 worker 拥有 200k 窗口，而 lead 已经使用了 40k。
+2. **基于 Prompt 的专业分工。** Lead 的 prompt 指明拆解和合成。每个 worker 的 prompt 指明寻找某件事中发生的变化。狭窄的 prompt 产生狭窄、可用的输出。
+3. **并行性。** Worker 并发运行，因此真实耗时大致为耗时最长的 worker 加上规划和合成，而不是所有 worker 耗时的总和。
 
-### The gain and its price
+### 收益与其代价
 
-The lesson reports a gain of 90.2 percent over the single agent on the internal evaluation, and a cost of about 15 times the tokens of a single agent. The same source says that about 80 percent of the variance on one browsing benchmark is explained by token usage alone. The pattern wins because it spends more tokens where they help, not because the lead is clever.
+课程报告在内部评估中相比单 agent 获得了 90.2% 的相对增益，且成本约为单 agent 的 15 倍 token。同一来源指出，某项浏览基准上约 80% 的方差单由 token 使用量解释。该模式胜出是因为它在有帮助的地方花费了更多 token，而不是因为 lead 聪明。
 
-### Operational lessons that come with it
+### 随之而来的操作经验
 
-Scale the effort to the question: a simple query needs one agent and a few tool calls, and a complex one may need more than ten workers, and the lead must estimate that. Decompose broad first, then go deeper where an answer warrants it. Long-running stateful agents need a gradual deployment where old versions drain, not a hot swap.
+根据问题调整算力：简单查询需要一个 agent 和少数工具调用，复杂查询可能需要十个以上的 worker，且 lead 必须做此估算。先广后深拆解，然后在回答有充分理由的地方深入。长时间运行的有状态 agent 需要平滑部署以便旧版本自然排空，而不是热替换。
 
 ## Follow-ups
 
-- **Level 1:** Why does the lead not read the raw sources? Expected: so that its window stays free for planning and synthesis, and so that each source is read once by the worker who owns it.
-- **Level 2:** When does the pattern lose to a pipeline? Expected: when step two needs step one's output, because then there is no parallel work and the extra agents only add tokens.
-- **Level 2:** What does the lead do when two workers disagree? Expected: it re-asks or notes the disagreement in the answer, and never picks one side in silence.
-- **Level 3:** A worker drifts beyond its sub-question. What stops it? Expected: an explicit scope in its prompt, a timeout at about twice the median worker runtime, and a token cap, after which the lead re-spawns with a narrower question or proceeds without it.
+- **Level 1:** 为什么 lead 不读原始源数据？ Expected: 好让它的窗口留出空间做规划和合成，并使每个源由拥有它的 worker 读取一次。
+- **Level 2:** 该模式何时会输给流水线？ Expected: 当第二步需要第一步的输出时，因为此时没有并行工作，额外的 agent 只会增加 token。
+- **Level 2:** 当两个 worker 出现分歧时，lead 怎么做？ Expected: 重新提问或在答案中注明分歧，绝不在沉默中偏向一方。
+- **Level 3:** worker 漂移超出其子问题，什么能阻止它？ Expected: 其 prompt 中的显式作用域、大约为中位数 worker 运行时两倍的超时，以及 token 上限，之后 lead 可以使用更窄的问题重新派生或在没有该结果的情况下继续。
 
 ## Wrong answers
 
-- "The lead is a bigger model, so it is smarter." The gain tracks token usage, and the workers do the reading; a bigger lead alone changes nothing about context.
-- "Multi-agent is cheaper because workers are small." It costs about 15 times the tokens, and it is worth it only when the task value covers that.
-- "Give the lead the raw sources too, so it can check the workers." That fills the lead's window with what the workers already read and removes the fresh-context advantage.
+- "Lead 是更大的模型，所以更聪明。" 收益跟踪 token 使用量，且 worker 承担阅读工作；单靠更大的 lead 不会改变关于上下文的任何问题。
+- "多 agent 更便宜，因为 worker 很小。" 它花费大约 15 倍的 token，只有当任务价值覆盖该成本时才值得。
+- "也给 lead 原始源数据，以便其可以检查 worker。" 这会用 worker 已经读取的内容填满 lead 的窗口，并消除纯净上下文的优势。
 
 ## Taught in
 
-The [supervisor pattern lesson](../../../phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/) builds the lead and the parallel workers and reports the measured gain.
+[Supervisor 模式课程](../../../phases/16-multi-agent-and-swarms/05-supervisor-orchestrator-pattern/)构建了 lead 和并行 worker，并报告了测得的收益。

@@ -1,6 +1,6 @@
 ---
 id: transfusion-two-losses
-title: Two losses, one transformer, one gradient step
+title: 两个损失、一个 Transformer、一次梯度更新
 card: multimodal
 kind: concept
 level: 4
@@ -16,19 +16,19 @@ related: [multimodal/vq-tokenizer-ceiling, multimodal/show-o-parallel-decoding]
 updated: 2026-11-03
 ---
 
-Explain how a single transformer can train the text objective of next-token prediction together with a denoising loss on images in one gradient step. Cover the input representation, the attention mask, how the loss is routed per position, and the balance problem that follows. Then say what a sibling architecture changed.
+请详细解释单个 Transformer 如何在单次梯度更新步骤中，将预测下一个 token 的纯文本因果建模目标与图像上的去噪扩散损失联合训练。请涵盖输入表征构建、注意力掩码设计、逐位置的损失路由机制，以及随之而来的损失平衡难题。随后，说明其同门架构做出了何种针对性改进。
 
 ## Short answer
 
-Text enters as discrete tokens through the embedding table; images enter as continuous 16 by 16 pixel patches through a linear projection, bracketed by image start and end tags. One forward pass runs over the mixed sequence, and the loss is picked per position: cross-entropy on the vocabulary head for text positions, and a flow-matching regression for image patches, which predicts the velocity from a noised patch toward the clean one at a sampled time. The mask is block-triangular, causal over text and bidirectional among the patches of one image, with text attending to images that closed before it and patches attending to the preceding text. Both losses backpropagate through the same weights, so their relative magnitude must be balanced by hand; the sibling architecture keeps the joint attention but gives text and image their own weights in every block.
+文本通过嵌入表以离散 token 形式输入，图像通过线性投影层以连续的 16 × 16 像素 patch 向量形式输入，并在图文交界处用图像起始和结束标签包围。混合序列经历单次前向传播，随后按位置分别路由损失：文本位置计算词表输出头上的交叉熵损失，图像 patch 位置则计算流匹配（flow-matching）回归损失（预测加噪 patch 在采样时间步朝向干净原图的速度向量）。注意力掩码采用块下三角结构：文本之间保持因果关系，单张图像内部 patch 之间保持全双向关联，文本关注在其之前闭合的图像，图像 patch 关注先前的文本。两套损失通过同一套权重反向传播，因此必须手动平衡两者的相对大小；兄弟架构保留了联合注意力，但在每个块中为文本和图像各自保留了独立权重。
 
 ## Full answer
 
-### The input
+### 输入表征设计
 
-Two kinds of positions in one sequence. A text position holds a token id and goes through the embedding table. An image position holds a real-valued patch vector, projected into the hidden size by a linear layer, the way a vision transformer embeds its input. Tags mark where an image starts and ends.
+单条输入序列中混合共存两种截然不同的输入形态：文本位置输入离散 token id 并通过标准词表嵌入表（Embedding table）查表；图像位置则输入实数维度的 patch 向量，通过线性投影层映射至隐层维度（与 Vision Transformer 的 patch 嵌入逻辑完全一致）。序列中使用标签标记图像的起始与闭合边界。
 
-### The mask
+### 注意力掩码拓扑矩阵
 
 ```text
 M[i, j] = 1 if
@@ -38,44 +38,44 @@ M[i, j] = 1 if
   or i is a patch, j is text, and j precedes the image start
 ```
 
-Teacher forcing on text requires the causal part. An image is one snapshot, so its patches may all see each other.
+在 Teacher Forcing 模式下文本必须防止窥探未来。而图像本质上是一个静止瞬间，因此其内部的所有 patch 之间天然应当互相可见。
 
-### The loss per position
+### 逐位置的损失路由
 
-- Text: the cross-entropy of the vocabulary head against the next token.
-- Image: sample a time t, interpolate between the clean patch and noise with weight t, feed the noisy patch, and regress the velocity, the noise minus the clean patch, with a mean squared error.
+- **文本位置**：在整个词表投影头上计算预测下一个 token 的标准交叉熵损失。
+- **图像位置**：随机采样时间步 t，按权重 t 在干净 patch 和噪声之间插值，得到带噪 patch，送入模型后通过均方误差（MSE）回归其速度向量（即噪声减去干净 patch 的物理差值）。
 
-Both terms add into one loss and one backward pass; the shared body receives both gradients.
+两项损失直接相加构成单体总损失标量，执行单次反向传播，共享的 Transformer 骨干网络同时接收来自两套目标的梯度流。
 
-### Generation
+### 推理生成流程
 
-Text decodes token by token. When the model emits the image start tag, generation switches to a denoising loop over the image patches, conditioned on the text so far, for a few dozen steps, then returns to text.
+文本生成采用标准的逐 token 自回归解码。一旦模型输出图像起始标签，解码器立即无缝切换为针对图像 patch 的多步扩散去噪采样循环（以迄今生成的文本上下文为条件引导）迭代数十步，待图像渲染完成后再切回文本自回归。
 
-### The balancing problem
+### 损失平衡难题
 
-The two losses live on different scales. The lesson's exercise poses a mix of 70 percent text and 30 percent image positions where the image loss is about ten times the text loss in magnitude; without weights, one head dominates the shared gradient. The weights, and any mismatch in schedules between the two objectives, are a search of their own, which is the price of avoiding a quantizer. The reward is image quality above a discrete model of the same size, by 3 to 5 points on the standard image score in the paper.
+两种损失的尺度不同。课程练习模拟了一个由 70% 文本位置与 30% 图像位置组成的混合序列，其中图像损失的数值绝对量级达到了文本损失的约 10 倍；若不施加手动权重调平，图像梯度会主导共享参数的更新。权重以及两个目标在调度上的任何不匹配，需要单独搜索，这是避开量化器的代价。回报是图像质量高于同等规模的离散模型，在论文标准图像指标上高出 3 到 5 分。
 
-### The sibling
+### 兄弟架构
 
-The multimodal diffusion transformer behind a well-known image generator keeps the joint attention across modalities but gives text and image their own query, key, value and MLP weights in every block, trains with rectified flow, and ships in 2B and 8B parameter variants. Separate weights remove some of the balancing pressure at the cost of more parameters.
+一个知名图像生成器背后的多模态扩散 transformer 保留了跨模态联合注意力，但在每个块内部为文本和图像分别设置了独立的 query、key、value 和 MLP 权重，采用整流流（rectified flow）训练，提供 2B 和 8B 两种参数规模。独立的权重减轻了平衡压力，代价是参数量增加。
 
-### Where it sits
+### 架构技术全景定位
 
-Discrete-code designs trade this plumbing for one loss and a tokenizer ceiling; the masked discrete design keeps one loss and parallel decoding. This design is the pick when fidelity is paramount and the two-loss recipe is acceptable.
+离散编码方案通过单一损失避开了损失平衡问题，但受制于分词器上限；掩码离散设计维持单损失并实现并行解码。当画质保真度至关重要且可以接受双损失配方时，该设计是合适的选择。
 
 ## Follow-ups
 
-- **Level 3:** Why may image patches attend bidirectionally when text may not? Expected: text is generated left to right under teacher forcing, so a token must not see its target; an image is produced as one snapshot, and its patches have no order.
-- **Level 4:** How would you set the loss weights? Expected: measure the magnitude and the gradient norm of each loss on a held-out batch, scale them to comparable contributions, and tune from there against a text eval and an image eval together, because one can improve while the other regresses.
-- **Level 4:** What does the sampled time t do in the training loss? Expected: it picks how much noise the patch carries, so the model learns the whole path from noise to clean; at generation each step moves along that path.
-- **Level 4:** What does the sibling's per-modality weight set cost and buy? Expected: more parameters per block; it buys separate capacity for two very different input statistics and eases the balance, while the joint attention still lets the modalities condition each other.
+- **Level 3:** 为什么图像 patch 之间可以做双向注意力，而文本绝对不行？ Expected: 文本在 teacher forcing 下从左向右生成，因此 token 不能看到预测目标；图像作为一个整体生成，patch 之间没有先后顺序。
+- **Level 4:** 在实际工程中你会如何设定两套损失的平衡权重？ Expected: 在独立的验证集 batch 上分别测量两套损失的均值大小与各自反向传播的梯度范数，按比例将其缩放至均衡贡献；随后在纯文本评测集与图像评测集上同时监控验证，因为往往一侧提升时另一侧正在退化。
+- **Level 4:** 训练损失中采样的随机时间步 t 起到了什么作用？ Expected: 它决定 patch 中有多少噪声，使模型学会从噪声到干净图像的整条路径；生成时每一步都沿着这条路径前进。
+- **Level 4:** 同门架构为各模态分配独立参数集带来了什么好处，付出了什么代价？ Expected: 代价是每个 block 的参数量大幅增加；好处是为统计特性截然不同的文本与图像提供了专用的容量空间并缓解了梯度冲突，同时联合注意力依然能保证模态间深度融合。
 
 ## Wrong answers
 
-- "One transformer can only have one loss." The loss is a function of the outputs per position; routing a different loss to different positions is one summed objective with one backward pass.
-- "Use a causal mask everywhere for simplicity." Causal attention inside an image hides part of each image from its own patches and hurts generation; the mask must be bidirectional inside an image block.
-- "The two losses balance themselves because they share the weights." Shared weights are the problem: the larger loss dominates the shared gradient until you weight them.
+- "单个 Transformer 只能绑定一个损失函数。" 损失函数是每个位置输出向量的数学计算；将不同位置映射到不同损失并直接求和，构成了单一的优化目标，只需一次反向传播。
+- "为追求实现极简，全局一律使用因果掩码。" 在图像内部强加单向因果掩码会严重破坏图像内部二维空间的双向拓扑感知，严重劣化图像生成质量；图像内部必须全双向。
+- "因为共享了一套主干权重，两套损失会自动实现动态平衡。" 共享参数正是冲突的根源：数值尺度更大的损失会强力霸占更新梯度，直到你显式引入加权系数为止。
 
 ## Taught in
 
-The [Transfusion lesson](../../../phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion/) builds the two-loss trainer and the mask and names its sibling design, and the [Show-o lesson](../../../phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified/) places it against the discrete designs.
+[Transfusion 课程](../../../phases/12-multimodal-ai/13-transfusion-autoregressive-diffusion/)构建了双损失训练器与掩码矩阵并指出了同门架构，[Show-o 课程](../../../phases/12-multimodal-ai/14-show-o-discrete-diffusion-unified/)将其与离散架构对比。

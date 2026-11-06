@@ -1,6 +1,6 @@
 ---
 id: feedback-loop-clean-data
-title: Keep clean data when the model changes its own future
+title: 当模型改变自身未来时保留纯净数据
 card: system-design
 kind: design
 level: 4
@@ -16,56 +16,56 @@ related: [system-design/churn-model-system, system-design/fraud-check-100ms, sys
 updated: 2026-11-03
 ---
 
-Three systems retrain monthly on their own production data: a churn model that sends save offers, a fraud model that blocks payments, and a ranking model that orders a feed. Each one gets a little worse after every retrain. Explain the shared cause, design the data layer that prevents it, and say what each training row must carry for the fix to work.
+三个系统每月基于自身线上生产数据重新训练：发放挽留优惠的用户流失预警模型、拦截可疑交易的支付风控模型，以及为信息流排序的推荐模型。每次重训之后，模型效果都会出现些微下滑。请解释导致这一现象的共同根因，设计能防止该问题的统一数据层，并说明每个训练样本行必须附带哪些字段才能让修复方案生效。
 
 ## Short answer
 
-Each model's decisions change the data that trains its next version, which is a feedback loop. Offers keep users who would have churned, so high-risk users look loyal; blocked payments never get a chargeback, so fraud disappears from the blocked region; the feed shows only its top items, so only those collect clicks. The fix is to keep data the model did not influence: a random holdout that never receives the intervention, a small share of random decisions, and a log that stores the score and the decision with every row, joined to features as of the decision time so training can separate influenced from clean data.
+每个模型的线上干预决策改变了用于训练其下一版模型的数据分布，这属于反馈闭环。挽留优惠留住了本会流失的用户，使得高危用户看起来非常忠诚；被拦截的交易永远不会产生拒付调单，因此欺诈从被拦截区域消失；推荐流只展示高分条目，导致仅有这些条目能够收集用户点击。解决方案是保留未受模型影响的数据：永不接受干预的随机对照保留组、针对极小比例流量实施随机决策，并在每行日志中记录决策时刻的模型得分与动作，与决策发生时刻的特征做时间点对齐拼接，从而使后续训练能够明确区分受干预数据与纯净基准数据。
 
 ## Full answer
 
-### Three shapes of the same loop
+### 同一闭环的三种不同形态
 
-| System | How the decision hides the label | What the retrain learns |
+| 系统类型 | 业务决策如何掩盖真实标签 | 重训模型学到了什么错误规律 |
 |---|---|---|
-| Churn offers | Offers retain some at-risk users | Their features do not predict churn |
-| Fraud blocks | A blocked payment has no outcome | The blocked region looks safe |
-| Feed ranking | Only shown items can be clicked | The current top items are the only good ones |
+| 流失挽留优惠 | 优惠成功留存了部分高危用户 | 这些特征无法预测用户流失 |
+| 支付风控拦截 | 被拦截的支付永远不会产生结果 | 被拦截的特征区域看起来非常安全 |
+| 信息流推荐排序 | 仅有被展示的条目能够被点击 | 当前排在前面的条目是唯一优秀的 |
 
-The loop is listed among the main sources of technical debt in production ML systems because it is silent: every retrain looks fine on its own held-out data, which is also influenced.
+该闭环被列为生产级机器学习系统技术债务的主要来源之一，因为它是隐蔽的：每次重训模型在其自有的留出验证集上表现都很好，因为该验证集同样受到了历史模型的系统性影响。
 
-### The data layer
+### 数据层设计方案
 
-1. A random holdout group that never receives the intervention. Its outcomes are the clean estimate of the base rate and the clean labels for training.
-2. A small share of random decisions on live traffic, for example payments that are not blocked or items shown out of order, so the blocked and unshown regions keep producing labels. The share is sized as the smallest that keeps enough labels from those regions.
-3. Logging of the score, the decision and the assignment with every row at decision time.
-4. Features joined as of the decision time, with the point-in-time rule from the feature store, so that a row's inputs are what the model saw and not a later snapshot that already reflects the outcome.
+1. 建立永不接受干预的随机对照保留组。其真实结果构成了对自然发生率的无偏估计，并为训练提供纯净基准标签。
+2. 在线上真实流量中对极小比例的请求执行随机决策。例如放行部分本应被拦截的支付，或打乱展示部分未排在头部的条目，从而使被拦截和未曝光区域持续产出真实标签。该比例应精细设定为满足这些区域产出足够标签所需的最低值。
+3. 在决策发生时刻，对每行数据同步落盘记录模型得分、采取的动作以及所归属的实验分组。
+4. 依据特征存储中的时间点规则，按决策发生时刻拼接特征，确保样本输入忠实还原模型决策时所见的数据面貌，而非反映后续业务干预结果的晚期快照。
 
-### What a training row carries
+### 训练样本行必须携带的字段
 
-The entity and the decision time, the features as of that time, the model score, the decision taken, the group it belonged to, the label and the label time. With those fields training can select clean rows, weight influenced rows, or model the decision as a feature. Without the decision and the group, influenced and clean rows are indistinguishable and the loop is invisible.
+目标实体标识与决策发生时间戳、截至该时间点的输入特征、模型给出的预测得分、系统实际执行的决策动作、样本所属的实验分组标识、最终业务标签及其产生时间戳。有了这些字段，训练过程才能精准筛选纯净样本、对受干预样本实施样本加权，或将历史决策作为显式特征建模。若缺失具体决策与分组标识，受污染数据与纯净数据将完全无法区分，闭环问题也将变得不可观测。
 
-### Why the feature store is part of it
+### 为什么特征存储是解决方案的关键一环
 
-A naive join on the entity returns the newest feature snapshot for every label, which copies the outcome into the input. The same mistake inside a feedback loop is worse: the newest snapshot also reflects the intervention. The as-of join with a TTL makes each row describe the moment of the decision, and the created timestamp check keeps a backfill from reading data that arrived later.
+朴素地根据实体 ID 拼接特征会抓取每个标签对应的最新特征快照，从而把最终结果泄露进输入特征中。在反馈闭环中这种错误更加致命：最新快照还反映了干预的影响。附带 TTL 的截止时间点拼接确保每行样本严格描述决策发生的瞬间，而创建时间戳核查能防止历史回填读取后续才迟滞入库的数据。
 
-### Measuring the fix
+### 衡量修复成效
 
-The holdout gives the business metric: the outcome in the treated group against the holdout group. It also gives the retrain test: evaluate the new model on holdout rows only, so the score is not inflated by the model's own decisions. A model that improves on influenced data and not on the holdout has learned the loop.
+随机保留对照组提供了最终的业务衡量基准：对比干预组与对照组在真实业务指标上的差距。它也提供了重训后的测试：只在保留组样本上评估新模型，避免模型自身的决策抬高得分。若模型仅在受干预数据上有提升，而在纯净对照组上停滞不前，则表明它只是学会了拟合历史闭环。
 
 ## Follow-ups
 
-- **Level 3:** Why is a time split alone not enough here? Expected: the recent period is also influenced by the deployed model; time ordering prevents future leakage but not intervention bias.
-- **Level 4:** The random non-blocking share costs real fraud. How do you argue for it? Expected: as the price of clean labels against the cost of a model that drifts blind; size it to the minimum that keeps enough labeled fraud from the blocked region.
-- **Level 4:** How does the exposure loop in ranking differ from the other two? Expected: the label is never collected rather than hidden; random exposure of lower-ranked items is the only way to learn their click rate.
-- **Level 4:** A retrain evaluated on the holdout is worse than on the full set. Which number do you trust? Expected: the holdout; the full set rewards the model for agreeing with its own past decisions.
+- **Level 3:** 为什么单纯采用时间序列切分无法解决该问题？ Expected: 最近的历史周期同样已经受线上已部署模型的干预污染；时间排序只能防范未来信息泄漏，无法消除业务干预偏差。
+- **Level 4:** 针对支付拦截引入随机放行会导致真实的欺诈坏账，你如何论证其合理性？ Expected: 将获取干净标签的代价与模型盲目漂移的成本比较；将随机放行比例设为能从被拦截区域获得足够带标签欺诈样本的最低值。
+- **Level 4:** 推荐系统中的曝光闭环与前两者有何不同？ Expected: 标签不是被掩盖，而是完全未被采集；随机曝光较低排名的条目是获取其真实点击率的唯一途径。
+- **Level 4:** 新模型在对照组上的评估表现差于在全量数据上的表现，你应该相信哪一个数字？ Expected: 相信对照组；在全量数据上的高分仅仅是因为新模型更迎合自身以往的历史决策。
 
 ## Wrong answers
 
-- "More training data fixes a drifting model." The new data is influenced; more of it entrenches the loop.
-- "A random train and test split shows the real performance." Both halves are influenced; only a holdout that never saw the intervention is clean.
-- "Log the decision later from the outcome table." The decision and the assignment must be recorded at decision time, with the features as of that time, or the join leaks the outcome.
+- "收集更多训练数据即可解决模型漂移。" 产生的新数据同样受到了历史干预的污染；盲目增加数据只会进一步加剧闭环恶化。
+- "随机切分训练集与测试集能反映真实性能。" 两份切片都已被历史模型干预污染；唯有从未经历干预的保留对照组才是干净的。
+- "等业务结果出来后，再从结果表中补录当时执行的决策。" 决策动作与实验分组必须在决策发生的瞬间实时记录，并关联当时快照，否则事后拼接会严重泄漏最终结果。
 
 ## Taught in
 
-The [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) names the three feedback loops and the shared fix, and the [feature store lesson](../../../phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/) gives the as-of join that keeps each training row at the decision time.
+[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)指出了三种反馈闭环形态及其通用解决方案，[特征存储课程](../../../phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/)给出了将训练样本精确锁定在决策时刻的截止时间点拼接机制。

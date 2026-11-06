@@ -1,6 +1,6 @@
 ---
 id: anchored-rubric
-title: Two engineers, one judge, different means
+title: 两名工程师用同一个 judge，均值却不同
 card: evaluation
 kind: design
 level: 2
@@ -16,49 +16,49 @@ related: [evaluation/judge-calibration-before-trust, evaluation/pairwise-positio
 updated: 2026-11-03
 ---
 
-Two engineers ran the same judge on the same 100 answers with the instruction "rate from 1 to 5 how good the answer is" and got means almost a full point apart. How do you rewrite the rubric so the scores become reproducible, and what else goes into the judge prompt?
+两名工程师用同一个 judge 给同样的 100 个回答打分，指令都是“按 1 到 5 分评价回答质量”，得到的均值却差了将近一分。你怎么重写评分量表，让分数可复现？judge 的 prompt 里还要放什么？
 
 ## Short answer
 
-Anchor every level to behavior a reader can check. A rubric that states what a 5, a 4 and a 3 look like reduces judge variance by 30 to 40 percent compared with an unanchored scale. Score several criteria separately, give the judge the input, the output and the reference, and ask for the reasoning next to the number.
+把每个分数档锚定到读者能核对的行为上。与没有锚点的量表相比，写清 5 分、4 分、3 分分别是什么样的量表，能把 judge 的方差降低 30% 到 40%。把几个维度分开打分，把输入、输出和参考答案都交给 judge，并要求它在分数旁边写出理由。
 
 ## Full answer
 
-### From vague to anchored
+### 从模糊到锚定
 
-The bad rubric asks how good the answer is. The good rubric describes each level:
+差的量表只问回答有多好。好的量表描述每一档：
 
-- **5**: factually correct, directly addresses the question, includes specific details, gives actionable information.
-- **4**: correct and on topic, but short on detail or slightly verbose.
-- **3**: mostly correct with a minor inaccuracy, or partially misses the intent.
-- **2**: significant factual errors, or only tangentially related.
-- **1**: wrong, off topic or harmful.
+- **5**：事实正确，直接回应问题，包含具体细节，给出可操作的信息。
+- **4**：正确且切题，但细节不足或略显啰嗦。
+- **3**：大体正确但有小错，或部分偏离了意图。
+- **2**：有明显的事实错误，或只沾到一点边。
+- **1**：错误、跑题或有害。
 
-### One criterion per score
+### 一个维度一个分数
 
-Score relevance, correctness, helpfulness and safety on separate scales. A single overall score collapses the dimensions, and optimizing it produces terse answers that are technically right and useless.
+相关性、正确性、有用性和安全性各用一个量表打分。单一总分会把几个维度压成一个；去优化它，会得到技术上正确、实际上没用的简短回答。
 
-### What the judge sees
+### judge 能看到什么
 
-The input, the output, the reference answer when one exists, and the anchored rubric for the criterion. Ask for a structured answer with the score and a short reason, so that a reviewer can audit the judge.
+输入、输出、参考答案（如果有），以及该维度的锚定量表。要求 judge 输出结构化结果，包含分数和简短理由，方便评审人审查 judge。
 
-### Prove it
+### 证明它可复现
 
-Run the judge three times on each case and compute an agreement statistic across the runs. Below 0.7 the rubric is still ambiguous. If the judge keeps wavering between two adjacent levels, switch that criterion to a pairwise comparison, which removes the scale.
+对每个样本让 judge 跑三次，计算几次运行之间的一致性统计量。低于 0.7 说明量表仍有歧义。如果 judge 总在相邻两档之间摇摆，就把这个维度改成成对比较，这样就不再需要绝对刻度。
 
 ## Follow-ups
 
-- **Level 2:** Why score four criteria instead of one overall score? Expected: one score collapses dimensions; a model can be correct and useless, and the single number hides the trade.
-- **Level 2:** How do you show the new rubric is reproducible? Expected: run the judge several times per case and compute an agreement statistic; below 0.7 rewrite again.
-- **Level 3:** The judge still wavers between 3 and 4 on many cases. What design change removes that? Expected: pairwise comparison, which only asks which output is better.
-- **Level 3:** One criterion has a reference answer and another has none. Does the rubric change? Expected: yes; correctness anchors to the reference, while helpfulness and safety anchor to properties of the output alone.
+- **Level 2:** 为什么要按四个维度打分，而不是只打一个总分？ Expected: 一个分数会把维度压扁；模型可以正确但没用，单一数字掩盖了这种取舍。
+- **Level 2:** 怎么证明新量表可复现？ Expected: 每个样本让 judge 跑几次，计算一致性统计量；低于 0.7 就再改。
+- **Level 3:** judge 仍在很多样本上于 3 和 4 之间摇摆。什么设计改动能消除这个问题？ Expected: 成对比较，它只问哪个输出更好。
+- **Level 3:** 一个维度有参考答案，另一个没有。量表要变吗？ Expected: 要；正确性锚定到参考答案，有用性和安全性只锚定到输出本身的属性。
 
 ## Wrong answers
 
-- "Lower the temperature of the judge." A deterministic judge still applies a vague scale differently across cases; the rubric is the fix.
-- "Average more runs." Averaging noise costs money and leaves a scale that two readers interpret differently.
-- "One overall score is simpler." Simpler to read and wrong to optimize; the lesson warns that single metric optimization produces terse useless answers.
+- "把 judge 的温度调低。" 确定性的 judge 在不同样本上照样会用不同的标准解读模糊量表；要修的是量表。
+- "多跑几次取平均。" 对噪声取平均要花钱，量表本身还是会被两个读者理解成两回事。
+- "一个总分更简单。" 读起来简单，拿来优化就错；课程提醒，只优化单一指标会产生简短而无用的回答。
 
 ## Taught in
 
-The [evaluation and testing lesson](../../../phases/11-llm-engineering/10-evaluation/) gives the anchored rubric, the four criteria and the agreement check.
+[评测与测试课](../../../phases/11-llm-engineering/10-evaluation/)给出了锚定量表、四个维度和一致性检查。

@@ -1,6 +1,6 @@
 ---
 id: thermal-throttle-voided-ab-test
-title: A thermal throttle that voided an A/B test
+title: 使 A/B 测试失效的温控降频
 card: scenarios
 kind: incident
 level: 2
@@ -25,60 +25,61 @@ source:
   - manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md
 ---
 
+
 ## Situation
 
-A team wants to know whether CUDA graphs help their `Qwen/Qwen3-8B` server on an L4. They run the concurrency sweep with graphs on, then the same sweep with graphs off, one after the other on the same afternoon, three seeds each. The two tables agree within a few percent, and at several points the run with graphs off reads a little faster. They conclude that graphs do nothing on this card and plan to turn them off in production to start faster and save memory.
+一个团队想知道 CUDA graph 是否有助于他们在 L4 上的 `Qwen/Qwen3-8B` 服务器。他们在同一个下午先后运行了开启 graph 和关闭 graph 的并发扫描，每次运行测三个种子。两份表格在几个百分点内吻合，在几个测试点上，关闭 graph 的运行甚至读数稍快。他们得出结论：graph 在这张卡上没有任何作用，并计划在生产环境中关闭它以加快启动并节省显存。
 
-One teammate mentions that the fans of the node were loud all afternoon, and that the other L4 in the node was running another team's test pods and an FP8 sweep at the same time.
+一位同事提到，那天下午节点的风扇一直很响，而且节点中的另一张 L4 当时正在运行另一个团队的测试 pod 和 FP8 扫描。
 
 ## Evidence
 
-- [the first comparison of CUDA graphs on and off, as the team read it](evidence/first-ab-table.txt)
-- [the state of both GPUs in the node during that sweep](evidence/gpu-state-during-sweep.txt)
-- [the start of each run in the repeated sweep, with the wait before it](evidence/cooled-restarts.txt)
-- [the same comparison on a cooled card, both servers on one day](evidence/same-day-pair.txt)
-- [the same mistake in a speculative decoding test on the other engine](evidence/the-other-engine.txt)
+- [团队最初看到的开启与关闭 CUDA graph 的首次对比](evidence/first-ab-table.txt)
+- [该扫描期间节点中两张 GPU 的状态](evidence/gpu-state-during-sweep.txt)
+- [重复扫描中每次运行的启动情况以及启动前的等待](evidence/cooled-restarts.txt)
+- [冷却后的显卡上同一天的两次服务器对比](evidence/same-day-pair.txt)
+- [另一个引擎上推测解码测试中的同类错误](evidence/the-other-engine.txt)
 
 ## Questions
 
-1. The two sweeps agree within a few percent. Why is that agreement not evidence that graphs do nothing?
-2. Read the GPU state line. Which slowdown flag is set, what clock does the card run at, and what share of its maximum is that?
-3. What does a slow clock do to a launch-bound step and to a memory-bound step, and why does that hide a graph effect in particular?
-4. Design the protocol that makes an A/B pair comparable on this card. Give the start condition, the repeat rule and what you record.
-5. With that protocol, what did graphs change on this card, and where did the result surprise us?
-6. The same mistake appeared in a speculative decoding test on another engine. What was the clock gap there, and what did the team do with those runs?
+1. 两次扫描在几个百分点内吻合。为什么这种吻合不能作为 graph 没有作用的证据？
+2. 读 GPU 状态行。哪个降频标志被置位了？卡运行在什么时钟下？占其最大值的多大比例？
+3. 低时钟对 launch 受限步和显存受限步有什么影响？为什么这尤其会掩盖 graph 的效果？
+4. 设计一个使这张卡上的 A/B 测试具有可比性的规范。给出启动条件、重复规则和记录内容。
+5. 在该规范下，graph 在这张卡上改变了什么？哪里的结果出乎我们的意料？
+6. 另一个引擎的推测解码测试中出现了同样的错误。那里的时钟差距有多大？团队如何处理那些运行？
 
 ## Walkthrough
 
-Start with the first table. The default server and the server without graphs sit within a few percent at every concurrency, and the seed ranges overlap. At one user the ranges are 10.0 to 14.9 and 10.2 to 12.3 tokens per second, which is wide for a point that should be stable. The sweep had no GPU telemetry, so nothing in the table says what the card was doing.
+从第一份表格开始。默认服务器和没有 graph 的服务器在每个并发下相差都在几个百分点之内，种子范围重叠。在单用户下，范围是每秒 10.0 到 14.9 和 10.2 到 12.3 token，对于一个本应稳定的测试点来说，这个范围太宽了。扫描没有 GPU 遥测，所以表格里没有任何内容说明卡在做什么。
 
-The GPU state line says it. The first GPU, the one that ran the sweep, was at 87 C, its SM clock was 360 MHz against a maximum of 2,040, and the software thermal slowdown flag was active while the card reported 100 percent utilization. The second GPU, at 81 C, held 2,025 MHz while it ran the other tenants' pods. The card under test was running at about a sixth of its clock for a reason that has nothing to do with the server flags.
+GPU 状态行说明了一切。运行扫描的第一张 GPU 温度为 87 C，其 SM 时钟为 360 MHz（最大值为 2,040），在卡报告 100% 利用率的同时，软件温控降频标志处于激活状态。第二张 GPU 为 81 C，在运行其他租户的 pod 时保持在 2,025 MHz。被测卡以大约六分之一的时钟运行，其原因与服务器参数毫无关系。
 
-A CUDA graph removes the launch time of the kernels in one decode step. On this card and model that saving is about half a millisecond of a step of 60 to 70 ms, and a throttled GPU is slow on every step, so the saving disappears in the noise. At the same time the throttle moves with temperature and with the neighbour's load, so two sweeps that ran one after the other did not run at the same speed. Agreement within a few percent on a card whose clock wandered is no evidence at all. The team removed those numbers.
+CUDA graph 消除的是一个 decode 步中 kernel 的 launch 时间。在这张卡和模型上，在 60 到 70 ms 的一步中，这项节省大约是半毫秒；而降频的 GPU 每一步都慢，所以这项节省消失在了噪声中。与此同时，降频随温度和邻居负载而变，所以先后运行的两次扫描并没有在相同的速度下运行。在一张时钟飘移的卡上相差几个百分点的吻合根本不是证据。团队移除了这些数字。
 
-The third listing shows the repaired method. Every run of the repeated sweep started at 72 C or below, and the kit waited for that temperature before each start, from 116 to 287 s. A run whose median SM clock fell under 1,000 MHz was set aside and repeated, up to three times. Both servers ran on one day, one after the other, with the same pool of 24,094 tokens, and a sampler recorded the clock and the temperature every second.
+第三份记录展示了修正后的方法。重复扫描的每次运行都在 72 C 或以下启动，套件在每次启动前等待达到该温度，等待时间为 116 到 287 s。中位数 SM 时钟低于 1,000 MHz 的运行被搁置并重跑，最多重跑三次。两台服务器在同一天先后运行，使用相同的 24,094 token 池，采样器每秒记录一次时钟和温度。
 
-The same-day pair is the result. Up to 16 users the graphs saved 0.5 to 0.7 ms of a step, about 1 percent, 60.15 against 60.64 ms at one user. Throughput was within 1.2 percent from 2 users up. At 16 and 32 users the server without graphs had the lower P99 ITL, 73 against 80 ms and 87 against 103 ms, with no seed overlap, and the manual reports that gap without a mechanism for it. At 64 users batches above 48 ran eager on both servers, so that row does not measure graphs at all.
+同一天的那对运行就是结果。在 16 个用户以内，graph 每步节省 0.5 到 0.7 ms，约 1%，单用户下为 60.15 对 60.64 ms。从 2 个用户起，吞吐量差距在 1.2% 以内。在 16 和 32 个用户下，没有 graph 的服务器具有更低的 P99 ITL（73 对 80 ms 和 87 对 103 ms，种子无重叠），手册报告了该差距但没有给出机制解释。在 64 个用户下，两台服务器上超过 48 的批次都以 eager 模式运行，所以该行根本没有测量 graph。
 
-The last listing is the other engine. Its first speculative decoding runs had no clock lock. At one user the run with no speculation ran at 210 MHz and the run with speculation at about 1,400 MHz. A gap that large hides any effect of the feature, so the team set those runs aside and locked the clock at 900 MHz before it compared again.
+最后一份记录是另一个引擎。其首次推测解码运行没有锁定时钟。在单用户下，不开推测的运行在 210 MHz 下运行，开启推测的运行在约 1,400 MHz 下运行。这么大的差距掩盖了该功能的任何效果，因此团队搁置了这些运行，并在再次比较之前把时钟锁定在 900 MHz。
 
 ## Resolution
 
-The first A/B was void. The card ran at 360 MHz with the thermal slowdown active, the clock was not recorded, and the two sweeps did not share a clock. Any conclusion about graphs from those tables is a conclusion about heat.
+第一次 A/B 测试无效。卡在温控降频激活的情况下以 360 MHz 运行，没有记录时钟，两次扫描的时钟也不同。从那些表格得出的关于 graph 的任何结论，其实反映的都是热量的影响。
 
-The repaired comparison kept graphs on. They saved about 1 percent of each decode step on this dense model, the throughput tie held within 1.2 percent, and the unexplained lower tail without graphs at 16 and 32 users is a reason to measure the tail on your model, not a reason to turn graphs off for memory. Size the graphs to your traffic instead. The method is the real fix: record `clocks.sm` and the temperature every second during every benchmark, start each run at a temperature that the card can hold, repeat any run whose median clock falls under your floor, and compare two runs only at similar clocks. The lab notes of the vLLM manual name four L4 sessions for the same reason, and compare numbers only inside one session.
+修正后的对比保持 graph 开启。在这个稠密模型上，它们在每个 decode 步中节省约 1%，吞吐量基本持平（差距在 1.2% 以内）；在 16 和 32 个用户下没有 graph 时更低的长尾，是在你自己的模型上测量长尾的理由，而不是为了显存而关闭 graph 的理由。改用适合你流量的 graph 大小。真正的修复是方法：在每次基准测试期间每秒记录 `clocks.sm` 和温度，在卡能承受的温度下启动每次运行，重跑中位数时钟低于底线的任何运行，并且只在相似时钟下比较两次运行。vLLM 手册的实验笔记出于同样的原因列出了四个 L4 会话，并且只在一个会话内部比较数字。
 
 ## Wrong turns
 
-- "Both configs ran on the same hot card, so the heat cancels out." The throttle moved with the temperature and with the neighbour's load. Two runs an hour apart did not share a clock, and a card at a sixth of its clock hides a half-millisecond effect in any case.
-- "Lock the clock at the maximum and the problem is gone." A lock sets the highest clock, and a GPU at a high temperature still slows below it. We locked at 900 MHz, a value that the card could hold, and still set aside runs that fell under it.
-- "Run the two configs in the other order." The second run still inherits the heat of the first. Alternate the configs, cool the card to the same temperature before each run, and record the clock.
-- "Wait one minute between runs." The repeated sweep needed 116 to 287 s to reach 72 C before a start. Wait for a temperature, not for a time.
+- "两种配置都在同一张发热的卡上运行，所以热量抵消了。" 降频随温度和邻居负载而变。相隔一小时的两次运行的时钟不同，而且在六分之一时钟下运行的卡在任何情况下都会掩盖半毫秒的效果。
+- "把时钟锁定在最大值，问题就消失了。" 锁定设置的是最高时钟，而高温下的 GPU 仍会降频到它以下。我们锁定在卡能保持的值 900 MHz，并且仍然搁置了低于该值的运行。
+- "以相反的顺序运行两种配置。" 第二次运行仍然继承了第一次的热量。轮流测试配置，每次运行前把卡冷却到相同的温度，并记录时钟。
+- "在两次运行之间等待一分钟。" 重复扫描在启动前需要 116 到 287 s 才能达到 72 C。要等待温度达标，而不是等待固定时间。
 
 ## Generalize
 
-Every A/B on hardware needs a control for the hardware. A clock that changes with heat or with a neighbour is a hidden variable that moves every number by the same factor, and that factor swallows small effects and invents large ones. Record the clock with every measurement, hold the start condition fixed, and treat two numbers from different clocks as two numbers from different machines.
+硬件上的每次 A/B 测试都需要控制好硬件变量。随发热或邻居变化的时钟是一个隐藏变量，它会把每个数字乘以相同的系数，而这个系数会吞没小效果，捏造大效果。每次测量都要记录时钟，固定启动条件，并把来自不同时钟的两个数字当作来自不同机器的两个数字。
 
 ## Taught in
 
-The SGLang manual records the first sweep and the repaired pair in [the CUDA graphs page](../../../manuals/sglang-101/sections/4-1-forwardmode-and-cuda-graphs.md) and sets the clock rule in [its benchmark page](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md), the vLLM manual tells the speculative decoding version in [the EAGLE3 page](../../../manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md) and names the sessions in [the lab notes](../../../manuals/vllm-101/sections/r-7-lab-notes.md), and [the load testing lesson](../../../phases/17-infrastructure-and-production/22-load-testing-llm-apis/docs/en.md) covers what a client cannot see.
+SGLang 手册在 [CUDA graph 页](../../../manuals/sglang-101/sections/4-1-forwardmode-and-cuda-graphs.md)记录了首次扫描和修正后的成对对比，并在[基准测试页](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)设定了时钟规则；vLLM 手册在 [EAGLE3 页](../../../manuals/vllm-101/sections/4-1-speed-up-decode-with-eagle3.md)讲述了推测解码版本，并在[实验笔记](../../../manuals/vllm-101/sections/r-7-lab-notes.md)列出了各会话；[负载测试课](../../../phases/17-infrastructure-and-production/22-load-testing-llm-apis/docs/en.md)涵盖了客户端无法看到的内容。

@@ -1,6 +1,6 @@
 ---
 id: router-or-manual
-title: A short router or a long manual for the agent
+title: 为 Agent 提供简短路由文件还是长篇手册
 card: agents
 kind: tradeoff
 level: 2
@@ -16,54 +16,54 @@ related: [agents/seven-surfaces-one-symptom-each]
 updated: 2026-11-03
 ---
 
-A repo has a 3000-line instructions file for its coding agent. The agent follows about half of it. One engineer wants to cut it to a page. Another says that every line came from an incident and nothing can go. How do you settle it?
+某仓库为其编码 agent 编写了一份长达 3000 行的说明文档。Agent 实际遵循的规则大概只有一半。一位工程师主张将其精简为一页纸。另一位工程师则表示文档中的每一行都源于一次事故，任何一条都不能删。你会如何解决这个分歧？
 
 ## Short answer
 
-Both are right about something, and the answer is a layered file set, not a shorter file. Keep a root router under about 50 lines that holds only pointers and the few hard rules. Move the rules into a rules file with one screen per category, and move the depth into topic documents that the agent loads only when a task touches them. Every rule stays, and the agent reaches any rule in at most two hops.
+两位工程师各有其合理之处，真正的破局方案是分层文件体系，而不是单纯压缩文件长度。在根目录下维护一个约 50 行以内的路由文件，仅承载核心指针和极少数不可逾越的硬性规则。将具体规范下沉到规则文件中，保证每个类别在一屏以内；并将深度专业细节拆分至专题文档中，仅在具体任务触及相关领域时才由 agent 按需加载。所有历史规则均得以保留，且 agent 从根路由到达任何一条规则最多只需跳转两次。
 
 ## Full answer
 
-### Why the long file fails
+### 为什么长篇大论的手册会失效
 
-The model loads the file, reads the first screen, runs out of attention budget, and acts on a fraction of what it was told. A long manual fails for the same reason a forty-page onboarding document fails. The reader skims it once and never returns to the part that mattered. Long manuals get ignored. Short routers get followed.
+模型加载整个大文件，读完第一屏就耗尽了注意力预算，最终只能在被灌输的海量信息中挑选零星片段付诸行动。长篇手册失效的原因与长达四十页的新人入职培训文档失效完全相同：读者快速扫过一遍，就再也不会回过头来看真正重要的部分。大部头手册会被无视，而精短明了的路由文件才会被切实遵循。
 
-### The three tiers
+### 三层分层架构
 
-| Tier | Lives in | Read when | Size |
+| 层级 | 所在位置 | 读取时机 | 典型体积 |
 |---|---|---|---|
-| Router | the root instructions file | Every session | Under about 50 lines |
-| Rules | `docs/agent-rules.md` | Every session, at startup | One screen per category |
-| Topic docs | `docs/<topic>.md` | Only when the task touches that topic | As deep as needed |
+| 路由器（Router） | 根目录说明文件 | 每次会话必读 | 约 50 行以内 |
+| 规则集（Rules） | `docs/agent-rules.md` | 每次会话启动时读取 | 每个类别一屏以内 |
+| 专题文档（Topic docs） | `docs/<topic>.md` | 仅当任务涉及该主题时按需读取 | 按实际所需纵深展开 |
 
-The router points at the state file, the task board, the rules and the verification command. It links every topic document by path, not by description.
+根路由器直接指向状态文件、任务看板、规则文件以及验证命令。它通过具体文件路径链接各个专题文档，而不是仅凭模糊的描述。
 
-### Two tests that keep it honest
+### 保持体系可靠的两项测试
 
-- **Reachability.** The agent reaches any rule in at most two hops from the router. A pointer that no longer resolves is worse than a missing rule, so a broken link in the router is itself a startup violation.
-- **Freshness.** The router is short enough that a reviewer reads it again on every pull request. That is the only thing that stops it from growing back into the manual.
+- **可达性（Reachability）。** Agent 从根路由出发，最多通过两次跳转即可定位任何一条规则。一个失效的指针比一条未被记录的规则危害更大，因此路由文件中出现失效死链本身就是启动阶段的违规。
+- **保鲜度（Freshness）。** 路由器足够简短，代码审查者在每次拉取请求时都能重新完整读完一遍。这是防止其重新膨胀退化为繁杂手册的唯一有效制约。
 
-### What to refuse while you trim
+### 精简过程中坚决拒绝的反模式
 
-The lesson lists anti-patterns that look like coverage. Conflicting instructions silently drop the agent from asking to guessing; one measurement put the resolve rate at 48.8 percent with clear instructions and 28 percent with conflicting ones. A style rule with no lint command lets the agent invent compliance, so pair every style rule with its command. Lead with commands and end with style. Write for the agent, not for a human reader, because terseness saves context.
+课程列举了看似面面俱到实则有害的典型反模式。相互冲突的指令会悄无声息地让 agent 从主动提问退化为胡乱猜测；一项实测表明，在指令清晰时问题解决率为 48.8 percent，而引入冲突指令后断崖式跌至 28 percent。缺少校验命令的代码风格规则会导致 agent 自行脑补合规标准，因此每条风格规则都必须配对具体的 lint 命令。先给出自动化命令，后阐述风格偏好。文档为 agent 而写而非面向人类读者，语言凝练能够极大节省宝贵的上下文。
 
-### Nested files
+### 嵌套级联文件
 
-Large repos keep one router per subcomponent. Tools walk from the working file to the root and concatenate every router they find, so a subdirectory file extends the root file. One large repository in the lesson carries 88 of them. Measurements in the lesson place the best files at a quality jump equal to a model upgrade, and the worst files below no file at all.
+大型代码库通常为每个子模块单独维护一个专属路由文件。工具链从当前修改的文件向上递归遍历至项目根目录，并将沿途发现的所有路由文件拼接在一起，从而使子目录规则能够精确扩展根目录规范。课程中分析的一处大型仓库挂载了 88 个这样的路由文件。实测表明，设计最优的路由文件带来的质量跃升堪比模型换代，而最差的冗余文件甚至不如完全不提供任何规则。
 
 ## Follow-ups
 
-- **Level 2:** The team keeps a rule in the router because it is important. What is the test for whether it belongs there? Expected: the router holds pointers and the few hard rules that apply to every session, and anything that applies to one kind of task goes in a topic document.
-- **Level 2:** How do you keep one source of truth when the team uses several coding agents? Expected: one root file and symlinks with the names each tool expects, so that every tool reads the same text.
-- **Level 3:** What does a lint for the workbench check? Expected: the router is under the line budget, every path it references exists, and no two rules conflict.
-- **Level 3:** Why does the lesson rank a dead link below a rule that was never written? Expected: the agent trusts the router, follows the pointer, finds nothing, and proceeds as if the rule did not exist, while a missing rule at least leaves no false promise.
+- **Level 2:** 团队坚持将某条规则留在根路由器中，理由是它极为重要，检验标准是什么？ Expected: 根路由器仅承载指针以及适用于所有会话的少数硬性约束，任何仅适用于某一类任务的规则都必须下沉到专题文档中。
+- **Level 2:** 当团队混合使用多款编码 agent 时，如何维护单一事实来源？ Expected: 维护一份根文件，并针对不同工具所期望的文件名创建软链接，使每款工具读取同一份文本。
+- **Level 3:** 工作台的 lint 检查应该验证什么？ Expected: 路由器行数未超预算、所引用的所有路径真实存在，且任意两条规则之间不存在逻辑冲突。
+- **Level 3:** 为什么课程将死链的危害排在从未写过的规则之上？ Expected: Agent 信任路由器并顺着指针查找却一无所获，便会当做规则不存在直接执行，而未写的规则至少不会给出虚假的安全承诺。
 
 ## Wrong answers
 
-- "Cut the file to one page and delete the rest." The rules came from incidents, and deleting them repeats the incidents, so move them to tiers instead.
-- "Keep the long file, and tell the agent to read all of it." The model has an attention budget, and an instruction to read everything does not change how much it acts on.
-- "Put the file in the system prompt so that it is always in context." Being in context is not the problem; acting on it is, and a short router with pointers gets followed where a long block does not.
+- "将文件硬砍到一页，其余全部删除。" 规则源于事故，一删了之只会重蹈覆辙，正确做法是分层治理。
+- "保留长文件，并在 prompt 里要求 agent 全部精读。" 模型的注意力预算是客观存在的，强制通读并不能提高实际落地的比例。
+- "把文件塞进系统 prompt，确保它时刻在上下文中。" 问题不在于是否在上下文中，而在于能否被有效执行；带指针的短路由能够被遵循，而长文本块则被忽略。
 
 ## Taught in
 
-The [minimal workbench lesson](../../../phases/14-agent-engineering/32-minimal-agent-workbench/) makes the router one of three files, and the [executable constraints lesson](../../../phases/14-agent-engineering/33-instructions-as-executable-constraints/) gives the tiers and the two tests.
+[最小 Agent 工作台](../../../phases/14-agent-engineering/32-minimal-agent-workbench/)课程将路由器确立为三大核心文件之一，[将 agent 指令变为可执行约束](../../../phases/14-agent-engineering/33-instructions-as-executable-constraints/)课程给出了分层体系与两项检验标准。

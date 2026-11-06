@@ -1,6 +1,6 @@
 ---
 id: qlora-on-one-gpu
-title: Fit a 7B fine-tune on a 24 GB GPU
+title: 在 24 GB 单卡 GPU 上微调 7B 模型
 card: post-training
 kind: estimate
 level: 2
@@ -16,51 +16,51 @@ related: [post-training/lora-parameter-count]
 updated: 2026-11-03
 ---
 
-You have one GPU with 24 GB of memory and want to fine-tune a 7B model on your own instruction data. Walk me through the memory for a full update, for LoRA and for QLoRA, and say what makes the last one fit.
+你拥有一张配备 24 GB 显存的单卡 GPU，希望在你自己的指令微调数据上微调一个 7B 模型。请带我推演全量参数更新、LoRA 以及 QLoRA 分别所需的显存开销，并说明是哪些技术使最后一种方案能够成功塞进显存中。
 
 ## Short answer
 
-A full update of a 7B model needs about 56 GB: the weights in half precision, the gradients, and two optimizer states per parameter, all in half precision. LoRA keeps the half-precision weights but trains only small adapters, so the gradients and optimizer states shrink and the run takes about 18 GB. QLoRA stores the frozen base in 4-bit, about 3.5 GB of weights, and trains the adapters in half precision, so the run takes about 6 GB and leaves room for activations on a 24 GB card.
+7B 模型的全量微调大约需要 56 GB 显存：权重、梯度，以及每个参数对应的两个优化器状态，全都采用半精度。LoRA 保留了半精度的基座权重，但仅训练极轻量的适配器，因此梯度和优化器状态显存急剧缩减，整体微调约需 18 GB。QLoRA 将冻结的基座权重压缩存储为 4-bit，权重本身仅占约 3.5 GB，并以半精度训练适配器，整体训练仅耗费约 6 GB 显存，为 24 GB 消费级显卡上的前向激活值留下了充足的空间。
 
 ## Full answer
 
-### The memory table
+### 显存占用对照表
 
-| Method | Weights | Training total | Fits on |
+| 微调范式 | 权重显存 | 训练总显存 | 适配硬件底线 |
 |---|---|---|---|
-| Full update, FP16 | 14 GB | about 56 GB before activations, which depend on the workload | one 80 GB datacenter GPU |
-| LoRA on an FP16 base | 14 GB | about 18 GB | one 40 GB GPU |
-| QLoRA, 4-bit base | 3.5 GB | about 6 GB | one 24 GB consumer GPU |
+| 全量微调，FP16 | 14 GB | 激活值之外约 56 GB，激活值取决于实际负载 | 单张 80 GB 数据中心 GPU |
+| 基于 FP16 基座的 LoRA | 14 GB | 约 18 GB | 单张 40 GB GPU |
+| 基于 4-bit 基座的 QLoRA | 3.5 GB | 约 6 GB | 单张 24 GB 消费级 GPU |
 
-The 56 GB comes from two bytes per weight, two bytes per gradient, and two optimizer states per parameter; activations come on top of that. This estimate keeps the optimizer states in half precision too. Standard Adam keeps its states in FP32, so a typical full update needs more memory than this, not less. The adapters remove the gradients and the states for every frozen weight, which is the large part.
+56 GB 的核算依据是：每个权重参数占 2 字节、对应梯度占 2 字节，外加每个参数 2 个半精度优化器状态共 4 字节；前向激活值在此之外额外增加。需要指出的是，该估计假设优化器状态也在半精度下维护；而标准的 Adam 优化器在 FP32 下维护状态，因此实际的全量微调显存开销通常比该数值更高。LoRA 适配器彻底去除了针对每一个冻结权重的梯度和优化器状态，消除了显存开销的大头。
 
-### What QLoRA adds
+### QLoRA 引入的三大核心技术
 
-1. NF4. A 4-bit type whose 16 levels sit at the quantiles of a normal distribution, which matches how weights are distributed and loses less than uniform 4-bit integers.
-2. Double quantization. Each block of 64 weights needs a scale in FP32, about 0.4 GB for a 7B model; quantizing the scales to 8 bits brings that down to about 0.1 GB.
-3. Paged optimizers. Optimizer states page to CPU memory when the GPU runs out, which trades some throughput for no out-of-memory crash from optimizer states. Activations stay on the GPU, so a long sequence can still run out of memory.
+1. **NF4 量化**：一种 4-bit 数据类型，其 16 个取值位于正态分布的分位点上，契合权重的分布，比均匀 4-bit 整数的信息损失更小。
+2. **双重量化**：每 64 个权重组成一个量化块，带有一个 FP32 缩放因子，在 7B 模型上缩放因子本身就要占约 0.4 GB；双重量化将这些缩放因子进一步量化为 8-bit，将其压缩至约 0.1 GB。
+3. **分页优化器**：GPU 显存不足时，将优化器状态换页到 CPU 内存，以部分吞吐量换取不因优化器状态而发生显存不足崩溃。激活值张量仍驻留在 GPU 上，因此过长的序列依然可能引发 OOM。
 
-### What it costs in quality
+### 对模型生成质量的影响
 
-The lesson's table puts LoRA at rank 16 within about one point of a full update, QLoRA at rank 16 a fraction behind that, and QLoRA at rank 64 level with the full update on the listed benchmarks.
+课程实测表明：rank 为 16 的 LoRA 与全量微调相比仅有约 1 个百分点的微弱差距；rank 为 16 的 QLoRA 紧随其后仅有微小差距；而当 rank 提升至 64 时，QLoRA 在列出的基准评测上完全达到了与全量微调平齐的水准。
 
-### What it costs in time and money
+### 时间与经济成本核算
 
-On the lesson's cost table, QLoRA at rank 16 on a 24 GB consumer card took about 6 hours and about 5 dollars for 50,000 examples over three epochs. The full update took about 8 hours on two 80 GB datacenter GPUs and about 32 dollars. Fused kernels cut the QLoRA run to about 2.5 hours.
+在课程的成本对照表中，在单张 24 GB 消费级显卡上使用 rank 16 的 QLoRA 在 50,000 条样本上训练 3 个 epoch，耗时约 6 小时、算力成本仅约 5 美元。相比之下，两张 80 GB 数据中心 GPU 上的全量微调耗时约 8 小时、花费约 32 美元。若配合融合算子加速，QLoRA 的训练时间可进一步被压缩至约 2.5 小时。
 
 ## Follow-ups
 
-- **Level 2:** Why does LoRA cut training memory so much more than it cuts weight memory? Expected: the gradients and the two optimizer states exist only for the adapter parameters, which are a fraction of a percent of the model.
-- **Level 2:** The adapters train in half precision while the base is 4-bit. Where does the forward pass compute? Expected: the base weights are dequantized block by block to the compute dtype for each matrix product, and the adapter path runs in half precision.
-- **Level 3:** When would you still pay for the full update? Expected: when the task needs changes that a low-rank update cannot express, when you have the data and the GPUs, or when the eval shows a gap that a higher rank does not close.
-- **Level 3:** How do you serve several QLoRA fine-tunes from one base? Expected: keep the adapters separate and load them on top of one base copy; merge only when you ship a single specialized model.
+- **Level 2:** 为什么 LoRA 削减训练显存的幅度远远超过它对权重显存的削减？ Expected: 梯度张量和两组 Adam 优化器状态仅存在于适配器参数上，而适配器参数量只占模型整体参数量的不足百分之一。
+- **Level 2:** 适配器以半精度训练而基座处于 4-bit 量化，前向传播在哪里执行？ Expected: 基座权重在矩阵相乘时按块反量化为计算精度，适配器路径则以半精度运行。
+- **Level 3:** 在什么情况下你依然会选择昂贵的全量微调？ Expected: 当下游任务需要极深层次的表征改造而低秩增量无法充分表达时、当你拥有极为充沛的专用数据与充足算力时，或者当评测显示增大 LoRA rank 依然无法抹平质量差距时。
+- **Level 3:** 如何基于单一基座模型同时提供多个 QLoRA 微调变体服务？ Expected: 将各个适配器独立保存，在运行时将它们按需挂载到同一份共享基座权重上；只有在最终面向生产单一特定模型交付时才执行权重合并。
 
 ## Wrong answers
 
-- "Quantize the whole model to 4-bit and fine-tune it directly." Gradients and optimizer states still need higher precision; the base stays frozen in 4-bit, and only the adapters train.
-- "QLoRA halves the quality." The lesson's table shows a loss of a fraction of a point at rank 16 and parity at rank 64.
-- "Load the base in 8-bit with LoRA; it is the same thing." Eight-bit weights take twice the memory of NF4, and the double quantization and paged optimizers are what make the 6 GB figure.
+- "把整个模型全部量化为 4-bit 然后直接在其上微调更新。" 梯度反向传播和优化器累加依然需要更高的数值精度；基座保持 4-bit 冻结，仅适配器参数参与求导更新。
+- "QLoRA 会使微调模型质量折半。" 课程数据表明 rank 16 下质量损失不到 1 个百分点，rank 64 时性能与全量微调打平。
+- "直接用 8-bit 加载基座跑 LoRA，效果完全是一回事。" 8-bit 权重占用 NF4 两倍的显存，且缺少双重量化与分页优化器，根本无法压到 6 GB 的极低显存线。
 
 ## Taught in
 
-The [LoRA lesson](../../../phases/11-llm-engineering/08-fine-tuning-lora/) gives the memory and cost tables and explains NF4, double quantization and paged optimizers.
+[LoRA 课程](../../../phases/11-llm-engineering/08-fine-tuning-lora/)给出了显存与成本核算表，并系统剖析了 NF4、双重量化与分页优化器的底层机理。

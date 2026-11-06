@@ -1,6 +1,6 @@
 ---
 id: drift-monitoring-design
-title: Design monitoring for a payment risk model
+title: 为支付风控模型设计漂移监控体系
 card: system-design
 kind: design
 level: 2
@@ -16,56 +16,56 @@ related: [system-design/concept-drift-blind-spot, system-design/fraud-check-100m
 updated: 2026-11-03
 ---
 
-A payment risk model scores every transaction. Labels arrive weeks later as chargebacks. Design the monitoring: what you watch, how you compare windows, which statistics you compute, and how you keep the alert rate low enough that people read the alerts.
+一个支付风控模型为每一笔交易评估风险。标签在数周后才以拒付的形式到达。请设计完整的监控方案：监控哪些指标、如何对比时间窗口、计算哪些统计量，以及如何控制告警频率以确保值班人员愿意认真阅读告警。
 
 ## Short answer
 
-Monitor four layers: system health, input distributions, prediction distributions, and outcomes once labels arrive. Compare a fixed reference window with sliding current windows, with the Population Stability Index and the two-sample KS statistic for numeric features and a chi-square test with Cramér's V for categorical ones. Alert only when a corrected p-value and an effect size both pass and the condition persists for consecutive windows, and send warnings to a dashboard rather than to a person.
+监控四个层级：系统健康状况、输入特征分布、模型预测分布，以及在标签回流后的结果。对比固定的基准参考窗口与滑动当前窗口，对数值型特征计算群体稳定性指标与双样本 KS 统计量，对类别型特征采用卡方检验配合克莱姆 V 系数。仅在经过多重假设校正后的 p 值与效应量同时满足各自阈值条件且该异常在连续窗口中持续存在时才触发报警，并将普通预警推送至监控仪表盘而非直接呼叫人工。
 
 ## Full answer
 
-### Four layers
+### 四层监控体系
 
-| Layer | Signals | Available | Question |
+| 监控层级 | 监控信号 | 可用时效 | 回答的核心问题 |
 |---|---|---|---|
-| System health | p50 and p99 latency, error rate, throughput | At once | Does the service answer? |
-| Inputs | Feature distributions, missing rates, schema, new categories | At once | Does live data look like training data? |
-| Predictions | Score distribution, positive rate, share of default answers | At once | Does the model behave as before? |
-| Outcomes | Accuracy, precision, calibration, business metric | After the label delay | Is the model still right? |
+| 系统健康层 | p50 与 p99 延迟、错误率、系统吞吐量 | 实时就绪 | 线上服务是否正常响应？ |
+| 输入特征层 | 特征分布、缺失率、数据模式、新增枚举类别 | 实时就绪 | 线上真实数据与训练数据是否一致？ |
+| 预测分布层 | 预测得分分布、正例比例、兜底默认值占比 | 实时就绪 | 模型的决策行为是否与以往保持一致？ |
+| 结果层 | 准确率、精确率、概率校准度、核心业务指标 | 标签延迟回流后 | 模型的预测判断到底是否依然正确？ |
 
-Only the last layer measures correctness and it arrives late, so the first three are the early warning.
+只有最后的结果层能衡量正确性，但它到达较晚，因此前三层负责提前预警。
 
-### Windows
+### 时间窗口设计
 
-The reference is the training data or a hand-checked production period, fixed until retraining. The current window is the last N events or the last T hours, sliding by a step smaller than its size. A small window reacts quickly and scores noise as drift; a large window is stable but late. Seasonality breaks naive windows, so the reference covers a full cycle or each window is compared with the same period of an earlier cycle. The lesson's demo uses windows of 500 events that move by 250, with labels 500 events late.
+基准参考窗口取自训练数据集或经过人工严格核查的生产历史周期，在模型重新训练前保持固定。当前滑动窗口取最近 N 个事件或最近 T 个小时，并以小于窗口大小的步长向前滑动。小窗口响应灵敏，容易将偶发噪音误判为数据漂移；大窗口统计稳定，但暴露问题较为滞后。周期性波动会破坏朴素的滑动对比，因此基准窗口必须覆盖完整的业务周期，或者将当前窗口与较早周期的相同时段比较。课程演示中采用了 500 个事件的窗口大小，每次滑动 250 个事件，标签回流延迟为 500 个事件。
 
-### Statistics
+### 统计检验量
 
-- PSI over ten reference-decile bins, with shares clipped to a small value so no bin is empty; conventional bands read below 0.1 as stable and above 0.25 as a significant shift, with the caveat that PSI grows with bins and shrinks with sample size.
-- KS statistic D as the effect size for numeric features, with its p-value from the effective sample size; with large samples the p-value alone flags gaps nobody cares about.
-- Chi-square with Cramér's V for categorical features, which also reacts to a category that appears only in the current window. With few events in a cell the p-value is not reliable, so pool rare categories into one bin before the test.
+- PSI：基于基准参考窗口的十分位数划分为十个分桶，分桶占比做极小值截断以避免除以零；业内通用经验将低于 0.1 视为分布稳定，超过 0.25 视为发生显著漂移，但需注意 PSI 会随分桶数量增加而增大，随样本量增大而减小。
+- KS 统计量 D：作为数值型特征的效应量，配合基于有效样本量计算出的 p 值；在大样本下，单独的 p 值会标记无人关心的微小差距。
+- 卡方检验配合克莱姆 V 系数：用于类别型特征，能敏锐感知当前窗口中突然冒出的全新枚举类别。对于频次过低的单元格，p 值计算不可靠，应在检验前将罕见类别合并到统一分桶中。
 
-### Alert policy
+### 告警策略
 
-With 50 features checked every hour at an alpha of 0.05, about 60 false alarms a day arrive when nothing changed. Four rules keep the rate useful: correct for multiple tests, so a family alpha of 0.01 over two tests gives 0.005 each; require an effect size; require persistence over consecutive drift windows, two in the demo; and separate dashboard warnings from alerts to a person.
+若对 50 个特征每小时运行一次显著性水平 alpha 为 0.05 的检验，在数据完全未发生变化的情况下，每天就会产生约 60 次误报。四条硬性规则确保告警具备实操价值：引入多重检验校正（如两项检验要求族错误率 0.01，单项对应 0.005）；必须同时达到效应量门槛；要求在连续的漂移窗口内持续超标（演示中为连续 2 个窗口）；区分普通预警与人工告警，轻度预警仅落盘仪表盘。
 
-### What retraining does
+### 重新训练的触发逻辑
 
-Covariate drift with stable accuracy often needs no action. Covariate drift into regions with little data calls for retraining on recent data. Prior drift calls for recalibration or a new threshold. Concept drift needs new labels first, because retraining on old labels teaches the old concept again.
+准确率保持稳定的协变量漂移通常无需任何干预。协变量漂移进入低样本稀疏区域时，需在近期数据上重新训练。先验漂移需要重新做概率校准或调整决策阈值。概念漂移则必须先积累新标签，因为在旧标签上重训只会让模型重新强化过时的错误认知。
 
 ## Follow-ups
 
-- **Level 2:** Why fix the reference window instead of sliding it too? Expected: a sliding reference follows the drift and hides it; the reference changes only at retraining.
-- **Level 2:** A clean window shows a tiny chi-square p-value. Why is it a warning and not an alert? Expected: the effect size is below threshold, so the policy logs a warning; the p-value alone is not enough.
-- **Level 3:** Labels arrive 500 events late. How does the outcome monitor handle that? Expected: it joins labels as they arrive and computes metrics on the labeled part, always looking that far into the past.
-- **Level 3:** Which drift stays invisible to this whole design except the last layer? Expected: concept drift, where the inputs do not change and only outcomes reveal the new relation.
+- **Level 2:** 为什么要固定基准参考窗口，而不是让它也同步滑动？ Expected: 滑动的参考窗口会随着线上漂移而一同偏移，从而掩盖真正的漂移；基准窗口唯有在重新训练上线时才可重置。
+- **Level 2:** 一个干净的窗口得出了极小的卡方 p 值，为什么仅记录预警而非触发告警？ Expected: 效应量低于预设阈值，因此策略仅记录预警；大样本下单独的 p 值不足以触发告警。
+- **Level 3:** 业务标签滞后 500 个事件，结果监控层如何处理？ Expected: 在标签到达时关联标签，仅在已拿到标签的数据切片上计算指标，统计视线永远滞后相应距离。
+- **Level 3:** 哪种漂移在上述设计中除最后一层外全程隐形？ Expected: 概念漂移；因为输入特征毫无变化，唯有结果监控层回流真实标签后才能暴露映射关系的改变。
 
 ## Wrong answers
 
-- "Alert on any p-value below 0.05." With many features and hourly checks that is dozens of false alarms a day and people stop reading.
-- "Watch accuracy; it is the only metric that matters." Accuracy arrives after the label delay; input and prediction monitors give the early warning.
-- "Retrain on a schedule and skip monitoring." A schedule retrains when nothing changed and waits when something did.
+- "只要 p 值低于 0.05 就立即触发告警。" 在特征繁多且高频运行的场景下，这会导致每天几十次虚假报警，最终导致值班人员对告警麻木。
+- "只盯准确率就行；它是唯一重要的指标。" 准确率在经历漫长的标签延迟后才会返回；输入与预测监控才能提供早发预警。
+- "按固定时间表定期重训，无需搭建监控。" 固定时间表会在没有发生漂移时白白浪费重训资源，而在真实发生突变时又原地干等。
 
 ## Taught in
 
-The [model monitoring lesson](../../../phases/02-ml-fundamentals/20-model-monitoring-and-drift/) gives the four layers, the windows, the three statistics and the alert policy.
+[模型监控课程](../../../phases/02-ml-fundamentals/20-model-monitoring-and-drift/)给出了四层监控体系、时间窗口策略、三大核心统计量以及告警去噪规则。

@@ -1,6 +1,6 @@
 ---
 id: loops-hold-the-pool
-title: A few endless answers fill the pool for everyone
+title: 几个停不下来的回答，占满了所有人的缓存池
 card: cost-capacity
 kind: debug
 level: 3
@@ -16,50 +16,50 @@ related: [cost-capacity/size-the-pool-from-peak, cost-capacity/autoscale-on-the-
 updated: 2026-11-03
 ---
 
-A self-hosted server shows its KV pool near full for hours while the request rate is normal. A few requests have been generating for many minutes each, and the users behind the other requests wait. What is going on, and what do you change tonight and tomorrow?
+一台自建服务器的 KV 池连续几个小时接近满载，请求速率却很正常。有几个请求各自已经生成了好多分钟，其他请求背后的用户都在等。这是怎么回事？今晚改什么，明天改什么？
 
 ## Short answer
 
-A handful of requests are in a generation loop. Every token of a running request stays in the pool until the request ends, so a request that never stops grows until it crowds out the rest. Tonight, cap the output length so that every request ends, and add a presence penalty for the workloads that loop. Tomorrow, set the shutdown grace period from the new cap, because a request that runs to the cap decides how long a graceful restart takes.
+有几个请求陷入了生成循环。运行中的请求，它的每个 token 都会留在池里直到请求结束，所以一个停不下来的请求会不断变大，直到把其他请求挤出去。今晚先限制输出长度，让每个请求都能结束，并给容易循环的工作负载加上 presence penalty。明天按新的上限设置停机宽限期，因为跑到上限的请求决定了一次优雅重启要多久。
 
 ## Full answer
 
-### The mechanism
+### 机制
 
-The pool holds the keys and values of every token of every running request. A request in a loop keeps generating, so it keeps taking slots until it reaches the output limit or the context length. With no cap, one looping request can hold a large share of the pool for the whole context, and new requests wait or running ones are retracted.
+池里保存着每个运行中请求的每个 token 的 key 和 value。陷入循环的请求一直在生成，就一直在占槽位，直到碰到输出上限或上下文长度。没有上限时，一个循环请求能在整个上下文长度内占住池的一大部分，新请求只能等待，或者运行中的请求会被撤回（retract）。
 
-### A production report with the same shape
+### 一份形态相同的生产报告
 
-The SGLang manual summarizes an academic service that served a hundred billion tokens and ran into model loops that held KV cache. Their traffic came from agentic coding tools, with a median prompt of 2,179 tokens and a 95th percentile of 99,746 tokens. Their fix was operational, not a kernel: an output cap of 32K tokens and a presence penalty for the workloads that loop. The manual's advice is to read such a report for its order of fixes, and that service capped output before it tuned anything else.
+SGLang 手册总结了一个学术服务的经历：它服务了一千亿个 token，遇到了占住 KV cache 的模型循环。它的流量来自 agent 编程工具，prompt 长度的中位数是 2,179 个 token，第 95 百分位是 99,746 个 token。它的修法是运维层面的，没有改内核：输出上限设为 32K token，并对容易循环的工作负载加 presence penalty。手册建议读这类报告时看它修复的先后顺序，这个服务在调任何别的东西之前，先限制了输出。
 
-### Read the metrics
+### 读指标
 
-The vLLM manual's alert table has the pattern: cache usage above 0.95 for more than a minute, waiting requests above zero, and a preemption rate above zero. Its pairing rule names the cause: preemptions with long answers mean that running requests grow until the pool runs out. The fixes it lists are lower concurrency or an FP8 KV cache, and the output cap is what turns the long answers into bounded ones.
+vLLM 手册的告警表里有这个模式：缓存使用率超过 0.95 持续一分钟以上，等待请求数大于零，抢占率大于零。它的成对解读规则点出了原因：长回答伴随抢占，说明运行中的请求不断变长，直到池被用完。它列出的修法是降低并发或改用 FP8 KV cache，而输出上限才能让长回答变成有界的回答。
 
-### Why the cap comes before the grace period
+### 为什么先定上限，再定宽限期
 
-A graceful shutdown drains the running requests before it stops. The grace period has to outlast the longest request, and the longest request is one that runs to the cap. The SGLang manual's arithmetic: an answer of 32K tokens at 30 tokens per second needs more than 18 minutes. Cap the output first, then set the termination grace period from the cap, or a drain can never finish in time and a rolling update kills requests mid-answer.
+优雅停机会先把运行中的请求排空再停止。宽限期必须比最长的请求更长，而最长的请求就是跑到上限的那个。SGLang 手册算过：一个 32K token 的回答，以每秒 30 个 token 生成，需要 18 分钟以上。先限制输出，再按上限设置终止宽限期；否则排空永远来不及完成，滚动更新会在回答到一半时杀掉请求。
 
-### Tomorrow
+### 明天
 
-- Find the loops: requests that finished with the length reason at the cap, grouped by tenant and prompt template.
-- Set per-tenant output caps that the product agreed to.
-- If the long answers turn out to be real agent sessions, grow the pool with an FP8 KV cache or more memory, and lower the concurrency cap.
-- Alert on the pair: cache usage near one with a normal request rate.
+- 找出循环：以长度原因结束、且停在上限的请求，按租户和 prompt 模板分组。
+- 设置产品方认可的按租户输出上限。
+- 如果长回答其实是真实的 agent 会话，就用 FP8 KV cache 或更多内存扩大池，并调低并发上限。
+- 对这对信号告警：缓存使用率接近 1，同时请求速率正常。
 
 ## Follow-ups
 
-- **Level 3:** Why does a looping request hurt other users and not only itself? Expected: the pool is shared. A request that never ends keeps its slots, so new requests wait or running ones are retracted.
-- **Level 3:** How do you find the looping requests after the fact? Expected: requests that finished with the length reason at the cap, grouped by tenant and prompt template.
-- **Level 4:** Why does the cap on output length come first, before you pick how long a drain may take? Expected: the grace period must outlast the longest request, and the longest request runs to the cap. The manual's arithmetic gives more than 18 minutes for 32K tokens at 30 tokens per second.
-- **Level 4:** The long answers are legitimate agent sessions. What then? Expected: grow the pool with an FP8 KV cache or more memory, lower the concurrency cap, and keep an output cap that the product agreed to.
+- **Level 3:** 为什么一个循环请求伤害的不只是它自己，还有其他用户？ Expected: 池是共享的。一个永远不结束的请求一直占着自己的槽位，新请求只能等待，或者运行中的请求会被撤回。
+- **Level 3:** 事后怎么找出那些循环的请求？ Expected: 找以长度原因结束、且停在上限的请求，按租户和 prompt 模板分组。
+- **Level 4:** 为什么要先定输出长度上限，再决定排空可以花多久？ Expected: 宽限期必须比最长的请求更长，而最长的请求会跑到上限。手册算出，32K token 以每秒 30 个 token 生成需要 18 分钟以上。
+- **Level 4:** 如果长回答是正当的 agent 会话，怎么办？ Expected: 用 FP8 KV cache 或更多内存扩大池，调低并发上限，并保留一个产品方认可的输出上限。
 
 ## Wrong answers
 
-- "Restart the server to clear the pool." Every running request fails, and the loops come back on the next prompt.
-- "Raise the memory fraction." A larger pool delays the symptom. A request with no cap fills any pool.
-- "Lower the temperature to stop the loops." Sampling settings change the odds of a loop. Only a cap guarantees that a request ends.
+- "重启服务器，把池清空。" 所有运行中的请求都会失败，下一个 prompt 来了循环还会出现。
+- "调大内存比例。" 更大的池只是推迟症状。一个没有上限的请求能填满任何池。
+- "调低温度来阻止循环。" 采样设置只改变出现循环的概率。只有上限能保证请求一定会结束。
 
 ## Taught in
 
-The [operating section of SGLang 101](../../../manuals/sglang-101/sections/7-1-operating-sglang.md) reports the output cap and the grace period arithmetic, and the [production watching section of vLLM 101](../../../manuals/vllm-101/sections/5-2-watch-vllm-in-production.md) pairs the preemption counter with the length of the answers.
+[SGLang 101 的运维一节](../../../manuals/sglang-101/sections/7-1-operating-sglang.md)报告了输出上限和宽限期的算法，[vLLM 101 的生产监控一节](../../../manuals/vllm-101/sections/5-2-watch-vllm-in-production.md)把抢占计数和回答长度放在一起解读。

@@ -1,6 +1,6 @@
 ---
 id: compare-two-models-with-folds
-title: Decide whether a small win on one split is real
+title: 判断单次划分上的微弱优势是否真实有效
 card: math-classical-ml
 kind: design
 level: 4
@@ -16,51 +16,51 @@ related: [math-classical-ml/scaler-fit-before-split, math-classical-ml/threshold
 updated: 2026-11-03
 ---
 
-Two variants of a classifier differ by one hyperparameter. On one held-out split, variant B beats variant A by a small margin, and the team wants to ship B. Design the evaluation that decides whether B is better, and say what you would report.
+一个分类器的两个变体仅相差一个超参数。在单次留出划分上，变体 B 以微弱优势胜过变体 A，团队希望直接上线变体 B。请设计评估方案来判定 B 是否确实更优，并说明你需要汇报哪些内容。
 
 ## Short answer
 
-One split gives one noisy number, so the gap could be chance. Run k-fold cross-validation with the same folds for both variants, keep the per-fold differences, and test whether their mean is far from zero with a paired t-statistic. Report the mean and spread of each variant's fold scores, the mean difference and the statistic, and keep the test set out of the comparison.
+单次划分只能得到一个含有噪声的指标数值，该差距完全可能是随机偶然所致。应使用相同的折对两个变体运行 k 折交叉验证，记录每一折上的表现差异，并通过配对 t 检验判断其均值是否显著偏离零。汇报两个变体在各折得分的均值与离散程度、平均差异与统计量，并在模型对比期间严格保留测试集不被触碰。
 
 ## Full answer
 
-### Why one split is not enough
+### 为什么单次划分是不够的
 
-A single split depends on which rows landed in each part. A different seed gives a different gap, and nothing in one number says how large that swing is. Folds show the spread.
+单次划分的结果严重依赖哪些样本被分配到了哪个子集。更换随机种子可能得到完全不同的差距，而单个数字无法体现这种波动的幅度。交叉验证折可以展现其离散程度。
 
-### The design
+### 方案设计
 
-1. Hold the test set out before anything else. It is for the final report, once.
-2. Build K folds on the training data. The lesson uses K equal to 5 and names 5 or 10 as the standard choices. Stratify when the classes are imbalanced, so every fold keeps the class ratio.
-3. Train and score both variants on the same folds, so the two scores in each fold are a pair. Pairing removes the fold-to-fold variation from the difference.
-4. Compute the per-fold differences, their mean and their standard deviation, and the paired t-statistic: mean difference divided by the standard deviation over the square root of K. The lesson's threshold for 5 folds is a t-statistic whose magnitude exceeds 2.78, for significance at p below 0.05 with 4 degrees of freedom.
-5. If the hyperparameter was chosen on these folds, wrap the whole thing in nested cross-validation: an inner loop picks the value, an outer loop measures it.
-6. Repeat with a few fold seeds and check the conclusion holds.
+1. 首先留出测试集。它只用于最终报告，且只评估一次。
+2. 在训练数据上构建 K 折。课程中使用 K 等于 5，并指出 5 或 10 是标准选择。样本类别不平衡时使用分层采样（stratified），确保每一折维持相同的类别比例。
+3. 在完全相同的折上训练和评估两个变体，使每一折上的两个得分构成配对。配对能消除折与折之间的数据变异对差异比较的影响。
+4. 计算每一折上的差异、均值和标准差，以及配对 t 统计量：平均差异除以标准差与根号 K 的商。课程中 5 折的判定阈值为 t 统计量绝对值超过 2.78，对应自由度为 4 时在 p 小于 0.05 水平下具有显著性。
+5. 如果超参数是在这些折上调优选出的，需采用嵌套交叉验证：内层循环选择参数值，外层循环评估性能。
+6. 使用多个划分随机种子重复验证，确认评估结论稳健一致。
 
-### What to report
+### 汇报内容
 
-- Each variant's mean fold score with its spread.
-- The mean difference, the statistic and the fold count.
-- The effect size in product terms, so the team can weigh it against the cost of the change.
-- One test set number for the variant you ship, measured once at the end.
+- 各变体在各折得分的均值与离散程度。
+- 平均得分差异、检验统计量以及折数。
+- 业务和产品层面的效应量，供团队权衡收益与改造成本。
+- 最终上线变体在独立测试集上的单次评测数值。
 
-### Caveats to say out loud
+### 需要当面说明的局限性
 
-The folds share training rows, so the t-test is an approximation, not a clean independent sample. A significant difference can still be too small to matter. And a comparison made on the test set turns it into a validation set, which is the mistake the design is built to prevent.
+各折之间共享了训练样本，因此 t 检验属于近似检验，并非严格独立的样本。统计显著的差异在业务实际中可能微不足道。而在测试集上对比模型会将其降级为验证集，这正是该方案要严格杜绝的错误。
 
 ## Follow-ups
 
-- **Level 3:** Why must both variants use the same folds? Expected: pairing removes the fold-to-fold variation from the difference, so the test asks only about the variants.
-- **Level 4:** What does an absolute t above 2.78 mean with five folds? Expected: with 4 degrees of freedom the mean difference is unlikely to be zero at the 5 percent level, so the gap is probably real.
-- **Level 4:** How do you avoid tuning on the folds you report? Expected: nested cross-validation; the inner loop picks the hyperparameter and the outer loop measures it, so the reported folds never saw the choice.
-- **Level 4:** The difference is significant and tiny. Do you ship B? Expected: weigh the effect size against the cost of the change; significance says the sign is reliable, not that it matters.
+- **Level 3:** 为什么两个变体必须使用完全相同的折？ Expected: 配对能够消除折间数据差异对比较结果的影响，使检验严格聚焦于模型变体本身。
+- **Level 4:** 在五折交叉验证中，t 统计量绝对值大于 2.78 意味着什么？ Expected: 在 4 个自由度下，平均差异在 5% 的显著性水平下不太可能为零，说明性能差距大概率是真实存在的。
+- **Level 4:** 如何避免在所汇报的折上调参导致数据泄漏？ Expected: 采用嵌套交叉验证；内层循环选取超参数，外层循环评估性能，确保汇报的外层折从未参与参数选择。
+- **Level 4:** 差异显著但极其微弱，你会发布变体 B 吗？ Expected: 权衡效应量与变更成本；统计显著性说明差异方向可靠，并不代表在实际业务中具有实质价值。
 
 ## Wrong answers
 
-- "One held-out split is enough if it is large." A single split still depends on which rows landed where; folds show the spread.
-- "Compare the two mean scores and pick the higher one." Without the per-fold pairing and the spread, a gap smaller than the fold noise looks like a win.
-- "Use the test set to break the tie." The test set is single use; a choice made on it turns it into a validation set.
+- "只要留出集足够大，单次划分就足够了。" 单次划分依然取决于具体样本的落点；多折交叉验证才能揭示性能的离散程度。
+- "直接比较两个平均分并选取较高者。" 没有逐折配对与离散程度的信息，小于折间噪声的微弱差距会被误当成真实的胜出。
+- "使用测试集来打破僵局。" 测试集只能使用一次；在测试集上做决策会将其退化为验证集。
 
 ## Taught in
 
-The [model evaluation lesson](../../../phases/02-ml-fundamentals/09-model-evaluation/) builds k-fold and stratified k-fold from scratch and ends with a paired comparison of two models.
+[模型评估课程](../../../phases/02-ml-fundamentals/09-model-evaluation/)从零构建了 k 折与分层 k 折交叉验证，并以两个模型的配对比较收尾。

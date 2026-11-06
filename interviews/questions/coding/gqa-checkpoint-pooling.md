@@ -1,6 +1,6 @@
 ---
 id: gqa-checkpoint-pooling
-title: Convert a multi-head checkpoint to grouped-query heads
+title: 把多头检查点转换成分组查询头
 card: coding
 kind: estimate
 level: 4
@@ -16,15 +16,15 @@ related: [coding/gqa-repeat-not-tile, coding/split-heads-reshape]
 updated: 2026-11-03
 ---
 
-You have a trained model with 64 query heads and 64 key and value heads, and you want to serve it with 8 key and value heads to shrink the cache. Write the function that pools the key projection of the checkpoint into groups, say by what factor the cache memory for keys and values falls, and explain why the pooled model needs more training before it is usable.
+你有一个训练好的模型，有 64 个 query 头和 64 个 key、value 头。你想用 8 个 key、value 头来部署它，以缩小缓存。写出把检查点的 key 投影按组池化的函数，说明 key 和 value 的缓存内存下降多少倍，并解释池化后的模型为什么还要再训练才能用。
 
 ## Short answer
 
-Group `g` of the new projection is the mean of the consecutive heads `g r` to `g r + r - 1`, where `r` is the number of query heads per group, taken over the columns of the projection matrix. The cache holds keys and values for 8 heads instead of 64, so that memory falls by a factor of eight. The mean of several heads is not a head the model was trained with, so quality drops until a short continued training run adapts the query heads to their shared group.
+新投影的第 `g` 组是连续头 `g r` 到 `g r + r - 1` 的均值，在投影矩阵的列上计算，其中 `r` 是每组的 query 头数。缓存只存 8 个头而不是 64 个头的 key 和 value，所以这部分内存降为八分之一。几个头的均值不是模型训练时见过的头，质量会下降，直到一次短的继续训练让 query 头适应它们共享的组。
 
 ## Full answer
 
-### The pooling
+### 池化
 
 ```python
 def mean_pool_kv_heads(w, n_heads, n_kv_heads):
@@ -37,32 +37,32 @@ def mean_pool_kv_heads(w, n_heads, n_kv_heads):
     return grouped.mean(axis=2).reshape(D, n_kv_heads * d_head)
 ```
 
-The reshape puts the groups first and the heads inside a group next, because the heads of one group are consecutive blocks of columns. Reshaping as `(D, r, G, d_head)` pools heads that are `G` apart, which gives a correct shape with the wrong groups. The mean, not the sum, keeps the scale of the projected keys close to the original, so the attention scores stay in range.
+reshape 把组放在前面，组内的头放在后面，因为同一组的头是连续的列块。按 `(D, r, G, d_head)` reshape 会把相隔 `G` 的头池化在一起，形状对了，分组却错了。用均值而不是求和，投影后 key 的尺度才接近原来，注意力分数也保持在正常范围内。
 
-### The memory factor
+### 内存倍数
 
-The cache stores one key and one value vector per layer, per head, per token. The number of query heads does not enter. Going from 64 to 8 key and value heads divides the stored bytes per token by eight, which is the example the multi-head lesson gives for a large open model. Weights fall much less, because the query and output projections are unchanged and only the key and value projections shrink.
+缓存为每层、每个头、每个 token 存一个 key 向量和一个 value 向量。query 头数不参与计算。key、value 头从 64 个降到 8 个，每个 token 存的字节数除以八，这正是多头课给出的一个大型开源模型的例子。权重下降得少得多，因为 query 投影和输出投影不变，只有 key 和 value 投影变小。
 
-### Why it needs training
+### 为什么要训练
 
-The query heads were trained against their own key heads. After pooling, eight query heads read one averaged key head that none of them saw in training. The lesson's lineage describes converting multi-head checkpoints to grouped-query checkpoints as a recipe with a continued training step; the pooling gives a starting point close to the original, and the uptraining recovers most of the quality. Serving the pooled weights directly works, but the eval must be rerun before shipping.
+query 头训练时对着的是各自的 key 头。池化后，八个 query 头读同一个平均出来的 key 头，它们在训练中都没见过这个头。课里讲的演进脉络把多头检查点转成分组查询检查点描述为一个带继续训练步骤的配方：池化给出一个接近原模型的起点，继续训练找回大部分质量。直接部署池化后的权重也能跑，但上线前必须重新跑评估。
 
-### What does not change
+### 什么不变
 
-The head size, the query projection, the output projection and the attention function itself are the same. Only the key and value projections and the repeat inside attention change, so the rest of the loader and the block are untouched.
+头的大小、query 投影、输出投影和注意力函数本身都不变。只有 key、value 投影和注意力内部的重复会变，加载器和块的其余部分都不用动。
 
 ## Follow-ups
 
-- **Level 3:** Why pool consecutive heads and not every eighth head? Expected: the attention reads group `h` floor-divided by `r` for query head `h`, so the pooled heads must be the ones that will share a group.
-- **Level 4:** How does the cache saving change when the model is served with a longer context? Expected: it does not change as a factor; the saving is per token, so the absolute bytes saved grow with the number of tokens held.
-- **Level 4:** The multi-head latent variant compresses keys and values into a low-rank latent. What does it trade for the extra saving? Expected: compute, because the latent must be projected back to full keys and values at attention time.
+- **Level 3:** 为什么池化连续的头，而不是每隔八个取一个？ Expected: 注意力里 query 头 `h` 读的是 `h` 整除 `r` 得到的组，所以被池化的头必须是之后共享一个组的那些头。
+- **Level 4:** 用更长的上下文部署时，缓存节省有什么变化？ Expected: 倍数不变；节省是按 token 计算的，所以节省的绝对字节数随缓存的 token 数增长。
+- **Level 4:** 多头潜在注意力变体把 key 和 value 压缩成低秩潜在向量。它用什么换来了额外的节省？ Expected: 计算量，因为计算注意力时要把潜在向量投影回完整的 key 和 value。
 
 ## Wrong answers
 
-- "Pooling is lossless since the mean preserves the average key." The individual heads are lost; the queries were trained against them, so quality drops until the model is adapted.
-- "The cache shrinks by the ratio of query heads to total heads." Only key and value heads live in the cache; the factor is the old count of key and value heads over the new count.
-- "Sum the heads so no information is lost." The sum scales the keys by the group size and pushes the scores out of the range the softmax was trained for.
+- "池化是无损的，因为均值保留了平均的 key。" 各个头本身丢了；query 是对着它们训练的，所以模型适应之前质量会下降。
+- "缓存按 query 头数和总头数的比例缩小。" 缓存里只有 key 头和 value 头；倍数是原来的 key、value 头数除以新的头数。
+- "把头加起来，就不会丢信息。" 求和会把 key 放大到组大小倍，分数超出 softmax 训练时的范围。
 
 ## Taught in
 
-The [multi-head attention lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) gives the grouped-query lineage and the cache factor, and the [grouped-query practice](../../../practice/grouped-query-attention/) implements the pooling of a multi-head checkpoint.
+[多头注意力课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)给出了分组查询的演进脉络和缓存倍数，[分组查询练习](../../../practice/grouped-query-attention/)实现了多头检查点的池化。

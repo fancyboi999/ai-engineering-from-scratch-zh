@@ -1,6 +1,6 @@
 ---
 id: exit-zero-was-not-a-pass
-title: An exit code of zero that was not a pass
+title: 退出码为 0 但并未通过的比对检查
 card: scenarios
 kind: incident
 level: 4
@@ -32,54 +32,54 @@ source:
 
 ## Situation
 
-A team keeps Evidence bundles of a shipped binary in version control. A nightly job analyses the current build with rea, exports a bundle, runs `rea compare` against the bundle of the night before, and posts "no change" to the team channel when the command exits 0. It has posted "no change" every night for three weeks. Then a release went out with a different optimization level, and the job still posted "no change". A reviewer opened the two bundles by hand and found that not one record was shared between them.
+一个团队在版本控制中保存已发布二进制文件的 Evidence 证据包。一个每晚运行的定时作业使用 rea 逆向分析当前构建、导出 bundle、执行 `rea compare` 比对前一晚的 bundle，并在命令退出码为 0 时向团队频道发送“无变更”通知。该机制连续三周每晚都报告“无变更”。随后一次发布采用了不同的编译优化级别，该作业依然汇报“无变更”。一名审查者手动打开两个 bundle，发现两者之间没有一条共享记录。
 
-Two more things went wrong in the same week. The job also keeps a digest of each bundle file to detect edits, and a colleague's export of the same records produced a different digest. And after the upgrade from the 6.5.0 release, an archived bundle that nobody had touched was refused at import. You are asked to say what the job measured for three weeks and to redesign it.
+同一周还发生了另外两起异常：该作业还保存每个 bundle 文件的摘要哈希以检测意外篡改，而一位同事对相同记录执行导出却得出了不同的哈希；此外从 6.5.0 版本升级后，一份此前从未改动过的归档 bundle 在导入时被系统拒绝。团队要求你说明该定时作业三周以来究竟在度量什么，并重新设计该流程。
 
 ## Evidence
 
-- [the import and compare commands with their exit codes](evidence/the-three-commands.txt)
-- [the head of the compare result](evidence/compare-status-and-summary.txt)
-- [the first of the ten changes](evidence/one-unresolved-record.txt)
-- [the limitation at the end of the result](evidence/the-closing-limitation.txt)
-- [the MCP export and the CLI export of the same records](evidence/two-exports-one-content.txt)
-- [the import counts of the bundle that this release wrote](evidence/import-of-the-current-bundle.txt)
-- [the import of the bundle that the old release wrote](evidence/old-bundle-refused.txt)
+- [导入与比对命令及其对应的进程退出码](evidence/the-three-commands.txt)
+- [比对输出结果的状态与摘要头部](evidence/compare-status-and-summary.txt)
+- [十处记录差异中的首项具体内容](evidence/one-unresolved-record.txt)
+- [比对结果末尾附带的局限性说明](evidence/the-closing-limitation.txt)
+- [针对相同记录分别通过 MCP 与 CLI 导出的结果对比](evidence/two-exports-one-content.txt)
+- [当前版本构建生成的 bundle 在导入时的计数情况](evidence/import-of-the-current-bundle.txt)
+- [旧版本构建生成的 bundle 在导入时被拒绝的日志](evidence/old-bundle-refused.txt)
 
 ## Questions
 
-1. The compare command exited 0 on two bundles with no record in common. What did the job read, and what should it have read?
-2. Every change is classified `unknown` with the kind `unresolved_branch`, and `records_removed` is 0. Why does rea not call a record that is on one side only a removal?
-3. Two exports of the same eight records have different digests and byte counts. Which digest belongs in the archive, and how do you check that two files hold the same evidence?
-4. The old bundle was refused with `retryable: false`. Which record failed, why that one, and what does the team do with evidence it saved under the old release?
-5. Write the aggregation rule for the nightly job, and say which tool answers the question it was trying to ask.
+1. 比对命令在两个毫无共同记录的 bundle 上返回了退出码 0。该作业此前读取了什么，原本应该读取什么？
+2. 每项差异均被归类为种类为 `unresolved_branch` 的 `unknown`，且 `records_removed` 为 0。为什么 rea 不将仅在一侧存在的记录判定为删除？
+3. 对相同八条记录的两次导出得出了不同的哈希与字节数。哪份哈希应当归档，如何核验两个文件包含相同的证据？
+4. 旧 bundle 被拒绝且标注为 `retryable: false`。哪条记录导入失败，为什么是它，团队应对旧版本保存的证据作何处置？
+5. 编写定时作业的聚合判定规则，并指出哪个工具能真正回答它试图探究的问题。
 
 ## Walkthrough
 
-1. **Read the exit codes against the results.** The command record shows `rea compare` with exit 0. The import of the current bundle also exits 0. Only the import of the old bundle exits 1. A zero exit from `rea compare` means that the comparison ran, not that it found two equal sets. The job treated the process status as the verdict and never parsed the output.
-2. **Read the status and the summary.** The result says `status: "unknown"`. Every `records_` counter is 0, and `unresolved` is 10. So the two bundles share no record, nothing was classified as unchanged, and nothing was classified as changed either. The job's "no change" message described a comparison that compared nothing.
-3. **Read one change.** The first change has a right-side id and an empty left side. Its classification is `unknown` and its conclusion kind is `unresolved_branch`. The limitation on the change says that a bundle has no inventory completeness marker, so one-sided membership may reflect incomplete capture. rea cannot tell a record that was removed from a record that was never captured on that side, because the bundle format does not say whether a capture was complete.
-4. **Read the closing limitation.** The same sentence closes the whole result: one-sided membership remains unknown. The two bundles were made from two builds. No `evidence_id` can match across them, because the id is a hash of the record's semantic content and the content describes a different file. `rea compare` answers "what changed in this evidence set" for two bundles of one build. For two builds the question goes to `compare_functions`, one function at a time.
-5. **Read the two exports.** The MCP export and the CLI export hold the same JSON content and different bytes: 178398 against 178397 bytes. The one byte is the newline that the capture kit added to its copy. The canonical digest is the one from `rea evidence-export`, and the compare result names that digest as its left bundle digest. A job that compares file digests must canonicalize both files first, or compare the JSON content.
-6. **Read the two imports.** The import of the current bundle reports 8 imported of 8. The import of the old bundle stops with `evidence_integrity_mismatch` at `records.3.evidence_id` and `retryable: false`. The bytes are the bytes that the old release wrote. The hash rule changed: the current release includes a `null` `relationship_coverage` in the identity of a record, and the old release left it out. Records 0 to 2 are dossiers with a coverage object, so their ids still verify. Record 3 is the first record without coverage, so it is the first id that fails.
+1. **对照比对结果审视退出码。** 命令记录显示 `rea compare` 退出码为 0。导入当前 bundle 同样退出码为 0。唯独导入旧 bundle 退出码为 1。`rea compare` 返回 0 仅代表比对流程顺利执行完毕，绝不代表找到了两个等价的证据集合。该定时作业将进程退出状态直接等同于业务判定结论，从未解析输出的真正内容。
+2. **分析状态与摘要数据。** 比对结果明确标注 `status: "unknown"`。所有 `records_` 统计项均为 0，而 `unresolved` 为 10。两个 bundle 之间没有任何共享记录，既没有任何记录被判定为未变更，也没有任何记录被判定为发生变更。作业发出的“无变更”消息实际上是在描述一次根本没有比对出任何实质结论的比对。
+3. **审视单项差异分析。** 第一项差异包含右侧 ID 而左侧为空。其分类为 `unknown`，结论类型为 `unresolved_branch`。差异上的局限性说明指出：bundle 缺乏全量清单完备性标记，因此仅在一侧存在可能反映的是采集不完整。rea 无法区分一条记录是被删除了，还是在另一侧从未被采集，因为 bundle 格式并未声明采集是否完整。
+4. **查阅结论性局限性说明。** 末尾的一句话总结了整个比对结果：单侧存在始终属于未知。这两个 bundle 是从两个不同的编译产物生成的。两者的 `evidence_id` 根本不可能匹配，因为该 ID 是记录语义内容的哈希，而语义内容描述的是不同的二进制文件。`rea compare` 用于回答同一构建生成的两个 bundle 之间的“证据集发生了什么变动”。对于两个不同构建之间的差异，必须通过 `compare_functions` 逐个函数展开比对。
+5. **对比两份导出产物。** MCP 导出与 CLI 导出包含完全相同的 JSON 语义内容，但字节数不同：178398 字节对 178397 字节。差异的这一个字节仅是抓取套件在其副本末尾添加的换行符。规范哈希是以 `rea evidence-export` 生成的为准，比对结果将其标识为左侧 bundle 哈希。若定时作业需比对文件哈希，必须先将两份文件规范化，或直接比对 JSON 语义内容。
+6. **分析两次导入行为。** 当前版本 bundle 导入报告 8/8 成功。旧版本 bundle 导入在 `records.3.evidence_id` 处因 `evidence_integrity_mismatch` 终止且标记为 `retryable: false`。文件字节与旧版本写入时完全一致。原因在于哈希计算规则发生了变更：当前版本将 `relationship_coverage` 为 `null` 纳入了记录的身份标识计算，而旧版本将其排除在外。记录 0 至 2 属于带有覆盖度对象的卷宗，其 ID 验证依然能通过。记录 3 是首个没有覆盖度对象的记录，因此成为首个校验失败的条目。
 
 ## Resolution
 
-For three weeks the job measured whether `rea compare` could start. It never read the status. The redesign reads the JSON and applies one rule: a result with status `unknown`, or with `unresolved` above 0, is not a pass, and the message names the count. A `pass` requires status `unchanged` with every record classified. The job compares bundles of one build only. When the build changes, it opens both builds and calls `compare_functions` for each function of interest, and it reads the eight dimensions of each record, as the manual shows for `_percent_change` and `_total`.
+三周以来该作业衡量的仅仅是 `rea compare` 能否正常启动，从未读取真实的判定状态。重新设计的逻辑解析 JSON 输出并执行一条硬规则：凡是状态为 `unknown` 或 `unresolved` 大于 0 的结果，一律判定为未通过并在报警信息中指明具体计数。只有状态为 `unchanged` 且所有记录均明确归类的结果才被视为通过。该作业仅用于比对同一构建的 bundle。当构建版本发生变更时，它打开两个构建针对每个重点函数调用 `compare_functions`，并审查每个记录的八个维度（正如手册针对 `_percent_change` 和 `_total` 所展示的那样）。
 
-The archive stores the canonical digest from `rea evidence-export` next to each bundle, and the rea version that wrote it. The team does not migrate saved evidence. For the old bundles it keeps the old release available to read them, and it regenerates the evidence it still needs with the current release. The first nightly run after the change posted a result with `unresolved: 10` and a red mark, which is what the two builds deserved.
+归档存储记录来自 `rea evidence-export` 的规范哈希以及生成它的 rea 版本号。团队不对已保存的证据二次迁移。对于旧 bundle，保留旧版本二进制工具以便随时调阅，并使用当前版本重新生成仍需使用的证据。改造后的首次夜间运行输出了 `unresolved: 10` 并亮起红灯，真实反映了两个不同构建并存的客观现状。
 
 ## Wrong turns
 
-- "Exit 0 means the comparison passed." The exit code says that the command completed. The verdict is in `status`, and here it was `unknown`.
-- "Ten unresolved records on the right and none on the left means ten records were added." A bundle carries no completeness marker, so rea cannot say whether the left side was captured completely. It says unknown, and so must you.
-- "Fix the old bundle by recomputing the ids and importing it." The refusal is not retryable, and rea does not migrate evidence. An id you compute yourself is no longer evidence that the tool wrote.
-- "Compare the file digests to detect a change." Two valid exports of the same records differed by one trailing newline. Compare canonical digests or JSON content.
+- "退出码为 0 说明比对已顺利通过。" 退出码仅代表命令正常结束。业务判定结论位于 `status` 字段中，此处明确为 `unknown`。
+- "右侧有十条未解析记录而左侧没有，说明新增了十条记录。" bundle 缺少完备性标记，rea 无法确认左侧是否完成了完整采集。它给出的结论是未知，你也必须尊重这一判定。
+- "重算 ID 并重新导入以修复旧 bundle。" 该拒绝明确标记为不可重试，且 rea 不提供证据迁移功能。你自己算出的 ID 不再是逆向工具生成的客观证据。
+- "比对文件哈希来检测变更。" 相同记录的两次有效导出仅因末尾换行符产生差异。应当比对规范哈希或 JSON 语义内容。
 
 ## Generalize
 
-A tool that can say "I do not know" needs a reader that can hear it. Any pipeline that turns a result into a pass or fail must read the field that carries the verdict and treat every value other than pass as not a pass, including unknown, unresolved and skipped. Record the version of the tool next to every artifact it wrote, because the identity rules of a format can change between releases, and compare canonical forms, never raw files.
+能够输出“我不知道”的工具，需要能够理解该结论的解析器。任何将工具输出转化为通过或失败的自动化流程，都必须解析承载判定结论的具体字段，并将除 `pass` 以外的任何状态（包括 unknown、unresolved 和 skipped）均视为未通过。在每份产物旁记录生成它的工具具体版本号，因为数据格式的身份标识规则可能在版本更迭中发生改变；始终比对规范化形式，绝不要直接比对原始文件字节。
 
 ## Taught in
 
-The [compare page of Reverse Engineering 101](../../../manuals/reverse-engineering-101/sections/5-5-compare-and-compare-functions.md#rea-compare-on-two-bundles) reads this result, the [bundles page](../../../manuals/reverse-engineering-101/sections/5-4-evidence-bundles-export-and-import.md#a-bundle-from-an-earlier-release) explains the two exports and the refused import, the [errors reference](../../../manuals/reverse-engineering-101/sections/r-3-errors.md#codes-that-are-not-errors) lists the results that refuse a conclusion and exit 0, and the [failure modes lesson](../../../phases/14-agent-engineering/26-failure-modes-agentic/) shows why a pipeline that tags only crashes misses most failures.
+[逆向工程 101 的比对页面](../../../manuals/reverse-engineering-101/sections/5-5-compare-and-compare-functions.md#rea-compare-on-two-bundles)解读了该输出结果，[bundle 页面](../../../manuals/reverse-engineering-101/sections/5-4-evidence-bundles-export-and-import.md#a-bundle-from-an-earlier-release)解释了两次导出与导入被拒的机制，[错误参考](../../../manuals/reverse-engineering-101/sections/r-3-errors.md#codes-that-are-not-errors)列出了拒绝下达结论但以 0 退出的状态码，而[失效模式课程](../../../phases/14-agent-engineering/26-failure-modes-agentic/)剖析了仅捕获进程崩溃的监控链路为何会漏掉绝大多数致命缺陷。

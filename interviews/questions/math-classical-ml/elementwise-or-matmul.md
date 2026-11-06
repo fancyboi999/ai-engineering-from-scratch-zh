@@ -1,6 +1,6 @@
 ---
 id: elementwise-or-matmul
-title: Two products in NumPy that print different numbers
+title: NumPy 中输出不同数值的两种乘法操作
 card: math-classical-ml
 kind: code-reading
 level: 1
@@ -16,7 +16,7 @@ related: [math-classical-ml/dense-layer-weight-shape]
 updated: 2026-11-03
 ---
 
-Read this code and say what each print shows. Then tell me which of the two operations a dense layer uses, and why.
+阅读以下代码并说明每次打印的输出内容。然后告诉我全连接层使用的是这两种操作中的哪一种，以及为什么。
 
 ```python
 import numpy as np
@@ -29,49 +29,49 @@ print(A @ B)
 
 ## Short answer
 
-The star multiplies matching positions, so the first print shows 5, 12, 21 and 32. The at sign forms dot products of rows with columns, so the second print shows 19, 22, 43 and 50. A layer uses the at sign, because every output must sum over every input.
+星号运算符执行逐元素相乘，因此第一个 print 输出 5、12、21 和 32。@ 运算符计算行与列的点积，因此第二个 print 输出 19、22、43 和 50。全连接层使用 @ 运算符，因为每个输出都必须对所有输入求和。
 
 ## Full answer
 
-### Element-wise product
+### 逐元素乘积
 
-Both arrays have the same shape, so the star pairs each cell with the cell at the same position:
+两个数组形状相同，因此星号运算符将相同位置上的元素配对相乘：
 
 ```text
 1*5 = 5    2*6 = 12
 3*7 = 21   4*8 = 32
 ```
 
-The order of A and B does not change the result.
+调换 A 和 B 的顺序不会改变计算结果。
 
-### Matrix product
+### 矩阵乘积
 
-The at sign calls the matmul method. Cell (i, j) of the result is the dot product of row i of A with column j of B:
+@ 运算符调用 matmul 方法。结果矩阵中第 (i, j) 个元素是 A 的第 i 行与 B 的第 j 列的点积：
 
 ```text
 1*5 + 2*7 = 19    1*6 + 2*8 = 22
 3*5 + 4*7 = 43    3*6 + 4*8 = 50
 ```
 
-The order matters. B times A gives other numbers. The inner sizes must agree, and the result has the rows of A and the columns of B.
+操作数顺序至关重要。B 乘以 A 会得到不同的数值。内侧维度必须一致，计算结果的行数等于 A 的行数，列数等于 B 的列数。
 
-### Which one a layer uses
+### 全连接层使用哪一种
 
-A dense layer computes an activation of W times x plus b. Each output mixes all inputs with its own row of weights, which is the dot product inside a matrix product. The element-wise product appears in other places in training, for example when the learning rate scales a gradient, or when a mask zeroes some values. NumPy runs the matrix product with tuned BLAS routines written in C and Fortran, which the lesson measures as about 100 times faster than a Python loop over the same numbers.
+全连接层计算 W 乘以 x 加 b 的激活值。每个输出都用自身的权重行混合所有输入，这正是矩阵乘法中的点积操作。逐元素乘积出现在模型训练的其他环节，例如学习率缩放梯度、或者用掩码将特定数值归零。NumPy 使用 C 和 Fortran 编写的高度优化 BLAS 例程来执行矩阵乘法，课程实测其比遍历相同数值的 Python 循环快约 100 倍。
 
 ## Follow-ups
 
-- **Level 1:** Does the order of A and B matter in each case? Expected: no for the element-wise product, yes for the matrix product.
-- **Level 2:** Which of the two operations does a learning rate step use? Expected: a scalar times the gradient, which is an element-wise scale.
-- **Level 2:** Why is the at sign so much faster than a loop in Python? Expected: it calls BLAS routines in C and Fortran. The lesson gives about 100 times.
-- **Level 3:** Someone writes the star for the layer and the code runs without an error. How is that possible? Expected: the shapes happened to be equal, so the element-wise product ran and gave wrong values with no error.
+- **Level 1:** 在这两种操作中，A 和 B 的顺序是否影响结果？ Expected: 逐元素乘法不影响，矩阵乘法则会改变结果。
+- **Level 2:** 学习率更新步骤使用这两种操作中的哪一种？ Expected: 标量乘以梯度，属于逐元素缩放。
+- **Level 2:** 为什么 @ 运算符比 Python 原生循环快得多？ Expected: 它调用了 C 和 Fortran 编写的 BLAS 例程；课程给出的实测加速比约为 100 倍。
+- **Level 3:** 有人在全连接层中误写了星号乘法，代码却正常运行未报错，这是怎么发生的？ Expected: 两个操作数形状恰好一致，逐元素乘法得以执行并静默输出了错误数值。
 
 ## Wrong answers
 
-- "Both print the same matrix, the star is another spelling of the at sign." The two operations follow different rules and give different numbers.
-- "The at sign is the element-wise product and the star is the matrix product." The at sign calls matmul, which forms dot products of rows and columns. The star works on matching positions.
-- "A dense layer multiplies each weight by its input, so it is element-wise." Each output also sums over all inputs. That sum is the dot product inside a matrix product.
+- "两者打印出相同的矩阵，星号只是 @ 运算符的另一种写法。" 这两种操作遵循完全不同的运算规则并产生不同的数值。
+- "@ 运算符是逐元素乘积，星号是矩阵乘积。" @ 调用 matmul 计算行列点积，星号则作用于相匹配的对应位置。
+- "全连接层将每个权重与对应输入相乘，因此是逐元素的。" 每个输出还需要对所有输入求和；该求和过程正是矩阵乘法内部的点积操作。
 
 ## Taught in
 
-The [vectors and matrices lesson](../../../phases/01-math-foundations/02-vectors-matrices-operations/) works both products by hand and then with NumPy.
+[向量与矩阵运算课程](../../../phases/01-math-foundations/02-vectors-matrices-operations/)手工推导了这两种乘法，随后用 NumPy 实现。

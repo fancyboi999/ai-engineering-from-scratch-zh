@@ -1,6 +1,6 @@
 ---
 id: three-copies-of-one-model-voted
-title: Three copies of one model voted, and the majority was wrong
+title: 三个相同模型的副本投票，多数方却给出了错误答案
 card: multi-agent
 kind: concept
 level: 4
@@ -16,61 +16,61 @@ related: [multi-agent/two-workers-return-different-facts]
 updated: 2026-11-03
 ---
 
-Five agents answer the same factual question and vote. Three of them run the same base model and agree on a wrong answer, and the two others are right. Majority vote picks the wrong answer. A colleague says that classical fault-tolerant consensus solves this. Explain why it does not, which assumptions break, and what the recent agent-specific protocols change.
+五个 agent 针对同一个客观事实问题展开回答并投票。其中三个运行相同基础模型的 agent 达成共识给出了完全相同的错误答案，而另外两个 agent 的回答是完全正确的。由于多数原则，系统最终采纳了错误答案。一位同事声称经典容错共识能够解决该问题。请驳斥该论断，指出经典假设在何处失效，并说明近期面向 agent 的协议做了哪些改变。
 
 ## Short answer
 
-Classical consensus tolerates fewer than a third of nodes behaving arbitrarily, and it assumes that faults are independent, that honest nodes are correct, and that a ground truth exists. Three agents on a shared base model share their faults, an honest model still hallucinates, and on some questions the agents define the truth. The agent-specific variants weigh each vote by a confidence probe, aggregate leaderless proposals by a geometric median, or split agents into a core and an edge with learned trust weights. None of them makes agreement equal correctness, so the consensus output still goes to an independent verifier.
+经典容错共识协议仅能容忍少于三分之一的节点发生任意行为，且假设：节点故障彼此独立、诚实节点必定正确，以及客观真值必然存在。同一基础模型上的三个 agent 会共享错误，诚实的模型依然会产生幻觉，且在某些问题上，真值由 agent 自身定义。面向 agent 的协议变体引入了按置信度探测加权投票、基于几何中位数的无主控聚合算法，或者将节点划分为核心层与边缘层并结合历史习得信任权重的机制。但这些机制都无法将“达成共识”等同于“事实正确”，因此共识的最终输出依然必须交给独立的校验器终审。
 
 ## Full answer
 
-### What the classical protocol gives and assumes
+### 经典共识协议的能力边界与基石假设
 
-The standard protocol reaches agreement on one value among n nodes when fewer than n divided by three are faulty, which needs n at least three f plus one. It runs three phases over signed messages and quorum certificates. Its three assumptions:
+标准协议在 n 个节点中故障节点少于 n 除以三时，就一个值达成一致；这要求 n 至少为三倍 f 加一。协议通过带签名的消息和法定人数证书，分三个阶段运行。它有三个假设：
 
-1. Faults are independent, so faulty nodes do not coordinate.
-2. Honest nodes are correct, so the protocol only aligns disagreement.
-3. The question has a ground truth, so agreement on a wrong value is still agreement.
+1. 故障彼此独立，因此故障节点不会协调行动。
+2. 诚实节点是正确的，因此协议只负责消除分歧。
+3. 问题有客观真值，因此对错误值达成一致也仍然算作一致。
 
-Model agents break all three. Agents on one base model share faults. An honest agent hallucinates. And on an ambiguous question the agents decide what is true.
+而在模型 agent 系统中，这三大假设全部被打破。基于同一基础模型的 agent 在模型结构上共享相同的认知偏见。一个完全遵循协议的“诚实”agent 依然会产生自信的幻觉。面对具有歧义的复杂问题，真值往往取决于这批 agent 自身的定性裁决。
 
-### Three attacks that pass the signature check
+### 三种能通过签名检查的攻击
 
-| Attack | What happens | Does the classical protocol handle it |
+| 攻击模式 | 实际行为特征 | 经典协议能否防范 |
 |---|---|---|
-| A deliberate lie | One agent outputs a wrong answer with high confidence | Yes, while the liars are under a third |
-| Sycophantic conformity | One agent reads the others and aligns with whoever spoke last | No, because the agent passes every check |
-| Correlated monoculture | Three agents on one model hallucinate the same answer | No, because all three honestly agree |
+| 蓄意欺骗注入 | 单个 agent 以极高的置信度恶意输出错误答案 | 能防范，只要造假节点比例严格低于三分之一 |
+| 谄媚迎合（Sycophancy） | 某个 agent 读取其他节点输出后，盲目迎合最后一位发言者的立场 | 无法防范，因为该 agent 在协议层完全合规 |
+| 认知同质化单一文化（Monoculture） | 基于同一模型的三个 agent 产生完全相同的幻觉且得出相同结论 | 无法防范，因为所有三方均极其诚实地表达了相同立场 |
 
-The prompt's case is the third.
+题干对应第三种情况。
 
-### The agent-specific responses
+### 面向 agent 的应对方法
 
-- **Confidence-weighted voting.** Each voter attaches a confidence probe, self-reported or from a calibration model, and the vote weight scales with it. The lesson reports a large improvement on fully connected graphs. It helps most against conformity, because an agent that adopted a position it did not derive tends to report low confidence.
-- **Leaderless aggregation by geometric median.** Workers propose in parallel, evaluators score the proposals, and the answer is the geometric median of the scored positions. It is robust while the faulty fraction is under a half, and it resists outliers and pulls toward the dense cluster rather than the model-biased mean.
-- **Weighted voting with a core and an edge.** Weights come from response quality and a trust score learned from history. A small core reaches agreement first and the edge follows, which bounds latency and lets the core be chosen for diversity.
+- **基于置信度探测的加权投票（Confidence-weighted voting）。** 每个投票节点附加置信度探测指标（自评打分或校准判别模型得出），投票权重与该指标直接成正比。课程指出该机制在全连接图中取得了显著成效。它对抗盲目从众尤为有效，因为未经过自主推导而人云亦云的 agent 通常会暴露出极低的置信度。
+- **基于几何中位数的无主控聚合算法（Geometric median）。** 工作 worker 并行提出方案，评估器对各方案打分，最终结果取打分空间中的几何中位数。只要故障节点的比例保持在二分之一以下该算法就具有鲁棒性，能够抵抗离群值，并将结果拉向紧密的观点密集簇而非带有模型偏差的均值。
+- **核心层与边缘层的分层加权架构。** 权重综合了响应质量以及基于历史表现习得的信任评分。小型核心层先达成共识，边缘层再跟进。这样既能限制延迟，也能按多样性挑选核心成员。
 
-### The stripped-down round
+### 极简实用的收敛轮次设计
 
-Each agent produces an answer and a confidence. The aggregator groups answers into semantic clusters, so that two phrasings of one value count together, sums the confidence per cluster, and accepts the top cluster only when its share passes a threshold. Below the threshold it retries or escalates. The lesson's working range for the threshold is 0.5 to 0.67 with five to seven agents. Minority clusters are logged with provenance, because they are the early warning for correlated errors.
+每个 agent 输出答案及对应的置信度。聚合器首先把答案按粗粒度语义聚类（使表达同一数值的不同措辞合并为同一簇），累加每个聚类的总置信度，并且唯有在第一名的置信度占比跨过设定阈值时才予以采纳。未达阈值则直接触发重试或向上升级。在拥有五到七个 agent 的系统中，课程使用的阈值范围为 0.5 到 0.67。少数派观点簇必须携带完整溯源凭据写入审计日志，因为它们是发现系统性相关误差的核心哨兵。
 
-### The uncomfortable measurement
+### 令人警醒的实测数据
 
-The lesson cites a study of scalar agreement across frontier models: even with no adversary, agents disagreed on scalar questions at rates above 30 percent on many benchmarks, and a single agent with a deceptive persona pulled the mixture's consensus more than 40 percentage points off the honest baseline. Consensus machinery aligns outputs. It does not tell you whether the aligned output is right.
+课程引用了一项前沿模型标量判断一致性的研究：即使没有对抗者，在多个基准上，agent 对标量问题的分歧率仍超过 30%；而一个具有欺骗人设的 agent 就把混合集成的共识拉离诚实基线超过 40 个百分点。共识机制只能对齐不同节点的输出，它根本无法证明对齐后的结论是正确的。
 
 ## Follow-ups
 
-- **Level 3:** Does the geometric median rescue this case? Expected: no. The median discounts outliers and moves toward the dense cluster, which helps only while the wrong cluster is under half. Here three of five votes are wrong, so the dense cluster is the wrong one and the median selects it.
-- **Level 3:** The three wrong agents are also the most confident. What now? Expected: no aggregator fixes a wrong cluster that is both larger and more confident, so the system needs diversity of base models or an independent verifier.
-- **Level 4:** Why bound the rounds at two or three? Expected: agents that observe earlier rounds start to mimic each other regardless of truth, so more rounds reward conformity.
-- **Level 4:** What do you monitor in production? Expected: the agreement rate, where a sharp rise means conformity and a sharp fall means model drift, and the minority clusters with their provenance.
+- **Level 3:** 几何中位数算法能否挽救题干中的错误局面？ Expected: 不能，中位数抑制离群值并倒向密集簇，仅在错误少于半数时有效，此处五票占三票，错误本身就是密集簇。
+- **Level 3:** 这三个错误的 agent 同时也是置信度最高的，应该怎么办？ Expected: 任何数学聚合算法都无法解决既是多数又具备最高置信度的错误簇，必须依赖异构模型或独立外部校验。
+- **Level 4:** 为什么多轮共识辩论必须将轮数严格限制在两到三轮？ Expected: 观察先前轮次的 agent 会逐渐模仿彼此不论事实真伪，更多轮次会奖励从众。
+- **Level 4:** 在生产环境中你应该对共识系统监控哪些核心指标？ Expected: 全局一致率（急剧上升代表盲从，急剧下降代表模型漂移），以及携带溯源凭证的少数派观点簇。
 
 ## Wrong answers
 
-- "Use the classical protocol with a two-thirds quorum." Three honest agents that share a hallucination form the quorum, and the protocol agrees on the wrong value.
-- "Add more copies of the same model until the majority is right." More copies of one model add more correlated votes, and the wrong cluster grows with them.
-- "Consensus means the answer is correct." Agreement and correctness are different measurements, and the consensus output needs a verifier that is independent of the ensemble.
+- "使用法定人数为三分之二的经典协议即可。" 三个诚实但共享相同幻觉的 agent 直接构成了合法法定人数，协议会对错误值达成共识。
+- "不断增加相同模型的副本数量，直到真理占上风。" 增加同一模型的副本只会成倍追加高度相关的错误选票，让错误簇的人头优势更加坚不可摧。
+- "只要各节点达成了共识，就证明结论是准确的。" 一致性与正确性是不同的衡量指标，共识输出需要由独立于集成系统的校验器检查。
 
 ## Taught in
 
-The [consensus and fault tolerance lesson](../../../phases/16-multi-agent-and-swarms/14-consensus-and-bft/) builds the minimal protocol and runs the three attacks against three aggregators.
+[共识与容错](../../../phases/16-multi-agent-and-swarms/14-consensus-and-bft/)课程构建了最小可行协议，并使用这三类攻击模式全面测试了三类聚合算法。

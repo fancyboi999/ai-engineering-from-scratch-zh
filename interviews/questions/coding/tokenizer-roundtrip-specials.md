@@ -1,6 +1,6 @@
 ---
 id: tokenizer-roundtrip-specials
-title: A byte-level tokenizer with protected special tokens
+title: 保护特殊 token 的字节级分词器
 card: coding
 kind: take-home
 level: 4
@@ -16,59 +16,59 @@ related: [coding/bpe-train-loop, coding/bpe-merge-no-overlap]
 updated: 2026-11-03
 ---
 
-Design and implement a tokenizer for a small language model: train it on a corpus, encode fresh text, decode ids back, and reserve two special tokens for document boundaries and padding. State the guarantees the test suite must pin, and explain how the special tokens survive both training and inference without ever being merged.
+为一个小语言模型设计并实现分词器：在语料上训练，编码新文本，把 id 解码回来，并为文档边界和填充保留两个特殊 token。说明测试套件必须固定哪些保证，并解释特殊 token 怎样在训练和推理中都不被合并。
 
 ## Short answer
 
-The base symbols are the 256 raw bytes, so every input has an encoding before any merge and decoding always terminates in bytes. Training runs on pre-tokenized chunks that never contain the special strings, so no merge can produce or consume a special id. At inference a matcher splits the text on the special strings first, maps each one to its reserved id, and runs the merge table on the text between them in training order. The suite pins the round trip on unseen text, on text with multi-byte characters, and on text that contains a literal special string with the flag off.
+基础符号是 256 个原始字节，所以任何输入在合并之前都有编码，解码最终总是落到字节上。训练在预分词后的块上运行，这些块从不包含特殊字符串，所以没有任何合并能产生或吃掉特殊 id。推理时，匹配器先按特殊字符串切分文本，把每个特殊字符串映射到保留的 id，再按训练顺序对它们之间的文本应用合并表。测试套件要固定三种往返：未见过的文本、含多字节字符的文本，以及开关关闭时含字面特殊字符串的文本。
 
 ## Full answer
 
-### The pipeline
+### 流水线
 
-1. Normalize the text to one Unicode form so that the same visible word gets the same bytes.
-2. Split on the special strings when the caller allows them, and map each match to its reserved id.
-3. Pre-tokenize the remaining text into chunks at whitespace and punctuation boundaries.
-4. Apply the merge table to each chunk's bytes in training order, with non-overlapping left-to-right replacement.
-5. Concatenate the ids.
+1. 把文本规范化成一种 Unicode 形式，同一个可见的词就会得到相同的字节。
+2. 调用方允许时，按特殊字符串切分，并把每个匹配映射到它保留的 id。
+3. 在空白和标点边界处，把剩下的文本预分词成块。
+4. 按训练顺序对每个块的字节应用合并表，从左到右、不重叠地替换。
+5. 把 id 拼接起来。
 
-Decoding reverses steps two to five: expand each id to its bytes, where a merged id expands to the bytes of its two parents and a reserved special id expands to the UTF-8 bytes of its string, and decode the byte string. Normalization is not reversible. A decomposed accent comes back as the composed character, so the round trip is exact only for text that is already in the normalized form.
+解码把第二到第五步反过来：把每个 id 展开成字节，合并出的 id 展开成它两个父符号的字节，保留的特殊 id 展开成它字符串的 UTF-8 字节，然后解码字节串。规范化不可逆。分解形式的重音会以组合字符的形式回来，所以只有本来就是规范形式的文本，往返才是精确的。
 
-### Why pre-tokenization
+### 为什么要预分词
 
-Without the split, merges cross word boundaries and the vocabulary fills with common phrases that do not generalize. The split keeps merges inside a word. The chunk boundaries also stop a merge from spanning the end of one word and the start of the next at inference, which is how training and inference stay consistent.
+不切分的话，合并会跨越词边界，词表会被不能泛化的常见短语填满。切分让合并留在词内。块边界还能阻止推理时的合并跨越上一个词的结尾和下一个词的开头，训练和推理就是这样保持一致的。
 
-### Special tokens
+### 特殊 token
 
-The ids after the byte block are reserved by hand. The training loop never sees the special strings, because the corpus is split and the strings are removed before pair counting, so no merge target can be a special id and no merge can include one. At inference the encoder takes a flag. With the flag off, the characters of a special string are ordinary bytes and tokenize as such. With the flag on, the exact string maps to its reserved id and is not subject to any merge. The matcher tries longer special strings first so that one string that contains another is matched whole.
+字节块之后的 id 是手工保留的。训练循环从来看不到特殊字符串，因为在统计字符对之前，语料已经被切分、这些字符串已被移除，所以任何合并目标都不会是特殊 id，任何合并也不会包含特殊 id。推理时编码器接受一个开关。开关关闭时，特殊字符串里的字符就是普通字节，照常分词。开关打开时，完全一致的字符串映射到保留 id，不参与任何合并。匹配器先尝试较长的特殊字符串，这样一个包含另一个的字符串会被整体匹配。
 
-### The guarantees to pin
+### 要固定的保证
 
-| Guarantee | Test |
+| 保证 | 测试 |
 |---|---|
-| Round trip on unseen text | encode then decode returns the exact bytes of the normalized input |
-| Multi-byte characters | a sentence with a four-byte emoji round-trips |
-| Literal special string, flag off | the string decodes back as text, not as a boundary |
-| Special string, flag on | exactly one id, the reserved one, appears |
-| Merge order | the same merge list gives the same ids on repeated encodes |
-| Reserved range | no merge in the table has a special id as a parent or a child |
+| 未见过文本的往返 | 编码再解码，得到规范化输入的精确字节 |
+| 多字节字符 | 含一个四字节 emoji 的句子能往返 |
+| 字面特殊字符串，开关关闭 | 字符串解码回文本，而不是边界 |
+| 特殊字符串，开关打开 | 恰好出现一个 id，就是保留的那个 |
+| 合并顺序 | 同一个合并列表在重复编码时给出相同的 id |
+| 保留区间 | 表中没有任何合并以特殊 id 作为父符号或子符号 |
 
-### The compression curve
+### 压缩曲线
 
-The number of ids for a held-out sentence falls as the merge budget grows. Training with a target vocabulary of 300 and then of 600 ids on the lesson corpus shows the drop directly; that curve is the measurement that justifies the vocabulary size.
+留出句子的 id 数量随合并预算增加而下降。在课程语料上先用 300 再用 600 个 id 的目标词表训练，可以直接看到下降；这条曲线就是支撑词表大小的测量。
 
 ## Follow-ups
 
-- **Level 3:** Why are the first 256 ids reserved for bytes rather than for the characters of the corpus? Expected: any input, including text in scripts the corpus never had, can then be encoded without an unknown token.
-- **Level 4:** Where do chat template markers fit in this design? Expected: they are special tokens like the boundary token, matched exactly before the merges, with fixed ids that the model was trained on; a wrong template puts the input outside the training distribution.
-- **Level 4:** How do you protect a deployed model from a tokenizer that drifts? Expected: hash the merge table and the special-token map, and check the hash in the pipeline before training and before serving; a different table decodes different ids.
+- **Level 3:** 前 256 个 id 为什么留给字节，而不是语料里的字符？ Expected: 这样任何输入，包括语料里从未出现过的文字，都能不借助未知 token 完成编码。
+- **Level 4:** 聊天模板标记在这个设计里放在哪里？ Expected: 它们和边界 token 一样是特殊 token，在合并前精确匹配，id 固定且模型用它们训练过；模板错了，输入就落到训练分布之外。
+- **Level 4:** 怎样防止已部署的模型遇到漂移的分词器？ Expected: 对合并表和特殊 token 映射算哈希，在训练前和部署前都在流水线里校验；表不同，解码出的 id 就不同。
 
 ## Wrong answers
 
-- "Add the special tokens to the corpus so the model learns them." Then they can be merged with neighbors and stop being single ids.
-- "Match special strings after the merges." The merges have already split the string into byte pieces, so the matcher never sees it.
-- "Decode by looking up a string per id in a dictionary." Ids are bytes, and a multi-byte character can be split across ids; concatenate bytes first, then decode.
+- "把特殊 token 加进语料，让模型学会它们。" 这样它们会和相邻符号合并，不再是单个 id。
+- "在合并之后再匹配特殊字符串。" 合并已经把字符串拆成了字节片段，匹配器根本看不到它。
+- "解码时用字典按 id 查字符串。" id 对应的是字节，一个多字节字符可能被拆到多个 id 里；先拼接字节，再解码。
 
 ## Taught in
 
-The [BPE from scratch lesson](../../../phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/) gives the byte floor, the reserved specials and the round-trip tests, the [production tokenizer lesson](../../../phases/10-llms-from-scratch/02-building-a-tokenizer/) adds normalization, pre-tokenization and exact matching of special strings, and the [BPE practice](../../../practice/bpe-merge-step/) is the merge step inside it.
+[从零实现 BPE 课](../../../phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/)给出了字节底座、保留的特殊 token 和往返测试，[生产级分词器课](../../../phases/10-llms-from-scratch/02-building-a-tokenizer/)加上了规范化、预分词和特殊字符串的精确匹配，[BPE 练习](../../../practice/bpe-merge-step/)就是其中的合并步骤。

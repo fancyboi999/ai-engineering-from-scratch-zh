@@ -1,6 +1,6 @@
 ---
 id: ab-test-prompt-rollout
-title: Roll out a new prompt without betting the product on it
+title: 在不拿核心产品冒险的前提下灰度发布新 Prompt
 card: system-design
 kind: design
 level: 2
@@ -16,51 +16,51 @@ related: [system-design/streaming-and-fallback, system-design/design-doc-blockin
 updated: 2026-11-03
 ---
 
-A new version of a chat prompt looks better in a notebook. Design how it reaches users: the stages, how users are assigned, what you measure at each stage, and when it rolls back automatically.
+在 Jupyter Notebook 中，新版对话 prompt 表现更优。请设计它触达线上用户的完整发布方案：包含哪些阶段、如何分配用户流量、各阶段度量哪些指标，以及在什么条件下触发自动回滚。
 
 ## Short answer
 
-Run it in shadow first, on all traffic, logging its answers without showing them, and compare quality metrics with the current prompt. Then route a small share of users to it, 10% in the lesson, and widen in steps to 25%, 50% and 100% while the metrics hold. Assign by a deterministic hash of the user id so each user sees one version, and roll back automatically when the new version's error rate reaches twice the old one over a window of requests.
+首先在全量流量上以影子模式运行，记录其回答但不向用户展示，与现有 prompt 对比质量指标。随后将少量用户流量路由到新版本，课程中为 10%，在指标保持稳定的前提下，按 25%、50% 和 100% 阶梯式放量。按用户 ID 的确定性哈希分流，确保每位用户始终看到一致的版本；若新版本在一定请求窗口内的错误率达到旧版本的两倍，则触发自动回滚。
 
 ## Full answer
 
-### Shadow mode
+### 影子模式
 
-The new prompt runs on 100% of traffic but only its logs are kept. Nobody sees its output. This gives a full comparison of latency, cost per request, guardrail block rate and quality scores against the current version, and users never see a shadow answer. Shadow calls can share the provider quota with live calls, so give them a separate quota or key; otherwise a quota limit can slow or fail live requests. It is the same first stage that the ML design lesson calls shadow deployment for a model.
+新版 prompt 在 100% 的流量上并行运行，但仅保留其日志记录，用户完全看不到其输出。这可以在不让任何用户看到影子回答的前提下，全面对比它与当前版本在延迟、单次请求成本、护栏拦截率和质量得分方面的表现。由于影子调用可能与线上调用共享模型供应商的配额，因此应为其配置独立的配额或 API Key；否则配额受限可能导致线上请求变慢或失败。这与机器学习系统设计课程中针对模型的第一阶段影子部署完全一致。
 
-### Percentage rollout
+### 百分比灰度发布
 
-Route 10% of traffic to the new version. If quality holds, raise it to 25%, then 50%, then 100%. If quality drops, switch back at once. Both versions stay deployed and the switch is configuration, so a rollback takes minutes, which is the lesson's rule for every stage.
+将 10% 的流量路由至新版本。若质量保持稳定，逐步提升至 25%、50%，直至 100%。若质量出现下滑，立即切换回滚。两个版本保持同时部署，流量切换完全通过配置完成，因此回滚在数分钟内完成，这也是课程中针对各个阶段制定的规则。
 
-### Deterministic assignment
+### 确定性分流分配
 
-Hash the user id combined with the name of the experiment and take it modulo 100. Buckets below the traffic share get the variant, the rest get the control. A user then sees the same version across requests inside one experiment, and the assignment can be recomputed later from the log. Random assignment per request mixes versions inside one conversation and makes the comparison noisy.
+将用户 ID 与实验名称拼接后计算哈希值，并对 100 取模。分桶数值小于目标流量比例的用户分配到实验组变体，其余分配给对照组。这样能保证同一用户在单次实验的所有请求中始终看到相同的版本，且该分流结果后续可根据日志完全重算复现。按单次请求随机分配会导致同一会话中混杂不同版本，从而给指标对比引入大量噪音。
 
-### What to measure
+### 度量指标
 
-Per prompt version: latency percentiles, user ratings where they exist, error rate, guardrail block rate and cost per request. The eval logger records the template name and version with every request, so the metrics split by version without extra plumbing.
+针对每个 prompt 版本分别统计：延迟分位数、用户评分（若有）、错误率、护栏拦截率以及单次请求成本。评估日志记录器会在每次请求时记录模板名称与版本号，无需额外接线即可按版本切分指标。
 
-### Automatic rollback
+### 自动回滚
 
-The lesson's exercise sets the rule: when a new version shows 2x the error rate of the previous version over 100 requests, revert automatically. The window matters; a handful of requests is noise, and waiting for thousands lets a bad prompt run too long.
+课程练习明确了规则：当新版本在 100 次请求的观察窗口内错误率达到前一版本的 2 倍时，触发自动回滚。观察窗口的大小至关重要；几次请求的波动只是偶然噪音，而等待数千次请求又会让劣质 prompt 线上运行过久。
 
-### A note on the business metric
+### 关于业务指标的补充说明
 
-Shadow and canary protect the user. Whether the new prompt improves the outcome that matters, such as task completion, needs a randomized split with enough traffic and time, which is the A/B stage from the ML design lesson.
+影子模式和金丝雀发布保护用户。新 prompt 能否改善关键业务结果（如任务完成率），仍需在流量和观察时间充足的随机分组实验中检验，即机器学习设计课程中的 A/B 测试阶段。
 
 ## Follow-ups
 
-- **Level 2:** Why hash the user id and not pick randomly per request? Expected: a user then gets one consistent version across a session and the assignment is reproducible from the log.
-- **Level 2:** What does shadow mode not tell you? Expected: how users react to the new answers; it only compares logged outputs and system metrics.
-- **Level 3:** The new prompt costs more per request but scores higher. Who decides? Expected: a guardrail on cost per request decides whether it can ship at all; the quality gain against the cost is then a product decision with both numbers on the table.
-- **Level 3:** How do you keep the control and the variant from sharing a cache entry? Expected: include the prompt version in the cache key, otherwise a hit returns the other version's answer and the comparison is corrupted.
+- **Level 2:** 为什么要哈希用户 ID，而不是按请求随机抽取？ Expected: 确保用户在整个会话期间获得一致的版本体验，且分流指派能够根据日志完全复现。
+- **Level 2:** 影子模式无法告诉你什么信息？ Expected: 用户对新回答的反应；它只能对比日志输出和系统级指标。
+- **Level 3:** 新 prompt 单次请求成本更高但得分也更高，由谁来决策？ Expected: 单次请求成本护栏决定其是否具备发布资格；在此前提下，质量收益与成本的权衡属于产品决策，需将两项数据摆在桌面上定夺。
+- **Level 3:** 如何防止对照组和实验组共享同一份缓存条目？ Expected: 在缓存键中包含 prompt 版本号，否则命中缓存会返回另一版本的回答，导致实验对比被污染。
 
 ## Wrong answers
 
-- "Ship to everyone and watch the dashboard." A regression then hits every user before the dashboard moves.
-- "Assign per request at random for a cleaner statistic." Users see both versions in one conversation and the logged metrics mix them.
-- "Shadow mode is enough; skip the canary." Shadow mode never shows the output to a user, so it cannot measure user reaction.
+- "直接全量上线，紧盯仪表盘就行。" 一旦出现退化，仪表盘还没来得及反映，所有用户就都已受到了影响。
+- "为了统计上更干净，每次请求随机指派版本。" 用户会在同一次对话中看到不同版本，记录的指标也会互相混杂。
+- "影子模式就足够了，跳过金丝雀灰度。" 影子模式从不向用户展示输出，因此根本无法衡量用户的真实反应。
 
 ## Taught in
 
-The [production LLM application lesson](../../../phases/11-llm-engineering/13-production-app/) describes shadow mode, percentage rollout and hashed assignment for prompts, and the [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) gives the same three stages with the rollback rule for models.
+[生产级 LLM 应用课程](../../../phases/11-llm-engineering/13-production-app/)描述了针对 prompt 的影子模式、百分比灰度发布与哈希分流机制，[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)给出了相同的模型三阶段发布与回滚规则。

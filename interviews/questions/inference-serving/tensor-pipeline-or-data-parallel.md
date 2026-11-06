@@ -1,6 +1,6 @@
 ---
 id: tensor-pipeline-or-data-parallel
-title: Choose tensor, pipeline or data parallelism
+title: 选择张量并行、流水线并行还是数据并行
 card: inference-serving
 kind: design
 level: 2
@@ -15,70 +15,69 @@ cheatsheet: []
 related: []
 updated: 2026-11-03
 ---
-
-You have a model that does not fit on one GPU, or you need more throughput than one GPU gives. Walk me through how you choose between tensor, pipeline and data parallelism, and what each one costs in communication.
+你的模型无法放进单张 GPU，或者你需要比单张 GPU 更高的吞吐量。请带我推演如何在张量并行、流水线并行与数据并行之间选择，以及每种并行在通信上需要付出什么代价。
 
 ## Short answer
 
-Ask three questions. If the model fits on one GPU with room for the KV cache you need, use data parallelism, one full copy per GPU, and the output grows with the copies. If it does not fit, split it: tensor parallelism inside one machine when the GPUs have a fast link and the GPU count divides the attention heads, and pipeline parallelism when they do not or when the model needs more than one machine. Tensor parallelism talks after every layer, pipeline parallelism once per stage boundary, and data parallelism not at all between copies.
+问三个问题。如果模型能放进单张 GPU 且留有你需要的 KV cache 空间，使用数据并行，每张 GPU 放一个完整副本，输出随副本数增长。如果放不下，切分模型：当 GPU 之间有高速链路且 GPU 数量能整除注意力头数时，在单机内使用张量并行；如果不满足或模型需要多台机器，使用流水线并行。张量并行在每一层之后通信，流水线并行在每个阶段边界通信一次，数据并行在副本之间完全不通信。
 
 ## Full answer
 
-### Three questions
+### 三个问题
 
-| Question | If yes | If no |
+| 问题 | 是 | 否 |
 |---|---|---|
-| Does the model fit on one GPU, with room for the KV cache you need? | Data parallelism: one copy per GPU, `--data-parallel-size N`. | Split the model; the next question decides where. |
-| Does the split model fit inside one machine? | Keep the split inside the machine; the next question picks the layout. | Add pipeline parallelism across machines. |
-| Do the GPUs have NVLink, and does the GPU count divide the model evenly? | Tensor parallelism, `--tensor-parallel-size N`. | Pipeline parallelism inside the machine, `--pipeline-parallel-size N`. |
+| 模型能否放进单张 GPU，并留有你需要的 KV cache 空间？ | 数据并行：每张 GPU 一个副本，`--data-parallel-size N`。 | 切分模型；下一个问题决定在哪里切分。 |
+| 切分后的模型能否放进单台机器？ | 把切分保留在机器内部；下一个问题决定具体布局。 | 跨机器增加流水线并行。 |
+| GPU 之间是否有 NVLink，且模型能均匀切分到这些 GPU 上？ | 张量并行，`--tensor-parallel-size N`。 | 机器内部使用流水线并行，`--pipeline-parallel-size N`。 |
 
-Across machines: set the pipeline size to the number of machines and the tensor size to the GPUs in each machine. The tensor size must divide the attention-head count. If the GPUs in a machine do not divide it, use a tensor size of 1 and put the whole GPU count into the pipeline size.
+跨机器时：将流水线大小设为机器台数，张量大小设为每台机器的 GPU 数。张量大小必须能整除注意力头数。如果机器内的 GPU 数无法整除头数，使用张量大小 1，把全部 GPU 数量放入流水线大小。
 
-### What each layout costs
+### 每种布局的代价
 
-| Layout | What it splits | Communication | Best for |
+| 布局 | 切分什么 | 通信 | 最适合 |
 |---|---|---|---|
-| Tensor | each layer across GPUs | after every layer, so it needs a fast link | a model too big for one GPU, inside one machine |
-| Pipeline | the layers into stages | once per stage boundary | a model too big for one machine, or GPUs without a fast link |
-| Data | nothing, each GPU holds a copy | none between copies | more output from a model that fits |
-| Expert | the experts of a mixture-of-experts model | before and after the expert layers | large expert models |
+| 张量 | 把每一层切分到各 GPU | 每一层之后通信，需要高速链路 | 单机内单张 GPU 放不下的大模型 |
+| 流水线 | 把各层切分为不同阶段 | 每个阶段边界通信一次 | 单台机器放不下的模型，或没有高速链路的 GPU |
+| 数据 | 不切分，每张 GPU 持有一个副本 | 副本之间无通信 | 放得下的模型需要更高输出 |
+| 专家 | 切分 MoE 模型的各个专家 | 专家层前后通信 | 大型 MoE 模型 |
 
-Tensor parallelism also splits the KV cache, so each GPU has more room for it. When the weights fill most of one GPU, two GPUs can hold several times the pool of one. The exception is a model with multi-head latent attention: it stores one compressed latent per token that cannot be split across heads, so every tensor-parallel rank keeps the full cache and more ranks add no tokens. Attention data parallelism answers that case.
+张量并行还会切分 KV cache，因此每张 GPU 有更多空间留给缓存。当权重占满单张 GPU 的大部分空间时，两张 GPU 能容纳的池是单张卡的数倍。例外是使用多头潜在注意力（multi-head latent attention）的模型：它为每个 token 存储一个无法按头切分的压缩 latent，所以每个张量并行 rank 都要保留完整的 cache，增加 rank 并不能增加 token 容量。注意力数据并行能解决这种场景。
 
-### Check the link
+### 检查链路
 
-Tensor parallelism sends data after every layer. On GPUs joined only by PCIe, such as two L4s in one host, that traffic can cost more than the split saves. The vLLM documentation suggests pipeline parallelism on such a machine, because it sends data only at stage boundaries, and it also accepts a GPU count that does not divide the model evenly. The manual did not run either layout on its two L4s, so measure them against each other before you pick.
+张量并行在每一层之后都要发送数据。在仅靠 PCIe 连接的 GPU 上（例如同一台主机内的两张 L4），这种通信开销可能超过切分带来的收益。vLLM 文档建议在这样的机器上使用流水线并行，因为它只在阶段边界发送数据，而且不要求模型能均匀切分到这些 GPU 上。手册没有在它的两张 L4 上运行这两种布局，所以在做出选择前应实测对比两者。
 
-### Start a second machine
+### 启动第二台机器
 
-Run the collective test script on both machines first. When the network and the drivers work, each process prints its success lines. Then start the server with a launcher that spans the machines, and start the API on one machine only. The traffic between the machines is not encrypted and can run code on the other side, so keep it on a private network.
+先在两台机器上运行集合通信测试脚本。当网络和驱动正常工作时，每个进程会打印成功日志。然后使用跨机器的启动器启动服务器，并且只在其中一台机器上启动 API。机器之间的流量未经加密，并且可能在另一端执行代码，因此必须保留在私有网络中。
 
-### Count the processes
+### 统计进程
 
-With data parallelism vLLM starts one engine core per copy and one coordinator that keeps them in step. With tensor parallelism it starts one worker per GPU under one engine core. In SGLang the world size is `--tp-size` times `--pp-size`, and `--dp-size` copies get a controller that sends each request to one copy, round robin by default. That controller does not look at pools or queues. On the manual's two L4s, where one card was shared and its copy had a pool of 2,925 tokens against 24,094, the pair served less than one card at every load.
+使用数据并行时，vLLM 为每个副本启动一个引擎核心，并由一个协调器保持它们同步。使用张量并行时，它在一个引擎核心下为每张 GPU 启动一个 worker。在 SGLang 中，world size 是 `--tp-size` 乘以 `--pp-size`，而 `--dp-size` 个副本由一个控制器管理，控制器默认以轮询方式将每个请求发送给一个副本。该控制器不检查池大小或队列。在手册测试的两张 L4 上，其中一张卡是共享的，其副本的池只有 2,925 token（另一张是 24,094），成对运行在各个负载下的输出反而低于单张卡。
 
-### Give a tensor group whole GPUs
+### 给张量组分配完整的 GPU
 
-Before SGLang loads weights for a tensor group, each rank measures its free memory and the group keeps the smallest value. If that value is under 90 percent of the local free memory, the server stops. On the shared pair the second card had 18.28 GB free against the 19.53 GB that the check required, so `--tp-size 2` refused to start, and no flag turns the check off. Every rank holds the same share of weights and the same pool, so the smallest card sets the size for all of them.
+在 SGLang 为张量组加载权重之前，每个 rank 会测量自己的空闲显存，整个组取最小值。如果该值低于本地空闲显存的 90%，服务器会停止运行。在共享的双卡环境中，第二张卡有 18.28 GB 空闲，而检查要求 19.53 GB，因此 `--tp-size 2` 拒绝启动，且没有任何参数可以关闭此检查。每个 rank 承担相同份额的权重和相同的池，因此最小的卡决定了所有卡的容量。
 
-### Very long prompts
+### 超长 prompt
 
-For prompts of hundreds of thousands of tokens, vLLM can split one sequence across GPUs with context parallelism. Use it when one long request is the problem, not when many short ones are.
+对于几十万 token 的 prompt，vLLM 可以使用上下文并行（context parallelism）将单条序列切分到多张 GPU 上。在单个长请求构成瓶颈时使用它，而不是在许多短请求排队时使用。
 
 ## Follow-ups
 
-- **Level 2:** Two GPUs in one host joined by PCIe only, and the model fits on one. What do you run? Expected: data parallelism, two full copies, because nothing moves between copies; tensor parallelism would pay after every layer over the slow link.
-- **Level 3:** The model needs two machines of 8 GPUs. How do you set the sizes, and what do you check first? Expected: pipeline size 2 for the machines and tensor size 8 inside each, with 8 dividing the attention heads; run the collective test on both machines first and keep the traffic on a private network, because it is not encrypted.
-- **Level 3:** Tensor parallelism on two GPUs where one is shared with another job. What does SGLang do at startup? Expected: it measures free memory on each rank, keeps the smallest, and stops if that is under 90 percent of the local free memory, because every rank holds the same share and pool; give the group whole GPUs.
-- **Level 4:** Why does tensor parallelism add no KV capacity when the attention keeps one latent per token? Expected: that attention stores one compressed latent per token that cannot be split across heads, so every rank keeps the full cache; attention data parallelism gives each group its own requests and cache, so capacity grows with the groups.
+- **Level 2:** 同一主机内的两张 GPU 仅靠 PCIe 连接，且模型能放进单卡。你跑什么？ Expected: 数据并行，两个完整副本，因为副本之间没有任何数据流动；张量并行在慢速链路的每一层之后都要付出通信代价。
+- **Level 3:** 模型需要 2 台各带 8 张 GPU 的机器。你怎么设置尺寸，首先检查什么？ Expected: 机器之间流水线大小设为 2，每台机器内张量大小设为 8，且 8 能整除注意力头数；先在两台机器上运行集合通信测试，并将流量保留在私有网络中，因为通信未经加密。
+- **Level 3:** 在两张 GPU 上做张量并行，其中一张与另一个任务共享。SGLang 启动时会做什么？ Expected: 它测量每个 rank 上的空闲显存，取最小值，若低于本地空闲显存的 90% 则停止，因为每个 rank 承担相同的份额和池；给张量组分配完整的 GPU。
+- **Level 4:** 为什么当注意力机制为每个 token 保留一个 latent 时，张量并行无法增加 KV 容量？ Expected: 这种注意力为每个 token 存储一个无法跨头切分的压缩 latent，所以每个 rank 都保留完整缓存；注意力数据并行让每个组处理自己的请求和缓存，因此容量随组数增长。
 
 ## Wrong answers
 
-- "Tensor parallelism is the default way to use more GPUs." It is the way to make a model fit; when the model fits, data parallelism adds output with no traffic between copies, and tensor parallelism over PCIe can cost more than it saves.
-- "More copies always mean more throughput." Only when every copy has about the same pool; a pair where one copy had an eighth of the pool served less than one card, because the round-robin controller fed it half the requests.
-- "Pipeline parallelism is only for several machines." Inside one machine it is the choice when the GPUs lack a fast link or when the GPU count does not divide the model evenly.
-- "Any GPU count works with tensor parallelism." The size must divide the attention-head count of the model; otherwise use a tensor size of 1 and put the whole count into the pipeline size.
+- "张量并行是利用更多 GPU 的默认方式。" 它是让模型能放下的方式；当模型放得下时，数据并行增加输出且副本之间没有通信流量，而在 PCIe 上做张量并行消耗的可能超过节省的。
+- "副本越多总意味着吞吐量越高。" 只有当每个副本拥有大致相同的池时才成立；在一个副本只有八分之一池大小的双卡配置中，它的表现弱于单卡，因为轮询控制器分给它一半的请求。
+- "流水线并行只用于多台机器。" 在单台机器内，当 GPU 缺乏高速链路或 模型无法均匀切分到这些 GPU 上时，流水线并行就是合适之选。
+- "任何 GPU 数量都可以做张量并行。" 尺寸必须能整除模型的注意力头数；否则使用张量大小 1，把全部数量放入流水线大小。
 
 ## Taught in
 
-[Choose tensor, pipeline, or data parallelism](../../../manuals/vllm-101/sections/6-1-choose-tensor-pipeline-or-data-parallelism.md) gives the decision tree, and [the SGLang parallelism section](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md) adds the memory balance check and the unequal pair.
+[选择张量、流水线还是数据并行](../../../manuals/vllm-101/sections/6-1-choose-tensor-pipeline-or-data-parallelism.md)给出了决策树，[SGLang 并行一节](../../../manuals/sglang-101/sections/6-1-tp-size-dp-size-and-attn-dp-size.md)补充了显存平衡检查和不均衡双卡测试。

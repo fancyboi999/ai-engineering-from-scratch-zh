@@ -1,6 +1,6 @@
 ---
 id: peeking-at-an-ab-test
-title: Stopping an experiment on the first good morning
+title: 在首个表现良好的早晨终止 A/B 实验的隐患
 card: production-mlops
 kind: tradeoff
 level: 3
@@ -16,46 +16,46 @@ related: [production-mlops/evals-or-ab-test, production-mlops/split-ratio-mismat
 updated: 2026-11-03
 ---
 
-A product manager reads the experiment dashboard every morning and wants to end the test on the first day the variant looks significant. Twenty other experiments run this quarter under the same plan. What is wrong with it, and what do you offer instead?
+某位产品经理每天早上查看实验看板，希望在变体首次达到统计显著的那天就结束测试。本季度还有二十个实验也按同样的方案运行。这样做有什么问题？你提供什么替代方案？
 
 ## Short answer
 
-A fixed-sample test assumes one look at a sample size chosen in advance. Looking every day and stopping at the first significant result gives noise many chances to cross the line, so the false positive rate climbs. Offer a sequential test, which stays valid under repeated looks and still allows an early stop on a clear winner. Across many experiments, correct for multiple comparisons, and reduce variance with pre-experiment data so each test needs fewer samples.
+固定样本量检验假设只在预先选定的样本量下检查一次结果。每天查看并在首次显著时停止，会给噪声多次越过阈值的机会，导致假阳性率上升。应改用序贯检验，它在反复查看时仍然有效，也允许在胜出结果明确时提前结束。多个实验之间要做多重比较校正，并用实验前数据降低方差，减少每次测试需要的样本。
 
 ## Full answer
 
-### The peeking problem
+### 反复查看结果的问题
 
-Classical A/B analysis assumes the sample size is fixed before the test. Each extra look is another test, and a stop at the first significant look selects the noise. The manager's plan is not wrong because it looks often. It is wrong because it decides on a procedure that was not built for repeated decisions.
+经典 A/B 分析假设样本量在测试前固定。每多看一次就是多做一次检验，首次显著时就停止，选中的可能只是噪声。经理的方案错不在于经常查看，而在于用不适合反复决策的方法做决策。
 
-### Sequential testing
+### 序贯检验
 
-Always-valid sequential procedures, such as the mixture sequential probability ratio test and confidence sequences, control the false positive rate under repeated looks. You can check daily and stop early on a clear winner, and the error rate stays what you set. The lesson's simulator shows the fixed and the sequential boundaries side by side.
+始终有效的序贯方法，例如混合序贯概率比检验和置信序列，能在反复查看时控制假阳性率。你可以每天检查，胜出结果明确时提前停止，错误率仍保持在设定水平。课程模拟器并排展示了固定样本量检验和序贯检验的边界。
 
-### Twenty experiments
+### 二十个实验
 
-At 95 percent confidence, 20 experiments produce about one false positive by chance. Two corrections exist. Bonferroni divides the error rate by the number of tests, which is strict. Benjamini-Hochberg controls the false discovery rate and is less conservative. Choose by the cost of one false launch against the cost of missing a real win.
+在 95% 置信度下，20 个实验仅凭偶然就会产生约一个假阳性。有两种校正方法。Bonferroni 将错误率除以检验次数，比较严格。Benjamini-Hochberg 控制错误发现率，相对不那么保守。选择取决于一次错误上线的代价与错过真实改进的代价。
 
-### Variance reduction
+### 降低方差
 
-CUPED regresses out the variance that pre-experiment data explains. The lesson gives a typical reduction of 30 to 70 percent, which raises the effective sample size at no cost in traffic. That is the honest way to shorten a test.
+CUPED 用回归剔除实验前数据能解释的方差。课程给出的典型降幅是 30% 到 70%，无需增加流量就能提高有效样本量。这才是合理缩短测试的方法。
 
-### Two more checks
+### 另外两项检查
 
-A sample ratio mismatch check catches a broken assignment before you read any result. Non-determinism in model output lowers the effective sample size, so the lesson multiplies the required sample by about 1.3 to 1.5.
+解读任何结果之前，样本比例不匹配检查能发现分组故障。模型输出的非确定性会降低有效样本量，因此课程将所需样本量乘以约 1.3 到 1.5。
 
 ## Follow-ups
 
-- **Level 3:** Bonferroni or Benjamini-Hochberg for the quarter? Expected: Bonferroni when any false launch is costly, Benjamini-Hochberg when you accept a controlled share of false discoveries in exchange for power.
-- **Level 3:** What does CUPED need, and what does it give? Expected: it needs a pre-period metric for each unit, and it gives a tighter estimate from the same traffic.
-- **Level 4:** A new model needs a larger sample than the quarter allows. What do you change? Expected: pick a primary metric with lower variance, apply CUPED, or extend the test. Do not shorten it by stopping early under a fixed-sample procedure.
+- **Level 3:** 本季度该选 Bonferroni 还是 Benjamini-Hochberg？ Expected: 任何一次错误上线代价都高时，选 Bonferroni；愿意接受受控比例的错误发现以换取更高检验功效时，选 Benjamini-Hochberg。
+- **Level 3:** CUPED 需要什么，能得到什么？ Expected: 每个实验单元的实验前指标，能用相同流量得到更精确的估计。
+- **Level 4:** 新模型所需样本量超过本季度能提供的数量，怎么办？ Expected: 选择方差更低的主要指标、应用 CUPED，或延长测试。不要在固定样本量方法下靠提前停止来缩短测试。
 
 ## Wrong answers
 
-- "Stopping early is fine when the p-value is small." Under a fixed-sample test, a small p-value on the first day is partly selected noise. Only a sequential procedure keeps that stop valid.
-- "Run all the tests at 95 percent and ship the winners." About one winner is a false positive by chance. Correct for multiple comparisons.
-- "A longer test is always more reliable." Longer helps only if the assignment is sound. Check the sample ratio first.
+- "p 值小就可以提前停止。" 固定样本量检验下，第一天的小 p 值有一部分来自挑选出的噪声。只有序贯方法能让这种停止决策保持有效。
+- "所有测试都按 95% 置信度运行，胜出的就上线。" 约一个胜出结果会是偶然产生的假阳性，应做多重比较校正。
+- "测试越长就越可靠。" 只有分组没有问题时，延长测试才有帮助。先检查样本比例。
 
 ## Taught in
 
-The [A/B testing lesson](../../../phases/17-infrastructure-and-production/21-ab-testing-llm-features/) covers sequential tests, CUPED, SRM checks and multiple-comparison corrections.
+[A/B 测试课程](../../../phases/17-infrastructure-and-production/21-ab-testing-llm-features/)涵盖序贯检验、CUPED、SRM 检查和多重比较校正。

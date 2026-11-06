@@ -1,6 +1,6 @@
 ---
 id: why-scale-by-sqrt-dk
-title: Why the attention scores are divided before the softmax
+title: 注意力分数为什么要在 softmax 之前做除法
 card: transformers
 kind: concept
 level: 1
@@ -16,52 +16,52 @@ related: []
 updated: 2026-11-03
 ---
 
-In the attention formula the raw scores go through a division before the softmax. A new engineer calls the division a convention and removes it to save one multiply. What happens to training, and how would you show the effect in ten minutes?
+注意力公式里，原始分数在进入 softmax 之前要先做一次除法。一位新工程师认为这个除法只是惯例，为了省一次乘法把它删了。训练会怎样？你怎么在十分钟内展示这个影响？
 
 ## Short answer
 
-A dot product of two vectors grows with their length, so without the division the scores grow with the key dimension. Large scores push the softmax into a region where one key takes almost all of the weight and the gradient to every other key is close to zero, so learning stalls. The division by `sqrt(d_k)` keeps the variance of the scores about constant for any head size. Show it with random Q and K at `d_k = 64`: print the score range and the softmax weights with and without the division.
+两个向量的点积随长度增长，所以不做除法，分数就随键的维度增大。分数太大会把 softmax 推进一个区域：一个键拿走几乎全部权重，流向其他每个键的梯度都接近零，学习就停滞了。除以 `sqrt(d_k)` 让分数的方差在任何头大小下都基本不变。用 `d_k = 64` 的随机 Q 和 K 来展示：分别打印做与不做除法时的分数范围和 softmax 权重。
 
 ## Full answer
 
-### The size of a score
+### 分数有多大
 
-A score is the sum of `d_k` products. When the components of Q and K have unit variance, the sum has variance `d_k`, so a typical score is about `sqrt(d_k)` in size. At `d_k = 64` the raw scores sit in the range of tens. A softmax over scores in the tens puts almost all of its mass on the largest entry.
+一个分数是 `d_k` 个乘积之和。Q 和 K 的各分量方差为 1 时，这个和的方差是 `d_k`，所以一个典型分数的大小约为 `sqrt(d_k)`。在 `d_k = 64` 时，原始分数在几十的范围内。对几十量级的分数做 softmax，几乎全部质量都落在最大的那一项上。
 
-### Why the model stops learning
+### 模型为什么停止学习
 
-The gradient of the softmax with respect to a score is small when one weight is near one and the others are near zero. The attention layer then behaves like a fixed lookup. The loss plateaus, and nothing fails loudly. The lesson calls this regime one where "one entry has almost all the mass and the others are vanishingly small".
+当一个权重接近 1、其余接近 0 时，softmax 对分数的梯度很小。注意力层的表现就像一次固定的查找。损失进入平台期，没有任何明显的报错。课程把这种状态描述为「一项拿走了几乎全部质量，其余各项小到可以忽略」。
 
-### The fix and its range
+### 修复方法和取值范围
 
-Divide the scores by `sqrt(d_k)` before the softmax:
+在 softmax 之前把分数除以 `sqrt(d_k)`：
 
 ```text
 weights = softmax(Q @ K.T / sqrt(d_k))
 output  = weights @ V
 ```
 
-In multi-head attention the dimension under the root is the head width, `d_head = d_model / n_heads`, not the model width. Production models land `d_head` at 64 or 128. The scaling keeps the score variance constant at any width. The lesson's rule of thumb keeps heads at 32 or wider, because a narrower head sees too few dimensions, and below 256, because wider heads lose the benefit of many small specialists.
+在多头注意力中，根号下的维度是头宽度 `d_head = d_model / n_heads`，而不是模型宽度。生产模型的 `d_head` 落在 64 或 128。缩放让分数方差在任何宽度下都保持不变。课程的经验法则是头宽度保持在 32 或以上，因为更窄的头看到的维度太少；并且低于 256，因为更宽的头会失去许多小专家分工的好处。
 
-### The ten-minute demonstration
+### 十分钟的演示
 
-1. Draw Q and K from a standard normal with `d_k = 64`.
-2. Print `(Q @ K.T).max()` with and without the division.
-3. Print the largest softmax weight in one row for both cases. Without the division it sits near one.
+1. 从标准正态分布中采样 Q 和 K，`d_k = 64`。
+2. 分别打印做与不做除法时的 `(Q @ K.T).max()`。
+3. 两种情况下各打印一行中最大的 softmax 权重。不做除法时它接近 1。
 
 ## Follow-ups
 
-- **Level 1:** What is the shape of the score matrix for a sequence of n tokens? Expected: (n, n), one row per query and one column per key.
-- **Level 2:** Why does the missing division cause a silent failure instead of an exception? Expected: the softmax saturates, the gradients become tiny, and the loss plateaus with no error.
-- **Level 2:** Does the division change what the layer can represent? Expected: no, the projections can absorb a constant; it changes the scale of the scores at initialization, which is where training happens or stalls.
-- **Level 3:** With eight heads of width 64 in a model of width 512, which number goes under the root? Expected: 64, the head width, because each head computes its own softmax over its own scores.
+- **Level 1:** n 个 token 的序列，分数矩阵是什么形状？ Expected: (n, n)，每个查询一行，每个键一列。
+- **Level 2:** 为什么缺了除法会静默失败，而不是抛异常？ Expected: softmax 饱和，梯度变得很小，损失进入平台期，没有任何报错。
+- **Level 2:** 这个除法改变了这一层能表示的东西吗？ Expected: 没有，投影可以吸收一个常数；它改变的是初始化时分数的尺度，而训练能否推进正取决于这个阶段。
+- **Level 3:** 宽度 512 的模型有八个宽度 64 的头，根号下放哪个数？ Expected: 64，即头宽度，因为每个头对自己的分数做自己的 softmax。
 
 ## Wrong answers
 
-- "The division keeps the attention weights summing to one." The softmax normalizes any scores to sum to one; the division controls their spread, not their sum.
-- "A larger learning rate recovers the lost gradient." When the softmax is saturated the gradient carries almost no information about the other keys, and a larger step does not create information.
-- "Scale the values instead of the scores." The values are summed after the weights are fixed, so their scale does not touch the softmax.
+- "除法是为了让注意力权重之和为 1。" softmax 对任何分数都会归一化到和为 1；除法控制的是分数的离散程度，不是总和。
+- "调大学习率就能找回丢掉的梯度。" softmax 饱和时，梯度几乎不携带其他键的信息，更大的步长也造不出信息。
+- "缩放值，而不是缩放分数。" 值是在权重确定之后才相加的，所以它们的尺度碰不到 softmax。
 
 ## Taught in
 
-The [self-attention lesson](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/) explains the saturation, the [multi-head lesson](../../../phases/07-transformers-deep-dive/03-multi-head-attention/) gives the head widths, and the [capstone attention block](../../../phases/19-capstone-projects/33-multihead-self-attention/) applies the scaling inside the batched block.
+[从零实现自注意力一课](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/)解释了饱和，[多头注意力一课](../../../phases/07-transformers-deep-dive/03-multi-head-attention/)给出了头宽度，[注意力 block 综合项目](../../../phases/19-capstone-projects/33-multihead-self-attention/)在批量 block 里应用了这个缩放。

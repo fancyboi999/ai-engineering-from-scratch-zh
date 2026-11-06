@@ -1,6 +1,6 @@
 ---
 id: a2a-rejected-task-loop
-title: The poll loop that never ends and the deploy that should not
+title: 永远停不下的轮询，和不该发生的部署
 card: protocols
 kind: debug
 level: 2
@@ -16,56 +16,56 @@ related: [protocols/a2a-card-before-the-call]
 updated: 2026-11-03
 ---
 
-A planner polls a remote agent with `GetTask` until a task is done. It stops when the state is completed, failed or canceled. Against a deploy agent, the loop never returns. Against a test runner, the planner deploys a build whose test suite had a failure. Explain both bugs.
+一个 planner 用 `GetTask` 轮询远程 agent，直到任务结束。状态为 completed、failed 或 canceled 时它就停下。对着一个部署 agent，这个循环永远不返回。对着一个测试运行器，planner 部署了一个测试套件里有失败用例的构建。解释这两个 bug。
 
 ## Short answer
 
-The loop knows three terminal states, and there are four. The deploy agent rejected the task, and a task in `TASK_STATE_REJECTED` never changes again, so the loop spins forever. The test runner finished the work it was asked to do, so its task is `TASK_STATE_COMPLETED` even with a failing test, because the verdict is a result and results travel in artifacts.
+循环只认识三种终态，而终态有四种。部署 agent 拒绝了任务，处于 `TASK_STATE_REJECTED` 的任务再也不会变化，所以循环一直空转。测试运行器完成了要求它做的工作，所以即使有测试失败，它的任务也是 `TASK_STATE_COMPLETED`；测试结论是结果，而结果放在产物里传递。
 
 ## Full answer
 
-### Nine states, two sets the client must hard-code
+### 九种状态，客户端必须写死的两组
 
-| Class | States |
+| 类别 | 状态 |
 |---|---|
-| active | `TASK_STATE_SUBMITTED`, `TASK_STATE_WORKING` |
-| interrupted | `TASK_STATE_INPUT_REQUIRED`, `TASK_STATE_AUTH_REQUIRED` |
-| terminal | `TASK_STATE_COMPLETED`, `TASK_STATE_FAILED`, `TASK_STATE_CANCELED`, `TASK_STATE_REJECTED` |
+| 活跃 | `TASK_STATE_SUBMITTED`、`TASK_STATE_WORKING` |
+| 中断 | `TASK_STATE_INPUT_REQUIRED`、`TASK_STATE_AUTH_REQUIRED` |
+| 终态 | `TASK_STATE_COMPLETED`、`TASK_STATE_FAILED`、`TASK_STATE_CANCELED`、`TASK_STATE_REJECTED` |
 
-`TASK_STATE_UNSPECIFIED` is the proto zero value. Treat it, and any unknown name, as an error. The proto marks four states terminal and two interrupted, and it gives no transition table, so accept any transition out of a state that is not terminal. A deploy agent can reject straight from submitted.
+`TASK_STATE_UNSPECIFIED` 是 proto 的零值。把它和任何不认识的名字都当作错误。proto 把四种状态标为终态、两种标为中断，但没有给出状态迁移表，所以要接受从任何非终态出发的任何迁移。部署 agent 可以直接从 submitted 进入 rejected。
 
-### Bug one: the forgotten ending
+### Bug 一：漏掉的结局
 
-Rejected means the agent decided not to do the task. In the recorded run the status message read "Production deploys are outside this agent's policy. Use the release train." The same request gets the same refusal, so the planner should stop and follow the message, not retry.
+rejected 表示 agent 决定不做这个任务。在录制的运行里，状态消息是“Production deploys are outside this agent's policy. Use the release train.”（生产部署不在该 agent 的策略内，请走发布流程）。同样的请求会得到同样的拒绝，所以 planner 应该停下并照消息去做，而不是重试。
 
-### Bug two: a state is not a verdict
+### Bug 二：状态不是结论
 
-Completed means the task finished successfully, and the job was to run the suite. In the recorded blocking run the status message said "1 failed, 11 passed", and the `summary.json` artifact carried `"passed": 11` and `"failed": 1`. A planner reads the `failed` count in that data part before it deploys. A message should not carry the output of a task.
+completed 表示任务成功完成，而这个任务的工作是运行测试套件。在录制的阻塞运行里，状态消息是“1 failed, 11 passed”，`summary.json` 产物里有 `"passed": 11` 和 `"failed": 1`。planner 在部署前要读这个 data part 里的 `failed` 计数。任务的输出不应该放在消息里。
 
-### What a finished task still answers
+### 已结束的任务还会怎么回答
 
-| Call on a terminal task | Reply |
+| 对终态任务的调用 | 回复 |
 |---|---|
-| `GetTask` | the final task, while the server keeps it |
-| `SendMessage` with its `taskId` | `UnsupportedOperationError`, `-32004` |
-| `SubscribeToTask` | `UnsupportedOperationError`, `-32004` |
-| `CancelTask` | `TaskNotCancelableError`, `-32002` |
+| `GetTask` | 最终的任务，只要服务器还保留着 |
+| 带上它的 `taskId` 调用 `SendMessage` | `UnsupportedOperationError`，`-32004` |
+| `SubscribeToTask` | `UnsupportedOperationError`，`-32004` |
+| `CancelTask` | `TaskNotCancelableError`，`-32002` |
 
-To go on, start a new task in the same `contextId` and name the finished task in `referenceTaskIds`.
+要继续，就在同一个 `contextId` 里新建任务，并在 `referenceTaskIds` 里写上已结束的任务。
 
 ## Follow-ups
 
-- **Level 2:** Which other states must the loop handle, and how? Expected: the two interrupted states; answer `TASK_STATE_INPUT_REQUIRED` with a message on the same task, and route `TASK_STATE_AUTH_REQUIRED` to an approver outside A2A while you subscribe or poll.
-- **Level 3:** You call `CancelTask` and get `-32002`. What next? Expected: call `GetTask`; canceled means an earlier cancel worked, another terminal state means the task ended first, and a running state means the server cannot stop it.
-- **Level 3:** The agent process crashed mid-task and your blocking send returned an error. Is the task failed? Expected: treat the outcome as unknown; the reference SDK stores the task as failed, but the client only saw an error, so read the task back.
-- **Level 4:** How do you continue a completed review with a changed diff? Expected: a new task with the same `contextId`, no `taskId`, and the old task in `referenceTaskIds`; a terminal task takes no more messages.
+- **Level 2:** 循环还必须处理哪些状态？怎么处理？ Expected: 两种中断状态；对 `TASK_STATE_INPUT_REQUIRED`，在同一个任务上发消息回答；对 `TASK_STATE_AUTH_REQUIRED`，把它转给 A2A 之外的审批人，同时继续订阅或轮询。
+- **Level 3:** 你调用 `CancelTask`，收到 `-32002`。下一步做什么？ Expected: 调用 `GetTask`；canceled 表示之前的一次取消生效了，其他终态表示任务先结束了，运行中的状态表示服务器停不下它。
+- **Level 3:** agent 进程在任务中途崩溃，你的阻塞发送返回了错误。任务算失败了吗？ Expected: 把结果当作未知；参考 SDK 会把任务存为 failed，但客户端只看到一个错误，所以要把任务读回来。
+- **Level 4:** diff 变了，怎么在一次已完成的评审基础上继续？ Expected: 新建一个任务，用同一个 `contextId`，不带 `taskId`，在 `referenceTaskIds` 里写上旧任务；终态任务不再接受消息。
 
 ## Wrong answers
 
-- "Compare the state with the lower-case string `completed`." The current version sends enum names such as `TASK_STATE_COMPLETED`, and an unknown name must be an error, not a wait.
-- "A completed task means the tests passed." Completed means the agent finished the work it was asked to do. The verdict is in the artifact.
-- "Send another message to the rejected task and ask again." A terminal task refuses messages. Start a new task in the same context.
+- "把状态和小写字符串 `completed` 比较。" 当前版本发送的是 `TASK_STATE_COMPLETED` 这样的枚举名，不认识的名字必须当作错误，而不是继续等。
+- "任务 completed 说明测试通过了。" completed 表示 agent 完成了要求它做的工作。结论在产物里。
+- "给被拒绝的任务再发一条消息，重新问一次。" 终态任务拒收消息。在同一个上下文里新建任务。
 
 ## Taught in
 
-The [terminal states section](../../../manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md) shows the four endings from the recorded runs, and the [task state section](../../../manuals/a2a-101/sections/3-4-task-and-task-state.md) classifies all nine values.
+[CancelTask 与终态一节](../../../manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md)展示了录制运行中的四种结局，[Task、TaskStatus 和 TaskState 一节](../../../manuals/a2a-101/sections/3-4-task-and-task-state.md)对全部九个取值做了分类。

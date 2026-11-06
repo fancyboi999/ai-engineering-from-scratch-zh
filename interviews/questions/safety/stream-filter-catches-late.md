@@ -1,6 +1,6 @@
 ---
 id: stream-filter-catches-late
-title: The detector said benign and the stream was cut
+title: 检测器判为良性，输出流却被截断了
 card: safety
 kind: debug
 level: 3
@@ -16,46 +16,46 @@ related: [safety/gate-aggregation-table, safety/one-regex-is-not-a-detector]
 updated: 2026-11-03
 ---
 
-Your gate blocks most attacks before the model runs. In the trace of one request the detector said benign, the model began answering with a procedure it must never give, and the response was cut after a few tokens and shipped as a redacted partial. Explain which layer acted, why the first layer missed, and whether the outcome is correct.
+你的门控会在模型运行前拦下大多数攻击。在某个请求的 trace 里，检测器判为良性，模型开始回答一段绝不能给出的操作步骤，几个 token 之后回复被截断，作为脱敏后的部分内容发了出去。解释是哪一层起了作用，第一层为什么漏掉，以及这个结果对不对。
 
 ## Short answer
 
-The streaming filter acted: it buffers a short window of emitted chunks, sweeps it for known continuation phrases, terminates the stream on a match and marks the output as terminated early, which the aggregator treats as a medium signal and maps to redact. The detector missed because the prompt was an encoding trick or a prefix injection whose surface the input rules did not cover. The outcome is correct for the design: the harmful continuation never completed, and the trace records the miss for the detector team.
+起作用的是流式过滤器：它缓冲已输出块的一个短窗口，在里面扫描已知的续写短语，命中就终止输出流，并把输出标记为提前终止；聚合器把这当作 medium 信号，映射为 redact。检测器漏掉，是因为这个 prompt 是编码伎俩或前缀注入，它的表面形式不在输入规则的覆盖范围内。按这个设计，结果是对的：有害的续写没能写完，trace 也为检测器团队记下了这次漏判。
 
 ## Full answer
 
-### The layer that acted
+### 起作用的那一层
 
-The gate runs at three checkpoints. Pre generation is the detector. During generation is a filter over the model's stream: the mock yields chunks of four tokens, the filter holds up to two chunks, runs a regex of continuation phrases over the window, and on a match stops the iterator and returns the partial output marked as terminated early. Post generation runs the classifier router and the rules engine on whatever was emitted.
+门控在三个检查点运行。生成前是检测器。生成中是模型输出流上的过滤器：模拟模型每次产出四个 token 的块，过滤器最多保留两个块，在窗口上跑一条匹配续写短语的正则，命中就停止迭代器，返回标记为提前终止的部分输出。生成后，分类器路由器和规则引擎对已经输出的内容运行。
 
-### Why the detector missed
+### 检测器为什么漏掉
 
-Two taxonomy categories are built to pass input rules. An encoding trick hides the forbidden tokens in base64, rot13, leet speak or zero width characters, and a rule set that does not decode that form sees nothing. A prefix injection ends the prompt with the first words of the answer, so the model continues from an assumed yes instead of deciding; the prompt itself can look harmless. The capstone's mock produces a partial harmful continuation on exactly that subset of attacks, on purpose, so the layers can be seen interacting.
+分类法里有两类攻击就是为了穿过输入规则而设计的。编码伎俩把违禁 token 藏进 base64、rot13、leet speak 或零宽字符里，不解码这种形式的规则集什么也看不到。前缀注入在 prompt 末尾写上回答的开头几个词，模型就会从一个默认的“好”接着往下写，而不是先做决定；prompt 本身看起来可能无害。综合项目的模拟模型故意在这部分攻击上产出一段不完整的有害续写，好让人看到各层如何互相配合。
 
-### Why redact and not block
+### 为什么是脱敏而不是拦截
 
-Early termination is one medium signal. The post generation pass on the partial text found nothing high. The maximum is medium, so the action is redact: the classifier redactors and the rules fixer run over the partial, and it ships with a trace that shows the detector verdict, the matched termination pattern, the post generation verdicts, the final action and the latency.
+提前终止是一个 medium 信号。生成后对部分文本的检查没有发现 high。最大值是 medium，所以动作是 redact：分类器脱敏器和规则修复器处理这段部分输出，然后连同 trace 一起发出。trace 里有检测器判定、命中的终止模式、生成后的各项判定、最终动作和延迟。
 
-### What to do with the trace
+### 拿 trace 做什么
 
-Add the prompt to the taxonomy as a fixture with its category and severity. Add or adjust a detector rule for its family. Rerun the metrics runner and read the recall change in that category and the false positive change on the benign list. The trace exists so that a miss becomes a fixture instead of a story.
+把这个 prompt 作为样本加入分类法，写上类别和严重度。为它所在的家族新增或调整一条检测规则。重新运行指标运行器，看这一类的召回率变化，以及良性列表上的误报变化。trace 的意义在于让一次漏判变成一个样本，而不是一个故事。
 
-### The limit
+### 局限
 
-The window holds two chunks. A continuation phrase split across more chunks escapes the filter, and the post generation pass is the backstop. A gate that looked only after generation would let a prefix injection stream its procedure to the user before any check.
+窗口只装两个块。续写短语拆到更多块里，就能逃过过滤器，这时由生成后检查兜底。如果门控只在生成后检查，前缀注入就能在任何检查之前把操作步骤流式发给用户。
 
 ## Follow-ups
 
-- **Level 3:** Why does the filter hold two chunks instead of scanning each chunk alone? Expected: a continuation phrase can span a chunk boundary; the window lets the regex see across it at the cost of a short delay.
-- **Level 3:** Which taxonomy categories does this layer exist for? Expected: encoding tricks that pass the input rules, and prefix injection, where the prompt sets the first words of the answer.
-- **Level 4:** What is the next action for the detector team, and how do they know it worked? Expected: add the prompt as a fixture with its category, add or adjust a rule, and read the per category recall and the benign false positive rate from the metrics runner.
+- **Level 3:** 为什么过滤器保留两个块，而不是逐块单独扫描？ Expected: 续写短语可能跨越块的边界；窗口让正则能跨边界匹配，代价是一点延迟。
+- **Level 3:** 这一层是为分类法里哪些类别而设的？ Expected: 能穿过输入规则的编码伎俩，以及由 prompt 设定回答开头几个词的前缀注入。
+- **Level 4:** 检测器团队下一步做什么？怎么知道有效？ Expected: 把这个 prompt 作为带类别的样本加入，新增或调整一条规则，然后从指标运行器读出按类别的召回率和良性误报率。
 
 ## Wrong answers
 
-- "The gate failed because the detector said benign." The gate is layered so that a miss in one layer is caught by the next; the trace shows the design working.
-- "Ship nothing when the stream is cut." The design maps early termination to redact and ships the partial through the redactors; a block needs a high signal.
-- "Scan the whole output after generation instead." A post hoc only look lets a prefix injection stream its procedure to the user before the check; the filter exists to stop the stream early.
+- "检测器判为良性，所以门控失败了。" 门控是分层的，一层漏掉的由下一层抓住；trace 显示设计在正常工作。
+- "输出流被截断时，什么都不发。" 设计把提前终止映射为 redact，部分输出经过脱敏器后发出；拦截需要 high 信号。
+- "改成生成结束后扫描整段输出。" 只做事后检查，前缀注入就能在检查之前把操作步骤流式发给用户；过滤器就是为了尽早停掉输出流。
 
 ## Taught in
 
-The [end to end safety gate capstone](../../../phases/19-capstone-projects/87-end-to-end-safety-gate/) builds the streaming filter and the trace, and the [jailbreak taxonomy capstone](../../../phases/19-capstone-projects/82-jailbreak-taxonomy/) defines the categories that reach it.
+[端到端安全门控综合项目](../../../phases/19-capstone-projects/87-end-to-end-safety-gate/)实现了流式过滤器和 trace，[越狱分类法综合项目](../../../phases/19-capstone-projects/82-jailbreak-taxonomy/)定义了会到达这一层的攻击类别。

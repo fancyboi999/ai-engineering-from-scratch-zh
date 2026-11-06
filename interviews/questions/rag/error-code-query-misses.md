@@ -1,6 +1,6 @@
 ---
 id: error-code-query-misses
-title: Vector search misses the article with the exact error code
+title: 向量搜索漏掉包含精确错误码的文章
 card: rag
 kind: debug
 level: 2
@@ -16,42 +16,42 @@ related: [rag/rrf-beats-score-sum, rag/read-the-rrf-function]
 updated: 2026-11-03
 ---
 
-Support agents search the knowledge base with the exact error code from a ticket, such as E-4021. The vector search returns articles about error handling in general and misses the one article that contains that code. What is happening, and what do you add?
+客服用工单中的精确错误码（如 E-4021）搜索知识库。向量搜索返回了介绍通用错误处理的文章，却漏掉唯一包含该错误码的文章。发生了什么？应该增加什么？
 
 ## Short answer
 
-The embedding model treats a rare code as noise, so the query vector lands near articles about errors in general and not near the one exact match. Add a lexical index with BM25 next to the vector index, run both for every query, and merge the two ranked lists with reciprocal rank fusion. The exact token wins on BM25, and the fused list puts that article first.
+嵌入模型把罕见错误码当成噪声，查询向量因此靠近通用错误处理文章，而不是精确匹配项。在向量索引旁增加 BM25 词法索引，每次查询同时运行两者，再用倒数排名融合合并列表。精确 token 在 BM25 上胜出，融合后的列表把这篇文章排在第一。
 
 ## Full answer
 
-### Two retrievers, two strengths
+### 两种检索器各有所长
 
-Semantic search understands meaning. "How do I cancel my subscription" matches "steps to terminate your plan" with no shared word. It misses exact matches, because a code such as E-4021 carries no meaning for the model to embed.
+语义搜索理解含义。“如何取消订阅”可以匹配“终止套餐的步骤”，即使两者没有共同词语。但它会漏掉精确匹配，因为 E-4021 这样的错误码没有可供模型嵌入的语义。
 
-Lexical search does the opposite. BM25 scores a document by summing, over the query terms, an inverse document frequency factor times a saturating term frequency factor with a length correction. A term that appears in few documents weighs most, so a rare code is exactly what BM25 is best at. It fails when the query and the document share no words.
+词法搜索恰好相反。BM25 对每个查询词计算逆文档频率与经过饱和及长度修正的词频因子的乘积，再求和。在少量文档中出现的词权重最高，因此罕见错误码正适合 BM25。查询和文档没有共同词语时，它就失败了。
 
-### Hybrid search
+### 混合检索
 
-Run both retrievers in parallel and fuse by rank: each document gets the sum of one over k plus its rank in each list, with k at 60. The capstone demo shows the three cases. The literal symbol query sits at BM25 rank 1 and dense rank 4, and fuses to rank 1. The paraphrased query sits at BM25 rank 6 and dense rank 1, and fuses to rank 1. The fusion wins on both query classes, so the fix for the error code does not cost the paraphrased queries.
+并行运行两种检索器，按排名融合：对每篇文档，将各列表中的 1 / (k + rank) 相加，k 取 60。综合项目演示了三类查询。字面符号查询在 BM25 中排第 1，在稠密检索中排第 4，融合后排第 1。改写查询在 BM25 中排第 6，在稠密检索中排第 1，融合后也排第 1。融合在两类查询上都胜出，所以修好错误码查询不会牺牲改写查询。
 
-### Two details that matter
+### 两个关键细节
 
-- **Field weighting.** If the codes live in a title or symbol field, repeat those tokens at index time so a title match counts more than a body match. The math stays the same.
-- **Out-of-vocabulary codes.** A code present in the ticket and absent from every article gets zero from BM25, because its document frequency is zero, while the dense side still returns plausible-looking neighbors. De-duplicate by document so the empty lexical side adds no stray rank contributions. Rank fusion still scores the documents that only the dense side returns, so they stay in the fused list and can rank first. Check that a retrieved article contains the code, and when none does, say that no retrieved article contains it instead of answering from the neighbors.
+- **字段加权。** 若错误码位于标题或符号字段，建立索引时重复这些 token，让标题匹配比正文匹配更有分量，计算公式不变。
+- **词表外错误码。** 工单中的错误码若未出现在任何文章中，文档频率为零，BM25 不会为它贡献分数；稠密检索仍可能返回貌似合理的邻近项。按文档去重，避免空的词法结果增加多余排名贡献。排名融合仍会保留仅由稠密检索返回的文档，它们甚至可能排首位。要检查检索到的文章是否包含该错误码；若都不包含，应明确说明检索结果中没有包含该错误码的文章，而不是根据邻近项作答。
 
 ## Follow-ups
 
-- **Level 2:** Why does BM25 give a rare code so much weight? Expected: the inverse document frequency factor; a term in few documents scores high and a term in most documents scores low.
-- **Level 2:** The code is in the ticket but in no article at all. What does each retriever return? Expected: BM25 contributes nothing for that term, and the dense retriever still returns neighbors that look plausible and are wrong, and the fusion keeps them; check that a retrieved article contains the code, and when none does, say that no retrieved article contains it.
-- **Level 3:** How do the paraphrased queries fare after you add the lexical index? Expected: they still win, because the fusion is rank based; in the demo the paraphrased query sat at BM25 rank 6 and dense rank 1 and fused to rank 1.
-- **Level 3:** The codes live in a short title field and the body is long prose. What do you tune? Expected: field weighting, which repeats the title tokens at index time so a title match counts more.
+- **Level 2:** BM25 为什么给罕见错误码很高的权重？ Expected: 逆文档频率因子使少量文档中的词得分高，大多数文档都有的词得分低。
+- **Level 2:** 错误码出现在工单中，但知识库完全没有，各检索器会返回什么？ Expected: BM25 不为该词贡献分数，稠密检索仍返回看似合理却错误的邻近项，融合也保留这些结果；应检查文章是否含该错误码，若没有就明确说明。
+- **Level 3:** 增加词法索引后，改写查询的效果怎样？ Expected: 依然胜出，因为融合基于排名；演示中改写查询在 BM25 中排第 6、稠密检索中排第 1，融合后排第 1。
+- **Level 3:** 错误码在简短标题中，正文很长，应调整什么？ Expected: 字段加权，在索引阶段重复标题 token，提高标题匹配权重。
 
 ## Wrong answers
 
-- "Switch to a better embedding model." A rare code has no meaning to learn; the fix is a lexical signal next to the semantic one.
-- "Lower the similarity threshold so more articles come back." More neighbors on the wrong topic do not include the one exact match.
-- "Replace the vector search with BM25." Then the queries that share no words with the article fail; run both and fuse.
+- "换一个更好的嵌入模型。" 罕见错误码缺少可学习的语义；应在语义信号之外增加词法信号。
+- "降低相似度阈值，让更多文章进入结果。" 更多偏题邻近项不能补上那个精确匹配项。
+- "用 BM25 替换向量搜索。" 这样会使与文章没有共同词语的查询失败；应同时运行并融合。
 
 ## Taught in
 
-The lesson [advanced RAG](../../../phases/11-llm-engineering/07-advanced-rag/) contrasts the two retrievers, and the lesson [hybrid retrieval](../../../phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/) shows the three query classes, field weighting and the out-of-vocabulary case.
+[进阶 RAG](../../../phases/11-llm-engineering/07-advanced-rag/)课程比较两种检索器，[混合检索](../../../phases/19-capstone-projects/65-hybrid-retrieval-bm25-dense/)课程展示三类查询、字段加权和词表外情形。

@@ -1,6 +1,6 @@
 ---
 id: which-knob-first
-title: Three runs to close a VLM benchmark gap
+title: 用三次训练缩小 VLM 基准差距
 card: multimodal
 kind: tradeoff
 level: 3
@@ -16,57 +16,57 @@ related: [multimodal/llm-size-sets-ceiling]
 updated: 2026-11-03
 ---
 
-You lead a small team training an open vision-language model. The first run lands well below the open-weight models of its size on a general benchmark and on a document-reading benchmark. You can afford three more full runs. Which three changes do you make, in what order, and what do you expect each to move?
+你负责带领一个小团队自研训练一款开源视觉语言模型（VLM）。第一次全量训练的跑分结果严重落后于同等参数规模的开源竞争对手，尤其在通用基准和文档阅读（OCR）基准上差距明显。团队的计算资源预算仅够再支撑三次全量训练。你会按什么顺序执行哪三项改动？你预期每一项改动将分别拉升哪些指标？
 
 ## Short answer
 
-Order the runs by the variance each axis explains. First, the resolution schedule and the token count: ramp from a low resolution to a high one and add image splitting for the document benchmark, where moving from 448 to 980 pixels added 3 to 5 points in the ablations. Second, the encoder: swap the common contrastive encoder for the stronger one, which added 3 or more points on the general benchmark, and concatenate a self-supervised encoder if grounding matters. Third, the data: replace distilled synthetic captions with dense human-written ones, which beat the distilled set on every benchmark in the reference comparison; leave the connector alone, because at a fixed token count it moves scores by about a point.
+严格按照各设计轴向所能解释的方差贡献大小来规划这三次实验。第一次实验聚焦分辨率调度与 Token 数量：采用由低到高渐进式预热并引入针对文档的高分辨率图像动态切片，在消融研究中将分辨率从 448 提升到 980 像素为阅读基准带来了 3 到 5 分的显著跃升。第二次实验聚焦视觉编码器：将常见的对比学习编码器换用为更强规格的对比编码器（通用基准提升 3 分以上），若考查定位则拼接自监督编码器特征。第三次实验聚焦数据质量：将模型蒸馏的合成描述全面替换为详尽的人工口述描述，该策略在基准对比中在全部 11 项基准上击败了模型蒸馏数据；坚决不把宝贵的实验预算浪费在连接器上，因为固定 token 数量下连接器对得分的影响仅在 1 分左右。
 
 ## Full answer
 
-### The evidence behind the order
+### 实验优先顺序背后的消融科学依据
 
-| Axis | What the ablations found | Expected move |
+| 设计轴向 | 消融实验的核心发现 | 预期带来的指标提升 |
 |---|---|---|
-| Visual tokens and resolution | about 60 percent of the variance; 384 to 448 adds 1 to 2 points; 448 to 980 with splitting adds 3 to 5 on reading tasks | the document benchmark |
-| Encoder | about 20 percent; a stronger contrastive encoder adds 3 or more; self-supervised features lead vision-centric tests by 5 to 7 | the general benchmark, counting and grounding |
-| Data | dense human captions beat distillation on 11 of 11 benchmarks in the reference comparison | both benchmarks, grounded detail most |
-| Connector | about 5 percent; within 1 point at a fixed token count | nothing worth a run |
-| Language model | 7B to 13B adds 2 to 4 points | both, if the budget allows a larger model |
+| 视觉 Token 与分辨率 | 解释了模型跑分约 60% 的方差；从 384 升至 448 提 1 到 2 分；448 结合切片升至 980 提 3 到 5 分 | 拉升文档阅读基准 |
+| 视觉编码器选型 | 解释约 20% 的方差；换用强对比编码器提 3 分以上；自监督特征在纯视觉感知上领先 5 到 7 分 | 拉升通用多模态基准、物体计数与空间坐标定位 |
+| 训练数据质量 | 详尽人工口述描述在权威对比实验中于 11 个基准上全部击败模型蒸馏数据 | 全面提升两套基准，对事实真实锚定度提升最显著 |
+| 连接桥接层架构 | 仅解释约 5% 的方差；在固定 token 数量下各类架构差距在 1 分以内 | 微乎其微，完全不值得为此单独浪费一次全量训练 |
+| 大语言模型规模 | 7B 扩大到 13B 稳定提升 2 到 4 分 | 若显存和算力预算允许换大底座，能全面拉升推理分 |
 
-### Run 1: resolution and tokens
+### 实验 1：分辨率调度与视觉 Token 数量
 
-Flat low-resolution training plateaus at medium accuracy. Ramp from 224 to 448 or native, then add splitting for reading tasks up to about 1280 pixels on the long side. The token count explains the most variance, and documents need pixels.
+采用固定的低分辨率训练很容易让模型过早陷入中等准确率的瓶颈平台期。在训练中采用渐进预热策略（从 224 平滑爬升至 448 或原生分辨率），并在阅读任务中针对长边引入最高约 1280 像素的动态切片方案。Token 总量解释了最大的跑分方差，而阅读图表和密集文字必须拥有物理像素。
 
-### Run 2: encoder
+### 实验 2：升级视觉编码器
 
-Swap to the stronger contrastive encoder at native resolution. If the benchmark includes counting or spatial questions, concatenate a self-supervised encoder's features, as the vision-centric recipes do. Retrain the projector; the language model keeps its adapters.
+在原生分辨率下切换至更强劲的对比学习编码器。若基准测试包含细粒度计数、空间几何关系或密集目标定位，按视觉先锋配方将自监督编码器（如 DINOv2）的特征一同拼接注入。保持大语言模型适配器不变，仅需微调重训投影层。
 
-### Run 3: data
+### 实验 3：数据
 
-Replace distilled captions with dense human captions where you can get them, and top up with task-specific instruction data for the document questions. The reference result: a model trained on 712K densely captioned images with no distilled data beat a much larger competitor on every benchmark listed. Caption density beats caption quantity, which beats distillation convenience.
+在能获取到高质量数据的范围内，全面用详尽的人工口述描述替代大模型批量生成的蒸馏描述，并针对文档图表问题补充垂直领域的真实指令微调数据。权威参考表明：仅使用 71.2 万张详尽描述且不含任何蒸馏数据的模型，全面击败了参数规模大得多的竞争对手。数据密度胜过数据总量，真实锚定性胜过蒸馏的廉价便利。
 
-### What you do not run
+### 不做连接器消融
 
-A connector ablation. Several controlled studies put it within a point at a fixed token count; the token count is the knob, and run 1 already turned it.
+多项受控研究表明，在固定 token 数量下不同连接器的跑分差异小于 1 分；单图 token 数量才是关键杠杆，而实验 1 已经调整了该杠杆。
 
-### How to keep the runs comparable
+### 如何保持训练可比性
 
-One axis per run, the same eval, the same seed where the framework allows it, and a record of the data mix and the resolution schedule for each. A run that changed two things cannot be credited to either.
+每次实验严格只改变单一轴向，在完全相同的测试集上评测，在框架允许下锁定随机种子，并详尽记录每次实验的数据混合配比与分辨率调度计划。一次性改动两个维度的混乱实验无法将收益科学归因给任何一方。
 
 ## Follow-ups
 
-- **Level 3:** Why does the document benchmark respond to resolution and the general one less? Expected: reading needs pixels per character; general questions need semantics that the encoder already carries at a low resolution.
-- **Level 3:** What does a resolution ramp buy over a flat high resolution? Expected: faster alignment early and a higher end point; the ablations show that flat schedules plateau at medium accuracy.
-- **Level 4:** You cannot get human captions in time. What is the next best data move? Expected: filter the distilled captions for grounding against the image with a contrastive checker and drop the ungrounded tail; density matters, but ungrounded density teaches hallucination.
-- **Level 4:** If a fourth run appears, is it the connector or the language model? Expected: the language model, if memory allows a larger one; it lifts reasoning by points, where the connector moves a fraction of one.
+- **Level 3:** 为什么文档基准对分辨率极度敏感，而通用基准相对不敏感？ Expected: 字符识别阅读需要足够的物理像素来支撑微观笔画细节；而通用场景问题更多依赖编码器在低分辨率下就已经捕捉到的宏观全局语义。
+- **Level 3:** 渐进式分辨率预热相比一上来就固定高分辨率训练带来了什么收益？ Expected: 前期收敛速度更快，且最终跑分天花板更高；消融实验证实固定不变的调度容易过早陷入中等精度的平台期。
+- **Level 4:** 若无法及时获取高质量人工标注数据，退而求其次的数据举措是什么？ Expected: 用图文对比打分器对照图像过滤现有蒸馏描述的真实锚定度，剔除低分长尾脏数据；信息密度固然重要，但缺乏真实锚定的虚假信息密度只会助长模型的幻觉。
+- **Level 4:** 如果获得了第四次全量实验的追加算力预算，你应该尝试连接器还是更换大语言模型？ Expected: 更换大语言模型底座（若显存和部署成本允许）；扩大语言模型能带来几个整分的综合推理提升，而连接器最多只能带来不足 1 分的微弱扰动。
 
 ## Wrong answers
 
-- "Start with the connector; it is the cheapest to retrain." Cheap and useless: at a fixed token count it moves scores by about a point in every controlled study.
-- "Generate more captions with a stronger proprietary model." Distilled captions inherit hallucinations; the reference comparison shows dense human captions beating distillation across the board.
-- "Train longer at the same settings." The ablations put the gap in resolution, encoder and data, not in steps; more steps at a flat low resolution plateau.
+- "先从连接器改起，因为它的重训开销最小最快。" 廉价但毫无效果：在固定 token 数量下更换连接器对分数的改变在 1 分以内。
+- "用更强大的商业大模型生成更多数量的合成描述。" 蒸馏描述必然带来严重的先验幻觉；基准对比显示详尽人工描述在所有榜单上全胜模型蒸馏数据。
+- "在现有相同的配置下增加训练步数延长训练。" 消融研究表明跑分差距源自分辨率、编码器和数据本身，而非步数不足；在低分辨率下盲目延长时间只会停留在平台期。
 
 ## Taught in
 
-The [open-weight recipes lesson](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/) gives the five-axis design space and the ablation tables, and the [LLaVA lesson](../../../phases/12-multimodal-ai/05-llava-visual-instruction-tuning/) shows the tiling scheme that the resolution run adds.
+[开源 VLM 训练配方课程](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/)给出了五维设计空间与消融归因表，[LLaVA 课程](../../../phases/12-multimodal-ai/05-llava-visual-instruction-tuning/)展示了动态切片切块的落地范式。

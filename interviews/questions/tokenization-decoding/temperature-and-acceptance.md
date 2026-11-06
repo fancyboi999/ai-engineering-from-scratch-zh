@@ -1,6 +1,6 @@
 ---
 id: temperature-and-acceptance
-title: Speculation flies on code and stalls on creative writing
+title: 推测解码在代码上飞快，在创意写作上停滞
 card: tokenization-decoding
 kind: tradeoff
 level: 2
@@ -16,51 +16,51 @@ related: [tokenization-decoding/speedup-from-alpha]
 updated: 2026-11-03
 ---
 
-Your creative-writing product samples at a high temperature and speculative decoding gives it no speedup at all, while the same setup flies on code completion. Explain the difference, and describe what the acceptance test becomes at temperature zero.
+你们的创意写作产品用较高的温度采样，推测解码完全没有带来加速；同样的配置在代码补全上却快得飞起。解释这个差别，并说明温度为零时接受检验变成什么。
 
 ## Short answer
 
-Acceptance depends on how often the verifier agrees with what the draft sampled. At a high temperature the target distribution is flat, the draft's samples spread across many tokens, and the acceptance ratio of verifier to draft probability falls toward one over the vocabulary size, so almost every draft is rejected and the draft's cost is paid for nothing. Code and structured output are predictable, so acceptance climbs above 0.9. At temperature zero the rule becomes a comparison: accept if the drafted token equals the verifier's most likely token, otherwise emit that token and stop.
+接受率取决于验证器有多常认同草稿采出的 token。温度高时，目标分布很平，草稿的采样分散在许多 token 上，验证器概率与草稿概率之比降向词表大小分之一，几乎每个草稿都被拒，草稿的成本白付了。代码和结构化输出可预测性强，接受率能升到 0.9 以上。温度为零时，规则变成一次比较：草稿 token 等于验证器最可能的 token 就接受，否则输出那个 token 并停止。
 
 ## Full answer
 
-### Why temperature is the lever
+### 为什么温度是关键
 
-The acceptance test is `u < min(1, q(d) / p(d))`. When both distributions are peaked on the same token the ratio is near one and the draft is accepted. Raise the temperature and both distributions flatten: the draft now samples tokens that the verifier gives little probability, the ratios shrink, and the rejections pile up. The lesson's exercise runs the loop at a temperature of 1.5 to show the collapse, where the algorithm becomes slower than plain decoding because the draft overhead stays and the accepted tokens vanish.
+接受检验是 `u < min(1, q(d) / p(d))`。两个分布都尖锐地集中在同一个 token 上时，比值接近 1，草稿被接受。升高温度，两个分布都变平：草稿开始采出验证器只给很小概率的 token，比值变小，拒绝越积越多。课程的练习在温度 1.5 下跑这个循环来展示崩溃：草稿的开销还在，被接受的 token 却没了，算法比普通解码还慢。
 
-### Why the task matters
+### 为什么任务很重要
 
-| Workload | Measured speedup in the lesson |
+| 负载 | 课程里实测的加速 |
 |---|---|
-| chat | 2 to 3 times |
-| code generation | 3 to 5 times |
-| creative writing | near zero |
+| 对话 | 2 到 3 倍 |
+| 代码生成 | 3 到 5 倍 |
+| 创意写作 | 接近零 |
 
-Code and structured output have a highly predictable next token, so even an imperfect draft agrees with the verifier most of the time; the EAGLE-3 lesson puts acceptance above 0.9 on such output. Open-ended prose at a high temperature has many acceptable continuations, and the draft rarely picks the one the verifier would.
+代码和结构化输出的下一个 token 高度可预测，即使草稿不完美，大多数时候也与验证器一致；EAGLE-3 课程给出这类输出的接受率在 0.9 以上。高温度下的开放式文本有许多可接受的续写，草稿很少恰好选中验证器会选的那一个。
 
-### The greedy case
+### 贪心情形
 
-With temperature zero both models are deterministic. The test reduces to `argmax(q) == d`: accept on a match, otherwise output `argmax(q)` and stop. The residual distribution is not needed, because the verifier's choice is a single token.
+温度为零时，两个模型都是确定的。检验退化为 `argmax(q) == d`：一致就接受，否则输出 `argmax(q)` 并停止。不需要残差分布，因为验证器的选择只有一个 token。
 
-### What to do about it
+### 怎么处理
 
-- Switch speculation off per request when the temperature is high, or route such requests to a plain decode pool; the EAGLE-3 lesson lists temperature-aware switching as a tuning knob.
-- Do not spend the draft on very short outputs of 1 to 5 tokens either; the overhead dominates.
-- Measure the acceptance rate per product surface and keep speculation where it pays; the production lesson's floor is about 0.55 at high concurrency.
+- 温度高时按请求关掉推测解码，或者把这类请求路由到普通解码池；EAGLE-3 课程把按温度切换列为一个调优开关。
+- 也不要给 1 到 5 个 token 的极短输出用草稿；开销会占大头。
+- 按产品场景分别测接受率，只在划算的地方保留推测解码；生产课程给出的高并发底线约为 0.55。
 
 ## Follow-ups
 
-- **Level 2:** What does the acceptance ratio become when the draft and the verifier agree exactly? Expected: one, so every draft is accepted and each pass yields the full draft plus the bonus token.
-- **Level 3:** May the draft sample at a different temperature from the verifier? Expected: yes, as long as p is the distribution the draft actually sampled from; the output still follows the verifier's distribution, but a mismatch lowers acceptance.
-- **Level 3:** How would you implement the switch in a serving layer? Expected: read the request's temperature and output length, and disable speculation above a temperature threshold or below a length threshold, with the thresholds set from measured acceptance.
-- **Level 4:** Why is the loss worse at high concurrency than the formula suggests? Expected: a rejected draft costs a verify and a re-roll that serialize under a full batch, and the batch already fills the memory bandwidth that speculation was exploiting, so the tail latency suffers.
+- **Level 2:** 草稿和验证器完全一致时，接受比值是多少？ Expected: 1，所以每个草稿都被接受，每次前向产出全部草稿加一个额外 token。
+- **Level 3:** 草稿可以用和验证器不同的温度采样吗？ Expected: 可以，只要 p 是草稿实际采样所用的分布；输出仍然服从验证器的分布，但不一致会降低接受率。
+- **Level 3:** 在服务层怎样实现这个开关？ Expected: 读取请求的温度和输出长度，温度高于阈值或长度低于阈值时禁用推测解码，阈值根据实测接受率设定。
+- **Level 4:** 为什么高并发下的损失比公式预测的更糟？ Expected: 被拒的草稿要付出一次验证和一次重抽，满批时它们串行排队；而推测解码原本利用的内存带宽已经被 batch 占满，长尾延迟因此变差。
 
 ## Wrong answers
 
-- "Lower the temperature so speculation works." The product chose the temperature for a reason; change the decoding path for those requests, not the product.
-- "The draft is too small; use a bigger draft." Size is not the issue when the target distribution is flat; a larger draft still cannot guess which of many acceptable tokens the verifier samples.
-- "At high temperature speculation changes the output." The rejection rule keeps the output distribution exact at any temperature; what changes is the speed.
+- "调低温度，让推测解码起作用。" 产品选这个温度是有原因的；该改的是这些请求的解码路径，不是产品。
+- "草稿太小了，换个大的。" 目标分布很平时，问题不在大小；更大的草稿也猜不出验证器会从众多可接受的 token 里采到哪一个。
+- "高温度下推测解码会改变输出。" 拒绝规则在任何温度下都让输出分布保持精确；变的只是速度。
 
 ## Taught in
 
-The [Phase 7 speculative decoding lesson](../../../phases/07-transformers-deep-dive/16-speculative-decoding/) ties acceptance to the decoding strategy, the [Phase 10 speculative decoding lesson](../../../phases/10-llms-from-scratch/25-speculative-decoding/) gives the greedy case and the workload table, the [EAGLE-3 lesson](../../../phases/10-llms-from-scratch/15-speculative-decoding-eagle3/) names the switching knob, and the [production EAGLE-3 lesson](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/) sets the acceptance floor.
+[阶段 7 推测解码课程](../../../phases/07-transformers-deep-dive/16-speculative-decoding/)把接受率和解码策略联系起来，[阶段 10 推测解码课程](../../../phases/10-llms-from-scratch/25-speculative-decoding/)给出了贪心情形和负载表，[EAGLE-3 课程](../../../phases/10-llms-from-scratch/15-speculative-decoding-eagle3/)提到了切换开关，[生产环境 EAGLE-3 课程](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/)给出了接受率底线。

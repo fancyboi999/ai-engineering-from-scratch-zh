@@ -1,6 +1,6 @@
 ---
 id: a-worker-died-mid-run
-title: A worker died mid-run, and the user paid for the run
+title: Worker 进程中途崩溃且用户已为该次运行付费
 card: multi-agent
 kind: design
 level: 3
@@ -16,15 +16,15 @@ related: []
 updated: 2026-11-03
 ---
 
-Your multi-agent prototype runs in one process with an in-memory event loop. In production, runs last hours while they wait for human input, worker processes crash and lose everything, peak load is ten times the average, and users are charged per run so a retried side effect is a double charge. Design the layer that goes under the agents, and say what you would build first.
+你的多 agent 原型系统在基于内存事件循环的单个进程中运行。在生产环境中，由于等待人工输入，单次运行持续数小时，worker 进程崩溃并丢失所有内容，峰值负载是平均值的十倍，且用户按次付费，因此重试副作用会导致二次扣费。请设计位于 agent 底层的架构层，并说明你最先构建什么。
 
 ## Short answer
 
-Put a durable execution layer under the agents: persist the full run state after each step under a run id, so that when a worker crashes its lease expires and any other worker resumes from the last checkpoint. That needs serializable state, a deterministic resume, and idempotent side effects. For the charge, use a deduplication key per run and an outbox so that side effects are written as intent first and executed once, use asynchronous I/O for the model calls, and deploy new versions beside old ones so that in-flight runs are never killed. Build the simplest version first, a web service with a relational database, and adopt a workflow engine when a measured problem demands it.
+在 agent 底层放置持久化执行层：在每一步之后将完整的运行状态持久化在运行 ID 下，以便当 worker 崩溃时其租约到期，任何其他 worker 都可以从最后一个检查点恢复。这需要可序列化的状态、确定性恢复和幂等副作用。针对计费，每次运行使用去重键并使用发件箱，以便副作用首先作为意图写入并仅执行一次，对模型调用使用异步 I/O，并在旧版本旁边部署新版本以便正在进行的运行绝不被终止。首先构建最简单的版本（带有关系型数据库的 Web 服务），等实测问题确实需要时，再采用工作流引擎。
 
 ## Full answer
 
-### The resume path
+### 恢复路径
 
 ```text
 worker crashes mid-step
@@ -34,55 +34,55 @@ worker crashes mid-step
   -> no duplicate side effect
 ```
 
-Three requirements make this work:
+三项要求使该机制生效：
 
-1. **Serializable state.** Everything the agent holds must be persistable. A closure with a live database connection does not survive a crash.
-2. **Deterministic resume.** Given the same state and the same inputs, the agent takes the same actions, or defers to a recorded result for the model calls.
-3. **Idempotent side effects.** Every external call carries a key, or writes to a table first and is executed by a separate process.
+1. **可序列化状态。** agent 所持有的全部内容必须能够被持久化。带有活跃数据库连接的闭包无法在崩溃后幸存。
+2. **确定性恢复。** 给定相同的状态和相同的输入，agent 会采取相同的行动，或者对模型调用直接使用已记录的结果。
+3. **幂等副作用。** 每次对外调用都携带一个键，或者先写入表中并由独立进程执行。
 
-Graph runtimes write a checkpoint after each step under a thread id. Workflow engines write after each activity. Event-sourced runtimes keep a journal. The pattern is the same.
+基于图的运行时在每个步骤之后按线程 ID 写入检查点。工作流引擎在每个活动之后写入。基于事件溯源的运行时维护日志。其模式是相同的。
 
-### The waiting run
+### 等待中的运行
 
-A run that waits hours for a human must not hold a worker. The runtime persists the run, releases the worker, and any worker resumes when the input arrives. That is what makes the checkpoint the unit of the system rather than the process.
+等待人工输入数小时的运行绝不能占用 worker。运行时将运行状态持久化，释放 worker，并在输入到达时由任何 worker 恢复。这正是使检查点而非进程成为系统单元的原因。
 
-### Exactly once, effectively
+### 实际达到恰好一次的效果
 
-At-least-once delivery plus an idempotent consumer is the only kind of exactly-once you get.
+至少一次投递加幂等消费者，是你能得到的唯一一种“恰好一次”。
 
-| Move | What it does |
+| 做法 | 效果 |
 |---|---|
-| Deduplication key per run | Included in every side-effect call so a retry is recognized |
-| Outbox | Intent is written to a table, and a separate executor performs it and marks it done |
-| Compensating transaction | When the effect succeeded and the tracking write failed, schedule the reverse |
+| 每次运行的去重键 | 包含在每次副作用调用中，以便识别重试 |
+| 发件箱（Outbox） | 意图被写入表中，由独立执行器执行并标记完成 |
+| 补偿事务 | 当副作用成功而追踪写入失败时，安排反向操作 |
 
-These are database patterns. The only agent-specific tax is that model calls are slow.
+这些都是数据库模式。agent 专属的唯一代价是模型调用很慢。
 
-### Concurrency
+### 并发
 
-Model calls are I/O bound, and a thread waiting for the next token is idle 99 percent of the time. At 10,000 concurrent calls, threads of about 1 MB each need about 10 GB for stacks alone, while cooperative fibers fit in one process. Use asynchronous I/O for the model layer and threads or processes only for CPU-bound work such as embedding.
+模型调用受 I/O 限制，等待下一个 token 的线程有 99 percent 的时间是空闲的。在 10,000 次并发调用时，每个约 1 MB 的线程仅栈就需要约 10 GB，而协作式纤程可以容纳在一个进程中。在模型层使用异步 I/O，仅将线程或进程用于 CPU 密集型工作（例如嵌入）。
 
-### Deploys
+### 部署
 
-Long-running stateful agents cannot be hot-swapped. Run several versions of the runtime at once, send a slice of new runs to the new version, and retire the old version when its runs finish.
+长时间运行的有状态 agent 无法热替换。同时运行多个版本的运行时，将一部分新运行发送给新版本，并在旧版本的运行完成时淘汰旧版本。
 
-### What to build first
+### 最先构建什么
 
-The lesson's counterpoint is that most teams over-engineer before they measure. A web service and a relational database, with each run as a row, optimistic concurrency on the state, a simple background worker and application-level retries, carries loads under about 100 concurrent runs on manageable tasks. Adopt a durable-execution engine when you hit a concrete problem the simple design cannot solve: hour-long waits at scale, cross-region coordination, or complex compensation policies.
+课程的反思是：绝大多数团队在衡量之前都过度设计。一个 Web 服务和一个关系型数据库，每次运行作为一行，状态采用乐观并发，加上简单的后台 worker 和应用级重试，在可控任务上可承载低于约 100 次并发运行的负载。只有当你遇到简单设计无法解决的具体问题时才采用持久化执行引擎：大规模的长达数小时等待、跨地域协调或复杂的补偿策略。
 
 ## Follow-ups
 
-- **Level 3:** Why is the model call the hard part of deterministic resume? Expected: it is not deterministic, so the resume must replay the recorded result of the call rather than make it again.
-- **Level 3:** What does the lease do? Expected: it marks a run as owned by one worker for a bounded time, so a crash frees the run for another worker without two workers running it at once.
-- **Level 4:** How do you test the outbox? Expected: run the same side effect twice through the executor and assert one external call, then crash the executor between the effect and the mark and assert that the compensation or the idempotent redo leaves one effect.
-- **Level 4:** Which feature of a workflow engine is hardest to replicate by hand, and is that a reason to adopt it? Expected: a reasoned pick such as durable timers for hour-long waits or compensation policies, with the rule that adoption follows a measured failure of the simple design.
+- **Level 3:** 为什么模型调用是确定性恢复的难点？ Expected: 它不是确定性的，因此恢复必须重放该调用记录的结果，而不是重新调用。
+- **Level 3:** 租约起什么作用？ Expected: 它将运行标记为被一个 worker 在有限时间内拥有，以便崩溃后将运行释放给另一个 worker，而不会有两个 worker 同时运行它。
+- **Level 4:** 你如何测试发件箱？ Expected: 通过执行器将同一副作用运行两次并断言一次外部调用，然后在副作用与标记之间使执行器崩溃，并断言补偿或幂等重做仅保留一个副作用。
+- **Level 4:** 工作流引擎的哪项特性最难手写复现，这是否是采用它的理由？ Expected: 一个有理有据的选择（例如针对数小时等待的持久定时器或补偿策略），其规则是只有实测证实简单设计失败后才采用引擎。
 
 ## Wrong answers
 
-- "Retry the whole run from the start when a worker dies." That repeats every side effect that already happened, which is the double charge in the prompt.
-- "Use a thread per run; it is simpler." Threads idle while they wait for tokens, and at ten thousand concurrent calls the stacks alone exhaust memory.
-- "Adopt a workflow engine on day one to be safe." The simple design carries about a hundred concurrent runs, and the engine's ceremony costs time until a measured problem pays for it.
+- "worker 死亡时从头重试整次运行。" 这会重复已经发生过的每个副作用，即题干中的二次扣费。
+- "每次运行使用一个线程；这样更简单。" 线程在等待 token 时处于空闲，在一万次并发调用时仅栈就会耗尽内存。
+- "第一天就采用工作流引擎以求稳妥。" 简单设计可承载约一百次并发运行，引擎的繁琐流程会消耗时间，只有实测问题才能证明这份投入值得。
 
 ## Taught in
 
-The [production scaling lesson](../../../phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/) builds the checkpoint store, the per-agent queue and the asynchronous demo, and lands the start-simple rule.
+[生产环境扩展课程](../../../phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/)构建了检查点存储、单 agent 队列和异步演示，并确立了从简开始的规则。

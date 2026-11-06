@@ -1,6 +1,6 @@
 ---
 id: chunk-size-by-query-type
-title: Review a chunking choice before the first index build
+title: 首次建索引前评审分块方案
 card: rag
 kind: tradeoff
 level: 2
@@ -16,52 +16,52 @@ related: [rag/overlap-measure-first, rag/take-home-stratified-eval]
 updated: 2026-11-03
 ---
 
-A team is about to index a new document corpus and asks you to review the chunker. They picked semantic splitting, 1000 tokens per chunk and 20 percent overlap, because a blog post recommended it. What do you tell them?
+团队准备为新语料建索引，请你评审分块器。他们因为博客推荐，选了语义切分、每块 1000 个 token、重叠 20%。你会怎么说？
 
 ## Short answer
 
-Start from the query type, not from a post. Factoid questions want 256 to 512 tokens, analytical or multi-hop questions 512 to 1024, and whole-section questions 1024 to 2048. Begin with recursive splitting at 512 tokens and no overlap, then measure recall at 5 on a 50-query set before you move any knob.
+从查询类型出发，而不是照搬文章。事实型问题适合 256 到 512 个 token，分析或多跳问题适合 512 到 1024，整节理解问题适合 1024 到 2048。先用 512-token 递归切分、零重叠，在 50 条查询集上测 recall@5，再调整参数。
 
 ## Full answer
 
-### Why size follows the question
+### 为什么大小取决于问题
 
-A chunk must be large enough to hold the answer plus its local context, and small enough that the top k returns the answer and not noise. Too small, at 64 to 128 tokens, and a chunk says "it increased 15% last quarter" with no subject. Too large, at 2048 tokens and more, and one chunk is 10% about revenue and 90% about headcount, so its embedding points nowhere.
+文本块要足够大，包含答案及局部上下文；又要足够小，让前 k 个结果主要包含答案而非噪声。64 到 128 个 token 太小，可能只剩“上季度增长了 15%”，却不知道主语。2048 个 token 及以上太大，一块可能只有 10% 谈收入、90% 谈人数，它的嵌入就没有明确指向。
 
-| Query type | Chunk size |
+| 查询类型 | 块大小 |
 |---|---|
-| Factoid | 256 to 512 tokens |
-| Analytical or multi-hop | 512 to 1024 tokens |
-| Whole-section comprehension | 1024 to 2048 tokens |
+| 事实型 | 256 到 512 个 token |
+| 分析或多跳 | 512 到 1024 个 token |
+| 整节理解 | 1024 到 2048 个 token |
 
-### What the measurements say
+### 测量结果说明什么
 
-- Recursive splitting at 512 tokens beat semantic splitting 69% to 54% in the chunking study.
-- Overlap gave zero measurable benefit in the sparse retrieval study, and every overlapped token is embedded and stored again, so the index cost grows with the overlap.
-- Response quality drops sharply around 2,500 tokens of context, so bigger chunks hit a cliff.
-- Semantic splitting without a minimum size produces 40-token fragments that hurt retrieval.
+- 分块研究中，512-token 递归切分以 69% 对 54% 胜过语义切分。
+- 稀疏检索研究中，重叠没有可测收益；每个重叠的 token 都要再嵌入、再存储一次，索引成本随重叠增长。
+- 上下文达到约 2,500 个 token 时，回答质量急剧下降，块越大越容易撞上这道断崖。
+- 语义切分不设最小大小时，会产生损害检索的 40-token 碎片。
 
-### Pick a default without a benchmark
+### 尚无基准时怎样选默认值
 
-Three properties decide the first chunker: the document type, the paragraph length, and whether the format carries structure. Prose with no structure gets recursive splitting. Markdown and API docs get the header splitter. Code gets a syntax-aware splitter. When in doubt, recursive splitting is the strongest single baseline.
+第一个分块器由三项属性决定：文档类型、段落长度、格式是否带结构。无结构的散文用递归切分；Markdown 和 API 文档用标题切分器；代码用语法感知切分器。拿不准时，递归切分是最强的单一基线。
 
-### Then measure
+### 然后测量
 
-Build a 50-query eval set, stratified by query type, and read recall at 5 for each candidate. Clamp every chunker with a minimum and a maximum size. Never let a chunk span two documents.
+建立按查询类型分层的 50 条评估集，逐个候选测 recall@5。每个分块器都要限定最小和最大大小，绝不让一个块跨两篇文档。
 
 ## Follow-ups
 
-- **Level 2:** Why does the chunk size depend on the kind of question? Expected: the chunk has to contain the answer with its context, and still be small enough that the top k is about the answer and not about the surrounding noise.
-- **Level 2:** The corpus is markdown API documentation. What do you try first? Expected: the structural header splitter, because the format carries explicit structure; drop or merge header-only chunks.
-- **Level 3:** Which two guards does every chunker need, whatever the strategy? Expected: a minimum and a maximum size, because chunks of 5 tokens or 5000 tokens both break retrieval.
-- **Level 3:** You switch the embedding model later. What do you run again? Expected: the chunking eval, because the winner depends on the corpus and the model, and semantic splitting moves its boundaries when the model changes.
+- **Level 2:** 为什么块大小依赖问题类型？ Expected: 块必须装下答案及其上下文，又要足够小，让前 k 个结果讲的是答案而不是周围的噪声。
+- **Level 2:** 语料是 Markdown API 文档，先试什么？ Expected: 结构化的标题切分器，因为这种格式带显式结构；删除或合并只有标题的块。
+- **Level 3:** 不论用哪种策略，每个分块器都需要哪两道防护？ Expected: 最小和最大大小，因为 5 个 token 和 5000 个 token 的块都会破坏检索。
+- **Level 3:** 之后更换嵌入模型，要重跑什么？ Expected: 分块评估，因为最优方案依赖语料与模型，语义切分的边界也会随模型变化。
 
 ## Wrong answers
 
-- "Semantic splitting is best because it follows meaning." It lost to recursive splitting at 512 tokens in the measured study, and it makes tiny fragments unless you set a floor.
-- "Overlap is a safety margin, keep it." The studies found that overlap often adds nothing, and it adds index cost in proportion to its size; justify any overlap with an ablation.
-- "Bigger chunks give the model more context." Quality drops around 2,500 tokens of context, and a chunk that covers many topics dilutes its own embedding.
+- "语义切分遵循含义，因此最好。" 在实测研究中它输给 512-token 递归切分；不设下限还会产生碎片。
+- "重叠是安全余量，应该保留。" 研究发现重叠常常毫无收益，还会按其大小成比例地增加索引成本；任何重叠都要用消融实验证明其价值。
+- "大块给模型更多上下文。" 约 2,500-token 上下文时质量会下降，多主题文本块也会稀释自身嵌入。
 
 ## Taught in
 
-The lesson [chunking strategies](../../../phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/) gives the size table and the measurements, the lesson [RAG](../../../phases/11-llm-engineering/06-rag/) explains the too-small and too-large failures, and the lesson [chunking comparison](../../../phases/19-capstone-projects/64-chunking-strategies-advanced/) picks a default from three properties.
+[分块策略](../../../phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/)课程给出大小表和测量，[RAG](../../../phases/11-llm-engineering/06-rag/)课程说明块过小与过大的故障，[分块比较](../../../phases/19-capstone-projects/64-chunking-strategies-advanced/)根据三种属性选择默认方案。

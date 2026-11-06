@@ -1,6 +1,6 @@
 ---
 id: reward-model-pairwise
-title: Why reward models learn from pairs, not scores
+title: 为什么奖励模型基于成对比较而非打分学习
 card: post-training
 kind: concept
 level: 2
@@ -16,51 +16,51 @@ related: [post-training/kl-penalty-purpose, post-training/reward-up-humans-flat]
 updated: 2026-11-03
 ---
 
-You need a reward model for a helpfulness objective. A product manager suggests asking raters to score each answer from one to ten and regressing on the scores. Why do most pipelines collect pairwise comparisons instead, and what loss do you train with?
+你需要为一个关于帮助性的对齐目标训练一个奖励模型。一位产品经理建议让人类标注员给每个回答从 1 到 10 分直接打分，并使用回归模型拟合这些绝对分数。为什么绝大多数工业级流水线选择收集成对比较数据？你将使用什么损失函数来训练该奖励模型？
 
 ## Short answer
 
-People are poor at absolute scores and good at relative judgments, so pipelines show two answers to one prompt and ask which is better. The reward model is the SFT model with its vocabulary head replaced by a scalar head. It trains with the Bradley-Terry loss, the negative log of the sigmoid of the reward difference between the preferred and the rejected answer. The difference in reward becomes a log-odds of preference, which turns many relative judgments into one consistent scale.
+人类天然不擅长给出绝对数值打分，但极其擅长做出二选一的相对好坏裁决，因此工业界向标注员展示同一个 prompt 下的两个回答，并询问哪一个更好。奖励模型通常是在 SFT 模型的基础上，将其原本的词表分类头替换为一个输出单个标量值的线性头。它使用 Bradley-Terry 损失函数训练：负的对数 sigmoid，其自变量为胜出回答与被拒回答之间的奖励预测差值。奖励的数值差因此被赋予了相对偏好几率对数的严格概率含义，将海量相对比较裁决无缝拟合到单一自洽的连续标量尺度上。
 
 ## Full answer
 
-### The loss
+### 核心损失函数数学形式
 
 ```text
 loss = -log( sigmoid( r(x, y_preferred) - r(x, y_rejected) ) )
 ```
 
-The sigmoid of the difference is the probability that the preferred answer wins. Training pushes the preferred reward up and the rejected reward down. The model reads the hidden state at the last position, because causal attention has seen the whole prompt and answer there, and projects it to one number.
+两回答奖励预测之差经 sigmoid 变换后，即为偏好回答胜出的预测概率。梯度反向传播会持续推高胜出回答的奖励分并压低被拒回答的奖励分。模型直接读取序列最后一个 token 位置的隐藏状态，因为在因果注意力机制下，该位置已经完整注意到了整个 prompt 和回答的全部上文，随后将其线性投影为一个单一的标量分值。
 
-### What accuracy to expect
+### 预期验证准确率的合理区间
 
-A random reward model ranks half of the pairs right. The reference pipeline in the RLHF lesson trained its reward model on 33,000 comparisons from 40 raters, about 5 minutes each, and reached about 72 percent accuracy on held-out pairs. That sounds low, but the raters agreed with each other about 73 percent of the time. That agreement estimates the noise in the labels. It is not a hard bound, but a score far above it is a reason to look for a leak.
+随机猜测的奖励模型在成对测试集上能蒙对 50%。在 RLHF 课程展示的基线流水线中，使用来自 40 位标注员的 33,000 次比较，每次约 5 分钟，训练出的奖励模型在保留测试集上的成对排序准确率约为 72%。这听起来似乎不高，但在相同数据上，两位人类标注员之间相互达成一致的比率也仅为 73% 左右。标注者一致率可以估计标签噪声。它不是硬性上限，但得分远高于它时，应检查是否有泄漏。
 
-### Noise in the labels
+### 应对标注标签噪声
 
-Roughly 30 percent of human labels are noisy or ambiguous. Filter pairs by rater agreement, or add a temperature to the sigmoid. Pairs where both answers are bad still teach the model which one is less bad.
+大约 30% 的人类偏好标签存在歧义或主观噪声。可以通过标注员共识过滤争议数据对，或在 sigmoid 中引入温度缩放因子。即使两个回答都很差，数据对依然能教会模型哪一个相对而言没有那么糟糕。
 
-### Size
+### 奖励模型的参数规模
 
-A reward model that is too small cannot score the policy's outputs faithfully. The lesson's table lists a 6B reward model for a 175B policy in one pipeline, and a 52B reward model trained on 22,000 comparisons in another. Larger reward models gave more stable signals to the RL stage.
+规模过小的奖励模型无法忠实表征庞大策略模型的细微输出。课程表格列举了业界实践：某流水线使用 6B 奖励模型评估 175B 策略，另一流水线则在 22,000 条对比数据上训练了 52B 的奖励模型。参数规模更大的奖励模型能为后续强化学习阶段提供显著更加稳定的梯度信号。
 
-### Where the reward model lives later
+### 奖励模型在后续阶段的复用
 
-The same scalar head powers best-of-N sampling at decode time and the reward side of reasoning pipelines. It is the entry to the whole alignment stack.
+同一个标量头可用于解码时的 best-of-N 采样，也可为推理流水线提供奖励。它是整个对齐技术栈的入口。
 
 ## Follow-ups
 
-- **Level 2:** Why read the last token's hidden state and not a mean over positions? Expected: with a causal mask the last position has attended to the whole sequence, so it holds the most complete summary; mean pooling is an alternative worth a test.
-- **Level 2:** Your reward model ranks 90 percent of the test pairs right. Good news? Expected: suspicious; with rater agreement near 73 percent, that score suggests a leak or a shortcut such as length, so check what the model keys on.
-- **Level 3:** How do you turn comparisons into a reward for several criteria at once? Expected: one reward model per criterion, such as helpfulness and safety, combined with weights; a single model learns a blur of the criteria.
-- **Level 4:** Why does the reward model need protection from the policy later? Expected: it saw only in-distribution answers; a policy under optimization moves off that distribution and finds answers that score high for the wrong reasons, which is why the RL stage carries a KL penalty.
+- **Level 2:** 为什么只读取最后一个 token 的隐藏状态，而不是对所有位置做平均池化？ Expected: 因果掩码保证了末位 token 已经完整关注了整条序列，包含最全面的全局上下文总结；平均池化也是一种可行的备选方案，值得通过实验对照。
+- **Level 2:** 你的奖励模型在测试集上达到了 90% 的惊人准确率，这是好消息吗？ Expected: 极其可疑；在人类标注一致性仅有 73% 的前提下，该高分通常暗示测试集发生了数据泄漏，或者模型抓住了文本长度等虚假作弊捷径，必须排查特征依赖。
+- **Level 3:** 如何将对比数据拓展到同时兼顾多个评估维度？ Expected: 为每个维度，例如有帮助性和安全性，分别训练奖励模型，再加权组合；单个模型混合打分会导致不同维度的准则模糊失焦。
+- **Level 4:** 为什么奖励模型在后续强化学习阶段必须受到严密保护？ Expected: 它仅仅见过分布内的标准样本；策略模型在优化过程中会偏离分布并探索出虚假高分的作弊漏洞，因此 RL 阶段必须设置 KL 散度惩罚。
 
 ## Wrong answers
 
-- "Regress on a one-to-ten score; it is more information per label." Absolute scores drift between raters and sessions; a pairwise judgment is cheap and consistent, and the Bradley-Terry fit recovers a scale from it.
-- "72 percent accuracy means the reward model is broken." The raters agreed only about 73 percent of the time; the model is near the agreement of its labels.
-- "Use a small reward model to save compute." A reward model that cannot represent the policy's outputs gives a noisy signal, and the policy exploits its blind spots.
+- "对 1 到 10 分的绝对打分做回归拟合，每个标签能提供更丰富的数值信息。" 绝对评分标准在不同标注员与不同时间段之间漂移极大；成对比较廉价且一致性极高，Bradley-Terry 拟合能自洽地还原连续尺度。
+- "72% 的准确率说明奖励模型训练失败了。" 人类标注员相互之间的一致性也仅有 73% 左右；模型已经接近其标签的一致率。
+- "使用超小型轻量级奖励模型以节省算力。" 参数过小的奖励模型无法充分理解并表征策略模型的复杂语言现象，其海量盲区会被策略优化器无情打穿。
 
 ## Taught in
 
-The [RLHF lesson](../../../phases/10-llms-from-scratch/07-rlhf/) builds the reward model and its pairwise loss, and the [reward modeling lesson](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/) places it in the full pipeline.
+[RLHF 课程](../../../phases/10-llms-from-scratch/07-rlhf/)亲手构建了奖励模型及其成对损失函数，而[奖励建模课程](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/)将其置于对齐流水线的全景中做了系统阐述。

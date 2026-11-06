@@ -1,6 +1,6 @@
 ---
 id: five-agents-and-a-vote
-title: Five agents and a vote made the answers worse
+title: 五个 agent 投票后，答案反而更差
 card: multi-agent
 kind: tradeoff
 level: 2
@@ -16,57 +16,57 @@ related: [multi-agent/three-copies-of-one-model-voted]
 updated: 2026-11-03
 ---
 
-A team added an ensemble to a question-answering task: five agents on the same model debate until they agree, then answer. Accuracy fell below the single agent. They want to add more agents. What went wrong, and what would you change first?
+某团队在问答任务中引入了集成机制：基于同一款模型运行五个 agent 展开辩论直到达成共识，然后再输出答案。然而实测准确率反而跌到了单个 agent 之下。团队计划继续增加更多 agent。请分析究竟哪里出了问题，以及你会优先改动什么。
 
 ## Short answer
 
-Whether debate helps depends on structure, not on the count: who talks to whom, how many rounds, whether the agents are different, and whether anyone argues against. Five copies of one model share their errors, so the vote is correlated, and debate until agreement rewards the most confident agent through conformity. Change the composition before the count: start from self-consistency with one strong model, then swap one agent for a different base model, bound the rounds at two or three, and add a judge that does not vote.
+辩论机制是否能够带来增益取决于其交互结构而非简单增加实体数量：包括谁与谁对话、交互多少轮、参与的 agent 是否具备异构性，以及是否存在明确提出反方论点的角色。同一模型的五个副本会共享错误，因此投票结果相关；而“辩论直到一致”会因从众效应奖励最自信的 agent。应当优先调整集成架构的异构成分而非盲目增加数量：先以单个强模型的自洽性（self-consistency）作为廉价基线，随后将其中一个 agent 替换为完全不同的异构基础模型，将辩论轮次严格约束在两到三轮，并加入不参与投票的 judge。
 
 ## Full answer
 
-### The baseline they skipped
+### 被团队直接跳过的廉价基线
 
-Self-consistency samples one model several times at a temperature above zero and takes the majority over the reasoning paths. On a grade-school math set it gave large gains with 40 samples over one greedy decode. Its limit is that one model's errors are correlated by construction. A systematic bias is in every sample. That is also the team's ensemble with extra coordination.
+自洽性（Self-consistency）是在大于零的温度下对单个模型多次采样，并在不同推理路径上取多数投票。在小学数学推理数据集上，40 次采样相比贪婪解码获得了巨大的质量跃升。但其根本局限在于单个模型的系统性偏差在先天上是完全相关的。相同的系统性偏见会出现在每一次采样中。而该团队构建的正是附加了额外协调摩擦成本的同一类同构系统。
 
-### Heterogeneity is the knob
+### 该调的是异构性
 
-Replacing one of the agents with a different base model gives a bigger gain than adding one more copy. Each independent source of error is worth more than another correlated sample. In the limit, three different models beat five copies of one on tasks with a clean ground truth. The literature's name for the design that leans on this is adversarial heterogeneous debate: different models, and one of them argues against.
+将其中一个 agent 替换为完全不同的基础模型，所带来的增益远大于单纯再增加一个同构副本。每一个完全独立的错误来源，其价值都远胜于又一个具备相关性的同构样本。在极限情况下，在具备客观标准答案的任务中，三个异构模型的协同表现通常能够直接击败五个同构副本。学术界将依托该特性的机制称为对抗性异构辩论（adversarial heterogeneous debate）：引入不同的底层模型，且强制其中一方必须充当反方展开辩驳。
 
-### Rounds and conformity
+### 辩论轮次与从众效应
 
-Debate can also degrade accuracy. Agents adjust their stance to match a critic even when the critic is wrong, and debate until agreement rewards whoever pushes hardest. Bound the rounds, two to three is typical, and give the final call to a separate judge that scores the consensus and does not vote. A survey of debate strategies found that variants structurally like self-consistency often underperform it at the same budget, and that debate helps most when agents are heterogeneous and the structure is adversarial.
+辩论同样可能导致输出质量的大幅退化。agent 会调整立场以迎合批评者，即使批评者是错的；而要求“必须辩论到达成一致”的机制，本质上是在奖励那些言辞最为激烈强硬的声音。必须对辩论轮次设置硬上限（两到三轮是典型配置），并将最终裁决交给单独的 judge，由它为共识打分，但不参与投票。关于辩论策略的系统调研显示，在相同计算预算下，结构类似于自洽性的辩论变体往往表现不及纯粹的自洽性采样，辩论只有在 agent 具备异构性且交互结构呈现对抗性时才能发挥出最大价值。
 
-### Topology and the tax
+### 拓扑与协调成本
 
-| Topology | Best for |
+| 拓扑结构 | 最适配场景 |
 |---|---|
-| Graph, any to any | Research, where agents critique each other |
-| Star, one hub | Fast factual consolidation |
-| Chain | Stepwise refinement |
+| 全连接图（Graph, any to any） | 深度研究，agent 之间互相批判 |
+| 星型结构（Star, one hub） | 快速的事实汇总与信息收敛 |
+| 链式结构（Chain） | 逐步递进的单向精细化加工 |
 
-On a graph the coordination tax appears past about 4 agents: wall-clock and tokens grow faster than quality, because every window fills with every peer's output. The ceiling is empirical and tied to current context capacity, not fundamental.
+在全连接图拓扑中，一旦 agent 数量超过约 4 个，协调税就会显现：真实耗时与 token 消耗增长快于质量提升，因为每个 agent 的窗口都被所有同伴的输出填满。该上限是经验性的，与当前上下文容量直接相关，而非绝对理论不可逾越。
 
-### A sequence that measures each step
+### 逐步度量各步骤的序列
 
-1. Self-consistency at five samples on one strong model. This is the cheap baseline.
-2. Heterogeneous voting at three agents if accuracy matters. Measure the delta.
-3. Debate only when the task has structure and bounded rounds are feasible.
-4. Log the minority cluster every time. A minority that is persistently right is a diversity signal.
-5. Report tokens and wall-clock next to accuracy, because better accuracy at ten times the cost is a business decision.
+1. 基于单个强模型执行 5 次自洽性采样。这是廉价的基线。
+2. 若对准确率有更高要求，升级为 3 个 agent 的异构投票。度量其变化差值。
+3. 仅在任务有结构、且能限制轮次时采用辩论。
+4. 每次均记录少数派观点簇。长期保持正确的少数派是多样性的信号。
+5. 在准确率旁边报告 token 和真实耗时，因为用十倍成本换取更高准确率属于商业决策。
 
 ## Follow-ups
 
-- **Level 2:** Why does adding a sixth copy of the same model not help? Expected: it adds one more correlated sample, so the shared bias gets one more vote.
-- **Level 2:** What does the judge do that the voters cannot? Expected: it scores the final consensus without having taken a position, so conformity pressure does not move it.
-- **Level 3:** When is plain self-consistency the right final answer? Expected: a simple task with a clean ground truth, where five samples of one strong model are as accurate as any ensemble and far cheaper.
-- **Level 3:** The task is opinion-shaped. What happens to the vote? Expected: agents converge on the most confident-looking answer rather than the most correct one, so a vote is an opinion poll and should be labeled as one.
+- **Level 2:** 为什么再追加第六个同一模型的副本依然无济于事？ Expected: 它只是又增加了一个高度相关的样本，共享的系统性偏见只是多获得了一票而已。
+- **Level 2:** judge 能做什么投票者做不到的事？ Expected: 它不先表明立场，只为最终共识打分，因此从众压力不会使它改变立场。
+- **Level 3:** 什么时候简单的自洽性采样才是最终的最佳方案？ Expected: 具备明确客观真值的简单任务，单个强模型的五次采样既能达到顶尖效果，成本又远低于复杂集成。
+- **Level 3:** 如果任务属于主观观点类任务，投票机制会发生什么？ Expected: agent 会收敛到看起来最自信而非最正确的答案，投票退化为舆论民调，必须明确标注。
 
 ## Wrong answers
 
-- "Add more agents until the vote stabilizes." A stable wrong vote is still wrong, and past about four agents on a graph the cost grows faster than the quality.
-- "Let them debate until they agree, because agreement means confidence." Unbounded debate rewards conformity, and the agreed answer is the loudest one, not the right one.
-- "Use the same model at different temperatures for diversity." That is self-consistency, and the systematic bias of the model survives every temperature.
+- "继续增加更多 agent，直到投票结果稳定下来。" 稳定的错误投票依然是错的，且在全连接拓扑中超过四个 agent 之后成本增长速度远快于质量收益。
+- "让他们一直辩论直到达成共识，因为共识代表着高度自信。" 无休止的辩论只会奖励盲目从众，最终达成一致的往往是声音最大的回答而非正确的回答。
+- "在不同采样温度下使用相同的模型以获取多样性。" 这本质上还是自洽性采样，模型先天的系统性认知偏差在任何温度下都依然存在。
 
 ## Taught in
 
-The [voting and debate topology lesson](../../../phases/16-multi-agent-and-swarms/15-voting-debate-topology/) builds the four topologies and measures the coordination tax.
+[投票、自洽性与辩论拓扑](../../../phases/16-multi-agent-and-swarms/15-voting-debate-topology/)课程构建了四种核心拓扑结构并量化度量了多 agent 协调税。

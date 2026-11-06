@@ -1,6 +1,6 @@
 ---
 id: plan-you-would-reject
-title: What you check before you approve an execution plan
+title: 批准执行计划前需要核查的事项
 card: behavioral
 kind: debug
 level: 2
@@ -16,53 +16,53 @@ related: [behavioral/leave-work-resumable, behavioral/split-that-only-looks-para
 updated: 2026-11-03
 ---
 
-A teammate, or a coding agent, hands you this plan for a change to a public API: update the endpoint, add tests, update the documentation. They want approval to start. What do you ask for before you say yes, and what would make you reject the plan outright?
+一位队友或代码 agent 递交给你一份修改公共 API 的计划：更新端点、增加测试、更新文档。他们希望获得你的批准以便开始执行。在点头同意之前你会要求补充什么？又有哪些情况会促使你当场拒绝该计划？
 
 ## Short answer
 
-That list repeats the request in future tense. I ask for five things on each item: a stable identifier, the smallest change, the repository facts that justify it, the items it depends on, and the exact check that closes it. I reject a plan with a duplicate identifier, an item without evidence or proof, a dependency on an unknown item, a cycle, or an irreversible step scheduled before the uncertainty it depends on is resolved.
+这份清单不过是用一般将来时将原始需求复述了一遍。我要求每个条目必须具备五项承诺：稳定的标识符、最小变更内容、证明该变更的仓库事实依据、其所依赖的前置条目以及关闭该条目的精确校验命令。若存在重复标识符、缺乏依据或证明的条目、依赖未知条目、存在循环依赖，或在相关不确定性尚未消除前就安排了不可逆操作，我都会直接拒绝该计划。
 
 ## Full answer
 
-### Why the three-line plan fails
+### 为什么这三行计划会失败
 
-Nothing in it says what was found in the repository, why those files are the right ones, which contract changes first, or what can run at the same time. Someone can complete every line and still create rework.
+这份计划丝毫没有说明在代码仓库中发现了什么事实、为什么修改这些文件是正确的、哪份接口契约应最先改动，以及哪些步骤可以并发执行。哪怕有人逐行完成了全部三项，最终仍可能造成大量返工。
 
-### The five commitments
+### 五项承诺
 
-| Commitment | Purpose |
+| 承诺项 | 目的 |
 |---|---|
-| Identifier | A stable reference for dependencies and handoff |
-| Change | The smallest behavior or contract change |
-| Evidence | Repository facts that justify the change |
-| Dependencies | Work that must be true first |
-| Proof | The exact check that closes the item |
+| 标识符 | 用于依赖引用和工作交接的稳定标识 |
+| 变更内容 | 最小的行为或接口契约改动 |
+| 依据事实 | 证明该改动具有必要性的仓库客观事实 |
+| 前置依赖 | 必须预先完成并成立的工作 |
+| 验证证明 | 用于闭环验收该条目的精确检验手段 |
 
-### Order by dependency, not by prose
+### 按依赖关系而非行文顺序排序
 
-When several surfaces depend on one behavior, the contract comes first. Tests, implementation and documentation then share one definition instead of inventing four. A dependency graph also shows safe concurrency: implementation and documentation can proceed together after the contract is fixed, and the integration gate waits for both.
+当多个代码层面依赖同一种行为时，必须优先确立契约。随后测试、实现与文档便能共享一个定义，而不是臆想出四套定义。依赖图还能清晰揭示安全的并发边界：契约固定之后，具体实现与文档编写可以并行推进，而最终的集成卡点则等待两者全部完成。
 
-### Evidence must be able to change the plan
+### 依据必须具备改变计划的能力
 
-An existing helper removes a planned abstraction. A compatibility test forces a migration step. A deployment constraint moves a schema change into another task. If a piece of evidence cannot change the plan, it is decoration, not evidence.
+一个现有的辅助函数能够省去原计划中的抽象封装；一项兼容性测试迫使团队增加数据迁移步骤；一项部署约束将数据模型改动拆分到另一个独立任务中。如果一项依据无法改变计划，那它就是装饰，而不是依据。
 
-### The rejection list
+### 拒绝清单
 
-The first five checks are mechanical: duplicate identifiers, items without evidence, items without proof, unknown dependencies, cycles. The last check needs judgment: does the first irreversible action, such as a migration or a public release, happen before the relevant uncertainty is resolved? I call that one out explicitly in the review.
+前五项属于机械检查：重复标识符、无依据条目、无验证证明条目、未知依赖项、循环依赖。最后一项则依赖专业判断：首次不可逆操作（例如数据迁移或公开发布）是否被安排在了相关不确定性消除之前？我会在审查意见中明确指出这一点。
 
 ## Follow-ups
 
-- **Level 2:** One item lists two proof commands. What do you do? Expected: split it into two items, because one item needs one clear completion proof.
-- **Level 2:** Two items depend on each other. What does that usually hide? Expected: an unresolved product or design disagreement; the cycle is the symptom, the missing decision is the cause.
-- **Level 3:** The plan sits in a chat thread as checked boxes. Why is that a problem? Expected: a session can end at any moment, and another person cannot see which proof ran or which item is now unblocked; the plan belongs next to the work.
-- **Level 3:** A migration item needs a human approval. How do you express that in the graph? Expected: as an explicit item with the approval as its proof, which every dependent item waits for.
+- **Level 2:** 某个条目列出了两条证明命令，你该如何处理？ Expected: 将其拆分为两个独立条目，因为一个条目只需要一个清晰明确的完成证明。
+- **Level 2:** 两个条目互相依赖，这通常掩盖了什么问题？ Expected: 尚未解决的产品或设计分歧；循环依赖只是表象，决策缺失才是根本原因。
+- **Level 3:** 工作计划以对话框复选框的形式存在，为什么这是个问题？ Expected: 会话随时可能意外终止，其他人无法查阅运行了哪些证明或哪些条目已解除阻塞；计划应当保存在工作产物旁。
+- **Level 3:** 某个迁移条目需要人工审批，如何在依赖图中表示？ Expected: 表示为一个明确条目并将该审批作为其证明依据，所有后续依赖条目均需等待该审批完成。
 
 ## Wrong answers
 
-- "Trust the author and review the result instead." Rework found at review time costs more than a plan rejected before editing.
-- "A longer plan is a better plan." Length adds nothing; evidence and proof on each item do.
-- "Dependencies are obvious from the order of the list." Prose order hides which steps can run together and which must wait.
+- "信任作者并在最终产物出来时再去审查。" 在审查阶段发现返工代价远高于在动手编辑前驳回不合格的计划。
+- "计划越长就代表越完善。" 篇幅不增加任何价值；每个条目上的依据和证明才起作用。
+- "依赖关系从清单顺序上一目了然。" 文本顺序掩盖了哪些步骤可以安全并发、哪些步骤必须串行等待。
 
 ## Taught in
 
-The [evidence-backed plan lesson](../../../phases/14-agent-engineering/44-plan-from-evidence/) gives the five commitments and the validation rules.
+[基于证据制定计划课程](../../../phases/14-agent-engineering/44-plan-from-evidence/)给出了五项承诺与验证规则。

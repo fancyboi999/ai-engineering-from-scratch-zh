@@ -1,6 +1,6 @@
 ---
 id: split-that-only-looks-parallel
-title: Decide whether to split work across parallel workers
+title: 评估是否将工作拆分给并行处理单元
 card: behavioral
 kind: tradeoff
 level: 3
@@ -16,56 +16,56 @@ related: [behavioral/plan-you-would-reject, behavioral/agent-decides-alone]
 updated: 2026-11-03
 ---
 
-Your manager wants a feature finished faster and suggests that you run two coding agents, or two engineers, in parallel on it. Tell me about a time you had to make that call. How did you decide, and what did you put in place before anyone started?
+你的主管希望某项功能能够更快交付，建议你安排两个代码 agent 或两位工程师并行开展工作。请讲一次你需要做出该抉择的经历。你是如何做出决定的？在任何人动手之前你预先设立了哪些规范？
 
 ## Short answer
 
-I delegate only when the work is really independent: two investigations that answer different unknowns, two implementations with disjoint files and contracts, a reviewer who only reads, or a slow external check that runs while local work continues. When the parts need the same files, the same open decision or the same mutable environment, I keep them serial, because a parallel split then converts one clear task into a coordination problem. Before anyone starts, each unit gets a goal, an owner, exclusive write paths, dependencies, a proof and a handoff.
+唯有当工作彼此真正独立时，我才会拆分并委托：两项解答不同未知数的调研、两个具有互斥文件与接口契约的实现单元、一个只读审查的检查者，或是在本地开发继续推进的同时运行的耗时外部检查。当不同部分依赖相同的文件、同一项未决决策或同一个可变环境时，我坚持串行推进，因为此时强行并行只会把一个清晰的任务变成协调问题。在任何人动手之前，每个工作单元都会明确目标、单一责任人、独占写入路径、前置依赖、验证证明和交接契约。
 
 ## Full answer
 
-### The parallelism test
+### 并行适用性检验
 
-More available workers is not a reason. The split is justified when at least one of these holds:
+存在更多可用的人手或算力绝非并行的理由。只有至少满足以下条件之一时，拆分才具有合理性：
 
-- two investigations can answer different unknowns on their own;
-- two implementations own disjoint files and contracts;
-- a reviewer can inspect a finished artifact without changing it;
-- a slow external check can run while local work continues.
+- 两项调查能够各自独立解答不同的未知数；
+- 两个实现单元各自独占互不重叠的文件与接口契约；
+- 审查者能够检查已完成的产物而无需修改；
+- 耗时的外部校验能够在本地工作持续推进的同时后台运行。
 
-### A work unit is a contract
+### 工作单元本质上是一份契约
 
-"Handle the backend" is not a unit. "Implement the duplicate check in one named file and prove it with the focused account test" is. Each unit records the goal, one accountable owner, exclusive paths, completed units it waits for, the exact evidence it returns, and a handoff with the files changed, the decisions made and the remaining risk.
+“负责后端”不是一个工作单元。“在指定的一个文件中实现去重校验，并通过定向账户测试予以证明”才是一个单元。每个单元都必须明确记录目标、唯一的直接责任人、独占的文件路径、等待完成的前置单元、返回的精确证据，以及包含变更文件列表、决策记录和剩余风险的交接物。
 
-### Three layers of isolation
+### 三层隔离机制
 
-1. Filesystem: separate worktrees or sandboxes stop accidental shared edits.
-2. Ownership: the contract stops two workers from editing the same path on purpose.
-3. State: separate logs and outputs stop one worker from overwriting another's evidence.
+1. 文件系统隔离：独立的工作树或沙箱环境杜绝意外的并发修改。
+2. 所有权隔离：契约约束防止两个协作者故意编辑同一个路径。
+3. 状态隔离：独立的日志与输出产物防止某个协作者覆盖另一个人的验证证据。
 
-Filesystem isolation does not solve ownership. Two clean worktrees can still produce two conflicting designs. The merge contract has to settle shared interfaces before work begins.
+文件系统隔离无法解决所有权冲突。两个干净隔离的工作树依然可能产出两份相互冲突的架构设计。合并契约必须在动手编码之前就敲定共享接口。
 
-### What the integrator does
+### 集成者的职责
 
-The integrator confirms each handoff matches its scope, reads the proof output rather than the summary, combines changes in dependency order, runs the full cross-unit gate, rejects hidden scope growth, and records conflicts as new decisions instead of silent edits. If integration means rewriting most of a worker's result, the split was wrong.
+集成者负责确认每份交付物完全符合其授权范围、亲自查阅证明输出而非轻信总结文本、按依赖顺序合并改动、运行跨单元的完整门禁校验、坚决拒绝隐蔽的范围蔓延，并将冲突记录为新的决策项而非私下悄悄修改。如果集成意味着需要重写某个协作者的大部分成果，则说明最初的拆分本身就是错误的。
 
-### The call I made
+### 我所做出的抉择
 
-The time this mattered most, the two halves looked independent but both needed the same response type to change. I ran one short unit to fix that contract first, then let the two implementations run in parallel against it. The serial step was shorter than the merge conflict it prevented.
+在最关键的一次抉择中，两个部分看似相互独立，但都需要修改同一个响应数据结构类型。我先安排了一个耗时极短的串行单元优先固定该契约，随后让两个实现单元以此为基准并行开发。这一串行步骤耗费的时间，远少于它所规避的代码合并冲突。
 
 ## Follow-ups
 
-- **Level 3:** A docs unit asks to own the whole application directory. What happens? Expected: the plan is blocked, because that parent path overlaps the paths of the implementation unit.
-- **Level 3:** A worker's dependency becomes invalid half way through. What is the rule? Expected: a written cancellation rule decided before the start, so the worker stops and returns a handoff instead of building on a dead contract.
-- **Level 4:** Where does the human stay in the loop when agents do the work? Expected: on choices that change public behavior, risk, authority or irreversible cost; agents own bounded investigation, implementation, verification and review.
-- **Level 4:** How do you know the decomposition was right after the fact? Expected: the integrator combined the handoffs without rewriting them, and the final changed-file set matched the union of the unit contracts.
+- **Level 3:** 一个负责文档的单元申请独占整个应用目录的所有权，该如何处理？ Expected: 该计划被直接驳回，因为父路径与实现单元的代码路径发生了重叠。
+- **Level 3:** 某协作者所依赖的前置项在开发中途失效，应对规则是什么？ Expected: 依据启动前拟定的书面取消规则，让该协作者立即停止并交付当前交接物，而非基于失效的契约继续徒劳开发。
+- **Level 4:** 当 agent 承担工作时，人在回路应保留在哪些环节？ Expected: 保留在改变公共行为、安全风险、权限授予或不可逆成本的决策上；agent 则负责有界调查、具体实现、验证和审查。
+- **Level 4:** 事后如何判断最初的工作拆分是否正确？ Expected: 集成者能够直接合并交付物而无需大幅重写，且最终变动的文件集合与各单元契约声明的并集严格一致。
 
 ## Wrong answers
 
-- "Two agents are always faster than one." Parallel work saves wall time only when the pieces are independent; otherwise it raises the failure rate.
-- "Separate worktrees solve the conflicts." They prevent accidental shared edits, not two conflicting designs of one interface.
-- "The integrator fixes whatever does not fit." If most of a result must be rewritten at integration, the original split was the mistake.
+- "两个 agent 干活肯定比一个快。" 唯有当各部分真正独立时，并行工作才能节省实际耗时；否则只会显著拉高失败率。
+- "各自独立的工作树就能解决冲突。" 它们只能防止意外并发编辑，无法阻止针对同一接口产生两套相互冲突的设计。
+- "集成者负责把不兼容的地方修好就行。" 如果某个结果的大部分必须在集成阶段重写，说明最初的拆分就是错误。
 
 ## Taught in
 
-The [delegation lesson](../../../phases/14-agent-engineering/45-delegate-with-isolation/) gives the parallelism test, the unit contract and the isolation layers.
+[隔离委托课程](../../../phases/14-agent-engineering/45-delegate-with-isolation/)给出了并行适用性检验、工作单元契约以及三层隔离机制。

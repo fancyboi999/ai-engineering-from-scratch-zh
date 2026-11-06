@@ -1,6 +1,6 @@
 ---
 id: json-mode-is-not-a-schema
-title: What JSON mode guarantees and what it does not
+title: JSON 模式能保证什么，不能保证什么
 card: prompting-structured-output
 kind: concept
 level: 1
@@ -16,46 +16,46 @@ related: [prompting-structured-output/three-failure-modes-structured, prompting-
 updated: 2026-11-03
 ---
 
-A teammate turned on the provider's JSON mode and says the extraction output is now guaranteed. What does JSON mode guarantee, what does it not, and what do you turn on instead?
+一位队友打开了服务商的 JSON 模式，说抽取输出现在有保证了。JSON 模式保证什么，不保证什么？你应该改开什么？
 
 ## Short answer
 
-JSON mode guarantees that a finished output parses, nothing more; a response cut at the token limit can still fail, so check the finish reason first. It does not guarantee your keys, your types, your enum values or the absence of extra fields. Turn on the schema mode, where the provider takes a JSON Schema and constrains decoding to it, and keep a check on your side for the values that a schema cannot judge.
+JSON 模式只保证正常结束的输出能被解析，仅此而已；在 token 上限处被截断的响应仍可能解析失败，所以先检查结束原因。它不保证你的键名、类型、枚举值，也不保证没有多余字段。改开 schema 模式，由服务商接收一份 JSON Schema 并据此约束解码；同时在你这一侧保留检查，覆盖 schema 判断不了的值。
 
 ## Full answer
 
-### Four levels of control
+### 四个控制层级
 
-| Level | Guarantee | Typical failure |
+| 层级 | 保证 | 典型失败 |
 |---|---|---|
-| A prompt that says "respond in JSON" | none; about 90 percent valid | code fences, preamble text, truncation, wrong structure |
-| JSON mode | valid syntax | extra keys, wrong types, missing fields |
-| Schema mode | the output conforms to your schema | a wrong value with the right type, or a refusal |
-| Constrained decoding | every token is valid for the schema | the same as schema mode; this is how schema mode is built |
+| prompt 里写「用 JSON 回复」 | 无保证；约 90% 合法 | 代码围栏、前导文字、截断、结构错误 |
+| JSON 模式 | 语法合法 | 多余的键、类型错误、缺字段 |
+| Schema 模式 | 输出符合你的 schema | 类型对但值错，或者拒答 |
+| 约束解码 | 每个 token 对 schema 都合法 | 与 schema 模式相同；schema 模式就是这样实现的 |
 
-The constrained decoding lesson is blunt about it: pure JSON mode guarantees valid JSON, not JSON that is valid for your use case, so always provide a full schema.
+约束解码那一课说得很直白：纯 JSON 模式保证的是合法 JSON，不是对你的用途合法的 JSON，所以一定要提供完整的 schema。
 
-### What strict schema mode asks of you
+### 严格 schema 模式对你的要求
 
-The structured output lesson lists the strict mode rules: every property appears in `required`, `additionalProperties` is false everywhere, and there is no unresolved reference. A schema that breaks these is rejected at request time with a 400.
+结构化输出协议那一课列出了严格模式的规则：每个属性都出现在 `required` 里，所有层级的 `additionalProperties` 都为 false，没有未解析的引用。违反这些规则的 schema 在请求时就会被 400 拒绝。
 
-### What stays with you
+### 仍然归你管的部分
 
-Under strict enforcement two failures disappear for a response that finishes, the parse error and the schema violation. A response cut at the token limit can still fail to parse, so check the finish reason before you read it. Two more remain. The model can refuse when the input does not fit the schema, which your code treats as a typed outcome. And the model can fill a field with a value that has the right type and the wrong content; no format layer sees that.
+严格约束下，对正常结束的响应，解析错误和 schema 违规这两种失败消失了。在 token 上限处被截断的响应仍可能解析失败，所以读之前先检查结束原因。还剩两种失败。输入不符合 schema 时，模型可能拒答，你的代码把它当作类型化结果处理。模型还可能在字段里填一个类型正确、内容错误的值；任何格式层都看不到这一点。
 
 ## Follow-ups
 
-- **Level 1:** Which failure remains under strict schema mode? Expected: a refusal, when the model decides the input does not fit the schema; handle it as a typed outcome, and route a response cut at the token limit to the error path.
-- **Level 2:** What does strict mode demand of the schema? Expected: every property required, additional properties forbidden, no unresolved references; otherwise the request is rejected with a 400.
-- **Level 2:** The output matches the schema and the price is wrong. Which layer failed? Expected: none of the format layers; the value is invented, and only a semantic check or an eval catches that.
-- **Level 3:** A field is sometimes unknown in the source text. How do you write the schema? Expected: allow null or a sentinel; a grammar that forces a value makes the model invent one, such as a date.
+- **Level 1:** 严格 schema 模式下还剩哪种失败？ Expected: 拒答，即模型判断输入不符合 schema；把它当作类型化结果处理，并把在 token 上限处截断的响应送进错误路径。
+- **Level 2:** 严格模式对 schema 有什么要求？ Expected: 每个属性都必填，禁止附加属性，没有未解析的引用；否则请求会被 400 拒绝。
+- **Level 2:** 输出符合 schema，但价格是错的。哪一层失败了？ Expected: 没有哪个格式层失败；这个值是编出来的，只有语义检查或评估能发现。
+- **Level 3:** 某个字段在源文本里有时没有。schema 怎么写？ Expected: 允许 null 或哨兵值；强制要求一个值的语法会让模型编一个，比如编一个日期。
 
 ## Wrong answers
 
-- "JSON mode means the keys match my model." It only guarantees syntax; extra keys, wrong types and missing fields still happen.
-- "Adding 'respond in valid JSON' to the prompt is the same thing." A prompt-only approach is about 90 percent reliable and fails with fences, preambles and truncation.
-- "With schema mode I can drop validation." A schema cannot catch a wrong value with the right type; keep a semantic check.
+- "JSON 模式意味着键名和我的数据模型一致。" 它只保证语法；多余的键、类型错误和缺字段照样会发生。
+- "在 prompt 里加一句「用合法 JSON 回复」是一回事。" 只靠 prompt 的做法可靠性约 90%，会因代码围栏、前导文字和截断而失败。
+- "有了 schema 模式就不用校验了。" schema 抓不到类型正确的错误值；要保留语义检查。
 
 ## Taught in
 
-The lesson [structured outputs](../../../phases/11-llm-engineering/03-structured-outputs/) lays out the four levels, the lesson [constrained decoding](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/) warns against JSON mode without a schema, and the lesson [structured output](../../../phases/13-tools-and-protocols/04-structured-output/) gives the strict mode rules.
+[结构化输出](../../../phases/11-llm-engineering/03-structured-outputs/)一课列出了四个层级，[约束解码](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/)一课警告不要只用 JSON 模式而不给 schema，[结构化输出协议](../../../phases/13-tools-and-protocols/04-structured-output/)一课给出了严格模式的规则。

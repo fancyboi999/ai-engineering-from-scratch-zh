@@ -1,6 +1,6 @@
 ---
 id: perceiver-fixed-tokens
-title: Any number of images, a fixed number of tokens each
+title: 图像数量不限，每张图像输出固定数量的 token
 card: multimodal
 kind: concept
 level: 2
@@ -16,51 +16,51 @@ related: [multimodal/image-tokens-per-image]
 updated: 2026-11-03
 ---
 
-A model must take a prompt with any number of images, some small and some large, interleaved with text, and then caption the last image from a few in-context examples. Explain the module that makes the number and the size of the images manageable, and how a text token knows which image to look at.
+某个多模态模型必须能够接收包含任意数量图像（有些尺寸很小，有些尺寸很大）与文本相互交错的 prompt，并基于上下文中的几个少样本（few-shot）示例对最后一张图像生成描述。请解释是哪一个模块使得图像数量与尺寸变得完全可控，以及文本 token 是如何知道该关注哪一张图像的。
 
 ## Short answer
 
-A resampler with a fixed set of learned latent vectors turns the patch tokens of each image into a fixed number of visual tokens. In the reference design, 64 latents attend over however many patches the encoder produced, 196 for a small image or 900 for a large one, through six blocks of cross-attention and self-attention, and every image exits as 64 tokens of one width. Text tokens then read those tokens through gated cross-attention layers inserted between the frozen language model blocks, and a mask lets each text token attend only to the latents of the most recent image before it in the sequence.
+一个包含固定可学习隐向量集合的重采样器（Perceiver Resampler）将每张图像的 patch token 统一转换为固定数量的视觉 token。在参考架构中，无论视觉编码器输出了 196 个 patch（小图）还是 900 个 patch（大图），64 个隐变量都会通过 6 个交叉注意力与自注意力 block 将其聚合，每张图像最终都输出为统一通道维度的 64 个 token。随后，文本 token 通过插入在冻结语言模型层间的门控交叉注意力层读取这些视觉 token，并通过特定掩码保证每个文本 token 仅关注其在序列中前面最近的一张图像。
 
 ## Full answer
 
-### The resampler
+### 重采样器（Perceiver Resampler）的工作机制
 
-Each block does two things. The K latents cross-attend to the N patch tokens, with queries from the latents and keys and values from the patches; then the latents run self-attention and a feed-forward layer among themselves. After six blocks the output is K tokens of width 1024, whatever N was. For video the resampler runs on each frame, with a temporal position encoding, so the frame count times 64 is the token count of the clip.
+每个 block 包含两步计算：首先，K 个可学习隐向量（Latents）与视觉编码器产出的 N 个 patch token 做交叉注意力聚合（Query 来自隐向量，Key 和 Value 来自图像 patch）；随后，这 K 个隐向量相互之间做自注意力计算并经过前馈网络。历经 6 个 block 之后，无论输入的 patch 数量 N 是多少，输出始终是 K 个通道维度为 1024 的视觉 token。对于视频数据，重采样器在每个单帧上分别运行并注入时间位置编码，因此视频片段的 token 总数就是帧数乘以 64。
 
-### Why fixed matters
+### 为什么“固定数量”至关重要
 
-Interleaved prompts have zero, one or many images. With a fixed count per image, what any one text token sees in cross-attention has the same shape whatever the prompt. The total grows with the image count, but each text token reads one image's latents.
+交错图文 prompt 可能包含零张、一张或许多张图像。如果每张图像输出固定数量的 token，那么无论 prompt 如何复杂，任意一个文本 token 在交叉注意力中所面对的视觉特征矩阵在维度上都是严格对齐的。token 总数随图片数量增长，但单个文本 token 每次仅聚焦单一图像的特征隐变量。
 
-### The gated bridge
+### 门控交叉注意力桥接层
 
-Between every fourth block of the frozen language model sits a new cross-attention layer with a residual gate: the output equals the block output plus the hyperbolic tangent of a learned scalar times the cross-attention. The scalar starts at zero, so at initialization the new layers do nothing, and the model is exactly the pretrained text model.
+在冻结的大语言模型每隔 4 个 block 之间，插入一个带有残差门控的全新交叉注意力层：该层的输出等于语言模型原 block 的输出，加上双曲正切函数（tanh）作用于可学习标量后再乘以交叉注意力的计算结果。该标量初始化为 0，因此在训练刚开始时新插入的层完全不生效，模型整体严格等价于预训练纯文本语言模型。
 
-### The mask
+### 掩码矩阵的作用
 
-In a sequence like image A, caption A, image B, caption B, image C, question, a text token attends only to the resampler tokens of the most recent image before it; the other images are masked. Attending to all preceding images is a valid alternative; the reference design chose the most recent one.
+在形如“图像 A、描述 A、图像 B、描述 B、图像 C、问题”的交错序列中，文本 token 仅被允许关注其在序列中直接位于其之前的最近一张图像的重采样 token；序列中其余所有图像全部被注意力掩码遮蔽。允许关注其之前的所有图像是一种备选方案，但基准设计选用了关注最近一张图像的策略。
 
-### In-context few-shot
+### 上下文少样本能力（In-Context Few-Shot）
 
-Three image and caption pairs followed by a new image form a prompt that the frozen language model already knows how to complete. The gated layers feed it image content, and its in-context learning carries over without a gradient step. That is the point of keeping the language model frozen and the gate at zero.
+三组“图片加描述”范例后紧跟一张新图片构成的 prompt，冻结的纯文本大模型凭借其固有的语言续写能力天然就能直接理解并完成少样本补全。门控交叉注意力层负责将各图像的内容注入上下文，而语言模型固有的 In-context 泛化能力在无需一步梯度更新的情况下沿用。这正是保持语言模型冻结并将门控标量初始化为零的核心价值。
 
-### Against the single-input bridge
+### 对比输入层的单次桥接结构
 
-The query-based bridge from the earlier lesson also uses learned queries, but once, at the input layer, with 32 queries. The resampler plus gated cross-attention reads the latents every few layers, which costs more parameters and compute and buys interleaving and few-shot behavior.
+早期基于 Query 的桥接方案（如 BLIP-2 Q-Former）同样使用可学习查询向量，但它仅在语言模型的第一层输入端执行一次（使用 32 个 query）。而重采样器搭配门控交叉注意力则是每隔若干层反复读取视觉隐变量，虽然增加了参数量与推理计算，却换取了处理任意交错图文以及少样本学习的强大泛化能力。
 
 ## Follow-ups
 
-- **Level 2:** Why does the latent side supply the query vectors and the patch side the rest, not the other way around? Expected: the output has one row per query, so queries from the latents give a fixed number of rows; the reverse would give one row per patch again.
-- **Level 2:** What does the temporal encoding do for video? Expected: each frame gives the same 64 latents, so without a time signal the model cannot tell the first frame from the last; the encoding marks the frame index.
-- **Level 3:** Why mask to the most recent image instead of all preceding images? Expected: it keeps the shape each text token sees constant and matches the interleaved reading order, where a caption describes the image before it; seeing all images is the alternative with a different trade-off.
-- **Level 3:** A fine-tune of a model like this lost text-only quality. Where do you look? Expected: the gate; if it opened too wide too fast, visual noise overwrote the text residual stream, so compare the gate values by layer with the base.
+- **Level 2:** 为什么是由隐向量提供 Query、patch 提供 Key/Value，而不是反过来？ Expected: 注意力输出矩阵的行数由 Query 决定，由隐向量提供 Query 才能固定输出行数；若反过来，输出行数依然等于 patch 数量。
+- **Level 2:** 时间位置编码对视频起到了什么作用？ Expected: 每一帧都生成相同的 64 个隐向量，若没有时间信号，模型将无法区分第一帧和最后一帧；时间编码显式标记了帧的时间序列索引。
+- **Level 3:** 为什么将掩码限制在“最近一张图像”，而不是“之前的所有图像”？ Expected: 它保持了每个文本 token 看到的视觉矩阵形状严格恒定，且贴合交错图文阅读逻辑（描述往往紧随其所对应的图片）；关注之前所有图像是另一种不同取舍的备选方案。
+- **Level 3:** 这类模型在微调后纯文本能力大幅下降，首先排查哪里？ Expected: 检查门控标量；若门控开启过快过大，视觉噪声会覆盖文本残差流，应逐层对比门控数值与初始基准的漂移。
 
 ## Wrong answers
 
-- "Pad every image to the same number of patches." Padding wastes compute on large images and loses detail on small ones; the resampler gives a fixed count without either.
-- "Let the text tokens attend to all image patches directly." The count then varies per image and per prompt, and a prompt with many images floods the attention; the latents keep it fixed.
-- "Initialize the gate open so that the model learns faster." An open gate at step zero destroys the frozen language model's text behavior; a start at zero is what preserves it.
+- "把每张图像填充到相同的 patch 数量。" 填充在大图上浪费计算，在小图上丢失细节；重采样器能在避免这两者的同时输出固定数量的 token。
+- "让文本 token 直接对所有原始图像 patch 做交叉注意力。" 这样每个文本 token 面对的视觉 token 数量就会随图片尺寸和张数剧烈波动，多图输入会淹没注意力；隐向量能将其固定。
+- "将门控标量初始化为开启状态，以便模型学得更快。" 初始开启门控会瞬间破坏预训练语言模型原本精密的纯文本特征空间；从零初始化正是保护语言能力的基石。
 
 ## Taught in
 
-The [Flamingo lesson](../../../phases/12-multimodal-ai/04-flamingo-gated-cross-attention/) walks the resampler, the gated layers and the interleaved mask, and the [BLIP-2 lesson](../../../phases/12-multimodal-ai/03-blip2-qformer-bridge/) gives the query bridge that it is compared with.
+[Flamingo 课程](../../../phases/12-multimodal-ai/04-flamingo-gated-cross-attention/)深入剖析了重采样器、门控层和交错图文掩码，[BLIP-2 课程](../../../phases/12-multimodal-ai/03-blip2-qformer-bridge/)给出了与之横向对比的输入端查询桥接层。

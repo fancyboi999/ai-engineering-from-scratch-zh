@@ -1,6 +1,6 @@
 ---
 id: outcome-before-output
-title: Reframe a request that names its own solution
+title: 重新审视预设解决方案的需求
 card: behavioral
 kind: concept
 level: 1
@@ -16,48 +16,48 @@ related: [behavioral/riskiest-assumption-first]
 updated: 2026-11-03
 ---
 
-A product manager asks you to build an incident assistant for the on-call team. You have one week. Before you plan any work, what do you ask, and what do you write down first?
+一位产品经理要求你为值班团队构建一个突发事件应急助手，工期只有一周。在规划任何工作之前，你会提出哪些问题，又会首先记录什么？
 
 ## Short answer
 
-The request names an artifact, not a result. I write an outcome frame first: who has the problem, when it happens, what they do today, which observable state must improve, which limits are fixed, and which nearby work is out of scope. Then I check the frame for a product form, a model or an architecture that no evidence supports yet.
+该需求指明的是具体产物而非实际成果。我首先构建一个成果框架：谁遇到了问题、何时何地发生、当前如何处理、哪项可观察状态必须改善、哪些限制是固定的，以及哪些邻近工作属于范围之外。随后，我检查该框架中是否存在尚无证据支持的产品形态、模型或系统架构。
 
 ## Full answer
 
-### The six parts of the frame
+### 成果框架的六个组成部分
 
-| Part | Question I answer |
+| 组成部分 | 我所解答的问题 |
 |---|---|
-| User | Who feels the problem directly? |
-| Situation | When and where does it happen? |
-| Current behavior | What happens today, including the workarounds? |
-| Desired outcome | Which observable state must get better? |
-| Constraints | Which safety, policy, cost or compatibility limits are fixed? |
-| Non-goals | Which tempting adjacent work is excluded? |
+| 用户 | 谁直接感受到了痛点？ |
+| 场景 | 痛点在何时何地发生？ |
+| 当前行为 | 目前是如何处理的，包括哪些变通手段？ |
+| 期望成果 | 哪项可被客观观察的状态必须得到改善？ |
+| 约束条件 | 哪些安全、策略、成本或兼容性限制是硬性固定的？ |
+| 非目标 | 哪些诱人但属于相邻范围的工作被特意排除？ |
 
-For the on-call team, the desired outcome could read: when an alert arrives, the engineer finds the failing service and one safe next step inside the incident time budget, and the diagnosis stays read-only and auditable. A runbook, a data repair or a smaller interface change can all satisfy that sentence. The team stays attached to the result, not to the first tool someone imagined.
+针对值班团队，期望成果可以表述为：当告警触发时，工程师能在应急时间预算内找到故障服务及一个安全的下一步操作，且排查过程始终保持只读和可审计。一份运行手册、一次数据修复或一处更小的界面调整都能满足这句话的要求。团队应始终聚焦于最终成效，而非绑定在某人最初设想的第一个工具上。
 
-### Leakage
+### 方案泄漏
 
-A frame leaks a solution when it contains an interface, a model choice, a framework or a storage system that evidence has not earned. "Users get a weekly summary from a model" leaks the summary and the cadence. "Users understand account changes before approval" states the result. A constraint can name a technology when compatibility really fixes it. I record why it is fixed.
+当框架中包含尚未经客观证据证实的界面、模型选型、开发框架或存储系统时，就发生了方案泄漏。“用户每周从模型获取一份摘要”泄漏了摘要形式与交付频次；“用户在审批前能清晰理解账户变更”则陈述了期望成效。只有当兼容性确实存在硬性要求时，约束条件中才允许指定具体技术，且必须注明固定的原因。
 
-### Constraints and non-goals do real work
+### 约束条件与非目标发挥实质作用
 
-Constraints are part of the goal. No production writes during diagnosis, a response inside the incident time budget, and no new runtime dependency all remove whole classes of solutions. Non-goals keep the first slice from growing into a platform: no automatic remediation, no new alert routing, no replacement of the incident commander.
+约束条件本身就是目标的一部分。排查期间严禁生产环境写入、响应耗时必须控制在应急时间预算内、不引入新的运行时依赖，这些约束直接排除了整类技术方案。非目标则防止首个切片膨胀为庞大的平台：不搞自动修复、不搞新的告警路由、不取代现场指挥官的职能。
 
 ## Follow-ups
 
-- **Level 1:** How do you tell an outcome from an output? Expected: an outcome names an observable change for a user; an output names an artifact such as a page, a tool or a model.
-- **Level 2:** The manager insists on a chat interface. Where does that go in the frame? Expected: into the constraints only when policy or compatibility fixes it, with the reason written down; otherwise it waits for evidence.
-- **Level 2:** Name two non-goals that keep the first slice small. Expected: no automatic fix of the incident and no new alert routing, for example; each one must be concrete enough to reject work.
-- **Level 3:** What is the first observation that would show the desired outcome is wrong? Expected: a measured time to find the failing service that is already short, which means the frame targets a problem that does not exist.
+- **Level 1:** 如何区分成果与产物？ Expected: 成果指明了面向用户的可观察变化；产物指明的则是具体构件，如页面、工具或模型。
+- **Level 2:** 经理坚持要求采用聊天对话界面，这应放在框架的什么位置？ Expected: 仅当策略或系统兼容性硬性要求时才列入约束条件并注明原因；否则必须等待客观证据支撑。
+- **Level 2:** 请举出两个能让首个切片保持精简的非目标。 Expected: 例如不自动修复故障、不开发新的告警路由；每一项都必须足够具体，以便据此拒绝额外工作。
+- **Level 3:** 什么观测结果能够首次证明期望成果定义有误？ Expected: 测得当前定位故障服务的耗时本就已经很短，这意味着框架所针对的问题并不存在。
 
 ## Wrong answers
 
-- "Start with the interface and refine the goal later." The interface is one output. It ties the team to the first artifact before anyone knows what must improve.
-- "Constraints are implementation details for later." A build that reaches the outcome and breaks a constraint has not reached the outcome.
-- "Non-goals are optional." Without them, a useful slice grows into a platform before the first result is measured.
+- "先从界面做起，随后逐步细化目标。" 界面只是一种产物形态。在有人知道必须改善什么之前，这会让团队绑定在第一个产物上。
+- "约束条件是后续才考虑的实现细节。" 一个达成了预期成果却破坏了硬性约束的构建方案，并未达成成果。
+- "非目标是可有可无的。" 没有非目标，一个实用的功能切片在测出首个结果之前就会失控膨胀为庞大平台。
 
 ## Taught in
 
-The [outcome frame lesson](../../../phases/14-agent-engineering/47-outcomes-before-output/) gives the six-part frame and the leakage check.
+[成果先于产物课程](../../../phases/14-agent-engineering/47-outcomes-before-output/)给出了六要素框架和方案泄漏核查规范。

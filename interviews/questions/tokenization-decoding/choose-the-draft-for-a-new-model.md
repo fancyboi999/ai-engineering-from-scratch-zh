@@ -1,6 +1,6 @@
 ---
 id: choose-the-draft-for-a-new-model
-title: Bake in the draft, train it after, or borrow a small model
+title: 草稿是预训练内置、事后训练，还是借用小模型
 card: tokenization-decoding
 kind: design
 level: 4
@@ -16,59 +16,59 @@ related: [tokenization-decoding/mtp-sequential-vs-parallel, tokenization-decodin
 updated: 2026-11-03
 ---
 
-You are about to pretrain a model that will later serve a large volume using speculative decoding. Three ways to get a draft are on the table: bake sequential multi-token modules into pretraining, train a hidden-state draft head after pretraining, or reuse a small model of the same family. Give the decision with its costs, and name the gate you measure before you ship the flag.
+你准备预训练一个模型，它以后要用推测解码承载大流量服务。获得草稿有三条路：在预训练里内置串行多 token 预测模块；预训练之后训练一个基于隐藏状态的草稿头；复用同家族的小模型。给出你的决策和对应成本，并说出打开开关之前要测量的门槛。
 
 ## Short answer
 
-If I control pretraining and the hidden size is at least 4096, I bake in the sequential modules: about 10 percent slower training buys a denser supervision signal and a draft that accepts 80 percent or more at depth one. If the weights already exist, I train a post-hoc head on the verifier's features with about 60 to 200B tokens; it is backward compatible and reaches 0.88 to 0.92 acceptance on general chat. A same-family small model needs no training and sits around 0.55 to 0.70. Whatever I pick, the gate is measured acceptance on my own traffic mix at production concurrency, with the flag off below about 0.55 and the tail latency watched, not the mean.
+如果预训练由我掌控，且隐藏维度至少 4096，我会内置串行模块：训练慢约 10%，换来更密的监督信号，以及在深度 1 上接受率达到 80% 或更高的草稿。如果权重已经存在，我会在验证器的特征上事后训练一个草稿头，用约 60 到 200B token；它向后兼容，在通用对话上接受率达到 0.88 到 0.92。同家族小模型不需要训练，接受率在 0.55 到 0.70 左右。无论选哪条路，门槛都是在生产并发下、在自己的流量构成上实测接受率，低于约 0.55 就关掉开关，并且盯长尾延迟，不盯均值。
 
 ## Full answer
 
-### The three options
+### 三个选项
 
-| Option | When trained | Works with existing weights | Draft parameters | Acceptance | Extra benefit |
+| 选项 | 何时训练 | 能否用于已有权重 | 草稿参数 | 接受率 | 额外收益 |
 |---|---|---|---|---|---|
-| Sequential modules in pretraining | during pretraining | no | one block plus a projection per depth | 0.80 and above at depth one | denser training signal |
-| Post-hoc head on verifier features | after pretraining | yes | one or two layers, trained on about 60 to 200B tokens | 0.88 to 0.92 on chat | none beyond speed |
-| Same-family small model | none | yes | a whole small model | 0.55 to 0.70 | none, and it costs memory |
+| 预训练内置串行模块 | 预训练期间 | 否 | 每个深度一个模块加一层投影 | 深度 1 上 0.80 及以上 | 更密的训练信号 |
+| 基于验证器特征的事后草稿头 | 预训练之后 | 是 | 一到两层，用约 60 到 200B token 训练 | 对话上 0.88 到 0.92 | 除了速度没有别的 |
+| 同家族小模型 | 不训练 | 是 | 一整个小模型 | 0.55 到 0.70 | 没有，还要占显存 |
 
-### The decision tree
+### 决策树
 
-1. **Do you own pretraining?** If yes and the model is large enough, the modules are the only option that improves the model and the serving at once; the report that introduced them measured about 1.8 times generation throughput from the draft alone. At a 1B scale the overhead hurts more than it helps.
-2. **Do the weights already exist?** Then the post-hoc head. It is a light training job compared with the verifier, and it does not touch the verifier's outputs.
-3. **No training budget at all?** The small model, as a prototype, knowing the acceptance ceiling is low and the second model takes memory.
+1. **预训练归你管吗？** 如果是，而且模型足够大，内置模块是唯一能同时改善模型和服务的选项；提出它的那份报告测得，仅草稿一项就带来约 1.8 倍的生成吞吐。在 1B 规模上，这部分开销弊大于利。
+2. **权重已经存在？** 那就选事后草稿头。和训练验证器相比，这是个轻量的训练任务，也不会改动验证器的输出。
+3. **完全没有训练预算？** 用小模型做原型，同时清楚它的接受率上限低，第二个模型还要占显存。
 
-### The gate
+### 门槛
 
-Speculation is opt-in on the production engine, and the production lesson's rule is that flipping the flag without measuring acceptance on real traffic is an anti-pattern. The plan:
+在生产引擎上，推测解码需要显式开启。生产课程的规则是：不在真实流量上测接受率就打开开关，是反模式。做法如下：
 
-1. Serve the target plain and record time to first token, inter-token latency and throughput at the target concurrency.
-2. Enable the draft and rerun the same benchmark.
-3. Read accepted draft tokens and proposed draft tokens per request from the engine and divide the first by the second to get acceptance.
-4. Below about 0.55 at production concurrency, disable the flag or train a domain-specific head.
-5. Confirm that the tail inter-token latency did not get worse, because a rejected draft costs a verify and a re-roll.
+1. 先用普通解码服务目标模型，在目标并发下记录首 token 时间、token 间延迟和吞吐量。
+2. 打开草稿，重跑同一个基准。
+3. 从引擎读出每个请求被接受的草稿 token 数和提议的草稿 token 数，前者除以后者，得到接受率。
+4. 生产并发下低于约 0.55 时，关掉开关，或者训练一个领域专用的草稿头。
+5. 确认长尾的 token 间延迟没有变差，因为一次被拒的草稿要付出一次验证和一次重抽。
 
-### Traffic mix
+### 流量构成
 
-A head trained on general chat sits at 0.6 to 0.8 there and falls to 0.4 to 0.6 on code, medical or legal traffic. Weight the acceptance by traffic share before you decide, and measure each slice on its own; a blended number can hide a slice where speculation is net negative. The capstone's exercise asks exactly this for a 70 percent chat and 30 percent code mix with acceptances of 0.7 and 0.4.
+在通用对话上训练的草稿头，在对话上接受率是 0.6 到 0.8，在代码、医疗或法律流量上降到 0.4 到 0.6。决策前按流量占比给接受率加权，并且每个切片单独测；混在一起的数字可能掩盖某个推测解码净亏的切片。综合项目的练习问的正是这个：70% 对话、30% 代码，接受率分别是 0.7 和 0.4。
 
-### Operate it
+### 运维
 
-Acceptance drifts when the target changes version and the draft does not, so alert on it per slice, and keep a draft-free or n-gram fallback for the slices where the head stops paying.
+目标模型换了版本而草稿没跟上时，接受率会漂移，所以要按切片告警；对草稿头不再划算的切片，保留不用草稿的方案或 n-gram 回退。
 
 ## Follow-ups
 
-- **Level 3:** The traffic is 70 percent chat at 0.7 acceptance and 30 percent code at 0.4. How do you decide? Expected: weight by traffic share, then check each slice against the floor; code alone is below it, so route code to a plain decode or train a code head.
-- **Level 4:** The target gets a new version next quarter. What happens to each option? Expected: the baked-in modules move with the model; the post-hoc head must be retrained against the new target; the small model drifts further; alert on acceptance per version.
-- **Level 4:** What does a hidden-state head read in the current generation? Expected: features from several target layers, not only the last, which is part of why acceptance rose.
-- **Level 4:** Where does the small-model option still win? Expected: a prototype with no training budget, or a CPU deployment where the engine ships only the plain draft path.
+- **Level 3:** 流量是 70% 对话（接受率 0.7）和 30% 代码（接受率 0.4）。你怎么决策？ Expected: 按流量占比加权，再逐个切片对照底线；代码单独看已经低于底线，所以把代码路由到普通解码，或训练一个代码草稿头。
+- **Level 4:** 目标模型下个季度出新版本。三个选项分别会怎样？ Expected: 内置模块随模型一起更新；事后草稿头必须对着新目标重训；小模型漂移得更远；按版本对接受率告警。
+- **Level 4:** 当前这一代基于隐藏状态的草稿头读取的是什么？ Expected: 目标模型多个层的特征，而不只是最后一层，这是接受率提高的原因之一。
+- **Level 4:** 小模型这条路在哪些场景仍然占优？ Expected: 没有训练预算的原型，或者引擎只提供普通草稿路径的 CPU 部署。
 
 ## Wrong answers
 
-- "Always use the latest hidden-state draft; it is strictly best." It needs training against your target and its acceptance on domain traffic can fall to 0.4; the baked-in modules give you a draft and a better model if you own pretraining.
-- "Bake the modules in later with a fine-tune." They are a pretraining choice; an existing dense model gets a post-hoc head instead.
-- "Pick by the speedup on a public benchmark." Acceptance depends on your traffic; the gate is measured on your own mix at your concurrency.
+- "永远用最新的隐藏状态草稿头，它严格最优。" 它需要对着你的目标模型训练，在领域流量上接受率可能跌到 0.4；如果预训练归你管，内置模块能同时给你草稿和一个更好的模型。
+- "以后用一次微调把模块加进去。" 这是预训练阶段的选择；已有的稠密模型应该加一个事后草稿头。
+- "按公开基准上的加速比来选。" 接受率取决于你的流量；门槛要在你自己的流量构成和并发下测。
 
 ## Taught in
 
-The [multi-token prediction lesson](../../../phases/10-llms-from-scratch/18-multi-token-prediction/) and the [EAGLE-3 lesson](../../../phases/10-llms-from-scratch/15-speculative-decoding-eagle3/) give the two trained options and their costs, the [production EAGLE-3 lesson](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/) sets the measurement gate, and the [speculative decoding server capstone](../../../phases/19-capstone-projects/14-speculative-decoding-server/) covers drift and fallback.
+[多 token 预测课程](../../../phases/10-llms-from-scratch/18-multi-token-prediction/)和 [EAGLE-3 课程](../../../phases/10-llms-from-scratch/15-speculative-decoding-eagle3/)给出了两种需要训练的选项及其成本，[生产环境 EAGLE-3 课程](../../../phases/17-infrastructure-and-production/05-eagle3-speculative-decoding/)规定了测量门槛，[推测解码服务端综合项目](../../../phases/19-capstone-projects/14-speculative-decoding-server/)讲了漂移和回退。

@@ -1,6 +1,6 @@
 ---
 id: two-users-two-workflows
-title: Two users describe two different workflows
+title: 两位用户描述了两种不同的工作流
 card: behavioral
 kind: tradeoff
 level: 2
@@ -16,52 +16,52 @@ related: [behavioral/evidence-ladder-for-workflows]
 updated: 2026-11-03
 ---
 
-Two senior analysts on the same team show you how they triage a flagged transaction. Their steps differ in order, in the tools they open, and in who they ask before they act. Your deadline allows one workflow in the first version. What do you do with the disagreement?
+同一团队的两位资深分析师向你展示了他们如何初筛排查被标记的可疑交易。他们在操作步骤的顺序、打开的工具以及行动前请示的对象上均存在差异。你的交付截止时间只允许首个版本支持单一工作流。面对这种分歧，你该如何处理？
 
 ## Short answer
 
-I keep both variants separate until I know why they differ. The difference can come from different roles, different risk levels, a legacy process next to a current one, a difference in expertise, or a real policy disagreement, and each of those leads to a different product. An averaged workflow can describe nobody, so the first version targets one variant on purpose and names the other as a known gap.
+在查明分歧的原因之前，我将两种变体保持独立。产生差异的原因可能是角色不同、风险等级不同、新旧遗留流程并存、专业经验差距或真实的业务策略分歧，而每一种原因都会导向不同的产品形态。平均化的工作流可能谁都代表不了，因此首个版本有意针对一种变体，并将另一种列为已知差距。
 
 ## Full answer
 
-### Why not average
+### 为什么不能取平均值
 
-Two people can perform different workflows for good reasons. Merging their steps into one path produces a sequence that neither of them follows. The assistant then fails at the first handoff or exception, which is where these features fail most.
+两个人各自采用不同的工作流通常都有充分的理由。强行将两者的步骤合并为单一流程，只会产出一个双方都不会遵循的序列。这会导致助手系统在首次任务交接或遇到异常分支时发生崩溃，而这恰恰是此类功能最容易失败的地方。
 
-### What the difference can mean
+### 差异背后的实际含义
 
-| Cause | What it tells the build |
+| 根本原因 | 对系统构建的启示 |
 |---|---|
-| Different roles | Two user types, maybe two outcome frames |
-| Different risk levels | The branch is a feature, not noise |
-| Legacy and current process | One variant may be retiring; confirm with the owner |
-| Expertise difference | The expert path may be the target and the other the training gap |
-| Policy disagreement | A human decision is needed before any build |
+| 角色分工不同 | 存在两类用户画像，可能需要两个独立的成果框架 |
+| 风险等级不同 | 业务分支本身就是核心功能，而非无关噪音 |
+| 遗留旧流程与现行流程并存 | 其中一种变体可能即将废弃；需向流程负责人确认 |
+| 专业经验差距 | 专家路径可能是目标形态，另一条则是培训缺失的产物 |
+| 策略规则分歧 | 在启动任何构建前，必须先交由人工做出明确决策 |
 
-### How I resolve it
+### 我所采取的解决步骤
 
-1. Record both variants as ordered steps with evidence and the rung of that evidence.
-2. Find where the branch begins and which authority boundary each variant crosses.
-3. Ask the owner of the process which cause applies; if it is a policy disagreement, that decision goes to a human and the build waits for it.
-4. Pick one variant for the first slice by risk and frequency, and write the other as a non-goal with the reason.
+1. 将两种变体分别记录为按序排列的步骤，附带支持证据及其在证据阶梯上的层级。
+2. 找出分支开始分流的位置，以及每种变体分别跨越了哪些权限边界。
+3. 向业务流程负责人核实具体原因；如果属于策略分歧，该决策交由人工裁决，系统构建原地等待。
+4. 综合考虑风险与发生频次，选择其中一种变体作为首个功能切片，将另一种作为非目标记录在案并注明原因。
 
-### Where the exception hides
+### 异常分支藏在何处
 
-Often one analyst's "extra" step is the exception path the other analyst has stopped noticing. I ask for a real case where the normal path failed before I call a step optional.
+很多时候，某位分析师口中所谓的“多余”步骤，正是另一位分析师已经不再注意的异常路径。在将某个步骤判定为可选项之前，我会要求调取常规流程失败时的真实案例来核验。
 
 ## Follow-ups
 
-- **Level 2:** One analyst asks a supervisor before acting and the other does not. What is that step? Expected: an authority boundary; the build must respect it, and the two variants may differ in risk level or role.
-- **Level 2:** You can only ship one path. How do you choose? Expected: by the risk and the frequency of each variant, with the other recorded as a named gap, not by averaging.
-- **Level 3:** The owner says both are fine. What do you record? Expected: that the policy allows both, with the evidence, so the assistant does not force one on everybody.
-- **Level 3:** How do you keep the second variant from disappearing from the plan? Expected: write it as a non-goal with its reason and a review point, so it stays visible as a decision instead of an omission.
+- **Level 2:** 一位分析师在操作前向上级请示，而另一位则不请示，该步骤属于什么？ Expected: 权限边界；系统构建必须遵守该边界，且两种变体可能在风险等级或角色职权上存在差异。
+- **Level 2:** 首个版本只能支持单一路径，你依据什么做出选择？ Expected: 依据每种变体的风险等级和发生频次来定，并将未选的变体作为已知空白明确记录，而非机械取平均。
+- **Level 3:** 业务负责人表示两种做法都可以，你该如何记录？ Expected: 记录策略上允许两种做法并附带依据证据，从而避免助手将单一路径强加给所有人。
+- **Level 3:** 如何防止第二种变体从后续规划中彻底遗失？ Expected: 将其作为附带原因和复审节点的非目标写入文档，使其作为明确的决策结论保持可见，而非无意间的遗漏。
 
 ## Wrong answers
 
-- "Merge the two into one standard process." The averaged workflow may describe nobody and breaks at the handoff.
-- "Follow the more senior person." Seniority is not evidence; the cause of the difference decides.
-- "Treat the extra steps as optional and skip them." The extra step is often the exception path that carries most of the risk.
+- "将两者合并为一套标准化流程。" 平均化的工作流可能谁都代表不了，且在交接环节会出问题。
+- "以资历更深的那位分析师的操作为准。" 资历高低并不是客观证据；导致差异的根本原因才具有决定权。
+- "把多出来的步骤视为可选项直接略过。" 多出来的步骤往往正是承载了绝大部分业务风险的异常分支路径。
 
 ## Taught in
 
-The [workflow discovery lesson](../../../phases/14-agent-engineering/48-discover-the-real-workflow/) explains why disagreement must not be averaged away and lists the causes behind variants.
+[工作流发现课程](../../../phases/14-agent-engineering/48-discover-the-real-workflow/)解释了为何绝不能用平均值抹平分歧，并列举了变体背后的产生原因。

@@ -1,6 +1,6 @@
 ---
 id: skew-triage
-title: Offline accuracy was fine and live accuracy is not
+title: 离线准确率达标但线上表现大幅滑坡的排查
 card: system-design
 kind: debug
 level: 3
@@ -16,55 +16,55 @@ related: [system-design/feature-store-design, system-design/concept-drift-blind-
 updated: 2026-11-03
 ---
 
-A churn model scored well offline and does worse than the older, simpler model on live traffic. Serving features are computed by another team's service. You have a sample of logged serving requests. Design the triage: which comparisons you run, in which order, what each one isolates, and what the fix looks like for each cause you find.
+一个用户流失预测模型在离线评估时指标优异，但在真实线上流量上的表现甚至差于原先陈旧、简易的旧模型。线上特征是由另一个团队的服务计算提供的。你拿到了一批线上记录的请求日志抽样。请设计排查方案：按什么顺序执行哪些比对、每一组比对能剥离排查出什么根因，以及针对发现的各类原因分别该如何修复。
 
 ## Short answer
 
-Compare the same entity and time across three pairs. The online store read against the training join tests the whole system and should show zero skew when both read one definition. A fresh computation against the training join isolates staleness, and the second team's code path against a fresh computation isolates code differences such as window boundaries and defaults. Each pair gives a mismatch rate and a mean absolute difference per feature, and the fix for every cause is the same shape: one registry definition that both paths call, with logged serving features checked against it.
+针对相同实体和时间开展三组对比。首先对比在线存储读取值与离线训练拼接值，两者读取唯一定义时应呈现零偏移；将实时重新计算值与训练拼接值比对以剥离排查特征时效问题；将外部团队的代码路径与实时计算值比对以剥离排查时间窗口边界与默认值等逻辑代码分歧。每组比对均计算特征维度的失配率与平均绝对误差，而最终的根治修复手段完全一致：在特征注册中心维护唯一定义，要求训练与在线双链路统一调用该定义，并持续开启线上特征抽样校验。
 
 ## Full answer
 
-### The four causes
+### 四大诱发原因
 
-| Cause | What happens | Example from the lesson |
+| 根本原因 | 具体表现 | 课程中的典型示例 |
 |---|---|---|
-| Two code paths | Training and serving compute the feature differently | The serving window includes one extra day |
-| Stale features | The served value has a different age than training saw | Training read weekly snapshots, serving computes fresh |
-| Different defaults | The two paths fill a missing value differently | Training used 365 for no purchase yet, serving used -1 |
-| Time travel | Training read a value from after the label time | A naive join took the newest snapshot |
+| 双代码路径分歧 | 训练与线上分别独立编写特征计算逻辑 | 线上服务的统计时间窗口多算了一整天 |
+| 特征时效不一致 | 线上使用的特征与训练所见的数据新鲜度不同 | 训练使用按周生成的快照，线上则实时动态计算 |
+| 缺失值默认值不一致 | 双链路在处理空缺值时填充了不同数值 | 训练针对无购买记录填 365，线上则填 -1 |
+| 时间旅行 | 训练链路读取了处于标签时间之后的未来数据 | 朴素拼接直接抓取了最新的特征快照 |
 
-### The three comparisons
+### 三组针对性对比排查
 
-1. Online store read against the training join. Both read the same materialized rows from one definition, so every feature should show a mismatch of zero. A nonzero result here means the store or the join itself is wrong.
-2. Fresh computation against the training join. This isolates staleness. In the lesson's demo the fresh value differs on most requests: 83.0% mismatch for days since last purchase, 30.5% for the purchase count, 37.1% for spend. Fresher is not better here, because the model learned from values up to six days old.
-3. Second code path against fresh computation. This isolates code. The demo shows 12.5% mismatch on both window counts, because the other team's window includes one extra day, and 5.5% mismatch on days since last purchase with a mean difference of 20.07, which comes only from new users where the defaults disagree, -1 against 365.
+1. 在线存储读取值对比训练拼接值：两者都是基于注册中心的唯一定义读取物化记录，因此所有特征的失配率理应为零。此处若出现非零失配，说明存储或拼接本身有误。
+2. 实时重新计算值对比训练拼接值：此举能精准剥离排查数据时效问题。在课程演示中，实时计算的新值在大部分请求上都产生了差异：距离上次购买天数的失配率高达 83.0%，购买次数失配率 30.5%，消费金额失配率 37.1%。在此场景下特征越新鲜反而效果越差，因为模型学习的是最多陈旧六天的特征值。
+3. 外部团队代码路径对比实时重新计算值：此举能精准剥离代码实现差异。演示表明两个窗口统计特征的失配率为 12.5%（因为对方窗口多算了一天）；而距离上次购买天数的失配率为 5.5% 且平均差值高达 20.07，这完全来自于新注册用户在缺失值默认设定上的分歧（-1 对比 365）。
 
-The check needs the same request keys on both sides, and it fails loudly when the keys differ or when there are no requests, because a missing request hides skew and an empty check proves nothing.
+校验逻辑必须基于两侧相同的请求主键匹配，在主键不一致或样本为空时必须显式报错，因为请求缺失会掩盖特征偏移，空跑校验更无法证明任何结论。
 
-### The fixes
+### 对应的根治方案
 
-- Two code paths: delete the private copy; both services call the registry definition, and a change creates a new version that old models do not pick up.
-- Stale features: match the serving age to the training age, or retrain on the fresher snapshots; a feature's freshness is part of its definition.
-- Different defaults: one default in the registry, applied by one function in both paths.
-- Time travel: the point-in-time join with the TTL, which the demo shows moves offline accuracy from an inflated 0.948 to an honest 0.893 and live accuracy from 0.763 to 0.876.
+- 双代码路径分歧：删除私有副本；两个服务都调用特征注册中心定义，逻辑修改必须升版，旧模型不自动继承新版本。
+- 特征时效不一致：使线上特征时效与训练时效保持一致，或者在更新鲜的快照数据上重新训练模型；特征的数据新鲜度本身就是其定义的一部分。
+- 默认值不一致：在注册中心确立唯一默认值，双链路统一调用下游函数填充空值。
+- 时间旅行：引入附带 TTL 的截止时间点拼接；课程演示表明该修复使虚高的离线准确率从 0.948 回归到诚实的 0.893，同时将真实线上准确率从 0.763 挽救提升至 0.876。
 
-### Why the simpler model won live
+### 为什么简易的旧模型在线上反而获胜
 
-The older model used features that both paths computed the same way. The new model trusted a feature whose live values came from a different window and a different default, so it saw inputs it never trained on.
+旧模型使用的特征在双链路上计算逻辑完全一致。新模型信任了线上取值来自不同窗口和不同默认值的特征，导致它在线上面对的是训练时从未见过的输入分布。
 
 ## Follow-ups
 
-- **Level 3:** Which comparison would you run first with one hour available? Expected: the first one; if the store read matches the training join, the system is consistent and the problem is elsewhere, and if not, every downstream check is moot.
-- **Level 3:** The defaults differ only for new users. Why does the mismatch rate understate the damage? Expected: the rate is low because new users are few, but the difference per mismatch is huge, so the model's output for every new user is wrong.
-- **Level 4:** The other team cannot change their service this quarter. What do you do? Expected: log their served features, train the next model on those logged values so training matches serving, and keep the skew check running so the gap is visible.
-- **Level 4:** How does a created timestamp enter the triage? Expected: a backfill written today can read late-arriving data, so a strict join also drops rows created after the label time; otherwise the training path itself is skewed.
+- **Level 3:** 若只有一个小时可用，你最先执行哪组比对？ Expected: 第一组，即在线存储对比训练拼接；若两者完全一致，说明基础工程管线健康，问题出在别处；若不一致，后续所有排查均无意义。
+- **Level 3:** 默认值差异仅发生在极少数新用户身上，为什么失配率会低估其造成的破坏？ Expected: 新用户占比较小使得总体失配率数字偏低，但每个失配样本的数值偏差极其巨大，导致模型对每位新用户的预测都不正确。
+- **Level 4:** 对方团队表示本季度无法排期修改其服务代码，你该如何应对？ Expected: 抽样落盘记录其线上实际生成的特征值，使用这批记录值重新训练下一代模型，使训练与线上保持一致，并保持特征偏移监控持续运行以暴露差距。
+- **Level 4:** 数据的入库创建时间戳在排查中起什么作用？ Expected: 今天执行的历史回填可能读到历史上延迟到达的数据，严格的时间点拼接必须剔除创建时间晚于标签时间的数据，否则训练数据本身就会发生特征穿越。
 
 ## Wrong answers
 
-- "Fresh serving features are always better than training snapshots." The model learned the training freshness; a different age is skew in either direction.
-- "A mismatch rate under a few percent is fine." A small rate with a large mean difference, as with the defaults, still breaks every affected prediction.
-- "Compare offline accuracy with live accuracy and call it drift." Drift is a change over time; skew is a difference between two readers of the same feature at the same time, and the three comparisons tell them apart.
+- "线上特征比训练快照更新鲜，这肯定是件好事。" 模型学习的是训练数据所具备的数据时效；新鲜度不一致双向都会构成特征偏移。
+- "失配率只要在几个百分点以内就可以忽略不计。" 即使整体比例很低，但若单点差值极大，依然会彻底搞砸所有受影响样本的预测。
+- "将离线准确率与线上准确率对比，称其为数据漂移。" 漂移是指数据随时间产生的客观变化；偏移是指同一时刻不同系统对同一特征计算出的数值差异，三组比对能将其精确区分。
 
 ## Taught in
 
-The [feature store lesson](../../../phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/) names the four causes of skew and runs the three comparisons on logged requests.
+[特征存储课程](../../../phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/)列举了特征偏移的四大根因，并演示了在请求日志上执行三组对比排查的全过程。

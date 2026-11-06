@@ -1,6 +1,6 @@
 ---
 id: pre-norm-vs-post-norm
-title: Why the norm moved in front of the sublayer
+title: norm 为什么挪到了子层前面
 card: transformers
 kind: tradeoff
 level: 2
@@ -16,56 +16,56 @@ related: []
 updated: 2026-11-03
 ---
 
-The 2017 paper placed the layer normalization after the residual add. Almost every model since about 2019 places it before the sublayer. What changed, how would you demonstrate the difference in one afternoon, and what does RMSNorm change on top of that?
+2017 年的论文把层归一化放在残差相加之后。大约 2019 年以后，几乎所有模型都把它放在子层之前。变的是什么？你怎么用一个下午演示出差别？RMSNorm 在此之上又改了什么？
 
 ## Short answer
 
-Post-norm sends the gradient of the skip path through a normalization at every layer, so at depth the gradient shrinks and the run needs a warmup schedule to survive. Pre-norm keeps the skip path unnormalized, so the gradient reaches the embeddings cleanly and a deep stack trains without warmup tricks. Demonstrate it by stacking twelve layers of each variant with the same initialization and printing the gradient norm at the embedding after one backward pass. RMSNorm then drops the mean subtraction, one fewer operation, with the same stability in practice.
+post-norm 让跳连路径上的梯度在每一层都经过一次归一化，所以层数一深，梯度就会缩小，训练要靠 warmup 调度才能撑下来。pre-norm 让跳连路径保持不归一化，梯度可以干净地传到 embedding，深层堆叠不靠 warmup 技巧也能训练。演示方法：两种变体各堆十二层，用相同的初始化，做一次反向传播后打印 embedding 处的梯度范数。RMSNorm 进一步去掉了减均值，少一步运算，实践中稳定性相同。
 
 ## Full answer
 
-### The two placements
+### 两种放法
 
 ```text
 pre-norm:   x + sublayer(LN(x))
 post-norm:  LN(x + sublayer(x))
 ```
 
-Same shapes, different training behavior. In the post-norm block the residual add is followed by the norm, so the signal that flows down the stack is normalized at each layer and the gradient that flows back must pass through every norm. At a depth of twelve and a learning rate of `3e-4` that gradient shrinks fast enough to need warmup. In the pre-norm block the norm sits inside the branch, before attention and before the MLP, and the skip path carries the raw signal.
+形状相同，训练表现不同。post-norm block 在残差相加之后接 norm，所以沿堆叠向下流动的信号每层都被归一化一次，回传的梯度也必须穿过每一个 norm。在十二层深、学习率 `3e-4` 时，这个梯度缩小得够快，需要 warmup。pre-norm block 把 norm 放在分支内部，注意力之前和 MLP 之前，跳连路径传递的是原始信号。
 
-### The afternoon experiment
+### 一个下午的实验
 
-1. Build a six-layer or twelve-layer stack with a `pre_ln` flag.
-2. Feed the same random input to both variants with identical weights.
-3. Run one backward pass and print the gradient norm at the embedding.
+1. 搭一个六层或十二层的堆叠，带一个 `pre_ln` 开关。
+2. 两种变体用相同的权重，输入同一份随机数据。
+3. 做一次反向传播，打印 embedding 处的梯度范数。
 
-The pre-norm stack shows an embedding gradient about an order of magnitude larger than the post-norm stack at the same learning rate.
+学习率相同时，pre-norm 堆叠在 embedding 处的梯度比 post-norm 大约一个数量级。
 
-### What pre-norm needs that post-norm did not
+### pre-norm 需要而 post-norm 不需要的东西
 
-A final norm before the output head. The residual stream is unnormalized in a pre-norm model, so the head needs one normalization at the end.
+输出头之前的最后一个 norm。pre-norm 模型的残差流没有归一化，所以输出头之前需要在最后做一次归一化。
 
 ### RMSNorm
 
-LayerNorm subtracts the mean and divides by the standard deviation. RMSNorm divides by the root mean square and skips the mean subtraction. It is one operation cheaper and is empirically at least as stable, which is why the modern block uses it.
+LayerNorm 先减均值，再除以标准差。RMSNorm 除以均方根，跳过减均值。它少一步运算，经验上稳定性至少一样好，所以现代 block 用它。
 
-### Where dropout goes
+### dropout 放在哪里
 
-After the attention softmax, on the attention output before the residual add, and after the second linear of the MLP. Never on the skip path itself, because that breaks the additive identity that lets the gradient flow at depth.
+放在注意力 softmax 之后，放在注意力输出上、残差相加之前，以及 MLP 第二个线性层之后。绝不放在跳连路径本身上，因为那会破坏让梯度在深层流动的加法恒等关系。
 
 ## Follow-ups
 
-- **Level 2:** Where exactly does the norm sit in a pre-norm block? Expected: inside each residual branch, before attention and before the MLP, plus one final norm before the head.
-- **Level 3:** Why does a pre-norm model need a final norm when a post-norm model does not? Expected: the pre-norm skip path is unnormalized, so the head would see an unbounded stream without it.
-- **Level 3:** Your six-layer post-norm model trains fine and the twenty-four-layer version diverges. Why? Expected: the skip-path gradient attenuates at every norm, and the effect compounds with depth; add warmup or switch to pre-norm.
-- **Level 4:** What would convince you to keep LayerNorm instead of RMSNorm? Expected: a measured quality or stability difference on your own run; the lesson's evidence is that RMSNorm matches it while being cheaper.
+- **Level 2:** pre-norm block 里 norm 具体放在哪里？ Expected: 放在每个残差分支内部，注意力之前和 MLP 之前，另外在输出头之前再加一个最后的 norm。
+- **Level 3:** 为什么 pre-norm 模型需要最后一个 norm，而 post-norm 模型不需要？ Expected: pre-norm 的跳连路径没有归一化，没有最后的 norm，输出头会看到一个没有界的残差流。
+- **Level 3:** 你的六层 post-norm 模型训练正常，二十四层的版本却发散了。为什么？ Expected: 跳连路径的梯度在每个 norm 处都会衰减，效果随深度累积；加 warmup，或者换成 pre-norm。
+- **Level 4:** 什么能让你保留 LayerNorm 而不换 RMSNorm？ Expected: 在你自己的训练上测到了质量或稳定性的差异；课程的证据是 RMSNorm 与它持平，而且更便宜。
 
 ## Wrong answers
 
-- "The two placements compute the same function in a different order." The composition differs: one normalizes the stream, the other normalizes only the branch input.
-- "Warmup is a learning-rate detail unrelated to the norm." The lesson ties the need for warmup directly to the post-norm gradient path.
-- "RMSNorm needs the mean to be stable." It omits the mean on purpose and matches LayerNorm in practice.
+- "两种放法只是用不同顺序算同一个函数。" 两者的复合方式不同：一种对残差流做归一化，另一种只对分支的输入做归一化。
+- "warmup 是学习率的细节，和 norm 无关。" 课程把对 warmup 的需要直接归因于 post-norm 的梯度路径。
+- "RMSNorm 需要均值才能稳定。" 它故意省掉均值，实践中与 LayerNorm 持平。
 
 ## Taught in
 
-The [full transformer lesson](../../../phases/07-transformers-deep-dive/05-full-transformer/) explains the move to pre-norm and RMSNorm, and the [block capstone](../../../phases/19-capstone-projects/34-transformer-block/) builds both variants and measures the gradient.
+[完整 transformer 一课](../../../phases/07-transformers-deep-dive/05-full-transformer/)解释了为什么改用 pre-norm 和 RMSNorm，[block 综合项目](../../../phases/19-capstone-projects/34-transformer-block/)实现了两种变体并测量了梯度。

@@ -1,6 +1,6 @@
 ---
 id: cosine-warmup-schedule-boundaries
-title: Warmup plus cosine schedule with pinned boundaries
+title: 边界固定的预热加余弦调度
 card: deep-learning
 kind: take-home
 level: 4
@@ -16,15 +16,15 @@ related: [deep-learning/warmup-before-the-peak-rate, deep-learning/pick-the-peak
 updated: 2026-11-03
 ---
 
-Take-home. Implement a learning rate schedule as one function of the step: a linear ramp from zero to a peak, a cosine decay from the peak to a floor, and a fixed floor after the last step. Deliver tests that pin the value at every boundary, prove the curve has no jumps, and show that a resumed run lands on the right value. Describe your design and your tests.
+课后作业。把学习率调度实现成关于步数的一个函数：从零线性升到峰值，从峰值按余弦降到下限，最后一步之后固定在下限。交付的测试要固定每个边界上的值，证明曲线没有跳变，并说明恢复训练后会落在正确的值上。描述你的设计和测试。
 
 ## Short answer
 
-Write one function with three branches: up to the warmup step, the peak times the step over the warmup length; between the warmup step and the total, the floor plus half the gap times one plus the cosine of pi times the progress since warmup ended; past the total, the floor. Test the fixed points: zero at step zero, the peak at the end of warmup from both branches, the floor at the last step and the floor one step later. Add a continuity test that bounds each one step change, and a resume test that computes the schedule from a saved global step.
+写一个有三个分支的函数：到预热步为止，学习率是峰值乘以步数与预热长度之比；在预热步和总步数之间，是下限加上以下乘积：差值的一半乘以（一加上 pi 乘预热结束后进度的余弦）；超过总步数，就是下限。测试固定点：第零步为零，预热结束时两个分支都给出峰值，最后一步是下限，再多一步还是下限。再加一个限制单步变化的连续性测试，以及一个从保存的全局步数计算调度的恢复测试。
 
 ## Full answer
 
-### The function
+### 函数
 
 ```text
 if warmup_steps > 0 and step <= warmup_steps:
@@ -36,36 +36,36 @@ else:
     lr = lr_min
 ```
 
-The cosine evaluates to 1 at the end of warmup, which gives the peak and matches the ramp's endpoint, and to -1 at the total, which gives the floor. The capstone lesson makes the point that this continuity is the reason to write one function over the step rather than three pieces glued together: a glued schedule loses a boundary the first time the peak or a step count changes. Two guards: the ramp branch runs only when the warmup is above zero, so a warmup of zero steps starts at the peak and decays at once, with no division by zero. The constructor rejects a warmup that is not less than the total, as the lesson's code does with an error, because the rate would hold the peak at the last step and drop to the floor one step later.
+余弦在预热结束时等于 1，得到峰值，和线性上升的终点一致；在总步数处等于 -1，得到下限。综合项目课强调，正是这种连续性，让我们把它写成一个关于步数的函数，而不是把三段拼起来：拼接的调度在第一次改峰值或步数时就会丢掉一个边界。有两个保护。上升分支只在预热大于零时运行，所以预热为零步时从峰值开始，立即衰减，不会除以零。构造函数拒绝不小于总步数的预热，课里的代码也是直接报错，因为否则学习率会在最后一步停在峰值，再多一步就掉到下限。
 
-### Why the floor is pinned, not an error
+### 为什么固定在下限，而不是报错
 
-A trainer that overshoots the configured total keeps a usable rate and logs a warning. Extending a run means changing the total in the config, not editing the loop. The floor is non-zero on purpose: the lesson keeps it near 10 percent of the peak so the optimizer keeps learning in the long tail, and warns that a floor of zero looks good on a plot and leaves the model under-trained.
+训练器超出配置的总步数时，仍然有可用的学习率，并记录一条警告。要延长训练，就改配置里的总步数，不改循环。下限故意不为零：课里把它保持在峰值的 10% 左右，让优化器在长尾阶段继续学习，并提醒下限为零在图上好看，却会让模型训练不足。
 
-### The tests
+### 测试
 
-1. **Fixed points.** With a non-zero warmup, lr(0) is 0, lr(warmup) equals the peak from the ramp branch and from the cosine branch, lr(total) equals the floor, lr(total + 1) equals the floor.
-2. **Continuity.** For every step from 0 to total, the change between consecutive steps is at most the larger of the warmup slope, peak over warmup steps, and the steepest cosine slope, pi times the gap over twice the decay length. The lesson's exercise notes that a short cosine segment can be steeper than the ramp, so the ramp slope alone is not a safe bound.
-3. **Resume.** Save a checkpoint with a global step, reload, and assert that the next value equals lr(global step + 1). The schedule reads a monotonic global step from the checkpoint, not an epoch counter or a loop variable, because sharded datasets and restarted loaders break the epoch to step mapping.
-4. **Shape.** Render the schedule to a text plot and a CSV, with one row per step, and check the plot into the run directory so a reviewer can see the curve without running anything.
+1. **固定点。** 预热不为零时，lr(0) 为 0，lr(warmup) 在上升分支和余弦分支上都等于峰值，lr(total) 等于下限，lr(total + 1) 等于下限。
+2. **连续性。** 从 0 到 total 的每一步，相邻两步之间的变化不超过两个斜率中较大的那个：预热斜率，即峰值除以预热步数；以及余弦的最大斜率，即 pi 乘差值除以两倍衰减长度。课里的练习指出，较短的余弦段可能比上升段更陡，所以只用上升斜率作上界并不安全。
+3. **恢复。** 保存一个带全局步数的检查点，重新加载，断言下一个值等于 lr(global step + 1)。调度从检查点读取单调递增的全局步数，而不是 epoch 计数器或循环变量，因为分片数据集和重启的加载器会打乱 epoch 到步数的映射。
+4. **形状。** 把调度渲染成文本图和 CSV，每步一行，把图存进运行目录，评审者不用运行任何东西就能看到曲线。
 
-### Production notes from the lesson
+### 课里的生产实践
 
-The schedule's four numbers live in a versioned config, not in code. The warmup is a fraction of the total, around 1 to 3 percent, so the shape survives a longer run. The log row is step, learning rate, gradient L2 norm and loss, in that order, so dashboards can read it.
+调度的四个数字放在带版本的配置里，不写在代码里。预热是总步数的一个比例，大约 1% 到 3%，这样训练变长时形状不变。日志行依次是步数、学习率、梯度 L2 范数和损失，方便看板读取。
 
 ## Follow-ups
 
-- **Level 3:** Why implement the three regions in one function? Expected: so the ramp endpoint and the cosine start share one formula for the peak, and a change to the peak or the step counts cannot open a gap at a boundary.
-- **Level 4:** What is the right bound for the continuity test? Expected: the larger of the ramp slope, peak over warmup steps, and the steepest cosine slope, pi times the gap over twice the decay length; a short cosine segment can be steeper than the ramp.
-- **Level 4:** Why pin at the floor after the last step instead of raising? Expected: a trainer that overshoots keeps a usable rate and logs a warning; extending training means changing the total in the config, not the loop.
-- **Level 4:** What makes a resumed run land on the right value? Expected: the schedule reads a monotonic global step saved in the checkpoint, not an epoch counter or a local loop variable.
+- **Level 3:** 为什么把三个区间写在一个函数里？ Expected: 这样上升的终点和余弦的起点用同一个公式算峰值，修改峰值或步数不会在边界上留下缺口。
+- **Level 4:** 连续性测试的正确上界是什么？ Expected: 上升斜率（峰值除以预热步数）和余弦最大斜率（pi 乘差值除以两倍衰减长度）中较大的那个；短的余弦段可能比上升段更陡。
+- **Level 4:** 为什么最后一步之后固定在下限，而不是抛异常？ Expected: 超出步数的训练器仍有可用的学习率，并记录警告；延长训练应该改配置里的总步数，而不是改循环。
+- **Level 4:** 什么能让恢复后的训练落在正确的值上？ Expected: 调度读取检查点里保存的单调全局步数，而不是 epoch 计数器或局部循环变量。
 
 ## Wrong answers
 
-- "Set the floor to zero so the schedule finishes cleanly." The lesson keeps a non-zero floor near 10 percent of the peak so the optimizer keeps learning in the tail; a zero floor looks clean and leaves the model under-trained.
-- "Test a few steps in the middle, the boundaries follow from the formula." An off by one at a boundary is the bug the lesson warns about; it shows up hours into a run as a rate that is 1 percent off at the moment it matters.
-- "Compute the rate from the epoch and the batch index." Sharded datasets and restarted loaders break that mapping; the global step is the durable axis.
+- "把下限设成零，让调度干净地结束。" 课里保留一个约为峰值 10% 的非零下限，让优化器在长尾继续学习；下限为零看起来干净，却会让模型训练不足。
+- "测中间的几步就行，边界由公式保证。" 边界上差一正是课里警告的 bug；它会在训练跑了几个小时后，在关键时刻表现为学习率偏差 1%。
+- "根据 epoch 和 batch 下标计算学习率。" 分片数据集和重启的加载器会破坏这个映射；全局步数才是可靠的坐标轴。
 
 ## Taught in
 
-The [cosine warmup capstone](../../../phases/19-capstone-projects/44-cosine-lr-warmup/) builds this schedule with its boundary contract and production patterns, and the [learning rate schedules lesson](../../../phases/03-deep-learning-core/09-learning-rate-schedules/) compares it with the other schedules.
+[余弦预热综合项目](../../../phases/19-capstone-projects/44-cosine-lr-warmup/)构建了这个调度及其边界契约和生产模式，[学习率调度课](../../../phases/03-deep-learning-core/09-learning-rate-schedules/)把它和其他调度做了比较。

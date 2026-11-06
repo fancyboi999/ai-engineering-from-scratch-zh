@@ -1,6 +1,6 @@
 ---
 id: train-only-the-projector
-title: Why the first VLM stage trains only the bridge
+title: 为什么 VLM 第一阶段只训练桥接层
 card: multimodal
 kind: concept
 level: 1
@@ -16,50 +16,50 @@ related: [multimodal/vlm-three-parts]
 updated: 2026-11-03
 ---
 
-In the first training stage of most open vision-language models, both the vision encoder and the decoder are frozen, and only the small projector learns. A junior engineer asks why anyone would train the smallest part first instead of the parts that matter. Answer them.
+在绝大多数开源视觉语言模型（VLM）的第一阶段训练中，视觉编码器和解码语言模型都处于完全冻结状态，只有体量极小的投影层（Projector）参与学习。一位初级工程师好奇地提问：为什么大家要最先训练最小的部件，而不是直接去训练真正关键的核心大模块？请向他解答。
 
 ## Short answer
 
-The two big parts already work: the encoder represents images, and the language model writes text. What is missing is a translation between their two vector spaces, and that translation is small. Training only the bridge costs a few hundred steps on one GPU, cannot damage either pretrained part, and gives the language model inputs it can read before anyone unfreezes it. Unfreezing the language model comes in the second stage, once the bridge produces tokens that look like language.
+因为两个大模块本身早已具备强大的单模态能力：编码器擅长提取图像特征，大语言模型擅长理解与生成文本。真正缺失的只是二者特征向量空间之间的一座翻译桥梁，而这座桥梁的参数量微乎其微。仅训练桥接层的成本是在单张 GPU 上运行几百步，既完全不会破坏任何一个预训练底座原有的表征，又能在解冻大语言模型之前为其喂入可理解的规范输入。解冻语言模型通常发生在第二阶段，此时桥接层产出的视觉 token 已经具备了类语言的几何形态。
 
 ## Full answer
 
-### What the projector is
+### 投影层到底是什么结构
 
-A two-layer MLP: linear, GELU, linear. The capstone's head maps 768 to 1024 to 512 and holds about 1.3M parameters next to an encoder of 86M. The reference open recipe's head maps 1024 to 4096 to 4096, about 22M parameters next to a 303M encoder and a 7B language model.
+一个两层多层感知机（MLP）：线性层、GELU 激活层、线性层。实战项目中的投影头将 768 维特征映射为 1024 维并最终输出为 512 维，在 86M 的视觉编码器面前仅包含约 1.3M 参数量。开源参考方案（如 LLaVA）的投影头则将 1024 维映射至 4096 维再到 4096 维，在 303M 视觉编码器和 7B 语言模型面前仅占约 22M 参数量。
 
-### Why the frozen big parts are the point
+### 为什么要冻结两个大模块
 
-- Stability. Gradients from a few thousand noisy pairs would overwrite features that the encoder learned from hundreds of millions of images.
-- Cost. The alignment stage of the reference recipe trains on 558k caption pairs in a few hours at a batch of 128. The capstone's version drives its loss from about 1.07 to about 0.80 in 200 steps.
-- A clean signal. With both big parts fixed, the loss moves only through the bridge, so you can read whether the two spaces align.
-- Swappability. Change the language model and retrain the bridge; the encoder stays.
+- **训练稳定性**：若直接全量训练，来自几千对带噪声样本的梯度会覆盖视觉编码器耗费数亿张高质量图像才习得的精细特征。
+- **极其低廉的算力开销**：参考方案的对齐阶段在 batch size 为 128 下使用 55.8 万条图文对仅需几个小时即可完成。实战项目的简化对齐更是仅需 200 步就能将损失从约 1.07 降至约 0.80。
+- **纯净的训练信号**：在两大主干完全冻结的前提下，损失函数的梯度全部汇聚在桥接层本身，能清晰观察两个异构模态空间是否正在成功对齐。
+- **即插即用的模块化解耦**：当需要升级或更换语言模型底座时，视觉编码器完全保持原样，只需极低成本重训该轻量投影头即可。
 
-### What the loss is
+### 第一阶段的损失函数形态
 
-The reference recipe uses the language-modeling loss on the caption, conditioned on the projected image tokens. The capstone uses a per-pair cosine alignment loss, one minus the cosine between a pooled image vector and a mean-pooled caption embedding, so that the dynamics stay visible; a contrastive batch version is the next lesson.
+主流开源方案通常直接在大模型上针对给定的图像特征计算文本描述的因果语言建模损失（Next-token loss）。教学实战项目则采用更具可观察性的逐对余弦对齐损失（1 减去池化图像向量与均值池化文本嵌入之间的余弦相似度），使对齐过程保持可观察；批量对比损失版本是下一课的内容。
 
-### What comes after
+### 第二阶段的后续演进
 
-Stage two unfreezes the language model, fully or through adapters, keeps the bridge trainable, and trains on instruction data. A bridge that was never aligned first gives the language model noise at the start of that stage.
+第二阶段（视觉指令微调）会全量或通过适配器解冻语言模型，保持桥接层可训练，并使用指令数据训练。未先对齐的桥接层会在第二阶段开始时给语言模型输入噪声。
 
-### The other kind of bridge
+### 另一种桥接形态
 
-A query-based bridge with a fixed set of learned vectors compresses the image to a fixed token count. It is larger, 188M parameters in the original, and it still trains with the backbones frozen; the principle is the same.
+包含固定数量可学习 Query 的桥接层（如 Q-Former）将图像压缩为固定 token 数量。它的参数量稍大（原始版本为 188M），但其第一阶段同样坚持冻结两大主干；原理相同。
 
 ## Follow-ups
 
-- **Level 1:** What does a frozen parameter mean in code? Expected: `requires_grad=False`, so the optimizer never sees it, and no memory goes to its gradient or optimizer state.
-- **Level 2:** Why pool the image tokens before the cosine loss in the capstone? Expected: the caption side is one vector, so the image side needs one vector too; the first token or the mean over all tokens are the usual choices.
-- **Level 2:** One linear layer would be smaller still. Why two? Expected: a single linear map can rotate and rescale but cannot bend; the GELU between two layers gives the one non-linear bend that aligns contrastive vision features to language embeddings.
-- **Level 3:** What breaks if you skip the alignment stage and start with instruction tuning with everything unfrozen? Expected: the language model receives unaligned inputs, and its gradients on a small set damage its text ability; the two stages exist to give it readable inputs first.
+- **Level 1:** 在代码中将参数“冻结”具体是指什么？ Expected: `requires_grad=False`，优化器看不到它，也不会为其分配梯度或优化器状态的内存。
+- **Level 2:** 为什么在实战项目的余弦损失中要先池化图像 token？ Expected: 文本描述在当前设计中被压缩为一个全局向量，因此图像侧也必须对齐为单个向量；通常取第一个 token 或对全部 token 取均值。
+- **Level 2:** 单层线性映射参数更少，为什么必须采用两层 MLP？ Expected: 单一线性映射可以旋转和缩放，但无法弯曲；两层之间的 GELU 提供了一次非线性弯折，使对比学习的视觉特征与语言嵌入对齐。
+- **Level 3:** 如果直接跳过对齐阶段，一开始就解冻所有参数做指令微调，会出现什么问题？ Expected: 语言模型在初期收到完全未对齐的视觉杂乱输入，在小规模数据上的震荡梯度会直接毁坏其原有的通用语言生成与逻辑推理能力；二阶段设计的初衷正是先喂给它看得懂的输入。
 
 ## Wrong answers
 
-- "Train the encoder; it is the part that sees." It already sees, and a small dataset cannot teach it more than it loses by overwriting features; the missing part is the translation.
-- "The projector is too small to carry an image." It does not carry the image; it maps tokens that already encode the image into the space the language model reads.
-- "Freezing is only a memory trick." Memory is one gain; the larger ones are stability, a clean training signal, and the ability to swap the language model.
+- "视觉编码器是视觉任务的核心，应该优先训练它。" 编码器早已经具备了成熟的图像理解能力，小规模图文对无法教给它更多知识，反而会冲垮其泛化特征；缺失的只是模态间的翻译器。
+- "投影层参数量太小了，根本无法承载整张图像的信息。" 投影层并不需要承载图像；它仅仅负责将编码器已经提取好的视觉 token 坐标变换至语言模型能直接读取的向量空间。
+- "冻结主干参数纯粹是为了节省显存开销。" 显存节省只是附带收益；更深层的意义在于数值稳定性、纯净可测的对齐信号，以及大语言模型底座的灵活可插拔性。
 
 ## Taught in
 
-The [projection capstone](../../../phases/19-capstone-projects/60-projection-layer-modality-align/) trains the bridge alone with a cosine loss, the [LLaVA lesson](../../../phases/12-multimodal-ai/05-llava-visual-instruction-tuning/) gives the two-stage recipe and its parameter counts, and the [BLIP-2 lesson](../../../phases/12-multimodal-ai/03-blip2-qformer-bridge/) explains the frozen-backbone economics.
+[模态对齐投影层实战](../../../phases/19-capstone-projects/60-projection-layer-modality-align/)使用余弦损失单独训练桥接层，[LLaVA 课程](../../../phases/12-multimodal-ai/05-llava-visual-instruction-tuning/)详细剖析了二阶段训练配方与参数量拆解，[BLIP-2 课程](../../../phases/12-multimodal-ai/03-blip2-qformer-bridge/)阐述了冻结主干背后的工程经济学。

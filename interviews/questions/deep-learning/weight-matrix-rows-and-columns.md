@@ -1,6 +1,6 @@
 ---
 id: weight-matrix-rows-and-columns
-title: Read the shapes of a 2-3-1 network from its Layer class
+title: 从 Layer 类实现推导 2-3-1 网络的张量形状
 card: deep-learning
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [deep-learning/xor-needs-a-hidden-layer, deep-learning/missing-zero-gra
 updated: 2026-11-03
 ---
 
-This Layer class comes from a pure Python forward pass.
+该 Layer 类来自一个纯 Python 实现的前向传播：
 
 ```python
 class Layer:
@@ -39,49 +39,49 @@ class Layer:
         return self.last_output
 ```
 
-For a 2-3-1 network, give the shape of each weight matrix and bias. Then say what happens when someone builds the hidden layer as `Layer(n_inputs=3, n_neurons=2)` by mistake.
+对于一个 2-3-1 结构的网络，请给出每个权重矩阵与偏置向量的形状。然后说明若有人误将隐藏层实例化为 `Layer(n_inputs=3, n_neurons=2)`，程序会发生什么。
 
 ## Short answer
 
-The hidden weights form a 3 by 2 matrix, one row per neuron and one column per input, with a bias of length 3; the output weights form a 1 by 3 matrix with a bias of length 1. The swapped call builds a 2 by 3 matrix: zip pairs each row's three weights with the two inputs and stops at the shorter one, the layer returns two values instead of three, and the output layer's zip truncates again. Nothing raises, and the network computes the wrong function.
+隐藏层权重为一个 3 乘 2 的矩阵（每个神经元对应一行，每个输入对应一列），配有长度为 3 的偏置；输出层权重为一个 1 乘 3 的矩阵，配有长度为 1 的偏置。如果误写了调用的参数顺序，则会构建出一个 2 乘 3 的矩阵：前向传播中的 zip 将每行的 3 个权重与传入的 2 个输入配对并在较短处截断，隐藏层只返回 2 个输出值而非 3 个，紧接着输出层的 zip 也会截断。整个程序不会抛出任何异常，但网络默默计算着完全错误的函数。
 
 ## Full answer
 
-### The rule and the table
+### 维度规则与推导表格
 
-The weight matrix of a layer has shape (neurons in this layer, neurons in the previous layer). Rows match the current layer, columns match the previous one.
+网络层的权重矩阵形状为 (当前层神经元数, 上一层神经元数)。行数严格对应当前层的输出节点，列数严格对应上一层的输入节点。
 
-| Step | Operation | Shapes | Result |
+| 步骤 | 操作说明 | 张量形状 | 输出结果 |
 |---|---|---|---|
-| Input | x | | (2,) |
-| Hidden linear | W1 x + b1 | W1 (3, 2), b1 (3,) | (3,) |
-| Hidden activation | sigmoid | | (3,) |
-| Output linear | W2 h + b2 | W2 (1, 3), b2 (1,) | (1,) |
-| Output activation | sigmoid | | (1,) |
+| 输入 | x | | (2,) |
+| 隐藏层线性运算 | W1 x + b1 | W1 (3, 2), b1 (3,) | (3,) |
+| 隐藏层非线性激活 | sigmoid | | (3,) |
+| 输出层线性运算 | W2 h + b2 | W2 (1, 3), b2 (1,) | (1,) |
+| 输出层非线性激活 | sigmoid | | (1,) |
 
-In the class, `len(self.weights)` is the neuron count and each row has `n_inputs` entries. The forward loop computes one dot product per row, adds that row's bias, and applies the sigmoid. The output of one layer is the input list of the next.
+在给出的类实现中，`len(self.weights)` 是当前层的神经元总数，且每一行包含 `n_inputs` 个权重元素。前向循环对每一行计算点积，加上该行的偏置标量，随后应用 Sigmoid。前一层的输出列表作为后一层的输入列表直接传入。
 
-### What the swapped call does
+### 参数调反时的执行破坏
 
-`Layer(n_inputs=3, n_neurons=2)` allocates two rows of three weights. The forward pass receives a two element input. Python's zip stops at the shorter sequence, so each row uses only its first two weights and the third is ignored. The layer returns two values. The output layer was built for three inputs, so its zip drops a weight too. No exception, no warning, and a model whose parameters are partly dead. A matrix library would raise on the inner size mismatch; this loop does not, which is why the lesson calls shape tracking the most important debugging skill in deep learning.
+若调用 `Layer(n_inputs=3, n_neurons=2)`，代码分配了包含两行、每行三个权重的结构。前向传播接收长度为 2 的输入向量。Python 原生内置的 zip 函数会在较短的输入序列耗尽时自动终止，因此每一行只计算了前两个权重的乘积，第三个权重被静默彻底忽略。隐藏层仅返回两个输出值。由于输出层原本是按照接收 3 个输入构建的，输出层的 zip 同样会自动丢弃其最后一个权重。没有任何异常报错，没有任何警告日志，模型参数部分处于坏死状态。专业的矩阵计算库会在内侧维度不匹配时抛出硬异常；而纯 Python 循环的这种静默截断极为危险，这也是课程将追踪张量形状视作深度学习最基础最重要的调试技能的原因。
 
-### Make it fail loudly
+### 保证快速失败的加固手段
 
-Add an assertion in forward that the input length equals the number of columns, or let the Network class check that each layer's input count equals the previous layer's neuron count when it is built.
+在前向传播开头添加断言，确保输入列表的长度严格等于当前权重矩阵的列数；或者在 Network 容器构建时自动校验前一层的神经元数与后一层的输入数完全相等。
 
 ## Follow-ups
 
-- **Level 2:** How many parameters does the 2-3-1 network have? Expected: nine in the hidden layer, six weights and three biases, and four in the output layer, three weights and one bias.
-- **Level 2:** Why does the loop not raise on the swapped shapes? Expected: zip stops at the shorter sequence, so extra weights are ignored and no error occurs; a matrix library would raise on the mismatch.
-- **Level 3:** Where do you put a check so the bug fails at once? Expected: an assertion in forward that the input length equals the column count, or a shape check between layers when the Network is built.
-- **Level 3:** A text model has a hidden state 768 wide and its input is one token id. Does the rule still hold? Expected: yes; the embedding maps the token to a 768 vector, and each later matrix has rows equal to its own width and columns equal to the previous width.
+- **Level 2:** 这个 2-3-1 网络总共有多少个可学习参数？ Expected: 隐藏层 9 个参数（6 个权重加 3 个偏置），输出层 4 个参数（3 个权重加 1 个偏置）。
+- **Level 2:** 为什么 Python 循环在参数形状颠倒时不会抛出异常？ Expected: Python 的 zip 在较短序列耗尽时静默终止，多余的权重被直接忽略而没有触发越界；而正规矩阵乘法库会报错。
+- **Level 3:** 应该在何处增加防线使得该错误能够立即暴露？ Expected: 在 forward 方法中增加断言校验输入长度是否等于列数，或在 Network 初始化时自动对比相邻层的维度。
+- **Level 3:** 文本模型的隐藏状态维度为 768，输入为一个 token id，上述维度规则依然成立吗？ Expected: 完全成立；Embedding 层将 token id 映射为 768 维向量，后续每个权重矩阵的行数等于自身输出宽度、列数等于前一层宽度。
 
 ## Wrong answers
 
-- "The weight matrix is inputs by neurons, so 2 by 3 for the hidden layer." In this class each row holds one neuron's weights across all inputs, so the matrix is neurons by inputs.
-- "A wrong shape always raises an error." A library matmul raises; this loop with zip does not, and a framework can broadcast a wrong shape silently.
-- "There is one bias per input." A bias belongs to a neuron, so there is one per output of the layer.
+- "权重矩阵形状是输入数乘神经元数，因此隐藏层是 2 乘 3。" 在该类实现中，每一行代表一个神经元在所有输入上的权重，因此矩阵维度为神经元数乘输入数（3 乘 2）。
+- "张量形状一旦配错，代码肯定会抛出报错中断。" 矩阵库的 matmul 确实会抛异常，但带有 zip 的纯 Python 循环会静默截断，且框架中的广播机制同样可能静默掩盖错误。
+- "每个输入对应一个独立的偏置项。" 偏置是绑定在神经元输出上的，因此偏置的数量严格等于当前网络层的输出神经元数。
 
 ## Taught in
 
-The [multi-layer networks lesson](../../../phases/03-deep-learning-core/02-multi-layer-networks/) builds this Layer class and traces the dimensions of the 2-3-1 network.
+[多层神经网络课程](../../../phases/03-deep-learning-core/02-multi-layer-networks/)构建了该 Layer 类，并完整推导了 2-3-1 网络的张量维度流转。

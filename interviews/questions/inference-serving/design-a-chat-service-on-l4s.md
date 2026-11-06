@@ -1,6 +1,6 @@
 ---
 id: design-a-chat-service-on-l4s
-title: Design a chat service on a fleet of L4 cards
+title: 在一批 L4 卡上设计对话服务
 card: inference-serving
 kind: design
 level: 4
@@ -16,62 +16,62 @@ related: []
 updated: 2026-11-03
 ---
 
-Design the serving layer for a chat product on a fleet of L4 cards with Qwen/Qwen3-8B. The target is a first token within 1 second and 100 ms or less per token for the P99 user. Every request shares a 2,048-token system prompt, and sessions run for several turns. How many users per card, which precision, which caps, and what do you measure before launch?
+用一批 L4 卡和 Qwen/Qwen3-8B 为一个对话产品设计服务层。目标是：对 P99 用户，首 token 在 1 秒内到达，之后每个 token 不超过 100 ms。所有请求共用一段 2,048 token 的系统 prompt，会话会持续好几轮。每张卡放多少用户？用什么精度？设什么上限？上线前要测什么？
 
 ## Short answer
 
-Size from the pool and the knee, not from throughput. In BF16 the 24,094-token pool on an L4 holds about 37 requests of 640 tokens, and with a cache reset the P99 gap between tokens at 16 users was already 522 ms, so a BF16 replica meets the target for well under 16 users; the FP8 checkpoint with an FP8 cache grows the pool to 142,369 tokens and served 2.87 requests per second within the same target at 64 users, where BF16 served none. So I would serve FP8 after an accuracy check on our prompts, put the shared system prompt first so that the cache holds it, keep the pool large enough for the sessions that return, cap users per replica at the measured knee in the gateway, and run the sweep with a flush, a clock record and a mixed length distribution before launch.
+按池的大小和拐点来定容量，不按吞吐量。BF16 下，L4 上 24,094 token 的池大约装得下 37 个 640 token 的请求，而重置缓存后，16 个用户时的 P99 token 间隔已经是 522 ms，所以一个 BF16 副本只有在用户数远少于 16 时才能达标；FP8 checkpoint 加 FP8 cache 把池扩大到 142,369 token，在 64 个用户时仍以每秒 2.87 个请求满足同一目标，而 BF16 一个都达不到。所以我会在自己的 prompt 上做完准确率检查后用 FP8，把共用的系统 prompt 放在最前面让缓存留住它，让池足够容纳会回来的会话，在网关上按实测拐点限制每个副本的用户数，并在上线前跑一轮带缓存清空、频率记录和混合长度分布的压测。
 
 ## Full answer
 
-### Users per card
+### 每张卡的用户数
 
-The knee on an L4 in BF16 sits between 8 and 16 users once the prefix cache is reset before each run. With the reset, 50 percent of requests met the target at 8 users against 75 to 81 percent without it, and at 16 users the share fell from about 65 percent to 25 percent, with a P99 ITL of 522 ms against 82 to 84 ms unflushed. The median first token with the reset was about 650 ms at 4 users, 951 to 978 ms at 8, and 1,550 to 1,587 ms at 16. Under a fixed arrival rate, both precisions met the target for every request up to 1 request per second; BF16 held 0.88 requests per second within target at 2 offered and none from 4, while FP8 held 3.18 at 4 offered. So a BF16 replica carries a handful of chat users, and an FP8 replica several times more; the sweep decides the exact count.
+每次运行前重置前缀缓存后，L4 上 BF16 的拐点在 8 到 16 个用户之间。重置后，8 个用户时 50% 的请求达标，不重置时是 75% 到 81%；16 个用户时，达标比例从约 65% 降到 25%，P99 ITL 为 522 ms，不清空时是 82 到 84 ms。重置后的中位首 token 时间，4 个用户约 650 ms，8 个用户 951 到 978 ms，16 个用户 1,550 到 1,587 ms。固定到达率下，两种精度在每秒 1 个请求以内都能让每个请求达标；BF16 在每秒 2 个请求时只有 0.88 个请求在目标内，从 4 个起为零，而 FP8 在每秒 4 个请求时有 3.18 个在目标内。所以一个 BF16 副本只能带少数几个对话用户，FP8 副本能带好几倍；具体数字由压测决定。
 
-### Precision
+### 精度
 
-On the same L4 the FP8 checkpoint with an FP8 cache changed the shape of the whole curve:
+在同一张 L4 上，FP8 checkpoint 加 FP8 cache 改变了整条曲线的形状：
 
-| Concurrency | BF16 output tok/s | FP8 output tok/s | BF16 median TTFT | FP8 median TTFT |
+| 并发数 | BF16 输出 tok/s | FP8 输出 tok/s | BF16 中位 TTFT | FP8 中位 TTFT |
 |---|---|---|---|---|
 | 1 | 13.42 | 24.53 | 189.16 ms | 140.72 ms |
 | 16 | 201.09 | 313.92 | 211.78 ms | 147.52 ms |
 | 32 | 270.11 | 507.20 | 2,969.61 ms | 199.09 ms |
 | 64 | 250.85 | 735.91 | 18,348.57 ms | 296.42 ms |
 
-The pool explains it: 24,094 tokens against 142,369. At 64 users the BF16 server ran at most 38 requests at a token usage of 0.99 with 26 in the queue; the FP8 server ran all 64 at 0.29 with an empty queue. Goodput at the target was 0 for BF16 at 32 and 64 users and 2.87 requests per second for FP8 at 64. The accuracy check on 500 GSM8K questions gave overlapping intervals for every FP8 configuration, with a KV scale of 1.0 because this model has no scales; run the same check on your own prompts, and read the scale warning in the startup log.
+原因在池：24,094 token 对 142,369 token。64 个用户时，BF16 服务器最多同时运行 38 个请求，token usage 为 0.99，队列里有 26 个；FP8 服务器 64 个全部在运行，usage 为 0.29，队列为空。在该目标下，BF16 在 32 和 64 个用户时 goodput 为 0，FP8 在 64 个用户时为每秒 2.87 个请求。在 500 道 GSM8K 题上的准确率检查中，所有 FP8 配置的区间都与 BF16 重叠，KV scale 用的是 1.0，因为这个模型没有提供 scale；在你自己的 prompt 上做同样的检查，并留意启动日志里关于 scale 的警告。
 
-### The shared prompt and the sessions that return
+### 共用 prompt 和会回来的会话
 
-Put the shared system prompt first and keep it byte-identical, with the tool list in a fixed order and nothing that changes per request before the user turn. The pool must then hold the working set. On the L4 with a 2,048-token prompt per group of users, the 24,094-token BF16 pool held about 11 such prompts: at 4 groups the median first token was 360 ms, at 16 groups the GPU-only server evicted prompts it needed again and the first token rose to 3,259 ms, and at 32 groups to 5,449 ms. A host tier held the evicted prompts and gave 553 ms at 16 groups and 817 at 32; at 64 groups the prompts needed more than the GPU and host pools together and the host tier only cut the wait to 3,610 ms from 6,821. With FP8 the pool holds far more prompts, so the first fix for the working set is the pool, and the host tier comes after.
+把共用的系统 prompt 放在最前面，并保持逐字节一致：工具列表顺序固定，用户轮次之前不放任何随请求变化的内容。这样池就必须装得下工作集。在 L4 上，每组用户一段 2,048 token 的 prompt，24,094 token 的 BF16 池大约装得下 11 段：4 组时中位首 token 为 360 ms；16 组时，只用 GPU 的服务器会驱逐之后还要用的 prompt，首 token 升到 3,259 ms；32 组时升到 5,449 ms。主机内存层保存被驱逐的 prompt，16 组时降到 553 ms，32 组时 817 ms；64 组时，这些 prompt 超过了 GPU 池和主机池的总和，主机层只把等待从 6,821 ms 降到 3,610 ms。FP8 下池能装下多得多的 prompt，所以解决工作集问题，第一步是池，主机层排在后面。
 
-Multi-turn sessions add the same problem over time. In an 8,192-token pool a trace of 24 sessions made the default eviction thrash: the hit rate fell to about 1.5 percent at turns 5 and 6, and a different policy only lifted it to 25 to 34 percent there. A 16,384-token pool reached 0.69 over the whole trace with every policy. Grow the pool before you change the policy, and route each session to the same replica so that its prefix is where it returns.
+多轮会话会随时间带来同样的问题。在 8,192 token 的池里，一条 24 个会话的 trace 让默认驱逐策略反复抖动：第 5、6 轮时命中率降到约 1.5%，换一种策略也只能把这两轮提到 25% 到 34%。16,384 token 的池在整条 trace 上用任何策略都达到 0.69 的命中率。先扩大池，再改策略，并把每个会话路由到同一个副本，让它回来时前缀还在。
 
-### Caps
+### 上限
 
-Enforce the knee in the gateway, not only in the engine. The engine admits until memory runs out, and a cap on the engine only chooses who waits: at 32 users on the L4 a cap of 16 moved the median first token from 1.8 to 12.3 s and cut output by 38 percent. Set the gateway limit one or two steps below the measured knee, and shed or queue above it. A second guard on the engine at the same count does no harm.
+在网关上按拐点限制并发，不要只在引擎上设上限。引擎会一直准入，直到显存用完，而引擎上的上限只决定谁来等待：L4 上 32 个用户时，上限 16 把中位首 token 从 1.8 秒推到 12.3 秒，输出减少了 38%。把网关上限设在实测拐点下方一到两档，超出部分丢弃或排队。在引擎上按同一数字再设一道保护，也没有坏处。
 
-### Before launch
+### 上线前
 
-1. Sweep concurrency with a flush and a new seed before every run, and record the cached tokens. The unflushed sweep put the knee between 16 and 32 users; the flushed one put it between 8 and 16.
-2. Record the SM clock and the temperature of every run, cool the card between runs, and set aside runs under a clock floor. Under an open-loop overload the L4 fell from 1,320 to 465 MHz with 70 percent of samples in thermal slowdown, so overload costs throughput as well as latency.
-3. Run your real length mix. Fixed lengths form waves and gave a median time to first token of 1,996 ms with a P99 ITL of 82 ms at 16 users; mixed lengths gave 291 ms and 300 ms. The two shapes measure two different servers.
-4. Run a fixed arrival rate as well as the closed loop, because real users do not wait for each other.
-5. Choose the limit from goodput at the target, and read the P99 ITL next to the first token.
+1. 压测并发时，每次运行前清空缓存、换新的随机种子，并记录命中缓存的 token 数。不清空的压测把拐点放在 16 到 32 个用户之间，清空后在 8 到 16 之间。
+2. 记录每次运行的 SM 频率和温度，在两次运行之间让卡冷却，剔除频率低于下限的运行。开环过载时，L4 从 1,320 MHz 降到 465 MHz，70% 的采样处于热降频状态，所以过载既增加延迟，也降低吞吐量。
+3. 用真实的长度分布去跑。固定长度会形成波浪，16 个用户时中位首 token 时间为 1,996 ms，P99 ITL 为 82 ms；混合长度下分别是 291 ms 和 300 ms。两种长度分布会让同一服务器表现得截然不同。
+4. 除了闭环，也跑一轮固定到达率，因为真实用户不会互相等待。
+5. 按目标下的 goodput 选上限，并把 P99 ITL 和首 token 时间放在一起看。
 
 ## Follow-ups
 
-- **Level 3:** Why not take the user count from the throughput peak of the sweep? Expected: throughput peaked at 32 users while no request met the target there, and the knee with a reset was between 8 and 16 users; goodput at the target sets the limit and throughput only explains it.
-- **Level 4:** The product adds long sessions that return after minutes. What changes? Expected: the working set grows past the GPU pool, the default eviction drops each session just before it returns, and the hit rate collapses, about 1.5 percent at later turns in an 8,192-token pool; grow the pool first, route each session to the same replica, and add a host tier only when the working set is larger than the GPU pool and smaller than the GPU and host pools together.
-- **Level 4:** Traffic doubles for an hour. What protects the users? Expected: a limit at the gateway that sheds or queues above the knee, because the engine admits until memory runs out and a cap on the engine only moves the wait to the first token, and because a passively cooled L4 under overload also loses clock, from 1,320 to 465 MHz, so overload costs throughput as well as latency.
+- **Level 3:** 为什么不按压测里吞吐量的峰值来定用户数？ Expected: 吞吐量在 32 个用户时达到峰值，但那里没有一个请求达标，而重置后的拐点在 8 到 16 个用户之间；目标下的 goodput 决定上限，吞吐量只用来解释。
+- **Level 4:** 产品增加了几分钟后才回来的长会话。有什么变化？ Expected: 工作集超出 GPU 池，默认驱逐策略恰好在会话回来之前把它丢掉，命中率崩溃，8,192 token 的池里后面几轮约为 1.5%；先扩大池，把每个会话路由到同一个副本，只有当工作集大于 GPU 池、又小于 GPU 池和主机池之和时才加主机层。
+- **Level 4:** 流量翻倍持续一小时。靠什么保护用户？ Expected: 网关上的上限，在拐点之上丢弃或排队，因为引擎会一直准入直到显存用完，引擎上的上限只会把等待挪到首 token 上；而且被动散热的 L4 过载时还会降频，从 1,320 MHz 降到 465 MHz，所以过载既增加延迟，也降低吞吐量。
 
 ## Wrong answers
 
-- "Run 32 users per card; the sweep showed 275 tokens per second there." No request met the target at 32 users, where the P99 ITL was 613 ms; the knee with a cache reset was between 8 and 16 users.
-- "Keep BF16, FP8 is a quality risk we cannot take." On 500 GSM8K questions every FP8 interval overlapped BF16, and FP8 was the difference between zero and 2.87 requests per second within target at 64 users; run the check on your prompts and decide on evidence.
-- "Set the engine cap at the knee and you are done." The engine cap only chooses who waits and moved the first token to 12.3 s at 32 users; enforce the knee in the gateway and shed load above it.
-- "Benchmark with fixed 512-token prompts, that is the standard." Fixed lengths form waves and gave a first token of 1,996 ms with a P99 ITL of 82 ms, while mixed lengths gave 291 and 300 ms; test your real length mix before you set the limit.
+- "每张卡跑 32 个用户，压测显示那里每秒有 275 个 token。" 32 个用户时没有一个请求达标，P99 ITL 是 613 ms；重置缓存后的拐点在 8 到 16 个用户之间。
+- "继续用 BF16，FP8 是我们承担不起的质量风险。" 在 500 道 GSM8K 题上，每个 FP8 区间都与 BF16 重叠，而 64 个用户时，每秒零个和 2.87 个达标请求的差别就来自 FP8；在你的 prompt 上做检查，按证据决定。
+- "把引擎上限设在拐点上就够了。" 引擎上限只决定谁来等待，32 个用户时把首 token 推到了 12.3 秒；要在网关上按拐点限制并发，拒绝超出部分的请求。
+- "用固定 512 token 的 prompt 压测，这是标准做法。" 固定长度会形成波浪，首 token 1,996 ms、P99 ITL 82 ms，而混合长度下是 291 ms 和 300 ms；定上限之前，用真实的长度分布测试。
 
 ## Taught in
 
-[Tune chat for many users](../../../manuals/vllm-101/sections/3-1-tune-chat-for-many-users.md) finds the knee, [the SGLang quantization section](../../../manuals/sglang-101/sections/4-3-quantization.md) measures FP8 on the same card, [the SGLang benchmark section](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md) gives the goodput method, and [Eviction policies and HiCache](../../../manuals/sglang-101/sections/3-5-eviction-policies-and-hicache.md) sizes the working set.
+[为大量用户调优对话服务](../../../manuals/vllm-101/sections/3-1-tune-chat-for-many-users.md)找出拐点，[SGLang 量化一节](../../../manuals/sglang-101/sections/4-3-quantization.md)在同一张卡上测量 FP8，[SGLang 基准测试一节](../../../manuals/sglang-101/sections/5-1-sglang-benchmark-serving.md)给出 goodput 的测法，[驱逐策略与 HiCache](../../../manuals/sglang-101/sections/3-5-eviction-policies-and-hicache.md)估算工作集的大小。

@@ -1,6 +1,6 @@
 ---
 id: batched-inference-api-budget
-title: Design a chat API for ten thousand daily users
+title: 为万级日活用户设计对话 API 系统
 card: system-design
 kind: design
 level: 3
@@ -16,59 +16,59 @@ related: [system-design/llm-cost-projection, system-design/streaming-and-fallbac
 updated: 2026-11-03
 ---
 
-Design the service behind a chat product with 10,000 daily active users who send about 5 queries each, with roughly 1,500 input tokens and 400 output tokens per query. Users must see a response start quickly, the tail must stay bounded, and the product has a unit cost target. Lay out the request path, the components, the budgets you hold each one to, and how you would scale it.
+请为一款拥有 10,000 日活跃用户（DAU）的对话产品设计后端服务。每位用户每天大约发送 5 次提问，单次提问包含约 1,500 个输入 token 和 400 个输出 token。系统要求首字返回迅速、长尾延迟严格受限，且具备明确的单次请求成本目标。请给出请求处理链路、各组件构成、分配给各环节的性能预算，以及后续的扩容方案。
 
 ## Short answer
 
-The request enters through a gateway that authenticates and rate limits per user, passes input guardrails, is matched against a semantic cache, and on a miss goes to the model with streaming, then through output guardrails, an eval logger and a cost tracker. The budgets are a median under 2s, a p99 under 10s, a cache hit rate above 30%, a guardrail block rate under 5%, and a cost per request under $0.01. At 50,000 queries a day this runs on a few async servers behind a load balancer; the servers are I/O bound, so a single async process holds a hundred or more concurrent requests and scaling means more servers, not more cores.
+请求首先进入网关执行按用户鉴权与限流，随后通过输入安全护栏并比对语义缓存；若未命中则流式调用模型，接着流经输出护栏、评估日志记录器与成本跟踪器。核心预算目标为：耗时中位数低于 2 秒、p99 延迟低于 10 秒、缓存命中率高于 30%、护栏拦截率低于 5%，且单次请求成本低于 $0.01。在每天 50,000 次查询规模下，该服务可运行在负载均衡器后面的几台异步服务器上；由于服务器属于 I/O 密集型，单个异步进程即可支撑上百个并发请求，扩容意味着增加服务器，而不是增加 CPU 核心。
 
 ## Full answer
 
-### The path
+### 请求链路
 
-Gateway for authentication, rate limits of 10-50 requests a minute per user and CORS; input guardrails for injection patterns and personal data; a prompt router that picks the template and version; a semantic cache keyed by query embedding with a similarity threshold and a time to live; the model call with streaming and a fallback chain; output guardrails; an eval logger; a cost tracker; a server-sent events response. Seven components, each one a known piece; the engineering is the wiring and the budgets.
+用于鉴权、按用户限制每分钟 10-50 次请求以及处理跨域（CORS）的 API 网关；用于拦截 prompt 注入模式与敏感个人数据的输入护栏；挑选模板与版本的 prompt 路由器；以查询 embedding 为键、配置相似度阈值和生存时间（TTL）的语义缓存；支持流式传输与降级链的模型调用层；输出安全护栏；评估日志记录器；成本跟踪器；最后通过 服务器发送事件（SSE）向客户端流式返回。全链路共七个组件，每个都是已知模块；工程的核心在于连接各组件并设定预算。
 
-### Budgets
+### 预算指标
 
-| Metric | Target | Why |
+| 指标 | 目标 | 原因 |
 |---|---|---|
-| Median latency | Under 2s | The typical experience |
-| p99 latency | Under 10s | The tail drives churn |
-| Cache hit rate | Above 30% | Direct cost savings |
-| Guardrail block rate | Under 5% | Higher means false positives |
-| Cost per request | Under $0.01 | Unit economics |
+| 延迟中位数 | 低于 2s | 代表典型用户的日常体验 |
+| p99 延迟 | 低于 10s | 长尾导致流失 |
+| 缓存命中率 | 高于 30% | 直接节省模型调用成本 |
+| 护栏拦截率 | 低于 5% | 过高意味着存在大量假阳性误报 |
+| 单次请求成本 | 低于 $0.01 | 满足单位经济模型要求 |
 
-Streaming puts the first token inside the median budget even when the full answer takes seconds. Maximum token limits on input and output bound both the cost and the tail. Every external call has a timeout.
+即使完整回答需要数秒，流式传输也能确保首 token 在中位数预算时间内返回。输入和输出的最大 token 限制为成本和长尾延迟设定了上限。所有外部调用均配置严格的超时时间。
 
-### Load and capacity
+### 负载与容量规划
 
-Traffic is 50,000 queries a day, and with the measured cache hit rate about 32,500 reach the model. Peak matters more than the average; size for the busiest minute. The servers wait on network I/O, so one async process serves 100+ concurrent requests and a box with four workers serves 400+. The lesson's scaling table puts this tier at a few async servers with a cache and a queue, for about $500 a month of infrastructure, with the model bill on top. Connection pooling to the provider avoids a new TLS handshake per request, which costs 100-200ms. Work that is not interactive, such as summarization, goes to a queue with workers and a job id the client polls.
+全天流量为 50,000 次查询，结合测得的缓存命中率，实际到达模型的请求约为 32,500 次。峰值负载远比平均值重要；必须按最繁忙的一分钟规划容量。服务器主要等待网络 I/O，因此单个异步进程即可承载 100+ 并发请求，一台 4 worker 的机器可处理 400+ 并发。根据课程扩容表，该业务规模仅需几台挂接缓存与队列的异步服务器，基础设施月成本约 $500，模型调用账单另计。与模型供应商维持连接池可避免每次请求重新建立耗时 100-200ms 的 TLS 握手。非交互式后台任务（如全文摘要）转入后台工作队列，客户端通过任务 ID 轮询状态。
 
-### Observability
+### 可观测性
 
-Every request writes one structured log line with the request id, the user, the template and version, the model, the input and output token counts, the latency, the cache result, the guardrail results and the cost. Traces across the components show where the time went. The five numbers in the table sit on one dashboard.
+每次请求写入一条结构化日志，包含请求 ID、用户标识、模板与版本号、模型名称、输入输出 token 数、耗时、缓存命中结果、护栏检测结果以及成本。跨组件的分布式追踪链路清晰呈现各阶段耗时。上表中的五项核心指标集中呈现在统一监控仪表盘上。
 
-### If the model is self-hosted
+### 若模型为自建私有化部署
 
-The pipeline lesson's serving stage adds continuous batching, speculative decoding, and KV cache eviction, with quantized weights for serving and the eval gate rerun on the quantized model. The same gateway, cache and guardrails sit in front of it.
+完整 LLM 流水线课程中的模型服务层补充了连续批处理、推测解码以及 KV cache 逐出机制，采用量化权重提供服务，并在量化模型上重新运行评估门禁。前端依然由相同的网关、缓存与护栏提供保护。
 
-### Before launch
+### 发布前检查清单
 
-The deployment checklist has fifteen items; the ones people skip are per-user rate limits, maximum token limits, a health endpoint that reports dependency status, timeouts on every external call, and a load test with 100 concurrent users.
+部署检查清单包含十五个核验项；最容易被遗漏的项目包括：单用户级限流、最大 token 限制、上报依赖健康状态的探针端点、所有外部调用的超时设置，以及 100 并发用户的压力测试。
 
 ## Follow-ups
 
-- **Level 3:** A user pastes a document far longer than the context window. Where is that caught? Expected: at the maximum input token limit before the model call, with a clear error, not at the provider.
-- **Level 3:** Why does cost per user matter when cost per request is already under target? Expected: a few heavy users dominate the bill; per-user tracking and a daily cap move them to a cheaper model or stop them.
-- **Level 4:** The provider has a regional outage during the daily peak. Walk the request path. Expected: backoff and retries on the primary, fall through the chain to a second model, then cached answers for repeated queries, then an unavailable message; the cost tracker shows the fallback's price and the dashboard shows the step that answered.
-- **Level 4:** How do you prove the service meets its budgets before the first user? Expected: a load test at 100 concurrent users against the staging stack with the dashboard metrics as pass criteria, plus a shadow run of the prompts on logged traffic.
+- **Level 3:** 用户粘贴了一篇远超上下文窗口的长篇文档，该在何处拦截？ Expected: 在调用模型前的最大输入 token 限制处拦截并给出明确提示，而不是直接透传抛给模型供应商报错。
+- **Level 3:** 单次请求成本已达标，为什么仍要关注每位用户的成本？ Expected: 少数重度用户会占据账单的绝大部分；按用户跟踪成本并配置每日消费上限，可将这些用户切换到更便宜的模型，或停止为其提供服务。
+- **Level 4:** 模型供应商在每日峰值期突发区域性宕机，请梳理请求链路。 Expected: 先对主模型退避重试，再沿降级链调用第二个模型，然后为重复查询返回缓存答案，最后返回服务不可用提示；成本跟踪器显示降级成本，仪表盘显示由哪一步给出了回答。
+- **Level 4:** 在首位用户访问之前，如何证明该服务满足所有预算？ Expected: 在预发环境中以仪表盘指标为通过标准开展 100 并发压测，并利用历史日志流量对 prompt 运行影子验证。
 
 ## Wrong answers
 
-- "Scale the model servers first." The service is I/O bound at this traffic; the gateway, cache and async servers are the design, and the model is a dependency.
-- "Skip the cache; the model is the product." A third of the traffic repeats, and the cache is the largest single saving in the bill.
-- "The p99 is a vendor problem." Timeouts, maximum tokens, streaming and the fallback chain are what bound the tail on your side.
+- "优先扩容模型推理服务器。" 在此流量级别下服务属于 I/O 密集型；网关、缓存和异步接入层才是核心架构设计，模型只是外部依赖。
+- "跳过缓存机制；模型才是产品核心。" 高达三分之一的查询会重复出现，缓存是缩减账单开销最大的单一手段。
+- "p99 延迟完全取决于供应商。" 超时、最大 token、流式传输和降级链路才是你这端约束长尾的手段。
 
 ## Taught in
 
-The [production LLM application lesson](../../../phases/11-llm-engineering/13-production-app/) gives the architecture, the budgets, the scaling table and the checklist, and the [complete LLM pipeline lesson](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/) describes the serving stage behind a self-hosted model.
+[生产级 LLM 应用课程](../../../phases/11-llm-engineering/13-production-app/)给出了系统架构、预算指标、扩容表及上线清单，[构建完整 LLM 流水线课程](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/)描述了自建私有化模型背后的推理服务层。

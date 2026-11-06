@@ -1,6 +1,6 @@
 ---
 id: per-token-or-per-minute
-title: Per-token or per-minute billing for a daytime load
+title: 白天负载该按 token 计费还是按分钟计费
 card: cost-capacity
 kind: tradeoff
 level: 2
@@ -16,52 +16,52 @@ related: [cost-capacity/warm-pool-or-cold-start, cost-capacity/batch-lane-triage
 updated: 2026-11-03
 ---
 
-Two inference platforms quote you for the same open model. One bills per million tokens. The other rents a dedicated GPU by the minute. Your traffic is steady through the working day and near zero at night. Which pricing wins, and what number decides it?
+两家推理平台为同一个开放模型给你报价。一家按每百万 token 计费，另一家按分钟出租一块独占 GPU。你的流量在整个工作日都很平稳，夜里接近零。哪种计费更划算？哪个数字决定结果？
 
 ## Short answer
 
-Sustained utilization decides it. Per-token billing charges only for what you use, so it wins when traffic is bursty or low and a dedicated GPU would sit idle. Per-minute billing charges for wall-clock time, so it wins once you keep the GPU busy, and the lesson's rule of thumb puts the crossover near 30 percent sustained utilization. A load that runs only in the daytime sits near that line, so measure your utilization over a full week before you sign.
+决定结果的是持续利用率。按 token 计费只收你用掉的部分，所以在流量突发或很低、独占 GPU 会闲着的时候更划算。按分钟计费收的是挂钟时间，所以一旦你能让 GPU 保持忙碌，它就更划算；课程的经验法则把交叉点放在持续利用率 30% 左右。只在白天运行的负载正好落在这条线附近，所以签约前先测一整周的利用率。
 
 ## Full answer
 
-### Two cost functions for one output
+### 同一份输出，两个成本函数
 
-Per-token pricing reflects the platform's own utilization curve across all of its customers, and you pay for no idle time. Per-minute or per-second pricing reflects exclusivity: the GPU is yours, and the bill runs whether or not a request arrives. The output, a model response, is the same.
+按 token 定价反映的是平台自己在所有客户身上的利用率曲线，你不为任何空闲时间付费。按分钟或按秒定价反映的是独占：GPU 归你，不管有没有请求进来，账单都在走。输出都一样，就是一次模型响应。
 
-### The crossover
+### 交叉点
 
-The economics lesson states the rule: above about 30 percent sustained utilization of a dedicated GPU, per-minute starts to beat per-token. Below it, per-token wins because you are not paying for idle. The lesson on managed platforms shows the same shape for reserved capacity on a hyperscaler: the break-even sits around 40 to 60 percent sustained utilization, savings reach up to 70 percent at high utilization, and the reservation is billed when idle.
+经济学课程给出了规则：独占 GPU 的持续利用率超过约 30% 时，按分钟开始胜过按 token。低于这个值，按 token 更划算，因为你不为空闲付费。托管平台课程在超大规模云厂商的预留容量上看到了同样的形状：盈亏平衡点在持续利用率 40% 到 60% 左右，高利用率时最多能省 70%，而预留容量空闲时也照样计费。
 
-### Compute it for your own traffic
+### 用你自己的流量算一遍
 
-1. Take the request count per hour of the day for a week, and the tokens per request.
-2. The per-token bill is the token total times the rate.
-3. The per-minute bill is the rented hours times the rate. That is every hour unless you scale to zero at night, which brings a cold start every morning.
-4. Utilization is the busy time divided by the rented time. Compare it with the crossover.
+1. 取一周内每天每个小时的请求数，以及每个请求的 token 数。
+2. 按 token 的账单 = token 总数乘以单价。
+3. 按分钟的账单 = 租用小时数乘以单价。除非夜里缩容到零，否则就是全部小时数；而缩容到零意味着每天早上一次冷启动。
+4. 利用率 = 忙碌时间除以租用时间。拿它和交叉点比较。
 
-### What the price does not show
+### 价格没体现的东西
 
-- Dedicated capacity avoids queueing behind other tenants. The lesson on managed platforms measures a lower first-token median on reserved capacity than on shared on-demand for the same model class.
-- A fine-tuned model can change the per-token price. One platform in the lesson serves a fine-tune at the base model's rate, which is a differentiator. A dedicated GPU serves it at the same hourly price either way.
-- Non-interactive work has a third option: a batch tier at about half the serverless rate.
+- 独占容量不用排在其他租户后面。托管平台课程测得，同一类模型在预留容量上的首 token 中位延迟，比共享按需实例更低。
+- 微调模型可能改变按 token 的价格。课程里有一家平台按基座模型的价格提供微调模型，这是它的差异化卖点。独占 GPU 跑哪种模型，按小时的价格都一样。
+- 非交互的工作还有第三个选项：batch 档，价格约为 serverless 的一半。
 
-### A mixed answer
+### 混合方案
 
-Rent dedicated capacity for the daytime floor, and send the overflow and the overnight batch to per-token or batch pricing. The utilization of the dedicated part then stays high, and the bursts never pay for an idle GPU.
+用独占容量承接白天的基线流量，把溢出的部分和夜间 batch 交给按 token 计费或 batch 计费。这样独占的那部分利用率一直很高，突发流量也不用为一块闲置的 GPU 付钱。
 
 ## Follow-ups
 
-- **Level 2:** Why does per-token pricing cost more per token than your own GPU time at high utilization? Expected: the platform's margin and its idle time are built into the per-token rate. At high utilization you pay for idle that you do not have.
-- **Level 2:** What changes when you scale the dedicated GPU to zero at night? Expected: you stop paying for the night and buy a cold start every morning, so the first requests of the day pay in latency.
-- **Level 3:** Why is the dedicated option faster at the tail? Expected: shared on-demand capacity competes with every other customer's traffic, and dedicated capacity does not. That is the gap the lesson on managed platforms measures between reserved and on-demand first-token latency.
-- **Level 3:** How does a fine-tuned model change the comparison? Expected: a per-token platform may serve the fine-tune at the base rate or charge a premium for it. A dedicated GPU serves it at the same hourly price either way.
+- **Level 2:** 高利用率时，为什么按 token 计费比你自己的 GPU 时间更贵？ Expected: 平台的利润和它的空闲时间都算进了按 token 的单价。高利用率时，你在为自己并没有的空闲付费。
+- **Level 2:** 夜里把独占 GPU 缩容到零，会有什么变化？ Expected: 你不再为夜里付费，但每天早上要经历一次冷启动，当天最早的那批请求要用延迟来买单。
+- **Level 3:** 为什么独占方案的尾延迟更好？ Expected: 共享的按需容量要和其他所有客户的流量竞争，独占容量不用。托管平台课程测出的预留与按需首 token 延迟差距，就来自这里。
+- **Level 3:** 微调模型怎样改变这个比较？ Expected: 按 token 计费的平台可能按基座模型价格提供微调模型，也可能为它加价。独占 GPU 无论跑哪种，按小时的价格都一样。
 
 ## Wrong answers
 
-- "Per-token is always cheaper because you never pay for idle." Above the utilization crossover, the per-token rate carries the platform's idle and margin, and your own GPU is cheaper.
-- "Dedicated is always cheaper at scale." Only when you keep it busy. A daytime-only load leaves it idle half the time.
-- "Compare the headline prices." The two prices have different units. Only your traffic profile turns them into a bill.
+- "按 token 总是更便宜，因为从不为空闲付费。" 利用率超过交叉点后，按 token 的单价里包含了平台的空闲和利润，你自己的 GPU 反而更便宜。
+- "规模大了，独占总是更便宜。" 只有你能让它保持忙碌时才成立。只在白天运行的负载会让它一半时间闲着。
+- "直接比较标价。" 两个价格的单位不同。只有你自己的流量画像才能把它们变成账单。
 
 ## Taught in
 
-The [inference platform economics lesson](../../../phases/17-infrastructure-and-production/02-inference-platform-economics/) gives the per-token against per-minute crossover, and the [managed platforms lesson](../../../phases/17-infrastructure-and-production/01-managed-llm-platforms/) gives the break-even for reserved capacity.
+[推理平台经济学课程](../../../phases/17-infrastructure-and-production/02-inference-platform-economics/)给出了按 token 与按分钟的交叉点，[托管平台课程](../../../phases/17-infrastructure-and-production/01-managed-llm-platforms/)给出了预留容量的盈亏平衡点。

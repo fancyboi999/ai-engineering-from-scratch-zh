@@ -1,6 +1,6 @@
 ---
 id: two-hundred-tools-in-the-catalog
-title: Two hundred registered tools, forty visible at a time
+title: 目录中两百个工具但每轮仅展示四十个
 card: agents
 kind: design
 level: 4
@@ -16,56 +16,56 @@ related: [agents/error-paths-the-model-can-fix]
 updated: 2026-11-03
 ---
 
-Your harness has grown to about two hundred tools across several teams. The model cannot hold all of them in context, two teams once registered the same name and the second silently replaced the first, and the success rate has fallen as the catalog grew. Design the registry and the policy for what the model sees on each turn.
+你的 harness 已经跨多个业务团队膨胀到了约两百个可用工具。模型根本无法在上下文中容纳全部工具，且曾发生过两个团队注册了相同名称导致后者静默覆盖前者的事故；随着工具目录的不断扩大，任务成功率反而持续走低。请为工具注册表以及模型在每一轮中所能看到的工具子集设计一套完备的策略。
 
 ## Short answer
 
-Make the registry the only source of truth for what exists, what shape the arguments take and which handler runs, and surface only ten to forty tools per turn. The registry holds a typed record per tool, rejects a second registration of a name unless the caller asks to override, and validates every call against a small schema subset with pointer-shaped errors. The exposure policy loads tool metadata into context only when the task needs it, and the fewer tools the model sees, the better it calls them.
+让注册表成为系统中关于哪些工具存在、参数结构为何以及调用哪个处理函数的单一事实来源，并且在每一轮中仅向模型暴露十到四十个工具。注册表为每个工具维护结构化的类型记录，在未显式声明覆盖时直接拒绝重复名称的二次注册，并通过包含八个关键字的小型 Schema 子集结合 JSON 指针路径对每次调用执行严格校验。工具暴露策略则确保仅在具体任务切实需要时才将对应工具的元数据加载进上下文，因为模型眼前可见的工具越精简，其调用准确率就越高。
 
 ## Full answer
 
-### The record
+### 注册表记录结构
 
-| Field | Purpose |
+| 字段 | 设计用途 |
 |---|---|
-| `name` | Unique, lower-case segments separated by dots |
-| `description` | One line shown to the model |
-| `schema` | A subset of JSON Schema with eight keywords |
-| `handler` | The callable, opaque to the validator |
-| `idempotent` | Lets the dispatcher decide whether a retry is safe |
-| `timeout_ms` | Per-tool override of the dispatcher default |
+| `name` | 唯一标识，由点号分隔的小写字符片段组成 |
+| `description` | 呈现给模型的单行功能描述 |
+| `schema` | 支持八个核心关键字的 JSON Schema 严格子集 |
+| `handler` | 可调用对象，校验器不检查其内部实现 |
+| `idempotent` | 幂等性标记，供分发器判定重试是否安全 |
+| `timeout_ms` | 针对特定工具覆盖分发器默认超时时间 |
 
-The schema is data and the handler is code. Keep them apart so that validation never ends up inside handlers.
+Schema 是静态数据，处理逻辑是可执行代码。将两者坚决解耦，防止参数校验逻辑散落渗透进各个业务处理函数中。
 
-### Three registry rules
+### 注册表必须坚守的三条铁律
 
-1. **No silent overwrite.** `register` raises on a known name unless `override=True`. The incident in the prompt is this rule missing.
-2. **Validate before dispatch.** A pure, recursive walk over the schema returns `Ok` or a list of errors with JSON pointer paths. No coercion, no handler call, no I/O, so the validator can run again over a replay log.
-3. **The registry is shape, not safety.** Timeouts and sandboxing live in the dispatcher. A validated call can still misbehave.
+1. **坚决杜绝静默覆盖。** 除非调用方显式传递 `override=True`，否则 `register` 在遇到已存在名称时必须抛出异常。题干中提到的线上事故正是由于缺失该规则引起的。
+2. **分发执行前强制校验。** 对 Schema 执行纯函数式的递归遍历，返回 `Ok` 或带有 JSON 指针路径的错误列表。不做任何类型强制转换、不调用底层处理函数、不执行外部 I/O，确保校验器能够直接在重放日志上无缝执行。
+3. **注册表仅负责数据形态而非全局安全。** 超时控制与沙箱隔离属于分发器的核心职责。即便一个通过了 Schema 校验的调用，其业务行为依然可能存在越权风险。
 
-### The exposure policy
+### 渐进式披露的工具暴露策略
 
-A catalog of two hundred tools and a context that fits forty is a routing problem. Surface a subset per turn based on the task, and load the rest just in time. The workbench lesson describes the pattern as skills that are revealed step by step: a function registry whose metadata enters context only when needed. The same lesson reports a team that deleted 80 percent of its agent's tools and saw the success rate go from 80 percent to 100 percent. More tools in view means more wrong choices, longer prompts and more schema to misread.
+拥有两百个工具的目录与只能塞入四十个工具的上下文，本质上是一个动态路由问题。根据具体任务类型在每一轮仅暴露一个精挑细选的子集，其余工具在需要时按需即时加载。工作台课程将这种模式抽象为逐步展开的技能（Skills）：一个只有在被唤醒时才将其元数据注入上下文的函数注册表。该课程指出，某团队在删除了其 agent 80 percent 的工具后，任务成功率直接从 80 percent 跃升至 100 percent。眼前堆砌的工具越多，模型越容易选错目标、prompt 越冗长，需要理解的 Schema 也越多。
 
-Practical selection signals: the active scope contract, the task type on the board, the tools used in the last few turns, and an explicit request from the model for a named family. Log the exposed set per turn so that a failure can be traced to a missing tool rather than a wrong call.
+实用的动态筛选信号包括：当前活动的任务范围契约、看板上的任务类型、最近几轮对话中使用过的工具，以及模型主动发起的特定工具族请求。在每一轮中将实际暴露的工具集合写入审计日志，以便排查故障时能够准确定位是缺失了工具还是模型调用失误。
 
-### What grows next
+### 后续演进路线
 
-Past about fifty tools, add `$ref` against a local definitions block so that shared argument shapes are written once, and `additionalProperties: false` so that an extra argument is an error rather than a silent drop. Both are small. Both are common.
+当工具目录跨过五十个时，应优先引入两项扩展：针对本地定义块的 `$ref` 支持，使得通用的参数结构只需定义一次；以及 `additionalProperties: false` 强校验，将多余的未声明参数判定为非法错误而非静默丢弃。这两项扩展都很小，也都很常见。
 
 ## Follow-ups
 
-- **Level 3:** Two teams want the same tool name for different handlers. What do you do? Expected: refuse the collision, namespace by dotted segment, and let the exposure policy pick the family the task needs.
-- **Level 3:** How do you prove the validator is still correct after a refactor? Expected: run it over a saved replay log of real calls, which works because it has no I/O, no clock and no globals.
-- **Level 4:** What breaks if the exposure policy is itself a model call? Expected: a second nondeterministic step on every turn, so the selection should be rule-based from the contract and the board, with the model allowed only to request a named family.
-- **Level 4:** The dispatcher retries a failed call. Which record field decides whether it may? Expected: `idempotent`, because a retry of a non-idempotent tool can repeat a side effect.
+- **Level 3:** 两个团队希望为不同的处理函数注册相同的工具名称，你会怎么做？ Expected: 坚决拒绝名称冲突，采用以点分隔的分段命名空间，并由工具暴露策略决定当前任务加载哪个工具族。
+- **Level 3:** 代码重构之后，你如何证明校验器逻辑依然完全正确？ Expected: 在历史真实调用的重放日志上执行回归测试，校验器不依赖 I/O、时钟和全局变量，天然支持确定性重放。
+- **Level 4:** 如果工具暴露策略本身依赖一次模型调用，会带来什么风险？ Expected: 在每一轮都引入了额外的非确定性步骤，因此筛选应当基于契约和看板的规则逻辑，模型仅能显式申请特定族。
+- **Level 4:** 分发器尝试重试一次失败的调用，由注册表中的哪个字段决定是否允许？ Expected: `idempotent` 字段，因为重试一个非幂等性的工具有可能重复触发副作用。
 
 ## Wrong answers
 
-- "Give the model the whole catalog and let it choose." The model cannot hold two hundred schemas, and success fell as the catalog grew, so the fix is fewer tools in view.
-- "Put validation in each handler, close to the code it protects." Validation inside handlers drifts per team and turns the dispatcher into a guessing game that ends in a stack trace.
-- "Allow re-registration so that teams can hot-fix a tool." A silent replace is the incident in the prompt, and a fix should pass an explicit override that shows up in review.
+- "把两百个工具的全部目录塞进 prompt，让模型自行挑选。" 模型无法在上下文中容纳两百个复杂的 Schema，且成功率随着目录扩大而下降，因此应减少可见工具。
+- "把校验逻辑写在每个工具处理函数内部，贴近业务代码。" 处理函数内的校验逻辑会导致各团队实现割裂漂移，把分发器变成靠排查调用栈报错来猜错的黑盒。
+- "允许自由重新注册，方便业务团队在线热修复工具。" 静默覆盖正是题干事故的直接诱因，任何修复都必须显式声明 override 并在审查中透明可见。
 
 ## Taught in
 
-The [tool registry lesson](../../../phases/19-capstone-projects/21-tool-registry-schema-validation/) builds the record and the validator, and the [why capable models still fail lesson](../../../phases/14-agent-engineering/31-agent-workbench-why-models-fail/) places skills and tool catalogs among the harness primitives.
+[带 Schema 校验的工具注册表](../../../phases/19-capstone-projects/21-tool-registry-schema-validation/)课程构建了记录结构与校验器，[Agent 工作台工程：能干的模型为什么还会失败](../../../phases/14-agent-engineering/31-agent-workbench-why-models-fail/)课程将技能与工具目录归入了 harness 底层原语。

@@ -1,6 +1,6 @@
 ---
 id: inverted-dropout-scale
-title: Why the dropout mask holds 1 over (1 minus p)
+title: dropout 掩码为什么存 1 除以 (1 减 p)
 card: deep-learning
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [deep-learning/train-mode-and-eval-mode, deep-learning/layernorm-not-ba
 updated: 2026-11-03
 ---
 
-This dropout module comes from a mini framework.
+这个 dropout 模块来自一个迷你框架。
 
 ```python
 class Dropout(Module):
@@ -37,39 +37,39 @@ class Dropout(Module):
         return [g * m for g, m in zip(grad, self.mask)]
 ```
 
-Why do the kept entries of the mask hold 1 over (1 minus p) rather than 1, and why does backward reuse the same mask? What would change if the forward kept 1 and the scaling moved to evaluation time?
+掩码里被保留的元素为什么存 1 除以 (1 减 p)，而不是 1？反向传播为什么复用同一个掩码？如果前向保留 1，把缩放移到评估时做，会有什么变化？
 
 ## Short answer
 
-Each unit is zeroed with probability p, so the expected value of a unit falls to (1 - p) times its original. Dividing the kept units by (1 - p) restores that expectation during training, so evaluation runs the plain network with no change. Backward multiplies by the same mask because the forward pass was a per-unit scale, and the derivative of a scale is the scale. Moving the factor to evaluation time also works, but then every inference path must know the dropout rate.
+每个单元以概率 p 被置零，所以单元的期望值降到原来的 (1 - p) 倍。训练时把保留的单元除以 (1 - p)，就恢复了这个期望，评估时直接运行普通网络，不用任何改动。反向传播乘以同一个掩码，因为前向就是按单元缩放，缩放的导数就是缩放系数本身。把系数移到评估时也可以，但那样每条推理路径都必须知道 dropout 率。
 
 ## Full answer
 
-### The expectation argument
+### 期望的论证
 
-A mask entry is 0 with probability p and 1 over (1 - p) otherwise. Its expected value is (1 - p) times 1 over (1 - p), which is 1. So the expected output of each unit in training equals its output with dropout off. The network sees the same scale in both modes, and the evaluation path has no dropout code at all. The lesson calls this inverted dropout. The original form kept the mask at 1 and multiplied by (1 - p) at test time, which forces inference code to know p.
+掩码元素以概率 p 为 0，否则为 1 除以 (1 - p)。它的期望是 (1 - p) 乘以 1 除以 (1 - p)，等于 1。所以训练时每个单元的期望输出等于关掉 dropout 时的输出。网络在两种模式下看到相同的尺度，评估路径里完全没有 dropout 代码。课里把这叫作反向 dropout。最初的形式让掩码保持为 1，在测试时乘以 (1 - p)，这就迫使推理代码必须知道 p。
 
-### The backward pass
+### 反向传播
 
-Dropout is an element-wise scale by the mask. The gradient of the input is the gradient of the output times the same mask: dropped units get 0, kept units get the gradient scaled by 1 over (1 - p). The mask must be the one from the matching forward pass, because the backward pass differentiates the function that ran forward. A fresh mask would pass gradient to units that were off and scale units that were on. The guard on a missing mask covers only a backward call before any training forward. The evaluation branch returns before it changes the mask, so a backward call after an evaluation forward reuses the mask of the last training forward.
+dropout 是按掩码逐元素缩放。输入的梯度等于输出的梯度乘以同一个掩码：被丢弃的单元得到 0，被保留的单元得到乘以 1 除以 (1 - p) 的梯度。掩码必须来自对应的那次前向，因为反向传播求导的是前向实际运行的函数。换一个新掩码，就会把梯度传给当时关掉的单元，并错误地缩放当时开着的单元。对缺失掩码的保护只覆盖在任何训练前向之前就调用反向的情况。评估分支在改动掩码之前就返回了，所以评估前向之后的反向调用会复用最近一次训练前向的掩码。
 
-### What dropout buys
+### dropout 带来了什么
 
-Zeroing random units stops neurons from relying on specific other neurons being present, which the lesson calls co-adaptation. Each mask selects a subnetwork, so training samples from about 2 to the N subnetworks of N units, and evaluation averages them in one pass by running the full network at the scaled expectation. Default rates: 0.1 for transformers, 0.5 for MLPs, 0.2 to 0.3 for CNNs. Higher p is stronger regularization and more risk of underfitting.
+随机置零单元，让神经元不再依赖某些特定神经元的存在，课里把这种依赖叫作共适应。每个掩码选出一个子网络，所以 N 个单元的网络在训练时从大约 2 的 N 次方个子网络中抽样；评估时用缩放后的期望运行完整网络，一次就把它们平均了。默认比率：transformer 为 0.1，MLP 为 0.5，CNN 为 0.2 到 0.3。p 越高，正则化越强，欠拟合的风险也越大。
 
 ## Follow-ups
 
-- **Level 2:** What gradient does a dropped unit receive? Expected: zero, because its mask entry is 0.
-- **Level 2:** Why must backward use the mask from the same forward pass? Expected: the backward pass differentiates the function that ran forward; a new mask would scale active units wrongly and pass gradient to inactive ones.
-- **Level 3:** What is the ensemble reading of dropout? Expected: each mask defines a subnetwork, so training samples from about 2 to the N subnetworks, and evaluation averages them by running the full network at the scaled expectation.
-- **Level 3:** Which rate does the lesson give for a transformer, and why is it lower than for an MLP? Expected: 0.1 against 0.5; a higher rate is stronger regularization with more underfitting risk, and the transformer default is the lighter one.
+- **Level 2:** 被丢弃的单元得到什么梯度？ Expected: 零，因为它的掩码元素是 0。
+- **Level 2:** 反向为什么必须用同一次前向的掩码？ Expected: 反向传播求导的是前向实际运行的函数；新掩码会错误地缩放活跃单元，并把梯度传给不活跃的单元。
+- **Level 3:** 从集成的角度怎样理解 dropout？ Expected: 每个掩码定义一个子网络，训练从大约 2 的 N 次方个子网络中抽样，评估时用缩放后的期望运行完整网络，把它们平均起来。
+- **Level 3:** 课里给 transformer 的比率是多少？为什么比 MLP 低？ Expected: 0.1 对 0.5；比率越高正则化越强，欠拟合风险也越大，transformer 的默认值是较轻的那个。
 
 ## Wrong answers
 
-- "The scale makes the outputs sum to one." It restores the expected value of each unit, not a sum.
-- "Backward should draw a fresh mask for exploration." The backward pass differentiates the function that ran forward; a different mask gives the gradient of a different function.
-- "In evaluation mode multiply by (1 - p) as well." With inverted dropout the scaling already happened in training; scaling again at evaluation shrinks every activation.
+- "缩放是为了让输出之和为一。" 它恢复的是每个单元的期望值，不是总和。
+- "反向时应该抽一个新掩码，增加探索。" 反向传播求导的是前向实际运行的函数；换一个掩码，得到的是另一个函数的梯度。
+- "评估模式下也乘以 (1 - p)。" 用反向 dropout 时缩放已经在训练中做过了；评估时再缩放会让每个激活值变小。
 
 ## Taught in
 
-The [regularization lesson](../../../phases/03-deep-learning-core/07-regularization/) derives inverted dropout, and the [mini framework lesson](../../../phases/03-deep-learning-core/10-mini-framework/) turns it into this module.
+[正则化课](../../../phases/03-deep-learning-core/07-regularization/)推导了反向 dropout，[迷你框架课](../../../phases/03-deep-learning-core/10-mini-framework/)把它写成了这个模块。

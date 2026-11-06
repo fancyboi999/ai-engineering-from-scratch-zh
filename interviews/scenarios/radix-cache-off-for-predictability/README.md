@@ -1,6 +1,6 @@
 ---
 id: radix-cache-off-for-predictability
-title: The radix cache turned off for predictability
+title: 为让结果可预测而关闭 radix 缓存
 card: scenarios
 kind: incident
 level: 2
@@ -28,57 +28,58 @@ source:
   - manuals/vllm-101/sections/r-7-lab-notes.md
 ---
 
+
 ## Situation
 
-After a benchmark incident in which a warm prefix cache made a loaded server look faster, a platform team writes a new policy: production and benchmarks must agree, so every SGLang server starts with `--disable-radix-cache`, and the vLLM replicas start with `--no-enable-prefix-caching`. The rollout goes out on a Friday.
+之前出过一次基准测试事故：热的前缀缓存让一台高负载服务器看起来更快。事后平台团队写了一条新规定：生产环境和基准测试必须一致，所以每台 SGLang 服务器都用 `--disable-radix-cache` 启动，vLLM 副本都用 `--no-enable-prefix-caching` 启动。这次变更在一个周五上线。
 
-On Monday a customer whose assistant sends a system prompt of about two thousand tokens with every question reports that the first token now takes several seconds instead of under one, and that the service answers fewer questions per minute at the same user count. The platform team replies that nothing changed in the model or the hardware, and that the new numbers are the "true" ones. You are asked to settle it.
+周一，一位客户报告了问题。他的助手每次提问都带一个约两千 token 的系统 prompt。现在首 token 要好几秒，以前不到一秒；用户数不变，服务每分钟能回答的问题却变少了。平台团队回复说，模型和硬件都没变，新的数字才是"真实"的数字。由你来给出结论。
 
 ## Evidence
 
-- [the shared-prefix benchmark: four groups of 16 prompts with one system prompt each](evidence/the-shared-prefix-workload.txt)
-- [the shared-prefix run on the GB10 with the radix cache on](evidence/gb10-with-the-cache.txt)
-- [the same run on the GB10 with --disable-radix-cache](evidence/gb10-without-the-cache.txt)
-- [two prefill lines on the L4 with the cache, 2,048 shared tokens](evidence/l4-prefill-with-the-cache.txt)
-- [two prefill lines on the L4 without the cache, 4,096 shared tokens](evidence/l4-prefill-without-the-cache.txt)
-- [the same test on the other engine, cache on and off by shared length](evidence/the-other-engine.txt)
-- [the SGLang table on the L4 by shared length, with the clock caveat](evidence/the-factor-and-its-caveat.txt)
+- [共享前缀基准测试：四组，每组 16 个 prompt，各共用一个系统 prompt](evidence/the-shared-prefix-workload.txt)
+- [GB10 上开启 radix 缓存的共享前缀运行](evidence/gb10-with-the-cache.txt)
+- [GB10 上加了 --disable-radix-cache 的同一运行](evidence/gb10-without-the-cache.txt)
+- [L4 上开启缓存、共享 2,048 个 token 时的两行 prefill 日志](evidence/l4-prefill-with-the-cache.txt)
+- [L4 上关闭缓存、共享 4,096 个 token 时的两行 prefill 日志](evidence/l4-prefill-without-the-cache.txt)
+- [另一个引擎上的同一测试，按共享长度分别开关缓存](evidence/the-other-engine.txt)
+- [L4 上按共享长度列出的 SGLang 表格，以及时钟方面的注意事项](evidence/the-factor-and-its-caveat.txt)
 
 ## Questions
 
-1. What does a prefix cache change about the work a server does, and what does it leave the same?
-2. From the two GB10 runs, how much did the first token and the throughput move, and which line proves that the same work was requested?
-3. Read the four L4 prefill lines. What do `#new-token`, `#cached-token` and `#pending-token` say about each configuration?
-4. Both engines were measured. Does the effect belong to one engine, and how does its size depend on the shared length?
-5. The policy wanted predictable numbers. Which fix gives that without the cost?
+1. 前缀缓存改变了服务器所做工作的哪一部分？哪一部分保持不变？
+2. 从 GB10 的两次运行看，首 token 和吞吐量分别变了多少？哪一行证明两次请求的工作量相同？
+3. 读 L4 的四行 prefill 日志。`#new-token`、`#cached-token` 和 `#pending-token` 分别说明了两种配置的什么情况？
+4. 两个引擎都测过了。这个效应只属于某一个引擎吗？它的大小如何随共享长度变化？
+5. 这条规定想要的是可预测的数字。哪种修复既能做到这一点，又不付出这个代价？
 
 ## Walkthrough
 
-1. **Know what the cache saves.** The tree indexes the KV entries of every prompt the server has seen. A new request reuses the longest matching prefix and prefills only the tokens after it. The decode work stays the same, so a cache hit removes prefill time and nothing else. A system prompt that every request repeats is the best case: the whole shared part comes from the tree.
-2. **Read the workload.** The kit runs the engine's own shared-prefix benchmark: four groups of 16 prompts, one system prompt of 2,048 tokens per group, a 128-token question on each prompt, and a cap of eight requests at once. The second server starts with the cache disabled.
-3. **Compare the two GB10 runs.** Both report 146646 input tokens over 64 requests, so the client asked for the same work. With the cache the run took 28.97 s and gave 141.38 output tokens per second with a median TTFT of 690.96 ms. Without it the run took 50.26 s, the output fell to 81.49, and the median TTFT rose to 2542.06 ms, with a P99 of 3304.86 ms against 2051.54. The input tokens per second tell the same story: 5061.63 with the tree and 2917.46 without. The customer's two complaints, a slower first token and fewer answers per minute, are both in this pair.
-4. **Read the L4 prefill lines.** With the cache and a 2,048-token shared prompt, one batch prefilled 405 new tokens and took 12952 from the cache, and the next prefilled 546 new with 17269 cached. Without the cache and a 4,096-token shared prompt, each batch prefilled 4096 new tokens with 0 cached, and 5527 tokens were still pending for the next chunk. Every request paid for its whole prompt, in chunks of the prefill size, while the others waited.
-5. **Check the other engine.** On the L4 with vLLM, the cache kept the median first token near 400 ms at every shared length: 408, 488, 396, 410 and 375 ms. Without it the first token grew with the shared part: 392, 753, 1,213, 2,550 and 13,353 ms, and the output fell from 113.6 to 19.6 tokens per second. The manual asks to read the last two rows with care, because the GPU throttled there, and names the 1,024-token row as the clean comparison: about three times the first token and 50 percent more output with the cache. The effect is the same on both engines, and it grows with the shared length.
-6. **Bound the factor.** The SGLang table on the L4 reads 479 ms against 14,706 ms at 4,096 shared tokens, 30.7 times, and 4.3 times the throughput. The run without the cache ran at 930 MHz against 1,440 with it, with a thermal flag in 62 percent of its samples, so the manual treats both factors as upper bounds and notes that a 35 percent clock gap cannot explain a factor of 30. Read the GB10 pair, which had no such gap, for the size you can trust.
+1. **弄清缓存省下了什么。** 这棵树索引了服务器见过的每个 prompt 的 KV 条目。新请求复用最长的匹配前缀，只对前缀之后的 token 做 prefill。decode 工作不变，所以缓存命中只省掉 prefill 时间，别的都不省。每个请求都重复同一个系统 prompt，是最理想的情况：整个共享部分都从树里取。
+2. **读负载。** 工具包运行引擎自带的共享前缀基准测试：四组 prompt，每组 16 个，每组一个 2,048 token 的系统 prompt，每个 prompt 后接一个 128 token 的问题，同时最多八个请求。第二台服务器在禁用缓存的情况下启动。
+3. **比较 GB10 的两次运行。** 两次都报告 64 个请求共 146646 个输入 token，所以客户端请求的工作量相同。开启缓存时，运行耗时 28.97 s，输出为每秒 141.38 token，TTFT 中位数为 690.96 ms。关闭缓存时，运行耗时 50.26 s，输出降到 81.49，TTFT 中位数升到 2542.06 ms，P99 为 3304.86 ms，而开启时是 2051.54。每秒输入 token 数说明的是同一件事：有树时 5061.63，没有树时 2917.46。客户的两条投诉，首 token 变慢和每分钟回答变少，都体现在这一对数据里。
+4. **读 L4 的 prefill 日志。** 开启缓存、共享 prompt 为 2,048 token 时，一个批次 prefill 了 405 个新 token，从缓存中取了 12952 个；下一个批次 prefill 了 546 个新 token，缓存 17269 个。关闭缓存、共享 prompt 为 4,096 token 时，每个批次都 prefill 4096 个新 token，缓存为 0，还有 5527 个 token 等着下一个分块。每个请求都要按 prefill 分块大小处理整个 prompt，其他请求则在一旁等待。
+5. **核对另一个引擎。** 在 L4 上用 vLLM 时，开启缓存让首 token 中位数在每个共享长度下都保持在 400 ms 左右：408、488、396、410 和 375 ms。关闭缓存后，首 token 随共享部分增长：392、753、1,213、2,550 和 13,353 ms，输出从每秒 113.6 token 降到 19.6。手册提醒最后两行要谨慎看待，因为那时 GPU 降频了；它把 1,024 token 那一行作为干净的对照：开启缓存时首 token 快约三倍，输出多 50%。两个引擎上的效应相同，并且随共享长度增大。
+6. **给倍数划定上限。** L4 上的 SGLang 表格在共享 4,096 个 token 时为 479 ms 对 14,706 ms，相差 30.7 倍，吞吐量相差 4.3 倍。没有缓存的那次运行频率为 930 MHz，有缓存时为 1,440，且 62% 的采样带有过热标志，所以手册把这两个倍数都当作上限，并指出 35% 的时钟差距解释不了 30 倍。可信的幅度要看 GB10 那一对数据，它没有这种差距。
 
 ## Resolution
 
-The policy caused the incident. The cache was never what made the benchmark lie; the method was, because the kit reused one seed on one server and never flushed between runs. Removing the cache from production removed the work-saving that the customer's traffic depends on. On the GB10, the shared-prefix run saw its median TTFT go from 690.96 ms to 2542.06 ms, and its output went from 141.38 to 81.49 tokens per second, for the same 146646 input tokens.
+事故是这条规定造成的。让基准测试失真的从来不是缓存，而是方法：工具包在同一台服务器上复用同一个种子，两次运行之间从不清空缓存。把缓存从生产环境拿掉，就拿掉了客户流量赖以节省工作的机制。在 GB10 上，同样 146646 个输入 token，共享前缀运行的 TTFT 中位数从 690.96 ms 升到 2542.06 ms，输出从每秒 141.38 token 降到 81.49。
 
-The fix is to turn the cache back on, on both engines, and to make the benchmarks predictable by protocol: flush the cache before each run that you compare, use a new seed per run, and record the cached tokens next to the result. Prove the production fix with `#cached-token` in the prefill lines, which should carry most of each shared prompt, and with the median TTFT of the customer's traffic back near the cached level. Keep the manual's one exception: turn the cache off only to test whether a wrong answer comes from reused KV, and try `--kv-canary log` first.
+修复办法是在两个引擎上重新开启缓存，并用流程让基准测试变得可预测：每次要比较的运行前清空缓存，每次运行换新种子，在结果旁记录缓存 token 数。用 prefill 日志里的 `#cached-token` 证明生产修复生效，它应当覆盖每个共享 prompt 的大部分；同时客户流量的 TTFT 中位数应回到接近有缓存时的水平。保留手册给的唯一例外：只有在测试错误答案是否来自复用的 KV 时才关闭缓存，而且先试 `--kv-canary log`。
 
 ## Wrong turns
 
-- "The cache made the benchmark lie, so it has no place in production." The benchmark lied because it reused its prompts without a flush. The cache in production serves prompts that really repeat, and the customer's system prompt is exactly that.
-- "Only the first token is affected, throughput is unchanged." On the GB10 the output fell from 141.38 to 81.49 tokens per second and the run took 50.26 s instead of 28.97. Prefill that is computed again occupies steps that decode would have used.
-- "The effect is an SGLang detail." The other engine moved from 396 to 1,213 ms at 1,024 shared tokens and from 375 to 13,353 ms at 4,096, on the same card.
-- "Shorten the customer's system prompt instead." The prompt is the customer's product. A server feature that removes the repeated work is the cheaper fix, and the manual measured no cost from the cache when nothing is shared.
-- "Keep it off, because a wrong answer might come from reused KV." That is the one reason the manual accepts, and even then it asks you to try `--kv-canary log` first and to turn the cache off only for the test.
+- "缓存让基准测试失真，所以生产环境不该用它。" 基准测试失真，是因为它不清空缓存就复用 prompt。生产环境中的缓存服务的是真正重复的 prompt，客户的系统 prompt 正是这种情况。
+- "只有首 token 受影响，吞吐量不变。" 在 GB10 上，输出从每秒 141.38 token 降到 81.49，运行耗时从 28.97 s 变成 50.26 s。重新计算的 prefill 占用了本可用于 decode 的步数。
+- "这是 SGLang 的细节。" 另一个引擎在同一张卡上，共享 1,024 个 token 时从 396 ms 变成 1,213 ms，共享 4,096 个时从 375 ms 变成 13,353 ms。
+- "改为缩短客户的系统 prompt。" 这个 prompt 是客户的产品。用服务器功能去掉重复工作是更便宜的修复，手册也测过，没有共享内容时缓存没有任何代价。
+- "继续关闭，因为错误答案可能来自复用的 KV。" 这是手册唯一接受的理由，即便如此，它也要求先试 `--kv-canary log`，并且只在测试期间关闭缓存。
 
 ## Generalize
 
-A measurement artifact is fixed in the measurement, not in the system. When a cache or any other state carries over between benchmark runs, reset the state between runs and record it; do not remove the mechanism from production, where the same state is the point. Before you change a default that saves work, measure the traffic that repeats and count what the default saves there.
+测量造成的假象要在测量中修复，而不是在系统中修复。缓存或其他状态在基准测试运行之间留存时，在两次运行之间重置它并记录下来；不要把这个机制从生产环境拿掉，生产环境要的正是这份状态。改动一个能省工作的默认设置之前，先测一测会重复的流量，算出这个默认设置在那里省下了多少。
 
 ## Taught in
 
-The SGLang manual measures the pair in [the RadixCache page](../../../manuals/sglang-101/sections/3-3-radixcache.md#the-same-test-on-a-24-gb-l4), the vLLM manual measures the other engine in [the prefix cache page](../../../manuals/vllm-101/sections/3-2-make-repeated-prompts-hit-the-prefix-cache.md) with the full table in [the lab notes](../../../manuals/vllm-101/sections/r-7-lab-notes.md), and [the RadixAttention lesson](../../../phases/17-infrastructure-and-production/06-sglang-radixattention/docs/en.md) teaches the tree and where it wins and loses.
+SGLang 手册在 [RadixCache 页](../../../manuals/sglang-101/sections/3-3-radixcache.md#the-same-test-on-a-24-gb-l4)测量了这一对数据，vLLM 手册在[前缀缓存页](../../../manuals/vllm-101/sections/3-2-make-repeated-prompts-hit-the-prefix-cache.md)测量了另一个引擎，完整表格见[实验笔记](../../../manuals/vllm-101/sections/r-7-lab-notes.md)，[RadixAttention 课](../../../phases/17-infrastructure-and-production/06-sglang-radixattention/docs/en.md)讲解了这棵树及其适用和不适用的情形。

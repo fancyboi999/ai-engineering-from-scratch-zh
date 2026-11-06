@@ -1,6 +1,6 @@
 ---
 id: compact-or-hand-off
-title: Compact the context, or end the session and hand off
+title: 压缩上下文还是结束会话并交接
 card: agents
 kind: tradeoff
 level: 3
@@ -16,50 +16,50 @@ related: [agents/a-handoff-is-not-a-status-report]
 updated: 2026-11-03
 ---
 
-A long coding session has used most of its context window. The runtime offers to summarize the older turns and keep going. Your teammate wants to let it run to the limit, because compaction is automatic. When do you compact, when do you end the session, and what do you measure to choose?
+一个漫长的编码会话已经消耗了大部分上下文窗口。运行时提出可以摘要较早轮次并继续执行。你的队友希望让它一直运行到极限，因为压缩是自动的。你会在何时压缩，何时结束会话，又衡量什么指标来做出选择？
 
 ## Short answer
 
-Compaction extends a session, and a handoff closes one cleanly and starts the next in fresh context. Compaction is fine while the compressed history still carries what the task needs, but quality decays as compression stacks up. The lesson's guidance is to end the session with a generated handoff at 50 to 75 percent of the budget, not at the wall, because the packet is cheap to write while the context is intact and expensive when the model is already losing its place.
+压缩用于延长会话生命周期，而交接则是干净利落地关闭当前会话并在全新的上下文中启动下一次会话。只要压缩后的历史记录仍承载任务所需的信息，压缩就完全可行，但随着压缩层层叠加，输出质量会逐渐衰退。课程的指导原则是在上下文预算用到 50% 到 75% 时通过自动生成的交接包结束会话，而不是硬顶到窗口极限，因为在上下文完好时编写交接包成本低廉，而在模型已经迷失方向时代价极其高昂。
 
 ## Full answer
 
-### Two different operations
+### 两种不同的操作
 
-| Operation | What it does | What it costs |
+| 操作 | 实际行为 | 付出的代价 |
 |---|---|---|
-| Compaction | Compresses the history in place and continues the same session | Each pass loses detail, and the losses stack up |
-| Fresh-session handoff | Writes a packet, ends the session, and resumes in a new context | A clean break, with the cost of generating and loading the packet |
+| 压缩（Compaction） | 就地压缩历史记录并继续同一个会话 | 每次压缩都会丢失细节，且损失会不断累加 |
+| 全新会话交接（Fresh-session handoff） | 写入交接包、结束会话并在新上下文中恢复 | 干净彻底的切换，代价是生成和加载交接包的开销 |
 
-Runtimes implement compaction in different ways: a server-side opaque summary, a local summary appended as a user message, a progressive multi-stage compression near the top of the window, or a timestamp-based hiding of old messages plus a short summary. The mechanism varies. The need is the same. Whatever survives compression must be serialized into a portable artifact, and that artifact is the handoff packet.
+不同的运行时以不同方式实现压缩：服务端的不透明摘要、作为用户消息追加的本地摘要、接近窗口上限时的渐进式多阶段压缩，或者基于时间戳隐藏旧消息并附带简短摘要。机制各异，但核心需求是一致的。凡是经历压缩后存活下来的关键信息，都必须序列化为可移植的产物，而该产物正是交接包。
 
-### Why not run to the wall
+### 为什么不能硬顶到极限
 
-A runtime that compacts at 95 percent compacts a context that is already full of compression artifacts. The packet generator then summarizes degraded state. The mistake is to keep compressing until quality collapses. The fix is to budget for an early, clean handoff. A session that ends at 50 to 75 percent still has the intact history, the real command records and a clear next action.
+在达到 95% 时才执行压缩的运行时，压缩的上下文本身已经充斥着各种压缩残留痕迹。随后交接包生成器总结的便是已经退化的状态。错误在于不断压缩直到质量崩溃。正确的应对方式是为尽早、干净的交接预留预算。在上下文预算用到 50% 到 75% 时结束的会话依然保留着完好的历史记录、真实的命令记录以及清晰的下一步行动。
 
-### Make the choice measurable
+### 让选型决策可衡量
 
-- Track the context fraction at which the session ends, and compare task outcomes across the two ranges.
-- Count how many times a session was compacted before it ended, and correlate with review findings.
-- Read the handoff packets: a packet with a vague `next_action` is a sign that the generator ran too late.
+- 跟踪会话结束时的上下文占比，并对比不同区间内的任务完成结果。
+- 统计会话在结束前被压缩了多少次，并与代码审查发现的问题做关联分析。
+- 检查交接包内容：如果交接包中的 `next_action` 含糊不清，说明生成器启动得太晚了。
 
-### One active handoff per branch
+### 每个分支仅保留一个活动的交接包
 
-Multi-agent work breaks on stale handoffs more than on bad output. Each packet carries the branch, the last known good commit and a status of active, superseded or archived. Only the active packet drives the next session.
+多 agent 协作往往更容易崩溃在过期的交接包上，而不是糟糕的单次输出上。每个交接包都携带分支、最后已知良好提交以及 active、superseded 或 archived 状态。只有处于 active 状态的交接包才能驱动下一次会话。
 
 ## Follow-ups
 
-- **Level 3:** Why is a fresh session better than a third compaction? Expected: compression losses stack up, while a fresh session starts from the packet, the state file and the repo, which are the system of record.
-- **Level 3:** What must be true of the tree before the handoff runs? Expected: the cleanup check passes, so the tree is committed or stashed with a note, no temp files remain, tests are green or named as risks, and the branch is right.
-- **Level 4:** The handoff is cheap, but the next session has to rebuild its working context. How do you keep that cost down? Expected: the packet lists the exact artifacts the next session must load before it acts, and the router points at them, so the session loads the state, the board and the active contract and nothing else.
-- **Level 4:** Two coding agent products are used on one task, one after the other. What makes the transition work? Expected: the packet schema, because the JSON form is product-neutral and both runtimes read the same fields.
+- **Level 3:** 为什么开启全新会话优于第三次压缩？ Expected: 压缩损失会累加，而新会话从交接包、状态文件和代码仓库启动，这些才是权威记录系统。
+- **Level 3:** 在执行交接前工作树必须满足什么条件？ Expected: 清理检查必须通过，工作树的改动已提交，或已 stash 并附上说明，无残留临时文件，测试呈绿色或作为风险列出，分支正确。
+- **Level 4:** 交接成本虽然低，但下一次会话必须重建工作上下文，如何压低该开销？ Expected: 交接包精确列出下一次会话行动前必须加载的产物，路由器直接指向它们，使会话仅加载状态、看板和当前活动契约。
+- **Level 4:** 在同一个任务上先后使用两款不同的编码 agent 产品，是什么保证过渡顺利？ Expected: 交接包的 Schema，因为 JSON 格式独立于具体产品，两个运行时读取相同的字段定义。
 
 ## Wrong answers
 
-- "Compaction is automatic, so let the runtime handle it." Automatic compaction decides when to compress, not whether the compressed state is still good enough to work from.
-- "End every session as early as possible to be safe." Each handoff costs a packet and a reload, so the target is a range, not a minimum.
-- "A longer context window removes the problem." A larger window delays the wall, and the quality decay from stacked compression is the same.
+- "压缩是全自动的，交给运行时处理就行。" 自动压缩只能决定何时触发压缩，无法判断压缩后的状态是否仍足以支撑高质量工作。
+- "为了稳妥起见，每次会话都尽可能早地结束。" 每次交接都需要生成交接包并重新加载上下文，因此目标是一个合理区间，而不是越小越好。
+- "更大的上下文窗口可以解决这个问题。" 更大的窗口只是推迟了触顶的时间，层层叠加压缩所带来的质量衰退本质依然相同。
 
 ## Taught in
 
-The [multi-session handoff lesson](../../../phases/14-agent-engineering/40-multi-session-handoff/) compares compaction strategies and sets the handoff window.
+[多会话交接](../../../phases/14-agent-engineering/40-multi-session-handoff/)课程对比了不同的压缩策略并界定了交接窗口。

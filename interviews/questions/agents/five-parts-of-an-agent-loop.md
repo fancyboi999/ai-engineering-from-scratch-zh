@@ -1,6 +1,6 @@
 ---
 id: five-parts-of-an-agent-loop
-title: What makes a loop an agent and not a chat bot
+title: 循环成为 Agent 而非聊天机器人的要素
 card: agents
 kind: concept
 level: 1
@@ -16,47 +16,47 @@ related: []
 updated: 2026-11-03
 ---
 
-A teammate says that their chat application is an agent because it calls a model inside a while loop. Name the parts that a real agent loop needs, and say what goes wrong when each one is missing.
+一位队友声称他们的聊天应用属于 agent，因为它在 while 循环中调用模型。请列出一个真正的 agent 循环所必需的核心组成部分，并说明缺少每一项时会导致什么问题。
 
 ## Short answer
 
-An agent loop needs five parts: a message buffer that grows with each turn, a tool registry that the model calls by name, a stop condition, a turn budget, and an observation formatter. The model is the same in a chat bot and in an agent. The difference is that the agent can pause, call a tool, read the result and continue. Without the five parts, the loop is a chat bot with extra steps.
+一个 agent 循环需要五个核心部分：随着每轮推进不断增长的消息缓冲区、模型可通过名称调用的工具注册表、明确的停止条件、轮数预算，以及观察结果格式化器。聊天机器人与 agent 背后的模型本身完全相同。本质区别在于 agent 能够暂停、调用工具、读取结果并继续前行。缺少这五个部分，该循环不过是多走了一道手续的聊天机器人而已。
 
 ## Full answer
 
-### The loop
+### 核心循环
 
-The pattern is the one from the ReAct paper. The model writes a thought, picks an action, reads an observation, and repeats until it decides to finish. Modern models move the thought to a separate reasoning channel, but the control flow is the same. Observe, think, act, observe, think, act, stop.
+该模式源自 ReAct 论文。模型写出思考、选择操作、读取观察结果，并反复循环直到决定结束。现代模型将思考转移至专门的推理通道中，但控制流依然如出一辙：观察、思考、行动、观察、思考、行动、停止。
 
-### The five parts
+### 五个核心组成部分
 
-| Part | What it does | Failure when missing |
+| 组成部分 | 职责功能 | 缺失时的系统故障 |
 |---|---|---|
-| Message buffer | Holds the user turn, the assistant turns, the tool turns and the final turn in order | The model forgets what it already did and repeats work |
-| Tool registry | Maps a tool name to a schema and a callable | The model names tools that do not exist, and nothing runs |
-| Stop condition | Ends the run on an explicit finish, on a turn with no tool call, on a budget, or on a guardrail | The run never ends, or ends only when the context is full |
-| Turn budget | Caps the number of iterations for this task class | One bad decision at step 38 becomes an endless run |
-| Observation formatter | Converts every tool output, including every error, into a string the model can read | A failed call becomes a crash instead of a correction |
+| 消息缓冲区 | 按顺序保存用户轮次、assistant 轮次、工具轮次与最终轮次 | 模型遗忘已完成的工作并不断重复劳动 |
+| 工具注册表 | 将工具名称映射为对应 Schema 与可调用函数 | 模型编造不存在的工具，导致没有任何操作能真正执行 |
+| 停止条件 | 依显式 finish、当轮无工具调用、预算耗尽或安全护栏终止运行 | 运行永无止境，或只有在上下文窗口塞满时才被迫退出 |
+| 轮数预算 | 针对当前任务类别限制最大迭代次数 | 在第 38 步的一个错误决策直接恶化为无限死循环 |
+| 观察结果格式化器 | 将所有工具输出（包括每条报错）转为模型可读的字符串 | 调用失败直接演变为系统崩溃而非自我纠错 |
 
-The formatter is the part that people forget. The lesson says that every 400 error in the stack must become an observation string, not an exception. A model that sees the error can correct the next call. A model that never sees it cannot.
+格式化器是经常被人忽视的部分。课程指出调用栈中的每一次 400 错误都必须转换为观察字符串，而不是直接抛出未处理异常。看到错误信息的模型可以纠正下一次调用，而永远看不到错误信息的模型则无能为力。
 
-### Why the parts matter now
+### 为什么这些部分在当前尤为重要
 
-Agents run 40 to 400 steps per task. Every framework in use today builds the same loop under its own names. The things that differ live around the loop: checkpoints, actor messaging, role templates, tracing. The loop itself does not change.
+Agent 如今处理单项任务常规需要运行 40 到 400 步。目前业界使用的每个框架本质上都在用各自的名称构建相同的循环。真正的差异存在于循环周边的基础设施中：检查点、actor 消息机制、角色模板、追踪。但循环的核心机制始终如一。
 
 ## Follow-ups
 
-- **Level 1:** What is an observation? Expected: the string form of a tool result that the loop appends to the buffer for the next model call.
-- **Level 2:** Why is a turn budget a separate part from the stop condition? Expected: the stop condition depends on what the model emits, and the budget protects the run when the model never emits a stop.
-- **Level 2:** Where does the thought go in a model with a native reasoning channel? Expected: in a separate field that the runtime passes between turns, so the transcript shows tool calls and results without inline thought text.
-- **Level 3:** What changes when two tool calls in one turn return out of order? Expected: each result needs a correlation id that ties it to its call, or the model reads the wrong result for a call.
+- **Level 1:** 什么是观察（Observation）？ Expected: 工具返回结果的字符串形式，由循环追加到缓冲区中供下一次模型调用读取。
+- **Level 2:** 为什么轮数预算需要作为独立于停止条件的组成部分？ Expected: 停止条件依赖于模型输出了什么，而预算在模型从未输出停止信号时提供确定性保护。
+- **Level 2:** 在具备原生推理通道的模型中，思考内容存放在何处？ Expected: 存放在运行时在各轮之间传递的专用字段中，使得运行记录可以仅展示工具调用与结果而不混入思考文本。
+- **Level 3:** 如果一轮中的两个工具调用乱序返回，需要做什么改动？ Expected: 每个结果都需要关联 ID 将其与对应调用绑定，否则模型会读取到错误的调用结果。
 
 ## Wrong answers
 
-- "An agent is a model with a long system prompt." A prompt cannot run a tool or read a result, so the model still stops at its first wrong guess.
-- "The loop ends when the model says it is done." A model can say it is done too early or never, so the loop also needs a turn budget and a no-tool-call stop.
-- "Tool errors should raise so that the developer sees them." An error that raises ends the run, while an error that becomes an observation lets the model fix the call.
+- "Agent 就是挂载了很长系统 prompt 的模型。" Prompt 无法执行工具或读取结果，模型依然会在遇到第一个错误猜测时停滞不前。
+- "循环会在模型声明自己完成时自动结束。" 模型可能会过早声明完成或者永远不声明，因此循环还需要轮数预算与无工具调用即停止。
+- "工具错误应该直接抛出异常以便开发者发现。" 抛出异常会直接终止运行，而将错误转化为观察结果能让模型自行纠正调用。
 
 ## Taught in
 
-The [agent loop lesson](../../../phases/14-agent-engineering/01-the-agent-loop/) builds the five parts with a scripted model and three tools.
+[Agent 循环：观察、思考、行动](../../../phases/14-agent-engineering/01-the-agent-loop/)课程使用预设脚本模型与三个工具构建了这五个核心部分。

@@ -1,6 +1,6 @@
 ---
 id: canary-gates-above-noise
-title: Set canary gates that do not halt on noise
+title: 设定不会被噪声叫停的金丝雀闸门
 card: production-mlops
 kind: design
 level: 3
@@ -16,52 +16,52 @@ related: [production-mlops/shadow-mode-is-a-smoke-test, production-mlops/canary-
 updated: 2026-11-03
 ---
 
-You run a canary for a new model. The team wants a rule that stops the rollout when the canary and the baseline differ on any metric. Design the gates so that they catch a real regression and let a healthy rollout through.
+你在为一个新模型跑金丝雀发布。团队想定一条规则：金丝雀和基线在任何指标上有差异，就停止发布。设计这些闸门，让它们能抓住真实的退化，也能放行健康的发布。
 
 ## Short answer
 
-Write each gate as a multiplier above the baseline, never as equality. Gate on five metrics: latency percentiles, cost per request, error and refusal rate, output length distribution and user feedback rate. Put every threshold above the run-to-run variance, which the lesson measured at up to 15 percent on identical inputs, and hold each step long enough to collect the samples the gate needs.
+每个闸门都写成基线之上的倍数，绝不写成相等。在五个指标上设闸门：延迟分位数、单请求成本、错误与拒答率、输出长度分布、用户反馈率。每个阈值都要高于运行间的波动，课程测得相同输入下这一波动最高达 15%；每一步都要停留足够久，攒够闸门需要的样本。
 
 ## Full answer
 
-### Why equality fails
+### 为什么要求相等会失败
 
-Identical inputs produce different outputs. Floating-point reductions on the GPU run in a different order for each batch shape, the batch size changes between runs, and sampling above temperature zero adds its own randomness. The lesson reports up to 15 percent accuracy variation between runs on the same eval set. "Stable" therefore means inside the expected variance, not identical to the baseline.
+相同的输入会产生不同的输出。GPU 上的浮点归约在不同 batch 形状下执行顺序不同，batch size 每次运行都会变，温度高于零的采样还会带来自己的随机性。课程报告，同一评估集上两次运行的准确率相差可达 15%。因此“稳定”是指落在预期波动之内，而不是与基线完全相同。
 
-### The five gates
+### 五个闸门
 
-| Metric | Breach |
+| 指标 | 越线条件 |
 |---|---|
-| Latency P50, P95, P99 | canary P99 above 1.5x the baseline |
-| Cost per request | more than 20 percent above the baseline |
-| Error and refusal rate | 2x the baseline |
-| Output length, mean and P99 | a shift in the distribution |
-| User feedback, thumbs-down and tickets | 1.5x the baseline |
+| 延迟 P50、P95、P99 | 金丝雀 P99 超过基线的 1.5x |
+| 单请求成本 | 比基线高出 20% 以上 |
+| 错误与拒答率 | 达到基线的 2x |
+| 输出长度，均值与 P99 | 分布发生偏移 |
+| 用户反馈，点踩与工单 | 达到基线的 1.5x |
 
-### Measure the noise floor first
+### 先测噪声底
 
-Before the canary, run two arms of the same baseline model and record the spread of each metric between them. That spread is the floor. A gate below it halts every rollout, including a good one. The lesson's exercise asks for the multipliers when the eval noise is plus or minus 7 percent, and the answer is a gate above that band.
+金丝雀开始前，用同一个基线模型跑两组，记录每个指标在两组之间的差距。这个差距就是噪声底。低于它的闸门会叫停每一次发布，好的发布也不例外。课程练习问的是：评估噪声为正负 7% 时，倍数该怎么设；答案是闸门要设在这个区间之上。
 
-### Hold each step long enough
+### 每一步停留足够久
 
-The progression runs 1, 10, 25, 50, 75 and 100 percent. Gates check every 5 to 15 minutes. At 1 percent of a load of 1,000 per minute, the canary sees 10 requests per minute, which is 50 to 150 data points per window. That is enough to read latency and errors, but one or two samples decide the P99, so the P99 gate must hold for more than one window. It is too few for user feedback. Each step must pause until the gate has its samples.
+发布按 1、10、25、50、75、100% 推进。闸门每 5 到 15 分钟检查一次。负载为每分钟 1,000 次时，1% 的金丝雀每分钟只拿到 10 个请求，每个窗口 50 到 150 个数据点。这足以看延迟和错误，但 P99 由一两个样本决定，所以 P99 闸门必须跨多个窗口持续成立。对用户反馈来说，这点样本太少。每一步都要停住，等闸门攒够样本。
 
-### Keep the exit cheap
+### 让退出便宜
 
-A halt is only useful when the rollback is fast. Keep the traffic share in a policy flag and the model in a registry with a pinned digest, so that a breach reverts in seconds.
+只有回滚够快，叫停才有用。把流量比例放在策略开关里，把模型放进 registry 并固定 digest，一旦越线，几秒内就能回退。
 
 ## Follow-ups
 
-- **Level 3:** How do you learn the size of the noise before the canary starts? Expected: run two canary arms of the same baseline and record the spread of each metric between them.
-- **Level 3:** User feedback at the first step is too thin to gate on. What do you do? Expected: gate the early steps on latency, cost, errors and length, and apply the feedback gate from the step that has enough samples.
-- **Level 4:** A gate fires at one step, and the metric is normal again on the next check. Continue or halt? Expected: halt and look. A gate that flaps sits inside the noise or sees an intermittent regression, and both need a decision before more users see the model.
+- **Level 3:** 金丝雀开始前，怎样知道噪声有多大？ Expected: 用同一个基线跑两个金丝雀分组，记录每个指标在两组之间的差距。
+- **Level 3:** 第一步的用户反馈太少，没法设闸门。怎么办？ Expected: 早期步骤只按延迟、成本、错误和长度设闸门，从样本足够的那一步起再启用反馈闸门。
+- **Level 4:** 某一步闸门触发了，下次检查时指标又正常了。继续还是叫停？ Expected: 叫停并排查。来回跳的闸门要么落在噪声里，要么看到了间歇性退化；两种情况都要在更多用户看到这个模型前做出决定。
 
 ## Wrong answers
 
-- "Stop on any difference from the baseline." Two runs of the same model differ, so that rule stops every rollout.
-- "Gate on the mean latency." A mean hides the tail. Gate on the percentiles.
-- "Allow zero cost increase." A better model can cost more. The lesson sets the breach at 20 percent, and the product decides whether the gain pays for it.
+- "与基线有任何差异就停止。" 同一个模型跑两次结果也不同，这条规则会叫停每一次发布。
+- "按平均延迟设闸门。" 平均值掩盖长尾。按分位数设闸门。
+- "成本一点都不许涨。" 更好的模型可能更贵。课程把越线点设在 20%，收益值不值由产品决定。
 
 ## Taught in
 
-The [progressive delivery lesson](../../../phases/17-infrastructure-and-production/20-shadow-canary-progressive/) lists the five gates, the non-determinism ceiling and the step cadence.
+[渐进式发布课程](../../../phases/17-infrastructure-and-production/20-shadow-canary-progressive/)列出了五个闸门、非确定性上限和每一步的节奏。

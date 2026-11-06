@@ -1,6 +1,6 @@
 ---
 id: classifier-head-swap-choice
-title: A spam classifier from 800 messages and a pretrained body
+title: 基于 800 条短消息与预训练主体构建分类器
 card: system-design
 kind: tradeoff
 level: 2
@@ -16,52 +16,52 @@ related: [system-design/finetune-pipeline-design, system-design/when-not-ml]
 updated: 2026-11-03
 ---
 
-You have a small pretrained language model and 800 labeled text messages, half spam and half not. Design the classifier: what you keep, what you replace, which of two training regimes you choose, how you split and evaluate, and when the other regime would win.
+你拥有一个小型预训练语言模型和 800 条带标签的文本消息，垃圾消息和非垃圾消息各占一半。请设计分类器方案：保留什么、替换什么、在两种训练方案中选择哪一种、如何切分数据集与开展评估，以及在什么情况下另一种方案会胜出。
 
 ## Short answer
 
-Keep the pretrained body and replace the vocabulary head with a linear layer to two classes over a mean-pooled, mask-weighted sequence vector. With 800 examples, train the head only with the body frozen: it is fast, light on memory and rarely overfits, and on this fixture it reaches about 0.9 precision and 0.85 recall after twenty epochs. Full fine-tuning takes about three times longer and lands within a couple of points either way; it starts to pay off at the scale of 80,000 examples or when the domain drifts far from the pretraining text.
+保留预训练的模型主体，将词表分类头替换为连接到两个类别的线性层，输入为基于注意力掩码加权平均池化的序列向量。面对 800 个样本，选择冻结主体仅训练分类头：这种方式速度快、内存开销小且极少过拟合，在当前固定数据集上训练 20 个 epoch 后即可达到约 0.9 的精确率和 0.85 的召回率。全量微调耗时约为其三倍，结果与仅训练分类头相差一两个百分点；全量微调在样本达到 80,000 量级或领域与预训练文本差异较大时才开始展现优势。
 
 ## Full answer
 
-### What to keep and replace
+### 保留什么与替换什么
 
-The body already encodes word identity, position and co-occurrence. Training a fresh classifier from scratch on 800 examples throws that away. The head is the wrong part: it projects to the vocabulary. Replace it with one linear layer from the hidden width to two logits over a pooled vector, and train with cross-entropy against the label.
+预训练主体已经编码了词的身份、位置和共现信息。在 800 个样本上从头训练全新分类器会丢弃这些信息。而原生的头部结构并不匹配任务：它将隐藏层映射到词表。因此将其替换为单一线性层，将隐藏层宽度映射为代表两个分类的 logits，在池化向量上计算，并以分类标签的交叉熵损失训练。
 
-### Pooling
+### 池化机制
 
-A classifier needs one vector per message. Mean pooling weighted by the attention mask is the simplest stable choice across lengths and needs no special token. The alternatives are a leading class token, which the body would have to be pretrained with, and the last non-padding token, which decoder-style classifiers use.
+分类任务需要每个消息序列提炼出一个定长向量。基于注意力掩码加权平均池化是跨不同序列长度最简单稳妥的选择，且无需引入特殊的分类标记。备选方案包括开头的类标记（需预训练阶段支持），以及解码器风格分类器所采用的最后一个非填充 token。
 
-### Two regimes, one loop
+### 两种训练方案，统一循环框架
 
-| Regime | Trainable set | Cost | Risk |
+| 方案 | 可训练参数集 | 训练代价 | 风险 |
 |---|---|---|---|
-| Head only | The linear head | Fast, almost free in memory | Underfits when the domain is far from pretraining |
-| Full fine-tuning | Head and body | About three times longer | Overfits and forgets on small data |
+| 仅训练分类头 | 仅线性分类头 | 极快，几乎无额外显存开销 | 领域与预训练相差过远时会欠拟合 |
+| 全量微调 | 分类头与模型主体 | 耗时约为前者的三倍 | 在小样本数据上极易过拟合且遗忘通用表征 |
 
-Both run through the same training function; the toggle flips `requires_grad` on the body parameters, so the optimizer sees only the head in the first regime.
+两者共用相同的训练函数；仅需切换模型主体参数的 `requires_grad` 属性，在第一种方案中优化器只更新分类头参数。
 
-### Data and evaluation
+### 数据切分与评估
 
-Split 80/20, stratified so the test set keeps the 50/50 balance: 640 train, 160 test. Report precision, recall and F1 for the spam class with the confusion matrix, so the numbers can be read as honest estimates. The fixture is balanced and generated, so real data will be noisier.
+采用 80/20 分层切分，使测试集保持 50/50 的类别平衡：640 条用于训练，160 条用于测试。汇报垃圾短信类别的精确率、召回率、F1 分数以及完整的混淆矩阵，以便将指标作为真实客观的估计值来审视。当前的合成固定数据集非常规整平衡，真实业务场景中的数据噪音往往更大。
 
-### The decision
+### 最终决策
 
-On 800 examples and a tiny body, head only is the right call. On 80,000 examples and a bigger body, full fine-tuning starts to win. A middle path unfreezes only the last block, which costs less than full tuning and learns more than the head alone. The contract is the API, not the winner: one training function, one toggle.
+在 800 个样本和微小主体场景下，仅训练分类头是合理的选择。在样本达到 80,000 条且模型体量更大时，全量微调才会开始显现优势。折中路径是仅解冻最后一个 transformer 模块，其训练开销低于全量微调，学到的表征又多于仅训练分类头。真正的工程契约是 API 接口设计而非单一赢家：统一的训练函数，配以可切换的配置开关。
 
 ## Follow-ups
 
-- **Level 2:** Why does the frozen body rarely overfit here? Expected: only the head's few parameters move, so the model cannot memorize 640 examples through the body.
-- **Level 2:** Why stratify the split? Expected: so the test set keeps the class balance and precision and recall mean what they say.
-- **Level 3:** Precision matters more than recall for this product. What changes in the design? Expected: the decision threshold on the spam logit, chosen on a validation split held out from the 640 training messages to trade recall for precision, so the 160 test messages stay untouched for the final numbers; the training regime stays the same.
-- **Level 3:** The messages are in a domain the body never saw. Which regime and why? Expected: full or partial fine-tuning, because the frozen features do not carry the domain and the head alone underfits.
+- **Level 2:** 为什么在此场景下冻结主体极少发生过拟合？ Expected: 仅更新分类头的少量参数，模型无法通过庞大的主体参数去死记硬背 640 条训练样本。
+- **Level 2:** 为什么要采用分层切分？ Expected: 确保测试集严格保持原始类别平衡比例，使计算出的精确率和召回率具有真实代表性。
+- **Level 3:** 若该产品更看重精确率而非召回率，系统设计需作何调整？ Expected: 调整基于垃圾短信 logit 的分类决策阈值，在从 640 条训练数据中留出的验证集上权衡阈值（以召回换取更高精确率），保证 160 条最终测试集保持盲测；训练方案本身保持不变。
+- **Level 3:** 若短信属于预训练主体从未见过的专有垂直领域，选哪种方案？为什么？ Expected: 全量微调或部分解冻微调，因为冻结的特征表征无法承载该专有领域知识，仅训练分类头会欠拟合。
 
 ## Wrong answers
 
-- "Train a small classifier from scratch; the model is tiny anyway." That wastes the pretraining and 800 examples are too few to learn the language from zero.
-- "Always fine-tune everything for the best accuracy." On small data full tuning overfits and forgets, for a result within a couple of points of the head alone at three times the cost.
-- "Use the last token's hidden state without a mask." Padded sequences then pool a padding position; the mask must select the last real token or weight the mean.
+- "从头训练一个小型分类器；反正模型很小。" 这浪费了预训练知识，且 800 个样本太少，不足以从零学习语言。
+- "始终微调全部参数以获得最佳准确率。" 在小数据上全量微调容易过拟合和遗忘，耗费三倍成本换来的结果与仅训练分类头相差一两个点。
+- "直接使用最后一个 token 的隐藏状态，不加掩码。" 填充序列会导致池化取到了 padding 位置的无用特征；掩码必须用于精准选取最后一个真实 token 或对平均值加权。
 
 ## Taught in
 
-The [classifier fine-tuning lesson](../../../phases/19-capstone-projects/38-classifier-finetuning/) builds both regimes on the 800-message fixture and compares their precision, recall and cost.
+[分类器微调课程](../../../phases/19-capstone-projects/38-classifier-finetuning/)在 800 条短消息数据集上构建了两种训练方案，并对比了各自的精确率、召回率与计算成本。

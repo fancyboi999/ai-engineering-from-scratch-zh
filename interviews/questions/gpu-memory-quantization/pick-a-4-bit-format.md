@@ -1,6 +1,6 @@
 ---
 id: pick-a-4-bit-format
-title: Pick a 4-bit format for a 14B model on 24 GB
+title: 为 24 GB 显存上的 14B 模型选择 4 位量化格式
 card: gpu-memory-quantization
 kind: tradeoff
 level: 2
@@ -16,62 +16,62 @@ related: []
 updated: 2026-11-03
 ---
 
-A 14B model must run on a 24 GB card and does not fit in FP8 with a usable pool. You can choose AWQ, GPTQ, a checkpoint in the compressed-tensors format, bitsandbytes at load time, or a GGUF file. How do you pick, and what did the manual measure for each?
+一个 14B 模型必须在一张 24 GB 显卡上运行，但在 FP8 下无法保留足够可用的 KV 显存池。你可以选择 AWQ、GPTQ、compressed-tensors 格式的权重、加载时 bitsandbytes 量化，或者 GGUF 文件。你如何选型，手册对各格式的实测结果是什么？
 
 ## Short answer
 
-Pick a published 4-bit checkpoint over quantization at load time, and pick the format from the engine and the workload. For a GPU server AWQ with the Marlin kernels is the default, GPTQ when you also serve LoRA adapters on the base, and GGUF only for CPU or edge serving, because its kernels are not built for GPUs. The manual started an AWQ Qwen3-14B on an L4 with 9.44 GiB of weights and a pool of 36,272 tokens, loaded Qwen3-1.7B with bitsandbytes in 1.33 GiB against 3.22 GiB in BF16, which is 41 percent, and loaded a GGUF file of 0.55 GiB through a plugin that the documentation calls experimental.
+优先选择已公开发布的 4 位量化权重，而不是在加载时实时量化；并根据推理引擎与业务工作负载挑选具体格式。对于 GPU 服务，搭配 Marlin 内核的 AWQ 是默认选择；若基座模型上还需要挂载 LoRA 适配器，则选择 GPTQ；GGUF 仅用于 CPU 或边缘端服务，因为其算子并非为 GPU 构建。手册在 L4 上实测了 AWQ 格式的 Qwen3-14B，权重占用 9.44 GiB，显存池保留了 36,272 token；使用 bitsandbytes 加载 Qwen3-1.7B 占用 1.33 GiB，相比 BF16 的 3.22 GiB 相当于 41%；并通过文档标为实验性的插件加载了 0.55 GiB 的 GGUF 文件。
 
 ## Full answer
 
-### The formats vLLM reads
+### vLLM 支持的量化格式
 
-| Format | What it stores | Notes at 0.31.0 |
+| 格式 | 存储内容 | 0.31.0 版本的注意事项 |
 |---|---|---|
-| AWQ and GPTQ | 4-bit weights, 16-bit math | runs from the Turing GPUs on, with the fast Marlin kernels on Ampere, Ada and Hopper |
-| compressed-tensors W4A16 or W8A8 | 4-bit or 8-bit weights, made with the LLM Compressor library | the vLLM project suggests this library to make your own checkpoint |
-| bitsandbytes | 4-bit weights, made when the server loads the model | needs the separate `vllm-bnb-plugin` package, then `--quantization bitsandbytes` for a model that is not quantized |
-| GGUF | the llama.cpp file format | needs the separate `vllm-gguf-plugin` package, and the documentation calls it experimental |
+| AWQ 与 GPTQ | 4 位权重，16 位计算 | 支持从 Turing 架构起的 GPU，在 Ampere、Ada 和 Hopper 上配备高效的 Marlin 内核 |
+| compressed-tensors W4A16 或 W8A8 | 4 位或 8 位权重，由 LLM Compressor 库生成 | vLLM 官方推荐使用此库构建自定义量化权重 |
+| bitsandbytes | 4 位权重，在服务加载模型时实时量化 | 需要单独安装 `vllm-bnb-plugin` 包，并在未量化模型上指定 `--quantization bitsandbytes` |
+| GGUF | llama.cpp 的专用文件格式 | 需要单独安装 `vllm-gguf-plugin` 包，文档明确标为实验性功能 |
 
-For a published checkpoint you set no flag; vLLM reads the method from the checkpoint config.
+对于已发布的量化模型无需额外传参；vLLM 会自动从模型配置中读取量化方法。
 
-### What the manual started
+### 手册实测情况
 
-- **AWQ.** `vllm serve Qwen/Qwen3-14B-AWQ --max-model-len 8192` on an L4 with no quantization flag. The log showed `quantization=auto_awq` and the Marlin kernel. The weights took 9.44 GiB and the pool held 36,272 tokens. Speed and accuracy were not measured.
-- **bitsandbytes.** Without the plugin, the server stopped with `Unknown quantization method: bitsandbytes`. With it, Qwen3-1.7B loaded in 1.33 GiB against 3.22 GiB in BF16, which is 41 percent, and the pool grew from 92,960 to 108,512 tokens. The 41 percent includes the embeddings and the output layer, which stay in 16-bit, so the share differs on a larger model.
-- **GGUF.** With the plugin, a 4-bit file of Qwen3-0.6B loaded 0.55 GiB of weights and a chat request returned HTTP 200.
+- **AWQ。** 在 L4 上执行 `vllm serve Qwen/Qwen3-14B-AWQ --max-model-len 8192` 且不带量化参数。日志显示 `quantization=auto_awq` 并启用了 Marlin 内核。权重占用 9.44 GiB，显存池容纳 36,272 token。未测试速度与准确率。
+- **bitsandbytes。** 若未安装插件，服务会因 `Unknown quantization method: bitsandbytes` 报错中止。安装插件后，Qwen3-1.7B 加载占用 1.33 GiB，相比 BF16 的 3.22 GiB 相当于 41%，显存池从 92,960 增至 108,512 token。41% 的比例包含了保持 16 位的嵌入层与输出层，因此在更大模型上该比例会有所不同。
+- **GGUF。** 安装插件后，4 位版本的 Qwen3-0.6B 加载了 0.55 GiB 权重，chat 请求正常返回 HTTP 200。
 
-The second GPU of the node was throttled during these starts, so the manual gives no speeds, and it measured no accuracy for either small format.
+在这些测试期间节点的第二张 GPU 遭遇降频，因此手册未提供吞吐测速，亦未对这两个小模型格式评测准确率。
 
-### The lesson's picking guide
+### 课程选型指南
 
-- CPU or edge serving: GGUF, with the medium 4-bit variant as the production default. GGUF is a file format that bundles several quantization variants, keeps the first and last layers at higher precision, and runs best in llama.cpp, the fastest CPU engine. In vLLM it is slow, about 93 tokens per second on a 7B model in the lesson's numbers, because the format is not built for GPU kernels.
-- GPU serving with routine chat and no adapters: AWQ. It protects the most salient weights during quantization; with the Marlin kernels it gave about 741 tokens per second on a 7B model, the best code accuracy among the 4-bit formats, and a 10.9 times speedup over a naive kernel.
-- GPU serving with many LoRA adapters on one base: GPTQ with Marlin, about 712 tokens per second on a 7B model and 2.6 times faster than without Marlin, because it supports LoRA in vLLM and the microscaling 4-bit formats did not at the start of 2026.
-- Reasoning-heavy work: FP8, and accept the memory cost; the lesson puts the AWQ loss on math at several points.
+- CPU 或边缘端服务：GGUF，生产默认采用中等 4 位变体。GGUF 是一种将多种量化变体打包在一起的文件格式，首尾层保持更高精度，在运行速度最快的 CPU 引擎 llama.cpp 中表现最佳。在 vLLM 中其速度较慢，课程测得 7B 模型约为 93 tok/s，因为该格式不是为 GPU 算子打造的。
+- 无适配器的常规聊天 GPU 服务：AWQ。它在量化过程中保护最显著的权重；结合 Marlin 内核，它在 7B 模型上达到约 741 tok/s，在所有 4 位格式中取得了最好的代码准确率，比朴素内核提升了 10.9 倍。
+- 单基座挂载多个 LoRA 适配器的 GPU 服务：带 Marlin 的 GPTQ，在 7B 模型上达到约 712 tok/s，比无 Marlin 快 2.6 倍，因为截至 2026 年初，vLLM 中的显式微缩放 4 位格式尚未支持 LoRA，而 GPTQ 完整支持。
+- 重度推理与数学任务：FP8，并接受相应的显存开销；课程指出 AWQ 在数学任务上会损失若干个百分点。
 
-### Two traps
+### 两个常见陷阱
 
-The calibration set must match the domain: AWQ and GPTQ pick the weights to protect from a calibration pass, and generic web text makes them protect the wrong weights for code, medical or legal traffic. Calibrate on hundreds of in-domain samples and test on the eval set. And the KV cache is separate from the weights: a 70B model at 4-bit is about 35 GB of weights, and at 128 concurrent requests with a 2k context its cache is near 20 GB on top.
+校准集必须与业务领域匹配：AWQ 与 GPTQ 通过校准推理挑选需要保护的关键权重，使用通用的网络爬虫文本会导致其为代码、医疗或法律流量保护了错误的权重。务必在数百个领域内真实样本上校准，并在评估集上验证。此外，KV cache 与权重显存是独立的：4 位量化的 70B 模型权重约为 35 GB，在 128 并发及 2k 上下文下，还需要额外近 20 GB 显存用于缓存。
 
-### The accuracy caveat
+### 准确率注意事项
 
-A 4-bit model can lose more accuracy than an FP8 model, and the loss depends on the model and the method. The manual ran its GSM8K check on FP8 and not on the 4-bit formats. Test the candidate formats on your own prompts, and when it is ambiguous run a 1,000-sample eval on each.
+4 位量化模型可能比 FP8 产生更多的准确率损失，具体取决于模型架构与量化方式。手册中的 GSM8K 检验是在 FP8 上执行的，并未覆盖 4 位格式。必须在自有的 prompt 业务集上测试候选格式；如果表现模糊，在各格式上运行 1,000 个样本的评估。
 
 ## Follow-ups
 
-- **Level 2:** Why pick a published checkpoint over bitsandbytes at load time? Expected: load-time quantization adds load time and gives a checkpoint that nobody evaluated; a published checkpoint has a known method and often a published accuracy, and vLLM reads the method from its config with no flag.
-- **Level 3:** The bitsandbytes load saved 41 percent on a 1.7B model. Will a 14B model save the same share? Expected: not the same; the 41 percent includes the embeddings and the output layer, which stay in 16-bit, and they are a smaller share of a larger model, so the saving changes.
-- **Level 3:** You need LoRA adapters on the 4-bit base. Which format? Expected: GPTQ with the Marlin kernels, because it supports LoRA adapters in vLLM; the microscaling 4-bit formats did not support LoRA at the start of 2026.
-- **Level 4:** A domain model quantized with AWQ on generic web text loses several points on its own eval. Why, and what do you do? Expected: AWQ picks the weights to protect from a calibration set, and generic text makes it protect the wrong ones for the domain; calibrate on hundreds of in-domain samples and test on the eval set before you ship.
+- **Level 2:** 为什么选择公开发布的权重，而不是在加载时使用 bitsandbytes 量化？ Expected: 加载时量化会显著拖慢启动速度，且产生未经充分验证的权重；已发布的权重具有明确的量化方法，通常附带已公开的准确率，且 vLLM 能直接从配置读取而无需额外参数。
+- **Level 3:** bitsandbytes 在 1.7B 模型上节省了 41% 内存。14B 模型也能节省相同的比例吗？ Expected: 不会相同；41% 包含了保持 16 位的嵌入层与输出层，它们在更大模型中所占比例较小，因此整体节省比例会发生改变。
+- **Level 3:** 需要在 4 位基座上挂载 LoRA 适配器，应选用哪种格式？ Expected: 搭配 Marlin 内核的 GPTQ，因为 vLLM 支持在其上挂载 LoRA 适配器；截至 2026 年初，显式微缩放 4 位格式尚未支持 LoRA。
+- **Level 4:** 采用通用文本校准的 AWQ 垂直领域模型在自有评估集上下滑了若干个百分点。原因是什么，如何解决？ Expected: AWQ 从校准集中挑选受保护的权重，通用文本导致其保护了与垂直领域不符的权重；在上线前，使用数百个领域内样本重新校准并在评估集上复测。
 
 ## Wrong answers
 
-- "GGUF is the most popular format, so use it on the GPU server." It is the CPU and edge default; in vLLM it needs an experimental plugin, and its kernels are not built for GPUs, about 93 tokens per second on a 7B model in the lesson's numbers.
-- "Quantize at load time with bitsandbytes, it is one flag." Without the plugin the server stops with an unknown method error, and the result is a checkpoint that nobody evaluated; use a published AWQ or GPTQ checkpoint and test it.
-- "4-bit loses as little as FP8." A 4-bit model can lose more, and the loss depends on the model and the method; AWQ loses several points on math in the lesson, so run your own check.
-- "The memory saving is 41 percent for any model." The measured 41 percent is one small model with its embeddings and output layer in 16-bit; the share differs on a larger model, and the KV cache is separate from the weights.
+- "GGUF 是最流行的格式，所以应在 GPU 服务器上使用。" 它是 CPU 和边缘端的首选；在 vLLM 中需要实验性插件，且其算子并非为 GPU 构建，在课程数据中 7B 模型仅跑出约 93 tok/s。
+- "在加载时用 bitsandbytes 量化，只需一个参数即可。" 未安装插件时服务会因不支持该方法而报错中止，且量化出的权重未经任何人评估；应直接选用已验证的公开发布 AWQ 或 GPTQ 权重。
+- "4 位量化的精度损失和 FP8 一样小。" 4 位模型可能损失更多精度，且取决于模型与方法；课程表明 AWQ 在数学上会掉若干个点，必须自行测试验证。
+- "对任何模型内存都能节省 41%。" 实测的 41% 来自一个嵌入层和输出层保留 16 位的小模型；在更大模型上比例不同，且 KV cache 显存与权重显存相互独立。
 
 ## Taught in
 
-[Fit a bigger model with FP8 weights](../../../manuals/vllm-101/sections/2-5-fit-a-bigger-model-with-fp8-weights.md) lists the formats and the three starts, and [the production quantization lesson](../../../phases/17-infrastructure-and-production/09-production-quantization/docs/en.md) and [the quantization lesson](../../../phases/10-llms-from-scratch/11-quantization/docs/en.md) give the picking guide.
+[用 FP8 权重装下更大的模型](../../../manuals/vllm-101/sections/2-5-fit-a-bigger-model-with-fp8-weights.md)列出了各格式和三次启动实测，[生产量化课程](../../../phases/17-infrastructure-and-production/09-production-quantization/docs/en.md)与[量化课程](../../../phases/10-llms-from-scratch/11-quantization/docs/en.md)给出了选型指南。

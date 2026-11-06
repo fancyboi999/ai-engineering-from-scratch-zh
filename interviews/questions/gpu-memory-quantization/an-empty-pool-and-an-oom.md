@@ -1,6 +1,6 @@
 ---
 id: an-empty-pool-and-an-oom
-title: The pool was 95 percent empty and the server died
+title: 显存池空了 95% 但服务却崩溃了
 card: gpu-memory-quantization
 kind: debug
 level: 3
@@ -16,53 +16,53 @@ related: []
 updated: 2026-11-03
 ---
 
-An SGLang server on a shared workstation ran for four minutes, and then a benchmark with 32 requests in flight crashed it with an out-of-memory error. The scheduler log just before the crash shows `token usage: 0.05`. Explain how the pool was 95 percent empty and the server still ran out of memory, and what you set.
+在共享工作站上运行的 SGLang 服务运行了 4 分钟后，在并发 32 的基准测试中因显存不足（OOM）崩溃。崩溃前调度器日志显示 `token usage: 0.05`。解释为什么显存池空了 95% 且服务仍然显存耗尽，以及应该如何设置。
 
 ## Short answer
 
-The KV pool is sized once at startup from a snapshot of free memory, and the automatic fraction gave 87.2 percent of what was free to the weights and the pool. Thirty-two requests held 16,095 tokens, 5 percent of a 312,581-token pool, so the pool had reserved 33 GB and used under 2 GB, and the activations of the next forward pass needed memory outside the pool that the operating system no longer had. On a machine that runs anything else, pass `--mem-fraction-static` yourself; with 0.4 the same benchmark finished all 128 requests at concurrency 32.
+KV 显存池仅在启动时根据空闲显存快照规划一次，自动计算得出的比例将当时空闲显存的 87.2% 分配给了模型权重和显存池。32 个请求占用了 16,095 个 token，仅占 312,581 token 显存池的 5%，这意味着显存池预留了 33 GB 却只用了不到 2 GB，而接下来一次前向传播所需的激活显存超出了显存池外部系统所剩的可用内存。在运行其他程序的机器上，必须手动传入 `--mem-fraction-static`；将其设置为 0.4 时，同一基准测试在并发 32 下顺利完成了全部 128 个请求。
 
 ## Full answer
 
-### Two startups, two pool sizes
+### 两次启动，两种显存池大小
 
-The manual started the server twice with the same command and no fraction. The first start saw 27.81 GB of system memory available, took a KV budget of 24.25 GB and sized a pool of 227,022 tokens. The second start saw 38.29 GB available, took 33.39 GB and sized 312,581 tokens. Nothing changed in SGLang between the runs; other programs used less memory at the second start. Both budgets were 87.2 percent of the free memory, because the automatic fraction resolved to 0.872.
+手册中记录了使用相同命令且不传比例参数连续两次启动服务的情况。第一次启动检测到系统可用内存为 27.81 GB，分配给 KV 的预算为 24.25 GB，规划出的显存池为 227,022 token。第二次启动检测到可用内存为 38.29 GB，分配了 33.39 GB，规划出 312,581 token。两次运行之间 SGLang 本身没有任何改动，只是第二次启动时其他程序占用的内存更少。两次预算都占空闲内存的 87.2%，因为自动计算的比例解析为 0.872。
 
-### The crash
+### 崩溃过程
 
-The last decode line before the crash showed 32 running requests with 16,095 tokens at a token usage of 0.05. The pool had reserved 33 GB and used under 2 GB of it. The next forward pass needed memory for its activations outside the pool, the operating system had none left, one command buffer failed, the scheduler died, and the server killed its whole process tree. An empty pool and an out-of-memory crash were the same event.
+崩溃前最后一条 decode 日志显示，32 个运行中的请求占用 16,095 token，token 使用率为 0.05。显存池预留了 33 GB，实际仅使用了不到 2 GB。下一次前向传播所需的激活值内存位于显存池之外，操作系统已无内存可用，导致一个命令缓冲区分配失败，调度器崩溃，进而导致服务器终止整个进程树。显存池大面积空闲与显存不足崩溃本质上是同一诱因造成的。
 
-### How SGLang decides the split
+### SGLang 如何划分显存
 
-The fraction is the share of memory for the weights plus the KV pool. Everything else, activations, graphs and other programs, lives outside it. On a GPU the automatic value comes from a reserve: 512 MB plus 1.5 MB for each token of the prefill chunk, more for tensor and pipeline parallelism and for graphs, and at least 10 GiB on a GPU with more than 60 GB. The fraction is the memory minus the reserve, divided by the memory. When the device capacity cannot be read, it becomes 0.95. After the weights load, SGLang measures free memory again, and the KV budget is that free memory minus the share outside the fraction of what was free before loading. On the laptop backend the rule is simpler: the smaller of the fraction of the device working set and the fraction of system memory available right now, and that second term is the snapshot that moved.
+该比例代表分配给模型权重与 KV 显存池的内存份额。激活值、计算图和其它程序均处于该份额之外。在 GPU 上，自动值通过保留空间计算得出：基础预留 512 MB，加上 prefill chunk 中每个 token 预留 1.5 MB，张量并行、流水线并行及计算图还会预留更多，在显存超过 60 GB 的 GPU 上至少预留 10 GiB。该比例即为总显存减去预留空间后除以总显存。当无法读取设备容量时，默认按 0.95 计算。加载权重后，SGLang 会再次测量空闲显存，KV 预算等于该空闲显存减去加载前空闲显存中未分配给该比例的份额。在笔记本后端上规则更简单：取设备工作集比例与当前系统可用内存比例两者中的较小值，而后者就是变动中的快照。
 
-### Where the default fails
+### 默认值失效的场景
 
-- A shared machine: the snapshot at startup does not hold for the life of the server.
-- Unknown capacity: the fraction becomes 0.95 and leaves 5 percent for activations, which one report hit as an out-of-memory error on the first prefill.
-- Memory the estimate does not know about: draft model copies that stay in memory while the target pool is sized, and a 64K-token prompt that ran out of memory in attention although the log reported room for 274,934 tokens.
+- 共享机器：启动时的内存快照无法代表服务运行期间的常态。
+- 设备容量未知：比例回退到 0.95，仅给激活值留下 5% 的空间，已有案例记录在第一次 prefill 时就触发 OOM 崩溃。
+- 估算未覆盖的内存：目标模型显存池规划期间仍驻留在内存中的草稿模型副本，以及一段 64K token 的 prompt 在注意力计算中耗尽显存，尽管日志显示仍有容纳 274,934 token 的空间。
 
-### The fix, and the other direction
+### 修复方案及另一方向
 
-With `--mem-fraction-static 0.4` the budget became 19.39 GB, 0.4 of the 48.49 GB snapshot, and the pool held 181,574 tokens, far more than 32 requests of 640 tokens need. A smaller pool cost nothing in this workload, because the workload never filled it. On a dedicated GPU trust the automatic value first. Raise it in steps of 0.02 only when the scheduler log shows a full pool and retractions. Find the upper limit in staging with your longest prompts, run production one or two steps below it, and lower it when long prompts fail with out-of-memory errors in attention.
+设置 `--mem-fraction-static 0.4` 后，预算变为 19.39 GB，即 48.49 GB 快照的 0.4，显存池可容纳 181,574 token，远超 32 个 640 token 请求的需求。显存池变小在此工作负载下没有任何损失，因为工作负载从未占满它。在专用 GPU 上，优先信任自动计算的值。只有在调度器日志显示显存池已满且出现请求回退（retraction）时，才以 0.02 为步长逐步调高。在预发环境中用最长的 prompt 测出上限，生产环境保持低一到两个步长运行；若长 prompt 在注意力计算中频繁遭遇 OOM，则下调该值。
 
-### What to measure
+### 监控指标
 
-Read the `max_total_num_tokens` line at startup, which is the result of the whole calculation. Watch `token usage` in the decode lines; near 1.0 the pool is full. Read the free memory of the machine during the heaviest prefill from the operating system. On the laptop backend the cache memory metric read 0.0 because that backend allocates its pool outside the metric's accounting; the pool log line, about 19,860 MB, is the number to use.
+在启动时查看 `max_total_num_tokens` 日志行，这是整个计算的最终结果。观察 decode 日志中的 `token usage`；接近 1.0 说明显存池已满。在最大规模 prefill 期间从操作系统层读取机器的空闲内存。在笔记本后端上，cache 内存指标显示为 0.0，因为该后端在指标统计范围之外分配显存池；应以显存池日志行中的数值（约 19,860 MB）为准。
 
 ## Follow-ups
 
-- **Level 3:** Why did the second start get a bigger pool than the first when nothing in SGLang changed? Expected: other programs used less memory at the second start, so the snapshot of free memory grew from 27.81 to 38.29 GB and the pool grew with it, from 24.25 to 33.39 GB at the same automatic fraction.
-- **Level 3:** What memory does the fraction cover, and what lives outside it? Expected: the weights plus the KV pool; activations, graphs, autotuning scratch and every other program live outside it, which is why a pool at 87 percent of free memory left nothing for the next forward pass.
-- **Level 4:** On a dedicated GPU, when do you raise the fraction and by how much? Expected: only when the scheduler log shows a full pool and retractions, in steps of 0.02; find the upper limit in staging with your longest prompts, run production one or two steps below it, and lower it when long prompts fail with out-of-memory errors in attention.
+- **Level 3:** 为什么在 SGLang 未做任何改动的情况下，第二次启动得到的显存池比第一次大？ Expected: 第二次启动时其他程序占用的内存更少，系统空闲内存快照从 27.81 GB 增至 38.29 GB，在相同的自动比例下，显存池随之从 24.25 GB 增至 33.39 GB。
+- **Level 3:** 该比例覆盖了哪些内存，哪些内存处于其范围之外？ Expected: 覆盖权重和 KV 显存池；激活值、计算图、自动调优临时空间及所有其他程序均在其之外，这正是空闲内存的 87% 被划给显存池后，下一次前向传播无法获得足够激活显存的原因。
+- **Level 4:** 在专用 GPU 上，何时调高该比例，调高幅度是多少？ Expected: 仅在调度器日志显示显存池已满且出现请求回退时，以 0.02 为步长递增；在预发环境中用最长 prompt 测出上限，生产环境保持低一到两个步长运行，当长 prompt 遇到注意力 OOM 时及时调低。
 
 ## Wrong answers
 
-- "A token usage of 0.05 means the server was nowhere near full." It means the pool was nearly empty; the pool had taken the memory and the activations outside it ran out, so an empty pool and an out-of-memory crash were the same event.
-- "Raise the fraction so that the pool is bigger and the crash goes away." The crash came from memory outside the pool; a bigger fraction takes more from the activations and the other programs, and 0.4 is what fixed it.
-- "The automatic fraction is tuned, so leave it." It assumes the machine belongs to the engine; on a shared machine the snapshot at startup does not hold for the life of the server, and when the capacity cannot be read it becomes 0.95 and fails on the first prefill.
-- "The pool line tells you the memory the server uses." The pool is the largest part and not the whole; one report measured 25 to 40 GB of short-lived allocations outside the accounting from the autotuner and the graph capture.
+- "token usage 为 0.05 意味着服务远未跑满。" 这说明显存池几乎是空的；但显存池抢占了过多内存，导致池外的激活显存不足，显存池大面积空闲与 OOM 崩溃属于同一诱因。
+- "调高比例能增大显存池并解决崩溃。" 崩溃来自显存池外部的内存耗尽；调高比例会进一步压缩激活值和其他程序的可用空间，设置成 0.4 才是解决办法。
+- "自动比例经过了调优，保持默认即可。" 它假定整台机器被推理引擎独占；在共享机器上启动时的快照并不持久有效，且在容量无法读取时会回退到 0.95，在第一次 prefill 时就会失败。
+- "显存池输出行展示了服务所用的全部内存。" 显存池是最大的部分但不是全部；已有报告记录自动调优和计算图捕获在统计范围外会产生 25 到 40 GB 的瞬时内存分配。
 
 ## Taught in
 
-[--mem-fraction-static and startup sizing](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md) has the crash log, the formula and the GB10 starts.
+[--mem-fraction-static 与启动容量计算](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md)给出了崩溃日志、计算公式和 GB10 启动数据。

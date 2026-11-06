@@ -1,6 +1,6 @@
 ---
 id: the-agent-ignores-a-written-rule
-title: The rule is in the repo, and the agent keeps breaking it
+title: 规则明确写入仓库但 Agent 仍不断违反
 card: agents
 kind: debug
 level: 3
@@ -16,50 +16,50 @@ related: [agents/router-or-manual, agents/rules-the-workbench-can-check]
 updated: 2026-11-03
 ---
 
-A rule says that no migration file may change without an approval. It lives in `docs/database.md`, which `docs/architecture.md` links, which the top-level instructions file links. The root file also says to always use the ORM, while the database document says to write raw SQL in migrations. The agent changed a migration twice this week without asking. Find the causes and fix them in order.
+某条规则规定：未经人工审批不允许修改任何数据库迁移文件。该规则保存在 `docs/database.md` 中，由 `docs/architecture.md` 引用，而顶层说明文件又链接了后者。同时，顶层根文件要求所有场景下必须使用 ORM，而数据库文档却明确要求迁移文件中必须编写原生 SQL。本周 agent 在未经任何审批的情况下两次修改了迁移文件。请找出导致该问题的根本原因并按序修复。
 
 ## Short answer
 
-There are three independent causes, and any one of them is enough. The rule is three hops from the router, past the two-hop reachability limit, so the agent never loads it, and it is prose with no check, so nothing refuses the write even when the agent reads it. And the root file conflicts with the database document, and conflicting instructions silently move an agent from asking to guessing. Fix the reach first, make the rule an approval-category rule with a block-severity check, and remove the conflict.
+存在三个各自独立的成因，且任意一个都足以酿成该故障。首先是该规则距离根路由器多达三次跳转，超过了两次可达性上限，导致 agent 根本不会加载它；其次它仅是缺乏对应检查的纯自然语言文本，即便 agent 读到了也没有任何机制拒绝写入。此外根文件与数据库文档存在正面冲突，而相互冲突的指令会悄无声息地诱使 agent 从主动提问退化为盲目猜测。修复顺序应当是先恢复可达性，再将该规则升级为带有 block 严重级别检查的审批类规则，最后消除规则冲突。
 
 ## Full answer
 
-### Cause one: reachability
+### 成因一：可达性断裂
 
-The agent should reach any rule in at most two hops from the router. This rule needs three. The router must link every topic document by path, so `docs/database.md` belongs in the router, and the rule itself belongs in `docs/agent-rules.md`, which the agent reads at every startup. A pointer that does not resolve is a worse failure than a missing rule, so check that each path in the router exists, and make a broken link a startup violation.
+Agent 从根路由器出发应当最多经过两次跳转就能触达任意一条规则。而该规则需要三次跳转。路由器必须通过文件路径直接链接每个专题文档，因此 `docs/database.md` 应当直接写入根路由器中，且该规则本身应直接放入 agent 每次启动必读的 `docs/agent-rules.md` 中。失效的死链比未写的规则危害更大，因此必须校验路由器中的每个路径是否存在，并将死链标记为启动阶段的违规。
 
-### Cause two: an aspirational rule
+### 成因二：空洞愿望型规则
 
-"Do not change migrations without approval" is a wish until a check exists. Rewrite it as an approval-category rule with a slug, a one-line description, a `check` that compares the diff against `migrations/**` and looks for an approval record, and `block` severity. The runtime refuses on block. The checker reports it. An override needs a human signature in the audit log.
+在缺乏具体检查代码的情况下，“未经审批不得修改迁移文件”只是一句空泛的愿望。应将其重写为包含 slug、单行说明、`check` 检查函数及 `block` 严重级别的审批类规则。检查函数比对 diff 是否触碰了 `migrations/**` 并核验审批记录。运行时遇 block 直接阻断执行。检查器如实上报，任何人工覆盖都必须在审计日志中附带人类签名。
 
-### Cause three: conflicting instructions
+### 成因三：指令自相矛盾
 
-The root file requires the ORM everywhere. The database document requires raw SQL inside migration files. The agent cannot satisfy both, and the measured effect of conflicting instructions is a quiet shift from an interactive mode, where the agent asks, to a greedy mode, where it guesses. One measurement in the lesson put the resolve rate at 48.8 percent without the conflict and 28 percent with it. An agent in greedy mode does not ask for approval. Number the priorities instead of stacking them flat, or scope the ORM rule to application code and the SQL rule to migrations so that they no longer overlap.
+根文件要求全局强制使用 ORM。数据库文档要求在迁移文件中手写原生 SQL。Agent 无法同时满足这两条规则，而相互冲突的指令已被实测证实会导致 agent 产生隐蔽的行为异化：从主动提问的交互模式滑向自行脑补的贪婪猜测模式。课程中的实测数据显示，没有冲突时问题解决率为 48.8%，存在冲突时为 28%。陷入贪婪模式的 agent 不会主动请求人工审批。应当明确标定优先级次序，或者将 ORM 规则严格圈定在应用层代码，将原生 SQL 规则严格限定在迁移文件，消除两者的适用重叠。
 
-### The order
+### 修复顺序与落地
 
-1. Move the rule into the rules file and link the database document from the router. Now the agent reads it.
-2. Add the check and the severity. Now the runtime refuses.
-3. Resolve the conflict. Now the agent asks instead of guessing.
-4. Add a workbench lint that fails when the router is over its line budget or references a missing file, so the regression cannot return.
+1. 将规则移入规则文件，并在根路由器中直接链接数据库专题文档。此时 agent 能够读到它。
+2. 添加自动化检查函数并配置 block 级别。此时运行时能够强制阻断。
+3. 消除 ORM 与原生 SQL 的规则范围冲突。此时 agent 恢复主动提问而非胡乱猜测。
+4. 引入工作台 lint 工具，当路由器超过行数预算或引用不存在文件时直接报错，杜绝问题复发。
 
-### Prove it
+### 验证修复成效
 
-Run the checker over this week's two runs. The rule report must show the approval rule failing on both, with block severity. Then run the agent on a task that touches a migration and confirm that it opens an approval request before the write.
+针对本周的两次故障运行重新执行检查器。规则报告必须清晰显示审批规则在两次运行中均被判定为失败，且级别均为 block。随后在涉及迁移修改的任务中重新运行 agent，验证其在执行写入前必须显式发起审批请求。
 
 ## Follow-ups
 
-- **Level 3:** Why does a shorter root file help here? Expected: a short router is read in full on every session and on every pull request review, so a pointer to the database document stays current and reachable.
-- **Level 3:** The team wants to keep the rule in the database document because that is where the context is. What do you do? Expected: keep the explanation there, put the rule and its check in the rules file, and link both from the router, so the rule is two hops away and still has its context.
-- **Level 4:** How would you find two rules that contradict each other before an incident? Expected: a lint that flags two rules whose scopes overlap with different verbs, and a review habit of numbering priorities in the router.
-- **Level 4:** The checker passes in CI, and the agent still edits a migration in a live session. Where is the gap? Expected: the checker runs after the fact, so the same check must also run as a pre-tool hook in the runtime, where it can refuse the write before it happens.
+- **Level 3:** 为什么更简短的根文件在这里能起到关键帮助？ Expected: 精简的路由器在每次会话以及每次 PR 审查中都能被完整重读，从而保证指向数据库文档的指针保持最新且真实可达。
+- **Level 3:** 团队希望将规则留在数据库文档中以保留上下文，你会怎么处理？ Expected: 在该文档中保留背景解释，将规则与检查放入规则文件，两者均从根路由链接，两跳可达且保留上下文。
+- **Level 4:** 在事故发生之前，你如何自动化发现相互矛盾的两条规则？ Expected: 构建 lint 工具标记适用范围重叠但动词要求相反的规则，并在代码审查中建立在路由器中明确标定优先级的习惯。
+- **Level 4:** 检查器在 CI 中通过了，但 agent 在实时交互会话中仍修改了迁移文件，漏洞在哪？ Expected: 检查器属于事后检验，相同的检查必须同时作为运行时的 pre-tool hook 运行，在写入发生前就地阻断。
 
 ## Wrong answers
 
-- "Add the rule to the system prompt in capital letters." Emphasis does not add a check, and the conflict in the router still pushes the agent toward guessing.
-- "The model is ignoring instructions, so switch models." The rule was unreachable, uncheckable and contradicted, and a different model meets the same three problems.
-- "Delete the ORM rule, since it caused the conflict." The ORM rule is correct for application code, so scope it rather than delete it.
+- "用大写字母把该规则追加到系统 prompt 中。" 强调字句并不能凭空创造出检查机制，且路由器中的逻辑冲突依然会促使 agent 走向胡乱猜测。
+- "这是模型不听指令，应该直接更换模型。" 该规则在物理上不可达、在技术上无法检查且自相矛盾，换用其他模型依然会遭遇相同的三个硬伤。
+- "既然引起了冲突，直接把 ORM 规则删掉。" ORM 规则在业务应用代码中是完全正确的，应当精确界定其生效范围，而不是删除它。
 
 ## Taught in
 
-The [executable constraints lesson](../../../phases/14-agent-engineering/33-instructions-as-executable-constraints/) sets the two-hop rule and the five categories, and the [minimal workbench lesson](../../../phases/14-agent-engineering/32-minimal-agent-workbench/) measures the cost of instructions that contradict each other.
+[将 agent 指令变为可执行约束](../../../phases/14-agent-engineering/33-instructions-as-executable-constraints/)课程确立了两跳可达规则与五大分类，[最小 Agent 工作台](../../../phases/14-agent-engineering/32-minimal-agent-workbench/)课程测定了相互矛盾的指令对系统造成的严重破坏。

@@ -1,6 +1,6 @@
 ---
 id: design-extraction-with-refusals
-title: Design an extraction service for purchase-order emails
+title: 为采购订单邮件设计信息抽取服务
 card: prompting-structured-output
 kind: design
 level: 3
@@ -16,58 +16,58 @@ related: [prompting-structured-output/three-failure-modes-structured, prompting-
 updated: 2026-11-03
 ---
 
-Design the extraction service for purchase-order emails. The input is free text; the output is a typed record with a customer, line items and a total. Cover the schema, the enforcement mode, the retry and refusal handling, and how you prove it works before it touches the accounting system.
+为采购订单邮件设计一个抽取服务。输入是自由文本；输出是一条类型化记录，包含客户、明细行和总金额。请讲清 schema、约束执行模式、重试和拒答处理，以及在它接触会计系统之前怎样证明它可用。
 
 ## Short answer
 
-Write one JSON Schema 2020-12 with the constraints that matter: required fields, enums for closed sets, a minimum of zero on the total, additional properties forbidden, and any reasoning field ahead of any decision field. Run it in the provider's strict schema mode so that a response that finishes cannot have a parse error or a schema violation, check the stop reason so that a response cut at the token limit goes to the error path, and treat a refusal as a typed outcome that goes to a review queue. Prove it with a labeled set of real emails scored per field, a refusal check on inputs that must not extract, and a run beside the human process before any record is written.
+写一份 JSON Schema 2020-12，写进真正重要的约束：必填字段、闭集用枚举、总金额最小值为零、禁止附加属性，任何推理字段都放在任何决策字段前面。用服务商的严格 schema 模式运行，这样正常结束的响应不会有解析错误或 schema 违规；检查停止原因，把因 token 上限被截断的响应送进错误路径；把拒答当作一种类型化结果，送进复核队列。在写入任何记录之前，用逐字段评分的真实邮件标注集、对不应抽取的输入做拒答检查，以及与人工流程并行运行来证明它可用。
 
 ## Full answer
 
-### The schema
+### Schema
 
-- `type`, `properties` and `required` for the shape; every property listed as required, with null allowed where the source can lack a value.
-- `enum` for closed sets such as currency or status; `minimum` on the total; `pattern`, `minLength` and `maxLength` on identifiers; `items` for the line items.
-- `additionalProperties: false` everywhere, which blocks invented fields and which strict mode demands.
-- Field order as logic: any `reasoning` field before `total` or `status`, because the model commits to the first field it writes.
+- 用 `type`、`properties` 和 `required` 定义结构；每个属性都列为必填，源文本可能缺值的地方允许 null。
+- 闭集（如币种或状态）用 `enum`；总金额加 `minimum`；标识符加 `pattern`、`minLength` 和 `maxLength`；明细行用 `items`。
+- 所有层级都设 `additionalProperties: false`，它能挡住编造的字段，严格模式也要求这样做。
+- 字段顺序就是逻辑：任何 `reasoning` 字段都放在 `total` 或 `status` 之前，因为模型写第一个字段时就做出了选择。
 
-In Python, a Pydantic model generates this schema; the service keeps the schema as the contract and the model as its binding.
+在 Python 里，用 Pydantic 模型生成这份 schema；服务把 schema 当作契约，把 Pydantic 模型当作它的语言绑定。
 
-### The enforcement mode
+### 约束执行模式
 
-| Situation | Pick |
+| 情况 | 选择 |
 |---|---|
-| A hosted frontier model, a flat schema | the provider's strict schema mode |
-| Several providers, retries acceptable | a retry library over the Pydantic model, which is portable and does not touch logits |
-| A local model, validity required | a grammar engine, finite state for a flat schema and context-free for a recursive one |
+| 托管的前沿模型，扁平 schema | 服务商的严格 schema 模式 |
+| 多家服务商，可以接受重试 | 基于 Pydantic 模型的重试库，可移植，不碰 logits |
+| 本地模型，必须保证合法 | 语法引擎：扁平 schema 用有限状态机，递归 schema 用上下文无关文法 |
 
-Strict mode is the default here: a finished output parses and validates by construction. Two failures remain: the refusal, and a response cut at the token limit, which can still fail to parse. Check the stop reason before you read the output, and send an incomplete response to the error path.
+这里默认用严格模式：正常结束的输出天然能解析、能通过校验。还剩两种失败：拒答，以及在 token 上限处被截断的响应，后者仍可能解析失败。读输出之前先检查停止原因，把不完整的响应送进错误路径。
 
-### Retry and refusal
+### 重试和拒答
 
-Outside strict mode: generate, parse, validate, inject the typed errors and retry, at most three times. More than three means the schema or the prompt is wrong for some inputs. In every mode: a refusal is a first-class outcome with a reason attached. Log it, return it typed, send it to the review queue, and never retry it, because forcing a record on an input that does not fit produces an invented record.
+不用严格模式时：生成、解析、校验，把类型化错误注入 prompt 后重试，最多三次。超过三次说明 schema 或 prompt 对某些输入有问题。无论使用哪种模式，都要把拒答作为独立的结果处理，并附上原因。记录日志，以类型化结果返回，送进复核队列，绝不重试，因为对不匹配的输入强行要一条记录，得到的只会是编造的记录。
 
-### Proof before accounting sees a record
+### 会计系统看到记录之前的证明
 
-1. **A labeled set** of real emails with gold records; the structured outputs lesson uses 50 documents. Report exact match, accuracy per field and type compliance.
-2. **A refusal check.** Construct inputs that must not extract, such as a lyric, a proof or a blank email, and count refusals against invented outputs.
-3. **A confidence per field** from repeated extraction or token probabilities, with low-confidence records routed to a human.
-4. **A schema version** on every record, and a schema diff that separates breaking changes from non-breaking ones before any deploy.
-5. **A side-by-side run** against the human process on the labeled set, with the service writing nothing until the field-level numbers clear the bar you set with finance.
+1. **标注集**：真实邮件配上标准答案记录；结构化输出一课用了 50 份文档。报告完全匹配率、逐字段准确率和类型合规率。
+2. **拒答检查**：构造不应被抽取的输入，比如一段歌词、一份证明或一封空邮件，统计拒答和编造输出各有多少。
+3. **逐字段置信度**：来自重复抽取或 token 概率，低置信度记录交给人工。
+4. **Schema 版本**：每条记录都带 schema 版本；任何部署之前，用 schema diff 区分破坏性变更和非破坏性变更。
+5. **并行运行**：在标注集上与人工流程并排运行；字段级指标达到你和财务部门商定的门槛之前，服务不写入任何记录。
 
 ## Follow-ups
 
-- **Level 3:** Why forbid additional properties? Expected: it blocks invented fields, and strict mode requires it everywhere.
-- **Level 3:** You expect to switch providers next year. Which mode do you pick? Expected: a retry library over the Pydantic model for portability, or keep the schema identical across providers so each strict mode receives the same contract.
-- **Level 4:** How do you version the schema once records exist? Expected: a version field on each record and a schema diff that separates breaking changes from non-breaking ones. Strict mode makes every field required, so an added field is breaking too, because the records written before it do not contain it; removed fields and changed types are breaking, and relaxed constraints are not.
-- **Level 4:** Which failure can this design not remove, and where does it go? Expected: a wrong value with the right type; it goes to the field-level eval and the confidence flags, and the low-confidence records go to review.
+- **Level 3:** 为什么要禁止附加属性？ Expected: 它能挡住编造的字段，而且严格模式要求所有层级都这样设置。
+- **Level 3:** 你预计明年要换服务商。选哪种模式？ Expected: 为了可移植，用基于 Pydantic 模型的重试库；或者让各服务商使用完全相同的 schema，这样每家的严格模式收到的是同一份契约。
+- **Level 4:** 已经有记录之后，schema 怎么做版本管理？ Expected: 每条记录带版本字段，用 schema diff 区分破坏性变更和非破坏性变更。严格模式把每个字段都设为必填，所以新增字段也是破坏性的，因为之前写入的记录不包含它；删除字段和修改类型是破坏性的，放宽约束不是。
+- **Level 4:** 这个设计消除不了哪种失败？它该交给谁？ Expected: 类型正确但值错误；它交给字段级评估和置信度标记，低置信度记录进入复核。
 
 ## Wrong answers
 
-- "Prompt for JSON and parse it, the model is good." That works 85 to 95 percent of the time and fails six different ways; accounting needs the contract.
-- "Retry refusals until the model gives a record." A refusal says the input does not fit; forcing a record invents one.
-- "Validation after generation is as good as strict mode." It is reliable but pays for every retry, and a truncated output costs a turn each time.
+- "用 prompt 要求输出 JSON 再解析就行，模型够好了。" 这只有 85% 到 95% 的时候有效，还有六种不同的出错方式；会计系统需要契约。
+- "遇到拒答就重试，直到模型给出记录。" 拒答说明输入不匹配；强行要记录就是让模型编一条。
+- "生成后再校验，和严格模式一样好。" 它可靠，但每次重试都要花钱，而且每次截断的输出都会白白浪费一轮。
 
 ## Taught in
 
-The lesson [structured output](../../../phases/13-tools-and-protocols/04-structured-output/) gives the schema constructs, the strict mode rules, the retry pattern and the refusal handling, the lesson [structured outputs](../../../phases/11-llm-engineering/03-structured-outputs/) sets the labeled eval and the schema diff, and the lesson [constrained decoding](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/) gives the mode table and the field order rule.
+[结构化输出协议](../../../phases/13-tools-and-protocols/04-structured-output/)一课给出了 schema 构造、严格模式规则、重试模式和拒答处理，[结构化输出](../../../phases/11-llm-engineering/03-structured-outputs/)一课规定了标注集评估和 schema diff，[约束解码](../../../phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/)一课给出了模式对照表和字段顺序规则。

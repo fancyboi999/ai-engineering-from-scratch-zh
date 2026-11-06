@@ -1,6 +1,6 @@
 ---
 id: dev-platform-or-telemetry-tool
-title: Pick an observability stack without locking in
+title: 选一套不被锁定的可观测技术栈
 card: production-mlops
 kind: tradeoff
 level: 3
@@ -16,58 +16,58 @@ related: [production-mlops/keep-every-error-trace, production-mlops/five-minute-
 updated: 2026-11-03
 ---
 
-Your team must choose an observability stack for a new model service. Half the team wants an all-in-one platform with evals, prompt versions and session replays. The other half wants a thin gateway that records every call and nothing more. How do you decide, and which pattern lets you avoid the choice?
+团队要为一个新的模型服务选可观测技术栈。一半人想要一站式平台，带评估、prompt 版本和会话回放。另一半人想要一个薄网关，只记录每次调用，别的什么都不做。你怎样决定？哪种模式能让你不必二选一？
 
 ## Short answer
 
-Decide on four axes: the framework you run on, the license you can accept, the budget, and whether you must self-host. A bundled development platform fits a team that iterates on prompts and needs evals tied to traces. A gateway or telemetry tool fits a team that needs portable instrumentation that does not depend on a framework. The pattern that avoids the choice is to emit OpenTelemetry spans with the GenAI conventions from every call and ship them to more than one place: a gateway for day-to-day, an eval platform for regressions, and an archive for long-term analysis.
+按四个维度决定：你用的框架、你能接受的许可证、预算，以及是否必须自托管。打包式开发平台适合频繁迭代 prompt、需要评估与 trace 绑定的团队。网关或遥测工具适合需要可移植、不依赖框架的埋点的团队。不必二选一的模式是：每次调用都按 GenAI 规范输出 OpenTelemetry span，并发往不止一个地方：网关看日常，评估平台查回归，归档做长期分析。
 
 ## Full answer
 
-### Two categories of tool
+### 两类工具
 
-Development platforms bundle observability with evals, prompt management, dataset versioning and session replay. You run experiments, compare prompts and regression-test a new prompt against old winners. Gateway and telemetry tools record the prompt, the response, the tokens, the latency, the model and the cost, and they stop there.
+开发平台把可观测性和评估、prompt 管理、数据集版本、会话回放打包在一起。你可以跑实验、比较 prompt，并让新 prompt 与以前胜出的版本做回归测试。网关和遥测工具记录 prompt、回复、token、延迟、模型和成本，到此为止。
 
-### The four axes
+### 四个维度
 
-| Axis | Question |
+| 维度 | 问题 |
 |---|---|
-| stack | one framework, a raw SDK, or several vendors |
-| license | open source only, a source-available license, or commercial |
-| budget | a free tier, a team plan, or an enterprise contract |
-| self-host | required, welcome, or never |
+| 技术栈 | 一个框架、直接用 SDK，还是多家供应商 |
+| 许可证 | 只用开源、源码可用许可证，还是商业许可 |
+| 预算 | 免费额度、团队套餐，还是企业合同 |
+| 自托管 | 必须、欢迎，还是绝不 |
 
-### The trap
+### 陷阱
 
-Instrumenting inside the agent framework ties the traces to that framework. Instrumenting at the HTTP or SDK layer is portable, so a change of framework or a second framework does not lose the history.
+在 agent 框架内部埋点，trace 就和这个框架绑在一起。在 HTTP 或 SDK 层埋点是可移植的，换框架或加第二个框架都不会丢失历史。
 
-### The glue pattern
+### 粘合模式
 
-1. Emit OpenTelemetry spans with the GenAI conventions from every model call.
-2. Route them to a gateway or telemetry tool for the daily view.
-3. Ship a copy to an eval platform for regressions.
-4. Archive them in a data lake for long-term analysis.
+1. 每次模型调用都按 GenAI 规范输出 OpenTelemetry span。
+2. 把它们路由到网关或遥测工具，用于日常查看。
+3. 复制一份发给评估平台，用于查回归。
+4. 归档到数据湖，用于长期分析。
 
-Every tool that reads the conventions can read the same spans, so the stack is a routing decision, not a rewrite.
+所有读得懂这套规范的工具都能读同一批 span，所以技术栈只是一个路由决定，而不是一次重写。
 
-### What to insist on in either case
+### 无论选哪条路都要坚持的事
 
-- Prompt versions tied to traces. When production regresses, you must be able to bisect to the prompt change that caused it.
-- An eval strategy. Tracing without evaluation is expensive logging.
-- A sampling policy at scale, because full retention at volume is more expensive than the calls it records.
+- prompt 版本与 trace 绑定。生产退化时，你必须能二分定位到引发它的那次 prompt 改动。
+- 有评估策略。没有评估的 tracing 只是昂贵的日志。
+- 规模上来后要有采样策略，因为大流量下全量保留比它记录的调用本身还贵。
 
 ## Follow-ups
 
-- **Level 3:** Why instrument at the SDK layer rather than inside the framework? Expected: framework hooks tie you to the framework. The SDK layer keeps working when you change frameworks or add a second one.
-- **Level 3:** What breaks when prompt versions are not tied to traces? Expected: when production regresses you cannot bisect to the prompt change that caused it.
-- **Level 4:** You ship the same spans to two backends. What do you check so that they agree? Expected: the same conventions version, the same sampling rules on both exporters, and one source of truth for cost attribution, so that two dashboards do not show two bills.
+- **Level 3:** 为什么在 SDK 层埋点，而不是在框架内部？ Expected: 框架钩子把你绑在框架上。SDK 层在你换框架或加第二个框架时照样能用。
+- **Level 3:** prompt 版本不与 trace 绑定，会坏在哪里？ Expected: 生产退化时，你无法二分定位到引发它的那次 prompt 改动。
+- **Level 4:** 你把同一批 span 发给两个后端。要检查什么才能让两边一致？ Expected: 规范版本相同，两个 exporter 的采样规则相同，成本归属只有一个事实来源，这样两个看板不会显示两份账单。
 
 ## Wrong answers
 
-- "Pick the tool with the most features." Features you do not use cost money and couple you. Pick on stack, license, budget and hosting.
-- "Tracing is enough, evals can come later." Traces without evals are logs with a price. A regression hides in them until a user reports it.
-- "The gateway records every call, so skip the platform." A proxy sees calls, not agent steps or sessions. It misses the multi-step traces that an agent regression needs.
+- "选功能最多的工具。" 用不上的功能既花钱又带来耦合。按技术栈、许可证、预算和托管方式来选。
+- "有 tracing 就够了，评估以后再说。" 没有评估的 trace 就是标了价的日志。退化藏在里面，直到用户报告才被发现。
+- "网关记录了每次调用，所以不需要平台。" 代理看到的是调用，看不到 agent 的步骤和会话。agent 退化需要的多步 trace，它会漏掉。
 
 ## Taught in
 
-The [observability stack lesson](../../../phases/17-infrastructure-and-production/13-llm-observability/) gives the two categories, the four axes and the glue pattern, and the [agent observability lesson](../../../phases/14-agent-engineering/24-agent-observability-platforms/) warns against tracing without evals.
+[可观测技术栈课程](../../../phases/17-infrastructure-and-production/13-llm-observability/)给出两类工具、四个维度和粘合模式，[agent 可观测性课程](../../../phases/14-agent-engineering/24-agent-observability-platforms/)警告不要只做 tracing 不做评估。

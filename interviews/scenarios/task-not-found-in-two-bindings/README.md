@@ -1,6 +1,6 @@
 ---
 id: task-not-found-in-two-bindings
-title: One error, two status codes
+title: 同一个错误，两种状态码
 card: scenarios
 kind: incident
 level: 2
@@ -27,53 +27,54 @@ source:
   - manuals/a2a-101/sections/r-4-errors.md
 ---
 
+
 ## Situation
 
-A planner delegates test runs to a remote `test-runner` agent. Its transport layer was written for a plain REST service. A 2xx reply is a success. A 404 means the record is not visible yet, so the client waits and asks again. A 5xx gets a retry with backoff. The planner first talked to the agent over its JSON-RPC interface. Last night it looked up a task id that the agent had purged, logged the lookup as a success, and then crashed on an empty result.
+一个规划器将测试运行任务委派给远程 `test-runner` agent。其底层传输层最初是为常规 REST 服务编写的：2xx 响应代表成功；404 代表记录尚未对外可见（客户端会等待并重新请求）；5xx 则触发带退避的重试机制。规划器最初通过 JSON-RPC 接口与 agent 通信。昨晚它查询了一个已被 agent 清除的任务 ID，将该查询记录为成功，随后因结果内容为空发生崩溃。
 
-A teammate moved the planner to the agent's HTTP+JSON interface this morning, "so that we get real status codes". The same lookup now comes back as a 404, and the planner has asked again every two seconds for an hour. You are asked to make the client stop at the right time in both bindings, without a special case for each error.
+一位同事今早将规划器迁移到了 agent 的 HTTP+JSON 接口上，“这样我们就能拿到真正的 HTTP 状态码”。现在相同的查询返回了 404，规划器在整整一个小时内每两秒就发起一次重复查询。你需要让客户端在两种协议绑定下都能在正确的时机停止，且不为每种错误单独写特殊处理。
 
 ## Evidence
 
-- [a GetTask for an unknown id over JSON-RPC, status and code](evidence/jsonrpc-lookup.txt)
-- [the detail inside data of the same JSON-RPC error](evidence/jsonrpc-reason.txt)
-- [the same lookup over HTTP+JSON, status and body head](evidence/rest-lookup.txt)
-- [the detail inside the HTTP+JSON error](evidence/rest-reason.txt)
-- [every A2A error with its code in each binding](evidence/error-table.txt)
-- [which errors a client may retry](evidence/retry-rules.txt)
+- [通过 JSON-RPC 查询未知 ID 的 GetTask 响应](evidence/jsonrpc-lookup.txt)
+- [同一 JSON-RPC 错误的 data 字段中的详情](evidence/jsonrpc-reason.txt)
+- [通过 HTTP+JSON 执行相同查询的响应头及响应体首部](evidence/rest-lookup.txt)
+- [HTTP+JSON 错误中的详情](evidence/rest-reason.txt)
+- [九种 A2A 协议错误在各绑定下的错误码映射对照表](evidence/error-table.txt)
+- [客户端可以重试哪些错误](evidence/retry-rules.txt)
 
 ## Questions
 
-1. In the JSON-RPC reply, where is the fact that the lookup failed, and what does the HTTP status tell you?
-2. Which field is identical in both replies, and which fields differ?
-3. How many of the nine A2A errors share one HTTP status, and what does that do to a policy that keys on the status alone?
-4. Which errors may a client retry, and what should it do with a task that is not found?
-5. The planner also retries a SendMessage after a timeout. What must it keep the same, and why?
+1. JSON-RPC 响应在哪里表明查询失败？HTTP 状态码又说明了什么？
+2. 哪个字段在两种响应中完全一致，哪些字段存在差异？
+3. 九种 A2A 错误中有多少种映射到了同一个 HTTP 状态码，这对单纯依赖状态码的策略有何影响？
+4. 客户端允许重试哪些错误，面对任务未找到应当如何处置？
+5. 规划器在超时后同样会对 SendMessage 执行重试。它必须保持什么不变，为什么？
 
 ## Walkthrough
 
-1. **Read the JSON-RPC reply.** The status line says `200 OK`, and the body has no `result`. In its place sits an `error` member with the code -32001 and the message `Task not found`. In this binding every reply is a 200, so the status carries no information. The client must open the body and test for `error` before it reads `result`.
-2. **Read the detail in `data`.** It is a list with one object. Its `reason` is `TASK_NOT_FOUND`, its `domain` is `a2a-protocol.org`, and its `metadata` repeats the task id. The reason is the name of the error without its suffix. This is the field a client can decide on.
-3. **Read the HTTP+JSON reply.** The status line says `404 Not Found`. The body is a Status object with `code` 404, `status` `NOT_FOUND`, the same message, and `details` where JSON-RPC had `data`. Inside the details sits the same detail object with the same reason. The envelope changed, and the error did not.
-4. **Read the table.** Seven of the nine A2A errors map to HTTP 400, and `InvalidParamsError` maps to 400 as well. The three JSON-RPC parse and request errors have no HTTP status at all. A rule keyed to the status cannot tell a task that cannot be canceled from a request with a bad field. Only `TaskNotFoundError` maps to 404, so a REST policy that waits on 404 waits on the one error that never clears.
-5. **Apply the retry rules.** `-32603`, HTTP 500 or 503, or a dropped connection: retry with backoff and honor `Retry-After`. HTTP 401: get a fresh credential. `-32600`, `-32602`, `-32005` and `-32009`: fix the request. `-32001`: stop, because the id is wrong, purged, or hidden from this caller. `-32002`, or `-32004` on a terminal task: start a new task. `-32003` or `-32007`: read the card again. A server must not reveal a task that the caller may not see, so not found can also mean "not yours".
-6. **Check the other retry.** A SendMessage that timed out may have created a task. Duplicate detection by `messageId` is optional, so a resend with a fresh id can start a second task. The planner resends the same bytes with the same `messageId`, and the server gets its one chance to recognize the duplicate.
+1. **读 JSON-RPC 响应。** 状态行是 `200 OK`，响应体没有 `result`，而是一个 `error` 成员，错误码为 -32001，消息为 `Task not found`。这个绑定的每条响应都是 200，所以状态码不提供信息。客户端必须先打开响应体、检查 `error`，再读取 `result`。
+2. **读 `data` 中的详情。** 它是一个只含一个对象的列表。对象的 `reason` 为 `TASK_NOT_FOUND`，`domain` 为 `a2a-protocol.org`，`metadata` 中再次给出了任务 ID。reason 是去掉后缀的错误名称，客户端可以依据这个字段做决定。
+3. **读 HTTP+JSON 响应。** 状态行是 `404 Not Found`。响应体是一个 Status 对象，`code` 为 404，`status` 为 `NOT_FOUND`，消息相同，JSON-RPC 的 `data` 在这里变成了 `details`。details 中的详情对象和 reason 都相同。外层包装变了，错误没变。
+4. **读映射表。** 九种 A2A 错误中有七种映射为 HTTP 400，`InvalidParamsError` 也映射为 400。三种 JSON-RPC 解析与请求错误则没有 HTTP 状态码。只依赖状态码的规则无法区分任务不可取消与请求字段有误。只有 `TaskNotFoundError` 映射为 404，所以遇到 404 就等待的 REST 策略，等的恰好是那种永远不会消失的错误。
+5. **套用重试规则。** `-32603`、HTTP 500 或 503，或连接中断：退避重试，并遵循 `Retry-After`；HTTP 401：获取新凭证；`-32600`、`-32602`、`-32005` 和 `-32009`：修正请求；`-32001`：停止，因为 ID 有误、已被清除，或对调用者不可见；`-32002`，或终态任务上的 `-32004`：开始新任务；`-32003` 或 `-32007`：重新读取卡片。服务器不得泄露调用者无权查看的任务，所以 not found 也可能表示“你无权查看”。
+6. **检查另一种重试。** 超时的 SendMessage 可能已经创建了任务。按 `messageId` 检测重复是可选功能，所以使用新 ID 重发可能会创建第二个任务。规划器用相同的 `messageId` 重发相同字节，给服务器识别重复请求的机会。
 
 ## Resolution
 
-The client decoded the transport and never the protocol. The fix is one error reader for both bindings. Read the HTTP status, then the `error` member or the Status body, then the `reason` of the first detail. Classify by reason into retry, re-authenticate, fix the request, or stop. On `TASK_NOT_FOUND` the planner stops after one reply, in either binding, which is what the capture shows: one request and one reply for the unknown id over JSON-RPC, and one request and one reply over HTTP+JSON. A retried send keeps its `messageId`. The hour of repeated lookups does not come back, because the decision no longer depends on a status code that one binding does not even use.
+客户端只解析了传输层，没有解析协议。修复是让两种绑定共用一个错误解析器。先读 HTTP 状态，再读 `error` 成员或 Status 响应体，最后读取首个详情对象的 `reason`。依据 reason 决定重试、重新鉴权、修正请求或停止。遇到 `TASK_NOT_FOUND` 时，规划器在两种绑定中都只接收一次响应就停止，采集记录也展示了这一点：针对未知 ID，JSON-RPC 和 HTTP+JSON 都各有一次请求和一次响应。重试发送时保持 `messageId` 不变。此后不再出现一小时的重复查询，因为决策不再依赖某种绑定根本不使用的状态码。
 
 ## Wrong turns
 
-- "Move every client to HTTP+JSON, then the status codes are real." Seven of the nine A2A errors arrive as 400 there, next to invalid parameters. The status still does not name the error.
-- "Match on the message text." The message is for a person. The reference implementation answers the same cases with other words and other field names, so a text match breaks on the next server.
-- "Treat 404 as eventual consistency and keep polling." The specification tells a server to answer not found for a purged id and for a task the caller may not see. No later call changes that answer.
-- "Resend with a fresh messageId to be safe." Duplicate detection is optional, and a fresh id removes the only hint the server has. The suite can run twice.
+- "把所有客户端都切到 HTTP+JSON，状态码就是真实的了。" 九种 A2A 错误中有七种在这里返回 400，参数无效也一样。状态码仍然不能指出具体错误。
+- "匹配消息文本。" 消息是给人看的。参考实现用其他措辞和字段名响应相同情况，所以换一个服务器，文本匹配就会失效。
+- "把 404 当作最终一致性问题，继续轮询。" 规范要求服务器对已清除的 ID 和调用者无权查看的任务返回 not found。后续调用不会改变这个回答。
+- "为保险起见，用新的 messageId 重发。" 重复检测是可选功能，新 ID 去掉了服务器仅有的线索。测试套件可能运行两次。
 
 ## Generalize
 
-A protocol carried over HTTP has two layers of status. The transport status says whether the bytes arrived. The protocol's own error says what happened to the request, and in some bindings it hides behind a 200. Decide on the protocol's discriminator, keep the set of retryable errors small and explicit, and give every retry an idempotency key that the server can see.
+HTTP 承载的协议有两层状态。传输状态说明字节是否送达。协议自身的错误说明请求发生了什么，在某些绑定里，它藏在 200 后面。依据协议的判别字段做决定，明确列出少量可重试错误，并让服务器能看到每次重试的幂等键。
 
 ## Taught in
 
-The [errors page of A2A 101](../../../manuals/a2a-101/sections/5-5-errors.md) reads these two replies and gives the retry rules, [the error table](../../../manuals/a2a-101/sections/r-4-errors.md) maps every error into the three bindings, and the [failure modes lesson](../../../phases/14-agent-engineering/26-failure-modes-agentic/) names the cascade that follows a client that cannot tell failure from success.
+[A2A 101 的错误页面](../../../manuals/a2a-101/sections/5-5-errors.md)解读了这两类响应并给出了重试准则，[错误对照表](../../../manuals/a2a-101/sections/r-4-errors.md)将所有错误映射至三种协议绑定，而[失败模式课](../../../phases/14-agent-engineering/26-failure-modes-agentic/)指出了客户端无法区分失败与成功时会引发的级联故障。

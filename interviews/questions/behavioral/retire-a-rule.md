@@ -1,6 +1,6 @@
 ---
 id: retire-a-rule
-title: Decide what to delete from a bloated instruction file
+title: 决定从臃肿的指令文件中删除哪些规则
 card: behavioral
 kind: tradeoff
 level: 3
@@ -16,52 +16,52 @@ related: [behavioral/correction-to-control, behavioral/feedback-ratchet-owner]
 updated: 2026-11-03
 ---
 
-A team's agent instruction file has grown for a year. Rules contradict each other, the context is heavy, and nobody remembers why half of them exist. You are asked to clean it up. How do you decide what stays, what goes, and what you will not touch yet?
+一个团队的 agent 指令文件持续膨胀了一整年。规则之间相互矛盾，上下文极其沉重，而且已经没人记得其中一半的规则究竟因何而设立了。现在由你负责清理。你如何决定哪些保留、哪些删除，以及哪些暂时不去触碰？
 
 ## Short answer
 
-Every control needs a retirement condition, and retirement needs evidence like any other change. I review each rule against four questions: did the architecture or workflow it protected change, did a stronger executable control replace it, has the failure stayed away across a meaningful window, and does the rule block legitimate work more often than it prevents harm. A rule that passes none of those stays, and a rule I cannot trace to a cause gets an owner and a review date before it gets deleted.
+每项控制措施都需要设定退役条件，而退役就像其他任何系统变更一样需要客观证据支撑。我依照四个问题来复审每条规则：它所保护的架构或工作流是否已发生改变、是否有更强的可执行控制取代了它、该故障是否在合理的观察窗口期内未再出现，以及该规则阻碍正常工作的频率是否高于其防范危害的频率。任何一条无法满足上述条件的规则都会被保留；而无法追溯原因的规则，在被删除前必须先明确负责人并设定复审日期。
 
 ## Full answer
 
-### Why the file grew
+### 为什么文件会不断膨胀
 
-Each rule was a correction promoted into prose. Prose is the weakest durable layer. Over a year the rules encoded a system that no longer exists, started to conflict, and now consume context on every run. The goal is not the longest instruction file. It is the smallest system that preserves hard-won judgment.
+每一条规则都是被固化进散文文本里的纠正意见。散文是最脆弱的持久层。历经一年时间，这些规则所编码描述的系统早已不复存在，彼此开始产生冲突，并且在每次运行时都在消耗上下文预算。优化的目标不是保留最长的指令文件，而是提炼出能够保留历经磨炼沉淀下来的判断的最小系统。
 
-### The review
+### 复审准则
 
-| Question | If yes |
+| 追问 | 若符合 |
 |---|---|
-| Did the architecture or workflow change? | The rule protects a system that is gone; retire it |
-| Did a type, a test or a permission replace it? | Delete the prose and keep the executable control |
-| Has the failure not recurred across the window? | Retire it, and note the window as the evidence |
-| Does it block legitimate work more than it prevents harm? | Rewrite it narrower or retire it |
+| 系统架构或工作流是否发生改变？ | 该规则保护的系统已不存在；予以退役 |
+| 是否有类型约束、测试或权限控制取代了它？ | 删除散文说明，保留可执行控制 |
+| 该故障是否在观察窗口内未再复发？ | 予以退役，并将该观察窗口记录为证据 |
+| 它阻碍正常工作的代价是否超过了其规避的危害？ | 收窄重写该规则或直接予以退役 |
 
-### Replace before delete
+### 替换优先于直接删除
 
-For a rule that still protects a real risk, the better move is often promotion rather than retirement: a prose rule about output shape becomes an example plus a validator, a prose rule about files becomes a scope policy. I delete the sentence only after proving the stronger control exists and fires.
+对于仍然用于防范真实风险的规则，更合理的做法通常是升级固化而非简单退役：关于输出格式的散文规则可以升级为规范示例配合校验器；关于文件操作的散文规则可以升级为范围策略。唯有证实更强的可执行控制切实存在并生效之后，我才会删除散文句子。
 
-### What I do not touch yet
+### 暂时不碰的内容
 
-A rule with no recorded cause and no owner is a gap in the record, not a candidate for deletion. I give it an owner and a review date, and I look for the correction that created it. Deleting it because it feels old is the mistake the lesson warns against.
+缺乏原因记录且没有负责人的规则属于记录缺失，而不是可以直接删除的候选对象。我会为它指定负责人并排定复审日期，同时寻找当初促使该规则创建的纠正记录。仅仅因为觉得一条规则看起来陈旧就删除它，正是课程所着重告诫的错误。
 
-### Guard against regrowth
+### 防范重新膨胀
 
-Every new control gets an owner, a verification, a review or expiry window and a retirement condition when it is created. Without that, the file fills again in a year.
+每项新控制措施在创建之时，都必须明确负责人、验证方案、复审或过期窗口以及明确的退役条件。若无此机制，指令文件不出一年又会重新被塞满。
 
 ## Follow-ups
 
-- **Level 3:** Two rules contradict each other. What do you do first? Expected: find the cause behind each; a contradiction usually means one of them protects a system or decision that changed.
-- **Level 3:** A rule has not fired in months. Is that enough to delete it? Expected: only if the window is meaningful for that failure and the risk it protected is still visible elsewhere; low frequency with high consequence can keep a rule alive.
-- **Level 4:** How do you show that a deletion was safe? Expected: the stronger control that replaced it fires on the original failure case, and the recurrence stays absent across the review window.
-- **Level 4:** What stops the file from growing back? Expected: a creation rule that every control carries an owner, a verification and a retirement condition, with periodic review.
+- **Level 3:** 两条规则相互矛盾，你首先做什么？ Expected: 查明各自背后的原因；矛盾通常意味着其中一条保护的是已经发生改变的系统或旧决策。
+- **Level 3:** 一条规则已有数月未被触发，这足以成为删除它的理由吗？ Expected: 仅当该时间窗口对该类故障足以反映该类故障是否会复发，且其防范的风险在其他地方仍然可见时才行；低频但高后果的风险依然需要保留规则。
+- **Level 4:** 你如何证明某次删除操作是安全的？ Expected: 取代它的更强控制在原始失败案例上成功拦截，且在复审窗口期内未发生故障复发。
+- **Level 4:** 依靠什么机制防止文件再次膨胀？ Expected: 确立创建规则，要求每项控制都必须具备负责人、验证方案和退役条件，并辅以周期性复审。
 
 ## Wrong answers
 
-- "Delete everything older than a year and see what breaks." Retirement needs evidence; a silent failure can take months to appear.
-- "Keep all of it, context is cheap." Stale rules conflict, encode a dead system and bloat every run.
-- "Rewrite the whole file from scratch." The file holds judgment that was paid for; the job is to move it to stronger layers, not to lose it.
+- "删除所有超过一年的规则，看看会出什么问题。" 退役需要证据支撑；某些隐性故障可能需要数月才会再次暴露。
+- "全部保留，反正上下文很便宜。" 陈旧过时的规则会产生冲突，编码了一个废弃的系统，并在每次运行时使上下文膨胀。
+- "推倒重来，从头重写整份文件。" 该文件包含了付出代价换来的判断；核心职责是将其转移到更强的系统层级，而不是将其丢弃。
 
 ## Taught in
 
-The [feedback-to-system lesson](../../../phases/14-agent-engineering/46-turn-feedback-into-system/) gives the retirement checks and the [feedback ratchet lesson](../../../phases/14-agent-engineering/54-build-the-feedback-ratchet/) gives the ownership and expiry fields.
+[反馈转化为系统课程](../../../phases/14-agent-engineering/46-turn-feedback-into-system/)给出了退役检查项，[反馈棘轮课程](../../../phases/14-agent-engineering/54-build-the-feedback-ratchet/)给出了归属与过期字段。

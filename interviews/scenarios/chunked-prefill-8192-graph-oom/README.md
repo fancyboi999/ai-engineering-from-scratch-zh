@@ -1,6 +1,6 @@
 ---
 id: chunked-prefill-8192-graph-oom
-title: A bigger prefill chunk that did not start
+title: 调大 prefill 分块后服务器起不来了
 card: scenarios
 kind: incident
 level: 2
@@ -28,53 +28,53 @@ source:
 
 ## Situation
 
-An engineer wants long prompts to get their first token sooner on an L4 server that runs `Qwen/Qwen3-8B`. The idea is simple: a prefill chunk twice as large means half as many scheduler turns for a long prompt. They start the server with `--chunked-prefill-size 8192` and leave every other flag at its default.
+一位工程师想让一台运行 `Qwen/Qwen3-8B` 的 L4 服务器更快地为长 prompt 返回首个 token。想法很简单：prefill 分块大一倍，长 prompt 需要的调度轮次就少一半。他们用 `--chunked-prefill-size 8192` 启动服务器，其他参数都保持默认。
 
-The server never becomes ready. The log ends with a `RuntimeError` from PyTorch that reads `INTERNAL ASSERT FAILED` and asks the reader to report a bug to PyTorch. The engineer opens a bug report with the PyTorch project and proposes to pin an older PyTorch for the whole fleet. The same server with no chunk flag has served every benchmark run on this card.
+服务器一直没有就绪。日志最后是一条来自 PyTorch 的 `RuntimeError`，内容是 `INTERNAL ASSERT FAILED`，并请读者向 PyTorch 报告 bug。工程师向 PyTorch 项目提了 bug，还提议整个集群都锁定一个更旧的 PyTorch。同一台服务器不加分块参数时，跑完了这张卡上的每一次基准测试。
 
 ## Evidence
 
-- [the engine, the model, the card and the one changed flag](evidence/the-settings.txt)
-- [the last six lines of the failed start](evidence/the-failed-start.txt)
-- [the same server with the default chunk](evidence/the-control.txt)
-- [the default start on the same card: the pool, the free memory and the prefill capture](evidence/default-start-pool-and-capture.txt)
-- [the settings line of the default start](evidence/default-start-settings-line.txt)
-- [the default chunk and the largest decode batch, by GPU memory](evidence/default-chunk-by-gpu-memory.txt)
-- [how the manual reads the failed start](evidence/the-manual-reading.txt)
+- [引擎、模型、显卡，以及唯一改动的参数](evidence/the-settings.txt)
+- [失败启动的最后六行](evidence/the-failed-start.txt)
+- [同一台服务器使用默认分块](evidence/the-control.txt)
+- [同一张卡上的默认启动：池、空闲显存和 prefill 捕获](evidence/default-start-pool-and-capture.txt)
+- [默认启动的设置行](evidence/default-start-settings-line.txt)
+- [按 GPU 显存划分的默认分块和最大解码批次](evidence/default-chunk-by-gpu-memory.txt)
+- [手册怎样解读这次失败的启动](evidence/the-manual-reading.txt)
 
 ## Questions
 
-1. The last line asks for a PyTorch bug report. Which line holds the real error, and how do you tell a cause from a consequence in this log?
-2. The pool is the same size in the failed start and in the sweep. Where did the memory go?
-3. Which startup step runs after the pool and needs memory outside it? How does the chunk size change what that step needs?
-4. The default start captured the same step on the same card. How much memory did its first captured shape use, and how much was left when it began?
-5. If the team still wants a chunk of 8192 here, which flag makes room and which flag should they not touch?
+1. 最后一行要求给 PyTorch 报 bug。真正的错误在哪一行？在这份日志里，怎样区分原因和后果？
+2. 失败启动和扫描测试里的池一样大。显存去哪了？
+3. 哪个启动步骤在池之后运行，并且需要池外的显存？分块大小怎样改变这一步的需求？
+4. 默认启动在同一张卡上捕获了同一个步骤。它第一个捕获的形状用了多少显存？开始时还剩多少？
+5. 如果团队仍想在这里用 8192 的分块，哪个参数能腾出空间？哪个参数不该碰？
 
 ## Walkthrough
 
-1. **Read upward from the assert and stop at the first error.** Two lines above the PyTorch assert is `torch.AcceleratorError: CUDA error: out of memory`. The assert, `markCaptureEnd called with no captures in progress`, is what the allocator says after a graph capture was cut short by that error. The scheduler then received a SIGQUIT from its child. The manual reads it the same way: the real error is the out-of-memory line, and the assert is the consequence.
-2. **Check what the pool took.** The failed start allocated a pool of 24,094 tokens, with 1.65 GB each for K and V, the same pool that the sweep servers on this card had. After the pool, 2.90 GB was free. So the pool did not grow with the chunk, and the memory that ran out was memory outside the pool.
-3. **Find the step that failed.** The line `Capturing prefill shape (num_tokens=8192 avail_mem=2.33 GB)` names it. Since the breakable graph for prefill arrived in the CUDA builds, startup captures a prefill graph for each shape up to the chunk size. The largest shape is the chunk itself. A capture of 8192 tokens holds the activations of an 8192-token prefill, and that needed more than the 2.33 GB that was left.
-4. **Compare with a start that worked.** The default start on this card shows the same sequence with a smaller shape. Its pool held 22,939 tokens that day, 2.86 GB was free after the pool, and the first captured shape was `num_tokens=4096` with 2.28 GB available. That capture ended after 48.33 s with 0.83 GB used and 1.45 GB still free. Twice the tokens in the capture asked for more than the whole remainder.
-5. **Read where the default comes from.** The table in the CUDA graphs page gives a chunk of 4096 for a card of 20 to 35 GB, and 8192 only from 60 GB upward. The default is sized to the memory that a capture can expect on that card. The scheduler page measured chunk changes on the GB10 and found no gain at 1 and 2 requests each second, and a loss at 0.5 with a smaller chunk. On the L4 the larger chunk never started, so there is no measurement of its gain.
+1. **从断言往上读，停在第一个错误。** PyTorch 断言上面两行是 `torch.AcceleratorError: CUDA error: out of memory`。断言 `markCaptureEnd called with no captures in progress` 是分配器在一次图捕获被这个错误打断之后说的话。随后调度器收到了来自子进程的 SIGQUIT。手册的解读相同：真正的错误是显存不足那一行，断言是它的后果。
+2. **查池占了多少。** 失败的启动分配了一个 24,094 token 的池，K 和 V 各 1.65 GB，和这张卡上扫描测试的服务器用的池一样。池之后还空闲 2.90 GB。所以池没有随分块变大，耗尽的是池外的显存。
+3. **找出失败的步骤。** `Capturing prefill shape (num_tokens=8192 avail_mem=2.33 GB)` 这一行点出了它。CUDA 构建引入 prefill 的 breakable graph 之后，启动时会为不超过分块大小的每个形状捕获一个 prefill 图。最大的形状就是分块本身。捕获 8192 个 token，要容纳一次 8192 token prefill 的激活值，这需要的显存超过了剩下的 2.33 GB。
+4. **和一次成功的启动对比。** 这张卡上的默认启动走的是同样的顺序，只是形状更小。那天它的池有 22,939 个 token，池之后空闲 2.86 GB，第一个捕获的形状是 `num_tokens=4096`，可用 2.28 GB。这次捕获用了 48.33 s，占用 0.83 GB，结束时还空闲 1.45 GB。捕获的 token 数翻倍后，所需显存超过了全部剩余显存。
+5. **读默认值从哪来。** CUDA 图页面的表格给出：20 到 35 GB 的卡，分块为 4096；60 GB 及以上才是 8192。默认值依据这类显卡上预计可供图捕获使用的显存来定。调度器页面在 GB10 上测过分块的改动：每秒 1 个和 2 个请求时没有收益，每秒 0.5 个请求时，更小的分块反而有损失。在 L4 上，更大的分块根本没启动起来，所以它的收益没有任何测量。
 
 ## Resolution
 
-Close the PyTorch report. The assert is a symptom of a capture that an out-of-memory error interrupted, and the cause is the prefill graph for 8192 tokens on a card with 2.33 GB left after the pool. The team kept the default chunk of 4096, and that server, on that card, started and served every run, which is the control that the incident record states.
+关闭向 PyTorch 提交的 bug 报告。断言是一次被显存不足打断的捕获的症状；原因是在池之后只剩 2.33 GB 的卡上，为 8192 个 token 捕获 prefill 图。团队保留默认的 4096 分块，那台服务器在那张卡上启动并跑完了每一次测试，这就是事故记录里写明的对照组。
 
-If a larger chunk is still wanted on this card, make room for the capture instead of removing it. Lower `--mem-fraction-static` by one step, so the pool shrinks and the capture has more than 2.33 GB, then read the `Capture target prefill CUDA graph end` line for the memory the capture used. The CUDA graphs page gives the order: fix capture memory with a smaller graph batch size or a lower fraction, and keep graphs on. Then measure the first token at the team's prompt lengths with both chunks before the change ships, because the manual found no gain from a chunk change on the machine where it could run both.
+如果这张卡上仍想用更大的分块，就为捕获腾出空间，而不是去掉捕获。把 `--mem-fraction-static` 调低一档，让池变小，捕获就能有多于 2.33 GB 的显存，然后读 `Capture target prefill CUDA graph end` 这一行，看捕获用了多少显存。CUDA 图页面给出了顺序：用更小的图批大小或更低的比例解决捕获显存问题，图保持开启。改动上线之前，再在团队实际的 prompt 长度上，用两种分块分别测首 token 时间，因为手册在能同时跑两种分块的机器上，没发现改分块有收益。
 
 ## Wrong turns
 
-- "Pin an older PyTorch, the assert says to report a bug." The assert reports an interrupted capture. The out-of-memory line two lines above it is the cause, and an older PyTorch changes nothing about free memory.
-- "Raise the memory fraction so the capture gets more memory." The fraction gives memory to the weights and the pool. Raising it shrinks what is left for the capture. Lower it.
-- "Turn CUDA graphs off and keep the big chunk." A server without decode graphs pays launch time on every token for every user. Fix the capture memory and keep the graphs.
-- "A bigger chunk always makes prefill faster, so it is worth the memory." The manual measured chunk sizes on the GB10 and found the three settings inside the seed spread of each other at 1 and 2 requests per second. Measure before you pay.
+- "锁定旧版 PyTorch，断言都说要报 bug 了。" 断言报告的是一次被打断的捕获。它上面两行的显存不足才是原因，旧版 PyTorch 改变不了空闲显存。
+- "调高内存比例，让捕获拿到更多显存。" 比例分配的是给权重和池的显存。调高它，留给捕获的就更少了。应该调低。
+- "关掉 CUDA 图，保留大分块。" 没有解码图的服务器，对每个用户的每个 token 都要付出 kernel 启动时间。解决捕获显存问题，保留图。
+- "分块越大 prefill 总是越快，值得花这些显存。" 手册在 GB10 上测过分块大小：每秒 1 个和 2 个请求时，三种设置彼此都落在随机种子带来的波动范围内。先测量，再付出代价。
 
 ## Generalize
 
-When a startup log ends in an assert from a library, read upward to the first error, because the library is often the second victim. Then ask which step the error fell in and what that step's memory depends on. A flag that changes a shape, such as a chunk size or a graph batch size, changes the memory of the capture that uses that shape, and the pool that the fraction sized does not move to make room. On a small card, the default chunk is a memory decision, not a speed decision.
+启动日志以某个库的断言结束时，往上读到第一个错误，因为这个库往往是第二个受害者。然后问：错误发生在哪一步，这一步的显存取决于什么。改变形状的参数，比如分块大小或图批大小，会改变使用这个形状的捕获所需的显存；而按比例定好大小的池不会挪开给它让位。在小显存的卡上，默认分块大小由显存约束决定，而不是由速度决定。
 
 ## Taught in
 
-The scheduler page of SGLang 101 records the failed start in [its chunked prefill part](../../../manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md), the graph capture section states [the default chunk by GPU memory and the rule for capture memory](../../../manuals/sglang-101/sections/4-1-forwardmode-and-cuda-graphs.md#what-sglang-captures-and-when-it-gives-up), and the memory page explains [how the fraction splits memory between the pool and everything else](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#how-sglang-decides-the-split).
+SGLang 101 的调度器页面在[分块 prefill 部分](../../../manuals/sglang-101/sections/2-2-the-scheduler-loop-and-schedule-policy.md)记录了这次失败的启动，图捕获一节给出了[按 GPU 显存划分的默认分块和捕获显存的规则](../../../manuals/sglang-101/sections/4-1-forwardmode-and-cuda-graphs.md#what-sglang-captures-and-when-it-gives-up)，内存页面解释了[比例怎样在池和其余一切之间划分显存](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#how-sglang-decides-the-split)。

@@ -1,6 +1,6 @@
 ---
 id: dense-layer-weight-shape
-title: Read a shape error in a dense layer
+title: 排查全连接层的张量形状错误
 card: math-classical-ml
 kind: concept
 level: 1
@@ -16,50 +16,50 @@ related: [math-classical-ml/elementwise-or-matmul]
 updated: 2026-11-03
 ---
 
-A colleague builds a dense layer that takes 784 inputs and gives 128 outputs. The first forward pass stops with a shape error. Which dimensions does the weight matrix need, and how do you read an error like this one?
+一位同事构建了一个接收 784 维输入、产生 128 维输出的全连接层。第一次前向传播便因形状错误而中断。权重矩阵需要具备哪些维度？你如何排查此类错误？
 
 ## Short answer
 
-The matrix is 128 by 784: one row for each output and one column for each input. A matrix product needs the inner sizes to agree, so a 128 by 784 matrix times a 784 by 1 input gives a 128 by 1 output. An error means the inner sizes differ, and the fix starts with the shapes of every operand written on paper.
+权重矩阵的形状为 128 乘 784：每一行对应一个输出，每一列对应一个输入。矩阵乘法要求内侧维度一致，因此 128 乘 784 的矩阵乘以 784 乘 1 的输入向量，得到 128 乘 1 的输出。报错意味着内侧维度不匹配，排查时首先要在纸上写出每个操作数的精确形状。
 
 ## Full answer
 
-### The rule
+### 乘法规则
 
-A product of an m by n matrix and an n by p matrix gives an m by p matrix. The inner sizes, both n, must agree. For the layer in the question:
+m 乘 n 的矩阵与 n 乘 p 的矩阵相乘，结果为 m 乘 p 的矩阵。内侧维度（同为 n）必须一致。对于本题中的网络层：
 
 ```text
 (128 x 784) @ (784 x 1) = (128 x 1)
   weights       input       output
 ```
 
-The rows of the weight matrix count the outputs. The columns count the inputs. Each output is the dot product of one weight row with the whole input vector.
+权重矩阵的行数对应输出维度，列数对应输入维度。每个输出都是一个权重行与整个输入向量的点积。
 
-### The bias
+### 偏置项
 
-The bias holds one value for each output. Store it as a 128 by 1 column, as the lesson does, so that it adds to the 128 by 1 result element by element. A flat array of 128 values against a 128 by 1 column broadcasts to 128 by 128 with no error. When the layer runs on a batch, the bias has fewer dimensions than the output, and broadcasting repeats it across the batch. Broadcasting only stretches a dimension of size 1, so it never fixes a 784 against a 128.
+偏置为每个输出保留一个数值。如课程所示，将其存储为 128 乘 1 的列向量，从而与 128 乘 1 的结果逐元素相加。若用包含 128 个值的一维扁平数组去与 128 乘 1 的列向量运算，广播机制会静默扩展为 128 乘 128 而不报任何错误。当该层按批次运行时，偏置的维度少于输出，广播机制会沿批次维度复制它。广播机制只能拉伸大小为 1 的维度，绝不可能解决 784 与 128 之间的不匹配问题。
 
-### How to read the error
+### 如何排查报错
 
-1. Write the shape of every operand next to the operation.
-2. Find the operation whose inner sizes do not match. That is the broken line.
-3. Decide which side is wrong. A transposed weight matrix, an input stored as a row instead of a column, and a missing batch dimension each give a different pair of numbers in the message.
+1. 在操作符旁写出每个操作数的形状。
+2. 找出内侧维度不一致的操作，定位出问题的代码行。
+3. 判定具体哪一侧出错。权重矩阵转置错误、输入按行向量而非列向量存储、以及缺少批次维度，都会在报错信息中体现为不同的数值对。
 
-The lesson makes the same check for a two layer network: the first matrix is 4 by 3 and the second is 2 by 4, so a 3 by 1 input gives a 4 by 1 hidden vector and a 2 by 1 output.
+课程在两层网络中做了同样的检查：第一层矩阵为 4 乘 3，第二层为 2 乘 4，因此 3 乘 1 的输入得到 4 乘 1 的隐藏向量以及 2 乘 1 的最终输出。
 
 ## Follow-ups
 
-- **Level 1:** What shape does the bias have? Expected: one value for each output, so 128 values, stored as a 128 by 1 column so that it adds to each output column.
-- **Level 2:** A batch of inputs arrives as rows instead of columns. What changes? Expected: the order of the product changes, so the batch matrix times the transposed weight gives one output row for each input.
-- **Level 2:** Why does a transpose appear in the backward pass? Expected: the gradient for the input needs the weight matrix with its rows and columns swapped, so that the shapes agree in the reverse direction.
-- **Level 3:** How does broadcasting hide a shape bug? Expected: a dimension of size 1 is stretched to fit, so a wrong shape can run without an error and give wrong values. An assertion on the shape catches it.
+- **Level 1:** 偏置项具有什么形状？ Expected: 每个输出对应一个值，共 128 个值，存储为 128 乘 1 的列向量以便与每个输出列相加。
+- **Level 2:** 输入批次以行向量而非列向量的形式传入，计算会有什么变化？ Expected: 矩阵乘法顺序改变，批次矩阵乘以转置后的权重矩阵，为每个输入生成一行输出。
+- **Level 2:** 为什么反向传播中会出现转置操作？ Expected: 对输入的梯度计算需要交换权重矩阵的行列，以使反向传播时的维度匹配。
+- **Level 3:** 广播机制是如何掩盖形状缺陷的？ Expected: 大小为 1 的维度会被自动拉伸匹配，导致错误形状的代码能够无报错运行并产生错误数值；通过显式的形状断言可以捕获该问题。
 
 ## Wrong answers
 
-- "The weight matrix is 784 by 128 because inputs come first." With a column input the matrix needs 128 rows and 784 columns. The order of the product decides which form is right, not the order in which you name the sizes.
-- "Shapes do not matter, the framework fixes them." Broadcasting repeats only a dimension of size 1. A 784 against a 128 inner size is an error, or a silent wrong result after a reshape.
-- "Transpose things until the code runs." A transpose that makes the code run can multiply the wrong pairs of numbers. Write the shapes down first and then change the one that is wrong.
+- "权重矩阵是 784 乘 128，因为输入排在前面。" 当输入为列向量时，矩阵需要 128 行和 784 列；乘法顺序决定了维度的先后，而非命名维度的口头顺序。
+- "形状并不重要，框架会自动修复。" 广播只对大小为 1 的维度生效；内侧维度 784 与 128 不匹配会报错，也可能在 reshape 后悄然产生错误结果。
+- "不断尝试转置直到代码能跑通为止。" 让代码勉强跑通的转置可能会将错误的数值对相乘；应先写下形状，再针对性修改错误的一方。
 
 ## Taught in
 
-The [vectors and matrices lesson](../../../phases/01-math-foundations/02-vectors-matrices-operations/) gives the shape rule and builds a dense layer from a Matrix class.
+[向量与矩阵运算课程](../../../phases/01-math-foundations/02-vectors-matrices-operations/)给出了形状运算规则，并基于 Matrix 类构建了全连接层。

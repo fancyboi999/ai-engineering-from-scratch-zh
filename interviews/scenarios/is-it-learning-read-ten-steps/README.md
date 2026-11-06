@@ -1,6 +1,6 @@
 ---
 id: is-it-learning-read-ten-steps
-title: Six steps in, is the run learning
+title: 模型真的在学习吗：读懂前十步训练日志
 card: scenarios
 kind: incident
 level: 2
@@ -27,55 +27,55 @@ source:
 
 ## Situation
 
-A GRPO run on GSM8K is six steps old. A teammate posts the reward of each step as the log printed it: 0.62890625, 0.59375, 0.7578125, 0.69140625, 0.58984375, 0.5859375. The last three fell. He says the model is getting worse, wants to stop the run, and wants to halve the learning rate before the next start.
+一个在 GSM8K 上的 GRPO 强化学习任务刚完成了六步。一位同事把日志打印的每步奖励发到了群里：0.62890625、0.59375、0.7578125、0.69140625、0.58984375、0.5859375。后三步连续下跌。他认为模型正在恶化，主张立刻停掉任务并在下次启动前将学习率减半。
 
-A second teammate opens the step 0 line and finds that the loss and the advantages are so close to zero that the log prints them in scientific notation. She concludes that no training happens at all and that the run is a waste of a GPU. You pull the log again a little later, when ten steps have finished, together with the three lines that the first step wrote.
+另一位同事打开了第 0 步的日志，发现损失值和优势值无限接近于零，以至于日志以科学计数法打印。她断定训练根本没有实际发生，整个任务纯属浪费 GPU 算力。稍后当任务跑完十步时，你调取了完整的十步日志以及第一步写入的三行核心数据。
 
 ## Evidence
 
-- [the reward of the first ten steps](evidence/ten-rewards.txt)
-- [the log probability gap of the first ten steps](evidence/ten-gaps.txt)
-- [the perf line of the first rollout](evidence/first-perf-line.txt)
-- [the rollout 0 line of the trainer](evidence/first-rollout-line.txt)
-- [the step 0 line of the trainer](evidence/first-step-line.txt)
-- [the healthy ranges of five numbers over the first ten steps of three seeds](evidence/healthy-ranges.txt)
-- [the signs of a broken run](evidence/signs-of-a-broken-run.txt)
+- [前十步记录的奖励数值序列](evidence/ten-rewards.txt)
+- [前十步记录的对数概率差距指标](evidence/ten-gaps.txt)
+- [首次采样生成的性能统计日志行](evidence/first-perf-line.txt)
+- [训练器记录的第 0 轮采样统计日志行](evidence/first-rollout-line.txt)
+- [训练器记录的第 0 步梯度与损失日志行](evidence/first-step-line.txt)
+- [三个随机种子在前十步中五项关键数值的健康分布区间](evidence/healthy-ranges.txt)
+- [训练任务彻底损坏的典型判据特征](evidence/signs-of-a-broken-run.txt)
 
 ## Questions
 
-1. Three falling steps in a row. How large is a normal move between two steps on this setup, and over how many steps do you read the reward?
-2. The gap between the engine and the trainer: what is its range over the ten steps, and what would a different shape of that series mean?
-3. Why are the centered rewards and the advantages of the first rollout near zero, and what number on the same line is the real signal?
-4. The step 0 loss is near zero, the clip fraction is 0 and the ppo_kl is 0. Which of those three are expected at step 0, and which number proves that a gradient exists?
-5. How many of the 32 groups gave no learning signal in the first rollout, and how do you read that count?
-6. Write the rule that decides, at any step, whether this run stops.
+1. 连续三步出现下跌。在此类配置下步与步之间的正常波动幅度有多大，应跨越多少步来评估奖励走势？
+2. 引擎与训练器之间的 logprob 差距在十步中的取值区间是多少，该序列呈现何种形态才代表异常？
+3. 为什么首次采样的中心化奖励与优势值无限接近于零，同一行中的哪个数值才是真正有效的监控信号？
+4. 第 0 步的 loss 接近零，截断比例为 0 且 ppo_kl 为 0。这三项中有哪些在第 0 步是完全符合预期的，哪个数值证明了梯度的真实存在？
+5. 首次采样中 32 个分组有多少组未能提供学习信号，如何正确解读这一计数？
+6. 编写在任意步骤下决定是否应当终止训练任务的判定规则。
 
 ## Walkthrough
 
-1. **Read all ten rewards, not six.** The ten values run from 0.5859375 to 0.7578125, and the four steps after the posted six are 0.6875, 0.67578125, 0.74609375 and 0.6484375. The manual measured steps 0 to 9 of three seeds of this recipe: rewards from 0.53 to 0.74, with a per-seed mean of 0.62 to 0.65, and moves of up to 0.14 from one step to the next. The fall after step 2 is a move of that size, and the three steps that fell are followed by four that did not. The manual's rule is to read the mean over five or more steps, never one step.
-2. **Read the gap.** The ten values of `train/train_rollout_logprob_abs_diff` run from 0.014312651939690113 to 0.01628461480140686, inside the manual's range of 0.0141 to 0.0164 for steps 0 to 9. The series is flat. A gap that grows step after step would mean that the two sides hold different weights, which is the one shape that stops a run at once.
-3. **Read the first perf line.** The answers had a mean length of 739.92578125 tokens and a median of 759.5, with the longest at the limit of 1024 and the shortest at 259. The field `rollout/truncated_ratio` is 0.3203125, so about a third of the answers hit the cap, inside the range of 0.19 to 0.43. The fields `rollout/zero_std/count_1` and `rollout/zero_std/count_0` are 7 and 3: ten of the 32 groups had every answer right or every answer wrong. Those groups teach nothing. The rest do.
-4. **Read the rollout 0 line.** `rollout/rewards` is about minus one point six times ten to the minus nine and `rollout/advantages` is about four point seven times ten to the minus ten. GRPO subtracts the mean reward of each group from each answer, so the mean of the centered rewards is zero by construction, and the advantages are centered the same way. The signal on that line is `rollout/raw_reward`, 0.62890625, the share of correct answers before centering.
-5. **Read the step 0 line.** `train/loss` is near zero for the same reason, because the advantages sum to zero across the batch. `train/pg_clipfrac` is 0.0 and `train/ppo_kl` is 0.0, and both must be 0 at step 0, because nothing can be clipped and the old and new probabilities are the same before the first update. `train/grad_norm` is 0.5216571092605591, inside the range of 0.35 to 4.95 over the whole run. That is the gradient. The gap on this line, 0.015336457639932632, sits inside the step-0 range of 0.0148 to 0.0157 that the manual recorded over 17 runs of this model.
-6. **Check the four signs of a broken run.** Step lines appear, so both processes started. No run of `503 Service Unavailable` lines goes on for minutes. The gap does not grow. The reward is not flat, and most of the 32 groups score with a spread. None of the four signs is present.
+1. **通读完整的十步奖励，而非仅看六步。** 十个奖励值分布在 0.5859375 到 0.7578125 之间，在同事公布的六步之后，后续四步分别为 0.6875、0.67578125、0.74609375 和 0.6484375。手册实测该配方在三个随机种子下的 0 到 9 步：奖励在 0.53 到 0.74 之间摆动，各种子的均值处于 0.62 到 0.65 之间，单步之间的正常波动幅度可达 0.14。第 2 步之后的下跌完全符合该正常波动幅度，且下跌的三步之后紧接着就是连续四步未见下跌。手册规则明确要求：必须基于五步或更多步的滑动平均值来判断趋势，绝不能仅凭单步涨跌做判断。
+2. **审查 logprob 差距指标。** `train/train_rollout_logprob_abs_diff` 的十个数值在 0.014312651939690113 到 0.01628461480140686 之间波动，完全落在手册给出的 0.0141 到 0.0164 的健康区间内。整条曲线保持完全平稳。如果该差距呈现步步递增的趋势，才代表双侧模型权重发生漂移不一致，那是必须立刻终止任务的严重异常形态。
+3. **分析首次采样的性能行。** 生成回答的平均长度为 739.92578125 个 token，中位数为 759.5，最长达到 1024 上限，最短为 259。字段 `rollout/truncated_ratio` 为 0.3203125，约三分之一的回答触碰了长度截断上限，处于 0.19 到 0.43 的正常范围内。字段 `rollout/zero_std/count_1` 和 `rollout/zero_std/count_0` 分别为 7 和 3：在 32 个提示词分组中，有 10 个分组内部所有样本全对或全错。这些分组不提供学习信号，其余分组则提供。
+4. **解读第 0 轮采样行。** `rollout/rewards` 约为负一点六乘十的负九次方，`rollout/advantages` 约为四点七乘十的负十次方。GRPO 算法从每个回答的奖励中减去该分组的均值，因此由数学构造决定了中心化奖励的均值必定恒等于零，优势值同理。该行上的有效信号是 `rollout/raw_reward`，即 0.62890625，这是中心化前正确回答的份额。
+5. **解读第 0 步训练行。** `train/loss` 接近于零完全是相同原因：整个批次内部优势值求和为零。`train/pg_clipfrac` 为 0.0，`train/ppo_kl` 为 0.0，两者在第 0 步必须为 0，因为首次更新前新旧策略完全等同，不可能发生裁剪或 KL 散度。`train/grad_norm` 为 0.5216571092605591，落在全训练周期 0.35 到 4.95 的健康梯度范数内。这正是梯度真实存在的铁证。该行记录的 gap 为 0.015336457639932632，完全落在手册记录的 17 次同模型运行第 0 步基准区间（0.0148 到 0.0157）之内。
+6. **核对损坏任务的四项指征。** 步数日志持续打出，说明双侧进程正常通信；没有出现持续数分钟的 `503 Service Unavailable` 报错；logprob 差距未见扩大；奖励未发生横盘僵死且绝大多数分组展现出正常方差离散。四项损坏指征无一命中。
 
 ## Resolution
 
-The run is healthy on every number that the manual asks you to read, and it stays on. The reward over ten steps sits in the range of the three healthy seeds, the gap is flat and in range, the cut share is in range, the gradient norm is in range, and the two step-0 values that must be zero are zero. The near-zero loss and advantages are what centering does, not a sign of a dead run.
+在技术手册要求核对的每一项指标上，该训练任务都表现出完全健康的体征，应当继续保持运行。十步内的奖励处于三个健康种子的基准波动范围内，差距曲线平稳且合规，截断率处于正常区间，梯度范数合理，而第 0 步在数学上必须为零的指标均准确为零。接近零的损失和优势值是 GRPO 分组归一化算法的自然产物，而非任务停摆的表象。
 
-The rule for stopping is the table of signs, not the last three rewards: stop when no step line appears within ten minutes, when the error lines do not stop for minutes, when the gap grows step after step, or when the reward stays flat while most groups score the same. For the trend, read means over five or more steps, and expect what the three seeds of the longer run showed: the reward rose, the answers got shorter, from about 720 to about 460 tokens, and the gap stayed flat.
+终止任务的决策必须依据损坏特征对照表，而非最近三步的局部波动：只有当超过十分钟未打出步数日志、报错持续数分钟不中断、gap 步步扩大或奖励在多数分组零方差下长期横盘僵死时才执行终止。评估模型表现应基于五步以上的滑动平均值，正如完整长程任务所展现的规律：奖励稳步提升、回答逐渐收敛精简（从约 720 token 降至约 460 token），而 logprob 差距始终保持平稳。
 
 ## Wrong turns
 
-- "Three falling steps, halve the learning rate." A move of up to 0.14 between two steps is normal on this setup, and the gradient norm sits in its range. A learning rate change now answers noise with a new variable, and the next run cannot be compared with this one.
-- "The loss is zero, so nothing trains." The advantages are centered in each group and sum to zero, which puts the loss near zero by construction. The gradient norm of 0.5216571092605591 is the proof that an update happened.
-- "A third of the answers are cut, raise the length limit." The cut share of 0.3203125 is inside 0.19 to 0.43, and it falls on its own as the model learns shorter answers. A higher limit makes every rollout slower.
-- "Ten groups out of 32 give no signal, so the data is wrong for this model." Those groups cost rollout time and teach nothing, and the rest still teach. The sign to act on is a flat reward with most groups the same, and the reward here is not flat.
+- "连续三步下跌，将学习率减半。" 在该配置下单步之间发生高达 0.14 的波动完全属于正常方差，且梯度范数处于健康区间。此时修改学习率是用新的变量去响应系统噪声，会导致后续运行丧失可比性。
+- "损失值为零，说明没有发生任何训练。" 优势值在组内归一化求和为零，导致损失值在数学上必然接近零。0.5216571092605591 的梯度范数正是参数发生更新的实证。
+- "三分之一的回答被截断，调大长度上限。" 0.3203125 的截断率处于 0.19 到 0.43 的预期区间内，随着模型学习到更短更精准的解答，截断率会自行下降。盲目调大上限会拖慢每次采样速度。
+- "32 组中有 10 组没有信号，说明数据不适合该模型。" 这些组虽然消耗了采样耗时且未贡献梯度，但其余组依然在正常提供更新动力。唯有当奖励长期横盘且绝大多数组均失去方差时才需要干预，当前奖励并不存在横盘。
 
 ## Generalize
 
-One number read at one step tells you almost nothing, and the number that everyone reads first, the reward, is the slowest to show a fault. Build a short list of signals with a healthy range for each, from your own seeds, and read them together before you touch a run. Know which values are zero by construction, so that a zero does not look like a dead run, and decide a stop from a sign of breakage, never from a dip.
+单步单指标的局部观测几乎无法提供任何有效信息，而所有人最先关注的奖励指标往往是对底层故障最迟钝的滞后指标。依据自有基线数据建立包含各指标健康区间的核查清单，在干预任务前综合判定。理解因算法数学构造而必然为零的指标，避免将算法固有特征误判为任务死亡；由明确的故障特征来驱动停机决策，绝不因正常波动而草率叫停。
 
 ## Taught in
 
-The Miles manual gives the five numbers and their ranges in [the first ten steps page](../../../manuals/miles-101/sections/1-3-read-your-first-ten-steps.md), the step-0 zeros of the clip fraction and the KL in [the first step page](../../../manuals/miles-101/sections/5-2-check-the-first-step.md), the eight signals of a run in [the read the run page](../../../manuals/miles-101/sections/5-1-read-the-run.md), and the noise between seeds in [the repeat page](../../../manuals/miles-101/sections/5-3-repeat-a-run.md).
+Miles 手册在[前十步页面](../../../manuals/miles-101/sections/1-3-read-your-first-ten-steps.md)列出了五项核心指标及其健康区间，在[第一步核查页面](../../../manuals/miles-101/sections/5-2-check-the-first-step.md)解析了第 0 步 KL 散度与截断率为零的原理，在[解读训练页面](../../../manuals/miles-101/sections/5-1-read-the-run.md)给出了八大监控信号，并在[多随机种子复现页面](../../../manuals/miles-101/sections/5-3-repeat-a-run.md)记录了种子之间的方差规律。

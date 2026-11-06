@@ -1,6 +1,6 @@
 ---
 id: tokenizer-drift-ci
-title: The weights did not change and the score fell
+title: 权重没变，分数却掉了
 card: tokenization-decoding
 kind: debug
 level: 3
@@ -16,57 +16,57 @@ related: [tokenization-decoding/chat-template-garbage, tokenization-decoding/pre
 updated: 2026-11-03
 ---
 
-After a routine dependency upgrade, an evaluation score for a deployed model fell sharply. No model weights changed. Give me a diagnosis plan that starts at the tokenizer, and the control you add so it cannot happen again.
+一次常规的依赖升级之后，一个已部署模型的评测分数大幅下降。模型权重一个都没变。给我一份从分词器查起的诊断计划，以及你会加什么控制，让这种事不再发生。
 
 ## Short answer
 
-A model trained with one vocabulary and served with another gets different ids for the same text and produces garbage, so first hash the tokenizer file in both environments and compare. If the hashes match, check the settings that change ids without changing the vocabulary: whether special tokens are added, whether a prefix space is added, and the normalization step, because a leading space or a ligature that normalizes differently moves whole tokens. Then freeze the tokenizer hash in CI and keep golden token ids for a fixed corpus so any change fails a test before it ships.
+用一套词表训练、用另一套词表服务的模型，同一段文本会得到不同的 ID，输出就是乱码，所以先在两个环境里给分词器文件算哈希并比对。哈希一致的话，再查那些不改词表却会改 ID 的设置：是否添加特殊 token、是否添加前缀空格，以及归一化步骤，因为一个前导空格，或一个归一化结果不同的连字，都会让整个 token 变掉。然后在 CI 里冻结分词器哈希，为一份固定语料保存标准 token ID（golden ids），任何改动在上线前都会让测试失败。
 
 ## Full answer
 
-### Step one: the file
+### 第一步：文件
 
-The merge table and the vocabulary are the tokenizer. A library upgrade can pull a different file, or resolve a model name to a newer revision. Compare the hash of the tokenizer file in the evaluation environment with the one the model was trained with.
+合并表和词表就是分词器。库升级可能拉来另一个文件，也可能把模型名解析到更新的修订版。把评测环境里分词器文件的哈希，和模型训练时用的那一份比对。
 
-### Step two: the settings around the file
+### 第二步：文件周围的设置
 
-| Setting | What changes | Symptom |
+| 设置 | 改变了什么 | 症状 |
 |---|---|---|
-| Add special tokens | a begin-of-text id appears or disappears at the start | every position shifts by one |
-| Add prefix space | the first word gets a word-initial id or a word-internal id | the first token of every prompt differs |
-| Normalization | a ligature such as the two-letter "fi" becomes two characters, or a fullwidth letter becomes ASCII | the same word gets different pieces in the two environments |
-| Pre-tokenizer engine | the Unicode-aware pattern falls back to ASCII classes | non-Latin text splits differently |
+| 添加特殊 token | 开头多出或少了一个文本开始 ID | 每个位置都错开一位 |
+| 添加前缀空格 | 第一个词拿到的是词首 ID 还是词中 ID | 每个 prompt 的第一个 token 都不同 |
+| 归一化 | 像双字母 "fi" 这样的连字变成两个字符，或全角字母变成 ASCII | 同一个词在两个环境里切出不同的片段 |
+| 预分词引擎 | 支持 Unicode 的模式退回到 ASCII 字符类 | 非拉丁文本的切法不同 |
 
-Each of these is a default that a library version can change. None of them touches the vocabulary file, so the hash alone does not catch them.
+这些都是库版本可能改掉的默认值。它们都不碰词表文件，所以只看哈希抓不到它们。
 
-### Step three: prove it
+### 第三步：证实
 
-Take a fixed sample of prompts from the evaluation. Encode them in both environments and diff the id lists. The first position that differs tells you which setting moved. Decode the differing ids to see the pieces.
+从评测里取一组固定的 prompt。在两个环境里分别编码，对 ID 列表做 diff。第一个不同的位置会告诉你是哪项设置变了。把不同的 ID 解码回来，看看是哪些片段。
 
-### The controls
+### 控制措施
 
-1. Pin the tokenizer file by hash in the deployment and fail the build when it changes.
-2. Store golden token ids for a fixed corpus that covers English, non-Latin scripts, code, emoji and a prompt with a leading space; the test encodes the corpus and compares.
-3. Assert a round trip, encode then decode, on the same corpus. Compare against the text that the configured normalizer produces, and require byte-exact equality for text that the normalizer leaves unchanged.
-4. Record the tokenizer settings next to the weights, so the serving config cannot drift from the training config.
+1. 在部署中按哈希锁定分词器文件，哈希一变就让构建失败。
+2. 为一份固定语料保存标准 token ID，语料覆盖英语、非拉丁文字、代码、emoji，以及一个带前导空格的 prompt；测试对语料编码并比对。
+3. 在同一份语料上断言往返：先编码再解码。与配置的归一化器产出的文本比对；对归一化器不改动的文本，要求字节级完全一致。
+4. 把分词器设置和权重放在一起记录，让服务配置无法偏离训练配置。
 
-### The validation plan from the lesson
+### 课程里的验证方案
 
-Average tokens per word on a held-out set, the unknown rate, the compression ratio and the round-trip equality. Those four numbers, tracked over time, show drift before an evaluation does.
+留出集上的平均每词 token 数、unknown 比率、压缩比和往返一致性。长期跟踪这四个数，能比评测更早发现漂移。
 
 ## Follow-ups
 
-- **Level 3:** How does a prefix space change the ids? Expected: the space is part of the word-initial token, so with it the first word gets one id and without it another, and the shift can continue through the merges.
-- **Level 3:** What does the compatibility normalization do, and when is it harmful? Expected: it maps compatibility characters to their plain forms, such as a ligature to two letters or a fullwidth letter to ASCII; it is lossy, so code or text that depends on the exact form changes meaning.
-- **Level 4:** The hashes match and the ids still differ on non-Latin text only. What moved? Expected: the pre-tokenizer engine; the environment without the Unicode-aware module fell back to the ASCII pattern.
-- **Level 4:** Design the CI gate in two sentences. Expected: a test that encodes a fixed multilingual corpus and compares against stored golden ids and a stored tokenizer hash; any difference fails the build and prints the first differing position.
+- **Level 3:** 前缀空格怎样改变 ID？ Expected: 空格是词首 token 的一部分，有空格时第一个词是一个 ID，没有时是另一个，这种差异还可能顺着合并继续传下去。
+- **Level 3:** 兼容性归一化做什么？什么时候有害？ Expected: 它把兼容字符映射成普通形式，比如连字变成两个字母、全角字母变成 ASCII；它是有损的，依赖精确字形的代码或文本会因此改变含义。
+- **Level 4:** 哈希一致，ID 却只在非拉丁文本上不同。变的是什么？ Expected: 预分词引擎；缺少 Unicode 感知模块的环境退回到了 ASCII 模式。
+- **Level 4:** 用两句话设计这道 CI 门槛。 Expected: 一个测试对固定的多语言语料编码，与保存的标准 ID 和保存的分词器哈希比对；任何差异都让构建失败，并打印第一个不同的位置。
 
 ## Wrong answers
 
-- "The weights did not change, so the model is the same." The model is the weights and the mapping from text to ids; change the mapping and the model sees different inputs.
-- "Retrain the model on the new tokenizer." A multi-week fix for a configuration bug; restore the training-time tokenizer and settings.
-- "Lowercase everything so the normalization does not matter." That changes the ids again and throws away information the model was trained with.
+- "权重没变，所以模型没变。" 模型是权重加上文本到 ID 的映射；映射变了，模型看到的输入就变了。
+- "在新分词器上重训模型。" 为一个配置 bug 花几周时间；应该恢复训练时的分词器和设置。
+- "全部转成小写，归一化就无所谓了。" 这会再一次改变 ID，还丢掉了模型训练时依赖的信息。
 
 ## Taught in
 
-The [subword tokenization lesson](../../../phases/05-nlp-foundations-to-advanced/19-subword-tokenization/) lists the drift and whitespace pitfalls and the validation plan, and the [tokenizer build lesson](../../../phases/10-llms-from-scratch/02-building-a-tokenizer/) covers normalization and the regex engines.
+[子词分词课程](../../../phases/05-nlp-foundations-to-advanced/19-subword-tokenization/)列出了漂移和空白相关的坑以及验证方案，[分词器构建课程](../../../phases/10-llms-from-scratch/02-building-a-tokenizer/)讲了归一化和正则引擎。

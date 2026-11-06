@@ -1,6 +1,6 @@
 ---
 id: two-refusal-metrics
-title: It refuses everything harmful, and the homework
+title: 有害请求全拒了，化学作业也拒了
 card: safety
 kind: concept
 level: 1
@@ -16,46 +16,46 @@ related: [safety/stated-confidence-ece, safety/safety-eval-missing-pieces]
 updated: 2026-11-03
 ---
 
-After a safety pass, the assistant refuses every prompt in the harmful set. The safety lead calls it a success. A product manager says that chemistry homework now gets refused too. Which numbers settle this, and how do you compute them?
+一轮安全处理之后，助手拒绝了有害集合里的每一条 prompt。安全负责人说这是成功。一位产品经理说，现在连化学作业也被拒了。哪些数字能平息这场争论？怎么计算？
 
 ## Short answer
 
-You need two metrics, not one. The under refusal rate is the share of unsafe prompts the model answered, and the over refusal rate is the share of safe prompts it refused. Treat the assistant as a binary classifier on prompt safety: label a prompt set safe or unsafe, detect refusals in the outputs, and report both rates with accuracy and a per category breakdown.
+你需要两个指标，不是一个。拒答不足率是模型回答了的不安全 prompt 的占比，过度拒答率是模型拒绝了的安全 prompt 的占比。把助手当作一个判断 prompt 是否安全的二分类器：给一组 prompt 标上安全或不安全，在输出里检测拒答，然后报告这两个比率，同时给出准确率和按类别的拆解。
 
 ## Full answer
 
-### Four objects
+### 四个对象
 
-1. A labeled prompt set. The capstone uses 25 unsafe prompts drawn from the taxonomy by id and 30 safe everyday prompts, with no overlap with the detector's benign set so the two evaluations stay independent.
-2. A model under test. The capstone uses a scripted mock with three policies: strict, over cautious and leaky. The last two are bugs the framework must detect.
-3. A refusal classifier on the output: a regex over phrases such as "I cannot", "I will not" and "as a responsible".
-4. An aggregator.
+1. 一组标注好的 prompt。综合项目用 25 条按 id 从分类法里抽出的不安全 prompt，加上 30 条日常的安全 prompt；它们和检测器的良性集合没有重叠，两项评估因此保持独立。
+2. 一个被测模型。综合项目用一个脚本化的模拟模型，有三种策略：严格、过度谨慎和泄漏。后两种是框架必须检测出来的 bug。
+3. 一个针对输出的拒答分类器：一条匹配“I cannot”“I will not”“as a responsible”等短语的正则。
+4. 一个聚合器。
 
-### The numbers
+### 指标
 
-- **Under refusal**: answered, on a prompt labeled unsafe.
-- **Over refusal**: refused, on a prompt labeled safe.
-- **Accuracy**: unsafe prompts correctly refused plus safe prompts correctly answered, over all prompts.
-- **Calibration**: when the model states a confidence, bin the prompts by it and compare each bin's confidence with its accuracy. A model that says 0.9 and is right 60 percent of the time has a gap of about 0.3 in that bin.
-- **Per category**: under refusal joined against the six taxonomy categories, so you can see that the model handles instruction override and slips on multi turn ramp.
+- **拒答不足**：在标为不安全的 prompt 上作答了。
+- **过度拒答**：在标为安全的 prompt 上拒绝了。
+- **准确率**：被正确拒绝的不安全 prompt 加上被正确回答的安全 prompt，除以全部 prompt。
+- **校准**：模型给出置信度时，按置信度把 prompt 分箱，比较每个分箱的置信度和准确率。一个说 0.9、只对 60% 的模型，在这个分箱里的差距约为 0.3。
+- **按类别**：把拒答不足和分类法的六个类别关联起来，就能看出模型挡住了指令覆盖，却在多轮递进上失守。
 
-### Reading the two sides
+### 两侧一起看
 
-A model that refuses everything has a perfect under refusal rate and a terrible over refusal rate. Every system prompt change moves both rates at once, so the report shows them side by side and the strict policy's numbers are the regression baseline.
+一个什么都拒绝的模型，拒答不足率完美，过度拒答率极差。每次改系统 prompt，两个比率都会同时变化，所以报告把它们并排列出，并以严格策略的数字作为回归基线。
 
 ## Follow-ups
 
-- **Level 1:** What does accuracy mean in this evaluation? Expected: unsafe prompts refused plus safe prompts answered, divided by all prompts.
-- **Level 2:** Why run the evaluator against a scripted mock model at all? Expected: a real model moves with every prompt and temperature change; a scripted policy moves the metrics for a known reason, so the framework itself can be tested.
-- **Level 2:** Why must the safe prompts here differ from the benign prompts used to test the detector? Expected: so the refusal evaluation and the detector evaluation stay independent and one does not tune the other.
-- **Level 3:** Why is a regex an acceptable refusal classifier here? Expected: it is auditable and deterministic; its misses are a known limit, and a model classifier can replace it later without changing the metric definitions.
+- **Level 1:** 在这项评估里，准确率指什么？ Expected: 被拒绝的不安全 prompt 加上被回答的安全 prompt，除以全部 prompt。
+- **Level 2:** 为什么要让评估器针对一个脚本化的模拟模型运行？ Expected: 真实模型会随每次 prompt 和温度改动而变化；脚本化策略让指标因已知原因变化，框架本身才能被测试。
+- **Level 2:** 为什么这里的安全 prompt 必须和测试检测器用的良性 prompt 不同？ Expected: 让拒答评估和检测器评估保持独立，不会用一个去调另一个。
+- **Level 3:** 为什么这里用正则当拒答分类器是可以接受的？ Expected: 它可审计、确定；它的漏判是已知局限，以后可以换成模型分类器，而指标定义不用改。
 
 ## Wrong answers
 
-- "Refusal rate on harmful prompts is the safety metric." It is half; a model that refuses everything scores perfectly on it.
-- "Over refusal is a product problem, not a safety problem." Both are bugs in the same decision boundary, and they move together with every change.
-- "Accuracy alone is enough." It hides which side failed; report both rates and the per category breakdown.
+- "有害 prompt 上的拒答率就是安全指标。" 它只是一半；什么都拒绝的模型能在它上面拿满分。
+- "过度拒答是产品问题，不是安全问题。" 两者都是同一条决策边界上的 bug，每次改动都会一起变。
+- "只看准确率就够了。" 它会掩盖是哪一侧出了问题；要报告两个比率和按类别的拆解。
 
 ## Taught in
 
-The [refusal evaluation capstone](../../../phases/19-capstone-projects/84-refusal-evaluation/) defines under refusal, over refusal, accuracy, calibration and the breakdown by attack category.
+[拒答评估综合项目](../../../phases/19-capstone-projects/84-refusal-evaluation/)定义了拒答不足、过度拒答、准确率、校准，以及按攻击类别的拆解。

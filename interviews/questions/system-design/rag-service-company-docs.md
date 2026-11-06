@@ -1,6 +1,6 @@
 ---
 id: rag-service-company-docs
-title: Design cited search over ten repositories of code
+title: 为十个代码仓库设计附带引用的检索问答系统
 card: system-design
 kind: design
 level: 3
@@ -16,65 +16,65 @@ related: [system-design/batched-inference-api-budget, system-design/eval-platfor
 updated: 2026-11-03
 ---
 
-An engineering organization wants to ask questions across 10 repositories with about 2M lines of code and get answers that cite file and line. The index must stay fresh on every push. Design the ingestion, the retrieval, the answer step, the freshness path, and the evaluation, with the budgets you would commit to.
+一家工程研发组织希望跨 10 个代码仓库（约 2M 行代码）提问，并获得精确引用文件与代码行号的回答。索引必须在每次 git push 时保持最新状态。请设计代码解析入库、检索架构、回答生成、增量保鲜路径以及评测体系，并明确给出你承诺达成的各项性能预算。
 
 ## Short answer
 
-Parse each file into function and class nodes and chunk at those boundaries, give each chunk a dense embedding, sparse terms and a one-sentence summary, and store a graph of imports and calls between chunks. A query runs dense and sparse search in parallel, merges and deduplicates, reranks the top 50 with a cross-encoder to keep 10, and hands those to a long-context model that must cite every claim by file and line; uncited claims are dropped. A push triggers a symbol-level diff so only changed chunks re-embed, with a budget of under 60 seconds for a 50-file push. Quality is measured on 100 labeled cross-repo questions with MRR@10, nDCG@10, citation faithfulness and p50 and p99 latency.
+将每个代码文件解析为函数与类语法节点并在节点边界切块，为每个代码块生成稠密向量嵌入、稀疏词项与单句自然语言摘要，并建立跨代码块的导入与调用关系图。查询到达时并行执行稠密检索与稀疏检索并去重，采用交叉编码器对 Top 50 候选重排精选出 Top 10，交付长上下文大模型并强制要求每条断言均附带文件与行号引用；未附引用的断言直接丢弃。代码推送通过符号级 diff 触发局部增量重新嵌入，承诺针对 50 个文件的代码提交在不到 60 秒内使变更可检索。系统质量基于 100 道标注的跨仓库真实问题做端到端评估，核心指标包括 MRR@10、nDCG@10、引用保真度以及 p50 与 p99 延迟。
 
 ## Full answer
 
-### Ingestion
+### 代码解析入库
 
-- A push webhook starts a worker that collects the changed files.
-- A parser with grammars for the languages in the fleet extracts function and class nodes with their full source span. Chunks follow node boundaries, not fixed token windows.
-- Each chunk gets three representations: a dense code embedding, sparse terms in a field-weighted index with symbol names weighted 4, bodies 1 and summaries 2, and a one-sentence summary written by a small model with the system preamble cached.
-- A symbol graph records imports, calls and inheritance across files and repositories, used at query time to expand retrieval across repo boundaries.
+- 代码推送 Webhook 触发后台 Worker 收集变动文件列表。
+- 针对代码库所涵盖的所有编程语言采用专用语法解析器提取函数与类节点及其完整的源码起止区间。代码切块严格依循语法节点边界，而非固定 token 窗口。
+- 为每个代码块构建三层表征：稠密代码向量嵌入；带字段加权的稀疏倒排索引（符号名权重 4，代码体 1，摘要 2）；以及由轻量模型基于缓存系统前缀生成的单句自然语言功能摘要。
+- 符号依赖图记录跨文件和跨仓库的 import 导入、函数调用与继承关系，在查询时用于跨仓库边界的拓扑扩散召回。
 
-The summary is the third retrievable modality: a user asks how something is authorized, the code says `check_permission`, and the summary says authorization.
+自然语言摘要构成了第三种检索模态：用户询问“权限认证如何处理”，代码原文叫 `check_permission`，而摘要直接包含了“权限认证”关键词。
 
-### Retrieval and answer
+### 检索与回答生成
 
-1. Fire dense and sparse search in parallel, deduplicate by repository, path and symbol.
-2. Rerank the top 50 with a cross-encoder and keep the top 10.
-3. Call the synthesizer with the reranked chunks and a cached system prompt, requiring a file and line anchor on every claim.
-4. Parse the output and check each anchor against the span at the indexed commit; a claim without an anchor, or with a span that is missing or does not support it, is re-asked or dropped. Only verified claims return.
+1. 并行发起稠密检索与稀疏检索，按仓库名、文件路径与符号名全局去重。
+2. 用交叉编码器深度重排 Top 50 候选，精选出前 10 个最相关的代码块。
+3. 将重排后的代码块连同缓存的系统 prompt 送入大模型，强制要求回答中的每句断言都必须附带文件与代码行号锚点。
+4. 解析模型输出，对照已索引提交中的代码区间严格校验每个引用锚点；缺乏引用锚点、代码区间不存在或无法支撑该论述的断言，将触发重新生成或直接剔除。仅返回经过严格验证的事实断言。
 
-Naive cosine search alone is poisoned by generated boilerplate, monorepo duplication and rarely imported symbols, which is why the hybrid search, the reranker and the graph exist.
+单纯的余弦搜索容易受到生成样板代码、Monorepo 重复和冷门符号的污染，这正是混合搜索、重排模型和图存在的原因。
 
-### Freshness
+### 增量保鲜
 
-On each webhook compute the symbol-level diff. Re-embed only the chunks whose text changed, recompute the import, call and inheritance edges of the changed symbols, and delete the chunks, summaries and edges of removed files and symbols from every store. The budget is a 50-file push searchable in under 60 seconds for the whole fleet, without reprocessing the 2M lines.
+Webhook 接收到提交后，计算符号级别的代码差异。仅对文本内容发生实质改变的代码块重新计算向量嵌入，重新计算受影响符号的导入、调用和继承拓扑边，并从所有存储中同步物理删除已废弃文件和符号对应的代码块、摘要与拓扑关系。性能预算为：包含 50 个文件的提交在不到 60 秒内完成整个代码库集合的增量索引刷新，无需重新处理全量 2M 行代码。
 
-### Evaluation and budgets
+### 评测体系与性能预算
 
-| Weight | Criterion | Measure |
+| 权重 | 评测维度 | 具体度量指标 |
 |---|---|---|
-| 25 | Retrieval quality | MRR@10 and nDCG@10 on 100 held-out questions |
-| 20 | Citation faithfulness | Share of claims with a verifiable file and line anchor |
-| 20 | Latency and scale | p95 query latency at 10k QPS on the indexed corpus |
-| 20 | Incremental indexing | Time from push to searchable on a 50-file commit |
-| 15 | Answer formatting | Clickable citations, snippet previews, follow-up affordance |
+| 25 | 检索质量 | 100 道独立留出问题上的 MRR@10 与 nDCG@10 |
+| 20 | 引用保真度 | 具备可验证真实文件和行号锚点的断言比例 |
+| 20 | 延迟与吞吐 | 在索引语料库上 10k QPS 下的 p95 查询延迟 |
+| 20 | 增量索引耗时 | 针对 50 个文件提交从 push 到可检索的耗时 |
+| 15 | 回答交互体验 | 可点击代码跳转引用、代码片段预览、追问引导能力 |
 
-A weekly rerun of the 100 questions with an alert on an MRR@10 drop above 5% catches drift in the index or the models.
+每周在 100 道基准问题上重新运行评测，设置 MRR@10 下降超过 5% 即触发告警，以防索引质量或底层模型发生静默漂移。
 
-### The service around it
+### 外围配套服务
 
-The query path sits inside the production stack from the application lesson: a gateway with per-user limits, guardrails on input and output, streaming of the answer, structured logs per retrieval and synthesis step, and cost tracking that attributes the summary model, the embeddings, the reranker and the synthesizer separately.
+查询链路完整封装在生产级应用框架内：配备单用户限流的 API 网关、输入输出双向安全护栏、回答内容流式传输、每一步检索与合成的结构化日志，以及将摘要模型、向量嵌入、重排模型与回答大模型分别独立核算的精细化成本跟踪。
 
 ## Follow-ups
 
-- **Level 3:** Why chunk at syntax nodes instead of fixed token windows? Expected: a window cuts functions in half and mixes neighbors; a node is one coherent unit with a stable symbol name to cite and deduplicate on.
-- **Level 3:** What does the reranker add that the two retrievers cannot? Expected: it scores each query and candidate pair together, which is more accurate than cosine on separate embeddings, at a cost that only the top 50 can afford.
-- **Level 4:** Generated boilerplate makes up a fifth of the corpus. What happens and what do you change? Expected: retrieval poisoning, where near-duplicate generated code crowds the results; flag generated chunks in the payload and down-weight them.
-- **Level 4:** A question needs code from four repositories. Which component carries that? Expected: the symbol graph expands the candidate set across import and call edges, so the reranker sees chunks from repositories the first search missed.
+- **Level 3:** 为什么必须按语法节点切块而非固定 token 窗口？ Expected: 固定窗口会把函数生硬切成两半并混杂无关邻近代码；语法节点是语义完整的独立单元，具备稳定的符号名称以便引用与去重。
+- **Level 3:** 重排模型提供了前两路检索器无法提供的什么能力？ Expected: 它将查询与候选一起打分，比对各自的向量计算余弦相似度更准确，且计算开销仅在 Top 50 候选集上才能承受。
+- **Level 4:** 自动生成的样板代码占据了整个代码库的五分之一，会导致什么问题？如何解决？ Expected: 引发检索污染，高度相似的生成样板代码会挤占宝贵的召回席位；需在元数据中标记生成代码块并降低它们的权重。
+- **Level 4:** 一个复杂问题需要横跨四个仓库的代码，哪项组件承载该能力？ Expected: 符号依赖图通过 import 与调用拓扑边扩散候选集合，使重排模型能看到首次搜索遗漏的其他关联仓库代码块。
 
 ## Wrong answers
 
-- "A million-token context window replaces retrieval." Context helps but does not rank; cross-repo questions still need retrieval and citations.
-- "Dense embeddings alone are enough for code." Exact symbol names need the sparse index, and the summary catches intent that the code text does not state.
-- "Re-index the fleet on every push to keep it simple." Reprocessing 2M lines per commit blows the freshness budget; the diff keeps the index consistent at a fraction of the work.
+- "百万 token 的上下文窗口取代检索。" 上下文有所帮助但无法排序；跨仓库问题依然需要检索和引用。
+- "对于代码场景，仅靠稠密向量嵌入就足够了。" 精确匹配函数符号名严重依赖稀疏倒排索引，而功能摘要能捕获代码文字本身未显式写出的高层设计意图。
+- "每次 push 时把全量代码重新建一遍索引，逻辑最简单。" 每次提交全量重算 2M 行代码会彻底打爆 60 秒的保鲜预算；基于 diff 的增量更新能以微小的算力保证一致性。
 
 ## Taught in
 
-The [RAG over a codebase capstone](../../../phases/19-capstone-projects/02-rag-over-codebase/) gives the ingestion, the hybrid retrieval, the citation rule, the freshness budget and the rubric, and the [production LLM application lesson](../../../phases/11-llm-engineering/13-production-app/) gives the service around the query path.
+[代码库 RAG 综合项目课程](../../../phases/19-capstone-projects/02-rag-over-codebase/)给出了入库管线、混合检索、引用校验、保鲜预算与评审标准，[生产级 LLM 应用课程](../../../phases/11-llm-engineering/13-production-app/)给出了查询链路的外围服务配套。

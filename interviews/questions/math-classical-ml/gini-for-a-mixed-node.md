@@ -1,6 +1,6 @@
 ---
 id: gini-for-a-mixed-node
-title: Score a tree node with Gini and with entropy
+title: 用基尼不纯度与信息熵评估决策树节点
 card: math-classical-ml
 kind: estimate
 level: 2
@@ -16,15 +16,15 @@ related: [math-classical-ml/mdi-ranks-noise-feature, math-classical-ml/bag-or-bo
 updated: 2026-11-03
 ---
 
-A node in a classification tree holds 6 cats and 4 dogs. Give its Gini impurity and its entropy in bits, and explain how a tree uses either number to choose a split.
+分类树中的一个节点包含 6 只猫和 4 条狗。请给出该节点的基尼不纯度以及以比特为单位的信息熵，并解释决策树如何利用其中任一指标来选择分裂。
 
 ## Short answer
 
-The class shares are 0.6 and 0.4. Gini is 1 minus the sum of squared shares, so 1 minus 0.36 minus 0.16, which is 0.48. Entropy is minus the sum of share times log base 2 of share, which comes to 0.971 bits. The tree tries every feature and threshold and keeps the split with the largest drop from the parent's impurity to the weighted impurity of the two children.
+类别占比分别为 0.6 和 0.4。基尼不纯度等于 1 减去各类别占比的平方和，即 1 减 0.36 减 0.16，等于 0.48。信息熵等于各类别占比与其以 2 为底的对数之积求和后取负值，计算结果为 0.971 比特。决策树会遍历所有特征和切分阈值，选择使父节点不纯度相对于两个子节点加权不纯度下降幅度最大的切分。
 
 ## Full answer
 
-### The two numbers
+### 两个指标的计算
 
 ```text
 Gini    = 1 - (0.6^2 + 0.4^2) = 1 - (0.36 + 0.16) = 0.48
@@ -33,29 +33,29 @@ Entropy = -(0.6 * log2(0.6) + 0.4 * log2(0.4))
         = 0.442 + 0.529 = 0.971 bits
 ```
 
-Gini is the chance that a random sample at the node is labeled wrong when you label it by the node's class distribution. Entropy is the average surprise of the labels at the node. Both are 0 for a pure node. For a two class node with equal shares, Gini is 0.5 and entropy is 1.0 bit.
+基尼不纯度表示在该节点中随机抽取一个样本并按节点类别分布标注时，被错误分类的概率。信息熵表示该节点标签的平均信息量。对于纯节点，两者皆为 0。对于样本比例各半的二分类节点，基尼不纯度为 0.5，信息熵为 1.0 比特。
 
-### How the tree uses them
+### 决策树如何利用它们
 
-The information gain of a split is the parent's impurity minus the weighted average of the children's impurity, where each child is weighted by its share of the samples. The algorithm is greedy: at each node it sorts each feature, tries every midpoint between distinct values as a threshold, and keeps the pair with the highest gain. Then it recurses into both children. Greedy splitting does not find the best tree, because that problem is NP-hard, but it works well in practice.
+切分的信息增益等于父节点不纯度减去子节点的加权平均不纯度，每个子节点的权重为其样本占比。算法采用贪心策略：在每个节点对每个特征排序，将所有相邻不同取值的中点作为候选阈值，保留增益最大的切分方案，然后对两个子节点递归执行该过程。贪心切分不能保证找到全局最优树（因为该问题是 NP-hard 的），但在实际中表现优异。
 
-### Gini or entropy
+### 基尼不纯度还是信息熵
 
-On most data the two criteria pick the same splits and give trees of about the same depth. Gini has no logarithm, so it is a little cheaper to compute. Entropy connects the split to information theory: the split that minimizes the conditional entropy of the label given the feature is the split that removes the most uncertainty.
+在大多数数据上，这两个准则选出的切分基本相同，生成的树深度也大致相仿。基尼不纯度不涉及对数运算，因此计算开销略低。信息熵则将切分与信息论联系起来：使给定特征下标签的条件熵最小的切分，正是消除最多不确定性的切分。
 
 ## Follow-ups
 
-- **Level 2:** What is the gain of a split that puts all the cats on one side and all the dogs on the other? Expected: the children are pure, so their impurity is 0 and the gain equals the parent's impurity, 0.48 for Gini.
-- **Level 2:** Why weight the children by their sample share? Expected: a pure child with one sample should not count as much as a mixed child with the rest of the data.
-- **Level 3:** How does the tree turn a continuous feature into candidate thresholds? Expected: sort the values and try the midpoint between each pair of distinct neighbors.
-- **Level 3:** What stops the recursion before every leaf holds one sample? Expected: pre-pruning limits such as a maximum depth, a minimum number of samples per leaf, or a minimum gain, or post-pruning after the full tree is grown.
+- **Level 2:** 若某个切分将所有的猫分到一侧、所有的狗分到另一侧，其增益是多少？ Expected: 子节点均为纯节点，其不纯度为 0，增益等于父节点的不纯度，对基尼不纯度而言为 0.48。
+- **Level 2:** 为什么子节点的不纯度要按样本占比加权？ Expected: 仅包含 1 个样本的纯子节点不应与包含其余绝大多数数据的混合子节点享有相同权重。
+- **Level 3:** 决策树如何将连续特征转换为候选切分阈值？ Expected: 对特征值排序，并以相邻不同数值的中点作为候选阈值。
+- **Level 3:** 在每个叶节点只剩 1 个样本之前，是什么机制终止了递归？ Expected: 预剪枝限制（如最大深度、叶节点最小样本数或最小增益阈值），或整棵树生长完成后的后剪枝。
 
 ## Wrong answers
 
-- "Gini is 0.6 times 0.4." That product is half of the two class Gini. The formula is 1 minus the sum of squared shares, which gives 0.48 here.
-- "Entropy of a 6 to 4 node is 1 bit because there are two classes." One bit is the maximum, reached only at equal shares. Unequal shares give less, 0.971 bits here.
-- "Pick the split with the lowest child impurity, and the parent does not matter." The parent's impurity is the same for every candidate split at that node, so the ranking is the same, but the gain is what the tree stores and reports as feature importance.
+- "基尼不纯度是 0.6 乘以 0.4。" 该乘积只是二分类基尼不纯度的一半；其计算公式为 1 减去占比平方和，在此处为 0.48。
+- "6 比 4 的节点信息熵为 1 比特，因为有两个类别。" 1 比特是最大值，仅在两类占比均等时达到；比例不均时取值更小，此处为 0.971 比特。
+- "只需选择子节点不纯度最低的切分，父节点不重要。" 父节点不纯度对该节点的所有候选切分都相同，排序虽然一致，但决策树存储并作为特征重要性汇报的正是增益本身。
 
 ## Taught in
 
-The [decision trees lesson](../../../phases/02-ml-fundamentals/04-decision-trees/) computes both criteria for this node, and the [information theory lesson](../../../phases/01-math-foundations/09-information-theory/) defines entropy and conditional entropy.
+[决策树课程](../../../phases/02-ml-fundamentals/04-decision-trees/)计算了该节点的两个指标，[信息论课程](../../../phases/01-math-foundations/09-information-theory/)定义了熵与条件熵。

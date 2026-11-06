@@ -1,6 +1,6 @@
 ---
 id: token-budget-at-low-load
-title: A larger token budget at low load
+title: 低负载下调大 token 预算
 card: inference-serving
 kind: tradeoff
 level: 3
@@ -15,20 +15,19 @@ cheatsheet: []
 related: []
 updated: 2026-11-03
 ---
-
-A teammate proposes `--max-num-batched-tokens 16384` so that long prompts get their first token sooner. The server runs a model with mixture-of-experts layers on one card. Requests arrive at about half a request per second, with prompts between 1,024 and 4,096 tokens. What do you expect to change, and what would you measure before you accept the change?
+一位同事提议设置 `--max-num-batched-tokens 16384`，以便长 prompt 能更快拿到首 token。服务器在单卡上运行带 MoE 层的模型。请求以大约每秒 0.5 个的到达率进入，prompt 长度在 1,024 到 4,096 token 之间。你预期会发生什么变化？在接受这项修改之前你会测量什么？
 
 ## Short answer
 
-A larger budget lets a long prompt finish its prefill in fewer steps, but each of those steps takes longer, and every running stream waits for it. At low load I expect a faster first token and a worse P99 ITL, and I would measure both with several seeds at the real request rate. On our GB10 at 0.5 requests per second, 16,384 raised the P99 ITL from 574 to 798 ms, while the first-token gain did not clear the seed spread.
+更大的预算让长 prompt 能在更少的步数内完成 prefill，但每一步的耗时变长，每个运行中的流都要等待。在低负载下，我预期首 token 更快，但 P99 ITL 会恶化，我会在真实到达率下用多个种子同时测量这两项指标。在我们的 GB10 上，每秒 0.5 个请求时，16,384 的预算把 P99 ITL 从 574 ms 推高到 798 ms，而首 token 的收益并未超出种子波动范围。
 
 ## Full answer
 
-### What the manual measured
+### 手册测得的结果
 
-Budgets of 2,048 and 16,384 tokens on the GB10 with Qwen3-30B-A3B, requests at a fixed rate, three seeds per point, each request asking for 64 to 256 tokens:
+在 GB10 上运行 Qwen3-30B-A3B，对比 2,048 和 16,384 的 token 预算，请求以固定到达率发送，每个点三个种子，每个请求生成 64 到 256 个 token：
 
-| Requests per second | Budget | Median TTFT | Median TPOT | P99 ITL |
+| 每秒请求数 | 预算 | 中位 TTFT | 中位 TPOT | P99 ITL |
 |---|---|---|---|---|
 | 0.5 | 2,048 | 1,145 ms | 149.3 ms | 574 ms |
 | 0.5 | 16,384 | 906 ms | 139.4 ms | 798 ms |
@@ -37,37 +36,37 @@ Budgets of 2,048 and 16,384 tokens on the GB10 with Qwen3-30B-A3B, requests at a
 | 2 | 2,048 | 560 ms | 205.5 ms | 587 ms |
 | 2 | 16,384 | 595 ms | 205.1 ms | 586 ms |
 
-At 0.5 requests per second the larger budget raised the P99 ITL by 39 percent, and the seed ranges did not overlap. The first token came sooner, but the seed ranges of the first token overlapped. So the cost is clear and the gain is not confirmed. At 1 and 2 requests per second the two budgets gave the same numbers within the seed ranges. All runs held a median clock of 2,398 to 2,411 MHz, so the clock does not explain any row.
+在每秒 0.5 个请求时，更大的预算使 P99 ITL 增加了 39%，且种子范围没有重叠。首 token 确实更早到达，但首 token 的种子范围存在重叠。所以代价是明确的，而收益尚未证实。在每秒 1 和 2 个请求时，两种预算在种子范围内测得的数字完全相同。所有运行的中位频率都在 2,398 到 2,411 MHz 之间，因此频率无法解释任何一行的差异。
 
-### Why the effect fades with the rate
+### 为什么该效应随到达率增加而减弱
 
-At a higher rate more requests share each step. One long prompt then fills a smaller share of the budget, and how it is chunked matters less. The result is narrow: two budgets, three low rates, one model, one machine. The P-PAS paper found that no single fixed budget was best at every load: a large budget won at low prefill pressure, a small one when several prefills competed with running streams.
+在更高的到达率下，更多请求共享同一步。长 prompt 占预算的比例变小，其切块方式的影响也随之减弱。这个结论的适用范围较窄：两种预算、三个低到达率、一个模型、一台机器。P-PAS 论文发现，没有哪个单一的固定预算能在所有负载下最优：在 prefill 压力低时大预算胜出，当多个 prefill 与运行中的流竞争时小预算胜出。
 
-### An open result
+### 一个未解决的现象
 
-The median first token at 0.5 requests per second was slower than at 1 request per second for both budgets. All three seeds at 0.5 were above 900 ms with the 2,048 budget, and all three at 1 were below 600 ms. One slow seed does not explain it. The manual did not find the cause and says so.
+在两种预算下，每秒 0.5 个请求时的中位首 token 时间都比每秒 1 个请求时更慢。在 2,048 预算下，0.5 请求率的全部三个种子都在 900 ms 以上，而 1 请求率的三个种子都在 600 ms 以下。单个慢种子无法解释该现象。手册没有找到原因，并如实说明了这一点。
 
-### How to decide
+### 怎么决定
 
-1. Read the budget that your server uses. The run with no flag matched 2,048 on this machine.
-2. If the P99 ITL is too high and long prompts arrive, lower the budget.
-3. If the first token of long prompts is too slow and the P99 ITL has room, raise it.
-4. Measure at your real request rate, and again when your load changes.
+1. 读取你的服务器实际使用的预算。在这台机器上，不带参数的运行对应 2,048。
+2. 如果 P99 ITL 过高且持续有长 prompt 到达，调小预算。
+3. 如果长 prompt 的首 token 太慢且 P99 ITL 还有余量，调大预算。
+4. 在你真实的请求到达率下测量，并在负载发生变化时重新测量。
 
-`--long-prefill-token-threshold` caps the tokens that one long prompt gets in a step when other requests wait. It is off by default and the manual did not test it.
+`--long-prefill-token-threshold` 可以在其他请求等待时，限制单个长 prompt 在一步中获得的 token 数。它默认关闭，手册未测试该参数。
 
 ## Follow-ups
 
-- **Level 3:** At the two higher rates the budgets tied. Why does the difference vanish as the rate rises? Expected: more requests share each step, so one long prompt fills a smaller share of the budget and its chunking matters less.
-- **Level 3:** Both budgets gave a later first token at the lowest rate than at the next rate up. How do you report that? Expected: all three seeds agreed, so it is not one slow seed; the cause was not found, so it stays an open result and no rule is built on it.
-- **Level 4:** Is there one budget that wins at every load? Expected: no; a large budget wins when prefill pressure is low and a small one when several prefills compete with streams, so the value must move with the load.
+- **Level 3:** 在两个较高的到达率下，两种预算打平。为什么差异会随到达率上升而消失？ Expected: 更多请求共享每一步，单个长 prompt 占预算的比例更小，其分块方式的影响更弱。
+- **Level 3:** 两种预算在最低到达率下的首 token 时间都慢于次低到达率。你会怎样汇报？ Expected: 全部三个种子结果一致，因此不是单个慢种子造成的；原因未查明，因此作为未决事实保留，不据此建立规则。
+- **Level 4:** 是否存在一个在所有负载下都最优的预算？ Expected: 不存在；大预算在 prefill 压力低时胜出，小预算在多个 prefill 与流竞争时胜出，因此该数值必须随负载调整。
 
 ## Wrong answers
 
-- "A larger budget is free because the GPU has spare compute at low load." Each step with a bigger chunk takes longer and every running stream waits for it; the P99 ITL rose 39 percent at 0.5 requests per second.
-- "Set the budget once from the GPU size and leave it." The best value moved with the request rate in these runs, so measure at your real rate and again when the load changes.
-- "The drop from 1,145 to 906 ms proves the first-token gain." The seed ranges of the first token overlapped, so the cost is confirmed and the gain is not.
+- "低负载下 GPU 有空闲算力，所以更大的预算没有代价。" 分块更大的每一步耗时更长，每个运行中的流都要等待；每秒 0.5 个请求时，P99 ITL 上升了 39%。
+- "根据 GPU 显存大小设置一次预算后保持不变即可。" 在这些测试中，最佳值随请求到达率变化，所以在真实到达率下测量，并在负载改变时重新测量。
+- "从 1,145 ms 降到 906 ms 证实了首 token 的收益。" 首 token 的种子范围存在重叠，所以代价已被证实，而收益尚未证实。
 
 ## Taught in
 
-[Keep long prompts from stalling short ones](../../../manuals/vllm-101/sections/3-3-keep-long-prompts-from-stalling-short-ones.md) has the six measured rows and the tuning order.
+[防止长 prompt 拖慢短 prompt](../../../manuals/vllm-101/sections/3-3-keep-long-prompts-from-stalling-short-ones.md)给出了这六组实测数据和调优顺序。

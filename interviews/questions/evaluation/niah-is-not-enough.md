@@ -1,6 +1,6 @@
 ---
 id: niah-is-not-enough
-title: A perfect needle test and a long contract
+title: needle 测试满分，面对的却是一份长合同
 card: evaluation
 kind: concept
 level: 2
@@ -16,46 +16,46 @@ related: [evaluation/effective-context-spec-sheet]
 updated: 2026-11-03
 ---
 
-A model card advertises a context window of one million tokens and a perfect score on a needle in a haystack test at that length. Your product asks the model to reconcile figures that appear in several places across a long contract. Does the card answer your question, and what do you measure instead?
+一张模型卡宣称上下文窗口有 100 万 token，并且在这个长度上的大海捞针（needle in a haystack）测试拿了满分。你的产品要求模型核对一份长合同里分散在多处的数字。这张模型卡回答了你的问题吗？你改测什么？
 
 ## Short answer
 
-No. A single needle test measures retrieval of one planted fact, and frontier models saturate it. Your task is multi hop aggregation, which degrades sharply past about 128k tokens on most models. Run a multi hop test at your target length and report two numbers: the effective retrieval length and the effective reasoning length.
+不能。单针测试衡量的是对单个植入事实的检索，前沿模型对此已经饱和。你的任务是多跳聚合，在大多数模型上超过约 128k token 就会急剧退化。应在目标长度上运行多跳测试，并汇报两个数值：有效检索长度和有效推理长度。
 
 ## Full answer
 
-### What the needle test measures
+### 大海捞针测试衡量了什么
 
-Place one fact at a controlled depth in filler text and ask for it. Sweep depth and length. It is the baseline, and it is necessary but not sufficient. Single needle success does not predict multi needle success, and neither predicts reasoning over dispersed facts, which is the first task to fail.
+在填充文本里按受控的深度放一个事实，然后提问。扫遍不同的深度和长度。它是基线：必要，但不充分。单针成功预测不了多针成功，两者都预测不了对分散事实的推理，而推理正是最先失败的任务。
 
-### What the harder benchmarks add
+### 更难的基准测试补充了什么
 
-- A multi task suite with 13 task types across retrieval, multi hop tracing, aggregation and question answering. In its first release only half of 17 models that claimed 32k context kept their quality at 32k.
-- A multi round coreference test with 8, 24 or 100 needles, which shows how many facts a model can hold at once. On one advertised 10M token model, the 8 needle variant fell to 26.3 percent at 1M tokens.
-- Non lexical needles that share no words with the query, so retrieval needs one reasoning step.
+- 一个多任务套件，13 种任务类型，覆盖检索、多跳追踪、聚合和问答。它首次发布时，17 个宣称支持 32k 上下文的模型里，只有一半在 32k 时保持住了质量。
+- 一个多轮共指测试，放 8、24 或 100 根针，显示模型能同时记住多少事实。在一个宣传 10M token 的模型上，8 针版本在 1M token 时降到了 26.3%。
+- 与查询没有共同词汇的非字面针，让检索需要一步推理。
 
-### The two numbers for your spec sheet
+### 规格表上的两个数
 
-1. **Effective retrieval length**: the longest context where the needle test still passes at a threshold such as 90 percent.
-2. **Effective reasoning length**: the longest context where a multi hop or aggregation task passes at a threshold such as 70 percent. It is usually 25 to 50 percent of the advertised window.
+1. **有效检索长度**：needle 测试仍能达到某个阈值（如 90%）的最长上下文。
+2. **有效推理长度**：多跳或聚合任务仍能达到某个阈值（如 70%）的最长上下文。它通常只有宣传窗口的 25% 到 50%。
 
-### Build the test for your contract
+### 为你的合同搭测试
 
-Plant three linked assignments in filler, such as a value, a second value defined from the first and a third defined from the second, and ask for the last one. Test depths 0, 0.25, 0.5, 0.75 and 1.0 at each length. Use needles that do not share keywords with the filler. Record the time to first token with every run; a million token prompt can take 30 to 120 seconds to prefill.
+在填充文本里埋三条相互关联的赋值：一个值，第二个值由第一个定义，第三个值由第二个定义，然后问最后一个。每个长度测 0、0.25、0.5、0.75 和 1.0 五个深度。针不能与填充文本共享关键词。每次运行都记录首 token 时间；一个百万 token 的 prompt 光 prefill 就可能要 30 到 120 秒。
 
 ## Follow-ups
 
-- **Level 2:** Why does a single needle pass not predict a three needle pass? Expected: several facts need attention at several positions at once; the multi needle test measures juggling, not retrieval.
-- **Level 2:** Which depths do you test? Expected: 0, 0.25, 0.5, 0.75 and 1.0, because models under attend to the middle of the input.
-- **Level 3:** The planted fact uses the same words as the surrounding text. What goes wrong? Expected: retrieval becomes trivial lexical matching; use a needle with no literal overlap.
-- **Level 3:** What do you measure next to accuracy at the target length? Expected: time to first token and cost per query; a million token prompt can take 30 to 120 seconds to prefill.
+- **Level 2:** 为什么单针通过预测不了三针通过？ Expected: 几个事实需要同时关注几个位置；多针测试衡量的是同时兼顾，不是检索。
+- **Level 2:** 你测哪些深度？ Expected: 0、0.25、0.5、0.75 和 1.0，因为模型对输入中间部分关注不足。
+- **Level 3:** 埋进去的事实用的是与周围文本相同的词。会出什么问题？ Expected: 检索变成了简单的字面匹配；改用没有字面重叠的针。
+- **Level 3:** 在目标长度上，除了准确率你还测什么？ Expected: 首 token 时间和单次查询成本；一个百万 token 的 prompt 光 prefill 就可能要 30 到 120 秒。
 
 ## Wrong answers
 
-- "The vendor's score is independent evidence." Vendors publish their own scores; rerun on your task at your length.
-- "Pass at one million means pass at every shorter length and every task." Report the curve per task type; an aggregate hides large task level differences.
-- "Test the middle depth only." Many implementations do; the middle is where models under attend, so test five depths.
+- "供应商的分数是独立证据。" 供应商发布的是自己测的分数；在你的任务和你的长度上重跑。
+- "一百万 token 能通过，就说明每个更短的长度、每种任务都能通过。" 按任务类型报告曲线；综合分会掩盖任务之间的巨大差异。
+- "只测中间深度。" 很多实现确实只测中间；而中间恰恰是模型关注不足的地方，所以要测五个深度。
 
 ## Taught in
 
-The [long context evaluation lesson](../../../phases/05-nlp-foundations-to-advanced/28-long-context-evaluation/) names the benchmarks and the two numbers for a spec sheet.
+[长上下文评测课](../../../phases/05-nlp-foundations-to-advanced/28-long-context-evaluation/)介绍了这些基准，以及规格表上的两个数。

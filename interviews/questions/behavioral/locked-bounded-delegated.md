@@ -1,6 +1,6 @@
 ---
 id: locked-bounded-delegated
-title: Write a specification that leaves judgment where it belongs
+title: 编写让决策判断各归其位的规范
 card: behavioral
 kind: design
 level: 3
@@ -16,58 +16,58 @@ related: [behavioral/agent-decides-alone, behavioral/plan-you-would-reject]
 updated: 2026-11-03
 ---
 
-You hand a task to a coding agent, or to a new engineer, to add a read-only diagnosis step to an incident tool. Last time the brief was two sentences and the result guessed the system. The time before, the brief was a twelve-page design and the result transcribed a mistake in it. How do you write this one?
+你需要将一项任务交给代码 agent 或新入职的工程师：为突发事件应急工具增加一个只读排查步骤。上一次你给出的要求只有两句话，结果对方只能靠猜测系统来实现。再上一次，你给出了一份长达十二页的设计文档，结果对方原封不动地把其中的错误照抄了进去。这一次你打算如何编写需求规范？
 
 ## Short answer
 
-I write an executable contract with six surfaces: the outcome, the invariants that must always hold, concrete examples, non-goals, a decision policy, and the proof required before completion. Every decision is marked locked, bounded or delegated by its consequence and reversibility. The production-write boundary is locked, the time budget for the data source is bounded, and local structure and names are delegated with an explanation required.
+我编写包含六个维度的可执行契约：期望结果、必须始终成立的不变量、具体示例、明确的非目标、决策策略以及完成前所需的证明依据。根据后果严重性与可逆性，每项决策分别标注为锁定、有界或委托。涉及生产环境写入的边界设为锁定，数据源的时间预算设为有界，而局部代码结构与命名则设为委托并要求附带说明。
 
 ## Full answer
 
-### Two bad extremes
+### 两个不良极端
 
-An underspecified task makes the builder guess the system. An overspecified task makes the builder transcribe a design that may already be wrong. The useful middle fixes invariants and evidence and leaves reversible choices open.
+规范不足的任务让构建者去猜测系统。规范过度的任务让构建者照抄可能本身就有错的设计。有价值的折中做法是固定不变量与证据，同时对可逆的选择保持开放。
 
-### The six surfaces
+### 六个维度
 
-| Surface | Purpose |
+| 维度 | 目的 |
 |---|---|
-| Outcome | The observable result |
-| Invariants | Conditions that must always stay true |
-| Examples | Concrete cases that show intent |
-| Non-goals | Adjacent behavior excluded on purpose |
-| Decision policy | Which choices are locked, bounded or delegated |
-| Proof | Evidence required before completion |
+| 期望结果 | 可被客观观察到的最终成效 |
+| 不变量 | 必须始终保持成立的硬性约束条件 |
+| 示例 | 展现设计意图的具体案例 |
+| 非目标 | 特意排除在外的相邻边缘行为 |
+| 决策策略 | 哪些选择属于锁定、有界或委托 |
+| 证明依据 | 任务完成前所必须出具的证据 |
 
-### Three decision modes
+### 三种决策模式
 
-- Locked: the builder must not choose. Public compatibility, authority, safety, irreversible cost, product commitments.
-- Bounded: the builder may choose inside explicit limits. Search budgets, retry counts, allowed dependencies, a known interface family.
-- Delegated: the builder owns the choice and explains it. Local structure, names, reversible refactors, implementation detail.
+- 锁定：开发者不得擅自决定。涵盖公共兼容性、权限分配、安全性、不可逆成本以及核心产品承诺。
+- 有界：开发者可在明确限制的范围内做选择。如检索预算、重试次数、允许引入的依赖项、已知的接口体系。
+- 委托：开发者全权负责该选择并需说明依据。如局部结构、命名规范、可逆重构、具体实现细节。
 
-"The implementation may use any read-only source that returns inside the time budget" is not vague. It is a delegated decision with a boundary and a proof.
+“具体实现可以使用在时间预算内返回结果的任意只读数据源”并不是模糊不清的描述，而是一个具备明确边界和证明要求的委托决策。
 
-### Examples compress intent
+### 用示例浓缩意图
 
-"Helpful", "robust" and "production-ready" are not executable. A small set of normal, edge, failure and forbidden cases gives the builder and the verifier the same target. Examples do not replace invariants; one passing case cannot prove a universal safety rule.
+诸如“好用”、“健壮”和“具备生产级质量”等词汇不可执行。提供一组涵盖常规、边缘、故障与被禁止情况的小规模案例，能让开发者与验证者对齐相同的目标。示例不能取代不变量；一个通过的案例无法证明全局安全性规则始终成立。
 
-### Proof matches the claim
+### 证明必须匹配声明
 
-A unit test proves a local function contract. A wire test proves serialization and transport. A browser journey proves an interface path. A replay set proves behavior over representative cases. An audit log proves that authority boundaries held. I do not accept a lower layer as proof of a higher-layer claim.
+单元测试只能证明局部函数契约。协议实测证明序列化与传输。浏览器自动化流程证明界面交互链路。重放测试集证明在代表性案例上的综合表现。审计日志证明权限边界保持有效。我不接受低层级作为高层级声明的证明。
 
 ## Follow-ups
 
-- **Level 3:** Someone moves the production-write decision from locked to delegated. The schema accepts it. Why is it still wrong? Expected: the schema checks shape, not product risk; a write to production is irreversible and changes authority, so it stays locked.
-- **Level 3:** A retry count is set to a fixed number in the brief. Is that locked or bounded? Expected: bounded is the better mode; the builder may pick inside a stated range and the range carries the reason.
-- **Level 4:** Three implementation instructions describe the same behavior. What do you replace them with? Expected: one invariant and two examples, so the intent survives a change of implementation.
-- **Level 4:** Why record the reason behind each locked choice? Expected: so a later team can revise it when the evidence changes, without archaeology through old threads.
+- **Level 3:** 有人把生产环境写入决策从锁定改成了委托，模式校验也通过了，为什么这依然是错误的？ Expected: 模式校验只检查格式结构而非产品风险；写入生产环境具有不可逆性且改变了系统权限，因此必须保持锁定。
+- **Level 3:** 任务要求中将重试次数写成固定数值，这属于锁定还是有界？ Expected: 更好的模式是有界；允许开发者在明确声明的取值区间内选择，且该区间附带设定的理由。
+- **Level 4:** 针对同一行为存在三条具体实现指令，你用什么来替换它们？ Expected: 替换为一条不变量和两个具体示例，确保在实现方式变动时核心意图依然能够保留。
+- **Level 4:** 为什么需要记录每项锁定决策背后的原因？ Expected: 便于后续团队在客观证据发生变化时修订，无需再去翻找陈旧的讨论记录。
 
 ## Wrong answers
 
-- "Specify every step so nothing can go wrong." A step-by-step script transcribes the author's mistakes and removes the judgment that catches them.
-- "Give the goal and trust the builder." Without invariants and proof, the builder guesses the system and the result cannot be verified.
-- "A passing unit test proves the feature works." A unit test proves a local contract, not an interface path or an authority boundary.
+- "把每一步骤都规定死，这样就不会出错。" 逐步脚本会照抄作者的错误，并拿掉捕获错误的判断力。
+- "只给出目标，充分信任开发者。" 缺乏不变量与证明依据，开发者只能猜测系统行为，其交付结果也无法被客观验证。
+- "只要单元测试通过就证明功能正常。" 单元测试仅证明局部契约，无法证明界面交互路径或权限边界。
 
 ## Taught in
 
-The [specification lesson](../../../phases/14-agent-engineering/51-write-specifications-that-preserve-judgment/) gives the six surfaces, the three decision modes and the rule that proof must match the claim.
+[规范制定课程](../../../phases/14-agent-engineering/51-write-specifications-that-preserve-judgment/)给出了六个维度、三种决策模式以及证明必须匹配声明的核心规则。

@@ -1,6 +1,6 @@
 ---
 id: rl-engine-died-silent
-title: The GPU is idle and the RL log keeps growing
+title: GPU 闲置但强化学习训练日志却不断膨胀
 card: post-training
 kind: debug
 level: 2
@@ -16,51 +16,51 @@ related: [post-training/grpo-groups-teach-nothing]
 updated: 2026-11-03
 ---
 
-You left a one-GPU RL training run alone for an hour. When you come back, the GPU is idle, the process is still alive, and the log file has grown to more than a hundred megabytes. Nothing reports a failure. What happened, how do you confirm it, and what do you put in place so that it cannot happen again?
+你让一个单卡 GPU 的强化学习训练任务在无人看管下运行了一小时。当你返回时，发现 GPU 完全处于空闲状态，训练进程依然活着，而日志文件已经增长到了上百兆字节。没有任何监控系统报告报错崩溃。到底发生了什么？你如何确认根因？应该采取什么机制防止该事故再次发生？
 
 ## Short answer
 
-The rollout engine died and the trainer never noticed. The engine failed during startup, and the rollout client kept sending requests to it, got a 503 from the router on each one, and retried. The failed run in the manual wrote 200,533 such error lines in 63 minutes and never reported a failure. Confirm it by counting the error lines per minute and by reading the engine lines above the first error, then run every unattended job with a watchdog that stops the container when the errors do not stop.
+采样引擎已经停止运行，而训练器并未察觉。采样引擎在启动阶段便报错退出，而采样客户端持续向路由器发送文本生成请求，并不断收到路由器返回的 503 报错继而重试。手册记录的失败实验在 63 分钟内写入了 200,533 行此类错误日志，却从未向外部报告失败。确认方法：统计每分钟的错误行数并检查首条错误日志之前的引擎启动输出；长效解决防线是为所有无人值守的训练任务配套运行一个看门狗守护进程，在错误持续不退时停止容器。
 
 ## Full answer
 
-### What a dead engine looks like
+### 引擎停止运行的典型表象
 
-The run that the manual lost asked for an attention backend that its GPU could not run. The engine raised an assertion during startup and exited. The trainer process stayed up and sent generate requests to the router for an hour, and the router returned `503 Service Unavailable` for each one. The first and the last error were 63 minutes apart.
+手册所记录的事故源于配置了当前 GPU 硬件无法运行的注意力后端。采样引擎在启动初期抛出断言并退出。然而训练器主进程依然常驻运行，并在长达一小时的时间里向路由器发送生成请求，路由器对每个请求均返回 `503 Service Unavailable`。首条和末条错误相隔整整 63 分钟。
 
-### Confirm the cause, in this order
+### 严格的排查排错顺序
 
-1. Count `503 Service Unavailable` over the whole log. The manual's healthy runs held none at all, with one exception below.
-2. Count the errors per minute. The dead engine wrote at least 2,669 in every full minute. A healthy but busy engine wrote bursts of up to about a minute and then nothing: the run with 16 answers per prompt logged 22,357 errors in bursts of up to 2,209 in one minute, the client retried, and the run finished every step.
-3. Read the engine lines above the first error. The cause lives there, not in the trainer lines.
+1. 统计整个日志中 `503 Service Unavailable` 的总出现次数。手册的正常运行都没有这种错误，下述一次运行除外。
+2. 统计每分钟产生的错误行数。死掉的引擎在每一个完整分钟内都会疯狂写入至少 2,669 行错误。而一个健康但负载极重的繁忙引擎，只会在长达约一分钟的极短时间窗口内偶发突发峰值，随后迅速归零：例如在每个 prompt 采样 16 个回答的重载实验中，总共记录了 22,357 行错误，单分钟的突发峰值达 2,209 行，但客户端重试成功，训练任务最终完整跑完了全部步骤。
+3. 检查首条 503 错误日志上方的采样引擎启动日志行。真正的崩溃根因记录在那里，而不是在训练器日志里。
 
-### Why a count alone is not enough
+### 为什么单凭错误总数不足以作为报警依据
 
-A count cannot separate a burst from a death, but time can. The watchdog in the manual reads the last 60 seconds of the container log every 30 seconds and counts the errors. It stops the run only when the count passes 100 in ten checks in a row. Replayed on the real error times of the busy run, a rule with six checks would have stopped that healthy run in 17 of 30 cases, because two bursts came 45 seconds apart. With ten checks it stopped no healthy case and still stops a dead engine in about five minutes.
+孤立的错误计数无法区分突发性瞬时拥塞与引擎彻底死亡，但时间维度可以。手册中的看门狗守护程序每隔 30 秒抓取容器过去 60 秒的日志并统计错误数。只有当错误数连续 10 次检测均超过 100 时，看门狗才会判定引擎死亡并强行杀掉容器。若规则放宽为连续 6 次，在面对真实重载健康任务的两次相隔 45 秒的突发拥塞时，30 个案例中有 17 个会将健康任务误判为死亡；而设为连续 10 次检测，既保证了对健康重载任务的零误杀，又能在引擎死亡后约 5 分钟内快速介入止损。
 
-### What the watchdog cannot see
+### 看门狗的盲区
 
-A run that hangs after a reward module import error writes almost no error lines. The manual's test stayed up for two hours with 44 of them, and the watchdog did not fire. For that symptom, look for `ModuleNotFoundError` with no `rollout 0` line after it.
+由于模块导入错误导致的挂起假死，进程几乎不会产生连续错误日志。手册实测显示该情况下进程运行两小时且只打印了 44 行错误日志，看门狗未能触发。对此类症状，需监控日志中是否出现了 `ModuleNotFoundError` 且其后长时间缺失 `rollout 0`。
 
-### Practice
+### 最佳运维实践
 
-- Start the watchdog in a second terminal for every run you leave alone, and test it first on a container that prints the error on purpose; the manual's test stopped a fake dead engine in 183 seconds.
-- Give each run its own container name and its own log file.
-- Read the exit code: 1 means the watchdog stopped the run, 2 means it lost contact with the container runtime and the run had no guard.
+- 在第二个终端中为每个无人看管的作业后台启动看门狗，并首先在一个故意打印错误的伪容器上验证其有效性；手册实测看门狗在 183 秒内成功干掉了模拟的假死容器。
+- 为每个独立任务分配唯一的容器名称和专用的日志文件路径。
+- 检查退出码：退出码 1 代表看门狗主动终止了异常容器，退出码 2 代表看门狗失去了与容器运行时的连接从而导致守护失效。
 
 ## Follow-ups
 
-- **Level 2:** Why does the trainer not fail when the engine is gone? Expected: the rollout client treats the 503 as a transient error and retries each request; nothing in the loop limits the retries or the idle time.
-- **Level 2:** Where do you look for the reason the engine died? Expected: the engine lines above the first 503 in the same log; in the manual's case an attention backend assertion for a GPU outside its supported range.
-- **Level 3:** Why did the manual raise the watchdog from six checks to ten? Expected: a replay on a healthy run showed bursts 45 seconds apart that six checks mistook for a death; ten checks never fired on a healthy run and still caught a dead engine in about five minutes.
-- **Level 3:** What does the watchdog miss, and what do you add for it? Expected: a run that hangs with few errors, such as a reward import failure; add a check that the first step line appears within a time limit.
+- **Level 2:** 为什么当引擎已经死亡后训练器进程不直接抛出异常退出？ Expected: 采样客户端将 503 视为瞬时网络抖动并无休止地重试每个请求；训练循环内没有任何限制最大重试次数或空转超时的保护机制。
+- **Level 2:** 应该在日志的什么位置定位引擎崩溃的真实原因？ Expected: 同一日志文件中首条 503 错误行上方的引擎启动日志；在手册案例中，是由于指定了超出当前 GPU 支持范围的注意力后端导致的断言崩溃。
+- **Level 3:** 为什么手册将看门狗的连续触发阈值从 6 次放宽到 10 次？ Expected: 在重载健康任务的真实日志重放中，相隔 45 秒的两次突发拥塞会被 6 次检测误判为假死；10 次连续检测彻底消除了误杀，且能在约 5 分钟内可靠捕获死机。
+- **Level 3:** 看门狗会漏掉什么故障，应该追加什么防护？ Expected: 错误很少的挂起，例如奖励模块导入失败；应追加首个训练步日志必须在限定超时时间内产生的硬性超时检查。
 
 ## Wrong answers
 
-- "Kill the run as soon as a 503 appears." A busy engine with hundreds of open requests writes bursts of these errors and recovers; the manual's busy run finished all its steps.
-- "Raise the client retry limit so the run survives." Retries are why the dead run lived for an hour; the engine will not come back by itself, and the GPU sits idle.
-- "The trainer crashed; look at the trainer lines." The trainer was alive and logging errors; the cause is in the engine startup lines above the first error.
+- "一旦日志中出现 503 错误，就立刻杀掉整个训练任务。" 挂载数百个并发请求的繁忙引擎在负载峰值下会产生短时突发 503 并在随后自动恢复；手册中的重载实验证明此类任务能顺利跑完全程。
+- "调大客户端的重试上限，以便任务能够存活。" 盲目重试正是导致死机任务白白空转一小时的直接原因；引擎进程已经退出，不可能自己复活，白白浪费 GPU 算力。
+- "训练器崩溃了，应该查看训练器的报错堆栈。" 训练器进程一直活着并不停记录错误；真正的根因在上方引擎启动失败的崩溃行。
 
 ## Taught in
 
-[Section 1.2 of Miles 101](../../../manuals/miles-101/sections/1-2-add-a-watchdog.md) replays the watchdog rule on real error times, and [section 7.1](../../../manuals/miles-101/sections/7-1-troubleshoot-by-symptom.md) lists the symptom next to the hang after a reward import error.
+[Miles 101 第 1.2 节](../../../manuals/miles-101/sections/1-2-add-a-watchdog.md)在真实错误时间序列上重放了看门狗规则并做了边界测试，而[第 7.1 节](../../../manuals/miles-101/sections/7-1-troubleshoot-by-symptom.md)将该症状与奖励函数导入挂起并列为核心故障。

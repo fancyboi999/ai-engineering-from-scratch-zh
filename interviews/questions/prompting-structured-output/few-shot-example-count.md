@@ -1,6 +1,6 @@
 ---
 id: few-shot-example-count
-title: How many examples go in the prompt, and which ones
+title: prompt 里放几个示例，放哪些
 card: prompting-structured-output
 kind: tradeoff
 level: 2
@@ -16,45 +16,45 @@ related: [prompting-structured-output/cot-when-it-hurts]
 updated: 2026-11-03
 ---
 
-A classification prompt has eight output labels. One engineer wants twenty examples in the prompt to be safe, another wants none and a longer instruction. How many examples do you include, which ones, and what decides it?
+某个分类 prompt 有八个输出标签。一位工程师想放 20 个示例求稳，另一位想一个都不放，改写更长的指令。你放几个示例？放哪些？由什么决定？
 
 ## Short answer
 
-Three to five for most tasks, and for a classifier with many labels one example per label, so eight here. Pick examples that are semantically close to the input and that cover every label, because similar examples beat random ones by 5 to 15 percent on classification. Below three the model has too little signal to extract the pattern; above five you pay context tokens on every call for diminishing returns.
+大多数任务放三到五个；标签多的分类器每个标签放一个，所以这里放八个。选与输入语义相近、并覆盖每个标签的示例，因为在分类任务上，相似示例比随机示例高 5% 到 15%。少于三个，模型得到的信号不足以提取模式；多于五个，收益会递减，却仍要在每次调用中付出上下文 token 的成本。
 
 ## Full answer
 
-### Examples are compressed instructions
+### 示例是压缩过的指令
 
-Instead of describing the format, you show it. Instead of explaining the reasoning, you demonstrate it. The model matches a pattern more reliably than it interprets an abstract rule. On simple sentiment tasks zero-shot and few-shot land within 2 percent of each other; on multi-step arithmetic and symbolic reasoning the examples add 10 to 25 percent.
+与其描述格式，不如直接展示。与其解释推理，不如直接演示。模型匹配模式比理解抽象规则更可靠。在简单情感分类上，零样本和少样本的差距在 2% 以内；在多步算术和符号推理上，示例能带来 10% 到 25% 的提升。
 
-### Which examples
+### 选哪些示例
 
-1. **Semantic similarity.** Pick the examples closest to the input in embedding space. At request time this means a pool of labeled examples and a nearest-neighbor selection per query.
-2. **Label diversity.** Cover every output category, or the model never sees that a label exists.
-3. **Difficulty matching.** Match the complexity of the target problem.
+1. **语义相似度。** 选在嵌入空间里离输入最近的示例。在处理请求时，这意味着维护一个标注示例池，为每次查询选择最近邻示例。
+2. **标签多样性。** 覆盖每个输出类别，否则模型看不到某个标签的示例。
+3. **难度匹配。** 与目标问题的复杂度相当。
 
-### The cost side
+### 成本这一侧
 
-Few-shot adds 200 to 500 tokens to every call. Two things keep that cheap. Hold the count at the knee, three to five. And if the examples are a fixed set, put them in the stable part of the prompt, after the system message and the tool definitions and before anything that changes per request, so a prefix cache serves them at the discounted rate. Examples picked per query by nearest neighbor change between requests, and a prefix cache stops at the first differing token. Put those below the cache breakpoint: the system message and the tool definitions above them still hit, and the examples pay the full rate.
+少样本让每次调用多出 200 到 500 个 token。有两件事能让它便宜。数量停在拐点，也就是三到五个。如果示例是固定的一组，就把它们放在 prompt 的稳定部分，即 system 消息和工具定义之后、任何按请求变化的内容之前，这样前缀缓存能按折扣价提供它们。按查询用最近邻挑出的示例每次请求都不同，而前缀缓存在第一个不同的 token 处就停止匹配。把这类示例放在缓存断点下方：上面的 system 消息和工具定义仍然命中，示例按全价计费。
 
-### When zero-shot wins
+### 零样本什么时候胜出
 
-Simple factual questions, creative tasks where examples constrain the output, and tasks where finding good examples is harder than writing a good instruction. The prompt engineering lesson still recommends two or three examples for a prompt that has to behave the same across providers, because examples transfer better than instructions alone.
+简单的事实问题、示例会束缚输出的创作任务，以及找到好示例比写好指令更难的任务。不过，prompt 工程那一课仍建议：如果一个 prompt 要在不同服务商上表现一致，就放两到三个示例，因为示例比单纯的指令迁移得更好。
 
 ## Follow-ups
 
-- **Level 2:** When does zero-shot win? Expected: simple factual questions, creative tasks where examples constrain, and tasks where good examples are harder to find than a good instruction.
-- **Level 2:** What do examples do that an instruction cannot? Expected: they show the format and the reasoning instead of describing them, and the model matches a shown pattern more reliably than it interprets a rule.
-- **Level 3:** How do you choose the examples at request time? Expected: embed a labeled pool and select the nearest examples to the input while keeping label coverage; the lesson measured a 5 to 15 percent gain over random selection.
-- **Level 3:** The examples cost 200 to 500 tokens on every call. How do you contain that? Expected: keep the count at three to five; place a fixed set of examples in the stable prefix so the prompt cache serves them at the discounted rate, and place examples picked per query below the breakpoint, because they change on every request.
+- **Level 2:** 零样本什么时候胜出？ Expected: 简单的事实问题、示例会束缚输出的创作任务，以及好示例比好指令更难找的任务。
+- **Level 2:** 示例能做到哪些指令做不到的事？ Expected: 它们展示格式和推理，而不是描述；模型匹配看到的模式比理解规则更可靠。
+- **Level 3:** 请求时怎么挑示例？ Expected: 把标注池做嵌入，选离输入最近的示例，同时保持标签覆盖；课程测得比随机选择高 5% 到 15%。
+- **Level 3:** 示例每次调用要花 200 到 500 个 token，怎么控制？ Expected: 数量保持在三到五个；固定的一组示例放进稳定前缀，让 prompt 缓存按折扣价提供；按查询挑选的示例放在断点下方，因为它们每次请求都在变。
 
 ## Wrong answers
 
-- "More examples are always safer." Above five the returns diminish and every example costs context on every call.
-- "Random examples are fine, the model generalizes." Similar examples beat random ones by 5 to 15 percent on classification.
-- "Describe the labels in detail and skip the examples." For a format-sensitive task with many labels, examples transfer the pattern better than a description, and across providers too.
+- "示例越多越保险。" 超过五个收益递减，而且每个示例每次调用都占用上下文。
+- "随机示例就够了，模型会泛化。" 在分类任务上，相似示例比随机示例高 5% 到 15%。
+- "把标签描述详细，不放示例。" 对标签多、格式敏感的任务，示例比描述更能传达模式，跨服务商时也是如此。
 
 ## Taught in
 
-The lesson [few-shot and chain-of-thought](../../../phases/11-llm-engineering/02-few-shot-cot/) gives the counts and the selection principles, the lesson [prompt engineering](../../../phases/11-llm-engineering/01-prompt-engineering/) recommends examples for cross-provider prompts, and the lesson [prompt caching](../../../phases/11-llm-engineering/15-prompt-caching/) places them in the cacheable prefix.
+[少样本与思维链](../../../phases/11-llm-engineering/02-few-shot-cot/)一课给出了示例数量和选择原则，[prompt 工程](../../../phases/11-llm-engineering/01-prompt-engineering/)一课建议跨服务商的 prompt 使用示例，[prompt 缓存](../../../phases/11-llm-engineering/15-prompt-caching/)一课把示例放进可缓存的前缀。

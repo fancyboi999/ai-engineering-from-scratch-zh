@@ -1,6 +1,6 @@
 ---
 id: cancel-a-finished-task
-title: A shutdown that retried a cancel forever
+title: 关停流程陷入取消操作的无限重试
 card: scenarios
 kind: incident
 level: 2
@@ -27,53 +27,53 @@ source:
 
 ## Situation
 
-A supervisor service drives a fleet of remote agents. At the end of a run it lists every task it started and sends `CancelTask` to each one. Its rule for every call is simple: an error means "not yet", so the call goes out again until it returns a task. Last night the shutdown never finished. Two tasks on the `test-runner` agent answered an error on every attempt, for the whole night.
+一个主管服务驱动着一组远程 agent。每次运行结束时，它列出自己启动的所有任务，向每个任务发送 `CancelTask`。它对每次调用的规则很简单：报错就表示“还没好”，于是再发一次，直到返回一个任务为止。昨晚关停一直没有结束。`test-runner` agent 上有两个任务，整晚每次尝试都返回错误。
 
-The on-call engineer reads the supervisor log. One of the two tasks had been stopped by an operator earlier in the run, by hand, through the same agent. After the shutdown routine failed to cancel it, the engineer sent it the message "Try again" to wake it up, and got a second kind of error. The ticket says that the agent is stuck and asks for a restart of the agent. You have the four exchanges that the capture kit recorded for the same sequence of calls.
+值班工程师读了主管服务的日志。两个任务中的一个，在这次运行早些时候已被操作员通过同一个 agent 手动停止。关停例程取消它失败后，工程师给它发了一条消息“Try again”想唤醒它，又收到另一种错误。工单说 agent 卡住了，要求重启 agent。你手上有采集套件针对同一组调用顺序录下的四次交互。
 
 ## Evidence
 
-- [the send that started the suite, and the state it came back in](evidence/the-send.txt)
-- [the reply to the first CancelTask](evidence/first-cancel.txt)
-- [the second CancelTask on the same id, status and code](evidence/second-cancel.txt)
-- [the detail inside the second cancel error](evidence/second-cancel-reason.txt)
-- [a message sent to the canceled task, and the code it got](evidence/message-after-cancel.txt)
-- [the detail inside the error for the message](evidence/message-after-cancel-reason.txt)
-- [what the specification and the implementations say about a repeated cancel](evidence/after-a-cancel-that-errors.txt)
+- [启动测试套件的那次发送，以及任务返回时的状态](evidence/the-send.txt)
+- [第一次 CancelTask 的回复](evidence/first-cancel.txt)
+- [对同一个 id 的第二次 CancelTask：状态码和错误码](evidence/second-cancel.txt)
+- [第二次取消错误里的详情](evidence/second-cancel-reason.txt)
+- [发给已取消任务的消息，以及它收到的错误码](evidence/message-after-cancel.txt)
+- [这条消息的错误里的详情](evidence/message-after-cancel-reason.txt)
+- [规范和各实现对重复取消的说法](evidence/after-a-cancel-that-errors.txt)
 
 ## Questions
 
-1. What did the first cancel return, and what did the task still carry?
-2. The second cancel and the later message got two different codes. What do their details have in common?
-3. Is a repeated cancel an error or a no-op? What does the specification say, and what do the kit and the reference implementation do?
-4. Which call tells the supervisor whether to keep going, and what are its three possible outcomes?
-5. How does the supervisor continue the work that the canceled task was doing?
+1. 第一次取消返回了什么？任务当时还带着哪些内容？
+2. 第二次取消和后来的消息收到两个不同的错误码。它们的详情有什么共同点？
+3. 重复取消是错误还是空操作？规范怎么说？采集套件和参考实现又怎么做？
+4. 哪个调用能告诉主管服务要不要继续？它可能有哪三种结果？
+5. 被取消的任务原来在做的工作，主管服务怎样接着做？
 
 ## Walkthrough
 
-1. **Read the send.** The planner asked for the full suite with `returnImmediately` set, and the task came back in `TASK_STATE_SUBMITTED`. The task exists and runs while the client is away.
-2. **Read the first cancel.** The reply is the task itself, now in `TASK_STATE_CANCELED`, with the status message "Canceled at the client's request." The history holds the request and the agent's progress message, and the artifacts hold the two log chunks the suite had written. A cancel is a request that the server may refuse, and this one succeeded.
-3. **Read the second cancel.** The HTTP status is 200, because JSON-RPC errors travel in a 200. The body has an `error` with code -32002 and the message "Task cannot be canceled". The detail gives the reason `TASK_NOT_CANCELABLE` and, in `metadata`, the state `TASK_STATE_CANCELED`. The error does not say "try later". It says that the task already ended, and how.
-4. **Read the message.** The "Try again" message carries the task id and the context id of the canceled task. The code is -32004 and the reason is `UNSUPPORTED_OPERATION`. The metadata names the same state. A terminal task refuses a message, a cancel and a subscription. Only `GetTask` still answers.
-5. **Read the rule.** One section of the specification lists `TaskNotCancelableError` for a finished task, and another calls cancel idempotent. Both this server and the reference SDK return -32002, and a cancel on a deleted task may return not found. A client cannot know which server it meets, so after a cancel that errors it calls `GetTask`. Canceled means an earlier cancel worked. Another terminal state means the task ended first. Running means the server could not stop it.
-6. **Check the stop set.** Four states are terminal: completed, failed, canceled and rejected. A loop that waits for "a task" as its success condition never ends on a task that is already in one of them.
+1. **读发送请求。** 规划器请求跑完整测试套件，并设置了 `returnImmediately`，任务返回时处于 `TASK_STATE_SUBMITTED`。任务已经存在，客户端不在时它也在运行。
+2. **读第一次取消。** 回复就是任务本身，现在处于 `TASK_STATE_CANCELED`，状态消息是“Canceled at the client's request.”。历史里有这次请求和 agent 的进度消息，产物里有测试套件已写出的两段日志。取消是一个服务端可以拒绝的请求，这一次成功了。
+3. **读第二次取消。** HTTP 状态码是 200，因为 JSON-RPC 错误放在 200 响应里返回。响应体里有一个 `error`，错误码 -32002，消息是“Task cannot be canceled”。详情给出原因 `TASK_NOT_CANCELABLE`，并在 `metadata` 里给出状态 `TASK_STATE_CANCELED`。这个错误说的不是“稍后再试”。它说的是任务已经结束，以及以什么状态结束。
+4. **读消息。** “Try again”这条消息带着已取消任务的任务 id 和上下文 id。错误码是 -32004，原因是 `UNSUPPORTED_OPERATION`。元数据给出的是同一个状态。终态任务拒绝消息、取消和订阅。只有 `GetTask` 还会回答。
+5. **读规则。** 规范有一节为已结束的任务列出 `TaskNotCancelableError`，另一节又说取消是幂等的。这个服务端和参考 SDK 都返回 -32002，对已删除任务的取消可能返回未找到。客户端无法知道自己遇到的是哪种服务端，所以取消报错之后，它调用 `GetTask`。状态是已取消，说明之前的某次取消成功了。是其他终态，说明任务先自己结束了。还在运行，说明服务端停不下它。
+6. **核对停止集合。** 终态有四个：completed、failed、canceled 和 rejected。一个以“返回任务”为成功条件的循环，遇到已经处于其中某个状态的任务，永远不会结束。
 
 ## Resolution
 
-Nothing was stuck. The supervisor's retry rule treated a permanent state as a transient error, and the engineer's "Try again" repeated the same mistake with a message. The fix is in the client. When `CancelTask` returns an error, the supervisor calls `GetTask` once and reads the state. A terminal state closes the entry. The code -32004 is read with its metadata, because the same code also covers a card without streaming and a card without an extended card. To continue the work, the supervisor starts a new task in the same context and names the finished task in `referenceTaskIds`. It never sends a message to a terminal task. In the capture, every call after the cancel is one request and one definitive answer, which is what the shutdown now takes: one pass over the list.
+没有任何东西卡住。主管服务的重试规则把一个永久状态当成了临时错误，工程师的“Try again”又用一条消息重复了同一个错误。修复在客户端。`CancelTask` 返回错误时，主管服务调用一次 `GetTask`，读取状态。终态就关闭这一项。错误码 -32004 要结合元数据读，因为同一个错误码还涵盖 agent 名片不支持流式和不提供扩展名片这两种情况。要继续工作，主管服务在同一个上下文里新建任务，并在 `referenceTaskIds` 里写上已结束的任务。它从不给终态任务发消息。在这份采集里，取消之后的每次调用都是一个请求、一个确定的回答；关停现在需要的也正是这样：把列表过一遍。
 
 ## Wrong turns
 
-- "Retry the cancel until it returns the task." The second cancel answers -32002 every time, and its metadata already names the final state. The retry can only stop when the client stops it.
-- "Message the task to restart it." A terminal task never changes again. The message gets -32004. New work is a new task, with the old id in `referenceTaskIds`.
-- "Read -32004 as 'this server does not support cancel'." The code covers three cases: no streaming, no extended card, and a terminal task. The message and the metadata, or a `GetTask`, tell them apart.
-- "Stop the loop on completed, failed and canceled." Rejected is terminal too. A loop that forgets it polls a refused task forever.
-- "Restart the agent." The agent answered every call at once with a correct error. A restart would throw away the task store and turn the next lookup into a not found.
+- "一直重试取消，直到它返回任务。" 第二次取消每次都返回 -32002，它的元数据已经给出了最终状态。重试只有在客户端停下它时才会停。
+- "给任务发消息让它重新开始。" 终态任务不会再变化。这条消息会收到 -32004。新的工作就是新的任务，把旧 id 写进 `referenceTaskIds`。
+- "把 -32004 理解为这个服务端不支持取消。" 这个错误码覆盖三种情况：不支持流式、没有扩展名片、任务已处于终态。消息和元数据，或者一次 `GetTask`，能把它们区分开。
+- "循环在 completed、failed 和 canceled 时停止。" rejected 也是终态。漏掉它的循环会对一个被拒绝的任务永远轮询下去。
+- "重启 agent。" agent 对每次调用都立即返回了正确的错误。重启会丢掉任务存储，让下一次查询变成未找到。
 
 ## Generalize
 
-An error from a mutation is not a reason to repeat the mutation. Read the state that the error names, or fetch it, and decide from the state. Separate the errors that time will change from the ones that no later call can change, and let the terminal set of your state machine end every loop, including the states you did not expect.
+一次修改操作报错，不构成重复这次修改的理由。读出错误里给出的状态，或者把状态查出来，再按状态做决定。把时间会改变的错误，和以后任何调用都改变不了的错误分开；让状态机的终态集合结束每一个循环，包括你没预料到的那些状态。
 
 ## Taught in
 
-The [cancel page of A2A 101](../../../manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md) walks through these four exchanges, [the state table](../../../manuals/a2a-101/sections/r-3-task-states.md) gives the client's next step for every state, [the errors page](../../../manuals/a2a-101/sections/5-5-errors.md) explains why one code covers three cases, and the [failure modes lesson](../../../phases/14-agent-engineering/26-failure-modes-agentic/) describes the cascade that starts when a client cannot tell "I failed" from "this cannot be done".
+[A2A 101 的取消页面](../../../manuals/a2a-101/sections/4-4-cancel-task-and-terminal-states.md)逐一讲解了这四次交互，[状态表](../../../manuals/a2a-101/sections/r-3-task-states.md)给出了客户端在每种状态下的下一步，[错误页面](../../../manuals/a2a-101/sections/5-5-errors.md)解释了一个错误码为什么覆盖三种情况，[失败模式这一课](../../../phases/14-agent-engineering/26-failure-modes-agentic/)描述了客户端分不清“我失败了”和“这件事做不到”时引发的连锁故障。

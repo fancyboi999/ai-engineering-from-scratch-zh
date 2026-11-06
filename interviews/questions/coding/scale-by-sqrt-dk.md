@@ -1,6 +1,6 @@
 ---
 id: scale-by-sqrt-dk
-title: The scale factor in dot-product attention
+title: 点积注意力里的缩放因子
 card: coding
 kind: code-reading
 level: 1
@@ -16,7 +16,7 @@ related: [coding/softmax-shift-max, coding/causal-mask-off-by-one]
 updated: 2026-11-03
 ---
 
-Here is an attention function from a take-home submission:
+这是一份课后作业里提交的注意力函数：
 
 ```python
 def attention(Q, K, V):
@@ -24,15 +24,15 @@ def attention(Q, K, V):
     return softmax(scores) @ V
 ```
 
-The tests for shape pass and the tests for the attention weights fail. Find the bug and explain what the correct factor protects against.
+形状测试通过了，注意力权重的测试没通过。找出 bug，并解释正确的因子防的是什么。
 
 ## Short answer
 
-The scores are divided by the key dimension instead of its square root. Dot products of random vectors grow with the dimension, so without the square root the softmax input is either too large, which saturates it and kills the gradient, or too small, which flattens every row toward uniform. The correct line divides by the square root of the last dimension of the keys.
+分数除以的是 key 的维度，而不是它的平方根。随机向量的点积随维度增长，没有平方根时，softmax 的输入要么太大，使它饱和、梯度消失，要么太小，使每一行都趋于均匀。正确的写法是除以 key 最后一个维度的平方根。
 
 ## Full answer
 
-### The fix
+### 修复
 
 ```python
 def attention(Q, K, V):
@@ -41,31 +41,31 @@ def attention(Q, K, V):
     return softmax(scores) @ V
 ```
 
-### Why the square root
+### 为什么是平方根
 
-When the entries of a query and a key have unit variance, their dot product has a variance equal to the dimension. Its typical size is therefore the square root of the dimension. Dividing by that size brings the scores back to unit scale, where the softmax has useful gradients. Dividing by the dimension itself over-corrects and makes every row close to uniform, so the output is almost the mean of the values regardless of the query.
+query 和 key 的各分量方差为一时，它们点积的方差等于维度。所以点积的典型大小是维度的平方根。除以这个大小，分数回到单位尺度，softmax 在这里有可用的梯度。直接除以维度是矫枉过正，每一行都接近均匀，不管 query 是什么，输出几乎都是 value 的均值。
 
-### Two neighbors of this bug
+### 这个 bug 的两个近亲
 
-- No scale at all: at a head size of 64 the raw scores reach the tens and the softmax saturates to one hot rows.
-- `K.T` on a batched tensor: `.T` reverses every axis, so a shape of batch by tokens by features becomes features by tokens by batch. With distinct sizes the matmul raises a shape error, and when the sizes happen to line up it mixes batches without an error. Swap only the last two axes.
+- 完全不缩放：头大小为 64 时，原始分数能到几十，softmax 饱和成 one-hot 行。
+- 对带 batch 的张量用 `K.T`：`.T` 会反转所有轴，batch 乘 token 乘特征的形状会变成特征乘 token 乘 batch。尺寸各不相同时 matmul 会报形状错误；尺寸恰好对得上时，它会不报错地把不同 batch 混在一起。只交换最后两个轴。
 
-### How the practice checks it
+### 练习怎样检查
 
-The practice task compares the weights, not only the output shape. A wrong scale changes every weight, so a reference weight matrix catches it at once.
+练习比较的是权重，不只是输出形状。错误的缩放会改变每一个权重，所以一个参考权重矩阵立刻就能发现它。
 
 ## Follow-ups
 
-- **Level 1:** What is the shape of the scores for one sequence? Expected: tokens by tokens, one row per query over all keys.
-- **Level 2:** Why do shape tests pass with the wrong factor? Expected: scaling does not change shapes; only the values move.
-- **Level 2:** How do you transpose the keys for a batched input? Expected: swap the last two axes only, for example with `swapaxes(-1, -2)`.
+- **Level 1:** 一个序列的分数是什么形状？ Expected: token 数乘 token 数，每个 query 一行，覆盖所有 key。
+- **Level 2:** 因子错了，形状测试为什么还能通过？ Expected: 缩放不改变形状，只改变数值。
+- **Level 2:** 对带 batch 的输入，怎样转置 key？ Expected: 只交换最后两个轴，例如用 `swapaxes(-1, -2)`。
 
 ## Wrong answers
 
-- "Any constant works, the model learns around it." The learned projections can compensate in training, but the practice checks a fixed reference, and in a trained model the wrong factor changes every head.
-- "Divide by the sequence length." The growth comes from the feature dimension, not from the number of tokens.
-- "Scaling is only for numerical overflow." The max shift inside softmax handles overflow; the scale keeps the softmax out of its saturated and flat regions.
+- "任何常数都行，模型会自己适应。" 训练中学到的投影能补偿一部分，但练习检查的是固定的参考值；在训练好的模型里，错误的因子会改变每一个头。
+- "除以序列长度。" 增长来自特征维度，不是 token 数量。
+- "缩放只是为了防止数值溢出。" softmax 内部减最大值负责处理溢出；缩放让 softmax 远离饱和区和平坦区。
 
 ## Taught in
 
-The [self-attention lesson](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/) explains the square-root scale factor, and the [attention practice](../../../practice/scaled-dot-product-attention/) checks the weights against a reference.
+[自注意力课](../../../phases/07-transformers-deep-dive/02-self-attention-from-scratch/)解释了平方根缩放因子，[注意力练习](../../../practice/scaled-dot-product-attention/)用参考实现核对权重。

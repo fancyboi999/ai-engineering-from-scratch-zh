@@ -1,6 +1,6 @@
 ---
 id: smallest-slice-that-decides
-title: Define the first slice so it can change the decision
+title: 定义能够改变决策的最小切片
 card: behavioral
 kind: design
 level: 2
@@ -16,47 +16,47 @@ related: [behavioral/riskiest-assumption-first, behavioral/prototype-became-prod
 updated: 2026-11-03
 ---
 
-Your team agrees to ship a minimum viable version of a new assistant. Three proposals are on the table: a polished interface on synthetic data, a working data pipeline with no interface, and a read-only replay over ten real incidents. Which one do you argue for, and how do you justify the choice?
+你的团队一致同意为新助手系统发布一个最小可行版本（MVP）。目前有三个备选方案：基于合成数据构建的精致 UI、一个能正常运行但没有前端界面的数据流水线，以及针对十次真实突发事件的只读回放。你支持哪一个方案，如何论证这一选择？
 
 ## Short answer
 
-I argue for the replay over real incidents. Small is useful only when the slice proves something that matters, so I first write the required proof set from the highest-risk open assumptions and reject any candidate that does not cover it. The polished page over fake data and the pipeline without users each remove the exact uncertainty the team needs to test.
+我主张选择针对真实突发事件的回放方案。唯有当切片证明了重要的东西时，小才有价值，因此我首先根据风险最高的开放性假设制定必须证明的事项清单，并拒绝任何无法覆盖该清单的备选方案。基于虚假数据的精致页面与缺乏真实用户的数据流水线，都恰恰排除了团队最急需检验的核心不确定性。
 
 ## Full answer
 
-### Vertical means evidence end to end
+### 纵向贯通意味着端到端的证据
 
-A useful slice crosses the minimum real workflow needed to observe an outcome. It can be narrow in users, data, duration and capability. It must not be narrow by cutting out the uncertainty under test. The replay across ten real incidents tests service identification and operator trust at once. A polished page over fake data may test comprehension but not data feasibility. A production auto-remediator would test everything at once with unacceptable consequence.
+有价值的切片必须贯穿能够观察到业务成效所需的最小真实工作流。它在用户规模、数据量、运行时长和功能范围上可以极其狭窄，但绝不能靠剔除待测的不确定性来缩小范围。对十次真实突发事件的离线重放，能够同时检验服务定位能力与值班人员的信任度。基于假数据的精致界面或许能检验理解成本，却无法验证数据可行性；而生产环境自动修复系统虽然能一次性检验所有环节，却伴随着不可承受的严重后果。
 
-### Required proof comes before scoring
+### 证明资格门槛先于量化打分
 
-I take the highest-risk open assumptions and turn them into a proof set. A candidate is eligible only if it covers that set. Among eligible candidates I compare outcome value, uncertainty reduced, effort, consequence and reversibility. The eligibility gate matters more than the arithmetic. A cheaper candidate that proves one required assumption stays ineligible even with a high score.
+我将风险最高的开放性假设转化为必须证明的证据集。备选方案唯有完全覆盖该证据集时才具备候选资格。在具备资格的候选方案中，我进一步权衡成果价值、消除的不确定性、研发工作量、潜在后果与可逆性。准入门槛远比简单的算术打分重要得多。一个成本更低但只能证明单项假设的方案，即便得分再高也不具备入选资格。
 
-### False minimums I name in the room
+### 我在评审现场点出的虚假最小版本
 
-- The interface-only minimum removes the data and operational uncertainty.
-- The infrastructure-only minimum proves possibility without user value.
-- The happy-path minimum omits the exception that creates most of the risk.
-- The demo minimum produces a persuasive artifact but no repeatable measurement.
-- The platform minimum builds reusable machinery before one workflow has earned it.
+- 仅做界面的最小版本：剔除了真实数据与运维层面的不确定性。
+- 仅做基础设施的最小版本：证明了技术可行性，却无法验证用户价值。
+- 仅覆盖理想主流程的最小版本：省略了产生绝大部分风险的异常分支。
+- 仅用于 Demo 演示的最小版本：产出了极具说服力的展示品，却没有可复现的量化度量。
+- 平台化的最小版本：在尚未有任何单一业务工作流证明其价值前，就过早构建通用的抽象机制。
 
-### The stop rule
+### 止损规则
 
-Before anyone builds, I write what happens if the slice fails: abandon the outcome, change the target user, test a different mechanism, collect better evidence, or narrow authority further. If every possible result leads to "keep building", the slice is not an experiment.
+在任何人动手编码前，我都会写明若该切片检验失败该如何应对：放弃该成果目标、更换目标用户群体、测试其他技术机制、采集更充分的证据，或进一步收窄系统权限。如果每种可能的结果都导向“继续开发”，那么这个切片就不是一次实验。
 
 ## Follow-ups
 
-- **Level 2:** The replay fails. Name two valid next moves. Expected: change the target user or situation, or test a different mechanism; both were written in the stop rule before the build.
-- **Level 2:** Why does a replay beat a live pilot here? Expected: it produces reversible evidence about trust and identification without exposing real users to a system nobody has measured.
-- **Level 3:** A reusable component would speed up all three proposals. When does it get built? Expected: after the slice has produced decisive evidence; building platform machinery first is the platform minimum.
-- **Level 3:** How do you keep the replay from becoming a demo? Expected: a repeatable measurement with a threshold decided in advance, not a persuasive walkthrough.
+- **Level 2:** 重放测试失败了，请列出两个有效的下一步应对举措。 Expected: 调整目标用户或具体应用场景，或者测试不同的技术机制；这两者都在编码前就已写入止损规则中。
+- **Level 2:** 为什么在此场景下离线重放优于实机试运行？ Expected: 它能在不将真实用户暴露给未经度量检验的系统的前提下，产出关于信任度与定位能力的可逆的验证证据。
+- **Level 3:** 一个可复用组件能够加速所有三个方案的开发，应该何时构建？ Expected: 在该切片产出决定性证据之后再构建；优先构建平台化机制属于典型的“平台化虚假最小版本”。
+- **Level 3:** 如何防止重放沦为单纯的 demo？ Expected: 依托预先确定判定阈值的可复现度量，而不是富有说服力的口头演示。
 
 ## Wrong answers
 
-- "The smallest build is the one with the fewest features." Smallness is measured by the evidence gained, not by the feature count.
-- "Build the interface first so stakeholders can see progress." A persuasive artifact without a measurement is the demo minimum.
-- "If the slice fails we iterate." Without a written stop rule, every result leads to more building and nothing was tested.
+- "功能最少的技术构建就是最小版本。" 精简程度是由获取的客观认知证据来衡量的，而非单纯数功能数量。
+- "先搭建前端界面，以便让干系人看到项目进展。" 缺乏度量指标的展示品属于纯粹的 Demo 演示虚假最小版本。
+- "如果切片失败了，我们继续快速迭代即可。" 若没有预先写明止损规则，任何结果都会沦为盲目继续构建的借口，意味着没有任何假设得到检验。
 
 ## Taught in
 
-The [smallest slice lesson](../../../phases/14-agent-engineering/50-choose-the-smallest-testable-slice/) gives the required proof gate, the false minimums and the stop rule.
+[最小切片选择课程](../../../phases/14-agent-engineering/50-choose-the-smallest-testable-slice/)给出了必要证明门槛、虚假最小版本清单以及止损规则设计。

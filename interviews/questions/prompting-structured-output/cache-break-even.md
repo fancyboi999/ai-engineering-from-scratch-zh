@@ -1,6 +1,6 @@
 ---
 id: cache-break-even
-title: Pick the cache lifetime for a batch of code reviews
+title: 为批量代码审查选择合适的缓存生命周期
 card: prompting-structured-output
 kind: estimate
 level: 3
@@ -16,49 +16,49 @@ related: [prompting-structured-output/timestamp-kills-the-cache]
 updated: 2026-11-03
 ---
 
-Your batch job sends the same 15,000-token rubric with each of twenty code reviews, spread over 40 minutes in uneven clusters, and some of the quiet stretches between clusters outlast the short cache. The provider bills a write at 1.25 times the input rate for a five-minute cache and at 2 times the input rate for a one-hour cache, and bills reads at one tenth of the input rate. Which cache do you pick, and show the break-even.
+你的批处理任务做 20 次代码审查，每次都带上同一份 15,000 token 的评分细则。这些请求在 40 分钟内分成几簇不均匀地到达，簇与簇之间有些空闲时段比短缓存的有效期还长。服务商对 5 分钟缓存按输入费率的 1.25 倍收写入费，对 1 小时缓存按 2 倍收写入费，读取按输入费率的十分之一收费。你选哪种缓存？给出盈亏平衡计算。
 
 ## Short answer
 
-The five-minute cache pays for itself on the first read: a write costs 1.25 times and a read 0.1 times the normal input rate, so one write plus one read averages 0.675 times, a saving of 32 percent, and one write plus ten reads averages 0.205 times, a saving of 80 percent. Each read refreshes the five-minute lifetime, so the five-minute cache expires only in a gap longer than five minutes. This batch has such gaps, so the one-hour cache fits; its write costs 2 times the input rate and it needs only two reads to come out ahead, and twenty reviews give far more. The rule of thumb is to cache anything reused at least three times within the lifetime.
+5 分钟缓存在第一次读取时就回本：写入是正常输入费率的 1.25 倍，读取是 0.1 倍，一次写入加一次读取平均为 0.675 倍，省 32%；一次写入加十次读取平均为 0.205 倍，省 80%。每次读取都会刷新 5 分钟的有效期，所以 5 分钟缓存只会在超过 5 分钟的空档里过期。这批任务就有这样的空档，因此 1 小时缓存更合适；它的写入是输入费率的 2 倍，只要两次读取就能领先，而 20 次审查远不止两次。经验法则：有效期内至少复用三次的内容都应该缓存。
 
 ## Full answer
 
-### The arithmetic
+### 算账
 
-| Case | Cost per request against uncached |
+| 情况 | 单次请求成本（相对无缓存） |
 |---|---|
-| One write, five-minute cache | 1.25 |
-| One read | 0.1 |
-| One write plus one read, averaged | 0.675, a saving of 32 percent |
-| One write plus ten reads, averaged | 0.205, a saving of 80 percent |
-| One write, one-hour cache | 2, so two reads to break even |
+| 一次写入，5 分钟缓存 | 1.25 |
+| 一次读取 | 0.1 |
+| 一次写入加一次读取，取平均 | 0.675，省 32% |
+| 一次写入加十次读取，取平均 | 0.205，省 80% |
+| 一次写入，1 小时缓存 | 2，需要两次读取才打平 |
 
-### The lifetime decides it
+### 有效期决定选择
 
-Each read refreshes the five-minute lifetime. If the reviews arrive steadily over 40 minutes, every gap stays inside five minutes, the entry never expires, and the five-minute cache wins with its cheaper write. If some gaps exceed five minutes, as in this batch, each of those gaps costs a new write at the premium, and the one-hour cache holds the whole batch for one write. If instead the reviews come as a burst of a few inside one minute followed by an idle hour, each burst fits the five-minute cache and the cheaper write wins. Pick from the gaps between requests, not from the total count.
+每次读取都会刷新 5 分钟的有效期。如果审查在 40 分钟里稳定到达，每个空档都不超过 5 分钟，条目永远不会过期，写入更便宜的 5 分钟缓存胜出。如果有些空档超过 5 分钟（本批就是这样），每个这样的空档都要按溢价重新写入一次，而 1 小时缓存一次写入就能撑完整批。反过来，如果审查是一分钟内突发几条、随后空闲一小时，每次突发都落在 5 分钟缓存内，写入更便宜的方案胜出。按请求之间的空档来选，不要按请求总数来选。
 
-### Prove it on the response
+### 用响应证明
 
-Read the usage fields: the lesson's first request reports 15,023 tokens written at 1.25 times, and the second reports the same count read at 0.1 times with zero written. In production, gate the deploy on a read fraction above 80 percent after warmup, and split the cost dashboard into cached and uncached tokens.
+读 usage 字段：课程里第一次请求报告写入 15,023 个 token，按 1.25 倍计费；第二次请求报告以 0.1 倍读取了同样数量的 token，写入为零。生产环境里，把「预热后读取占比超过 80%」设为部署门禁，并把成本看板拆成已缓存和未缓存 token 两部分。
 
-### Other provider shapes
+### 其他服务商的形态
 
-The automatic provider gives 50 percent off reads with no premium, up to an hour on a best-effort basis, so the only job is a stable prefix. The explicit cache object on the third provider is storage-billed and reads at about 25 percent of the input rate; it fits reuse of one giant prompt across days.
+自动缓存的服务商对读取打五折（50%），没有写入溢价，尽力保留最长一小时，所以唯一要做的就是让前缀保持稳定。第三家服务商的显式缓存对象按存储计费，读取约为输入费率的 25%，适合跨多天复用同一个超大 prompt。
 
 ## Follow-ups
 
-- **Level 3:** Why does the five-minute cache break even on the first read? Expected: the write costs 1.25 times and the read 0.1 times, so two requests average 0.675 times the uncached cost.
-- **Level 3:** What does the one-hour cache need to come out ahead? Expected: two reads, because its write costs 2 times the input rate.
-- **Level 4:** The reviews arrive in bursts of several within a minute, then nothing for an hour. Does the answer change? Expected: yes; each burst lives inside a five-minute cache, so the cheaper write wins, and the one-hour cache would pay the 2 times write for reuse that never comes.
-- **Level 4:** How do you verify the saving in production rather than on paper? Expected: read the cache creation and cache read token fields on each response, gate the deploy on a read fraction above 80 percent after warmup, and split the dashboard into cached and uncached tokens.
+- **Level 3:** 为什么 5 分钟缓存在第一次读取时就能打平？ Expected: 写入是 1.25 倍，读取是 0.1 倍，两次请求平均下来是无缓存成本的 0.675 倍。
+- **Level 3:** 1 小时缓存需要什么条件才能领先？ Expected: 两次读取，因为它的写入是输入费率的 2 倍。
+- **Level 4:** 如果审查在一分钟内突发几条，然后一小时没有请求，答案会变吗？ Expected: 会；每次突发都落在 5 分钟缓存内，写入更便宜的方案胜出，而 1 小时缓存会为永远不会到来的复用支付 2 倍的写入费。
+- **Level 4:** 怎样在生产环境而不是纸面上验证节省？ Expected: 读每个响应里的 cache creation 和 cache read token 字段，把预热后读取占比超过 80% 设为部署门禁，并把看板拆成已缓存和未缓存 token。
 
 ## Wrong answers
 
-- "Always pick the longer cache to be safe." Its write costs 2 times the input rate against 1.25; with reuse inside five minutes the shorter cache is cheaper.
-- "The write premium makes caching a loss for short jobs." One write plus one read already saves 32 percent on the five-minute cache.
-- "Cache the user message too." It differs on every request, so it never hits; the layout leaves it below the breakpoint.
+- "保险起见，总是选更长的缓存。" 它的写入是输入费率的 2 倍，短缓存是 1.25 倍；复用都在 5 分钟内时，短缓存更便宜。
+- "写入溢价让短任务用缓存反而亏钱。" 在 5 分钟缓存上，一次写入加一次读取就已经省 32%。
+- "把用户消息也缓存起来。" 它每次请求都不同，永远不会命中；布局里它放在断点下方。
 
 ## Taught in
 
-The lesson [prompt caching](../../../phases/11-llm-engineering/15-prompt-caching/) gives the provider table, the break-even arithmetic and the usage fields.
+[prompt 缓存](../../../phases/11-llm-engineering/15-prompt-caching/)一课给出了服务商对照表、盈亏平衡算法和 usage 字段。

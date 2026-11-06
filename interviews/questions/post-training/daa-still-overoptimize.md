@@ -1,6 +1,6 @@
 ---
 id: daa-still-overoptimize
-title: Does dropping the reward model end reward hacking
+title: 去掉奖励模型就能终结奖励作弊吗
 card: post-training
 kind: concept
 level: 4
@@ -16,51 +16,51 @@ related: [post-training/dpo-chosen-logprob-falls, post-training/reward-up-humans
 updated: 2026-11-03
 ---
 
-A staff engineer argues that moving every alignment run from PPO to direct preference methods ends the reward-hacking problem, because there is no reward model left to hack. Make the counter-argument with the mechanism, and say what survives in your pipeline either way.
+一位资深工程师断言：将所有对齐训练从 PPO 迁移到直接偏好优化方法能够一劳永逸地解决奖励作弊问题，因为系统中已经不存在可被攻击的奖励模型了。请从数学机制出发提出反驳，并说明无论哪种技术路线，你的工程流水线中都必须保留哪些防御手段。
 
 ## Short answer
 
-Direct methods remove the explicit reward model, not the proxy. The quantity they optimize is the log ratio of policy to reference, an implicit reward that the preference data pins down only where the data has coverage. Under optimization the policy queries that ratio out of distribution, and the published curves of gold reward against KL show the same peak and then collapse as reward-model pipelines, with the KL regularization failing to stabilize it. What survives: a blind held-out eval, early stopping, broader preference data, and ensembles of signals.
+直接偏好优化方法只是去掉了显式的独立奖励模型，但并没有消除代理度量本身的缺陷。DPO 优化的目标函数本质上是当前策略对参考策略概率比的对数，这是一个隐式奖励函数，偏好数据只能在有样本覆盖的区域约束它。在持续优化过程中，策略会采样出偏离数据分布的输出，公开发表的黄金奖励对 KL 散度曲线显示，直接对齐算法在达到峰值后同样会发生性能坍塌，其固有的结构化 KL 正则化根本无法阻止这一退化。必须在流水线中保留的手段包括：盲测保留集评估、早停、更广泛的偏好数据以及多信号集成。
 
 ## Full answer
 
-### The mechanism
+### 核心数学机制
 
-DPO rewrites the reward as beta times the log ratio of policy to reference. That function is fit from pairs, and it is constrained only on the pairs. Everywhere else its value is whatever the parameterization implies. As the policy moves to raise the margin, it samples from regions no pair covered, where the implicit reward is arbitrary. The study of scaling laws for over-optimization in direct alignment trained policies across KL budgets and found the same shape as reward-model over-optimization: the gold reward rises, peaks, and falls as the KL grows.
+DPO 将奖励重写为参数 beta 乘以策略对参考模型的概率比的对数。该函数是从偏好对比对中拟合出来的，且仅仅在这些数据对上受到严格约束。在偏好数据未能覆盖的广袤输出空间中，其取值完全由神经网络参数化的外推行为决定。当优化过程不断推高胜负边际时，策略模型会漂移到任何样本对都未曾触达的区域，那里的隐式奖励是任意的。关于直接对齐中过度优化缩放法则的研究系统性地训练了跨越不同 KL 预算的模型，绘制出的黄金真实奖励曲线呈现出与传统奖励模型过度优化完全相同的轨迹：随 KL 散度上升，真实性能先上升、触顶，随后随着 KL 的增长而下降。
 
-### Where Goodhart bites now
+### 古德哈特定律在当下的体现形式
 
-In the PPO stack the proxy is a trained reward model. In the direct stack the proxy is the ratio against the reference. The failures look different: the degraded chosen response, where the chosen answer loses probability while the margin grows; length exploitation, where a longer winner pads the gap; arbitrary rewards on pairs that are rare under the reference. They are one disease in a different organ.
+在 PPO 体系中，被攻击的代理目标是一个独立训练的奖励模型。在直接对齐体系中，被攻击的代理目标则是相对于参考模型的概率比率。具体的失效表象有所不同：包括选定回答退化，即边际增大时选定回答的概率却下降；利用长度，即更长的胜出回答拉大差距；以及对参考模型下罕见的回答对给出任意奖励。这是同一种问题在不同位置的表现。
 
-### Why the KL does not save it
+### 为什么结构化 KL 无法拯救它
 
-In PPO the KL term is explicit and tunable, and an adaptive controller holds it near a target. In DPO the anchor is structural: the sigmoid saturates as the ratio grows. The study's result is that this structural regularization does not stop the collapse. Beta changes the speed, not the shape.
+在 PPO 中，KL 惩罚项是显式且动态可调的，自适应控制器能将策略强行约束在目标锚点附近。而在 DPO 中，对参考模型的锚定仅仅是结构性的：依靠几率比变大时 sigmoid 函数的饱和特性提供约束。科研论文的严格结论表明，这种结构性正则化无法阻止性能坍塌。调整超参数 beta 只能改变坍塌发生的速度，而无法改变曲线必将坍塌的轨迹形态。
 
-### What survives in any pipeline
+### 任何对齐流水线中必须长存的工程防线
 
-- A blind, held-out human or trusted-judge eval on a fixed prompt set, read at every checkpoint. It is the one signal the policy cannot game.
-- Early stopping on that eval, not on the training margin.
-- Data: coverage of the regions the policy drifts into, collected from the current policy's samples.
-- Ensembles: several reward signals or several losses on one battery, because one exploit rarely fits all of them.
-- Logs of the absolute chosen log-probability and of the KL to the reference, so that the drift is visible before the eval falls.
+- 在固定 prompt 集上，对每个检查点做留出集盲评，由人类或可信 judge 评估。这是策略模型唯一无法作弊的真实信号。
+- 基于该盲测真实指标执行早停，而不是依据训练边际。
+- 动态主动扩充数据：从当前策略模型的实际采样分布中收集新的偏好数据，填补策略漂移所暴露的盲区。
+- 信号集成：在测试套件中结合多个奖励模型或多种损失函数，因为单一漏洞很难同时欺骗所有机制。
+- 严密监控绝对选定对数概率以及对参考模型的 KL 散度，确保在下游评估指标崩塌之前提前捕捉到策略漂移。
 
-### The honest version of the claim
+### 对该论断的客观评价
 
-Direct methods do remove a model to train and host, PPO's instability, and the class of exploits that live in reward model weights. They are the default for most frontier post-training runs for those reasons. They do not remove the need to guard against over-optimization, so the guard moves into the pipeline design.
+直接偏好方法确实成功省去了训练和部署独立奖励模型的开销，规避了 PPO 训练中数值不稳定的噩梦，并消除了奖励模型自身权重漏洞所滋生的攻击面。这也是当前前沿模型后训练普遍将其作为首选的原因。但它们绝没有消除防御过度优化的必要性，相关的防御责任只是转移到了工程流水线的系统设计之中。
 
 ## Follow-ups
 
-- **Level 3:** What does DPO remove from the PPO stack, concretely? Expected: a reward model to train and host, the PPO loop with its clip and value head, and an explicit KL coefficient; it keeps the frozen reference.
-- **Level 4:** Which variant bounds the gap, and what does that buy against this failure? Expected: the identity-mapping loss, whose margin target is one over two beta; it stops a weak preference from producing an unbounded implicit reward, which removes one path to collapse but not the out-of-distribution query.
-- **Level 4:** How do you detect over-optimization without a gold reward? Expected: a held-out eval with generation, the absolute chosen log-probability, the KL to the reference, and a comparison across checkpoints; a margin that grows while the eval falls is the signature.
-- **Level 4:** Does iterating, with fresh pairs from the current policy each round, help? Expected: yes, it moves the data coverage to where the policy lives, which is what the reference-ratio proxy lacks; it also reintroduces an online loop that needs its own stop rule.
+- **Level 3:** 从具体实现来看，DPO 从 PPO 架构中具体移除了什么？ Expected: 移除了独立训练和托管的奖励模型、带截断和价值评估头的 PPO 训练循环，以及显式的 KL 散度超参数；保留了冻结的参考策略模型。
+- **Level 4:** 哪种 DPO 变体对边界施加了有界约束，这在防御此类失效上带来了什么？ Expected: 恒等映射损失，其边际目标被限制在二倍 beta 分之一；它阻止了微弱偏好产生无限膨胀的隐式奖励，切断了通往坍塌的一条路径，但仍未解决分布外查询的问题。
+- **Level 4:** 在没有黄金标准奖励函数的前提下，你如何在工程中检测过度优化？ Expected: 在保留测试集上执行真实文本生成评估、监控选定回答的绝对对数概率、监控相对参考模型的 KL 散度并跨 checkpoint 对比；边际持续上升而盲测质量下跌正是过度优化的铁证。
+- **Level 4:** 每轮都从当前策略收集新回答对来迭代，是否有帮助？ Expected: 有帮助，它将偏好数据的覆盖范围动态推移到了当前策略实际活动的区域，修补了静态比率代理的缺陷；但它也重新引入了在线循环，需要独立的停止规则。
 
 ## Wrong answers
 
-- "No reward model means nothing to hack." The implicit reward is a function the data pins down only on the pairs; the policy can push it anywhere else.
-- "The structural KL in DPO is enough regularization." The published curves show the same peak and collapse across KL budgets; beta changes the speed, not the shape.
-- "Use a smaller beta so the policy learns faster and you can stop earlier." A smaller beta lets the policy move further from the reference per unit of margin, which is the direction of the failure.
+- "没有奖励模型就意味着没有任何东西可被攻击。" 隐式奖励是一个数学函数，数据仅在有限的数据点上约束了它；优化器完全可以将其推向任意荒谬的未知空间。
+- "DPO 内置的结构性 KL 已经提供了足够充分的正则化。" 公开研究的缩放曲线表明在各种 KL 预算下都会发生坍塌；改变 beta 只能改变速度，改变不了曲线形态。
+- "使用更小的 beta 参数让策略学得更快，从而能够更早停机。" 更小的 beta 意味着在产生单位边际时允许策略偏离参考模型更远，这反而会加速诱发过度优化坍塌。
 
 ## Taught in
 
-The [DPO family lesson](../../../phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/) states the universal over-optimization result and the fixes that transfer, and the [reward modeling lesson](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/) lists the over-optimization guards that every pipeline keeps.
+[DPO 家族课程](../../../phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/)阐述了普遍存在的过度优化定律及其防御手段，而[奖励建模课程](../../../phases/09-reinforcement-learning/09-reward-modeling-rlhf/)列出了所有流水线通用的过度优化防范机制。

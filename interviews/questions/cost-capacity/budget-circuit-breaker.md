@@ -1,6 +1,6 @@
 ---
 id: budget-circuit-breaker
-title: Controls that stop a bug from spending the month
+title: 防止一个 bug 花光整月预算的控制措施
 card: cost-capacity
 kind: design
 level: 2
@@ -16,59 +16,59 @@ related: [cost-capacity/cost-per-outcome]
 updated: 2026-11-03
 ---
 
-Last month a bug in a retry loop spent the whole monthly model budget in two days, and nobody saw it until the invoice. Design the controls that stop the next one, with the thresholds and what each threshold does.
+上个月，一个重试循环里的 bug 两天就花光了整月的模型预算，直到账单寄来才有人发现。请设计能拦住下一次的控制措施，写出各个阈值，以及每个阈值触发什么动作。
 
 ## Short answer
 
-Put a cost tracker on every call and a ladder of thresholds on top of it. At 70 percent of the budget alert, at 85 percent throttle so that every request goes to the cheapest model, and at 95 percent stop so that only cached answers are served and new calls are refused. In front of the ladder, add a rate limit and a daily spend cap per tenant, and a kill switch that pauses a tenant whose spend jumps far above its own history.
+在每次调用上挂一个成本追踪器，再在它上面搭一组阶梯阈值。花到预算的 70% 时告警；到 85% 时限流，所有请求都走最便宜的模型；到 95% 时停止，只返回缓存里的回答，拒绝新调用。在这组阶梯之前，再给每个租户加上速率限制和每日花费上限，并加一个 kill switch：某个租户的花费远远超出它自己的历史水平时，就暂停这个租户。
 
 ## Full answer
 
-### The tracker
+### 追踪器
 
-Every call logs the timestamp, the model, the input and output tokens, the latency, the computed cost, the user, the cache status and the request category. The running total against the monthly budget is the input of every control below. A check that runs nightly is too slow, because a retry loop spends a day's budget in minutes.
+每次调用都记录时间戳、模型、输入和输出 token 数、延迟、算出的成本、用户、缓存状态和请求类别。相对月度预算的实时累计花费，是下面每一项控制的输入。每晚跑一次检查太慢了，因为重试循环几分钟就能花掉一天的预算。
 
-### The budget ladder
+### 预算阶梯
 
-| Share spent | Action |
+| 已花比例 | 动作 |
 |---|---|
-| 70 percent | send an alert |
-| 85 percent | throttle: route every request to the cheapest model |
-| 95 percent | stop: serve cached responses only, refuse new requests |
+| 70% | 发送告警 |
+| 85% | 限流：所有请求都路由到最便宜的模型 |
+| 95% | 停止：只返回缓存的响应，拒绝新请求 |
 
-Each step buys time for the next. The alert gives people a chance to act, the throttle keeps the service up at lower quality while the spend slows, and the stop protects the budget when nobody acted.
+每一级都为下一级争取时间。告警给人一个处理的机会；限流在花费放缓时以较低的质量维持服务；没有人处理时，停止这一级保住预算。
 
-### The per-tenant ladder
+### 按租户的阶梯
 
-The FinOps lesson gives three controls per tenant for a multi-tenant product:
+FinOps 课程为多租户产品给出了每个租户的三项控制：
 
-1. A rate limit at 2 to 3 times the expected peak, with a rate-limit status and a retry header. The tenant feels friction and gets no surprise bill.
-2. A daily spend cap at 1.5 to 3 times the contracted ceiling. Crossing it tightens the rate limit and alerts customer success.
-3. A kill switch when the spend z-score against the tenant's own baseline passes 4. It pauses the tenant and pages on-call.
+1. 速率限制设为预期峰值的 2 到 3 倍，返回限流状态码和重试响应头。租户会感到受阻，但不会收到意外的账单。
+2. 每日花费上限设为合同上限的 1.5 到 3 倍。超过上限就收紧速率限制，并通知客户成功团队。
+3. 租户花费相对自身基线的 z-score 超过 4 时触发 kill switch。它暂停这个租户，并呼叫值班人员。
 
-The z-score matters because tenants differ by orders of magnitude. A fixed amount is noise for a large tenant and a month of budget for a small one.
+z-score 之所以重要，是因为不同租户的规模相差几个数量级。同一个固定金额，对大租户只是噪声，对小租户就是一个月的预算。
 
-### Test the ladder
+### 测试这组阶梯
 
-The caching lesson's exercise simulates 1,000 requests against a budget of 1.00 dollars and checks that each threshold fires. Its projection exercise forecasts the month from the trailing 7-day average and alerts when the forecast exceeds the budget by more than 20 percent. Both belong in the test suite, because a circuit breaker that was never tripped on purpose is a hope.
+缓存课程的练习用 1.00 美元的预算模拟 1,000 个请求，检查每个阈值都会触发。它的预测练习用最近 7 天的平均值预测整月花费，预测值超出预算 20% 以上时告警。这两项都应该放进测试套件，因为从没被故意触发过的熔断器只是一种期望。
 
-### Where it runs
+### 放在哪里运行
 
-At the gateway, where every call passes. A control that lives in one application misses the application that has the bug.
+放在网关上，所有调用都要经过那里。只装在某一个应用里的控制，会漏掉恰好有 bug 的那个应用。
 
 ## Follow-ups
 
-- **Level 2:** Why three thresholds and not one hard stop? Expected: the alert gives people time, the throttle buys more time at lower quality, and the stop protects the budget. One hard stop surprises users with no warning.
-- **Level 3:** What changes for users during the throttle step? Expected: quality, because every request goes to the cheapest model. The service stays up while the spend slows.
-- **Level 3:** Why is the kill switch relative to the tenant's history? Expected: tenants differ by orders of magnitude. A z-score catches a jump for a small tenant and ignores a normal day for a large one.
-- **Level 4:** The retry bug spent the budget in two days. Which control fires first? Expected: the daily spend cap or the z-score kill switch fires on the first day. The monthly ladder would only have warned at 70 percent.
+- **Level 2:** 为什么要三个阈值，而不是一个硬性停止？ Expected: 告警给人留出时间，限流以较低质量再争取一些时间，停止保住预算。只有一个硬性停止，用户会在毫无预警时突然受影响。
+- **Level 3:** 限流这一级对用户有什么变化？ Expected: 质量下降，因为所有请求都走最便宜的模型。服务仍然在线，花费放缓。
+- **Level 3:** 为什么 kill switch 要以租户自己的历史为参照？ Expected: 租户规模相差几个数量级。z-score 能抓住小租户的突增，也不会把大租户的正常一天当成异常。
+- **Level 4:** 重试 bug 两天花光了预算。哪项控制最先触发？ Expected: 第一天就会触发每日花费上限或 z-score kill switch。月度阶梯只会在 70% 时发出一次告警。
 
 ## Wrong answers
 
-- "Set a hard limit at the provider and stop there." The provider limit stops every tenant at once with no warning. The ladder degrades first and isolates the tenant.
-- "An alert to the team channel is enough." The incident is a bug at night. The throttle and the stop act without a person.
-- "Check the budget nightly." A retry loop spends a day's budget in minutes. The tracker has to run on every call.
+- "在提供商那边设一个硬性上限，到了就停。" 提供商的上限会在没有任何预警时同时停掉所有租户。阶梯会先降级，并把出问题的租户隔离出来。
+- "往团队群里发个告警就够了。" 这次事故是夜里的一个 bug。限流和停止不需要有人在场就会生效。
+- "每晚检查一次预算。" 重试循环几分钟就能花掉一天的预算。追踪器必须在每次调用上运行。
 
 ## Taught in
 
-The [caching and cost lesson](../../../phases/11-llm-engineering/11-caching-cost/) sets the three budget thresholds, and the [FinOps lesson](../../../phases/17-infrastructure-and-production/27-finops-llms/) adds the per-tenant enforcement ladder.
+[缓存与成本课程](../../../phases/11-llm-engineering/11-caching-cost/)设定了三个预算阈值，[FinOps 课程](../../../phases/17-infrastructure-and-production/27-finops-llms/)补充了按租户执行的控制阶梯。

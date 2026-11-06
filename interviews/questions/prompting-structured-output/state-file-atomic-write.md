@@ -1,6 +1,6 @@
 ---
 id: state-file-atomic-write
-title: Review a state write that can corrupt the next session
+title: 审查一段可能损坏下一次会话的状态写入
 card: prompting-structured-output
 kind: code-reading
 level: 4
@@ -16,7 +16,7 @@ related: [prompting-structured-output/take-home-two-tier-memory]
 updated: 2026-11-03
 ---
 
-An agent workbench persists its state between sessions with this code. Review it. What can go wrong, what does the lesson's writer do instead, and what else belongs around the write?
+某个 agent 工作台用下面这段代码在会话之间持久化状态。请审查它。哪里会出问题？课程的写入器是怎么做的？写入还需要哪些配套机制？
 
 ```python
 def save_state(path, state):
@@ -28,50 +28,50 @@ def save_state(path, state):
 
 ## Short answer
 
-Two faults. A crash in the middle of the write leaves a truncated file that the next session loads as corrupt state, and the silent except hides it, so the agent resumes against garbage with no signal. The lesson's writer creates a temp file in the same directory, writes, syncs to disk and renames over the target, so the file on disk is either the old version or the new one. Around it belong a schema check that refuses a bad state before it is written, a version field with a migration path, and idempotency keys for tool calls that are not safe to repeat.
+两个缺陷。写到一半崩溃会留下一个被截断的文件，下一次会话把它当作损坏的状态加载；静默的 except 又把问题藏了起来，agent 在毫无信号的情况下基于垃圾数据恢复。课程的写入器在同一目录下创建临时文件，写入，同步到磁盘，再重命名覆盖目标，所以磁盘上的文件要么是旧版本，要么是新版本。配套机制还应包括：在写入前拒绝坏状态的 schema 检查、带迁移路径的版本字段，以及为不能安全重复的工具调用准备的幂等键。
 
 ## Full answer
 
-### The two bugs
+### 两个 bug
 
-The lesson points at a bug report from an open-source project in March 2026 with this exact shape: the state file was written with a plain text write and exceptions were caught and silenced. Partial writes left sessions resuming against corrupt state with no signal. The first bug is the non-atomic write. The second is the except clause that turns a loud failure into a quiet one.
+课程引用了 2026 年 3 月一个开源项目的 bug 报告，代码形态和这里完全一样：状态文件用普通的文本写入方式写出，异常被捕获后静默吞掉。写入不完整导致会话在没有任何信号的情况下从损坏的状态恢复。第一个 bug 是非原子写入。第二个是那条 except，它把本应显露的失败变成了无声的失败。
 
-### The atomic writer
+### 原子写入器
 
-1. Create a temp file with `tempfile.mkstemp` beside the target, inside its directory.
-2. Write the content.
-3. `fsync` so the bytes reach the disk.
-4. `os.replace` the temp file over the target, which is an atomic rename on POSIX and on Windows.
+1. 用 `tempfile.mkstemp` 在目标旁边、也就是目标所在目录里创建临时文件。
+2. 写入内容。
+3. 调用 `fsync`，让字节真正落到磁盘。
+4. 用 `os.replace` 把临时文件替换到目标上，这在 POSIX 和 Windows 上都是原子重命名。
 
-A reader sees the old file or the new file, never a mix.
+读取方看到的要么是旧文件，要么是新文件，绝不会是两者的混合。
 
-### Schema first
+### schema 优先
 
-The state file carries a contract: required keys, an enum of allowed status values, forbidden values such as null for an array, a pattern for task ids, and a `schema_version` integer. The manager validates before it writes, so a bad write is a refused write, and it refuses to load a file at a version it cannot migrate. A migration script ships with every schema bump and runs idempotently on startup.
+状态文件带有契约：必填键、允许的状态值枚举、禁止的值（比如数组字段为 null）、任务 id 的模式，以及一个整数 `schema_version`。管理器在写入前校验，所以坏的写入会被拒绝；它也拒绝加载自己无法迁移的版本的文件。每次 schema 升级都附带一个迁移脚本，启动时以幂等方式运行。
 
-### Around the write
+### 写入的配套机制
 
-- **Idempotency keys.** If a crash lands between a tool call and its checkpoint, recovery retries the call. Fine for a read; dangerous for an email or a database insert. Log a started record with the call id before execution and a completed record with the result after it. On retry, a call with a completed record is skipped and its stored result is used. A call with only a started record may or may not have run, so reconcile it first, for example by asking the target system whether that idempotency key was applied, before you repeat or skip it.
-- **Small state, separate artifacts.** Transcripts, generated files and data sets live in their own files or in object storage; the state holds only the paths.
-- **Event log plus snapshot.** Append every mutation to an event log and snapshot the state on a schedule; resume reads the snapshot and replays later events, which also lets you replay agent decisions when debugging.
+- **幂等键。** 如果崩溃发生在工具调用和它的检查点之间，恢复时会重试这次调用。读操作没问题；发邮件或插入数据库就危险了。执行前记录一条带调用 id 的 started 记录，执行后记录一条带结果的 completed 记录。重试时，有 completed 记录的调用直接跳过，使用保存的结果。只有 started 记录的调用可能执行过也可能没有，所以在重做或跳过之前先核对，比如询问目标系统这个幂等键是否已经生效。
+- **状态要小，产物分开放。** 对话记录、生成的文件和数据集放在各自的文件或对象存储里；状态只保存路径。
+- **事件日志加快照。** 每次变更都追加到事件日志，并按计划给状态做快照；恢复时读快照再重放之后的事件，调试时也能借此重放 agent 的决策。
 
-### What belongs in the file
+### 文件里该放什么
 
-The active task id, the files touched this session, the assumptions made, open blockers and the next action. Not raw transcripts, reasoning traces, sampled completions or vendor model ids. The test is whether the entry would be useful three months from now in a CI rerun.
+当前任务 id、本次会话改动过的文件、做出的假设、未解决的阻塞和下一步动作。不放原始对话记录、推理过程、采样出的补全或厂商的模型 id。检验标准是：三个月后在 CI 里重跑时，这一项还有没有用。
 
 ## Follow-ups
 
-- **Level 3:** Why does the temp file live in the same directory as the target? Expected: so the final step is a rename on the same filesystem and stays atomic; the lesson's recipe is a temp file beside the target, write, sync, replace.
-- **Level 4:** An agent crashes after a tool call and before the checkpoint. What goes wrong on recovery, and what fixes it? Expected: the call is retried, which is dangerous for an email or an insert; log a started record with the call id before execution and a completed record with the result after it; reuse the result of a completed call, and reconcile a call that has only a started record before you repeat it.
-- **Level 4:** Two agents write the same state file within 50 ms. What does the atomic rename save, and what does it not? Expected: it prevents a torn file, so each reader sees one complete version; it does not stop the second write from replacing the first, which needs coordination between the writers.
-- **Level 4:** What belongs in the state file and what does not? Expected: the active task, touched files, assumptions, blockers and the next action; not transcripts, reasoning traces, completions or vendor model ids, and large artifacts only by path.
+- **Level 3:** 为什么临时文件要和目标放在同一个目录？ Expected: 这样最后一步是同一文件系统内的重命名，仍然是原子的；课程的做法是在目标旁边建临时文件，写入，同步，替换。
+- **Level 4:** agent 在工具调用之后、检查点之前崩溃。恢复时出什么问题，怎么修？ Expected: 这次调用会被重试，对发邮件或插入数据很危险；执行前记录带调用 id 的 started 记录，执行后记录带结果的 completed 记录；已完成的调用复用结果，只有 started 记录的调用先核对再决定是否重做。
+- **Level 4:** 两个 agent 在 50 ms 内写同一个状态文件。原子重命名能挽救什么，不能挽救什么？ Expected: 它防止文件被写坏，每个读取方都看到一个完整的版本；它不能阻止第二次写入替换掉第一次，这需要写入方之间的协调。
+- **Level 4:** 状态文件里该放什么，不该放什么？ Expected: 放当前任务、改动过的文件、假设、阻塞和下一步动作；不放对话记录、推理过程、补全或厂商模型 id，大产物只放路径。
 
 ## Wrong answers
 
-- "Catch the exception and keep going, the next write will fix it." The silent except is the second bug; it hides a truncated file that the next session loads.
-- "Write to a temp file, then copy it over the target." A copy can be interrupted too; the atomic step is the rename.
-- "Store the full transcript in the state so nothing is lost." Transcripts are telemetry, not durable state; keep the file small and keep artifacts in separate files with only their paths in state.
+- "捕获异常继续跑，下一次写入会修好的。" 静默的 except 就是第二个 bug；它藏起了一个被截断、会被下一次会话加载的文件。
+- "先写临时文件，再把它复制到目标上。" 复制也会被打断；原子的那一步是重命名。
+- "把完整对话记录存进状态，什么都不会丢。" 对话记录是遥测数据，不是持久状态；文件要小，产物放在单独的文件里，状态里只留路径。
 
 ## Taught in
 
-The lesson [repo memory](../../../phases/14-agent-engineering/34-repo-memory-and-state/) gives the atomic write recipe, the schema-first contract, idempotency keys and the event log pattern.
+[仓库记忆与状态](../../../phases/14-agent-engineering/34-repo-memory-and-state/)一课给出了原子写入做法、schema 优先的契约、幂等键和事件日志模式。

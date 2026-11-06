@@ -1,6 +1,6 @@
 ---
 id: filter-before-search
-title: Filter on metadata ahead of the vector search
+title: 在向量搜索前按元数据过滤
 card: rag
 kind: design
 level: 2
@@ -16,50 +16,50 @@ related: [rag/jurisdiction-leak-in-shared-index, rag/design-rag-over-company-doc
 updated: 2026-11-03
 ---
 
-A question asks what changed in the security policy last month. Your vector search returns a two-year-old security document because it is semantically close. Design the retrieval step so that this cannot happen, and say what else the same mechanism buys you in a regulated deployment.
+问题问的是上个月安全政策的变化，向量搜索却因语义相近返回两年前的安全文档。设计检索步骤，避免这种情况，并说明同一机制对受监管部署还有什么帮助。
 
 ## Short answer
 
-Store metadata with each chunk, such as the source, the creation date, the category, the author and the version, and filter on it before the similarity search runs. For this question the filter is the security category and the last 30 days, so the old document is never a candidate. Under regulation the same pre-filter carries role labels and jurisdiction tags, so a user only retrieves chunks they are allowed to see.
+每个文本块都保存来源、创建日期、类别、作者和版本等元数据，在相似度搜索之前过滤。本题应限定安全类别和最近 30 天，让旧文档无法进入候选集。在受监管场景中，同一个预过滤器还带上岗位标签和司法管辖区标签，用户只能检索到自己有权查看的文本块。
 
 ## Full answer
 
-### Pre-filter, not post-filter
+### 先过滤，再检索
 
-A filter after the top k comes back can leave nothing: if every slot in the top k went to old documents, the right one never had a chance. A filter applied ahead of the search shrinks the space the similarity search runs over, which the advanced RAG lesson calls critical for performance at scale, and an excluded document cannot fill a slot. Vector stores support this as metadata pre-filtering.
+取前 k 个结果后再过滤，可能一个结果都不剩：若前 k 个位置全由旧文档占据，正确文档就从未有机会入选。搜索前过滤会缩小相似度搜索空间；进阶 RAG 课程指出，这对大规模性能至关重要，也能防止排除在外的文档占用候选名额。向量数据库以元数据预过滤的形式支持这一点。
 
-### What to store
+### 保存哪些字段
 
-| Field | Used for |
+| 字段 | 用途 |
 |---|---|
-| Source document | citations and per-document de-duplication |
-| Creation date and version | time windows and stale-document control |
-| Category | scope, such as security or billing |
-| Author | provenance |
-| Role label | who may see the chunk |
-| Jurisdiction tag | which regulatory scope the chunk belongs to |
+| 来源文档 | 引用和按文档去重 |
+| 创建日期与版本 | 时间窗口与过期文档控制 |
+| 类别 | 限定安全、计费等范围 |
+| 作者 | 来源追溯 |
+| 岗位标签 | 确定谁能看到文本块 |
+| 司法管辖区标签 | 确定文本块所属监管范围 |
 
-### The regulated pipeline
+### 受监管流水线
 
-The production capstone orders the query side as: filter by role and jurisdiction first, then parallel dense and BM25 retrieval, then rank fusion, then the top 20 to the reranker, then the top 5 to the generator. The labels are produced at ingestion, next to the chunk summaries, so nothing downstream has to guess them.
+生产综合项目按以下顺序处理查询：先按岗位与司法管辖区过滤，再并行执行稠密检索与 BM25，随后融合排名，将前 20 个结果送入重排模型，前 5 个送入生成器。标签在摄取阶段随文本块摘要生成，下游无需猜测。
 
-### Prove it
+### 如何证明有效
 
-Access control that is not tested is a hope. The capstone runs a pre-release red team with cross-jurisdiction leak probes, and its exercise builds a second corpus slice under another jurisdiction and runs a 20-question cross-jurisdiction probe, scored pass or fail.
+没测试过的访问控制只是一厢情愿。综合项目在发布前执行包含跨司法管辖区泄漏探测的红队测试；练习另建一个属于其他司法管辖区的语料切片，运行 20 个跨区问题，以通过或失败评分。
 
 ## Follow-ups
 
-- **Level 2:** Why filter before the search and not after? Expected: the search space shrinks, which helps at scale, and an excluded document can never take a slot in the top k.
-- **Level 2:** Which fields do you store with each chunk? Expected: source, date, category, author and version, plus role and jurisdiction labels in a regulated setting.
-- **Level 3:** How do you test that the role filter holds? Expected: a probe set of cross-jurisdiction questions, which the capstone runs as a 20-question check scored pass or fail.
-- **Level 3:** Where does the filter sit relative to the reranker and the generator? Expected: before retrieval; the capstone filters, then runs hybrid retrieval, then the reranker gets the top 20 and the generator gets the top 5.
+- **Level 2:** 为什么搜索前过滤，而不是搜索后？ Expected: 可以缩小搜索空间，改善大规模性能，而且排除在外的文档永远不能占用前 k 个位置。
+- **Level 2:** 每个文本块应保存哪些字段？ Expected: 来源、日期、类别、作者、版本；受监管场景还需岗位和司法管辖区标签。
+- **Level 3:** 如何测试岗位过滤有效？ Expected: 使用跨司法管辖区问题探测集；综合项目以 20 个问题检查，并按通过或失败评分。
+- **Level 3:** 过滤相对于重排模型和生成器处于什么位置？ Expected: 在检索之前；综合项目先过滤，再混合检索，随后重排模型接收前 20 个，生成器接收前 5 个。
 
 ## Wrong answers
 
-- "Put the date into the query text so the embedding reflects it." An embedding does not enforce a date; a semantically close old document still scores high.
-- "Filter the results after the top k comes back." If the top k is all old documents the filter leaves nothing, and the right one never had a chance.
-- "Tell the model not to use documents from another jurisdiction." Access control belongs in retrieval, before the text reaches the prompt.
+- "把日期写进查询，让嵌入反映时间。" 嵌入无法强制日期约束；语义接近的旧文档仍会得高分。
+- "取得前 k 个结果后再过滤。" 如果全部是旧文档，过滤后将为空，正确文档从未有机会入选。
+- "告诉模型不要使用其他司法管辖区的文档。" 访问控制应在检索阶段完成，在文本进入 prompt 之前实施。
 
 ## Taught in
 
-The lesson [advanced RAG](../../../phases/11-llm-engineering/07-advanced-rag/) explains metadata pre-filtering, and the capstone [production RAG](../../../phases/19-capstone-projects/08-production-rag-chatbot/) applies the access filters ahead of retrieval and probes them in the red team.
+[进阶 RAG](../../../phases/11-llm-engineering/07-advanced-rag/)课程说明元数据预过滤，[生产 RAG](../../../phases/19-capstone-projects/08-production-rag-chatbot/)综合项目在检索前应用访问过滤，并用红队测试验证。

@@ -1,6 +1,6 @@
 ---
 id: span-kind-client-or-internal
-title: Which agent spans are CLIENT and which are INTERNAL
+title: 哪些 agent span 是 CLIENT，哪些是 INTERNAL
 card: production-mlops
 kind: concept
 level: 1
@@ -16,15 +16,15 @@ related: [production-mlops/read-this-span, production-mlops/trace-context-over-s
 updated: 2026-11-03
 ---
 
-You add tracing to an agent. In one run it calls a model API twice, runs two tools inside its own process and sends one request to a tool server on another machine. Which of these operations get a CLIENT span, which get an INTERNAL span, and why does anyone care?
+你正在给一个 agent 添加追踪。在一次运行中，它调用了两次模型 API，在自己的进程内运行了两个工具，并向另一台机器上的工具服务器发送了一次请求。这些操作中，哪些获得 CLIENT span，哪些获得 INTERNAL span，为什么这很重要？
 
 ## Short answer
 
-A call that leaves the process gets a CLIENT span: the two model API calls and the request to the remote tool server. The agent loop step and a tool that runs in your own process get INTERNAL spans. The kind tells a backend the direction of each call, so it can show which operations left the process and which did not.
+离开进程的调用获得 CLIENT span：两次模型 API 调用，以及发往远程工具服务器的请求。agent 循环步骤和在自己进程内运行的工具获得 INTERNAL span。类型向后端说明每次调用的方向，以便显示哪些操作离开了进程，哪些没有。
 
 ## Full answer
 
-### The tree for this run
+### 这一次运行的树状结构
 
 ```text
 invoke_agent            INTERNAL
@@ -35,37 +35,37 @@ invoke_agent            INTERNAL
  └── chat               CLIENT
 ```
 
-Every span shares one trace id. Each child carries the id of its parent. That is what makes the run one tree instead of six loose records.
+每个 span 共享同一个 trace ID。每个子节点都携带其父节点的 ID。这让整批操作成为一棵树，而不是六条分散的记录。
 
-### The rule
+### 规则
 
-CLIENT marks a call across a process boundary: a model provider, a tool server, a hosted agent service. INTERNAL marks the agent's own loop steps and any tool that runs in the same process. The conventions apply the same rule to the agent span itself: an agent that runs as a remote service is CLIENT from the caller, and an in-process agent framework is INTERNAL.
+CLIENT 标记跨越进程边界的调用：模型服务商、工具服务器、托管的 agent 服务。INTERNAL 标记 agent 自身的循环步骤，以及在同一进程内运行的所有工具。规范对 agent span 本身也应用相同规则：作为远程服务运行的 agent，从调用方看是 CLIENT；进程内的 agent 框架则是 INTERNAL。
 
-### The attributes that go with each kind
+### 各类 span 附带的属性
 
-| Span | Attributes |
+| Span | 属性 |
 |---|---|
-| model call | `gen_ai.operation.name`, `gen_ai.provider.name`, `gen_ai.request.model`, `gen_ai.response.model`, `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`, `gen_ai.response.id` |
-| tool call | `gen_ai.tool.name`, `gen_ai.tool.call.id` |
-| agent run | `gen_ai.agent.name`, `gen_ai.agent.id` |
+| 模型调用 | `gen_ai.operation.name`、`gen_ai.provider.name`、`gen_ai.request.model`、`gen_ai.response.model`、`gen_ai.usage.input_tokens`、`gen_ai.usage.output_tokens`、`gen_ai.response.id` |
+| 工具调用 | `gen_ai.tool.name`、`gen_ai.tool.call.id` |
+| agent 运行 | `gen_ai.agent.name`、`gen_ai.agent.id` |
 
-### Why it matters
+### 为什么重要
 
-Backends draw a waterfall from the kinds and the parent links. A CLIENT span with no response id cannot be matched to the provider log. A tool span with no parent is an orphan, and you can no longer see which agent step caused the call.
+后端根据类型和父级关联绘制瀑布图。缺少响应 ID 的 CLIENT span 无法与服务商日志匹配。没有父级的工具 span 是孤立节点，你无法再看出是哪个 agent 步骤引发了调用。
 
 ## Follow-ups
 
-- **Level 1:** What joins the spans into one tree? Expected: one shared trace id, and a parent span id on every child.
-- **Level 2:** The agent calls a hosted agent service instead of a local one. What kind is that span? Expected: CLIENT, because the agent runs in another process.
-- **Level 2:** Which attribute lets a dashboard split cost by provider? Expected: `gen_ai.provider.name`, and multi-provider dashboards break when it is missing.
-- **Level 3:** A sub-agent runs inside the same process. Does it start a new trace? Expected: no. It is a child span under the parent agent span, so the whole run stays in one trace.
+- **Level 1:** 是什么把多个 span 连成一棵树？ Expected: 一个共享的 trace ID，以及每个子节点上的父 span ID。
+- **Level 2:** agent 调用了托管的 agent 服务而非本地服务，该 span 是什么类型？ Expected: CLIENT，因为该 agent 在另一个进程中运行。
+- **Level 2:** 哪个属性让看板能按服务商切分成本？ Expected: `gen_ai.provider.name`；缺少它时，多服务商看板就会失效。
+- **Level 3:** 同一进程内运行的子 agent，会开启新 trace 吗？ Expected: 不会。它是父 agent span 下的子 span，整套运行保留在同一个 trace 中。
 
 ## Wrong answers
 
-- "Every tool call is a CLIENT span." A tool that runs in your process is INTERNAL. Only the call that leaves the process is CLIENT.
-- "The kind is decoration." Backends read the kind to show direction, and the conventions set it per span category.
-- "Start a new trace for each tool call, for isolation." Separate traces lose the parent link, so you cannot see which step caused the call.
+- "每个工具调用都是 CLIENT span。" 在你进程内运行的工具是 INTERNAL，只有离开进程的调用才是 CLIENT。
+- "类型只是装饰。" 后端读取类型来展示方向，规范也按 span 类别规定了类型。
+- "为了隔离，为每个工具调用开启新 trace。" 分开的 trace 会丢失父级关联，让你无法看出哪一步引发了调用。
 
 ## Taught in
 
-The [OpenTelemetry GenAI lesson](../../../phases/13-tools-and-protocols/20-opentelemetry-genai/) draws the span hierarchy, and the [conventions lesson](../../../phases/14-agent-engineering/23-otel-genai-conventions/) names the span categories and their kinds.
+[OpenTelemetry GenAI 课程](../../../phases/13-tools-and-protocols/20-opentelemetry-genai/)绘制了 span 层级结构，[语义规范课程](../../../phases/14-agent-engineering/23-otel-genai-conventions/)列出了 span 类别及其类型。

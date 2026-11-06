@@ -1,6 +1,6 @@
 ---
 id: residual-stream-and-dropout
-title: What the skip path does and where dropout may go
+title: 跳连路径的作用，以及 dropout 能放在哪里
 card: transformers
 kind: concept
 level: 2
@@ -16,50 +16,50 @@ related: [transformers/pre-norm-vs-post-norm]
 updated: 2026-11-03
 ---
 
-A transformer block has two skip paths, one around attention and one around the feed-forward network. What do they do for training, which of the two sublayers moves information between tokens, and why does a dropout layer placed on the skip path itself break something?
+一个 transformer block 有两条跳连路径，一条绕过注意力，一条绕过前馈网络。它们对训练起什么作用？两个子层中，哪个在 token 之间传递信息？为什么把 dropout 层直接放在跳连路径上会弄坏东西？
 
 ## Short answer
 
-The skip path makes the gradient additive across depth, so its norm stays in scale through a twelve-layer stack instead of shrinking at every layer, and it lets each block learn a small update to a running representation instead of a full replacement. Only attention mixes tokens; the MLP applies the same two layers to every position on its own. Dropout belongs after the attention softmax, on the attention output before the residual add, and after the second linear of the MLP; on the skip path it breaks the identity that carries the gradient, and early stacks that did this trained brittly.
+跳连路径让梯度沿深度变成相加的关系，所以在十二层的堆叠中，梯度范数保持在同一量级，而不是每层缩小一次；它还让每个 block 学习对一个持续传递的表示做小幅更新，而不是整个替换。只有注意力混合 token；MLP 对每个位置单独应用同样的两层。dropout 应该放在注意力 softmax 之后、残差相加之前的注意力输出上，以及 MLP 第二个线性层之后；放在跳连路径上，会破坏承载梯度的恒等关系，早期这样做的堆叠训练起来很脆弱。
 
 ## Full answer
 
-### The block as a function
+### 把 block 看成一个函数
 
-A decoder block takes a tensor of shape `(batch, sequence, embedding)` and returns the same shape. Inside, two sublayers do the work:
+解码器 block 接收形状为 `(batch, sequence, embedding)` 的张量，返回同样形状的张量。内部由两个子层完成工作：
 
 ```text
 x = x + attention(norm(x))
 x = x + mlp(norm(x))
 ```
 
-Each line is an additive update to the stream that flows top to bottom through every block. The lesson calls that tensor the residual stream.
+每一行都是对一条数据流的加法更新，这条流自上而下穿过每个 block。课程把这个张量叫作残差流。
 
-### Why the additive path matters
+### 加法路径为什么重要
 
-Without the skip path, gradients vanish past about six layers. With it, the gradient of the loss with respect to an early layer has a direct term that does not pass through the sublayers, so depth adds terms instead of multiplying attenuations. The second effect is representational: a block does not have to reproduce its input; it adds what it learned.
+没有跳连路径，梯度在约六层之后就会消失。有了它，损失对前面某层的梯度里有一个不穿过子层的直接项，所以深度增加的是相加的项，而不是连乘的衰减。第二个作用在表示上：block 不需要复现自己的输入，只需要把学到的东西加上去。
 
-### Who talks to whom
+### 谁和谁交流
 
-Attention is the only place tokens exchange information. The MLP is position-wise: the same weights apply to every token independently, with a hidden width of four times the embedding width and a GELU in the classic block. The modern block uses SwiGLU, three matrices at about 2.6 times the width so that the parameter count matches the old four-times MLP, and it drops the bias terms.
+注意力是 token 之间交换信息的唯一地方。MLP 是逐位置的：同样的权重独立作用于每个 token，经典 block 里隐藏宽度是 embedding 宽度的四倍，激活函数是 GELU。现代 block 用 SwiGLU，三个矩阵、宽度约 2.6 倍，这样参数量和旧的四倍 MLP 持平，并且去掉了偏置项。
 
-### Dropout on the branches, never on the identity
+### dropout 放在分支上，绝不放在恒等项上
 
-Attention dropout after the softmax, residual dropout on the attention output, and residual dropout after the second linear of the MLP. Dropout applied to the identity term randomly removes part of it, and the gradient path that made depth tractable is no longer reliable.
+注意力 dropout 放在 softmax 之后，残差 dropout 放在注意力输出上，以及 MLP 第二个线性层之后。对恒等项做 dropout 会随机去掉其中一部分，让深度变得可训练的那条梯度路径就不再可靠。
 
 ## Follow-ups
 
-- **Level 2:** Which sublayer would you remove if the model only needed per-token transformations? Expected: attention; the MLP never looks across positions.
-- **Level 3:** Why does the modern FFN use an expansion of about 2.6 instead of 4? Expected: SwiGLU has three weight matrices, so 2.6 times the width matches the parameter count of the two-matrix MLP at 4 times.
-- **Level 3:** Why do modern stacks drop the bias terms in the linear layers? Expected: the lesson reports a slight perplexity improvement and a smaller model.
-- **Level 4:** A reviewer wants to regularize a small model by dropping out the identity term. Your answer? Expected: no; keep dropout on the branch outputs, because the additive identity is what lets the gradient reach early layers.
+- **Level 2:** 如果模型只需要逐 token 的变换，你会去掉哪个子层？ Expected: 注意力；MLP 从不跨位置查看。
+- **Level 3:** 现代 FFN 的扩展倍数为什么约是 2.6，而不是 4？ Expected: SwiGLU 有三个权重矩阵，所以 2.6 倍宽度和两个矩阵、四倍宽度的 MLP 参数量持平。
+- **Level 3:** 现代堆叠为什么去掉线性层的偏置项？ Expected: 课程报告这样困惑度略有改善，模型也更小。
+- **Level 4:** 一位评审想对小模型的恒等项做 dropout 来正则化。你怎么回答？ Expected: 不行；dropout 留在分支输出上，因为正是加法的恒等关系让梯度能传到前面的层。
 
 ## Wrong answers
 
-- "The skip path exists to keep the output shape equal to the input shape." The shape would match anyway; the skip path is about gradient flow and additive updates.
-- "Dropout anywhere inside the block is equivalent." Dropout on the identity term damages the gradient path; dropout on the branch outputs does not.
-- "The feed-forward network mixes information between tokens." It applies the same MLP to each position alone; mixing happens only in attention.
+- "跳连路径是为了让输出形状和输入形状一致。" 没有它形状也一致；跳连路径关乎梯度流动和加法更新。
+- "dropout 放在 block 里任何地方都一样。" 放在恒等项上会损坏梯度路径；放在分支输出上不会。
+- "前馈网络在 token 之间混合信息。" 它对每个位置单独应用同一个 MLP；混合只发生在注意力里。
 
 ## Taught in
 
-The [full transformer lesson](../../../phases/07-transformers-deep-dive/05-full-transformer/) names the six pieces of the block, and the [block capstone](../../../phases/19-capstone-projects/34-transformer-block/) explains the residual stream and the dropout placement.
+[完整 transformer 一课](../../../phases/07-transformers-deep-dive/05-full-transformer/)列出了 block 的六个组成部分，[block 综合项目](../../../phases/19-capstone-projects/34-transformer-block/)解释了残差流和 dropout 的位置。

@@ -1,6 +1,6 @@
 ---
 id: read-the-tiled-softmax
-title: Read the running softmax and find the fragile line
+title: 读懂滑动 softmax，找出脆弱的那一行
 card: transformers
 kind: code-reading
 level: 3
@@ -16,7 +16,7 @@ related: [transformers/flash-attention-is-exact]
 updated: 2026-11-03
 ---
 
-Read this function from the lesson. It computes the attention output for one query against keys and values in blocks of four.
+读一下课程里的这个函数。它把键和值按每块四个分块，计算一个查询的注意力输出。
 
 ```python
 def tiled_softmax_dot(q, K, V, tile=4):
@@ -37,52 +37,52 @@ def tiled_softmax_dot(q, K, V, tile=4):
     return [o / s for o in out]
 ```
 
-Explain the role of `exp_old`, argue that the result equals the one-shot `softmax(qK^T) V`, and point at the input that makes this code produce a NaN.
+解释 `exp_old` 的作用，论证结果等于一次性计算的 `softmax(qK^T) V`，并指出哪种输入会让这段代码产生 NaN。
 
 ## Short answer
 
-The loop keeps a running maximum `m` and a running sum `s` over the blocks seen so far. When a block raises the maximum, `exp_old` is the exponential of the old maximum minus the new one, and it rescales the sum and the partial output so that every earlier term is expressed against the new maximum; a block that does not raise the maximum gives `exp_old` of one. At the end each weight is the exponential of its score minus the global maximum, divided by the global sum, which is exactly the stable softmax. The fragile input is a first block whose scores are all minus infinity, as a fully masked block would be: `new_m` stays minus infinity, and `exp_new` evaluates minus infinity minus minus infinity, which is NaN.
+循环维护到目前为止所见各块的滑动最大值 `m` 和滑动和 `s`。某个块抬高了最大值时，`exp_old` 是旧最大值减新最大值的指数，它重新缩放总和与部分输出，让之前的每一项都以新的最大值为基准；没有抬高最大值的块，`exp_old` 为 1。最后，每个权重都是它的分数减全局最大值后的指数，再除以全局和，这正是数值稳定的 softmax。脆弱的输入是第一个块的分数全为负无穷，完全被 mask 的块就是这样：`new_m` 仍是负无穷，`exp_new` 计算的是负无穷减负无穷，结果是 NaN。
 
 ## Full answer
 
-### The invariant
+### 不变量
 
-After each block, `out` holds the sum over all keys seen so far of `exp(score - m) * v`, and `s` holds the sum of `exp(score - m)`, both relative to the current `m`. The identity that makes the rescale correct is
+每处理完一个块，`out` 保存的是目前所见所有键上 `exp(score - m) * v` 的和，`s` 保存的是 `exp(score - m)` 的和，两者都以当前的 `m` 为基准。让重新缩放成立的恒等式是
 
 ```text
 exp(score - m_new) = exp(score - m_old) * exp(m_old - m_new)
 ```
 
-so multiplying the old accumulators by `exp(m_old - m_new)` moves them to the new reference point without touching any individual score again. The first block has no old reference, which is why `exp_old` is zero when `m` is still minus infinity: the empty accumulators contribute nothing.
+所以把旧的累加器乘以 `exp(m_old - m_new)`，就能把它们挪到新的基准点，而不用再碰任何一个单独的分数。第一个块没有旧基准，所以 `m` 仍是负无穷时 `exp_old` 为零：空的累加器不贡献任何东西。
 
-### Why the final division is exact
+### 最后的除法为什么精确
 
-Division by `s` happens once, at the end, with the global maximum in every exponential. That is the definition of a numerically stable softmax over the whole row, computed without ever holding the whole row. The working set is one block of keys and values and one output vector. The real kernel does this per block of queries, with blocks of keys and values streamed through on-chip memory, and writes each output tile once.
+除以 `s` 只在最后做一次，此时每个指数里用的都是全局最大值。这就是对整行做数值稳定 softmax 的定义，只是计算过程中从未持有整行。工作集是一块键和值，外加一个输出向量。真实的 kernel 按查询块来做这件事，键和值的块流经片上内存，每个输出块只写一次。
 
-### The NaN
+### NaN
 
-A causal kernel skips blocks that lie entirely above the diagonal; a kernel that applies the mask by setting scores to minus infinity must guard the case where every score in the block is minus infinity. Here `max(-inf, -inf, ...)` is minus infinity, and `exp(-inf - (-inf))` is NaN, which then poisons `s` and `out`. The guard: skip a block whose maximum is minus infinity, or test `new_m` before computing `exp_new`.
+因果 kernel 会跳过完全位于对角线上方的块；如果 kernel 靠把分数设成负无穷来施加 mask，就必须防住块里所有分数都是负无穷的情况。这时 `max(-inf, -inf, ...)` 是负无穷，而 `exp(-inf - (-inf))` 是 NaN，随后污染 `s` 和 `out`。防护方法：跳过最大值为负无穷的块，或者在计算 `exp_new` 之前检查 `new_m`。
 
-### What a reviewer tests
+### 评审要测什么
 
-1. Equality with the one-shot softmax on random inputs, within floating-point tolerance.
-2. A second block whose scores are all lower than the first block's maximum, so that the rescale path with `exp_old` equal to one is exercised.
-3. A block whose scores are all higher, so that `exp_old` is less than one and the earlier terms shrink.
-4. A fully masked first block, which must not produce NaN.
+1. 在随机输入上，与一次性 softmax 在浮点容差内相等。
+2. 第二个块的分数全都低于第一个块的最大值，覆盖 `exp_old` 等于 1 的缩放路径。
+3. 某个块的分数全都更高，使 `exp_old` 小于 1，之前的项随之缩小。
+4. 第一个块完全被 mask，不能产生 NaN。
 
 ## Follow-ups
 
-- **Level 3:** What does a smaller tile cost and buy? Expected: more rescale steps and more loop overhead against a smaller working set on chip; the real kernel picks the tile to fit on-chip memory.
-- **Level 3:** Why is `exp_old` set to zero and not one on the first block? Expected: there is no earlier term to carry; the accumulators are empty, and `exp(-inf - new_m)` would be zero anyway for a finite `new_m`.
-- **Level 4:** How does the causal mask change the loop in a production kernel? Expected: blocks fully above the diagonal are skipped rather than masked, and partially masked blocks apply minus infinity per entry before the maximum is taken.
-- **Level 4:** Where does the backward pass get the softmax values it needs? Expected: it recomputes them from the stored row maximum and row sum instead of storing the N by N matrix.
+- **Level 3:** 更小的块有什么代价，换来什么？ Expected: 缩放步骤更多、循环开销更大，换来更小的片上工作集；真实的 kernel 按片上内存的容量选块大小。
+- **Level 3:** 为什么第一个块的 `exp_old` 设为零而不是一？ Expected: 没有之前的项需要继承；累加器是空的，而且对有限的 `new_m`，`exp(-inf - new_m)` 本来也是零。
+- **Level 4:** 在生产 kernel 中，因果 mask 怎样改变这个循环？ Expected: 完全位于对角线上方的块直接跳过而不是施加 mask，部分被遮住的块在取最大值之前逐项设为负无穷。
+- **Level 4:** 反向传播从哪里拿到它需要的 softmax 值？ Expected: 根据存下的每行最大值和每行总和重新计算，而不是存下 N 乘 N 矩阵。
 
 ## Wrong answers
 
-- "`exp_old` is a decay factor like a learning rate." It is an exact change of reference point; the output is identical to the one-shot formula.
-- "You could store the scores and normalize at the end." That stores the full row, which is the memory cost the kernel exists to avoid.
-- "Each block should be normalized by its own sum." A per-block normalization breaks the global softmax; only the final division is correct.
+- "`exp_old` 是一个类似学习率的衰减因子。" 它是精确的基准点变换；输出和一次性公式完全相同。
+- "可以把分数存下来，最后再归一化。" 那样就存下了整行，而 kernel 存在的意义正是避免这份显存开销。
+- "每个块应该用它自己的和来归一化。" 按块归一化会破坏全局 softmax；只有最后那一次除法是对的。
 
 ## Taught in
 
-The [KV cache and Flash Attention lesson](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/) gives this function as the tiled softmax build step.
+[KV cache 与 Flash Attention 一课](../../../phases/07-transformers-deep-dive/12-kv-cache-flash-attention/)在分块 softmax 的构建步骤里给出了这个函数。

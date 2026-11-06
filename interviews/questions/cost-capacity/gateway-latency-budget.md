@@ -1,6 +1,6 @@
 ---
 id: gateway-latency-budget
-title: Which gateways fit in a 20 ms tail budget
+title: 哪些网关放得进 20 ms 的尾延迟预算
 card: cost-capacity
 kind: estimate
 level: 2
@@ -16,53 +16,53 @@ related: [cost-capacity/budget-circuit-breaker]
 updated: 2026-11-03
 ---
 
-Your SLA is a P99 time to first token under 320 ms. The model alone measures 300 ms at P99. You are choosing a gateway to put in front of it. Which classes of gateway fit in the budget, and what do you do when the one you want does not?
+你的 SLA 要求首 token 时间的 P99 低于 320 ms。模型本身的 P99 实测是 300 ms。你要在它前面放一个网关。哪几类网关放得进这个预算？你想要的那个放不进去时怎么办？
 
 ## Short answer
 
-The gateway has at most 20 ms at the tail. An edge-managed gateway at 1 to 3 ms and a high-performance gateway at 3 to 8 ms fit, a lightweight proxy at 5 to 15 ms fits with little margin, and a control-plane gateway at 20 to 40 ms does not. If you need the features of the slow one, split the roles: keep the fast gateway on the request path, run the heavy features out of band, or buy the budget back from the model with a faster first token.
+网关在尾部最多只有 20 ms。边缘托管网关是 1 到 3 ms，高性能网关是 3 到 8 ms，都放得进；轻量代理是 5 到 15 ms，放得进但余量很小；控制面网关是 20 到 40 ms，放不进。如果你需要慢网关的功能，就拆分职责：快网关留在请求路径上，重功能放到带外运行，或者让模型更快吐出首 token，从模型那边把预算挣回来。
 
 ## Full answer
 
-### The budget
+### 预算
 
-The target is 320 ms and the model takes 300 ms, so the gateway may add 20 ms, and that is at the tail. A P99 target means the gateway's own P99, not its median, and a gateway that is quick when idle can be slow under load. The sum of the two tails is a screening estimate only. Before you commit to the SLA, measure the end-to-end first-token P99 through the gateway under load.
+目标是 320 ms，模型占 300 ms，所以网关最多能加 20 ms，而且这是尾部的预算。P99 目标指的是网关自己的 P99，不是它的中位数；一个空闲时很快的网关，在负载下可能很慢。把两段尾延迟相加只是一个筛选用的估算。在承诺 SLA 之前，要在负载下实测经过网关的端到端首 token P99。
 
-### The classes
+### 几类网关
 
-| Class | Overhead in the lesson | Fits |
+| 类别 | 课程给出的开销 | 放得进吗 |
 |---|---|---|
-| edge-managed, zero-ops | 1 to 3 ms | yes |
-| high-performance, built on a mature API gateway | 3 to 8 ms | yes |
-| lightweight open-source proxy | 5 to 15 ms | with little margin |
-| control plane with guardrails and audit | 20 to 40 ms | no |
+| 边缘托管，零运维 | 1 到 3 ms | 能 |
+| 高性能，基于成熟的 API 网关构建 | 3 到 8 ms | 能 |
+| 轻量开源代理 | 5 到 15 ms | 能，但余量很小 |
+| 带护栏和审计的控制面 | 20 到 40 ms | 不能 |
 
-The lesson's rule of thumb matches: for a P99 under 100 ms, pick the edge or the high-performance class. For a P99 under 500 ms, any class works.
+这与课程的经验法则一致：P99 要低于 100 ms，就选边缘托管或高性能这两类。P99 低于 500 ms 时，哪一类都行。
 
-### When you want the slow one
+### 你偏偏想要慢的那个
 
-The control-plane class brings PII redaction, jailbreak detection and audit trails. Three ways to keep them inside the budget:
+控制面这一类带来 PII 脱敏、越狱检测和审计追踪。有三种办法让它们留在预算内：
 
-1. Split the roles. Put the fast gateway on the request path and run observability and audit off the path. The lesson notes that production deployments combine an observability tool with a scale gateway in exactly this split.
-2. Keep only what must be inline. Redaction has to run before the provider sees the prompt, so it stays on the path. Audit and tracing do not.
-3. Buy back budget from the model. Prefix caching lowers the first-token time, and a faster model tier does too.
+1. 拆分职责。快网关放在请求路径上，可观测性和审计放到路径之外运行。课程指出，生产部署正是这样拆分，把一个可观测性工具和一个扛规模的网关组合起来。
+2. 只把必须同步执行的部分留在路径上。脱敏必须在提供商看到 prompt 之前完成，所以它要留在路径上。审计和链路追踪不需要。
+3. 从模型那边挣回预算。前缀缓存能降低首 token 时间，换一个更快的模型档位也能。
 
-### Scale decides as well
+### 规模也会决定选择
 
-The lightweight proxy breaks down around 2000 requests per second with an 8 GB footprint in the published benchmark, and the lesson places it below 500 requests per second. If the traffic will grow past that, the high-performance class is the only one that fits both the latency and the scale.
+在公开的基准测试中，轻量代理在每秒 2000 个请求左右、内存占用 8 GB 时就撑不住了，课程把它放在每秒 500 个请求以下的场景。如果流量会超过这个量，只有高性能这一类能同时满足延迟和规模。
 
 ## Follow-ups
 
-- **Level 2:** Why measure the gateway at P99 and not at its median? Expected: the SLA is a P99, and the gateway's tail adds to the model's tail.
-- **Level 3:** The slow gateway's value is PII redaction. How do you keep it inside the budget? Expected: keep the redaction inline because it must run before the provider sees the prompt, move observability and audit off the path, and then measure whether the remaining overhead fits.
-- **Level 3:** Traffic will triple next year. Which class survives? Expected: the lightweight proxy breaks down around 2000 requests per second, so plan the move to the high-performance class before that.
+- **Level 2:** 为什么要看网关的 P99，而不是它的中位数？ Expected: SLA 是 P99，网关的尾延迟会叠加在模型的尾延迟上。
+- **Level 3:** 慢网关的价值在于 PII 脱敏。怎么把它留在预算内？ Expected: 脱敏必须在提供商看到 prompt 之前运行，所以留在路径上；可观测性和审计移到路径之外，然后实测剩下的开销是否放得下。
+- **Level 3:** 明年流量会涨到三倍。哪一类网关扛得住？ Expected: 轻量代理在每秒 2000 个请求左右就撑不住了，所以在那之前就要计划迁到高性能这一类。
 
 ## Wrong answers
 
-- "Every gateway adds a few milliseconds, pick on features." The lesson's overheads run from 1 to 40 ms, and 40 ms is twice this budget.
-- "Put the gateway behind the model, not in front." The gateway routes and falls back before the model. Behind the model it protects nothing.
-- "Add the gateway's median to the model's P99." Two tails do not add that way. Measure the gateway's own tail under load.
+- "每个网关都只加几毫秒，按功能挑就行。" 课程给出的开销从 1 ms 到 40 ms 不等，40 ms 是这个预算的两倍。
+- "把网关放在模型后面，而不是前面。" 网关在调用模型之前做路由和回退。放在模型后面，它什么都保护不了。
+- "把网关的中位数加到模型的 P99 上。" 两段尾延迟不能这样相加。要在负载下实测网关自己的尾延迟。
 
 ## Taught in
 
-The [AI gateways lesson](../../../phases/17-infrastructure-and-production/19-ai-gateways/) gives the latency overhead per gateway class and the scale ceilings.
+[AI 网关课程](../../../phases/17-infrastructure-and-production/19-ai-gateways/)给出了每类网关的延迟开销和规模上限。

@@ -1,6 +1,6 @@
 ---
 id: design-doc-blocking-review
-title: Review an ML design document and name the blockers
+title: 评审机器学习设计文档并指出一票否决项
 card: system-design
 kind: design
 level: 4
@@ -16,60 +16,60 @@ related: [system-design/when-not-ml, system-design/ab-test-prompt-rollout, syste
 updated: 2026-11-03
 ---
 
-You are the reviewer for ML design documents before any training starts. A team hands you a document for a payment fraud check that proposes batch scoring, where one job takes an hour, with a three-minute staleness limit, reports an offline AUC, lists a majority-class baseline, and has no rollout section. Walk me through your review: the sections you expect, which gaps block, how you score it, and what you tell the team.
+在启动任何模型训练之前，你负责评审机器学习系统设计文档。一个团队递交了一份支付风控反欺诈检查的设计文档：文档提议采用批处理推理打分，单次任务耗时 1 小时，但业务要求的时效上限为 3 分钟，汇报了离线 AUC 指标，列举了多数类基线，且完全没有灰度发布章节。请梳理你的评审过程：你期望看到的章节、哪些缺失属于一票否决项、你如何打分评定，以及你最终给团队的反馈意见。
 
 ## Short answer
 
-The document needs nine sections, and six items block a review because each one makes the system unsafe or useless: the decision that uses the prediction, a business metric, a heuristic or current-system baseline, confirmation that every feature exists at prediction time, a shadow or canary stage with a rollback, and a default action for every failure. This document fails at least three of them: the only baseline is trivial, there is no rollout and no rollback, and the serving choice fails the fit check because batch cannot meet a limit of three minutes when one job takes an hour. I send it back with the blocking list first, and I ask for precision at the decision threshold instead of AUC.
+一份合格的设计文档需要包含九个章节，其中六项属于一票否决的阻断项，因为任何一项缺失都会导致系统处于不安全或无价值状态：依赖该预测的具体业务决策、核心业务指标、启发式规则或现有系统对比基线、确认所有特征在预测时刻均已客观存在、包含回滚机制的影子或金丝雀灰度阶段，以及针对各项故障的明确兜底动作。该文档至少在三项上未通过：唯一的基线是微不足道的，完全缺失灰度发布与回滚方案，且服务模式未能通过匹配度核查，即批处理在单任务耗时 1 小时的情况下根本无法满足 3 分钟的时效限制。我首先会将一票否决清单驳回给团队，并要求使用业务决策阈值下的精确率指标来替代笼统的 AUC。
 
 ## Full answer
 
-### The nine sections
+### 九大核心章节
 
-| Section | Question it answers | Blocking item |
+| 章节 | 所回答的核心问题 | 一票否决阻断项 |
 |---|---|---|
-| Problem | What is predicted, which decision uses it, why rules are not enough | The decision |
-| Metrics | Offline, online, business and guardrail metrics | The business metric |
-| Baselines | Trivial, heuristic and current-system baselines | A heuristic or current baseline |
-| Data | Label source, delay, feature availability at prediction time | No leakage |
-| Budgets and serving | Latency, peak QPS, cost, staleness, and the mode that fits | None |
-| Rollout | Shadow, canary, A/B and the rollback | Shadow or canary plus rollback |
-| Feedback loops | How the model's decisions alter its later training data | None |
-| Failure modes | The default action for each failure | A default for every failure |
-| Monitoring | What is watched after launch | None |
+| 问题定义 | 预测什么目标、哪项业务决策使用它、为何纯规则不够 | 明确的业务决策 |
+| 指标体系 | 离线指标、在线指标、业务指标与护栏指标 | 核心业务指标 |
+| 对比基线 | 简单基线、启发式规则基线以及现有线上流程基线 | 启发式规则或现有系统基线 |
+| 数据链路 | 标签来源、回流延迟、打分时刻特征客观可用性 | 杜绝特征泄漏 |
+| 预算与推理服务 | 延迟、峰值 QPS、成本、数据时效，以及相匹配的模式 | 无 |
+| 灰度发布 | 影子部署、金丝雀灰度、A/B 测试以及回滚方案 | 影子/金丝雀配合回滚 |
+| 反馈闭环 | 模型的业务干预决策如何影响其未来的重训数据 | 无 |
+| 故障模式 | 针对各类异常故障场景的默认兜底动作 | 每类故障均有兜底 |
+| 运维监控 | 上线后对数据与系统的持续监控指标 | 无 |
 
-### Scoring
+### 评分机制
 
-Each checklist item has a weight, a blocking flag and a check. Blocking items weigh 2. The score is the sum of passed weights over the total, and the verdict is ready for review only when the score reaches 0.85 and no blocking item fails. A document can score high on the non-blocking items and still be sent back on one blocker; that is the point of the flag.
+检查清单中的每项都有权重、阻断标记和核验逻辑。阻断项权重为 2。总得分是各项通过权重之和除以总权重，仅当总分达到 0.85 且没有任何阻断项失败时，文档才算达到进入评审的标准。即使非阻断项得分再高，只要触发了一处阻断项，文档就会直接退回；这正是设立阻断标记的意义所在。
 
-### The serving fit check
+### 推理服务匹配度核查
 
-This check reuses the cost model. It reads the workload numbers from the document, prices the chosen mode, and fails when that mode misses the staleness limit, the latency budget or the daily cost budget. A batch job that takes an hour cannot meet a limit of three minutes at any price, so a document that says batch with that limit fails the check. For a payment decision made at request time the fit is online, and the document must state the peak QPS and the p99 budget that size it.
+该核查复用了课程中的成本模型。它从设计文档中读取工作负载参数，为所选推理模式核算成本，若该模式无法满足时效限制、延迟预算或每日成本预算，则直接判定不合格。单次批处理耗时 1 小时，在任何价格下都无法满足 3 分钟的时效限制，因此填报批处理模式直接判定违规。对于支付请求发生时必须做出的即时决策，匹配的模式是在线服务，文档必须明确标明用于容量规划的峰值 QPS 与 p99 延迟预算。
 
-### What I tell the team
+### 给团队的反馈意见
 
-1. Blockers first: name the action that each score starts; add the rule the fraud team uses today as the heuristic baseline and set the minimum lift; add shadow and canary stages with a configuration rollback; write a default for a timeout, a missing feature, a new card and a sudden score shift.
-2. Then the serving section: switch to online, give the budgets, price it.
-3. Then the metric: AUC averages thresholds nobody uses; report precision and recall at the approve, review and block thresholds, and name the business metric and the guardrails.
-4. Last the feedback loop and the monitoring, which are not blocking but will decide the second quarter.
+1. 首先指出阻断项：明确每个预测得分所触发的具体业务动作；补充风控团队当前使用的规则作为启发式基线并设定最低性能提升门槛；补充影子部署与金丝雀阶段，配合基于配置的回滚机制；为超时、特征缺失、新卡号以及得分分布突变补充明确的兜底策略。
+2. 随后修改推理章节：切换为在线服务模式，给出性能预算并测算成本。
+3. 接着修正指标：AUC 抹平了实际业务从不使用的各种阈值表现；需汇报通过、人工审核以及直接拦截三个决策阈值下的精确率与召回率，并明确业务指标与护栏指标。
+4. 最后补充反馈闭环与监控方案，这两项虽然不阻断评审，却会决定系统在第二个季度的表现。
 
-### Why the review happens before training
+### 为什么评审必须发生在训练启动前
 
-Every failure in the churn story at the start of the design lesson happened before training: no decision, stale cadence, a leaked feature, no comparison with the existing rule. A one-page document asks about each, and the review costs a day where the failures cost a quarter.
+设计课程开头的流失预警案例中，每一个严重失败都在训练开始前就已经埋下：缺乏业务决策、时效脱节、特征穿越泄漏、未对比现有业务规则。一页设计文档能够提前对这些隐患逐一排查；评审花费一天，而这些失败会耗费一个季度。
 
 ## Follow-ups
 
-- **Level 3:** The team says the majority baseline is enough since it scores zero on F1. Why is that the wrong baseline? Expected: it is the trivial one and usually weak; the heuristic or current system is the real competitor and the one the lift is measured against.
-- **Level 4:** Why does the serving fit check belong in a document review rather than in load testing? Expected: it is arithmetic on stated budgets and prices, so it catches an infeasible design before a line of serving code exists.
-- **Level 4:** The document proposes a hybrid serving mode. What does the checker do and what do you do? Expected: the lesson's cost model has no hybrid plan, so the check fails until a hybrid plan is added; ask the team to price the batch and the online parts and add the plan.
-- **Level 4:** What is the one non-blocking section you would still refuse to skip for a fraud system? Expected: feedback loops, because blocked payments never get a label and the model drifts toward its own decisions without a clean sample.
+- **Level 3:** 团队说多数类基线的 F1 为零，所以有它就够了。为什么这个基线不对？ Expected: 多数类基线是基础简单基线，通常极弱；启发式规则或现行系统才是真实的竞争对手，模型的超额收益必须对照后者来衡量。
+- **Level 4:** 为什么服务匹配度核查属于设计文档评审环节，而非留到压测阶段？ Expected: 它是基于既定预算指标与云资源价格的纯数学测算，能够在写出哪怕一行服务代码前就提前识破不切实际的架构设计。
+- **Level 4:** 设计文档提议采用混合推理模式，检查器和你会作何反应？ Expected: 课程成本模型此前未内置混合方案，因此检查器会判定不通过直至补齐；要求团队分别为批处理和在线层分步定价，并补充至规划中。
+- **Level 4:** 针对风控反欺诈系统，哪一个非阻断章节是你坚决拒绝跳过的？ Expected: 反馈闭环；因为被拦截的支付永远拿不到标签，若缺乏干净样本，模型会在随后的迭代中严重向自身历史决策漂移。
 
 ## Wrong answers
 
-- "A strong offline metric compensates for a missing rollout." A model with no shadow stage and no rollback reaches users with no way back; that is why rollout blocks.
-- "Score the document and pass it at a high enough total." One failed blocker fails the review regardless of the total.
-- "Serving mode is an implementation detail for later." The fit check shows batch cannot meet the limit at all, which changes the architecture and the cost.
+- "强劲的离线指标可以弥补发布方案的缺失。" 缺乏影子阶段与回滚机制的模型一旦触达真实用户将无路可退；这正是发布方案被设为阻断项的原因。
+- "只要总分足够高，就可以通过设计评审。" 只要有一项阻断项失败，无论总分多高都必须直接驳回。
+- "服务运行模式是后续实现的工程细节。" 匹配度核查表明批处理根本无法满足时效限制，这会改变架构和成本。
 
 ## Taught in
 
-The [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) defines the design document, its six blocking items, the score threshold and the serving fit check.
+[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)定义了设计文档规范、六大一票否决阻断项、及格分数阈值以及推理服务匹配度核查。

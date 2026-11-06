@@ -1,6 +1,6 @@
 ---
 id: llm-size-sets-ceiling
-title: Which knob moves a multimodal reasoning score
+title: 哪个维度能真正提高多模态推理能力基准得分
 card: multimodal
 kind: concept
 level: 2
@@ -16,50 +16,50 @@ related: [multimodal/qformer-or-mlp]
 updated: 2026-11-03
 ---
 
-Your 7B vision-language model trails a competitor on a multimodal reasoning benchmark by several points. The team's plan is a new connector design. Argue for or against, using what the ablation literature says about where the score comes from.
+你们自研的 7B 视觉语言模型在多模态复杂推理基准测试中落后竞品好几分。团队当前的改进计划是重新设计一套全新的连接器（Connector）。请结合消融实验领域的文献结论，就该计划给出支持或反对的论证。
 
 ## Short answer
 
-Against. Across the controlled studies, swapping the connector moved a reasoning benchmark by less than a point at a fixed token count, while swapping the encoder moved it by three or more, and doubling the language model from 7B to 13B added two to four points. The reasoning ceiling of such a model is the text reasoning ceiling of its language model; the visual side can only feed it. Spend the effort on the language model size, the encoder, the token count and the data before the connector.
+反对。在严格控制变量的系列消融研究中，在固定视觉 token 数量的前提下更换连接器结构对推理基准得分的影响通常小于 1 分；而更换更强的视觉编码器能带来 3 分以上的提升，将语言模型从 7B 扩展至 13B 更是能直接带来 2 到 4 分的跃升。多模态模型的推理能力上限本质上就是其底层大语言模型纯文本推理能力的上限；视觉侧充其量只能为其提供充足的高质量特征输入。在折腾连接器之前，应优先把研发精力投入到语言模型参数规模、视觉编码器选型、视觉 token 数量以及数据质量上。
 
 ## Full answer
 
-### The decomposition
+### 跑分方差的科学归因分解
 
-The one study that held every axis fixed but one found that the per-image visual-token count explained about 60 percent of the variance in scores, the encoder about 20 percent, the connector about 5 percent, and everything else about 15 percent.
+一项保持其余所有轴向严格不变的控制变量研究表明：单图所分配的视觉 token 数量解释了基准得分约 60% 的方差，视觉编码器贡献了约 20%，连接器仅贡献了约 5%，其余因素共占约 15%。
 
-### The language model sets the ceiling
+### 大语言模型决定推理天花板
 
-Going from a 7B to a 13B language model reliably added 2 to 4 points on the flagship reasoning benchmark across the papers in the lesson, and at 70B most benchmarks saturate. The reason is structural: the encoder produces features and the connector translates them, but the reasoning happens in the language model. A 7B model cannot stand in for a 70B model through a cleverer connector.
+在课程引用的多篇前沿论文中，将大语言模型从 7B 扩大到 13B 能稳定为旗舰级多模态推理基准带来 2 到 4 分的增长；而在扩大至 70B 时绝大多数基准测试甚至出现饱和。其结构性根因非常直观：视觉编码器负责提取特征，连接器负责空间投影对齐，但所有逻辑推导与多跳推理全部发生在大语言模型内部。再精巧的连接器设计也无法让一个 7B 的语言模型凭空拥有 70B 模型的逻辑深度。
 
-### The encoder is the second lever
+### 视觉编码器是第二大有效杠杆
 
-Swapping the common contrastive encoder for a stronger one added 3 or more points on the reasoning benchmark in one study, and self-supervised encoders led a vision-centric benchmark by about 5 to 7 points over the common contrastive one. The 2026 default pairs a strong contrastive encoder with a self-supervised one for dense features when grounding matters.
+一项研究中，用更强的编码器替换常用的对比学习编码器，使推理基准提高了 3 分或更多；在以视觉为核心的基准上，自监督编码器比常用的对比学习编码器高出约 5 到 7 分。2026 年的默认做法是在需要视觉定位依据时，将强对比学习编码器与提供密集特征的自监督编码器搭配使用。
 
-### The connector is a wash
+### 连接器架构影响微弱
 
-At a fixed token count, an MLP, a query bridge and a resampler landed within about 1 point of each other in several independent studies. The connector is a cost question about tokens, not a quality question.
+在固定视觉 token 数量的严谨对比下，多层感知机（MLP）、查询桥接层（Q-Former）和重采样器（Resampler）在多个独立研究中的成绩差距都在 1 分以内。连接器本质上是关于 token 数量预算与显存开销的工程权衡，而不是决定模型智能质量的决定性因素。
 
-### What to do instead
+### 正确的破局路线
 
-1. Check the token count per image; more visual tokens up to the sweet spot helps more than any connector.
-2. Check the encoder and the resolution schedule.
-3. Check the data: detailed human captions beat distilled synthetic captions at the same token count.
-4. If the gap is in reasoning, the honest fix is a larger language model, and the budget question follows.
+1. 检查单张图像分配的 token 数量；在未达到边际收益拐点前，增加视觉 token 比改进任何连接器都更有效。
+2. 审查视觉编码器表征能力及分辨率调度策略。
+3. 审查训练数据质量：在相同 token 数量下，详尽的人工口述描述优于模型生成的蒸馏数据。
+4. 若真正的业务差距在多步复杂推理上，最诚实的解决之道是换用更大参数规模的大语言模型底座，随后评估计算预算。
 
 ## Follow-ups
 
-- **Level 2:** Why does a bigger language model help a visual task? Expected: the benchmark asks for reasoning over what the encoder saw, and the reasoning happens in the language model; the visual side sets what it knows, not how well it thinks.
-- **Level 2:** When would a connector change still be the right move? Expected: when the token budget binds, because then the connector decides how many tokens you can afford, which is the axis that matters most.
-- **Level 3:** Which benchmarks move with the encoder and which do not? Expected: vision-centric benchmarks, counting and grounding, move with a self-supervised encoder, by about 5 to 7 points in one study; the reasoning benchmark also moves, by 3 or more points for a stronger contrastive encoder, so the encoder matters for both kinds.
-- **Level 3:** Design the smallest ablation that settles this for your model. Expected: hold the data, the encoder, the token count, the resolution schedule and the training schedule fixed, swap the language model size in one run and the connector in another, and compare both with the baseline on the same eval.
+- **Level 2:** 为什么更大的语言模型有助于纯视觉任务？ Expected: 基准测试考查的是对编码器所见内容的综合逻辑推理，而推理发生在大模型内部；视觉端决定了模型“看到了什么”，而语言底座决定了它“思考得有多深刻”。
+- **Level 2:** 在什么情况下调整连接器才是正确合理的决策？ Expected: 当上下文 token 预算受到极其严苛的物理限制时，因为此时连接器决定了系统能负担得起多少个 token，而 token 数量正是最关键的轴向。
+- **Level 3:** 哪些基准测试对视觉编码器极度敏感，哪些不敏感？ Expected: 纯视觉感知、细粒度计数与空间坐标定位基准在改用自监督编码器后提升显著（实测高出 5 到 7 分）；同时更强的编码器也为推理基准带来了 3 分以上的提升，因此编码器对两类任务都很关键。
+- **Level 3:** 请设计一套规模最小的消融实验来终结团队关于该问题的争论。 Expected: 保持数据、编码器、token 数量、分辨率调度和训练调度不变，一次实验更换语言模型规模，另一次更换连接器；在相同评估上将两者分别与基线对比。
 
 ## Wrong answers
 
-- "The connector is where the modalities meet, so it must matter most." Its measured share is about 5 percent of the variance; the token count and the encoder dominate.
-- "A better connector lets a small language model reason like a large one." The reasoning ceiling is the language model's; no bridge adds reasoning the language model does not have.
-- "More visual tokens always help." They help up to the sweet spot and then give diminishing returns at a growing compute cost; the gain is in the token count, not in the architecture that emits them.
+- "连接器是双模态交汇的桥梁，理所当然是最核心的技术命门。" 实测表明连接器在跑分方差中仅占约 5% 的微弱份额；token 总量与编码器质量占据绝对主导。
+- "更优越的连接器能让小参数语言模型具备大模型的复杂推理力。" 推理天花板由语言模型决定；任何桥接结构都无法凭空给语言模型注入它原本没有的推导能力。
+- "视觉 token 数量永远越多越好。" 增加到合适范围之前有帮助，之后收益递减、计算成本继续增长；收益来自 token 数量，而非生成这些 token 的架构。
 
 ## Taught in
 
-The [open-weight recipes lesson](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/) decomposes the variance across the five design axes, and the [vision-language models lesson](../../../phases/04-computer-vision/25-vision-language-models/) lays out the pattern the axes belong to.
+[开源 VLM 训练配方课程](../../../phases/12-multimodal-ai/07-open-weight-vlm-recipes/)在五大设计轴向上精确分解了跑分方差归因，[视觉语言模型基础课程](../../../phases/04-computer-vision/25-vision-language-models/)梳理了各轴向所属的宏观架构模式。

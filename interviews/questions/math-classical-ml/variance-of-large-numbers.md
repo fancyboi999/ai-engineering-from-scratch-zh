@@ -1,6 +1,6 @@
 ---
 id: variance-of-large-numbers
-title: A variance that comes out wrong on large values
+title: 在大数值特征上计算错误的方差实现
 card: math-classical-ml
 kind: debug
 level: 3
@@ -16,50 +16,50 @@ related: [math-classical-ml/softmax-inf-at-large-logits, math-classical-ml/gradi
 updated: 2026-11-03
 ---
 
-A feature pipeline computes the variance of a column with the formula mean of x squared minus the square of the mean, in float32. On a column with values near one million the result is far from the true value and sometimes negative. Explain the cause and propose a formula that holds.
+一个特征工程流水线使用平方的均值减去均值的平方这一朴素公式计算单列方差，全程采用 float32 单精度。在数值接近 100 万的数据列上，计算出的方差与真实值相差甚远，甚至偶尔返回负数。请解释问题根源并提供稳健正确的计算公式。
 
 ## Short answer
 
-The two terms are each about 10 to the 12 and almost equal, and their difference is the small true variance. In float32 the spacing between neighboring numbers at that size is far larger than the variance, so the subtraction returns rounding noise, which can be negative. Compute the variance from centered values instead: subtract the mean first, or use the running update that the lesson calls the Welford algorithm.
+两项数值都在 10 的 12 次方左右且几乎完全相等，两者的差值才是真实的微小方差。在 float32 中，该尺度下相邻可表示浮点数之间的间距远大于真实方差，因此相减操作返回的全是舍入噪声，该噪声可能为负数。改用基于中心化数值的方差公式：先减去均值再求平方，或采用课程中介绍的 Welford 单遍流式增量算法。
 
 ## Full answer
 
-### Catastrophic cancellation
+### 灾难性抵消现象
 
-When two nearly equal floating point numbers are subtracted, their leading digits cancel and the rounding error of each operand becomes the leading digits of the result. The lesson's small example subtracts 1.0000001 and 1.0 in float32 and gets a relative error of 19.2 percent from a single operation. The variance formula does this at a much larger scale.
+当两个极其接近的浮点数执行减法时，它们的大量高位有效数字相互抵消，操作数的浮点舍入误差被直接放大为结果的主要有效位。课程中的微型示例在 float32 下用 1.0000001 减去 1.0，仅单次减法便产生了高达 19.2% 的相对误差。朴素方差公式则是在更大的数量级上重演了这一灾难。
 
-### The numbers in the question
+### 题目中大数值的具体算术过程
 
-float32 keeps about 7 decimal digits. For values near one million, x squared is near 10 to the 12, and the gap between representable numbers there is far above 1. The true variance of the lesson's exercise values, 1000000.0, 1000001.0 and 1000002.0, is 0.6667. Both terms of the formula round to the nearest representable value, and the difference carries the rounding, not the variance. A negative result is possible because nothing in the formula stops the rounding from flipping the sign.
+float32 仅能保留大约 7 位十进制有效数字。对于接近 100 万（1e6）的数值，其平方在 10 的 12 次方附近，此时该尺度下相邻可表示浮点数之间的最小间隔远大于 1。课程练习中三个样本值分别为 1000000.0、1000001.0 和 1000002.0，其真实方差仅为 0.6667。朴素公式中的两项各自被舍入到最近的可表示浮点数，二者的减法差值完全被舍入噪声淹没，真实方差荡然无存；由于舍入误差的正负不受约束，相减结果完全可能算成负数。
 
-### A formula that holds
+### 稳健可靠的计算公式
 
-Center first, then square:
+先中心化，再求平方：
 
 ```text
 mean = sum(x) / n
 variance = sum((x - mean)^2) / n
 ```
 
-The deviations are small numbers, their squares are small, and no large nearly equal terms are subtracted. For a stream of values where two passes over the data cost too much, the Welford update keeps a running mean and a running sum of squared deviations, and updates both with each new value. Both approaches give a result close to 0.6667 for the exercise values where the naive formula fails.
+样本偏差 (x - mean) 是微小的数值，其平方也很小，因此避免了两个极其接近的极大数之间的相减。对于两遍扫描成本过高的流式数据，Welford 算法维护实时均值和偏差平方和，并在每个新值到来时更新两者。对于朴素公式崩溃的练习样例，这两种改进方案均能稳定计算出极其贴近 0.6667 的精确方差。
 
-### The same shape elsewhere
+### 该模式在其他场景的重现
 
-The lesson lists the other places this pattern appears: subtracting nearly equal log probabilities, and a finite difference with a step that is too small. The cure is the same each time: rearrange the arithmetic so that the large nearly equal terms are never subtracted.
+课程列举了该灾难性抵消重现的另外两个典型场景：相近对数概率之间的减法，以及步长过小的有限差分梯度计算。根治原则如出一辙：重构算术逻辑，从源头避免相近极大数之间的减法。
 
 ## Follow-ups
 
-- **Level 3:** Why can the naive result be negative when a variance cannot? Expected: the result is rounding noise, and nothing in the formula bounds the sign of noise.
-- **Level 3:** Would float64 fix the pipeline? Expected: it moves the problem to larger values, around 10 to the 15 digits of precision, but the same inputs scaled up break it again; the centered formula fixes it at any scale.
-- **Level 4:** The column arrives as a stream and you cannot hold it in memory for two passes. What do you do? Expected: use the Welford update, which keeps a running mean and a running sum of squared deviations in one pass.
-- **Level 4:** Where does this same cancellation hide inside a normalization layer? Expected: a layer norm or batch norm that computes variance as mean of squares minus squared mean on activations with a large mean; implementations center first for this reason.
+- **Level 3:** 为什么方差在数学上非负，而朴素公式在计算机中却能算出负数？ Expected: 两个相近大数相减的结果全是被放大的舍入误差噪声，公式本身没有任何机制阻止噪声符号翻转为负。
+- **Level 3:** 直接改用 float64 双精度浮点能否彻底解决该问题？ Expected: 双精度只是将问题推迟到了更大的数值规模（精度约为 15 位十进制有效数字）；一旦输入数据继续按比例放大依然会失效，而中心化公式在任意尺度下都具有数值鲁棒性。
+- **Level 4:** 若特征以流式数据实时传入且内存无法容纳两遍扫描，你如何处理？ Expected: 使用 Welford 增量算法，在单遍流式扫描中实时维护滑动均值与平方差累加和。
+- **Level 4:** 相同的灾难性抵消缺陷隐藏在归一化层的什么位置？ Expected: 在均值很大的激活值上直接用平方均值减去均值平方来计算方差的 LayerNorm 或 BatchNorm；实际实现因此先中心化再算方差。
 
 ## Wrong answers
 
-- "The formula is correct algebra, so the code must have a typo." The algebra is exact and the arithmetic is not. The two terms are correct to about 7 digits each, and the variance lives below that.
-- "Clamp the result at zero." That hides the sign and keeps the wrong magnitude.
-- "Divide the column by one million first and multiply the variance back." Scaling helps here, but it moves the mean, not the problem; a column with a large mean and a tiny spread still cancels. Center first.
+- "代数推导完全正确，代码肯定只是有打字笔误。" 代数是精确的但浮点计算机算术不是；两项数值各自具有约 7 位有效位，而真实方差落在有效精度之外。
+- "将计算出的负数结果直接强制截断为零。" 这只是掩盖了负号，完全无法纠正极度错误的数值量级。
+- "先将整列除以 100 万算完方差再乘回去。" 缩放虽能缓解本例，但它移动的是均值而非根因；对于均值极大且方差极小的特征列，减法依然会发生灾难性抵消；必须先中心化。
 
 ## Taught in
 
-The [numerical stability lesson](../../../phases/01-math-foundations/13-numerical-stability/) explains how nearly equal numbers cancel and sets this variance as its first exercise.
+[数值稳定性课程](../../../phases/01-math-foundations/13-numerical-stability/)解释了相近浮点数相减的抵消现象，并将本方差计算设为首个实践练习。

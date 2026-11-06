@@ -1,6 +1,6 @@
 ---
 id: metric-layers-churn-auc
-title: A churn model with a good AUC that nobody uses
+title: AUC 表现优异却无人问津的流失预警模型
 card: system-design
 kind: concept
 level: 1
@@ -16,51 +16,51 @@ related: [system-design/churn-model-system, system-design/when-not-ml]
 updated: 2026-11-03
 ---
 
-A data scientist reports a churn classifier with an AUC of 0.91. Three months after launch, nobody on the retention team uses the scores. The algorithm was fine. Name the design decisions that were missing, and say which metric should have been reported instead.
+一位数据科学家汇报了一个 AUC 高达 0.91 的用户流失分类模型。然而上线三个月后，留存运营团队中没有一个人真正使用该模型的预测得分。算法本身并没有问题。请指出系统设计上缺失的关键决策，并说明当时本应汇报哪项指标。
 
 ## Short answer
 
-The failures happened before training: nobody named the action a score starts, the scores arrived weekly while the team called customers daily, a feature leaked the label through the cancellation reason, and nobody compared the model with the rule the team already used. AUC averages over every threshold including ones never used; the decision was to contact the top 5 percent each night, so the right offline number was precision in that top 5 percent, paired with online, business and guardrail metrics.
+失败发生在训练之前：没有人明确指出预测得分究竟驱动哪项具体业务动作、预测得分按周生成而运营团队每天都要电话触达客户、特征中的订阅取消原因字段直接泄露了未来标签，而且没有人拿模型对照团队现有的业务规则。AUC 对所有阈值取平均，包括从未使用过的阈值；当时的实际业务决策是每晚联系风险最高的前 5% 用户，因此真正正确的离线指标是前 5% 样本的精确率，并与在线指标、业务指标和护栏指标形成完备体系。
 
 ## Full answer
 
-### Four layers of metrics
+### 指标的四个层级
 
-| Layer | When measured | Churn example |
+| 层级 | 测算时机 | 流失预警系统示例 |
 |---|---|---|
-| Offline | Before launch, on held-out past data | Precision in the top 5 percent at the offer threshold |
-| Online | During launch, on live traffic | Offer acceptance rate, share of users scored |
-| Business | Weeks later, with an experiment | 30-day churn in the treated group versus a holdout |
-| Guardrail | All the time | Offer cost per saved user, unsubscribe rate, p99 latency |
+| 离线指标 | 上线前，在留出的历史数据上 | 挽留优惠阈值下排名前 5% 样本的精确率 |
+| 在线指标 | 上线期间，在线上实时流量上 | 优惠接受率、完成打分的用户覆盖比例 |
+| 业务指标 | 数周后，通过实验对比得出 | 干预实验组相比随机对照组的 30 天流失率降低幅度 |
+| 护栏指标 | 全程持续监控 | 挽回单个用户的优惠成本、退订率、p99 延迟 |
 
-The layers disagree often. The offline score comes from a past that did not contain the model. The online metric depends on how people react to the decision. The business metric moves slowly and carries noise from everything else in the company. The guardrails must not get worse.
+各层级指标之间经常出现冲突分歧。离线指标来自不包含该模型历史干预的过去数据。在线指标取决于真实用户对该决策动作的直接反馈。业务指标变动缓慢，且夹杂着公司其他业务变动带来的环境噪音。护栏指标则绝不能变差。
 
-### Pick the offline metric from the decision
+### 依据业务决策反推离线指标
 
-The job contacts a fixed share of users, so the metric is the precision of that share. AUC ranks every pair of users, most of which never reach the decision. The rules guide quoted in the lesson puts it first: design the metrics before deciding what the system does.
+批处理任务的业务动作是触达固定比例的用户，因此核心指标是该触达份额内的预测精确率。AUC 评估的是对全量用户两两配对的相对排序能力，而其中绝大多数用户根本不会被纳入业务干预范围。课程引用的工程规则开宗明义：在决定系统做什么之前，先设计好指标体系。
 
-### Baselines
+### 对比基线
 
-An F1 of 0.56 is good against a best alternative of 0.30 and poor against a rule that reaches 0.60. Three baselines are needed: the trivial one, a heuristic such as the idle-days rule the support team used, and the current system. The lift is measured against the strongest one, and a minimum lift is set before the results are seen.
+0.56 的 F1 分数在最佳备选方案为 0.30 时算好，但若面对能达到 0.60 的简单规则时则属于劣质。需要三个基线：简单基线、启发式基线（如客服团队使用的空闲天数规则），以及现有系统。超额收益必须对照最强基线来衡量，且必须在看到测试结果之前就预先设定好最低性能提升门槛。
 
-### The other three failures
+### 另外三处失败
 
-- Freshness: weekly scores for a daily process means the team acted on stale numbers.
-- Leakage: a feature written after the outcome contained the answer, so the offline score was inflated.
-- Decision: a score with no action attached cannot change a business metric.
+- 数据时效：以周为单位更新的得分用于支持每日开展的业务，导致团队依据过时数据采取行动。
+- 特征泄漏：在结果发生后才填写的字段直接包含了答案，抬高了离线得分。
+- 缺乏决策承接：一个没有绑定任何明确业务动作的分数，根本无法驱动任何业务指标发生改变。
 
 ## Follow-ups
 
-- **Level 1:** Why is a 30-day churn label slow to evaluate? Expected: the label arrives at the end of the horizon, so the business metric lags the launch by at least that long.
-- **Level 2:** Which guardrail would catch a model that saves users at any price? Expected: offer cost per saved user.
-- **Level 2:** The heuristic baseline beats the model by a small margin. What ships? Expected: the rule, because it is cheaper to run and explain, unless the model clears the minimum lift.
+- **Level 1:** 为什么 30 天流失标签评估起来非常缓慢？ Expected: 真实业务标签必须在 30 天周期完全走完后才能确立，导致业务指标至少比上线滞后同样长的时间。
+- **Level 2:** 哪项护栏指标能拦截不惜一切代价挽留用户的失控模型？ Expected: 挽回单个用户的平均优惠成本。
+- **Level 2:** 启发式规则基线以微弱优势击败了模型，应该上线什么？ Expected: 直接上线启发式规则，因为其运行成本更低且业务可解释性更强，除非模型能超过预设的最低超额增益门槛。
 
 ## Wrong answers
 
-- "A higher AUC would have fixed adoption." Adoption failed on freshness, action and trust, not on ranking quality.
-- "Business metrics are enough; skip the offline one." The business metric arrives weeks later and is noisy; the offline metric gates the launch.
-- "Guardrails are a product concern, not a model concern." A model that moves a guardrail the wrong way is rolled back no matter its offline score.
+- "只要 AUC 再高一点，团队就会愿意使用了。" 业务落地的失败根源在于时效脱节、动作缺失与信任崩塌，而非排序质量的高低。
+- "业务指标就足够了，跳过离线指标。" 业务指标在数周后才会延迟返回且充满外部噪音；离线指标是决定模型能否上线的准入门槛。
+- "护栏指标属于产品经理关心的事，与模型无关。" 任何导致护栏指标恶化的模型，无论其离线得分多高，都必须立即予以回滚。
 
 ## Taught in
 
-The [ML system design lesson](../../../phases/02-ml-fundamentals/19-ml-system-design/) opens with the churn model that nobody used and defines the four metric layers and the baselines.
+[机器学习系统设计课程](../../../phases/02-ml-fundamentals/19-ml-system-design/)以无人使用的流失模型为开篇，详细定义了四层指标体系与三类对比基线。

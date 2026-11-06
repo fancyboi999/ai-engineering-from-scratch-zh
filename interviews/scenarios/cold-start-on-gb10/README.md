@@ -1,6 +1,6 @@
 ---
 id: cold-start-on-gb10
-title: A five-minute cold start on the GB10
+title: GB10 上五分钟的冷启动
 card: scenarios
 kind: incident
 level: 2
@@ -26,54 +26,54 @@ source:
 
 ## Situation
 
-A team serves `Qwen/Qwen3-30B-A3B-Instruct-2507` from a pool of GB10 machines behind an autoscaler. At a traffic spike the autoscaler starts new replicas. Each new replica takes more than five minutes before it answers its first request, so the autoscaler counts it as unhealthy and starts more. By the time the replicas are up, the spike is over, and the team pays for machines that served nothing.
+一个团队用一组 GB10 机器部署 `Qwen/Qwen3-30B-A3B-Instruct-2507`，前面有一个自动扩缩器。流量突增时，自动扩缩器会启动新副本。每个新副本要五分钟以上才能回答第一个请求，于是自动扩缩器把它算作不健康，又启动更多副本。等副本都起来，流量高峰已经过去，团队为一批什么都没服务的机器付了钱。
 
-The first guess is the image pull or the network. The logs rule both out: the container image was already on each machine, and the weights were on the local NVMe drive. The second guess is that the model is simply too large for the machine, but each replica serves well once it is up.
+第一个猜测是镜像拉取或网络。日志把两者都排除了：容器镜像早已在每台机器上，权重也在本地 NVMe 盘上。第二个猜测是模型对这台机器来说太大，可每个副本一旦起来，服务得都很好。
 
 ## Evidence
 
-- [the settings of the server that started](evidence/the-settings.txt)
-- [the end of the weight load](evidence/weight-load.txt)
-- [the compile and the warmup](evidence/compile-time.txt)
-- [the graph capture and the KV cache sizing](evidence/graphs-and-pool.txt)
-- [the memory accounting line at the end of startup](evidence/memory-split.txt)
+- [启动的那台服务器的设置](evidence/the-settings.txt)
+- [权重加载的结尾](evidence/weight-load.txt)
+- [编译和预热](evidence/compile-time.txt)
+- [图捕获和 KV cache 容量设定](evidence/graphs-and-pool.txt)
+- [启动结束时的内存核算行](evidence/memory-split.txt)
 
 ## Questions
 
-1. Read the startup lines in order. Where did the five minutes go, and how much of that was the copy of the weights?
-2. On this machine the weights and the GPU allocation live in one memory. Why does the load still take minutes?
-3. Which lines prove that the server sized itself as planned, and what do they say about a fraction of 0.75 on this machine?
-4. What can a second start of the same image on the same machine skip, and what must it pay again?
-5. A field report cut a cold start of another engine from 695 s to 88 s and then to 9.6 s. Which cost did each step remove, and which of those steps apply here?
-6. How does this change the autoscaling design?
+1. 按顺序读启动日志。五分钟花在哪里？其中多少是权重拷贝？
+2. 在这台机器上，权重文件和 GPU 分配的空间位于同一块内存中。为什么加载还要好几分钟？
+3. 哪几行证明服务器按计划设定了自身的容量？它们说明 0.75 的比例在这台机器上意味着什么？
+4. 同一个镜像在同一台机器上第二次启动，能跳过什么？必须重新承担什么开销？
+5. 一份现场报告把另一个引擎的冷启动从 695 s 降到 88 s，再降到 9.6 s。每一步去掉了哪项成本？哪些步骤适用于这里？
+6. 这会怎样改变自动扩缩的设计？
 
 ## Walkthrough
 
-Read the log as a timeline. The weight loader finished after 325.26 seconds, and the model loading line reports 56.93 GiB of memory and 330.542793 seconds. The compile took 18.67 s in total and the warmup 0.40 s. The graph capture finished in 39 secs and took 1.17 GiB. So the weights are almost all of the start, and the compile and the graphs together are about one minute of it.
+把日志当作时间线读。权重加载器在 325.26 秒后完成，模型加载那一行报告了 56.93 GiB 内存和 330.542793 秒。编译总共用了 18.67 s，预热用了 0.40 s。图捕获在 39 秒内完成，占用 1.17 GiB。因此，加载权重占了启动时间的绝大部分，编译和图捕获合计约一分钟。
 
-The second question is why a copy inside one memory takes so long. The loader copies each tensor from the memory-mapped safetensors file into the GPU allocation, one tensor at a time. On the GB10, a copy from a file-backed page is slow. An open issue in the engine's tracker measured about 1.7 ms for each tensor copied from the file view, against about 0.2 ms for a copy that started in host memory. The 0.31.0 release made a different part of the load faster, an indexed lookup of expert names that saves about 25 s on this machine, and the cost of each tensor copy stays. The fix is not in a flag.
+第二个问题是：同一块内存里的拷贝为什么这么慢。加载器把每个张量从内存映射的 safetensors 文件拷贝到 GPU 分配的内存中，一次一个张量。在 GB10 上，从文件映射页拷贝很慢。引擎 issue 跟踪器中一个未关闭的 issue 测得：从文件视图拷贝每个张量约 1.7 ms，而从主机内存开始的拷贝约 0.2 ms。0.31.0 版本让加载的另一部分变快了，即按索引查找专家名称，在这台机器上省了约 25 s，但每个张量的拷贝成本还在。这个问题不是一个参数能解决的。
 
-The sizing lines show that the memory plan held. The settings line asked for a fraction of 0.75 and an override of 14,685 blocks. The server found 31.32 GiB available for the KV cache, overrode its own count of 21,381 blocks with the 14,685 that the sweep wanted, and reported a pool of 234,960 tokens, enough for 28.68 concurrent requests of 8,192 tokens. The accounting line at the end gives the whole split: 114.94 of 121.69 GiB free at startup, a desired share of 91.27 GiB at 0.75, and an actual use of 58.16 GiB for the weights and other memory, 1.78 GiB for the peak activation and 0.31 GiB for the graphs, with 31.32 GiB of cache in use. On unified memory the fraction is a share of the whole machine, and the rest stays free for the OS and its page cache.
+容量设定的几行显示内存计划成立了。设置行要求比例 0.75，并把块数覆盖为 14,685。服务器发现有 31.32 GiB 可用于 KV cache，用扫描需要的 14,685 覆盖了自己算出的 21,381 个块，报告池为 234,960 个 token，足够 28.68 个 8,192 token 的并发请求。结尾的核算行给出完整划分：启动时 121.69 GiB 里有 114.94 GiB 空闲，按 0.75 期望份额为 91.27 GiB；实际使用中，权重和其他内存占 58.16 GiB，峰值激活占 1.78 GiB，图占 0.31 GiB，正在使用的 cache 为 31.32 GiB。在统一内存上，比例是整台机器的一个份额，其余部分留给操作系统和它的页缓存。
 
-A second start on the same machine pays the weights again. The compile is different: the log shows the engine saving its compiled function to a cache directory, so the next start loads it instead of compiling. The graph capture repeats. The field report in the SGLang manual, from an engineer blog of April 2026 about an eight-GPU server, timed the same phases on the other engine: 695 s cold, with 531 s of it the weight load. Kernel caches kept between runs brought a warm start to 88 s, and a process checkpoint with the weights staged in host memory brought it to 9.6 s. The first step is the cache mount that applies here. The last step needs host memory that the weights can wait in, which this machine shares with the GPU.
+同一台机器上的第二次启动还要重新付出权重的代价。编译不一样：日志显示引擎把编译好的函数存进了缓存目录，所以下次启动直接加载，不再编译。图捕获会重做。SGLang 手册里的现场报告来自 2026 年 4 月一篇关于八 GPU 服务器的工程博客，它在另一个引擎上测了相同的阶段：冷启动 695 s，其中 531 s 是权重加载。在多次运行之间保留 kernel 缓存，让热启动降到 88 s；用进程检查点并把权重放在主机内存里待命，降到 9.6 s。第一步就是这里适用的缓存挂载。最后一步需要一块能让权重待命的主机内存，而这台机器的主机内存和 GPU 共用。
 
 ## Resolution
 
-The cold start is the weight copy, 325.26 s of a 330 s load, and no serving flag shortens it. The team changes the design around that fact. Each replica starts once and stays up, because a restart pays the full load again. The weights stay on the local NVMe drive and never on a network mount. The compile cache directory is on a volume that survives the container, so the second start skips the 18.67 s compile.
+冷启动就是权重拷贝，330 s 的加载里占 325.26 s，没有哪个服务参数能缩短它。团队围绕这个事实改了设计。每个副本只启动一次，然后常驻，因为重启要重新付出完整的加载时间。权重留在本地 NVMe 盘上，绝不放在网络挂载上。编译缓存目录放在容器销毁后仍会保留的卷上，所以第二次启动可以跳过 18.67 s 的编译。
 
-The autoscaler changes in two ways. Its readiness check waits for the application startup line and one short request, and a replica that is still loading counts as starting, not as unhealthy, so the autoscaler stops adding replicas on top of replicas that are about to come up. And the scaling signal moves from the current queue to a forecast with a lead time longer than the six minutes that a start takes, or the pool keeps warm standby replicas that are already loaded. On this machine the fraction of 0.75 left 31.32 GiB for the cache. The block override capped the pool at 234,960 tokens, and without the override the same memory holds about 342,000 tokens at 96 KiB per token, so a standby replica can take a large share of a spike by itself.
+自动扩缩器有两处改动。它的就绪检查等待应用启动日志行出现，再加一次简短请求；还在加载的副本算作启动中，不算不健康，这样自动扩缩器就不会在马上要起来的副本之上继续加副本。另外，扩缩信号从当前队列改为一个预测，提前量要长于一次启动所需的六分钟；或者资源池里保留已经加载好的热备副本。在这台机器上，0.75 的比例给 cache 留了 31.32 GiB。块数覆盖把池限制在 234,960 个 token；不加覆盖时，同样的内存按每 token 96 KiB 能放约 342,000 个 token，所以一个热备副本自己就能扛下突增流量的一大部分。
 
 ## Wrong turns
 
-- "The image pull is slow, cache the image." The image was local. The log puts 325.26 s in the weight loader after the container had started.
-- "Add replicas faster when the queue grows." Every replica pays the same five minutes, and the spike lasts less than that. More replicas that arrive late cost more and serve nothing.
-- "Lower the memory fraction so the server starts sooner." The fraction decides the cache size, not the copy speed. The weights take 56.93 GiB and 325.26 s at any fraction.
-- "Turn off the compile and the graphs to save a minute." Together they cost about one minute of a five-minute start, the compile is cached after the first start, and both pay back on every decode step for the life of the replica.
+- "镜像拉取慢，把镜像缓存起来。" 镜像本来就在本地。日志显示，容器启动之后，权重加载器花了 325.26 s。
+- "队列增长时更快地加副本。" 每个副本都要付出同样的五分钟，而突增持续不到这么久。来晚的副本越多，花得越多，服务的请求却为零。
+- "调低内存比例，让服务器更快启动。" 比例决定 cache 大小，不决定拷贝速度。无论比例多少，权重都要 56.93 GiB 和 325.26 s。
+- "关掉编译和图，省一分钟。" 两者加起来只占五分钟启动里的约一分钟，编译在第一次启动后就被缓存，而且两者在副本整个生命周期里的每个解码步都会回本。
 
 ## Generalize
 
-When a start is slow, read the phase timings before you change anything, because the largest phase is usually one that no flag controls. Then move the design to fit it: start rarely, keep what a restart can reuse on storage that survives, and give the autoscaler a signal with more lead time than the start takes. A replica that is loading is not unhealthy, and a probe that cannot tell the difference will scale a fleet into the ground.
+启动慢时，先读各阶段的耗时，再动任何东西，因为最大的那个阶段通常没有参数能控制。然后让设计去适应它：少启动，把重启时可以复用的内容放到持久化存储上，给自动扩缩器一个提前量长于启动时间的信号。正在加载的副本不是不健康；分不清这两者的探针，会因不断扩容而拖垮整个集群。
 
 ## Taught in
 
-The vLLM manual reads this startup log in [the DGX Spark page](../../../manuals/vllm-101/sections/2-3-size-memory-on-a-dgx-spark.md), weighs compile and graph capture in [the compile page](../../../manuals/vllm-101/sections/4-3-keep-cuda-graphs-and-compile-on.md) and names the image and the driver in [the version pins](../../../manuals/vllm-101/sections/r-4-version-pins.md), and the SGLang manual gives the cache directories and the field report in [its operating page](../../../manuals/sglang-101/sections/7-1-operating-sglang.md).
+vLLM 手册在[DGX Spark 页面](../../../manuals/vllm-101/sections/2-3-size-memory-on-a-dgx-spark.md)解读了这份启动日志，在[编译页面](../../../manuals/vllm-101/sections/4-3-keep-cuda-graphs-and-compile-on.md)权衡了编译和图捕获，并在[版本锁定](../../../manuals/vllm-101/sections/r-4-version-pins.md)里列出镜像和驱动，SGLang 手册则在[运维页面](../../../manuals/sglang-101/sections/7-1-operating-sglang.md)给出了缓存目录和这份现场报告。

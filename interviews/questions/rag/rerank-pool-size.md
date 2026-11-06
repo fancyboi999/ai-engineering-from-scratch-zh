@@ -1,6 +1,6 @@
 ---
 id: rerank-pool-size
-title: Pick how many candidates the reranker scores
+title: 选择重排模型的候选数量
 card: rag
 kind: tradeoff
 level: 3
@@ -16,45 +16,45 @@ related: [rag/bi-encoder-vs-cross-encoder, rag/cross-encoder-passes-per-query]
 updated: 2026-11-03
 ---
 
-You add a cross-encoder behind a hybrid retriever. The prompt receives K chunks. The team wants a rule for N, the number of candidates the reranker scores, and one engineer proposes a small N to protect the latency budget. How do you choose N, and what do you refuse?
+混合检索器后新增了交叉编码器，prompt 最终接收 K 个文本块。团队要确定重排模型评分的候选数量 N，有人建议为了延迟预算把 N 设小。你怎样选择 N，又会拒绝哪些做法？
 
 ## Short answer
 
-Choose N from the recall curve of the reranked output and the latency budget together. Sweep N on a held-out query set; the lift saturates at a knee somewhere around 20 to 50 candidates, and past it every extra candidate costs a forward pass for nothing. Keep N at least three times K, because the reranker can only promote a chunk that the retriever put in the pool.
+结合重排输出的召回率曲线与延迟预算选择 N。在留出查询集上扫描 N，质量提升通常在 20 到 50 个候选附近出现拐点，此后每多一个候选都要多一次前向传播，却毫无收益。N 至少取 K 的三倍，因为重排模型只能提升已经进入候选池的文本块。
 
 ## Full answer
 
-### The one tunable
+### 一个可调参数
 
-The two-stage pipeline has one knob. The bi-encoder returns N candidates, the cross-encoder scores each pair and keeps K. The lesson shows the shape of the curve with illustrative values: recall at 1 rises from N of 5 to N of 20, rises less to N of 50, and does not change at N of 100. The values are not measurements from the fixture; the knee is real.
+两阶段流水线只有一个可调参数。双编码器返回 N 个候选，交叉编码器为每个文本对评分并保留 K 个。课程用示意值描述曲线：N 从 5 增到 20，recall@1 上升；增到 50 时提升变小；增到 100 时不再变化。这些数值不是测试数据上的实测结果，但拐点是真实存在的。
 
-### The cap
+### 召回上限
 
-The cross-encoder cannot raise recall above the bi-encoder recall at N. A low N caps quality, not only latency. If N equals K, the reranker can reorder the K candidates but cannot bring a new one in, so recall at K cannot move and the lift looks like zero.
+交叉编码器的召回率无法超过双编码器的 recall@N。N 太小限制的不只是延迟，也包括质量。如果 N 等于 K，重排模型只能重新排列 K 个候选，无法引入新候选，因此 recall@K 无法变化，看起来提升为零。
 
-### The cost side
+### 成本因素
 
-- Batch the N pairs into one forward pass. Scored one by one, the latency multiplies by N.
-- Plan the memory. A 22M parameter cross-encoder takes 88 MB at float32 before any batch.
-- Cache reranker output by the hash of the query and the document id. A stable corpus reranks the same way, so hits buy a free latency cut.
+- 将 N 个文本对合为一个批次执行前向传播。逐个评分会让延迟乘以 N。
+- 规划内存。22M 参数交叉编码器的 float32 权重在处理批次前就占 88 MB。
+- 用查询哈希和文档 ID 作为键缓存重排输出。语料稳定时重排结果不变，缓存命中可直接减少延迟。
 
-### Pin the three together
+### 三者一起固定
 
-The bi-encoder, the cross-encoder and N are one choice. A change in any of them invalidates the eval, so the sweep runs again after a model change.
+双编码器、交叉编码器与 N 是同一个选型组合。任意一个发生变化，原评估就失效，因此模型变化后要重新扫描 N。
 
 ## Follow-ups
 
-- **Level 3:** Why does the curve flatten? Expected: past the knee the extra candidates are rarely relevant, so the reranker has nothing more to promote while each one still costs a forward pass.
-- **Level 3:** You cut N from 50 to 10 to save latency. What else moves? Expected: the recall cap, because the reranker cannot see a chunk outside the pool; run the eval again instead of assuming.
-- **Level 4:** The embedder is upgraded. Is the chosen N still valid? Expected: no; a new bi-encoder changes recall at N, so the sweep must run again before the release.
-- **Level 4:** How do you get the latency back without a smaller N? Expected: one batched forward pass for the N pairs, and a cache keyed on the query and the document id.
+- **Level 3:** 曲线为什么趋平？ Expected: 拐点之后新增候选很少相关，重排模型没有更多值得提升的项，每个候选却仍要一次前向传播。
+- **Level 3:** 为省延迟把 N 从 50 降到 10，还改变了什么？ Expected: 召回上限，因为重排模型看不到池外的块；应重新评估，不能凭假设决定。
+- **Level 4:** 嵌入模型升级后，原 N 还有效吗？ Expected: 无效；新双编码器改变 recall@N，发布前必须重新扫描。
+- **Level 4:** 不缩小 N，怎样降低延迟？ Expected: 对 N 个文本对执行批量前向传播，并以查询和文档 ID 为键缓存。
 
 ## Wrong answers
 
-- "Set N equal to K to save time." Then the reranker can only reorder the K chunks and never bring a new one in, so recall at K cannot move.
-- "The larger N, the better." Past the knee the lift saturates and each extra candidate costs one forward pass.
-- "Pick N once and keep it." N is pinned with the two models; a change in either one invalidates the choice.
+- "为节省时间，让 N 等于 K。" 这样重排模型只能给这 K 个块重新排序，引入不了新块，recall@K 无法变化。
+- "N 越大越好。" 拐点后质量提升饱和，每多一个候选仍要一次前向传播。
+- "选定 N 后一直保持。" N 与两个模型绑定，任一模型变化都会使原选择失效。
 
 ## Taught in
 
-The lesson [cross-encoder](../../../phases/19-capstone-projects/66-reranker-cross-encoder/) gives the latency against quality curve, the three times K rule and the batching and memory notes.
+[交叉编码器](../../../phases/19-capstone-projects/66-reranker-cross-encoder/)课程给出延迟与质量曲线、三倍 K 规则，以及批处理和内存说明。

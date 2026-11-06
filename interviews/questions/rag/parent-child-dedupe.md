@@ -1,6 +1,6 @@
 ---
 id: parent-child-dedupe
-title: Read the parent-document retrieval function
+title: 读懂父文档检索函数
 card: rag
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [rag/chunk-size-by-query-type, rag/cosine-is-the-default]
 updated: 2026-11-03
 ---
 
-Read this retrieval function from the chunking lesson. What problem does the two-level layout solve, what does the `seen` set do, and how many parents can the function return?
+阅读分块课程里的这个检索函数。两级布局解决什么问题？`seen` 集合做什么？函数能返回多少个父块？
 
 ```python
 def retrieve_parent(child_query, mapping, encoder, top_k=3):
@@ -34,42 +34,42 @@ def retrieve_parent(child_query, mapping, encoder, top_k=3):
 
 ## Short answer
 
-Small child chunks are indexed for a precise match and the larger parent is returned for context, which removes the trade-off between a precise hit and enough surrounding text. The `seen` set drops a parent that several top children map to, so the prompt does not receive the same text twice. For a mapping that is not empty and a positive `top_k`, the function returns between one and `top_k` parents, fewer when children share a parent; an empty mapping or a `top_k` of zero returns none.
+索引小子块以精确匹配，返回大父块提供上下文，从而兼顾命中精度与周围文本。多个高排名子块映射同一父块时，`seen` 删除重复父块，避免 prompt 重复接收文本。映射非空且 `top_k` 为正时，返回一到 `top_k` 个父块，共用父块时更少；空映射或 `top_k` 为零时不返回父块。
 
 ## Full answer
 
-### The layout
+### 布局
 
-Standard chunking forces a choice: small chunks match precisely but lack context, large chunks carry context but cover many topics. The two-level layout indexes small children and stores the parent each child came from. The chunking lesson splits parents at 2048 and children at 256 by default, and the advanced RAG lesson draws a 512-token parent with four 128-token children. A query about one detail matches one child precisely, and the prompt receives the whole parent, including the lines around the detail.
+普通分块必须取舍：小块匹配精确但缺上下文，大块有上下文却涵盖多个主题。两级布局索引小子块，同时保存来源父块。分块课程默认父块大小 2048、子块 256；进阶 RAG 课程画的是一个 512-token 父块配四个 128-token 子块。细节问题精确命中子块，prompt 收到包含周围行的整个父块。
 
-### Walk the function
+### 逐步阅读函数
 
-1. Encode every child and the query with normalization on, so the matrix product equals the cosine.
-2. Sort children by score and keep the top k indices.
-3. For each top child, look up its parent index; if that parent was not seen, append the parent text and mark it.
-4. Return the parents in the order of their best child.
+1. 对所有子块和查询启用归一化编码，使矩阵乘积等于余弦。
+2. 按分数排序子块，保留前 k 个索引。
+3. 查询每个高排名子块的父索引；尚未出现过就追加父文本并记录。
+4. 按各父块最佳子块的顺序返回父块。
 
-### Why de-duplicate
+### 为什么去重
 
-Several children of one parent often match the same query, because they sit in the same section. Without the set, the prompt would receive the same parent twice or three times and waste its context budget. The lesson calls this the key insight of the pattern.
+同一父块中的多个子块位于同一节，常匹配相同查询。不用集合时，同一父文本会进入 prompt 两三次，浪费上下文预算。课程将去重称为这一模式的关键。
 
-### What production changes
+### 生产环境要改什么
 
-The function re-encodes every child on each call. A real index stores the child vectors once and only embeds the query. The two-level layout also degrades gracefully: a poor child match still returns a reasonable parent.
+函数每次调用都会重新编码所有子块。真实索引应只存一次子块向量，每次只编码查询。两级布局也能平稳退化：子块匹配得不好时，仍会返回一个合理的父块。
 
 ## Follow-ups
 
-- **Level 2:** Why index the child and not the parent? Expected: a small chunk matches a specific question precisely, while a large chunk covers many topics and its embedding points nowhere in particular.
-- **Level 2:** Why a plain matrix product and no cosine? Expected: the vectors are normalized at encode time, so the dot product equals the cosine.
-- **Level 3:** What does this function do on every call that production code must not? Expected: it re-encodes all the children; store the child vectors once at index time and embed only the query.
-- **Level 3:** Two parents each have one matching child, and a third parent has three matching children below the cut. What does the function miss? Expected: it ranks by the best child only; a parent with several good children gets no extra credit unless you aggregate child scores per parent.
+- **Level 2:** 为什么索引子块而非父块？ Expected: 小块能精确匹配具体问题，大块涉及多个主题，嵌入方向不明确。
+- **Level 2:** 为什么直接矩阵乘积，不另外计算余弦？ Expected: 编码时已经归一化，点积等于余弦。
+- **Level 3:** 函数每次调用做了什么生产代码不该做的事？ Expected: 重新编码全部子块；应在索引时保存向量，每次只编码查询。
+- **Level 3:** 两个父块各有一个命中子块，第三个父块有三个不错的子块却都在截断线以下，会漏掉什么？ Expected: 函数只按最佳子块排序；除非按父块聚合子块分数，多个不错子块不会带来额外收益。
 
 ## Wrong answers
 
-- "Return the parent of every top child, duplicates included." Several children map to one parent, and the repeated text wastes the context budget.
-- "Make the child as large as the parent." Then there is no precision gain; the point is a small match unit and a large context unit.
-- "The function always returns exactly top_k parents." It returns fewer when children share a parent.
+- "返回每个高排名子块的父块，包括重复项。" 多个子块映射同一父块，重复文本浪费上下文。
+- "让子块和父块一样大。" 这样没有精度收益；关键就是小匹配单元与大上下文单元。
+- "函数总返回恰好 top_k 个父块。" 子块共用父块时，返回数量会更少。
 
 ## Taught in
 
-The lesson [chunking strategies](../../../phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/) gives this function and the de-duplication insight, and the lesson [advanced RAG](../../../phases/11-llm-engineering/07-advanced-rag/) draws the parent and child layout.
+[分块策略](../../../phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/)课程给出函数与去重原理，[进阶 RAG](../../../phases/11-llm-engineering/07-advanced-rag/)课程展示父子布局。

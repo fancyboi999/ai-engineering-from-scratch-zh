@@ -1,6 +1,6 @@
 ---
 id: sft-learning-rate-gap
-title: Reusing the pretraining learning rate for SFT
+title: 在 SFT 中直接复用预训练学习率的代价
 card: post-training
 kind: concept
 level: 2
@@ -16,52 +16,52 @@ related: [post-training/sft-data-quality-wins]
 updated: 2026-11-03
 ---
 
-A colleague copies the pretraining configuration into an SFT run: the same peak learning rate, the same warmup, three epochs over 27,000 examples. The loss on the SFT set drops fast and everyone is happy. What do you expect to see when you test the model, and what do you change?
+一位同事把预训练的训练配置全盘照搬到了 SFT 任务中：完全相同的峰值学习率、完全相同的预热步数，在 27,000 条样本上训练了 3 个 epoch。SFT 训练集上的损失迅速下降，大家都皆大欢喜。当你在真实场景测试该模型时，预期会看到什么？你应该做出什么修改？
 
 ## Short answer
 
-Expect catastrophic forgetting: the model answers in the training format, but its loss on raw text rises and it gets worse at code, math and anything outside the set. Pretraining used a peak rate about fifteen times higher than the SFT value in the lesson, 3e-4 against 2e-5. Cut the rate into the 1e-5 to 5e-5 range, keep one to three epochs, and track raw-text loss next to the SFT loss.
+预期会出现灾难性遗忘：模型能按照训练格式回答，但它在原始文本上的损失上升，在代码、数学和数据集之外的任何内容上都会变差。预训练的峰值学习率大约是课程中 SFT 值的 15 倍，3e-4 对比 2e-5。将学习率降到 1e-5 到 5e-5 范围内，保持一到三个 epoch，并在跟踪 SFT 损失的同时跟踪原始文本损失。
 
 ## Full answer
 
-### Two very different regimes
+### 两种截然不同的训练范式
 
-| Setting | Pretraining | SFT |
+| 配置项 | 预训练 | SFT |
 |---|---|---|
-| Peak learning rate | 3e-4 | 2e-5 |
-| Epochs | 1 | 2 |
-| Warmup steps | 2,000 | 0 to 100 |
-| Data | 2T tokens | 27,000 examples |
+| 峰值学习率 | 3e-4 | 2e-5 |
+| Epoch 数 | 1 | 2 |
+| 预热步数 | 2,000 | 0 到 100 |
+| 数据 | 2T tokens | 27,000 个样本 |
 
-The SFT run adjusts a model that already works. A large step overwrites pretrained features with the patterns of a small set.
+SFT 调整的是已经能正常工作的模型。大步长会用小集合的模式覆盖预训练特征。
 
-### How to see the damage
+### 如何观察损伤
 
-Hold out a slice of raw text and measure its next-token loss before and after SFT. The lesson's rule: a rise of more than 10 to 15 percent means the run is too aggressive. Lower the rate or the epochs. Run a small eval on tasks outside the SFT set as well.
+留出一部分原始文本，测量 SFT 前后的下一个 token 损失。课程的规则：上升超过 10% 到 15% 说明训练过于激进。降低学习率或减少 epoch。同时在 SFT 数据集之外的任务上运行小规模评估。
 
-### Three mitigations
+### 三种缓解措施
 
-1. A low learning rate, 1e-5 to 5e-5.
-2. Short training, 1 to 3 epochs. More than 3 epochs on a small set leads to memorization, and the model repeats training examples word for word.
-3. A mix of 2 to 5 percent raw pretraining text in the SFT batches, with no mask, so that the model keeps its general ability.
+1. 较低的学习率，1e-5 到 5e-5。
+2. 较短的训练，1 到 3 个 epoch。在小集合上超过 3 个 epoch 会导致死记硬背，模型会逐字重复训练样本。
+3. 在 SFT 批次中混入 2% 到 5% 的未处理预训练文本，不加掩码，让模型保持通用能力。
 
-### Why the loss curve misleads
+### 为什么损失曲线会误导人
 
-A fast drop in SFT loss at a high rate is overfitting to the set, not learning. The lesson's exercise compares 1e-4, 2e-5 and 1e-6: the high rate falls fast and ends higher, the low rate barely moves, and the middle value is the sweet spot.
+在高学习率下，SFT 损失快速下降是对小集合的过拟合，而不是学到了东西。课程的练习对比了 1e-4、2e-5 和 1e-6：高学习率下降快且最终损失更高，低学习率几乎不动，中间值则是最合适的值。
 
 ## Follow-ups
 
-- **Level 2:** Why does a rate that works for pretraining destroy an SFT run? Expected: pretraining starts from noise and averages over trillions of tokens; SFT starts from a working model and a small set, so each large step overwrites features that the set does not cover.
-- **Level 2:** How many epochs, and how do you decide? Expected: one to three; stop when the held-out instruction loss stops improving and the raw-text loss has not risen past the budget.
-- **Level 3:** The raw-text loss rose by a quarter, but the product team likes the answers. Ship it? Expected: not as it is; the model lost general ability that users will hit; rerun with a lower rate or a pretraining mix and compare on an eval outside the set.
-- **Level 3:** How does LoRA change this picture? Expected: the base weights stay frozen, so the damage is bounded to the adapter and a merge is reversible; the adapter also tolerates a higher rate than a full update.
+- **Level 2:** 为什么适合预训练的学习率会毁掉 SFT 训练？ Expected: 预训练从噪声开始，并在数万亿 token 上求平均；SFT 从能工作的模型和小集合开始，每个大步长都会覆盖小集合未覆盖的特征。
+- **Level 2:** 应该跑几个 epoch，如何决定？ Expected: 一到三个；当留出集指令损失停止改善且原始文本损失未超过预算时停止。
+- **Level 3:** 原始文本损失上升了四分之一，但产品团队喜欢现在的回答。可以发布吗？ Expected: 不能照现状发布；模型丢失了用户会触及的通用能力；用更低的学习率或混入预训练文本重新运行，并在集合外的评估上做对比。
+- **Level 3:** LoRA 如何改变这种情况？ Expected: 基座权重保持冻结，因此破坏被限制在适配器内，且合并是可逆的；适配器也比全量更新更能承受较高的学习率。
 
 ## Wrong answers
 
-- "The SFT loss dropped, so the run worked." The loss on the set says nothing about what the model forgot; measure the raw-text loss and an eval outside the set.
-- "Warm up for 2,000 steps, like pretraining." The SFT set gives few steps in total; the lesson uses 0 to 100 warmup steps.
-- "Use a higher rate to finish faster, the data is small." A high rate on a small set overfits and overwrites pretrained knowledge; small data needs smaller steps, not larger ones.
+- "SFT 损失下降了，说明训练有效。" 集合上的损失说明不了模型遗忘了什么；测量原始文本损失以及集合外的评估。
+- "像预训练一样预热 2,000 步。" SFT 集合总共只有很少的步数；课程使用 0 到 100 步预热。
+- "为了更快完成，用更高的学习率，反正数据量很小。" 在小集合上使用高学习率会导致过拟合并覆盖预训练知识；小数据需要更小的步长，而不是更大的。
 
 ## Taught in
 
-The [SFT lesson](../../../phases/10-llms-from-scratch/06-instruction-tuning-sft/) compares the pretraining and SFT hyperparameters and measures forgetting with a raw-text loss.
+[SFT 课程](../../../phases/10-llms-from-scratch/06-instruction-tuning-sft/)横向对比了预训练与 SFT 的超参数范式，并利用无监督文本损失系统度量了灾难性遗忘。

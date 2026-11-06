@@ -1,6 +1,6 @@
 ---
 id: error-paths-the-model-can-fix
-title: Read the registry, what the model gets back on a bad call
+title: 阅读注册表：模型在错误调用时收到什么
 card: agents
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [agents/five-parts-of-an-agent-loop]
 updated: 2026-11-03
 ---
 
-A tool is registered with this schema, and the model sends the four argument sets below. For each one, say what the registry returns and why the shape of the answer matters to the model.
+一个工具使用下方 Schema 完成注册，模型发送了以下四组参数。针对每一组参数，说明注册表返回什么内容，以及返回结果的格式为什么对模型至关重要。
 
 ```python
 registry.register(
@@ -41,48 +41,48 @@ cases = [
 
 ## Short answer
 
-The first case passes validation and returns an Ok result. The second returns one error at `/id` with keyword `type`, because a string is not an integer and the validator never coerces. The third returns one error at `/id` with keyword `required`, because the property is missing. The fourth returns one error at `/fields/1` with keyword `enum`, because `phone` is not an allowed value, and the path points at the exact element so the model can fix that one value in the next call.
+第一组用例通过校验并返回 Ok 结果。第二组在 `/id` 处返回一条关键字为 `type` 的错误，因为字符串不是整数且校验器从不做类型强制转换。第三组在 `/id` 处返回一条关键字为 `required` 的错误，因为缺少必填属性。第四组在 `/fields/1` 处返回一条关键字为 `enum` 的错误，因为 `phone` 不是允许的枚举值，路径精确指向该元素，使模型在下一次调用中能够准确修正该值。
 
 ## Full answer
 
-### The walk
+### 遍历过程
 
-The validator dispatches on `type`. For an object it checks `required` first, then walks each property that has a schema. For an array it walks each element with the `items` schema and appends the index to the path. A type mismatch stops the walk at that node and reports one error, so a wrong type does not produce a cascade of nested errors underneath it.
+校验器按 `type` 分发。针对对象类型，它首先检查 `required`，然后遍历每个定义了 Schema 的属性。针对数组类型，它使用 `items` Schema 遍历每个元素，并将索引追加到路径末尾。一旦发生类型不匹配，校验器会立即停止继续遍历该节点并报告错误，因此错误的类型不会在其下方引发一连串层叠嵌套错误。
 
-| Case | Result | Path | Keyword |
+| 用例 | 结果 | 路径 | 关键字 |
 |---|---|---|---|
 | `{"id": 42, "fields": ["id", "name"]}` | `Ok` | | |
-| `{"id": "forty-two"}` | one error | `/id` | `type` |
-| `{"fields": ["id"]}` | one error | `/id` | `required` |
-| `{"id": 1, "fields": ["id", "phone"]}` | one error | `/fields/1` | `enum` |
+| `{"id": "forty-two"}` | 1 条错误 | `/id` | `type` |
+| `{"fields": ["id"]}` | 1 条错误 | `/id` | `required` |
+| `{"id": 1, "fields": ["id", "phone"]}` | 1 条错误 | `/fields/1` | `enum` |
 
-### Why the path is the product
+### 为什么路径是指向结果的关键
 
-The model reads a pointer better than a sentence. An error that says the email field expected a string, with the path `/user/email`, is fixed in one round trip. A prose message that says the arguments were invalid costs a turn of guessing. Paths follow the JSON pointer form: slash-separated property names and array indices, with `~` and `/` escaped inside a segment.
+相比普通句子，模型更容易理解指针。一条指出邮箱字段需要字符串并附带路径 `/user/email` 的错误，仅需一次往返就能被纠正。而一条仅说明参数非法的纯文本消息则需要花费整整一轮去猜测。路径遵循 JSON Pointer 规范：斜杠分隔的属性名与数组索引，段内的 `~` 和 `/` 均经过转义。
 
-### What the validator refuses to do
+### 校验器拒绝做的事
 
-- It does not coerce. The string `"42"` fails an integer or number schema. A model that learns that strings are accepted sends strings everywhere.
-- It does not call the handler. The schema is data and the handler is code, and mixing them puts validation inside handlers where it drifts.
-- It is not a security boundary. A handler can misbehave after validation passes. The dispatcher adds timeouts and sandboxing. The registry adds shape.
+- 它不做类型强制转换。字符串 `"42"` 在整数或数值 Schema 下直接失败。一旦模型发现字符串也能被接受，它就会在所有地方发送字符串。
+- 它不调用处理函数。Schema 是数据，处理函数是代码，将两者混杂会把校验逻辑分散塞入各个处理函数中并导致漂移。
+- 它不是安全边界。即使校验通过，处理函数依然可能产生异常行为。超时控制与沙箱化应当由分发器负责，注册表只负责形态校验。
 
-### Registration hygiene
+### 注册规范
 
-`register` rejects a name that is already in the table unless the caller passes `override=True`. Two parts of a codebase registering the same name is a bug that takes a week to find in production, so the default is to raise.
+除非调用方显式传入 `override=True`，否则 `register` 会直接拒绝已存在于表中的同名工具。代码库的不同部分注册同一个名称属于严重 bug，在生产环境中往往需要耗费一周才能排查出来，因此默认行为是抛出异常。
 
 ## Follow-ups
 
-- **Level 2:** The model sends `{"id": true}`. What happens? Expected: a type error at `/id`, because the validator treats a boolean as not an integer even though the language would accept it.
-- **Level 2:** Why does a type mismatch stop the walk at that node? Expected: the children have no meaning when the parent is the wrong type, and one clear error beats a list of errors caused by the same mistake.
-- **Level 3:** The schema uses `oneOf`. What does `register` do? Expected: it raises, because the registry supports eight keywords and rejects anything outside the subset at registration time.
-- **Level 3:** The catalog passes fifty tools and schemas start to repeat. What two extensions do you add first? Expected: `$ref` against a local definitions block, and `additionalProperties: false` for a strict shape.
+- **Level 2:** 模型发送了 `{"id": true}`，会发生什么？ Expected: 在 `/id` 处返回类型错误，因为即使底层语言可能接受，校验器也判定布尔值不是整数。
+- **Level 2:** 为什么类型不匹配时会停止遍历该节点？ Expected: 当父节点类型错误时子节点毫无意义，一个清晰的错误远胜过同一失误引发的错误列表。
+- **Level 3:** Schema 中使用了 `oneOf`，`register` 会怎么处理？ Expected: 它会抛出异常，因为注册表仅支持八个关键字，在注册时会直接拒绝子集之外的任何内容。
+- **Level 3:** 当工具目录超过五十个且 Schema 开始重复时，最先添加哪两项扩展？ Expected: 针对本地定义块的 `$ref` 支持，以及用于强制严格形态的 `additionalProperties: false`。
 
 ## Wrong answers
 
-- "Return one message that says invalid arguments and let the model retry." A retry without a path is a guess, and a path fixes the call in one round trip.
-- "Coerce the string to a number, because the intent is clear." Coercion teaches the model that the schema is advice, and the next call sends a string where no coercion exists.
-- "Validation makes the tool safe to call." Validation checks shape, and the handler can still misbehave, so timeouts and sandboxing belong in the dispatcher.
+- "返回一条参数非法的通用消息，让模型自己重试。" 缺少路径的重试纯粹是瞎猜，而精确路径能让模型一次往返就纠正调用。
+- "将字符串强制转换为数字，因为意图很明确。" 强制转换会让模型认为 Schema 只是建议，下一次调用就会在没有转换逻辑的地方发送字符串。
+- "校验能保证工具可以安全调用。" 校验仅检查数据形态，处理函数依然可能行为异常，超时与沙箱应当由分发器提供保障。
 
 ## Taught in
 
-The [tool registry lesson](../../../phases/19-capstone-projects/21-tool-registry-schema-validation/) builds the registry, the eight-keyword validator and the pointer paths.
+[带 Schema 校验的工具注册表](../../../phases/19-capstone-projects/21-tool-registry-schema-validation/)课程构建了注册表、八关键字校验器以及指针路径。

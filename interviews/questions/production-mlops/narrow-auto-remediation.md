@@ -1,6 +1,6 @@
 ---
 id: narrow-auto-remediation
-title: Which fixes an operations agent may run alone
+title: 运维 agent 可以独立执行哪些修复
 card: production-mlops
 kind: tradeoff
 level: 3
@@ -16,51 +16,51 @@ related: [production-mlops/two-models-disagree, production-mlops/prediction-with
 updated: 2026-11-03
 ---
 
-A vendor demo shows an operations agent that repairs incidents on its own. Your director asks which actions you would let such an agent take on the model service without a person in the loop. Draw the line and defend it.
+某厂商演示了一个能独立修复事故的运维 agent。你的主管问：在模型服务上，你愿意让这样的 agent 在无人参与的情况下执行哪些操作？划定边界，并说明理由。
 
 ## Short answer
 
-Allow a narrow set that was approved in advance: restart a pod, revert one named deployment, scale a pool inside approved bounds, and flip an approved feature flag. Keep everything that changes the shape of the system behind a person: topology, resource limits, new code, access rights and databases. The agent proposes, a person approves the judgment calls, and the safe set grows only as the agent builds a record.
+只允许预先批准的小范围操作：重启一个 Pod、回滚某个指定的部署、在已批准的范围内扩缩容实例池，以及切换已批准的功能开关。凡是改变系统形态的操作，都交给人决定，包括拓扑、资源限制、新代码、访问权限和数据库变更。agent 提建议，需要判断的决策由人批准；只有在 agent 积累了执行记录后，才扩大安全操作集合。
 
 ## Full answer
 
-### The two sets
+### 两类操作
 
-| Safe, automated | Not safe, human only |
+| 安全，可自动执行 | 不安全，只能由人执行 |
 |---|---|
-| restart a pod | change the service topology |
-| revert one specific deployment | modify resource limits |
-| scale a pool within pre-approved bounds | deploy new code |
-| enable a pre-approved feature flag | change access rights |
-| | alter a database |
+| 重启一个 Pod | 改变服务拓扑 |
+| 回滚某个指定的部署 | 修改资源限制 |
+| 在预先批准的范围内扩缩容实例池 | 部署新代码 |
+| 启用预先批准的功能开关 | 改变访问权限 |
+| | 修改数据库 |
 
-### What makes an action safe
+### 什么让操作安全
 
-It is reversible, its blast radius is bounded in advance, and it matches a step in a runbook that a person wrote. The lesson's example incident is a KV cache spike that pushed a serving engine out of memory. A pod restart clears it, and a restart is on the safe list. Raising the memory limit might also clear it, and that change alters how every pod runs from then on, so it stays with a person.
+操作可逆，爆炸半径事先有限定，而且对应人工编写的 runbook 中的一个步骤。课程的事故示例是 KV cache 激增，导致推理服务引擎内存耗尽。重启 Pod 能清除问题，而且重启属于安全操作。调高内存限制也可能清除问题，但它会改变此后每个 Pod 的运行方式，所以仍由人决定。
 
-### How an action earns automation
+### 操作如何获得自动执行资格
 
-1. Write the runbook in structured form: symptom, hypothesis, verify, act.
-2. Give the action a success criterion and a verify step that runs after it.
-3. Record every proposal and every human decision.
-4. Promote the action from proposed to automatic after a run of incidents where the proposal matched what the person chose.
+1. 编写结构化 runbook：症状、假设、验证、处置。
+2. 为操作设定成功标准，以及执行后的验证步骤。
+3. 记录每次建议和每次人工决策。
+4. 在一系列事故中，建议都与人的选择一致后，将该操作从建议执行升级为自动执行。
 
-### The approval gate stays
+### 保留审批关口
 
-The architecture is a supervisor over log, metric and runbook agents, a hypothesis with evidence, a human approval, and then an action from the narrow set. Even when two independent models agree on the cause, the approval stays for anything outside the safe set. The lesson is direct about vendors who sell a system that needs no supervision: they are overselling.
+架构由一个监督者协调日志、指标和 runbook agent，形成带证据的假设，交给人批准，然后从小范围操作集合中执行一个动作。即使两个模型独立得出相同根因，安全集合以外的操作仍需审批。课程直言：厂商若声称系统不需要任何监督，就是夸大宣传。
 
 ## Follow-ups
 
-- **Level 3:** Why is a scale-up inside bounds safe while a resource limit change is not? Expected: the bounds were approved in advance and the action reverses cleanly. A limit change alters how every pod runs and can trigger the next incident.
-- **Level 3:** What has to be true before the agent may run an action unsupervised? Expected: a structured runbook, a verify step with a success criterion, an audit record, and a record of proposals that matched the human decision.
-- **Level 4:** The agent restarted the busiest pod during a load spike because a probe failed. Was that inside the rules? Expected: the action was allowed and the trigger was wrong. A restart under load drops the running requests, so the rule needs a condition on load and on the probe type, not only on the action.
+- **Level 3:** 为什么在限定范围内扩容是安全的，而修改资源限制不是？ Expected: 范围事先经过批准，操作也能顺利撤销。修改限制会改变每个 Pod 的运行方式，可能引发下一次事故。
+- **Level 3:** agent 无人监督执行操作前，必须满足哪些条件？ Expected: 有结构化 runbook、带成功标准的验证步骤、审计记录，以及建议与人工决策一致的历史记录。
+- **Level 4:** 负载突增时，agent 因探针失败重启了最繁忙的 Pod。这符合规则吗？ Expected: 操作被允许，但触发条件错了。高负载下重启会丢掉正在处理的请求，因此规则要包含负载和探针类型条件，而不只是动作名称。
 
 ## Wrong answers
 
-- "If the agent is accurate enough, let it do everything." Accuracy on past incidents does not bound the damage of one wrong broad action.
-- "No automation until the agent is perfect." A restart and a revert are safe today, and they remove the first part of most investigations.
-- "An approval step makes the agent useless at night." The agent still does the investigation. The person approves one proposed action instead of starting from the dashboards.
+- "只要 agent 足够准确，就让它做一切。" 对过去事故的判断准确率，无法限制一次错误的大范围操作造成的损害。
+- "agent 完美之前，不做任何自动化。" 重启和回滚现在就是安全操作，能省去大多数排查的第一部分。
+- "审批步骤会让 agent 在夜间没用。" agent 仍会完成排查。人只需批准一个建议的操作，而不必从看板开始查起。
 
 ## Taught in
 
-The [SRE for AI lesson](../../../phases/17-infrastructure-and-production/23-sre-for-ai/) draws the line between narrow and broad remediation and keeps the human approval gate.
+[AI 的 SRE 课程](../../../phases/17-infrastructure-and-production/23-sre-for-ai/)区分小范围与大范围修复，并保留人工审批关口。

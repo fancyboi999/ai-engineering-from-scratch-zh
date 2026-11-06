@@ -1,6 +1,6 @@
 ---
 id: dropout-off-at-eval
-title: Dropout that still acts during evaluation
+title: 评估时仍在起作用的 dropout
 card: coding
 kind: code-reading
 level: 2
@@ -16,7 +16,7 @@ related: [coding/loss-shift-flatten]
 updated: 2026-11-03
 ---
 
-Two evaluation runs on the same checkpoint and the same fixed validation batches report different losses. The dropout layer is:
+在同一个检查点、同一组固定验证 batch 上跑两次评估，报告的损失不一样。dropout 层是这样写的：
 
 ```python
 def dropout_forward(x, p, rng, training):
@@ -26,20 +26,20 @@ def dropout_forward(x, p, rng, training):
     return x * (1 - p), mask
 ```
 
-Find every problem with the inference path and explain what the evaluation function expects.
+找出推理路径上的所有问题，并说明评估函数期望它怎样表现。
 
 ## Short answer
 
-Inverted dropout scales the kept units during training so that inference is the identity, but this inference path multiplies the input by one minus p, which belongs to the non-inverted form and shrinks every activation. It also draws from the generator in inference mode, which changes every later random number in the run, such as the next training mask and the next probe sample. Inference must return the input unchanged and must not touch the generator.
+反向 dropout 在训练时放大保留的单元，这样推理时就是恒等变换；但这条推理路径把输入乘以一减 p，这属于非反向形式，会缩小每个激活值。它还在推理模式下从生成器取随机数，改变了这次运行之后的每个随机数，例如下一个训练掩码和下一个探针样本。推理必须原样返回输入，并且不能动生成器。
 
 ## Full answer
 
-### The two bugs
+### 两个 bug
 
-1. Scaling at inference. With inverted dropout the division by one minus p happens in training, so the expected activation already matches the no-dropout value. Scaling again at inference halves the signal at a rate of one half and damages every layer that follows.
-2. Drawing at inference. The mask is sampled before the branch. Evaluation consumes random numbers, so the generation sample after the probe, and any later training step, sees a different stream than a run without the probe.
+1. 推理时缩放。反向 dropout 在训练时除以一减 p，所以激活值的期望已经和没有 dropout 时一致。推理时再缩放一次，在比率为二分之一时信号会减半，之后的每一层都会受影响。
+2. 推理时取随机数。掩码在分支之前采样。评估消耗了随机数，所以探针之后的生成采样，以及之后的任何训练步，看到的随机数流都和没有探针的运行不同。
 
-### The fix
+### 修复
 
 ```python
 def dropout_forward(x, p, rng, training):
@@ -49,24 +49,24 @@ def dropout_forward(x, p, rng, training):
     return x * mask / (1 - p), mask
 ```
 
-At inference the layer returns a copy of the input and a mask that is true everywhere, and it does not draw. Keep an entry when the random number is at or above p, so the complement rule is right, and divide the kept entries by one minus p. The backward pass multiplies the incoming gradient by the same mask and divides by the same factor.
+推理时，这一层返回输入的副本和一个全为真的掩码，不取随机数。随机数大于等于 p 时保留该元素，这样取补的规则才对；保留的元素除以一减 p。反向传播把传入的梯度乘以同一个掩码，再除以同一个系数。
 
-### What evaluation expects
+### 评估期望什么
 
-The training loop's evaluation function runs a fixed number of validation batches with no gradient and no dropout, and the number must be reproducible across runs given the same seed and split. Any randomness inside the model during that pass breaks the comparison between two runs, because the difference measures the random stream rather than the model. The assembly lesson's model has an embedding dropout of 0.1, so this layer sits in the path of every evaluation.
+训练循环的评估函数在不算梯度、不开 dropout 的情况下跑固定数量的验证 batch；给定相同的种子和切分，结果必须能在多次运行之间复现。这一遍里模型内部只要有随机性，两次运行的比较就失效，因为差异衡量的是随机数流，而不是模型。组装课里的模型在嵌入上有 0.1 的 dropout，所以每次评估都会经过这一层。
 
 ## Follow-ups
 
-- **Level 2:** Why divide by one minus p during training at all? Expected: so the expected value of each activation is the same with and without the mask, which makes inference the identity.
-- **Level 2:** Why must the backward pass use the same mask? Expected: the gradient must flow only through the units that were kept, with the same scale, otherwise the gradient does not match the forward computation.
-- **Level 3:** The evaluation is reproducible but still differs from a run that skipped the probe. What else draws? Expected: the sampled generation at the probe step consumes draws from the shared generator; give the probe its own generator.
+- **Level 2:** 训练时为什么要除以一减 p？ Expected: 让每个激活值在有掩码和无掩码时期望相同，推理就成了恒等变换。
+- **Level 2:** 反向传播为什么必须用同一个掩码？ Expected: 梯度只能以相同的缩放流过被保留的单元，否则梯度和前向计算对不上。
+- **Level 3:** 评估已经可复现，但结果仍和跳过探针的运行不同。还有什么在取随机数？ Expected: 探针那一步的采样生成会从共享生成器取随机数；给探针一个单独的生成器。
 
 ## Wrong answers
 
-- "Scale down at inference as the original dropout paper did." That form skips the scaling in training; mixing the two forms shrinks the activations.
-- "Re-seed the generator before every evaluation." It hides the extra draws but still changes the training stream afterwards; the inference path should not draw at all.
-- "Keep an entry when the random number is below p." That keeps a fraction p and drops the rest, the complement of the intended mask.
+- "像最初的 dropout 论文那样，在推理时缩小。" 那种形式训练时不缩放；两种形式混用会让激活值变小。
+- "每次评估前重新设置生成器的种子。" 这能掩盖多取的随机数，但之后的训练随机数流仍然会变；推理路径根本不应该取随机数。
+- "随机数小于 p 时保留该元素。" 这样保留的是比例 p，其余都丢掉，正好是目标掩码的补集。
 
 ## Taught in
 
-The [training loop lesson](../../../phases/19-capstone-projects/36-training-loop-eval/) requires that evaluation skip gradients and dropout, the [GPT assembly lesson](../../../phases/19-capstone-projects/35-gpt-model-assembly/) places the embedding dropout, and the [inverted dropout practice](../../../practice/inverted-dropout/) checks the identity at inference.
+[训练循环课](../../../phases/19-capstone-projects/36-training-loop-eval/)要求评估跳过梯度和 dropout，[GPT 组装课](../../../phases/19-capstone-projects/35-gpt-model-assembly/)设置了嵌入 dropout，[反向 dropout 练习](../../../practice/inverted-dropout/)检查推理时的恒等变换。

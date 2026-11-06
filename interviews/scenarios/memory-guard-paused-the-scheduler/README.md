@@ -1,6 +1,6 @@
 ---
 id: memory-guard-paused-the-scheduler
-title: A memory guard paused the scheduler mid-start
+title: 内存守护进程在启动中途挂起调度器
 card: scenarios
 kind: incident
 level: 4
@@ -28,56 +28,56 @@ source:
 
 ## Situation
 
-A team gets time on a GB10 desktop that several people share, and starts an SGLang server for `Qwen/Qwen3-30B-A3B-Instruct-2507`. Three starts in one afternoon stall after the weights load. The server log stops, the scheduler process is alive but does nothing for a while, then the log continues as if nothing happened. Nobody sees an error.
+一个团队获得了一台多人共享的 GB10 桌面机器的使用时间，为 `Qwen/Qwen3-30B-A3B-Instruct-2507` 启动 SGLang 推理服务。在一个下午连续三次启动均在权重加载完毕后发生卡死停顿。服务器日志突然停止输出，调度器进程依然存活但在一段时间内毫无作为，随后日志又如同无事发生一般恢复正常打印。现场没有任何人看到显式报错。
 
-That afternoon the on-call channel also gets pages from a kernel-log alert. Nine bursts of an NVIDIA driver line that says `Out of memory` arrive between 13:52 and 16:46, up to 13 lines in one minute. The team puts the two things together: the driver is faulty, and the server leaks memory until the driver fails. They ask to move the model to a smaller, dedicated card. The owner of the desktop asks you to review before anyone changes hardware.
+当天下午，值班群也接连收到了内核日志告警呼叫。在 13:52 到 16:46 之间，NVIDIA 驱动打印了九次包含 `Out of memory` 的突发日志，单分钟内最高达 13 行。团队将这两件事联系在一起：驱动存在质量缺陷，且推理服务器存在内存泄漏直至驱动崩溃。他们请求将模型迁移至规格更小但独占的显卡上。桌面机器的所有者在硬件变动前要求你复盘。
 
 ## Evidence
 
-- [the guard log around the first pause](evidence/first-pause.txt)
-- [two more pauses in the next hour](evidence/two-more-pauses.txt)
-- [the weights and the pool of a default start that was kept](evidence/the-pool-size.txt)
-- [the driver line in the kernel log, counted by minute](evidence/driver-bursts.txt)
-- [what the manual can and cannot say about the three pauses](evidence/what-is-not-proven.txt)
-- [the driver bursts and the position of the manual](evidence/alert-on-health.txt)
-- [how to start on a shared machine with unified memory](evidence/the-container-rule.txt)
+- [首次挂起停顿前后内存守护进程记录的审计日志](evidence/first-pause.txt)
+- [随后一小时内发生的另外两次挂起停顿记录](evidence/two-more-pauses.txt)
+- [一份妥善保存的默认启动中的权重与显存池规模数据](evidence/the-pool-size.txt)
+- [按分钟统计的内核日志中 GPU 驱动错误日志突发](evidence/driver-bursts.txt)
+- [技术手册关于三次挂起能够说明与不能说明的事实界定](evidence/what-is-not-proven.txt)
+- [针对驱动日志突发与技术手册关于告警指标的权威立场](evidence/alert-on-health.txt)
+- [在多用户共享统一内存机器上启动服务的标准规程](evidence/the-container-rule.txt)
 
 ## Questions
 
-1. The scheduler stopped and later continued, and the server log shows no error. Which process stopped it, and on what rule?
-2. The guard saw one process grow by tens of GiB in five seconds. Which allocation is that likely to be, and how do you check it against a start whose log was kept?
-3. The three pauses report different growth. What can you conclude from the guard log alone, and what can you not?
-4. Nine bursts of the driver line fell on one day. What does the manual claim about them, and what would it take to tie one burst to one start?
-5. Which alert do you keep and which do you remove, and what is the start procedure for this machine from now on?
+1. 调度器停止后又恢复运行且服务器日志未见报错。是哪个系统进程停止了它，依据何种规则？
+2. 守护进程观测到单个进程在 5 秒内暴涨数十 GiB 内存。那极可能是哪项内存分配，如何与留存的启动日志交叉核验？
+3. 三次挂起报告了截然不同的内存增长量。单凭守护进程日志你能得出什么结论，又不能得出什么？
+4. 驱动日志突发集中在同一天爆发。手册对此做出了何种论述，将一次突发与某次启动相绑定需要什么条件？
+5. 应当保留哪个告警、移除哪个告警，该机器今后的启动操作标准规程应当如何制定？
 
 ## Walkthrough
 
-1. **Read the guard log first.** The desktop runs a memory guard daemon for its other users. It stops the process that grows fastest when free memory gets low. Its first entry reads `Critical: 34.2 GiB left before the freeze zone`, and the same second it paused `sglang::schedul` because it grew 36.7 GiB in 5s. Eight seconds later the guard logged `Back to normal: 28.9 GiB available`. The scheduler was the fastest-growing process on the machine, so the guard was correct by its own rule. That is the stall the team saw, and no server log records it, because the server was not told anything.
-2. **Match the growth against a kept start.** The default start that the manual kept shows what the scheduler allocates right after the weights: a KV pool that holds 227,243 tokens, with 10.40 GB for K and 10.40 GB for V, allocated in a few seconds, with 54.84 GB free before and 31.22 GB free after. The manual reads the 36.7 GiB as the size of a KV pool allocation. It also notes a field report of 25 to 40 GB of short-lived allocations outside the fraction, from the autotuner and the graph capture, and says plainly that the guard log does not separate the pool from those. So the growth is the startup allocation of a server on unified memory, and its exact split is not proven.
-3. **Read the other two pauses with the same care.** They report 9.4 GiB and 28.1 GiB of growth, and each time the guard reported normal within seconds. The server logs of those three starts were not kept, so nobody can say which allocation each pause caught. The manual's table of six kept starts shows why a single number would mislead anyway: the same weights measured between 54.78 and 57.92 GB, and the pools ran from 216,775 to 258,017 tokens, because the kernel's file cache changed during each load. What the guard log does prove is a process that grows by tens of GiB in seconds and then stops growing. A leak would keep the guard busy after the pool line, and no entry shows that.
-4. **Read the driver bursts as a count, not a verdict.** The kernel line is `NV_ERR_NO_MEMORY` from the driver's allocator. The bursts are dated 2026-10-16, the day of the first test and sweep starts, with 3 to 13 lines per minute. The manual kept no server logs from that day, so it cannot match a burst to a start and refuses to. What it can say is that every server in its later captures became healthy and finished its benchmarks. To tie a burst to a start you would need the server log with timestamps and the free-memory log of the machine for the same minute.
-5. **Turn the reading into a procedure.** The manual's position for a shared GB10 has four steps: start SGLang in a container with a memory limit, start below the fraction of 0.7 that its kit used, log the free memory of the machine once a second during startup, and raise the fraction only after you saw the peak. Add two more from the same page: pass `--mem-fraction-static` on purpose, and tell the other users of the machine before you start. For the guard, the manual agreed with the owner to stop it for the time of its runs. On the alert, the position is one sentence: do not alert on the driver line alone, alert when a server does not become healthy.
+1. **优先调阅守护进程审计日志。** 该桌面机器为保障其他用户正常使用，后台常驻了一个内存守护进程。当可用内存过低时，它会自动挂起增长速度最快的进程。其首条记录清晰写道：`Critical: 34.2 GiB left before the freeze zone`，且在同一秒它强行挂起了 `sglang::schedul`，原因是该进程在 5s 内激增了 36.7 GiB 内存。八秒后守护进程记录 `Back to normal: 28.9 GiB available` 并恢复了该进程。调度器当时正是整台机器上内存膨胀最迅猛的进程，因此守护进程按自身规则准确执行了操作。这就是团队观测到的卡死停顿，而服务器日志对此毫无记载，因为服务器根本未收到任何通知。
+2. **将内存膨胀与基准启动日志对齐。** 手册完整留存的一份默认启动日志揭示了调度器在权重加载之后分配的内容：容量为 227,243 个 token 的 KV 显存池（K 和 V 各占 10.40 GB），在短短数秒内完成分配，分配前空闲 54.84 GB，分配后剩余 31.22 GB。手册将 36.7 GiB 视为 KV 池分配以及自动调优与图捕获所产生的 25 至 40 GB 瞬时开销的综合体，并坦承守护日志无法将它们细分剥离。因此激增的本质是统一内存服务器启动时的集中内存分配行为，其具体内部切分在证据上并未证实。
+3. **审视另外两次挂起记录。** 另外两次挂起分别报告了 9.4 GiB 和 28.1 GiB 的增长，且每次守护进程均在数秒内解除了挂起。这三次启动的服务器日志未能妥善保留，因而无法断言每次挂起具体捕获的是哪个阶段。手册记录的六次完整启动表明单一数字本就会波动：由于文件缓存变动，相同的权重在各次启动中占用 54.78 到 57.92 GB，显存池在 216,775 到 258,017 token 之间浮动。守护日志确凿证明的是：一个进程在数秒内激增数十 GiB，随后彻底停止增长。如果是内存泄漏，守护进程在显存池建立后会频繁介入，而日志中没有任何此类迹象。
+4. **将驱动日志突发视为计数值而非定罪证据。** 内核行是驱动分配器抛出的 `NV_ERR_NO_MEMORY`。突发集中在 2026-10-16，即首次测试与参数扫描当天，每分钟包含 3 到 13 行。由于当天未保留服务器日志，手册拒绝将突发强行对应到具体启动上。手册确证的是：后续捕获中的所有服务器全部恢复健康并顺利跑完了基准测试。要将突发绑定到启动上，必须同时拥有带时间戳的服务器日志与同分钟的整机空闲内存监控。
+5. **将实证提炼为操作规程。** 手册针对共享 GB10 制定了四步规程：在带有内存上限的容器中运行 SGLang；以低于测试套件所用的 0.7 比例启动；在启动期间每秒记录一次机器空闲内存；仅在观测到内存峰值后才考虑调高比例。并补充两项原则：显式传入 `--mem-fraction-static`，并在启动前通知机器上的其他用户。对于守护进程，团队与机器所有者协商在测试期间临时将其停用。对于告警，原则仅有一句话：绝不对驱动单行日志单独告警，仅对服务器未能转为健康状态建立告警。
 
 ## Resolution
 
-As far as the evidence shows, the server did not leak and the driver was not faulty. A guard that watches the whole machine paused the scheduler while it allocated its pool, three times, and resumed it each time within seconds. The driver bursts fell on the same day, and the captures hold no link from any burst to a failed start or to a user who saw an error.
+根据现有确凿证据，服务器不存在内存泄漏，驱动也未损坏。监控整机全局的守护进程在调度器集中分配显存池时先后三次挂起了进程，并在每次挂起数秒后自动恢复了执行。驱动日志突发发生在同一天，但没有任何证据将任何一次突发与启动失败或用户报错相挂钩。
 
-The team kept the model on the GB10 and changed how it starts: an explicit fraction, a container with a memory cap, a free-memory log during startup, and an agreement with the owner about the guard while the server runs. The kernel-line page was replaced with a health alert on the server's ready line and its health endpoint, which in the kept start returned 503 before the ready line and 200 after it. The measurement that supports the change is the set of later starts, which reached their pool lines and ran their benchmarks with no pause and no page.
+团队决定继续在 GB10 上保留该模型，并重构了启动操作流程：显式指定内存比例、使用带有内存配额的容器隔离运行、启动期间采集高频空闲内存日志，并与所有者约定在运行窗口期停用守护进程。将基于内核驱动日志的告警彻底废除，替换为基于服务器就绪行与健康检查端点的可用性告警（在留存日志中，健康端点在打出就绪行前返回 503，就绪后返回 200）。支撑该决策的数据依据是后续的一系列成功启动：所有服务均顺利完成了显存池分配并完成了基准测试，期间未发生任何挂起停顿与误报呼叫。
 
-Two things stay open, and the write-up says so. No capture ties a driver burst to a start, and the field report of allocations outside the fraction is from before this version and was not measured here.
+报告同时如实披露了两处悬而未决的事实：当前抓取记录无法将驱动突发与具体启动严格绑定；关于配额之外瞬时开销的实战报告源自旧版本，在当前环境下未作独立定量测量。
 
 ## Wrong turns
 
-- "The server leaks memory until the driver fails." The guard logged normal within seconds of each pause, and no entry shows growth after the pool was in place. A pool of tens of GB allocated in seconds is the design, not a leak.
-- "Replace the driver." The bursts carry no user-visible failure in the captures, and every later server became healthy. A line in the kernel log is not an incident until a user or a probe sees one.
-- "Raise the fraction, so the pool is allocated once and the guard stops complaining." The fraction sets the pool size. A larger pool grows faster and leaves less for the other users. Lower it, cap the container, and watch the peak.
-- "Match each burst to a start from the timestamps." Without the server logs of that day the match is a guess, and the manual refused to make it. Keep the logs that let you correlate before you correlate.
-- "Move to a smaller dedicated card." That trades a shared machine for a smaller pool and gives up the result that the GB10 served every later run. Fix the start procedure first, then decide.
+- "服务器发生内存泄漏直至驱动崩溃。" 守护进程在每次挂起数秒后即恢复正常状态，且在显存池就绪后未见任何持续增长。数秒内划拨数十 GB 是架构正常设计，而非内存泄漏。
+- "更换 GPU 驱动。" 抓取记录中突发日志未引发任何面向用户的可见故障，且后续所有服务器均恢复健康。在用户或探针观测到实际损坏前，内核日志中的一行文本不能界定为事故。
+- "调高内存比例以便显存池一次性分足，让守护进程停止抱怨。" 比例决定显存池大小。更大的池子在启动时膨胀更猛烈，给其他用户留下的空间更少。应降低比例、限制容器并观测峰值。
+- "仅凭时间戳将每次突发与启动绑定。" 缺少当天的服务器日志，此类匹配纯属无依据的猜测，手册对此予以明确拒绝。在建立因果关联前，先确保具备支撑关联的基础日志。
+- "迁移到更小的独占显卡上。" 这无异于用更小的显存池换取独占环境，并彻底放弃了 GB10 顺利承载后续所有任务的高性能收益。先规范启动规程，再做硬件决策。
 
 ## Generalize
 
-On unified memory, a KV pool is memory that the whole machine gives up in a few seconds, and every guard, daemon and user on that machine sees it go. Treat the start of a server as an event that you announce, cap and log, not as something that happens inside one process. When an alert fires, ask what it measured and who was harmed. Keep the logs that let you connect an event to a cause, and when they are missing, write down that the connection is not proven instead of asserting it.
+在统一内存架构下，KV 显存池是整台机器在短短数秒内交出的系统全局内存，机器上的所有守护进程、系统服务和其他用户都会目睹该资源的瞬间转移。将大型推理服务器的启动视为一项必须提前宣告、严格设限并高频审计的重大系统事件，而非单一用户进程内部的私有行为。告警触发时，审视其度量的物理意义以及谁真正受到了损害；妥善留存将事件关联至根因所需的上下文日志，在缺乏证据时，如实记录因果关系尚未证实，绝不妄下定论。
 
 ## Taught in
 
-The memory page of SGLang 101 records the pauses and the driver bursts in [a pool that other programs see](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#a-pool-that-other-programs-see) and gives the start procedure in [memory outside the fraction](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#memory-outside-the-fraction), and [the incident index](../../../manuals/sglang-101/sections/r-3-incident-index.md#our-capture) lists both with their status.
+SGLang 手册在[其他程序看到的显存池页面](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#a-pool-that-other-programs-see)记录了挂起停顿与驱动突发，并在[比例之外的内存页面](../../../manuals/sglang-101/sections/3-2-mem-fraction-static-and-startup-sizing.md#memory-outside-the-fraction)规范了标准启动流程，而[故障索引](../../../manuals/sglang-101/sections/r-3-incident-index.md#our-capture)汇总了这两项现象及其调查状态。

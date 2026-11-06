@@ -1,6 +1,6 @@
 ---
 id: finetune-pipeline-design
-title: One command from raw data to a served tuned model
+title: 单条命令完成从原始数据到调优模型部署
 card: system-design
 kind: design
 level: 3
@@ -16,57 +16,57 @@ related: [system-design/eval-platform-ship-gate, system-design/pipeline-rollback
 updated: 2026-11-03
 ---
 
-A team wants to adapt an open model in the 8B class to its own domain and serve it at a measurable cost per million tokens. Design the pipeline so that one command runs it end to end: the stages, the hardware per stage, the data hygiene, the ablations you require, the serving measurements, and what the release must include.
+一个团队希望将一个 8B 量级的开放模型适配到自身专有业务领域，并以可度量的每百万 token 成本对外提供推理服务。请设计流水线，使其能够通过单条命令完成端到端全流程：包含各阶段划分、各阶段硬件配置、数据清洗规范、强制要求的消融实验、推理服务度量指标，以及最终交付物所必须包含的内容。
 
 ## Short answer
 
-Five stages, each with a config file in version control: data preparation with deduplication, a quality filter, personal data scrubbing and a contamination check against the eval sets; supervised fine-tuning for 2-3 epochs on 8xH100 with a cosine schedule and packed sequences; one epoch of preference tuning on 4xH100 with a swept beta; quantization into three formats; and serving with speculative draft heads and autoscaling on queue wait. The deliverable is an ablation table of base, SFT only, SFT plus DPO and SFT plus GRPO on the task benchmarks, serving numbers at batch 1, 8 and 32 with the draft acceptance rate and cost per million tokens, a safety pass rate, and a model card with seeds, configs and commit hashes.
+流水线划分为五个阶段，每个阶段的配置文件均纳入版本控制：数据准备阶段执行去重、质量过滤、个人隐私数据脱敏以及对照评估测试集的数据污染检查；监督微调阶段在 8xH100 上执行 2-3 个 epoch，采用余弦学习率衰减与序列拼接；偏好微调阶段在 4xH100 上扫描超参数 beta 并执行一个 epoch；模型量化为三种格式；在线服务层配置推测解码的草稿头并依据请求队列排队等待时间实现弹性伸缩。最终交付物包括基座模型、仅 SFT、SFT 加 DPO 以及 SFT 加 GRPO 在业务基准上的完整消融对比表，在批大小为 1、8 和 32 下实测的吞吐、草稿头接受率与每百万 token 成本，安全评估通过率，以及附带随机种子、配置参数与 Git commit 哈希的模型卡片。
 
 ## Full answer
 
-### Stages and hardware
+### 阶段划分与硬件配置
 
-| Stage | What | Hardware in the capstone |
+| 阶段 | 核心任务 | 综合项目中的参考硬件 |
 |---|---|---|
-| Data | Deduplicate, filter quality, scrub personal data, split with a seed | CPU |
-| Contamination check | Near-duplicate hashing of every validation split against the public test sets; reject overlap | CPU |
-| SFT | Sharded optimizer, fast attention kernels, packed sequences, 2-3 epochs | 8xH100 |
-| Preference tuning | One epoch of DPO on pairs, or GRPO with a verifiable reward; sweep beta | 4xH100 |
-| Quantize | Three formats for deployment flexibility; record size and throughput | One GPU |
-| Serve | Draft heads for speculation, autoscaling on queue wait | Serving GPUs |
-| Eval and card | Benchmark matrix, safety eval, model card | CPU plus eval GPU |
+| 数据清洗准备 | 数据去重、质量过滤、敏感信息脱敏、基于固定随机种子切分 | CPU |
+| 数据污染拦截 | 对每个验证集切片与公开测试集做近重复哈希比对；严禁重叠 | CPU |
+| 监督微调 | 分片优化器、高性能注意力算子、样本打包拼接，训练 2-3 个 epoch | 8xH100 |
+| 偏好对齐微调 | 基于偏好成对样本执行 1 个 epoch 的 DPO，或采用可验证奖励的 GRPO；扫描超参 beta | 4xH100 |
+| 模型量化 | 输出三种格式以满足多样化部署需求；记录大小和吞吐量 | 单张 GPU |
+| 在线推理服务 | 配置推测解码草稿头加速生成，依据队列排队时间触发弹性伸缩 | 专用推理 GPU |
+| 综合评估与文档 | 基准评测矩阵比对、安全对齐评估、输出规范 Model Card | CPU 配合评估 GPU |
 
-In the capstone's example run the data stage keeps 280k of 300k examples, SFT takes 6h12m and moves validation loss from 1.42 to 1.03, DPO runs 1h40m at a beta of 0.08, the quantized weights are 4.6 GB, and serving shows a draft acceptance rate of 0.74 with a p99 of 126ms at a batch of 8.
+在综合项目的示例运行中，数据阶段从 300k 样本中筛选保留了 280k 条，SFT 耗时 6 小时 12 分钟并将验证集损失从 1.42 降至 1.03，DPO 在 beta 为 0.08 下运行了 1 小时 40 分钟，量化后权重仅为 4.6 GB，在线服务在批大小为 8 时草稿头接受率达到 0.74 且 p99 延迟为 126ms。
 
-### Hygiene is a gate, not a step
+### 数据卫生是硬门禁而非普通步骤
 
-The contamination check runs before training and fails the pipeline on overlap. The capstone's exercise leaks a small share of test answers into training and watches a benchmark jump unrealistically; the check is what makes the eval delta believable. The pipeline lesson adds the mechanism: a manifest with an input and output hash per stage, so the SFT stage refuses data that does not match the hash the contamination check approved.
+数据污染检查在模型训练开始前执行，一旦发现数据重叠立即终止整条流水线。综合项目的练习中特意将少量测试集答案泄漏进训练集，目睹了评测指标不切实际地暴涨；前置污染拦截是确保评测净增益具有说服力的保障。完整流水线课程补充了对应的防护机制：清单文件为每个阶段维护输入与输出哈希，SFT 阶段会坚决拒绝不符合污染检查所核准哈希的数据输入。
 
-### Ablations are the deliverable
+### 消融实验是核心交付物
 
-The question the pipeline answers is not whether the model got better but which stage paid for it. Run the eval matrix on the base, on SFT only, on SFT plus DPO and on SFT plus GRPO. The example reports gains of +3.2 on one benchmark and +0.41 on another after the full run. Without the ablation, a regression from preference tuning hides behind the SFT gain.
+流水线真正要回答的不是“模型是否变好了”，而是“各阶段的投入是否物有所值”。必须在基座模型、仅 SFT、SFT+DPO 以及 SFT+GRPO 四个状态下分别运行基准评测矩阵。示例运行中，全流程跑完后在某基准上获得了 +3.2 的提升，在另一基准上提升了 +0.41。若缺乏分步消融，偏好微调阶段导致的性能回退很容易掩盖在 SFT 阶段的巨大增益之下。
 
-### Serving measurements
+### 推理服务度量
 
-Tokens per second at batch sizes 1, 8 and 32, the acceptance rate of the draft heads, and the cost for each million tokens against a hosted alternative at matched quality. Acceptance measured on the domain data, not generic chat, because the draft heads were trained for the domain and the latency budget depends on it.
+测试在 Batch Size 为 1、8 和 32 时的每秒生成 token 数、推测草稿头的实际接受率，以及对照同等质量外部托管模型核算的每百万 token 实际成本。接受率必须在真实领域业务流量上实测，而非使用通用聊天数据，因为草稿头是针对特定领域训练的，整个系统的延迟预算依赖于这一指标。
 
-### The release
+### 最终发布包内容
 
-A model card with the data sources and licenses, the training configs, the eval matrix, the safety pass rate, a reproducibility section with seeds and commit hashes, and the quantization deltas. One command reruns the pipeline with identical seeds; the rubric weights reproducibility and data hygiene as heavily as the eval gain.
+完整的模型卡片：列明数据来源与许可证、完整训练配置参数、综合评测矩阵、安全评估通过率、包含随机种子与 git commit 哈希的可复现章节，以及量化带来的精度损益说明。单条命令可基于完全相同的随机种子重新运行整条流水线；在评审评分标准中，可复现性与数据纯净度占据与模型评测收益同等重要的权重。
 
 ## Follow-ups
 
-- **Level 3:** Why does preference tuning need fewer GPUs than SFT? Expected: it runs one epoch on a much smaller set of pairs, and the capstone sizes it at half the SFT hardware.
-- **Level 3:** Which stage gets rerun when the safety eval fails on the quantized model? Expected: quantization and serving only; the pipeline lesson's rollback invalidates the failed stage and its descendants.
-- **Level 4:** The acceptance rate on domain traffic is far below the number from generic chat data. What does that do to the design? Expected: the latency budget was set on the wrong number; retrain the draft heads on domain data or size serving without the speculation gain.
-- **Level 4:** A smaller model with a low-rank adapter matches quality at a tenth of the memory. How does the pipeline change? Expected: the SFT stage swaps to adapter training with the same data and eval gates, and the quantization and serving stages consume the merged weights unchanged.
+- **Level 3:** 为什么偏好对齐阶段需要的 GPU 数量少于 SFT 阶段？ Expected: 它只在规模小得多的偏好样本对上运行 1 个 epoch，综合项目中配置的硬件资源仅为 SFT 的一半。
+- **Level 3:** 若量化模型在安全评估上未通过，需要重跑哪些阶段？ Expected: 仅需重跑量化与服务部署阶段；完整流水线课程的回滚机制只使失败阶段及其下游依赖失效。
+- **Level 4:** 草稿头在业务领域数据上的实际接受率远低于通用聊天数据，对架构设计有何影响？ Expected: 原定的延迟预算建立在错误假设之上；需使用垂直领域数据重新训练草稿头，或在不考虑推测解码加速的前提下重新规划推理算力。
+- **Level 4:** 一个引入低秩适配器的小模型在十分之一显存下达到了同等效果，流水线如何调整？ Expected: 将 SFT 阶段切换为适配器训练，沿用相同的数据与评估门禁，后续的量化与服务层直接消费合并后的权重即可，无缝衔接。
 
 ## Wrong answers
 
-- "Skip the contamination check; the data is internal." Internal data copies public text all the time, and one leaked test set makes the whole eval table meaningless.
-- "Report the final model against the base and stop." Without the per-stage ablation nobody knows whether preference tuning helped or hurt.
-- "Measure serving at batch one only." Throughput and cost per million tokens come from batched decoding; batch one measures latency, not economics.
+- "跳过数据污染检查；反正都是内部数据。" 内部数据经常复制外部公开文本，一旦泄漏了一个测试集，整份评测对比表就失去了参考价值。
+- "只汇报最终模型相比基座模型的综合提升就交差。" 缺乏各阶段的逐级消融实验，根本无法查明偏好对齐阶段到底是带来了收益还是造成了损伤。
+- "仅仅在 Batch 为 1 的场景下测试推理性能。" 吞吐量与每百万 token 成本来自批量解码；Batch 1 测量的只是单纯的端到端延迟，无法反映整体经济性。
 
 ## Taught in
 
-The [end-to-end fine-tuning capstone](../../../phases/19-capstone-projects/07-end-to-end-fine-tuning-pipeline/) gives the five stages, the hardware, the example run and the rubric, and the [complete LLM pipeline lesson](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/) gives the manifest, the hash chain and the rollback set.
+[端到端微调综合项目课程](../../../phases/19-capstone-projects/07-end-to-end-fine-tuning-pipeline/)给出了五个阶段划分、硬件配置、示例运行数据与验收规范，[构建完整 LLM 流水线课程](../../../phases/10-llms-from-scratch/13-building-complete-llm-pipeline/)给出了清单文件、哈希校验链与回滚机制。
