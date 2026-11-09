@@ -206,6 +206,24 @@ test('the lesson template fetches fragments and keeps the browser fallback', () 
   assert.match(fs.readFileSync(path.join(__dirname, '..', '.gitignore'), 'utf8'), /^site\/lesson-code\/$/m);
 });
 
+test('runtime lesson rendering consumes the fetched fragments', () => {
+  const template = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  const start = template.indexOf('function fetchLesson(');
+  const end = template.indexOf('function showError(', start);
+  assert.ok(start > 0 && end > start);
+  const body = template.slice(start, end);
+  assert.match(body, /var codePromise = fetchLessonCode\(path\);/);
+  assert.match(body, /renderLesson\(embeddedCertification\.markdown, blocks\)/);
+  assert.match(body, /Promise\.all\(\[lessonDocument, codePromise\]\)/);
+  assert.match(body, /renderLesson\(md, results\[1\]\)/);
+});
+
+test('prerendered lesson pages render code with the build highlighter', () => {
+  const build = fs.readFileSync(path.join(__dirname, 'build.js'), 'utf8');
+  assert.ok(/let body = mdRender\.parseMd\(md, \{ renderCode: code\.render \}\);/.test(build), 'prerender must use lib/code');
+  assert.ok(/^const code = require\('\.\/lib\/code'\);$/m.test(build), 'build.js must load lib/code');
+});
+
 test('two builds give the same bytes', t => {
   const root = fixture(t);
   const first = buildLessonCode({ root });

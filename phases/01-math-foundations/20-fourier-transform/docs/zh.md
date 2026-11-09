@@ -3,7 +3,7 @@
 > 每个信号都是正弦波之和。傅里叶变换告诉你是哪些。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 01-04 课、19 课（复数）
 **预计时间：** ~90 分钟
 
@@ -426,7 +426,7 @@ spectrogram = np.abs(Zxx) ** 2
 
 ## 拿去用
 
-运行 `code/fourier.py` 来生成 `outputs/prompt-spectral-analyzer.md`。
+运行 `code/fourier.py` 来生成 `outputs/prompt-spectral-analyzer.md`。TypeScript 版本 `code/fourier.ts` 写入相同的文件。
 
 ## 练习
 

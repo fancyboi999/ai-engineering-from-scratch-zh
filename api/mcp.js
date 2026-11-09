@@ -28,9 +28,12 @@ async function readBody(req) {
     body = Buffer.concat(chunks);
   }
   if (Buffer.isBuffer(body)) body = body.toString('utf8');
-  const encoded = typeof body === 'string' ? body : JSON.stringify(body);
-  if (Buffer.byteLength(encoded) > 65536) throw new RangeError('Request body exceeds 64 KiB.');
-  return JSON.parse(encoded);
+  if (typeof body !== 'string') {
+    if (body !== null && typeof body === 'object' && Buffer.byteLength(JSON.stringify(body)) > 65536) throw new RangeError('Request body exceeds 64 KiB.');
+    return body;
+  }
+  if (Buffer.byteLength(body) > 65536) throw new RangeError('Request body exceeds 64 KiB.');
+  return JSON.parse(body);
 }
 
 function object(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }

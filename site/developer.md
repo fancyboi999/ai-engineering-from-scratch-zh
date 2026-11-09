@@ -32,7 +32,7 @@ REST 支持 GET 和 HEAD；HEAD 返回与 GET 相同的元数据，不含正文�
 
 ## 配额与缓存
 
-catalog、resource 和 MCP 各自按客户端 IP 在每个函数实例上执行 60 秒固定窗口、120 次请求的配额。同一公网 IP 的客户端共享配额。未缓存响应携带：
+catalog、resource 和 MCP 各自在每个函数实例上按客户端执行 60 秒固定窗口、120 次请求的配额。一个客户端指一个 IPv4 地址或一个 IPv6 /64 前缀。一个客户端的请求不消耗另一个客户端的配额。共享公网 IPv4 地址或 IPv6 /64 的客户端共享配额。未缓存响应携带：
 
 ```text
 RateLimit-Policy: "client-instance";q=120;w=60

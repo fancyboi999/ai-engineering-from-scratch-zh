@@ -323,6 +323,8 @@ flowchart TB
   P16 --> P19["阶段 19 · 综合项目"]
   P17 --> P19
   P18 --> P19
+  classDef phase fill:#fafaf5,stroke:#3553ff,color:#1a1a1a
+  class P0,P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19 phase
 ```
 
 <a id="contents"></a>
@@ -337,10 +339,10 @@ flowchart TB
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [开发环境](phases/00-setup-and-tooling/01-dev-environment/) | Build | Python |
+| 01 | [开发环境](phases/00-setup-and-tooling/01-dev-environment/) | Build | Python, TypeScript, Rust |
 | 02 | [Git 与协作](phases/00-setup-and-tooling/02-git-and-collaboration/) | Learn | — |
 | 03 | [GPU 配置与云端](phases/00-setup-and-tooling/03-gpu-setup-and-cloud/) | Build | Python |
-| 04 | [API 与密钥](phases/00-setup-and-tooling/04-apis-and-keys/) | Build | Python |
+| 04 | [API 与密钥](phases/00-setup-and-tooling/04-apis-and-keys/) | Build | Python, TypeScript |
 | 05 | [Jupyter Notebook](phases/00-setup-and-tooling/05-jupyter-notebooks/) | Build | Python |
 | 06 | [Python 环境管理](phases/00-setup-and-tooling/06-python-environments/) | Build | Shell |
 | 07 | [面向 AI 的 Docker](phases/00-setup-and-tooling/07-docker-for-ai/) | Build | Docker |
@@ -360,24 +362,24 @@ flowchart TB
 | 01 | [线性代数直觉](phases/01-math-foundations/01-linear-algebra-intuition/) | Learn | Python, Julia |
 | 02 | [向量、矩阵与运算](phases/01-math-foundations/02-vectors-matrices-operations/) | Build | Python, Julia |
 | 03 | [矩阵变换与特征值](phases/01-math-foundations/03-matrix-transformations/) | Build | Python, Julia |
-| 04 | [机器学习里的微积分：导数与梯度](phases/01-math-foundations/04-calculus-for-ml/) | Learn | Python |
-| 05 | [链式法则与自动微分](phases/01-math-foundations/05-chain-rule-and-autodiff/) | Build | Python |
-| 06 | [概率与分布](phases/01-math-foundations/06-probability-and-distributions/) | Learn | Python |
-| 07 | [贝叶斯定理与统计思维](phases/01-math-foundations/07-bayes-theorem/) | Build | Python |
-| 08 | [优化：梯度下降家族](phases/01-math-foundations/08-optimization/) | Build | Python |
-| 09 | [信息论：熵与 KL 散度](phases/01-math-foundations/09-information-theory/) | Learn | Python |
-| 10 | [降维：PCA、t-SNE、UMAP](phases/01-math-foundations/10-dimensionality-reduction/) | Build | Python |
+| 04 | [机器学习里的微积分：导数与梯度](phases/01-math-foundations/04-calculus-for-ml/) | Learn | Python, Julia |
+| 05 | [链式法则与自动微分](phases/01-math-foundations/05-chain-rule-and-autodiff/) | Build | Python, Julia |
+| 06 | [概率与分布](phases/01-math-foundations/06-probability-and-distributions/) | Learn | Python, Julia |
+| 07 | [贝叶斯定理与统计思维](phases/01-math-foundations/07-bayes-theorem/) | Build | Python, TypeScript |
+| 08 | [优化：梯度下降家族](phases/01-math-foundations/08-optimization/) | Build | Python, Julia |
+| 09 | [信息论：熵与 KL 散度](phases/01-math-foundations/09-information-theory/) | Learn | Python, TypeScript |
+| 10 | [降维：PCA、t-SNE、UMAP](phases/01-math-foundations/10-dimensionality-reduction/) | Build | Python, TypeScript |
 | 11 | [奇异值分解](phases/01-math-foundations/11-singular-value-decomposition/) | Build | Python, Julia |
-| 12 | [张量运算](phases/01-math-foundations/12-tensor-operations/) | Build | Python |
-| 13 | [数值稳定性](phases/01-math-foundations/13-numerical-stability/) | Build | Python |
-| 14 | [范数与距离](phases/01-math-foundations/14-norms-and-distances/) | Build | Python |
-| 15 | [机器学习里的统计学](phases/01-math-foundations/15-statistics-for-ml/) | Build | Python |
-| 16 | [采样方法](phases/01-math-foundations/16-sampling-methods/) | Build | Python |
-| 17 | [线性方程组](phases/01-math-foundations/17-linear-systems/) | Build | Python |
-| 18 | [凸优化](phases/01-math-foundations/18-convex-optimization/) | Build | Python |
+| 12 | [张量运算](phases/01-math-foundations/12-tensor-operations/) | Build | Python, TypeScript |
+| 13 | [数值稳定性](phases/01-math-foundations/13-numerical-stability/) | Build | Python, TypeScript |
+| 14 | [范数与距离](phases/01-math-foundations/14-norms-and-distances/) | Build | Python, TypeScript |
+| 15 | [机器学习里的统计学](phases/01-math-foundations/15-statistics-for-ml/) | Build | Python, TypeScript |
+| 16 | [采样方法](phases/01-math-foundations/16-sampling-methods/) | Build | Python, TypeScript |
+| 17 | [线性方程组](phases/01-math-foundations/17-linear-systems/) | Build | Python, TypeScript |
+| 18 | [凸优化](phases/01-math-foundations/18-convex-optimization/) | Build | Python, TypeScript |
 | 19 | [面向 AI 的复数](phases/01-math-foundations/19-complex-numbers/) | Learn | Python |
-| 20 | [傅里叶变换](phases/01-math-foundations/20-fourier-transform/) | Build | Python |
-| 21 | [机器学习里的图论](phases/01-math-foundations/21-graph-theory/) | Build | Python |
+| 20 | [傅里叶变换](phases/01-math-foundations/20-fourier-transform/) | Build | Python, TypeScript |
+| 21 | [机器学习里的图论](phases/01-math-foundations/21-graph-theory/) | Build | Python, TypeScript |
 | 22 | [随机过程](phases/01-math-foundations/22-stochastic-processes/) | Learn | Python |
 
 </details>
@@ -389,14 +391,14 @@ flowchart TB
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
 | 01 | [什么是机器学习](phases/02-ml-fundamentals/01-what-is-machine-learning/) | Learn | Python |
-| 02 | [从零实现线性回归](phases/02-ml-fundamentals/02-linear-regression/) | Build | Python |
-| 03 | [逻辑回归与分类](phases/02-ml-fundamentals/03-logistic-regression/) | Build | Python |
-| 04 | [决策树与随机森林](phases/02-ml-fundamentals/04-decision-trees/) | Build | Python |
-| 05 | [支持向量机](phases/02-ml-fundamentals/05-support-vector-machines/) | Build | Python |
-| 06 | [KNN 与距离度量](phases/02-ml-fundamentals/06-knn-and-distances/) | Build | Python |
-| 07 | [无监督学习：K-Means、DBSCAN](phases/02-ml-fundamentals/07-unsupervised-learning/) | Build | Python |
-| 08 | [特征工程与特征选择](phases/02-ml-fundamentals/08-feature-engineering/) | Build | Python |
-| 09 | [模型评估：指标与交叉验证](phases/02-ml-fundamentals/09-model-evaluation/) | Build | Python |
+| 02 | [从零实现线性回归](phases/02-ml-fundamentals/02-linear-regression/) | Build | Python, Rust, Julia |
+| 03 | [逻辑回归与分类](phases/02-ml-fundamentals/03-logistic-regression/) | Build | Python, Rust, Julia |
+| 04 | [决策树与随机森林](phases/02-ml-fundamentals/04-decision-trees/) | Build | Python, TypeScript |
+| 05 | [支持向量机](phases/02-ml-fundamentals/05-support-vector-machines/) | Build | Python, Julia |
+| 06 | [KNN 与距离度量](phases/02-ml-fundamentals/06-knn-and-distances/) | Build | Python, TypeScript |
+| 07 | [无监督学习：K-Means、DBSCAN](phases/02-ml-fundamentals/07-unsupervised-learning/) | Build | Python, TypeScript |
+| 08 | [特征工程与特征选择](phases/02-ml-fundamentals/08-feature-engineering/) | Build | Python, TypeScript |
+| 09 | [模型评估：指标与交叉验证](phases/02-ml-fundamentals/09-model-evaluation/) | Build | Python, Julia |
 | 10 | [偏差、方差与学习曲线](phases/02-ml-fundamentals/10-bias-variance/) | Learn | Python |
 | 11 | [集成方法：Boosting、Bagging、Stacking](phases/02-ml-fundamentals/11-ensemble-methods/) | Build | Python |
 | 12 | [超参数调优](phases/02-ml-fundamentals/12-hyperparameter-tuning/) | Build | Python |
@@ -418,16 +420,16 @@ flowchart TB
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [感知机：一切的起点](phases/03-deep-learning-core/01-the-perceptron/) | Build | Python |
-| 02 | [多层网络与前向传播](phases/03-deep-learning-core/02-multi-layer-networks/) | Build | Python |
-| 03 | [从零实现反向传播](phases/03-deep-learning-core/03-backpropagation/) | Build | Python |
-| 04 | [激活函数：ReLU、Sigmoid、GELU 及其原因](phases/03-deep-learning-core/04-activation-functions/) | Build | Python |
-| 05 | [损失函数：MSE、交叉熵、对比损失](phases/03-deep-learning-core/05-loss-functions/) | Build | Python |
-| 06 | [优化器：SGD、Momentum、Adam、AdamW](phases/03-deep-learning-core/06-optimizers/) | Build | Python |
-| 07 | [正则化：Dropout、权重衰减、BatchNorm](phases/03-deep-learning-core/07-regularization/) | Build | Python |
-| 08 | [权重初始化与训练稳定性](phases/03-deep-learning-core/08-weight-initialization/) | Build | Python |
-| 09 | [学习率调度与 Warmup](phases/03-deep-learning-core/09-learning-rate-schedules/) | Build | Python |
-| 10 | [造一个你自己的迷你框架](phases/03-deep-learning-core/10-mini-framework/) | Build | Python |
+| 01 | [感知机：一切的起点](phases/03-deep-learning-core/01-the-perceptron/) | Build | Python, Rust, Julia |
+| 02 | [多层网络与前向传播](phases/03-deep-learning-core/02-multi-layer-networks/) | Build | Python, TypeScript |
+| 03 | [从零实现反向传播](phases/03-deep-learning-core/03-backpropagation/) | Build | Python, Rust, Julia |
+| 04 | [激活函数：ReLU、Sigmoid、GELU 及其原因](phases/03-deep-learning-core/04-activation-functions/) | Build | Python, Julia |
+| 05 | [损失函数：MSE、交叉熵、对比损失](phases/03-deep-learning-core/05-loss-functions/) | Build | Python, Julia |
+| 06 | [优化器：SGD、Momentum、Adam、AdamW](phases/03-deep-learning-core/06-optimizers/) | Build | Python, TypeScript |
+| 07 | [正则化：Dropout、权重衰减、BatchNorm](phases/03-deep-learning-core/07-regularization/) | Build | Python, TypeScript |
+| 08 | [权重初始化与训练稳定性](phases/03-deep-learning-core/08-weight-initialization/) | Build | Python, TypeScript |
+| 09 | [学习率调度与 Warmup](phases/03-deep-learning-core/09-learning-rate-schedules/) | Build | Python, TypeScript |
+| 10 | [造一个你自己的迷你框架](phases/03-deep-learning-core/10-mini-framework/) | Build | Python, TypeScript |
 | 11 | [PyTorch 入门](phases/03-deep-learning-core/11-intro-to-pytorch/) | Build | Python |
 | 12 | [JAX 入门](phases/03-deep-learning-core/12-intro-to-jax/) | Build | Python |
 | 13 | [调试神经网络](phases/03-deep-learning-core/13-debugging-neural-networks/) | Build | Python |
@@ -454,7 +456,7 @@ flowchart TB
 | 12 | [视频理解——时序建模](phases/04-computer-vision/12-video-understanding/) | Build | Python |
 | 13 | [3D 视觉：点云、NeRF](phases/04-computer-vision/13-3d-vision-nerf/) | Build | Python |
 | 14 | [Vision Transformer（ViT）](phases/04-computer-vision/14-vision-transformers/) | Build | Python |
-| 15 | [实时视觉：边缘部署](phases/04-computer-vision/15-real-time-edge/) | Build | Python |
+| 15 | [实时视觉：边缘部署](phases/04-computer-vision/15-real-time-edge/) | Build | Python, Rust |
 | 16 | [构建一条完整的视觉流水线](phases/04-computer-vision/16-vision-pipeline-capstone/) | Build | Python |
 | 17 | [自监督视觉——SimCLR、DINO、MAE](phases/04-computer-vision/17-self-supervised-vision/) | Build | Python |
 | 18 | [开放词表视觉——CLIP](phases/04-computer-vision/18-open-vocab-clip/) | Build | Python |
@@ -495,11 +497,11 @@ flowchart TB
 | 16 | [文本生成](phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/) | Build | Python |
 | 17 | [聊天机器人：从规则到神经网络](phases/05-nlp-foundations-to-advanced/17-chatbots-rule-to-neural/) | Build | Python |
 | 18 | [多语言 NLP](phases/05-nlp-foundations-to-advanced/18-multilingual-nlp/) | Build | Python |
-| 19 | [子词分词：BPE、WordPiece、Unigram、SentencePiece](phases/05-nlp-foundations-to-advanced/19-subword-tokenization/) | Learn | Python |
+| 19 | [子词分词：BPE、WordPiece、Unigram、SentencePiece](phases/05-nlp-foundations-to-advanced/19-subword-tokenization/) | Learn | Python, TypeScript |
 | 20 | [结构化输出与约束解码](phases/05-nlp-foundations-to-advanced/20-structured-outputs-constrained-decoding/) | Build | Python |
 | 21 | [自然语言推理与文本蕴含](phases/05-nlp-foundations-to-advanced/21-nli-textual-entailment/) | Learn | Python |
 | 22 | [嵌入模型深入剖析](phases/05-nlp-foundations-to-advanced/22-embedding-models-deep-dive/) | Learn | Python |
-| 23 | [RAG 的分块策略](phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/) | Build | Python |
+| 23 | [RAG 的分块策略](phases/05-nlp-foundations-to-advanced/23-chunking-strategies-rag/) | Build | Python, TypeScript |
 | 24 | [指代消解](phases/05-nlp-foundations-to-advanced/24-coreference-resolution/) | Learn | Python |
 | 25 | [实体链接与消歧](phases/05-nlp-foundations-to-advanced/25-entity-linking/) | Build | Python |
 | 26 | [关系抽取与知识图谱构建](phases/05-nlp-foundations-to-advanced/26-relation-extraction-kg/) | Build | Python |
@@ -525,7 +527,7 @@ flowchart TB
 | 08 | [声音克隆与音色转换](phases/06-speech-and-audio/08-voice-cloning-conversion) | Build | Python |
 | 09 | [音乐生成](phases/06-speech-and-audio/09-music-generation) | Build | Python |
 | 10 | [音频语言模型](phases/06-speech-and-audio/10-audio-language-models) | Build | Python |
-| 11 | [实时音频处理](phases/06-speech-and-audio/11-real-time-audio-processing) | Build | Python |
+| 11 | [实时音频处理](phases/06-speech-and-audio/11-real-time-audio-processing) | Build | Python, Rust |
 | 12 | [搭一条语音助手流水线](phases/06-speech-and-audio/12-voice-assistant-pipeline) | Build | Python |
 | 13 | [神经音频编解码器——EnCodec、SNAC、Mimi、DAC](phases/06-speech-and-audio/13-neural-audio-codecs) | Learn | Python |
 | 14 | [语音活动检测与轮次切换](phases/06-speech-and-audio/14-voice-activity-detection-turn-taking) | Build | Python |
@@ -541,22 +543,22 @@ flowchart TB
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [为什么用 Transformer：RNN 的问题](phases/07-transformers-deep-dive/01-why-transformers/) | Learn | Python |
-| 02 | [从零实现自注意力](phases/07-transformers-deep-dive/02-self-attention-from-scratch/) | Build | Python |
-| 03 | [多头注意力](phases/07-transformers-deep-dive/03-multi-head-attention/) | Build | Python |
-| 04 | [位置编码：正弦、RoPE、ALiBi](phases/07-transformers-deep-dive/04-positional-encoding/) | Build | Python |
-| 05 | [完整的 Transformer：编码器 + 解码器](phases/07-transformers-deep-dive/05-full-transformer/) | Build | Python |
+| 01 | [为什么用 Transformer：RNN 的问题](phases/07-transformers-deep-dive/01-why-transformers/) | Learn | Python, Julia |
+| 02 | [从零实现自注意力](phases/07-transformers-deep-dive/02-self-attention-from-scratch/) | Build | Python, Rust, Julia |
+| 03 | [多头注意力](phases/07-transformers-deep-dive/03-multi-head-attention/) | Build | Python, Rust |
+| 04 | [位置编码：正弦、RoPE、ALiBi](phases/07-transformers-deep-dive/04-positional-encoding/) | Build | Python, Rust, Julia |
+| 05 | [完整的 Transformer：编码器 + 解码器](phases/07-transformers-deep-dive/05-full-transformer/) | Build | Python, Julia |
 | 06 | [BERT——掩码语言建模](phases/07-transformers-deep-dive/06-bert-masked-language-modeling/) | Build | Python |
 | 07 | [GPT——因果语言建模](phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/) | Build | Python |
 | 08 | [T5、BART——编码器-解码器模型](phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/) | Learn | Python |
 | 09 | [Vision Transformer（ViT）](phases/07-transformers-deep-dive/09-vision-transformers/) | Build | Python |
 | 10 | [音频 Transformer——Whisper 架构](phases/07-transformers-deep-dive/10-audio-transformers-whisper/) | Learn | Python |
-| 11 | [专家混合（MoE）](phases/07-transformers-deep-dive/11-mixture-of-experts/) | Build | Python |
-| 12 | [KV Cache、Flash Attention 与推理优化](phases/07-transformers-deep-dive/12-kv-cache-flash-attention/) | Build | Python |
+| 11 | [专家混合（MoE）](phases/07-transformers-deep-dive/11-mixture-of-experts/) | Build | Python, Rust |
+| 12 | [KV Cache、Flash Attention 与推理优化](phases/07-transformers-deep-dive/12-kv-cache-flash-attention/) | Build | Python, Rust |
 | 13 | [缩放定律](phases/07-transformers-deep-dive/13-scaling-laws/) | Learn | Python |
 | 14 | [从零构建一个 Transformer](phases/07-transformers-deep-dive/14-build-a-transformer-capstone/) | Build | Python |
-| 15 | [Attention 变体——滑动窗口、稀疏、差分](phases/07-transformers-deep-dive/15-attention-variants/) | Build | Python |
-| 16 | [投机解码——草稿、验证、重复](phases/07-transformers-deep-dive/16-speculative-decoding/) | Build | Python |
+| 15 | [Attention 变体——滑动窗口、稀疏、差分](phases/07-transformers-deep-dive/15-attention-variants/) | Build | Python, Rust |
+| 16 | [投机解码——草稿、验证、重复](phases/07-transformers-deep-dive/16-speculative-decoding/) | Build | Python, Rust |
 
 </details>
 
@@ -614,15 +616,15 @@ flowchart TB
 | 01 | [分词器：BPE、WordPiece、SentencePiece](phases/10-llms-from-scratch/01-tokenizers/) | Build | Python, Rust |
 | 02 | [从零实现一个分词器](phases/10-llms-from-scratch/02-building-a-tokenizer/) | Build | Python |
 | 03 | [预训练的数据流水线](phases/10-llms-from-scratch/03-data-pipelines/) | Build | Python |
-| 04 | [预训练一个迷你 GPT（124M）](phases/10-llms-from-scratch/04-pre-training-mini-gpt/) | Build | Python |
+| 04 | [预训练一个迷你 GPT（124M）](phases/10-llms-from-scratch/04-pre-training-mini-gpt/) | Build | Python, Rust |
 | 05 | [分布式训练、FSDP、DeepSpeed](phases/10-llms-from-scratch/05-scaling-distributed/) | Build | Python |
 | 06 | [指令微调——SFT](phases/10-llms-from-scratch/06-instruction-tuning-sft/) | Build | Python |
 | 07 | [RLHF——奖励模型 + PPO](phases/10-llms-from-scratch/07-rlhf/) | Build | Python |
 | 08 | [DPO——直接偏好优化](phases/10-llms-from-scratch/08-dpo/) | Build | Python |
 | 09 | [Constitutional AI 与自我改进](phases/10-llms-from-scratch/09-constitutional-ai-self-improvement/) | Build | Python |
 | 10 | [评估——基准与 evals](phases/10-llms-from-scratch/10-evaluation/) | Build | Python |
-| 11 | [量化：INT8、GPTQ、AWQ、GGUF](phases/10-llms-from-scratch/11-quantization/) | Build | Python |
-| 12 | [推理优化](phases/10-llms-from-scratch/12-inference-optimization/) | Build | Python |
+| 11 | [量化：INT8、GPTQ、AWQ、GGUF](phases/10-llms-from-scratch/11-quantization/) | Build | Python, Rust |
+| 12 | [推理优化](phases/10-llms-from-scratch/12-inference-optimization/) | Build | Python, Rust |
 | 13 | [搭一条完整的 LLM 流水线](phases/10-llms-from-scratch/13-building-complete-llm-pipeline/) | Build | Python |
 | 14 | [开源模型：架构逐一拆解](phases/10-llms-from-scratch/14-open-models-architecture-walkthroughs/) | Learn | Python |
 | 15 | [投机解码与 EAGLE-3](phases/10-llms-from-scratch/15-speculative-decoding-eagle3/) | Build | Python |
@@ -644,18 +646,18 @@ flowchart TB
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [提示工程：技巧与套路](phases/11-llm-engineering/01-prompt-engineering/) | Build | Python |
+| 01 | [提示工程：技巧与套路](phases/11-llm-engineering/01-prompt-engineering/) | Build | Python, TypeScript |
 | 02 | [Few-Shot、CoT、Tree-of-Thought](phases/11-llm-engineering/02-few-shot-cot/) | Build | Python |
-| 03 | [结构化输出](phases/11-llm-engineering/03-structured-outputs/) | Build | Python |
-| 04 | [嵌入与向量表示](phases/11-llm-engineering/04-embeddings/) | Build | Python |
-| 05 | [上下文工程](phases/11-llm-engineering/05-context-engineering/) | Build | Python |
-| 06 | [RAG：检索增强生成](phases/11-llm-engineering/06-rag/) | Build | Python |
+| 03 | [结构化输出](phases/11-llm-engineering/03-structured-outputs/) | Build | Python, TypeScript |
+| 04 | [嵌入与向量表示](phases/11-llm-engineering/04-embeddings/) | Build | Python, TypeScript |
+| 05 | [上下文工程](phases/11-llm-engineering/05-context-engineering/) | Build | Python, TypeScript |
+| 06 | [RAG：检索增强生成](phases/11-llm-engineering/06-rag/) | Build | Python, TypeScript |
 | 07 | [进阶 RAG：分块、重排](phases/11-llm-engineering/07-advanced-rag/) | Build | Python |
 | 08 | [用 LoRA 与 QLoRA 微调](phases/11-llm-engineering/08-fine-tuning-lora/) | Build | Python |
-| 09 | [函数调用与工具使用](phases/11-llm-engineering/09-function-calling/) | Build | Python |
+| 09 | [函数调用与工具使用](phases/11-llm-engineering/09-function-calling/) | Build | Python, TypeScript |
 | 10 | [评估与测试](phases/11-llm-engineering/10-evaluation/) | Build | Python |
 | 11 | [缓存、限流与成本](phases/11-llm-engineering/11-caching-cost/) | Build | Python |
-| 12 | [护栏与安全](phases/11-llm-engineering/12-guardrails/) | Build | Python |
+| 12 | [护栏与安全](phases/11-llm-engineering/12-guardrails/) | Build | Python, TypeScript |
 | 13 | [构建一个生产级 LLM 应用](phases/11-llm-engineering/13-production-app/) | Build | Python |
 | 14 | [模型上下文协议（MCP）](phases/11-llm-engineering/14-model-context-protocol/) | Build | Python |
 | 15 | [提示缓存与上下文缓存](phases/11-llm-engineering/15-prompt-caching/) | Build | Python |
@@ -704,13 +706,13 @@ flowchart TB
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [工具接口](phases/13-tools-and-protocols/01-the-tool-interface/) | Learn | Python |
+| 01 | [工具接口](phases/13-tools-and-protocols/01-the-tool-interface/) | Learn | Python, TypeScript |
 | 02 | [函数调用深入剖析](phases/13-tools-and-protocols/02-function-calling-deep-dive/) | Build | Python |
 | 03 | [并行与流式工具调用](phases/13-tools-and-protocols/03-parallel-and-streaming-tool-calls/) | Build | Python |
 | 04 | [结构化输出](phases/13-tools-and-protocols/04-structured-output/) | Build | Python |
 | 05 | [工具 Schema 设计](phases/13-tools-and-protocols/05-tool-schema-design/) | Learn | Python |
 | 06 | [MCP 基础](phases/13-tools-and-protocols/06-mcp-fundamentals/) | Learn | Python |
-| 07 | [构建一个 MCP server](phases/13-tools-and-protocols/07-building-an-mcp-server/) | Build | Python |
+| 07 | [构建一个 MCP server](phases/13-tools-and-protocols/07-building-an-mcp-server/) | Build | Python, TypeScript |
 | 08 | [构建一个 MCP client](phases/13-tools-and-protocols/08-building-an-mcp-client/) | Build | Python |
 | 09 | [MCP 传输层](phases/13-tools-and-protocols/09-mcp-transports/) | Learn | Python |
 | 10 | [MCP 资源与提示](phases/13-tools-and-protocols/10-mcp-resources-and-prompts/) | Build | Python |
@@ -722,7 +724,7 @@ flowchart TB
 | 16 | [MCP 安全 II——OAuth 2.1](phases/13-tools-and-protocols/16-mcp-security-oauth-2-1/) | Build | Python |
 | 17 | [MCP 网关与注册表](phases/13-tools-and-protocols/17-mcp-gateways-and-registries/) | Learn | Python |
 | 18 | [生产环境的 MCP 认证——iii 上的 DCR + JWKS](phases/13-tools-and-protocols/18-mcp-auth-production/) | Build | Python |
-| 19 | [A2A 协议](phases/13-tools-and-protocols/19-a2a-protocol/) | Build | Python |
+| 19 | [A2A 协议](phases/13-tools-and-protocols/19-a2a-protocol/) | Build | Python, TypeScript |
 | 20 | [OpenTelemetry GenAI](phases/13-tools-and-protocols/20-opentelemetry-genai/) | Build | Python |
 | 21 | [LLM 路由层](phases/13-tools-and-protocols/21-llm-routing-layer/) | Learn | Python |
 | 22 | [Skills 与 Agent SDK](phases/13-tools-and-protocols/22-skills-and-agent-sdks/) | Learn | Python |
@@ -760,24 +762,24 @@ flowchart TB
 
 | # | Lesson | Type | Lang |
 |:---:|--------|:----:|------|
-| 01 | [Agent 循环](phases/14-agent-engineering/01-the-agent-loop/) | Build | Python |
+| 01 | [Agent 循环](phases/14-agent-engineering/01-the-agent-loop/) | Build | Python, TypeScript |
 | 02 | [ReWOO 与 Plan-and-Execute](phases/14-agent-engineering/02-rewoo-plan-and-execute/) | Build | Python |
 | 03 | [Reflexion 与言语强化学习](phases/14-agent-engineering/03-reflexion-verbal-rl/) | Build | Python |
 | 04 | [Tree of Thoughts 与 LATS](phases/14-agent-engineering/04-tree-of-thoughts-lats/) | Build | Python |
 | 05 | [Self-Refine 与 CRITIC](phases/14-agent-engineering/05-self-refine-and-critic/) | Build | Python |
-| 06 | [工具使用与函数调用](phases/14-agent-engineering/06-tool-use-and-function-calling/) | Build | Python |
+| 06 | [工具使用与函数调用](phases/14-agent-engineering/06-tool-use-and-function-calling/) | Build | Python, TypeScript |
 | 07 | [Agent 记忆——虚拟上下文与记忆分页](phases/14-agent-engineering/07-memory-virtual-context-memgpt/) | Build | Python |
 | 08 | [记忆块与休眠时计算](phases/14-agent-engineering/08-memory-blocks-sleep-time-compute/) | Build | Python |
 | 09 | [混合记忆——向量 + 图 + KV](phases/14-agent-engineering/09-hybrid-memory-mem0/) | Build | Python |
 | 10 | [技能库与终身学习——Voyager](phases/14-agent-engineering/10-skill-libraries-voyager/) | Build | Python |
 | 11 | [用 HTN 与进化搜索做规划](phases/14-agent-engineering/11-planning-htn-and-evolutionary/) | Build | Python |
 | 12 | [Anthropic 的工作流模式](phases/14-agent-engineering/12-anthropic-workflow-patterns/) | Build | Python |
-| 13 | [有状态图编排——持久执行与检查点](phases/14-agent-engineering/13-langgraph-stateful-graphs/) | Build | Python |
+| 13 | [有状态图编排——持久执行与检查点](phases/14-agent-engineering/13-langgraph-stateful-graphs/) | Build | Python, TypeScript |
 | 14 | [Agent 的 Actor 模型——异步消息与类型化运行时](phases/14-agent-engineering/14-autogen-actor-model/) | Build | Python |
 | 15 | [基于角色的 Agent 团队——角色、任务与流程](phases/14-agent-engineering/15-crewai-role-based-crews/) | Build | Python |
 | 16 | [OpenAI Agents SDK——交接、护栏、追踪](phases/14-agent-engineering/16-openai-agents-sdk/) | Build | Python |
 | 17 | [Harness 即库——子 agent 与会话存储](phases/14-agent-engineering/17-claude-agent-sdk/) | Build | Python |
-| 18 | [生产级 Agent 运行时——快速实例化与类型化工作流](phases/14-agent-engineering/18-agno-and-mastra-runtimes/) | Learn | Python |
+| 18 | [生产级 Agent 运行时——快速实例化与类型化工作流](phases/14-agent-engineering/18-agno-and-mastra-runtimes/) | Learn | Python, TypeScript |
 | 19 | [基准——SWE-bench、GAIA、AgentBench](phases/14-agent-engineering/19-benchmarks-swebench-gaia/) | Learn | Python |
 | 20 | [基准——WebArena 与 OSWorld](phases/14-agent-engineering/20-benchmarks-webarena-osworld/) | Learn | Python |
 | 21 | [操作电脑——Claude、OpenAI CUA、Gemini](phases/14-agent-engineering/21-computer-use-agents/) | Build | Python |
@@ -902,14 +904,14 @@ flowchart TB
 | 10 | [无服务器 LLM 的冷启动缓解](phases/17-infrastructure-and-production/10-cold-start-mitigation/) | Learn | Python |
 | 11 | [多区域 LLM 服务与 KV 缓存局部性](phases/17-infrastructure-and-production/11-multi-region-kv-locality/) | Learn | Python |
 | 12 | [边缘推理 — ANE、Hexagon、WebGPU、Jetson](phases/17-infrastructure-and-production/12-edge-inference/) | Learn | Python |
-| 13 | [LLM 可观测性技术栈选型](phases/17-infrastructure-and-production/13-llm-observability/) | Learn | Python |
-| 14 | [提示缓存与语义缓存的经济学](phases/17-infrastructure-and-production/14-prompt-semantic-caching/) | Learn | Python |
-| 15 | [批处理 API — 50% 折扣作为行业标准](phases/17-infrastructure-and-production/15-batch-apis/) | Learn | Python |
-| 16 | [把模型路由作为降本原语](phases/17-infrastructure-and-production/16-model-routing/) | Learn | Python |
+| 13 | [LLM 可观测性技术栈选型](phases/17-infrastructure-and-production/13-llm-observability/) | Learn | Python, TypeScript |
+| 14 | [提示缓存与语义缓存的经济学](phases/17-infrastructure-and-production/14-prompt-semantic-caching/) | Learn | Python, TypeScript |
+| 15 | [批处理 API — 50% 折扣作为行业标准](phases/17-infrastructure-and-production/15-batch-apis/) | Learn | Python, TypeScript |
+| 16 | [把模型路由作为降本原语](phases/17-infrastructure-and-production/16-model-routing/) | Learn | Python, TypeScript |
 | 17 | [预填充/解码分离 — NVIDIA Dynamo 与 llm-d](phases/17-infrastructure-and-production/17-disaggregated-prefill-decode/) | Learn | Python |
 | 18 | [生产级推理服务栈——KV 卸载与缓存感知路由](phases/17-infrastructure-and-production/18-vllm-production-stack-lmcache/) | Learn | Python |
-| 19 | [AI 网关 — LiteLLM、Portkey、Kong、Bifrost](phases/17-infrastructure-and-production/19-ai-gateways/) | Learn | Python |
-| 20 | [影子、金丝雀与渐进式部署](phases/17-infrastructure-and-production/20-shadow-canary-progressive/) | Learn | Python |
+| 19 | [AI 网关 — LiteLLM、Portkey、Kong、Bifrost](phases/17-infrastructure-and-production/19-ai-gateways/) | Learn | Python, TypeScript |
+| 20 | [影子、金丝雀与渐进式部署](phases/17-infrastructure-and-production/20-shadow-canary-progressive/) | Learn | Python, TypeScript |
 | 21 | [LLM 功能的 A/B 测试 — GrowthBook 与 Statsig](phases/17-infrastructure-and-production/21-ab-testing-llm-features/) | Learn | Python |
 | 22 | [LLM API 的负载测试 — k6、LLMPerf、GenAI-Perf](phases/17-infrastructure-and-production/22-load-testing-llm-apis/) | Build | Python |
 | 23 | [面向 AI 的 SRE — 多智能体事件响应](phases/17-infrastructure-and-production/23-sre-for-ai/) | Learn | Python |
@@ -1050,7 +1052,7 @@ flowchart TB
 | 83 | [Prompt 注入检测器](phases/19-capstone-projects/83-prompt-injection-detector/) | I. 安全护栏 | Python |
 | 84 | [拒答评估](phases/19-capstone-projects/84-refusal-evaluation/) | I. 安全护栏 | Python |
 | 85 | [内容分类器集成](phases/19-capstone-projects/85-content-classifier-integration/) | I. 安全护栏 | Python |
-| 86 | [Constitutional 规则引擎](phases/19-capstone-projects/86-constitutional-rules-engine/) | I. 安全护栏 | Python |
+| 86 | [Constitutional 规则引擎](phases/19-capstone-projects/86-constitutional-rules-engine/) | I. 安全护栏 | Python, YAML |
 | 87 | [端到端 safety gate](phases/19-capstone-projects/87-end-to-end-safety-gate/) | I. 安全护栏 | Python |
 
 </details>
@@ -1130,6 +1132,8 @@ flowchart LR
   C --> B["动手构建<br/><sub>原始数学，不用框架</sub>"]
   B --> U["实际使用<br/><sub>用 PyTorch / sklearn 完成相同操作</sub>"]
   U --> S["拿去用<br/><sub>提示词 · 技能 · agent · MCP</sub>"]
+  classDef beat fill:#fafaf5,stroke:#3553ff,color:#1a1a1a
+  class M,Pr,C,B,U,S beat
 ```
 
 ## 每节课都有产出

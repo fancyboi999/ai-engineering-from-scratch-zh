@@ -3,7 +3,7 @@
 > 高维数据是有结构的。你从对的角度去看，才能找到它。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 01 课（线性代数直觉）、02 课（向量、矩阵与运算）、03 课（特征值与特征向量）、06 课（概率与分布）
 **预计时间：** ~90 分钟
 
@@ -197,6 +197,13 @@ pca-axes
 ```
 
 ## 动手构建
+
+TypeScript 移植版本位于 `code/dim_reduction.ts`。MNIST 演示需要 scikit-learn，因此仅在 Python 中运行。
+
+```bash
+python3 code/dim_reduction.py
+npx tsx code/dim_reduction.ts
+```
 
 ### 第 1 步：从零写 PCA
 

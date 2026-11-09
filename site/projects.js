@@ -310,6 +310,8 @@
       };
       var first = DATA.projects.filter(function (p) { return !picked || picked.projects.indexOf(p.id) !== -1; })[0];
       if (first && start) start.href = projectHref(first.id);
+      showPlanned.disabled = !!picked;
+      showPlanned.title = picked ? '规划中的项目尚未纳入职业路线' : '';
       if (roleNote) {
         roleNote.hidden = !picked;
         roleNote.innerHTML = picked
@@ -505,6 +507,7 @@
     if (certificateHost && window.AIFSProjectCertificates) window.AIFSProjectCertificates.mount(certificateHost, project);
 
     var requested = parsed.stage;
+    var shownStage = requested;
     var stageIndex = Math.max(0, project.stages.findIndex(function (s) { return s.id === requested; }));
     if (!requested) {
       var progress = progressFor(project.id);
@@ -520,7 +523,10 @@
         '<div class="pj-progress-head"><span>你的进度</span><strong>' + done + ' / ' + project.stages.length + '</strong></div>' +
         '<div class="pj-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><span style="width:' + pct + '%"></span></div>' +
         '<p class="pj-small">这是保存在本浏览器中的自报进度。要获取证书，请在下方导入评分证据。</p>';
-      document.getElementById('pjStageList').innerHTML = project.stages.map(function (stage, index) {
+      var list = document.getElementById('pjStageList');
+      var active = document.activeElement;
+      var focusedIndex = active && list.contains && list.contains(active) ? active.getAttribute('data-stage-index') : null;
+      list.innerHTML = project.stages.map(function (stage, index) {
         var isDone = !!progress[stage.id];
         return '<li><a href="' + projectHref(project.id, stage.id) + '" data-stage-index="' + index + '" class="pj-stage-link' +
           (index === stageIndex ? ' is-current' : '') + (isDone ? ' is-done' : '') + '"' + (index === stageIndex ? ' aria-current="step"' : '') + '>' +
@@ -528,6 +534,18 @@
           '<span class="pj-stage-text"><span class="pj-stage-title">' + esc(stage.title) + '</span>' +
           '<span class="pj-stage-sub">' + esc(difficultyLabel(stage.difficulty)) + (stage.hours ? ' · ~' + stage.hours + '小时' : '') + (stageLanguages(stage).length ? ' · ' + esc(stageLanguages(stage).join(' + ')) : '') + '</span></span></a></li>';
       }).join('');
+      if (focusedIndex === null) return;
+      var link = list.querySelector('[data-stage-index="' + focusedIndex + '"]');
+      if (link) link.focus({ preventScroll: true });
+    }
+
+    function paintToggle() {
+      var toggle = document.getElementById('pjToggleDone');
+      if (!toggle) return;
+      var isDone = !!progressFor(project.id)[project.stages[stageIndex].id];
+      toggle.setAttribute('data-done', String(isDone));
+      toggle.classList.toggle('secondary', isDone);
+      toggle.textContent = isDone ? '标为未完成' : '标记阶段完成';
     }
 
     var requestVersion = 0;
@@ -554,7 +572,7 @@
         '<div class="pj-doc" id="pjDoc"><p class="pj-loading">正在加载课程…</p></div>' +
         (stage.demo ? '<details class="pj-context pj-stage-recording"><summary>观看阶段 ' + stage.number + ' 录制</summary>' + demoFigure(stage.demo, project.contentBase || project.path) + '</details>' : '') +
         '<footer class="pj-stage-foot">' +
-          '<button type="button" class="pj-action' + (isDone ? ' secondary' : '') + '" id="pjToggleDone">' + (isDone ? '标为未完成' : '标记阶段完成') + '</button>' +
+          '<button type="button" class="pj-action' + (isDone ? ' secondary' : '') + '" id="pjToggleDone" data-done="' + isDone + '">' + (isDone ? '标为未完成' : '标记阶段完成') + '</button>' +
           '<div class="pj-stage-nav">' +
             (prev ? '<a class="pj-action secondary" href="' + projectHref(project.id, prev.id) + '" data-stage-index="' + (stageIndex - 1) + '">← ' + esc(prev.title) + '</a>' : '') +
             (next ? '<a class="pj-action secondary" href="' + projectHref(project.id, next.id) + '" data-stage-index="' + (stageIndex + 1) + '">' + esc(next.title) + ' →</a>' : '') +
@@ -562,10 +580,11 @@
           '<a class="pj-source-link" href="' + esc(repoFileUrl(stage.doc)) + '" target="_blank" rel="noopener">在 GitHub 查看本课</a>' +
         '</footer>';
 
-      document.getElementById('pjToggleDone').addEventListener('click', function () {
-        setStageDone(project.id, stage.id, !progressFor(project.id)[stage.id]);
+      var toggle = document.getElementById('pjToggleDone');
+      toggle.addEventListener('click', function () {
+        setStageDone(project.id, stage.id, toggle.getAttribute('data-done') !== 'true');
         drawRail();
-        drawStage();
+        paintToggle();
       });
 
       if (prerenderedStage && prerenderedStage.id === stage.id) {
@@ -595,7 +614,10 @@
 
     function go(index, push) {
       stageIndex = index;
-      if (push) history.pushState({ stage: index }, '', projectHref(project.id, project.stages[index].id));
+      if (push) {
+        shownStage = project.stages[index].id;
+        history.pushState({ stage: index }, '', projectHref(project.id, shownStage));
+      }
       drawRail();
       drawStage();
       updateProjectSeo(project, parseProjectUrl().stage ? project.stages[index] : null);
@@ -611,8 +633,16 @@
     });
     window.addEventListener('popstate', function () {
       var parsed = parseProjectUrl();
-      var idx = project.stages.findIndex(function (st) { return st.id === parsed.stage; });
+      var s = parsed.stage;
+      if (s === shownStage) return;
+      shownStage = s;
+      var idx = project.stages.findIndex(function (st) { return st.id === s; });
       go(idx === -1 ? 0 : idx, false);
+    });
+    window.addEventListener('storage', function (event) {
+      if (event.key && event.key !== PROGRESS_KEY) return;
+      drawRail();
+      paintToggle();
     });
 
     go(stageIndex, false);

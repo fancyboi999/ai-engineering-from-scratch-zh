@@ -100,6 +100,7 @@ const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://aieng-zh.cn';
 
 // 浏览器与构建时共用同一份 Markdown 渲染器。
 const mdRender = require('./md-render.js');
+const code = require('./lib/code');
 
 // GITHUB_BASE lesson url -> site path "phases/<phase>/<lesson>"
 function lessonPath(url) {
@@ -2582,7 +2583,7 @@ function writeLessonPages(phases, lessonManifest) {
     const ogTitle = title + ' · AI 工程从零开始';
 
     // 正文结构与客户端 renderLesson 完全同构：parseMd + AI 面板占位 + 上下课导航
-    let body = mdRender.parseMd(md);
+    let body = mdRender.parseMd(md, { renderCode: code.render });
     body += '<div class="ai-panels" id="aiPanels"></div>';
     body += bottomNavHtml(flat, i);
     const article =
@@ -3052,7 +3053,7 @@ if (require.main === module) {
   verifySiteCss();
   if (process.argv.includes('--check')) verifyCurriculum();
   else {
-    require('./lib/code').init().then(build).then(() => require('./build-search').main()).catch(error => {
+    code.init().then(build).then(() => require('./build-search').main()).catch(error => {
       console.error(error);
       process.exitCode = 1;
     });

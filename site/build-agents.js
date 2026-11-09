@@ -19,6 +19,15 @@ function pageMarkdown(html, filename) {
   return `# ${title}\n\n规范页面：${ORIGIN}/${filename === 'index.html' ? '' : filename}\n\n${text}\n\n[课程索引](${ORIGIN}/llms.txt) | [API 与 MCP 文档](${ORIGIN}/docs)\n`;
 }
 
+const DISCOVERY_HEADING = '## API 与 MCP';
+
+function withDiscovery(llms) {
+  if (llms.split('\n').includes(DISCOVERY_HEADING)) return llms;
+  const discovery = `${DISCOVERY_HEADING}\n\n- [开发者文档](${ORIGIN}/docs)：公开只读 API、错误、配额和版本约定。\n- [OpenAPI 3.1](${ORIGIN}/openapi.json)：REST 接口定义。\n- [MCP 清单](${ORIGIN}/server.json)：Streamable HTTP 地址 ${ORIGIN}/mcp。\n\n`;
+  const at = llms.search(/^## /m);
+  return at < 0 ? llms.trimEnd() + '\n\n' + discovery : llms.slice(0, at) + discovery + llms.slice(at);
+}
+
 function phaseLabel(phase) {
   return `阶段 ${String(phase.id).padStart(2, '0')}：${phase.name}`;
 }
@@ -122,10 +131,10 @@ function build(navigation) {
   }
   const llmsPath = path.join(__dirname, 'llms.txt');
   const llms = fs.readFileSync(llmsPath, 'utf8');
-  const discovery = `## API 与 MCP\n\n- [开发者文档](${ORIGIN}/docs)：公开只读 API、错误、配额和版本约定。\n- [OpenAPI 3.1](${ORIGIN}/openapi.json)：REST 接口定义。\n- [MCP 清单](${ORIGIN}/server.json)：Streamable HTTP 地址 ${ORIGIN}/mcp。\n\n`;
-  if (!llms.includes('## API 与 MCP')) fs.writeFileSync(llmsPath, llms.replace(/\n\n/, '\n\n' + discovery));
+  const next = withDiscovery(llms);
+  if (next !== llms) fs.writeFileSync(llmsPath, next);
   console.log(`Built ${entries.length} Chinese agent resources and ${new Set(Object.values(PAGES)).size} Markdown pages.`);
 }
 
 if (require.main === module) build();
-module.exports = { pageMarkdown, navigationMarkdown, build };
+module.exports = { pageMarkdown, navigationMarkdown, withDiscovery, build };

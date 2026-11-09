@@ -3,7 +3,7 @@
 > 逻辑回归把一条直线掰成 S 形曲线，用概率回答是非题。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Julia、Rust
 **前置要求：** 阶段 2 第 1-2 课（什么是 ML、线性回归）
 **预计时间：** ~90 分钟
 
@@ -503,6 +503,7 @@ print(f"\nClassification Report:\n{classification_report(y_te, y_pred)}")
 
 本节课产出：
 - `code/logistic_regression.py` - 从零实现的带指标的逻辑回归
+- `code/main.rs` - Rust 实现的相同代码，仅使用标准库。通过 `rustc --edition 2021 code/main.rs && ./main` 运行。
 
 ## 练习
 

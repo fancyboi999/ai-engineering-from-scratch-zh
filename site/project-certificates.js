@@ -24,20 +24,27 @@
   function mount(host, project) {
     host.innerHTML = '<div class="pj-eyebrow">项目证书</div><h3>保留你的学习证据。</h3><p>在自己的工作区通过每个阶段，再导入评分报告下载完成证书。</p><pre class="pj-cmd"><code>python3 scripts/project_test.py ' + escape(project.id) + ' --all --strict --path my-' + escape(project.id) + ' --report completion.json</code></pre><div class="pj-certificate-fields"><label>你的姓名<input id="pjCertificateName" maxlength="100" autocomplete="name"></label><label>评分报告<input id="pjCertificateFile" type="file" accept="application/json,.json"></label><button type="button" class="pj-action" id="pjCertificateDownload" disabled>下载证书</button></div><p id="pjCertificateStatus" role="status">证书基于本地证据，并非监考证书或厂商资质。</p>';
     var report = null;
+    var readToken = 0;
     var status = host.querySelector('#pjCertificateStatus');
     var button = host.querySelector('#pjCertificateDownload');
     var name = host.querySelector('#pjCertificateName');
     function enabled() { button.disabled = !report || !name.value.trim(); }
     name.addEventListener('input', enabled);
     host.querySelector('#pjCertificateFile').addEventListener('change', async function (event) {
+      var token = ++readToken;
       report = null; enabled();
       try {
         var file = event.target.files[0];
         if (!file || file.size > 2000000) throw new Error('请选择小于 2 MB 的评分 JSON 报告。');
-        var parsed = JSON.parse(await file.text());
+        var text = await file.text();
+        if (token !== readToken) return;
+        var parsed = JSON.parse(text);
         validate(parsed, project); report = parsed;
         status.textContent = '导入的学习者报告已通过全部阶段。输入姓名即可下载。';
-      } catch (error) { status.textContent = error.message; }
+      } catch (error) {
+        if (token !== readToken) return;
+        status.textContent = error.message;
+      }
       enabled();
     });
     button.addEventListener('click', function () {

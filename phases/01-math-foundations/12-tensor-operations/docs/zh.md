@@ -3,7 +3,7 @@
 > 张量是数据和深度学习之间的通用语言。每张图、每个句子、每个梯度都从中流过。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 01 课（线性代数直觉）、02 课（向量、矩阵与运算）
 **预计时间：** ~90 分钟
 
@@ -107,7 +107,12 @@ tensor-broadcast
 
 ## 动手构建
 
-代码在 `code/tensors.py` 里。每一步都引用那里的实现。
+代码在 `code/tensors.py` 里。每一步都引用那里的实现。`code/tensors.ts` 中的 TypeScript 移植版本输出相同的结果。
+
+```bash
+python3 code/tensors.py
+npx tsx code/tensors.ts
+```
 
 ### 第 1 步：张量存储和步长
 

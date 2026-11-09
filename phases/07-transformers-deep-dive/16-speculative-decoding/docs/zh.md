@@ -3,7 +3,7 @@
 > 自回归解码是串行的。每个 token 都等着上一个。投机解码打断这条链：一个廉价模型起草 N 个 token，昂贵模型用一次前向通过验证全部 N 个。当草稿对了，你就用一次大模型前向换来了 N 次生成。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Rust
 **前置要求：** 阶段 7 · 07（GPT 因果 LM）、阶段 7 · 12（KV Cache 与 Flash Attention）
 **预计时间：** ~60 分钟
 
@@ -91,6 +91,13 @@ draft-verify-tokens
 - 一个"大模型"，是手写分布上的确定性 softmax（这样我们能解析地验证接受的数学）。
 - 一个"草稿模型"，是大模型的扰动版。
 - 一个接受/拒绝循环，产生与直接采样相同的边缘分布。
+
+`code/main.rs` 是包含相同函数和演示的 Rust 移植版。它仅使用标准库。随机数与 Python 版不同，但打印出的结论相同。
+
+```bash
+python3 code/main.py
+rustc --edition 2021 -O code/main.rs -o /tmp/lesson && /tmp/lesson
+```
 
 ### 第 1 步：拒绝步
 

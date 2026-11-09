@@ -3,7 +3,7 @@
 > 采样是 AI 探索可能性空间的方式。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 06-07 课（概率，贝叶斯定理）
 **预计时间：** ~120 分钟
 
@@ -608,6 +608,8 @@ def gumbel_softmax(logits, temperature):
 展示降低温度如何让输出趋近一个 one-hot 向量。
 
 带全部可视化的完整实现在 `code/sampling.py` 里。
+
+TypeScript 移植版本位于 `code/sampling.ts`。它使用带种子的独立随机数生成器，因此随机数输出与 Python 不同。
 
 ## 实际使用
 

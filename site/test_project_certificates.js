@@ -15,3 +15,41 @@ test('stage order and identity are checked', () => { const r = report(); r.proje
 test('stale manifest hash is rejected', () => { const r = report(); r.projects[0].manifestHash = 'b'.repeat(64); assert.throws(() => validate(r, project), /已变化/); });
 test('duplicate matching results are rejected', () => { const r = report(); r.projects.push(r.projects[0]); assert.throws(() => validate(r, project), /一条本项目结果/); });
 test('certificate escapes learner and project text', () => { const result = certificate(report(), project, '<img onerror=alert(1)>'); assert.ok(!result.includes('<img')); assert.ok(result.includes('&lt;project&gt;')); assert.ok(result.includes('非监考')); });
+
+function fakeControl() {
+  const listeners = {};
+  return { value: '', disabled: false, textContent: '', addEventListener(type, fn) { listeners[type] = fn; }, fire(type, event) { return listeners[type](event); } };
+}
+
+function mountCertificate() {
+  const { mount } = require('./project-certificates');
+  const controls = { '#pjCertificateStatus': fakeControl(), '#pjCertificateDownload': fakeControl(), '#pjCertificateName': fakeControl(), '#pjCertificateFile': fakeControl() };
+  mount({ set innerHTML(_) {}, querySelector: selector => controls[selector] }, project);
+  controls['#pjCertificateName'].value = 'Ada';
+  return controls;
+}
+
+function slowFile(body, delay) {
+  return { size: body.length, text: () => new Promise(resolve => setTimeout(() => resolve(body), delay)) };
+}
+
+test('a slow earlier report cannot overwrite a newer pick', async () => {
+  const controls = mountCertificate();
+  const file = controls['#pjCertificateFile'];
+  const first = file.fire('change', { target: { files: [slowFile(JSON.stringify(report()), 30)] } });
+  const second = file.fire('change', { target: { files: [slowFile('not json', 1)] } });
+  await Promise.all([first, second]);
+  assert.equal(controls['#pjCertificateDownload'].disabled, true);
+  assert.doesNotMatch(controls['#pjCertificateStatus'].textContent, /通过全部阶段/);
+});
+
+test('a slow earlier failure cannot hide a newer valid report', async () => {
+  const controls = mountCertificate();
+  const file = controls['#pjCertificateFile'];
+  const first = file.fire('change', { target: { files: [slowFile('not json', 30)] } });
+  const second = file.fire('change', { target: { files: [slowFile(JSON.stringify(report()), 1)] } });
+  await Promise.all([first, second]);
+  assert.equal(controls['#pjCertificateDownload'].disabled, false);
+  assert.match(controls['#pjCertificateStatus'].textContent, /通过全部阶段/);
+});
+

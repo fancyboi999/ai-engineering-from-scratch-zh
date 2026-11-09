@@ -365,19 +365,23 @@
     window.addEventListener('hashchange', function () {
       if (!state.article) return;
       var hash = window.location.hash || '';
-      if (hash.indexOf(SHARE_PREFIX) === 0) {
+      if (hash.indexOf(SHARE_PREFIX) === 0 || (state.shared && (hash === '' || hash === '#'))) {
+        if (state.editor && state.editor.shared) closeEditor(false);
         readShare();
         paint(false);
         renderPanel();
-      } else if (/^#hl-/.test(hash)) {
-        revealHashTarget();
       }
+      if (/^#hl-/.test(hash)) revealHashTarget();
+    });
+    window.addEventListener('load', function () {
+      if (state.article && state.hashPending && !state.userMoved) revealHashTarget();
     });
     ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function (name) {
       window.addEventListener(name, function () { state.userMoved = true; }, { passive: true, capture: true });
     });
     Store.onChange(function (_, meta) {
       if (state.painting || !state.article) return;
+      syncWithStore();
       paint(!(meta && meta.external));
       renderPanel();
     });
@@ -468,8 +472,42 @@
     return /\btranslated-(ltr|rtl)\b/.test(root.className || '') || !!document.querySelector('html.translated-ltr, html.translated-rtl, body > .goog-te-banner-frame');
   }
 
-  function updateToolbar() {
+  function selectionForToolbar() {
     var info = selectionInfo();
+    if (info && state.editor && !ui.editor.hidden) {
+      if (!closeEditor(false)) return null;
+      info = restoreSelection(info);
+    }
+    return info;
+  }
+
+  function rawPoint(model, offset, isEnd) {
+    for (var i = 0; i < model.segments.length; i++) {
+      var segment = model.segments[i];
+      if (!segment.node || segment.atomic || offset < segment.start || offset > segment.end) continue;
+      if (isEnd ? offset > segment.start : offset < segment.end) return { node: segment.node, offset: offset - segment.start };
+    }
+    return null;
+  }
+
+  function restoreSelection(info) {
+    var model = Anchor.buildModel(state.article);
+    var raw = model.normalized ? Anchor.normalizedToRaw(model.normalized, info.start, info.end) : null;
+    var start = raw && rawPoint(model, raw.start, false);
+    var end = raw && rawPoint(model, raw.end, true);
+    var selection = window.getSelection();
+    if (start && end && selection && selection.addRange) {
+      var range = document.createRange();
+      range.setStart(start.node, start.offset);
+      range.setEnd(end.node, end.offset);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    return selectionInfo();
+  }
+
+  function updateToolbar() {
+    var info = selectionForToolbar();
     if (!info) {
       if (!toolbarFocused()) hideToolbar();
       return;
@@ -535,6 +573,11 @@
     return '';
   }
 
+  function operationMessage() {
+    var info = Store.info();
+    return info.operationError || !info.persistent ? storageMessage() : '';
+  }
+
   function snapMessage(kind) {
     if (kind === 'math') return "公式按整体高亮，已选中完整公式。";
     if (kind === 'figure') return "图表按整体高亮。";
@@ -574,10 +617,10 @@
     clearSelection();
     hideToolbar();
     if (!item) {
-      announce(Store.info().readOnly ? "当前浏览器无法修改高亮。" : (storageMessage() || "高亮保存失败。"));
+      announce(Store.info().readOnly ? "当前浏览器无法修改高亮。" : (operationMessage() || "高亮保存失败。"));
       return;
     }
-    var message = storageMessage() || snapMessage(pending.snapped);
+    var message = operationMessage() || snapMessage(pending.snapped);
     if (message) toast(message);
     else announce("高亮已保存。");
     if (withNote) openEditor(item.id, true);
@@ -599,13 +642,18 @@
     if (announceIt) announce("已取消重新定位。");
   }
 
+  function cancelDeletedFindAgain() {
+    cancelFindAgain(false);
+    toast("该高亮已删除，已取消关联。");
+  }
+
   function attachPending() {
     var pending = state.pending;
     var id = state.findAgain;
     if (!pending || !id || !state.ctx || pending.tooLong) return;
     var item = findItem(id);
     if (!item) {
-      cancelFindAgain(false);
+      cancelDeletedFindAgain();
       return;
     }
     var fields = anchorFields(pending);
@@ -864,11 +912,29 @@
       state.settled = true;
       paint(true);
       renderPanel();
-      if (state.hashPending) {
-        state.hashPending = false;
-        if (!state.userMoved) revealHashTarget();
-      }
+      revealPendingHash();
     }, delay);
+  }
+
+  function revealPendingHash() {
+    if (!state.hashPending) return;
+    state.hashPending = false;
+    if (!state.userMoved) revealHashTarget();
+  }
+
+  function syncWithStore() {
+    if (state.findAgain && !findItem(state.findAgain)) cancelDeletedFindAgain();
+    if (!state.editor || state.editor.shared) return;
+    var item = findItem(state.editor.id);
+    if (!item) {
+      state.editor = null;
+      ui.editor.hidden = true;
+      return;
+    }
+    if (ui.editorNote.value === state.editor.baseNote && item.note !== state.editor.baseNote) {
+      ui.editorNote.value = item.note;
+      state.editor.baseNote = item.note;
+    }
   }
 
   function firstMark(id) {
@@ -977,7 +1043,7 @@
       return;
     }
     if (event.altKey && !event.ctrlKey && !event.metaKey && (event.code === 'KeyH' || event.key === 'h' || event.key === 'H')) {
-      var info = selectionInfo();
+      var info = selectionForToolbar();
       if (!info) return;
       event.preventDefault();
       state.pending = info;
@@ -1007,12 +1073,15 @@
   }
 
   function openEditor(id, focusNote, anchorEl) {
+    if (!sharedItem(id) && !findItem(id)) return;
+    var fromPanel = !!(anchorEl && ui.panel.contains(anchorEl));
+    if (state.editor && !closeEditor(false)) return;
     var shared = sharedItem(id);
     var item = shared || findItem(id);
     if (!item) return;
     hideToolbar();
-    var fromPanel = !!(anchorEl && ui.panel.contains(anchorEl));
-    state.editor = { id: id, anchor: anchorEl || null, fromPanel: fromPanel, shared: !!shared, returnFocus: fromPanel ? null : (anchorEl || firstMark(id)) };
+    state.findAgain = '';
+    state.editor = { id: id, anchor: anchorEl || null, fromPanel: fromPanel, shared: !!shared, baseNote: item.note || '', returnFocus: fromPanel ? null : (anchorEl || firstMark(id)) };
     ui.editorNote.value = item.note || '';
     ui.editorStatus.textContent = '';
     var readOnly = Store.info().readOnly || !!shared;
@@ -1063,29 +1132,30 @@
   }
 
   function closeEditor(restoreFocus) {
-    if (!state.editor) return;
-    if (!state.editor.shared && state.ctx && !Store.info().readOnly) {
-      var current = findItem(state.editor.id);
-      if (current && ui.editorNote.value !== (current.note || '')) {
-        var editing = state.editor;
-        state.editor = null;
-        if (Store.update(state.ctx.path, editing.id, { note: ui.editorNote.value })) announce("笔记已保存。");
-        state.editor = editing;
+    if (!state.editor) return true;
+    var editing = state.editor;
+    if (!editing.shared && state.ctx && !Store.info().readOnly && ui.editorNote.value !== editing.baseNote && findItem(editing.id)) {
+      if (!Store.update(state.ctx.path, editing.id, { note: ui.editorNote.value })) {
+        ui.editorStatus.textContent = ("笔记无法保存。" + storageMessage()).trim();
+        announce(ui.editorStatus.textContent);
+        return false;
       }
+      announce(operationMessage() || "笔记已保存。");
     }
     var target = state.editor.returnFocus;
     var id = state.editor.id;
     var fromPanel = state.editor.fromPanel;
     state.editor = null;
     ui.editor.hidden = true;
-    if (!restoreFocus) return;
+    if (!restoreFocus) return true;
     if (fromPanel && !ui.panel.hidden) {
       var row = ui.list.querySelector('.aifs-hl-item[data-hl-id="' + id + '"] button[data-action="edit"]');
       (row || ui.list).focus();
-      return;
+      return true;
     }
     if (!target || !target.isConnected) target = firstMark(id);
     if (target && target.focus) target.focus({ preventScroll: true });
+    return true;
   }
 
   function saveEditor(patch, closeAfter) {
@@ -1096,11 +1166,12 @@
       ui.editorStatus.textContent = "修改保存失败。";
       return;
     }
+    if (state.editor && state.editor.id === id) state.editor.baseNote = updated.note;
     var swatches = ui.editorColors.querySelectorAll('button[data-color]');
     for (var i = 0; i < swatches.length; i++) {
       swatches[i].setAttribute('aria-pressed', swatches[i].getAttribute('data-color') === updated.color ? 'true' : 'false');
     }
-    var message = storageMessage();
+    var message = operationMessage();
     announce(message || (patch.color ? '颜色已改为：' + COLOR_LABELS[updated.color].toLowerCase() + '.' : "笔记已保存。"));
     if (closeAfter) closeEditor(true);
     else positionEditor();
@@ -1150,6 +1221,7 @@
   }
 
   function dismissShared() {
+    if (state.editor && state.editor.shared) closeEditor(false);
     state.shared = null;
     if ((window.location.hash || '').indexOf(SHARE_PREFIX) === 0 && window.history && history.replaceState) {
       history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -1188,7 +1260,7 @@
     if (!state.ctx) return;
     var link = shareUrl(state.ctx.path, ids);
     if (!link) {
-      toast(Store.info().lastError === 'share-too-many' ? "单个分享链接最多包含 100 条高亮。请减少数量，或使用同步文件。" : Store.info().lastError === 'share-too-large' ? "这些高亮超出单个链接的长度限制。请减少分享数量，或使用同步文件。" : "当前页面还没有可分享的高亮。");
+      toast(Store.info().operationError === 'share-too-many' ? "单个分享链接最多包含 100 条高亮。请减少数量，或使用同步文件。" : Store.info().operationError === 'share-too-large' ? "这些高亮超出单个链接的长度限制。请减少分享数量，或使用同步文件。" : "当前页面还没有可分享的高亮。");
       return;
     }
     showShareLink(link);
@@ -1229,6 +1301,7 @@
   }
 
   function openPanel() {
+    if (state.findAgain) cancelFindAgain(false);
     ui.panel.hidden = false;
     ui.launcher.setAttribute('aria-expanded', 'true');
     document.documentElement.classList.add('aifs-hl-panel-open');
@@ -1241,6 +1314,8 @@
     ui.panel.hidden = true;
     ui.launcher.setAttribute('aria-expanded', 'false');
     document.documentElement.classList.remove('aifs-hl-panel-open');
+    ui.panelNotice.textContent = '';
+    ui.panelNotice.hidden = true;
     if (state.editor && state.editor.fromPanel) closeEditor(false);
     if (restoreFocus) ui.launcher.focus();
   }
@@ -1602,15 +1677,15 @@
     state.hashPending = /^#hl-/.test(window.location.hash || '');
     state.userMoved = false;
     revealHashTarget();
-    if (state.hashPending && document.readyState !== 'complete') {
-      window.addEventListener('load', revealHashTarget, { once: true });
-    }
     scheduleSettle();
   }
 
   function unmount() {
     hideToolbar();
-    if (state.editor) closeEditor(false);
+    if (state.editor && !closeEditor(false)) {
+      state.editor = null;
+      ui.editor.hidden = true;
+    }
     stopObserving();
     window.clearTimeout(state.settleTimer);
     window.clearTimeout(state.mutationTimer);
@@ -1641,6 +1716,7 @@
       state.settled = true;
       paint(true);
       renderPanel();
+      revealPendingHash();
     },
     status: function () {
       var copy = {};

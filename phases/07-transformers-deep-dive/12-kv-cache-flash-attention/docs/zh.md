@@ -3,7 +3,7 @@
 > 训练是并行的、受 FLOP 约束。推理是串行的、受显存约束。瓶颈不同，招数不同。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Rust
 **前置要求：** 阶段 7 · 02（Self-Attention）、阶段 7 · 05（完整的 Transformer）、阶段 7 · 07（GPT）
 **预计时间：** ~75 分钟
 
@@ -130,7 +130,7 @@ iso-machine {"machine":"kv-cache"}
 ```
 
 
-见 `code/main.py`。我们实现：
+见 `code/main.py`，或其 Rust 移植版 `code/main.rs`。运行 Rust 版本：`rustc --edition 2021 -O code/main.rs -o /tmp/lesson && /tmp/lesson`。我们实现：
 
 1. 一个朴素的 $O(N^2)$ 增量解码器。
 2. 一个 $O(N)$ 的 KV 缓存解码器。

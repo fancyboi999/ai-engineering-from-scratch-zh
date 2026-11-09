@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parseMd, readLessonMarkdown, prerenderedCode } = require('../site/lesson-markdown');
-const { representation } = require('../lib/agent-http');
+const { representation, quality, problem } = require('../lib/agent-http');
 
 const ORIGIN = 'https://aieng-zh.cn';
 const SEO_START = '<!-- AIFS:LESSON-SEO:START -->';
@@ -411,7 +411,7 @@ function normalizedLessonLocation(req, lessonPath, entry, assets) {
 
   if (hasQuery(req, 'lang')) {
     const lang = queryValue(req, 'lang');
-    if (!certificationLesson && validLanguageCode(lang) && listedValue(assets.languageCodes, lang)) {
+    if (!certificationLesson && lang !== 'en' && validLanguageCode(lang) && listedValue(assets.languageCodes, lang)) {
       params.set('lang', lang);
     } else {
       needsRedirect = true;
@@ -455,9 +455,10 @@ function createHandler(options) {
       return;
     }
 
-    res.setHeader('Vary', 'Accept, Accept-Encoding');
-    const requestedRepresentation = representation(req.headers && req.headers.accept);
+    const accept = req.headers && req.headers.accept;
+    const requestedRepresentation = representation(accept);
     if (!requestedRepresentation) {
+      res.setHeader('Vary', 'Accept, Accept-Encoding');
       send(res, method, 406, errorPage('不支持该内容格式', '请请求 text/html 或 text/markdown。'), 'no-store');
       return;
     }
@@ -491,15 +492,23 @@ function createHandler(options) {
       }
       const heading = lessonHeading(entry, manifest);
       const markdown = typeof assets.readMarkdown === 'function' ? assets.readMarkdown(lessonPath) : null;
-      res.setHeader('Content-Language', 'zh-CN');
-      if (requestedRepresentation === 'text/markdown') {
-        if (typeof markdown !== 'string' || !markdown.trim()) throw new Error('lesson-source-unavailable');
+      const markdownRequested = requestedRepresentation === 'text/markdown';
+      if (markdownRequested && typeof markdown === 'string' && markdown.trim()) {
+        res.setHeader('Vary', 'Accept, Accept-Encoding');
+        res.setHeader('Content-Language', 'zh-CN');
         send(res, method, 200, markdown, 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800', 'text/markdown');
+        return;
+      }
+      if (markdownRequested && !quality(accept, 'text/html')) {
+        res.setHeader('Vary', 'Accept, Accept-Encoding');
+        problem({ method }, res, 406, 'representation_not_supported', 'This lesson has no Markdown source. Request text/html.');
         return;
       }
       let html = replaceMarkedRegion(template, SEO_START, SEO_END, lessonHead(entry, lessonPath, heading, assets));
       html = replaceMarkedRegion(html, FALLBACK_START, FALLBACK_END, lessonFallback(entry, lessonPath, contextParams, heading, markdown, assets));
       if (html.includes(HUBS_START)) html = replaceMarkedRegion(html, HUBS_START, HUBS_END, lessonHubLinks(entry, heading, assets));
+      res.setHeader('Vary', 'Accept, Accept-Encoding');
+      res.setHeader('Content-Language', 'zh-CN');
       send(res, method, 200, html, 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800');
     } catch (_) {
       send(res, method, 500, errorPage('课程页面暂不可用', '课程页面组装失败，请先从课程目录继续。'), 'no-store');

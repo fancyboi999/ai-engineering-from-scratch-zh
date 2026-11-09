@@ -3,7 +3,7 @@
 > 浮点是一个会漏的抽象。它会在训练时咬你一口，而你压根看不到它来。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 01-04 课
 **预计时间：** ~120 分钟
 
@@ -557,7 +557,7 @@ check_tensor("bad",  [1.0, float('nan'), 3.0])
 check_tensor("ugly", [1.0, float('inf'), 3.0])
 ```
 
-完整实现见 `code/numerical.py`，里面演示了所有边界情况。
+完整实现见 `code/numerical.py`，里面演示了所有边界情况。`code/numerical.ts` 是包含相同函数和演示的 TypeScript 移植版本。
 
 ## 拿去用
 
