@@ -3,7 +3,7 @@ const schemas = require('../lib/agent-schemas');
 const { quality, send, problem, apiHeaders, createLimiter } = require('../lib/agent-http');
 
 const PROTOCOL = '2025-11-25';
-const VERSIONS = [PROTOCOL, '2025-06-18', '2025-03-26'];
+const VERSIONS = [PROTOCOL];
 const annotations = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
 const TOOLS = [
   { name: 'search_curriculum', description: '检索 AI Engineering from Scratch 中文版已发布的课程与项目。返回 read_resource 使用的稳定路径，不运行课程代码。', inputSchema: schemas.searchInput, outputSchema: schemas.searchOutput, annotations },

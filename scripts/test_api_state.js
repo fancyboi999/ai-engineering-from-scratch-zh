@@ -145,13 +145,12 @@ test('a limiter full of exhausted clients refuses new clients', () => {
   assert.equal(call('192.0.2.1'), 429);
 });
 
-test('MCP accepts 2025-06-18 and parses each request body once', async () => {
+test('MCP keeps the implemented revision only and parses each request body once', async () => {
   const handler = mcp.createHandler({ limit: () => true });
-  const ping = await rpc(handler, { jsonrpc: '2.0', id: 1, method: 'ping' }, '2025-06-18');
+  const ping = await rpc(handler, { jsonrpc: '2.0', id: 1, method: 'ping' }, '2025-11-25');
   assert.equal(ping.statusCode, 200);
   assert.deepEqual(ping.json.result, {});
-  const init = await rpc(handler, { jsonrpc: '2.0', id: 2, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'state-test', version: '1' } } }, '2025-06-18');
-  assert.equal(init.json.result.protocolVersion, '2025-06-18');
+  assert.equal((await rpc(handler, { jsonrpc: '2.0', id: 2, method: 'ping' }, '2025-06-18')).statusCode, 400);
   const message = { jsonrpc: '2.0', id: 3, method: 'ping' };
   assert.deepEqual((await rpc(handler, JSON.stringify(message))).json.result, {});
   assert.deepEqual((await rpc(handler, Buffer.from(JSON.stringify(message)))).json.result, {});
