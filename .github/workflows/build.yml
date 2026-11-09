@@ -59,6 +59,7 @@ on:
       - "scripts/test_tts.js"
       - "scripts/test_agent_negotiation.js"
       - "scripts/test_agent_api.js"
+      - "scripts/test_api_state.js"
       - "scripts/test_agent_wire.js"
       - "scripts/serve-agent-site.js"
       - "scripts/test_agent_readiness.py"
@@ -163,6 +164,7 @@ jobs:
         run: |
           node scripts/test_agent_negotiation.js
           node scripts/test_agent_api.js
+          node scripts/test_api_state.js
           node scripts/test_agent_wire.js
       - name: Agent 可读性与公开资源契约
         run: python3 scripts/test_agent_readiness.py
