@@ -3,6 +3,8 @@
 
   var root = document.documentElement;
   var assessmentTimer = null;
+  var assessmentView = null;
+  var assessmentWatching = false;
   var GITHUB_BLOB_BASE = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/';
 
   function esc(value) {
@@ -499,7 +501,10 @@
       });
     }
     if (window.AIFSCertProgress) {
-      window.AIFSCertProgress.onChange(function () { renderAssessments(track); });
+      window.AIFSCertProgress.onChange(function () {
+        renderTrackProgress(track);
+        renderAssessments(track);
+      });
     }
   }
 
@@ -726,7 +731,62 @@
     mount.innerHTML = '<div class="cert-error"><h1>未找到测评</h1><p>生成的认证数据中没有这套练习。</p><a class="cert-action" href="certifications.html">所有认证</a></div>';
   }
 
+  function hasAnswers(draft) {
+    var answers = isRecord(draft && draft.answers) ? draft.answers : {};
+    return Object.keys(answers).some(function (id) {
+      return Array.isArray(answers[id]) && answers[id].length > 0;
+    });
+  }
+
+  function sittingStarted(draft) {
+    return hasAnswers(draft) || (isRecord(draft) && draft.touched === true);
+  }
+
+  function stopAssessmentTimer() {
+    if (!assessmentTimer) return;
+    clearInterval(assessmentTimer);
+    assessmentTimer = null;
+  }
+
+  function sittingConflict(assessment, version, draft) {
+    var progress = window.AIFSCertProgress;
+    if (!progress) return null;
+    var submitted = draft.startedAt ? assessmentAttempts(assessment.id, version).find(function (attempt) {
+      return attempt.startedAt === draft.startedAt;
+    }) : null;
+    if (submitted) return { attempt: submitted };
+    var stored = null;
+    try {
+      stored = typeof progress.getDraft === 'function' ? progress.getDraft(assessment.id, version) : null;
+    } catch (_) {}
+    if (isRecord(stored) && stored.startedAt !== draft.startedAt && String(stored.version) === String(version) && sittingStarted(stored)) return { draft: stored };
+    return null;
+  }
+
+  function resolveSittingConflict(mount, assessment, track, questions, conflict) {
+    stopAssessmentTimer();
+    assessmentView = null;
+    if (conflict.attempt) {
+      renderAssessmentResults(mount, assessment, track, questions, conflict.attempt);
+      updateAssessmentResultUrl(assessment.id, true);
+      return;
+    }
+    renderAssessmentLoaded(mount, assessment, track, true);
+  }
+
+  function watchAssessmentProgress() {
+    if (assessmentWatching || !window.AIFSCertProgress || typeof window.AIFSCertProgress.onChange !== 'function') return;
+    assessmentWatching = true;
+    window.AIFSCertProgress.onChange(function () {
+      var view = assessmentView;
+      if (!view) return;
+      var conflict = sittingConflict(view.assessment, view.version, view.draft);
+      if (conflict) resolveSittingConflict(view.mount, view.assessment, view.track, view.questions, conflict);
+    });
+  }
+
   function renderAssessmentLoaded(mount, assessment, track, forceForm) {
+    assessmentView = null;
     renderProgramNotice('assessmentProgramNotice', programForTrack(track), '独立练习材料');
     var questions = (assessment.questions || []).map(normalizeQuestion);
     if (!questions.length) {
@@ -744,19 +804,16 @@
 
     var limit = Number(assessment.timeLimitMinutes || 0);
     var draft = window.AIFSCertProgress && window.AIFSCertProgress.getDraft(assessment.id, version);
-    if (draft && !validDraftForAssessment(draft, version, questions, limit)) {
+    var abandoned = draft && !sittingStarted(draft);
+    if (draft && (abandoned || !validDraftForAssessment(draft, version, questions, limit))) {
       if (window.AIFSCertProgress) window.AIFSCertProgress.clearDraft(assessment.id, version);
       draft = null;
     }
-    if (!draft) {
-      var now = Date.now();
-      draft = { answers: {}, startedAt: now, deadlineAt: limit ? now + limit * 60000 : 0, version: version };
-      if (window.AIFSCertProgress) window.AIFSCertProgress.saveDraft(assessment.id, version, draft);
-    }
+    if (!draft) draft = { answers: {}, startedAt: 0, deadlineAt: 0, version: version };
 
     mount.innerHTML = '<div class="assessment-shell"><div class="cert-breadcrumb"><a href="certifications.html">认证</a><span>/</span>' + (track ? '<a href="certification.html?id=' + encodeURIComponent(track.id) + '">' + esc(track.examCode || track.shortName || track.id) + '</a><span>/</span>' : '') + '<span>练习</span></div><section class="assessment-hero"><div class="cert-eyebrow">' + esc(assessmentKindLabel(assessment.kind)) + '</div><h1>' + esc(title) + '</h1><p>' + esc(assessment.summary || assessment.description || '完成原创场景题后提交，即可查看解析和知识域反馈。') + '</p><p class="assessment-scoring-note">准备好后即可提交；未作答题目按错误计算。</p><div class="cert-meta-row">' + metaChip(questions.length + ' 道原创题') + metaChip(limit ? limit + ' 分钟限制' : '不限时') + metaChip(progressIsPersistent() ? '已保存到本地' : '进度仅在当前页面有效') + '</div></section>' +
       '<div class="cert-notice"><strong>仅为练习分数</strong><p>结果是本开源课程计算的百分比，不是官方量表分数、认证决定或通过保证。</p></div>' +
-      (limit ? '<div class="cert-timer" id="assessmentTimer" role="timer" aria-live="off" aria-label="剩余时间"><span>剩余时间</span><strong id="assessmentTimerValue">' + formatRemaining(draft.deadlineAt - Date.now()) + '</strong></div>' : '') +
+      (limit ? '<div class="cert-timer" id="assessmentTimer" role="timer" aria-live="off" aria-label="剩余时间"><span>剩余时间</span><strong id="assessmentTimerValue">' + formatRemaining(draft.startedAt ? draft.deadlineAt - Date.now() : limit * 60000) + '</strong></div>' : '') +
       '<form class="assessment-form" id="assessmentForm" tabindex="-1" aria-label="测评题目">' + questions.map(function (question, index) { return renderQuestion(question, index, draft.answers[question.id] || []); }).join('') + '<div class="cert-submit-row"><p>可以提交未完成的作答；未答题按错误计算，提交后显示解析。</p><button class="cert-action" type="submit">提交练习</button></div></form></div>';
 
     var form = document.getElementById('assessmentForm');
@@ -766,6 +823,17 @@
       var qid = input.getAttribute('data-question');
       var question = questions.find(function (item) { return item.id === qid; });
       if (!question) return;
+      var conflict = sittingConflict(assessment, version, draft);
+      if (conflict) {
+        resolveSittingConflict(mount, assessment, track, questions, conflict);
+        return;
+      }
+      var starting = !draft.startedAt;
+      if (starting) {
+        draft.startedAt = Date.now();
+        draft.deadlineAt = limit ? draft.startedAt + limit * 60000 : 0;
+      }
+      draft.touched = true;
       if (question.type === 'multiple') {
         draft.answers[qid] = Array.from(form.querySelectorAll('input[data-question="' + cssEscape(qid) + '"]:checked')).map(function (node) { return Number(node.value); });
       } else {
@@ -776,11 +844,14 @@
         if (option) option.classList.toggle('is-selected', node.checked);
       });
       if (window.AIFSCertProgress) window.AIFSCertProgress.saveDraft(assessment.id, version, draft);
+      if (starting) startTimer(mount, assessment, track, questions, draft);
     });
     form.addEventListener('submit', function (event) {
       event.preventDefault();
       submitAssessment(mount, assessment, track, questions, draft, false);
     });
+    assessmentView = { mount: mount, assessment: assessment, track: track, questions: questions, draft: draft, version: version };
+    watchAssessmentProgress();
     startTimer(mount, assessment, track, questions, draft);
   }
 
@@ -827,10 +898,21 @@
   }
 
   function submitAssessment(mount, assessment, track, questions, draft, timedOut) {
-    if (assessmentTimer) {
-      clearInterval(assessmentTimer);
-      assessmentTimer = null;
+    stopAssessmentTimer();
+    var version = assessmentVersion(assessment);
+    var progress = window.AIFSCertProgress;
+    var conflict = sittingConflict(assessment, version, draft);
+    if (conflict) {
+      resolveSittingConflict(mount, assessment, track, questions, conflict);
+      return;
     }
+    assessmentView = null;
+    if (timedOut && !sittingStarted(draft)) {
+      if (progress) progress.clearDraft(assessment.id, version);
+      renderAssessmentLoaded(mount, assessment, track, true);
+      return;
+    }
+    if (!draft.startedAt) draft.startedAt = Date.now();
     var score = scoreAssessmentAnswers(questions, draft.answers);
     var submittedAt = Date.now();
     var attempt = {
@@ -843,11 +925,16 @@
       submittedAt: submittedAt,
       durationMs: submittedAt - draft.startedAt,
       timedOut: !!timedOut,
-      version: assessmentVersion(assessment),
+      version: version,
     };
-    if (window.AIFSCertProgress) window.AIFSCertProgress.recordAttempt(assessment.id, assessmentVersion(assessment), attempt);
-    renderAssessmentResults(mount, assessment, track, questions, attempt);
-    updateAssessmentResultUrl(assessment.id, true);
+    var recorded = false;
+    if (progress) {
+      try {
+        recorded = progress.recordAttempt(assessment.id, version, attempt) === true;
+      } catch (_) {}
+    }
+    renderAssessmentResults(mount, assessment, track, questions, attempt, !recorded);
+    updateAssessmentResultUrl(assessment.id, recorded);
     scrollToPageTop();
     focusWithoutScrolling(document.getElementById('assessmentResultsSummary'));
   }
@@ -895,7 +982,8 @@
     return '<section class="cert-remediation" aria-labelledby="remediationTitle"><div class="cert-eyebrow">定向补强</div><h2 id="remediationTitle">复习做错的决策</h2><p>下面每节课都来自错题的内部引用。先复习对应决策，再开始一次新的练习。</p><div class="cert-remediation-grid">' + cards + '</div></section>';
   }
 
-  function renderAssessmentResults(mount, assessment, track, questions, attempt) {
+  function renderAssessmentResults(mount, assessment, track, questions, attempt, unsaved) {
+    assessmentView = null;
     var attemptAnswers = isRecord(attempt.answers) ? attempt.answers : {};
     var scoreSummary = scoreAssessmentAnswers(questions, attemptAnswers);
     var domainHtml = Object.keys(scoreSummary.domains).map(function (id) {
@@ -906,7 +994,9 @@
     }).join('');
     var remediationHtml = renderRemediation(track, questions, attempt);
     var latestResultHref = 'assessment.html?id=' + encodeURIComponent(assessment.id) + '&result=latest';
-    mount.innerHTML = '<div class="assessment-shell cert-results"><div class="cert-breadcrumb"><a href="certifications.html">认证</a><span>/</span>' + (track ? '<a href="certification.html?id=' + encodeURIComponent(track.id) + '">' + esc(track.examCode || track.shortName || track.id) + '</a><span>/</span>' : '') + '<span>结果</span></div><section class="cert-results-summary" id="assessmentResultsSummary" tabindex="-1" aria-label="测评结果"><div class="cert-results-head"><div><div class="cert-eyebrow">练习结果</div><div class="cert-results-score">' + scoreSummary.percent + '%</div></div><div><strong>' + scoreSummary.correct + ' / ' + scoreSummary.total + ' 题完全正确</strong><p>' + (attempt.timedOut ? '计时结束时自动提交。' : '用时 ' + formatDuration(attempt.durationMs) + ' 后提交') + '</p></div></div><div class="cert-domain-score-grid">' + domainHtml + '</div><div class="cert-notice"><strong>不是官方量表分数</strong><p>这个百分比只衡量当前原创练习，不能预测或保证认证提供方的量表分数。</p></div><div class="cert-track-hero-actions"><button class="cert-action" type="button" id="assessmentRetake">开始新的作答</button><a class="cert-action secondary" href="' + attr(latestResultHref) + '">再次查看最近结果</a>' + (track ? '<a class="cert-action secondary" href="certification.html?id=' + encodeURIComponent(track.id) + '">返回路线</a>' : '') + '</div></section>' + remediationHtml + '<section aria-labelledby="reviewTitle"><div class="cert-section-heading"><div><div class="cert-eyebrow">复盘</div><h2 id="reviewTitle">决策与解析</h2></div><p>用每道错题定位需要复习的知识域和决策规则。</p></div>' + questions.map(function (question, index) { return renderReview(question, index, attemptAnswers[question.id] || [], track); }).join('') + '</section></div>';
+    var unsavedHtml = unsaved ? '<div class="cert-notice" role="alert"><strong>结果未保存</strong><p>当前浏览器无法存储本次作答。离开或刷新此页面将丢失结果。</p></div>' : '';
+    var revisitHtml = unsaved ? '' : '<a class="cert-action secondary" href="' + attr(latestResultHref) + '">再次查看最近结果</a>';
+    mount.innerHTML = '<div class="assessment-shell cert-results"><div class="cert-breadcrumb"><a href="certifications.html">认证</a><span>/</span>' + (track ? '<a href="certification.html?id=' + encodeURIComponent(track.id) + '">' + esc(track.examCode || track.shortName || track.id) + '</a><span>/</span>' : '') + '<span>结果</span></div><section class="cert-results-summary" id="assessmentResultsSummary" tabindex="-1" aria-label="测评结果"><div class="cert-results-head"><div><div class="cert-eyebrow">练习结果</div><div class="cert-results-score">' + scoreSummary.percent + '%</div></div><div><strong>' + scoreSummary.correct + ' / ' + scoreSummary.total + ' 题完全正确</strong><p>' + (attempt.timedOut ? '计时结束时自动提交。' : '用时 ' + formatDuration(attempt.durationMs) + ' 后提交') + '</p></div></div><div class="cert-domain-score-grid">' + domainHtml + '</div><div class="cert-notice"><strong>不是官方量表分数</strong><p>这个百分比只衡量当前原创练习，不能预测或保证认证提供方的量表分数。</p></div>' + unsavedHtml + '<div class="cert-track-hero-actions"><button class="cert-action" type="button" id="assessmentRetake">开始新的作答</button>' + revisitHtml + (track ? '<a class="cert-action secondary" href="certification.html?id=' + encodeURIComponent(track.id) + '">返回路线</a>' : '') + '</div></section>' + remediationHtml + '<section aria-labelledby="reviewTitle"><div class="cert-section-heading"><div><div class="cert-eyebrow">复盘</div><h2 id="reviewTitle">决策与解析</h2></div><p>用每道错题定位需要复习的知识域和决策规则。</p></div>' + questions.map(function (question, index) { return renderReview(question, index, attemptAnswers[question.id] || [], track); }).join('') + '</section></div>';
     var retake = document.getElementById('assessmentRetake');
     if (retake) retake.addEventListener('click', function () {
       if (window.AIFSCertProgress) window.AIFSCertProgress.clearDraft(assessment.id, assessmentVersion(assessment));
