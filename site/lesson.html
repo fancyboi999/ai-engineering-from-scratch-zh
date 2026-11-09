@@ -3699,15 +3699,20 @@
       var lessonFetchSequence = 0;
 
       function fetchLesson(path, retried) {
+        // 构建期 Shiki 片段与正文并行请求；缺失或超时回退正则高亮。
+        var codePromise = fetchLessonCode(path);
         if (certificationLesson && path === certificationLesson.path && typeof certificationLesson.markdown === 'string') {
           lessonQuizPromise = Promise.resolve(certificationLesson.quiz || null);
-          try {
-            renderLesson(certificationLesson.markdown);
-            fetchQuiz(path);
-          } catch (err) {
-            console.error('renderLesson failed', err);
-            showError('渲染出错', '认证课程已加载，但渲染失败。详情请查看浏览器控制台。');
-          }
+          var embeddedCertification = certificationLesson;
+          codePromise.then(function (blocks) {
+            try {
+              renderLesson(embeddedCertification.markdown, blocks);
+              fetchQuiz(path);
+            } catch (err) {
+              console.error('renderLesson failed', err);
+              showError('渲染出错', '认证课程已加载，但渲染失败。详情请查看浏览器控制台。');
+            }
+          });
           return;
         }
 
@@ -3728,10 +3733,11 @@
               if (!res.ok) throw new Error('fetch-failed');
               return res.text();
             });
-        lessonDocument
-          .then(function (md) {
+        Promise.all([lessonDocument, codePromise])
+          .then(function (results) {
+            var md = results[0];
             try {
-              renderLesson(md);
+              renderLesson(md, results[1]);
             } catch (err) {
               console.error('renderLesson failed', err);
               showError('渲染出错', '已加载课程的 Markdown，但渲染失败。详情请查看浏览器控制台。');
