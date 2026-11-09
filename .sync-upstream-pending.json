@@ -1,29 +1,42 @@
 {
-  "base": "fe6c657dfb8d02cc898fcee7d4cfbf663aae1416",
-  "target": "d7b5633f91591ee3bf55c8d80831b515498cc0e6",
+  "base": "d7b5633f91591ee3bf55c8d80831b515498cc0e6",
+  "target": "1d08d70dd5641abe5217a6dfe1f3cf25a14f77e8",
   "pending": [
-    {
-      "id": "batch-1-lesson-fixes",
-      "title": "核心课程理论与测验去偏勘误（#749）",
-      "commit": "60941c963"
-    },
     {
       "id": "batch-2-code-render-search",
       "title": "Shiki 构建期代码渲染与 Pagefind 检索基础架构（#732, #751, #752）",
-      "commit": "d1cf10338"
+      "commit": "d1cf10338",
+      "note": "Pagefind 已上线验证；Shiki 在 /lessons/ 与 lesson.html 均未消费构建期片段，本轮修复后需线上复验。"
     },
     {
-      "id": "batch-3-interviews-scaffold",
-      "title": "面试题库系统脚手架、页面构建与验证工具（#731, #735）",
-      "commit": "321cd607c"
-    },
-    {
-      "id": "batch-4-upstream-fixes",
-      "title": "上游四级标题、phase-13/45 夹具编译器闸门与 phase-10 测验干扰项（#707, #726, #725）",
+      "id": "batch-5-lesson-ports",
+      "title": "30 课 TypeScript/Rust 移植、Python 修复与 README 语言列（#763, #765）",
       "upstream": [
-        "2c22ad8f6",
-        "b019240f6",
-        "6ad299d6d"
+        "77633fd65",
+        "7a2df71f4"
+      ]
+    },
+    {
+      "id": "batch-6-lesson-ports-ci",
+      "title": "lesson-ports CI：单文件 Rust 与 phase 01–03 TypeScript 编译运行",
+      "upstream": [
+        "77633fd65",
+        "7a2df71f4"
+      ]
+    },
+    {
+      "id": "batch-7-state-machines",
+      "title": "跨标签页、浮层与失败场景状态机修复（#759）",
+      "upstream": [
+        "836a27d8f"
+      ]
+    },
+    {
+      "id": "batch-8-llms-readme",
+      "title": "llms.txt 发现区段位置与 README Mermaid 节点底色（#762, #758）",
+      "upstream": [
+        "1a9681e93",
+        "cc5d0e6a0"
       ]
     }
   ],
@@ -209,6 +222,21 @@
         "phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering/",
         "phases/10-llms-from-scratch/06-instruction-tuning-sft/quiz.json",
         "phases/10-llms-from-scratch/07-rlhf/quiz.json"
+      ]
+    },
+    {
+      "scope": "上游 d7b5633f9..1d08d70dd 同步（2026-11-09）",
+      "decision": "#763/#765：代码按上游逐字节移植，en.md 改动语义译入 zh.md；statistics.py 因 #60 中文侧数值改进与上游分叉，只移植零方差抛异常这一行。README 语言列与 upstream/main 全量对齐（542 行一致，且声明的语言都有对应代码文件）。lesson-ports 并入 build.yml 新 job，不引入 curriculum.yml。#759：以中文实现为底按语义移植 api/lib/site 状态机修复与回归测试，跳过 lib/lesson-translations.js、site/lang-picker.js、site/ui-i18n.js、site/test_ui_i18n.js（中文站无多语言管线）；lang=en 改为 308 到无语言参数地址并补测试。#762 修正生产 llms.txt 发现区段位于摘要之前的问题。#758 只改 README，不同步 i18n 镜像。五个 chore(site): rebuild data.js 由中文源重建，不复制。线上核验 batch-2 时发现 Shiki 构建期片段未被任何课程入口消费，本轮在 build.js 预渲染与 lesson.html 运行时接入并补回归测试。",
+      "paths": [
+        "phases/",
+        "README.md",
+        ".github/workflows/build.yml",
+        "api/",
+        "lib/",
+        "site/build.js",
+        "site/lesson.html",
+        "site/build-agents.js",
+        "site/"
       ]
     }
   ]
