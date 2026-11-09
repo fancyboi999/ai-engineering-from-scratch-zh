@@ -7,7 +7,7 @@
 
   // Runtime-created links must resolve from the assets, including on /lessons/**.
   var assetScript = document.currentScript;
-  var assetBase = assetScript && assetScript.src ? new URL('.', assetScript.src).href : (document.baseURI || (typeof location !== 'undefined' && (location.href || (location.origin ? location.origin + '/' : ''))) || 'https://aieng-zh.cn/');
+  var assetBase = assetScript && assetScript.src ? new URL('.', assetScript.src).href : document.baseURI;
   function assetHref(href) { return new URL(href, assetBase).href; }
 
   var COLORS = Store.COLORS;
