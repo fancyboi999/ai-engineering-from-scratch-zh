@@ -364,6 +364,10 @@
               clearTimeout(pending.timer);
               pending.timer = setTimeout(timeout, pending.limit);
             }
+          } else if (message.phase === 'failed') {
+            reset();
+            onStatus('failed');
+            finish({ error: message.message || 'Python 运行时无法启动。' });
           } else {
             onStatus(message.phase, message.ms);
           }
@@ -381,6 +385,7 @@
         event.preventDefault();
         finish({ error: 'Python 运行环境已停止：' + (event.message || 'unknown error') });
         reset();
+        onStatus('stopped');
       };
       worker.postMessage({ type: 'boot', pyodide: pyodide });
       onStatus('loading');
@@ -526,6 +531,7 @@
     var dataPromise = null;
     var hintsShown = 0;
     var saveTimer = null;
+    var executing = false;
 
     function data() {
       if (!dataPromise) {
@@ -538,16 +544,20 @@
       return dataPromise;
     }
 
-    function persist(code) {
+    function cancelSave() {
       clearTimeout(saveTimer);
       saveTimer = null;
+    }
+
+    function persist(code) {
+      cancelSave();
       if (!store) return;
       if (code === starter) store.clearCode(id);
       else store.saveCode(id, code);
     }
 
     function save(code) {
-      clearTimeout(saveTimer);
+      cancelSave();
       saveTimer = setTimeout(function () { persist(code); }, 250);
     }
 
@@ -561,7 +571,8 @@
         runtime: '正在启动 Python',
         numpy: '正在加载 NumPy',
         ready: 'Python 环境已就绪' + (ms ? '，耗时 ' + (ms / 1000).toFixed(1) + ' 秒' : ''),
-        stopped: 'Python 已停止；下次运行时会重新启动'
+        stopped: 'Python 已停止；下次运行时会重新启动',
+        failed: 'Python 加载失败；下次运行时会重新尝试'
       }[phase] || '';
       runtimeLabel.textContent = text;
       runtimeLabel.setAttribute('data-phase', phase);
@@ -578,7 +589,8 @@
     }
 
     function execute(kind) {
-      if (runner.busy()) return;
+      if (executing || runner.busy()) return;
+      executing = true;
       var code = editor.value();
       persist(code);
       setBusy(true, kind === 'submit' ? '正在运行全部检查' : '正在运行示例');
@@ -586,8 +598,9 @@
         curve.reset();
         return runner.run({ tests: problem.tests, fixtures: problem.fixtures, support: problem.support, code: code, layers: kind === 'submit' ? [] : ['examples'], limit: problem.limit || limit });
       }).then(function (outcome) {
-        setBusy(false);
+        executing = false;
         if (outcome.busy) return;
+        setBusy(false);
         if (outcome.timeout) {
           results.innerHTML = '<p class="pr-verdict pr-verdict-fail" role="status"><strong>运行超时。</strong>检查在 ' + Math.round(outcome.limit / 1000) + ' 秒内没有完成。请检查是否有无法结束的循环，或计算量是否随输入规模增长过快。</p>';
           if (store) store.record(id, kind, 0, 1);
@@ -608,6 +621,7 @@
         paintStatuses();
         if (kind === 'submit' && report.summary.ok) unlock(true);
       }, function (error) {
+        executing = false;
         setBusy(false);
         results.innerHTML = '<p class="pr-verdict pr-verdict-fail" role="status"><strong>无法启动运行。</strong> ' + escapeHtml(error.message) + '</p>';
       });
@@ -681,11 +695,13 @@
       var saved = store.loadCode(id);
       if (typeof saved === 'string' && saved.length) editor.set(saved);
       store.open(id, version);
+      paintStatuses();
     }
     runButton.addEventListener('click', function () { execute('run'); });
     submitButton.addEventListener('click', function () { execute('submit'); });
     resetButton.addEventListener('click', function () {
       if (editor.value() !== starter && !window.confirm('要将代码恢复为起始模板吗？当前代码会被覆盖。')) return;
+      cancelSave();
       editor.set(starter);
       if (store) store.clearCode(id);
     });
