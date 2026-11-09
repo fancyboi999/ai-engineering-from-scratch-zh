@@ -226,7 +226,7 @@
     },
     {
       "scope": "上游 d7b5633f9..1d08d70dd 同步（2026-11-09）",
-      "decision": "#763/#765：代码按上游逐字节移植，en.md 改动语义译入 zh.md；statistics.py 因 #60 中文侧数值改进与上游分叉，只移植零方差抛异常这一行。README 语言列与 upstream/main 全量对齐（542 行一致，且声明的语言都有对应代码文件）。lesson-ports 并入 build.yml 新 job，不引入 curriculum.yml。#759：以中文实现为底按语义移植 api/lib/site 状态机修复与回归测试，跳过 lib/lesson-translations.js、site/lang-picker.js、site/ui-i18n.js、site/test_ui_i18n.js（中文站无多语言管线）；lang=en 改为 308 到无语言参数地址并补测试。#762 修正生产 llms.txt 发现区段位于摘要之前的问题。#758 只改 README，不同步 i18n 镜像。五个 chore(site): rebuild data.js 由中文源重建，不复制。线上核验 batch-2 时发现 Shiki 构建期片段未被任何课程入口消费，本轮在 build.js 预渲染与 lesson.html 运行时接入并补回归测试。",
+      "decision": "#763/#765：代码按上游逐字节移植，en.md 改动语义译入 zh.md；statistics.py 因 #60 中文侧数值改进与上游分叉，只移植零方差抛异常这一行。README 语言列与 upstream/main 全量对齐（542 行一致，且声明的语言都有对应代码文件）。lesson-ports 并入 build.yml 新 job，不引入 curriculum.yml。#759：以中文实现为底按语义移植 api/lib/site 状态机修复与回归测试，跳过 lib/lesson-translations.js、site/lang-picker.js、site/ui-i18n.js、site/test_ui_i18n.js（中文站无多语言管线）；lang=en 改为 308 到无语言参数地址并补测试。#762 修正生产 llms.txt 发现区段位于摘要之前的问题。#758 只改 README，不同步 i18n 镜像。五个 chore(site): rebuild data.js 由中文源重建，不复制。线上核验 batch-2 时发现 Shiki 构建期片段未被任何课程入口消费，本轮在 build.js 预渲染与 lesson.html 运行时接入并补回归测试。 MCP 维持中文仓既有安全边界，只协商已实现的 2025-11-25；上游 #759 新增的 2025-06-18 与既有 2025-03-26 不接受，只移植请求体单次解析。集成复核撤回子任务为迁就测试桩写入生产代码的分支（projects.js 的 querySelector 守卫、highlights.js 硬编码域名回退），改为补全测试桩。",
       "paths": [
         "phases/",
         "README.md",
