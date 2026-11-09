@@ -180,6 +180,19 @@ test('production lesson handler loads the zh-only repository without languages.j
   assert.match(response.body, /rel="canonical" href="https:\/\/aieng-zh\.cn\/lessons\/13-tools-and-protocols\/06-mcp-fundamentals\/"/);
 });
 
+test('lesson route drops lang=en with a permanent redirect', function () {
+  const assets = makeAssets();
+  const handler = lessonApi.createHandler({ loadAssets: function () { return assets.lesson; } });
+  const response = invoke(handler, {
+    method: 'GET',
+    url: '/lesson?path=phases%2F01-math%2F01-vectors&lang=en',
+    query: { path: 'phases/01-math/01-vectors', lang: 'en' },
+  });
+
+  assert.equal(response.statusCode, 308);
+  assert.equal(response.headers.location, '/lesson?path=phases%2F01-math%2F01-vectors');
+});
+
 test('lesson route renders unique crawlable HTML with a path-only canonical', function () {
   const assets = makeAssets();
   const handler = lessonApi.createHandler({ loadAssets: function () { return assets.lesson; } });
