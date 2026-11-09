@@ -92,6 +92,7 @@ function page(kind, search, storage = new Map()) {
     currentScript: null,
     title: '',
     getElementById: get,
+    querySelector: () => null,
     querySelectorAll: () => [],
     addEventListener() {},
     createElement: () => element(''),

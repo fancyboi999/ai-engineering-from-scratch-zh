@@ -410,7 +410,6 @@
   }
 
   function updateProjectSeo(project, stage) {
-    if (typeof document.querySelector !== 'function') return;
     var title = (stage ? stage.title + ' - ' : '') + project.title + ' - 项目 - 从零开始学 AI 工程';
     var description = stage ? stage.summary : project.summary || project.tagline;
     var canonical = 'https://aieng-zh.cn/project/' + project.id + '/' + (stage ? stage.id + '/' : '');
