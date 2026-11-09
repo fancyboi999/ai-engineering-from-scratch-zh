@@ -3,7 +3,7 @@
 > 概率讲的是你预期什么。贝叶斯定理讲的是你学到什么。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 06 课（概率基础）
 **预计时间：** ~75 分钟
 
@@ -145,6 +145,8 @@ P(\text{word} \mid \text{class}) = \frac{\text{count}(\text{word}, \text{class})
 
 给每个计数加 1，保证没有任何概率会是零。
 
+从未在任何训练消息中出现过的词不在词汇表中。`predict` 会跳过它，因为它不能为任何一类提供证据。
+
 ### 最大后验（MAP）
 
 MLE 问：什么参数能最大化 $P(\text{data} \mid \text{parameters})$？
@@ -235,7 +237,7 @@ class NaiveBayes:
                 self.vocab.add(word)
 
     def predict(self, document):
-        words = document.lower().split()
+        words = [word for word in document.lower().split() if word in self.vocab]
         total_docs = sum(self.class_counts.values())
         vocab_size = len(self.vocab)
         best_class = None
@@ -335,7 +337,7 @@ for msg, pred in zip(test_messages, predictions):
 
 ## 拿去用
 
-这里构建的 NaiveBayes 类展示了完整流水线：分词、用 Laplace 平滑做概率估计、对数空间预测。`code/bayes.py` 里的代码端到端运行，除了 Python 标准库不依赖任何东西。
+这里构建的 NaiveBayes 类展示了完整流水线：分词、用 Laplace 平滑做概率估计、对数空间预测。`code/bayes.py` 里的代码端到端运行，除了 Python 标准库不依赖任何东西。`code/bayes.ts` 中的 TypeScript 移植版本仅使用 Node 标准库。
 
 ### 共轭先验
 

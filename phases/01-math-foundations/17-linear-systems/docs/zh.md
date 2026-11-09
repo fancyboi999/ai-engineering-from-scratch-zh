@@ -3,7 +3,7 @@
 > 求解 $Ax = b$ 是数学里最古老的问题，至今仍在驱动你的神经网络。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 01 课（线性代数直觉）、02 课（向量与矩阵）、03 课（矩阵变换）
 **预计时间：** ~120 分钟
 
@@ -546,6 +546,7 @@ print(f"Ridge weights (sklearn): {ridge_sk.coef_}")
 
 本节课产出：
 - `code/linear_systems.py`，含高斯消元、LU 分解、Cholesky 分解、最小二乘和岭回归的从零实现
+- `code/linear_systems.ts`，同一文件的 TypeScript 移植版本。由于 TypeScript 没有 NumPy，它与小型从零参考求解器对比。
 - 一个可运行的演示，表明正规方程和 sklearn 的 LinearRegression 产出相同的权重
 
 ## 练习
