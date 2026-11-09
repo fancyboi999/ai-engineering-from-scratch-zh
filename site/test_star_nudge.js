@@ -67,8 +67,22 @@ test('the note asks for a star on the Chinese repository, not upstream', () => {
 });
 
 test('a CSS-hidden modal, like the lesson diagram viewer, does not block the note', () => {
-  const source = fs.readFileSync(path.join(__dirname, 'star-nudge.js'), 'utf8');
-  assert.match(source, /function busy\(\)[\s\S]*getClientRects\(\)\.length[\s\S]*return true/);
+  const { BUSY } = nudge;
+  assert.ok(BUSY && BUSY.includes('.mermaid-modal-overlay.open'));
   const lesson = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
   assert.match(lesson, /class="mermaid-modal" role="dialog" aria-modal="true"/);
+});
+
+test('only overlays that are actually open hold the note back', () => {
+  const { BUSY, busyIn } = nudge;
+  assert.doesNotMatch(BUSY, /aria-modal/, 'the home modal and the palette always carry aria-modal, so it says nothing about open state');
+  for (const open of ['dialog[open]', 'body[data-palette-open]', '#cmdPalette.cp-open', '#modalOverlay.open', '.header-menu-toggle[aria-expanded="true"]']) {
+    assert.ok(BUSY.split(', ').includes(open), open);
+  }
+  const seen = [];
+  assert.equal(busyIn({ querySelector: (selector) => { seen.push(selector); return null; } }), false);
+  assert.deepEqual(seen, [BUSY]);
+  assert.equal(busyIn({ querySelector: () => ({}) }), true);
+  const source = fs.readFileSync(path.join(__dirname, 'star-nudge.js'), 'utf8');
+  assert.match(source, /event\.key === 'Escape' && !event\.defaultPrevented/);
 });
