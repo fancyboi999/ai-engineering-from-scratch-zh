@@ -3,7 +3,7 @@
 > 一个稠密的 70B transformer 对每个 token 都激活全部参数。一个 671B 的 MoE 每个 token 只激活 37B，却在每个基准上打败它。稀疏是这十年最重要的 scaling 想法。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Rust
 **前置要求：** 阶段 7 · 05（完整的 Transformer）、阶段 7 · 07（GPT）
 **预计时间：** ~45 分钟
 
@@ -90,6 +90,13 @@ expert-routing
 - top-k=2 路由
 - softmax 归一化的门控权重
 - 通过每专家偏置实现的无辅助损失均衡
+
+`code/main.rs` 是包含相同函数和演示的 Rust 移植版。它仅使用标准库。随机数与 Python 版不同，但打印出的结论相同。
+
+```bash
+python3 code/main.py
+rustc --edition 2021 -O code/main.rs -o /tmp/lesson && /tmp/lesson
+```
 
 ### 第 1 步：路由器
 

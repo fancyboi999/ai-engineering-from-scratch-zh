@@ -3,7 +3,7 @@
 > 完整注意力是个圈。每个 token 都看每个 token，显存为此买单。三种变体掰弯这个圈的形状，把一半的成本赚回来。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Rust
 **前置要求：** 阶段 7 · 02（Self-Attention）、阶段 7 · 03（Multi-Head）、阶段 7 · 12（KV Cache / Flash Attention）
 **预计时间：** ~60 分钟
 
@@ -90,7 +90,7 @@ gqa-kv-sharing
 
 ## 动手构建
 
-见 `code/main.py`。我们实现一个因果掩码对比器，在一个玩具序列上把完整、SWA、局部+跨步、差分注意力并排展示。
+见 `code/main.py`，或其 Rust 移植版 `code/main.rs`。运行 Rust 版本：`rustc --edition 2021 -O code/main.rs -o /tmp/lesson && /tmp/lesson`。我们实现一个因果掩码对比器，在一个玩具序列上把完整、SWA、局部+跨步、差分注意力并排展示。
 
 ### 第 1 步：完整因果掩码（基线）
 
