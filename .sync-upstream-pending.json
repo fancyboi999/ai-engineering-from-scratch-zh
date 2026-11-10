@@ -1,45 +1,7 @@
 {
   "base": "d7b5633f91591ee3bf55c8d80831b515498cc0e6",
   "target": "1d08d70dd5641abe5217a6dfe1f3cf25a14f77e8",
-  "pending": [
-    {
-      "id": "batch-2-code-render-search",
-      "title": "Shiki 构建期代码渲染与 Pagefind 检索基础架构（#732, #751, #752）",
-      "commit": "d1cf10338",
-      "note": "Pagefind 已上线验证；Shiki 在 /lessons/ 与 lesson.html 均未消费构建期片段，本轮修复后需线上复验。"
-    },
-    {
-      "id": "batch-5-lesson-ports",
-      "title": "30 课 TypeScript/Rust 移植、Python 修复与 README 语言列（#763, #765）",
-      "upstream": [
-        "77633fd65",
-        "7a2df71f4"
-      ]
-    },
-    {
-      "id": "batch-6-lesson-ports-ci",
-      "title": "lesson-ports CI：单文件 Rust 与 phase 01–03 TypeScript 编译运行",
-      "upstream": [
-        "77633fd65",
-        "7a2df71f4"
-      ]
-    },
-    {
-      "id": "batch-7-state-machines",
-      "title": "跨标签页、浮层与失败场景状态机修复（#759）",
-      "upstream": [
-        "836a27d8f"
-      ]
-    },
-    {
-      "id": "batch-8-llms-readme",
-      "title": "llms.txt 发现区段位置与 README Mermaid 节点底色（#762, #758）",
-      "upstream": [
-        "1a9681e93",
-        "cc5d0e6a0"
-      ]
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
