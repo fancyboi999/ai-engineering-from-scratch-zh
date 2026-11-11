@@ -61,6 +61,7 @@ scripts/                       # 审计和构建工具
 | TypeScript | `hono`、`zod`、`ws`（只在需要 WebSocket 时）、`@hono/node-server`、Node 20+ 标准库 |
 | Rust | 标准库，单文件 `rustc --edition 2021` |
 | Julia | `Random`、`Statistics`、`LinearAlgebra`、`Printf` |
+| Go | 标准库，单文件 `go run`，需通过 `gofmt` 与 `go vet` |
 
 ## 课程契约
 
