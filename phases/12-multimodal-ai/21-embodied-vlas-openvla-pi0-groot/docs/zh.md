@@ -3,7 +3,7 @@
 > 模型第一次从网页上读出一份菜谱并在一台厨房机器人上执行，是 RT-2（Google DeepMind，2023 年 7 月）。RT-2 把动作离散化为文本 token，在网络数据加机器人动作数据上协同微调一个 VLM，并证明了网络规模的视觉-语言知识能迁移到机器人控制。OpenVLA（2024 年 6 月）出货了开放的 7B 参考。Physical Intelligence 的 π0 系列（2024-2025）加入了 flow-matching 动作专家。NVIDIA 的 GR00T N1（2025 年 3 月）为人形机器人交付了大规模的双系统（系统 1 / 系统 2）控制。VLA 原语——vision-language-action，一个能看、能读、能动的单一模型——是本阶段理解模型与 Phase 15 自主系统之间的桥梁。
 
 **类型：** Learn
-**语言：** Python（标准库，动作分词器 + VLA 推理骨架）
+**语言：** Python（标准库，动作分词器 + VLA 推理骨架）、TypeScript
 **前置要求：** Phase 12 · 05（LLaVA）、Phase 15（自主系统，被引用）
 **预计时间：** ~180 分钟
 

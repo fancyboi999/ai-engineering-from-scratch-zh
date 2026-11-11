@@ -3,7 +3,7 @@
 > 交互式结果仍是一场 MCP 工具和资源交换。2026-07-28 核心让这场交换自包含，而 Apps 扩展增加了沙箱化浏览器界面。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 07（MCP server）、阶段 13 · 10（resources）
 **预计时间：** ~75 分钟
 
@@ -265,6 +265,7 @@ t3-ui-sandbox
 ```bash
 cd phases/13-tools-and-protocols/14-mcp-apps
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

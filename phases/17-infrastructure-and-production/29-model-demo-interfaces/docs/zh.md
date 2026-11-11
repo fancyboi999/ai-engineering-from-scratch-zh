@@ -3,7 +3,7 @@
 > 一个模型 Demo 本质上是一份契约：输入、模型调用与输出。在公开分享链接之前，必须为每个组成部分设定严格的边界限制。
 
 **类型：** 构建
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 · 第 13 课（构建生产级 LLM 应用）、阶段 17 · 第 08 课（推理指标）、阶段 17 · 第 19 课（AI 网关）
 **预计时间：** ~90 分钟
 
@@ -208,12 +208,14 @@ demo-token-bucket
 
 ```bash
 python3 phases/17-infrastructure-and-production/29-model-demo-interfaces/code/main.py
+npx tsx phases/17-infrastructure-and-production/29-model-demo-interfaces/code/main.ts
 ```
 
 该自检测试会全面覆盖输入校验器、令牌桶限流算法、SSE 事件流封装以及一次完整的 HTTP 网络回环交互。测试会自动在随机闲置端口启动临时服务、发送三组网络请求、安全退出服务并输出验证报告。当需要启动常驻服务供浏览器访问时，添加 `--serve` 参数：
 
 ```bash
 python3 phases/17-infrastructure-and-production/29-model-demo-interfaces/code/main.py --serve
+npx tsx phases/17-infrastructure-and-production/29-model-demo-interfaces/code/main.ts --serve
 ```
 
 在浏览器中打开 `http://127.0.0.1:8000`，按 Ctrl+C 可停止运行。
@@ -471,6 +473,7 @@ curl -N -X POST http://127.0.0.1:8000/api/stream \
 export DEMO_ACCESS_TOKEN="$(python3 -c 'import secrets; print(secrets.token_urlsafe(24))')"
 echo "$DEMO_ACCESS_TOKEN"
 python3 phases/17-infrastructure-and-production/29-model-demo-interfaces/code/main.py --serve
+npx tsx phases/17-infrastructure-and-production/29-model-demo-interfaces/code/main.ts --serve
 ```
 
 运行完整自动化单测：

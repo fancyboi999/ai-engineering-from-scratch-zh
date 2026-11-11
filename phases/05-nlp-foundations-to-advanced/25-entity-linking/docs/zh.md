@@ -3,7 +3,7 @@
 > NER 找到了 "Paris"。实体链接来定夺：是法国巴黎？Paris Hilton？德州的 Paris？还是特洛伊王子帕里斯？不做链接，你的知识图谱就一直含混。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 06（NER）、Phase 5 · 24（共指消解）
 **预计时间：** ~60 分钟
 

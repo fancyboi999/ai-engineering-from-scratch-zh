@@ -3,7 +3,7 @@
 > Anthropic 的建议：「从简单 prompt 开始，用全面的评估优化它们，只在需要时才加多步 agent 系统。」评估不是最后一步。它是驱动阶段 14 里每个其他选择的外层循环。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 的全部内容。
 **预计时间：** ~60 分钟
 
@@ -103,6 +103,7 @@ ae-eval-three-layers
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每用例通过/失败、回归标志、CI 关卡裁决。

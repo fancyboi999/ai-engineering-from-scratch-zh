@@ -3,7 +3,7 @@
 > REINFORCE 噪声大。加一个学习 $\hat{V}(s)$ 的 critic，从回报里减掉它，你就得到一个期望相同但方差低得多的优势。这就是 actor-critic。A2C 同步地跑它；A3C 跨线程跑它。两者都是每个现代深度 RL 方法的心智模型。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 9 · 04（TD 学习）、Phase 9 · 06（REINFORCE）
 **预计时间：** ~75 分钟
 

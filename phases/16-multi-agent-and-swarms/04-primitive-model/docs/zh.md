@@ -3,7 +3,7 @@
 > 原语就四个，不多不少：agent、handoff、共享状态、orchestrator。它们构成一个四维设计空间，2026 年的主要多 agent 框架（AutoGen、LangGraph、CrewAI、OpenAI Agents SDK、Microsoft Agent Framework）都是其中的点。本课从零构建这四个原语，把一个玩具系统跑一遍，再把主流框架映射到同一组坐标轴上，让你一段话就能读懂任何新发布。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 14（Agent 工程）、Phase 16 · 01（为什么要用多 agent）
 **预计时间：** ~60 分钟
 
@@ -132,6 +132,7 @@ a5-primitive-radar
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：三次 orchestrator 运行，每种模式一次。每次都打印最终的消息池。如果 researcher 提前判定自己干完了，handoff 驱动的那次会触达更少的 agent——这就是 LLM 路由取舍的微缩版。

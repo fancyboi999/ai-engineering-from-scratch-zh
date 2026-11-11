@@ -3,7 +3,7 @@
 > verification gate 决定一个 tool call 应不应该跑，sandbox 决定它真跑的时候到底会发生什么。这节课交付一个 subprocess runner：它会拒绝危险可执行文件、拒绝危险 argv 形状、把所有文件路径关进 project root、截断超长输出，并在 wall-clock timeout 到达时杀掉失控进程。它是夹在模型与操作系统之间的第二道防线。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、TypeScript
 **前置要求：** 第 19 阶段 · 25（verification gates 与 observation budget），第 14 阶段 · 33（instructions as constraints），第 14 阶段 · 38（verification gates）
 **预计时间：** ~90 分钟
 
@@ -87,6 +87,7 @@ sandbox 默认用 `subprocess.run` 且 `shell=False`，同时打开 `capture_out
 ```bash
 cd phases/19-capstone-projects/26-sandbox-runner-denylist
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m pytest code/tests/ -v
 ```
 

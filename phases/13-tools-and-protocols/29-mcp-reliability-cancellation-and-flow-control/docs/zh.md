@@ -3,7 +3,7 @@
 > 请求 ID 只用于关联消息。它不会让副作用变得安全、停止 worker，也无法保护流免受慢消费者的影响。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 第 13 阶段，第 09 和 13 课
 **预计时间：** 约 120 分钟
 
@@ -319,6 +319,7 @@ cap: 8000 ms
 ```bash
 cd phases/13-tools-and-protocols/29-mcp-reliability-cancellation-and-flow-control/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

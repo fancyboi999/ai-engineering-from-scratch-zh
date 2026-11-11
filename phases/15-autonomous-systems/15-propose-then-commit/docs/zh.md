@@ -3,7 +3,7 @@
 > 2026 年关于 HITL 的共识很具体。它不是"agent 问一下，用户点 Approve"。它是先提议后提交：提议的动作带一个幂等键持久化到一个持久存储；连同意图、数据血缘、碰到的权限、爆炸半径和回滚计划一起呈现给一个审查者；只有在收到肯定确认后才提交；执行后还要核验，确认副作用确实发生了。LangGraph 的 `interrupt()` 加 PostgreSQL checkpoint、Microsoft Agent Framework 的 `RequestInfoEvent`、Cloudflare 的 `waitForApproval()`，实现的都是同一个形态。标志性的失败模式是橡皮图章式批准：没看就点了 "Approve?"。有记录在案的缓解手段是带显式清单的挑战-应答（challenge-and-response）。
 
 **类型：** Learn
-**语言：** Python（标准库，带幂等性的先提议后提交状态机）
+**语言：** Python（标准库，带幂等性的先提议后提交状态机）、TypeScript
 **前置要求：** 阶段 15 · 12（持久化执行），阶段 15 · 14（绊线）
 **预计时间：** ~60 分钟
 

@@ -3,7 +3,7 @@
 > Tools 执行操作。Resources 暴露可寻址内容。Prompts 打包由用户选择的消息模板。好的 MCP server 会让这些契约保持分离且可预测。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13，第 07 课（构建 MCP Server），阶段 13，第 09 课（MCP Transports）
 **预计时间：** 约 60 分钟
 
@@ -279,6 +279,7 @@ t3-primitive-sort
 ```bash
 cd phases/13-tools-and-protocols/10-mcp-resources-and-prompts/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 
@@ -304,6 +305,7 @@ Python model 不会打开真实 HTTP connection。它表示 SDK 必须放入请�
 ```bash
 cd phases/13-tools-and-protocols/10-mcp-resources-and-prompts/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

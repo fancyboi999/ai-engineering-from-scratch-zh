@@ -3,7 +3,7 @@
 > 扛不住失败的 plan，本质上只是脚本。能在失败后 replan 的脚本，才配叫 agent。先把 replanner 搭出来。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 第 13 阶段第 01-07 课、第 14 阶段第 01 课
 **预计时间：** ~90 分钟
 

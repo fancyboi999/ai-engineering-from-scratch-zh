@@ -3,7 +3,7 @@
 > detector 是一个从 prompt 到「置信度 + 类别」的函数。别的都只是凭感觉。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 18 安全相关课程、阶段 19 Track A 第 25-29 课
 **预计时间：** ~90 分钟
 
@@ -57,7 +57,7 @@ normalize 环节用标准库的 `re.sub` 和 `codecs`。base64 normalize 会尝�
 
 ## 实际使用
 
-运行 `python3 main.py`。demo 加载 taxonomy，让 detector 跑遍每个 fixture，再让它跑一遍烘焙进 `benign.py` 的 benign-prompt 语料库，并打印每个类别的指标。`outputs/detector_report.json` 这个文件就是第 87 课安全防护要消费的产物。
+运行 `python3 main.py` 或 `npx tsx main.ts`。demo 加载 taxonomy，让 detector 跑遍每个 fixture，再让它跑一遍烘焙进 `benign.py` 的 benign-prompt 语料库，并打印每个类别的指标。`outputs/detector_report.json` 这个文件就是第 87 课安全防护要消费的产物。
 
 ## 拿去用
 

@@ -3,7 +3,7 @@
 > Twelve Labs 把 Marengo + Pegasus 产品化了。VideoDB 出了 CRUD-for-video 的 API。AI2 的 Molmo 2 发布了开源 VLM checkpoint。Gemini 长上下文原生处理数小时的视频。TimeLens-100K 在规模上定义了时间定位。2026 年的流水线已经定型：场景切分、逐场景 caption + embedding、转写对齐、多向量索引，以及一个用 (start, end) 时间戳加帧预览作答的查询。这个顶点项目就是摄入 100 小时、刷公开基准、并衡量计数和动作类问题上的幻觉。
 
 **类型：** Capstone
-**语言：** Python（流水线）、TypeScript（UI）
+**语言：** Python（流水线）、TypeScript（UI、流水线脚手架）
 **前置要求：** 第 4 阶段（CV）、第 6 阶段（语音）、第 7 阶段（transformer）、第 11 阶段（LLM 工程）、第 12 阶段（多模态）、第 17 阶段（基础设施）
 **涉及阶段：** P4 · P6 · P7 · P11 · P12 · P17
 **预计时间：** 30 小时

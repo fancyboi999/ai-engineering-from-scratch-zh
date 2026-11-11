@@ -3,7 +3,7 @@
 > 反汇编列表是在声称哪些字节是指令。本课编写解码器和控制流图，核验这项声称。
 
 **类型：** Build
-**语言：** Python、C、x86-64 汇编
+**语言：** Python、TypeScript、C、x86-64 汇编
 **前置要求：** 阶段 13 · 32（从零读取 ELF）
 **预计时间：** 约 150 分钟
 
@@ -347,6 +347,7 @@ OFFSET           TYPE                     VALUE
 ```bash
 cd phases/13-tools-and-protocols/33-disassembly-and-control-flow
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一份 JSON 报告。它为每个夹具给出对照基准一致性，为每个函数给出三种方法的指令、块、边计数，并列出不可达块、未解析间接跳转、回边、直接支配节点及表，最后给出陷阱比较。
@@ -486,6 +487,7 @@ analysis.cfg.back_edges()
 ```bash
 cd phases/13-tools-and-protocols/33-disassembly-and-control-flow
 python3 code/lab.py
+npx tsx code/lab.ts
 ```
 
 检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
@@ -505,6 +507,7 @@ python3 code/lab.py
 ```bash
 cd phases/13-tools-and-protocols/33-disassembly-and-control-flow
 python3 code/main.py
+npx tsx code/main.ts
 python3 code/tests/test_main.py
 ```
 

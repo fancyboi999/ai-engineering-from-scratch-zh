@@ -3,7 +3,7 @@
 > 两个 RNN 假扮翻译官。它们撞上的瓶颈，正是注意力存在的理由。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 08（用于文本的 CNN + RNN）、Phase 3 · 11（PyTorch 入门）
 **预计时间：** ~75 分钟
 

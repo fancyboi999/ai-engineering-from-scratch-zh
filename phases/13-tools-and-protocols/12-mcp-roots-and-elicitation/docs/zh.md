@@ -3,7 +3,7 @@
 > Roots 在 MCP 2026-07-28 中已弃用，且从来不是 security sandbox。将 scope 放入可见的 tool arguments 或 resource URIs，在 server 授权；当 tool 确实需要用户输入时使用 MRTR。用户看到决策，模型看到 handle，任一 server instance 都能处理 retry。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 07（MCP server），阶段 13 · 11（无状态 MRTR）
 **预计时间：** 约 60 分钟
 
@@ -247,6 +247,7 @@ data store 在内存中，便于检查协议行为；使用 database 时 securit
 ```bash
 cd phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

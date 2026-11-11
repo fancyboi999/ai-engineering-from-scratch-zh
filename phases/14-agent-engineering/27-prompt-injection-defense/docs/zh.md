@@ -3,7 +3,7 @@
 > Greshake 等人（AISec 2023）确立了「间接 prompt 注入」是 agent 安全的决定性问题。攻击者把指令埋进 agent 会检索的数据里；一旦摄入，这些指令就覆盖开发者 prompt。把所有被检索的内容都当成在工具使用接触面上的任意代码执行。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 06（工具使用）、阶段 14 · 21（Computer Use）
 **预计时间：** ~75 分钟
 
@@ -81,6 +81,7 @@ injection-hijack
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每调用的轨迹，展示验证器裁决和执行器行为。

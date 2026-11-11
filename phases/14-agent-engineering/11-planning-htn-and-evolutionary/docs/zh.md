@@ -3,7 +3,7 @@
 > 符号规划处理那些计划可被证明正确的情形。演化式代码搜索处理那些适应度函数机器可校验的情形。ChatHTN（2025）和 AlphaEvolve（2025）展示了各自与 LLM 配对时能解锁什么。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 02（ReWOO 与 Plan-and-Execute）
 **预计时间：** ~75 分钟
 
@@ -102,6 +102,7 @@ htn-tree-expand
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示 HTN 规划器分解一个复合任务（带一次计划中途的 LLM 兜底），以及演化循环收敛到一个目标表达式。

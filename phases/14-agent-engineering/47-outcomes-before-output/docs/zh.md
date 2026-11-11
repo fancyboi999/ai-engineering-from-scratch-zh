@@ -3,7 +3,7 @@
 > 实现越快，选错问题的代价越大。先塑造结果，才能让速度指向正确方向。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 无
 **预计时间：** ~60 分钟
 
@@ -82,6 +82,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

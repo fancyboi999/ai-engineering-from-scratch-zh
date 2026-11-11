@@ -3,7 +3,7 @@
 > 扩散模型采样要走 20-50 步，因为它从噪声到数据走的是一条弯路。流匹配（Lipman et al., 2023）和整流流（Liu et al., 2022）把路径训直了。路径越直，步数越少，推理越快。Stable Diffusion 3、Flux.1、AudioCraft 2 在 2024 年全都换成了流匹配。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 8 · 06（DDPM）、阶段 1 · 微积分
 **预计时间：** ~45 分钟
 

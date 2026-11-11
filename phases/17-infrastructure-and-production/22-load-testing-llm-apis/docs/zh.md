@@ -3,7 +3,7 @@
 > 传统压测工具不是为流式响应、可变输出长度、token 级指标或 GPU 饱和设计的。两个陷阱咬大多数团队。GIL 陷阱：Locust 的 token 级测量在 Python GIL 下跑分词，重并发时它和请求生成抢资源；分词积压随后膨胀报告的 token 间延迟 —— 瓶颈是你的客户端，不是服务器。prompt 一致性陷阱：循环里发相同的 prompt 只测了 token 分布上的一个点；真实流量长度多变、前缀匹配多样。LLMPerf 用 `--mean-input-tokens` + `--stddev-input-tokens` 修这点。2026 年的工具映射：LLM 专用（GenAI-Perf、LLMPerf、LLM-Locust、guidellm）用于 token 级精度；**k6 v2026.1.0** + **k6 Operator 1.0 GA（2025 年 9 月）** —— 流式感知、经由 TestRun/PrivateLoadZone CRD 的 Kubernetes 原生分布式，最适合 CI/CD 闸门；Vegeta 用于 Go 恒速饱和；Locust 2.43.3 只有配 LLM-Locust 扩展才能做流式。负载模式：稳态、爬坡、尖峰（自动扩缩测试）、浸泡（内存泄漏）。
 
 **类型：** Build
-**语言：** Python（标准库，一个玩具级真实 prompt 生成器 + 延迟采集器）
+**语言：** Python、TypeScript（标准库，一个玩具级真实 prompt 生成器 + 延迟采集器）
 **前置要求：** 阶段 17 · 08（推理指标）、阶段 17 · 03（GPU 自动扩缩）
 **预计时间：** ~75 分钟
 

@@ -3,7 +3,7 @@
 > 单条思维链轨迹没有回溯的余地。ToT（Yao 等人，2023）把推理变成一棵树，每个节点上做自评。LATS（Zhou 等人，2024）在蒙特卡洛树搜索之下统一了 ToT、ReAct 和 Reflexion。Game of 24 从 4%（CoT）涨到 74%（ToT）；LATS 在 HumanEval 上拿到 92.7% 的 pass@1。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 03（Reflexion）
 **预计时间：** ~75 分钟
 
@@ -93,6 +93,7 @@ tree-of-thoughts
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示 ToT 用 BFS 在每个节点展开三个候选，对比 LATS 通过 MCTS 收敛到最佳 rollout。两者都打印 token 数。

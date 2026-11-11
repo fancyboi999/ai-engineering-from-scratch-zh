@@ -3,7 +3,7 @@
 > 三个生产工具框定了 2026 年的红队技术栈。Llama Guard（Meta）——一个在 14 个 MLCommons 危害类别上微调的 Llama-3.1-8B 分类器；2025 年的 Llama Guard 4 是一个从 Llama 4 Scout 剪枝而来的 12B 原生多模态分类器。Garak（NVIDIA）——开源 LLM 漏洞扫描器，带静态、动态、自适应探针，针对幻觉、数据泄露、提示注入、毒性、越狱。PyRIT（Microsoft）——多轮红队战役，带 Crescendo、TAP，以及用于深度利用的自定义转换器链。Llama Guard 3 记录在 Meta 的「Llama 3 Herd of Models」（arXiv:2407.21783）里；Llama Guard 3-1B-INT4 在 arXiv:2411.17713；Garak 的探针架构在 github.com/NVIDIA/garak。这些工具是 2026 年红队研究（第 12-15 课）与部署（第 17 课起）之间的生产接口。
 
 **类型：** Build
-**语言：** Python（标准库，工具架构模拟器和 Llama Guard 风格分类器的模拟）
+**语言：** Python、TypeScript（标准库，工具架构模拟器和 Llama Guard 风格分类器的模拟）
 **前置要求：** 阶段 18 · 12-15（越狱与 IPI）
 **预计时间：** ~75 分钟
 

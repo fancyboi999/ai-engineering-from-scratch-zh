@@ -3,7 +3,7 @@
 > "She called him. He did not answer. The doctor was at lunch." 三处指代两个人，谁都没被点名。共指消解弄清谁是谁。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 06（NER）、Phase 5 · 07（词性与句法分析）
 **预计时间：** ~60 分钟
 

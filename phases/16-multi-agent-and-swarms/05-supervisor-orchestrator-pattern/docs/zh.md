@@ -3,7 +3,7 @@
 > 一个 lead agent 做规划和分派；专精的 worker 在并行的上下文里执行、然后汇报。这就是 Anthropic Research 系统背后的模式（Claude Opus 4 当 lead，Sonnet 4 当 subagent），在内部研究评测上相比单 agent Opus 4 测得 +90.2%。Anthropic 的工程博客指出，BrowseComp 上 80% 的方差仅靠 token 用量就能解释——多 agent 之所以赢，很大程度上是因为每个 subagent 都拿到一个全新的上下文窗口。本课从原语出发构建 supervisor 模式，并覆盖 2026 年生产部署给出的工程教训。
 
 **类型：** Learn + Build
-**语言：** Python（标准库，`threading`）
+**语言：** Python（标准库，`threading`）、TypeScript
 **前置要求：** Phase 16 · 04（原语模型）
 **预计时间：** ~75 分钟
 
@@ -88,6 +88,7 @@ supervisor-hierarchy
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出展示计划、带起止时间戳的并行 worker 轨迹，以及最终综合。你能看到墙钟时间的收益：三个 0.3 秒的 worker 在约 0.35 秒里跑完，而不是 0.9 秒。

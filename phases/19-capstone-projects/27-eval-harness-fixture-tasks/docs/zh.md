@@ -3,7 +3,7 @@
 > coding agent 的上限，取决于你拿什么任务集去量它。这节课会做一套 evaluation harness：吃进一目录 fixture task，把每个 task 喂给候选 agent，用确定性 verifier 评分，再聚合成 pass@1、pass@k、平均延迟和平均成本。harness 就是那份能分清“回归”与“重构”的真值源。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、TypeScript
 **前置要求：** 第 19 阶段 · 25（verification gates），第 19 阶段 · 26（sandbox runner），第 14 阶段 · 30（eval-driven agent development），第 14 阶段 · 19（SWE-bench 与 GAIA benchmarks）
 **预计时间：** ~90 分钟
 
@@ -103,6 +103,7 @@ fixture task 由 `tasks/` 下的 JSON 和配套 `buggy/`、`expected/` 目录组
 ```bash
 cd phases/19-capstone-projects/27-eval-harness-fixture-tasks
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m pytest code/tests/ -v
 ```
 

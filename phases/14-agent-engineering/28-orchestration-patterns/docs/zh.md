@@ -3,7 +3,7 @@
 > 四种编排模式在 2026 年的各框架里反复出现：supervisor-worker、swarm / 点对点、hierarchical、debate。Anthropic 的建议：「关键是为你的需求构建对的系统。」从简单开始；只在「单个 agent 加五种工作流模式」不够用时才加拓扑。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 12（工作流模式）、阶段 14 · 25（多 agent 辩论）
 **预计时间：** ~60 分钟
 
@@ -98,6 +98,7 @@ orchestration-pattern
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每模式的轨迹 + 操作数。supervisor 最干净；swarm 最短；hierarchical 最深；debate 最贵。

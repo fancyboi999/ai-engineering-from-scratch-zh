@@ -3,7 +3,7 @@
 > 关于编译程序的每项发现，都应是带哈希、置信度、权威来源及能力边界的记录。
 
 **类型：** Build
-**语言：** Python、C
+**语言：** Python、C、TypeScript
 **前置要求：** 阶段 13 · 32（从零读取 ELF）、阶段 13 · 33（反汇编与控制流）、阶段 13 · 34（提升为伪代码）
 **预计时间：** 约 105 分钟
 
@@ -306,6 +306,7 @@ rea 有三种类似缓存的东西。Ghidra 目标快照是输入的私有副本
 ```bash
 cd phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 演示读取目标文件，导入两条 rea 记录，验证快照并推导两个模型。随后记录 18 项预测、开启 18 个未知项、编译运行测试程序、检查全部主张并解决 17 个未知项。预期结构：
@@ -441,6 +442,7 @@ ledger.verify_unknown_chain(unknown_id)
 ```bash
 cd phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns
 python3 code/lab.py
+npx tsx code/lab.ts
 ```
 
 检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
@@ -460,6 +462,7 @@ python3 code/lab.py
 ```bash
 cd phases/13-tools-and-protocols/35-evidence-confidence-and-unknowns
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

@@ -3,7 +3,7 @@
 > 一个手感对的语音 agent，端到端延迟在 800ms 以下，知道你什么时候说完了，能处理打断（barge-in），还能调用工具而不卡顿。2026 年，Retell、Vapi、LiveKit Agents、Pipecat 都达到了这条线。它们靠的是同一套形态：流式 ASR、一个轮次检测器、流式 LLM、流式 TTS，全部通过 WebRTC 串起来，每一跳都卡着激进的延迟预算。做一个出来，测 WER、MOS 和误截断率，再让它在丢包下跑一跑。
 
 **类型：** Capstone
-**语言：** Python（agent + 流水线）、TypeScript（web 客户端）
+**语言：** Python（agent + 流水线）、TypeScript（web 客户端、调度器脚手架）
 **前置要求：** 第 6 阶段（语音与音频）、第 7 阶段（transformer）、第 11 阶段（LLM 工程）、第 13 阶段（工具）、第 14 阶段（agent）、第 17 阶段（基础设施）
 **涉及阶段：** P6 · P7 · P11 · P13 · P14 · P17
 **预计时间：** 30 小时

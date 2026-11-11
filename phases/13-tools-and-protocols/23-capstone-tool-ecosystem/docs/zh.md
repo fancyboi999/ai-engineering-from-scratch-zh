@@ -3,7 +3,7 @@
 > 生产 agent 系统由一组边界构成，而不是功能的堆砌。本综合项目将易于阅读的进程内模拟，与真实部署仍需要的协议客户端、授权服务器、沙箱和遥测导出器明确分开。
 
 **类型：** Build
-**语言：** Python（标准库，进程内模拟）
+**语言：** Python（标准库，进程内模拟）、TypeScript
 **前置要求：** 阶段 13 · 第 01 至 22 课，使用 MCP `2026-07-28` 修订版
 **预计时间：** 约 120 分钟
 
@@ -203,6 +203,7 @@ t3-capstone-chain
 ```bash
 cd phases/13-tools-and-protocols/23-capstone-tool-ecosystem
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 检查以下六点：

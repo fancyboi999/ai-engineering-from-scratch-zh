@@ -3,7 +3,7 @@
 > GPT-4o 出货了一个大多数开放模型无法复刻的产品：一个能听语音、看视频、并实时说回的 agent。到 2024 年底，开放生态的答案是 MIO（Wang 等人，2024 年 9 月）。MIO 把文本、图像、语音、音乐分词，在交错序列上训一个因果 transformer，并从任意模态生成到任意模态。AnyGPT（Zhan 等人，2024 年 2 月）是概念验证；MIO 是放大版；Unified-IO 2（Allen AI，2023 年 12 月）是带视觉 + 动作 grounding 的表亲。本节课通读任意到任意的模式——四个分词器、一个 transformer、对流式友好的解码。
 
 **类型：** Learn
-**语言：** Python（标准库，四模态 token 分配器 + 流式解码循环）
+**语言：** Python、TypeScript（标准库，四模态 token 分配器 + 流式解码循环）
 **前置要求：** Phase 12 · 11（Chameleon）、Phase 6（语音与音频）
 **预计时间：** ~120 分钟
 

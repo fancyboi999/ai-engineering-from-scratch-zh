@@ -3,7 +3,7 @@
 > 用户敲进来的那个 query，并不是你的 retriever 想要的那个 query。改写在检索之前把这道鸿沟填上，让索引看到一个更接近答案样子的东西。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 第 04 课（embedding）、第 06 课（RAG）；阶段 19 Track B 基础（第 20-29 课）；阶段 19 第 64、65 课
 **预计时间：** ~90 分钟
 
@@ -120,6 +120,7 @@ retriever 的形状复用自第 65 课（hybrid BM25 + dense）。fusion 还是�
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是每种策略的排序，加一个最终小结。HyDE 在措辞错配的 query 上胜出。Multi-query 在 paraphrase 方差的 query 上胜出。Decomposition 在多主题的 query 上胜出。兜底（不改写）在三者中至少一个上会输。

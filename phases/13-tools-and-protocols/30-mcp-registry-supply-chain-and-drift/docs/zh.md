@@ -3,7 +3,7 @@
 > Registry 条目只能说明发布者声明了什么。生产准入要证明你获取了什么、观察到了什么、批准了什么，以及能安全恢复到什么。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 17（网关和 Registry）、阶段 13 · 18（生产认证）
 **预计时间：** 约 90 分钟
 
@@ -163,6 +163,7 @@ Registry API 会在每条服务器记录旁附加响应级 `_meta` 对象。Regi
 ```bash
 cd phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 演示会执行五项操作：
@@ -288,6 +289,7 @@ c.ledger.verify()
 ```bash
 cd phases/13-tools-and-protocols/30-mcp-registry-supply-chain-and-drift
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

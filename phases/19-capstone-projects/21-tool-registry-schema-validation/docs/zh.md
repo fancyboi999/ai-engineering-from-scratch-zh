@@ -3,7 +3,7 @@
 > 一个 agent 连校验都做不了的 tool，本质上就不能安全调用。先把 registry 和 schema checker 做出来，再谈工具本身。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 第 13 阶段第 01-07 课、第 14 阶段第 01 课
 **预计时间：** ~90 分钟
 

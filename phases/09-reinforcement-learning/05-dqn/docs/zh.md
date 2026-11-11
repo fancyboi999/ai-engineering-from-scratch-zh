@@ -3,7 +3,7 @@
 > 2013 年：Mnih 在原始像素上训了一个 Q-learning 网络，在七个 Atari 游戏上击败了所有经典 RL agent。2015 年：扩展到 49 个游戏，登上 Nature，点燃了深度 RL 时代。DQN 就是 Q-learning 加上三个让函数近似稳定的技巧。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 3 · 03（反向传播）、Phase 9 · 04（Q-learning、SARSA）
 **预计时间：** ~75 分钟
 

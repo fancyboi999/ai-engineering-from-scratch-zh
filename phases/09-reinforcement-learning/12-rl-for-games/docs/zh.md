@@ -3,7 +3,7 @@
 > 1992 年：TD-Gammon 用纯 TD 在西洋双陆棋上击败人类冠军。2016 年：AlphaGo 击败李世石。2017 年：AlphaZero 从零开始横扫国际象棋、将棋和围棋。2025 年：DeepSeek-R1 证明了同一套配方（用 GRPO 换掉 PPO）在推理上也行。游戏是驱动本阶段每个突破的那块基准。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 9 · 05（DQN）、Phase 9 · 08（PPO）、Phase 9 · 09（RLHF）、Phase 9 · 10（MARL）
 **预计时间：** ~120 分钟
 

@@ -3,7 +3,7 @@
 > 推测解码（阶段 10 · 15）在一条序列内并行化 token。多 agent 框架跨整条序列并行，但强制显式协调（投票、子任务切分）。Hogwild! Inference（Rodionov et al., arXiv:2504.06261）做的是别的：让同一个 LLM 的 N 个实例并行地针对一个共享的 KV cache 运行。每个 worker 即时看到其他每个 worker 生成的 token。现代推理模型——QwQ、DeepSeek-R1——能经那个共享 cache 自我协调，不用任何微调。这个方法是实验性的，但它打开了一条全新的推理并行轴，和推测解码正交。本节课用 stdlib Python 实现一个两 worker 的 Hogwild! 模拟器，并解释为什么共享 cache 的协作从现有模型的推理能力里涌现。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、Rust
 **前置要求：** 阶段 10 · 12（推理优化），阶段 10 · 15（推测解码）
 **预计时间：** ~60 分钟
 

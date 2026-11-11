@@ -3,7 +3,7 @@
 > -1 的平方根并不虚幻。它是旋转、频率以及半个信号处理领域的钥匙。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 1，第 01-04 课（线性代数、微积分）
 **预计时间：** ~60 分钟
 
@@ -426,7 +426,7 @@ freqs = np.fft.fftfreq(128, d=1/128)
 
 ## 拿去用
 
-运行 `code/complex_numbers.py` 来生成 `outputs/skill-complex-arithmetic.md`。
+运行 `code/complex_numbers.py` 或 `npx tsx code/complex_numbers.ts` 来生成 `outputs/skill-complex-arithmetic.md`。
 
 ## 练习
 

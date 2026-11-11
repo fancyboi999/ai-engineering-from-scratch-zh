@@ -3,7 +3,7 @@
 > Sakana 的 AI-Scientist-v2 发表了完整的论文。Agent Laboratory 跑通了实验。Allen AI 公开了 trace。2026 年的形态是在实验上做规划-执行-验证的树搜索、有预算的成本、沙箱化的代码执行、一个带视觉反馈的 LaTeX 写作器，以及一组自动化的 NeurIPS 风格审稿人集成。这个顶点项目就是做一个出来，在每篇论文 30 美元以内端到端跑完，并扛住 Sakana 记录在案的沙箱逃逸红队。
 
 **类型：** Capstone
-**语言：** Python（agent + 沙箱）、LaTeX（输出）
+**语言：** Python（agent + 沙箱）、TypeScript、LaTeX（输出）
 **前置要求：** 第 2 阶段（ML）、第 3 阶段（深度学习）、第 7 阶段（transformer）、第 10 阶段（从零做 LLM）、第 14 阶段（agent）、第 15 阶段（自主系统）、第 16 阶段（多 agent）、第 18 阶段（安全）
 **涉及阶段：** P0 · P2 · P3 · P7 · P10 · P14 · P15 · P16 · P18
 **预计时间：** 40 小时

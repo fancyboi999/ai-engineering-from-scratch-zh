@@ -3,7 +3,7 @@
 > 在 MCP 之前、在 A2A 之前，先有了 FIPA-ACL。2000 年，智能物理 agent 基金会（FIPA；2005 年成为 IEEE Computer Society 标准委员会）批准了一套 agent 通信语言，带二十个 performative、两种内容语言，以及一套交互协议——contract net、subscribe/notify、request-when。它在工业界淡出，是因为本体（ontology）开销对当时的 web 太重，但 LLM 带来的多 agent 系统复兴正在悄悄重新实现同一批想法，只是丢掉了形式语义：JSON 契约顶替了 performative，自然语言顶替了本体。本课认真读一遍 FIPA-ACL，好让你看清 2026 年的哪些协议决策是旧瓶装新酒、哪些是真创新，以及当前这波浪潮会在哪些地方重新踩中 2000 年代早已解决的坑。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 01（为什么要用多 agent）
 **预计时间：** ~60 分钟
 
@@ -160,6 +160,7 @@ sw-contract-net
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一段并排的追踪记录，把每条现代消息同时以 2026 年的 JSON 形态和 FIPA-ACL 形态展示，再跑一遍合同网竞标的往返编解码。同样的协议原语在往返中幸存下来，变的只有语法。

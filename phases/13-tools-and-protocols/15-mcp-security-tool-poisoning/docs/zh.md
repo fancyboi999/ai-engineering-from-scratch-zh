@@ -3,7 +3,7 @@
 > 无状态不等于无须信任。它意味着每个请求都要携带让 server 和 gateway 能够独立验证调用所需的证据。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 07（MCP server）、阶段 13 · 08（MCP client）
 **预计时间：** ~60 分钟
 
@@ -248,6 +248,7 @@ tp-tool-poisoning
 ```bash
 cd phases/13-tools-and-protocols/15-mcp-security-tool-poisoning
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

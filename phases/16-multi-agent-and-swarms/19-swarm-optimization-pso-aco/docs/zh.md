@@ -3,7 +3,7 @@
 > 生物启发优化正在 LLM 上卷土重来。**LMPSO**（arXiv:2504.09247）用 PSO，每个粒子的速度是一条 prompt，由 LLM 生成下一个候选；在结构化序列输出（数学表达式、程序）上效果好。**Model Swarms**（arXiv:2410.11163）把每个 LLM 专家当成模型权重流形上的一个 PSO 粒子，仅用 200 个实例就在 9 个数据集上相对 12 个基线报告了 **13.3% 平均提升**。**SwarmPrompt**（ICAART 2025）把 PSO + Grey Wolf 混合起来做 prompt 优化。**AMRO-S**（arXiv:2603.12933）是用 ACO 启发的信息素专家来做多 agent LLM 路由——**4.7 倍加速**、可解释的路由证据、质量门控的异步更新把推理与学习解耦。本课在 prompt 参数空间上实现 PSO、在 agent 路由上实现 ACO，测量这些经典算法为何契合 LLM 时代、以及何时不契合。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 09（并行 Swarm 网络）、Phase 16 · 14（共识与 BFT）
 **预计时间：** ~75 分钟
 
@@ -107,6 +107,7 @@ swarm-stigmergy
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：

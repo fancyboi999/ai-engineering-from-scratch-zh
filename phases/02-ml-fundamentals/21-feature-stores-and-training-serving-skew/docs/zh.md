@@ -3,7 +3,7 @@
 > 特征只有一种业务定义，却有两个读取端：训练端按每个打标时刻回溯历史切片，而推理端读取当下的最新状态。当两端读取的数据产生分歧时，模型看到的将是它在离线阶段从未见过的奇异输入。
 
 **类型：** 构建
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 2，第 08 课（特征工程）、第 13 课（ML 流水线）、第 15 课（时间序列）与第 19 课（ML 系统设计）
 **预计时间：** ~100 分钟
 
@@ -275,6 +275,7 @@ def detect_skew(
 
 ```bash
 python3 phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/code/main.py
+npx tsx phases/02-ml-fundamentals/21-feature-stores-and-training-serving-skew/code/main.ts
 ```
 
 ```console

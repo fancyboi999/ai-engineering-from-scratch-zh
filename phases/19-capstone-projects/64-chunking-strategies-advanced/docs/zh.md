@@ -3,7 +3,7 @@
 > Chunking 决定了你的 retriever 究竟能捞出什么。一旦边界切错，再好的 embedding 模型、再强的 reranker、再聪明的 LLM 都无法在下游把伤害补回来。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 第 04 课（embedding）、第 06 课（RAG）、第 07 课（advanced RAG）；阶段 19 Track B 基础（第 20-29 课）
 **预计时间：** ~90 分钟
 
@@ -89,6 +89,7 @@ ci-chunk-boundaries
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一张小表，每种策略一行、每个 k 一列。Sentence 在带结构的 fixture 上输了。Structural-markdown 在 markdown fixture 上赢了。Recursive 在混合 fixture 上稳住了局面，因为它的递归会自适应。Semantic clustering 在散文 fixture 上赢了——那里压根没有可用的结构线索。

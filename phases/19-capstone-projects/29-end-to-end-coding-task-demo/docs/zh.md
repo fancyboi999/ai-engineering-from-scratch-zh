@@ -3,7 +3,7 @@
 > 这是 Track A 的回报时刻。这节课把 gate chain、sandbox、eval harness 和 OTel span 全缝进一个真的能跑的 coding agent 里，让它在一个多文件 Python 项目上修一个真实但小规模的 fixture bug。agent policy 是确定性的，不是 LLM；正因为如此，这节课可复现，也更清楚地说明：真正有价值的一直是 harness，本来就不是模型。契约完全一致，以后换成真实模型，只是把 policy 那道缝替换掉。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、TypeScript
 **前置要求：** 第 19 阶段 · 25（verification gates），第 19 阶段 · 26（sandbox），第 19 阶段 · 27（eval harness），第 19 阶段 · 28（observability），第 14 阶段 · 38（verification gates），第 14 阶段 · 41（workbench for real repos），第 14 阶段 · 42（agent workbench capstone）
 **预计时间：** ~90 分钟
 
@@ -105,6 +105,7 @@ bundled fixture 形状和第 27 课的 task 结构一致：一个 buggy 文件 +
 ```bash
 cd phases/19-capstone-projects/29-end-to-end-coding-task-demo
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m pytest code/tests/ -v
 ```
 

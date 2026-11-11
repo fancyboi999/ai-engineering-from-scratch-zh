@@ -3,7 +3,7 @@
 > Transfusion 混合了连续和离散表示。Show-o（Xie 等人，2024 年 8 月）走了另一条路：文本 token 用因果下一 token 预测，图像 token 用 MaskGIT 精神下的掩码离散扩散。两者都坐在一个 transformer 里，配一个混合注意力掩码。结果是在一个骨干、每种模态一个分词器、一种损失表述（下一 token 扩展为掩码预测）上，统一了 VQA、文生图、图像修复和混合模态生成。本节课走一遍 Show-o 设计——为什么掩码离散扩散是一个并行的、少步的图像生成器——并与 Transfusion 和 Emu3 作对比。
 
 **类型：** Learn
-**语言：** Python（标准库，掩码离散扩散采样器）
+**语言：** Python、TypeScript（标准库，掩码离散扩散采样器）
 **前置要求：** Phase 12 · 13（Transfusion）
 **预计时间：** ~120 分钟
 

@@ -3,7 +3,7 @@
 > 字节码文件包含程序，也包含编译器为它留下的注释。本课构建读取器，查明每种容器保留了哪些注释。
 
 **类型：** Build
-**语言：** Python、Java、C#、WebAssembly 文本格式
+**语言：** Python、TypeScript、Java、C#、WebAssembly 文本格式
 **前置要求：** 阶段 13 · 第 32 课（从零构建 ELF 读取器）、第 33 课（反汇编与控制流）
 **预计时间：** 约 150 分钟
 
@@ -265,6 +265,7 @@ IL_0023: 1a 2a        ldc.i4.4, ret
 ```bash
 cd phases/13-tools-and-protocols/43-bytecode-and-managed-formats
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一份 JSON 报告。对每个 pyc，它给出两种头部、文件和 `grade` 的大小、采集清单中的指令数量与操作码名，以及当前解释器能否读取。对每种 class 构建，它给出版本、大小、调试表计数和 `javap` 一致性。对每种 Wasm 构建，它给出节、类型、函数、name 节内容和 `wasm-objdump` 一致性。对程序集，它给出 CLI 头部、流、表行数、方法和 System.Reflection.Metadata 一致性。报告最后是保留信息表，以及 `PATH` 中发现的解释器列表。
@@ -378,6 +379,7 @@ asm.token_text(0x11000001)
 ```bash
 cd phases/13-tools-and-protocols/43-bytecode-and-managed-formats
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

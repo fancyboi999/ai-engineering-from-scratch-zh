@@ -3,7 +3,7 @@
 > 统一多模态模型有个绕不开的张力。理解想要语义特征——SigLIP 或 DINOv2 输出富含概念级信息的向量。生成想要利于重建的编码——能组回清晰像素的 VQ token。这两个目标在单个编码器里不兼容。Janus（DeepSeek，2024 年 10 月）和 Janus-Pro（DeepSeek，2025 年 1 月）主张解法是别再硬凑：把两个编码器解耦。在任务间共享 transformer 主体，但理解走 SigLIP、生成走 VQ 分词器。在 7B 规模上，Janus-Pro 在 GenEval 上击败 DALL-E 3，同时在 MMMU 上追平 LLaVA。本节课通读为什么两个编码器能在一个失败的地方成功。
 
 **类型：** Build
-**语言：** Python（标准库，双编码器路由 + 共享主体信号）
+**语言：** Python、TypeScript（标准库，双编码器路由 + 共享主体信号）
 **前置要求：** Phase 12 · 13（Transfusion）、Phase 12 · 14（Show-o）
 **预计时间：** ~120 分钟
 

@@ -3,7 +3,7 @@
 > 你的 system prompt 是 4,000 token。你的 RAG 上下文是 20,000 token。你每个请求都把两者发过去。你也为两者付费——每一次。prompt caching 让 provider 在它那边把那段前缀保温，复用时只按正常费率的 10% 给你计费。用对了，它把推理成本砍掉 50–90%、首 token 延迟砍掉 40–85%。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 · 01（Prompt Engineering）、阶段 11 · 05（Context Engineering）、阶段 11 · 11（缓存与成本）
 **预计时间：** ~60 分钟
 

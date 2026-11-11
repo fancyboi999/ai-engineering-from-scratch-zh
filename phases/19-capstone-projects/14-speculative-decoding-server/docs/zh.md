@@ -3,7 +3,7 @@
 > 推测解码让廉价 draft 提议 token，再由目标模型一次性验证；它已经是生产级优化，不再只是研究技巧。vLLM 0.7 里的 EAGLE-3 在真实流量上交出 2.5-3 倍吞吐。P-EAGLE（AWS 2026）把并行推测又往前推了一截，SGLang 的 SpecForge 大规模训练 draft 头，Red Hat 的 Speculators hub 为常见开源模型发布对齐 draft，TensorRT-LLM 则让推测解码在 NVIDIA 上成为一等公民。2026 年的生产服务栈是带 EAGLE 系列 draft、FP8 或 INT4 量化、按 queue-wait 做 HPA 的 vLLM 或 SGLang。本顶点项目要用两个开源模型达到基线 2.5 倍以上吞吐，并附一份完整的尾延迟报告。
 
 **类型：** Capstone
-**语言：** Python（服务）、C++ / CUDA（kernel 检视）、YAML（配置）
+**语言：** Python（服务）、TypeScript、C++ / CUDA（kernel 检视）、YAML（配置）
 **前置要求：** 第 3 阶段（深度学习）、第 7 阶段（transformer）、第 10 阶段（从零做 LLM）、第 17 阶段（基础设施）
 **涉及阶段：** P3 · P7 · P10 · P17
 **预计时间：** 30 小时

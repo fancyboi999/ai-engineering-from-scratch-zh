@@ -3,7 +3,7 @@
 > DeepSeek-V3 在 2,048 张 H800 GPU 上训练，MoE 专家散布在各节点。跨节点专家 all-to-all 通信，每 1 GPU 小时计算就配 1 GPU 小时通信。GPU 一半时间闲着。DualPipe（DeepSeek，2024 年 12 月）是一条双向流水线，把前向和反向计算与它们触发的 all-to-all 通信重叠起来。气泡下降，吞吐攀升，而保留两份模型参数拷贝（给它命名的那个 "dual"）在专家并行本来就已经把专家散到各 rank 上之后是廉价的。本节课是一篇 Learn 型走读，讲 DualPipe 究竟做什么，以及为什么 Sea AI Lab 的 DualPipeV 改进以略微更紧的气泡为代价去掉了 2 倍参数成本。
 
 **类型：** Learn
-**语言：** Python（stdlib，调度模拟器）
+**语言：** Python（stdlib，调度模拟器）、Rust
 **前置要求：** 阶段 10 · 05（分布式训练、FSDP、DeepSpeed），阶段 10 · 14（开放模型架构和 MoE）
 **预计时间：** ~60 分钟
 

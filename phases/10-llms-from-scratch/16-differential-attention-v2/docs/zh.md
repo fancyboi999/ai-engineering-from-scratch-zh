@@ -3,7 +3,7 @@
 > Softmax 注意力把少量概率撒到每个不匹配的 token 上。在 10 万个 token 上，那点噪声累积起来淹没信号。Differential Transformer（Ye et al., ICLR 2025）通过把注意力算成两个 softmax 之差、减掉共享的噪声底来修复它。DIFF V2（微软，2026 年 1 月）是生产栈的重写：decode 延迟匹配基线 Transformer，无自定义核，FlashAttention 兼容。本节课端到端走 V1 到 V2，并附一个你能在 stdlib Python 里跑的差分操作玩具实现。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、Rust
 **前置要求：** 阶段 7 · 02（自注意力），阶段 7 · 15（注意力变体），阶段 10 · 14（架构走读）
 **预计时间：** ~60 分钟
 

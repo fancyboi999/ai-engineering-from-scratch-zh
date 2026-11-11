@@ -3,7 +3,7 @@
 > dispatcher 是 harness 为 schema 上每一条承诺买单的地方。timeout、retry、dedupe、错误映射，全压在这一道接缝上。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 第 13 阶段第 01-07 课、第 14 阶段第 01 课
 **预计时间：** ~90 分钟
 

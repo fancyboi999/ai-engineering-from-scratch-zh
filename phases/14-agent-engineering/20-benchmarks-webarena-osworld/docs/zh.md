@@ -3,7 +3,7 @@
 > WebArena 测网页 agent 在四个自托管应用上的能力。OSWorld 测桌面 agent 在 Ubuntu、Windows、macOS 上的能力。发布时（2023–2024）两者都显示出顶尖 agent 与人类之间的巨大差距。差距在缩小；失败模式没变。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 19（SWE-bench、GAIA）
 **预计时间：** ~60 分钟
 
@@ -78,6 +78,7 @@ ae-agent-human-gap
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每任务成功率和轨迹效率，镜像 OSWorld-Human 的方法论。

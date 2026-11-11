@@ -3,7 +3,7 @@
 > 并行 agent 只有在工作相互独立时才能节省墙钟时间；否则，它们会把一个清晰任务变成协调问题，并更快地失败。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 39 和 44 课
 **预计时间：** ~70 分钟
 
@@ -86,6 +86,7 @@ flowchart TD
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

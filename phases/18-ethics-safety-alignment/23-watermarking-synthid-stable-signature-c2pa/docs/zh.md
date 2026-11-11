@@ -3,7 +3,7 @@
 > 三项技术构成了 2026 年 AI 生成内容的溯源体系。SynthID（Google DeepMind）——图像水印于 2023 年 8 月推出，文本+视频于 2024 年 5 月（Gemini + Veo），文本于 2024 年 10 月经 Responsible GenAI Toolkit 开源，统一的多媒体检测器于 2025 年 11 月随 Gemini 3 Pro 一同发布。文本水印不可察觉地调整下一个 token 的采样概率；图像/视频水印能挺过压缩、裁剪、滤镜、帧率变化。Stable Signature（Fernandez et al., ICCV 2023, arXiv:2303.15435）——微调潜在扩散解码器，让每个输出都含有一条固定消息；被裁剪（裁到内容的 10%）的生成图像，在 FPR<1e-6 时检测率 >90%。后续工作「Stable Signature is Unstable」（arXiv:2405.07145, 2024 年 5 月）——微调能在保住质量的同时移除水印。C2PA——一个加密签名、可察觉篡改的元数据标准（C2PA 2.2 Explainer 2025）。水印与 C2PA 互补：元数据能被剥掉但携带更丰富的溯源；水印能挺过转码但携带的信息更少。
 
 **类型：** Build
-**语言：** Python（标准库，token 水印嵌入 + 检测）
+**语言：** Python、TypeScript（标准库，token 水印嵌入 + 检测）
 **前置要求：** 阶段 10 · 04（采样）、阶段 01 · 09（信息论）
 **预计时间：** ~75 分钟
 

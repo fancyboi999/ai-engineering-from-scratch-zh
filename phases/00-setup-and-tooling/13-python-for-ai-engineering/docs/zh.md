@@ -3,7 +3,7 @@
 > 本课程绝大多数代码都使用同一套核心 Python 惯用法。在后续数学与模型课程依赖它们之前，先在这里彻底掌握。
 
 **类型：** 构建
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 开发环境配置（Dev Environment）、Python 环境（Python Environments）
 **预计时间：** ~120 分钟
 
@@ -822,6 +822,7 @@ print([round(v, 3) for v in standardize((4.0, 700.0))])
 
 ```bash
 python3 phases/00-setup-and-tooling/13-python-for-ai-engineering/code/main.py
+npx tsx phases/00-setup-and-tooling/13-python-for-ai-engineering/code/main.ts
 ```
 
 ```text

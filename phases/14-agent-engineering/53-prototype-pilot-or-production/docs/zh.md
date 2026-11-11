@@ -3,7 +3,7 @@
 > 它们是不同的学习环境，不是精致程度的等级。选择以最少无谓后果回答当前未知项的阶段。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 50 到 52 课
 **预计时间：** ~70 分钟
 
@@ -82,6 +82,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

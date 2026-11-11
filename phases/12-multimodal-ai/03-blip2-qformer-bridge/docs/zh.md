@@ -3,7 +3,7 @@
 > CLIP 对齐了图像和文本，但它生不出 caption、答不了问题、也没法对话。BLIP-2（Salesforce，2023）用一座小巧的可训练桥解决了这件事：32 个可学习的 query 向量通过交叉注意力去关注一个冻结 ViT 的特征，然后直接插进一个冻结 LLM 的输入流。1.88 亿参数的桥，把一个 ViT-g/14 连到了冻结的 LLM，最大可到 11B 的 Flan-T5-XXL。一直到 2026 年，每一个基于适配器的 VLM——MiniGPT-4、InstructBLIP、LLaVA 的那些表亲——都是它的后代。本节课通读 Q-Former 的架构，讲清它的两阶段训练，并搭一个玩具版，把视觉 token 喂进一个冻结的文本解码器。
 
 **类型：** Build
-**语言：** Python（标准库，交叉注意力 + 可学习 query 演示）
+**语言：** Python、TypeScript（标准库，交叉注意力 + 可学习 query 演示）
 **前置要求：** Phase 12 · 02（CLIP）、Phase 7（Transformers）
 **预计时间：** ~180 分钟
 

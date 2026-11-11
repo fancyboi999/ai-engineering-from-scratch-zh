@@ -3,7 +3,7 @@
 > 五个组织定义了 2026 年实验室之外的对齐研究层。MATS（ML Alignment & Theory Scholars）：自 2021 年底以来 527+ 名研究者、180+ 篇论文、10K+ 引用、h 指数 47；2024 年夏季队列注册为 501(c)(3)，约 90 名学者和 40 名导师；2025 年之前的校友中 80% 从事安全/安保工作，其中 200+ 在 Anthropic、DeepMind、OpenAI、UK AISI、RAND、Redwood、METR、Apollo。Redwood Research：由 Buck Shlegeris 创立的应用对齐实验室；提出了 AI 控制（第 10 课）；与 UK AISI 合作搞控制安全论证。Apollo Research：为前沿实验室做部署前阴谋评估；撰写了上下文阴谋（第 8 课）和 Towards Safety Cases for AI Scheming。METR（Model Evaluation and Threat Research）：基于任务的能力评估、自主任务时间跨度研究；「Common Elements of Frontier AI Safety Policies」对比各实验室框架。Eleos AI Research：模型福祉部署前评估（第 19 课）；做了 Claude Opus 4 福祉评估。
 
 **类型：** Learn
-**语言：** 无
+**语言：** Python、TypeScript
 **前置要求：** 阶段 18 · 01-27（阶段 18 前面的课）
 **预计时间：** ~45 分钟
 

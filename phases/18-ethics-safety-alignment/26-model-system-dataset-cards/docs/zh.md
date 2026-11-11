@@ -3,7 +3,7 @@
 > 三种文档格式构成了 AI 透明度的骨架。模型卡（Mitchell et al. 2019）——模型的营养标签：训练数据、按因素分解的定量分析、伦理考量、注意事项；而 Hugging Face 上只有 0.3% 的模型卡记录了伦理考量（Oreamuno et al. 2023）。数据集说明书（Datasheets for Datasets，Gebru et al. 2018, CACM）——动机、构成、采集过程、标注、分发、维护；类比电子元件说明书。数据卡（Data Cards，Pushkarna et al., Google 2022）——模块化分层细节（望远镜式、潜望镜式、显微镜式），作为面向多样读者的边界对象。2024-2025 的进展：经 LLM 自动生成（CardGen, Liu et al. 2024）；模型卡细节程度与 HF 上至多 29% 的下载量提升相关（Liang et al. 2024）；可验证证明（Laminator, Duddu et al. 2024）；针对碳/水的可持续性报告增补（Jouneaux et al. 2025 年 7 月）；EU/ISO 监管卡正在出现。系统卡（System Cards，Sidhpurwala 2024；Meta 系统级透明度；「Blueprints of Trust」arXiv:2509.20394）——端到端 AI 系统文档，覆盖安全能力、提示注入防护、数据外泄检测、与人类价值观的对齐。
 
 **类型：** Build
-**语言：** Python（标准库，模型卡 + 数据集说明书 + 系统卡生成器）
+**语言：** Python、TypeScript（标准库，模型卡 + 数据集说明书 + 系统卡生成器）
 **前置要求：** 阶段 18 · 18（安全框架）、阶段 18 · 24（监管）
 **预计时间：** ~60 分钟
 

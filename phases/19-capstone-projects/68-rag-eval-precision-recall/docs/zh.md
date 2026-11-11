@@ -3,7 +3,7 @@
 > 如果你没法同时给检索和答案打分，你就没法上线这个系统。这两者不是同一个指标，同一个 prompt 会在不同的维度上翻车。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 第 06 课（RAG）、第 10 课（评测）；阶段 19 Track B 基础（第 20-29 课）；阶段 19 第 64、65、66、67 课
 **预计时间：** ~90 分钟
 
@@ -121,6 +121,7 @@ ci-rag-metric-ladder
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出在一张指标表里展示每个变体的 precision@k、recall@k、MRR、nDCG@k、faithfulness 和 answer relevance。hybrid retrieval 那行在 recall 上打赢 chunker baseline；rerank 那行在 MRR 上打赢 hybrid。

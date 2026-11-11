@@ -3,7 +3,7 @@
 > "I want a cheap restaurant in the north... actually make it moderate... and add Italian." 三轮，三次状态更新。DST 让槽位-值字典保持同步，预订才不出错。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 17（聊天机器人）、Phase 5 · 20（结构化输出）
 **预计时间：** ~75 分钟
 

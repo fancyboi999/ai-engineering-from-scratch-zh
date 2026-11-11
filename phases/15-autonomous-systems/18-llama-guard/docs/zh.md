@@ -3,7 +3,7 @@
 > Llama Guard 3（Meta，Llama-3.1-8B 基座，为内容安全微调）对 LLM 的输入和输出都按一套 MLCommons 13 危害分类法、跨 8 种语言做分类。一个 1B-INT4 量化变体在移动 CPU 上跑出超过 30 tokens/秒。Llama Guard 4 是多模态的（图像 + 文本），把分类扩展到 S1–S14 集合（含 S14 代码解释器滥用），并且是 Llama Guard 3 8B/11B 的即插即用替代品。NVIDIA NeMo Guardrails v0.20.0（2026 年 1 月）在输入和输出 rail 之上加了 Colang 对话流 rail。诚实的一笔：《Bypassing Prompt Injection and Jailbreak Detection in LLM Guardrails》（Huang 等人，arXiv:2504.11168）展示了 Emoji 走私在六个知名 guard 系统上打出 100% 的攻击成功率；NeMo Guard Detect 在越狱上录得 72.54% 的 ASR。分类器是一个层，不是一个解决方案。
 
 **类型：** Learn
-**语言：** Python（标准库，带类别标签的分类器模拟器）
+**语言：** Python（标准库，带类别标签的分类器模拟器）、TypeScript
 **前置要求：** 阶段 15 · 10（权限模式），阶段 15 · 17（章程）
 **预计时间：** ~45 分钟
 

@@ -3,7 +3,7 @@
 > 交付关闭一次构建循环，也打开学习循环。证据必须改变系统，否则它只是无人负责的遥测。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 46 和 53 课
 **预计时间：** ~75 分钟
 
@@ -90,6 +90,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

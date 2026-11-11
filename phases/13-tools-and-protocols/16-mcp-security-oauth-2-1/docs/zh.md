@@ -3,7 +3,7 @@
 > 远程 MCP 请求是无状态的，但其授权并不匿名。每份凭据都要绑定到签发它的签发方，每个 token 都要绑定到接收它的资源。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 09（传输）、阶段 13 · 15（安全）
 **预计时间：** ~90 分钟
 
@@ -252,6 +252,7 @@ t3-scope-stepup
 ```bash
 cd phases/13-tools-and-protocols/16-mcp-security-oauth-2-1
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

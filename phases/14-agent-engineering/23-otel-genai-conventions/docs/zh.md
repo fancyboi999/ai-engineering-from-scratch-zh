@@ -3,7 +3,7 @@
 > OpenTelemetry 的 GenAI SIG（2024 年 4 月成立）定义了 agent 遥测的标准 schema。span 名、属性和内容捕获规则在各厂商间收敛，于是 agent trace 在 Datadog、Grafana、Jaeger 和 Honeycomb 里含义一致。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 13（LangGraph）、阶段 14 · 24（可观测性平台）
 **预计时间：** ~60 分钟
 
@@ -88,6 +88,7 @@ ae-genai-span-tree
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：一棵带所有必需 GenAI 属性的 span 树，以及一个展示 opt-in 内容引用的「外部存储」。

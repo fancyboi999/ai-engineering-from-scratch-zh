@@ -3,7 +3,7 @@
 > 长视野自主 agent（METR 的「1 小时到 8 小时工作曲线」）需要经济能动性。新兴的**五层栈**是：**DePIN**（物理算力）→ **身份**（W3C DID + 声誉资本）→ **认知**（RAG + MCP）→ **结算**（账户抽象）→ **治理**（Agentic DAO）。生产级的 agent 激励网络包括 **Bittensor**（TAO 子网奖励任务专属模型）、**Fetch.ai / ASI Alliance**（ASI-1 Mini LLM + FET 代币）、和 **Gonka**（基于 transformer 的 PoW，把算力重新分配到有产出的 AI 任务上）。学术工作：AAMAS 2025 的去中心化 LaMAS 用 **Shapley 值信用归因** 公平地奖励有贡献的 agent；Google Research 的《Mechanism design for large language models》提出在单调聚合下用二价支付的 **token 拍卖**。本课构建一个最小的 agent 市场，对一条多 agent 流水线应用 Shapley 值信用归因，并跑一场二价 token 拍卖，让博弈论这套机器具体落地。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 16（谈判与议价）、Phase 16 · 09（并行 Swarm 网络）
 **预计时间：** ~75 分钟
 
@@ -110,6 +110,7 @@ swarm-auction
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：每个 agent 的 Shapley 值；展示诚实出价均衡的拍卖结果；预热后声誉加权路由相比随机有 10-20% 质量提升。

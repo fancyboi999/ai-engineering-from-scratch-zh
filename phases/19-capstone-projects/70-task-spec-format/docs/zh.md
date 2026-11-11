@@ -3,7 +3,7 @@
 > 一套 eval harness 的好坏，上限就是它的任务所遵守的那份契约。在你动手写第一个打分函数之前，先把 JSONL 的形状和 metric 的命名词表冻结下来。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段19 Track B 基础
 **预计时间：** ~90 分钟
 

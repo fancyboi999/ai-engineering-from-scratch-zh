@@ -3,7 +3,7 @@
 > 音频是一个 16-48 kHz 的一维信号。一段五秒的片段是 8 万到 24 万个采样点。没有 transformer 能直接注意这么长的序列。2026 年每一个生产音频模型的解法都一样：一个神经编解码器（Encodec、SoundStream、DAC）把音频在 50-75 Hz 压成离散 token，再用一个 transformer 或扩散模型生成 token。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 6 · 02（音频特征）、阶段 6 · 04（ASR）、阶段 8 · 06（DDPM）
 **预计时间：** ~45 分钟
 

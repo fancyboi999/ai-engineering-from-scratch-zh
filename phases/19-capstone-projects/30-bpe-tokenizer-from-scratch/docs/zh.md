@@ -3,7 +3,7 @@
 > 输入是 bytes，输出是 ids，再把 ids 还原回同一串 bytes。把现代文本模型几乎都还在使用的 tokenizer 亲手搭出来。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 第 04 阶段课程、第 07 阶段 transformer 课程
 **预计时间：** ~90 分钟
 

@@ -3,7 +3,7 @@
 > OpenAI Preparedness Framework v2（2025 年 4 月）引入了研究类别（Research Categories）——长程自主性、Sandbagging、自主复制与适应、破坏防护措施——区别于追踪类别（Tracked Categories）。追踪类别触发能力报告（Capabilities Report）加防护措施报告（Safeguards Report），由安全顾问组（Safety Advisory Group）评审。DeepMind 的 FSF v3（2025 年 9 月，2026 年 4 月 17 日加入了追踪能力等级）把自主性折进 ML 研发和网络（Cyber）两个领域（ML 研发自主性 1 级 = 以相对于人类 + AI 工具有竞争力的成本完全自动化 AI 研发流水线）。FSF v3 通过对工具性推理（instrumental reasoning）滥用的自动化监控，明确处理欺骗性对齐。诚实的一笔：PF v2 里的研究类别（含长程自主性）不会自动触发缓解措施；政策措辞是"潜在的"。DeepMind 自己也说，如果工具性推理增强，自动化监控"长期看不会一直够用"。
 
 **类型：** Learn
-**语言：** Python（标准库，三框架决策表 diff 工具）
+**语言：** Python（标准库，三框架决策表 diff 工具）、TypeScript
 **前置要求：** 阶段 15 · 19（Anthropic RSP）
 **预计时间：** ~45 分钟
 

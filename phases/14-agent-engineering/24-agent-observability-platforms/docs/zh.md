@@ -3,7 +3,7 @@
 > 三个可自托管的 agent 可观测性平台主导 2026 年。Langfuse（MIT）—— 每月 600 万+ 次安装，tracing + prompt 管理 + 评估 + 会话回放。Arize Phoenix（Elastic 2.0）—— 深度的 agent 专用评估、RAG 相关性、OpenInference 自动 instrumentation。Comet Opik（Apache 2.0）—— 自动化 prompt 优化、guardrail、LLM 裁判幻觉检测。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 23（OTel GenAI）
 **预计时间：** ~45 分钟
 
@@ -80,6 +80,7 @@ wb-trace-ingest
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每会话评估分数和失败分类，匹配 Langfuse/Phoenix/Opik 会展示的东西。

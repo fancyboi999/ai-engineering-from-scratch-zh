@@ -3,7 +3,7 @@
 > 2026 年的音频生成几乎全靠 token。EnCodec、SNAC、Mimi 和 DAC 把连续波形变成 transformer 能预测的离散序列。语义-声学 token 的切分——第一个码本当语义、其余当声学——是自 Transformer 以来音频领域最重要的架构转变。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 6 · 02（频谱图）、阶段 10 · 11（量化）、阶段 5 · 19（子词分词）
 **预计时间：** ~60 分钟
 

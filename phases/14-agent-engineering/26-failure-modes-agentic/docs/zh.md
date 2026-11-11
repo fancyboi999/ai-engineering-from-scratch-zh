@@ -3,7 +3,7 @@
 > MASFT（Berkeley，2025）编目了 3 大类、14 种多 agent 失败模式。微软的 Taxonomy 记录了既有 AI 失败在 agent 场景下如何被放大。行业实地数据收敛到五种反复出现的模式：幻觉动作、范围蔓延、级联错误、上下文丢失、工具误用。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 05（Self-Refine 与 CRITIC）、阶段 14 · 24（可观测性）
 **预计时间：** ~60 分钟
 
@@ -89,6 +89,7 @@ failure-cascade
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每 trace 标签 + 聚合分布，廉价复现 Phoenix 的 trace 聚类所揭示的东西。

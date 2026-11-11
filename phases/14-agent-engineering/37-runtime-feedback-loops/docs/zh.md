@@ -3,7 +3,7 @@
 > 看不到真实命令输出的 agent 在瞎猜。一个反馈运行器把 stdout、stderr、退出码和计时捕获进一条结构化记录，下一轮可以读。然后 agent 对事实做反应，而不是对自己对事实的预测做反应。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 32（最小工作台）、阶段 14 · 35（Init 脚本）
 **预计时间：** ~50 分钟
 
@@ -72,6 +72,7 @@ wb-feedback-loop
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：三条反馈记录追加到 `feedback_record.jsonl`，每个的最后一条内联打印。跨重跑 tail 这个文件，看循环累积。

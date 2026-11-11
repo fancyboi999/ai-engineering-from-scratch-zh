@@ -5,7 +5,7 @@
 > **规范说明（2026-07-28）：** Dynamic Client Registration 已由 Client ID Metadata Document 取代而废弃。DCR 保留为兼容机制。使用它时，client 必须声明正确的 `application_type`。client 会校验存在的 RFC 9207 `iss` 值，且绝不跨 authorization-server issuer 复用凭据。
 
 **类型：** Build
-**语言：** Python (stdlib)
+**语言：** Python (stdlib)、TypeScript
 **前置要求：** Phase 13 · 16（OAuth 2.1 状态机），Phase 13 · 17（网关）
 **预计时间：** 约 90 分钟
 
@@ -329,6 +329,7 @@ t3-jwks-rotate
 ```bash
 cd phases/13-tools-and-protocols/18-mcp-auth-production
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

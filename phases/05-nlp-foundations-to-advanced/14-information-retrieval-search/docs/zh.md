@@ -3,7 +3,7 @@
 > BM25 精确但脆弱。稠密撒得开但漏关键词。混合是 2026 年的默认。其余的都是调参。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 02（BoW + TF-IDF）、Phase 5 · 04（GloVe、FastText、子词）
 **预计时间：** ~75 分钟
 

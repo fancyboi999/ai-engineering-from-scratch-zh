@@ -3,7 +3,7 @@
 > AWS 的 DevOps Agent 正式 GA，Resolve AI 公开了它的 K8s 排查手册，NeuBird 演示了语义监控，Metoro 把 AI SRE 跟每个服务的 SLO 绑在了一起。生产形态已经定型：一个告警 webhook 触发，一个 agent 读遥测、走一遍 K8s 对象的图、给根因假设排序，再发一条带审批按钮的 Slack 简报。默认只读。每一次修复都要过人类这一关。这个顶点项目就是这样一个 agent，在 20 个合成事故上评测，并在三个共享案例上跟 AWS 的 Agent 对比。
 
 **类型：** Capstone
-**语言：** Python（agent）、TypeScript（Slack 集成）
+**语言：** Python（agent）、TypeScript（Slack 集成、agent 脚手架）
 **前置要求：** 第 11 阶段（LLM 工程）、第 13 阶段（工具与 MCP）、第 14 阶段（agent）、第 15 阶段（自主系统）、第 17 阶段（基础设施）、第 18 阶段（安全）
 **涉及阶段：** P11 · P13 · P14 · P15 · P17 · P18
 **预计时间：** 30 小时

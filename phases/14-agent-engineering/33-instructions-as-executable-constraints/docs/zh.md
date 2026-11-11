@@ -3,7 +3,7 @@
 > 写成散文的指令是愿望。写成约束的指令是测试。工作台把每条规则变成 agent 在运行时能检查、审查者事后能验证的东西。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 32（最小工作台）
 **预计时间：** ~50 分钟
 
@@ -96,6 +96,7 @@ wb-rule-checkoff
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：解析后的规则集、运行轨迹、每规则的通过/失败，以及一份存在脚本旁边的 `rule_report.json`。

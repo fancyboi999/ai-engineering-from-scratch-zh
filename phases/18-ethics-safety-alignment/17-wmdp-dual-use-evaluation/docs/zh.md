@@ -3,7 +3,7 @@
 > Li et al., "The WMDP Benchmark: Measuring and Reducing Malicious Use With Unlearning"（ICML 2024, arXiv:2403.03218）。4,157 道多选题，覆盖生物安全（1,520）、网络安全（2,225）、化学（412）。题目运作在「黄区」——临近的赋能知识，经多专家评审和 ITAR/EAR 法律合规过滤。双重用途：作为两用能力的代理评估，以及作为遗忘（unlearning）基准（配套的 RMU 方法在保住通用能力的同时降低 WMDP 表现）。2024-2025 的领域叙事：早期 OpenAI/Anthropic 2024 评估报告相比互联网搜索的「轻度提升」；到 2025 年 4 月，OpenAI 的 Preparedness Framework v2 称模型「正处在实质性帮助新手制造已知生物威胁的临界点上」。Anthropic 的生物武器获取试验显示 2.53 倍提升，不足以排除 ASL-3。
 
 **类型：** Learn
-**语言：** Python（标准库，WMDP 形态的提升评估测试台）
+**语言：** Python、TypeScript（标准库，WMDP 形态的提升评估测试台）
 **前置要求：** 阶段 18 · 16（红队工具）、阶段 14（智能体工程）
 **预计时间：** ~60 分钟
 

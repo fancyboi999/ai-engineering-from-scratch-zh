@@ -3,7 +3,7 @@
 > 一个 Skill 只有在通过 lint、能在正确请求上路由、可改进可衡量任务、始终遵守策略，并在其他宿主上诚实降级时才算完成。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 13 · 22、24、25 和 26
 **预计时间：** 约 150 分钟
 
@@ -425,6 +425,7 @@ package:
 cd "$(git rev-parse --show-toplevel)"
 cd phases/13-tools-and-protocols/27-skill-evals-packaging-and-portability
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

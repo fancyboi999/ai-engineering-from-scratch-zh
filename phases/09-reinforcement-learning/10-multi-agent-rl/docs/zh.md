@@ -3,7 +3,7 @@
 > 单 agent RL 假设环境是平稳的。把两个会学习的 agent 放进同一个世界，这个假设就破了：每个 agent 都是另一个 agent 环境的一部分，而两者都在变。多 agent RL 就是那套在马尔可夫假设不再成立时让学习仍能收敛的技巧。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 9 · 04（Q-learning）、Phase 9 · 06（REINFORCE）、Phase 9 · 07（Actor-Critic）
 **预计时间：** ~45 分钟
 

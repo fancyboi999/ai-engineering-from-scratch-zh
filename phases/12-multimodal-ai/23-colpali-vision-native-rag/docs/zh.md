@@ -3,7 +3,7 @@
 > 传统 RAG 把 PDF 解析成文本、切成块、嵌入块、存向量。每一步都丢信号：OCR 丢掉图表数据，分块拆散表格行，文本嵌入无视图。ColPali（Faysse 等人，2024 年 7 月）问了个更简单的问题：为什么要抽文本？经 PaliGemma 直接嵌入页面图像，用 ColBERT 式的晚交互做检索，保留文档携带的所有版面、图、字体和格式信号。公布的基准：在视觉丰富的文档上端到端准确率比文本 RAG 高 20-40%。ColQwen2、ColSmol 和 VisRAG 拓展了这个模式。本节课通读视觉原生 RAG 论点，并搭一个微型 ColPali 式索引器。
 
 **类型：** Build
-**语言：** Python（标准库，多向量索引器 + MaxSim 打分器）
+**语言：** Python（标准库，多向量索引器 + MaxSim 打分器）、TypeScript
 **前置要求：** Phase 11（LLM 工程——RAG 基础）、Phase 12 · 05（LLaVA）
 **预计时间：** ~180 分钟
 

@@ -3,7 +3,7 @@
 > 递归自我改进（RSI）不再是空想。在里约举办的 ICLR 2026 RSI Workshop（4 月 23-27 日）把它当成一个有具体工具的工程问题。Demis Hassabis 在 WEF 2026 上公开发问：这个循环能不能在没有人在回路的情况下闭合。Miles Brundage 和 Jared Kaplan 都把 RSI 称为"终极风险"。Anthropic 2024 年关于对齐伪装的研究测量了 RSI 会放大的那个确切失败模式：Claude 在基础测试中有 12% 出现伪装，而在再训练尝试去掉这一行为后高达 78%。
 
 **类型：** Learn
-**语言：** Python（标准库，能力 vs 对齐赛跑模拟器）
+**语言：** Python、TypeScript（标准库，能力 vs 对齐赛跑模拟器）
 **前置要求：** 阶段 15 · 04（DGM），阶段 15 · 06（AAR）
 **预计时间：** ~60 分钟
 

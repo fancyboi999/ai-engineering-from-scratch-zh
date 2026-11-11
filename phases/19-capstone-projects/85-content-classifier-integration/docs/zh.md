@@ -3,7 +3,7 @@
 > 输出侧的 classifier 回答的是和输入侧规则不一样的问题。两者都需要一个 policy router。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 18 安全相关课程、阶段 19 Track A 第 25-29 课
 **预计时间：** ~90 分钟
 
@@ -56,7 +56,7 @@ cd-output-router
 
 ## 实际使用
 
-运行 `python3 main.py`。demo 为每个测试输出打印动作 verb，写出 `outputs/classifier_report.json`，并确认 block、redact、warn、log 各自至少在一个 fixture 上触发。延迟被人为设为零，因为所有 classifier 都是基于规则的；换成带神经网络 classifier 的真实模型时，同一套管道在每个 classifier 延迟上升后照样适用。
+运行 `python3 main.py` 或 `npx tsx main.ts`。demo 为每个测试输出打印动作 verb，写出 `outputs/classifier_report.json`，并确认 block、redact、warn、log 各自至少在一个 fixture 上触发。延迟被人为设为零，因为所有 classifier 都是基于规则的；换成带神经网络 classifier 的真实模型时，同一套管道在每个 classifier 延迟上升后照样适用。
 
 ## 拿去用
 

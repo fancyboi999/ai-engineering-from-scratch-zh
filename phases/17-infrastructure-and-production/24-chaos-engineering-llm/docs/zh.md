@@ -3,7 +3,7 @@
 > 2026 年，面向 LLM 的混沌工程是它自己的一门学科。在生产里跑实验前的前提：定义好的 SLI/SLO、trace+指标+日志的可观测性、自动回滚、runbook、on-call。架构有四个面：控制（实验调度器）、目标（服务、基础设施、数据存储）、安全（守卫 + 中止 + 流量过滤）、可观测性（指标 + trace + 日志）、反馈（进 SLO 调整）。guardrails 是强制的：燃尽率告警在每日错误预算燃尽 > 2x 预期时暂停实验；抑制窗口 + trace-ID 关联给告警噪声去重。节奏：每周小 canary + SLO 复盘；每月 game day + 复盘；每季度跨团队韧性审计 + 依赖映射。LLM 专属实验：内存过载、网络故障、供应商宕机、畸形 prompt、KV cache 驱逐风暴。工具：Harness Chaos Engineering（LLM 推导的建议、爆炸半径缩小、MCP 工具集成）；LitmusChaos（CNCF）；Chaos Mesh（CNCF Kubernetes 原生）。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级混沌实验执行器）
+**语言：** Python、TypeScript（标准库，一个玩具级混沌实验执行器）
 **前置要求：** 阶段 17 · 23（面向 AI 的 SRE）、阶段 17 · 13（可观测性）
 **预计时间：** ~60 分钟
 

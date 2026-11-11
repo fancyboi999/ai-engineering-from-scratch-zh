@@ -3,7 +3,7 @@
 > Whisper（Radford 等人，2022 年 12 月）了结了语音识别——68 万小时弱监督多语言语音、一个简单的编码器-解码器 transformer、一个让后续每个 ASR 发布都引用它的基准。但识别不是推理。问"这段录音里有什么乐器""说话人在表达什么情绪""第 3 分钟发生了什么"，需要的是音频理解，不是转录。Qwen-Audio、SALMONN、LTU 和 NVIDIA 的 Audio Flamingo 3（AF3，2025 年 7 月）层层搭起了这套栈：保留 Whisper 类编码器、外挂 Q-former、在音频-文本指令数据上训练、加入思维链推理。本节课走一遍这条弧线。
 
 **类型：** Build
-**语言：** Python（标准库，log-Mel 频谱图 + 音频 Q-former 骨架）
+**语言：** Python（标准库，log-Mel 频谱图 + 音频 Q-former 骨架）、TypeScript
 **前置要求：** Phase 6（语音与音频）、Phase 12 · 03（Q-Former）
 **预计时间：** ~180 分钟
 

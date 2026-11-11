@@ -3,7 +3,7 @@
 > 三家超大规模云厂商，三套截然不同的策略。AWS Bedrock 是一个模型市场 —— Claude、Llama、Titan、Stability、Cohere 都藏在同一个 API 后面。Azure OpenAI 是与 OpenAI 的独家合作，再加上为专属算力准备的 Provisioned Throughput Units（PTUs）。Vertex AI 则以 Gemini 优先，长上下文和多模态讲得最好。2026 年 Artificial Analysis 在 Llama 3.1 405B 等量级模型上测得 Azure OpenAI 中位延迟约 50 ms，Bedrock 约 75 ms —— 这个差距由 PTUs 解释，专属算力本就强过共享按需。决策准则不是"谁最快"，而是"哪家的模型目录和 FinOps 视图匹配我的产品"。这一课教你把权衡写下来再选，而不是凭感觉。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级成本与延迟对比器）
+**语言：** Python、TypeScript（标准库，一个玩具级成本与延迟对比器）
 **前置要求：** 阶段 11（LLM 工程）、阶段 13（工具与协议）
 **预计时间：** ~60 分钟
 

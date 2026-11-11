@@ -3,7 +3,7 @@
 > 生成前、生成中、生成后。三个检查点，一个 verdict，每个请求一条审计轨迹。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 18 安全相关课程、阶段 19 Track A 第 25-29 课
 **预计时间：** ~90 分钟
 
@@ -59,7 +59,7 @@ demo 跑全部 50 个 taxonomy fixture 外加 10 条 benign prompt。trace 摘�
 
 ## 实际使用
 
-`python3 main.py`。demo 加载所有东西，端到端跑一遍，打印摘要表，并写出 trace 产物。退出码为 0。demo 在字面意义上是自终止的：每个请求要么跑到完成、要么提前终止，然后 gate 移到下一个。
+`python3 main.py` 或 `npx tsx main.ts`。demo 加载所有东西，端到端跑一遍，打印摘要表，并写出 trace 产物。退出码为 0。demo 在字面意义上是自终止的：每个请求要么跑到完成、要么提前终止，然后 gate 移到下一个。
 
 ## 拿去用
 

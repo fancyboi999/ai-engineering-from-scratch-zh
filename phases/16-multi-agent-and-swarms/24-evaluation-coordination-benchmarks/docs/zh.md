@@ -3,7 +3,7 @@
 > 五个 2025-2026 年的基准覆盖了多 agent 评估空间。**MultiAgentBench / MARBLE**（ACL 2025，arXiv:2503.01935）用里程碑 KPI 评测 star/chain/tree/graph 拓扑；**graph 最适合研究**，认知规划带来约 3% 的里程碑达成提升。**COMMA** 评测多模态非对称信息协调；包括 GPT-4o 在内的最先进模型都难以打败随机基线。**MedAgentBoard**（arXiv:2505.12371）覆盖四个医疗任务类别，常发现多 agent 不优于单 LLM。**AgentArch**（arXiv:2509.10769）对结合工具使用 + 记忆 + orchestration 的企业 agent 架构做基准。**SWE-bench Pro**（[arXiv:2509.16941](https://arxiv.org/abs/2509.16941)）有横跨 41 个仓库的 1865 个问题，涵盖商业应用、B2B 服务、开发者工具；前沿模型在 Pro 上得约 23%、而在 Verified 上 70%+——一记针对污染的现实检验。据报告，Claude Opus 4.7（2026 年 4 月）在 Pro 上以显式 agent 团队协调取得 **64.3%**（Anthropic 尚未发布一手来源——当作初步数据看待）；Verdent（agent 脚手架）在 Verified 上达到 **76.1% pass@1**（[Verdent 技术报告](https://www.verdent.ai/blog/swe-bench-verified-technical-report)）。**AAAI 2026 Bridge Program WMAC**（https://multiagents.org/2026/）是 2026 年的社区焦点。本课建立在 MARBLE 的指标之上，跑一遍拓扑对指标的扫描，并钉死「光通过 SWE-bench Verified 不是泛化的证据」这条规则。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 15（投票与辩论拓扑）、Phase 16 · 23（故障模式）
 **预计时间：** ~75 分钟
 
@@ -104,6 +104,7 @@ a5-bench-gap
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：系统记分卡，含原始准确率、里程碑达成、每任务成本、相对随机基线的增量、以及一条污染检查备注。

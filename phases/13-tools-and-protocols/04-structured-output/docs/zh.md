@@ -3,7 +3,7 @@
 > "客客气气求模型返回 JSON"有 5% 到 15% 的概率失败，连前沿模型也不例外。结构化输出用受约束解码弥合这道鸿沟：模型从字面上就被阻止吐出任何会违反 schema 的 token。OpenAI 的严格模式、Anthropic 的 schema 定型工具调用、Gemini 的 `responseSchema`、Pydantic AI 的 `output_type`、Zod 的 `.parse`，是同一个想法的五种表面形式。本课构建 schema 校验器和严格模式契约，学员之后每一条生产抽取管线都会用到它们。
 
 **类型：** Build
-**语言：** Python（标准库，JSON Schema 2020-12 子集）
+**语言：** Python、TypeScript（标准库，JSON Schema 2020-12 子集）
 **前置要求：** 阶段 13 · 02（function calling 深入剖析）
 **预计时间：** ~75 分钟
 

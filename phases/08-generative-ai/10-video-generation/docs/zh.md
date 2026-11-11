@@ -3,7 +3,7 @@
 > 图像是一个二维张量。视频是一个三维张量。理论是一样的；算力难 10-100 倍。OpenAI 的 Sora（2024 年 2 月）证明了这事可行。到 2026 年，Veo 2、Kling 1.5、Runway Gen-3、Pika 2.0、WAN 2.2 都能从文本生产 1080p 视频——而开源权重那一栈（CogVideoX、HunyuanVideo、Mochi-1、WAN 2.2）落后 12 个月。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 8 · 07（潜空间扩散）、阶段 7 · 09（ViT）、阶段 8 · 06（DDPM）
 **预计时间：** ~45 分钟
 

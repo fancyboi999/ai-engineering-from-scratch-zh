@@ -3,7 +3,7 @@
 > 生产级推理服务栈把路由器、引擎与可观测性接入同一个 Kubernetes 部署，并把 KV cache 当作可离开 GPU 的资源。KV 卸载把缓存移出 GPU 内存，在查询与引擎之间复用（先到 CPU DRAM，再到磁盘/Ceph）。vLLM production-stack 是参考部署，LMCache 是卸载层。vLLM 0.11.0 的 KV Offloading Connector（2026 年 1 月）通过 Connector API（v0.9.0+）让它异步且可插拔。卸载路径通常隐藏在请求路径之外，但缓存未命中与提升仍可能增加端到端延迟。即使没有共享前缀，LMCache 也有价值：GPU 的 KV 槽用尽时，被抢占的请求可以从 CPU 恢复，而不必重算 prefill。在 16 块 H100（80GB HBM）、横跨 4 个 a3-highgpu-4g 的公开基准中，KV cache 超过 HBM 时，原生 CPU offload 和 LMCache 都显著提升吞吐；低 KV 占用时，各配置与基线持平，开销很小。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级 KV 溢出模拟器）
+**语言：** Python、TypeScript（标准库，一个玩具级 KV 溢出模拟器）
 **前置要求：** 阶段 17 · 04（推理服务引擎内部机制）、阶段 17 · 06（SGLang/RadixAttention）
 **预计时间：** ~60 分钟
 

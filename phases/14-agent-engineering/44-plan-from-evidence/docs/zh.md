@@ -3,7 +3,7 @@
 > 计划不是更好看的待办清单。它是一张依赖图：每项改动都有理由，每个终点都有证明。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 43 课
 **预计时间：** ~65 分钟
 
@@ -92,6 +92,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

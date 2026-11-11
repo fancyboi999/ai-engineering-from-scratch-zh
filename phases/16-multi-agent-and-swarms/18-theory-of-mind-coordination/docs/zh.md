@@ -3,7 +3,7 @@
 > Li 等人（arXiv:2310.10701）表明，合作文字游戏里的 LLM agent 表现出**涌现的高阶心智理论（Theory of Mind，ToM）**——推理「另一个 agent 对第三个 agent 信念的看法」——但因上下文管理和幻觉而在长视野规划上失败。Riedl（arXiv:2510.05174）跨一个群体测量高阶协同，发现**只有**在 ToM-prompt 条件下才产生身份关联的分化和目标导向的互补；能力较低的 LLM 只表现出虚假涌现。也就是说，协调涌现是依赖 prompt、依赖模型的，不是白来的。本课实现一个最小的 ToM 感知 agent，在有和没有 ToM 提示的情况下跑一个合作任务，并对照 Riedl 2025 协议测量协调增量。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 07（心智社会与辩论）、Phase 16 · 17（生成式 agent）
 **预计时间：** ~75 分钟
 
@@ -120,6 +120,7 @@ sw-theory-of-mind
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：零阶 agent 以约 35% 的比率重复劳动，在 10 轮内完成约 60% 的试验。一阶 ToM agent 重复率约 5%、完成约 95%。这个增量就是可测的协调效应。

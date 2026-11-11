@@ -3,7 +3,7 @@
 > 反编译器有类型表时打印 `a->balance`，没有时打印 `*(int *)(param_1 + 4)`。本课从内存访问构建类型表，从 DWARF 5 读取真实类型表，再展示两者何处一致。
 
 **类型：** Build
-**语言：** Python, C, C++, x86-64 assembly
+**语言：** Python、TypeScript、C、C++、x86-64 汇编
 **前置要求：** 阶段 13 · 33（反汇编与控制流）、阶段 13 · 34（提升为伪代码）
 **预计时间：** ~140 分钟
 
@@ -383,6 +383,7 @@ rea 6.5.0 使用 Ghidra provider 时将反编译文本作为记录返回。Ghidr
 ```bash
 cd phases/13-tools-and-protocols/41-recovering-data-and-types
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一份含五部分的 JSON 报告。`dwarf` 保存 `-O0` 目标文件的单元头、结构体和函数。`oracles` 保存 psABI 规则布局、`ctypes` 布局、DWARF 布局、原生运行结果和 `agree` 标志。`builds` 保存三个目标文件各自的访问、推断布局和比较。`cxx` 保存反修饰名称、两个虚表、两条 typeinfo、虚调用和 DWARF 槽。`tools` 列出保存的工具输出。
@@ -513,6 +514,7 @@ find_virtual_calls(load_listing("shapes-x86_64-O0-g.objdump.txt"), [read_vtable(
 ```bash
 cd phases/13-tools-and-protocols/41-recovering-data-and-types
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

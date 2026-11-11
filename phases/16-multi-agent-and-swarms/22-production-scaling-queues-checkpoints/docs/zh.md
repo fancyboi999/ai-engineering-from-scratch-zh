@@ -3,7 +3,7 @@
 > 把多 agent 系统扩展到数千个并发运行需要**持久化执行（durable execution）**：工作队列加检查点，并配套正确的租约处理、幂等副作用与确定性重放，使任何 worker 都能在任何崩溃后恢复任意运行。LangGraph 的运行时是参考例子：它在每个 super-step 之后按 `thread_id` 写一个检查点（默认 Postgres）；worker 崩溃会释放租约，另一个 worker 接着恢复。agent 能无限期沉睡，等待人类输入。**MegaAgent**（arXiv:2408.09955）为每个 agent 运行生产者-消费者队列，带三个状态（Idle / Processing / Response）和两层协调（组内聊天 + 组间管理聊天）。**Fiber/async** 在 LLM 流式上优于「每任务一线程」：线程 99% 的时间都在等待 token，fiber 则在 I/O 上协作式让出。反方观点是，在负载证明你需要更多之前，坚持 **FastAPI + Postgres，别的都不要**。本课会构建检查点日志、带状态转移的每 agent 工作队列和 async-vs-thread 演示，并落实「从简开始」规则。
 
 **类型：** Learn + Build
-**语言：** Python（标准库，`asyncio`、`sqlite3`）
+**语言：** Python（标准库，`asyncio`、`sqlite3`）、TypeScript
 **前置要求：** Phase 16 · 09（并行 Swarm 网络）、Phase 16 · 13（共享内存）
 **预计时间：** ~75 分钟
 
@@ -133,6 +133,7 @@ sw-checkpoint-replay
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：模拟崩溃后检查点恢复成功；async 版本在 < 1 秒内处理 500 个并发调用；线程版本花几秒，并且每个并发单元用掉的内存高出几个数量级。

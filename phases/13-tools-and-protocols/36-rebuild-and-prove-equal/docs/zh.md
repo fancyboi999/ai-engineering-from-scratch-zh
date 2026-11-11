@@ -3,7 +3,7 @@
 > 测试通过只证明测试范围内一致。等价验证还需触及所有边界的输入网格，以及屏蔽重定位后的字节匹配。
 
 **类型：** Build
-**语言：** Python、C
+**语言：** Python、C、TypeScript
 **前置要求：** 阶段 13 · 34（提升为伪代码）、阶段 13 · 35（证据、置信度与未知项）
 **预计时间：** 约 110 分钟
 
@@ -271,6 +271,7 @@ DecompileBench 测量 130 个真实程序的 23,400 个函数，发现 LLM 方�
 ```bash
 cd phases/13-tools-and-protocols/36-rebuild-and-prove-equal
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 PATH 有 clang 时，演示编译两组候选，各运行 92 单元；重编译八个候选，重放 agent 运行，生成证明记录。无 clang 时读取已提交目标文件，将行为主张报告为 unknown。
@@ -371,6 +372,9 @@ report.masked_equal, report.relocations_match, report.tables_equal, report.reaso
 GHIDRA_INSTALL_DIR=/opt/homebrew/Cellar/ghidra/12.1.4/libexec \
 JAVA_HOME=/opt/homebrew/opt/openjdk@21 \
 python3 code/main.py --live
+GHIDRA_INSTALL_DIR=/opt/homebrew/Cellar/ghidra/12.1.4/libexec \
+JAVA_HOME=/opt/homebrew/opt/openjdk@21 \
+npx tsx code/main.ts --live
 ```
 
 首次 `analyze_function` 因 Ghidra 导入耗时数秒。比较新证据 ID 与提交记录。相同字节和分析配置得到相同 ID，因为内容哈希排除了路径。
@@ -404,6 +408,7 @@ python3 code/main.py --live
 ```bash
 cd phases/13-tools-and-protocols/36-rebuild-and-prove-equal
 python3 code/lab.py
+npx tsx code/lab.ts
 ```
 
 检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
@@ -423,6 +428,7 @@ python3 code/lab.py
 ```bash
 cd phases/13-tools-and-protocols/36-rebuild-and-prove-equal
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

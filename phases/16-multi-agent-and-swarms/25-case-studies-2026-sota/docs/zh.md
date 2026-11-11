@@ -3,7 +3,7 @@
 > 三个值得端到端研究的生产级参考，每个展示多 agent 工程的一个不同切面。**Anthropic 的 Research 系统**（orchestrator-worker、15 倍 token、相比单 agent Opus 4 +90.2%、彩虹部署）是标准的 supervisor 案例。**MetaGPT / ChatDev**（用 SOP 编码的软件工程角色专精；ChatDev 的「沟通式去幻觉」；MacNet 通过 DAG 扩展到 >1000 agent，arXiv:2406.07155）是标准的角色拆解案例。**OpenClaw / Moltbook**（最初是 Peter Steinberger 的 Clawdbot，2025 年 11 月；改名两次；到 2026 年 3 月 24.7 万 GitHub star；本地 ReAct 循环 agent；Moltbook 作为一个纯 agent 社交网络，上线数天内约 230 万个 agent 账号，2026-03-10 被 Meta 收购）展示了人群规模下会发生什么：涌现的经济活动、prompt 注入风险、国家级监管（中国在 2026 年 3 月限制政府电脑使用 OpenClaw）。**2026 年 4 月的框架版图：** LangGraph 和 CrewAI 领跑生产；AG2 是社区版 AutoGen 延续；Microsoft AutoGen 处于维护模式（已并入 Microsoft Agent Framework，RC 2026 年 2 月）；OpenAI Agents SDK 是生产版 Swarm 继任者；Google ADK（2025 年 4 月）是 A2A 原生的入局者。如今每个主流框架都附带 MCP 支持；多数附带 A2A。本课端到端读完每个案例、提炼共同模式，让你能凭知识而非营销来为你下一个生产系统选对参考。
 
 **类型：** Learn（收官）
-**语言：** —
+**语言：** Python、TypeScript
 **前置要求：** 整个 Phase 16（第 01-24 课）
 **预计时间：** ~90 分钟
 

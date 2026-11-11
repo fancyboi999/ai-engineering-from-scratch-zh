@@ -3,7 +3,7 @@
 > 路线图把不确定性藏进功能；假设地图则揭示：这些功能值得存在之前，什么必须为真。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 48 课
 **预计时间：** ~65 分钟
 
@@ -82,6 +82,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

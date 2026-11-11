@@ -3,7 +3,7 @@
 > 2026 年最常见的多 agent 拆解：一个 agent 做规划、一个执行、一个批判或验证。MetaGPT（arXiv:2308.00352）把它形式化为编码进角色 prompt 的 SOP——产品经理、架构师、项目经理、工程师、QA 工程师——遵循 `Code = SOP(Team)`。ChatDev（arXiv:2307.07924）用一条「聊天链」把设计师、程序员、评审、测试串起来，并带「沟通式去幻觉」（communicative dehallucination，agent 显式索取缺失的细节）。verifier 是承重的：Cemri 等人（MAST，arXiv:2503.13657）表明每一次多 agent 失败都能追溯到验证缺失或损坏。PwC 报告称 CrewAI 里结构化的校验循环带来 7 倍准确率提升（10% → 70%）。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 04（原语模型）、Phase 16 · 05（Supervisor）
 **预计时间：** ~60 分钟
 
@@ -88,6 +88,7 @@ swarm-roles
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 ## 实际使用

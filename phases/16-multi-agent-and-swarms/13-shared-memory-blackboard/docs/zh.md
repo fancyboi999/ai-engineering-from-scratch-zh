@@ -3,7 +3,7 @@
 > 2026 年的多 agent 系统里两种做法并存：**消息池**（人人看到人人的消息，如 AutoGen GroupChat 或 MetaGPT）和**带订阅的黑板**（agent 订阅相关事件，如 Context-Aware MCP 或 Matrix 框架）。两者都是多 agent 系统里唯一有状态的部分——这意味着两者都是有意思的 bug 安家的地方。标准故障模式是**记忆投毒（memory poisoning）**：一个 agent 幻想出一个「事实」，其他 agent 把它当成已验证的，准确率逐渐衰减，这种方式比立刻崩溃难调试得多。本课用标准库构建这两种结构，注入一次投毒攻击，并展示三种在生产里真正管用的缓解手段。
 
 **类型：** Learn + Build
-**语言：** Python（标准库，`threading`）
+**语言：** Python（标准库，`threading`）、TypeScript
 **前置要求：** Phase 16 · 04（原语模型）、Phase 16 · 09（并行 Swarm 网络）
 **预计时间：** ~75 分钟
 
@@ -119,6 +119,7 @@ swarm-blackboard
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：

@@ -3,7 +3,7 @@
 > RSP v3.0 于 2026 年 2 月 24 日生效，取代了 2023 年的政策。两层缓解：Anthropic 会单方面去做的事 vs 被定位为全行业建议的事（包含 RAND SL-4 安全标准）。把前沿安全路线图（Frontier Safety Roadmap）和风险报告（Risk Report）加为常设文档，而非一次性交付物。删掉了 2023 年的暂停承诺。引入了 AI R&D-4 阈值：一旦越过，Anthropic 必须发表一份正面论证（affirmative case），指明失准风险与缓解措施。Claude Opus 4.6 没越过它。Anthropic 在 v3.0 公告里说"有把握地排除这一点正变得困难"。SaferAI 给 2023 年的 RSP 评了 2.2 分；他们把 v3.0 下调到 1.9，把 Anthropic 跟 OpenAI 和 DeepMind 一起放进了"弱"这一档 RSP。定性阈值取代了 2023 年的定量承诺；移除暂停条款是最尖锐的回退。
 
 **类型：** Learn
-**语言：** Python（标准库，RSP 阈值决策引擎）
+**语言：** Python（标准库，RSP 阈值决策引擎）、TypeScript
 **前置要求：** 阶段 15 · 06（AAR），阶段 15 · 07（RSI）
 **预计时间：** ~45 分钟
 

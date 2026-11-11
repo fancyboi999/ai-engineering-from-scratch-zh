@@ -3,7 +3,7 @@
 > 传统 A/B 测试不是为非确定性的 LLM 造的。关键区别：eval 回答"模型能不能干这活？"A/B 测试回答"用户在不在乎？"两者都需要；凭感觉上线的时代结束了。2026 年测什么：prompt 工程（措辞）、模型选择（GPT-4 vs GPT-3.5 vs OSS；准确率 vs 成本 vs 延迟）、生成参数（temperature、top-p）。真实案例：一个聊天机器人的奖励模型变体带来 +70% 对话长度和 +30% 留存；Nextdoor 的 AI 主题行实验在奖励函数精调后带来 +1% CTR；Khan Academy 的 Khanmigo 在延迟 vs 数学准确率这个轴上迭代。平台划分：**Statsig**（2025 年 9 月被 OpenAI 以 11 亿美元收购）—— 序贯测试、CUPED、一体化。**GrowthBook** —— 开源、仓库原生、贝叶斯 + 频率派 + 序贯引擎、CUPED、SRM 检查、Benjamini-Hochberg + Bonferroni 校正。你基于对仓库-SQL 的偏好，以及"被 OpenAI 收购"对你的组织重不重要来挑。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级序贯测试模拟器）
+**语言：** Python、TypeScript（标准库，一个玩具级序贯测试模拟器）
 **前置要求：** 阶段 17 · 13（可观测性）、阶段 17 · 20（渐进式部署）
 **预计时间：** ~60 分钟
 

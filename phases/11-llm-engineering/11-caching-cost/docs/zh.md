@@ -3,7 +3,7 @@
 > 大多数 AI 创业公司不是死于糟糕的模型。它们死于糟糕的单位经济模型。一次 GPT-4o 调用只花零点几美分。一万个用户每天调十次，光输入 token 就花 $250——这还是在你收到第一美元之前。活下来的公司，是把每次 API 调用都当成一笔财务交易、而不是一次函数调用的那些。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 第 09 课（Function Calling）
 **预计时间：** ~45 分钟
 **相关：** 阶段 11 · 15（Prompt Caching）——本课讲应用层缓存（语义缓存、精确哈希缓存、模型路由）。第 15 课讲 provider 层的 prompt caching（Anthropic cache_control、OpenAI 自动、Gemini CachedContent）。两者结合，成本能降 50-95%。
