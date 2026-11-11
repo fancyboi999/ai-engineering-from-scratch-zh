@@ -3,7 +3,7 @@
 > BERT 看两边。GPT 只看过去。那个三角掩码是现代 AI 里影响最大的一行代码。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Rust
 **前置要求：** 阶段 7 · 02（Self-Attention）、阶段 7 · 05（完整的 Transformer）、阶段 7 · 06（BERT）
 **预计时间：** ~75 分钟
 

@@ -3,7 +3,7 @@
 > 一个能干的模型还不够。可靠的 agent 需要一个工作台：指令、状态、范围、反馈、验证、审查和交接。把这些剥掉，连前沿模型都会产出不安全到无法交付的活儿。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 26（失败模式）
 **预计时间：** ~45 分钟
 
@@ -148,6 +148,7 @@ wb-seven-surfaces
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：两次运行的并排日志、一份总结仅 prompt 运行的 `failure_modes.json`，以及工作台运行的一行裁决。

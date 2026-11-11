@@ -3,7 +3,7 @@
 > 跟 supervisor 对照：没有中心决策者。agent 读一条共享事件总线、异步领活儿、把结果写回去。LangGraph 明确支持面向去中心化、动态环境的「Swarm 架构」。Matrix（arXiv:2511.21686）把控制流和数据流都表示成经分布式队列传递的序列化消息，以消除 orchestrator 瓶颈。取舍很明确：用确定性和可追踪性换可扩展性。swarm 适合有许多独立子问题的任务；它不适合需要一份单一、连贯计划的任务。
 
 **类型：** Learn + Build
-**语言：** Python（标准库，`threading`、`queue`）
+**语言：** Python（标准库，`threading`、`queue`）、TypeScript
 **前置要求：** Phase 16 · 05（Supervisor 模式）、Phase 16 · 04（原语模型）
 **预计时间：** ~75 分钟
 
@@ -86,6 +86,7 @@ swarm 自动均衡负载；固定分配会在某个 worker 被分到的任务很
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出展示每个 worker 的任务数（swarm 分配得不均匀但最优）和墙钟时间。

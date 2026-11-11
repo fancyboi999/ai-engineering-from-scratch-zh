@@ -3,7 +3,7 @@
 > 一张图像是一格格 patch。一个句子是一格格 token。同一个 transformer 两者通吃。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、Rust
 **前置要求：** 阶段 7 · 05（完整的 Transformer）、阶段 4 · 03（CNN）、阶段 4 · 14（Vision Transformers 入门）
 **预计时间：** ~45 分钟
 

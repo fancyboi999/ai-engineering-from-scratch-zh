@@ -3,7 +3,7 @@
 > 最便宜的聚合：采样 N 个独立 agent，多数投票。Wang 等人 2022 年的自洽性用一个模型采样 N 次做了这件事。多 agent 用**异质** agent 扩展了它，以逃离单一栽培——不同模型、不同 prompt、不同温度、不同上下文。在多数投票之外，辩论拓扑也很重要：MultiAgentBench（arXiv:2503.01935，ACL 2025）评测了 star / chain / tree / graph 协调，发现 **graph 最适合研究**，超过约 4 个 agent 后出现「协调税（coordination tax）」。AgentVerse（ICLR 2024）记录了两种涌现模式——志愿行为和从众行为——而从众既是特性（找到共识）也是风险（群体思维，第 24 课）。本课绘制拓扑空间、构建每个变体、并测量协调税。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 07（心智社会与辩论）、Phase 16 · 14（共识与 BFT）
 **预计时间：** ~75 分钟
 
@@ -116,6 +116,7 @@ sw-debate-topology
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：一张拓扑 × N → (accuracy, tokens, latency) 的表。graph 在研究型任务上 N=3-5 时胜出；star 在快答事实任务上胜出；graph 在 N=7 时露出协调税（延迟膨胀得比准确率快）。

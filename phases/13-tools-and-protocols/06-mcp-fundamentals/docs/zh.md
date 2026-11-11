@@ -3,7 +3,7 @@
 > 现代 MCP 没有握手，也没有协议会话。每个请求都必须携带足以被独立理解、授权、路由和重试的元数据。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13，第 01 至 05 课
 **预计时间：** 约 55 分钟
 
@@ -164,6 +164,7 @@ mcp-tool-call
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

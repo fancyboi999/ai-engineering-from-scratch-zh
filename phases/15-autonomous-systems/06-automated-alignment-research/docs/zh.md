@@ -3,7 +3,7 @@
 > Anthropic 在相互独立的沙箱里跑了多支并行的 Claude Opus 4.6 自主对齐研究员（Autonomous Alignment Researcher）团队，通过一个共享论坛协作，而该论坛的日志存在任何沙箱之外（这样 agent 删不掉自己的记录）。在弱到强（weak-to-strong）训练问题上，这些 AAR 超过了人类研究者。Anthropic 自己的总结指出，规定好的工作流常常约束 AAR 的灵活度、拖累表现。把对齐研究自动化，正是那个把时间线压缩到 RSP 意在检测的那些失准风险面前的压缩步骤。
 
 **类型：** Learn
-**语言：** Python（标准库，并行研究论坛模拟器）
+**语言：** Python、TypeScript（标准库，并行研究论坛模拟器）
 **前置要求：** 阶段 15 · 05（AI Scientist v2），阶段 15 · 04（DGM）
 **预计时间：** ~60 分钟
 

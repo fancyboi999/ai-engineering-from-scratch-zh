@@ -3,7 +3,7 @@
 > 优化编译器会把源码结构替换成成本更低的指令形态。每种形态都有推导过程；本课构建一个识别器，反向执行推导，再对照源码检查结果。
 
 **类型：** Build
-**语言：** Python, C, x86-64 assembly, AArch64 assembly
+**语言：** Python, TypeScript, C, x86-64 assembly, AArch64 assembly
 **前置要求：** 阶段 13 · 33（反汇编与控制流）、阶段 13 · 34（提升为伪代码）、阶段 13 · 38（调用约定）
 **预计时间：** ~150 分钟
 
@@ -253,6 +253,7 @@ Compiler Explorer 用于正向分析。粘贴 `idioms.c`，选择例如“x86-64
 ```bash
 cd phases/13-tools-and-protocols/39-compiler-idioms-and-optimization
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一份 JSON 报告。对 18 个构建中的每一个，它列出全部函数及其模式，包括类型、源码形式、证据地址、验证情况和详细字段。最后给出每个构建的类型矩阵、两种架构下的 `-O2` 与 `-O3` 对比，以及 `unverified` 列表。
@@ -380,6 +381,7 @@ for name in ("idioms-x86_64-O1", "idioms-arm64-O1"):
 ```bash
 cd phases/13-tools-and-protocols/39-compiler-idioms-and-optimization
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

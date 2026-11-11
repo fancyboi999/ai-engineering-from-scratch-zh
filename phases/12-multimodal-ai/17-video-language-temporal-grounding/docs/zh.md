@@ -3,7 +3,7 @@
 > 视频不是一摞照片。一段 5 秒的片段有因果顺序、动作动词和事件时序，是图像模型表示不了的。Video-LLaMA（Zhang 等人，2023 年 6 月）出货了第一个带视听 grounding 的开放视频 LLM。VideoChat 和 Video-LLaVA 放大了这个模式。到 2025 年，Qwen2.5-VL 与时间对齐的 M-RoPE 缩小了与前沿专有模型的差距。每个系统处理时间的方式都不同——每片段一个 Q-former、每帧 concat-pool、每个 token 一个时间对齐的位置 ID。本节课通读这些模式，搭一个均匀 vs 动态帧采样器，并在时间 grounding 任务上评测。
 
 **类型：** Build
-**语言：** Python（标准库，帧采样器 + 时间 grounding 评测器）
+**语言：** Python（标准库，帧采样器 + 时间 grounding 评测器）、TypeScript
 **前置要求：** Phase 12 · 08（LLaVA-OneVision）
 **预计时间：** ~180 分钟
 

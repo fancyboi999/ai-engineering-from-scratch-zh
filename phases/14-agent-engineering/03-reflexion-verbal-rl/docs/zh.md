@@ -3,7 +3,7 @@
 > 基于梯度的 RL 要修一个失败模式得跑上千次试验加一个 GPU 集群。Reflexion（Shinn 等人，NeurIPS 2023）用自然语言搞定：每次失败试验后，agent 写一段反思、存进情景记忆、把下一次试验建立在这段记忆之上。这就是 Letta 的 sleep-time compute、Claude Code 的 CLAUDE.md learnings、以及 pro-workflow 的 learn-rule 背后的模式。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 02（ReWOO）
 **预计时间：** ~60 分钟
 
@@ -94,6 +94,7 @@ react-trace
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示三次试验。第 1 次失败，存下一段反思，第 2 次看到反思有改进但仍失败，第 3 次成功。和一次基线运行（无反思）对比 —— 它会一直卡在第 1 次的答案上。

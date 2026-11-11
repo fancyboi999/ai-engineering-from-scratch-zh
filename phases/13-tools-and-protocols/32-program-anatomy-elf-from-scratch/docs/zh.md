@@ -3,7 +3,7 @@
 > 编译后的程序是一组相互指向的表。自己写的读取器，输出可以逐字节核对。
 
 **类型：** Build
-**语言：** Python（标准库）、C（仅用于夹具）
+**语言：** Python（标准库）、TypeScript、C（仅用于夹具）
 **前置要求：** 阶段 0 · 01（开发环境），已安装 clang；Python 3.10 或更高版本；十六进制运算
 **预计时间：** 约 120 分钟
 
@@ -275,6 +275,7 @@ rea 通过 `inspect_macho` 读取 Mach-O，该工具经 `xcrun` 运行 `otool -h
 ```bash
 cd phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 演示先读取 `ledger-x86_64-O1.o`，打印头、节、符号、重定位及文件偏移映射，再打印四个函数的字节串。随后读取 `ledger-arm64-O1.o` 并输出对照表，最后打印 `tiny-x86_64` 的程序头。预期输出行：
@@ -395,6 +396,7 @@ macho.function_bytes("_percent_change")[:4].hex()
 ```bash
 cd phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch
 python3 code/lab.py
+npx tsx code/lab.ts
 ```
 
 检查器会用 `code/main.py` 和已提交夹具计算答案，并为每项输出 `PASS`、`FAIL` 或 `TODO` 及总分。只有五项全部通过时，命令才以状态码 0 退出。可运行 `python3 code/lab.py my-answers.json` 检查另一份答案。`code/tests/test_lab.py` 会验证检查器既接受正确答案，也拒绝错误答案。
@@ -414,6 +416,7 @@ python3 code/lab.py
 ```bash
 cd phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

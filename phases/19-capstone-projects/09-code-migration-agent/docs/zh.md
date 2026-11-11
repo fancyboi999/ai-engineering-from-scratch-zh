@@ -3,7 +3,7 @@
 > Amazon 的 MigrationBench（Java 8 到 17）和 Google 的 App Engine Py2-to-Py3 迁移器立下了 2026 年的标准。Moderne 的 OpenRewrite 大规模做确定性的 AST 重写。Grit 用 codemod 风格的 DSL 瞄准同一个问题。生产范式把两者结合：一个做安全重写的确定性底座，加一个处理含糊情形的 agent 层、一个做逐分支构建的沙箱，以及一个在 PR 打开前转绿的测试外壳。这个顶点项目就是迁移 50 个真实仓库，并发出一份带失败分类法的通过率。
 
 **类型：** Capstone
-**语言：** Python（agent）、Java / Python（目标）、TypeScript（看板）
+**语言：** Python（agent）、Java / Python（目标）、TypeScript（看板、agent 脚手架）
 **前置要求：** 第 5 阶段（NLP）、第 7 阶段（transformer）、第 11 阶段（LLM 工程）、第 13 阶段（工具）、第 14 阶段（agent）、第 15 阶段（自主系统）、第 17 阶段（基础设施）
 **涉及阶段：** P5 · P7 · P11 · P13 · P14 · P15 · P17
 **预计时间：** 30 小时

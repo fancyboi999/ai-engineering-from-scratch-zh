@@ -3,7 +3,7 @@
 > 用集中式 vault（HashiCorp Vault、AWS Secrets Manager、Azure Key Vault）消灭密钥四散。绝不把凭证放在配置文件、VCS 里的 env 文件、电子表格里。用 IAM role 而不是静态 key；CI/CD 用 OIDC。AI 网关模式是 2026 年的解：应用 → 网关 → 模型供应商，网关在运行时从 vault 拉凭证。在 vault 里轮换，所有应用几分钟内拿到 —— 不用重新部署，不用在 Slack 里问"谁有新 key"。轮换策略 ≤90 天；每次提交用 TruffleHog / GitGuardian / Gitleaks 扫。零信任：MFA、SSO、RBAC/ABAC、短时 token、设备态势。PII 擦洗用实体识别在转发前掩码 PHI/PII；一致性 token 化（Mesh 方式）把敏感值映射到稳定占位符，于是 LLM 保住代码/关系语义。网络出口：LLM 服务放在专用 VPC/VNet 子网，只放行 `api.openai.com`、`api.anthropic.com` 等；阻断其他一切出站。2026 年的事件成因：Vercel 供应链攻击经由被攻陷的 CI/CD 凭证，跨数千个客户部署外泄了 env var。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级 PII 擦洗器 + 审计日志写入器）
+**语言：** Python、TypeScript（标准库，一个玩具级 PII 擦洗器 + 审计日志写入器）
 **前置要求：** 阶段 17 · 19（AI 网关）、阶段 17 · 13（可观测性）
 **预计时间：** ~60 分钟
 

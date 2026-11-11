@@ -3,7 +3,7 @@
 > 把 agent 当作 actor：异步交换消息、用事件驱动处理器响应、隔离故障，并自然获得并发。AutoGen v0.4（Microsoft Research，2025 年 1 月）围绕这个模型重新设计了 agent 编排；该框架现在进入维护模式，Microsoft Agent Framework（2025 年 10 月公开预览）成为它的生产继任者。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 12（工作流模式）
 **预计时间：** ~75 分钟
 
@@ -79,6 +79,7 @@ actor-mailbox
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示消息投递、一个 actor 里模拟的失败（不会让另一个崩溃），以及对一个共享裁决的收敛。

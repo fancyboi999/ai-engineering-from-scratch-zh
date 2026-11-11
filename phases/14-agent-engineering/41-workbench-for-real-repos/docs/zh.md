@@ -3,7 +3,7 @@
 > 十一节 workbench 接触面，如果挺不过与真实代码库的交锋，就一文不值。这一课在一个小示例应用上把同一个任务跑两遍：仅 prompt vs 工作台引导。数字来论证。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 32 到 14 · 40
 **预计时间：** ~60 分钟
 
@@ -85,6 +85,7 @@ wb-ab-runs
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每条流水线结果的控制台表、存在脚本旁边的 markdown 报告，以及给想画图的人用的 JSON。

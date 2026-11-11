@@ -3,7 +3,7 @@
 > CVE-2025-32711「EchoLeak」（CVSS 9.3）是第一个在生产 LLM 系统（Microsoft 365 Copilot）中被公开记录的零点击提示注入。由 Aim Labs（Aim Security）发现，向 MSRC 披露，于 2025 年 6 月经服务端更新打补丁。攻击：攻击者给任意员工发一封精心构造的邮件；受害者的 Copilot 在一次例行查询中把这封邮件作为 RAG 上下文检索进来；隐藏指令执行；Copilot 经一个 CSP 批准的 Microsoft 域名外泄敏感的组织数据。绕过了 XPIA 提示注入过滤器和 Copilot 的链接脱敏机制。Aim Labs 起的术语：「LLM 范围越界」（LLM Scope Violation）——外部不可信输入操纵模型去访问并泄露机密数据。相关：CamoLeak（CVSS 9.6, GitHub Copilot Chat）利用了 Camo 图像代理；修复办法是彻底禁用图像渲染。GitHub Copilot RCE CVE-2025-53773。NIST 把间接提示注入称为「生成式 AI 最大的安全缺陷」；OWASP 2025 把它列为 LLM 应用的第一大威胁。
 
 **类型：** Learn
-**语言：** Python（标准库，范围越界 trace 重建）
+**语言：** Python、TypeScript（标准库，范围越界 trace 重建）
 **前置要求：** 阶段 18 · 15（间接提示注入）
 **预计时间：** ~45 分钟
 

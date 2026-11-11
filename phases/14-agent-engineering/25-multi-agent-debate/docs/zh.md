@@ -3,7 +3,7 @@
 > Du 等人（ICML 2024，「Society of Minds」）跑 N 个模型实例，各自独立提出答案，然后在 R 轮里互相批判以收敛。改善事实性、规则遵循、推理能力。稀疏拓扑在 token 成本上胜过全连接网格。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 12（工作流模式）、阶段 14 · 05（Self-Refine 与 CRITIC）
 **预计时间：** ~60 分钟
 
@@ -82,6 +82,7 @@ debate-converge
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出：每协议的准确率和成本；稀疏在 2/3 问题上以更低成本匹配全连接。

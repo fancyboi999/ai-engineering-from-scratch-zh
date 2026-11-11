@@ -3,7 +3,7 @@
 > 模型的重建结果是一项附有报告的主张。本课构建验证框架，用你自己的字节、运行结果和 DWARF 同时评判代码与报告。
 
 **类型：** Build
-**语言：** Python、C
+**语言：** Python、C、TypeScript
 **前置要求：** 阶段 13 · 第 35 课（证据、置信度与未知项）、阶段 13 · 第 36 课（重建并证明等价）
 **预计时间：** 约 140 分钟
 
@@ -218,6 +218,7 @@ NDSS BAR 2026 研究在 24 项离线逆向任务上运行三个 agent，归纳�
 ```bash
 cd phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 路径中存在 clang 时，演示按夹具选项编译每个候选，构建八个差分程序，让每个程序运行 92 个网格单元和 256 个语料输入，读取 DWARF、核对所有引用，再输出评分卡。路径中既没有 clang 也没有 cc 时，`grid`、`fuzz` 和每项结论都为 `unknown`。如果 clang 不是 `code/fixtures/build-record.json` 记录的夹具编译器，只有字节比对改用已提交对象，`grid` 和 `fuzz` 仍用主机编译器重新编译每个候选。字节比对要求编译器和编译选项都相同才有意义。已提交对象也只在 `code/fixtures/build-record.json` 仍能把它对应到磁盘上的候选源码时才能代替重建：修改源码后，字节字段为 `unknown`，不会拿过期的字节下结论。
@@ -316,6 +317,7 @@ field_names(load_candidate("f1_mul_first"), target=POISONED_OBJECT)["status"]
 
 ```bash
 python3 code/main.py mcp-serve
+npx tsx code/main.ts mcp-serve
 ```
 
 逐行粘贴以下三行：
@@ -354,6 +356,7 @@ python3 code/main.py mcp-serve
 ```bash
 cd phases/13-tools-and-protocols/45-ai-assisted-reverse-engineering
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

@@ -3,7 +3,7 @@
 > Anthropic 的 Constitutional Classifiers、Meta 的 Llama Guard 4、Google 的 ShieldGemma-2、NVIDIA 的 Nemotron 3 Content Safety，以及做多语种覆盖的 X-Guard，定义了 2026 年的安全分类器栈。garak、PyRIT、NVIDIA Aegis、promptfoo 成了标准的对抗评测工具。NeMo Guardrails v0.12 把它们串进一条生产流水线。这个顶点项目把这一切都接到一起：围着一个目标应用的分层安全外壳、一个跑 6+ 攻击家族的自主红队 agent，以及一次产出可测量无害性差值的宪法式自我批评运行。
 
 **类型：** Capstone
-**语言：** Python（安全流水线、红队）、YAML（策略配置）
+**语言：** Python（安全流水线、红队）、TypeScript、YAML（策略配置）
 **前置要求：** 第 10 阶段（从零做 LLM）、第 11 阶段（LLM 工程）、第 13 阶段（工具）、第 14 阶段（agent）、第 18 阶段（伦理、安全、对齐）
 **涉及阶段：** P10 · P11 · P13 · P14 · P18
 **预计时间：** 25 小时

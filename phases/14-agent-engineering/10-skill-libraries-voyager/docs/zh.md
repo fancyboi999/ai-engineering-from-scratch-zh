@@ -3,7 +3,7 @@
 > Voyager（Wang 等人，TMLR 2024）把可执行代码当成一个技能。技能是具名的、可检索的、可组合的，并由环境反馈精修。这是 Claude Agent SDK skill、skillkit 以及 2026 年技能库模式的参考架构。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 07（MemGPT）、阶段 14 · 08（Letta 块）
 **预计时间：** ~75 分钟
 
@@ -104,6 +104,7 @@ voyager-skills
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示库写入、检索、组合、一次失败执行和一次 v2 精修 —— 端到端的 Voyager 循环。

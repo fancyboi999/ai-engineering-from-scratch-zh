@@ -3,7 +3,7 @@
 > 只有发现、参数、结果、分页和传输元数据共用同一份契约，工具自动化才是安全的。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13，第 07、09 和 10 课
 **预计时间：** 约 120 分钟
 
@@ -327,6 +327,7 @@ if not result.get("nextCursor"):
 ```bash
 cd phases/13-tools-and-protocols/28-mcp-tool-contracts-and-content/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

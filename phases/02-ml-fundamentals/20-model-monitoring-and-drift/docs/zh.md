@@ -3,7 +3,7 @@
 > 部署上线的模型往往在没有任何报错信息的情况下悄然失效。当外部现实世界与训练集分布渐行渐远时，模型依然在正常返回预测分数，唯有建立完备的监控体系才能捕捉这种落差。
 
 **类型：** 构建
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 2，第 09 课（模型评估）、第 16 课（异常检测）与第 19 课（ML 系统设计）
 **预计时间：** ~110 分钟
 
@@ -261,6 +261,7 @@ def level(self, metrics: dict[str, float]) -> str:
 
 ```bash
 python3 phases/02-ml-fundamentals/20-model-monitoring-and-drift/code/main.py
+npx tsx phases/02-ml-fundamentals/20-model-monitoring-and-drift/code/main.ts
 ```
 
 ```console

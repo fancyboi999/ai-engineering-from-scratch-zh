@@ -3,7 +3,7 @@
 > 你在第 04 课从零搭了一个 GPT-2 Small。2026 年的前沿开放模型就是同一个家族，加上五六处具体改动。RMSNorm 取代 LayerNorm。SwiGLU 取代 GELU。RoPE 取代学习式位置。GQA 或 MLA 取代完整 MHA。规模化的 Mixture-of-Experts。你已经会的数学覆盖了它们的 95%。本节课把 Llama 3、DeepSeek-V3、Mixtral、Qwen 和 Gemma 并排读，点出每个架构分叉的确切那一行。
 
 **类型：** Learn
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、Rust
 **前置要求：** 阶段 10，第 04、05、12 课（预训练、规模化、推理）
 **预计时间：** ~45 分钟
 

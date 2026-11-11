@@ -3,7 +3,7 @@
 > 2026 年的多 agent 工程团队已经收敛到同一种形态：一个架构师规划，N 个程序员在并行 worktree 里干活，一个评审者把关，一个测试者验证。SWE-AF 的工厂架构、MetaGPT 的角色化 prompt、AutoGen 0.4 的类型化 actor 图、Cognition 的 Devin 和 Factory 的 Droids 都独立走到了这里。并行 worktree 把墙钟时间换成吞吐，共享状态与交接协议则成为失败面。本顶点项目要搭出这个团队，在 SWE-bench Pro 上评测，并报告哪些交接会断、多久断一次。
 
 **类型：** Capstone
-**语言：** Python / TypeScript（agent）、Shell（worktree 脚本）
+**语言：** Python / TypeScript（agent、任务看板脚手架）、Shell（worktree 脚本）
 **前置要求：** 第 11 阶段（LLM 工程）、第 13 阶段（工具）、第 14 阶段（agent）、第 15 阶段（自主系统）、第 16 阶段（多 agent）、第 17 阶段（基础设施）
 **涉及阶段：** P11 · P13 · P14 · P15 · P16 · P17
 **预计时间：** 40 小时

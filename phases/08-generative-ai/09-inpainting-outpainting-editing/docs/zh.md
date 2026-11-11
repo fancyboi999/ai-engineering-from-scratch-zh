@@ -3,7 +3,7 @@
 > 文生图造新东西。Inpainting 修旧东西。生产里 70% 能计费的图像活儿是编辑——换背景、去 logo、扩画布、重画一只手。Inpainting 才是扩散赚钱的地方。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 8 · 07（潜空间扩散）、阶段 8 · 08（ControlNet 与 LoRA）
 **预计时间：** ~75 分钟
 

@@ -3,7 +3,7 @@
 > OpenAI 的 Swarm（2024 年 10 月）把多 agent orchestration 提炼成两个原语：**routine**（作为 system prompt 的指令 + 工具）和 **handoff**（一个返回另一个 Agent 的工具）。没有状态机，没有分支 DSL——LLM 通过调用正确的 handoff 工具来路由。OpenAI Agents SDK（2025 年 3 月）是它的生产继任者。Swarm 本身仍是概念上最干净的参考——它的全部源码不过几百行。这个模式之所以病毒式传播，是因为它的 API 接口大致就是「agent = prompt + 工具；handoff = 返回 agent 的函数」。局限：无状态，所以记忆是调用方的问题。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 04（原语模型）
 **预计时间：** ~60 分钟
 
@@ -94,6 +94,7 @@ sw-handoff-routing
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 ## 实际使用

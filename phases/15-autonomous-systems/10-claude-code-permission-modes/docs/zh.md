@@ -3,7 +3,7 @@
 > 权限阶梯用逐级提高的自主程度，控制自主 agent 无需询问就能执行哪些动作。以本课使用的 Claude Code 为例，它有六种模式："plan" 在每个动作前都问，"default"（UI 中标为 "Manual"）只对有风险的动作问，"acceptEdits" 自动批准文件写入但仍确认 shell 执行，"bypassPermissions" 批准一切。Auto Mode 对应 `auto` 模式，由独立的分类器模型在每个动作运行前进行审查，并阻止超出用户请求的权限升级。动作预算通过 `max_turns` 和 `max_budget_usd` 执行。`auto` 是否可用取决于套餐、组织设置、模型与提供商；Anthropic 也明确表示，分类器单凭自己并不充分。
 
 **类型：** Learn
-**语言：** Python（标准库，两阶段分类器模拟器）
+**语言：** Python（标准库，两阶段分类器模拟器）、TypeScript
 **前置要求：** 阶段 15 · 01（长程 agent），阶段 15 · 09（编码 agent 全景）
 **预计时间：** ~45 分钟
 

@@ -3,7 +3,7 @@
 > 2026 年有三个生产级 computer-use 模型。三个都是基于视觉的。三个都把截图、DOM 文本和工具输出当成不可信输入。只有直接的用户指令才算授权。逐步安全服务是常态。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 20（WebArena、OSWorld）、阶段 14 · 27（Prompt Injection）
 **预计时间：** ~60 分钟
 
@@ -92,6 +92,7 @@ computer-use-cursor
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出展示安全分类器抓到 DOM 文本里一条注入的指令，并拦下一次未确认的购买。

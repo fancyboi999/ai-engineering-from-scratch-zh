@@ -3,7 +3,7 @@
 > Google 在 2025 年 4 月公布了 A2A；到 2026 年 4 月规范位于 https://a2a-protocol.org/latest/specification/，有 150+ 个组织支持它。A2A 是 MCP（第 13 课）的横向补充：MCP 是纵向的（agent ↔ 工具），A2A 是对等的（agent ↔ agent）。它定义了 Agent Card（发现）、带产物（文本、结构化数据、视频）的任务、不透明的任务生命周期、以及认证。生产系统越来越多地把 MCP 和 A2A 配对使用。Google Cloud 在 2025-2026 年间把 A2A 支持卷进了 Vertex AI Agent Builder。
 
 **类型：** Learn + Build
-**语言：** Python（标准库，`http.server`、`json`）
+**语言：** Python（标准库，`http.server`、`json`）、TypeScript
 **前置要求：** Phase 16 · 04（原语模型）
 **预计时间：** ~75 分钟
 
@@ -154,6 +154,7 @@ sw-agent-card-discovery
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 脚本在后台线程里启动服务器，然后对它跑客户端。你能看到完整流程：发现、发送消息、轮询、产物。

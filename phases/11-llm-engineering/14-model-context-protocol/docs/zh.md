@@ -3,7 +3,7 @@
 > MCP 为 AI host 提供一套发现和调用工具、resource 与 prompt 的统一协议。2026-07-28 修订版让该协议变为无状态：能力和版本上下文随每个请求传递，而非绑定在连接握手中。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 11 · 09（Function Calling）、阶段 11 · 03（Structured Outputs）
 **预计时间：** ~75 分钟
 
@@ -215,6 +215,7 @@ Mcp-Name: add
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 cd code
 python3 -m unittest discover tests -v
 ```

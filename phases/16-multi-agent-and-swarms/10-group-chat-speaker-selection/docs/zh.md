@@ -3,7 +3,7 @@
 > 共享对话编排让 N 个 agent 进入同一段对话，再由选择器函数（LLM、轮询或自定义）决定谁接着发言。这是涌现式多 agent 对话的原型：agent 不知道自己在某张静态图里的角色，只对共享池作出反应。AutoGen GroupChat 和 AG2 GroupChat 是参考实现。AutoGen v0.2 的 GroupChat 语义被保留在 AG2 分叉里，AutoGen v0.4 则把它重写成事件驱动的 actor 模型。微软在 2026 年 2 月把 AutoGen 转入维护模式，并把它与 Semantic Kernel 合并进 Microsoft Agent Framework（RC 2026 年 2 月）。GroupChat 原语在 AG2 与 Microsoft Agent Framework 中都保留了下来，学一次即可迁移使用。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 04（原语模型）
 **预计时间：** ~60 分钟
 
@@ -104,6 +104,7 @@ swarm-speaker
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 ## 实际使用

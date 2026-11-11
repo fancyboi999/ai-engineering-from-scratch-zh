@@ -3,7 +3,7 @@
 > AI 安全中心（CAIS，旧金山，2022 年由 Dan Hendrycks 和 Oliver Zhang 创立）发布了四风险框架——恶意使用、AI 竞赛、组织性风险、失控 AI——以及 2023 年 5 月那份由数百名教授和企业领袖签署的关于灭绝风险的声明。CAIS 2026 年的发布：用于前沿模型评估的 AI Dashboard、Remote Labor Index（与 Scale AI 合作）、超级智能战略论文（Superintelligence Strategy Paper）、AI Frontiers 通讯。一个不同的实体：NIST 的 AI 标准与创新中心（CAISI）——面向美国政府的自愿协议和聚焦网络、生物、化学武器风险的非密级能力评估。CAIS 把组织性风险列为四个顶级风险之一：安全文化、严格审计、多层防御和信息安全是根基，但常常被拿来跟部署速度做取舍。加州 SB-53 一旦签署，将是美国第一项州级的灾难性风险监管。
 
 **类型：** Learn
-**语言：** Python（标准库，四风险清单与缓解匹配器）
+**语言：** Python（标准库，四风险清单与缓解匹配器）、TypeScript
 **前置要求：** 阶段 15 · 19（RSP），阶段 15 · 20（PF + FSF）
 **预计时间：** ~45 分钟
 

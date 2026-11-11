@@ -3,7 +3,7 @@
 > A2C 每个 rollout 更新一次后就扔掉。PPO 把策略梯度裹进一个裁剪过的重要性比率里，让你能在同一份数据上做 10+ 轮而不让策略爆掉。Schulman 等人（2017）。直到 2026 年仍是默认的策略梯度算法。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 9 · 06（REINFORCE）、Phase 9 · 07（Actor-Critic）
 **预计时间：** ~75 分钟
 

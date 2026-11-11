@@ -3,7 +3,7 @@
 > 一个 agent 调用五个工具、三个 MCP server 和两个子 agent。你需要贯穿这一切的一条 trace。OpenTelemetry GenAI 语义约定（属性自 v1.37 起稳定）是 2026 年的标准，被 Datadog、Langfuse、Arize Phoenix、OpenLLMetry 和 AgentOps 原生支持。本课点名必需属性、走一遍 span 层级（agent → LLM → tool），并交付一个能接进任意 OTel exporter 的标准库 span 发射器。
 
 **类型：** Build
-**语言：** Python（标准库，OTel span 发射器）
+**语言：** Python（标准库，OTel span 发射器）、TypeScript
 **前置要求：** 阶段 13 · 07（MCP server）、阶段 13 · 08（MCP client）
 **预计时间：** ~75 分钟
 

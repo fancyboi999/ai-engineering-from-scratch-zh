@@ -3,7 +3,7 @@
 > 聊天历史是易失的。仓库是持久的。工作台把 agent 状态存进有版本的文件，于是下个会话、下个 agent、下个审查者都从同一个真相源读取。
 
 **类型：** Build
-**语言：** Python（标准库 + 可选 `jsonschema`）
+**语言：** Python（标准库 + 可选 `jsonschema`）、TypeScript
 **前置要求：** 阶段 14 · 32（最小工作台）
 **预计时间：** ~60 分钟
 
@@ -81,6 +81,7 @@ wb-state-persist
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 脚本写 `workdir/agent_state.json` 和 `workdir/task_board.json`，跨两轮变更它们，并在每一步打印校验后的状态。

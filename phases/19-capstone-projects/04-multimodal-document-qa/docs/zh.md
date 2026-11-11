@@ -3,7 +3,7 @@
 > 2026 年文档问答的前沿，从“先 OCR 再处理文本”转向了视觉优先的后期交互（late interaction）。ColPali、ColQwen2.5、ColQwen3-omni 把每一页 PDF 当成图像，用多向量后期交互做 embedding，让查询直接对 patch 做注意力。在财务 10-K、科学论文、手写笔记上，这套范式大幅领先于 OCR 优先。在 1 万页上端到端搭出这条流水线，再发一份跟“先 OCR 再处理文本”并排对比的报告。
 
 **类型：** Capstone
-**语言：** Python（流水线）、TypeScript（查看器 UI）
+**语言：** Python（流水线）、TypeScript（查看器 UI、检索脚手架）
 **前置要求：** 第 4 阶段（计算机视觉）、第 5 阶段（NLP）、第 7 阶段（transformer）、第 11 阶段（LLM 工程）、第 12 阶段（多模态）、第 17 阶段（基础设施）
 **涉及阶段：** P4 · P5 · P7 · P11 · P12 · P17
 **预计时间：** 30 小时

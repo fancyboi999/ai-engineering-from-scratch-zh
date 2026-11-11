@@ -3,7 +3,7 @@
 > ELIZA 用模式匹配回复。DialogFlow 映射意图。GPT 从权重里答题。Claude 跑工具并核验。每个时代都解决了上一个时代最显眼的失败。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 13（问答）、Phase 5 · 14（信息检索）
 **预计时间：** ~75 分钟
 

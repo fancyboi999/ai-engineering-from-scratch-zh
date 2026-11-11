@@ -3,7 +3,7 @@
 > 2026 年，Harvey、Glean、Mendable、LlamaCloud 都跑着同一套生产形态。用 docling 或 Unstructured 摄入、视觉内容用 ColPali。混合搜索。用 bge-reranker-v2-gemma 重排。用带 prompt caching、命中率 60-80% 的 Claude Sonnet 4.7 合成。用 Llama Guard 4 和 NeMo Guardrails 把关。用 Langfuse 和 Phoenix 盯着。用 RAGAS 在 200 问金标准集上打分。在一个受监管领域（法律、临床、保险）里做一个出来，这个顶点项目就是通过金标准集、红队，以及漂移看板。
 
 **类型：** Capstone
-**语言：** Python（流水线 + API）、TypeScript（聊天 UI）
+**语言：** Python（流水线 + API）、TypeScript（聊天 UI、流水线脚手架）
 **前置要求：** 第 5 阶段（NLP）、第 7 阶段（transformer）、第 11 阶段（LLM 工程）、第 12 阶段（多模态）、第 17 阶段（基础设施）、第 18 阶段（安全）
 **涉及阶段：** P5 · P7 · P11 · P12 · P17 · P18
 **预计时间：** 30 小时

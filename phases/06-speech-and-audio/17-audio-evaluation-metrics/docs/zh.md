@@ -3,7 +3,7 @@
 > 测不了的东西你就交付不了。这一课给每个音频任务点名 2026 年的指标：ASR（WER、CER、RTFx）、TTS（MOS、UTMOS、SECS、ASR 往返 WER）、音频-语言（MMAU、LongAudioBench）、音乐（FAD、CLAP）、说话人（EER）。还有你拿来对比的那些排行榜。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 6 · 04、06、07、09、10；阶段 2 · 09（模型评估）
 **预计时间：** ~60 分钟
 

@@ -3,7 +3,7 @@
 > 五款工具读取同一目标文件，对一个 switch 给出四种地址、三种块计数、两种答案。本课构建测试程序，分清这些差异。
 
 **类型：** Build
-**语言：** Python、C、x86-64 汇编、Java（一份 Ghidra 脚本）
+**语言：** Python、TypeScript、C、x86-64 汇编、Java（一份 Ghidra 脚本）
 **前置要求：** 阶段 13 · 32（从零读取 ELF）、阶段 13 · 33（反汇编与控制流）、阶段 13 · 34（提升为伪代码）
 **预计时间：** 约 150 分钟
 
@@ -342,6 +342,7 @@ rizin 自身无反编译器，捕获也记录 pdc 不存在。本课无法捕获
 ```bash
 cd phases/13-tools-and-protocols/37-the-reverse-engineering-landscape
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出一份 JSON。开头列捕获时工具版本和本机可用工具（可能全部缺失）；随后逐目标给出符号范围、填充、各工具基址、发现或杜撰的函数起点，并逐函数比较指令起点、块数、边数和缺边。最后给每工具字节核算、工具原注、自然语言发现及 IR 部分：三条指令的翻译器输出与捕获提升的计数。
@@ -472,6 +473,7 @@ report["functionStarts"]["angr"]
 ```bash
 cd phases/13-tools-and-protocols/37-the-reverse-engineering-landscape
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

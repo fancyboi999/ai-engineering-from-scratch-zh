@@ -3,7 +3,7 @@
 > 生产级的长程 agent 不靠 `while True` 跑。每一次 LLM 调用都变成一个带 checkpoint、重试和重放的 activity。Temporal 的 OpenAI Agents SDK 集成在 2026 年 3 月 GA。Claude Code Routines（Anthropic）在没有一个常驻本地进程的情况下跑定时的 Claude Code 调用。会话在等待人类输入时暂停、在部署中存活，并从以 `thread_id` 为键的最新 checkpoint 恢复。这套新的工效背后坐着一个老模式——工作流编排——只多了一个新输入：把 LLM 调用当作必须在恢复时被确定性重放的非确定性 activity。
 
 **类型：** Learn
-**语言：** Python（标准库，最小持久化执行状态机）
+**语言：** Python（标准库，最小持久化执行状态机）、TypeScript
 **前置要求：** 阶段 15 · 10（权限模式），阶段 15 · 01（长程 agent）
 **预计时间：** ~60 分钟
 

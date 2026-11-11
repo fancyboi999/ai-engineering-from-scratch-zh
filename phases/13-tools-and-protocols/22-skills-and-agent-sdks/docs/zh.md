@@ -3,7 +3,7 @@
 > Skill 不是换了更好文件名的长 prompt。它是由指令、资源和可执行辅助工具组成的可发现包，通过运行时契约进入 agent 上下文。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 第 13 阶段 · 01（工具接口），第 13 阶段 · 05（工具 Schema 设计）
 **预计时间：** 约 90 分钟
 
@@ -334,6 +334,7 @@ If that skill is unavailable, stop and report the missing dependency.
 cd "$(git rev-parse --show-toplevel)"
 cd phases/13-tools-and-protocols/22-skills-and-agent-sdks
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

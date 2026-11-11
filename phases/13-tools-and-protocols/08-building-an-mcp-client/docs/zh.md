@@ -3,7 +3,7 @@
 > 现代 MCP client 在每条请求中重复自己的契约。它最棘手的兼容性决定，是分清旧 server 真正过时的情形，与现代 server 正在报告可纠正 error 的情形。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13，第 07 课
 **预计时间：** 约 85 分钟
 
@@ -178,6 +178,7 @@ tp-client-merge
 ```bash
 cd code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

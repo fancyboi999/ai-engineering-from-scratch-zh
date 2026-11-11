@@ -3,7 +3,7 @@
 > SWE-bench Verified 在不到三年里从 4% 涨到了 80.9%。同一个 Claude Sonnet 4.5，在 SWE-agent v1 上得 43.2%，在 Cline autonomous 上得 59.8%——模型外围的脚手架如今跟模型本身一样要紧。OpenHands（前身是 OpenDevin）是活跃度最高的 MIT 许可平台，它的 CodeAct 循环直接在沙箱里执行 Python 动作，而不是 JSON 工具调用。这些头条数字掩盖了一个方法学问题：SWE-bench Verified 500 个任务里有 161 个只需改 1-2 行，而 SWE-bench Pro（10+ 行的任务）上同样这批前沿模型只落在 23-59%。
 
 **类型：** Learn
-**语言：** Python（标准库，CodeAct vs JSON 工具调用对比）
+**语言：** Python、TypeScript（标准库，CodeAct vs JSON 工具调用对比）
 **前置要求：** 阶段 14 · 07（工具使用），阶段 15 · 01（长程 agent）
 **预计时间：** ~45 分钟
 

@@ -3,7 +3,7 @@
 > Skill 可以建议一项操作。只有宿主可以授权，只有隔离边界能够约束，只有验证才能判断它是否成功。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 13 · 25（Skill 调用与路由）、阶段 13 · 15（MCP 安全 I）
 **预计时间：** 约 120 分钟
 
@@ -288,6 +288,7 @@ skill-approval-decision
 cd "$(git rev-parse --show-toplevel)"
 cd phases/13-tools-and-protocols/26-skill-permissions-sandboxes-and-trust
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

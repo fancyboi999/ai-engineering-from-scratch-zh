@@ -3,7 +3,7 @@
 > 没有 observability 的 agent harness，就是一个花钱的黑盒。这节课手搓一个 span builder：它产出的记录符合 OpenTelemetry GenAI semantic conventions，把 span 逐行写入 JSONL 文件，并同时暴露 Prometheus 文本格式的 counter 与 histogram。整个实现只用 Python stdlib，离线可跑。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、TypeScript
 **前置要求：** 第 19 阶段 · 25（verification gates），第 19 阶段 · 26（sandbox），第 19 阶段 · 27（eval harness），第 13 阶段 · 20（OpenTelemetry GenAI），第 14 阶段 · 23（OTel GenAI conventions）
 **预计时间：** ~90 分钟
 
@@ -96,6 +96,7 @@ GenAI conventions 在规范中仍标记为 Development，而且已经改过属�
 ```bash
 cd phases/19-capstone-projects/28-observability-otel-traces
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m pytest code/tests/ -v
 ```
 

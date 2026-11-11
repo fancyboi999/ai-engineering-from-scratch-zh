@@ -3,7 +3,7 @@
 > 需求不会等在会议里被收集。它们散落在行动、变通做法、记录和分歧之中。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 47 课
 **预计时间：** ~70 分钟
 
@@ -82,6 +82,7 @@ AI 功能常在交接和例外处失败，因为只塑造了 happy path。
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

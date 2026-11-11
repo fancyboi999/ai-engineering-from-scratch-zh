@@ -3,7 +3,7 @@
 > Word2Vec 给每个词训一个 embedding。GloVe 直接分解共现矩阵。FastText 嵌入词的零件。BPE 搭起了通往 transformer 的桥。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 03（从零实现 Word2Vec）
 **预计时间：** ~45 分钟
 

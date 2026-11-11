@@ -3,7 +3,7 @@
 > MCP 2026-07-28 不推荐为新设计使用 Sampling，并移除了 server-to-client request channel。若现有 workflow 仍需 client 的 model，server 返回 `input_required` result，client 携带 model output 重试原始 request。推理 loop 在协议层变得显式、有界且无状态。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 07（MCP server），阶段 13 · 10（resources 与 prompts）
 **预计时间：** 约 75 分钟
 
@@ -210,6 +210,7 @@ fake host model 让示例保持确定性。连接真实 host 时只替换 `fake_
 ```bash
 cd phases/13-tools-and-protocols/11-mcp-sampling/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

@@ -3,7 +3,7 @@
 > MCP 无状态并不代表每个操作都必须在一次请求内完成。官方 Tasks 扩展为长时间工作提供显式、持久的句柄。server 可从 `tools/call` 返回该句柄，任何实例都能回答 `tasks/get`，client 通过 `tasks/update` 提供输入，无需复活协议会话。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 09（传输）、阶段 13 · 11（无状态 MRTR）、阶段 13 · 12（信息征询）
 **预计时间：** ~90 分钟
 
@@ -413,6 +413,7 @@ worker 显式推进，而非在 background thread 中 sleep。这样每次状态
 ```bash
 cd phases/13-tools-and-protocols/13-mcp-async-tasks/code
 python3 main.py
+npx tsx main.ts
 python3 -m unittest discover tests -v
 ```
 

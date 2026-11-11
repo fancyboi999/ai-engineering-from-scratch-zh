@@ -3,7 +3,7 @@
 > 一段 1 小时、24 FPS 的 4K 视频，切 patch 并嵌入后，产出量级在 6000 万 token。一集 2 小时播客转录是 3 万 token。一部完整的蓝光电影，即便用激进池化压过，也是数十万 token。Google 的 Gemini 1.5（2024 年 3 月）以 1000 万 token 上下文开启了这个时代，能对一小时长的视频做可靠的大海捞针式召回。LWM（Liu 等人，2024 年 2 月）展示了 ring attention 的缩放路径。LongVILA 和 Video-XL 进一步放大了摄入。VideoAgent 用 agent 式检索换掉了原始上下文。每种路线在算力、召回和工程复杂度上都是不同的取舍。本节课把它们并排来读。
 
 **类型：** Build
-**语言：** Python（标准库，大海捞针模拟器 + agent 式检索路由器）
+**语言：** Python（标准库，大海捞针模拟器 + agent 式检索路由器）、TypeScript
 **前置要求：** Phase 12 · 17（视频时间 token）
 **预计时间：** ~180 分钟
 

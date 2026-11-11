@@ -3,7 +3,7 @@
 > 边缘的核心约束是内存带宽，不是算力。移动 DRAM 在 50-90 GB/s；数据中心 HBM3 越过 2-3 TB/s —— 30-50 倍的差距。Decode 受内存限制，所以这差距是决定性的。2026 年版图分成四块。Apple M4/A18 Neural Engine 峰值 38 TOPS，带统一内存（无 CPU↔NPU 拷贝）。Qualcomm Snapdragon X Elite / 8 Gen 4 Hexagon 达到 45 TOPS。WebGPU + WebLLM 在 M3 Max 上以约 41 tok/s 跑 Llama 3.1 8B（Q4）（大约是原生的 70-80%）；17.6k GitHub star，OpenAI 兼容 API，约 70-75% 移动端覆盖。NVIDIA Jetson Orin Nano Super（8GB）装得下 Llama 3.2 3B / Phi-3；AGX Orin 通过 vLLM 以约 40 tok/s 跑 gpt-oss-20b；Jetson T4000（JetPack 7.1）是 AGX Orin 的 2 倍。TensorRT Edge-LLM 支持 EAGLE-3、NVFP4、chunked prefill —— 由 Bosch、ThunderSoft、MediaTek 在 CES 2026 上展示。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级带宽受限 decode 模拟器）
+**语言：** Python、TypeScript（标准库，一个玩具级带宽受限 decode 模拟器）
 **前置要求：** 阶段 17 · 04（推理服务引擎内部机制）、阶段 17 · 09（生产量化）
 **预计时间：** ~60 分钟
 

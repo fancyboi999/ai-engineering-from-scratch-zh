@@ -3,7 +3,7 @@
 > Chameleon 和 Emu3 把全部赌注押在离散 token 上。它们能work，但量化瓶颈是看得见的——图像质量在连续空间扩散模型之下平台化。Transfusion（Meta，Zhou 等人，2024 年 8 月）下了反方向的赌注：让图像保持连续，彻底扔掉 VQ-VAE，用两个损失训一个 transformer。文本 token 走下一 token 预测。图像 patch 走 flow-matching / 扩散损失。两个目标优化同一套权重。Stable Diffusion 3 底层的架构（MMDiT）是它的近亲。本节课通读 Transfusion 论点，搭一个玩具级双损失训练器，并追踪那个让一个 transformer 同时干两份活的注意力掩码。
 
 **类型：** Build
-**语言：** Python（标准库，MNIST 规模玩具上的双损失训练器）
+**语言：** Python、TypeScript（标准库，MNIST 规模玩具上的双损失训练器）
 **前置要求：** Phase 12 · 11（Chameleon）、Phase 8（生成式 AI）
 **预计时间：** ~180 分钟
 

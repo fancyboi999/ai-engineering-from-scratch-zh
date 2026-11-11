@@ -3,7 +3,7 @@
 > 多 agent 协调的强化学习血脉，到 2026 年仍在影响 LLM-agent 系统。**MADDPG**（Lowe 等人，NeurIPS 2017，arXiv:1706.02275）引入了集中训练、分散执行（Centralized Training, Decentralized Execution，CTDE）：训练时每个 critic 看到所有 agent 的状态和动作；测试时只跑本地 actor。适用于合作、竞争、混合场景。**QMIX**（Rashid 等人，ICML 2018，arXiv:1803.11485）是带单调混合网络的价值分解；每个 agent 的 Q 组合成联合 Q，所以 `argmax` 能干净地分散——在星际争霸多 agent 挑战赛（SMAC）上占优。**MAPPO**（Yu 等人，NeurIPS 2022，arXiv:2103.01955）是带集中价值函数的 PPO；在 particle-world、SMAC、Google Research Football、Hanabi 上「出人意料地有效」，且几乎不用调参。这些支撑着「必须分散行动的 agent 团队」的策略训练。MAPPO 是 **2026 年默认的合作式 MARL 基线**。本课从一个小网格世界玩具构建每一个，让这三个想法在你碰 LLM-agent 训练之前就长进肌肉记忆里。
 
 **类型：** Learn
-**语言：** Python（标准库，不用 NumPy 的小实现）
+**语言：** Python（标准库，不用 NumPy 的小实现）、TypeScript
 **前置要求：** Phase 09（强化学习）、Phase 16 · 09（并行 Swarm 网络）
 **预计时间：** ~90 分钟
 
@@ -117,6 +117,7 @@ sw-ctde
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：独立 agent 平均约 6 步；CTDE 变体收敛到约 3.5 步（4x4 网格的最优是 3）。尽管是脚本化策略，模式差异仍然显现。

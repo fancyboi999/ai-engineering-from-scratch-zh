@@ -3,7 +3,7 @@
 > 先数数，再思考。在定义清晰的任务上，到 2026 年 TF-IDF 仍然能打赢 embedding。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 01（文本处理）、Phase 2 · 02（从零实现线性回归）
 **预计时间：** ~75 分钟
 

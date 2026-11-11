@@ -3,7 +3,7 @@
 > Gallegos、Rossi、Barrow、Tanjim、Kim、Dernoncourt、Yu、Zhang、Ahmed（Computational Linguistics 2024, arXiv:2309.00770）。这篇 2024 年的奠基性综述把表征性危害（刻板印象、抹除）与分配性危害（资源分配不均）区分开，并把评估指标归类为基于嵌入、基于概率、或基于生成文本。2024-2025 的实证：An et al.（PNAS Nexus, 2025 年 3 月）在 GPT-3.5 Turbo、GPT-4o、Gemini 1.5 Flash、Claude 3.5 Sonnet、Llama 3-70B 上，针对 20 个入门级岗位的自动化简历评估，测量交叉的「性别 x 种族」偏见。WinoIdentity（COLM 2025, arXiv:2508.07111）为交叉身份引入基于不确定性的公平评估。Yu & Ananiadou 2025 在 MLP 层里识别出「性别神经元」；Ahsan & Wallace 2025 用 SAE 揭示临床种族偏见；Zhou et al. 2024（UniBias）操纵注意力头来去偏。元批评（arXiv:2508.11067）：十年文献过度聚焦于二元性别偏见。
 
 **类型：** Build
-**语言：** Python（标准库，玩具级基于嵌入的偏见探针）
+**语言：** Python、TypeScript（标准库，玩具级基于嵌入的偏见探针）
 **前置要求：** 阶段 05（词嵌入）、阶段 18 · 01（遵循指令）
 **预计时间：** ~60 分钟
 

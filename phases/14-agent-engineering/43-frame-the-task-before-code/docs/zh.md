@@ -3,7 +3,7 @@
 > 编码 agent 能很快完成清晰的任务，也能很快完成不清晰的任务。速度相同，代价不同。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 31 和 36 课
 **预计时间：** ~60 分钟
 
@@ -93,6 +93,7 @@ agent 应继续处理可发现和已委托的未知项。在某个选择被埋�
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

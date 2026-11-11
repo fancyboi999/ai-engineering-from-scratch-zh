@@ -3,7 +3,7 @@
 > Transport 负责承载 MCP 消息，不会补充缺失的协议状态。在 `2026-07-28` 中，本地 stdio 和远程 Streamable HTTP 都承载自描述请求。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13，第 07 和 08 课
 **预计时间：** 约 65 分钟
 
@@ -189,6 +189,7 @@ tp-transport-handshake
 ```bash
 cd code
 python3 main.py --probe
+npx tsx main.ts --probe
 python3 -m unittest discover tests -v
 ```
 

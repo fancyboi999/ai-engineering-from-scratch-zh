@@ -3,7 +3,7 @@
 > BAAI 的 Emu3（Wang 等人，2024 年 9 月）是那个本该终结扩散 vs 自回归之争的 2024 年成果。单个 Llama 式的纯解码器 transformer，只用下一 token 预测目标训练，跨一个统一词表（文本 + VQ 图像 token + 3D VQ 视频 token），在图像生成上击败 SDXL，在感知上击败 LLaVA-1.6。没有 CLIP 损失。没有扩散调度。推理时为质量用了 classifier-free guidance，但核心训练目标是带 teacher forcing 的下一 token 预测。发表在 Nature 上。本节课通读 Emu3 论点——为什么更好的分词器加规模就是你需要的全部——并与扩散路线作对比。
 
 **类型：** Learn
-**语言：** Python（标准库，3D 视频分词器数学 + 自回归采样器骨架）
+**语言：** Python、TypeScript（标准库，3D 视频分词器数学 + 自回归采样器骨架）
 **前置要求：** Phase 12 · 11（Chameleon）
 **预计时间：** ~120 分钟
 

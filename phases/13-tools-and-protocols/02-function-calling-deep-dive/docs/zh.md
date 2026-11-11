@@ -3,7 +3,7 @@
 > 三家前沿 provider 在 2024 年收敛到了同一个工具调用循环上，然后在其他一切上各自发散。OpenAI 用 `tools` 和 `tool_calls`。Anthropic 用 `tool_use` 和 `tool_result` block。Gemini 用 `functionDeclarations` 和唯一 id 关联。本课把三者并排做 diff，让在一家 provider 上跑通的代码，移植时不至于直接崩掉。
 
 **类型：** Build
-**语言：** Python（标准库，schema 翻译器）
+**语言：** Python、TypeScript（标准库，schema 翻译器）
 **前置要求：** 阶段 13 · 01（工具接口）
 **预计时间：** ~75 分钟
 

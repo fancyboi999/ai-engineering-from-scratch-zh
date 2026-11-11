@@ -3,7 +3,7 @@
 > 是三层，不是一层。Karpenter 动态供给节点（不到一分钟，比 Cluster Autoscaler 快 40%）。KAI Scheduler 处理 gang scheduling、拓扑感知和分层队列 —— 它防住"八缺一"的部分分配陷阱：七个节点干等着、烧着钱，就因为缺一块 GPU。应用层自动扩缩器（NVIDIA Dynamo Planner、llm-d Workload Variant Autoscaler）按推理特有的信号扩缩 —— 队列深度、KV cache 利用率 —— 而不是按 CPU/DCGM 占空比。经典的 HPA 陷阱在于 `DCGM_FI_DEV_GPU_UTIL` 是一个占空比测量：100% 可能是 10 个请求，也可能是 100 个。vLLM 预分配 KV cache 内存，所以内存永远不会触发缩容。这一课教你把三层组合起来，并避开 Karpenter 默认的 `WhenEmptyOrUnderutilized` 策略 —— 它会在推理进行到一半时干掉正在跑的 GPU 任务。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级的队列深度自动扩缩模拟器）
+**语言：** Python、TypeScript（标准库，一个玩具级的队列深度自动扩缩模拟器）
 **前置要求：** 阶段 17 · 02（推理平台经济学）、阶段 17 · 04（推理服务引擎内部机制）
 **预计时间：** ~75 分钟
 

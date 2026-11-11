@@ -3,7 +3,7 @@
 > agent 谈判资源、价格、任务分配和条款。2026 年的基准集很清楚：NegotiationArena（arXiv:2402.05863）显示 LLM 能通过人设操纵（「绝望」）把收益提升约 20%；《Measuring Bargaining Abilities》（arXiv:2402.15813）显示买方比卖方难、且规模帮不上忙——它们的 **OG-Narrator**（确定性报价生成器 + LLM 叙述器）把成交率从 26.67% 推到 88.88%；大规模自主谈判竞赛（arXiv:2503.06416）跑了约 18 万场谈判，发现**隐藏思维链**的 agent 靠向对手藏起推理而获胜；Bhattacharya 等人 2025 年用哈佛谈判项目（Harvard Negotiation Project）指标，把 Llama-3 排为最有效、Claude-3 最激进、GPT-4 最公平。本课实现合同网协议（Contract Net Protocol，FIPA 的祖宗，第 02 课）、接上一个 LLM 风格的买/卖方、跑一个 OG-Narrator 风格的拆解、并测量每个结构选择如何改变成交率。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 02（FIPA-ACL 遗产）、Phase 16 · 09（并行 Swarm 网络）
 **预计时间：** ~75 分钟
 
@@ -120,6 +120,7 @@ a5-og-narrator
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：朴素 LLM 成交率约 65-75%；OG-Narrator 成交率约 85-95%；这 15-25 个点的差距就是把报价生成与叙述拆开带来的结构优势。外加一个三竞标者、一个任务的合同网任务市场分配示例。

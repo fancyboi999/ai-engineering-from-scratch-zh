@@ -3,7 +3,7 @@
 > 经典分布式系统 BFT 撞上随机的 LLM。2025-2026 年间出现了三个研究方向：**CP-WBFT**（arXiv:2511.10400）用一个置信度探针给每张票加权；**DecentLLMs**（arXiv:2507.14928）走无领导者路线，worker 并行提案、用几何中位数聚合；**WBFT**（arXiv:2505.05103）把加权投票和层级结构聚类（Hierarchical Structure Clustering）结合，把节点分成 Core 和 Edge。《Can AI Agents Agree?》（arXiv:2603.01213）给出的诚实经验结果是：即便只是标量一致，今天也很脆弱——单个欺骗性 agent 就能搞垮一个 Mixture-of-Agents。BFT 是必要的，但不充分。本课构建一个最小 BFT 协议，注入三种 agent 专属攻击（拜占庭谎言、谄媚从众、相关误差单一栽培），并测量每种共识变体如何应对。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 07（心智社会与辩论）、Phase 16 · 13（共享内存）
 **预计时间：** ~75 分钟
 
@@ -107,6 +107,7 @@ swarm-consensus-wave
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 预期输出：一张 (attack, aggregator) -> 最终答案的表，正确答案高亮。相对多数在单一栽培这一例上失败。CPWBFT 的置信度加权缓解谄媚。当单一栽培不足总体的一半时，DecentLLMs 的几何中位数会拉向诚实簇。

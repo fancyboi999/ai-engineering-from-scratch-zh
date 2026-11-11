@@ -3,7 +3,7 @@
 > 层级式就是嵌套的 supervisor。manager agent 管 sub-manager，sub-manager 管 worker。CrewAI 的 `Process.hierarchical` 是教科书版本：一个 `manager_llm` 动态分派任务、校验输出。它在 LangGraph 里的对应物是 `create_supervisor(create_supervisor(...))`。当任务本身就是一张真实的组织架构图时，这是自然的模式。它也是最容易塌缩成「管理层空转」的模式——manager agent 派活儿派得烂、误读下级输出、或达不成共识。串行往往打得过它。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** Phase 16 · 05（Supervisor 模式）
 **预计时间：** ~60 分钟
 
@@ -85,6 +85,7 @@ swarm-hierarchy-token
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出展示两条路径，并把「问了什么」对「交付了什么」清晰地并排摆出来。

@@ -3,7 +3,7 @@
 > Self-Refine（Madaan 等人，2023）让一个 LLM 在循环里扮演三个角色 —— 生成、反馈、精修。平均收益：7 个任务上绝对值 +20。CRITIC（Gou 等人，2023）通过把验证步骤路由到外部工具来加固反馈环节。2026 年这个模式在每个框架里都以「evaluator-optimizer」（Anthropic）或 guardrail 循环（OpenAI Agents SDK）的形式出现。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 03（Reflexion）
 **预计时间：** ~60 分钟
 
@@ -103,6 +103,7 @@ self-refine
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 对比 Self-Refine 和 CRITIC 两次运行。CRITIC 抓到了一个 Self-Refine 漏掉的事实错误，因为外部验证器有自我批判者所没有的锚定。

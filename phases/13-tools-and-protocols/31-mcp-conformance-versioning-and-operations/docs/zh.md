@@ -3,7 +3,7 @@
 > 某个 SDK 的 happy path 跑通一次，并不代表 server 就一致。真正的一致性存在于线上、版本边界、中间层和回滚期间。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 09（传输）、阶段 13 · 17（网关）、阶段 13 · 30（Registry 准入）
 **预计时间：** 约 100 分钟
 
@@ -265,6 +265,7 @@ release gate 同样拒绝空的 transcript、SDK differential 或 proxy evidence
 ```bash
 cd phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 这个 demo 会运行恰好十五条 golden 和负向转录记录，包括有效和格式错误的 completion 结果；比较原始结果与 SDK 视图；检查折叠了 origin error 的 proxy；评估 health；认证 rollback evidence；并选择该 target。
@@ -395,6 +396,7 @@ compare_sdk_view(
 ```bash
 cd phases/13-tools-and-protocols/31-mcp-conformance-versioning-and-operations
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

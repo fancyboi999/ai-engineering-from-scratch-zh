@@ -3,7 +3,7 @@
 > 一个 8B 级模型，在你自己的数据上训练、用你自己的偏好做 DPO 对齐、量化、推测解码，并以可测量的 $/100 万 token 提供服务。2026 年的开源栈是 Axolotl v0.8、TRL 0.15、迭代用 Unsloth、量化用 GPTQ/AWQ/GGUF、服务用带 EAGLE-3 的 vLLM 0.7。这个顶点项目就是可复现地跑完整条流水线——输入 YAML，输出一个服务端点——并在 2026 Model Openness Framework 下发一张 model card。
 
 **类型：** Capstone
-**语言：** Python（流水线）、YAML（配置）、Bash（脚本）
+**语言：** Python（流水线）、TypeScript、YAML（配置）、Bash（脚本）
 **前置要求：** 第 2 阶段（ML）、第 3 阶段（DL）、第 7 阶段（transformer）、第 10 阶段（从零做 LLM）、第 11 阶段（LLM 工程）、第 17 阶段（基础设施）、第 18 阶段（安全）
 **涉及阶段：** P2 · P3 · P7 · P10 · P11 · P17 · P18
 **预计时间：** 35 小时

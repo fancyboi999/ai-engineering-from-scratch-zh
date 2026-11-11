@@ -3,7 +3,7 @@
 > 翻译是养活了 NLP 研究三十年、如今还在继续养活它的那个任务。
 
 **类型：** Build
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 10（注意力机制）、Phase 5 · 04（GloVe、FastText、子词）
 **预计时间：** ~75 分钟
 

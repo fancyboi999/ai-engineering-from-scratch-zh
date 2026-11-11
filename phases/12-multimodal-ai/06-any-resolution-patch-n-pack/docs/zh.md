@@ -3,7 +3,7 @@
 > 真实图像不是 224x224 的方块。一张收据是 1:3，一张图表是 16:9，一张医学扫描可能是 4096x4096，一张手机截图是 9:19.5。2024 年之前的 VLM 答案——把一切都缩成固定方块——丢掉了让 OCR、文档理解和高分辨率场景解析得以运作的信号。NaViT（Google，2023）证明了你可以用块对角掩码把可变分辨率的 patch 打包进单个 transformer batch。Qwen2-VL 的 M-RoPE（2024）彻底扔掉了绝对位置表。LLaVA-NeXT 的 AnyRes 把高分辨率图切成基础图 + 子图。SigLIP 2 的 NaFlex 变体（2025）如今是那些想用单个 checkpoint 服务所有长宽比的开放 VLM 的默认编码器。本节课从头到尾实现 patch-n'-pack。
 
 **类型：** Build
-**语言：** Python（标准库，patch 打包器 + 块对角掩码）
+**语言：** Python、TypeScript（标准库，patch 打包器 + 块对角掩码）
 **前置要求：** Phase 12 · 01（ViT patch）、Phase 12 · 05（LLaVA）
 **预计时间：** ~120 分钟
 

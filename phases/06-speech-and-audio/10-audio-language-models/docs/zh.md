@@ -3,7 +3,7 @@
 > 2026 年的音频-语言模型能在语音 + 环境声 + 音乐上做推理。Qwen2.5-Omni-7B 在 MMAU-Pro 上追平 GPT-4o Audio。Audio Flamingo Next 在 LongAudioBench 上击败 Gemini 2.5 Pro。开源和闭源之间的差距基本抹平了——除了多音频任务，那上面所有人都接近随机。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 6 · 04（ASR）、阶段 12 · 03（视觉-语言模型）、阶段 7 · 10（音频 Transformer）
 **预计时间：** ~45 分钟
 

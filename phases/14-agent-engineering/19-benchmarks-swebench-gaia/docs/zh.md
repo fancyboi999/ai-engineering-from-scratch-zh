@@ -3,7 +3,7 @@
 > 2026 年有三个基准锚定 agent 评估。SWE-bench 测代码打补丁。GAIA 测通才型工具使用。AgentBench 测多环境推理。要懂它们的构成、它们的污染情况，以及它们没测什么。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 06（工具使用）
 **预计时间：** ~60 分钟
 
@@ -93,6 +93,7 @@ ae-swebench-gate
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出展示每任务、每难度的解决率，并让评估器规则变得具体。

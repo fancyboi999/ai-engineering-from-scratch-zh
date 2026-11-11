@@ -3,7 +3,7 @@
 > 第 01 到 12 课的每样东西都是一条流水线里的一个阶段。本节课是把那些阶段变成一次端到端运行的脚手架：分词、预训练、规模化、SFT、对齐、评估、量化、服务。你不会在笔记本电脑上训练一个 70B 模型。你会产出编排层、manifest、eval 关卡和回滚计划——2026 年的前沿团队用它们来决定什么能交付。这是收官之作。
 
 **类型：** Build
-**语言：** Python（stdlib）
+**语言：** Python（stdlib）、Rust
 **前置要求：** 阶段 10 全部 01-12 课
 **预计时间：** ~120 分钟
 
@@ -216,10 +216,16 @@ beam-search
 
 规范的工作流有三条命令。
 
-```
+```bash
 python code/main.py plan    # validate manifest, compute cost estimate, print DAG
 python code/main.py run     # execute stages, writing to manifest.out.yaml
 python code/main.py gate    # read manifest.out.yaml, apply eval gates, ship-or-hold
+```
+
+Rust 移植版运行同样的 `plan` 步骤：
+
+```bash
+rustc --edition 2021 -O code/main.rs -o /tmp/lesson && /tmp/lesson plan
 ```
 
 每次都先跑 `plan`。大多数流水线 bug 在 plan 时就暴露了——缺失的关卡阈值、过期的哈希、预算超支。跑 `plan` 是免费的。跑 `run` 是昂贵的。在便宜的那一侧抓 bug 来省钱。

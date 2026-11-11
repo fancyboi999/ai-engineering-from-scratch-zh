@@ -3,7 +3,7 @@
 > 2026 年，每个像样的工程组织内部都跑着一套理解含义、而不只是字符串的代码搜索。Sourcegraph Amp、Cursor 的代码库问答、Augment 的企业图谱、Aider 的 repomap、Pinterest 的内部 MCP——同一套形态。摄入很多个仓库，用 tree-sitter 解析，对函数级和类级的 chunk 做 embedding，混合搜索，重排，带引用作答。这个顶点项目要求你做一个能扛住跨 10 个仓库、200 万行代码，并且在每次 git push 时都能挺过增量重建索引的系统。
 
 **类型：** Capstone
-**语言：** Python（摄入）、TypeScript（API + UI）
+**语言：** Python（摄入）、TypeScript（API + UI、检索脚手架）
 **前置要求：** 第 5 阶段（NLP 基础）、第 7 阶段（transformer）、第 11 阶段（LLM 工程）、第 13 阶段（工具）、第 17 阶段（基础设施）
 **涉及阶段：** P5 · P7 · P11 · P13 · P17
 **预计时间：** 30 小时

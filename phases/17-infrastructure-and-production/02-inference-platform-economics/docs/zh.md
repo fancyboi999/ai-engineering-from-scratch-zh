@@ -3,7 +3,7 @@
 > 2026 年的推理市场已经不再是租 GPU 时间。它分化成三块：定制芯片（Groq、Cerebras、SambaNova）、GPU 平台（Baseten、Together、Fireworks、Modal）和 API 优先的市场（Replicate、DeepInfra）。Fireworks 在 2026 年 5 月 1 日把每 GPU 每小时的价格涨了 1 美元，而 40 亿美元估值、每天 10T+ token 的处理量告诉你：靠走量的模式行得通。Baseten 在 2026 年 1 月以 50 亿美元估值完成了 3 亿美元的 E 轮。竞争定位的规律很简单：Fireworks 优化延迟，Together 优化目录广度，Baseten 优化企业级打磨，Modal 优化 Python 原生开发体验，Replicate 优化多模态覆盖，Anyscale 优化分布式 Python。这一课给你一张能直接递给创始人的对比矩阵。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级的单次调用经济账对比器）
+**语言：** Python、TypeScript（标准库，一个玩具级的单次调用经济账对比器）
 **前置要求：** 阶段 17 · 01（托管 LLM 平台）、阶段 17 · 04（推理服务引擎内部机制）
 **预计时间：** ~60 分钟
 

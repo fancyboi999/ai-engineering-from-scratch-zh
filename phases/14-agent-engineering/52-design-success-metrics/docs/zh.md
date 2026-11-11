@@ -3,7 +3,7 @@
 > 测量应回答一个决定，而不是装饰仪表盘。从目标开始，推导问题，再选择能回答它们的最小指标集。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 第 47 和 51 课
 **预计时间：** ~70 分钟
 
@@ -85,6 +85,7 @@ flowchart LR
 
 ```bash
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

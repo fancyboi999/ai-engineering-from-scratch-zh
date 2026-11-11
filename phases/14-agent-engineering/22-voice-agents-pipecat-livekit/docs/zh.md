@@ -3,7 +3,7 @@
 > 语音 agent 在 2026 年是一等的生产类别。Pipecat 给你一条 Python 的、基于帧的流水线（VAD → STT → LLM → TTS → 传输）。LiveKit Agents 通过 WebRTC 把 AI 模型桥接给用户。高端技术栈的生产延迟目标落在端到端 450–600ms。
 
 **类型：** Learn
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 12（工作流模式）
 **预计时间：** ~60 分钟
 
@@ -89,6 +89,7 @@ voice-pipeline
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示正常流程，以及一次在话语中途停掉 TTS 的插话取消。

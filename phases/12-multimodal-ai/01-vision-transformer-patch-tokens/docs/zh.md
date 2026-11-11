@@ -3,7 +3,7 @@
 > 在一切多模态之前，图像必须先变成一串 transformer 吃得下的 token。2020 年的 ViT 论文给出的答案是：16x16 像素的 patch、一次线性投影、一个位置嵌入。五年过去，每一个 2026 年的前沿模型（原生 2576px 的 Claude Opus 4.7、Gemini 3.1 Pro、Qwen3.5-Omni）仍然从这里起步——编码器从 ViT 换成 DINOv2 再换成 SigLIP 2，加进了 register token，位置方案变成了 2D-RoPE，但这个原语始终没变。本节课从头到尾通读 patch-token 流水线，并用纯标准库 Python 把它搭出来，好让 Phase 12 剩下的内容对"视觉 token"有一个具体的心智模型。
 
 **类型：** Learn
-**语言：** Python（标准库，patch 分词器 + 几何计算器）
+**语言：** Python、TypeScript（标准库，patch 分词器 + 几何计算器）
 **前置要求：** Phase 7（Transformers）、Phase 4（计算机视觉）
 **预计时间：** ~120 分钟
 

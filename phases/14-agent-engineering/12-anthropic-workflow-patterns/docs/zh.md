@@ -3,7 +3,7 @@
 > Schluntz 和 Zhang（Anthropic，2024 年 12 月）把工作流（预定义路径）和 agent（动态工具使用）区分开。五种工作流模式覆盖大多数情形。先从直接 API 调用开始。只在步骤无法预测时才加 agent。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）
 **预计时间：** ~60 分钟
 
@@ -77,6 +77,7 @@ workflow-chain
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 每个模式打印自己的轨迹。每个模式的代码总量约 10-15 行；一个框架的成本是以千行计的。

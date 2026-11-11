@@ -3,7 +3,7 @@
 > ReAct 在一条流里交替进行思考和行动。ReWOO 把它们分开：先来一个大计划，然后执行。token 少 5 倍，HotpotQA 上准确率 +4%，而且你还能把规划器蒸馏进一个 7B 模型。Plan-and-Execute 把它一般化了；Plan-and-Act 把它扩展到了网页导航。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）
 **预计时间：** ~60 分钟
 
@@ -85,6 +85,7 @@ rewoo-plan
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹先展示完整计划，然后是 worker 结果，再然后是 solver 组合。把 token 数（我们打印了一个粗略的字符数）和一次 ReAct 式交替运行做对比 —— 在这种结构化任务上 ReWOO 胜出。

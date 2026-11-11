@@ -3,7 +3,7 @@
 > 引擎选型取决于硬件、规模和生态，而不是照着排行榜抄答案。2026 年主导自托管推理的是 llama.cpp、Ollama、vLLM 和 SGLang，TGI 则落在维护模式之后。**llama.cpp** 在 CPU 上最快，模型支持最广，也能完全掌控量化和线程。**Ollama** 是开发笔记本上的一条命令安装，比 llama.cpp 慢约 15-30%（Go + CGo + HTTP 序列化），在类生产负载下吞吐可差 3 倍。**TGI 于 2025 年 12 月 11 日进入维护模式**，只修 bug，裸吞吐比 vLLM 慢约 10%，但历来可观测性和 HF 生态集成出色；长期采用风险使 SGLang 或 vLLM 成为新项目更稳妥的默认。**vLLM** 是通用生产默认，v0.15.1（2026 年 2 月）增加了 PyTorch 2.10、RTX Blackwell SM120 和 H200 优化。**SGLang** 擅长 agentic 多轮与前缀密集负载，已在生产中部署于 400,000+ 块 GPU。硬件约束：CPU 优先时选 llama.cpp；AMD / 非 NVIDIA 环境中，vLLM 是支持最强的路径，TRT-LLM 则锁定 NVIDIA。2026 年常见流水线是开发用 Ollama、预发用 llama.cpp、生产用 vLLM 或 SGLang。注意各引擎采用不同权重格式：llama.cpp 系列使用 GGUF，GPU 引擎使用 HF safetensors，阶段之间可能需要格式转换。
 
 **类型：** Learn
-**语言：** Python（标准库，引擎决策树遍历器）
+**语言：** Python、TypeScript（标准库，引擎决策树遍历器）
 **前置要求：** 阶段 17 里所有讲引擎的课（04、06、07、09、18）
 **预计时间：** ~45 分钟
 

@@ -3,7 +3,7 @@
 > 反汇编显示函数读取哪些寄存器，只有 ABI 说明这些寄存器的含义。ABI 由目标文件头决定，所以先读头，再逐个核对寄存器背后的规则。
 
 **类型：** Build
-**语言：** Python、C、x86-64 与 AArch64 汇编
+**语言：** Python、TypeScript、C、x86-64 与 AArch64 汇编
 **前置要求：** 阶段 13 · 32（从零读取 ELF）、阶段 13 · 33（反汇编与控制流）
 **预计时间：** 约 140 分钟
 
@@ -195,6 +195,7 @@ CFA 是调用前 SP，比入口 SP 高八字节，因此 RBP -16 对应入口 -8
 ```bash
 cd phases/13-tools-and-protocols/38-calling-conventions-and-stack-frames
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出 JSON，逐个列七目标的格式、机器、ABI，再逐个列十二函数的序言字节、保存寄存器及入口偏移、帧大小、帧指针、参数寄存器、栈参数偏移、溢出存储、返回寄存器/隐含指针、调用深度、调用者输出寄存器和存储。每函数最后列规则、源码签名预期、字节观察值及是否一致。报告末尾为两类展开交叉核验及工具捕获。84 项函数分析共有 489 个检查，全部一致。
@@ -331,6 +332,7 @@ for row in eh_frame_cross_check("convention-x86_64-linux-O2-eh"):
 ```bash
 cd phases/13-tools-and-protocols/38-calling-conventions-and-stack-frames
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

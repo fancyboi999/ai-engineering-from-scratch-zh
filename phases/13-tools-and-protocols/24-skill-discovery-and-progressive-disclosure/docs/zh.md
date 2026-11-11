@@ -3,7 +3,7 @@
 > Skill 的价值在加载正文之前就已经出现：名称和描述让它进入目录；只有任务走到需要它的地方，深层文件才进入上下文。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 13 · 22（Agent Skills：可移植契约与运行时边界）
 **预计时间：** 约 105 分钟
 
@@ -224,6 +224,7 @@ skill-resource-containment
 cd "$(git rev-parse --show-toplevel)"
 cd phases/13-tools-and-protocols/24-skill-discovery-and-progressive-disclosure
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

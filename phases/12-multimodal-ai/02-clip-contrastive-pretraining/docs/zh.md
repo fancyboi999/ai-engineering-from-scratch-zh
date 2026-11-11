@@ -3,7 +3,7 @@
 > OpenAI 的 CLIP（2021）证明了一个足以撑起后续五年的想法：只用嘈杂的网络图文对加一个对比损失，就能把图像编码器和文本编码器对齐到同一个向量空间。零监督标签。4 亿对。由此得到的嵌入空间能做零样本分类、图文检索，还能作为视觉塔插进每一个 2026 年的 VLM。SigLIP 2（2025）用 sigmoid 换掉 softmax，以更低的成本把规模推过了 CLIP。本节课把从 InfoNCE 到 sigmoid 成对损失的数学走一遍，并用纯标准库 Python 把训练步骤搭出来。
 
 **类型：** Build
-**语言：** Python（标准库，InfoNCE + sigmoid 损失实现）
+**语言：** Python、TypeScript（标准库，InfoNCE + sigmoid 损失实现）
 **前置要求：** Phase 12 · 01（ViT patch）、Phase 7（Transformers）
 **预计时间：** ~180 分钟
 

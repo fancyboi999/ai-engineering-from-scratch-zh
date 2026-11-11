@@ -3,7 +3,7 @@
 > 网关应让每条路由清晰可见。2026-07-28 协议为它划定方法、名称、版本、能力、身份、缓存和追踪边界，无需传输层会话。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 13 · 15（安全）、阶段 13 · 16（授权）
 **预计时间：** ~75 分钟
 
@@ -326,6 +326,7 @@ t3-gateway-funnel
 ```bash
 cd phases/13-tools-and-protocols/17-mcp-gateways-and-registries
 python3 code/main.py
+npx tsx code/main.ts
 PYTHONPATH=code python3 -m unittest discover code/tests -v
 ```
 

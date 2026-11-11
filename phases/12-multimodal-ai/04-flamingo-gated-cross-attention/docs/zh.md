@@ -3,7 +3,7 @@
 > DeepMind 的 Flamingo（2022）抢在所有人前面做了两件事。它证明了单个模型能处理任意交错的图像、视频、文本序列。它还证明了 VLM 能做 in-context 学习——给一个带三个 (图像, caption) 示例的少样本 prompt，模型就能给一张新图配上 caption，一步梯度都不走。机制是：门控交叉注意力层，插在冻结 LLM 已有的层之间，配一个从零起步的可学习 tanh 门，于是 LLM 的文本能力在初始化时被完整保留。本节课走一遍 Flamingo 的 Perceiver resampler 和门控交叉注意力架构——它是 Gemini 交错输入和 Idefics2 视觉 token 的祖先。
 
 **类型：** Learn
-**语言：** Python（标准库，门控交叉注意力 + Perceiver resampler 演示）
+**语言：** Python、TypeScript（标准库，门控交叉注意力 + Perceiver resampler 演示）
 **前置要求：** Phase 12 · 03（BLIP-2 Q-Former）
 **预计时间：** ~120 分钟
 

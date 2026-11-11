@@ -3,7 +3,7 @@
 > 两个想法让记忆扩展到单次对话之外：模型可直接编辑的离散功能性记忆块，以及一个在主 agent 空闲时异步整合记忆的 sleep-time agent。
 
 **类型：** Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 07（MemGPT）
 **预计时间：** ~75 分钟
 
@@ -91,6 +91,7 @@ memory-blocks
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 transcript 展示了这种拆分：主轮次快且产生原始写入；sleep 遍历做压实和清理。

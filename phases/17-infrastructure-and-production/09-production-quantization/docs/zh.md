@@ -3,7 +3,7 @@
 > 量化格式不是一个放之四海皆准的选择 —— 它是硬件、服务引擎和工作负载的函数。GGUF Q4_K_M 或 Q5_K_M 统治 CPU 和边缘，经由 llama.cpp 和 Ollama 交付。当你需要在同一个基座上跑多 LoRA 时，GPTQ 在 vLLM 里胜出。带 Marlin-AWQ kernel 的 AWQ 在一个 7B 量级模型上跑到约 741 tok/s，并在 INT4 上拿到最好的 Pass@1 —— 数据中心生产的 2026 默认选。FP8 在 Hopper、Ada 和 Blackwell 上仍是中间地带 —— 近乎无损且广受支持。NVFP4 和 MXFP4（Blackwell 微缩放）很激进，需要按 block 验证。两个陷阱咬团队：校准数据集必须匹配部署领域，以及 KV cache 和权重量化是分开的 —— "我的模型现在只有 4 GB 了"这条 AWQ 教训忘了生产批大小下那 10-30 GB 的 KV cache。
 
 **类型：** Learn
-**语言：** Python（标准库，跨格式的玩具级内存与吞吐对比）
+**语言：** Python、TypeScript（标准库，跨格式的玩具级内存与吞吐对比）
 **前置要求：** 阶段 10 · 13（量化基础）、阶段 17 · 04（推理服务引擎内部机制）
 **预计时间：** ~75 分钟
 

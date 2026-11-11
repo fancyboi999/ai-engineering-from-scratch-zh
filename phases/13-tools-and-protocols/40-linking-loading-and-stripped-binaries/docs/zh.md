@@ -3,7 +3,7 @@
 > 链接后的程序会调用自身不包含的函数。本课读取链接器为这些调用写入的三种格式的表，沿一次调用追踪到加载器填充的槽，并在构建失去名称后找回其中的函数。
 
 **类型：** Build
-**语言：** Python, C, x86-64 and arm64 assembly
+**语言：** Python, TypeScript, C, x86-64 and arm64 assembly
 **前置要求：** 阶段 13 · 32（从零构建 ELF）、33（反汇编与控制流）、38（调用约定）
 **预计时间：** ~160 分钟
 
@@ -283,6 +283,7 @@ IDA 和 Binary Ninja 闭源，这里依据文档描述。上游本课实验机�
 ```bash
 cd phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 输出是一份含五部分的 JSON 报告。`elf` 保存两个目标文件的重定位计数、链接规划，以及 `tiny-dyn-x86_64` 的动态节、PLT 和 GOT。`coff` 保存两个目标文件的节、重定位、函数和未定义名称。`pe` 保存 `tiny-x86_64.exe` 的头、目录、导入、导出、基址重定位和 IAT 调用。`macho` 保存 `ledger_main` 的桩、链式修正、修正行和导出，`ledger_main_nochain` 的传统布局、dylib，以及两份剥离报告。`identification` 保存 `-O0` 和 `-O2` 的真值、四种方法及其评分，以及签名与冲突。
@@ -412,6 +413,7 @@ match_signatures(sigs, stripped, starts)
 ```bash
 cd phases/13-tools-and-protocols/40-linking-loading-and-stripped-binaries
 python3 code/main.py
+npx tsx code/main.ts
 python3 code/tests/test_main.py
 ```
 

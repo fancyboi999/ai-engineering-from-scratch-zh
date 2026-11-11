@@ -3,7 +3,7 @@
 > LDA：文档是主题的混合，主题是词上的分布。BERTopic：文档在 embedding 空间里聚类，簇就是主题。目标相同，分解方式不同。
 
 **类型：** Learn
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** Phase 5 · 02（BoW + TF-IDF）、Phase 5 · 03（Word2Vec）
 **预计时间：** ~45 分钟
 

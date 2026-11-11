@@ -3,7 +3,7 @@
 > 状态空间模型（SSM）和 transformer 想要不同的东西。Transformer 以二次成本的注意力换质量。SSM 以一个递归换线性时间推理和恒定内存，但质量落后。AI21 的 Jamba（2024 年 3 月）和 Jamba 1.5（2024 年 8 月）把它们放进同一个模型：每 7 个 Mamba 层配 1 个 Transformer 层，每隔一个块用 MoE，以及一个能塞进单张 80GB GPU 的 256k context 窗口。Mamba-3（ICLR 2026）用复值状态空间和 MIMO 投影收紧了 SSM 那一侧。本节课端到端读两个架构，并解释为什么混合配方在纯 SSM 和纯 Transformer 的长 context 尝试都没撑住时，挺过了三年的规模化。
 
 **类型：** Learn
-**语言：** Python（stdlib，层混合计算器）
+**语言：** Python（stdlib，层混合计算器）、Rust
 **前置要求：** 阶段 10 · 14（开放模型架构），阶段 10 · 17（原生稀疏注意力）
 **预计时间：** ~60 分钟
 

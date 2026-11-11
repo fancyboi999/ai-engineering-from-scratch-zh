@@ -3,7 +3,7 @@
 > Khanmigo（Khan Academy）、Duolingo Max、Google LearnLM / Gemini for Education、Quizlet Q-Chat、Synthesis Tutor，全都在 2026 年大规模交付了自适应多模态辅导。共同的形态是：一套苏格拉底式策略（绝不直接甩出答案）、一个每次交互后都更新的学习者模型（贝叶斯知识追踪风格）、语音 + 文本 + 拍照解题的输入、课程图检索、间隔重复排程，以及针对适龄内容的硬性安全过滤。这个顶点项目就是交付一个学科专属的导师（K-12 代数或 Python 入门），用 10 个学习者做一项为期两周的成效研究，并通过一次内容安全审计。
 
 **类型：** Capstone
-**语言：** Python（后端、学习者模型）、TypeScript（web 应用）、SQL（课程图，经 Postgres + Neo4j）
+**语言：** Python（后端、学习者模型）、TypeScript（web 应用、学习者模型脚手架）、SQL（课程图，经 Postgres + Neo4j）
 **前置要求：** 第 5 阶段（NLP）、第 6 阶段（语音）、第 11 阶段（LLM 工程）、第 12 阶段（多模态）、第 14 阶段（agent）、第 17 阶段（基础设施）、第 18 阶段（安全）
 **涉及阶段：** P5 · P6 · P11 · P12 · P14 · P17 · P18
 **预计时间：** 30 小时

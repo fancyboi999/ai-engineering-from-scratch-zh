@@ -3,7 +3,7 @@
 > 一套可以直接导入的 harness：内置工具、用于上下文隔离的子 agent、hook、W3C trace 传播和会话持久化。Claude Agent SDK 是参考实现，也就是 Claude Code harness 的库形态；Claude Managed Agents 则是面向长时异步工作的托管替代品。
 
 **类型：** Learn + Build
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 14 · 01（Agent 循环）、阶段 14 · 10（技能库）
 **预计时间：** ~75 分钟
 
@@ -95,6 +95,7 @@ ae-subagent-isolation
 
 ```
 python3 code/main.py
+npx tsx code/main.ts
 ```
 
 轨迹展示子 agent 的上下文隔离（编排器上下文大小保持有界）、hook 执行和会话持久化。

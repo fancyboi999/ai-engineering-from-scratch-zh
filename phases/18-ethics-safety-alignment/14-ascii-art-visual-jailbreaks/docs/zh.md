@@ -3,7 +3,7 @@
 > Jiang、Xu、Niu、Xiang、Ramasubramanian、Li、Poovendran，"ArtPrompt: ASCII Art-based Jailbreak Attacks against Aligned LLMs"（ACL 2024, arXiv:2402.11753）。把有害请求里安全相关的 token 遮掉，换成同一批字母的 ASCII 艺术渲染，再把这个伪装后的提示发出去。GPT-3.5、GPT-4、Gemini、Claude、Llama-2 都无法稳健地识别 ASCII 艺术 token。这种攻击绕过了 PPL（困惑度过滤）、改写防御、重分词。相关工作：ViTC 基准测量对非语义视觉提示的识别；StructuralSleight 把它推广到「不常见的文本编码结构」（树、图、嵌套 JSON），作为一个编码攻击家族。
 
 **类型：** Build
-**语言：** Python（标准库，ArtPrompt token 遮蔽测试台）
+**语言：** Python、TypeScript（标准库，ArtPrompt token 遮蔽测试台）
 **前置要求：** 阶段 18 · 12（PAIR）、阶段 18 · 13（MSJ）
 **预计时间：** ~60 分钟
 

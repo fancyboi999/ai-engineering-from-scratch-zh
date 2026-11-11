@@ -3,7 +3,7 @@
 > 调用先是权限决策，随后才是相关性决策。好的描述帮助模型选择；好的策略决定是否允许该选择。
 
 **类型：** 动手构建
-**语言：** Python（标准库）
+**语言：** Python（标准库）、TypeScript
 **前置要求：** 阶段 13 · 24（Skill 发现与渐进式披露）
 **预计时间：** 约 105 分钟
 
@@ -258,6 +258,7 @@ skill-host-adapter
 ```bash
 cd phases/13-tools-and-protocols/25-skill-invocation-and-routing
 python3 code/main.py
+npx tsx code/main.ts
 python3 -m unittest discover -s code/tests -v
 ```
 

@@ -3,7 +3,7 @@
 > 模型只是整个系统中的一个组件。系统设计决定了模型预测什么、由谁依据预测采取行动、运行成本几何，以及发生故障时该如何安全兜底。
 
 **类型：** 构建
-**语言：** Python
+**语言：** Python、TypeScript
 **前置要求：** 阶段 2，第 09 课（模型评估）与第 13 课（ML 流水线）
 **预计时间：** ~110 分钟
 
@@ -295,6 +295,7 @@ CheckItem("serving_fit", 1, False, "pick a serving mode that meets the staleness
 
 ```bash
 python3 phases/02-ml-fundamentals/19-ml-system-design/code/main.py
+npx tsx phases/02-ml-fundamentals/19-ml-system-design/code/main.ts
 ```
 
 ```console
@@ -322,6 +323,7 @@ feed ranking, 2-hour freshness
 
 ```bash
 python3 phases/02-ml-fundamentals/19-ml-system-design/code/main.py my_design_doc.json
+npx tsx phases/02-ml-fundamentals/19-ml-system-design/code/main.ts my_design_doc.json
 ```
 
 ## 实际使用

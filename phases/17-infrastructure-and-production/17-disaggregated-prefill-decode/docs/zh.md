@@ -3,7 +3,7 @@
 > Prefill 受计算限制；decode 受内存限制。把两者跑在同一块 GPU 上会浪费其中一种资源。分离（disaggregation）把它们拆到分开的池上，并经由 NIXL（RDMA/InfiniBand 或回退到 TCP）在两者之间传输 KV cache。NVIDIA Dynamo（GTC 2025 发布，1.0 GA）位于 vLLM/SGLang/TRT-LLM 之上 —— 它的 Planner Profiler + SLA Planner 自动按比例匹配 prefill:decode 的配比以满足 SLO。NVIDIA 公布的吞吐增益大致在这个区间 —— developer.nvidia.com（2025-06）显示 DeepSeek-R1 MoE 在 GB200 NVL72 + Dynamo 上、在中等延迟制度下约 6 倍的提升，而 Dynamo 产品页（developer.nvidia.com，无日期）宣传 GB300 NVL72 + Dynamo 相比 Hopper 最高 50 倍的 MoE 吞吐。那个"30x"的数字是跨全栈 Blackwell + Dynamo + DeepSeek-R1 报告的社区聚合；我们没找到一个准确说 30x 的单一一手来源，所以把它当方向性说法。llm-d（Red Hat + AWS）是 Kubernetes 原生的：prefill / decode / 路由器作为独立的 Service，按角色分别配 HPA。llm-d 0.5 加了分层 KV offloading、缓存感知 LoRA 路由、UCCL 网络、缩到零。经济性：对多个客户披露做内部汇总，提示在恒定 SLA 下从同机部署切到带 Dynamo 的分离式，能在 200 万美元级的推理开销上节省 30-40%（即每年 60-80 万美元）；那个具体的 $2M→$600-800K 数字是内部综合，不是单一已发布案例 —— 把它当数量级锚点，不是引用出处。短 prompt（<512 token、短输出）不值得那笔传输成本。
 
 **类型：** Learn
-**语言：** Python（标准库，一个玩具级分离式 vs 同机模拟器）
+**语言：** Python、TypeScript（标准库，一个玩具级分离式 vs 同机模拟器）
 **前置要求：** 阶段 17 · 04（推理服务引擎内部机制）、阶段 17 · 08（推理指标）
 **预计时间：** ~75 分钟
 
