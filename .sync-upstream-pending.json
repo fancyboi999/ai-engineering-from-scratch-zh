@@ -1,7 +1,16 @@
 {
-  "base": "d7b5633f91591ee3bf55c8d80831b515498cc0e6",
-  "target": "1d08d70dd5641abe5217a6dfe1f3cf25a14f77e8",
-  "pending": [],
+  "base": "1d08d70dd5641abe5217a6dfe1f3cf25a14f77e8",
+  "target": "8c09d890956fdef7d75d888aa8efecc16ff3846c",
+  "pending": [
+    {
+      "id": "batch-ports-767-768",
+      "title": "TypeScript/Rust/Julia/Go 课程移植、语言行与运行命令、CI 移植检查（#767, #768）",
+      "upstream": [
+        "690c3bfd3",
+        "9e60f3e76"
+      ]
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -199,6 +208,25 @@
         "site/lesson.html",
         "site/build-agents.js",
         "site/"
+      ]
+    },
+    {
+      "scope": "上游 1d08d70..8c09d89 多语言移植（2026-11-11）",
+      "decision": "433 个新增移植文件按上游原样加入；116 个已有代码文件三方合并，114 个中文仓与基准一致直接取上游，2 个无冲突合并。351 篇 en.md 改动以结构化方式移入 docs/zh.md：语言行追加新语言（顿号分隔，综合项目的 scaffold 说明译为“脚手架”），运行命令行按上下文插入，正文改动（10/02 回退分词正则、15/14 断路器轮次、19/83/85/87 运行说明、10/13 Rust 运行说明）人工翻译；每篇新增围栏与命令行数与上游一致。build.yml 的 lesson-ports 任务按上游加入 Julia、Go 与 Node 22 TypeScript 检查。README 语言列与语言列表、llms 摘要、首页与课程页描述加入 Go。autonomous-agents 速查表 velocity 数值随 15/13 代码改为 0.03；不批量刷新 source_hash，与上游一致，过期提示保留。vllm-serving 保留中文版，不替换为上游模型生成版本。i18n/ 多语言 README 与 audit_readme_locales.py 不适用于中文仓，跳过。",
+      "paths": [
+        "phases/",
+        "README.md",
+        ".github/workflows/build.yml",
+        "site/build.js",
+        "site/index.html",
+        "site/lesson.html",
+        "AGENTS.md",
+        "cheatsheets/autonomous-agents.md",
+        "cheatsheets/vllm-serving.md",
+        "i18n/",
+        "scripts/audit_readme_locales.py",
+        ".github/workflows/curriculum.yml",
+        "site/data.js"
       ]
     }
   ]
