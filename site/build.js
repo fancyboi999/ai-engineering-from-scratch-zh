@@ -2384,7 +2384,7 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
   let total = 0;
   phases.forEach(p => { total += p.lessons.filter(l => lessonPath(l.url)).length; });
   let out = `# AI Engineering from Scratch · 简体中文版\n\n`;
-  out += `> 一套免费、开源的 AI 工程课程，从零亲手实现核心算法——${total} 节课，横跨 ${phases.length} 个阶段，从线性代数到自主 agent。Python、TypeScript、Rust、Julia。\n\n`;
+  out += `> 一套免费、开源的 AI 工程课程，从零亲手实现核心算法——${total} 节课，横跨 ${phases.length} 个阶段，从线性代数到自主 agent。Python、TypeScript、Rust、Julia、Go。\n\n`;
   out += `Canonical site: ${SITE_ORIGIN}\n`;
   out += `Source: https://github.com/fancyboi999/ai-engineering-from-scratch-zh\n`;
   out += `Upstream: https://github.com/rohitg00/ai-engineering-from-scratch\n`;
