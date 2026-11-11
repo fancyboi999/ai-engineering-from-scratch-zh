@@ -3,7 +3,7 @@
 > 命中断点只是对某个构建某次运行的观察。本课构建一个工具，将观察转化为对前面静态分析结论的已确认、已反驳和未观察到三种判定。
 
 **类型：** Build
-**语言：** Python, TypeScript, C, arm64 assembly, lldb command language
+**语言：** Python、TypeScript、C、arm64 汇编、lldb 命令语言
 **前置要求：** 阶段 13 · 33（反汇编与控制流）、阶段 13 · 35（证据、置信度与未知项）
 **预计时间：** ~130 分钟
 
