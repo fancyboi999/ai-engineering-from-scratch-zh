@@ -1,16 +1,7 @@
 {
   "base": "1d08d70dd5641abe5217a6dfe1f3cf25a14f77e8",
   "target": "8c09d890956fdef7d75d888aa8efecc16ff3846c",
-  "pending": [
-    {
-      "id": "batch-ports-767-768",
-      "title": "TypeScript/Rust/Julia/Go 课程移植、语言行与运行命令、CI 移植检查（#767, #768）",
-      "upstream": [
-        "690c3bfd3",
-        "9e60f3e76"
-      ]
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
