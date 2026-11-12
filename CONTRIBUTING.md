@@ -73,7 +73,7 @@ frontmatter 的 `name`、`description`、`phase`、`lesson` 应与用途及所�
 - 按课程声明的依赖运行实现与测试，提供真实输出。
 - 代码清楚表达行为；必要注释说明不变量、边界和设计原因，教学推导放在正文。
 - 根据课程目标选择语言，从最小可运行实现逐步引入框架。
-- 用 Mermaid、SVG 或已注册的交互图表解释概念。
+- 用 Mermaid、SVG 或已注册的交互图表解释概念。新增或修改交互图表后，运行 `node scripts/audit_lesson_figures.js --only <name>`，结果须为 `TOTAL 0`：标签不重叠、不超出画布，文字不小于 9px，桌面宽度下不需要横向滚动。脚本需要 `CHROME_PATH`，并且 `NODE_PATH` 中要有 `puppeteer-core`；`--shots <dir>` 会保存失败图表的截图。
 - 写作使用准确、直接的中文；事实引用原始规范、论文或官方文档。
 
 ## 提交 Pull Request

@@ -135,7 +135,7 @@
     var boxes = [{ x: 30, y: 30 }, { x: 30, y: 105 }, { x: 30, y: 180 }];
     var logX = 350, i;
     // the append-only log on the right
-    svg.appendChild(svgEl('rect', { x: logX, y: 24, width: 140, height: 200, rx: '5', fill: 'none', stroke: BP, 'stroke-width': '2' }));
+    svg.appendChild(svgEl('rect', { x: logX, y: 24, width: 140, height: 212, rx: '5', fill: 'none', stroke: BP, 'stroke-width': '2' }));
     svg.appendChild(txt(logX + 70, 18, 'SHARED FORUM (append-only)', { mono: true, size: '8', fill: BP, spacing: '0.08em' }));
     for (i = 0; i < 5; i++) {
       var lr = svgEl('rect', { x: logX + 12, y: 200 - i * 34, width: 116, height: 26, rx: '2', fill: SURF, stroke: RULE, 'stroke-width': '1', opacity: '0' });
@@ -153,7 +153,8 @@
       var pid = 'aar-path-' + i;
       var sy = by + 28, ey = 200 - i * 50 + 13;
       svg.appendChild(svgEl('path', { id: pid, d: 'M ' + (bx + 120) + ' ' + sy + ' C 250 ' + sy + ' 280 ' + ey + ' ' + logX + ' ' + ey, fill: 'none', stroke: RULE, 'stroke-width': '1', 'stroke-dasharray': '3 3' }));
-      var rec = svgEl('rect', { x: -7, y: -5, width: 14, height: 10, rx: '2', fill: colors[i] });
+      var rec = svgEl('rect', { x: -7, y: -5, width: 14, height: 10, rx: '2', fill: colors[i], opacity: i ? '0' : '1' });
+      if (i) rec.appendChild(svgEl('set', { attributeName: 'opacity', to: '1', begin: (i * 0.6) + 's' }));
       var mo = svgEl('animateMotion', { dur: '3s', begin: (i * 0.6) + 's', repeatCount: 'indefinite' });
       mo.appendChild(svgEl('mpath', { href: '#' + pid }));
       rec.appendChild(mo);

@@ -55,6 +55,8 @@ on:
       - "scripts/test_debias_quizzes.py"
       - "scripts/check_figure_loader.js"
       - "scripts/test_figures_i18n_zh.js"
+      - "scripts/audit_lesson_figures.js"
+      - "scripts/test_audit_lesson_figures.js"
       - "scripts/test_lesson_mobile_css.js"
       - "scripts/test_tts.js"
       - "scripts/test_agent_negotiation.js"
@@ -256,6 +258,26 @@ jobs:
           node scripts/test_project_layout.js
           node scripts/test_ui_display.js
           node scripts/audit_figure_localization.js --mode dynamic --check --output "$RUNNER_TEMP/figure-localization.json"
+      - name: 课程图表几何审计（中文标签不重叠、不出界、桌面不意外横向滚动）
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+        run: |
+          node --test scripts/test_audit_lesson_figures.js
+          # 几何审计量的是中文字形的真实宽高；runner 默认没有中日韩字体，汉字会回退成方框，测得的文字框与线上不一致。
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+          fc-list :lang=zh family | grep -q . || { echo "缺少中文字体，图表几何审计结果不可信"; exit 1; }
+          npm install --no-save --no-package-lock --prefix "$RUNNER_TEMP/figures" puppeteer-core@24.10.0
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH" || { echo "缺少 Chrome，图表几何审计未执行"; exit 1; }
+          CHROME_PATH="$CHROME_PATH" NODE_PATH="$RUNNER_TEMP/figures/node_modules" node scripts/audit_lesson_figures.js --shots "$RUNNER_TEMP/figure-shots"
+      - name: 上传失败图表截图
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: figure-audit-shots
+          path: ${{ runner.temp }}/figure-shots
+          if-no-files-found: ignore
+          retention-days: 7
 
   lesson-ports:
     name: lesson ports compile and run

@@ -63,7 +63,7 @@
     stale.appendChild(anim('opacity', '1;1;0.25;0.25', D, { keyTimes: '0;0.28;0.4;1' }));
     svg.appendChild(stale);
     var fail = txt(336, 125, '✗ import error', WARN, 8, 'start');
-    fail.appendChild(anim('opacity', '0;0;1;1', D, { keyTimes: '0;0.24;0.3;1' }));
+    fail.appendChild(anim('opacity', '0;0;1;1;0;0', D, { keyTimes: '0;0.24;0.3;0.44;0.49;1' }));
     svg.appendChild(fail);
     var arc = svgEl('path', { d: 'M200 121 C 158 121, 158 66, 134 66', fill: 'none', stroke: WARN, 'stroke-width': '1.8', 'stroke-dasharray': '6 5' });
     arc.appendChild(anim('stroke-dashoffset', '80;80;0;0', D, { keyTimes: '0;0.3;0.44;1', calcMode: 'spline', keySplines: SPL3 }));
@@ -93,30 +93,29 @@
     svg.appendChild(txt(260, 16, 'every tool call walks the chain · first DENY wins', MUTE, 10));
     var names = ['budget', 'recency', 'whitelist', 'regex'];
     var subs = ['tokens left?', 'stale reads?', 'tool known?', 'argv clean?'];
-    var gx = [64, 172, 280, 388], gy = 56, gw = 92, gh = 40, i;
+    var gx = [64, 172, 280, 388], gy = 56, gw = 92, gh = 56, i;
     svg.appendChild(svgEl('line', { x1: 24, y1: gy + gh / 2, x2: 504, y2: gy + gh / 2, stroke: RULE, 'stroke-width': '1.2', 'stroke-dasharray': '3 4' }));
     for (i = 0; i < 4; i++) {
       var r = svgEl('rect', { x: gx[i], y: gy, width: gw, height: gh, rx: 5, fill: BG, stroke: BP, 'stroke-width': '1.6', opacity: '0.55' });
       r.appendChild(anim('opacity', '0.55;1;0.55', D, { begin: (0.3 + i * 0.25) + 's' }));
       svg.appendChild(r);
-      svg.appendChild(txt(gx[i] + gw / 2, gy + 17, names[i], BP, 10));
-      svg.appendChild(txt(gx[i] + gw / 2, gy + 31, subs[i], MUTE, 7));
+      svg.appendChild(txt(gx[i] + gw / 2, gy + 16, names[i], BP, 10));
+      svg.appendChild(txt(gx[i] + gw / 2, gy + 48, subs[i], MUTE, 7));
     }
     svg.appendChild(txt(24, gy - 10, 'call: read_file', SOFT, 8, 'start'));
     svg.appendChild(txt(504, gy - 10, 'ALLOW', BP, 9, 'end'));
     var pa = svgEl('rect', { x: 24, y: gy + gh / 2 - 6, width: 16, height: 12, rx: 2, fill: BP });
-    pa.appendChild(anim('x', '24;110;218;326;434;488;488', D, { keyTimes: '0;0.09;0.18;0.27;0.36;0.44;1', calcMode: 'spline', keySplines: SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL }));
+    pa.appendChild(animT('translate', '0 0;86 0;194 0;302 0;410 0;464 0;464 0', D, { keyTimes: '0;0.09;0.18;0.27;0.36;0.44;1', calcMode: 'spline', keySplines: SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL }));
     pa.appendChild(anim('opacity', '1;1;1;1;1;1;0;0', D, { keyTimes: '0;0.09;0.18;0.27;0.36;0.5;0.56;1' }));
     svg.appendChild(pa);
     var pb = svgEl('rect', { x: 24, y: gy + gh / 2 - 6, width: 16, height: 12, rx: 2, fill: WARN });
-    pb.appendChild(anim('x', '24;24;110;218;326;326;326', D, { keyTimes: '0;0.5;0.58;0.66;0.74;0.8;1', calcMode: 'spline', keySplines: SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL }));
-    pb.appendChild(anim('y', '70;70;70;138;138', D, { keyTimes: '0;0.76;0.8;0.9;1' }));
+    pb.appendChild(animT('translate', '0 0;0 0;86 0;194 0;302 0;302 0;302 0;302 68;302 68', D, { keyTimes: '0;0.5;0.58;0.66;0.74;0.76;0.8;0.9;1', calcMode: 'spline', keySplines: SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL + ';' + SPL }));
     pb.appendChild(anim('opacity', '0;0;1;1;1;0;0', D, { keyTimes: '0;0.48;0.52;0.85;0.9;0.97;1' }));
     svg.appendChild(pb);
-    var deny = txt(326, 168, '✗ DENY unknown tool "shell"', WARN, 8);
+    var deny = txt(364, 176, '✗ DENY unknown tool "shell"', WARN, 8, 'end');
     deny.appendChild(anim('opacity', '0;0;1;1;0;0', D, { keyTimes: '0;0.78;0.84;0.94;0.98;1' }));
     svg.appendChild(deny);
-    var route = svgEl('path', { d: 'M488 76 V 150 H 384 V 186', fill: 'none', stroke: BP, 'stroke-width': '1.4', 'stroke-dasharray': '5 4' });
+    var route = svgEl('path', { d: 'M488 84 V 140 H 372 V 192', fill: 'none', stroke: BP, 'stroke-width': '1.4', 'stroke-dasharray': '5 4' });
     route.appendChild(anim('stroke-dashoffset', '60;60;0;0', D, { keyTimes: '0;0.42;0.52;1', calcMode: 'spline', keySplines: SPL3 }));
     route.appendChild(anim('opacity', '0;0;1;1', D, { keyTimes: '0;0.4;0.44;1' }));
     svg.appendChild(route);
@@ -176,7 +175,7 @@
       ]));
     }
     svg.appendChild(txt(104, 200, 'denylist', MUTE, 8, 'end'));
-    svg.appendChild(txt(444, 200, 'by name and argv shape', MUTE, 8, 'start'));
+    svg.appendChild(txt(256, 228, 'by name and argv shape', MUTE, 8, 'middle'));
     card(host, 'PATH JAIL + DENYLIST', 'refuse by prefix, name, shape',
       svg,
       'Two refusal surfaces sit between the model and the operating system. Every path argument resolves through realpath and must keep the project root as a prefix, so a ../../ traversal bounces off the jail wall instead of reaching /etc. Alongside it, a denylist refuses executables by name and an argv inspector catches interpreters smuggling shell through -c flags. Output is truncated and a wall-clock timeout kills whatever runs away.');

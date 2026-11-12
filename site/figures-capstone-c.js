@@ -93,10 +93,15 @@
     var add1 = block(116, 24, 'add residual', '', BG, MUTE);
     var ln2 = block(150, 24, 'LayerNorm 2', '', SURF, MUTE);
     var mlp = block(182, 38, 'MLP  D→4D→D', '', BG, BP);
-    [ln1, attn, add1, ln2, mlp].forEach(function (g) { svg.appendChild(g); });
+    host.setAttribute('data-static-time', '0.42');
     // vertical spine flowing down
     var spine = svgEl('line', { x1: sx + w / 2, y1: 28, x2: sx + w / 2, y2: 220, stroke: RULE, 'stroke-width': '2' });
     svg.appendChild(spine);
+    var dot = svgEl('circle', { r: 5, fill: WARN });
+    dot.appendChild(anim('cy', '28;220', '2.6s'));
+    dot.setAttribute('cx', sx + w / 2);
+    svg.appendChild(dot);
+    [ln1, attn, add1, ln2, mlp].forEach(function (g) { svg.appendChild(g); });
     // first residual bypass: from input around attention into add1
     var rp1 = svgEl('path', { d: 'M' + sx + ' 30 C 120 30, 120 128, ' + sx + ' 128', fill: 'none', stroke: BP, 'stroke-width': '2', 'stroke-dasharray': '7 5' });
     rp1.appendChild(anim('stroke-dashoffset', '120;0', '2.2s'));
@@ -106,11 +111,6 @@
     var rp2 = svgEl('path', { d: 'M' + sx + ' 132 C 120 132, 120 232, ' + sx + ' 232', fill: 'none', stroke: BP, 'stroke-width': '2', 'stroke-dasharray': '7 5' });
     rp2.appendChild(anim('stroke-dashoffset', '120;0', '2.2s', { begin: '0.5s' }));
     svg.appendChild(rp2);
-    // a signal token riding the spine down through the block
-    var dot = svgEl('circle', { r: 5, fill: WARN });
-    dot.appendChild(anim('cy', '28;220', '2.6s'));
-    dot.setAttribute('cx', sx + w / 2);
-    svg.appendChild(dot);
     svg.appendChild(txt(sx + w / 2, 238, 'output  (B, T, D)', INK, 10));
     // pre-LN annotation on the right
     svg.appendChild(txt(420, 60, 'pre-LN:', INK, 10, 'middle'));
@@ -127,7 +127,7 @@
 
   // ── 35: GPT assembly — stack of blocks, head tied back to the token table ──
   function gptAssembly(host) {
-    var svg = svgEl('svg', { viewBox: '0 0 520 250' });
+    var svg = svgEl('svg', { viewBox: '0 0 520 304' });
     var cx = 200, w = 150;
     svg.appendChild(txt(cx + w / 2, 16, 'token ids  (B, T)', INK, 10));
     // token + position embedding merge
@@ -198,7 +198,7 @@
     svg.appendChild(svgEl('rect', { x: 248, y: y0, width: 24, height: 3 * (rh + gap) - gap, rx: 4, fill: SURF, stroke: MUTE, 'stroke-width': '1.4' }));
     svg.appendChild(txt(260, y0 - 6, 'shape', MUTE, 8));
     svg.appendChild(txt(260, y0 + (3 * (rh + gap) - gap) / 2, 'check', MUTE, 8, 'middle'));
-    svg.appendChild(txt(rx + w / 2 + 16, y0 + 2 * (rh + gap) + 21, '✗ mismatch logged', WARN, 8, 'start'));
+    svg.appendChild(txt(rx + w / 2, y0 + 3 * (rh + gap) - gap + 16, '✗ mismatch logged', WARN, 8, 'middle'));
     card(host, 'WEIGHT REMAP', 'rename · shape-check · assign',
       svg,
       'A published checkpoint carries the original implementation\'s parameter names, not yours. The loader is a string-to-string mapper feeding a single shape check: matching tensors copy under no_grad into the local name, mismatches are logged and refused rather than copied blindly. Every assignment is recorded so a misload shows up in the report instead of as silent gibberish at generation time.');
@@ -210,7 +210,7 @@
     var toks = ['<INST>', 'capital', 'of', 'France', '<RESP>', 'Paris', 'is', 'it'];
     var mask = [0, 0, 0, 0, 0, 1, 1, 1]; // 1 = response, scored
     var bw = 56, gap = 4, x0 = 24, y = 56;
-    svg.appendChild(txt(x0, 38, 'one causal sequence', MUTE, 10, 'start'));
+    svg.appendChild(txt(x0, 18, 'one causal sequence', MUTE, 10, 'start'));
     var i;
     for (i = 0; i < toks.length; i++) {
       var x = x0 + i * (bw + gap);

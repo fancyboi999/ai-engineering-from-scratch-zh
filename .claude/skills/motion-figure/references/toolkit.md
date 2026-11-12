@@ -15,6 +15,9 @@
 | `LF.uid(prefix)` | 返回 lf-3 等新 ID。每图在 render 外调用一次 |
 | `LF.clamp(x, lo, hi)`、`LF.lerp(a, b, t)` | 数值辅助函数 |
 | `LF.fmtInt(n)`、`LF.fmtSeq(n)` | 将 12345 格式化为 12,345，将 8192 格式化为 8K |
+| `LF.textWidth(text, size, serif)` | 返回标签在 viewBox 单位下的宽度：等宽字体每个半角字符 0.6 倍字号，衬线 0.54 倍，全角字符 1 倍。框宽取该宽度加 16 |
+| `LF.wrapText(text, size, width, serif)` | 把标签拆成行列表，每行不超过 `width`。英文在空格处断行，中文可在字间断行。单个英文词比 `width` 宽时独占一行，需加宽框。每行画一个 `<text>` |
+| `LF.hold(node, begin)` | 运动元素在第 `begin` 秒开始运动前隐藏，之后显示。凡 `animateMotion` 设了延迟 `begin` 的点、token 或数据包都要使用，否则它会停在 SVG 原点 |
 | `LF.motion` | feedback 180ms、enter 220ms、press 160ms 与两种缓动曲线 |
 | `LF.autoplay`、`LF.raf` | 旧图的脚本动画辅助函数，新图使用 SMIL，不再使用它们 |
 | `LF.registerDisposer(host, fn)` | 注册课程卸载宿主时运行的清理函数 |

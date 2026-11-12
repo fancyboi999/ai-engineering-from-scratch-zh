@@ -97,7 +97,8 @@
       "worker": "工作",
       "pool": "进程池",
       "score = mean(pass) · per-model EvalRun → leaderboard": "得分 = mean(pass) · 每个模型的 EvalRun → 排行榜",
-      "The runner reads the task spec, fans the tasks across a worker pool, and scores each with the metric layer plus the calibration report. Cells light pass (blue) or fail (orange) as the sweep crosses them. Per-model EvalRun records flow straight into the leaderboard aggregator; the demo self-terminates on a clean run.": "运行器读取任务规范，将任务分发到工作进程池，并结合指标层与校准报告逐项评分。扫描经过单元格时，单元格会标记通过（蓝色）或失败（橙色）。每个模型的 EvalRun 记录直接进入排行榜聚合器；演示会在完整运行成功后自行结束。"
+      "The runner reads the task spec, fans the tasks across a worker pool, and scores each with the metric layer plus the calibration report. Cells light pass (blue) or fail (orange) as the sweep crosses them. Per-model EvalRun records flow straight into the leaderboard aggregator; the demo self-terminates on a clean run.": "运行器读取任务规范，将任务分发到工作进程池，并结合指标层与校准报告逐项评分。扫描经过单元格时，单元格会标记通过（蓝色）或失败（橙色）。每个模型的 EvalRun 记录直接进入排行榜聚合器；演示会在完整运行成功后自行结束。",
+      "worker pool": "工作进程池"
     },
     "patterns": [],
     "preserve": [

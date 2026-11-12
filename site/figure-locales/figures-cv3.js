@@ -137,7 +137,8 @@
       "keep #2": "保留 #2",
       "keep #3": "保留 #3",
       "IoU cost matrix -> Hungarian assignment -> persist IDs across frames": "IoU 代价矩阵 -> 匈牙利算法分配 -> 跨帧保留 ID",
-      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用"
+      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用",
+      "tracks at t-1 (solid) + detections at t (shaded), matched by IoU": "t-1 时刻轨迹（实线）与 t 时刻检测（阴影），按 IoU 匹配"
     },
     "patterns": [],
     "preserve": []

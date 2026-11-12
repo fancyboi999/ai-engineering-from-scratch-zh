@@ -44,6 +44,7 @@
   var ROW = 18;
   var LABEL_W = 44;
   var FOOT = 92;
+  var GAP = 16;
 
   var KIND_STYLE = {
     arg: { fill: SURF, stroke: BP, dash: 'none', text: INK },
@@ -73,7 +74,7 @@
       '.re38 button[aria-pressed="true"]{border-color:var(--blueprint,#3553ff);background:var(--blueprint,#3553ff);color:var(--bg,#fafaf5)}',
       '.re38__signature{margin:0 0 10px;font-family:var(--font-mono,monospace);font-size:.8rem;color:var(--ink,#1a1a1a)}',
       '.re38__scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule-soft,#ddd);background:var(--bg,#fafaf5)}',
-      '.re38__scroll svg{display:block;min-width:700px;width:100%;height:auto}',
+      '.re38__scroll svg{display:block;width:100%;height:auto}',
       '.re38__prologues{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}',
       '.re38__prologue{font-family:var(--font-mono,monospace);font-size:.74rem;line-height:1.5;color:var(--ink-soft,#555);white-space:pre-wrap;word-break:break-word;border-top:1px solid var(--rule-soft,#ddd);padding-top:6px}',
       '.re38__prologue b{color:var(--ink,#1a1a1a);font-weight:600}',
@@ -156,17 +157,18 @@
     svg.appendChild(text(x, 36, frame.frame + ' 字节栈帧, ' + fpText, MUTE, 'start', 10.5));
     var entryY = yFor(0, rng);
     svg.appendChild(svgEl('line', { x1: x, y1: entryY, x2: x + COL_W, y2: entryY, stroke: INK, 'stroke-width': '1.5' }));
-    svg.appendChild(text(x + COL_W, entryY - 3, '入口 SP', INK, 'end', 9.5));
+    svg.appendChild(text(x + COL_W, entryY + 12, '入口 SP', INK, 'end', 9.5));
     if (frame.frame > 0) {
-      var spY = yFor(-frame.frame, rng);
+      var spY = yFor(-frame.frame, rng) + GAP;
       svg.appendChild(svgEl('line', { x1: x, y1: spY, x2: x + COL_W, y2: spY, stroke: BP, 'stroke-width': '1.5' }));
       svg.appendChild(text(x + COL_W, spY + 11, '序言后 SP', BP, 'end', 9.5));
     }
     for (i = 0; i < frame.cells.length; i++) {
       var cell = frame.cells[i];
       var style = KIND_STYLE[cell.kind] || KIND_STYLE.local;
-      var y0 = yFor(cell.hi, rng);
-      var y1 = yFor(cell.lo, rng);
+      var shift = cell.lo < 0 ? GAP : 0;
+      var y0 = yFor(cell.hi, rng) + shift;
+      var y1 = yFor(cell.lo, rng) + shift;
       var inset = cell.kind === 'redzone' ? 3 : 0;
       svg.appendChild(svgEl('rect', {
         x: cellX + inset, y: y0 + inset, width: cellW - 2 * inset, height: Math.max(2, y1 - y0 - 2 * inset),
@@ -179,12 +181,34 @@
         svg.appendChild(text(cellX + cellW - 6, y1 - 5, cellLabelZh(cell.label), WARN, 'end', 9.5));
       }
     }
-    var footY = yFor(rng.bottom, rng) + 20;
-    var regs = [];
-    for (i = 0; i < frame.regs.length; i++) regs.push(frame.regs[i].p + ' 位于 ' + frame.regs[i].r);
-    svg.appendChild(text(x, footY, '参数寄存器：' + (regs.length ? regs.join(', ') : '无'), INK, 'start', 9.5));
-    svg.appendChild(text(x, footY + 14, '结果位于 ' + frame.ret.join(', '), INK, 'start', 9.5));
-    svg.appendChild(text(x, footY + 28, frame.agree + ' / ' + frame.checks + ' 项检查符合规则', BP, 'start', 9.5));
+    var footY = yFor(rng.bottom, rng) + GAP + 20;
+    var lines = regLines(frame);
+    for (i = 0; i < lines.length; i++) svg.appendChild(text(x, footY + i * 14, lines[i], INK, 'start', 9.5));
+    footY += lines.length * 14;
+    svg.appendChild(text(x, footY, '结果位于 ' + frame.ret.join(', '), INK, 'start', 9.5));
+    svg.appendChild(text(x, footY + 14, frame.agree + ' / ' + frame.checks + ' 项检查符合规则', BP, 'start', 9.5));
+  }
+
+  function regLines(frame) {
+    var lines = [];
+    var i;
+    if (!frame.regs.length) return ['参数寄存器：无'];
+    if (frame.regs.length === 1) return ['参数寄存器：' + frame.regs[0].p + ' 位于 ' + frame.regs[0].r];
+    lines.push('参数寄存器：');
+    for (i = 0; i < frame.regs.length; i += 3) {
+      var chunk = [];
+      var j;
+      for (j = i; j < Math.min(i + 3, frame.regs.length); j++) chunk.push(frame.regs[j].p + ' 位于 ' + frame.regs[j].r);
+      lines.push('  ' + chunk.join(', ') + (j < frame.regs.length ? ',' : ''));
+    }
+    return lines;
+  }
+
+  function maxRegLines(state) {
+    var most = 1;
+    var i;
+    for (i = 0; i < DATA.abis.length; i++) most = Math.max(most, regLines(frameOf(state, DATA.abis[i].id)).length);
+    return most;
   }
 
   function prologueBlock(abi, frame) {
@@ -209,7 +233,7 @@
 
     function render() {
       var rng = range(state);
-      var height = yFor(rng.bottom, rng) + FOOT;
+      var height = yFor(rng.bottom, rng) + GAP + FOOT + (maxRegLines(state) - 1) * 14;
       var i;
       while (svg.firstChild) svg.removeChild(svg.firstChild);
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + height);

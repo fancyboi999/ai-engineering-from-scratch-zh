@@ -148,7 +148,21 @@
       "Step 9 of 10: Return evidence with the artifact": "第 9 / 10 步：随产物返回证据",
       "Step 9 of 10: Return evidence with the artifact. A fluent claim is weaker than paths, observations, and exit results.": "第 9 / 10 步：随产物返回证据。流畅的主张不如路径、观察结果和退出结果有力。",
       "Step 10 of 10: Verification closes the loop": "第 10 / 10 步：验证形成闭环",
-      "Step 10 of 10: Verification closes the loop. Check the result independently of the model that produced it.": "第 10 / 10 步：验证形成闭环。由产生结果的模型之外的机制独立检查结果。"
+      "Step 10 of 10: Verification closes the loop. Check the result independently of the model that produced it.": "第 10 / 10 步：验证形成闭环。由产生结果的模型之外的机制独立检查结果。",
+      "metadata +": "元数据 +",
+      "layout": "布局",
+      "name +": "名称 +",
+      "description": "描述",
+      "explicit or": "显式或",
+      "implicit": "隐式",
+      "body enters": "正文进入",
+      "context": "上下文",
+      "Disclose": "按需披露",
+      "resources": "资源",
+      "only required": "仅加载所需",
+      "branch": "分支",
+      "host tools +": "宿主工具 +",
+      "policy": "策略"
     },
     "patterns": [
       [
@@ -387,7 +401,13 @@
       "Step 5 of 6: Name host-specific semantics": "第 5 / 6 步：明确宿主专用语义",
       "Step 5 of 6: Name host-specific semantics. Unknown extensions require an explicit adapter decision.": "第 5 / 6 步：明确宿主专用语义。未知扩展必须由适配器明确决策。",
       "Step 6 of 6: Then inspect body and resources": "第 6 / 6 步：然后检查正文与资源",
-      "Step 6 of 6: Then inspect body and resources. Deep checks are useful only after the cheap structure is sound.": "第 6 / 6 步：然后检查正文与资源。先确认基础结构正确，深层检查才有意义。"
+      "Step 6 of 6: Then inspect body and resources. Deep checks are useful only after the cheap structure is sound.": "第 6 / 6 步：然后检查正文与资源。先确认基础结构正确，深层检查才有意义。",
+      "Name =": "名称 =",
+      "directory": "目录",
+      "name +": "名称 +",
+      "description": "描述",
+      "adapter": "适配器",
+      "allowlist": "允许列表"
     },
     "patterns": [
       [
@@ -498,7 +518,28 @@
       "Step 7 of 8: Budget the exact serialization": "第 7 / 8 步：按实际序列化结果计算预算",
       "Step 7 of 8: Budget the exact serialization. Catalog size belongs to the host and active context is a separate budget.": "第 7 / 8 步：按实际序列化结果计算预算。目录大小由宿主决定，激活上下文另有预算。",
       "Step 8 of 8: Publish compact metadata": "第 8 / 8 步：发布精简元数据",
-      "Step 8 of 8: Publish compact metadata. The model sees routing identity, not the full package tree.": "第 8 / 8 步：发布精简元数据。模型只看到路由身份信息，而不是整个技能包目录树。"
+      "Step 8 of 8: Publish compact metadata. The model sees routing identity, not the full package tree.": "第 8 / 8 步：发布精简元数据。模型只看到路由身份信息，而不是整个技能包目录树。",
+      "workspace,": "工作区、",
+      "user, admin": "用户、管理员",
+      "immediate": "直接子级",
+      "skill dirs": "技能目录",
+      "Find": "查找",
+      "one entry": "单一",
+      "point": "入口",
+      "shape +": "结构 +",
+      "limits": "限制",
+      "scope +": "范围 +",
+      "source": "来源",
+      "declared": "声明的",
+      "policy": "策略",
+      "Apply": "应用",
+      "budget": "预算",
+      "bounded": "有界",
+      "catalog": "目录",
+      "Publish": "发布",
+      "entry": "条目",
+      "description": "描述",
+      "+ path": "+ 路径"
     },
     "patterns": [
       [
@@ -744,7 +785,23 @@
       "Step 6 of 7: Bound context admission": "第 6 / 7 步：限制进入上下文的内容",
       "Step 6 of 7: Bound context admission. Reject unexpected types and files above the declared size limit.": "第 6 / 7 步：限制进入上下文的内容。拒绝意外类型和超过声明大小限制的文件。",
       "Step 7 of 7: Load with evidence or reject": "第 7 / 7 步：有据加载，否则拒绝",
-      "Step 7 of 7: Load with evidence or reject. Record the resource, branch reason, and byte count without logging secrets.": "第 7 / 7 步：有据加载，否则拒绝。记录资源、分支加载理由和字节数，不记录机密。"
+      "Step 7 of 7: Load with evidence or reject. Record the resource, branch reason, and byte count without logging secrets.": "第 7 / 7 步：有据加载，否则拒绝。记录资源、分支加载理由和字节数，不记录机密。",
+      "real package": "真实包",
+      "root": "根目录",
+      "Target under": "目标位于",
+      "root?": "根目录内？",
+      "escaped": "已越出",
+      "regular allowed": "允许的普通",
+      "file": "文件",
+      "special": "特殊",
+      "Within size": "符合大小",
+      "limit?": "限制？",
+      "bounded context": "限制上下文",
+      "read": "读取量",
+      "oversized": "超大",
+      "resource": "资源",
+      "record reason +": "记录原因 +",
+      "bytes": "字节数"
     },
     "patterns": [
       [
@@ -862,7 +919,17 @@
       "Step 5 of 6: Executing or blocked": "第 5 / 6 步：执行中或受阻",
       "Step 5 of 6: Executing or blocked. Work begins only when capability, permission, and approval are available.": "第 5 / 6 步：执行中或受阻。只有能力、权限和批准均可用时，工作才开始。",
       "Step 6 of 6: Completed": "第 6 / 6 步：已完成",
-      "Step 6 of 6: Completed. Independent verification turns an attempted workflow into a completed one.": "第 6 / 6 步：已完成。独立验证让已尝试的工作流成为已完成的工作流。"
+      "Step 6 of 6: Completed. Independent verification turns an attempted workflow into a completed one.": "第 6 / 6 步：已完成。独立验证让已尝试的工作流成为已完成的工作流。",
+      "host identity": "宿主身份",
+      "or description": "或描述",
+      "body in": "正文已入",
+      "context": "上下文",
+      "actor or": "执行者或",
+      "policy blocks": "策略阻止",
+      "threshold not": "未达到",
+      "met": "阈值",
+      "capability or": "能力或",
+      "approval absent": "批准缺失"
     },
     "patterns": [
       [
@@ -1038,7 +1105,9 @@
       "Step 4 of 5: Instructions consume data": "第 4 / 5 步：指令读取数据",
       "Step 4 of 5: Instructions consume data. The skill chooses a branch without interpolating raw text into a shell.": "第 4 / 5 步：指令读取数据。技能选择分支，不把原始文本插入 shell。",
       "Step 5 of 5: Typed tools validate again": "第 5 / 5 步：有类型的工具再次校验",
-      "Step 5 of 5: Typed tools validate again. Crossing into execution requires a schema and a bounded argument vector.": "第 5 / 5 步：有类型的工具再次校验。进入执行边界时，必须有 schema 和有界参数向量。"
+      "Step 5 of 5: Typed tools validate again. Crossing into execution requires a schema and a bounded argument vector.": "第 5 / 5 步：有类型的工具再次校验。进入执行边界时，必须有 schema 和有界参数向量。",
+      "procedure sees": "流程读取",
+      "data": "数据"
     },
     "patterns": [
       [
@@ -1128,7 +1197,15 @@
       "Step 4 of 5: Host behavior stays host-specific": "第 4 / 5 步：宿主行为留在宿主层",
       "Step 4 of 5: Host behavior stays host-specific. Discovery, activation APIs, policy fields, and argument syntax belong here.": "第 4 / 5 步：宿主行为留在宿主层。发现、激活 API、策略字段和参数语法都属于这里。",
       "Step 5 of 5: Compose at the runtime boundary": "第 5 / 5 步：在运行时边界组合",
-      "Step 5 of 5: Compose at the runtime boundary. The adapter activates the portable bundle without rewriting its core claims.": "第 5 / 5 步：在运行时边界组合。适配器激活可移植包，不改写其核心主张。"
+      "Step 5 of 5: Compose at the runtime boundary. The adapter activates the portable bundle without rewriting its core claims.": "第 5 / 5 步：在运行时边界组合。适配器激活可移植包，不改写其核心主张。",
+      "cross-host": "跨宿主",
+      "directory": "目录",
+      "runtime-specific": "运行时专用",
+      "code": "代码",
+      "Argument": "参数",
+      "binding": "绑定",
+      "core + adapter": "核心 + 适配器",
+      "semantics": "语义"
     },
     "patterns": [
       [
@@ -1244,7 +1321,20 @@
       "Step 7 of 8: Capture observations": "第 7 / 8 步：收集观察结果",
       "Step 7 of 8: Capture observations. Exit codes, diffs, files, and tool results become evidence.": "第 7 / 8 步：收集观察结果。退出码、差异、文件和工具结果都成为证据。",
       "Step 8 of 8: Verify independently": "第 8 / 8 步：独立验证",
-      "Step 8 of 8: Verify independently. Containment and authorization do not prove the result is correct.": "第 8 / 8 步：独立验证。限制范围和获得授权，并不能证明结果正确。"
+      "Step 8 of 8: Verify independently. Containment and authorization do not prove the result is correct.": "第 8 / 8 步：独立验证。限制范围和获得授权，并不能证明结果正确。",
+      "Model": "模型",
+      "proposal": "提议",
+      "structured": "结构化",
+      "action": "行动",
+      "operation": "操作",
+      "exists": "确实存在",
+      "Approval": "需要",
+      "needed?": "批准？",
+      "consequence": "后果",
+      "Stop and": "停止并",
+      "report": "报告",
+      "contract": "契约检查",
+      "passes": "通过"
     },
     "patterns": [
       [
@@ -1371,7 +1461,14 @@
       "Step 5 of 6: Enforce at the host boundary": "第 5 / 6 步：在宿主边界执行约束",
       "Step 5 of 6: Enforce at the host boundary. The model cannot provide its own isolation or permission policy.": "第 5 / 6 步：在宿主边界执行约束。模型无法自行提供隔离或权限策略。",
       "Step 6 of 6: Constrain every consequence surface": "第 6 / 6 步：约束每一种后果面",
-      "Step 6 of 6: Constrain every consequence surface. Files, network, credentials, and external effects need separate policies.": "第 6 / 6 步：约束每一种后果面。文件、网络、凭证和外部影响需要分别制定策略。"
+      "Step 6 of 6: Constrain every consequence surface. Files, network, credentials, and external effects need separate policies.": "第 6 / 6 步：约束每一种后果面。文件、网络、凭证和外部影响需要分别制定策略。",
+      "publisher-": "发布者",
+      "controlled": "控制",
+      "supporting": "配套",
+      "issue, web,": "议题、网页、",
+      "document": "文档",
+      "Host tools +": "宿主工具 +",
+      "executor": "执行器"
     },
     "patterns": [
       [
@@ -1477,7 +1574,16 @@
       "Step 5 of 6: Honor the decision": "第 5 / 6 步：遵守决策",
       "Step 5 of 6: Honor the decision. A grant binds one action. A denial stops it.": "第 5 / 6 步：遵守决策。一次授权绑定一项行动；拒绝就停止它。",
       "Step 6 of 6: Revalidate before launch": "第 6 / 6 步：启动前重新校验",
-      "Step 6 of 6: Revalidate before launch. The executor checks the normalized target again and verifies the result afterward.": "第 6 / 6 步：启动前重新校验。执行器会再次检查规范化后的目标，并在执行后验证结果。"
+      "Step 6 of 6: Revalidate before launch. The executor checks the normalized target again and verifies the result afterward.": "第 6 / 6 步：启动前重新校验。执行器会再次检查规范化后的目标，并在执行后验证结果。",
+      "target +": "目标 +",
+      "consequence": "后果",
+      "Reversible +": "可逆且",
+      "local?": "在本地？",
+      "actor + operation +": "执行者 + 操作 +",
+      "target": "目标",
+      "Ask scoped": "请求特定范围的",
+      "approval": "批准",
+      "show exact": "展示确切"
     },
     "patterns": [
       [
@@ -1579,7 +1685,14 @@
       "Step 6 of 7: Write to an artifact contract": "第 6 / 7 步：按产物契约写作",
       "Step 6 of 7: Write to an artifact contract. Required fields and paths turn completion into an observable claim.": "第 6 / 7 步：按产物契约写作。必需字段和路径，使完成状态成为可观察的主张。",
       "Step 7 of 7: Verify by another mechanism": "第 7 / 7 步：用另一种机制验证",
-      "Step 7 of 7: Verify by another mechanism. Machine checks and calibrated human review close the workflow.": "第 7 / 7 步：用另一种机制验证。机器检查和经过校准的人工审查共同闭环工作流。"
+      "Step 7 of 7: Verify by another mechanism. Machine checks and calibrated human review close the workflow.": "第 7 / 7 步：用另一种机制验证。机器检查和经过校准的人工审查共同闭环工作流。",
+      "trigger": "触发",
+      "boundary": "边界",
+      "classify +": "分类 +",
+      "branch": "选择分支",
+      "collect": "收集",
+      "evidence": "证据",
+      "interpret": "解读"
     },
     "patterns": [
       [
@@ -1816,7 +1929,13 @@
       "Step 5 of 6: Probe real discovery": "第 5 / 6 步：探测真实发现流程",
       "Step 5 of 6: Probe real discovery. The installed scope and host catalog must find the expected identity.": "第 5 / 6 步：探测真实发现流程。安装作用域和宿主目录必须能找到预期身份。",
       "Step 6 of 6: Execute the installed smoke test": "第 6 / 6 步：执行已安装副本的冒烟测试",
-      "Step 6 of 6: Execute the installed smoke test. Source-only success cannot prove installer or runtime behavior.": "第 6 / 6 步：执行已安装副本的冒烟测试。源文件通过检查，不能证明安装器或运行时的行为正确。"
+      "Step 6 of 6: Execute the installed smoke test. Source-only success cannot prove installer or runtime behavior.": "第 6 / 6 步：执行已安装副本的冒烟测试。源文件通过检查，不能证明安装器或运行时的行为正确。",
+      "canonical paths": "规范路径",
+      "+ hashes": "+ 哈希",
+      "detect loss or": "检测丢失或",
+      "drift": "漂移",
+      "Run eval smoke": "运行评估冒烟",
+      "test": "测试"
     },
     "patterns": [
       [
@@ -1938,7 +2057,30 @@
       "Step 7 of 8: Re-run with new evidence": "第 7 / 8 步：携新证据重跑",
       "Step 7 of 8: Re-run with new evidence. Preserve per-run traces and check for regressions in untouched layers.": "第 7 / 8 步：携新证据重跑。保留每轮轨迹，并检查未改动层有无回归。",
       "Step 8 of 8: Release only after the gate passes": "第 8 / 8 步：通过关卡后才能发布",
-      "Step 8 of 8: Release only after the gate passes. Ship the complete bundle and its compatibility evidence together.": "第 8 / 8 步：通过关卡后才能发布。完整包与兼容性证据一同交付。"
+      "Step 8 of 8: Release only after the gate passes. Ship the complete bundle and its compatibility evidence together.": "第 8 / 8 步：通过关卡后才能发布。完整包与兼容性证据一同交付。",
+      "Observe": "观察",
+      "workflow": "工作流",
+      "real expert": "真实专家",
+      "practice": "实践",
+      "Define": "定义",
+      "contract": "契约",
+      "trigger +": "触发条件 +",
+      "artifact +": "产物 +",
+      "Package": "封装",
+      "procedure": "流程",
+      "Run layered": "运行分层",
+      "evals": "评估",
+      "route repair": "正确分派",
+      "correctly": "修复",
+      "body, refs,": "正文、参考、",
+      "tools": "工具",
+      "deterministic": "确定性",
+      "code": "代码",
+      "adapter or": "适配器或",
+      "fallback": "回退",
+      "Re-run affected": "重跑受影响",
+      "Release complete": "发布完整",
+      "bundle": "包"
     },
     "patterns": [
       [

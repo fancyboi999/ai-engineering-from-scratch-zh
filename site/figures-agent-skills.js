@@ -35,6 +35,8 @@
       '.asf-edge.is-visible{opacity:.82;transform:none}',
       '.asf-edge path{fill:none;stroke:var(--blueprint,#3553ff);stroke-width:2}',
       '.asf-edge.is-warning path{stroke:var(--warn,#b8870f)}',
+      '.asf-edge-tag.is-visible{opacity:1}',
+      '.asf-edge-tag rect{fill:var(--bg-surface,#f3f1e8)}',
       '.asf-edge-label{fill:var(--ink-mute,#777);font-family:var(--font-mono,monospace);font-size:11px;text-anchor:middle;paint-order:stroke;stroke:var(--bg-surface,#f3f1e8);stroke-width:5;stroke-linejoin:round}',
       '.asf-node{opacity:.2;transform:translateY(8px);transform-box:fill-box;transform-origin:center;transition:opacity 280ms var(--ease-out,cubic-bezier(.23,1,.32,1)),transform 280ms var(--ease-out,cubic-bezier(.23,1,.32,1))}',
       '.asf-node.is-visible{opacity:.68;transform:none}',
@@ -76,14 +78,15 @@
     };
   }
 
-  function E(from, to, stage, label, tone, points) {
+  function E(from, to, stage, label, tone, points, labelAt) {
     return {
       from: from,
       to: to,
       stage: stage || 0,
       label: label || '',
       tone: tone || '',
-      points: points || null
+      points: points || null,
+      labelAt: labelAt || null
     };
   }
 
@@ -146,42 +149,79 @@
     }, []);
   }
 
-  function nodeTextLayout(node) {
+  function typeScale(viewBox) {
+    var width = Number(String(viewBox).split(/\s+/)[2]) || 760;
+    var floor = Math.max(9.5, Math.ceil(width * 8.6 / 694 * 2) / 2);
+    return {
+      title: 14,
+      detail: Math.max(11, floor),
+      compactTitle: Math.max(11.5, floor + 1),
+      compactDetail: floor,
+      edge: Math.max(11, floor),
+      zone: Math.max(12, floor)
+    };
+  }
+
+  function nodeTextLayout(node, type) {
     var available = Math.max(28, node.width - 24);
     var rawTitle = lines(node.title);
     var rawDetail = node.detail ? lines(node.detail) : [];
-    var compact = rawTitle.some(function (line) { return line.length * 8.4 > available; }) ||
-      rawDetail.some(function (line) { return line.length * 6.6 > available; });
+    var compact = rawTitle.some(function (line) { return line.length * 0.6 * type.title > available; }) ||
+      rawDetail.some(function (line) { return line.length * 0.6 * type.detail > available; });
     if (!compact) {
+      var plainDetailStep = Math.round(type.detail * 1.27);
+      var plainDetailY = node.y + 27 + rawTitle.length * 17 + Math.max(0, type.detail - 11);
+      var plainLast = rawDetail.length ? plainDetailY + (rawDetail.length - 1) * plainDetailStep : node.y + 23 + (rawTitle.length - 1) * 17;
       return {
         compact: false,
         title: rawTitle,
         detail: rawDetail,
+        titleSize: type.title,
+        detailSize: type.detail,
         titleY: node.y + 23,
-        detailY: node.y + 27 + rawTitle.length * 17,
+        detailY: plainDetailY,
         titleStep: 17,
-        detailStep: 14
+        detailStep: plainDetailStep,
+        required: plainLast - node.y + 10
       };
     }
 
-    var title = wrappedLines(node.title, Math.max(5, Math.floor(available / 6.9)));
-    var detail = node.detail ? wrappedLines(node.detail, Math.max(6, Math.floor(available / 5.7))) : [];
-    var titleStep = 13;
-    var detailStep = 11;
-    var titleHeight = 15 + Math.max(0, title.length - 1) * titleStep;
-    var detailHeight = detail.length ? 12 + Math.max(0, detail.length - 1) * detailStep : 0;
-    var totalHeight = titleHeight + (detail.length ? 1 + detailHeight : 0);
-    var top = node.y + Math.max(2, (node.height - totalHeight) / 2);
-    var titleY = top + 12;
+    var titleSize = type.compactTitle;
+    var detailSize = type.compactDetail;
+    var title = wrappedLines(node.title, Math.max(5, Math.floor(available / (0.6 * titleSize))));
+    var detail = node.detail ? wrappedLines(node.detail, Math.max(6, Math.floor(available / (0.6 * detailSize)))) : [];
+    var titleStep = Math.round(titleSize * 1.13);
+    var detailStep = Math.round(detailSize * 1.16);
+    var titleHeight = titleSize * 1.3 + Math.max(0, title.length - 1) * titleStep;
+    var detailHeight = detail.length ? detailSize * 1.26 + Math.max(0, detail.length - 1) * detailStep : 0;
+    var totalHeight = titleHeight + (detail.length ? 2 + detailHeight : 0);
+    var top = node.y + Math.max(4, (node.height - totalHeight) / 2);
+    var titleY = top + titleSize * 1.04;
     return {
       compact: true,
       title: title,
       detail: detail,
+      titleSize: titleSize,
+      detailSize: detailSize,
       titleY: titleY,
-      detailY: titleY + Math.max(0, title.length - 1) * titleStep + 14,
+      detailY: titleY + Math.max(0, title.length - 1) * titleStep + detailSize + 4.5,
       titleStep: titleStep,
-      detailStep: detailStep
+      detailStep: detailStep,
+      required: Math.ceil(totalHeight + 10)
     };
+  }
+
+  function fitNode(source, type) {
+    var node = {};
+    Object.keys(source).forEach(function (key) { node[key] = source[key]; });
+    var layout = nodeTextLayout(node, type);
+    if (layout.required > node.height) {
+      node.y -= (layout.required - node.height) / 2;
+      node.height = layout.required;
+      layout = nodeTextLayout(node, type);
+    }
+    node.layout = layout;
+    return node;
   }
 
   function nodeCenter(node) {
@@ -217,8 +257,8 @@
     return 'M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + my + ' ' + x2 + ' ' + my + ' ' + x2 + ' ' + y2;
   }
 
-  function textBlock(node, className, value, startY, lineHeight) {
-    var text = svgEl('text', { x: node.x + 12, y: startY, class: className });
+  function textBlock(node, className, value, startY, lineHeight, size) {
+    var text = svgEl('text', { x: node.x + 12, y: startY, class: className, style: 'font-size:' + size + 'px' });
     lines(value).forEach(function (line, index) {
       text.appendChild(svgEl('tspan', {
         x: node.x + 12,
@@ -247,8 +287,10 @@
       var nodeMap = {};
       var nodeViews = [];
       var edgeViews = [];
+      var type = typeScale(config.viewBox || '0 0 760 480');
+      var nodes = config.nodes.map(function (node) { return fitNode(node, type); });
 
-      config.nodes.forEach(function (node) { nodeMap[node.id] = node; });
+      nodes.forEach(function (node) { nodeMap[node.id] = node; });
 
       var svg = svgEl('svg', {
         class: 'asf-svg',
@@ -274,10 +316,11 @@
       (config.zones || []).forEach(function (zone) {
         svg.appendChild(svgEl('g', { class: 'asf-zone' }, [
           svgEl('rect', { x: zone.x, y: zone.y, width: zone.width, height: zone.height }),
-          svgEl('text', { x: zone.x + 10, y: zone.y + 18 }, [document.createTextNode(zone.label)])
+          svgEl('text', { x: zone.x + 10, y: zone.y + 18, style: 'font-size:' + type.zone + 'px' }, [document.createTextNode(zone.label)])
         ]));
       });
 
+      var edgeTags = [];
       config.edges.forEach(function (edge) {
         var group = svgEl('g', { class: 'asf-edge' + (edge.tone === 'warning' ? ' is-warning' : '') });
         var path = svgEl('path', {
@@ -285,25 +328,36 @@
           'marker-end': 'url(#' + (edge.tone === 'warning' ? uid + '-warn-arrow' : uid + '-arrow') + ')'
         });
         group.appendChild(path);
+        var tag = null;
         if (edge.label) {
           var fromCenter = nodeCenter(nodeMap[edge.from]);
           var toCenter = nodeCenter(nodeMap[edge.to]);
           var labelX = edge.points && edge.points.length ? edge.points[Math.floor(edge.points.length / 2)][0] : (fromCenter.x + toCenter.x) / 2;
           var labelY = edge.points && edge.points.length ? edge.points[Math.floor(edge.points.length / 2)][1] - 7 : (fromCenter.y + toCenter.y) / 2 - 7;
-          group.appendChild(svgEl('text', { x: labelX, y: labelY, class: 'asf-edge-label' }, [document.createTextNode(edge.label)]));
+          if (edge.labelAt) {
+            labelX = edge.labelAt[0];
+            labelY = edge.labelAt[1];
+          }
+          var tagWidth = edge.label.length * 0.6 * type.edge + 8;
+          tag = svgEl('g', { class: 'asf-edge asf-edge-tag' }, [
+            svgEl('rect', { x: labelX - tagWidth / 2, y: labelY - type.edge, width: tagWidth, height: type.edge + 4 }),
+            svgEl('text', { x: labelX, y: labelY, class: 'asf-edge-label', style: 'font-size:' + type.edge + 'px' }, [document.createTextNode(edge.label)])
+          ]);
+          edgeTags.push(tag);
         }
         svg.appendChild(group);
-        edgeViews.push({ config: edge, element: group });
+        edgeViews.push({ config: edge, element: group, tag: tag });
       });
+      edgeTags.forEach(function (tag) { svg.appendChild(tag); });
 
-      config.nodes.forEach(function (node) {
-        var layout = nodeTextLayout(node);
+      nodes.forEach(function (node) {
+        var layout = node.layout;
         var nodeClass = 'asf-node' + (node.kind === 'decision' ? ' is-decision' : '') + (node.kind === 'warning' ? ' is-warning' : '') + (layout.compact ? ' is-compact' : '');
         var group = svgEl('g', { class: nodeClass, 'data-node': node.id });
         group.appendChild(svgEl('rect', { x: node.x, y: node.y, width: node.width, height: node.height, rx: '0' }));
-        group.appendChild(textBlock(node, 'asf-title', layout.title, layout.titleY, layout.titleStep));
+        group.appendChild(textBlock(node, 'asf-title', layout.title, layout.titleY, layout.titleStep, layout.titleSize));
         if (layout.detail.length) {
-          group.appendChild(textBlock(node, 'asf-detail', layout.detail, layout.detailY, layout.detailStep));
+          group.appendChild(textBlock(node, 'asf-detail', layout.detail, layout.detailY, layout.detailStep, layout.detailSize));
         }
         svg.appendChild(group);
         nodeViews.push({ config: node, element: group });
@@ -343,6 +397,7 @@
         });
         edgeViews.forEach(function (view) {
           view.element.classList.toggle('is-visible', view.config.stage <= state.step);
+          if (view.tag) view.tag.classList.toggle('is-visible', view.config.stage <= state.step);
         });
         range.value = String(state.step);
         range.setAttribute('aria-valuetext', 'Step ' + (state.step + 1) + ' of ' + config.steps.length + ': ' + config.steps[state.step].label);
@@ -456,14 +511,15 @@
         N('refs', 205, 150, 'references/', 'branch rules', 1, '', 140, 64),
         N('scripts', 375, 150, 'scripts/', 'deterministic helpers', 1, '', 140, 64),
         N('assets', 545, 150, 'assets/', 'output material', 1, '', 140, 64),
-        N('policy', 185, 292, 'release-policy.md', 'domain constraint', 2, '', 150, 62),
-        N('format', 350, 292, 'changelog-format.md', 'format contract', 2, '', 160, 62),
-        N('inspect', 520, 292, 'inspect_release.py', 'evidence collector', 2, '', 150, 62),
-        N('checklist', 590, 342, 'release-checklist.md', 'deliverable template', 2, '', 145, 62)
+        N('policy', 32, 290, 'release-policy.md', 'domain constraint', 2, '', 165, 62),
+        N('format', 209, 290, 'changelog-format.md', 'format contract', 2, '', 165, 62),
+        N('inspect', 386, 290, 'inspect_release.py', 'evidence collector', 2, '', 165, 62),
+        N('checklist', 563, 290, 'release-checklist.md', 'deliverable template', 2, '', 165, 62)
       ],
       edges: [
         E('bundle', 'entry', 1), E('bundle', 'refs', 1), E('bundle', 'scripts', 1), E('bundle', 'assets', 1),
-        E('refs', 'policy', 2), E('refs', 'format', 2), E('scripts', 'inspect', 2), E('assets', 'checklist', 2)
+        E('refs', 'policy', 2, '', '', [[232, 214], [232, 250], [114, 250], [114, 290]]), E('refs', 'format', 2, '', '', [[291, 214], [291, 290]]),
+        E('scripts', 'inspect', 2, '', '', [[468, 214], [468, 290]]), E('assets', 'checklist', 2, '', '', [[645, 214], [645, 290]])
       ],
       steps: [
         S('The directory is the unit', 'Install, version, review, and remove the whole package root.', ['bundle']),
@@ -483,8 +539,8 @@
         N('validate', 190, 55, 'Validate', 'metadata + layout', 1, '', 140, 60),
         N('catalog', 360, 55, 'Catalog', 'name + description', 2, '', 140, 60),
         N('select', 535, 55, 'Select?', 'explicit or implicit', 3, 'decision', 140, 60),
-        N('unloaded', 730, 25, 'Leave unloaded', 'no match', 4, 'warning', 150, 54),
-        N('activate', 730, 125, 'Activate', 'body enters context', 4, '', 150, 60),
+        N('unloaded', 740, 25, 'Leave unloaded', 'no match', 4, 'warning', 150, 54),
+        N('activate', 740, 125, 'Activate', 'body enters context', 4, '', 150, 60),
         N('body', 535, 230, 'Load SKILL.md', 'working procedure', 5, '', 150, 60),
         N('resources', 350, 230, 'Disclose resources', 'only required branch', 6, '', 155, 60),
         N('execute', 165, 230, 'Request execution', 'host tools + policy', 7, '', 155, 60),
@@ -654,7 +710,7 @@
         N('inside', 650, 105, 'Target under root?', 'after symlinks', 3, 'decision', 150, 62),
         N('reject2', 815, 45, 'Reject', 'escaped root', 4, 'warning', 110, 52),
         N('type', 650, 230, 'Expected file type?', 'regular allowed file', 4, 'decision', 150, 62),
-        N('reject3', 815, 230, 'Reject', 'wrong or special file', 5, 'warning', 110, 52),
+        N('reject3', 820, 230, 'Reject', 'wrong or special file', 5, 'warning', 108, 52),
         N('limit', 455, 350, 'Within size limit?', 'bounded context read', 5, 'decision', 155, 62),
         N('reject4', 670, 390, 'Reject', 'oversized resource', 6, 'warning', 130, 52),
         N('load', 255, 455, 'Load resource', 'record reason + bytes', 6, '', 150, 62)
@@ -662,7 +718,7 @@
       edges: [
         E('request', 'escape', 1), E('escape', 'reject1', 2, 'yes', 'warning'), E('escape', 'resolve', 2, 'no'),
         E('resolve', 'inside', 3), E('inside', 'reject2', 4, 'no', 'warning'), E('inside', 'type', 4, 'yes'),
-        E('type', 'reject3', 5, 'no', 'warning'), E('type', 'limit', 5, 'yes'),
+        E('type', 'reject3', 5, 'no', 'warning', [[800, 258], [810, 258], [820, 258]]), E('type', 'limit', 5, 'yes'),
         E('limit', 'reject4', 6, 'no', 'warning'), E('limit', 'load', 6, 'yes')
       ],
       steps: [
@@ -767,7 +823,7 @@
       hint: 'keep extensions outside the core contract',
       description: 'A portable skill bundle and a host adapter contribute different inputs to one runtime activation boundary.',
       viewBox: '0 0 860 500',
-      zones: [Z(25, 35, 365, 390, 'portable package'), Z(470, 35, 365, 390, 'host adapter')],
+      zones: [Z(25, 35, 365, 340, 'portable package'), Z(470, 35, 365, 340, 'host adapter')],
       nodes: [
         N('bundle', 130, 70, 'Portable bundle', 'cross-host directory', 0, '', 155, 60),
         N('skill', 55, 180, 'SKILL.md', 'core procedure', 1, '', 130, 58),
@@ -813,7 +869,7 @@
       ],
       edges: [
         E('skill', 'model', 1), E('model', 'capability', 2), E('capability', 'permission', 3), E('permission', 'approval', 4),
-        E('approval', 'executor', 5, 'allowed or granted'), E('approval', 'stop', 5, 'denied', 'warning'),
+        E('approval', 'executor', 5, 'allowed or granted', '', [[682, 105], [682, 86], [775, 86]]), E('approval', 'stop', 5, 'denied', 'warning', [[700, 167], [700, 229], [775, 229]]),
         E('executor', 'observe', 6, '', '', [[845, 117], [930, 117], [930, 275], [145, 275]]), E('observe', 'verify', 7)
       ],
       steps: [
@@ -848,7 +904,7 @@
         N('effects', 780, 455, 'External effects', 'publish, delete, bill', 5, 'warning', 110, 58)
       ],
       edges: [
-        E('package', 'instructions', 1), E('resources', 'instructions', 1), E('untrusted', 'instructions', 1, 'data, not authority', 'warning'),
+        E('package', 'instructions', 1), E('resources', 'instructions', 1), E('untrusted', 'instructions', 1, 'data, not authority', 'warning', [[190, 262], [290, 262], [290, 201]]),
         E('instructions', 'requests', 3), E('scripts', 'requests', 3), E('requests', 'host', 4),
         E('host', 'files', 5), E('host', 'network', 5, '', 'warning'), E('host', 'credentials', 5, '', 'warning'), E('host', 'effects', 5, '', 'warning')
       ],
@@ -872,7 +928,7 @@
         N('action', 35, 65, 'Proposed action', 'target + consequence', 0, '', 145, 60),
         N('reversible', 225, 65, 'Reversible + local?', 'rollback possible', 1, 'decision', 165, 62),
         N('scope', 470, 35, 'Inside pre-approved scope?', 'actor + operation + target', 2, 'decision', 185, 62),
-        N('impact', 470, 180, 'External, destructive, costly, or sensitive?', 'high consequence', 2, 'decision', 205, 76),
+        N('impact', 470, 180, 'External, destructive, costly, or sensitive?', 'high consequence', 2, 'decision', 190, 76),
         N('execute', 700, 35, 'Execute in sandbox', 'containment remains', 3, '', 165, 62),
         N('ask', 700, 220, 'Ask scoped approval', 'show exact consequence', 3, 'warning', 165, 62),
         N('granted', 500, 360, 'Granted', 'immutable action record', 4, '', 135, 58),
@@ -883,7 +939,7 @@
         E('action', 'reversible', 1), E('reversible', 'scope', 2, 'yes'), E('reversible', 'impact', 2, 'no'),
         E('scope', 'execute', 3, 'yes'), E('scope', 'ask', 3, 'no', 'warning'), E('impact', 'ask', 3, 'yes', 'warning'), E('impact', 'execute', 3, 'no'),
         E('ask', 'granted', 4, 'granted'), E('ask', 'denied', 4, 'denied', 'warning'),
-        E('execute', 'result', 5), E('granted', 'result', 5)
+        E('execute', 'result', 5, '', '', [[865, 66], [884, 66], [884, 500], [660, 500]]), E('granted', 'result', 5)
       ],
       steps: [
         S('Name the action', 'Approval cannot be evaluated from a vague request to allow a general shell.', ['action']),
@@ -997,11 +1053,18 @@
       ],
       edges: [
         E('observe', 'contract', 1), E('contract', 'package', 2), E('package', 'eval', 3), E('eval', 'failure', 4),
-        E('failure', 'routing', 5, 'routing'), E('failure', 'behavior', 5, 'behavior'), E('failure', 'script', 5, 'script'),
-        E('failure', 'safety', 5, 'safety', 'warning'), E('failure', 'portability', 5, 'portability'),
-        E('routing', 'reeval', 6), E('behavior', 'reeval', 6), E('script', 'reeval', 6), E('safety', 'reeval', 6), E('portability', 'reeval', 6),
-        E('reeval', 'eval', 6, 'new evidence', '', [[455, 400], [455, 355], [642, 355], [642, 115]]),
-        E('failure', 'release', 7, 'passes gate')
+        E('failure', 'routing', 5, 'routing', '', [[827, 115], [827, 185], [117, 185], [117, 250]]),
+        E('failure', 'behavior', 5, 'behavior', '', [[827, 115], [827, 185], [277, 185], [277, 250]]),
+        E('failure', 'script', 5, 'script', '', [[827, 115], [827, 185], [437, 185], [437, 250]]),
+        E('failure', 'safety', 5, 'safety', 'warning', [[827, 115], [827, 185], [597, 185], [597, 250]]),
+        E('failure', 'portability', 5, 'portability', '', [[827, 115], [827, 185], [757, 185], [757, 250]]),
+        E('routing', 'reeval', 6, '', '', [[117, 308], [117, 355], [455, 355], [455, 400]]),
+        E('behavior', 'reeval', 6, '', '', [[277, 308], [277, 355], [455, 355], [455, 400]]),
+        E('script', 'reeval', 6, '', '', [[437, 308], [437, 355], [455, 355], [455, 400]]),
+        E('safety', 'reeval', 6, '', '', [[597, 308], [597, 355], [455, 355], [455, 400]]),
+        E('portability', 'reeval', 6, '', '', [[757, 308], [757, 355], [455, 355], [455, 400]]),
+        E('reeval', 'eval', 6, 'new evidence', '', [[540, 430], [677, 430], [677, 150], [642, 150], [642, 115]], [608, 423]),
+        E('failure', 'release', 7, 'passes gate', '', [[905, 85], [945, 85], [945, 530], [815, 530]], [878, 523])
       ],
       steps: [
         S('Observe real work', 'Extract a stable procedure from evidence, not from a broad topic label.', ['observe']),

@@ -154,7 +154,11 @@
       "4.0x compression (16 → 4)  ·  compresses while keeping the main structure": "4.0 倍压缩（16 → 4）  ·  压缩同时保留主要结构",
       "x → encoder → z (4 dims) → decoder → x̂  ·  the bottleneck forces the network to keep only what matters": "x → 编码器 → z（4 维）→ 解码器 → x̂  ·  瓶颈迫使网络只保留重要信息",
       "16.0x compression (16 → 1)  ·  bottleneck too small: detail is lost": "16.0 倍压缩（16 → 1）  ·  瓶颈过窄：细节丢失",
-      "1.0x compression (16 → 16)  ·  wide bottleneck: near-perfect but no compression": "1.0 倍压缩（16 → 16）  ·  宽瓶颈：几乎完美，但没有压缩"
+      "1.0x compression (16 → 16)  ·  wide bottleneck: near-perfect but no compression": "1.0 倍压缩（16 → 16）  ·  宽瓶颈：几乎完美，但没有压缩",
+      "grey = input (16 dims)": "灰色 = 输入（16 维）",
+      "blue dashed = reconstruction from 4-dim bottleneck": "蓝色虚线 = 4 维瓶颈的重构",
+      "blue dashed = reconstruction from 1-dim bottleneck": "蓝色虚线 = 1 维瓶颈的重构",
+      "blue dashed = reconstruction from 16-dim bottleneck": "蓝色虚线 = 16 维瓶颈的重构"
     },
     "patterns": [
       [

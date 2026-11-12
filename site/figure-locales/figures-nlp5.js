@@ -81,9 +81,9 @@
       "turn 2": "第 2 轮",
       "turn 3": "第 3 轮",
       "dialogue state": "对话状态",
-      "price": "price（价格）",
-      "area": "area（区域）",
-      "cuisine": "cuisine（菜系）",
+      "price": "价格",
+      "area": "区域",
+      "cuisine": "菜系",
       "JGA: a turn counts only if every slot is right": "JGA：仅当全部槽位正确时，该轮才算正确",
       "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用"
     },
@@ -127,7 +127,9 @@
       "A vision transformer never convolves: the image is cut into fixed patches, each patch is flattened and linearly projected, and the patches queue up as tokens behind a learned [CLS] token. Position embeddings are the only memory of the original grid; from there it is the standard transformer encoder.": "视觉 transformer 不执行卷积：图像被切成固定分块，各块展平后线性投影，作为 token 排在可学习的 [CLS] token 后。位置嵌入是模型保留原始网格位置的唯一方式；之后就是标准的 transformer 编码器。",
       "image, 3 x 3 patches": "图像，3 x 3 个分块",
       "flatten + linearly project, add position embeddings": "展平后线性投影，再加入位置嵌入",
-      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用"
+      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用",
+      "flatten + linearly project,": "展平后线性投影，",
+      "add position embeddings": "再加入位置嵌入"
     },
     "patterns": [],
     "preserve": [
@@ -148,7 +150,9 @@
       "encoder": "编码器",
       "decoder": "解码器",
       "decoder output, one token at a time": "解码器逐个输出 token",
-      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用"
+      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，动画已停用",
+      "decoder output,": "解码器输出，",
+      "one token at a time": "一次一个 token"
     },
     "patterns": [],
     "preserve": [

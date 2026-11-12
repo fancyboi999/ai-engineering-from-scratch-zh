@@ -80,7 +80,7 @@
       "frames per second multiply tokens": "每秒帧数成倍增加 token",
       "Visual tokens scale with sampled frames, and frames scale with FPS times duration. Doubling the sampling rate doubles the token count, so an hour-long clip races past any fixed context window. The three escape routes are brute-force million-token context, ring attention split across devices, and aggressive pooling or agentic retrieval that never loads the whole video at once.": "视觉 token 数随采样帧数增长，而帧数等于 FPS 乘时长。采样率翻倍，token 数也翻倍，因此一小时视频很快就会超过任何固定上下文窗口。三条出路是直接使用百万 token 上下文、在设备间分摊环形注意力，或积极池化与 agent 检索，避免一次加载整段视频。",
       "context limit": "上下文上限",
-      "tokens": "token 数",
+      "tokens": "token",
       "frames per second": "每秒帧数",
       "1 fps": "1 帧/秒",
       "2 fps": "2 帧/秒",

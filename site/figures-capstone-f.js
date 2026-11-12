@@ -43,9 +43,10 @@
   }
   // fade + grow entrance from 95% about (cx,cy), soft exit at loop end
   function pop(kids, cx, cy, dur, at) {
-    var g = svgEl('g', { transform: 'translate(' + cx + ' ' + cy + ')' }, kids);
-    g.appendChild(svgEl('animateTransform', { attributeName: 'transform', type: 'scale', additive: 'sum', values: '0.95;1;1', dur: dur, begin: at, repeatCount: 'indefinite', calcMode: 'spline', keySplines: EASE + ';0 0 1 1', keyTimes: '0;0.18;1' }));
-    g.appendChild(svgEl('animateTransform', { attributeName: 'transform', type: 'translate', additive: 'sum', values: (-cx) + ' ' + (-cy), dur: dur, begin: at, repeatCount: 'indefinite' }));
+    var inner = svgEl('g', { transform: 'translate(' + (-cx) + ' ' + (-cy) + ')' }, kids);
+    var mid = svgEl('g', {}, [inner]);
+    mid.appendChild(svgEl('animateTransform', { attributeName: 'transform', type: 'scale', values: '0.95;1;1', dur: dur, begin: at, repeatCount: 'indefinite', calcMode: 'spline', keySplines: EASE + ';0 0 1 1', keyTimes: '0;0.18;1' }));
+    var g = svgEl('g', { transform: 'translate(' + cx + ' ' + cy + ')' }, [mid]);
     g.appendChild(anim('opacity', '0;1;1;0', dur, { begin: at, keyTimes: '0;0.14;0.94;1', calcMode: 'spline', keySplines: EASE + ';0 0 1 1;0.4 0 1 1' }));
     return g;
   }
@@ -111,18 +112,20 @@
     p1.appendChild(anim('opacity', '0;1;1;0;0', D, { keyTimes: '0;0.04;0.5;0.56;1' }));
     s.appendChild(p1);
     var p2 = dot('5', WARN);
+    p2.setAttribute('opacity', '0');
     p2.appendChild(mov('M116 70 L257 70 L257 140', D, { begin: '2.4s', calcMode: 'linear', keyPoints: '0;0.668;0.668;1;1', keyTimes: '0;0.15;0.25;0.4;1' }));
     p2.appendChild(anim('opacity', '0;1;1;1;0;0', D, { begin: '2.4s', keyTimes: '0;0.03;0.3;0.38;0.44;1' }));
     s.appendChild(p2);
     var ok = txt(257, 190, 'actor + tool + args + expiry', '8', WARN);
     ok.appendChild(anim('opacity', '0;0;1;1;0', D, { keyTimes: '0;0.85;0.9;0.98;1' }));
     s.appendChild(pop([box(197, 146, 120, 28), txt(257, 163, 'approval record', '9'), ok], 257, 160, D, '0.45s'));
-    var reg = [box(40, 170, 110, 30), txt(95, 184, 'registry', '9'), txt(95, 196, 'server.json', '7', MUTE),
-      line(150, 185, 430, 86, SOFT, { 'stroke-dasharray': '4 3' }),
-      txt(300, 152, 'live server/discover probe', '8', MUTE)];
-    s.appendChild(pop(reg, 95, 185, D, '0.6s'));
+    var reg = [box(404, 156, 92, 30), txt(450, 170, 'registry', '9'), txt(450, 182, 'server.json', '7', MUTE),
+      line(450, 156, 450, 84, SOFT, { 'stroke-dasharray': '4 3' }),
+      txt(442, 124, 'live server/discover probe', '8', MUTE, 'end')];
+    s.appendChild(pop(reg, 450, 171, D, '0.6s'));
     var poll = dot('3.5', MUTE);
-    poll.appendChild(mov('M150 185 L430 86', D, { begin: '0.9s', calcMode: 'linear', keyPoints: '0;1;1', keyTimes: '0;0.22;1' }));
+    poll.setAttribute('opacity', '0');
+    poll.appendChild(mov('M450 156 L450 86', D, { begin: '0.9s', calcMode: 'linear', keyPoints: '0;1;1', keyTimes: '0;0.22;1' }));
     poll.appendChild(anim('opacity', '0;1;0;0', D, { begin: '0.9s', keyTimes: '0;0.06;0.24;1' }));
     s.appendChild(poll);
     shell(host, 'STATELESS MCP GATE + REGISTRY', 'metadata and authority checked per request', s,
@@ -175,15 +178,15 @@
     for (i = 0; i < 5; i++) {
       var y = 24 + i * 34, model = i === 3, gate = i === 2;
       stack.push(fade(box(150, y, 220, 26, model ? BLUE : SURF, model ? 'none' : (gate ? WARN : RULE)), D, (i * 0.08) + 's'));
-      stack.push(fade(txt(260, y + 17, names[i], '9', model ? BG : INK), D, (i * 0.08) + 's'));
+      stack.push(fade(txt(162, y + 17, names[i], '9', model ? BG : INK, 'start'), D, (i * 0.08) + 's'));
     }
     s.appendChild(pop(stack, 260, 105, D, '0s'));
     var safe = dot('5', BLUE);
-    safe.appendChild(mov('M260 8 L260 200', D, { calcMode: 'linear', keyPoints: '0;0;1;1', keyTimes: '0;0.1;0.6;1' }));
+    safe.appendChild(mov('M280 8 L280 200', D, { calcMode: 'linear', keyPoints: '0;0;1;1', keyTimes: '0;0.1;0.6;1' }));
     safe.appendChild(anim('opacity', '0;0;1;1;0;0', D, { keyTimes: '0;0.1;0.14;0.56;0.62;1' }));
     s.appendChild(safe);
     var atk = dot('5', WARN);
-    atk.appendChild(mov('M310 8 L310 105 L430 105', D, { calcMode: 'linear', keyPoints: '0;0;0.447;0.447;1;1', keyTimes: '0;0.3;0.5;0.56;0.72;1' }));
+    atk.appendChild(mov('M330 8 L330 105 L430 105', D, { calcMode: 'linear', keyPoints: '0;0;0.447;0.447;1;1', keyTimes: '0;0.3;0.5;0.56;0.72;1' }));
     atk.appendChild(anim('opacity', '0;0;1;1;0;0', D, { keyTimes: '0;0.3;0.34;0.7;0.76;1' }));
     s.appendChild(atk);
     var flash = box(150, 92, 220, 26, 'none', WARN);

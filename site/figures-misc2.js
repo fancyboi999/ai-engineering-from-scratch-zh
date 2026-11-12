@@ -108,15 +108,15 @@
   // ── mx-research-loop: hypothesis→code→run→critique cycle with sandbox + review
   // phases/15-autonomous-systems/05-ai-scientist-v2
   function researchLoop(host) {
-    var W = 520, H = 240, CX = 260, CY = 120, R = 78;
+    var W = 520, H = 260, CX = 260, CY = 120, R = 78;
     var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H });
     var nodes = [
       { a: -90, t: 'idea', c: BP },
-      { a: -18, t: 'novelty?', c: MUTE },
-      { a: 54, t: 'experiment', c: BP },
-      { a: 126, t: 'sandbox run', c: WARN },
-      { a: 198, t: 'figures', c: BP },
-      { a: 270, t: 'writeup', c: BP }
+      { a: -30, t: 'novelty?', c: MUTE },
+      { a: 30, t: 'experiment', c: BP },
+      { a: 90, t: 'sandbox run', c: WARN },
+      { a: 150, t: 'figures', c: BP },
+      { a: 210, t: 'writeup', c: BP }
     ];
     // dashed cycle ring
     var ring = svgEl('circle', { cx: CX, cy: CY, r: R, fill: 'none', stroke: SOFT, 'stroke-width': 1.4, 'stroke-dasharray': '5 5' });
@@ -136,7 +136,7 @@
     // center critique label
     svg.appendChild(txt(CX, CY - 4, 'VLM', 9, INK));
     svg.appendChild(txt(CX, CY + 10, 'critique', 8, MUTE));
-    svg.appendChild(txt(CX, 224, '42% of runs fail on coding errors; the loop re-enters at sandbox', 8.5, WARN));
+    svg.appendChild(txt(CX, 248, '42% of runs fail on coding errors; the loop re-enters at sandbox', 8.5, WARN));
     shell(host, 'AUTONOMOUS RESEARCH LOOP', 'idea → experiment → sandbox → critique, iterated', svg,
       'AI Scientist v2 closes the research loop without human templates: it generates ideas, checks novelty, drafts and runs experiments in a sandbox, has a vision-language model critique the figures, and writes the paper, iterating on internal review. One generated paper passed an ICLR 2025 workshop review. Independent evaluation found 42% of experiments failed on coding errors and the novelty check often mislabeled established methods as new, so the sandbox edge of the loop is where reliability is decided.');
   }
@@ -155,18 +155,18 @@
     // K drafted tokens in a row between draft and target; last is rejected
     var ks = [{ x: 140, ok: true }, { x: 190, ok: true }, { x: 240, ok: true }, { x: 290, ok: false }];
     ks.forEach(function (k, i) {
-      svg.appendChild(svgEl('rect', { x: k.x, y: 102, width: 30, height: 28, rx: 3, fill: 'none', stroke: SOFT, 'stroke-width': 1.4 }));
-      var tok = svgEl('rect', { x: k.x, y: 102, width: 30, height: 28, rx: 3, fill: 'none', stroke: k.ok ? BP : WARN, 'stroke-width': 1.4, opacity: 0 });
+      svg.appendChild(svgEl('rect', { x: k.x, y: 96, width: 30, height: 40, rx: 3, fill: 'none', stroke: SOFT, 'stroke-width': 1.4 }));
+      var tok = svgEl('rect', { x: k.x, y: 96, width: 30, height: 40, rx: 3, fill: 'none', stroke: k.ok ? BP : WARN, 'stroke-width': 1.4, opacity: 0 });
       tok.appendChild(anim('opacity', '0;1;1', '4s', { begin: (i * 0.4) + 's' }));
       svg.appendChild(tok);
-      svg.appendChild(txt(k.x + 15, 120, 't' + (i + 1), 8, MUTE));
+      svg.appendChild(txt(k.x + 15, 110, 't' + (i + 1), 8, MUTE));
       var mark = txt(k.x + 15, 152, k.ok ? 'accept' : 'reject', 7.5, k.ok ? BP : WARN);
       mark.appendChild(anim('opacity', '0;0;1;1', '4s', { begin: (i * 0.4) + 's' }));
       svg.appendChild(mark);
     });
     // draft proposes (token flowing right), target verifies (single pulse back)
     var prop = svgEl('circle', { cx: 0, cy: 0, r: 5, fill: BP });
-    prop.appendChild(motion('M100 117 L370 117', '4s', '0s'));
+    prop.appendChild(motion('M100 126 L370 126', '4s', '0s'));
     svg.appendChild(prop);
     var verify = svgEl('rect', { x: 365, y: 90, width: 90, height: 54, rx: 4, fill: 'none', stroke: INK, 'stroke-width': 1 });
     verify.appendChild(anim('opacity', '0.2;1;0.2', '4s', { begin: '1.8s' }));
@@ -204,8 +204,9 @@
     // requests in: first tries primary (bounces), then routes to fallback
     var i;
     for (i = 0; i < 4; i++) {
-      var g = svgEl('g', {}, [svgEl('circle', { cx: 0, cy: 0, r: 5, fill: BP })]);
-      g.appendChild(motion('M-20 116 L80 116 L445 110', '3s', (i * 0.55) + 's'));
+      var g = svgEl('g', { opacity: 0 }, [svgEl('circle', { cx: 0, cy: 0, r: 5, fill: BP })]);
+      g.appendChild(motion('M46 116 L80 116 L445 110', '3s', (i * 0.55) + 's'));
+      g.appendChild(anim('opacity', '1;1', '3s', { begin: (i * 0.55) + 's' }));
       svg.appendChild(g);
     }
     var bounce = txt(250, 60, '429 → reroute', 8, WARN);
@@ -289,7 +290,8 @@
     // tokens fall through the gate; invalid ones (warn) are masked out, valid pass
     var spec = [{ ok: true, b: '0s' }, { ok: false, b: '0.7s' }, { ok: true, b: '1.4s' }, { ok: true, b: '2.1s' }];
     spec.forEach(function (s) {
-      var c = svgEl('circle', { cx: 0, cy: 0, r: 5, fill: s.ok ? BP : WARN });
+      var c = svgEl('circle', { cx: 0, cy: 0, r: 5, fill: s.ok ? BP : WARN, opacity: 0 });
+      c.appendChild(anim('opacity', '1;1', '3.2s', { begin: s.b }));
       if (s.ok) {
         c.appendChild(motion('M150 115 L260 115 L432 115', '3.2s', s.b));
       } else {
@@ -330,7 +332,7 @@
     callTok.appendChild(motion('M170 100 C 240 50, 290 50, 350 100', '2.8s', '0s'));
     callTok.appendChild(anim('opacity', '1;1;0;0', '2.8s'));
     svg.appendChild(callTok);
-    var resTok = svgEl('rect', { x: -10, y: -7, width: 20, height: 14, rx: 2, fill: INK });
+    var resTok = svgEl('rect', { x: -10, y: -7, width: 20, height: 14, rx: 2, fill: INK, opacity: 0 });
     resTok.appendChild(motion('M350 136 C 290 186, 240 186, 170 136', '2.8s', '1.4s'));
     resTok.appendChild(anim('opacity', '0;1;1;0', '2.8s', { begin: '1.4s' }));
     svg.appendChild(resTok);

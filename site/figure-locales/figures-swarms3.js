@@ -32,7 +32,9 @@
       "triage": "分诊",
       "billing": "账单",
       "refund": "退款",
-      "handoff = a tool call returning the next agent  ·  whoever holds the token is the orchestrator": "交接 = 返回下一个 agent 的工具调用 · 当前持有会话控制权的 agent 就是编排者"
+      "handoff = a tool call returning the next agent  ·  whoever holds the token is the orchestrator": "交接 = 返回下一个 agent 的工具调用 · 当前持有会话控制权的 agent 就是编排者",
+      "handoff = a tool call returning the next agent": "交接 = 返回下一个 agent 的工具调用",
+      "whoever holds the token is the orchestrator": "当前持有会话控制权的 agent 就是编排者"
     },
     "patterns": [],
     "preserve": []
