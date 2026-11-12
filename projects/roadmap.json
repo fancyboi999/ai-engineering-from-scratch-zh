@@ -223,34 +223,6 @@
       "firstDemo": "展示改述问题命中缓存，而关键数字或租户变化时未命中。"
     },
     {
-      "id": "tool-contract-migration-checker",
-      "title": "工具契约迁移检查器",
-      "level": 3,
-      "source": "core",
-      "status": "planned",
-      "track": "systems",
-      "languages": [
-        "TypeScript",
-        "Python"
-      ],
-      "tagline": "找出拟议 schema 变更会破坏的已保存工具调用。",
-      "summary": "帮助工具作者演进可调用接口，而现有 agent 仍持有旧参数形状。比较文档化的新旧 schema 子集，为必填字段和收窄取值生成反例，在两个校验器中重放已保存调用。导出兼容性报告和可评审的 CI 迁移 fixture。",
-      "output": "schema 兼容性 CLI、破坏性调用 fixture 和 CI 报告",
-      "prerequisiteProjects": [
-        "json-schema-output-guard"
-      ],
-      "milestones": [
-        "加载版本化工具契约和已保存调用",
-        "分类支持的 schema 变更",
-        "生成并重放失效调用反例",
-        "导出迁移 fixture 和兼容性门禁"
-      ],
-      "references": [],
-      "distinctFrom": "JSON Schema 输出守卫校验一个载荷；本项目分析两份工具契约的兼容性，给出有效性发生变化的具体调用。它不把包升级映射到源码调用位置。",
-      "firstDemo": "为虚构目录工具添加必填参数，生成一条在旧契约通过、在新契约失败的保存调用。",
-      "implementationBoundary": "公布支持的 schema 子集，将未处理关键字标为未解决，而不是宣称完整 JSON Schema 兼容。"
-    },
-    {
       "id": "video-highlight-storyboard",
       "title": "视频高光故事板",
       "level": 3,
