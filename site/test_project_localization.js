@@ -15,7 +15,7 @@ const localizedProjects = [
   'infrastructure-plan-explainer', 'kubernetes-event-storyboard', 'log-volume-reduction-lab',
   'plain-language-rewrite-desk', 'retry-storm-lab', 'sensitive-text-redaction-gate',
   'service-ownership-navigator', 'signed-webhook-inbox', 'streaming-answer-recovery',
-  'subtitle-localization-desk', 'ui-string-localization-workbench',
+  'subtitle-localization-desk', 'tool-contract-migration-checker', 'ui-string-localization-workbench',
   'vocabulary-autocomplete-pad', 'workshop-materials-planner',
 ];
 function chinese(value) { assert.match(value, /[\u4e00-\u9fff]/); }

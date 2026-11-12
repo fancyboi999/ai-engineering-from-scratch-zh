@@ -46,7 +46,7 @@
   var LEVEL_PITCH = 78;
   var NODE_W = 96;
   var NODE_H = 34;
-  var LEAF_H = 58;
+  var LEAF_H = 72;
 
   function ensureStyles() {
     if (document.getElementById('re44-styles')) return;
@@ -64,7 +64,7 @@
       '.re44 button[aria-pressed="true"]{border-color:var(--blueprint,#3553ff);background:var(--blueprint,#3553ff);color:var(--bg,#fafaf5)}',
       '.re44__legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--font-mono,monospace);font-size:.72rem;color:var(--ink-soft,#555)}',
       '.re44__legend span{display:inline-flex;align-items:center;gap:6px}',
-      '.re44__legend svg{width:28px;height:8px;display:block}',
+      '.re44__legend svg{width:28px!important;height:8px!important;max-width:none!important;margin:0!important;display:block}',
       '.re44__scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule-soft,#ddd);background:var(--bg,#fafaf5)}',
       '.re44__scroll svg{display:block;min-width:520px;width:100%;height:auto}',
       '.re44 .re44__pick{cursor:pointer}',
@@ -219,15 +219,16 @@
 
   var TREE = layoutTree();
 
-  function rangeText(leaf) {
-    if (!leaf.bounded) return '边界内无输入';
-    if (leaf.bounded.min === DATA.tree.domain[0] && leaf.bounded.max === DATA.tree.domain[1]) return leaf.bounded.count + ' 个输入分布于边界内';
-    return 'score ' + leaf.bounded.min + '..' + leaf.bounded.max + ' (' + leaf.bounded.count + ')';
+  function rangeLines(leaf) {
+    if (!leaf.bounded) return ['边界内', '无输入'];
+    if (leaf.bounded.min === DATA.tree.domain[0] && leaf.bounded.max === DATA.tree.domain[1]) return [leaf.bounded.count + ' 个输入', '分布于边界内'];
+    return ['score ' + leaf.bounded.min + '..' + leaf.bounded.max, '(' + leaf.bounded.count + ')'];
   }
 
   function drawTree(svg, state, onPick) {
     svg.appendChild(text(16, TREE_Y + 2, '路径树：' + DATA.tree.function + ' 位于 ' + DATA.tree.object + ', ' + DATA.tree.pathCount + ' 条路径，score 搜索范围 ' + DATA.tree.domain[0] + '..' + DATA.tree.domain[1], MUTE, 'start', 11));
     var i;
+    var tags = [];
     for (i = 0; i < DATA.tree.edges.length; i++) {
       var e = DATA.tree.edges[i];
       if (e.cond === '') continue;
@@ -241,10 +242,12 @@
       var midY = (y1 + y2) / 2;
       svg.appendChild(svgEl('path', { d: 'M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + midY + ' ' + x2 + ' ' + midY + ' ' + x2 + ' ' + y2, fill: 'none', stroke: BP, 'stroke-width': '1.4' }));
       var label = e.cond.length > 24 ? e.cond.replace(/local_10/g, 'q') : e.cond;
-      var lx = (x1 + x2) / 2;
-      svg.appendChild(svgEl('rect', { x: lx - label.length * 3.1, y: midY - 9, width: label.length * 6.2, height: 13, fill: BG, opacity: '0.92' }));
-      svg.appendChild(text(lx, midY + 1, label, INK, 'middle', 9.8));
+      var lx = x2;
+      var ly = y2 - 8;
+      tags.push(svgEl('rect', { x: lx - label.length * 3.1, y: ly - 10, width: label.length * 6.2, height: 13, fill: BG, opacity: '0.92' }));
+      tags.push(text(lx, ly, label, INK, 'middle', 9.8));
     }
+    for (i = 0; i < tags.length; i++) svg.appendChild(tags[i]);
     var id;
     for (id in TREE.positions) {
       if (!Object.prototype.hasOwnProperty.call(TREE.positions, id)) continue;
@@ -252,14 +255,18 @@
       var labels = DATA.tree.labels[id] || [];
       var leaf = p.leaf ? leafRecord(id) : null;
       var h = p.leaf ? LEAF_H : NODE_H;
+      var nodeText = labels.length ? labels[0].replace('local_10', 'q').replace('local_4', 'r') : '';
+      var nw = p.leaf ? NODE_W : Math.max(NODE_W, nodeText.length * 6 + 16);
       var selected = state.pick && state.pick.kind === 'leaf' && state.pick.id === id;
       var g = svgEl('g', p.leaf ? { 'class': 're44__pick', tabindex: '0', role: 'button' } : {});
-      g.appendChild(svgEl('rect', { x: p.x - NODE_W / 2, y: p.y - h / 2, width: NODE_W, height: h, rx: 3, fill: p.leaf ? SURF : BG, stroke: p.leaf ? BP : RULE, 'stroke-width': selected ? '2.4' : '1.3' }));
+      g.appendChild(svgEl('rect', { x: p.x - nw / 2, y: p.y - h / 2, width: nw, height: h, rx: 3, fill: p.leaf ? SURF : BG, stroke: p.leaf ? BP : RULE, 'stroke-width': selected ? '2.4' : '1.3' }));
       g.appendChild(text(p.x, p.y - h / 2 + 13, id, p.leaf ? BP : MUTE, 'middle', 10.5));
-      if (labels.length) g.appendChild(text(p.x, p.y - h / 2 + 26, labels[0].replace('local_10', 'q').replace('local_4', 'r'), INK, 'middle', 10));
+      if (labels.length) g.appendChild(text(p.x, p.y - h / 2 + 26, nodeText, INK, 'middle', 10));
       if (leaf) {
         g.appendChild(text(p.x, p.y - h / 2 + 40, '返回 ' + leaf.returns, INK, 'middle', 10, '600'));
-        g.appendChild(text(p.x, p.y - h / 2 + 52, rangeText(leaf), MUTE, 'middle', 9.2));
+        var range = rangeLines(leaf);
+        g.appendChild(text(p.x, p.y - h / 2 + 53, range[0], MUTE, 'middle', 9.2));
+        g.appendChild(text(p.x, p.y - h / 2 + 65, range[1], MUTE, 'middle', 9.2));
         g.appendChild(svgEl('title', {}, [document.createTextNode('叶节点 ' + id + ': ' + leaf.condition)]));
         (function (leafId) {
           g.addEventListener('click', function () { onPick({ kind: 'leaf', id: leafId }); });

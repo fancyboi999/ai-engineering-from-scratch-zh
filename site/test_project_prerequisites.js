@@ -15,7 +15,7 @@ vm.runInContext(helper('esc') + '\n' + helper('prerequisiteHtml'), context);
 const render = context.prerequisiteHtml;
 const escape = context.esc;
 
-test('renderProject uses the bounded prerequisite renderer for actual 71 strings and 54 course objects', () => {
+test('renderProject uses the bounded prerequisite renderer for actual 74 strings and 54 course objects', () => {
   assert.match(source, /var prereqs = \(project\.prerequisites \|\| \[\]\)\.map\(prerequisiteHtml\)\.join\(''\)/);
   let strings = 0, courses = 0;
   const projects = vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'projects-data.js'), 'utf8') + '\nwindow.AIFS_PROJECTS.projects', { window: {} });
@@ -31,7 +31,7 @@ test('renderProject uses the bounded prerequisite renderer for actual 71 strings
       courses++;
     }
   }
-  assert.equal(strings, 71); assert.equal(courses, 54);
+  assert.equal(strings, 74); assert.equal(courses, 54);
   for (const file of ['project.html', 'projects.html']) assert.match(fs.readFileSync(path.join(__dirname, file), 'utf8'), /projects\.js\?v=20261106a/);
 });
 

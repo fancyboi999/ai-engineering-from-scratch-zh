@@ -52,7 +52,7 @@ test('all 542 static lessons preserve Chinese source rendering, canonical, quiz 
 });
 
 test('project, stage, manual and Hub sources are fully generated', () => {
-  assert.equal(projects.length, 78);
+  assert.equal(projects.length, 79);
   let stages = 0;
   const sitemap = read('sitemap.xml');
   for (const project of projects) {
@@ -64,7 +64,7 @@ test('project, stage, manual and Hub sources are fully generated', () => {
       stages++;
     }
   }
-  assert.equal(stages, 322);
+  assert.equal(stages, 326);
   for (const { id, status } of manualManifests) {
     assert.match(read(`manual-${id}.html`), /lang="zh-CN"/);
     assert.match(read(`manual-${id}-print.html`), /lang="zh-CN"/);
@@ -79,7 +79,7 @@ test('project, stage, manual and Hub sources are fully generated', () => {
   assert.equal(fs.readdirSync(path.join(site, 'hubs/phase')).length, 20);
   assert.equal(fs.readdirSync(path.join(site, 'hubs/glossary')).length, 225);
   const cards = JSON.parse(read('og-cards.json')).cards;
-  assert.equal(Object.keys(cards).filter(key => key.startsWith('project/')).length, 78);
+  assert.equal(Object.keys(cards).filter(key => key.startsWith('project/')).length, 79);
   assert.deepEqual(Object.keys(cards).filter(key => key.startsWith('manual/')).sort(), publishedManualIds.map(id => 'manual/' + id));
   assert.equal(Object.keys(cards).filter(key => key.startsWith('phase/')).length, 20);
   assert.equal(Object.keys(cards).filter(key => key.startsWith('term/')).length, 225);

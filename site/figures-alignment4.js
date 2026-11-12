@@ -100,26 +100,26 @@
       }
       doc.appendChild(fadeWin(D, (0.03 + i * 0.05).toFixed(2), (0.13 + i * 0.05).toFixed(2), '0.93'));
       svg.appendChild(doc);
-      var lead = svgEl('line', { x1: 130, y1: y + 31, x2: 196, y2: 106 + i * 4, stroke: MUTE, 'stroke-width': '1.2', 'stroke-dasharray': '4 3', opacity: '0' });
+      var lead = svgEl('line', { x1: 130, y1: y + 31, x2: 172, y2: 106 + i * 4, stroke: MUTE, 'stroke-width': '1.2', 'stroke-dasharray': '4 3', opacity: '0' });
       lead.appendChild(fadeWin(D, '0.2', '0.28', '0.93'));
       svg.appendChild(lead);
     }
     svg.appendChild(txt(78, 34, 'identical resumes', MUTE, 9));
     var box = svgEl('g', {}, [
-      svgEl('rect', { x: 200, y: 84, width: 92, height: 52, rx: 6, fill: BP, opacity: '0.12' }),
-      svgEl('rect', { x: 200, y: 84, width: 92, height: 52, rx: 6, fill: 'none', stroke: BP, 'stroke-width': '2' }),
-      txt(246, 106, 'LLM', BP, 12),
-      txt(246, 122, 'scorer', SOFT, 9)
+      svgEl('rect', { x: 176, y: 84, width: 92, height: 52, rx: 6, fill: BP, opacity: '0.12' }),
+      svgEl('rect', { x: 176, y: 84, width: 92, height: 52, rx: 6, fill: 'none', stroke: BP, 'stroke-width': '2' }),
+      txt(222, 106, 'LLM', BP, 12),
+      txt(222, 122, 'scorer', SOFT, 9)
     ]);
     box.appendChild(anim('opacity', '0.75;1;0.75', '3s'));
     svg.appendChild(box);
     var bw = [176, 104];
     for (i = 0; i < 2; i++) {
       var by = 92 + i * 26;
-      var bar = svgEl('rect', { x: 310, y: by, width: 0, height: 14, rx: 3, fill: i ? WARN : BP, opacity: '0.8' });
+      var bar = svgEl('rect', { x: 284, y: by, width: 0, height: 14, rx: 3, fill: i ? WARN : BP, opacity: '0.8' });
       bar.appendChild(anim('width', '0;0;' + bw[i] + ';' + bw[i] + ';0', D, { calcMode: 'spline', keyTimes: winKT(0.34 + i * 0.05, 0.52 + i * 0.05, 0.92), keySplines: WINSPL }));
       svg.appendChild(bar);
-      var lb = txt(310 + bw[i] + 8, by + 11, i ? 'score B' : 'score A', i ? WARN : BP, 9, 'start');
+      var lb = txt(284 + bw[i] + 8, by + 11, i ? 'score B' : 'score A', i ? WARN : BP, 9, 'start');
       lb.setAttribute('opacity', '0');
       lb.appendChild(fadeWin(D, (0.52 + i * 0.05).toFixed(2), (0.58 + i * 0.05).toFixed(2), '0.92'));
       svg.appendChild(lb);
@@ -213,6 +213,7 @@
   function anWatermark(host) {
     var svg = svgEl('svg', { viewBox: '0 0 520 220' });
     var D = '5.5s';
+    host.setAttribute('data-static-time', '4.9');
     var green = [1, 0, 1, 1, 0, 1, 0, 1, 1], i;
     svg.appendChild(txt(40, 52, 'sampled tokens', MUTE, 9, 'start'));
     for (i = 0; i < 9; i++) {
@@ -340,12 +341,13 @@
   function anProvenance(host) {
     var svg = svgEl('svg', { viewBox: '0 0 520 230' });
     var D = '6s';
+    host.setAttribute('data-static-time', '4.7');
     svg.appendChild(svgEl('rect', { x: 218, y: 58, width: 10, height: 118, rx: 3, fill: SURF, stroke: RULE, 'stroke-width': '1' }));
     svg.appendChild(svgEl('rect', { x: 196, y: 48, width: 54, height: 12, rx: 3, fill: BG, stroke: BP, 'stroke-width': '1.6' }));
     svg.appendChild(txt(223, 38, 'consent gate, collection time', BP, 9));
     svg.appendChild(svgEl('rect', { x: 300, y: 62, width: 180, height: 112, rx: 8, fill: SURF, stroke: INK, 'stroke-width': '1.8' }));
-    svg.appendChild(txt(390, 112, 'model weights', INK, 12));
-    svg.appendChild(txt(390, 130, 'no surgical erasure', MUTE, 9));
+    svg.appendChild(txt(390, 88, 'model weights', INK, 12));
+    svg.appendChild(txt(390, 104, 'no surgical erasure', MUTE, 9));
     var i;
     for (i = 0; i < 2; i++) {
       var doc = svgEl('g', {}, [
@@ -354,12 +356,12 @@
         svgEl('line', { x1: -7, y1: 0, x2: 7, y2: 0, stroke: RULE, 'stroke-width': '2' }),
         svgEl('line', { x1: -7, y1: 8, x2: 7, y2: 8, stroke: RULE, 'stroke-width': '2' })
       ]);
-      doc.appendChild(animT('translate', '52 118;52 118;372 118;372 118', D,
+      doc.appendChild(animT('translate', '52 140;52 140;372 140;372 140', D,
         { calcMode: 'spline', keyTimes: '0;' + (0.04 + i * 0.07).toFixed(2) + ';' + (0.4 + i * 0.07).toFixed(2) + ';1', keySplines: '0 0 1 1;' + EASE + ';0 0 1 1' }));
       doc.appendChild(anim('opacity', '0;1;1;0;0', D, { keyTimes: '0;' + (0.08 + i * 0.07).toFixed(2) + ';' + (0.34 + i * 0.07).toFixed(2) + ';' + (0.44 + i * 0.07).toFixed(2) + ';1' }));
       svg.appendChild(doc);
     }
-    svg.appendChild(txt(52, 168, 'opt-out honored here', MUTE, 9));
+    svg.appendChild(txt(66, 176, 'opt-out honored here', MUTE, 9));
     var back = svgEl('g', { opacity: '0' }, [
       svgEl('line', { x1: 296, y1: 196, x2: 120, y2: 196, stroke: WARN, 'stroke-width': '1.8', 'stroke-dasharray': '6 4' }),
       svgEl('polygon', { points: '120,191 120,201 110,196', fill: WARN }),
@@ -382,7 +384,8 @@
   function anModeration(host) {
     var svg = svgEl('svg', { viewBox: '0 0 520 230' });
     var D = '5.5s';
-    var bx = [24, 128, 244, 358, 462], bw = [66, 84, 82, 84, 44];
+    host.setAttribute('data-static-time', '2.5');
+    var bx = [12, 88, 208, 300, 424], bw = [56, 100, 72, 104, 56];
     var bl = ['user', 'input filter', 'model', 'output filter', 'reply'];
     var i;
     for (i = 0; i < 5; i++) {
@@ -390,25 +393,25 @@
       svg.appendChild(svgEl('rect', { x: bx[i], y: 78, width: bw[i], height: 40, rx: 6, fill: filt ? BP : BG, 'fill-opacity': filt ? '0.12' : '1', stroke: filt ? BP : RULE, 'stroke-width': '1.7' }));
       svg.appendChild(txt(bx[i] + bw[i] / 2, 102, bl[i], filt ? BP : SOFT, 10));
     }
-    svg.appendChild(svgEl('rect', { x: 128, y: 168, width: 84, height: 30, rx: 5, fill: SURF, stroke: WARN, 'stroke-width': '1.5' }));
-    svg.appendChild(txt(170, 187, 'blocked', WARN, 10));
+    svg.appendChild(svgEl('rect', { x: 96, y: 174, width: 84, height: 30, rx: 5, fill: SURF, stroke: WARN, 'stroke-width': '1.5' }));
+    svg.appendChild(txt(138, 193, 'blocked', WARN, 10));
     var bad = svgEl('circle', { r: 6, fill: WARN });
-    bad.appendChild(animT('translate', '57 60;57 60;170 60;170 60;170 152;170 152', D,
+    bad.appendChild(animT('translate', '40 60;40 60;138 60;138 60;138 158;138 158', D,
       { calcMode: 'spline', keyTimes: '0;0.06;0.22;0.3;0.44;1', keySplines: '0 0 1 1;' + EASE + ';0 0 1 1;' + EASE + ';0 0 1 1' }));
     bad.appendChild(anim('opacity', '0;1;1;1;1;0', D, { keyTimes: '0;0.04;0.3;0.44;0.5;0.56' }));
     svg.appendChild(bad);
     var ok = svgEl('circle', { r: 6, fill: BP });
-    ok.appendChild(animT('translate', '57 60;57 60;170 60;170 60;285 60;285 60;400 60;400 60;484 60;484 60', D,
+    ok.appendChild(animT('translate', '40 60;40 60;138 60;138 60;244 60;244 60;352 60;352 60;452 60;452 60', D,
       { calcMode: 'spline', keyTimes: '0;0.2;0.32;0.38;0.5;0.56;0.68;0.74;0.86;1',
         keySplines: '0 0 1 1;' + EASE + ';0 0 1 1;' + EASE + ';0 0 1 1;' + EASE + ';0 0 1 1;' + EASE + ';0 0 1 1' }));
     ok.appendChild(anim('opacity', '0;0;1;1;0', D, { keyTimes: '0;0.16;0.22;0.9;0.97' }));
     svg.appendChild(ok);
-    var ring = svgEl('circle', { cx: 400, cy: 98, r: 12, fill: 'none', stroke: WARN, 'stroke-width': '2', opacity: '0' });
+    var ring = svgEl('circle', { cx: 352, cy: 60, r: 12, fill: 'none', stroke: WARN, 'stroke-width': '2', opacity: '0' });
     ring.appendChild(anim('opacity', '0;0;0.9;0;0', D, { keyTimes: '0;0.68;0.72;0.8;1' }));
-    ring.appendChild(anim('r', '10;10;16;20;10', D, { keyTimes: '0;0.68;0.74;0.8;1' }));
+    ring.appendChild(anim('r', '10;10;14;16;10', D, { keyTimes: '0;0.68;0.74;0.8;1' }));
     svg.appendChild(ring);
-    svg.appendChild(txt(400, 148, 'post-generation check', MUTE, 9));
-    svg.appendChild(txt(170, 148, 'pre-generation check', MUTE, 9));
+    svg.appendChild(txt(352, 138, 'post-generation check', MUTE, 9));
+    svg.appendChild(txt(138, 138, 'pre-generation check', MUTE, 9));
     card(host, 'LAYERED MODERATION', 'input · output · custom rules',
       svg,
       'Production moderation runs in layers. An input check screens the prompt before generation, so the amber request never reaches the model. An output check screens what the model produced, the ring pulse, catching harm the input layer could not predict. Custom domain rules stack on top. OpenAI omni-moderation returns 13 category flags per call, Llama Guard covers the 14 MLCommons hazards, and async parallel calls hide the added latency.');
@@ -435,7 +438,7 @@
     var eb = svgEl('rect', { x: 342, y: 138, width: 0, height: 22, rx: 3, fill: WARN, opacity: '0.85' });
     eb.appendChild(anim('width', '0;0;118;118;0', D, { calcMode: 'spline', keyTimes: winKT(0.4, 0.62, 0.92), keySplines: WINSPL }));
     svg.appendChild(eb);
-    var elb = txt(342, 178, 'smaller ratio, larger absolute reach', WARN, 10, 'start');
+    var elb = txt(TH - 6, 178, 'smaller ratio, larger absolute reach', WARN, 10, 'end');
     elb.setAttribute('opacity', '0');
     elb.appendChild(fadeWin(D, '0.6', '0.68', '0.92'));
     svg.appendChild(elb);

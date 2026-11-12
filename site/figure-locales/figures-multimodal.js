@@ -248,7 +248,8 @@
       "txt:boat": "文本：boat",
       "txt:bird": "文本：bird",
       "matched-pair mass 99%  ·  diagonal outlined  ·  balanced": "匹配对概率质量 99% · 对角线已描边 · 均衡",
-      "L = −log softmax(sim / τ)[matched],  τ = 0.10   ·   each image-row and text-column softmaxes to the matched pair": "L = −log softmax(sim / τ)[matched]，τ = 0.10 · 每个图像行和文本列都通过 softmax 对准匹配对"
+      "L = −log softmax(sim / τ)[matched],  τ = 0.10   ·   each image-row and text-column softmaxes to the matched pair": "L = −log softmax(sim / τ)[matched]，τ = 0.10 · 每个图像行和文本列都通过 softmax 对准匹配对",
+      "txt:": "文本："
     },
     "patterns": [
       [
@@ -268,6 +269,27 @@
         "L = −log softmax(sim / τ)[matched]，τ = $1 · 每个图像行和文本列都通过 softmax 对准匹配对"
       ]
     ],
-    "preserve": []
+    "preserve": [
+      {
+        "text": "dog",
+        "reason": "对比矩阵的演示样本标签，与原图“图像：dog”等译法一致，保留英文"
+      },
+      {
+        "text": "car",
+        "reason": "对比矩阵的演示样本标签，与原图“图像：dog”等译法一致，保留英文"
+      },
+      {
+        "text": "tree",
+        "reason": "对比矩阵的演示样本标签，与原图“图像：dog”等译法一致，保留英文"
+      },
+      {
+        "text": "boat",
+        "reason": "对比矩阵的演示样本标签，与原图“图像：dog”等译法一致，保留英文"
+      },
+      {
+        "text": "bird",
+        "reason": "对比矩阵的演示样本标签，与原图“图像：dog”等译法一致，保留英文"
+      }
+    ]
   }
 };

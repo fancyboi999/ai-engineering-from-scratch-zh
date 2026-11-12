@@ -3,7 +3,7 @@ id: tool-calling
 title: 工具调用与结构化输出
 subtitle: 声明工具、读取调用、返回结果、并行执行、流式接收参数，并约束输出为通过校验的 JSON。
 hue: 30
-sources: phases/11-llm-engineering/03-structured-outputs, phases/11-llm-engineering/09-function-calling, phases/13-tools-and-protocols/01-the-tool-interface, phases/13-tools-and-protocols/02-function-calling-deep-dive, phases/13-tools-and-protocols/03-parallel-and-streaming-tool-calls, phases/13-tools-and-protocols/04-structured-output, phases/13-tools-and-protocols/05-tool-schema-design, phases/19-capstone-projects/21-tool-registry-schema-validation, phases/19-capstone-projects/23-function-call-dispatcher
+sources: phases/11-llm-engineering/03-structured-outputs, phases/11-llm-engineering/09-function-calling, phases/13-tools-and-protocols/01-the-tool-interface, phases/13-tools-and-protocols/02-function-calling-deep-dive, phases/13-tools-and-protocols/03-parallel-and-streaming-tool-calls, phases/13-tools-and-protocols/04-structured-output, phases/13-tools-and-protocols/05-tool-schema-design, phases/19-capstone-projects/21-tool-registry-schema-validation, phases/19-capstone-projects/23-function-call-dispatcher, projects/tool-contract-migration-checker
 code: TC
 source_hash: 1407bd7b6c38ea4a
 ---

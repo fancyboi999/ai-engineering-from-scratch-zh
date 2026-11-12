@@ -365,7 +365,7 @@
     artGrid.appendChild(svgEl('animateTransform', { attributeName: 'transform', type: 'translate', additive: 'sum', values: '70 164;70 164;396 164;396 164', dur: '5s', begin: '0s', repeatCount: 'indefinite', keyTimes: '0;0.44;0.78;1', calcMode: 'spline', keySplines: '0 0 1 1;' + SPL + ';0 0 1 1' }));
     artGrid.appendChild(svgEl('animate', { attributeName: 'opacity', values: '0;0;1;1;1;0', dur: '5s', begin: '0s', repeatCount: 'indefinite', keyTimes: '0;0.4;0.46;0.78;0.94;1' }));
     svg.appendChild(artGrid);
-    svg.appendChild(txt(70, 192, 'same word as ASCII art: passes', '8', 'var(--ink-mute,#777)'));
+    svg.appendChild(txt(88, 192, 'same word as ASCII art: passes', '8', 'var(--ink-mute,#777)'));
     var readout = txt(420, 138, 'reads: bomb', '9', 'var(--warn,#b8870f)');
     readout.appendChild(anim('opacity', '0;0;1;1;0', '5s', { keyTimes: '0;0.8;0.86;0.96;1' }));
     svg.appendChild(readout);
@@ -485,9 +485,9 @@
     zg.appendChild(svgEl('rect', { x: '140', y: '48', width: '130', height: '26', fill: 'var(--bg-surface,#eee)' }));
     zg.appendChild(svgEl('rect', { x: '270', y: '48', width: '130', height: '26', fill: 'var(--warn,#b8870f)', opacity: '0.3' }));
     zg.appendChild(svgEl('rect', { x: '400', y: '48', width: '74', height: '26', fill: 'var(--warn,#b8870f)', opacity: '0.75' }));
-    zg.appendChild(txt(205, 42, 'public knowledge', '8', 'var(--ink-mute,#777)'));
-    zg.appendChild(txt(335, 42, 'yellow zone', '8', 'var(--warn,#b8870f)'));
-    zg.appendChild(txt(437, 42, 'recipes', '8', 'var(--warn,#b8870f)'));
+    zg.appendChild(txt(205, 30, 'public knowledge', '8', 'var(--ink-mute,#777)'));
+    zg.appendChild(txt(335, 30, 'yellow zone', '8', 'var(--warn,#b8870f)'));
+    zg.appendChild(txt(437, 30, 'recipes', '8', 'var(--warn,#b8870f)'));
     zg.appendChild(txt(335, 90, 'proximate enabling knowledge, no synthesis steps', '7', 'var(--ink-mute,#777)'));
     pop(zg, '0s');
     svg.appendChild(zg);
@@ -530,7 +530,7 @@
       enter(ln, (i * 0.15) + 's');
       svg.appendChild(ln);
       svg.appendChild(txt(64, r.y + 3, r.name, '9', i === 1 ? 'var(--warn,#b8870f)' : 'var(--ink-mute,#777)', 'end'));
-      svg.appendChild(txt(336, r.y - 5, r.sub, '7', 'var(--ink-mute,#777)', 'start'));
+      svg.appendChild(txt(72, r.y - 6, r.sub, '7', 'var(--ink-mute,#777)', 'start'));
     }
     var curve = svgEl('path', { d: 'M80 214 C 160 210, 220 180, 300 104', fill: 'none', stroke: 'var(--blueprint,#3553ff)', 'stroke-width': '2', 'stroke-dasharray': '260', 'stroke-dashoffset': '260' });
     curve.appendChild(svgEl('animate', { attributeName: 'stroke-dashoffset', values: '260;0;0;260', dur: '6s', begin: '0.6s', repeatCount: 'indefinite', keyTimes: '0;0.45;0.9;1', calcMode: 'spline', keySplines: SPL + ';0 0 1 1;0.4 0 1 1' }));
@@ -551,7 +551,7 @@
     req.appendChild(anim('opacity', '0;0;1;1;0', '6s', { begin: '0.6s', keyTimes: '0;0.46;0.52;0.9;1' }));
     gate.appendChild(req);
     svg.appendChild(gate);
-    svg.appendChild(txt(438, 234, 'RSP, PF, and FSF all gate scaling this way', '7', 'var(--ink-mute,#777)'));
+    svg.appendChild(txt(400, 234, 'RSP, PF, and FSF all gate scaling this way', '7', 'var(--ink-mute,#777)'));
     shell(host, 'CAPABILITY THRESHOLDS', 'cross the rung, close the gate',
       svg,
       'The shared structure of the frontier safety frameworks: Anthropic\'s RSP defines AI Safety Levels modeled on biosafety tiers, OpenAI\'s Preparedness Framework tracks High Capability thresholds, DeepMind\'s FSF defines Critical Capability Levels. As evaluated capability climbs and crosses a threshold rung, deployment gates close until the required safeguards are in place; ASL-3 activated in May 2025 for CBRN-relevant models. Competitor-adjustment clauses are the pressure valve all three added for race dynamics.');

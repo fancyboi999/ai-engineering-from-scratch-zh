@@ -506,7 +506,7 @@
       "tools/call (id 1): deploy_release": "工具调用 tools/call（id 1）：deploy_release",
       "input_required: confirm + requestState": "input_required：确认 + requestState",
       "tools/call (id 2): new id, inputResponses": "tools/call（id 2）：新 id、inputResponses",
-      "complete: deployed = true": "完成状态 complete：deployed = true",
+      "complete: deployed = true": "已完成：deployed = true",
       "client gathers confirmation from the user": "客户端收集用户确认",
       "A client sends tools/call with id 1. The server ends that request with an input_required result carrying inputRequests and requestState instead of holding a stream open. The client gathers the confirmation from the user, then sends an independent tools/call with a new id 2 that carries inputResponses and echoes requestState exactly. The server replies complete.": "客户端发送 id 为 1 的 tools/call。服务器用携带 inputRequests 与 requestState 的 input_required 结果结束此请求，而非保持流开启。客户端收集用户确认，再发起独立的 tools/call，使用新 id 2，携带 inputResponses，并逐字原样回传 requestState。服务器回复 complete。",
       "The server never pushes a request to the client. It ends the first call with input_required, and the client starts an independent second call, with a new JSON-RPC id, that echoes requestState byte for byte and supplies inputResponses.": "服务器从不向客户端推送请求。它用 input_required 结束首次调用，由客户端发起独立的第二次调用，使用新的 JSON-RPC id，逐字节回传 requestState，并提供 inputResponses。"
@@ -678,7 +678,8 @@
       "stdio has no header layer: version and capabilities travel only in _meta": "stdio 没有请求头层：版本与能力仅在 _meta 中传送",
       "HTTP mirrors method, name, and x-mcp-header params; a mismatch is 400 + -32020": "HTTP 镜像 method、name 与 x-mcp-header 参数；不匹配则返回 400 + -32020",
       "Left: stdio transport between a client and a child server process, connected by a stdin line down, a stdout line up, and a dashed stderr line up, with no header layer at all. Right: Streamable HTTP, where a client posts to the server and the server posts back a response; a checkpoint on the request arrow marks where mismatched headers are rejected with HTTP 400 and error code -32020.": "左侧：客户端与子进程服务器通过 stdio 通信，stdin 向下、stdout 向上、stderr 用虚线单独向上，完全没有请求头层。右侧：Streamable HTTP 中客户端向服务器发送 POST，服务器返回响应；请求箭头上的检查点表示请求头不匹配时，以 HTTP 400 与错误码 -32020 拒绝。",
-      "stdio carries every message inline over stdin and stdout, with logs on a separate stderr line and no header layer at all. Streamable HTTP mirrors the method, the tool or resource name, and any x-mcp-header argument into headers so a gateway can route without parsing the body, but the body stays the source of truth: a header that disagrees with it is rejected with HTTP 400 and a HeaderMismatch (-32020) error before the tool ever runs.": "stdio 在 stdin 与 stdout 中逐行承载消息，日志独走 stderr，完全没有请求头层。Streamable HTTP 将方法、工具或资源名称，以及 x-mcp-header 参数镜像到请求头，让网关无需解析正文即可路由；但正文始终是唯一事实来源。请求头若与正文不一致，会在工具运行前以 HTTP 400 与 HeaderMismatch（-32020）拒绝。"
+      "stdio carries every message inline over stdin and stdout, with logs on a separate stderr line and no header layer at all. Streamable HTTP mirrors the method, the tool or resource name, and any x-mcp-header argument into headers so a gateway can route without parsing the body, but the body stays the source of truth: a header that disagrees with it is rejected with HTTP 400 and a HeaderMismatch (-32020) error before the tool ever runs.": "stdio 在 stdin 与 stdout 中逐行承载消息，日志独走 stderr，完全没有请求头层。Streamable HTTP 将方法、工具或资源名称，以及 x-mcp-header 参数镜像到请求头，让网关无需解析正文即可路由；但正文始终是唯一事实来源。请求头若与正文不一致，会在工具运行前以 HTTP 400 与 HeaderMismatch（-32020）拒绝。",
+      "mismatch:": "不匹配："
     },
     "patterns": [],
     "preserve": [
@@ -1047,7 +1048,7 @@
       "server": "服务器",
       "tool + ui": "工具 + ui",
       "review": "审查",
-      "mime + csp": "MIME 类型 + CSP 策略",
+      "mime + csp": "MIME 与 CSP",
       "consent": "用户同意",
       "tool call": "工具调用",
       "review passes": "审查通过",

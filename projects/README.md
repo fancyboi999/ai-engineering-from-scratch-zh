@@ -1,6 +1,6 @@
 # 项目
 
-从零构建有用的 AI 工程工具，一次完成一个经过测试的阶段。目录覆盖 Python、Rust、TypeScript 和 Go，共有 102 个项目：76 个就绪项目，26 个见[路线图](ROADMAP.md)。
+从零构建有用的 AI 工程工具，一次完成一个经过测试的阶段。目录覆盖 Python、Rust、TypeScript 和 Go，共有 104 个项目：79 个就绪项目，25 个见[路线图](ROADMAP.md)。
 
 每个就绪项目都有可运行参考实现、学习者初始代码、累计阶段测试、机制图、讲解和运行／输出 GIF。核心测试使用本地 fixture，不需要模型凭据。可选框架对照使用真实 SDK 与确定性假模型。规划项目只有拟定目标和学习里程碑，实现和完成测试尚待编写。
 
@@ -81,6 +81,7 @@ python3 scripts/project_test.py semantic-notes-search --all --strict --path my-s
 | [工作坊材料规划器](workshop-materials-planner/) | 2 | Python | 4 | 约 8 小时 |
 | [agent 预算规划器](agent-budget-planner/) | 3 | Python | 4 | 约 8 小时 |
 | [agent 追踪调试器](agent-trace-debugger/) | 3 | TypeScript | 4 | 约 8 小时 |
+| [二进制检查器](binary-inspector/) | 3 | Python | 6 | 约 10 小时 |
 | [社区学习路径查找器](community-learning-path-finder/) | 3 | Python | 4 | 约 8 小时 |
 | [跨 agent 技能安装器](skill-installer/) | 3 | TypeScript | 4 | 约 8 小时 |
 | [数据库迁移演练](database-migration-rehearsal/) | 3 | Python | 4 | 约 8 小时 |
@@ -98,6 +99,7 @@ python3 scripts/project_test.py semantic-notes-search --all --strict --path my-s
 | [流式答案恢复](streaming-answer-recovery/) | 3 | TypeScript, Go | 4 | 约 8 小时 |
 | [Google ADK 支持 agent](support-agent-with-google-adk/) | 3 | Python | 4 | 约 8 小时 |
 | [Mastra 类型化工作流 agent](typed-workflow-agent-with-mastra/) | 3 | TypeScript | 4 | 约 8 小时 |
+| [工具契约迁移检查器](tool-contract-migration-checker/) | 3 | Python | 4 | 约 8 小时 |
 | [视觉证据库](visual-evidence-library/) | 3 | Python | 4 | 约 8 小时 |
 | [语音笔记转录流水线](voice-note-transcriber-pipeline/) | 3 | Python | 4 | 约 8 小时 |
 | [网页变更简报](web-change-brief/) | 3 | Go | 4 | 约 8 小时 |
@@ -112,12 +114,13 @@ python3 scripts/project_test.py semantic-notes-search --all --strict --path my-s
 | [工具调用防火墙](tool-call-firewall/) | 4 | Rust | 4 | 约 8 小时 |
 | [浏览器 agent](browser-agent/) | 5 | TypeScript, Python | 4 | 约 8 小时 |
 | [分布式评估农场协调器](distributed-eval-farm/) | 5 | Go | 4 | 约 8 小时 |
+| [迷你反编译器](mini-decompiler/) | 5 | Python | 8 | 约 18 小时 |
 | [自改进技能循环](self-improving-skill-loop/) | 5 | Python | 4 | 约 8 小时 |
 
 
 ## 路线图
 
-[26 个规划项目](ROADMAP.md)通过实用应用、数据与多模态工作流、开发工具、DevOps 和 agent 系统扩展全部五个级别。每份简介列明交付物、前置项目、首个演示和四个拟定里程碑。网站将这些卡片标为规划中，不计入已完成阶段或证书。
+[25 个规划项目](ROADMAP.md)通过实用应用、数据与多模态工作流、开发工具、DevOps 和 agent 系统扩展全部五个级别。每份简介列明交付物、前置项目、首个演示和四个拟定里程碑。网站将这些卡片标为规划中，不计入已完成阶段或证书。
 
 ## 构建自己能用的应用
 

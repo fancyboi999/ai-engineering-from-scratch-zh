@@ -89,7 +89,11 @@
     for (i = 0; i < 5; i++) {
       var y = y0 + i * rh, g = gold[i];
       svg.appendChild(txt(x0 - 14, y + 17, String(i + 1), MUTE, 10, 'end'));
-      svg.appendChild(svgEl('rect', { x: x0, y: y, width: 170, height: 26, rx: 4, fill: g ? BP : BG, 'fill-opacity': g ? '0.14' : '1', stroke: g ? BP : RULE, 'stroke-width': g ? '1.8' : '1' }));
+      if (g) {
+        svg.appendChild(svgEl('rect', { x: x0, y: y, width: 170, height: 26, rx: 4, fill: BG }));
+        svg.appendChild(svgEl('rect', { x: x0, y: y, width: 170, height: 26, rx: 4, fill: BP, 'fill-opacity': '0.14' }));
+      }
+      svg.appendChild(svgEl('rect', { x: x0, y: y, width: 170, height: 26, rx: 4, fill: g ? 'none' : BG, stroke: g ? BP : RULE, 'stroke-width': g ? '1.8' : '1' }));
       svg.appendChild(txt(x0 + 85, y + 17, g ? 'gold doc' : 'doc', g ? BP : MUTE, 10));
     }
     var sweep = svgEl('rect', { x: x0 - 4, y: y0 - 4, width: 178, height: 34, rx: 5, fill: 'none', stroke: BP, 'stroke-width': '2.2', opacity: '0.9' });
@@ -325,7 +329,7 @@
     var runner = svgEl('circle', { cy: ty, r: 6, fill: BP });
     runner.appendChild(anim('cx', tx0 + ';' + tx1 + ';' + tx1, dur, { keyTimes: '0;0.9;1', calcMode: 'spline', keySplines: '0.4 0 0.6 1;0 0 1 1' }));
     svg.appendChild(runner);
-    svg.appendChild(txt(355, 222, 'invariants: loss falls · ranks agree · 12P/N optimiser bytes · resume byte-equal', MUTE, 8.5));
+    svg.appendChild(txt(260, 222, 'invariants: loss falls · ranks agree · 12P/N optimiser bytes · resume byte-equal', MUTE, 8.5));
     card(host, 'DISTRIBUTED ASSEMBLY', 'compose · run 20 steps',
       svg,
       'Each piece was built and tested alone; the capstone proves they compose. DDP broadcast syncs the initial weights once, the ZeRO-1 step replaces optimiser.step every iteration, and the sharded checkpoint fires at step 10. The run self-terminates after 20 steps only if all four invariants hold on every rank.');

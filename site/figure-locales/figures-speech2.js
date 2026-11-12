@@ -34,7 +34,7 @@
       "slide the threshold": "移动阈值",
       "Raise the threshold and you reject more genuine speakers (false reject rate climbs); lower it and you accept more impostors (false accept rate climbs). The orange line sweeps the threshold and settles where the two curves cross. That single crossover point is the Equal Error Rate, the one number every speaker-verification leaderboard quotes.": "提高阈值会拒绝更多真实说话人，误拒率上升；降低阈值则会接受更多冒充者，误受率上升。橙线扫描阈值，停在两条曲线相交之处。这个交点就是等错误率（EER），也是说话人验证排行榜常用的单项指标。",
       "error rate vs decision threshold": "错误率与决策阈值",
-      "EER: FAR = FRR": "等错误率 EER：FAR = FRR"
+      "EER: FAR = FRR": "交点：FAR = FRR"
     },
     "patterns": [],
     "preserve": [

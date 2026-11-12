@@ -84,7 +84,7 @@ tags: [figures, svg, smil, animation, interactive, dither]
 9. animateMotion 使用 keyPoints 时，calcMode=linear，keyPoints 与 keyTimes 项数相同，不带 values。
 10. 动画 fill 或 stroke 值不用 var()。叠加目标颜色元素，改变其透明度。
 11. 循环只改变 opacity、transform、stroke-dashoffset 或路径运动。x、y、x1、y1、x2、y2、width、height、r、cx、cy、rx、ry 动画会被运行时改为一次性。
-12. 宿主 data-static-time 指定的帧必须完整可读，默认 1.5 秒。完整状态较晚才出现时显式设置。
+12. 宿主 data-static-time 指定的帧必须完整可读，默认 1.5 秒。完整状态较晚才出现时显式设置。该帧中运动元素不压在标签上，同一标签的两种状态不同时可见。
 13. 元素绕中心缩放：组内内容围绕 (0,0) 绘制，用 translate 移动组，缩放用 additive=sum。
 
 滑块组件：
@@ -100,7 +100,7 @@ tags: [figures, svg, smil, animation, interactive, dither]
 
 20. 颜色来自 CSS 变量，以浅色值作默认，例如 `var(--blueprint,#3553ff)`。无变量可用时才用字面十六进制值。
 21. 主体最多一个强调色 blueprint，第二状态可用 warn，其他部分用 ink 和 rule token。
-22. SVG 字至少 12 单位，字体 var(--font-mono)。必须更小时，给 SVG 至少 500px 宽并允许图内横向滚动。
+22. SVG 字至少 12 单位，字体 var(--font-mono)。必须更小时，给 SVG 至少 500px 宽并允许图内横向滚动。用 `LF.textWidth` 按文字确定框宽，长标签用 `LF.wrapText` 换行。矩阵单元格分别按宽和高计算，取较小值。线条和框边不穿过标签，标签不宽于其背后的框。
 23. 在手机上测量实际字号。375px 屏幕中 520 单位图可能只宽 279px，12 单位标签实际约 6.4px。
 24. 图注清楚说明每种颜色。英文每句最多 25 词，中文用短句。
 25. lf-label 英文大写、两至四词，中文对应翻译。
@@ -136,6 +136,7 @@ tags: [figures, svg, smil, animation, interactive, dither]
 - [ ] 减少动态效果时图完整，没有丢失元素。
 - [ ] 深色下所有线和标签可见。
 - [ ] 375px 宽时标签可读，图表外页面不横向滚动。
+- [ ] 在课程仓库内运行 `node scripts/audit_lesson_figures.js --only <name>`，输出 `TOTAL 0`。它在 Chrome 中按桌面和手机宽度挂载图表，检查静态帧和两个动画时刻。以下情况会失败：标签重叠；标签或闭合图形超出 viewBox；文字小于 9px；桌面宽度下需要横向滚动；标签被图形遮挡或被线条穿过；标签宽于其框；带边框的框互相重叠。文字检查允许 0.5px 舍入误差。用 `--shots <dir>` 查看失败截图，重新排布出错区域，不要逐个挪标签凑数。viewBox 中的最小字号决定最后两项：图宽 728px 时，文字至少需要 `9 × viewBox 宽 / 728` 单位。
 - [ ] 滑块到最小、最大均无 NaN、负宽度、控制台错误。
 - [ ] SVG 有一个 title 和 desc，滑动后 ID 保持不变。
 - [ ] 图注解释每种颜色。

@@ -44,12 +44,12 @@
     // overlapping raw candidates (drawn with dash to look proposed)
     var raw = [[80, 70, 100, 120], [92, 80, 96, 116], [70, 64, 118, 132], [104, 92, 88, 104]];
     raw.forEach(function (b, i) {
-      var r = svgEl('rect', { x: b[0], y: b[1], width: b[2], height: b[3], fill: 'none', stroke: WARN, 'stroke-width': '1.4', 'stroke-dasharray': '4 3', opacity: '0' });
+      var r = svgEl('path', { d: 'M' + b[0] + ' ' + b[1] + ' h' + b[2] + ' v' + b[3] + ' h' + (-b[2]) + ' Z', fill: 'none', stroke: WARN, 'stroke-width': '1.4', 'stroke-dasharray': '4 3', opacity: '0' });
       r.appendChild(anim('opacity', '0;0.9;0.9;0.15;0.15', '5s', { begin: (i * 0.12) + 's', keyTimes: '0;0.18;0.5;0.62;1' }));
       svg.appendChild(r);
     });
     // the survivor box, drawn last, solid
-    var win = svgEl('rect', { x: 78, y: 66, width: 104, height: 126, fill: 'none', stroke: BLUE, 'stroke-width': '2.6', opacity: '0' });
+    var win = svgEl('path', { d: 'M78 66 h104 v126 h-104 Z', fill: 'none', stroke: BLUE, 'stroke-width': '2.6', opacity: '0' });
     win.appendChild(anim('opacity', '0;0;1;1', '5s', { keyTimes: '0;0.55;0.72;1' }));
     svg.appendChild(win);
     var lab = svgEl('rect', { x: 78, y: 52, width: 56, height: 13, fill: BLUE, opacity: '0' });
@@ -169,7 +169,7 @@
 
   // ── diffusion-denoise (10): a noisy grid walks back to a clean image ────────
   function diffusionDenoise(host) {
-    var svg = svgEl('svg', { viewBox: '0 0 520 220' });
+    var svg = svgEl('svg', { viewBox: '0 0 520 264' });
     svg.appendChild(txt(14, 16, 'x_T  pure noise'));
     svg.appendChild(txt(360, 16, 'x_0  sample'));
     // a 6x6 grid: each cell animates from random noise opacity to a target image
@@ -190,18 +190,18 @@
       svg.appendChild(rect);
     }
     // a step counter walking T → 0
-    var counter = svgEl('text', { x: 260, y: 212, fill: BLUE, 'font-size': '13', 'font-family': 'monospace', 'text-anchor': 'middle' }, [document.createTextNode('t = 1000')]);
+    var counter = svgEl('text', { x: 260, y: 254, fill: BLUE, 'font-size': '13', 'font-family': 'monospace', 'text-anchor': 'middle' }, [document.createTextNode('t = 1000')]);
     var ct = svgEl('animate', { attributeName: 'opacity', values: '1;1', dur: '5s', repeatCount: 'indefinite' });
     counter.appendChild(ct);
     // simulate countdown with discrete text via <set>-style chained values is hard; use a sweeping arrow instead
     svg.appendChild(counter);
     // denoise arrow sweeping right with a moving marker
-    svg.appendChild(svgEl('line', { x1: 150, y1: 200, x2: 318, y2: 200, stroke: SOFT, 'stroke-width': '2' }));
+    svg.appendChild(svgEl('line', { x1: 150, y1: 214, x2: 318, y2: 214, stroke: SOFT, 'stroke-width': '2' }));
     var head = svgEl('polygon', { points: '0,-4 8,0 0,4', fill: WARN });
-    var mp = svgEl('animateMotion', { dur: '5s', repeatCount: 'indefinite', path: 'M 150 200 L 318 200' });
+    var mp = svgEl('animateMotion', { dur: '5s', repeatCount: 'indefinite', path: 'M 150 214 L 318 214' });
     head.appendChild(mp);
     svg.appendChild(head);
-    svg.appendChild(txt(150, 196, 'reverse process: predict and subtract noise, step by step', 9));
+    svg.appendChild(txt(150, 232, 'reverse process: predict and subtract noise, step by step', 9));
     host.appendChild(shell('DIFFUSION · DENOISING', 'from pure noise to a sample', svg,
       'A diffusion model learns to remove a little noise at a time. Sampling starts from a grid of pure Gaussian noise and walks backward: each step predicts the noise and subtracts it, so structure emerges gradually. Repeat the small denoising step enough times and a coherent image condenses out of static.'));
   }
@@ -244,7 +244,7 @@
       px.appendChild(anim('opacity', '0;0;0.85;0.85', '4s', { begin: (i2 * 0.25) + 's', keyTimes: '0;0.7;0.9;1' }));
       svg.appendChild(px);
     }
-    svg.appendChild(txt(150, 215, 'march along each ray, query the MLP for density + colour, integrate → one pixel', 9));
+    svg.appendChild(txt(14, 215, 'march along each ray, query the MLP for density + colour, integrate → one pixel', 9));
     host.appendChild(shell('NeRF · VOLUME RENDERING', 'rays sample the field, colours integrate', svg,
       'A NeRF stores a scene as a function: give it a 3D point and view direction, it returns density and colour. To render a pixel, cast a ray from the camera, sample points along it, query the MLP at each, and integrate density-weighted colour front to back. Each ray collapses a line through space into one pixel.'));
   }
@@ -282,12 +282,14 @@
     hl.appendChild(mp);
     svg.appendChild(hl);
     // legend
-    svg.appendChild(svgEl('rect', { x: 300, y: 70, width: 14, height: 14, fill: BLUE }));
-    svg.appendChild(txt(320, 81, 'matching (image, caption) — pull together', 11));
+    svg.appendChild(svgEl('rect', { x: 300, y: 50, width: 14, height: 14, fill: BLUE }));
+    svg.appendChild(txt(320, 61, 'matching (image, caption)', 11));
+    svg.appendChild(txt(320, 77, 'pull together', 11));
     svg.appendChild(svgEl('rect', { x: 300, y: 96, width: 14, height: 14, fill: MUTE, opacity: '0.5' }));
-    svg.appendChild(txt(320, 107, 'mismatched pairs — push apart', 11));
-    svg.appendChild(txt(300, 150, 'softmax over each row and column', 10));
-    svg.appendChild(txt(300, 166, 'drives the diagonal high', 10));
+    svg.appendChild(txt(320, 107, 'mismatched pairs', 11));
+    svg.appendChild(txt(320, 123, 'push apart', 11));
+    svg.appendChild(txt(300, 156, 'softmax over each row and column', 10));
+    svg.appendChild(txt(300, 172, 'drives the diagonal high', 10));
     host.appendChild(shell('CLIP · CONTRASTIVE MATRIX', 'matching pairs land on the diagonal', svg,
       'CLIP embeds images and captions into one shared space. For a batch of N pairs it builds an NxN similarity matrix and trains so the diagonal (true pairs) scores high and every off-diagonal scores low. Watch the diagonal brighten as matching pairs are pulled together and mismatches pushed apart.'));
   }
@@ -320,14 +322,14 @@
     ring.appendChild(anim('r', '5;5;48;48', '6s', { keyTimes: '0;0.45;0.65;1' }));
     ring.appendChild(anim('opacity', '0;0;0.9;0', '6s', { keyTimes: '0;0.45;0.65;1' }));
     svg.appendChild(ring);
-    svg.appendChild(txt(220, 230, 'query → nearest neighbours by cosine distance = same class', 10));
+    svg.appendChild(txt(14, 232, 'query → nearest neighbours by cosine distance = same class', 10));
     host.appendChild(shell('METRIC LEARNING · RETRIEVAL', 'same-class points cluster, query rings its neighbours', svg,
       'Retrieval ranks candidates by distance in an embedding space. Metric learning shapes that space: a triplet or contrastive loss pulls same-class points together and pushes other classes apart. Once the clusters are tight, a query\'s nearest neighbours by cosine distance are reliably the right answers.'));
   }
 
   // ── depth-rays (26): RGB grid → depth gradient, a scan sweep colours by range ─
   function depthSweep(host) {
-    var svg = svgEl('svg', { viewBox: '0 0 520 230' });
+    var svg = svgEl('svg', { viewBox: '0 0 520 248' });
     svg.appendChild(txt(14, 16, 'RGB frame'));
     svg.appendChild(txt(300, 16, 'predicted depth (near → far)'));
     var N = 6, cell = 28, gx = 14, gy = 28, gx2 = 300;
@@ -358,7 +360,7 @@
     svg.appendChild(txt(102, 215, 'mid', 9));
     svg.appendChild(svgEl('rect', { x: 138, y: 206, width: 20, height: 10, fill: INK }));
     svg.appendChild(txt(162, 215, 'far', 9));
-    svg.appendChild(txt(230, 215, 'one RGB frame → a distance per pixel, no stereo or LiDAR', 9));
+    svg.appendChild(txt(14, 236, 'one RGB frame → a distance per pixel, no stereo or LiDAR', 9));
     host.appendChild(shell('MONOCULAR DEPTH', 'one frame in, a distance per pixel out', svg,
       'A monocular depth model maps a single RGB frame to a distance for every pixel. A frozen ViT encoder reads perspective, texture, and learned scene priors; a light decoder upsamples them into a dense depth map. Near surfaces glow bright, far ones recede — all from one image, no stereo rig or depth sensor.'));
   }

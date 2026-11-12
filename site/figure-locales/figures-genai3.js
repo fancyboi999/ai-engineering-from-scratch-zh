@@ -164,7 +164,8 @@
       "Inception feature space (2 of 2048 dims)": "Inception 特征空间（显示 2 维，共 2048 维）",
       "real (blue)   generated (amber)": "真实（蓝色）  生成（琥珀色）",
       "FID = high": "FID = 高",
-      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，因此关闭动画"
+      "Animation disabled because reduced motion is enabled": "已启用减少动态效果，因此关闭动画",
+      "FID = low": "FID = 低"
     },
     "patterns": [
       [

@@ -33,7 +33,7 @@
       { x: 18, y: 96, w: 40, h: 80, n: 3, col: W },      // portrait, 3 patches
       { x: 18, y: 188, w: 56, h: 40, n: 2, col: B }      // small, 2 patches
     ];
-    svg.appendChild(txt(53, 18, 'variable-resolution images', 'middle', 'var(--ink-mute,#777)', 10));
+    svg.appendChild(txt(18, 18, 'variable-resolution images', 'start', 'var(--ink-mute,#777)', 10));
     svg.appendChild(txt(360, 18, 'one packed sequence (block-diagonal mask)', 'middle', 'var(--ink-mute,#777)', 10));
     var slot = 0, total = imgs.reduce(function (a, im) { return a + im.n; }, 0), seqX = 230, cw = 26;
     imgs.forEach(function (im, gi) {
@@ -85,7 +85,7 @@
     for (i = 0; i < 4; i++) {
       var sy = 57 + i * 38, ey = 57 + i * 38;
       var p = svgEl('circle', { r: '4', fill: B });
-      var mo = svgEl('animateMotion', { dur: '2.4s', repeatCount: 'indefinite', path: 'M 90 ' + sy + ' L 200 116 L 320 116 L 420 ' + ey, begin: (i * 0.3).toFixed(2) + 's' });
+      var mo = svgEl('animateMotion', { dur: '2.4s', repeatCount: 'indefinite', path: 'M 90 ' + sy + ' L 200 170 L 320 170 L 420 ' + ey, begin: (i * 0.3).toFixed(2) + 's' });
       p.appendChild(mo);
       svg.appendChild(p);
     }
@@ -127,8 +127,8 @@
 
   // ── mm-video-token-budget: rising FPS multiplies tokens past the context line ─
   function videoTokenBudget(host) {
-    var svg = svgFor(230), B = 'var(--blueprint,#3553ff)', W = 'var(--warn,#b8870f)';
-    var PAD = 40, W0 = 520, H0 = 230, baseY = 190, topY = 30;
+    var svg = svgFor(236), B = 'var(--blueprint,#3553ff)', W = 'var(--warn,#b8870f)';
+    var PAD = 40, W0 = 520, H0 = 236, baseY = 190, topY = 30;
     svg.appendChild(svgEl('line', { x1: PAD, y1: baseY, x2: W0 - 20, y2: baseY, stroke: 'var(--rule-soft,#ddd)', 'stroke-width': '1' }));
     svg.appendChild(svgEl('line', { x1: PAD, y1: baseY, x2: PAD, y2: topY, stroke: 'var(--rule-soft,#ddd)', 'stroke-width': '1' }));
     // context window ceiling line
@@ -136,7 +136,7 @@
     svg.appendChild(svgEl('line', { x1: PAD, y1: ceil, x2: W0 - 20, y2: ceil, stroke: W, 'stroke-width': '1.2', 'stroke-dasharray': '5 4' }));
     svg.appendChild(txt(W0 - 24, ceil - 5, 'context limit', 'end', W, 10));
     svg.appendChild(txt(PAD - 6, topY + 6, 'tokens', 'end', 'var(--ink-mute,#777)', 9));
-    svg.appendChild(txt(W0 - 20, baseY + 16, 'frames per second', 'end', 'var(--ink-mute,#777)', 10));
+    svg.appendChild(txt(W0 - 20, baseY + 34, 'frames per second', 'end', 'var(--ink-mute,#777)', 10));
     // growing bars, heights animate up to show multiplication with FPS
     var fps = [1, 2, 4, 8, 16], bw = 56, gap = 30;
     fps.forEach(function (f, i) {
@@ -271,8 +271,8 @@
 
   // ── mm-agent-loop: perceive -> reason -> act -> observe cycles forever ───────
   function agentLoop(host) {
-    var svg = svgFor(240), B = 'var(--blueprint,#3553ff)', W = 'var(--warn,#b8870f)';
-    var CX = 260, CY = 130, R = 78;
+    var svg = svgFor(300), B = 'var(--blueprint,#3553ff)', W = 'var(--warn,#b8870f)';
+    var CX = 260, CY = 150, R = 78;
     var nodes = [
       { a: -90, lab: 'perceive', sub: 'screenshot' },
       { a: 0, lab: 'reason', sub: 'plan' },
@@ -290,9 +290,13 @@
       var node = svgEl('circle', { cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: '8', fill: B });
       node.appendChild(anim('r', '8;12;8', '0;0.5;1', '4s', { begin: (i * 1).toFixed(0) + 's' }));
       svg.appendChild(node);
-      var ly = p.y < CY ? p.y - 14 : p.y + 22;
-      svg.appendChild(txt(p.x.toFixed(1), ly.toFixed(1), p.lab, 'middle', 'var(--ink-soft,#555)', 11));
-      svg.appendChild(txt(p.x.toFixed(1), (ly + (p.y < CY ? -12 : 13)).toFixed(1), p.sub, 'middle', 'var(--ink-mute,#999)', 9));
+      var side = Math.abs(p.y - CY) < 1;
+      var lx = side ? p.x + (p.x > CX ? 18 : -18) : p.x;
+      var anchor = side ? (p.x > CX ? 'start' : 'end') : 'middle';
+      var ly = side ? p.y - 2 : (p.y < CY ? p.y - 14 : p.y + 22);
+      var sy = side ? ly + 13 : ly + (p.y < CY ? -12 : 13);
+      svg.appendChild(txt(lx.toFixed(1), ly.toFixed(1), p.lab, anchor, 'var(--ink-soft,#555)', 11));
+      svg.appendChild(txt(lx.toFixed(1), sy.toFixed(1), p.sub, anchor, 'var(--ink-mute,#999)', 9));
     });
     // a token traveling around the cycle clockwise
     var path = 'M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1) +
@@ -303,7 +307,7 @@
     var trav = svgEl('circle', { r: '5', fill: W });
     trav.appendChild(svgEl('animateMotion', { dur: '4s', repeatCount: 'indefinite', path: path }));
     svg.appendChild(trav);
-    svg.appendChild(txt(CX, 232, 'repeat until the task is done · errors compound', 'middle', 'var(--ink-soft,#555)', 10));
+    svg.appendChild(txt(CX, 288, 'repeat until the task is done · errors compound', 'middle', 'var(--ink-soft,#555)', 10));
     wrap(host, svg);
     cap(host, 'AGENT LOOP', 'perceive, reason, act, observe',
       'A computer-use agent runs a cycle: perceive the screen, reason about the goal, emit a structured action such as a click coordinate or a typed string, then observe the resulting screenshot and go again. Every turn is one multimodal model call, and grounding to the right pixel is the hard part. Because mistakes carry into the next observation, recovery matters as much as the first plan.');

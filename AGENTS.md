@@ -146,6 +146,12 @@ node scripts/check_figure_loader.js
 node scripts/test_tts.js
 ```
 
+改动 `site/figures*.js`、`site/lesson-figures.js` 或汉化文案时，再运行图表几何审计。它在 Chrome 中按桌面和手机宽度挂载每张课程图（含中文覆盖层），必须输出 `TOTAL 0`：
+
+```bash
+CHROME_PATH=<chrome> NODE_PATH=<含 puppeteer-core 的目录>/node_modules node scripts/audit_lesson_figures.js
+```
+
 项目与手册整合还需运行：
 
 ```bash

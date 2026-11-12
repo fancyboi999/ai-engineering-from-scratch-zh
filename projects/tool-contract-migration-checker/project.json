@@ -1,0 +1,126 @@
+{
+  "id": "tool-contract-migration-checker",
+  "title": "工具契约迁移检查器",
+  "level": 3,
+  "levelName": "工程师",
+  "tagline": "找出拟议的 schema 变更会破坏哪些已保存的工具调用。",
+  "summary": "现有 agent 仍按旧参数形状调用工具时，帮助工具作者安全地演进可调用接口。比较新旧 schema 中有文档说明的子集，为必填字段和收窄的取值生成反例，并用两个校验器回放已保存的调用。最后为 CI 导出兼容性报告和可审查的迁移夹具。",
+  "youWillBuild": "一个 schema 兼容性 CLI、破坏性调用夹具和 CI 兼容性报告。",
+  "usefulFor": [
+    "修改 agent 工具 schema 时在 CI 中运行，确保契约变更不会破坏已部署的 agent 或已保存的交互记录。"
+  ],
+  "hours": 8,
+  "languages": [
+    "Python"
+  ],
+  "languageWhy": {
+    "Python": "标准库的字典、JSON 校验和集合运算让契约差异比较和夹具生成完全透明，不依赖框架魔法。"
+  },
+  "status": "ready",
+  "source": "community",
+  "author": {
+    "name": "Nivesh Kumar Meena",
+    "github": "iitking"
+  },
+  "skills": [
+    "加载带版本的工具契约与已保存调用",
+    "分类受支持的 schema 变更",
+    "生成并回放破坏性调用反例",
+    "导出迁移夹具与兼容性闸门"
+  ],
+  "prerequisites": [
+    "Python 3.10+",
+    "JSON Schema 基础（properties、required、类型、枚举）",
+    "json-schema-output-guard"
+  ],
+  "figures": true,
+  "overviewFigure": "pj-tool-contract-migration-checker-1",
+  "demo": {
+    "cwd": "solution",
+    "command": [
+      "python3",
+      "cli.py",
+      "--old",
+      "samples/catalog_v1.json",
+      "--new",
+      "samples/catalog_v2.json",
+      "--calls",
+      "samples/saved_calls.json",
+      "--output",
+      "report.json"
+    ]
+  },
+  "demos": [
+    {
+      "title": "初始化与评分",
+      "gif": "media/run.gif",
+      "poster": "media/run.png",
+      "record": "media/run.json"
+    },
+    {
+      "title": "检查实际输出",
+      "gif": "media/output.gif",
+      "poster": "media/output.png",
+      "record": "media/output.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "01-load-contracts-and-calls",
+      "title": "加载带版本的工具契约与已保存调用",
+      "summary": "校验基本 schema 结构，解析录下的参数载荷，确认已保存的调用符合原始契约。",
+      "hours": 2,
+      "difficulty": "starter",
+      "language": "python",
+      "languageWhy": "使用显式的字典遍历和标准库异常。",
+      "concepts": [
+        "schema 解析",
+        "载荷校验"
+      ],
+      "figure": "pj-tool-contract-migration-checker-1"
+    },
+    {
+      "id": "02-classify-schema-changes",
+      "title": "分类受支持的 schema 变更",
+      "summary": "比较新旧 schema，把变更归为兼容、破坏性和无法判定的关键词。",
+      "hours": 2,
+      "difficulty": "builder",
+      "language": "python",
+      "languageWhy": "纯集合差运算和逐属性检查让破坏性变更的判定是确定的。",
+      "concepts": [
+        "schema 差异比较",
+        "兼容性规则"
+      ],
+      "figure": "pj-tool-contract-migration-checker-2"
+    },
+    {
+      "id": "03-generate-and-replay-counterexamples",
+      "title": "生成并回放破坏性调用反例",
+      "summary": "合成满足旧契约、却无法通过新契约的最小参数载荷，并用两个校验器回放已保存的调用。",
+      "hours": 2,
+      "difficulty": "engineer",
+      "language": "python",
+      "languageWhy": "生成式测试和历史记录回放能给出具体的失败案例。",
+      "concepts": [
+        "反例合成",
+        "记录回放"
+      ],
+      "figure": "pj-tool-contract-migration-checker-3"
+    },
+    {
+      "id": "04-export-fixtures-and-ci-gate",
+      "title": "导出迁移夹具与兼容性闸门",
+      "summary": "生成机器可读的兼容性报告，导出用于迁移测试的独立夹具，并实现 CI 闸门 CLI。",
+      "hours": 2,
+      "difficulty": "engineer",
+      "language": "python",
+      "languageWhy": "带可配置退出码的 CLI 入口把检查器接入持续集成流程。",
+      "concepts": [
+        "CI 闸门",
+        "迁移夹具",
+        "审计报告"
+      ],
+      "figure": "pj-tool-contract-migration-checker-4"
+    }
+  ]
+}

@@ -46,18 +46,35 @@
       '.lesson-figure.lf-animated{border:1px solid var(--rule-soft,#ddd);background:var(--bg,#fafaf5);margin:28px 0;padding:14px}',
       '.lesson-figure.lf-animated svg{display:block;width:100%;height:auto;max-width:760px;margin:0 auto;color:var(--blueprint,#3553ff)}',
       '.lf-out svg{display:block;width:100%;height:auto;max-width:560px;margin:4px auto 0}',
-      '.lf-motion-toggle{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 10px auto;padding:6px 12px;border:1px solid var(--rule-soft,#ddd);background:var(--bg,#fafaf5);color:var(--ink-soft,#555);font-family:var(--font-mono,monospace);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:color 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),border-color 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),opacity 180ms var(--ease-out,cubic-bezier(.23,1,.32,1))}',
-      '.lf-motion-toggle:hover,.lf-motion-toggle:focus-visible{color:var(--blueprint,#3553ff);border-color:var(--blueprint,#3553ff)}',
-      '.lf-motion-toggle[aria-pressed=true]{color:var(--blueprint,#3553ff);border-color:var(--blueprint,#3553ff);background:var(--blueprint-tint,rgba(53,83,255,.08))}',
+      '.lf-tools{display:flex;flex-wrap:wrap;align-items:center;gap:0 4px;margin:0 0 10px;font-family:var(--font-mono,monospace)}',
+      '.lesson-figure.lf-has-card{padding:0}',
+      '.lesson-figure.lf-has-card>.lf-card-root{border:0;margin:0}',
+      '.lesson-figure.lf-has-card>.lf-tools{margin:0;padding:0 6px;border-bottom:1px solid var(--rule-soft,#ddd)}',
+      '.lf-motion-toggle{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin:0;padding:6px 10px;border:0;background:none;color:var(--ink-soft,#555);font-family:var(--font-mono,monospace);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:color 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),opacity 180ms var(--ease-out,cubic-bezier(.23,1,.32,1))}',
+      '.lf-motion-toggle:hover,.lf-motion-toggle:focus-visible{color:var(--blueprint,#3553ff)}',
+      '.lf-motion-toggle:focus-visible,.lf-scrub input:focus-visible{outline:2px solid var(--blueprint,#3553ff);outline-offset:2px}',
+      '.lf-motion-toggle[aria-pressed=true]{color:var(--blueprint,#3553ff)}',
       '.lf-motion-toggle:disabled{cursor:default;opacity:.72}',
       '.lf-motion-toggle:active{transform:scale(.97);transition:transform 160ms var(--ease-out,cubic-bezier(.23,1,.32,1))}',
-      '.lf-replay{margin-left:8px}',
+      '.lf-expand{margin-left:auto}',
+      '.lf-scrub{display:inline-flex;align-items:center;gap:8px;flex:1 1 150px;max-width:280px;min-height:44px;padding:0 10px;color:var(--ink-soft,#555);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}',
+      '.lf-scrub input{flex:1;min-width:72px;margin:0;accent-color:var(--blueprint,#3553ff)}',
+      '.lesson-figure.lf-expanded{position:fixed;inset:0;z-index:9000;margin:0;padding:16px;border:0;overflow:auto;overscroll-behavior:contain;background:var(--bg,#fafaf5);animation:lf-expand 220ms var(--ease-out,cubic-bezier(.23,1,.32,1)) both}',
+      '.lesson-figure.lf-expanded.lf-has-card{padding:0}',
+      '.lesson-figure.lf-expanded svg{max-width:min(100%,1280px)}',
+      '.lesson-figure.lf-expanded>.lf-tools{position:sticky;top:0;z-index:1;background:var(--bg,#fafaf5)}',
+      '@keyframes lf-expand{from{opacity:0;transform:translateY(14px) scale(.985)}}',
       '.lesson-figure svg [data-lf-stable=true]{transition:opacity 220ms var(--ease-out,cubic-bezier(.23,1,.32,1)),transform 220ms var(--ease-out,cubic-bezier(.23,1,.32,1)),fill 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),stroke 180ms var(--ease-out,cubic-bezier(.23,1,.32,1));transform-box:fill-box;transform-origin:center}',
-      '@media(prefers-reduced-motion:reduce){.lf-bar i{transition:none}.lf-motion-toggle{transform:none!important}.lesson-figure svg [data-lf-stable=true]{transition:opacity 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),fill 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),stroke 180ms var(--ease-out,cubic-bezier(.23,1,.32,1))}}',
-      '@media print{.lf-motion-toggle{display:none!important}}'
+      '@media(prefers-reduced-motion:reduce){.lf-bar i{transition:none}.lf-motion-toggle{transform:none!important}.lesson-figure.lf-expanded{animation:none}.lesson-figure svg [data-lf-stable=true]{transition:opacity 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),fill 180ms var(--ease-out,cubic-bezier(.23,1,.32,1)),stroke 180ms var(--ease-out,cubic-bezier(.23,1,.32,1))}}',
+      '.lf-scroll{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;background:linear-gradient(to right,var(--bg,#fafaf5) 30%,transparent) left center/40px 100% no-repeat local,linear-gradient(to left,var(--bg,#fafaf5) 30%,transparent) right center/40px 100% no-repeat local,linear-gradient(to right,color-mix(in srgb,var(--ink,#1a1a1a) 14%,transparent),transparent) left center/12px 100% no-repeat scroll,linear-gradient(to left,color-mix(in srgb,var(--ink,#1a1a1a) 14%,transparent),transparent) right center/12px 100% no-repeat scroll,var(--bg,#fafaf5)}',
+      '.lf-scroll:focus-visible{outline:2px solid var(--blueprint,#3553ff);outline-offset:2px}',
+      '@media print{.lf-tools{display:none!important}.lf-scroll{overflow:visible;background:none}.lesson-figure svg[data-lf-fit]{min-width:0!important}}'
     ].join('\n');
     document.head.appendChild(s);
   }
+
+  var MIN_TEXT_PX = 9;
+  var TEXT_PX_TOLERANCE = 0.5;
 
   function el(tag, attrs, kids) {
     var e = document.createElement(tag);
@@ -122,6 +139,45 @@
 
   function smil(tag, attrs, kids) {
     return svgEl(tag, attrs, kids);
+  }
+
+  // 中文页面：全角字符按 1 个字号计宽，并可在任意两个全角字符之间断行。
+  var WIDE_CHAR = /[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6]/;
+
+  function textWidth(text, size, serif) {
+    var str = String(text);
+    var narrow = serif ? 0.54 : 0.6;
+    var width = 0;
+    for (var i = 0; i < str.length; i++) width += size * (WIDE_CHAR.test(str.charAt(i)) ? 1 : narrow);
+    return width;
+  }
+
+  function wrapText(text, size, width, serif) {
+    var tokens = String(text).match(/[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6]|[^\s\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60\uffe0-\uffe6]+|\s+/g) || [];
+    var lines = [];
+    var line = '';
+    var gap = false;
+    for (var i = 0; i < tokens.length; i++) {
+      var tok = tokens[i];
+      if (/^\s+$/.test(tok)) { gap = true; continue; }
+      var joint = line && gap && !(WIDE_CHAR.test(tok) && WIDE_CHAR.test(line.charAt(line.length - 1))) ? ' ' : '';
+      var next = line + joint + tok;
+      if (line && textWidth(next, size, serif) > width) {
+        lines.push(line);
+        line = tok;
+      } else {
+        line = next;
+      }
+      gap = false;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function hold(node, begin) {
+    node.setAttribute('opacity', '0');
+    node.appendChild(smil('set', { attributeName: 'opacity', to: '1', begin: begin + 's', fill: 'freeze' }));
+    return node;
   }
 
   function formattedValue(state, key, fmt) {
@@ -229,6 +285,7 @@
       }
       while (svg.childNodes.length > nextChildren.length) svg.removeChild(svg.lastChild);
     });
+    scheduleTextFit(host);
     return result;
   }
 
@@ -293,6 +350,9 @@
         printing: false,
         reduced: prefersReducedMotion(),
         control: null,
+        tools: null,
+        scrubTime: null,
+        expanded: false,
         policyInstalled: false
       };
     }
@@ -363,6 +423,141 @@
     }
   }
 
+  function toolbar(host) {
+    var record = hostRecord(host);
+    if (record.tools) return record.tools;
+    var tools = el('div', { class: 'lf-tools', role: 'group', 'aria-label': '图表控件' });
+    host.insertBefore(tools, host.firstChild || null);
+    record.tools = tools;
+    registerDisposer(host, function () {
+      if (tools.parentNode) tools.parentNode.removeChild(tools);
+      record.tools = null;
+    });
+    return tools;
+  }
+
+  function clockSeconds(value) {
+    var match = /^\s*(\d*\.?\d+)\s*(ms|s)?\s*$/.exec(value || '');
+    if (!match) return 0;
+    return match[2] === 'ms' ? Number(match[1]) / 1000 : Number(match[1]);
+  }
+
+  function activeSeconds(animation) {
+    var repeats = Number(animation.getAttribute('repeatCount'));
+    return clockSeconds(animation.getAttribute('dur')) * (repeats > 0 ? repeats : 1);
+  }
+
+  function smilSpan(animations) {
+    var span = 0;
+    for (var i = 0; i < animations.length; i++) {
+      var end = clockSeconds(animations[i].getAttribute('begin')) + activeSeconds(animations[i]);
+      if (end > span) span = end;
+    }
+    return clamp(Math.ceil((span || 6) * 20) / 20, 1, 30);
+  }
+
+  function loopPeriod(animations) {
+    var period = 0;
+    for (var i = 0; i < animations.length; i++) {
+      if (animations[i].getAttribute('repeatCount') !== 'indefinite') continue;
+      var ms = Math.round(clockSeconds(animations[i].getAttribute('dur')) * 1000);
+      if (!ms) continue;
+      var a = period || ms;
+      var b = ms;
+      while (b) { var rest = a % b; a = b; b = rest; }
+      period = (period || ms) / a * ms;
+      if (period > 30000) return 0;
+    }
+    return period / 1000;
+  }
+
+  function loopStart(animations) {
+    var start = 0;
+    for (var i = 0; i < animations.length; i++) {
+      var at = clockSeconds(animations[i].getAttribute('begin'));
+      if (animations[i].getAttribute('repeatCount') !== 'indefinite') at += activeSeconds(animations[i]);
+      if (at > start) start = at;
+    }
+    return start;
+  }
+
+  function tabStops(host) {
+    var nodes = host.querySelectorAll('button,input,select,textarea,a[href],[tabindex]');
+    var stops = [];
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].disabled || nodes[i].getAttribute('tabindex') === '-1' || !nodes[i].getClientRects().length) continue;
+      stops.push(nodes[i]);
+    }
+    return stops;
+  }
+
+  function installExpand(host) {
+    var record = hostRecord(host);
+    if (record.expand || !host.querySelector || !host.querySelector('svg')) return;
+    var button = el('button', {
+      class: 'lf-motion-toggle lf-expand',
+      type: 'button',
+      'aria-expanded': 'false',
+      'aria-label': '全屏查看图表'
+    }, ['全屏']);
+    var root = document.documentElement;
+    var pageOverflow = '';
+    var hostLabel = null;
+    function onKey(event) {
+      if (event.key === 'Escape') { setExpanded(false); return; }
+      if (event.key !== 'Tab') return;
+      var stops = tabStops(host);
+      if (!stops.length) return;
+      var first = stops[0];
+      var last = stops[stops.length - 1];
+      var inside = host.contains(document.activeElement);
+      if (event.shiftKey && (!inside || document.activeElement === first)) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && (!inside || document.activeElement === last)) { event.preventDefault(); first.focus(); }
+    }
+    function setExpanded(open) {
+      if (record.expanded === open) return;
+      record.expanded = open;
+      host.classList.toggle('lf-expanded', open);
+      button.textContent = open ? '关闭' : '全屏';
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      button.setAttribute('aria-label', open ? '关闭全屏图表' : '全屏查看图表');
+      if (open) {
+        hostLabel = host.getAttribute('aria-label');
+        host.setAttribute('role', 'dialog');
+        host.setAttribute('aria-modal', 'true');
+        if (!hostLabel) host.setAttribute('aria-label', textFrom(host, '.lf-label', '课程图表'));
+        pageOverflow = root.style.overflow;
+        root.style.overflow = 'hidden';
+        document.addEventListener('keydown', onKey);
+      } else {
+        host.removeAttribute('role');
+        host.removeAttribute('aria-modal');
+        if (!hostLabel) host.removeAttribute('aria-label');
+        root.style.overflow = pageOverflow;
+        document.removeEventListener('keydown', onKey);
+      }
+      button.focus();
+    }
+    button.addEventListener('click', function () { setExpanded(!record.expanded); });
+    toolbar(host).appendChild(button);
+    record.expand = button;
+    registerDisposer(host, function () { setExpanded(false); });
+  }
+
+  function adoptCard(host) {
+    if (!host.classList.contains('lf-animated') || typeof window.getComputedStyle !== 'function') return;
+    var card = null;
+    for (var i = 0; i < host.children.length; i++) {
+      var child = host.children[i];
+      if (child.classList.contains('lf-tools')) continue;
+      if (card || String(child.tagName).toLowerCase() === 'svg') return;
+      card = child;
+    }
+    if (!card || parseFloat(window.getComputedStyle(card).borderTopWidth) <= 0) return;
+    card.classList.add('lf-card-root');
+    host.classList.add('lf-has-card');
+  }
+
   function installMotionPolicy(host) {
     var record = hostRecord(host);
     if (record.policyInstalled) return;
@@ -376,10 +571,11 @@
     }, ['暂停动画']);
     control.addEventListener('click', function () {
       record.userPaused = !record.userPaused;
+      if (!record.userPaused) record.scrubTime = null;
       control.setAttribute('aria-label', record.userPaused ? 'Play explanatory animation' : 'Pause explanatory animation');
       updateMotionPolicy(host);
     });
-    host.insertBefore(control, host.firstChild || null);
+    toolbar(host).appendChild(control);
     record.control = control;
     watchReducedMotion(host);
 
@@ -465,7 +661,13 @@
     }
 
     step(staticT, true);
-    addMotionController(host, { pause: pause, resume: resume, staticFrame: staticFrame });
+    function seek(t) {
+      pause();
+      localT = t;
+      step(t, false);
+    }
+
+    addMotionController(host, { pause: pause, resume: resume, staticFrame: staticFrame, seek: seek });
     registerDisposer(host, dispose);
     return dispose;
   }
@@ -494,11 +696,20 @@
     if (!allAnimated.length && !continuous.length) return;
     var svgs = host.querySelectorAll('svg');
     var staticTime = Number(host.getAttribute('data-static-time') || 1.5);
+    var smilRecord = hostRecord(host);
+    var clock = (allAnimated[0] && allAnimated[0].ownerSVGElement) || svgs[0];
     var hasFinite = false;
     for (var a = 0; a < allAnimated.length; a++) {
       if (allAnimated[a].getAttribute('repeatCount') !== 'indefinite') { hasFinite = true; break; }
     }
+    var follow = 0;
+    function stopFollow() {
+      if (!follow) return;
+      window.clearInterval(follow);
+      follow = 0;
+    }
     function pause() {
+      stopFollow();
       for (var i = 0; i < svgs.length; i++) {
         if (typeof svgs[i].pauseAnimations === 'function') svgs[i].pauseAnimations();
       }
@@ -507,11 +718,23 @@
       for (var i = 0; i < svgs.length; i++) {
         if (typeof svgs[i].unpauseAnimations === 'function') svgs[i].unpauseAnimations();
       }
+      if (follow || !scrub || typeof window.setInterval !== 'function' || !clock || typeof clock.getCurrentTime !== 'function') return;
+      follow = window.setInterval(function () {
+        var now = clock.getCurrentTime();
+        if (continuous.length && now >= span) {
+          now = period ? settled + ((now - settled) % period) : 0;
+          for (var i = 0; i < svgs.length; i++) {
+            if (typeof svgs[i].setCurrentTime === 'function') svgs[i].setCurrentTime(now);
+          }
+        }
+        scrub.value = String(Math.min(now, span));
+      }, 200);
     }
     function staticFrame() {
+      stopFollow();
       for (var i = 0; i < svgs.length; i++) {
         try {
-          if (typeof svgs[i].setCurrentTime === 'function') svgs[i].setCurrentTime(staticTime);
+          if (typeof svgs[i].setCurrentTime === 'function') svgs[i].setCurrentTime(typeof smilRecord.scrubTime === 'number' ? smilRecord.scrubTime : staticTime);
           if (typeof svgs[i].pauseAnimations === 'function') svgs[i].pauseAnimations();
         } catch (_) {}
       }
@@ -520,6 +743,8 @@
       var record = hostRecord(host);
       if (record.reduced || record.printing) { staticFrame(); return; }
       record.userPaused = false;
+      record.scrubTime = null;
+      scrub.value = '0';
       for (var i = 0; i < svgs.length; i++) {
         try {
           if (typeof svgs[i].setCurrentTime === 'function') svgs[i].setCurrentTime(0);
@@ -530,6 +755,29 @@
     }
     if (prefersReducedMotion()) staticFrame();
     addMotionController(host, { pause: pause, resume: resume, staticFrame: staticFrame });
+    var period = loopPeriod(allAnimated);
+    var settled = loopStart(allAnimated);
+    var span = smilSpan(allAnimated);
+    if (period) span = Math.ceil((settled + period) * 20) / 20;
+    else if (continuous.length) span = 30;
+    var scrub = el('input', {
+      type: 'range',
+      min: '0',
+      max: String(span),
+      step: '0.05',
+      value: String(prefersReducedMotion() ? Math.min(staticTime, span) : 0),
+      'aria-label': '逐步查看动画，单位为秒'
+    });
+    function onScrub() {
+      smilRecord.scrubTime = Number(scrub.value);
+      smilRecord.userPaused = true;
+      staticFrame();
+      updateMotionPolicy(host);
+    }
+    scrub.addEventListener('input', onScrub);
+    toolbar(host).appendChild(el('label', { class: 'lf-scrub' }, [el('span', {}, ['步进']), scrub]));
+    registerDisposer(host, function () { scrub.removeEventListener('input', onScrub); });
+    updateMotionPolicy(host);
     if (hasFinite) {
       var replayControl = el('button', {
         class: 'lf-motion-toggle lf-replay',
@@ -538,7 +786,7 @@
       }, ['重播动画']);
       replayControl.addEventListener('click', replay);
       var record = hostRecord(host);
-      host.insertBefore(replayControl, record.control && record.control.nextSibling ? record.control.nextSibling : null);
+      toolbar(host).insertBefore(replayControl, record.control && record.control.nextSibling ? record.control.nextSibling : null);
       registerDisposer(host, function () {
         replayControl.removeEventListener('click', replay);
         if (replayControl.parentNode) replayControl.parentNode.removeChild(replayControl);
@@ -586,6 +834,73 @@
       if (!svg.getAttribute('role')) svg.setAttribute('role', 'img');
       if (!svg.getAttribute('aria-labelledby')) svg.setAttribute('aria-labelledby', title.id + ' ' + desc.id);
     }
+  }
+
+  function scrollsSideways(node, host) {
+    for (var current = node.parentNode; current && current.nodeType === 1; current = current.parentNode) {
+      var overflow = window.getComputedStyle(current).overflowX;
+      if (overflow === 'auto' || overflow === 'scroll') return current;
+      if (current === host) break;
+    }
+    return null;
+  }
+
+  function fitSvgText(host) {
+    if (!host || !host.querySelectorAll || typeof window.getComputedStyle !== 'function') return;
+    var svgs = host.querySelectorAll('svg[viewBox]');
+    for (var i = 0; i < svgs.length; i++) {
+      var svg = svgs[i];
+      if (svg._lfOwnMinWidth === undefined) svg._lfOwnMinWidth = svg.style.minWidth || '';
+      svg.style.minWidth = svg._lfOwnMinWidth;
+      var frame = svg.getBoundingClientRect();
+      if (frame.width < 1) continue;
+      var texts = svg.querySelectorAll('text');
+      var smallest = Infinity;
+      for (var j = 0; j < texts.length; j++) {
+        if (!texts[j].textContent || !texts[j].textContent.trim() || typeof texts[j].getScreenCTM !== 'function') continue;
+        var matrix = texts[j].getScreenCTM();
+        var size = parseFloat(window.getComputedStyle(texts[j]).fontSize) * (matrix ? Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b) : 1);
+        if (size > 0 && size < smallest) smallest = size;
+      }
+      svg.setAttribute('data-lf-fit', '1');
+      var small = smallest < MIN_TEXT_PX - TEXT_PX_TOLERANCE;
+      if (small) svg.style.minWidth = Math.ceil(frame.width * MIN_TEXT_PX / smallest) + 'px';
+      var scroller = scrollsSideways(svg, host);
+      if (!scroller) {
+        if (!small) continue;
+        scroller = svg.parentNode;
+        scroller.classList.add('lf-scroll');
+      }
+      if (scroller.scrollWidth > scroller.clientWidth + 1 && !scroller.hasAttribute('tabindex')) {
+        scroller.setAttribute('tabindex', '0');
+        if (!scroller.getAttribute('role')) scroller.setAttribute('role', 'group');
+        if (!scroller.getAttribute('aria-label')) scroller.setAttribute('aria-label', '图表，可横向滚动');
+      }
+    }
+  }
+
+  function scheduleTextFit(host) {
+    if (!host || host._lfFitQueued) return;
+    host._lfFitQueued = true;
+    var run = function () {
+      host._lfFitQueued = false;
+      if (host.isConnected) fitSvgText(host);
+    };
+    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(run);
+    else setTimeout(run, 16);
+  }
+
+  function ensureTextFit(host) {
+    fitSvgText(host);
+    if (typeof window.ResizeObserver !== 'function') return;
+    var width = host.clientWidth;
+    var observer = new window.ResizeObserver(function () {
+      if (host.clientWidth === width) return;
+      width = host.clientWidth;
+      scheduleTextFit(host);
+    });
+    observer.observe(host);
+    registerDisposer(host, function () { observer.disconnect(); });
   }
 
   function closestControl(node) {
@@ -1267,6 +1582,9 @@
         ensureSvgAccessibility(host);
         if (host.querySelector('svg')) host.classList.add('lf-animated');
         attachSmilController(host);
+        installExpand(host);
+        adoptCard(host);
+        ensureTextFit(host);
         host.dataset.lfMounted = '1';
         host.removeAttribute('aria-busy');
       } catch (e) {
@@ -1344,6 +1662,7 @@
     el: el, svgEl: svgEl, slider: slider, select: select,
     fmtInt: fmtInt, fmtSeq: fmtSeq, clamp: clamp, lerp: lerp, raf: raf,
     uid: uid, motion: MOTION, smil: smil,
+    textWidth: textWidth, wrapText: wrapText, hold: hold,
     autoplay: autoplay, registerDisposer: registerDisposer, addMotionController: addMotionController,
     register: register
   };
