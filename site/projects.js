@@ -248,7 +248,8 @@
   }
 
   function demoFigure(demo, baseDir) {
-    function asset(file) { return baseDir.indexOf('project-content/') === 0 ? baseDir + '/' + file : contentUrl(normalizePath(baseDir + '/' + file)); }
+    // 项目页位于 /project/<id>/[<stage>/]，相对地址会被拼到路由下面，所以站内素材一律从站点根解析。
+    function asset(file) { return baseDir.indexOf('project-content/') === 0 ? '/' + normalizePath(baseDir + '/' + file) : contentUrl(normalizePath(baseDir + '/' + file)); }
     var media;
     var play = '';
     if (demo.video) {
