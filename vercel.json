@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "node site/build.js",
   "outputDirectory": "site",
   "framework": null,
   "installCommand": "npm ci --no-audit --no-fund",
