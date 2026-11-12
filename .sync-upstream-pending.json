@@ -1,24 +1,7 @@
 {
   "base": "8c09d890956fdef7d75d888aa8efecc16ff3846c",
   "target": "a509402c0b5455d11ddc2b5fa83cc8c0d2e0692b",
-  "pending": [
-    {
-      "id": "batch-figures-772-774",
-      "title": "课程图表几何审计、手机可读性重排、图表工具栏与步进（#772, #773, #774）",
-      "upstream": [
-        "ca6bb93f6",
-        "660136c4f",
-        "f7720373b"
-      ]
-    },
-    {
-      "id": "batch-project-769",
-      "title": "新实战项目：工具契约迁移检查器（#769）",
-      "upstream": [
-        "b539632e8"
-      ]
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -239,7 +222,7 @@
     },
     {
       "scope": "上游 8c09d89..a509402 图表几何与新项目（2026-11-12）",
-      "decision": "57 个图表文件中，35 个与上游基准相同直接取上游，15 个无冲突三方合并，figures-re-38/40/41/44 冲突按上游新布局重排并保留中文文案（re-41 的换行宽度按全角字符 2 列计算）。LF.textWidth/LF.wrapText 改为全角字符按 1 个字号计宽、中文可按字断行，并加中文回归测试。图表工具栏（全屏、步进、控件组）文案直接汉化。上游拆行后的标签片段补入 figure-locales 与 READER_TEXT，旧整句键保留；re-44 的 score 区间与 contrastive-matrix 样本词登记保留。audit_lesson_figures.js 读取 docs/zh.md 并按站点顺序加载中文覆盖层，测量读者实际看到的中文标签；中文 .lf-readable-viewport 是有提示、可键盘操作的 12px 可读滚动区，审计不将其计为意外滚动。中文标签导致的 8 处几何问题以缩短译文修正，cap-training-loop 右侧节点标签按上游左侧规则对称放到点右边。几何审计并入 build.yml 的真实 DOM 步骤；不移植按 en.md 触发的 lesson-figures.yml。lesson.html 与 skills.html 冲突仅为构建生成的版本号和 token 数，以中文构建结果为准。新项目 tool-contract-migration-checker 代码、样本、测试与录制原样移植，README、API、阶段文档、starter 说明、project.json 和机制图译为中文，加入项目汉化测试；README/ROADMAP/roadmap.json 按上游登记，并补入此前未登记的 binary-inspector 与 mini-decompiler。",
+      "decision": "57 个图表文件中，35 个与上游基准相同直接取上游，15 个无冲突三方合并，figures-re-38/40/41/44 冲突按上游新布局重排并保留中文文案（re-41 的换行宽度按全角字符 2 列计算）。LF.textWidth/LF.wrapText 改为全角字符按 1 个字号计宽、中文可按字断行，并加中文回归测试。图表工具栏（全屏、步进、控件组）文案直接汉化。上游拆行后的标签片段补入 figure-locales 与 READER_TEXT，旧整句键保留；re-44 的 score 区间与 contrastive-matrix 样本词登记保留。audit_lesson_figures.js 读取 docs/zh.md 并按站点顺序加载中文覆盖层，测量读者实际看到的中文标签；中文 .lf-readable-viewport 是有提示、可键盘操作的 12px 可读滚动区，审计不将其计为意外滚动。中文标签导致的 8 处几何问题以缩短译文修正，cap-training-loop 右侧节点标签按上游左侧规则对称放到点右边。几何审计并入 build.yml 的真实 DOM 步骤；不移植按 en.md 触发的 lesson-figures.yml。lesson.html 与 skills.html 冲突仅为构建生成的版本号和 token 数，以中文构建结果为准。新项目 tool-contract-migration-checker 代码、样本、测试与录制原样移植，README、API、阶段文档、starter 说明、project.json 和机制图译为中文，加入项目汉化测试；README/ROADMAP/roadmap.json 按上游登记，并补入此前未登记的 binary-inspector 与 mini-decompiler。合并前 CI 发现 runner 缺中日韩字体，汉字回退成方框，几何审计量到的文字框与线上不一致：build.yml 的几何审计步骤先安装 fonts-noto-cjk 并校验 fc-list 有中文字体。safety-checkpoints 的请求包在静止帧压住模型框内标签，改为插到关卡框之下（沿箭头可见、进框被遮挡），属中文站对上游图层顺序的偏离。新项目归入 cheatsheets/topics.yaml 的 tool-calling 主题来源；冻结证据版本不含该项目，因此不新增速查区块。test_site_integration、test_project_prerequisites、test_agent_api 中的项目、阶段与前置计数同步为 79/326/74。",
       "paths": [
         "site/figures*.js",
         "site/lesson-figures.js",
@@ -262,7 +245,13 @@
         "projects/roadmap.json",
         "site/lesson.html",
         "site/skills.html",
-        "site/data.js"
+        "site/data.js",
+        "site/figures-capstone-b.js",
+        "cheatsheets/topics.yaml",
+        "cheatsheets/tool-calling.md",
+        "scripts/test_site_integration.js",
+        "scripts/test_agent_api.js",
+        "site/test_project_prerequisites.js"
       ]
     }
   ]
