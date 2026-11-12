@@ -2062,7 +2062,7 @@ function withCard(html, type, id, spec) {
 }
 
 // 共享脚本一族的缓存键。脚本在浏览器缓存一天、HTML 只缓存五分钟，族内任一脚本内容变化都要升级此键。
-const SHARED_SCRIPT_VERSION = '20261106a';
+const SHARED_SCRIPT_VERSION = '20261112a';
 // 页面样式表一族的缓存键，规则同上：族内任一样式表内容变化都要升级此键。
 const SHARED_STYLE_VERSION = '20261106a';
 

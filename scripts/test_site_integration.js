@@ -185,5 +185,5 @@ test('app.js modal Hub wire switches phases, rejects undeclared targets and pres
   phases[0].hub = valid; context.openModal(0, true);
   assert.equal(link.hidden, false); assert.equal(link.getAttribute('href'), valid); context.closeModal(true);
   assert.match(read('index.html'), /<a class="modal-phase-link" id="modalPhaseLink" hidden>/);
-  assert.match(read('index.html'), /app\.js\?v=20261106a/);
+  assert.match(read('index.html'), /app\.js\?v=20261112a/);
 });
