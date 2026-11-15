@@ -14,9 +14,9 @@ const HUBS_END = '<!-- AIFS:LESSON-HUBS:END -->';
 const LESSON_QUERY_NAMES = new Set(['path', 'track', 'fromTrack', 'learningPath', 'lang', 'ttsTest', 'legacy']);
 const CLEAN_SEGMENT = /^[a-z0-9][a-z0-9-]*$/;
 const learnLessonIndexes = new WeakMap();
-const LEARNING_PATH_ALIASES = Object.freeze({
+const LEARNING_PATH_ALIASES = Object.freeze(Object.assign(Object.create(null), {
   'mcp-engineering': 'model-context-protocol',
-});
+}));
 
 let productionAssets;
 
@@ -127,11 +127,20 @@ function requestPathname(req) {
   }
 }
 
+function isLearnRequest(req) {
+  const pathname = requestPathname(req);
+  if (pathname === '/lesson' || pathname === '/lesson.html' || pathname.startsWith('/lessons/')) return false;
+  if (pathname === '/learn' || pathname.startsWith('/learn/')) return true;
+  return hasQuery(req, 'cleanPhase') || hasQuery(req, 'cleanLesson');
+}
+
 function learnRequestPath(req) {
   const pathname = requestPathname(req);
   if (pathname === '/lesson' || pathname === '/lesson.html' || pathname.startsWith('/lessons/')) return '';
-  const direct = /^\/learn\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\/?$/.exec(pathname);
-  if (direct) return `/learn/${direct[1]}/${direct[2]}`;
+  if (pathname === '/learn' || pathname.startsWith('/learn/')) {
+    const direct = /^\/learn\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\/?$/.exec(pathname);
+    return direct ? `/learn/${direct[1]}/${direct[2]}` : '';
+  }
   const phase = queryValue(req, 'cleanPhase');
   const lesson = queryValue(req, 'cleanLesson');
   return CLEAN_SEGMENT.test(phase) && CLEAN_SEGMENT.test(lesson) ? `/learn/${phase}/${lesson}` : '';
@@ -531,8 +540,9 @@ function createHandler(options) {
       send(res, method, 406, errorPage('不支持该内容格式', '请请求 text/html 或 text/markdown。'), 'no-store');
       return;
     }
-    const learnRequest = learnRequestPath(req);
-    const queryPath = queryValue(req, 'path');
+    const isLearn = isLearnRequest(req);
+    const learnRequest = isLearn ? learnRequestPath(req) : '';
+    const queryPath = isLearn ? '' : queryValue(req, 'path');
     if (!learnRequest && !validLessonPath(queryPath)) {
       send(res, method, 404, errorPage('找不到课程', '这个课程路径不存在。请从课程目录、站点地图或 agent 课程索引继续。'), 'no-store');
       return;

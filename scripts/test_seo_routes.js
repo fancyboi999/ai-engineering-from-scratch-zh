@@ -879,6 +879,8 @@ test('/learn/<phase>/<lesson> with or without trailing slash permanently redirec
     { url: '/learn/math/vectors/', headers: { accept: 'text/markdown' } },
     { url: '/learn/math/vectors?lang=zh&utm_source=upstream' },
     { url: '/learn/math/vectors/?lang=en&learningPath=missing-path' },
+    { url: '/learn/math/vectors/?learningPath=__proto__&fromTrack=toString' },
+    { url: '/api/lesson?cleanPhase=math&cleanLesson=vectors&path=phases/07-transformers/09-vectors', query: { cleanPhase: 'math', cleanLesson: 'vectors', path: 'phases/07-transformers/09-vectors' } },
   ];
 
   for (const shape of redirectShapes) {
@@ -909,6 +911,12 @@ test('/learn/<phase>/<lesson> with or without trailing slash permanently redirec
     { method: 'GET', url: '/learn/math/missing' },
     { method: 'GET', url: '/learn/math/missing/' },
     { method: 'GET', url: '/learn/claude/models' },
+    { method: 'GET', url: '/learn?path=phases/01-math/01-vectors', query: { path: 'phases/01-math/01-vectors' } },
+    { method: 'GET', url: '/learn/-bad/slug?path=phases/01-math/01-vectors', query: { cleanPhase: '-bad', cleanLesson: 'slug', path: 'phases/01-math/01-vectors' } },
+    { method: 'GET', url: '/learn/__proto__/toString?path=phases/01-math/01-vectors' },
+    { method: 'GET', url: '/learn/__proto__/toString?cleanPhase=math&cleanLesson=vectors', query },
+    { method: 'GET', url: '/api/lesson?cleanPhase=-bad&cleanLesson=slug&path=phases/01-math/01-vectors', query: { cleanPhase: '-bad', cleanLesson: 'slug', path: 'phases/01-math/01-vectors' } },
+    { method: 'GET', url: '/api/lesson?cleanPhase=__proto__&cleanLesson=toString&path=phases/01-math/01-vectors', query: Object.assign(Object.create(null), { cleanPhase: '__proto__', cleanLesson: 'toString', path: 'phases/01-math/01-vectors' }) },
     { method: 'GET', url: '/lesson?cleanPhase=math&cleanLesson=vectors', query },
     { method: 'GET', url: '/lesson.html?cleanPhase=math&cleanLesson=vectors', query },
   ]) {

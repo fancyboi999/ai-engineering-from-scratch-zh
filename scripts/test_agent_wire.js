@@ -73,6 +73,16 @@ test('real HTTP serves navigation representations, discovery aliases, static les
   const followedLearn = await fetch(base + '/learn/setup-and-tooling/python-for-ai-engineering');
   assert.equal(followedLearn.status, 200);
   assert.match(await followedLearn.text(), /<link rel="canonical" href="https:\/\/aieng-zh\.cn\/lessons\/00-setup-and-tooling\/13-python-for-ai-engineering\/">/);
+  for (const badLearn of [
+    '/learn/-bad/slug?path=phases/00-setup-and-tooling/01-dev-environment',
+    '/learn/__proto__/toString?path=phases/00-setup-and-tooling/01-dev-environment',
+    '/api/lesson?cleanPhase=__proto__&cleanLesson=toString&path=phases/00-setup-and-tooling/01-dev-environment',
+  ]) {
+    const badRes = await fetch(base + badLearn, { redirect: 'manual' });
+    assert.equal(badRes.status, 404, badLearn);
+    assert.equal(badRes.headers.get('cache-control'), 'no-store', badLearn);
+    assert.equal(badRes.headers.get('location'), null, badLearn);
+  }
   const legacy = await fetch(base + '/lesson.html?path=phases%2F00-setup-and-tooling%2F01-dev-environment', { redirect: 'manual' });
   assert.equal(legacy.status, 200);
   assert.match(await legacy.text(), /md-render\.js/);
