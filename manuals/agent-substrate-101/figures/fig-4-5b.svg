@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 384" role="img" aria-labelledby="fig-4-5b-title fig-4-5b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-5b-title">Resumes at one time on one node: the time of each request, and the rate</title>
-  <desc id="fig-4-5b-desc">Two panels for bursts of 1 to 300 resumes at one time on one node with 24 vCPU, in two runs. The first run had 200 workers and three bursts of each size from 1 to 150. The second run had 300 workers and bursts of 150, 200 and 300. The slowest of 10 took 0.43 s. At 300 at one time the median was 7.3 to 7.4 s. From 50 upward the node finished 32 to 39 resumes each second. 4 requests of the second run got no answer in 90 s and are not drawn.</desc>
+  <title id="fig-4-5b-title">单节点并发恢复：每个请求的耗时与每秒完成速率</title>
+  <desc id="fig-4-5b-desc">24 vCPU 单节点上两次运行中 1 至 300 并发恢复突发的双面板图。首次运行含 200 个 worker，1 至 150 各档突发跑三次；第二次运行含 300 个 worker，跑 150、200 与 300 突发。10 并发最慢耗时 0.43 s；300 并发中位数为 7.3 至 7.4 s。50 并发及以上时节点每秒完成 32 至 39 次恢复。第二次运行中有 4 个请求在 90 s 内未获响应，未绘出。</desc>
   <path d="M22 23 L34 13" fill="none" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.3" stroke-linejoin="round"/>
-  <text x="42" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">one burst, its requests from first to last answer</text>
+  <text x="42" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">单次突发：从首个到末个响应的各请求</text>
   <line x1="410" y1="18" x2="434" y2="18" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="442" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">0.5 s, from the project site</text>
+  <text x="442" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">0.5 s，项目官网指标</text>
   <circle cx="26" cy="44" r="3" fill="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="36" y="48" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">first run: 200 workers, 1 or 2 connections</text>
+  <text x="36" y="48" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">首次运行：200 worker，1 或 2 连接</text>
   <circle cx="330" cy="44" r="3" fill="var(--m-teal-ink, #18696a)"/>
-  <text x="340" y="48" font-size="11" fill="var(--m-teal-ink, #18696a)">second run: 300 workers, 1 connection each</text>
+  <text x="340" y="48" font-size="11" fill="var(--m-teal-ink, #18696a)">第二次运行：300 worker，各 1 连接</text>
   <line x1="46" y1="328" x2="386" y2="328" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="40" y="332" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="46" y1="316.4" x2="386" y2="316.4" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -41,7 +41,7 @@
   <text x="322.25" y="345" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">200</text>
   <line x1="364.75" y1="328" x2="364.75" y2="332" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="364.75" y="345" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <text x="46" y="84" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds until the reply, each request</text>
+  <text x="46" y="84" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个请求收到回复的耗时，秒</text>
   <line x1="46" y1="316.4" x2="386" y2="316.4" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1" stroke-dasharray="5 4"/>
   <circle cx="55.25" cy="319.3" r="1.6" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="67.25" cy="320" r="1.6" fill="var(--m-violet-ink, #5b4fa3)"/>
@@ -87,7 +87,7 @@
   <text x="574.13" y="345" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">100</text>
   <line x1="604.71" y1="328" x2="604.71" y2="332" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="604.71" y="345" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">300</text>
-  <text x="436" y="84" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">resumes finished each second</text>
+  <text x="436" y="84" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每秒完成的恢复数</text>
   <circle cx="442.93" cy="315.94" r="2.2" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="442.93" cy="315.01" r="2.2" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="442.93" cy="315.01" r="2.2" fill="var(--m-violet-ink, #5b4fa3)"/>
@@ -112,7 +112,7 @@
   <circle cx="607.71" cy="179.06" r="2.2" fill="var(--m-teal-ink, #18696a)"/>
   <circle cx="607.71" cy="178.59" r="2.2" fill="var(--m-teal-ink, #18696a)"/>
   <path d="M585.4 152.1 L593.4 161.4 L604.7 178.6" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.6" stroke-linejoin="round"/>
-  <text x="465.23" y="109.92" font-size="11" class="m-serif" fill="var(--m-ink, #1a1a1a)">32 to 39 each second</text>
-  <text x="465.23" y="123.92" font-size="11" class="m-serif" fill="var(--m-ink, #1a1a1a)">from 50 at one time</text>
-  <text x="320" y="372" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">resumes sent at one time, to actors that each have a snapshot on the node</text>
+  <text x="465.23" y="109.92" font-size="11" class="m-serif" fill="var(--m-ink, #1a1a1a)">每秒 32 至 39 次</text>
+  <text x="465.23" y="123.92" font-size="11" class="m-serif" fill="var(--m-ink, #1a1a1a)">50 并发及以上</text>
+  <text x="320" y="372" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同时发往节点本地已有快照的 actor 的并发恢复数</text>
 </svg>

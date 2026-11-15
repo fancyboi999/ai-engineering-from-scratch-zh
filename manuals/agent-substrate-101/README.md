@@ -1,74 +1,74 @@
 # Agent Substrate 101
 
-Agent Substrate v1.0.0 on Kubernetes, from the first actor to a cluster that you can size, upgrade, and debug. Each decision has a measured answer. The documentation tells you what each object and flag does. This manual tells you what happened when we ran it, broke it, and recovered it. The web edition is at [aiengineeringfromscratch.com/manual-agent-substrate-101.html](https://aiengineeringfromscratch.com/manual-agent-substrate-101.html), and each release of the course attaches the PDF as `aiefs-manual-agent-substrate-101.pdf`.
+面向 Kubernetes 上的 Agent Substrate v1.0.0 技术手册，从第一个 actor 一直讲到容量规划、版本升级与故障排查，每项工程决策都给出实测答案。官方文档说明每个对象和标志的设计用途，本手册则记录真实运行、主动注入故障并恢复集群的全过程。中文网页版位于 [aieng-zh.cn/manual-agent-substrate-101.html](https://aieng-zh.cn/manual-agent-substrate-101.html)，上游英文课程各版本 release 附带英文 PDF `aiefs-manual-agent-substrate-101.pdf`。
 
-## What is in it
+## 手册内容
 
-- 40 sections in 9 parts, then ten reference sections. Part 1 puts the whole system on one page. Parts 2 to 6 cover the install, actors, workers and capacity, identity and access, and the network. Part 7 connects kagent 1.0, agentgateway v1.7.0, and Agent Executor. Part 8 covers operation, failure, and upgrade. Part 9 builds four agents that you can run.
-- Each measured number names its machine and the number of runs. Pages that this edition does not measure yet say so, and section 8.5 lists the runs that come in the next edition.
-- 75 figures and a cover plate, drawn with the figure kit. The charts read the summary files, and most show each run, not only a median.
-- 177 listings. Each one is cut from a recorded file or from the source at the pinned tag, and the audit checks it line for line.
-- Section 1.1 sets each headline claim of the project site beside the result that we measured.
+- 正文共 9 个部分 40 节，外加 10 节参考。第 1 部分用一页篇幅勾勒整个系统；第 2 至第 6 部分覆盖安装、actor、worker 与容量、身份与访问控制以及网络；第 7 部分连接 kagent 1.0、agentgateway v1.7.0 与 Agent Executor；第 8 部分覆盖运维、故障与升级；第 9 部分亲手构建四个可直接运行的组件。
+- 每个实测数字都注明测试机器与运行次数。当前版本尚未测量的场景在文中如实标明，第 8.5 节汇总列入下一版的补测清单。
+- 75 幅正文图表与 1 幅封面插图，均由图表套件生成。统计图表直接读取汇总文件，大多数同时绘出单次样本点与中位数。
+- 177 段代码清单（listing），每一段都截自实测录制文件或固定标签处的源码，经审计脚本逐行核对溯源。
+- 第 1.1 节将项目官网的每项核心宣称与我们的实测结果并列对照。
 
-## Files
+## 目录结构
 
-| Path | Holds |
+| 路径 | 内容 |
 |---|---|
-| `manual.json` | the manifest: the pin, the parts, the palette, the sources, the cover plate |
-| `front.md`, `sections/` | the text, one file per section |
-| `figures/src/` | the figure sources, built to `figures/*.svg` |
-| `capture/lab/` | 24 recorded experiments, `A-quickstart` to `Z-bursts`. Each holds its scripts, its raw output, and a README that names the rows not to use |
-| `capture/lab/summary/` | 38 summary files that the tables and charts read |
-| `capture/lab/REDACTIONS.txt` | each file that was cut, shortened, or scrubbed before it was committed, and why |
-| `capture/run.py` | rebuilds the summaries from the recordings and checks them, with no network |
-| `capture/demos/` | four demos with their recorded runs: an idle suspender, a stateful agent, a tool sandbox, and a failure drill |
-| `research/brief.md` | the research brief that the manual was written from |
+| `manual.json` | 手册清单：固定版本、篇章结构、配色表、来源、封面插图 |
+| `front.md`、`sections/` | 正文 Markdown，每节一个文件 |
+| `figures/src/` | 图表脚本源码，构建输出至 `figures/*.svg` |
+| `capture/lab/` | `A-quickstart` 至 `Z-bursts` 共 24 组录制实验，每组包含脚本、原始输出及说明废弃行的 README |
+| `capture/lab/summary/` | 供表格和统计图读取的 38 份汇总文件 |
+| `capture/lab/REDACTIONS.txt` | 提交前裁剪、缩短或脱敏的每个文件及原因记录 |
+| `capture/run.py` | 离线从原始录制重建并校验汇总文件，无需联网 |
+| `capture/demos/` | 四个示例程序及其录制输出：空闲挂起器、有状态 agent、工具沙箱、故障演练 |
+| `research/brief.md` | 编写本手册所依据的研究简报 |
 
-## The pin
+## 固定版本
 
-| Item | Value |
+| 项目 | 版本 |
 |---|---|
-| Agent Substrate | v1.0.0, commit `b34fbee742906494b5eb4f1f36987176bf8770a4`, released 2026-11-05 |
+| Agent Substrate | v1.0.0，提交 `b34fbee742906494b5eb4f1f36987176bf8770a4`，发布于 2026-11-05 |
 | kagent | v1.0.0 |
 | agentgateway | v1.7.0 |
-| Agent Executor | commit `a72b8ca4`, and release v0.3.1 for one comparison |
-| Verified | 2026-11-12 to 2026-11-13 |
+| Agent Executor | 提交 `a72b8ca4`，另用 v0.3.1 做一处对比 |
+| 核验日期 | 2026-11-12 至 2026-11-13（上游录制与核验日期） |
 
-## The recording hosts
+## 录制环境
 
-| Name in the manual | Machine |
+| 手册中的名称 | 机器配置 |
 |---|---|
-| the x86 server guest | a KVM guest with 24 vCPU and 47 GB, with nested KVM |
-| a second x86 server guest | a KVM guest with 16 vCPU and 23 GB, or one with 16 vCPU and 31 GB. The manual names each by its memory |
-| the Mac | an Apple silicon laptop under Docker Desktop, with the arm64 release images |
+| x86 服务器客户机 | 24 vCPU、47 GB 内存的 KVM 客户机，开启嵌套 KVM |
+| 另一台 x86 服务器客户机 | 16 vCPU、23 GB 内存，或 16 vCPU、31 GB 内存的 KVM 客户机，文中按内存大小区分 |
+| Mac | 运行 Docker Desktop 的 Apple silicon 笔记本，使用 arm64 发布镜像 |
 
-The clusters are kind clusters with one to three nodes. The kagent and Agent Executor runs used a small open model on CPU, 1 to 2 GB, at 7 to 14 tokens per second. No GPU was used. `capture/README.md` maps each experiment to its machine. Do not compare a number from one machine with a number from another.
+测试集群均为 1 至 3 节点的 kind 集群。kagent 与 Agent Executor 实验使用运行在 CPU 上的 1 至 2 GB 小型开源模型，速度约每秒 7 至 14 个 token，未使用 GPU。`capture/README.md` 列出了每组实验对应的机器，请勿跨机器横向比较耗时数字。
 
-## How to read it
+## 阅读建议
 
-Start with the front matter, "How to read this manual". It installs Agent Substrate from the release images and wakes one actor. Read Part 1 once and completely. After that, go to the page that answers your question. When something breaks, start at the symptom table in section 8.3.
+先读前言“如何阅读本手册”，照着命令从发布镜像装起 Agent Substrate 并唤醒第一个 actor。完整通读一遍第 1 部分，之后按手头问题直接跳读对应章节。遇到集群异常时，先查第 8.3 节的现象对照表。
 
-## Run the recordings again
+## 复验录制数据
 
-The recordings need a Kubernetes cluster, so they cannot run in CI. The scripts of each experiment are in its folder under `capture/lab/`, and `capture/README.md` lists the machines, the versions, and the method. The four demos in `capture/demos/` each have a README and a `run.sh`.
+原始录制依赖 Kubernetes 集群，不在 CI 中重跑；各组实验脚本保存在 `capture/lab/` 对应子目录下，`capture/README.md` 记录了机器、软件版本与步骤，`capture/demos/` 下的四个示例各有独立 README 和 `run.sh`。
 
-The summaries rebuild offline:
+汇总文件可离线复验（上游录制快照核对，不在本机重跑集群）：
 
 ```bash
 cd manuals/agent-substrate-101
 python3 capture/run.py --check
 ```
 
-The check rebuilds every summary in a temporary folder and compares it with the committed file. It prints one `skipped:` line for the recordings, because it does not start a cluster.
+该命令在临时目录重建全部汇总并与已提交文件比对，录制部分会打印一行 `skipped:` 说明未启动集群。
 
-## Build and check
+## 构建与审计
 
-From the repository root:
+在仓库根目录运行：
 
 ```bash
 node manuals/_shared/figkit.js build manuals/agent-substrate-101
 node site/build-manuals.js
-node scripts/audit_manuals.js --manual agent-substrate-101
+node scripts/audit_manuals.js --manual agent-substrate-101 --skip-capture
 ```
 
-The audit must report `TOTAL 0`. See [manuals/AUTHORING.md](../AUTHORING.md) for the contract.
+审计必须报告 `TOTAL 0`。完整规范见 [manuals/AUTHORING.md](../AUTHORING.md)。

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-4-2b-title fig-4-2b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-2b-title">Resume time against memory held, for both sandbox classes</title>
-  <desc id="fig-4-2b-desc">Seconds for one request to a suspended actor against the MiB of random memory it holds, on the x86 server guest, from the snapshot on the node. Every one of the 60 resumes is a small dot, ten for each size and class, and a line joins the medians. The microvm class has a median of 0.33 s at 0 MiB, 0.49 s at 200 MiB, 0.80 s at 500 MiB. The gvisor class has a median of 0.22 s at 0 MiB, 0.47 s at 200 MiB, 1.07 s at 500 MiB. The microvm line starts 0.10 s higher and rises about half as fast, so the two lines cross a little above 200 MiB.</desc>
+  <title id="fig-4-2b-title">两种沙箱类别下恢复耗时与所持内存的关系</title>
+  <desc id="fig-4-2b-desc">x86 服务器客户机上从节点本地快照恢复时，向挂起 actor 发一次请求的耗时秒数与其所持随机内存 MiB 的关系。共 60 次恢复各为一个小点（每种规格与沙箱类别各 10 次），线条连接中位数。microvm 类别的中位数为：0 MiB 为 0.33 s、200 MiB 为 0.49 s、500 MiB 为 0.80 s；gvisor 类别的中位数为：0 MiB 为 0.22 s、200 MiB 为 0.47 s、500 MiB 为 1.07 s。microvm 起点高出 0.10 s，但斜率约为一半，因此两条线在略高于 200 MiB 处交叉。</desc>
   <line x1="46" y1="310" x2="476" y2="310" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="40" y="314" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.0</text>
   <line x1="46" y1="271.43" x2="476" y2="271.43" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -31,8 +31,8 @@
   <text x="390" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">400</text>
   <line x1="476" y1="310" x2="476" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="476" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">500</text>
-  <text x="261" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">memory the actor holds, MiB</text>
-  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds from request to reply, at the client</text>
+  <text x="261" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 持有的内存，MiB</text>
+  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端从请求到回复的耗时，秒</text>
   <path d="M46.0 267.2 L218.0 219.0 L476.0 104.0" fill="none" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linejoin="round"/>
   <path d="M46.0 247.1 L218.0 215.3 L476.0 155.1" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.8" stroke-linejoin="round"/>
   <line x1="52" y1="265.06" x2="52" y2="268.54" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1" stroke-opacity="0.45"/>
@@ -102,17 +102,17 @@
   <circle cx="481" cy="156.49" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="481" cy="161.11" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="492" y="94.03" font-size="11.5" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">gvisor</text>
-  <text x="492" y="109.03" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.07 s median of 10</text>
-  <text x="492" y="124.03" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">about 1.7 ms per MiB</text>
+  <text x="492" y="109.03" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.07 s（10 次中位）</text>
+  <text x="492" y="124.03" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">约 1.7 ms / MiB</text>
   <text x="492" y="159.14" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">microvm</text>
-  <text x="492" y="174.14" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">0.80 s median of 10</text>
-  <text x="492" y="189.14" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">about 1.0 ms per MiB</text>
+  <text x="492" y="174.14" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">0.80 s（10 次中位）</text>
+  <text x="492" y="189.14" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">约 1.0 ms / MiB</text>
   <text x="70" y="217.57" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">microvm 0.33 s</text>
   <text x="70" y="294.71" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">gvisor 0.22 s</text>
-  <text x="230.9" y="249.14" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">at 200 MiB: 0.49 s and 0.47 s</text>
-  <text x="230.9" y="263.14" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the medians cross above this size</text>
+  <text x="230.9" y="249.14" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">200 MiB 时：0.49 s 与 0.47 s</text>
+  <text x="230.9" y="263.14" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">超过此规格后中位数交叉</text>
   <circle cx="61.9" cy="51.43" r="1.9" fill="var(--m-ink-soft, #4a4a4a)"/>
-  <text x="70.9" y="55.43" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one resume</text>
-  <line x1="142.9" y1="51.43" x2="160.9" y2="51.43" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
-  <text x="166.9" y="55.43" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">median of one size</text>
+  <text x="70.9" y="55.43" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单次恢复</text>
+  <line x1="132.9" y1="51.43" x2="150.9" y2="51.43" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
+  <text x="156.9" y="55.43" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单一规格中位数</text>
 </svg>

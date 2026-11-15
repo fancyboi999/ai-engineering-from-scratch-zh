@@ -1,39 +1,39 @@
 # WorkerPool
 
-> A WorkerPool is a set of worker pods that you size, and each pod reports a capacity taken from its own CPU and memory limits.
+> WorkerPool 是一组由你定大小的 worker pod，每个 pod 按自己的 CPU 和内存 limit 上报容量。
 
-You create an actor, send it a request, and look for its pod. There is no pod with the name of the actor. The actor runs inside a worker pod that existed before the actor did, and that hosts other actors too. The WorkerPool is the object that made that pod.
+你创建一个 actor，给它发一个请求，然后去找它的 pod。集群里没有以 actor 命名的 pod。actor 运行在一个 worker pod 里，这个 pod 在 actor 出现之前就已存在，还同时承载其他 actor。创建这个 pod 的对象就是 `WorkerPool`。
 
-When you finish this section, you can write a WorkerPool, read the output of `kubectl ate get workers`, and say where each capacity number comes from.
+读完本节，你能写出一个 `WorkerPool`，读懂 `kubectl ate get workers` 的输出，并说清每个容量数字的来源。
 
-## Three CRDs, and no Actor among them
+## 三个 CRD，其中没有 Actor {#s-workerpool-three-crds-and-no-actor-among-them}
 
-**WorkerPool:** a namespaced Kubernetes object that asks for a number of worker pods of one sandbox class.
+**WorkerPool：** 一个带命名空间的 Kubernetes 对象，用来申请若干个同一沙箱类别的 worker pod。
 
-Substrate adds three CRDs to your cluster, all in the group `ate.dev` at version `v1`. A WorkerPool is the only one you write often. A SandboxConfig names the sandbox binaries for a class, and the install creates a default for each class. A CSIDriverConfig belongs to a preview feature for external volumes.
+Substrate 向集群添加三个 CRD，都在 `ate.dev` 组、`v1` 版本下。你经常要写的只有 `WorkerPool`。`SandboxConfig` 为一个沙箱类别指定沙箱二进制文件，安装时会为每个类别创建一份默认配置。`CSIDriverConfig` 属于外部卷的预览功能。
 
 ```listing
-title: the CRDs after the install
+title: 安装后的 CRD
 source: capture/lab/A-quickstart/60-state.log
 lang: text
-note: Three lines from the state dump that we took after the quickstart.
+note: 快速上手之后我们导出了状态，这里取其中三行。
 ---
 csidriverconfigs.ate.dev   Cluster      v1(storage)   2026-11-12T10:05:33Z
 sandboxconfigs.ate.dev     Cluster      v1(storage)   2026-11-12T10:05:33Z
 workerpools.ate.dev        Namespaced   v1(storage)   2026-11-12T10:05:33Z
 ```
 
-Actors, ActorTemplates and atespaces are absent from that list. They are rows in Postgres that `ate-api-server` serves, so `kubectl get` cannot show them {{run}}. Use `kubectl` for the pool and `kubectl ate` for all that runs on the pool.
+列表里没有 Actor、ActorTemplate 和 atespace。它们是 `ate-api-server` 提供服务的 Postgres 行，所以 `kubectl get` 看不到 {{run}}。用 `kubectl` 管理 pool，用 `kubectl ate` 管理运行在 pool 上的一切。
 
-## The pool we used
+## 我们使用的 pool {#s-workerpool-the-pool-we-used}
 
-This is the pool behind most measurements in this manual. It asks for two gVisor workers, each with 2 CPUs and 3 GiB.
+本手册大部分实测都基于这个 pool。它申请两个 gVisor worker，每个 2 个 CPU、3 GiB 内存。
 
 ```listing
-title: a WorkerPool with two workers
+title: 带两个 worker 的 WorkerPool
 source: capture/lab/C-resume-vs-size/pool.yaml
 lang: yaml
-note: The Namespace object above the pool is cut.
+note: pool 上方的 Namespace 对象已省略。
 ---
 apiVersion: ate.dev/v1
 kind: WorkerPool
@@ -57,46 +57,46 @@ spec:
         memory: 3Gi
 ```
 
-Four fields carry the meaning {{code}}:
+四个字段承载了主要含义 {{code}}：
 
-- `spec.replicas` is the number of worker pods. The pool has a `scale` subresource, so `kubectl scale` and an autoscaler can change it.
-- `spec.workerImage` is the worker binary for the class. Use `ateworker-gvisor` for `gvisor` and `ateworker-microvm` for `microvm`.
-- `spec.sandboxClasses` takes exactly one entry at v1.0.0, and you cannot change its `name` later. [Sandbox classes](#s-sandbox-classes) compares the two.
-- `spec.template.resources.limits` is the capacity of each worker. It is the most important field in the object.
+- `spec.replicas` 是 worker pod 的数量。pool 有 `scale` 子资源，所以 `kubectl scale` 和自动扩缩器都能修改它。
+- `spec.workerImage` 是该类别的 worker 二进制镜像。`gvisor` 用 `ateworker-gvisor`，`microvm` 用 `ateworker-microvm`。
+- `spec.sandboxClasses` 在 v1.0.0 只接受一个条目，之后不能改它的 `name`。[沙箱类别](#s-sandbox-classes)对比了这两种类别。
+- `spec.template.resources.limits` 是每个 worker 的容量。它是这个对象里最重要的字段。
 
-The label `workload: ballast` sits on the pool object, under `metadata.labels`. An ActorTemplate selects pools with `workerSelector.matchLabels`, and the match reads the labels of the pool object. Labels under `spec.template.labels` go to the Deployment and its pods, and they do not affect which actors the pool accepts {{code}}.
+标签 `workload: ballast` 写在 pool 对象上，位于 `metadata.labels` 下。ActorTemplate 用 `workerSelector.matchLabels` 选择 pool，匹配读取的是 pool 对象的标签。`spec.template.labels` 下的标签会落到 Deployment 及其 pod 上，不影响 pool 接受哪些 actor {{code}}。
 
-A selector is the only link between a template and a pool. The namespace of the pool and Kubernetes RBAC do not limit which templates can select it {{code}}. An actor can add its own `workerSelector`, which narrows the selector of the template and takes effect at the next resume. Put a label on each pool that only the intended templates use.
+选择器是模板与 pool 之间唯一的连接。pool 所在的命名空间和 Kubernetes RBAC 都不限制哪些模板能选中它 {{code}}。actor 可以加上自己的 `workerSelector`，它会收窄模板的选择器，并在下一次恢复时生效。给每个 pool 打一个只有目标模板才会使用的标签。
 
-## From the pool to a registered worker
+## 从 pool 到已注册的 worker {#s-workerpool-from-the-pool-to-a-registered-worker}
 
 ```figure
 id: fig-4-1
 kind: flow
-title: from a WorkerPool to two registered workers
-claim: A WorkerPool becomes a Deployment of worker pods, and each pod becomes a Worker record that reports the limits of the pod as capacity.
-caption: Read left to right. Grey is Kubernetes, blue is the Substrate control plane, violet is the worker side. The numbers under each worker are one row of kubectl ate get workers. From capture/lab/C-resume-vs-size/pool.yaml and capture/lab/I-capacity/02-workers-when-full.txt.
+title: 从 WorkerPool 到两个已注册的 worker
+claim: WorkerPool 变成由 worker pod 组成的 Deployment，每个 pod 又变成一条 Worker 记录，并把 pod 的 limit 作为容量上报。
+caption: 从左往右读。灰色是 Kubernetes，蓝色是 Substrate 控制平面，紫色是 worker 一侧。每个 worker 下方的数字是 kubectl ate get workers 的一行。来源：capture/lab/C-resume-vs-size/pool.yaml、capture/lab/I-capacity/02-workers-when-full.txt。
 ```
 
-Four steps separate your YAML from a worker that can take an actor {{code}}:
+从你的 YAML 到一个能接收 actor 的 worker，要经过四步 {{code}}：
 
-1. `ate-controller` reads the WorkerPool and writes a Deployment with the same replica count. Each pod has the label `ate.dev/worker-pool`.
-2. `ate-controller` watches those pods and creates one Worker record for each in `ate-api-server`. The name of the record is the UID of the pod.
-3. `atelet` on the node registers the worker and reports which sandbox runtimes it can run.
-4. When the pod is Ready, the Worker moves to `WORKER_STATE_ACTIVE`. Only an active worker receives actors.
+1. `ate-controller` 读取 `WorkerPool`，写出副本数相同的 Deployment。每个 pod 带有标签 `ate.dev/worker-pool`。
+2. `ate-controller` 监视这些 pod，并在 `ate-api-server` 中为每个 pod 创建一条 Worker 记录。记录的名字是 pod 的 UID。
+3. 节点上的 `atelet` 注册 worker，并上报它能运行哪些沙箱运行时。
+4. pod 变为 Ready 后，Worker 进入 `WORKER_STATE_ACTIVE`。只有活跃的 worker 才会收到 actor。
 
-**Worker:** the record in `ate-api-server` for one worker pod, with its state, its capacity, and the resources that actors have booked on it.
+**Worker：** `ate-api-server` 中对应一个 worker pod 的记录，包含它的状态、容量，以及 actor 已在它上面预订的资源。
 
-A Worker has three states. `WORKER_STATE_UNAVAILABLE` means registered and not Ready. `WORKER_STATE_ACTIVE` means ready for actors. `WORKER_STATE_DRAINING` means the pod is terminating, and a worker never leaves that state.
+Worker 有三种状态。`WORKER_STATE_UNAVAILABLE` 表示已注册但未 Ready。`WORKER_STATE_ACTIVE` 表示可以接收 actor。`WORKER_STATE_DRAINING` 表示 pod 正在终止，worker 一旦进入该状态就不会离开。
 
-A terminating worker pod is slow on purpose. The controller sets its termination grace period to 3,600 seconds, and the worker gives its actors up to 30 minutes to stop {{code}}. A rollout of a pool with running actors can take that long.
+终止中的 worker pod 故意很慢。控制器把它的终止宽限期设为 3,600 秒，worker 最多给它的 actor 30 分钟来停止 {{code}}。对带有运行中 actor 的 pool 做滚动更新，可能要等这么久。
 
-## What `kubectl ate get workers` shows
+## `kubectl ate get workers` 显示什么 {#s-workerpool-what-kubectl-ate-get-workers-shows}
 
-We ran the command when four actors with 1 CPU each were running on the pool.
+我们在 pool 上运行着四个 actor、每个占 1 个 CPU 时执行了这条命令。
 
 ```listing
-title: both workers full
+title: 两个 worker 都已满
 source: capture/lab/I-capacity/02-workers-when-full.txt
 lang: text
 ---
@@ -105,52 +105,52 @@ b17a6492-9643-42f1-bfdb-8bb88ee46772   ballast   WORKER_STATE_ACTIVE   2/1000   
 ee4ba8b4-dbfa-4555-a621-7cf7662c1091   ballast   WORKER_STATE_ACTIVE   2/1000   2000/2000         512Mi/3008Mi   lab-c/ballast-65cf95d875-f65dl   114s
 ```
 
-Each of the three middle columns is a pair: booked, then capacity.
+中间三列都是一对数字：先是已预订量，再是容量。
 
-| Column | Capacity comes from | In our pool |
+| 列 | 容量来源 | 我们的 pool |
 |---|---|---|
-| `ACTORS` | the worker flag `--max-actors`, default 1000 | 2 of 1000 |
-| `CPU(MILLICORES)` | the CPU limit of the worker container | 2000 of 2000 |
-| `MEMORY` | the memory limit, less what the worker keeps for itself | 512Mi of 3008Mi |
+| `ACTORS` | worker 标志 `--max-actors`，默认 1000 | 1000 中的 2 |
+| `CPU(MILLICORES)` | worker 容器的 CPU limit | 2000 中的 2000 |
+| `MEMORY` | 内存 limit 减去 worker 自留的部分 | 3008Mi 中的 512Mi |
 
-The worker kept 64 MiB of its 3 GiB limit, so it reported 3008Mi. The demo pools with a 1 GiB limit reported 960Mi, the same 64 MiB less {{run}}.
+worker 从 3 GiB 的 limit 里自留了 64 MiB，所以上报 3008Mi。内存 limit 为 1 GiB 的示例 pool 上报 960Mi，同样少了 64 MiB {{run}}。
 
-The booked side is the sum of the limits that each running actor declares in its ActorTemplate. Each actor here declared 1000 millicores and 256 MiB. Two actors booked the whole CPU capacity and a sixth of the memory. The worker is full, and CPU is the reason.
+已预订部分，是每个运行中的 actor 在 ActorTemplate 里声明的 limit 之和。这里每个 actor 声明了 1000 millicores 和 256 MiB。两个 actor 订满了全部 CPU 容量和六分之一的内存。worker 已满，原因是 CPU。
 
-`cpuMillicores` has two jobs. The worker books it for placement, and the worker also writes it into the sandbox as a CPU quota for each 100 ms period {{code}}. The documentation says that the node kernel slows the actor to that quota {{docs}}.
+`cpuMillicores` 有两个作用。worker 用它做放置时的预订，同时把它作为每 100 ms 周期的 CPU 配额写入沙箱 {{code}}。文档说节点内核会把 actor 限速到这个配额 {{docs}}。
 
-The quota is a hard cap. We tested it with a program that runs a fixed number of loop steps, about 5 seconds of work on one free core. It ran on 1 thread and on 4 threads, under four templates. We read the CPU time of the actor from its cgroup on the node, before and after each run.
+这个配额是硬上限。我们用一个按固定循环步数运行的程序来测试，在一个空闲核心上大约要 5 秒。它分别用 1 个线程和 4 个线程运行，覆盖四个模板。每次运行前后，我们都从节点上的 cgroup 读取 actor 的 CPU 时间。
 
-**We measured** three runs for each row on a second x86 server guest (16 vCPU, 23 GB). The pool had one worker pod with a Kubernetes limit of 6 CPU.
+**我们测得**每一行各三次运行，环境是第二台 x86 服务器客户机（16 vCPU、23 GB）。pool 只有一个 worker pod，Kubernetes limit 为 6 CPU。
 
-| `cpuMillicores` | Threads | Wall time, s | Host cores used |
+| `cpuMillicores` | 线程数 | 墙钟时间（秒） | 使用的宿主机核心数 |
 |---|---|---|---|
-| 250 | 1 | 27.1 to 27.6 | 0.25 |
-| 250 | 4 | 26.5 to 27.9 | 0.25 |
-| 500 | 1 | 12.7 to 13.1 | 0.50 to 0.51 |
-| 500 | 4 | 12.4 to 12.8 | 0.50 |
-| 1000 | 1 | 4.9 to 5.4 | 1.01 |
-| 1000 | 4 | 5.3 to 5.5 | 1.00 to 1.01 |
-| 2000 | 1 | 4.1 to 4.5 | 1.12 |
-| 2000 | 4 | 1.38 to 1.42 | 1.96 to 2.01 |
+| 250 | 1 | 27.1 到 27.6 | 0.25 |
+| 250 | 4 | 26.5 到 27.9 | 0.25 |
+| 500 | 1 | 12.7 到 13.1 | 0.50 到 0.51 |
+| 500 | 4 | 12.4 到 12.8 | 0.50 |
+| 1000 | 1 | 4.9 到 5.4 | 1.01 |
+| 1000 | 4 | 5.3 到 5.5 | 1.00 到 1.01 |
+| 2000 | 1 | 4.1 到 4.5 | 1.12 |
+| 2000 | 4 | 1.38 到 1.42 | 1.96 到 2.01 |
 
 ```figure
 id: fig-4-1b
 kind: chart
-title: host cores an actor used at four CPU limits
-claim: An actor used 0.25, 0.50, and 1.0 host cores at limits of 250, 500, and 1000 millicores, and it needed four threads to use 2.0 cores at 2000.
-caption: Read the cores on the vertical axis against the limit of the template. The solid line is 1 thread and the dashed line is 4 threads, with one dot for each run. The thin dashed line is the limit itself. From capture/lab/summary/cpu-limit-x86.json.
+title: actor 在四个 CPU limit 下使用的宿主机核心数
+claim: 在 250、500、1000 millicores 的 limit 下，actor 分别用了 0.25、0.50 和 1.0 个宿主机核心，到 2000 时需要四个线程才用满 2.0 个核心。
+caption: 纵轴是核心数，横轴是模板的 limit。实线是 1 个线程，虚线是 4 个线程，每次运行一个点。细虚线是 limit 本身。来源：capture/lab/summary/cpu-limit-x86.json。
 ```
 
-The actor never used more host cores than its limit. Up to 1000 millicores, four threads did not get more CPU than one thread. The same work took 5.4 times longer at 250 millicores than at 1000. In one row the limit was not the bound: one thread at 2000 millicores used 1.12 cores, because one thread fills one core. Four threads used the whole limit there.
+actor 使用的宿主机核心数从未超过它的 limit。在 1000 millicores 以内，四个线程并不比一个线程拿到更多 CPU。同样的工作量，250 millicores 比 1000 millicores 慢 5.4 倍。有一行里 limit 不是瓶颈：2000 millicores 下的一个线程只用了 1.12 个核心，因为一个线程只能占满一个核心。四个线程在那里用满了整个 limit。
 
-The cap is a cgroup for each actor, inside the cgroup of the worker pod. The worker pod had `cpu.max=600000 100000`, which is its Kubernetes limit of 6 CPU. Inside it we found one cgroup for each actor, named with the uid of the actor and the suffix `_sandbox`. Its `cpu.max` was the template limit, and the gVisor processes of the actor ran in it.
+这个上限是每个 actor 一个 cgroup，嵌在 worker pod 的 cgroup 里。worker pod 的 `cpu.max=600000 100000`，即它的 Kubernetes limit 6 CPU。在它里面，我们找到每个 actor 一个 cgroup，名字是 actor 的 uid 加后缀 `_sandbox`。它的 `cpu.max` 就是模板的 limit，actor 的 gVisor 进程都在其中运行。
 
 ```listing
-title: the CPU quota of four actors, as the node reports it
+title: 节点报告的四个 actor 的 CPU 配额
 source: capture/lab/Q-network/n-cpu-limit/42-cgroup-after.txt
 lang: text
-note: The complete file, read after the runs. The columns are the limit in millicores, the quota and the period in microseconds, and the counters of the cgroup.
+note: 完整文件，在运行结束后读取。各列依次是 millicores 为单位的 limit、以微秒计的配额与周期，以及 cgroup 的计数器。
 ---
 250 25000/100000 usage_usec 41467478 nr_periods 1672 nr_throttled 1649 throttled_usec 428931388 
 500 50000/100000 usage_usec 38723256 nr_periods 793 nr_throttled 765 throttled_usec 157096786 
@@ -158,25 +158,25 @@ note: The complete file, read after the runs. The columns are the limit in milli
 2000 200000/100000 usage_usec 23220151 nr_periods 204 nr_throttled 38 throttled_usec 854079 
 ```
 
-Two facts about the inside of the sandbox follow, and both can mislead you.
+沙箱内部有两个事实，都可能误导你。
 
-- **The actor does not see its limit.** The program counted 2 CPUs at all four limits, and it could not read the cgroup files. A runtime that sizes a thread pool from the CPU count gets 2 at 250 millicores.
-- **CPU time read inside a throttled sandbox is wrong.** At 250 millicores with 1 thread, the program reported 22 to 24 seconds of CPU time. The same run used 6.9 seconds on the host. Do not use `getrusage` or `/proc` inside an actor to measure CPU use. Read the cgroup on the node.
+- **actor 看不到自己的 limit。** 程序在四种 limit 下都数出 2 个 CPU，而且读不到 cgroup 文件。按 CPU 数量确定线程池大小的运行时，在 250 millicores 下也会得到 2。
+- **在被限速的沙箱里读到的 CPU 时间是错的。** 在 250 millicores、1 个线程下，程序报告了 22 到 24 秒的 CPU 时间。同一次运行在宿主机上只用了 6.9 秒。不要在 actor 里用 `getrusage` 或 `/proc` 来测 CPU 用量，要读节点上的 cgroup。
 
-The second fact explains an earlier reading of ours. A demo command reported 2.0 seconds of CPU time in 2.38 seconds under 500 millicores, which looked like no cap. That CPU time came from inside the sandbox, so it does not count. [A tool sandbox](#s-a-tool-sandbox) has that run and the correction.
+第二个事实解释了我们早先的一次读数。一条示例命令在 500 millicores 下报告了 2.38 秒里有 2.0 秒的 CPU 时间，看起来像是没有限速。那段 CPU 时间来自沙箱内部，所以不能算数。[工具沙箱](#s-a-tool-sandbox)里有那次运行和更正。
 
-We tested one actor at a time. Memory limits, and CPU limits with several busy actors on one worker, come in the next edition. One row is not explained. Four threads at 2000 millicores used 2.8 seconds of host CPU, and 1 thread used 4.6 to 5.1 seconds for the same work.
+我们一次只测了一个 actor。内存 limit，以及一个 worker 上多个繁忙 actor 的 CPU limit，将在下一版补充。有一行没有得到解释。在 2000 millicores 下，四个线程用了 2.8 秒宿主机 CPU，而同样的工作 1 个线程用了 4.6 到 5.1 秒。
 
-A suspended actor books nothing. The command counts running actors only.
+挂起的 actor 不预订任何资源。该命令只统计运行中的 actor。
 
-Two habits from `kubectl` do not carry over. The command has no `-A` flag, and it lists the workers of every namespace by default. It has four filters: `-n` for one Kubernetes namespace, `-l` for pool labels, `-a` for the workers that host actors of one atespace, and `--sandbox-class`.
+`kubectl` 的两个习惯在这里不适用。这条命令没有 `-A` 标志，默认列出所有命名空间的 worker。它有四个过滤器：`-n` 过滤一个 Kubernetes 命名空间，`-l` 过滤 pool 标签，`-a` 过滤承载某个 atespace 的 actor 的 worker，还有 `--sandbox-class`。
 
-## A pool without limits reports the whole node
+## 没有 limit 的 pool 会上报整个节点 {#s-workerpool-a-pool-without-limits-reports-the-whole-node}
 
-kagent v1.0.0 installs a pool named `kagent-default` with no `resources` at all. We listed its worker on a guest with 16 vCPUs and 31 GiB.
+kagent v1.0.0 安装了一个名为 `kagent-default` 的 pool，完全没有 `resources`。我们在一台 16 vCPU、31 GiB 的客户机上列出了它的 worker。
 
 ```listing
-title: the worker of a pool without limits
+title: 没有 limit 的 pool 的 worker
 source: capture/lab/K-kagent/inventory/workers-end.txt
 lang: text
 ---
@@ -184,22 +184,22 @@ NAME                                   POOL             STATE                 AC
 6dfb9d1d-cce7-4e42-af53-799a4132fa5d   kagent-default   WORKER_STATE_ACTIVE   0/1000   0/16000           0/32797744Ki   kagent/kagent-default-679c58c6cb-pljdk   19m
 ```
 
-The worker claims all 16 CPUs and all the memory of the node. The Substrate documentation says that a worker without limits reports zero and has no bound. Our run disagrees: the worker read the size of the node and reported that. A user reported the same on a larger cluster {{issue #3479}}.
+这个 worker 声称拥有节点的全部 16 个 CPU 和全部内存。Substrate 文档说，没有 limit 的 worker 上报 0 且没有上界。我们的运行结果与此不符：worker 读取了节点的大小并上报了它。有用户在更大的集群上报告过同样的现象 {{issue #3479}}。
 
-The result is a capacity that nothing backs. The pod has no limit, so Kubernetes reserves nothing for it. A second pool on the same node would claim the same 16 CPUs again. The control plane, the dataplane and Postgres run on that node too. [kagent 1.0 on Substrate](#s-kagent-on-substrate) shows what that worker did under load.
+结果是一个没有任何东西支撑的容量。pod 没有 limit，所以 Kubernetes 不为它预留任何资源。同一节点上的第二个 pool 会再次声称同样的 16 个 CPU。控制平面、数据平面和 Postgres 也运行在这个节点上。[Substrate 上的 kagent 1.0](#s-kagent-on-substrate) 展示了这个 worker 在负载下的表现。
 
-Our position: always set `limits` on a pool, and set the memory request equal to the memory limit. Then the memory that the worker reports is memory that Kubernetes has reserved. Kubernetes reserves CPU only up to the CPU request. The example above requests 500 millicores and reports 2 CPUs. Set the CPU request equal to the limit when actors must get the CPU that they book. [Sizing a pool](#s-sizing-a-pool) turns that rule into numbers.
+我们的判断：始终给 pool 设置 `limits`，并让内存 request 等于内存 limit。这样 worker 上报的内存就是 Kubernetes 已预留的内存。Kubernetes 只在 CPU request 的范围内预留 CPU。上面的例子 request 了 500 millicores，却上报 2 个 CPU。如果 actor 必须拿到它们预订的 CPU，就让 CPU request 等于 limit。[pool 定容](#s-sizing-a-pool)把这条规则换算成了具体数字。
 
-One more fact matters before you give a pool to a team. A worker pod runs as root with `SYS_ADMIN` and `NET_ADMIN`, and its seccomp profile is unconfined {{run}}. The sandbox inside the pod isolates the actor. The pod does not isolate the worker from the node, so run pools on nodes that you trust.
+把 pool 交给团队之前，还有一个事实要知道。worker pod 以 root 身份运行，带有 `SYS_ADMIN` 和 `NET_ADMIN`，seccomp 配置为 unconfined {{run}}。pod 内的沙箱隔离 actor。pod 本身并不把 worker 与节点隔离，所以请把 pool 运行在你信任的节点上。
 
 ```takeaways
-- Use kubectl for WorkerPools and kubectl ate for workers, actors, and templates.
-- Put the selector label under metadata.labels of the pool, where templates match it.
-- Set CPU and memory limits on every pool, with the memory request equal to the limit.
-- Read each pair in kubectl ate get workers as booked, then capacity.
-- Treat cpuMillicores as a hard cap for each actor, and set thread counts in the template yourself.
-- Measure the CPU use of an actor from its cgroup on the node, never inside the sandbox.
-- Expect a pool rollout to wait up to 30 minutes for running actors.
+- 用 kubectl 管理 WorkerPool，用 kubectl ate 管理 worker、actor 和模板。
+- 把选择器标签放在 pool 的 metadata.labels 下，模板在那里匹配。
+- 给每个 pool 设置 CPU 和内存 limit，并让内存 request 等于 limit。
+- 把 kubectl ate get workers 里的每一对数字读作“已预订，然后是容量”。
+- 把 cpuMillicores 当作每个 actor 的硬上限，线程数要在模板里自己设置。
+- 从节点上的 cgroup 测量 actor 的 CPU 用量，不要在沙箱里测。
+- 预期 pool 滚动更新会为运行中的 actor 等待最长 30 分钟。
 ```
 
-Sources: capture/lab/summary/demos-x86.json, capture/lab/N-demos/tool-sandbox/tasks.tsv, capture/lab/summary/cpu-limit-x86.json, capture/lab/Q-network/n-cpu-limit/40-work.tsv, capture/lab/Q-network/n-cpu-limit/42-cgroup-after.txt, capture/lab/Q-network/n-cpu-limit/22-cgroup-250.txt, capture/lab/Q-network/n-cpu-limit/41-info-250.json, capture/lab/Q-network/n-cpu-limit/03-worker-pod-resources.json, capture/lab/Q-network/n-cpu-limit/10-burn.tsv, capture/lab/A-quickstart/60-state.log, capture/lab/C-resume-vs-size/pool.yaml, capture/lab/C-resume-vs-size/tmpl-0.yaml, capture/lab/I-capacity/02-workers-when-full.txt, capture/lab/I-capacity/03-actors-when-full.txt, capture/lab/I-capacity/14-workers-full.txt, capture/lab/K-kagent/inventory/workers-end.txt, capture/lab/K-kagent/inventory/workerpools.yaml, capture/lab/K-kagent/inventory/worker-pod-spec.json; api/infra/k8s/ate/v1/workerpool_types.go, cmd/atecontroller/internal/controllers/workerpool_apply.go, cmd/atecontroller/internal/workersync/syncer.go, cmd/ateworker-gvisor/main.go, cmd/ateworker-gvisor/memory.go, api/ateapi/v1/ateapi.proto (Worker, WorkerStatus, WorkerState), cmd/kubectl-ate/internal/cmd/worker.go at v1.0.0; docs/reference/api-guide.md at v1.0.0; issue https://github.com/agent-substrate/substrate/issues/3479.
+来源：capture/lab/summary/demos-x86.json, capture/lab/N-demos/tool-sandbox/tasks.tsv, capture/lab/summary/cpu-limit-x86.json, capture/lab/Q-network/n-cpu-limit/40-work.tsv, capture/lab/Q-network/n-cpu-limit/42-cgroup-after.txt, capture/lab/Q-network/n-cpu-limit/22-cgroup-250.txt, capture/lab/Q-network/n-cpu-limit/41-info-250.json, capture/lab/Q-network/n-cpu-limit/03-worker-pod-resources.json, capture/lab/Q-network/n-cpu-limit/10-burn.tsv, capture/lab/A-quickstart/60-state.log, capture/lab/C-resume-vs-size/pool.yaml, capture/lab/C-resume-vs-size/tmpl-0.yaml, capture/lab/I-capacity/02-workers-when-full.txt, capture/lab/I-capacity/03-actors-when-full.txt, capture/lab/I-capacity/14-workers-full.txt, capture/lab/K-kagent/inventory/workers-end.txt, capture/lab/K-kagent/inventory/workerpools.yaml, capture/lab/K-kagent/inventory/worker-pod-spec.json; api/infra/k8s/ate/v1/workerpool_types.go, cmd/atecontroller/internal/controllers/workerpool_apply.go, cmd/atecontroller/internal/workersync/syncer.go, cmd/ateworker-gvisor/main.go, cmd/ateworker-gvisor/memory.go, api/ateapi/v1/ateapi.proto (Worker, WorkerStatus, WorkerState), cmd/kubectl-ate/internal/cmd/worker.go at v1.0.0; docs/reference/api-guide.md at v1.0.0; issue https://github.com/agent-substrate/substrate/issues/3479.

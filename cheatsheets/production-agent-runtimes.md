@@ -4,8 +4,8 @@ title: 生产 agent 运行时与队列
 code: PA
 subtitle: 选择运行时形态，创建检查点并重放，用租约与栅栏管理任务，重试有作用域的读取。使用 Python 与 Go。
 hue: 30
-sources: phases/14-agent-engineering/29-production-runtimes, phases/15-autonomous-systems/12-durable-execution, phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints, projects/durable-agent-jobs, projects/cloud-agent-with-aws-strands
-source_hash: fbbc02c35bb8bf0a
+sources: phases/14-agent-engineering/29-production-runtimes, phases/15-autonomous-systems/12-durable-execution, phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints, projects/durable-agent-jobs, projects/cloud-agent-with-aws-strands, manuals/agent-substrate-101
+source_hash: 89df69e23cc07ea4
 ---
 
 ## 选择运行时形态

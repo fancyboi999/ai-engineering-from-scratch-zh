@@ -15,10 +15,10 @@ const of = prefix => {
 const describe = (prefix, kind) => {
   const found = of(prefix);
   const containers = Number(found[0].ready.split('/')[1]);
-  if (found[0].status === 'Completed') return 'Job, Completed';
-  const each = containers === 1 ? '' : `, ${containers} containers${found.length > 1 ? ' each' : ''}`;
-  if (kind) return containers === 1 ? `${kind}, 1 pod` : `${kind}${each}`;
-  return `${found.length} ${found.length === 1 ? 'pod' : 'pods'}${each}`;
+  if (found[0].status === 'Completed') return 'Job，已完成';
+  const each = containers === 1 ? '' : `，${found.length > 1 ? '各 ' : ''}${containers} 容器`;
+  if (kind) return containers === 1 ? `${kind}，1 pod` : `${kind}${each}`;
+  return `${found.length} pod${each}`;
 };
 const running = pods.filter(pod => pod.status === 'Running').length;
 const finished = pods.filter(pod => pod.status === 'Completed').length;
@@ -36,7 +36,7 @@ const columns = [
   },
   {
     back: { name: 'postgres-0', prefix: 'postgres-0', hue: 'teal', form: 'cylinder', kind: 'StatefulSet' },
-    front: { name: 'rustfs', prefix: 'rustfs-5', hue: 'teal', form: 'bucket', kind: 'object store' },
+    front: { name: 'rustfs', prefix: 'rustfs-5', hue: 'teal', form: 'bucket', kind: '对象存储' },
   },
   {
     back: { name: 'atenet-router', prefix: 'atenet-router', hue: 'indigo', form: 'gateway', mark: ENVOY },
@@ -50,8 +50,8 @@ const columns = [
 
 module.exports = figure('fig-2-4b', {
   height: 448,
-  title: 'The pods of ate-system on kind-control-plane',
-  desc: `An isometric drawing of the namespace ate-system as one floor tile on the node kind-control-plane, which carries the Kubernetes mark. The tile holds ${running} running pods and ${finished} finished Job, one object for each pod. Two ate-api-server towers and two ate-idp-server towers stand side by side, and one ate-controller tower stands alone, all with the Agent Substrate mark. postgres-0 is a cylinder and rustfs is a bucket. atenet-router and atenet-egress are gateway units with the Envoy mark. atelet and k8s-credential-provider are small units, and the finished Job rustfs-bucket-init is a dashed outline.`,
+  title: 'kind-control-plane 上 ate-system 的各个 pod',
+  desc: `等轴测图将命名空间 ate-system 绘为带 Kubernetes 标志的节点 kind-control-plane 上的一块底板。底板上有 ${running} 个运行中 pod 和 ${finished} 个已完成 Job，每个立体对应一个 pod。两座 ate-api-server 塔和两座 ate-idp-server 塔并排而立，一座 ate-controller 塔独立其旁，均带 Agent Substrate 标志。postgres-0 为圆柱体，rustfs 为存储桶。atenet-router 与 atenet-egress 为带 Envoy 标志的网关单元。atelet 与 k8s-credential-provider 为小型单元，已完成的 Job rustfs-bucket-init 为虚线轮廓。`,
 }, f => {
   const V = forms.isoView(f, { ox: 170, oy: 104, angle: 'true' });
   const tag = (x, y, title, sub, hue, anchor = 'start') => {
@@ -66,7 +66,7 @@ module.exports = figure('fig-2-4b', {
     return forms.unit(f, V, [x, y, 0], item.hue, { w: 36, d: 36, h: 26, ghost: item.ghost });
   };
 
-  f.kicker(20, 18, `ate-system · ${running} running pods, ${finished} finished Job`);
+  f.kicker(20, 18, `ate-system · ${running} 个运行中 pod，${finished} 个已完成 Job`);
   forms.slab(f, V, [-28, -28, 0], 'grey', { w: 520, d: 156, mark: { id: 'kubernetes', size: 38, at: [464, 50] } });
   forms.tile(f, V, [-14, -14, 0], 'grey', { w: 450, d: 128 });
 
@@ -93,8 +93,8 @@ module.exports = figure('fig-2-4b', {
     tag(x - 30, y + 52, label.item.name, describe(label.item.prefix, label.item.kind), label.item.hue, 'end');
     f.leader([x - 26, y + 48], [x + 6, y + 2], { hue: label.item.hue });
   }
-  f.text(20, 58, 'namespace ate-system', { size: 11, serif: true, hue: 'ink-mute' });
+  f.text(20, 58, '命名空间 ate-system', { size: 11, serif: true, hue: 'ink-mute' });
   f.leader([50, 64], V.P(-14, 96, 0), { hue: 'ink-mute' });
-  f.text(620, 424, 'node', { size: 11, serif: true, hue: 'ink-mute', anchor: 'end' });
+  f.text(620, 424, '节点', { size: 11, serif: true, hue: 'ink-mute', anchor: 'end' });
   f.text(620, 440, 'kind-control-plane', { size: 12, weight: 700, hue: 'grey', anchor: 'end' });
 });

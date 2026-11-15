@@ -6,7 +6,7 @@ const { chart, load } = require('../../../_shared/chart.js');
 
 const store = load(path.join(__dirname, '../../capture/lab/summary/remote-store-x86.json'));
 const places = [
-  { key: 'remote:0:0', name: 'plain' },
+  { key: 'remote:0:0', name: '明文' },
   { key: 'remote-tls:0:0', name: 'TLS' },
   { key: 'remote:0:100', name: '100 Mbit/s' },
   { key: 'remote:0:20', name: '20 Mbit/s' },
@@ -15,8 +15,8 @@ const places = [
 const sizes = [0, 200, 1000];
 const cell = (place, mib) => store.cycles.find(item => `${item.store}:${item.added_round_trip_ms}:${item.rate_mbit}` === place && item.mib === mib);
 const panels = [
-  { field: 'seconds_to_first_200', name: 'request to the first 200', x: 56, hue: 'teal', limit: true },
-  { field: 'suspend_sync_seconds', name: 'synchronous suspend', x: 362, hue: 'amber', limit: false },
+  { field: 'seconds_to_first_200', name: '请求至首个 200 的耗时（秒）', x: 56, hue: 'teal', limit: true },
+  { field: 'suspend_sync_seconds', name: '同步挂起耗时（秒）', x: 362, hue: 'amber', limit: false },
 ];
 const top = 70;
 const tall = 240;
@@ -29,18 +29,18 @@ const slow = cell('remote:0:20', 200);
 
 module.exports = figure('fig-8-1c', {
   height: 390,
-  title: 'A bucket on another guest: every cycle, on a scale of powers of ten',
-  desc: `Two panels plot every one of ${cycles} cycles with the bucket on a second guest. With no shaping, a request to an actor of 1,000 MiB took a median of ${plain.seconds_to_first_200.median.toFixed(1)} s to its first 200. At 20 Mbit/s, an actor of 200 MiB took ${slow.seconds_to_first_200.median.toFixed(1)} s, and its synchronous suspend took ${slow.suspend_sync_seconds.median.toFixed(1)} s. In ${late} cycles the first answer was a 504 after 10 s, and a later request returned 200.`,
+  title: '另一台客户机上的 bucket：对数坐标下每轮循环的耗时',
+  desc: `两个面板绘制 bucket 位于另一台客户机时全部 ${cycles} 轮循环的实测耗时（10 的幂次对数刻度）。不做流量整形时，发往 1,000 MiB actor 的请求拿到首个 200 的中位耗时为 ${plain.seconds_to_first_200.median.toFixed(1)} 秒。限速 20 Mbit/s 时，200 MiB actor 拿到首个 200 的中位耗时为 ${slow.seconds_to_first_200.median.toFixed(1)} 秒，同步挂起中位耗时为 ${slow.suspend_sync_seconds.median.toFixed(1)} 秒。共有 ${late} 轮循环首次响应在 10 秒后返回 504，后续重试请求返回 200。`,
 }, f => {
   f.dot(26, 18, { hue: 'ink-soft', r: 1.9 });
-  f.text(36, 22, 'one cycle', { size: 11, hue: 'ink-soft' });
+  f.text(36, 22, '单轮循环', { size: 11, hue: 'ink-soft' });
   f.rule(110, 18, 128, 18, { hue: 'ink-soft', width: 1.8 });
-  f.text(136, 22, 'median of five cycles', { size: 11, hue: 'ink-soft' });
+  f.text(136, 22, '5 轮循环中位数', { size: 11, hue: 'ink-soft' });
   f.rule(300, 18, 318, 18, { hue: 'rose', width: 1.4, dash: 'dashed' });
-  f.text(326, 22, 'the router answers 504 after 10 s', { size: 11, hue: 'ink-soft' });
+  f.text(326, 22, '路由器在 10 s 后返回 504', { size: 11, hue: 'ink-soft' });
 
   for (const panel of panels) {
-    const c = chart(f, { x: panel.x, y: top, w: 230, h: tall, xDomain: [-0.5, 4.5], yDomain: [-1, 3], xTicks: [0, 1, 2, 3, 4], yTicks: [-1, 0, 1, 2, 3], xFormat: () => '', yFormat: power, yLabel: `${panel.name}, seconds` });
+    const c = chart(f, { x: panel.x, y: top, w: 230, h: tall, xDomain: [-0.5, 4.5], yDomain: [-1, 3], xTicks: [0, 1, 2, 3, 4], yTicks: [-1, 0, 1, 2, 3], xFormat: () => '', yFormat: power, yLabel: panel.name });
     places.forEach((place, index) => f.text(c.px(index), top + tall + (index % 2 ? 31 : 17), place.name, { size: 11, anchor: 'middle', hue: 'ink-soft' }));
     if (panel.limit) f.rule(c.px(-0.5), c.py(1), c.px(4.5), c.py(1), { hue: 'rose', width: 1.4, dash: 'dashed' });
     for (const mib of sizes) {
@@ -55,6 +55,6 @@ module.exports = figure('fig-8-1c', {
       });
     }
   }
-  f.text(320, 362, 'the path from the node to the bucket on the other guest', { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
-  f.text(320, 378, 'the number above a group is the MiB of data in the actor', { size: 11, serif: true, anchor: 'middle', hue: 'ink-soft' });
+  f.text(320, 362, '从节点通往另一台客户机上 bucket 的网络路径', { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
+  f.text(320, 378, '每组上方的数字为 actor 内存中的数据体积（MiB）', { size: 11, serif: true, anchor: 'middle', hue: 'ink-soft' });
 });

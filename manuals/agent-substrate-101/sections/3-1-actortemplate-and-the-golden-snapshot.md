@@ -1,22 +1,22 @@
-# ActorTemplate and the golden snapshot
+# ActorTemplate 与黄金快照
 
-> Substrate snapshots each ActorTemplate once, and an actor created after that starts suspended from the snapshot, so its first call pays a restore.
+> Substrate 对每个 ActorTemplate 只做一次快照，之后创建的 actor 从该快照以挂起状态起步，所以它的首次调用要付出一次恢复的代价。
 
-Your agent image takes several seconds to import its libraries and load its tools. With a Deployment, every new pod pays those seconds again. Substrate moves that cost to the template. It starts the image once, takes a snapshot, and creates every new actor from that snapshot. The cost does not disappear: the first request to a new actor restores the snapshot, and the restore grows with the memory in it.
+你的 agent 镜像要花几秒导入库、加载工具。用 Deployment 时，每个新 pod 都要再付一遍这几秒。Substrate 把这笔开销移到了模板上：它只启动一次镜像，生成一份快照，之后每个新 actor 都从这份快照创建。开销并没有消失：新 actor 的第一个请求要恢复快照，恢复时间随快照里的内存增长。
 
-When you finish this section, you can write an ActorTemplate, check that its golden snapshot exists, and predict the first-call time of a new actor.
+读完本节，你能写出 ActorTemplate，确认它的黄金快照已经存在，并预测新 actor 的首次调用耗时。
 
-## The template we used
+## 我们用的模板 {#s-actortemplate-and-the-golden-snapshot-the-template-we-used}
 
-**ActorTemplate:** the description of an actor: its containers, its resource limits, its volumes, the worker pools that it can run on, and its snapshot settings. A template belongs to one atespace, and `ate-api-server` stores it in Postgres. It is not a Kubernetes object, so `kubectl get` does not list it.
+**ActorTemplate：** 对 actor 的描述，包含容器、资源上限、卷、可运行它的 worker 池以及快照设置。模板属于一个 atespace，由 `ate-api-server` 存进 Postgres。它不是 Kubernetes 对象，所以 `kubectl get` 列不出它。
 
-This is one of the five templates of our resume tests. The actor is a small Go server that holds 200 MiB of random bytes and counts its requests.
+下面是我们恢复测试用的五个模板之一。这个 actor 是一个小型 Go 服务，持有 200 MiB 随机字节，并统计自己收到的请求数。
 
 ```listing
-title: an ActorTemplate that holds 200 MiB
+title: 一个持有 200 MiB 的 ActorTemplate
 source: capture/lab/C-resume-vs-size/tmpl-200.yaml
 lang: yaml
-note: The complete file. We created it with kubectl ate create actor-template -f.
+note: 完整文件。我们用 kubectl ate create actor-template -f 创建了它。
 ---
 metadata:
   atespace: lab-c
@@ -42,47 +42,47 @@ snapshotConfig:
   preferredFidelity: SNAPSHOT_FIDELITY_MEMORY
 ```
 
-Five fields decide how the actor behaves.
+五个字段决定 actor 的行为。
 
-- `image` must name a digest, and a tag alone is refused {{code}}. Ours is a `scratch` image from a plain `docker build`, with no change for Substrate.
-- `resources.limits` needs both values {{code}}. The scheduler books them against the capacity of a worker, which [section 4.1](#s-workerpool) explains.
-- `workerSelector` matches the labels of a WorkerPool object. [Section 3.6](#s-atespaces) shows why the namespace of the pool does not count.
-- `wakeupProbe` is a readiness check that runs on every resume. The actor becomes `ACTOR_STATE_RUNNING` only after the probe passes {{docs}}.
-- `preferredFidelity` says how much state a snapshot keeps. [Section 3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives) compares the three levels.
+- `image` 必须写明 digest，只写标签会被拒绝 {{code}}。我们的镜像是用普通 `docker build` 构建的 `scratch` 镜像，没有为 Substrate 做任何改动。
+- `resources.limits` 两个值都要填 {{code}}。调度器按 worker 的容量来记这两个值，[第 4.1 节](#s-workerpool)有详细说明。
+- `workerSelector` 匹配的是 `WorkerPool` 对象的标签。[第 3.6 节](#s-atespaces)说明了为什么池所在的 namespace 不起作用。
+- `wakeupProbe` 是每次恢复时都会运行的就绪检查。探测通过之后，actor 才会变成 `ACTOR_STATE_RUNNING` {{docs}}。
+- `preferredFidelity` 决定快照保留多少状态。[第 3.4 节](#s-snapshot-fidelity-and-where-a-snapshot-lives)比较了三个级别。
 
-A template is immutable, and the API has no call that updates one {{code}}. For new code you create a new template, and then you move each suspended actor with `kubectl ate update actor --template` {{docs}}.
+模板不可变，API 里没有更新模板的调用 {{code}}。要换新代码，就创建一个新模板，再用 `kubectl ate update actor --template` 把每个已挂起的 actor 迁过去 {{docs}}。
 
-We ran that move with two templates that differ in the image. On a running actor the update is refused.
+我们用两个只有镜像不同的模板做了这次迁移。对正在运行的 actor，更新会被拒绝。
 
 ```listing
-title: a template change on a running actor
+title: 对运行中 actor 更换模板
 source: capture/lab/V-validation/06-template-move/10-move.tsv
 lang: text
-note: One line of the trace. The time and the event name at the start of the line are cut.
+note: 跟踪记录中的一行。行首的时间和事件名已截掉。
 ---
 …Error: failed to update actor: rpc error: code = FailedPrecondition desc = actor must be ACTOR_STATE_SUSPENDED to change its actor template (got: ACTOR_STATE_RUNNING) 
 ```
 
-On the suspended actor the update was accepted, and the next call ran the new image. The count in memory started again at 1, and so did the count on the root filesystem. The count on the `durableDir` volume continued at 4. So this move kept the `durableDir` volume and dropped the old memory snapshot. A move with an external volume is a run for the next edition. Suspend first, and expect a cold start of the new image on the next call.
+对已挂起的 actor，更新被接受，下一次调用运行的是新镜像。内存里的计数从 1 重新开始，根文件系统上的计数也一样。`durableDir` 卷上的计数则接着数到 4。所以这次迁移保留了 `durableDir` 卷，丢掉了旧的内存快照。带外部卷的迁移要留到下一版再测。先挂起，并预期下一次调用会冷启动新镜像。
 
-## The golden snapshot is built once
+## 黄金快照只构建一次 {#s-actortemplate-and-the-golden-snapshot-the-golden-snapshot-is-built-once}
 
-**Golden snapshot:** the snapshot of one temporary actor that Substrate starts from a new template. Substrate stores it under a tag, the golden tag, and every new actor of that template starts from that tag.
+**黄金快照（golden snapshot）：** Substrate 从新模板启动一个临时 actor，并给它生成的快照。Substrate 把它存在一个标签下，即黄金标签，该模板的每个新 actor 都从这个标签启动。
 
-`ate-api-server` builds the golden snapshot in four steps {{docs}}.
+`ate-api-server` 分四步构建黄金快照 {{docs}}。
 
-1. It creates a temporary golden actor in the atespace of the template, and it resumes that actor.
-2. It waits until the actor is ready. If a container has no `wakeupProbe`, it waits 20 seconds more {{code}}.
-3. It suspends the actor at the `preferredFidelity` of the template, and it copies the snapshot to a published tag.
-4. It deletes the golden actor, and it writes the tag into the status of the template.
+1. 在模板所在的 atespace 里创建一个临时的黄金 actor，并恢复它。
+2. 等到 actor 就绪。如果某个容器没有 `wakeupProbe`，还要再多等 20 秒 {{code}}。
+3. 按模板的 `preferredFidelity` 挂起 actor，并把快照复制到一个发布标签。
+4. 删除黄金 actor，并把标签写进模板的 status。
 
-The log of `ate-api-server` on our kagent cluster shows all four steps for one template.
+我们 kagent 集群上 `ate-api-server` 的日志，展示了一个模板的这四步。
 
 ```listing
-title: the golden actor of one template, from create to delete
+title: 一个模板的黄金 actor，从创建到删除
 source: capture/lab/K-kagent/logs/actor-state-changes.tsv
 lang: text
-note: The first seven lines of the file. The columns are the time, the uid of the actor, the operation, and the new state.
+note: 该文件的前七行。各列依次是时间、actor 的 uid、操作和新状态。
 ---
 2026-11-12T10:16:44.165402326Z	dd7b8625-0d96-4d7d-89da-4ec9cc3b914a	create	suspended
 2026-11-12T10:16:44.178659651Z	dd7b8625-0d96-4d7d-89da-4ec9cc3b914a	resume	resuming
@@ -93,19 +93,19 @@ note: The first seven lines of the file. The columns are the time, the uid of th
 2026-11-12T10:16:54.328177186Z	dd7b8625-0d96-4d7d-89da-4ec9cc3b914a	delete	deleted
 ```
 
-The timestamps show a resume of 9.84 seconds, because the golden actor is the one actor that boots the image from zero. The suspend took 0.15 seconds. That template had a files-only fidelity, so the snapshot held no memory.
+时间戳显示这次恢复用了 9.84 秒，因为黄金 actor 是唯一一个从零启动镜像的 actor。挂起用了 0.15 秒。这个模板的保真度是仅文件，所以快照里没有内存。
 
-The build pays the full start of your application, once.
+构建过程只付一次应用完整启动的代价。
 
-**We measured** one template for a Python server on the x86 server guest (24 vCPU, 47 GB, nested KVM), with n=1. The server builds a dict of one million values at start. The golden tag was ready 39.3 seconds after `create actor-template`. The process was 32.9 seconds old at its first request, so most of that time was the application start under gVisor. A new actor of that template then answered its first call in a median of 0.63 seconds, with five new actors. [Section 3.3](#s-suspendactor-and-resumeactor) shows the server.
+**我们测得**一个 Python 服务模板的数据，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM），n=1。这个服务在启动时构建一个含一百万个值的 dict。黄金标签在 `create actor-template` 之后 39.3 秒就绪。进程在处理第一个请求时已运行 32.9 秒，所以大部分时间花在 gVisor 下的应用启动上。之后，该模板的新 actor 首次调用的中位数是 0.63 秒，共测了五个新 actor。[第 3.3 节](#s-suspendactor-and-resumeactor)展示了这个服务。
 
-The golden tag does not exist at the moment the template does. In our resume tests we listed the five templates 21 seconds after we created them.
+模板建好的那一刻，黄金标签还不存在。在恢复测试里，我们在创建五个模板 21 秒后列出了它们。
 
 ```listing
-title: five templates, 21 seconds after create
+title: 创建 21 秒后的五个模板
 source: capture/lab/C-resume-vs-size/02-templates.txt
 lang: text
-note: The complete file. The 1,000 MiB template has no golden tag yet.
+note: 完整文件。1,000 MiB 的模板还没有黄金标签。
 ---
 ATESPACE   NAME           GOLDEN TAG                             ERROR   AGE
 lab-c      ballast-0      e32029d7-3d9b-4212-8953-e88d7cede5b4           21s
@@ -115,15 +115,15 @@ lab-c      ballast-50     0382e2fc-99db-461a-8845-a90d93484443           21s
 lab-c      ballast-500    2fa7aaf9-1fe8-4076-9350-af27ba338a6b           20s
 ```
 
-All five had a tag when we looked again at 118 seconds. Wait for the `GOLDEN TAG` column before you create actors. An actor that you create earlier records no snapshot. It boots from the image on its first call, and it keeps that cold start until its own first suspend {{docs}}.
+我们在 118 秒时再看，五个模板都有了标签。创建 actor 之前，先等 `GOLDEN TAG` 这一列出现。更早创建的 actor 不会记录快照。它在首次调用时从镜像启动，并在自己第一次挂起前一直保持这次冷启动的状态 {{docs}}。
 
-We ran that race. We created an actor directly after its template, and `create actor` succeeded.
+我们复现了这个竞态。我们在模板之后立刻创建了一个 actor，`create actor` 成功了。
 
 ```listing
-title: an actor created before the golden snapshot exists
+title: 黄金快照出现之前创建的 actor
 source: capture/lab/V-validation/05-golden-race/10-race.tsv
 lang: text
-note: Four lines of the trace. The actor rc1 is early, and the actor rc2 was created after the golden tag. The lines between them are cut.
+note: 跟踪记录中的四行。actor rc1 创建得早，actor rc2 在黄金标签出现之后创建。两者之间的行已截掉。
 ---
 2026-11-12T12:49:47.365Z	rc1-state	ACTOR_STATE_SUSPENDED	-	
 2026-11-12T12:49:48.542Z	rc1-first-call	200	0.983729	tag=v3 count=1 mb=200 fill=random sum=26936 rootfs=-1 data=-1 pid=1 process_age_s=0.8 child[none]
@@ -132,21 +132,21 @@ note: Four lines of the trace. The actor rc1 is early, and the actor rc2 was cre
 2026-11-12T12:50:01.888Z	rc2-state-new	ACTOR_STATE_SUSPENDED	-	SNAPSHOT_OWNER_TAG:SNAPSHOT_FIDELITY_MEMORY:SNAPSHOT_STORAGE_STATE_COMPLETED:gen1
 ```
 
-**We measured** this once on the x86 server guest (24 vCPU, 47 GB, nested KVM), with a 200 MiB actor. The early actor was `ACTOR_STATE_SUSPENDED` with an empty snapshot list. Its first call was a cold start and took 0.98 seconds. The golden tag was ready 11 seconds later, and the first call of an actor created after that took 0.93 seconds. Five more early actors of another template still had no snapshot 25 seconds later.
+**我们测得**这一次的数据，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM），actor 为 200 MiB。早创建的 actor 处于 `ACTOR_STATE_SUSPENDED`，快照列表为空。它的首次调用是冷启动，用了 0.98 秒。黄金标签 11 秒后就绪，在那之后创建的 actor 首次调用用了 0.93 秒。另一个模板的五个早创建 actor，25 秒后仍然没有快照。
 
-So an early actor never adopts the golden snapshot. It gets its own snapshot at its first suspend. Our actor starts in under a second, so the two first calls cost the same. With an application that needs 30 seconds to start, the early actor pays 30 seconds on its first call.
+所以早创建的 actor 永远不会采用黄金快照。它在第一次挂起时得到自己的快照。我们的 actor 启动不到一秒，所以两次首次调用耗时相同。如果应用需要 30 秒启动，早创建的 actor 在首次调用时就要付 30 秒。
 
-You can turn the golden snapshot off with `snapshotConfig.goldenSnapshotConfig.mode: GOLDEN_SNAPSHOT_MODE_DISABLED` {{code}}. Every new actor then boots from the image.
+你可以用 `snapshotConfig.goldenSnapshotConfig.mode: GOLDEN_SNAPSHOT_MODE_DISABLED` 关掉黄金快照 {{code}}。之后每个新 actor 都从镜像启动。
 
-## A new actor starts suspended
+## 新 actor 以挂起状态起步 {#s-actortemplate-and-the-golden-snapshot-a-new-actor-starts-suspended}
 
-`kubectl ate create actor` writes one row in Postgres and touches no worker, so its time does not depend on the template. The new actor is suspended. It already has a snapshot when the template had its golden tag at that moment.
+`kubectl ate create actor` 在 Postgres 里写一行，不碰任何 worker，所以它的耗时与模板无关。新 actor 处于挂起状态。如果此刻模板已经有黄金标签，它就已经带着一份快照。
 
 ```listing
-title: the actor my-counter-1 directly after create
+title: 刚创建完的 actor my-counter-1
 source: capture/lab/B-lifecycle/00-actor-before.json
 lang: json
-note: The sandboxRuntime block and the end of the file are cut.
+note: 已截掉 sandboxRuntime 块和文件末尾。
 ---
 {
   "actorTemplate": {
@@ -181,48 +181,48 @@ note: The sandboxRuntime block and the end of the file are cut.
 }
 ```
 
-Read three fields. `state` is `ACTOR_STATE_SUSPENDED`, so no sandbox exists yet. `owner` is `SNAPSHOT_OWNER_TAG`, so the actor borrows the snapshot of the golden tag and owns none. The URI has a `tags` segment, and it does not hold the uid of the actor. The actor writes its own snapshot at its first suspend.
+重点看三个字段。`state` 是 `ACTOR_STATE_SUSPENDED`，说明还没有沙箱存在。`owner` 是 `SNAPSHOT_OWNER_TAG`，说明这个 actor 借用黄金标签的快照，自己不拥有快照。URI 里有 `tags` 段，不含 actor 的 uid。actor 在第一次挂起时才会写出自己的快照。
 
 ```figure
 id: fig-3-1
 kind: flow
-title: from ActorTemplate to the first call
-claim: Substrate builds one golden snapshot for each template, and an actor created after that starts suspended from it.
-caption: Read the top row once for each template and the bottom row once for each actor. The numbers match the key. Names and seconds are from our resume tests on the x86 server guest. From capture/lab/C-resume-vs-size/10-local.tsv and capture/lab/C-resume-vs-size/02-templates.txt.
+title: 从 ActorTemplate 到首次调用
+claim: Substrate 为每个模板构建一份黄金快照，之后创建的 actor 都从它以挂起状态起步。
+caption: 上面一行对每个模板执行一次，下面一行对每个 actor 执行一次。编号与图例对应。名称和秒数来自我们在 x86 服务器客户机上的恢复测试。来源：capture/lab/C-resume-vs-size/10-local.tsv、capture/lab/C-resume-vs-size/02-templates.txt。
 ```
 
-## The first call pays for the restore
+## 首次调用要付恢复的代价 {#s-actortemplate-and-the-golden-snapshot-the-first-call-pays-for-the-restore}
 
-The first request to a new actor restores the golden snapshot. For a small actor you do not notice it. For a large one, it is the slowest request that the actor ever serves.
+新 actor 的第一个请求会恢复黄金快照。小 actor 几乎感觉不到。对大 actor 来说，这是它一生中最慢的一次请求。
 
-| Memory in the template | First call of a new actor, median | Fastest and slowest of 5 | Later resume of the same actor, median |
+| 模板中的内存 | 新 actor 的首次调用，中位数 | 5 次中的最快与最慢 | 同一 actor 之后的恢复，中位数 |
 |---|---|---|---|
-| 0 MiB | 0.23 s | 0.22 to 0.24 s | 0.22 s |
-| 50 MiB | 0.25 s | 0.24 to 0.40 s | 0.24 s |
-| 200 MiB | 0.62 s | 0.56 to 0.86 s | 0.47 s |
-| 500 MiB | 5.76 s | 1.86 to 6.76 s | 1.07 s |
-| 1,000 MiB | 6.60 s | 3.46 to 12.75 s | 2.16 s |
+| 0 MiB | 0.23 秒 | 0.22 到 0.24 秒 | 0.22 秒 |
+| 50 MiB | 0.25 秒 | 0.24 到 0.40 秒 | 0.24 秒 |
+| 200 MiB | 0.62 秒 | 0.56 到 0.86 秒 | 0.47 秒 |
+| 500 MiB | 5.76 秒 | 1.86 到 6.76 秒 | 1.07 秒 |
+| 1,000 MiB | 6.60 秒 | 3.46 到 12.75 秒 | 2.16 秒 |
 
-**We measured** these times on the x86 server guest (24 vCPU, 47 GB, nested KVM), with gVisor and five new actors for each size. Each time is one request through `kubectl ate proxy`, timed at the client. A request to an actor that already runs took 0.06 seconds on the same path. The later resume is the median of 10 resumes from the snapshot on the node. `kubectl ate create actor` returned in 0.20 to 0.26 seconds for all 25 actors.
+**我们测得**这些耗时，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM），gVisor，每种大小各五个新 actor。每个耗时是经 `kubectl ate proxy` 发出的一次请求，在客户端计时。在同一路径上，对一个已在运行的 actor 发请求用了 0.06 秒。“之后的恢复”是从节点上的快照恢复 10 次的中位数。`kubectl ate create actor` 对全部 25 个 actor 的返回时间是 0.20 到 0.26 秒。
 
 ```figure
 id: fig-3-1b
 kind: chart
-title: the first call of a new actor against its memory
-claim: At 1,000 MiB the first call of a new actor took 3.5 to 12.7 seconds, and a later resume took 2.2 seconds.
-caption: Each teal dot is the first call of one new actor, five for each size, and the teal line joins the medians. The violet line is the median of ten later resumes of one actor from the node. Measured on the x86 server guest. From capture/lab/summary/resume-x86.json.
+title: 新 actor 的首次调用与内存的关系
+claim: 在 1,000 MiB 时，新 actor 的首次调用用了 3.5 到 12.7 秒，之后的恢复用了 2.2 秒。
+caption: 每个青色点是一个新 actor 的首次调用，每种大小五个，青色线连接各中位数。紫色线是同一 actor 从节点恢复十次的中位数。测于 x86 服务器客户机。来源：capture/lab/summary/resume-x86.json。
 ```
 
-Up to 200 MiB the first call costs about the same as a later resume. At 500 MiB and above it costs three to five times more, and the spread is wide. We did not find the cause of that spread. We can say where the node kept data. Its `snapshot-cache` directory held 1,765 MiB, and the five snapshot sizes of our templates add up to 1,760 MiB.
+到 200 MiB 为止，首次调用与之后的恢复耗时差不多。到 500 MiB 及以上，首次调用耗时达到三到五倍，而且波动很大。我们没有找到波动的原因。我们能确定的是节点把数据放在哪里：它的 `snapshot-cache` 目录占了 1,765 MiB，而我们五个模板的快照大小总和是 1,760 MiB。
 
-Our position: the golden snapshot is a good place for slow start code and a bad place for large memory. If your template holds more than about 200 MiB, send one request to each new actor before a user does. Use a request that changes no state: our counter adds one on every call. Then suspend it. A later resume from the node copy follows the lower line.
+我们的判断：黄金快照适合放启动慢的代码，不适合放大内存。如果你的模板持有超过约 200 MiB 的内存，就在用户访问前先给每个新 actor 发一次请求。用不改变状态的请求，比如我们的计数器每次调用都会加一，之后再挂起它。之后从节点上的副本恢复，耗时就会落在较低的那条线上。
 
 ```takeaways
-- Pin the image of a template by digest, and set both resource limits.
-- Give every container a wakeupProbe, so the golden snapshot needs no extra 20 seconds.
-- Wait for the GOLDEN TAG column before you create the first actor.
-- Create a new template for new code, suspend each actor, and then move it.
-- Send one request that changes no state to a large new actor before a user does.
+- 用 digest 固定模板的镜像，并设置两个资源上限。
+- 给每个容器配 wakeupProbe，这样黄金快照不用多等 20 秒。
+- 创建第一个 actor 之前，先等 GOLDEN TAG 列出现。
+- 换新代码就创建新模板，先挂起每个 actor，再迁移。
+- 在用户请求到达前，先向内存较大的新 actor 发一次不改变状态的请求。
 ```
 
-Sources: capture/lab/summary/resume-x86.json, capture/lab/C-resume-vs-size/tmpl-200.yaml, capture/lab/C-resume-vs-size/02-templates.txt, capture/lab/C-resume-vs-size/09-templates-at-start.txt, capture/lab/C-resume-vs-size/10-local.tsv, capture/lab/C-resume-vs-size/20-storage-footprint.txt, capture/lab/C-resume-vs-size/00-image.txt, capture/lab/B-lifecycle/00-actor-before.json, capture/lab/K-kagent/logs/actor-state-changes.tsv, capture/lab/summary/kagent-turns-x86.json, capture/lab/summary/footprint-x86.json, capture/lab/summary/validation-memory-x86.json, capture/lab/V-validation/02-python-runtime/10-python.tsv, capture/lab/V-validation/05-golden-race/10-race.tsv, capture/lab/V-validation/06-template-move/10-move.tsv. Agent Substrate v1.0.0: api/ateapi/v1/ateapi.proto (ActorTemplate, GoldenSnapshotMode, Snapshot, SnapshotOwner), cmd/ateapi/internal/controlapi/template_reconciler.go (goldenSnapshotWarmup), docs/reference/api-guide.md (The Golden Snapshot, Container Wakeup Probe, UpdateActor).
+来源：capture/lab/summary/resume-x86.json, capture/lab/C-resume-vs-size/tmpl-200.yaml, capture/lab/C-resume-vs-size/02-templates.txt, capture/lab/C-resume-vs-size/09-templates-at-start.txt, capture/lab/C-resume-vs-size/10-local.tsv, capture/lab/C-resume-vs-size/20-storage-footprint.txt, capture/lab/C-resume-vs-size/00-image.txt, capture/lab/B-lifecycle/00-actor-before.json, capture/lab/K-kagent/logs/actor-state-changes.tsv, capture/lab/summary/kagent-turns-x86.json, capture/lab/summary/footprint-x86.json, capture/lab/summary/validation-memory-x86.json, capture/lab/V-validation/02-python-runtime/10-python.tsv, capture/lab/V-validation/05-golden-race/10-race.tsv, capture/lab/V-validation/06-template-move/10-move.tsv. Agent Substrate v1.0.0: api/ateapi/v1/ateapi.proto (ActorTemplate, GoldenSnapshotMode, Snapshot, SnapshotOwner), cmd/ateapi/internal/controlapi/template_reconciler.go (goldenSnapshotWarmup), docs/reference/api-guide.md (The Golden Snapshot, Container Wakeup Probe, UpdateActor).

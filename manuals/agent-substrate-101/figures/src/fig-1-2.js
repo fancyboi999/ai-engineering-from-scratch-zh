@@ -19,11 +19,11 @@ const restore = stamp(restored.time) - stamp(restoring.time);
 
 const BASE = 68;
 const lanes = [
-  { title: 'curl', sub: 'client', hue: 'olive', draw: (f, x) => flat.terminal(f, x, BASE - 34, 'olive') },
+  { title: 'curl', sub: '客户端', hue: 'olive', draw: (f, x) => flat.terminal(f, x, BASE - 34, 'olive') },
   { title: 'kubectl ate', sub: 'proxy actor', hue: 'olive', draw: (f, x) => flat.unit(f, x, BASE - 42, 'olive', { w: 40, h: 42, mark: 'kubernetes' }) },
-  { title: 'atenet-router', sub: 'dataplane', hue: 'indigo', draw: (f, x) => flat.gateway(f, x, BASE - 40, 'indigo', { mark: 'envoy' }) },
-  { title: 'ate-api-server', sub: 'control plane', hue: 'blue', draw: (f, x) => flat.tower(f, x, BASE - 48, 'blue', { mark: 'substrate' }) },
-  { title: 'Postgres', sub: 'actor rows', hue: 'teal', draw: (f, x) => flat.cylinder(f, x, BASE - 58, 'teal', { mark: 'postgresql' }) },
+  { title: 'atenet-router', sub: '数据平面', hue: 'indigo', draw: (f, x) => flat.gateway(f, x, BASE - 40, 'indigo', { mark: 'envoy' }) },
+  { title: 'ate-api-server', sub: '控制平面', hue: 'blue', draw: (f, x) => flat.tower(f, x, BASE - 48, 'blue', { mark: 'substrate' }) },
+  { title: 'Postgres', sub: 'actor 行', hue: 'teal', draw: (f, x) => flat.cylinder(f, x, BASE - 58, 'teal', { mark: 'postgresql' }) },
   {
     title: 'worker pod',
     sub: 'my-counter-1',
@@ -40,20 +40,20 @@ const TOP = 136;
 
 const rows = [
   [0, 1, 'call', 'POST localhost:8000/', null],
-  [1, 2, 'event', 'mTLS CONNECT to port 8444', 'through a kube-apiserver port-forward'],
-  [2, 3, 'call', 'ResumeActor', 'sent for every request'],
-  [3, 4, 'call', 'read the actor row', 'ACTOR_STATE_SUSPENDED'],
-  [3, 4, 'write', 'take the lease, bind a worker', null],
-  [3, 5, 'state', 'atelet restores the golden snapshot', `SUSPENDED to RUNNING, ${restore.toFixed(2)} s in a later resume`],
-  [3, 2, 'reply', `worker ${workerIp}`, 'with its SPIFFE ID'],
-  [2, 5, 'event', 'CONNECT to port 8443', 'then actor port 80'],
-  [1, 0, 'reply', '200, count: 1', `${first.toFixed(3)} s at the client`],
+  [1, 2, 'event', 'mTLS CONNECT 到端口 8444', '经 kube-apiserver 端口转发'],
+  [2, 3, 'call', 'ResumeActor', '每次请求均发送'],
+  [3, 4, 'call', '读取 actor 行', 'ACTOR_STATE_SUSPENDED'],
+  [3, 4, 'write', '获取租约，绑定 worker', null],
+  [3, 5, 'state', 'atelet 恢复黄金快照', `SUSPENDED 到 RUNNING，后续恢复 ${restore.toFixed(2)} s`],
+  [3, 2, 'reply', `worker ${workerIp}`, '附带其 SPIFFE ID'],
+  [2, 5, 'event', 'CONNECT 到端口 8443', '再转至 actor 端口 80'],
+  [1, 0, 'reply', '200, count: 1', `客户端耗时 ${first.toFixed(3)} s`],
 ];
 
 module.exports = figure('fig-1-2', {
   height: 576,
-  title: 'The first request to my-counter-1',
-  desc: `Six lifelines, each under a small drawing of its party: curl as a terminal, the kubectl ate proxy actor as a small unit with the Kubernetes mark, atenet-router as a gateway with the Envoy mark, ate-api-server as a server with the Agent Substrate mark, Postgres as a cylinder with its mark, and the worker pod as a frame that holds a gVisor sandbox and the actor. Nine numbered exchanges: curl sends POST to 127.0.0.1:8000, the proxy opens an mTLS CONNECT to router port 8444 through a kube-apiserver port-forward, the router calls ResumeActor, ate-api-server reads the actor row and finds it suspended, takes the lease and binds a worker, has atelet restore the golden snapshot so the actor goes from SUSPENDED to RUNNING, and returns worker ${workerIp} to the router. The router opens a CONNECT to worker port 8443, and curl gets 200 with count 1 after ${first.toFixed(3)} seconds. Steps 5 and 6 have amber numbers because they happen only when the actor is suspended. In a later resume of the same actor the restore took ${restore.toFixed(2)} seconds, and a request to the running actor took ${typical.toFixed(3)} seconds.`,
+  title: '发往 my-counter-1 的首次请求',
+  desc: `六条生命线，各自上方绘有对应组件图标：终端 curl、带 Kubernetes 标志的 kubectl ate proxy actor、带 Envoy 标志的网关 atenet-router、带 Agent Substrate 标志的服务端 ate-api-server、带标志的圆柱体 Postgres，以及容纳 gVisor 沙箱与 actor 的 worker pod。九步交互：curl 向 127.0.0.1:8000 发送 POST，代理由 kube-apiserver 端口转发向路由器端口 8444 建立 mTLS CONNECT，路由器调用 ResumeActor，ate-api-server 读取 actor 行发现其已挂起，获取租约并绑定 worker，让 atelet 恢复黄金快照使 actor 从 SUSPENDED 变为 RUNNING，再向路由器返回 worker ${workerIp}。路由器向 worker 端口 8443 建立 CONNECT，curl 在 ${first.toFixed(3)} s 后收到带 count 1 的 200。第 5、6 步标为琥珀色，因为仅当 actor 处于挂起态时发生。同一 actor 后续恢复耗时 ${restore.toFixed(2)} s，发往运行中 actor 的请求耗时 ${typical.toFixed(3)} s。`,
 }, f => {
   lanes.forEach((lane, index) => {
     lane.draw(f, cx(index));
@@ -72,5 +72,5 @@ module.exports = figure('fig-1-2', {
   f.beat(0);
   f.step(16, 560, 5, { hue: 'amber' });
   f.step(38, 560, 6, { hue: 'amber' });
-  f.text(54, 564, `only when the actor is suspended. A running actor skips them and answers in ${typical.toFixed(3)} s.`, { size: 11, serif: true, hue: 'ink-soft', knock: true });
+  f.text(54, 564, `仅在 actor 挂起时执行。运行中 actor 会跳过这两步，${typical.toFixed(3)} s 返回。`, { size: 11, serif: true, hue: 'ink-soft', knock: true });
 });

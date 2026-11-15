@@ -3,30 +3,30 @@
 const { figure } = require('../../../_shared/figkit.js');
 
 const lanes = [
-  { title: 'client', sub: 'curl', hue: 'olive' },
-  { title: 'atenet-router', sub: 'dataplane', hue: 'indigo' },
-  { title: 'ate-api-server', sub: 'control plane', hue: 'blue' },
-  { title: 'Postgres', sub: 'actor rows', hue: 'teal' },
+  { title: '客户端', sub: 'curl', hue: 'olive' },
+  { title: 'atenet-router', sub: '数据平面', hue: 'indigo' },
+  { title: 'ate-api-server', sub: '控制平面', hue: 'blue' },
+  { title: 'Postgres', sub: 'actor 行', hue: 'teal' },
   { title: 'worker pod', sub: 'my-counter-1', hue: 'violet' },
-  { title: 'other hosts', sub: 'not Substrate', hue: 'olive' },
+  { title: '外部主机', sub: '非 Substrate', hue: 'olive' },
 ];
 const cx = index => 60 + index * 104;
 
 const rows = [
-  [0, 1, 'call', 'POST /, ate-target-actor', 'a call · solid ink'],
-  [2, 3, 'write', 'worker assignment row', 'a durable write · solid teal'],
-  [2, 4, 'state', 'SUSPENDED to RUNNING', 'a state change · dashed amber'],
-  [1, 4, 'event', 'CONNECT tunnel, port 8443', 'a stream · dotted indigo'],
-  [4, 5, 'model', 'POST to mock-llm:8080', 'a model call · solid plum'],
-  [4, 5, 'effect', 'GET https://example.org/, 200', 'an outside effect · dashed olive'],
-  [1, 0, 'reply', '200, count 1, 0.36 s', 'a reply · dashed ink'],
-  [1, 0, 'fail', '503 no worker has room', 'a failure · dashed rose'],
+  [0, 1, 'call', 'POST /, ate-target-actor', '调用 · 墨色实线'],
+  [2, 3, 'write', 'worker 分配行', '持久写入 · 青绿实线'],
+  [2, 4, 'state', 'SUSPENDED 到 RUNNING', '状态迁移 · 琥珀虚线'],
+  [1, 4, 'event', 'CONNECT 隧道，端口 8443', '流 · 靛蓝点线'],
+  [4, 5, 'model', 'POST 到 mock-llm:8080', '模型调用 · 梅紫实线'],
+  [4, 5, 'effect', 'GET https://example.org/, 200', '外部副作用 · 橄榄虚线'],
+  [1, 0, 'reply', '200, count 1, 0.36 s', '回复 · 墨色虚线'],
+  [1, 0, 'fail', '503 无可用 worker', '失败 · 玫红虚线'],
 ];
 
 module.exports = figure('fig-0-1', {
   height: 470,
-  title: 'Reading a sequence figure in this manual',
-  desc: 'Six lifelines: the client, atenet-router, ate-api-server, Postgres, the worker pod that runs my-counter-1, and other hosts. Eight numbered rows use the eight arrow styles: POST with the ate-target-actor header as a solid ink call, the worker assignment row as a solid teal durable write, SUSPENDED to RUNNING as a dashed amber state change, the CONNECT tunnel on port 8443 as a dotted indigo stream, a POST to mock-llm as a solid plum model call, a GET to example.org as a dashed olive outside effect, 200 with count 1 in 0.36 s as a dashed ink reply, and 503 no worker has room as a dashed rose failure.',
+  title: '如何阅读本手册的时序图',
+  desc: '六条生命线：客户端、atenet-router、ate-api-server、Postgres、运行 my-counter-1 的 worker pod 与外部主机。八个编号行展示八种箭头样式：带 ate-target-actor 头的 POST 为墨色实线调用，worker 分配行为青绿实线持久写入，SUSPENDED 到 RUNNING 为琥珀虚线状态迁移，端口 8443 的 CONNECT 隧道为靛蓝点线流，发往 mock-llm 的 POST 为梅紫实线模型调用，发往 example.org 的 GET 为橄榄虚线外部副作用，0.36 s 返回 count 1 的 200 为墨色虚线回复，503 无可用 worker 为玫红虚线失败。',
 }, f => {
   lanes.forEach((lane, index) => {
     f.box({ x: cx(index), y: 8, w: 100, h: 40, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 11, anchor: 'middle', pad: 3 });

@@ -1,69 +1,69 @@
-# agentgateway with Substrate
+# 配合 Substrate 使用 agentgateway
 
-> agentgateway can be the dataplane of Substrate, the dataplane inside the kagent distribution, or a gateway behind an egress rule, and only the third selects models and tools.
+> agentgateway 可以是 Substrate 的数据平面、kagent 发行版内部的数据平面，或出站规则后方的网关，且仅有第三种形态能够选择模型与工具。
 
-A colleague tells you that all agent traffic goes through agentgateway, so you can limit which models an agent calls. The first half is true in some clusters. The second half depends on where agentgateway is in the path. It can be in three places, and each place decides different things.
+有同事告诉你，所有 agent 流量都会经过 agentgateway，因此你可以限制 agent 调用哪些模型。前半句在某些集群里确实成立，后半句则取决于 agentgateway 位于调用路径上的哪一环。它可以部署在三个不同位置，每个位置裁决的事项截然不同。
 
-When you finish this section, you can name the place that agentgateway has in a cluster. You can also say what the egress policy of Substrate can express, and when you need a second gateway behind it.
+读完本节，你能指出 agentgateway 在集群中所处的位置。你还能说明 Substrate 的出站策略能够表达什么，以及何时需要在它后面再放第二道网关。
 
 ```figure
 id: fig-7-2
 kind: flow
-title: three places for agentgateway
-claim: In places A and B agentgateway enforces the Substrate policy, and only in place C does it read model and tool traffic.
-caption: Each row is one request path, read left to right. Indigo boxes are the Substrate dataplane. The bold line under a row says what agentgateway decides in that place. The dashed box is a gateway that you deploy yourself. From capture/lab/G-dataplane, capture/lab/K-kagent, capture/lab/summary/network-x86.json, and the agentgateway source at v1.7.0.
+title: agentgateway 的三种位置
+claim: 在位置 A 和 B 中 agentgateway 负责执行 Substrate 策略，只有在位置 C 中它才读取模型与工具流量。
+caption: 每一行代表一条请求路径，从左往右读。靛蓝色方块是 Substrate 数据平面。每一行下方的粗线说明 agentgateway 在该处裁决什么。虚线框代表你自行部署的网关。来源：capture/lab/G-dataplane、capture/lab/K-kagent、capture/lab/summary/network-x86.json 以及 v1.7.0 的 agentgateway 源码。
 ```
 
-| Place | Who installs it | What it decides | What we ran |
+| 位置 | 谁负责安装 | 裁决什么 | 我们的实测 |
 |---|---|---|---|
-| A. The dataplane of Substrate | you, with one `ate-setup` flag | ingress identity, the egress policy, credential injection | the full comparison with Envoy |
-| B. The dataplane in the kagent distribution | the kagent installer | the same as A | 98 kagent turns through it |
-| C. A model or MCP gateway behind egress | you, as your own workload | models, tools, budgets | a model gateway with two mock models, over TLS, on both dataplanes |
+| A. Substrate 的数据平面 | 由你通过一个 `ate-setup` 标志配置 | 入站身份、出站策略、凭据注入 | 与 Envoy 的完整对比 |
+| B. kagent 发行版内部的数据平面 | kagent 安装器 | 与 A 相同 | 98 个 kagent 轮次均通过它 |
+| C. 出站后方的模型或 MCP 网关 | 由你作为自己的工作负载部署 | 模型、工具、预算 | 带有两个模拟模型的模型网关，基于 TLS，在两种数据平面上均测过 |
 
-## Place A: the dataplane of Substrate
+## 位置 A：Substrate 的数据平面 {#s-agentgateway-place-a-the-dataplane-of-substrate}
 
-Substrate has two proxies in every request path: `atenet-router` for ingress and `atenet-egress` for egress. The proxy binary in both is Envoy by default. Pass `--atenet-dataplane=agentgateway` to `ate-setup`, and both run agentgateway {{code}}.
+Substrate 在每条请求路径上都有两个代理：入站的 `atenet-router` 与出站的 `atenet-egress`。两者默认的代理二进制程序均为 Envoy。向 `ate-setup` 传入 `--atenet-dataplane=agentgateway`，两者便都会运行 agentgateway{{code}}。
 
-We switched a running cluster from Envoy to agentgateway with that flag. The command took 32 s and ended with exit code 0. We did not need a new cluster.
+我们使用该标志在运行中的集群上从 Envoy 切换到了 agentgateway。命令耗时 32 秒并以状态码 0 结束，不需要新建集群。
 
-**We measured** both dataplanes on an x86 server guest with 16 vCPU and 23 GB, one sample each at idle. The router and the egress gateway used about 38 MB in 2 containers with agentgateway. They used about 91 MB in 5 containers with Envoy.
+**我们测得**在带有 16 vCPU 和 23 GB 内存的 x86 服务器客户机上测量了两种数据平面，空闲时各采集一个样本。在 agentgateway 下，router 与出站网关在 2 个容器中占用约 38 MB 内存。在 Envoy 下，它们在 5 个容器中占用约 91 MB 内存。
 
-Our short verdict has four parts.
+我们的简短结论包含四点。
 
-- **Lighter.** Two containers do the work of five, with less than half the idle memory.
-- **Ingress clients are authenticated.** A client with no certificate got the TLS alert `certificate required`. A client with an allowed identity got 200.
-- **The interception CA private key is in the dataplane container.** With Envoy, only a sidecar holds that key.
-- **The egress gateway logs at debug level.** It prints the headers of every request. An injected credential never appeared in the log. A custom header that the actor set itself did appear, in clear text.
+- **更轻量。** 两个容器完成五个容器的工作，空闲内存占用不到原来的一半。
+- **入站客户端受到认证。** 没有证书的客户端收到 TLS 告警 `certificate required`，持有允许身份的客户端收到 200。
+- **拦截 CA 私钥存放在数据平面容器中。** 使用 Envoy 时，只有 sidecar 容器持有该私钥。
+- **出站网关以 debug 级别记录日志。** 它会打印每个请求的请求头。注入的凭据从未在日志中出现，但 actor 自身设置的自定义请求头会以明文打印。
 
-Choose agentgateway when memory on each node matters to you. Before production, lower the log level, and decide if you accept the key in the proxy container. [The dataplane choice](#s-the-dataplane-choice) has the full comparison, row by row.
+当每个节点的内存开销对你很重要时，选择 agentgateway。上线生产前，请调低日志级别，并确认你是否能接受私钥存放在代理容器中。[数据平面选型](#s-the-dataplane-choice)一节提供了逐行对比的完整表格。
 
-The log level is one variable on the egress Deployment, and the installer sets it to `debug`.
+日志级别由出站 Deployment 上的一个环境变量控制，安装器默认将其设为 `debug`。
 
 ```bash
 kubectl -n ate-system set env deploy/atenet-egress RUST_LOG=info
 ```
 
-**We measured** 100 requests from one actor at each level, on a second x86 server guest (16 vCPU, 23 GB), in one run. Each request had a custom header and an `Authorization` header with test values. At `debug` the gateway wrote 4,380 lines and 1,590,006 bytes, and 200 lines held the value of the custom header. At `info` it wrote 100 lines and 46,300 bytes, and no line held a header value. At `warn` it wrote nothing. All 300 requests returned 200.
+**我们测得**在第二台 x86 服务器客户机（16 vCPU、23 GB）上的单次运行中，针对每个级别测试了单个 actor 发出的 100 个请求。每个请求都包含一个自定义头与一个带有测试值的 `Authorization` 头。在 `debug` 级别下，网关写入 4,380 行日志，共计 1,590,006 字节，其中 200 行记录了自定义头的值。在 `info` 级别下，它写入 100 行日志，共计 46,300 字节，没有任何一行包含请求头的值。在 `warn` 级别下没有任何输出。全部 300 个请求均返回 200。
 
-The change does not last. After the next `ate-setup deploy ate-system` run, the Deployment had `RUST_LOG=debug` again. Set it after each installer run, or in the tool that applies your manifests.
+这一修改无法持久保留。在下一次运行 `ate-setup deploy ate-system` 后，Deployment 会再次恢复为 `RUST_LOG=debug`。请在每次运行安装器后重新设置，或将其维护在应用清单的工具中。
 
-## Place B: the dataplane inside the kagent distribution
+## 位置 B：kagent 发行版内部的数据平面 {#s-agentgateway-place-b-the-dataplane-inside-the-kagent-distribution}
 
-kagent installs its own distribution of Substrate, as [kagent 1.0 on Substrate](#s-kagent-on-substrate) shows. In that distribution agentgateway was the only dataplane that we saw. Our cluster ran agentgateway v1.7.0 in `atenet-router` and in `atenet-egress` {{run}}. The values that the kagent installer passes to the Substrate charts name no dataplane {{kagent}}. The charts themselves are not in the kagent repository, so we could not check them for an Envoy option.
+kagent 会安装它自己的 Substrate 发行版，正如[第 7.1 节](#s-kagent-on-substrate)所示。在那个发行版中，我们看到的唯一数据平面就是 agentgateway。我们的集群在 `atenet-router` 与 `atenet-egress` 中运行的均是 agentgateway v1.7.0{{run}}。kagent 安装器传给 Substrate chart 的配置值中没有指定数据平面{{kagent}}。由于这些 chart 本身不在 kagent 仓库中，我们无法检查它们是否提供了 Envoy 选项。
 
-One cost of this dataplane is specific to credentials. The gateway, agentgateway v1.7.0, keeps each fetched credential for 300 seconds. So a rotated Secret can take up to 5 minutes to reach requests {{agentgateway}}. With Envoy and the bundled provider, the next request gets the new value.
+该数据平面的一个代价专门针对凭据。作为网关的 agentgateway v1.7.0 会将每个获取到的凭据保留 300 秒。因此轮转后的 Secret 最多可能需要 5 分钟才能应用到请求中{{agentgateway}}。而在 Envoy 配合内置提供方时，下一个请求就能拿到新值。
 
-**We measured** this in place A, on a second x86 server guest (16 vCPU, 23 GB), with three changes of one Secret on each dataplane. On agentgateway the upstream saw the new value after 280.5, 200.9, and 100.6 s. On Envoy it took 1.0, 1.0, and 1.6 s. No request failed on either one. The code is the same in place B, so plan for the same 5 minutes there. [Credential injection](#s-credential-injection) has the run.
+**我们测得**在位置 A 的环境下，在第二台 x86 服务器客户机（16 vCPU、23 GB）上，每种数据平面各测了三次同一个 Secret 的变更。在 agentgateway 上，上游分别在 280.5、200.9 和 100.6 秒后观察到新值。在 Envoy 上分别耗时 1.0、1.0 和 1.6 秒。两种环境下均没有请求失败。位置 B 采用的代码与之一致，因此在位置 B 中也要预留这 5 分钟的窗口。具体实测见[凭据注入](#s-credential-injection)。
 
-We saw the same two costs as in place A. The egress gateway ran with `RUST_LOG=debug`, and 3,376 of its 4,199 log lines in 3 minutes were debug lines. The CA private key was mounted in its container.
+我们观察到了与位置 A 相同的两个代价。出站网关运行在 `RUST_LOG=debug` 级别，3 分钟内的 4,199 行日志中有 3,376 行是 debug 日志。CA 私钥直接挂载在其容器内部。
 
-We also saw the same ingress authentication. A plain pod with no certificate could not reach an actor.
+我们也观察到了相同的入站认证表现。没有证书的普通 pod 无法访问 actor。
 
 ```listing
-title: the router of the kagent distribution refuses a pod with no certificate
+title: kagent 发行版的 router 拒绝没有证书的 pod
 source: capture/lab/K-kagent/parallel/ingress-probe.txt
 lang: text
-note: The probe ran from a pod in the default namespace. Three more lines of this namespace are cut.
+note: 探测从 default 命名空间的一个 pod 发起。该命名空间另外三行已截去。
 ---
 from namespace default:
 http://atenet-router.ate-system.svc:80/ code=000 curl_exit=7 Failed to connect to atenet-router.ate-system.svc port 80 after 3 ms: Could not connect to server
@@ -73,28 +73,28 @@ https://atenet-router.ate-system.svc:8444/ code=000 curl_exit=56 OpenSSL SSL_rea
 …
 ```
 
-Ports 80 and 8081 refused the connection. Ports 443 and 8444 asked for a client certificate. The Session actor stayed `ACTOR_STATE_SUSPENDED` through the probe.
+端口 80 与 8081 拒绝了连接，端口 443 与 8444 要求客户端出示证书。在整个探测期间，会话 actor 始终保持在 `ACTOR_STATE_SUSPENDED` 状态。
 
-kagent itself has no agentgateway configuration. kagent writes an egress policy for each actor into the Substrate API, and the dataplane enforces that policy. So place B gives kagent the same policy that place A gives you, and no more.
+kagent 本身并不包含 agentgateway 配置。kagent 会为每个 actor 在 Substrate API 中写入一份出站策略，由数据平面负责执行该策略。因此位置 B 为 kagent 提供的策略能力与位置 A 给你的完全相同，没有额外扩展。
 
-## Place C: a gateway that actors call
+## 位置 C：供 actor 调用的网关 {#s-agentgateway-place-c-a-gateway-that-actors-call}
 
-You will read that a policy can say which models, tools, or other agents an actor can call. At v1.0.0, the egress policy of Substrate has no field for any of them. This table is the whole policy.
+你可能会读到策略可以规定 actor 能够调用哪些模型、工具或其他 agent。在 v1.0.0 中，Substrate 的出站策略完全没有针对这些维度的字段。下表概括了该策略的全部表达能力。
 
-| The egress policy can | The egress policy cannot |
+| 出站策略能够做到 | 出站策略无法做到 |
 |---|---|
-| allow a host name, exact or with one wildcard label | allow or deny a model name |
-| allow a port on that host | allow or deny one tool of an MCP server |
-| choose `http`, `https` with interception, or `tlsPassthrough` | set a token budget or a rate limit |
-| replace one request header with a Secret value or an Actor JWT | inspect a prompt or an answer |
+| 放行精确的主机名，或带有单个通配符标签的主机名 | 允许或拒绝某个具体模型名称 |
+| 放行该主机上的某个端口 | 允许或拒绝 MCP 服务器中的某个工具 |
+| 选择 `http`、带拦截的 `https` 或 `tlsPassthrough` | 设置 Token 预算或速率限制 |
+| 用 Secret 值或 Actor JWT 替换单个请求头 | 检查 Prompt 内容或模型回答 |
 
-The configuration of the egress gateway shows the same limit. Each route has one policy, `substrateEgress`, and one kind of backend, `dynamic`. A dynamic backend is the host that the actor asked for. The file has no model backend and no MCP route.
+出站网关的配置印证了这一局限。每条路由只包含一条策略 `substrateEgress`，以及一种后端类型 `dynamic`。动态后端代表 actor 所请求的目标主机。配置文件中既没有模型后端，也没有 MCP 路由。
 
 ```listing
-title: the request policy of the agentgateway egress gateway
+title: agentgateway 出站网关的请求策略
 source: capture/lab/G-dataplane/agentgateway/10-atenet-egress-agentgateway-substrate-config.yaml
 lang: yaml
-note: The listeners above this route and the credential provider settings below it are cut.
+note: 此路由上方的监听器配置以及下方的凭据提供方设置已截去。
 ---
 …
         - backends:
@@ -107,26 +107,26 @@ note: The listeners above this route and the credential provider settings below 
 …
 ```
 
-agentgateway as a product can do the rest. Its model gateway mode routes requests to model providers and applies budgets, load balancing, and failover. Its MCP gateway mode federates tools from MCP servers {{agentgateway}}. Neither mode is configured in the Substrate dataplane, in place A or in place B.
+作为独立产品的 agentgateway 具备其余所有功能。它的模型网关模式能将请求路由至各模型提供商，并执行配额预算、负载均衡与故障转移。它的 MCP 网关模式能够聚合来自各 MCP 服务器的工具{{agentgateway}}。但这两种模式在 Substrate 的数据平面中均未启用，无论在位置 A 还是位置 B 中。
 
-To use those modes, deploy a second agentgateway as your own workload and put it behind the egress gateway:
+要使用这些模式，需要将第二个 agentgateway 作为你自己的工作负载部署在出站网关后方：
 
-1. Run agentgateway as a model gateway or an MCP gateway in the cluster.
-2. Write one egress rule that allows only the host and the port of that gateway.
-3. Add a `replaceHeaders` effect with an [Actor JWT](#s-actor-jwts) to that rule, so the gateway knows which actor calls.
-4. Make the gateway verify that token against the issuer of Substrate, and write the model and tool rules there.
+1. 在集群中以模型网关或 MCP 网关模式运行 agentgateway。
+2. 编写一条出站规则，仅放行该网关的主机和端口。
+3. 在该规则上添加带有 [Actor JWT](#s-actor-jwts) 的 `replaceHeaders` 效果，使网关知道是哪个 actor 在调用。
+4. 让该网关针对 Substrate 签发方验证该令牌，并在网关处配置模型与工具的限制规则。
 
-The actor can then reach no model host directly, and the second gateway decides what each actor is allowed to call.
+这样 actor 便无法直接访问任何外部模型主机，转由第二道网关裁决每个 actor 有权调用的内容。
 
-### What we ran
+### 我们的实测运行 {#s-agentgateway-what-we-ran}
 
-We ran the first two steps of this design, with a model gateway and no real model. The gateway was agentgateway v1.7.0 as a normal Deployment in its own namespace. Two mock backends with an OpenAI-compatible API stood for two providers, and each one logged what it received. The gateway served TLS with a certificate from a private CA that we made with `openssl`.
+我们实际验证了该设计的前两个步骤，使用了一个模型网关，未连接真实模型。该网关作为普通的 agentgateway v1.7.0 Deployment 运行在自己的命名空间中。两个带有兼容 OpenAI API 的模拟后端代表两个服务提供商，每个后端都会记录收到的请求。网关通过私有 CA 签发的证书提供 TLS 服务，该私有 CA 由我们使用 `openssl` 生成。
 
 ```listing
-title: the configuration of the model gateway
+title: 模型网关的配置
 source: capture/lab/Q-network/i-model-gateway/gw-tls.yaml
 lang: yaml
-note: The complete file. The two key variables hold test values that we made up.
+note: 完整文件。两个密钥变量保存的是我们构造的测试值。
 ---
 config: {}
 llm:
@@ -149,13 +149,13 @@ llm:
       apiKey: $KEY_B
 ```
 
-The actor had one `https` rule for the gateway host. The rule replaced the header `X-Lab` with the value of a Kubernetes Secret. The actor sent a placeholder in that header and in `Authorization`, and it asked for the model `fast`.
+actor 配置了一条针对网关主机的 `https` 规则。规则用 Kubernetes Secret 的值替换请求头 `X-Lab`。actor 在该请求头与 `Authorization` 中发送占位符，并请求模型 `fast`。
 
 ```listing
-title: one request from the actor through egress to the model gateway
+title: actor 经由出站网关访问模型网关的单个请求
 source: capture/lab/Q-network/i-model-gateway/20-results-agentgateway-private-ca-trusted.txt
 lang: console
-note: One request on the agentgateway dataplane, and the answer for a model name that the gateway does not know. The requests between them are cut. All values are test values that we made up.
+note: agentgateway 数据平面上的一个请求，以及针对网关未知模型名称的应答。中间的请求已截去。所有值均为我们构造的测试值。
 ---
 $ curl -sS -m 15 --cacert /run/ate/egress-trust-bundle/trust-bundle.pem -w '\ncode=%{http_code} t=%{time_total} verify=%{ssl_verify_result}\n' -H 'content-type: application/json' -H 'Authorization: Bearer placeholder-from-actor' -H 'X-Lab: placeholder-from-actor' -d '{"model":"fast","messages":[{"role":"user","content":"hi"}]}' https://modelgw.model-gw.svc.cluster.local/v1/chat/completions
 exit=0
@@ -166,41 +166,41 @@ code=200 t=0.744791 verify=0
 code=404
 ```
 
-**We measured** this path on a second x86 server guest (16 vCPU, 23 GB), once on each dataplane. The backend `mock-a` received the model `small-1`, the provider key of the gateway, and the Secret value in `X-Lab`. With `"model":"smart"`, the backend `mock-b` received `big-1` and the second provider key. The placeholder of the actor reached no backend, in 0 log lines. A request for `"model":"other"` returned 404 with `model_not_found` from the model gateway.
+**我们测得**在第二台 x86 服务器客户机（16 vCPU、23 GB）上对该路径进行测量，每种数据平面各测一次。后端 `mock-a` 收到了模型标识 `small-1`、网关的提供商密钥以及 `X-Lab` 中的 Secret 值。请求 `"model":"smart"` 时，后端 `mock-b` 收到了 `big-1` 与第二个提供商密钥。后端没有任何一行日志收到过 actor 的占位符（0 行）。请求 `"model":"other"` 时，模型网关返回了带有 `model_not_found` 的 404。
 
-So the model gateway selects the model, and the egress policy does not. Two keys are in the path, and the actor sends neither. Our mock backend printed both in its reply, so the actor read them there. A real backend must not return a credential.
+因此是模型网关选择模型，出站策略并不选模型。路径中存在两个密钥，actor 两者都不需要发送。我们的模拟后端在应答中打印了这两个密钥，因此 actor 在应答里读到了它们。真实的后端绝对不能回显凭据。
 
-The egress gateway injects the header that identifies the caller. The model gateway replaces `Authorization` with its own provider key. A credential for the model gateway itself must therefore travel in another header. Client authentication on the model gateway, with an Actor JWT, is planned for the next edition.
+出站网关注入识别调用方身份的请求头。模型网关将 `Authorization` 替换为其自身的提供商密钥。因此针对模型网关本身的凭据必须通过其他请求头传递。在模型网关上借助 Actor JWT 进行客户端身份验证，计划在下一版手册中实现。
 
-**The private CA failed at first.** With the default install, the request through the `https` rule returned 503 on both dataplanes. The egress gateway verifies the upstream certificate against the system roots of its own container, and it did not know our CA. [TLS interception](#s-tls-interception) has the two error texts and the patch that fixed it. The patch is lost when the installer runs again.
+**私有 CA 最初调用失败。** 在默认安装下，通过 `https` 规则发起的请求在两种数据平面上均返回 503。出站网关使用其容器自带的系统根证书验证上游证书，它并不认识我们的私有 CA。[TLS 拦截](#s-tls-interception)记录了两个具体的错误文本以及修复用的补丁。当安装器再次运行时，该补丁会失效。
 
-**We measured** the latency on the same guest (16 vCPU, 23 GB), as medians of n=30 or n=10. The request had 60 bytes, and the reply had about 250 bytes.
+**我们测得**在同一台客户机（16 vCPU、23 GB）上的延迟中位数，样本数为 n=30 或 n=10。请求大小为 60 字节，应答大小约为 250 字节。
 
-| Path | A new connection for each request | One reused connection |
+| 路径 | 每次请求均新建连接 | 复用单条连接 |
 |---|---|---|
-| A plain pod to a mock backend, no egress | 4.2 to 4.4 ms | not measured |
-| A plain pod through the TLS model gateway | 14.7 to 14.9 ms | not measured |
-| The actor through egress to a mock backend, `http` rule | 22.8 to 27.5 ms | 9.2 ms on agentgateway, 4.4 ms on Envoy |
-| The actor through egress, `https` rule, to the TLS model gateway | 618 and 690 ms on agentgateway, 614 ms on Envoy | 10.0 ms on agentgateway, 11.9 ms on Envoy |
+| 普通 pod 直连模拟后端，不出站 | 4.2 到 4.4 ms | 未测量 |
+| 普通 pod 经由 TLS 模型网关 | 14.7 到 14.9 ms | 未测量 |
+| actor 经出站网关访问模拟后端，`http` 规则 | 22.8 到 27.5 ms | agentgateway 上 9.2 ms，Envoy 上 4.4 ms |
+| actor 经出站网关 `https` 规则访问 TLS 模型网关 | agentgateway 上 618 与 690 ms，Envoy 上 614 ms | agentgateway 上 10.0 ms，Envoy 上 11.9 ms |
 
-The last row is the one to design for. Each new connection under an `https` rule cost about 0.6 s on both dataplanes. Almost all of it was the TLS handshake with the interception endpoint: 606 of 618 ms on agentgateway, and 600 of 614 ms on Envoy. On a reused connection the same request took 10 to 12 ms. An agent that opens a new HTTPS connection for each model call pays 0.6 s each time. Keep one client with a connection pool for the life of the actor.
+最后一行是架构设计必须考虑的关键。在 `https` 规则下，每条新建连接在两种数据平面上都要耗费约 0.6 秒。其中绝大部分时间花在与拦截端点的 TLS 握手上：在 agentgateway 上占 618 ms 中的 606 ms，在 Envoy 上占 614 ms 中的 600 ms。在复用连接时，相同的请求只需 10 到 12 ms。每次调用模型都新建 HTTPS 连接的 agent 每次都要承担 0.6 秒的开销。请在 actor 的整个生命周期内保持使用带有连接池的单一客户端。
 
-A second cluster ran node tests on the same guest at the same time, so read a difference of a few milliseconds as noise. We have not found yet where the 0.6 s goes inside the handshake. That search, a real model host, a streamed reply, and an MCP gateway are planned for the next edition.
+测试期间另一集群同时在该客户机上运行节点测试，因此几毫秒的波动可视为测试噪声。我们目前尚未查明握手阶段究竟是哪一步消耗了 0.6 秒。该细节探究、真实外部模型主机、流式应答以及 MCP 网关均计划在下一版手册中补充。
 
-Three limits of the egress gateway apply to this design, and one section proves each:
+出站网关的三个限制直接制约了这一架构设计，各小节对此给出了实证：
 
-- The gateway replaces a header only when the request already has that header. A request with no `authorization` header passed unchanged. [Credential injection](#s-credential-injection) has that run.
-- A WebSocket upgrade returned 403, so the gateway behind egress must use plain HTTP requests or streamed HTTP responses. [EgressPolicy and default deny](#s-egresspolicy-and-default-deny) has that run.
-- A removed rule does not close a response that is streaming or a pass-through connection. A reused HTTP connection is refused at its next request. [The dataplane choice](#s-the-dataplane-choice) has those runs.
+- 网关仅在请求中已包含对应头时才执行替换。没有 `authorization` 头的请求原样通过，相关实测见[凭据注入](#s-credential-injection)。
+- WebSocket 升级请求返回 403，因此出站后方的网关必须使用普通的 HTTP 请求或流式 HTTP 响应，相关实测见[EgressPolicy 与默认拒绝](#s-egresspolicy-and-default-deny)。
+- 被删除的规则不会主动关闭流式传输的响应或已建立的透传连接。复用的 HTTP 连接在下一次请求时才会被拒绝，相关实测见[数据平面选型](#s-the-dataplane-choice)。
 
 ```takeaways
-- Find the place of agentgateway in your cluster before you promise a policy.
-- Use the egress policy for hosts, ports, TLS mode, and one credential header.
-- Deploy a second gateway behind one egress rule to select models and tools.
-- Set `RUST_LOG=info` on `atenet-egress` before production, and again after each installer run.
-- Reuse one HTTPS connection for model calls, because each new intercepted connection cost 0.6 s.
-- Add your private CA to the root file of the egress container before you call a private gateway.
-- Read section 6.6 before you change the dataplane of a running cluster.
+- 在承诺策略能力之前，先弄清 agentgateway 在集群中处于哪个位置。
+- 用出站策略限定主机、端口、TLS 模式以及单个凭据头。
+- 在出站规则后方部署第二道网关，用来选择模型与工具。
+- 上线前把 `atenet-egress` 的 `RUST_LOG` 设为 `info`，每次跑完安装器后再设一次。
+- 调用模型时复用单条 HTTPS 连接，因为每次新建拦截连接耗时 0.6 秒。
+- 调用私有网关前，把私有 CA 加进出站容器的根证书文件。
+- 切换运行中集群的数据平面之前，先读第 6.6 节。
 ```
 
-Sources: capture/lab/G-dataplane/01-switch-in-place/11-timing.txt, capture/lab/G-dataplane/agentgateway/13-crictl-stats-atenet.txt, capture/lab/G-dataplane/envoy/13-crictl-stats-atenet.txt, capture/lab/G-dataplane/agentgateway/ingress-auth/10-results.txt, capture/lab/G-dataplane/agentgateway/04-volumes-atenet-egress.json, capture/lab/G-dataplane/agentgateway/10-atenet-egress-agentgateway-substrate-config.yaml, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/agentgateway/50-custom-header.txt, capture/lab/F-egress/envoy/20-results.txt, capture/lab/K-kagent/inventory/images.tsv, capture/lab/K-kagent/inventory/deploy-atenet-egress.yaml, capture/lab/K-kagent/parallel/ingress-probe.txt, capture/lab/K-kagent/session1/egress-policy-actor.yaml, capture/lab/K-kagent/session1/mock.log, capture/lab/Q-network/i-model-gateway/gw-tls.yaml, capture/lab/Q-network/i-model-gateway/Pgw.yaml, capture/lab/Q-network/i-model-gateway/20-results-agentgateway-private-ca-trusted.txt, capture/lab/Q-network/i-model-gateway/20-results-envoy-private-ca-trusted.txt, capture/lab/Q-network/i-model-gateway/23-mock-a-received-agentgateway-private-ca-trusted.log, capture/lab/Q-network/i-model-gateway/24-marker-counts-agentgateway-private-ca-trusted.txt, capture/lab/Q-network/i-model-gateway/31-latency-agentgateway-private-ca-trusted.tsv, capture/lab/Q-network/i-model-gateway/31-latency-envoy-private-ca-trusted.tsv, capture/lab/Q-network/i-model-gateway/51-connection-cost-agentgateway.tsv, capture/lab/Q-network/i-model-gateway/51-connection-cost-envoy-private-ca-trusted.tsv, capture/lab/Q-network/j-log-level/10-volume.tsv, capture/lab/Q-network/00-dataplane-switch-to-agentgateway/17-after-rerun-rust-log-and-roots.json, capture/lab/Q-network/l-credential-rotation/agentgateway/20-rotations.tsv, capture/lab/Q-network/l-credential-rotation/envoy/20-rotations.tsv, capture/lab/summary/network-x86.json, capture/lab/summary/rotation-x86.json; Agent Substrate v1.0.0 source: cmd/atenet/internal/router/config.go, cmd/ate-setup/commands.md, manifests/ate-install/agentgateway; agentgateway v1.7.0 source: README.md, crates/agentgateway/src/http/substrate (README.md, egress.rs); kagent v1.0.0 Substrate distribution charts.
+来源：capture/lab/G-dataplane/01-switch-in-place/11-timing.txt, capture/lab/G-dataplane/agentgateway/13-crictl-stats-atenet.txt, capture/lab/G-dataplane/envoy/13-crictl-stats-atenet.txt, capture/lab/G-dataplane/agentgateway/ingress-auth/10-results.txt, capture/lab/G-dataplane/agentgateway/04-volumes-atenet-egress.json, capture/lab/G-dataplane/agentgateway/10-atenet-egress-agentgateway-substrate-config.yaml, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/agentgateway/50-custom-header.txt, capture/lab/F-egress/envoy/20-results.txt, capture/lab/K-kagent/inventory/images.tsv, capture/lab/K-kagent/inventory/deploy-atenet-egress.yaml, capture/lab/K-kagent/parallel/ingress-probe.txt, capture/lab/K-kagent/session1/egress-policy-actor.yaml, capture/lab/K-kagent/session1/mock.log, capture/lab/Q-network/i-model-gateway/gw-tls.yaml, capture/lab/Q-network/i-model-gateway/Pgw.yaml, capture/lab/Q-network/i-model-gateway/20-results-agentgateway-private-ca-trusted.txt, capture/lab/Q-network/i-model-gateway/20-results-envoy-private-ca-trusted.txt, capture/lab/Q-network/i-model-gateway/23-mock-a-received-agentgateway-private-ca-trusted.log, capture/lab/Q-network/i-model-gateway/24-marker-counts-agentgateway-private-ca-trusted.txt, capture/lab/Q-network/i-model-gateway/31-latency-agentgateway-private-ca-trusted.tsv, capture/lab/Q-network/i-model-gateway/31-latency-envoy-private-ca-trusted.tsv, capture/lab/Q-network/i-model-gateway/51-connection-cost-agentgateway.tsv, capture/lab/Q-network/i-model-gateway/51-connection-cost-envoy-private-ca-trusted.tsv, capture/lab/Q-network/j-log-level/10-volume.tsv, capture/lab/Q-network/00-dataplane-switch-to-agentgateway/17-after-rerun-rust-log-and-roots.json, capture/lab/Q-network/l-credential-rotation/agentgateway/20-rotations.tsv, capture/lab/Q-network/l-credential-rotation/envoy/20-rotations.tsv, capture/lab/summary/network-x86.json, capture/lab/summary/rotation-x86.json; Agent Substrate v1.0.0 source: cmd/atenet/internal/router/config.go, cmd/ate-setup/commands.md, manifests/ate-install/agentgateway; agentgateway v1.7.0 source: README.md, crates/agentgateway/src/http/substrate (README.md, egress.rs); kagent v1.0.0 Substrate distribution charts.

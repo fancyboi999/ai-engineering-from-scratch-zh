@@ -1,113 +1,113 @@
-# Errors
+# 错误
 
-> Every error text that our runs recorded, in alphabetical order, with where it appears, what it means, and the section that explains it.
+> 我们的运行记录到的每条错误文本按字母顺序列出，并注明它出现在哪里、含义是什么，以及哪一节做了解释。
 
-Search this page for a fragment of the text in your log. Names such as `lab-c/r1` are the atespace and the actor of our run, and your text has your own. [Section 8.3](#s-symptom-cause-fix) gives the fix for each one, grouped by symptom. All strings are from Agent Substrate v1.0.0, except the last table, which is from kagent v1.0.0. One table lists texts that we read in the code and did not record, and it says so.
+在本页搜索你日志里文本的一个片段。像 `lab-c/r1` 这样的名称来自我们那次运行里的 atespace 和 actor，你的日志里会是你自己的名称。[第 8.3 节](#s-symptom-cause-fix)按症状分组，给出每一条的修复办法。所有字符串都来自 Agent Substrate v1.0.0，只有最后一张表来自 kagent v1.0.0。有一张表列出我们在代码里读到、但没有录制过的文本，表中会注明这一点。
 
-## From a request to an actor
+## 从请求到 actor {#s-ref-errors-from-a-request-to-an-actor}
 
-The bodies in this table are from the Envoy dataplane, unless a row names agentgateway. On agentgateway, read the status code and the `ate-error-reason` response header, as [section 8.3](#s-symptom-cause-fix) explains.
+除非某一行写明 agentgateway，本表中的响应体都来自 Envoy 数据平面。在 agentgateway 上，请读状态码和 `ate-error-reason` 响应头，[第 8.3 节](#s-symptom-cause-fix)对此有说明。
 
-| Text | Code | Meaning | Section |
+| 文本 | 状态码 | 含义 | 章节 |
 |---|---|---|---|
-| `actor ate-demo-counter/does-not-exist not found` | 404, Envoy router | No actor has that name in that atespace. | [6.1](#s-the-router-and-ingress) |
-| `actor lab-c/b0-5 unavailable: no worker has room for the actor` | 503 after 5.06 s | No worker of a matching pool had free CPU and memory inside the parking budget. | [4.4](#s-request-parking) |
-| `actor lab-c/r1 unavailable: AssignWorker prerequisite not met for Actor: lab-c/r1 (got: ACTOR_STATE_CRASHED, want ACTOR_STATE_SUSPENDED)` | 503 in 0.07 s | The actor is crashed, and only a suspended actor can resume. | [3.5](#s-crashed-and-revertactor) |
-| `actor lab-e/e-run unavailable` | 503 after 3 to 5 s | The router got no answer from `ate-api-server`. We also saw this text while Postgres was down, so check both. | [8.2](#s-when-a-dependency-is-down) |
-| `actor lab-n/q2 unavailable: AssignWorker prerequisite not met for Actor: lab-n/q2 (got: ACTOR_STATE_REVERTING, want ACTOR_STATE_SUSPENDED)` | 503 in 0.06 s | A revert started while the node of the actor was down, and it did not finish. The state stays until the node is back. | [3.5](#s-crashed-and-revertactor), [8.2](#s-when-a-dependency-is-down) |
-| `actor lab-n/d2 unavailable: AssignWorker prerequisite not met for Actor: lab-n/d2 (got: ACTOR_STATE_DELETING, want ACTOR_STATE_SUSPENDED)` | 503 in 0.07 s | A delete started while the node of the actor was down, and it did not finish. The name is blocked until the node is back. | [8.2](#s-when-a-dependency-is-down) |
-| `actor lab-n/u1 unavailable` | 503 after 5 to 8 s, after one or two 504s at the client timeout of 10 s | The actor is in `ACTOR_STATE_RESUMING` on a node that stopped. | [4.3](#s-placement) |
-| `actor xa/x2 unavailable: no worker has room for the actor` | 503 after 5.06 s | The `workerSelector` of the template matched no WorkerPool. The text is the same as for a full pool, and the template has no golden tag. | [3.6](#s-atespaces) |
-| `error resuming actor lab-c/x1` | 500 in 0.08 s | The resume failed because the node-local snapshot was gone. The actor is now crashed. | [3.5](#s-crashed-and-revertactor) |
-| `error resuming actor lab-c/r1` | 500 in 0.41 s | The request arrived soon after a node restart, before the workers had registered. The actor is now crashed. | [8.2](#s-when-a-dependency-is-down) |
-| `error resuming actor lab-e/e-run` | 500 after a wait of up to 9 s | `ate-api-server` could not read Postgres. | [8.2](#s-when-a-dependency-is-down) |
-| `ingress failed` | any failure code on the agentgateway router: 404, 500, 503, and 504 in our runs, and 401 and 403 in the code | The agentgateway body for every ingress failure except a full pool. It does not name the cause. We got it for an unknown actor, for a missing routing header, and with Postgres or `ate-api-server` away. Read the status code and the `ate-error-reason` header. | [8.3](#s-symptom-cause-fix), [8.2](#s-when-a-dependency-is-down), [6.6](#s-the-dataplane-choice) |
-| `method not allowed` | 405, agentgateway router, port 8444 | A `POST` on the port that accepts `CONNECT` only. | [6.1](#s-the-router-and-ingress) |
-| `no worker has room for the actor`, with no text in front of it | 503, agentgateway router, from the code | The full pool on agentgateway. The body has no `actor ... unavailable:` text in front. | [4.4](#s-request-parking) |
-| `invalid actor reference` | 404, Envoy router | The `ate-target-actor` header is not `atespace/name`. | [6.1](#s-the-router-and-ingress) |
-| `upstream connect error or disconnect/reset before headers. reset reason: connection termination` | 503 in about 0.06 s | The process in the sandbox exited. The actor still reads RUNNING, for 20 minutes in our longest watch. | [8.3](#s-symptom-cause-fix), [3.5](#s-crashed-and-revertactor) |
-| The same text, after a longer delay | 503 after 0.50 to 5.07 s | The node of a running actor stopped. The actor still reads RUNNING. All 150 requests of our probe had this delay. | [8.3](#s-symptom-cause-fix), [4.3](#s-placement) |
-| The same text, on a request that was open | 503 after 2.2 s | A suspend stopped the actor during the request. The actor reads SUSPENDED, and the next request resumes it. | [3.3](#s-suspendactor-and-resumeactor) |
-| code 000, no body | client timeout | The request hung. In our runs the cause was Postgres, or the Kubernetes API server for requests through `kubectl ate proxy`. | [8.2](#s-when-a-dependency-is-down) |
+| `actor ate-demo-counter/does-not-exist not found` | 404，Envoy router | 该 atespace 里没有这个名称的 actor。 | [6.1](#s-the-router-and-ingress) |
+| `actor lab-c/b0-5 unavailable: no worker has room for the actor` | 503，5.06 秒后 | 在暂存预算内，匹配池里没有 worker 有空闲的 CPU 和内存。 | [4.4](#s-request-parking) |
+| `actor lab-c/r1 unavailable: AssignWorker prerequisite not met for Actor: lab-c/r1 (got: ACTOR_STATE_CRASHED, want ACTOR_STATE_SUSPENDED)` | 503，0.07 秒内 | actor 已崩溃，而只有已挂起的 actor 才能恢复。 | [3.5](#s-crashed-and-revertactor) |
+| `actor lab-e/e-run unavailable` | 503，3 到 5 秒后 | router 没有收到 `ate-api-server` 的回答。Postgres 宕机时我们也见过这条文本，所以两处都要查。 | [8.2](#s-when-a-dependency-is-down) |
+| `actor lab-n/q2 unavailable: AssignWorker prerequisite not met for Actor: lab-n/q2 (got: ACTOR_STATE_REVERTING, want ACTOR_STATE_SUSPENDED)` | 503，0.06 秒内 | actor 所在节点宕机期间开始了一次回退，但未能完成。状态会保持不变，直到节点恢复。 | [3.5](#s-crashed-and-revertactor)、[8.2](#s-when-a-dependency-is-down) |
+| `actor lab-n/d2 unavailable: AssignWorker prerequisite not met for Actor: lab-n/d2 (got: ACTOR_STATE_DELETING, want ACTOR_STATE_SUSPENDED)` | 503，0.07 秒内 | actor 所在节点宕机期间开始了一次删除，但未能完成。名称会一直被占用，直到节点恢复。 | [8.2](#s-when-a-dependency-is-down) |
+| `actor lab-n/u1 unavailable` | 503，5 到 8 秒后，此前有一两次在 10 秒客户端超时处返回 504 | actor 处于 `ACTOR_STATE_RESUMING`，而它所在的节点已停止。 | [4.3](#s-placement) |
+| `actor xa/x2 unavailable: no worker has room for the actor` | 503，5.06 秒后 | 模板的 `workerSelector` 没有匹配任何 WorkerPool。文本与池已满时相同，而且模板没有黄金标签。 | [3.6](#s-atespaces) |
+| `error resuming actor lab-c/x1` | 500，0.08 秒内 | 恢复失败，因为节点本地快照已经不在。actor 现在处于崩溃状态。 | [3.5](#s-crashed-and-revertactor) |
+| `error resuming actor lab-c/r1` | 500，0.41 秒内 | 请求在节点重启后不久到达，此时 worker 还没有完成注册。actor 现在处于崩溃状态。 | [8.2](#s-when-a-dependency-is-down) |
+| `error resuming actor lab-e/e-run` | 500，最多等待 9 秒后 | `ate-api-server` 无法读取 Postgres。 | [8.2](#s-when-a-dependency-is-down) |
+| `ingress failed` | agentgateway router 上的任何失败状态码：我们的运行里有 404、500、503 和 504，代码里还有 401 和 403 | 除池已满之外，agentgateway 对每种入站失败返回的响应体。它不指明原因。我们在 actor 不存在、缺少路由头，以及 Postgres 或 `ate-api-server` 不可用时都得到过它。请读状态码和 `ate-error-reason` 头。 | [8.3](#s-symptom-cause-fix)、[8.2](#s-when-a-dependency-is-down)、[6.6](#s-the-dataplane-choice) |
+| `method not allowed` | 405，agentgateway router，端口 8444 | 对只接受 `CONNECT` 的端口发了 `POST`。 | [6.1](#s-the-router-and-ingress) |
+| `no worker has room for the actor`，前面没有其他文本 | 503，agentgateway router，来自代码 | agentgateway 上池已满的情形。响应体前面没有 `actor ... unavailable:` 文本。 | [4.4](#s-request-parking) |
+| `invalid actor reference` | 404，Envoy router | `ate-target-actor` 头不是 `atespace/name` 的形式。 | [6.1](#s-the-router-and-ingress) |
+| `upstream connect error or disconnect/reset before headers. reset reason: connection termination` | 503，约 0.06 秒内 | 沙箱里的进程已退出。actor 仍显示 RUNNING，在我们最长的一次观察里持续了 20 分钟。 | [8.3](#s-symptom-cause-fix)、[3.5](#s-crashed-and-revertactor) |
+| 同样的文本，但延迟更长 | 503，0.50 到 5.07 秒后 | 运行中 actor 所在的节点已停止。actor 仍显示 RUNNING。我们探测的全部 150 个请求都有这个延迟。 | [8.3](#s-symptom-cause-fix)、[4.3](#s-placement) |
+| 同样的文本，出现在一个未完成的请求上 | 503，2.2 秒后 | 请求期间，一次挂起停掉了 actor。actor 显示 SUSPENDED，下一个请求会恢复它。 | [3.3](#s-suspendactor-and-resumeactor) |
+| 状态码 000，无响应体 | 客户端超时 | 请求挂起了。在我们的运行里，原因是 Postgres，对于经 `kubectl ate proxy` 的请求则是 Kubernetes API server。 | [8.2](#s-when-a-dependency-is-down) |
 
-### Texts from the code that our runs did not record
+### 代码里有、但我们的运行没有记录的文本 {#s-ref-errors-texts-from-the-code-that-our-runs-did-not-record}
 
-These bodies are in the router code of the Envoy dataplane at v1.0.0. `X` is the atespace and the name of the actor.
+这些响应体在 v1.0.0 的 Envoy 数据平面 router 代码里。`X` 是 actor 的 atespace 和名称。
 
-| Text | Code | Meaning | Section |
+| 文本 | 状态码 | 含义 | 章节 |
 |---|---|---|---|
-| `actor "X" unavailable: router at capacity` | 503 | The parking lot of the router was full, so the router shed the request after one failed resume attempt. | [4.4](#s-request-parking) |
-| `actor X unavailable: another operation is in progress for this actor` | 503 | Another workflow held the lease of the actor for the whole parking budget. | [4.4](#s-request-parking), [8.1](#s-postgres-and-the-object-store) |
-| `actor X authentication required` | 401 | `ate-api-server` did not accept the identity of the router. | [5.2](#s-access-policies) |
-| `actor X access denied` | 403 | `ate-api-server` refused the resume call of the router. | [5.2](#s-access-policies) |
-| `actor X request timed out` | 504 | The resume did not finish before its deadline. | [8.2](#s-when-a-dependency-is-down) |
-| `request for actor X canceled by client` | 408 | The client closed the request while the router waited. The client does not see this reply, and the router log does. | [4.4](#s-request-parking) |
+| `actor "X" unavailable: router at capacity` | 503 | router 的暂存区已满，所以 router 在一次恢复尝试失败后丢弃了该请求。 | [4.4](#s-request-parking) |
+| `actor X unavailable: another operation is in progress for this actor` | 503 | 另一个工作流在整个暂存预算内一直持有该 actor 的租约。 | [4.4](#s-request-parking)、[8.1](#s-postgres-and-the-object-store) |
+| `actor X authentication required` | 401 | `ate-api-server` 不接受 router 的身份。 | [5.2](#s-access-policies) |
+| `actor X access denied` | 403 | `ate-api-server` 拒绝了 router 的恢复调用。 | [5.2](#s-access-policies) |
+| `actor X request timed out` | 504 | 恢复没有在截止时间前完成。 | [8.2](#s-when-a-dependency-is-down) |
+| `request for actor X canceled by client` | 408 | router 等待期间客户端关闭了请求。客户端看不到这条回复，router 日志里能看到。 | [4.4](#s-request-parking) |
 
-## From a TLS handshake with the router
+## 与 router 进行 TLS 握手时的错误 {#s-ref-errors-from-a-tls-handshake-with-the-router}
 
-| Text | Dataplane | Meaning | Section |
+| 文本 | 数据平面 | 含义 | 章节 |
 |---|---|---|---|
-| `tlsv13 alert certificate required` | agentgateway | The client sent no certificate. | [5.1](#s-client-authentication) |
-| `certificate unknown` | Envoy | The client certificate has an identity that the allowlist does not hold. | [5.1](#s-client-authentication) |
-| `Connection reset by peer` | agentgateway | The same cause as the row above. | [6.6](#s-the-dataplane-choice) |
-| `SSL: no alternative certificate subject name matches target hostname 'atenet-router.ate-system.svc.cluster.local'` | both | The client used the long name of the Service. The router certificate is valid for `atenet-router.ate-system.svc`. | [6.1](#s-the-router-and-ingress) |
+| `tlsv13 alert certificate required` | agentgateway | 客户端没有发送证书。 | [5.1](#s-client-authentication) |
+| `certificate unknown` | Envoy | 客户端证书的身份不在允许列表里。 | [5.1](#s-client-authentication) |
+| `Connection reset by peer` | agentgateway | 与上一行原因相同。 | [6.6](#s-the-dataplane-choice) |
+| `SSL: no alternative certificate subject name matches target hostname 'atenet-router.ate-system.svc.cluster.local'` | 两者都有 | 客户端用了 Service 的长名称。router 证书对 `atenet-router.ate-system.svc` 有效。 | [6.1](#s-the-router-and-ingress) |
 
-## From inside an actor, on the way out
+## actor 内部出站路径上的错误 {#s-ref-errors-from-inside-an-actor-on-the-way-out}
 
-| Text | Dataplane | Meaning | Section |
+| 文本 | 数据平面 | 含义 | 章节 |
 |---|---|---|---|
-| `actor egress policy denied` | agentgateway, HTTP 403 | No rule of the egress policy allows the destination. | [6.2](#s-egresspolicy-and-default-deny) |
-| `egress denied` | Envoy, HTTP 403 | No rule of the egress policy allows the destination. | [6.2](#s-egresspolicy-and-default-deny) |
-| `status: NXDOMAIN` | both | The DNS relay answers only for names that a rule allows. | [6.3](#s-the-dns-relay) |
-| `curl: (6) Could not resolve host: drip.egress-target.svc.cluster.local` | both | The same cause, as `curl` reports it. | [6.3](#s-the-dns-relay) |
-| `upstream connection failed` | agentgateway, HTTP 503 | The host of an `https` rule has a certificate that the gateway does not trust, such as one from a private CA. The gateway log has `invalid peer certificate: UnknownIssuer`. | [6.4](#s-tls-interception) |
-| `upstream connect error or disconnect/reset before headers. reset reason: remote connection failure` | Envoy, HTTP 503 | The same cause. The gateway log has `CERTIFICATE_VERIFY_FAILED`. | [6.4](#s-tls-interception) |
+| `actor egress policy denied` | agentgateway，HTTP 403 | 出站策略没有任何规则允许该目的地。 | [6.2](#s-egresspolicy-and-default-deny) |
+| `egress denied` | Envoy，HTTP 403 | 出站策略没有任何规则允许该目的地。 | [6.2](#s-egresspolicy-and-default-deny) |
+| `status: NXDOMAIN` | 两者都有 | DNS 中继只应答规则允许的名称。 | [6.3](#s-the-dns-relay) |
+| `curl: (6) Could not resolve host: drip.egress-target.svc.cluster.local` | 两者都有 | 原因相同，这是 `curl` 的报告方式。 | [6.3](#s-the-dns-relay) |
+| `upstream connection failed` | agentgateway，HTTP 503 | `https` 规则的主机使用了网关不信任的证书，例如来自私有 CA 的证书。网关日志里有 `invalid peer certificate: UnknownIssuer`。 | [6.4](#s-tls-interception) |
+| `upstream connect error or disconnect/reset before headers. reset reason: remote connection failure` | Envoy，HTTP 503 | 原因相同。网关日志里有 `CERTIFICATE_VERIFY_FAILED`。 | [6.4](#s-tls-interception) |
 
-## From kubectl ate and the installer
+## 来自 kubectl ate 与安装器的错误 {#s-ref-errors-from-kubectl-ate-and-the-installer}
 
-| Text | Meaning | Section |
+| 文本 | 含义 | 章节 |
 |---|---|---|
-| `actor "f-deny" in atespace "lab-f" has no egress policy` | `get egress-policy` on an actor that has none. The actor is at default deny. | [6.2](#s-egresspolicy-and-default-deny) |
-| `egress_policy.rules[2].tls_passthrough.ports: Required value` | A pass-through rule needs `ports`. | [6.2](#s-egresspolicy-and-default-deny) |
-| `Error: failed to connect to ate-api-server: no ready api pods in ate-system` | No `ate-api-server` pod is ready. In one run the cause was Postgres. In another it was a node restart, before `ate-api-server` was ready. | [8.2](#s-when-a-dependency-is-down), [4.3](#s-placement) |
-| `Error: failed to create actor: rpc error: code = AlreadyExists desc = Actor d2 already exists` | A create with the name of an actor that a failed delete left in `ACTOR_STATE_DELETING`. Its node was down. | [8.2](#s-when-a-dependency-is-down) |
-| `Error: failed to create actor: rpc error: code = FailedPrecondition desc = Tag not found` | `create actor --template` for a template whose golden tag was deleted. `get actor-templates` still lists the tag id. | [3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives) |
-| `Error: failed to create tag: rpc error: code = Aborted desc = another operation is in progress for this actor` | `create tag` on an actor with a resume in progress on a node that had stopped. | [8.2](#s-when-a-dependency-is-down) |
-| `Error: failed to create tag: rpc error: code = FailedPrecondition desc = Actor lab-n/t1 must be ACTOR_STATE_SUSPENDED to be tagged (got: ACTOR_STATE_RESUMING)` | `create tag` on an actor that is not suspended. We also saw it with `got: ACTOR_STATE_CRASHED`. | [3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives), [8.2](#s-when-a-dependency-is-down) |
-| `Error: failed to create actor template: rpc error: code = InvalidArgument desc = actor_template.golden_egress_policy: Forbidden` | The template has a preview field, and the server flag or the client flag `--preview` is missing. | [8.5](#s-limits-at-v1-0-0) |
-| `Error: failed to list actors: rpc error: code = PermissionDenied desc = permission denied: principal "user:system%3Aserviceaccount%3Aate-users%3Aalice" lacks "can_list_actors" on "atespace:lab-v"` | The token is valid, and no access policy allows the call. The same sentence names `can_create_actor`, `can_list_workers`, `can_list_atespaces`, or `can_create_access_policy` for other calls. | [5.2](#s-access-policies) |
-| `Error: failed to list actors: rpc error: code = Unauthenticated desc = invalid bearer token` | The token file holds no valid token for the audience `api.ate-system.svc`. | [5.1](#s-client-authentication) |
-| `Error: failed to resume actor: rpc error: code = Unavailable desc = while calling atelet Restore` | A resume in the first seconds after the control plane returned from a node restart. The worker had not registered again. | [4.3](#s-placement) |
-| `Error: failed to resume actor: rpc error: code = Unavailable desc = worker b17a6492-9643-42f1-bfdb-8bb88ee46772 assigned to actor lab-c/w1 is unavailable` | A resume a few seconds later. The worker from before the restart was marked unavailable. We got the same text from `resume actor` for an actor on a node that had stopped. | [4.3](#s-placement), [8.2](#s-when-a-dependency-is-down) |
-| `Error: failed to revert actor: rpc error: code = Aborted desc = another operation is in progress for this actor` | A revert while a resume was in progress on a node that had stopped. | [3.5](#s-crashed-and-revertactor) |
-| `Error: failed to revert actor: rpc error: code = FailedPrecondition desc = Actor lab-n/p3 is not in a revertable state (got: ACTOR_STATE_RESUMING, want one of [ACTOR_STATE_RUNNING ACTOR_STATE_CRASHED]` | A revert of an actor that stayed in `ACTOR_STATE_RESUMING` on a stopped node. Our trace cut the end of the text. In the code the text ends with `, or ACTOR_STATE_SUSPENDED with a node-local snapshot)`, which is the third state that a revert accepts. | [3.5](#s-crashed-and-revertactor) |
-| `Error: failed to revert actor: rpc error: code = Unavailable desc = while calling atelet Terminate` | A revert of an actor whose node had stopped. The actor stayed in `ACTOR_STATE_REVERTING`, and each later revert during the outage failed with the same text. One more revert worked in 0.2 s after the node and its `atelet` were back. | [3.5](#s-crashed-and-revertactor), [8.2](#s-when-a-dependency-is-down) |
-| `Error: failed to suspend actor: rpc error: code = FailedPrecondition desc = MarkSuspending prerequisite not met for Actor: lab-n/d2 (got: ACTOR_STATE_RESUMING, want ACTOR_STATE_RUNNING)` | A suspend of an actor that is not running. Ours was in `ACTOR_STATE_RESUMING` on a node that had stopped. | [8.2](#s-when-a-dependency-is-down) |
-| `Error: failed to suspend actor: rpc error: code = Internal desc = internal server error: workflow failed at step CallAteletSuspend: actor lab-c/j1 crashed` | A suspend found a dead sandbox. The actor is now crashed. | [8.3](#s-symptom-cause-fix) |
-| `Error: failed to update actor: rpc error: code = FailedPrecondition desc = actor must be ACTOR_STATE_SUSPENDED to change its actor template (got: ACTOR_STATE_RUNNING)` | `update actor --template` on a running actor. Suspend it first. | [3.1](#s-actortemplate-and-the-golden-snapshot) |
-| `Error: manifest for actor "f-main" in atespace "lab-f" lacks the metadata.uid and metadata.version preconditions that "get egress-policy -o yaml" prints` | An update must name the version that it replaces. | [6.2](#s-egresspolicy-and-default-deny) |
-| `Error: rpc error: code = Unavailable desc = while calling atelet Terminate` | A `delete actor` for an actor whose node had stopped. The actor stayed in `ACTOR_STATE_DELETING`. | [8.2](#s-when-a-dependency-is-down) |
-| `Error: unknown flag "-A"` | `get workers` has no all-atespaces flag. It lists every namespace by default. | [2.2](#s-kubectl-ate) |
-| `Error: while building the envoy-dataplane image: exit status 125` | The source install needs `docker buildx`. | [2.1](#s-install-with-ate-setup) |
-| `global has no access policy` | `get access-policy --global` on a new install. Only the bootstrap owners have a global role. | [5.2](#s-access-policies) |
-| `Unable to connect to the server: EOF` | `kubectl` could not reach the Kubernetes API server. Actors still served requests. | [8.2](#s-when-a-dependency-is-down) |
-| `unknown flag: --platform` | Docker has no buildx plugin. This line comes before the build error above. | [2.1](#s-install-with-ate-setup) |
-| `Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.` | No `--token-file` was given, so the CLI uses the shared identity. | [5.1](#s-client-authentication) |
+| `actor "f-deny" in atespace "lab-f" has no egress policy` | 对没有出站策略的 actor 执行 `get egress-policy`。该 actor 处于默认拒绝。 | [6.2](#s-egresspolicy-and-default-deny) |
+| `egress_policy.rules[2].tls_passthrough.ports: Required value` | 透传规则必须有 `ports`。 | [6.2](#s-egresspolicy-and-default-deny) |
+| `Error: failed to connect to ate-api-server: no ready api pods in ate-system` | 没有就绪的 `ate-api-server` pod。有一次运行的原因是 Postgres。另一次是节点重启，`ate-api-server` 尚未就绪。 | [8.2](#s-when-a-dependency-is-down)、[4.3](#s-placement) |
+| `Error: failed to create actor: rpc error: code = AlreadyExists desc = Actor d2 already exists` | 创建时用了一个 actor 的名称，而该 actor 因一次失败的删除停留在 `ACTOR_STATE_DELETING`。它的节点当时宕机。 | [8.2](#s-when-a-dependency-is-down) |
+| `Error: failed to create actor: rpc error: code = FailedPrecondition desc = Tag not found` | `create actor --template` 所用模板的黄金标签已被删除。`get actor-templates` 仍然列出该标签 id。 | [3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives) |
+| `Error: failed to create tag: rpc error: code = Aborted desc = another operation is in progress for this actor` | 对一个 actor 执行 `create tag`，而它在已停止的节点上有一次进行中的恢复。 | [8.2](#s-when-a-dependency-is-down) |
+| `Error: failed to create tag: rpc error: code = FailedPrecondition desc = Actor lab-n/t1 must be ACTOR_STATE_SUSPENDED to be tagged (got: ACTOR_STATE_RESUMING)` | 对未挂起的 actor 执行 `create tag`。我们也见过 `got: ACTOR_STATE_CRASHED` 的情形。 | [3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives)、[8.2](#s-when-a-dependency-is-down) |
+| `Error: failed to create actor template: rpc error: code = InvalidArgument desc = actor_template.golden_egress_policy: Forbidden` | 模板含有预览字段，但服务端或客户端缺少 `--preview` 标志。 | [8.5](#s-limits-at-v1-0-0) |
+| `Error: failed to list actors: rpc error: code = PermissionDenied desc = permission denied: principal "user:system%3Aserviceaccount%3Aate-users%3Aalice" lacks "can_list_actors" on "atespace:lab-v"` | 令牌有效，但没有任何访问策略允许这次调用。同一句话在其他调用里会写出 `can_create_actor`、`can_list_workers`、`can_list_atespaces` 或 `can_create_access_policy`。 | [5.2](#s-access-policies) |
+| `Error: failed to list actors: rpc error: code = Unauthenticated desc = invalid bearer token` | 令牌文件里没有受众为 `api.ate-system.svc` 的有效令牌。 | [5.1](#s-client-authentication) |
+| `Error: failed to resume actor: rpc error: code = Unavailable desc = while calling atelet Restore` | 控制平面在节点重启后恢复的最初几秒里发起的恢复。worker 还没有重新注册。 | [4.3](#s-placement) |
+| `Error: failed to resume actor: rpc error: code = Unavailable desc = worker b17a6492-9643-42f1-bfdb-8bb88ee46772 assigned to actor lab-c/w1 is unavailable` | 几秒之后发起的恢复。重启前的那个 worker 已被标记为不可用。对于所在节点已停止的 actor，`resume actor` 也返回过同样的文本。 | [4.3](#s-placement)、[8.2](#s-when-a-dependency-is-down) |
+| `Error: failed to revert actor: rpc error: code = Aborted desc = another operation is in progress for this actor` | 在已停止的节点上有一次恢复进行时发起了回退。 | [3.5](#s-crashed-and-revertactor) |
+| `Error: failed to revert actor: rpc error: code = FailedPrecondition desc = Actor lab-n/p3 is not in a revertable state (got: ACTOR_STATE_RESUMING, want one of [ACTOR_STATE_RUNNING ACTOR_STATE_CRASHED]` | 回退一个因节点停止而停留在 `ACTOR_STATE_RESUMING` 的 actor。我们的记录截掉了文本的末尾。代码里的文本以 `, or ACTOR_STATE_SUSPENDED with a node-local snapshot)` 结束，这是回退接受的第三个状态。 | [3.5](#s-crashed-and-revertactor) |
+| `Error: failed to revert actor: rpc error: code = Unavailable desc = while calling atelet Terminate` | 回退一个节点已停止的 actor。actor 停留在 `ACTOR_STATE_REVERTING`，节点停机期间，此后的每次回退都以同样的文本失败。节点及其 `atelet` 恢复后，再回退一次，0.2 秒内成功。 | [3.5](#s-crashed-and-revertactor)、[8.2](#s-when-a-dependency-is-down) |
+| `Error: failed to suspend actor: rpc error: code = FailedPrecondition desc = MarkSuspending prerequisite not met for Actor: lab-n/d2 (got: ACTOR_STATE_RESUMING, want ACTOR_STATE_RUNNING)` | 挂起一个未在运行的 actor。我们的 actor 在已停止的节点上处于 `ACTOR_STATE_RESUMING`。 | [8.2](#s-when-a-dependency-is-down) |
+| `Error: failed to suspend actor: rpc error: code = Internal desc = internal server error: workflow failed at step CallAteletSuspend: actor lab-c/j1 crashed` | 挂起时发现沙箱已死。actor 现在处于崩溃状态。 | [8.3](#s-symptom-cause-fix) |
+| `Error: failed to update actor: rpc error: code = FailedPrecondition desc = actor must be ACTOR_STATE_SUSPENDED to change its actor template (got: ACTOR_STATE_RUNNING)` | 对运行中的 actor 执行 `update actor --template`。请先挂起它。 | [3.1](#s-actortemplate-and-the-golden-snapshot) |
+| `Error: manifest for actor "f-main" in atespace "lab-f" lacks the metadata.uid and metadata.version preconditions that "get egress-policy -o yaml" prints` | 更新必须写明它所替换的版本。 | [6.2](#s-egresspolicy-and-default-deny) |
+| `Error: rpc error: code = Unavailable desc = while calling atelet Terminate` | 对节点已停止的 actor 执行 `delete actor`。actor 停留在 `ACTOR_STATE_DELETING`。 | [8.2](#s-when-a-dependency-is-down) |
+| `Error: unknown flag "-A"` | `get workers` 没有“所有 atespace”标志。它默认列出所有命名空间。 | [2.2](#s-kubectl-ate) |
+| `Error: while building the envoy-dataplane image: exit status 125` | 从源码安装需要 `docker buildx`。 | [2.1](#s-install-with-ate-setup) |
+| `global has no access policy` | 在新安装上执行 `get access-policy --global`。只有引导所有者拥有全局角色。 | [5.2](#s-access-policies) |
+| `Unable to connect to the server: EOF` | `kubectl` 无法连接 Kubernetes API server。actor 仍在处理请求。 | [8.2](#s-when-a-dependency-is-down) |
+| `unknown flag: --platform` | Docker 没有 buildx 插件。这一行出现在上面那条构建错误之前。 | [2.1](#s-install-with-ate-setup) |
+| `Warning: no --token-file given; acting as the shared identity system:serviceaccount:ate-system:ate-client rather than as yourself. Pass --token-file to act as yourself.` | 没有给出 `--token-file`，所以 CLI 使用共享身份。 | [5.1](#s-client-authentication) |
 
-## From the API, as status codes
+## API 返回的状态码 {#s-ref-errors-from-the-api-as-status-codes}
 
-| Code | When | Section |
+| 状态码 | 何时出现 | 章节 |
 |---|---|---|
-| `FAILED_PRECONDITION` | a lifecycle call from a state that it does not accept, such as a resume of a crashed actor, or a delete of an atespace that is not empty | [the states reference](#s-ref-states) |
-| `ABORTED` | a write that named an old `version`, or two workflows on one object. The texts in the code are `concurrent update conflict, please retry` for an actor or a worker, `EgressPolicy version conflict`, and `another operation is in progress for this actor`. | [the API reference](#s-ref-api-methods) |
-| `InvalidArgument` | a manifest that fails validation, such as a rule without ports | [6.2](#s-egresspolicy-and-default-deny) |
-| `Internal` | a workflow step failed. The text names the step. | [8.3](#s-symptom-cause-fix) |
+| `FAILED_PRECONDITION` | 在不接受的状态下发起生命周期调用，例如恢复已崩溃的 actor，或删除不为空的 atespace | [状态参考](#s-ref-states) |
+| `ABORTED` | 写入时指明了旧的 `version`，或两个工作流作用于同一对象。代码里的文本有：actor 或 worker 的 `concurrent update conflict, please retry`、`EgressPolicy version conflict`，以及 `another operation is in progress for this actor`。 | [API 参考](#s-ref-api-methods) |
+| `InvalidArgument` | 清单未通过校验，例如规则缺少端口 | [6.2](#s-egresspolicy-and-default-deny) |
+| `Internal` | 某个工作流步骤失败。文本会指明该步骤。 | [8.3](#s-symptom-cause-fix) |
 
-## From the kagent CLI
+## 来自 kagent CLI 的错误 {#s-ref-errors-from-the-kagent-cli}
 
-| Text | Meaning | Section |
+| 文本 | 含义 | 章节 |
 |---|---|---|
-| `bind: address already in use` | Two CLI calls opened a port-forward on port 8083 at the same time. | [7.1](#s-kagent-on-substrate) |
-| `kubectl port-forward exited before the server became ready` | The first line of the same failure. | [7.1](#s-kagent-on-substrate) |
+| `bind: address already in use` | 两个 CLI 调用同时在端口 8083 上打开了端口转发。 | [7.1](#s-kagent-on-substrate) |
+| `kubectl port-forward exited before the server became ready` | 同一次失败的第一行。 | [7.1](#s-kagent-on-substrate) |
 
-Sources: capture/lab/P-node-loss/40-balt-suspend-resume-delete.tsv, capture/lab/P-node-loss/60-d-running.tsv, capture/lab/P-node-loss/74-second-revert.tsv, capture/lab/P-node-loss/80-tag-rescue.tsv, capture/lab/P-node-loss/96-golden-tag-deleted.txt, capture/lab/Q-network/g-dependency-loss-agw/12-probe-incluster.tsv, capture/lab/Q-network/i-model-gateway/20-results-agentgateway.txt, capture/lab/Q-network/i-model-gateway/20-results-envoy.txt, capture/lab/Q-network/i-model-gateway/41-egress-503-line.log, capture/lab/Q-network/i-model-gateway/44-envoy-egress-503.excerpt.log, capture/lab/Q-network/m-router-ports/agentgateway/10-port-probes.tsv, capture/lab/Q-network/m-router-ports/agentgateway/11-port-probes-supplement.txt, capture/lab/V-validation/06-template-move/10-move.tsv, capture/lab/V-validation/07-cross-namespace-pool/10-cross.tsv, capture/lab/V-validation/08-access-control/10-access.tsv, capture/lab/V-validation/10-preview-feature/10-preview.tsv, capture/lab/V-validation/11-process-exit-long-watch/10-watch.tsv, capture/lab/V-validation/12-suspend-during-request/10-inflight.tsv, capture/lab/N-demos/failure-drill/drill-run.log, capture/lab/L-gaps/multinode/70-stop-after-upload.tsv, capture/lab/L-gaps/multinode/75-stop-after-upload-revert.tsv, capture/lab/L-gaps/multinode/80-stop-before-upload.tsv, capture/lab/L-gaps/multinode/90-stop-while-running.tsv, capture/lab/L-gaps/multinode/93-after-node-return.tsv, capture/lab/L-gaps/restart/10-poll.tsv, capture/lab/I-capacity/01-unplanned-full-pool-503.tsv, capture/lab/B-lifecycle/20-trace-ops.tsv, capture/lab/D-durability/30-local-loss.tsv, capture/lab/D-durability/40-node-reboot.tsv, capture/lab/D-durability/44-r1-after-reboot.yaml, capture/lab/J-container-death/10-trace.tsv, capture/lab/E-dependency-loss/12-probe-incluster.tsv, capture/lab/E-dependency-loss/12-probe-proxy.tsv, capture/lab/E-dependency-loss/14-T1-cli-during.txt, capture/lab/E-dependency-loss/16-T3-kubectl-during.txt, capture/lab/G-dataplane/envoy/ingress-auth/, capture/lab/G-dataplane/agentgateway/ingress-auth/, capture/lab/F-egress/envoy/20-results.txt, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/envoy/19-first-run-update-refused.txt, capture/lab/F-egress/envoy/19b-second-run-passthrough-ports-required.txt, capture/lab/A-quickstart/20-deploy-ate-system.FAILED-no-buildx.log, capture/lab/A-quickstart/60-state.log, capture/lab/A-quickstart/50-create-actor.log, capture/lab/K-kagent/latency/D-par-5.err; api/ateapi/v1/ateapi.proto (the status codes in the method comments), cmd/atenet/internal/router/ingress/errors.go, cmd/ateapi/internal/controlapi/workflow.go, workflow_revert.go, actor.go, worker.go and egress_policy.go at v1.0.0; agentgateway v1.7.0 crates/agentgateway/src/proxy/mod.rs and crates/agentgateway/src/http/substrate/ingress.rs.
+来源：capture/lab/P-node-loss/40-balt-suspend-resume-delete.tsv, capture/lab/P-node-loss/60-d-running.tsv, capture/lab/P-node-loss/74-second-revert.tsv, capture/lab/P-node-loss/80-tag-rescue.tsv, capture/lab/P-node-loss/96-golden-tag-deleted.txt, capture/lab/Q-network/g-dependency-loss-agw/12-probe-incluster.tsv, capture/lab/Q-network/i-model-gateway/20-results-agentgateway.txt, capture/lab/Q-network/i-model-gateway/20-results-envoy.txt, capture/lab/Q-network/i-model-gateway/41-egress-503-line.log, capture/lab/Q-network/i-model-gateway/44-envoy-egress-503.excerpt.log, capture/lab/Q-network/m-router-ports/agentgateway/10-port-probes.tsv, capture/lab/Q-network/m-router-ports/agentgateway/11-port-probes-supplement.txt, capture/lab/V-validation/06-template-move/10-move.tsv, capture/lab/V-validation/07-cross-namespace-pool/10-cross.tsv, capture/lab/V-validation/08-access-control/10-access.tsv, capture/lab/V-validation/10-preview-feature/10-preview.tsv, capture/lab/V-validation/11-process-exit-long-watch/10-watch.tsv, capture/lab/V-validation/12-suspend-during-request/10-inflight.tsv, capture/lab/N-demos/failure-drill/drill-run.log, capture/lab/L-gaps/multinode/70-stop-after-upload.tsv, capture/lab/L-gaps/multinode/75-stop-after-upload-revert.tsv, capture/lab/L-gaps/multinode/80-stop-before-upload.tsv, capture/lab/L-gaps/multinode/90-stop-while-running.tsv, capture/lab/L-gaps/multinode/93-after-node-return.tsv, capture/lab/L-gaps/restart/10-poll.tsv, capture/lab/I-capacity/01-unplanned-full-pool-503.tsv, capture/lab/B-lifecycle/20-trace-ops.tsv, capture/lab/D-durability/30-local-loss.tsv, capture/lab/D-durability/40-node-reboot.tsv, capture/lab/D-durability/44-r1-after-reboot.yaml, capture/lab/J-container-death/10-trace.tsv, capture/lab/E-dependency-loss/12-probe-incluster.tsv, capture/lab/E-dependency-loss/12-probe-proxy.tsv, capture/lab/E-dependency-loss/14-T1-cli-during.txt, capture/lab/E-dependency-loss/16-T3-kubectl-during.txt, capture/lab/G-dataplane/envoy/ingress-auth/, capture/lab/G-dataplane/agentgateway/ingress-auth/, capture/lab/F-egress/envoy/20-results.txt, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/envoy/19-first-run-update-refused.txt, capture/lab/F-egress/envoy/19b-second-run-passthrough-ports-required.txt, capture/lab/A-quickstart/20-deploy-ate-system.FAILED-no-buildx.log, capture/lab/A-quickstart/60-state.log, capture/lab/A-quickstart/50-create-actor.log, capture/lab/K-kagent/latency/D-par-5.err; api/ateapi/v1/ateapi.proto (the status codes in the method comments), cmd/atenet/internal/router/ingress/errors.go, cmd/ateapi/internal/controlapi/workflow.go, workflow_revert.go, actor.go, worker.go and egress_policy.go at v1.0.0; agentgateway v1.7.0 crates/agentgateway/src/proxy/mod.rs and crates/agentgateway/src/http/substrate/ingress.rs.

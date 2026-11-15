@@ -7,7 +7,7 @@ const { chart, load } = require('../../../_shared/chart.js');
 const restore = load(path.join(__dirname, '../../capture/lab/summary/restore-limit-x86.json'));
 const alone = restore.single_restores.worker_restore_seconds;
 const bursts = restore.bursts;
-const columns = [{ label: 'alone', seconds: alone.runs, hue: 'green' }, ...bursts.map((burst, index) => ({ label: `burst ${index + 1}`, seconds: burst.worker_restore_seconds, hue: 'violet', burst }))];
+const columns = [{ label: '单次', seconds: alone.runs, hue: 'green' }, ...bursts.map((burst, index) => ({ label: `突发 ${index + 1}`, seconds: burst.worker_restore_seconds, hue: 'violet', burst }))];
 const medians = bursts.map(burst => burst.worker_restore_seconds_median);
 const flight = bursts.map(burst => burst.in_flight_median);
 const rates = bursts.map(burst => burst.restores_per_second);
@@ -15,17 +15,17 @@ const sizes = bursts.map(burst => burst.restores);
 
 module.exports = figure('fig-4-5c', {
   height: 368,
-  title: 'The worker restore of each actor, alone and inside a burst',
-  desc: `One dot for each of ${alone.n + sizes.reduce((sum, size) => sum + size, 0)} restores that atelet logged on one node with ${restore.node_cpus} vCPU. Alone, the restore inside the worker took a median of ${alone.median.toFixed(2)} s in ${alone.n} restores. Inside ${bursts.length} bursts of ${Math.min(...sizes)} to ${Math.max(...sizes)} restores, a median of ${Math.min(...flight)} to ${Math.max(...flight)} ran at the same time, and the median restore took ${Math.min(...medians).toFixed(1)} to ${Math.max(...medians).toFixed(1)} s. Each burst finished ${Math.min(...rates).toFixed(0)} to ${Math.max(...rates).toFixed(0)} restores each second.`,
+  title: '单个 actor 的 worker 恢复耗时：单独执行与突发并发对比',
+  desc: `${restore.node_cpus} vCPU 单节点上 atelet 记录的共 ${alone.n + sizes.reduce((sum, size) => sum + size, 0)} 次恢复。单独执行时，${alone.n} 次 worker 内部恢复的中位耗时为 ${alone.median.toFixed(2)} s。在 ${bursts.length} 次规模为 ${Math.min(...sizes)} 至 ${Math.max(...sizes)} 的恢复突发中，同时执行的恢复数中位数为 ${Math.min(...flight)} 至 ${Math.max(...flight)}，恢复耗时中位数为 ${Math.min(...medians).toFixed(1)} 至 ${Math.max(...medians).toFixed(1)} s，每次突发每秒完成 ${Math.min(...rates).toFixed(0)} 至 ${Math.max(...rates).toFixed(0)} 次恢复。`,
 }, f => {
   f.rule(22, 18, 34, 18, { hue: 'violet', width: 2.4 });
-  f.text(40, 22, 'a burst: median, box of the middle half, line from 5 to 95 percent', { size: 11, hue: 'violet' });
+  f.text(40, 22, '一次突发：中位数、中间半数箱体、5% 至 95% 竖线', { size: 11, hue: 'violet' });
 
   f.dot(26, 40, { hue: 'green', r: 2 });
-  f.text(36, 44, 'one restore alone', { size: 11, hue: 'green' });
-  f.text(200, 44, 'number over a burst: median count of restores at once', { size: 11, hue: 'ink-soft' });
+  f.text(36, 44, '单独恢复一次', { size: 11, hue: 'green' });
+  f.text(200, 44, '突发上方数字：同时恢复数的中位数', { size: 11, hue: 'ink-soft' });
 
-  const plot = chart(f, { x: 50, y: 82, w: 560, h: 236, xDomain: [-0.5, columns.length - 0.5], yDomain: [0, 4], xTicks: columns.map((_, index) => index), yTicks: [0, 0.5, 1, 2, 3, 4], xFormat: index => columns[index].label, yLabel: 'seconds of the worker restore, each actor' });
+  const plot = chart(f, { x: 50, y: 82, w: 560, h: 236, xDomain: [-0.5, columns.length - 0.5], yDomain: [0, 4], xTicks: columns.map((_, index) => index), yTicks: [0, 0.5, 1, 2, 3, 4], xFormat: index => columns[index].label, yLabel: '每个 actor 的 worker 恢复耗时，秒' });
   const at = (sorted, q) => sorted[Math.round(q * (sorted.length - 1))];
   columns.forEach(({ seconds, hue, burst }, index) => {
     const cx = plot.px(index);
@@ -41,5 +41,5 @@ module.exports = figure('fig-4-5c', {
   });
   f.text(plot.px(0), plot.py(alone.max) - 22, `${alone.median.toFixed(2)} s`, { size: 11, anchor: 'middle', serif: true, hue: 'green' });
 
-  f.text(330, 356, `bursts of ${Math.min(...sizes)} to ${Math.max(...sizes)} resumes; each burst finished ${Math.min(...rates).toFixed(0)} to ${Math.max(...rates).toFixed(0)} restores each second`, { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
+  f.text(330, 356, `${Math.min(...sizes)} 至 ${Math.max(...sizes)} 并发恢复突发；每次突发每秒完成 ${Math.min(...rates).toFixed(0)} 至 ${Math.max(...rates).toFixed(0)} 次恢复`, { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
 });

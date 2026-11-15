@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 368" role="img" aria-labelledby="fig-4-5c-title fig-4-5c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-5c-title">The worker restore of each actor, alone and inside a burst</title>
-  <desc id="fig-4-5c-desc">One dot for each of 1192 restores that atelet logged on one node with 24 vCPU. Alone, the restore inside the worker took a median of 0.27 s in 20 restores. Inside 8 bursts of 134 to 150 restores, a median of 75 to 116 ran at the same time, and the median restore took 2.1 to 2.9 s. Each burst finished 35 to 41 restores each second.</desc>
+  <title id="fig-4-5c-title">单个 actor 的 worker 恢复耗时：单独执行与突发并发对比</title>
+  <desc id="fig-4-5c-desc">24 vCPU 单节点上 atelet 记录的共 1192 次恢复。单独执行时，20 次 worker 内部恢复的中位耗时为 0.27 s。在 8 次规模为 134 至 150 的恢复突发中，同时执行的恢复数中位数为 75 至 116，恢复耗时中位数为 2.1 至 2.9 s，每次突发每秒完成 35 至 41 次恢复。</desc>
   <line x1="22" y1="18" x2="34" y2="18" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="2.4"/>
-  <text x="40" y="22" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">a burst: median, box of the middle half, line from 5 to 95 percent</text>
+  <text x="40" y="22" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">一次突发：中位数、中间半数箱体、5% 至 95% 竖线</text>
   <circle cx="26" cy="40" r="2" fill="var(--m-green-ink, #336b40)"/>
-  <text x="36" y="44" font-size="11" fill="var(--m-green-ink, #336b40)">one restore alone</text>
-  <text x="200" y="44" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">number over a burst: median count of restores at once</text>
+  <text x="36" y="44" font-size="11" fill="var(--m-green-ink, #336b40)">单独恢复一次</text>
+  <text x="200" y="44" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">突发上方数字：同时恢复数的中位数</text>
   <line x1="50" y1="318" x2="610" y2="318" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="44" y="322" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="50" y1="288.5" x2="610" y2="288.5" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -21,24 +21,24 @@
   <line x1="50" y1="318" x2="610" y2="318" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="50" y1="82" x2="50" y2="318" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="81.11" y1="318" x2="81.11" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="81.11" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">alone</text>
+  <text x="81.11" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">单次</text>
   <line x1="143.33" y1="318" x2="143.33" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="143.33" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 1</text>
+  <text x="143.33" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 1</text>
   <line x1="205.56" y1="318" x2="205.56" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="205.56" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 2</text>
+  <text x="205.56" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 2</text>
   <line x1="267.78" y1="318" x2="267.78" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="267.78" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 3</text>
+  <text x="267.78" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 3</text>
   <line x1="330" y1="318" x2="330" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="330" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 4</text>
+  <text x="330" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 4</text>
   <line x1="392.22" y1="318" x2="392.22" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="392.22" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 5</text>
+  <text x="392.22" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 5</text>
   <line x1="454.44" y1="318" x2="454.44" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="454.44" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 6</text>
+  <text x="454.44" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 6</text>
   <line x1="516.67" y1="318" x2="516.67" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="516.67" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 7</text>
+  <text x="516.67" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 7</text>
   <line x1="578.89" y1="318" x2="578.89" y2="322" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="578.89" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">burst 8</text>
-  <text x="50" y="70" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds of the worker restore, each actor</text>
+  <text x="578.89" y="335" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">突发 8</text>
+  <text x="50" y="70" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个 actor 的 worker 恢复耗时，秒</text>
   <circle cx="66.11" cy="302.96" r="1.6" fill="var(--m-green-ink, #336b40)"/>
   <circle cx="84.65" cy="302.31" r="1.6" fill="var(--m-green-ink, #336b40)"/>
   <circle cx="73.19" cy="302.66" r="1.6" fill="var(--m-green-ink, #336b40)"/>
@@ -92,5 +92,5 @@
   <line x1="565.89" y1="159.41" x2="591.89" y2="159.41" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="2.4"/>
   <text x="578.89" y="94" font-size="11" text-anchor="middle" fill="var(--m-ink, #1a1a1a)">102</text>
   <text x="81.11" y="277.89" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-green-ink, #336b40)">0.27 s</text>
-  <text x="330" y="356" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bursts of 134 to 150 resumes; each burst finished 35 to 41 restores each second</text>
+  <text x="330" y="356" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">134 至 150 并发恢复突发；每次突发每秒完成 35 至 41 次恢复</text>
 </svg>

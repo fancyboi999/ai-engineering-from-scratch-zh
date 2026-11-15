@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 692" role="img" aria-labelledby="plate-substrate-request-title plate-substrate-request-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="plate-substrate-request-title">One request wakes one actor</title>
-  <desc id="plate-substrate-request-desc">An isometric drawing of one request. A client terminal sends POST / through kubectl ate proxy. In the namespace ate-system, atenet-router with the Envoy mark calls ResumeActor on ate-api-server, which reads the actor row in Postgres and binds a worker. Below is the node kind-control-plane with the Kubernetes mark. On it are a worker pod drawn as an open frame, a gVisor sandbox inside it, atelet, and the object store as a bucket. atelet restores the golden snapshot into the sandbox, and the actor my-counter-1 goes from SUSPENDED, a dashed outline, to RUNNING, three solid layers for memory, file, and rootfs. The router then opens a tunnel to port 8443. The first request took 0.358 s, the next four took 0.062 s to 0.091 s, and a request after 900 s with no traffic took 0.080 s.</desc>
+  <title id="plate-substrate-request-title">单次请求唤醒单个 actor 的完整路径</title>
+  <desc id="plate-substrate-request-desc">单次请求的等轴测全局视图。客户端终端经 kubectl ate proxy 发送 POST /。在 ate-system 命名空间内，带 Envoy 标识的 atenet-router 调用 ate-api-server 的 ResumeActor，后者读取 Postgres 中的 actor 行记录并绑定 worker。下方为带 Kubernetes 标识的 kind-control-plane 节点，其上绘有敞口框架表示的 worker pod、内部的 gVisor 沙箱、atelet 以及绘为 bucket 的对象存储。atelet 将黄金快照恢复至沙箱内，使 actor my-counter-1 从虚线轮廓的 SUSPENDED 变为由内存、文件与 rootfs 三层实心块组成的 RUNNING。随后路由器打通指向端口 8443 的隧道。实测首次请求耗时 0.358 s，后续四次耗时 0.062 s 至 0.091 s，无流量空闲 900 s 后的请求耗时 0.080 s。</desc>
   <defs><marker id="plate-substrate-request-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="plate-substrate-request-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker><marker id="plate-substrate-request-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="plate-substrate-request-head-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-indigo-ink, #4b4f9e)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">THE REQUEST PATH · AGENT SUBSTRATE V1.0.0</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">请求路径 · AGENT SUBSTRATE V1.0.0</text>
   <text x="620" y="18" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">my-counter-1</text>
   <polygon points="248.3,111 625.9,329 539.3,379 161.7,161" fill="var(--m-paper, #fafaf5)" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.1" stroke-linejoin="round" stroke-dasharray="5 4"/>
   <polygon points="90.7,66 95.8,63 121.1,70 159.2,92 154,95 128.8,88" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
@@ -58,18 +58,18 @@
   <path d="M564.5 310.3l0 .5-1.9 1.3-4.4 .6-1.2 6.4-1 1.7-2.4 1.2-1.2 .1-1-.3-.7-.8-.6-1.7-.2-4.7-.5-2.4-1.2 1.2-1.4 .5-2.1-.1-1.1-.7 .3-.5 2.6-.8 1-1.2 0-.7-1.3 0-1.2-.6-3.4 3.8-.9 .4-1.4-.7-1.3-1.7-1.7-4.5-1.6-6.7 .1-3.4 .9-2.7 1.7-1.5 2.9-.7 2.9 .2 3.1 .9 2.9-1.2 3.7 .2 2.5-.5 2.2-.1 2.4 .5 1.8 .8 2.3 2.2 .3 1.1 0 2.1-1.5 5.7-3.2 6.3 1.3 .7 2.7-.2z" fill="var(--m-teal-ink, #18696a)"/>
   <path d="M549.6 311.5l.3 8.3 1.1 1.8 1.6 .6 2.7-.6 1.4-1.3 .6-1.9 .8-6.5M546.3 292.6l-4.6-1.1-3.6 .5-1.3 .6-1.1 1.2-.7 1.6-.4 2.2 .2 2.8 1.2 5.2 1.2 3.8 1.6 2.9 1.4 1.1 .9-.1 3.8-3.9M552.9 291.7l3.8-.6 3.1 .4 2.4 1.2 2 2.2 .1 2.9-.9 4.1-1.6 3.9-2.2 3.9M559.6 309.7l1.4 .8 3.6-.1-1 1.1-1.7 .8-2.5 .2-1.3-.5 .3-1.4 1.2-.9-3.2-5.7-.7-3.1 .5-1.2 .7-.5 2.9-.3-.7-1.8-1.1-1.8-3-2.7-2.1-.8-2.5-.4-1.8 .2-2 .8-1.4 1.3-1 1.6-.7 2.3-.3 2.9M547.5 310.5l-1.1 1.3-2.5 .8-.3 .6 .9 .5 1.5 .2 2.3-.7 1.1-1.1 .1-.9-1-1M547.4 310.5l1.7-5.8-.1-2.9-.7-2-.7-.6-1.2-.1-1.6 .4-1.5 .9-.2 5.6 .4 1.6 1.1 1.4 1.3 .7 1.5 .2M559.8 299.1l-.3 3.5 .2 3.8-.7 2.2" fill="none" stroke="var(--m-paper, #fafaf5)" stroke-width="1" stroke-linejoin="round"/>
   <path d="M547 300.3l.7 .4-.7 .4-.7-.7zM558.4 300.1l-.7 .6-.7-.4 .6-.3z" fill="var(--m-paper, #fafaf5)"/>
-  <text x="20" y="126" font-size="12" font-weight="700" fill="var(--m-olive-ink, #515f26)">client</text>
+  <text x="20" y="126" font-size="12" font-weight="700" fill="var(--m-olive-ink, #515f26)">客户端</text>
   <text x="20" y="141" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">curl -X POST</text>
   <text x="20" y="156" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kubectl ate proxy</text>
   <text x="250" y="70" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">atenet-router</text>
-  <text x="250" y="85" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Envoy dataplane</text>
+  <text x="250" y="85" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Envoy 数据平面</text>
   <text x="420" y="158" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">ate-api-server</text>
-  <text x="420" y="173" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">control plane</text>
+  <text x="420" y="173" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">控制平面</text>
   <text x="549.6" y="240" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">Postgres</text>
-  <text x="620" y="196" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-mute, #666660)">namespace ate-system</text>
+  <text x="620" y="196" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-mute, #666660)">命名空间 ate-system</text>
   <polyline points="604,202 605.1,317" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="605.1" cy="317" r="2" fill="var(--m-ink-mute, #666660)"/>
-  <text x="620" y="382" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor row</text>
+  <text x="620" y="382" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 行记录</text>
   <polyline points="594,371 568.5,334.4" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="568.5" cy="334.4" r="2" fill="var(--m-teal-ink, #18696a)"/>
   <polygon points="88.9,445 237.9,359 244.9,361 627.7,582 478.7,668 471.7,666" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
@@ -136,18 +136,18 @@
   <text x="20" y="304" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">worker pod</text>
   <polyline points="96,300 149.5,322" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="149.5" cy="322" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="20" y="326" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">gVisor sandbox</text>
-  <polyline points="124,322 166.9,338" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <text x="20" y="326" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">gVisor 沙箱</text>
+  <polyline points="98,322 166.9,338" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="166.9" cy="338" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="20" y="356" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">my-counter-1</text>
-  <text x="20" y="374" font-size="11" fill="var(--m-green-ink, #336b40)">memory</text>
-  <polyline points="65.6,370 232.7,377" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <text x="20" y="374" font-size="11" fill="var(--m-green-ink, #336b40)">内存</text>
+  <polyline points="48,370 232.7,377" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="232.7" cy="377" r="2" fill="var(--m-green-ink, #336b40)"/>
-  <text x="20" y="390" font-size="11" fill="var(--m-green-ink, #336b40)">file</text>
-  <polyline points="52.4,386 224.9,392.5" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <text x="20" y="390" font-size="11" fill="var(--m-green-ink, #336b40)">文件</text>
+  <polyline points="48,386 224.9,392.5" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="224.9" cy="392.5" r="2" fill="var(--m-green-ink, #336b40)"/>
   <text x="20" y="406" font-size="11" fill="var(--m-green-ink, #336b40)">rootfs</text>
-  <polyline points="65.6,402 217.1,409" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <polyline points="66,402 217.1,409" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="217.1" cy="409" r="2" fill="var(--m-green-ink, #336b40)"/>
   <text x="175.5" y="455" font-size="11.5" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">RUNNING</text>
   <polyline points="187.5,443 215.4,427" fill="none" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8" stroke-dasharray="2 3"/>
@@ -156,14 +156,14 @@
   <polyline points="272.4,492 298.5,465" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="298.5" cy="465" r="2" fill="var(--m-amber-ink, #85590c)"/>
   <text x="366" y="543" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">atelet</text>
-  <text x="620" y="490" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-teal-ink, #18696a)">object store</text>
+  <text x="620" y="490" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-teal-ink, #18696a)">对象存储</text>
   <text x="620" y="505" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">rustfs bucket</text>
-  <text x="620" y="660" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-mute, #666660)">node</text>
+  <text x="620" y="660" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-mute, #666660)">节点</text>
   <text x="620" y="676" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-grey-ink, #5e5e59)">kind-control-plane</text>
-  <text x="20" y="556" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">MEASURED AT THE CLIENT</text>
-  <text x="20" y="620" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">through kubectl ate proxy, x86 server guest</text>
-  <text x="20" y="638" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">after 900 s with no request: 60 of 60 samples RUNNING</text>
-  <text x="20" y="656" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">then a request took 0.080 s</text>
+  <text x="20" y="556" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">客户端实测耗时</text>
+  <text x="20" y="620" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">经由 kubectl ate proxy，x86 服务器客户机</text>
+  <text x="20" y="638" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">无请求空闲 900 s 后：60/60 次采样仍为 RUNNING</text>
+  <text x="20" y="656" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">随后一次请求耗时 0.080 s</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <path d="M120.1 97 L198.9 142.5" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#plate-substrate-request-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M120.1 97 L198.9 142.5" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
@@ -183,8 +183,8 @@
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
   <path d="M431 276.5 L518.5 327" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#plate-substrate-request-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M431 276.5 L518.5 327" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="440.9" y="276.42" width="72" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="476.9" y="287" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">read, bind</text>
+  <rect class="m-knock" x="446.4" y="276.42" width="61" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="476.9" y="287" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">读取并绑定</text>
   <circle cx="463.9" cy="312.5" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-teal-ink, #18696a)" stroke-width="1"/>
   <text x="463.9" y="316.5" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">3</text>
   </g>
@@ -204,7 +204,7 @@
   <polygon points="475.2,529 489,537 475.2,545 461.3,537" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-linejoin="round"/>
   <circle cx="454.4" cy="564" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-teal-ink, #18696a)" stroke-width="1"/>
   <text x="454.4" y="568" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">5</text>
-  <text x="454.4" y="588" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">golden snapshot</text>
+  <text x="454.4" y="588" font-size="11" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">黄金快照</text>
   <path d="M287.2 463.5 L216.2 422.5" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#plate-substrate-request-head-amber)"/>
   </g>
   <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
@@ -212,14 +212,14 @@
   <circle class="m-packet" r="3.5" fill="var(--m-indigo-ink, #4b4f9e)" opacity="0"><animateMotion path="M250 190L250 365" keyPoints="0;0;1;1" keyTimes="0;0.789;0.934;1" calcMode="linear" dur="3.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.789;0.811;0.934;1" dur="3.8s" begin="indefinite" fill="freeze"/></circle>
   <circle cx="235" cy="236" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1"/>
   <text x="235" y="240" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">6</text>
-  <text x="220" y="240" font-size="11.5" text-anchor="end" fill="var(--m-indigo-ink, #4b4f9e)">tunnel, port 8443</text>
+  <text x="220" y="240" font-size="11.5" text-anchor="end" fill="var(--m-indigo-ink, #4b4f9e)">隧道，端口 8443</text>
   </g>
   <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
   <path d="M198.9 157.5 L107.1 104.5" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#plate-substrate-request-head-ink)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-ink, #1a1a1a)" opacity="0"><animateMotion path="M198.9 157.5 L107.1 104.5" keyPoints="0;0;1;1" keyTimes="0;0.818;0.943;1" calcMode="linear" dur="4.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.818;0.836;0.943;1" dur="4.4s" begin="indefinite" fill="freeze"/></circle>
   <circle cx="132.2" cy="136" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="132.2" y="140" font-size="11" text-anchor="middle">7</text>
-  <text x="20" y="578" font-size="12" font-weight="700" fill="var(--m-amber-ink, #85590c)">first request 0.358 s</text>
-  <text x="20" y="598" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">next four 0.062 s to 0.091 s</text>
+  <text x="20" y="578" font-size="12" font-weight="700" fill="var(--m-amber-ink, #85590c)">首次请求 0.358 s</text>
+  <text x="20" y="598" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">后续四次 0.062 s 至 0.091 s</text>
   </g>
 </svg>

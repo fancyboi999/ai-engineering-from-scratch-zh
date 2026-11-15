@@ -9,7 +9,7 @@ const X0 = 96;
 const X1 = 612;
 const MINUTES = 43;
 const px = minutes => X0 + (minutes / MINUTES) * (X1 - X0);
-const clock = seconds => `${Math.floor(seconds / 60)} min ${Math.round(seconds % 60)} s`;
+const clock = seconds => `${Math.floor(seconds / 60)} 分 ${Math.round(seconds % 60)} 秒`;
 const upload = Math.min(...data.actors.map(a => a.seconds_to_upload));
 const detach = Math.max(...data.actors.map(a => a.seconds_to_detach));
 const resumes = load(path.join(__dirname, '../../capture/lab/summary/resume-x86.json')).object_store_default_timers.points;
@@ -21,15 +21,15 @@ const diskLow = Math.min(...disk.map(row => row.mib));
 
 module.exports = figure('fig-3-4', {
   height: 352,
-  title: 'Where a snapshot lives after an asynchronous suspend',
-  desc: `A timeline of four actors, d0, d50, d200 and d500, over 43 minutes after an asynchronous suspend with default atelet timers on the x86 server guest. For the first 5 minutes each snapshot is only on the node and its state is PENDING. From about 5 minutes to about 30 minutes the snapshot is on the node and in the object store. After about 30 minutes the node copy is removed and only the object store copy remains. The first three uploads completed after 5 min 1 s to 5 min 2 s, and the 500 MiB one after 5 min 11 s. A request 42 minutes after the suspend resumed each actor from the object store in ${data.actors.map(a => `${resumeOf(a.mib).toFixed(2)} s`).join(', ')}. A row of dots under the bars shows the size of the snapshots on the node disk in each of ${disk.length} samples: ${diskHigh} MiB until the node copies were removed and ${diskLow} MiB after that.`,
+  title: '异步挂起后快照存放在哪里',
+  desc: `x86 服务器客户机上使用默认 atelet 计时器异步挂起后，四个 actor（d0、d50、d200、d500）在 43 分钟内的时间线。前 5 分钟每份快照仅存于节点本地，状态为 PENDING；约 5 分钟至 30 分钟同时存在于节点与对象存储；约 30 分钟后节点副本被移除，仅保留对象存储副本。前三次上传在 5 分 1 秒至 5 分 2 秒完成，500 MiB 的一次在 5 分 11 秒完成。挂起 42 分钟后发起请求，各 actor 从对象存储恢复耗时分别为 ${data.actors.map(a => `${resumeOf(a.mib).toFixed(2)} s`).join('、')}。柱条下方圆点展示 ${disk.length} 次采样中节点磁盘上的快照体积：节点副本移除前为 ${diskHigh} MiB，移除后为 ${diskLow} MiB。`,
 }, f => {
   f.rect(20, 14, 14, 10, { hue: 'rose', dash: 'dashed' });
-  f.text(40, 23, 'node only, PENDING', { size: 11, hue: 'rose' });
+  f.text(40, 23, '仅节点，PENDING', { size: 11, hue: 'rose' });
   f.rect(196, 14, 14, 10, { hue: 'violet' });
-  f.text(216, 23, 'node and object store', { size: 11, hue: 'violet' });
+  f.text(216, 23, '节点与对象存储', { size: 11, hue: 'violet' });
   f.rect(390, 14, 14, 10, { hue: 'teal' });
-  f.text(410, 23, 'object store only', { size: 11, hue: 'teal' });
+  f.text(410, 23, '仅对象存储', { size: 11, hue: 'teal' });
 
   data.actors.forEach((actor, index) => {
     const y = 66 + index * 38;
@@ -41,19 +41,19 @@ module.exports = figure('fig-3-4', {
     f.rect(px(up), y, px(down) - px(up), 20, { hue: 'violet' });
     f.rect(px(down), y, px(42) - px(down), 20, { hue: 'teal' });
     f.dot(px(42), y + 10, { hue: 'amber', r: 3.5 });
-    f.text(px(42) - 8, y + 14, `resumed in ${resumeOf(actor.mib).toFixed(2)} s`, { size: 11, serif: true, hue: 'ink-soft', anchor: 'end' });
+    f.text(px(42) - 8, y + 14, `${resumeOf(actor.mib).toFixed(2)} s 恢复`, { size: 11, serif: true, hue: 'ink-soft', anchor: 'end' });
   });
   f.text(56, 56, 'MiB', { size: 11, serif: true, hue: 'ink-soft' });
 
   f.rule(px(upload / 60), 30, px(upload / 60), 266, { hue: 'teal', dash: 'dashed', width: 1.2 });
-  f.text(px(upload / 60) + 6, 40, `upload done after ${clock(upload)}`, { size: 11, hue: 'teal' });
+  f.text(px(upload / 60) + 6, 40, `${clock(upload)} 后完成上传`, { size: 11, hue: 'teal' });
   f.rule(px(detach / 60), 46, px(detach / 60), 266, { hue: 'violet', dash: 'dashed', width: 1.2 });
-  f.text(px(detach / 60) - 6, 56, `node copy removed after ${clock(detach)}`, { size: 11, hue: 'violet', anchor: 'end' });
+  f.text(px(detach / 60) - 6, 56, `${clock(detach)} 后移除节点副本`, { size: 11, hue: 'violet', anchor: 'end' });
 
-  f.text(20, 232, 'node', { size: 12, weight: 700 });
-  f.text(20, 247, 'disk', { size: 12, weight: 700 });
+  f.text(20, 232, '节点', { size: 12, weight: 700 });
+  f.text(20, 247, '磁盘', { size: 12, weight: 700 });
   for (const row of disk) f.dot(px(row.minutes), row.mib === diskHigh ? 226 : 252, { hue: 'violet', r: 2 });
-  f.text(px(6), 244, `${diskHigh} MiB of snapshots, one dot for each sample`, { size: 11, serif: true, hue: 'violet' });
+  f.text(px(6), 244, `${diskHigh} MiB 快照，每次采样一点`, { size: 11, serif: true, hue: 'violet' });
   f.text(px(30.6), 242, `${diskLow} MiB`, { size: 11, serif: true, hue: 'violet' });
 
   f.rule(X0, 272, X1, 272, { hue: 'ink' });
@@ -61,8 +61,8 @@ module.exports = figure('fig-3-4', {
     f.rule(px(m), 268, px(m), 276, { hue: 'ink' });
     f.text(px(m), 290, String(m), { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.kicker(20, 290, 'Minutes');
+  f.kicker(20, 290, '分钟');
   f.dot(26, 312, { hue: 'amber', r: 3.5 });
-  f.text(36, 316, 'one request 42 minutes after the suspend: every actor resumed from the object store', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 336, 'In the rose part, losing the node copy leaves the actor CRASHED. Each time is at most 10 s late.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(36, 316, '挂起 42 分钟后发一次请求：所有 actor 均从对象存储恢复', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 336, '在玫红区间丢失节点副本会让 actor 进入 CRASHED。各时间最多延后 10 s。', { size: 11, serif: true, hue: 'ink-soft' });
 });

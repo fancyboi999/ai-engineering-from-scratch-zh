@@ -13,48 +13,48 @@ const xs = [20, 144, 268, 392, 516];
 const rows = [
   {
     y: 34,
-    decides: 'decides: who gets in, which hosts an actor reaches, one injected header',
-    kicker: 'A · the dataplane of Substrate, by your choice',
-    note: 'ate-setup --atenet-dataplane=agentgateway. Idle: 38 MB in 2 containers. Envoy: 91 MB in 5.',
+    decides: '决定事项：谁能入站、actor 可访问哪些主机、注入一个请求头',
+    kicker: 'A · 由你选择的 Substrate 数据平面',
+    note: 'ate-setup --atenet-dataplane=agentgateway。空闲内存：2 容器共 38 MB；Envoy 为 5 容器共 91 MB。',
     boxes: [
-      { hue: 'olive', title: 'client', sub: 'mTLS client' },
+      { hue: 'olive', title: '客户端', sub: 'mTLS 客户端' },
       { hue: 'indigo', title: 'atenet-router', sub: 'agentgateway' },
       { hue: 'green', title: 'actor', sub: 'my-counter-1' },
       { hue: 'indigo', title: 'atenet-egress', sub: 'agentgateway' },
-      { hue: 'olive', title: 'host', sub: 'in the policy' },
+      { hue: 'olive', title: '目标主机', sub: '策略允许范围' },
     ],
   },
   {
     y: 178,
-    decides: 'decides: the same three things',
-    kicker: 'B · the dataplane inside the kagent distribution',
-    note: 'The kagent charts install agentgateway v1.7.0 and have no Envoy option. 98 turns ran through it.',
+    decides: '决定事项：同样这三项',
+    kicker: 'B · kagent 发行版内置的数据平面',
+    note: 'kagent chart 安装 agentgateway v1.7.0，无 Envoy 选项。共 98 个轮次经其转发。',
     boxes: [
-      { hue: 'plum', title: 'kagent', sub: 'controller' },
+      { hue: 'plum', title: 'kagent', sub: '控制器' },
       { hue: 'indigo', title: 'atenet-router', sub: 'agentgateway' },
       { hue: 'green', title: 'actor', sub: 'session-<uuid>' },
       { hue: 'indigo', title: 'atenet-egress', sub: 'agentgateway' },
-      { hue: 'plum', title: 'model host', sub: 'in the policy' },
+      { hue: 'plum', title: '模型主机', sub: '策略允许范围' },
     ],
   },
   {
     y: 322,
-    decides: 'decides: the model, and the key that the provider gets',
-    kicker: 'C · a gateway that the actor calls through an egress rule',
-    note: `Ran over TLS with two mock models. A new connection: ${fresh[0]} ms. A reused one: ${reused[0]} ms.`,
+    decides: '决定事项：选用哪个模型，以及发往模型提供方的密钥',
+    kicker: 'C · actor 经由出站规则调用的独立网关',
+    note: `基于 TLS 连接两个模拟模型实测。新建连接：${fresh[0]} ms；复用连接：${reused[0]} ms。`,
     boxes: [
       { hue: 'green', title: 'actor', sub: 'f-main' },
-      { hue: 'indigo', title: 'atenet-egress', sub: 'one https rule' },
-      { hue: 'grey', title: 'agentgateway', sub: 'model gateway', dash: 'dashed', strokeWidth: 1.8 },
-      { hue: 'plum', title: 'model', sub: 'mock-a, mock-b' },
+      { hue: 'indigo', title: 'atenet-egress', sub: '单条 https 规则' },
+      { hue: 'grey', title: 'agentgateway', sub: '模型网关', dash: 'dashed', strokeWidth: 1.8 },
+      { hue: 'plum', title: '模型', sub: 'mock-a, mock-b' },
     ],
   },
 ];
 
 module.exports = figure('fig-7-2', {
   height: 432,
-  title: 'Three places where agentgateway can sit next to Substrate',
-  desc: `Three rows. Row A: agentgateway is the proxy in atenet-router and atenet-egress when you install Substrate with the agentgateway dataplane. Row B: the kagent distribution installs the same two proxies and has no Envoy option. Row C: a separate agentgateway is a model gateway that the actor reaches through one egress rule, and that gateway selects the model. In our run with two mock backends, a request on a new intercepted TLS connection took ${fresh[0]} milliseconds on the agentgateway dataplane and ${fresh[1]} on Envoy, and a request on a reused connection took ${reused[0]} and ${reused[1]} milliseconds.`,
+  title: 'agentgateway 与 Substrate 配合的三种位置',
+  desc: `三行架构。A 行：以 agentgateway 数据平面安装 Substrate 时，agentgateway 充当 atenet-router 与 atenet-egress 内的代理。B 行：kagent 发行版安装相同的两个代理，且不提供 Envoy 选项。C 行：独立的 agentgateway 充当模型网关，actor 通过单条出站规则访问它并由它选择模型。在连接两个模拟后端的实测中，新建拦截 TLS 连接的请求在 agentgateway 数据平面上耗时 ${fresh[0]} ms（Envoy 为 ${fresh[1]} ms），复用连接分别耗时 ${reused[0]} ms 与 ${reused[1]} ms。`,
 }, f => {
   for (const row of rows) {
     f.kicker(20, row.y - 10, row.kicker);

@@ -28,9 +28,9 @@ function firstLookups() {
 }
 
 const tracks = [
-  { label: ['Envoy, polled', 'rule added'], points: polled('envoy') },
-  { label: ['agentgateway, polled', 'rule added'], points: polled('agentgateway') },
-  { label: ['Envoy, first lookups', 'of a new name'], points: firstLookups() },
+  { label: ['Envoy，持续轮询', '添加规则后'], points: polled('envoy') },
+  { label: ['agentgateway，持续轮询', '添加规则后'], points: polled('agentgateway') },
+  { label: ['Envoy，首次查询', '此前未查过的新域名'], points: firstLookups() },
 ];
 const FROM = -6;
 const TO = 20;
@@ -39,11 +39,11 @@ const slow = tracks[2].points.filter(point => !point.ok).map(point => Math.round
 
 module.exports = figure('fig-6-3b', {
   height: 236,
-  title: 'DNS answers for example.com after a rule for it is added',
-  desc: `Three tracks over a time axis in seconds, where zero is the moment the policy update returned. In the polled run on Envoy and in the polled run on agentgateway, the samples up to 2 seconds before zero are NXDOMAIN and every later sample is an answer. In a third run on Envoy, with no earlier lookup of the name, requests at ${slow.join(' and ')} seconds did not resolve the host, and a request at 18 seconds did.`,
+  title: '为 example.com 添加规则后的 DNS 解析响应',
+  desc: `秒级时间轴上的三条轨道，0 秒为策略更新命令返回时刻。在 Envoy 与 agentgateway 的持续轮询运行中，直到 -2 秒的采样均为 NXDOMAIN，此后每次采样都正常解析。在 Envoy 上此前未查询过该域名的第三次运行中，第 ${slow.join(' 与 ')} 秒的请求未能解析主机，第 18 秒的请求解析成功。`,
 }, f => {
   f.rule(px(0), 22, px(0), 180, { hue: 'ink', dash: 'dashed' });
-  f.text(px(0) + 5, 18, 'update returned', { size: 11, hue: 'ink-soft' });
+  f.text(px(0) + 5, 18, '策略更新返回', { size: 11, hue: 'ink-soft' });
   tracks.forEach((track, index) => {
     const y = 56 + index * 46;
     f.text(16, y - 3, track.label[0], { size: 11.5, weight: 700 });
@@ -55,15 +55,15 @@ module.exports = figure('fig-6-3b', {
     }
   });
   const last = tracks[2].points;
-  f.text(px(last[1].t) + 4, 56 + 2 * 46 - 12, 'not resolved', { size: 11, hue: 'rose', anchor: 'end' });
+  f.text(px(last[1].t) + 4, 56 + 2 * 46 - 12, '未解析成功', { size: 11, hue: 'rose', anchor: 'end' });
   f.rule(px(FROM), 180, px(TO), 180, { hue: 'ink' });
   for (let t = FROM; t <= TO; t += 2) {
     f.rule(px(t), 176, px(t), 184, { hue: 'ink' });
     if (t % 4 === 0) f.text(px(t), 198, String(t), { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.kicker(16, 198, 'Seconds');
+  f.kicker(16, 198, '秒');
   f.dot(196, 222, { hue: 'rose', r: 4 });
-  f.text(206, 226, 'NXDOMAIN or not resolved', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(206, 226, 'NXDOMAIN 或未解析', { size: 11, serif: true, hue: 'ink-soft' });
   f.dot(380, 222, { hue: 'violet', r: 4 });
-  f.text(390, 226, 'the relay answered', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(390, 226, 'DNS 中继返回地址', { size: 11, serif: true, hue: 'ink-soft' });
 });

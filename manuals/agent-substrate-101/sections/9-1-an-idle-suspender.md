@@ -1,43 +1,43 @@
-# An idle suspender
+# 空闲挂起器
 
-> A small proxy that records the last request for each actor and calls SuspendActor after 30 quiet seconds ran three actors in room for two.
+> 一个小型代理记录每个 actor 最近一次请求，并在 30 秒无请求后调用 SuspendActor，让三个 actor 挤进只容得下两个的空间。
 
-You installed Substrate because most of your agents wait most of the time. Then you watch the pool, and every actor that ever got a request is still running. Nothing suspended them, because nothing in Substrate v1.0.0 does that. The missing piece is yours to write, and it is small.
+你安装 Substrate，是因为你的大多数 agent 大部分时间都在等待。可是一看 pool，每个收到过请求的 actor 仍在运行。没有谁去挂起它们，因为 Substrate v1.0.0 里没有任何组件做这件事。缺的这一块要你自己写，而且很小。
 
-When you finish this section, you can run a program that suspends idle actors. You can also say what signal it uses, what it costs each client, and where the design stops.
+读完本节，你能运行一个挂起空闲 actor 的程序。你还能说清它用什么信号、每个客户端要为它付出什么代价，以及这个设计在哪里止步。
 
-## Which signal says that an actor is idle
+## 用哪个信号判断 actor 空闲 {#s-an-idle-suspender-which-signal-says-that-an-actor-is-idle}
 
-**Idle suspender:** a program outside Substrate that decides when an actor has had no work for long enough, and calls `SuspendActor` for it.
+**空闲挂起器（idle suspender）：** 一个运行在 Substrate 之外的程序，负责判断某个 actor 是否已经足够久没有工作，并为它调用 `SuspendActor`。
 
-The hard part is the signal. We looked for one on the server side and did not find one that fits.
+难点在信号。我们在服务端找过，没有找到合适的。
 
-| Candidate signal | Where it is | Why it does not fit |
+| 候选信号 | 所在位置 | 为什么不合适 |
 |---|---|---|
-| request metrics of the router | `atenet.router.route.duration` | Actor names are not allowed as metric labels, so it cannot say which actor is quiet {{docs}} |
-| the usage event of each actor | `ate.actor.usage_sampled` | It reports CPU time and memory once a minute, and it measures work, not requests {{docs}} |
-| the actor record | `kubectl ate get actor` | It has a state and an update time, and no time of the last request |
+| router 的请求指标 | `atenet.router.route.duration` | 指标标签不允许使用 actor 名称，所以它说不出哪个 actor 安静了 {{docs}} |
+| 每个 actor 的用量事件 | `ate.actor.usage_sampled` | 它每分钟报告一次 CPU 时间和内存，衡量的是工作量，不是请求 {{docs}} |
+| actor 记录 | `kubectl ate get actor` | 它有状态和更新时间，但没有最近一次请求的时间 |
 
-So the suspender has to see the requests itself. It sits in the path of the traffic, and the time of the last request is a value in its own memory.
+所以挂起器必须自己看到请求。它位于流量的路径上，最近一次请求的时间就是它自己内存里的一个值。
 
 ```figure
 id: fig-9-1
 kind: flow
-title: the idle suspender in the request path
-claim: The suspender forwards each request, keeps the time of the last one for each actor, and calls SuspendActor when an actor is quiet.
-caption: Read left to right for a request, and top to bottom for the suspend. The table in the middle is the only state of the suspender. From capture/demos/idle-suspender/suspender.py.
+title: 请求路径上的空闲挂起器
+claim: 挂起器转发每个请求，为每个 actor 记下最近一次请求的时间，并在 actor 安静下来时调用 SuspendActor。
+caption: 请求从左向右读，挂起从上向下读。中间的表是挂起器唯一的状态。来源：capture/demos/idle-suspender/suspender.py。
 ```
 
-## The program
+## 程序 {#s-an-idle-suspender-the-program}
 
-The demo is one Python file of 125 lines with no dependencies. It starts one `kubectl ate proxy actor` for each actor that you name. It listens on one port and forwards `/<actor>/<path>` to the proxy of that actor.
+示例是一个 125 行的 Python 文件，没有任何依赖。它为你指定的每个 actor 启动一个 `kubectl ate proxy actor`。它监听一个端口，并把 `/<actor>/<path>` 转发给对应 actor 的代理。
 
 ```bash
 python3 suspender.py --atespace demo-idle --idle 30 --listen 8080 busy bursty rare
 curl http://127.0.0.1:8080/busy/
 ```
 
-One loop makes the decision once a second. An actor is due when it is running, has no open request, and finished its last request at least `--idle` seconds ago.
+一个循环每秒做一次判断。当 actor 正在运行、没有未完成的请求，并且上一个请求至少在 `--idle` 秒前结束时，它就到期了。
 
 ```python
 due = [name for name, actor in actors.items()
@@ -46,21 +46,21 @@ for name in due:
     done, seconds = cli("suspend", "actor", name)
 ```
 
-A request that arrives during a suspend waits until the suspend ends. The suspender never resumes an actor. The next request goes to the router as before, and the router resumes the actor. The full file is in [the idle suspender folder](manuals/agent-substrate-101/capture/demos/idle-suspender).
+在挂起期间到达的请求会等到挂起结束。挂起器从不恢复 actor。下一个请求照常交给 router，由 router 恢复 actor。完整文件在[空闲挂起器目录](manuals/agent-substrate-101/capture/demos/idle-suspender)。
 
-## Ten minutes with three actors and room for two
+## 十分钟，三个 actor，只有两个名额 {#s-an-idle-suspender-ten-minutes-with-three-actors-and-room-for-two}
 
-The pool in the recording has one worker with two CPUs, and each actor asks for one CPU. So two actors can run at one time. We created three, and sent each a different pattern of traffic.
+录制所用的 pool 只有一个 worker，有两个 CPU，每个 actor 申请一个 CPU。所以同一时间只能运行两个 actor。我们创建了三个，并给每个发送不同模式的流量。
 
-- `busy` gets one request each 5 seconds.
-- `bursty` gets five requests in 5 seconds, and then nothing for 145 seconds.
-- `rare` gets one request after 60 seconds and one after 400 seconds.
+- `busy` 每 5 秒收到一个请求。
+- `bursty` 在 5 秒内收到五个请求，然后 145 秒没有任何请求。
+- `rare` 在 60 秒后收到一个请求，在 400 秒后再收到一个。
 
 ```listing
-title: the first two minutes of the suspender log
+title: 挂起器日志的前两分钟
 source: capture/lab/N-demos/idle-suspender/suspender.tsv
 lang: text
-note: The start, the first suspend, the first request to the third actor, and its suspend. Lines of warm requests between them are cut.
+note: 起点、第一次挂起、对第三个 actor 的第一次请求以及它的挂起。其间的热请求行已省略。
 ---
 2026-11-12T12:50:05	watch	busy	port=18080	running=False
 2026-11-12T12:50:05	watch	bursty	port=18081	running=False
@@ -83,66 +83,66 @@ note: The start, the first suspend, the first request to the third actor, and it
 2026-11-12T12:51:45	request	busy	200	0.065	warm
 ```
 
-Read the fifth field of each request line. The word `resumed` marks a request that found the actor suspended. At 12:50:49 the suspender suspended `bursty` after 31 quiet seconds. That freed one of the two places. At 12:51:13 the first request for `rare` arrived, and the router resumed it into the free place in 0.24 seconds.
+看每条 request 行的第五个字段。`resumed` 一词表示这个请求发现 actor 处于挂起状态。12:50:49 时，挂起器在 31 秒无请求后挂起了 `bursty`，空出两个名额中的一个。12:51:13 时，`rare` 的第一个请求到达，router 在 0.24 秒内把它恢复到这个空名额里。
 
 ```figure
 id: fig-9-1b
 kind: timeline
-title: three actors share two places for ten minutes
-claim: All 140 requests returned 200, and the worker held one actor for 38 of 58 samples in place of the three that had traffic.
-caption: Each row is one actor. A green band is the time the actor ran, a dot is one request, and an amber mark is a suspend by the suspender. The top row is the CPU that the worker had booked. From capture/lab/summary/demos-x86.json.
+title: 三个 actor 十分钟内共用两个名额
+claim: 全部 140 个请求都返回 200，58 次采样中有 38 次 worker 只驻留了一个 actor，而不必让三个有流量的 actor 全都常驻。
+caption: 每行是一个 actor。绿色条带是 actor 的运行时间，圆点是一个请求，琥珀色标记是挂起器做的一次挂起。最上面一行是 worker 已预订的 CPU。来源：capture/lab/summary/demos-x86.json。
 ```
 
-**We measured** this run on a second x86 server guest (16 vCPU, 31 GB), with the suspender on the same guest as the cluster. In 10 minutes the three actors got 140 requests, and all 140 returned 200.
+**我们测得**这次运行，环境是第二台 x86 服务器客户机（16 vCPU、31 GB），挂起器与集群运行在同一台客户机上。10 分钟内三个 actor 共收到 140 个请求，全部返回 200。
 
-| Result | Value |
+| 结果 | 数值 |
 |---|---|
-| requests that found the actor suspended | 7 of 140 |
-| time of those requests, after the first two | 0.24 to 0.26 s |
-| time of a request to a running actor, median | 0.06 s |
-| suspends by the suspender | 7, each 0.33 to 0.39 s at the CLI. Six came in the 10 minutes, and the seventh came 10 min 34 s after the start |
-| CPU booked on the worker, mean of 58 samples | 1,345 of 2,000 millicores |
+| 发现 actor 处于挂起状态的请求 | 140 个中的 7 个 |
+| 这些请求的耗时（前两个除外） | 0.24 到 0.26 秒 |
+| 对运行中 actor 的请求耗时，中位数 | 0.06 秒 |
+| 挂起器的挂起次数 | 7 次，CLI 端每次 0.33 到 0.39 秒。10 分钟内发生 6 次，第 7 次发生在启动后 10 分 34 秒 |
+| worker 上已预订的 CPU，58 次采样的均值 | 2,000 millicores 中的 1,345 |
 
-The first two resumed requests took 0.44 and 0.49 seconds, because two actors started in the same second. A client that meets a suspended actor pays about 0.2 seconds more than a warm request for this small actor. [SuspendActor and ResumeActor](#s-suspendactor-and-resumeactor) shows how that cost grows with memory.
+前两个恢复的请求分别用了 0.44 和 0.49 秒，因为两个 actor 在同一秒启动。对这个小 actor 来说，遇到挂起状态的客户端要比热请求多付出约 0.2 秒。这个代价如何随内存增长，见 [SuspendActor 与 ResumeActor](#s-suspendactor-and-resumeactor)。
 
-## The same traffic without the suspender
+## 没有挂起器时的同样流量 {#s-an-idle-suspender-the-same-traffic-without-the-suspender}
 
-We ran the first two minutes again with the suspender in `--dry-run` mode. It forwards requests and logs each decision, and it suspends nothing.
+我们用 `--dry-run` 模式的挂起器把前两分钟又跑了一遍。它转发请求并记录每个决定，但什么也不挂起。
 
 ```listing
-title: the request for the third actor without the suspender
+title: 没有挂起器时对第三个 actor 的请求
 source: capture/lab/N-demos/idle-suspender/requests-without-suspender.tsv
 lang: text
-note: The header and the one line for the actor named rare.
+note: 表头，以及名为 rare 的 actor 的那一行。
 ---
 ts	actor	http	seconds	body
 …
 2026-11-12T13:05:30.579Z	rare	503	5.054876	actor demo-idle/rare unavailable: no worker has room for the actor
 ```
 
-After 60 seconds both places were still taken by `busy` and `bursty`, and `bursty` had been quiet for 55 seconds. The request for `rare` waited the 5 second parking budget and returned 503. [Request parking](#s-request-parking) explains that wait.
+60 秒后，两个名额仍被 `busy` 和 `bursty` 占着，而 `bursty` 已经安静了 55 秒。`rare` 的请求等满了 5 秒的暂存预算，然后返回 503。[请求暂存](#s-request-parking)解释了这段等待。
 
-## Limits of the design
+## 设计的局限 {#s-an-idle-suspender-limits-of-the-design}
 
-- **It sees only its own traffic.** A request that reaches the router another way does not reset the timer. Send all traffic through the suspender, or the suspender stops an actor that is in use.
-- **Idle means no request, not no work.** An actor that computes after it answers looks idle. The usage events can cover that case, at a delay of one minute.
-- **One process holds the state.** A restart forgets the last request times. The demo then reads the state of each actor and starts its timers again.
-- **A request can arrive during a suspend.** The demo holds a new request until its suspend call ends, and then forwards it. Your own suspender needs the same rule for each actor. A request that reaches the router another way still gets a 503.
-- **The demo uses the CLI.** Each suspend starts one process and uses the shared identity of the CLI.
+- **它只看得到自己的流量。** 以其他方式到达 router 的请求不会重置计时器。请让所有流量都经过挂起器，否则挂起器会停掉一个正在使用的 actor。
+- **空闲指没有请求，不是没有工作。** 一个在回答之后继续计算的 actor 看起来也是空闲的。用量事件可以覆盖这种情况，代价是一分钟的延迟。
+- **状态只在一个进程里。** 重启会忘掉最近一次请求的时间。示例此时会读取每个 actor 的状态，并重新启动计时器。
+- **挂起期间可能有请求到达。** 示例会把新请求扣住，等它的挂起调用结束后再转发。你自己的挂起器需要对每个 actor 遵守同样的规则。以其他方式到达 router 的请求仍然会得到 503。
+- **示例使用 CLI。** 每次挂起都会启动一个进程，并使用 CLI 的共享身份。
 
-## What to change for production
+## 上生产前要改什么 {#s-an-idle-suspender-what-to-change-for-production}
 
-Run the suspender inside the cluster, beside the router. Give it a client certificate with an identity on the ingress allow list, and let it call `ate-api-server` with its own identity. Then it no longer needs the Kubernetes API server for each request.
+将挂起器部署在集群内部，紧邻 router。给它配置一张带有入站允许列表身份的客户端证书，并让它以自己的身份调用 `ate-api-server`。这样它就不必为每个请求去访问 Kubernetes API server。
 
-Choose the idle time from the resume cost of your actor. With a resume of 0.25 seconds, 30 seconds of idle time is safe. With a resume of 5 seconds, a short idle time makes many users wait, and a long one keeps workers full.
+空闲时间要根据 actor 的恢复代价来选。恢复只要 0.25 秒时，30 秒的空闲时间是安全的。恢复要 5 秒时，空闲时间太短会让许多用户等待，太长又会让 worker 一直占满。
 
-Suspend in the default asynchronous mode, as the demo does. Then read [Snapshot fidelity, and where a snapshot lives](#s-snapshot-fidelity-and-where-a-snapshot-lives) for what a node loss costs in the first 5 minutes.
+挂起请使用默认的异步模式，就像示例那样。然后阅读[快照保真度，以及快照存放在哪里](#s-snapshot-fidelity-and-where-a-snapshot-lives)，了解节点丢失在最初 5 分钟内的代价。
 
 ```takeaways
-- Put one component in the request path that records the last request for each actor.
-- Suspend an actor only when it has no open request and has been quiet for your idle time.
-- Send all actor traffic through that component, or it suspends actors that are in use.
-- Choose the idle time from the measured resume time of your own actor.
+- 在请求路径上放一个组件，记录每个 actor 最近一次请求的时间。
+- 只在 actor 没有未完成请求，且已安静达到你设定的空闲时间后才挂起它。
+- 让所有 actor 流量都经过这个组件，否则它会挂起正在使用的 actor。
+- 根据你自己 actor 实测的恢复时间来选择空闲时间。
 ```
 
-Sources: capture/lab/N-demos/idle-suspender/suspender.tsv, capture/lab/N-demos/idle-suspender/requests-with-suspender.tsv, capture/lab/N-demos/idle-suspender/requests-without-suspender.tsv, capture/lab/N-demos/idle-suspender/capacity-requests-with-suspender.tsv, capture/lab/summary/demos-x86.json, capture/demos/idle-suspender/suspender.py, capture/demos/idle-suspender/run.sh, docs/metrics/registry/metrics.yaml at v1.0.0, docs/guides/observability.md at v1.0.0
+来源：capture/lab/N-demos/idle-suspender/suspender.tsv, capture/lab/N-demos/idle-suspender/requests-with-suspender.tsv, capture/lab/N-demos/idle-suspender/requests-without-suspender.tsv, capture/lab/N-demos/idle-suspender/capacity-requests-with-suspender.tsv, capture/lab/summary/demos-x86.json, capture/demos/idle-suspender/suspender.py, capture/demos/idle-suspender/run.sh, docs/metrics/registry/metrics.yaml at v1.0.0, docs/guides/observability.md at v1.0.0

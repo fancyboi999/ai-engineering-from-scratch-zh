@@ -26,18 +26,18 @@ const two = s => s.toFixed(2);
 
 module.exports = figure('fig-4-4', {
   height: 300,
-  title: 'Requests to a full pool against the 5 second parking budget',
-  desc: `Four rows on a time axis from 0 to 6 seconds, with a dashed line at the 5 second parking budget. Two requests to a pool with a free worker return 200 in ${two(Math.min(...free))} and ${two(Math.max(...free))} seconds. ${refused.length} requests to a full pool each wait ${two(Math.min(...refused))} to ${two(Math.max(...refused))} seconds and return 503. One parked request returns 200 in ${two(served)} seconds, because a worker became free ${two(freed)} seconds into its wait. In a ${run.seconds} second load run, ${run.ok} of ${run.requests} requests were served, in ${two(run.ok_average_seconds)} seconds on average and ${two(run.ok_slowest_seconds)} seconds at the slowest.`,
+  title: '池满时的请求表现与 5 秒暂存预算',
+  desc: `0 至 6 秒时间轴上的四行对比，5 秒暂存预算处绘有虚线。发往有空闲 worker 池的两个请求分别在 ${two(Math.min(...free))} s 与 ${two(Math.max(...free))} s 返回 200。发往满池的 ${refused.length} 个请求各自等待 ${two(Math.min(...refused))} 至 ${two(Math.max(...refused))} s 后返回 503。一个暂存的请求在 ${two(served)} s 返回 200，因为等待 ${two(freed)} s 时腾出了一个 worker。在 ${run.seconds} s 压测运行中，${run.requests} 个请求完成了 ${run.ok} 个，平均耗时 ${two(run.ok_average_seconds)} s，最慢 ${two(run.ok_slowest_seconds)} s。`,
 }, f => {
   const rows = [
-    { name: 'free worker', note: 'p1 and p2, no wait', hue: 'green', end: Math.max(...free), dots: free, label: `200 in ${two(Math.min(...free))} and ${two(Math.max(...free))} s` },
-    { name: 'full pool', note: `${refused.length} requests, no worker`, hue: 'rose', end: Math.max(...refused), dots: refused, label: `503 in ${two(Math.min(...refused))} to ${two(Math.max(...refused))} s`, above: true },
-    { name: 'full pool', note: 'p3, then p1 suspends', hue: 'green', end: served, dots: [served], label: `200 in ${two(served)} s`, mark: freed },
-    { name: 'load run, 30 s', note: `${run.ok} of ${run.requests} served`, hue: 'green', end: run.ok_slowest_seconds, dots: [run.ok_slowest_seconds], label: `slowest ${two(run.ok_slowest_seconds)} s`, average: run.ok_average_seconds, light: true },
+    { name: '有空闲 worker', note: 'p1 与 p2，无等待', hue: 'green', end: Math.max(...free), dots: free, label: `${two(Math.min(...free))} 与 ${two(Math.max(...free))} s 返回 200` },
+    { name: '池已满', note: `${refused.length} 个请求，无空闲 worker`, hue: 'rose', end: Math.max(...refused), dots: refused, label: `${two(Math.min(...refused))} 至 ${two(Math.max(...refused))} s 返回 503`, above: true },
+    { name: '池已满', note: 'p3 等待时 p1 挂起', hue: 'green', end: served, dots: [served], label: `${two(served)} s 返回 200`, mark: freed },
+    { name: '压测运行，30 s', note: `完成 ${run.ok} / ${run.requests}`, hue: 'green', end: run.ok_slowest_seconds, dots: [run.ok_slowest_seconds], label: `最慢 ${two(run.ok_slowest_seconds)} s`, average: run.ok_average_seconds, light: true },
   ];
   for (let s = 1; s <= 6; s += 1) f.rule(x(s), 34, x(s), AXIS, { hue: 'ink-mute', opacity: 0.2 });
   f.rule(x(BUDGET), 26, x(BUDGET), AXIS, { hue: 'amber', dash: 'dashed', width: 1.4 });
-  f.text(x(BUDGET) - 6, 22, 'parking budget 5 s', { size: 11, hue: 'amber', anchor: 'end', weight: 700 });
+  f.text(x(BUDGET) - 6, 22, '暂存预算 5 s', { size: 11, hue: 'amber', anchor: 'end', weight: 700 });
   rows.forEach((row, index) => {
     const y = 48 + index * 52;
     f.text(20, y + 8, row.name, { size: 12, weight: 700 });
@@ -48,11 +48,11 @@ module.exports = figure('fig-4-4', {
     else f.text(x(row.end) + 10, y + 12, row.label, { size: 11.5, hue: row.hue, weight: 700, knock: true });
     if (row.mark) {
       f.rule(x(row.mark), y - 5, x(row.mark), y + 21, { hue: 'violet', width: 1.6 });
-      f.text(x(row.mark), y + 34, `worker free at ${two(row.mark)} s, answer ${two(row.end - row.mark)} s later`, { size: 11, hue: 'violet', anchor: 'middle', knock: true });
+      f.text(x(row.mark), y + 34, `${two(row.mark)} s 腾出 worker，${two(row.end - row.mark)} s 后返回`, { size: 11, hue: 'violet', anchor: 'middle', knock: true });
     }
     if (row.average) {
       f.rule(x(row.average), y - 5, x(row.average), y + 21, { hue: 'green', width: 1.6 });
-      f.text(x(row.average) + 6, y + 34, `average ${two(row.average)} s`, { size: 11, hue: 'green', knock: true });
+      f.text(x(row.average) + 6, y + 34, `平均 ${two(row.average)} s`, { size: 11, hue: 'green', knock: true });
     }
   });
   f.rule(x(0), 34, x(0), AXIS, { hue: 'ink' });
@@ -61,5 +61,5 @@ module.exports = figure('fig-4-4', {
     f.rule(x(s), AXIS, x(s), AXIS + 5, { hue: 'ink' });
     f.text(x(s), AXIS + 18, String(s), { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.text(x(3), AXIS + 38, 'seconds from the start of the request to its answer', { size: 11.5, serif: true, hue: 'ink-soft', anchor: 'middle' });
+  f.text(x(3), AXIS + 38, '从请求发出到收到响应的秒数', { size: 11.5, serif: true, hue: 'ink-soft', anchor: 'middle' });
 });

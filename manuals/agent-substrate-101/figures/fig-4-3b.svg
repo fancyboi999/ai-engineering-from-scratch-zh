@@ -1,31 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 318" role="img" aria-labelledby="fig-4-3b-title fig-4-3b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-3b-title">A suspended actor after its node stops</title>
-  <desc id="fig-4-3b-desc">A timeline of 476 seconds after the node multi-worker2 was stopped, on a cluster with two worker nodes. The actor u1 was suspended on that node with its snapshot complete in the object store. The two workers of the node stay listed as active for 43 seconds and are then marked unavailable. Their pods are evicted after 5 min 43 s. The actor is in the resuming state on the stopped node from the first request, and 43 requests fail in that time. At 5 min 44 s the actor is crashed, and the next 57 requests fail at once. The actor never moves to the other node.</desc>
-  <text x="20" y="50" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">node</text>
+  <title id="fig-4-3b-title">所在节点停止后，已挂起 actor 的状态变化</title>
+  <desc id="fig-4-3b-desc">双 worker 节点集群中，节点 multi-worker2 停止后 476 秒的时间线。actor u1 原本在该节点挂起，且快照已完整上传至对象存储。该节点的两个 worker 在前 43 秒仍列为活跃，随后被标为不可用；它们的 pod 在 5 分 43 秒 后被驱逐。从首次请求开始，actor 在已停节点上处于 RESUMING，其间 43 次请求失败。到 5 分 44 秒 时 actor 进入 CRASHED，随后 57 次请求立即失败。actor 始终未迁移到另一节点。</desc>
+  <text x="20" y="50" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">节点</text>
   <text x="20" y="64" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">multi-worker2</text>
   <rect x="132" y="40" width="10.35" height="14" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <rect x="142.35" y="40" width="465.55" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
-  <text x="148.35" y="34" font-size="11" fill="var(--m-rose-ink, #b0344d)">docker stop, the node is gone after 10 s</text>
-  <text x="603.9" y="68" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">started again at 7 min 56 s</text>
-  <text x="20" y="106" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">its 2 workers</text>
-  <text x="20" y="120" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">in the API list</text>
+  <text x="148.35" y="34" font-size="11" fill="var(--m-rose-ink, #b0344d)">docker stop，10 s 后节点停止</text>
+  <text x="603.9" y="68" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">7 分 56 秒 重新启动</text>
+  <text x="20" y="106" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">其上 2 个 worker</text>
+  <text x="20" y="120" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">API 列表中</text>
   <rect x="132" y="96" width="42.67" height="14" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="174.67" y="96" width="300.1" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
   <line x1="174.67" y1="88" x2="174.67" y2="118" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="180.67" y="90" font-size="11" fill="var(--m-rose-ink, #b0344d)">WORKER_STATE_UNAVAILABLE after 43 s</text>
+  <text x="180.67" y="90" font-size="11" fill="var(--m-rose-ink, #b0344d)">43 s 后标为 WORKER_STATE_UNAVAILABLE</text>
   <line x1="474.77" y1="88" x2="474.77" y2="118" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="468.77" y="124" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">pods evicted, 5 min 43 s</text>
+  <text x="468.77" y="124" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">pod 被驱逐，5 分 43 秒</text>
   <text x="132" y="124" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">ACTIVE</text>
   <text x="20" y="162" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">actor u1</text>
-  <text x="20" y="176" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">suspended, sync</text>
+  <text x="20" y="176" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已同步挂起</text>
   <rect x="132" y="152" width="10.58" height="14" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <rect x="142.58" y="152" width="333.17" height="14" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <rect x="475.75" y="152" width="132.15" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="148.58" y="146" font-size="11" fill="var(--m-amber-ink, #85590c)">RESUMING on the stopped node, 5 min 33 s</text>
+  <text x="148.58" y="146" font-size="11" fill="var(--m-amber-ink, #85590c)">在已停节点上 RESUMING，持续 5 分 33 秒</text>
   <line x1="475.75" y1="150" x2="475.75" y2="174" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="469.75" y="180" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">ACTOR_STATE_CRASHED at 5 min 44 s</text>
-  <text x="20" y="218" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">requests</text>
-  <text x="20" y="232" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one bar for each</text>
+  <text x="469.75" y="180" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">5 分 44 秒 进入 ACTOR_STATE_CRASHED</text>
+  <text x="20" y="218" font-size="11.5" font-weight="700" fill="var(--m-ink, #1a1a1a)">请求</text>
+  <text x="20" y="232" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次一条竖线</text>
   <rect x="142.58" y="208" width="10.06" height="14" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="154.87" y="208" width="7.78" height="14" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="164.88" y="208" width="10.06" height="14" fill="var(--m-rose-ink, #b0344d)"/>
@@ -126,28 +126,28 @@
   <rect x="599.81" y="208" width="1.2" height="14" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="602.1" y="208" width="1.2" height="14" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="604.41" y="208" width="1.2" height="14" fill="var(--m-rose-ink, #b0344d)"/>
-  <text x="142.58" y="238" font-size="11" fill="var(--m-rose-ink, #b0344d)">2 times 504 after 10 s, 41 times 503</text>
+  <text x="142.58" y="238" font-size="11" fill="var(--m-rose-ink, #b0344d)">2 次 10 s 后 504，41 次 503</text>
   <text x="142.58" y="252" font-size="11" fill="var(--m-rose-ink, #b0344d)">actor lab-n/u1 unavailable</text>
-  <text x="612" y="238" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">57 times 503 at once</text>
+  <text x="612" y="238" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">57 次立即返回 503</text>
   <text x="612" y="252" font-size="11" text-anchor="end" fill="var(--m-rose-ink, #b0344d)">AssignWorker prerequisite not met</text>
   <line x1="132" y1="272" x2="612" y2="272" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="132" y1="268" x2="132" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="132" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="192" y1="268" x2="192" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="192" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1 min</text>
+  <text x="192" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1 分</text>
   <line x1="252" y1="268" x2="252" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="252" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">2 min</text>
+  <text x="252" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">2 分</text>
   <line x1="312" y1="268" x2="312" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="312" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">3 min</text>
+  <text x="312" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">3 分</text>
   <line x1="372" y1="268" x2="372" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="372" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4 min</text>
+  <text x="372" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4 分</text>
   <line x1="432" y1="268" x2="432" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="432" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">5 min</text>
+  <text x="432" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">5 分</text>
   <line x1="492" y1="268" x2="492" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="492" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">6 min</text>
+  <text x="492" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">6 分</text>
   <line x1="552" y1="268" x2="552" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="552" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">7 min</text>
+  <text x="552" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">7 分</text>
   <line x1="612" y1="268" x2="612" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="612" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">8 min</text>
-  <text x="20" y="310" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Time from the stop command. The other node had two active workers with room.</text>
+  <text x="612" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">8 分</text>
+  <text x="20" y="310" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">时间自停止命令算起。另一节点上有两个带空闲容量的活跃 worker。</text>
 </svg>

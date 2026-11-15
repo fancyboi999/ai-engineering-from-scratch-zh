@@ -1,20 +1,20 @@
-# One request, from the client to the actor and back
+# 一个请求，从客户端到 actor 再返回
 
-> A request to a suspended actor passes the proxy, `atenet-router`, `ate-api-server`, and Postgres before a worker restores the actor, and a request to a running actor still asks all four.
+> 发往已挂起 actor 的请求会依次经过代理、`atenet-router`、`ate-api-server` 和 Postgres，worker 才恢复 actor，而发往运行中 actor 的请求仍然要询问这四个组件。
 
-You sent `curl -X POST http://localhost:8000/` and a count came back. Six programs handled that request, and one of them wrote to a database before the actor ran. When a request fails later, the error text names one of those programs, so you need to know the order.
+你发送 `curl -X POST http://localhost:8000/`，请求便返回了一个计数值。六个程序参与了这次处理，其中一个在 actor 运行前就向数据库写入了记录。之后请求若失败，错误文本会点出其中某个程序，因此你需要清楚它们的顺序。
 
-When you finish this section, you can name each hop of one request and say which hops a running actor skips. You can also say which parts of the cluster must be up for a request to pass.
+读完本节，你能说出一个请求的每一跳，并指出运行中的 actor 会跳过哪几跳。你还能说出集群里哪些部分必须在线，请求才能通过。
 
-## The recording
+## 录制记录 {#s-one-request-from-client-to-actor-the-recording}
 
-We created `my-counter-1` in the atespace `ate-demo-counter` and started `kubectl ate proxy`. Then we sent five requests, one after the other. This is the start of the recording. The columns are the time, the event, the HTTP status, the seconds at the client, and the body.
+我们在 atespace `ate-demo-counter` 里创建了 `my-counter-1`，并启动了 `kubectl ate proxy`。随后我们依次发了五个请求。这是录制记录的开头。各列依次是时间、事件、HTTP 状态、客户端耗时的秒数和响应体。
 
 ```listing
-title: five requests to a new actor
+title: 发往新 actor 的五个请求
 source: capture/lab/B-lifecycle/10-trace.tsv
 lang: text
-note: The first eight lines of the trace. The actor state was read before the first request and after the fifth.
+note: 追踪记录的前八行。第一个请求之前和第五个请求之后都读取了 actor 状态。
 ---
 ts	event	detail
 2026-11-12T10:14:21.286Z	state	ACTOR_STATE_SUSPENDED	-
@@ -26,39 +26,39 @@ ts	event	detail
 2026-11-12T10:14:22.203Z	state	ACTOR_STATE_RUNNING	-
 ```
 
-**We measured** these requests on an x86 server guest with 24 vCPU and 47 GB, through `kubectl ate proxy`, in one run. The first request took 0.358 s. The next four took 0.091 s, 0.067 s, 0.062 s, and 0.068 s.
+**我们测得**这些请求，在一台 24 vCPU、47 GB 的 x86 服务器客户机上，通过 `kubectl ate proxy` 运行了一次。第一个请求用了 0.358 秒。接下来四个分别用了 0.091 秒、0.067 秒、0.062 秒和 0.068 秒。
 
-The actor was `ACTOR_STATE_SUSPENDED` before the first request and `ACTOR_STATE_RUNNING` after the fifth. No command resumed it. The first request did.
+第一个请求之前，actor 处于 `ACTOR_STATE_SUSPENDED`，第五个请求之后处于 `ACTOR_STATE_RUNNING`。没有任何命令主动恢复它，是第一个请求触发了恢复。
 
-## Hop by hop
+## 逐跳解读 {#s-one-request-from-client-to-actor-hop-by-hop}
 
-[Figure 1.2](#fig-1-2) draws the first request. The numbers in this list match the rows of the figure.
+[图 1.2](#fig-1-2) 画出了第一个请求。下面列表里的编号与图中的行对应。
 
 ```figure
 id: fig-1-2
 kind: sequence
-title: the first request to my-counter-1
-claim: The first request to a suspended actor makes the router call ResumeActor, and ate-api-server restores the actor before the request reaches it.
-caption: Read the rows from top to bottom. The drawing above each lifeline is its party, with the mark of its project. Row 2 is the only one that passes kube-apiserver. Rows 5 and 6 have amber numbers because a request to a running actor skips them. The note under row 6 is the restore time of a later resume of the same actor. From capture/lab/B-lifecycle/10-trace.tsv, capture/lab/B-lifecycle/12-actor-running.json, and capture/lab/B-lifecycle/27-lifecycle.log.
+title: 发往 my-counter-1 的第一个请求
+claim: 对已挂起 actor 的第一个请求会让 router 调用 ResumeActor，由 ate-api-server 在请求到达之前恢复 actor。
+caption: 从上到下读每一行。每条生命线上方的图形代表对应的参与方，并带有所属项目的标记。第 2 行是唯一经过 kube-apiserver 的一行。第 5 行和第 6 行的编号是琥珀色，因为发往运行中 actor 的请求会跳过它们。第 6 行下方的注释是同一个 actor 之后一次恢复的恢复时间。来源：capture/lab/B-lifecycle/10-trace.tsv、capture/lab/B-lifecycle/12-actor-running.json、capture/lab/B-lifecycle/27-lifecycle.log。
 ```
 
-1. `curl` sends the request to `127.0.0.1:8000`, where `kubectl ate proxy` listens.
-2. The proxy opens a port-forward through the Kubernetes API server to `atenet-router`. Inside that port-forward it opens an mTLS CONNECT tunnel to router port 8444, with a client certificate {{code}}.
-3. The router reads the target actor and calls `ResumeActor` on `ate-api-server`. It does so for every request, because it keeps no record of where an actor runs {{code}}. Requests that arrive at the same time for one actor share one call.
-4. `ate-api-server` reads the actor row from Postgres. The state is `ACTOR_STATE_SUSPENDED`.
-5. `ate-api-server` takes a lease on the actor, chooses a worker with room, and writes the assignment to Postgres in one transaction {{code}}.
-6. `ate-api-server` tells `atelet` on that node to restore the snapshot. The worker starts the sandbox from it, and the actor state becomes `ACTOR_STATE_RUNNING`.
-7. `ate-api-server` returns the actor to the router, with the IP address of the worker pod and the identity of the worker.
-8. The router opens a tunnel to port 8443 of the worker pod and checks that identity. The worker forwards the request to port 80 of the actor {{code}}.
-9. The reply goes back the same way.
+1. `curl` 把请求发到 `127.0.0.1:8000`，`kubectl ate proxy` 在那里监听。
+2. 代理通过 Kubernetes API server 打开一条到 `atenet-router` 的端口转发。在这条端口转发内部，它携带客户端证书，向 router 的 8444 端口打开一条 mTLS CONNECT 隧道 {{code}}。
+3. router 读出目标 actor，对 `ate-api-server` 调用 `ResumeActor`。每个请求它都这样做，因为它不记录 actor 在哪里运行 {{code}}。同时到达、发往同一个 actor 的请求共用一次调用。
+4. `ate-api-server` 从 Postgres 读出 actor 的记录行。状态是 `ACTOR_STATE_SUSPENDED`。
+5. `ate-api-server` 对 actor 加租约，选一个有空位的 worker，并在一个事务里把分配结果写入 Postgres {{code}}。
+6. `ate-api-server` 通知那个节点上的 `atelet` 恢复快照。worker 用它启动沙箱，actor 状态变成 `ACTOR_STATE_RUNNING`。
+7. `ate-api-server` 把 actor 返回给 router，同时带上 worker pod 的 IP 地址和 worker 的身份。
+8. router 向 worker pod 的 8443 端口打开一条隧道，并校验这个身份。worker 将请求转发至 actor 的 80 端口 {{code}}。
+9. 响应沿原路返回。
 
-A new actor has never run, so the snapshot in step 6 is not its own. It is the golden snapshot of its template, and [section 3.1](#s-actortemplate-and-the-golden-snapshot) explains it. After step 7 the actor object carries the assignment:
+新 actor 从未运行过，所以第 6 步里的快照不是它自己的。它是它所用模板的黄金快照，[第 3.1 节](#s-actortemplate-and-the-golden-snapshot)会解释。第 7 步之后，actor 对象带上了分配结果：
 
 ```listing
-title: the actor after the first request
+title: 第一个请求之后的 actor
 source: capture/lab/B-lifecycle/12-actor-running.json
 lang: json
-note: Cut from the actor object. The metadata, the snapshot list, and the sandbox version attributes are cut.
+note: 截自 actor 对象。元数据、快照列表和沙箱版本属性已截去。
 ---
     "state": "ACTOR_STATE_RUNNING",
     "workerAssignment": {
@@ -75,66 +75,66 @@ note: Cut from the actor object. The metadata, the snapshot list, and the sandbo
       "workerSpiffeId": "spiffe://cluster.local/ns/ate-demo-counter/sa/ateworker"
 ```
 
-## Where the 0.36 s goes
+## 0.36 秒花在哪里 {#s-one-request-from-client-to-actor-where-the-0-36-s-goes}
 
-The first request paid for the restore. The four after it did not. The difference is about 0.29 s on this guest, for an actor that holds almost no memory.
+第一个请求为恢复付了代价，之后的四个没有。在这台客户机上，对一个几乎不占内存的 actor，差值约为 0.29 秒。
 
-The worker writes one log line when a restore starts and one when it ends. We did not save that log for the first request. We saved it for a later resume of the same actor:
+worker 在恢复开始时写一行日志，结束时再写一行。我们没有保存第一个请求的那份日志，保存的是同一个 actor 之后一次恢复的日志：
 
 ```listing
-title: one restore in the lifecycle log
+title: 生命周期日志里的一次恢复
 source: capture/lab/B-lifecycle/27-lifecycle.log
 lang: text
-note: The span and trace fields of each line are cut.
+note: 每行的 span 和 trace 字段已截去。
 ---
 {"time":"2026-11-12T10:30:17.846333794Z","message":"Actor restoring",…
 {"time":"2026-11-12T10:30:18.098955499Z","message":"Actor restored",…
 ```
 
-**We measured** that resume on the same guest, once. The two log lines are 0.253 s apart, and the request that caused the restore took 0.382 s at the client. So about two thirds of a first request is the restore itself.
+**我们测得**那次恢复，在同一台客户机上运行了一次。两行日志相隔 0.253 秒，而触发这次恢复的请求在客户端用了 0.382 秒。因此首次请求大约有三分之二的时间花在恢复本身。
 
-That share grows with the actor. A restore reads the memory that the actor held, and [section 3.3](#s-suspendactor-and-resumeactor) shows 2.16 s for an actor with 1000 MiB.
+这个占比会随 actor 增大。恢复要读取 actor 持有的内存，[第 3.3 节](#s-suspendactor-and-resumeactor)展示了 1000 MiB 的 actor 需要 2.16 秒。
 
-## A request to a running actor
+## 对运行中 actor 的请求 {#s-one-request-from-client-to-actor-a-request-to-a-running-actor}
 
-A request to a running actor still does steps 1 to 4. `ate-api-server` reads the row, finds `ACTOR_STATE_RUNNING`, and returns at once {{code}}. Steps 5 and 6 do not happen. So a request costs one call to `ate-api-server` and one read from Postgres, also when nothing is resumed. Requests that arrive together for one actor share that call.
+对运行中 actor 的请求仍然要走第 1 到 4 步。`ate-api-server` 读出这一行，发现是 `ACTOR_STATE_RUNNING`，立即返回 {{code}}。第 5 步和第 6 步不会发生。所以即使什么都不用恢复，一个请求也要付出一次对 `ate-api-server` 的调用和一次对 Postgres 的读取。同时到达、发往同一个 actor 的请求共用这次调用。
 
-Most of the 0.06 s in our recording is the proxy, not Substrate.
+我们录制中的 0.06 秒，大部分是代理的耗时，不是 Substrate 的。
 
-**We measured** both paths on the second x86 guest, with 16 vCPU and 23 GB, in the 30 s before a test. A pod that sent its requests to the router answered in 0.027 s at the median, with 30 requests. The same actor through `kubectl ate proxy` answered in 0.067 s at the median, with 28 requests.
+**我们测得**两条路径的性能，在第二台 x86 客户机（16 vCPU、23 GB）上取一次测试前的 30 秒。集群内直接请求 router 的 pod，在 30 个请求中应答时间中位数是 0.027 秒。通过 `kubectl ate proxy` 访问同一个 actor，在 28 个请求中应答时间中位数是 0.067 秒。
 
-Use the number from the pod when you plan latency. The proxy is a tool for your own machine, and [section 2.3](#s-your-first-actor-and-the-proxy) shows why it must not carry real traffic.
+规划延迟时，请用 pod 里测得的数字。代理是给你自己机器用的工具，[第 2.3 节](#s-your-first-actor-and-the-proxy)说明了为什么它不能承载真实流量。
 
-## What must be up
+## 哪些必须在线 {#s-one-request-from-client-to-actor-what-must-be-up}
 
-Three things follow from the path.
+这条路径带来三点结论。
 
-- **Postgres and `ate-api-server` are on every request path.** A running actor that needs no resume still fails when either one is down. On our second guest, requests to a running actor failed within seconds of each outage. [Section 8.2](#s-when-a-dependency-is-down) has the timeline.
-- **The Kubernetes API server is on no request path.** Only row 2 of the figure passes it, and that row belongs to the proxy. In the same test, kube-apiserver was down for 86 s. In that time 103 of 103 requests from a pod were served: 86 to a running actor and 17 resumes.
-- **The object store is on the path only when a snapshot is not on the node.** [Section 3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives) says when that is.
+- **Postgres 和 `ate-api-server` 在每条请求路径上。** 一个不需要恢复的运行中 actor，在二者任一宕机时仍然会失败。在我们的第二台客户机上，每次故障后几秒内，发往运行中 actor 的请求就失败了。[第 8.2 节](#s-when-a-dependency-is-down)有时间线。
+- **Kubernetes API server 不在任何请求路径上。** 只有图中的第 2 行经过它，而那一行属于代理。在同一次测试里，kube-apiserver 宕机了 86 秒。这段时间里，来自 pod 的 103 个请求中有 103 个得到了响应：86 个发往运行中的 actor，17 个触发了恢复。
+- **只有快照不在节点上时，对象存储才在路径上。** [第 3.4 节](#s-snapshot-fidelity-and-where-a-snapshot-lives)说明了什么时候会这样。
 
-The install runs one `atenet-router` pod and one Postgres pod. Every request to every actor passes both. [Section 8.1](#s-postgres-and-the-object-store) says what to do about Postgres.
+安装会运行一个 `atenet-router` pod 和一个 Postgres pod。每个 actor 的每个请求都要经过这两者。[第 8.1 节](#s-postgres-and-the-object-store)说明了 Postgres 该怎么处理。
 
-## The actor stays up
+## actor 保持运行 {#s-one-request-from-client-to-actor-the-actor-stays-up}
 
-After the fifth request we sent nothing for 900 s. [Figure 1.2b](#fig-1-2b) shows all six requests of the recording, and every state sample between the last two.
+第五个请求之后，我们 900 秒没有发送任何请求。[图 1.2b](#fig-1-2b) 展示了录制中的全部六个请求，以及最后两个请求之间的每个状态样本。
 
 ```figure
 id: fig-1-2b
 kind: chart
-title: six requests to my-counter-1, and its state for 900 idle seconds
-claim: Only the first request paid for a resume, and the request after 900 idle seconds was as fast as the others because the actor never stopped.
-caption: Each bar is the time of one request at the client. The amber bar includes the resume from the golden snapshot, and the dashed line is the median of requests 2 to 5. Each dot in the lower part is one state sample from the 900 seconds with no request. From capture/lab/B-lifecycle/10-trace.tsv.
+title: 发往 my-counter-1 的六个请求，以及它在 900 秒空闲期间的状态
+claim: 只有第一个请求为恢复付出了代价，空闲 900 秒之后的请求和其他请求一样快，因为 actor 从未停止过。
+caption: 每根柱子是一个请求在客户端的耗时。琥珀色柱子包含从黄金快照恢复的时间，虚线是第 2 到 5 个请求的中位数。下半部分的每个点是 900 秒无请求期间的一个状态样本。来源：capture/lab/B-lifecycle/10-trace.tsv。
 ```
 
-The sixth request took 0.080 s and returned count 6. A resume would have cost about 0.36 s. The actor was never suspended, and it held its worker for the whole 15 minutes. [Section 1.1](#s-what-substrate-does-and-what-it-leaves-to-you) names this as the first job that Substrate leaves to you.
+第六个请求用了 0.080 秒，返回计数 6。一次恢复大约会花 0.36 秒。这个 actor 从未被挂起，在整整 15 分钟里一直占着它的 worker。[第 1.1 节](#s-what-substrate-does-and-what-it-leaves-to-you)把这一点列为 Substrate 留给你的第一项工作。
 
 ```takeaways
-- Read an error from the router as a reply from ate-api-server, because the router asks it for every request.
-- Plan latency from a pod that calls the router, not from kubectl ate proxy.
-- Keep Postgres and ate-api-server healthy before anything else, because every request needs both.
-- Expect the first request to a suspended actor to cost one restore.
-- Suspend an actor yourself when its work is done.
+- 把来自 router 的错误当作 ate-api-server 的回复来读，因为 router 每个请求都要问它。
+- 根据调用 router 的 pod 来规划延迟，不要用 kubectl ate proxy。
+- 优先让 Postgres 和 ate-api-server 保持健康，因为每个请求都需要两者。
+- 预期对已挂起 actor 的第一个请求要付出一次恢复的代价。
+- actor 的工作完成后，自己去挂起它。
 ```
 
-Sources: capture/lab/B-lifecycle/10-trace.tsv, capture/lab/B-lifecycle/12-actor-running.json, capture/lab/B-lifecycle/27-lifecycle.log, capture/lab/B-lifecycle/20-trace-ops.tsv, capture/lab/B-lifecycle/01-proxy.log, capture/lab/summary/dependency-loss-x86.json, capture/lab/E-dependency-loss/20-analysis.txt, capture/lab/E-dependency-loss/12-probe-proxy.tsv, capture/lab/E-dependency-loss/12-probe-incluster.tsv, capture/lab/summary/resume-x86.json; cmd/atenet/internal/router/ingress, cmd/ateapi workflow_resume.go, internal/ateclient/router.go, cmd/kubectl-ate/internal/cmd/proxy.go, and docs/concepts/architecture.md at v1.0.0.
+来源：capture/lab/B-lifecycle/10-trace.tsv, capture/lab/B-lifecycle/12-actor-running.json, capture/lab/B-lifecycle/27-lifecycle.log, capture/lab/B-lifecycle/20-trace-ops.tsv, capture/lab/B-lifecycle/01-proxy.log, capture/lab/summary/dependency-loss-x86.json, capture/lab/E-dependency-loss/20-analysis.txt, capture/lab/E-dependency-loss/12-probe-proxy.tsv, capture/lab/E-dependency-loss/12-probe-incluster.tsv, capture/lab/summary/resume-x86.json; cmd/atenet/internal/router/ingress, cmd/ateapi workflow_resume.go, internal/ateclient/router.go, cmd/kubectl-ate/internal/cmd/proxy.go, and docs/concepts/architecture.md at v1.0.0.

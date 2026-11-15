@@ -18,11 +18,11 @@ const actors = Math.max(...kagent.parallel_workers.map(sample => sample.actors))
 const overhead = (kagent.resume_seconds.turns_only.median + kagent.suspend_seconds.median).toFixed(2);
 
 const questions = [
-  { ask: 'Does the agent run on CPU only?', proof: 'an actor cannot use a GPU at v1.0.0', choice: 'a pod for each agent', why: 'on a GPU node', hue: 'grey' },
-  { ask: 'Is the agent idle most of the time?', proof: 'a busy actor holds its worker all day', choice: 'a pod for each agent', why: 'you free no capacity', hue: 'grey' },
-  { ask: 'Must state outlive the idle time?', proof: `a resume took ${at(200)} s at 200 MiB, ${at(1000)} s at 1000 MiB`, choice: 'a sandbox for each session', why: 'no snapshot, no object store', hue: 'grey' },
-  { ask: 'Can you operate Postgres?', proof: `Postgres away for ${loss.outage_seconds} s: ${failed} requests failed`, choice: 'a hosted sandbox', why: 'an API and no cluster', hue: 'grey' },
-  { ask: 'Does something call SuspendActor?', proof: `idle for ${idle.seconds} s: still RUNNING in every sample`, choice: 'a harness first', why: 'kagent suspends after each turn', hue: 'plum' },
+  { ask: 'agent 是否仅使用 CPU 运行？', proof: 'v1.0.0 中 actor 无法使用 GPU', choice: '每个 agent 独立 pod', why: '调度在 GPU 节点上', hue: 'grey' },
+  { ask: 'agent 大部分时间是否处于空闲？', proof: '繁忙 actor 会全天独占 worker', choice: '每个 agent 独立 pod', why: '无法释放任何容量', hue: 'grey' },
+  { ask: '状态是否必须跨空闲期保留？', proof: `200 MiB 恢复需 ${at(200)} s，1000 MiB 需 ${at(1000)} s`, choice: '每个会话独立沙箱', why: '无需快照与对象存储', hue: 'grey' },
+  { ask: '你能否运维 Postgres？', proof: `Postgres 中断 ${loss.outage_seconds} s：${failed} 个请求失败`, choice: '托管沙箱服务', why: '直接调 API，无需管集群', hue: 'grey' },
+  { ask: '是否有组件调用 SuspendActor？', proof: `空闲 ${idle.seconds} s：每次采样仍为 RUNNING`, choice: '先引入 harness', why: 'kagent 会在每轮后挂起', hue: 'plum' },
 ];
 const LEFT = 20;
 const WIDE = 356;
@@ -33,24 +33,24 @@ const PITCH = 76;
 
 module.exports = figure('fig-7-4', {
   height: 500,
-  title: 'Five questions that decide if Agent Substrate fits',
-  desc: `Five questions in a column, each with the fact or the run behind it. A no on any question leads right to a simpler choice: a pod for each agent on a GPU node, a pod for each agent, a sandbox for each session, a hosted sandbox, or a harness that must come first. Five yes answers lead to Agent Substrate, where one worker ran ${actors} actors at one time and a kagent turn paid ${overhead} seconds of resume and suspend.`,
+  title: '判断 Agent Substrate 是否适用的五个问题',
+  desc: `按列排列的五个问题及其背后的事实或实测数据。任一问题回答“否”都直接导向更简单的方案：GPU 节点上的单 agent 独立 pod、普通单 agent 独立 pod、单会话独立沙箱、托管沙箱服务，或先引入 harness。五个问题全答“是”则指向 Agent Substrate：实测单个 worker 可同时运行 ${actors} 个 actor，单个 kagent 轮次的恢复与挂起开销共 ${overhead} 秒。`,
 }, f => {
-  f.kicker(LEFT, 20, 'answer in this order');
-  f.kicker(RIGHT, 20, 'on the first no, choose');
+  f.kicker(LEFT, 20, '按此顺序依次判断');
+  f.kicker(RIGHT, 20, '首次答“否”时选择');
   questions.forEach((question, index) => {
     const y = TOP + index * PITCH;
     f.rect(LEFT, y, WIDE, TALL, { fill: color('paper'), stroke: color('ink') });
     f.step(LEFT + 22, y + TALL / 2, index + 1);
     f.text(LEFT + 44, y + 22, question.ask, { size: 12.5, weight: 700 });
     f.text(LEFT + 44, y + 40, question.proof, { size: 11, serif: true, hue: 'ink-soft' });
-    f.arrow([LEFT + WIDE, y + TALL / 2], [RIGHT - 1, y + TALL / 2], { style: 'call', label: 'no' });
+    f.arrow([LEFT + WIDE, y + TALL / 2], [RIGHT - 1, y + TALL / 2], { style: 'call', label: '否' });
     f.box({ x: RIGHT, y: y + 3, w: 200, h: TALL - 6, hue: question.hue, title: question.choice, titleSize: 11.5, sub: question.why, pad: 6 });
-    f.arrow([LEFT + 22, y + TALL], [LEFT + 22, y + PITCH - 1], { style: 'call', label: 'yes' });
+    f.arrow([LEFT + 22, y + TALL], [LEFT + 22, y + PITCH - 1], { style: 'call', label: '是' });
   });
   const y = TOP + questions.length * PITCH;
   f.rect(LEFT, y, 600, 76, { hue: 'blue', strokeWidth: 2.4 });
-  f.text(LEFT + 20, y + 30, 'Choose Agent Substrate', { size: 16, weight: 700, hue: 'blue' });
-  f.text(LEFT + 20, y + 50, 'many stateful actors on few worker pods', { size: 12, serif: true });
-  f.text(LEFT + 20, y + 66, `one worker ran ${actors} actors at one time, and a kagent turn paid ${overhead} s of resume and suspend`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(LEFT + 20, y + 30, '选择 Agent Substrate', { size: 16, weight: 700, hue: 'blue' });
+  f.text(LEFT + 20, y + 50, '在少量 worker pod 上承载大量有状态 actor', { size: 12, serif: true });
+  f.text(LEFT + 20, y + 66, `实测单个 worker 同时运行 ${actors} 个 actor，每个 kagent 轮次的恢复与挂起开销为 ${overhead} s`, { size: 11, serif: true, hue: 'ink-soft' });
 });

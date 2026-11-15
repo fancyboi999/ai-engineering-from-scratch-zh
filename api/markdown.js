@@ -19,7 +19,11 @@ function hubPageRegistry(manifest) {
   return manifest.pages;
 }
 
-function createHandler({ siteRoot = SITE_ROOT, readHubPages = () => JSON.parse(fs.readFileSync(path.join(siteRoot, 'hub-pages.json'), 'utf8')) } = {}) {
+function readSiteFile(relativePath) {
+  return fs.readFileSync(path.join(SITE_ROOT, relativePath), 'utf8');
+}
+
+function createHandler({ readSite = readSiteFile, readHubPages = () => JSON.parse(readSite('hub-pages.json')) } = {}) {
   let hubs;
   return (req, res) => {
   const method = req.method || 'GET';
@@ -73,7 +77,7 @@ function createHandler({ siteRoot = SITE_ROOT, readHubPages = () => JSON.parse(f
     if (type === 'text/markdown') {
       send(404, 'text/markdown', '# 页面不存在\n\n请查看[课程索引](/llms.txt)、[站点地图](/sitemap.xml)或[课程目录](/catalog.html)。\n');
     } else if (type === 'text/html') {
-      send(404, 'text/html', fs.readFileSync(path.join(siteRoot, '404.html'), 'utf8'));
+      send(404, 'text/html', readSite('404.html'));
     } else {
       problem(404, 'Not Found', 'resource_not_found', '请通过 /llms.txt 或 /sitemap.xml 查找公开资源。');
     }
@@ -87,10 +91,10 @@ function createHandler({ siteRoot = SITE_ROOT, readHubPages = () => JSON.parse(f
 
   try {
     if (type === 'text/markdown') {
-      send(200, 'text/markdown', fs.readFileSync(path.join(siteRoot, page.markdown), 'utf8'));
+      send(200, 'text/markdown', readSite(page.markdown));
       return;
     }
-    send(200, 'text/html', fs.readFileSync(path.join(siteRoot, file), 'utf8'));
+    send(200, 'text/html', readSite(file));
   } catch (_) {
     problem(503, 'Service Unavailable', 'content_unavailable', '页面内容暂不可用，请稍后重试。');
   }

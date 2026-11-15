@@ -1,119 +1,119 @@
-# API methods
+# API 方法
 
-> The Substrate API at v1.0.0 is two gRPC services with 50 methods, and four plugin services that a third party can implement.
+> v1.0.0 的 Substrate API 由两个 gRPC 服务和 50 个方法组成，另有四个可由第三方实现的插件服务。
 
-`ate-api-server` serves both services on one port, 443 in the Service named `api` in `ate-system`. The proto package is `substrate.ateapi.v1`, so the full name of a method is `/substrate.ateapi.v1.Control/GetActor`. The Go package is `go.ate.dev/substrate/api/ateapi/v1`. A client authenticates as [section 5.1](#s-client-authentication) describes, and each `Control` method is checked against the access policies of [section 5.2](#s-access-policies).
+`ate-api-server` 在同一个端口上提供这两个服务：`ate-system` 中名为 `api` 的 Service 的 443 端口。proto 包是 `substrate.ateapi.v1`，所以方法的全名形如 `/substrate.ateapi.v1.Control/GetActor`。Go 包是 `go.ate.dev/substrate/api/ateapi/v1`。客户端按[第 5.1 节](#s-client-authentication)的方式认证，每个 `Control` 方法都要按[第 5.2 节](#s-access-policies)的访问策略检查。
 
-The tables give each method, what it does at v1.0.0, and the `kubectl ate` command that calls it. A dash means that the CLI has no command for it. Our runs called every actor method, the egress policy methods, and the create, get, and list methods for templates, atespaces, and workers. `UpdateActor` ran in the template move of [section 3.1](#s-actortemplate-and-the-golden-snapshot). Our runs also created, replaced, and deleted an atespace access policy and read the global one, in [section 5.2](#s-access-policies).
+下面的表格列出每个方法、它在 v1.0.0 中的作用，以及调用它的 `kubectl ate` 命令。表中的 `-` 表示 CLI 没有对应命令。我们的运行调用了每个 actor 方法、出站策略方法，以及模板、atespace 和 worker 的 create、get、list 方法。`UpdateActor` 在[第 3.1 节](#s-actortemplate-and-the-golden-snapshot)的模板迁移中运行过。我们的运行还在[第 5.2 节](#s-access-policies)创建、替换并删除了一个 atespace 访问策略，并读取了全局策略。
 
-Our runs created three tags, started three actors from them, and deleted tags, in [section 3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives). They did not change the scope of a tag.
+我们的运行在[第 3.4 节](#s-snapshot-fidelity-and-where-a-snapshot-lives)创建了三个标签，用它们启动了三个 actor，并删除了标签。运行没有改动标签的作用域。
 
-## Control: actors
+## Control：actors {#s-ref-api-methods-control-actors}
 
-| Method | What it does | `kubectl ate` |
+| 方法 | 作用 | `kubectl ate` |
 |---|---|---|
-| `CreateActor` | Creates an actor from a template or a tag. The new actor is `ACTOR_STATE_SUSPENDED`. | `create actor` |
-| `GetActor` | Returns one actor with its state and snapshots. | `get actor <name>` |
-| `ListActors` | Lists actors in one atespace or in all. | `get actor` |
-| `UpdateActor` | Changes the template or the worker selector of an actor. Needs the `uid` and the `version`. | `update actor` |
-| `SuspendActor` | Checkpoints a running actor to a new snapshot. A suspended actor is returned unchanged. `options.mode` is asynchronous by default. | `suspend actor` |
-| `ResumeActor` | Resumes a suspended actor from its latest snapshot. A running actor is returned unchanged, with `resumed=false`. The router calls it for every request and relies on that reply. | `resume actor` |
-| `RevertActor` | Returns an actor to `ACTOR_STATE_SUSPENDED` at its durable snapshot. Accepts a crashed actor, a running actor, and a suspended actor with a node-local snapshot. Also accepts an actor already in `ACTOR_STATE_REVERTING`, for a retry. In our run that retry worked only after the node of the actor was back. A revert calls `atelet` on the node that the actor is assigned to. It continues without `atelet` only for a suspended actor whose latest snapshot is already durable {{code}}. | `revert actor` |
-| `DeleteActor` | Stops the workload, releases the worker, and removes the record. Accepts any state. | `delete actor` |
-| `MintActorJwt` | Issues a token that states the identity of an actor. Only the egress gateway is allowed to call it. | - |
+| `CreateActor` | 从模板或标签创建 actor。新 actor 处于 `ACTOR_STATE_SUSPENDED`。 | `create actor` |
+| `GetActor` | 返回一个 actor 及其状态和快照。 | `get actor <name>` |
+| `ListActors` | 列出一个 atespace 或全部 atespace 中的 actor。 | `get actor` |
+| `UpdateActor` | 修改 actor 的模板或 worker 选择器。需要 `uid` 和 `version`。 | `update actor` |
+| `SuspendActor` | 把运行中的 actor 检查点到一个新快照。已挂起的 actor 原样返回。`options.mode` 默认是异步。 | `suspend actor` |
+| `ResumeActor` | 从最新快照恢复已挂起的 actor。运行中的 actor 原样返回，并带 `resumed=false`。router 对每个请求都调用它，并依赖这个回复。 | `resume actor` |
+| `RevertActor` | 把 actor 回退到其持久快照对应的 `ACTOR_STATE_SUSPENDED` 状态。接受崩溃的 actor、运行中的 actor，以及只有节点本地快照的已挂起 actor。也接受已处于 `ACTOR_STATE_REVERTING` 的 actor，用于重试。在我们的运行中，这种重试只有等 actor 所在节点恢复后才成功。回退会调用 actor 所分配节点上的 `atelet`。仅当已挂起 actor 的最新快照已经持久时，才会在没有 `atelet` 的情况下继续执行 {{code}}。 | `revert actor` |
+| `DeleteActor` | 停止工作负载，释放 worker，并删除记录。接受任何状态。 | `delete actor` |
+| `MintActorJwt` | 签发一个声明 actor 身份的令牌。只允许出站网关调用。 | - |
 
-## Control: egress policies
+## Control：出站策略 {#s-ref-api-methods-control-egress-policies}
 
-An egress policy is one object under one actor. [Section 6.2](#s-egresspolicy-and-default-deny) explains its rules.
+出站策略是从属于单个 actor 的对象。它的规则见[第 6.2 节](#s-egresspolicy-and-default-deny)。
 
-| Method | What it does | `kubectl ate` |
+| 方法 | 作用 | `kubectl ate` |
 |---|---|---|
-| `CreateActorEgressPolicy` | Creates the policy of an actor. | `create egress-policy <actor> -f` |
-| `GetActorEgressPolicy` | Returns the policy. | `get egress-policy <actor>` |
-| `UpdateActorEgressPolicy` | Replaces the policy. Needs `metadata.uid` and `metadata.version`. | `update egress-policy <actor> -f` |
-| `DeleteActorEgressPolicy` | Deletes the policy. The actor returns to default deny. | `delete egress-policy <actor>` |
+| `CreateActorEgressPolicy` | 创建 actor 的策略。 | `create egress-policy <actor> -f` |
+| `GetActorEgressPolicy` | 返回该策略。 | `get egress-policy <actor>` |
+| `UpdateActorEgressPolicy` | 替换该策略。需要 `metadata.uid` 和 `metadata.version`。 | `update egress-policy <actor> -f` |
+| `DeleteActorEgressPolicy` | 删除该策略。actor 回到默认拒绝。 | `delete egress-policy <actor>` |
 
-## Control: templates, tags, and atespaces
+## Control：模板、标签与 atespace {#s-ref-api-methods-control-templates-tags-and-atespaces}
 
-| Method | What it does | `kubectl ate` |
+| 方法 | 作用 | `kubectl ate` |
 |---|---|---|
-| `CreateActorTemplate` | Creates a template. A reconciler then builds its golden snapshot. | `create actor-template -f` |
-| `GetActorTemplate` | Returns one template with the status of its golden snapshot. | `get actor-template <name>` |
-| `ListActorTemplates` | Lists templates. | `get actor-template` |
-| `DeleteActorTemplate` | Deletes a template, its golden actor, and its golden tag. | `delete actor-template` |
-| `CreateTag` | Gives a name to a copy of the durable snapshot of a suspended actor. Uploads the snapshot first if it is not uploaded. | `create tag --actor` |
-| `GetTag` | Returns one tag. | `get tag <name>` |
-| `ListTags` | Lists tags. | `get tag` |
-| `UpdateTag` | Changes the scope of a tag between `atespace` and `published`. | `update tag --scope` |
-| `DeleteTag` | Deletes a tag and its snapshot. Actors that still start from the tag cannot resume afterwards. It accepts the golden tag of a template, and `create actor` for that template then fails with `Tag not found`. | `delete tag` |
-| `CreateAtespace` | Creates an atespace. | `create atespace` |
-| `GetAtespace` | Returns one atespace. | `get atespace <name>` |
-| `ListAtespaces` | Lists atespaces. | `get atespace` |
-| `DeleteAtespace` | Deletes an empty atespace. Fails while an actor or a tag remains. | `delete atespace` |
+| `CreateActorTemplate` | 创建模板。随后由一个调谐器（reconciler）构建它的黄金快照。 | `create actor-template -f` |
+| `GetActorTemplate` | 返回一个模板及其黄金快照的状态。 | `get actor-template <name>` |
+| `ListActorTemplates` | 列出模板。 | `get actor-template` |
+| `DeleteActorTemplate` | 删除模板、它的黄金 actor 和它的黄金标签。 | `delete actor-template` |
+| `CreateTag` | 为已挂起 actor 持久快照的一份副本命名。如果快照尚未上传，先上传。 | `create tag --actor` |
+| `GetTag` | 返回一个标签。 | `get tag <name>` |
+| `ListTags` | 列出标签。 | `get tag` |
+| `UpdateTag` | 在 `atespace` 与 `published` 之间修改标签的作用域。 | `update tag --scope` |
+| `DeleteTag` | 删除标签及其快照。仍从该标签启动的 actor 此后将无法恢复。它也接受模板的黄金标签，删掉之后对该模板执行 `create actor` 会失败并报 `Tag not found`。 | `delete tag` |
+| `CreateAtespace` | 创建 atespace。 | `create atespace` |
+| `GetAtespace` | 返回一个 atespace。 | `get atespace <name>` |
+| `ListAtespaces` | 列出 atespace。 | `get atespace` |
+| `DeleteAtespace` | 删除空的 atespace。只要还剩 actor 或标签就会失败。 | `delete atespace` |
 
-## Control: workers
+## Control：workers {#s-ref-api-methods-control-workers}
 
-`ate-controller` and `atelet` call most of these. An operator reads workers and rarely writes them.
+这些方法大多由 `ate-controller` 和 `atelet` 调用。运维人员读取 worker，很少写入。
 
-| Method | What it does | `kubectl ate` |
+| 方法 | 作用 | `kubectl ate` |
 |---|---|---|
-| `ListWorkers` | Lists workers with capacity and reserved resources. | `get worker`, `top worker` |
-| `GetWorker` | Returns one worker. | `get worker <name>` |
-| `ListWorkerActorAssignments` | Lists the actors on one worker. | - |
-| `CreateWorker` | Registers a worker when its pod has an address. The worker starts as unavailable. | - |
-| `UpdateWorker` | Updates the pool state that the controller observed. | - |
-| `DeleteWorker` | Removes a worker record. | - |
-| `DrainWorker` | Marks a worker as terminating. The scheduler places no new actor on it. One-way. | - |
-| `MarkWorkerAvailable` | Moves an unavailable worker to active. | - |
-| `MarkWorkerUnavailable` | Moves an active worker to unavailable, for example while its pod is not ready. | - |
+| `ListWorkers` | 列出 worker 及其容量和已预留资源。 | `get worker`、`top worker` |
+| `GetWorker` | 返回一个 worker。 | `get worker <name>` |
+| `ListWorkerActorAssignments` | 列出一个 worker 上的 actor。 | - |
+| `CreateWorker` | 在 worker 的 pod 有地址后注册它。worker 起初为不可用。 | - |
+| `UpdateWorker` | 更新控制器观察到的池状态。 | - |
+| `DeleteWorker` | 删除 worker 记录。 | - |
+| `DrainWorker` | 把 worker 标记为终止中。调度器不再向它放置新 actor。单向不可逆。 | - |
+| `MarkWorkerAvailable` | 把不可用的 worker 改为活跃。 | - |
+| `MarkWorkerUnavailable` | 把活跃的 worker 改为不可用，例如在它的 pod 未就绪时。 | - |
 
-## Control: access policies
+## Control：访问策略 {#s-ref-api-methods-control-access-policies}
 
-| Method | What it does | `kubectl ate` |
+| 方法 | 作用 | `kubectl ate` |
 |---|---|---|
-| `GetGlobalAccessPolicy` | Returns the one policy for the whole install. | `get access-policy --global` |
-| `CreateGlobalAccessPolicy` | Creates it. The owners named at install can always do this. | `create access-policy --global -f` |
-| `UpdateGlobalAccessPolicy` | Replaces it. Empty bindings remove every grant except those of the install owners. | `update access-policy --global -f` |
-| `GetAtespaceAccessPolicy` | Returns the policy of one atespace. | `get access-policy -a` |
-| `CreateAtespaceAccessPolicy` | Creates it. | `create access-policy -a -f` |
-| `UpdateAtespaceAccessPolicy` | Replaces it. | `update access-policy -a -f` |
-| `DeleteAtespaceAccessPolicy` | Deletes it. | `delete access-policy -a` |
+| `GetGlobalAccessPolicy` | 返回整个安装唯一的那份策略。 | `get access-policy --global` |
+| `CreateGlobalAccessPolicy` | 创建它。安装时指定的所有者始终可以执行此操作。 | `create access-policy --global -f` |
+| `UpdateGlobalAccessPolicy` | 替换它。绑定为空时，除安装所有者的授权外，所有授权都会被移除。 | `update access-policy --global -f` |
+| `GetAtespaceAccessPolicy` | 返回一个 atespace 的策略。 | `get access-policy -a` |
+| `CreateAtespaceAccessPolicy` | 创建它。 | `create access-policy -a -f` |
+| `UpdateAtespaceAccessPolicy` | 替换它。 | `update access-policy -a -f` |
+| `DeleteAtespaceAccessPolicy` | 删除它。 | `delete access-policy -a` |
 
-The global policy has no delete method.
+全局策略没有删除方法。
 
-## WorkerService: for atelet only
+## WorkerService：仅供 atelet 使用 {#s-ref-api-methods-workerservice-for-atelet-only}
 
-`atelet` on each node calls these eight methods. A client of yours never does. They explain log lines and states that you see.
+每个节点上的 `atelet` 调用这八个方法。你的客户端从不调用它们。它们能解释你看到的日志行和状态。
 
-| Method | What it does |
+| 方法 | 作用 |
 |---|---|
-| `AcquireWorkerEpoch` | Gives a worker process a new epoch number when it starts. |
-| `RegisterWorker` | Records that the worker process runs under that epoch. Actors from an older epoch become crashed. |
-| `SetWorkerSandboxRuntimes` | Reports which sandbox classes and versions the worker can run and restore. |
-| `MintWorkerActorCertificate` | Issues a certificate for a worker that acts for one actor. Its SPIFFE path starts with `worker-for-actor`, so it is not an identity of the actor itself. |
-| `MintWorkerActorJwt` | Issues a token for a worker that acts for one actor. Its subject is `worker-for-actor/<atespace>/<name>`, and it speaks for the worker. |
-| `RequestActorSuspend` | Asks the control plane to suspend an actor on behalf of the worker. `atelet` forwards the call from a worker-side library, and no binary at v1.0.0 imports that library. So nothing triggers it. |
-| `ReportActorSnapshotState` | Reports that a pending snapshot reached the bucket, or that the actor left the node. |
-| `ReportActorCrashed` | Reports that a sandbox died. The actor moves from running to crashed. |
+| `AcquireWorkerEpoch` | 在 worker 进程启动时，给它一个新的 epoch 编号。 |
+| `RegisterWorker` | 记录该 worker 进程在这个 epoch 下运行。来自旧 epoch 的 actor 会变为崩溃。 |
+| `SetWorkerSandboxRuntimes` | 报告 worker 能运行和恢复哪些沙箱类别及版本。 |
+| `MintWorkerActorCertificate` | 为代表某个 actor 行事的 worker 签发证书。它的 SPIFFE 路径以 `worker-for-actor` 开头，所以它不是 actor 自身的身份。 |
+| `MintWorkerActorJwt` | 为代表某个 actor 行事的 worker 签发令牌。它的 subject 是 `worker-for-actor/<atespace>/<name>`，代表的是 worker。 |
+| `RequestActorSuspend` | 代表 worker 请求控制平面挂起一个 actor。`atelet` 转发来自 worker 侧库的调用，而 v1.0.0 中没有任何二进制导入该库。所以没有东西会触发它。 |
+| `ReportActorSnapshotState` | 报告待处理快照已到达 bucket，或 actor 已离开该节点。 |
+| `ReportActorCrashed` | 报告沙箱已死亡。actor 从运行变为崩溃。 |
 
-## Plugin services
+## 插件服务 {#s-ref-api-methods-plugin-services}
 
-Substrate calls these services over gRPC. The repository includes one implementation of each, and another party can supply its own.
+Substrate 通过 gRPC 调用这些服务。仓库为每个服务带了一个实现，其他方也可以提供自己的实现。
 
-| Service | Methods | Who calls it | Purpose |
+| 服务 | 方法 | 调用方 | 用途 |
 |---|---|---|---|
-| `NodeProvider` | `FetchSnapshot`, `UploadSnapshot` | `atelet` | moves snapshot files between a node and the bucket |
-| `ControlProvider` | `CleanupSnapshot`, `CopySnapshot` | `ate-api-server` | deletes a snapshot, and copies one for a tag |
-| `AssetProvider` | `FetchAsset` | `atelet` | downloads sandbox runtime files |
-| `CredentialProvider` | `FetchSecret` | the egress gateway | returns the secret that replaces a header, as [section 6.5](#s-credential-injection) shows |
+| `NodeProvider` | `FetchSnapshot`、`UploadSnapshot` | `atelet` | 在节点与 bucket 之间搬运快照文件 |
+| `ControlProvider` | `CleanupSnapshot`、`CopySnapshot` | `ate-api-server` | 删除快照，并为标签复制快照 |
+| `AssetProvider` | `FetchAsset` | `atelet` | 下载沙箱运行时文件 |
+| `CredentialProvider` | `FetchSecret` | 出站网关 | 返回用来替换请求头的密钥，见[第 6.5 节](#s-credential-injection) |
 
-## Conventions that every method shares
+## 所有方法共有的约定 {#s-ref-api-methods-conventions-that-every-method-shares}
 
-- **Names:** an object is addressed by an atespace and a name. Workers and atespaces have a name only.
-- **Preconditions:** each object has `metadata.uid` and `metadata.version`. An update or a guarded delete that names an old version fails with `ABORTED`.
-- **Wrong state:** a lifecycle call from a state that it does not accept fails with `FAILED_PRECONDITION`. A resume of a crashed actor is the case that we recorded.
-- **Lists:** list methods take `page_size` and `page_token`.
-- **Deadline:** the server ends any call after 10 minutes.
-- **Preview fields:** a field behind a preview feature is rejected unless the server enables it and the client sends the header `Ate-Preview-Allowed: true`.
+- **名称：** 对象由 atespace 和名称共同定位。worker 和 atespace 只有名称。
+- **前置条件：** 每个对象都有 `metadata.uid` 和 `metadata.version`。更新或带保护的删除如果指定了旧版本，会以 `ABORTED` 失败。
+- **状态错误：** 从某个生命周期调用不接受的状态发起该调用，会以 `FAILED_PRECONDITION` 失败。我们记录到的情形是恢复一个崩溃的 actor。
+- **列表：** list 方法接受 `page_size` 和 `page_token`。
+- **期限：** 服务器会在 10 分钟后终止任何调用。
+- **预览字段：** 预览功能背后的字段会被拒绝，除非服务器启用了它，且客户端发送请求头 `Ate-Preview-Allowed: true`。
 
-Sources: capture/lab/P-node-loss/86-tags.txt, capture/lab/P-node-loss/74-second-revert.tsv, capture/lab/P-node-loss/96-golden-tag-deleted.txt, api/ateapi/v1/ateapi.proto (services Control and WorkerService, and the request messages), api/objectstore/v1/objectstore.proto, api/credprovider/v1/credprovider.proto, cmd/ateapi/main.go (the port and the deadline), cmd/kubectl-ate/internal/cmd/ (the command for each method) and docs/dev/preview-gates.md at v1.0.0; capture/lab/B-lifecycle/20-trace-ops.tsv, capture/lab/F-egress/envoy/20-results.txt, capture/lab/A-quickstart/60-state.log, capture/lab/K-kagent/session1/ (the methods that our runs called).
+来源：capture/lab/P-node-loss/86-tags.txt, capture/lab/P-node-loss/74-second-revert.tsv, capture/lab/P-node-loss/96-golden-tag-deleted.txt, api/ateapi/v1/ateapi.proto (services Control and WorkerService, and the request messages), api/objectstore/v1/objectstore.proto, api/credprovider/v1/credprovider.proto, cmd/ateapi/main.go (the port and the deadline), cmd/kubectl-ate/internal/cmd/ (the command for each method) and docs/dev/preview-gates.md at v1.0.0; capture/lab/B-lifecycle/20-trace-ops.tsv, capture/lab/F-egress/envoy/20-results.txt, capture/lab/A-quickstart/60-state.log, capture/lab/K-kagent/session1/ (the methods that our runs called).

@@ -1,56 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 358" role="img" aria-labelledby="fig-6-1b-title fig-6-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-6-1b-title">What a caller of atenet-router sees on each dataplane</title>
-  <desc id="fig-6-1b-desc">Five rows in two groups, with the outcome on the Envoy dataplane and on the agentgateway dataplane. In the first group the router refuses the caller in the TLS layer and the caller gets no HTTP status: with no client certificate, Envoy cuts the connection and agentgateway sends the alert certificate required. With an identity that is not on the list, Envoy sends the alert certificate unknown and agentgateway resets the connection. In the second group the caller has the allowed identity atenet-client and gets an HTTP answer: 200 from my-counter-1 in 0.037 seconds on Envoy and 0.035 seconds on agentgateway, 404 for an actor that does not exist, and 404 for a request with no routing header.</desc>
-  <text x="16" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">THE REQUEST</text>
-  <text x="232" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ENVOY DATAPLANE</text>
-  <text x="438" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">AGENTGATEWAY DATAPLANE</text>
+  <title id="fig-6-1b-title">两种数据平面下调用 atenet-router 看到的响应</title>
+  <desc id="fig-6-1b-desc">分两组的五种请求情形，对比 Envoy 数据平面与 agentgateway 数据平面的结果。第一组在 TLS 层拒绝调用方，无 HTTP 状态码：无客户端证书时 Envoy 断开连接，agentgateway 发送告警 certificate required；身份不在允许列表中时 Envoy 发送告警 certificate unknown，agentgateway 重置连接。第二组使用允许的身份 atenet-client，均返回 HTTP 响应：访问 my-counter-1 时 Envoy 用 0.037 s 返回 200，agentgateway 用 0.035 s 返回 200；访问不存在的 actor 或未传路由头均返回 404。</desc>
+  <text x="16" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">请求情况</text>
+  <text x="232" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ENVOY 数据平面</text>
+  <text x="438" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">AGENTGATEWAY 数据平面</text>
   <line x1="16" y1="34" x2="624" y2="34" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.5"/>
-  <text x="16" y="50" font-size="11.5" font-weight="700" fill="var(--m-rose-ink, #b0344d)">Refused in the TLS layer: no HTTP status</text>
+  <text x="16" y="50" font-size="11.5" font-weight="700" fill="var(--m-rose-ink, #b0344d)">在 TLS 层被拒绝：无 HTTP 状态码</text>
   <rect x="16" y="60" width="196" height="44" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
-  <text x="114" y="76.95" font-size="11.5" text-anchor="middle" font-weight="700">no client certificate</text>
-  <text x="114" y="94.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">a pod with no certificate</text>
+  <text x="114" y="76.95" font-size="11.5" text-anchor="middle" font-weight="700">无客户端证书</text>
+  <text x="114" y="94.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未携带证书的 pod</text>
   <rect x="232" y="60" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
-  <text x="325" y="76.95" font-size="11.5" text-anchor="middle" font-weight="700">connection cut</text>
+  <text x="325" y="76.95" font-size="11.5" text-anchor="middle" font-weight="700">连接中断</text>
   <text x="325" y="94.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">curl: Broken pipe</text>
   <rect x="438" y="60" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
-  <text x="531" y="76.95" font-size="11.5" text-anchor="middle" font-weight="700">TLS alert</text>
+  <text x="531" y="76.95" font-size="11.5" text-anchor="middle" font-weight="700">TLS 告警</text>
   <text x="531" y="94.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">certificate required</text>
   <rect x="16" y="112" width="196" height="44" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
-  <text x="114" y="128.95" font-size="11.5" text-anchor="middle" font-weight="700">identity not on the list</text>
+  <text x="114" y="128.95" font-size="11.5" text-anchor="middle" font-weight="700">身份不在允许列表中</text>
   <text x="114" y="146.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ns/probe/sa/default</text>
   <rect x="232" y="112" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
-  <text x="325" y="128.95" font-size="11.5" text-anchor="middle" font-weight="700">TLS alert</text>
+  <text x="325" y="128.95" font-size="11.5" text-anchor="middle" font-weight="700">TLS 告警</text>
   <text x="325" y="146.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">certificate unknown</text>
   <rect x="438" y="112" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
-  <text x="531" y="128.95" font-size="11.5" text-anchor="middle" font-weight="700">connection reset</text>
-  <text x="531" y="146.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">reset by peer, no alert</text>
+  <text x="531" y="128.95" font-size="11.5" text-anchor="middle" font-weight="700">连接重置</text>
+  <text x="531" y="146.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">reset by peer，无告警</text>
   <line x1="16" y1="172" x2="624" y2="172" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.5"/>
-  <text x="16" y="188" font-size="11.5" font-weight="700">Allowed identity atenet-client: an HTTP answer</text>
+  <text x="16" y="188" font-size="11.5" font-weight="700">允许的身份 atenet-client：返回 HTTP 响应</text>
   <rect x="16" y="198" width="196" height="44" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="114" y="214.95" font-size="11.5" text-anchor="middle" font-weight="700">actor my-counter-1</text>
   <text x="114" y="232.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ACTOR_STATE_RUNNING</text>
   <rect x="232" y="198" width="186" height="44" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
-  <text x="325" y="214.95" font-size="11.5" text-anchor="middle" font-weight="700">200 in 0.037 s</text>
-  <text x="325" y="232.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.032 s through 8444</text>
+  <text x="325" y="214.95" font-size="11.5" text-anchor="middle" font-weight="700">0.037 s 返回 200</text>
+  <text x="325" y="232.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">经 8444 为 0.032 s</text>
   <rect x="438" y="198" width="186" height="44" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
-  <text x="531" y="214.95" font-size="11.5" text-anchor="middle" font-weight="700">200 in 0.035 s</text>
-  <text x="531" y="232.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.029 s through 8444</text>
+  <text x="531" y="214.95" font-size="11.5" text-anchor="middle" font-weight="700">0.035 s 返回 200</text>
+  <text x="531" y="232.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">经 8444 为 0.029 s</text>
   <rect x="16" y="250" width="196" height="44" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="114" y="266.95" font-size="11.5" text-anchor="middle" font-weight="700">actor does-not-exist</text>
-  <text x="114" y="284.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">no such actor in the atespace</text>
+  <text x="114" y="284.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">atespace 中无此 actor</text>
   <rect x="232" y="250" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="325" y="266.95" font-size="11.5" text-anchor="middle" font-weight="700">404 in 0.024 s</text>
+  <text x="325" y="266.95" font-size="11.5" text-anchor="middle" font-weight="700">0.024 s 返回 404</text>
   <text x="325" y="284.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">body: actor not found</text>
   <rect x="438" y="250" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="531" y="266.95" font-size="11.5" text-anchor="middle" font-weight="700">404 in 0.022 s</text>
+  <text x="531" y="266.95" font-size="11.5" text-anchor="middle" font-weight="700">0.022 s 返回 404</text>
   <text x="531" y="284.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">body: ingress failed</text>
   <rect x="16" y="302" width="196" height="44" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
-  <text x="114" y="318.95" font-size="11.5" text-anchor="middle" font-weight="700">no routing header</text>
-  <text x="114" y="336.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ate-target-actor is absent</text>
+  <text x="114" y="318.95" font-size="11.5" text-anchor="middle" font-weight="700">缺少路由头</text>
+  <text x="114" y="336.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未传 ate-target-actor</text>
   <rect x="232" y="302" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="325" y="318.95" font-size="11.5" text-anchor="middle" font-weight="700">404 in 0.018 s</text>
+  <text x="325" y="318.95" font-size="11.5" text-anchor="middle" font-weight="700">0.018 s 返回 404</text>
   <text x="325" y="336.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">body: invalid actor reference</text>
   <rect x="438" y="302" width="186" height="44" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="531" y="318.95" font-size="11.5" text-anchor="middle" font-weight="700">404 in 0.018 s</text>
+  <text x="531" y="318.95" font-size="11.5" text-anchor="middle" font-weight="700">0.018 s 返回 404</text>
   <text x="531" y="336.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">body: ingress failed</text>
 </svg>

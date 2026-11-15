@@ -1,68 +1,68 @@
-# Agent Substrate 101: fact brief
+# Agent Substrate 101：事实简报
 
-This is the brief the sections were written from. It states what we concluded, which run proved it, and which runs come next. The recordings are in `capture/lab/`, and `capture/README.md` describes each folder.
+本简报是编写各小节的依据。它说明了我们的结论、证明各结论的运行记录，以及后续将进行的运行。录制记录存放在 `capture/lab/` 中，`capture/README.md` 描述了每个目录。
 
-## Pins
+## 固定版本
 
-| Subject | Version | Date |
+| 主题 | 版本 | 日期 |
 |---|---|---|
-| Agent Substrate | v1.0.0, commit `b34fbee742906494b5eb4f1f36987176bf8770a4` | released 2026-11-05 |
-| kagent | v1.0.0, with its own distribution of Substrate at v1.0.0 | released 2026-11-09 |
+| Agent Substrate | v1.0.0，提交 `b34fbee742906494b5eb4f1f36987176bf8770a4` | 发布于 2026-11-05 |
+| kagent | v1.0.0，带有自己的 Substrate v1.0.0 发行版 | 发布于 2026-11-09 |
 | agentgateway | v1.7.0 | |
-| Kubernetes | 1.37.0, as `kindest/node:v1.37.0` on kind v0.33.0 | |
+| Kubernetes | 1.37.0，基于 kind v0.33.0 的 `kindest/node:v1.37.0` | |
 
-Facts were verified on 2026-11-12.
+事实已于 2026-11-12 核验。
 
-## Test beds
+## 测试环境
 
-- Three KVM guests on one x86 server, each with its own kind clusters. The first has 24 vCPU and 47 GB, for upstream Substrate built from source. The second has 16 vCPU and 23 GB, for the install from the release images. The third has 16 vCPU and 31 GB, for kagent.
-- One Apple silicon laptop under Docker Desktop, with 10 CPU and 8 GB for Docker.
-- The sandbox class was gVisor in every run except the microVM runs of experiment L. The object store was rustfs inside the cluster. The model behind kagent was a mock server, and in two later runs a small open model on CPU.
+- 一台 x86 服务器上的三台 KVM 客户机，每台有自己的 kind 集群。第一台有 24 vCPU 和 47 GB，用于从源码构建的上游 Substrate。第二台有 16 vCPU 和 23 GB，用于从发布镜像安装。第三台有 16 vCPU 和 31 GB，用于 kagent。
+- 一台运行 Docker Desktop 的 Apple 芯片笔记本电脑，为 Docker 分配了 10 CPU 和 8 GB。
+- 除实验 L 的 microVM 运行外，每次运行的沙箱类别均为 gVisor。对象存储为集群内的 rustfs。kagent 背后的模型为模拟服务，在后续两次运行中采用了运行在 CPU 上的轻量开源模型。
 
-## Positions and the runs that prove them
+## 判断与证明它们的运行记录
 
-1. **Substrate does not suspend an idle actor.** We left a running actor with no request for 900 s and sampled its state every 15 s. Every sample was `ACTOR_STATE_RUNNING`. The caller must call `SuspendActor`. kagent does that after every turn: 98 of 98 turns ended in a suspend. Runs: B-lifecycle, K-kagent.
-2. **Suspend is asynchronous by default, and the snapshot is not durable at once.** After an async suspend the snapshot stayed `PENDING` on the node for 5 minutes, and the node copy stayed for 30 minutes. When the node copy was removed in that window, or the node restarted, the next request returned 500 and the actor became `CRASHED`. After `RevertActor` the actor resumed from the last durable snapshot and the later calls were gone. Run: D-durability.
-3. **Postgres and `ate-api-server` are on every request path. The Kubernetes API server is on none.** With Postgres or `ate-api-server` scaled to zero, requests to a running actor failed within seconds. With kube-apiserver down for 86 s, every request to a running actor and every fresh resume was served. Run: E-dependency-loss.
-4. **Resume time grows with the memory the actor holds.** On the x86 guest a resume from the node took 0.22 s at 0 MiB, 0.47 s at 200 MiB, 1.07 s at 500 MiB, and 2.16 s at 1000 MiB. A resume from the object store took about twice as long. Runs: C-resume-vs-size, M-mac-arm64.
-5. **agentgateway is a dataplane option of Substrate, and it authenticates ingress clients.** It used 2 containers and about 38 MB at idle, against 5 containers and about 91 MB for Envoy. It mounts the interception CA private key in the dataplane container, and its egress gateway logs request headers at debug level. Run: G-dataplane.
-6. **An egress policy allows hosts and ports, intercepts TLS, and replaces a credential header.** It does not select models or tools. A removed rule stopped new requests in seconds, and an open connection kept working 20 s later. Runs: F-egress, K-kagent.
-7. **A dead process is not always a crashed actor.** When the process in the sandbox exited, the actor stayed `RUNNING` and every request returned 503 until a suspend was tried. A memory kill was detected in about 4 s. Run: J-container-death.
-8. **Install from the release images.** The system install took 162 s from the release images and 266 s from source. The source path needs the Docker buildx plugin and compiles a Rust module, and the quickstart names neither. Runs: A-quickstart, G-dataplane, M-mac-arm64.
+1. **Substrate 不会挂起空闲的 actor。** 我们让一个运行中的 actor 在没有请求的情况下保持 900 秒，每 15 秒采样一次状态。每个样本都是 `ACTOR_STATE_RUNNING`。调用方必须调用 `SuspendActor`。kagent 在每个轮次后都会这样做：98 个轮次中有 98 个以挂起收尾。运行记录：B-lifecycle、K-kagent。
+2. **挂起默认是异步的，快照不会立即持久。** 异步挂起后，快照在节点上保持 `PENDING` 达 5 分钟，节点副本保留 30 分钟。若在该时间窗口内移除节点副本或重启节点，下一个请求会返回 500，且 actor 变为 `CRASHED`。执行 `RevertActor` 后，actor 从最后一个持久快照恢复，后续调用随之消失。运行记录：D-durability。
+3. **Postgres 和 `ate-api-server` 在每条请求路径上。Kubernetes API server 不在任何一条上。** 将 Postgres 或 `ate-api-server` 缩容到零时，发往运行中 actor 的请求在几秒内失败。在 kube-apiserver 宕机 86 秒期间，发往运行中 actor 的每个请求与每次全新恢复都得到正常响应。运行记录：E-dependency-loss。
+4. **恢复时间随 actor 持有的内存增长。** 在 x86 客户机上，从节点恢复在 0 MiB 时耗时 0.22 秒，200 MiB 时耗时 0.47 秒，500 MiB 时耗时 1.07 秒，1000 MiB 时耗时 2.16 秒。从对象存储恢复大约耗时两倍。运行记录：C-resume-vs-size、M-mac-arm64。
+5. **agentgateway 是 Substrate 的一个数据平面选项，并且它会认证入站客户端。** 空闲时它占用 2 个容器和约 38 MB，而 Envoy 占用 5 个容器和约 91 MB。它把拦截 CA 私钥挂载到数据平面容器中，其出站网关在 debug 级别记录请求头。运行记录：G-dataplane。
+6. **出站策略允许主机和端口，拦截 TLS，并替换凭据头。** 它不选择模型或工具。删除一条规则在几秒内阻止了新请求，而已打开的连接在 20 秒后仍然可用。运行记录：F-egress、K-kagent。
+7. **死亡的进程不总是崩溃的 actor。** 沙箱内的进程退出时，actor 仍保持 `RUNNING`，所有请求返回 503，直到尝试挂起。内存击杀大约在 4 秒内被检测到。运行记录：J-container-death。
+8. **从发布镜像安装。** 系统安装从发布镜像耗时 162 秒，从源码耗时 266 秒。源码路径需要 Docker buildx 插件并编译一个 Rust 模块，快速上手指南两者均未提及。运行记录：A-quickstart、G-dataplane、M-mac-arm64。
 
-## Numbers a section can use
+## 小节可引用的数字
 
-| Fact | Value | Where |
+| 事实 | 数值 | 出处 |
 |---|---|---|
-| First request to a new actor, small actor | 0.36 s | B-lifecycle |
-| Warm request through `kubectl ate proxy` | 0.06 to 0.09 s | B-lifecycle |
-| Async suspend, small actor | 0.40 s | B-lifecycle |
-| Sync suspend, 1000 MiB | 6.4 s median | C-resume-vs-size |
-| Worker pod deleted to `CRASHED` | 0.6 s | B-lifecycle |
-| Full pool, time to the 503 | 5.06 s | I-capacity |
-| Parking load run | 90 of 92 requests served | I-capacity |
-| 25 suspended actors, node snapshots | 8.8 GB | C-resume-vs-size |
-| 25 suspended actors, object store | 10.8 GB | C-resume-vs-size |
-| kagent turn, resume part | 0.38 s median, n=98 | K-kagent |
-| kagent turn, suspend part | 0.14 s median, n=99 | K-kagent |
-| Mac, resume of a small actor | 0.09 s | M-mac-arm64 |
+| 发往新 actor 的第一个请求，小型 actor | 0.36 秒 | B-lifecycle |
+| 经过 `kubectl ate proxy` 的热请求 | 0.06 到 0.09 秒 | B-lifecycle |
+| 异步挂起，小型 actor | 0.40 秒 | B-lifecycle |
+| 同步挂起，1000 MiB | 中位数 6.4 秒 | C-resume-vs-size |
+| Worker pod 删除到变为 `CRASHED` | 0.6 秒 | B-lifecycle |
+| 满载池，到返回 503 的时间 | 5.06 秒 | I-capacity |
+| 暂存负载运行 | 92 个请求中响应了 90 个 | I-capacity |
+| 25 个已挂起 actor，节点快照 | 8.8 GB | C-resume-vs-size |
+| 25 个已挂起 actor，对象存储 | 10.8 GB | C-resume-vs-size |
+| kagent 轮次，恢复部分 | 中位数 0.38 秒，n=98 | K-kagent |
+| kagent 轮次，挂起部分 | 中位数 0.14 秒，n=99 | K-kagent |
+| Mac，小型 actor 的恢复 | 0.09 秒 | M-mac-arm64 |
 
-Each value is one machine and one day. `capture/lab/summary/` holds the full statistics.
+每个数值代表一台机器和一个特定日期。`capture/lab/summary/` 保存了完整统计数据。
 
-## Corrections that the runs made to our first reading
+## 运行记录对我们最初理解的修正
 
-- We first read the code as saying that the agentgateway dataplane accepts ingress clients without a certificate. An installed cluster refused them. The installer always adds a static mTLS component.
-- We first expected the kagent install to create three default Harness objects. At v1.0.0 it created none.
-- We expected suspend and resume to fail on arm64. On Apple silicon they worked for our test actor in 66 of 66 requests.
+- 我们最初阅读代码时，以为 agentgateway 数据平面接收未经证书认证的入站客户端。实际安装的集群拒绝了这类客户端。安装器始终添加一个静态 mTLS 组件。
+- 我们最初预期 kagent 安装会创建三个默认 Harness 对象。在 v1.0.0 中，它一个都没有创建。
+- 我们最初预期挂起和恢复在 arm64 上会失败。在 Apple 芯片上，我们的测试 actor 在 66 次请求中 66 次成功。
 
-## Coming next
+## 后续内容
 
-These runs are planned for the next edition. Until then, this edition does not measure them.
+这些运行计划在下一版中进行。在那之前，本版未对它们进行测量。
 
-- Substrate on GKE. That section is written from the documentation and the code.
-- kagent with a hosted model or a model on a GPU, and its codex, claude, and bring-your-own harnesses.
-- A bucket in a cloud, or a real link with 100 ms of delay. Ours was in the cluster, outside it on the same guest, and on a second guest of the same server.
-- An upgrade from v0.6.0 that keeps actors, a rollback across a schema change, more than one node at scale, bursts above 300 resumes at one time, and a second run of the Kubernetes API outage with resumes.
-- What inside the gVisor restores sets about 37 resumes each second on one node, and why about 1 in 700 burst requests got no answer.
-- Actors with more than 1000 MiB of memory, and images with an init system or a large root filesystem.
-- Why workers reported no room for about one minute after a node restart.
+- GKE 上的 Substrate。该小节基于文档和代码编写。
+- 搭配托管模型或 GPU 模型的 kagent，以及它的 codex、claude 和自带（bring-your-own）harness。
+- 云端 bucket，或带有 100 毫秒真实延迟的链路。我们的 bucket 位于集群内、同一客户机集群外，以及同一服务器的第二台客户机上。
+- 保留 actor 从 v0.6.0 升级、跨 schema 变更回滚、多节点大规模运行、并发超过 300 次恢复的突发负载，以及带恢复操作的 Kubernetes API 宕机二次测试。
+- gVisor 恢复内部是什么机制将单个节点限制在每秒约 37 次恢复，以及为何约 700 次突发请求中有 1 次未得到应答。
+- 内存超过 1000 MiB 的 actor，以及带有 init 系统或大型根文件系统的镜像。
+- 为何节点重启后约一分钟内 worker 报告没有空间。

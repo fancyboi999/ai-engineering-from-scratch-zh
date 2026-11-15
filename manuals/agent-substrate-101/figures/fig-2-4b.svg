@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 448" role="img" aria-labelledby="fig-2-4b-title fig-2-4b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-2-4b-title">The pods of ate-system on kind-control-plane</title>
-  <desc id="fig-2-4b-desc">An isometric drawing of the namespace ate-system as one floor tile on the node kind-control-plane, which carries the Kubernetes mark. The tile holds 11 running pods and 1 finished Job, one object for each pod. Two ate-api-server towers and two ate-idp-server towers stand side by side, and one ate-controller tower stands alone, all with the Agent Substrate mark. postgres-0 is a cylinder and rustfs is a bucket. atenet-router and atenet-egress are gateway units with the Envoy mark. atelet and k8s-credential-provider are small units, and the finished Job rustfs-bucket-init is a dashed outline.</desc>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ATE-SYSTEM · 11 RUNNING PODS, 1 FINISHED JOB</text>
+  <title id="fig-2-4b-title">kind-control-plane 上 ate-system 的各个 pod</title>
+  <desc id="fig-2-4b-desc">等轴测图将命名空间 ate-system 绘为带 Kubernetes 标志的节点 kind-control-plane 上的一块底板。底板上有 11 个运行中 pod 和 1 个已完成 Job，每个立体对应一个 pod。两座 ate-api-server 塔和两座 ate-idp-server 塔并排而立，一座 ate-controller 塔独立其旁，均带 Agent Substrate 标志。postgres-0 为圆柱体，rustfs 为存储桶。atenet-router 与 atenet-egress 为带 Envoy 标志的网关单元。atelet 与 k8s-credential-provider 为小型单元，已完成的 Job rustfs-bucket-init 为虚线轮廓。</desc>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ATE-SYSTEM · 11 个运行中 POD，1 个已完成 JOB</text>
   <polygon points="34.9,164 170,86 177,88 627.3,348 492.2,426 485.2,424" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
   <polygon points="170,76 620.3,336 620.3,346 485.2,424 34.9,164 34.9,154" fill="var(--m-panel, #f3f1e8)"/>
   <polygon points="170,76 620.3,336 620.3,346 485.2,424 34.9,164 34.9,154" fill="var(--m-grey-fill, #ecebe3)"/>
@@ -146,11 +146,11 @@
   <path d="M472.2 304.5L494.8 317.5" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-linejoin="round"/>
   <polygon points="447.1,298 478.3,316 478.3,342 447.1,360 416,342 416,316" fill="var(--m-paper, #fafaf5)" fill-opacity="0.6" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="5 4"/>
   <text x="162" y="40" font-size="11.5" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">ate-api-server</text>
-  <text x="162" y="54" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 pods, 2 containers each</text>
+  <text x="162" y="54" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 pod，各 2 容器</text>
   <polyline points="170,58 170,78" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="170" cy="78" r="2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="227.8" y="78" font-size="11.5" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">ate-idp-server</text>
-  <text x="227.8" y="92" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 pods</text>
+  <text x="227.8" y="92" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 pod</text>
   <polyline points="235.8,96 235.8,116" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="235.8" cy="116" r="2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="293.6" y="116" font-size="11.5" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">ate-controller</text>
@@ -158,15 +158,15 @@
   <polyline points="301.6,134 301.6,154" fill="none" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="301.6" cy="154" r="2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="362.9" y="148" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">postgres-0</text>
-  <text x="362.9" y="162" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">StatefulSet, 2 containers</text>
+  <text x="362.9" y="162" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">StatefulSet，2 容器</text>
   <polyline points="370.9,166 370.9,182" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="370.9" cy="182" r="2" fill="var(--m-teal-ink, #18696a)"/>
   <text x="425.3" y="206" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">atenet-router</text>
-  <text x="425.3" y="220" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1 pod, 2 containers</text>
+  <text x="425.3" y="220" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1 pod，2 容器</text>
   <polyline points="433.3,224 433.3,248" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="433.3" cy="248" r="2" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="491.1" y="248" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">atelet</text>
-  <text x="491.1" y="262" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">DaemonSet, 2 containers</text>
+  <text x="491.1" y="262" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">DaemonSet，2 容器</text>
   <polyline points="499.1,266 499.1,286" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="499.1" cy="286" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="188.5" y="280" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">k8s-credential-provider</text>
@@ -174,20 +174,20 @@
   <polyline points="192.5,276 224.5,230" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="224.5" cy="230" r="2" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="254.3" y="318" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-teal-ink, #18696a)">rustfs</text>
-  <text x="254.3" y="332" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">object store, 1 pod</text>
+  <text x="254.3" y="332" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">对象存储，1 pod</text>
   <polyline points="258.3,314 290.3,268" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="290.3" cy="268" r="2" fill="var(--m-teal-ink, #18696a)"/>
   <text x="320.1" y="356" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">atenet-egress</text>
-  <text x="320.1" y="370" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1 pod, 3 containers</text>
+  <text x="320.1" y="370" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1 pod，3 容器</text>
   <polyline points="324.1,352 356.1,306" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="356.1" cy="306" r="2" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="386" y="394" font-size="11.5" text-anchor="end" font-weight="700" fill="var(--m-grey-ink, #5e5e59)">rustfs-bucket-init</text>
-  <text x="386" y="408" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Job, Completed</text>
+  <text x="386" y="408" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Job，已完成</text>
   <polyline points="390,390 422,344" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="422" cy="344" r="2" fill="var(--m-grey-ink, #5e5e59)"/>
-  <text x="20" y="58" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">namespace ate-system</text>
+  <text x="20" y="58" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">命名空间 ate-system</text>
   <polyline points="50,64 74.7,145" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="74.7" cy="145" r="2" fill="var(--m-ink-mute, #666660)"/>
-  <text x="620" y="424" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-mute, #666660)">node</text>
+  <text x="620" y="424" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-mute, #666660)">节点</text>
   <text x="620" y="440" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-grey-ink, #5e5e59)">kind-control-plane</text>
 </svg>

@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 356" role="img" aria-labelledby="fig-8-1b-title fig-8-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-8-1b-title">A bucket outside the cluster, and 20 or 100 ms of added round trip</title>
-  <desc id="fig-8-1b-desc">Two panels plot every one of 49 cycles on one guest. With the bucket outside the cluster and no added delay, a resume of 1,000 MiB from the bucket took a median of 4.79 s. With 20 ms of added round trip it took 10.24 s, and the synchronous suspend took 8.39 s against 7.09 s. At 100 ms only actors with no data in memory were measured.</desc>
+  <title id="fig-8-1b-title">集群外 bucket 以及增加 20 或 100 ms 往返延迟时的耗时</title>
+  <desc id="fig-8-1b-desc">两个面板绘制单台客户机上全部 49 轮循环的实测数据。当 bucket 位于集群外且无额外延迟时，从 bucket 恢复 1,000 MiB 的中位耗时为 4.79 秒；增加 20 ms 往返延迟后增至 10.24 秒，同步挂起中位耗时则从 7.09 秒增至 8.39 秒。在 +100 ms 条件下，仅测量了内存无额外数据的 actor。</desc>
   <circle cx="26" cy="18" r="1.9" fill="var(--m-ink-soft, #4a4a4a)"/>
-  <text x="36" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">one cycle</text>
+  <text x="36" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">单轮循环</text>
   <line x1="120" y1="18" x2="138" y2="18" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
-  <text x="146" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">medians of one size</text>
-  <text x="620" y="22" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">not measured: 200 and 1,000 MiB at +100 ms</text>
+  <text x="146" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">同体积中位数</text>
+  <text x="620" y="22" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未测量：+100 ms 下的 200 与 1,000 MiB</text>
   <line x1="56" y1="302" x2="282" y2="302" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="50" y="306" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="56" y1="263.33" x2="282" y2="263.33" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -23,14 +23,14 @@
   <line x1="56" y1="302" x2="282" y2="302" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="56" y1="70" x2="56" y2="302" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="79.79" y1="302" x2="79.79" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="79.79" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">inside</text>
+  <text x="79.79" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">集群内</text>
   <line x1="139.26" y1="302" x2="139.26" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="139.26" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">outside</text>
+  <text x="139.26" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">集群外</text>
   <line x1="198.74" y1="302" x2="198.74" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="198.74" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">+20 ms</text>
   <line x1="258.21" y1="302" x2="258.21" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="258.21" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">+100 ms</text>
-  <text x="56" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">resume from the bucket, seconds</text>
+  <text x="56" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">从 bucket 恢复耗时（秒）</text>
   <circle cx="72.99" cy="297.24" r="1.8" fill="var(--m-teal-ink, #18696a)"/>
   <circle cx="76.39" cy="297.75" r="1.8" fill="var(--m-teal-ink, #18696a)"/>
   <circle cx="79.79" cy="296.68" r="1.8" fill="var(--m-teal-ink, #18696a)"/>
@@ -103,14 +103,14 @@
   <line x1="356" y1="302" x2="582" y2="302" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="356" y1="70" x2="356" y2="302" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="379.79" y1="302" x2="379.79" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="379.79" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">inside</text>
+  <text x="379.79" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">集群内</text>
   <line x1="439.26" y1="302" x2="439.26" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="439.26" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">outside</text>
+  <text x="439.26" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">集群外</text>
   <line x1="498.74" y1="302" x2="498.74" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="498.74" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">+20 ms</text>
   <line x1="558.21" y1="302" x2="558.21" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="558.21" y="319" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">+100 ms</text>
-  <text x="356" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">synchronous suspend, seconds</text>
+  <text x="356" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同步挂起耗时（秒）</text>
   <circle cx="372.99" cy="293.59" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <circle cx="376.39" cy="291.44" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <circle cx="379.79" cy="292.91" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
@@ -166,5 +166,5 @@
   <circle cx="503.84" cy="142.27" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <path d="M379.8 177.4 L439.3 164.8 L498.7 139.7" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.6" stroke-linejoin="round"/>
   <text x="510.74" y="130.74" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">1,000 MiB</text>
-  <text x="320" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">where the bucket is, and the round trip added between the node and the bucket</text>
+  <text x="320" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bucket 所在位置，以及节点与 bucket 之间增加的往返延迟</text>
 </svg>

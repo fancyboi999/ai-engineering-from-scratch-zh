@@ -11,23 +11,23 @@ const real = /CN=(.*)$/.exec(issuers[1])[1];
 
 module.exports = figure('fig-6-4', {
   height: 262,
-  title: 'Who holds the TLS session for each rule kind',
-  desc: `Two columns. On the left, an https rule for example.com: the actor f-main holds TLS session 1 with atenet-egress, which presents a leaf certificate from ${minted}, and atenet-egress holds TLS session 2 with example.com. On the right, a tlsPassthrough rule for example.org: the actor holds one TLS session with example.org, atenet-egress reads only the server name and forwards the bytes, and the actor sees a certificate from ${real}.`,
+  title: '不同规则类型下谁持有 TLS 会话',
+  desc: `左右两列对比。左列为针对 example.com 的 https 规则：actor f-main 与出示 ${minted} 所签叶证书的 atenet-egress 持有 TLS 会话 1，atenet-egress 再与 example.com 持有 TLS 会话 2。右列为针对 example.org 的 tlsPassthrough 规则：actor 直接与 example.org 持有一条端到端 TLS 会话，atenet-egress 只读取服务器名并透传字节，actor 看到由 ${real} 签发的原始证书。`,
 }, f => {
-  f.kicker(20, 18, 'https rule: example.com');
-  f.kicker(336, 18, 'tlsPassthrough rule: example.org');
+  f.kicker(20, 18, 'https 规则：example.com');
+  f.kicker(336, 18, 'tlsPassthrough 规则：example.org');
   f.rule(320, 8, 320, 254, { dash: 'dashed' });
   const left = [
-    { hue: 'green', title: 'actor f-main', sub: 'trusts the projected bundle' },
-    { hue: 'indigo', title: 'atenet-egress', sub: `leaf from ${minted}` },
-    { hue: 'olive', title: 'example.com', sub: 'public certificate, checked by the gateway' },
+    { hue: 'green', title: 'actor f-main', sub: '信任投射进来的信任包' },
+    { hue: 'indigo', title: 'atenet-egress', sub: `叶证书来自 ${minted}` },
+    { hue: 'olive', title: 'example.com', sub: '公网证书，由出站网关校验' },
   ];
   const right = [
-    { hue: 'green', title: 'actor f-main', sub: 'uses its normal root store' },
-    { hue: 'indigo', title: 'atenet-egress', sub: 'reads the server name, forwards bytes', dash: 'dashed' },
-    { hue: 'olive', title: 'example.org', sub: `issuer ${real}` },
+    { hue: 'green', title: 'actor f-main', sub: '使用自身默认根证书库' },
+    { hue: 'indigo', title: 'atenet-egress', sub: '读取服务器名并透传字节', dash: 'dashed' },
+    { hue: 'olive', title: 'example.org', sub: `签发者 ${real}` },
   ];
-  const labels = [['TLS session 1', 'TLS session 2'], ['one TLS session', 'the same session']];
+  const labels = [['TLS 会话 1', 'TLS 会话 2'], ['同一条 TLS 会话', '同一条会话延续']];
   [[left, 20], [right, 336]].forEach(([column, x], side) => {
     column.forEach((item, index) => {
       const y = 30 + index * 84;

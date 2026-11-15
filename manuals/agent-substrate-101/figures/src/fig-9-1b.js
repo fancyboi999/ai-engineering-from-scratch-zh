@@ -31,12 +31,12 @@ const samples = run.capacity.filter(sample => sample.t <= END).length;
 
 module.exports = figure('fig-9-1b', {
   height: 326,
-  title: 'Three actors share room for two, for ten minutes',
-  desc: `A timeline of ${END} seconds on the second x86 server guest. The worker has room for two actors of one CPU each. The actor busy gets a request each 5 seconds and runs for the whole time. The actor bursty gets five requests each 150 seconds, and the suspender suspends it ${suspends.filter(s => s.actor === 'bursty').length} times after 30 quiet seconds. The actor rare gets two requests and is suspended ${suspends.filter(s => s.actor === 'rare').length} times. All ${requests.length} requests returned 200. The worker had one CPU booked in ${one} of ${samples} samples and two in the rest.`,
+  title: '三个 actor 在十分钟内共享两个槽位',
+  desc: `第二台 x86 服务器客户机上 ${END} 秒的运行时间线。该 worker 仅可同时容纳两个各占 1 核 CPU 的 actor。actor busy 每 5 秒收到一次请求并全程保持运行；actor bursty 每 150 秒收到五次突发请求，挂起器在每次空闲满 30 秒后将其挂起（共 ${suspends.filter(s => s.actor === 'bursty').length} 次）；actor rare 共收到两次请求并被挂起 ${suspends.filter(s => s.actor === 'rare').length} 次。全部 ${requests.length} 个请求均返回 200。在 ${samples} 次容量采样中，有 ${one} 次占用 1 核 CPU，其余占用 2 核 CPU。`,
 }, f => {
   const top = 40;
-  f.text(16, top + 16, 'CPU booked', { size: 12, weight: 700 });
-  f.text(16, top + 31, 'of 2 CPUs', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(16, top + 16, '已占用 CPU', { size: 12, weight: 700 });
+  f.text(16, top + 31, '共 2 核 CPU', { size: 11, serif: true, hue: 'ink-soft' });
   const cap = run.capacity.filter(sample => sample.t <= END);
   cap.forEach((sample, index) => {
     const next = index + 1 < cap.length ? cap[index + 1].t : END;
@@ -45,12 +45,12 @@ module.exports = figure('fig-9-1b', {
   });
   f.rule(X0, top + 34, X1, top + 34, { hue: 'violet' });
   f.rule(X0, top + 4, X1, top + 4, { hue: 'violet', dash: 'dashed', opacity: 0.6 });
-  f.text(X1, top - 4, '2 CPUs, the pool is full', { size: 11, hue: 'violet', anchor: 'end' });
+  f.text(X1, top - 4, '2 核 CPU，worker 池满载', { size: 11, hue: 'violet', anchor: 'end' });
 
   actors.forEach((name, index) => {
     const y = 108 + index * 48;
     f.text(16, y + 12, name, { size: 12, weight: 700 });
-    f.text(16, y + 27, `${requests.filter(r => r.actor === name).length} requests`, { size: 11, serif: true, hue: 'ink-soft' });
+    f.text(16, y + 27, `${requests.filter(r => r.actor === name).length} 个请求`, { size: 11, serif: true, hue: 'ink-soft' });
     f.rule(X0, y + 8, X1, y + 8, { hue: 'ink-mute', opacity: 0.3 });
     for (const [a, b] of spans(name)) f.rect(px(a), y, px(b) - px(a), 16, { fill: color('green-fill'), stroke: color('green-ink') });
     for (const r of requests.filter(q => q.actor === name)) f.dot(px(r.t), y + 8, { hue: r.kind === 'resumed' ? 'ink' : 'green', r: r.kind === 'resumed' ? 2.6 : 1.3 });
@@ -62,9 +62,9 @@ module.exports = figure('fig-9-1b', {
     f.rule(px(t), axis, px(t), axis + 5, { hue: 'ink' });
     f.text(px(t), axis + 18, String(t / 60), { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.text((X0 + X1) / 2, axis + 36, 'minutes from the first request', { size: 11.5, serif: true, hue: 'ink-soft', anchor: 'middle' });
+  f.text((X0 + X1) / 2, axis + 36, '自首个请求起算的分钟数', { size: 11.5, serif: true, hue: 'ink-soft', anchor: 'middle' });
   f.rule(X0, axis + 50, X0, axis + 62, { hue: 'amber', width: 2 });
-  f.text(X0 + 8, axis + 60, 'suspend after 30 quiet seconds', { size: 11, hue: 'amber' });
+  f.text(X0 + 8, axis + 60, '空闲 30 秒后挂起', { size: 11, hue: 'amber' });
   f.dot(X0 + 250, axis + 56, { hue: 'ink', r: 2.6 });
-  f.text(X0 + 258, axis + 60, 'request that resumed the actor', { size: 11 });
+  f.text(X0 + 258, axis + 60, '触发 actor 恢复的请求', { size: 11 });
 });

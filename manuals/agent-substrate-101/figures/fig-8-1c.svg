@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 390" role="img" aria-labelledby="fig-8-1c-title fig-8-1c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-8-1c-title">A bucket on another guest: every cycle, on a scale of powers of ten</title>
-  <desc id="fig-8-1c-desc">Two panels plot every one of 51 cycles with the bucket on a second guest. With no shaping, a request to an actor of 1,000 MiB took a median of 12.2 s to its first 200. At 20 Mbit/s, an actor of 200 MiB took 87.8 s, and its synchronous suspend took 88.5 s. In 26 cycles the first answer was a 504 after 10 s, and a later request returned 200.</desc>
+  <title id="fig-8-1c-title">另一台客户机上的 bucket：对数坐标下每轮循环的耗时</title>
+  <desc id="fig-8-1c-desc">两个面板绘制 bucket 位于另一台客户机时全部 51 轮循环的实测耗时（10 的幂次对数刻度）。不做流量整形时，发往 1,000 MiB actor 的请求拿到首个 200 的中位耗时为 12.2 秒。限速 20 Mbit/s 时，200 MiB actor 拿到首个 200 的中位耗时为 87.8 秒，同步挂起中位耗时为 88.5 秒。共有 26 轮循环首次响应在 10 秒后返回 504，后续重试请求返回 200。</desc>
   <circle cx="26" cy="18" r="1.9" fill="var(--m-ink-soft, #4a4a4a)"/>
-  <text x="36" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">one cycle</text>
+  <text x="36" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">单轮循环</text>
   <line x1="110" y1="18" x2="128" y2="18" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
-  <text x="136" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">median of five cycles</text>
+  <text x="136" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">5 轮循环中位数</text>
   <line x1="300" y1="18" x2="318" y2="18" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.4" stroke-dasharray="5 4"/>
-  <text x="326" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">the router answers 504 after 10 s</text>
+  <text x="326" y="22" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">路由器在 10 s 后返回 504</text>
   <line x1="56" y1="310" x2="286" y2="310" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="50" y="314" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.1</text>
   <line x1="56" y1="250" x2="286" y2="250" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -29,8 +29,8 @@
   <text x="217" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)"></text>
   <line x1="263" y1="310" x2="263" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="263" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)"></text>
-  <text x="56" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">request to the first 200, seconds</text>
-  <text x="79" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">plain</text>
+  <text x="56" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求至首个 200 的耗时（秒）</text>
+  <text x="79" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">明文</text>
   <text x="125" y="341" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">TLS</text>
   <text x="171" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">100 Mbit/s</text>
   <text x="217" y="341" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">20 Mbit/s</text>
@@ -130,8 +130,8 @@
   <text x="523" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)"></text>
   <line x1="569" y1="310" x2="569" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="569" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)"></text>
-  <text x="362" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">synchronous suspend, seconds</text>
-  <text x="385" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">plain</text>
+  <text x="362" y="58" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同步挂起耗时（秒）</text>
+  <text x="385" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">明文</text>
   <text x="431" y="341" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">TLS</text>
   <text x="477" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">100 Mbit/s</text>
   <text x="523" y="341" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">20 Mbit/s</text>
@@ -208,6 +208,6 @@
   <text x="431" y="161.04" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">1,000</text>
   <circle cx="569" cy="92.35" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <text x="569" y="84.35" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">1,000</text>
-  <text x="320" y="362" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the path from the node to the bucket on the other guest</text>
-  <text x="320" y="378" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the number above a group is the MiB of data in the actor</text>
+  <text x="320" y="362" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">从节点通往另一台客户机上 bucket 的网络路径</text>
+  <text x="320" y="378" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每组上方的数字为 actor 内存中的数据体积（MiB）</text>
 </svg>

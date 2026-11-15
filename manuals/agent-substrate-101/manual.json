@@ -1,9 +1,9 @@
 {
   "id": "agent-substrate-101",
   "title": "Agent Substrate 101",
-  "subtitle": "Install, run, connect, and debug stateful agent actors on Kubernetes, with a measured answer for each decision",
-  "summary": "How to install Agent Substrate, run actors that suspend and resume, control their network, connect kagent and agentgateway, and fix a cluster from the symptom. Measured on our own clusters with Agent Substrate v1.0.0.",
-  "audience": "You run agents on Kubernetes, or you plan to. You know pods, Services, and kubectl. You have not used Agent Substrate, and you want to know what it does and what it costs before you depend on it.",
+  "subtitle": "在 Kubernetes 上安装、运行、连接与排障有状态 agent actor，每项决策都有实测依据",
+  "summary": "如何安装 Agent Substrate，运行可挂起与恢复的 actor，控制其网络，接入 kagent 与 agentgateway，并从故障现象定位集群根因。全部基于我们在自有集群上对 Agent Substrate v1.0.0 的实测。",
+  "audience": "你正在或计划在 Kubernetes 上运行 agent，熟悉 pod、Service 与 kubectl，尚未用过 Agent Substrate，希望在投入生产依赖前搞清它做什么以及代价几何。",
   "edition": "2026.11",
   "status": "ready",
   "pin": {
@@ -15,95 +15,95 @@
     "verified": "2026-11-12"
   },
   "outcomes": [
-    "Install Agent Substrate on a kind cluster from the release images, create an actor, and send it a request.",
-    "Predict how long an actor takes to resume from the memory it holds, and choose between an asynchronous and a synchronous suspend.",
-    "Size a WorkerPool, and say what a client sees when the pool is full.",
-    "Write an egress policy, inject a credential, and choose between the Envoy and the agentgateway dataplane.",
-    "Find the cause of a 500 or a 503 from its text, and bring a crashed actor back with RevertActor.",
-    "Build the parts Substrate leaves to you: an idle suspender, a stateful agent actor, a tool sandbox, and a failure drill."
+    "从发布镜像在 kind 集群上安装 Agent Substrate，创建一个 actor 并向它发送请求。",
+    "根据 actor 持有的内存大小预测恢复耗时，并在异步挂起与同步挂起之间做出选择。",
+    "为 WorkerPool 规划容量，并说明池满时客户端会看到什么响应。",
+    "编写出站策略、注入凭据，并在 Envoy 与 agentgateway 数据平面之间选型。",
+    "根据报错文本查明 500 或 503 的成因，并用 RevertActor 将崩溃的 actor 恢复上线。",
+    "亲手构建 Substrate 留给你的四个组件：空闲挂起器、有状态 agent actor、工具沙箱与故障演练。"
   ],
   "palette": [
     {
       "hue": "blue",
-      "meaning": "the Substrate control plane: ate-api-server, ate-controller, ate-idp-server"
+      "meaning": "Substrate 控制平面：ate-api-server、ate-controller、ate-idp-server"
     },
     {
       "hue": "violet",
-      "meaning": "workers and sandboxes: atelet, worker pods, gVisor, microVM"
+      "meaning": "worker 与沙箱：atelet、worker pod、gVisor、microVM"
     },
     {
       "hue": "green",
-      "meaning": "the actor: the workload you run"
+      "meaning": "actor：你运行的工作负载"
     },
     {
       "hue": "plum",
-      "meaning": "the agent harness and model calls: kagent, the model"
+      "meaning": "agent harness 与模型调用：kagent、模型"
     },
     {
       "hue": "olive",
-      "meaning": "the client and hosts outside the cluster"
+      "meaning": "客户端与集群外主机"
     },
     {
       "hue": "indigo",
-      "meaning": "the dataplane: atenet-router, atenet-egress, Envoy, agentgateway"
+      "meaning": "数据平面：atenet-router、atenet-egress、Envoy、agentgateway"
     },
     {
       "hue": "amber",
-      "meaning": "lifecycle: actor states and the steps between them"
+      "meaning": "生命周期：actor 状态及状态间的迁移步骤"
     },
     {
       "hue": "teal",
-      "meaning": "durable state: Postgres, the object store, snapshots"
+      "meaning": "持久状态：Postgres、对象存储、快照"
     },
     {
       "hue": "rose",
-      "meaning": "failure: a crashed actor, a 500, a 503, lost calls"
+      "meaning": "失败：崩溃的 actor、500、503、丢失的调用"
     },
     {
       "hue": "grey",
-      "meaning": "outside Substrate: Kubernetes, the node, the operator"
+      "meaning": "Substrate 外部：Kubernetes、节点、运维人员"
     }
   ],
   "sources": [
     {
-      "name": "Recorded runs",
+      "name": "实测录制记录",
       "path": "capture/lab/ (two x86 server guests and an Apple silicon laptop, Agent Substrate v1.0.0, kagent v1.0.0, agentgateway v1.7.0)",
-      "usedFor": "every listing and every number marked as measured"
+      "usedFor": "所有代码清单与所有标注为实测的数值"
     },
     {
-      "name": "Agent Substrate source at the release tag",
+      "name": "发布标签处的 Agent Substrate 源码",
       "path": "v1.0.0 (b34fbee7)",
-      "usedFor": "every default, state, flag, and mechanism, and the reference tables"
+      "usedFor": "所有默认值、状态、标志、内部机制以及参考表格"
     },
     {
-      "name": "Agent Substrate documentation at the tag",
+      "name": "发布标签处的 Agent Substrate 文档",
       "path": "docs/ at v1.0.0",
-      "usedFor": "install paths and documented behaviour, checked against the code and our runs"
+      "usedFor": "安装路径与文档声明行为，均已对照源码与实测核验"
     },
     {
-      "name": "Agent Substrate GitHub issues and pull requests",
+      "name": "Agent Substrate GitHub issue 与 PR",
       "path": "github.com/agent-substrate/substrate",
-      "usedFor": "known failures, limits, and the history of each feature"
+      "usedFor": "已知故障、限制及各项特性的演进脉络"
     },
     {
-      "name": "kagent source at its release tag",
+      "name": "发布标签处的 kagent 源码",
       "path": "github.com/kagent-dev/kagent v1.0.0",
-      "usedFor": "how a Session becomes an Actor, and the egress policy that kagent writes"
+      "usedFor": "Session 如何映射为 Actor，以及 kagent 生成的出站策略"
     },
     {
-      "name": "agentgateway source at its release tag",
+      "name": "发布标签处的 agentgateway 源码",
       "path": "github.com/agentgateway/agentgateway v1.7.0",
-      "usedFor": "the Substrate policies of the agentgateway dataplane"
+      "usedFor": "agentgateway 数据平面的 Substrate 策略实现"
     },
     {
-      "name": "The Agent Substrate project site at version 1.0",
+      "name": "1.0 版本的 Agent Substrate 项目官网",
       "path": "ate.dev, read 2026-11-12",
-      "usedFor": "the headline claims that section 1.1 sets beside our runs, checked against the docs at the tag"
+      "usedFor": "第 1.1 节与实测结果并列核对的官网核心宣称，已对照标签处文档复核"
     },
     {
-      "name": "Agent Executor source and documentation",
+      "name": "Agent Executor 源码与文档",
       "path": "github.com/google/ax, read 2026-11-12",
-      "usedFor": "section 7.5, built from source at one commit and run"
+      "usedFor": "第 7.5 节，在固定提交处从源码构建并实测运行"
     }
   ],
   "quoteSources": {
@@ -129,15 +129,15 @@
   "front": "front.md",
   "plate": {
     "figure": "plate-substrate-request",
-    "title": "One request wakes one actor",
-    "caption": "On our test server, the first request to a suspended actor took 0.36 s, and the next four took 0.06 to 0.09 s. The router asked ate-api-server before each one. From capture/lab/B-lifecycle/10-trace.tsv."
+    "title": "一次请求唤醒一个 actor",
+    "caption": "在我们的测试服务器上，发往已挂起 actor 的首次请求耗时 0.36 秒，随后四次耗时 0.06 到 0.09 秒。每次请求前路由器都会先询问 ate-api-server。来源：capture/lab/B-lifecycle/10-trace.tsv。"
   },
   "parts": [
     {
       "number": 1,
-      "title": "Substrate on One Page",
-      "thesis": "Substrate runs many actors on few worker pods, and it leaves the decision to suspend an actor to you.",
-      "summary": "What Substrate does and what it leaves to you, then one request from the client to a suspended actor and back.",
+      "title": "一页读懂 Substrate",
+      "thesis": "Substrate 在少量 worker pod 上运行大量 actor，而何时挂起 actor 的决策权留给了你。",
+      "summary": "Substrate 负责什么、留给你什么，以及一次请求从客户端到达已挂起 actor 再返回的全过程。",
       "accent": "blue",
       "sections": [
         {
@@ -152,9 +152,9 @@
     },
     {
       "number": 2,
-      "title": "Start",
-      "thesis": "Install from the release images, create one actor, and prove that it answers before you change a setting.",
-      "summary": "The install with ate-setup, the kubectl ate plugin, a first actor behind the proxy, and the objects that the install created.",
+      "title": "起步",
+      "thesis": "先从发布镜像完成安装、创建一个 actor 并验证它能响应，再去改动任何配置。",
+      "summary": "用 ate-setup 安装、kubectl ate 插件、代理后的第一个 actor，以及安装过程创建的对象。",
       "accent": "green",
       "sections": [
         {
@@ -177,9 +177,9 @@
     },
     {
       "number": 3,
-      "title": "Actors",
-      "thesis": "An actor is a snapshot that runs for a while, so its speed and its safety both depend on where that snapshot is.",
-      "summary": "The ActorTemplate and its golden snapshot, the seven states, suspend and resume with their measured cost, snapshot fidelity, CRASHED and RevertActor, and atespaces.",
+      "title": "Actor",
+      "thesis": "Actor 本质上是一份短暂运行起来的快照，因此它的速度与安全性都取决于这份快照存放在哪里。",
+      "summary": "ActorTemplate 与黄金快照、七种状态、挂起与恢复的实测开销、快照保真度、CRASHED 与 RevertActor，以及 atespace。",
       "accent": "amber",
       "sections": [
         {
@@ -210,9 +210,9 @@
     },
     {
       "number": 4,
-      "title": "Workers and Capacity",
-      "thesis": "A WorkerPool decides how many actors run at one time, and a full pool answers with a 503 after five seconds.",
-      "summary": "The WorkerPool, the gVisor and microVM sandbox classes, placement, request parking, and how to size a pool.",
+      "title": "Worker 与容量",
+      "thesis": "WorkerPool 决定同时能运行多少个 actor，池满时请求会在五秒后收到 503。",
+      "summary": "WorkerPool、gVisor 与 microVM 沙箱类别、放置策略、请求暂存，以及如何规划池容量。",
       "accent": "violet",
       "sections": [
         {
@@ -239,9 +239,9 @@
     },
     {
       "number": 5,
-      "title": "Identity and Access",
-      "thesis": "Every caller and every actor has an identity, and the default install lets all clients share one.",
-      "summary": "How a client authenticates, how an access policy limits an atespace, and what an actor JWT carries.",
+      "title": "身份与访问控制",
+      "thesis": "每个调用方和每个 actor 都有身份，而默认安装会让所有客户端共用同一个身份。",
+      "summary": "客户端如何完成认证、访问策略如何限制 atespace，以及 actor JWT 携带哪些声明。",
       "accent": "indigo",
       "sections": [
         {
@@ -260,9 +260,9 @@
     },
     {
       "number": 6,
-      "title": "Network",
-      "thesis": "An actor reaches nothing until a policy names the host, and a removed rule does not close an open connection.",
-      "summary": "The router and ingress, the egress policy and default deny, the DNS relay, TLS interception, credential injection, and the choice between Envoy and agentgateway.",
+      "title": "网络",
+      "thesis": "在策略显式点名目标主机前 actor 无法访问任何外部地址，但移除规则不会断开已建立的连接。",
+      "summary": "路由器与入站、出站策略与默认拒绝、DNS 中继、TLS 拦截、凭据注入，以及 Envoy 与 agentgateway 的选型。",
       "accent": "olive",
       "sections": [
         {
@@ -293,9 +293,9 @@
     },
     {
       "number": 7,
-      "title": "Integrations",
-      "thesis": "kagent does the suspending that Substrate leaves to you, and agentgateway can carry the traffic in both directions.",
-      "summary": "kagent 1.0 on Substrate, agentgateway with Substrate, Substrate on GKE, when Substrate is the right choice, and Agent Executor.",
+      "title": "生态集成",
+      "thesis": "kagent 补上了 Substrate 留给你的挂起逻辑，而 agentgateway 可以同时承载入站与出站流量。",
+      "summary": "Substrate 上的 kagent 1.0、agentgateway 协同、GKE 部署、何时该选 Substrate，以及 Agent Executor。",
       "accent": "plum",
       "sections": [
         {
@@ -322,9 +322,9 @@
     },
     {
       "number": 8,
-      "title": "Operate and Debug",
-      "thesis": "Postgres and ate-api-server are on every request path, so their health is the health of every actor.",
-      "summary": "Postgres and the object store, what fails when a dependency is down, symptoms and their fixes, the upgrade path, and the limits at v1.0.0.",
+      "title": "运维与排障",
+      "thesis": "Postgres 与 ate-api-server 位于每一条请求路径上，因此它们的健康度直接决定每个 actor 的健康度。",
+      "summary": "Postgres 与对象存储、依赖中断时的故障表现、症状与修复对照表、升级路径，以及 v1.0.0 的已知限制。",
       "accent": "rose",
       "sections": [
         {
@@ -351,9 +351,9 @@
     },
     {
       "number": 9,
-      "title": "Build",
-      "thesis": "Four small programs that you can run show what you must build around Substrate: an idle suspender, a stateful agent, a tool sandbox, and a failure drill.",
-      "summary": "An idle suspender, an agent actor that keeps its conversation, a sandbox for commands you do not trust, and a drill for six failures.",
+      "title": "动手构建",
+      "thesis": "四个可直接运行的小程序展示了围绕 Substrate 必须自建的组件：空闲挂起器、有状态 agent、工具沙箱与故障演练。",
+      "summary": "空闲挂起器、保留对话历史的 agent actor、隔离不可信命令的工具沙箱，以及覆盖六类故障的演练脚本。",
       "accent": "green",
       "sections": [
         {
@@ -376,8 +376,8 @@
     }
   ],
   "reference": {
-    "title": "Reference",
-    "thesis": "The methods, objects, states, commands, flags, errors, terms, and sources this manual uses, in one place.",
+    "title": "参考",
+    "thesis": "集中收录本手册用到的全部方法、对象、状态、命令、标志、错误、术语与来源。",
     "accent": "teal",
     "sections": [
       {

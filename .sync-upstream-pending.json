@@ -1,7 +1,16 @@
 {
-  "base": "8c09d890956fdef7d75d888aa8efecc16ff3846c",
-  "target": "a509402c0b5455d11ddc2b5fa83cc8c0d2e0692b",
-  "pending": [],
+  "base": "a509402c0b5455d11ddc2b5fa83cc8c0d2e0692b",
+  "target": "8afa245ebc2e8861480edf8c4911a2b6d9769688",
+  "pending": [
+    {
+      "batch": "site-shell-778-796",
+      "summary": "课程正文优先、五项栏目导航与移动底栏、首页阶段卡片及 44x44 搜索图标（#778 #796）线上部署验收"
+    },
+    {
+      "batch": "manual-agent-substrate-101",
+      "summary": "Agent Substrate 101 中文技术手册、76 幅图表本地化及配套设施（#782 #795 #797）线上部署验收"
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -252,6 +261,44 @@
         "scripts/test_site_integration.js",
         "scripts/test_agent_api.js",
         "site/test_project_prerequisites.js"
+      ]
+    },
+    {
+      "scope": "上游 a509402..8afa245 站点导航、/learn/ 308 兼容与 Agent Substrate 101 手册（2026-11-15）",
+      "decision": "#778/#796：语义移植课程行动清单默认折叠与持久化、五项主导航优先级与移动端 5 格底栏、首页续读入口与三联机器卡片、20 张阶段卡片进度状态及全站 44x44 放大镜 SVG 搜索按钮；保留中文站预渲染 /lessons/ 路由与嵌套目录相对解析。#780（决策 D1=A）：保留中文站 /lessons/<phase>/<lesson>/ 静态预渲染、canonical、sitemap.xml、llms.txt 与 OG 契约不变，仅在 vercel.json 与 api/lesson.js 新增无前缀及带前缀 /learn/<phase>/<lesson>[/] 单跳 308 兼容跳转并保留合法查询参数（PR #153）。#779（决策 D2=A）：跳过首页近期发布动态区块与 GitHub Releases 抓取流水线（site/releases.json、scripts/fetch-releases.js、scripts/prebuild.js、site/test_releases.js）。#781：tool-contract-migration-checker 速查表登记已在中文仓前序批次完成。#782/#795/#797：引入 Agent Substrate 101 手册全部 50 节正文、front.md、manual.json、README.md、capture/README.md 与 research/brief.md 并完成中文翻译与审校，保留显式英文 {#s-...} 标题锚点与 177 处 listing 原始输出逐字节一致；76 幅图表源码本地化并按中文全角宽度重生成 SVG；移植 forms.js、marks.js、figkit.ISO/mark、AUTHORING.md、write-manual v1.1.0、build-manuals.js 的 labMeasuredEvidence() 与中文句末 readerCaption() 修复、header.js 新手册横幅及 production-agent-runtimes 速查表登记；收敛 vercel.json 中 api/markdown 与 api/v1/markdown 的 includeFiles/excludeFiles（剔除第 7 本手册加入后突破 250 MB 限制的离线打印版 manual-*-print.html 及无关静态子目录）并在 scripts/test_function_bundles.js 补充 markdown 函数包体积预算门禁。五个 chore(site): rebuild data.js 由中文源重建，不复制。已检视基准前移至 8afa245eb，栈内批次在完成 CI、合并与线上生产验证前保留 pending。",
+      "paths": [
+        "lib/site-navigation.js",
+        "lib/hub-routes.js",
+        "api/lesson.js",
+        "api/markdown.js",
+        "vercel.json",
+        "scripts/test_function_bundles.js",
+        "site/header.js",
+        "site/app.js",
+        "site/index.html",
+        "site/lesson.html",
+        "site/style.css",
+        "site/build.js",
+        "site/build-manuals.js",
+        "site/test_manuals.js",
+        "site/data.js",
+        "site/skills.html",
+        "site/skills.md",
+        "site/releases.json",
+        "scripts/fetch-releases.js",
+        "scripts/prebuild.js",
+        "scripts/check_manual_outputs.js",
+        "manuals/_shared/figkit.js",
+        "manuals/_shared/forms.js",
+        "manuals/_shared/marks.js",
+        "manuals/AUTHORING.md",
+        "manuals/agent-substrate-101/",
+        "skills/write-manual/SKILL.md",
+        ".claude/skills/write-manual/SKILL.md",
+        "cheatsheets/topics.yaml",
+        "cheatsheets/production-agent-runtimes.md",
+        ".github/workflows/build.yml",
+        ".gitignore"
       ]
     }
   ]

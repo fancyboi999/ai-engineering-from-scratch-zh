@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 432" role="img" aria-labelledby="fig-7-2-title fig-7-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-2-title">Three places where agentgateway can sit next to Substrate</title>
-  <desc id="fig-7-2-desc">Three rows. Row A: agentgateway is the proxy in atenet-router and atenet-egress when you install Substrate with the agentgateway dataplane. Row B: the kagent distribution installs the same two proxies and has no Envoy option. Row C: a separate agentgateway is a model gateway that the actor reaches through one egress rule, and that gateway selects the model. In our run with two mock backends, a request on a new intercepted TLS connection took 618 milliseconds on the agentgateway dataplane and 614 on Envoy, and a request on a reused connection took 10 and 12 milliseconds.</desc>
+  <title id="fig-7-2-title">agentgateway 与 Substrate 配合的三种位置</title>
+  <desc id="fig-7-2-desc">三行架构。A 行：以 agentgateway 数据平面安装 Substrate 时，agentgateway 充当 atenet-router 与 atenet-egress 内的代理。B 行：kagent 发行版安装相同的两个代理，且不提供 Envoy 选项。C 行：独立的 agentgateway 充当模型网关，actor 通过单条出站规则访问它并由它选择模型。在连接两个模拟后端的实测中，新建拦截 TLS 连接的请求在 agentgateway 数据平面上耗时 618 ms（Envoy 为 614 ms），复用连接分别耗时 10 ms 与 12 ms。</desc>
   <defs><marker id="fig-7-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
-  <text x="20" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · THE DATAPLANE OF SUBSTRATE, BY YOUR CHOICE</text>
+  <text x="20" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A · 由你选择的 SUBSTRATE 数据平面</text>
   <rect x="20" y="34" width="104" height="46" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
-  <text x="72" y="51.95" font-size="11.5" text-anchor="middle" font-weight="700">client</text>
-  <text x="72" y="69.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mTLS client</text>
+  <text x="72" y="51.95" font-size="11.5" text-anchor="middle" font-weight="700">客户端</text>
+  <text x="72" y="69.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mTLS 客户端</text>
   <line x1="124" y1="57" x2="143" y2="57" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="144" y="34" width="104" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="196" y="51.95" font-size="11.5" text-anchor="middle" font-weight="700">atenet-router</text>
@@ -20,14 +20,14 @@
   <text x="444" y="69.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agentgateway</text>
   <line x1="496" y1="57" x2="515" y2="57" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="516" y="34" width="104" height="46" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
-  <text x="568" y="51.95" font-size="11.5" text-anchor="middle" font-weight="700">host</text>
-  <text x="568" y="69.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">in the policy</text>
-  <text x="20" y="102" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">decides: who gets in, which hosts an actor reaches, one injected header</text>
-  <text x="20" y="120" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ate-setup --atenet-dataplane=agentgateway. Idle: 38 MB in 2 containers. Envoy: 91 MB in 5.</text>
-  <text x="20" y="168" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · THE DATAPLANE INSIDE THE KAGENT DISTRIBUTION</text>
+  <text x="568" y="51.95" font-size="11.5" text-anchor="middle" font-weight="700">目标主机</text>
+  <text x="568" y="69.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">策略允许范围</text>
+  <text x="20" y="102" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">决定事项：谁能入站、actor 可访问哪些主机、注入一个请求头</text>
+  <text x="20" y="120" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ate-setup --atenet-dataplane=agentgateway。空闲内存：2 容器共 38 MB；Envoy 为 5 容器共 91 MB。</text>
+  <text x="20" y="168" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B · KAGENT 发行版内置的数据平面</text>
   <rect x="20" y="178" width="104" height="46" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
   <text x="72" y="195.95" font-size="11.5" text-anchor="middle" font-weight="700">kagent</text>
-  <text x="72" y="213.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">controller</text>
+  <text x="72" y="213.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">控制器</text>
   <line x1="124" y1="201" x2="143" y2="201" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="144" y="178" width="104" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="196" y="195.95" font-size="11.5" text-anchor="middle" font-weight="700">atenet-router</text>
@@ -42,28 +42,28 @@
   <text x="444" y="213.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agentgateway</text>
   <line x1="496" y1="201" x2="515" y2="201" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="516" y="178" width="104" height="46" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
-  <text x="568" y="195.95" font-size="11.5" text-anchor="middle" font-weight="700">model host</text>
-  <text x="568" y="213.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">in the policy</text>
-  <text x="20" y="246" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">decides: the same three things</text>
-  <text x="20" y="264" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">The kagent charts install agentgateway v1.7.0 and have no Envoy option. 98 turns ran through it.</text>
-  <text x="20" y="312" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">C · A GATEWAY THAT THE ACTOR CALLS THROUGH AN EGRESS RULE</text>
+  <text x="568" y="195.95" font-size="11.5" text-anchor="middle" font-weight="700">模型主机</text>
+  <text x="568" y="213.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">策略允许范围</text>
+  <text x="20" y="246" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">决定事项：同样这三项</text>
+  <text x="20" y="264" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kagent chart 安装 agentgateway v1.7.0，无 Envoy 选项。共 98 个轮次经其转发。</text>
+  <text x="20" y="312" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">C · ACTOR 经由出站规则调用的独立网关</text>
   <rect x="20" y="322" width="104" height="46" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <text x="72" y="339.95" font-size="11.5" text-anchor="middle" font-weight="700">actor</text>
   <text x="72" y="357.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">f-main</text>
   <line x1="124" y1="345" x2="143" y2="345" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="144" y="322" width="104" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="196" y="339.95" font-size="11.5" text-anchor="middle" font-weight="700">atenet-egress</text>
-  <text x="196" y="357.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one https rule</text>
+  <text x="196" y="357.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单条 https 规则</text>
   <line x1="248" y1="345" x2="267" y2="345" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="268" y="322" width="104" height="46" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.8" stroke-dasharray="5 4"/>
   <text x="320" y="339.95" font-size="11.5" text-anchor="middle" font-weight="700">agentgateway</text>
-  <text x="320" y="357.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">model gateway</text>
+  <text x="320" y="357.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型网关</text>
   <line x1="372" y1="345" x2="391" y2="345" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-2-head-ink)"/>
   <rect x="392" y="322" width="104" height="46" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
-  <text x="444" y="339.95" font-size="11.5" text-anchor="middle" font-weight="700">model</text>
+  <text x="444" y="339.95" font-size="11.5" text-anchor="middle" font-weight="700">模型</text>
   <text x="444" y="357.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mock-a, mock-b</text>
-  <text x="20" y="390" font-size="11.5" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">decides: the model, and the key that the provider gets</text>
-  <text x="20" y="408" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Ran over TLS with two mock models. A new connection: 618 ms. A reused one: 10 ms.</text>
+  <text x="20" y="390" font-size="11.5" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">决定事项：选用哪个模型，以及发往模型提供方的密钥</text>
+  <text x="20" y="408" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">基于 TLS 连接两个模拟模型实测。新建连接：618 ms；复用连接：10 ms。</text>
   <line x1="20" y1="142" x2="620" y2="142" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4" stroke-opacity="0.5"/>
   <line x1="20" y1="286" x2="620" y2="286" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4" stroke-opacity="0.5"/>
 </svg>

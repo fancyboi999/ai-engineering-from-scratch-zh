@@ -55,7 +55,7 @@ function steps(f, y, list, worker) {
     const x1 = px(worker.start);
     const x2 = px(worker.end);
     f.rect(x1, y, x2 - x1, 16, { hue: 'violet' });
-    f.text((x1 + x2) / 2, y + 29, '3, the pool rolls', { size: 11, weight: 700, anchor: 'middle', hue: 'violet' });
+    f.text((x1 + x2) / 2, y + 29, '3，池滚动更新', { size: 11, weight: 700, anchor: 'middle', hue: 'violet' });
   }
 }
 
@@ -74,50 +74,50 @@ const step4a = second.steps.find(step => step.step.startsWith('24a'));
 
 module.exports = figure('fig-8-4b', {
   height: 488,
-  title: 'Two upgrades from v1.0.0-rc.3 to v1.0.0, against the request streams',
-  desc: `Two timelines of the same upgrade on one kind node, run once each. In the first run the loop actor failed ${cycles1.failed} of ${cycles1.cycles} suspend and resume cycles, all in the atelet step, and the RUNNING actor crashed when the worker image changed. In the second run the loop actor failed ${window2.cycles} cycles in a row in the atelet step, then crashed in the worker step and stayed crashed. The RUNNING actor that exits on SIGTERM crashed again, and the one that handles SIGTERM failed ${trap2.failed} of ${trap2.requests} requests.`,
+  title: '从 v1.0.0-rc.3 到 v1.0.0 的两次升级实测及请求流表现',
+  desc: `单 kind 节点上同一升级流程两次实测的时间线。第一次运行中，循环挂起恢复的 actor 在 ${cycles1.cycles} 轮中失败 ${cycles1.failed} 轮（全部发生在 atelet 步骤），而 RUNNING 状态的 actor 在 worker 镜像变更后崩溃。第二次运行中，循环 actor 在 atelet 步骤连续失败 ${window2.cycles} 轮，随后在 worker 步骤崩溃并保持崩溃状态；收到 SIGTERM 即退出的 RUNNING actor 再次崩溃，而捕获处理 SIGTERM 的 RUNNING actor 在 ${trap2.requests} 次请求中失败 ${trap2.failed} 次。`,
 }, f => {
   f.rect(20, 14, 12, 8, { fill: color('green-ink'), stroke: 'none' });
-  f.text(38, 22, 'returned 200', { size: 11, hue: 'ink-soft' });
+  f.text(38, 22, '返回 200', { size: 11, hue: 'ink-soft' });
   f.rect(140, 14, 12, 8, { fill: color('rose-ink'), stroke: 'none' });
-  f.text(158, 22, 'failed', { size: 11, hue: 'ink-soft' });
+  f.text(158, 22, '失败', { size: 11, hue: 'ink-soft' });
   f.rect(216, 12, 12, 12, { fill: color('blue-ink'), stroke: 'none' });
-  f.text(234, 22, 'a control plane step', { size: 11, hue: 'ink-soft' });
+  f.text(234, 22, '控制平面步骤', { size: 11, hue: 'ink-soft' });
   f.rect(390, 12, 12, 12, { fill: color('violet-ink'), stroke: 'none' });
-  f.text(408, 22, 'a worker step', { size: 11, hue: 'ink-soft' });
+  f.text(408, 22, 'worker 步骤', { size: 11, hue: 'ink-soft' });
 
-  f.text(20, 58, 'First run', { size: 12.5, weight: 700, hue: 'ink' });
-  rowLabel(f, 82, 'upgrade step');
+  f.text(20, 58, '第一次运行', { size: 12.5, weight: 700, hue: 'ink' });
+  rowLabel(f, 82, '升级步骤');
   steps(f, 74, first.steps);
   const patch = first.steps.find(step => step.step.startsWith('23'));
   const next = first.steps.find(step => step.step.startsWith('24a'));
-  f.text((px(patch.end_t) + px(next.begin_t)) / 2, 86, 'we watched the pool for 160 s', { size: 11, serif: true, anchor: 'middle', hue: 'ink-soft' });
-  rowLabel(f, 136, 'suspend and resume,', 'one actor in a loop');
+  f.text((px(patch.end_t) + px(next.begin_t)) / 2, 86, '观察 worker 池 160 s', { size: 11, serif: true, anchor: 'middle', hue: 'ink-soft' });
+  rowLabel(f, 136, '挂起与恢复循环', '（单个 actor）');
   band(f, 132, runs(cycles1.per_cycle.filter(item => item.t <= LAST), 3.5, item => item.ok));
-  f.text(px(cycles1.first_failure_t), 125, `${cycles1.failed} cycles failed, in ${cycles1.failed_window_seconds.toFixed(0)} s of step 2`, { size: 11, serif: true, hue: 'rose' });
-  rowLabel(f, 176, 'RUNNING actor that', 'exits on SIGTERM');
+  f.text(px(cycles1.first_failure_t), 125, `步骤 2 的 ${cycles1.failed_window_seconds.toFixed(0)} s 内失败 ${cycles1.failed} 轮`, { size: 11, serif: true, hue: 'rose' });
+  rowLabel(f, 176, '收到 SIGTERM 即退出的', 'RUNNING actor');
   band(f, 172, runs(running1.per_second.filter(item => item.t <= LAST), 1, item => item.code === '200'));
-  f.text(px(running1.first_failure_t) + 4, 165, 'CRASHED after the image change, 503 until a revert', { size: 11, serif: true, hue: 'rose' });
+  f.text(px(running1.first_failure_t) + 4, 165, '镜像变更后变为 CRASHED，回退前一直返回 503', { size: 11, serif: true, hue: 'rose' });
 
   f.rule(20, 208, RIGHT, 208);
-  f.text(20, 234, 'Second run', { size: 12.5, weight: 700, hue: 'ink' });
-  rowLabel(f, 258, 'upgrade step');
+  f.text(20, 234, '第二次运行', { size: 12.5, weight: 700, hue: 'ink' });
+  rowLabel(f, 258, '升级步骤');
   steps(f, 250, second.steps, { start: second.pool_patch_t, end: step4a.begin_t });
-  rowLabel(f, 314, 'suspend and resume,', 'one actor in a loop');
+  rowLabel(f, 314, '挂起与恢复循环', '（单个 actor）');
   band(f, 310, runs(cycles2.per_cycle.filter(item => item.t <= LAST), 3.5, item => item.ok));
-  f.text(px(window2.first_t), 303, `${window2.cycles} failed in ${(window2.next_ok_t - window2.first_t).toFixed(0)} s of step 2`, { size: 11, serif: true, hue: 'rose' });
-  f.text(RIGHT, 303, 'then CRASHED until a revert', { size: 11, serif: true, hue: 'rose', anchor: 'end' });
-  rowLabel(f, 354, 'RUNNING actor that', 'exits on SIGTERM');
+  f.text(px(window2.first_t), 303, `步骤 2 的 ${(window2.next_ok_t - window2.first_t).toFixed(0)} s 内失败 ${window2.cycles} 轮`, { size: 11, serif: true, hue: 'rose' });
+  f.text(RIGHT, 303, '随后变为 CRASHED，直至回退', { size: 11, serif: true, hue: 'rose', anchor: 'end' });
+  rowLabel(f, 354, '收到 SIGTERM 即退出的', 'RUNNING actor');
   band(f, 350, runs(plain2.per_second.filter(item => item.t <= LAST), 1, item => item.code === '200'));
-  f.text(px(second.pool_patch_t + plain2.first_failure_seconds_after_pool_patch) + 4, 343, `${plain2.failed} of ${plain2.requests} failed, CRASHED until a revert`, { size: 11, serif: true, hue: 'rose' });
-  rowLabel(f, 394, 'RUNNING actor that', 'handles SIGTERM');
+  f.text(px(second.pool_patch_t + plain2.first_failure_seconds_after_pool_patch) + 4, 343, `${plain2.failed}/${plain2.requests} 次失败，回退前保持 CRASHED`, { size: 11, serif: true, hue: 'rose' });
+  rowLabel(f, 394, '捕获处理 SIGTERM 的', 'RUNNING actor');
   band(f, 390, runs(trap2.per_second.filter(item => item.t <= LAST), 1, item => item.code === '200'));
-  f.text(px(120), 383, `${trap2.failed} of ${trap2.requests} failed`, { size: 11, serif: true, hue: 'green' });
+  f.text(px(120), 383, `${trap2.failed}/${trap2.requests} 次失败`, { size: 11, serif: true, hue: 'green' });
 
   f.rule(px(0), 428, px(LAST), 428, { hue: 'ink' });
   for (const t of [0, 60, 120, 180, 240, 300]) {
     f.rule(px(t), 424, px(t), 432, { hue: 'ink' });
     f.text(px(t), 446, `${t} s`, { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.text((px(0) + px(LAST)) / 2, 470, 'seconds since the start of step 1', { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
+  f.text((px(0) + px(LAST)) / 2, 470, '自步骤 1 开始起算的秒数', { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
 });

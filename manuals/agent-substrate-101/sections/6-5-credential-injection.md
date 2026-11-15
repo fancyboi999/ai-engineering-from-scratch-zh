@@ -1,24 +1,24 @@
-# Credential injection
+# 凭据注入
 
-> The gateway replaces a placeholder header with a secret that the actor never holds, and an upstream that returns its request headers gives that secret back to the actor.
+> 网关用 actor 绝不持有的 Secret 替换占位头，而返回请求头的上游服务会把这个 Secret 送回给 actor。
 
-An agent needs an API key to call a model or a code host. The agent also runs code that a model wrote. Substrate can copy the memory and the files of its sandbox to an object store at each suspend. You do not want the key in that sandbox, in its environment, or in its snapshots.
+agent 调用模型或代码托管服务时需要 API 密钥。agent 还会运行由模型编写的代码。Substrate 可以在每次挂起时把沙箱的内存与文件复制到对象存储。你不希望把密钥放进沙箱、环境变量或它的快照中。
 
-When you finish this section, you can write a rule that injects a credential, and grant an atespace access to a Kubernetes Secret. You can also name the cases where the swap fails and the one case where the secret reaches the actor.
+读完本节，你能编写注入凭据的规则，并为 atespace 授予访问 Kubernetes Secret 的权限。你还能指出替换失败的各种情况，以及 Secret 流入 actor 的唯一场景。
 
-## The swap in one request
+## 单个请求中的替换过程 {#s-credential-injection-the-swap-in-one-request}
 
-Credential injection is an effect on an `http` or `https` rule. The rule names a header and a secret. The actor sends that header with any value, and the gateway overwrites the value before the request leaves the cluster.
+凭据注入是配置在 `http` 或 `https` 规则上的一种效果。规则声明请求头和 Secret。actor 发送带有任意值的该请求头，网关在请求离开集群之前将其值覆盖。
 
-**Placeholder header:** the header that the actor sends with a value that is not a secret, such as `Authorization: placeholder-from-actor`. Its presence asks for the swap. Its value is thrown away.
+**占位头（placeholder header）：** actor 发送的带有非敏感值的请求头，例如 `Authorization: placeholder-from-actor`。它的存在表明需要进行替换，其原本的值会被丢弃。
 
-This is the rule file from our test. It has three headers, so that one request can exercise each outcome.
+这是我们测试中的规则文件。它配置了三个请求头，以便一个请求测试全部可能的结果。
 
 ```listing
-title: one rule with three credential headers
+title: 带三个凭据头的单条规则
 source: capture/lab/F-egress/envoy/P4.yaml
 lang: yaml
-note: The complete rule file. Only the first header names a Secret that exists in a granted namespace.
+note: 完整的规则文件。只有第一个请求头指向已授权命名空间中存在的 Secret。
 ---
 rules:
 - http:
@@ -34,15 +34,15 @@ rules:
         credentialUri: ate-secret://k8s.io/default/cred-ns/does-not-exist/token
 ```
 
-Each entry has a `header`, an optional `prefix`, and one source: a `credentialUri`, or an `actorJwt` that [section 5.3](#s-actor-jwts) covers. A rule takes up to 16 entries {{code}}.
+每个条目包含一个 `header`、一个可选的 `prefix`，以及一个来源（`credentialUri` 或[第 5.3 节](#s-actor-jwts)介绍的 `actorJwt`）。一条规则最多接受 16 个条目{{code}}。
 
-The upstream in our test prints each request that it receives. The actor sent the placeholder, and this is what arrived.
+我们测试中的上游服务会打印收到的每个请求。actor 发送了占位头，实际送达的内容如下。
 
 ```listing
-title: the request that the upstream received
+title: 上游服务收到的请求
 source: capture/lab/F-egress/envoy/20-results.txt
 lang: console
-note: The command in the actor and the matching lines of the response. The upstream is a server that returns the request it received.
+note: actor 内部的命令及响应中的匹配行。上游是一台回显所接收请求的服务器。
 ---
 $ curl -sS -m 8 -i -H 'Authorization: placeholder-from-actor' http://whoami.egress-target.svc.cluster.local/ | grep -i -E 'HTTP/|authorization|x-forwarded|RemoteAddr|egress'
 …
@@ -56,43 +56,43 @@ Authorization: Bearer lab-granted-marker-1794480266
 ```figure
 id: fig-6-5
 kind: sequence
-title: one request with a placeholder header
-claim: The secret travels from the Kubernetes Secret to atenet-egress and on to the upstream, and it enters the actor only if the upstream sends it back.
-caption: Read from top to bottom. Steps 2 and 3 happen for each request that carries the header. Step 6 is the leak that our test upstream produced. From capture/lab/F-egress/envoy/20-results.txt and capture/lab/F-egress/envoy/P4.yaml.
+title: 带有占位头的单个请求
+claim: Secret 从 Kubernetes Secret 传递到 atenet-egress 并送往上游，仅当上游将其回传时才会进入 actor。
+caption: 从上往下读。第 2 步和第 3 步在每个带有该请求头的请求中都会执行。第 6 步是我们的测试上游产生的泄漏。来源：capture/lab/F-egress/envoy/20-results.txt、capture/lab/F-egress/envoy/P4.yaml。
 ```
 
-The environment of the actor held no secret. We listed it, and we searched `/run`, `/etc`, and `/tmp` for the value. Nothing matched. A secret that never enters the sandbox cannot be in a snapshot of it.
+actor 的环境变量中没有任何 Secret。我们检查了环境变量列表，并在 `/run`、`/etc` 和 `/tmp` 中搜索了该凭据值，均未匹配到任何内容。从未进入沙箱的 Secret 绝不会出现在沙箱快照中。
 
-Our test used an `http` rule to a Service in the cluster. With `http`, the credential leaves the gateway in cleartext {{code}}. For a real API, put the effect on an `https` rule.
+我们的测试使用了指向集群内 Service 的 `http` 规则。在 `http` 规则下，凭据离开网关后以明文传输{{code}}。针对真实的外部 API，请把该效果配置在 `https` 规则上。
 
-## The `ate-secret://` reference and the bundled provider
+## `ate-secret://` 引用与内置提供方 {#s-credential-injection-the-ate-secret-reference-and-the-bundled-provider}
 
-**Credential provider:** a gRPC service that turns a reference into a secret value. The gateway picks the provider from the host part of the reference and sends it the reference and the identity of the actor {{code}}. The provider decides if that actor gets that secret.
+**凭据提供方（credential provider）：** 将引用解析为 Secret 值的 gRPC 服务。网关根据引用中的主机部分选择提供方，并向其发送引用与 actor 的身份{{code}}。提供方据此决定该 actor 是否有权获取该 Secret。
 
-Substrate v1.0.0 installs one provider when you pass `--credential-provider='{"name":"k8s.io"}'`. It runs as the Deployment `k8s-credential-provider` in `ate-system`, and it reads Kubernetes Secrets. Its references have this form:
+在安装时传入 `--credential-provider='{"name":"k8s.io"}'`，Substrate v1.0.0 就会安装一个提供方。它以 Deployment `k8s-credential-provider` 运行在 `ate-system` 中，负责读取 Kubernetes Secret。它的引用格式如下：
 
 ```text
 ate-secret://k8s.io/default/<namespace>/<secret>/<key>
 ```
 
-The provider reads the Secret for each call that it gets and keeps no copy {{code}}. How soon a rotated Secret takes effect depends on the dataplane, because the gateway decides how often it calls the provider.
+提供方每次收到调用都会读取 Secret，自身不留副本{{code}}。轮转后的 Secret 多快生效取决于数据平面，因为网关决定多久调用一次提供方。
 
-| Dataplane | What the gateway does | A rotated Secret takes effect |
+| 数据平面 | 网关的处理方式 | 轮转后的 Secret 生效时间 |
 |---|---|---|
-| Envoy | It calls the provider for each request that carries the header, and it keeps no copy {{code}}. | on the next request, or the one after it: 1.0 to 1.6 s in our run |
-| agentgateway v1.7.0 | It keeps each fetched credential for 300 seconds, for one actor and one reference. `ate-setup` sets no other value {{agentgateway}}. | after the time that is left of those 300 seconds: 100.6 to 280.5 s in our run |
+| Envoy | 对每个带有该请求头的请求都调用提供方，不保留副本{{code}}。 | 在下一个请求或其后的请求生效，我们的实测为 1.0 到 1.6 秒 |
+| agentgateway v1.7.0 | 对同一个 actor 和同一个引用，将获取到的凭据保留 300 秒。`ate-setup` 没有配置其他值{{agentgateway}}。 | 在这 300 秒剩余的时间之后生效，我们的实测为 100.6 到 280.5 秒 |
 
-The agentgateway row covers every kagent install, because that distribution runs agentgateway. We read both rows in the code first, and then we measured them.
+agentgateway 这一行涵盖所有 kagent 安装，因为该发行版运行 agentgateway。我们先在代码中核实了这两行行为，随后进行了实际测量。
 
-**We measured** three changes of one Secret on each dataplane, on a second x86 server guest (16 vCPU, 23 GB). One running actor had one `http` rule with the effect. It sent one request about each second to an echo service in the cluster. We recorded when that service first saw each new value.
+**我们测得**在第二台 x86 服务器客户机（16 vCPU、23 GB）上，每种数据平面各测试三次 Secret 变更。一个运行中的 actor 配置了一条带有该效果的 `http` 规则。它大约每秒向集群内的回显服务发送一次请求。我们记录了该服务首次观察到每个新值的时刻。
 
-**We measured** these lags in that run on the same guest (16 vCPU, 23 GB), with n=3 changes for each dataplane. On agentgateway the lag was 280.5, 200.9, and 100.6 s. In those times 233, 168, and 84 requests still carried the old value. On Envoy the lag was 1.0, 1.0, and 1.6 s, and one request in all carried an old value. No request failed on either dataplane, in 759 and 275 requests.
+**我们测得**在同一台客户机（16 vCPU、23 GB）的该次运行中，每种数据平面各经历 n=3 次变更后的延迟。在 agentgateway 上延迟分别为 280.5、200.9 和 100.6 秒。在这些时段内，分别有 233、168 和 84 个请求仍携带旧值。在 Envoy 上延迟分别为 1.0、1.0 和 1.6 秒，总共只有 1 个请求携带旧值。在 759 次与 275 次请求中，两种数据平面均未出现请求失败。
 
 ```listing
-title: three changes of the Secret on agentgateway
+title: agentgateway 上的三次 Secret 变更
 source: capture/lab/Q-network/l-credential-rotation/agentgateway/20-rotations.tsv
 lang: text
-note: The complete table of the file. The first three columns are the change, the wait before it, and the time of the change. The fourth is the time the upstream first saw the new value. The last two are the lag in seconds and the requests that still carried the old value.
+note: 文件的完整表格。前三列分别是轮换序号、轮换前等待时间和变更发生时间。第四列是上游首次观察到新值的时间。最后两列是延迟秒数和变更后仍携带旧值的请求数。
 ---
 rotation	wait_before_s	secret_changed_epoch	first_seen_epoch	lag_s	old_values_after_change
 1	5	1794493351.752	1794493632.272	280.5	233
@@ -103,26 +103,26 @@ rotation	wait_before_s	secret_changed_epoch	first_seen_epoch	lag_s	old_values_af
 ```figure
 id: fig-6-5b
 kind: chart
-title: seconds until the upstream saw a changed credential
-claim: A changed Secret reached the upstream in 1.0 to 1.6 s on Envoy and in 100.6 to 280.5 s on agentgateway.
-caption: Read each line left to right over the three changes. The time axis is logarithmic. The solid line is agentgateway, the dashed line is Envoy, and the rose line marks 300 s. From capture/lab/summary/rotation-x86.json.
+title: 上游观察到凭据变更所耗费的秒数
+claim: 变更后的 Secret 在 Envoy 上用时 1.0 到 1.6 秒到达上游，在 agentgateway 上用时 100.6 到 280.5 秒。
+caption: 从左往右沿三次变更阅读每条曲线。时间轴采用对数刻度。实线代表 agentgateway，虚线代表 Envoy，玫红色线条标出 300 秒。来源：capture/lab/summary/rotation-x86.json。
 ```
 
-The three lags on agentgateway are not random. The upstream first saw a new value at three moments that were 301 s apart. So the gateway fetched the credential again each time its copy was 300 s old. The lag after a change is the time left until that moment. It can be any value from 0 to about 300 s. On Envoy our probe sent one request each second, so we cannot state a lag below 1 s.
+agentgateway 上的三次延迟并非随机数值。上游首次观察到新值的三个时刻之间恰好相隔 301 秒。这说明网关在本地副本达到 300 秒时才会重新获取凭据。变更发生后的延迟就是距离下一次刷新的剩余时间，介于 0 到约 300 秒之间。在 Envoy 上我们的探测器每秒发送一次请求，因此无法给出 1 秒以下的延迟数字。
 
-During a change the upstream saw the old value or the new one. It never saw an empty header, and it never saw the placeholder of the actor. That is why no request failed. It also means that a secret which you revoke stays in use on agentgateway for up to 5 minutes. Revoke the old value at the upstream when you must stop its use at once. When you rotate without an incident, keep the old value valid at the upstream for 5 minutes after the change.
+在变更期间，上游看到的要么是旧值要么是新值。它从未收到过空请求头，也从未收到过 actor 的占位值。这就是没有请求失败的原因。这也意味着一旦吊销某个 Secret，在 agentgateway 上它仍可能继续被使用长达 5 分钟。若必须立即终止其使用，请直接在上游吊销旧值。在非紧急的常规轮转中，变更后请保持旧值在上游继续有效 5 分钟。
 
-We tested one Secret and one actor. Whether a restart of `atenet-egress` forces a new fetch is a test for the next edition.
+我们测试了一个 Secret 和一个 actor。重启 `atenet-egress` 是否会强制重新获取凭据，留待下一版测试。
 
-On Envoy, the cost is one call to the provider and one read of the Kubernetes API for each request that carries the header. On agentgateway, most requests make no call to the provider.
+在 Envoy 上，每个携带该请求头的请求都要付出一次调用提供方和一次读取 Kubernetes API 的代价。在 agentgateway 上，绝大多数请求无需调用提供方。
 
-The provider starts with no access. A ConfigMap, `k8s-credential-provider-namespace-policy`, maps each atespace to the namespaces whose Secrets its actors can use. The install creates it empty.
+提供方初始状态下没有任何权限。ConfigMap `k8s-credential-provider-namespace-policy` 将每个 atespace 映射到其 actor 可以使用的 Secret 所在的命名空间。安装完成后该配置为空。
 
 ```listing
-title: the grant for one atespace
+title: 单个 atespace 的授权配置
 source: capture/lab/F-egress/envoy/provider-policy.yaml
 lang: yaml
-note: The content of the key namespace-policy.yaml in the ConfigMap.
+note: ConfigMap 中 namespace-policy.yaml 键的内容。
 ---
 policies:
 - atespace: lab-f
@@ -130,28 +130,28 @@ policies:
   - cred-ns
 ```
 
-The provider reads this file once, when it starts {{docs}}. We restarted the Deployment after our edit, and the grant worked. The grant is wide: every actor in the atespace can name every Secret in the namespace. Keep one namespace that holds only the Secrets that agents are allowed to use.
+提供方在启动时读取一次该文件{{docs}}。编辑后我们重启了 Deployment，授权随之生效。该授权范围较广：atespace 里的每个 actor 都可以引用该命名空间里的每个 Secret。请专门保留一个只存放允许 agent 使用的 Secret 的命名空间。
 
-The help text of the installer says that a provider requires the Envoy dataplane. In our run the installer accepted `k8s.io` with agentgateway, and injection gave the same result on both.
+安装器的帮助文本称凭据提供方需要 Envoy 数据平面。在我们的实际运行中，安装器在使用 agentgateway 时也接受了 `k8s.io`，注入效果在两种数据平面上完全相同。
 
-## When the swap does not happen
+## 替换未发生的情况 {#s-credential-injection-when-the-swap-does-not-happen}
 
-| The actor sends | The reference points to | Envoy dataplane | agentgateway dataplane |
+| actor 发送的内容 | 引用指向的目标 | Envoy 数据平面 | agentgateway 数据平面 |
 |---|---|---|---|
-| `Authorization` with a placeholder | a Secret in a granted namespace | `200`, upstream gets the secret | `200`, upstream gets the secret |
-| `X-Other-Token` with a placeholder | a Secret in a namespace with no grant | `403`, `egress denied` | `403`, `actor egress policy denied` |
-| `X-Missing-Token` with a placeholder | a Secret that does not exist | `403`, `egress denied` | `403`, `actor egress policy denied` |
-| no credential header | any | `200`, request passes unchanged | `200`, request passes unchanged |
+| 带占位头的 `Authorization` | 已授权命名空间中存在的 Secret | `200`，上游获得 Secret | `200`，上游获得 Secret |
+| 带占位头的 `X-Other-Token` | 未授权命名空间中的 Secret | `403`，`egress denied` | `403`，`actor egress policy denied` |
+| 带占位头的 `X-Missing-Token` | 不存在的 Secret | `403`，`egress denied` | `403`，`actor egress policy denied` |
+| 无凭据请求头 | 任意 | `200`，请求原样通过 | `200`，请求原样通过 |
 
-The two `403` cases return the same body on purpose. A caller cannot use the answer to learn which Secrets exist {{code}}. You cannot either, so check the grant and the Secret name by hand.
+两种 `403` 场景特意返回了相同的响应体。调用方无法通过响应推断哪些 Secret 存在{{code}}。你也无法推断，因此需要手动核对授权配置与 Secret 名称。
 
-The last row needs care. The effect runs only when the header is present. Without the header, the gateway fetches nothing and forwards the request as it is. The host is still allowed, so the request arrives without a credential.
+最后一行需要格外注意。替换效果仅在请求头存在时触发。缺少该请求头时，网关不获取任何凭据，并按原样转发请求。主机本身依然被允许访问，因此请求会在不带凭据的情况下送达上游。
 
 ```listing
-title: the same request without the header
+title: 不带凭据头的相同请求
 source: capture/lab/F-egress/envoy/20-results.txt
 lang: console
-note: The command and the matching lines. No Authorization line came back, because none was sent upstream.
+note: 命令与匹配行。由于没有向上游发送凭据，因此没有 Authorization 行返回。
 ---
 $ curl -sS -m 8 -i http://whoami.egress-target.svc.cluster.local/ | grep -i -E 'HTTP/|authorization'
 …
@@ -159,29 +159,29 @@ HTTP/1.1 200 OK
 GET / HTTP/1.1
 ```
 
-In practice the symptom is a `401` from the API, not an error from the gateway. A tool that builds its own request, such as a plain `wget` in a shell, sends no placeholder and gets no credential. We saw this in the kagent run: a `wget` from the actor reached the model host with three headers and no `authorization`.
+在实际使用中，这种情况的表象通常是 API 返回 `401`，而不是网关报错。自己拼装请求的工具（例如 shell 里的原生 `wget`）不会发送占位头，也就拿不到凭据。我们在 kagent 的运行中观察到了这点：actor 发出的 `wget` 到达模型主机时携带了三个头，唯独缺少 `authorization`。
 
-## The upstream that returns headers
+## 回传请求头的上游服务 {#s-credential-injection-the-upstream-that-returns-headers}
 
-Look again at the second listing of this section. The actor ran that `curl`, and the response body contained `Authorization: Bearer lab-granted-marker-1794480266`. Our test upstream returns each request to its sender, so the actor read the secret that it was never given.
+再看一眼本节的第二个清单。actor 执行了该 `curl` 命令，响应体中包含了 `Authorization: Bearer lab-granted-marker-1794480266`。我们的测试上游把收到的每个请求原样回传给发送者，使得 actor 读到了原本从未交给它的 Secret。
 
-The gateway cannot prevent this. It controls the request, not what the upstream does with it. The consequence is a rule for you: a credential is only as private as the hosts in its rule.
+网关无法阻止这一行为。它控制的是请求本身，无法控制上游对请求的处理。这引出了一条必须遵守的规则：凭据的安全程度取决于规则中所允许的主机。
 
-- Name the exact host that owns the credential. Never attach a credential to a rule with `*` in its hostnames.
-- Do not attach a credential to a host that the actor can make return its headers, such as a debug endpoint or a request inspector.
-- Give the agent a credential with the smallest scope that the API offers. Treat it as known to the agent.
+- 指明拥有该凭据的精确主机，绝不要把凭据挂在主机名含 `*` 的规则上。
+- 不要把凭据挂在 actor 能让它回传请求头的主机上，例如调试端点或请求检查服务。
+- 只给 agent 申请 API 提供的最小权限凭据，并按 agent 已知晓该凭据来设防。
 
-The logs were clean in our run. The injected value appeared in no log line of the gateway or the provider, on either dataplane. The agentgateway egress pod runs with `RUST_LOG=debug` and prints the headers of each request. It printed `authorization` as `Sensitive`. For an injected `X-Api-Key`, it printed the placeholder that the actor sent and never the secret. A value that the actor itself sends in a custom header is logged in clear there.
+在我们的运行中日志记录非常干净。在两种数据平面上，注入的值都没有出现在网关或提供方的任何日志行中。agentgateway 的出站 pod 运行在 `RUST_LOG=debug` 级别，会打印每个请求的请求头，其中 `authorization` 被打印为 `Sensitive`。对于注入的 `X-Api-Key`，它打印的是 actor 发送的占位值，从不打印真实的 Secret。而 actor 自己在自定义头中发送的值，在此处会以明文记录。
 
-## What kagent does with it
+## kagent 如何使用凭据注入 {#s-credential-injection-what-kagent-does-with-it}
 
-kagent uses this feature for model keys, so you get it without writing a rule. For each session, kagent writes a policy with one rule for the model host of the ModelConfig.
+kagent 将此功能用于模型密钥，因此无需手动编写规则。每次会话中，kagent 都会生成一份策略，其中包含一条指向 ModelConfig 中模型主机的规则。
 
 ```listing
-title: the model rule that kagent wrote
+title: kagent 生成的模型规则
 source: capture/lab/K-kagent/session1/egress-policy-actor.yaml
 lang: yaml
-note: The second of three rules in the policy of one session actor.
+note: 单个会话 actor 策略中三条规则里的第二条。
 ---
 - http:
     effects:
@@ -196,19 +196,19 @@ note: The second of three rules in the policy of one session actor.
       - 8080
 ```
 
-kagent also sets `OPENAI_API_KEY=kagent-credential-injected` in the environment of the actor. The model client reads that variable and sends it as the `authorization` header, which is the placeholder. Our mock model server received `Bearer sk-mock-not-a-real-key`, a test value that we made up, on 10 of 10 calls.
+kagent 还在 actor 的环境中设置了 `OPENAI_API_KEY=kagent-credential-injected`。模型客户端读取该变量并将其作为 `authorization` 请求头发送，这正是占位头。我们的模拟模型服务器在 10 次调用中全部收到了 `Bearer sk-mock-not-a-real-key`，这是我们自己编造的测试值。
 
-We ran kagent against a mock model over HTTP in the cluster. A real model host over HTTPS is planned for the next edition. [Section 7.1](#s-kagent-on-substrate) has the rest of that policy.
+我们在集群内通过 HTTP 对模拟模型运行了 kagent。通过 HTTPS 访问真实模型主机计划在下一版测试。该策略的其余部分见[第 7.1 节](#s-kagent-on-substrate)。
 
 ```takeaways
-- Put the credential effect on an `https` rule for any host outside the cluster.
-- Grant each atespace one namespace, and keep only agent Secrets in it.
-- Restart `k8s-credential-provider` after you edit the namespace grant.
-- Keep a rotated secret valid for 5 more minutes at the upstream when the dataplane is agentgateway.
-- Revoke a leaked secret at the upstream too, because agentgateway can send it for 5 more minutes.
-- Make each client send the placeholder header, and read a `401` as a missing placeholder.
-- Name exact hosts in a rule that carries a credential, never `*`.
-- Assume that the agent can learn any credential whose upstream returns request headers.
+- 对集群外的任何主机，都将凭据效果配置在 `https` 规则上。
+- 为每个 atespace 分配一个专属命名空间，且其中只存放 agent 使用的 Secret。
+- 修改命名空间授权后重启 `k8s-credential-provider`。
+- 当数据平面是 agentgateway 时，轮换后保持旧 Secret 在上游继续有效 5 分钟。
+- 泄露的 Secret 也必须在上游吊销，因为 agentgateway 可能会继续发送 5 分钟。
+- 确保每个客户端都发送占位头，若收到 `401` 应首先排查是否遗漏占位头。
+- 在携带凭据的规则中必须指明确切主机，切勿使用 `*`。
+- 如果上游会回传请求头，就假定 agent 已经能够获悉该凭据。
 ```
 
-Sources: capture/lab/F-egress/envoy/20-results.txt, capture/lab/F-egress/envoy/P4.yaml, capture/lab/F-egress/envoy/policy-f-main-P4-live.yaml, capture/lab/F-egress/envoy/provider-policy.yaml, capture/lab/F-egress/envoy/04-provider-policy-apply.log, capture/lab/F-egress/envoy/32-marker-in-logs.txt, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/agentgateway/32-marker-in-logs.txt, capture/lab/F-egress/agentgateway/50-custom-header.txt, capture/lab/G-dataplane/agentgateway/03-containers-atenet-egress.tsv, capture/lab/K-kagent/session1/egress-policy-actor.yaml, capture/lab/K-kagent/session1/mock.log, capture/lab/K-kagent/session1/turn2.out, capture/lab/K-kagent/session1/actor-template.yaml, capture/lab/Q-network/l-credential-rotation/agentgateway/20-rotations.tsv, capture/lab/Q-network/l-credential-rotation/envoy/20-rotations.tsv, capture/lab/Q-network/l-credential-rotation/agentgateway/10-probe.tsv, capture/lab/Q-network/l-credential-rotation/envoy/10-probe.tsv, capture/lab/Q-network/l-credential-rotation/agentgateway/01-policy-live.yaml, capture/lab/summary/rotation-x86.json, api/ateapi/v1/ateapi.proto (HttpRuleEffects, CredentialHeader), cmd/atenet/internal/router/egress/credentials.go, cmd/credential-provider/kubernetes-secrets/kubeprovider.go, cmd/ate-setup/internal/steps/overlay.go, docs/guides/egress-credential-injection.md at v1.0.0; agentgateway v1.7.0 crates/agentgateway/src/http/substrate/egress.rs (the credential cache of 300 seconds).
+来源：capture/lab/F-egress/envoy/20-results.txt, capture/lab/F-egress/envoy/P4.yaml, capture/lab/F-egress/envoy/policy-f-main-P4-live.yaml, capture/lab/F-egress/envoy/provider-policy.yaml, capture/lab/F-egress/envoy/04-provider-policy-apply.log, capture/lab/F-egress/envoy/32-marker-in-logs.txt, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/agentgateway/32-marker-in-logs.txt, capture/lab/F-egress/agentgateway/50-custom-header.txt, capture/lab/G-dataplane/agentgateway/03-containers-atenet-egress.tsv, capture/lab/K-kagent/session1/egress-policy-actor.yaml, capture/lab/K-kagent/session1/mock.log, capture/lab/K-kagent/session1/turn2.out, capture/lab/K-kagent/session1/actor-template.yaml, capture/lab/Q-network/l-credential-rotation/agentgateway/20-rotations.tsv, capture/lab/Q-network/l-credential-rotation/envoy/20-rotations.tsv, capture/lab/Q-network/l-credential-rotation/agentgateway/10-probe.tsv, capture/lab/Q-network/l-credential-rotation/envoy/10-probe.tsv, capture/lab/Q-network/l-credential-rotation/agentgateway/01-policy-live.yaml, capture/lab/summary/rotation-x86.json, api/ateapi/v1/ateapi.proto (HttpRuleEffects, CredentialHeader), cmd/atenet/internal/router/egress/credentials.go, cmd/credential-provider/kubernetes-secrets/kubeprovider.go, cmd/ate-setup/internal/steps/overlay.go, docs/guides/egress-credential-injection.md at v1.0.0; agentgateway v1.7.0 crates/agentgateway/src/http/substrate/egress.rs (the credential cache of 300 seconds).

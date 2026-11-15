@@ -13,35 +13,35 @@ function probes(dataplane) {
 }
 const envoy = probes('envoy');
 const agw = probes('agentgateway');
-const served = p => [`200 in ${p['https-443'].s} s`, `${p['connect-8444'].s} s through 8444`, 'green'];
-const missing = (p, key, body) => [`${p[key].code} in ${p[key].s} s`, body, 'rose'];
+const served = p => [`${p['https-443'].s} s 返回 200`, `经 8444 为 ${p['connect-8444'].s} s`, 'green'];
+const missing = (p, key, body) => [`${p[key].s} s 返回 ${p[key].code}`, body, 'rose'];
 
 const groups = [
   {
-    name: 'Refused in the TLS layer: no HTTP status',
+    name: '在 TLS 层被拒绝：无 HTTP 状态码',
     rows: [
-      { caller: ['no client certificate', 'a pod with no certificate'], envoy: ['connection cut', 'curl: Broken pipe', 'rose'], agw: ['TLS alert', 'certificate required', 'rose'] },
-      { caller: ['identity not on the list', 'ns/probe/sa/default'], envoy: ['TLS alert', 'certificate unknown', 'rose'], agw: ['connection reset', 'reset by peer, no alert', 'rose'] },
+      { caller: ['无客户端证书', '未携带证书的 pod'], envoy: ['连接中断', 'curl: Broken pipe', 'rose'], agw: ['TLS 告警', 'certificate required', 'rose'] },
+      { caller: ['身份不在允许列表中', 'ns/probe/sa/default'], envoy: ['TLS 告警', 'certificate unknown', 'rose'], agw: ['连接重置', 'reset by peer，无告警', 'rose'] },
     ],
   },
   {
-    name: 'Allowed identity atenet-client: an HTTP answer',
+    name: '允许的身份 atenet-client：返回 HTTP 响应',
     rows: [
       { caller: ['actor my-counter-1', 'ACTOR_STATE_RUNNING'], envoy: served(envoy), agw: served(agw) },
-      { caller: ['actor does-not-exist', 'no such actor in the atespace'], envoy: missing(envoy, 'unknown-actor', 'body: actor not found'), agw: missing(agw, 'unknown-actor', 'body: ingress failed') },
-      { caller: ['no routing header', 'ate-target-actor is absent'], envoy: missing(envoy, 'no-header', 'body: invalid actor reference'), agw: missing(agw, 'no-header', 'body: ingress failed') },
+      { caller: ['actor does-not-exist', 'atespace 中无此 actor'], envoy: missing(envoy, 'unknown-actor', 'body: actor not found'), agw: missing(agw, 'unknown-actor', 'body: ingress failed') },
+      { caller: ['缺少路由头', '未传 ate-target-actor'], envoy: missing(envoy, 'no-header', 'body: invalid actor reference'), agw: missing(agw, 'no-header', 'body: ingress failed') },
     ],
   },
 ];
 
 module.exports = figure('fig-6-1b', {
   height: 358,
-  title: 'What a caller of atenet-router sees on each dataplane',
-  desc: `Five rows in two groups, with the outcome on the Envoy dataplane and on the agentgateway dataplane. In the first group the router refuses the caller in the TLS layer and the caller gets no HTTP status: with no client certificate, Envoy cuts the connection and agentgateway sends the alert certificate required. With an identity that is not on the list, Envoy sends the alert certificate unknown and agentgateway resets the connection. In the second group the caller has the allowed identity atenet-client and gets an HTTP answer: 200 from my-counter-1 in ${envoy['https-443'].s} seconds on Envoy and ${agw['https-443'].s} seconds on agentgateway, 404 for an actor that does not exist, and 404 for a request with no routing header.`,
+  title: '两种数据平面下调用 atenet-router 看到的响应',
+  desc: `分两组的五种请求情形，对比 Envoy 数据平面与 agentgateway 数据平面的结果。第一组在 TLS 层拒绝调用方，无 HTTP 状态码：无客户端证书时 Envoy 断开连接，agentgateway 发送告警 certificate required；身份不在允许列表中时 Envoy 发送告警 certificate unknown，agentgateway 重置连接。第二组使用允许的身份 atenet-client，均返回 HTTP 响应：访问 my-counter-1 时 Envoy 用 ${envoy['https-443'].s} s 返回 200，agentgateway 用 ${agw['https-443'].s} s 返回 200；访问不存在的 actor 或未传路由头均返回 404。`,
 }, f => {
-  f.kicker(16, 18, 'The request');
-  f.kicker(232, 18, 'Envoy dataplane');
-  f.kicker(438, 18, 'agentgateway dataplane');
+  f.kicker(16, 18, '请求情况');
+  f.kicker(232, 18, 'Envoy 数据平面');
+  f.kicker(438, 18, 'agentgateway 数据平面');
   let y = 30;
   groups.forEach((group, g) => {
     f.rule(16, y + 4, 624, y + 4, { opacity: 0.5 });

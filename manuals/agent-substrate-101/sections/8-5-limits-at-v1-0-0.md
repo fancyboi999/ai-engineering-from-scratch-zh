@@ -1,177 +1,177 @@
-# Limits at v1.0.0
+# v1.0.0 的局限
 
-> At v1.0.0 Substrate runs, suspends, and resumes actors on request, and it leaves the suspend decision, pool size, failover, and key rotation to you.
+> 在 v1.0.0 中，Substrate 按请求运行、挂起和恢复 actor，而挂起时机、池大小、故障切换和密钥轮换都留给你自己。
 
-You plan a rollout and write down what the platform will do for you. It will stop idle sessions. It will add capacity under load. It will survive the loss of one pod. For Agent Substrate v1.0.0, each of those three lines is wrong, and the release does not say so in one place.
+你在规划上线时，会写下平台将替你做的事：停掉空闲会话，在负载上升时自动扩容，扛住单个 pod 故障。对 Agent Substrate v1.0.0 来说，这三条都不成立，而且发布说明没有在一处讲清楚。
 
-When you finish this section, you can list what Substrate does not do at v1.0.0. You can also say which of our claims rest on a run, and which runs come in the next edition.
+读完本节，你能列出 Substrate 在 v1.0.0 中不做的事。你还能说清，我们的哪些论断有实测运行支撑，哪些运行留到下一版。
 
-## What Substrate leaves to you
+## Substrate 留给你的事 {#s-limits-at-v1-0-0-what-substrate-leaves-to-you}
 
-[Figure 8.5](#fig-8-5) sets each job that a platform team expects against the party that does it at v1.0.0.
+[图 8.5](#fig-8-5) 把平台团队期望的每项工作，与 v1.0.0 中实际承担它的一方逐行对照。
 
 ```figure
 id: fig-8-5
 kind: comparison
-title: who does each job at v1.0.0
-claim: Substrate performs the lifecycle operations that you request, and your harness or your platform team must decide when to request them.
-caption: Read each row left to right. The left column is what Substrate does, and the right column is what you or your harness must add. From the code at v1.0.0 and the runs in capture/lab/B-lifecycle/10-trace.tsv and capture/lab/J-container-death/10-trace.tsv.
+title: v1.0.0 中每项工作由谁承担
+claim: Substrate 执行你请求的生命周期操作，而何时发出请求必须由你的 harness 或平台团队决定。
+caption: 每行从左往右读。左列是 Substrate 做的事，右列是你或你的 harness 必须补上的事。来源：v1.0.0 的代码、capture/lab/B-lifecycle/10-trace.tsv、capture/lab/J-container-death/10-trace.tsv。
 ```
 
-### No idle suspend
+### 没有空闲挂起 {#s-limits-at-v1-0-0-no-idle-suspend}
 
-Nothing in Substrate suspends an actor because it has no requests. **The code** has no idle timer in `ate-api-server`, in `atelet`, or in either worker. The worker API has a method for a worker to ask for a suspend, `RequestActorSuspend`. `atelet` forwards that call, and a client library for it exists in the repository. No worker at v1.0.0 uses the library, so nothing sends the call.
+Substrate 中没有任何机制会因为 actor 没有请求而挂起它。**代码**里，`ate-api-server`、`atelet` 和两种 worker 都没有空闲计时器。worker API 有一个让 worker 请求挂起的方法 `RequestActorSuspend`。`atelet` 会转发这个调用，仓库里也有对应的客户端库。但 v1.0.0 中没有任何 worker 使用这个库，所以没有任何组件发出这个调用。
 
-**We measured** this on an x86 server guest (24 vCPU, 47 GB, nested KVM). One actor received no request for 900 s, and it read RUNNING in 60 of 60 samples. A running actor reserves its full CPU and memory limit on a worker for all that time.
+**我们测得**，在一台 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）上，一个 actor 连续 900 秒没有收到请求，60 次采样中有 60 次读到 RUNNING。运行中的 actor 在整段时间里，都在 worker 上占用其完整的 CPU 和内存上限。
 
-The harness must call `SuspendActor`. kagent does it after every turn, in 98 of 98 turns in our run, as [section 7.1](#s-kagent-on-substrate) shows. If you write your own harness, the suspend call is the first thing to build.
+必须由 harness 调用 `SuspendActor`。kagent 在每一轮之后都会调用，我们的运行中 98 轮全部如此，见[第 7.1 节](#s-kagent-on-substrate)。如果你自己写 harness，挂起调用是第一件要做的事。
 
-### No autoscaler, and no overcommit
+### 没有自动扩缩容，也没有超卖 {#s-limits-at-v1-0-0-no-autoscaler-and-no-overcommit}
 
-A WorkerPool has a fixed `replicas` number. Nothing in the install changes it. The WorkerPool kind has a scale subresource, so an outside autoscaler can change the number. A run with one is planned for the next edition. CPU and memory use are poor signals for it. An actor reserves its limit while it runs, whether or not it works.
+`WorkerPool` 的 `replicas` 数是固定的，安装过程不会改动它。`WorkerPool` 类型有 scale 子资源，所以外部自动扩缩器可以改这个数。带自动扩缩器的运行已列入下一版计划。CPU 和内存使用率不是好的扩缩信号，因为 actor 运行期间不管有没有干活，都会占住它的上限。
 
-Substrate also books each running actor at its full declared limit. A proposal to book less than the limit exists in the public issues, and the maintainers moved it to after the release.
+Substrate 还按每个运行中 actor 声明的完整上限记账。公开 issue 里有一个按低于上限记账的提案，维护者把它推迟到了发布之后。
 
-**We measured** the effect in the kagent run, on a second x86 server guest (16 vCPU, 31 GB). One run started 24 turns at the same time. The single worker reported 16,000 millicores, and each actor reserved 1,000. The worker stopped at 16 running actors, and the other eight turns waited.
+**我们测得**这一效应，是在 kagent 运行中，用的是第二台 x86 服务器客户机（16 vCPU、31 GB）。一次运行同时启动了 24 轮。单个 worker 报告 16,000 millicore，每个 actor 占 1,000。worker 在 16 个运行中的 actor 处停住，其余 8 轮在等待。
 
-When a pool is full, a request waits up to 5 s and then gets a 503. [Section 4.5](#s-sizing-a-pool) gives the arithmetic for a pool.
+池满时，请求最多等 5 秒，然后得到 503。池的计算方法见[第 4.5 节](#s-sizing-a-pool)。
 
-### No GPU
+### 没有 GPU {#s-limits-at-v1-0-0-no-gpu}
 
-An ActorTemplate at v1.0.0 can declare two resources: `cpuMillicores` and `memoryBytes`. The API has no field for a GPU or for any other device, so we ran no GPU test.
+v1.0.0 的 `ActorTemplate` 只能声明两种资源：`cpuMillicores` 和 `memoryBytes`。API 里没有 GPU 或其他设备的字段，所以我们没有做 GPU 测试。
 
-### Single-replica components
+### 单副本组件 {#s-limits-at-v1-0-0-single-replica-components}
 
-**The code** sets these replica counts in the install manifests.
+**代码**在安装清单里设置了这些副本数。
 
-| Component | Replicas | What stops when the one pod is away |
+| 组件 | 副本数 | 唯一的 pod 不在时，什么会停 |
 |---|---|---|
-| `ate-api-server` | 2 | nothing, while one replica remains |
-| `ate-idp-server` | 2 | nothing, while one replica remains |
-| `atenet-router` | 1 | every request to every actor |
-| `atenet-egress` | 1 | every new outbound connection from an actor |
-| `ate-controller` | 1 | changes to worker pools |
-| `podcertificate-controller` | 1 | new and renewed certificates |
-| bundled Postgres | 1 | every request, as [section 8.2](#s-when-a-dependency-is-down) measures |
+| `ate-api-server` | 2 | 只要还剩一个副本，就没有影响 |
+| `ate-idp-server` | 2 | 只要还剩一个副本，就没有影响 |
+| `atenet-router` | 1 | 发往所有 actor 的所有请求 |
+| `atenet-egress` | 1 | actor 发起的每个新出站连接 |
+| `ate-controller` | 1 | 对 worker 池的变更 |
+| `podcertificate-controller` | 1 | 新证书和证书续期 |
+| 内置 Postgres | 1 | 所有请求，见[第 8.2 节](#s-when-a-dependency-is-down)的实测 |
 
-The right column is our reading of the request path, except for the Postgres row, which we ran. The router keeps its parked requests in memory, and a graceful shutdown does not drop them. After the stop signal the router keeps the parked requests until each one gets its full budget and a normal answer {{docs}}. The flag `--drain-timeout` sets that limit, and its default is longer than the parking budget {{code}}. Only a crash, a forced kill, or a drain past `--drain-timeout` drops a parked request.
+右列是我们对请求路径的解读，Postgres 一行除外，那一行我们实际跑过。router 把暂存的请求放在内存里，而优雅关闭不会丢掉它们。收到停止信号后，router 会保留这些暂存的请求，直到每个请求用完完整预算并得到正常响应 {{docs}}。标志 `--drain-timeout` 设定这个上限，它的默认值比暂存预算更长 {{code}}。只有崩溃、强制杀死，或排空超过 `--drain-timeout`，才会丢掉暂存的请求。
 
-We restarted the router once, as the fix in [section 8.2](#s-when-a-dependency-is-down). What a restart does to parked requests, and a restart of the egress gateway, are runs for the next edition.
+我们重启过一次 router，作为[第 8.2 节](#s-when-a-dependency-is-down)的修复手段。重启对暂存请求的影响，以及出站网关的重启，是留给下一版的运行。
 
-### Crash detection has a gap
+### 崩溃检测有缺口 {#s-limits-at-v1-0-0-crash-detection-has-a-gap}
 
-Substrate marks an actor crashed when its sandbox dies or when the kernel kills it for memory. It does not notice a process that exits inside a sandbox that still runs. [Section 8.3](#s-symptom-cause-fix) shows that actor. A design for this detection is open in the public issues.
+actor 的沙箱死亡，或内核因内存不足杀掉它时，Substrate 会把它标为崩溃。但沙箱仍在运行、里面的进程已经退出时，Substrate 发现不了。[第 8.3 节](#s-symptom-cause-fix)展示了这样的 actor。公开 issue 里有一个针对这种检测的设计，尚未落地。
 
-**We measured** two such actors on the x86 server guest (24 vCPU, 47 GB, nested KVM). Both read RUNNING for 20 minutes 36 s after the exit, in 81 and 80 samples. All 20 requests to one of them returned 503. Each kept 1,000 millicores of its worker for all that time. The first suspend call failed and marked the actor crashed. A longer watch and a worker restart are on the list for the next edition.
+**我们测得**两个这样的 actor，在 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）上。退出之后 20 分 36 秒里，两者都读到 RUNNING，分别是 81 次和 80 次采样。发往其中一个的 20 个请求全部返回 503。在整段时间里，每个 actor 都占着所在 worker 的 1,000 millicore。第一次挂起调用失败，并把 actor 标为崩溃。更长时间的观察和 worker 重启，已列入下一版的计划。
 
-It also does not mark a running actor whose node stops. On a cluster with two worker nodes, that actor read RUNNING for the 10 minutes of our probe. Each of 150 requests got a 503.
+它同样不会标记所在节点已停止的运行中 actor。在一个有两个 worker 节点的集群上，这样的 actor 在我们 10 分钟的探测里一直读到 RUNNING。150 个请求每一个都得到 503。
 
-### An actor does not leave a dead node by itself
+### actor 不会自己离开已死的节点 {#s-limits-at-v1-0-0-an-actor-does-not-leave-a-dead-node-by-itself}
 
-A suspended actor is bound to the node of its last suspend, and Substrate v1.0.0 did not release it when that node stopped.
+挂起的 actor 绑定在它上次挂起所在的节点上，节点停止时，Substrate v1.0.0 不会释放它。
 
-**We measured** this on the second x86 server guest (16 vCPU, 23 GB), with two worker nodes and one actor for each of four cases. An actor had a complete snapshot in the object store. It stayed in RESUMING on the stopped node for 5 min 33 s from its first request. It was crashed 5 min 44 s after the stop command. The other node had two free workers. A `revert` during the outage failed or had no lasting effect in 4 of 4 attempts on three actors.
+**我们测得**这一点，是在第二台 x86 服务器客户机（16 vCPU、23 GB）上，两个 worker 节点，四种情形各一个 actor。其中一个 actor 在对象存储里有完整快照。从它的第一个请求算起，它在已停止的节点上停在 RESUMING 状态 5 分 33 秒。从停止命令算起，5 分 44 秒后它变成崩溃。另一个节点有两个空闲 worker。故障期间的 `revert`，在三个 actor 上的 4 次尝试里全部失败，或没有持久效果。
 
-The workers of a stopped node were listed as active for 43 to 51 s after the stop command. A new resume can go to a dead node in that time. Kubernetes moved the worker pods to the other node after 5 minutes and did not move them back. [Section 4.3](#s-placement) has the timeline.
+停止命令之后 43 到 51 秒，已停止节点上的 worker 仍被列为 active。这段时间里，新的恢复可能被送到已死的节点。5 分钟后 Kubernetes 把 worker pod 移到了另一个节点，之后没有再移回来。时间线见[第 4.3 节](#s-placement)。
 
-**We measured** 13 more node-stop cases on a second x86 server guest (16 vCPU, 23 GB), once each, with the default timers. In none of them did an actor leave the stopped node by itself. One `revert` freed an actor in one situation only: suspended with `--mode sync`, no request since the stop, and the workers already marked unavailable. That revert took 7.1 s. In every other situation a `revert` left the actor in REVERTING until the node was back. A new actor from a tag that existed before the stop served its first request after 1.2 s, in 3 of 3 rescues.
+**我们测得**另外 13 种节点停止的情形，用的是第二台 x86 服务器客户机（16 vCPU、23 GB），每种一次，计时器都用默认值。没有任何一种情形里，actor 自己离开了已停止的节点。只有一种情形下，一次 `revert` 释放了 actor：用 `--mode sync` 挂起，停止之后没有请求，worker 已被标为不可用。这次 revert 用了 7.1 秒。其他所有情形里，`revert` 都让 actor 停在 REVERTING，直到节点恢复。在停止之前就存在的标签上新建 actor，首个请求在 1.2 秒后得到响应，3 次救援全部如此。
 
-So recovery from a node loss is yours to build. Substrate does not move actors, and it does not move pool pods back to a node that returns. [Section 8.2](#s-when-a-dependency-is-down) has the runbook.
+所以，节点丢失后的恢复要你自己搭。Substrate 不会迁移 actor，节点恢复后也不会把池里的 pod 移回去。运行手册见[第 8.2 节](#s-when-a-dependency-is-down)。
 
-### Access is coarse at the router
+### router 处的访问控制很粗 {#s-limits-at-v1-0-0-access-is-coarse-at-the-router}
 
-The ingress allowlist holds client identities, and each listed client can reach every actor in every atespace. Access policies for each atespace govern the API calls, as [section 5.2](#s-access-policies) explains. They do not govern requests through the router at v1.0.0.
+入站允许列表里放的是客户端身份，列表中的每个客户端都能访问每个 atespace 里的每个 actor。各 atespace 的访问策略管的是 API 调用，见[第 5.2 节](#s-access-policies)。在 v1.0.0 中，它们不管经由 router 的请求。
 
-### Manual key rotation
+### 手动轮换密钥 {#s-limits-at-v1-0-0-manual-key-rotation}
 
-The key that signs actor JWTs lives in a pool that an operator edits. The CLI has `kubectl ate admin add-jwt-key`, `activate-jwt-key`, and `remove-jwt-key`, and the documentation gives the waits between them. No component rotates the key on a schedule. [Section 5.3](#s-actor-jwts) covers the tokens. Our install had one key, and our decoded token named it. A rotation is a run for the next edition.
+给 actor JWT 签名的密钥放在一个由运维人员编辑的池里。CLI 有 `kubectl ate admin add-jwt-key`、`activate-jwt-key` 和 `remove-jwt-key`，文档给出了它们之间要等待的时间。没有任何组件按计划轮换密钥。令牌的内容见[第 5.3 节](#s-actor-jwts)。我们的安装里只有一个密钥，解码后的令牌也指向它。密钥轮换留待下一版实测。
 
-### A suspend does not wait for requests
+### 挂起不会等待请求 {#s-limits-at-v1-0-0-a-suspend-does-not-wait-for-requests}
 
-`SuspendActor` stops the sandbox at once. A request that is open at that moment gets a 503, and the suspend call still reports success. We saw this in both suspend modes, as [section 3.3](#s-suspendactor-and-resumeactor) shows. The caller of the suspend must know that the actor is idle.
+`SuspendActor` 会立即停掉沙箱。此刻还开着的请求会得到 503，而挂起调用仍然报告成功。两种挂起模式下我们都看到了这一点，见[第 3.3 节](#s-suspendactor-and-resumeactor)。发起挂起的一方必须知道 actor 已经空闲。
 
-### Preview features are off
+### 预览功能默认关闭 {#s-limits-at-v1-0-0-preview-features-are-off}
 
-Three features exist behind a server flag and a client flag. All three are off by default.
+有三个功能藏在服务端标志和客户端标志之后，三个默认都是关闭的。
 
-| Preview name | What it adds |
+| 预览名称 | 它增加了什么 |
 |---|---|
-| `ExternalVolumes` | CSI volumes that an actor mounts and that no snapshot includes |
-| `GoldenEgressPolicy` | an egress policy for the actor that builds the golden snapshot |
-| `PerTemplateSnapshotLocation` | a snapshot location in each template, in place of one for the cluster |
+| `ExternalVolumes` | actor 挂载的 CSI 卷，快照不包含这些卷 |
+| `GoldenEgressPolicy` | 为构建黄金快照的 actor 设置的出站策略 |
+| `PerTemplateSnapshotLocation` | 每个模板各自的快照位置，取代整个集群共用的一个位置 |
 
-To use one, start every component with `--preview` and its name, and pass `--preview` to `kubectl ate`. A request without the client flag behaves as if the feature were off. We tried all four combinations with a template that has a `goldenEgressPolicy` field.
+要使用其中一个，需用 `--preview` 加上它的名称启动每个组件，并给 `kubectl ate` 也传 `--preview`。没有客户端标志的请求，行为就像该功能关闭一样。我们用一个带 `goldenEgressPolicy` 字段的模板，试了全部四种组合。
 
-| Server `--preview` | `kubectl ate --preview` | Result of `create actor-template` |
+| 服务端 `--preview` | `kubectl ate --preview` | `create actor-template` 的结果 |
 |---|---|---|
-| empty | no | `InvalidArgument desc = actor_template.golden_egress_policy: Forbidden` |
-| empty | yes | the same error |
-| `GoldenEgressPolicy` | no | the same error |
-| `GoldenEgressPolicy` | yes | accepted, and the golden tag was ready within 30 s |
+| 空 | 否 | `InvalidArgument desc = actor_template.golden_egress_policy: Forbidden` |
+| 空 | 是 | 同样的错误 |
+| `GoldenEgressPolicy` | 否 | 同样的错误 |
+| `GoldenEgressPolicy` | 是 | 被接受，黄金标签在 30 秒内就绪 |
 
 ```listing
-title: the error when one of the two switches is missing
+title: 两个开关缺一个时的错误
 source: capture/lab/V-validation/10-preview-feature/10-preview.tsv
 lang: text
-note: One line of the trace, with the server flag on and the client flag missing.
+note: 追踪记录中的一行：服务端标志已开，客户端标志缺失。
 ---
 2026-11-12T13:06:36.842Z	on	no-flag	Error: failed to create actor template: rpc error: code = InvalidArgument desc = actor_template.golden_egress_policy: Forbidden 
 ```
 
-We ran each combination once on the x86 server guest. The error does not name the preview feature or the flag, so you must know that the field is a preview field. Once the template existed, `kubectl ate get` read it without the client flag.
+每种组合我们都在 x86 服务器客户机上跑了一次。错误信息没有指出预览功能或标志的名称，所以你必须自己知道这个字段属于预览字段。模板建好之后，`kubectl ate get` 不带客户端标志也能读到它。
 
-Our test had two limits. We set the flag on `ate-api-server` only, with an edit of its Deployment, and the documented way sets it on every component through `ate-setup`. A test that the egress rule of the golden actor works is planned for the next edition. Every other experiment ran with `--preview=` empty, so this manual describes none of the three features in use.
+我们的测试有两点局限。我们只在 `ate-api-server` 上设了标志，方法是编辑它的 Deployment，而文档给出的方式是通过 `ate-setup` 在每个组件上设置。验证黄金 actor 的出站规则是否生效，已列入下一版计划。其余所有实验都在 `--preview=` 为空的条件下运行，所以本手册没有描述这三个功能的实际使用。
 
-### Smaller limits that will reach you
+### 会影响到你的小局限 {#s-limits-at-v1-0-0-smaller-limits-that-will-reach-you}
 
-- An open response or pass-through connection outlives its egress rule. Removing a rule stops requests, also on a reused connection, within 9 s. Only a suspend cuts the rest, as [section 6.6](#s-the-dataplane-choice) shows.
-- A changed Secret takes up to 5 minutes to reach requests on agentgateway. We measured 100.6 to 280.5 s there, and 1.0 to 1.6 s on Envoy. [Section 6.5](#s-credential-injection) has the run.
-- The egress gateway trusts public roots only. A host with a certificate from a private CA returned 503 until we replaced the root file in the proxy container. The installer removes that patch. [Section 6.4](#s-tls-interception) has it.
-- On agentgateway, the stats port 15020 of the router answers `/metrics` with no credentials, and the egress gateway logs at `debug` after every installer run. [Section 6.1](#s-the-router-and-ingress) and [section 6.6](#s-the-dataplane-choice) have both.
-- `kubectl ate delete tag` accepts the golden tag of a template. The template then lists a tag that is gone, and `create actor` fails with `Tag not found`. [Section 3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives) has that mistake.
-- An actor sees 2 CPUs at every CPU limit, and the limit is a hard cap. [Section 4.1](#s-workerpool) has the measurement.
-- Names are identities. The documentation tells you never to reuse the name of a deleted atespace. A request that was allowed for the old one can apply to the new one.
-- Postgres is the only store. The maintainers declined a storage plugin before the release.
-- A durable directory has no size limit in the API, so one actor can fill the node disk. This comes from an open issue, and a run on it is planned for the next edition.
-- The gVisor class accepts a limit for each container and enforces only the limit of the actor.
+- 已打开的响应或透传连接，比它的出站规则活得更久。删除规则后，请求会在 9 秒内停止，复用的连接也一样。只有挂起能切断其余连接，见[第 6.6 节](#s-the-dataplane-choice)。
+- 在 agentgateway 上，改过的 Secret 最长要 5 分钟才会作用到请求上。我们在那里测得 100.6 到 280.5 秒，在 Envoy 上是 1.0 到 1.6 秒。运行记录见[第 6.5 节](#s-credential-injection)。
+- 出站网关只信任公共根证书。使用私有 CA 证书的主机会返回 503，直到我们替换了代理容器里的根证书文件。安装器会撤销这个补丁。详见[第 6.4 节](#s-tls-interception)。
+- 在 agentgateway 上，router 的统计端口 15020 无需凭据就会响应 `/metrics`，而且每次运行安装器之后，出站网关都以 `debug` 级别记日志。两者分别见[第 6.1 节](#s-the-router-and-ingress)和[第 6.6 节](#s-the-dataplane-choice)。
+- `kubectl ate delete tag` 会接受模板的黄金标签。之后模板列出一个已不存在的标签，`create actor` 会以 `Tag not found` 失败。这个错误见[第 3.4 节](#s-snapshot-fidelity-and-where-a-snapshot-lives)。
+- 无论 CPU 上限设多少，actor 看到的都是 2 个 CPU，而且该上限是硬上限。测量见[第 4.1 节](#s-workerpool)。
+- 名称就是身份。文档告诉你，永远不要复用已删除 atespace 的名称。曾经对旧 atespace 放行的请求，可能适用于新的那个。
+- Postgres 是唯一的存储。维护者在发布前拒绝了存储插件。
+- API 对持久目录没有大小限制，所以一个 actor 可能写满节点磁盘。这来自一个未关闭的 issue，针对它的运行已列入下一版计划。
+- gVisor 类别接受每个容器的上限，但只强制执行 actor 的上限。
 
-**Our position:** none of these limits makes v1.0.0 unusable. Together they mean that Substrate is one layer of a platform. Budget engineering time for four things. They are a harness that suspends, an autoscaler that reads free worker slots, a database with failover, and a probe for dead processes. [Section 7.4](#s-when-to-choose-substrate) weighs that cost against the alternatives.
+**我们的判断：** 这些局限没有一条让 v1.0.0 不可用。合在一起，它们说明 Substrate 只是平台的一层。要为四件事预留工程时间：会挂起的 harness、读取空闲 worker 槽位的自动扩缩器、带故障切换的数据库，以及探测死进程的探针。[第 7.4 节](#s-when-to-choose-substrate)会把这笔成本与其他方案对比。
 
-## Coming in the next edition {#s-next-edition}
+## 下一版将补充 {#s-next-edition}
 
-This edition measured Substrate on kind clusters on our own machines. The next edition adds the runs below. Until then, treat each item as not measured.
+本版在我们自己机器上的 kind 集群里测量了 Substrate。下一版会加入下面这些运行。在此之前，把每一项都当作未测量。
 
-Most numbers here came from clusters with one kind node, and one cluster had two worker nodes. Each cluster ran one of the two dataplanes. The object store was in the cluster, except in two experiments: once outside the cluster on the same guest, and once on a second guest.
+这里的大多数数字来自只有一个 kind 节点的集群，另有一个集群有两个 worker 节点。每个集群只运行两种数据平面中的一种。对象存储在集群内，只有两个实验例外：一次在同一台客户机上的集群外，一次在第二台客户机上。
 
-| Area | Planned runs |
+| 领域 | 计划中的运行 |
 |---|---|
-| Clouds | GKE first, then other managed Kubernetes services |
-| Storage | Google Cloud Storage, Amazon S3, a real link with 100 ms of delay to a bucket, more than one cycle of 1,000 MiB with 100 ms on the path between two guests, a managed Postgres, a Postgres outage with dropped packets, a connection pooler, a restore of either store. Also the cause of one running actor that stayed at 504 after a Postgres outage: we saw it once and have not found the cause yet |
-| Scale | more than 10,750 actor rows in one cluster, more than 450 actors with a snapshot of their own, more than 300 resumes at one time, more than 300 workers on one node, a burst on more than one node, a burst to actors whose snapshot is only in the bucket, what inside the gVisor restores sets about 37 resumes each second, more replicas of `ate-api-server` with a higher connection limit of Postgres, a third run of 200 and of 300 at one time, more than 24 parallel turns, more than two worker nodes, more than 20 actors across nodes, and the site claims of millions of agents and of 10x density |
-| Sandbox | the microVM class on arm64, with agentgateway, with a resume from the object store, above 500 MiB, and across CPU models. Also images with an init system, non-root images, large root filesystems |
-| Agents | a hosted model, a model on a GPU, or a model large enough for real agent work behind kagent, any real model behind a model gateway, a kagent turn that runs away while a bound is set, the `maxCompletionTokens` field of a ModelConfig, a streamed model reply through a model gateway, client authentication at a model gateway, the codex and claude harnesses, MCP servers through the egress gateway |
-| Lifecycle | an upgrade from v0.6.0 that keeps actors, an upgrade between two supported releases, a rollback across a schema change, an upgrade on more than one node or with the microVM class, a third run of an upgrade step, a drain with a PodDisruptionBudget on the pool, a drain of the node that runs `ate-system`, a revert in the first 20 s after a drain, the restore of a deleted golden tag, a resume at the two lower fidelities for an application with a long start on this guest |
-| Network | a suspend as a cut-off for a `tlsPassthrough` connection, the step that takes 0.6 s in an intercepted handshake, the log level of `atenet-router`, a restart of `atenet-egress` as a way to refresh a credential, the content of every metric label on the agentgateway stats port, port 9902 of the Envoy container |
-| Limits | memory limits under load, CPU limits with several busy actors on one worker, an outside autoscaler on a pool, a durable directory that fills the node disk |
-| Identity | the signature check of an actor JWT with the published key, a key rotation, federation with a second issuer or a cloud provider, a second token issuer for clients |
-| Snapshots | why the object store copy of the Python actor was half of its node copy, and equal for random bytes |
-| Failure | a dead process that stays `RUNNING` for more than 20 minutes or across a worker restart, the three outages on more than one node, egress during an outage, parked requests during a router restart, an egress restart, a node that is alive and unreachable, a node that loses power or its network, a node loss on the microVM class or on agentgateway, a node that is full by CPU or by a count of actors, a second run of the Kubernetes API outage with resumes and free workers, a pool with spare workers on a third node, other node timers of Kubernetes. Also two causes we saw and have not found yet: a burst request with no answer in 90 s, and an actor left in `ACTOR_STATE_RESUMING` after a database outage |
-| Agent Executor | a hosted or large model in a task, the example agent with a model that can do its work, a node loss under a task, a large or private clone, an MCP server that the image starts as a command, an MCP registry with listed servers, an MCP server outside the cluster, the release v0.3.1 on the Substrate commit that it names |
-| Apple silicon | actors above 200 MiB, a resume from the object store |
-| Preview | `ExternalVolumes` and `PerTemplateSnapshotLocation` on upstream Substrate, the flag on every component, and the behaviour of a golden egress policy |
+| 云 | 先做 GKE，再做其他托管 Kubernetes 服务 |
+| 存储 | Google Cloud Storage、Amazon S3、到 bucket 带 100 ms 延迟的真实链路、两台客户机之间路径增加 100 ms 延迟下多轮 1,000 MiB 测试、托管 Postgres、带丢包的 Postgres 故障、连接池、任一存储的恢复。还有一个运行中的 actor 在 Postgres 故障后停在 504 的原因：我们只见过一次，还没有找到原因 |
+| 规模 | 单个集群里超过 10,750 个 actor 行、超过 450 个各有独立快照的 actor、超过 300 个同时恢复、单个节点上超过 300 个 worker、跨多个节点的突发、对快照只在 bucket 里的 actor 的突发、gVisor 恢复内部究竟是什么把每秒恢复数限制在约 37 次、更多 `ate-api-server` 副本配合更高的 Postgres 连接上限、同时 200 和 300 的第三次运行、超过 24 个并行轮次、超过两个 worker 节点、跨节点超过 20 个 actor，以及官网上关于百万 agent 和 10 倍密度的宣称 |
+| 沙箱 | arm64 上的 microVM 类别、搭配 agentgateway、从对象存储恢复、超过 500 MiB，以及跨 CPU 型号。还有带 init 系统的镜像、非 root 镜像、大型根文件系统 |
+| Agent | 托管模型、GPU 上的模型、规模足以在 kagent 背后承担真实 agent 工作的模型、模型网关后面的任何真实模型、设定了上界时失控的 kagent 轮次、ModelConfig 的 `maxCompletionTokens` 字段、经模型网关的流式模型回复、模型网关处的客户端认证、codex 和 claude 这两种 harness、经出站网关的 MCP 服务器 |
+| 生命周期 | 保留 actor 的 v0.6.0 升级、两个受支持版本之间的升级、跨 schema 变更的回滚、多节点或使用 microVM 类别时的升级、升级步骤的第三次运行、池上带 PodDisruptionBudget 的排空、运行 `ate-system` 的节点的排空、排空后最初 20 秒内的 revert、已删除黄金标签的恢复、在这台客户机上针对启动缓慢的应用测试较低两档保真度的恢复 |
+| 网络 | 把挂起当作 `tlsPassthrough` 连接的切断手段、被拦截的握手中耗时 0.6 秒的那一步、`atenet-router` 的日志级别、把重启 `atenet-egress` 当作刷新凭据的手段、agentgateway 统计端口上每个指标标签的内容、Envoy 容器的 9902 端口 |
+| 上限 | 负载下的内存上限、一个 worker 上多个繁忙 actor 时的 CPU 上限、池上的外部自动扩缩器、写满节点磁盘的持久目录 |
+| 身份 | 用公开密钥校验 actor JWT 的签名、密钥轮换、与第二个签发方或云提供方的联邦、给客户端用的第二个令牌签发方 |
+| 快照 | 为什么 Python actor 在对象存储里的副本只有节点副本的一半，而随机字节的两份一样大 |
+| 故障 | 死进程停在 `RUNNING` 超过 20 分钟或跨过 worker 重启、多节点上的三类故障、故障期间的出站、router 重启期间暂存的请求、出站网关重启、节点存活但不可达、节点断电或断网、microVM 类别或 agentgateway 上的节点丢失、节点按 CPU 或 actor 数量占满、在有恢复请求和空闲 worker 的条件下重测 Kubernetes API 故障、第三个节点上有备用 worker 的池、Kubernetes 的其他节点计时器。还有我们见过但没找到原因的两件事：一个突发请求 90 秒内没有响应，以及数据库故障后停在 `ACTOR_STATE_RESUMING` 的 actor |
+| Agent Executor | 任务中的托管模型或大模型、配上能完成其工作的模型的示例 agent、任务中的节点丢失、大型或私有的 clone、由镜像以命令方式启动的 MCP 服务器、列有服务器的 MCP registry、集群外的 MCP 服务器、它所指定的 Substrate 提交上的 v0.3.1 发布 |
+| Apple silicon | 超过 200 MiB 的 actor、从对象存储恢复 |
+| 预览 | 上游 Substrate 上的 `ExternalVolumes` 和 `PerTemplateSnapshotLocation`、每个组件上都设标志，以及黄金出站策略的行为 |
 
-Until then, a section that states a fact from these areas takes it from the code or the documentation at the tag. The text says so.
+在此之前，凡是陈述这些领域事实的小节，都取自对应标签处的代码或文档。正文会写明这一点。
 
 ```takeaways
-- Build the suspend call into your harness first, because Substrate never suspends an idle actor.
-- Scale a WorkerPool on free worker slots, never on CPU use.
-- Run more than one router replica before you depend on the cluster, and test it.
-- Watch for the `upstream connect error` 503 to find a dead process or a dead node.
-- Plan for a stopped node as an outage, because no actor left a dead node by itself.
-- Write your own node-loss runbook from section 8.2, and keep tags for the actors that must move.
-- Leave preview features off unless you accept that this manual tested only how to turn one on.
-- Suspend only idle actors, because a suspend cuts an open request.
-- Read GKE and cloud bucket claims as documentation for now, and our upgrades as two runs from a candidate.
+- 先把挂起调用做进你的 harness，因为 Substrate 从不挂起空闲的 actor。
+- 按空闲 worker 槽位扩缩 `WorkerPool`，不要按 CPU 使用率。
+- 依赖集群之前，先运行多个 router 副本并测试它。
+- 留意 `upstream connect error` 的 503，用它发现死进程或死节点。
+- 把节点停止当作故障来规划，因为没有任何 actor 自己离开过已死的节点。
+- 照着第 8.2 节写你自己的节点丢失运行手册，并为必须迁移的 actor 保留标签。
+- 保持预览功能关闭，除非你接受本手册只验证过如何开启它们。
+- 只挂起空闲的 actor，因为挂起会切断打开的请求。
+- 把 GKE 和云 bucket 的说法当作文档说明，把我们的升级结果当作候选版本上的两次运行。
 ```
 
-Sources: capture/lab/summary/upgrade-x86.json, capture/lab/summary/scale-x86.json, capture/lab/summary/bursts-one-node-x86.json, capture/lab/summary/restore-limit-x86.json, capture/lab/summary/object-store-x86.json, capture/lab/summary/node-drain-x86.json, api/ateapi/v1/ateapi.proto (Resources, RequestActorSuspend, AccessPolicy), internal/preview/preview.go, api/infra/k8s/ate/v1/workerpool_types.go (replicas and the scale subresource), manifests/ate-install/ate-api-server.yaml, ate-idp-server.yaml, atenet-router.yaml, atenet-egress.yaml, ate-controller.yaml, pod-certificate-controller.yaml and postgres/postgres.yaml (replica counts), cmd/kubectl-ate/internal/cmd/admin.go, cmd/ate-setup/commands.md (the ingress allowlist) at v1.0.0; docs/guides/actor-jwt-key-rotation.md, docs/dev/preview-gates.md, docs/reference/api-guide.md and docs/reference/sandbox-classes.md at v1.0.0; issues #3775 and #2972 (dead process detection), #3441 (overcommit), #3589 (ingress authorization), #3203 (storage plugins), #3602 (durable directory size), #3347 (name reuse), #3285 (open connections); capture/lab/L-gaps/multinode/70-stop-after-upload.tsv, capture/lab/L-gaps/multinode/75-stop-after-upload-revert.tsv, capture/lab/L-gaps/multinode/80-stop-before-upload.tsv, capture/lab/L-gaps/multinode/90-stop-while-running.tsv, capture/lab/L-gaps/multinode/96-controller-events.log, capture/lab/L-gaps/multinode/85-node-return.tsv, capture/lab/summary/node-loss-x86.json, capture/lab/P-node-loss/10-a-quiet-revert.tsv, capture/lab/P-node-loss/80-tag-rescue.tsv, capture/lab/P-node-loss/96-golden-tag-deleted.txt, capture/lab/summary/rotation-x86.json, capture/lab/summary/network-x86.json, capture/lab/summary/cpu-limit-x86.json, capture/lab/summary/microvm-x86.json, capture/lab/B-lifecycle/10-trace.tsv, capture/lab/J-container-death/10-trace.tsv, capture/lab/K-kagent/parallel/, capture/lab/K-kagent/logs/actor-state-changes.tsv, capture/lab/C-resume-vs-size/31-atelet-args-patched.txt, capture/lab/I-capacity/17-router-args.txt, capture/lab/summary/failures-x86.json, capture/lab/summary/kagent-turns-x86.json, capture/lab/V-validation/10-preview-feature/10-preview.tsv, capture/lab/V-validation/10-preview-feature/tmpl-gep.yaml, capture/lab/V-validation/11-process-exit-long-watch/10-watch.tsv, capture/lab/V-validation/11-process-exit-long-watch/11-workers-end.txt, capture/lab/V-validation/12-suspend-during-request/10-inflight.tsv, capture/lab/V-validation/09-actor-jwt/16-jwks-key-ids.json, capture/lab/V-validation/03-parallel-resume/24-summary.tsv., capture/lab/summary/remote-store-x86.json, capture/lab/summary/remote-postgres-x86.json
+来源： capture/lab/summary/upgrade-x86.json, capture/lab/summary/scale-x86.json, capture/lab/summary/bursts-one-node-x86.json, capture/lab/summary/restore-limit-x86.json, capture/lab/summary/object-store-x86.json, capture/lab/summary/node-drain-x86.json, api/ateapi/v1/ateapi.proto (Resources, RequestActorSuspend, AccessPolicy), internal/preview/preview.go, api/infra/k8s/ate/v1/workerpool_types.go (replicas and the scale subresource), manifests/ate-install/ate-api-server.yaml, ate-idp-server.yaml, atenet-router.yaml, atenet-egress.yaml, ate-controller.yaml, pod-certificate-controller.yaml and postgres/postgres.yaml (replica counts), cmd/kubectl-ate/internal/cmd/admin.go, cmd/ate-setup/commands.md (the ingress allowlist) at v1.0.0; docs/guides/actor-jwt-key-rotation.md, docs/dev/preview-gates.md, docs/reference/api-guide.md and docs/reference/sandbox-classes.md at v1.0.0; issues #3775 and #2972 (dead process detection), #3441 (overcommit), #3589 (ingress authorization), #3203 (storage plugins), #3602 (durable directory size), #3347 (name reuse), #3285 (open connections); capture/lab/L-gaps/multinode/70-stop-after-upload.tsv, capture/lab/L-gaps/multinode/75-stop-after-upload-revert.tsv, capture/lab/L-gaps/multinode/80-stop-before-upload.tsv, capture/lab/L-gaps/multinode/90-stop-while-running.tsv, capture/lab/L-gaps/multinode/96-controller-events.log, capture/lab/L-gaps/multinode/85-node-return.tsv, capture/lab/summary/node-loss-x86.json, capture/lab/P-node-loss/10-a-quiet-revert.tsv, capture/lab/P-node-loss/80-tag-rescue.tsv, capture/lab/P-node-loss/96-golden-tag-deleted.txt, capture/lab/summary/rotation-x86.json, capture/lab/summary/network-x86.json, capture/lab/summary/cpu-limit-x86.json, capture/lab/summary/microvm-x86.json, capture/lab/B-lifecycle/10-trace.tsv, capture/lab/J-container-death/10-trace.tsv, capture/lab/K-kagent/parallel/, capture/lab/K-kagent/logs/actor-state-changes.tsv, capture/lab/C-resume-vs-size/31-atelet-args-patched.txt, capture/lab/I-capacity/17-router-args.txt, capture/lab/summary/failures-x86.json, capture/lab/summary/kagent-turns-x86.json, capture/lab/V-validation/10-preview-feature/10-preview.tsv, capture/lab/V-validation/10-preview-feature/tmpl-gep.yaml, capture/lab/V-validation/11-process-exit-long-watch/10-watch.tsv, capture/lab/V-validation/11-process-exit-long-watch/11-workers-end.txt, capture/lab/V-validation/12-suspend-during-request/10-inflight.tsv, capture/lab/V-validation/09-actor-jwt/16-jwks-key-ids.json, capture/lab/V-validation/03-parallel-resume/24-summary.tsv., capture/lab/summary/remote-store-x86.json, capture/lab/summary/remote-postgres-x86.json

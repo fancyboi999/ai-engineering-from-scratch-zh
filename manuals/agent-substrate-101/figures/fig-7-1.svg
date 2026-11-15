@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 546" role="img" aria-labelledby="fig-7-1-title fig-7-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-1-title">One recorded kagent turn resumes the Session actor, runs, and suspends it again</title>
-  <desc id="fig-7-1-desc">Five lifelines, each under a small drawing of its party: the client as a terminal, the kagent controller as a server with the kagent mark, atenet-router as a gateway with the agentgateway mark, ate-api-server as a server with the Agent Substrate mark, and the actor named session-uuid as three layers. Nine numbered exchanges show one recorded turn, each with its time from the moment the client sent the message. The router asks for ResumeActor and the actor is RUNNING 0.41 s later. The turn runs. kagent calls SuspendActor, the client has its answer after 1.26 s, and the actor is SUSPENDED after 1.36 s.</desc>
+  <title id="fig-7-1-title">一次录制的 kagent 轮次：恢复会话 actor、运行并再次挂起</title>
+  <desc id="fig-7-1-desc">五条生命线，各自上方绘有组件图标：终端客户端、带 kagent 标志的 kagent controller、带 agentgateway 标志的网关 atenet-router、带 Agent Substrate 标志的 ate-api-server 以及三层结构的 actor session-uuid。九步交互给出从客户端发送消息起算的时间戳：路由器调用 ResumeActor，0.41 s 后 actor 进入 RUNNING；轮次执行完成；kagent 调用同步 SuspendActor，客户端在 1.26 s 后拿到回答，actor 在 1.36 s 后回到 SUSPENDED。</desc>
   <defs><marker id="fig-7-1-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-7-1-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
-  <text x="30" y="88" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">TIME</text>
+  <text x="30" y="88" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">时间</text>
   <polygon points="120,24 164,24 164,50 120,50" fill="var(--m-panel, #f3f1e8)"/>
   <polygon points="120,24 164,24 164,50 120,50" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.3" stroke-linejoin="round"/>
   <polygon points="120,24 164,24 164,29 120,29" fill="var(--m-olive-ink, #515f26)" fill-opacity="0.8"/>
@@ -10,7 +10,7 @@
   <polygon points="133,35.8 155,35.8 155,38.3 133,38.3" fill="var(--m-olive-ink, #515f26)" fill-opacity="0.75"/>
   <polygon points="125,43 145,43 145,45.5 125,45.5" fill="var(--m-olive-ink, #515f26)" fill-opacity="0.4"/>
   <polygon points="125,53 159,53 164,58 120,58" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)" stroke-width="1.1" stroke-linejoin="round"/>
-  <text x="142" y="74" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-olive-ink, #515f26)">client</text>
+  <text x="142" y="74" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-olive-ink, #515f26)">客户端</text>
   <text x="142" y="88" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kagent CLI</text>
   <line x1="142" y1="94" x2="142" y2="500" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="2 3"/>
   <polygon points="231,10 273,10 273,58 231,58" fill="var(--m-panel, #f3f1e8)"/>
@@ -64,73 +64,73 @@
   <text x="14" y="138" font-size="11" text-anchor="middle">1</text>
   <text x="30" y="138" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">+0.00 s</text>
   <line x1="142" y1="134" x2="251" y2="134" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-ink)"/>
-  <rect class="m-knock" x="169.85" y="117.03" width="54.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="197" y="128" font-size="11.5" text-anchor="middle">message</text>
-  <rect class="m-knock" x="122.72" y="138.42" width="148.56" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="197" y="149" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">A2A, with the Session id</text>
+  <rect class="m-knock" x="182.5" y="117.03" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="197" y="128" font-size="11.5" text-anchor="middle">消息</text>
+  <rect class="m-knock" x="141.42" y="138.42" width="111.16" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="197" y="149" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">A2A，带 Session ID</text>
   <circle cx="14" cy="176" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="14" y="180" font-size="11" text-anchor="middle">2</text>
   <text x="30" y="180" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">+0.32 s</text>
   <line x1="252" y1="176" x2="361" y2="176" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-ink)"/>
   <rect class="m-knock" x="248.8" y="159.03" width="116.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="307" y="170" font-size="11.5" text-anchor="middle">ate-target-actor</text>
-  <rect class="m-knock" x="262.42" y="180.42" width="89.16" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="307" y="191" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mTLS, port 443</text>
+  <rect class="m-knock" x="263.74" y="180.42" width="86.52" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="307" y="191" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">mTLS，端口 443</text>
   <circle cx="14" cy="218" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="14" y="222" font-size="11" text-anchor="middle">3</text>
   <text x="30" y="222" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">+0.47 s</text>
   <line x1="362" y1="218" x2="471" y2="218" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-ink)"/>
   <rect class="m-knock" x="376.05" y="201.03" width="81.9" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="417" y="212" font-size="11.5" text-anchor="middle">ResumeActor</text>
-  <rect class="m-knock" x="369.45" y="222.42" width="95.1" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="417" y="233" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the router asks</text>
+  <rect class="m-knock" x="375.5" y="222.42" width="83" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="417" y="233" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">路由器发起请求</text>
   <circle cx="14" cy="260" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1"/>
   <text x="14" y="264" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">4</text>
   <text x="30" y="264" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">+0.88 s</text>
   <line x1="472" y1="260" x2="581" y2="260" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-1-head-amber)"/>
   <rect class="m-knock" x="499.85" y="243.03" width="54.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="527" y="254" font-size="11.5" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">RUNNING</text>
-  <rect class="m-knock" x="473.51" y="264.42" width="106.98" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="527" y="275" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">resumed in 0.41 s</text>
+  <rect class="m-knock" x="481.21" y="264.42" width="91.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="527" y="275" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.41 s 完成恢复</text>
   <circle cx="14" cy="302" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="14" y="306" font-size="11" text-anchor="middle">5</text>
   <line x1="362" y1="302" x2="581" y2="302" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-ink)"/>
-  <rect class="m-knock" x="441.4" y="285.03" width="61.2" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="472" y="296" font-size="11.5" text-anchor="middle">the turn</text>
-  <rect class="m-knock" x="385.84" y="306.42" width="172.32" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="472" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">gRPC to port 80 of the actor</text>
+  <rect class="m-knock" x="446" y="285.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="472" y="296" font-size="11.5" text-anchor="middle">执行轮次</text>
+  <rect class="m-knock" x="393.98" y="306.42" width="156.04" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="472" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">发往 actor 端口 80 的 gRPC</text>
   <circle cx="14" cy="344" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="14" y="348" font-size="11" text-anchor="middle">6</text>
   <text x="30" y="348" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">+1.07 s</text>
   <line x1="582" y1="344" x2="253" y2="344" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-1-head-ink)"/>
   <rect class="m-knock" x="345" y="327.03" width="144" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="417" y="338" font-size="11.5" text-anchor="middle">TASK_STATE_COMPLETED</text>
-  <rect class="m-knock" x="357.57" y="348.42" width="118.86" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="417" y="359" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the turn ran 0.19 s</text>
+  <rect class="m-knock" x="371.21" y="348.42" width="91.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="417" y="359" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">轮次运行 0.19 s</text>
   <circle cx="14" cy="386" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="14" y="390" font-size="11" text-anchor="middle">7</text>
   <text x="30" y="390" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">+1.23 s</text>
   <line x1="252" y1="386" x2="471" y2="386" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-1-head-ink)"/>
   <rect class="m-knock" x="317.6" y="369.03" width="88.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="362" y="380" font-size="11.5" text-anchor="middle">SuspendActor</text>
-  <rect class="m-knock" x="290.69" y="390.42" width="142.62" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="362" y="401" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">synchronous, files only</text>
+  <rect class="m-knock" x="304" y="390.42" width="116" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="362" y="401" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同步挂起，仅文件快照</text>
   <circle cx="14" cy="428" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="14" y="432" font-size="11" text-anchor="middle">8</text>
   <text x="30" y="432" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">+1.26 s</text>
   <line x1="252" y1="428" x2="143" y2="428" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-1-head-ink)"/>
-  <rect class="m-knock" x="173.3" y="411.03" width="47.4" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="197" y="422" font-size="11.5" text-anchor="middle">answer</text>
-  <rect class="m-knock" x="134.6" y="432.42" width="124.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="197" y="443" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.26 s at the client</text>
+  <rect class="m-knock" x="171" y="411.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="197" y="422" font-size="11.5" text-anchor="middle">响应结果</text>
+  <rect class="m-knock" x="145.71" y="432.42" width="102.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="197" y="443" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端耗时 1.26 s</text>
   <circle cx="14" cy="470" r="9" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1"/>
   <text x="14" y="474" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">9</text>
   <text x="30" y="474" font-size="11" font-weight="700" fill="var(--m-amber-ink, #85590c)">+1.36 s</text>
   <line x1="472" y1="470" x2="581" y2="470" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-1-head-amber)"/>
   <rect class="m-knock" x="492.95" y="453.03" width="68.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
   <text x="527" y="464" font-size="11.5" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">SUSPENDED</text>
-  <rect class="m-knock" x="467.57" y="474.42" width="118.86" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="527" y="485" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">suspended in 0.13 s</text>
-  <text x="20" y="518" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">One recorded turn of 98. Over all of them the resume took 0.380 s at the median,</text>
-  <text x="20" y="534" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">and the suspend took 0.142 s. The model was a mock server.</text>
+  <rect class="m-knock" x="481.21" y="474.42" width="91.58" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="527" y="485" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.13 s 完成挂起</text>
+  <text x="20" y="518" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">98 个录制轮次中的一次。全部轮次的恢复耗时中位数为 0.380 s，</text>
+  <text x="20" y="534" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">挂起耗时中位数为 0.142 s。模型使用模拟服务。</text>
 </svg>

@@ -6,11 +6,11 @@ const { load } = require('../../../_shared/chart.js');
 
 const drain = load(path.join(__dirname, '../../capture/lab/summary/node-drain-x86.json'));
 const names = {
-  a: ['RUNNING,', 'one request each second'],
-  b: ['suspended with --mode sync,', 'no request during the drain'],
-  b2: ['suspended with --mode sync,', 'requests from 2 s after the drain'],
-  c: ['suspended, default mode,', 'newest snapshot still PENDING'],
-  d: ['RUNNING,', 'one request of 120 s open'],
+  a: ['RUNNING，', '每秒 1 个请求'],
+  b: ['--mode sync 挂起，', '排空期间无请求'],
+  b2: ['--mode sync 挂起，', '排空 2 s 后开始发请求'],
+  c: ['默认模式挂起，', '最新快照仍为 PENDING'],
+  d: ['RUNNING，', '1 个 120 s 长请求未结束'],
 };
 const LEFT = 188;
 const RIGHT = 460;
@@ -21,23 +21,23 @@ const TOP = 52;
 const STEP = 50;
 
 function outcome(item) {
-  if (item.revert) return [`${item.failed_after_drain} of ${item.requests_after_drain} failed`, `revert, 200 after ${item.revert.seconds_to_first_ok} s`];
-  return [`${item.ok_after_drain} of ${item.requests_after_drain} returned 200`, `first answer in ${item.first_ok_seconds.toFixed(2)} s`];
+  if (item.revert) return [`${item.failed_after_drain}/${item.requests_after_drain} 个请求失败`, `回退后 ${item.revert.seconds_to_first_ok} s 返回 200`];
+  return [`${item.ok_after_drain}/${item.requests_after_drain} 个返回 200`, `首个响应耗时 ${item.first_ok_seconds.toFixed(2)} s`];
 }
 
 module.exports = figure('fig-8-2f', {
   height: TOP + STEP * drain.cases.length + 62,
-  title: 'Five drains of one worker node, request by request',
-  desc: `Five rows, one for each actor state at the moment of a kubectl drain. The two actors that were RUNNING failed every request after the drain until a revert that we sent, ${drain.cases[0].failed_after_drain} of ${drain.cases[0].requests_after_drain} and ${drain.cases[4].failed_after_drain} of ${drain.cases[4].requests_after_drain} requests. The three suspended actors returned 200 on their first request after the drain with no command, on the other node.`,
+  title: '五次排空同一 worker 节点时的逐请求表现',
+  desc: `五行分别对应执行 kubectl drain 时处于不同状态的 actor。两个处于 RUNNING 状态的 actor 在排空后所有请求均失败（分别为 ${drain.cases[0].failed_after_drain}/${drain.cases[0].requests_after_drain} 与 ${drain.cases[4].failed_after_drain}/${drain.cases[4].requests_after_drain}），直至我们手动发送回退。三个处于挂起状态的 actor 无需任何命令，排空后首个请求即在另一节点上返回 200。`,
 }, f => {
   f.rect(20, 14, 4, 10, { fill: color('green-ink'), stroke: 'none' });
-  f.text(30, 23, 'one request, 200', { size: 11, hue: 'ink-soft' });
+  f.text(30, 23, '单次请求，200', { size: 11, hue: 'ink-soft' });
   f.rect(150, 14, 4, 10, { fill: color('rose-ink'), stroke: 'none' });
-  f.text(160, 23, 'one request, failed', { size: 11, hue: 'ink-soft' });
+  f.text(160, 23, '单次请求，失败', { size: 11, hue: 'ink-soft' });
   f.rule(298, 12, 298, 26, { hue: 'ink', dash: 'dashed' });
-  f.text(306, 23, 'the revert that we sent', { size: 11, hue: 'ink-soft' });
+  f.text(306, 23, '手动发送的回退', { size: 11, hue: 'ink-soft' });
   f.rect(470, 14, 12, 10, { hue: 'grey', stroke: 'none' });
-  f.text(488, 23, 'kubectl drain runs', { size: 11, hue: 'ink-soft' });
+  f.text(488, 23, 'kubectl drain 执行期', { size: 11, hue: 'ink-soft' });
 
   drain.cases.forEach((item, index) => {
     const y = TOP + index * STEP;
@@ -64,5 +64,5 @@ module.exports = figure('fig-8-2f', {
     f.rule(px(t), axis - 4, px(t), axis + 4, { hue: 'ink' });
     f.text(px(t), axis + 18, `${t} s`, { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.text((px(FIRST) + px(LAST)) / 2, axis + 38, 'seconds since the drain command', { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
+  f.text((px(FIRST) + px(LAST)) / 2, axis + 38, '自执行 drain 命令起算的秒数', { size: 11.5, serif: true, anchor: 'middle', hue: 'ink-soft' });
 });

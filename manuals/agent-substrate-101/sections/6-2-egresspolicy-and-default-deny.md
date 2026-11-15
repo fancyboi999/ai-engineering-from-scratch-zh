@@ -1,20 +1,20 @@
-# EgressPolicy and default deny
+# EgressPolicy 与默认拒绝
 
-> An actor with no EgressPolicy reaches nothing, and a policy opens named hosts and ports only, through three rule kinds and no CIDR rule.
+> 没有 EgressPolicy 的 actor 什么都访问不了，策略只通过三种规则开放指定的主机和端口，没有 CIDR 规则。
 
-Your agent runs a tool that downloads a package, and the tool reports that the host does not resolve. You open a shell in the actor and `curl` fails for every name you try. The network is not broken. The actor has no policy, so Substrate denies all of it.
+你的 agent 运行一个下载软件包的工具，工具报告主机无法解析。你在 actor 里开一个 shell，试的每个名字 `curl` 都失败。网络并没有坏。这个 actor 没有策略，所以 Substrate 全部拒绝。
 
-When you finish this section, you can write an EgressPolicy for one actor and apply it with `kubectl ate`. You can also tell from the error which layer refused a connection.
+读完本节，你能为一个 actor 写出 EgressPolicy，并用 `kubectl ate` 应用它。你还能根据错误判断是哪一层拒绝了连接。
 
-## The path of an outgoing connection
+## 出站连接的路径 {#s-egresspolicy-and-default-deny-the-path-of-an-outgoing-connection}
 
-An actor does not sit on the pod network. Its sandbox has one link of four addresses, and the far end of that link belongs to the worker.
+actor 不在 pod 网络上。它的沙箱只有一条带四个地址的链路，链路的另一端属于 worker。
 
 ```listing
-title: the network that an actor sees
+title: actor 看到的网络
 source: capture/lab/F-egress/envoy/20-results.txt
 lang: text
-note: Output of resolv.conf, the addresses, and the routes inside the actor f-deny. The loopback and IPv6 lines are cut.
+note: actor f-deny 内部的 resolv.conf、地址和路由的输出。回环和 IPv6 相关行已截去。
 ---
 nameserver 169.254.17.1
 search ate-demo-egress.svc.cluster.local svc.cluster.local cluster.local
@@ -25,45 +25,45 @@ inet 169.254.17.2/30 scope global dynamic eth0
 default via 169.254.17.1 dev eth0 scope link
 ```
 
-Three parts of Substrate handle what leaves that link {{code}}:
+Substrate 有三个部分处理离开这条链路的流量{{code}}：
 
-1. Firewall rules in the worker redirect every TCP connection to `atunnel`, a process in the worker pod. Other protocols are rejected, except DNS to `169.254.17.1`.
-2. `atunnel` opens a mutual TLS `CONNECT` to the Service `atenet-egress`. It presents the certificate of the actor, and the target is the original IP and port.
-3. `atenet-egress` verifies the certificate and asks `ate-api-server` that the actor is running or resuming. Then it reads the policy of that actor and decides.
+1. worker 里的防火墙规则把每个 TCP 连接重定向到 `atunnel`，它是 worker pod 里的一个进程。除了发往 `169.254.17.1` 的 DNS，其他协议都被拒绝。
+2. `atunnel` 向 Service `atenet-egress` 打开一条双向 TLS 的 `CONNECT`。它出示 actor 的证书，目标是原始的 IP 和端口。
+3. `atenet-egress` 验证证书，并向 `ate-api-server` 确认该 actor 正在运行或正在恢复。然后它读取这个 actor 的策略并做出决定。
 
 ```figure
 id: fig-6-2
 kind: flow
-title: where an outgoing connection is decided
-claim: A connection from an actor passes two checks, the DNS relay for the name and atenet-egress for the request, and each one reads the same policy.
-caption: Read from left to right. The upper path is a name lookup and the lower path is the connection itself. The dashed arrows from the top are the policy that each check reads. The upstream host sees the IP of atenet-egress, never the actor. From capture/lab/F-egress/envoy/20-results.txt and the atunnel and router sources at v1.0.0.
+title: 出站连接在哪里被裁决
+claim: actor 发出的连接要过两道检查，一道是针对名称的 DNS 中继，一道是针对请求的 atenet-egress，两者读取同一份策略。
+caption: 从左往右读。上面的路径是名称查询，下面的路径是连接本身。从上方引出的虚线箭头是每道检查所读取的策略。上游主机看到的是 atenet-egress 的 IP，从来看不到 actor。来源：capture/lab/F-egress/envoy/20-results.txt 以及 v1.0.0 的 atunnel 与 router 源码。
 ```
 
-The upstream host never sees the actor. In our run the test server reported the caller as `10.244.0.22`, the pod IP of `atenet-egress`. Actor networking is IPv4 only at this version {{docs}}.
+上游主机从来看不到 actor。在我们的运行里，测试服务器把调用方报告为 `10.244.0.22`，这是 `atenet-egress` 的 pod IP。这个版本的 actor 网络只支持 IPv4{{docs}}。
 
-## The policy is an API record, one per actor
+## 策略是一条 API 记录，每个 actor 一条 {#s-egresspolicy-and-default-deny-the-policy-is-an-api-record-one-per-actor}
 
-**EgressPolicy:** the list of allow rules for one actor. It is a record in the Substrate API with the fixed name `default`, stored under the actor. It is not a Kubernetes object, so `kubectl get` does not show it.
+**EgressPolicy：** 一个 actor 的允许规则列表。它是 Substrate API 里的一条记录，固定名称为 `default`，存放在 actor 之下。它不是 Kubernetes 对象，所以 `kubectl get` 看不到它。
 
-You create the policy after the actor exists. A new actor does not copy the policy of its template {{docs}}. A harness that creates actors must therefore write a policy for each one, which is what kagent does ([section 7.1](#s-kagent-on-substrate)).
+你要在 actor 创建之后再创建策略。新 actor 不会复制其模板的策略{{docs}}。因此创建 actor 的 harness 必须为每个 actor 写一份策略，kagent 就是这么做的（[第 7.1 节](#s-kagent-on-substrate)）。
 
-A policy holds up to 256 rules, and the order of the rules has no meaning {{code}}. Each rule is one of three kinds.
+一份策略最多有 256 条规则，规则的顺序没有意义{{code}}。每条规则属于三种类型之一。
 
-| Rule kind | What the gateway reads | Default port | Credential effects |
+| 规则类型 | 网关读取什么 | 默认端口 | 凭据效果 |
 |---|---|---|---|
-| `http` | the `Host` header of each cleartext request | 80 | yes |
-| `https` | each request, after the gateway decrypts the TLS session | 443 | yes |
-| `tlsPassthrough` | the server name in the TLS handshake, once for each connection | none, you must list ports | no |
+| `http` | 每个明文请求的 `Host` 头 | 80 | 有 |
+| `https` | 网关解密 TLS 会话后的每个请求 | 443 | 有 |
+| `tlsPassthrough` | TLS 握手里的服务器名称，每个连接读一次 | 无，必须列出端口 | 无 |
 
-A rule has three fields: `hostnames`, `ports`, and `effects`. A hostname is a lowercase DNS name, or a name with `*` as its whole first label, or `*` alone {{code}}. An IP address is not valid, and no rule kind takes a CIDR range. A rule also has no field for a path, a method, a model, or a tool. The policy decides which hosts an actor can reach. It does not decide what the actor asks them for.
+一条规则有三个字段：`hostnames`、`ports` 和 `effects`。主机名是小写的 DNS 名称，或者以 `*` 作为整个第一级标签的名称，或者单独一个 `*`{{code}}。IP 地址无效，任何规则类型都不接受 CIDR 范围。规则里也没有路径、方法、模型或工具的字段。策略决定 actor 能访问哪些主机，不决定 actor 向这些主机请求什么。
 
-This is the policy of our test actor `f-main`, as the API returned it. We wrote the three rules. The API added the default ports and the metadata.
+下面是我们的测试 actor `f-main` 的策略，原样取自 API 的返回。三条规则是我们写的。默认端口和元数据由 API 补上。
 
 ```listing
-title: an EgressPolicy with one rule of each kind
+title: 每种类型各一条规则的 EgressPolicy
 source: capture/lab/F-egress/envoy/policy-f-main-P2-live.yaml
 lang: yaml
-note: The complete output of get egress-policy with -o yaml.
+note: get egress-policy 加 -o yaml 的完整输出。
 ---
 metadata:
   atespace: lab-f
@@ -93,65 +93,65 @@ rules:
       - 443
 ```
 
-## Create and update a policy
+## 创建与更新策略 {#s-egresspolicy-and-default-deny-create-and-update-a-policy}
 
-The first policy of an actor needs only the rules.
+一个 actor 的第一份策略只需要规则。
 
 ```bash
 kubectl ate create egress-policy f-main -a lab-f -f policy.yaml
 kubectl ate get egress-policy f-main -a lab-f -o yaml
 ```
 
-An update is stricter, and we got it wrong twice. The first time, we sent a file with only `rules`.
+更新要严格得多，我们错了两次。第一次，我们发送了只有 `rules` 的文件。
 
 ```listing
-title: an update without the preconditions
+title: 缺少前置条件的更新
 source: capture/lab/F-egress/envoy/19-first-run-update-refused.txt
 lang: text
-note: The answer of update egress-policy to a file that has rules and no metadata.
+note: update egress-policy 对只有规则、没有元数据的文件的应答。
 ---
 Error: manifest for actor "f-main" in atespace "lab-f" lacks the metadata.uid and metadata.version preconditions that "get egress-policy -o yaml" prints
 ```
 
-`update egress-policy` replaces the whole policy, and it needs to know which version you edited. Read the policy with `-o yaml`, keep `metadata.uid` and `metadata.version`, change the rules, and send the file back.
+`update egress-policy` 会替换整份策略，它需要知道你编辑的是哪个版本。用 `-o yaml` 读出策略，保留 `metadata.uid` 和 `metadata.version`，修改规则，再把文件发回去。
 
-If the stored policy changed between your read and your update, the server refuses the update. The CLI then tells you to run `get egress-policy -o yaml` again {{code}}. The CLI itself checks only that both values are in the file. Read the policy again and repeat the change. We did not run that case.
+如果存储的策略在你读取和更新之间发生了变化，服务器会拒绝这次更新。CLI 随后会让你重新运行 `get egress-policy -o yaml`{{code}}。CLI 自己只检查这两个值是否在文件里。重新读取策略，再重做一遍修改即可。我们没有运行这种情况。
 
-The second time, the file had a `tlsPassthrough` rule with no ports.
+第二次，文件里有一条没有 ports 的 `tlsPassthrough` 规则。
 
 ```listing
-title: a tlsPassthrough rule without ports
+title: 没有端口的 tlsPassthrough 规则
 source: capture/lab/F-egress/envoy/19b-second-run-passthrough-ports-required.txt
 lang: text
-note: The answer of update egress-policy. The rule index counts from zero.
+note: update egress-policy 的应答。规则下标从零开始计数。
 ---
 Error: failed to update egress policy for actor "f-main" in atespace "lab-f": rpc error: code = InvalidArgument desc = egress_policy.rules[2].tls_passthrough.ports: Required value
 ```
 
-An `http` rule without ports means port 80, and an `https` rule means port 443. A `tlsPassthrough` rule has no default. Write `ports: {numbers: [443]}` each time.
+没有端口的 `http` 规则表示端口 80，`https` 规则表示端口 443。`tlsPassthrough` 规则没有默认值。每次都要写 `ports: {numbers: [443]}`。
 
-## What a denied request looks like
+## 被拒绝的请求是什么样子 {#s-egresspolicy-and-default-deny-what-a-denied-request-looks-like}
 
-The two dataplanes enforce the same policy and answer in different words. Learn both sets, because an agent sees these strings in its tool output.
+两种数据平面执行同一份策略，但用不同的措辞应答。两套都要熟悉，因为 agent 会在工具输出里看到这些字符串。
 
-| The actor does this | Envoy dataplane | agentgateway dataplane |
+| actor 的操作 | Envoy 数据平面 | agentgateway 数据平面 |
 |---|---|---|
-| Resolves any name, with no policy | `NXDOMAIN` | `NXDOMAIN` |
-| Resolves a name that is not in its policy | `NXDOMAIN` | `NXDOMAIN` |
-| Queries another resolver, such as `8.8.8.8` | timeout | timeout |
-| Sends HTTP to an IP, with no policy | connection reset | `403`, `actor egress policy denied` |
-| Sends HTTP to an IP that is not in its policy | `403`, `egress denied` | `403`, `actor egress policy denied` |
-| Opens TLS to an IP, with no policy | handshake cut | handshake cut |
-| Opens TLS with a server name that no rule lists | handshake cut | handshake cut |
-| Sends a WebSocket upgrade to an allowed host | `403` | `403`, `WebSocket egress is not supported` |
+| 没有策略时解析任何名称 | `NXDOMAIN` | `NXDOMAIN` |
+| 解析策略里没有的名称 | `NXDOMAIN` | `NXDOMAIN` |
+| 查询另一个解析器，例如 `8.8.8.8` | 超时 | 超时 |
+| 没有策略时向一个 IP 发送 HTTP | 连接被重置 | `403`，`actor egress policy denied` |
+| 向策略里没有的 IP 发送 HTTP | `403`，`egress denied` | `403`，`actor egress policy denied` |
+| 没有策略时向一个 IP 打开 TLS | 握手被切断 | 握手被切断 |
+| 用没有任何规则列出的服务器名称打开 TLS | 握手被切断 | 握手被切断 |
+| 向允许的主机发送 WebSocket 升级请求 | `403` | `403`，`WebSocket egress is not supported` |
 
-A name outside the policy never reaches the gateway, because the DNS relay answers first. [Section 6.3](#s-the-dns-relay) covers that relay. The gateway answers only when the actor already has an IP address.
+策略之外的名称到不了网关，因为 DNS 中继会先应答。该中继见[第 6.3 节](#s-the-dns-relay)。只有 actor 已经拿到 IP 地址时，网关才会应答。
 
 ```listing
-title: HTTP to an IP with no policy, agentgateway dataplane
+title: 没有策略时向一个 IP 发 HTTP，agentgateway 数据平面
 source: capture/lab/F-egress/agentgateway/20-results.txt
 lang: text
-note: The response to a request for an IP address from the actor f-deny. The date header is cut.
+note: actor f-deny 对一个 IP 地址发出请求得到的响应。date 头已截去。
 ---
 HTTP/1.1 403 Forbidden
 content-type: text/plain
@@ -160,17 +160,17 @@ content-length: 26
 actor egress policy denied
 ```
 
-On Envoy, the same request from the same actor ended with `curl: (56) Recv failure: Connection reset by peer`. The Envoy text `egress denied` appears only when the actor has a policy and the request does not match it.
+在 Envoy 上，同一个 actor 的同一个请求以 `curl: (56) Recv failure: Connection reset by peer` 结束。Envoy 的文本 `egress denied` 只在 actor 有策略而请求不匹配时才会出现。
 
-## The Host header does not open another host
+## Host 头打不开另一台主机 {#s-egresspolicy-and-default-deny-the-host-header-does-not-open-another-host}
 
-A policy that names hosts invites one attack: connect to an IP of your choice and claim an allowed name in the `Host` header. We tried it. The policy allowed only `whoami.egress-target.svc.cluster.local`. The actor connected to the IP of a second service, `drip`, and sent the allowed name.
+按主机名定义的策略会招来一种攻击：连接到你选定的 IP，并在 `Host` 头里冒充一个被允许的名称。我们试了这种攻击。策略只允许 `whoami.egress-target.svc.cluster.local`。actor 连接到第二个服务 `drip` 的 IP，并发送了被允许的名称。
 
 ```listing
-title: a request to another IP with the allowed Host header
+title: 带允许的 Host 头请求另一个 IP
 source: capture/lab/F-egress/envoy/20-results.txt
 lang: console
-note: The command and the lines that show which server answered. The headers between them are cut.
+note: 命令，以及显示是哪台服务器应答的几行。两者之间的响应头已截去。
 ---
 $ curl -sS -m 8 -i -H 'Host: whoami.egress-target.svc.cluster.local' 'http://10.96.185.134/drip?n=1' | head -14
 …
@@ -179,17 +179,17 @@ HTTP/1.1 200 OK
 Hostname: whoami-5bdb4584f6-4gqz6
 ```
 
-The answer came from `whoami`, not from `drip`. The gateway took the name from the header, found it in the policy, and connected to that name itself. It ignored the IP that the actor had chosen. Both dataplanes did the same. An actor therefore reaches only the hosts that the policy names, whatever address it dials.
+应答来自 `whoami`，不是 `drip`。网关从请求头里取出名称，在策略里找到它，然后自己连接到这个名称。它忽略了 actor 选定的 IP。两种数据平面的做法相同。因此无论 actor 拨哪个地址，它都只能访问策略点名的主机。
 
-The reverse also holds. A policy names hosts, so it cannot pin an IP. If the name resolves to a new address tomorrow, the gateway follows it.
+反过来也成立。策略点名的是主机，所以它无法锁定 IP。如果这个名称明天解析到新地址，网关会跟过去。
 
 ```takeaways
-- Write an EgressPolicy for each actor, because a new actor starts with none.
-- Use `https` when you need credential injection, and `tlsPassthrough` when the client must see the real certificate.
-- Keep `metadata.uid` and `metadata.version` in each file that you send to `update egress-policy`.
-- List `ports` in each `tlsPassthrough` rule.
-- Read `NXDOMAIN` inside an actor as a name that the policy does not list.
-- Do not expect a policy to restrict paths, methods, models, or tools.
+- 给每个 actor 写一份 EgressPolicy，因为新 actor 一开始没有策略。
+- 需要凭据注入时用 `https`，客户端必须看到真实证书时用 `tlsPassthrough`。
+- 发给 `update egress-policy` 的每个文件都要保留 `metadata.uid` 和 `metadata.version`。
+- 每条 `tlsPassthrough` 规则都要列出 `ports`。
+- 把 actor 里的 `NXDOMAIN` 读作策略没有列出的名称。
+- 不要指望策略限制路径、方法、模型或工具。
 ```
 
-Sources: capture/lab/F-egress/envoy/20-results.txt, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/envoy/policy-f-main-P2-live.yaml, capture/lab/F-egress/envoy/P2.yaml, capture/lab/F-egress/envoy/19-first-run-update-refused.txt, capture/lab/F-egress/envoy/19b-second-run-passthrough-ports-required.txt, capture/lab/F-egress/envoy/applied-P2.yaml, capture/lab/K-kagent/session1/egress-policy-actor.yaml, api/ateapi/v1/ateapi.proto (EgressPolicy, EgressRule, HttpRule, HttpsRule, TlsPassthroughRule, Ports), internal/ateworker/actornet/sandbox.go, cmd/atenet/internal/router/egress/egress.go, docs/guides/network-egress.md, docs/guides/egress-traffic.md and docs/reference/kubectl-ate.md at v1.0.0.
+来源：capture/lab/F-egress/envoy/20-results.txt, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/F-egress/envoy/policy-f-main-P2-live.yaml, capture/lab/F-egress/envoy/P2.yaml, capture/lab/F-egress/envoy/19-first-run-update-refused.txt, capture/lab/F-egress/envoy/19b-second-run-passthrough-ports-required.txt, capture/lab/F-egress/envoy/applied-P2.yaml, capture/lab/K-kagent/session1/egress-policy-actor.yaml, api/ateapi/v1/ateapi.proto (EgressPolicy, EgressRule, HttpRule, HttpsRule, TlsPassthroughRule, Ports), internal/ateworker/actornet/sandbox.go, cmd/atenet/internal/router/egress/egress.go, docs/guides/network-egress.md, docs/guides/egress-traffic.md and docs/reference/kubectl-ate.md at v1.0.0.

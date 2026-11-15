@@ -34,8 +34,8 @@ function samples(dataplane) {
 }
 
 const groups = [
-  { name: 'Envoy dataplane', data: samples('envoy'), responseEnd: 39 },
-  { name: 'agentgateway dataplane', data: samples('agentgateway'), responseEnd: 18 },
+  { name: 'Envoy 数据平面', data: samples('envoy'), responseEnd: 39 },
+  { name: 'agentgateway 数据平面', data: samples('agentgateway'), responseEnd: 18 },
 ];
 const FROM = -6;
 const END = 40;
@@ -47,19 +47,19 @@ const lastServed = points => Math.max(...points.filter(point => point.ok).map(po
 
 module.exports = figure('fig-6-6b', {
   height: 490,
-  title: 'New work and open connections after a rule is removed',
-  desc: `Two groups of seven tracks over a time axis from ${FROM} to ${END} seconds, where zero is the removal of the rule. Each dot is one sample, about every 2 seconds. On the Envoy dataplane, the first sample after the removal is a refusal for a new DNS lookup and for a new pass-through connection. New HTTP requests are served until ${Math.round(lastServed(groups[0].data.http))} seconds and refused from ${Math.round(first(groups[0].data.http))} seconds. A request on a reused HTTP/1.1 connection is refused from ${Math.round(first(groups[0].data.h1))} seconds, and on a reused HTTP/2 connection of an https rule from ${Math.round(first(groups[0].data.h2))} seconds. An HTTP response that was open ran until the server ended it at 39 seconds, and an open pass-through connection served a second request at 20 seconds. On the agentgateway dataplane, the first sample after the removal is a refusal for all three kinds of new work and for the next request on both reused connections. An open HTTP response ran until the server ended it at 18 seconds, and an open pass-through connection served a second request at 20 seconds.`,
+  title: '移除出站规则后的新建请求与已打开连接',
+  desc: `${FROM} 至 ${END} 秒时间轴上的两组共十四条轨道，0 秒为移除规则时刻，约每 2 秒采样一点。在 Envoy 数据平面上，移除后首次采样即拒绝新建 DNS 查询和新建透传连接；新建 HTTP 请求放行至 ${Math.round(lastServed(groups[0].data.http))} s，从 ${Math.round(first(groups[0].data.http))} s 起拒绝；复用 HTTP/1.1 连接上的请求从 ${Math.round(first(groups[0].data.h1))} s 起拒绝，https 规则复用 HTTP/2 连接上的请求从 ${Math.round(first(groups[0].data.h2))} s 起拒绝；已打开的 HTTP 响应持续到服务端在 39 s 结束，已打开的透传连接在 20 s 完成了第二次请求。在 agentgateway 数据平面上，移除后首次采样即拒绝全部三类新建请求及两种复用连接上的后续请求；已打开的 HTTP 响应在 18 s 结束，已打开的透传连接在 20 s 完成了第二次请求。`,
 }, f => {
   const lastGroupBottom = 30 + groups.length * 204;
   groups.forEach((group, g) => {
     const top = 30 + g * 204;
     f.kicker(16, top, group.name);
     const tracks = [
-      ['new DNS lookup', group.data.dns],
-      ['new HTTP request', group.data.http],
-      ['new pass-through connection', group.data.conn],
-      ['reused HTTP/1.1 connection', group.data.h1],
-      ['reused HTTP/2, https rule', group.data.h2],
+      ['新建 DNS 查询', group.data.dns],
+      ['新建 HTTP 请求', group.data.http],
+      ['新建透传连接', group.data.conn],
+      ['复用 HTTP/1.1 连接', group.data.h1],
+      ['复用 HTTP/2（https 规则）', group.data.h2],
     ];
     tracks.forEach(([label, points], index) => {
       const y = top + 26 + index * 24;
@@ -71,11 +71,11 @@ module.exports = figure('fig-6-6b', {
       }
       const t = first(points);
       const immediate = points.filter(point => point.t >= 0)[0].t === t;
-      f.text(immediate ? px(0) + 6 : px(t) - 5, y - 8, immediate ? 'refused at the first sample' : `refused from ${Math.round(t)} s`, { size: 11, hue: 'rose', weight: 700 });
+      f.text(immediate ? px(0) + 6 : px(t) - 5, y - 8, immediate ? '首次采样即拒绝' : `${Math.round(t)} s 起拒绝`, { size: 11, hue: 'rose', weight: 700 });
     });
     const open = [
-      ['open HTTP response', group.responseEnd, `the server ended it at ${group.responseEnd} s`],
-      ['open pass-through', 20, 'second request served at 20 s'],
+      ['已打开的 HTTP 响应', group.responseEnd, `服务端于 ${group.responseEnd} s 结束`],
+      ['已打开的透传连接', 20, '20 s 完成第二次请求'],
     ];
     open.forEach(([label, end, note], index) => {
       const y = top + 26 + (index + 5) * 24;
@@ -87,17 +87,17 @@ module.exports = figure('fig-6-6b', {
     });
   });
   f.rule(px(0), 22, px(0), lastGroupBottom, { hue: 'ink', dash: 'dashed' });
-  f.text(px(0) + 6, 20, 'rule removed', { size: 11, hue: 'ink-soft' });
+  f.text(px(0) + 6, 20, '移除规则', { size: 11, hue: 'ink-soft' });
   const axis = lastGroupBottom;
   f.rule(px(FROM), axis, px(END), axis, { hue: 'ink' });
   for (let t = -5; t <= END; t += 5) {
     f.rule(px(t), axis, px(t), axis + 5, { hue: 'ink' });
     if (t % 10 === 0) f.text(px(t), axis + 18, String(t), { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.text(16, axis + 18, 'seconds after the removal', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(16, axis + 18, '移除后的秒数', { size: 11, serif: true, hue: 'ink-soft' });
   f.dot(px(FROM) + 4, axis + 34, { hue: 'green', r: 3.2 });
-  f.text(px(FROM) + 12, axis + 38, 'served', { size: 11, serif: true, hue: 'ink-soft' });
-  f.dot(px(FROM) + 74, axis + 34, { hue: 'rose', r: 3.2 });
-  f.text(px(FROM) + 82, axis + 38, 'refused', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(px(FROM) + 150, axis + 38, 'bar: a connection opened before the removal', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(px(FROM) + 12, axis + 38, '放行', { size: 11, serif: true, hue: 'ink-soft' });
+  f.dot(px(FROM) + 56, axis + 34, { hue: 'rose', r: 3.2 });
+  f.text(px(FROM) + 64, axis + 38, '拒绝', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(px(FROM) + 114, axis + 38, '长条：规则移除前已打开的连接', { size: 11, serif: true, hue: 'ink-soft' });
 });

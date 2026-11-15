@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 614" role="img" aria-labelledby="fig-8-1-title fig-8-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-8-1-title">The three places that hold an actor</title>
-  <desc id="fig-8-1-desc">An isometric drawing of three stores. Two ate-api-server replicas read and write actor records in a single-replica Postgres, drawn as a cylinder with one band for the actor row. On the node, atelet writes each checkpoint to the node disk, drawn as a tray that holds the node-local snapshots and the snapshot cache, and uploads it five minutes later to the object store, drawn as a bucket. With 25 suspended actors the node held 8,801 MiB of snapshots and 1,765 MiB of cache, and the bucket held 10,824 MiB. After the actors were deleted the bucket held 2,064 MiB.</desc>
+  <title id="fig-8-1-title">保存 actor 状态的三个位置</title>
+  <desc id="fig-8-1-desc">三处存储的等轴测视图。两个 ate-api-server 副本读写单副本 Postgres（绘为圆柱体，其中一圈色带代表 actor 行记录）。在节点上，atelet 将每次检查点写入节点磁盘（绘为容纳节点本地快照与快照缓存的托盘），并在 5 分钟后上传至对象存储（绘为 bucket）。挂载 25 个挂起 actor 时，节点磁盘存有 8,801 MiB 快照与 1,765 MiB 缓存，bucket 存有 10,824 MiB；删除这些 actor 后，bucket 仍保留 2,064 MiB。</desc>
   <defs><marker id="fig-8-1-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
   <polygon points="156.9,88 195,66 220.8,73.2 258.9,95.2 220.8,117.2 195,110" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
   <polygon points="195,20 233.1,42 233.1,88 195,110 156.9,88 156.9,42" fill="var(--m-panel, #f3f1e8)"/>
@@ -44,10 +44,10 @@
   <path d="M319.7 165.7l.3 8.9 1.2 1.9 1.7 .7 2.8-.7 1.6-1.4 .6-2 .9-6.9M316.2 145.6l-4.9-1.1-3.9 .4-1.4 .8-1.1 1.2-.8 1.7-.4 2.4 .2 3 1.3 5.5 1.3 4 1.7 3.1 1.4 1.2 1-.1 4.1-4.2M323.3 144.6l4-.6 3.2 .4 2.7 1.3 2.1 2.3 .1 3.2-1 4.4-1.6 4.1-2.4 4.2M330.4 163.9l1.4 .8 3.9-.1-1 1.1-1.9 .9-2.6 .3-1.4-.6 .3-1.5 1.3-.9-3.4-6.2-.8-3.3 .5-1.2 .8-.6 3.1-.2-.7-2-1.3-1.9-3.1-2.8-2.3-1-2.7-.3-1.8 .1-2.2 .9-1.5 1.4-1 1.7-.8 2.4-.3 3.2M317.5 164.7l-1.2 1.4-2.6 .8-.4 .7 1 .5 1.5 .2 2.6-.7 1.1-1.2 .1-1-1.1-1M317.4 164.7l1.8-6.2-.2-3-.7-2.2-.7-.6-1.4-.2-1.7 .5-1.6 .9-.2 6 .5 1.7 1.2 1.5 1.3 .8 1.7 .2M330.6 152.5l-.3 3.8 .2 4.1-.8 2.3" fill="none" stroke="var(--m-paper, #fafaf5)" stroke-width="1" stroke-linejoin="round"/>
   <path d="M316.9 153.8l.8 .4-.8 .5-.8-.7zM329.1 153.7l-.8 .6-.8-.4 .8-.4z" fill="var(--m-paper, #fafaf5)"/>
   <text x="20" y="158" font-size="12" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">ate-api-server</text>
-  <text x="20" y="173" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 replicas</text>
+  <text x="20" y="173" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 个副本</text>
   <text x="410" y="24" font-size="12" font-weight="700" fill="var(--m-teal-ink, #18696a)">Postgres</text>
-  <text x="410" y="39" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">postgres-0, 1 replica</text>
-  <text x="410" y="62" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">TABLES</text>
+  <text x="410" y="39" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">postgres-0，单副本</text>
+  <text x="410" y="62" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">数据表</text>
   <text x="410" y="79" font-size="11">atespaces</text>
   <text x="410" y="95" font-size="11" font-weight="700" fill="var(--m-teal-ink, #18696a)">actors</text>
   <text x="410" y="111" font-size="11">actor_templates</text>
@@ -58,7 +58,7 @@
   <text x="410" y="191" font-size="11">leases</text>
   <polyline points="404,91 340.3,192.4" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="340.3" cy="192.4" r="2" fill="var(--m-teal-ink, #18696a)"/>
-  <text x="410" y="213" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">no actor is in etcd</text>
+  <text x="410" y="213" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">etcd 中不存任何 actor</text>
   <polygon points="84.2,417 191.6,355 198.6,357 479.2,519 371.8,581 364.8,579" fill="var(--m-accent, #3553ff)" fill-opacity="0.12"/>
   <polygon points="191.6,345 472.2,507 472.2,517 364.8,579 84.2,417 84.2,407" fill="var(--m-panel, #f3f1e8)"/>
   <polygon points="191.6,345 472.2,507 472.2,517 364.8,579 84.2,417 84.2,407" fill="var(--m-grey-fill, #ecebe3)"/>
@@ -95,22 +95,22 @@
   <polygon points="373.5,253 389,262 389,242 373.5,233" fill="var(--m-paper, #fafaf5)" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-linejoin="round"/>
   <polygon points="366.5,257 382.1,266 382.1,246 366.5,237" fill="var(--m-paper, #fafaf5)" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-linejoin="round"/>
   <text x="154.4" y="353" font-size="12" text-anchor="end" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">atelet</text>
-  <text x="154.4" y="368" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one on each node</text>
-  <text x="452" y="262" font-size="12" font-weight="700" fill="var(--m-teal-ink, #18696a)">object store</text>
-  <text x="452" y="277" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">rustfs on kind, 1 pod</text>
-  <text x="452" y="300" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">SNAPSHOT ADDRESS</text>
+  <text x="154.4" y="368" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每节点一个</text>
+  <text x="452" y="262" font-size="12" font-weight="700" fill="var(--m-teal-ink, #18696a)">对象存储</text>
+  <text x="452" y="277" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kind 上的 rustfs，单 pod</text>
+  <text x="452" y="300" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">快照地址</text>
   <text x="452" y="317" font-size="11">gs://ate-snapshots/</text>
   <text x="460" y="333" font-size="11">atespaces/&lt;atespace&gt;/</text>
   <text x="468" y="349" font-size="11">actors/&lt;actor uid&gt;/</text>
   <text x="476" y="365" font-size="11">snapshots/&lt;uuid&gt;</text>
-  <text x="452" y="392" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">MEASURED</text>
-  <text x="452" y="409" font-size="11">10,824 MiB, 25 actors</text>
-  <text x="452" y="425" font-size="11">2,064 MiB after delete</text>
-  <text x="452" y="444" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">golden snapshots stay</text>
-  <text x="20" y="506" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">node disk</text>
+  <text x="452" y="392" font-size="11" letter-spacing="1.2" fill="var(--m-teal-ink, #18696a)">实测占用</text>
+  <text x="452" y="409" font-size="11">10,824 MiB（25 个 actor）</text>
+  <text x="452" y="425" font-size="11">删除后剩余 2,064 MiB</text>
+  <text x="452" y="444" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">黄金快照保留不删</text>
+  <text x="20" y="506" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">节点磁盘</text>
   <text x="20" y="521" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">/var/lib/ate</text>
-  <text x="20" y="544" font-size="11" letter-spacing="1.2" fill="var(--m-violet-ink, #5b4fa3)">DIRECTORIES</text>
-  <text x="176" y="544" font-size="11" letter-spacing="1.2" fill="var(--m-violet-ink, #5b4fa3)">MEASURED</text>
+  <text x="20" y="544" font-size="11" letter-spacing="1.2" fill="var(--m-violet-ink, #5b4fa3)">目录</text>
+  <text x="176" y="544" font-size="11" letter-spacing="1.2" fill="var(--m-violet-ink, #5b4fa3)">实测占用</text>
   <text x="20" y="561" font-size="11">snapshots/&lt;actor uid&gt;</text>
   <text x="176" y="561" font-size="11">8,801 MiB</text>
   <polyline points="240,557 279.9,465" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
@@ -119,24 +119,24 @@
   <text x="176" y="577" font-size="11">1,765 MiB</text>
   <polyline points="240,573 333.6,496" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="333.6" cy="496" r="2" fill="var(--m-teal-ink, #18696a)"/>
-  <text x="20" y="596" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">copy stays 30 minutes</text>
-  <text x="430" y="574" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">the node</text>
+  <text x="20" y="596" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">副本保留 30 分钟</text>
+  <text x="430" y="574" font-size="11" class="m-serif" fill="var(--m-ink-mute, #666660)">节点</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <path d="M200.2 121 L293.8 175" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-1-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M200.2 121 L293.8 175" keyPoints="0;0;1;1" keyTimes="0;0;0.688;1" calcMode="linear" dur="0.8s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0;0.1;0.688;1" dur="0.8s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="212.95" y="122.03" width="68.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="247" y="133" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">each call</text>
+  <rect class="m-knock" x="221" y="122.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="247" y="133" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">每次调用</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
   <path d="M210.6 408 L285.1 451" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-1-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M210.6 408 L285.1 451" keyPoints="0;0;1;1" keyTimes="0;0.429;0.821;1" calcMode="linear" dur="1.4s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.429;0.486;0.821;1" dur="1.4s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="210.4" y="403.53" width="75" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="247.9" y="414.5" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">checkpoint</text>
+  <rect class="m-knock" x="227.65" y="403.53" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="247.9" y="414.5" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">检查点</text>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
   <path d="M210.6 386 L352.7 304" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-1-head-teal)"/>
   <circle class="m-packet" r="3.5" fill="var(--m-teal-ink, #18696a)" opacity="0"><animateMotion path="M210.6 386 L352.7 304" keyPoints="0;0;1;1" keyTimes="0;0.6;0.875;1" calcMode="linear" dur="2s" begin="indefinite" fill="freeze"/><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.6;0.64;0.875;1" dur="2s" begin="indefinite" fill="freeze"/></circle>
-  <rect class="m-knock" x="213.15" y="319.03" width="137.1" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="281.7" y="330" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">upload, 5 min later</text>
+  <rect class="m-knock" x="243.05" y="319.03" width="77.3" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="281.7" y="330" font-size="11.5" text-anchor="middle" fill="var(--m-teal-ink, #18696a)">5 分钟后上传</text>
   </g>
 </svg>

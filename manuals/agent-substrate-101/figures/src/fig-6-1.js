@@ -22,28 +22,28 @@ const state = answered.state;
 const totalMs = Math.round(seconds * 1000);
 
 const lanes = [
-  { x: 74, w: 112, title: 'caller pod', sub: 'atenet-client', hue: 'olive' },
-  { x: 214, w: 112, title: 'atenet-router', sub: 'Service port 443', hue: 'indigo' },
-  { x: 354, w: 112, title: 'ate-api-server', sub: 'control plane', hue: 'blue' },
-  { x: 474, w: 100, title: 'Postgres', sub: 'actor rows', hue: 'teal' },
+  { x: 74, w: 112, title: '调用方 pod', sub: 'atenet-client', hue: 'olive' },
+  { x: 214, w: 112, title: 'atenet-router', sub: 'Service 端口 443', hue: 'indigo' },
+  { x: 354, w: 112, title: 'ate-api-server', sub: '控制平面', hue: 'blue' },
+  { x: 474, w: 100, title: 'Postgres', sub: 'actor 行', hue: 'teal' },
   { x: 580, w: 100, title: 'worker pod', sub: 'my-counter-1', hue: 'violet' },
 ];
 
 const rows = [
-  [0, 1, 'call', 'POST / over mTLS', 'ate-target-actor header'],
-  [1, 2, 'call', 'ResumeActor', 'for every request'],
-  [2, 3, 'call', 'read actor row', null],
-  [2, 1, 'reply', state, 'worker IP and SPIFFE ID'],
-  [1, 4, 'event', 'mTLS CONNECT to the worker', 'then actor port 80'],
+  [0, 1, 'call', '经 mTLS 发送 POST /', 'ate-target-actor 头'],
+  [1, 2, 'call', 'ResumeActor', '每次请求均调用'],
+  [2, 3, 'call', '读取 actor 行', null],
+  [2, 1, 'reply', state, 'worker IP 与 SPIFFE ID'],
+  [1, 4, 'event', '向 worker 建 mTLS CONNECT', '再转至 actor 端口 80'],
   [4, 1, 'reply', '200', null],
-  [1, 0, 'reply', '200', `${totalMs} ms at the caller`],
+  [1, 0, 'reply', '200', `调用方耗时 ${totalMs} ms`],
 ];
 const yOf = index => 84 + index * 46;
 
 module.exports = figure('fig-6-1', {
   height: 410,
-  title: 'One request through atenet-router to a running actor',
-  desc: `Five lifelines: a caller pod with the identity atenet-client, atenet-router, ate-api-server, Postgres, and the worker pod that runs my-counter-1. Seven numbered exchanges: the caller sends POST over mutual TLS with the ate-target-actor header, the router calls ResumeActor, ate-api-server reads the actor row, and it returns ${state} with the worker IP and SPIFFE ID. That call took ${resumeMs.toFixed(1)} milliseconds. The router opens an mTLS CONNECT to the worker, the actor answers 200, and the caller has the 200 after ${totalMs} milliseconds.`,
+  title: '经 atenet-router 发往运行中 actor 的一次请求',
+  desc: `五条生命线：持有 atenet-client 身份的调用方 pod、atenet-router、ate-api-server、Postgres 以及运行 my-counter-1 的 worker pod。七步交互：调用方经双向 TLS 发送带 ate-target-actor 头的 POST，路由器调用 ResumeActor，ate-api-server 读取 actor 行并返回 ${state} 及 worker IP 与 SPIFFE ID（该调用耗时 ${resumeMs.toFixed(1)} ms）。随后路由器向 worker 建立 mTLS CONNECT，actor 返回 200，调用方在 ${totalMs} ms 后收到 200。`,
 }, f => {
   lanes.forEach(lane => {
     f.box({ x: lane.x, y: 8, w: lane.w, h: 40, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 11, anchor: 'middle', pad: 3 });
@@ -54,7 +54,7 @@ module.exports = figure('fig-6-1', {
   f.rule(bx, yOf(1), bx + 6, yOf(1), { hue: 'ink', width: 1.4 });
   f.rule(bx, yOf(3), bx + 6, yOf(3), { hue: 'ink', width: 1.4 });
   f.text(bx - 8, yOf(2) - 2, `${resumeMs.toFixed(1)} ms`, { size: 12, weight: 700, anchor: 'end' });
-  f.text(bx - 8, yOf(2) + 13, `of the ${totalMs} ms`, { size: 11, serif: true, hue: 'ink-soft', anchor: 'end' });
+  f.text(bx - 8, yOf(2) + 13, `总耗时 ${totalMs} ms`, { size: 11, serif: true, hue: 'ink-soft', anchor: 'end' });
   rows.forEach(([from, to, style, label, note], index) => {
     const y = yOf(index);
     f.beat(index + 1);

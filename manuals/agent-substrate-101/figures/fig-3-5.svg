@@ -1,47 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 390" role="img" aria-labelledby="fig-3-5-title fig-3-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-3-5-title">From the error text to the fix</title>
-  <desc id="fig-3-5-desc">A decision figure with four rows. A 500 with the text error resuming actor and a 503 with the text AssignWorker prerequisite not met both mean ACTOR_STATE_CRASHED, and the fix is kubectl ate revert actor, which loses the calls since the last completed snapshot. A 503 with the text upstream connect error means the process exited while the state is still ACTOR_STATE_RUNNING, and a synchronous suspend moves it to CRASHED before the revert. An actor on a stopped node returns the same text and also stays RUNNING. A suspend or a revert does not help it while the node is down, and figure 8.2d has the steps for that case. A 503 after 5 seconds with the text no worker has room for the actor means the actor is healthy and the pool is full.</desc>
+  <title id="fig-3-5-title">从错误文本定位修复步骤</title>
+  <desc id="fig-3-5-desc">四行决策图。带 error resuming actor 的 500 与带 AssignWorker prerequisite not met 的 503 都代表 ACTOR_STATE_CRASHED，修复方法是 kubectl ate revert actor，这会丢弃最近一次已完成快照之后的调用。带 upstream connect error 的 503 表示进程已退出但状态仍为 ACTOR_STATE_RUNNING，需先同步挂起使其转为 CRASHED 再回退。已停止节点上的 actor 也会返回相同错误并保持 RUNNING，节点停机期间挂起或回退均无效，处理步骤见图 8.2d。等待 5 秒后返回 no worker has room for the actor 的 503 说明 actor 健康，只是 worker 池已满。</desc>
   <defs><marker id="fig-3-5-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-3-5-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-3-5-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">WHAT THE CALLER SEES</text>
-  <text x="296" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ACTOR STATE</text>
-  <text x="456" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">WHAT TO DO</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">调用方看到的响应</text>
+  <text x="296" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">ACTOR 状态</text>
+  <text x="456" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">处理步骤</text>
   <rect x="20" y="28" width="250" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="32" y="53.25" font-size="12.5" font-weight="700">500 in 0.08 s</text>
+  <text x="32" y="53.25" font-size="12.5" font-weight="700">500（0.08 s）</text>
   <text x="32" y="70.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">error resuming actor lab-c/x1</text>
   <rect x="20" y="104" width="250" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="32" y="121.75" font-size="12.5" font-weight="700">503 in 0.06 s</text>
+  <text x="32" y="121.75" font-size="12.5" font-weight="700">503（0.06 s）</text>
   <text x="32" y="139.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">AssignWorker prerequisite not met</text>
   <text x="32" y="154.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">got: ACTOR_STATE_CRASHED</text>
   <rect x="20" y="196" width="250" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="32" y="213.75" font-size="12.5" font-weight="700">503 in 0.06 s</text>
+  <text x="32" y="213.75" font-size="12.5" font-weight="700">503（0.06 s）</text>
   <text x="32" y="231.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">upstream connect error or disconnect</text>
   <text x="32" y="246.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">reset reason: connection termination</text>
   <rect x="20" y="288" width="250" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="32" y="313.25" font-size="12.5" font-weight="700">503 after 5.06 s</text>
+  <text x="32" y="313.25" font-size="12.5" font-weight="700">503（5.06 s 后）</text>
   <text x="32" y="330.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">no worker has room for the actor</text>
   <rect x="296" y="50" width="134" height="92" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
   <text x="363" y="83.75" font-size="12.5" text-anchor="middle" font-weight="700">CRASHED</text>
-  <text x="363" y="101.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">resume actor</text>
-  <text x="363" y="116.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">is refused</text>
+  <text x="363" y="101.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">拒绝执行</text>
+  <text x="363" y="116.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">resume actor</text>
   <rect x="296" y="196" width="134" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
   <text x="363" y="221.25" font-size="12.5" text-anchor="middle" font-weight="700">RUNNING</text>
-  <text x="363" y="238.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the process exited</text>
+  <text x="363" y="238.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">进程已退出</text>
   <rect x="296" y="288" width="134" height="60" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="363" y="313.25" font-size="12.5" text-anchor="middle" font-weight="700">SUSPENDED</text>
-  <text x="363" y="330.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the pool is full</text>
+  <text x="363" y="330.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">worker 池已满</text>
   <rect x="456" y="50" width="164" height="92" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="538" y="76.25" font-size="12.5" text-anchor="middle" font-weight="700">revert actor</text>
-  <text x="538" y="93.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">back to the last</text>
-  <text x="538" y="108.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">COMPLETED snapshot,</text>
-  <text x="538" y="123.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">later calls are lost</text>
+  <text x="538" y="93.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回退至最近一次</text>
+  <text x="538" y="108.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">COMPLETED 快照，</text>
+  <text x="538" y="123.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">后续调用丢失</text>
   <rect x="456" y="196" width="164" height="60" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="538" y="213.45" font-size="11.5" text-anchor="middle" font-weight="700">suspend --mode sync</text>
-  <text x="538" y="230.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">it fails and marks</text>
-  <text x="538" y="245.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the actor CRASHED</text>
+  <text x="538" y="230.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">执行失败并将</text>
+  <text x="538" y="245.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 标为 CRASHED</text>
   <rect x="456" y="288" width="164" height="60" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="538" y="305.75" font-size="12.5" text-anchor="middle" font-weight="700">add workers</text>
-  <text x="538" y="323.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">or try again later,</text>
-  <text x="538" y="338.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">see section 4.4</text>
+  <text x="538" y="305.75" font-size="12.5" text-anchor="middle" font-weight="700">扩容 worker</text>
+  <text x="538" y="323.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或稍后重试，</text>
+  <text x="538" y="338.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">详见第 4.4 节</text>
   <line x1="270" y1="58" x2="295" y2="58" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-5-head-rose)"/>
   <line x1="270" y1="134" x2="295" y2="122" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-5-head-rose)"/>
   <line x1="270" y1="226" x2="295" y2="226" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-5-head-rose)"/>
@@ -50,6 +50,6 @@
   <line x1="430" y1="226" x2="455" y2="226" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-5-head-ink)"/>
   <line x1="430" y1="318" x2="455" y2="318" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-3-5-head-ink)"/>
   <line x1="538" y1="195" x2="538" y2="143" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-5-head-amber)"/>
-  <text x="20" y="366" font-size="11" class="m-serif" fill="var(--m-rose-ink, #b0344d)">A stopped node gives the third text too. Then send no revert: see figure 8.2d.</text>
-  <text x="20" y="382" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Seconds and names are from our runs on the x86 server guest, Envoy dataplane.</text>
+  <text x="20" y="366" font-size="11" class="m-serif" fill="var(--m-rose-ink, #b0344d)">节点停止也会返回第三种错误文本。此时不要回退：详见图 8.2d。</text>
+  <text x="20" y="382" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">耗时与名称取自 x86 服务器客户机（Envoy 数据平面）的实测运行。</text>
 </svg>

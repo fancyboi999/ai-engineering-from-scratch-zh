@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 356" role="img" aria-labelledby="fig-7-1b-title fig-7-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-1b-title">A kagent turn costs the same with a pause and with no pause</title>
-  <desc id="fig-7-1b-desc">Every run of our kagent test with a mock model, as one dot each, with the median as a line. Resume 0.380 s over 98 turns, suspend 0.142 s over 99 suspends, a turn 4 seconds after the last one 0.726 s, a turn with no pause 0.738 s, and the first turn of a new Session 0.605 s.</desc>
+  <title id="fig-7-1b-title">有间隔与无间隔的 kagent 轮次耗时相同</title>
+  <desc id="fig-7-1b-desc">使用模拟模型的 kagent 测试中每次运行各绘为一个点，横线表示中位数：98 轮恢复的中位数为 0.380 s，99 次挂起的中位数为 0.142 s，间隔 4 秒的轮次为 0.726 s，无间隔连续轮次为 0.738 s，新会话首次轮次为 0.605 s。</desc>
   <line x1="62" y1="284" x2="610" y2="284" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="56" y="288" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="62" y1="234" x2="610" y2="234" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -13,9 +13,9 @@
   <text x="56" y="88" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1</text>
   <line x1="62" y1="284" x2="610" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="62" y1="64" x2="62" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="62" y="52" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds for each run, with a mock model</text>
-  <text x="171.6" y="24" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-amber-ink, #85590c)">STATE CHANGES INSIDE A TURN</text>
-  <text x="445.6" y="24" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-plum-ink, #8a3d72)">THE WHOLE TURN, IN THE CLUSTER</text>
+  <text x="62" y="52" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">使用模拟模型时每次运行的耗时，秒</text>
+  <text x="171.6" y="24" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-amber-ink, #85590c)">轮次内的状态迁移</text>
+  <text x="445.6" y="24" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-plum-ink, #8a3d72)">集群内的完整轮次</text>
   <line x1="281.2" y1="64" x2="281.2" y2="284" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4" stroke-opacity="0.6"/>
   <line x1="68.8" y1="208" x2="164.8" y2="208" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.4"/>
   <circle cx="76.8" cy="240.8" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
@@ -118,8 +118,8 @@
   <circle cx="156.8" cy="175.6" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <rect class="m-knock" x="88.6" y="155.24" width="56.4" height="16" fill="var(--m-panel, #f3f1e8)"/>
   <text x="116.8" y="166.6" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">0.380 s</text>
-  <text x="116.8" y="302" font-size="11" text-anchor="middle">resume</text>
-  <text x="116.8" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">98 runs</text>
+  <text x="116.8" y="302" font-size="11" text-anchor="middle">恢复</text>
+  <text x="116.8" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">98 次</text>
   <line x1="178.4" y1="255.6" x2="274.4" y2="255.6" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.4"/>
   <circle cx="186.4" cy="260" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <circle cx="187.22" cy="259.8" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
@@ -222,8 +222,8 @@
   <circle cx="266.4" cy="204.4" r="1.8" fill="var(--m-amber-ink, #85590c)"/>
   <rect class="m-knock" x="198.2" y="184.04" width="56.4" height="16" fill="var(--m-panel, #f3f1e8)"/>
   <text x="226.4" y="195.4" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">0.142 s</text>
-  <text x="226.4" y="302" font-size="11" text-anchor="middle">suspend</text>
-  <text x="226.4" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">99 runs</text>
+  <text x="226.4" y="302" font-size="11" text-anchor="middle">挂起</text>
+  <text x="226.4" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">99 次</text>
   <line x1="288" y1="138.8" x2="384" y2="138.8" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.4"/>
   <circle cx="296" cy="159.6" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
   <circle cx="300.21" cy="153" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
@@ -247,8 +247,8 @@
   <circle cx="376" cy="120.4" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
   <rect class="m-knock" x="307.8" y="100.04" width="56.4" height="16" fill="var(--m-panel, #f3f1e8)"/>
   <text x="336" y="111.4" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">0.726 s</text>
-  <text x="336" y="302" font-size="11" text-anchor="middle">turn, 4 s apart</text>
-  <text x="336" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">20 runs</text>
+  <text x="336" y="302" font-size="11" text-anchor="middle">间隔 4 s 轮次</text>
+  <text x="336" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">20 次</text>
   <line x1="397.6" y1="136.4" x2="493.6" y2="136.4" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.4"/>
   <circle cx="405.6" cy="159.2" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
   <circle cx="409.81" cy="157.8" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
@@ -272,8 +272,8 @@
   <circle cx="485.6" cy="124.6" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
   <rect class="m-knock" x="417.4" y="104.24" width="56.4" height="16" fill="var(--m-panel, #f3f1e8)"/>
   <text x="445.6" y="115.6" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">0.738 s</text>
-  <text x="445.6" y="302" font-size="11" text-anchor="middle">turn, no pause</text>
-  <text x="445.6" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">20 runs</text>
+  <text x="445.6" y="302" font-size="11" text-anchor="middle">无间隔轮次</text>
+  <text x="445.6" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">20 次</text>
   <line x1="507.2" y1="163" x2="603.2" y2="163" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.4"/>
   <circle cx="515.2" cy="181.8" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
   <circle cx="524.09" cy="177.8" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
@@ -287,10 +287,10 @@
   <circle cx="595.2" cy="150.2" r="1.8" fill="var(--m-plum-ink, #8a3d72)"/>
   <rect class="m-knock" x="527" y="129.84" width="56.4" height="16" fill="var(--m-panel, #f3f1e8)"/>
   <text x="555.2" y="141.2" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">0.605 s</text>
-  <text x="555.2" y="302" font-size="11" text-anchor="middle">first turn</text>
-  <text x="555.2" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">10 runs</text>
+  <text x="555.2" y="302" font-size="11" text-anchor="middle">首次轮次</text>
+  <text x="555.2" y="317" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">10 次</text>
   <path d="M336 103 V98 H445.59999999999997 V103" fill="none" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2" stroke-linejoin="round"/>
-  <rect class="m-knock" x="307.61" y="81.42" width="166.38" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="390.8" y="92" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-plum-ink, #8a3d72)">no warm turn: 0.012 s apart</text>
-  <text x="62" y="344" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one dot: one run, sorted from the fastest to the slowest. black line: the median.</text>
+  <rect class="m-knock" x="320.04" y="81.42" width="141.52" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="390.8" y="92" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-plum-ink, #8a3d72)">无热轮次：相差仅 0.012 s</text>
+  <text x="62" y="344" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每点代表一次运行（由快到慢排列），黑线表示中位数。</text>
 </svg>

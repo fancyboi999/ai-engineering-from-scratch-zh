@@ -19,12 +19,12 @@
     "api/markdown.js": {
       "maxDuration": 10,
       "includeFiles": "{site/*.html,site/hub-pages.json,site/hubs/{phase,glossary}/*.html,site/agent-pages/{*,phase/*,glossary/*}.md}",
-      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
+      "excludeFiles": "{site/manual-*.html,site/**/*.js,site/{lessons,lesson-code,manual,interviews,cheatsheets,project,practice,pagefind,anatomy,project-content,assets,figures}/**,site/agent-pages/{interviews,practice}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
     },
     "api/v1/markdown.js": {
       "maxDuration": 10,
       "includeFiles": "{site/*.html,site/hub-pages.json,site/hubs/{phase,glossary}/*.html,site/agent-pages/{*,phase/*,glossary/*}.md}",
-      "excludeFiles": "{site/**/*.js,site/{lessons,project-content,assets,figures}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
+      "excludeFiles": "{site/manual-*.html,site/**/*.js,site/{lessons,lesson-code,manual,interviews,cheatsheets,project,practice,pagefind,anatomy,project-content,assets,figures}/**,site/agent-pages/{interviews,practice}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
     },
     "api/not-found.js": {
       "maxDuration": 10,

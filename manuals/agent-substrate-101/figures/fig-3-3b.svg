@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-3-3b-title fig-3-3b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-3-3b-title">What a synchronous suspend costs the caller</title>
-  <desc id="fig-3-3b-desc">Seconds for kubectl ate suspend actor to return against the MiB of random memory the actor holds, on the x86 server guest. Every one of the 75 suspends is a small dot, and a line joins the medians. The default asynchronous suspend returns when the snapshot is on the node, and its median is 0.34 s at 0 MiB, 0.50 s at 50 MiB, 0.79 s at 200 MiB, 1.17 s at 500 MiB, 1.95 s at 1000 MiB, with ten suspends for each size. With --mode sync the command returns after the upload to the object store, and its median is 0.40 s at 0 MiB, 1.03 s at 50 MiB, 2.02 s at 200 MiB, 3.59 s at 500 MiB, 6.41 s at 1000 MiB, with five suspends for each size. At 1000 MiB the synchronous suspend takes 4.5 s more.</desc>
+  <title id="fig-3-3b-title">同步挂起给调用方增加的等待时间</title>
+  <desc id="fig-3-3b-desc">x86 服务器客户机上，kubectl ate suspend actor 返回耗时秒数与 actor 所持随机内存 MiB 的关系。共 75 次挂起各为一个小点，实线连接中位数。默认的异步挂起在快照写入节点后即返回，中位数为：0 MiB 为 0.34 s、50 MiB 为 0.50 s、200 MiB 为 0.79 s、500 MiB 为 1.17 s、1000 MiB 为 1.95 s（每种规格 10 次）。加上 --mode sync 后命令在上传至对象存储完成后才返回，中位数为：0 MiB 为 0.40 s、50 MiB 为 1.03 s、200 MiB 为 2.02 s、500 MiB 为 3.59 s、1000 MiB 为 6.41 s（每种规格 5 次）。在 1000 MiB 时同步挂起多耗时 4.5 s。</desc>
   <defs><marker id="fig-3-3b-head-ink-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink-soft, #4a4a4a)"/></marker></defs>
   <line x1="46" y1="310" x2="486" y2="310" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="40" y="314" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
@@ -24,8 +24,8 @@
   <text x="266" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">500</text>
   <line x1="486" y1="310" x2="486" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="486" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1000</text>
-  <text x="266" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">memory the actor holds, MiB</text>
-  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds until kubectl ate suspend actor returns</text>
+  <text x="266" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 持有的内存，MiB</text>
+  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">kubectl ate suspend actor 返回耗时，秒</text>
   <path d="M46.0 296.5 L68.0 275.3 L134.0 241.9 L266.0 188.8 L486.0 93.7" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.8" stroke-linejoin="round"/>
   <path d="M46.0 298.7 L68.0 293.1 L134.0 283.3 L266.0 270.5 L486.0 244.2" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.8" stroke-linejoin="round"/>
   <line x1="56" y1="295.69" x2="56" y2="296.74" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-opacity="0.45"/>
@@ -114,18 +114,18 @@
   <circle cx="482" cy="242.6" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="482" cy="241.76" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="500" y="97.73" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">--mode sync</text>
-  <text x="500" y="112.73" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">6.41 s median of 5</text>
-  <text x="500" y="126.73" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">after the upload</text>
-  <text x="500" y="248.19" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">async, the default</text>
-  <text x="500" y="263.19" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.95 s median of 10</text>
-  <text x="500" y="277.19" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">snapshot on the node</text>
+  <text x="500" y="112.73" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">6.41 s（5 次中位）</text>
+  <text x="500" y="126.73" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">上传完成后返回</text>
+  <text x="500" y="248.19" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">异步（默认）</text>
+  <text x="500" y="263.19" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.95 s（10 次中位）</text>
+  <text x="500" y="277.19" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">快照写入节点即回</text>
   <path d="M464 239.1875 V98.72999999999999" fill="none" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1" stroke-linejoin="round" marker-end="url(#fig-3-3b-head-ink-soft)" marker-start="url(#fig-3-3b-head-ink-soft)"/>
-  <rect class="m-knock" x="346.08" y="162.38" width="112.92" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="456" y="172.96" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">4.5 s more to wait</text>
-  <rect class="m-knock" x="369.84" y="176.38" width="89.16" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="456" y="186.96" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">for the upload</text>
+  <rect class="m-knock" x="395.36" y="162.38" width="63.64" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="456" y="172.96" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">多等 4.5 s</text>
+  <rect class="m-knock" x="387" y="176.38" width="72" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="456" y="186.96" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">等待上传完成</text>
   <circle cx="57.8" cy="56.25" r="1.9" fill="var(--m-ink-soft, #4a4a4a)"/>
-  <text x="66.8" y="60.25" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one suspend</text>
-  <line x1="142.8" y1="56.25" x2="160.8" y2="56.25" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
-  <text x="166.8" y="60.25" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">median of one size</text>
+  <text x="66.8" y="60.25" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单次挂起</text>
+  <line x1="128.8" y1="56.25" x2="146.8" y2="56.25" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
+  <text x="152.8" y="60.25" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单一规格中位数</text>
 </svg>

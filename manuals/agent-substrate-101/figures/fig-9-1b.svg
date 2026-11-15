@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 326" role="img" aria-labelledby="fig-9-1b-title fig-9-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-9-1b-title">Three actors share room for two, for ten minutes</title>
-  <desc id="fig-9-1b-desc">A timeline of 600 seconds on the second x86 server guest. The worker has room for two actors of one CPU each. The actor busy gets a request each 5 seconds and runs for the whole time. The actor bursty gets five requests each 150 seconds, and the suspender suspends it 4 times after 30 quiet seconds. The actor rare gets two requests and is suspended 2 times. All 140 requests returned 200. The worker had one CPU booked in 38 of 58 samples and two in the rest.</desc>
-  <text x="16" y="56" font-size="12" font-weight="700">CPU booked</text>
-  <text x="16" y="71" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">of 2 CPUs</text>
+  <title id="fig-9-1b-title">三个 actor 在十分钟内共享两个槽位</title>
+  <desc id="fig-9-1b-desc">第二台 x86 服务器客户机上 600 秒的运行时间线。该 worker 仅可同时容纳两个各占 1 核 CPU 的 actor。actor busy 每 5 秒收到一次请求并全程保持运行；actor bursty 每 150 秒收到五次突发请求，挂起器在每次空闲满 30 秒后将其挂起（共 4 次）；actor rare 共收到两次请求并被挂起 2 次。全部 140 个请求均返回 200。在 58 次容量采样中，有 38 次占用 1 核 CPU，其余占用 2 核 CPU。</desc>
+  <text x="16" y="56" font-size="12" font-weight="700">已占用 CPU</text>
+  <text x="16" y="71" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">共 2 核 CPU</text>
   <rect x="136.32" y="44" width="8.4" height="30" fill="var(--m-violet-fill, #ebe8f5)"/>
   <rect x="144.72" y="44" width="8.32" height="30" fill="var(--m-violet-fill, #ebe8f5)"/>
   <rect x="153.04" y="44" width="8.32" height="30" fill="var(--m-violet-fill, #ebe8f5)"/>
@@ -63,9 +63,9 @@
   <rect x="610.64" y="59" width="5.36" height="15" fill="var(--m-violet-fill, #ebe8f5)"/>
   <line x1="136" y1="74" x2="616" y2="74" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="136" y1="44" x2="616" y2="44" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1" stroke-dasharray="5 4" stroke-opacity="0.6"/>
-  <text x="616" y="36" font-size="11" text-anchor="end" fill="var(--m-violet-ink, #5b4fa3)">2 CPUs, the pool is full</text>
+  <text x="616" y="36" font-size="11" text-anchor="end" fill="var(--m-violet-ink, #5b4fa3)">2 核 CPU，worker 池满载</text>
   <text x="16" y="120" font-size="12" font-weight="700">busy</text>
-  <text x="16" y="135" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">118 requests</text>
+  <text x="16" y="135" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">118 个请求</text>
   <line x1="136" y1="116" x2="616" y2="116" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <rect x="136" y="108" width="480" height="16" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <circle cx="136" cy="116" r="2.6" fill="var(--m-ink, #1a1a1a)"/>
@@ -187,7 +187,7 @@
   <circle cx="608.8" cy="116" r="1.3" fill="var(--m-green-ink, #336b40)"/>
   <circle cx="612.8" cy="116" r="1.3" fill="var(--m-green-ink, #336b40)"/>
   <text x="16" y="168" font-size="12" font-weight="700">bursty</text>
-  <text x="16" y="183" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">20 requests</text>
+  <text x="16" y="183" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">20 个请求</text>
   <line x1="136" y1="164" x2="616" y2="164" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <rect x="136" y="156" width="28.8" height="16" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <rect x="256.61" y="156" width="28.19" height="16" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
@@ -218,7 +218,7 @@
   <line x1="405.6" y1="151" x2="405.6" y2="177" stroke="var(--m-amber-ink, #85590c)" stroke-width="2"/>
   <line x1="526.4" y1="151" x2="526.4" y2="177" stroke="var(--m-amber-ink, #85590c)" stroke-width="2"/>
   <text x="16" y="216" font-size="12" font-weight="700">rare</text>
-  <text x="16" y="231" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 requests</text>
+  <text x="16" y="231" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 个请求</text>
   <line x1="136" y1="212" x2="616" y2="212" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <rect x="183.81" y="204" width="24.99" height="16" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
   <rect x="455.79" y="204" width="25.01" height="16" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
@@ -249,9 +249,9 @@
   <text x="568" y="276" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">9</text>
   <line x1="616" y1="258" x2="616" y2="263" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="616" y="276" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">10</text>
-  <text x="376" y="294" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">minutes from the first request</text>
+  <text x="376" y="294" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">自首个请求起算的分钟数</text>
   <line x1="136" y1="308" x2="136" y2="320" stroke="var(--m-amber-ink, #85590c)" stroke-width="2"/>
-  <text x="144" y="318" font-size="11" fill="var(--m-amber-ink, #85590c)">suspend after 30 quiet seconds</text>
+  <text x="144" y="318" font-size="11" fill="var(--m-amber-ink, #85590c)">空闲 30 秒后挂起</text>
   <circle cx="386" cy="314" r="2.6" fill="var(--m-ink, #1a1a1a)"/>
-  <text x="394" y="318" font-size="11">request that resumed the actor</text>
+  <text x="394" y="318" font-size="11">触发 actor 恢复的请求</text>
 </svg>

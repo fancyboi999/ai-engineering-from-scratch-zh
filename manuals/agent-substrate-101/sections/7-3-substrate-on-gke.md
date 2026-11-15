@@ -1,108 +1,108 @@
-# Substrate on GKE
+# GKE 上的 Substrate
 
-> Agent Substrate on GKE is an installer and its documentation for a system that you operate in your own GKE Standard cluster, and Google does not run its control plane.
+> GKE 上的 Agent Substrate 是由你在自己的 GKE Standard 集群中运维的系统及其安装器和文档，Google 并不运行其控制平面。
 
-Your team runs GKE, and you read that Agent Substrate is generally available there. You open the cluster page and look for a checkbox. You find none, and `gcloud` has no command for it. This edition does not run Substrate on GKE. This section comes from the Google documentation and the installer code, both read on 2026-11-12, and it says so where that matters. A measured GKE run is the first item planned for the next edition, listed in [Coming in the next edition](#s-next-edition).
+你的团队使用 GKE，而且你读到 Agent Substrate 已经在那里正式商用（GA）。你打开集群管理页面寻找勾选项，却一无所获，`gcloud` 也没有提供对应命令。本版手册并未在 GKE 上实际运行 Substrate。本节内容源自 Google 官方文档与安装器代码，两者均查阅于 2026-11-12，凡涉及处均已注明。带有实测数据的 GKE 运行是下一版手册规划的第一项内容，已列在[下一版将补充](#s-next-edition)。
 
-When you finish this section, you can say what the GKE installer creates and what it leaves for you to operate. You can also check a cluster against the requirements and find the quota that limits your resume rate.
+读完本节，你能说出 GKE 安装器创建了什么、留下了哪些需要你自行运维的组件。你还能对照要求检查集群，并找出限制恢复速率的关键配额。
 
-## What "on GKE" means
+## “在 GKE 上”意味着什么 {#s-substrate-on-gke-what-on-gke-means}
 
-Agent Substrate on GKE is open source software that you deploy onto your own GKE Standard cluster {{docs}}. Google gives you an installer, the documentation, and dashboards. Google does not operate the control plane or the database. Both run as pods in your cluster, and your team is on call for them.
+GKE 上的 Agent Substrate 是一套开源软件，由你自行部署到自己的 GKE Standard 集群中{{docs}}。Google 提供的是安装器、文档与监控看板。Google 并不负责运维控制平面或数据库。两者都作为 pod 运行在你的集群里，由你的团队承担运维值班职责。
 
-| Google gives you | You operate |
+| Google 提供 | 由你运维 |
 |---|---|
-| the installer, in the repository `ai-on-gke/substrate-gke` | `ate-api-server`, `ate-controller`, and `ate-idp-server` |
-| the documentation and the sizing guidance | the PostgreSQL instance and its disk |
-| Cloud Monitoring dashboards | the dataplane and `atelet` on every node |
-| the Kubernetes control plane of the GKE cluster | suspend, scaling, upgrades, and every WorkerPool |
+| 位于仓库 `ai-on-gke/substrate-gke` 的安装器 | `ate-api-server`、`ate-controller` 与 `ate-idp-server` |
+| 官方文档与容量规划指引 | PostgreSQL 实例及其底层磁盘 |
+| Cloud Monitoring 监控看板 | 数据平面以及每个节点上的 `atelet` |
+| GKE 集群的 Kubernetes 控制平面 | 挂起、弹性伸缩、系统升级以及所有 `WorkerPool` |
 
-The product has no extra charge. You pay the normal GKE price for the cluster, the disks, the buckets, and the image repository that the installer creates {{docs}}.
+该产品不收取额外费用。你只需按照常规 GKE 定价，为安装器创建的集群、磁盘、bucket 以及镜像仓库付费{{docs}}。
 
-So a statement that Substrate is a managed capability of Google Cloud goes further than the documentation does. The control plane failure modes in [When a dependency is down](#s-when-a-dependency-is-down) are yours on GKE too.
+因此，如果有人声称 Substrate 是 Google Cloud 的全托管能力，这显然超出了官方文档的陈述范围。[当依赖组件宕机时](#s-when-a-dependency-is-down)中讨论的控制平面故障模式，在 GKE 上同样需要由你承担。
 
-## What the installer creates
+## 安装器创建了什么 {#s-substrate-on-gke-what-the-installer-creates}
 
-The installer is an interactive program that runs on your machine. It needs `git`, Go, `make`, `kubectl`, the `gcloud` CLI, and `gke-gcloud-auth-plugin`. It also needs Docker with the buildx plugin, because it builds the Substrate images from source and pushes them to your project. It cannot run in Cloud Shell, because the disk there is too small {{docs}}.
+安装器是一个运行在本地机器上的交互式程序。它依赖 `git`、Go、`make`、`kubectl`、`gcloud` CLI 以及 `gke-gcloud-auth-plugin`。它还需要带有 buildx 插件的 Docker，因为它要从源码构建 Substrate 镜像并推送到你的 GCP 项目。它无法在 Cloud Shell 中运行，因为那里的磁盘空间不足{{docs}}。
 
 ```figure
 id: fig-7-3
 kind: tree
-title: what the GKE installer creates
-claim: The installer creates cloud resources in your project and installs the same control plane in your cluster that ate-setup installs on kind.
-caption: Read top to bottom. The left column is what the setup-gcp tool creates. The right column is what the ate-setup tool installs, and you operate all of it. From the Google Cloud documentation for Agent Substrate on GKE and the installer repository at v1.0.0-gke.0.
+title: GKE 安装器创建的资源
+claim: 安装器在你的项目中创建云端资源，并在集群中安装与 ate-setup 在 kind 上相同的控制平面。
+caption: 从上往下读。左列是 setup-gcp 工具创建的内容。右列是 ate-setup 工具安装的内容，全部由你自行运维。来源：Google Cloud 的 Agent Substrate on GKE 官方文档，以及 v1.0.0-gke.0 的安装器仓库。
 ```
 
-The installer asks for the image source, the project, the cluster, a bucket name, and the ingress clients. Then it runs two tools. The tool `setup-gcp` creates the cloud resources. The tool `ate-setup` installs the cluster components, and it is the same tool that [Install with ate-setup](#s-install-with-ate-setup) uses on kind.
+安装器会提示输入镜像源、GCP 项目、集群、bucket 名称以及入站客户端列表。随后它运行两个工具。`setup-gcp` 负责创建云端资源。`ate-setup` 负责安装集群组件，它与[使用 ate-setup 安装](#s-install-with-ate-setup)在 kind 上使用的是同一个工具。
 
-Four details of the install will cost you time if you miss them.
+在安装过程中，有四个细节极易疏漏并浪费时间：
 
-- **Pass an explicit version.** One page of the documentation says that the installer builds the latest version, and a later paragraph says v1.0.0. Enter the tag `v1.0.0`.
-- **Name your ingress clients.** The installer asks for the SPIFFE IDs of the clients that can call the router. The port-forward steps of the Counter demo do not work on such a cluster, because your laptop is not one of those clients.
-- **Expect a control plane update on an existing cluster.** The installer enables the `podcertificaterequests` and `clustertrustbundles` APIs. The documentation gives about 10 minutes for that update.
-- **Delete the database disk yourself.** The cleanup command does not remove the 500 GiB disk of PostgreSQL. You pay for it until you delete it.
+- **明确指定版本号。** 文档有一处称安装器会构建最新版本，后文段落又写着 v1.0.0。请输入标签 `v1.0.0`。
+- **列出入站客户端身份。** 安装器会索取有权调用 router 的客户端 SPIFFE ID。在这样的集群上，Counter 示例的端口转发步骤无法生效，因为你的笔记本电脑不在被允许的客户端之列。
+- **现有集群需要预留控制平面更新时间。** 安装器会启用 `podcertificaterequests` 与 `clustertrustbundles` API。官方文档指出该更新大约需要 10 分钟。
+- **手动删除数据库磁盘。** 清理命令不会删除 PostgreSQL 的 500 GiB 磁盘。在手动删除之前，你需要持续为此磁盘付费。
 
-## Requirements
+## 运行环境要求 {#s-substrate-on-gke-requirements}
 
-| Subject | Requirement |
+| 项目 | 要求 |
 |---|---|
-| Cluster mode | GKE Standard. Autopilot is not supported. |
-| Version | Control plane and all node pools at 1.37 or later. The Extended release channel is not supported. |
-| Cluster features | Dataplane V2, Workload Identity Federation for GKE, and Managed OpenTelemetry. The installer turns them on in a cluster that it creates. An existing cluster must already use Dataplane V2. |
-| Worker nodes | x86 only, `c3-standard-4` or larger. E2 machine types are not supported. |
-| GKE Sandbox | Must be off on the node pools that hold workers. |
-| microVM class | Nested virtualization, or an x86 metal machine type. You can set nested virtualization only when you create the node pool. |
-| Accelerators | No GPU and no TPU inside an actor. |
-| More than about 800 sandboxes on a node | Raise the inotify limits and the neighbour table limits of the kernel. The installer does that only for clusters that it creates. |
-| Your account | Seven IAM roles, from Service Usage Admin to Monitoring Editor. |
+| 集群模式 | GKE Standard，不支持 Autopilot。 |
+| 版本要求 | 控制平面与所有节点池版本为 1.37 或更高，不支持 Extended 发布通道。 |
+| 集群特性 | Dataplane V2、Workload Identity Federation for GKE 以及托管的 OpenTelemetry。新创建的集群由安装器自动开启，现有集群必须已经在使用 Dataplane V2。 |
+| Worker 节点 | 仅限 x86 架构，规格为 `c3-standard-4` 或更高，不支持 E2 机型。 |
+| GKE Sandbox | 承载 worker 的节点池必须关闭 GKE Sandbox。 |
+| microVM 类别 | 需支持嵌套虚拟化（nested virtualization），或选用 x86 裸金属机型。嵌套虚拟化仅能在创建节点池时设置。 |
+| 加速卡 | actor 内部不支持 GPU，也不支持 TPU。 |
+| 单节点运行超过约 800 个沙箱 | 需调高内核的 inotify 上限与邻居表（neighbour table）上限，安装器仅针对其新建的集群执行此优化。 |
+| 操作账号权限 | 需具备七个 IAM 角色，涵盖 Service Usage Admin 到 Monitoring Editor。 |
 
-Two rows deserve a comment. The x86 rule comes from the GKE documentation. An older Google post names Arm machines, and that text does not agree with the documentation, so we follow the documentation. On our Apple silicon laptop the upstream release images ran on arm64, but that run says nothing about GKE.
+有两行值得特别说明。关于 x86 的要求来自 GKE 官方文档。早期一篇 Google 博客曾提及 Arm 机器，该表述与官方文档冲突，我们以官方文档为准。在搭载 Apple 芯片的笔记本电脑上，上游发布的镜像可以在 arm64 上运行，但这并不能代表 GKE 的情况。
 
-The GPU row is a limit of Substrate, and GKE cannot remove it. [Limits at v1.0.0](#s-limits-at-v1-0-0) has the detail.
+关于 GPU 的限制属于 Substrate 本身的局限，GKE 无法打破这一限制。详见[v1.0.0 的限制](#s-limits-at-v1-0-0)。
 
-## The quotas and limits that bound your scale
+## 决定扩展规模的配额与上限 {#s-substrate-on-gke-the-quotas-and-limits-that-bound-your-scale}
 
-The documentation names these numbers {{docs}}. The planned GKE run will test them.
+官方文档给出了下列关键数字{{docs}}。后续规划的 GKE 实际测试将对它们进行验证。
 
-| Limit | Value | Why you care |
+| 限制项 | 数值 | 关注原因 |
 |---|---|---|
-| Security Token Service, token exchange | 6,000 requests each minute for a project, by default | Each actor needs a token for its snapshot. Plan for 60 times your peak resumes each second. |
-| Actors on one worker | 1,000 by default, the `--max-actors` flag | The real number is lower when CPU or memory fills first. |
-| PostgreSQL | one instance | It grows only when you give that instance a larger machine. |
-| Boot disk of a node | 100 GiB, 3,600 IOPS, 290 MiB each second | Node copies of snapshots use this disk unless you mount another. |
-| Snapshot upload delay, node copy | 5 minutes, 30 minutes | The same defaults that we measured on kind. |
+| Security Token Service 令牌交换 | 项目默认每分钟 6,000 次请求 | 每个 actor 的快照都需要令牌，应按峰值每秒恢复次数的 60 倍进行规划。 |
+| 单个 worker 上的 actor 数量 | 默认 1,000 个，对应 `--max-actors` 标志 | 当 CPU 或内存率先耗尽时，实际承载量会更低。 |
+| PostgreSQL | 单实例 | 仅能通过垂直扩容机器配置来扩展。 |
+| 节点引导磁盘 | 100 GiB，3,600 IOPS，每秒 290 MiB | 除非挂载其他磁盘，否则快照的节点副本使用此磁盘。 |
+| 快照上传延迟，节点副本 | 5 分钟，30 分钟 | 默认值与我们在 kind 上实测的一致。 |
 
-The token quota is easy to miss. It is shared with every other workload in the project that uses Workload Identity Federation. At 200 resumes each second you need 12,000 requests each minute for Substrate alone, which is twice the default. Add the peak of the other workloads. Ask for more quota before the load test.
+令牌配额极易被忽视。该配额由项目内所有使用 Workload Identity Federation 的工作负载共享。在每秒 200 次恢复的峰值下，仅 Substrate 一项就需要每分钟 12,000 次请求，达到了默认配额的两倍。再加上其他工作负载的峰值用量，在进行压力测试前必须提前申请提高配额。
 
-A pool of microVM workers has one more limit. A microVM worker pod requests the resource `ate.dev/kvm`, and node auto-provisioning cannot see that resource on a pool with zero nodes. Such a pool does not grow from zero. The documentation gives three patterns that keep a node or a buffer ready.
+microVM worker 池还存在一个特殊限制。microVM worker pod 会请求资源 `ate.dev/kvm`，而节点自动置备功能在节点数为零的池上无法识别该资源。因此这类池无法从零自动扩容。官方文档给出了三种保留就绪节点或就绪缓冲区的应对模式。
 
-The GKE documentation also says that Substrate does not suspend an idle actor by itself. That agrees with our run on kind, where an idle actor stayed `ACTOR_STATE_RUNNING` for 900 s.
+GKE 官方文档还明确指出，Substrate 不会自动挂起处于空闲状态的 actor。这与我们在 kind 上的实测一致：空闲 actor 保持 `ACTOR_STATE_RUNNING` 达 900 秒之久。
 
-## The dates
+## 关键时间线 {#s-substrate-on-gke-the-dates}
 
-| Date | Event |
+| 日期 | 事件 |
 |---|---|
-| 2026-05-20 | Google announces Agent Substrate. |
-| 2026-09-11 | GKE release note: available for evaluation and non-production use. Production needs an allowlist. |
-| 2026-11-05 | Agent Substrate v1.0.0. |
-| 2026-11-06 | The GKE installer has its only release, v1.0.0-gke.0. |
-| 2026-11-09 | GKE release note: generally available for GKE Standard clusters at 1.37 or later. |
+| 2026-05-20 | Google 发布 Agent Substrate。 |
+| 2026-09-11 | GKE 发布说明：开放评估与非生产环境使用，生产使用需加白名单。 |
+| 2026-11-05 | Agent Substrate v1.0.0 发布。 |
+| 2026-11-06 | GKE 安装器发布其唯一版本 v1.0.0-gke.0。 |
+| 2026-11-09 | GKE 发布说明：面向 1.37 或更高版本的 GKE Standard 集群正式商用（GA）。 |
 
-Text from September 2026 that calls Substrate on GKE a non-production feature is out of date. A Google post dated 2026-11-05 said generally available four days before the release note did. Use the release note date.
+2026 年 9 月将 GKE 上的 Substrate 称为非生产特性的资料已经过时。Google 在 2026-11-05 发布的一篇博客提前四天提到了正式商用，应以发布说明记载的日期为准。
 
-## What our runs say about GKE, and what they do not
+## 我们的实测对 GKE 说明了什么，又有哪些局限 {#s-substrate-on-gke-what-our-runs-say-about-gke-and-what-they-do-not}
 
-The control plane on GKE is the same software that we ran on kind. Three of our results are properties of that software, so expect them on GKE. Substrate does not suspend an idle actor. A snapshot is durable only after the upload. PostgreSQL is on every request path.
+GKE 上的控制平面与我们在 kind 上运行的属于同一套软件。我们的三项实测结论属于该软件本身的固有特性，因此在 GKE 上也成立。Substrate 不会自动挂起空闲 actor。快照只有在上传之后才具备持久性。PostgreSQL 位于每条请求的路径上。
 
-Our times do not transfer. Our object store was in the cluster, on the same disk as the node. A Cloud Storage bucket is remote, so a resume from the object store on GKE needs a measurement of its own. Run the resume test from [SuspendActor and ResumeActor](#s-suspendactor-and-resumeactor) on your cluster before you promise a number.
+但我们在耗时方面的测试数据不能直接套用。我们当时使用的对象存储位于集群内部，与节点共享磁盘。Cloud Storage bucket 是远端存储，在 GKE 上从对象存储恢复需要进行专门测量。在对外承诺任何指标之前，请先在自己的集群上运行[SuspendActor 与 ResumeActor](#s-suspendactor-and-resumeactor)中的恢复测试。
 
 ```takeaways
-- Plan staff for the control plane and PostgreSQL, because Google does not operate them.
-- Check the cluster against the requirements table before you run the installer.
-- Enter the tag v1.0.0 when the installer asks for a version.
-- Raise the token exchange quota to 60 times your peak resumes each second, plus the use of other workloads.
-- Delete the PostgreSQL disk yourself after a cleanup.
-- Measure resume time on your own cluster, with your own bucket.
+- 为控制平面与 PostgreSQL 安排值班运维人力，因为 Google 并不代管它们。
+- 运行安装器前对照要求清单核对集群配置。
+- 安装器提示输入版本时明确输入标签 `v1.0.0`。
+- 将令牌交换配额提升至峰值每秒恢复次数的 60 倍，并叠加其他工作负载的开销。
+- 资源清理后自行手动删除 PostgreSQL 磁盘。
+- 使用你自己的 bucket，在自己的集群上实测恢复时间。
 ```
 
-Sources: Google Cloud documentation, read 2026-11-12: "About Agent Substrate on GKE", "Install Agent Substrate on GKE", "Plan and design Agent Substrate on GKE", "Plan an architecture for AI agent workloads on GKE", and the GKE release notes of 2026-09-11 and 2026-11-09; the repository ai-on-gke/substrate-gke at v1.0.0-gke.0 (README and install.sh); Google Cloud blog posts of 2026-05-20, 2026-09-15 and 2026-11-05; Agent Substrate v1.0.0 release notes; capture/lab/B-lifecycle/10-trace.tsv, capture/lab/M-mac-arm64/80-local.tsv.
+来源：Google Cloud documentation, read 2026-11-12: "About Agent Substrate on GKE", "Install Agent Substrate on GKE", "Plan and design Agent Substrate on GKE", "Plan an architecture for AI agent workloads on GKE", and the GKE release notes of 2026-09-11 and 2026-11-09; the repository ai-on-gke/substrate-gke at v1.0.0-gke.0 (README and install.sh); Google Cloud blog posts of 2026-05-20, 2026-09-15 and 2026-11-05; Agent Substrate v1.0.0 release notes; capture/lab/B-lifecycle/10-trace.tsv, capture/lab/M-mac-arm64/80-local.tsv.

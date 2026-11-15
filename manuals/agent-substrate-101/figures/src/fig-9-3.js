@@ -5,20 +5,20 @@ const { figure } = require('../../../_shared/figkit.js');
 const { load } = require('../../../_shared/chart.js');
 
 const tasks = load(path.join(__dirname, '../../capture/lab/summary/demos-x86.json')).tool_sandbox;
-const names = ['download from the mirror', 'outside host, by name', 'outside host, by IP', 'Kubernetes API, by name', '2 s of CPU work', '640 MiB of memory'];
-const results = ['file saved, exit 0', 'NXDOMAIN', '403 from the gateway', 'name not resolved', '2.38 s of wall time', '503, actor CRASHED'];
+const names = ['从镜像站下载文件', '按域名访问外部主机', '按 IP 访问外部主机', '按域名访问 Kubernetes API', '2 s CPU 计算任务', '分配 640 MiB 内存'];
+const results = ['文件已保存，exit 0', 'NXDOMAIN', '网关返回 403', '域名未解析', '墙钟耗时 2.38 s', '503，actor CRASHED'];
 const good = [true, false, false, false, true, false];
 const two = value => value.toFixed(2);
 
 module.exports = figure('fig-9-3', {
   height: 336,
-  title: 'Six tasks in one sandbox actor, each followed by a revert',
-  desc: `Six rows for six commands sent to one sandbox actor on the second x86 server guest, with one egress rule for a package mirror, 500 millicores and 256 MiB. ${tasks.map((t, i) => `${names[i]}: ${results[i]}, revert in ${two(t.revert_seconds)} s, ${t.files_after_revert} files after it`).join('. ')}.`,
+  title: '同一工具沙箱 actor 中依次执行并回退的六项任务',
+  desc: `第二台 x86 服务器客户机上向同一工具沙箱 actor（配置单条软件源出站规则、500 millicores 与 256 MiB 内存）发送六条命令的六行实测结果。${tasks.map((t, i) => `${names[i]}：${results[i]}，回退耗时 ${two(t.revert_seconds)} s，回退后剩余 ${t.files_after_revert} 个文件`).join('；')}。`,
 }, f => {
-  f.kicker(16, 28, 'the command tries');
-  f.kicker(232, 28, 'what it gets');
-  f.kicker(420, 28, 'revert', { hue: 'amber' });
-  f.kicker(506, 28, 'files in /work', { hue: 'green' });
+  f.kicker(16, 28, '命令尝试执行的操作');
+  f.kicker(232, 28, '执行结果');
+  f.kicker(420, 28, '回退', { hue: 'amber' });
+  f.kicker(506, 28, '/work 内文件数', { hue: 'green' });
   tasks.forEach((task, index) => {
     const y = 46 + index * 46;
     const hue = good[index] ? 'green' : 'rose';

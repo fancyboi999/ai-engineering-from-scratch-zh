@@ -1,201 +1,201 @@
-# Upgrade, and advice that no longer works
+# 升级，以及已经失效的建议
 
-> No release before 1.0.0 upgrades in place, and most instructions written for those releases fail at v1.0.0 in a way that this section names.
+> 1.0.0 之前的任何版本都不能原地升级，为这些版本写的大多数操作说明在 v1.0.0 上都会失败，本节逐条指出失败的方式。
 
-You search for an error and find a tutorial from three months ago. Its first command runs a script that your checkout does not have. Its second command passes a flag that the CLI rejects. The tutorial was correct for v0.1.0. Agent Substrate changed its installer, its API package, its states, and its request path before 1.0.0, and it kept no compatibility with the old forms.
+你搜索一条报错，找到一篇三个月前的教程。它的第一条命令运行一个脚本，而你的代码检出里没有这个脚本。它的第二条命令传了一个 CLI 不认的参数。这篇教程在 v0.1.0 上是对的。Agent Substrate 在 1.0.0 之前改了安装器、API 包、状态和请求路径，而且没有保留对旧形式的兼容。
 
-When you finish this section, you can translate an old instruction into the v1.0.0 form. You can also say which upgrades the project supports, and in which order the components move.
+读完本节，你能把一条旧操作说明转换成 v1.0.0 的写法。你还能说清项目支持哪些升级，以及各组件按什么顺序升级。
 
-## Old instructions, and what they do now
+## 旧操作说明，以及它们现在的结果 {#s-upgrade-and-stale-advice-old-instructions-and-what-they-do-now}
 
-The table lists each old instruction that we found in the v0.1.0 tree or in posts from that time. The middle column is what happens at v1.0.0. **The code** at the two tags is the source for each row, except where the text says that we ran it.
+下表列出我们在 v0.1.0 代码树或当时的文章里找到的每条旧操作说明。中间一列是它在 v1.0.0 上的结果。每一行的依据是两个标签处的**代码**，文中说明我们运行过的除外。
 
-| Old instruction | What happens at v1.0.0 | What to do |
+| 旧操作说明 | v1.0.0 上的结果 | 该怎么做 |
 |---|---|---|
-| `hack/install-ate-kind.sh --deploy-ate-system` | The script is not in the repository. | Run `ate-setup deploy ate-system`, as [section 2.1](#s-install-with-ate-setup) shows. |
-| `go run ./tools/setup-gcp bootstrap` | The tool is not in the repository. It moved to a separate repository for GKE. | Follow [section 7.3](#s-substrate-on-gke). |
-| `kubectl ate create actor --template-ref counter` | The flag does not exist. | Use `--template counter`. |
-| `kubectl port-forward svc/atenet-router 8000:80`, then a `Host` header | Nothing listens on port 80. The router reads the `ate-target-actor` header and requires a client certificate. | Use `kubectl ate proxy actor`, as [section 2.3](#s-your-first-actor-and-the-proxy) shows. |
-| `kubectl ate pause actor`, `PauseActor`, `ACTOR_STATE_PAUSED` | The command, the method, and the state do not exist. | Use `kubectl ate suspend actor`. |
-| A stored state number such as 7 for crashed | The numbers changed. Crashed is 5, deleting is 6, and reverting is 7. | Store the state name, never the number. |
-| `apiVersion: ate.dev/v1alpha1` in a WorkerPool | The CRD serves `v1` only, with no conversion. The apply fails. | Write `ate.dev/v1`. |
-| A Go import of `pkg/proto/ateapipb` | The module is `go.ate.dev/substrate`, and the package is `api/ateapi/v1`. | Generate the client again from the v1.0.0 proto file. |
-| A gRPC call to `/ateapi.Control/GetActor` | The service is `substrate.ateapi.v1.Control`. The old method name reaches nothing. | Use a client built from the v1.0.0 proto file. |
-| Template fields `snapshotsConfig.onPause` and `sandboxConfig` | The fields do not exist. A template has `snapshotConfig.preferredFidelity`, and the sandbox class comes from the WorkerPool. | Write the template as [section 3.1](#s-actortemplate-and-the-golden-snapshot) shows. |
-| A template with no resource limits | The API requires `cpuMillicores` and `memoryBytes` under `resources.limits`. | Set both. |
-| A node label `ate.dev/substrate-version` | Nothing reads the label. | Remove the step. |
-| The installer flag `--cordon-control-plane` | The flag is `--cordon-system-infra-components`, and the node label changed with it. | Use the new flag and the label `ate.dev/workloadType=ate-system-infra`. |
+| `hack/install-ate-kind.sh --deploy-ate-system` | 仓库里没有这个脚本。 | 运行 `ate-setup deploy ate-system`，见[第 2.1 节](#s-install-with-ate-setup)。 |
+| `go run ./tools/setup-gcp bootstrap` | 仓库里没有这个工具。它已移到 GKE 专用的另一个仓库。 | 按[第 7.3 节](#s-substrate-on-gke)操作。 |
+| `kubectl ate create actor --template-ref counter` | 没有这个参数。 | 用 `--template counter`。 |
+| `kubectl port-forward svc/atenet-router 8000:80`，再带 `Host` 头 | 80 端口上没有任何监听。router 读取 `ate-target-actor` 头，并要求客户端证书。 | 用 `kubectl ate proxy actor`，见[第 2.3 节](#s-your-first-actor-and-the-proxy)。 |
+| `kubectl ate pause actor`、`PauseActor`、`ACTOR_STATE_PAUSED` | 这个命令、方法和状态都不存在。 | 用 `kubectl ate suspend actor`。 |
+| 存下来的状态编号，例如用 7 表示崩溃 | 编号变了。崩溃是 5，删除中是 6，回退中是 7。 | 存状态名，不要存编号。 |
+| `WorkerPool` 里的 `apiVersion: ate.dev/v1alpha1` | CRD 只提供 `v1`，没有转换。apply 会失败。 | 写 `ate.dev/v1`。 |
+| Go 代码导入 `pkg/proto/ateapipb` | 模块是 `go.ate.dev/substrate`，包是 `api/ateapi/v1`。 | 用 v1.0.0 的 proto 文件重新生成客户端。 |
+| gRPC 调用 `/ateapi.Control/GetActor` | 服务名是 `substrate.ateapi.v1.Control`。旧方法名找不到任何服务。 | 使用基于 v1.0.0 的 proto 文件生成的客户端。 |
+| 模板字段 `snapshotsConfig.onPause` 和 `sandboxConfig` | 这些字段不存在。模板里有 `snapshotConfig.preferredFidelity`，沙箱类别来自 `WorkerPool`。 | 按[第 3.1 节](#s-actortemplate-and-the-golden-snapshot)的格式编写模板。 |
+| 没有资源限制的模板 | API 要求在 `resources.limits` 下提供 `cpuMillicores` 和 `memoryBytes`。 | 两个都要设。 |
+| 节点标签 `ate.dev/substrate-version` | 没有任何组件读取这个标签。 | 删掉这一步。 |
+| 安装器参数 `--cordon-control-plane` | 参数现在叫 `--cordon-system-infra-components`，节点标签也随之改了。 | 用新参数和标签 `ate.dev/workloadType=ate-system-infra`。 |
 
-Two rows deserve more than a cell.
+有两行需要展开说明。
 
-**The request path changed for security.** At v0.1.0 any pod that reached the router Service could call any actor with a `Host` header. At v1.0.0 the router asks for a client certificate and checks its identity against an allowlist. We probed the old ports on both dataplanes. On agentgateway, ports 80 and 8081 refused the connection. On Envoy they are not in the Service, and the connection timed out.
+**请求路径为了安全改了。** 在 v0.1.0，任何能访问 router Service 的 pod 都可以带一个 `Host` 头调用任意 actor。在 v1.0.0，router 要求客户端证书，并按允许列表检查证书里的身份。我们在两种数据平面上探测了旧端口。在 agentgateway 上，80 和 8081 端口拒绝连接。在 Envoy 上，这两个端口不在 Service 里，连接超时。
 
-The two dataplanes differ in what they list. With Envoy, the router Service has ports 443 and 8444 only. The agentgateway overlay adds ports 80 and 8081 to the Service and to the NetworkPolicy {{code}}. Nothing listened behind them in our install. The gateway configuration that `ate-setup` installed declared ports 8443 and 8444 only, and the agentgateway process listened on those two {{run}}. So on agentgateway the Service lists two ports that refuse every connection.
+两种数据平面列出的端口不同。使用 Envoy 时，router Service 只有 443 和 8444 端口。agentgateway 的 overlay 把 80 和 8081 端口加进了 Service 和 NetworkPolicy {{code}}。在我们的安装里，这两个端口后面没有任何监听。`ate-setup` 安装的网关配置只声明了 8443 和 8444 端口，agentgateway 进程也只监听这两个端口 {{run}}。所以在 agentgateway 上，Service 列出了两个会拒绝所有连接的端口。
 
-Its fifth port is different: the stats port 15020 answered `/metrics` to a pod in another namespace, with no credentials. [The router and ingress](#s-the-router-and-ingress) has the port table and that note.
+它的第五个端口情况不同：统计端口 15020 会向另一个命名空间里的 pod 返回 `/metrics`，且不需要任何凭据。[router 与入站](#s-the-router-and-ingress)一节有端口表和这条说明。
 
-A tutorial that ends with a plain `curl` to the router cannot work. Do not look for a setting that brings the old path back.
+末尾用普通 `curl` 请求 router 的教程不可能跑通。不要去找能恢复旧路径的设置。
 
-**The API renumbered its states.** A state name in a response is safe. A number in a database column, a metric label, or an alert rule from before 1.0.0 now means a different state. An old rule that pages on state 7 pages on a revert.
+**API 重新编了状态号。** 响应里的状态名是安全的。1.0.0 之前留在数据库列、指标标签或告警规则里的编号，现在指向另一个状态。如果一条旧规则对状态 7 触发告警，现在它响应的其实是回退状态。
 
-## Advice that is stale in a quieter way
+## 失效得更隐蔽的建议 {#s-upgrade-and-stale-advice-advice-that-is-stale-in-a-quieter-way}
 
-Some statements do not fail with an error. They are wrong, and the system runs.
+有些说法不会报错。它们是错的，系统却照常运行。
 
-| Statement | Where you read it | What we found |
+| 说法 | 你在哪里读到 | 我们的发现 |
 |---|---|---|
-| Substrate suspends an actor that has no requests. | the quickstart at the tag, and many posts | Nothing suspends it. The caller must call `SuspendActor`. |
-| A suspend returns when the snapshot is safe. | tutorials for v0.1.0, where it was true | The default is asynchronous. The snapshot is on one node first. |
-| The agentgateway dataplane accepts any client. | a reading of the manifests | The installer always adds the client certificate check. |
-| A credential provider requires the Envoy dataplane. | the help text of the installer flag | The installer accepted the provider with agentgateway, and injection worked. |
-| Upgrade with `NEW_RELEASE=v0.4.2`. | the example in the upgrade page at the tag | No v0.4.2 exists, and the same page excludes every 0.x upgrade. |
+| Substrate 会挂起没有请求的 actor。 | 该标签处的快速上手，以及许多帖子 | 没有任何组件会自动挂起它。调用方必须自己调用 `SuspendActor`。 |
+| 挂起在快照安全后才返回。 | v0.1.0 的教程，当时确实如此 | 默认是异步挂起。快照先落在一个节点上。 |
+| agentgateway 数据平面接受任何客户端。 | 对清单的解读 | 安装器总会加上客户端证书检查。 |
+| 凭据提供方要求使用 Envoy 数据平面。 | 安装器参数的帮助文本 | 安装器在 agentgateway 下接受了该提供方，凭据注入也生效了。 |
+| 用 `NEW_RELEASE=v0.4.2` 升级。 | 该标签处升级页面里的示例 | 不存在 v0.4.2，而且同一页明确排除了所有 0.x 升级。 |
 
-**We measured** the first two rows on an x86 server guest (24 vCPU, 47 GB, nested KVM). An actor with no requests for 900 s read RUNNING in 60 of 60 samples. After a default suspend, the snapshots of four actors stayed in the pending state. The upload finished 5 min 1 s to 5 min 11 s after the suspend. [Section 3.3](#s-suspendactor-and-resumeactor) and [section 3.4](#s-snapshot-fidelity-and-where-a-snapshot-lives) give both runs in full.
+**我们测得**前两行的结果，环境是一台 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）。一个 actor 900 秒没有请求，60 次采样里有 60 次显示 RUNNING。默认挂起之后，四个 actor 的快照都停在待上传（pending）状态。上传在挂起后 5 分 1 秒到 5 分 11 秒之间完成。[第 3.3 节](#s-suspendactor-and-resumeactor)和[第 3.4 节](#s-snapshot-fidelity-and-where-a-snapshot-lives)给出了这两次运行的完整记录。
 
-**Our position:** date every Substrate instruction before you follow it. If the text was written before 2026-11-05, check each command against the v1.0.0 help output first. The project made its largest breaks in the three weeks before the release. A post from October can be as wrong as one from July.
+**我们的判断：** 照着任何 Substrate 操作说明做之前，先看它的日期。如果文字写于 2026-11-05 之前，先拿 v1.0.0 的帮助输出逐条核对命令。项目最大的几次破坏性改动发生在发布前的三周内。十月的文章可能和七月的一样错。
 
-## Which upgrades the project supports
+## 项目支持哪些升级 {#s-upgrade-and-stale-advice-which-upgrades-the-project-supports}
 
-The upgrade page at the tag gives five cases. The version skew policy that it rests on starts at 1.0.0.
+该标签处的升级页面给出五种情况。它依据的版本偏差策略从 1.0.0 开始。
 
-| From and to | Supported | What to do |
+| 起始与目标版本 | 是否支持 | 该怎么做 |
 |---|---|---|
-| A later patch of the same minor, such as 1.0.0 to 1.0.2 | yes, and you can skip patches | Follow the four steps below. |
-| The next minor, such as 1.0 to 1.1 | yes | Follow the four steps below. |
-| Two minors at once, such as 1.0 to 1.2 | no | Upgrade to 1.1 first. |
-| A new major | no | Install again. |
-| Any 0.x release to 1.0.0 | no | Install again, with a new database. |
+| 同一个次版本的后续补丁，例如 1.0.0 到 1.0.2 | 支持，可以跳过中间的补丁 | 按下面的四个步骤做。 |
+| 下一个次版本，例如 1.0 到 1.1 | 支持 | 按下面的四个步骤做。 |
+| 一次跨两个次版本，例如 1.0 到 1.2 | 不支持 | 先升到 1.1。 |
+| 新的主版本 | 不支持 | 重新安装。 |
+| 任何 0.x 版本到 1.0.0 | 不支持 | 重新安装，并使用新数据库。 |
 
-The last row has a hard cause. The project merged all its schema migrations into one file on 2026-10-23, and `ate-api-server` refuses a schema that has no version. A database from before that date cannot be upgraded. Your actors and their snapshots from a 0.x cluster do not move to 1.0.0.
+最后一行有一个硬性原因。项目在 2026-10-23 把所有 schema 迁移合并成一个文件，而 `ate-api-server` 会拒绝没有版本号的 schema。这个日期之前的数据库无法升级。0.x 集群里的 actor 及其快照不会迁移到 1.0.0。
 
-## The order, and what running actors see
+## 升级顺序，以及运行中的 actor 会看到什么 {#s-upgrade-and-stale-advice-the-order-and-what-running-actors-see}
 
-Components move in a fixed order. A component is allowed to be one release newer than the ones after it, and never newer than the ones before it. [Figure 8.4](#fig-8-4) shows the four steps.
+各组件按固定顺序升级。一个组件可以比排在它后面的组件新一个版本，但不能比排在它前面的组件新。[图 8.4](#fig-8-4) 展示这四个步骤。
 
 ```figure
 id: fig-8-4
 kind: flow
-title: the four steps of a supported upgrade
-claim: Only the worker step ends running actors, and an actor has 30 minutes there only if its process survives SIGTERM.
-caption: Read top to bottom. Each row is one step. The left box holds the components that move, and the right box says what a running actor sees. From the upgrade page and the version skew policy at v1.0.0.
+title: 受支持升级的四个步骤
+claim: 只有 worker 这一步会结束运行中的 actor，而 actor 只有在进程能挺过 SIGTERM 时才有 30 分钟。
+caption: 从上向下读，每行是一个步骤。左侧方框是要升级的组件，右侧方框说明运行中的 actor 会看到什么。来源：v1.0.0 升级页面与版本偏差策略。
 ```
 
-1. `podcertificate-controller`, which signs the certificates that components show each other. Running actors see nothing.
-2. `atelet`, one node at a time. Running actors keep running. In our two runs, suspends and resumes on the node failed for 24 s and for 34 s.
-3. The workers. You change `spec.workerImage` of each WorkerPool, and the pool replaces 10 percent of its workers in each batch.
-4. `ate-api-server` and `ate-idp-server`, then the CRDs and `ate-controller`, then the router and the egress gateway, then the SandboxConfig, then the rest of the system bundle.
+1. `podcertificate-controller`，它为组件之间互相出示的证书签名。运行中的 actor 什么也看不到。
+2. `atelet`，一次一个节点。运行中的 actor 继续运行。在我们的两次运行里，节点上的挂起和恢复分别失败了 24 秒和 34 秒。
+3. worker。你修改每个 `WorkerPool` 的 `spec.workerImage`，池每一批替换 10% 的 worker。
+4. `ate-api-server` 和 `ate-idp-server`，然后是 CRD 和 `ate-controller`，然后是 router 和出站网关，然后是 `SandboxConfig`，最后是其余系统组件包。
 
-Step 3 is the one that costs you work. Each actor on an old worker receives `SIGTERM`. The upgrade page gives it 30 minutes after that {{docs}}, and our run shows that the time exists only if its process survives the signal. Substrate does not suspend it in that time.
+第 3 步最费功夫。旧 worker 上的每个 actor 都会收到 `SIGTERM`。升级页面在这之后给它 30 分钟 {{docs}}，而我们的运行表明，只有进程能挺过这个信号，这段时间才存在。Substrate 不会在这段时间里替它挂起。
 
-If nothing calls `SuspendActor`, the actor becomes `ACTOR_STATE_CRASHED` and loses its work since the last snapshot. This is the idle suspend rule again: your harness must act on the signal. A spot instance gives between 15 seconds and two minutes, never 30 minutes.
+如果没有任何操作调用 `SuspendActor`，actor 就会变成 `ACTOR_STATE_CRASHED`，并丢掉上一次快照之后的工作。这又回到了空闲挂起那条规则：你的 harness 必须自己响应这个信号。spot 实例只给 15 秒到两分钟，从来不会给 30 分钟。
 
-Step 4 has one action that cannot be undone. The first new `ate-api-server` pod migrates the database schema, and a rollback leaves the new schema in place. Take a database backup before step 4. You can roll back to the release you came from and no further.
+第 4 步有一个无法撤销的动作。第一个新的 `ate-api-server` pod 会迁移数据库 schema，回滚后新 schema 仍然留着。第 4 步之前先做数据库备份。你可以回滚到升级前的版本，不能再往前。
 
-**Our position:** before any worker upgrade, stop new requests and wait for the open ones. Then suspend every actor with `--mode sync` yourself. Keep requests stopped until the workers are replaced, because a request resumes an actor. A synchronous suspend puts the snapshot in the bucket before it returns. Then step 3 finds no running actors, and the 30 minutes do not matter.
+**我们的判断：** 任何 worker 升级之前，先停止新请求，等已有请求结束。然后自己用 `--mode sync` 挂起每个 actor。在 worker 替换完成前一直不放行请求，因为一个请求会恢复一个 actor。同步挂起会在返回前把快照放进 bucket。这样第 3 步就找不到运行中的 actor，那 30 分钟也就无关紧要了。
 
-## Two upgrades that we ran: v1.0.0-rc.3 to v1.0.0
+## 我们运行的两次升级：v1.0.0-rc.3 到 v1.0.0 {#s-upgrade-and-stale-advice-two-upgrades-that-we-ran-v1-0-0-rc-3-to-v1-0-0}
 
-No supported older release exists yet, because the policy starts at 1.0.0. The registry holds images for three release candidates and for v1.0.0, and for nothing older. An install of v0.6.0 from the release images failed with a 404 for its first image. So we installed v1.0.0-rc.3 and moved it to v1.0.0 by the steps above, twice, each time on a new cluster. The policy does not cover this path, and the two releases have the same schema version. [Figure 8.4b](#fig-8-4b) sets the steps of both runs against the request streams.
+目前没有受支持的更早版本，因为策略从 1.0.0 开始。镜像仓库里有三个候选版本和 v1.0.0 的镜像，没有更旧的。使用发布镜像安装 v0.6.0 时，拉取第一个镜像就返回了 404。所以我们安装了 v1.0.0-rc.3，并按上面的步骤把它升到 v1.0.0，一共做了两次，每次都在新集群上。策略并不覆盖这条路径，而且这两个版本的 schema 版本相同。[图 8.4b](#fig-8-4b) 把两次运行的步骤与请求流放在一起对照。
 
 ```figure
 id: fig-8-4b
 kind: timeline
-title: two upgrades from v1.0.0-rc.3 to v1.0.0, against the request streams
-claim: In both runs suspends and resumes failed in the atelet step, and a running actor that exits on SIGTERM crashed when the worker image changed.
-caption: Read each panel left to right. The top row of a panel shows when each step ran. The rows below show each request of a stream, green for 200 and rose for a failure. The second run had a second running actor, which handles SIGTERM. From capture/lab/summary/upgrade-x86.json and capture/lab/summary/upgrade-rerun-x86.json.
+title: 从 v1.0.0-rc.3 到 v1.0.0 的两次升级，与请求流对照
+claim: 两次运行里，挂起和恢复都在 atelet 这一步失败，而一个在 SIGTERM 时退出的运行中 actor 在 worker 镜像变更时崩溃了。
+caption: 每个面板从左向右读。面板顶行显示每个步骤何时运行。下面各行显示一条请求流的每个请求，绿色是 200，玫红色是失败。第二次运行多了一个会处理 SIGTERM 的运行中 actor。来源：capture/lab/summary/upgrade-x86.json、capture/lab/summary/upgrade-rerun-x86.json。
 ```
 
-**We measured** the first upgrade on the x86 server guest (24 vCPU, 47 GB, nested KVM). It had one kind node and a pool of 8 workers. Three streams ran during it. One suspended and resumed one actor about every 3.5 s. One listed the actors every 2 s. One sent a request each second to a `RUNNING` actor.
+**我们测得**第一次升级的结果，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）。它有一个 kind 节点和一个 8 个 worker 的池。升级期间运行了三条请求流。一条大约每 3.5 秒挂起并恢复一个 actor。一条每 2 秒列出一次 actor。一条每秒向一个 `RUNNING` actor 发一个请求。
 
-**We measured** a second upgrade on the same guest, once, on a new cluster with the bundled Postgres and a pool of 10 workers. The streams were the same, and the request stream went to two `RUNNING` actors. The process of one exits on `SIGTERM`, and the process of the other handles it.
+**我们测得**第二次升级的结果，环境是同一台客户机，只做了一次，在新集群上，使用内置 Postgres 和 10 个 worker 的池。请求流相同，只是请求流发往两个 `RUNNING` actor。其中一个的进程在 `SIGTERM` 时退出，另一个的进程会处理它。
 
-| Step | Seconds, first run | Seconds, second run | What a client saw |
+| 步骤 | 秒数，第一次运行 | 秒数，第二次运行 | 客户端看到什么 |
 |---|---|---|---|
-| 1, `podcertificate-controller` | 33.9 | 19.3 | nothing |
-| 2, `atelet` | 30.9 | 40.7 | 7 suspend and resume cycles in a row failed over 24 s in the first run, and 10 over 34 s in the second. The suspend failed with `while getting atelet conn` or with `Unavailable` from `atelet`, and the request got 503 |
-| 3, the worker image of the pool | 0.4 for the patch | 0.3 for the patch | the `RUNNING` actor that exits on `SIGTERM` crashed. In the first run it answered 503 from 1.2 s after the patch. In the second it answered 503 from 18 s, and it was `ACTOR_STATE_CRASHED` at the sample 22 s after the patch |
-| 4a, `ate-api-server` and `ate-idp-server` | 28.4 | 45.3 | nothing |
-| 4b, the CRDs and `ate-controller` | 12.3 | 19.4 | nothing |
-| 4c, the router and the egress gateway | 21.8 | 40.7 | nothing |
-| 4d, the SandboxConfig | 18.7 | 3.6 | nothing |
-| 4e, the system bundle | 29.5 | 36.1 | nothing |
+| 1，`podcertificate-controller` | 33.9 | 19.3 | 没有影响 |
+| 2，`atelet` | 30.9 | 40.7 | 第一次运行里连续 7 个挂起并恢复的周期在 24 秒内失败，第二次是 10 个，历时 34 秒。挂起失败时报 `while getting atelet conn`，或者来自 `atelet` 的 `Unavailable`，请求得到 503 |
+| 3，池的 worker 镜像 | patch 用了 0.4 | patch 用了 0.3 | 在 `SIGTERM` 时退出的那个 `RUNNING` actor 崩溃了。第一次运行里它在 patch 后 1.2 秒开始返回 503。第二次在 18 秒开始返回 503，patch 后 22 秒的采样里它已是 `ACTOR_STATE_CRASHED` |
+| 4a，`ate-api-server` 和 `ate-idp-server` | 28.4 | 45.3 | 没有影响 |
+| 4b，CRD 和 `ate-controller` | 12.3 | 19.4 | 没有影响 |
+| 4c，router 和出站网关 | 21.8 | 40.7 | 没有影响 |
+| 4d，`SandboxConfig` | 18.7 | 3.6 | 没有影响 |
+| 4e，系统组件包 | 29.5 | 36.1 | 没有影响 |
 
-In the first run, step 1 to the end of step 4e took 343 s. That includes 160 s of watching the pool in step 3. The cycle stream had 103 good cycles of 110, and all 7 failures were in step 2. The list stream got an answer 211 of 211 times.
+第一次运行里，从第 1 步到第 4e 步结束共 343 秒。其中包括第 3 步观察池的 160 秒。周期流在 110 个周期里有 103 个成功，7 次失败全部出现在第 2 步。列表流 211 次请求全部得到应答。
 
-In the second run that time was 346 s, with 135 s of the worker step in it. The list stream got an answer 199 of 199 times. In both runs the schema version did not change, and every Substrate pod ran v1.0.0 at the end.
+第二次运行的总时间是 346 秒，其中 worker 这一步占 135 秒。列表流 199 次请求全部得到应答。两次运行里 schema 版本都没有变，结束时每个 Substrate pod 都运行 v1.0.0。
 
-We made one actor of each kind before each upgrade and called each one after it.
+每次升级之前，我们各创建一个每种类型的 actor，升级之后逐个调用。
 
-| The actor before the upgrade | First run | Second run |
+| 升级前的 actor | 第一次运行 | 第二次运行 |
 |---|---|---|
-| Suspended with `--mode sync` at count 3 | 200, count 4 | 200, count 4 |
-| Suspended in the default mode at count 3 | 200, count 4 | 200, count 4 |
-| Suspended at count 5, with a tag | 200, count 6 | 200, count 6 |
-| Created and never run | 200, count 1 | 200, count 1 |
-| A new actor from the golden snapshot that the release candidate made | 200, count 1 | 200, count 1 |
-| A new actor from the tag | 200, count 6 | 200, count 6 |
-| `RUNNING` during step 3, with a process that exits on `SIGTERM` | `ACTOR_STATE_CRASHED`. 368 of 469 requests got 503. A `revert` took 0.22 s, and the count went back to 1 | `ACTOR_STATE_CRASHED`. 118 of 441 requests got 503. A `revert` took 0.22 s, and the count started again from the golden snapshot |
-| `RUNNING` during step 3, with a process that handles `SIGTERM` | not in this run | 441 of 441 requests served. A suspend of 0.62 s moved it to a new worker, and it kept its count |
-| In the suspend and resume loop during step 3 | every cycle of step 3 served | `ACTOR_STATE_CRASHED` 15 s after the patch, when its suspend failed with `Unavailable` from `atelet`. It stayed crashed for 395 s, until our `revert`. One call was lost |
+| 在计数 3 处用 `--mode sync` 挂起 | 200，计数 4 | 200，计数 4 |
+| 在计数 3 处用默认模式挂起 | 200，计数 4 | 200，计数 4 |
+| 在计数 5 处挂起，带标签 | 200，计数 6 | 200，计数 6 |
+| 已创建但从未运行 | 200，计数 1 | 200，计数 1 |
+| 从候选版本生成的黄金快照创建的新 actor | 200，计数 1 | 200，计数 1 |
+| 从标签创建的新 actor | 200，计数 6 | 200，计数 6 |
+| 第 3 步期间 `RUNNING`，进程在 `SIGTERM` 时退出 | `ACTOR_STATE_CRASHED`。469 个请求里 368 个得到 503。一次 `revert` 用了 0.22 秒，计数回到 1 | `ACTOR_STATE_CRASHED`。441 个请求里 118 个得到 503。一次 `revert` 用了 0.22 秒，计数从黄金快照重新开始 |
+| 第 3 步期间 `RUNNING`，进程会处理 `SIGTERM` | 本轮未包含 | 441 个请求全部成功处理。一次 0.62 秒的挂起把它移到了新 worker，计数保持不变 |
+| 第 3 步期间处于挂起与恢复循环中 | 第 3 步的每个周期都成功 | 在 patch 后 15 秒变为 `ACTOR_STATE_CRASHED`，当时它的挂起因来自 `atelet` 的 `Unavailable` 而失败。它一直崩溃了 395 秒，直到我们执行 `revert`。丢了一次调用 |
 
-So snapshots, tags, and the golden snapshot from the release candidate worked on v1.0.0 in both runs. The losses were in step 3. An actor that exits on `SIGTERM` crashed each time. An actor whose suspend was in progress when its worker went away crashed once, in the second run. Nothing repaired it until we sent a `revert`.
+所以在两次运行里，快照、标签和候选版本留下的黄金快照在 v1.0.0 上都能正常工作。损失出在第 3 步。在 `SIGTERM` 时退出的 actor 每次都崩溃。挂起进行到一半时 worker 消失的 actor 崩溃了一次，出现在第二次运行里。在我们发送 `revert` 之前，没有任何东西修复它。
 
-### The 30 minutes depend on the actor
+### 这 30 分钟取决于 actor {#s-upgrade-and-stale-advice-the-30-minutes-depend-on-the-actor}
 
-The upgrade page gives each running actor `SIGTERM` and then 30 minutes {{docs}}. Our running actor did not get 30 minutes. Its process exits on `SIGTERM`, so the actor crashed in seconds.
+升级页面给每个运行中的 actor 先发 `SIGTERM`，再给 30 分钟 {{docs}}。我们那个运行中的 actor 没有得到 30 分钟。它的进程在 `SIGTERM` 时退出，所以 actor 在几秒内就崩溃了。
 
-**We measured** this in a second roll of the same pool, now on v1.0.0, once. Two actors ran. The process of the first exits on `SIGTERM`, and that actor was `ACTOR_STATE_CRASHED` at the first sample, 5 s after the patch. The process of the second handles `SIGTERM` and keeps running. That actor stayed `RUNNING` and answered 36 of 36 requests in 175 s, while its worker pod was `Terminating`.
+**我们测得**这一点，是在同一个池的第二次滚动里，这次在 v1.0.0 上，只做了一次。运行了两个 actor。第一个的进程在 `SIGTERM` 时退出，这个 actor 在第一次采样，也就是 patch 后 5 秒，就已是 `ACTOR_STATE_CRASHED`。第二个的进程会处理 `SIGTERM` 并继续运行。这个 actor 一直是 `RUNNING`，在 175 秒内应答了 36 个请求中的 36 个，而它的 worker pod 处于 `Terminating`。
 
-We then suspended it with `--mode sync` in 0.64 s. It resumed on a new worker, and its count continued.
+随后我们用 `--mode sync` 挂起它，用了 0.64 秒。它在新 worker 上恢复，计数继续。
 
-The second upgrade and the rollback below each had the same two actors, once. In both, the actor without a handler crashed, and the actor with a handler served every request and kept its count after a suspend. So the result holds in all our rolls of a pool. An actor without a handler crashed in 4 of 4, and an actor with a handler survived in 3 of 3.
+第二次升级和下面的回滚各自带着同样的两个 actor，各做了一次。在这两次里，没有处理函数的 actor 崩溃了，有处理函数的 actor 响应了每个请求，挂起之后计数也保持不变。所以这个结果在我们对池的所有滚动里都成立。没有处理函数的 actor 4 次里崩溃 4 次，有处理函数的 actor 3 次里存活 3 次。
 
-So the window exists only for an actor whose main process survives `SIGTERM`. A program exits on that signal unless it has a handler.
+所以这个窗口只对主进程能挺过 `SIGTERM` 的 actor 存在。程序收到这个信号就会退出，除非它有处理函数。
 
-Our runs also move the suspend earlier than the upgrade page puts it. Suspends and resumes failed for 24 s and for 34 s while `atelet` restarted on our one node. So stop requests and suspend every actor before step 2, and resume traffic after step 3. The actor that crashed in the loop shows the cost of a suspend that is still in progress when the worker goes away.
+我们的运行还表明，挂起要比升级页面安排的更早。我们那一个节点上的 `atelet` 重启期间，挂起和恢复分别失败了 24 秒和 34 秒。所以在第 2 步之前就要停止请求并挂起每个 actor，到第 3 步之后再恢复流量。循环里崩溃的那个 actor 说明了这么做的代价，即 worker 消失时挂起尚未完成。
 
-## A rollback that we ran: v1.0.0 to v1.0.0-rc.3
+## 我们运行的一次回滚：v1.0.0 到 v1.0.0-rc.3 {#s-upgrade-and-stale-advice-a-rollback-that-we-ran-v1-0-0-to-v1-0-0-rc-3}
 
-The upgrade page gives one sentence for a rollback. It is the same list in reverse, from the old release, and an actor that crashes goes back to its last snapshot with `kubectl ate revert actor` {{docs}}.
+升级页面对回滚只写了一句话。做法是从旧版本出发，把同一份清单倒过来，崩溃的 actor 用 `kubectl ate revert actor` 回到它的上一个快照 {{docs}}。
 
-**We measured** one rollback, right after the second upgrade, on the same cluster. We ran it from the checkout of v1.0.0-rc.3 with the configuration that we saved before the upgrade, in the reverse order. Before it started, we reverted the actor that had crashed in the loop. The same three streams ran.
+**我们测得**一次回滚的结果，紧接在第二次升级之后，在同一个集群上。我们在 v1.0.0-rc.3 的检出里运行它，用升级前保存的配置，按相反的顺序执行。开始之前，我们先回退了在循环里崩溃的那个 actor。同样的三条请求流继续运行。
 
-| Step | Seconds | What a client saw |
+| 步骤 | 秒数 | 客户端看到什么 |
 |---|---|---|
-| 4d, the SandboxConfig | 3.5 | nothing |
-| 4c, the router and the egress gateway | 23.3 | nothing |
-| 4b, the CRDs and `ate-controller` | 5.0 | nothing |
-| 4a, `ate-api-server` and `ate-idp-server` | 25.0 | nothing |
-| 3, the worker image of the pool, back to v1.0.0-rc.3 | 0.4 for the patch | the actor that exits on `SIGTERM` answered 503 from 6.4 s after the patch, and 130 of 306 requests failed. A `revert` took 0.21 s, and its count started again from the golden snapshot. The actor with a handler served 306 of 306 |
-| 2, `atelet` | 12.7 | one suspend and resume cycle failed |
-| 1, `podcertificate-controller` | 3.7 | nothing |
+| 4d，`SandboxConfig` | 3.5 | 没有影响 |
+| 4c，router 和出站网关 | 23.3 | 没有影响 |
+| 4b，CRD 和 `ate-controller` | 5.0 | 没有影响 |
+| 4a，`ate-api-server` 和 `ate-idp-server` | 25.0 | 没有影响 |
+| 3，池的 worker 镜像，回到 v1.0.0-rc.3 | patch 用了 0.4 | 在 `SIGTERM` 时退出的 actor 从 patch 后 6.4 秒开始返回 503，306 个请求里 130 个失败。一次 `revert` 用了 0.21 秒，它的计数从黄金快照重新开始。有处理函数的 actor 306 个请求全部成功 |
+| 2，`atelet` | 12.7 | 一个挂起并恢复周期失败 |
+| 1，`podcertificate-controller` | 3.7 | 没有影响 |
 
-We did not run step 4e in reverse. After the rollback every actor returned 200, and each suspended actor kept its count. Every Substrate image was v1.0.0-rc.3, and the schema version had not changed. The list stream got an answer 138 of 138 times.
+我们没有反向运行第 4e 步。回滚之后每个 actor 都返回 200，每个已挂起的 actor 都保留了计数。每个 Substrate 镜像都是 v1.0.0-rc.3，schema 版本没有变。列表流 138 次请求全部得到应答。
 
-The rollback cost the same as the upgrade, and in the same step. This pair of releases has no schema change, so our run cannot show what a rollback does to a new schema. The upgrade page says that the new schema stays, and you need the backup from before step 4 for that case.
+回滚的代价与升级相同，也出在同一个步骤。这一对版本没有 schema 变更，所以我们的运行无法说明回滚遇到新 schema 时会怎样。升级页面说新 schema 会留下，这种情况需要第 4 步之前的备份。
 
-## From v0.6.0: no upgrade, and a reinstall that needs two fixes
+## 从 v0.6.0 出发：无法升级，重新安装还需要两处修复 {#s-upgrade-and-stale-advice-from-v0-6-0-no-upgrade-and-a-reinstall-that-needs-two-fixes}
 
-The registry has no images for v0.6.0, so we built it from its tag, on a new cluster on the same guest, once. Its README quickstart failed twice. The first deploy stopped at once.
+镜像仓库里没有 v0.6.0 的镜像，因此我们在同一台客户机的新集群上从源码标签构建安装，共测试了一次。它的 README 快速上手失败了两次。第一次部署立刻就停了。
 
 ```listing
-title: the install command of the v0.6.0 README
+title: v0.6.0 README 里的安装命令
 source: capture/lab/Y-reruns-rollback-scale/40-v060/00-install/20-deploy-ate-system.log
 lang: text
-note: The last useful line of the output.
+note: 输出里最后一行有用的内容。
 ---
 Error: at least one of ATE_INGRESS_ALLOWED_SPIFFE_IDS, config.ingressAllowedSPIFFEIDs or --ingress-allowed-spiffe-ids must be set, got none
 ```
 
-With an ingress identity added, the deploy took 278 s. The README command for the demo, `deploy demo-counter`, printed the help and returned 0, and `deploy demo counter` worked. The README then sends a request through port 80 of the router, and the port-forward failed with `Service atenet-router does not have a service port 80`. So no request reached the four actors that we made on v0.6.0 by the path of the README.
+加上入站身份之后，部署用了 278 秒。README 里的演示命令 `deploy demo-counter` 打印了帮助并返回 0，`deploy demo counter` 才真正生效。随后 README 通过 router 的 80 端口发请求，端口转发失败了，报 `Service atenet-router does not have a service port 80`。所以按 README 的路径，没有任何请求到达我们在 v0.6.0 上创建的那四个 actor。
 
-We then ran the v1.0.0 installer on that cluster, as a direct upgrade. It stopped in 3 s.
+接着我们在那个集群上运行 v1.0.0 的安装器，作为直接升级。它在 3 秒内就停了。
 
 ```listing
-title: a direct upgrade from v0.6.0 to v1.0.0
+title: 从 v0.6.0 直接升级到 v1.0.0
 source: capture/lab/Y-reruns-rollback-scale/40-v060/20-direct-upgrade/10-deploy.log
 lang: text
-note: The error line is cut after the first sentence.
+note: 错误行在第一句之后被截断。
 ---
 [step]: deploy_crds
 [step]: images: pre-built from ghcr.io/agent-substrate/substrate, tag v1.0.0
@@ -203,33 +203,33 @@ note: The error line is cut after the first sentence.
 Error: while applying customresourcedefinition/csidriverconfigs.ate.dev: CustomResourceDefinition.apiextensions.k8s.io "csidriverconfigs.ate.dev" is invalid: status.storedVersions[0]: Invalid value: "v1alpha1": missing from spec.versions …
 ```
 
-The v0.6.0 system kept running. The v1.0.0 CLI could not talk to it: `unknown service substrate.ateapi.v1.Control`. Requests through `kubectl ate proxy` of v1.0.0 still reached three of the four actors, on the old system. The upgrade page of v0.6.0 says to install again, so we did that on the same cluster.
+v0.6.0 系统继续运行。v1.0.0 的 CLI 无法与它通信：`unknown service substrate.ateapi.v1.Control`。通过 v1.0.0 的 `kubectl ate proxy` 发出的请求，仍然到达了旧系统上四个 actor 中的三个。v0.6.0 的升级页面说要重新安装，所以我们在同一个集群上这样做了。
 
-| Step | Result |
+| 步骤 | 结果 |
 |---|---|
-| `ate-setup delete all` of v1.0.0 | done in 346 s. It removed every Substrate namespace and volume |
-| deploy v1.0.0 | failed in 1 s, on the stored version of the `sandboxconfigs.ate.dev` CRD. That CRD stayed in deletion, because the SandboxConfig `gvisor-default` kept the finalizer `sandboxconfig.ate.dev/workerpool-protection` and its controller was gone |
-| remove the finalizer, deploy again | failed after 157 s. `atelet` stopped with `image cache at "/var/lib/ate/image-cache" has layout version "2" and this atelet supports "3"` |
-| delete that folder on the node, deploy again | done in 30 s |
+| v1.0.0 的 `ate-setup delete all` | 346 秒完成。它删除了全部 Substrate 命名空间和卷 |
+| 部署 v1.0.0 | 1 秒后失败，原因是 `sandboxconfigs.ate.dev` CRD 仍残留已存储版本。该 CRD 一直卡在删除中，因为 `SandboxConfig` `gvisor-default` 还带着 finalizer `sandboxconfig.ate.dev/workerpool-protection`，而它的控制器已经不在了 |
+| 删除 finalizer，再次部署 | 157 秒后失败。`atelet` 停止，报 `image cache at "/var/lib/ate/image-cache" has layout version "2" and this atelet supports "3"` |
+| 删除节点上的那个文件夹，再次部署 | 30 秒完成 |
 
-The new system had no actor and no atespace. Nothing that we made on v0.6.0 survived.
+新系统里没有 actor，也没有 atespace。我们在 v0.6.0 上创建的一切都没有保留下来。
 
-**Our position:** do not move a 0.x cluster to 1.0. Install 1.0 on a new cluster, create your templates again, and move traffic. If you must reuse the cluster, plan for the finalizer and the image cache, and for an empty system at the end.
+**我们的判断：** 不要把 0.x 集群迁到 1.0。在新集群上安装 1.0，重新创建模板，再迁移流量。如果一定要复用集群，要为 finalizer 和镜像缓存做好准备，并接受最后得到一个空系统。
 
-## Coming next
+## 后续内容 {#s-upgrade-and-stale-advice-coming-next}
 
-We ran two upgrades and one rollback, each once, on one node, and both upgrades started from a release candidate. From v0.6.0 we found no path that keeps an actor. The next edition adds an upgrade between two supported releases and a rollback that crosses a schema change. It also adds upgrades on more than one node, with the microVM class, and with a Postgres outside the cluster.
+我们运行了两次升级和一次回滚，每次只做一遍，只用一个节点，两次升级都从候选版本出发。从 v0.6.0 出发，我们没有找到任何能保留 actor 的路径。下一版将补充两个受支持版本之间的升级，以及跨越 schema 变更的回滚。它还会补充多节点、microVM 类别和集群外 Postgres 下的升级。
 
-A new kagent release, v1.0.1, appeared on the day of our kagent run. All our kagent results are from v1.0.0.
+我们的 kagent 运行当天，出现了新的 kagent 版本 v1.0.1。我们所有的 kagent 结果都来自 v1.0.0。
 
 ```takeaways
-- Check the date of a Substrate tutorial, and distrust anything written before 2026-11-05.
-- Install 1.0 on a new cluster to move from any 0.x release, because no actor survives.
-- Store actor state names, never the numbers.
-- Stop requests and suspend every actor with `--mode sync` before the `atelet` step of an upgrade.
-- Handle `SIGTERM` in the actor process, or every roll of the workers crashes the actor.
-- Take a database backup before the API server step of an upgrade.
-- Upgrade one minor release at a time, in the documented component order.
+- 先看 Substrate 教程的日期，对 2026-11-05 之前写的内容保持怀疑。
+- 要从任何 0.x 版本迁移，就在新集群上安装 1.0，因为没有 actor 能保留下来。
+- 存 actor 的状态名，不要存编号。
+- 升级到 `atelet` 这一步之前，先停止请求，并用 `--mode sync` 挂起每个 actor。
+- 在 actor 进程里处理 `SIGTERM`，否则每次滚动 worker 都会让 actor 崩溃。
+- 升级到 API server 这一步之前，先做数据库备份。
+- 每次只升一个次版本，并按文档规定的组件顺序进行。
 ```
 
-Sources: capture/lab/summary/upgrade-x86.json, capture/lab/summary/upgrade-rerun-x86.json, capture/lab/summary/v060-x86.json, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/20-upgrade/00-timeline-steps.tsv, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/20-upgrade/02-cycle-stream.tsv, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/30-after/10-actors-after.txt, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/40-worker-roll-on-v1.0.0/10-watch.tsv, capture/lab/U-pg-upgrade-scale/30-upgrade-v0.6.0/00-install-v0.6.0/51-ghcr-release-tags.txt, capture/lab/U-pg-upgrade-scale/30-upgrade-v0.6.0/00-install-v0.6.0/20-deploy-ate-system.log, capture/lab/Q-network/m-router-ports/agentgateway/10-port-probes.tsv, capture/lab/Q-network/m-router-ports/envoy/10-port-probes.tsv, capture/lab/Q-network/m-router-ports/agentgateway/11-port-probes-supplement.txt, README.md, the ActorState enum and the CLI at v0.1.0 and at v1.0.0 (the old and new commands); cmd/kubectl-ate/internal/cmd/actor.go, api/ateapi/v1/ateapi.proto, manifests/ate-install/generated/ate.dev_workerpools.yaml, cmd/ate-setup/commands.md and go.mod at v1.0.0; docs/guides/upgrade.md, docs/reference/version-skew-policy.md, docs/dev/postgresql-schema-evolution.md and docs/get-started/quickstart.md at v1.0.0; capture/lab/B-lifecycle/10-trace.tsv, capture/lab/D-durability/10-watch-part1.tsv, capture/lab/G-dataplane/envoy/ingress-auth/, capture/lab/G-dataplane/agentgateway/ingress-auth/, capture/lab/G-dataplane/02-agentgateway-without-ingress-allowlist/, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/summary/failures-x86.json, capture/lab/summary/timers-x86.json, capture/lab/G-dataplane/agentgateway/06-services.txt, capture/lab/G-dataplane/agentgateway/11-listening.txt, capture/lab/G-dataplane/agentgateway/10-atenet-router-agentgateway-config.yaml, capture/lab/G-dataplane/envoy/06-services.txt; manifests/ate-install/atenet-router.yaml and manifests/ate-install/components/agentgateway/kustomization.yaml at v1.0.0.
+来源： capture/lab/summary/upgrade-x86.json, capture/lab/summary/upgrade-rerun-x86.json, capture/lab/summary/v060-x86.json, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/20-upgrade/00-timeline-steps.tsv, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/20-upgrade/02-cycle-stream.tsv, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/30-after/10-actors-after.txt, capture/lab/U-pg-upgrade-scale/30-upgrade-v1.0.0-rc.3/40-worker-roll-on-v1.0.0/10-watch.tsv, capture/lab/U-pg-upgrade-scale/30-upgrade-v0.6.0/00-install-v0.6.0/51-ghcr-release-tags.txt, capture/lab/U-pg-upgrade-scale/30-upgrade-v0.6.0/00-install-v0.6.0/20-deploy-ate-system.log, capture/lab/Q-network/m-router-ports/agentgateway/10-port-probes.tsv, capture/lab/Q-network/m-router-ports/envoy/10-port-probes.tsv, capture/lab/Q-network/m-router-ports/agentgateway/11-port-probes-supplement.txt, README.md, the ActorState enum and the CLI at v0.1.0 and at v1.0.0 (the old and new commands); cmd/kubectl-ate/internal/cmd/actor.go, api/ateapi/v1/ateapi.proto, manifests/ate-install/generated/ate.dev_workerpools.yaml, cmd/ate-setup/commands.md and go.mod at v1.0.0; docs/guides/upgrade.md, docs/reference/version-skew-policy.md, docs/dev/postgresql-schema-evolution.md and docs/get-started/quickstart.md at v1.0.0; capture/lab/B-lifecycle/10-trace.tsv, capture/lab/D-durability/10-watch-part1.tsv, capture/lab/G-dataplane/envoy/ingress-auth/, capture/lab/G-dataplane/agentgateway/ingress-auth/, capture/lab/G-dataplane/02-agentgateway-without-ingress-allowlist/, capture/lab/F-egress/agentgateway/20-results.txt, capture/lab/summary/failures-x86.json, capture/lab/summary/timers-x86.json, capture/lab/G-dataplane/agentgateway/06-services.txt, capture/lab/G-dataplane/agentgateway/11-listening.txt, capture/lab/G-dataplane/agentgateway/10-atenet-router-agentgateway-config.yaml, capture/lab/G-dataplane/envoy/06-services.txt; manifests/ate-install/atenet-router.yaml and manifests/ate-install/components/agentgateway/kustomization.yaml at v1.0.0.

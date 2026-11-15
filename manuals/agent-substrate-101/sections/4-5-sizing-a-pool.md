@@ -1,191 +1,191 @@
-# Sizing a pool
+# 为 pool 规划容量
 
-> The limits that you declare decide how many actors run at one time, and disk decides how many suspended actors you can keep.
+> 你声明的 limit 决定同一时刻能运行多少 actor，而磁盘决定你能保留多少挂起的 actor。
 
-Someone asks how many agents your cluster can hold. The question has two answers, and they differ by orders of magnitude. One answer is the number of actors that run at the same moment. The other is the number of actors that exist and wait in a suspended state.
+有人问你的集群能容纳多少 agent。这个问题有两个答案，两者相差数个数量级。一个答案是同一时刻运行的 actor 数量。另一个是已经存在、处于挂起状态等待的 actor 数量。
 
-When you finish this section, you can compute both numbers for a pool and choose the limits of a worker. You can also name the resource that runs out first.
+读完本节，你能为一个 pool 计算出这两个数字，并选定 worker 的 limit。你还能说出哪种资源会最先耗尽。
 
-## Running actors: the arithmetic of declared limits
+## 运行中的 actor：声明 limit 的算术规则 {#s-sizing-a-pool-running-actors-the-arithmetic-of-declared-limits}
 
-A worker reports a capacity, and each running actor books a part of it. [WorkerPool](#s-workerpool) showed where the capacity comes from. The booking is the limit that the ActorTemplate declares, plus a memory overhead that the sandbox runtime reports {{code}}. The scheduler never looks at what an actor uses.
+worker 会上报容量，每个运行中的 actor 预订其中的一部分。[WorkerPool](#s-workerpool) 展示了容量的来源。预订量等于 ActorTemplate 声明的 limit，加上沙箱运行时上报的内存开销 {{code}}。调度器从不看 actor 实际用了多少。
 
-The number of actors that one worker runs is the smallest of three values:
+单个 worker 能运行的 actor 数量是以下三个值中的最小值：
 
-- the CPU limit of the worker, divided by the CPU limit of the actor
-- the memory limit of the worker less 64 MiB, divided by the memory booking of the actor
-- 1,000, the default of `--max-actors`
+- worker 的 CPU limit 除以 actor 的 CPU limit
+- worker 的内存 limit 减去 64 MiB，再除以 actor 的内存预订量
+- 1,000，即 `--max-actors` 的默认值
 
 ```figure
 id: fig-4-5
 kind: comparison
-title: running actors per worker follow the CPU that the worker reports
-claim: Two workers with a 2 CPU limit ran four one-CPU actors, and one worker with no limits ran sixteen on a node with 16 vCPUs.
-caption: Each green square is a running actor that declares 1 CPU. The rose square is an actor that found no room. The amber squares are turns that waited. The two columns are two different test machines. From capture/lab/I-capacity/02-workers-when-full.txt and capture/lab/K-kagent/parallel/workers-during.txt.
+title: 每个 worker 运行的 actor 数取决于 worker 上报的 CPU
+claim: 两个 CPU limit 为 2 的 worker 运行了四个单 CPU actor，而一个无 limit 的 worker 在 16 vCPU 节点上运行了十六个。
+caption: 每个绿色方块代表一个声明 1 CPU 的运行中 actor。玫红色方块代表未找到空位的 actor。琥珀色方块代表经历等待的轮次。两列分别对应两台不同的测试机器。来源：capture/lab/I-capacity/02-workers-when-full.txt、capture/lab/K-kagent/parallel/workers-during.txt。
 ```
 
-**We measured** the left column on the x86 server guest (24 vCPU, 47 GB, nested KVM). The pool had two workers with a limit of 2 CPUs and 3 GiB. Each actor declared 1 CPU and 256 MiB. Four actors ran, two on each worker. Eight requests that needed a fifth running actor all returned 503. CPU was the limit: each worker had booked 512Mi of 3008Mi.
+**我们测得**左侧一列的数据，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）。pool 包含两个 worker，limit 为 2 个 CPU 和 3 GiB。每个 actor 声明 1 个 CPU 和 256 MiB。四个 actor 运行起来，每个 worker 上两个。需要第五个运行中 actor 的八个请求全部返回 503。瓶颈在于 CPU：每个 worker 只预订了 3008Mi 中的 512Mi。
 
-**We measured** the right column on a second x86 server guest (16 vCPU, 31 GB), in the kagent run. The kagent pool sets no limits, and each actor declares 1 CPU and 1 GiB. We started 24 turns at the same time, one run. The worker reached 16 running actors and 16000 of 16000 millicores, and the other 8 turns waited. All 24 turns completed, in 4.3 to 7.8 seconds. With 8 turns at the same time, all 8 completed in 2.5 to 3.6 seconds.
+**我们测得**右侧一列的数据，环境是第二台 x86 服务器客户机（16 vCPU、31 GB），来自 kagent 运行。kagent 的 pool 未设置 limit，每个 actor 声明 1 个 CPU 和 1 GiB。我们同时启动了 24 个轮次，运行一次。worker 达到了 16 个运行中 actor 以及 16000/16000 millicores，其余 8 个轮次进入等待。全部 24 个轮次最终完成，耗时 4.3 到 7.8 秒。同时启动 8 个轮次时，全部 8 个在 2.5 到 3.6 秒内完成。
 
-[The parallel turns chart in section 7.1](#fig-7-1c) shows the time of each turn in both runs.
+[第 7.1 节的并发轮次图表](#fig-7-1c)展示了两次运行中每个轮次的耗时。
 
-The second result looks like free capacity, and it is the opposite. That worker promised every CPU of the node to actors, and the control plane runs on the same node. Set limits, as [WorkerPool](#s-workerpool) explains.
+第二个结果看起来像是白得的容量，实则相反。那个 worker 把节点的全部 CPU 都许诺给了 actor，而控制平面也跑在同一个节点上。请像 [WorkerPool](#s-workerpool) 解释的那样设置 limit。
 
-The CPU value of a template is a booking for placement, and the worker also writes it into the sandbox as a CPU quota {{code}}. That quota is a hard cap.
+模板中的 CPU 值用于放置时的资源预订，worker 也会将其作为 CPU 配额写入沙箱 {{code}}。该配额是硬上限。
 
-**We measured** a fixed amount of work under four limits on a second x86 server guest (16 vCPU, 23 GB). Each of eight rows had three runs. The actor used 0.25, 0.50, and 1.01 host cores at 250, 500, and 1000 millicores, with one thread or with four. At 2000 millicores, one thread used 1.12 cores and four threads used 1.96 to 2.01. The work took 27.1 to 27.6 seconds at 250 millicores and 4.9 to 5.4 seconds at 1000.
+**我们测得**四种 limit 下的固定工作量，环境是第二台 x86 服务器客户机（16 vCPU、23 GB）。八行数据中每行运行三次。在 250、500 和 1000 millicores 下，无论 1 个线程还是 4 个线程，actor 分别使用了 0.25、0.50 和 1.01 个宿主机核心。在 2000 millicores 下，1 个线程使用 1.12 个核心，4 个线程使用 1.96 到 2.01 个核心。同一份工作在 250 millicores 下耗时 27.1 到 27.6 秒，在 1000 millicores 下耗时 4.9 到 5.4 秒。
 
-[WorkerPool](#s-workerpool) has the table and the chart.
+[WorkerPool](#s-workerpool) 中有完整的表格和图表。
 
-So a low value packs more actors on a worker, and each of them is that much slower when it is busy. Size the value from the CPU that one turn needs, not from the average. The actor still sees 2 CPUs at every limit, so set thread counts in the template yourself. Several busy actors on one worker at the same time are a run for the next edition.
+因此较低的 limit 能在一个 worker 上塞进更多 actor，但每个 actor 忙碌时也会等比例变慢。应按单轮所需的 CPU 来定这个值，而不是按平均值。actor 在任何 limit 下都依然看到 2 个 CPU，因此需要在模板里自行设置线程数。同一 worker 上同时运行多个繁忙 actor 的测试留待下一版补充。
 
-A burst of resumes inside the capacity of the pool is cheap.
+在 pool 容量范围内的突发恢复成本很低。
 
-**We measured** 16 resumes at the same instant on the x86 server guest (24 vCPU, 47 GB, nested KVM), 80 requests in five rounds. The median was 0.37 seconds, against 0.23 seconds for one resume alone, and all 80 returned 200. [Request parking](#s-request-parking) has the chart.
+**我们测得**同一瞬间的 16 次恢复，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM），五轮共 80 个请求。中位数耗时为 0.37 秒，而单独一次恢复为 0.23 秒，全部 80 个请求均返回 200。[请求暂存](#s-request-parking)中附有该图表。
 
-A dead actor counts as a running one. An actor whose process has exited stays `ACTOR_STATE_RUNNING`, and it keeps its booking. Two such actors each held 1,000 millicores of a worker for the 20 minutes of our watch. A burst of 32 resumes then found 14 free places in a pool of 16. [CRASHED and RevertActor](#s-crashed-and-revertactor) shows how to find and free them.
+已死亡的 actor 仍算作运行中。进程已经退出的 actor 会停留在 `ACTOR_STATE_RUNNING`，并继续保留其资源预订。在我们观察的 20 分钟内，两个这样的 actor 各自占着 worker 的 1,000 millicores。随后 32 次突发恢复在容量为 16 的 pool 中只找到了 14 个空位。[CRASHED 与 RevertActor](#s-crashed-and-revertactor) 说明了如何发现并释放它们。
 
-Two reports by other people help you choose the CPU limit of an actor. We did not repeat either.
+其他人的两份报告有助于确定 actor 的 CPU limit。这两项测试我们均未重复运行。
 
-A contributor measured real CPU use on workers that were fully booked, in issue 3441 {{issue #3441}}. Seven actors with 1 CPU each used between 0.55 and 0.8 cores together, at the median. A generous limit therefore costs you most of a worker, because Substrate at v1.0.0 has no overcommit.
+一位贡献者在 issue 3441 中测量了满额预订的 worker 上的真实 CPU 用量 {{issue #3441}}。七个各声明 1 CPU 的 actor 合计使用的中位数在 0.55 到 0.8 个核心之间。因此过于宽裕的 limit 会浪费 worker 的大部分容量，因为 Substrate v1.0.0 不支持超配。
 
-A user measured resume time against the CPU limit of the actor on a release candidate of v1.0.0, in issue 3431 {{issue #3431}}. The median was 0.46 seconds at 50 millicores, 0.23 seconds at 100, and about 0.15 seconds from 250 up. A limit below 250 millicores saves capacity and costs resume time.
+一位用户在 v1.0.0 候选发布版上测量了恢复时间与 actor CPU limit 的关系，见 issue 3431 {{issue #3431}}。在 50 millicores 下中位数为 0.46 秒，100 millicores 下为 0.23 秒，250 millicores 及以上约为 0.15 秒。低于 250 millicores 的 limit 能省出容量，代价是拖慢恢复时间。
 
-## Suspended actors: disk, in three places
+## 挂起的 actor：分布在三处的磁盘占用 {#s-sizing-a-pool-suspended-actors-disk-in-three-places}
 
-A suspended actor books nothing on a worker. You can keep far more suspended actors than running ones. Each of them costs disk.
+挂起的 actor 在 worker 上不预订任何资源。你能保留的挂起 actor 数量远多于运行中数量。它们每一个都消耗磁盘。
 
-[The footprint chart in section 3.4](#fig-3-4c) shows these sizes as bars.
+[第 3.4 节的占用空间图表](#fig-3-4c)以条形图展示了这些大小。
 
-**We measured** disk use on the x86 server guest (24 vCPU, 47 GB, nested KVM) with 25 suspended actors, one sample. The actors held 8,750 MiB of memory in total. The node held 8,801 MiB of snapshots and the object store held 10,824 MiB. After we deleted the actors, the node held 1 MiB of snapshots and the object store held 2,064 MiB. A cache of 1,765 MiB stayed on the node in both samples.
+**我们测得** 25 个挂起 actor 的磁盘占用，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM），取样一次。这些 actor 共持有 8,750 MiB 内存。节点持有 8,801 MiB 快照，对象存储持有 10,824 MiB。删除这些 actor 后，节点持有 1 MiB 快照，对象存储持有 2,064 MiB。两次采样中节点上都保留了 1,765 MiB 的缓存。
 
-Three rules come out of those numbers:
+从这些数字里可以得出三条规则：
 
-- **A memory snapshot is as large as the memory that holds data.** An actor with 200 MiB of random bytes made a snapshot of 201.9 MiB. Random bytes are the worst case. The same actor with 200 MiB of zero bytes made a snapshot of 4.0 MiB, and with half of each, 103.8 MiB. On the microVM class the snapshot also holds the guest, and it was 59 to 70 MiB larger, as [sandbox classes](#s-sandbox-classes) shows.
-- **You pay two times for 30 minutes.** With the default timers, the node keeps its copy for 30 minutes after the suspend. The object store has a second copy after 5 minutes. [Snapshot fidelity, and where a snapshot lives](#s-snapshot-fidelity-and-where-a-snapshot-lives) has the timeline.
-- **Golden snapshots stay.** The 2,064 MiB that remained belong to the five templates. Deleting actors does not free that space.
+- **内存快照的大小等于存有数据的内存大小。** 持有 200 MiB 随机字节的 actor 生成了 201.9 MiB 的快照。随机字节是最坏情况。同一个 actor 若持有 200 MiB 全零字节，快照仅为 4.0 MiB；若各占一半，则为 103.8 MiB。在 microVM 类别下，快照还包含客户机本身，体积大出 59 到 70 MiB，见[沙箱类别](#s-sandbox-classes)。
+- **有 30 分钟你需要付出两倍空间。** 在默认计时器下，节点在挂起后将本地副本保留 30 分钟。对象存储在 5 分钟后拥有第二份副本。[快照保真度，以及快照存放在哪里](#s-snapshot-fidelity-and-where-a-snapshot-lives)给出了时间线。
+- **黄金快照会留存下来。** 余下的 2,064 MiB 属于那五个模板。删除 actor 不会释放这部分空间。
 
-The disk that one node needs for snapshots is therefore the number of suspends in 30 minutes, times the snapshot size. A node that suspends 200 actors of 200 MiB each half hour needs 40 GiB for snapshots alone. The snapshot directory is a path on the node, and Kubernetes charges it to no pod.
+因此，单节点为快照所需的磁盘空间，等于 30 分钟内的挂起次数乘以快照大小。一个每半小时挂起 200 个各占 200 MiB 的 actor 的节点，单是快照就需要 40 GiB。快照目录是节点上的一个路径，Kubernetes 不会将其计入任何 pod 的配额。
 
-On a pool that spans nodes, size each node by itself. A suspended actor resumes only on the node of its last suspend, for 30 minutes with the default timers. In our runs on two worker nodes, no actor moved off a node that stopped. When the node returned, Kubernetes left the new worker pods on the other node. [Placement](#s-placement) has those runs.
+对于跨节点的 pool，请逐个节点单独规划容量。在默认计时器下，挂起的 actor 在 30 分钟内只在上次挂起所在的节点上恢复。在我们的双 worker 节点测试中，没有任何 actor 迁离停止的节点。当节点恢复上线时，Kubernetes 把新的 worker pod 留在了另一节点上。[放置](#s-placement)记录了这些运行。
 
-## Many resumes at one time
+## 同一时刻的大量恢复 {#s-sizing-a-pool-many-resumes-at-one-time}
 
-A pool with free workers still has a limit on how fast it starts actors. We sent bursts of resumes to one node and timed each request. [Figure 4.5b](#fig-4-5b) shows every request of two runs.
+即使 pool 中有空闲 worker，它启动 actor 的速率仍有上限。我们向单个节点发送了突发恢复并记录了每个请求的耗时。[图 4.5b](#fig-4-5b)展示了两次运行中的全部请求。
 
 ```figure
 id: fig-4-5b
 kind: chart
-title: resumes at one time on one node
-claim: One node finished 32 to 39 resumes each second from 50 to 300 at one time, so the wait grew with the size of the burst.
-caption: In the left panel each line is one burst, with its requests in order from the first answer to the last. A line passes through 31 of them. The sizes on its horizontal axis are not to scale. The right panel has the rate of each burst against the burst size. The dashed line is the 0.5 s that the project site states. Four requests of the second run got no answer in 90 s and are not drawn. From capture/lab/summary/scale-x86.json and capture/lab/summary/bursts-one-node-x86.json.
+title: 单节点上同一时刻的恢复
+claim: 单节点处理同一时刻 50 到 300 次恢复时，每秒完成 32 到 39 次，等待时间随突发规模线性增长。
+caption: 左图中每条线代表一次突发，请求按首个响应到最后一个响应排序。每条线穿过其中 31 个请求。横轴上的规模未按比例绘制。右图给出每次突发的速率与突发规模的关系。虚线是项目网站宣称的 0.5 秒。第二次运行中有四个请求在 90 秒内未收到应答，未在图中绘出。来源：capture/lab/summary/scale-x86.json、capture/lab/summary/bursts-one-node-x86.json。
 ```
 
-**We measured** the first run on the x86 server guest (24 vCPU, 47 GB, nested KVM). It had one kind node and a pool of 200 gVisor workers. The actor was a Python counter with a 128 MiB limit, and each actor had its own snapshot on the node. One client process in a pod sent each burst to the router, over one or two HTTP/2 connections. Each burst size ran three times, and all 933 requests returned 200.
+**我们测得**第一次运行，环境是 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）。集群有一个 kind 节点和一个包含 200 个 gVisor worker 的 pool。actor 是一个 limit 为 128 MiB 的 Python 计数器，每个 actor 在节点上都有自己的快照。pod 内的单个客户端进程通过一到两条 HTTP/2 连接向 router 发送每次突发。每个突发规模运行三次，全部 933 个请求均返回 200。
 
-| Resumes at one time | Median of each burst | Slowest request | Resumes each second |
+| 同一时刻恢复数 | 每次突发的中位数 | 最慢请求 | 每秒恢复数 |
 |---|---|---|---|
-| 1, 30 times in a row | 0.36 s (0.33 to 0.40) | 0.40 s | not a burst |
-| 10 | 0.38 to 0.40 s | 0.43 s | 23 to 24 |
-| 50 | 1.16 to 1.34 s | 1.38 s | 36 to 38 |
-| 100 | 2.21 to 2.26 s | 2.73 s | 36 to 39 |
-| 150 | 3.16 to 3.42 s | 4.14 s | 36 to 38 |
+| 1，连续 30 次 | 0.36 s (0.33 到 0.40) | 0.40 s | 非突发 |
+| 10 | 0.38 到 0.40 s | 0.43 s | 23 到 24 |
+| 50 | 1.16 到 1.34 s | 1.38 s | 36 到 38 |
+| 100 | 2.21 到 2.26 s | 2.73 s | 36 到 39 |
+| 150 | 3.16 到 3.42 s | 4.14 s | 36 到 38 |
 
-The rate stops rising at about 37 resumes each second. From there a larger burst only waits longer, and twice the burst took twice the time. A first start from the golden snapshot ran at the same rate: 34 to 38 each second for 150 new actors, in three waves.
+速率在大约每秒 37 次恢复时停止上升。超过这一点后，更大的突发只会排队等待更久，两倍规模的突发需要两倍时间。从黄金快照首次启动处于相同速率：分三波启动 150 个新 actor 时，每秒完成 34 到 38 次。
 
-**We measured** a second run on the same guest, on a new kind node with a limit of 700 pods. The pool grew from 50 to 300 workers in steps of 50, and each step was ready in 17 to 21 s. At every step the Kubernetes API answered `/readyz` in a median of 105 to 108 ms, so 300 workers did not slow it. The actor was the same counter, and each request opened its own connection. A single resume took a median of 0.35 s, in 20 resumes.
+**我们测得**在同一台客户机上的第二次运行，使用 pod 上限为 700 的全新 kind 节点。pool 以每次 50 个的步长从 50 个 worker 扩到 300 个，每一步都在 17 到 21 秒内就绪。每一步中，Kubernetes API 响应 `/readyz` 的中位数为 105 到 108 毫秒，可见 300 个 worker 并没有拖慢它。actor 仍是同一个计数器，每个请求各自建立一条连接。单次恢复的中位数耗时为 0.35 秒（共 20 次恢复）。
 
-| Resumes at one time | Bursts | Median of each burst | 95th percentile | Resumes each second |
+| 同一时刻恢复数 | 突发次数 | 每次突发的中位数 | 95 分位值 | 每秒恢复数 |
 |---|---|---|---|---|
-| 150 | 3 | 3.15 to 3.55 s | 3.83 to 4.09 s | 35 to 39 |
-| 200 | 2 | 4.33 and 4.55 s | 5.42 and 5.61 s | 35 and 36 |
-| 300 | 2 | 7.29 and 7.42 s | 9.10 and 9.17 s | 32 and 32 |
+| 150 | 3 | 3.15 到 3.55 s | 3.83 到 4.09 s | 35 到 39 |
+| 200 | 2 | 4.33 和 4.55 s | 5.42 和 5.61 s | 35 和 36 |
+| 300 | 2 | 7.29 和 7.42 s | 9.10 和 9.17 s | 32 和 32 |
 
-1,448 of 1,450 requests in these bursts returned 200. The other two got no answer in 90 s, and the rate counts the answered requests up to the slowest answer. A first start of 300 new actors, 150 at a time, ran at 30 and 34 each second. So the rate held at 32 to 39 from 50 to 300 at one time, and fell a little at 300.
+在这些突发的 1,450 个请求中，有 1,448 个返回 200。其余两个在 90 秒内未收到应答，速率按截至最慢应答时已完成的请求数计算。分批首次启动 300 个新 actor（每批 150 个）的速率为每秒 30 和 34 次。因此从同一时刻 50 到 300 个恢复，速率稳定在每秒 32 到 39 次，在 300 时略有回落。
 
-## What sets that rate
+## 是什么决定了该速率 {#s-sizing-a-pool-what-sets-that-rate}
 
-[Figure 4.5c](#fig-4-5c) shows the restore inside the worker, the step of a resume that took the most time.
+[图 4.5c](#fig-4-5c)展示了 worker 内部的恢复过程，这是单次恢复中耗时最长的步骤。
 
 ```figure
 id: fig-4-5c
 kind: chart
-title: the worker restore of each actor, alone and inside a burst
-claim: Inside a burst about 100 restores ran at once, and each one took about ten times as long as a restore alone.
-caption: The first column has 20 restores sent one at a time, one dot each. Each other column is one burst of 134 to 150 resumes, as a box of its restore times. The number over a box is the median count of restores in progress at one moment. The bursts of 200 and 300 are not in the log. From capture/lab/summary/restore-limit-x86.json.
+title: 每个 actor 单独恢复与突发中恢复时的 worker 内部恢复耗时
+claim: 在突发中大约 100 次恢复同时运行，每次耗时约为单独恢复时的十倍。
+caption: 第一列是逐个发送的 20 次恢复，每次一个点。其余各列是 134 到 150 次恢复的突发，箱线图展示其恢复耗时。箱线上方的数字是同一时刻进行中的恢复数量中位数。200 和 300 的突发未录入日志。来源：capture/lab/summary/restore-limit-x86.json。
 ```
 
-**We measured** this in the second run, from the restore log of `atelet` and the CPU of each process, sampled each second. Alone, the restore inside the worker took a median of 0.27 s, in 20 restores. In eight bursts, a median of 75 to 116 restores were in progress at one moment. Each one took a median of 2.1 to 2.9 s inside the worker, and each burst finished 35 to 41 restores each second. So nothing limits how many restores start at once, and each one slows when about 100 run together.
+**我们测得**第二次运行中的这一数据，取自 `atelet` 的恢复日志和每秒采样的各进程 CPU。单独执行时，worker 内部恢复的中位数耗时为 0.27 秒（共 20 次恢复）。在八次突发中，同一时刻正在进行的恢复数量中位数达到 75 到 116 次。每次恢复在 worker 内部的中位数耗时升至 2.1 到 2.9 秒，每次突发每秒完成 35 到 41 次恢复。可见没有任何机制限制同时启动多少次恢复，而当大约 100 个恢复并发运行时，每一个都会变慢。
 
-We ruled out the parts that we could change or watch, in 13 bursts with no hung request:
+在 13 次没有挂死请求的突发中，我们逐一排除了可以调整或观测的组件：
 
-- `ate-api-server`: with 1, 2, and 4 replicas the rate was 36 to 37, 35 to 39, and 32 to 36 each second. It used 0.24 to 0.39 cores on average in a burst, and no thread more than 0.06 cores.
-- The router: with 1 replica of `atenet-router` the rate was 35 to 39, and with 4 replicas 35.5 and 36.3.
-- Postgres, `kube-apiserver`, and etcd: each used less than 0.25 cores on average, and no thread more than 0.07 cores.
-- The client: one or four curl processes gave the same rate. So did one connection for each request, against one or two in the first run.
-- The node: 9.5 to 11.4 of its 24 cores were busy on average in a burst, with peaks of 14 to 16. I/O wait was 0.02 to 0.12 cores on average, in the bursts that recorded it.
+- `ate-api-server`：在 1、2 和 4 个副本下，速率分别为每秒 36 到 37、35 到 39 以及 32 到 36 次。突发期间它平均使用 0.24 到 0.39 个核心，没有任何线程超过 0.06 个核心。
+- router：在 1 个 `atenet-router` 副本下速率为 35 到 39，在 4 个副本下为 35.5 和 36.3。
+- Postgres、`kube-apiserver` 和 etcd：各自平均使用不到 0.25 个核心，没有任何线程超过 0.07 个核心。
+- 客户端：一个或四个 curl 进程给出的速率相同。每个请求单独建连与第一次运行中的一两条连接对比也一样。
+- 节点：突发期间 24 个核心中平均有 9.5 到 11.4 个核心忙碌，峰值为 14 到 16 个。在记录了 I/O 等待的突发中，平均 I/O 等待为 0.02 到 0.12 个核心。
 
-The busiest processes were the gVisor sandboxes, at 2.1 to 2.9 cores on average, and the worker processes, at 1.5 to 2.2. So the limit is on the node, inside the gVisor restores that run together. Plain CPU, disk wait, and the control plane of Substrate are ruled out. This edition does not measure its cause, and the next one does. Lock contention in the guest kernel or in gVisor, and a cost of nested virtualisation, are possible. We are sure of what the limit is not, and less sure of where it is.
+最繁忙的进程是 gVisor 沙箱（平均 2.1 到 2.9 个核心）和 worker 进程（1.5 到 2.2 个核心）。因此瓶颈出在节点上，就在并发运行的 gVisor 恢复内部。纯 CPU 算力、磁盘等待和 Substrate 控制平面都已排除。本版未测量其根因，下一版会补测。客户机内核或 gVisor 内部的锁竞争，以及嵌套虚拟化的开销，都是可能的原因。我们确定瓶颈不在哪里，但还不太确定它具体在哪里。
 
-## More replicas of ate-api-server
+## ate-api-server 的更多副本 {#s-sizing-a-pool-more-replicas-of-ate-api-server}
 
-**We measured** two bursts of 150 with four replicas of `ate-api-server`, in the second run. 33 of 300 requests returned 500 and 3 returned 503. The bundled Postgres allows 100 connections, and the four replicas ran it out of them. The API server logged `FATAL: remaining connection slots are reserved for roles with the SUPERUSER attribute (SQLSTATE 53300)` and `FATAL: sorry, too many clients already`. Its arguments have no flag for the size of its connection pool.
+**我们测得**在四个 `ate-api-server` 副本下的两次 150 并发突发，属于第二次运行。300 个请求中有 33 个返回 500，3 个返回 503。内置 Postgres 只允许 100 个连接，四个副本耗尽了连接数。API server 记录了 `FATAL: remaining connection slots are reserved for roles with the SUPERUSER attribute (SQLSTATE 53300)` 和 `FATAL: sorry, too many clients already`。它的参数里没有设置连接池大小的标志。
 
-Eight actors ended `ACTOR_STATE_CRASHED`, and one `revert` brought each one back, in 0.33 to 0.38 s. Two more actors stayed in `ACTOR_STATE_RESUMING` for at least 4 minutes, and [section 8.2](#s-when-a-dependency-is-down) has them.
+八个 actor 最终处于 `ACTOR_STATE_CRASHED`，一次 `revert` 在 0.33 到 0.38 秒内把它们各自拉回。另有两个 actor 停留在 `ACTOR_STATE_RESUMING` 至少 4 分钟，见[第 8.2 节](#s-when-a-dependency-is-down)。
 
-**Our position:** keep the two replicas of `ate-api-server` that the install sets, when you use the bundled Postgres. More replicas did not raise the rate on one node, and four of them failed resumes and crashed actors. If you need more replicas for availability, raise the connection limit of Postgres first. A run with that change is planned for the next edition.
+**我们的判断：** 使用内置 Postgres 时，请保留安装器默认的两个 `ate-api-server` 副本。更多副本既没提高单节点速率，四个副本还导致恢复失败和 actor 崩溃。如果为了高可用需要更多副本，请先调高 Postgres 的连接上限。下一版计划补测这一改动。
 
-## The count of stored actors
+## 存储的 actor 数量 {#s-sizing-a-pool-the-count-of-stored-actors}
 
-The count of stored actors did not change these numbers. In the first run we raised the count to 10,750 actor rows in Postgres. A single resume took a median of 0.36 to 0.38 s at each of four sizes, with 10 resumes each. The database was 20 MB at 10,750 rows, and `kubectl ate get actors` took 0.86 s. The creates ran at 76 to 86 each second, and none of 10,000 failed.
+存储的 actor 数量并未改变这些数字。在第一次运行中，我们将 Postgres 中的 actor 行数增加到了 10,750 行。在四种规模下（各测试 10 次恢复），单次恢复的中位数耗时都在 0.36 到 0.38 秒。10,750 行时数据库大小为 20 MB，`kubectl ate get actors` 耗时 0.86 秒。创建速率为每秒 76 到 86 个，10,000 次创建无一失败。
 
-**Our position:** plan the pool for the burst, and not only for the peak count. If 100 sessions wake in the same second on one node like ours, the last one waits about 2.7 s. With 300 it waits about 9 s. Spread a wake-up of many actors over time in your client. More nodes are the other answer. Until the next edition measures them, measure that rate yourself.
+**我们的判断：** 按突发流量规划 pool，而不要只按峰值总数规划。如果在我们这样的单节点上同一秒唤醒 100 个会话，最后一个大概要等 2.7 秒。如果是 300 个，大概要等 9 秒。请在客户端把大量 actor 的唤醒时间错开。增加节点是另一种办法。在下一版实测之前，请自行测量该速率。
 
-Two limits stopped the runs. Each suspended actor of this kind kept 12.9 MB on the node disk, and 450 of them left 3.9 GB free on the guest. We also stopped at 10,750 rows, below the 20,000 that we planned. In the second run the delayed upload of 300 snapshots took the guest disk from 4.9 to 4.0 GB in one minute. So 200 and 300 at one time ran twice each, and not three times. An idle worker used a median of 16.7 MB of memory, in 200 workers.
+两个上限让测试停了下来。这种挂起 actor 每个在节点磁盘上保留 12.9 MB，450 个之后客户机就只剩 3.9 GB 可用空间。我们也停在了 10,750 行，低于原计划的 20,000 行。在第二次运行中，300 个快照的延迟上传在一分钟内把客户机磁盘从 4.9 GB 压到了 4.0 GB。因此同一时刻 200 和 300 的突发各只跑了两次，而不是三次。空闲 worker 的内存占用中位数为 16.7 MB（在 200 个 worker 中测得）。
 
-## No autoscaler
+## 没有自动扩缩器 {#s-sizing-a-pool-no-autoscaler}
 
-Substrate v1.0.0 has no code that changes `spec.replicas` {{code}}. The WorkerPool has a `scale` subresource, so a HorizontalPodAutoscaler or your own controller can change the count. The controller publishes `ate.workerpool.desired_workers` and `ate.workerpool.ready_workers` for that purpose {{docs}}. A run with an autoscaler is planned for the next edition.
+Substrate v1.0.0 中没有任何修改 `spec.replicas` 的代码 {{code}}。`WorkerPool` 拥有 `scale` 子资源，因此 HorizontalPodAutoscaler 或你自己的控制器可以修改副本数。控制器为此发布了 `ate.workerpool.desired_workers` 和 `ate.workerpool.ready_workers` 指标 {{docs}}。下一版计划补测使用自动扩缩器的运行情况。
 
-Plan as if you have none. [Request parking](#s-request-parking) holds a request for 5 seconds. Do not plan for a new worker pod to start and register in that time.
+请按没有自动扩缩器来规划。[请求暂存](#s-request-parking)只保留请求 5 秒。不要指望新的 worker pod 能在这段时间内启动并完成注册。
 
-**We measured** two such starts, each once. On the x86 server guest (24 vCPU, 47 GB, nested KVM), a new pool of 200 workers was ready after 75 s. On the second x86 server guest (16 vCPU, 23 GB), we scaled a pool from 4 workers to 6 while a request waited for room. That request returned 200 in 1.55 s, 1.7 s after the scale command. Both clusters had the worker image on the node already, so a first pull is not in these numbers.
+**我们测得**两次这样的启动，各一次。在 x86 服务器客户机（24 vCPU、47 GB、嵌套 KVM）上，包含 200 个 worker 的新 pool 在 75 秒后就绪。在第二台 x86 服务器客户机（16 vCPU、23 GB）上，当一个请求正在等待空位时，我们将 pool 从 4 个 worker 扩容到 6 个。该请求用时 1.55 秒返回 200，时间点就在扩容命令发出后的 1.7 秒。两个集群的节点上都已提前缓存了 worker 镜像，所以这些数字不含首次拉取镜像的耗时。
 
- Size the pool for the peak of running actors, with room to spare.
+按运行中 actor 的峰值来定 pool 的大小，并留出余量。
 
-## What others reported at scale
+## 他人在大规模下的报告 {#s-sizing-a-pool-what-others-reported-at-scale}
 
-Our largest cluster had two worker nodes. Our largest count was 10,750 actor rows on one node, of which 150 had a snapshot of their own. The project site states `10×` the density of container runtimes. The documentation gives a benchmark method and no result. We measured two parts of that claim and made no comparison with a container runtime. A suspended actor used no worker and 12.9 MB of node disk, and an idle worker used 16.7 MB of memory.
+我们最大的集群有两个 worker 节点。我们最大的测试量是在单节点上存入 10,750 行 actor，其中 150 个拥有自己的快照。项目网站宣称密度是容器运行时的 `10×`。文档给出了基准测试方法，但未给出结果。我们测量了该宣称的两个侧面，未与容器运行时作对比。挂起 actor 不占用 worker 且消耗 12.9 MB 节点磁盘，空闲 worker 消耗 16.7 MB 内存。
 
-These reports come from the issue tracker of Substrate. Their authors ran them, and we did not.
+以下报告来自 Substrate 的 issue 跟踪器。由各作者自行运行，我们未做验证。
 
-| Report | Conditions | Result |
+| 报告 | 条件 | 结果 |
 |---|---|---|
-| Issue 3479, pools without limits {{issue #3479}} | 320 workers, eight on each 8 vCPU node, no limits on the pool | every worker registered the whole node, so placement never refused an actor |
-| Issue 3408, density on one node {{issue #3408}} | one node with 192 vCPUs and 503 GiB, gVisor, a development build | at 6,200 actors, 1,187 sandboxes died and all actors stayed RUNNING. With a newer gVisor build, 5,600 actors ran with no deaths, and at 6,000 the node ran out of memory |
-| Issue 3702, Postgres under load {{issue #3702}} | 9,000 actors in create and delete cycles, 900 workers, v1.0.0-rc.1 | Postgres used 53 to 60 of 64 cores. The first command came 4 to 18 seconds after create. With 2,700 workers the wait went away |
-| Issue 3101, disk after asynchronous suspends {{issue #3101}} | a 50 GB node disk, 10 suspends of 512 MB each | the kubelet evicted both worker pods and then `atelet`, and the node stayed under disk pressure for more than 34 minutes |
+| Issue 3479，无 limit 的 pool {{issue #3479}} | 320 个 worker，每台 8 vCPU 节点 8 个，pool 无 limit | 每个 worker 都注册了整个节点，因此放置从未拒绝过任何 actor |
+| Issue 3408，单节点密度 {{issue #3408}} | 单节点 192 vCPU 和 503 GiB，gVisor，开发构建版 | 到 6,200 个 actor 时，1,187 个沙箱死亡而所有 actor 仍为 RUNNING。换用更新的 gVisor 构建版后，5,600 个 actor 运行无死亡，到 6,000 个时节点内存耗尽 |
+| Issue 3702，高负载下的 Postgres {{issue #3702}} | 9,000 个 actor 处于创建与删除循环，900 个 worker，v1.0.0-rc.1 | Postgres 占用了 64 核中的 53 到 60 核。首个命令在创建后 4 到 18 秒到达。扩到 2,700 个 worker 后等待消失 |
+| Issue 3101，异步挂起后的磁盘占用 {{issue #3101}} | 50 GB 节点磁盘，10 次各 512 MB 的挂起 | kubelet 先后驱逐了两个 worker pod 和 `atelet`，节点在 34 分钟以上处于磁盘压力状态 |
 
-Read the table as four separate limits: missing limits, node memory, Postgres row locks, and node disk. Each one appeared before CPU ran out. The Postgres report adds one design hint. Many small workers behaved better than few large ones at that scale: about 3 actors on each worker, not 10.
+把上表读作四个相互独立的瓶颈：缺少 limit、节点内存、Postgres 行锁和节点磁盘。每一个都在 CPU 耗尽之前率先出现。Postgres 报告还多了一条设计提示：在该规模下，许多较小的 worker 比少数较大的 worker 表现更好，大约每个 worker 3 个 actor，而不是 10 个。
 
-## A procedure
+## 操作步骤 {#s-sizing-a-pool-a-procedure}
 
-1. Measure the peak memory of one actor, and set the template limit a little above it.
-2. Set the CPU limit of the actor to 250 millicores or more.
-3. Choose the actors for each worker. Set the worker limits to that count times the booking of one actor, plus 64 MiB. On `microvm` the memory booking is the limit plus an overhead, 7.6 MiB in our run.
-4. Set `replicas` to the peak of running actors divided by that count, plus spare workers.
-5. Size the node disk for 30 minutes of snapshots, and watch it.
+1. 测量单个 actor 的峰值内存，并将模板 limit 设得略高于该值。
+2. 将 actor 的 CPU limit 设为 250 millicores 或更高。
+3. 选定每个 worker 承载的 actor 数量。将 worker limit 设为该数量乘以单个 actor 的预订量，再加 64 MiB。在 `microvm` 上，内存预订量是 limit 加上额外开销，我们的运行中为 7.6 MiB。
+4. 将 `replicas` 设为运行中 actor 峰值除以该数量，再加上备用 worker。
+5. 按 30 分钟的快照量规划节点磁盘，并持续监控它。
 
 ```takeaways
-- Compute running actors per worker from declared limits, never from real use.
-- Count an actor with a dead process as running, until a suspend marks it crashed.
-- Keep actor CPU limits at 250 millicores or more to protect resume time.
-- Size node disk as suspends in 30 minutes times the snapshot size.
-- Size the pool for the peak, because Substrate has no autoscaler.
-- Plan for about 37 resumes each second on one node, and spread a larger wake-up over time.
-- Keep two replicas of ate-api-server with the bundled Postgres, because four ran it out of connections.
-- Watch node memory, node disk, and Postgres before you add CPU.
+- 按声明的 limit 计算每个 worker 运行的 actor 数量，绝不按实际用量算。
+- 把进程已死亡的 actor 算作运行中，直到挂起把它标记为崩溃。
+- 将 actor CPU limit 保持在 250 millicores 或以上，以保障恢复时间。
+- 按 30 分钟内的挂起次数乘以快照大小来定节点磁盘容量。
+- 按峰值来定 pool 的大小，因为 Substrate 没有自动扩缩器。
+- 按单节点每秒约 37 次恢复来规划，并在时间上错开更大规模的唤醒。
+- 使用内置 Postgres 时保持两个 ate-api-server 副本，因为四个副本耗尽了连接。
+- 先紧盯节点内存、节点磁盘和 Postgres，再考虑增加 CPU。
 ```
 
-Sources: capture/lab/summary/scale-x86.json, capture/lab/summary/bursts-one-node-x86.json, capture/lab/summary/restore-limit-x86.json, capture/lab/Z-bursts/10-run/20-concurrency.tsv, capture/lab/Z-bursts/00-setup/20-growth.tsv, capture/lab/Z-bursts/10-run/51-restore-concurrency.txt, capture/lab/Z-bursts/10-run/40-errors/40-postgres.log, capture/lab/Z-bursts/10-run/43-ateapi-pool-settings.json, capture/lab/summary/full-node-x86.json, capture/lab/U-pg-upgrade-scale/40-scale/10-run/20-concurrency.tsv, capture/lab/U-pg-upgrade-scale/40-scale/10-run/30-rows.tsv, capture/lab/U-pg-upgrade-scale/40-scale/00-setup/30-setup.log, capture/lab/summary/microvm-x86.json, capture/lab/summary/validation-parallel-x86.json, capture/lab/summary/validation-memory-x86.json, capture/lab/summary/demos-x86.json, capture/lab/summary/cpu-limit-x86.json, capture/lab/Q-network/n-cpu-limit/40-work.tsv, capture/lab/V-validation/03-parallel-resume/11-workers-before-32.txt, capture/lab/V-validation/11-process-exit-long-watch/11-workers-end.txt, capture/lab/N-demos/tool-sandbox/tasks.tsv, capture/lab/L-gaps/multinode/52-placement-counts.txt, capture/lab/L-gaps/multinode/70-stop-after-upload.tsv, capture/lab/L-gaps/multinode/85-node-return.tsv, capture/lab/I-capacity/01-unplanned-full-pool-503.tsv, capture/lab/I-capacity/02-workers-when-full.txt, capture/lab/I-capacity/03-actors-when-full.txt, capture/lab/C-resume-vs-size/pool.yaml, capture/lab/C-resume-vs-size/tmpl-0.yaml, capture/lab/C-resume-vs-size/20-storage-footprint.txt, capture/lab/C-resume-vs-size/23-storage-after-delete.txt, capture/lab/summary/footprint-x86.json, capture/lab/summary/parking-x86.json, capture/lab/K-kagent/parallel/workers-during.txt, capture/lab/K-kagent/parallel/states-during.txt, capture/lab/K-kagent/parallel/timings.tsv, capture/lab/K-kagent/inventory/workers-end.txt, capture/lab/D-durability/10-watch-part1.tsv, capture/lab/E-dependency-loss/00-setup.log, capture/lab/E-dependency-loss/22-actors-5min-later.txt; cmd/ateapi/internal/scheduling/scheduling.go, cmd/ateworker-gvisor/memory.go, cmd/ateworker-gvisor/main.go, api/infra/k8s/ate/v1/workerpool_types.go, cmd/atelet/main.go at v1.0.0; docs/reference/api-guide.md, docs/guides/observability.md, docs/guides/node-storage.md, docs/guides/benchmarking.md, site/layouts/_shortcodes/home.html at v1.0.0; issues https://github.com/agent-substrate/substrate/issues/3479, https://github.com/agent-substrate/substrate/issues/3408, https://github.com/agent-substrate/substrate/issues/3702, https://github.com/agent-substrate/substrate/issues/3101, https://github.com/agent-substrate/substrate/issues/3441, https://github.com/agent-substrate/substrate/issues/3431.
+来源：capture/lab/summary/scale-x86.json, capture/lab/summary/bursts-one-node-x86.json, capture/lab/summary/restore-limit-x86.json, capture/lab/Z-bursts/10-run/20-concurrency.tsv, capture/lab/Z-bursts/00-setup/20-growth.tsv, capture/lab/Z-bursts/10-run/51-restore-concurrency.txt, capture/lab/Z-bursts/10-run/40-errors/40-postgres.log, capture/lab/Z-bursts/10-run/43-ateapi-pool-settings.json, capture/lab/summary/full-node-x86.json, capture/lab/U-pg-upgrade-scale/40-scale/10-run/20-concurrency.tsv, capture/lab/U-pg-upgrade-scale/40-scale/10-run/30-rows.tsv, capture/lab/U-pg-upgrade-scale/40-scale/00-setup/30-setup.log, capture/lab/summary/microvm-x86.json, capture/lab/summary/validation-parallel-x86.json, capture/lab/summary/validation-memory-x86.json, capture/lab/summary/demos-x86.json, capture/lab/summary/cpu-limit-x86.json, capture/lab/Q-network/n-cpu-limit/40-work.tsv, capture/lab/V-validation/03-parallel-resume/11-workers-before-32.txt, capture/lab/V-validation/11-process-exit-long-watch/11-workers-end.txt, capture/lab/N-demos/tool-sandbox/tasks.tsv, capture/lab/L-gaps/multinode/52-placement-counts.txt, capture/lab/L-gaps/multinode/70-stop-after-upload.tsv, capture/lab/L-gaps/multinode/85-node-return.tsv, capture/lab/I-capacity/01-unplanned-full-pool-503.tsv, capture/lab/I-capacity/02-workers-when-full.txt, capture/lab/I-capacity/03-actors-when-full.txt, capture/lab/C-resume-vs-size/pool.yaml, capture/lab/C-resume-vs-size/tmpl-0.yaml, capture/lab/C-resume-vs-size/20-storage-footprint.txt, capture/lab/C-resume-vs-size/23-storage-after-delete.txt, capture/lab/summary/footprint-x86.json, capture/lab/summary/parking-x86.json, capture/lab/K-kagent/parallel/workers-during.txt, capture/lab/K-kagent/parallel/states-during.txt, capture/lab/K-kagent/parallel/timings.tsv, capture/lab/K-kagent/inventory/workers-end.txt, capture/lab/D-durability/10-watch-part1.tsv, capture/lab/E-dependency-loss/00-setup.log, capture/lab/E-dependency-loss/22-actors-5min-later.txt; cmd/ateapi/internal/scheduling/scheduling.go, cmd/ateworker-gvisor/memory.go, cmd/ateworker-gvisor/main.go, api/infra/k8s/ate/v1/workerpool_types.go, cmd/atelet/main.go at v1.0.0; docs/reference/api-guide.md, docs/guides/observability.md, docs/guides/node-storage.md, docs/guides/benchmarking.md, site/layouts/_shortcodes/home.html at v1.0.0; issues https://github.com/agent-substrate/substrate/issues/3479, https://github.com/agent-substrate/substrate/issues/3408, https://github.com/agent-substrate/substrate/issues/3702, https://github.com/agent-substrate/substrate/issues/3101, https://github.com/agent-substrate/substrate/issues/3441, https://github.com/agent-substrate/substrate/issues/3431.

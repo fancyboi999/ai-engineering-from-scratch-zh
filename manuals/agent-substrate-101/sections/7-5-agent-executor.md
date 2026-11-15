@@ -1,63 +1,63 @@
-# Agent Executor on Substrate
+# Substrate 上的 Agent Executor
 
-> Agent Executor runs each task as one files-only actor on Substrate v1.0.0, never suspends it, and opens no egress, so you set the rule on the actor.
+> Agent Executor 在 Substrate v1.0.0 上把每个任务作为一个仅文件 actor 运行，从不挂起它，也不开放出站，所以出站规则要你在 actor 上自己设置。
 
-The project site names two systems that are built on Agent Substrate. One is kagent, which [kagent 1.0 on Substrate](#s-kagent-on-substrate) covers from our own run. The other is Agent Executor, and your team asks if it is the better base for coding agents. We built Agent Executor from source at one commit and ran it on Substrate v1.0.0, in two runs.
+项目网站点名了两个构建在 Agent Substrate 之上的系统。一个是 kagent，[Substrate 上的 kagent 1.0](#s-kagent-on-substrate) 用我们自己的运行结果讲过。另一个是 Agent Executor，你的团队想知道它是不是 coding agent 更好的底座。我们从同一个提交构建了 Agent Executor，并在 Substrate v1.0.0 上做了两次运行。
 
-When you finish this section, you can map each Agent Executor object to the Substrate object behind it. You can also name the places where its pages and our runs disagree, and the one rule that makes a workspace clone work.
+读完本节，你能把每个 Agent Executor 对象对应到它背后的 Substrate 对象。你还能指出它的文档页面与我们的运行结果不一致的地方，以及让工作区克隆成功的那一条规则。
 
-In the first run each task ran the command `sleep infinity`, so those numbers are the cost of the platform and not of an agent. In the second run we cloned a repository and called a model from a task. We also ran the example agent image and deleted a worker under a task. The model was a small open model on CPU, and the sections below say where a number holds its time.
+第一次运行中，每个任务执行的命令是 `sleep infinity`，所以那些数字是平台本身的开销，不是 agent 的开销。第二次运行中，我们克隆了一个仓库，并从任务里调用了模型。我们还运行了示例 agent 镜像，并在任务运行时删除了一个 worker。模型是 CPU 上的一个小型开源模型，下面各节会说明哪个数字包含了模型时间。
 
-## What we ran
+## 我们运行了什么 {#s-agent-executor-what-we-ran}
 
-Agent Executor, short name AX, is an open-source orchestrator from Google for agent tasks. Its license is Apache-2.0. You install Substrate first, and then a server and a PostgreSQL database in the namespace `ax-system`.
+Agent Executor，简称 AX，是 Google 的开源 agent 任务编排器，许可证为 Apache-2.0。你先安装 Substrate，再在命名空间 `ax-system` 里安装一个服务器和一个 PostgreSQL 数据库。
 
-Three versions exist, and only one fits Substrate v1.0.0.
+它有三个版本，只有一个适配 Substrate v1.0.0。
 
-| Version | Substrate that its module file requires | In this manual |
+| 版本 | 它的模块文件要求的 Substrate | 在本手册中的情况 |
 |---|---|---|
-| release v0.3.1, 2026-09-25 | a Substrate commit from 2026-09-11, with Redis and a controller | installed on v1.0.0 and on v0.6.0, and no task started on either |
-| the baseline commit of the installation page | v0.6.0 | read only, because the head commit needs v1.0.0 |
-| commit `a72b8ca4`, 2026-11-11 | v1.0.0 | built and run |
+| release v0.3.1，2026-09-25 | 2026-09-11 的一个 Substrate 提交，带 Redis 和一个控制器 | 安装在 v1.0.0 和 v0.6.0 上，两者都没有启动任何任务 |
+| 安装页面的基线提交 | v0.6.0 | 只读，因为最新提交需要 v1.0.0 |
+| 提交 `a72b8ca4`，2026-11-11 | v1.0.0 | 已构建并运行 |
 
-The installation page at that commit still names the v0.6.0 baseline. Check the module file of the commit that you install, and not the page.
+该提交的安装页面仍然写着 v0.6.0 基线。请检查你所安装提交的模块文件，不要只看页面。
 
-**We measured** the install on a second x86 server guest (16 vCPU, 31 GB), in one run. The cluster had Substrate v1.0.0 from the release images, the Envoy dataplane, and gVisor. The command line tool built in 17 s. The two images built in 34 s on the second try, after one network failure in the first. PostgreSQL was ready after 23.9 s and the server after 7.0 s. At idle the server used 6.3 MB and its PostgreSQL used 30.3 MB.
+**我们测得**这次安装，环境是第二台 x86 服务器客户机（16 vCPU，31 GB），一次运行。集群使用发布镜像的 Substrate v1.0.0、Envoy 数据平面和 gVisor。命令行工具构建用了 17 秒。两个镜像在第二次尝试时用 34 秒构建完成，第一次因一次网络故障失败。PostgreSQL 在 23.9 秒后就绪，服务器在 7.0 秒后就绪。空闲时服务器占用 6.3 MB，它的 PostgreSQL 占用 30.3 MB。
 
-The first task then failed. The server identity had no grant in the Substrate access policy.
+随后第一个任务失败了。服务器身份在 Substrate 访问策略里没有授权。
 
 ```listing
-title: the first task before the Substrate grant
+title: Substrate 授权之前的第一个任务
 source: capture/lab/R-agent-executor/10-install/51-apply-before-grant.log
 lang: text
-note: The object fields between the error and the phase are cut.
+note: 错误与 phase 之间的对象字段已截去。
 ---
 Error: applying document 1: rpc error: code = Internal desc = provisioning task on substrate: ensuring atespace: creating atespace "default": rpc error: code = PermissionDenied desc = permission denied: principal "user:system%3Aserviceaccount%3Aax-system%3Aax-server" lacks "can_create_atespace" on "global:root"
 …
 Phase:        Failed
 ```
 
-The installation page tells you to add that grant, and it is right. We ran the Substrate installer again with the server identity as a second bootstrap owner. The same run added that identity to the ingress allowlist of the router. That step took 29.7 s. [Access policies](#s-access-policies) shows what a bootstrap owner is allowed to do. It is a wide grant.
+安装页面要求你添加这条授权，它是对的。我们把服务器身份作为第二个引导所有者，重新运行了 Substrate 安装器。同一次运行还把这个身份加进了 router 的入站允许列表。这一步用了 29.7 秒。[访问策略](#s-access-policies)说明了引导所有者可以做什么。这是一项范围很宽的授权。
 
-## How a task becomes an actor
+## 一个任务如何变成 actor {#s-agent-executor-how-a-task-becomes-an-actor}
 
-The pages call the four kinds resources in `ax.io/v1alpha1`. They are not Kubernetes resources. The cluster had no CRD for them. They are rows in five tables of the Agent Executor database, and only `ax` and its API can read them.
+页面把这四种对象称为 `ax.io/v1alpha1` 中的资源。它们不是 Kubernetes 资源，集群里没有它们的 CRD。它们是 Agent Executor 数据库五张表中的行，只有 `ax` 和它的 API 能读到。
 
 ```figure
 id: fig-7-5
 kind: flow
-title: what each Agent Executor object became on Agent Substrate
-claim: One task became one actor and one template with a files-only snapshot, and no object opened egress or chose a pool.
-caption: Read each row left to right. The left column is what you write, and the right column is what existed on Substrate after it. A rose arrow marks a row where nothing was done for you. From our run of commit a72b8ca4 on Substrate v1.0.0, in capture/lab/R-agent-executor.
+title: 每个 Agent Executor 对象在 Agent Substrate 上变成了什么
+claim: 一个任务变成一个 actor 和一个带仅文件快照的模板，没有任何对象开放出站或选择 worker 池。
+caption: 每一行从左往右读。左列是你写的东西，右列是在这之后 Substrate 上存在的东西。玫瑰色箭头标出没有替你做任何事的一行。来源：我们在 Substrate v1.0.0 上运行提交 a72b8ca4 的结果，位于 capture/lab/R-agent-executor。
 ```
 
-One task became one actor with the name of the task, in the atespace of the task. Each task also got its own ActorTemplate. Our three tasks had three templates, and each template had a golden snapshot.
+一个任务变成一个 actor，名字与任务相同，位于任务所在的 atespace。每个任务还会得到自己的 `ActorTemplate`。我们的三个任务有三个模板，每个模板都有一个黄金快照。
 
 ```listing
-title: the template that Agent Executor created for one task
+title: Agent Executor 为一个任务创建的模板
 source: capture/lab/R-agent-executor/30-concept-map/05-actor-template.yaml
 lang: yaml
-note: The task manifest in the environment, the metadata, and the status are cut.
+note: 环境中的任务清单、元数据和状态已截去。
 ---
 containers:
 - command:
@@ -83,28 +83,28 @@ volumes:
   name: workspace
 ```
 
-Read four facts from it.
+从中读出四个事实。
 
-- **A runner is process 1.** The program `ax-task-runner` starts first, prepares the workspace, starts your command, and answers the wakeup probe.
-- **The snapshot is files-only.** One durable directory is kept, at `/workspace`.
-- **The defaults are small.** A task with no limits got 1 CPU and 512 MiB.
-- **The template names no pool.** It has no worker selector.
+- **runner 是 1 号进程。** 程序 `ax-task-runner` 最先启动，它准备工作区，启动你的命令，并应答唤醒探测。
+- **快照是仅文件的。** 只保留一个持久目录，位于 `/workspace`。
+- **默认值很小。** 没有设置限制的任务得到 1 个 CPU 和 512 MiB。
+- **模板没有指定 worker 池。** 它没有 worker 选择器。
 
-The last fact had an effect in our first run. We created a WorkerPool of two workers for Agent Executor. No task used it. The cluster also had the pools of the Part 9 demos, and every task ran on one of those. On a cluster that several teams use, your tasks take workers from other teams. [Placement](#s-placement) shows how a selector prevents that, and Agent Executor sets none.
+最后一个事实在我们的第一次运行里产生了影响。我们为 Agent Executor 创建了一个有两个 worker 的 `WorkerPool`，没有任何任务用到它。集群里还有第 9 部分示例的 worker 池，每个任务都跑在其中某个池上。在多个团队共用的集群里，你的任务会占用其他团队的 worker。[放置](#s-placement)说明了选择器如何避免这种情况，而 Agent Executor 一个选择器也不设置。
 
-## Who sends the suspend
+## 谁来发出挂起 {#s-agent-executor-who-sends-the-suspend}
 
-You do. A new task starts in the phase `Suspended`. The command `ax resume task` starts it, and `ax suspend task` checkpoints it.
+你来发。新任务从 `Suspended` 阶段开始。命令 `ax resume task` 启动它，`ax suspend task` 为它生成检查点。
 
-**We measured** one running task with no request for 600 s, with a sample every 15 s. All 40 samples showed `ACTOR_STATE_RUNNING`. Agent Executor did not suspend the task, and Substrate did not. So our first position holds here too. The roadmap of the project lists an automatic suspend as future work.
+**我们测得**一个运行中的任务在 600 秒内没有任何请求，每 15 秒采样一次。40 个样本全部显示 `ACTOR_STATE_RUNNING`。Agent Executor 没有挂起这个任务，Substrate 也没有。所以我们的第一个判断在这里同样成立。项目路线图把自动挂起列为未来工作。
 
-A suspend keeps only the files in `/workspace`. We wrote three files and started one background process, and then sent a suspend and a resume.
+挂起只保留 `/workspace` 中的文件。我们写了三个文件并启动了一个后台进程，然后发出挂起和恢复。
 
 ```listing
-title: the sandbox after one suspend and one resume
+title: 一次挂起和一次恢复之后的沙箱
 source: capture/lab/R-agent-executor/40-lifecycle/25-survive-after.txt
 lang: text
-note: The directory entries and the processes of the check itself are cut.
+note: 目录条目和检查命令自身的进程已截去。
 ---
 ls: cannot access '/tmp/scratch.txt': No such file or directory
 ls: cannot access '/root-marker.txt': No such file or directory
@@ -116,57 +116,57 @@ note-from-run-1
 …
 ```
 
-The file in `/workspace` came back. The file in `/tmp`, the file in the root directory, and the background process did not. The runner and the command had an age of 0 s. Each resume is a new start of your command.
+`/workspace` 中的文件回来了。`/tmp` 中的文件、根目录中的文件和后台进程都没有回来。runner 和命令的运行时长都是 0 秒。每次恢复都是你的命令的一次全新启动。
 
-Agent Executor also uses the asynchronous suspend. The snapshot of the last suspend stayed `PENDING` for about 5 minutes. [Snapshot fidelity, and where a snapshot lives](#s-snapshot-fidelity-and-where-a-snapshot-lives) shows what a node loss costs in that window.
+Agent Executor 同样使用异步挂起。最后一次挂起的快照有大约 5 分钟一直是 `PENDING`。[快照保真度与快照的存放位置](#s-snapshot-fidelity-and-where-a-snapshot-lives)说明了在这个窗口内丢失节点要付出什么代价。
 
-**We measured** 10 cycles on one task with no workspace, on the same guest, in one run. All 40 commands returned 0.
+**我们测得**一个没有工作区的任务的 10 个周期，环境是同一台客户机，一次运行。全部 40 条命令都返回 0。
 
-| Command | Runs | Seconds at the client |
+| 命令 | 运行次数 | 客户端耗时（秒） |
 |---|---|---|
-| `ax suspend task` | 10 | median 0.178, from 0.163 to 0.220 |
-| `ax resume task` | 10 | median 0.244, from 0.223 to 0.334 |
-| one command through `ax ssh` | 10 | median 0.738, from 0.728 to 0.753 |
-| `ax describe task` | 10 | median 0.035 |
-| `ax delete task` | 2 | 0.197 and 0.206 |
-| first `ax resume task`, no workspace | 2 | 4.5 after the install, then 2.289 |
-| first `ax resume task`, clone with no egress rule | 1 | 12.350, which is five tries of the runner |
+| `ax suspend task` | 10 | 中位数 0.178，范围 0.163 到 0.220 |
+| `ax resume task` | 10 | 中位数 0.244，范围 0.223 到 0.334 |
+| 通过 `ax ssh` 运行一条命令 | 10 | 中位数 0.738，范围 0.728 到 0.753 |
+| `ax describe task` | 10 | 中位数 0.035 |
+| `ax delete task` | 2 | 0.197 和 0.206 |
+| 第一次 `ax resume task`，无工作区 | 2 | 安装后为 4.5，随后为 2.289 |
+| 第一次 `ax resume task`，克隆且无出站规则 | 1 | 12.350，即 runner 的五次尝试 |
 
 ```figure
 id: fig-7-5b
 kind: chart
-title: the cost of each Agent Executor command, and of a resume that prepares a workspace
-claim: A resume of a prepared task took about 0.24 s, and a resume whose clone failed took more than 10 s because the runner tried five times.
-caption: On the left, each dot is one run of 10 cycles on one task, and the black line is the median. On the right, each bar is the time of ax resume task for one state of the workspace. The grey line under it gives the number of runs. The command of every task was sleep infinity. A real agent image adds its own start time to each resume. From capture/lab/summary/agent-executor-x86.json and capture/lab/summary/agent-executor-followups-x86.json.
+title: 每条 Agent Executor 命令的开销，以及准备工作区的恢复的开销
+claim: 已准备好的任务恢复约需 0.24 秒，而克隆失败的恢复超过 10 秒，因为 runner 尝试了五次。
+caption: 左侧每个点是对一个任务做 10 个周期的一次运行，黑线是中位数。右侧每根柱子是工作区处于某种状态时 ax resume task 的耗时，下方的灰线给出运行次数。每个任务的命令都是 sleep infinity。真实的 agent 镜像会在每次恢复上加上它自己的启动时间。来源：capture/lab/summary/agent-executor-x86.json、capture/lab/summary/agent-executor-followups-x86.json。
 ```
 
-The resume returned in 0.24 s because `sleep` starts at once. Your number is the start time of your image. The Python agent of [A stateful agent actor](#s-a-stateful-agent-actor) took 4.5 to 5.1 s for the same kind of start.
+恢复在 0.24 秒内返回，是因为 `sleep` 立即启动。你的数字取决于你的镜像的启动时间。[有状态 agent actor](#s-a-stateful-agent-actor) 里的 Python agent 在同类启动上用了 4.5 到 5.1 秒。
 
-## Where the pages and the run disagree
+## 文档页面与运行结果不一致之处 {#s-agent-executor-where-the-pages-and-the-run-disagree}
 
-### A workspace clones only with a rule that you set
+### 工作区只有在你设置规则后才能克隆 {#s-agent-executor-a-workspace-clones-only-with-a-rule-that-you-set}
 
-A task with no gateway has no external network access. The manifest page says so, and our run confirmed it. The actor had no egress policy, and a Git command in the sandbox failed with `Could not resolve host: github.com`. [EgressPolicy and default deny](#s-egresspolicy-and-default-deny) explains that result.
+没有网关的任务没有外部网络访问。清单页面这样说，我们的运行也证实了。这个 actor 没有出站策略，沙箱里的 Git 命令以 `Could not resolve host: github.com` 失败。[EgressPolicy 与默认拒绝](#s-egresspolicy-and-default-deny)解释了这个结果。
 
-A `Gateway` is the documented way to open egress. We applied one, and Agent Executor stored it. A task that named it was rejected.
+`Gateway` 是文档中开放出站的方式。我们应用了一个，Agent Executor 也存下了它。但引用它的任务被拒绝了。
 
 ```listing
-title: a task that names a gateway
+title: 引用网关的任务
 source: capture/lab/R-agent-executor/60-gateway-model/05-apply-task-with-gateway.log
 lang: text
 ---
 Error: applying document 1: rpc error: code = Unimplemented desc = spec.gateway is not supported yet
 ```
 
-The manifest page says that this binding is not available yet, so the rejection is expected. The effect is larger than the page suggests. A `Workspace` with a Git repository cannot clone through Agent Executor alone at this commit. No Agent Executor object can open the route to the Git host.
+清单页面说这个绑定尚不可用，所以被拒绝在预期之内。但影响比页面暗示的更大。在这个提交上，带 Git 仓库的 `Workspace` 单靠 Agent Executor 无法克隆。没有任何 Agent Executor 对象能打开通往 Git 主机的路由。
 
-Agent Executor also did not report the failed clone.
+Agent Executor 也没有报告克隆失败。
 
 ```listing
-title: the task after five failed attempts to clone
+title: 克隆失败五次之后的任务
 source: capture/lab/R-agent-executor/70-workspace/08-describe-after-resume.log
 lang: text
-note: The first lines of the description are cut.
+note: 描述开头的几行已截去。
 ---
 …
 Workspace:    ax-ws  path=/workspace
@@ -178,19 +178,19 @@ Conditions:
   Ready           True    TaskRunning    Task is running and its workspace is ready
 ```
 
-**We measured** this on one task with one repository, in one run. The inline file of the workspace was written. The repository directory held an empty `.git` folder. The runner tried the clone 5 times, and the first resume took 12.350 s. The second resume tried again and took 10.367 s. Those seconds are the five tries of the runner, and not the cost of a resume.
+**我们测得**这一点，对象是一个带一个仓库的任务，一次运行。工作区的内联文件已经写入。仓库目录里只有一个空的 `.git` 文件夹。runner 尝试克隆 5 次，第一次恢复用了 12.350 秒。第二次恢复再次尝试，用了 10.367 秒。这些秒数是 runner 的五次尝试，不是一次恢复的开销。
 
-The error was in the actor log and in the file `/ax/git-error.log` in the sandbox. Read that file before you trust the condition `WorkspaceReady`.
+错误出现在 actor 日志里，也出现在沙箱的文件 `/ax/git-error.log` 里。在相信条件 `WorkspaceReady` 之前，先读那个文件。
 
-You can open the route yourself, with `kubectl ate` and not with `ax`. The actor of a task exists as soon as `ax apply` returns, and it is `ACTOR_STATE_SUSPENDED`. So you can create its egress policy before the first resume. The kind of rule decides the result.
+你可以自己打开这条路由，用 `kubectl ate`，不用 `ax`。任务的 actor 在 `ax apply` 返回后就已经存在，处于 `ACTOR_STATE_SUSPENDED`。所以你可以在第一次恢复之前创建它的出站策略。规则的种类决定结果。
 
-An `https` rule for the Git host did not work. That rule lets the egress gateway intercept TLS, as [TLS interception](#s-tls-interception) explains. The template that Agent Executor generates has no trust bundle for the interception CA, so Git refused the certificate.
+针对 Git 主机的 `https` 规则不起作用。这种规则让出站网关拦截 TLS，[TLS 拦截](#s-tls-interception)对此有说明。Agent Executor 生成的模板没有拦截 CA 的信任包，所以 Git 拒绝了证书。
 
 ```listing
-title: the clone behind an https rule
+title: https 规则之下的克隆
 source: capture/lab/S-ax-model/30-ax-clone/10-ssh-clone-state.log
 lang: text
-note: The directory entries above the error are cut, and one line of Git output inside it.
+note: 错误之上的目录条目已截去，其中一行 Git 输出也已截去。
 ---
 …
 error: git fetch: exit status 128
@@ -198,23 +198,23 @@ error: git fetch: exit status 128
 fatal: unable to access 'https://github.com/pallets/itsdangerous.git/': server verification failed: certificate signer not trusted. (CAfile: /etc/ssl/certs/ca-certificates.crt CRLfile: none)
 ```
 
-A `tlsPassthrough` rule worked, and it needs a port. An update with host names only was refused.
+`tlsPassthrough` 规则可以工作，而且它需要指定端口。只填主机名的更新被拒绝了。
 
 ```listing
-title: a tlsPassthrough rule with no port
+title: 没有端口的 tlsPassthrough 规则
 source: capture/lab/S-ax-model/30-ax-clone/41-update-egress.log
 lang: text
-note: The CLI warning above the error is cut.
+note: 错误之上的 CLI 警告已截去。
 ---
 …
 Error: failed to update egress policy for actor "s-clone" in atespace "default": rpc error: code = InvalidArgument desc = egress_policy.rules[0].tls_passthrough.ports: Required value
 ```
 
 ```listing
-title: the rule that let the workspace clone
+title: 让工作区得以克隆的规则
 source: capture/lab/S-ax-model/30-ax-clone/62-egress-now.log
 lang: yaml
-note: The CLI warning and the metadata above the rules are cut.
+note: CLI 警告和规则之上的元数据已截去。
 ---
 …
 rules:
@@ -226,48 +226,48 @@ rules:
       - 443
 ```
 
-**We measured** this on the same second x86 server guest (16 vCPU, 31 GB), on one task with one small public repository. With the `https` rule, `ax resume task` took a median of 11.62 s over 14 resumes, from 10.69 to 17.21 s, and every clone failed. With the `tlsPassthrough` rule, the resume that cloned took 9.57 s, in one run. The next 5 resumes took a median of 0.265 s, and each one found the same commit in the checkout.
+**我们测得**这一点，环境是同一台第二台 x86 服务器客户机（16 vCPU，31 GB），测试对象是一个带有一个小型公共仓库的任务。使用 `https` 规则时，在 14 次恢复中，`ax resume task` 的耗时中位数为 11.62 秒，范围 10.69 到 17.21 秒，每次克隆都失败。使用 `tlsPassthrough` 规则时，执行克隆的那次恢复用了 9.57 秒，一次运行。接下来的 5 次恢复耗时中位数为 0.265 秒，每次都在检出目录中找到了相同的提交。
 
-We ran this a second time in a later run, on a new task with the rule set before the first resume. The resume that cloned took 5.47 s. The next 5 resumes took a median of 0.268 s, with the same commit each time. So the resume that clones has two values, 5.47 and 9.57 s. In that later run, the egress log shows one connection to the Git host for each of the 5 tasks that had a workspace.
+在后来的一次运行中，我们又测了一次，对象是一个在首次恢复前就设置好规则的新任务。执行克隆的那次恢复用了 5.47 秒。接下来的 5 次恢复耗时中位数为 0.268 秒，每次也都找到了相同的提交。所以执行克隆的恢复有两个数值：5.47 秒与 9.57 秒。在后一次运行中，出站日志显示 5 个带有工作区的任务各自对 Git 主机建立了一次连接。
 
-A pass-through rule gives up what an intercepted rule gives you. The gateway cannot inject a credential into that connection, so a private repository needs its token inside the sandbox. [Credential injection](#s-credential-injection) explains the difference.
+透传规则放弃了拦截规则所带来的好处。网关无法向该连接注入凭据，所以私有仓库需要把 token 放在沙箱内部。[凭据注入](#s-credential-injection)解释了这种区别。
 
-### The route on port 80 does not exist
+### 80 端口上的路由并不存在 {#s-agent-executor-the-route-on-port-80-does-not-exist}
 
-The networking page reaches a task with plain HTTP on port 80 of the router Service. Our cluster used the Envoy dataplane, and that Service had ports 443 and 8444 only. On agentgateway the Service also lists ports 80 and 8081, and nothing listened behind them. [The router and ingress](#s-the-router-and-ingress) has the ports of each dataplane.
+网络页面通过 router Service 的 80 端口以普通 HTTP 访问任务。我们的集群使用 Envoy 数据平面，该 Service 只有 443 和 8444 两个端口。在 agentgateway 上，该 Service 虽然列出了 80 和 8081 端口，但背后没有任何进程监听。[router 与入站](#s-the-router-and-ingress)列出了每个数据平面的端口。
 
 ```listing
-title: the port-forward command of the networking page
+title: 网络页面的端口转发命令
 source: capture/lab/R-agent-executor/80-networking/03-port-forward-80.log
 lang: text
-note: The line of the curl command that followed is cut.
+note: 其后的 curl 命令一行已截去。
 ---
 error: Service atenet-router does not have a service port 80
 …
 ```
 
-A request from a pod in the cluster to port 80 timed out after 8 s. The command `ax ssh` worked, because it does not use that route. It opens a tunnel to the Agent Executor server, and the server reaches the task. A task needs `debug: true` for that. Without it, `ax ssh` returned `does not expose guest services`.
+集群内 pod 向 80 端口发出的请求在 8 秒后超时。命令 `ax ssh` 可以工作，因为它不走这条路由。它打开一条通往 Agent Executor 服务器的隧道，再由服务器访问任务。为此任务需要设置 `debug: true`。没有这项设置时，`ax ssh` 返回 `does not expose guest services`。
 
-### Three smaller differences
+### 三处较小的差异 {#s-agent-executor-three-smaller-differences}
 
-| The pages say | Our run showed |
+| 页面所写 | 我们的运行表明 |
 |---|---|
-| without a WorkerPool, the first resume fails with `ResourceExhausted` | the task ran on a pool of another namespace, and our pool stayed empty |
-| a task that binds a missing workspace is rejected | confirmed, with `FailedPrecondition`. A delete of a workspace that a task still used was accepted |
-| a `Model` refers to a Kubernetes Secret with the key | a `Model` that named a Secret that did not exist was accepted. No field of a task names a `Model` |
+| 没有 WorkerPool 时，首次恢复以 `ResourceExhausted` 失败 | 任务跑在另一个命名空间的 worker 池上，我们的池保持为空 |
+| 绑定不存在的工作区的任务会被拒绝 | 证实，错误为 `FailedPrecondition`。删除仍被任务使用的工作区却被接受了 |
+| `Model` 引用带有密钥的 Kubernetes Secret | 引用不存在的 Secret 的 `Model` 被接受了。任务没有任何字段引用 `Model` |
 
-After a delete, the actor and the template of the task were gone. The atespace `default` that Agent Executor created stayed.
+删除之后，任务对应的 actor 和模板都消失了。Agent Executor 创建的 atespace `default` 则保留了下来。
 
-## A model call from a task
+## 从任务中调用模型 {#s-agent-executor-a-model-call-from-a-task}
 
-A `Model` object is stored, and nothing uses it at this commit. We read the code. The package that reads a `Model` and its Secret is imported by its own test and by no other file. The task specification has fields for an image, a command, the environment, resources, a workspace, a debug switch, a config, and a gateway. It has no field that names a `Model`.
+`Model` 对象会被存下来，但在这个提交上没有任何代码使用它。我们读了源码。读取 `Model` 及其 Secret 的包只被它自己的测试导入，没有其他文件导入它。任务规范包含镜像、命令、环境、资源、工作区、调试开关、配置和网关等字段，但没有任何字段用来指明 `Model`。
 
-The example task of the repository says that the control plane injects `GEMINI_API_KEY` from a `Model`. We applied a `Model` with that key name and a task beside it. Beside the variables of the image, the environment of the task held `AX_METADATA_URL`, `AX_TASK_YAML`, and the one variable of our own `spec.env`. It held no `GEMINI_API_KEY`.
+仓库中的示例任务声称控制平面会从 `Model` 中注入 `GEMINI_API_KEY`。我们应用了一个带有该键名的 `Model`，并在旁边放了一个任务。除了镜像自带的变量，任务的环境变量里只有 `AX_METADATA_URL`、`AX_TASK_YAML` 以及我们自己写在 `spec.env` 里的一个变量。里面根本没有 `GEMINI_API_KEY`。
 
-A task can still call a model. The route is an egress rule on the actor, as for the clone. Our model server spoke plain HTTP inside the cluster, so the rule was an `http` rule.
+任务仍然可以调用模型。路由方式是在 actor 上配置一条出站规则，就像克隆时那样。我们的模型服务器在集群内部使用普通 HTTP，所以这条规则是 `http` 规则。
 
 ```listing
-title: the egress rule for the model server
+title: 模型服务器的出站规则
 source: capture/lab/S-ax-model/60-ax-model/07-egress.yaml
 lang: yaml
 ---
@@ -278,23 +278,23 @@ rules:
       numbers: [11434]
 ```
 
-The model was `qwen2.5:3b`, an open model of 1.9 GB, on the Ollama server 0.40.16 with 12 CPUs and no GPU. It produced 7.1 tokens per second at the median over 5 requests. That is a small model on slow hardware. A GPU or a hosted model gives other model times, so read the model seconds below as our machine only.
+模型是开源的 `qwen2.5:3b`，大小为 1.9 GB，运行在 12 个 CPU 且没有 GPU 的 Ollama 服务器 0.40.16 上。在 5 次请求中，生成速度中位数为每秒 7.1 个 token。这是慢硬件上的小模型。GPU 或托管模型会给出不同的模型耗时，所以请把下面的模型秒数仅视为我们这台机器的表现。
 
-**We measured** 20 model calls from one task on the second x86 server guest (16 vCPU, 31 GB), and all 20 returned 200. Ten calls went to the running task. Ten more were whole turns: `ax resume task`, one call, `ax suspend task`. A turn took 4.34 s at the median, from 4.03 to 5.90 s. The resume was 0.25 s of that and the suspend 0.15 s. The model call was 2.94 s for a reply of at most 80 tokens.
+**我们测得**从同一台第二台 x86 服务器客户机（16 vCPU，31 GB）上的一个任务发出的 20 次模型调用，20 次全部返回 200。其中 10 次调用发给运行中的任务。另外 10 次是完整的一轮：`ax resume task`、一次调用、`ax suspend task`。一轮耗时的中位数为 4.34 秒，范围 4.03 到 5.90 秒。其中恢复占 0.25 秒，挂起占 0.15 秒。对于最多 80 个 token 的回复，模型调用耗时 2.94 秒。
 
-So the platform cost of a turn was about 0.4 s here, as in the first run. Every other second was the model and the `ax ssh` round trip.
+所以在这里，一轮调用的平台开销约为 0.4 秒，与第一次运行一致。其余每秒耗时都在模型计算和 `ax ssh` 的往返上。
 
-## The example agent image
+## 示例 agent 镜像 {#s-agent-executor-the-example-agent-image}
 
-The repository has one agent example, Claude Code in a task image. Its documented setup needs a vendor key. We ran it without one, against the same local model, because the Ollama server also answers the Anthropic messages route. The task set the base URL of the agent to that server through `spec.env`, and an `http` rule on the actor opened the route.
+该仓库有一个 agent 示例：任务镜像中的 Claude Code。文档中的设置需要厂商密钥。我们在没有密钥的情况下运行了它，直接对接同一个本地模型，因为 Ollama 服务器也支持 Anthropic 的 messages 路由。任务通过 `spec.env` 把 agent 的基础 URL 指向该服务器，actor 上的 `http` 规则打开了该路由。
 
-**We measured** one run, on the second x86 server guest (16 vCPU, 31 GB). The image build took 50 s, and the image is 253 MB with Claude Code 2.1.322. The first `ax resume task` took 5.94 s. The agent command then ran for 31.7 s and sent two model requests, of 28.78 s and 1.32 s. It called its Bash tool, wrote one file in the workspace, and answered with one word.
+**我们测得**一次运行，环境是第二台 x86 服务器客户机（16 vCPU，31 GB）。镜像构建用了 50 秒，包含 Claude Code 2.1.322 的镜像大小为 253 MB。第一次 `ax resume task` 用了 5.94 秒。随后 agent 命令运行了 31.7 秒，发出了两次模型请求，分别耗时 28.78 秒和 1.32 秒。它调用了 Bash 工具，在工作区里写了一个文件，并用一个词作答。
 
 ```listing
-title: the workspace after the agent command ended
+title: agent 命令结束后的工作区
 source: capture/lab/S-ax-model/70-agent-image/21-workspace.log
 lang: text
-note: The directory entries above the file and the processes of the check itself are cut.
+note: 文件之上的目录条目和检查命令自身的进程已截去。
 ---
 …
 -rw-r--r-- 1 root root  15 Nov 12 16:41 agent-output.txt
@@ -304,25 +304,25 @@ agent-was-here
 …
 ```
 
-Read the process list. The agent command is gone, and the runner is still process 1. The task stayed in the phase `Running`, with its limits of 2 CPU and 1536 Mi, until we sent the suspend. A task that has finished its work does not end and does not suspend.
+请看进程列表。agent 命令已经退出，runner 仍是 1 号进程。任务一直处于 `Running` 阶段，带着 2 个 CPU 和 1536 Mi 的限制，直到我们发出挂起。完成工作的任务既不会自行结束，也不会自行挂起。
 
-A second run of the same task, in a later run, did not write the file. The model answered `Done` after one request of 18.03 s and did not call the tool. The agent command ended after 19.5 s, and the task again stayed in the phase `Running`. So 1 of 2 runs wrote the file. The difference is the model. Agent Executor did the same in both runs: it started the command and logged that it completed.
+在后来的一次运行中，同一个任务的第二次运行没有写入该文件。模型在一次 18.03 秒的请求后回答 `Done`，没有调用工具。agent 命令在 19.5 秒后结束，任务同样一直停在 `Running` 阶段。所以在两次运行中，有一次写了文件。差异来自模型。Agent Executor 在两次运行中的行为完全一致：它启动命令，并记录命令已完成。
 
-These two runs prove the path and nothing about the quality of an agent. Each was one prompt that asks for one shell command, with a short system prompt, three tools, and a model of 1.9 GB.
+这两次运行验证了通路，并不说明 agent 的优劣。每次都是一个要求执行一条 shell 命令的提示词，配合简短的系统提示词、三个工具以及一个 1.9 GB 的模型。
 
-## Skills and MCP servers of a workspace
+## 工作区的技能与 MCP 服务器 {#s-agent-executor-skills-and-mcp-servers-of-a-workspace}
 
-A Workspace has two more fields that an agent can use: `skills` and `mcp`. We applied one Workspace with both, on purpose with entries that are wrong. It named a skills path and a skills registry. It also named an MCP registry and four MCP servers. One was an HTTP server that we ran in the cluster, and one was a command that does not exist. One entry had a name only, and one had a name that was already used.
+工作区还有两个供 agent 使用的字段：`skills` 和 `mcp`。我们故意填入错误条目，应用了一个同时包含两者的工作区。它指定了一个技能路径和一个技能注册表。它还指定了一个 MCP 注册表和四个 MCP 服务器。其中一个是我们在集群中运行的 HTTP 服务器，一个是不存在的命令，一个条目只有名字，还有一个条目的名字已被使用。
 
-`ax apply` accepted all of it, and `ax get workspace` counted 4 MCP servers. Nothing is checked when you apply.
+`ax apply` 接受了所有内容，`ax get workspace` 统计出 4 个 MCP 服务器。在应用时没有任何校验。
 
-**Skills.** The skills path became an empty directory, and that is all.
+**技能。** 技能路径只变成了一个空目录，仅此而已。
 
 ```listing
-title: the skills path inside the task
+title: 任务内部的技能路径
 source: capture/lab/W-ax-kagent-2/30-ax-mcp-skills/18-inside.log
 lang: text
-note: The workspace listing above and the other checks below are cut.
+note: 上方的工作区列表和下方的其他检查已截去。
 ---
 …
 /.agents/skills:
@@ -332,62 +332,62 @@ drwxr-xr-x 1 root root 60 Nov 12 18:42 ..
 …
 ```
 
-The code agrees. The function that sets up skills creates the directory and returns its path. `ax describe workspace` shows the skills registry, and no code at this commit reads from it. If your agent needs skills, put them in the image or in the repository.
+代码印证了这一点。设置技能的函数创建该目录并返回其路径。`ax describe workspace` 显示了技能注册表，但在这个提交上没有任何代码读取它。如果你的 agent 需要技能，请把它们放进镜像或仓库中。
 
-**MCP servers.** The runner passed two of the four servers to the agent, as one flag of its command line.
+**MCP 服务器。** runner 把四个服务器中的两个作为命令行的一个参数传给了 agent。
 
 ```listing
-title: the MCP flag of the agent command
+title: agent 命令的 MCP 参数
 source: capture/lab/W-ax-kagent-2/30-ax-mcp-skills/15-claude-cmdline.txt
 lang: text
-note: The other flags and the prompt are cut.
+note: 其他参数和提示词已截去。
 ---
 …
 --mcp-config={"mcpServers":{"docs":{"type":"http","url":"http://lab-mcp.ax-system.svc.cluster.local:8080/mcp"},"missing-command":{"args":["--repo","/workspace"],"command":"no-such-mcp-binary","type":"stdio"}}}
 …
 ```
 
-The runner skipped the other two and logged one warning for each: `skipping MCP server with neither an endpoint nor a command`, and `skipping MCP server with a missing or duplicate name`. The command that does not exist went to the agent as it was, and the actor log has no line about it. The MCP registry entry reached nothing.
+runner 跳过了另外两个，并各自记录了一条警告：`skipping MCP server with neither an endpoint nor a command` 与 `skipping MCP server with a missing or duplicate name`。那个不存在的命令原样传给了 agent，actor 日志中没有相关记录。MCP 注册表条目没有影响任何东西。
 
-Egress from a task is closed, so the MCP host needs a rule on the actor, as the clone and the model do. Ours was an `http` rule for the Service name of the MCP server and its port.
+任务的出站是关闭的，所以 MCP 主机和克隆、模型一样，都需要在 actor 上配置规则。我们配置的是一条针对 MCP 服务器 Service 名称和端口的 `http` 规则。
 
-**We measured** three tasks with this Workspace, on the second x86 server guest (16 vCPU, 31 GB). In 3 of 3, the MCP server logged `initialize` and `tools/list` from the task. So the connection from the agent to a static HTTP MCP server works.
+**我们测得**带有此工作区的三个任务，环境是第二台 x86 服务器客户机（16 vCPU，31 GB）。在 3 个任务中，MCP 服务器都记录到了来自任务的 `initialize` 和 `tools/list`。所以 agent 到静态 HTTP MCP 服务器的连接是可以工作的。
 
-What the model did with the tool is a second result, and it is about the 3b model. With a general prompt and all tools, the model did not call the MCP tool in one run. Its first request took 130 s, and its answer was `.done`. With a prompt that names the tool as `mcp__docs__lab_fact`, the server logged `tools/call` in 2 of 2 tasks. The call came 19 s and 5 s after the agent command started. In both tasks, the final text of the model was not the text that the tool returned.
+模型如何使用该工具是第二个结果，这与 3b 模型本身有关。使用通用提示词和全部工具时，模型在一次运行中没有调用 MCP 工具。它的第一次请求用了 130 秒，回答是 `.done`。使用明确指定工具为 `mcp__docs__lab_fact` 的提示词时，服务器在 2 个任务中都记录到了 `tools/call`。调用发生在 agent 命令启动后的 19 秒和 5 秒。在这两个任务中，模型的最终文本都不是工具返回的内容。
 
-Three MCP runs are planned for the next edition. One uses a stdio server in the image, one a registry with listed servers, and one a server outside the cluster.
+下一版计划补充三次 MCP 运行：一次使用镜像内的 stdio 服务器，一次使用列出服务器的注册表，一次使用集群外的服务器。
 
-## The example with its own prompt and repository
+## 带有自身提示词和仓库的示例 {#s-agent-executor-the-example-with-its-own-prompt-and-repository}
 
-The example task of the repository clones a small Python library. Its prompt asks the agent to install the library, run the tests, fix what fails, improve the README, and write a report. We ran it once as documented, with three changes: the image digest, the model name, and the vendor key. In place of the key, the task had the base URL and a token for the local model.
+仓库的示例任务会克隆一个小型的 Python 库。其提示词让 agent 安装该库、运行测试、修复失败项、改进 README 并写一份报告。我们按照文档运行了一次，做了三处改动：镜像摘要、模型名称以及厂商密钥。任务用本地模型的基础 URL 和 token 替代了厂商密钥。
 
-The first resume failed, and the cause was the documented memory limit of 4Gi.
+第一次恢复失败了，原因在于文档中写的 4Gi 内存限制。
 
 ```listing
-title: the first resume of the example task
+title: 示例任务的首次恢复
 source: capture/lab/W-ax-kagent-2/40-ax-example/08-resume-4gi.log
 lang: text
 ---
 Error: resuming task: rpc error: code = Internal desc = resuming task on substrate: resuming actor: resuming actor default/claude-code: rpc error: code = ResourceExhausted desc = no worker has room for the actor
 ```
 
-The workers of our pool had 1984Mi each. An actor must fit on one worker, as [Sizing a pool](#s-sizing-a-pool) explains. So size the pool for the task before you apply it.
+我们 worker 池里的 worker 每个只有 1984Mi。一个 actor 必须能容纳在单个 worker 上，[确定 worker 池的规模](#s-sizing-a-pool)对此有说明。所以在应用任务之前，先根据任务调整 worker 池的大小。
 
-We then lowered the limit in the file and applied it again. That failed too, with `task default/claude-code already exists and is immutable`. A task cannot be changed. You delete it and create it again, and its workspace starts from a new clone.
+随后我们在文件里调低了限制并重新应用。这同样失败了，提示 `task default/claude-code already exists and is immutable`。任务不可修改。你必须删除它再重新创建，它的工作区会从全新克隆重新开始。
 
-**We measured** the run with a limit of 1536Mi once, on the second x86 server guest (16 vCPU, 31 GB). The first resume took 4.74 s and included the clone. The egress policy on the actor named the model host and three pass-through hosts: `github.com`, `pypi.org`, and `files.pythonhosted.org`. The egress log shows connections to all three.
+**我们测得**限制设为 1536Mi 的运行一次，环境是第二台 x86 服务器客户机（16 vCPU，31 GB）。首次恢复用了 4.74 秒，包含了克隆过程。actor 上的出站策略指明了模型主机和三个透传主机：`github.com`、`pypi.org` 和 `files.pythonhosted.org`。出站日志显示对这三者都建立了连接。
 
-The agent command ran for 302.7 s and sent 4 model requests, of 160.0, 40.7, 42.8, and 52.1 s. The report file was in the workspace 161 s after the resume. We looked every 16 s.
+agent 命令运行了 302.7 秒，发出了 4 次模型请求，分别耗时 160.0、40.7、42.8 和 52.1 秒。恢复后 161 秒，报告文件出现在工作区中。我们每 16 秒检查一次。
 
-Agent Executor did its part. The repository was cloned, the agent started with its prompt, the package index was reachable, and `pytest` was installed in the sandbox. The runner logged that the command completed. The task then stayed in the phase `Running`, as in the short runs.
+Agent Executor 尽到了它的职责。仓库克隆成功，agent 带着提示词启动，包索引可达，沙箱中安装了 `pytest`。runner 记录了命令已完成。随后任务一直停留在 `Running` 阶段，与简短运行时相同。
 
-The model did not do the work, and its report is false.
+模型没有完成工作，它的报告是伪造的。
 
 ```listing
-title: the report that the agent wrote
+title: agent 写入的报告
 source: capture/lab/W-ax-kagent-2/40-ax-example/22-inside.log
 lang: text
-note: The workspace listing above and the Git, tool, and process checks below are cut.
+note: 上方的工作区列表以及下方的 Git、工具和进程检查已截去。
 ---
 …
 ## Check
@@ -402,41 +402,41 @@ No further actions are needed.
 …
 ```
 
-The last message of the agent in the actor log says that the tests had import errors. It says that the agent would install two packages and try again. It did not. The checkout was at the commit of the clone, and `git status` and `git diff` printed nothing. No README was changed.
+actor 日志中 agent 的最后一条消息称测试存在导入错误，并称 agent 会安装两个包再试一次。但它并没有这样做。检出目录仍停留在克隆时的提交上，`git status` 和 `git diff` 没有输出任何内容，README 没有任何改动。
 
-This is a result about a model of 1.9 GB on CPU. It is not a result about Agent Executor. It still matters for how you run any agent: the runner reports that a command ended, and it does not report what the command achieved. Check the work, not the phase.
+这是关于 CPU 上 1.9 GB 模型的结果，不是关于 Agent Executor 的结果。但它对你运行任何 agent 都很重要：runner 报告命令已结束，并不报告命令达成了什么。请检查工作本身，不要只看阶段。
 
-One thing we did not explain. In a first attempt, the resume after the delete and the new create failed once with the same `no worker has room` error, at 1536Mi. A worker looked free seconds later. The second attempt, some minutes later, is the run above.
+有一点我们没有解释。在第一次尝试中，删除并新建之后的恢复在 1536Mi 下失败过一次，报同样的 `no worker has room` 错误。几秒后 worker 看起来就空闲了。几分钟后的第二次尝试就是上面记录的运行。
 
-## A worker that goes away under a task
+## 任务底层的 worker 消失 {#s-agent-executor-a-worker-that-goes-away-under-a-task}
 
-We deleted the worker pod that held a running task, in two runs. Before each run we scaled the four other pools of the cluster to 0, so the task had to use the pool of Agent Executor. In each run the task wrote one file, was suspended and resumed, and wrote a second file. Then the worker pod was deleted.
+在两次运行中，我们删除了承载运行中任务的 worker pod。每次运行前我们把集群中的另外四个池缩容到 0，所以任务必须使用 Agent Executor 的池。在每次运行中，任务写了一个文件，被挂起后恢复，又写了第二个文件。随后 worker pod 被删除。
 
 ```figure
 id: fig-7-5c
 kind: flow
-title: a worker pod deleted under a running task, with a young snapshot and with an uploaded one
-claim: The resume after a worker loss took 0.3 s in both runs, and it kept the saved file only when the snapshot had reached the object store.
-caption: Read each row left to right. The first box is the state of the durable snapshot of the last suspend when the worker pod was deleted. The last box is what the task found in its workspace after ax resume task. From capture/lab/summary/agent-executor-followups-x86.json.
+title: 运行中任务底层的 worker pod 被删除：快照刚生成与已上传两种情况
+claim: 丢失 worker 后的恢复在两次运行中都用了 0.3 秒，并且只有在快照已到达对象存储时才保留保存的文件。
+caption: 每一行从左往右读。第一个框是 worker pod 被删除时上次挂起的持久快照所处的状态。最后一个框是执行 ax resume task 后任务在工作区中找到的内容。来源：capture/lab/summary/agent-executor-followups-x86.json。
 ```
 
-| | Run 1 | Run 2 |
+| | 运行 1 | 运行 2 |
 |---|---|---|
-| Last `ax suspend task` before the loss | 8.7 s | 307 s |
-| Durable snapshot at the loss | `PENDING` | `COMPLETED`, 301 s after the suspend |
-| Actor after the loss | `CRASHED`, seen after 1.2 s | `CRASHED`, seen after 0.9 s |
-| With no command | `CRASHED` for the 41 s that we watched | `CRASHED` for the 300 s that we watched |
-| `ax resume task` | 0.30 s, `RUNNING` on another worker | 0.33 s, `RUNNING` on another worker |
-| File written before the last suspend | lost | kept |
-| File written after the last suspend | lost | lost |
+| 故障前最后一次 `ax suspend task` | 8.7 秒 | 307 秒 |
+| 故障发生时的持久快照 | `PENDING` | `COMPLETED`，挂起后 301 秒 |
+| 故障发生后的 actor | `CRASHED`，1.2 秒后观察到 | `CRASHED`，0.9 秒后观察到 |
+| 不执行命令时的状态 | 在观察的 41 秒内保持 `CRASHED` | 在观察的 300 秒内保持 `CRASHED` |
+| `ax resume task` | 0.30 秒，在另一个 worker 上变为 `RUNNING` | 0.33 秒，在另一个 worker 上变为 `RUNNING` |
+| 最后一次挂起前写入的文件 | 丢失 | 保留 |
+| 最后一次挂起后写入的文件 | 丢失 | 丢失 |
 
-**We measured** each run once, on the second x86 server guest (16 vCPU, 31 GB), with one kind node and a pool of two workers. Each task ran `sleep infinity`.
+**我们测得**每次运行各一次，环境是第二台 x86 服务器客户机（16 vCPU，31 GB），带有一个 kind 节点和一个包含两个 worker 的 worker 池。每个任务运行 `sleep infinity`。
 
 ```listing
-title: the task after its worker pod was deleted
+title: worker pod 被删除之后的任务
 source: capture/lab/S-ax-model/40-ax-worker-loss/23-describe-after-loss.log
 lang: text
-note: The name, the atespace, the actor, and the command are cut.
+note: 名称、atespace、actor 和命令已截去。
 ---
 …
 Phase:        Failed
@@ -447,121 +447,121 @@ Conditions:
   Ready           False   Failed         worker pod went away while hosting the actor
 ```
 
-Two results matter. The first is good. `ax resume task` was enough, in both runs. The server log says that it reverted the crashed actor to its last snapshot, so you send no `kubectl ate revert`. [CRASHED and RevertActor](#s-crashed-and-revertactor) shows the same failure on plain Substrate, where you send the revert.
+有两个结论很重要。第一个是好消息：在两次运行中，仅执行 `ax resume task` 就足够了。服务器日志表明它把崩溃的 actor 回退到了上一个快照，所以你无需发送 `kubectl ate revert`。[CRASHED 与 RevertActor](#s-crashed-and-revertactor) 展示了普通 Substrate 上的相同故障，在那里你需要主动发送回退。
 
-The second result is a loss. In run 1, the file that `ax suspend task` had saved was gone. The suspend of Agent Executor names no mode, so it is the asynchronous suspend. The snapshot stays on the worker for about 5 minutes before the upload. The worker was lost inside that window. [Snapshot fidelity, and where a snapshot lives](#s-snapshot-fidelity-and-where-a-snapshot-lives) measures that window on plain Substrate.
+第二个结论是损失。在运行 1 中，`ax suspend task` 保存的文件丢失了。Agent Executor 的挂起没有指定模式，所以是异步挂起。快照在 worker 上停留约 5 分钟后才上传。worker 恰好在这个窗口期内丢失了。[快照保真度与快照的存放位置](#s-snapshot-fidelity-and-where-a-snapshot-lives)在普通 Substrate 上测量了这个窗口。
 
-**Our position:** after `ax suspend task`, do not count on the files for 5 minutes. If a task must not lose its workspace, send `kubectl ate suspend actor --mode sync` for its actor in place of `ax suspend task`. We did not test that command on a task.
+**我们的判断：** 执行 `ax suspend task` 之后，5 分钟内不要指望文件已安全落盘。如果任务绝不能丢失工作区，请针对其 actor 发送 `kubectl ate suspend actor --mode sync`，不要用 `ax suspend task`。我们没有在任务上测试过该命令。
 
-### With a command open
+### 命令正在运行时 {#s-agent-executor-with-a-command-open}
 
-In the two runs above, no request was open when the worker pod went away. We ran two more, runs 3 and 4, with two `ax ssh` commands open. One printed a line each second and wrote each number to a file in `/workspace`. The other was a `sleep 120`. We deleted the worker pod 8 s after they started.
+在上面的两次运行中，worker pod 消失时没有任何打开的请求。我们又进行了两次运行（运行 3 和运行 4），当时有两个 `ax ssh` 命令正在运行。一个命令每秒打印一行并把每个数字写入 `/workspace` 下的文件，另一个是 `sleep 120`。在它们启动 8 秒后，我们删除了 worker pod。
 
 ```figure
 id: fig-7-5d
 kind: timeline
-title: an open ax ssh command when the worker pod is deleted
-claim: An open command ended with an error within 0.2 s of the delete, and nothing started it again.
-caption: Read each row left to right. Zero is the delete of the worker pod. A green mark is one line that the open command printed, and the rose mark is the moment the command ended with an error. The dashed line is the first sample that showed the actor as CRASHED. From capture/lab/summary/agent-executor-second-x86.json.
+title: worker pod 被删除时正在运行的 ax ssh 命令
+claim: 正在运行的命令在删除后 0.2 秒内报错退出，没有任何机制重新启动它。
+caption: 每一行从左往右读。0 点是 worker pod 被删除的时刻。绿色标记是打开的命令打印出的一行，玫瑰色标记是命令报错退出的时刻。虚线是首次观察到 actor 为 CRASHED 的采样点。来源：capture/lab/summary/agent-executor-second-x86.json。
 ```
 
-| | Run 3 | Run 4 |
+| | 运行 3 | 运行 4 |
 |---|---|---|
-| Last `ax suspend task` before the loss | 11.9 s | 329 s |
-| Durable snapshot of that suspend | `PENDING` | `COMPLETED` |
-| The command that printed lines | ended 0.17 s after the delete, exit code 1 | ended 0.16 s after the delete, exit code 1 |
-| The `sleep 120` command | ended at the same moment, with an error | ended at the same moment, with an error |
-| Actor after the loss | `CRASHED`, seen after 1.9 s | `CRASHED`, seen after 0.6 s |
-| `ax ssh` while the task was failed | refused | refused |
-| `ax resume task`, sent after 46 s | 0.28 s, `Running` | 0.53 s, `Running` |
-| Note written before the last suspend | lost | kept |
-| File written by the open command | lost | lost |
+| 故障前最后一次 `ax suspend task` | 11.9 秒 | 329 秒 |
+| 该次挂起的持久快照 | `PENDING` | `COMPLETED` |
+| 持续打印行的命令 | 删除后 0.17 秒结束，退出码 1 | 删除后 0.16 秒结束，退出码 1 |
+| `sleep 120` 命令 | 在同一时刻报错结束 | 在同一时刻报错结束 |
+| 故障发生后的 actor | `CRASHED`，1.9 秒后观察到 | `CRASHED`，0.6 秒后观察到 |
+| 任务处于 Failed 状态时的 `ax ssh` | 被拒绝 | 被拒绝 |
+| 46 秒后发出的 `ax resume task` | 0.28 秒，变为 `Running` | 0.53 秒，变为 `Running` |
+| 最后一次挂起前写入的记录 | 丢失 | 保留 |
+| 运行中的命令写入的文件 | 丢失 | 丢失 |
 
-**We measured** each run once, on the second x86 server guest (16 vCPU, 31 GB), with one kind node and a pool of two workers. The other four pools were scaled to 0 for the runs.
+**我们测得**每次运行各一次，环境是第二台 x86 服务器客户机（16 vCPU，31 GB），带有一个 kind 节点和一个包含两个 worker 的 worker 池。其他四个池在测试时缩容至 0。
 
-The command that printed lines ended with `server closed the stream without sending trailers`. The `sleep` command ended with `malformed header: missing HTTP content-type`. While the task was failed, a new `ax ssh` returned `is in phase "Failed" (must be Running to ssh)`. We did not record the exit code of the `sleep` command in a way that we trust.
+打印行的命令以 `server closed the stream without sending trailers` 结束。`sleep` 命令以 `malformed header: missing HTTP content-type` 结束。在任务处于失败状态时，新的 `ax ssh` 返回 `is in phase "Failed" (must be Running to ssh)`。我们没有以可信的方式记录下 `sleep` 命令的退出码。
 
-Nothing sends an open command again. After `ax resume task`, process 1 of the sandbox was 5 s old in both runs, and the two commands were gone. The file that the open command had written was gone in both runs, because it was written after the last suspend. Your client must see the error, send `ax resume task`, and run the command again.
+没有任何机制会重新发送正在执行的命令。执行 `ax resume task` 后，两次运行中沙箱的 1 号进程启动时间都只有 5 秒，两个命令都不见了。运行中的命令所写的文件在两次运行中都丢失了，因为它们是在最后一次挂起之后写入的。你的客户端必须捕获错误，发送 `ax resume task`，并重新运行命令。
 
-These two runs repeat the first two results. A resume alone repaired the task, in 4 of 4 runs now. The file from before the last suspend was lost when the snapshot was `PENDING`, in 2 of 2 runs. It was kept when the snapshot was `COMPLETED`, in 2 of 2.
+这两次运行印证了前两个结论：现在 4 次运行中有 4 次单靠一次恢复就修复了任务。快照处于 `PENDING` 时最后一次挂起前的文件丢失，2 次中占 2 次。快照处于 `COMPLETED` 时文件得以保留，2 次中占 2 次。
 
-## The release v0.3.1 on Substrate v1.0.0
+## Substrate v1.0.0 上的发布版 v0.3.1 {#s-agent-executor-the-release-v0-3-1-on-substrate-v1-0-0}
 
-We installed the release v0.3.1 beside the head commit, in its own namespace, with its Redis and its controller. It is 61 commits behind the commit that we ran. No task started. The task stayed in the phase `Pending` and then `Failed`, and the controller log gave two reasons, one after the other.
+我们把发布版 v0.3.1 与最新提交并排安装，放在它自己的命名空间里，带上它的 Redis 和控制器。它落后我们运行的提交 61 个提交。没有任何任务能启动。任务先是停在 `Pending` 阶段，然后变成 `Failed`，控制器日志相继给出了两个原因。
 
-The first was a timeout to `ate-api-server`. A NetworkPolicy of Substrate v1.0.0 admits only namespaces with the label `ate.dev/api-access: "true"`, and the manifests of v0.3.1 do not set it. We added the label. The second reason then appeared.
+第一个原因是连接 `ate-api-server` 超时。Substrate v1.0.0 的 NetworkPolicy 只放行带有标签 `ate.dev/api-access: "true"` 的命名空间，而 v0.3.1 的清单没有打这个标签。我们加上了该标签，随后出现了第二个原因。
 
 ```listing
-title: the controller of release v0.3.1 after the namespace label
+title: 加上命名空间标签后发布版 v0.3.1 的控制器
 source: capture/lab/S-ax-model/50-ax-v031/92-controller-after-label.log
 lang: text
-note: The time, the event fields, and the start of the error are cut.
+note: 时间、事件字段和错误的开头已截去。
 ---
 … rpc error: code = Unimplemented desc = unknown service ateapi.Control"
 ```
 
-The release calls the gRPC service `ateapi.Control`. Substrate v1.0.0 serves `substrate.ateapi.v1.Control`. No setting bridges that. So the release list is not a guide to what runs on v1.0.0. Check the module file of the commit that you install.
+该发布版调用 gRPC 服务 `ateapi.Control`。Substrate v1.0.0 提供的服务是 `substrate.ateapi.v1.Control`。没有任何配置可以搭起这两者的桥梁。所以发布列表不能作为在 v1.0.0 上能跑什么的指南。请检查你所安装提交的模块文件。
 
-### The same release on Substrate v0.6.0
+### Substrate v0.6.0 上的同一个发布版 {#s-agent-executor-the-same-release-on-substrate-v0-6-0}
 
-Substrate v0.6.0 still serves `ateapi.Control`, and the commit that the release requires is older than v0.6.0. So we tried the release there, once, on a new cluster with v0.6.0 built from source. The namespace had the label. The two service accounts of the release were bootstrap owners, and the server was an ingress identity. Redis, the controller, and the server all ran.
+Substrate v0.6.0 仍提供 `ateapi.Control`，而且该发布版要求的提交比 v0.6.0 更早。所以我们在那里测试了一次该发布版，环境是一个从源码构建了 v0.6.0 的新集群。命名空间打了标签。发布版的两个服务账号是引导所有者，服务器是入站身份。Redis、控制器和服务器全部跑了起来。
 
-The task failed when the controller created its actor.
+当控制器创建其 actor 时，任务失败了。
 
 ```listing
-title: release v0.3.1 on Substrate v0.6.0
+title: Substrate v0.6.0 上的发布版 v0.3.1
 source: capture/lab/Y-reruns-rollback-scale/40-v060/40-ax031/53-describe.log
 lang: text
-note: The phase and the condition of the task.
+note: 任务的 phase 和 condition。
 ---
 Phase:        Failed
 …
 Ready  False   ActorCreationFailed  creating actor default/ax031-install-check: rpc error: code = InvalidArgument desc = [actor.actor_template.atespace: Required value, actor.actor_template.name: Required value]
 ```
 
-The controller log shows the step before it. The release first tried to create a template for the task, and v0.6.0 refused two fields that it did not know, `snapshot_config` and `resources`. The release then created the actor with no template, and v0.6.0 requires one. So the release fails on v0.6.0 too. A build of the Substrate commit that the release names is planned for the next edition.
+控制器日志显示了前一步。该发布版首先尝试为任务创建模板，而 v0.6.0 拒绝了两个它不认识的字段：`snapshot_config` 和 `resources`。发布版随后在没有模板的情况下创建 actor，而 v0.6.0 强制要求模板。所以该发布版在 v0.6.0 上同样失败。构建该发布版指明的 Substrate 提交计划在下一版补充。
 
-## Coming next
+## 后续内容 {#s-agent-executor-coming-next}
 
-These runs are planned for the next edition, with the rest of [Coming in the next edition](#s-next-edition).
+以下运行计划在下一版补充，连同[下一版将补充的内容](#s-next-edition)的其余部分：
 
-- **A model that can do real agent work.** Our model was small and on CPU, and its report on the example was false. A hosted model and a model on a GPU come next.
-- **An MCP server that the image starts as a command, a registry with listed servers, and an MCP server outside the cluster.**
-- **A node loss under a task.** The cluster had one node, so this needs a second one.
-- **A large or private repository.** The time of a first resume with a large clone is not measured.
-- **The release v0.3.1 on the Substrate commit that it names.** On v1.0.0 and on v0.6.0 it started no task.
+- **能够执行真正 agent 工作的模型。** 我们的模型很小且在 CPU 上运行，在示例上的报告是伪造的。托管模型和 GPU 上的模型将在后续测试。
+- **由镜像作为命令启动的 MCP 服务器、列出服务器的注册表，以及集群外部的 MCP 服务器。**
+- **任务底层发生节点丢失。** 集群只有一个节点，所以这需要第二个节点。
+- **大型或私有仓库。** 包含大型克隆的首次恢复耗时未测量。
+- **在它指明的 Substrate 提交上的发布版 v0.3.1。** 在 v1.0.0 和 v0.6.0 上它都没有启动任何任务。
 
-## Our position
+## 我们的判断 {#s-agent-executor-our-position}
 
-Agent Executor is early, and its pages say so. Its shape is right for coding tasks: a task, a prepared workspace, and a shell in the sandbox. Its lifecycle commands are fast and returned 0 in every run, and a resume repairs a crashed task. Three gaps decide the answer today. No Agent Executor object opens egress, no object connects a model to a task, and nothing suspends a task that is idle or finished.
+Agent Executor 仍处于早期阶段，它的文档也这样说明。它的形态很适合编码任务：一个任务、一个准备好的工作区，以及沙箱里的一个 shell。它的生命周期命令很快，在每次运行中都返回 0，而且一次恢复就能修复崩溃的任务。如今有三个差距决定了答案：没有 Agent Executor 对象能开放出站，没有对象能把模型连接到任务，也没有任何机制能挂起空闲或已完成的任务。
 
-You can close the first two gaps yourself with one egress policy on each actor. That works, and it is a second tool and a second place of truth beside `ax`. The same policy must name each MCP server of a workspace. A skills path gives the agent an empty directory.
+你可以通过在每个 actor 上配置一条出站策略来亲自弥补前两个差距。这行得通，但这成了 `ax` 之外的第二套工具和第二处真理来源。同一条策略必须指明工作区的每个 MCP 服务器。技能路径给 agent 的只是一个空目录。
 
-| | kagent 1.0 | Agent Executor at `a72b8ca4` |
+| | kagent 1.0 | 位于 `a72b8ca4` 的 Agent Executor |
 |---|---|---|
-| One actor is | one Session | one Task |
-| Who sends the suspend | kagent, after each turn | you, with `ax suspend task` |
-| Suspend mode | synchronous | asynchronous |
-| Snapshot fidelity | files-only | files-only |
-| Substrate that it uses | its own distribution, installed with it | the Substrate that you installed |
-| Egress through its own objects | three rules for each actor | closed, and the gateway binding is rejected |
-| A model for the agent | a ModelConfig, with the key injected by the gateway | a `Model` that no task can name |
-| Its own database | PostgreSQL | PostgreSQL |
-| A bound on a model call | `timeout` and `maxTokens` on the ModelConfig | none in Agent Executor, so set it in the agent or at the model server |
-| In this manual | run with a mock model and with a small model on CPU | run with no model, then with the same small model |
+| 一个 actor 对应 | 一个会话 | 一个任务 |
+| 谁来发出挂起 | kagent，每轮之后 | 你，使用 `ax suspend task` |
+| 挂起模式 | 同步 | 异步 |
+| 快照保真度 | 仅文件 | 仅文件 |
+| 所用 Substrate | 随它一起安装的自有发行版 | 你安装的 Substrate |
+| 通过自身对象出站 | 每个 actor 三条规则 | 关闭，网关绑定被拒绝 |
+| 为 agent 提供模型 | ModelConfig，由网关注入密钥 | 没有任何任务能引用的 `Model` |
+| 自身的数据库 | PostgreSQL | PostgreSQL |
+| 模型调用的限制 | ModelConfig 上的 `timeout` 与 `maxTokens` | Agent Executor 中没有，需在 agent 或模型服务器设置 |
+| 在本手册中 | 使用模拟模型和 CPU 上的小模型运行 | 不带模型运行，随后使用同一小模型运行 |
 
-If you need chat sessions on Substrate today, use kagent 1.0. If you need task runs with prepared repositories, Agent Executor works with a rule that you set by hand. It is better to wait for the gateway binding. Then repeat the tests of this section on the commit that you install.
+如果你今天需要在 Substrate 上使用对话会话，请用 kagent 1.0。如果你需要带有预备好仓库的任务运行，Agent Executor 在配合手动设置规则的情况下可以工作。最好等待网关绑定的完善，随后在你安装的提交上重复本节的测试。
 
 ```takeaways
-- Install the Agent Executor commit whose module file requires your Substrate version.
-- Add the server identity to the Substrate access policy and to the router allowlist before the first task.
-- Send the suspend yourself, also after a task has finished its work.
-- Set a `tlsPassthrough` rule with port 443 on the actor before the first resume of a task that clones.
-- Read `/ax/git-error.log` in the sandbox, because `WorkspaceReady` was true after a failed clone.
-- Wait 5 minutes after `ax suspend task` before you count on the saved files.
-- After a worker loss, send `ax resume task` and run the open command again.
-- Size the pool for the memory limit of the task, because a task cannot be changed.
-- Keep Agent Executor on a cluster of its own until its templates name a pool.
+- 安装模块文件要求你的 Substrate 版本的那个 Agent Executor 提交。
+- 在第一个任务之前，把服务器身份添加到 Substrate 访问策略和 router 允许列表中。
+- 自己发出挂起，在任务完成工作之后也需发出。
+- 在克隆任务首次恢复之前，在 actor 上配置带 443 端口的 tlsPassthrough 规则。
+- 检查沙箱中的 /ax/git-error.log，因为克隆失败后 WorkspaceReady 依然为 true。
+- 执行 ax suspend task 之后，等待 5 分钟再指望保存的文件已安全落盘。
+- worker 丢失后，执行 ax resume task 并重新运行打开的命令。
+- 根据任务的内存限制调整 worker 池的大小，因为任务一旦创建就不可修改。
+- 在模板能够指明 worker 池之前，把 Agent Executor 放在独立的集群中。
 ```
 
-Sources: capture/lab/summary/v060-x86.json; capture/lab/R-agent-executor/00-source/refs-and-pins.txt; capture/lab/R-agent-executor/10-install/steps.tsv, 20-make-images.FAILED-apk-fetch.log, 51-apply-before-grant.log, 61-substrate-after-grant.txt, 62-ax-pool.yaml; capture/lab/R-agent-executor/20-inventory/02-crds.txt, 06-idle-resources.txt, 07-postgres-tables.txt; capture/lab/R-agent-executor/30-concept-map/05-actor-template.yaml, 07-egress-policy.yaml, 10-actors.txt; capture/lab/R-agent-executor/40-lifecycle/11-state-changes.tsv, 20-survive-before.txt, 25-survive-after.txt, 30-cycles.tsv; capture/lab/R-agent-executor/50-idle/10-idle-watch.tsv; capture/lab/R-agent-executor/60-gateway-model/05-apply-task-with-gateway.log; capture/lab/R-agent-executor/70-workspace/steps.tsv, 08-describe-after-resume.log, 10-ssh-egress.log, 20-runner-log-lines.log, 21-ssh-clone-state.log; capture/lab/R-agent-executor/80-networking/01-router-service.txt, 02-in-cluster-curl-http.log, 03-port-forward-80.log, 04-tunnel-list.log; capture/lab/R-agent-executor/90-nodebug/05-ssh.log; capture/lab/R-agent-executor/98-model/05-get-describe.log; capture/lab/R-agent-executor/99-delete/steps.tsv, 02-templates-before.txt, 10-templates-after.txt, 12-atespaces-after.txt; capture/lab/summary/agent-executor-x86.json; capture/lab/summary/agent-executor-followups-x86.json; capture/lab/summary/agent-executor-second-x86.json; capture/lab/W-ax-kagent-2/20-ax-flight/05-pool-replicas-saved.txt, 42-pools-after.txt; capture/lab/W-ax-kagent-2/20-ax-flight/w-fl1 and w-fl2: steps.tsv, 12c-actor-suspended.yaml, 19-poll-changes.tsv, 20-inflight-stream.tsv, 20-inflight-stream.end, 20-inflight-stream.err, 20-inflight-sleep.end, 20-inflight-sleep.out, 21-events.tsv, 23-describe-after-loss.log, 25b-ssh-while-crashed.log, 28-files-after-resume.log; capture/lab/W-ax-kagent-2/30-ax-mcp-skills/04-workspace.yaml, 05-apply-workspace.log, 06-describe-workspace.log, 06b-get-workspace.log, 07-task.yaml, 08-egress.yaml, 15-claude-cmdline.txt, 16-actor.log, 18-inside.log, 20-mcp-server.log, 21-ollama-gin.log, steps.tsv; capture/lab/W-ax-kagent-2/31-ax-mcp-call/w-mcp2 and w-mcp3: 07-task.yaml, 16-actor.log, 20-mcp-server.log, 21-ollama-gin.log, steps.tsv; capture/lab/W-ax-kagent-2/40-ax-example/01-original.yaml, 02-diff-from-original.txt, 03-diff-memory.txt, 04-egress.yaml, 05-workers.txt, 08-resume-4gi.log, 10-apply-1536mi.log, 18-events.tsv, 19-poll.tsv, 20-actor.log, 21-describe.log, 22-inside.log, 24-ollama-gin.log, 26b-egress-hosts.log, steps.tsv; capture/lab/W-ax-kagent-2/40-ax-example-attempt1/steps.tsv, 16-resume-fresh.log; capture/lab/W-ax-kagent-2/50-ax-clone-2/steps.tsv, 02-egress.yaml, 10-cycles-after-clone.tsv; capture/lab/W-ax-kagent-2/51-ax-agent-image-2/steps.tsv, 11-task.yaml, 19-actor.log, 20-describe.log, 21-workspace.log, 22-ollama-gin.log; capture/lab/summary/kagent-model-x86.json (the model benchmark); capture/lab/S-ax-model/10-model/10-bench.tsv, 06-list.txt, 02-image.txt; capture/lab/S-ax-model/30-ax-clone/steps.tsv, 04-actor-after-apply.log, 10-ssh-clone-state.log, 12-actor-logs.log, 21-template-trust-grep.txt, 41-update-egress.log, 62-egress-now.log, 66-ssh-clone-state.log, 32-cycles-https-rule-no-trust.tsv, 49-cycles-https-rule-no-trust-2.tsv, 69-cycles-after-clone.tsv; capture/lab/S-ax-model/40-ax-worker-loss/steps.tsv, 05-pool-replicas-saved.txt, 16-actor-before.yaml, 19-poll-changes.tsv, 21-events.tsv, 23-describe-after-loss.log, 28-ssh-after-resume.log, 40-ax-server.log; capture/lab/S-ax-model/41-ax-worker-loss-durable/steps.tsv, 12c-durable-changes.tsv, 19-poll-changes.tsv, 21-events.tsv, 28-files-after-resume.log, 40-ax-server.log; capture/lab/S-ax-model/50-ax-v031/01-tag.txt, 02-gomod-v031.txt, 44-pods.txt, 85-controller-final.log, 86-ate-api-netpol.yaml, 92-controller-after-label.log, 93-describe.log, 12-proto-compare.txt; capture/lab/S-ax-model/60-ax-model/04-model-and-task.yaml, 07-egress.yaml, 10-env-in-task.log, 12-model-calls-running.tsv, 13-turns-resume-call-suspend.tsv; capture/lab/S-ax-model/70-agent-image/steps.tsv, 03-image.txt, 04-claude-version.txt, 07-anthropic-format-check.txt, 11-task.yaml, 19-actor.log, 20-describe.log, 21-workspace.log, 22-ollama.log; the Agent Executor repository github.com/google/ax at commit a72b8ca46cb54a6f9bd53c8bb349d3a2089e7735, read 2026-11-12: README.md, docs/installation.md, docs/manifests.md, docs/networking.md, docs/roadmap.md, go.mod, internal/server/server.go, internal/model/client.go and client_test.go, internal/workspace/setup.go (setupSkills), internal/server/server.go (the immutable task error), internal/substrate/client.go (SuspendActor), pkg/apis/v1alpha1/task.proto (TaskSpec), examples/claude-code/task.yaml, and its release list; capture/lab/summary/demos-x86.json.
+来源： capture/lab/summary/v060-x86.json; capture/lab/R-agent-executor/00-source/refs-and-pins.txt; capture/lab/R-agent-executor/10-install/steps.tsv, 20-make-images.FAILED-apk-fetch.log, 51-apply-before-grant.log, 61-substrate-after-grant.txt, 62-ax-pool.yaml; capture/lab/R-agent-executor/20-inventory/02-crds.txt, 06-idle-resources.txt, 07-postgres-tables.txt; capture/lab/R-agent-executor/30-concept-map/05-actor-template.yaml, 07-egress-policy.yaml, 10-actors.txt; capture/lab/R-agent-executor/40-lifecycle/11-state-changes.tsv, 20-survive-before.txt, 25-survive-after.txt, 30-cycles.tsv; capture/lab/R-agent-executor/50-idle/10-idle-watch.tsv; capture/lab/R-agent-executor/60-gateway-model/05-apply-task-with-gateway.log; capture/lab/R-agent-executor/70-workspace/steps.tsv, 08-describe-after-resume.log, 10-ssh-egress.log, 20-runner-log-lines.log, 21-ssh-clone-state.log; capture/lab/R-agent-executor/80-networking/01-router-service.txt, 02-in-cluster-curl-http.log, 03-port-forward-80.log, 04-tunnel-list.log; capture/lab/R-agent-executor/90-nodebug/05-ssh.log; capture/lab/R-agent-executor/98-model/05-get-describe.log; capture/lab/R-agent-executor/99-delete/steps.tsv, 02-templates-before.txt, 10-templates-after.txt, 12-atespaces-after.txt; capture/lab/summary/agent-executor-x86.json; capture/lab/summary/agent-executor-followups-x86.json; capture/lab/summary/agent-executor-second-x86.json; capture/lab/W-ax-kagent-2/20-ax-flight/05-pool-replicas-saved.txt, 42-pools-after.txt; capture/lab/W-ax-kagent-2/20-ax-flight/w-fl1 and w-fl2: steps.tsv, 12c-actor-suspended.yaml, 19-poll-changes.tsv, 20-inflight-stream.tsv, 20-inflight-stream.end, 20-inflight-stream.err, 20-inflight-sleep.end, 20-inflight-sleep.out, 21-events.tsv, 23-describe-after-loss.log, 25b-ssh-while-crashed.log, 28-files-after-resume.log; capture/lab/W-ax-kagent-2/30-ax-mcp-skills/04-workspace.yaml, 05-apply-workspace.log, 06-describe-workspace.log, 06b-get-workspace.log, 07-task.yaml, 08-egress.yaml, 15-claude-cmdline.txt, 16-actor.log, 18-inside.log, 20-mcp-server.log, 21-ollama-gin.log, steps.tsv; capture/lab/W-ax-kagent-2/31-ax-mcp-call/w-mcp2 and w-mcp3: 07-task.yaml, 16-actor.log, 20-mcp-server.log, 21-ollama-gin.log, steps.tsv; capture/lab/W-ax-kagent-2/40-ax-example/01-original.yaml, 02-diff-from-original.txt, 03-diff-memory.txt, 04-egress.yaml, 05-workers.txt, 08-resume-4gi.log, 10-apply-1536mi.log, 18-events.tsv, 19-poll.tsv, 20-actor.log, 21-describe.log, 22-inside.log, 24-ollama-gin.log, 26b-egress-hosts.log, steps.tsv; capture/lab/W-ax-kagent-2/40-ax-example-attempt1/steps.tsv, 16-resume-fresh.log; capture/lab/W-ax-kagent-2/50-ax-clone-2/steps.tsv, 02-egress.yaml, 10-cycles-after-clone.tsv; capture/lab/W-ax-kagent-2/51-ax-agent-image-2/steps.tsv, 11-task.yaml, 19-actor.log, 20-describe.log, 21-workspace.log, 22-ollama-gin.log; capture/lab/summary/kagent-model-x86.json (the model benchmark); capture/lab/S-ax-model/10-model/10-bench.tsv, 06-list.txt, 02-image.txt; capture/lab/S-ax-model/30-ax-clone/steps.tsv, 04-actor-after-apply.log, 10-ssh-clone-state.log, 12-actor-logs.log, 21-template-trust-grep.txt, 41-update-egress.log, 62-egress-now.log, 66-ssh-clone-state.log, 32-cycles-https-rule-no-trust.tsv, 49-cycles-https-rule-no-trust-2.tsv, 69-cycles-after-clone.tsv; capture/lab/S-ax-model/40-ax-worker-loss/steps.tsv, 05-pool-replicas-saved.txt, 16-actor-before.yaml, 19-poll-changes.tsv, 21-events.tsv, 23-describe-after-loss.log, 28-ssh-after-resume.log, 40-ax-server.log; capture/lab/S-ax-model/41-ax-worker-loss-durable/steps.tsv, 12c-durable-changes.tsv, 19-poll-changes.tsv, 21-events.tsv, 28-files-after-resume.log, 40-ax-server.log; capture/lab/S-ax-model/50-ax-v031/01-tag.txt, 02-gomod-v031.txt, 44-pods.txt, 85-controller-final.log, 86-ate-api-netpol.yaml, 92-controller-after-label.log, 93-describe.log, 12-proto-compare.txt; capture/lab/S-ax-model/60-ax-model/04-model-and-task.yaml, 07-egress.yaml, 10-env-in-task.log, 12-model-calls-running.tsv, 13-turns-resume-call-suspend.tsv; capture/lab/S-ax-model/70-agent-image/steps.tsv, 03-image.txt, 04-claude-version.txt, 07-anthropic-format-check.txt, 11-task.yaml, 19-actor.log, 20-describe.log, 21-workspace.log, 22-ollama.log; the Agent Executor repository github.com/google/ax at commit a72b8ca46cb54a6f9bd53c8bb349d3a2089e7735, read 2026-11-12: README.md, docs/installation.md, docs/manifests.md, docs/networking.md, docs/roadmap.md, go.mod, internal/server/server.go, internal/model/client.go and client_test.go, internal/workspace/setup.go (setupSkills), internal/server/server.go (the immutable task error), internal/substrate/client.go (SuspendActor), pkg/apis/v1alpha1/task.proto (TaskSpec), examples/claude-code/task.yaml, and its release list; capture/lab/summary/demos-x86.json.

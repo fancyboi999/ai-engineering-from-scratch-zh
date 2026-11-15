@@ -1,20 +1,20 @@
-# A stateful agent actor
+# 有状态 agent actor
 
-> An agent that writes each turn to a durable directory keeps its conversation under both snapshot fidelities, and the fidelity decides what else it keeps and how fast it returns.
+> 一个把每个轮次写入持久目录的 agent，在两种快照保真度下都能保留对话，而保真度决定了它还能保留什么以及返回有多快。
 
-You have an agent that talks to a model and keeps a conversation. You want to run one copy for each user, and you do not want to pay for a pod while the user reads the answer. The question that decides your design is simple. What does the agent still know after a suspend?
+你有一个与模型对话并保留对话记录的 agent。你想为每个用户运行一个副本，又不想在用户阅读回复时为 pod 付费。决定你设计的核心问题很简单：挂起之后，agent 到底还记得什么？
 
-When you finish this section, you can build an agent actor that keeps its conversation across a suspend. You can also choose a snapshot fidelity from a measured cost, and give the agent a model key that it never holds.
+读完本节，你能构建一个在经历挂起后仍能保留对话记录的 agent actor。你还能依据实测成本选择快照保真度，并为 agent 提供它从未直接持有的模型密钥。
 
-## The agent
+## agent {#s-a-stateful-agent-actor-the-agent}
 
-The demo agent is one Python file of 100 lines with no dependencies. It serves three paths, and it handles one chat turn at a time.
+示例 agent 是一个 100 行的 Python 文件，没有任何依赖。它提供三个路径，一次处理一个对话轮次。
 
-- `POST /chat` adds your message to the conversation, calls the model, and stores both messages.
-- `POST /note` keeps a text in a Python variable and in a file under `/tmp`. Nothing durable holds it.
-- `GET /history` returns the conversation and five facts about the state of the process.
+- `POST /chat` 把你的消息加入对话，调用模型，并存储这两条消息。
+- `POST /note` 把一段文本保存在一个 Python 变量以及 `/tmp` 下的一个文件中。没有任何持久化存储保存它。
+- `GET /history` 返回对话记录以及关于进程状态的五个事实。
 
-The agent keeps the conversation in two places. One is a list in process memory. The other is a SQLite file in `/data`, which the template mounts as a durable directory. When the process starts, it loads the list from the file.
+该 agent 将对话保存在两个地方。一处是进程内存中的一个列表。另一处是 `/data` 中的一个 SQLite 文件，模板将该位置挂载为持久目录。当进程启动时，它会从该文件加载这个列表。
 
 ```python
 def stored_turns():
@@ -27,25 +27,25 @@ memory = stored_turns()
 rehydrated = len(memory)
 ```
 
-That one load at the start is the whole design. A process that restarts with an empty memory reads its past from the durable directory. The full file is in [the stateful agent folder](manuals/agent-substrate-101/capture/demos/stateful-agent).
+启动时的那一次加载就是整个设计的核心。一个带着空内存重启的进程，会从持久目录中读出自己的过去。完整文件在[有状态 agent 目录](manuals/agent-substrate-101/capture/demos/stateful-agent)。
 
 ```figure
 id: fig-9-2
 kind: comparison
-title: what the agent holds after a suspend, under each fidelity
-claim: The conversation returned under both fidelities, and the note, the file under /tmp, and the process itself returned only under memory fidelity.
-caption: Read the two columns as the same agent after its first suspend. Green rows came back and rose rows did not. The values are from the two recorded sessions. From capture/lab/N-demos/stateful-agent/session-memory.tsv and session-volumes.tsv.
+title: 每次挂起后 agent 在各保真度下保留的内容
+claim: 在两种保真度下对话都得以恢复，而便签、/tmp 下的文件以及进程本身仅在内存保真度下得以保留。
+caption: 两列分别对应同一个 agent 在经历第一次挂起后的状态。绿色行表示恢复的内容，玫瑰色行表示丢失的内容。数值来自两次录制的会话。来源：capture/lab/N-demos/stateful-agent/session-memory.tsv、session-volumes.tsv。
 ```
 
-## The model key
+## 模型密钥 {#s-a-stateful-agent-actor-the-model-key}
 
-The agent sends the text `Bearer placeholder` in its `Authorization` header. It has no other key. The real key is a Kubernetes Secret in a namespace that the actor cannot read. The egress gateway replaces the header on the way out.
+agent 在其 `Authorization` 头中发送文本 `Bearer placeholder`。它没有其他密钥。真正的密钥是某个命名空间中的 Kubernetes Secret，而该 actor 无法读取该命名空间。出站网关在请求出站时替换该请求头。
 
 ```listing
-title: the egress policy of the agent actor, as the API stores it
+title: agent actor 的出站策略（API 存储的格式）
 source: capture/lab/N-demos/stateful-agent/egress-policy-memory-live.yaml
 lang: yaml
-note: The rules. The metadata lines above them are cut.
+note: 规则部分。上方的元数据行已省略。
 ---
 …
 rules:
@@ -62,17 +62,17 @@ rules:
       - 80
 ```
 
-The model in this demo is a mock server in the cluster, not a real model. It answers from the messages that it receives, and it reports which key arrived. In every one of the 16 model calls of our two sessions it reported the real key. [Credential injection](#s-credential-injection) explains the mechanism and its limits.
+本示例中的模型是集群内的一个模拟服务器，并非真实模型。它根据收到的消息作答，并报告收到了哪个密钥。在我们两个会话的全部 16 次模型调用中，它报告的都是真正的密钥。[凭据注入](#s-credential-injection)解释了该机制及其局限。
 
-## Two sessions, one for each fidelity
+## 两个会话，两种保真度各一 {#s-a-stateful-agent-actor-two-sessions-one-for-each-fidelity}
 
-We made the same template two times. One copy asks for `SNAPSHOT_FIDELITY_MEMORY` and the other for `SNAPSHOT_FIDELITY_VOLUMES`. Each session has two turns and a note, then three rounds of suspend, one turn, and one more turn.
+我们将同一个模板创建了两份。一份申请 `SNAPSHOT_FIDELITY_MEMORY`，另一份申请 `SNAPSHOT_FIDELITY_VOLUMES`。每个会话包含两个轮次和一个便签，随后是三轮挂起、一个轮次，再加一个轮次。
 
 ```listing
-title: the session under memory fidelity
+title: 内存保真度下的会话
 source: capture/lab/N-demos/stateful-agent/session-memory.tsv
 lang: text
-note: The header, the first three steps, and the two turns after the first suspend. The reply text is cut at the mark.
+note: 表头、前三个步骤，以及第一次挂起后的两个轮次。回复文本在标记处被截断。
 ---
 step	http	seconds	reply
 turn 1, new actor	200	0.584397	{"reply": "turn 1: you said 'my name is Ada'. Your first message was 'my name is Ada'. Gateway sent the real key.", "memory_turns": 2, "db_turns": 2, "rehydrated_from_db": 0, "note": null, "scratch_file": false, "proces …
@@ -82,13 +82,13 @@ turn 3, after suspend 1	200	0.297402	{"reply": "turn 3: you said 'message after 
 turn 3b, warm	200	0.101483	{"reply": "turn 4: you said 'warm message 1'. Your first message was 'my name is Ada'. Gateway sent the real key.", "memory_turns": 8, "db_turns": 8, "rehydrated_from_db": 0, "note": "remember the number 42", "scratch_file" …
 ```
 
-Under memory fidelity the agent is the same process after the suspend. The note is there, the file under `/tmp` is there, and `process_age_s` keeps growing. The agent loaded nothing from SQLite, because it never started again.
+在内存保真度下，挂起后的 agent 仍是同一个进程。便签还在，`/tmp` 下的文件还在，`process_age_s` 也一直在增长。agent 没有从 SQLite 加载任何内容，因为它根本没有重新启动。
 
 ```listing
-title: the session under volumes fidelity
+title: 卷保真度下的会话
 source: capture/lab/N-demos/stateful-agent/session-volumes.tsv
 lang: text
-note: The header, the first three steps, and the two turns after the first suspend. The reply text is cut at the mark.
+note: 表头、前三个步骤，以及第一次挂起后的两个轮次。回复文本在标记处被截断。
 ---
 step	http	seconds	reply
 turn 1, new actor	200	5.083124	{"reply": "turn 1: you said 'my name is Ada'. Your first message was 'my name is Ada'. Gateway sent the real key.", "memory_turns": 2, "db_turns": 2, "rehydrated_from_db": 0, "note": null, "scratch_file": false, "proces …
@@ -98,48 +98,48 @@ turn 3, after suspend 1	200	5.059144	{"reply": "turn 3: you said 'message after 
 turn 3b, warm	200	0.093130	{"reply": "turn 4: you said 'warm message 1'. Your first message was 'my name is Ada'. Gateway sent the real key.", "memory_turns": 8, "db_turns": 8, "rehydrated_from_db": 4, "note": null, "scratch_file": false, "process_ag …
 ```
 
-Under volumes fidelity the agent is a new process after each suspend. Its age is 0.3 seconds when it answers. The note and the file are gone. The conversation is complete, because the new process loaded four turns from SQLite. The model still received the first message of the session in each call.
+在卷保真度下，每次挂起后 agent 都是一个全新的进程。当它作答时，它的存活时间只有 0.3 秒。便签和文件都不见了。对话记录是完整的，因为新进程从 SQLite 加载了四个轮次。模型在每次调用中仍然收到了会话的第一条消息。
 
-## What each fidelity costs
+## 两种保真度各自的代价 {#s-a-stateful-agent-actor-what-each-fidelity-costs}
 
-**We measured** the time of each turn at the client, on a second x86 server guest (16 vCPU, 31 GB), through `kubectl ate proxy`. Each session has three turns that follow a suspend and four turns on a running actor. The mock model answers at once, so these times hold no model time.
+**我们测得**每个轮次在客户端的耗时，环境是第二台 x86 服务器客户机（16 vCPU、31 GB），经由 `kubectl ate proxy` 发起。每个会话有三个跟在挂起之后的轮次，以及四个在运行中 actor 上的轮次。模拟模型会立即应答，因此这些耗时不包含模型时间。
 
 ```figure
 id: fig-9-2b
 kind: chart
-title: the time of one turn, by fidelity and by the state of the actor
-claim: A turn that resumed the actor took 0.30 seconds under memory fidelity and 4.5 to 5.1 seconds under volumes fidelity.
-caption: Each dot is one turn. The left group is a turn on a running actor, and the right group is a turn that had to resume the actor first. From capture/lab/summary/demos-x86.json.
+title: 单个轮次的耗时（按保真度和 actor 状态区分）
+claim: 恢复 actor 的轮次在内存保真度下耗时 0.30 秒，在卷保真度下耗时 4.5 到 5.1 秒。
+caption: 每个圆点代表一个轮次。左侧一组是在运行中 actor 上的轮次，右侧一组是必须先恢复 actor 的轮次。来源：capture/lab/summary/demos-x86.json。
 ```
 
-| Turn | Memory fidelity | Volumes fidelity |
+| 轮次 | 内存保真度 | 卷保真度 |
 |---|---|---|
-| on a running actor | 0.09 to 0.11 s | 0.09 to 0.10 s |
-| after a suspend | 0.30 to 0.32 s | 4.49 to 5.06 s |
-| first turn of a new actor | 0.58 s | 5.08 s |
+| 在运行中的 actor 上 | 0.09 到 0.11 秒 | 0.09 到 0.10 秒 |
+| 挂起之后 | 0.30 到 0.32 秒 | 4.49 到 5.06 秒 |
+| 新 actor 的首个轮次 | 0.58 秒 | 5.08 秒 |
 
-The lifecycle log of the actor shows where the time goes. Under memory fidelity the restore took 0.15 to 0.17 seconds. Under volumes fidelity it took 4.3 to 4.8 seconds, because the sandbox boots the image and starts Python each time. We did not measure which part of that boot is the largest.
+actor 的生命周期日志揭示了时间花在哪里。在内存保真度下，恢复耗时 0.15 到 0.17 秒。在卷保真度下耗时 4.3 到 4.8 秒，因为沙箱每次都要引导镜像并启动 Python。我们没有测量该引导过程中哪一部分占比最大。
 
-This result differs from the kagent run in [kagent 1.0 on Substrate](#s-kagent-on-substrate), where a resume under volumes fidelity took 0.38 seconds. The kagent harness is a compiled program in another image. Your own image decides this number, so measure it before you choose.
+这个结果与 [Substrate 上的 kagent 1.0](#s-kagent-on-substrate) 中的 kagent 运行不同，后者在卷保真度下的恢复耗时为 0.38 秒。kagent harness 是另一个镜像中的已编译程序。你自己使用的镜像决定了这个数字，因此在选型前请务必实测。
 
-## Limits of the demo
+## 示例的局限 {#s-a-stateful-agent-actor-limits-of-the-demo}
 
-- The model is a mock. A real model adds its own time to each turn.
-- One actor ran in each session. We did not measure many agents that resume at the same time. [Sizing a pool](#s-sizing-a-pool) has bursts of up to 300 counter actors.
-- SQLite holds each turn after the model answers. A crash between the answer and the write loses that turn.
-- The agent has no authentication. Each caller that can reach the router can read the conversation.
+- 模型是模拟的。真实模型会给每个轮次增加它自己的耗时。
+- 每个会话只运行了一个 actor。我们没有测量多个 agent 同时恢复的情况。[为 pool 规划容量](#s-sizing-a-pool)中包含了多达 300 个计数器 actor 的并发突发。
+- SQLite 在模型作答之后保存每个轮次。若在作答与写入之间发生崩溃，将丢失该轮次。
+- agent 没有身份认证。能触达 router 的每个调用方都可以读取对话记录。
 
-## What to change for production
+## 上生产前要改什么 {#s-a-stateful-agent-actor-what-to-change-for-production}
 
-Keep the write to the durable directory even when you choose memory fidelity. A crashed actor returns to its last durable snapshot, and a revert can drop the newest memory. The durable directory is part of that snapshot, so the file goes back with it. A turn is safe only after the next synchronous suspend, or in a store outside the actor.
+即使选择内存保真度，也要保留写入持久目录的逻辑。崩溃的 actor 会退回它最近一次持久快照，而回退可能会丢弃最新的内存状态。持久目录是该快照的一部分，因此文件会随之一同回退。轮次只有在下一次同步挂起之后，或者保存在 actor 外部的存储中时，才是安全的。
 
-Choose memory fidelity when a user waits for the first answer after a pause, and your agent holds little memory. Choose volumes fidelity when the agent holds much memory or when you want a clean process after each suspend. For a clean process on every turn, the harness must suspend the actor between turns. Then make the image start fast.
+当用户在停顿后等待第一次回答，且你的 agent 占用的内存较小时，选择内存保真度。当 agent 占用大量内存，或者你希望在每次挂起后得到一个干净的进程时，选择卷保真度。若要每个轮次都有一个干净的进程，harness 必须在轮次之间挂起 actor。然后让镜像的启动尽可能变快。
 
 ```takeaways
-- Write each turn to a durable directory, and load it when the process starts.
-- Give the agent a placeholder key, and let the egress policy insert the real one.
-- Measure a resume with your own image under both fidelities before you choose one.
-- Treat process memory and files under /tmp as lost when you use volumes fidelity.
+- 把每个轮次写入持久目录，并在进程启动时加载它。
+- 给 agent 一个占位密钥，让出站策略注入真正的密钥。
+- 在选择之前，用你自己的镜像在两种保真度下分别测量恢复耗时。
+- 使用卷保真度时，把进程内存和 /tmp 下的文件视为会丢失的状态。
 ```
 
-Sources: capture/lab/N-demos/stateful-agent/session-memory.tsv, capture/lab/N-demos/stateful-agent/session-volumes.tsv, capture/lab/N-demos/stateful-agent/egress-policy-memory-live.yaml, capture/lab/N-demos/stateful-agent/lifecycle-memory.log, capture/lab/N-demos/stateful-agent/lifecycle-volumes.log, capture/lab/N-demos/stateful-agent/mock-llm.log, capture/lab/summary/demos-x86.json, capture/demos/stateful-agent/agent.py, capture/demos/stateful-agent/template.yaml
+来源：capture/lab/N-demos/stateful-agent/session-memory.tsv, capture/lab/N-demos/stateful-agent/session-volumes.tsv, capture/lab/N-demos/stateful-agent/egress-policy-memory-live.yaml, capture/lab/N-demos/stateful-agent/lifecycle-memory.log, capture/lab/N-demos/stateful-agent/lifecycle-volumes.log, capture/lab/N-demos/stateful-agent/mock-llm.log, capture/lab/summary/demos-x86.json, capture/demos/stateful-agent/agent.py, capture/demos/stateful-agent/template.yaml

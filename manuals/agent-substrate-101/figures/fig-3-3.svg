@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-3-3-title fig-3-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-3-3-title">Resume time against the memory an actor holds</title>
-  <desc id="fig-3-3-desc">Seconds for one request to a suspended actor against the MiB of random memory it holds, on the x86 server guest with gVisor. Every one of the 75 resumes is a small dot, and a line joins the medians. From the snapshot on the node the median is 0.22 s at 0 MiB, 0.24 s at 50 MiB, 0.47 s at 200 MiB, 1.07 s at 500 MiB, 2.16 s at 1000 MiB, with ten resumes for each size. One resume at 1000 MiB took 5.09 s and the other nine took at most 2.45 s. From the object store in the same cluster the median is 0.24 s at 0 MiB, 0.41 s at 50 MiB, 0.96 s at 200 MiB, 2.26 s at 500 MiB, 4.68 s at 1000 MiB, with five resumes for each size. A dashed line marks 0.5 s, which the node path passes above 200 MiB and the object store path above 50 MiB.</desc>
+  <title id="fig-3-3-title">恢复耗时与 actor 所持内存的关系</title>
+  <desc id="fig-3-3-desc">带 gVisor 的 x86 服务器客户机上，向已挂起 actor 发一次请求的耗时秒数与其所持随机内存 MiB 的关系。共 75 次恢复各绘为一个小点，实线连接中位数。从节点本地快照恢复的中位数为：0 MiB 为 0.22 s、50 MiB 为 0.24 s、200 MiB 为 0.47 s、500 MiB 为 1.07 s、1000 MiB 为 2.16 s（每种规格 10 次）；1000 MiB 下有一次耗时 5.09 s，其余 9 次至多 2.45 s。从同集群对象存储恢复的中位数为：0 MiB 为 0.24 s、50 MiB 为 0.41 s、200 MiB 为 0.96 s、500 MiB 为 2.26 s、1000 MiB 为 4.68 s（每种规格 5 次）。虚线标出 0.5 s：节点路径在 200 MiB 以上超过该线，对象存储路径在 50 MiB 以上超过该线。</desc>
   <line x1="46" y1="310" x2="486" y2="310" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="40" y="314" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="46" y1="265" x2="486" y2="265" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -27,8 +27,8 @@
   <text x="266" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">500</text>
   <line x1="486" y1="310" x2="486" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="486" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1000</text>
-  <text x="266" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">memory the actor holds, MiB</text>
-  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds from request to reply, at the client</text>
+  <text x="266" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 持有的内存，MiB</text>
+  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端从请求到回复的耗时，秒</text>
   <line x1="46" y1="287.5" x2="486" y2="287.5" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1" stroke-dasharray="5 4"/>
   <path d="M46.0 299.1 L68.0 291.4 L134.0 267.0 L266.0 208.5 L486.0 99.5" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.8" stroke-linejoin="round"/>
   <path d="M46.0 300.0 L68.0 299.3 L134.0 288.8 L266.0 261.9 L486.0 212.8" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.8" stroke-linejoin="round"/>
@@ -117,21 +117,21 @@
   <circle cx="482" cy="212.13" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="482" cy="208.48" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
   <circle cx="482" cy="199.75" r="1.9" fill="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="500" y="103.49" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">object store</text>
-  <text x="500" y="118.49" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">4.68 s median of 5</text>
-  <text x="500" y="216.8" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">node</text>
-  <text x="500" y="231.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2.16 s median of 10</text>
-  <text x="472" y="75.13" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">5.09 s, the first of 10 from the node</text>
-  <text x="336.4" y="201.5" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">about 4 ms per MiB</text>
-  <text x="354" y="280.25" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">about 2 ms per MiB</text>
+  <text x="500" y="103.49" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">对象存储</text>
+  <text x="500" y="118.49" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">4.68 s（5 次中位）</text>
+  <text x="500" y="216.8" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">节点本地</text>
+  <text x="500" y="231.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2.16 s（10 次中位）</text>
+  <text x="472" y="75.13" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">5.09 s，节点本地第 1/10 次</text>
+  <text x="336.4" y="201.5" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">约 4 ms / MiB</text>
+  <text x="354" y="280.25" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">约 2 ms / MiB</text>
   <text x="500" y="291.5" font-size="11.5" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">0.5 s</text>
-  <text x="500" y="306.5" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">what the project states</text>
+  <text x="500" y="306.5" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">项目宣称值</text>
   <circle cx="57.8" cy="54" r="1.9" fill="var(--m-ink-soft, #4a4a4a)"/>
-  <text x="66.8" y="58" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one resume</text>
-  <line x1="138.8" y1="54" x2="156.8" y2="54" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
-  <text x="162.8" y="58" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">median of one size</text>
+  <text x="66.8" y="58" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单次恢复</text>
+  <line x1="128.8" y1="54" x2="146.8" y2="54" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
+  <text x="152.8" y="58" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单一规格中位数</text>
   <polyline points="76.8,168 130,288.76" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="130" cy="288.76" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="54.8" y="147" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">under 0.5 s up to 200 MiB from the node</text>
-  <text x="54.8" y="161" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">and up to 50 MiB from the object store</text>
+  <text x="54.8" y="147" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">节点本地 200 MiB 内低于 0.5 s</text>
+  <text x="54.8" y="161" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">对象存储 50 MiB 内低于 0.5 s</text>
 </svg>

@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 364" role="img" aria-labelledby="fig-8-2f-title fig-8-2f-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-8-2f-title">Five drains of one worker node, request by request</title>
-  <desc id="fig-8-2f-desc">Five rows, one for each actor state at the moment of a kubectl drain. The two actors that were RUNNING failed every request after the drain until a revert that we sent, 46 of 62 and 16 of 30 requests. The three suspended actors returned 200 on their first request after the drain with no command, on the other node.</desc>
+  <title id="fig-8-2f-title">五次排空同一 worker 节点时的逐请求表现</title>
+  <desc id="fig-8-2f-desc">五行分别对应执行 kubectl drain 时处于不同状态的 actor。两个处于 RUNNING 状态的 actor 在排空后所有请求均失败（分别为 46/62 与 16/30），直至我们手动发送回退。三个处于挂起状态的 actor 无需任何命令，排空后首个请求即在另一节点上返回 200。</desc>
   <rect x="20" y="14" width="4" height="10" fill="var(--m-green-ink, #336b40)"/>
-  <text x="30" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">one request, 200</text>
+  <text x="30" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">单次请求，200</text>
   <rect x="150" y="14" width="4" height="10" fill="var(--m-rose-ink, #b0344d)"/>
-  <text x="160" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">one request, failed</text>
+  <text x="160" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">单次请求，失败</text>
   <line x1="298" y1="12" x2="298" y2="26" stroke="var(--m-ink, #1a1a1a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="306" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">the revert that we sent</text>
+  <text x="306" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">手动发送的回退</text>
   <rect x="470" y="14" width="12" height="10" fill="var(--m-grey-fill, #ecebe3)"/>
-  <text x="488" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">kubectl drain runs</text>
-  <text x="20" y="64" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">RUNNING,</text>
-  <text x="20" y="79" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one request each second</text>
+  <text x="488" y="23" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">kubectl drain 执行期</text>
+  <text x="20" y="64" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">RUNNING，</text>
+  <text x="20" y="79" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每秒 1 个请求</text>
   <line x1="188" y1="82" x2="460" y2="82" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1"/>
   <rect x="206.13" y="54" width="7.98" height="28" fill="var(--m-grey-fill, #ecebe3)"/>
   <rect x="206.08" y="58" width="3" height="14" fill="var(--m-rose-ink, #b0344d)"/>
@@ -64,18 +64,18 @@
   <rect x="452.33" y="58" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <rect x="457.05" y="58" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <line x1="441.14" y1="50" x2="441.14" y2="86" stroke="var(--m-ink, #1a1a1a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="472" y="64" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">46 of 62 failed</text>
-  <text x="472" y="79" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">revert, 200 after 0.8 s</text>
-  <text x="20" y="114" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">suspended with --mode sync,</text>
-  <text x="20" y="129" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">no request during the drain</text>
+  <text x="472" y="64" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">46/62 个请求失败</text>
+  <text x="472" y="79" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回退后 0.8 s 返回 200</text>
+  <text x="20" y="114" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">--mode sync 挂起，</text>
+  <text x="20" y="129" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">排空期间无请求</text>
   <line x1="188" y1="132" x2="460" y2="132" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1"/>
   <rect x="206.13" y="104" width="4.35" height="28" fill="var(--m-grey-fill, #ecebe3)"/>
   <rect x="229.29" y="108" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <rect x="230.38" y="108" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
-  <text x="472" y="114" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">2 of 2 returned 200</text>
-  <text x="472" y="129" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">first answer in 0.58 s</text>
-  <text x="20" y="164" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">suspended with --mode sync,</text>
-  <text x="20" y="179" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">requests from 2 s after the drain</text>
+  <text x="472" y="114" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">2/2 个返回 200</text>
+  <text x="472" y="129" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首个响应耗时 0.58 s</text>
+  <text x="20" y="164" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">--mode sync 挂起，</text>
+  <text x="20" y="179" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">排空 2 s 后开始发请求</text>
   <line x1="188" y1="182" x2="460" y2="182" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1"/>
   <rect x="206.13" y="154" width="7.98" height="28" fill="var(--m-grey-fill, #ecebe3)"/>
   <rect x="214.43" y="158" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
@@ -108,18 +108,18 @@
   <rect x="342.45" y="158" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <rect x="347.52" y="158" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <rect x="351.88" y="158" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
-  <text x="472" y="164" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">30 of 30 returned 200</text>
-  <text x="472" y="179" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">first answer in 0.49 s</text>
-  <text x="20" y="214" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">suspended, default mode,</text>
-  <text x="20" y="229" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">newest snapshot still PENDING</text>
+  <text x="472" y="164" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">30/30 个返回 200</text>
+  <text x="472" y="179" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首个响应耗时 0.49 s</text>
+  <text x="20" y="214" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">默认模式挂起，</text>
+  <text x="20" y="229" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">最新快照仍为 PENDING</text>
   <line x1="188" y1="232" x2="460" y2="232" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1"/>
   <rect x="206.13" y="204" width="4.35" height="28" fill="var(--m-grey-fill, #ecebe3)"/>
   <rect x="231.47" y="208" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <rect x="232.56" y="208" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
-  <text x="472" y="214" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">2 of 2 returned 200</text>
-  <text x="472" y="229" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">first answer in 1.19 s</text>
-  <text x="20" y="264" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">RUNNING,</text>
-  <text x="20" y="279" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one request of 120 s open</text>
+  <text x="472" y="214" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">2/2 个返回 200</text>
+  <text x="472" y="229" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">首个响应耗时 1.19 s</text>
+  <text x="20" y="264" font-size="11.5" class="m-serif" fill="var(--m-ink, #1a1a1a)">RUNNING，</text>
+  <text x="20" y="279" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1 个 120 s 长请求未结束</text>
   <line x1="188" y1="282" x2="460" y2="282" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1"/>
   <rect x="206.13" y="254" width="7.98" height="28" fill="var(--m-grey-fill, #ecebe3)"/>
   <rect x="195.25" y="272" width="12.33" height="6" fill="var(--m-rose-ink, #b0344d)"/>
@@ -154,8 +154,8 @@
   <rect x="353.69" y="258" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <rect x="358.04" y="258" width="3" height="14" fill="var(--m-green-ink, #336b40)"/>
   <line x1="296.07" y1="250" x2="296.07" y2="286" stroke="var(--m-ink, #1a1a1a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="472" y="264" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">16 of 30 failed</text>
-  <text x="472" y="279" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">revert, 200 after 0.7 s</text>
+  <text x="472" y="264" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">16/30 个请求失败</text>
+  <text x="472" y="279" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回退后 0.7 s 返回 200</text>
   <line x1="188" y1="308" x2="460" y2="308" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="206.13" y1="304" x2="206.13" y2="312" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="206.13" y="326" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0 s</text>
@@ -173,5 +173,5 @@
   <text x="423.73" y="326" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">60 s</text>
   <line x1="460" y1="304" x2="460" y2="312" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="460" y="326" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">70 s</text>
-  <text x="324" y="346" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds since the drain command</text>
+  <text x="324" y="346" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">自执行 drain 命令起算的秒数</text>
 </svg>

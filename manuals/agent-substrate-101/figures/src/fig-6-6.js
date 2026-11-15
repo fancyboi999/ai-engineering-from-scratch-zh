@@ -36,14 +36,14 @@ const x = mb => X0 + mb * PER_MB;
 
 module.exports = figure('fig-6-6', {
   height: 344,
-  title: 'Idle memory of each dataplane, container by container',
-  desc: `Two stacked bars on an axis from 0 to 100 MB. The Envoy dataplane has ${sides[0].items.length} containers that hold ${Math.round(sides[0].total)} MB in total: atenet-router and envoy in the pod atenet-router, and envoy, ext-proc, and sdsmint in the pod atenet-egress. Only sdsmint holds the CA key. The agentgateway dataplane has ${sides[1].items.length} containers that hold ${Math.round(sides[1].total)} MB in total: one agentgateway container in each pod. The agentgateway container in atenet-egress holds the CA key.`,
+  title: '两种数据平面按容器拆分的空闲内存占用',
+  desc: `0 至 100 MB 坐标轴上的两条堆叠柱。Envoy 数据平面共 ${sides[0].items.length} 个容器，总计占用 ${Math.round(sides[0].total)} MB：atenet-router pod 内的 atenet-router 与 envoy，以及 atenet-egress pod 内的 envoy、ext-proc 与 sdsmint，其中仅 sdsmint 持有拦截 CA 私钥。agentgateway 数据平面共 ${sides[1].items.length} 个容器，总计占用 ${Math.round(sides[1].total)} MB：两个 pod 内各一个 agentgateway 容器，其中 atenet-egress 内的容器持有 CA 私钥。`,
 }, f => {
   for (let mb = 20; mb <= 100; mb += 20) f.rule(x(mb), 40, x(mb), AXIS, { hue: 'ink-mute', opacity: 0.2 });
-  f.text(X0, 24, 'Each bracket is a pod, and each box is a container.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(X0, 24, '每个方括号代表一个 pod，每个方框代表一个容器。', { size: 11, serif: true, hue: 'ink-soft' });
   for (const side of sides) {
     f.text(16, side.y + 20, side.label, { size: 12, weight: 700 });
-    f.text(16, side.y + 36, `${side.items.length} containers`, { size: 11, serif: true, hue: 'ink-soft' });
+    f.text(16, side.y + 36, `${side.items.length} 个容器`, { size: 11, serif: true, hue: 'ink-soft' });
     let at = 0;
     for (const pod of PODS) {
       const inPod = side.items.filter(item => item.pod === pod);
@@ -64,7 +64,7 @@ module.exports = figure('fig-6-6', {
           f.text(cx, side.y + 35, item.mb.toFixed(1), { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
         }
         if (key) {
-          const note = w > 50 ? 'holds the CA key' : `${item.name}, ${item.mb.toFixed(1)} MB, holds the CA key`;
+          const note = w > 50 ? '持有 CA 私钥' : `${item.name}，${item.mb.toFixed(1)} MB，持有 CA 私钥`;
           f.leader([cx, side.y + BAR + 18], [cx, side.y + BAR + 2], { hue: 'indigo' });
           f.text(w > 50 ? cx + 8 : left + w, side.y + BAR + 26, note, { size: 11, hue: 'indigo', anchor: w > 50 ? 'start' : 'end', knock: true });
         }
@@ -79,5 +79,5 @@ module.exports = figure('fig-6-6', {
     f.rule(x(mb), AXIS, x(mb), AXIS + 5, { hue: 'ink' });
     f.text(x(mb), AXIS + 18, String(mb), { size: 11, anchor: 'middle', hue: 'ink-soft' });
   }
-  f.text(x(50), AXIS + 36, 'MB of memory at idle, one sample for each container', { size: 11.5, serif: true, hue: 'ink-soft', anchor: 'middle' });
+  f.text(x(50), AXIS + 36, '空闲态内存（MB），每个容器采样一次', { size: 11.5, serif: true, hue: 'ink-soft', anchor: 'middle' });
 });

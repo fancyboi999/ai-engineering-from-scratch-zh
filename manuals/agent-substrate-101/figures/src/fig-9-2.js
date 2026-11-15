@@ -9,23 +9,23 @@ const after = kind => agent[kind].turns.find(turn => turn.phase === 'resumed');
 const memory = after('memory');
 const volumes = after('volumes');
 const rows = [
-  ['conversation', `${memory.memory_turns} of ${memory.db_turns} messages`, true, `${volumes.memory_turns} of ${volumes.db_turns} messages`, true],
-  ['loaded from SQLite at start', `${memory.rehydrated_from_db} messages`, true, `${volumes.rehydrated_from_db} messages`, true],
-  ['note in a variable', memory.note ? 'kept' : 'lost', Boolean(memory.note), volumes.note ? 'kept' : 'lost', Boolean(volumes.note)],
-  ['file under /tmp', memory.scratch_file ? 'kept' : 'lost', memory.scratch_file, volumes.scratch_file ? 'kept' : 'lost', volumes.scratch_file],
-  ['age of the process', `${memory.process_age_s} s, same process`, true, `${volumes.process_age_s} s, new process`, false],
-  ['time of this turn', `${memory.seconds.toFixed(2)} s`, true, `${volumes.seconds.toFixed(2)} s`, false],
+  ['对话消息数', `${memory.memory_turns}/${memory.db_turns} 条消息`, true, `${volumes.memory_turns}/${volumes.db_turns} 条消息`, true],
+  ['启动时从 SQLite 加载', `${memory.rehydrated_from_db} 条消息`, true, `${volumes.rehydrated_from_db} 条消息`, true],
+  ['变量中的便签', memory.note ? '保留' : '丢失', Boolean(memory.note), volumes.note ? '保留' : '丢失', Boolean(volumes.note)],
+  ['/tmp 下的临时文件', memory.scratch_file ? '保留' : '丢失', memory.scratch_file, volumes.scratch_file ? '保留' : '丢失', volumes.scratch_file],
+  ['进程存活时长', `${memory.process_age_s} s，原进程`, true, `${volumes.process_age_s} s，新进程`, false],
+  ['本轮耗时', `${memory.seconds.toFixed(2)} s`, true, `${volumes.seconds.toFixed(2)} s`, false],
 ];
 
 module.exports = figure('fig-9-2', {
   height: 318,
-  title: 'What the agent holds on the first turn after a suspend, under each fidelity',
-  desc: `Two columns for the same agent on its first turn after a suspend, on the second x86 server guest. Under memory fidelity it holds ${memory.memory_turns} messages, its note, its file under /tmp, and the same process at ${memory.process_age_s} seconds of age, and the turn took ${memory.seconds.toFixed(2)} seconds. Under volumes fidelity it holds ${volumes.memory_turns} messages because it loaded ${volumes.rehydrated_from_db} from SQLite, it lost the note and the file, the process is ${volumes.process_age_s} seconds old, and the turn took ${volumes.seconds.toFixed(2)} seconds.`,
+  title: '两种快照保真度下挂起后首轮调用时 agent 保有的状态',
+  desc: `第二台 x86 服务器客户机上同一 agent 在挂起后首轮调用时的两列对比。在内存保真度下，它保有 ${memory.memory_turns} 条消息、便签、/tmp 下的文件以及已存活 ${memory.process_age_s} 秒的原进程，该轮耗时 ${memory.seconds.toFixed(2)} 秒。在卷保真度下，它因启动时从 SQLite 重新加载 ${volumes.rehydrated_from_db} 条消息而保有 ${volumes.memory_turns} 条消息，但丢失了便签与 /tmp 文件，新进程仅存活 ${volumes.process_age_s} 秒，该轮耗时 ${volumes.seconds.toFixed(2)} 秒。`,
 }, f => {
   const left = 214;
   const right = 430;
-  f.box({ x: left, y: 16, w: 196, h: 40, hue: 'green', title: 'memory fidelity', sub: 'SNAPSHOT_FIDELITY_MEMORY' });
-  f.box({ x: right, y: 16, w: 196, h: 40, hue: 'teal', title: 'volumes fidelity', sub: 'SNAPSHOT_FIDELITY_VOLUMES' });
+  f.box({ x: left, y: 16, w: 196, h: 40, hue: 'green', title: '内存保真度', sub: 'SNAPSHOT_FIDELITY_MEMORY' });
+  f.box({ x: right, y: 16, w: 196, h: 40, hue: 'teal', title: '卷保真度', sub: 'SNAPSHOT_FIDELITY_VOLUMES' });
   rows.forEach(([name, a, aOk, b, bOk], index) => {
     const y = 72 + index * 40;
     f.rule(16, y - 6, 626, y - 6, { hue: 'ink-mute', opacity: 0.25 });
