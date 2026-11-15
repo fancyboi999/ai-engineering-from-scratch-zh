@@ -1,16 +1,7 @@
 {
   "base": "a509402c0b5455d11ddc2b5fa83cc8c0d2e0692b",
   "target": "8afa245ebc2e8861480edf8c4911a2b6d9769688",
-  "pending": [
-    {
-      "batch": "site-shell-778-796",
-      "summary": "课程正文优先、五项栏目导航与移动底栏、首页阶段卡片及 44x44 搜索图标（#778 #796）线上部署验收"
-    },
-    {
-      "batch": "manual-agent-substrate-101",
-      "summary": "Agent Substrate 101 中文技术手册、76 幅图表本地化及配套设施（#782 #795 #797）线上部署验收"
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
