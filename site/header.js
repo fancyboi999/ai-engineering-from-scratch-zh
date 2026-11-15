@@ -9,6 +9,15 @@
   var CACHE_KEY = 'gh:stars:' + REPO;
   var CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   var NARROW_HEADER_QUERY = '(max-width: 820px)';
+  var COMPACT_HEADER_QUERY = '(max-width: 1180px)';
+  var COMPACT_PRIORITY_COUNT = 3;
+  var TAB_ITEMS = [
+    { href: 'catalog.html', label: '课程', icon: 'M3 4h7v16H3zM14 4h7v16h-7z' },
+    { href: 'learning-paths.html', label: '路径', icon: 'M5 19V9M5 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM19 5v10M19 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM5 19h8a6 6 0 0 0 6-6' },
+    { href: 'practice', label: '练习', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z' },
+    { href: 'projects.html', label: '项目', icon: 'M4 20l6-6M14 4l6 6-8 8-6-6z' },
+    { href: 'roadmap.html', label: '进度', icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2' }
+  ];
   var NARRATION_VERSION = '20261021a';
   var THEME_MENU_VERSION = '20261030a';
   var STAR_NUDGE_VERSION = '20261103a';
@@ -43,10 +52,12 @@
     if (/^\/(lesson|certification|highlights)(?=[?#]|$)/.test(href)) {
       return href.replace(/^\/(lesson|certification|highlights)(?=[?#]|$)/, '$1.html');
     }
-    if (/^\/cheatsheets(?:\/|$)/.test(href)) {
-      return href.replace(/^\/cheatsheets(?=[?#]|$)/, '/cheatsheets/index.html').replace(/^(\/cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
+    if (/^(?:\/|(?:\.\.?\/)*)cheatsheets(?:\/|$)/.test(href)) {
+      return href.replace(/^((?:\/|(?:\.\.?\/)*)cheatsheets)(?=[?#]|$)/, '$1/index.html').replace(/^((?:\/|(?:\.\.?\/)*)cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
     }
-    if (/^\/practice(?:\/|$)/.test(href)) return href.replace(/^\/practice(?=[?#]|$)/, '/practice/index.html').replace(/^(\/practice\/(?:tracks\/)?[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
+    if (/^(?:\/|(?:\.\.?\/)*)practice(?:\/|$)/.test(href)) {
+      return href.replace(/^((?:\/|(?:\.\.?\/)*)practice)(?=[?#]|$)/, '$1/index.html').replace(/^((?:\/|(?:\.\.?\/)*)practice\/(?:tracks\/)?[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
+    }
     if (/^\/manual-[a-z0-9-]+\/[a-z0-9-]+(?=[?#]|$)/.test(href)) return href.replace(/^(\/manual-[a-z0-9-]+\/[a-z0-9-]+)/, '/manual$1.html');
     if (/^\/roadmap(?=[?#]|$)/.test(href)) return href.replace('/roadmap', '/prereqs.html');
     return href.replace(/(^|\/)(lesson|certification|highlights)(?=[?#]|$)/, '$1$2.html');
@@ -241,7 +252,8 @@
     var target = current;
     if (current === 'roadmap.html' || current === 'path.html') target = 'prereqs.html';
     if (current === 'project.html' || /^\/project\//.test(pathname)) target = 'projects.html';
-    if (/^manual-/.test(current)) target = 'manuals.html';
+    if (/^manual-/.test(current) || /^\/manual(?:-|\/)/.test(pathname)) target = 'manuals.html';
+    if (/^\/practice(?:\/|$)/.test(pathname)) target = 'practice.html';
     if (/^\/interviews(?:\/|$)/.test(pathname)) target = 'interviews.html';
     if (/^\/(?:hubs\/)?glossary\//.test(pathname)) target = 'glossary.html';
     if (/^\/(?:hubs\/)?phase\//.test(pathname) || /^\/lessons\//.test(pathname)) target = 'catalog.html';
@@ -328,6 +340,7 @@
     inner.appendChild(toggle);
     inner.appendChild(nav);
     var narrow = window.matchMedia ? window.matchMedia(NARROW_HEADER_QUERY) : null;
+    var compact = window.matchMedia ? window.matchMedia(COMPACT_HEADER_QUERY) : null;
     var open = false;
 
     function isMovableTool(child) {
@@ -351,8 +364,11 @@
     }
 
     function movePriorityLinksOut() {
+      var limit = compact && compact.matches ? COMPACT_PRIORITY_COUNT : priorityEntries.length;
       for (var i = 0; i < priorityEntries.length; i++) {
-        priorityNav.appendChild(priorityEntries[i].link);
+        var entry = priorityEntries[i];
+        if (i < limit) priorityNav.appendChild(entry.link);
+        else nav.insertBefore(entry.link, entry.marker.nextSibling);
       }
       priorityNav.hidden = priorityEntries.length === 0;
     }
@@ -382,7 +398,7 @@
       if (isNarrow) restorePriorityLinks();
       else movePriorityLinksOut();
       moveToolsIntoMenu();
-      setOpen(false, menuHadFocus || (isNarrow && priorityHadFocus));
+      setOpen(false, menuHadFocus || (isNarrow && priorityHadFocus) || nav.contains(document.activeElement));
     }
 
     toggle.addEventListener('click', function () { setOpen(!open, false); });
@@ -412,6 +428,10 @@
     if (narrow) {
       if (typeof narrow.addEventListener === 'function') narrow.addEventListener('change', syncLayout);
       else if (typeof narrow.addListener === 'function') narrow.addListener(syncLayout);
+    }
+    if (compact) {
+      if (typeof compact.addEventListener === 'function') compact.addEventListener('change', syncLayout);
+      else if (typeof compact.addListener === 'function') compact.addListener(syncLayout);
     }
 
     if (typeof MutationObserver === 'function') {
@@ -461,7 +481,7 @@
     function loadScript(name) {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = HEADER_BASE + name + '?v=20261106a';
+        script.src = HEADER_BASE + name + '?v=20261115a';
         script.onload = resolve;
         script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
         document.head.appendChild(script);
@@ -576,8 +596,47 @@
     });
   }
 
+  function tabItemHref(href, base) {
+    return href.charAt(0) === '/' ? href : base + href;
+  }
+
+  function isTabItemActive(itemHref, current, pathname) {
+    if (itemHref === 'practice') return /^\/practice(?:\/|$)/.test(pathname);
+    if (itemHref === 'catalog.html') return current === 'catalog.html' || /^\/(?:hubs\/)?phase\//.test(pathname);
+    if (itemHref === 'projects.html') return current === 'projects.html' || current === 'project.html' || /^\/project\//.test(pathname);
+    if (itemHref === 'roadmap.html') return current === 'roadmap.html' || current === 'prereqs.html' || current === 'path.html';
+    return pageFile(itemHref) === current && !/^\/(?:practice|interviews|cheatsheets|manual|project|hubs|glossary|phase|lessons)(?:-|\/|$)/.test(pathname);
+  }
+
+  function setupTabBar() {
+    var header = document.querySelector('.site-header');
+    if (document.querySelector('.site-tabbar') || !header) return;
+    if (document.documentElement.hasAttribute('data-poster') || document.querySelector('.lesson-layout')) return;
+    var logo = header.querySelector('.logo');
+    var logoHref = logo && logo.getAttribute('href') || '';
+    var base = logoHref.replace(/index\.html(?:[?#].*)?$/, '');
+    var bar = document.createElement('nav');
+    bar.className = 'site-tabbar';
+    bar.setAttribute('aria-label', '栏目导航');
+    var current = pageFile(location.href);
+    var pathname = sitePath();
+    var html = '';
+    for (var i = 0; i < TAB_ITEMS.length; i++) {
+      var item = TAB_ITEMS[i];
+      var active = isTabItemActive(item.href, current, pathname);
+      html += '<a href="' + tabItemHref(item.href, base) + '"' + (active ? ' aria-current="page"' : '') + '>'
+        + '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" aria-hidden="true"><path d="' + item.icon + '"/></svg>'
+        + '<span>' + item.label + '</span></a>';
+    }
+    bar.innerHTML = html;
+    adaptRouteTree(bar);
+    document.body.appendChild(bar);
+    document.body.classList.add('has-site-tabbar');
+  }
+
   function load() {
     setupBanner();
+    setupTabBar();
     var headers = document.querySelectorAll('.site-header');
     for (var i = 0; i < headers.length; i++) {
       setupHeaderTheme(headers[i]);

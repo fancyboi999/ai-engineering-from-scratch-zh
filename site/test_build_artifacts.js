@@ -462,7 +462,7 @@ function writeMarkdown(file, { name, description, version }) {
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20261106a';
-  const scriptRelease = '20261112a';
+  const scriptRelease = '20261115a';
   const appRelease = scriptRelease;
   const styleRelease = HEADER_ASSET_VERSION;
   const navigationRelease = HEADER_ASSET_VERSION;
@@ -1499,17 +1499,17 @@ test('homepage preserves live GitHub CTAs and the motion-aware learner marquee',
   assert.doesNotMatch(mastheadCta[0], /Start (?:MCP Engineering|Agent Skills)/i);
   assert.match(
     mastheadCta[0],
-    /<a class="masthead-btn masthead-btn--primary" href="lesson\.html\?path=phases\/00-setup-and-tooling\/01-dev-environment">[\s\S]*?<span>开始学习第一课<\/span>/
+    /<a class="masthead-btn masthead-btn--primary" id="mastheadStart" href="lesson\.html\?path=phases\/00-setup-and-tooling\/01-dev-environment">[\s\S]*?<span id="mastheadStartLabel">开始学习第一课<\/span>/
   );
   assert.match(mastheadCta[0], /<a class="masthead-btn" href="learning-paths\.html">[\s\S]*?<span>探索学习路径<\/span>/);
   assert.match(
     mastheadCta[0],
-    /<a class="masthead-btn" href="https:\/\/github\.com\/fancyboi999\/ai-engineering-from-scratch-zh"[^>]*>[\s\S]*?<span>在 GitHub 上 Star<\/span>[\s\S]*?<span class="masthead-btn-count" data-gh-stars="fancyboi999\/ai-engineering-from-scratch-zh" data-loading="true">/
+    /<a class="masthead-btn masthead-btn--quiet" href="https:\/\/github\.com\/fancyboi999\/ai-engineering-from-scratch-zh"[^>]*>[\s\S]*?<span>在 GitHub 上 Star<\/span>[\s\S]*?<span class="masthead-btn-count" data-gh-stars="fancyboi999\/ai-engineering-from-scratch-zh" data-loading="true">/
   );
   assert.doesNotMatch(homepage, /class="manual-attribution/, 'the homepage attribution line stays removed');
   assert.match(
     mastheadCta[0],
-    /<a class="masthead-btn" href="https:\/\/github\.com\/fancyboi999"[^>]*>[\s\S]*?<span>关注 @fancyboi999<\/span>/
+    /<a class="masthead-btn masthead-btn--quiet" href="https:\/\/github\.com\/fancyboi999"[^>]*>[\s\S]*?<span>关注 @fancyboi999<\/span>/
   );
   assert.match(homepage, /<script src="header\.js\?v=[^"]+" defer><\/script>/);
   assert.match(headerSource, /\[data-gh-stars="' \+ REPO \+ '"\]/);
@@ -1579,10 +1579,15 @@ test('shared header keeps priority links, GitHub stars and search beside the men
   const movableTools = headerSource.match(/function isMovableTool\(child\) \{([\s\S]*?)\n    \}/);
 
   assert.match(headerSource, /var NARROW_HEADER_QUERY = '\(max-width: 820px\)'/);
+  assert.match(headerSource, /var COMPACT_HEADER_QUERY = '\(max-width: 1180px\)'/);
+  assert.match(headerSource, /var COMPACT_PRIORITY_COUNT = 3/);
+  assert.match(headerSource, /function setupTabBar\(\) \{[\s\S]*?document\.querySelector\('\.lesson-layout'\)\) return;/);
   assert.match(headerSource, /priorityNav\.className = 'header-priority-nav'/);
   assert.match(headerSource, /link\.hasAttribute\('data-header-priority'\)/);
-  assert.doesNotMatch(headerSource, /ensureNavigationLink|addNavigationLinks/);
+  assert.doesNotMatch(headerSource, /ensureNavigationLink|addNavigationLinks|restoreDesktopTools/);
   assert.match(headerSource, /if \(isNarrow\) restorePriorityLinks\(\);[\s\S]*?else movePriorityLinksOut\(\)/);
+  assert.match(styles, /\.search-toggle\s*\{[\s\S]*?width:\s*44px;[\s\S]*?height:\s*44px;[\s\S]*?flex:\s*0 0 44px;/);
+  assert.match(styles, /\.search-toggle svg\s*\{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;[\s\S]*?stroke-width:\s*2;/);
 
   assert.match(
     headerSource,
@@ -1825,7 +1830,7 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   const localeLoaderVersion = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'figures-manifest.js'))).digest('hex').slice(0, 12);
   assert.ok(lessonHtml.includes('<script src="figures-manifest.js?v=' + localeLoaderVersion + '"'),
     'the lesson must load the current content-addressed locale loader');
-  assert.match(lessonHtml, /<script src="progress\.js\?v=20261112a/);
+  assert.match(lessonHtml, /<script src="progress\.js\?v=20261115a/);
   assert.match(fs.readFileSync(path.join(__dirname, 'lesson-figures.js'), 'utf8'), /providerBaseUrl \+ provider/);
   assert.match(lessonHtml, /import\('https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@11/);
 });

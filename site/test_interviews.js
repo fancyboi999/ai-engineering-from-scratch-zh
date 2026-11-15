@@ -196,7 +196,7 @@ test('clean URLs route to the pages and the old .html URLs redirect', () => {
 });
 
 test('the menu, the footers, the hub pages and the roadmap link to the interviews', () => {
-  assert.match(require('../lib/site-navigation').renderNavigation(''), /<a href="interviews" data-header-page="interviews">面试题库<\/a>/);
+  assert.match(require('../lib/site-navigation').renderNavigation(''), /<a href="interviews" data-header-page="interviews" data-header-priority>面试题库<\/a>/);
   assert.match(fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8'), /<a href="\/interviews">面试题库<\/a>/);
   assert.match(fs.readFileSync(path.join(__dirname, 'build-hubs.js'), 'utf8'), /\['\/interviews', '面试题库'\]/);
   const roadmap = fs.readFileSync(path.join(__dirname, 'roadmap.html'), 'utf8');
