@@ -72,6 +72,14 @@ def main() -> None:
 
     route_rewrites = {rewrite["source"]: rewrite["destination"] for rewrite in rewrites}
     assert route_rewrites["/lesson"] == "/api/lesson"
+    assert (
+        route_rewrites["/learn/:cleanPhase([a-z0-9-]+)/:cleanLesson([a-z0-9-]+)"]
+        == "/api/lesson?cleanPhase=:cleanPhase&cleanLesson=:cleanLesson"
+    )
+    assert (
+        route_rewrites["/learn/:cleanPhase([a-z0-9-]+)/:cleanLesson([a-z0-9-]+)/"]
+        == "/api/lesson?cleanPhase=:cleanPhase&cleanLesson=:cleanLesson"
+    )
     assert route_rewrites["/certification"] == "/api/certification"
     assert "/lesson.html" not in route_rewrites
     assert "/certification.html" not in route_rewrites
@@ -185,6 +193,10 @@ def main() -> None:
     assert sitemap_lessons == set(core_lessons)
     assert sitemap.count("/lesson?path=") == len(certification_lessons)
     assert sitemap.count("/certification?id=") == len(tracks)
+    assert "/learn/" not in sitemap
+    llms_txt = (SITE / "llms.txt").read_text(encoding="utf-8")
+    assert "https://aieng-zh.cn/learn/" not in llms_txt
+    assert llms_txt.count("https://aieng-zh.cn/lessons/") >= len(core_lessons)
 
     templates_and_markers = (
         ("lesson.html", "AIFS:LESSON-SEO:START", "AIFS:LESSON-FALLBACK:START"),

@@ -601,6 +601,14 @@ test('deployment routes the root and extensionless pages through handlers withou
   const rewrites = new Map(config.rewrites.map(function (rule) { return [rule.source, rule.destination]; }));
   const routes = new Map((config.routes || []).map(function (rule) { return [rule.src, rule]; }));
   assert.equal(rewrites.get('/lesson'), '/api/lesson');
+  assert.equal(
+    rewrites.get('/learn/:cleanPhase([a-z0-9-]+)/:cleanLesson([a-z0-9-]+)'),
+    '/api/lesson?cleanPhase=:cleanPhase&cleanLesson=:cleanLesson'
+  );
+  assert.equal(
+    rewrites.get('/learn/:cleanPhase([a-z0-9-]+)/:cleanLesson([a-z0-9-]+)/'),
+    '/api/lesson?cleanPhase=:cleanPhase&cleanLesson=:cleanLesson'
+  );
   assert.equal(rewrites.get('/certification'), '/api/certification');
   assert.equal(rewrites.has('/'), false);
   assert.equal(routes.get('/').dest, '/api/markdown?path=/');
@@ -847,4 +855,112 @@ test('OG reader adapter uses Chinese helper card IDs and never swallows renderin
   assert.equal(invoke(lesson, { method: 'GET', query: { path: 'phases/01-math/01-vectors' } }).statusCode, 500);
   assert.equal(invoke(track, { method: 'GET', query: { id: 'claude-example' } }).statusCode, 500);
   assert.equal(invoke(lesson, { method: 'GET', query: { path: 'phases/01-math/01-vectors' }, headers: { accept: 'text/markdown' } }).statusCode, 200);
+});
+
+test('/learn/<phase>/<lesson> with or without trailing slash permanently redirects 308 to /lessons/<phase>/<lesson>/', () => {
+  const assets = makeAssets();
+  let markdownReads = 0;
+  assets.lesson.readMarkdown = () => {
+    markdownReads += 1;
+    return '# 不应在 308 跳转时读取正文';
+  };
+  const handler = lessonApi.createHandler({ loadAssets: () => assets.lesson });
+  const query = { cleanPhase: 'math', cleanLesson: 'vectors' };
+  const redirectShapes = [
+    { url: '/learn/math/vectors' },
+    { url: '/learn/math/vectors/' },
+    { url: '/learn/01-math/01-vectors' },
+    { url: '/learn/01-math/01-vectors/' },
+    { url: '/learn/math/vectors', query },
+    { url: '/learn/math/vectors/', query },
+    { url: '/learn/math/vectors?cleanPhase=math&cleanLesson=vectors', query },
+    { url: '/api/lesson?cleanPhase=math&cleanLesson=vectors', query },
+    { url: '/learn/math/vectors', query: { cleanPhase: ['math', 'math'], cleanLesson: ['vectors', 'vectors'] } },
+    { url: '/learn/math/vectors/', headers: { accept: 'text/markdown' } },
+    { url: '/learn/math/vectors?lang=zh&utm_source=upstream' },
+    { url: '/learn/math/vectors/?lang=en&learningPath=missing-path' },
+    { url: '/learn/math/vectors/?learningPath=__proto__&fromTrack=toString' },
+    { url: '/api/lesson?cleanPhase=math&cleanLesson=vectors&path=phases/07-transformers/09-vectors', query: { cleanPhase: 'math', cleanLesson: 'vectors', path: 'phases/07-transformers/09-vectors' } },
+  ];
+
+  for (const shape of redirectShapes) {
+    for (const method of ['GET', 'HEAD']) {
+      const response = invoke(handler, Object.assign({ method }, shape));
+      assert.equal(response.statusCode, 308, `${method} ${JSON.stringify(shape)}`);
+      assert.equal(response.headers.location, '/lessons/01-math/01-vectors/', `${method} ${JSON.stringify(shape)}`);
+      assert.equal(response.body, '');
+    }
+  }
+  assert.equal(markdownReads, 0);
+
+  const withLearningPath = invoke(handler, {
+    method: 'GET',
+    url: '/learn/math/vectors/?learningPath=mcp-engineering&lang=hi&utm_source=x',
+  });
+  assert.equal(withLearningPath.statusCode, 308);
+  assert.equal(withLearningPath.headers.location, '/lessons/01-math/01-vectors/?learningPath=model-context-protocol');
+
+  const withFromTrack = invoke(handler, {
+    method: 'GET',
+    url: '/learn/math/vectors?fromTrack=claude-example',
+  });
+  assert.equal(withFromTrack.statusCode, 308);
+  assert.equal(withFromTrack.headers.location, '/lessons/01-math/01-vectors/?fromTrack=claude-example');
+
+  for (const bad of [
+    { method: 'GET', url: '/learn/math/missing' },
+    { method: 'GET', url: '/learn/math/missing/' },
+    { method: 'GET', url: '/learn/claude/models' },
+    { method: 'GET', url: '/learn?path=phases/01-math/01-vectors', query: { path: 'phases/01-math/01-vectors' } },
+    { method: 'GET', url: '/learn/-bad/slug?path=phases/01-math/01-vectors', query: { cleanPhase: '-bad', cleanLesson: 'slug', path: 'phases/01-math/01-vectors' } },
+    { method: 'GET', url: '/learn/__proto__/toString?path=phases/01-math/01-vectors' },
+    { method: 'GET', url: '/learn/__proto__/toString?cleanPhase=math&cleanLesson=vectors', query },
+    { method: 'GET', url: '/api/lesson?cleanPhase=-bad&cleanLesson=slug&path=phases/01-math/01-vectors', query: { cleanPhase: '-bad', cleanLesson: 'slug', path: 'phases/01-math/01-vectors' } },
+    { method: 'GET', url: '/api/lesson?cleanPhase=__proto__&cleanLesson=toString&path=phases/01-math/01-vectors', query: Object.assign(Object.create(null), { cleanPhase: '__proto__', cleanLesson: 'toString', path: 'phases/01-math/01-vectors' }) },
+    { method: 'GET', url: '/lesson?cleanPhase=math&cleanLesson=vectors', query },
+    { method: 'GET', url: '/lesson.html?cleanPhase=math&cleanLesson=vectors', query },
+  ]) {
+    const response = invoke(handler, bad);
+    assert.equal(response.statusCode, 404, JSON.stringify(bad));
+    assert.equal(response.headers['cache-control'], 'no-store');
+  }
+
+  for (const prodUrl of [
+    '/learn/setup-and-tooling/dev-environment',
+    '/learn/setup-and-tooling/dev-environment/',
+    '/learn/00-setup-and-tooling/01-dev-environment',
+    '/learn/00-setup-and-tooling/01-dev-environment/',
+  ]) {
+    const prodResponse = invoke(lessonApi, { method: 'GET', url: prodUrl, headers: { host: 'aieng-zh.cn' } });
+    assert.equal(prodResponse.statusCode, 308, prodUrl);
+    assert.equal(prodResponse.headers.location, '/lessons/00-setup-and-tooling/01-dev-environment/', prodUrl);
+  }
+});
+
+test('course canonical URLs, prerendered pages, sitemap.xml, llms.txt, and OG cards stay on /lessons/<phase>/<lesson>/', () => {
+  const repoRoot = path.join(__dirname, '..');
+  const ogCards = require('../lib/og-cards');
+  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'site', 'lesson-seo.json'), 'utf8'));
+  const sitemap = fs.readFileSync(path.join(repoRoot, 'site', 'sitemap.xml'), 'utf8');
+  const llms = fs.readFileSync(path.join(repoRoot, 'site', 'llms.txt'), 'utf8');
+
+  assert.doesNotMatch(sitemap, /\/learn\//);
+  assert.doesNotMatch(llms, /https:\/\/aieng-zh\.cn\/learn\//);
+
+  const samplePath = 'phases/00-setup-and-tooling/01-dev-environment';
+  const expectedPath = '/lessons/00-setup-and-tooling/01-dev-environment/';
+  const expectedCanonical = 'https://aieng-zh.cn' + expectedPath;
+  const entry = manifest.lessons[samplePath];
+  assert.equal(entry.canonicalUrl, expectedCanonical);
+  assert.equal(ogCards.lessonCard(entry).path, expectedPath);
+  assert.ok(sitemap.includes(`<loc>${expectedCanonical}</loc>`));
+  assert.ok(llms.includes(`(${expectedCanonical})`));
+
+  const prerenderedHtml = fs.readFileSync(
+    path.join(repoRoot, 'site', 'lessons', '00-setup-and-tooling', '01-dev-environment', 'index.html'),
+    'utf8'
+  );
+  assert.match(prerenderedHtml, new RegExp(`<link rel="canonical" href="${expectedCanonical}">`));
+  assert.match(prerenderedHtml, new RegExp(`<meta property="og:url" content="${expectedCanonical}">`));
+  assert.match(prerenderedHtml, /<meta property="og:image" content="https:\/\/aieng-zh\.cn\/og\/lesson\/phases\/00-setup-and-tooling\/01-dev-environment\.png\?v=[0-9a-f]{12}">/);
 });
