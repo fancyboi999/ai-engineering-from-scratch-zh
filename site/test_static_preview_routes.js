@@ -191,13 +191,21 @@ test('deployed contextual routes stay extensionless while zh canonicals keep sta
 
 
 test('plain static preview resolves practice and manual chapter pages', () => {
-  const { api } = loadRouteRuntime('http://localhost:8000/index.html');
+  const { api } = loadRouteRuntime('http://localhost:8000/site/index.html');
   for (const [href, expected] of [
+    ['practice', 'practice/index.html'],
+    ['../practice', '../practice/index.html'],
+    ['practice/index.html', 'practice/index.html'],
     ['/practice', '/practice/index.html'],
     ['/practice/adam-step', '/practice/adam-step.html'],
     ['/practice/tracks/optimizers', '/practice/tracks/optimizers.html'],
+    ['cheatsheets', 'cheatsheets/index.html'],
     ['/manual-vllm-101/count-the-memory-before-you-pick-a-gpu', '/manual/manual-vllm-101/count-the-memory-before-you-pick-a-gpu.html'],
   ]) assert.equal(api.adaptHref(href), expected);
+  const fileApi = loadRouteRuntime('file:///tmp/site/index.html').api;
+  assert.equal(fileApi.adaptHref('practice'), 'practice/index.html');
+  assert.equal(fileApi.adaptHref('../practice'), '../practice/index.html');
   const deployed = loadRouteRuntime('https://aieng-zh.cn/').api;
+  assert.equal(deployed.adaptHref('practice'), 'practice');
   assert.equal(deployed.adaptHref('/practice/adam-step'), '/practice/adam-step');
 });

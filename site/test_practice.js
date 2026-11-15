@@ -141,7 +141,7 @@ test('clean URLs route to the practice pages and the run data is not indexed', (
 });
 
 test('the menu, the footers and the hub pages link to the practice pages', () => {
-  assert.match(fs.readFileSync(path.join(__dirname, '..', 'lib', 'site-navigation.js'), 'utf8'), /\{ href: 'practice', label: '编程练习' \}/);
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'lib', 'site-navigation.js'), 'utf8'), /\{ href: 'practice', label: '编程练习', priority: true \}/);
   assert.match(fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8'), /编程练习/);
   assert.match(fs.readFileSync(path.join(__dirname, 'build-hubs.js'), 'utf8'), /\['\/practice', '编程练习'\]/);
 });

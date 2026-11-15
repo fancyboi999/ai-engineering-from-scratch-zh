@@ -131,6 +131,8 @@
     if (!grid) return;
     var hasProgress = !!window.AIFSProgress;
     var html = '';
+    var nextMarked = false;
+    grid.classList.add('phase-cards');
     for (var i = 0; i < PHASES.length; i++) {
       var p = PHASES[i];
       var total = p.lessons.length;
@@ -143,13 +145,25 @@
       }
       var count = done > 0 ? done + ' / ' + total : total + ' 节课';
       var statusClass = escapeHtml(String(p.status || 'planned').replace(/ /g, '-'));
-      var roman = toRoman(p.id);
       var num = String(p.id).padStart(2, '0');
-      html += '<div class="toc-row" data-phase="' + i + '" role="button" tabindex="0" aria-haspopup="dialog" aria-label="打开阶段 ' + num + '：' + escapeHtml(p.name) + '">';
-      html += '<span class="toc-num">' + roman + '.</span>';
-      html += '<div><span class="toc-status ' + statusClass + '"></span><span class="toc-name">' + escapeHtml(p.name) + '</span></div>';
-      html += '<span class="toc-meta">' + count + '</span>';
-      html += '<span class="toc-meta">' + num + '</span>';
+      var finished = total > 0 && done >= total;
+      var isNext = !finished && !nextMarked && total > 0;
+      if (isNext) nextMarked = true;
+      var action = '未开始';
+      if (finished) action = '已完成';
+      else if (done > 0) action = '继续';
+      else if (isNext) action = '由此开始';
+      var percent = total > 0 ? Math.round(done / total * 100) : 0;
+      var cardClass = 'phase-card';
+      if (isNext) cardClass += ' is-next';
+      if (done > 0 && !finished) cardClass += ' is-started';
+      if (finished) cardClass += ' is-done';
+      html += '<div class="' + cardClass + '" data-phase="' + i + '" role="button" tabindex="0" aria-haspopup="dialog" aria-label="打开阶段 ' + num + '：' + escapeHtml(p.name) + '">';
+      html += '<div class="phase-card-top"><span class="phase-card-num">阶段 ' + num + '</span><span class="toc-status ' + statusClass + '"></span></div>';
+      html += '<h3 class="phase-card-name">' + escapeHtml(p.name) + '</h3>';
+      html += '<p class="phase-card-desc">' + escapeHtml(p.desc || '') + '</p>';
+      html += '<div class="phase-card-bar" aria-hidden="true"><span style="width:' + percent + '%"></span></div>';
+      html += '<div class="phase-card-foot"><span class="phase-card-count">' + count + '</span><span class="phase-card-action">' + action + '</span></div>';
       html += '</div>';
     }
     grid.innerHTML = html;
@@ -166,29 +180,11 @@
     // Since the user has already seen the initial reveal animation, just mark
     // the rebuilt rows as visible immediately (no second fade-in).
     if (document.body.classList.contains('js-anim')) {
-      var newRows = grid.querySelectorAll('.toc-row');
+      var newRows = grid.querySelectorAll('.toc-row, .phase-card');
       for (var r = 0; r < newRows.length; r++) {
         newRows[r].classList.add('in-view', 'visible');
       }
     }
-  }
-
-  function toRoman(num) {
-    var lookup = [
-      ['M', 1000], ['CM', 900], ['D', 500], ['CD', 400],
-      ['C', 100], ['XC', 90], ['L', 50], ['XL', 40],
-      ['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]
-    ];
-    var n = parseInt(num, 10);
-    if (isNaN(n) || n <= 0) return String(num);
-    var out = '';
-    for (var k = 0; k < lookup.length; k++) {
-      while (n >= lookup[k][1]) {
-        out += lookup[k][0];
-        n -= lookup[k][1];
-      }
-    }
-    return out;
   }
 
   function initModal() {
@@ -754,7 +750,7 @@
 
   function initFadeObserver() {
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var visibleEls = document.querySelectorAll('.reveal, .fade-in, .ascii-rule, .toc-row');
+    var visibleEls = document.querySelectorAll('.reveal, .fade-in, .ascii-rule, .toc-row, .phase-card');
     for (var v = 0; v < visibleEls.length; v++) {
       visibleEls[v].classList.add('in-view', 'visible');
     }
@@ -789,7 +785,7 @@
   }
 
   function initStaggerIndex() {
-    var rows = document.querySelectorAll('.toc-list .toc-row');
+    var rows = document.querySelectorAll('.toc-list .toc-row, .toc-list .phase-card');
     for (var i = 0; i < rows.length; i++) {
       rows[i].style.setProperty('--stagger-delay', (i * 30) + 'ms');
     }

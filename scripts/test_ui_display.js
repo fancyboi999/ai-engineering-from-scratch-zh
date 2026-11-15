@@ -132,7 +132,7 @@ async function main() {
       console.log('header/glossary layout:', JSON.stringify({width,columns:row.columns,headingGap:row.headingGap,overlap:false}));
     }
     const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '编程练习', '面试题库', '学习方法', 'Agent 技能', 'Agent 内部机制', '我的高亮', '关于'];
-    const priorities = ['课程目录', '课程表', '学习路径'];
+    const priorities = ['课程表', '学习路径', '实战项目', '编程练习', '面试题库'];
     const contexts = [
       ['index.html#contents', null, false], ['prereqs.html', '路线图', true],
       ['roadmap', '路线图', true], ['path', '路线图', true],
@@ -148,10 +148,15 @@ async function main() {
       ['hubs/phase/tools-and-protocols.html', '课程表', true],
       ['hubs/glossary/activation-checkpointing.html', '术语表', true],
       ['cheatsheets/sglang-serving.html', '速查表', true],
+      ['practice/index.html', '编程练习', true],
+      ['practice/adam-step.html', '编程练习', true],
+      ['practice/tracks/agent-building-blocks.html', '编程练习', true],
+      ['manual/manual-a2a-101/a-client.html', '技术手册', true],
     ];
-    for (const width of [1920, 1280, 390]) {
-      // Every generator on desktop; the two originally inconsistent pages at each breakpoint.
-      for (const [page, active, narration] of (width === 1920 ? contexts : contexts.filter(([page]) => ['catalog.html', 'certifications.html', 'contact.html'].includes(page)))) {
+    for (const width of [1920, 1280, 1024, 390]) {
+      // Every generator on desktop; representative pages at compact and mobile breakpoints.
+      const expectedPriorities = width <= 820 ? [] : width <= 1180 ? priorities.slice(0, 3) : priorities;
+      for (const [page, active, narration] of (width === 1920 ? contexts : contexts.filter(([page]) => ['catalog.html', 'certifications.html', 'contact.html', 'lessons/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/'].includes(page)))) {
         await command('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
         await command('Page.navigate', { url: `http://127.0.0.1:${server.address().port}/${page}` });
         let ready = false;
@@ -173,19 +178,36 @@ async function main() {
           searchSvg:!!document.querySelector('.search-toggle svg circle'),
           searchSize:[document.querySelector('.search-toggle').offsetWidth,document.querySelector('.search-toggle').offsetHeight],
           slot:!!document.querySelector('.header-narration-slot'),
-          themeSize:['width','height'].map(key=>parseFloat(getComputedStyle(document.querySelector('#themeToggle'))[key]))
+          themeSize:['width','height'].map(key=>parseFloat(getComputedStyle(document.querySelector('#themeToggle'))[key])),
+          tabbarPresent:!!document.querySelector('.site-tabbar'),
+          tabbarVisible:!!document.querySelector('.site-tabbar') && getComputedStyle(document.querySelector('.site-tabbar')).display!=='none',
+          isLesson:!!document.querySelector('.lesson-layout')
         })`);
-        assert.deepEqual(state.links, width > 820 ? menu.filter(label => !priorities.includes(label)) : menu, page);
-        assert.deepEqual(state.priority, width > 820 ? priorities : [], page);
+        assert.deepEqual(state.links, menu.filter(label => !expectedPriorities.includes(label)), page);
+        assert.deepEqual(state.priority, expectedPriorities, page);
         assert.equal(state.active, active, page);
         assert.equal(state.home, page.startsWith('index.html') ? 'page' : null, page);
         assert.equal(state.narration, narration, page);
         if (!narration) assert.equal(state.narrationRequested, false, page);
         assert.equal(state.github, 1, page);
         assert.equal(state.searchSvg, true, page);
-        assert.deepEqual(state.searchSize, width <= 600 ? [44,44] : [36,36], page);
+        assert.deepEqual(state.searchSize, [44, 44], page);
         assert.equal(state.slot, true, page);
         assert.deepEqual(state.themeSize, [44,44], page);
+        assert.equal(state.tabbarPresent, !state.isLesson, page);
+        assert.equal(state.tabbarVisible, !state.isLesson && width <= 820, page);
+        if (width === 390 && !state.isLesson) {
+          const menuClearance = await evaluate(`(function(){
+            const toggle=document.querySelector('.header-menu-toggle'),nav=document.querySelector('.header-nav'),tabbar=document.querySelector('.site-tabbar'),theme=document.getElementById('themeToggle');
+            toggle.click(); nav.scrollTop=nav.scrollHeight;
+            const navBox=nav.getBoundingClientRect(),tabBox=tabbar.getBoundingClientRect(),themeBox=theme.getBoundingClientRect();
+            const hit=document.elementFromPoint(themeBox.left+themeBox.width/2, themeBox.bottom-6);
+            const ok=!!hit && theme.contains(hit) && navBox.bottom<=tabBox.top;
+            toggle.click();
+            return {ok,navBottom:navBox.bottom,tabTop:tabBox.top,hitTag:hit?.tagName||null,hitClass:hit?.className||null};
+          })()`);
+          assert.equal(menuClearance.ok, true, `${page}: ${JSON.stringify(menuClearance)}`);
+        }
         console.log('shared navigation:', JSON.stringify({page,width,active,narration,consistent:true}));
       }
     }
@@ -206,15 +228,17 @@ async function main() {
             const image=images[0]?.getBoundingClientRect();
             return {visible:images.length,dark:images[0]?.classList.contains('agent-machine-dark'),
               fits:!!image && image.width>0 && image.right<=innerWidth+1,
-              reflow:!!image && (innerWidth<=760 ? image.top>=copy.bottom-1 : image.left>=copy.right-1)};
+              reflow:!!image && image.bottom<=copy.top+1};
           });
           const details=document.querySelector('.course-phase-discovery');
           return {width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,machines,
+            phaseCards:document.querySelectorAll('.phase-card').length,
             resources:document.querySelectorAll('.course-resource-list>li>a').length,
             phases:details?.querySelectorAll('a').length,collapsed:details?.open===false};
         })()`);
         assert.ok(state.scroll <= state.width+1, JSON.stringify(state));
-        assert.equal(state.machines.length, 2);
+        assert.equal(state.machines.length, 3);
+        assert.equal(state.phaseCards, data.PHASES.length);
         for (const machine of state.machines) {
           assert.equal(machine.visible, 1, JSON.stringify(machine));
           assert.equal(machine.dark, theme === 'dark');

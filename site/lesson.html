@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261106a">
+  <link rel="stylesheet" href="style.css?v=20261115a">
   <link rel="stylesheet" href="certifications.css?v=20261106a">
   <link rel="stylesheet" href="highlights.css?v=20261026a">
   <link rel="stylesheet" href="lesson-walkthrough.css?v=20261026a">
@@ -834,6 +834,44 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--ink-soft);
+    }
+
+    .lesson-action-panel.is-collapsed {
+      margin: 16px 0 28px;
+      background: transparent;
+      border-color: var(--rule-soft);
+    }
+
+    .lesson-action-panel.is-collapsed .lesson-action-head {
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 0;
+    }
+
+    .lesson-action-panel.is-collapsed .lesson-action-head > div:first-child { display: none; }
+
+    .lesson-action-panel.is-collapsed .lesson-action-status { flex: 1; }
+
+    .lesson-action-details[hidden] { display: none; }
+
+    .lesson-action-toggle {
+      flex-shrink: 0;
+      min-height: 36px;
+      padding: 6px 12px;
+      border: 1px solid var(--blueprint);
+      background: transparent;
+      color: var(--blueprint);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .lesson-action-toggle:hover,
+    .lesson-action-toggle:focus-visible {
+      background: var(--blueprint);
+      color: var(--bg);
     }
 
     .lesson-action-loop {
@@ -2512,6 +2550,7 @@
     @media (max-width: 768px) {
       .lesson-main { padding: 56px 16px 60px; }
       .lesson-action-head { display: grid; grid-template-columns: minmax(0, 1fr); }
+      .lesson-action-panel.is-collapsed .lesson-action-head { display: flex; flex-wrap: wrap; }
       .lesson-action-loop { grid-template-columns: minmax(0, 1fr); }
       .lesson-action-step {
         border-right: 0;
@@ -2657,17 +2696,17 @@
   <div class="header-inner">
     <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span><span class="logo-label">AI / FROM SCRATCH</span></a>
     <nav class="header-nav" aria-label="主导航"><!-- Shared navigation: lib/site-navigation.js -->
-<a href="index.html#contents" data-header-page="index" data-header-priority>课程目录</a>
+<a href="index.html#contents" data-header-page="index">课程目录</a>
 <a href="catalog.html" data-header-page="catalog" data-header-priority>课程表</a>
 <a href="prereqs.html" data-header-page="prereqs">路线图</a>
 <a href="learning-paths.html" data-header-page="learning-paths" data-header-priority>学习路径</a>
 <a href="certifications.html" data-header-page="certifications">认证</a>
-<a href="projects.html" data-header-page="projects">实战项目</a>
+<a href="projects.html" data-header-page="projects" data-header-priority>实战项目</a>
 <a href="manuals.html" data-header-page="manuals">技术手册</a>
 <a href="glossary.html" data-header-page="glossary">术语表</a>
 <a href="cheatsheets" data-header-page="cheatsheets">速查表</a>
-<a href="practice" data-header-page="practice">编程练习</a>
-<a href="interviews" data-header-page="interviews">面试题库</a>
+<a href="practice" data-header-page="practice" data-header-priority>编程练习</a>
+<a href="interviews" data-header-page="interviews" data-header-priority>面试题库</a>
 <a href="how-to-learn.html" data-header-page="how-to-learn">学习方法</a>
 <a href="skills.html" data-header-page="skills">Agent 技能</a>
 <a href="inside-an-ai-agent.html" data-header-page="inside-an-ai-agent">Agent 内部机制</a>
@@ -2711,9 +2750,9 @@
     <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
   </div>
 
-  <script src="md-render.js?v=20261112a"></script>
+  <script src="md-render.js?v=20261115a"></script>
   <script src="build-meta.js?v=20261106a"></script>
-  <script src="data.js?v=20261112a"></script>
+  <script src="data.js?v=20261115a"></script>
   <script>
     (function () {
       var path = '';
@@ -2735,11 +2774,11 @@
     }());
   </script>
   <script src="content-source.js?v=20261012a"></script>
-  <script src="progress.js?v=20261112a"></script>
-  <script src="highlights-anchor.js?v=20261112a"></script>
-  <script src="highlights-store.js?v=20261112a"></script>
-  <script src="highlights.js?v=20261112a"></script>
-  <script src="lesson-walkthrough.js?v=20261112a"></script>
+  <script src="progress.js?v=20261115a"></script>
+  <script src="highlights-anchor.js?v=20261115a"></script>
+  <script src="highlights-store.js?v=20261115a"></script>
+  <script src="highlights.js?v=20261115a"></script>
+  <script src="lesson-walkthrough.js?v=20261115a"></script>
   <script id="learningPathProgressRuntime">
     (function (root) {
       'use strict';
@@ -2860,8 +2899,8 @@
     });
     window._mermaidReady = mermaid;
   </script>
-  <script src="header.js?v=20261106a" defer></script>
-  <script src="cmdpalette.js?v=20261112a" defer></script>
+  <script src="header.js?v=20261115a" defer></script>
+  <script src="cmdpalette.js?v=20261115a" defer></script>
   <script src="lesson-figures.js?v=9ed45625eaea"></script>
   <script src="code-copy.js?v=20261106a" defer></script>
   <script src="figure-manifest.js?v=e73e1e2c4fe2"></script>
@@ -3990,7 +4029,9 @@
         panel.innerHTML =
           '<div class="lesson-action-head"><div><h2 class="lesson-action-title" id="lessonActionTitle">把这节课落实成行动</h2>' +
           '<p class="lesson-action-intro">用这组步骤把阅读转成可核查的证据。每个检查点独立记录，不等同于测验正确率。</p></div>' +
-          '<div class="lesson-action-status" role="status" aria-live="polite">已完成 0/5 个检查点</div></div>' +
+          '<div class="lesson-action-status" role="status" aria-live="polite">已完成 0/5 个检查点</div>' +
+          '<button class="lesson-action-toggle" type="button" aria-expanded="false" aria-controls="lessonActionDetails">展开清单</button></div>' +
+          '<div class="lesson-action-details" id="lessonActionDetails" hidden>' +
           '<div class="lesson-action-loop" aria-label="课程工作流检查点">' +
           '<button class="lesson-action-step" type="button" data-checkpoint="read"><span class="lesson-action-step-num">01</span><span class="lesson-action-step-title">阅读</span><span class="lesson-action-step-copy">理解主张与约束。</span></button>' +
           '<button class="lesson-action-step" type="button" data-checkpoint="built"><span class="lesson-action-step-num">02</span><span class="lesson-action-step-title">构建</span><span class="lesson-action-step-copy">创建或修改课程产出。</span></button>' +
@@ -4001,7 +4042,24 @@
           '<div class="lesson-action-run"><div class="lesson-action-label">从仓库运行</div>' +
           '<div class="lesson-action-command-row"><code class="lesson-action-command">正在查找独立的可运行文件</code><button class="lesson-action-copy" type="button" hidden>复制命令</button></div>' +
           '<p class="lesson-action-note">页面正在检查本课的 code 目录是否有独立入口。</p></div>' +
-          lessonActionPathHtml() + '</div>';
+          lessonActionPathHtml() + '</div></div>';
+
+        var actionToggle = panel.querySelector('.lesson-action-toggle');
+        var actionDetails = panel.querySelector('.lesson-action-details');
+        function setLessonActionOpen(open) {
+          actionDetails.hidden = !open;
+          panel.classList.toggle('is-collapsed', !open);
+          actionToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          actionToggle.textContent = open ? '收起清单' : '展开清单';
+        }
+        var actionOpen = false;
+        try { actionOpen = window.localStorage.getItem('aifs:lesson-checklist-open') === '1'; } catch (_) {}
+        setLessonActionOpen(actionOpen);
+        actionToggle.addEventListener('click', function () {
+          var next = actionDetails.hidden;
+          setLessonActionOpen(next);
+          try { window.localStorage.setItem('aifs:lesson-checklist-open', next ? '1' : '0'); } catch (_) {}
+        });
 
         var metaTags = article.querySelectorAll('.lesson-meta-tag');
         var anchor = metaTags.length ? metaTags[metaTags.length - 1] : article.querySelector('.learning-objectives, .motto, h1');
