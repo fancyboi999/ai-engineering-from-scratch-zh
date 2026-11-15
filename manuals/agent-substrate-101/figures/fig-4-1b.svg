@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-4-1b-title fig-4-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-4-1b-title">四种 CPU 上限下 actor 实际使用的宿主核心数</title>
+  <desc id="fig-4-1b-desc">固定工作负载在 1 线程与 4 线程下使用的宿主核心数对模板 cpuMillicores 上限的关系图，每点运行三次，共 24 次。1 线程中位数为：250 下 0.25 核、500 下 0.50 核、1000 下 1.01 核、2000 下 1.12 核；4 线程中位数为：250 下 0.25 核、500 下 0.50 核、1000 下 1.00 核、2000 下 2.00 核。虚线标出配额上限本身。实测点紧贴该虚线，低于 2000 millicores 时 4 线程并未比 1 线程获得更多 CPU。同一工作负载在 250 millicores 下耗时 27.4 s，在 1000 下耗时 5.1 s。所有上限下程序均看到 2 个 CPU。</desc>
+  <line x1="52" y1="280" x2="452" y2="280" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="46" y="284" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="52" y1="225.45" x2="452" y2="225.45" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="46" y="229.45" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.5</text>
+  <line x1="52" y1="170.91" x2="452" y2="170.91" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="46" y="174.91" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1</text>
+  <line x1="52" y1="116.36" x2="452" y2="116.36" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="46" y="120.36" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1.5</text>
+  <line x1="52" y1="61.82" x2="452" y2="61.82" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="46" y="65.82" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2</text>
+  <line x1="52" y1="280" x2="452" y2="280" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="52" y1="40" x2="52" y2="280" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="102" y1="280" x2="102" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="102" y="297" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">250</text>
+  <line x1="152" y1="280" x2="152" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="152" y="297" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">500</text>
+  <line x1="252" y1="280" x2="252" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="252" y="297" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1000</text>
+  <line x1="452" y1="280" x2="452" y2="284" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="452" y="297" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">2000</text>
+  <text x="252" y="314" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模板的 resources.limits.cpuMillicores</text>
+  <text x="52" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor cgroup 使用的宿主核心数</text>
+  <line x1="52" y1="280" x2="452" y2="61.82" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <path d="M102.0 252.7 L152.0 225.5 L252.0 170.9 L452.0 61.8" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linejoin="round"/>
+  <path d="M102.0 252.7 L152.0 225.5 L252.0 169.8 L452.0 157.8" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="106" cy="252.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="106" cy="252.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="106" cy="252.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="156" cy="225.45" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="156" cy="225.45" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="156" cy="225.45" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="256" cy="170.91" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="256" cy="169.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="256" cy="170.91" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="456" cy="60.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="456" cy="61.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="456" cy="66.18" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="98" cy="252.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="98" cy="252.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="98" cy="252.73" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="148" cy="224.36" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="148" cy="225.45" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="148" cy="225.45" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="248" cy="169.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="248" cy="169.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="248" cy="169.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="448" cy="157.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="448" cy="157.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="448" cy="157.82" r="2.4" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="466" y="65.82" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">4 线程</text>
+  <text x="466" y="80.82" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2000 下 2.00 核</text>
+  <text x="466" y="161.82" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">1 线程</text>
+  <text x="466" y="176.82" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2000 下 1.12 核，</text>
+  <text x="466" y="190.82" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单线程跑满单核</text>
+  <text x="312" y="256.73" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">细虚线：配额上限</text>
+  <text x="64" y="77.82" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">250、500、1000 下为 0.25、0.50、1.01 核，</text>
+  <text x="64" y="91.82" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">1 线程与 4 线程相同</text>
+  <text x="64" y="132.36" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同一负载：250 下 27.4 s，1000 下 5.1 s</text>
+  <text x="64" y="146.36" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">250 下耗时为 5.4 倍</text>
+  <text x="52" y="332" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每点代表一次运行，每档各跑三次。所有上限下程序均看到 2 个 CPU。</text>
+</svg>

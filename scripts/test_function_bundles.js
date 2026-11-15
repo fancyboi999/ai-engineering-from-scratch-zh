@@ -10,7 +10,7 @@ const { globSync } = createRequire(require.resolve('@vercel/nft'))('glob');
 
 const ROOT = path.join(__dirname, '..');
 const config = require('../vercel.json');
-const budgets = { certification: 5, lesson: 30, og: 10 };
+const budgets = { certification: 5, lesson: 30, markdown: 25, og: 10 };
 
 test('deployment routing compiles with the Vercel platform parser', () => {
   const transformed = getTransformedRoutes(config);
@@ -27,23 +27,32 @@ test('deployment routing compiles with the Vercel platform parser', () => {
     headers: [{ source: '/manual-[a-z0-9-]+/[a-z0-9-]+', headers: [{ key: 'Vary', value: 'Accept' }] }],
   });
   assert.equal(invalid.error && invalid.error.code, 'invalid_header', 'raw RegExp syntax must not bypass path-to-regexp validation');
+  for (const [fnName, fnConfig] of Object.entries(config.functions || {})) {
+    for (const key of ['includeFiles', 'excludeFiles']) {
+      if (typeof fnConfig[key] === 'string') {
+        assert.ok(fnConfig[key].length <= 256, `${fnName}.${key} is ${fnConfig[key].length} chars (Vercel maxLength is 256)`);
+      }
+    }
+  }
 });
 const sourceOnly = [
   /^scripts\//,
   /^projects\/(?!.*\/docs\/zh\.md$)/,
   /^manuals\/.*\/capture\//,
   /^site\/(?:build[^/]*|test[_-][^/]*)(?:\/|$)/,
-  /(?:^|\/)(?:tests?|__tests__)(?:\/|[_.-])/,
+  /^(?!site\/(?:agent-pages|hubs)\/glossary\/test-oracle\.(?:md|html)$)(?:.*\/)?(?:tests?|__tests__)(?:\/|[_.-])/,
 ];
 
 async function invoke(handler, url, headers = {}) {
+  const parsed = new URL(url, 'https://aieng-zh.cn');
+  const query = Object.fromEntries(parsed.searchParams.entries());
   const response = {
     statusCode: 200,
     headers: {},
     setHeader(name, value) { this.headers[name.toLowerCase()] = String(value); },
     end(body) { this.body = Buffer.isBuffer(body) ? body : Buffer.from(body || ''); },
   };
-  await handler({ method: 'GET', url, headers }, response);
+  await handler({ method: 'GET', url, query, headers }, response);
   return response;
 }
 
@@ -84,6 +93,19 @@ async function smoke(name, root) {
         }
       }
     }
+  } else if (name === 'markdown') {
+    for (const [targetPath, accept, expectedType] of [
+      ['/', 'text/html', /^text\/html/],
+      ['/', 'text/markdown', /^text\/markdown/],
+      ['/phase/setup-and-tooling', 'text/markdown', /^text\/markdown/],
+    ]) {
+      const response = await invoke(handler, `/api/markdown?path=${encodeURIComponent(targetPath)}`, { accept });
+      assert.equal(response.statusCode, 200, `${targetPath} (${accept})`);
+      assert.match(response.headers['content-type'], expectedType);
+      assert.ok(response.body.length > 0);
+    }
+    const missing = await invoke(handler, '/api/markdown?path=/not-a-page', { accept: 'text/html' });
+    assert.equal(missing.statusCode, 404);
   } else {
     const lesson = Object.keys(manifest(root, 'lesson-seo').lessons)[0];
     const track = Object.keys(manifest(root, 'certification-seo').tracks)[0];
@@ -103,8 +125,13 @@ async function smoke(name, root) {
 for (const [name, megabytes] of Object.entries(budgets)) {
   test(`${name} deployment contains only runtime files and serves from its bundle`, async function (t) {
     const entry = `api/${name}.js`;
-    const trace = await nodeFileTrace([entry], { base: ROOT, ignore: ['.git', '.git/**', '.vercel/**'] });
-    const files = new Set([...trace.fileList, ...globSync(config.functions[entry].includeFiles, { cwd: ROOT, nodir: true })]);
+    const fnConfig = config.functions[entry] || {};
+    const trace = await nodeFileTrace([entry], {
+      base: ROOT,
+      ignore: ['.git', '.git/**', '.vercel/**', ...(fnConfig.excludeFiles ? [fnConfig.excludeFiles] : [])],
+    });
+    const excluded = new Set(fnConfig.excludeFiles ? globSync(fnConfig.excludeFiles, { cwd: ROOT, nodir: true }) : []);
+    const files = new Set([...trace.fileList, ...(fnConfig.includeFiles ? globSync(fnConfig.includeFiles, { cwd: ROOT, nodir: true }) : [])].filter(file => !excluded.has(file)));
     const unexpected = [...files].filter(file => sourceOnly.some(pattern => pattern.test(file)));
     assert.equal(unexpected.length, 0, `source files leaked into ${entry}: ${unexpected.slice(0, 10).join(', ')}`);
     const bytes = [...files].reduce((total, file) => total + fs.statSync(path.join(ROOT, file)).size, 0);

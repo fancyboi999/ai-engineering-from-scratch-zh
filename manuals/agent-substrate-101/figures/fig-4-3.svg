@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-4-3-title fig-4-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-4-3-title">ate-api-server 如何为一次恢复选定 worker</title>
+  <desc id="fig-4-3-desc">从 ResumeActor 到绑定 worker 的流程。所有 worker 依次经过六项检查：已注册且处于 WORKER_STATE_ACTIVE、匹配快照的沙箱类别、持有节点本地快照的所在节点、具备可恢复内存快照的运行时、匹配模板与 actor 的 worker 选择器标签，以及剩余容量满足 actor 资源上限。若无候选者，则返回错误 no worker has room for the actor，路由器暂存请求；若有候选者，则随机抽两个并在单个 Postgres 事务中绑定负载较低的一个。</desc>
+  <defs><marker id="fig-4-3-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-3-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-4-3-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
+  <rect x="20" y="20" width="150" height="48" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="95" y="39.25" font-size="12.5" text-anchor="middle" font-weight="700">ResumeActor</text>
+  <text x="95" y="56.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 处于 SUSPENDED</text>
+  <text x="210" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">对每个 WORKER 执行六项检查</text>
+  <rect x="210" y="28" width="410" height="28" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="222" y="45.6" font-size="12" font-weight="400">1  已注册且处于 WORKER_STATE_ACTIVE</text>
+  <rect x="210" y="62" width="410" height="28" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="222" y="79.6" font-size="12" font-weight="400">2  匹配快照的沙箱类别</text>
+  <rect x="210" y="96" width="410" height="28" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="222" y="113.6" font-size="12" font-weight="400">3  若存在节点本地快照，则须在同一节点</text>
+  <rect x="210" y="130" width="410" height="28" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="222" y="147.6" font-size="12" font-weight="400">4  具备可恢复该内存快照的运行时</text>
+  <rect x="210" y="164" width="410" height="28" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="222" y="181.6" font-size="12" font-weight="400">5  标签匹配模板与 actor 的 workerSelector</text>
+  <rect x="210" y="198" width="410" height="28" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="222" y="215.6" font-size="12" font-weight="400">6  剩余容量满足 actor 的资源上限</text>
+  <line x1="170" y1="44" x2="209" y2="44" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
+  <rect x="20" y="262" width="230" height="66" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="135" y="282.75" font-size="12.5" text-anchor="middle" font-weight="700">无候选 worker</text>
+  <text x="135" y="300.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">no worker has room for the actor</text>
+  <text x="135" y="315.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">路由器暂存该请求</text>
+  <rect x="280" y="262" width="160" height="66" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="360" y="282.75" font-size="12.5" text-anchor="middle" font-weight="700">随机抽两个</text>
+  <text x="360" y="300.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">负载较低的候选者</text>
+  <text x="360" y="315.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">胜出</text>
+  <rect x="470" y="262" width="150" height="66" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="545" y="282.75" font-size="12.5" text-anchor="middle" font-weight="700">绑定</text>
+  <text x="545" y="300.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Postgres 内的</text>
+  <text x="545" y="315.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单个事务</text>
+  <path d="M230 227 V244 H135 V261" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-4-3-head-rose)"/>
+  <text x="127" y="240" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-rose-ink, #b0344d)">无 worker 通过</text>
+  <text x="368" y="248" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">通过检查的 worker</text>
+  <line x1="360" y1="227" x2="360" y2="261" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-ink)"/>
+  <line x1="440" y1="295" x2="469" y2="295" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-4-3-head-teal)"/>
+  <text x="545" y="346" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">ACTOR_STATE_RESUMING</text>
+</svg>

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-3-4-title fig-3-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-3-4-title">异步挂起后快照存放在哪里</title>
+  <desc id="fig-3-4-desc">x86 服务器客户机上使用默认 atelet 计时器异步挂起后，四个 actor（d0、d50、d200、d500）在 43 分钟内的时间线。前 5 分钟每份快照仅存于节点本地，状态为 PENDING；约 5 分钟至 30 分钟同时存在于节点与对象存储；约 30 分钟后节点副本被移除，仅保留对象存储副本。前三次上传在 5 分 1 秒至 5 分 2 秒完成，500 MiB 的一次在 5 分 11 秒完成。挂起 42 分钟后发起请求，各 actor 从对象存储恢复耗时分别为 0.25 s、0.52 s、1.19 s、2.44 s。柱条下方圆点展示 38 次采样中节点磁盘上的快照体积：节点副本移除前为 758 MiB，移除后为 1 MiB。</desc>
+  <rect x="20" y="14" width="14" height="10" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="40" y="23" font-size="11" fill="var(--m-rose-ink, #b0344d)">仅节点，PENDING</text>
+  <rect x="196" y="14" width="14" height="10" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="216" y="23" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">节点与对象存储</text>
+  <rect x="390" y="14" width="14" height="10" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="410" y="23" font-size="11" fill="var(--m-teal-ink, #18696a)">仅对象存储</text>
+  <text x="20" y="80" font-size="12" font-weight="700">d0</text>
+  <text x="56" y="80" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <rect x="96" y="66" width="60.42" height="20" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <rect x="156.42" y="66" width="300.26" height="20" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <rect x="456.68" y="66" width="143.32" height="20" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <circle cx="600" cy="76" r="3.5" fill="var(--m-amber-ink, #85590c)"/>
+  <text x="592" y="80" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.25 s 恢复</text>
+  <text x="20" y="118" font-size="12" font-weight="700">d50</text>
+  <text x="56" y="118" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">50</text>
+  <rect x="96" y="104" width="60.32" height="20" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <rect x="156.32" y="104" width="300.26" height="20" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <rect x="456.58" y="104" width="143.42" height="20" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <circle cx="600" cy="114" r="3.5" fill="var(--m-amber-ink, #85590c)"/>
+  <text x="592" y="118" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.52 s 恢复</text>
+  <text x="20" y="156" font-size="12" font-weight="700">d200</text>
+  <text x="56" y="156" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">200</text>
+  <rect x="96" y="142" width="60.18" height="20" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <rect x="156.18" y="142" width="300.24" height="20" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <rect x="456.42" y="142" width="143.58" height="20" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <circle cx="600" cy="152" r="3.5" fill="var(--m-amber-ink, #85590c)"/>
+  <text x="592" y="156" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.19 s 恢复</text>
+  <text x="20" y="194" font-size="12" font-weight="700">d500</text>
+  <text x="56" y="194" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">500</text>
+  <rect x="96" y="180" width="62.12" height="20" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <rect x="158.12" y="180" width="298.04" height="20" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <rect x="456.16" y="180" width="143.84" height="20" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <circle cx="600" cy="190" r="3.5" fill="var(--m-amber-ink, #85590c)"/>
+  <text x="592" y="194" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2.44 s 恢复</text>
+  <text x="56" y="56" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">MiB</text>
+  <line x1="156.18" y1="30" x2="156.18" y2="266" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="162.18" y="40" font-size="11" fill="var(--m-teal-ink, #18696a)">5 分 1 秒 后完成上传</text>
+  <line x1="456.68" y1="46" x2="456.68" y2="266" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="450.68" y="56" font-size="11" text-anchor="end" fill="var(--m-violet-ink, #5b4fa3)">30 分 3 秒 后移除节点副本</text>
+  <text x="20" y="232" font-size="12" font-weight="700">节点</text>
+  <text x="20" y="247" font-size="12" font-weight="700">磁盘</text>
+  <circle cx="108.06" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="121.32" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="134.55" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="147.79" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="161.03" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="174.26" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="187.52" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="200.75" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="213.99" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="227.25" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="240.47" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="253.73" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="267" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="280.28" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="293.54" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="306.8" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="320.02" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="333.28" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="346.53" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="359.76" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="373" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="386.24" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="399.46" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="412.73" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="425.98" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="439.22" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="452.46" cy="226" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="465.66" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="478.84" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="492.1" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="505.35" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="518.56" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="531.8" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="545.04" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="558.28" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="571.51" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="584.74" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <circle cx="597.97" cy="252" r="2" fill="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="168" y="244" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">758 MiB 快照，每次采样一点</text>
+  <text x="463.2" y="242" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">1 MiB</text>
+  <line x1="96" y1="272" x2="612" y2="272" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="96" y1="268" x2="96" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="96" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="156" y1="268" x2="156" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="156" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">5</text>
+  <line x1="216" y1="268" x2="216" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="216" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">10</text>
+  <line x1="276" y1="268" x2="276" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="276" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">15</text>
+  <line x1="336" y1="268" x2="336" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="336" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">20</text>
+  <line x1="396" y1="268" x2="396" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="396" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">25</text>
+  <line x1="456" y1="268" x2="456" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="456" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">30</text>
+  <line x1="516" y1="268" x2="516" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="516" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">35</text>
+  <line x1="576" y1="268" x2="576" y2="276" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="576" y="290" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">40</text>
+  <text x="20" y="290" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">分钟</text>
+  <circle cx="26" cy="312" r="3.5" fill="var(--m-amber-ink, #85590c)"/>
+  <text x="36" y="316" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">挂起 42 分钟后发一次请求：所有 actor 均从对象存储恢复</text>
+  <text x="20" y="336" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">在玫红区间丢失节点副本会让 actor 进入 CRASHED。各时间最多延后 10 s。</text>
+</svg>

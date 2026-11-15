@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 472" role="img" aria-labelledby="fig-7-5-title fig-7-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-7-5-title">实测中每个 Agent Executor 对象在 Agent Substrate 上的实际映射</title>
+  <desc id="fig-7-5-desc">六行展示我们在 Substrate v1.0.0 上实测 Agent Executor 某一提交时的对象映射关系。Task 是 Agent Executor 数据库中的一行记录，映射为同名的单个 actor 与模板，使用仅文件快照与黄金快照。Workspace 由 task runner 在每次启动时于沙箱内准备。Gateway 虽可存储，但引用它的 task 会因 Unimplemented 被拒绝，因此不会创建出站策略。Model 存储时不校验其 Secret，且 task 无字段引用 Model，因此密钥不会传入 task。resume 与 suspend 命令映射为两个 Substrate 调用，无请求的 task 在 600 秒内一直保持 RUNNING。模板未指定 worker 池，导致所有 task 均运行在另一命名空间的 WorkerPool 上。</desc>
+  <defs><marker id="fig-7-5-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-7-5-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">AGENT EXECUTOR</text>
+  <text x="380" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">AGENT SUBSTRATE</text>
+  <rect x="20" y="34" width="240" height="48" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="140" y="53.1" font-size="12" text-anchor="middle" font-weight="700">Task</text>
+  <text x="140" y="70.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">自身数据库中的一行记录</text>
+  <rect x="380" y="34" width="240" height="48" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="500" y="53.1" font-size="12" text-anchor="middle" font-weight="700">Actor 与 ActorTemplate</text>
+  <text x="500" y="70.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同名，仅文件快照</text>
+  <line x1="260" y1="58" x2="379" y2="58" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-5-head-ink)"/>
+  <rect class="m-knock" x="293.5" y="41.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="319.5" y="52" font-size="11.5" text-anchor="middle">一一对应</text>
+  <rect x="20" y="106" width="240" height="48" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="140" y="125.1" font-size="12" text-anchor="middle" font-weight="700">Workspace</text>
+  <text x="140" y="142.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">内联文件与 Git 仓库</text>
+  <rect x="380" y="106" width="240" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="500" y="125.1" font-size="12" text-anchor="middle" font-weight="700">ax-task-runner, PID 1</text>
+  <text x="500" y="142.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先写文件，再尝试 clone</text>
+  <line x1="260" y1="130" x2="379" y2="130" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-5-head-ink)"/>
+  <rect class="m-knock" x="287.75" y="113.03" width="63.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="319.5" y="124" font-size="11.5" text-anchor="middle">每次启动时</text>
+  <rect x="20" y="178" width="240" height="48" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="140" y="197.1" font-size="12" text-anchor="middle" font-weight="700">Gateway</text>
+  <text x="140" y="214.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已存储，含 1 条出站规则</text>
+  <rect x="380" y="178" width="240" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="500" y="197.1" font-size="12" text-anchor="middle" font-weight="700">无 EgressPolicy</text>
+  <text x="500" y="214.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">spec.gateway: Unimplemented</text>
+  <line x1="260" y1="202" x2="379" y2="202" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-5-head-rose)"/>
+  <rect class="m-knock" x="299.25" y="185.03" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="319.5" y="196" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">被拒绝</text>
+  <rect x="20" y="250" width="240" height="48" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="140" y="269.1" font-size="12" text-anchor="middle" font-weight="700">Model</text>
+  <text x="140" y="286.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已存储，不校验 Secret</text>
+  <rect x="380" y="250" width="240" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="500" y="269.1" font-size="12" text-anchor="middle" font-weight="700">Substrate 上无对应物</text>
+  <text x="500" y="286.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">无 task 字段引用 Model</text>
+  <line x1="260" y1="274" x2="379" y2="274" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-5-head-rose)"/>
+  <rect class="m-knock" x="299.25" y="257.03" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="319.5" y="268" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">未使用</text>
+  <rect x="20" y="322" width="240" height="48" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="140" y="341.1" font-size="12" text-anchor="middle" font-weight="700">ax resume, ax suspend</text>
+  <text x="140" y="358.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">由你手动执行的命令</text>
+  <rect x="380" y="322" width="240" height="48" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="500" y="341.1" font-size="12" text-anchor="middle" font-weight="700">ResumeActor, SuspendActor</text>
+  <text x="500" y="358.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">空闲 600 s 仍为 RUNNING</text>
+  <line x1="260" y1="346" x2="379" y2="346" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-5-head-ink)"/>
+  <rect class="m-knock" x="293.5" y="329.03" width="52" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="319.5" y="340" font-size="11.5" text-anchor="middle">由你调用</text>
+  <rect x="20" y="394" width="240" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="140" y="413.1" font-size="12" text-anchor="middle" font-weight="700">无 worker 选择器</text>
+  <text x="140" y="430.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模板未指定任何池</text>
+  <rect x="380" y="394" width="240" height="48" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="500" y="413.1" font-size="12" text-anchor="middle" font-weight="700">其他团队的 WorkerPool</text>
+  <text x="500" y="430.3" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">所有 task 均跑在池外</text>
+  <line x1="260" y1="418" x2="379" y2="418" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-5-head-rose)"/>
+  <rect class="m-knock" x="299.25" y="401.03" width="40.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="319.5" y="412" font-size="11.5" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">任意池</text>
+</svg>

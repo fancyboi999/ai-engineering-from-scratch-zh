@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" role="img" aria-labelledby="fig-3-1b-title fig-3-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-3-1b-title">新 actor 的首次调用耗时与模板内存的关系</title>
+  <desc id="fig-3-1b-desc">x86 服务器客户机上，新 actor 首次请求（需恢复黄金快照）耗时秒数对模板所持内存 MiB 的关系。25 个新 actor 各为一个圆点，每种规格 5 个，实线连接中位数：0 MiB 为 0.23 s、50 MiB 为 0.25 s、200 MiB 为 0.62 s、500 MiB 为 5.76 s、1000 MiB 为 6.60 s。500 MiB 的 5 次首次调用耗时 1.86、3.03、5.76、6.24、6.76 s，1000 MiB 的 5 次耗时 3.46、3.56、6.60、11.85、12.75 s。另一条线展示单个 actor 从节点本地快照连续恢复 10 次的中位数，在 1000 MiB 时为 2.16 s。</desc>
+  <line x1="46" y1="310" x2="486" y2="310" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="314" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="46" y1="271.43" x2="486" y2="271.43" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="275.43" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2</text>
+  <line x1="46" y1="232.86" x2="486" y2="232.86" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="236.86" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">4</text>
+  <line x1="46" y1="194.29" x2="486" y2="194.29" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="198.29" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">6</text>
+  <line x1="46" y1="155.71" x2="486" y2="155.71" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="159.71" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">8</text>
+  <line x1="46" y1="117.14" x2="486" y2="117.14" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="121.14" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">10</text>
+  <line x1="46" y1="78.57" x2="486" y2="78.57" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="82.57" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">12</text>
+  <line x1="46" y1="40" x2="486" y2="40" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="40" y="44" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">14</text>
+  <line x1="46" y1="310" x2="486" y2="310" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="46" y1="40" x2="46" y2="310" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="46" y1="310" x2="46" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="46" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0</text>
+  <line x1="68" y1="310" x2="68" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="68" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">50</text>
+  <line x1="134" y1="310" x2="134" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="134" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">200</text>
+  <line x1="266" y1="310" x2="266" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="266" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">500</text>
+  <line x1="486" y1="310" x2="486" y2="314" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="486" y="327" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1000</text>
+  <text x="266" y="344" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模板持有的内存，MiB</text>
+  <text x="46" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">客户端从请求到回复的耗时，秒</text>
+  <path d="M46.0 305.7 L68.0 305.4 L134.0 300.9 L266.0 289.4 L486.0 268.3" fill="none" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M46.0 305.6 L68.0 305.1 L134.0 298.1 L266.0 198.9 L486.0 182.8" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.8" stroke-linejoin="round"/>
+  <line x1="51" y1="305.37" x2="51" y2="305.83" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-opacity="0.45"/>
+  <circle cx="51" cy="305.37" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="51" cy="305.56" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="51" cy="305.83" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="51" cy="305.74" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="51" cy="305.64" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <line x1="68" y1="302.29" x2="68" y2="305.33" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-opacity="0.45"/>
+  <circle cx="68" cy="302.29" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="68" cy="304.99" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="68" cy="305.12" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="68" cy="305.33" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="68" cy="305.27" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <line x1="134" y1="293.36" x2="134" y2="299.18" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-opacity="0.45"/>
+  <circle cx="134" cy="293.36" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="134" cy="299.18" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="134" cy="297.89" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="134" cy="298.14" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="134" cy="298.89" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <line x1="266" y1="179.63" x2="266" y2="274.09" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-opacity="0.45"/>
+  <circle cx="266" cy="251.64" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="266" cy="274.09" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="266" cy="179.63" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="266" cy="198.88" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="266" cy="189.58" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <line x1="486" y1="64.2" x2="486" y2="243.19" stroke="var(--m-teal-ink, #18696a)" stroke-width="1" stroke-opacity="0.45"/>
+  <circle cx="486" cy="81.54" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="486" cy="243.19" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="486" cy="182.75" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="486" cy="241.4" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <circle cx="486" cy="64.2" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <text x="500" y="68.2" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">12.75 s 最慢</text>
+  <text x="500" y="186.75" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">首次调用</text>
+  <text x="500" y="201.75" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">6.60 s（5 次中位）</text>
+  <text x="500" y="247.19" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">3.46 s 最快</text>
+  <text x="500" y="276.34" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">后续恢复</text>
+  <text x="500" y="291.34" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2.16 s（10 次中位）</text>
+  <text x="266" y="133.14" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">500 MiB 的 5 个新 actor：</text>
+  <text x="266" y="147.14" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-teal-ink, #18696a)">1.86、3.03、5.76、6.24、6.76 s</text>
+  <polyline points="94.4,230.29 134,298.14" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8" stroke-dasharray="2 3"/>
+  <circle cx="134" cy="298.14" r="2" fill="var(--m-teal-ink, #18696a)"/>
+  <text x="54.8" y="210.29" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">200 MiB 以内首次调用</text>
+  <text x="54.8" y="224.29" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">保持在 0.9 s 以下</text>
+  <circle cx="57.8" cy="55.29" r="2.4" fill="var(--m-teal-ink, #18696a)"/>
+  <text x="66.8" y="59.29" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单个新 actor 的首次调用</text>
+  <line x1="54.8" y1="69.29" x2="72.8" y2="69.29" stroke="var(--m-ink-soft, #4a4a4a)" stroke-width="1.8"/>
+  <text x="78.8" y="73.29" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">单一规格的中位数</text>
+</svg>

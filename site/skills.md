@@ -181,7 +181,7 @@
 - 安装： `npx skills add fancyboi999/ai-engineering-from-scratch-zh --skill isometric-explainer`
 - 源文件： https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/skills/isometric-explainer/SKILL.md
 
-### write-manual (v1.0.0)
+### write-manual (v1.1.0)
 
 围绕一个工具的固定版本编写长篇手册，包含来源、目录、每个示例的离线运行记录、图表与审计。
 

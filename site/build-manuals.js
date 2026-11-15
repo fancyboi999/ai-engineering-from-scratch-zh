@@ -121,18 +121,56 @@ function evidenceLink(url, label = '完整记录') {
 
 function readerCaption(caption) {
   const text = String(caption || '').trim();
-  const matches = [...text.matchAll(/(?:\s+|。)(?:From (?!step\b)|来源[：:])[^。]*$/g)];
+  const matches = [...text.matchAll(/(?:(?<=。)\s*|\s+)(?:From (?!step\b)|来源[：:])[^。]*[。.]?$/g)];
   if (!matches.length) return text;
   const match = matches[matches.length - 1];
   const tail = text.slice(match.index).trim();
-  if (!/(?:\/|\.(?:txt|json|jsonl|log|md|py|ts|proto|http|yaml)\b|\bcapture\b|\bsource\b|\b来源[：:]|\b代码\b|\b文档\b|\b报告\b|\bv\d)/i.test(tail)) return text;
+  if (!/(?:\/|\.(?:txt|tsv|csv|json|jsonl|log|md|py|ts|js|go|rs|proto|http|yaml|yml|toml|sh)\b|\bcapture\b|\bsource\b|来源[：:]|代码|文档|报告|\bv\d)/i.test(tail)) return text;
   return text.slice(0, match.index).trim();
+}
+
+const MEASURED = /^\*\*(?:我们测得|我们实测|实测|We measured)\*\*/i;
+
+// capture/lab 手册的每个实测段落各自指向最相关的录制汇总：段内引用的图、同一小节图注里
+// 唯一的汇总、Apple 芯片的录制，最后退回到来源行里的汇总目录。
+function labMeasuredEvidence(doc, manual, sourcesText) {
+  const paths = new Set(sourcesText.match(/capture\/[A-Za-z0-9_./-]*[A-Za-z0-9_-]/g) || []);
+  if (![...paths].some(rel => rel.startsWith('capture/lab/'))) return false;
+  const has = rel => paths.has(rel);
+  const labSummaries = text => String(text || '').match(/capture\/lab\/summary\/[A-Za-z0-9_.-]*[A-Za-z0-9_-]/g) || [];
+  const figureCaptions = new Map(doc.blocks.filter(block => block.type === 'figure').map(block => [block.id, block.caption]));
+  const underHeading = new Map();
+  let section = '';
+  for (const block of doc.blocks) {
+    if (block.type === 'heading') section = block.text;
+    if (block.type !== 'figure') continue;
+    if (!underHeading.has(section)) underHeading.set(section, new Set());
+    for (const rel of labSummaries(block.caption).filter(has)) underHeading.get(section).add(rel);
+  }
+  const summaries = [...paths].filter(rel => rel.startsWith('capture/lab/summary/'));
+  let heading = '';
+  for (const block of doc.blocks) {
+    if (block.type === 'heading') heading = block.text;
+    if (block.type !== 'paragraph' || !MEASURED.test(block.text)) continue;
+    const mac = /\bMac\b|Apple silicon|Apple 芯片|苹果芯片/.test(`${heading} ${block.text}`);
+    const cited = new Set((block.text.match(/\(#fig-[a-z0-9-]+\)/g) || []).flatMap(link => labSummaries(figureCaptions.get(link.slice(2, -1)))).filter(has));
+    const nearby = underHeading.get(heading) || new Set();
+    let rel = null;
+    if (cited.size === 1) rel = [...cited][0];
+    else if (!cited.size && !mac && nearby.size === 1) rel = [...nearby][0];
+    else if (mac) rel = [...paths].find(item => item.startsWith('capture/lab/') && /mac/i.test(item)) || null;
+    else if (summaries.length === 1) rel = summaries[0];
+    if (!rel) rel = summaries.length ? 'capture/lab/summary' : 'capture/lab';
+    block.evidence = evidenceLink(evidenceUrl(path.join(manual.dir, rel), docLine(doc, block.line)), '原始运行');
+  }
+  return true;
 }
 
 function measuredEvidence(doc, manual) {
   const has = rel => fs.existsSync(path.join(manual.dir, rel));
   const sources = doc.blocks.find(block => block.type === 'paragraph' && SOURCE_LINE.test(block.text));
   if (!sources) return;
+  if (labMeasuredEvidence(doc, manual, sources.text)) return;
   const context = `${doc.title} ${doc.thesis} ${sources.text}`;
   const picked = [];
   const add = rel => { if (has(rel) && !picked.includes(rel)) picked.push(rel); };
@@ -587,8 +625,8 @@ function blockHtml(block, doc, manual, acc) {
     case 'heading': return `<h${block.level} id="${block.id}">${inline(block.text)}</h${block.level}>`;
     case 'paragraph': {
       if (SOURCE_LINE.test(block.text)) return '';
-      const measured = /^\*\*(?:我们测得|我们实测|实测|We measured)\*\*/i.test(block.text);
-      return `<p${/^\*\*[^*]+[：:]\*\*\s/.test(block.text) ? ' class="m-def"' : ''}>${inline(block.text)}${measured && doc.evidence ? ` ${doc.evidence}` : ''}</p>`;
+      const evidence = MEASURED.test(block.text) ? block.evidence || doc.evidence : '';
+      return `<p${/^\*\*[^*]+[：:]\*\*\s/.test(block.text) ? ' class="m-def"' : ''}>${inline(block.text)}${evidence ? ` ${evidence}` : ''}</p>`;
     }
     case 'list': {
       const tag = block.ordered ? 'ol' : 'ul';

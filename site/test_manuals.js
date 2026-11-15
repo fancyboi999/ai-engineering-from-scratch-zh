@@ -505,6 +505,7 @@ const ZH_SECTION = SECTION
   .replace('A demo exists so that tests have something small to render.', '演示为测试提供一个小型渲染对象。')
   .replace('Your test needs a manual. 读完本节，你能渲染手册并校验结果。', '你的测试需要一本手册。读完本节后，你可以渲染手册并校验结果。')
   .replace('A request becomes a task.', '请求成为任务。')
+  .replace('Read left to right. From capture/out/task.json.', '从左向右阅读。来源：capture/out/task.json。')
   .replace('Sources: spec', '来源：spec');
 
 test('Chinese section shape accepts equivalent outcomes, sources and full stops', () => {
@@ -584,6 +585,7 @@ test('Chinese web and offline print output use genuine URLs and mark historic ev
   }
   assert.match(html, /github\.com\/fancyboi999\/ai-engineering-from-scratch-zh/);
   assert.match(html, /class="m-evidence"[^>]*>完整记录<\/a>/);
+  assert.match(html, /<figcaption class="m-fig-cap"><strong>请求成为任务。<\/strong> 从左向右阅读。<\/figcaption>/);
   assert.match(html, /data-source="capture\/out\/task\.json"/);
   assert.doesNotMatch(html.replace(/\sdata-source="[^"]*"/g, ''), /capture\/out\/task\.json/);
   assert.match(html, /上游记录的核验日期为 2026-10-06/);
@@ -631,3 +633,23 @@ test('audit CLI fails closed when a mistaken root or selector loads no manuals',
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /TOTAL 0/);
 });
+
+test('capture/lab measured paragraphs resolve figure, heading, Mac, and summary folder evidence links', () => {
+  const manual = manuals.loadManual(path.join(__dirname, '..', 'manuals', 'agent-substrate-101'));
+  const out = tempDir('manual-lab-evidence-');
+  manuals.writeWeb([manual], out, { drafts: true });
+  const html = fs.readFileSync(path.join(out, 'manual-agent-substrate-101.html'), 'utf8');
+  const links = [...html.matchAll(/href="([^"]+)"[^>]*>原始运行<\/a>/g)].map(match => match[1]);
+  assert.equal(links.length, 159, `expected 159 lab evidence links, got ${links.length}`);
+  const figcaps = [...html.matchAll(/<figcaption class="m-fig-cap">([\s\S]*?)<\/figcaption>/g)].map(match => match[1]);
+  assert.equal(figcaps.length, 76);
+  for (const cap of figcaps) assert.doesNotMatch(cap, /来源[：:]|capture\/lab\//);
+  const prefix = 'https://github.com/fancyboi999/ai-engineering-from-scratch-zh/';
+  for (const link of links) assert.ok(link.startsWith(prefix), link);
+  assert.ok(links.includes(`${prefix}blob/main/manuals/agent-substrate-101/capture/lab/summary/install-steps.json`));
+  assert.ok(links.includes(`${prefix}blob/main/manuals/agent-substrate-101/capture/lab/M-mac-arm64/02-steps.tsv`));
+  assert.ok(links.includes(`${prefix}blob/main/manuals/agent-substrate-101/capture/lab/summary/resume-mac.json`));
+  assert.ok(links.includes(`${prefix}tree/main/manuals/agent-substrate-101/capture/lab/summary`));
+  assert.ok(links.includes(`${prefix}tree/main/manuals/agent-substrate-101/capture/lab`));
+});
+

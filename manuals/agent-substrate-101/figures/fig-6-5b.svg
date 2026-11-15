@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-6-5b-title fig-6-5b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-6-5b-title">凭据轮换后上游看到新值所需的秒数</title>
+  <desc id="fig-6-5b-desc">对数时间轴折线图。在两种数据平面上分别将一条 replaceHeaders 规则背后的 Kubernetes Secret 修改三次，由单个 actor 每秒发一次请求。在 agentgateway 上，上游分别在 280.5、200.9、100.6 s 后看到新值，期间仍有 233、168、84 次请求携带旧值；在 Envoy 上分别耗时 1.0、1.0、1.6 s，期间有 0、0、1 次请求携带旧值。agentgateway 上三次首次看到新值的时间相隔 301 与 301 s。两种数据平面在 759 次与 275 次请求中均无失败。</desc>
+  <line x1="60" y1="246.92" x2="440" y2="246.92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="250.92" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1 s</text>
+  <line x1="60" y1="170.25" x2="440" y2="170.25" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="174.25" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">10 s</text>
+  <line x1="60" y1="93.59" x2="440" y2="93.59" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="97.59" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100 s</text>
+  <line x1="60" y1="57.01" x2="440" y2="57.01" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="54" y="61.01" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">300 s</text>
+  <line x1="60" y1="270" x2="440" y2="270" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="60" y1="40" x2="60" y2="270" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <line x1="123.33" y1="270" x2="123.33" y2="274" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="123.33" y="287" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">第 1 次</text>
+  <line x1="250" y1="270" x2="250" y2="274" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="250" y="287" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">第 2 次</text>
+  <line x1="376.67" y1="270" x2="376.67" y2="274" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
+  <text x="376.67" y="287" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">第 3 次</text>
+  <text x="250" y="304" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">按顺序对 Kubernetes Secret 的三次修改</text>
+  <text x="60" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">上游看到新凭据值的秒数（对数刻度）</text>
+  <line x1="60" y1="57.01" x2="440" y2="57.01" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1" stroke-dasharray="5 4"/>
+  <path d="M123.3 59.2 L250.0 70.4 L376.7 93.4" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="123.33" cy="59.25" r="3.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
+  <circle cx="250" cy="70.36" r="3.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
+  <circle cx="376.67" cy="93.39" r="3.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
+  <path d="M123.3 246.9 L250.0 246.9 L376.7 231.3" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linejoin="round"/>
+  <circle cx="123.33" cy="246.92" r="3.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
+  <circle cx="250" cy="246.92" r="3.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
+  <circle cx="376.67" cy="231.27" r="3.4" fill="var(--m-indigo-ink, #4b4f9e)"/>
+  <rect class="m-knock" x="97.23" y="66.67" width="52.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="123.33" y="77.25" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">280.5 s</text>
+  <rect class="m-knock" x="223.9" y="77.78" width="52.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="250" y="88.36" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">200.9 s</text>
+  <rect class="m-knock" x="350.57" y="100.81" width="52.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="376.67" y="111.39" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">100.6 s</text>
+  <rect class="m-knock" x="103.83" y="227.34" width="39" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="123.33" y="237.92" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">1.0 s</text>
+  <rect class="m-knock" x="230.5" y="227.34" width="39" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="250" y="237.92" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">1.0 s</text>
+  <rect class="m-knock" x="357.17" y="211.69" width="39" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="376.67" y="222.27" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">1.6 s</text>
+  <text x="456" y="115.39" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">agentgateway</text>
+  <text x="456" y="130.39" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">更新后仍有 233、168、84 次</text>
+  <text x="456" y="144.39" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求携带旧值</text>
+  <text x="456" y="235.27" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">Envoy</text>
+  <text x="456" y="250.27" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">更新后仍有 0、0、1 次</text>
+  <text x="456" y="264.27" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求携带旧值</text>
+  <text x="456" y="61.01" font-size="11.5" font-weight="700" fill="var(--m-rose-ink, #b0344d)">300 s</text>
+  <text x="456" y="76.01" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agentgateway 上新值出现</text>
+  <text x="456" y="90.01" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">间隔约 301 s</text>
+  <text x="60" y="322" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每秒一次请求，全程零失败：agentgateway 共 759 次，Envoy 共 275 次。</text>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 346" role="img" aria-labelledby="fig-8-4-title fig-8-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-8-4-title">受支持升级流程的四个步骤</title>
+  <desc id="fig-8-4-desc">从上到下的四个升级步骤：podcertificate-controller、各节点上的 atelet、workers，最后是 API server、controller 与数据平面。前两步中运行中的 actor 保持运行（某次实测在 atelet 步骤中挂起与恢复曾失败 24 秒）。在 worker 步骤中每个 actor 会收到 SIGTERM，仅当进程未直接退出时才有 30 分钟窗口完成挂起；无人挂起的 actor 会变为崩溃状态。最后一步会迁移数据库 schema，回滚不会撤销该迁移。</desc>
+  <defs><marker id="fig-8-4-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-8-4-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-8-4-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker><marker id="fig-8-4-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">按此顺序依次升级</text>
+  <text x="310" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">运行中 ACTOR 受到的影响</text>
+  <rect x="20" y="30" width="240" height="60" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="140" y="55.25" font-size="12.5" text-anchor="middle" font-weight="700">1  podcertificate-controller</text>
+  <text x="140" y="72.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">签发各组件证书</text>
+  <rect x="20" y="110" width="240" height="60" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="140" y="135.25" font-size="12.5" text-anchor="middle" font-weight="700">2  atelet</text>
+  <text x="140" y="152.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次升级一个节点</text>
+  <line x1="140" y1="90" x2="140" y2="109" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-4-head-ink)"/>
+  <rect x="20" y="190" width="240" height="60" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="140" y="215.25" font-size="12.5" text-anchor="middle" font-weight="700">3  workers</text>
+  <text x="140" y="232.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每批滚动池容量的 10%</text>
+  <line x1="140" y1="170" x2="140" y2="189" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-4-head-ink)"/>
+  <rect x="20" y="270" width="240" height="60" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="140" y="287.75" font-size="12.5" text-anchor="middle" font-weight="700">4  ate-api-server 及其他组件</text>
+  <text x="140" y="305.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ate-idp-server, CRD, ate-controller,</text>
+  <text x="140" y="320.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">router, egress, SandboxConfig</text>
+  <line x1="140" y1="250" x2="140" y2="269" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-4-head-ink)"/>
+  <rect x="310" y="30" width="310" height="60" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="465" y="55.25" font-size="12.5" text-anchor="middle" font-weight="700">无影响</text>
+  <text x="465" y="72.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">actor 继续正常运行</text>
+  <rect x="310" y="110" width="310" height="60" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="465" y="127.75" font-size="12.5" text-anchor="middle" font-weight="700">继续运行</text>
+  <text x="465" y="145.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">实测中该节点上的挂起与恢复</text>
+  <text x="465" y="160.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">曾连续失败 24 s</text>
+  <rect x="310" y="190" width="176" height="60" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)" stroke-width="2"/>
+  <text x="398" y="207.6" font-size="12" text-anchor="middle" font-weight="700">SIGTERM</text>
+  <text x="398" y="224.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">进程捕获信号时有</text>
+  <text x="398" y="239.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">30 分钟完成挂起</text>
+  <rect x="514" y="190" width="106" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="567" y="207.6" font-size="12" text-anchor="middle" font-weight="700">CRASHED</text>
+  <text x="567" y="224.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">若无组件</text>
+  <text x="567" y="239.8" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">将其挂起</text>
+  <rect x="310" y="270" width="310" height="60" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="465" y="287.75" font-size="12.5" text-anchor="middle" font-weight="700">迁移数据库 schema</text>
+  <text x="465" y="305.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">API 调用可能短暂中断一次；</text>
+  <text x="465" y="320.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">回滚不会撤销该 schema 迁移</text>
+  <line x1="260" y1="60" x2="309" y2="60" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-4-head-ink)"/>
+  <line x1="260" y1="140" x2="309" y2="140" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-4-head-ink)"/>
+  <line x1="260" y1="220" x2="309" y2="220" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-4-head-amber)"/>
+  <line x1="260" y1="300" x2="309" y2="300" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-8-4-head-teal)"/>
+  <line x1="486" y1="220" x2="513" y2="220" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-4-head-rose)"/>
+</svg>

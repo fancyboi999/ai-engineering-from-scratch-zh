@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 498" role="img" aria-labelledby="fig-8-2d-title fig-8-2d-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-8-2d-title">节点停机时如何处理单个 actor</title>
+  <desc id="fig-8-2d-desc">基于双 worker 节点集群节点停机实测的五行决策图。第一行：停机前打好快照标签时，基于该标签创建的新 actor 在执行创建命令 1.2 秒后即可响应首个请求（3/3 次救援全部成功）。第二行：以 sync 模式挂起且停机后未收到请求的 actor，可在停机 45 至 52 秒、worker 显示 UNAVAILABLE 后执行回退（耗时 7.1 秒）。第三行：默认模式挂起且持久快照仍为 PENDING 的 actor 无需执行任何命令，在节点启动 26 秒后即可响应请求。第四行：停机期间收到过请求或原处于运行状态的 actor，需等待原节点恢复后再执行一次回退。第五行：中断期间因执行命令而进入 REVERTING 或 DELETING 的 actor 会一直停留在该状态，直至原节点恢复。</desc>
+  <defs><marker id="fig-8-2d-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-8-2d-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-8-2d-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">停机时的 ACTOR 状态</text>
+  <text x="212" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">处理方式</text>
+  <text x="404" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">实测结果</text>
+  <rect x="20" y="28" width="178" height="72" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="29" y="57.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任意状态，停机前</text>
+  <text x="29" y="72.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已打好快照标签</text>
+  <rect x="212" y="28" width="178" height="72" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="221" y="51.45" font-size="11.5" font-weight="700">create actor --tag</text>
+  <text x="221" y="68.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">基于标签创建新 actor，</text>
+  <text x="221" y="83.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">再将请求发往新 actor</text>
+  <rect x="404" y="28" width="216" height="72" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="412" y="51.3" font-size="11" font-weight="700">1.2 s 后返回 200</text>
+  <text x="412" y="68.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">在另一节点 3/3 次救援成功，</text>
+  <text x="412" y="83.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">使用新 actor 名称</text>
+  <line x1="198" y1="64" x2="211" y2="64" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-2d-head-ink)"/>
+  <line x1="390" y1="64" x2="403" y2="64" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-2d-head-amber)"/>
+  <rect x="20" y="118" width="178" height="72" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="29" y="147.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">SUSPENDED, --mode sync,</text>
+  <text x="29" y="162.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">停机后未收到请求</text>
+  <rect x="212" y="118" width="178" height="72" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="221" y="141.45" font-size="11.5" font-weight="700">先等待，再执行一次回退</text>
+  <text x="221" y="158.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">等 worker 变为 UNAVAILABLE</text>
+  <text x="221" y="173.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">（停机后 45 至 52 s）</text>
+  <rect x="404" y="118" width="216" height="72" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="412" y="141.3" font-size="11" font-weight="700">回退 7.1 s，请求 0.56 s 返回 200</text>
+  <text x="412" y="158.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">迁移至另一节点，</text>
+  <text x="412" y="173.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未丢失任何状态</text>
+  <line x1="198" y1="154" x2="211" y2="154" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-2d-head-ink)"/>
+  <line x1="390" y1="154" x2="403" y2="154" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-2d-head-amber)"/>
+  <rect x="20" y="208" width="178" height="72" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="29" y="237.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">默认模式 SUSPENDED，</text>
+  <text x="29" y="252.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">持久快照处于 PENDING</text>
+  <rect x="212" y="208" width="178" height="72" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="221" y="231.45" font-size="11.5" font-weight="700">不执行任何管理命令</text>
+  <text x="221" y="248.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">等待原节点恢复，</text>
+  <text x="221" y="263.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">随后直接发请求即可</text>
+  <rect x="404" y="208" width="216" height="72" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="412" y="231.3" font-size="11" font-weight="700">请求 0.36 s 返回 200</text>
+  <text x="412" y="248.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">节点启动后 26 s 恢复服务；</text>
+  <text x="412" y="263.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">若先回退会丢 2 次调用</text>
+  <line x1="198" y1="244" x2="211" y2="244" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-2d-head-ink)"/>
+  <line x1="390" y1="244" x2="403" y2="244" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-2d-head-amber)"/>
+  <rect x="20" y="298" width="178" height="72" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="29" y="327.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">收到过请求：RESUMING 后</text>
+  <text x="29" y="342.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">CRASHED；或原为 RUNNING</text>
+  <rect x="212" y="298" width="178" height="72" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="221" y="321.45" font-size="11.5" font-weight="700">停机期不回退、不删除</text>
+  <text x="221" y="338.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">等待原节点恢复，</text>
+  <text x="221" y="353.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">再执行一次回退</text>
+  <rect x="404" y="298" width="216" height="72" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="412" y="321.3" font-size="11" font-weight="700">回退 0.3 s，请求 0.90 s 返回 200</text>
+  <text x="412" y="338.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">RUNNING：0.48 s 返回 200，</text>
+  <text x="412" y="353.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">上次快照后的变更丢失</text>
+  <line x1="198" y1="334" x2="211" y2="334" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-2d-head-ink)"/>
+  <line x1="390" y1="334" x2="403" y2="334" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-2d-head-amber)"/>
+  <rect x="20" y="388" width="178" height="72" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="29" y="417.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">因早先命令卡在</text>
+  <text x="29" y="432.8" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">REVERTING 或 DELETING</text>
+  <rect x="212" y="388" width="178" height="72" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="221" y="411.45" font-size="11.5" font-weight="700">等待原节点恢复</text>
+  <text x="221" y="428.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">停机期 4/4 次回退均失败；</text>
+  <text x="221" y="443.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">atelet 恢复后再回退</text>
+  <rect x="404" y="388" width="216" height="72" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="412" y="411.3" font-size="11" font-weight="700">回退 0.2 s，请求 0.47 s 返回 200</text>
+  <text x="412" y="428.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">仅 1 次成功；另 4 次在节点</text>
+  <text x="412" y="443.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">恢复 210 s 后仍为 REVERTING</text>
+  <line x1="198" y1="424" x2="211" y2="424" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-8-2d-head-ink)"/>
+  <line x1="390" y1="424" x2="403" y2="424" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-8-2d-head-rose)"/>
+  <text x="20" y="484" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">双 worker 节点、Envoy 数据平面、默认计时器下每种情形各实测一次。</text>
+</svg>

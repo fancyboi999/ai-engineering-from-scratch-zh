@@ -11,6 +11,7 @@ const builder = require('../site/build-manuals.js');
 // 手册计数按本次审阅的固定 upstream/main manifest 与图表源检验。
 const EXPECTED = {
   'a2a-101': { sections: 28, references: 7, figures: 31 },
+  'agent-substrate-101': { sections: 40, references: 10, figures: 75 },
   'docker-sandboxes-101': { sections: 33, references: 8, figures: 34 },
   'miles-101': { sections: 34, references: 5, figures: 18 },
   'reverse-engineering-101': { sections: 26, references: 6, figures: 37 },
