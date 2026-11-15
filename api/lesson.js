@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { parseMd, readLessonMarkdown, prerenderedCode } = require('../site/lesson-markdown');
 const { representation, quality, problem } = require('../lib/agent-http');
+const { lessonCleanPath, lessonStaticPath } = require('../lib/hub-routes');
 
 const ORIGIN = 'https://aieng-zh.cn';
 const SEO_START = '<!-- AIFS:LESSON-SEO:START -->';
@@ -11,6 +12,8 @@ const FALLBACK_END = '<!-- AIFS:LESSON-FALLBACK:END -->';
 const HUBS_START = '<!-- AIFS:LESSON-HUBS:START -->';
 const HUBS_END = '<!-- AIFS:LESSON-HUBS:END -->';
 const LESSON_QUERY_NAMES = new Set(['path', 'track', 'fromTrack', 'learningPath', 'lang', 'ttsTest', 'legacy']);
+const CLEAN_SEGMENT = /^[a-z0-9][a-z0-9-]*$/;
+const learnLessonIndexes = new WeakMap();
 const LEARNING_PATH_ALIASES = Object.freeze({
   'mcp-engineering': 'model-context-protocol',
 });
@@ -116,6 +119,42 @@ function hasQuery(req, name) {
   return queryNames(req).has(name);
 }
 
+function requestPathname(req) {
+  try {
+    return new URL(req.url || '/', 'http://localhost').pathname;
+  } catch (_) {
+    return '';
+  }
+}
+
+function learnRequestPath(req) {
+  const pathname = requestPathname(req);
+  if (pathname === '/lesson' || pathname === '/lesson.html' || pathname.startsWith('/lessons/')) return '';
+  const direct = /^\/learn\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\/?$/.exec(pathname);
+  if (direct) return `/learn/${direct[1]}/${direct[2]}`;
+  const phase = queryValue(req, 'cleanPhase');
+  const lesson = queryValue(req, 'cleanLesson');
+  return CLEAN_SEGMENT.test(phase) && CLEAN_SEGMENT.test(lesson) ? `/learn/${phase}/${lesson}` : '';
+}
+
+function lessonPathForLearnPath(manifest, learnPath) {
+  let index = learnLessonIndexes.get(manifest);
+  if (!index) {
+    index = new Map();
+    for (const lessonPath of Object.keys(manifest.lessons)) {
+      const clean = lessonCleanPath(lessonPath);
+      if (clean && !index.has(clean)) index.set(clean, lessonPath);
+      const numberedMatch = /^phases\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)$/.exec(lessonPath);
+      if (numberedMatch) {
+        const numbered = `/learn/${numberedMatch[1]}/${numberedMatch[2]}`;
+        if (!index.has(numbered)) index.set(numbered, lessonPath);
+      }
+    }
+    learnLessonIndexes.set(manifest, index);
+  }
+  return index.get(learnPath) || '';
+}
+
 function validLessonPath(value) {
   if (!value || value.includes('..') || value.includes('\\') || value.includes('\0')) return false;
   return /^(?:phases\/[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*|certifications\/[a-z0-9][a-z0-9-]*\/lessons\/[a-z0-9][a-z0-9-]*)$/.test(value);
@@ -134,8 +173,9 @@ function listedValue(values, value) {
 }
 
 function canonicalForLesson(lessonPath) {
-  if (lessonPath.startsWith('phases/')) {
-    return `${ORIGIN}/lessons/${lessonPath.replace(/^phases\//, '')}/`;
+  const staticPath = lessonStaticPath(lessonPath);
+  if (staticPath) {
+    return `${ORIGIN}${staticPath}`;
   }
   return `${ORIGIN}/lesson?path=${encodeURIComponent(lessonPath)}`;
 }
@@ -443,6 +483,35 @@ function sendRedirect(res, method, location) {
   send(res, method, 308, '', 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800');
 }
 
+function learnRedirectLocation(req, lessonPath, entry) {
+  const staticPath = lessonStaticPath(lessonPath);
+  const params = new URLSearchParams();
+  let hasNavigationContext = false;
+
+  if (hasQuery(req, 'learningPath')) {
+    const requestedLearningPath = queryValue(req, 'learningPath');
+    const learningPath = LEARNING_PATH_ALIASES[requestedLearningPath] || requestedLearningPath;
+    if (validTrackId(learningPath) && listedValue(entry.learningPathIds, learningPath)) {
+      params.set('learningPath', learningPath);
+      hasNavigationContext = true;
+    }
+  }
+
+  if (!hasNavigationContext && hasQuery(req, 'fromTrack')) {
+    const fromTrack = queryValue(req, 'fromTrack');
+    if (validTrackId(fromTrack) && listedValue(entry.fromTrackIds, fromTrack)) {
+      params.set('fromTrack', fromTrack);
+    }
+  }
+
+  if (hasQuery(req, 'ttsTest') && isLocalRequest(req) && queryValue(req, 'ttsTest') === 'silent') {
+    params.set('ttsTest', 'silent');
+  }
+
+  const query = params.toString();
+  return `${staticPath}${query ? `?${query}` : ''}`;
+}
+
 function createHandler(options) {
   const loadAssets = options && typeof options.loadAssets === 'function'
     ? options.loadAssets
@@ -462,8 +531,9 @@ function createHandler(options) {
       send(res, method, 406, errorPage('不支持该内容格式', '请请求 text/html 或 text/markdown。'), 'no-store');
       return;
     }
-    const lessonPath = queryValue(req, 'path');
-    if (!validLessonPath(lessonPath)) {
+    const learnRequest = learnRequestPath(req);
+    const queryPath = queryValue(req, 'path');
+    if (!learnRequest && !validLessonPath(queryPath)) {
       send(res, method, 404, errorPage('找不到课程', '这个课程路径不存在。请从课程目录、站点地图或 agent 课程索引继续。'), 'no-store');
       return;
     }
@@ -473,6 +543,7 @@ function createHandler(options) {
       const manifest = assets && assets.manifest;
       if (typeof template !== 'string') throw new Error('template-shape');
       if (!manifest || !manifest.lessons || typeof manifest.lessons !== 'object') throw new Error('manifest-shape');
+      const lessonPath = learnRequest ? lessonPathForLearnPath(manifest, learnRequest) : queryPath;
       const entry = Object.prototype.hasOwnProperty.call(manifest.lessons, lessonPath)
         ? manifest.lessons[lessonPath]
         : null;
@@ -480,10 +551,13 @@ function createHandler(options) {
         send(res, method, 404, errorPage('找不到课程', '这个路径不在当前课程中。请从课程目录、站点地图或 agent 课程索引继续。'), 'no-store');
         return;
       }
+      if (learnRequest) {
+        sendRedirect(res, method, learnRedirectLocation(req, lessonPath, entry));
+        return;
+      }
       const normalized = normalizedLessonLocation(req, lessonPath, entry, assets);
       if (normalized.needsRedirect) {
-        res.setHeader('Location', normalized.location);
-        send(res, method, 308, '', 'public, max-age=300, s-maxage=86400, stale-while-revalidate=604800');
+        sendRedirect(res, method, normalized.location);
         return;
       }
       const contextParams = {};

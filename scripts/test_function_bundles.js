@@ -73,6 +73,16 @@ async function smoke(name, root) {
       assert.equal(markdown.statusCode, 200);
       assert.match(markdown.headers['content-type'], /^text\/markdown/);
       assert.equal(markdown.body.toString(), fs.readFileSync(path.join(ROOT, entry.path, 'docs', 'zh.md'), 'utf8'));
+      if (kind === 'course') {
+        const [, phaseDir, lessonDir] = /^phases\/([^/]+)\/([^/]+)$/.exec(entry.path);
+        const cleanBase = `/learn/${phaseDir.replace(/^\d+-/, '')}/${lessonDir.replace(/^\d+-/, '')}`;
+        const expectedLocation = `/lessons/${phaseDir}/${lessonDir}/`;
+        for (const learnUrl of [cleanBase, `${cleanBase}/`]) {
+          const redirect = await invoke(handler, learnUrl);
+          assert.equal(redirect.statusCode, 308, learnUrl);
+          assert.equal(redirect.headers.location, expectedLocation, learnUrl);
+        }
+      }
     }
   } else {
     const lesson = Object.keys(manifest(root, 'lesson-seo').lessons)[0];
