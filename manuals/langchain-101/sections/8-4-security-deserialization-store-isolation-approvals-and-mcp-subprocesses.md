@@ -8,7 +8,7 @@
 
 ## 要修改的四个默认值 {#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses-four-defaults-to-change}
 
-[图 8.4](#fig-8-4)展示了四条边界：我们的测试输入通过了默认值，并给出了拦住它的改动。MCP 是第五条边界，那里的默认值拒绝了我们的输入。
+[图](#fig-8-4)展示了四条边界：我们的测试输入通过了默认值，并给出了拦住它的改动。MCP 是第五条边界，那里的默认值拒绝了我们的输入。
 
 ```figure
 id: fig-8-4
@@ -97,7 +97,7 @@ Agent Server 的 store 权限有过安全公告 GHSA-4hm6-w6qq-w73v，涉及 0.1
 
 **我们测得**：用一个脚本化的调用方、没有模型来测这些规则。调用方每次运行通过 `create_deep_agent` 发一个工具调用，后端是 `virtual_mode=True` 的 `FilesystemBackend`。文件夹里有一个 workspace、根目录和 workspace 里各一个 `.env`、一个 `.git` 文件夹、一个 `secrets` 文件夹和两个符号链接。我们在 Mac 上对 8 个规则列表各跑 28 个调用，每个调用后检查磁盘。其中五个规则列表抄自文档的权限页面 {{docs oss/python/deepagents/permissions}}。
 
-[图 8.4b](#fig-8-4b)展示了七个规则列表下 28 个调用中的十个。在五个文档规则列表里，有 22 个调用运行了，而这些列表本来是要拦住它们的。这 22 个都在带点开头部分的路径上。
+[图](#fig-8-4b)展示了七个规则列表下 28 个调用中的十个。在五个文档规则列表里，有 22 个调用运行了，而这些列表本来是要拦住它们的。这 22 个都在带点开头部分的路径上。
 
 ```figure
 id: fig-8-4b

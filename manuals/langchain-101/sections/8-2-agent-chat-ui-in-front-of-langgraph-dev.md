@@ -32,7 +32,7 @@ agent_percall = create_agent(model(), tools=[get_weather, send_email], system_pr
 
 ## 一次审批的请求 {#s-agent-chat-ui-in-front-of-langgraph-dev-the-requests-of-one-approval}
 
-**我们测得**：在 Mac 上，用一个录制代理夹在浏览器和服务器之间。浏览器是无头 Chromium，会话共有 15 次运行。[图 8.2](#fig-8-2) 根据这份记录画出一次审批的请求。
+**我们测得**：在 Mac 上，用一个录制代理夹在浏览器和服务器之间。浏览器是无头 Chromium，会话共有 15 次运行。[图](#fig-8-2) 根据这份记录画出一次审批的请求。
 
 加载时，UI 调用 `GET /info` 和 `POST /threads/search`，后者以图 id 为元数据、上限 100。这次搜索填充线程历史列表。一个线程的第一条消息先用 `POST /threads` 创建线程，再启动运行。
 

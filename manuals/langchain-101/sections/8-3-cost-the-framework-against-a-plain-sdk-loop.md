@@ -45,7 +45,7 @@ claim: 在 1.8 秒的真实运行中，create_agent 在模型之外花了 37.6 m
 caption: 每个点是 Mac 上的一次运行，每个程序 40 次，轮次打乱，黑线是中位数。来源：capture/lab/summary/overhead-mac-real.json。
 ```
 
-**我们测得**：在 Mac 上，每个程序跑 40 次运行，经过 2 轮预热后打乱成 40 轮。[图 8.3](#fig-8-3) 展示了每次运行。每次在 `add(2, 3)` 和 `multiply(5, 4)` 之后都得到 20。模型之外时间的中位数：朴素循环 25.1 ms，`bind_tools` 循环 29.3 ms，`create_agent` 37.6 ms，带 `InMemorySaver` 为 37.6 ms，手工搭建的 `StateGraph` 为 36.7 ms。与同一轮里的朴素循环相比，它们分别多 6.6、15.6、12.2 和 11.5 ms。
+**我们测得**：在 Mac 上，每个程序跑 40 次运行，经过 2 轮预热后打乱成 40 轮。[图](#fig-8-3) 展示了每次运行。每次在 `add(2, 3)` 和 `multiply(5, 4)` 之后都得到 20。模型之外时间的中位数：朴素循环 25.1 ms，`bind_tools` 循环 29.3 ms，`create_agent` 37.6 ms，带 `InMemorySaver` 为 37.6 ms，手工搭建的 `StateGraph` 为 36.7 ms。与同一轮里的朴素循环相比，它们分别多 6.6、15.6、12.2 和 11.5 ms。
 
 在原生路径上，朴素 `ollama` 循环在模型之外花了 11.7 ms。带 `ChatOllama` 的 `create_agent` 花了 29.0 ms，多 13.0 ms；`StateGraph` 花了 22.2 ms，多 7.8 ms。
 
@@ -96,23 +96,23 @@ note: 截取到每个请求的账目。其余字节是同样的键和值，只�
 
 请求头有两个字段不同。LangChain 程序发送 `x-stainless-raw-response: true`，因为 `ChatOpenAI` 通过 `with_raw_response` 调用客户端 {{code libs/partners/openai/langchain_openai/chat_models/base.py}}。在录制的请求里，它们也没有朴素循环发送的 `x-stainless-read-timeout`。
 
-Deep Agents 的 harness 是例外。在 Qwen3 8B 上，`create_deep_agent` 每次调用比朴素循环多发 2,075 到 2,251 个提示词 token。一句话回答的 token 是朴素循环的 81.4 倍，两次工具调用是 10.0 倍，文件任务是 9.1 倍。[第 7.4 节](#s-deep-agents-0-7)和[图 7.4](#fig-7-4)展示了每次调用。只有用到规划、文件或子 agent 时，才值得付这些 token。
+Deep Agents 的 harness 是例外。在 Qwen3 8B 上，`create_deep_agent` 每次调用比朴素循环多发 2,075 到 2,251 个提示词 token。一句话回答的 token 是朴素循环的 81.4 倍，两次工具调用是 10.0 倍，文件任务是 9.1 倍。[第 7.4 节](#s-deep-agents-0-7)和[图](#fig-7-4)展示了每次调用。只有用到规划、文件或子 agent 时，才值得付这些 token。
 
 [第 1.2 节](#s-do-you-need-langchain)的任务套件在更大规模上给出同样的图景。deep agent 发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。在 Claude Haiku 5.5 上，每次调用多约 3,570 个。提示词缓存会改变账单。在 Claude 上，deep agent 的花费是朴素循环的 1.16 到 1.24 倍；不用缓存、按标价算则是 3.10 到 3.14 倍。
 
 ## 导入与磁盘 {#s-cost-the-framework-against-a-plain-sdk-loop-imports-and-disk}
 
-进程启动的成本，对 CLI 工具、测试运行和无服务器处理函数都很重要。[第 3.1 节](#s-install-and-the-package-map)用[图 3.1b](#fig-3-1b)给出了导入时间。在字节码已写入时，`create_agent` 和 `ChatOpenAI` 的导入中位数用了 0.831 秒，`import openai` 用了 0.329 秒。第一次启动、没有字节码时，两者分别是 2.64 秒和 1.064 秒。安装体积约为两倍：54,312 KiB 对 26,356 KiB。
+进程启动的成本，对 CLI 工具、测试运行和无服务器处理函数都很重要。[第 3.1 节](#s-install-and-the-package-map)用[图](#fig-3-1b)给出了导入时间。在字节码已写入时，`create_agent` 和 `ChatOpenAI` 的导入中位数用了 0.831 秒，`import openai` 用了 0.329 秒。第一次启动、没有字节码时，两者分别是 2.64 秒和 1.064 秒。安装体积约为两倍：54,312 KiB 对 26,356 KiB。
 
 ## 检查点 {#s-cost-the-framework-against-a-plain-sdk-loop-checkpoints}
 
-checkpointer 在每一步写入整个状态，除非某个通道只保存变化。[第 5.5 节](#s-context-engineering-and-summarization)用[图 5.5b](#fig-5-5b)给出了记录。在 `PostgresSaver` 上，用普通消息列表时，10 步处最后 10 次写入的中位数是 2.88 ms。到 5,000 步时是 148.65 ms。
+checkpointer 在每一步写入整个状态，除非某个通道只保存变化。[第 5.5 节](#s-context-engineering-and-summarization)用[图](#fig-5-5b)给出了记录。在 `PostgresSaver` 上，用普通消息列表时，10 步处最后 10 次写入的中位数是 2.88 ms。到 5,000 步时是 148.65 ms。
 
 一个 5,000 步的线程占 7,289 MB。用 `DeltaChannel` 时，写入保持在约 1.1 ms，每 100 步一个快照，线程占 81 MB。对长线程做摘要，并测量你自己线程的步数。
 
 ## 追踪 {#s-cost-the-framework-against-a-plain-sdk-loop-tracing}
 
-追踪给每次运行增加一笔成本，退出时又增加一笔。[第 7.6 节](#s-langsmith-tracing)用[图 7.6](#fig-7-6)给出了两者。对着一个立即应答的本地记录器，追踪给一次 1.6 秒的 Qwen3 4B agent 运行增加了 7.4 ms。七个进程中有六个，首次被追踪的运行在模型之外花了 83 到 243 ms。一个出故障的端点让退出拖了 10 到 17 秒，一个挂起的端点让进程一直不退出。
+追踪给每次运行增加一笔成本，退出时又增加一笔。[第 7.6 节](#s-langsmith-tracing)用[图](#fig-7-6)给出了两者。对着一个立即应答的本地记录器，追踪给一次 1.6 秒的 Qwen3 4B agent 运行增加了 7.4 ms。七个进程中有六个，首次被追踪的运行在模型之外花了 83 到 243 ms。一个出故障的端点让退出拖了 10 到 17 秒，一个挂起的端点让进程一直不退出。
 
 [第 9.4 节](#s-opentelemetry-spans-with-langsmith-off)用自己的 OpenTelemetry span 追踪一个服务。`LANGSMITH_TRACING` 为 false 或未设置时，记录器没有收到任何请求。
 

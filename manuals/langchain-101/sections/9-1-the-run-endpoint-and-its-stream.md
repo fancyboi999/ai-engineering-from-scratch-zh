@@ -21,7 +21,7 @@
 
 这个 agent 有六个工具，一个由[第 9.5 节](#s-timeouts-retries-backup-model-and-shutdown)解释的中间件栈，以及[第 9.2 节](#s-postgres-checkpointer-store-and-owner-check)的 Postgres checkpointer 和 store。模型是一项设置：`ollama:<name>` 或 `anthropic:<name>`。
 
-这个栈有八个中间件，其中三个会增加节点。[图 9.1b](#fig-9-1b)根据 `build_agent` 的 Mermaid 文本画出了编译后的图。工具包用从不被调用的模型构建它，并用一个 OpenTelemetry 模块的替身。`Tracing` 和 `ToolTimeout` 只有 wrap 钩子，所以这个替身不改变任何节点。
+这个栈有八个中间件，其中三个会增加节点。[图](#fig-9-1b)根据 `build_agent` 的 Mermaid 文本画出了编译后的图。工具包用从不被调用的模型构建它，并用一个 OpenTelemetry 模块的替身。`Tracing` 和 `ToolTimeout` 只有 wrap 钩子，所以这个替身不改变任何节点。
 
 ```figure
 id: fig-9-1b

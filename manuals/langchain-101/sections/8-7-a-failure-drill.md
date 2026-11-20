@@ -157,7 +157,7 @@ note: 三次运行中的第一次。GraphRecursionError 消息的其余部分在
 
 用例 6 是前面各节没有展示的一种故障。`create_agent` 的工具节点把工具放在一个以名称为键的字典里，所以第二个 `lookup` 替换了第一个 {{code libs/prebuilt/langgraph/prebuilt/tool_node.py}}。模型只看到一个工具，agent 什么都没抛，每次调用都进了退款函数。所以答案说它在退款表里找不到订单 7 的任何信息。同一个中间件的两个实例会抛 `AssertionError`，见[第 4.5 节](#s-middleware-hooks-and-their-order)。两个同名工具却什么都不抛。
 
-用例 7 展示了一个需要再做一处改动的修法。`ModelCallLimitMiddleware` 给 agent 的每个循环加了自己的节点，所以三次模型调用需要超过 10 步。`recursion_limit` 为 10 时，运行仍然抛出。设为 25 时，它在第三次调用之后自己结束了。[图 8.7](#fig-8-7)把每个症状和修复后的结果并排放在一起。
+用例 7 展示了一个需要再做一处改动的修法。`ModelCallLimitMiddleware` 给 agent 的每个循环加了自己的节点，所以三次模型调用需要超过 10 步。`recursion_limit` 为 10 时，运行仍然抛出。设为 25 时，它在第三次调用之后自己结束了。[图](#fig-8-7)把每个症状和修复后的结果并排放在一起。
 
 ```figure
 id: fig-8-7
