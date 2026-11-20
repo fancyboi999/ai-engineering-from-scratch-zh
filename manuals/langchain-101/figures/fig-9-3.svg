@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="fig-9-3-title fig-9-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-9-3-title">worker 在写入退款行后被杀死，然后重启</title>
+  <title id="fig-9-3-title">worker 在写入退款行后被杀掉，然后重启</title>
   <desc id="fig-9-3-desc">上图：Mac 上用 Qwen3 4B 的一次试验。approve 在 0 s 发出，退款行在 0.2 s 出现在 Postgres 中，SIGKILL 在 0.3 s 到来。新进程在 3.1 s 读取线程，发现 next 为 [&quot;tools&quot;]，审批被再次询问。下图：map 恢复值，10 次试验中有 10 次只有一行退款，10 次再次询问审批。plain 恢复值，10 次试验中有 10 次只有一行退款，10 次再次询问审批。</desc>
   <defs><marker id="fig-9-3-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
   <line x1="150" y1="190" x2="610" y2="190" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>

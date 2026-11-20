@@ -92,7 +92,7 @@ id: fig-6-8
 kind: decision
 title: 节点失败尝试的路径
 claim: 每次失败的尝试，包括超时，都先交给 retry_on，只有最后一次尝试之后错误处理器才运行，否则运行会抛出异常。
-caption: 请从顶部那次失败的尝试开始读。每个灰色方框是一项检查，它的箭头旁是录制工具包的结果。玫瑰色方框是离开 invoke 的错误。来源：capture/out/37-error-handler-timeout.txt。
+caption: 请从顶部那次失败的尝试开始读。每个灰色方框是一项检查，它的箭头旁是录制工具包的结果。玫红色方框是离开 invoke 的错误。来源：capture/out/37-error-handler-timeout.txt。
 ```
 
 超时只适用于异步节点。代码会拒绝给同步节点设置超时，因为同步的 Python 函数无法从外部停止 {{code libs/langgraph/langgraph/_internal/_timeout.py}}。录制工具包还没有记录这个拒绝。它的录制留到下一版，与[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)里的其他未决项放在一起。
@@ -122,7 +122,7 @@ For troubleshooting, visit: https://docs.langchain.com/oss/python/langgraph/erro
 
 图 API 页面给出的值从 `langgraph` 1.1.4 起是 10,007，在 1.0.6 到 1.1.3 之间是 10,000 {{docs oss/python/langgraph/graph-api}}。较早的建议把 25 当作图的默认值。在锁定版本上，25 是 `langchain_core` runnable config 的默认值，图并不使用它 {{code libs/core/langchain_core/runnables/config.py}}。要把 `recursion_limit` 传在 config 的顶层，而不是 `configurable` 之下 {{docs oss/python/langgraph/graph-api}}。本手册把这些不同的数字登记为冲突 D105，[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)展示了 Agent Server 的上限。
 
-**我们测量了** Mac 上普通循环的每个默认值，每个用例运行一次，不用模型。普通循环在 10007 步停下。把环境变量设成 25，或者用 `recursion_limit=25`，它在 25 步停下。
+**我们测得** Mac 上朴素循环的每个默认值，每个用例运行一次，不用模型。朴素循环在 10007 步停下。把环境变量设成 25，或者用 `recursion_limit=25`，它在 25 步停下。
 
 agent 在 x86 服务器客户机上用 Qwen3 4B 运行，被要求一直调用某个工具，直到工具回答“finished”，而工具从不这样回答。在 `recursion_limit=25` 下，agent 发起了 13 次模型调用（Qwen3 4B，x86 服务器客户机，3 次中的 3 次）。在 `recursion_limit` 为 101 时发起了 51 次。没有上限时，实验脚本在 1200 秒、121 次模型调用之后把它停掉。[图](#fig-6-8b)展示了每次运行。
 

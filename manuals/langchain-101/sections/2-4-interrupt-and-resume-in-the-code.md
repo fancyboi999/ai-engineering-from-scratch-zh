@@ -74,7 +74,7 @@ id: fig-2-4
 kind: timeline
 title: 三次调用回答两个并行节点里的三个问题
 claim: 每次调用都从第一行重新运行等待中的节点及其模型调用，按下标重放已保存的答案，并且从不再运行已完成的节点 other。
-caption: 列是按顺序排列的调用，行是四个节点。琥珀色单元格停在一个中断处，带着它的 id，青绿色单元格完成，虚线单元格重新应用了已保存的写入。每个单元格里的列表是该节点在第一行看到的恢复列表。底部几行统计模型调用，并写出每次调用保存的检查点。来源：capture/lab/internals/04-interrupt/trace.txt。
+caption: 列是按顺序排列的调用，行是四个节点。琥珀色单元格停在一个中断处，带着它的 id，青色单元格完成，虚线单元格重新应用了已保存的写入。每个单元格里的列表是该节点在第一行看到的恢复列表。底部几行统计模型调用，并写出每次调用保存的检查点。来源：capture/lab/internals/04-interrupt/trace.txt。
 ```
 
 ## 重放的代价 {#s-interrupt-and-resume-in-the-code-what-the-replay-costs}

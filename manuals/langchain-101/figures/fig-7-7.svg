@@ -32,7 +32,7 @@
   <text x="342" y="219.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">false: 2 + 3 = 5.</text>
   <rect x="330" y="278" width="290" height="52" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
   <text x="342" y="299.25" font-size="12.5" font-weight="700">POST /runs 7, PATCH 7</text>
-  <text x="342" y="316.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">智能体的 LangChain 运行</text>
+  <text x="342" y="316.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agent 的 LangChain 运行</text>
   <line x1="370" y1="78" x2="370" y2="107" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-7-head-ink)"/>
   <line x1="370" y1="154" x2="370" y2="177" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-7-head-ink)"/>
   <path d="M580 154 V277" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-7-7-head-rose)"/>

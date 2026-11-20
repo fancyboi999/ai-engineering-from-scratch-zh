@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-5-3-title fig-5-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-3-title">让订单被重复扣款的崩溃试验</title>
-  <desc id="fig-5-3-desc">点阵，每次试验一个点，六行对应 saver 与持久性模式的组合，五列对应终止点，分左右两个面板。左面板是 Mac 上不带模型的图，每个单元格 5 次试验：150 次中有 80 次让副作用执行了两次。右面板是 x86 服务器虚拟机上的 Qwen3 4B agent，没有幂等键，每个单元格是一根含二十次试验的条，标出扣款两次的次数：被终止的 560 次试验中有 331 次扣款两次。每一次在工具内部的终止都扣款两次，而 sync 在该步之后终止只扣款一次。</desc>
+  <desc id="fig-5-3-desc">点阵，每次试验一个点，六行对应 saver 与持久性模式的组合，五列对应终止点，分左右两个面板。左面板是 Mac 上不带模型的图，每个单元格 5 次试验：150 次中有 80 次让副作用执行了两次。右面板是 x86 服务器虚拟机上的 Qwen3 4B agent，没有幂等键，每个单元格是一根含二十次试验的条，标出扣款两次的次数：被杀的 560 次试验中有 331 次扣款两次。每一次在工具内部的终止都扣款两次，而 sync 在该步之后终止只扣款一次。</desc>
   <text x="140" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">图，MAC，不带模型</text>
   <text x="164" y="42" font-size="11" text-anchor="middle" font-weight="700">1</text>
   <text x="212" y="42" font-size="11" text-anchor="middle" font-weight="700">2</text>
@@ -273,7 +273,7 @@
   <circle cx="140" cy="290" r="3.2" fill="var(--m-teal-ink, #18696a)"/>
   <text x="150" y="294" font-size="11" class="m-serif" fill="var(--m-teal-ink, #18696a)">扣款一次</text>
   <circle cx="250" cy="290" r="2.8" fill="var(--m-paper, #fafaf5)" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
-  <text x="260" y="294" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未被终止，exit 模式没有走到这里</text>
-  <text x="20" y="318" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">合计：图 150 次中 80 次，agent 在无幂等键时被终止的 560 次中 331 次。</text>
-  <text x="20" y="334" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">以线程和订单 id 作幂等键：图 150 次中 0 次，agent 被终止的 140 次中 0 次。</text>
+  <text x="260" y="294" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未被杀，exit 模式没有走到这里</text>
+  <text x="20" y="318" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">合计：图 150 次中 80 次，agent 在无幂等键时被杀的 560 次中 331 次。</text>
+  <text x="20" y="334" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">以线程和订单 id 作幂等键：图 150 次中 0 次，agent 被杀的 140 次中 0 次。</text>
 </svg>

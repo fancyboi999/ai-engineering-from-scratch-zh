@@ -26,7 +26,7 @@ const count = r => subset.filter(t => r.tasks[t]).length;
 module.exports = figure('fig-r-11', {
   height: Y0 + 9 * RH + 3 * 22 + 50,
   title: '三次贪心运行互相一致，三次采样运行则不一致',
-  desc: `Mac 上 Qwen3 4B 在 30 个子集任务上的网格。plain 循环与 deep agent 各在 temperature 0、seed 42 下运行三次，每次运行在每个任务上结果都相同，token 与工具调用也相同：分别通过 30 个中的 ${count(ROWS[0])} 个和 ${count(ROWS[3])} 个。temperature 0.7、seed 为 1、2、3 的 plain 循环分别通过 30 个中的 ${seeds.map(k => SP.seeds[k].pass).join('、')} 个，有 ${SP.mixed.length} 个任务在不同 seed 间结果改变：${SP.mixed.join(', ')}。`,
+  desc: `Mac 上 Qwen3 4B 在 30 个子集任务上的网格。朴素循环与 deep agent 各在 temperature 0、seed 42 下运行三次，每次运行在每个任务上结果都相同，token 与工具调用也相同：分别通过 30 个中的 ${count(ROWS[0])} 个和 ${count(ROWS[3])} 个。temperature 0.7、seed 为 1、2、3 的 朴素循环分别通过 30 个中的 ${seeds.map(k => SP.seeds[k].pass).join('、')} 个，有 ${SP.mixed.length} 个任务在不同 seed 间结果改变：${SP.mixed.join(', ')}。`,
 }, f => {
   f.kicker(20, 22, 'Qwen3 4B，30 个子集任务');
   f.kicker(620, 22, '通过', { anchor: 'end' });

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 382" role="img" aria-labelledby="fig-7-4c-title fig-7-4c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-4c-title">20 个文件任务：plain 循环、deep agent 与落盘的 deep agent</title>
-  <desc id="fig-7-4c-desc">三个模型、三种框架在 20 个文件任务上的网格。实心方块表示通过，玫红方块表示失败。方块下方的绿点表示该次运行中模型用 Deep Agents 的文件工具写入过，灰点表示只用它读取过。默认后端下，这些工具写入智能体状态，而检查器读取磁盘。Qwen3 4B 在 plain 下通过 16 个，作为默认 deep agent 通过 2 个，使用 FilesystemBackend 时通过 16 个。Qwen3 8B 通过 17、5 和 9 个。Claude Haiku 5.5 通过 20、20 和 19 个。</desc>
+  <title id="fig-7-4c-title">20 个文件任务：朴素循环、deep agent 与落盘的 deep agent</title>
+  <desc id="fig-7-4c-desc">三个模型、三种框架在 20 个文件任务上的网格。实心方块表示通过，玫红方块表示失败。方块下方的绿点表示该次运行中模型用 Deep Agents 的文件工具写入过，灰点表示只用它读取过。默认后端下，这些工具写入 agent 状态，而检查器读取磁盘。Qwen3 4B 在朴素循环下通过 16 个，作为默认 deep agent 通过 2 个，使用 FilesystemBackend 时通过 16 个。Qwen3 8B 通过 17、5 和 9 个。Claude Haiku 5.5 通过 20、20 和 19 个。</desc>
   <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">模型，框架</text>
   <text x="204" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">FILES01 至 FILES20</text>
   <text x="620" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过</text>
@@ -293,6 +293,6 @@
   <text x="34" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">用 write_file、edit_file 或 delete 写入过</text>
   <circle cx="344" cy="326" r="2" fill="var(--m-ink-mute, #666660)"/>
   <text x="354" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">只读过：ls、glob、read_file</text>
-  <text x="20" y="352" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">默认：StateBackend，文件存放在智能体状态里。落盘：任务文件夹上的 FilesystemBackend。</text>
+  <text x="20" y="352" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">默认：StateBackend，文件存放在 agent 状态里。落盘：任务文件夹上的 FilesystemBackend。</text>
   <text x="20" y="370" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每一行还都有五个写入该文件夹的任务工具。检查器读取这个文件夹。</text>
 </svg>

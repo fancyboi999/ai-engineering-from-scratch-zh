@@ -32,7 +32,7 @@ const m8 = cell('qwen3:8b', 'ptc');
 module.exports = figure('fig-7-4f', {
   height: Y0 + nRows * RH + MODELS.length * 30 + 76,
   title: '有无 eval 工具的通过数，4 个模型，39 个任务',
-  desc: `在 39 个 chain 与 sql 任务上，对 plain 循环、deep agent 和带 eval 工具的 deep agent 的通过率条形图，模型为 Qwen3 8B、Qwen3 14B、gpt-oss 20B 和 Claude Haiku 5.5。Haiku 带 eval 工具时通过 ${hay.n} 个中的 ${hay.pass} 个，提示词要求使用时通过 ${hayN.n} 个中的 ${hayN.pass} 个，Qwen3 8B 带 eval 工具时通过 ${m8.n} 个中的 ${m8.pass} 个。各列依次为模型调用数、以千计的提示词 token 数，以及每个任务的中位秒数。`,
+  desc: `在 39 个 chain 与 sql 任务上，对 朴素循环、deep agent 和带 eval 工具的 deep agent 的通过率条形图，模型为 Qwen3 8B、Qwen3 14B、gpt-oss 20B 和 Claude Haiku 5.5。Haiku 带 eval 工具时通过 ${hay.n} 个中的 ${hay.pass} 个，提示词要求使用时通过 ${hayN.n} 个中的 ${hayN.pass} 个，Qwen3 8B 带 eval 工具时通过 ${m8.n} 个中的 ${m8.pass} 个。各列依次为模型调用数、以千计的提示词 token 数，以及每个任务的中位秒数。`,
 }, f => {
   f.kicker(20, 22, '通过数/任务数');
   f.kicker(400, 22, '调用', { anchor: 'end' });

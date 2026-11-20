@@ -12,7 +12,7 @@
 
 有三个限制决定了这一版能运行什么。带 Postgres 和 Redis 的完整 Agent Server，没有 LangSmith API 密钥或许可证密钥就起不来，见[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)。
 
-我们的 LangSmith 账户是新注册的免费计划账户。它跑过追踪、`evaluate`、pytest 插件和提示词 hub，下面的列表里是它没覆盖到的内容。我们的本地模型是 Ollama 上的 Qwen3 0.6B 到 30B-A3B 和 gpt-oss 20B。Claude Haiku 5.5 和 Claude Sonnet 5.5 在固定预算下运行了[第 1.2 节](#s-do-you-need-langchain)的任务套件。Claude Haiku 5.5 还运行了[第 9.6 节](#s-evals-that-check-state)的 20 个评估。下面其他托管服务的用例还没有运行。
+我们的 LangSmith 账户是新注册的免费计划账户。它跑过追踪、`evaluate`、pytest 插件和prompt hub，下面的列表里是它没覆盖到的内容。我们的本地模型是 Ollama 上的 Qwen3 0.6B 到 30B-A3B 和 gpt-oss 20B。Claude Haiku 5.5 和 Claude Sonnet 5.5 在固定预算下运行了[第 1.2 节](#s-do-you-need-langchain)的任务集。Claude Haiku 5.5 还运行了[第 9.6 节](#s-evals-that-check-state)的 20 个评估。下面其他托管服务的用例还没有运行。
 
 下面每个列表都写明用例，以及文字在哪一节停下来。大多数图的用例不需要账户，只需要录制工具包里的一个新场景。
 
@@ -56,12 +56,12 @@
 
 ## MCP {#s-limits-at-the-pin-and-what-comes-in-the-next-edition-mcp}
 
-- OAuth、URL 模式的 elicitation，以及一轮里的多个输入请求。[第 7.3 节](#s-mcp-with-langchain-mcp)
-- 在 agent 运行内部抛出 `MCPError` 的两个 elicitation 用例，以及基于 stdio 的 elicitation 用例。[第 7.3 节](#s-mcp-with-langchain-mcp)
+- OAuth、URL 模式的征询输入，以及一轮里的多个输入请求。[第 7.3 节](#s-mcp-with-langchain-mcp)
+- 在 agent 运行内部抛出 `MCPError` 的两个征询输入用例，以及基于 stdio 的征询输入用例。[第 7.3 节](#s-mcp-with-langchain-mcp)
 
 ## 托管提供方与真实模型 {#s-limits-at-the-pin-and-what-comes-in-the-next-edition-hosted-providers-and-real-models}
 
-- 一个更难的任务套件，用来区分 Claude Haiku 5.5 和 Claude Sonnet 5.5，因为两者都通过了各自运行的每个任务。[第 1.2 节](#s-do-you-need-langchain)
+- 一个更难的任务集，用来区分 Claude Haiku 5.5 和 Claude Sonnet 5.5，因为两者都通过了各自运行的每个任务。[第 1.2 节](#s-do-you-need-langchain)
 - 在 Anthropic 或 OpenAI 上做真实延迟加载的 `ProviderToolSearchMiddleware`。[第 4.6 节](#s-the-built-in-middleware)
 - 对错误请求产生的 400 使用 `ModelFallbackMiddleware`。[第 4.7 节](#s-retries-backup-models-rate-limits-and-caching)
 - `set_llm_cache`、`create_agent` 的节点缓存，以及针对模型的限流器。[第 4.7 节](#s-retries-backup-models-rate-limits-and-caching)

@@ -17,7 +17,7 @@
 | 通道版本（channel version） | 循环为检查点中每个通道保存的一个数字。在一个超步中发生变化的通道会得到新的版本。 | [2.1](#s-the-superstep-loop-plan-execute-update) |
 | 检查器（checker） | 测试基准里判定通过与否的函数，依据是工具改变了什么，例如运行过的查询、数据库、文件和笔记 store。 | [测试基准方法](#s-ref-the-bench-method) |
 | 检查点（checkpoint） | 一个线程在一步之后保存的状态，包含步号、下一批节点，以及它前一个检查点的 id。 | [1.3](#s-one-create-agent-run) |
-| 检查点元组（checkpoint tuple） | checkpointer 对一个检查点返回的内容：它的 `config`、`metadata`、检查点本身、父检查点的配置，以及待写入内容。 | [5.2](#s-checkpointers-and-threads) |
+| 检查点元组（checkpoint tuple） | checkpointer 对一个检查点返回的内容：它的 `config`、`metadata`、检查点本身、父检查点的配置，以及待写入项。 | [5.2](#s-checkpointers-and-threads) |
 | checkpointer | 在每一步之后保存图状态，并在下一次运行开始时加载最新检查点的对象。 | [5.2](#s-checkpointers-and-threads) |
 | 块（消息的） | 模型流式输出的消息的一部分，例如 `AIMessageChunk`。多个块可以用 `+` 合并成一条消息。 | [3.3](#s-messages-and-content-blocks) |
 | 块（流的） | `stream` 产出的一个条目。它的形状取决于流模式、模式的数量和流的版本。 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) |
@@ -26,13 +26,13 @@
 | 内容块（content block） | 消息中一个带类型的部分，是带 `type` 的字典，`type` 例如 `text`、`reasoning`、`image`、`file` 或 `tool_call`。 | [3.3](#s-messages-and-content-blocks) |
 | 上下文工程（context engineering） | 选择模型每次调用时接收什么：哪些消息、哪些工具、哪些指令。 | [5.5](#s-context-engineering-and-summarization) |
 | 上下文窗口（context window） | 模型一次调用最多接受的 token 数，输入和输出合计。 | [5.5](#s-context-engineering-and-summarization) |
-| `create_agent` | `langchain.agents` 中的函数，把模型、工具、提示和中间件变成一个 `CompiledStateGraph`。 | [4.1](#s-create-agent-and-the-graph-it-builds) |
+| `create_agent` | `langchain.agents` 中的函数，把模型、工具、提示词和中间件变成一个 `CompiledStateGraph`。 | [4.1](#s-create-agent-and-the-graph-it-builds) |
 | 决定（decision） | 对一次暂停的工具调用的回答，`type` 为 `approve`、`edit`、`reject` 或 `respond`。 | [6.5](#s-human-in-the-loop-batched-and-per-call) |
 | 决策模型（decision model） | 来自 `langchain_core.decisions` 的 `BaseDecisionModel`，在 `langchain-core` 1.8.0 中新增，用来回答带类型的问题。 | [4.8](#s-guardrails-pii-and-the-decision-middleware-beta) |
 | deep agent | 由 `deepagents` 的 `create_deep_agent` 创建的 agent。它是一个 `create_agent` 图，在你自己的中间件外围套了一组固定的中间件。 | [7.4](#s-deep-agents-0-7) |
 | Deep Agents | 包名为 `deepagents` 的 harness 项目，为 agent 增加文件工具、子 agent 和摘要。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
 | `default_retry_on` | 两个重试中间件的默认 `retry_on`。它对每个 `Exception` 都重试，唯独 `is_retryable` 为 false 的 `ModelError` 除外。 | [4.7](#s-retries-backup-models-rate-limits-and-caching) |
-| 交付延迟（delivery delay） | 在同一个时钟上，从模型服务器发出一个 token 到你的循环看到它之间的时间。 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) |
+| 送达延迟（delivery delay） | 在同一个时钟上，从模型服务器发出一个 token 到你的循环看到它之间的时间。 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) |
 | `DeltaChannel` | `langgraph.channels.delta` 中的 beta 通道类型，每一步只保存新的写入。它在 `snapshot_frequency` 次更新（默认 100）之后，或 5,000 步之后保存一次完整快照。 | [5.5](#s-context-engineering-and-summarization) |
 | 干扰工具（distractor tool） | 任务不需要的工具，名称和描述看起来合理。测试基准里有 95 个。 | [4.4](#s-many-tools-and-the-tool-selector) |
 | 发行包（distribution） | `pip` 所称的包，例如 `langchain-core`。它的导入名把 `-` 换成 `_`。 | [3.1](#s-install-and-the-package-map) |
@@ -60,12 +60,12 @@
 | 幂等工具（idempotent tool） | 用相同参数调用两次，得到相同结果、产生相同副作用的工具。 | [9.5](#s-timeouts-retries-backup-model-and-shutdown) |
 | 中断（interrupt） | 节点内部对 `interrupt(value)` 的一次调用。它停止运行、保存检查点，并把 `value` 交给调用方。 | [6.4](#s-interrupt-and-resume) |
 | 条目（item） | store 中的一个值，带有命名空间、键，以及创建和更新的时间。 | [5.4](#s-stores-and-long-term-memory) |
-| 每个 worker 的任务数（jobs per worker） | Agent Server 的一个队列 worker 同时执行的运行数。 | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) |
+| 每个 worker 的作业数（jobs per worker） | Agent Server 的一个队列 worker 同时执行的运行数。 | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) |
 | `jump_to` | 节点钩子返回的键，用来把运行转到 `model`、`tools` 或 `end`。 | [4.5](#s-middleware-hooks-and-their-order) |
 | 实验记录（lab recording） | 在我们的某台机器上，对真实模型或真实数据库进行的一次运行，以原始文件保存在 `capture/lab/` 中。 | [本手册是怎么做的](#s-ref-how-this-manual-was-made) |
 | LangChain | agent 框架，位于 `langchain` 和 `langchain-core` 两个包中。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
 | LangGraph | 把 agent 作为节点图来运行的运行时，位于 `langgraph` 包中。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
-| LangSmith | 用于追踪、评估、提示和部署的托管平台，以及它的客户端包 `langsmith`。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
+| LangSmith | 用于追踪、评估、提示词和部署的托管平台，以及它的客户端包 `langsmith`。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
 | `max_concurrency` | 运行配置中的键，限制一步里同时运行的任务数。 | [4.1](#s-create-agent-and-the-graph-it-builds) |
 | MCP 适配器（MCP adapter） | `langchain.mcp` 中的 `MCPAdapter` 类。它通过 FastMCP 连接 MCP 服务器，并把服务器的工具作为 LangChain 工具返回。 | [7.3](#s-mcp-with-langchain-mcp) |
 | MCP 工具错误（MCP tool error） | `isError` 设为 true 的工具结果。工具抛出异常时，FastMCP 服务器会发出这样的结果。 | [7.3](#s-mcp-with-langchain-mcp) |
@@ -78,7 +78,7 @@
 | 命名空间（子图的） | 子图在其父图内运行的路径，例如 `inner:<task id>`。流的块、检查点和状态都带有它。 | [6.7](#s-subgraphs-and-multi-agent-patterns) |
 | 节点钩子（node hook） | `create_agent` 会把它变成图节点的中间件钩子。它接收状态和运行时。 | [4.5](#s-middleware-hooks-and-their-order) |
 | 节点超时（node timeout） | `add_node` 的 `timeout`，单位为秒，对异步节点的每次尝试生效。 | [6.8](#s-error-handlers-node-timeouts-and-the-recursion-limit) |
-| 待写入内容（pending write） | 一个任务在一步中写入的值，保存在该步起始的检查点之下。它可能在自己那一步的检查点之后才到达 saver。恢复时会应用它，而不会重新运行那个任务。 | [5.2](#s-checkpointers-and-threads), [2.3](#s-the-checkpoint-write-path-and-durability) |
+| 待写入项（pending write） | 一个任务在一步中写入的值，保存在该步起始的检查点之下。它可能在自己那一步的检查点之后才到达 saver。恢复时会应用它，而不会重新运行那个任务。 | [5.2](#s-checkpointers-and-threads), [2.3](#s-the-checkpoint-write-path-and-durability) |
 | 逐调用模式（per-call mode） | `interrupt_mode="per_call"`。每个暂停的调用有自己的中断，一次恢复可以按中断 id 回答其中任何一个。 | [6.5](#s-human-in-the-loop-batched-and-per-call) |
 | `PIIMiddleware` | 在消息中找出一种个人数据，并对每个匹配项应用一种策略的中间件。 | [4.8](#s-guardrails-pii-and-the-decision-middleware-beta) |
 | 普通边（plain edge） | 源节点每次完成后，LangGraph 都会沿着走的边。 | [6.2](#s-edges-send-and-command) |
@@ -116,11 +116,11 @@
 | 子图（subgraph） | 用作另一个图的节点的已编译图。两个 schema 共有的键在它们之间传递。 | [6.7](#s-subgraphs-and-multi-agent-patterns) |
 | 汇总评估器（summary evaluator） | 一次给实验的所有行打分的函数，例如计算准确率。 | [7.7](#s-evaluation-with-langsmith) |
 | 摘要消息（summary message） | `SummarizationMiddleware` 用来代替旧消息写入的用户消息。 | [5.5](#s-context-engineering-and-summarization) |
-| 系统提示（system prompt） | 排在 agent 每次模型请求最前面的指令。 | [3.5](#s-the-system-prompt) |
+| 系统提示词（system 提示词） | 排在 agent 每次模型请求最前面的指令。 | [3.5](#s-the-system-prompt) |
 | 目标（评估的） | `evaluate` 用每个示例的输入去调用的函数。 | [7.7](#s-evaluation-with-langsmith) |
 | 目标（MCP 适配器的） | `MCPAdapter` 的第一个参数：`http` 或 `https` URL、`Path`、传输、服务器或配置。 | [7.3](#s-mcp-with-langchain-mcp) |
 | 任务（task） | 用 `@task` 装饰的函数。调用返回一个 future，LangGraph 在它完成时保存其结果。 | [6.3](#s-the-functional-api-entrypoint-and-task) |
-| 任务套件（task suite） | 测试基准工具包里的 99 个任务，分五个任务族，每个都按它的工具改变了什么来检查。 | [1.2](#s-do-you-need-langchain) |
+| 任务集（task suite） | 测试基准工具包里的 99 个任务，分五个任务族，每个都按它的工具改变了什么来检查。 | [1.2](#s-do-you-need-langchain) |
 | 切分器（text splitter） | 把文档切成最多 `chunk_size` 个字符的块，并重复 `chunk_overlap` 个字符的对象。 | [7.1](#s-embeddings-splitters-vector-stores-and-retrievers) |
 | 线程（thread） | 保存在同一个 `thread_id` 之下的一系列检查点。一个线程就是一段对话。 | [5.2](#s-checkpointers-and-threads) |
 | 工具（tool） | 用 `@tool` 包装的函数，带有名称、描述和参数的 JSON schema。 | [3.4](#s-tools-toolruntime-and-tool-errors) |

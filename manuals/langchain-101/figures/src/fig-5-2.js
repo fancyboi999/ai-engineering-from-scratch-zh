@@ -28,8 +28,8 @@ const restart = (turns[1][turns[1].length - 1].step + turns[2][0].step) / 2;
 
 module.exports = figure('fig-5-2', {
   height: 300,
-  title: 'SQLite 文件中同一线程的三个回合',
-  desc: `SqliteSaver 的 checkpoints 表中线程 ${rows[0].thread} 的 ${rows.length} 行，排在一条从 ${rows[0].step} 到 ${rows[rows.length - 1].step} 的步轴上。${turns.map((turn, i) => `第 ${i + 1} 回合“${humans[i]}”在第 ${turn[0].step} 步有一个输入检查点，在第 ${turn.slice(1).map(r => r.step).join('、')} 步有循环检查点，结束后状态里有 ${counts[i]} 条消息`).join('。')}。第 2 回合与第 3 回合之间，连接被关闭，一个新进程打开同一个文件。文件里有 ${table('checkpoints')} 行检查点和 ${table('writes')} 行待处理写入。`,
+  title: 'SQLite 文件中同一线程的三轮',
+  desc: `SqliteSaver 的 checkpoints 表中线程 ${rows[0].thread} 的 ${rows.length} 行，排在一条从 ${rows[0].step} 到 ${rows[rows.length - 1].step} 的步轴上。${turns.map((turn, i) => `第 ${i + 1} 轮“${humans[i]}”在第 ${turn[0].step} 步有一个输入检查点，在第 ${turn.slice(1).map(r => r.step).join('、')} 步有循环检查点，结束后状态里有 ${counts[i]} 条消息`).join('。')}。第 2 轮与第 3 轮之间，连接被关闭，一个新进程打开同一个文件。文件里有 ${table('checkpoints')} 行检查点和 ${table('writes')} 行待处理写入。`,
 }, f => {
   f.kicker(20, 18, `线程 ${rows[0].thread}，每个检查点一行`);
   turns.forEach((turn, i) => {
@@ -39,7 +39,7 @@ module.exports = figure('fig-5-2', {
     f.rule(x1, 62, x2, 62, { hue: 'violet' });
     f.rule(x1, 58, x1, 66, { hue: 'violet' });
     f.rule(x2, 58, x2, 66, { hue: 'violet' });
-    f.text(x1 + 6, 38, `第 ${i + 1} 回合`, { size: 11, hue: 'violet', weight: 700 });
+    f.text(x1 + 6, 38, `第 ${i + 1} 轮`, { size: 11, hue: 'violet', weight: 700 });
     f.text(x1 + 6, 52, humans[i], { size: 11, serif: true, hue: 'violet' });
     turn.forEach(row => {
       const hue = row.source === 'input' ? 'amber' : 'teal';

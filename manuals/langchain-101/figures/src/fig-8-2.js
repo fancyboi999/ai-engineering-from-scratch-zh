@@ -30,7 +30,7 @@ const tool = summary.tool_runs.find(t => t.name === 'send_email');
 const lanes = [
   { title: 'Agent Chat UI', sub: '浏览器', hue: 'violet', draw: (f, x) => flat.terminal(f, x, 18, 'violet', { w: 40, h: 34 }) },
   { title: 'Agent Server', sub: 'langgraph dev', hue: 'indigo', draw: (f, x) => flat.unit(f, x, 22, 'indigo', { w: 34, h: 30 }) },
-  { title: '智能体图', sub: 'create_agent，Ollama', hue: 'plum', draw: (f, x) => flat.tower(f, x, 18, 'plum', { w: 34, h: 34 }) },
+  { title: 'agent 图', sub: 'create_agent，Ollama', hue: 'plum', draw: (f, x) => flat.tower(f, x, 18, 'plum', { w: 34, h: 34 }) },
 ];
 const cx = [70, 340, 540];
 
@@ -62,7 +62,7 @@ const HEIGHT = 112 + groups.reduce((sum, g) => sum + g.rows.length * 40 + 10, 0)
 module.exports = figure('fig-8-2', {
   height: HEIGHT,
   title: 'Agent Chat UI 一次审批的请求',
-  desc: `三条生命线：浏览器中的 Agent Chat UI、langgraph dev 下的 Agent Server，以及 Ollama 上的智能体图。步骤 1，加载时 UI 调用 GET /info 和 POST /threads/search（graph_id 为 ${search.body_shape.metadata.graph_id}，limit 为 ${search.body_shape.limit}），线程的第一条消息会调用 POST /threads。步骤 2，消息以 POST runs/stream 发出，流模式为 ${ask.body_shape.stream_mode.join(', ')}，on_disconnect 为 ${ask.body_shape.on_disconnect}。模型在 POST 之后 ${s(ask.timing.server_first_model_output_s)} 返回完整的 ${ask.timing.sse_first_ai_value} 调用，一个 messages 事件携带它，一个 values 事件携带 __interrupt__。UI 随后调用 POST /history。步骤 3，Approve 发出 POST runs/stream，带 command.resume 的 decisions ${resume.body_shape['command.resume'].decisions.map(d => d.type).join(', ')}、on_disconnect ${resume.body_shape.on_disconnect} 和 stream_resumable ${resume.body_shape.stream_resumable}。工具运行，首个 token 在 POST 之后 ${s(resume.timing.sse_first_ai_event_s)} 到达，UI 再晚 ${s(resume.timing.ui_minus_sse_s)} 把它绘出。`,
+  desc: `三条生命线：浏览器中的 Agent Chat UI、langgraph dev 下的 Agent Server，以及 Ollama 上的 agent 图。步骤 1，加载时 UI 调用 GET /info 和 POST /threads/search（graph_id 为 ${search.body_shape.metadata.graph_id}，limit 为 ${search.body_shape.limit}），线程的第一条消息会调用 POST /threads。步骤 2，消息以 POST runs/stream 发出，流模式为 ${ask.body_shape.stream_mode.join(', ')}，on_disconnect 为 ${ask.body_shape.on_disconnect}。模型在 POST 之后 ${s(ask.timing.server_first_model_output_s)} 返回完整的 ${ask.timing.sse_first_ai_value} 调用，一个 messages 事件携带它，一个 values 事件携带 __interrupt__。UI 随后调用 POST /history。步骤 3，Approve 发出 POST runs/stream，带 command.resume 的 decisions ${resume.body_shape['command.resume'].decisions.map(d => d.type).join(', ')}、on_disconnect ${resume.body_shape.on_disconnect} 和 stream_resumable ${resume.body_shape.stream_resumable}。工具运行，首个 token 在 POST 之后 ${s(resume.timing.sse_first_ai_event_s)} 到达，UI 再晚 ${s(resume.timing.ui_minus_sse_s)} 把它绘出。`,
 }, f => {
   lanes.forEach((lane, index) => {
     lane.draw(f, cx[index]);

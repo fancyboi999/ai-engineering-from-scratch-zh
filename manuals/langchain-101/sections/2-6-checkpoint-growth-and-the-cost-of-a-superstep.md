@@ -67,7 +67,7 @@ id: fig-2-6
 kind: chart
 title: 每个检查点行的字节数，普通消息对比 DeltaChannel
 claim: 普通的行保存整个列表，增长到 99 KB，而 DeltaChannel 的行保持在 750 字节左右，只在每 100 次更新时有一份快照。
-caption: 每个点是一次含 100 次真实工具往返的 create_agent 运行里 checkpoints 表的一行，按顺序排列，每次运行 203 行。青绿色是普通通道，靛蓝色是 DeltaChannel，两个圆环是它的快照行。来源：capture/lab/internals/09-growth/growth.json。
+caption: 每个点是一次含 100 次真实工具往返的 create_agent 运行里 checkpoints 表的一行，按顺序排列，每次运行 203 行。青色是普通通道，靛蓝色是 DeltaChannel，两个圆环是它的快照行。来源：capture/lab/internals/09-growth/growth.json。
 ```
 
 reducer `_messages_delta_reducer` 的名字是私有的，这个通道也是 beta。第 5.5 节列出了修改已有线程的通道时的规则。

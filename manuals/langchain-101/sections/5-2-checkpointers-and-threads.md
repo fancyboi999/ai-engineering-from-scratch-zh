@@ -164,7 +164,7 @@ claim: 一个连接和 20 个连接的池，在 64 个线程、Qwen3 4B 下都�
 caption: 每个点是一次运行，每个位置两次运行。每条线连接一种连接配置的均值。左图是每秒运行数，右图是 aput 的 p99，单位毫秒，对数刻度。x 轴是同时运行的线程数，对数刻度。来源：capture/lab/summary/concurrency-x86-real.json。
 ```
 
-模型跑在 CPU 上时，吞吐量远在 saver 之前就被模型限制了。池的大小按同时运行的线程数来定。我们的 p99 数据没有显示池能降低检查点写入的尾部延迟。在仍在运行的线程上再发第二次运行，是另一个问题，叫双重发消息（double texting），[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)在 Agent Server 上讲它。
+模型跑在 CPU 上时，吞吐量远在 saver 之前就被模型限制了。池的大小按同时运行的线程数来定。我们的 p99 数据没有显示池能降低检查点写入的尾部延迟。在仍在运行的线程上再发第二次运行，是另一个问题，叫双重发送（double texting），[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)在 Agent Server 上讲它。
 
 ```takeaways
 - 传入 checkpointer，并在对话的每一轮使用同一个 thread_id。

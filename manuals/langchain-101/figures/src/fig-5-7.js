@@ -6,7 +6,7 @@ const { load } = require('../../../_shared/chart.js');
 
 const data = load(path.join(__dirname, '../../capture/lab/summary/demos-mac.json'));
 const steps = data.assistant.default;
-const names = ['记住', '请求发送', '批准', '恢复', '再次批准', '第三回合', '新线程 t2'];
+const names = ['记住', '请求发送', '批准', '恢复', '再次批准', '第三轮', '新线程 t2'];
 const X0 = 216;
 const COL = 81;
 const ROW = 40;
@@ -22,7 +22,7 @@ const cols = [
 module.exports = figure('fig-5-7', {
   height: 418,
   title: 'assistant 的七个进程，以及每个进程留下的内容',
-  desc: `一张表，assistant 在 Mac 上运行的七个进程各占一行，每一列是进程结束时读到的一个计数。进程 3 批准了邮件、发出了邮件，随后以退出码 ${steps[2].exit} 被终止。进程 4 恢复后发现同一个审批又在等待。进程 5 再次批准，send_email 第二次运行，幂等键检查跳过了发送。最后 send_email 一共运行了 ${steps[6].attempts} 次，发件箱里有 ${steps[6].sent} 封邮件。新线程上的进程 7 在 store 里仍然找到 ${steps[6].memories} 条记忆。`,
+  desc: `一张表，assistant 在 Mac 上运行的七个进程各占一行，每一列是进程结束时读到的一个计数。进程 3 批准了邮件、发出了邮件，随后以退出码 ${steps[2].exit} 被杀。进程 4 恢复后发现同一个审批又在等待。进程 5 再次批准，send_email 第二次运行，幂等键检查跳过了发送。最后 send_email 一共运行了 ${steps[6].attempts} 次，发件箱里有 ${steps[6].sent} 封邮件。新线程上的进程 7 在 store 里仍然找到 ${steps[6].memories} 条记忆。`,
 }, f => {
   cols.forEach(([head], c) => head.forEach((line, k) => f.text(X0 + c * COL + (COL - 8) / 2, 22 + k * 15, line, { size: 11, anchor: 'middle', hue: 'ink-soft', weight: 700 })));
   steps.forEach((s, i) => {

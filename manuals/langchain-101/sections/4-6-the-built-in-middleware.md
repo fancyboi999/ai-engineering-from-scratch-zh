@@ -182,25 +182,25 @@ note: 请求 ls 的那次运行的第一条 ToolMessage 的 content。
 
 **RubricMiddleware：** `deepagents` 的一个中间件，按评分标准给 agent 的答案打分。调用方把评分标准作为状态键 `rubric` 传入。没有评分标准时，中间件什么也不做 {{code libs/deepagents/deepagents/middleware/rubric.py}}。agent 将要结束时，评分模型读取对话记录，对每条标准给出一个裁决。`needs_revision` 裁决会让 agent 回去再来一轮。经过 `max_iterations` 轮之后，运行以 `max_iterations_reached` 结束。
 
-**我们测得**它的表现，针对第一次测试台里，Qwen3 8B 的纯循环失败的那 25 个任务。执行者是 `create_agent` 里的 Qwen3 8B，带这个中间件，`max_iterations=3`。评分者是第二个 Ollama 0.31.1 上的 Qwen3 14B，在 Mac 上。
+**我们测得**它的表现，针对第一个测试基准里，Qwen3 8B 的朴素循环失败的那 25 个任务。worker 是 `create_agent` 里的 Qwen3 8B，带这个中间件，`max_iterations=3`。评分器是第二个 Ollama 0.31.1 上的 Qwen3 14B，在 Mac 上。
 
 评分标准有四条。每个事实都来自某个工具结果。答案以正确的值提交了一次。每个要求的修改都做了。请求的每个部分都完成了。
 
-每个任务运行一次。25 个任务的一格样本很小，而且这些任务正是因为纯循环失败才被选中的。[图](#fig-4-6b)显示每一次运行。
+每个任务运行一次。25 个任务的一格样本很小，而且这些任务正是因为朴素循环失败才被选中的。[图](#fig-4-6b)显示每一次运行。
 
 ```figure
 id: fig-4-6b
 kind: chart
-title: RubricMiddleware 在 Qwen3 8B 纯循环失败的 25 个任务上的表现
-claim: Qwen3 14B 评分者对 14 次运行说了满意，其中 12 次运行仍未通过状态检查。
-caption: 每一行是一个任务。方块按顺序给出评分者的裁决，下一列是状态检查。调用数统计执行者的模型调用。来自 capture/lab/bench2/summary-bench2.json。
+title: RubricMiddleware 在 Qwen3 8B 朴素循环失败的 25 个任务上的表现
+claim: Qwen3 14B 评分器对 14 次运行说了满意，其中 12 次运行仍未通过状态检查。
+caption: 每一行是一个任务。方块按顺序给出评分器的裁决，下一列是状态检查。调用数统计 worker 的模型调用。来自 capture/lab/bench2/summary-bench2.json。
 ```
 
 三个任务通过了：`r06`、`sql03` 和 `sql09`。十二次运行在第一次评审就得到 `satisfied`，其中 11 次没通过检查。十一次运行在轮数上限处结束，`r06` 是其中之一。
 
-评分标准把执行者的调用从 108 次增加到 173 次，把执行者的提示词 token 从 75,987 增加到 174,192。评分者增加了 56 次调用和 113,851 个提示词 token。三轮任务 `multi13` 在每一轮里都有评分轮次，一共 9 次评分调用和 22 次执行者调用。25 次运行总共用了 16,841 秒，纯运行是 446 秒，其中 11,379 秒是评分者的时间。这台 Mac 是共用的，所以这些时间是上限。
+评分标准把 worker 的调用从 108 次增加到 173 次，把 worker 的提示词 token 从 75,987 增加到 174,192。评分器增加了 56 次调用和 113,851 个提示词 token。三轮任务 `multi13` 在每一轮里都有评分轮次，一共 9 次评分调用和 22 次 worker 调用。25 次运行总共用了 16,841 秒，纯运行是 446 秒，其中 11,379 秒是评分器的时间。这台 Mac 是共用的，所以这些时间是上限。
 
-所以评分者的好坏取决于它的模型。14B 的评分者对状态检查没有通过的运行说了满意。依赖评分者的裁决之前，先拿你的状态检查器去核对它。
+所以评分器的好坏取决于它的模型。14B 的评分器对状态检查没有通过的运行说了满意。依赖评分器的裁决之前，先拿你的状态检查器去核对它。
 
 ```takeaways
 - 给 SummarizationMiddleware 设置 trigger，因为默认值永远不会摘要。
@@ -208,7 +208,7 @@ caption: 每一行是一个任务。方块按顺序给出评分者的裁决，�
 - 使用 thread_limit 时，给 ModelCallLimitMiddleware 配一个 checkpointer。
 - 在沙箱之外，给 ShellToolMiddleware 传入 HostExecutionPolicy 以外的 execution_policy。
 - 从 deepagents 导入 FilesystemMiddleware、SubAgentMiddleware 和 RubricMiddleware，不要从 langchain 导入。
-- 用状态检查器核对 RubricMiddleware 的评分者，因为 14B 的评分者接受了 12 次失败的运行。
+- 用状态检查器核对 RubricMiddleware 的评分器，因为 14B 的评分器接受了 12 次失败的运行。
 ```
 
 来源：capture/out/09-middleware-order.txt, capture/out/11-mw-call-limits.txt, capture/out/17-mw-todo-context-editing.txt, capture/out/18-mw-selection-emulation.txt, capture/out/19-mw-shell-files.txt, capture/s_middleware.py; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/middleware/built-in); libs/langchain_v1/langchain/agents/middleware at langchain==1.5.0; capture/lab/bench2/summary-bench2.json, capture/lab/bench2/runs/rubric.jsonl, capture/lab/bench2/logs/q-rubric.log, capture/lab/bench2/kit2/run2.py; libs/deepagents/deepagents/middleware/rubric.py at deepagents==0.7.38.

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 478" role="img" aria-labelledby="fig-1-2-title fig-1-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-1-2-title">每个模型与 harness 在每项任务上的结果</title>
-  <desc id="fig-1-2-desc">一张网格，每行是一个模型与 harness 的组合，每列对应 99 项任务套件中的一项任务，按任务族分组。实心方块表示通过，玫红方块表示失败，空白列表示该任务不在该行的 30 项子集之内。Claude Haiku 5.5 用 plain loop（朴素循环）在 99 项中通过 99 项，用 deep agent 通过 99 项。Qwen3 4B 的 plain 通过 70 项，deep 通过 55 项；Qwen3 8B 分别通过 74 项和 58 项。在 Qwen3 模型上，plain loop、create_agent 与手工搭建的 StateGraph 这几行在它们共有的每项任务上结果相同。</desc>
+  <desc id="fig-1-2-desc">一张网格，每行是一个模型与 harness 的组合，每列对应 99 项任务集中的一项任务，按任务族分组。实心方块表示通过，玫红方块表示失败，空白列表示该任务不在该行的 30 项子集之内。Claude Haiku 5.5 用 朴素循环在 99 项中通过 99 项，用 deep agent 通过 99 项。Qwen3 4B 的朴素循环通过 70 项，deep 通过 55 项；Qwen3 8B 分别通过 74 项和 58 项。在 Qwen3 模型上，朴素循环、create_agent 与手工搭建的 StateGraph 这几行在它们共有的每项任务上结果相同。</desc>
   <text x="20" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">模型</text>
   <text x="124" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">HARNESS</text>
   <text x="620" y="24" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过</text>

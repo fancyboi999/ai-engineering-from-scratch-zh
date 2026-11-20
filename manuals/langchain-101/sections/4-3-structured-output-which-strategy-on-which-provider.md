@@ -16,7 +16,7 @@
 
 ## 实验 {#s-structured-output-which-strategy-on-which-provider-the-experiment}
 
-测试台把[任务集](#s-do-you-need-langchain)里的 20 个链任务和 19 个 SQL 任务通过 `create_agent` 跑了一遍。每个任务在作答之前需要两到六次查询。schema 只有一个字段：
+测试基准把[任务集](#s-do-you-need-langchain)里的 20 个链任务和 19 个 SQL 任务通过 `create_agent` 跑了一遍。每个任务在作答之前需要两到六次查询。schema 只有一个字段：
 
 ```listing
 title: 每次结构化输出运行的 schema
@@ -84,7 +84,7 @@ note: 一行记录，只保留方法、调用次数、token、时间和错误。
 **提取调用（extraction call）：** agent 运行之后的一次 `with_structured_output` 调用，它读取问题和最终回复，返回符合 schema 的对象。
 
 ```listing
-title: 测试台的提取调用
+title: 测试基准的提取调用
 source: capture/lab/bench/kit/structured.py
 lang: python
 note: 这次调用和它的两条消息。周围的错误处理已截去。
@@ -117,7 +117,7 @@ note: 自由文本方法的一行记录，只保留工具包读到的值、真�
 
 ## 成本与时间 {#s-structured-output-which-strategy-on-which-provider-cost-and-time}
 
-**我们测得**四种方法的成本，在 Claude Haiku 5.5 上对 39 个任务按标价计算。工具包的结构化输出运行器没有加提示缓存，所以这些数字没有缓存折扣。
+**我们测得**四种方法的成本，在 Claude Haiku 5.5 上对 39 个任务按标价计算。工具包的结构化输出运行器没有加提示词缓存，所以这些数字没有缓存折扣。
 
 | Claude Haiku 5.5 上的方法 | 正确数 | 模型调用，中位数 | 39 个任务的成本 | 每个任务的时间，中位数 |
 |---|---|---|---|---|

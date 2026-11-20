@@ -23,7 +23,7 @@
 | `get_tuple(config)` | 返回配置所指定的 `CheckpointTuple`，或该线程最新的一个 | 262 |
 | `list(config, ...)` | 返回一个线程的检查点，最新的在前 | 277 |
 | `put(config, checkpoint, metadata, new_versions)` | 保存一个检查点 | 301 |
-| `put_writes(config, writes, task_id)` | 保存一个任务的待写入内容 | 324 |
+| `put_writes(config, writes, task_id)` | 保存一个任务的待写入项 | 324 |
 | `delete_thread(thread_id)` | 删除一个线程的所有检查点和写入 | 344 |
 | `get_next_version(current, channel)` | 返回一个通道的下一个版本 | 721 |
 
@@ -57,7 +57,7 @@
 | `checkpoint_id` | 线程中的一个检查点，用于重放或分叉 |
 | `checkpoint_ns` | 子图的命名空间。空字符串表示顶层图 |
 
-带 checkpointer 的图，在运行配置完全没有 `configurable` 条目时会抛出 `ValueError` {{code langgraph/langgraph/pregel/main.py:2701-2705}}. `configurable` 里有其他键时能通过这项检查，但会在之后失败，例如 `KeyError: 'checkpoint_ns'`。错误文本见[错误参考](#s-ref-errors)。
+带 checkpointer 的图，在运行配置完全没有 `configurable` 条目时会抛出 `ValueError` {{code langgraph/langgraph/pregel/main.py:2701-2705}}。 `configurable` 里有其他键时能通过这项检查，但会在之后失败，例如 `KeyError: 'checkpoint_ns'`。错误文本见[错误](#s-ref-errors)。
 
 ## 已编译图的状态方法 {#s-ref-checkpointer-and-store-api-state-methods-of-a-compiled-graph}
 
@@ -72,11 +72,11 @@
 
 ## 持久性 {#s-ref-checkpointer-and-store-api-durability}
 
-`Durability` 取值为 `sync`、`async` 或 `exit` {{code langgraph/langgraph/types.py:99}}. 默认是 `async` {{code langgraph/langgraph/pregel/main.py:2715}}. 旧参数 `checkpoint_during` 仍然可用，但会发出警告：`True` 对应 `async`，`False` 对应 `exit` {{code langgraph/langgraph/pregel/main.py:2837-2847}}. [第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)说明每种模式在崩溃前保存了什么。
+`Durability` 取值为 `sync`、`async` 或 `exit` {{code langgraph/langgraph/types.py:99}}。 默认是 `async` {{code langgraph/langgraph/pregel/main.py:2715}}。 旧参数 `checkpoint_during` 仍然可用，但会发出警告：`True` 对应 `async`，`False` 对应 `exit` {{code langgraph/langgraph/pregel/main.py:2837-2847}}。 [第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)说明每种模式在崩溃前保存了什么。
 
 ## 子图的 checkpointer {#s-ref-checkpointer-and-store-api-checkpointers-of-a-subgraph}
 
-`compile` 的 `checkpointer` 参数接受 `None`、`True`、`False` 或一个 saver {{code langgraph/langgraph/types.py:110}}. `None` 继承父图的 saver，`True` 让子图的状态跨调用保留，`False` 关闭检查点。[第 6.7 节](#s-subgraphs-and-multi-agent-patterns)描述了这三种取值。
+`compile` 的 `checkpointer` 参数接受 `None`、`True`、`False` 或一个 saver {{code langgraph/langgraph/types.py:110}}。 `None` 继承父图的 saver，`True` 让子图的状态跨调用保留，`False` 关闭检查点。[第 6.7 节](#s-subgraphs-and-multi-agent-patterns)描述了这三种取值。
 
 ## store {#s-ref-checkpointer-and-store-api-the-stores}
 
@@ -103,9 +103,9 @@
 
 {{code checkpoint/langgraph/store/base/__init__.py:733-980}}
 
-`Item` 含 `value`、`key`、`namespace`、`created_at` 和 `updated_at`。`SearchItem` 多一个 `score` {{code checkpoint/langgraph/store/base/__init__.py:51-151}}. `IndexConfig` 设置嵌入、嵌入的维度和要嵌入的字段，`TTLConfig` 设置过期时间 {{code checkpoint/langgraph/store/base/__init__.py:545-578}}.
+`Item` 含 `value`、`key`、`namespace`、`created_at` 和 `updated_at`。`SearchItem` 多一个 `score` {{code checkpoint/langgraph/store/base/__init__.py:51-151}}。 `IndexConfig` 设置嵌入、嵌入的维度和要嵌入的字段，`TTLConfig` 设置过期时间 {{code checkpoint/langgraph/store/base/__init__.py:545-578}}。
 
-命名空间的标签不能为空，也不能包含句点或 NUL 字节。每种情况都会抛出 `InvalidNamespaceError` {{code checkpoint/langgraph/store/base/__init__.py:1317-1341}}.
+命名空间的标签不能为空，也不能包含句点或 NUL 字节。每种情况都会抛出 `InvalidNamespaceError` {{code checkpoint/langgraph/store/base/__init__.py:1317-1341}}。
 
 | Store | 表 |
 |---|---|
@@ -114,6 +114,6 @@
 
 ## 序列化器 {#s-ref-checkpointer-and-store-api-the-serializer}
 
-两种 saver 默认都使用 `JsonPlusSerializer` {{code checkpoint/langgraph/checkpoint/serde/jsonplus.py:104}}. `EncryptedSerializer` 用 AES 包装它，并从 `LANGGRAPH_AES_KEY` 读取密钥 {{code checkpoint/langgraph/checkpoint/serde/encrypted.py:54-59}}. [第 5.6 节](#s-serialization-of-state-and-what-does-not-round-trip)说明哪些值取回后会发生变化。
+两种 saver 默认都使用 `JsonPlusSerializer` {{code checkpoint/langgraph/checkpoint/serde/jsonplus.py:104}}。 `EncryptedSerializer` 用 AES 包装它，并从 `LANGGRAPH_AES_KEY` 读取密钥 {{code checkpoint/langgraph/checkpoint/serde/encrypted.py:54-59}}。 [第 5.6 节](#s-serialization-of-state-and-what-does-not-round-trip)说明哪些值取回后会发生变化。
 
 来源：libs/checkpoint/langgraph/checkpoint/base/__init__.py, libs/checkpoint/langgraph/checkpoint/memory/__init__.py, libs/checkpoint/langgraph/store/base/__init__.py, libs/checkpoint/langgraph/store/memory/__init__.py, libs/checkpoint/langgraph/checkpoint/serde/jsonplus.py, libs/checkpoint/langgraph/checkpoint/serde/encrypted.py, libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py, libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/aio.py, libs/checkpoint-sqlite/langgraph/store/sqlite/base.py, libs/checkpoint-postgres/langgraph/checkpoint/postgres/__init__.py, libs/checkpoint-postgres/langgraph/checkpoint/postgres/aio.py, libs/checkpoint-postgres/langgraph/checkpoint/postgres/base.py, libs/checkpoint-postgres/langgraph/store/postgres/base.py, libs/langgraph/langgraph/types.py，以及 libs/langgraph/langgraph/pregel/main.py（langgraph 1.2.22）； capture/out/28-checkpoint-memory.txt, capture/out/29-checkpoint-sqlite.txt, capture/out/30-state-history-forks.txt, capture/out/33-store.txt.

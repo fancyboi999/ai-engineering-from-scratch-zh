@@ -6,7 +6,7 @@
 
 ## 六个钩子 {#s-ref-middleware-hooks-and-classes-the-six-hooks}
 
-`AgentMiddleware` 从 `types.py` 的第 387 行开始 {{code libs/langchain_v1/langchain/agents/middleware/types.py:387}}.
+`AgentMiddleware` 从 `types.py` 的第 387 行开始 {{code libs/langchain_v1/langchain/agents/middleware/types.py:387}}。
 
 | 钩子 | 异步形式 | 种类 | 参数 | 返回值 | 行号 |
 |---|---|---|---|---|---|
@@ -17,7 +17,7 @@
 | `wrap_tool_call` | `awrap_tool_call` | 包装 | `request`、`handler` | `ToolMessage` 或 `Command` | 676, 758 |
 | `after_agent` | `aafter_agent` | node | `state`, `runtime` | a state update or `None` | 652, 663 |
 
-只实现了包装钩子同步形式的中间件，在 `ainvoke` 下会抛出 `NotImplementedError`。错误消息列出三种修复方式，反过来的情况同样会抛出 {{code libs/langchain_v1/langchain/agents/middleware/types.py:588-598}} {{code libs/langchain_v1/langchain/agents/middleware/types.py:640-650}}.
+只实现了包装钩子同步形式的中间件，在 `ainvoke` 下会抛出 `NotImplementedError`。错误消息列出三种修复方式，反过来的情况同样会抛出 {{code libs/langchain_v1/langchain/agents/middleware/types.py:588-598}} {{code libs/langchain_v1/langchain/agents/middleware/types.py:640-650}}。
 
 ## 顺序与名称 {#s-ref-middleware-hooks-and-classes-order-and-names}
 
@@ -35,7 +35,7 @@
 
 ## 装饰器 {#s-ref-middleware-hooks-and-classes-decorators}
 
-每个装饰器把一个函数变成带有一个钩子的中间件类 {{code libs/langchain_v1/langchain/agents/middleware/types.py:881-2039}}.
+每个装饰器把一个函数变成带有一个钩子的中间件类 {{code libs/langchain_v1/langchain/agents/middleware/types.py:881-2039}}。
 
 | 装饰器 | 钩子 | 行号 |
 |---|---|---|
@@ -80,7 +80,7 @@
 | `PIIMiddleware` | `before_model`, `after_model` | `pii_type` 必填，`strategy="redact"`, `apply_to_input=True`, `apply_to_output=False`, `apply_to_tool_results=False` | `pii.py:513`, `:577` |
 | `ModelRouterMiddleware` | `before_agent`, `wrap_model_call` | `choices`、`instructions` 和 `classifier` 必填。Beta，带 `@beta` 标记，据发布说明在 1.5.0 中新增 | `model_router.py:72`, `:121` |
 | `AutoModeMiddleware` | `wrap_tool_call` | `tools` 和 `classifier` 必填，`criteria=None`。仅在 docstring 中标注为 Beta，没有 `@beta` 标记也没有警告，据发布说明在 1.5.0 中新增 | `auto_mode.py:64`, `:117` |
-| `TodoListMiddleware` | `wrap_model_call`, `after_model` | 默认的系统提示和工具描述 | `todo.py:174`, `:203` |
+| `TodoListMiddleware` | `wrap_model_call`, `after_model` | 默认的系统提示词和工具描述 | `todo.py:174`, `:203` |
 | `LLMToolSelectorMiddleware` | `wrap_model_call` | `model=None`, `max_tools=None`, `always_include=None`, `max_retries=1` | `tool_selection.py:121`, `:150` |
 | `LLMToolEmulator` | `wrap_tool_call` | `tools=None`, `model=None` | `tool_emulator.py:27`, `:71` |
 | `ProviderToolSearchMiddleware` | `wrap_model_call` | `searchable_tools=None` | `provider_tool_search.py:57`, `:93` |
@@ -89,7 +89,7 @@
 
 {{code libs/langchain_v1/langchain/agents/middleware/model_retry.py:116-125}} {{code libs/langchain_v1/langchain/agents/middleware/tool_call_limit.py:202-208}} {{code libs/langchain_v1/langchain/agents/middleware/model_call_limit.py:126-131}} {{code libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py:491-498}} {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:282-292}} {{code libs/langchain_v1/langchain/agents/middleware/pii.py:577-586}} {{code libs/langchain_v1/langchain/agents/middleware/file_search.py:133-138}} {{code libs/langchain_v1/langchain/agents/middleware/auto_mode.py:117-124}} {{code libs/langchain_v1/langchain/agents/middleware/model_router.py:121-127}}
 
-`max_retries` 为 2 表示一共尝试 3 次。两个重试类的 `retry_on` 默认都是 `default_retry_on`，见[第 4.7 节](#s-retries-backup-models-rate-limits-and-caching)。在默认的 `trigger=None` 下，`SummarizationMiddleware` 永远不会做摘要 {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:698-701}}.
+`max_retries` 为 2 表示一共尝试 3 次。两个重试类的 `retry_on` 默认都是 `default_retry_on`，见[第 4.7 节](#s-retries-backup-models-rate-limits-and-caching)。在默认的 `trigger=None` 下，`SummarizationMiddleware` 永远不会做摘要 {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:698-701}}。
 
 ## 人工审核的类型 {#s-ref-middleware-hooks-and-classes-types-of-human-review}
 
@@ -101,6 +101,6 @@
 | `HITLResponse` | `decisions` | 289 |
 | `InterruptOnConfig` | `allowed_decisions`, `description`, `args_schema`, `when` | 306 |
 
-`interrupt_on` 中的 `True` 允许全部四种决定 {{code libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py:586}}. [第 6.5 节](#s-human-in-the-loop-batched-and-per-call)运行了两种模式。
+`interrupt_on` 中的 `True` 允许全部四种决定 {{code libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py:586}}。 [第 6.5 节](#s-human-in-the-loop-batched-and-per-call)运行了两种模式。
 
 来源：libs/langchain_v1/langchain/agents/middleware/__init__.py, types.py, summarization.py, context_editing.py, human_in_the_loop.py, model_call_limit.py, tool_call_limit.py, tool_retry.py, model_retry.py, model_fallback.py, model_refusal.py, tool_error.py, pii.py, model_router.py, auto_mode.py, todo.py, tool_selection.py, tool_emulator.py, provider_tool_search.py, shell_tool.py, file_search.py，以及 libs/langchain_v1/langchain/agents/factory.py（langchain==1.5.0）；libs/prebuilt/langgraph/prebuilt/tool_node.py（langgraph 1.2.22）； capture/out/09-middleware-order.txt.

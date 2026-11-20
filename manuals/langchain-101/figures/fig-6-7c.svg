@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 416" role="img" aria-labelledby="fig-6-7c-title fig-6-7c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-6-7c-title">chain01 经过各模式的一次录制运行</title>
-  <desc id="fig-6-7c-desc">五个泳道面板，每个模式一个，任务为 chain01，模型为 Claude Haiku 5.5，共用 10 秒的时间轴。每条泳道是一个智能体，每个梅紫方框是一次模型调用，每个三角形是一次工具调用。单智能体：5 次模型调用，15764 个输入 token，5.4 s，通过；子智能体（Deep Agents）：7 次模型调用，32426 个输入 token，9.7 s，通过；智能体转交：5 次模型调用，10526 个输入 token，6.4 s，通过；skills：6 次模型调用，10627 个输入 token，6.1 s，通过；路由：6 次模型调用，9577 个输入 token，7.0 s，失败。</desc>
+  <desc id="fig-6-7c-desc">五个泳道面板，每个模式一个，任务为 chain01，模型为 Claude Haiku 5.5，共用 10 秒的时间轴。每条泳道是一个 agent，每个梅紫方框是一次模型调用，每个三角形是一次工具调用。单智能体：5 次模型调用，15764 个输入 token，5.4 s，通过；子智能体（Deep Agents）：7 次模型调用，32426 个输入 token，9.7 s，通过；智能体转交：5 次模型调用，10526 个输入 token，6.4 s，通过；skills：6 次模型调用，10627 个输入 token，6.1 s，通过；路由：6 次模型调用，9577 个输入 token，7.0 s，失败。</desc>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <text x="16" y="26" font-size="12" font-weight="700">单智能体</text>
   <text x="624" y="26" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">5 次模型调用，输入 15.8k token，通过</text>

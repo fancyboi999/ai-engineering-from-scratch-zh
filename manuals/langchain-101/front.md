@@ -64,7 +64,7 @@ GitHub 的 issue 和拉取请求，是锁定版本上某个行为的证据，正
 
 Mac 是一台共用的笔记本，每次计时运行期间上面都有其他工作在跑。读 Mac 上的每个时间时，把它当作该机器的上界。实验用的本地模型有 Qwen3 0.6B、1.7B、4B、8B、14B 和 30B-A3B，以及 gpt-oss 20B，都在 Ollama 上运行，嵌入用 `nomic-embed-text`。录制工具包在 x86 服务器客户机上使用 Qwen3 4B Instruct。[第 8.7 节](#s-a-failure-drill)的故障演练和[第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)的崩溃矩阵也是如此。实验运行 T05、T07、T08、T11、T17、T18 和 T19 同样如此。
 
-**任务集基准：** [第 1.2 节](#s-do-you-need-langchain)的 99 个任务，每个都按工具留下的状态来检查。Claude Haiku 5.5（`claude-haiku-5-5`）和 Claude Sonnet 5.5（`claude-sonnet-5-5`）从 Mac 经 Anthropic API 运行。预算设有上限，每次调用都记在成本账本里。[基准方法](#s-ref-the-bench-method)给出任务、设置，以及不应使用的行。
+**测试基准：** [第 1.2 节](#s-do-you-need-langchain)的 99 个任务，每个都按工具留下的状态来检查。Claude Haiku 5.5（`claude-haiku-5-5`）和 Claude Sonnet 5.5（`claude-sonnet-5-5`）从 Mac 经 Anthropic API 运行。预算设有上限，每次调用都记在成本账本里。[测试基准方法](#s-ref-the-bench-method)给出任务、设置，以及不应使用的行。
 
 Claude Haiku 5.5 还运行了[第 9.6 节](#s-evals-that-check-state)里生产服务的 20 项评估，每次调用同样记在这类账本里。它还对[第 8.4 节](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)的文件规则发起了 60 次攻击，花费 $0.021。该节的规则矩阵没有用模型，是由脚本化的调用方驱动权限层，小节里也写明了这一点。本手册里其余的模型耗时，都是本地模型的耗时。
 

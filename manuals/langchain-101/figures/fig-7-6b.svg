@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 414" role="img" aria-labelledby="fig-7-6b-title fig-7-6b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-7-6b-title">从最后一次运行到进程退出的秒数，按端点分组</title>
-  <desc id="fig-7-6b-desc">Mac 上从最后一次智能体运行到进程退出的耗时点图，每种端点条件一个进程，每个进程做 50 次 Qwen3 4B 智能体运行。结尾调用 wait_for_all_tracers 时：端点正常为 0.4 s，端点很慢为 0.4 s。不调用时：端点很慢 3.7 s，端点很慢且关闭后台回调 3.7 s，端点返回 500 为 17.1 s，端点宕机为 9.9 s（收到 350 次运行中的 0 次），端点挂起则在最后一次运行后 208 s 仍然存活，300 s 时被终止（收到 350 次运行中的 50 次）。所有条件下每次智能体运行都返回了答案。</desc>
+  <desc id="fig-7-6b-desc">Mac 上从最后一次 agent 运行到进程退出的耗时点图，每种端点条件一个进程，每个进程做 50 次 Qwen3 4B agent 运行。结尾调用 wait_for_all_tracers 时：端点正常为 0.4 s，端点很慢为 0.4 s。不调用时：端点很慢 3.7 s，端点很慢且关闭后台回调 3.7 s，端点返回 500 为 17.1 s，端点宕机为 9.9 s（收到 350 次运行中的 0 次），端点挂起则在最后一次运行后 208 s 仍然存活，300 s 时被杀（收到 350 次运行中的 50 次）。所有条件下每次 agent 运行都返回了答案。</desc>
   <defs><marker id="fig-7-6b-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
   <line x1="70" y1="282" x2="610" y2="282" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="286" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
@@ -62,7 +62,7 @@
   <rect class="m-knock" x="543.13" y="165.62" width="56.6" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="571.43" y="176.2" font-size="11" text-anchor="middle" fill="var(--m-rose-ink, #b0344d)">于 300 s</text>
   <text x="571.43" y="300" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">挂起</text>
-  <text x="70" y="344" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是一个含 50 次智能体运行的进程，共 350 次追踪运行。</text>
+  <text x="70" y="344" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是一个含 50 次 agent 运行的进程，共 350 次追踪运行。</text>
   <text x="70" y="362" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">点上方的分数是到达端点的追踪运行数。</text>
   <text x="70" y="380" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">flush：最后一次运行后调用 wait_for_all_tracers()。后台关闭：</text>
   <text x="70" y="398" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">LANGCHAIN_CALLBACKS_BACKGROUND=false。每个进程中的 50 次运行都给出了答案。</text>

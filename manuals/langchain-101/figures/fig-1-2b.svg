@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 428" role="img" aria-labelledby="fig-1-2b-title fig-1-2b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-1-2b-title">模型之外的耗时，以及 deep agent 的提示词 token 数</title>
-  <desc id="fig-1-2b-desc">两幅点图。左：每项任务中模型调用与工具之外的毫秒数，纵轴为对数刻度；Qwen3 4B 在 30 项子集上用四种 harness，Claude Haiku 5.5 在 99 项任务上用两种。中位数：Qwen3 4B 朴素 6.2 ms， create 22.5 ms， graph 18.5 ms， deep 55.2 ms，Haiku 朴素 8.4 ms， deep 66.5 ms。模型在 Qwen3 4B 上每项任务的耗时中位数为 9.7 s，在 Haiku 上为 5.0 s。右：七个模型上逐项任务的 deep agent 提示词 token 数除以 plain loop 的提示词 token 数。在所有任务上，deep agent 发送的提示词 token 是 plain loop 的 3.62 到 4.35 倍。</desc>
+  <desc id="fig-1-2b-desc">两幅点图。左：每项任务中模型调用与工具之外的毫秒数，纵轴为对数刻度；Qwen3 4B 在 30 项子集上用四种 harness，Claude Haiku 5.5 在 99 项任务上用两种。中位数：Qwen3 4B 朴素 6.2 ms， create 22.5 ms， graph 18.5 ms， deep 55.2 ms，Haiku 朴素 8.4 ms， deep 66.5 ms。模型在 Qwen3 4B 上每项任务的耗时中位数为 9.7 s，在 Haiku 上为 5.0 s。右：七个模型上逐项任务的 deep agent 提示词 token 数除以 朴素循环 的提示词 token 数。在所有任务上，deep agent 发送的提示词 token 是 朴素循环 的 3.62 到 4.35 倍。</desc>
   <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A. 每项任务中模型之外的耗时</text>
-  <text x="372" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B. DEEP AGENT 相对 PLAIN LOOP</text>
+  <text x="372" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B. DEEP AGENT 相对 朴素循环</text>
   <line x1="62" y1="326" x2="324" y2="326" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="56" y="330" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1 ms</text>
   <line x1="62" y1="236" x2="324" y2="236" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>

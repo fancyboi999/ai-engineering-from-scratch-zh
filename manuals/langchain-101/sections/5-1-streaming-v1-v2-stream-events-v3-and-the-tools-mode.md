@@ -85,7 +85,7 @@ id: fig-5-1
 kind: timeline
 title: 一次 agent 运行在每种流模式下的块
 claim: 同一次运行，updates 模式产出 3 个块，values 模式 4 个，messages 模式 13 个，stream_events v3 产出 23 个事件。
-caption: 每一行是同一次 agent 运行的一条流。每个标记是一个块，放在产生它的节点运行上。颜色表示块携带的内容：靛蓝是完整状态，梅红是模型输出，绿色是工具输出，琥珀色是开始（空心）或结束的任务。tools 一行是会发出两个 delta 的 slow_sum agent。来源：capture/out/21-stream-updates-values.txt、capture/out/22-stream-messages.txt、capture/out/23-stream-tasks-custom-debug.txt、capture/out/25-stream-events-v3.txt 和 capture/out/26-stream-tools-mode.txt。
+caption: 每一行是同一次 agent 运行的一条流。每个标记是一个块，放在产生它的节点运行上。颜色表示块携带的内容：靛蓝是完整状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始（空心）或结束的任务。tools 一行是会发出两个 delta 的 slow_sum agent。来源：capture/out/21-stream-updates-values.txt、capture/out/22-stream-messages.txt、capture/out/23-stream-tasks-custom-debug.txt、capture/out/25-stream-events-v3.txt 和 capture/out/26-stream-tools-mode.txt。
 ```
 
 | 模式 | 一个块是 | add 运行的块数 |
@@ -340,7 +340,7 @@ chunk 3:
 
 九种 API 里有八种按服务器使用的间隔，一个个送出 token。文本回复的首 token 延迟中位数是 1.28 到 3.46 毫秒，最差的 p95 是 7.63 毫秒。请求在调用后 3.8 到 10.5 毫秒到达代理。网上有一种说法，称 LangGraph 的流式输出会给首个 token 增加 100 到 300 毫秒。这里不成立，本手册把它记为冲突 D211。
 
-这些层消耗 CPU 时间，但没有增加你能察觉的延迟。下面的 CPU 时间只是参考值，不是绝对成本，因为机器上同时有其他任务。80 个 token 的一次运行，在纯 `openai` 循环里用了 63.4 毫秒 CPU，在 `ChatOpenAI.stream` 里用了 80.3 毫秒。通过 agent 运行用了 102.3 到 140.4 毫秒。带一次工具调用和一句短回答的运行，在纯循环里用了 20.1 毫秒，通过 agent 用了 41.0 到 49.0 毫秒。
+这些层消耗 CPU 时间，但没有增加你能察觉的延迟。下面的 CPU 时间只是参考值，不是绝对成本，因为机器上同时有其他任务。80 个 token 的一次运行，在朴素 `openai` 循环里用了 63.4 毫秒 CPU，在 `ChatOpenAI.stream` 里用了 80.3 毫秒。通过 agent 运行用了 102.3 到 140.4 毫秒。带一次工具调用和一句短回答的运行，在朴素循环里用了 20.1 毫秒，通过 agent 用了 41.0 到 49.0 毫秒。
 
 工具调用让最终文本晚到的时间，只有工具往返那么久。Ollama 把每个工具调用放在一个块里发出，这个块在发出后 1.9 到 9.4 毫秒到达循环。第二次请求里，首个 token 在发出后 1.74 到 3.69 毫秒到达循环。[图](#fig-5-1c)里玫红色的一行是例外。
 
@@ -397,7 +397,7 @@ claim: 先读 reasoning 的 v3 循环在 4,052 毫秒时一次性看到全部 80
 caption: 上面一对是只遍历 message.text 的循环，下面一对先读 message.reasoning。橄榄色刻线是 Ollama 上 Qwen3 4B 的发出时刻，其他刻线是循环看到 token 的时刻。来源：capture/lab/summary/streaming-mac-real.json。
 ```
 
-顺序对其他投影也有影响。在工具阶段，文档里的循环先读 `message.text`，再读 `message.tool_calls`。Ollama 把调用放在一个块里发出，所以对 Qwen3 4B，文档循环在发出后中位数 7.9 毫秒看到调用。它的异步形式用了 9.4 毫秒，纯循环用了 1.9 毫秒。
+顺序对其他投影也有影响。在工具阶段，文档里的循环先读 `message.text`，再读 `message.tool_calls`。Ollama 把调用放在一个块里发出，所以对 Qwen3 4B，文档循环在发出后中位数 7.9 毫秒看到调用。它的异步形式用了 9.4 毫秒，朴素循环用了 1.9 毫秒。
 
 **我们测得**不同顺序的影响，用的是真实的 reasoning 模型，环境是 Mac：`ChatOllama` 加 Qwen3 4B 和 `reasoning=True`，每种顺序 3 次运行。先读 reasoning 时，484 个 reasoning delta 实时流出。随后全部 103 个文本 delta 在同一时刻到达，比最后一个 reasoning delta 晚 3,424 到 4,036 毫秒。先读 text 时，文本实时流出，reasoning 在最后一次性到达。Qwen3 8B 在 5 次运行里表现相同。先读 text 时，它的 763 个 reasoning delta 在 2 毫秒内于末尾到齐，晚了 57 到 112 秒。
 

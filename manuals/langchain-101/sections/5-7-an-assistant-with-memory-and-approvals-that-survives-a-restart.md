@@ -12,11 +12,11 @@
 
 演示用到了这些章节：
 
-- [Checkpointer 与线程](#s-checkpointers-and-threads)：`SqliteSaver` 把每个线程保存在一个文件里。
+- [Checkpointer 与线程：短期记忆](#s-checkpointers-and-threads)：`SqliteSaver` 把每个线程保存在一个文件里。
 - [持久性模式，以及两步之间的崩溃](#s-durability-modes-and-a-crash-between-two-steps)：崩溃，以及幂等键。
-- [Store 与长期记忆](#s-stores-and-long-term-memory)：`SqliteStore`，用户 id 来自 `context`。
+- [Store 与长期记忆，以及命名空间隔离](#s-stores-and-long-term-memory)：`SqliteStore`，用户 id 来自 `context`。
 - [上下文工程与摘要](#s-context-engineering-and-summarization)：带触发条件的 `SummarizationMiddleware`。
-- [人在回路，批量与逐个调用](#s-human-in-the-loop-batched-and-per-call)：对 `send_email` 做 `per_call` 审核。
+- [人在回路：HumanInTheLoopMiddleware 的批量模式与逐调用模式](#s-human-in-the-loop-batched-and-per-call)：对 `send_email` 做 `per_call` 审核。
 
 ## 代码 {#s-an-assistant-with-memory-and-approvals-that-survives-a-restart-the-code}
 

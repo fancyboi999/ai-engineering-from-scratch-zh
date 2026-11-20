@@ -22,7 +22,7 @@ const trial = (f, x, y, t, cell, r) => {
 module.exports = figure('fig-5-3', {
   height: 340,
   title: '让订单被重复扣款的崩溃试验',
-  desc: `点阵，每次试验一个点，六行对应 saver 与持久性模式的组合，五列对应终止点，分左右两个面板。左面板是 Mac 上不带模型的图，每个单元格 5 次试验：${mac.graph.trials} 次中有 ${mac.graph.twice} 次让副作用执行了两次。右面板是 x86 服务器虚拟机上的 Qwen3 4B agent，没有幂等键，每个单元格是一根含二十次试验的条，标出扣款两次的次数：被终止的 ${none.killed} 次试验中有 ${none.twice} 次扣款两次。每一次在工具内部的终止都扣款两次，而 sync 在该步之后终止只扣款一次。`,
+  desc: `点阵，每次试验一个点，六行对应 saver 与持久性模式的组合，五列对应终止点，分左右两个面板。左面板是 Mac 上不带模型的图，每个单元格 5 次试验：${mac.graph.trials} 次中有 ${mac.graph.twice} 次让副作用执行了两次。右面板是 x86 服务器虚拟机上的 Qwen3 4B agent，没有幂等键，每个单元格是一根含二十次试验的条，标出扣款两次的次数：被杀的 ${none.killed} 次试验中有 ${none.twice} 次扣款两次。每一次在工具内部的终止都扣款两次，而 sync 在该步之后终止只扣款一次。`,
 }, f => {
   const panels = [{ x: 140, title: '图，Mac，不带模型' }, { x: 390, title: 'agent，x86，Qwen3 4B' }];
   panels.forEach(panel => {
@@ -52,7 +52,7 @@ module.exports = figure('fig-5-3', {
   f.dot(140, 290, { hue: 'teal', r: 3.2 });
   f.text(150, 294, '扣款一次', { size: 11, serif: true, hue: 'teal' });
   hollow(f, 250, 290, 2.8);
-  f.text(260, 294, '未被终止，exit 模式没有走到这里', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 318, `合计：图 ${mac.graph.trials} 次中 ${mac.graph.twice} 次，agent 在无幂等键时被终止的 ${none.killed} 次中 ${none.twice} 次。`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 334, `以线程和订单 id 作幂等键：图 ${mac.graph_idempotent.trials} 次中 ${mac.graph_idempotent.twice} 次，agent 被终止的 ${order.killed} 次中 ${order.twice} 次。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(260, 294, '未被杀，exit 模式没有走到这里', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 318, `合计：图 ${mac.graph.trials} 次中 ${mac.graph.twice} 次，agent 在无幂等键时被杀的 ${none.killed} 次中 ${none.twice} 次。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 334, `以线程和订单 id 作幂等键：图 ${mac.graph_idempotent.trials} 次中 ${mac.graph_idempotent.twice} 次，agent 被杀的 ${order.killed} 次中 ${order.twice} 次。`, { size: 11, serif: true, hue: 'ink-soft' });
 });

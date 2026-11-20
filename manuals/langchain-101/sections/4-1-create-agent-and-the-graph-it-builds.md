@@ -291,11 +291,11 @@ type langgraph.graph.state.CompiledStateGraph
 
 ## agent 这一层的开销 {#s-create-agent-and-the-graph-it-builds-what-the-agent-layer-costs}
 
-**我们测得**一个任务，在 Mac 上进行：两个工具和三次模型调用，对着 Ollama 上的 Qwen3 4B，每种变体打乱顺序各跑 40 次。纯 `openai` 循环和 `create_agent` 发送同样的工具 schema，每次运行都得到同样的答案。代理给每次模型调用计时，模型之外的时间就是这次运行的其余部分。
+**我们测得**一个任务，在 Mac 上进行：两个工具和三次模型调用，对着 Ollama 上的 Qwen3 4B，每种变体打乱顺序各跑 40 次。朴素 `openai` 循环和 `create_agent` 发送同样的工具 schema，每次运行都得到同样的答案。代理给每次模型调用计时，模型之外的时间就是这次运行的其余部分。
 
-| 变体 | 模型之外的时间，中位数 | 同一轮里比纯循环多出的 |
+| 变体 | 模型之外的时间，中位数 | 同一轮里比朴素循环多出的 |
 |---|---|---|
-| 纯 `openai` 循环 | 25.1 ms | 基线 |
+| 朴素 `openai` 循环 | 25.1 ms | 基线 |
 | `ChatOpenAI.bind_tools` 循环 | 29.3 ms | 6.6 ms |
 | `create_agent` | 37.6 ms | 15.6 ms |
 | 带 `InMemorySaver` 的 `create_agent` | 37.6 ms | 12.2 ms |

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 372" role="img" aria-labelledby="fig-7-6d-title fig-7-6d-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-6d-title">LangSmith 追踪视图中一次被追踪的智能体运行</title>
-  <desc id="fig-7-6d-desc">对 LangSmith 追踪视图的重绘，内容是 Ollama 上 Qwen3 4B 的一次 create_agent 运行，位于托管免费套餐的项目 aiefs-lc101-trace 中。左窗格是运行树：6.13 s 的 LangGraph 根运行有 6 个子运行，3.33 s 的 model 节点内含一次 282 token 的 ChatOllama 调用，tools 节点内含 0.00 s 的 add 工具，第二个 2.79 s 的 model 节点内含一次 302 token 的 ChatOllama 调用。每个运行旁的条形显示它在 6.13 s 内的运行时间段。右窗格是根运行：输入是用户问题 What is 305 + 18?，输出是用户消息、调用 add（a 为 305，b 为 18）的 AI 消息、工具结果 323，以及最终的 AI 回答 323。</desc>
+  <title id="fig-7-6d-title">LangSmith 追踪视图中一次被追踪的 agent 运行</title>
+  <desc id="fig-7-6d-desc">对 LangSmith 追踪视图的重绘，内容是 Ollama 上 Qwen3 4B 的一次 create_agent 运行，位于托管免费计划的项目 aiefs-lc101-trace 中。左窗格是运行树：6.13 s 的 LangGraph 根运行有 6 个子运行，3.33 s 的 model 节点内含一次 282 token 的 ChatOllama 调用，tools 节点内含 0.00 s 的 add 工具，第二个 2.79 s 的 model 节点内含一次 302 token 的 ChatOllama 调用。每个运行旁的条形显示它在 6.13 s 内的运行时间段。右窗格是根运行：输入是用户问题 What is 305 + 18?，输出是用户消息、调用 add（a 为 305，b 为 18）的 AI 消息、工具结果 323，以及最终的 AI 回答 323。</desc>
   <rect x="16" y="10" width="608" height="30" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
   <text x="28" y="30" font-size="12.5" font-weight="700" fill="var(--m-olive-ink, #515f26)">LangSmith</text>
   <text x="112" y="30" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">项目 aiefs-lc101-trace，开启追踪的一次运行</text>

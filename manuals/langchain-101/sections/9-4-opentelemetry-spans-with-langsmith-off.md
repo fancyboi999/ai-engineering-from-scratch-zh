@@ -32,7 +32,7 @@ class Tracing(AgentMiddleware):
 
 属性名遵循 OpenTelemetry 的生成式 AI 约定。token 数直接取自提供方。Ollama 的是 `prompt_eval_count` 和 `eval_count`，由模型自己的分词器计数。Anthropic 的是响应里的 `usage`。
 
-**我们测得**在 Mac 上，提示已在 Ollama 缓存中时，它是否仍报告完整的提示长度。对 Qwen3 4B 发出三次相同的调用，每次报告的 `prompt_eval_count` 都是 65。提示评估第一次耗时 1401.9 ms，其中包含加载模型的时间，之后分别是 68.6 ms 和 28.7 ms。所以这个计数就是提示长度，缓存命中只体现在耗时上。
+**我们测得**在 Mac 上，提示词已在 Ollama 缓存中时，它是否仍报告完整的提示词长度。对 Qwen3 4B 发出三次相同的调用，每次报告的 `prompt_eval_count` 都是 65。提示词评估第一次耗时 1401.9 ms，其中包含加载模型的时间，之后分别是 68.6 ms 和 28.7 ms。所以这个计数就是提示词长度，缓存命中只体现在耗时上。
 
 导出器把每个 span 写成文件里的一行 JSON。换成 collector 或任何 OTLP 导出器，中间件都不用改。
 
@@ -64,7 +64,7 @@ id: fig-9-4
 kind: chart
 title: 每次对话的输入 token：model.call span 内与 span 外
 claim: model.call span 只含 76,076 个计费输入 token 中的 60,354 个，其余来自摘要器调用和被替换的回复。
-caption: 每根柱是 Claude Haiku 5.5 的一次评估对话，按案例编号排列。梅红色是 model.call span 内的输入 token，玫瑰色是 span 外的计费 token。案例 9 没有调用模型，案例 16 只用了备用模型。数据来自 capture/lab/prodapp-mac/summary/cost-mac.json。
+caption: 每根柱是 Claude Haiku 5.5 的一次评估对话，按案例编号排列。梅紫色是 model.call span 内的输入 token，玫红色是 span 外的计费 token。案例 9 没有调用模型，案例 16 只用了备用模型。数据来自 capture/lab/prodapp-mac/summary/cost-mac.json。
 ```
 
 ## 带 trace id 的日志 {#s-opentelemetry-spans-with-langsmith-off-logs-that-carry-the-trace-id}

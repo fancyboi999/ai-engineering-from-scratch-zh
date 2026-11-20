@@ -64,8 +64,8 @@ const total = name => rows.find(row => row[0] === name)[1].length;
 
 module.exports = figure('fig-5-1', {
   height: 404,
-  title: '一次 agent 运行在各个流模式下的数据块',
-  desc: `八行，对应同一次 agent 运行的八种流，分四列：输入、第 1 步的 ${nodes[0]} 节点、第 2 步的 ${nodes[1]} 节点、第 3 步的 ${nodes[2]} 节点。每个标记是从录制中读出的一个数据块，颜色表示它携带的内容：靛蓝是整个状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始或结束的任务。updates 有 ${total('updates')} 个，values ${total('values')} 个，messages ${total('messages')} 个，tasks ${total('tasks')} 个，debug ${total('debug')} 个，custom ${total('custom')} 个，slow_sum agent 上的 tools 模式 ${total('tools')} 个，stream_events v3 有 ${total('v3 events')} 个事件。v3 流在每一步结束时发出一个 values 事件。`,
+  title: '一次 agent 运行在各个流模式下的块',
+  desc: `八行，对应同一次 agent 运行的八种流，分四列：输入、第 1 步的 ${nodes[0]} 节点、第 2 步的 ${nodes[1]} 节点、第 3 步的 ${nodes[2]} 节点。每个标记是从录制中读出的一个块，颜色表示它携带的内容：靛蓝是整个状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始或结束的任务。updates 有 ${total('updates')} 个，values ${total('values')} 个，messages ${total('messages')} 个，tasks ${total('tasks')} 个，debug ${total('debug')} 个，custom ${total('custom')} 个，slow_sum agent 上的 tools 模式 ${total('tools')} 个，stream_events v3 有 ${total('v3 events')} 个事件。v3 流在每一步结束时发出一个 values 事件。`,
 }, f => {
   bands.forEach(band => {
     const hue = band.label === '输入' ? 'violet' : band.label.startsWith('tools') ? 'green' : 'indigo';
@@ -98,7 +98,7 @@ module.exports = figure('fig-5-1', {
     f.rect(x, 318, 6, 14, { fill: style.filled ? color(`${style.hue}-ink`) : color('paper'), stroke: color(`${style.hue}-ink`), strokeWidth: 1.2 });
     f.text(x + 12, 330, name, { size: 11, serif: true, hue: 'ink-soft' });
   });
-  f.text(20, 362, '每个标记是一个数据块。tasks 和 debug 运行时没有 checkpointer。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 362, '每个标记是一个块。tasks 和 debug 运行时没有 checkpointer。', { size: 11, serif: true, hue: 'ink-soft' });
   f.text(20, 380, 'tools 行来自 slow_sum agent：开始、两个增量、完成。', { size: 11, serif: true, hue: 'ink-soft' });
   f.text(20, 398, '每一列都以一个 v3 values 事件收尾。', { size: 11, serif: true, hue: 'ink-soft' });
 });

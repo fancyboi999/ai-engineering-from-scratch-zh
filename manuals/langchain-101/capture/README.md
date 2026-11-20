@@ -27,7 +27,7 @@ python3.13 -m venv capture/.venv
 capture/.venv/bin/pip install -r capture/requirements.txt
 ```
 
-运行 `run.py` 的解释器没有这些固定版本的包时，`run.py` 会用 `capture/.venv/bin/python`，或 `LANGCHAIN101_PYTHON` 指定的解释器，重新运行自己。两者都找不到时，`--check` 会打印 `skipped:` 和原因并以 0 退出，而普通运行以 1 退出。`capture/.venv/` 被 git 忽略。
+运行 `run.py` 的解释器没有这些锁定版本的包时，`run.py` 会用 `capture/.venv/bin/python`，或 `LANGCHAIN101_PYTHON` 指定的解释器，重新运行自己。两者都找不到时，`--check` 会打印 `skipped:` 和原因并以 0 退出，而普通运行以 1 退出。`capture/.venv/` 被 git 忽略。
 
 你也可以一次只运行一个场景：`python3 capture/run.py mw-hitl stream-v2` 只写出名字以这些词开头的文件，`out/` 的其余部分保持原样。普通运行从不删除 `out/` 里的文件。
 
@@ -131,7 +131,7 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 
 | 文件 | 展示什么 |
 |---|---|
-| `00-versions.txt` | Python 次版本号，以及每个固定版本的包的已安装版本 |
+| `00-versions.txt` | Python 次版本号，以及每个锁定版本的包的已安装版本 |
 | `01-init-chat-model.txt` | 用于 OpenAI、Anthropic 和 Ollama 的 `init_chat_model`、模型档案（model profile）、提供方推断、未知名称的错误、可配置模型、工具包 `ChatOllama` 的设置 |
 | `02-messages.txt` | 消息类型、dict 与 tuple 的强制转换、`content_blocks`、多模态块、被解析成标准块的 Anthropic 风格推理、块相加、工具调用块合并、`trim_messages` |
 | `03-tools.txt` | `@tool` 的 schema、对模型隐藏的 `ToolRuntime` 参数、在 agent 之外调用的 `ToolRuntime` 工具 |
@@ -200,8 +200,8 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 - 带真实延迟的 `ProviderToolSearchMiddleware`。它需要 Anthropic 或 OpenAI 模型，所以在 `ChatOllama` 上它会抛出 `ValueError`。
 - 抛出异常的 `ModelRefusalMiddleware`。它作用于 `refusal` 内容块，而 Ollama 从不发送这种块。Qwen3 4B 以纯文本拒绝，会被直接放行。
 - 来自真实模型的校验错误。让 Qwen3 4B 给整数字段填小数、给数字填单词，或填超出范围的值，它发回的是有效参数，或者用文字拒绝。工具包里的错误参数来自 `19` 里的 shell 工具。
-- LangSmith 追踪到服务器、数据集、会上传的实验，以及提示词 hub。工具包把追踪发给一个带录制 HTTP 会话的客户端，用 `upload_results=False` 运行 `evaluate`，并记录客户端本来会发送的内容。
-- 基于 stdio 和 HTTP 传输的 `langchain.mcp`、elicitation 和 OAuth。工具包只用进程内传输。
+- LangSmith 追踪到服务器、数据集、会上传的实验，以及prompt hub。工具包把追踪发给一个带录制 HTTP 会话的客户端，用 `upload_results=False` 运行 `evaluate`，并记录客户端本来会发送的内容。
+- 基于 stdio 和 HTTP 传输的 `langchain.mcp`、征询输入和 OAuth。工具包只用进程内传输。
 - `PostgresSaver` 和 `PostgresStore`。它们需要一个运行中的 Postgres。
 - Agent Server（`langgraph dev`、`up`、`deploy`）。
 - 任何形式的计时。工具包遮蔽每次回复的计时，`out/` 里没有任何东西是测量值。

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-7-5-title fig-7-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-7-5-title">deep agent 每次模型调用的提示词 token</title>
-  <desc id="fig-7-5-desc">在 Mac 上用 Qwen3 8B 运行一次 deep agent，其 7 次模型调用的提示词 token 点图。主智能体调用了 5 次，token 数为 3651, 3872, 4016, 4225, 4446，共 20210，绑定了 9 个工具。editor 子智能体调用了 2 次，token 数为 1977 和 2113，共 4090，绑定了 7 个工具。</desc>
+  <desc id="fig-7-5-desc">在 Mac 上用 Qwen3 8B 运行一次 deep agent，其 7 次模型调用的提示词 token 点图。主 agent 调用了 5 次，token 数为 3651, 3872, 4016, 4225, 4446，共 20210，绑定了 9 个工具。editor 子 agent 调用了 2 次，token 数为 1977 和 2113，共 4090，绑定了 7 个工具。</desc>
   <line x1="70" y1="276" x2="610" y2="276" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="280" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="70" y1="232" x2="610" y2="232" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -66,8 +66,8 @@
   <text x="571.43" y="70.38" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">4446</text>
   <rect class="m-knock" x="557.43" y="257.42" width="28" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="571.43" y="268" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">回答</text>
-  <text x="124" y="69.2" font-size="11.5" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">主智能体：5 次调用，20210 token</text>
-  <text x="309.14" y="221" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">editor 子智能体：2 次调用，4090 token</text>
+  <text x="124" y="69.2" font-size="11.5" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">主 agent：5 次调用，20210 token</text>
+  <text x="309.14" y="221" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">editor 子 agent：2 次调用，4090 token</text>
   <text x="70" y="334" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">坐标轴上的标签是该次调用请求的工具。</text>
   <text x="70" y="352" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">第 4、5 次调用在 task 工具内运行，绑定 7 个工具，而不是 9 个。</text>
 </svg>

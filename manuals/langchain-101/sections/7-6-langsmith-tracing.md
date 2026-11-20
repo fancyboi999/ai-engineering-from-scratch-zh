@@ -56,7 +56,7 @@ note: 子运行，只保留它的标识字段。
 
 LangChain 的运行会生成更深的树：每个图节点对应一个 chain 运行，每次模型调用和工具调用对应一个叶子。[第 1.3 节](#s-one-create-agent-run)为一轮 agent 画出了那棵树。
 
-**我们测量了** 托管 API 上的这棵树，用的是免费计划的新账户，从 Mac 发起。agent 是 Ollama 上 Qwen3 4B 的 `create_agent`，带一个工具 `add`。我们用客户端读回了一条保存的追踪。它有 7 个运行，名称与本地记录器收到的相同：
+**我们测得**托管 API 上的这棵树，用的是免费计划的新账户，从 Mac 发起。agent 是 Ollama 上 Qwen3 4B 的 `create_agent`，带一个工具 `add`。我们用客户端读回了一条保存的追踪。它有 7 个运行，名称与本地记录器收到的相同：
 
 | 运行 | 类型 | 父运行 | 标签 | token |
 |---|---|---|---|---|
@@ -114,7 +114,7 @@ HTTP requests the client received, by method and path:
 }
 ```
 
-**我们测量了** 同样的用例，对托管 API，在 Mac 上，使用 `langsmith` 0.14.17 和 `langchain-core` 1.8.0。进程里有密钥和项目名，`LANGSMITH_TRACING` 未设置。`"local"` 里的三次 agent 运行也各调用了一个 `traceable` 函数。全部 21 个 LangChain 运行都到达了服务器，分 7 次 multipart 发送。服务器为它们创建了项目 `aiefs-lc101-local`。`traceable` 函数什么也没有发送：
+**我们测得**同样的用例，对托管 API，在 Mac 上，使用 `langsmith` 0.14.17 和 `langchain-core` 1.8.0。进程里有密钥和项目名，`LANGSMITH_TRACING` 未设置。`"local"` 里的三次 agent 运行也各调用了一个 `traceable` 函数。全部 21 个 LangChain 运行都到达了服务器，分 7 次 multipart 发送。服务器为它们创建了项目 `aiefs-lc101-local`。`traceable` 函数什么也没有发送：
 
 ```listing
 title: 服务器为 enabled="local" 里的三次 agent 运行保存了什么
@@ -142,7 +142,7 @@ lang: json
 
 所以对 agent 来说，`"local"` 什么也没有留在本地，即使在真实账户上也是如此。我们在 `langchain-ai/langchain` 提交了一份报告，编号 #41870。
 
-**我们测量了** 更早之前对 Mac 上本地记录器的同一用例，没有端点、没有密钥，`LANGSMITH_TRACING=false`。agent 的运行试图连接默认主机。我们替换了 HTTP 层，所以没有任何东西离开这台机器：
+**我们测得**更早之前对 Mac 上本地记录器的同一用例，没有端点、没有密钥，`LANGSMITH_TRACING=false`。agent 的运行试图连接默认主机。我们替换了 HTTP 层，所以没有任何东西离开这台机器：
 
 ```listing
 title: 没有环境变量时，本地 agent 运行的请求
@@ -200,7 +200,7 @@ HTTP requests the client received:
 
 LangSmith 产品页面说，SDK 在后台发送追踪，应用性能从不受影响 {{site langchain.com/langsmith/observability}}。
 
-**我们测量了** 对托管 API 的 agent，在 Mac 上，开启追踪 30 次、关闭追踪 30 次，在一个进程里交错运行。每次运行都回答正确。我们取的是模型之外的时间：墙钟时间减去 Ollama 为它的两次回复报告的时间。我们去掉了第一次被追踪的运行，它在模型之外花了 121 毫秒。
+**我们测得**对托管 API 的 agent，在 Mac 上，开启追踪 30 次、关闭追踪 30 次，在一个进程里交错运行。每次运行都回答正确。我们取的是模型之外的时间：墙钟时间减去 Ollama 为它的两次回复报告的时间。我们去掉了第一次被追踪的运行，它在模型之外花了 121 毫秒。
 
 - **追踪关闭。** 中位数的一次运行在模型之外花了 10.9 毫秒。
 - **追踪开启。** 中位数的一次运行在模型之外花了 16.9 毫秒。
@@ -208,7 +208,7 @@ LangSmith 产品页面说，SDK 在后台发送追踪，应用性能从不受影
 
 墙钟时间的中位数是关闭时 11.66 秒，开启时 11.78 秒。这批运行期间有另一个 agent 在用同一个 Ollama 模型，所以模型时间浮动了好几秒。不要从墙钟时间读出任何结论。
 
-**我们测量了** 追踪的成本，最先是对 Mac 上立即应答的本地记录器。一个进程运行了 122 次，每隔一次切换开关追踪。我们去掉了前两次，每种条件剩下 60 次运行。[图](#fig-7-6)展示了每次运行。
+**我们测得**追踪的成本，最先是对 Mac 上立即应答的本地记录器。一个进程运行了 122 次，每隔一次切换开关追踪。我们去掉了前两次，每种条件剩下 60 次运行。[图](#fig-7-6)展示了每次运行。
 
 ```figure
 id: fig-7-6
@@ -230,7 +230,7 @@ caption: 每个点是 Mac 上的一次 agent 运行，每种条件 60 次，在�
 
 `invoke` 在服务器拿到追踪之前就返回了。客户端从后台线程发送运行，服务器稍后才保存。
 
-**我们测量了** 对托管 API 的 30 次被追踪运行的延迟。每次 `invoke` 返回后，脚本每隔 0.25 秒对根运行调用一次 `read_run`，再加上每次读取本身的时间。所以分辨率由轮询和读取决定，下面的数字是估计值：
+**我们测得**对托管 API 的 30 次被追踪运行的延迟。每次 `invoke` 返回后，脚本每隔 0.25 秒对根运行调用一次 `read_run`，再加上每次读取本身的时间。所以分辨率由轮询和读取决定，下面的数字是估计值：
 
 | 事件 | 中位数 | p90 | 最大值 |
 |---|---|---|---|
@@ -241,7 +241,7 @@ caption: 每个点是 Mac 上的一次 agent 运行，每种条件 60 次，在�
 
 ## 客户端发送什么 {#s-langsmith-tracing-what-the-client-sends}
 
-**我们测量了** 对托管 API 的 30 次被追踪运行的每个请求。客户端只发送了 `POST /runs/multipart`，每次被追踪的运行 3 个 post，每个都得到状态 202。它没有发送 `PATCH`，也没有发送 `POST /runs`。其他请求只有两个 `GET /info`，进程里每个客户端一个：
+**我们测得**对托管 API 的 30 次被追踪运行的每个请求。客户端只发送了 `POST /runs/multipart`，每次被追踪的运行 3 个 post，每个都得到状态 202。它没有发送 `PATCH`，也没有发送 `POST /runs`。其他请求只有两个 `GET /info`，进程里每个客户端一个：
 
 ```listing
 title: 30 次被追踪运行发往托管 API 的请求
@@ -265,7 +265,7 @@ lang: json
 
 同一个产品页面说，在 LangSmith 出现故障期间，你的 agent 照常运行 {{site langchain.com/langsmith/observability}}。追踪文档警告说，进程可能在所有追踪发送完之前结束 {{docs langsmith/trace-with-langchain}}。
 
-**我们测量了** Mac 上本地记录器的每种状态下，一个进程运行 50 次 Qwen3 4B 的 agent，共 350 个被追踪的运行。记录器可以按需失败，托管 API 做不到。[图](#fig-7-6b)展示了从最后一次运行到进程退出的时间。
+**我们测得** Mac 上本地记录器的每种状态下，一个进程运行 50 次 Qwen3 4B 的 agent，共 350 个被追踪的运行。记录器可以按需失败，托管 API 做不到。[图](#fig-7-6b)展示了从最后一次运行到进程退出的时间。
 
 ```figure
 id: fig-7-6b
@@ -285,7 +285,7 @@ caption: 每个点是 Mac 上一个进程，运行 50 次 Qwen3 4B 的 agent。�
 
 ## 账户报告的限制 {#s-langsmith-tracing-the-limits-that-the-account-reports}
 
-客户端从 `GET /info` 读取它的批处理设置，服务器也在那里报告它的限制。**我们测量了** 托管 API 对免费计划新账户返回了什么，只用了 GET 请求：
+客户端从 `GET /info` 读取它的批处理设置，服务器也在那里报告它的限制。**我们测得**托管 API 对免费计划新账户返回了什么，只用了 GET 请求：
 
 ```listing
 title: 托管 API 的 GET /info 里的批处理设置和限制

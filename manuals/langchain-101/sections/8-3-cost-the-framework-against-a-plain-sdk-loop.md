@@ -98,7 +98,7 @@ note: 截取到每个请求的账目。其余字节是同样的键和值，只�
 
 Deep Agents 的 harness 是例外。在 Qwen3 8B 上，`create_deep_agent` 每次调用比朴素循环多发 2,075 到 2,251 个提示词 token。一句话回答的 token 是朴素循环的 81.4 倍，两次工具调用是 10.0 倍，文件任务是 9.1 倍。[第 7.4 节](#s-deep-agents-0-7)和[图](#fig-7-4)展示了每次调用。只有用到规划、文件或子 agent 时，才值得付这些 token。
 
-[第 1.2 节](#s-do-you-need-langchain)的任务套件在更大规模上给出同样的图景。deep agent 发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。在 Claude Haiku 5.5 上，每次调用多约 3,570 个。提示词缓存会改变账单。在 Claude 上，deep agent 的花费是朴素循环的 1.16 到 1.24 倍；不用缓存、按标价算则是 3.10 到 3.14 倍。
+[第 1.2 节](#s-do-you-need-langchain)的任务集在更大规模上给出同样的图景。deep agent 发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。在 Claude Haiku 5.5 上，每次调用多约 3,570 个。提示词缓存会改变账单。在 Claude 上，deep agent 的花费是朴素循环的 1.16 到 1.24 倍；不用缓存、按标价算则是 3.10 到 3.14 倍。
 
 ## 导入与磁盘 {#s-cost-the-framework-against-a-plain-sdk-loop-imports-and-disk}
 

@@ -17,7 +17,7 @@ const programs = [
 module.exports = figure('fig-8-3', {
   height: 380,
   title: '三次 Qwen3 4B 调用的一次运行中，模型之外的耗时',
-  desc: `点图，展示 Mac 上每次运行在模型之外花费的毫秒数，每个程序 ${v.a_plain_openai.n} 次运行，对象是 Ollama 上的 Qwen3 4B，经一个给每次模型调用计时的代理访问。中位数：plain openai 循环 ${v.a_plain_openai.framework_ms_median} ms，ChatOpenAI bind_tools 循环 ${v.b_bind_tools_loop.framework_ms_median} ms，create_agent ${v.c_create_agent.framework_ms_median} ms，带 InMemorySaver 的 create_agent ${v.d_create_agent_saver.framework_ms_median} ms，手写 StateGraph ${v.e_stategraph.framework_ms_median} ms。`,
+  desc: `点图，展示 Mac 上每次运行在模型之外花费的毫秒数，每个程序 ${v.a_plain_openai.n} 次运行，对象是 Ollama 上的 Qwen3 4B，经一个给每次模型调用计时的代理访问。中位数：朴素 openai 循环 ${v.a_plain_openai.framework_ms_median} ms，ChatOpenAI bind_tools 循环 ${v.b_bind_tools_loop.framework_ms_median} ms，create_agent ${v.c_create_agent.framework_ms_median} ms，带 InMemorySaver 的 create_agent ${v.d_create_agent_saver.framework_ms_median} ms，手写 StateGraph ${v.e_stategraph.framework_ms_median} ms。`,
 }, f => {
   const c = chart(f, { x: 70, y: 40, w: 540, h: 250, xDomain: [0, 5], yDomain: [0, 80], yTicks: [0, 20, 40, 60, 80], yLabel: '模型之外的毫秒数' });
   programs.forEach(([key, label, hue], i) => {

@@ -58,7 +58,7 @@ raw saver.get_tuple works: checkpoint step=0 pending_writes=[('26351ed0', 'x', 1
 invoke(None) resume raises again: InvalidUpdateError; node bodies re-run on resume: [] (empty means the saved writes were reapplied, not re-executed)
 ```
 
-两次写入都作为步骤 0 检查点的待定写入保存了下来。`get_state` 应用待定写入来构建它返回的状态 {{code libs/langgraph/langgraph/pregel/main.py:1326-1333}}。所以它用同样的两个值调用同一个 `LastValue.update`，抛出同样的错误。`invoke(None)` 重新应用同样的写入，并在不运行任何节点或模型的情况下抛出异常。只有原始 saver 能读取这个线程。
+两次写入都作为步骤 0 检查点的待写入项保存了下来。`get_state` 应用待写入项来构建它返回的状态 {{code libs/langgraph/langgraph/pregel/main.py:1326-1333}}。所以它用同样的两个值调用同一个 `LastValue.update`，抛出同样的错误。`invoke(None)` 重新应用同样的写入，并在不运行任何节点或模型的情况下抛出异常。只有原始 saver 能读取这个线程。
 
 ## 修复一个损坏的线程 {#s-channels-and-colliding-writes-repairing-a-broken-thread}
 
@@ -92,7 +92,7 @@ id: fig-2-2
 kind: sequence
 title: 一次 LastValue 冲突、它之后失败的读取，以及修复
 claim: 两次写入在更新抛出异常之前就已保存，所以每次读取都会重放这次冲突，直到带 reducer 的 schema 重新应用同样那些已保存的写入。
-caption: 从上到下阅读。青绿色箭头是保存到 InMemorySaver 的待定写入，玫瑰色箭头是抛出的异常，下方的块是同一个线程在修好的图下的情形。来源：capture/lab/internals/02-channels/trace.txt 和 capture/lab/internals/02-channels/repair.txt。
+caption: 从上到下阅读。青色箭头是保存到 InMemorySaver 的待写入项，玫红色箭头是抛出的异常，下方的块是同一个线程在修好的图下的情形。来源：capture/lab/internals/02-channels/trace.txt 和 capture/lab/internals/02-channels/repair.txt。
 ```
 
 所以冲突不需要修复数据。部署 reducer，每个损坏的线程都会用它已保存的写入完成。你选的 reducer 决定了值：这里 `operator.add` 得到 3，即输入 0 加 1 加 2。按键的含义选 reducer，并预期它按任务路径顺序看到写入。
@@ -101,7 +101,7 @@ caption: 从上到下阅读。青绿色箭头是保存到 InMemorySaver 的待�
 
 **add_messages：** 消息列表的 reducer。它替换具有相同 id 的消息，删除 `RemoveMessage` 点名的消息，并追加其余的。
 
-没有 id 的消息，会在 `add_messages` 内部得到一个新的 `uuid4`。reducer 把它直接设在消息对象本身上 {{code libs/langgraph/langgraph/graph/message.py:199-205}}。这发生在更新阶段。到那时，循环已经把同一个对象交给了 checkpointer 的后台 `put_writes`。所以，已保存的待定写入只有在序列化发生在 reducer 之后时才带有这个 id。
+没有 id 的消息，会在 `add_messages` 内部得到一个新的 `uuid4`。reducer 把它直接设在消息对象本身上 {{code libs/langgraph/langgraph/graph/message.py:199-205}}。这发生在更新阶段。到那时，循环已经把同一个对象交给了 checkpointer 的后台 `put_writes`。所以，已保存的待写入项只有在序列化发生在 reducer 之后时才带有这个 id。
 
 聊天模型的回复已经带着 id，LangChain 根据运行来设置它，所以竞争碰不到它。测试节点返回模型的回复，以及一条根据回复文本构建、没有 id 的第二条消息：
 

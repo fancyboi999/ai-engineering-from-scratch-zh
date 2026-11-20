@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 473" role="img" aria-labelledby="fig-7-4f-title fig-7-4f-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-7-4f-title">有无 eval 工具的通过数，4 个模型，39 个任务</title>
-  <desc id="fig-7-4f-desc">在 39 个 chain 与 sql 任务上，对 plain 循环、deep agent 和带 eval 工具的 deep agent 的通过率条形图，模型为 Qwen3 8B、Qwen3 14B、gpt-oss 20B 和 Claude Haiku 5.5。Haiku 带 eval 工具时通过 39 个中的 39 个，提示词要求使用时通过 39 个中的 39 个，Qwen3 8B 带 eval 工具时通过 39 个中的 23 个。各列依次为模型调用数、以千计的提示词 token 数，以及每个任务的中位秒数。</desc>
+  <desc id="fig-7-4f-desc">在 39 个 chain 与 sql 任务上，对 朴素循环、deep agent 和带 eval 工具的 deep agent 的通过率条形图，模型为 Qwen3 8B、Qwen3 14B、gpt-oss 20B 和 Claude Haiku 5.5。Haiku 带 eval 工具时通过 39 个中的 39 个，提示词要求使用时通过 39 个中的 39 个，Qwen3 8B 带 eval 工具时通过 39 个中的 23 个。各列依次为模型调用数、以千计的提示词 token 数，以及每个任务的中位秒数。</desc>
   <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过数/任务数</text>
   <text x="400" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">调用</text>
   <text x="496" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">提示词</text>

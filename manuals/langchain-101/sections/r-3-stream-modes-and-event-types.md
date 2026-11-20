@@ -6,7 +6,7 @@
 
 ## stream 的模式 {#s-ref-stream-modes-and-event-types-the-modes-of-stream}
 
-类型 `StreamMode` 列出七种模式 {{code libs/langgraph/langgraph/types.py:132-134}}。循环还接受 `tools`，类型里没有列出它 {{code libs/langgraph/langgraph/pregel/main.py:2949-2950}}。这处缺口在[来源页](#s-ref-sources-and-conflicts)的冲突登记里记为 D4。
+类型 `StreamMode` 列出七种模式 {{code libs/langgraph/langgraph/types.py:132-134}}。循环还接受 `tools`，类型里没有列出它 {{code libs/langgraph/langgraph/pregel/main.py:2949-2950}}。这处缺口在[来源与冲突](#s-ref-sources-and-conflicts)的冲突登记里记为 D4。
 
 | 模式 | v1 中的一个块 | 我们的运行中的块数 | 录制文件 |
 |---|---|---|---|
@@ -19,7 +19,7 @@
 | `checkpoints` | 形如 `get_state` 的检查点 | 不在录制工具包中 | 无 |
 | `tools` | 工具事件，见下表 | 4，在 `slow_sum` agent 上 | `26-stream-tools-mode.txt` |
 
-没有指定模式时，`create_agent` 图流出 `updates` {{code libs/langgraph/langgraph/graph/state.py:1357}}. 普通的 `Pregel` 对象流出 `values` {{code libs/langgraph/langgraph/pregel/main.py:715}}. 在另一个图内部，没有指定模式的图同样流出 `values` {{code libs/langgraph/langgraph/pregel/main.py:2850-2857}}.
+没有指定模式时，`create_agent` 图流出 `updates` {{code libs/langgraph/langgraph/graph/state.py:1357}}。 普通的 `Pregel` 对象流出 `values` {{code libs/langgraph/langgraph/pregel/main.py:715}}。 在另一个图内部，没有指定模式的图同样流出 `values` {{code libs/langgraph/langgraph/pregel/main.py:2850-2857}}。
 
 `messages` 块的元数据除其他键外，还含有 `langgraph_node`、`langgraph_step`、`langgraph_triggers`、`ls_provider` 和 `ls_model_type`。读取 `langgraph_node` 可以区分 agent 自己的模型和工具内部的模型。
 
@@ -48,7 +48,7 @@
 
 {{code libs/langgraph/langgraph/types.py:274-379}}
 
-`invoke(..., version="v2")` 返回带 `value` 和 `interrupts` 的 `GraphOutput` {{code libs/langgraph/langgraph/types.py:381-421}}. 把它当字典访问仍然可用，但会发出 `LangGraphDeprecatedSinceV11` 警告，见录制文件 `24-stream-v2.txt`。
+`invoke(..., version="v2")` 返回带 `value` 和 `interrupts` 的 `GraphOutput` {{code libs/langgraph/langgraph/types.py:381-421}}。 把它当字典访问仍然可用，但会发出 `LangGraphDeprecatedSinceV11` 警告，见录制文件 `24-stream-v2.txt`。
 
 ## 工具事件 {#s-ref-stream-modes-and-event-types-tool-events}
 
@@ -65,7 +65,7 @@
 
 ## stream_events v3 {#s-ref-stream-modes-and-event-types-stream-events-v3}
 
-`stream_events` 默认是 `version="v2"`，必须显式指定 `v3` {{code libs/langgraph/langgraph/pregel/main.py:3751-3758}}. v3 版本处于 beta，并会发出警告 `LangChainBetaWarning: The v3 streaming protocol on Pregel is experimental.` {{code libs/langgraph/langgraph/pregel/main.py:3617}}. 它返回 `GraphRunStream`，在录制文件 `25-stream-events-v3.txt` 中它的公开成员是 `abort`, `extensions`, `interleave`, `interrupted`, `interrupts`, `lifecycle`, `messages`, `output`, `subagents`, `subgraphs`, `tool_calls`, and `values`.
+`stream_events` 默认是 `version="v2"`，必须显式指定 `v3` {{code libs/langgraph/langgraph/pregel/main.py:3751-3758}}。 v3 版本处于 beta，并会发出警告 `LangChainBetaWarning: The v3 streaming protocol on Pregel is experimental.` {{code libs/langgraph/langgraph/pregel/main.py:3617}}。 它返回 `GraphRunStream`，在录制文件 `25-stream-events-v3.txt` 中它的公开成员是 `abort`, `extensions`, `interleave`, `interrupted`, `interrupts`, `lifecycle`, `messages`, `output`, `subagents`, `subgraphs`, `tool_calls`, and `values`.
 
 | 规则 | 位置 |
 |---|---|
@@ -98,6 +98,6 @@
 
 {{code langchain_protocol/protocol.py:470-495}}
 
-如果提供方以流的方式发送工具调用的参数，就会发出 `tool-call-delta` 增量 {{code langchain_protocol/protocol.py:177}}. `ChatOllama` 则在最后一个块之前，把每个调用完整地放在一个块里发出。所以录制工具包的 v3 运行里只有一个 `tool-call-delta`，它携带了整个调用。
+如果提供方以流的方式发送工具调用的参数，就会发出 `tool-call-delta` 增量 {{code langchain_protocol/protocol.py:177}}。 `ChatOllama` 则在最后一个块之前，把每个调用完整地放在一个块里发出。所以录制工具包的 v3 运行里只有一个 `tool-call-delta`，它携带了整个调用。
 
 来源：libs/langgraph/langgraph/types.py、libs/langgraph/langgraph/pregel/main.py 和 libs/langgraph/langgraph/graph/state.py（langgraph 1.2.22）；libs/prebuilt/langgraph/prebuilt/tool_node.py（langgraph-prebuilt 1.1.2）；libs/core/langchain_core/runnables/base.py（langchain-core 1.8.0）；langchain_protocol/protocol.py（langchain-protocol 0.0.21）； capture/requirements.txt, capture/README.md, capture/out/21-stream-updates-values.txt, capture/out/22-stream-messages.txt, capture/out/23-stream-tasks-custom-debug.txt, capture/out/24-stream-v2.txt, capture/out/25-stream-events-v3.txt, capture/out/25-stream-events-v3.events.json, capture/out/26-stream-tools-mode.txt.
