@@ -1,17 +1,17 @@
-# Edges, Send, and Command
+# 边、Send 与 Command
 
-> A plain edge always runs, a conditional edge picks from the state, `Send` starts one task per item, and `Command` updates and routes in one return.
+> 普通边总会执行，条件边根据状态选择，`Send` 为每一项启动一个任务，`Command` 在一次返回里同时更新和路由。
 
-You have a list of subjects whose length you learn only at run time, and you want one model call for each subject. After them, one node must choose between two endings and record why. You need three kinds of routing in one graph.
+你有一个主题列表，长度到运行时才知道，你想为每个主题调用一次模型。之后，有一个节点必须在两种结尾里选一个，并记录原因。你需要在一个图里使用三种路由。
 
-When you finish this section, you can connect nodes with plain and conditional edges. You can also start a variable number of tasks with `Send`, and route from a node with `Command`.
+读完本节，你能用普通边和条件边连接节点。你还能用 `Send` 启动数量可变的任务，并用 `Command` 从节点路由。
 
-## The graph
+## 图 {#s-edges-send-and-command-the-graph}
 
-The kit graph of [section 6.1](#s-stategraph-state-and-reducers) has five nodes. This is the code that connects them:
+[第 6.1 节](#s-stategraph-state-and-reducers)里录制工具包的图有五个节点。下面是连接它们的代码：
 
 ```listing
-title: the nodes and edges of the joke graph
+title: 笑话图的节点和边
 source: capture/s_graph.py
 lang: python
 ---
@@ -29,13 +29,13 @@ lang: python
     app = graph.compile()
 ```
 
-`compile` checks the graph and returns the object you run. The graph API page says that you must compile a graph before you invoke or stream it {{docs oss/python/langgraph/graph-api}}. The Mermaid text of the compiled graph shows every edge. A solid arrow `-->` is a plain edge, and a dotted arrow `-.->` is a conditional one:
+`compile` 检查图，并返回你要运行的对象。graph API 页面说，图必须先编译，才能调用或流式运行 {{docs oss/python/langgraph/graph-api}}。编译后的图的 Mermaid 文本显示了每一条边。实线箭头 `-->` 是普通边，虚线箭头 `-.->` 是条件边：
 
 ```listing
-title: the edges of the compiled graph
+title: 编译后的图的边
 source: capture/out/34-stategraph-reducers-send-command.txt
 lang: text
-note: The edge lines of the Mermaid text. The node lines and the styles are cut.
+note: Mermaid 文本里的边的行。节点行和样式被截掉了。
 ---
 	__start__ --> plan;
 	pick -.-> publish;
@@ -46,44 +46,44 @@ note: The edge lines of the Mermaid text. The node lines and the styles are cut.
 	retry --> __end__;
 ```
 
-No `add_edge` call leaves `pick`, but the graph has two edges out of it. They come from the return type of `pick`, as the next part shows.
+没有任何 `add_edge` 调用从 `pick` 出发，但图里有两条从它出发的边。它们来自 `pick` 的返回类型，下一部分会说明。
 
-[Figure](#fig-6-2b) draws the full Mermaid text from top to bottom.
+[图](#fig-6-2b)从上到下画出了完整的 Mermaid 文本。
 
 ```figure
 id: fig-6-2b
 kind: structure
-title: the joke graph as LangGraph draws it
-claim: The Mermaid text has three conditional edges, from plan and from pick, and no add_edge call made any of them.
-caption: Read from __start__ at the top. Solid arrows are add_edge calls. Dashed amber arrows come from Send and from the Command return type. From capture/out/50-draw-fanout.txt.
+title: LangGraph 画出的笑话图
+claim: Mermaid 文本里有三条条件边，从 plan 和 pick 出发，没有任何 add_edge 调用创建它们。
+caption: 从顶部的 __start__ 开始读。实线箭头是 add_edge 调用。琥珀色的虚线箭头来自 Send 和 Command 的返回类型。来源：capture/out/50-draw-fanout.txt。
 ```
 
-[Figure](#fig-6-2) draws the graph and one run through it.
+[图](#fig-6-2)画出了这个图，以及穿过它的一次运行。
 
 ```figure
 id: fig-6-2
 kind: flow
-title: the joke graph and one run
-claim: Send starts three write_joke tasks in one step, and Command from pick updates best and goes to publish, so retry never runs.
-caption: Read from __start__ at the left to __end__ at the right. Solid arrows are plain edges, and dashed amber arrows are routes chosen at run time. The grey retry node did not run. The table below shows what each step wrote to the state. From capture/out/34-stategraph-reducers-send-command.txt.
+title: 笑话图与一次运行
+claim: Send 在一步里启动三个 write_joke 任务，pick 返回的 Command 更新 best 并转到 publish，所以 retry 从未运行。
+caption: 从左边的 __start__ 读到右边的 __end__。实线箭头是普通边，琥珀色虚线箭头是运行时选择的路由。灰色的 retry 节点没有运行。下面的表显示每一步往状态里写了什么。来源：capture/out/34-stategraph-reducers-send-command.txt。
 ```
 
-## Plain and conditional edges
+## 普通边与条件边 {#s-edges-send-and-command-plain-and-conditional-edges}
 
-**Plain edge:** an edge from one node to another that LangGraph follows every time the first node finishes.
+**普通边（plain edge）：** 从一个节点到另一个节点的边，第一个节点每次结束时，LangGraph 都会沿着它走。
 
-**Conditional edge:** an edge with a routing function. After the source node runs, the function reads the state and returns the next node, a list of nodes, or `END`.
+**条件边（conditional edge）：** 带路由函数的边。源节点运行之后，函数读取状态，并返回下一个节点、节点列表或 `END`。
 
-The third argument of `add_conditional_edges` lists the nodes that the function can return. LangGraph uses that list to draw the graph. [Section 1.3](#s-one-create-agent-run) showed the conditional edges of an agent: after `model`, the tool calls in the last message choose `tools` or `__end__`.
+`add_conditional_edges` 的第三个参数列出函数可能返回的节点。LangGraph 用这个列表来画图。[第 1.3 节](#s-one-create-agent-run)显示过 agent 的条件边：在 `model` 之后，由最后一条消息里的工具调用在 `tools` 和 `__end__` 之间选择。
 
-## Send: one task for each item
+## Send：每一项一个任务 {#s-edges-send-and-command-send-one-task-for-each-item}
 
-**Send:** a value that names a node and the input of one run of it. A routing function that returns a list of them starts one task for each item, in the same step.
+**Send：** 一个值，指明一个节点和这个节点一次运行的输入。返回一组它们的路由函数，会在同一步里为每一项启动一个任务。
 
-`fan_out` is the routing function after `plan`. It reads `subjects` and returns one `Send` for each subject. Each `write_joke` task gets its own small dict as input, and it does not see the full state:
+`fan_out` 是 `plan` 之后的路由函数。它读取 `subjects`，为每个主题返回一个 `Send`。每个 `write_joke` 任务拿到自己的小字典作为输入，看不到完整的状态：
 
 ```listing
-title: the routing function and the node it starts
+title: 路由函数和它启动的节点
 source: capture/s_graph.py
 lang: python
 ---
@@ -94,13 +94,13 @@ lang: python
         return {"jokes": [f"a joke about {arg['subject']}"], "log": [f"write_joke({arg['subject']})"]}
 ```
 
-The `updates` stream yields one chunk for each task. The three `write_joke` chunks come between the chunk of `plan` and the chunk of `pick`:
+`updates` 流为每个任务产出一个块。三个 `write_joke` 块位于 `plan` 的块和 `pick` 的块之间：
 
 ```listing
-title: the three write_joke chunks
+title: 三个 write_joke 块
 source: capture/out/34-stategraph-reducers-send-command.txt
 lang: json
-note: Three of the six chunks of the updates stream, cut to the jokes key.
+note: updates 流六个块里的三个，只截取了 jokes 键。
 ---
   "write_joke": {
     "jokes": [
@@ -118,18 +118,18 @@ note: Three of the six chunks of the updates stream, cut to the jokes key.
     ],
 ```
 
-The three tasks write `jokes` in the same step, so the key needs the reducer of section 6.1. The docs page for `Send` and `Command` calls this pattern map-reduce {{docs oss/python/langgraph/graph-api-send-command}}.
+三个任务在同一步里写 `jokes`，所以这个键需要第 6.1 节的 reducer。`Send` 和 `Command` 的文档页面把这种模式称为 map-reduce {{docs oss/python/langgraph/graph-api-send-command}}。
 
-Import `Send` from `langgraph.types`. An import from `langgraph.constants` still works at the pin, and it warns that the path is deprecated {{code libs/langgraph/langgraph/constants.py}}.
+从 `langgraph.types` 导入 `Send`。从 `langgraph.constants` 导入在锁定版本上仍然可用，同时会警告这个路径已弃用 {{code libs/langgraph/langgraph/constants.py}}。
 
-## Command: update and route in one return
+## Command：一次返回里更新并路由 {#s-edges-send-and-command-command-update-and-route-in-one-return}
 
-**Command:** a value that a node returns to update the state and name the next node in one step. Its fields are `update`, `goto`, `graph`, and `resume`.
+**Command：** 节点返回的一个值，在一步里更新状态并指明下一个节点。它的字段是 `update`、`goto`、`graph` 和 `resume`。
 
-`pick` chooses the first joke in sort order. It returns a `Command` that sets `best`, adds a line to `log`, and goes to `publish` or `retry`:
+`pick` 选择按排序最靠前的笑话。它返回一个 `Command`，设置 `best`，往 `log` 里加一行，并转到 `publish` 或 `retry`：
 
 ```listing
-title: a node that returns a Command
+title: 返回 Command 的节点
 source: capture/s_graph.py
 lang: python
 ---
@@ -139,10 +139,10 @@ lang: python
         return Command(update={"best": best, "log": [f"pick -> {target}"]}, goto=target)
 ```
 
-The `Literal` in the return type names the two possible targets. LangGraph reads it to draw the two dotted edges out of `pick`, and the docs say that the annotation is required for that {{docs oss/python/langgraph/graph-api-send-command}}. The run went to `publish`, and `retry` did not run. The last two chunks of the stream show it:
+返回类型里的 `Literal` 指明两个可能的目标。LangGraph 读取它，画出从 `pick` 出发的两条虚线边，文档说这个标注对此是必需的 {{docs oss/python/langgraph/graph-api-send-command}}。运行转到了 `publish`，`retry` 没有运行。流的最后两个块显示了这一点：
 
 ```listing
-title: the last two chunks of the run
+title: 这次运行的最后两个块
 source: capture/out/34-stategraph-reducers-send-command.txt
 lang: json
 ---
@@ -164,16 +164,16 @@ lang: json
 }
 ```
 
-Use a conditional edge when the route depends only on the state. Use `Command` when the node that computes the update also knows the route, as `pick` does.
+路由只取决于状态时，用条件边。像 `pick` 那样，计算更新的节点同时也知道路由时，用 `Command`。
 
-`Command` has two more uses. With `resume`, it is the input that answers an interrupt, and [section 6.4](#s-interrupt-and-resume) shows it. With `graph=Command.PARENT`, a node inside a subgraph routes to a node of the parent graph {{docs oss/python/langgraph/graph-api-send-command}}. The kit does not run `Command.PARENT` yet. A capture of it comes in the next edition, with the other open items of [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition).
+`Command` 还有两种用法。带 `resume` 时，它是回答中断的输入，[第 6.4 节](#s-interrupt-and-resume)会展示。带 `graph=Command.PARENT` 时，子图里的节点会路由到父图的节点 {{docs oss/python/langgraph/graph-api-send-command}}。录制工具包还没有运行 `Command.PARENT`。它的录制会在下一版出现，与[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)里的其他待办项一起。
 
 ```takeaways
-- List the possible targets of a conditional edge in its third argument.
-- Return a list of Send values to run one node once for each item.
-- Give every key that parallel tasks write a reducer.
-- Annotate a node that returns Command with Command[Literal[...]] for each target.
-- Import Send and Command from langgraph.types.
+- 在条件边的第三个参数里，列出它可能的目标。
+- 返回一组 Send 值，让一个节点为每一项各运行一次。
+- 给并行任务写入的每个键都配一个 reducer。
+- 对返回 Command 的节点，用 Command[Literal[...]] 标注每个目标。
+- 从 langgraph.types 导入 Send 和 Command。
 ```
 
-Sources: capture/s_graph.py, capture/out/34-stategraph-reducers-send-command.txt, capture/out/50-draw-fanout.txt; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/constants.py, and libs/langgraph/langgraph/graph/state.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/graph-api, oss/python/langgraph/graph-api-send-command).
+来源：capture/s_graph.py, capture/out/34-stategraph-reducers-send-command.txt, capture/out/50-draw-fanout.txt; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/constants.py, and libs/langgraph/langgraph/graph/state.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/graph-api, oss/python/langgraph/graph-api-send-command).

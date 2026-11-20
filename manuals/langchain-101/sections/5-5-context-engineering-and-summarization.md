@@ -1,30 +1,30 @@
-# Context engineering and summarization
+# 上下文工程与摘要
 
-> A thread grows on every turn, so each model call gets longer and each checkpoint larger, until you trim or summarize the messages and store them as deltas.
+> 线程每一轮都在增长，所以每次模型调用越来越长，每个检查点越来越大，直到你裁剪或摘要这些消息，并把它们存成增量。
 
-Your assistant feels quick in the first hour. After a few dozen turns on one thread, every answer takes longer, the provider bill grows, and the database grows faster than the bill. Nothing failed. The agent sends the whole thread to the model on every call, and the checkpointer saves the whole thread on every step.
+你的助手在第一个小时里感觉很快。在同一个线程上跑过几十轮之后，每个回答都变慢了，服务商的账单在涨，数据库涨得比账单还快。没有任何东西失败。agent 每次调用都把整个线程发给模型，checkpointer 每一步都保存整个线程。
 
-When you finish this section, you can choose what the model receives, set a summarization trigger, and predict how a long thread grows.
+读完本节，你能选择模型接收什么、设置摘要触发条件，并预测一个长线程如何增长。
 
-## What the model receives
+## 模型接收什么 {#s-context-engineering-and-summarization-what-the-model-receives}
 
-**Context engineering:** the choice of what the model receives on each call: which messages, which tools, and which instructions.
+**上下文工程（context engineering）：** 选择模型在每次调用中接收什么：哪些消息、哪些工具、哪些指令。
 
-**Context window:** the most tokens that a model accepts in one call, input and output together.
+**上下文窗口（context window）：** 模型在一次调用中接受的最大 token 数，输入和输出合计。
 
-[Section 5.2](#s-checkpointers-and-threads) showed that each call gets every message of the thread. The short-term memory page names three ways to keep the list short: trim it, delete messages, and summarize it {{docs oss/python/langchain/short-term-memory}}. Each one must keep the rule of [section 3.4](#s-tools-toolruntime-and-tool-errors): one `ToolMessage` answers each tool call, and no `ToolMessage` stands alone.
+[第 5.2 节](#s-checkpointers-and-threads)显示了每次调用都会拿到线程里的每条消息。short-term memory 页面列出三种缩短列表的办法：裁剪、删除消息和摘要 {{docs oss/python/langchain/short-term-memory}}。每一种都必须遵守[第 3.4 节](#s-tools-toolruntime-and-tool-errors)的规则：每个工具调用有一条 `ToolMessage` 回应，没有任何 `ToolMessage` 单独存在。
 
-## trim_messages
+## trim_messages {#s-context-engineering-and-summarization-trim-messages}
 
-**trim_messages:** a function in `langchain_core.messages` that keeps the first or the last messages of a list up to a token budget. It changes the list that you pass to a model, and it leaves the state as it was.
+**trim_messages：** `langchain_core.messages` 里的函数，在 token 预算内保留列表的开头或末尾的消息。它改变你传给模型的列表，状态保持原样。
 
-The kit trims the five messages of [section 3.3](#s-messages-and-content-blocks) to a budget of three. The token counter is `len`, so each message counts as one token:
+录制工具包把[第 3.3 节](#s-messages-and-content-blocks)的五条消息裁剪到三的预算。token 计数器是 `len`，所以每条消息算一个 token：
 
 ```listing
-title: trim_messages keeps the last three messages
+title: trim_messages 保留最后三条消息
 source: capture/out/02-messages.txt
 lang: json
-note: The usage numbers are cut.
+note: 用量数字被截掉了。
 ---
 max_tokens=3, token_counter=len:
 [
@@ -46,19 +46,19 @@ max_tokens=3, token_counter=len:
 ]
 ```
 
-The result keeps the `ToolMessage` of `call_1` and drops the AI message that made the call. Most providers reject such a request. With `start_on="human"`, the trim drops messages until it finds a human message. The last two messages hold none, so only the system message was left. Trim on whole turns, and check the first message after the system message.
+结果保留了 `call_1` 的 `ToolMessage`，却丢掉了发出这个调用的 AI 消息。大多数服务商会拒绝这样的请求。用 `start_on="human"` 时，裁剪会丢弃消息，直到遇到一条 human 消息。最后两条消息里没有 human 消息，所以只剩下系统消息。按完整的轮次来裁剪，并检查系统消息之后的第一条消息。
 
-## SummarizationMiddleware
+## SummarizationMiddleware {#s-context-engineering-and-summarization-summarizationmiddleware}
 
-**Summary message:** a human message that `SummarizationMiddleware` writes in place of old messages. It starts with `Here is a summary of the conversation to date:` and carries `lc_source` `summarization`.
+**摘要消息（summary message）：** `SummarizationMiddleware` 取代旧消息写出的 human 消息。它以 `Here is a summary of the conversation to date:` 开头，并带有 `lc_source` 为 `summarization`。
 
-`SummarizationMiddleware` calls a second model to summarize the old messages when a trigger fires, and keeps the newest ones. The kit sets `trigger=("messages", 6)` and `keep=("messages", 2)`, and sends seven messages:
+触发条件满足时，`SummarizationMiddleware` 调用第二个模型来摘要旧消息，并保留最新的几条。录制工具包设置 `trigger=("messages", 6)` 和 `keep=("messages", 2)`，并发送七条消息：
 
 ```listing
-title: the state after the summary
+title: 摘要之后的状态
 source: capture/out/10-mw-summarization.txt
 lang: json
-note: The summary is cut after its first section. The ids of the last two messages are cut.
+note: 摘要在第一节之后被截断。最后两条消息的 id 被截掉。
 ---
   {
     "type": "HumanMessage",
@@ -77,55 +77,55 @@ note: The summary is cut after its first section. The ids of the last two messag
     "content": "Now 1 + 1?",
 ```
 
-The agent model then got three messages: the summary, the last answer, and the new question. It called `add` with 1 and 1, and answered `The sum is 2.`.
+之后 agent 模型拿到三条消息：摘要、最后一个回答和新问题。它用 1 和 1 调用了 `add`，并回答了 `The sum is 2.`。
 
-The summary is a model output, so it can be wrong. The summarizer saw only the five old messages. It wrote that 4 + 5 got no answer, and listed an `add` call for it that never ran. The answer `The sum is 9.` was in the two kept messages, out of its sight. The middleware replaced the messages in the state, so later turns start from the summary.
+摘要是模型输出，所以可能出错。摘要器只看到五条旧消息。它写道 4 + 5 没有得到回答，并为它列出了一个从未运行过的 `add` 调用。回答 `The sum is 9.` 在保留的两条消息里，不在它的视野之内。中间件替换了状态里的消息，所以之后的轮次都从摘要开始。
 
-With no `trigger`, the middleware never summarizes. The built-in middleware page says the same {{docs oss/python/langchain/middleware/built-in}}. In the kit, the model got all seven messages. Set the trigger. The default `keep` is `("messages", 20)`. Part 4 covers `ContextEditingMiddleware`, which clears old tool results in place of a summary.
+没有 `trigger` 时，中间件永远不摘要。built-in middleware 页面也这么说 {{docs oss/python/langchain/middleware/built-in}}。在录制工具包里，模型拿到了全部七条消息。要设置触发条件。`keep` 的默认值是 `("messages", 20)`。第 4 部分讲 `ContextEditingMiddleware`，它不做摘要，而是就地清除旧的工具结果。
 
-## A long thread on a real model
+## 真实模型上的长线程 {#s-context-engineering-and-summarization-a-long-thread-on-a-real-model}
 
-**We measured** long threads on the x86 server guest, 32 vCPU and 48 GiB, with `create_agent`, `PostgresSaver` on PostgreSQL 16.15, and default durability. The model was Qwen3 4B on Ollama on CPU, temperature 0, seed 42, with a context of 8192 tokens. The summary model was the same model.
+**我们测得**长线程的表现，环境是 x86 服务器客户机，32 vCPU 和 48 GiB，用 `create_agent`、PostgreSQL 16.15 上的 `PostgresSaver` 和默认持久性。模型是 CPU 上 Ollama 里的 Qwen3 4B，温度 0，种子 42，上下文 8192 个 token。摘要用的模型是同一个。
 
-Each variant was one run of 200 turns on one thread. Turns 1 to 5 gave five facts, and the rest cycled through a plain answer, one add call, and two parallel add calls. Every 25 turns, five recall questions about the facts ran on a fork of the thread, so they never entered it. The script gave each variant about 70 minutes.
+每个变体是同一个线程上 200 轮的一次运行。第 1 到 5 轮给出五个事实，其余的轮次循环：一个普通回答、一次 add 调用、两次并行的 add 调用。每 25 轮，关于这些事实的五个回忆问题在线程的一个分叉上运行，所以它们从不进入线程。脚本给每个变体约 70 分钟。
 
-| Variant | Summaries | Turn p50 without / with a summary call | Largest prompt | Add turns right | Recall of the 5 facts | Thread size |
+| 变体 | 摘要次数 | 每轮 p50，无摘要调用 / 有摘要调用 | 最大提示词 | add 轮次正确 | 5 个事实的回忆 | 线程大小 |
 |---|---|---|---|---|---|---|
-| no summarization | 0 | 7.4 s, and 308 to 621 s from turn 88 | 8,191 tokens, the full context | 59 of 59 | 5 of 5 to turn 75, then 0 of 4 after turn 94, and the fifth got HTTP 400 | 20.52 MB at turn 90 |
-| `("messages", 60)`, keep 7 | 13 | 5.5 s / 55.2 s | 2,146 tokens | 126 of 130 | 5 of 5 at all 8 probes | 12.42 MB at turn 200 |
-| `("tokens", 6000)`, keep 1,500 tokens | 4 | 7.5 s / 108.4 s | 5,985 tokens | 130 of 130 | 5 of 5 to turn 50, 0 of 5 from turn 75 | 38.00 MB at turn 200 |
-| `("messages", 20)`, keep 1 | 39 | 5.4 s / 57.3 s | 1,219 tokens | 103 of 130: the sums were right in 129, and the tool was skipped in 26 | 5 of 5 to turn 75, then 4 of 5 without the code word | 6.40 MB at turn 200 |
+| 无摘要 | 0 | 7.4 秒，从第 88 轮起 308 到 621 秒 | 8,191 个 token，即整个上下文 | 59 次中 59 次 | 到第 75 轮是 5 个中 5 个，第 94 轮之后 4 个中 0 个，第五个得到 HTTP 400 | 第 90 轮时 20.52 MB |
+| `("messages", 60)`，保留 7 | 13 | 5.5 秒 / 55.2 秒 | 2,146 个 token | 130 次中 126 次 | 全部 8 次探测，5 个中 5 个 | 第 200 轮时 12.42 MB |
+| `("tokens", 6000)`，保留 1,500 个 token | 4 | 7.5 秒 / 108.4 秒 | 5,985 个 token | 130 次中 130 次 | 到第 50 轮是 5 个中 5 个，从第 75 轮起 5 个中 0 个 | 第 200 轮时 38.00 MB |
+| `("messages", 20)`，保留 1 | 39 | 5.4 秒 / 57.3 秒 | 1,219 个 token | 130 次中 103 次：129 次的和是对的，26 次跳过了工具 | 到第 75 轮是 5 个中 5 个，之后 5 个中 4 个，缺口令 | 第 200 轮时 6.40 MB |
 
-[Figure](#fig-5-5) shows the median of each block of 25 turns. Without summarization, the median turn grew from 4.7 s in turns 1 to 25 to 11.2 s in turns 51 to 75. At turn 88 the prompt reached the context of 8,192 tokens. From then on, each model call took about 300 s on this CPU, nearly all of it to read the prompt. The turns took 308 to 621 s, and the run stopped at its time limit after turn 94.
+[图](#fig-5-5)显示每 25 轮一块的中位数。没有摘要时，中位轮次的时间从第 1 到 25 轮的 4.7 秒，增长到第 51 到 75 轮的 11.2 秒。在第 88 轮，提示词达到了 8,192 个 token 的上下文。从那以后，每次模型调用在这块 CPU 上约需 300 秒，几乎全部用来读提示词。各轮耗时 308 到 621 秒，运行在第 94 轮之后因时间上限而停止。
 
-Ollama cut the oldest part of the prompt without an error. The answers stayed right. But four recall questions on the last checkpoint all said that the model did not know. The fifth failed with HTTP 400, `request (8192 tokens) exceeds the available context size (8192 tokens)`.
+Ollama 没有报错就截掉了提示词最旧的部分。回答仍然是对的。但是最后一个检查点上的四个回忆问题，全都说模型不知道。第五个以 HTTP 400 失败，`request (8192 tokens) exceeds the available context size (8192 tokens)`。
 
-With a trigger, the median turn stayed between 5.4 and 7.5 s. The median turn with a summary call took 55 to 108 s, because the summary is one more model call over the old messages. The summary call alone took 44 to 85 s at the median. LangChain, LangGraph, and Postgres took 18.9 to 24.7 ms of a turn at the median.
+有触发条件时，中位轮次稳定在 5.4 到 7.5 秒之间。带摘要调用的中位轮次需要 55 到 108 秒，因为摘要是对旧消息多做的一次模型调用。摘要调用本身的中位数是 44 到 85 秒。LangChain、LangGraph 和 Postgres 在每轮里的中位数占 18.9 到 24.7 毫秒。
 
-A summary can lose facts. The 6,000-token trigger summarized first at turn 65. From turn 75 on, the model knew none of the five facts, in 6 of 6 probes. The 20-message trigger lost the code word from turn 100 on. The 60-message trigger kept all five in all 8 probes. Check what your summary keeps before you trust a trigger.
+摘要会丢失事实。6,000 个 token 的触发条件在第 65 轮第一次摘要。从第 75 轮起，模型对五个事实一个也不知道，6 次探测全部如此。20 条消息的触发条件，从第 100 轮起丢了口令。60 条消息的触发条件在全部 8 次探测里保住了五个。信任一个触发条件之前，先检查你的摘要保留了什么。
 
-The tool messages stayed paired in every case. 0 of 1,143 model requests had a `ToolMessage` without its tool call (Qwen3 4B, x86 server guest). Issue #38352 reports such orphans after a summary, and they did not happen in our runs.
+在所有情况下，工具消息都保持成对。1,143 次模型请求里，有 0 次出现没有对应工具调用的 `ToolMessage`（x86 服务器客户机上的 Qwen3 4B）。issue #38352 报告了摘要之后出现这种孤立消息，在我们的运行里没有发生。
 
 ```figure
 id: fig-5-5
 kind: chart
-title: turn time over 200 turns on Qwen3 4B, with and without summarization
-claim: Without summarization a turn takes 5 to 10 minutes once the context fills at turn 88, and with a trigger block medians stay at 4.4 to 9.2 s.
-caption: Each dot is the median turn time of 25 turns in one run, one run per variant. Each open ring is one turn of the run without summarization after its prompt filled the context. The shaded band spans the 10th to the 90th percentile of the same 25 turns. The y axis is on a log scale. From capture/lab/summary/long-threads-x86-real.json.
+title: Qwen3 4B 上 200 轮的轮次耗时，有摘要与无摘要
+claim: 没有摘要时，第 88 轮上下文填满之后，一轮需要 5 到 10 分钟，有触发条件时，各块的中位数保持在 4.4 到 9.2 秒。
+caption: 每个点是一次运行里 25 轮的中位轮次耗时，每个变体一次运行。每个空心圆环是无摘要运行里，提示词填满上下文之后的一轮。阴影带覆盖同样 25 轮的第 10 到第 90 百分位。y 轴为对数刻度。来源：capture/lab/summary/long-threads-x86-real.json。
 ```
 
-The thread still grew with a summary. Every old checkpoint stays in Postgres, so storage grew in a straight line. With the 60-message trigger, it grew from 5.98 MB at turn 100 to 12.42 MB at turn 200. With the 6,000-token trigger, it grew from 17.58 MB to 38.00 MB. A summary limits what the model gets. It does not limit what the checkpointer keeps.
+有摘要时，线程仍然在增长。每个旧检查点都留在 Postgres 里，所以存储呈直线增长。60 条消息的触发条件下，它从第 100 轮的 5.98 MB 增长到第 200 轮的 12.42 MB。6,000 个 token 的触发条件下，它从 17.58 MB 增长到 38.00 MB。摘要限制的是模型拿到什么，不限制 checkpointer 保留什么。
 
-## Checkpoint growth, and DeltaChannel
+## 检查点增长与 DeltaChannel {#s-context-engineering-and-summarization-checkpoint-growth-and-deltachannel}
 
-A plain message channel saves the whole list in every checkpoint. A thread of n steps then stores about n squared over two messages.
+普通的消息通道在每个检查点里保存整个列表。一个 n 步的线程于是大约保存 n 的平方除以二条消息。
 
-**DeltaChannel:** a channel type in `langgraph.channels.delta` that saves only the new writes of each step, plus a full snapshot. The snapshot comes after `snapshot_frequency` updates to the channel, 100 by default, or after 5,000 steps, whichever is first {{code libs/langgraph/langgraph/channels/delta.py:50-64}}. It is beta at the pin.
+**DeltaChannel：** `langgraph.channels.delta` 里的通道类型，只保存每一步的新写入，外加一份完整快照。快照出现在通道更新了 `snapshot_frequency` 次之后（默认 100 次），或者 5,000 步之后，以先到者为准 {{code libs/langgraph/langgraph/channels/delta.py:50-64}}。它在锁定版本上是 beta。
 
-The lab graph declares its message channel in three ways:
+实验记录里的图用三种方式声明它的消息通道：
 
 ```listing
-title: a plain channel and two DeltaChannel settings
+title: 一个普通通道和两种 DeltaChannel 设置
 source: capture/lab/T03-checkpoint-cost-x86/t03_ckpt.py
 lang: python
 ---
@@ -141,34 +141,34 @@ lang: python
         n: int
 ```
 
-`_messages_delta_reducer` is the delta form of `add_messages` in `langgraph.graph.message`. Its name starts with `_`, so it is private at the pin.
+`_messages_delta_reducer` 是 `langgraph.graph.message` 里 `add_messages` 的增量形式。它的名字以 `_` 开头，所以在锁定版本上是私有的。
 
-**We measured** checkpoint cost on the x86 server guest with `durability="sync"`, one 400-character message per step, and one thread per run. We ran 3 runs at 10, 100, and 1,000 steps and 1 run at 5,000, for `InMemorySaver`, `SqliteSaver`, and `PostgresSaver`. On Postgres, a plain thread held 0.05 MB at 10 steps and 3.08 MB at 100. It held 292.58 MB at 1,000 steps and 7,289.37 MB at 5,000.
+**我们测得**检查点的成本，环境是 x86 服务器客户机，用 `durability="sync"`，每步一条 400 个字符的消息，每次运行一个线程。我们对 `InMemorySaver`、`SqliteSaver` 和 `PostgresSaver`，在 10、100 和 1,000 步各运行 3 次，在 5,000 步运行 1 次。在 Postgres 上，普通线程在 10 步时占 0.05 MB，100 步时占 3.08 MB，1,000 步时占 292.58 MB，5,000 步时占 7,289.37 MB。
 
-With `DeltaChannel` and a snapshot every 100 steps, the 5,000-step thread held 81.2 MB. With a snapshot every 1,000, it held 15.7 MB. From 1,000 steps on, the plain thread had the same size on the three savers, within 0.05 percent. [Figure](#fig-5-5b) plots every run.
+用 `DeltaChannel` 并每 100 步一次快照时，5,000 步的线程占 81.2 MB。每 1,000 步一次快照时，占 15.7 MB。从 1,000 步起，普通线程在三种 saver 上大小相同，相差在 0.05% 以内。[图](#fig-5-5b)画出了每次运行。
 
 ```figure
 id: fig-5-5b
 kind: chart
-title: storage of one thread by steps, plain and DeltaChannel
-claim: A plain message channel stores 7,289 MB after 5,000 steps, and DeltaChannel stores 81 MB with snapshots every 100 steps and 16 MB every 1,000.
-caption: Both axes are on a log scale. Each dot is one run on PostgresSaver, three runs at 10 to 1,000 steps and one at 5,000. From capture/lab/summary/checkpoint-cost-x86.json.
+title: 一个线程按步数划分的存储量，普通通道与 DeltaChannel
+claim: 普通消息通道在 5,000 步后存储 7,289 MB，DeltaChannel 在每 100 步一次快照时存储 81 MB，每 1,000 步一次快照时存储 16 MB。
+caption: 两个坐标轴都是对数刻度。每个点是 PostgresSaver 上的一次运行，10 到 1,000 步各三次，5,000 步一次。来源：capture/lab/summary/checkpoint-cost-x86.json。
 ```
 
-Write time grew with the plain thread too. The median `put` of the last 10 steps on Postgres went from 2.88 ms at 10 steps to 148.65 ms at 5,000. With either `DeltaChannel` setting it stayed between 1.02 and 1.18 ms.
+写入时间也随普通线程增长。在 Postgres 上，最后 10 步的 `put` 中位数，从 10 步时的 2.88 毫秒增长到 5,000 步时的 148.65 毫秒。用任何一种 `DeltaChannel` 设置，它都保持在 1.02 到 1.18 毫秒之间。
 
-Reads went the other way. At 1,000 steps on Postgres, `get_state` took 29.28 to 31.8 ms on the plain thread. With `DeltaChannel` it took 43.24 to 65.61 ms, best of three reads in each run. A delta channel rebuilds the list from its writes since the last snapshot. [Section 2.6](#s-checkpoint-growth-and-the-cost-of-a-superstep) found the same direction on a real agent on `SqliteSaver`, at a smaller scale. After 100 round trips, a read took 2.76 ms with `DeltaChannel` against 2.59 ms plain.
+读取则相反。在 Postgres 上 1,000 步时，普通线程的 `get_state` 用了 29.28 到 31.8 毫秒。用 `DeltaChannel` 时用了 43.24 到 65.61 毫秒，是每次运行中三次读取里最快的一次。增量通道会根据上一份快照之后的写入重建列表。[第 2.6 节](#s-checkpoint-growth-and-the-cost-of-a-superstep)在 `SqliteSaver` 上的一个真实 agent 里发现了同样的方向，规模更小。100 次往返之后，用 `DeltaChannel` 一次读取用 2.76 毫秒，普通的是 2.59 毫秒。
 
-The pregel page lists two rules for `DeltaChannel` {{docs oss/python/langgraph/pregel}}. Do not change a persisted channel between delta and plain, because the two encode checkpoints in different ways. Do not move a thread that used `DeltaChannel` back to a LangGraph older than 1.2, because it cannot read the delta format. Issue #7714 measured a token cost of checkpoints, and a maintainer closed it, because checkpoints are not sent to the model {{issue 7714}}. Our numbers agree: the cost of a checkpoint is storage and time, and the cost of the context is tokens.
+pregel 页面列出了 `DeltaChannel` 的两条规则 {{docs oss/python/langgraph/pregel}}。不要把一个已持久化的通道在增量和普通之间切换，因为两者对检查点的编码方式不同。不要把用过 `DeltaChannel` 的线程移回早于 1.2 的 LangGraph，因为它读不了增量格式。issue #7714 测量了检查点的 token 成本，一位维护者关闭了它，因为检查点不会发给模型 {{issue 7714}}。我们的数字与此一致：检查点的成本是存储和时间，上下文的成本是 token。
 
 ```takeaways
-- Set a trigger on SummarizationMiddleware, because the default never summarizes.
-- Trim on whole turns, and check that no ToolMessage starts the list.
-- Expect turn time to grow with the thread when nothing limits the context.
-- Size the trigger below the context of the model, because a full context is cut silently and then refused.
-- Test what a summary keeps with recall questions, because a summary can drop facts.
-- Use DeltaChannel for a long message channel, and keep its type for the life of the thread.
-- Prune old checkpoints yourself, because a summary does not shrink the checkpointer. With DeltaChannel, keep the snapshot and the writes after it, or save a full snapshot first.
+- 给 SummarizationMiddleware 设置 trigger，因为默认值永远不摘要。
+- 按完整的轮次裁剪，并检查列表不是以 ToolMessage 开头。
+- 没有任何东西限制上下文时，预期每轮耗时会随线程增长。
+- 把触发条件定在模型上下文之下，因为填满的上下文会被悄悄截断，随后被拒绝。
+- 用回忆问题测试摘要保留了什么，因为摘要可能丢掉事实。
+- 长消息通道用 DeltaChannel，并在线程的整个生命周期里保持它的类型。
+- 自己清理旧检查点，因为摘要不会缩小 checkpointer。用 DeltaChannel 时，保留快照和它之后的写入，或者先保存一份完整快照。
 ```
 
-Sources: capture/s_start.py, capture/s_middleware.py, capture/out/02-messages.txt, capture/out/10-mw-summarization.txt; capture/lab/summary/long-threads-x86-real.json, capture/lab/summary/checkpoint-cost-x86.json, capture/lab/summary/checkpoint-reads-x86.json, capture/lab/T10-long-threads-x86-real/01-turns-none.jsonl, capture/lab/T10-long-threads-x86-real/01-turns-msgs60_keep7.jsonl, capture/lab/T10-long-threads-x86-real/01-turns-tok6000_keep1500.jsonl, capture/lab/T10-long-threads-x86-real/01-turns-msgs20_keep1.jsonl, capture/lab/T10-long-threads-x86-real/02-none-probe-after-deadline.log, capture/lab/T10-long-threads-x86-real/t10r_long.py, capture/lab/T03-checkpoint-cost-x86/01-steps.jsonl, capture/lab/T03-checkpoint-cost-x86/02-steps-5000.jsonl, capture/lab/T03-checkpoint-cost-x86/t03_ckpt.py; libs/langchain_v1/langchain/agents/middleware/summarization.py and libs/core/langchain_core/messages/utils.py at langchain==1.5.0; libs/langgraph/langgraph/channels/delta.py and libs/langgraph/langgraph/graph/message.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/short-term-memory, oss/python/langchain/middleware/built-in, oss/python/langgraph/pregel); GitHub issues langchain-ai/langchain#38352 and langchain-ai/langgraph#7714.
+来源：capture/s_start.py, capture/s_middleware.py, capture/out/02-messages.txt, capture/out/10-mw-summarization.txt; capture/lab/summary/long-threads-x86-real.json, capture/lab/summary/checkpoint-cost-x86.json, capture/lab/summary/checkpoint-reads-x86.json, capture/lab/T10-long-threads-x86-real/01-turns-none.jsonl, capture/lab/T10-long-threads-x86-real/01-turns-msgs60_keep7.jsonl, capture/lab/T10-long-threads-x86-real/01-turns-tok6000_keep1500.jsonl, capture/lab/T10-long-threads-x86-real/01-turns-msgs20_keep1.jsonl, capture/lab/T10-long-threads-x86-real/02-none-probe-after-deadline.log, capture/lab/T10-long-threads-x86-real/t10r_long.py, capture/lab/T03-checkpoint-cost-x86/01-steps.jsonl, capture/lab/T03-checkpoint-cost-x86/02-steps-5000.jsonl, capture/lab/T03-checkpoint-cost-x86/t03_ckpt.py; libs/langchain_v1/langchain/agents/middleware/summarization.py and libs/core/langchain_core/messages/utils.py at langchain==1.5.0; libs/langgraph/langgraph/channels/delta.py and libs/langgraph/langgraph/graph/message.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/short-term-memory, oss/python/langchain/middleware/built-in, oss/python/langgraph/pregel); GitHub issues langchain-ai/langchain#38352 and langchain-ai/langgraph#7714.

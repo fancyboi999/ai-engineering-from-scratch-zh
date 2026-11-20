@@ -1,21 +1,21 @@
-# StateGraph, state, and reducers
+# StateGraph、状态与 reducer
 
-> A `StateGraph` node returns a partial update, and each state key merges that update with its reducer, or replaces the old value when the key has no reducer.
+> `StateGraph` 的节点返回部分更新，每个状态键用自己的 reducer 合并这个更新；键没有 reducer 时，则替换旧值。
 
-You write a graph in which three nodes run in the same step, and each one adds a joke to a list. One version of the graph ends with three jokes. Another version raises an error before the step ends. What decides it is the reducer of the key that the nodes write.
+你写了一个图，其中三个节点在同一步里运行，每个节点往列表里加一个笑话。图的一个版本最终得到三个笑话，另一个版本在这一步结束前就抛出错误。决定结果的，是这些节点所写的键的 reducer。
 
-When you finish this section, you can declare a state schema and choose a reducer for each key. You can also predict what two writes to one key in one step do.
+读完本节，你能声明状态模式，并为每个键选择 reducer。你还能预测同一步里对一个键的两次写入会怎样。
 
-## The state schema
+## 状态模式 {#s-stategraph-state-and-reducers-the-state-schema}
 
-**State:** the shared data of one graph run, declared as a schema whose keys are the values that nodes read and write.
+**状态（state）：** 一次图运行的共享数据，声明为一个模式，模式的键就是节点读写的值。
 
-**Reducer:** a function of the old value and an update that returns the new value of one state key.
+**Reducer：** 以旧值和一个更新为输入、返回某个状态键新值的函数。
 
-`create_agent` built its graph for you in Part 1. A `StateGraph` is the same object, and you build it by hand. The kit declares its state as a `TypedDict`. Two keys carry a reducer in `Annotated`, and three keys have none:
+`create_agent` 在第 1 部分里替你构建了它的图。`StateGraph` 是同一种对象，你要手工构建它。录制工具包把状态声明为一个 `TypedDict`。两个键在 `Annotated` 里带 reducer，三个键没有：
 
 ```listing
-title: a state schema with two reducers
+title: 带两个 reducer 的状态模式
 source: capture/s_graph.py
 lang: python
 ---
@@ -27,14 +27,14 @@ class Fanout(TypedDict):
     best: str
 ```
 
-A key with no reducer keeps the last value written to it. The graph API page states this default too, and it adds that a node returns only the keys it changes {{docs oss/python/langgraph/graph-api}}. LangGraph stores such a key in a `LastValue` channel, and a key with a reducer in a `BinaryOperatorAggregate` channel {{docs oss/python/langgraph/pregel}}. A schema can also be a dataclass or a Pydantic model, but `create_agent` needs a `TypedDict` {{docs oss/python/langgraph/graph-api}}.
+没有 reducer 的键保留最后写入它的值。graph API 页面也说明了这个默认行为，并补充说节点只返回它改动的键 {{docs oss/python/langgraph/graph-api}}。LangGraph 把这样的键存在 `LastValue` 通道里，把带 reducer 的键存在 `BinaryOperatorAggregate` 通道里 {{docs oss/python/langgraph/pregel}}。模式也可以是 dataclass 或 Pydantic 模型，但 `create_agent` 需要 `TypedDict` {{docs oss/python/langgraph/graph-api}}。
 
-## A node returns a partial update
+## 节点返回部分更新 {#s-stategraph-state-and-reducers-a-node-returns-a-partial-update}
 
-A node is a function of the state. It returns a dict with only the keys it changes. The first node of the kit graph writes two of the five keys:
+节点是状态的函数。它返回的字典里只有它改动的键。录制工具包图的第一个节点，写五个键里的两个：
 
 ```listing
-title: the plan node
+title: plan 节点
 source: capture/s_graph.py
 lang: python
 ---
@@ -42,15 +42,15 @@ lang: python
         return {"subjects": ["cats", "dogs", "owls"], "log": ["plan"]}
 ```
 
-LangGraph applies each key of the update with the reducer of that key. `subjects` has no reducer, so the list replaces the empty list of the input. `log` has `operator.add`, so `["plan"]` joins the end of the old list. Every node after it adds one entry to `log` in the same way.
+LangGraph 用每个键自己的 reducer 来应用更新里的这个键。`subjects` 没有 reducer，所以这个列表替换了输入里的空列表。`log` 有 `operator.add`，所以 `["plan"]` 接在旧列表的末尾。它之后的每个节点，都以同样的方式往 `log` 里加一项。
 
-The run ends with six entries in `log`, one for each node run:
+运行结束时，`log` 里有六项，每次节点运行一项：
 
 ```listing
-title: the final state of the run
+title: 运行的最终状态
 source: capture/out/34-stategraph-reducers-send-command.txt
 lang: json
-note: The final state. The topic and subjects keys are cut.
+note: 最终状态。topic 和 subjects 键被截掉了。
 ---
   "jokes": [
     "a joke about cats",
@@ -68,14 +68,14 @@ note: The final state. The topic and subjects keys are cut.
   "best": "a joke about cats"
 ```
 
-## Two writes to one key in one step
+## 一步里对同一个键的两次写入 {#s-stategraph-state-and-reducers-two-writes-to-one-key-in-one-step}
 
-The three `write_joke` runs happen in one step, and each returns one joke under `jokes`. The reducer joins the three updates, so the state holds three jokes. [Section 6.2](#s-edges-send-and-command) shows how the graph starts three runs of one node.
+三次 `write_joke` 运行发生在同一步里，每次在 `jokes` 下返回一个笑话。reducer 把三个更新合并起来，所以状态里有三个笑话。[第 6.2 节](#s-edges-send-and-command)说明了图如何为一个节点启动三次运行。
 
-A key with no reducer accepts one write in each step. The kit builds a graph whose two nodes both start after `__start__`, and both write `value`:
+没有 reducer 的键，每一步只接受一次写入。录制工具包构建了一个图，它的两个节点都在 `__start__` 之后启动，并且都写 `value`：
 
 ```listing
-title: two nodes write one key with no reducer
+title: 两个节点写同一个没有 reducer 的键
 source: capture/s_graph.py
 lang: python
 ---
@@ -89,10 +89,10 @@ lang: python
     g.add_edge(START, "b")
 ```
 
-The run raises at the end of the step, and the error names the key:
+运行在这一步结束时抛出错误，错误里指明了这个键：
 
 ```listing
-title: the error for two writes to one key
+title: 对同一个键写入两次的错误
 source: capture/out/34-stategraph-reducers-send-command.txt
 lang: text
 ---
@@ -100,29 +100,29 @@ raised langgraph.errors.InvalidUpdateError: At key 'value': Can receive only one
 For troubleshooting, visit: https://docs.langchain.com/oss/python/langgraph/errors/INVALID_CONCURRENT_GRAPH_UPDATE
 ```
 
-[Figure](#fig-6-1) sets the two keys side by side.
+[图](#fig-6-1)把这两种键并排放在一起。
 
 ```figure
 id: fig-6-1
 kind: comparison
-title: two writes to one key in one step
-claim: Three writes to a key with operator.add join into one list, and two writes to a key with no reducer raise InvalidUpdateError at the end of the step.
-caption: Read each column from the writes at the top to the state at the bottom. The left column is jokes in the joke graph, and the right column is value in the two-node graph. From capture/out/34-stategraph-reducers-send-command.txt.
+title: 一步里对同一个键的两次写入
+claim: 对带 operator.add 的键写入三次，会合并成一个列表，对没有 reducer 的键写入两次，会在这一步结束时抛出 InvalidUpdateError。
+caption: 每一列从顶部的写入读到底部的状态。左列是笑话图里的 jokes，右列是两节点图里的 value。来源：capture/out/34-stategraph-reducers-send-command.txt。
 ```
 
-The joined list keeps the order of the three subjects: cats, dogs, owls. The kit check records that order again on every run.
+合并后的列表保持三个主题的顺序：cats、dogs、owls。录制工具包的检查在每次运行里都会再次记录这个顺序。
 
-## What the error leaves in a saved thread
+## 错误在已保存线程里留下什么 {#s-stategraph-state-and-reducers-what-the-error-leaves-in-a-saved-thread}
 
-On a graph with a checkpointer, the error does more than fail one run. Both node bodies ran before the update raised, and both writes were saved as pending writes. Every later read of the thread applies those writes again, and raises again.
+在带 checkpointer 的图上，这个错误做的不止让一次运行失败。更新抛出错误之前，两个节点的函数体都已运行，两次写入都已作为待写入项保存。此后每次读取这个线程，都会再次应用这些写入，并再次抛出错误。
 
-The runtime part ran the two-node graph with a checkpointer, `InMemorySaver`. Each node asked Qwen3 4B for a digit and returned it as `x`, on the x86 server guest:
+运行时部分用 checkpointer `InMemorySaver` 运行了这个两节点的图。每个节点向 Qwen3 4B 要一个数字，并把它作为 `x` 返回，环境是 x86 服务器客户机：
 
 ```listing
-title: the thread after the conflict
+title: 冲突之后的线程
 source: capture/lab/internals/02-channels/trace.txt
 lang: text
-note: The frame list and the per-checkpoint dump are cut.
+note: 帧列表和逐个检查点的转储被截掉了。
 ---
 raised InvalidUpdateError: At key 'x': Can receive only one value per step. Use an Annotated key to handle multiple values.
 …
@@ -135,17 +135,17 @@ raw saver.get_tuple works: checkpoint step=0 pending_writes=[('26351ed0', 'x', 1
 invoke(None) resume raises again: InvalidUpdateError; node bodies re-run on resume: [] (empty means the saved writes were reapplied, not re-executed)
 ```
 
-So `get_state` raises, and an admin page that reads the thread fails too. `invoke(None)` raises without running a node. A new turn on the same thread raises as well. Only `get_state_history` and the raw saver still read the thread. We reported this as langgraph issue #9712 {{issue langgraph#9712}}. [Section 2.2](#s-channels-and-colliding-writes) follows the raise through the update phase.
+所以 `get_state` 会抛出错误，读取线程的管理页面也会失败。`invoke(None)` 不运行任何节点就抛出错误。在同一线程上开始新的一轮，同样会抛出错误。只有 `get_state_history` 和原始的 saver 仍然能读取这个线程。我们把这个问题报告为 langgraph issue #9712 {{issue langgraph#9712}}。[第 2.2 节](#s-channels-and-colliding-writes)沿着更新阶段追踪了这次抛出。
 
-## Recovering the thread
+## 恢复线程 {#s-stategraph-state-and-reducers-recovering-the-thread}
 
-**We measured** four ways out on the x86 server guest with Qwen3 4B, one run each, on the same graph:
+**我们测得**四种出路，环境是 x86 服务器客户机上的 Qwen3 4B，在同一个图上各运行一次：
 
 ```listing
-title: the first two of four ways out of a LastValue conflict
+title: 摆脱 LastValue 冲突的四种办法里的前两种
 source: capture/lab/internals/02-channels/repair.txt
 lang: text
-note: The checkpoint id in the update_state result is cut, and so are parts 3 and 4.
+note: update_state 结果里的检查点 id 被截掉了，第 3 和第 4 种办法也被截掉了。
 ---
 ## 1. same graph, after the raise
 get_state: raises InvalidUpdateError: At key 'x': Can receive only one value per step. Use an Annotated key to handle multiple v
@@ -160,24 +160,24 @@ invoke(None): ok -> {'x': 3}
 node bodies run by invoke(None): []; model calls so far 8
 ```
 
-- A reducer repairs the thread from its saved writes. The same saver, under a graph with `x: Annotated[int, operator.add]`, read the thread at once and finished the run. No node ran again, so no model call was paid twice. The value was 3, the input 0 plus 1 plus 2.
-- `update_state` recovers the thread too. It writes a new checkpoint with the value you pass, and the repro of issue #9712 reads the thread again after it. The graph is still wrong, though. The next `invoke(None)` ran both nodes and both model calls again, and raised again.
-- A fork from the input checkpoint, under the same graph, ran both nodes and raised.
-- `delete_thread` clears the thread, and you lose its history.
+- reducer 能根据保存的写入修好线程。同一个 saver，在 `x: Annotated[int, operator.add]` 的图下，立刻读出了线程并完成了这次运行。没有节点再次运行，所以没有为模型调用多付一次。值是 3，即输入 0 加 1 加 2。
+- `update_state` 也能恢复线程。它用你传入的值写一个新检查点，issue #9712 的复现在它之后能再次读取线程。但图仍然是错的。下一次 `invoke(None)` 再次运行了两个节点和两次模型调用，并再次抛出错误。
+- 从输入检查点分叉，在同一个图下，运行了两个节点并抛出错误。
+- `delete_thread` 清除线程，你会失去它的历史。
 
-So deploy the reducer first. Every broken thread then finishes from its saved writes. Use `update_state` when you must set the value by hand, and only on a graph that has the reducer. Choose the reducer for what the key means, because it decides the value of the repaired thread.
+所以先部署 reducer。每个损坏的线程随后都能根据保存的写入完成。必须手工设置值时才用 `update_state`，并且只在有 reducer 的图上用。按这个键的含义选择 reducer，因为它决定了修复后线程的值。
 
-## add_messages and MessagesState
+## add_messages 与 MessagesState {#s-stategraph-state-and-reducers-add-messages-and-messagesstate}
 
-**add_messages:** the reducer for a list of messages. It appends a message with a new id, replaces a message with the same id, and deletes the message that a `RemoveMessage` names.
+**add_messages：** 消息列表的 reducer。它追加带新 id 的消息，替换 id 相同的消息，并删除 `RemoveMessage` 指名的消息。
 
-The kit calls `add_messages` on two messages `m1` and `m2`. An update with a new text for `m2` and a new message `m3` replaced one and appended the other. An update with `RemoveMessage(id="m1")` left only `m2`:
+录制工具包对两条消息 `m1` 和 `m2` 调用了 `add_messages`。一个给 `m2` 新文本、并带新消息 `m3` 的更新，替换了一条，追加了另一条。一个带 `RemoveMessage(id="m1")` 的更新，只剩下 `m2`：
 
 ```listing
-title: add_messages replaces by id and removes
+title: add_messages 按 id 替换和删除
 source: capture/out/34-stategraph-reducers-send-command.txt
 lang: json
-note: The first result is cut to its three ids and texts.
+note: 第一个结果被截成只剩三个 id 和文本。
 ---
 replace m2, append m3:
 …
@@ -200,21 +200,21 @@ remove m1:
 ]
 ```
 
-So the `messages` key of an agent can change in place. The agents page calls it append only {{docs oss/python/langchain/agents}}, and the short-term memory page removes messages with `RemoveMessage` {{docs oss/python/langchain/short-term-memory}}. The code of `add_messages` decides, and this manual records the disagreement as conflict D104.
+所以 agent 的 `messages` 键可以就地修改。agents 页面称它只追加 {{docs oss/python/langchain/agents}}，而 short-term memory 页面用 `RemoveMessage` 删除消息 {{docs oss/python/langchain/short-term-memory}}。以 `add_messages` 的代码为准，本手册把这处分歧记为冲突 D104。
 
-`MessagesState` is a schema with one `messages` key and the `add_messages` reducer. A node can return a dict such as `{"role": "assistant", "content": "..."}`, and the reducer turns it into an `AIMessage` with a new UUID. Every message in the state then has an id, so a later update can replace or remove it.
+`MessagesState` 是一个只有 `messages` 键、并带 `add_messages` reducer 的模式。节点可以返回形如 `{"role": "assistant", "content": "..."}` 的字典，reducer 把它变成带新 UUID 的 `AIMessage`。这样，状态里的每条消息都有 id，之后的更新就能替换或删除它。
 
-## Clearing a key that has a reducer
+## 清空带 reducer 的键 {#s-stategraph-state-and-reducers-clearing-a-key-that-has-a-reducer}
 
-A node that returns an empty list for `log` does not clear it, because `operator.add` joins the empty list to the old one. The state page says to wrap the value in `Overwrite` to skip the reducer {{docs oss/python/langgraph/graph-api-state}}. The kit does not run `Overwrite` yet. A capture of it comes in the next edition, with the other open items of [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition).
+节点为 `log` 返回空列表并不能清空它，因为 `operator.add` 会把空列表接到旧列表后面。state 页面说，把值包进 `Overwrite` 就能跳过 reducer {{docs oss/python/langgraph/graph-api-state}}。录制工具包还没有运行 `Overwrite`。它的录制会在下一版出现，与[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)里的其他待办项一起。
 
 ```takeaways
-- Return only the keys a node changes, and let each reducer merge them.
-- Give a key a reducer when two nodes can write it in one step.
-- Read InvalidUpdateError as two writes to a key with no reducer.
-- After InvalidUpdateError on a saved thread, deploy the reducer, then resume with invoke(None).
-- Give each message an id when a later update must replace or remove it.
-- Use Overwrite to clear a key that has a merging reducer.
+- 只返回节点改动的键，让每个 reducer 来合并它们。
+- 当两个节点可能在一步里写同一个键时，给这个键加 reducer。
+- 把 InvalidUpdateError 读作对没有 reducer 的键写入了两次。
+- 已保存线程出现 InvalidUpdateError 后，先部署 reducer，再用 invoke(None) 恢复。
+- 之后的更新要替换或删除消息时，给每条消息一个 id。
+- 用 Overwrite 清空带合并 reducer 的键。
 ```
 
-Sources: capture/s_graph.py, capture/out/34-stategraph-reducers-send-command.txt; capture/lab/internals/02-channels/trace.txt, capture/lab/internals/02-channels/run.py, capture/lab/internals/02-channels/repair.txt, capture/lab/internals/02-channels/repair.py; libs/langgraph/langgraph/graph/state.py, libs/langgraph/langgraph/graph/message.py, libs/langgraph/langgraph/channels/last_value.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22; GitHub issue langchain-ai/langgraph#9712; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/graph-api, oss/python/langgraph/graph-api-state, oss/python/langgraph/pregel, oss/python/langchain/agents, oss/python/langchain/short-term-memory).
+来源：capture/s_graph.py, capture/out/34-stategraph-reducers-send-command.txt; capture/lab/internals/02-channels/trace.txt, capture/lab/internals/02-channels/run.py, capture/lab/internals/02-channels/repair.txt, capture/lab/internals/02-channels/repair.py; libs/langgraph/langgraph/graph/state.py, libs/langgraph/langgraph/graph/message.py, libs/langgraph/langgraph/channels/last_value.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22; GitHub issue langchain-ai/langgraph#9712; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/graph-api, oss/python/langgraph/graph-api-state, oss/python/langgraph/pregel, oss/python/langchain/agents, oss/python/langchain/short-term-memory).

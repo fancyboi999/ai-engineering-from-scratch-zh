@@ -1,24 +1,24 @@
-# Streaming: v1, v2, stream_events v3, and the tools mode
+# 流式输出：v1、v2、stream_events v3 与 tools 模式
 
-> One agent run can stream as v1 chunks whose shape follows your options, as v2 StreamPart dicts with one shape, or as v3 events, which are beta.
+> 同一次 agent 运行，可以按 v1 流出形状随选项变化的块，按 v2 流出形状固定的 StreamPart 字典，也可以按 v3 流出事件，而 v3 还是 beta。
 
-You stream an agent into a chat window with `stream_mode="messages"`, and the tokens arrive. Then you add `"updates"` to show tool progress, and your loop breaks, because each chunk is now a tuple. The run did not change. The stream API changed the shape of what it yields.
+你用 `stream_mode="messages"` 把 agent 流式输出到聊天窗口，token 一个个到达。接着你加上 `"updates"` 来显示工具进度，循环就坏了，因为现在每个块都是元组。运行本身没有变，变的是流 API 产出数据的形状。
 
-When you finish this section, you can choose a stream API and a stream mode, and predict each chunk of one run. You can also read the tool events of the `tools` mode, which the stream mode type leaves out.
+读完本节，你能选择流 API 和流模式，并预测一次运行的每个块。你还能读懂 `tools` 模式的工具事件，而流模式的类型定义里没有列出这个模式。
 
-## Stream modes in v1
+## v1 中的流模式 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-stream-modes-in-v1}
 
-**Stream mode:** the name that you pass as `stream_mode`, which decides what `stream` yields at each step of the graph.
+**流模式（stream mode）：** 你作为 `stream_mode` 传入的名字，决定 `stream` 在图的每一步产出什么。
 
-**Chunk:** one item that `stream` yields. Its shape depends on the stream mode, the number of modes, and the stream version.
+**块（chunk）：** `stream` 产出的一项。它的形状取决于流模式、模式的数量和流的版本。
 
-The kit streams the agent of [section 1.3](#s-one-create-agent-run) in each mode. In `updates` mode, each chunk is one node and the state keys that it wrote:
+录制工具包用每种模式流式运行[第 1.3 节](#s-one-create-agent-run)的 agent。在 `updates` 模式下，每个块是一个节点，加上它写入的状态键：
 
 ```listing
-title: the first chunk in updates mode
+title: updates 模式的第一个块
 source: capture/out/21-stream-updates-values.txt
 lang: json
-note: The tool call is cut to its name and id.
+note: 工具调用被截成只剩名字和 id。
 ---
 chunk 0:
 {
@@ -35,15 +35,15 @@ chunk 0:
             "id": "<uuid-2>",
 ```
 
-In `values` mode, each chunk is the whole state. The first chunk holds only the input, so the same run gives four chunks in `values` mode and three in `updates` mode.
+在 `values` 模式下，每个块是完整的状态。第一个块只有输入，所以同一次运行在 `values` 模式下产出四个块，在 `updates` 模式下产出三个块。
 
-In `messages` mode, each chunk is a pair: a message chunk and its metadata. The metadata names the node and the step. `ChatOllama` sent the tool call whole on one chunk, then an empty chunk marked `last`. The `ToolMessage` of the tools node comes as a chunk too:
+在 `messages` 模式下，每个块是一对数据：一个消息块和它的元数据。元数据指明节点和步数。`ChatOllama` 把工具调用整个放在一个块里发出，随后是一个标为 `last` 的空块。tools 节点的 `ToolMessage` 也作为一个块到达：
 
 ```listing
-title: the first three chunks in messages mode
+title: messages 模式的前三个块
 source: capture/out/22-stream-messages.txt
 lang: json
-note: The tool call, the metadata of the reply, and the triggers are cut.
+note: 工具调用、回复的元数据和触发器被截掉了。
 ---
 chunk 0:
 {
@@ -76,39 +76,39 @@ chunk 2:
     "langgraph_step": 2,
 ```
 
-The final answer `2 + 3 = 5.` then came as eight text chunks, such as `2`, ` +`, and ` `. Two empty chunks followed, and the second was marked `last`. Ollama chose those pieces, so another model or another version splits the text in another way.
+最终答案 `2 + 3 = 5.` 随后分成八个文本块到达，例如 `2`、` +` 和 ` `。后面跟着两个空块，第二个标为 `last`。这些切分由 Ollama 决定，换一个模型或版本，文本会按别的方式切开。
 
-[Figure](#fig-5-1) puts the chunks of each mode on the three node runs of this one run.
+[图](#fig-5-1)把每种模式的块放到这一次运行的三次节点运行上。
 
 ```figure
 id: fig-5-1
 kind: timeline
-title: the chunks of one agent run in each stream mode
-claim: The same run yields 3 chunks in updates mode, 4 in values mode, 13 in messages mode, and 23 events from stream_events v3.
-caption: Each row is one stream of the same agent run. Each mark is one chunk, placed on the node run that made it. Colour shows what a chunk carries: indigo a whole state, plum model output, green tool output, amber a task that starts (outlined) or ends. The tools row is the slow_sum agent, which emits two deltas. From capture/out/21-stream-updates-values.txt, capture/out/22-stream-messages.txt, capture/out/23-stream-tasks-custom-debug.txt, capture/out/25-stream-events-v3.txt, and capture/out/26-stream-tools-mode.txt.
+title: 一次 agent 运行在每种流模式下的块
+claim: 同一次运行，updates 模式产出 3 个块，values 模式 4 个，messages 模式 13 个，stream_events v3 产出 23 个事件。
+caption: 每一行是同一次 agent 运行的一条流。每个标记是一个块，放在产生它的节点运行上。颜色表示块携带的内容：靛蓝是完整状态，梅红是模型输出，绿色是工具输出，琥珀色是开始（空心）或结束的任务。tools 一行是会发出两个 delta 的 slow_sum agent。来源：capture/out/21-stream-updates-values.txt、capture/out/22-stream-messages.txt、capture/out/23-stream-tasks-custom-debug.txt、capture/out/25-stream-events-v3.txt 和 capture/out/26-stream-tools-mode.txt。
 ```
 
-| Mode | One chunk is | Chunks for the add run |
+| 模式 | 一个块是 | add 运行的块数 |
 |---|---|---|
 | `updates` | `{node: what it wrote}` | 3 |
-| `values` | the whole state after a step | 4 |
-| `messages` | a message chunk and its metadata | 13 |
-| `tasks` | the start or the result of one node run | 6 |
-| `debug` | a task or a task result, with the step and a time | 6 |
-| `custom` | a value that a node or tool writes with its stream writer | 0, because `add` writes nothing |
-| `tools` | a tool event: started, an output delta, or finished | 4, from the `slow_sum` agent |
+| `values` | 一步之后的完整状态 | 4 |
+| `messages` | 一个消息块和它的元数据 | 13 |
+| `tasks` | 一次节点运行的开始或结果 | 6 |
+| `debug` | 一个任务或任务结果，带步数和时间 | 6 |
+| `custom` | 节点或工具用它的流写入器写出的值 | 0，因为 `add` 什么也不写 |
+| `tools` | 一个工具事件：开始、输出 delta 或结束 | 4，来自 `slow_sum` agent |
 
-The streaming page of LangGraph says that `tasks` mode needs a checkpointer {{docs oss/python/langgraph/streaming}}. The kit ran `tasks` and `debug` with no checkpointer and got six chunks from each. Without a checkpointer, the four `debug` chunks that the kit prints were `task` and `task_result` chunks. The kit does not print the last two. This manual records the disagreement as conflict D124. The `checkpoints` mode is not in the kit, and it comes in the next edition, as [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) says.
+LangGraph 的流式输出页面说，`tasks` 模式需要 checkpointer {{docs oss/python/langgraph/streaming}}。录制工具包在没有 checkpointer 的情况下运行了 `tasks` 和 `debug`，各得到六个块。没有 checkpointer 时，录制工具包打印出的四个 `debug` 块是 `task` 和 `task_result` 块，后两个它没有打印。本手册把这处分歧记为冲突 D124。`checkpoints` 模式不在录制工具包里，它会在下一版出现，见[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)。
 
-## Several modes at once
+## 同时使用多种模式 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-several-modes-at-once}
 
-Pass a list of modes, and each v1 chunk becomes a tuple of the mode and the data. Code written for one mode breaks when a second mode is added:
+传入一个模式列表，每个 v1 块就变成由模式和数据组成的元组。为单一模式写的代码，在加入第二个模式后会坏掉：
 
 ```listing
-title: two modes in v1
+title: v1 中的两种模式
 source: capture/out/22-stream-messages.txt
 lang: json
-note: The kit printed the mode, the text, and the node of each tuple. Chunks 3 to 14 are cut.
+note: 录制工具包打印了每个元组的模式、文本和节点。第 3 到 14 个块被截掉。
 ---
 chunk 0:
 {
@@ -141,19 +141,19 @@ chunk 15:
 }
 ```
 
-The `messages` chunks of a model call come before the `updates` chunk of the same node. The node must end before LangGraph knows what it wrote.
+一次模型调用的 `messages` 块，先于同一节点的 `updates` 块到达。节点必须先结束，LangGraph 才知道它写了什么。
 
-## StreamPart in v2
+## v2 中的 StreamPart {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-streampart-in-v2}
 
-**StreamPart:** the dict that `stream(..., version="v2")` yields, with three keys: `type`, `ns`, and `data`. `type` names the mode, and `ns` names the subgraph.
+**StreamPart：** `stream(..., version="v2")` 产出的字典，有三个键：`type`、`ns` 和 `data`。`type` 是模式名，`ns` 是子图名。
 
-LangGraph 1.1 added `version="v2"` {{docs oss/python/langgraph/streaming}}. Every chunk then has the same three keys, with one mode or with several:
+LangGraph 1.1 加入了 `version="v2"` {{docs oss/python/langgraph/streaming}}。此后无论一种模式还是多种模式，每个块都有同样的三个键：
 
 ```listing
-title: one StreamPart in v2
+title: v2 中的一个 StreamPart
 source: capture/out/24-stream-v2.txt
 lang: json
-note: The state update is cut. The kit added the keys list.
+note: 状态更新被截掉。键列表是录制工具包加的。
 ---
 part 2:
 {
@@ -170,10 +170,10 @@ part 2:
 }
 ```
 
-`invoke(..., version="v2")` returns a `GraphOutput` with `value` and `interrupts`. The old dict access still works, and it warns:
+`invoke(..., version="v2")` 返回一个 `GraphOutput`，带 `value` 和 `interrupts`。旧的字典访问方式仍然可用，但会给出警告：
 
 ```listing
-title: dict access on GraphOutput
+title: 对 GraphOutput 做字典访问
 source: capture/out/24-stream-v2.txt
 lang: text
 ---
@@ -182,27 +182,27 @@ result['messages'] has 4 messages
 warning LangGraphDeprecatedSinceV11: Accessing GraphOutput via `result[key]` is deprecated. Use `result.value` to access the output value directly, or `result.interrupts` for interrupts. Deprecated in LangGraph V1.1 to be removed in V3.0.
 ```
 
-Use v2 in new code. A loop that switches on `part["type"]` keeps working when you add a mode or a subgraph. [Figure](#fig-5-1b) sets the three shapes side by side.
+新代码用 v2。按 `part["type"]` 分支的循环，在你加一种模式或一个子图时仍然能用。[图](#fig-5-1b)把三种形状并排放在一起。
 
 ```figure
 id: fig-5-1b
 kind: comparison
-title: the same tool result in v1, v2, and v3
-claim: v1 changes its shape with the number of modes, v2 always yields type, ns, and data, and v3 adds a method and a sequence number.
-caption: Each column is one stream API. Read the outer shape at the top, then the tool result that it carries. From capture/out/22-stream-messages.txt, capture/out/24-stream-v2.txt, and capture/out/25-stream-events-v3.events.json.
+title: 同一个工具结果在 v1、v2 和 v3 中的样子
+claim: v1 的形状随模式数量变化，v2 总是产出 type、ns 和 data，v3 再加上一个 method 和一个序号。
+caption: 每一列是一种流 API。先看顶部的外层形状，再看它携带的工具结果。来源：capture/out/22-stream-messages.txt、capture/out/24-stream-v2.txt 和 capture/out/25-stream-events-v3.events.json。
 ```
 
-## stream_events v3
+## stream_events v3 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-stream-events-v3}
 
-**GraphRunStream:** the object that `stream_events(..., version="v3")` returns. You iterate it for raw events, or read its typed views such as `messages`, `values`, and `output`.
+**GraphRunStream：** `stream_events(..., version="v3")` 返回的对象。你可以遍历它取原始事件，也可以读它的类型化视图，例如 `messages`、`values` 和 `output`。
 
-The LangChain streaming page recommends event streaming for new applications {{docs oss/python/langchain/streaming}}. At the pin it is beta, and the call warns:
+LangChain 的流式输出页面建议新应用使用事件流 {{docs oss/python/langchain/streaming}}。在锁定版本上它是 beta，调用时会给出警告：
 
 ```listing
-title: stream_events v3 and its members
+title: stream_events v3 及其成员
 source: capture/out/25-stream-events-v3.txt
 lang: text
-note: The list of members is cut to five.
+note: 成员列表被截成五项。
 ---
 warning LangChainBetaWarning: The v3 streaming protocol on Pregel is experimental.
 
@@ -220,10 +220,10 @@ public members of GraphRunStream:
 23 events
 ```
 
-Each event has a `method`, a `params` object with a namespace and a time, and a sequence number `seq`. The tool call of the run is two events of the method `tools`:
+每个事件有一个 `method`、一个带命名空间和时间的 `params` 对象，以及一个序号 `seq`。这次运行的工具调用是两个 `tools` 方法的事件：
 
 ```listing
-title: one v3 event
+title: 一个 v3 事件
 source: capture/out/25-stream-events-v3.events.json
 lang: json
 ---
@@ -247,16 +247,16 @@ lang: json
   },
 ```
 
-A model call is a group of `messages` events: `message-start`, `content-block-start`, the deltas, `content-block-finish`, and `message-finish`. The first call had one `content-block-delta` of type `tool-call-delta`, which carried the whole call. The second had eight of type `text-delta`, one for each piece of text. A `values` event follows each step. That is 23 events for the run, against 13 chunks in `messages` mode.
+一次模型调用是一组 `messages` 事件：`message-start`、`content-block-start`、若干 delta、`content-block-finish` 和 `message-finish`。第一次调用只有一个 `tool-call-delta` 类型的 `content-block-delta`，它带着整个调用。第二次调用有八个 `text-delta` 类型的 delta，每段文本一个。每一步之后跟一个 `values` 事件。这次运行共 23 个事件，而 `messages` 模式只有 13 个块。
 
-Three differences from v1 and v2 break code that you port:
+有三处与 v1、v2 不同，移植代码时会出问题：
 
-- `stream_events(version="v3")` rejects `stream_mode` with a `TypeError`, because v3 builds its own set of modes.
-- The sync `stream_events(version="v2")` raises `NotImplementedError`. Use `astream_events` for v1 and v2 events.
-- The AI messages in `run.output` have their content as a list of standard blocks, with `output_version` `v1` in `response_metadata`. In v1 and v2 the same messages had string content.
+- `stream_events(version="v3")` 会拒绝 `stream_mode`，抛出 `TypeError`，因为 v3 自己构建模式集合。
+- 同步的 `stream_events(version="v2")` 会抛出 `NotImplementedError`。要拿 v1 和 v2 的事件，请用 `astream_events`。
+- `run.output` 里的 AI 消息，内容是标准块的列表，`response_metadata` 里的 `output_version` 为 `v1`。在 v1 和 v2 里，同样的消息内容是字符串。
 
 ```listing
-title: the last message of run.output
+title: run.output 的最后一条消息
 source: capture/out/25-stream-events-v3.txt
 lang: json
 ---
@@ -277,16 +277,16 @@ lang: json
     },
 ```
 
-Read the text of such a message with `message.text`, which works for both forms, as [section 3.3](#s-messages-and-content-blocks) shows.
+用 `message.text` 读这类消息的文本，两种形式都适用，见[第 3.3 节](#s-messages-and-content-blocks)。
 
-## The tools mode
+## tools 模式 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-the-tools-mode}
 
-**Tool event:** a chunk of the `tools` stream mode. It is `tool-started`, `tool-output-delta`, or `tool-finished`, and it carries the `tool_call_id`.
+**工具事件（tool event）：** `tools` 流模式的一个块。它是 `tool-started`、`tool-output-delta` 或 `tool-finished` 之一，并带有 `tool_call_id`。
 
-The type `StreamMode` lists seven modes, and the `stream` docstring lists the same seven {{code libs/langgraph/langgraph/types.py}}. The loop also accepts `tools` {{code libs/langgraph/langgraph/pregel/main.py}}. The LangGraph streaming page does not list it either {{docs oss/python/langgraph/streaming}}. This manual records the gap as conflict D4. A tool sends a delta with `runtime.emit_output_delta`:
+类型 `StreamMode` 列出七种模式，`stream` 的文档字符串列出同样的七种 {{code libs/langgraph/langgraph/types.py}}。循环代码还接受 `tools` {{code libs/langgraph/langgraph/pregel/main.py}}。LangGraph 的流式输出页面也没有列出它 {{docs oss/python/langgraph/streaming}}。本手册把这个缺口记为冲突 D4。工具用 `runtime.emit_output_delta` 发出 delta：
 
 ```listing
-title: a tool that reports progress
+title: 一个汇报进度的工具
 source: capture/s_stream.py
 lang: python
 ---
@@ -299,10 +299,10 @@ def slow_sum(a: int, b: int, runtime: ToolRuntime) -> int:
 ```
 
 ```listing
-title: the tools mode
+title: tools 模式
 source: capture/out/26-stream-tools-mode.txt
 lang: json
-note: The finished event is cut to its first lines.
+note: finished 事件被截成只剩开头几行。
 ---
 chunk 0:
 {
@@ -330,36 +330,36 @@ chunk 3:
   "tool_call_id": "<uuid-1>",
 ```
 
-In a stream without `tools` mode, `emit_output_delta` does nothing. The kit streamed the same agent in `updates` mode and got the three node chunks only. In v2, a tool event is a StreamPart with `type` `tools`.
+不带 `tools` 模式的流里，`emit_output_delta` 什么也不做。录制工具包用 `updates` 模式流式运行同一个 agent，只得到三个节点块。在 v2 里，工具事件是 `type` 为 `tools` 的 StreamPart。
 
-## Delivery delay of each stream API
+## 各流 API 的送达延迟 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-delivery-delay-of-each-stream-api}
 
-**Delivery delay:** the time from the moment the model server sends a token to the moment your loop sees it, on one clock.
+**送达延迟（delivery delay）：** 在同一个时钟下，从模型服务器发出 token，到你的循环看到它之间的时间。
 
-**We measured** delivery delay on the Mac, an Apple M1 Max with 10 cores and 64 GiB, for nine ways to stream one agent. Qwen3 4B on Ollama streamed each reply through a proxy on 127.0.0.1 that stamped each line as it passed it on. Each API ran 24 times for a text reply of 80 tokens, about 32 ms apart. It also ran 24 times for one tool call followed by a one-sentence answer. Other work ran on the machine, with a load average of 1.4 to 6.2.
+**我们测得**九种流式运行同一个 agent 的送达延迟，环境是 Mac，Apple M1 Max，10 核，64 GiB。Ollama 上的 Qwen3 4B 把每条回复流经 127.0.0.1 上的一个代理，代理在转发每一行时打上时间戳。每种 API 对 80 个 token 的文本回复运行 24 次，token 间隔约 32 毫秒。它还对“一次工具调用加一句话回答”的场景运行 24 次。机器上同时有其他任务，负载均值在 1.4 到 6.2 之间。
 
-Eight of the nine APIs delivered the tokens one at a time, at the gaps that the server used. The median first-token delay of a text reply was 1.28 to 3.46 ms, and the worst p95 was 7.63 ms. The request reached the proxy 3.8 to 10.5 ms after the call. A claim on the web says that LangGraph streaming adds 100 to 300 ms to the first token. It does not hold here, and this manual records it as conflict D211.
+九种 API 里有八种按服务器使用的间隔，一个个送出 token。文本回复的首 token 延迟中位数是 1.28 到 3.46 毫秒，最差的 p95 是 7.63 毫秒。请求在调用后 3.8 到 10.5 毫秒到达代理。网上有一种说法，称 LangGraph 的流式输出会给首个 token 增加 100 到 300 毫秒。这里不成立，本手册把它记为冲突 D211。
 
-The layers cost CPU time, and they add no delay that you can see. The CPU times below are indicative, not absolute costs, because other work ran on the machine. One run of 80 tokens used 63.4 ms of CPU in a plain `openai` loop and 80.3 ms in `ChatOpenAI.stream`. Through the agent it used 102.3 to 140.4 ms. A run with a tool call and a short answer used 20.1 ms in the plain loop and 41.0 to 49.0 ms through the agent.
+这些层消耗 CPU 时间，但没有增加你能察觉的延迟。下面的 CPU 时间只是参考值，不是绝对成本，因为机器上同时有其他任务。80 个 token 的一次运行，在纯 `openai` 循环里用了 63.4 毫秒 CPU，在 `ChatOpenAI.stream` 里用了 80.3 毫秒。通过 agent 运行用了 102.3 到 140.4 毫秒。带一次工具调用和一句短回答的运行，在纯循环里用了 20.1 毫秒，通过 agent 用了 41.0 到 49.0 毫秒。
 
-A tool call delayed the final text only by the tool round trip. Ollama sent each tool call in one chunk, and the chunk reached the loop 1.9 to 9.4 ms after the send. On the second request, the first token reached the loop 1.74 to 3.69 ms after the send. The rose row of [figure](#fig-5-1c) is the exception.
+工具调用让最终文本晚到的时间，只有工具往返那么久。Ollama 把每个工具调用放在一个块里发出，这个块在发出后 1.9 到 9.4 毫秒到达循环。第二次请求里，首个 token 在发出后 1.74 到 3.69 毫秒到达循环。[图](#fig-5-1c)里玫红色的一行是例外。
 
 ```figure
 id: fig-5-1c
 kind: chart
-title: first-token delivery delay of each run, by stream API
-claim: Eight of the nine stream APIs deliver the first token about 2 ms after the send, and the loop that reads reasoning first waits 2,663 ms.
-caption: Each row is one stream API, and each dot is one run of 80 tokens of Qwen3 4B, 24 per API, on a log scale. The tick is the median, also printed on the right. From capture/lab/summary/streaming-mac-real.json.
+title: 按流 API 划分的每次运行的首 token 送达延迟
+claim: 九种流 API 里有八种在发出后约 2 毫秒送达首 token，而先读 reasoning 的循环要等 2,663 毫秒。
+caption: 每一行是一种流 API，每个点是一次 80 个 token 的 Qwen3 4B 运行，每种 API 24 次，坐标为对数刻度。刻线是中位数，也印在右侧。来源：capture/lab/summary/streaming-mac-real.json。
 ```
 
-## Projections of one v3 message
+## 一条 v3 消息的投影 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-projections-of-one-v3-message}
 
-**Projection:** a typed view of one v3 message, such as `message.text`, `message.reasoning`, or `message.tool_calls`, that yields its own deltas.
+**投影（projection）：** 一条 v3 消息的类型化视图，例如 `message.text`、`message.reasoning` 或 `message.tool_calls`，它产出自己的 delta。
 
-Issue langchain#38484 reports that a v3 consumer gets the final answer in one burst {{issue langchain#38484}}. Our runs reproduce it. The order in which the loop reads the projections sets it off, and the cause is in the projection code. The rose row of [figure](#fig-5-1c) reads `message.reasoning`, then `message.text`, as the issue does:
+issue langchain#38484 报告说，v3 的消费方会一次性拿到最终答案 {{issue langchain#38484}}。我们的运行复现了这一点。触发它的是循环读取各投影的顺序，原因在投影代码里。[图](#fig-5-1c)里玫红色的一行先读 `message.reasoning`，再读 `message.text`，与该 issue 一致：
 
 ```listing
-title: a loop that reads reasoning before text
+title: 先读 reasoning 再读 text 的循环
 source: capture/lab/T04-streaming-mac-real/t04_run.py
 lang: python
 ---
@@ -371,40 +371,40 @@ lang: python
                 rec.on_text(d, label)
 ```
 
-Qwen3 4B Instruct sends no reasoning, and the reasoning loop still ends only when the message ends. Then the 80 text tokens arrive at once, 2,663 ms late at the median.
+Qwen3 4B Instruct 不发 reasoning，但 reasoning 循环仍然要等到消息结束才会结束。随后 80 个文本 token 一次到齐，中位数晚了 2,663 毫秒。
 
-## Why the second projection waits
+## 为什么第二个投影要等 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-why-the-second-projection-waits}
 
-A v3 stream runs no background thread. The reader pulls it. When a projection such as `message.text` has no new delta in its list, its iterator runs the graph until the next event arrives {{code libs/core/langchain_core/language_models/chat_model_stream.py:247-269}} {{code libs/langgraph/langgraph/stream/run_stream.py:136-160}}. Each pulled event goes to every projection of its message. A text delta goes into the list of `message.text`, even while nobody reads that list.
+v3 流不运行后台线程，由读取方来拉取。当 `message.text` 这样的投影，列表里没有新的 delta 时，它的迭代器会运行图，直到下一个事件到来 {{code libs/core/langchain_core/language_models/chat_model_stream.py:247-269}} {{code libs/langgraph/langgraph/stream/run_stream.py:136-160}}。每个被拉取的事件会送给它所属消息的每个投影。一个文本 delta 会进入 `message.text` 的列表，即使此时没人读这个列表。
 
-A projection iterator stops only when its projection is marked done. All three projections of a message are marked done in one place, when the whole message finishes {{code libs/core/langchain_core/language_models/chat_model_stream.py:1092-1094}}. The end of the reasoning block closes that block, and it does not complete `message.reasoning` {{code libs/core/langchain_core/language_models/chat_model_stream.py:962-976}}.
+投影迭代器只在它的投影被标记为完成时才停止。一条消息的三个投影，在同一个地方、也就是整条消息结束时，一并被标记为完成 {{code libs/core/langchain_core/language_models/chat_model_stream.py:1092-1094}}。reasoning 块的结束只会关闭这个块，不会让 `message.reasoning` 完成 {{code libs/core/langchain_core/language_models/chat_model_stream.py:962-976}}。
 
-So the reasoning loop cannot end before the last text token arrives. While it waits, it pulls every text delta into the list of `message.text`. When the message ends, the text loop finds all of them there at once. [Section 2.5](#s-where-each-stream-mode-comes-from) follows this path through the code.
+所以在最后一个文本 token 到达之前，reasoning 循环无法结束。它等待的同时，把每个文本 delta 拉进 `message.text` 的列表。消息结束时，文本循环发现它们已经全在那里。[第 2.5 节](#s-where-each-stream-mode-comes-from)沿着代码追踪了这条路径。
 
-**We measured** the cause on the x86 server guest with Qwen3 8B, reasoning on, through `create_agent`. Three sync v3 loops ran 5 times each, interleaved. Each reply had 211 reasoning deltas, then 60 text deltas. In 5 of 5 runs, the loop that read reasoning first got all 60 text deltas within 0.1 ms. The model had sent the whole reply over 8.64 to 8.89 s. 
+**我们测得**原因，环境是 x86 服务器客户机，Qwen3 8B，开启 reasoning，通过 `create_agent` 运行。三个同步 v3 循环交替各运行 5 次。每条回复有 211 个 reasoning delta，随后是 60 个文本 delta。5 次运行全部如此：先读 reasoning 的循环，在 0.1 毫秒内拿到全部 60 个文本 delta。而模型发完整条回复用了 8.64 到 8.89 秒。
 
-This is one machine under load, so read it as an order. The Mac rows below give the lag as 4.0 to 8.5 s.
+这是一台负载下的机器，所以只把它当作数量级来读。下面 Mac 的几行给出的延迟是 4.0 到 8.5 秒。
 
-The loop over `message.text` alone got each delta with a median lag of 0.7 ms and a maximum of 4.9 ms. The loop over the raw events of each message had a median of 0.7 ms and a maximum of 0.9 ms.
+只遍历 `message.text` 的循环，每个 delta 的延迟中位数是 0.7 毫秒，最大 4.9 毫秒。遍历每条消息原始事件的循环，中位数 0.7 毫秒，最大 0.9 毫秒。
 
-**We measured** the same burst on the Mac with Qwen3 8B and reasoning on, five async v3 loops, 5 runs each. Each reply had 763 reasoning deltas and 62 text deltas. The loop in the order of the docs and the `asyncio.gather` loop of the issue got all 62 text deltas within 0.2 ms. That burst came 4.0 to 8.5 s after the first text delta was sent, in 10 of 10 runs. A loop over `message.text` only, and a loop over the raw events, saw each text delta at most 15.3 ms after its send. [Figure](#fig-5-1d) puts one run of Qwen3 4B on a time axis for two of the loops.
+**我们测得**同样的突发现象，环境是 Mac，Qwen3 8B，开启 reasoning，五个异步 v3 循环，各运行 5 次。每条回复有 763 个 reasoning delta 和 62 个文本 delta。按文档顺序读取的循环，以及 issue 里的 `asyncio.gather` 循环，都在 0.2 毫秒内拿到全部 62 个文本 delta。10 次运行全部如此，这次突发出现在首个文本 delta 发出后 4.0 到 8.5 秒。只读 `message.text` 的循环和读原始事件的循环，看到每个文本 delta 最多比发出时晚 15.3 毫秒。[图](#fig-5-1d)把 Qwen3 4B 的一次运行，按其中两个循环放到时间轴上。
 
 ```figure
 id: fig-5-1d
 kind: timeline
-title: when each token was sent and seen, in two async v3 loops
-claim: A v3 loop that reads reasoning first sees all 80 tokens at once at 4,052 ms, and a text-only loop sees each as sent.
-caption: The top pair is a loop over message.text only, and the bottom pair reads message.reasoning first. Olive ticks are sends by Qwen3 4B on Ollama, and the other ticks are the moments the loop saw a token. From capture/lab/summary/streaming-mac-real.json.
+title: 两个异步 v3 循环里每个 token 的发出和看到时刻
+claim: 先读 reasoning 的 v3 循环在 4,052 毫秒时一次性看到全部 80 个 token，只读文本的循环则按发出时间逐个看到。
+caption: 上面一对是只遍历 message.text 的循环，下面一对先读 message.reasoning。橄榄色刻线是 Ollama 上 Qwen3 4B 的发出时刻，其他刻线是循环看到 token 的时刻。来源：capture/lab/summary/streaming-mac-real.json。
 ```
 
-The order matters for the other projections too. In the tool phase, the docs loop reads `message.text` and then `message.tool_calls`. Ollama sends a call in one chunk, so with Qwen3 4B the docs loop saw the call 7.9 ms after the send at the median. Its async form saw it after 9.4 ms, and the plain loop after 1.9 ms.
+顺序对其他投影也有影响。在工具阶段，文档里的循环先读 `message.text`，再读 `message.tool_calls`。Ollama 把调用放在一个块里发出，所以对 Qwen3 4B，文档循环在发出后中位数 7.9 毫秒看到调用。它的异步形式用了 9.4 毫秒，纯循环用了 1.9 毫秒。
 
-**We measured** the order with a real reasoning model on the Mac: `ChatOllama` with Qwen3 4B and `reasoning=True`, 3 runs per order. With reasoning first, 484 reasoning deltas streamed live. Then all 103 text deltas arrived at one instant, 3,424 to 4,036 ms after the last reasoning delta. With text first, the text streamed, and the reasoning arrived in one burst at the end. Qwen3 8B did the same in 5 runs. With text first, its 763 reasoning deltas arrived within 2 ms at the end, 57 to 112 s late.
+**我们测得**不同顺序的影响，用的是真实的 reasoning 模型，环境是 Mac：`ChatOllama` 加 Qwen3 4B 和 `reasoning=True`，每种顺序 3 次运行。先读 reasoning 时，484 个 reasoning delta 实时流出。随后全部 103 个文本 delta 在同一时刻到达，比最后一个 reasoning delta 晚 3,424 到 4,036 毫秒。先读 text 时，文本实时流出，reasoning 在最后一次性到达。Qwen3 8B 在 5 次运行里表现相同。先读 text 时，它的 763 个 reasoning delta 在 2 毫秒内于末尾到齐，晚了 57 到 112 秒。
 
-The reasoning examples of the LangChain streaming pages read `message.reasoning` first, and then `message.text` {{docs oss/python/langchain/streaming}} {{docs oss/python/langchain/event-streaming}}. With a reasoning model, those examples show the answer only after the whole message. The LangGraph page says to read the raw events when you need every delta in arrival order {{docs oss/python/langgraph/event-streaming}}. The raw loop of the lab does that, and it streamed every token in [figure](#fig-5-1c):
+LangChain 流式输出页面的 reasoning 示例，都是先读 `message.reasoning`，再读 `message.text` {{docs oss/python/langchain/streaming}} {{docs oss/python/langchain/event-streaming}}。对 reasoning 模型来说，这些示例要等整条消息结束才显示答案。LangGraph 页面说，需要按到达顺序拿到每个 delta 时，应读原始事件 {{docs oss/python/langgraph/event-streaming}}。实验记录里的原始事件循环就是这么做的，它在[图](#fig-5-1c)里实时流出了每个 token：
 
 ```listing
-title: a loop over the raw v3 events
+title: 遍历原始 v3 事件的循环
 source: capture/lab/T04-streaming-mac-real/t04_run.py
 lang: python
 ---
@@ -424,17 +424,17 @@ def run_v3_raw(ctx, model, scenario, tag, rec):
             rec.on_text(d.get("text", ""), "raw")
 ```
 
-Its first tool call delta arrived 4.4 ms after the send, and its text 2.4 ms after the send.
+它的第一个工具调用 delta 在发出后 4.4 毫秒到达，文本在发出后 2.4 毫秒到达。
 
-## The consumer to write
+## 该写的消费方 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-the-consumer-to-write}
 
-Pick one of two shapes. When you show only the answer, read `message.text` alone. When you show the reasoning and the answer, iterate the raw events of each message and switch on the delta type. Each delta then reaches your UI in the order the model sent it. This is the loop of the x86 runs above:
+二选一。只显示答案时，只读 `message.text`。既显示 reasoning 又显示答案时，遍历每条消息的原始事件，按 delta 类型分支。这样每个 delta 都按模型发出的顺序到达你的界面。上面 x86 的运行用的就是这个循环：
 
 ```listing
-title: a consumer that shows reasoning and text as they arrive
+title: 一个随到随显示 reasoning 和文本的消费方
 source: capture/lab/internals/05-streaming/run.py
 lang: python
-note: The branches of the other two loops are cut.
+note: 另外两个循环的分支被截掉了。
 ---
     stream = agent.stream_events({"messages": [{"role": "user", "content": PROMPT_38484}]}, version="v3")
     for message in stream.messages:
@@ -446,19 +446,19 @@ note: The branches of the other two loops are cut.
                     got.append((now(), kind, delta.get("reasoning") or delta.get("text")))
 ```
 
-Do not read two projections of one message one after the other. A projection that you read second always waits for the end of the message. The rule holds for `message.tool_calls` too, as the tool phase above showed. A task for each projection could also work, and [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) lists it as not run.
+不要在同一条消息上一个接一个地读两个投影。后读的那个投影总要等到消息结束。这条规则对 `message.tool_calls` 同样成立，上面的工具阶段已经说明。为每个投影开一个任务也许可行，[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)把它列为没有运行的项目。
 
-A closed pull request for the issue, #38533, passed the run config to `model_.invoke` in `create_agent` {{code libs/langchain_v1/langchain/agents/factory.py:1509}}. That change does not touch the projection code. In the same agent, the text-only and raw loops already got every delta live. So do not wait for a fix in `create_agent`.
+这个 issue 有一个已关闭的拉取请求 #38533，它让 `create_agent` 把运行配置传给 `model_.invoke` {{code libs/langchain_v1/langchain/agents/factory.py:1509}}。这个改动没有碰投影代码。在同一个 agent 里，只读文本的循环和原始事件循环本来就能实时拿到每个 delta。所以不要等 `create_agent` 的修复。
 
-## How a real model streams a tool call
+## 真实模型如何流出工具调用 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-how-a-real-model-streams-a-tool-call}
 
-`ChatOllama` sends each tool call whole, with its id, on one chunk. Its `tool_call_chunks` entry has the full arguments as one string and the `index` `null`. An empty chunk marked `chunk_position="last"` ends the reply:
+`ChatOllama` 把每个工具调用连同它的 id 整个放在一个块里发出。它的 `tool_call_chunks` 条目里，完整参数是一个字符串，`index` 是 `null`。一个标为 `chunk_position="last"` 的空块结束这条回复：
 
 ```listing
-title: the chunk that carries the tool call
+title: 携带工具调用的那个块
 source: capture/out/27-stream-tool-call-chunks.txt
 lang: json
-note: The usage and the metadata are cut.
+note: 用量和元数据被截掉了。
 ---
 13 chunks, 1 with tool_call_chunks
 …
@@ -473,18 +473,18 @@ note: The usage and the metadata are cut.
       ],
 ```
 
-The kit also asked the model to write `Let me add.` before the call. Four text chunks came first, then the chunk with the call, then the empty `last` chunk. So the call never rides on the chunk marked `last`, and v3 got one `tool-call-delta` for it. A model or a fake that splits the arguments and ends on a flagged chunk loses the last piece under v3, as [section 3.4](#s-tools-toolruntime-and-tool-errors) shows.
+录制工具包还让模型在调用前先写 `Let me add.`。结果先到四个文本块，然后是带调用的块，最后是空的 `last` 块。所以调用从不放在标为 `last` 的块上，v3 为它只给出一个 `tool-call-delta`。如果某个模型或测试替身把参数拆开，并以带标记的块收尾，在 v3 下会丢掉最后一段，见[第 3.4 节](#s-tools-toolruntime-and-tool-errors)。
 
 ```takeaways
-- Use version="v2" and switch on part["type"], so a new mode does not change the shape.
-- Expect messages mode to yield the ToolMessage as well as the model tokens.
-- Pass a checkpointer only when you need checkpoints, because tasks and debug work without one.
-- Add "tools" to stream_mode to get tool progress from emit_output_delta.
-- Treat stream_events v3 as beta, and read message.text for content in either form.
-- Test streaming against a real model, because a fake decides how a tool call is chunked.
-- Read the raw v3 events, or one projection per message, when tokens must arrive live.
-- Never read message.reasoning before message.text in one loop, because every projection ends with the message.
-- Expect about 2 ms of delivery delay from eight of the nine stream APIs on one machine.
+- 使用 version="v2" 并按 part["type"] 分支，这样新增模式不会改变形状。
+- 预期 messages 模式除了模型 token，还会产出 ToolMessage。
+- 只在需要检查点时才传 checkpointer，因为 tasks 和 debug 没有它也能工作。
+- 在 stream_mode 里加上 "tools"，就能拿到 emit_output_delta 发出的工具进度。
+- 把 stream_events v3 当作 beta，并用 message.text 读内容，两种形式都适用。
+- 用真实模型测试流式输出，因为测试替身决定了工具调用如何分块。
+- 需要 token 实时到达时，读原始 v3 事件，或者每条消息只读一个投影。
+- 在同一个循环里不要先读 message.reasoning 再读 message.text，因为每个投影都随消息结束才结束。
+- 在同一台机器上，九种流 API 里有八种的送达延迟约为 2 毫秒。
 ```
 
-Sources: capture/s_stream.py, capture/out/21-stream-updates-values.txt, capture/out/22-stream-messages.txt, capture/out/23-stream-tasks-custom-debug.txt, capture/out/24-stream-v2.txt, capture/out/25-stream-events-v3.txt, capture/out/25-stream-events-v3.events.json, capture/out/26-stream-tools-mode.txt, capture/out/27-stream-tool-call-chunks.txt; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/pregel/main.py, and libs/langgraph/langgraph/pregel/_tools.py at langgraph 1.2.22; libs/partners/ollama/langchain_ollama/chat_models.py at langchain-ollama 1.1.0; capture/lab/summary/streaming-mac-real.json, capture/lab/T04-streaming-mac-real/real_text-per-run.jsonl, capture/lab/T04-streaming-mac-real/real_tool-per-run.jsonl, capture/lab/T04-streaming-mac-real/03-iso38484-qwen3-8b.jsonl, capture/lab/T04-streaming-mac-real/real_text-runs-excerpt.jsonl, capture/lab/T04-streaming-mac-real/real_text-server-excerpt.jsonl, capture/lab/T04-streaming-mac-real/t04_run.py, capture/lab/T04-streaming-mac-real/t04_stream_server.py, capture/lab/T04-streaming-mac-real/t04_iso_real.py; capture/lab/summary/streaming-mac.json, capture/lab/T04-streaming-mac/reasoning-ollama-runs.jsonl; capture/lab/internals/05-streaming/run.py, capture/lab/internals/05-streaming/trace.txt, capture/lab/internals/05-streaming/v3_38484.json; libs/core/langchain_core/messages/ai.py, libs/core/langchain_core/language_models/_compat_bridge.py, and libs/core/langchain_core/language_models/chat_model_stream.py at langchain-core 1.8.0; libs/langgraph/langgraph/stream/run_stream.py at langgraph 1.2.22; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0; issue langchain#38484 and pull request #38533; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/streaming, oss/python/langchain/streaming, oss/python/langchain/event-streaming, oss/python/langgraph/event-streaming).
+来源：capture/s_stream.py, capture/out/21-stream-updates-values.txt, capture/out/22-stream-messages.txt, capture/out/23-stream-tasks-custom-debug.txt, capture/out/24-stream-v2.txt, capture/out/25-stream-events-v3.txt, capture/out/25-stream-events-v3.events.json, capture/out/26-stream-tools-mode.txt, capture/out/27-stream-tool-call-chunks.txt; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/pregel/main.py, and libs/langgraph/langgraph/pregel/_tools.py at langgraph 1.2.22; libs/partners/ollama/langchain_ollama/chat_models.py at langchain-ollama 1.1.0; capture/lab/summary/streaming-mac-real.json, capture/lab/T04-streaming-mac-real/real_text-per-run.jsonl, capture/lab/T04-streaming-mac-real/real_tool-per-run.jsonl, capture/lab/T04-streaming-mac-real/03-iso38484-qwen3-8b.jsonl, capture/lab/T04-streaming-mac-real/real_text-runs-excerpt.jsonl, capture/lab/T04-streaming-mac-real/real_text-server-excerpt.jsonl, capture/lab/T04-streaming-mac-real/t04_run.py, capture/lab/T04-streaming-mac-real/t04_stream_server.py, capture/lab/T04-streaming-mac-real/t04_iso_real.py; capture/lab/summary/streaming-mac.json, capture/lab/T04-streaming-mac/reasoning-ollama-runs.jsonl; capture/lab/internals/05-streaming/run.py, capture/lab/internals/05-streaming/trace.txt, capture/lab/internals/05-streaming/v3_38484.json; libs/core/langchain_core/messages/ai.py, libs/core/langchain_core/language_models/_compat_bridge.py, and libs/core/langchain_core/language_models/chat_model_stream.py at langchain-core 1.8.0; libs/langgraph/langgraph/stream/run_stream.py at langgraph 1.2.22; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0; issue langchain#38484 and pull request #38533; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/streaming, oss/python/langchain/streaming, oss/python/langchain/event-streaming, oss/python/langgraph/event-streaming).

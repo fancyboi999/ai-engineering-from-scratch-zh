@@ -1,21 +1,21 @@
-# Checkpointers and threads: short-term memory
+# Checkpointer 与线程：短期记忆
 
-> A checkpointer saves the state of a thread after each step, so the next turn on the same `thread_id` starts from the last checkpoint, also after a restart.
+> checkpointer 在每一步之后保存线程的状态，所以同一个 `thread_id` 的下一轮会从最后一个检查点开始，重启之后也一样。
 
-You build a chat on `create_agent`, and the user asks "What did I ask you?". The agent has no idea, because each `invoke` started from an empty state. The model is not the cause. The agent keeps nothing between runs unless something saves the state.
+你在 `create_agent` 上搭了一个聊天应用，用户问“我问了你什么？”。agent 毫无头绪，因为每次 `invoke` 都从空状态开始。原因不在模型。除非有东西保存状态，否则 agent 在两次运行之间什么都留不下。
 
-When you finish this section, you can give an agent short-term memory, read a checkpoint, and size a Postgres saver for many threads.
+读完本节，你能给 agent 加上短期记忆、读取一个检查点，并为很多线程估算 Postgres saver 的规模。
 
-## A thread across two turns
+## 跨两轮的一个线程 {#s-checkpointers-and-threads-a-thread-across-two-turns}
 
-**Checkpointer:** an object that saves the graph state after each step and loads the latest checkpoint when the next run starts. `InMemorySaver`, `SqliteSaver`, and `PostgresSaver` are checkpointers.
+**Checkpointer：** 在每一步之后保存图状态，并在下一次运行开始时加载最新检查点的对象。`InMemorySaver`、`SqliteSaver` 和 `PostgresSaver` 都是 checkpointer。
 
-**Thread:** the series of checkpoints saved under one `thread_id`. A thread is the conversation, and each `invoke` on it is one turn.
+**线程（thread）：** 保存在同一个 `thread_id` 下的一系列检查点。线程就是对话，线程上的每次 `invoke` 是一轮。
 
-The kit runs two turns on the thread `memory-thread`:
+录制工具包在线程 `memory-thread` 上运行两轮：
 
 ```listing
-title: two turns on one thread
+title: 一个线程上的两轮
 source: capture/s_persist.py
 lang: python
 ---
@@ -27,10 +27,10 @@ def two_turns(cap, checkpointer, name):
     out = agent.invoke(ask("What did I ask you?"), cfg)
 ```
 
-The second turn passed one new message. The model got the whole first turn before it:
+第二轮只传了一条新消息。模型拿到的，是它前面的整个第一轮：
 
 ```listing
-title: what the model received on turn 2
+title: 模型在第 2 轮收到的内容
 source: capture/out/28-checkpoint-memory.txt
 lang: json
 ---
@@ -44,33 +44,33 @@ what the model received on turn 2:
 ]
 ```
 
-Qwen3 4B answered `You asked what 2 + 3 is, and I calculated that it equals 5.`.
+Qwen3 4B 回答了 `You asked what 2 + 3 is, and I calculated that it equals 5.`。
 
-So short-term memory is the message list in the checkpoint. The `add_messages` reducer appends the new human message to it, and every model call gets all of it. The cost of a long thread is in [section 5.5](#s-context-engineering-and-summarization).
+所以短期记忆就是检查点里的消息列表。`add_messages` reducer 把新的 human 消息追加进去，每次模型调用都会拿到全部消息。长线程的成本在[第 5.5 节](#s-context-engineering-and-summarization)。
 
-A run on a checkpointer needs a `thread_id`. Without one, the agent raises before it runs:
+在 checkpointer 上运行需要 `thread_id`。没有它，agent 在运行之前就会抛出错误：
 
 ```listing
-title: a checkpointer with no thread_id
+title: 没有 thread_id 的 checkpointer
 source: capture/out/28-checkpoint-memory.txt
 lang: text
 ---
 raised builtins.ValueError: Checkpointer requires one or more of the following 'configurable' keys: thread_id, checkpoint_ns, checkpoint_id
 ```
 
-A new `thread_id` starts empty. In the kit, a second agent on the same saver with the thread `other-thread` saw only its own question. Asked `What did I ask you?`, the model said that this was their first exchange. `delete_thread("memory-thread")` removed all 8 checkpoints of the first thread.
+新的 `thread_id` 从空开始。在录制工具包里，同一个 saver 上的第二个 agent 使用线程 `other-thread`，只看到自己的问题。问它 `What did I ask you?`，模型说这是它们的第一次交流。`delete_thread("memory-thread")` 删掉了第一个线程的全部 8 个检查点。
 
-You do not create a thread first. The first checkpoint creates it. The checkpointers page says that a thread must be created before a run, and that rule belongs to the Agent Server API {{docs oss/python/langgraph/checkpointers}}. This manual records it as conflict D118.
+你不需要先创建线程，第一个检查点会创建它。checkpointers 页面说线程必须在运行前创建，这条规则属于 Agent Server API {{docs oss/python/langgraph/checkpointers}}。本手册把这处分歧记为冲突 D118。
 
-## What a checkpoint holds
+## 检查点里有什么 {#s-checkpointers-and-threads-what-a-checkpoint-holds}
 
-**Checkpoint tuple:** what a checkpointer returns for one checkpoint: its `config`, its `metadata`, the `checkpoint` itself, the config of its parent, and its pending writes.
+**检查点元组（checkpoint tuple）：** checkpointer 为一个检查点返回的内容：它的 `config`、`metadata`、`checkpoint` 本身、父检查点的 config，以及待写入项。
 
 ```listing
-title: the latest checkpoint of the thread
+title: 线程的最新检查点
 source: capture/out/28-checkpoint-memory.txt
 lang: json
-note: The channel versions are cut.
+note: 通道版本被截掉。
 ---
 {
   "config": {
@@ -104,14 +104,14 @@ note: The channel versions are cut.
 }
 ```
 
-`channel_values` holds the state: here the `messages` list. `channel_versions` and `versions_seen` tell the loop which nodes have new input, so a resume runs the right node next. `checkpoint_ns` is empty for the top graph and names the parent node inside a subgraph.
+`channel_values` 保存状态，这里是 `messages` 列表。`channel_versions` 和 `versions_seen` 告诉循环哪些节点有了新输入，所以恢复时会运行正确的下一个节点。`checkpoint_ns` 对顶层图是空的，在子图里则是父节点的名字。
 
-## SqliteSaver across a restart
+## 跨重启的 SqliteSaver {#s-checkpointers-and-threads-sqlitesaver-across-a-restart}
 
-`InMemorySaver` keeps its checkpoints in the process. The persistence page says that they are gone when the process restarts {{docs oss/python/langgraph/persistence}}. Use it for tests. A file or a database keeps a thread across a restart. The kit runs two turns on `SqliteSaver`, closes the connection, then opens the file again with a new agent:
+`InMemorySaver` 把检查点放在进程里。persistence 页面说，进程重启时它们就没了 {{docs oss/python/langgraph/persistence}}。只在测试里用它。文件或数据库才能让线程在重启后仍然存在。录制工具包在 `SqliteSaver` 上运行两轮，关闭连接，再用一个新 agent 重新打开这个文件：
 
 ```listing
-title: open the file again and continue the thread
+title: 重新打开文件并继续线程
 source: capture/s_persist.py
 lang: python
 ---
@@ -120,10 +120,10 @@ lang: python
         out = agent.invoke(ask("Remind me what my first question was."), thread("sqlite-thread"))
 ```
 
-The third turn got all six earlier messages, and the model answered `Your first question was, "What is 2 + 3?"`. The file has two tables, `checkpoints` and `writes`:
+第三轮拿到了前面全部六条消息，模型回答了 `Your first question was, "What is 2 + 3?"`。文件里有两张表，`checkpoints` 和 `writes`：
 
 ```listing
-title: the two tables after three turns
+title: 三轮之后的两张表
 source: capture/out/29-checkpoint-sqlite.txt
 lang: text
 ---
@@ -132,46 +132,46 @@ checkpoints: 11 rows, columns ['thread_id', 'checkpoint_ns', 'checkpoint_id', 'p
 writes: 13 rows, columns ['thread_id', 'checkpoint_ns', 'checkpoint_id', 'task_id', 'task_path', 'idx', 'channel', 'type', 'value']
 ```
 
-**Pending write:** a value that a task wrote during a step, saved in the `writes` table under the checkpoint that the step started from. On a resume, LangGraph applies the pending writes of the last checkpoint and does not run those tasks again.
+**待写入项（pending write）：** 任务在一步中写出的值，保存在 `writes` 表里，归在这一步开始时所基于的检查点之下。恢复时，LangGraph 应用最后一个检查点的待写入项，不再重新运行这些任务。
 
-The loop saves each pending write in the background, as the task finishes, and it does not wait for that call {{code libs/langgraph/langgraph/pregel/_loop.py:523-551}}. So a pending write can reach the saver after the checkpoint of its own step. A trace in [section 2.3](#s-the-checkpoint-write-path-and-durability) shows a model write saved after that checkpoint, on `SqliteSaver` with `durability="sync"`. That order is harmless, because the checkpoint already holds the value. The window that matters comes earlier in a step, and [section 5.3](#s-durability-modes-and-a-crash-between-two-steps) measures it.
+任务一结束，循环就在后台保存它的每个待写入项，并且不等这次调用返回 {{code libs/langgraph/langgraph/pregel/_loop.py:523-551}}。所以待写入项可能在它所属那一步的检查点之后才到达 saver。[第 2.3 节](#s-the-checkpoint-write-path-and-durability)的一条追踪显示，在 `SqliteSaver` 和 `durability="sync"` 下，一次模型写入在该检查点之后才保存。这个顺序无害，因为检查点已经包含了这个值。真正要紧的窗口出现在一步的更早阶段，[第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)测量了它。
 
-Each turn starts with a checkpoint whose `source` is `input`, and the step count goes on across turns. [Figure](#fig-5-2) draws the 11 rows.
+每一轮都以 `source` 为 `input` 的检查点开始，步数在各轮之间继续累加。[图](#fig-5-2)画出了这 11 行。
 
 ```figure
 id: fig-5-2
 kind: timeline
-title: three turns of one thread in the SQLite file
-claim: Each turn adds an input checkpoint and then one loop checkpoint per step, and the step numbers keep counting across the turns and the restart.
-caption: Read left to right along the step axis. Each mark is one row of the checkpoints table. Amber marks are input checkpoints, teal marks are loop checkpoints. From capture/out/29-checkpoint-sqlite.txt.
+title: SQLite 文件里一个线程的三轮
+claim: 每一轮先增加一个输入检查点，再每步增加一个循环检查点，步号在各轮和重启之间持续累加。
+caption: 沿步轴从左向右读。每个标记是 checkpoints 表的一行。琥珀色标记是输入检查点，青色标记是循环检查点。来源：capture/out/29-checkpoint-sqlite.txt。
 ```
 
-Every row has the `type` `msgpack`. That is the serializer of the checkpoint, and [section 5.6](#s-serialization-of-state-and-what-does-not-round-trip) shows what it keeps.
+每一行的 `type` 都是 `msgpack`。那是检查点的序列化器，[第 5.6 节](#s-serialization-of-state-and-what-does-not-round-trip)会说明它保留了什么。
 
-## Many threads on one Postgres saver
+## 一个 Postgres saver 上的很多线程 {#s-checkpointers-and-threads-many-threads-on-one-postgres-saver}
 
-A server runs many threads at once on one checkpointer. The question is how many connections it needs.
+服务器在一个 checkpointer 上同时运行很多线程。问题是它需要多少个连接。
 
-**We measured** this on the x86 server guest, 32 vCPU and 48 GiB, with `AsyncPostgresSaver` on PostgreSQL 16.15 and Qwen3 4B on Ollama on CPU. One asyncio process ran 1, 4, 16, and 64 threads at once, two runs per cell, with one connection and with a pool of 20. Each thread ran two agent runs of two model calls and one tool call. All 680 runs answered right, with 0 errors. The model set the pace, at 0.42 to 0.44 model calls per second in every cell from 4 threads up. So 64 threads of two runs took 587 to 589 s, with one connection and with the pool.
+**我们测得**这一点，环境是 x86 服务器客户机，32 vCPU、48 GiB，用 PostgreSQL 16.15 上的 `AsyncPostgresSaver`，以及 CPU 上 Ollama 里的 Qwen3 4B。一个 asyncio 进程同时运行 1、4、16 和 64 个线程，每个单元格运行两次，分别用一个连接和一个 20 个连接的池。每个线程运行两次 agent，每次两个模型调用和一个工具调用。全部 680 次运行都答对了，0 个错误。节奏由模型决定：从 4 个线程起，每个单元格都是每秒 0.42 到 0.44 次模型调用。所以 64 个线程各两次运行，用一个连接和用池都花了 587 到 589 秒。
 
-The saver stayed fast at the median. `aput` took 2.8 to 4.5 ms and `aput_writes` 3.7 to 5.8 ms in every cell. At 64 threads, the p99 of `aput` was 318 and 450 ms with one connection, and 254 and 273 ms with the pool. The client measured these times, so they include the wait of the event loop. Keep them as client p99 values, and do not read the gap between the two setups as an effect of the pool. The pool opened up to 21 connections and had at most 3 active at a sample.
+saver 的中位数一直很快。每个单元格里，`aput` 用了 2.8 到 4.5 毫秒，`aput_writes` 用了 3.7 到 5.8 毫秒。在 64 个线程时，`aput` 的 p99 在一个连接下是 318 和 450 毫秒，在池下是 254 和 273 毫秒。这些时间由客户端测得，所以包含事件循环的等待。把它们当作客户端 p99 值，不要把两种配置之间的差距解读成池的效果。池最多打开了 21 个连接，一次采样中最多 3 个处于活跃状态。
 
 ```figure
 id: fig-5-2b
 kind: chart
-title: runs per second and checkpoint write p99 on one AsyncPostgresSaver, by threads
-claim: One connection and a pool of 20 both give 0.22 runs per second at 64 threads with Qwen3 4B, and the aput p99 does not separate them.
-caption: Each dot is one run, two runs per point. Each line joins the means of one connection setup. The left chart gives runs per second, and the right chart gives the p99 of aput in ms on a log scale. The x axis is the number of threads at once, on a log scale. From capture/lab/summary/concurrency-x86-real.json.
+title: 一个 AsyncPostgresSaver 上，按线程数划分的每秒运行数和检查点写入 p99
+claim: 一个连接和 20 个连接的池，在 64 个线程、Qwen3 4B 下都是每秒 0.22 次运行，aput 的 p99 也区分不出两者。
+caption: 每个点是一次运行，每个位置两次运行。每条线连接一种连接配置的均值。左图是每秒运行数，右图是 aput 的 p99，单位毫秒，对数刻度。x 轴是同时运行的线程数，对数刻度。来源：capture/lab/summary/concurrency-x86-real.json。
 ```
 
-With a model on CPU, the model limits throughput long before the saver does. Size the pool to the threads that run at once. Our p99 values do not show that the pool lowers the tail of checkpoint writes. A second run on a thread that is still running is a different problem, double texting, and [section 8.1](#s-agent-server-langgraph-dev-up-and-deploy) covers it on Agent Server.
+模型跑在 CPU 上时，吞吐量远在 saver 之前就被模型限制了。池的大小按同时运行的线程数来定。我们的 p99 数据没有显示池能降低检查点写入的尾部延迟。在仍在运行的线程上再发第二次运行，是另一个问题，叫双重发消息（double texting），[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)在 Agent Server 上讲它。
 
 ```takeaways
-- Pass a checkpointer and the same thread_id on every turn of a conversation.
-- Use InMemorySaver in tests only, because a restart loses its threads.
-- Start a new thread with a new thread_id, and remove one with delete_thread.
-- Read channel_values for the state and metadata step and source for the position in the thread.
-- Use a connection pool for AsyncPostgresSaver, and expect the model, not the saver, to limit throughput.
+- 传入 checkpointer，并在对话的每一轮使用同一个 thread_id。
+- InMemorySaver 只用于测试，因为重启会丢掉它的线程。
+- 用新的 thread_id 开始新线程，用 delete_thread 删除线程。
+- 读 channel_values 获取状态，读 metadata 里的 step 和 source 获取线程中的位置。
+- AsyncPostgresSaver 使用连接池，并预期限制吞吐量的是模型，而不是 saver。
 ```
 
-Sources: capture/s_persist.py, capture/common.py, capture/out/28-checkpoint-memory.txt, capture/out/29-checkpoint-sqlite.txt; capture/lab/summary/concurrency-x86-real.json, capture/lab/T16-concurrency-x86-real/01-levels.jsonl, capture/lab/T16-concurrency-x86-real/t16r_conc.py, capture/lab/internals/03-checkpoint/trace.txt; libs/langgraph/langgraph/pregel/_loop.py at langgraph 1.2.22; libs/checkpoint/langgraph/checkpoint/base/__init__.py, libs/checkpoint/langgraph/checkpoint/memory/__init__.py, and libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/persistence, oss/python/langgraph/checkpointers, oss/python/langchain/short-term-memory).
+来源：capture/s_persist.py, capture/common.py, capture/out/28-checkpoint-memory.txt, capture/out/29-checkpoint-sqlite.txt; capture/lab/summary/concurrency-x86-real.json, capture/lab/T16-concurrency-x86-real/01-levels.jsonl, capture/lab/T16-concurrency-x86-real/t16r_conc.py, capture/lab/internals/03-checkpoint/trace.txt; libs/langgraph/langgraph/pregel/_loop.py at langgraph 1.2.22; libs/checkpoint/langgraph/checkpoint/base/__init__.py, libs/checkpoint/langgraph/checkpoint/memory/__init__.py, and libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/persistence, oss/python/langgraph/checkpointers, oss/python/langchain/short-term-memory).
