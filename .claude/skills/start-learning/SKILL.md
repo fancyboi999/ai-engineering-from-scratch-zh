@@ -2,7 +2,7 @@
 name: start-learning
 version: 1.0.0
 description: >
-  AI Engineering from Scratch 课程的一次性入门流程（523 节课、20 个阶段）。访谈学习者、
+  AI Engineering from Scratch 课程的一次性入门流程（542 节课、20 个阶段）。访谈学习者、
   运行分级测验，并写入由 learn skill 驱动的持久学习计划 LEARNING.md。触发短语：
   “开始学习”、“设置课程”、“开始课程”、“带我入门”、“创建学习计划”，或
   "start learning", "set up the course", "begin the curriculum", "onboard me",

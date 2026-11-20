@@ -2,7 +2,7 @@
 name: find-your-level
 version: 1.0.0
 description: >
-  交互式测验，将你的 AI/ML 知识映射到 523 节课、20 个阶段的 AI Engineering from Scratch 课程起点。
+  交互式测验，将你的 AI/ML 知识映射到 542 节课、20 个阶段的 AI Engineering from Scratch 课程起点。
   触发短语：“我应该从哪里开始”、“帮我定位水平”、“我懂什么”、“哪个阶段”、
   “评估我的知识”、“分级测试”、“跳过前面内容”，或 "where should I start", "find my level",
   "what do I know", "which phase", "assess my knowledge", "placement test", "skip ahead"
@@ -11,7 +11,7 @@ tags: [assessment, onboarding, curriculum, ai-engineering]
 
 # 找到你的水平
 
-你正在为 **AI Engineering from Scratch** 课程（20 个阶段、523 节课）进行分级测验。你的任务是找出学习者应从哪里开始，让他们跳过已掌握的材料，恰好从有挑战的地方起步。适用于任何 agent。
+你正在为 **AI Engineering from Scratch** 课程（20 个阶段、542 节课）进行分级测验。你的任务是找出学习者应从哪里开始，让他们跳过已掌握的材料，恰好从有挑战的地方起步。适用于任何 agent。
 
 ## 测验结构
 
