@@ -1,23 +1,23 @@
-# Agent Chat UI in front of langgraph dev
+# langgraph dev 前面的 Agent Chat UI
 
-> Agent Chat UI answers batched approvals only, and a typed message closes a pending approval, so the model said the tool ran in 2 of 2 trials.
+> Agent Chat UI 只能回答批量审批，而用户输入一条消息就会关掉待处理的审批，于是模型在 2 次试验中都说工具已经运行了。
 
-You serve your agent with `langgraph dev`, and you want a chat window in front of it today. Agent Chat UI is the client that the LangGraph docs point to. You enter the server address and the graph id, and you chat. Then a reviewer types "did you send it?" instead of clicking Approve. The model answers yes, and no email left.
+你用 `langgraph dev` 提供 agent 服务，想今天就在前面放一个聊天窗口。Agent Chat UI 是 LangGraph 文档指向的客户端。你填入服务器地址和图 id，就能聊天。然后一位审阅者没有点 Approve，而是输入了“你发出去了吗？”。模型回答发了，可实际没有任何邮件离开。
 
-When you finish this section, you can connect Agent Chat UI to a local server. You can say which requests it sends and which stream modes it asks for. You can say which approval payloads it can answer, and what happens to a pending approval when the user types instead.
+读完本节，你能把 Agent Chat UI 连到本地服务器。你能说出它发出哪些请求、请求哪些流模式。你还能说出它能回答哪些审批载荷，以及用户在审批待处理时直接打字会发生什么。
 
-## What the UI needs from your graph
+## UI 对你的图有什么要求 {#s-agent-chat-ui-in-front-of-langgraph-dev-what-the-ui-needs-from-your-graph}
 
-**Agent Chat UI:** an open source Next.js app that chats with a graph on Agent Server through the LangGraph JavaScript SDK. The docs describe a hosted copy and a local clone {{docs oss/python/langgraph/ui}}.
+**Agent Chat UI：** 一个开源的 Next.js 应用，通过 LangGraph JavaScript SDK 与 Agent Server 上的图聊天。文档介绍了托管版和本地克隆两种用法 {{docs oss/python/langgraph/ui}}。
 
-The repository has no release and no tag. We ran commit `0d21f7f` of `main`, with Next.js 16.4.3 and `@langchain/langgraph-sdk` 1.12.8. The server was `langgraph-cli` 0.4.43 with `langgraph-api` 0.18.0.
+这个仓库没有发布版本，也没有标签。我们运行的是 `main` 上的提交 `0d21f7f`，Next.js 16.4.3，`@langchain/langgraph-sdk` 1.12.8。服务器是 `langgraph-cli` 0.4.43 加 `langgraph-api` 0.18.0。
 
-The setup form asks for three values. The **deployment URL** is the address of the server. The **assistant or graph id** is a key under `graphs` in `langgraph.json`. The **LangSmith API key** is optional, and a local server does not need it. The UI keeps that key in the local storage of the browser {{code src/lib/api-key.tsx:15-32}}.
+设置表单要三个值。**部署 URL** 是服务器的地址。**assistant 或图 id** 是 `langgraph.json` 里 `graphs` 下的一个键。**LangSmith API 密钥**可选，本地服务器不需要。UI 把这个密钥存在浏览器的 local storage 里 {{code src/lib/api-key.tsx:15-32}}。
 
-The graph must keep its conversation under a `messages` key, as every `create_agent` graph does. Our graph was a `create_agent` on Qwen3 4B with two tools. `get_weather` ran freely, and `HumanInTheLoopMiddleware` held `send_email` for approval.
+图必须把对话放在 `messages` 键下，每个 `create_agent` 图都是这样。我们的图是用 Qwen3 4B 的 `create_agent`，带两个工具。`get_weather` 直接运行，`HumanInTheLoopMiddleware` 把 `send_email` 拦下来等审批。
 
 ```listing
-title: the two graphs that langgraph dev served
+title: langgraph dev 提供服务的两张图
 source: capture/lab/chat-ui-mac/code/graphs.py
 lang: python
 ---
@@ -30,17 +30,17 @@ agent_percall = create_agent(model(), tools=[get_weather, send_email], system_pr
                              middleware=[HumanInTheLoopMiddleware(GATE, interrupt_mode="per_call")])
 ```
 
-## The requests of one approval
+## 一次审批的请求 {#s-agent-chat-ui-in-front-of-langgraph-dev-the-requests-of-one-approval}
 
-**We measured** this on the Mac with a recording proxy between the browser and the server. The browser was headless Chromium, and the session had 15 runs. [Figure](#fig-8-2) draws the requests of one approval from that record.
+**我们测得**：在 Mac 上，用一个录制代理夹在浏览器和服务器之间。浏览器是无头 Chromium，会话共有 15 次运行。[图 8.2](#fig-8-2) 根据这份记录画出一次审批的请求。
 
-On load, the UI called `GET /info` and `POST /threads/search` with the graph id as metadata and a limit of 100. That search fills the thread history list. The first message of a thread created the thread with `POST /threads`, and then started the run.
+加载时，UI 调用 `GET /info` 和 `POST /threads/search`，后者以图 id 为元数据、上限 100。这次搜索填充线程历史列表。一个线程的第一条消息先用 `POST /threads` 创建线程，再启动运行。
 
 ```listing
-title: the body of POST runs/stream for a new message
+title: 新消息的 POST runs/stream 请求体
 source: capture/lab/chat-ui-mac/summary/extracts.json
 lang: json
-note: Cut to the options after the input.
+note: 截取到 input 之后的选项。
 ---
    "stream_mode": [
     "values",
@@ -57,29 +57,29 @@ note: Cut to the options after the input.
    "on_disconnect": "continue"
 ```
 
-The UI code asks for `values` only. The SDK adds `messages-tuple` for the tokens and `custom` for UI events {{code @langchain/langgraph-sdk/dist/react/stream.lgp.js:545-557}} {{code @langchain/langgraph-sdk/dist/react/stream.lgp.js:148}}. The graph id goes in `assistant_id`, and the server resolves it. After every run, the UI called `POST /history` with a limit of 10.
+UI 代码只请求 `values`。SDK 额外加上用于 token 的 `messages-tuple` 和用于 UI 事件的 `custom` {{code @langchain/langgraph-sdk/dist/react/stream.lgp.js:545-557}} {{code @langchain/langgraph-sdk/dist/react/stream.lgp.js:148}}。图 id 放在 `assistant_id` 里，由服务器解析。每次运行结束后，UI 都会调用上限为 10 的 `POST /history`。
 
-The approval reached the UI inside a `values` event, under the key `__interrupt__`. The stream had no `updates` event. [Section 5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) explains each stream mode.
+审批以 `values` 事件的形式到达 UI，位于键 `__interrupt__` 之下。流里没有 `updates` 事件。[第 5.1 节](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode)解释了每种流模式。
 
 ```figure
 id: fig-8-2
 kind: sequence
-title: the requests of Agent Chat UI for one approval
-claim: A message is one POST runs/stream with three stream modes, the approval returns in a values event, and Approve is a second POST with command.resume.
-caption: Read from the top. Solid arrows are requests, dotted arrows are SSE events, and the amber arrow carries the interrupt. Times are from the recording proxy on the Mac. From capture/lab/chat-ui-mac/summary/chatui-mac.json.
+title: Agent Chat UI 为一次审批发出的请求
+claim: 一条消息就是一次带三种流模式的 POST runs/stream；审批在 values 事件里返回；Approve 是第二次带 command.resume 的 POST。
+caption: 从上往下读。实线箭头是请求，虚线箭头是 SSE 事件，琥珀色箭头携带中断。时间来自 Mac 上的录制代理。来源：capture/lab/chat-ui-mac/summary/chatui-mac.json。
 ```
 
-## Approve, edit, and reject
+## 批准、编辑和拒绝 {#s-agent-chat-ui-in-front-of-langgraph-dev-approve-edit-and-reject}
 
-The batched payload has `action_requests` and `review_configs`. The UI checks for both lists and draws a form with one text box per argument {{code src/lib/agent-inbox-interrupt.ts}}. Approve, edit, and reject each worked once, with n=1 for each.
+批量载荷里有 `action_requests` 和 `review_configs`。UI 检查这两个列表是否都在，并画出一个表单，每个参数一个文本框 {{code src/lib/agent-inbox-interrupt.ts}}。批准、编辑、拒绝各成功了一次，每种 n=1。
 
-A decision goes back as a plain resume value with a `decisions` list. The request also names the checkpoint to resume from.
+决定以一个带 `decisions` 列表的普通恢复值回传。请求里还指明了要从哪个检查点恢复。
 
 ```listing
-title: the body of POST runs/stream for an edit
+title: 编辑时 POST runs/stream 的请求体
 source: capture/lab/chat-ui-mac/summary/extracts.json
 lang: json
-note: Cut to the command and the stream options.
+note: 截取到 command 和流选项。
 ---
    "command": {
     "resume": {
@@ -106,21 +106,21 @@ note: Cut to the command and the stream options.
    "stream_resumable": false,
 ```
 
-The resume request sets `on_disconnect` to `cancel`, while a new message sets `continue`. The SDK picks `cancel` when the call does not ask for a resumable stream {{code @langchain/langgraph-sdk/dist/react/stream.lgp.js:357}}. So a reviewer who closes the tab during the resume cancels that run.
+恢复请求把 `on_disconnect` 设为 `cancel`，而新消息设的是 `continue`。调用没有请求可恢复的流时，SDK 就选 `cancel` {{code @langchain/langgraph-sdk/dist/react/stream.lgp.js:357}}。所以审阅者在恢复期间关掉标签页，就会取消那次运行。
 
-The tool log of the graph shows what ran. The approved call ran with the model's arguments. The edited call ran with the reviewer's body. The rejected call did not run, and the model answered "I won't send an invoice."
+图的工具日志显示了实际运行了什么。批准的调用用模型给的参数运行。编辑的调用用审阅者写的正文运行。被拒绝的调用没有运行，模型回答“I won't send an invoice.”
 
-The edit has a display gap. The tool call card still showed the body that the model wrote, not the edited one. The middleware keeps the model's call in the AI message and swaps the arguments only when the tool runs. Only the tool result names the arguments that ran, in a note from the middleware. [Section 6.5](#s-human-in-the-loop-batched-and-per-call) shows that note.
+编辑有一处显示缺口。工具调用卡片仍显示模型写的正文，而不是编辑后的。中间件把模型的调用保留在 AI 消息里，只在工具运行时才替换参数。只有工具结果里的一条中间件备注，说明了实际运行的参数。[第 6.5 节](#s-human-in-the-loop-batched-and-per-call)展示了这条备注。
 
-## A per-call approval has no buttons
+## 逐调用审批没有按钮 {#s-agent-chat-ui-in-front-of-langgraph-dev-a-per-call-approval-has-no-buttons}
 
-In per-call mode the interrupt value is a `tool_approval` object with a `response_schema`. It has no `action_requests`, so the UI check fails. The UI drew a read-only card named "Human Interrupt", with the fields and no decision control (n=1).
+在 per-call 模式下，中断值是带 `response_schema` 的 `tool_approval` 对象。它没有 `action_requests`，所以 UI 的检查不通过。UI 画出一张名为“Human Interrupt”的只读卡片，里面有字段，却没有决定控件（n=1）。
 
 ```listing
-title: the per-call interrupt that the UI could not answer
+title: UI 回答不了的 per-call 中断
 source: capture/lab/chat-ui-mac/summary/extracts.json
 lang: json
-note: Cut before the response schema.
+note: 截取到响应 schema 之前。
 ---
   "per_call, request 50": [
    {
@@ -135,19 +135,19 @@ note: Cut before the response schema.
      },
 ```
 
-The resume of the UI could not answer it anyway. Per-call mode wants one decision keyed by interrupt id, and the UI sends a `decisions` list. The service of the [production part](#s-approvals-and-the-idempotency-key) uses per-call mode and its own routes, so this UI cannot drive it as is.
+UI 的恢复请求本来也回答不了它。per-call 模式要的是按中断 id 为键的单个决定，而 UI 发送的是 `decisions` 列表。[生产部分](#s-approvals-and-the-idempotency-key)的服务使用 per-call 模式和自己的路由，所以这个 UI 原样驱动不了它。
 
-## Typing over a pending approval
+## 在待处理审批上打字 {#s-agent-chat-ui-in-front-of-langgraph-dev-typing-over-a-pending-approval}
 
-The UI lets the user type while an approval waits. Before it sends the message, it looks for an AI message whose tool calls have no tool result. For each one, it adds a tool message with the content "Successfully handled tool call." and an id that starts with `do-not-render-` {{code src/lib/ensure-tool-responses.ts:6-34}}. The chat view hides every message with that prefix.
+审批在等待时，UI 允许用户打字。发送消息之前，它会查找工具调用没有工具结果的 AI 消息。对每一条，它补上一条工具消息，内容是“Successfully handled tool call.”，id 以 `do-not-render-` 开头 {{code src/lib/ensure-tool-responses.ts:6-34}}。聊天视图会隐藏所有带这个前缀的消息。
 
-**We measured** this once in each mode. We asked for an email, let the approval wait, and typed "Did you send the email to Max?"
+**我们测得**：每种模式各测一次。我们要求发一封邮件，让审批保持等待，然后输入“Did you send the email to Max?”
 
 ```listing
-title: the thread after the typed message, batched mode
+title: 输入消息之后的线程，批量模式
 source: capture/lab/chat-ui-mac/summary/extracts.json
 lang: json
-note: Cut to the last three messages.
+note: 截取到最后三条消息。
 ---
    {
     "type": "tool",
@@ -174,35 +174,35 @@ note: Cut to the last three messages.
    }
 ```
 
-`send_email` never ran in either trial. The thread was `idle` with no interrupt, so the approval was gone. In both modes the model said that it sent the email. The user saw that answer and no trace of the placeholder result.
+两次试验中 `send_email` 都没有运行。线程是 `idle`，没有中断，所以审批消失了。两种模式下，模型都说它发了邮件。用户看到了这个回答，看不到占位结果的任何痕迹。
 
-So the UI decides the approval for the user. Keep the side effect safe in the tool, as the [production part](#s-approvals-and-the-idempotency-key) does with a key. In your own fork, disable the input while `thread.interrupt` is set.
+所以，UI 替用户做了审批的决定。要在工具里保证副作用安全，[生产部分](#s-approvals-and-the-idempotency-key)就是用一个键来做的。在你自己的 fork 里，`thread.interrupt` 有值期间要禁用输入框。
 
-## Streaming, tool calls, and time on screen
+## 流式输出、工具调用与屏幕上的时间 {#s-agent-chat-ui-in-front-of-langgraph-dev-streaming-tool-calls-and-time-on-screen}
 
-Text streamed token by token. Each token was one `messages` event, and the UI grew the reply in place. `ChatOllama` sends a tool call whole, on one chunk with the final metadata. So the tool call card appeared at once, complete, with no partial arguments.
+文本逐 token 流式输出。每个 token 是一个 `messages` 事件，UI 就地把回复写长。`ChatOllama` 把工具调用整个发出，放在带最终元数据的一个块上。所以工具调用卡片一下子完整出现，没有残缺的参数。
 
-**We measured** the delay from the proxy to the screen with a DOM observer in the page. The browser and the proxy share the clock of the Mac. The first visible change came 0.037 to 0.158 s after its SSE event reached the proxy, median 0.094 s, n=9.
+**我们测得**：用页面里的 DOM 观察器测量从代理到屏幕的延迟。浏览器和代理共用 Mac 的时钟。第一次可见变化出现在它的 SSE 事件到达代理之后 0.037 到 0.158 秒，中位数 0.094 秒，n=9。
 
-For a plain question in a new thread, the first token reached the proxy 0.87 to 1.23 s after the POST, n=3. It was on screen 0.04 to 0.07 s later. The approval form came 0.145 and 0.204 s after the tool call card, n=2.
+对新线程里的一个普通问题，第一个 token 在 POST 之后 0.87 到 1.23 秒到达代理，n=3。它在 0.04 到 0.07 秒后出现在屏幕上。审批表单出现在工具调用卡片之后 0.145 秒和 0.204 秒，n=2。
 
-The first run waited in a queue behind another client of the same Ollama before its tool call. Do not read its time as UI time.
+第一次运行在发出工具调用之前，在同一个 Ollama 的另一个客户端后面排了队。别把它的时间当成 UI 时间。
 
-## Threads, history, and what leaves the machine
+## 线程、历史，以及离开这台机器的数据 {#s-agent-chat-ui-in-front-of-langgraph-dev-threads-history-and-what-leaves-the-machine}
 
-The history panel listed each thread by its first human message. A click on a thread sent one `POST /history` with a limit of 10. That call returned 85,940 bytes for a thread of four turns, and the full thread came back. A reload of a thread with a pending approval drew the approval form again from the same call (n=1).
+历史面板按第一条人类消息列出每个线程。点击一个线程会发出一次上限为 10 的 `POST /history`。对一个四轮的线程，这次调用返回了 85,940 字节，整个线程都回来了。重新加载一个带待处理审批的线程，会用同一次调用重新画出审批表单（n=1）。
 
-Tracing was off, and no LangSmith key was set. Our hooks on `httpx` and `requests` logged 16 requests from the server, all `POST /api/chat` to the local Ollama. The browser made 97 requests, all to the UI and to the proxy. We set `NEXT_TELEMETRY_DISABLED=1`, so we did not test the default telemetry of Next.js. [Section 8.1](#s-agent-server-langgraph-dev-up-and-deploy) shows what the server sends when tracing is on.
+追踪是关闭的，也没有设 LangSmith 密钥。我们挂在 `httpx` 和 `requests` 上的钩子记录了服务器的 16 个请求，全是发往本地 Ollama 的 `POST /api/chat`。浏览器发了 97 个请求，全部发往 UI 和代理。我们设了 `NEXT_TELEMETRY_DISABLED=1`，所以没有测 Next.js 默认的遥测。开启追踪时服务器会发送什么，见[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)。
 
-The repository also has a passthrough route that adds your LangSmith key to each request. Its README warns that the route checks no caller. Deployed as is, it lets anyone read your threads and start runs on your account.
+这个仓库还有一条透传路由，会给每个请求加上你的 LangSmith 密钥。它的 README 警告说，这条路由不检查调用方。原样部署的话，任何人都能读取你的线程，并在你的账户上启动运行。
 
 ```takeaways
-- Require approval with batched HumanInTheLoopMiddleware when Agent Chat UI must answer it.
-- Expect a per-call approval to show as a read-only card with no decision control.
-- Make the tool safe on its own, because a typed message closes the approval as a success.
-- Read the tool result after an edit, because the tool call card keeps the model's arguments.
-- Expect a resume to cancel when the tab closes, because the UI sends on_disconnect cancel.
-- Put your own auth in front of the passthrough route before you deploy it.
+- 要让 Agent Chat UI 能回答审批，就用批量模式的 HumanInTheLoopMiddleware。
+- 预期 per-call 审批显示为没有决定控件的只读卡片。
+- 让工具自身保证安全，因为输入消息会把审批当作成功关掉。
+- 编辑之后要读工具结果，因为工具调用卡片保留的是模型的参数。
+- 预期标签页关闭时恢复会被取消，因为 UI 发送 on_disconnect cancel。
+- 部署透传路由之前，先在它前面放上你自己的认证。
 ```
 
-Sources: capture/lab/chat-ui-mac/summary/chatui-mac.json, capture/lab/chat-ui-mac/summary/extracts.json, capture/lab/chat-ui-mac/summary/timing-summary.json, capture/lab/chat-ui-mac/runs/requests.jsonl, capture/lab/chat-ui-mac/runs/sse/, capture/lab/chat-ui-mac/runs/graph-events.jsonl, capture/lab/chat-ui-mac/runs/server-netlog.jsonl, capture/lab/chat-ui-mac/runs/browser-network.txt, capture/lab/chat-ui-mac/runs/state-batched-after-new-message.json, capture/lab/chat-ui-mac/runs/state-percall-after-new-message.json, capture/lab/chat-ui-mac/code/graphs.py, capture/lab/chat-ui-mac/code/recproxy.py, capture/lab/chat-ui-mac/code/ui_observer.js, capture/lab/chat-ui-mac/VERSIONS.txt; src/lib/api-key.tsx, src/lib/agent-inbox-interrupt.ts, src/lib/ensure-tool-responses.ts, and README.md at agent-chat-ui commit 0d21f7ff4c45287797e876dc6d8b150b6f277b1e; dist/react/stream.lgp.js at @langchain/langgraph-sdk 1.12.8; oss/python/langgraph/ui in the LangChain docs, read on 2026-11-15.
+来源：capture/lab/chat-ui-mac/summary/chatui-mac.json, capture/lab/chat-ui-mac/summary/extracts.json, capture/lab/chat-ui-mac/summary/timing-summary.json, capture/lab/chat-ui-mac/runs/requests.jsonl, capture/lab/chat-ui-mac/runs/sse/, capture/lab/chat-ui-mac/runs/graph-events.jsonl, capture/lab/chat-ui-mac/runs/server-netlog.jsonl, capture/lab/chat-ui-mac/runs/browser-network.txt, capture/lab/chat-ui-mac/runs/state-batched-after-new-message.json, capture/lab/chat-ui-mac/runs/state-percall-after-new-message.json, capture/lab/chat-ui-mac/code/graphs.py, capture/lab/chat-ui-mac/code/recproxy.py, capture/lab/chat-ui-mac/code/ui_observer.js, capture/lab/chat-ui-mac/VERSIONS.txt; src/lib/api-key.tsx, src/lib/agent-inbox-interrupt.ts, src/lib/ensure-tool-responses.ts, and README.md at agent-chat-ui commit 0d21f7ff4c45287797e876dc6d8b150b6f277b1e; dist/react/stream.lgp.js at @langchain/langgraph-sdk 1.12.8; oss/python/langgraph/ui in the LangChain docs, read on 2026-11-15.

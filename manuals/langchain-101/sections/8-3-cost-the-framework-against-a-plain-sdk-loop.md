@@ -1,75 +1,75 @@
-# Cost: the framework against a plain SDK loop
+# 成本：框架对比朴素 SDK 循环
 
-> `create_agent` adds about 5 ms per model call and no tokens to a plain loop, while Deep Agents, long plain threads, and a failing trace endpoint cost far more.
+> `create_agent` 相对朴素循环，每次模型调用多约 5 毫秒，不多花 token；而 Deep Agents、很长的朴素线程和一个出故障的追踪端点，代价要大得多。
 
-Your team has a plain loop on the `openai` client that works. Someone asks what LangChain would cost before you move to it. The answer has several parts: time per call, tokens, request bytes, import time, disk, checkpoints, and traces.
+你的团队有一个基于 `openai` 客户端的朴素循环，运行得很好。迁移之前，有人问 LangChain 要花多少成本。答案有几部分：每次调用的时间、token、请求字节数、导入时间、磁盘、检查点和追踪。
 
-When you finish this section, you can say what each layer of the stack adds to a run, and choose where to spend it.
+读完本节，你能说清技术栈的每一层给一次运行增加了什么，并选择把成本花在哪里。
 
-## The cost sheet
+## 成本表 {#s-cost-the-framework-against-a-plain-sdk-loop-the-cost-sheet}
 
-**We measured** each row of this table on one machine, and the row names the machine and the count. The Mac is an Apple M1 Max with 10 cores and 64 GiB, shared with other work. The x86 server guest has 32 vCPU and 48 GiB. The machines differ, so compare numbers inside a row, never across rows.
+**我们测得**这张表里的每一行，都在一台机器上，行里写明机器和次数。Mac 是 Apple M1 Max，10 核、64 GiB，还要和其他工作共用。x86 服务器客户机有 32 vCPU 和 48 GiB。机器不同，所以只在同一行内比较数字，不要跨行比较。
 
-| Cost | Plain loop | LangChain | Machine and count | Section |
+| 成本 | 朴素循环 | LangChain | 机器和次数 | 章节 |
 |---|---|---|---|---|
-| time beyond the model in one run of three Qwen3 4B calls | 25.1 ms (1.3% of the run) | 37.6 ms with `create_agent` (2.3%), 15.6 ms more in the same round | the Mac, 40 runs each | this section |
-| prompt tokens of the three calls of that run, on Qwen3 4B | 261, 300, 340 | the same | the Mac, 40 runs each | this section |
-| request bytes of those three calls, on Qwen3 4B | 679, 936, 1,199 | 696, 948, 1,206 | the Mac, 40 runs each | this section |
-| prompt tokens of a one-word answer, on Qwen3 8B | 28 | 28 with `create_agent`, 2,279 with `create_deep_agent` | the Mac, 3 runs each | [7.4](#s-deep-agents-0-7) |
-| imports, with bytecode written | 0.329 s for `openai` | 0.831 s for `create_agent` and `ChatOpenAI` | the Mac, 10 runs each | [3.1](#s-install-and-the-package-map) |
-| install | 14 packages, 26,356 KiB | 44 packages, 54,312 KiB | the Mac, one install each | [3.1](#s-install-and-the-package-map) |
-| one checkpoint write on `PostgresSaver`, median of the last 10 of 5,000 steps | none | 148.65 ms plain, 1.13 ms with `DeltaChannel` | the x86 server guest, one run | [5.5](#s-context-engineering-and-summarization) |
-| time outside the model of one Qwen3 4B agent run with tracing on, against a local recorder | none | 26.3 ms against 17.7 ms with tracing off, 0.5% of the run | the Mac, 60 interleaved runs each | [7.6](#s-langsmith-tracing) |
-| one middleware hook, each time it runs | none | 183 to 190 µs node hook, 45 to 50 µs wrap hook, 0.2 to 0.5% of a real Qwen3 4B run | the x86 server guest under load 14 to 25, 20 runs per cell | this section |
+| 三次 Qwen3 4B 调用的一次运行里，模型之外的时间 | 25.1 ms（占该次运行 1.3%） | `create_agent` 为 37.6 ms（2.3%），同一轮里多 15.6 ms | Mac，每种 40 次运行 | 本节 |
+| 该次运行三次调用的提示词 token，Qwen3 4B | 261、300、340 | 相同 | Mac，每种 40 次运行 | 本节 |
+| 这三次调用的请求字节数，Qwen3 4B | 679、936、1,199 | 696、948、1,206 | Mac，每种 40 次运行 | 本节 |
+| 一句话回答的提示词 token，Qwen3 8B | 28 | `create_agent` 为 28，`create_deep_agent` 为 2,279 | Mac，每种 3 次运行 | [7.4](#s-deep-agents-0-7) |
+| 导入时间，已写入字节码 | `openai` 为 0.329 秒 | `create_agent` 加 `ChatOpenAI` 为 0.831 秒 | Mac，每种 10 次运行 | [3.1](#s-install-and-the-package-map) |
+| 安装 | 14 个包，26,356 KiB | 44 个包，54,312 KiB | Mac，各安装一次 | [3.1](#s-install-and-the-package-map) |
+| `PostgresSaver` 一次检查点写入，5,000 步中最后 10 次的中位数 | 无 | 普通情况 148.65 ms，用 `DeltaChannel` 为 1.13 ms | x86 服务器客户机，一次运行 | [5.5](#s-context-engineering-and-summarization) |
+| 开启追踪时，一次 Qwen3 4B agent 运行里模型之外的时间，对着本地记录器 | 无 | 26.3 ms，关闭追踪时为 17.7 ms，占该次运行 0.5% | Mac，各 60 次交错运行 | [7.6](#s-langsmith-tracing) |
+| 一个中间件钩子每次运行的耗时 | 无 | 节点钩子 183 到 190 µs，wrap 钩子 45 到 50 µs，占真实 Qwen3 4B 运行的 0.2% 到 0.5% | x86 服务器客户机，负载 14 到 25，每格 20 次运行 | 本节 |
 
-The rest of this section gives the recordings behind the first three rows and the last row, which no other section shows in full. [Section 9.7](#s-workers-the-advisory-lock-and-cost) prices a whole support conversation from measured tokens: $0.61 for 1,000 conversations on Claude Haiku 5.5.
+本节其余部分给出前三行和最后一行背后的记录，其他章节都没有完整展示它们。[第 9.7 节](#s-workers-the-advisory-lock-and-cost)用测得的 token 给一整段客服对话定价：在 Claude Haiku 5.5 上，1,000 段对话花 0.61 美元。
 
-## Time per run
+## 每次运行的时间 {#s-cost-the-framework-against-a-plain-sdk-loop-time-per-run}
 
-The task of the recording is one question that needs two tools, `add` and then `multiply`, and three model calls. Eight programs ran it against Qwen3 4B on Ollama, five on the `/v1` path and three on the native path. A proxy timed each model call. Every run gave the right answer, and each program called the same tools with the same arguments.
+这次记录的任务是一个需要两个工具的问题：先 `add`，再 `multiply`，共三次模型调用。八个程序对 Ollama 上的 Qwen3 4B 运行它，五个走 `/v1` 路径，三个走原生路径。代理给每次模型调用计时。每次运行都给出了正确答案，每个程序用相同的参数调用相同的工具。
 
-**Time outside the model:** the wall time of a run minus the time of its model calls at the proxy. It holds the HTTP client and the proxy hop too, so a plain loop also has some.
+**模型之外的时间：** 一次运行的墙钟时间，减去代理处测得的模型调用时间。它也包含 HTTP 客户端和代理这一跳，所以朴素循环也有一部分。
 
-- **plain `openai` loop**: the `openai` client, a list of messages, and a loop over the tool calls.
-- **`ChatOpenAI.bind_tools` loop**: the same loop, with the model of `langchain-openai` in place of the client.
-- **`create_agent`**: the agent with `ChatOpenAI` and the two tools.
-- **`create_agent` with `InMemorySaver`**: the same agent with a checkpointer and a thread.
-- **hand-built `StateGraph`**: a model node, a `ToolNode`, and `tools_condition`, the same graph as `create_agent` written by hand.
-- **native programs**: a plain `ollama` loop, `create_agent` with `ChatOllama`, and the hand-built `StateGraph` with `ChatOllama`, all on `/api/chat`.
+- **朴素 `openai` 循环**：`openai` 客户端、一个消息列表，以及一个遍历工具调用的循环。
+- **`ChatOpenAI.bind_tools` 循环**：同样的循环，把客户端换成 `langchain-openai` 的模型。
+- **`create_agent`**：带 `ChatOpenAI` 和两个工具的 agent。
+- **带 `InMemorySaver` 的 `create_agent`**：同一个 agent，加上 checkpointer 和一个线程。
+- **手工搭建的 `StateGraph`**：一个模型节点、一个 `ToolNode` 和 `tools_condition`，与 `create_agent` 相同的图，用手写实现。
+- **原生程序**：一个朴素的 `ollama` 循环、带 `ChatOllama` 的 `create_agent`，以及带 `ChatOllama` 的手工 `StateGraph`，都走 `/api/chat`。
 
 ```figure
 id: fig-8-3
 kind: chart
-title: time beyond the model in one run of three Qwen3 4B calls
-claim: In a real run of 1.8 s, create_agent spent 37.6 ms outside the model against 25.1 ms for a plain openai loop, and a hand-built StateGraph 36.7 ms.
-caption: Each dot is one run on the Mac, 40 per program, in shuffled rounds, and the black line is the median. From capture/lab/summary/overhead-mac-real.json.
+title: 三次 Qwen3 4B 调用的一次运行里，模型之外的时间
+claim: 在 1.8 秒的真实运行中，create_agent 在模型之外花了 37.6 ms，朴素 openai 循环为 25.1 ms，手工搭建的 StateGraph 为 36.7 ms。
+caption: 每个点是 Mac 上的一次运行，每个程序 40 次，轮次打乱，黑线是中位数。来源：capture/lab/summary/overhead-mac-real.json。
 ```
 
-**We measured** 40 runs of each program on the Mac, in 40 shuffled rounds after 2 warm-up rounds. [Figure](#fig-8-3) shows each run. Every run gave 20 after `add(2, 3)` and `multiply(5, 4)`. The median time outside the model was 25.1 ms for the plain loop and 29.3 ms for the `bind_tools` loop. It was 37.6 ms for `create_agent`, 37.6 ms with `InMemorySaver`, and 36.7 ms for the hand-built `StateGraph`. Against the plain loop in the same round, they added 6.6, 15.6, 12.2, and 11.5 ms.
+**我们测得**：在 Mac 上，每个程序跑 40 次运行，经过 2 轮预热后打乱成 40 轮。[图 8.3](#fig-8-3) 展示了每次运行。每次在 `add(2, 3)` 和 `multiply(5, 4)` 之后都得到 20。模型之外时间的中位数：朴素循环 25.1 ms，`bind_tools` 循环 29.3 ms，`create_agent` 37.6 ms，带 `InMemorySaver` 为 37.6 ms，手工搭建的 `StateGraph` 为 36.7 ms。与同一轮里的朴素循环相比，它们分别多 6.6、15.6、12.2 和 11.5 ms。
 
-On the native path, the plain `ollama` loop spent 11.7 ms outside the model. `create_agent` with `ChatOllama` spent 29.0 ms, 13.0 ms more, and the `StateGraph` 22.2 ms, 7.8 ms more.
+在原生路径上，朴素 `ollama` 循环在模型之外花了 11.7 ms。带 `ChatOllama` 的 `create_agent` 花了 29.0 ms，多 13.0 ms；`StateGraph` 花了 22.2 ms，多 7.8 ms。
 
-Per model call, the agent layer adds about 4 to 5 ms, and 3 ms of CPU. On the `/v1` path, the time outside the model was 1.3 to 2.3% of a run of 1.7 to 2.0 s. The model time moved from 1.2 s to 3.7 s per run with the other load on the machine. So compare the time outside the model, not the wall time.
+按每次模型调用算，agent 层增加约 4 到 5 ms，其中 CPU 时间 3 ms。在 `/v1` 路径上，模型之外的时间占一次 1.7 到 2.0 秒运行的 1.3% 到 2.3%。机器上有其他负载时，每次运行的模型时间在 1.2 秒到 3.7 秒之间浮动。所以要比较模型之外的时间，不要比较墙钟时间。
 
-## Tokens and request bytes
+## token 与请求字节数 {#s-cost-the-framework-against-a-plain-sdk-loop-tokens-and-request-bytes}
 
-A framework could add tokens: a system prompt of its own, extra tool fields, or a schema. `create_agent` adds none. **We measured** the usage that Ollama returned for each call, through a proxy that recorded each request, 40 runs per program on the Mac. Every run of a program had the same three calls:
+框架可能增加 token：自带的系统提示词、额外的工具字段，或一个 schema。`create_agent` 一个都不加。**我们测得**：用一个记录每个请求的代理，读取 Ollama 为每次调用返回的用量，在 Mac 上每个程序 40 次运行。同一个程序的每次运行都有相同的三次调用：
 
-| Call | Plain loop: bytes, prompt tokens, completion tokens | `create_agent`: bytes, prompt tokens, completion tokens |
+| 调用 | 朴素循环：字节数、提示词 token、补全 token | `create_agent`：字节数、提示词 token、补全 token |
 |---|---|---|
 | 1 | 679, 261, 25 | 696, 261, 25 |
 | 2 | 936, 300, 25 | 948, 300, 25 |
 | 3 | 1,199, 340, 3 | 1,206, 340, 3 |
 
-The tokens were the same for both programs, call by call. The request of `create_agent` was 7 to 17 bytes longer on each call.
+两个程序逐次调用的 token 相同。`create_agent` 的请求每次长 7 到 17 字节。
 
-**We captured** the raw request bodies of both programs at the proxy, 5 runs each, and compared them call by call. Every byte of the difference is in this ledger:
+**我们录制了**两个程序在代理处的原始请求体，各 5 次运行，并逐次调用做了比较。差异的每一个字节都在下面这份账目里：
 
 ```listing
-title: the bytes that create_agent adds to each request
+title: create_agent 给每个请求多加的字节
 source: capture/lab/last-two-mac/03-request-body-diff.txt
 lang: text
-note: Cut to the ledger of each request. The other bytes are the same keys and values in another order.
+note: 截取到每个请求的账目。其余字节是同样的键和值，只是顺序不同。
 ---
 ### request 1: a_plain_openai (679 B) vs c_create_agent (696 B), round 1, raw bodies as sent
 …
@@ -92,37 +92,37 @@ note: Cut to the ledger of each request. The other bytes are the same keys and v
   ledger sum +7 B; measured +7 B
 ```
 
-`ChatOpenAI` adds `"stream": false` and writes the temperature as a float, 17 bytes on every call. For each earlier tool call in the history, it sends `"content": null` where the plain loop echoed the empty string of Ollama. It writes the arguments again with spaces, and it leaves out the `"index": 0` that the plain loop copied from `model_dump()`. That is 5 bytes fewer per turn. The tool schemas are equal as JSON but not as bytes: `create_agent` writes `"type": "object"` after `"required"`, and `"content"` before `"role"` in each message.
+`ChatOpenAI` 加上 `"stream": false`，并把 temperature 写成浮点数，每次调用多 17 字节。对历史里每个更早的工具调用，它发送 `"content": null`，而朴素循环回显的是 Ollama 给的空字符串。它还把参数重新写成带空格的形式，并去掉了朴素循环从 `model_dump()` 抄来的 `"index": 0`。每一轮因此少 5 字节。工具 schema 作为 JSON 相等，作为字节却不相等：`create_agent` 把 `"type": "object"` 写在 `"required"` 之后，并在每条消息里把 `"content"` 写在 `"role"` 之前。
 
-The headers differ in two fields. The LangChain programs send `x-stainless-raw-response: true`, because `ChatOpenAI` calls the client through `with_raw_response` {{code libs/partners/openai/langchain_openai/chat_models/base.py}}. In the recorded requests they also had no `x-stainless-read-timeout`, which the plain loop sent.
+请求头有两个字段不同。LangChain 程序发送 `x-stainless-raw-response: true`，因为 `ChatOpenAI` 通过 `with_raw_response` 调用客户端 {{code libs/partners/openai/langchain_openai/chat_models/base.py}}。在录制的请求里，它们也没有朴素循环发送的 `x-stainless-read-timeout`。
 
-The Deep Agents harness is the exception. On Qwen3 8B, `create_deep_agent` sent 2,075 to 2,251 more prompt tokens on every call than a plain loop. That was 81.4 times the tokens of a one-word answer, 10.0 times for two tool calls, and 9.1 times for a file task. [Section 7.4](#s-deep-agents-0-7) and [figure](#fig-7-4) show each call. Pay those tokens only when you use the planning, the files, or the subagents.
+Deep Agents 的 harness 是例外。在 Qwen3 8B 上，`create_deep_agent` 每次调用比朴素循环多发 2,075 到 2,251 个提示词 token。一句话回答的 token 是朴素循环的 81.4 倍，两次工具调用是 10.0 倍，文件任务是 9.1 倍。[第 7.4 节](#s-deep-agents-0-7)和[图 7.4](#fig-7-4)展示了每次调用。只有用到规划、文件或子 agent 时，才值得付这些 token。
 
-The task suite of [section 1.2](#s-do-you-need-langchain) gives the same picture at scale. The deep agent sent 3.6 to 4.3 times the prompt tokens of the plain loop. On Claude Haiku 5.5 that was about 3,570 more per call. Prompt caching changes the bill. On Claude the deep agent cost 1.16 to 1.24 times the plain loop, and 3.10 to 3.14 times at list price with no cache.
+[第 1.2 节](#s-do-you-need-langchain)的任务套件在更大规模上给出同样的图景。deep agent 发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。在 Claude Haiku 5.5 上，每次调用多约 3,570 个。提示词缓存会改变账单。在 Claude 上，deep agent 的花费是朴素循环的 1.16 到 1.24 倍；不用缓存、按标价算则是 3.10 到 3.14 倍。
 
-## Imports and disk
+## 导入与磁盘 {#s-cost-the-framework-against-a-plain-sdk-loop-imports-and-disk}
 
-The cost of a process start matters for a CLI tool, a test run, and a serverless handler. [Section 3.1](#s-install-and-the-package-map) gives the import times with [figure](#fig-3-1b). With bytecode already written, the imports for `create_agent` and `ChatOpenAI` took 0.831 s at the median, against 0.329 s for `import openai`. On the first start with no bytecode, they took 2.64 s against 1.064 s. The install is about twice the size: 54,312 KiB against 26,356 KiB.
+进程启动的成本，对 CLI 工具、测试运行和无服务器处理函数都很重要。[第 3.1 节](#s-install-and-the-package-map)用[图 3.1b](#fig-3-1b)给出了导入时间。在字节码已写入时，`create_agent` 和 `ChatOpenAI` 的导入中位数用了 0.831 秒，`import openai` 用了 0.329 秒。第一次启动、没有字节码时，两者分别是 2.64 秒和 1.064 秒。安装体积约为两倍：54,312 KiB 对 26,356 KiB。
 
-## Checkpoints
+## 检查点 {#s-cost-the-framework-against-a-plain-sdk-loop-checkpoints}
 
-A checkpointer writes the whole state at each step, unless a channel saves only the change. [Section 5.5](#s-context-engineering-and-summarization) gives the recording with [figure](#fig-5-5b). On `PostgresSaver` with a plain message list, the median of the last 10 writes was 2.88 ms at 10 steps. At 5,000 steps it was 148.65 ms.
+checkpointer 在每一步写入整个状态，除非某个通道只保存变化。[第 5.5 节](#s-context-engineering-and-summarization)用[图 5.5b](#fig-5-5b)给出了记录。在 `PostgresSaver` 上，用普通消息列表时，10 步处最后 10 次写入的中位数是 2.88 ms。到 5,000 步时是 148.65 ms。
 
-One thread of 5,000 steps held 7,289 MB. With `DeltaChannel`, the write stayed near 1.1 ms, and the thread held 81 MB with a snapshot every 100 steps. Summarize long threads, and measure the step count of your own threads.
+一个 5,000 步的线程占 7,289 MB。用 `DeltaChannel` 时，写入保持在约 1.1 ms，每 100 步一个快照，线程占 81 MB。对长线程做摘要，并测量你自己线程的步数。
 
-## Tracing
+## 追踪 {#s-cost-the-framework-against-a-plain-sdk-loop-tracing}
 
-Tracing adds a cost to each run and a cost at exit. [Section 7.6](#s-langsmith-tracing) gives both with [figure](#fig-7-6). Against a local recorder that answered at once, tracing added 7.4 ms to a 1.6 s agent run on Qwen3 4B. In six of seven processes, the first traced run spent 83 to 243 ms outside the model. A failing endpoint held the exit for 10 to 17 s, and a hanging endpoint kept the process alive.
+追踪给每次运行增加一笔成本，退出时又增加一笔。[第 7.6 节](#s-langsmith-tracing)用[图 7.6](#fig-7-6)给出了两者。对着一个立即应答的本地记录器，追踪给一次 1.6 秒的 Qwen3 4B agent 运行增加了 7.4 ms。七个进程中有六个，首次被追踪的运行在模型之外花了 83 到 243 ms。一个出故障的端点让退出拖了 10 到 17 秒，一个挂起的端点让进程一直不退出。
 
-[Section 9.4](#s-opentelemetry-spans-with-langsmith-off) traces a service with its own OpenTelemetry spans. With `LANGSMITH_TRACING` false or unset, a recorder got no request.
+[第 9.4 节](#s-opentelemetry-spans-with-langsmith-off)用自己的 OpenTelemetry span 追踪一个服务。`LANGSMITH_TRACING` 为 false 或未设置时，记录器没有收到任何请求。
 
-## Middleware hooks
+## 中间件钩子 {#s-cost-the-framework-against-a-plain-sdk-loop-middleware-hooks}
 
-Each middleware hook is one more node of the graph or one more wrapper around a call, as [section 4.5](#s-middleware-hooks-and-their-order) shows. A node hook, such as `before_model`, adds a step of the loop each time it runs. A wrap hook, such as `wrap_model_call`, adds a function call and no node.
+每个中间件钩子，要么是图里多一个节点，要么是一次调用外多一层包装，见[第 4.5 节](#s-middleware-hooks-and-their-order)。节点钩子，例如 `before_model`，每次运行都给循环增加一步。wrap 钩子，例如 `wrap_model_call`，增加一次函数调用，不增加节点。
 
-**We measured** the cost on the x86 server guest with Qwen3 4B on Ollama. Framework time is wall time minus time inside the model call. A run of two model calls and one tool call took 2.61 s, of which 5.88 ms was framework. Cells had 1, 10, or 20 middlewares, 20 timed runs each in shuffled rounds. Every run gave the right answer, and the middlewares did nothing. The cost per hook call is the slope of the median over the middleware count, divided by the calls of that hook in one run.
+**我们测得**：在 x86 服务器客户机上，用 Ollama 里的 Qwen3 4B 测这笔成本。框架时间是墙钟时间减去模型调用内部的时间。一次含两次模型调用和一次工具调用的运行用了 2.61 秒，其中 5.88 ms 是框架。每格有 1、10 或 20 个中间件，每格 20 次计时运行，轮次打乱。每次运行都给出了正确答案，这些中间件什么也不做。每次钩子调用的成本，是中位数随中间件数量变化的斜率，除以一次运行里该钩子的调用次数。
 
-| Hook | Calls in one run | Cost of each call | Framework time with 20 middlewares | Graph nodes with 20 |
+| 钩子 | 一次运行里的调用次数 | 每次调用的成本 | 20 个中间件时的框架时间 | 20 个时的图节点数 |
 |---|---|---|---|---|
 | `before_model` | 2 | 183 µs | 13.2 ms | 24 |
 | `after_model` | 2 | 190 µs | 13.5 ms | 24 |
@@ -130,32 +130,32 @@ Each middleware hook is one more node of the graph or one more wrapper around a 
 | `wrap_model_call` | 2 | 45 µs | 7.7 ms | 4 |
 | `wrap_tool_call` | 1 | 50 µs | 6.9 ms | 4 |
 
-The framework share of the run was 0.2% with no middleware and 0.5% with 20 node hooks. The load average was 14 to 25, because Ollama used every core. So read the shares and the ratio of node hooks to wrap hooks, not the microseconds.
+框架在运行中的占比：没有中间件时是 0.2%，20 个节点钩子时是 0.5%。平均负载是 14 到 25，因为 Ollama 用满了每个核心。所以看占比和节点钩子与 wrap 钩子的比值，不要看微秒数。
 
-**We measured** nine setups of built-in middleware in the same way on the x86 server guest with Qwen3 4B, 20 runs per cell. Seven held one middleware, one held five `PIIMiddleware` instances, and one held a stack of five. None of them acted: no retry, no limit reached, no summary, no interrupt.
+**我们测得**：在 x86 服务器客户机上，用同样的方法、Qwen3 4B 测了九种内置中间件配置，每格 20 次运行。七种各含一个中间件，一种含五个 `PIIMiddleware` 实例，一种含五个中间件的栈。它们都没有动作：没有重试，没有触及限制，没有摘要，没有中断。
 
-| Middleware, as configured | Added to a run | Graph nodes |
+| 中间件及其配置 | 给一次运行增加的时间 | 图节点数 |
 |---|---|---|
 | `ToolRetryMiddleware()` | 0.14 ms | 4 |
 | `ModelRetryMiddleware()` | 0.15 ms | 4 |
-| `SummarizationMiddleware` with a trigger that never fires | 0.36 ms | 5 |
+| 触发条件永不满足的 `SummarizationMiddleware` | 0.36 ms | 5 |
 | `ToolCallLimitMiddleware(run_limit=1000)` | 0.75 ms | 5 |
-| `HumanInTheLoopMiddleware` with no interrupt for the tool that ran | 0.86 ms | 5 |
+| 对已运行的工具没有中断的 `HumanInTheLoopMiddleware` | 0.86 ms | 5 |
 | `ModelCallLimitMiddleware(run_limit=1000)` | 1.30 ms | 6 |
 | `PIIMiddleware("email", strategy="redact")` | 1.36 ms | 6 |
-| five `PIIMiddleware` instances, one per type | 4.77 ms | 14 |
-| a stack of summarization, PII, a model call limit, tool retry, and review | 3.39 ms | 10 |
+| 五个 `PIIMiddleware` 实例，每种类型一个 | 4.77 ms | 14 |
+| 摘要、PII、模型调用限制、工具重试和审核组成的栈 | 3.39 ms | 10 |
 
-The cost follows the node count. The retries wrap calls and add under 0.2 ms, and each middleware with a node adds 0.4 to 1.4 ms. The five PII instances added 4.8 ms to a 2.64 s run of Qwen3 4B, 0.4%. So choose middleware for what it does, and keep node hooks out of a loop that makes thousands of fast calls.
+成本跟着节点数走。重试包装调用，增加不到 0.2 ms；每个带节点的中间件增加 0.4 到 1.4 ms。五个 PII 实例给一次 2.64 秒的 Qwen3 4B 运行增加了 4.8 ms，占 0.4%。所以按中间件的作用来选，并且别把节点钩子放进一个要做成千上万次快速调用的循环。
 
 ```takeaways
-- Budget about 5 ms per model call for create_agent beyond the model, under 3% of a local model run.
-- Expect the same prompt tokens from create_agent as from your plain loop.
-- Choose Deep Agents for its tools, and turn on prompt caching, because each call carries thousands more tokens.
-- Use DeltaChannel or summarization when a thread runs to thousands of steps.
-- Count the import time in every short-lived process, such as a CLI tool or a handler.
-- Call wait_for_all_tracers() before a traced process exits.
-- Prefer a wrap hook to a node hook when a middleware runs on every call of a fast loop.
+- 为 create_agent 在模型之外预留每次模型调用约 5 ms，不到本地模型运行的 3%。
+- 预期 create_agent 的提示词 token 与你的朴素循环相同。
+- 为了 Deep Agents 的工具才选它，并打开提示词缓存，因为每次调用多带几千个 token。
+- 线程长到几千步时，用 DeltaChannel 或摘要。
+- 在每个短命进程里，例如 CLI 工具或处理函数，都要把导入时间算进去。
+- 被追踪的进程退出前，调用 wait_for_all_tracers()。
+- 中间件要在快速循环的每次调用上运行时，优先用 wrap 钩子，不用节点钩子。
 ```
 
-Sources: capture/lab/summary/overhead-mac-real.json, capture/lab/T01-overhead-mac-real/01-runs.jsonl, capture/lab/T01-overhead-mac-real/t01_real.py, capture/lab/T01-overhead-mac-real/mr_common.py, capture/lab/last-two-mac/02-request-bodies.jsonl, capture/lab/last-two-mac/03-request-body-diff.txt, capture/lab/last-two-mac/lt2_body_diff.py, capture/lab/last-two-mac/lt2_diff.py, capture/lab/last-two-mac/lt_common.py; capture/lab/bench/summary-mac.json, capture/lab/bench/runs/main.jsonl, capture/lab/bench/runs/cost-ledger.jsonl; capture/lab/summary/import-times-mac.json, capture/lab/summary/install-size-mac.json, capture/lab/summary/tokens-mac.json, capture/lab/summary/checkpoint-cost-x86.json, capture/lab/summary/tracing-mac-real.json; capture/lab/summary/middleware-x86.json, capture/lab/T11-middleware-cost-x86/01-cost.jsonl, capture/lab/T11-middleware-cost-x86/t11_real.py; capture/lab/summary/middleware-mac.json; libs/partners/openai/langchain_openai/chat_models/base.py at langchain-openai 1.8.0.
+来源：capture/lab/summary/overhead-mac-real.json, capture/lab/T01-overhead-mac-real/01-runs.jsonl, capture/lab/T01-overhead-mac-real/t01_real.py, capture/lab/T01-overhead-mac-real/mr_common.py, capture/lab/last-two-mac/02-request-bodies.jsonl, capture/lab/last-two-mac/03-request-body-diff.txt, capture/lab/last-two-mac/lt2_body_diff.py, capture/lab/last-two-mac/lt2_diff.py, capture/lab/last-two-mac/lt_common.py; capture/lab/bench/summary-mac.json, capture/lab/bench/runs/main.jsonl, capture/lab/bench/runs/cost-ledger.jsonl; capture/lab/summary/import-times-mac.json, capture/lab/summary/install-size-mac.json, capture/lab/summary/tokens-mac.json, capture/lab/summary/checkpoint-cost-x86.json, capture/lab/summary/tracing-mac-real.json; capture/lab/summary/middleware-x86.json, capture/lab/T11-middleware-cost-x86/01-cost.jsonl, capture/lab/T11-middleware-cost-x86/t11_real.py; capture/lab/summary/middleware-mac.json; libs/partners/openai/langchain_openai/chat_models/base.py at langchain-openai 1.8.0.
