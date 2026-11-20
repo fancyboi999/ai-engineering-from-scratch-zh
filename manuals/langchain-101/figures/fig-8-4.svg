@@ -1,49 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 452" role="img" aria-labelledby="fig-8-4-title fig-8-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-8-4-title">Where input crosses into code, by default and with the setting</title>
-  <desc id="fig-8-4-desc">Four rows, each from an input on the left to two results on the right: the default result in rose and the result with a setting in violet. An edited SqliteSaver checkpoint row that names a class makes get_state build the class, and LANGGRAPH_STRICT_MSGPACK=true gives back the raw fields. A user id of star makes list_namespaces list every user, while search on the same prefix returns one user. A batched review lets an edit of send_email into delete_file run delete_file, and per-call review raises ValidationError. An agent inside tracing_context with enabled local sends requests to api.smith.langchain.com, and enabled False sends no run, only one GET /info.</desc>
+  <title id="fig-8-4-title">输入跨入代码之处：默认情况与设置之后</title>
+  <desc id="fig-8-4-desc">四行，每行从左侧的输入指向右侧的两个结果：玫红色是默认结果，紫罗兰色是使用某项设置后的结果。指名了一个类的、被编辑过的 SqliteSaver 检查点行，会让 get_state 构建该类，而 LANGGRAPH_STRICT_MSGPACK=true 返回原始字段。用户 id 为星号时，list_namespaces 列出所有用户，而对同一前缀的 search 只返回一个用户。批量审批下，把 send_email 编辑成 delete_file 会让 delete_file 运行，逐个调用审批则抛出 ValidationError。在 enabled 为 local 的 tracing_context 内，智能体会向 api.smith.langchain.com 发出请求，而 enabled 为 False 时不发送任何运行，只有一次 GET /info。</desc>
   <defs><marker id="fig-8-4-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-8-4-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
-  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">THE INPUT</text>
-  <text x="300" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">THE DEFAULT, THEN THE CHANGE</text>
+  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">输入</text>
+  <text x="300" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">默认结果，然后是改动后的结果</text>
   <rect x="20" y="34" width="252" height="76" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
-  <text x="32" y="59.75" font-size="12.5" font-weight="700">a checkpoint row names a class</text>
-  <text x="32" y="77.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">an edited SqliteSaver row,</text>
-  <text x="32" y="92.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">read with get_state</text>
+  <text x="32" y="59.75" font-size="12.5" font-weight="700">检查点行指名了一个类</text>
+  <text x="32" y="77.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">被编辑过的 SqliteSaver 行，</text>
+  <text x="32" y="92.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">用 get_state 读取</text>
   <rect x="300" y="34" width="320" height="34" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="312" y="54.45" font-size="11.5" font-weight="700">default: get_state built the lab class</text>
+  <text x="312" y="54.45" font-size="11.5" font-weight="700">默认：get_state 构建了实验用的类</text>
   <rect x="300" y="76" width="320" height="34" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="312" y="96.45" font-size="11.5" font-weight="700">LANGGRAPH_STRICT_MSGPACK=true: raw fields</text>
+  <text x="312" y="96.45" font-size="11.5" font-weight="700">LANGGRAPH_STRICT_MSGPACK=true：原始字段</text>
   <path d="M272 51 H299" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-8-4-head-rose)"/>
   <path d="M272 93 H299" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-4-head-ink)"/>
   <rect x="20" y="130" width="252" height="76" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
-  <text x="32" y="155.75" font-size="12.5" font-weight="700">a user id of *</text>
-  <text x="32" y="173.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">a store prefix built</text>
-  <text x="32" y="188.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">from that id</text>
+  <text x="32" y="155.75" font-size="12.5" font-weight="700">用户 id 为 *</text>
+  <text x="32" y="173.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">由该 id 构造的</text>
+  <text x="32" y="188.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">store 前缀</text>
   <rect x="300" y="130" width="320" height="34" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="312" y="150.45" font-size="11.5" font-weight="700">list_namespaces listed every user</text>
+  <text x="312" y="150.45" font-size="11.5" font-weight="700">list_namespaces 列出了每个用户</text>
   <rect x="300" y="172" width="320" height="34" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="312" y="192.45" font-size="11.5" font-weight="700">search on the same prefix: one user only</text>
+  <text x="312" y="192.45" font-size="11.5" font-weight="700">对同一前缀的 search：只有一个用户</text>
   <path d="M272 147 H299" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-8-4-head-rose)"/>
   <path d="M272 189 H299" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-4-head-ink)"/>
   <rect x="20" y="226" width="252" height="76" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
-  <text x="32" y="251.75" font-size="12.5" font-weight="700">an edit switches the tool</text>
-  <text x="32" y="269.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">send_email edited into</text>
-  <text x="32" y="284.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">a call of delete_file</text>
+  <text x="32" y="251.75" font-size="12.5" font-weight="700">编辑切换了工具</text>
+  <text x="32" y="269.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">send_email 被编辑成</text>
+  <text x="32" y="284.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">delete_file 的调用</text>
   <rect x="300" y="226" width="320" height="34" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="312" y="246.45" font-size="11.5" font-weight="700">batched: delete_file ran in 3 of 3 runs</text>
+  <text x="312" y="246.45" font-size="11.5" font-weight="700">batched：delete_file 在 3 次运行中全部运行</text>
   <rect x="300" y="268" width="320" height="34" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="312" y="288.45" font-size="11.5" font-weight="700">per_call: ValidationError, nothing ran</text>
+  <text x="312" y="288.45" font-size="11.5" font-weight="700">per_call：ValidationError，没有运行</text>
   <path d="M272 243 H299" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-8-4-head-rose)"/>
   <path d="M272 285 H299" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-4-head-ink)"/>
   <rect x="20" y="322" width="252" height="76" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
-  <text x="32" y="347.75" font-size="12.5" font-weight="700">an agent inside a local trace</text>
-  <text x="32" y="365.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tracing_context with</text>
+  <text x="32" y="347.75" font-size="12.5" font-weight="700">本地追踪中的智能体</text>
+  <text x="32" y="365.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tracing_context，</text>
   <text x="32" y="380.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">enabled=&quot;local&quot;</text>
   <rect x="300" y="322" width="320" height="34" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="312" y="342.45" font-size="11.5" font-weight="700">requests to api.smith.langchain.com</text>
+  <text x="312" y="342.45" font-size="11.5" font-weight="700">向 api.smith.langchain.com 发出请求</text>
   <rect x="300" y="364" width="320" height="34" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="312" y="384.45" font-size="11.5" font-weight="700">enabled=False: no run sent</text>
+  <text x="312" y="384.45" font-size="11.5" font-weight="700">enabled=False：没有发送运行</text>
   <path d="M272 339 H299" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-8-4-head-rose)"/>
   <path d="M272 381 H299" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-8-4-head-ink)"/>
-  <text x="20" y="428" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Rose: the result with the default. Violet: the result after the change.</text>
-  <text x="20" y="444" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Each result is a recorded run on the Mac or the x86 server guest, or a capture of the kit.</text>
+  <text x="20" y="428" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">玫红：默认设置下的结果。紫罗兰：改动之后的结果。</text>
+  <text x="20" y="444" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个结果都是 Mac 或 x86 服务器虚拟机上的一次录制运行，或录制工具包的一份录制。</text>
 </svg>

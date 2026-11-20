@@ -7,7 +7,7 @@ const { chart, load } = require('../../../_shared/chart.js');
 const data = load(path.join(__dirname, '../../capture/lab/prodapp-mac/summary/stream-mac.json'));
 const requests = data.events.filter(e => e.kind === 'request');
 const runs = data.spans.filter(s => s.name === 'agent.run').sort((a, b) => a.start - b.start);
-const TITLES = { 1: 'POST /runs: where is my order', 2: 'POST /runs: refund 8900 cents', 3: 'POST /approve: approve' };
+const TITLES = { 1: 'POST /runs：where is my order', 2: 'POST /runs：refund 8900 cents', 3: 'POST /approve：approve' };
 const turns = requests.map(req => {
   const run = runs.find(r => r.start >= req.wall - 0.05 && r.start <= req.wall + 5);
   const inside = data.spans.filter(s => s.trace_id === run.trace_id && (s.name === 'model.call' || s.name.startsWith('tool.')));
@@ -20,17 +20,17 @@ const PANEL = 124;
 
 module.exports = figure('fig-9-1', {
   height: 52 + turns.length * PANEL + 50,
-  title: 'Three requests to the service, the spans of each run, and the SSE events',
-  desc: `One conversation with Qwen3 4B on the Mac. ${turns.map(t => `Request ${t.turn} took ${Math.max(...t.events.map(e => e.t_ms)).toFixed(0)} ms, with ${t.inside.filter(s => s.name === 'model.call').length} model calls and events ${[...new Set(t.events.map(e => e.kind))].join(', ')}`).join('. ')}.`,
+  title: '对服务的三次请求、每次运行的 span 与 SSE 事件',
+  desc: `Mac 上与 Qwen3 4B 的一次对话。${turns.map(t => `请求 ${t.turn} 用了 ${Math.max(...t.events.map(e => e.t_ms)).toFixed(0)} ms，含 ${t.inside.filter(s => s.name === 'model.call').length} 次模型调用，事件有 ${[...new Set(t.events.map(e => e.kind))].join(', ')}`).join('。')}。`,
 }, f => {
   f.rect(16, 12, 14, 10, { hue: 'plum' });
   f.text(36, 21, 'model.call', { size: 11 });
   f.rect(126, 12, 14, 10, { hue: 'green' });
-  f.text(146, 21, 'tool span', { size: 11 });
+  f.text(146, 21, '工具 span', { size: 11 });
   f.dot(236, 17, { hue: 'indigo', r: 3.5 });
-  f.text(246, 21, 'SSE event at the client', { size: 11 });
+  f.text(246, 21, '客户端收到的 SSE 事件', { size: 11 });
   f.rect(420, 12, 14, 10, { hue: 'violet' });
-  f.text(440, 21, 'token events', { size: 11 });
+  f.text(440, 21, 'token 事件', { size: 11 });
   turns.forEach((t, i) => {
     const y0 = 44 + i * PANEL;
     f.text(16, y0 + 12, `${t.turn}. ${TITLES[t.turn] || ''}`, { size: 11.5, weight: 700 });
@@ -43,15 +43,15 @@ module.exports = figure('fig-9-1', {
       }
       f.rule(c.px(0), c.py(0) + 30, c.px(span), c.py(0) + 30, { hue: 'ink' });
     }
-    f.text(16, c.py(1.5) + 4, 'server task', { size: 11, hue: 'ink-soft' });
-    f.text(16, c.py(0.5) + 4, 'client stream', { size: 11, hue: 'ink-soft' });
+    f.text(16, c.py(1.5) + 4, '服务端任务', { size: 11, hue: 'ink-soft' });
+    f.text(16, c.py(0.5) + 4, '客户端流', { size: 11, hue: 'ink-soft' });
     for (const s of t.inside) {
       const x1 = c.px(Math.max(0, (s.start - t.wall) * 1000));
       const x2 = c.px(Math.min(span, (s.end - t.wall) * 1000));
       const model = s.name === 'model.call';
       f.rect(x1, c.py(1.5) - 9, Math.max(2, x2 - x1), 18, { hue: model ? 'plum' : 'green' });
       const a = s.attributes;
-      const label = `${a['gen_ai.usage.input_tokens']} in, ${a['gen_ai.usage.output_tokens']} out`;
+      const label = `输入 ${a['gen_ai.usage.input_tokens']}，输出 ${a['gen_ai.usage.output_tokens']}`;
       if (model && measure(label, 11) < x2 - x1 - 6) f.text((x1 + x2) / 2, c.py(1.5) + 4, label, { size: 11, anchor: 'middle', max: x2 - x1 - 4 });
     }
     if (t.tokens) f.rect(c.px(t.tokens.first_ms), c.py(0.5) - 5, Math.max(2, c.px(t.tokens.last_ms) - c.px(t.tokens.first_ms)), 10, { hue: 'violet' });
@@ -69,5 +69,5 @@ module.exports = figure('fig-9-1', {
       ends[line] = left + w;
     }
   });
-  f.text(150 + 235, 52 + turns.length * PANEL + 40, 'milliseconds after the request was sent', { size: 11.5, anchor: 'middle', serif: true, hue: 'ink-soft' });
+  f.text(150 + 235, 52 + turns.length * PANEL + 40, '请求发出后的毫秒数', { size: 11.5, anchor: 'middle', serif: true, hue: 'ink-soft' });
 });

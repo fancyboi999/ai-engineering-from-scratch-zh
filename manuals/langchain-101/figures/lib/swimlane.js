@@ -1,8 +1,8 @@
 'use strict';
 
 const CONTROL = new Set(['task', 'load_skill', 'submit_answer']);
-const LABEL = { single: 'agent', skills: 'agent', orders_db: 'orders db', synthesize: 'synth' };
-const PATTERN_NAME = { single: 'single agent', subagents: 'subagents (Deep Agents)', handoffs: 'agent transfers', skills: 'skills', router: 'router' };
+const LABEL = { single: '智能体', skills: '智能体', orders_db: '订单库', synthesize: '汇总' };
+const PATTERN_NAME = { single: '单智能体', subagents: '子智能体（Deep Agents）', handoffs: '智能体转交', skills: 'skills', router: '路由' };
 const LANE_H = 24;
 const HEAD_H = 24;
 const GAP = 10;
@@ -40,8 +40,8 @@ function panel(f, { x, y, w, run, tmax, beat }) {
   const px = t => left + (t / tmax) * width;
   f.beat(beat);
   f.text(x, y + 14, PATTERN_NAME[run.pattern] || run.pattern, { size: 12, weight: 700 });
-  const verdict = run.passed ? 'pass' : 'fail';
-  f.text(x + w, y + 14, `${run.calls} model calls, ${(run.in / 1000).toFixed(1)}k tokens in, ${verdict}`, { size: 11, anchor: 'end', hue: run.passed ? 'ink-soft' : 'rose' });
+  const verdict = run.passed ? '通过' : '失败';
+  f.text(x + w, y + 14, `${run.calls} 次模型调用，输入 ${(run.in / 1000).toFixed(1)}k token，${verdict}`, { size: 11, anchor: 'end', hue: run.passed ? 'ink-soft' : 'rose' });
   const top = y + HEAD_H;
   lanes.forEach((lane, i) => {
     const ly = top + i * LANE_H;
@@ -84,14 +84,14 @@ function axis(f, { x, y, w, tmax, step }) {
 
 function legend(f, { x, y, turns }) {
   f.rect(x, y - 9, 16, 10, { hue: 'plum' });
-  f.text(x + 22, y, 'model call, numbered in order', { size: 11, hue: 'ink-soft' });
+  f.text(x + 22, y, '模型调用，按顺序编号', { size: 11, hue: 'ink-soft' });
   f.mark(`M${x + 236} ${y}l4 -7l4 7z`, { hue: 'green' });
-  f.text(x + 250, y, 'domain tool', { size: 11, hue: 'ink-soft' });
+  f.text(x + 250, y, '业务工具', { size: 11, hue: 'ink-soft' });
   f.mark(`M${x + 342} ${y}l4 -7l4 7z`, { hue: 'amber' });
-  f.text(x + 356, y, 'task, transfer, skill, submit', { size: 11, hue: 'ink-soft' });
+  f.text(x + 356, y, 'task、转交、技能、提交', { size: 11, hue: 'ink-soft' });
   if (turns) {
     f.rule(x, y + 12, x + 16, y + 12, { hue: 'amber', dash: 'dashed' });
-    f.text(x + 22, y + 16, 'start of the next user turn', { size: 11, hue: 'ink-soft' });
+    f.text(x + 22, y + 16, '下一轮用户消息的起点', { size: 11, hue: 'ink-soft' });
   }
 }
 

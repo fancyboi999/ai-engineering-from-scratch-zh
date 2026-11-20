@@ -7,24 +7,24 @@ const { load } = require('../../../_shared/chart.js');
 const data = load(path.join(__dirname, '../../capture/lab/prodapp-mac/summary/fix-mac.json')).load;
 const count = (cell, key) => Object.entries(cell.kinds).filter(([k]) => k.startsWith(key)).reduce((s, [, v]) => s + v, 0);
 const parts = cell => [
-  ['done', count(cell, 'runs:200:done') + count(cell, 'approve:200:done'), 'violet'],
-  ['interrupted', count(cell, 'runs:200:interrupted'), 'amber'],
-  ['409 on approve', count(cell, 'approve:409'), 'grey'],
+  ['完成', count(cell, 'runs:200:done') + count(cell, 'approve:200:done'), 'violet'],
+  ['已中断', count(cell, 'runs:200:interrupted'), 'amber'],
+  ['approve 返回 409', count(cell, 'approve:409'), 'grey'],
   ['ReadTimeout', Object.values(cell.client_errors).reduce((s, v) => s + v, 0), 'rose'],
 ];
-const ROWS = [['without a heartbeat', data.before], ['with a heartbeat every 15 s', data.after]];
+const ROWS = [['没有心跳', data.before], ['每 15 s 一次心跳', data.after]];
 const total = Math.max(...ROWS.map(([, c]) => parts(c).reduce((s, p) => s + p[1], 0)));
 const scale = 600 / total;
 
 module.exports = figure('fig-9-1c', {
   height: 236,
-  title: 'What 50 clients saw, without and with a heartbeat on the stream',
-  desc: ROWS.map(([label, c]) => `${label}: ${parts(c).map(([n, v]) => `${v} ${n}`).join(', ')}, ${c.runs_per_s_exact} runs each second`).join('. ') + '. One worker, Qwen3 4B on the Mac, read timeout 120 s.',
+  title: '50 个客户端看到的结果：流上没有心跳与有心跳',
+  desc: ROWS.map(([label, c]) => `${label}：${parts(c).map(([n, v]) => `${n} ${v} 次`).join('，')}，每秒 ${c.runs_per_s_exact} 次运行`).join('。') + '。一个 worker，Mac 上的 Qwen3 4B，读取超时 120 s。',
 }, f => {
   ROWS.forEach(([label, cell], r) => {
     const y = 20 + r * 86;
     f.text(16, y + 12, label, { size: 11.5, weight: 700 });
-    f.text(16, y + 28, `${cell.runs_per_s_exact} runs each second, median ${cell.p50_s.toFixed(0)} s per run`, { size: 11, serif: true, hue: 'ink-soft' });
+    f.text(16, y + 28, `每秒 ${cell.runs_per_s_exact} 次运行，每次运行中位数 ${cell.p50_s.toFixed(0)} s`, { size: 11, serif: true, hue: 'ink-soft' });
     let x = 16;
     for (const [name, value, hue] of parts(cell)) {
       if (!value) continue;

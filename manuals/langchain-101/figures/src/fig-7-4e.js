@@ -15,11 +15,11 @@ const loops = graph.edges.filter(e => e.from === e.to).map(e => e.from);
 
 module.exports = figure('fig-7-4e', {
   height: plan.bottom + 44,
-  title: 'The graph of a deep agent',
-  desc: `The compiled graph of create_deep_agent with tools=[add], drawn from its draw_mermaid output. It has ${s.nodes} nodes. PatchToolCallsMiddleware.before_agent runs before model, and _ParentNotifierMiddleware.after_agent runs before the end. The tools node holds ${tools.length} tools: ${tools.join(', ')}. The ${loops.join(', ')} node also has a conditional edge back to itself.`,
+  title: 'deep agent 的图',
+  desc: `带 tools=[add] 的 create_deep_agent 的已编译图，由 draw_mermaid 输出绘制。它有 ${s.nodes} 个节点。PatchToolCallsMiddleware.before_agent 在 model 之前运行，_ParentNotifierMiddleware.after_agent 在结束之前运行。tools 节点含 ${tools.length} 个工具：${tools.join(', ')}。${loops.join(', ')} 节点还有一条条件边回到自身。`,
 }, f => {
-  f.kicker(20, 20, 'get_graph() of create_deep_agent');
-  f.text(620, 20, `${s.nodes} nodes, ${tools.length} tools`, { size: 11, anchor: 'end', hue: 'ink-soft' });
+  f.kicker(20, 20, 'create_deep_agent 的 get_graph()');
+  f.text(620, 20, `${s.nodes} 个节点，${tools.length} 个工具`, { size: 11, anchor: 'end', hue: 'ink-soft' });
   gl.draw(f, plan);
-  gl.legend(f, plan.bottom + 30);
+  gl.legend(f, plan.bottom + 30, { plain: '普通边', conditional: '条件边，运行时选择' });
 });

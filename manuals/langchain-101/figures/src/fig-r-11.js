@@ -10,26 +10,26 @@ const subset = S.main.subset;
 const mixed = new Set(SP.mixed);
 const seeds = Object.keys(SP.seeds).sort();
 const ROWS = [
-  ...SP.greedy.plain.map((r, i) => ({ label: `greedy, run ${i + 1}`, tasks: r, hue: 'violet', group: 'plain loop, temperature 0, seed 42' })),
-  ...SP.greedy.deep_agent.map((r, i) => ({ label: `greedy, run ${i + 1}`, tasks: r, hue: 'blue', group: 'deep agent, temperature 0, seed 42' })),
-  ...seeds.map(k => ({ label: `seed ${k.split('-s')[1]}`, tasks: SP.seeds[k].tasks, hue: 'violet', group: 'plain loop, temperature 0.7' })),
+  ...SP.greedy.plain.map((r, i) => ({ label: `贪心，第 ${i + 1} 次运行`, tasks: r, hue: 'violet', group: 'plain 循环，temperature 0，seed 42' })),
+  ...SP.greedy.deep_agent.map((r, i) => ({ label: `贪心，第 ${i + 1} 次运行`, tasks: r, hue: 'blue', group: 'deep agent，temperature 0，seed 42' })),
+  ...seeds.map(k => ({ label: `seed ${k.split('-s')[1]}`, tasks: SP.seeds[k].tasks, hue: 'violet', group: 'plain 循环，temperature 0.7' })),
 ];
 const X0 = 160;
 const SQ = 12;
 const RH = 18;
 const Y0 = 62;
 const FAMS = ['chain', 'sql', 'r', 'files', 'multi'];
-const famName = { chain: 'chain', sql: 'sql', r: 'retrieval', files: 'files', multi: 'multiturn' };
+const famName = { chain: 'chain', sql: 'sql', r: '检索', files: 'files', multi: '多轮' };
 const colX = t => X0 + subset.indexOf(t) * (SQ + 1) + FAMS.findIndex(p => t.startsWith(p)) * 6;
 const count = r => subset.filter(t => r.tasks[t]).length;
 
 module.exports = figure('fig-r-11', {
   height: Y0 + 9 * RH + 3 * 22 + 50,
-  title: 'Three greedy runs repeat each other, three sampled runs do not',
-  desc: `A grid of the 30 subset tasks for Qwen3 4B on the Mac. The plain loop and the deep agent each ran three times at temperature 0 and seed 42, and every run gave the same outcome on every task, with the same tokens and tool calls: ${count(ROWS[0])} and ${count(ROWS[3])} of 30. The plain loop at temperature 0.7 with seeds 1, 2 and 3 passed ${seeds.map(k => SP.seeds[k].pass).join(', ')} of 30, and ${SP.mixed.length} tasks changed outcome between seeds: ${SP.mixed.join(', ')}.`,
+  title: '三次贪心运行互相一致，三次采样运行则不一致',
+  desc: `Mac 上 Qwen3 4B 在 30 个子集任务上的网格。plain 循环与 deep agent 各在 temperature 0、seed 42 下运行三次，每次运行在每个任务上结果都相同，token 与工具调用也相同：分别通过 30 个中的 ${count(ROWS[0])} 个和 ${count(ROWS[3])} 个。temperature 0.7、seed 为 1、2、3 的 plain 循环分别通过 30 个中的 ${seeds.map(k => SP.seeds[k].pass).join('、')} 个，有 ${SP.mixed.length} 个任务在不同 seed 间结果改变：${SP.mixed.join(', ')}。`,
 }, f => {
-  f.kicker(20, 22, 'Qwen3 4B, 30 subset tasks');
-  f.kicker(620, 22, 'pass', { anchor: 'end' });
+  f.kicker(20, 22, 'Qwen3 4B，30 个子集任务');
+  f.kicker(620, 22, '通过', { anchor: 'end' });
   FAMS.forEach(p => {
     const ts = subset.filter(t => t.startsWith(p));
     const a = colX(ts[0]);
@@ -56,5 +56,5 @@ module.exports = figure('fig-r-11', {
   subset.filter(t => mixed.has(t)).forEach(t => {
     f.path(`M${colX(t) + (SQ - 2) / 2} ${y + 10} L${colX(t) + (SQ - 2) / 2 - 4} ${y + 17} L${colX(t) + (SQ - 2) / 2 + 4} ${y + 17} Z`, { hue: 'amber', head: false, width: 1.4, packet: false });
   });
-  f.text(20, y + 34, `amber marks: the ${mixed.size} tasks whose outcome changed between seeds`, { size: 11, serif: true, hue: 'amber' });
+  f.text(20, y + 34, `琥珀标记：${mixed.size} 个任务在不同 seed 间结果有变化`, { size: 11, serif: true, hue: 'amber' });
 });

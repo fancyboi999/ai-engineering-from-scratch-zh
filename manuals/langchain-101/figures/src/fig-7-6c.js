@@ -3,25 +3,25 @@
 const { figure } = require('../../../_shared/figkit.js');
 
 const lanes = [
-  { x: 80, name: 'your code', hue: 'violet' },
+  { x: 80, name: '你的代码', hue: 'violet' },
   { x: 232, name: 'traceable', hue: 'blue' },
   { x: 392, name: 'callbacks', hue: 'blue' },
-  { x: 556, name: 'the client', hue: 'olive' },
+  { x: 556, name: '客户端', hue: 'olive' },
 ];
 const rows = [
-  [0, 1, 'call', 'pipeline() in "local"', 'a traceable function'],
-  [1, 0, 'reply', 'RunTree to on_end', 'kept in memory, 0 requests'],
-  [0, 2, 'call', 'agent.invoke() in "local"', 'LangChain code'],
-  [2, 2, 'state', 'tracing on: "local" is truthy', 'LangChainTracer added'],
-  [2, 3, 'fail', 'POST /runs 7, PATCH 7', 'sent, although local'],
-  [0, 2, 'call', 'invoke() in enabled=False', 'inside collect_runs()'],
-  [2, 0, 'reply', '4 runs in traced_runs', 'kept in memory, 0 requests'],
+  [0, 1, 'call', '"local" 下的 pipeline()', '一个 traceable 函数'],
+  [1, 0, 'reply', 'RunTree 交给 on_end', '保存在内存中，0 个请求'],
+  [0, 2, 'call', '"local" 下的 agent.invoke()', 'LangChain 代码'],
+  [2, 2, 'state', '追踪开启："local" 为真值', '添加了 LangChainTracer'],
+  [2, 3, 'fail', 'POST /runs 7, PATCH 7', '已发送，尽管是 local'],
+  [0, 2, 'call', 'enabled=False 下的 invoke()', '在 collect_runs() 内'],
+  [2, 0, 'reply', 'traced_runs 中有 4 个运行', '保存在内存中，0 个请求'],
 ];
 
 module.exports = figure('fig-7-6c', {
   height: 420,
-  title: 'What tracing_context(enabled="local") keeps and sends',
-  desc: 'Four lifelines: your code, the traceable wrapper of langsmith, the LangChain callback manager, and the LangSmith client. A traceable function inside tracing_context with enabled set to local builds a run tree and gives it to on_end, and the client gets no request. An agent.invoke inside the same context turns tracing on, because the callback manager treats the string local as true and adds a LangChainTracer, which sends POST /runs 7 times and PATCH 7 times. The same invoke inside tracing_context with enabled set to False and inside collect_runs keeps four top runs in memory and sends nothing.',
+  title: 'tracing_context(enabled="local") 保留与发送的内容',
+  desc: '四条生命线：你的代码、langsmith 的 traceable 包装器、LangChain 回调管理器和 LangSmith 客户端。enabled 设为 local 的 tracing_context 内，traceable 函数构建一棵运行树并交给 on_end，客户端收不到任何请求。同一上下文内的 agent.invoke 会打开追踪，因为回调管理器把字符串 local 当作真值，并添加 LangChainTracer，它发送 7 次 POST /runs 和 7 次 PATCH。enabled 设为 False 的 tracing_context 加 collect_runs 内的同一个 invoke，把四个顶层运行保留在内存中，什么也不发送。',
 }, f => {
   for (const lane of lanes) {
     f.box({ x: lane.x, y: 10, w: 116, h: 30, hue: lane.hue, title: lane.name, titleSize: 12, anchor: 'middle' });

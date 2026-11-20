@@ -6,16 +6,16 @@ const { load } = require('../../../_shared/chart.js');
 
 const S = load(path.join(__dirname, '../../capture/lab/bench2/summary-bench2.json'));
 const MODELS = [
-  ['qwen3:8b', 'Qwen3 8B, Ollama'],
-  ['qwen3:14b', 'Qwen3 14B, Ollama'],
-  ['gpt-oss:20b', 'gpt-oss 20B, Ollama'],
-  ['claude-haiku-5-5', 'Claude Haiku 5.5, API'],
+  ['qwen3:8b', 'Qwen3 8B，Ollama'],
+  ['qwen3:14b', 'Qwen3 14B，Ollama'],
+  ['gpt-oss:20b', 'gpt-oss 20B，Ollama'],
+  ['claude-haiku-5-5', 'Claude Haiku 5.5，API'],
 ];
 const ARMS = [
-  ['plain', 'plain loop', 'violet'],
+  ['plain', 'plain 循环', 'violet'],
   ['deep', 'deep agent', 'blue'],
-  ['ptc', 'deep agent + eval tool', 'green'],
-  ['nudge', '+ asks for eval', 'indigo'],
+  ['ptc', 'deep agent + eval 工具', 'green'],
+  ['nudge', '+ 要求用 eval', 'indigo'],
 ];
 const BX = 196;
 const BW = 110;
@@ -31,13 +31,13 @@ const m8 = cell('qwen3:8b', 'ptc');
 
 module.exports = figure('fig-7-4f', {
   height: Y0 + nRows * RH + MODELS.length * 30 + 76,
-  title: 'Pass counts with and without the eval tool, four models on 39 tasks',
-  desc: `Bars of the pass rate on the 39 chain and sql tasks for a plain loop, a deep agent, and a deep agent with the eval tool, on Qwen3 8B, Qwen3 14B, gpt-oss 20B and Claude Haiku 5.5. Haiku passed ${hay.pass} of ${hay.n} with the eval tool and ${hayN.pass} of ${hayN.n} when the prompt asked for it, and Qwen3 8B passed ${m8.pass} of ${m8.n} with the eval tool. Columns give model calls, prompt tokens in thousands, and the median seconds per task.`,
+  title: '有无 eval 工具的通过数，4 个模型，39 个任务',
+  desc: `在 39 个 chain 与 sql 任务上，对 plain 循环、deep agent 和带 eval 工具的 deep agent 的通过率条形图，模型为 Qwen3 8B、Qwen3 14B、gpt-oss 20B 和 Claude Haiku 5.5。Haiku 带 eval 工具时通过 ${hay.n} 个中的 ${hay.pass} 个，提示词要求使用时通过 ${hayN.n} 个中的 ${hayN.pass} 个，Qwen3 8B 带 eval 工具时通过 ${m8.n} 个中的 ${m8.pass} 个。各列依次为模型调用数、以千计的提示词 token 数，以及每个任务的中位秒数。`,
 }, f => {
-  f.kicker(20, 22, 'pass of tasks');
-  f.kicker(400, 22, 'calls', { anchor: 'end' });
-  f.kicker(496, 22, 'prompt', { anchor: 'end' });
-  f.kicker(596, 22, 'sec/task', { anchor: 'end' });
+  f.kicker(20, 22, '通过数/任务数');
+  f.kicker(400, 22, '调用', { anchor: 'end' });
+  f.kicker(496, 22, '提示词', { anchor: 'end' });
+  f.kicker(596, 22, '秒/任务', { anchor: 'end' });
   f.rule(20, 32, 620, 32, { hue: 'ink-mute' });
   let y = Y0;
   rows.forEach(([m, name, arms], g) => {
@@ -58,7 +58,7 @@ module.exports = figure('fig-7-4f', {
     y += 10;
   });
   f.beat(0);
-  f.text(20, y + 6, '12-task rows: the chain and sql tasks of the 30-task subset.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, y + 22, `No local model called eval. Haiku used it in ${hayN.eval_runs} of ${hayN.n} nudged runs.`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, y + 38, 'Local seconds come from a Mac that ran other work.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 6, '12 个任务的行：30 任务子集中的 chain 与 sql 任务。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 22, `没有本地模型调用过 eval。在要求使用的 ${hayN.n} 次运行中，Haiku 有 ${hayN.eval_runs} 次用了它。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 38, '本地秒数来自一台同时在跑其他任务的 Mac。', { size: 11, serif: true, hue: 'ink-soft' });
 });

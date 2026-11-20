@@ -22,22 +22,22 @@ const rows = [
   ['prepare', 'outer', prepared],
   ['shout', 'inner', waiting],
   ['ask_ok', 'inner', returned],
-  ['operator.add', 'parent update', [...parent, '+', ...mark(returned)]],
+  ['operator.add', '父图更新', [...parent, '+', ...mark(returned)]],
   ['finish', 'outer', [...parent, ...mark(returned), final[final.length - 1]]],
 ];
 
 module.exports = figure('fig-6-7', {
   height: 380,
-  title: 'The steps list through a subgraph',
-  desc: 'Five rows from top to bottom, each a node and the steps list after it. prepare writes outer.prepare. Inside the namespace of the subgraph inner, shout adds inner.shout and ask_ok adds inner.ask_ok=yes, so the subgraph returns three entries. The parent applies that output with operator.add to its list that already holds outer.prepare, so outer.prepare appears twice. finish adds outer.finish, and the final list has five entries.',
+  title: '经过子图的 steps 列表',
+  desc: '五行，自上而下，每行是一个节点及其执行后的 steps 列表。prepare 写入 outer.prepare。在子图 inner 的命名空间内，shout 添加 inner.shout，ask_ok 添加 inner.ask_ok=yes，所以子图返回三个条目。父图用 operator.add 把这个输出并入已含 outer.prepare 的列表，所以 outer.prepare 出现两次。finish 添加 outer.finish，最终列表有五个条目。',
 }, f => {
-  f.kicker(20, 18, 'node');
-  f.kicker(128, 18, 'steps after the node');
+  f.kicker(20, 18, '节点');
+  f.kicker(128, 18, '节点之后的 steps 列表');
   f.rect(10, 92, 620, 126, { hue: 'indigo', dash: 'dashed', fill: 'none' });
-  f.text(620, 210, 'namespace inner:<uuid-1>', { size: 11, anchor: 'end', hue: 'indigo', serif: true });
+  f.text(620, 210, '命名空间 inner:<uuid-1>', { size: 11, anchor: 'end', hue: 'indigo', serif: true });
   rows.forEach(([node, where, items], i) => {
     const y = 32 + i * 66;
-    const hue = where === 'parent update' ? 'grey' : 'indigo';
+    const hue = where === '父图更新' ? 'grey' : 'indigo';
     f.box({ x: 16, y, w: 100, h: 42, hue, title: node, sub: where, titleSize: 11.5, pad: 4 });
     if (i < rows.length - 1) f.arrow([66, y + 42], [66, y + 65], { style: 'call' });
     let x = 128;
@@ -55,5 +55,5 @@ module.exports = figure('fig-6-7', {
       x += w + 6;
     });
   });
-  f.text(20, 372, 'The rose entry is the copy that operator.add in the parent added to its own list.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 372, '玫红色条目是父图中 operator.add 加进自己列表的副本。', { size: 11, serif: true, hue: 'ink-soft' });
 });

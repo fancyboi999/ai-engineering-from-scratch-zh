@@ -18,10 +18,10 @@ const resume = /Command\(resume='([^']+)'\)/.exec(text)[1];
 const repeated = runs.filter(line => line === runs[1]).length;
 
 const lanes = [
-  { title: 'your code', sub: 'invoke', hue: 'violet' },
-  { title: 'graph', sub: 'Pregel loop', hue: 'indigo' },
-  { title: writeNode, sub: 'node', hue: 'indigo' },
-  { title: reviewNode, sub: 'node', hue: 'indigo' },
+  { title: '你的代码', sub: 'invoke', hue: 'violet' },
+  { title: '图', sub: 'Pregel 循环', hue: 'indigo' },
+  { title: writeNode, sub: '节点', hue: 'indigo' },
+  { title: reviewNode, sub: '节点', hue: 'indigo' },
   { title: 'checkpointer', sub: 'InMemorySaver', hue: 'teal' },
 ];
 const cx = index => 46 + index * 86;
@@ -29,29 +29,29 @@ const LOG = 446;
 
 const rows = [
   [0, 1, 'call', 'invoke(input)'],
-  [1, 2, 'call', `run ${writeNode}`, 0],
-  [1, 3, 'call', `run ${reviewNode}`, 1],
-  [3, 4, 'write', 'pause saved', null, `next: ${next.join(', ')}`],
-  [1, 0, 'state', `interrupt: ${pause.question}`],
+  [1, 2, 'call', `运行 ${writeNode}`, 0],
+  [1, 3, 'call', `运行 ${reviewNode}`, 1],
+  [3, 4, 'write', '暂停已保存', null, `next: ${next.join(', ')}`],
+  [1, 0, 'state', `中断：${pause.question}`],
   null,
   [0, 1, 'call', `Command(resume='${resume}')`],
-  [1, 3, 'call', `run ${reviewNode} again`, 2],
+  [1, 3, 'call', `再次运行 ${reviewNode}`, 2],
   [3, 1, 'reply', `verdict: ${value.verdict}`, 3],
-  [1, 4, 'write', 'step saved', null, 'next: none'],
-  [1, 0, 'reply', 'final state'],
+  [1, 4, 'write', '步骤已保存', null, 'next: none'],
+  [1, 0, 'reply', '最终状态'],
 ];
 
 module.exports = figure('fig-6-4', {
   height: 600,
-  title: 'One interrupt and one resume',
-  desc: `Five lifelines: your code, the graph loop, the ${writeNode} node, the ${reviewNode} node, and the checkpointer. A sixth column is the log of node bodies that ran, in order, from the capture. The first invoke runs ${writeNode}, then ${reviewNode} up to its interrupt, saves the pause with next ${next.join(', ')}, and returns the interrupt "${pause.question}". The resume with Command resume ${resume} runs ${reviewNode} again from its first line. The log shows "${runs[1]}" ${repeated} times, then "${runs[3]}", and the verdict ${value.verdict} is saved. ${writeNode} does not run again.`,
+  title: '一次中断与一次恢复',
+  desc: `五条生命线：你的代码、图循环、${writeNode} 节点、${reviewNode} 节点和 checkpointer。第六列是录制中已运行节点体的日志，按顺序排列。第一次 invoke 运行 ${writeNode}，再运行 ${reviewNode} 直到它的中断，保存暂停状态（next 为 ${next.join(', ')}），并返回中断 "${pause.question}"。用 Command resume ${resume} 恢复时，${reviewNode} 从第一行重新运行。日志中 "${runs[1]}" 出现 ${repeated} 次，随后是 "${runs[3]}"，判定 ${value.verdict} 被保存。${writeNode} 不再运行。`,
 }, f => {
   lanes.forEach((lane, index) => {
     f.box({ x: cx(index), y: 8, w: 84, h: 40, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 11, anchor: 'middle', pad: 2 });
     f.lifeline(cx(index), 48, 590);
   });
-  f.kicker(LOG, 22, 'node bodies run');
-  f.text(LOG, 38, 'the log, in order', { size: 11, serif: true, hue: 'ink-soft' });
+  f.kicker(LOG, 22, '已运行的节点体');
+  f.text(LOG, 38, '日志，按顺序', { size: 11, serif: true, hue: 'ink-soft' });
   f.rule(LOG - 12, 8, LOG - 12, 590, { hue: 'ink-mute', opacity: 0.4 });
   f.text(20, 70, 'INVOKE', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
   let n = 0;
@@ -59,8 +59,8 @@ module.exports = figure('fig-6-4', {
     const y = 92 + index * 44;
     if (!row) {
       f.rule(20, y - 4, LOG - 20, y - 4, { hue: 'ink-mute', dash: 'dashed' });
-      f.text(20, y + 12, 'THE RESUME', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
-      f.text(cx(2), y + 12, `${writeNode} does not run`, { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft', knock: true });
+      f.text(20, y + 12, '恢复', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
+      f.text(cx(2), y + 12, `${writeNode} 不运行`, { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft', knock: true });
       return;
     }
     const [from, to, style, label, log, note] = row;
@@ -79,5 +79,5 @@ module.exports = figure('fig-6-4', {
   });
   f.beat(0);
   f.text(LOG, 574, `"${runs[1]}"`, { size: 11, serif: true, hue: 'rose' });
-  f.text(LOG, 588, `ran ${repeated} times`, { size: 11, serif: true, hue: 'rose', weight: 700 });
+  f.text(LOG, 588, `运行了 ${repeated} 次`, { size: 11, serif: true, hue: 'rose', weight: 700 });
 });

@@ -15,11 +15,11 @@ const plan = gl.layout(graph, { top: 44, hue, metaMax: 240 });
 
 module.exports = figure('fig-9-1b', {
   height: plan.bottom + 44,
-  title: 'The graph of the service agent',
-  desc: `The compiled graph of build_agent in the reference service, drawn from its draw_mermaid output. It has ${s.nodes} nodes, ${hooks.length} of them hook nodes: ${hooks.join(', ')}. The other middleware have only wrap hooks and add no node. ModelCallLimitMiddleware can end the run before model or after it. The tools node holds ${tools.length} tools: ${tools.join(', ')}.`,
+  title: '服务智能体的图',
+  desc: `参考服务中 build_agent 的已编译图，由 draw_mermaid 输出绘制。它有 ${s.nodes} 个节点，其中 ${hooks.length} 个是钩子节点：${hooks.join(', ')}。其他中间件只有 wrap 钩子，不增加节点。ModelCallLimitMiddleware 可以在 model 之前或之后结束运行。tools 节点含 ${tools.length} 个工具：${tools.join(', ')}。`,
 }, f => {
-  f.kicker(20, 20, 'get_graph() of build_agent');
-  f.text(620, 20, `${s.nodes} nodes, ${hooks.length} of them hooks`, { size: 11, anchor: 'end', hue: 'ink-soft' });
+  f.kicker(20, 20, 'build_agent 的 get_graph()');
+  f.text(620, 20, `${s.nodes} 个节点，其中 ${hooks.length} 个是钩子`, { size: 11, anchor: 'end', hue: 'ink-soft' });
   gl.draw(f, plan);
-  gl.legend(f, plan.bottom + 30);
+  gl.legend(f, plan.bottom + 30, { plain: '普通边', conditional: '条件边，运行时选择' });
 });

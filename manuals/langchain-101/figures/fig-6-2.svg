@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="fig-6-2-title fig-6-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-6-2-title">The joke graph and one run</title>
-  <desc id="fig-6-2-desc">The top is the graph from the capture: __start__ to plan, then three Send arrows from plan to three write_joke tasks for cats, dogs, owls in one step, then plain edges to pick. pick returns a Command with best set to &quot;a joke about cats&quot; and goto publish, so publish runs and then __end__. The retry node, the other target of pick, did not run. The bottom is a table of what each node wrote to the state in each of the 4 steps, read from the updates stream: plan wrote subjects, each write_joke wrote one joke, operator.add joined the three into a list of 3, and pick wrote best. The log key ends with 6 entries.</desc>
+  <title id="fig-6-2-title">笑话图与一次运行</title>
+  <desc id="fig-6-2-desc">上方是录制中的图：__start__ 到 plan，再由 plan 发出三条 Send 箭头，在同一超步内指向 cats, dogs, owls 三个 write_joke 任务，随后用普通边汇入 pick。pick 返回一个 Command，best 设为 &quot;a joke about cats&quot;，goto 为 publish，所以 publish 先运行，再到 __end__。pick 的另一个目标 retry 节点没有运行。下方的表按 updates 流读取，列出 4 个超步中每个节点写入状态的内容：plan 写入 subjects，每个 write_joke 写入一个笑话，operator.add 把三者合并为含 3 项的列表，pick 写入 best。log 键最终有 6 条记录。</desc>
   <defs><marker id="fig-6-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-6-2-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-6-2-head-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-grey-ink, #5e5e59)"/></marker><marker id="fig-6-2-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
   <rect x="12" y="76" width="74" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="49" y="99.45" font-size="11.5" text-anchor="middle" font-weight="700">__start__</text>
   <rect x="104" y="76" width="66" height="40" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="137" y="91.25" font-size="12.5" text-anchor="middle" font-weight="700">plan</text>
-  <text x="137" y="108.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">step 1</text>
+  <text x="137" y="108.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">超步 1</text>
   <line x1="86" y1="96" x2="103" y2="96" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-6-2-head-ink)"/>
   <rect x="206" y="24" width="102" height="40" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="257" y="38.95" font-size="11.5" text-anchor="middle" font-weight="700">write_joke</text>
@@ -23,16 +23,16 @@
   <text x="257" y="160.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">owls</text>
   <path d="M170 96 H186 V148 H205" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-6-2-head-amber)"/>
   <path d="M308 148 H324 V96 H343" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round"/>
-  <text x="178" y="16" font-size="11" fill="var(--m-amber-ink, #85590c)">Send x 3</text>
+  <text x="178" y="16" font-size="11" fill="var(--m-amber-ink, #85590c)">Send × 3</text>
   <rect x="344" y="76" width="66" height="40" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="377" y="91.25" font-size="12.5" text-anchor="middle" font-weight="700">pick</text>
   <text x="377" y="108.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Command</text>
   <rect x="452" y="36" width="82" height="40" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="493" y="51.25" font-size="12.5" text-anchor="middle" font-weight="700">publish</text>
-  <text x="493" y="68.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ran</text>
+  <text x="493" y="68.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">已运行</text>
   <rect x="452" y="124" width="82" height="40" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)" stroke-dasharray="5 4"/>
   <text x="493" y="139.25" font-size="12.5" text-anchor="middle" font-weight="700">retry</text>
-  <text x="493" y="156.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">did not run</text>
+  <text x="493" y="156.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未运行</text>
   <path d="M410 90 H428 V56 H451" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-6-2-head-amber)"/>
   <path d="M410 102 H428 V144 H451" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-6-2-head-grey)"/>
   <text x="431" y="28" font-size="11" fill="var(--m-amber-ink, #85590c)">goto publish</text>
@@ -40,15 +40,15 @@
   <text x="594" y="99.45" font-size="11.5" text-anchor="middle" font-weight="700">__end__</text>
   <path d="M534 56 H546 V90 H559" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-6-2-head-ink)"/>
   <path d="M534 144 H546 V102 H559" fill="none" stroke="var(--m-grey-ink, #5e5e59)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-6-2-head-grey)"/>
-  <text x="20" y="186" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">WHAT EACH STEP WROTE TO THE STATE</text>
-  <text x="137" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">step 1</text>
-  <line x1="77" y1="216" x2="77" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
-  <text x="257" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">step 2</text>
-  <line x1="197" y1="216" x2="197" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
-  <text x="377" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">step 3</text>
-  <line x1="317" y1="216" x2="317" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
-  <text x="493" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">step 4</text>
-  <line x1="433" y1="216" x2="433" y2="418" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="20" y="186" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每个超步写入状态的内容</text>
+  <text x="137" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">超步 1</text>
+  <line x1="77" y1="216" x2="77" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="257" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">超步 2</text>
+  <line x1="197" y1="216" x2="197" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="377" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">超步 3</text>
+  <line x1="317" y1="216" x2="317" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="493" y="210" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">超步 4</text>
+  <line x1="433" y1="216" x2="433" y2="418" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <text x="20" y="240" font-size="11" font-weight="700" fill="var(--m-teal-ink, #18696a)">subjects</text>
   <rect x="78" y="227" width="118" height="18" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8"/>
   <text x="137" y="240" font-size="11" text-anchor="middle">cats, dogs, owls</text>
@@ -60,10 +60,10 @@
   <rect x="198" y="301" width="118" height="18" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8"/>
   <text x="257" y="314" font-size="11" text-anchor="middle">a joke about owls</text>
   <line x1="317" y1="290" x2="347" y2="290" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-6-2-head-teal)"/>
-  <rect class="m-knock" x="350" y="275.42" width="144.6" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="353" y="286" font-size="11" font-weight="700" fill="var(--m-teal-ink, #18696a)">operator.add: 3 items</text>
-  <rect class="m-knock" x="350" y="289.42" width="130.74" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="353" y="300" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one list in the state</text>
+  <rect class="m-knock" x="350" y="275.42" width="120.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="353" y="286" font-size="11" font-weight="700" fill="var(--m-teal-ink, #18696a)">operator.add：3 项</text>
+  <rect class="m-knock" x="350" y="289.42" width="94" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="353" y="300" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">状态中的一个列表</text>
   <text x="20" y="348" font-size="11" font-weight="700" fill="var(--m-teal-ink, #18696a)">best</text>
   <rect x="318" y="335" width="118" height="18" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8"/>
   <text x="377" y="348" font-size="11" text-anchor="middle">a joke about cats</text>
@@ -80,6 +80,6 @@
   <text x="377" y="382" font-size="11" text-anchor="middle">pick -&gt; publish</text>
   <rect x="434" y="369" width="118" height="18" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8"/>
   <text x="493" y="382" font-size="11" text-anchor="middle">publish</text>
-  <text x="20" y="450" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Three writes to jokes in one step joined into one list. The log key ends with 6 entries.</text>
-  <text x="20" y="468" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Each teal cell is one value a node returned, read from the updates stream.</text>
+  <text x="20" y="450" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同一超步内对 jokes 的三次写入合并成了一个列表。log 键最终有 6 条记录。</text>
+  <text x="20" y="468" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个青绿色单元格是节点返回的一个值，读自 updates 流。</text>
 </svg>
