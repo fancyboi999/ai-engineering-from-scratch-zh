@@ -1,26 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-3-1b-title fig-3-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-3-1b-title">Import time of four imports, 10 runs each</title>
-  <desc id="fig-3-1b-desc">A dot chart of import time in seconds on the Mac, 10 runs of each import in a new Python process, with bytecode on disk on the left and without bytecode on the right. Medians with bytecode: pass 0.023 s, import openai 0.329 s, langgraph StateGraph 0.477 s, create_agent with ChatOpenAI 0.831 s. Medians without bytecode: 0.063 s, 1.064 s, 1.85 s, and 2.64 s.</desc>
-  <line x1="70" y1="300" x2="610" y2="300" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <title id="fig-3-1b-title">四种导入的导入耗时，各 10 次运行</title>
+  <desc id="fig-3-1b-desc">导入耗时（秒）的点图，在 Mac 上每种导入在新的 Python 进程中运行 10 次，左侧是磁盘上已有字节码，右侧是没有字节码。有字节码时的中位数：pass 0.023 s，import openai 0.329 s，langgraph 的 StateGraph 0.477 s，create_agent 加 ChatOpenAI 0.831 s。没有字节码时的中位数依次为 0.063 s、1.064 s、1.85 s 和 2.64 s。</desc>
+  <line x1="70" y1="300" x2="610" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="304" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
-  <line x1="70" y1="256.67" x2="610" y2="256.67" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="256.67" x2="610" y2="256.67" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="260.67" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.5</text>
-  <line x1="70" y1="213.33" x2="610" y2="213.33" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="213.33" x2="610" y2="213.33" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="217.33" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1</text>
-  <line x1="70" y1="170" x2="610" y2="170" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="170" x2="610" y2="170" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="174" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1.5</text>
-  <line x1="70" y1="126.67" x2="610" y2="126.67" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="126.67" x2="610" y2="126.67" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="130.67" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2</text>
-  <line x1="70" y1="83.33" x2="610" y2="83.33" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="83.33" x2="610" y2="83.33" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="87.33" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2.5</text>
-  <line x1="70" y1="40" x2="610" y2="40" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="40" x2="610" y2="40" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="44" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">3</text>
   <line x1="70" y1="300" x2="610" y2="300" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="40" x2="70" y2="300" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="70" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">seconds</text>
-  <text x="205" y="30" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">BYTECODE ON DISK</text>
-  <text x="475" y="30" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">NO BYTECODE</text>
-  <line x1="340" y1="40" x2="340" y2="300" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="70" y="28" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">秒</text>
+  <text x="205" y="30" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">磁盘上有字节码</text>
+  <text x="475" y="30" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">没有字节码</text>
+  <line x1="340" y1="40" x2="340" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <circle cx="120.1" cy="298.01" r="2.6" fill="var(--m-grey-ink, #5e5e59)"/>
   <circle cx="122.3" cy="298.01" r="2.6" fill="var(--m-grey-ink, #5e5e59)"/>
   <circle cx="124.5" cy="298.18" r="2.6" fill="var(--m-grey-ink, #5e5e59)"/>
@@ -133,6 +133,6 @@
   <rect class="m-knock" x="563.8" y="51.62" width="32.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="580" y="62.2" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">2.64</text>
   <text x="580" y="318" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">agent</text>
-  <text x="70" y="346" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">pass: an empty program. agent: create_agent with ChatOpenAI.</text>
-  <text x="70" y="364" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Each dot is one run on the Mac. Each short line is the median of 10.</text>
+  <text x="70" y="346" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">pass：空程序。agent：create_agent 加 ChatOpenAI。</text>
+  <text x="70" y="364" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是在 Mac 上的一次运行。每条短线是 10 次的中位数。</text>
 </svg>

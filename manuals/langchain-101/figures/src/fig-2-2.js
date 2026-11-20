@@ -31,16 +31,16 @@ const SAVER = 560;
 
 module.exports = figure('fig-2-2', {
   height: 600,
-  title: 'A LastValue conflict, the reads that fail after it, and the repair',
-  desc: `A sequence on four lifelines: your code, the Pregel loop, the nodes a and b, and InMemorySaver. invoke starts the run. The loop runs ${ran.join(' and ')}, and each finished node has its write to x saved as a pending write on checkpoint step ${ckptStep}: ${pending.map(p => `${p.channel}=${p.value} from ${p.node}`).join(' and ')}. Then apply_writes calls LastValue.update with two values and raises ${errorName}. A later get_state reads the same pending writes and raises again, through ${getStateFrames}. invoke(None) reapplies the writes, runs no node, and raises again. In the lower block, the same saver is opened by the graph recompiled with ${fixedSchema}. get_state returns ${fixedState}, and invoke(None) finishes with the same state and runs no node.`,
+  title: 'LastValue 冲突、冲突之后失败的读取，以及修复',
+  desc: `四条生命线组成的时序图：你的代码、Pregel 循环、节点 a 和 b，以及 InMemorySaver。invoke 启动运行。循环运行 ${ran.join(' 和 ')}，每个完成的节点对 x 的写入都作为待处理写入保存在第 ${ckptStep} 步的检查点上：${pending.map(p => `${p.node} 写的 ${p.channel}=${p.value}`).join('，')}。随后 apply_writes 用两个值调用 LastValue.update，并抛出 ${errorName}。之后的 get_state 读到同样的待处理写入，再次抛出，调用栈经过 ${getStateFrames}。invoke(None) 重新应用这些写入，不运行任何节点，再次抛出。在下半部分，同一个 saver 由重新编译的图打开，所用模式为 ${fixedSchema}。get_state 返回 ${fixedState}，invoke(None) 以同样的状态结束，且不运行任何节点。`,
 }, f => {
   const term = forms.flat.terminal(f, CODE, 30, 'violet');
   const loop = forms.flat.unit(f, LOOP, 32, 'indigo');
   const nodes = forms.flat.unit(f, NODES, 32, 'indigo');
   const saver = forms.flat.cylinder(f, SAVER, 22, 'teal', { w: 40, h: 46 });
-  f.text(CODE, 84, 'your code', { size: 11.5, anchor: 'middle', hue: 'violet' });
-  f.text(LOOP, 84, 'Pregel loop', { size: 11.5, anchor: 'middle', hue: 'indigo' });
-  f.text(NODES, 84, 'nodes a, b', { size: 11.5, anchor: 'middle', hue: 'indigo' });
+  f.text(CODE, 84, '你的代码', { size: 11.5, anchor: 'middle', hue: 'violet' });
+  f.text(LOOP, 84, 'Pregel 循环', { size: 11.5, anchor: 'middle', hue: 'indigo' });
+  f.text(NODES, 84, '节点 a、b', { size: 11.5, anchor: 'middle', hue: 'indigo' });
   f.text(SAVER, 84, 'InMemorySaver', { size: 11.5, anchor: 'middle', hue: 'teal' });
   for (const x of [CODE, LOOP, NODES, SAVER]) f.lifeline(x, 92, 584);
 
@@ -52,7 +52,7 @@ module.exports = figure('fig-2-2', {
   y += 34;
   f.beat(2);
   row(2, y, 'ink');
-  f.arrow([LOOP, y], [NODES - 2, y], { style: 'call', label: `run ${ran.join(', ')}` });
+  f.arrow([LOOP, y], [NODES - 2, y], { style: 'call', label: `运行 ${ran.join(', ')}` });
   y += 34;
   f.beat(3);
   row(3, y, 'teal');
@@ -65,29 +65,29 @@ module.exports = figure('fig-2-2', {
   row(4, y, 'rose');
   f.rect(LOOP - 60, y - 13, 120, 22, { hue: 'rose' });
   f.text(LOOP, y + 3, 'apply_writes', { size: 11.5, anchor: 'middle', hue: 'rose', weight: 700 });
-  f.text(LOOP + 70, y + 3, 'LastValue gets two values', { size: 11, serif: true, hue: 'ink-soft', knock: true });
+  f.text(LOOP + 70, y + 3, 'LastValue 收到两个值', { size: 11, serif: true, hue: 'ink-soft', knock: true });
   y += 30;
   f.arrow([LOOP - 2, y], [CODE + 2, y], { style: 'fail', label: errorName });
   y += 40;
   f.beat(5);
   row(5, y, 'rose');
   f.arrow([CODE, y], [LOOP - 2, y], { style: 'call', label: 'get_state' });
-  f.arrow([LOOP, y], [SAVER - 22, y], { style: 'call', label: `read step ${ckptStep} + pending`, labelX: 400 });
+  f.arrow([LOOP, y], [SAVER - 22, y], { style: 'call', label: `读取第 ${ckptStep} 步及待处理写入`, labelX: 400 });
   y += 26;
-  f.arrow([LOOP - 2, y], [CODE + 2, y], { style: 'fail', label: `${errorName} again` });
+  f.arrow([LOOP - 2, y], [CODE + 2, y], { style: 'fail', label: `再次 ${errorName}` });
   y += 38;
   f.beat(6);
   row(6, y, 'rose');
   f.arrow([CODE, y], [LOOP - 2, y], { style: 'call', label: 'invoke(None)' });
-  f.text(LOOP + 12, y + 4, `nodes run: ${resumeRan}, writes reapplied`, { size: 11, serif: true, hue: 'ink-soft', knock: true });
+  f.text(LOOP + 12, y + 4, `运行的节点：${resumeRan}，写入已重新应用`, { size: 11, serif: true, hue: 'ink-soft', knock: true });
   y += 26;
-  f.arrow([LOOP - 2, y], [CODE + 2, y], { style: 'fail', label: `${errorName} again` });
+  f.arrow([LOOP - 2, y], [CODE + 2, y], { style: 'fail', label: `再次 ${errorName}` });
 
   y += 30;
   f.beat(7);
   f.rule(14, y, 626, y, { hue: 'ink-mute', dash: 'dashed' });
-  f.text(36, y + 18, 'same saver, graph recompiled', { size: 11.5, hue: 'teal', weight: 700, knock: true });
-  f.text(36, y + 36, `with ${fixedSchema}`, { size: 11, hue: 'teal', knock: true });
+  f.text(36, y + 18, '同一个 saver，图已重新编译', { size: 11.5, hue: 'teal', weight: 700, knock: true });
+  f.text(36, y + 36, `使用 ${fixedSchema}`, { size: 11, hue: 'teal', knock: true });
   y += 62;
   row(7, y, 'teal');
   f.arrow([CODE, y], [LOOP - 2, y], { style: 'call', label: 'get_state' });
@@ -97,7 +97,7 @@ module.exports = figure('fig-2-2', {
   f.beat(8);
   row(8, y, 'teal');
   f.arrow([CODE, y], [LOOP - 2, y], { style: 'call', label: 'invoke(None)' });
-  f.text(LOOP + 12, y + 4, `nodes run: ${fixedRan}, saved writes reduced: 0 + 1 + 2`, { size: 11, serif: true, hue: 'ink-soft', knock: true });
+  f.text(LOOP + 12, y + 4, `运行的节点：${fixedRan}，已保存的写入归并：0 + 1 + 2`, { size: 11, serif: true, hue: 'ink-soft', knock: true });
   y += 24;
   f.arrow([LOOP - 2, y], [CODE + 2, y], { style: 'reply', label: fixedState });
 });

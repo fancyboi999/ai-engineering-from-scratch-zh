@@ -4,14 +4,14 @@ const { figure } = require('../../../_shared/figkit.js');
 
 module.exports = figure('fig-3-1', {
   height: 470,
-  title: 'What each package requires at the pin',
-  desc: 'A dependency tree. deepagents 0.7.38 requires langchain 1.5 or later, langchain-anthropic 1.7.10 or later, langchain-google-genai 4.4.3 or later, and langsmith 0.14.17 or later. langchain 1.5.0 requires langchain-core 1.8 or later and langgraph from 1.2.12 to below 1.3, with the extras openai, anthropic, ollama, and mcp drawn dashed. langgraph 1.2.22 requires langchain-core 1.4.7 or later, langgraph-checkpoint 4.3 to below 5, langgraph-prebuilt 1.1 to below 1.2, and langgraph-sdk 0.4.6 to below 0.5. langchain-core 1.8.0 requires langsmith 0.14.9 to below 1, langchain-protocol 0.0.20 or later, and pydantic 2.7.4 to below 3.',
+  title: '锁定版本下各个包的依赖要求',
+  desc: '一棵依赖树。deepagents 0.7.38 要求 langchain 1.5 或更高、langchain-anthropic 1.7.10 或更高、langchain-google-genai 4.4.3 或更高，以及 langsmith 0.14.17 或更高。langchain 1.5.0 要求 langchain-core 1.8 或更高，以及从 1.2.12 到低于 1.3 的 langgraph，extras 包括 openai、anthropic、ollama 和 mcp，以虚线画出。langgraph 1.2.22 要求 langchain-core 1.4.7 或更高、4.3 到低于 5 的 langgraph-checkpoint、1.1 到低于 1.2 的 langgraph-prebuilt，以及 0.4.6 到低于 0.5 的 langgraph-sdk。langchain-core 1.8.0 要求 0.14.9 到低于 1 的 langsmith、0.0.20 或更高的 langchain-protocol，以及 2.7.4 到低于 3 的 pydantic。',
 }, f => {
   const B = (x, y, w, title, sub, hue, dash) => f.box({ x, y, w, h: 44, hue, title, sub, dash, titleSize: 12 });
-  const deep = B(20, 14, 180, 'deepagents 0.7.38', 'optional harness', 'blue', 'dashed');
+  const deep = B(20, 14, 180, 'deepagents 0.7.38', '可选的 harness', 'blue', 'dashed');
   const lc = B(240, 14, 180, 'langchain 1.5.0', 'create_agent', 'blue');
   const extras = B(460, 14, 160, 'extras', 'openai, ollama, mcp', 'plum', 'dashed');
-  const prov = B(20, 120, 180, 'two providers', 'anthropic, google-genai', 'plum');
+  const prov = B(20, 120, 180, '两个 provider', 'anthropic, google-genai', 'plum');
   const lg = B(240, 120, 180, 'langgraph 1.2.22', '>=1.2.12,<1.3.0', 'indigo');
   const core = B(240, 236, 180, 'langchain-core 1.8.0', '>=1.8.0,<2', 'blue');
   const cp = B(460, 120, 160, 'checkpoint 4.3.2', '>=4.3.0,<5', 'indigo');
@@ -32,6 +32,6 @@ module.exports = figure('fig-3-1', {
   f.path(`M${core.x} 270 L110 270 L110 ${ls.y - 1}`, { style: 'call' });
   arrow([330, core.y + core.h], [330, proto.y]);
   f.path(`M${core.x + core.w} 280 L540 330 L540 ${pyd.y - 1}`, { style: 'call' });
-  f.text(20, 432, 'Arrows read as requires, with the declared range under each name.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 450, 'deepagents also requires langsmith >=0.14.17 and langchain >=1.5.0.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 432, '箭头表示“要求”，每个名称下方是声明的版本范围。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 450, 'deepagents 还要求 langsmith >=0.14.17 和 langchain >=1.5.0。', { size: 11, serif: true, hue: 'ink-soft' });
 });

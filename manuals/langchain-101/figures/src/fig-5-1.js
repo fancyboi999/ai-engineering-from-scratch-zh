@@ -55,25 +55,25 @@ const STYLE = {
   end: { hue: 'amber', filled: true },
 };
 const bands = [
-  { x: 112, w: 52, label: 'input' },
-  { x: 176, w: 132, label: `${nodes[0]}, step 1` },
-  { x: 320, w: 96, label: `${nodes[1]}, step 2` },
-  { x: 428, w: 150, label: `${nodes[2]}, step 3` },
+  { x: 112, w: 52, label: '输入' },
+  { x: 176, w: 132, label: `${nodes[0]}，第 1 步` },
+  { x: 320, w: 96, label: `${nodes[1]}，第 2 步` },
+  { x: 428, w: 150, label: `${nodes[2]}，第 3 步` },
 ];
 const total = name => rows.find(row => row[0] === name)[1].length;
 
 module.exports = figure('fig-5-1', {
   height: 404,
-  title: 'The chunks of one agent run in each stream mode',
-  desc: `Eight rows, one for each stream of the same agent run, over four columns: the input, the ${nodes[0]} node at step 1, the ${nodes[1]} node at step 2, and the ${nodes[2]} node at step 3. Each mark is one chunk read from the capture, coloured by what it carries: indigo a whole state, plum model output, green tool output, amber a task that starts or ends. updates has ${total('updates')}, values ${total('values')}, messages ${total('messages')}, tasks ${total('tasks')}, debug ${total('debug')}, custom ${total('custom')}, the tools mode ${total('tools')} on the slow_sum agent, and stream_events v3 has ${total('v3 events')} events. The v3 stream closes each step with a values event.`,
+  title: '一次 agent 运行在各个流模式下的数据块',
+  desc: `八行，对应同一次 agent 运行的八种流，分四列：输入、第 1 步的 ${nodes[0]} 节点、第 2 步的 ${nodes[1]} 节点、第 3 步的 ${nodes[2]} 节点。每个标记是从录制中读出的一个数据块，颜色表示它携带的内容：靛蓝是整个状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始或结束的任务。updates 有 ${total('updates')} 个，values ${total('values')} 个，messages ${total('messages')} 个，tasks ${total('tasks')} 个，debug ${total('debug')} 个，custom ${total('custom')} 个，slow_sum agent 上的 tools 模式 ${total('tools')} 个，stream_events v3 有 ${total('v3 events')} 个事件。v3 流在每一步结束时发出一个 values 事件。`,
 }, f => {
   bands.forEach(band => {
-    const hue = band.label === 'input' ? 'violet' : band.label.startsWith('tools') ? 'green' : 'indigo';
+    const hue = band.label === '输入' ? 'violet' : band.label.startsWith('tools') ? 'green' : 'indigo';
     f.text(band.x + band.w / 2, 24, band.label, { size: 11, anchor: 'middle', hue });
     f.rule(band.x - 6, 34, band.x - 6, 300, { hue: 'ink-mute', dash: 'dashed' });
   });
   f.rule(584, 34, 584, 300, { hue: 'ink-mute', dash: 'dashed' });
-  f.kicker(20, 24, 'stream');
+  f.kicker(20, 24, '流');
   f.kicker(606, 24, 'n', { anchor: 'middle' });
   rows.forEach(([name, marks], i) => {
     const y = 52 + i * 32;
@@ -91,14 +91,14 @@ module.exports = figure('fig-5-1', {
     f.text(606, y + 4, String(marks.length), { size: 12, anchor: 'middle', weight: 700, hue: marks.length ? 'indigo' : 'ink-mute' });
   });
   f.beat(0);
-  const key = [['state', 'whole state'], ['model', 'model output'], ['tool', 'tool output'], ['start', 'task starts'], ['end', 'task ends']];
+  const key = [['state', '整个状态'], ['model', '模型输出'], ['tool', '工具输出'], ['start', '任务开始'], ['end', '任务结束']];
   key.forEach(([kind, name], i) => {
     const style = STYLE[kind];
     const x = 20 + i * 122;
     f.rect(x, 318, 6, 14, { fill: style.filled ? color(`${style.hue}-ink`) : color('paper'), stroke: color(`${style.hue}-ink`), strokeWidth: 1.2 });
     f.text(x + 12, 330, name, { size: 11, serif: true, hue: 'ink-soft' });
   });
-  f.text(20, 362, 'Each mark is one chunk. tasks and debug ran with no checkpointer.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 380, 'The tools row is the slow_sum agent: started, two deltas, finished.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 398, 'A v3 values event closes each column.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 362, '每个标记是一个数据块。tasks 和 debug 运行时没有 checkpointer。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 380, 'tools 行来自 slow_sum agent：开始、两个增量、完成。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 398, '每一列都以一个 v3 values 事件收尾。', { size: 11, serif: true, hue: 'ink-soft' });
 });

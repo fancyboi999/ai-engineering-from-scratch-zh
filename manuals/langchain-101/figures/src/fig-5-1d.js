@@ -9,18 +9,18 @@ const live = data.timeline.astream_events_v3;
 const batched = data.timeline.astream_events_v3_gather;
 const last = run => run.tokens[run.tokens.length - 1];
 const tracks = [
-  [live, 0, 'model sends', 'olive', 'text loop only'],
-  [live, 1, 'consumer sees', 'indigo', ''],
-  [batched, 0, 'model sends', 'olive', 'reasoning loop, then text'],
-  [batched, 1, 'consumer sees', 'rose', ''],
+  [live, 0, '模型发送', 'olive', '只读文本的循环'],
+  [live, 1, '消费者收到', 'indigo', ''],
+  [batched, 0, '模型发送', 'olive', '先读推理，再读文本的循环'],
+  [batched, 1, '消费者收到', 'rose', ''],
 ];
 
 module.exports = figure('fig-5-1d', {
   height: 330,
-  title: 'When each token was sent and seen, in two async v3 consumers',
-  desc: `A timeline of one run of each consumer on the Mac, with ${live.tokens.length} tokens of Qwen3 4B. In the text loop, each token is seen within a few milliseconds of the send, from ${live.tokens[0][1]} ms to ${last(live)[1]} ms after the run starts. In the loop that reads reasoning first, the model sends from ${batched.tokens[0][0]} ms to ${last(batched)[0]} ms, and the consumer sees all ${batched.tokens.length} tokens at ${batched.tokens[0][1]} to ${last(batched)[1]} ms.`,
+  title: '两种 async v3 消费者中，每个 token 的发送时刻与收到时刻',
+  desc: `Mac 上两种消费者各一次运行的时间线，Qwen3 4B 生成 ${live.tokens.length} 个 token。在文本循环中，每个 token 都在发送后几毫秒内被看到，范围是运行开始后的 ${live.tokens[0][1]} ms 到 ${last(live)[1]} ms。在先读推理的循环中，模型从 ${batched.tokens[0][0]} ms 到 ${last(batched)[0]} ms 持续发送，消费者在 ${batched.tokens[0][1]} 到 ${last(batched)[1]} ms 一次看到全部 ${batched.tokens.length} 个 token。`,
 }, f => {
-  const c = chart(f, { x: 214, y: 44, w: 396, h: 200, xDomain: [0, 4500], yDomain: [0, 4], xTicks: [0, 1000, 2000, 3000, 4000], xFormat: String, xLabel: 'milliseconds since the run started' });
+  const c = chart(f, { x: 214, y: 44, w: 396, h: 200, xDomain: [0, 4500], yDomain: [0, 4], xTicks: [0, 1000, 2000, 3000, 4000], xFormat: String, xLabel: '运行开始后的毫秒数' });
   tracks.forEach(([run, column, label, hue, group], i) => {
     const cy = c.py(3.5 - i);
     if (group) f.text(20, cy - 18, group, { size: 11.5, weight: 700, hue: 'ink' });
@@ -29,7 +29,7 @@ module.exports = figure('fig-5-1d', {
     f.mark(d, { hue });
   });
   const seen = batched.tokens[0][1];
-  f.text(c.px(seen) - 8, c.py(0.5) + 4, `all ${batched.tokens.length} at ${Math.round(seen)} ms`, { size: 11, hue: 'rose', anchor: 'end', weight: 700, knock: true });
-  f.text(20, 298, `Each tick is one of ${live.tokens.length} tokens in one run. Olive ticks are sends by Qwen3 4B on Ollama.`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 314, 'The others are the moments the consumer saw a token. The lower loop sees text at the end.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(c.px(seen) - 8, c.py(0.5) + 4, `全部 ${batched.tokens.length} 个在 ${Math.round(seen)} ms`, { size: 11, hue: 'rose', anchor: 'end', weight: 700, knock: true });
+  f.text(20, 298, `每根刻度线是一次运行中 ${live.tokens.length} 个 token 之一。橄榄色刻度线是 Ollama 上的 Qwen3 4B 发送的时刻。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 314, '其余是消费者看到 token 的时刻。下面那个循环要到最后才看到文本。', { size: 11, serif: true, hue: 'ink-soft' });
 });

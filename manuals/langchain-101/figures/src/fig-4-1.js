@@ -43,7 +43,7 @@ const hueOf = name => (name === 'model' ? 'plum' : name === 'tools' ? 'green' : 
 const agentEdges = list(agent, '## edges').map(e => ({ from: e.split(' -> ')[0], to: e.split(' -> ')[1].replace(' (conditional)', ''), conditional: e.includes('(conditional)') }));
 const small = (f, y, nodes, label, edges) => {
   f.text(20, y - 8, label, { size: 11.5, weight: 700, hue: 'violet' });
-  f.text(620, y - 8, `${nodes.length} nodes`, { size: 11, anchor: 'end', hue: 'ink-soft' });
+  f.text(620, y - 8, `${nodes.length} 个节点`, { size: 11, anchor: 'end', hue: 'ink-soft' });
   const x = name => 20 + nodes.indexOf(name) * 140;
   nodes.forEach(name => f.box({ x: x(name), y, w: 104, h: H, hue: hueOf(name), title: name, titleSize: 11, pad: 2 }));
   for (const e of edges) {
@@ -61,16 +61,16 @@ const small = (f, y, nodes, label, edges) => {
 
 module.exports = figure('fig-4-1', {
   height: 512,
-  title: 'What each argument of create_agent builds',
-  desc: `Three compiled graphs read from the capture kit. create_agent with a model and no tools has ${bare.length} nodes: ${bare.join(', ')}. Adding tools=[add] adds the tools node, ${withTools.length} nodes. Adding middleware=[A, B, C] with all four node hooks adds ${hooks.length} hook nodes, ${mwNodes.length} in all, drawn as a grid with the ${mwEdges.length} edges of the graph: the before hooks run A, B, C, the after_model hooks run C, B, A, and A.after_model routes to tools, back to A.before_model, or to the after_agent hooks. A dashed amber edge leaves a node with more than one next node. The system_prompt and the response_format add no node. They change each request inside the model node. Every agent gets the config recursion_limit ${config.recursion_limit} and stream_mode ${streamMode}.`,
+  title: 'create_agent 的每个参数构建出什么',
+  desc: `三张读自录制工具包的编译图。只给模型、不给工具的 create_agent 有 ${bare.length} 个节点：${bare.join('、')}。加上 tools=[add] 后多出 tools 节点，共 ${withTools.length} 个节点。再加上带全部四种节点钩子的 middleware=[A, B, C]，多出 ${hooks.length} 个钩子节点，共 ${mwNodes.length} 个，画成网格，图中共有 ${mwEdges.length} 条边：before 钩子依次运行 A、B、C，after_model 钩子依次运行 C、B、A，A.after_model 会路由到 tools、回到 A.before_model，或进入 after_agent 钩子。从有多个后继节点的节点引出的边画成琥珀色虚线。system_prompt 和 response_format 不增加节点，它们在 model 节点内部改变每个请求。每个 agent 的配置都带有 recursion_limit ${config.recursion_limit} 和 stream_mode ${streamMode}。`,
 }, f => {
-  f.kicker(20, 18, 'the nodes of the compiled graph');
+  f.kicker(20, 18, '编译后的图中的节点');
   small(f, 50, bare, 'create_agent(model)', [{ from: bare[0], to: bare[1] }, { from: bare[1], to: bare[2] }]);
   small(f, 114, withTools, 'create_agent(model, tools=[add])', agentEdges);
-  f.text(20, 170, 'a graph with no tools has one next node after model. Tools add the tools node and a choice.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 170, '没有工具的图，model 之后只有一个后继节点。加上工具会多出 tools 节点和一次选择。', { size: 11, serif: true, hue: 'ink-soft' });
 
   f.text(20, 204, 'create_agent(model, tools=[add], middleware=[A, B, C])', { size: 11.5, weight: 700, hue: 'violet' });
-  f.text(620, 204, `${mwNodes.length} nodes, ${hooks.length} of them hooks`, { size: 11, anchor: 'end', hue: 'ink-soft' });
+  f.text(620, 204, `${mwNodes.length} 个节点，其中 ${hooks.length} 个是钩子`, { size: 11, anchor: 'end', hue: 'ink-soft' });
   for (const name of mwNodes) {
     const p = at(name);
     f.box({ x: p.x, y: p.y, w: W, h: H, hue: hueOf(name), title: name, titleSize: 11, pad: 2, weight: name.includes('.') ? 400 : 700 });
@@ -95,7 +95,7 @@ module.exports = figure('fig-4-1', {
       f.path(`M${a.cx} ${down ? a.y + H : a.y} V${mid} H${tx} V${down ? b.y - 1 : b.y + H + 1}`, style);
     }
   }
-  f.text(20, 464, 'Solid: the only next node. Dashed amber: a conditional edge, the next node is chosen at run time.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 482, 'system_prompt and response_format add no node: they change each request inside model.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 500, `Every agent also gets recursion_limit ${config.recursion_limit} and stream_mode ${streamMode} in its config.`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 464, '实线：唯一的后继节点。琥珀虚线：条件边，后继节点在运行时选定。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 482, 'system_prompt 和 response_format 不增加节点：它们在 model 内部改变每个请求。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 500, `每个 agent 的配置里还带有 recursion_limit ${config.recursion_limit} 和 stream_mode ${streamMode}。`, { size: 11, serif: true, hue: 'ink-soft' });
 });

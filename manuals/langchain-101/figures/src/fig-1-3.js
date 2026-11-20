@@ -21,14 +21,14 @@ const answer = final[3].content;
 const system = calls[0].messages[0].split(': ')[1];
 
 const kindOf = message => ({ HumanMessage: ['H', 'violet'], AIMessage: ['AI', 'plum'], ToolMessage: ['T', 'green'] })[message.type];
-const nextOf = cp => (cp.next.length ? cp.next.join(', ') : 'none');
-const cpRow = i => ({ write: checkpoints[i], label: `put, step ${checkpoints[i].step}`, note: `next: ${nextOf(checkpoints[i])}` });
+const nextOf = cp => (cp.next.length ? cp.next.join(', ') : '无');
+const cpRow = i => ({ write: checkpoints[i], label: `put，第 ${checkpoints[i].step} 步`, note: `next: ${nextOf(checkpoints[i])}` });
 
 const lanes = [
-  { title: 'your code', sub: 'agent.invoke', hue: 'violet', draw: (f, x) => flat.terminal(f, x, 18, 'violet', { w: 40, h: 34 }) },
-  { title: 'model node', sub: 'model', hue: 'indigo', draw: (f, x) => flat.unit(f, x, 22, 'indigo', { w: 34, h: 30 }) },
-  { title: 'chat model', sub: calls[0].model, hue: 'plum', draw: (f, x) => flat.tower(f, x, 18, 'plum', { w: 34, h: 34 }) },
-  { title: 'tools node', sub: call.name, hue: 'green', draw: (f, x) => flat.unit(f, x, 22, 'green', { w: 34, h: 30 }) },
+  { title: '你的代码', sub: 'agent.invoke', hue: 'violet', draw: (f, x) => flat.terminal(f, x, 18, 'violet', { w: 40, h: 34 }) },
+  { title: 'model 节点', sub: 'model', hue: 'indigo', draw: (f, x) => flat.unit(f, x, 22, 'indigo', { w: 34, h: 30 }) },
+  { title: '聊天模型', sub: calls[0].model, hue: 'plum', draw: (f, x) => flat.tower(f, x, 18, 'plum', { w: 34, h: 34 }) },
+  { title: 'tools 节点', sub: call.name, hue: 'green', draw: (f, x) => flat.unit(f, x, 22, 'green', { w: 34, h: 30 }) },
   { title: 'checkpointer', sub: 'InMemorySaver', hue: 'teal', draw: (f, x) => flat.cylinder(f, x, 14, 'teal', { w: 34, h: 40 }) },
 ];
 const cx = index => 46 + index * 90;
@@ -38,28 +38,28 @@ const groups = [
   [[0, 4, 'write', cpRow(0)]],
   [[0, 4, 'write', cpRow(1)]],
   [
-    [1, 2, 'model', { label: `call 1: ${calls[0].messages.length} messages` }],
+    [1, 2, 'model', { label: `调用 1：${calls[0].messages.length} 条消息` }],
     [2, 1, 'reply', { label: `tool_calls: ${call.name}(${Object.values(call.args).join(', ')})` }],
     [1, 4, 'write', cpRow(2)],
   ],
   [
     [1, 3, 'call', { label: `Send: ${call.name}, ${call.id}` }],
-    [3, 4, 'write', { ...cpRow(3), label: `put, step ${checkpoints[3].step}: ${final[2].type} ${final[2].content}` }],
+    [3, 4, 'write', { ...cpRow(3), label: `put，第 ${checkpoints[3].step} 步：${final[2].type} ${final[2].content}` }],
   ],
   [
-    [1, 2, 'model', { label: `call 2: ${calls[1].messages.length} messages` }],
+    [1, 2, 'model', { label: `调用 2：${calls[1].messages.length} 条消息` }],
     [2, 1, 'reply', { label: answer }],
   ],
   [
     [1, 4, 'write', cpRow(4)],
-    [1, 0, 'reply', { label: `${final.length} messages` }],
+    [1, 0, 'reply', { label: `${final.length} 条消息` }],
   ],
 ];
 
 module.exports = figure('fig-1-3', {
   height: 610,
-  title: 'One create_agent run, step by step',
-  desc: `Five lifelines under small drawings: your code as a terminal, the model node, the chat model, the tools node, and the checkpointer as a cylinder. A sixth column shows the messages in each checkpoint as chips. Six numbered steps, which match the list in the text: 1, the input checkpoint at step ${checkpoints[0].step} with no messages and next __start__. 2, the checkpoint at step ${checkpoints[1].step} with the human message and next model. 3, the model node calls the chat model with the system prompt "${system}" and the human message, gets a tool call ${call.name} with ${Object.values(call.args).join(' and ')}, and saves step ${checkpoints[2].step} with next tools. 4, the model node sends the tool call to the tools node, which saves step ${checkpoints[3].step} with the ToolMessage for ${call.id} and next model. 5, the second model call gets ${calls[1].messages.length} messages and answers "${answer}". 6, the checkpoint at step ${checkpoints[4].step} has ${final.length} messages and no next node, and invoke returns them.`,
+  title: '一次 create_agent 运行，逐步展开',
+  desc: `五条生命线，上方各有一幅小图：你的代码画成终端，model 节点，聊天模型，tools 节点，以及画成圆柱的 checkpointer。第六列用小方块显示每个检查点里的消息。六个编号步骤与正文中的列表一一对应：1，第 ${checkpoints[0].step} 步的输入检查点，没有消息，next 为 __start__。2，第 ${checkpoints[1].step} 步的检查点，含用户消息，next 为 model。3，model 节点带着系统提示词“${system}”和用户消息调用聊天模型，得到工具调用 ${call.name}，参数为 ${Object.values(call.args).join(' 和 ')}，并保存第 ${checkpoints[2].step} 步，next 为 tools。4，model 节点把工具调用发给 tools 节点，tools 节点保存第 ${checkpoints[3].step} 步，其中含 ${call.id} 对应的 ToolMessage，next 为 model。5，第二次模型调用收到 ${calls[1].messages.length} 条消息，回答“${answer}”。6，第 ${checkpoints[4].step} 步的检查点含 ${final.length} 条消息，没有下一个节点，invoke 把它们返回。`,
 }, f => {
   lanes.forEach((lane, index) => {
     lane.draw(f, cx(index));
@@ -68,7 +68,7 @@ module.exports = figure('fig-1-3', {
     f.lifeline(cx(index), 92, 572);
   });
   f.kicker(STATE, 70, 'state.messages');
-  f.text(STATE, 84, 'in each checkpoint', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(STATE, 84, '每个检查点中的内容', { size: 11, serif: true, hue: 'ink-soft' });
   f.rule(STATE - 14, 60, STATE - 14, 572, { hue: 'ink-mute', opacity: 0.4 });
 
   let y = 116;
@@ -83,7 +83,7 @@ module.exports = figure('fig-1-3', {
       if (row.note) f.text(x2 - 76, y + 16, row.note, { size: 11, anchor: 'middle', hue: 'amber', knock: true });
       if (row.write) {
         const count = row.write.messages.length;
-        if (!count) f.text(STATE, y + 4, 'empty', { size: 11, serif: true, hue: 'ink-mute' });
+        if (!count) f.text(STATE, y + 4, '空', { size: 11, serif: true, hue: 'ink-mute' });
         final.slice(0, count).forEach((message, k) => {
           const [mark, hue] = kindOf(message);
           const fresh = k >= saved;
@@ -99,12 +99,12 @@ module.exports = figure('fig-1-3', {
     y += 8;
   });
   f.beat(0);
-  const legend = [['H', 'violet', 'human'], ['AI', 'plum', 'AIMessage'], ['T', 'green', 'ToolMessage']];
+  const legend = [['H', 'violet', 'HumanMessage'], ['AI', 'plum', 'AIMessage'], ['T', 'green', 'ToolMessage']];
   legend.forEach(([mark, hue, name], i) => {
     const x = 20 + i * 150;
     f.rect(x, 584, 30, 16, { fill: color(`${hue}-fill`), stroke: color(`${hue}-ink`), strokeWidth: 1.4 });
     f.text(x + 15, 596, mark, { size: 11, anchor: 'middle', hue, weight: 700 });
     f.text(x + 38, 596, name, { size: 11, serif: true, hue: 'ink-soft' });
   });
-  f.text(STATE, 596, 'bold: new in that step', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(STATE, 596, '粗体：该步新增', { size: 11, serif: true, hue: 'ink-soft' });
 });

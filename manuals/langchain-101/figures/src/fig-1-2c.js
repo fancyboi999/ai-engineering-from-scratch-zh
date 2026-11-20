@@ -12,18 +12,18 @@ const SIDES = [['deep_agent', 'Deep Agents', 'blue'], ['claude_agent_sdk', 'Clau
   return { k, name, hue, s, perTask: ids.map(t => s.tasks[t].in / 1000) };
 });
 const COLS = [
-  { title: ['tasks passed', 'of 30'], max: 30, v: s => s.pass, fmt: v => `${v}` },
-  { title: ['model calls', 'per task'], max: 10, v: s => s.calls_med, fmt: v => `${v}` },
-  { title: ['input tokens', 'per task'], max: Math.ceil(Math.max(...SIDES.map(x => x.s.in_med)) / 10000) * 10, v: s => s.in_med / 1000, fmt: v => `${v.toFixed(1)}k` },
-  { title: ['dollars', 'for 30 tasks'], max: 0.02, v: s => s.cost_sum, fmt: v => `$${v.toFixed(4)}` },
+  { title: ['通过的任务', '共 30 项'], max: 30, v: s => s.pass, fmt: v => `${v}` },
+  { title: ['模型调用', '每项任务'], max: 10, v: s => s.calls_med, fmt: v => `${v}` },
+  { title: ['输入 token', '每项任务'], max: Math.ceil(Math.max(...SIDES.map(x => x.s.in_med)) / 10000) * 10, v: s => s.in_med / 1000, fmt: v => `${v.toFixed(1)}k` },
+  { title: ['费用（美元）', '30 项任务'], max: 0.02, v: s => s.cost_sum, fmt: v => `$${v.toFixed(4)}` },
 ];
 const X0 = 168;
 const CW = 104;
 
 module.exports = figure('fig-1-2c', {
   height: 236,
-  title: 'Deep Agents and the Claude Agent SDK on the same 30 tasks',
-  desc: `A dot table for Claude Haiku 5.5 with the same tools and the same system prompt in both harnesses. ${SIDES.map(x => `${x.name}: ${x.s.pass} of ${x.s.n} passed, a median of ${x.s.calls_med} model calls and ${(x.s.in_med / 1000).toFixed(1)}k input tokens per task, $${x.s.cost_sum.toFixed(4)} for all tasks`).join('; ')}. The two harnesses agreed on ${S.agree} of ${S.n_common} task outcomes. Below, each dot is the input tokens of one task.`,
+  title: 'Deep Agents 与 Claude Agent SDK 在同样 30 项任务上的对比',
+  desc: `Claude Haiku 5.5 在两个 harness 里使用相同工具和相同系统提示词的点状表。${SIDES.map(x => `${x.name}：${x.s.n} 项中通过 ${x.s.pass} 项，每项任务模型调用中位数 ${x.s.calls_med} 次、输入 ${(x.s.in_med / 1000).toFixed(1)}k token，全部任务共 $${x.s.cost_sum.toFixed(4)}`).join('；')}。两个 harness 在 ${S.n_common} 项任务中有 ${S.agree} 项结果一致。下方每个点是一项任务的输入 token 数。`,
 }, f => {
   COLS.forEach((c, i) => {
     const x = X0 + i * (CW + 14);
@@ -50,8 +50,8 @@ module.exports = figure('fig-1-2c', {
   const left = X0;
   const width = 4 * CW + 3 * 14;
   const max = Math.ceil(Math.max(...SIDES.flatMap(x => x.perTask)) / 20) * 20;
-  f.kicker(16, top + 4, 'input tokens');
-  f.kicker(16, top + 20, 'per task');
+  f.kicker(16, top + 4, '输入 token');
+  f.kicker(16, top + 20, '每项任务');
   SIDES.forEach((side, r) => {
     const y = top + r * 22;
     f.rule(left, y, left + width, y, { hue: 'ink-mute', opacity: 0.3 });

@@ -28,10 +28,10 @@ const restart = (turns[1][turns[1].length - 1].step + turns[2][0].step) / 2;
 
 module.exports = figure('fig-5-2', {
   height: 300,
-  title: 'Three turns of one thread in the SQLite file',
-  desc: `${rows.length} rows of the checkpoints table of SqliteSaver for the thread ${rows[0].thread}, on one step axis from ${rows[0].step} to ${rows[rows.length - 1].step}. ${turns.map((turn, i) => `Turn ${i + 1}, "${humans[i]}", has an input checkpoint at step ${turn[0].step} and loop checkpoints at steps ${turn.slice(1).map(r => r.step).join(', ')}, and leaves ${counts[i]} messages in the state`).join('. ')}. Between turn 2 and turn 3 the connection was closed and a new process opened the same file. The file holds ${table('checkpoints')} checkpoint rows and ${table('writes')} rows of pending writes.`,
+  title: 'SQLite 文件中同一线程的三个回合',
+  desc: `SqliteSaver 的 checkpoints 表中线程 ${rows[0].thread} 的 ${rows.length} 行，排在一条从 ${rows[0].step} 到 ${rows[rows.length - 1].step} 的步轴上。${turns.map((turn, i) => `第 ${i + 1} 回合“${humans[i]}”在第 ${turn[0].step} 步有一个输入检查点，在第 ${turn.slice(1).map(r => r.step).join('、')} 步有循环检查点，结束后状态里有 ${counts[i]} 条消息`).join('。')}。第 2 回合与第 3 回合之间，连接被关闭，一个新进程打开同一个文件。文件里有 ${table('checkpoints')} 行检查点和 ${table('writes')} 行待处理写入。`,
 }, f => {
-  f.kicker(20, 18, `thread ${rows[0].thread}, one row per checkpoint`);
+  f.kicker(20, 18, `线程 ${rows[0].thread}，每个检查点一行`);
   turns.forEach((turn, i) => {
     const x1 = px(turn[0].step) - 19;
     const x2 = px(turn[turn.length - 1].step) + 19;
@@ -39,7 +39,7 @@ module.exports = figure('fig-5-2', {
     f.rule(x1, 62, x2, 62, { hue: 'violet' });
     f.rule(x1, 58, x1, 66, { hue: 'violet' });
     f.rule(x2, 58, x2, 66, { hue: 'violet' });
-    f.text(x1 + 6, 38, `turn ${i + 1}`, { size: 11, hue: 'violet', weight: 700 });
+    f.text(x1 + 6, 38, `第 ${i + 1} 回合`, { size: 11, hue: 'violet', weight: 700 });
     f.text(x1 + 6, 52, humans[i], { size: 11, serif: true, hue: 'violet' });
     turn.forEach(row => {
       const hue = row.source === 'input' ? 'amber' : 'teal';
@@ -47,8 +47,8 @@ module.exports = figure('fig-5-2', {
       f.text(px(row.step), 104, row.source, { size: 11, anchor: 'middle', hue });
       f.rule(px(row.step), 116, px(row.step), 150, { hue: 'ink-mute', opacity: 0.5 });
     });
-    f.text((x1 + x2) / 2, 210, `${counts[i]} messages`, { size: 11, anchor: 'middle', hue: 'teal', weight: 700 });
-    f.text((x1 + x2) / 2, 224, 'in the state after', { size: 11, serif: true, anchor: 'middle', hue: 'ink-soft' });
+    f.text((x1 + x2) / 2, 210, `${counts[i]} 条消息`, { size: 11, anchor: 'middle', hue: 'teal', weight: 700 });
+    f.text((x1 + x2) / 2, 224, '此后状态中的消息数', { size: 11, serif: true, anchor: 'middle', hue: 'ink-soft' });
   });
   f.beat(0);
   f.rule(px(rows[0].step) - 20, 150, px(rows[rows.length - 1].step) + 20, 150, { hue: 'ink' });
@@ -58,15 +58,15 @@ module.exports = figure('fig-5-2', {
   }
   f.text(px(rows[0].step) - 20, 188, 'metadata.step', { size: 11, serif: true, hue: 'ink-soft' });
   f.rule(px(restart), 66, px(restart), 236, { hue: 'grey', dash: 'dashed' });
-  f.text(px(restart) + 6, 252, 'connection closed, a new', { size: 11, serif: true, hue: 'grey' });
-  f.text(px(restart) + 6, 266, 'process opens the same file', { size: 11, serif: true, hue: 'grey' });
+  f.text(px(restart) + 6, 252, '连接关闭，新进程', { size: 11, serif: true, hue: 'grey' });
+  f.text(px(restart) + 6, 266, '打开同一个文件', { size: 11, serif: true, hue: 'grey' });
 
   const db = flat.cylinder(f, 584, 74, 'teal', { w: 48, h: 60 });
   f.text(584, db.y + db.h + 18, 'checkpoints.db', { size: 11, weight: 700, anchor: 'middle', hue: 'teal' });
   f.text(584, db.y + db.h + 34, `checkpoints ${table('checkpoints')}`, { size: 11, anchor: 'middle', hue: 'ink-soft' });
   f.text(584, db.y + db.h + 50, `writes ${table('writes')}`, { size: 11, anchor: 'middle', hue: 'ink-soft' });
 
-  const legend = [['amber', 'input', 'the new message is in'], ['teal', 'loop', 'saved after a step']];
+  const legend = [['amber', 'input', '新消息已写入'], ['teal', 'loop', '一步完成后保存']];
   legend.forEach(([hue, mark, name], i) => {
     const y = 252 + i * 20;
     f.rect(20, y - 12, 40, 16, { fill: color(`${hue}-fill`), stroke: color(`${hue}-ink`) });

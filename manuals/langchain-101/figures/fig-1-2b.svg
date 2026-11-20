@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 428" role="img" aria-labelledby="fig-1-2b-title fig-1-2b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-1-2b-title">Time outside the model, and the prompt tokens of a deep agent</title>
-  <desc id="fig-1-2b-desc">Two dot charts. Left: the milliseconds outside the model call and the tools in each task, on a log scale, for Qwen3 4B on the 30-task subset with four harnesses and for Claude Haiku 5.5 on 99 tasks with two. Medians: Qwen3 4B plain 6.2 ms,  create 22.5 ms,  graph 18.5 ms,  deep 55.2 ms, Haiku plain 8.4 ms,  deep 66.5 ms. The model took a median of 9.7 s per task on Qwen3 4B and 5.0 s on Haiku. Right: the prompt tokens of the deep agent divided by those of the plain loop, task by task, for seven models. Over all tasks the deep agent sent 3.62 to 4.35 times the prompt tokens.</desc>
-  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">A. OUTSIDE THE MODEL, EACH TASK</text>
-  <text x="372" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">B. DEEP AGENT OVER PLAIN LOOP</text>
-  <line x1="62" y1="326" x2="324" y2="326" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <title id="fig-1-2b-title">模型之外的耗时，以及 deep agent 的提示词 token 数</title>
+  <desc id="fig-1-2b-desc">两幅点图。左：每项任务中模型调用与工具之外的毫秒数，纵轴为对数刻度；Qwen3 4B 在 30 项子集上用四种 harness，Claude Haiku 5.5 在 99 项任务上用两种。中位数：Qwen3 4B 朴素 6.2 ms， create 22.5 ms， graph 18.5 ms， deep 55.2 ms，Haiku 朴素 8.4 ms， deep 66.5 ms。模型在 Qwen3 4B 上每项任务的耗时中位数为 9.7 s，在 Haiku 上为 5.0 s。右：七个模型上逐项任务的 deep agent 提示词 token 数除以 plain loop 的提示词 token 数。在所有任务上，deep agent 发送的提示词 token 是 plain loop 的 3.62 到 4.35 倍。</desc>
+  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">A. 每项任务中模型之外的耗时</text>
+  <text x="372" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">B. DEEP AGENT 相对 PLAIN LOOP</text>
+  <line x1="62" y1="326" x2="324" y2="326" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="56" y="330" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1 ms</text>
-  <line x1="62" y1="236" x2="324" y2="236" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="62" y1="236" x2="324" y2="236" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="56" y="240" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">10 ms</text>
-  <line x1="62" y1="146" x2="324" y2="146" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="62" y1="146" x2="324" y2="146" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="56" y="150" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100 ms</text>
-  <line x1="62" y1="56" x2="324" y2="56" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="62" y1="56" x2="324" y2="56" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="56" y="60" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1000 ms</text>
   <line x1="62" y1="326" x2="324" y2="326" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="62" y1="56" x2="62" y2="326" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
@@ -17,7 +17,7 @@
   <path d="M75.3 303.8h3v3h-3zM82.3 281.6h3v3h-3zM89.3 279.0h3v3h-3zM81.3 277.8h3v3h-3zM88.3 273.4h3v3h-3zM80.3 265.7h3v3h-3zM87.3 264.0h3v3h-3zM79.3 264.0h3v3h-3zM86.3 263.2h3v3h-3zM78.3 260.8h3v3h-3zM85.3 259.3h3v3h-3zM77.3 259.3h3v3h-3zM84.3 257.2h3v3h-3zM76.3 256.5h3v3h-3zM83.3 253.8h3v3h-3zM75.3 252.6h3v3h-3zM82.3 251.9h3v3h-3zM89.3 250.2h3v3h-3zM81.3 250.2h3v3h-3zM88.3 250.2h3v3h-3zM80.3 248.4h3v3h-3zM87.3 244.7h3v3h-3zM79.3 239.5h3v3h-3zM86.3 226.1h3v3h-3zM78.3 221.9h3v3h-3zM85.3 218.7h3v3h-3zM77.3 217.9h3v3h-3zM84.3 212.9h3v3h-3zM76.3 202.8h3v3h-3zM83.3 197.6h3v3h-3z" fill="var(--m-violet-ink, #5b4fa3)"/>
   <line x1="70.83" y1="254.68" x2="96.83" y2="254.68" stroke="var(--m-ink, #1a1a1a)" stroke-width="2"/>
   <text x="83.83" y="50" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink, #1a1a1a)">6.2</text>
-  <text x="83.83" y="344" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">plain</text>
+  <text x="83.83" y="344" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">朴素</text>
   <path d="M119.0 225.2h3v3h-3zM126.0 224.5h3v3h-3zM133.0 221.9h3v3h-3zM125.0 217.6h3v3h-3zM132.0 217.1h3v3h-3zM124.0 213.3h3v3h-3zM131.0 213.3h3v3h-3zM123.0 213.1h3v3h-3zM130.0 212.9h3v3h-3zM122.0 211.7h3v3h-3zM129.0 211.5h3v3h-3zM121.0 209.6h3v3h-3zM128.0 205.9h3v3h-3zM120.0 204.9h3v3h-3zM127.0 204.8h3v3h-3zM119.0 200.9h3v3h-3zM126.0 200.6h3v3h-3zM133.0 198.8h3v3h-3zM125.0 197.2h3v3h-3zM132.0 197.0h3v3h-3zM124.0 192.9h3v3h-3zM131.0 190.7h3v3h-3zM123.0 185.0h3v3h-3zM130.0 184.1h3v3h-3zM122.0 183.8h3v3h-3zM129.0 180.7h3v3h-3zM121.0 178.8h3v3h-3zM128.0 178.3h3v3h-3zM120.0 173.6h3v3h-3zM127.0 126.5h3v3h-3z" fill="var(--m-blue-ink, #2f5d9a)"/>
   <line x1="114.5" y1="204.3" x2="140.5" y2="204.3" stroke="var(--m-ink, #1a1a1a)" stroke-width="2"/>
   <text x="127.5" y="50" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink, #1a1a1a)">23</text>
@@ -33,30 +33,30 @@
   <path d="M250.0 270.3h3v3h-3zM257.0 268.4h3v3h-3zM264.0 259.3h3v3h-3zM256.0 257.9h3v3h-3zM263.0 257.9h3v3h-3zM255.0 257.2h3v3h-3zM262.0 256.5h3v3h-3zM254.0 256.5h3v3h-3zM261.0 256.5h3v3h-3zM253.0 255.8h3v3h-3zM260.0 255.8h3v3h-3zM252.0 255.8h3v3h-3zM259.0 255.8h3v3h-3zM251.0 255.1h3v3h-3zM258.0 254.5h3v3h-3zM250.0 254.5h3v3h-3zM257.0 254.5h3v3h-3zM264.0 254.5h3v3h-3zM256.0 254.5h3v3h-3zM263.0 253.8h3v3h-3zM255.0 253.8h3v3h-3zM262.0 253.8h3v3h-3zM254.0 253.8h3v3h-3zM261.0 253.2h3v3h-3zM253.0 251.9h3v3h-3zM260.0 251.3h3v3h-3zM252.0 250.7h3v3h-3zM259.0 250.2h3v3h-3zM251.0 249.6h3v3h-3zM258.0 249.6h3v3h-3zM250.0 249.0h3v3h-3zM257.0 249.0h3v3h-3zM264.0 248.4h3v3h-3zM256.0 247.3h3v3h-3zM263.0 246.3h3v3h-3zM255.0 245.7h3v3h-3zM262.0 245.7h3v3h-3zM254.0 245.7h3v3h-3zM261.0 245.2h3v3h-3zM253.0 244.7h3v3h-3zM260.0 244.7h3v3h-3zM252.0 244.7h3v3h-3zM259.0 244.2h3v3h-3zM251.0 243.2h3v3h-3zM258.0 241.8h3v3h-3zM250.0 241.8h3v3h-3zM257.0 241.8h3v3h-3zM264.0 241.8h3v3h-3zM256.0 241.3h3v3h-3zM263.0 241.3h3v3h-3zM255.0 240.9h3v3h-3zM262.0 240.9h3v3h-3zM254.0 237.8h3v3h-3zM261.0 237.8h3v3h-3zM253.0 237.8h3v3h-3zM260.0 237.3h3v3h-3zM252.0 236.5h3v3h-3zM259.0 235.7h3v3h-3zM251.0 235.7h3v3h-3zM258.0 235.3h3v3h-3zM250.0 233.7h3v3h-3zM257.0 233.7h3v3h-3zM264.0 233.7h3v3h-3zM256.0 233.0h3v3h-3zM263.0 232.6h3v3h-3zM255.0 232.6h3v3h-3zM262.0 232.2h3v3h-3zM254.0 232.2h3v3h-3zM261.0 231.9h3v3h-3zM253.0 231.1h3v3h-3zM260.0 230.4h3v3h-3zM252.0 226.4h3v3h-3zM259.0 226.1h3v3h-3zM251.0 225.5h3v3h-3zM258.0 224.9h3v3h-3zM250.0 221.3h3v3h-3zM257.0 218.9h3v3h-3zM264.0 218.4h3v3h-3zM256.0 214.5h3v3h-3zM263.0 209.2h3v3h-3zM255.0 206.6h3v3h-3zM262.0 200.4h3v3h-3zM254.0 199.0h3v3h-3zM261.0 197.9h3v3h-3zM253.0 195.7h3v3h-3zM260.0 191.6h3v3h-3zM252.0 191.0h3v3h-3zM259.0 189.9h3v3h-3zM251.0 189.7h3v3h-3zM258.0 189.2h3v3h-3zM250.0 189.2h3v3h-3zM257.0 187.6h3v3h-3zM264.0 185.8h3v3h-3zM256.0 185.3h3v3h-3zM263.0 183.7h3v3h-3zM255.0 181.2h3v3h-3zM262.0 179.3h3v3h-3zM254.0 178.3h3v3h-3zM261.0 176.9h3v3h-3z" fill="var(--m-violet-ink, #5b4fa3)"/>
   <line x1="245.5" y1="242.81" x2="271.5" y2="242.81" stroke="var(--m-ink, #1a1a1a)" stroke-width="2"/>
   <text x="258.5" y="50" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink, #1a1a1a)">8.4</text>
-  <text x="258.5" y="344" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">plain</text>
+  <text x="258.5" y="344" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">朴素</text>
   <path d="M293.7 186.1h3v3h-3zM300.7 184.7h3v3h-3zM307.7 183.7h3v3h-3zM299.7 183.5h3v3h-3zM306.7 183.0h3v3h-3zM298.7 181.8h3v3h-3zM305.7 179.5h3v3h-3zM297.7 179.4h3v3h-3zM304.7 174.5h3v3h-3zM296.7 173.4h3v3h-3zM303.7 172.5h3v3h-3zM295.7 172.0h3v3h-3zM302.7 171.0h3v3h-3zM294.7 169.9h3v3h-3zM301.7 169.7h3v3h-3zM293.7 169.5h3v3h-3zM300.7 168.7h3v3h-3zM307.7 168.4h3v3h-3zM299.7 167.6h3v3h-3zM306.7 167.0h3v3h-3zM298.7 167.0h3v3h-3zM305.7 166.3h3v3h-3zM297.7 166.2h3v3h-3zM304.7 166.2h3v3h-3zM296.7 165.4h3v3h-3zM303.7 164.9h3v3h-3zM295.7 164.7h3v3h-3zM302.7 164.5h3v3h-3zM294.7 164.1h3v3h-3zM301.7 164.0h3v3h-3zM293.7 164.0h3v3h-3zM300.7 163.6h3v3h-3zM307.7 163.2h3v3h-3zM299.7 162.7h3v3h-3zM306.7 162.6h3v3h-3zM298.7 162.3h3v3h-3zM305.7 162.2h3v3h-3zM297.7 162.1h3v3h-3zM304.7 161.5h3v3h-3zM296.7 161.5h3v3h-3zM303.7 161.3h3v3h-3zM295.7 161.3h3v3h-3zM302.7 161.2h3v3h-3zM294.7 161.2h3v3h-3zM301.7 161.2h3v3h-3zM293.7 161.0h3v3h-3zM300.7 161.0h3v3h-3zM307.7 161.0h3v3h-3zM299.7 160.6h3v3h-3zM306.7 160.4h3v3h-3zM298.7 160.3h3v3h-3zM305.7 160.1h3v3h-3zM297.7 160.0h3v3h-3zM304.7 160.0h3v3h-3zM296.7 159.5h3v3h-3zM303.7 159.2h3v3h-3zM295.7 158.5h3v3h-3zM302.7 158.2h3v3h-3zM294.7 158.2h3v3h-3zM301.7 157.4h3v3h-3zM293.7 156.9h3v3h-3zM300.7 156.4h3v3h-3zM307.7 156.2h3v3h-3zM299.7 156.0h3v3h-3zM306.7 156.0h3v3h-3zM298.7 155.8h3v3h-3zM305.7 155.3h3v3h-3zM297.7 154.8h3v3h-3zM304.7 154.2h3v3h-3zM296.7 154.1h3v3h-3zM303.7 153.6h3v3h-3zM295.7 153.6h3v3h-3zM302.7 152.8h3v3h-3zM294.7 152.4h3v3h-3zM301.7 152.1h3v3h-3zM293.7 151.4h3v3h-3zM300.7 151.2h3v3h-3zM307.7 150.9h3v3h-3zM299.7 150.4h3v3h-3zM306.7 148.4h3v3h-3zM298.7 145.3h3v3h-3zM305.7 144.8h3v3h-3zM297.7 140.3h3v3h-3zM304.7 140.3h3v3h-3zM296.7 139.6h3v3h-3zM303.7 139.0h3v3h-3zM295.7 138.7h3v3h-3zM302.7 138.0h3v3h-3zM294.7 136.2h3v3h-3zM301.7 135.8h3v3h-3zM293.7 134.5h3v3h-3zM300.7 134.3h3v3h-3zM307.7 133.9h3v3h-3zM299.7 133.1h3v3h-3zM306.7 132.8h3v3h-3zM298.7 131.6h3v3h-3zM305.7 114.6h3v3h-3zM297.7 109.6h3v3h-3zM304.7 72.3h3v3h-3z" fill="var(--m-blue-ink, #2f5d9a)"/>
   <line x1="289.17" y1="161.95" x2="315.17" y2="161.95" stroke="var(--m-ink, #1a1a1a)" stroke-width="2"/>
   <text x="302.17" y="50" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink, #1a1a1a)">67</text>
   <text x="302.17" y="344" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">deep</text>
-  <text x="149.33" y="362" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">Qwen3 4B, 30 tasks</text>
-  <text x="280.33" y="362" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">Haiku, 99</text>
-  <line x1="236.67" y1="60" x2="236.67" y2="326" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-dasharray="5 4"/>
-  <text x="62" y="398" font-size="11" class="m-serif" fill="var(--m-plum-ink, #8a3d72)">model time per task: 9.7 s on Qwen3 4B, 5.0 s on Haiku</text>
-  <line x1="400" y1="326" x2="620" y2="326" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <text x="149.33" y="362" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">Qwen3 4B，30 项任务</text>
+  <text x="280.33" y="362" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">Haiku，99 项</text>
+  <line x1="236.67" y1="60" x2="236.67" y2="326" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="62" y="398" font-size="11" class="m-serif" fill="var(--m-plum-ink, #8a3d72)">每项任务的模型耗时：Qwen3 4B 为 9.7 s，Haiku 为 5.0 s</text>
+  <line x1="400" y1="326" x2="620" y2="326" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="330" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0.5x</text>
-  <line x1="400" y1="287.43" x2="620" y2="287.43" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="287.43" x2="620" y2="287.43" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="291.43" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1x</text>
-  <line x1="400" y1="248.86" x2="620" y2="248.86" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="248.86" x2="620" y2="248.86" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="252.86" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2x</text>
-  <line x1="400" y1="210.29" x2="620" y2="210.29" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="210.29" x2="620" y2="210.29" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="214.29" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">4x</text>
-  <line x1="400" y1="171.71" x2="620" y2="171.71" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="171.71" x2="620" y2="171.71" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="175.71" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">8x</text>
-  <line x1="400" y1="133.14" x2="620" y2="133.14" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="133.14" x2="620" y2="133.14" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="137.14" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">16x</text>
-  <line x1="400" y1="94.57" x2="620" y2="94.57" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="94.57" x2="620" y2="94.57" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="98.57" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">32x</text>
-  <line x1="400" y1="56" x2="620" y2="56" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="400" y1="56" x2="620" y2="56" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="394" y="60" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">64x</text>
   <line x1="400" y1="326" x2="620" y2="326" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="400" y1="56" x2="400" y2="326" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
@@ -91,7 +91,7 @@
   <line x1="593.29" y1="215.09" x2="615.29" y2="215.09" stroke="var(--m-ink, #1a1a1a)" stroke-width="2"/>
   <text x="604.29" y="344" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">Sonnet</text>
   <text x="604.29" y="376" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">30</text>
-  <text x="400" y="398" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">line: all tasks, 3.6x to 4.3x</text>
-  <text x="400" y="414" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">dashed: equal tokens</text>
+  <text x="400" y="398" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">横线：全部任务，3.6x 到 4.3x</text>
+  <text x="400" y="414" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">虚线：token 数相同</text>
   </g>
 </svg>

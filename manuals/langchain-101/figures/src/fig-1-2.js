@@ -26,7 +26,7 @@ const GROUPS = [
   ['qwen3:30b-a3b', ['plain', 'deep_agent']],
 ];
 const HUE = { plain: 'violet', create_agent: 'blue', langgraph: 'indigo', deep_agent: 'blue' };
-const LABEL = { plain: 'plain loop', create_agent: 'create_agent', langgraph: 'StateGraph', deep_agent: 'deep agent' };
+const LABEL = { plain: '朴素循环', create_agent: 'create_agent', langgraph: 'StateGraph', deep_agent: 'deep agent' };
 
 const order = M.order;
 const X0 = 212;
@@ -62,12 +62,12 @@ const height = Y0 + rowsTotal * RH + (GROUPS.length - 1) * SEP + 92;
 
 module.exports = figure('fig-1-2', {
   height,
-  title: 'The outcome of every task, for each model and harness',
-  desc: `A grid with one row per model and harness and one column per task of the 99-task suite, grouped by family. A filled square is a pass, a rose square is a fail, and a blank column is a task outside the 30-task subset of that row. Claude Haiku 5.5 passed ${haiku[0].pass} of 99 with the plain loop and ${haiku[1].pass} of 99 as a deep agent. Qwen3 4B passed ${q4[0].pass} plain and ${q4[1].pass} deep, and Qwen3 8B ${q8[0].pass} and ${q8[1].pass}. On the Qwen3 models the plain loop, create_agent and the hand-built StateGraph rows are the same on every task they share.`,
+  title: '每个模型与 harness 在每项任务上的结果',
+  desc: `一张网格，每行是一个模型与 harness 的组合，每列对应 99 项任务套件中的一项任务，按任务族分组。实心方块表示通过，玫红方块表示失败，空白列表示该任务不在该行的 30 项子集之内。Claude Haiku 5.5 用 plain loop（朴素循环）在 99 项中通过 ${haiku[0].pass} 项，用 deep agent 通过 ${haiku[1].pass} 项。Qwen3 4B 的 plain 通过 ${q4[0].pass} 项，deep 通过 ${q4[1].pass} 项；Qwen3 8B 分别通过 ${q8[0].pass} 项和 ${q8[1].pass} 项。在 Qwen3 模型上，plain loop、create_agent 与手工搭建的 StateGraph 这几行在它们共有的每项任务上结果相同。`,
 }, f => {
-  f.kicker(20, 24, 'model');
+  f.kicker(20, 24, '模型');
   f.kicker(124, 24, 'harness');
-  f.kicker(620, 24, 'pass', { anchor: 'end' });
+  f.kicker(620, 24, '通过', { anchor: 'end' });
   for (const fam of FAM) {
     const cx = (famStart[fam] + famEnd[fam]) / 2;
     f.text(cx, 46, fam, { size: 11, anchor: 'middle', hue: 'ink-soft' });
@@ -107,9 +107,9 @@ module.exports = figure('fig-1-2', {
   f.rect(20, ly - 10, 10, 11, { fill: color('violet-ink'), stroke: 'none' });
   f.rect(32, ly - 10, 10, 11, { fill: color('blue-ink'), stroke: 'none' });
   f.rect(44, ly - 10, 10, 11, { fill: color('indigo-ink'), stroke: 'none' });
-  f.text(60, ly, 'pass, in the colour of the harness layer', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(60, ly, '通过，颜色对应 harness 所在的层', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(330, ly - 10, 10, 11, { fill: color('rose-ink'), stroke: 'none' });
-  f.text(346, ly, 'fail: wrong state, wrong tool, or no answer', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ly + 22, 'Rows with 30 tasks ran the stratified subset, six tasks of each family. Blank columns did not run.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ly + 40, 'Qwen3 rows: greedy decoding on the Mac. Claude rows: the API, default sampling, one run per task.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(346, ly, '失败：状态错误、工具错误或没有答案', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ly + 22, '30 项任务的行运行的是分层子集，每个任务族 6 项。空白列表示没有运行。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ly + 40, 'Qwen3 行：在 Mac 上用贪心解码。Claude 行：通过 API，默认采样，每项任务运行一次。', { size: 11, serif: true, hue: 'ink-soft' });
 });

@@ -21,10 +21,10 @@ const trial = (f, x, y, t, cell, r) => {
 
 module.exports = figure('fig-5-3', {
   height: 340,
-  title: 'Crash trials that charged the order twice',
-  desc: `A grid of dots, one dot per trial, for six rows of saver and durability mode and five kill points, in two panels. The left panel is the graph on the Mac with no model, five trials per cell: ${mac.graph.twice} of ${mac.graph.trials} ran the effect twice. The right panel is the Qwen3 4B agent on the x86 server guest with no key, one bar of twenty trials per cell with the count that charged twice: ${none.twice} of ${none.killed} killed trials charged twice. Every kill inside the tool charged twice, and sync with a kill after the step charged once.`,
+  title: '让订单被重复扣款的崩溃试验',
+  desc: `点阵，每次试验一个点，六行对应 saver 与持久性模式的组合，五列对应终止点，分左右两个面板。左面板是 Mac 上不带模型的图，每个单元格 5 次试验：${mac.graph.trials} 次中有 ${mac.graph.twice} 次让副作用执行了两次。右面板是 x86 服务器虚拟机上的 Qwen3 4B agent，没有幂等键，每个单元格是一根含二十次试验的条，标出扣款两次的次数：被终止的 ${none.killed} 次试验中有 ${none.twice} 次扣款两次。每一次在工具内部的终止都扣款两次，而 sync 在该步之后终止只扣款一次。`,
 }, f => {
-  const panels = [{ x: 140, title: 'graph, the Mac, no model' }, { x: 390, title: 'agent, x86, Qwen3 4B' }];
+  const panels = [{ x: 140, title: '图，Mac，不带模型' }, { x: 390, title: 'agent，x86，Qwen3 4B' }];
   panels.forEach(panel => {
     f.kicker(panel.x, 20, panel.title);
     points.forEach((_, k) => f.text(panel.x + k * colW + colW / 2, 42, String(k + 1), { size: 11, anchor: 'middle', weight: 700 }));
@@ -48,11 +48,11 @@ module.exports = figure('fig-5-3', {
   f.rule(20, 141, 620, 141, { hue: 'ink-mute', dash: 'dashed' });
   f.text(20, 264, '1 before_tool   2 inside_tool   3 before_put_writes   4 before_put   5 after_tool', { size: 11, hue: 'ink-soft' });
   f.dot(26, 290, { hue: 'rose', r: 3.2 });
-  f.text(36, 294, 'charged twice', { size: 11, serif: true, hue: 'rose' });
+  f.text(36, 294, '扣款两次', { size: 11, serif: true, hue: 'rose' });
   f.dot(140, 290, { hue: 'teal', r: 3.2 });
-  f.text(150, 294, 'charged once', { size: 11, serif: true, hue: 'teal' });
+  f.text(150, 294, '扣款一次', { size: 11, serif: true, hue: 'teal' });
   hollow(f, 250, 290, 2.8);
-  f.text(260, 294, 'not killed, exit mode never reached it', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 318, `Totals: graph ${mac.graph.twice} of ${mac.graph.trials}, agent ${none.twice} of ${none.killed} killed with no key.`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 334, `Keyed on the thread and order id: graph ${mac.graph_idempotent.twice} of ${mac.graph_idempotent.trials}, agent ${order.twice} of ${order.killed} killed.`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(260, 294, '未被终止，exit 模式没有走到这里', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 318, `合计：图 ${mac.graph.trials} 次中 ${mac.graph.twice} 次，agent 在无幂等键时被终止的 ${none.killed} 次中 ${none.twice} 次。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 334, `以线程和订单 id 作幂等键：图 ${mac.graph_idempotent.trials} 次中 ${mac.graph_idempotent.twice} 次，agent 被终止的 ${order.killed} 次中 ${order.twice} 次。`, { size: 11, serif: true, hue: 'ink-soft' });
 });

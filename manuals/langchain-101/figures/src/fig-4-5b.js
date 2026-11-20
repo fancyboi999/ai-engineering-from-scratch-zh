@@ -14,11 +14,11 @@ const plan = gl.layout(graph, { top: 40, hue });
 
 module.exports = figure('fig-4-5b', {
   height: plan.bottom + 40,
-  title: 'The graph of middleware A, B, and C',
-  desc: `The compiled graph of create_agent with tools=[add] and middleware=[A, B, C], drawn from its draw_mermaid output. It has ${s.nodes} nodes, ${hooks.length} of them hook nodes, and ${s.edges} edges, ${s.conditional} of them conditional. The before hooks run A, B, C from the top. The after_model hooks run C, B, A under model. A.after_model has three conditional edges: to tools, to C.after_agent, and back to A.before_model. tools goes back to A.before_model.`,
+  title: '中间件 A、B、C 的图',
+  desc: `带 tools=[add] 和 middleware=[A, B, C] 的 create_agent 的编译图，根据它的 draw_mermaid 输出绘制。共有 ${s.nodes} 个节点，其中 ${hooks.length} 个是钩子节点，共 ${s.edges} 条边，其中 ${s.conditional} 条是条件边。before 钩子从顶部起依次运行 A、B、C。after_model 钩子在 model 下方依次运行 C、B、A。A.after_model 有三条条件边：到 tools、到 C.after_agent、回到 A.before_model。tools 回到 A.before_model。`,
 }, f => {
-  f.kicker(20, 18, 'get_graph() of the agent');
-  f.text(620, 18, `${s.nodes} nodes, ${hooks.length} of them hooks`, { size: 11, anchor: 'end', hue: 'ink-soft' });
+  f.kicker(20, 18, 'agent 的 get_graph()');
+  f.text(620, 18, `${s.nodes} 个节点，其中 ${hooks.length} 个是钩子`, { size: 11, anchor: 'end', hue: 'ink-soft' });
   gl.draw(f, plan);
   gl.legend(f, plan.bottom + 28);
 });

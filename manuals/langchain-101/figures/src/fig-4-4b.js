@@ -20,7 +20,7 @@ const median = xs => {
 };
 const PANELS = [
   { m: 'claude-haiku-5-5', name: 'Claude Haiku 5.5', sels: ['off', 'on'], x: 70 },
-  { m: Q4, name: 'Qwen3 4B on the Mac', sels: ['off', 'on', 'on_desc'], x: 380 },
+  { m: Q4, name: 'Mac 上的 Qwen3 4B', sels: ['off', 'on', 'on_desc'], x: 380 },
 ];
 const HUE = { off: 'blue', on: 'plum', on_desc: 'plum' };
 const DX = { off: -9, on: 0, on_desc: 9 };
@@ -31,13 +31,13 @@ const tokOn = hk('on').map(c => c.in_tok_med);
 
 module.exports = figure('fig-4-4b', {
   height: 470,
-  title: 'Prompt tokens of each run against the number of tools',
-  desc: `Two dot charts of the prompt tokens of each run, on a log scale, at 5, 20, 50 and 100 tools, without the selector in blue and with LLMToolSelectorMiddleware in plum. On Claude Haiku 5.5 the median run sent ${tokOff.map(v => Math.round(v)).join(', ')} tokens without the selector and ${tokOn.map(v => Math.round(v)).join(', ')} with it, in ${hk('off').map(c => c.calls_med).join(', ')} and ${hk('on').map(c => c.calls_med).join(', ')} model calls. With prompt caching the ten runs at 100 tools cost ${money(hk('off')[3].cost_sum)} without the selector and ${money(hk('on')[3].cost_sum)} with it. On Qwen3 4B the selector cut the tokens, and the runs failed instead.`,
+  title: '每次运行的提示词 token 数与工具数量的关系',
+  desc: `两幅点图，展示每次运行的提示词 token 数，纵轴为对数刻度，横轴是 5、20、50 和 100 个工具；蓝色表示没有选择器，梅紫色表示使用 LLMToolSelectorMiddleware。在 Claude Haiku 5.5 上，没有选择器时中位数运行发送的 token 数为 ${tokOff.map(v => Math.round(v)).join('、')}，有选择器时为 ${tokOn.map(v => Math.round(v)).join('、')}，模型调用次数分别为 ${hk('off').map(c => c.calls_med).join('、')} 和 ${hk('on').map(c => c.calls_med).join('、')}。开启提示词缓存后，100 个工具下的十次运行，没有选择器时花费 ${money(hk('off')[3].cost_sum)}，有选择器时花费 ${money(hk('on')[3].cost_sum)}。在 Qwen3 4B 上，选择器减少了 token，但运行反而失败了。`,
 }, f => {
   PANELS.forEach((p, pi) => {
     f.beat(pi + 1);
-    f.kicker(p.x - 50, 22, pi ? 'b. Qwen3 4B, the Mac' : 'a. Claude Haiku 5.5');
-    const C = chart(f, { x: p.x, y: 52, w: 230, h: 230, xDomain: [-0.5, 3.5], yScale: 'log10', yDomain: [50, 100000], yTicks: [100, 1000, 10000, 100000], yFormat: v => `${v / 1000}k`, xTicks: [0, 1, 2, 3], xFormat: i => String(SIZES[i]), xLabel: 'tools bound to the agent', yLabel: 'prompt tokens per run' });
+    f.kicker(p.x - 50, 22, pi ? 'b. Mac 上的 Qwen3 4B' : 'a. Claude Haiku 5.5');
+    const C = chart(f, { x: p.x, y: 52, w: 230, h: 230, xDomain: [-0.5, 3.5], yScale: 'log10', yDomain: [50, 100000], yTicks: [100, 1000, 10000, 100000], yFormat: v => `${v / 1000}k`, xTicks: [0, 1, 2, 3], xFormat: i => String(SIZES[i]), xLabel: '绑定到 agent 的工具数', yLabel: '每次运行的提示词 token 数' });
     p.sels.forEach(s => {
       const pts = SIZES.map((n, i) => {
         const c = get(p.m, n, s);
@@ -49,21 +49,21 @@ module.exports = figure('fig-4-4b', {
   });
   f.beat(0);
   const ty = 342;
-  f.kicker(20, ty, 'a. billed for 10 runs, with prompt caching');
+  f.kicker(20, ty, 'a. 十次运行的计费，含提示词缓存');
   SIZES.forEach((n, i) => f.text(178 + i * 64, ty + 20, `${n}`, { size: 11, hue: 'ink', anchor: 'end', weight: 700 }));
-  [['off', 'no selector'], ['on', 'selector']].forEach(([s, name], r) => {
+  [['off', '无选择器'], ['on', '选择器']].forEach(([s, name], r) => {
     f.text(20, ty + 38 + r * 18, name, { size: 11, hue: HUE[s] });
     SIZES.forEach((n, i) => f.text(178 + i * 64, ty + 38 + r * 18, money(get('claude-haiku-5-5', n, s).cost_sum), { size: 11, hue: 'ink', anchor: 'end' }));
   });
-  [['off', 'no selector'], ['on', 'selector']].forEach(([s, name], r) => {
-    f.text(20, ty + 76 + r * 18, `${name}, calls`, { size: 11, hue: HUE[s] });
+  [['off', '无选择器'], ['on', '选择器']].forEach(([s, name], r) => {
+    f.text(20, ty + 76 + r * 18, `${name}，调用次数`, { size: 11, hue: HUE[s] });
     SIZES.forEach((n, i) => f.text(178 + i * 64, ty + 76 + r * 18, String(get('claude-haiku-5-5', n, s).calls_med), { size: 11, hue: 'ink', anchor: 'end' }));
   });
-  f.kicker(380, ty, 'b. median seconds per run');
+  f.kicker(380, ty, 'b. 每次运行的中位耗时（秒）');
   SIZES.forEach((n, i) => f.text(520 + i * 33, ty + 20, `${n}`, { size: 11, hue: 'ink', anchor: 'end', weight: 700 }));
-  [['off', 'none'], ['on', 'selector'], ['on_desc', '+ list']].forEach(([s, name], r) => {
+  [['off', '无'], ['on', '选择器'], ['on_desc', '+ 列表']].forEach(([s, name], r) => {
     f.text(380, ty + 38 + r * 18, name, { size: 11, hue: HUE[s] });
     SIZES.forEach((n, i) => f.text(520 + i * 33, ty + 38 + r * 18, String(Math.round(get(Q4, n, s).wall_med)), { size: 11, hue: 'ink', anchor: 'end' }));
   });
-  f.text(380, ty + 104, 'dashed: selector + list', { size: 11, serif: true, hue: 'plum' });
+  f.text(380, ty + 104, '虚线：选择器 + 列表', { size: 11, serif: true, hue: 'plum' });
 });

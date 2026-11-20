@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-2-6-title fig-2-6-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-2-6-title">Bytes of each checkpoint row, plain messages against DeltaChannel</title>
-  <desc id="fig-2-6-desc">Bytes of every row of the SqliteSaver checkpoints table, in order, for one create_agent run of 100 real tool round trips with Qwen3 4B on the x86 server guest, once with the plain add_messages channel and once with a state_schema whose messages use DeltaChannel. Each dot is one row, 203 rows per run. The plain rows grow in a straight line from 689 to 99390 bytes, 10132489 bytes in all. The DeltaChannel rows stay near 643 bytes, except 2 snapshot rows at positions 100 and 200 of 49515 and 98638 bytes, 286606 bytes in all. With the writes table, the plain thread holds 25.7 times the bytes of the DeltaChannel thread.</desc>
-  <line x1="70" y1="294" x2="490" y2="294" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <title id="fig-2-6-title">每个检查点行的字节数：普通 messages 与 DeltaChannel 对比</title>
+  <desc id="fig-2-6-desc">SqliteSaver 的 checkpoints 表中每一行的字节数，按顺序排列，对象是 x86 服务器虚拟机上用 Qwen3 4B、含 100 次真实工具往返的一次 create_agent 运行；一次用普通的 add_messages 通道，一次用 messages 采用 DeltaChannel 的 state_schema。每个点是一行，每次运行 203 行。普通行从 689 字节呈直线增长到 99390 字节，总计 10132489 字节。DeltaChannel 行保持在约 643 字节，只有 2 个快照行例外，位置为 100 和 200，大小为 49515 和 98638 字节，总计 286606 字节。加上 writes 表，普通线程占用的字节数是 DeltaChannel 线程的 25.7 倍。</desc>
+  <line x1="70" y1="294" x2="490" y2="294" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="298" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0 KB</text>
-  <line x1="70" y1="244" x2="490" y2="244" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="244" x2="490" y2="244" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="248" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">20 KB</text>
-  <line x1="70" y1="194" x2="490" y2="194" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="194" x2="490" y2="194" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="198" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">40 KB</text>
-  <line x1="70" y1="144" x2="490" y2="144" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="144" x2="490" y2="144" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="148" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">60 KB</text>
-  <line x1="70" y1="94" x2="490" y2="94" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="94" x2="490" y2="94" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="98" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">80 KB</text>
-  <line x1="70" y1="44" x2="490" y2="44" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="70" y1="44" x2="490" y2="44" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="48" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">100 KB</text>
   <line x1="70" y1="294" x2="490" y2="294" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="44" x2="70" y2="294" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
@@ -25,8 +25,8 @@
   <text x="370" y="311" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">150</text>
   <line x1="470" y1="294" x2="470" y2="298" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="470" y="311" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">200</text>
-  <text x="280" y="328" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">checkpoint row, in order</text>
-  <text x="70" y="32" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bytes of the row</text>
+  <text x="280" y="328" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">检查点行，按顺序</text>
+  <text x="70" y="32" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">该行的字节数</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <circle cx="70" cy="293.23" r="1.5" fill="var(--m-teal-ink, #18696a)"/>
   <circle cx="72" cy="292.28" r="1.5" fill="var(--m-teal-ink, #18696a)"/>
@@ -438,12 +438,12 @@
   <circle cx="474" cy="292.49" r="1.5" fill="var(--m-indigo-ink, #4b4f9e)"/>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
-  <text x="486" y="61.53" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">plain messages</text>
-  <text x="486" y="76.53" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">10.13 MB in all</text>
+  <text x="486" y="61.53" font-size="11.5" font-weight="700" fill="var(--m-teal-ink, #18696a)">普通 messages</text>
+  <text x="486" y="76.53" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">共 10.13 MB</text>
   <text x="486" y="262.39" font-size="11.5" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">DeltaChannel</text>
-  <text x="486" y="277.39" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.29 MB in all</text>
-  <text x="198" y="261.5" font-size="11" fill="var(--m-indigo-ink, #4b4f9e)">DeltaChannel snapshot rows</text>
-  <text x="198" y="276.5" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one per 100 updates</text>
+  <text x="486" y="277.39" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">共 0.29 MB</text>
+  <text x="198" y="261.5" font-size="11" fill="var(--m-indigo-ink, #4b4f9e)">DeltaChannel 快照行</text>
+  <text x="198" y="276.5" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每 100 次更新一行</text>
   <circle cx="270.0" cy="170.2" r="4" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.5"/>
   <polyline points="238,249.5 273,174.21" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="273" cy="174.21" r="2" fill="var(--m-indigo-ink, #4b4f9e)"/>
@@ -451,5 +451,5 @@
   <polyline points="238,249.5 468,51.41" fill="none" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8" stroke-dasharray="2 3"/>
   <circle cx="468" cy="51.41" r="2" fill="var(--m-indigo-ink, #4b4f9e)"/>
   </g>
-  <text x="70" y="356" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">whole thread with writes: 10.24 MB plain, 0.40 MB DeltaChannel, 25.7 times less</text>
+  <text x="70" y="356" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">含 writes 的整个线程：普通 10.24 MB，DeltaChannel 0.40 MB，少 25.7 倍</text>
 </svg>

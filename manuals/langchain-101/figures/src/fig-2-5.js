@@ -33,10 +33,10 @@ const RH = 28;
 
 module.exports = figure('fig-2-5', {
   height: 440,
-  title: 'Where each stream mode is produced in one agent run',
-  desc: `Seven rows, one per stream mode, on a time axis in milliseconds for one create_agent run with Qwen3 4B on the x86 server guest, all modes on and version v2. The axis has three zoomed spans with breaks: the start, the end of the first model step and the tools step around 1.9 s, and the answer from 2.6 s. The supersteps are ${bands.map(b => `${b.name} from ${b.from} to ${b.to} ms`).join(', ')}. Each tick is one item: ${MODES.map(m => `${m} ${counts[m]}`).join(', ')}. messages, custom, and updates items appear while a task runs or as it finishes. A values item comes after the update phase. The checkpoints and debug items of a step appear at the start of the next superstep, together with the tasks start item. The answer tokens arrived from ${firstText.t} ms, about one every 67 ms.`,
+  title: '一次 agent 运行中各个流模式在何处产生',
+  desc: `七行，每个流模式一行，时间轴以毫秒计，对应 x86 服务器虚拟机上用 Qwen3 4B 的一次 create_agent 运行，所有模式全开，版本 v2。时间轴有三段放大区间，之间有断口：开头，第一个模型步骤结束与 tools 步骤前后的 1.9 s 附近，以及从 2.6 s 开始的回答。各超步为 ${bands.map(b => `${b.name} 从 ${b.from} 到 ${b.to} ms`).join('，')}。每个刻度是一个条目：${MODES.map(m => `${m} ${counts[m]}`).join('，')}。messages、custom 和 updates 条目在任务运行时或完成时出现。values 条目出现在更新阶段之后。一个步骤的 checkpoints 与 debug 条目出现在下一个超步开始时，与 tasks 的 start 条目一起。回答的 token 从 ${firstText.t} ms 起到达，大约每 67 ms 一个。`,
 }, f => {
-  f.kicker(20, 30, 'stream mode');
+  f.kicker(20, 30, '流模式');
   bands.forEach(b => {
     SEGS.forEach(s => {
       const a = Math.max(b.from, s.a);
@@ -52,10 +52,10 @@ module.exports = figure('fig-2-5', {
       f.rule(bx - 3, RY + MODES.length * RH - 8, bx + 3, RY + MODES.length * RH - 12, { hue: 'ink-mute' });
     }
   });
-  f.text(X(4), RY - 30, 'start', { size: 11, anchor: 'middle', hue: 'ink-soft' });
-  f.text(X(1893), RY - 30, 'model ends', { size: 11, hue: 'plum' });
+  f.text(X(4), RY - 30, '开始', { size: 11, anchor: 'middle', hue: 'ink-soft' });
+  f.text(X(1893), RY - 30, 'model 结束', { size: 11, hue: 'plum' });
   f.text(X(1899), RY - 30, 'tools', { size: 11, anchor: 'middle', hue: 'green' });
-  f.text(X(2950), RY - 30, 'model answers', { size: 11, anchor: 'middle', hue: 'plum' });
+  f.text(X(2950), RY - 30, 'model 给出回答', { size: 11, anchor: 'middle', hue: 'plum' });
   MODES.forEach((mode, r) => {
     const y = RY + r * RH;
     f.beat(r + 1);
@@ -78,7 +78,7 @@ module.exports = figure('fig-2-5', {
       f.text(X(t), axisY + 18, String(t), { size: 11, anchor: 'middle', hue: 'ink-soft' });
     }
   });
-  f.text(20, axisY + 18, 'ms', { size: 11, hue: 'ink-soft' });
+  f.text(20, axisY + 18, '毫秒', { size: 11, hue: 'ink-soft' });
 
   f.beat(8);
   const tool = bands.find(b => b.name === 'tools');
@@ -97,10 +97,10 @@ module.exports = figure('fig-2-5', {
 
   f.beat(0);
   const notes = [
-    [1, `custom: the tool calls stream_writer at ${cus.t} ms, inside the tools task`],
-    [2, `updates: the tools task finishes at ${upd.t} ms, and its writes go out at once`],
-    [3, `values: after the update phase of the superstep, at ${val.t} ms`],
-    [4, `checkpoints: emitted when the next superstep plans, at ${ck.t} ms`],
+    [1, `custom：工具在 ${cus.t} ms 调用 stream_writer，位于 tools 任务内部`],
+    [2, `updates：tools 任务在 ${upd.t} ms 完成，它的写入立即发出`],
+    [3, `values：在该超步的更新阶段之后，${val.t} ms`],
+    [4, `checkpoints：下一个超步规划时发出，${ck.t} ms`],
   ];
   notes.forEach(([n, line], k) => {
     const y = axisY + 46 + k * 22;

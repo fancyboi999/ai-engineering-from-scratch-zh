@@ -49,17 +49,17 @@ const label = t => {
 
 module.exports = figure('fig-2-1', {
   height: 430,
-  title: 'Six supersteps of one create_agent run, with channel versions',
-  desc: `A grid of the ${steps.length} planned supersteps of one create_agent run with two tool calls, from the input step ${steps[0].step} to step ${last.step}, which finds no task. The top row names the tasks planned in each step: __start__, model, two PUSH tasks of tools, model again, and none. Four rows below give the version of __start__, messages, branch:to:model, and __pregel_tasks after each step. A filled cell is a channel written in that step, a dashed cell is a channel cleared by its reader with a new version, and a plain grey number is a version carried over. Every channel that changes in one step gets the same number. Amber arrows run from the channel version that triggers a task to that task in the next step. The bottom row is the version of branch:to:model that model had seen. At step ${last.step} the channel is at version ${lastBranch} and model saw ${seenModel[5]}, but the channel is empty, so no task runs.`,
+  title: '一次 create_agent 运行的六个超步及通道版本',
+  desc: `一张网格，列出一次含两次工具调用的 create_agent 运行中规划的 ${steps.length} 个超步，从输入步 ${steps[0].step} 到找不到任务的步 ${last.step}。最上一行是各步规划的任务：__start__、model、tools 的两个 PUSH 任务、再一次 model，以及无任务。下面四行给出每步之后 __start__、messages、branch:to:model 和 __pregel_tasks 的版本。实心格表示该步写入的通道，虚线格表示被读取方清空并换了新版本的通道，灰色数字表示沿用的版本。同一步中变化的通道得到相同的版本号。琥珀色箭头从触发任务的通道版本指向下一步里的该任务。最后一行是 model 已经见过的 branch:to:model 版本。在第 ${last.step} 步，通道版本为 ${lastBranch}，model 见过的是 ${seenModel[5]}，但通道为空，所以没有任务运行。`,
 }, f => {
-  f.kicker(20, 22, 'superstep');
+  f.kicker(20, 22, '超步');
   steps.forEach((s, i) => {
     f.text(colX(i) + 35, 22, String(s.step), { size: 12, weight: 700, anchor: 'middle', hue: 'amber' });
   });
-  f.text(20, TASK_Y + 16, 'tasks planned', { size: 11.5, hue: 'amber' });
-  f.text(20, TASK_Y + 32, 'PULL or PUSH', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, TASK_Y + 16, '规划的任务', { size: 11.5, hue: 'amber' });
+  f.text(20, TASK_Y + 32, 'PULL 或 PUSH', { size: 11, serif: true, hue: 'ink-soft' });
   CHANNELS.forEach((ch, r) => f.text(20, rowY(r) + 19, ch, { size: 11.5, hue: 'indigo' }));
-  f.text(20, rowY(4) + 15, 'model had seen', { size: 11.5, hue: 'ink-soft' });
+  f.text(20, rowY(4) + 15, 'model 已见过', { size: 11.5, hue: 'ink-soft' });
   f.text(20, rowY(4) + 29, 'branch:to:model', { size: 11, serif: true, hue: 'ink-soft' });
   f.rule(16, ROW_Y - 10, 620, ROW_Y - 10, { hue: 'ink-mute', opacity: 0.4 });
   f.rule(16, rowY(4) - 4, 620, rowY(4) - 4, { hue: 'ink-mute', opacity: 0.4 });
@@ -69,9 +69,9 @@ module.exports = figure('fig-2-1', {
     f.beat(i + 1);
     const x = colX(i);
     if (i === 0) {
-      f.box({ x: x + 2, y: TASK_Y + 4, w: 66, h: 22, hue: 'violet', title: 'input', titleSize: 11, weight: 400, pad: 3 });
+      f.box({ x: x + 2, y: TASK_Y + 4, w: 66, h: 22, hue: 'violet', title: '输入', titleSize: 11, weight: 400, pad: 3 });
     } else if (!s.tasks.length) {
-      f.text(x + 35, TASK_Y + 19, 'none', { size: 11, anchor: 'middle', hue: 'ink-mute' });
+      f.text(x + 35, TASK_Y + 19, '无', { size: 11, anchor: 'middle', hue: 'ink-mute' });
     } else {
       s.tasks.forEach((t, k) => {
         const y = TASK_Y + 4 + k * 24;
@@ -119,9 +119,9 @@ module.exports = figure('fig-2-1', {
   f.beat(0);
   const NY = 300;
   const notes = [
-    [colX(2) + 35, 1, `step ${steps[2].step}: messages, __pregel_tasks and branch:to:model all get v${steps[2].after.messages}`],
-    [colX(4) + 35, 2, `step ${steps[4].step}: branch:to:model v${steps[3].after['branch:to:model']} is newer than seen v${seenModel[3]}, so model runs`],
-    [colX(5) + 35, 3, `step ${last.step}: v${lastBranch} is newer than seen v${seenModel[5]}, but the channel is empty: no task`],
+    [colX(2) + 35, 1, `第 ${steps[2].step} 步：messages、__pregel_tasks 和 branch:to:model 都得到 v${steps[2].after.messages}`],
+    [colX(4) + 35, 2, `第 ${steps[4].step} 步：branch:to:model 的 v${steps[3].after['branch:to:model']} 比已见过的 v${seenModel[3]} 新，所以 model 运行`],
+    [colX(5) + 35, 3, `第 ${last.step} 步：v${lastBranch} 比已见过的 v${seenModel[5]} 新，但通道为空：没有任务`],
   ];
   notes.forEach(([cx, n, text], k) => {
     const y = NY + k * 22;
@@ -131,14 +131,14 @@ module.exports = figure('fig-2-1', {
   });
   const ky = 384;
   f.rect(20, ky - 11, 22, 14, { hue: 'indigo' });
-  f.text(48, ky, 'written, new version', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(48, ky, '已写入，新版本', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(200, ky - 11, 22, 14, { fill: color('paper'), stroke: color('indigo-ink'), dash: 'dashed' });
-  f.text(228, ky, 'read and cleared, new version', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(228, ky, '已读取并清空，新版本', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(20, ky + 9, 22, 14, { hue: 'amber', dash: 'dashed' });
-  f.text(48, ky + 20, 'PUSH task from a Send', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(48, ky + 20, '由 Send 产生的 PUSH 任务', { size: 11, serif: true, hue: 'ink-soft' });
   f.path(`M200 ${ky + 16} H222`, { style: 'state', packet: false });
-  f.text(228, ky + 20, 'version that triggers the next task', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ky + 40, 'grey number: version carried over', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(228, ky + 20, '触发下一个任务的版本', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ky + 40, '灰色数字：沿用的版本', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(330, ky + 29, 22, 14, { fill: 'none', stroke: color('rose-ink'), dash: 'dashed' });
-  f.text(358, ky + 40, 'empty channel, triggers nothing', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(358, ky + 40, '空通道，不触发任何任务', { size: 11, serif: true, hue: 'ink-soft' });
 });

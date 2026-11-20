@@ -29,12 +29,12 @@ const line = (f, x, y, w, content, hue, options = {}) => {
 
 module.exports = figure('fig-3-5', {
   height: 400,
-  title: 'How the model node builds each request',
-  desc: `Two rows, one for each model call of the run in 06-agent-run.txt. On the left of each row is state.messages before the call, in teal: ${calls[0].messages.length - 1} message before call 1 and ${calls[1].messages.length - 1} before call 2. In the middle is the request the chat model received: the violet system prompt "${system.slice(8)}" first, dashed because it is not in the state, then the same messages from the state. A plum arrow carries the request to the chat model. A teal arrow carries the reply back, and the model node appends it to state.messages: a tool call to ${replies[0].tool_calls[0].name} after call 1, and "${replies[1].content}" after call 2. Between the rows the tools node appends the ToolMessage. The state ends with ${final.length} messages and no system message.`,
+  title: 'model 节点如何构建每个请求',
+  desc: `两行，每行对应 06-agent-run.txt 中那次运行的一次模型调用。每行左侧是调用之前的 state.messages，青绿色：调用 1 之前有 ${calls[0].messages.length - 1} 条消息，调用 2 之前有 ${calls[1].messages.length - 1} 条。中间是聊天模型收到的请求：先是紫色的系统提示词“${system.slice(8)}”，因为它不在状态里，所以用虚线；然后是来自状态的同样那些消息。一条梅紫色箭头把请求送到聊天模型。一条青绿色箭头把回复带回，model 节点把它追加到 state.messages：调用 1 之后是对 ${replies[0].tool_calls[0].name} 的工具调用，调用 2 之后是“${replies[1].content}”。两行之间，tools 节点追加 ToolMessage。状态最终有 ${final.length} 条消息，不含系统消息。`,
 }, f => {
   f.kicker(20, 18, 'state.messages');
-  f.kicker(236, 18, 'the request');
-  f.kicker(510, 18, 'chat model');
+  f.kicker(236, 18, '请求');
+  f.kicker(510, 18, '聊天模型');
 
   const states = [final.slice(0, calls[0].messages.length - 1), final.slice(0, calls[1].messages.length - 1)];
   states.forEach((state, r) => {
@@ -50,21 +50,21 @@ module.exports = figure('fig-3-5', {
     state.forEach((message, k) => line(f, 244, top + 26 + k * 24, 184, short(message), 'teal'));
     f.arrow([216, top + 14 + 24], [235, top + 14 + 24], { style: 'call' });
 
-    const model = f.box({ x: 510, y: top - 4, w: 110, h: 44, hue: 'plum', title: `call ${calls[r].call}`, sub: `tools: ${calls[r].tools.join(', ')}`, titleSize: 11.5 });
-    f.arrow([436, top + 16], [model.x - 1, top + 16], { style: 'model', label: `${request.length} messages`, labelX: 473 });
+    const model = f.box({ x: 510, y: top - 4, w: 110, h: 44, hue: 'plum', title: `调用 ${calls[r].call}`, sub: `工具：${calls[r].tools.join(', ')}`, titleSize: 11.5 });
+    f.arrow([436, top + 16], [model.x - 1, top + 16], { style: 'model', label: `${request.length} 条消息`, labelX: 473 });
 
     f.beat(r * 2 + 2);
     const reply = replies[r];
     const y = top + Math.max(state.length * 24 + 12, request.length * 24 + 12) + 14;
     f.path(`M565 ${top + 40} V${y} H${20 + 196 + 1}`, { style: 'write' });
-    f.text(340, y - 6, `appended: ${short(reply)}`, { size: 11.5, hue: 'teal', anchor: 'middle', knock: true });
+    f.text(340, y - 6, `追加：${short(reply)}`, { size: 11.5, hue: 'teal', anchor: 'middle', knock: true });
     line(f, 28, y - 10, 180, short(reply), 'plum', { fresh: true });
   });
 
   f.beat(5);
   const end = 34 + 2 * ROW + 6;
-  f.text(20, end + 10, `then the tools node appends "${short(final[2])}", and call 2 sees it.`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, end + 28, `After the run state.messages holds ${final.length} messages. The system prompt is not one of them.`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, end + 10, `随后 tools 节点追加“${short(final[2])}”，调用 2 能看到它。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, end + 28, `运行结束后 state.messages 有 ${final.length} 条消息，其中不含系统提示词。`, { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(20, end + 40, 14, 12, { fill: color('violet-fill'), stroke: color('violet-ink'), dash: 'dashed' });
-  f.text(40, end + 50, 'the system_prompt of create_agent: sent first on every call, never saved', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(40, end + 50, 'create_agent 的 system_prompt：每次调用都先发送，从不保存', { size: 11, serif: true, hue: 'ink-soft' });
 });

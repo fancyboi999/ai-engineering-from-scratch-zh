@@ -1,48 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 236" role="img" aria-labelledby="fig-1-2c-title fig-1-2c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-1-2c-title">Deep Agents and the Claude Agent SDK on the same 30 tasks</title>
-  <desc id="fig-1-2c-desc">A dot table for Claude Haiku 5.5 with the same tools and the same system prompt in both harnesses. Deep Agents: 30 of 30 passed, a median of 5 model calls and 23.7k input tokens per task, $0.0168 for all tasks; Claude Agent SDK: 30 of 30 passed, a median of 4.5 model calls and 9.3k input tokens per task, $0.0139 for all tasks. The two harnesses agreed on 30 of 30 task outcomes. Below, each dot is the input tokens of one task.</desc>
-  <text x="168" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">TASKS PASSED</text>
-  <text x="168" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">OF 30</text>
-  <text x="286" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">MODEL CALLS</text>
-  <text x="286" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">PER TASK</text>
-  <text x="404" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">INPUT TOKENS</text>
-  <text x="404" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">PER TASK</text>
-  <text x="522" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">DOLLARS</text>
-  <text x="522" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">FOR 30 TASKS</text>
+  <title id="fig-1-2c-title">Deep Agents 与 Claude Agent SDK 在同样 30 项任务上的对比</title>
+  <desc id="fig-1-2c-desc">Claude Haiku 5.5 在两个 harness 里使用相同工具和相同系统提示词的点状表。Deep Agents：30 项中通过 30 项，每项任务模型调用中位数 5 次、输入 23.7k token，全部任务共 $0.0168；Claude Agent SDK：30 项中通过 30 项，每项任务模型调用中位数 4.5 次、输入 9.3k token，全部任务共 $0.0139。两个 harness 在 30 项任务中有 30 项结果一致。下方每个点是一项任务的输入 token 数。</desc>
+  <text x="168" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过的任务</text>
+  <text x="168" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">共 30 项</text>
+  <text x="286" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">模型调用</text>
+  <text x="286" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每项任务</text>
+  <text x="404" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">输入 TOKEN</text>
+  <text x="404" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每项任务</text>
+  <text x="522" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">费用（美元）</text>
+  <text x="522" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">30 项任务</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <text x="16" y="66" font-size="12" font-weight="700" fill="var(--m-blue-ink, #2f5d9a)">Deep Agents</text>
-  <line x1="168" y1="62" x2="272" y2="62" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="168" y1="62" x2="272" y2="62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="272" cy="62" r="4.5" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="264" y="54" font-size="11" text-anchor="end">30</text>
-  <line x1="286" y1="62" x2="390" y2="62" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="286" y1="62" x2="390" y2="62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="338" cy="62" r="4.5" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="346" y="54" font-size="11">5</text>
-  <line x1="404" y1="62" x2="508" y2="62" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="404" y1="62" x2="508" y2="62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="486.21" cy="62" r="4.5" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="478.21" y="54" font-size="11" text-anchor="end">23.7k</text>
-  <line x1="522" y1="62" x2="626" y2="62" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="522" y1="62" x2="626" y2="62" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="609.16" cy="62" r="4.5" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="601.16" y="54" font-size="11" text-anchor="end">$0.0168</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
   <text x="16" y="96" font-size="12" font-weight="700" fill="var(--m-olive-ink, #515f26)">Claude Agent SDK</text>
-  <line x1="168" y1="92" x2="272" y2="92" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="168" y1="92" x2="272" y2="92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="272" cy="92" r="4.5" fill="var(--m-olive-ink, #515f26)"/>
   <text x="264" y="84" font-size="11" text-anchor="end">30</text>
-  <line x1="286" y1="92" x2="390" y2="92" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="286" y1="92" x2="390" y2="92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="332.8" cy="92" r="4.5" fill="var(--m-olive-ink, #515f26)"/>
   <text x="340.8" y="84" font-size="11">4.5</text>
-  <line x1="404" y1="92" x2="508" y2="92" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="404" y1="92" x2="508" y2="92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="436.08" cy="92" r="4.5" fill="var(--m-olive-ink, #515f26)"/>
   <text x="444.08" y="84" font-size="11">9.3k</text>
-  <line x1="522" y1="92" x2="626" y2="92" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="522" y1="92" x2="626" y2="92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="594.11" cy="92" r="4.5" fill="var(--m-olive-ink, #515f26)"/>
   <text x="586.11" y="84" font-size="11" text-anchor="end">$0.0139</text>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
-  <text x="16" y="142" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">INPUT TOKENS</text>
-  <text x="16" y="158" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">PER TASK</text>
-  <line x1="168" y1="138" x2="626" y2="138" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="16" y="142" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">输入 TOKEN</text>
+  <text x="16" y="158" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每项任务</text>
+  <line x1="168" y1="138" x2="626" y2="138" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="237.1" cy="135" r="2.2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="237.52" cy="138" r="2.2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="272.92" cy="141" r="2.2" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -73,7 +73,7 @@
   <circle cx="509.27" cy="135" r="2.2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="514.77" cy="138" r="2.2" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="589.61" cy="141" r="2.2" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <line x1="168" y1="160" x2="626" y2="160" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="168" y1="160" x2="626" y2="160" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.3"/>
   <circle cx="191.75" cy="157" r="2.2" fill="var(--m-olive-ink, #515f26)"/>
   <circle cx="191.75" cy="160" r="2.2" fill="var(--m-olive-ink, #515f26)"/>
   <circle cx="204.66" cy="163" r="2.2" fill="var(--m-olive-ink, #515f26)"/>

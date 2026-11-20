@@ -13,8 +13,8 @@ const count = (key, outcome) => data.cells[key].outcomes.filter(o => o === outco
 
 module.exports = figure('fig-4-2b', {
   height: 400,
-  title: 'The outcome of each structured output run',
-  desc: `A dot matrix of 400 runs on the Mac with four Qwen3 models on Ollama. Rows are the flat, nested, union, and enum schemas under ToolStrategy and ProviderStrategy, and columns are the 0.6B, 1.7B, 4B, and 8B models. Blue dots are valid on the first call, amber dots are valid after a retry, and rose dots raised. ProviderStrategy raised on every union run at build time and on ${count('qwen3:4b-instruct-2507-q4_K_M enum provider', 'raised')} enum runs on the 4B model, and was valid otherwise. ToolStrategy raised on ${count('qwen3:0.6b nested tool', 'raised')} of 20 nested runs on 0.6B and ${count('qwen3:8b nested tool', 'raised')} of 10 on 8B. The summary holds ${data.runs} runs, and the rest use AutoStrategy.`,
+  title: '每次结构化输出运行的结果',
+  desc: `400 次运行的点阵，在 Mac 上用 Ollama 里的四个 Qwen3 模型。行是 ToolStrategy 与 ProviderStrategy 下的 flat、nested、union 和 enum 四种 schema，列是 0.6B、1.7B、4B 和 8B 模型。蓝点表示第一次调用就有效，琥珀点表示重试后有效，玫红点表示抛出异常。ProviderStrategy 在每次 union 运行中都于构建时抛出异常，在 4B 模型上有 ${count('qwen3:4b-instruct-2507-q4_K_M enum provider', 'raised')} 次 enum 运行抛出异常，其余有效。ToolStrategy 在 0.6B 的 20 次 nested 运行中有 ${count('qwen3:0.6b nested tool', 'raised')} 次抛出异常，在 8B 的 10 次中有 ${count('qwen3:8b nested tool', 'raised')} 次。汇总文件共有 ${data.runs} 次运行，其余使用 AutoStrategy。`,
 }, f => {
   const x0 = 170;
   const colW = 112;
@@ -38,12 +38,12 @@ module.exports = figure('fig-4-2b', {
     });
     y += 4;
   });
-  const legend = [['valid on the first call', 'blue'], ['valid after a retry', 'amber'], ['raised', 'rose']];
+  const legend = [['第一次调用就有效', 'blue'], ['重试后有效', 'amber'], ['抛出异常', 'rose']];
   let lx = 20;
   legend.forEach(([label, hue]) => {
     f.dot(lx + 4, y + 16, { hue, r: 3.8 });
     const box = f.text(lx + 14, y + 20, label, { size: 11.5, hue });
     lx = box.right + 24;
   });
-  f.text(20, y + 42, 'Each dot is one run on the Mac. Every ProviderStrategy union run raised in create_agent.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 42, '每个点是在 Mac 上的一次运行。ProviderStrategy 的每次 union 运行都在 create_agent 中抛出异常。', { size: 11, serif: true, hue: 'ink-soft' });
 });

@@ -12,7 +12,7 @@ const ROWS = [
   ['qwen3:8b', 'Qwen3 8B', ['none', 'tool', 'extract']],
   ['claude-haiku-5-5', 'Haiku 5.5', ['none', 'tool', 'provider', 'extract']],
 ];
-const VAR = { none: 'free text', tool: 'ToolStrategy', provider: 'ProviderStrategy', extract: 'extract call' };
+const VAR = { none: '自由文本', tool: 'ToolStrategy', provider: 'ProviderStrategy', extract: '提取调用' };
 const cell = (m, v) => {
   const c = ST.cells[`${m}|${v}`];
   if (!c) throw new Error(`fig-4-3: no cell ${m} ${v}`);
@@ -40,14 +40,14 @@ const k = (m, v) => cell(m, v).correct;
 
 module.exports = figure('fig-4-3', {
   height,
-  title: 'Structured output: the answer of every task, by strategy and model',
-  desc: `A grid with one row per model and strategy and one column per task: 20 chain tasks and 19 SQL tasks, each with lookup tools. A blue square is a correct structured answer, a light rose square a wrong value, an empty square no structured answer, and a solid rose square a raised error. On Qwen3 4B, ToolStrategy gave no answer in ${39 - cell(Q4, 'tool').present} of 39 tasks and ProviderStrategy raised in ${cell(Q4, 'provider').n - cell(Q4, 'provider').present} of ${cell(Q4, 'provider').n}. A second model call that extracts the answer from the final text was correct in ${k(Q4, 'extract')} of 39 on Qwen3 4B, ${k('qwen3:8b', 'extract')} on Qwen3 8B and ${k('claude-haiku-5-5', 'extract')} on Claude Haiku 5.5. Free text read by its last number was correct in ${k('claude-haiku-5-5', 'none')} of 39 on Haiku.`,
+  title: '结构化输出：按策略和模型划分的每项任务的答案',
+  desc: `一张网格，每行是一个模型与策略的组合，每列是一项任务：20 项 chain 任务和 19 项 SQL 任务，各带查询工具。蓝色方块是正确的结构化答案，浅玫红方块是错误的值，空方块是没有结构化答案，实心玫红方块是抛出的错误。在 Qwen3 4B 上，ToolStrategy 在 39 项任务中有 ${39 - cell(Q4, 'tool').present} 项没有给出答案，ProviderStrategy 在 ${cell(Q4, 'provider').n} 项中有 ${cell(Q4, 'provider').n - cell(Q4, 'provider').present} 项抛出异常。再发起第二次模型调用，从最终文本中提取答案，在 Qwen3 4B 上 39 项中正确 ${k(Q4, 'extract')} 项，在 Qwen3 8B 上正确 ${k('qwen3:8b', 'extract')} 项，在 Claude Haiku 5.5 上正确 ${k('claude-haiku-5-5', 'extract')} 项。自由文本取最后一个数字，在 Haiku 上 39 项中正确 ${k('claude-haiku-5-5', 'none')} 项。`,
 }, f => {
-  f.kicker(20, 22, 'model');
-  f.kicker(110, 22, 'strategy');
-  f.kicker(620, 22, 'correct', { anchor: 'end' });
-  f.text((X0 + chainEnd) / 2, 42, 'chain, 20 tasks', { size: 11, anchor: 'middle', hue: 'ink-soft' });
-  f.text((sqlStart + XEND) / 2, 42, 'sql, 19 tasks', { size: 11, anchor: 'middle', hue: 'ink-soft' });
+  f.kicker(20, 22, '模型');
+  f.kicker(110, 22, '策略');
+  f.kicker(620, 22, '正确', { anchor: 'end' });
+  f.text((X0 + chainEnd) / 2, 42, 'chain，20 项任务', { size: 11, anchor: 'middle', hue: 'ink-soft' });
+  f.text((sqlStart + XEND) / 2, 42, 'sql，19 项任务', { size: 11, anchor: 'middle', hue: 'ink-soft' });
   f.rule(X0, 49, chainEnd, 49, { hue: 'ink-mute' });
   f.rule(sqlStart, 49, XEND, 49, { hue: 'ink-mute' });
   let y = Y0;
@@ -80,12 +80,12 @@ module.exports = figure('fig-4-3', {
   f.beat(0);
   const ly = y + 24;
   f.rect(20, ly - 10, 9, 12, { fill: color('blue-ink'), stroke: 'none' });
-  f.text(34, ly, 'correct value', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(34, ly, '正确的值', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(140.5, ly - 9.5, 8, 11, { fill: color('rose-fill'), stroke: color('rose-ink') });
-  f.text(154, ly, 'wrong value', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(154, ly, '错误的值', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(250.5, ly - 9.5, 8, 11, { fill: 'none', stroke: color('ink-mute') });
-  f.text(264, ly, 'no structured answer', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(264, ly, '没有结构化答案', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(410, ly - 10, 9, 12, { fill: color('rose-ink'), stroke: 'none' });
-  f.text(424, ly, 'raised an error', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ly + 24, 'Qwen3 4B ProviderStrategy ran 10 of the tasks. Every run on the Mac, Haiku through the API.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(424, ly, '抛出错误', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ly + 24, 'Qwen3 4B 的 ProviderStrategy 只运行了其中 10 项任务。全部在 Mac 上运行，Haiku 通过 API。', { size: 11, serif: true, hue: 'ink-soft' });
 });

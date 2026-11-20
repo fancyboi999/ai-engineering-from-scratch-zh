@@ -30,7 +30,7 @@ const listOf = (body, node) => `[${(enter(body, node)['scratchpad.resume'] || []
 const ran = (body, node) => logs(body).some(l => l.node === node);
 const calls = (body, node) => logs(body).filter(l => l.node === node && l.event.startsWith('model call')).length;
 const returned = (body, node) => logs(body).filter(l => l.node === node && /returned/.test(l.event)).map(l => /'([^']+)'/.exec(l.event)[1]);
-const plural = n => `${n} model call${n === 1 ? '' : 's'}`;
+const plural = n => `${n} 次模型调用`;
 
 const askId1 = i1[0].id;
 const approveId = i1[1].id;
@@ -40,29 +40,29 @@ const total = Object.values(perCall).reduce((a, b) => a + b, 0);
 
 const cells = {
   ask: [
-    { hue: 'amber', lines: [`enter, list ${listOf(run1, 'ask')}`, plural(calls(run1, 'ask')), 'call #0 stops', `id ${askId1}`] },
-    { hue: 'amber', lines: [`enter, list ${listOf(run2b, 'ask')}`, plural(calls(run2b, 'ask')), `#0 returns ${returned(run2b, 'ask')[0]}`, `#1 stops ${askId2}`] },
-    { hue: 'teal', lines: [`enter, list ${listOf(run3, 'ask')}`, plural(calls(run3, 'ask')), `#0 replays ${returned(run3, 'ask')[0]}`, `#1 gets ${nullResume}, done`] },
+    { hue: 'amber', lines: [`进入，列表 ${listOf(run1, 'ask')}`, plural(calls(run1, 'ask')), '调用 #0 停止', `id ${askId1}`] },
+    { hue: 'amber', lines: [`进入，列表 ${listOf(run2b, 'ask')}`, plural(calls(run2b, 'ask')), `#0 返回 ${returned(run2b, 'ask')[0]}`, `#1 停止 ${askId2}`] },
+    { hue: 'teal', lines: [`进入，列表 ${listOf(run3, 'ask')}`, plural(calls(run3, 'ask')), `#0 重放 ${returned(run3, 'ask')[0]}`, `#1 得到 ${nullResume}，完成`] },
   ],
   approve: [
-    { hue: 'amber', lines: [`enter, list ${listOf(run1, 'approve')}`, plural(calls(run1, 'approve')), 'call #0 stops', `id ${approveId}`] },
-    { hue: 'teal', lines: [`enter, list ${listOf(run2b, 'approve')}`, plural(calls(run2b, 'approve')), `#0 returns ${returned(run2b, 'approve')[0]}`, 'done'] },
+    { hue: 'amber', lines: [`进入，列表 ${listOf(run1, 'approve')}`, plural(calls(run1, 'approve')), '调用 #0 停止', `id ${approveId}`] },
+    { hue: 'teal', lines: [`进入，列表 ${listOf(run2b, 'approve')}`, plural(calls(run2b, 'approve')), `#0 返回 ${returned(run2b, 'approve')[0]}`, '完成'] },
     null,
   ],
   other: [
-    { hue: 'teal', lines: ['runs once', plural(calls(run1, 'other')), 'done', 'writes saved'] },
-    { hue: 'teal', dash: true, lines: ['not run', plural(calls(run2b, 'other')), 'saved writes', 'reapplied'] },
+    { hue: 'teal', lines: ['运行一次', plural(calls(run1, 'other')), '完成', '写入已保存'] },
+    { hue: 'teal', dash: true, lines: ['未运行', plural(calls(run2b, 'other')), '已保存的写入', '重新应用'] },
     null,
   ],
-  after: [null, null, { hue: 'teal', lines: ['runs', plural(calls(run3, 'after')), 'done'] }],
+  after: [null, null, { hue: 'teal', lines: ['运行', plural(calls(run3, 'after')), '完成'] }],
 };
 if (reapplied !== 'other' || ran(run2b, 'other') || ran(run3, 'approve') || !ran(run3, 'after')) throw new Error('fig-2-4: capture does not match the drawing');
 
 const COLS = [
-  { x: 108, w: 146, head: 'invoke(input)', sub: 'run 1', key: 'run 1' },
-  { x: 260, w: 68, head: "'yes'", sub: 'run 2a', key: 'run 2a' },
-  { x: 334, w: 146, head: '{id: answer}', sub: 'run 2b', key: 'run 2b' },
-  { x: 486, w: 136, head: "'A2'", sub: 'run 3', key: 'run 3' },
+  { x: 108, w: 146, head: 'invoke(input)', sub: '调用 1', key: 'run 1' },
+  { x: 260, w: 68, head: "'yes'", sub: '调用 2a', key: 'run 2a' },
+  { x: 334, w: 146, head: '{id: answer}', sub: '调用 2b', key: 'run 2b' },
+  { x: 486, w: 136, head: "'A2'", sub: '调用 3', key: 'run 3' },
 ];
 const RUN_COL = [0, 2, 3];
 const ROWS = ['ask', 'approve', 'other', 'after'];
@@ -71,11 +71,11 @@ const RH = 76;
 
 module.exports = figure('fig-2-4', {
   height: 520,
-  title: 'Three calls that answer three questions in two parallel nodes',
-  desc: `A grid of four nodes against four calls on one thread with InMemorySaver and Qwen3 4B on the x86 server guest. ask, approve, and other run in parallel after START, and after runs last. ask and approve each ask the model for a question before they call interrupt. Call 1 starts the run: ask stops at its first interrupt with id ${askId1}, approve stops with id ${approveId}, and other finishes. Call 2a resumes with one plain value and raises ${err}, because two interrupts wait, and makes no model call. Call 2b resumes with a map from id to answer: approve asks the model again, gets OK, and finishes. ask asks the model again, replays its first answer, asks for its second question, and stops with id ${askId2}. other does not run, because its saved writes are reapplied. Call 3 resumes with A2: ask runs a third time with two model calls and finishes, and after runs. The calls made ${perCall['run 1']}, ${perCall['run 2a']}, ${perCall['run 2b']}, and ${perCall['run 3']} model calls, ${total} for five prompts. The thread holds ${history.length} checkpoints, steps ${history.slice().reverse().join(', ')}.`,
+  title: '三次调用回答并行两个节点提出的三个问题',
+  desc: `四个节点与四次调用组成的网格，在同一个线程上使用 InMemorySaver，模型为 x86 服务器虚拟机上的 Qwen3 4B。ask、approve 和 other 在 START 之后并行运行，after 最后运行。ask 和 approve 在调用 interrupt 之前，各自先让模型提出一个问题。调用 1 启动运行：ask 在它的第一个中断处停止，id 为 ${askId1}，approve 停止，id 为 ${approveId}，other 完成。调用 2a 用一个普通值恢复，抛出 ${err}，因为有两个中断在等待，且不产生任何模型调用。调用 2b 用一个从 id 到答案的映射恢复：approve 再次询问模型，得到 OK，完成。ask 再次询问模型，重放它的第一个答案，提出第二个问题，并以 id ${askId2} 停止。other 不运行，因为它已保存的写入被重新应用。调用 3 用 A2 恢复：ask 第三次运行，共两次模型调用，完成，随后 after 运行。四次调用分别产生 ${perCall['run 1']}、${perCall['run 2a']}、${perCall['run 2b']} 和 ${perCall['run 3']} 次模型调用，五个提示共 ${total} 次。线程保存了 ${history.length} 个检查点，步为 ${history.slice().reverse().join('、')}。`,
 }, f => {
-  f.kicker(20, 22, 'call');
-  f.text(20, 40, 'resume value', { size: 11, serif: true, hue: 'ink-soft' });
+  f.kicker(20, 22, '第几次调用');
+  f.text(20, 40, '恢复值', { size: 11, serif: true, hue: 'ink-soft' });
   COLS.forEach((c, k) => {
     f.text(c.x + c.w / 2, 22, c.sub, { size: 11, anchor: 'middle', hue: 'ink-mute' });
     f.text(c.x + c.w / 2, 40, c.head, { size: 11.5, anchor: 'middle', weight: 700, hue: k === 1 ? 'rose' : 'violet' });
@@ -102,30 +102,30 @@ module.exports = figure('fig-2-4', {
   f.beat(2);
   const c2 = COLS[1];
   f.rect(c2.x, Y0, c2.w, 3 * RH - 10, { hue: 'rose', dash: 'dashed' });
-  ['Runtime', 'Error', '', '2 waiting', 'no node', 'ran'].forEach((line, i) => {
+  ['Runtime', 'Error', '', '2 个在等待', '没有节点', '运行'].forEach((line, i) => {
     if (line) f.text(c2.x + c2.w / 2, Y0 + 40 + i * 16, line, { size: 11, anchor: 'middle', hue: i < 2 ? 'rose' : 'ink-soft', weight: i < 2 ? 700 : undefined });
   });
 
   f.beat(5);
   const my = Y0 + 4 * RH + 8;
-  f.text(20, my + 14, 'model calls', { size: 11.5, hue: 'plum', weight: 700 });
-  f.text(20, my + 40, 'checkpoints', { size: 11.5, hue: 'teal', weight: 700 });
+  f.text(20, my + 14, '模型调用', { size: 11.5, hue: 'plum', weight: 700 });
+  f.text(20, my + 40, '检查点', { size: 11.5, hue: 'teal', weight: 700 });
   const made = [history.filter(s => s <= 0), [], [], history.filter(s => s > 0)];
   COLS.forEach((c, k) => {
     f.text(c.x + c.w / 2, my + 14, String(perCall[c.key]), { size: 12, anchor: 'middle', hue: 'plum', weight: 700 });
     const steps = made[k];
-    f.text(c.x + c.w / 2, my + 40, steps.length ? `step ${steps.sort((a, b) => a - b).join(', step ')}` : 'none', { size: 11, anchor: 'middle', hue: steps.length ? 'teal' : 'ink-mute' });
+    f.text(c.x + c.w / 2, my + 40, steps.length ? `第 ${steps.sort((a, b) => a - b).join('、')} 步` : '无', { size: 11, anchor: 'middle', hue: steps.length ? 'teal' : 'ink-mute' });
   });
-  f.text(334 + 73, my + 56, 'answers saved as writes', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
-  f.text(334 + 73, my + 70, 'on the step 0 checkpoint', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
+  f.text(334 + 73, my + 56, '答案作为写入保存', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
+  f.text(334 + 73, my + 70, '在第 0 步的检查点上', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
 
   f.beat(0);
   const ky = 486;
   f.rect(20, ky - 11, 22, 14, { hue: 'amber' });
-  f.text(48, ky, 'stops at an interrupt', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(48, ky, '在中断处停止', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(220, ky - 11, 22, 14, { hue: 'teal' });
-  f.text(248, ky, 'finishes', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(248, ky, '完成', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(340, ky - 11, 22, 14, { hue: 'teal', dash: 'dashed' });
-  f.text(368, ky, 'writes reapplied, no run', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ky + 22, `list: the resume list on entry; ${total} model calls for five prompts in all`.replace(';', ','), { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(368, ky, '写入重新应用，不运行', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ky + 22, `列表：进入时的恢复列表，五个提示共 ${total} 次模型调用`, { size: 11, serif: true, hue: 'ink-soft' });
 });

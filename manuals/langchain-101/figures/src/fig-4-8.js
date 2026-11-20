@@ -31,10 +31,10 @@ const CHAR = 7.2;
 
 module.exports = figure('fig-4-8', {
   height: 468,
-  title: 'Four PII strategies on one input',
-  desc: `One human message holds an email address, a card number, an IP address, and a URL, each underlined in the hue of the row that matched it. Five rows each ran one PIIMiddleware. ${runs.filter(r => r.content).map(r => `${r.type} with ${r.strategy} replaced "${r.from}" with "${r.to}"`).join('. ')}. email with block raised ${runs[4].raised[1]}, "${runs[4].raised[2]}", and the model got ${runs[4].calls} calls. Each other run made ${runs[0].calls} model call, and only the matched span of the newest human message changed.`,
+  title: '同一输入上的四种 PII 策略',
+  desc: `一条用户消息包含一个电子邮件地址、一个卡号、一个 IP 地址和一个 URL，各自用匹配它的那一行的颜色画下划线。五行各运行一个 PIIMiddleware。${runs.filter(r => r.content).map(r => `${r.type} 配合 ${r.strategy} 把“${r.from}”替换成“${r.to}”`).join('；')}。email 配合 block 抛出 ${runs[4].raised[1]}，“${runs[4].raised[2]}”，模型收到 ${runs[4].calls} 次调用。其他每次运行都有 ${runs[0].calls} 次模型调用，且只有最新用户消息中匹配的片段发生了变化。`,
 }, f => {
-  f.kicker(20, 18, 'the human message');
+  f.kicker(20, 18, '用户消息');
   f.rect(20, 28, 600, 76, { hue: 'violet' });
   const spans = runs.filter(r => r.content && r.strategy !== 'block');
   lines.forEach((line, i) => {
@@ -51,8 +51,8 @@ module.exports = figure('fig-4-8', {
   });
 
   f.kicker(32, 128, 'PIIMiddleware');
-  f.kicker(250, 128, 'the matched span becomes');
-  f.kicker(620, 128, 'model calls', { anchor: 'end' });
+  f.kicker(250, 128, '匹配的片段变成');
+  f.kicker(620, 128, '模型调用', { anchor: 'end' });
   runs.forEach((run, i) => {
     const y = 140 + i * 56;
     f.beat(i + 1);
@@ -71,6 +71,6 @@ module.exports = figure('fig-4-8', {
     f.text(600, y + 27, String(run.calls), { size: 13, weight: 700, anchor: 'middle', hue: run.calls ? 'plum' : 'rose' });
   });
   f.beat(0);
-  f.text(20, 442, 'Each row is one run. Grey: what the input held. Bold: what was saved and sent instead.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 458, 'Only the newest human message changed, because apply_to_input is the default.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 442, '每行是一次运行。灰色：输入原本的内容。粗体：实际保存并发送的内容。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 458, '只有最新的用户消息发生了变化，因为 apply_to_input 是默认值。', { size: 11, serif: true, hue: 'ink-soft' });
 });

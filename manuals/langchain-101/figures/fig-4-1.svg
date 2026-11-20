@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" role="img" aria-labelledby="fig-4-1-title fig-4-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-1-title">What each argument of create_agent builds</title>
-  <desc id="fig-4-1-desc">Three compiled graphs read from the capture kit. create_agent with a model and no tools has 3 nodes: __start__, model, __end__. Adding tools=[add] adds the tools node, 4 nodes. Adding middleware=[A, B, C] with all four node hooks adds 12 hook nodes, 16 in all, drawn as a grid with the 17 edges of the graph: the before hooks run A, B, C, the after_model hooks run C, B, A, and A.after_model routes to tools, back to A.before_model, or to the after_agent hooks. A dashed amber edge leaves a node with more than one next node. The system_prompt and the response_format add no node. They change each request inside the model node. Every agent gets the config recursion_limit 9999 and stream_mode updates.</desc>
+  <title id="fig-4-1-title">create_agent 的每个参数构建出什么</title>
+  <desc id="fig-4-1-desc">三张读自录制工具包的编译图。只给模型、不给工具的 create_agent 有 3 个节点：__start__、model、__end__。加上 tools=[add] 后多出 tools 节点，共 4 个节点。再加上带全部四种节点钩子的 middleware=[A, B, C]，多出 12 个钩子节点，共 16 个，画成网格，图中共有 17 条边：before 钩子依次运行 A、B、C，after_model 钩子依次运行 C、B、A，A.after_model 会路由到 tools、回到 A.before_model，或进入 after_agent 钩子。从有多个后继节点的节点引出的边画成琥珀色虚线。system_prompt 和 response_format 不增加节点，它们在 model 节点内部改变每个请求。每个 agent 的配置都带有 recursion_limit 9999 和 stream_mode updates。</desc>
   <defs><marker id="fig-4-1-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-1-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
-  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">THE NODES OF THE COMPILED GRAPH</text>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">编译后的图中的节点</text>
   <text x="20" y="42" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">create_agent(model)</text>
-  <text x="620" y="42" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">3 nodes</text>
+  <text x="620" y="42" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">3 个节点</text>
   <rect x="20" y="50" width="104" height="24" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="72" y="65.3" font-size="11" text-anchor="middle" font-weight="700">__start__</text>
   <rect x="160" y="50" width="104" height="24" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
@@ -14,7 +14,7 @@
   <line x1="124" y1="62" x2="159" y2="62" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-1-head-ink)"/>
   <line x1="264" y1="62" x2="299" y2="62" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-1-head-ink)"/>
   <text x="20" y="106" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">create_agent(model, tools=[add])</text>
-  <text x="620" y="106" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">4 nodes</text>
+  <text x="620" y="106" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">4 个节点</text>
   <rect x="20" y="114" width="104" height="24" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="72" y="129.3" font-size="11" text-anchor="middle" font-weight="700">__start__</text>
   <rect x="160" y="114" width="104" height="24" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
@@ -27,9 +27,9 @@
   <path d="M232 138 V150 H492 V139" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-4-1-head-amber)"/>
   <line x1="264" y1="121" x2="299" y2="121" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-1-head-amber)"/>
   <line x1="300" y1="131" x2="265" y2="131" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-1-head-amber)"/>
-  <text x="20" y="170" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">a graph with no tools has one next node after model. Tools add the tools node and a choice.</text>
+  <text x="20" y="170" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">没有工具的图，model 之后只有一个后继节点。加上工具会多出 tools 节点和一次选择。</text>
   <text x="20" y="204" font-size="11.5" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">create_agent(model, tools=[add], middleware=[A, B, C])</text>
-  <text x="620" y="204" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">16 nodes, 12 of them hooks</text>
+  <text x="620" y="204" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">16 个节点，其中 12 个是钩子</text>
   <rect x="20" y="228" width="130" height="24" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
   <text x="85" y="243.3" font-size="11" text-anchor="middle" font-weight="700">__start__</text>
   <rect x="476" y="282" width="130" height="24" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
@@ -79,7 +79,7 @@
   <line x1="541" y1="306" x2="541" y2="335" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-1-head-ink)"/>
   <line x1="85" y1="336" x2="85" y2="307" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-1-head-ink)"/>
   <line x1="454" y1="402" x2="475" y2="402" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-1-head-ink)"/>
-  <text x="20" y="464" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Solid: the only next node. Dashed amber: a conditional edge, the next node is chosen at run time.</text>
-  <text x="20" y="482" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">system_prompt and response_format add no node: they change each request inside model.</text>
-  <text x="20" y="500" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Every agent also gets recursion_limit 9999 and stream_mode updates in its config.</text>
+  <text x="20" y="464" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">实线：唯一的后继节点。琥珀虚线：条件边，后继节点在运行时选定。</text>
+  <text x="20" y="482" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">system_prompt 和 response_format 不增加节点：它们在 model 内部改变每个请求。</text>
+  <text x="20" y="500" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个 agent 的配置里还带有 recursion_limit 9999 和 stream_mode updates。</text>
 </svg>
