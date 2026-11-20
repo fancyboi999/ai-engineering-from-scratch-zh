@@ -1,25 +1,25 @@
-# Stores and long-term memory, and namespace isolation
+# Store 与长期记忆，以及命名空间隔离
 
-> A store keeps JSON items under namespaces that every thread can read, and it isolates one user from another only as well as the namespace prefix that your code builds.
+> store 把 JSON 条目保存在命名空间下，每个线程都能读取它们，而它隔离用户的程度，只取决于你的代码构造的命名空间前缀。
 
-A user tells your assistant that they prefer short answers. A week later they start a new conversation, which is a new thread, and the assistant has forgotten. A checkpointer keeps one thread. A fact that must outlive the thread needs a different place.
+用户告诉你的助手，他们喜欢简短的回答。一周后他们开始一场新对话，也就是一个新线程，助手却已经忘了。checkpointer 只保存一个线程。要比线程活得更久的事实，需要另一个地方。
 
-When you finish this section, you can save and search memories in a store, read them from a tool, and keep users apart by namespace.
+读完本节，你能在 store 里保存和搜索记忆，从工具里读取它们，并用命名空间把用户隔开。
 
-## Items and namespaces
+## 条目与命名空间 {#s-stores-and-long-term-memory-items-and-namespaces}
 
-**Store:** an object that saves JSON items by namespace and key, shared by all threads of a graph. `InMemoryStore`, `SqliteStore`, and `PostgresStore` are stores.
+**Store：** 按命名空间和键保存 JSON 条目的对象，由一个图的所有线程共享。`InMemoryStore`、`SqliteStore` 和 `PostgresStore` 都是 store。
 
-**Namespace:** a tuple of strings, such as `("users", "ada", "memories")`, that groups the items of a store. Each string is a label.
+**命名空间（namespace）：** 一个字符串元组，例如 `("users", "ada", "memories")`，用来给 store 里的条目分组。每个字符串是一个标签。
 
-**Item:** one value in a store, with its namespace, its key, and the times it was created and updated.
+**条目（item）：** store 里的一个值，带有它的命名空间、键，以及创建和更新的时间。
 
-The long-term memory page builds memory on stores in the same way {{docs oss/python/langchain/long-term-memory}}. Import `InMemoryStore` from `langgraph.store.memory`. The stores page links the name to a class in `langchain_core.stores`, which is a different key-value store without namespaces {{docs oss/python/langgraph/stores}}. This manual records the mix-up as conflict D106.
+long-term memory 页面以同样的方式在 store 上构建记忆 {{docs oss/python/langchain/long-term-memory}}。从 `langgraph.store.memory` 导入 `InMemoryStore`。stores 页面把这个名字链接到 `langchain_core.stores` 里的一个类，而那是另一种没有命名空间的键值存储 {{docs oss/python/langgraph/stores}}。本手册把这处混淆记为冲突 D106。
 
-The kit puts four items for two users and reads one back:
+录制工具包为两个用户放入四个条目，并读回其中一个：
 
 ```listing
-title: one item from the store
+title: store 里的一个条目
 source: capture/out/33-store.txt
 lang: json
 ---
@@ -40,17 +40,17 @@ get:
 }
 ```
 
-`list_namespaces()` lists the three namespaces. With `prefix=("users", "ada")` it lists only the two of `ada`. With `max_depth=2` it cuts each namespace to two labels and lists `("users", "ada")` and `("users", "grace")`.
+`list_namespaces()` 列出三个命名空间。加上 `prefix=("users", "ada")` 时，只列出 `ada` 的那两个。加上 `max_depth=2` 时，每个命名空间被截成两个标签，列出 `("users", "ada")` 和 `("users", "grace")`。
 
-## search is a prefix match
+## search 是前缀匹配 {#s-stores-and-long-term-memory-search-is-a-prefix-match}
 
-`search(namespace_prefix)` returns the items of every namespace that starts with the prefix. The stores page says the same: the prefix is not an exact match {{docs oss/python/langgraph/stores}}. A search for `("users", "ada")` returned the items from both `memories` and `settings`:
+`search(namespace_prefix)` 返回所有以该前缀开头的命名空间里的条目。stores 页面也这么说：前缀不是精确匹配 {{docs oss/python/langgraph/stores}}。对 `("users", "ada")` 的搜索，返回了 `memories` 和 `settings` 两处的条目：
 
 ```listing
-title: search with a two-label prefix
+title: 用两个标签的前缀搜索
 source: capture/out/33-store.txt
 lang: json
-note: The values are cut.
+note: 值被截掉了。
 ---
 search(('users', 'ada')):
 [
@@ -77,24 +77,24 @@ search(('users', 'ada')):
     "theme",
 ```
 
-The stores page adds that the order of the results depends on the backend {{docs oss/python/langgraph/stores}}. A `filter` matches values inside the prefix, and `delete` removes one item, so `get` returns `null` after it. [Figure](#fig-5-4) draws the tree that these calls walk.
+stores 页面补充说，结果的顺序取决于后端 {{docs oss/python/langgraph/stores}}。`filter` 在前缀之内匹配值，`delete` 删除一个条目，所以之后 `get` 返回 `null`。[图](#fig-5-4)画出了这些调用所遍历的树。
 
-A store with an `index` adds semantic search over the fields that you name. The kit indexed three items of `ada` with `nomic-embed-text` on Ollama, with `dims` 768. A query for `works in Pune` scored 1.0 on its own item and 0.350555 on `likes tea`. The question `Which city is Ada's office in?` names no item, and it still ranked `works in Pune` first, with 0.484968, and `likes tea` second, with 0.386065.
+带 `index` 的 store 会在你指明的字段上增加语义搜索。录制工具包用 Ollama 上的 `nomic-embed-text`，`dims` 为 768，为 `ada` 的三个条目建了索引。查询 `works in Pune` 时，它自己的条目得分 1.0，`likes tea` 得分 0.350555。问题 `Which city is Ada's office in?` 没有指名任何条目，却仍然把 `works in Pune` 排第一，得分 0.484968，`likes tea` 排第二，得分 0.386065。
 
 ```figure
 id: fig-5-4
 kind: tree
-title: the namespaces of the kit store
-claim: A search for users and ada covers both namespaces under ada, and no prefix that ends at a full label reaches the items of grace.
-caption: Read from the root at the top. Each box is one label, and each card under a namespace is one item, with its key and value. The shaded part is what search with the prefix users, ada returns. From capture/out/33-store.txt and capture/lab/summary/stores-mac.json.
+title: 录制工具包 store 的命名空间
+claim: 对 users 和 ada 的搜索覆盖 ada 下的两个命名空间，没有任何以完整标签结尾的前缀能碰到 grace 的条目。
+caption: 从顶部的根开始读。每个方框是一个标签，命名空间下的每张卡片是一个条目，带它的键和值。阴影部分是用前缀 users, ada 搜索时返回的内容。来源：capture/out/33-store.txt 和 capture/lab/summary/stores-mac.json。
 ```
 
-## A tool reads the store
+## 工具读取 store {#s-stores-and-long-term-memory-a-tool-reads-the-store}
 
-`create_agent(..., store=store)` passes the store to each tool through `ToolRuntime`. The kit tool reads the user from the run context and searches that user's namespace:
+`create_agent(..., store=store)` 通过 `ToolRuntime` 把 store 传给每个工具。录制工具包里的工具从运行上下文读取用户，并搜索这个用户的命名空间：
 
 ```listing
-title: a tool that reads the store
+title: 一个读取 store 的工具
 source: capture/s_persist.py
 lang: python
 ---
@@ -106,69 +106,69 @@ lang: python
 ```
 
 ```listing
-title: the same tool for two users
+title: 同一个工具对两个用户
 source: capture/out/44-store-agent.txt
 lang: text
-note: The answers of the model are cut.
+note: 模型的回答被截掉了。
 ---
 user ada: tool returned ['prefers short answers']
 …
 user grace: tool returned ['prefers long answers']
 ```
 
-Qwen3 4B called `recall` in both runs. It answered Ada with `I know you prefer short answers.`, and Grace with a long reply about her taste for long answers.
+Qwen3 4B 在两次运行里都调用了 `recall`。它回答 Ada 说 `I know you prefer short answers.`，回答 Grace 时则用一段长回复讲她对长回答的偏好。
 
-The user comes from `context`, which your code sets, and never from the model. If the model could name the user in a tool argument, it could read another user's items. Each run also warned `PydanticSerializationUnexpectedValue` for the field `context`, because the agent had no `context_schema` for the dict. The warning did not change the result.
+用户来自 `context`，由你的代码设置，绝不来自模型。如果模型能在工具参数里指定用户，它就能读取别的用户的条目。每次运行还对字段 `context` 给出了 `PydanticSerializationUnexpectedValue` 警告，因为这个 agent 没有为这个字典设置 `context_schema`。警告没有改变结果。
 
-## Namespace isolation
+## 命名空间隔离 {#s-stores-and-long-term-memory-namespace-isolation}
 
-**We measured** isolation on the Mac, Apple M1 Max with 10 cores and 64 GiB, one run per query. The stores were `InMemoryStore`, `SqliteStore`, and `PostgresStore` on PostgreSQL 14. Eight users each had one item under `("users", <user>, "memories")`. Five of the user ids were SQL `LIKE` and SQLite `GLOB` characters: `a_ice`, `%`, `*`, `al?ce`, and `[a]lice`. For each user and store, a search with the prefix of that user returned only that user's item: 0 of 24 searches crossed users.
+**我们测得**隔离效果，环境是 Mac，Apple M1 Max，10 核，64 GiB，每个查询运行一次。用的 store 是 `InMemoryStore`、`SqliteStore` 和 PostgreSQL 14 上的 `PostgresStore`。八个用户在 `("users", <user>, "memories")` 下各有一个条目。其中五个用户 id 是 SQL `LIKE` 和 SQLite `GLOB` 的特殊字符：`a_ice`、`%`、`*`、`al?ce` 和 `[a]lice`。对每个用户和每个 store，用该用户的前缀搜索，只返回该用户的条目：24 次搜索中有 0 次越过了用户。
 
-The same runs found four places where isolation depends on your code:
+同样的运行找到了四处隔离取决于你的代码的地方：
 
-- `list_namespaces(prefix=("users", "*"))` listed the namespaces of every user in all three stores. `*` is a wildcard in `list_namespaces` and a plain character in `search`. Refuse a user id of `*` before you build a prefix with it.
-- `search(())` with an empty prefix returned the items of every user: 9 in `InMemoryStore` and 8 in the other two. Never search with a prefix shorter than the user label.
-- A partial label matched nothing: `("users", "ali")` did not reach `alice`. The fix for advisory GHSA-47pj-3jcm-6whg holds at the pin.
-- A label with a `.` was refused with `InvalidNamespaceError` in `put` and `get`. `SqliteStore` and `PostgresStore` also refused it in `batch`. `InMemoryStore` stored `("users", "bob.x")` through `batch`, and a `GetOp` for `("users", "alice.memories")` created an empty namespace. No item crossed users.
+- `list_namespaces(prefix=("users", "*"))` 在三种 store 里都列出了所有用户的命名空间。`*` 在 `list_namespaces` 里是通配符，在 `search` 里是普通字符。用 `*` 构造前缀之前，先拒绝用户 id 为 `*` 的请求。
+- 用空前缀的 `search(())` 返回了所有用户的条目：`InMemoryStore` 里 9 个，另外两种里 8 个。绝不要用比用户标签更短的前缀去搜索。
+- 只有一部分标签什么也匹配不到：`("users", "ali")` 碰不到 `alice`。针对安全通告 GHSA-47pj-3jcm-6whg 的修复在锁定版本上有效。
+- 带 `.` 的标签在 `put` 和 `get` 里被 `InvalidNamespaceError` 拒绝。`SqliteStore` 和 `PostgresStore` 在 `batch` 里也拒绝它。`InMemoryStore` 通过 `batch` 存下了 `("users", "bob.x")`，而对 `("users", "alice.memories")` 的 `GetOp` 创建了一个空的命名空间。没有任何条目越过用户。
 
-A filter stays inside its prefix. `search(("users", "bob"), filter={"owner": "alice"})` returned nothing. Semantic search stayed inside its prefix too. With `nomic-embed-text` on Ollama, a query that matched the item of `alice` best returned only `bob` under the prefix of `bob`.
+过滤器始终在它的前缀之内。`search(("users", "bob"), filter={"owner": "alice"})` 什么也没返回。语义搜索同样留在它的前缀之内。用 Ollama 上的 `nomic-embed-text`，一个与 `alice` 的条目最匹配的查询，在 `bob` 的前缀下只返回了 `bob` 的条目。
 
-## Deep Agents memory files and the namespace factory
+## Deep Agents 的记忆文件与命名空间工厂 {#s-stores-and-long-term-memory-deep-agents-memory-files-and-the-namespace-factory}
 
 
-A deep agent reads and writes memory as files. `CompositeBackend` sends paths under `/memories/` to a `StoreBackend`, and `StoreBackend` keeps each file as one store item. The namespace of every item comes from a factory that you pass, and the agent's tools never pick it {{code libs/deepagents/deepagents/backends/store.py:98-168}}.
+deep agent 把记忆当作文件来读写。`CompositeBackend` 把 `/memories/` 下的路径交给 `StoreBackend`，`StoreBackend` 把每个文件保存为一个 store 条目。每个条目的命名空间来自你传入的工厂，agent 的工具从不选择它 {{code libs/deepagents/deepagents/backends/store.py:98-168}}。
 
-**StoreBackend:** a Deep Agents backend that keeps files in a LangGraph store, under a namespace that a factory returns for each run.
+**StoreBackend：** 一个 Deep Agents 后端，把文件保存在 LangGraph store 里，命名空间由工厂为每次运行返回。
 
-At the pin the factory is required. `StoreBackend(store=s)` raised `TypeError: missing 1 required keyword-only argument: 'namespace'`. The backends page still says that without a factory the legacy default reads `assistant_id`, so all users of an assistant share storage {{docs oss/python/deepagents/backends}}. That default is gone at 0.7.38, and this manual records the page as stale.
+在锁定版本上，工厂是必需的。`StoreBackend(store=s)` 抛出了 `TypeError: missing 1 required keyword-only argument: 'namespace'`。backends 页面仍然说，没有工厂时，旧的默认值读取 `assistant_id`，所以一个助手的所有用户共享存储 {{docs oss/python/deepagents/backends}}。这个默认值在 0.7.38 里已经不存在，本手册把这个页面记为已过时。
 
-The composite examples on the same page pass `namespace=lambda _rt: ("memories",)`. That is one namespace for every user of the agent. Copy it into a service with many users, and each user's agent reads the files of all the others.
+同一页面的组合示例传入 `namespace=lambda _rt: ("memories",)`。这是整个 agent 所有用户共用的一个命名空间。把它抄进有很多用户的服务，每个用户的 agent 都会读到其他所有人的文件。
 
-**We measured** this with a real agent. A deep agent on Qwen3 8B, on Ollama on the Mac at temperature 0, had `/memories/` on a `StoreBackend`. In each session, Alice asked it to save a locker code in `/memories/notes.md`. Then Bob, in a new thread, asked for any locker code under `/memories/`. Each session had a fresh store, and we ran 10 sessions per setup on `InMemoryStore` and on `PostgresStore`, on PostgreSQL 14. Alice's save worked in all 80 sessions.
+**我们测得**这一点，用的是一个真实的 agent。一个 deep agent 用 Qwen3 8B，在 Mac 上的 Ollama 里，温度为 0，`/memories/` 放在 `StoreBackend` 上。每个会话里，Alice 让它把一个储物柜密码存到 `/memories/notes.md`。然后 Bob 在一个新线程里，要求它读取 `/memories/` 下的任何储物柜密码。每个会话用一个全新的 store，我们对 `InMemoryStore` 和 PostgreSQL 14 上的 `PostgresStore`，每种配置各运行 10 个会话。Alice 的保存在全部 80 个会话里都成功了。
 
-[Figure](#fig-5-4b) shows each session:
+[图](#fig-5-4b)显示了每个会话：
 
-- **The docs factory, `("memories",)`.** Bob's agent called `ls` and `read_file` and told him Alice's code, in 10 of 10 sessions on each store.
-- **A factory per user, `("users", rt.context.user_id)`.** Bob's agent listed an empty folder and told him there was no code, in 10 of 10 sessions on each store.
-- **The same factory, plus a `recall` tool that searches `("users",)`.** This is the naive tool from [Namespace isolation](#s-stores-and-long-term-memory): a prefix one label short. Asked about `/memories/`, the model used `ls` only, and nothing leaked in 20 sessions. Asked to use its recall tool, it called `recall` and told Bob Alice's code, in 10 of 10 sessions on each store.
+- **文档里的工厂，`("memories",)`。** Bob 的 agent 调用了 `ls` 和 `read_file`，并告诉了他 Alice 的密码，每种 store 的 10 个会话里 10 次。
+- **每个用户一个工厂，`("users", rt.context.user_id)`。** Bob 的 agent 列出一个空文件夹，并告诉他没有密码，每种 store 的 10 个会话里 10 次。
+- **同一个工厂，加上一个搜索 `("users",)` 的 `recall` 工具。** 这是[命名空间隔离](#s-stores-and-long-term-memory)里那个幼稚的工具：前缀少了一个标签。问到 `/memories/` 时，模型只用了 `ls`，20 个会话里什么也没泄露。被要求使用它的 recall 工具时，它调用了 `recall`，并告诉 Bob Alice 的密码，每种 store 的 10 个会话里 10 次。
 
 ```figure
 id: fig-5-4b
 kind: chart
-title: two users, one deep agent, and where the memory file is kept
-claim: A constant namespace gave Bob Alice's code in 20 of 20 sessions, and a per-user factory gave it in 0 of 20.
-caption: One square per session, Qwen3 8B on the Mac, temperature 0, a fresh store per session, 10 sessions per row. Rose is a session where Bob's answer held Alice's code. From capture/lab/summary/store-namespace-mac.json.
+title: 两个用户，一个 deep agent，以及记忆文件放在哪里
+claim: 固定的命名空间在 20 个会话里 20 次把 Alice 的密码给了 Bob，每个用户一个的工厂是 20 次里 0 次。
+caption: 每个会话一个方块，Mac 上的 Qwen3 8B，温度 0，每个会话一个全新的 store，每行 10 个会话。玫红色表示 Bob 的回答里有 Alice 的密码的会话。来源：capture/lab/summary/store-namespace-mac.json。
 ```
 
-The recall result is the lesson of the figure. A per-user file backend kept the users apart. One tool that searched a shorter prefix undid it, and the model used that tool as soon as a user named it. Whether a model leaks depends on the prompt, so test the data path, and not only the answers. In one more session, Bob asked the agent to "check your long-term memory" without naming `/memories/`. It called no tool and said it had no memory.
+recall 的结果是这张图的教训。按用户分开的文件后端把用户隔开了。一个搜索了更短前缀的工具把这一切推翻，而且用户一点名，模型就用了那个工具。模型是否泄露取决于提示词，所以要测试数据路径，不能只测试回答。再看一个会话：Bob 让 agent“检查你的长期记忆”，没有点名 `/memories/`。它没有调用任何工具，说自己没有记忆。
 
-The factory reads the user from the run context, which your code sets. Give the agent a `context_schema`, and pass the user with each call:
+工厂从运行上下文里读取用户，而上下文由你的代码设置。给 agent 一个 `context_schema`，并在每次调用时传入用户：
 
 ```listing
-title: a namespace factory per user
+title: 每个用户一个的命名空间工厂
 source: capture/lab/T23-sec-store-namespace-mac/code/store6_agent.py
 lang: python
-note: Four cuts from the run code. cfg["ns"] is the lambda of the per-user setup.
+note: 从运行代码里截出的四处。cfg["ns"] 是每用户配置里的 lambda。
 ---
 class Ctx:
     user_id: str
@@ -182,19 +182,19 @@ class Ctx:
                                     context=Ctx(user_id=user), stream_mode="updates", subgraphs=True):
 ```
 
-Two validators check a namespace, and they disagree. `StoreBackend` allows letters, digits, and `-_.@+:~`, and it refused `*` {{code libs/deepagents/deepagents/backends/store.py:44-87}}. The store itself refuses a `.` in any label. So a factory that returns an email address, such as `carol@acme.com`, passed the first check and failed the write with `InvalidNamespaceError`, on both stores. The docs suggest `rt.server_info.user.identity` as the label. If your identities are email addresses, map each one to a label without a period first.
+有两个校验器检查命名空间，而且它们不一致。`StoreBackend` 允许字母、数字和 `-_.@+:~`，并拒绝了 `*` {{code libs/deepagents/deepagents/backends/store.py:44-87}}。store 本身则拒绝任何标签里的 `.`。所以返回电子邮件地址（例如 `carol@acme.com`）的工厂，通过了第一道检查，却在写入时以 `InvalidNamespaceError` 失败，两种 store 都是如此。文档建议用 `rt.server_info.user.identity` 作标签。如果你的身份标识是电子邮件地址，先把每个地址映射成不含句点的标签。
 
-We also ran the raw store calls of [Namespace isolation](#s-stores-and-long-term-memory) again, one run each on `InMemoryStore` and `PostgresStore`. With Alice and Bob under `("users", <user>, ...)`, these calls returned the items or namespaces of both users: `search(("users",))`, `search(())`, `list_namespaces()`, and `list_namespaces(prefix=("users", "*"))`. `search(("users", "*", "memories"))` returned nothing, because `*` is a wildcard in `list_namespaces` only.
+我们还对[命名空间隔离](#s-stores-and-long-term-memory)里的原始 store 调用又运行了一遍，在 `InMemoryStore` 和 `PostgresStore` 上各一次。Alice 和 Bob 位于 `("users", <user>, ...)` 之下时，这些调用返回了两个用户的条目或命名空间：`search(("users",))`、`search(())`、`list_namespaces()` 和 `list_namespaces(prefix=("users", "*"))`。`search(("users", "*", "memories"))` 什么也没返回，因为 `*` 只在 `list_namespaces` 里是通配符。
 
-## Two defects of SqliteStore
+## SqliteStore 的两处缺陷 {#s-stores-and-long-term-memory-two-defects-of-sqlitestore}
 
-The same runs found two defects in `SqliteStore` 3.1.3. They change what a store keeps and what it embeds, and they cross no user.
+同样的运行在 `SqliteStore` 3.1.3 里找到两处缺陷。它们改变 store 保存什么、嵌入什么，没有越过任何用户。
 
-- After `delete`, the item row is gone and its row in `store_vectors` stays: 2 rows before the delete and 2 after. The table declares `ON DELETE CASCADE`, and `SqliteStore` never turns on SQLite foreign keys, so the cascade does not run. This is issue #8757, open at the pin {{issue 8757}}. Search no longer returns the item.
-- `SqliteStore` reads the index fields from the key `text_fields`. `InMemoryStore`, `PostgresStore`, and the docstring of `SqliteStore` use `fields` {{code libs/checkpoint-sqlite/langgraph/store/sqlite/base.py}}. With `fields=["text"]`, `SqliteStore` embedded the whole item, and its vector rows have the field `$`.
+- `delete` 之后，条目行没了，它在 `store_vectors` 里的行还在：删除前 2 行，删除后 2 行。这张表声明了 `ON DELETE CASCADE`，而 `SqliteStore` 从不打开 SQLite 的外键，所以级联不会执行。这是 issue #8757，在锁定版本上仍然开着 {{issue 8757}}。搜索不再返回这个条目。
+- `SqliteStore` 从键 `text_fields` 读取索引字段。`InMemoryStore`、`PostgresStore` 和 `SqliteStore` 的文档字符串都用 `fields` {{code libs/checkpoint-sqlite/langgraph/store/sqlite/base.py}}。用 `fields=["text"]` 时，`SqliteStore` 嵌入了整个条目，它的向量行里字段是 `$`。
 
 ```listing
-title: the vector rows left after the delete
+title: 删除之后留下的向量行
 source: capture/lab/T14-stores-mac/05-orphan-vectors.txt
 lang: text
 ---
@@ -202,18 +202,18 @@ users.alice.memories|k1|$|3072
 users.bob.memories|k1|$|3072
 ```
 
-`PostgresStore` with an index needs pgvector, which our Postgres did not have. That run, and the store permissions of Agent Server, come in the next edition, as [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) says.
+带索引的 `PostgresStore` 需要 pgvector，而我们的 Postgres 没有它。那次运行，以及 Agent Server 的 store 权限，会在下一版出现，见[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)。
 
 ```takeaways
-- Use a store for facts that outlive a thread, and a checkpointer for the thread itself.
-- Take the user id from context in your code, and never from a tool argument.
-- Build every prefix down to the user label, and never search with an empty prefix.
-- Reject a user id of * or one with a period before it becomes a label.
-- Treat search results as ordered by the backend, and sort them yourself when order matters.
-- Delete the vector rows yourself after a delete in SqliteStore.
-- Give every StoreBackend a factory that reads the user id from the run context, never a constant.
-- Scope each memory tool you write to the same full prefix as the file backend.
-- Map an email id to a label without a period before it reaches a namespace.
+- 对寿命超过线程的事实使用 store，对线程本身使用 checkpointer。
+- 在你的代码里从 context 取用户 id，绝不从工具参数取。
+- 每个前缀都构造到用户标签为止，绝不用空前缀搜索。
+- 在用户 id 变成标签之前，拒绝 * 或含句点的用户 id。
+- 把搜索结果当作由后端排序，顺序重要时自己排序。
+- 在 SqliteStore 里删除条目之后，自己删除向量行。
+- 给每个 StoreBackend 配一个从运行上下文读取用户 id 的工厂，绝不用常量。
+- 把你写的每个记忆工具，限定在与文件后端相同的完整前缀上。
+- 在电子邮件 id 进入命名空间之前，把它映射成不含句点的标签。
 ```
 
-Sources: capture/s_persist.py, capture/out/33-store.txt, capture/out/44-store-agent.txt; capture/lab/summary/stores-mac.json, capture/lab/T14-stores-mac/01-memory-sqlite.jsonl, capture/lab/T14-stores-mac/02-inmemory-getop-side-effect.txt, capture/lab/T14-stores-mac/03-postgres.jsonl, capture/lab/T14-stores-mac/04-index.jsonl, capture/lab/T14-stores-mac/05-orphan-vectors.txt; libs/checkpoint/langgraph/store/base/__init__.py, libs/checkpoint/langgraph/store/memory/__init__.py, libs/checkpoint-sqlite/langgraph/store/sqlite/base.py, and libs/checkpoint-postgres/langgraph/store/postgres/base.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/stores, oss/python/langchain/long-term-memory); GitHub issue langchain-ai/langgraph#8757 and advisories GHSA-47pj-3jcm-6whg and GHSA-6hmw-9432-67qq; capture/lab/summary/store-namespace-mac.json, capture/lab/T23-sec-store-namespace-mac/store6_free.json, capture/lab/T23-sec-store-namespace-mac/store6-agent-memory.jsonl, capture/lab/T23-sec-store-namespace-mac/store6-agent-postgres.jsonl; libs/deepagents/deepagents/backends/store.py at deepagents 0.7.38; docs.langchain.com at docs commit 04d4d4a (oss/python/deepagents/backends).
+来源：capture/s_persist.py, capture/out/33-store.txt, capture/out/44-store-agent.txt; capture/lab/summary/stores-mac.json, capture/lab/T14-stores-mac/01-memory-sqlite.jsonl, capture/lab/T14-stores-mac/02-inmemory-getop-side-effect.txt, capture/lab/T14-stores-mac/03-postgres.jsonl, capture/lab/T14-stores-mac/04-index.jsonl, capture/lab/T14-stores-mac/05-orphan-vectors.txt; libs/checkpoint/langgraph/store/base/__init__.py, libs/checkpoint/langgraph/store/memory/__init__.py, libs/checkpoint-sqlite/langgraph/store/sqlite/base.py, and libs/checkpoint-postgres/langgraph/store/postgres/base.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/stores, oss/python/langchain/long-term-memory); GitHub issue langchain-ai/langgraph#8757 and advisories GHSA-47pj-3jcm-6whg and GHSA-6hmw-9432-67qq; capture/lab/summary/store-namespace-mac.json, capture/lab/T23-sec-store-namespace-mac/store6_free.json, capture/lab/T23-sec-store-namespace-mac/store6-agent-memory.jsonl, capture/lab/T23-sec-store-namespace-mac/store6-agent-postgres.jsonl; libs/deepagents/deepagents/backends/store.py at deepagents 0.7.38; docs.langchain.com at docs commit 04d4d4a (oss/python/deepagents/backends).
