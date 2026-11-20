@@ -1,19 +1,19 @@
-# Tools, ToolRuntime, and tool errors
+# 工具、ToolRuntime 与工具错误
 
-> A tool is a typed function with a schema, `ToolRuntime` hides the run from the model, and by default only bad arguments become an error message.
+> 工具是带 schema 的类型化函数，`ToolRuntime` 把这次运行对模型隐藏起来，而默认情况下只有错误的参数会变成一条错误消息。
 
-You give an agent a tool that reads a file, the disk fails, and the whole run raises. Another time the model sends a string where the tool wants an integer, and the run goes on with an error message in the conversation. The same agent handled two failures in two different ways.
+你给 agent 一个读文件的工具，磁盘出了故障，整个运行抛出异常。另一次，模型在工具要整数的地方发来一个字符串，运行却带着对话里的一条错误消息继续往下走。同一个 agent，用两种不同的方式处理了两次失败。
 
-When you finish this section, you can write a tool with a schema the model can use, and read the run from inside it. You can also predict what each kind of tool failure does to a run.
+读完本节，你能写出一个模型可以使用的带 schema 的工具，并在工具内部读取这次运行。你还能预测每一种工具失败会对运行造成什么影响。
 
-## The schema the model sees
+## 模型看到的 schema {#s-tools-toolruntime-and-tool-errors-the-schema-the-model-sees}
 
-**Tool:** a function wrapped by `@tool`, with a name, a description, and a JSON schema for its arguments.
+**工具（tool）：** 用 `@tool` 包装的函数，带名称、描述，以及参数的 JSON schema。
 
-The kit defines `add` with two typed arguments and a docstring:
+工具包定义了 `add`，有两个带类型的参数和一段 docstring：
 
 ```listing
-title: the add tool
+title: add 工具
 source: capture/common.py
 lang: python
 ---
@@ -23,10 +23,10 @@ def add(a: int, b: int) -> int:
     return a + b
 ```
 
-`@tool` builds the schema from the type hints and takes the description from the docstring. This is what a model receives:
+`@tool` 根据类型注解构建 schema，并从 docstring 取描述。模型收到的是下面这些：
 
 ```listing
-title: the schema of add
+title: add 的 schema
 source: capture/out/03-tools.txt
 lang: json
 ---
@@ -51,19 +51,19 @@ lang: json
 }
 ```
 
-A tool with no type hints gets no useful schema. The tools page says that type hints are required, because they define the input schema {{docs oss/python/langchain/tools}}. Write the docstring for the model, because it is the only explanation the model gets.
+没有类型注解的工具得不到有用的 schema。工具页说类型注解是必需的，因为它们定义了输入 schema {{docs oss/python/langchain/tools}}。docstring 要写给模型看，因为它是模型得到的唯一说明。
 
-## ToolRuntime
+## ToolRuntime {#s-tools-toolruntime-and-tool-errors-toolruntime}
 
-**ToolRuntime:** a parameter type that gives a tool the state, the context, the store, the stream writer, and the id of the current tool call.
+**ToolRuntime：** 一种参数类型，给工具提供状态、上下文、store、流写入器，以及当前工具调用的 id。
 
-A parameter named `runtime` with the type `ToolRuntime` is filled in by the agent. The model never sees it. The documentation says the same {{docs oss/python/langchain/tools}}. The kit tool `lookup_order` has two parameters, and its schema has one:
+名为 `runtime`、类型为 `ToolRuntime` 的参数由 agent 填入，模型永远看不到它。文档也这么说 {{docs oss/python/langchain/tools}}。工具包里的工具 `lookup_order` 有两个参数，它的 schema 里只有一个：
 
 ```listing
-title: lookup_order and its schema
+title: lookup_order 及其 schema
 source: capture/out/03-tools.txt
 lang: json
-note: The argument list of the tool, then the schema the model sees.
+note: 先是工具的参数列表，然后是模型看到的 schema。
 ---
 lookup_order.args:
 [
@@ -81,15 +81,15 @@ tool_call_schema:
   },
 ```
 
-`runtime` and `config` are reserved names. The tools page warns that a tool argument with either name causes errors at run time {{docs oss/python/langchain/tools}}.
+`runtime` 和 `config` 是保留名。工具页警告说，工具参数用了这两个名字之一，会在运行时出错 {{docs oss/python/langchain/tools}}。
 
-Inside an agent, `lookup_order` reads `runtime.context` and `runtime.tool_call_id`, and it writes one value with `runtime.stream_writer`. The value arrives in the `custom` stream mode, before the `ToolMessage`:
+在 agent 内部，`lookup_order` 读取 `runtime.context` 和 `runtime.tool_call_id`，并用 `runtime.stream_writer` 写出一个值。这个值在 `ToolMessage` 之前，通过 `custom` 流模式到达：
 
 ```listing
-title: ToolRuntime inside create_agent
+title: create_agent 内部的 ToolRuntime
 source: capture/out/43-tool-runtime-agent.txt
 lang: json
-note: The custom chunk and the tool update. The two model updates are cut.
+note: custom 块和工具的更新。两次模型更新已截去。
 ---
 custom:
 {
@@ -103,15 +103,15 @@ updates tools:
     "content": "order A-17: shipped (asked by ada, tool_call_id=<uuid-2>)",
 ```
 
-Call `runtime.stream_writer(value)` as a function. The example in the `ToolRuntime` docstring calls `stream_writer.write(...)` {{code libs/prebuilt/langgraph/prebuilt/tool_node.py:1746}}. That method does not exist, because `StreamWriter` is a plain callable {{code libs/langgraph/langgraph/types.py}}. This manual records the disagreement as conflict D3.
+把 `runtime.stream_writer(value)` 当作函数调用。`ToolRuntime` 的 docstring 里的示例调用的是 `stream_writer.write(...)` {{code libs/prebuilt/langgraph/prebuilt/tool_node.py:1746}}。这个方法并不存在，因为 `StreamWriter` 只是一个普通的可调用对象 {{code libs/langgraph/langgraph/types.py}}。本手册把这处分歧记为冲突 D3。
 
-A `ToolRuntime` tool cannot run outside an agent. Called with only its arguments, it raises a `ValidationError` because `runtime` is missing:
+带 `ToolRuntime` 的工具不能在 agent 之外运行。只传参数去调用它，会因为缺少 `runtime` 而抛出 `ValidationError`：
 
 ```listing
-title: a ToolRuntime tool invoked by hand
+title: 手动调用的 ToolRuntime 工具
 source: capture/out/03-tools.txt
 lang: text
-note: The help line of pydantic is cut.
+note: pydantic 的帮助行已截去。
 ---
 lookup_order.invoke({'order_id': 'A-17'}):
 
@@ -120,31 +120,31 @@ runtime
   Field required [type=missing, input_value={'order_id': 'A-17'}, input_type=dict]
 ```
 
-Test such a tool inside an agent, as the kit does with Qwen3 4B.
+这样的工具要放在 agent 里测试，工具包就是用 Qwen3 4B 这样做的。
 
-## Tool errors
+## 工具错误 {#s-tools-toolruntime-and-tool-errors-tool-errors}
 
-**Tool error:** a failure while the agent runs a tool call. Its kind decides if the run raises or goes on.
+**工具错误（tool error）：** agent 执行工具调用时发生的失败。它的种类决定运行是抛出异常还是继续。
 
-The agent runs tools with a `ToolNode`. `create_agent` uses the default error handler of `ToolNode`, which turns an invalid call into a message and raises every other exception {{code libs/prebuilt/langgraph/prebuilt/tool_node.py}}. [Figure](#fig-3-4) draws the four cases of the kit.
+agent 用 `ToolNode` 运行工具。`create_agent` 使用 `ToolNode` 的默认错误处理器，它把无效的调用变成一条消息，其他所有异常都会抛出 {{code libs/prebuilt/langgraph/prebuilt/tool_node.py}}。[图](#fig-3-4)画出了工具包里的四种情况。
 
 ```figure
 id: fig-3-4
 kind: decision
-title: what each kind of tool failure does to a run
-claim: Bad arguments and an unknown tool name become an error ToolMessage, and an exception inside the tool ends the run unless middleware converts it.
-caption: Read each row from the failure on the left to the result on the right. Green rows go on to the next model call, and the rose row raises out of invoke. From capture/out/04-tool-errors.txt and capture/out/19-mw-shell-files.txt.
+title: 每一种工具失败对运行造成什么影响
+claim: 错误的参数和未知的工具名会变成一条错误的 ToolMessage，工具内部的异常会结束运行，除非中间件把它转换掉。
+caption: 每一行从左边的失败读到右边的结果。绿色行继续进入下一次模型调用，玫红色行从 invoke 里抛出。来自 capture/out/04-tool-errors.txt 和 capture/out/19-mw-shell-files.txt。
 ```
 
-Bad arguments become a `ToolMessage` with `status` `error`, and the model gets a second chance. The kit could not make Qwen3 4B send a bad argument to `add`. Asked for `2.5 + 3`, it sent 2 and 3, and then told the user that the tool takes integers. Asked to set a volume of 0 to 10 to 11, it called no tool and said that 10 is the maximum.
+错误的参数会变成 `status` 为 `error` 的 `ToolMessage`，模型得到第二次机会。工具包没能让 Qwen3 4B 给 `add` 发送错误的参数。让它算 `2.5 + 3`，它发送了 2 和 3，然后告诉用户这个工具只接受整数。让它把 0 到 10 的音量设为 11，它没有调用任何工具，只说 10 是最大值。
 
-The bad arguments came from the shell tool of [section 4.6](#s-the-built-in-middleware). The model sent the command as an object in place of a string, six times in a row:
+错误的参数来自[第 4.6 节](#s-the-built-in-middleware)的 shell 工具。模型把命令作为对象而不是字符串发送，连续六次：
 
 ```listing
-title: the model sends bad arguments
+title: 模型发送了错误的参数
 source: capture/out/19-mw-shell-files.txt
 lang: json
-note: The first ToolMessage of the run that asked for ls.
+note: 请求 ls 的那次运行的第一条 ToolMessage。
 ---
     "content": "Error invoking tool 'shell' with kwargs {'command': {'command': 'ls'}} with error:\n command: Input should be a valid string\n Please fix the error and try again.",
     "name": "shell",
@@ -152,19 +152,19 @@ note: The first ToolMessage of the run that asked for ls.
     "status": "error"
 ```
 
-A second chance does not help when the model repeats the same mistake, so set a recursion limit or a tool call limit.
+模型重复同一个错误时，第二次机会没有帮助，所以要设置递归上限或工具调用上限。
 
-A real model rarely names a tool that it was not given. Told about a `subtract` tool that did not exist, Qwen3 4B called `add` with 5 and -3. An unknown name comes when the tools change under a thread. The kit paused an agent that had `subtract`, then resumed the thread with an agent that had only `add`. The saved call became an error message: `Error: subtract is not a valid tool, try one of [add].`.
+真实的模型很少说出一个没有给它的工具名。告诉 Qwen3 4B 有一个并不存在的 `subtract` 工具，它调用的是 `add`，参数为 5 和 -3。未知的名称出现在工具随线程变化的时候。工具包让一个拥有 `subtract` 的 agent 暂停，然后用一个只有 `add` 的 agent 恢复这个线程。已保存的调用变成了一条错误消息：`Error: subtract is not a valid tool, try one of [add].`。
 
-An exception inside the tool is different. With no middleware, `invoke` raised `RuntimeError: disk on fire`, and the run ended.
+工具内部的异常则不同。没有中间件时，`invoke` 抛出了 `RuntimeError: disk on fire`，运行就此结束。
 
-`ToolErrorMiddleware` turns that exception into a message. Its `on_error` function returns the text, and the run goes on:
+`ToolErrorMiddleware` 把这个异常变成一条消息。它的 `on_error` 函数返回文本，运行继续：
 
 ```listing
-title: ToolErrorMiddleware turns the exception into a message
+title: ToolErrorMiddleware 把异常变成一条消息
 source: capture/out/04-tool-errors.txt
 lang: json
-note: The ToolMessage only.
+note: 只保留 ToolMessage。
 ---
     "type": "ToolMessage",
     "content": "RuntimeError in flaky_disk: disk on fire",
@@ -174,40 +174,40 @@ note: The ToolMessage only.
     "status": "error"
 ```
 
-`ToolErrorMiddleware()` with no `on_error` raises `ValueError` when you build it. A retry is a different choice: `ToolRetryMiddleware` runs the tool again, and Part 4 counts its attempts.
+不带 `on_error` 的 `ToolErrorMiddleware()` 在构建时就会抛出 `ValueError`。重试是另一种选择：`ToolRetryMiddleware` 会再次运行工具，第 4 部分会数它的尝试次数。
 
-## Tool names and tool call ids
+## 工具名与工具调用 id {#s-tools-toolruntime-and-tool-errors-tool-names-and-tool-call-ids}
 
-**Tool call id:** the id that the model gives each tool call, which the `ToolMessage` of that call carries back.
+**工具调用 id（tool call id）：** 模型给每个工具调用的 id，该调用的 `ToolMessage` 会把它带回来。
 
-**We measured** three cases with Qwen3 4B. The duplicate-name case ran 3 times on the x86 server guest and gave the same result in 3 of 3 runs. The call-count case ran once for each count. The id-less case is a stub on the Mac, with one row for each case.
+**我们测得**三种情形，用的是 Qwen3 4B。重名情形在 x86 服务器客户机上跑了 3 次，3 次结果相同。调用次数情形每种次数各跑一次。无 id 情形是 Mac 上的桩（stub），每种情形一行。
 
-Two tools with the same name raised no error in `create_agent`. We passed `safe_lookup` and `privileged_delete`, both named `account_action`. The later tool in the list won: the model got only its schema, and each call ran only that tool. With `privileged_delete` second, the call of `account_action` ran `privileged_delete`.
+两个同名的工具，在 `create_agent` 里不会报错。我们传入 `safe_lookup` 和 `privileged_delete`，两者都叫 `account_action`。列表中靠后的工具胜出：模型只拿到它的 schema，每次调用也只运行这一个工具。当 `privileged_delete` 排第二时，`account_action` 的调用运行的就是 `privileged_delete`。
 
-With a real model, the choice of the model followed the description of the later tool. It refused a lookup when it saw `Delete an account.`. It ran `privileged_delete` for a delete request. Issue langgraph#7988 reports this {{issue langgraph#7988}}. Give every tool a unique name.
+用真实模型时，模型的选择跟随靠后那个工具的描述。看到 `Delete an account.` 时，它拒绝了查询请求。对删除请求，它运行了 `privileged_delete`。langgraph#7988 报告了这个问题 {{issue langgraph#7988}}。给每个工具起一个唯一的名字。
 
-A server that sends tool calls with no id breaks the run in two ways. We sent two parallel calls with no id from a stub to `ChatOpenAI` and `create_agent`. Under `invoke` and `stream_mode="messages"`, both tools ran, and then the run raised `TypeError: Tool lookup returned unexpected type: <class 'str'>`. So the side effects happened, and the run failed. Under `stream_events` v3, each id became `""`, both tools ran, and both `ToolMessage` objects had the id `""`. Issue langchain#40531 reports this coercion {{issue langchain#40531}}.
+服务器发来不带 id 的工具调用，会以两种方式破坏运行。我们从一个桩向 `ChatOpenAI` 和 `create_agent` 发送了两个没有 id 的并行调用。在 `invoke` 和 `stream_mode="messages"` 下，两个工具都运行了，随后运行抛出 `TypeError: Tool lookup returned unexpected type: <class 'str'>`。也就是说，副作用发生了，运行却失败了。在 `stream_events` v3 下，每个 id 都变成了 `""`，两个工具都运行了，两条 `ToolMessage` 的 id 都是 `""`。langchain#40531 报告了这种强制转换 {{issue langchain#40531}}。
 
-No real model produced id-less calls: Ollama 0.31.1 sends ids on both paths, so these rows come from a stub on the Mac.
+没有任何真实模型产生过无 id 的调用：Ollama 0.31.1 在两条路径上都发送 id，所以这些行来自 Mac 上的桩。
 
-Qwen3 4B made 2, 2, 4, 8, and 16 calls when asked for 1, 2, 4, 8, and 16. Each count ran once on the x86 server guest. Every call had an id, on both paths. The paths were `ChatOllama` and `ChatOpenAI` on the `/v1` path of Ollama.
+让 Qwen3 4B 做 1、2、4、8、16 个调用的请求，它分别发出了 2、2、4、8、16 个调用。每种次数在 x86 服务器客户机上各跑一次。两条路径上，每个调用都有 id。这两条路径是 `ChatOllama`，以及 Ollama 的 `/v1` 路径上的 `ChatOpenAI`。
 
-Under v3, a tool call piece on the last chunk of a stream is lost. A chunk with `chunk_position="last"` reports parsed tool calls from `content_blocks`, and only the calls with an id, in place of chunk blocks {{code libs/core/langchain_core/messages/ai.py}}. A fragment of arguments does not parse alone, so `chunks_to_events` gets no delta for it {{code libs/core/langchain_core/language_models/_compat_bridge.py}}. In a fake model (no real model produces this), the second call became an invalid tool call and got an error `ToolMessage`. With no ids, one of the two calls never ran.
+在 v3 下，流的最后一个块上的工具调用片段会丢失。带 `chunk_position="last"` 的块，从 `content_blocks` 里上报解析好的工具调用，而且只上报带 id 的调用，不上报块内容块 {{code libs/core/langchain_core/messages/ai.py}}。参数片段单独无法解析，所以 `chunks_to_events` 拿不到它的增量 {{code libs/core/langchain_core/language_models/_compat_bridge.py}}。在假模型里（真实模型不会产生这种情况），第二个调用变成了无效的工具调用，并得到一条错误的 `ToolMessage`。没有 id 时，两个调用中有一个从未运行。
 
-`ChatOpenAI` ends its stream with an empty chunk, so it is safe. Make a custom model do the same.
+`ChatOpenAI` 用一个空块结束它的流，所以是安全的。请让自定义模型也这样做。
 
-## One ToolMessage for each tool call
+## 每个工具调用一条 ToolMessage {#s-tools-toolruntime-and-tool-errors-one-toolmessage-for-each-tool-call}
 
-The tools page says that each tool call in the history needs a `ToolMessage` that answers it {{docs oss/python/langchain/tools}}. The agent keeps this rule for you in every case above, including the errors. Code that edits the messages, such as a trim or a summary, must keep it too.
+工具页说，历史里的每个工具调用都需要一条回答它的 `ToolMessage` {{docs oss/python/langchain/tools}}。在上面所有情形里，包括出错的情形，agent 都替你遵守了这条规则。编辑消息的代码，例如裁剪或摘要，也必须遵守。
 
 ```takeaways
-- Give every tool argument a type hint and write the docstring for the model.
-- Use a runtime parameter of type ToolRuntime for context, state, and the stream writer.
-- Call runtime.stream_writer(value) as a function.
-- Add ToolErrorMiddleware when an exception inside a tool must not end the run.
-- Keep one ToolMessage for each tool call when you edit messages.
-- Give every tool a unique name, because the last duplicate wins without an error.
-- End a custom model stream with an empty chunk marked last.
+- 给每个工具参数加类型注解，并把 docstring 写给模型看。
+- 用类型为 ToolRuntime 的 runtime 参数获取上下文、状态和流写入器。
+- 把 runtime.stream_writer(value) 当作函数调用。
+- 工具内部的异常不该结束运行时，加入 ToolErrorMiddleware。
+- 编辑消息时，让每个工具调用保持一条 ToolMessage。
+- 给每个工具起唯一的名字，因为重名时最后一个静默胜出，不报错。
+- 自定义模型的流，要以标记为 last 的空块结尾。
 ```
 
-Sources: capture/common.py, capture/s_start.py, capture/out/03-tools.txt, capture/out/43-tool-runtime-agent.txt, capture/out/04-tool-errors.txt, capture/out/19-mw-shell-files.txt; capture/lab/summary/parallel-tools-x86.json, capture/lab/T08-parallel-tools-x86/01-counts.jsonl, capture/lab/T08-parallel-tools-x86/02-raw-ollama.jsonl, capture/lab/T08-parallel-tools-x86/03-dupnames.jsonl, capture/lab/T08-parallel-tools-x86/t08_real.py; capture/lab/summary/parallel-tools-mac.json, capture/lab/T08-parallel-tools-mac/02-idless-and-dupnames.jsonl, capture/lab/T08-parallel-tools-mac/t08_ids.py; issue langgraph#7988, issue langchain#40531; libs/core/langchain_core/messages/ai.py and libs/core/langchain_core/language_models/_compat_bridge.py at langchain-core 1.8.0; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/tools); libs/prebuilt/langgraph/prebuilt/tool_node.py and libs/langgraph/langgraph/types.py at langgraph 1.2.22; libs/core/langchain_core/tools at langchain==1.5.0.
+来源：capture/common.py, capture/s_start.py, capture/out/03-tools.txt, capture/out/43-tool-runtime-agent.txt, capture/out/04-tool-errors.txt, capture/out/19-mw-shell-files.txt; capture/lab/summary/parallel-tools-x86.json, capture/lab/T08-parallel-tools-x86/01-counts.jsonl, capture/lab/T08-parallel-tools-x86/02-raw-ollama.jsonl, capture/lab/T08-parallel-tools-x86/03-dupnames.jsonl, capture/lab/T08-parallel-tools-x86/t08_real.py; capture/lab/summary/parallel-tools-mac.json, capture/lab/T08-parallel-tools-mac/02-idless-and-dupnames.jsonl, capture/lab/T08-parallel-tools-mac/t08_ids.py; issue langgraph#7988, issue langchain#40531; libs/core/langchain_core/messages/ai.py and libs/core/langchain_core/language_models/_compat_bridge.py at langchain-core 1.8.0; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/tools); libs/prebuilt/langgraph/prebuilt/tool_node.py and libs/langgraph/langgraph/types.py at langgraph 1.2.22; libs/core/langchain_core/tools at langchain==1.5.0.

@@ -1,25 +1,25 @@
-# Structured output: which strategy, on which provider
+# 结构化输出：哪个提供方用哪种策略
 
-> On Qwen3 4B, ToolStrategy gave no object in 39 of 39 tasks and ProviderStrategy raised in 10 of 10, while an extraction call matched the best score on each model.
+> 在 Qwen3 4B 上，ToolStrategy 在 39 个任务中有 39 个没有给出对象，ProviderStrategy 在 10 次中有 10 次抛出异常，而一次提取调用在每个模型上都达到了最高得分。
 
-Your agent looks up a price, converts it, and must hand your code a number. You pass a Pydantic class as `response_format`, as the documentation shows. On Claude the number arrives. On a local model through Ollama, the same agent finishes every lookup and returns `structured_response=None`, or raises before it calls a tool.
+你的 agent 查一个价格，换算后，必须把一个数字交给你的代码。你按文档所示，把一个 Pydantic 类作为 `response_format` 传入。在 Claude 上，数字到手。在通过 Ollama 的本地模型上，同一个 agent 完成了每一次查询，却返回 `structured_response=None`，或者在调用任何工具之前就抛出异常。
 
-When you finish this section, you can pick a structured output method for each provider from measured rates. You can also explain both Ollama failures from the code, and add the one extra call that works on both providers.
+读完本节，你能根据实测比率为每个提供方挑选结构化输出的方法。你还能从代码上解释 Ollama 的两种失败，并加上那一次在两个提供方上都管用的额外调用。
 
-## The position
+## 结论 {#s-structured-output-which-strategy-on-which-provider-the-position}
 
-- **On Ollama, keep `response_format` out of an agent that has tools.** Run the agent to its final reply, then make one `with_structured_output` call on that reply.
-- **On Claude, use `ProviderStrategy` or `ToolStrategy`.** They returned the right value in 39 of 39 and 38 of 39 tasks.
-- **Never parse the free text with a pattern.** Claude Haiku 5.5 had the right value in its reply in 37 of 39 tasks. The last number of the reply was right in 15.
+- **在 Ollama 上，不要给带工具的 agent 设置 `response_format`。** 让 agent 运行到最终回复，然后对这条回复再做一次 `with_structured_output` 调用。
+- **在 Claude 上，使用 `ProviderStrategy` 或 `ToolStrategy`。** 它们在 39 个任务中分别有 39 个和 38 个返回了正确的值。
+- **永远不要用模式去解析自由文本。** Claude Haiku 5.5 在 39 个任务中有 37 个，回复里有正确的值。回复的最后一个数字只有 15 个是对的。
 
-[Section 4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) explains how each strategy works and how `AutoStrategy` picks one. This section measures them on real tasks with real lookups.
+[第 4.2 节](#s-structured-output-autostrategy-providerstrategy-toolstrategy)解释每种策略的工作方式，以及 `AutoStrategy` 如何选择。本节在真实任务和真实查询上测量它们。
 
-## The experiment
+## 实验 {#s-structured-output-which-strategy-on-which-provider-the-experiment}
 
-The bench ran the 20 chain tasks and the 19 SQL tasks of [the task suite](#s-do-you-need-langchain) through `create_agent`. Each task needs two to six lookups before the answer. The schema had one field:
+测试台把[任务集](#s-do-you-need-langchain)里的 20 个链任务和 19 个 SQL 任务通过 `create_agent` 跑了一遍。每个任务在作答之前需要两到六次查询。schema 只有一个字段：
 
 ```listing
-title: the schema of every structured output run
+title: 每次结构化输出运行的 schema
 source: capture/lab/bench/kit/structured.py
 lang: python
 ---
@@ -27,123 +27,123 @@ class FinalAnswer(BaseModel):
     answer: str = Field(description="Only the final answer value: a number or a name, with no units and no explanation.")
 ```
 
-The agent had the lookup tools of the family and no `submit_answer`. The system prompt asked it to finish with the final answer value. Four methods ran on the same tasks:
+agent 有该族的查询工具，没有 `submit_answer`。系统提示词要求它以最终答案的值结束。四种方法在同样的任务上运行：
 
-- **Free text:** no `response_format`. The kit took the last number of the final reply, or the whole reply for a name.
-- **`ToolStrategy`:** `response_format=ToolStrategy(FinalAnswer)`.
-- **`ProviderStrategy`:** `response_format=ProviderStrategy(FinalAnswer)`.
-- **Extraction call:** no `response_format`. After the run, one more call of the same model, through `with_structured_output(FinalAnswer)`, read the question and the final reply.
+- **自由文本：** 没有 `response_format`。工具包取最终回复的最后一个数字，名称则取整条回复。
+- **`ToolStrategy`：** `response_format=ToolStrategy(FinalAnswer)`。
+- **`ProviderStrategy`：** `response_format=ProviderStrategy(FinalAnswer)`。
+- **提取调用：** 没有 `response_format`。运行之后，用同一个模型再调用一次，通过 `with_structured_output(FinalAnswer)`，读取问题和最终回复。
 
-A run counts as correct when the lookups ran with the right arguments and the structured value matched the truth.
+查询以正确的参数运行、结构化的值又与真值相符时，这次运行算作正确。
 
-**We measured** every row on the Mac: Qwen3 4B and Qwen3 8B on Ollama at temperature 0, and Claude Haiku 5.5 through the API. Each cell is one run per task, 39 tasks, except `ProviderStrategy` on Qwen3 4B, which ran 10. Qwen3 8B did not run `ProviderStrategy`. [Figure](#fig-4-3) shows every task.
+**我们测得**每一行，在 Mac 上进行：Ollama 上温度为 0 的 Qwen3 4B 和 Qwen3 8B，以及通过 API 调用的 Claude Haiku 5.5。每个格子是每个任务一次运行，共 39 个任务，只有 Qwen3 4B 上的 `ProviderStrategy` 例外，它跑了 10 个。Qwen3 8B 没有运行 `ProviderStrategy`。[图](#fig-4-3)显示每一个任务。
 
 ```figure
 id: fig-4-3
 kind: chart
-title: structured output, the answer of every task by method and model
-claim: On Qwen3 4B both strategies returned no object, the extraction call kept every value the reply held, and on Claude all but free text worked.
-caption: Each column is one task and each row is one model and method. Blue is a correct value, light rose a wrong value, an empty square no structured answer, and solid rose a raised error. From capture/lab/bench/summary-mac.json.
+title: 结构化输出，按方法和模型列出每个任务的答案
+claim: 在 Qwen3 4B 上两种策略都没有返回对象，提取调用保住了回复里有的每个值，在 Claude 上除自由文本外都管用。
+caption: 每一列是一个任务，每一行是一个模型和方法。蓝色是正确的值，浅玫红是错误的值，空方块是没有结构化答案，实心玫红是抛出了错误。来自 capture/lab/bench/summary-mac.json。
 ```
 
-| Model | Free text | `ToolStrategy` | `ProviderStrategy` | Extraction call |
+| 模型 | 自由文本 | `ToolStrategy` | `ProviderStrategy` | 提取调用 |
 |---|---|---|---|---|
-| Qwen3 4B | 25 of 39, 0.48 to 0.77 | 0 of 39, 0.00 to 0.09 | 0 of 10, 0.00 to 0.28 | 30 of 39, 0.62 to 0.87 |
-| Qwen3 8B | 18 of 39, 0.32 to 0.61 | 14 of 39, 0.23 to 0.52 | not run | 26 of 39, 0.51 to 0.79 |
-| Claude Haiku 5.5 | 15 of 39, 0.25 to 0.54 | 38 of 39, 0.87 to 1.00 | 39 of 39, 0.91 to 1.00 | 39 of 39, 0.91 to 1.00 |
+| Qwen3 4B | 39 个中 25 个，0.48 至 0.77 | 39 个中 0 个，0.00 至 0.09 | 10 个中 0 个，0.00 至 0.28 | 39 个中 30 个，0.62 至 0.87 |
+| Qwen3 8B | 39 个中 18 个，0.32 至 0.61 | 39 个中 14 个，0.23 至 0.52 | 未运行 | 39 个中 26 个，0.51 至 0.79 |
+| Claude Haiku 5.5 | 39 个中 15 个，0.25 至 0.54 | 39 个中 38 个，0.87 至 1.00 | 39 个中 39 个，0.91 至 1.00 | 39 个中 39 个，0.91 至 1.00 |
 
-The intervals are 95% Wilson intervals.
+区间是 95% 的 Wilson 区间。
 
-## Why ToolStrategy returns nothing on Ollama
+## ToolStrategy 为什么在 Ollama 上什么也不返回 {#s-structured-output-which-strategy-on-which-provider-why-toolstrategy-returns-nothing-on-ollama}
 
-`ToolStrategy` binds a tool named after the schema and asks for `tool_choice="any"`, so the model must call some tool. `ChatOllama.bind_tools` takes that argument and drops it, because Ollama has no such option {{code libs/partners/ollama/langchain_ollama/chat_models.py:1410-1431}}. Nothing forces the call of `FinalAnswer`.
+`ToolStrategy` 绑定一个以 schema 命名的工具，并请求 `tool_choice="any"`，所以模型必须调用某个工具。`ChatOllama.bind_tools` 接受这个参数，却把它丢掉，因为 Ollama 没有这样的选项 {{code libs/partners/ollama/langchain_ollama/chat_models.py:1410-1431}}。没有任何东西强制调用 `FinalAnswer`。
 
-So the model does what it does without a schema. It calls the lookups, then answers in text. A text reply with no tool call ends the agent loop, and `structured_response` stays `None`. No error tells you.
+于是模型按它没有 schema 时的做法行事。它调用查询工具，然后用文本作答。没有工具调用的文本回复会结束 agent 循环，`structured_response` 仍然是 `None`。没有任何错误提示你。
 
-Qwen3 4B made every required lookup in 39 of 39 tasks and called `FinalAnswer` in none. Qwen3 8B called it in 14 of 39, and all 14 values were right. On Ollama, `AutoStrategy` resolves to `ToolStrategy`, as [section 4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) shows. So the plain `response_format=FinalAnswer` gives the same result. On `claude-haiku-5-5` at the pin, `AutoStrategy` also resolves to `ToolStrategy`, as section 4.2 explains.
+Qwen3 4B 在 39 个任务中的 39 个里，做了每一次必需的查询，却一次也没有调用 `FinalAnswer`。Qwen3 8B 在 39 个中有 14 个调用了它，这 14 个值全是对的。在 Ollama 上，`AutoStrategy` 解析为 `ToolStrategy`，如[第 4.2 节](#s-structured-output-autostrategy-providerstrategy-toolstrategy)所示。所以直接写 `response_format=FinalAnswer` 得到同样的结果。在锁定版本上的 `claude-haiku-5-5` 上，`AutoStrategy` 同样解析为 `ToolStrategy`，4.2 节已作解释。
 
-## Why ProviderStrategy raises on Ollama
+## ProviderStrategy 为什么在 Ollama 上抛出异常 {#s-structured-output-which-strategy-on-which-provider-why-providerstrategy-raises-on-ollama}
 
-`ProviderStrategy` sends the schema as the `format` of the Ollama request, next to the tools. The agent parses the reply as JSON only when the reply has no tool call {{code libs/langchain_v1/langchain/agents/factory.py:1260-1275}}. In all 10 runs on Qwen3 4B, the first reply had neither a tool call nor text:
+`ProviderStrategy` 把 schema 作为 Ollama 请求的 `format`，与工具一起发送。只有回复里没有工具调用时，agent 才把回复当作 JSON 解析 {{code libs/langchain_v1/langchain/agents/factory.py:1260-1275}}。在 Qwen3 4B 的全部 10 次运行里，第一条回复既没有工具调用，也没有文本：
 
 ```listing
-title: the first and only model call of a ProviderStrategy run on Qwen3 4B
+title: Qwen3 4B 上一次 ProviderStrategy 运行的第一次也是唯一一次模型调用
 source: capture/lab/bench/runs/structured.jsonl
 lang: json
-note: One row, cut to the method, the call counts, the tokens, the time, and the error.
+note: 一行记录，只保留方法、调用次数、token、时间和错误。
 ---
 {"run_id": "bd6e197e", "ts": "2026-11-14T20:21:06", "task_id": "chain01", "family": "chain", "model": "qwen3:4b-instruct-2507-q4_K_M", "variant": "provider", "answer_present": false, …"lookups_ok": false, "model_calls": 1, "tool_calls": 0, "in_tokens": 682, "out_tokens": 1024, "wall_s": 38.814, …"final_text": "", "error": "StructuredOutputValidationError: Failed to parse structured output for tool 'FinalAnswer': Native structured output expected valid JSON for FinalAnswer, but parsing failed: Expecting value: line 1 column 1 (char 0).."}
 ```
 
-Each of the 10 replies used all 1,024 output tokens that the kit allowed, in 18 to 43 s, and left empty content. The agent parsed the empty text and raised on the first call, before any lookup ran. With the schema as `format`, the model never wrote a tool call in our runs, so the task could not start.
+这 10 条回复，每一条都用光了工具包允许的 1,024 个输出 token，耗时 18 到 43 秒，却留下空内容。agent 解析空文本，在第一次调用就抛出异常，此时还没有任何查询运行。schema 作为 `format` 时，模型在我们的运行里从未写出工具调用，所以任务根本无法开始。
 
-Section 4.2 met the same error with one `add` tool. Here it happened on every task that needs a lookup.
+4.2 节用一个 `add` 工具遇到过同样的错误。这里每个需要查询的任务都出现了它。
 
-## The extraction call
+## 提取调用 {#s-structured-output-which-strategy-on-which-provider-the-extraction-call}
 
-**Extraction call:** one call of `with_structured_output` after the agent run, which reads the question and the final reply and returns the schema.
+**提取调用（extraction call）：** agent 运行之后的一次 `with_structured_output` 调用，它读取问题和最终回复，返回符合 schema 的对象。
 
 ```listing
-title: the extraction call of the bench
+title: 测试台的提取调用
 source: capture/lab/bench/kit/structured.py
 lang: python
-note: The call and its two messages. The error handling around it is cut.
+note: 这次调用和它的两条消息。周围的错误处理已截去。
 ---
                             ex = model.with_structured_output(FinalAnswer).invoke(
                                 [{"role": "system", "content": "Extract the final answer value from the assistant reply. Return only the value."},
                                  {"role": "user", "content": f"Question: {t['turns'][0]}\n\nAssistant reply: {ft}"}], config={"callbacks": [meter]})
 ```
 
-The agent loop runs with no schema, so the model calls its tools as it would anyway. The second call has no tools, so `ChatOllama` can use the `format` of the request without a conflict.
+agent 循环不带 schema 运行，所以模型照它本来的方式调用工具。第二次调用没有工具，所以 `ChatOllama` 可以使用请求的 `format`，不会产生冲突。
 
-On Qwen3 4B the extraction call was right in 30 of 39 tasks. The right value appeared somewhere in the final reply in exactly those 30. On Qwen3 8B the two counts were 26 and 26. So the extraction lost no answer that the agent had found, on either model. The other failures were wrong lookups or wrong arithmetic in the agent loop, and no output method can repair those.
+在 Qwen3 4B 上，提取调用在 39 个任务中对了 30 个。恰好在这 30 个里，最终回复的某处出现了正确的值。在 Qwen3 8B 上，两个计数是 26 和 26。所以在两个模型上，提取都没有丢掉 agent 已经找到的任何答案。其余的失败，是 agent 循环里的查询错误或算术错误，没有任何输出方法能修复它们。
 
-On Claude Haiku 5.5 the extraction call was right in 39 of 39, the same as `ProviderStrategy`.
+在 Claude Haiku 5.5 上，提取调用 39 个全对，和 `ProviderStrategy` 一样。
 
-## Free text fails on Claude too
+## 自由文本在 Claude 上同样失败 {#s-structured-output-which-strategy-on-which-provider-free-text-fails-on-claude-too}
 
-Claude Haiku 5.5 wrote the right value in its final reply in 37 of 39 tasks. The last number of the reply was right in 15. It states the answer first, then explains:
+Claude Haiku 5.5 在 39 个任务中有 37 个，最终回复里写出了正确的值。回复的最后一个数字只有 15 个是对的。它先说出答案，再做解释：
 
 ```listing
-title: a correct reply whose last number is not the answer
+title: 一条正确的回复，但它的最后一个数字不是答案
 source: capture/lab/bench/runs/structured.jsonl
 lang: json
-note: One row of the free text method, cut to the value the kit read, the truth, and the reply.
+note: 自由文本方法的一行记录，只保留工具包读到的值、真值和回复。
 ---
 {"run_id": "d2c25350", "ts": "2026-11-15T11:40:49", …"value": "1.086957", "truth": 138.587, "correct": false, "correct_any_number_in_text": true, …"final_text": "The total for 3 trail lanterns is **$138.59 USD**. The unit price is \u20ac42.50, converted at 1 EUR = 1.086957 USD.", "error": null}
 ```
 
-The last number is the exchange rate. On Qwen3 4B the same pattern was right in 25 of 39, while 30 replies held the value. A pattern loses answers on every model we ran.
+最后一个数字是汇率。在 Qwen3 4B 上，同样的模式在 39 个中对了 25 个，而有 30 条回复里含有正确的值。在我们运行过的每个模型上，模式都会丢掉答案。
 
-## Cost and time
+## 成本与时间 {#s-structured-output-which-strategy-on-which-provider-cost-and-time}
 
-**We measured** the cost of the four methods on Claude Haiku 5.5 over the 39 tasks, at list price. The structured output runner of the kit added no prompt cache, so these numbers have no cache discount.
+**我们测得**四种方法的成本，在 Claude Haiku 5.5 上对 39 个任务按标价计算。工具包的结构化输出运行器没有加提示缓存，所以这些数字没有缓存折扣。
 
-| Method on Claude Haiku 5.5 | Correct | Model calls, median | Cost of 39 tasks | Time per task, median |
+| Claude Haiku 5.5 上的方法 | 正确数 | 模型调用，中位数 | 39 个任务的成本 | 每个任务的时间，中位数 |
 |---|---|---|---|---|
-| Free text | 15 | 4 | $0.0267 | 4.5 s |
-| `ToolStrategy` | 38 | 4 | $0.0287 | 4.4 s |
-| `ProviderStrategy` | 39 | 4 | $0.0284 | 5.0 s |
-| Extraction call | 39 | 5 | $0.0307 | 4.3 s |
+| 自由文本 | 15 | 4 | $0.0267 | 4.5 秒 |
+| `ToolStrategy` | 38 | 4 | $0.0287 | 4.4 秒 |
+| `ProviderStrategy` | 39 | 4 | $0.0284 | 5.0 秒 |
+| 提取调用 | 39 | 5 | $0.0307 | 4.3 秒 |
 
-The extraction call cost 8% more than `ProviderStrategy`, for one more model call with a short prompt. On Qwen3 4B it took 9.3 s per task at the median, against 9.8 s for free text, because the short extraction call is fast.
+提取调用比 `ProviderStrategy` 贵 8%，换来多一次带短提示词的模型调用。在 Qwen3 4B 上，它每个任务的中位耗时是 9.3 秒，自由文本是 9.8 秒，因为简短的提取调用很快。
 
-## Which method, on which provider
+## 哪个提供方用哪种方法 {#s-structured-output-which-strategy-on-which-provider-which-method-on-which-provider}
 
-| Provider | The agent has tools | Use | The number behind it |
+| 提供方 | agent 有工具 | 使用 | 背后的数字 |
 |---|---|---|---|
-| Ollama through `ChatOllama` | yes | the extraction call | 30 of 39 against 0 of 39 and 0 of 10 on Qwen3 4B |
-| Ollama through `ChatOllama` | no | `ToolStrategy` or `ProviderStrategy`, with a limit on calls | [section 4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) gives the failure rates per schema |
-| Anthropic through `ChatAnthropic` | yes | `ProviderStrategy` or `ToolStrategy` | 39 and 38 of 39 on Claude Haiku 5.5 |
-| Any provider | any | never a pattern on the free text | 15 of 39 on Claude Haiku 5.5 |
+| 通过 `ChatOllama` 的 Ollama | 是 | 提取调用 | Qwen3 4B 上 39 个中 30 个，对比 39 个中 0 个和 10 个中 0 个 |
+| 通过 `ChatOllama` 的 Ollama | 否 | `ToolStrategy` 或 `ProviderStrategy`，并限制调用次数 | [第 4.2 节](#s-structured-output-autostrategy-providerstrategy-toolstrategy)给出每个 schema 的失败率 |
+| 通过 `ChatAnthropic` 的 Anthropic | 是 | `ProviderStrategy` 或 `ToolStrategy` | Claude Haiku 5.5 上 39 个中 39 个和 38 个 |
+| 任何提供方 | 任意 | 永远不要对自由文本用模式 | Claude Haiku 5.5 上 39 个中 15 个 |
 
-Test the provider you run in production. These results hold for `langchain` 1.5.0, `langchain-ollama` 1.1.0, and `langchain-anthropic` 1.7.10.
+请测试你在生产中运行的那个提供方。这些结果适用于 `langchain` 1.5.0、`langchain-ollama` 1.1.0 和 `langchain-anthropic` 1.7.10。
 
 ```takeaways
-- Leave response_format off an agent with tools on ChatOllama, and add one extraction call after the run.
-- Check structured_response for None after every run, because ToolStrategy on Ollama fails without an error.
-- Use ProviderStrategy or ToolStrategy on Claude, where both returned the right value in 38 or more of 39 tasks.
-- Parse answers with a schema call, never with a pattern on the reply.
+- 在 ChatOllama 上，不要给带工具的 agent 设置 response_format，改为运行之后加一次提取调用。
+- 每次运行之后都检查 structured_response 是否为 None，因为 Ollama 上的 ToolStrategy 失败时不报错。
+- 在 Claude 上使用 ProviderStrategy 或 ToolStrategy，它们在 39 个任务中至少 38 个返回了正确的值。
+- 用 schema 调用来解析答案，永远不要对回复用模式。
 ```
 
-Sources: capture/lab/bench/summary-mac.json, capture/lab/bench/summarize.py, capture/lab/bench/runs/structured.jsonl, capture/lab/bench/runs/cost-ledger.jsonl, capture/lab/bench/kit/structured.py, capture/lab/bench/kit/harnesses.py, capture/lab/bench/data/tasks.jsonl; libs/partners/ollama/langchain_ollama/chat_models.py at langchain-ollama 1.1.0; libs/langchain_v1/langchain/agents/factory.py and libs/langchain_v1/langchain/agents/structured_output.py at langchain==1.5.0; libs/partners/anthropic/langchain_anthropic/chat_models.py at langchain-anthropic 1.7.10.
+来源：capture/lab/bench/summary-mac.json, capture/lab/bench/summarize.py, capture/lab/bench/runs/structured.jsonl, capture/lab/bench/runs/cost-ledger.jsonl, capture/lab/bench/kit/structured.py, capture/lab/bench/kit/harnesses.py, capture/lab/bench/data/tasks.jsonl; libs/partners/ollama/langchain_ollama/chat_models.py at langchain-ollama 1.1.0; libs/langchain_v1/langchain/agents/factory.py and libs/langchain_v1/langchain/agents/structured_output.py at langchain==1.5.0; libs/partners/anthropic/langchain_anthropic/chat_models.py at langchain-anthropic 1.7.10.
