@@ -13,11 +13,11 @@ const plan = gl.layout(graph, { top: 44, hue });
 
 module.exports = figure('fig-1-3c', {
   height: plan.bottom + 44,
-  title: 'The graph of the agent in this run',
-  desc: `The compiled graph of create_agent with one tool, drawn from its draw_mermaid output. It has ${s.nodes} nodes: ${s.names.join(', ')}. One plain edge goes from __start__ to model. Three conditional edges go from model to tools, from model to __end__, and from tools back to model. The tools node lists the tool add.`,
+  title: '本次运行中 agent 的图',
+  desc: `带一个工具的 create_agent 编译图，根据它的 draw_mermaid 输出绘制。共有 ${s.nodes} 个节点：${s.names.join('、')}。一条普通边从 __start__ 到 model。三条条件边分别从 model 到 tools、从 model 到 __end__、从 tools 回到 model。tools 节点列出工具 add。`,
 }, f => {
-  f.kicker(20, 20, 'the compiled graph');
-  f.text(620, 20, `${s.nodes} nodes, ${s.plain} plain edge, ${s.conditional} conditional`, { size: 11, anchor: 'end', hue: 'ink-soft' });
+  f.kicker(20, 20, '编译后的图');
+  f.text(620, 20, `${s.nodes} 个节点，${s.plain} 条普通边，${s.conditional} 条条件边`, { size: 11, anchor: 'end', hue: 'ink-soft' });
   gl.draw(f, plan);
   gl.legend(f, plan.bottom + 30);
 });

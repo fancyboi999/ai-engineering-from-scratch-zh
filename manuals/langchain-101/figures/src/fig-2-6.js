@@ -18,28 +18,28 @@ const ratio = thread(plainRow) / thread(deltaRow);
 
 module.exports = figure('fig-2-6', {
   height: 380,
-  title: 'Bytes of each checkpoint row, plain messages against DeltaChannel',
-  desc: `Bytes of every row of the SqliteSaver checkpoints table, in order, for one create_agent run of ${plainRow.tool_round_trips} real tool round trips with Qwen3 4B on the x86 server guest, once with the plain add_messages channel and once with a state_schema whose messages use DeltaChannel. Each dot is one row, ${plain.length} rows per run. The plain rows grow in a straight line from ${plain[1]} to ${plain[plain.length - 1]} bytes, ${plainRow.checkpoint_bytes_total} bytes in all. The DeltaChannel rows stay near ${typical} bytes, except ${snapshots.length} snapshot rows at positions ${snapshots.map(s => s[0]).join(' and ')} of ${snapshots.map(s => s[1]).join(' and ')} bytes, ${deltaRow.checkpoint_bytes_total} bytes in all. With the writes table, the plain thread holds ${ratio.toFixed(1)} times the bytes of the DeltaChannel thread.`,
+  title: '每个检查点行的字节数：普通 messages 与 DeltaChannel 对比',
+  desc: `SqliteSaver 的 checkpoints 表中每一行的字节数，按顺序排列，对象是 x86 服务器虚拟机上用 Qwen3 4B、含 ${plainRow.tool_round_trips} 次真实工具往返的一次 create_agent 运行；一次用普通的 add_messages 通道，一次用 messages 采用 DeltaChannel 的 state_schema。每个点是一行，每次运行 ${plain.length} 行。普通行从 ${plain[1]} 字节呈直线增长到 ${plain[plain.length - 1]} 字节，总计 ${plainRow.checkpoint_bytes_total} 字节。DeltaChannel 行保持在约 ${typical} 字节，只有 ${snapshots.length} 个快照行例外，位置为 ${snapshots.map(s => s[0]).join(' 和 ')}，大小为 ${snapshots.map(s => s[1]).join(' 和 ')} 字节，总计 ${deltaRow.checkpoint_bytes_total} 字节。加上 writes 表，普通线程占用的字节数是 DeltaChannel 线程的 ${ratio.toFixed(1)} 倍。`,
 }, f => {
-  const c = chart(f, { x: 70, y: 44, w: 420, h: 250, xDomain: [0, 210], yDomain: [0, 100000], xTicks: [0, 50, 100, 150, 200], yTicks: [0, 20000, 40000, 60000, 80000, 100000], yFormat: v => `${v / 1000} KB`, xLabel: 'checkpoint row, in order', yLabel: 'bytes of the row' });
+  const c = chart(f, { x: 70, y: 44, w: 420, h: 250, xDomain: [0, 210], yDomain: [0, 100000], xTicks: [0, 50, 100, 150, 200], yTicks: [0, 20000, 40000, 60000, 80000, 100000], yFormat: v => `${v / 1000} KB`, xLabel: '检查点行，按顺序', yLabel: '该行的字节数' });
   f.beat(1);
   plain.forEach((b, i) => f.dot(c.px(i), c.py(b), { hue: 'teal', r: 1.5 }));
   f.beat(2);
   delta.forEach((b, i) => f.dot(c.px(i), c.py(b), { hue: 'indigo', r: 1.5 }));
   f.beat(3);
   const last = plain.length - 1;
-  f.text(c.px(last) + 12, c.py(plain[last]) + 16, 'plain messages', { size: 11.5, weight: 700, hue: 'teal' });
-  f.text(c.px(last) + 12, c.py(plain[last]) + 31, `${mb(Number(plainRow.checkpoint_bytes_total))} in all`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(c.px(last) + 12, c.py(plain[last]) + 16, '普通 messages', { size: 11.5, weight: 700, hue: 'teal' });
+  f.text(c.px(last) + 12, c.py(plain[last]) + 31, `共 ${mb(Number(plainRow.checkpoint_bytes_total))}`, { size: 11, serif: true, hue: 'ink-soft' });
   f.text(c.px(last) + 12, c.py(typical) - 30, 'DeltaChannel', { size: 11.5, weight: 700, hue: 'indigo' });
-  f.text(c.px(last) + 12, c.py(typical) - 15, `${mb(Number(deltaRow.checkpoint_bytes_total))} in all`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(c.px(last) + 12, c.py(typical) - 15, `共 ${mb(Number(deltaRow.checkpoint_bytes_total))}`, { size: 11, serif: true, hue: 'ink-soft' });
   const lx = c.px(64);
   const ly = c.py(13000);
-  f.text(lx, ly, 'DeltaChannel snapshot rows', { size: 11, hue: 'indigo' });
-  f.text(lx, ly + 15, 'one per 100 updates', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(lx, ly, 'DeltaChannel 快照行', { size: 11, hue: 'indigo' });
+  f.text(lx, ly + 15, '每 100 次更新一行', { size: 11, serif: true, hue: 'ink-soft' });
   snapshots.forEach(([i, b]) => {
     f.emit(`<circle cx="${c.px(i).toFixed(1)}" cy="${c.py(b).toFixed(1)}" r="4" fill="none" stroke="${color('indigo-ink')}" stroke-width="1.5"/>`);
     f.leader([lx + 40, ly - 12], [c.px(i) + (i > 150 ? -2 : 3), c.py(b) + 4], { hue: 'indigo' });
   });
   f.beat(0);
-  f.text(70, 356, `whole thread with writes: ${mb(thread(plainRow))} plain, ${mb(thread(deltaRow))} DeltaChannel, ${ratio.toFixed(1)} times less`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(70, 356, `含 writes 的整个线程：普通 ${mb(thread(plainRow))}，DeltaChannel ${mb(thread(deltaRow))}，少 ${ratio.toFixed(1)} 倍`, { size: 11, serif: true, hue: 'ink-soft' });
 });

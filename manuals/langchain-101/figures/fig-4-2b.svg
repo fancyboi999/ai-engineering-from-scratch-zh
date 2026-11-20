@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="fig-4-2b-title fig-4-2b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-2b-title">The outcome of each structured output run</title>
-  <desc id="fig-4-2b-desc">A dot matrix of 400 runs on the Mac with four Qwen3 models on Ollama. Rows are the flat, nested, union, and enum schemas under ToolStrategy and ProviderStrategy, and columns are the 0.6B, 1.7B, 4B, and 8B models. Blue dots are valid on the first call, amber dots are valid after a retry, and rose dots raised. ProviderStrategy raised on every union run at build time and on 3 enum runs on the 4B model, and was valid otherwise. ToolStrategy raised on 19 of 20 nested runs on 0.6B and 10 of 10 on 8B. The summary holds 600 runs, and the rest use AutoStrategy.</desc>
+  <title id="fig-4-2b-title">每次结构化输出运行的结果</title>
+  <desc id="fig-4-2b-desc">400 次运行的点阵，在 Mac 上用 Ollama 里的四个 Qwen3 模型。行是 ToolStrategy 与 ProviderStrategy 下的 flat、nested、union 和 enum 四种 schema，列是 0.6B、1.7B、4B 和 8B 模型。蓝点表示第一次调用就有效，琥珀点表示重试后有效，玫红点表示抛出异常。ProviderStrategy 在每次 union 运行中都于构建时抛出异常，在 4B 模型上有 3 次 enum 运行抛出异常，其余有效。ToolStrategy 在 0.6B 的 20 次 nested 运行中有 19 次抛出异常，在 8B 的 10 次中有 10 次。汇总文件共有 600 次运行，其余使用 AutoStrategy。</desc>
   <text x="218" y="26" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0.6B, n=20</text>
   <text x="330" y="26" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1.7B, n=10</text>
   <text x="442" y="26" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">4B, n=10</text>
   <text x="554" y="26" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">8B, n=10</text>
   <text x="20" y="54" font-size="11" letter-spacing="1.2" fill="var(--m-ink-soft, #4a4a4a)">TOOLSTRATEGY</text>
   <text x="30" y="76" font-size="11.5">flat</text>
-  <line x1="162" y1="92" x2="620" y2="92" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="92" x2="620" y2="92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="67" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="180" cy="67" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="190" cy="67" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
@@ -59,7 +59,7 @@
   <circle cx="586" cy="73" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="596" cy="73" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="30" y="108" font-size="11.5">nested</text>
-  <line x1="162" y1="124" x2="620" y2="124" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="124" x2="620" y2="124" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="99" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="180" cy="99" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="190" cy="99" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
@@ -111,7 +111,7 @@
   <circle cx="586" cy="105" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="596" cy="105" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <text x="30" y="140" font-size="11.5">union</text>
-  <line x1="162" y1="156" x2="620" y2="156" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="156" x2="620" y2="156" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="131" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="180" cy="131" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="190" cy="131" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -163,7 +163,7 @@
   <circle cx="586" cy="137" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="596" cy="137" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="30" y="172" font-size="11.5">enum</text>
-  <line x1="162" y1="188" x2="620" y2="188" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="188" x2="620" y2="188" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="163" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="180" cy="163" r="3.4" fill="var(--m-amber-ink, #85590c)"/>
   <circle cx="190" cy="163" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
@@ -216,7 +216,7 @@
   <circle cx="596" cy="169" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="20" y="206" font-size="11" letter-spacing="1.2" fill="var(--m-ink-soft, #4a4a4a)">PROVIDERSTRATEGY</text>
   <text x="30" y="228" font-size="11.5">flat</text>
-  <line x1="162" y1="244" x2="620" y2="244" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="244" x2="620" y2="244" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="219" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="180" cy="219" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="190" cy="219" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -268,7 +268,7 @@
   <circle cx="586" cy="225" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="596" cy="225" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="30" y="260" font-size="11.5">nested</text>
-  <line x1="162" y1="276" x2="620" y2="276" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="276" x2="620" y2="276" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="251" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="180" cy="251" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="190" cy="251" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -320,7 +320,7 @@
   <circle cx="586" cy="257" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="596" cy="257" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="30" y="292" font-size="11.5">union</text>
-  <line x1="162" y1="308" x2="620" y2="308" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="308" x2="620" y2="308" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="283" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="180" cy="283" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="190" cy="283" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
@@ -372,7 +372,7 @@
   <circle cx="586" cy="289" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="596" cy="289" r="3.4" fill="var(--m-rose-ink, #b0344d)"/>
   <text x="30" y="324" font-size="11.5">enum</text>
-  <line x1="162" y1="340" x2="620" y2="340" stroke="var(--m-ink-mute, #6f6f6a)" stroke-width="1" stroke-opacity="0.25"/>
+  <line x1="162" y1="340" x2="620" y2="340" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <circle cx="170" cy="315" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="180" cy="315" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="190" cy="315" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -424,10 +424,10 @@
   <circle cx="586" cy="321" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="596" cy="321" r="3.4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="24" cy="362" r="3.8" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="34" y="366" font-size="11.5" fill="var(--m-blue-ink, #2f5d9a)">valid on the first call</text>
-  <circle cx="220.7" cy="362" r="3.8" fill="var(--m-amber-ink, #85590c)"/>
-  <text x="230.7" y="366" font-size="11.5" fill="var(--m-amber-ink, #85590c)">valid after a retry</text>
-  <circle cx="389.8" cy="362" r="3.8" fill="var(--m-rose-ink, #b0344d)"/>
-  <text x="399.8" y="366" font-size="11.5" fill="var(--m-rose-ink, #b0344d)">raised</text>
-  <text x="20" y="388" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Each dot is one run on the Mac. Every ProviderStrategy union run raised in create_agent.</text>
+  <text x="34" y="366" font-size="11.5" fill="var(--m-blue-ink, #2f5d9a)">第一次调用就有效</text>
+  <circle cx="154" cy="362" r="3.8" fill="var(--m-amber-ink, #85590c)"/>
+  <text x="164" y="366" font-size="11.5" fill="var(--m-amber-ink, #85590c)">重试后有效</text>
+  <circle cx="249.5" cy="362" r="3.8" fill="var(--m-rose-ink, #b0344d)"/>
+  <text x="259.5" y="366" font-size="11.5" fill="var(--m-rose-ink, #b0344d)">抛出异常</text>
+  <text x="20" y="388" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是在 Mac 上的一次运行。ProviderStrategy 的每次 union 运行都在 create_agent 中抛出异常。</text>
 </svg>

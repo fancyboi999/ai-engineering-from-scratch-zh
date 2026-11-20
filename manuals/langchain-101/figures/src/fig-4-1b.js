@@ -19,13 +19,13 @@ const s = gl.summary(graph);
 
 module.exports = figure('fig-4-1b', {
   height: 310,
-  title: 'From draw_mermaid lines to a drawing',
-  desc: `The draw_mermaid output of the agent with one tool, line by line, next to the drawing it describes. ${nodeRows.length} node lines give each node an id and a label: the :::first and :::last classes mark __start__ and __end__, and the label of tools carries the metadata __tools = add. ${edgeRows.length} edge lines follow: --> is a plain edge and -.-> is a conditional edge. The drawing has ${s.nodes} nodes, ${s.plain} plain edge, and ${s.conditional} conditional edges.`,
+  title: '从 draw_mermaid 的各行到一幅图',
+  desc: `带一个工具的 agent 的 draw_mermaid 输出，逐行列出，旁边是它所描述的图。${nodeRows.length} 行节点定义给出每个节点的 id 和标签：:::first 与 :::last 类标出 __start__ 和 __end__，tools 的标签带有元数据 __tools = add。随后是 ${edgeRows.length} 行边定义：--> 是普通边，-.-> 是条件边。图中有 ${s.nodes} 个节点、${s.plain} 条普通边和 ${s.conditional} 条条件边。`,
 }, f => {
-  f.kicker(20, 20, 'the lines of draw_mermaid()');
-  f.kicker(420, 20, 'the drawing');
+  f.kicker(20, 20, 'draw_mermaid() 的各行');
+  f.kicker(420, 20, '对应的图');
   let y = 50;
-  f.text(20, y, 'node lines: id(label), number matches the drawing', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y, '节点行：id(label)，编号与图对应', { size: 11, serif: true, hue: 'ink-soft' });
   y += 22;
   nodeRows.forEach((line, i) => {
     f.step(30, y - 4, i + 1, { hue: 'indigo' });
@@ -33,7 +33,7 @@ module.exports = figure('fig-4-1b', {
     y += 24;
   });
   y += 6;
-  f.text(20, y, 'edge lines: --> plain, -.-> conditional', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y, '边行：--> 普通，-.-> 条件', { size: 11, serif: true, hue: 'ink-soft' });
   y += 22;
   for (const line of edgeRows) {
     const conditional = line.includes('-.->');
@@ -47,5 +47,5 @@ module.exports = figure('fig-4-1b', {
     const box = plan.boxes.get(id);
     f.step(box.x - 14, box.y + box.h / 2, i + 1, { hue: 'indigo' });
   });
-  f.text(20, y + 8, 'The frontmatter and the classDef lines only set the style.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 8, 'frontmatter 和 classDef 行只设置样式。', { size: 11, serif: true, hue: 'ink-soft' });
 });

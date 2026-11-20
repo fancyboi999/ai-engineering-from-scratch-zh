@@ -3,9 +3,9 @@
 const { figure } = require('../../../_shared/figkit.js');
 
 const groups = [
-  { x: 20, w: 210, title: 'wrap_model_call only', hue: 'plum', items: [['ContextEditingMiddleware'], ['ModelRetryMiddleware'], ['ModelFallbackMiddleware'], ['ModelRefusalMiddleware'], ['LLMToolSelectorMiddleware'], ['ProviderToolSearchMiddleware']] },
-  { x: 250, w: 180, title: 'wrap_tool_call only', hue: 'green', items: [['ToolRetryMiddleware'], ['ToolErrorMiddleware'], ['LLMToolEmulator'], ['AutoModeMiddleware']] },
-  { x: 440, w: 180, title: 'node hooks', hue: 'blue', items: [
+  { x: 20, w: 210, title: '仅 wrap_model_call', hue: 'plum', items: [['ContextEditingMiddleware'], ['ModelRetryMiddleware'], ['ModelFallbackMiddleware'], ['ModelRefusalMiddleware'], ['LLMToolSelectorMiddleware'], ['ProviderToolSearchMiddleware']] },
+  { x: 250, w: 180, title: '仅 wrap_tool_call', hue: 'green', items: [['ToolRetryMiddleware'], ['ToolErrorMiddleware'], ['LLMToolEmulator'], ['AutoModeMiddleware']] },
+  { x: 440, w: 180, title: '节点钩子', hue: 'blue', items: [
     ['SummarizationMiddleware', 'before_model'],
     ['HumanInTheLoopMiddleware', 'after_model, wrap_tool_call'],
     ['ModelCallLimitMiddleware', 'before_model, after_model'],
@@ -19,13 +19,13 @@ const groups = [
 
 module.exports = figure('fig-4-6', {
   height: 440,
-  title: 'The 19 built-in middleware classes by hook',
-  desc: 'A tree with the root langchain.agents.middleware and four branches. wrap_model_call only: ContextEditingMiddleware, ModelRetryMiddleware, ModelFallbackMiddleware, ModelRefusalMiddleware, LLMToolSelectorMiddleware, ProviderToolSearchMiddleware. wrap_tool_call only: ToolRetryMiddleware, ToolErrorMiddleware, LLMToolEmulator, AutoModeMiddleware. Node hooks: SummarizationMiddleware, HumanInTheLoopMiddleware, ModelCallLimitMiddleware, ToolCallLimitMiddleware, PIIMiddleware, TodoListMiddleware, ModelRouterMiddleware, ShellToolMiddleware. Tools only: FilesystemFileSearchMiddleware.',
+  title: '19 个内置中间件类，按钩子分类',
+  desc: '一棵树，根是 langchain.agents.middleware，有四个分支。仅 wrap_model_call：ContextEditingMiddleware、ModelRetryMiddleware、ModelFallbackMiddleware、ModelRefusalMiddleware、LLMToolSelectorMiddleware、ProviderToolSearchMiddleware。仅 wrap_tool_call：ToolRetryMiddleware、ToolErrorMiddleware、LLMToolEmulator、AutoModeMiddleware。节点钩子：SummarizationMiddleware、HumanInTheLoopMiddleware、ModelCallLimitMiddleware、ToolCallLimitMiddleware、PIIMiddleware、TodoListMiddleware、ModelRouterMiddleware、ShellToolMiddleware。仅提供工具：FilesystemFileSearchMiddleware。',
 }, f => {
-  const root = f.box({ x: 320, y: 12, w: 300, h: 40, hue: 'blue', title: 'langchain.agents.middleware', sub: '19 classes at langchain 1.5.0', anchor: 'middle', titleSize: 12 });
+  const root = f.box({ x: 320, y: 12, w: 300, h: 40, hue: 'blue', title: 'langchain.agents.middleware', sub: 'langchain 1.5.0 中的 19 个类', anchor: 'middle', titleSize: 12 });
   f.rule(125, 70, 530, 70, { hue: 'ink-mute' });
   f.rule(320, root.y + root.h, 320, 70, { hue: 'ink-mute' });
-  const tools = { x: 20, w: 210, title: 'tools only', hue: 'grey', items: [['FilesystemFileSearchMiddleware']] };
+  const tools = { x: 20, w: 210, title: '仅提供工具', hue: 'grey', items: [['FilesystemFileSearchMiddleware']] };
   const draw = (g, top) => {
     const box = f.box({ x: g.x, y: top, w: g.w, h: 30, hue: g.hue, title: `${g.title} (${g.items.length})`, titleSize: 11 });
     let y = top + 30;

@@ -1,60 +1,60 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 520" role="img" aria-labelledby="fig-4-2-title fig-4-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-4-2-title">Which strategy runs, and how it fails</title>
-  <desc id="fig-4-2-desc">A decision figure. An explicit ToolStrategy and an explicit ProviderStrategy are kept as they are. A plain schema or AutoStrategy becomes ProviderStrategy when the model profile says structured_output is true, or when the model name is in a fixed list, and ToolStrategy otherwise. ToolStrategy fails by retrying a parse error with no count, by looping to the recursion limit when the agent has no tools, and by ending with no structured_response when the agent has a tool of its own. ProviderStrategy fails with ValueError at build time for a union, raises on a 400 from the server, and raises on bad JSON on the first call.</desc>
+  <title id="fig-4-2-title">哪种策略会运行，以及它如何失败</title>
+  <desc id="fig-4-2-desc">一张决策图。显式给出的 ToolStrategy 和显式给出的 ProviderStrategy 保持原样。普通 schema 或 AutoStrategy 在模型档案说 structured_output 为 true，或模型名在固定列表中时，变成 ProviderStrategy，否则变成 ToolStrategy。ToolStrategy 的失败方式有：对解析错误无次数限制地重试；agent 没有工具时一直循环到递归上限；agent 有自己的工具时结束但没有 structured_response。ProviderStrategy 的失败方式有：联合类型在构建时抛出 ValueError；服务器返回 400 时抛出异常；第一次调用返回错误的 JSON 时抛出异常。</desc>
   <defs><marker id="fig-4-2-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-4-2-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker><marker id="fig-4-2-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
-  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">WHAT YOU PASS AS RESPONSE_FORMAT</text>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">你传给 RESPONSE_FORMAT 的内容</text>
   <rect x="20" y="34" width="196" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="118" y="54.25" font-size="12.5" text-anchor="middle" font-weight="700">ToolStrategy(s)</text>
-  <text x="118" y="71.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">explicit</text>
+  <text x="118" y="71.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">显式</text>
   <rect x="222" y="34" width="196" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
-  <text x="320" y="54.25" font-size="12.5" text-anchor="middle" font-weight="700">a plain schema</text>
-  <text x="320" y="71.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">or AutoStrategy(s)</text>
+  <text x="320" y="54.25" font-size="12.5" text-anchor="middle" font-weight="700">普通 schema</text>
+  <text x="320" y="71.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">或 AutoStrategy(s)</text>
   <rect x="424" y="34" width="196" height="50" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
   <text x="522" y="54.25" font-size="12.5" text-anchor="middle" font-weight="700">ProviderStrategy(s)</text>
-  <text x="522" y="71.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">explicit</text>
+  <text x="522" y="71.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">显式</text>
   <rect x="222" y="118" width="196" height="50" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="320" y="138.25" font-size="12.5" text-anchor="middle" font-weight="700">model.profile</text>
-  <text x="320" y="155.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">says structured_output?</text>
+  <text x="320" y="155.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">说明 structured_output？</text>
   <rect x="222" y="202" width="196" height="50" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
-  <text x="320" y="222.25" font-size="12.5" text-anchor="middle" font-weight="700">model name</text>
-  <text x="320" y="239.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">in the fixed list?</text>
+  <text x="320" y="222.25" font-size="12.5" text-anchor="middle" font-weight="700">模型名</text>
+  <text x="320" y="239.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">在固定列表中？</text>
   <rect x="20" y="290" width="260" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="150" y="310.25" font-size="12.5" text-anchor="middle" font-weight="700">ToolStrategy runs</text>
-  <text x="150" y="327.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one tool per schema, tool_choice any</text>
+  <text x="150" y="310.25" font-size="12.5" text-anchor="middle" font-weight="700">运行 ToolStrategy</text>
+  <text x="150" y="327.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个 schema 一个工具，tool_choice 为 any</text>
   <rect x="360" y="290" width="260" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
-  <text x="490" y="310.25" font-size="12.5" text-anchor="middle" font-weight="700">ProviderStrategy runs</text>
-  <text x="490" y="327.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">response_format, one attempt</text>
+  <text x="490" y="310.25" font-size="12.5" text-anchor="middle" font-weight="700">运行 ProviderStrategy</text>
+  <text x="490" y="327.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">response_format，只尝试一次</text>
   <line x1="70" y1="84" x2="70" y2="289" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
-  <rect class="m-knock" x="75" y="175.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="78" y="186.5" font-size="11.5">kept</text>
+  <rect class="m-knock" x="75" y="175.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="78" y="186.5" font-size="11.5">保持</text>
   <line x1="570" y1="84" x2="570" y2="289" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
-  <rect class="m-knock" x="575" y="175.53" width="33.6" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="578" y="186.5" font-size="11.5">kept</text>
+  <rect class="m-knock" x="575" y="175.53" width="29" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="578" y="186.5" font-size="11.5">保持</text>
   <line x1="320" y1="84" x2="320" y2="117" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-4-2-head-ink)"/>
   <path d="M418 143 H510 V289" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-4-2-head-amber)"/>
-  <rect class="m-knock" x="423" y="126.42" width="25.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="426" y="137" font-size="11" fill="var(--m-amber-ink, #85590c)">yes</text>
+  <rect class="m-knock" x="423" y="126.42" width="17" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="426" y="137" font-size="11" fill="var(--m-amber-ink, #85590c)">是</text>
   <line x1="320" y1="168" x2="320" y2="201" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-2-head-amber)"/>
-  <rect class="m-knock" x="325" y="173.53" width="19.8" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="328" y="184.5" font-size="11.5" fill="var(--m-amber-ink, #85590c)">no</text>
+  <rect class="m-knock" x="325" y="173.53" width="17.5" height="15.5" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="328" y="184.5" font-size="11.5" fill="var(--m-amber-ink, #85590c)">否</text>
   <path d="M418 227 H460 V289" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-4-2-head-amber)"/>
-  <rect class="m-knock" x="423" y="210.42" width="25.8" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="426" y="221" font-size="11" fill="var(--m-amber-ink, #85590c)">yes</text>
+  <rect class="m-knock" x="423" y="210.42" width="17" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="426" y="221" font-size="11" fill="var(--m-amber-ink, #85590c)">是</text>
   <path d="M222 227 H170 V289" fill="none" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-4-2-head-amber)"/>
-  <rect class="m-knock" x="183" y="210.42" width="19.2" height="15" fill="var(--m-panel, #f3f1e8)"/>
-  <text x="186" y="221" font-size="11" fill="var(--m-amber-ink, #85590c)">no</text>
-  <text x="20" y="372" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">HOW EACH ONE FAILS</text>
+  <rect class="m-knock" x="183" y="210.42" width="17" height="15" fill="var(--m-panel, #f3f1e8)"/>
+  <text x="186" y="221" font-size="11" fill="var(--m-amber-ink, #85590c)">否</text>
+  <text x="20" y="372" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">各自如何失败</text>
   <rect x="20" y="384" width="290" height="92" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
   <text x="32" y="410.25" font-size="12.5" font-weight="700">ToolStrategy</text>
-  <text x="32" y="427.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">parse error: retry with no count</text>
-  <text x="32" y="442.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tools=[]: loops to the recursion limit</text>
-  <text x="32" y="457.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">your tool + plain text: no result, no error</text>
+  <text x="32" y="427.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">解析错误：重试，无次数限制</text>
+  <text x="32" y="442.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tools=[]：循环到递归上限</text>
+  <text x="32" y="457.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">你的工具加纯文本：没有结果，也没有错误</text>
   <rect x="330" y="384" width="290" height="92" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
   <text x="342" y="410.25" font-size="12.5" font-weight="700">ProviderStrategy</text>
-  <text x="342" y="427.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">a union: ValueError at build</text>
-  <text x="342" y="442.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">a 400 from the server: raises</text>
-  <text x="342" y="457.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">bad JSON: raises on the first call</text>
+  <text x="342" y="427.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">联合类型：构建时 ValueError</text>
+  <text x="342" y="442.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器返回 400：抛出异常</text>
+  <text x="342" y="457.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">错误的 JSON：第一次调用就抛出异常</text>
   <line x1="230" y1="340" x2="230" y2="383" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-2-head-rose)"/>
   <line x1="490" y1="340" x2="490" y2="383" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-4-2-head-rose)"/>
-  <text x="20" y="504" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">No failure at run time moves a run from one strategy to the other.</text>
+  <text x="20" y="504" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行时的任何失败都不会让一次运行从一种策略转到另一种。</text>
 </svg>

@@ -28,15 +28,15 @@ const PITCH = 40;
 
 module.exports = figure('fig-1-3b', {
   height: 480,
-  title: 'The runs of one traced agent turn',
-  desc: `An indented tree of ${runs.length} runs in the order they started, one row each: ${runs.map(run => `${run.type} ${run.name}`).join(', ')}. The root agent_turn is the traceable function of the kit, inside tracing_context with enabled local, and it stayed in memory. Each of the ${posts} runs below it has a dashed olive arrow to a client lane on the right, because the client got one POST /runs when the run started and one PATCH when it ended: ${posts} POST and ${patches} PATCH in all. Each graph node is a chain run, the two model calls are llm leaves, and the tool call is a tool leaf.`,
+  title: '一次被追踪的 agent 轮次中的各个 run',
+  desc: `一棵缩进树，列出 ${runs.length} 个 run，按开始顺序每行一个：${runs.map(run => `${run.type} ${run.name}`).join('，')}。根节点 agent_turn 是录制工具包里的 traceable 函数，运行在 enabled 为 local 的 tracing_context 中，数据只留在内存里。它下面的 ${posts} 个 run 各有一条橄榄色虚线箭头指向右侧的客户端泳道，因为客户端在 run 开始时收到一次 POST /runs，结束时收到一次 PATCH，共 ${posts} 个 POST 和 ${patches} 个 PATCH。每个图节点是一个 chain run，两次模型调用是 llm 叶子，工具调用是 tool 叶子。`,
 }, f => {
   flat.gateway(f, CLIENT, 6, 'olive', { w: 52, h: 36, ports: 4 });
-  f.text(CLIENT, 58, 'the client', { size: 11, weight: 700, hue: 'olive', anchor: 'middle' });
-  f.text(CLIENT, 72, 'records each request', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
+  f.text(CLIENT, 58, '客户端', { size: 11, weight: 700, hue: 'olive', anchor: 'middle' });
+  f.text(CLIENT, 72, '记录每个请求', { size: 11, serif: true, hue: 'ink-soft', anchor: 'middle' });
   f.lifeline(CLIENT, 78, TOP + runs.length * PITCH - 10);
-  f.kicker(20, 20, 'run tree, in the order the runs started');
-  f.text(20, 38, 'name above its run type', { size: 11, serif: true, hue: 'ink-soft' });
+  f.kicker(20, 20, 'run 树，按 run 开始的顺序');
+  f.text(20, 38, '名称在上，run 类型在下', { size: 11, serif: true, hue: 'ink-soft' });
 
   const parents = [];
   runs.forEach((run, index) => {
@@ -54,17 +54,17 @@ module.exports = figure('fig-1-3b', {
     f.text(x + 10, y, run.name, { size: 11.5, weight: 700, hue });
     f.text(x + 10, y + 12, `${run.type} run`, { size: 11, serif: true, hue: 'ink-soft' });
     if (run.depth === 0) {
-      f.text(x + w + 12, y + 4, "kept in memory: tracing_context(enabled='local')", { size: 11, serif: true, hue: 'ink-mute' });
+      f.text(x + w + 12, y + 4, "保存在内存中：tracing_context(enabled='local')", { size: 11, serif: true, hue: 'ink-mute' });
       return;
     }
-    f.arrow([x + w, y], [CLIENT - 1, y], { style: 'effect', label: index === 1 ? 'POST, then PATCH' : undefined, labelX: 440 });
+    f.arrow([x + w, y], [CLIENT - 1, y], { style: 'effect', label: index === 1 ? '先 POST，后 PATCH' : undefined, labelX: 440 });
   });
 
   f.beat(0);
   const bottom = TOP + runs.length * PITCH + 8;
   f.rule(20, bottom, 620, bottom, { opacity: 0.4 });
-  f.text(20, bottom + 22, `${runs.length - 1} runs below the root, ${posts} POST /runs and ${patches} PATCH at the client.`, { size: 11, serif: true, hue: 'ink-soft' });
-  const key = [['indigo', 'a graph node'], ['plum', 'a model call'], ['green', 'a tool call']];
+  f.text(20, bottom + 22, `根节点之下有 ${runs.length - 1} 个 run，客户端收到 ${posts} 个 POST /runs 和 ${patches} 个 PATCH。`, { size: 11, serif: true, hue: 'ink-soft' });
+  const key = [['indigo', '图节点'], ['plum', '模型调用'], ['green', '工具调用']];
   key.forEach(([hue, name], i) => {
     f.rect(20 + i * 150, bottom + 36, 14, 12, { hue });
     f.text(40 + i * 150, bottom + 46, name, { size: 11, serif: true, hue: 'ink-soft' });

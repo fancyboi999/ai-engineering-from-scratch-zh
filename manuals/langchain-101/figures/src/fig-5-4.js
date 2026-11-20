@@ -28,14 +28,14 @@ const userX = user => {
 
 module.exports = figure('fig-5-4', {
   height: 388,
-  title: 'The namespaces of the kit store',
-  desc: `A tree of the namespace labels that list_namespaces returned: users, then ${users.join(' and ')}, then ${leaves.map(l => `${l.name} under ${l.user}`).join(', ')}. Under each namespace are its items with their key and value: ${items.map(i => `${i.key} "${i.value}" in ${i.ns}`).join(', ')}. A shaded area covers ada and its two namespaces: search with the prefix users, ada returned those ${found.length} items. A dashed line under the second row shows where list_namespaces with max_depth 2 stops, at ${shallow.length} namespaces. A note says that a partial label such as ali matched nothing in ${partial.length} store backends in the lab.`,
+  title: '录制工具包 store 的命名空间',
+  desc: `list_namespaces 返回的命名空间标签组成的树：users，其下是 ${users.join(' 和 ')}，再往下是 ${leaves.map(l => `${l.user} 下的 ${l.name}`).join('、')}。每个命名空间下面是它的条目，带键和值：${items.map(i => `${i.ns} 中的 ${i.key}“${i.value}”`).join('、')}。一块阴影区域覆盖 ada 及其两个命名空间：用前缀 users、ada 做的 search 返回了这 ${found.length} 个条目。第二行下方的虚线表示 max_depth 为 2 的 list_namespaces 在哪里停止，得到 ${shallow.length} 个命名空间。一条注释说明：像 ali 这样的部分标签，在实验记录里的 ${partial.length} 种 store 后端中都没有匹配到任何内容。`,
 }, f => {
   const adaLeaves = leaves.filter(l => l.user === 'ada');
   const left = Math.min(...adaLeaves.map(l => CX[l.path])) - 100;
   const right = Math.max(...adaLeaves.map(l => CX[l.path])) + 100;
   f.rect(left, 82, right - left, 252, { fill: color('teal-fill'), stroke: color('teal-ink'), dash: 'dashed' });
-  f.text(left + 10, 324, `search(('users', 'ada')): ${found.length} items`, { size: 11.5, hue: 'teal', weight: 700 });
+  f.text(left + 10, 324, `search(('users', 'ada'))：${found.length} 个条目`, { size: 11.5, hue: 'teal', weight: 700 });
 
   const root = f.box({ x: 320, y: 12, w: 120, h: 30, hue: 'grey', title: 'users', anchor: 'middle', titleSize: 12 });
   const join = (from, to) => f.path(`M${from.cx} ${from.y + from.h} V${to.y - 10} H${to.cx} V${to.y - 1}`, { style: 'call', head: false });
@@ -45,7 +45,7 @@ module.exports = figure('fig-5-4', {
     join(root, userBox[user]);
   });
   f.rule(20, 140, 620, 140, { hue: 'ink-mute', dash: 'dashed' });
-  f.text(30, 153, `max_depth=2: ${shallow.length} namespaces`, { size: 11, hue: 'ink-soft' });
+  f.text(30, 153, `max_depth=2：${shallow.length} 个命名空间`, { size: 11, hue: 'ink-soft' });
   leaves.forEach(leaf => {
     const box = f.box({ x: CX[leaf.path], y: 168, w: 140, h: 30, hue: 'teal', title: leaf.name, anchor: 'middle', titleSize: 12 });
     join(userBox[leaf.user], box);
@@ -53,10 +53,10 @@ module.exports = figure('fig-5-4', {
       const y = 216 + k * 36;
       if (!k) f.rule(CX[leaf.path], 198, CX[leaf.path], y, { hue: 'teal' });
       f.rect(CX[leaf.path] - 92, y, 184, 30, { fill: color('paper'), stroke: color('teal-ink') });
-      f.text(CX[leaf.path] - 84, y + 13, `key ${item.key}`, { size: 11, weight: 700, hue: 'teal' });
+      f.text(CX[leaf.path] - 84, y + 13, `键 ${item.key}`, { size: 11, weight: 700, hue: 'teal' });
       f.text(CX[leaf.path] - 84, y + 26, item.value, { size: 11, serif: true, hue: 'ink-soft' });
     });
   });
-  f.text(20, 362, `The namespace is a tuple of full labels. A search for ('users', 'ali') returned nothing`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 378, `in each of the ${partial.length} backends of the lab, because a label never matches part of another.`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 362, `命名空间是由完整标签组成的元组。对 ('users', 'ali') 的搜索没有返回任何内容，`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 378, `实验记录里的 ${partial.length} 种后端都是如此，因为一个标签不会匹配另一个标签的一部分。`, { size: 11, serif: true, hue: 'ink-soft' });
 });

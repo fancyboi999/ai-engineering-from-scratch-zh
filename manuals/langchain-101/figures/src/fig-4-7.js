@@ -10,17 +10,17 @@ const arrivals = cell.ledger_rows[0];
 if (!cell.ledger_rows.every(n => n === arrivals) || !cell.tool_executions.every(n => n === arrivals)) throw new Error('fig-4-7: runs differ');
 
 const lanes = [
-  { title: 'tools node', sub: 'tool call', hue: 'indigo' },
+  { title: 'tools 节点', sub: '工具调用', hue: 'indigo' },
   { title: 'ToolRetry', sub: 'Middleware()', hue: 'blue' },
-  { title: 'remote_action', sub: 'the tool', hue: 'green' },
-  { title: 'PostgreSQL ledger', sub: 'INSERT, pg_sleep(3)', hue: 'olive' },
+  { title: 'remote_action', sub: '工具', hue: 'green' },
+  { title: 'PostgreSQL 账本', sub: 'INSERT, pg_sleep(3)', hue: 'olive' },
 ];
 const cx = index => 80 + index * 160;
 
 module.exports = figure('fig-4-7', {
   height: 500,
-  title: 'A tool call that times out three times',
-  desc: `A sequence with four lifelines: the tools node, ToolRetryMiddleware, the remote_action tool, and a ledger table in PostgreSQL. The tool inserts a row, then runs pg_sleep(3) under a statement timeout of 1 s. Each of ${arrivals} attempts writes its row, and each ends with QueryCanceled. The middleware waits 1 s, then 2 s, between attempts. After the last attempt it returns an error ToolMessage, and the ledger holds ${arrivals} rows, in each of ${cell.ledger_rows.length} runs with Qwen3 4B on the x86 server guest.`,
+  title: '一次连续三次超时的工具调用',
+  desc: `四条生命线的时序图：tools 节点、ToolRetryMiddleware、remote_action 工具，以及 PostgreSQL 里的账本表。工具先插入一行，再在 1 s 的语句超时下运行 pg_sleep(3)。${arrivals} 次尝试每次都写入它的行，每次都以 QueryCanceled 结束。中间件在尝试之间先等 1 s，再等 2 s。最后一次尝试之后，它返回一条错误的 ToolMessage，账本里有 ${arrivals} 行；在 x86 服务器虚拟机上用 Qwen3 4B 的 ${cell.ledger_rows.length} 次运行中，每次都是如此。`,
 }, f => {
   lanes.forEach((lane, i) => {
     f.box({ x: cx(i), y: 8, w: 140, h: 40, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 11.5, anchor: 'middle', pad: 4 });
@@ -35,14 +35,14 @@ module.exports = figure('fig-4-7', {
   };
   row(0, 1, 'call', 'remote_action(item)');
   for (let a = 1; a <= arrivals; a += 1) {
-    row(1, 2, 'call', `attempt ${a}`);
+    row(1, 2, 'call', `第 ${a} 次尝试`);
     row(2, 3, 'effect', `INSERT ${a}`);
-    row(2, 1, 'fail', 'QueryCanceled after 1 s');
+    row(2, 1, 'fail', 'QueryCanceled，1 s 后');
     if (a < arrivals) {
-      f.text(cx(1) - 8, y - 10, `wait ${a === 1 ? 1 : 2} s`, { size: 11, hue: 'amber', anchor: 'end', knock: true });
+      f.text(cx(1) - 8, y - 10, `等待 ${a === 1 ? 1 : 2} s`, { size: 11, hue: 'amber', anchor: 'end', knock: true });
       y += 6;
     }
   }
-  row(1, 0, 'reply', 'error ToolMessage');
-  f.text(cx(3), y - 4, `${arrivals} ledger rows`, { size: 12, anchor: 'middle', hue: 'rose', weight: 700, knock: true });
+  row(1, 0, 'reply', '错误的 ToolMessage');
+  f.text(cx(3), y - 4, `账本 ${arrivals} 行`, { size: 12, anchor: 'middle', hue: 'rose', weight: 700, knock: true });
 });

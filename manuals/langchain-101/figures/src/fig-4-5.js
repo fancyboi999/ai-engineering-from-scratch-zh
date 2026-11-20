@@ -36,14 +36,14 @@ const X0 = 104;
 const PITCH = (618 - X0) / events.length;
 const px = i => X0 + (i + 0.5) * PITCH;
 const LANES = [92, 128, 164, 200];
-const LANE_NAMES = ['A', 'B', 'C', 'model, tool'];
+const LANE_NAMES = ['A', 'B', 'C', '模型、工具'];
 
 module.exports = figure('fig-4-5', {
   height: 452,
-  title: 'The order of hooks from three middlewares',
-  desc: `A trace of the ${events.length} hook calls that middleware=[A, B, C] logged in one tool round trip, read from left to right. Three lanes, A, B and C, and a fourth lane for the model and the tool. Each dot is one node hook. Each bar is one wrap hook, from its enter to its exit. ${phases.length} numbered phases run along the top: before_agent A B C, before_model A B C, wrap_model_call entered A B C with the model inside and left C B A, after_model C B A, wrap_tool_call entered A B C around the add tool and left C B A, the same model pass again, and after_agent C B A. The bars of A are the longest, so A is the outer layer. Under the trace, the graph edges read from the compiled agent: ${chain.join(' to ')}.`,
+  title: '三个中间件的钩子顺序',
+  desc: `middleware=[A, B, C] 在一次工具往返中记录了 ${events.length} 次钩子调用，自左向右阅读。三条泳道 A、B、C，第四条泳道是模型与工具。每个点是一个节点钩子。每根条是一个 wrap 钩子，从进入到退出。顶部有 ${phases.length} 个编号阶段：before_agent A B C，before_model A B C，wrap_model_call 依次进入 A B C、模型在最内层、再依次离开 C B A，after_model C B A，wrap_tool_call 依次进入 A B C、围住 add 工具、再依次离开 C B A，同样的模型阶段再来一遍，以及 after_agent C B A。A 的条最长，所以 A 是最外层。轨迹下方是从编译后的 agent 读出的图的边：${chain.join(' 到 ')}。`,
 }, f => {
-  f.kicker(20, 18, `${events.length} hook calls in the order they ran`);
+  f.kicker(20, 18, `${events.length} 次钩子调用，按运行顺序排列`);
   phases.forEach((phase, n) => {
     const x1 = px(phase.start) - PITCH * 0.4;
     const x2 = px(phase.end) + PITCH * 0.4;
@@ -84,24 +84,24 @@ module.exports = figure('fig-4-5', {
     const names = events.slice(phase.start, phase.end + 1).filter(e => e.who && e.edge !== 'exit').map(e => e.who).join(' ');
     return `${n + 1} ${phase.kind}${names ? `: ${names}` : ''}`;
   });
-  f.kicker(20, 238, 'phases');
+  f.kicker(20, 238, '阶段');
   key.forEach((line, i) => f.text(20 + (i % 3) * 206, 258 + Math.floor(i / 3) * 18, line, { size: 11, hue: 'ink-soft' }));
 
   const legendY = 330;
   f.emit(`<circle cx="26" cy="${legendY - 4}" r="4" fill="${color('indigo-ink')}" stroke="${color('indigo-ink')}" stroke-width="1.4"/>`);
-  f.text(36, legendY, 'before_ node hook', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(36, legendY, 'before_ 节点钩子', { size: 11, serif: true, hue: 'ink-soft' });
   f.emit(`<circle cx="176" cy="${legendY - 4}" r="4" fill="${color('panel')}" stroke="${color('indigo-ink')}" stroke-width="1.4"/>`);
-  f.text(186, legendY, 'after_ node hook', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(186, legendY, 'after_ 节点钩子', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(316, legendY - 10, 22, 12, { hue: 'blue' });
   f.text(344, legendY, 'wrap_model_call', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(470, legendY - 10, 22, 12, { hue: 'green' });
   f.text(498, legendY, 'wrap_tool_call', { size: 11, serif: true, hue: 'ink-soft' });
 
-  f.kicker(20, 372, 'graph edges around the model node');
+  f.kicker(20, 372, 'model 节点周围的图的边');
   chain.forEach((node, i) => {
     const x = 20 + i * 122;
     f.box({ x, y: 386, w: 100, h: 26, hue: node === 'model' ? 'indigo' : 'blue', title: node, titleSize: 11, pad: 2 });
     if (i < chain.length - 1) f.arrow([x + 100, 399], [x + 121, 399], { style: 'call' });
   });
-  f.text(20, 436, 'Each after_model hook is its own node, and the edges run in the reverse of the list order.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 436, '每个 after_model 钩子都是独立的节点，边按列表顺序的反方向连接。', { size: 11, serif: true, hue: 'ink-soft' });
 });
