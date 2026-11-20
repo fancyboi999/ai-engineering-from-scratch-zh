@@ -1,31 +1,31 @@
-# Channels and colliding writes
+# 通道与冲突写入
 
-> Give every key that two nodes write in one superstep a reducer before you deploy: a conflict breaks every later read of the thread, and only a reducer repairs it.
+> 部署之前，给每个会在同一超步里被两个节点写入的键加一个 reducer：冲突会让该线程之后的每次读取都失败，只有 reducer 能修复它。
 
-You add a second branch to a graph that works. Both branches ask the model for a value and set `x`. The first run fails with `InvalidUpdateError`. You open the thread in your admin page to look. That read fails with the same error, and so does a retry of the run, and so does a new turn.
+你给一张能正常工作的图加了第二个分支。两个分支都向模型要一个值，并设置 `x`。第一次运行就以 `InvalidUpdateError` 失败。你在管理页面里打开这个线程去看，这次读取以同样的错误失败，重试这次运行也失败，开一个新的轮次还是失败。
 
-When you finish this section, you can say what each channel type does with zero, one, or two writes in a superstep. You can also repair a thread that a conflict broke, and say when a message id can change across a resume.
+读完本节，你能说出每种通道类型在一个超步里收到零次、一次或两次写入时会怎么做。你还能修复被冲突弄坏的线程，并说出消息 id 何时可能在一次恢复前后发生变化。
 
-## Seven channels, three cases
+## 七种通道，三种情形 {#s-channels-and-colliding-writes-seven-channels-three-cases}
 
-**Channel:** the object that holds one key of the graph state, or one internal value of the loop. `apply_writes` calls its `update` once per superstep with all the writes for it.
+**通道：** 保存图状态里一个键，或循环里一个内部值的对象。`apply_writes` 每个超步对它调用一次 `update`，传入针对它的全部写入。
 
-The capture drives each channel class directly with the same list of writes that `apply_writes` would pass. This part calls no model, because it tests the channel classes alone. The table is the result at `langgraph` 1.2.22:
+录制直接驱动每个通道类，传入与 `apply_writes` 会传的相同的写入列表。这一部分不调用模型，因为它只测试通道类。下表是 `langgraph` 1.2.22 上的结果：
 
-| Channel | Used for | No write | One write | Two writes in one superstep |
+| 通道 | 用途 | 没有写入 | 一次写入 | 一个超步里两次写入 |
 |---|---|---|---|---|
-| `LastValue` | a state key with no reducer | keeps the value | replaces it | raises `InvalidUpdateError` |
-| `BinaryOperatorAggregate` | a key with a reducer, such as `add_messages` | keeps the value | folds it in | folds both, in task-path order |
-| `Topic(accumulate=False)` | `__pregel_tasks`, the queue of `Send` | clears the queue | holds it | holds both |
-| `EphemeralValue(guard=True)` | `__start__`, the input | clears it, new version | holds it | raises |
-| `EphemeralValue(guard=False)` | `branch:to:<node>`, `jump_to` | clears it, new version | holds it | keeps the last |
-| `NamedBarrierValue` | `join:a+b:c`, an edge that waits for several nodes | keeps the names seen | adds the name | adds both |
-| `DeltaChannel` (beta) | a message list that saves writes instead of values | keeps the value | one reducer call | one reducer call for both |
+| `LastValue` | 没有 reducer 的状态键 | 保持原值 | 替换它 | 抛出 `InvalidUpdateError` |
+| `BinaryOperatorAggregate` | 带 reducer 的键，例如 `add_messages` | 保持原值 | 折叠进去 | 按任务路径顺序折叠两者 |
+| `Topic(accumulate=False)` | `__pregel_tasks`，`Send` 的队列 | 清空队列 | 保存它 | 两者都保存 |
+| `EphemeralValue(guard=True)` | `__start__`，输入 | 清空它，新版本 | 保存它 | 抛出异常 |
+| `EphemeralValue(guard=False)` | `branch:to:<node>`、`jump_to` | 清空它，新版本 | 保存它 | 保留最后一个 |
+| `NamedBarrierValue` | `join:a+b:c`，一条等待多个节点的边 | 保持已见到的名字 | 加入该名字 | 两个都加入 |
+| `DeltaChannel`（beta） | 保存写入而不是值的消息列表 | 保持原值 | 一次 reducer 调用 | 两者合并为一次 reducer 调用 |
 
-The rows come from the channel code: `LastValue` raises on more than one value {{code libs/langgraph/langgraph/channels/last_value.py:56-64}}. `BinaryOperatorAggregate` folds each value and refuses two `Overwrite` values {{code libs/langgraph/langgraph/channels/binop.py:127-148}}. The two ephemeral channels clear on an empty update {{code libs/langgraph/langgraph/channels/ephemeral_value.py:55-68}}. A `Topic` without `accumulate` empties itself first on every update {{code libs/langgraph/langgraph/channels/topic.py:77-85}}. The barrier adds each name it knows {{code libs/langgraph/langgraph/channels/named_barrier_value.py:56-67}}. `DeltaChannel` passes the whole list of writes to its reducer in one call {{code libs/langgraph/langgraph/channels/delta.py:159-183}}.
+这些行来自通道代码：`LastValue` 在收到多于一个值时抛出异常 {{code libs/langgraph/langgraph/channels/last_value.py:56-64}}。`BinaryOperatorAggregate` 逐个折叠每个值，并拒绝两个 `Overwrite` 值 {{code libs/langgraph/langgraph/channels/binop.py:127-148}}。两个临时通道在空更新时清空 {{code libs/langgraph/langgraph/channels/ephemeral_value.py:55-68}}。不带 `accumulate` 的 `Topic` 在每次更新时先清空自己 {{code libs/langgraph/langgraph/channels/topic.py:77-85}}。屏障把它认识的每个名字都加进去 {{code libs/langgraph/langgraph/channels/named_barrier_value.py:56-67}}。`DeltaChannel` 把整个写入列表一次性传给它的 reducer {{code libs/langgraph/langgraph/channels/delta.py:159-183}}。
 
 ```listing
-title: one channel, three updates
+title: 一个通道，三次更新
 source: capture/lab/internals/02-channels/trace.txt
 lang: text
 ---
@@ -35,17 +35,17 @@ lang: text
   update([2, 3]) -> RAISES InvalidUpdateError: At key 'x': Can receive only one value per step. Use an Annotated key to handle multiple values.; available=True get=1 checkpoint()=1
 ```
 
-## The conflict that breaks a thread
+## 会弄坏线程的冲突 {#s-channels-and-colliding-writes-the-conflict-that-breaks-a-thread}
 
-The error itself is documented in [section 6.1](#s-stategraph-state-and-reducers). What happens to the thread after it is not.
+这个错误本身记录在[第 6.1 节](#s-stategraph-state-and-reducers)。而它之后线程会怎样，却没有记录。
 
-The capture runs `START -> a` and `START -> b` on `InMemorySaver`, with Qwen3 4B on the x86 server guest. `a` asks the model for the digit 1 and returns it as `x`, and `b` does the same for 2. `x` has no reducer. The raise comes from the update phase, after both node bodies and both model calls ran {{code libs/langgraph/langgraph/pregel/_loop.py:732}} {{code libs/langgraph/langgraph/pregel/_algo.py:319}}:
+录制在 `InMemorySaver` 上运行 `START -> a` 和 `START -> b`，在 x86 服务器客户机上用 Qwen3 4B。`a` 向模型要数字 1 并把它作为 `x` 返回，`b` 对 2 做同样的事。`x` 没有 reducer。异常来自更新阶段，此时两个节点体和两次模型调用都已经运行完 {{code libs/langgraph/langgraph/pregel/_loop.py:732}} {{code libs/langgraph/langgraph/pregel/_algo.py:319}}：
 
 ```listing
-title: the raise, and the writes saved before it
+title: 抛出的异常，以及它之前已保存的写入
 source: capture/lab/internals/02-channels/trace.txt
 lang: text
-note: The frame list and the per-checkpoint dump are cut.
+note: 帧列表和逐检查点转储被截掉了。
 ---
 raised InvalidUpdateError: At key 'x': Can receive only one value per step. Use an Annotated key to handle multiple values.
 …
@@ -58,17 +58,17 @@ raw saver.get_tuple works: checkpoint step=0 pending_writes=[('26351ed0', 'x', 1
 invoke(None) resume raises again: InvalidUpdateError; node bodies re-run on resume: [] (empty means the saved writes were reapplied, not re-executed)
 ```
 
-Both writes were saved as pending writes of the checkpoint at step 0. `get_state` applies pending writes to build the state it returns {{code libs/langgraph/langgraph/pregel/main.py:1326-1333}}. So it calls the same `LastValue.update` with the same two values, and it raises the same error. `invoke(None)` reapplies the same writes and raises without running a node or the model. Only the raw saver reads the thread.
+两次写入都作为步骤 0 检查点的待定写入保存了下来。`get_state` 应用待定写入来构建它返回的状态 {{code libs/langgraph/langgraph/pregel/main.py:1326-1333}}。所以它用同样的两个值调用同一个 `LastValue.update`，抛出同样的错误。`invoke(None)` 重新应用同样的写入，并在不运行任何节点或模型的情况下抛出异常。只有原始 saver 能读取这个线程。
 
-## Repairing a broken thread
+## 修复一个损坏的线程 {#s-channels-and-colliding-writes-repairing-a-broken-thread}
 
-**We measured** four ways out on the x86 server guest with Qwen3 4B, one run each, with the same graph and `InMemorySaver`. The file made 14 model calls in all:
+**我们测得**四条出路，在 x86 服务器客户机上用 Qwen3 4B，每条一次运行，用同一张图和 `InMemorySaver`。这个文件一共做了 14 次模型调用：
 
 ```listing
-title: four repairs of a thread with a LastValue conflict
+title: 修复带 LastValue 冲突的线程的四种办法
 source: capture/lab/internals/02-channels/repair.txt
 lang: text
-note: The checkpoint id in the update_state result is cut, and so are parts 3 and 4.
+note: update_state 结果里的检查点 id 被截掉了，第 3 和第 4 部分也被截掉了。
 ---
 ## 1. same graph, after the raise
 get_state: raises InvalidUpdateError: At key 'x': Can receive only one value per step. Use an Annotated key to handle multiple v
@@ -83,30 +83,30 @@ invoke(None): ok -> {'x': 3}
 node bodies run by invoke(None): []; model calls so far 8
 ```
 
-`update_state` wrote a new checkpoint, and the next `invoke(None)` ran both nodes and both model calls again, then raised again. A new turn raised too, because the graph is still wrong. A fork from the input checkpoint ran both nodes and raised. Only a fixed schema helped. The same saver with `x: Annotated[int, operator.add]` read the thread at once and finished the run. No node ran again, so no model call was paid twice.
+`update_state` 写入了一个新检查点，接下来的 `invoke(None)` 把两个节点和两次模型调用又都运行了一遍，然后再次抛出异常。新开一轮也抛出，因为图仍然是错的。从输入检查点分叉出去，也运行了两个节点并抛出。只有修好 schema 才有用。同一个 saver 配上 `x: Annotated[int, operator.add]`，立刻读出了线程并完成了这次运行。没有任何节点再次运行，所以没有模型调用被付两次钱。
 
-[Figure](#fig-2-2) draws the broken run and the repair.
+[图](#fig-2-2)画出这次损坏的运行和修复。
 
 ```figure
 id: fig-2-2
 kind: sequence
-title: a LastValue conflict, the reads that fail after it, and the repair
-claim: Both writes are saved before the update raises, so every read replays the conflict until a schema with a reducer reapplies the same saved writes.
-caption: Read top to bottom. Teal arrows are pending writes saved to InMemorySaver, rose arrows are raises, and the lower block is the same thread under the fixed graph. From capture/lab/internals/02-channels/trace.txt and capture/lab/internals/02-channels/repair.txt.
+title: 一次 LastValue 冲突、它之后失败的读取，以及修复
+claim: 两次写入在更新抛出异常之前就已保存，所以每次读取都会重放这次冲突，直到带 reducer 的 schema 重新应用同样那些已保存的写入。
+caption: 从上到下阅读。青绿色箭头是保存到 InMemorySaver 的待定写入，玫瑰色箭头是抛出的异常，下方的块是同一个线程在修好的图下的情形。来源：capture/lab/internals/02-channels/trace.txt 和 capture/lab/internals/02-channels/repair.txt。
 ```
 
-So a conflict needs no data repair. Deploy the reducer, and every broken thread finishes from its saved writes. The reducer you pick decides the value: `operator.add` gave 3 here, which is the input 0 plus 1 plus 2. Choose the reducer for what the key means, and expect it to see the writes in task-path order.
+所以冲突不需要修复数据。部署 reducer，每个损坏的线程都会用它已保存的写入完成。你选的 reducer 决定了值：这里 `operator.add` 得到 3，即输入 0 加 1 加 2。按键的含义选 reducer，并预期它按任务路径顺序看到写入。
 
-## The add_messages id race
+## add_messages 的 id 竞争 {#s-channels-and-colliding-writes-the-add-messages-id-race}
 
-**add_messages:** the reducer of a message list. It replaces a message with the same id, removes the message that a `RemoveMessage` names, and appends the rest.
+**add_messages：** 消息列表的 reducer。它替换具有相同 id 的消息，删除 `RemoveMessage` 点名的消息，并追加其余的。
 
-A message with no id gets a new `uuid4` inside `add_messages`. The reducer sets it on the message object itself {{code libs/langgraph/langgraph/graph/message.py:199-205}}. That happens in the update phase. By then, the loop has already passed the same object to the background `put_writes` of the checkpointer. So the saved pending write has the id only if serialization ran after the reducer.
+没有 id 的消息，会在 `add_messages` 内部得到一个新的 `uuid4`。reducer 把它直接设在消息对象本身上 {{code libs/langgraph/langgraph/graph/message.py:199-205}}。这发生在更新阶段。到那时，循环已经把同一个对象交给了 checkpointer 的后台 `put_writes`。所以，已保存的待定写入只有在序列化发生在 reducer 之后时才带有这个 id。
 
-A reply from a chat model already carries an id, which LangChain sets from the run, so the race cannot touch it. The test node returns the model reply and a second message that it builds from the reply text, with no id:
+聊天模型的回复已经带着 id，LangChain 根据运行来设置它，所以竞争碰不到它。测试节点返回模型的回复，以及一条根据回复文本构建、没有 id 的第二条消息：
 
 ```listing
-title: the node of the race test
+title: 竞争测试的节点
 source: capture/lab/internals/02-channels/race.py
 lang: python
 ---
@@ -116,23 +116,23 @@ lang: python
         return {"messages": [r, AIMessage(content="copied: " + r.text)]}
 ```
 
-**We measured** it on the x86 server guest with Qwen3 4B, two runs of 200, on `InMemorySaver` with `durability="async"`. All 400 model replies carried an id when the node returned. The built message was saved with its id in 200 of 200 runs, both times. A control with no model, where the node returns the built message at once, gave 200 of 200 twice. The same control with a 0.6 s sleep in the node saved 4 of 200 writes without an id:
+**我们测得**这一点，在 x86 服务器客户机上用 Qwen3 4B，两次各 200 个运行，在 `InMemorySaver` 上用 `durability="async"`。节点返回时，全部 400 条模型回复都带着 id。构建出来的消息在 200 次运行中的 200 次都带着 id 保存了下来，两次都是如此。一个没有模型的对照，节点立刻返回构建的消息，两次都是 200 次中的 200 次。同样的对照，在节点里加 0.6 秒的睡眠，有 200 次写入中的 4 次保存时没有 id：
 
 ```listing
-title: the control run that lost the id
+title: 丢了 id 的对照运行
 source: capture/lab/internals/02-channels/race_control_sleep06.txt
 lang: text
 ---
   {"with id": 196, "without id": 4}
 ```
 
-So the race is rare, and only a message that your own code builds is exposed. When the saved write has no id, a resume reapplies it and `add_messages` gives the message a second, different id. A client that streamed the first id and later edits or removes the message by id then misses it. The loop gives stable ids only to messages in a `DeltaChannel` {{code libs/langgraph/langgraph/pregel/_messages.py:516-547}}. Set `id=str(uuid4())` on every message you build, so the reducer never has to.
+所以这个竞争很少见，而且只有你自己的代码构建的消息才会暴露。当已保存的写入没有 id 时，恢复会重新应用它，`add_messages` 就给这条消息第二个不同的 id。已经流式收到第一个 id、之后按 id 编辑或删除这条消息的客户端，就会找不到它。只有 `DeltaChannel` 里的消息，循环才会给出稳定的 id {{code libs/langgraph/langgraph/pregel/_messages.py:516-547}}。给你构建的每条消息设上 `id=str(uuid4())`，这样 reducer 就不必去设了。
 
 ```takeaways
-- Give every key that two nodes can write in one superstep a reducer.
-- After a LastValue conflict, deploy the reducer and resume with invoke(None), because the saved writes are reapplied.
-- Use update_state only to make the thread readable, because only a reducer stops the next run from raising.
-- Set an id on every message your code builds, because model replies have one and built messages do not.
+- 给每个会在同一超步里被两个节点写入的键加一个 reducer。
+- 发生 LastValue 冲突之后，部署 reducer 并用 invoke(None) 恢复，因为已保存的写入会被重新应用。
+- update_state 只用来让线程变得可读，因为只有 reducer 才能阻止下一次运行再次抛出异常。
+- 给你的代码构建的每条消息设置 id，因为模型回复自带一个，而构建出来的消息没有。
 ```
 
-Sources: capture/lab/internals/02-channels/trace.txt, capture/lab/internals/02-channels/run.py, capture/lab/internals/02-channels/repair.txt, capture/lab/internals/02-channels/repair.py, capture/lab/internals/02-channels/race.py, capture/lab/internals/02-channels/race_run1.txt, capture/lab/internals/02-channels/race_run2.txt, capture/lab/internals/02-channels/race_control.py, capture/lab/internals/02-channels/race_control_nodelay_run1.txt, capture/lab/internals/02-channels/race_control_nodelay_run2.txt, capture/lab/internals/02-channels/race_control_sleep06.txt, capture/lab/internals/common/instrument.py, capture/lab/internals/common/real.py; libs/langgraph/langgraph/channels/last_value.py, libs/langgraph/langgraph/channels/binop.py, libs/langgraph/langgraph/channels/ephemeral_value.py, libs/langgraph/langgraph/channels/topic.py, libs/langgraph/langgraph/channels/named_barrier_value.py, libs/langgraph/langgraph/channels/delta.py, libs/langgraph/langgraph/graph/message.py, libs/langgraph/langgraph/pregel/_messages.py, libs/langgraph/langgraph/pregel/_loop.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22.
+来源： capture/lab/internals/02-channels/trace.txt, capture/lab/internals/02-channels/run.py, capture/lab/internals/02-channels/repair.txt, capture/lab/internals/02-channels/repair.py, capture/lab/internals/02-channels/race.py, capture/lab/internals/02-channels/race_run1.txt, capture/lab/internals/02-channels/race_run2.txt, capture/lab/internals/02-channels/race_control.py, capture/lab/internals/02-channels/race_control_nodelay_run1.txt, capture/lab/internals/02-channels/race_control_nodelay_run2.txt, capture/lab/internals/02-channels/race_control_sleep06.txt, capture/lab/internals/common/instrument.py, capture/lab/internals/common/real.py; libs/langgraph/langgraph/channels/last_value.py, libs/langgraph/langgraph/channels/binop.py, libs/langgraph/langgraph/channels/ephemeral_value.py, libs/langgraph/langgraph/channels/topic.py, libs/langgraph/langgraph/channels/named_barrier_value.py, libs/langgraph/langgraph/channels/delta.py, libs/langgraph/langgraph/graph/message.py, libs/langgraph/langgraph/pregel/_messages.py, libs/langgraph/langgraph/pregel/_loop.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22.

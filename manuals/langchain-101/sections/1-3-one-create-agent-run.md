@@ -1,20 +1,20 @@
-# One create_agent run, from invoke to the last checkpoint
+# 一次 create_agent 运行，从 invoke 到最后一个检查点
 
-> One `invoke` of a `create_agent` agent runs four graph steps, makes two model calls and one tool call, and with a checkpointer saves five checkpoints.
+> 对 `create_agent` 的 agent 做一次 `invoke`，会运行四个图步骤，做两次模型调用和一次工具调用，带 checkpointer 时保存五个检查点。
 
-You call `agent.invoke` with one question and get four messages back. The reply looks like one exchange with a model. Behind it, a graph ran four steps, the model ran twice, and a tool ran once. When a run fails later, the error names one of those steps, so you need to know their order.
+你用一个问题调用 `agent.invoke`，拿回四条消息。回复看起来像是和模型的一次交流。在它背后，一张图运行了四个步骤，模型运行了两次，一个工具运行了一次。之后某次运行失败时，错误会点名其中一个步骤，所以你需要知道它们的顺序。
 
-When you finish this section, you can name each step of one agent run and the state after it. You can also say what a checkpointer saves at each step, and what a trace records.
+读完本节，你能说出一次 agent 运行的每个步骤，以及每一步之后的状态。你还能说出 checkpointer 在每一步保存什么，以及追踪记录什么。
 
-## The run
+## 这次运行 {#s-one-create-agent-run-the-run}
 
-The agent from the [first run](#s-front) has one tool, `add`, and the system prompt `You add numbers.`. Its model is Qwen3 4B on Ollama. It called `add` with 2 and 3, and then answered. This is the state at the end of the run:
+[第一次运行](#s-front)里的 agent 有一个工具 `add`，系统提示词是 `You add numbers.`。它的模型是 Ollama 上的 Qwen3 4B。它用 2 和 3 调用了 `add`，然后给出回答。下面是运行结束时的状态：
 
 ```listing
-title: the final state of one run
+title: 一次运行的最终状态
 source: capture/out/06-agent-run.txt
 lang: json
-note: The key list and the metadata of each reply are cut. All four messages are shown.
+note: 键列表和每条回复的元数据被截掉了。四条消息全部展示。
 ---
   {
     "type": "HumanMessage",
@@ -51,17 +51,17 @@ note: The key list and the metadata of each reply are cut. All four messages are
     "id": "lc_run--<uuid-5>-0",
 ```
 
-The state holds one key, `messages`. The system prompt is not in it. The two model replies have ids that start with `lc_run--`, because LangChain gives each model output the id of its run. The human and tool messages get a plain UUID when the graph adds them. The tool call id is a UUID too, because `ChatOllama` makes one for each call. Each reply also carries `response_metadata` and `usage_metadata` from Ollama, with the token counts of the call.
+状态里只有一个键 `messages`，系统提示词不在其中。两条模型回复的 id 以 `lc_run--` 开头，因为 LangChain 把每次模型输出所属运行的 id 给了它。人类消息和工具消息在图添加它们时得到一个普通的 UUID。工具调用 id 也是 UUID，因为 `ChatOllama` 为每次调用生成一个。每条回复还带着来自 Ollama 的 `response_metadata` 和 `usage_metadata`，里面是该次调用的 token 数。
 
-## What the model received
+## 模型收到了什么 {#s-one-create-agent-run-what-the-model-received}
 
-The kit records each call with a callback handler. The model ran twice, and both calls got the system prompt first and the same bound tool:
+工具包用一个回调处理器记录每次调用。模型运行了两次，两次调用都先收到系统提示词，并绑定了同一个工具：
 
 ```listing
-title: the two model calls
+title: 两次模型调用
 source: capture/out/06-agent-run.txt
 lang: json
-note: Cut to the messages and the bound tools. The model label is cut.
+note: 截取消息和绑定的工具。模型标签被截掉了。
 ---
     "call": 1,
     "messages": [
@@ -81,31 +81,31 @@ note: Cut to the messages and the bound tools. The model label is cut.
     ],
 ```
 
-So the agent sends the whole conversation on every call, and it adds the system prompt to the front of each request. [Section 3.5](#s-the-system-prompt) explains why the prompt stays out of the state.
+所以 agent 在每次调用里都发送整段对话，并把系统提示词加到每个请求的最前面。[第 3.5 节](#s-the-system-prompt)解释为什么提示词不放在状态里。
 
-## Step by step
+## 逐步看 {#s-one-create-agent-run-step-by-step}
 
-[Figure](#fig-1-3) draws the run. The numbers in this list match the rows of the figure.
+[图](#fig-1-3)画出这次运行。这个列表里的编号与图中的行相对应。
 
 ```figure
 id: fig-1-3
 kind: sequence
-title: one create_agent run, step by step
-claim: The model node runs twice and the tools node once, and the checkpointer saves the state after the input and after each of the four steps.
-caption: Read the rows from top to bottom. Each teal arrow is one checkpoint, with its step number. The amber note under each checkpoint is the node that runs next. The chips on the right are the messages in each checkpoint, and a bold chip is new in that step. From capture/out/06-agent-run.txt, capture/out/05-agent-graph.txt, and capture/out/30-state-history-forks.txt.
+title: 一次 create_agent 运行，逐步展开
+claim: model 节点运行两次，tools 节点运行一次，checkpointer 在输入之后和四个步骤之后各保存一次状态。
+caption: 从上到下阅读各行。每个青绿色箭头是一个检查点，带着它的步骤编号。每个检查点下方的琥珀色注释是接下来运行的节点。右侧的小标签是每个检查点里的消息，粗体标签是这一步新增的。来源：capture/out/06-agent-run.txt、capture/out/05-agent-graph.txt 和 capture/out/30-state-history-forks.txt。
 ```
 
-1. `invoke` puts the input on the graph. With a checkpointer, LangGraph saves the input checkpoint, step `-1`.
-2. The `__start__` node writes the human message into `messages`. Checkpoint step `0` says the next node is `model`.
-3. The `model` node adds the system prompt, binds the tools, and calls the model. The model answers with one tool call. Checkpoint step `1` says the next node is `tools`.
-4. The `tools` node runs `add(a=2, b=3)` and appends a `ToolMessage` whose `tool_call_id` is the id of the call. Checkpoint step `2` says the next node is `model`.
-5. The `model` node calls the model again with all three messages. The model answers with text and no tool call.
-6. The edge after `model` sees no tool call and goes to `__end__`. Checkpoint step `3` has no next node, and `invoke` returns the state.
+1. `invoke` 把输入送到图上。有 checkpointer 时，LangGraph 保存输入检查点，步骤为 `-1`。
+2. `__start__` 节点把人类消息写进 `messages`。步骤 `0` 的检查点说明下一个节点是 `model`。
+3. `model` 节点加上系统提示词，绑定工具，并调用模型。模型用一次工具调用作答。步骤 `1` 的检查点说明下一个节点是 `tools`。
+4. `tools` 节点运行 `add(a=2, b=3)`，并追加一条 `ToolMessage`，它的 `tool_call_id` 就是那次调用的 id。步骤 `2` 的检查点说明下一个节点是 `model`。
+5. `model` 节点带着全部三条消息再次调用模型。模型用文本作答，没有工具调用。
+6. `model` 之后的边看到没有工具调用，就走向 `__end__`。步骤 `3` 的检查点没有下一个节点，`invoke` 返回状态。
 
-The edges in the compiled graph say the same. Two edges out of `model` are conditional, and the tool calls choose between them:
+编译后的图里的边说的是同一件事。从 `model` 出去的两条边是条件边，由工具调用在它们之间做选择：
 
 ```listing
-title: the edges of the agent graph
+title: agent 图的边
 source: capture/out/05-agent-graph.txt
 lang: json
 ---
@@ -117,29 +117,29 @@ lang: json
 ]
 ```
 
-A graph with no tools has no `tools` node. It is `__start__`, `model`, and `__end__`, and it runs one model call.
+没有工具的图没有 `tools` 节点。它只有 `__start__`、`model` 和 `__end__`，运行一次模型调用。
 
-[Figure](#fig-1-3c) draws the graph of this agent from the Mermaid text that the compiled graph returns. [Section 4.1](#s-create-agent-and-the-graph-it-builds) shows how to draw your own.
+[图](#fig-1-3c)根据编译后的图返回的 Mermaid 文本，画出这个 agent 的图。[第 4.1 节](#s-create-agent-and-the-graph-it-builds)展示如何画你自己的图。
 
 ```figure
 id: fig-1-3c
 kind: structure
-title: the graph of the agent in this run
-claim: One plain edge leads into model, and three conditional edges leave model and tools, so the run picks its path at run time.
-caption: Read from __start__ at the top. Solid arrows are plain edges, and dashed amber arrows are conditional edges. The tools node lists its one tool. From capture/out/48-draw-agent.txt.
+title: 这次运行里 agent 的图
+claim: 一条普通边通向 model，三条条件边从 model 和 tools 出发，所以运行在运行时才选定路径。
+caption: 从顶部的 __start__ 开始读。实线箭头是普通边，琥珀色虚线箭头是条件边。tools 节点列出它唯一的工具。来源：capture/out/48-draw-agent.txt。
 ```
 
-## The checkpoints
+## 检查点 {#s-one-create-agent-run-the-checkpoints}
 
-**Checkpoint:** the saved state of one thread after one step, with the step number, the next nodes, and the id of the checkpoint before it.
+**检查点：** 一个线程在某一步之后保存的状态，带着步骤编号、下一个节点，以及它之前那个检查点的 id。
 
-The run above had no checkpointer. The kit runs the same shape of agent with `InMemorySaver` in two other scenarios. One asks `What is 2 + 3?` and then a second question on the same thread. After both turns the thread had 8 checkpoints, and the last was step 6:
+上面那次运行没有 checkpointer。工具包在另外两个场景里用 `InMemorySaver` 运行同样形状的 agent。其中一个问了 `What is 2 + 3?`，然后在同一个线程上问了第二个问题。两轮之后，线程里有 8 个检查点，最后一个是步骤 6：
 
 ```listing
-title: the thread after two turns
+title: 两轮之后的线程
 source: capture/out/28-checkpoint-memory.txt
 lang: text
-note: Cut to the step of the last checkpoint and the count.
+note: 截取最后一个检查点的步骤和数量。
 ---
   "step": 6,
   "source": "loop",
@@ -147,15 +147,15 @@ note: Cut to the step of the last checkpoint and the count.
 8 checkpoints
 ```
 
-The first turn saved steps `-1` to `3`, which is five checkpoints. The second turn saved steps `4` to `6`. It made one model call, because the model answered without a tool.
+第一轮保存了步骤 `-1` 到 `3`，共五个检查点。第二轮保存了步骤 `4` 到 `6`。它只做了一次模型调用，因为模型没有用工具就作答了。
 
-The other scenario asks a `charge` tool to charge 10 and reads the history back, newest first. Its steps match the list above, one for one:
+另一个场景让 `charge` 工具扣 10，并按从新到旧的顺序读回历史。它的步骤与上面的列表逐一对应：
 
 ```listing
-title: the history of one turn, newest first
+title: 一轮的历史，从新到旧
 source: capture/out/30-state-history-forks.txt
 lang: json
-note: Cut to the step, the source, and the next nodes of each checkpoint. The ids and the messages are cut.
+note: 截取每个检查点的步骤、来源和下一个节点。id 和消息被截掉了。
 ---
   "step": 3,
   "source": "loop",
@@ -186,17 +186,17 @@ note: Cut to the step, the source, and the next nodes of each checkpoint. The id
   ],
 ```
 
-A checkpoint whose `next` names a node is a place where the run can stop and resume. Part 5 says when each checkpoint is written, and what a crash between two of them repeats.
+`next` 指向某个节点的检查点，是运行可以停下并恢复的地方。第 5 部分说明每个检查点何时写入，以及两个检查点之间的崩溃会重复什么。
 
-## The stream of the same run
+## 同一次运行的流 {#s-one-create-agent-run-the-stream-of-the-same-run}
 
-Every compiled `StateGraph` has the default stream mode `updates`, and an agent is one {{code libs/langgraph/langgraph/graph/state.py}}. So `agent.stream(input)` with no mode yields one chunk for each step, keyed by the node that ran:
+每张编译后的 `StateGraph` 都有默认流模式 `updates`，agent 也是其中之一 {{code libs/langgraph/langgraph/graph/state.py}}。所以不带模式的 `agent.stream(input)` 为每一步产出一个块，以运行的节点为键：
 
 ```listing
-title: the chunks of a stream with no mode
+title: 不带模式的流所产出的块
 source: capture/out/21-stream-updates-values.txt
 lang: json
-note: The last section of the file. Each chunk is cut to its keys.
+note: 文件的最后一部分。每个块都截成它的键。
 ---
 chunk 0 keys:
 [
@@ -214,17 +214,17 @@ chunk 2 keys:
 ]
 ```
 
-Three chunks for three node runs. The `__start__` step yields no chunk. Part 5 shows the other stream modes.
+三次节点运行，三个块。`__start__` 步骤不产出块。第 5 部分展示其他流模式。
 
-## The trace
+## 追踪 {#s-one-create-agent-run-the-trace}
 
-With tracing on, LangChain sends one run to LangSmith for each piece of work. The kit wraps the same agent in a local trace and records what the client would send:
+开启追踪后，LangChain 为每一份工作向 LangSmith 发送一条运行记录。工具包把同一个 agent 包进一个本地追踪，并记录客户端本来会发送的内容：
 
 ```listing
-title: the runs of one traced agent turn
+title: 一次被追踪的 agent 轮次所产生的运行
 source: capture/out/42-langsmith.txt
 lang: text
-note: Cut to the request counts and the tree of runs, which sit at lines 82 to 99 of the file.
+note: 截取请求计数和运行树，它们位于文件的第 82 到 99 行。
 ---
   "PATCH /runs/<run-id>": 7,
   "POST /runs": 7
@@ -240,25 +240,25 @@ chain agent_turn
       llm ChatOllama
 ```
 
-The tree has eight runs. The outer `agent_turn` is the `traceable` function of the kit, and it stayed in memory. The seven LangChain runs below it each got one `POST` when it started and one `PATCH` when it ended. [Figure](#fig-1-3b) draws the tree. Each node of the graph is a `chain` run, and the model calls and the tool call are leaves.
+这棵树有八个运行。最外层的 `agent_turn` 是工具包里的 `traceable` 函数，它留在内存里。它下面的七个 LangChain 运行，开始时各收到一次 `POST`，结束时各收到一次 `PATCH`。[图](#fig-1-3b)画出这棵树。图的每个节点是一个 `chain` 运行，模型调用和工具调用是叶子。
 
 ```figure
 id: fig-1-3b
 kind: tree
-title: the runs of one traced agent turn
-claim: A traced turn is a tree of runs, with one chain run for each graph node and one leaf for each model call and tool call.
-caption: Read from the root at the top. Each box is one run, with its name above its run type. The violet root stayed in memory, and the client got the seven runs below it. The plum leaves are model calls and the green leaf is the tool call. From capture/out/42-langsmith.txt.
+title: 一次被追踪的 agent 轮次所产生的运行
+claim: 一次被追踪的轮次是一棵运行树，每个图节点对应一个 chain 运行，每次模型调用和工具调用各对应一个叶子。
+caption: 从顶部的根开始读。每个方框是一个运行，运行类型之上写着它的名字。紫色的根留在内存里，客户端收到它下面的七个运行。梅红色的叶子是模型调用，绿色的叶子是工具调用。来源：capture/out/42-langsmith.txt。
 ```
 
-## The recursion limit
+## 递归上限 {#s-one-create-agent-run-the-recursion-limit}
 
-Each step counts against the recursion limit of the run. `create_agent` sets that limit to 9999 on the compiled graph, just under the LangGraph default of 10007 for other graphs:
+每个步骤都计入这次运行的递归上限。`create_agent` 在编译后的图上把这个上限设为 9999，略低于其他图的 LangGraph 默认值 10007：
 
 ```listing
-title: the config on the compiled agent
+title: 编译后 agent 上的配置
 source: capture/out/05-agent-graph.txt
 lang: json
-note: The config of the compiled graph, from the same file.
+note: 编译后的图的配置，取自同一个文件。
 ---
 {
   "recursion_limit": 9999,
@@ -269,16 +269,16 @@ note: The config of the compiled graph, from the same file.
 }
 ```
 
-A model that never stops asking for a tool runs until the limit. The kit told Qwen3 4B to count upward with `add` and never stop. With `recursion_limit=6` in the config, the run stopped after three model calls and two tool calls, with `GraphRecursionError: Recursion limit of 6 reached without hitting a stop condition.`
+一个永不停止地要求工具的模型，会一直运行到上限。工具包让 Qwen3 4B 用 `add` 一直往上数，永不停止。配置里设 `recursion_limit=6` 时，运行在三次模型调用和两次工具调用之后停止，错误是 `GraphRecursionError: Recursion limit of 6 reached without hitting a stop condition.`。
 
-**We measured** a looping agent on the x86 server guest. With Qwen3 4B, it made 121 model calls before the script stopped it at 1200 s, and it showed no sign of stopping. `recursion_limit=25` stopped it after 13 model calls, in 3 of 3 runs. Set a limit that fits your task, because a loop costs every model call it makes.
+**我们测得**一个循环的 agent，在 x86 服务器客户机上。用 Qwen3 4B 时，它做了 121 次模型调用，脚本在 1200 秒时把它停掉，而它没有任何要停的迹象。`recursion_limit=25` 让它在 13 次模型调用之后停下，3 次运行里 3 次如此。设一个适合你任务的上限，因为循环会为它做的每一次模型调用付费。
 
 ```takeaways
-- Expect the model to receive the system prompt and the whole conversation on every call.
-- Read next on a checkpoint to know which node runs on a resume.
-- Pass a checkpointer and a thread_id when you need the steps saved.
-- Stream with no mode to get one chunk for each node run.
-- Set recursion_limit for each run, because the default of 9999 steps allows about 5000 model calls. This is arithmetic, not a run.
+- 预期模型在每次调用里都会收到系统提示词和整段对话。
+- 读检查点上的 next，就知道恢复时哪个节点会运行。
+- 需要保存各步骤时，传入 checkpointer 和 thread_id。
+- 不带模式地流式输出，就为每次节点运行得到一个块。
+- 为每次运行设置 recursion_limit，因为 9999 步的默认值允许约 5000 次模型调用。这是算术，不是一次运行。
 ```
 
-Sources: capture/out/06-agent-run.txt, capture/out/05-agent-graph.txt, capture/out/48-draw-agent.txt, capture/out/28-checkpoint-memory.txt, capture/out/30-state-history-forks.txt, capture/out/21-stream-updates-values.txt, capture/out/46-recursion-agent.txt, capture/out/42-langsmith.txt; capture/lab/summary/recursion-x86.json, capture/lab/T17-claims-x86/01-claims.jsonl, capture/lab/T17-claims-x86/02-nolimit.jsonl, capture/lab/summary/recursion-mac.json, capture/lab/T17-claims-mac/01-recursion-limit.jsonl; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0, libs/langgraph/langgraph/graph/state.py and libs/langgraph/langgraph/_internal/_config.py at langgraph 1.2.22.
+来源： capture/out/06-agent-run.txt, capture/out/05-agent-graph.txt, capture/out/48-draw-agent.txt, capture/out/28-checkpoint-memory.txt, capture/out/30-state-history-forks.txt, capture/out/21-stream-updates-values.txt, capture/out/46-recursion-agent.txt, capture/out/42-langsmith.txt; capture/lab/summary/recursion-x86.json, capture/lab/T17-claims-x86/01-claims.jsonl, capture/lab/T17-claims-x86/02-nolimit.jsonl, capture/lab/summary/recursion-mac.json, capture/lab/T17-claims-mac/01-recursion-limit.jsonl; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0, libs/langgraph/langgraph/graph/state.py and libs/langgraph/langgraph/_internal/_config.py at langgraph 1.2.22.

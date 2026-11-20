@@ -1,33 +1,33 @@
-# interrupt() and Command(resume): the resume index and interrupt ids
+# interrupt() 与 Command(resume)：恢复下标与中断 id
 
-> A resume reruns the node from its first line, model calls too, and matches answers by position, so keep model calls out of interrupting nodes and resume by id map.
+> 恢复会从第一行重跑节点，模型调用也一并重跑，并按位置匹配答案，所以别把模型调用放在会中断的节点里，并用 id 映射来恢复。
 
-Your graph asks two people at once: a traveller in one branch and an approver in another. Each node first asks the model to write its question. Both questions reach your UI. The approver answers first, and your server sends `Command(resume="OK")`. LangGraph raises `RuntimeError`, and nothing resumes. When you send both answers as a map, it works, and your bill shows the model wrote the same questions again.
+你的图同时询问两个人：一个分支里问旅行者，另一个分支里问审批人。每个节点先让模型写出它的问题。两个问题都送到了你的界面。审批人先回答，你的服务器发出 `Command(resume="OK")`。LangGraph 抛出 `RuntimeError`，什么也没有恢复。当你把两个答案作为一个映射发送时，它就好了，而你的账单显示模型把同样的问题又写了一遍。
 
-When you finish this section, you can trace a resume through `interrupt()` line by line and predict which answer each call gets. You can also resume two waiting nodes in one call, and count the model calls that a resume repeats.
+读完本节，你能逐行跟踪一次经过 `interrupt()` 的恢复，并预测每次调用得到哪个答案。你还能在一次调用里恢复两个等待中的节点，并数出恢复重复的模型调用。
 
-## What interrupt() does on each call
+## interrupt() 每次调用做什么 {#s-interrupt-and-resume-in-the-code-what-interrupt-does-on-each-call}
 
-**Resume list:** the list of answers that one task has received so far, saved as a write on the channel `__resume__`.
+**恢复列表：** 一个任务到目前为止收到的答案列表，作为对 `__resume__` 通道的一次写入保存。
 
-`interrupt()` keeps a counter in the scratchpad of its task. On each call it takes the next index and tries three sources in order {{code libs/langgraph/langgraph/types.py:1029-1058}}:
+`interrupt()` 在它任务的 scratchpad 里保存一个计数器。每次调用时，它取下一个下标，并按顺序尝试三个来源 {{code libs/langgraph/langgraph/types.py:1029-1058}}：
 
-1. If the resume list of the task has an answer at this index, it returns that answer. This is the replay of an earlier question.
-2. Otherwise, if the resume command carried one answer for the whole graph, it appends that answer to the list, saves the list, and returns it.
-3. Otherwise, it raises `GraphInterrupt` with a new `Interrupt`, and the node stops.
+1. 如果该任务的恢复列表在这个下标上有答案，它就返回这个答案。这是对先前问题的重放。
+2. 否则，如果恢复命令为整张图带来了一个答案，它把这个答案追加到列表里，保存列表，并返回它。
+3. 否则，它抛出带有新 `Interrupt` 的 `GraphInterrupt`，节点随之停止。
 
-**Interrupt id:** the id of one question. It is an `xxh3` hash of the task namespace, with `|n` added for the nth unanswered question of that task {{code libs/langgraph/langgraph/types.py:583-589}}.
+**中断 id：** 一个问题的 id。它是任务命名空间的 `xxh3` 哈希，对该任务第 n 个未回答的问题再加上 `|n` {{code libs/langgraph/langgraph/types.py:583-589}}。
 
-When a task raises `GraphInterrupt`, the runner saves the question and the resume list as writes of that task {{code libs/langgraph/langgraph/pregel/_runner.py:594-600}}. The id needs no storage. The loop recomputes it from the namespace and the number of answers. The saver stores the question as a write on `__interrupt__` with index -3, and each answer on `__resume__` with index -4 {{code libs/checkpoint/langgraph/checkpoint/base/__init__.py:824}}.
+任务抛出 `GraphInterrupt` 时，运行器把问题和恢复列表作为该任务的写入保存 {{code libs/langgraph/langgraph/pregel/_runner.py:594-600}}。id 不需要存储。循环根据命名空间和已有答案的数量重新计算它。saver 把问题作为 `__interrupt__` 上下标为 -3 的写入存储，把每个答案作为 `__resume__` 上下标为 -4 的写入存储 {{code libs/checkpoint/langgraph/checkpoint/base/__init__.py:824}}。
 
-## Three calls on one thread, captured
+## 一个线程上的三次调用，录下来 {#s-interrupt-and-resume-in-the-code-three-calls-on-one-thread-captured}
 
-The capture graph runs `ask`, `approve`, and `other` in parallel after `START`, and then `after`. It uses Qwen3 4B on the x86 server guest at temperature 0. `ask` asks the model for a question, calls `interrupt()`, asks the model for a second question, and calls `interrupt()` again. `approve` asks the model for one question and calls `interrupt()` once. `other` calls the weather tool and the model, and never interrupts. Each node logs its first line with its namespace and its resume list, and logs each model call.
+录制用的图在 `START` 之后并行运行 `ask`、`approve` 和 `other`，然后运行 `after`。它在 x86 服务器客户机上用 Qwen3 4B，temperature 为 0。`ask` 向模型要一个问题，调用 `interrupt()`，再向模型要第二个问题，再调用 `interrupt()`。`approve` 向模型要一个问题，调用一次 `interrupt()`。`other` 调用天气工具和模型，从不中断。每个节点在它的第一行记录它的命名空间和它的恢复列表，并记录每次模型调用。
 
-The first `invoke` returned two interrupts. `other` ran and finished, and its writes were saved:
+第一次 `invoke` 返回了两个中断。`other` 运行并完成，它的写入被保存：
 
 ```listing
-title: run 1, two interrupts and the recomputed ids
+title: 运行 1，两个中断以及重新计算出的 id
 source: capture/lab/internals/04-interrupt/trace.txt
 lang: text
 ---
@@ -38,10 +38,10 @@ lang: text
   recompute id for approve: xxh3_128(task_checkpoint_ns='approve:56f9f439-6fe7-44ef-ec89-762fd2b36cf4') = 11314d20c136... matches=True
 ```
 
-A resume with one plain value raised, and no node and no model call ran. The loop counts the pending interrupts, and with more than one it requires a map from id to answer {{code libs/langgraph/langgraph/pregel/_loop.py:1066-1075}}:
+用一个普通值恢复，抛出了异常，没有任何节点和模型调用运行。循环会数有多少待定的中断，多于一个时，它要求一个从 id 到答案的映射 {{code libs/langgraph/langgraph/pregel/_loop.py:1066-1075}}：
 
 ```listing
-title: run 2a, one answer for two questions
+title: 运行 2a，两个问题只给一个答案
 source: capture/lab/internals/04-interrupt/trace.txt
 lang: text
 ---
@@ -49,10 +49,10 @@ lang: text
   raises RuntimeError: When there are multiple pending interrupts, you must specify the interrupt id when resuming. Docs: https://docs.langchain.com/oss/python/lan
 ```
 
-The map form worked. Both nodes ran again from their first line, and both called the model again before they reached `interrupt()`. `approve` got `OK` and finished. `ask` got `A1` for its first question, asked the model for its second, and stopped there with a new id. `other` did not run again. The loop reapplied its saved writes:
+映射形式管用。两个节点都从第一行重新运行，并且在到达 `interrupt()` 之前都又调用了一次模型。`approve` 拿到 `OK` 并完成。`ask` 为它的第一个问题拿到 `A1`，向模型要它的第二个问题，然后带着新的 id 停在那里。`other` 没有再次运行。循环重新应用了它已保存的写入：
 
 ```listing
-title: run 2b, a map of answers by id
+title: 运行 2b，按 id 给出的答案映射
 source: capture/lab/internals/04-interrupt/trace.txt
 lang: text
 ---
@@ -67,36 +67,36 @@ lang: text
   second interrupt id expected = xxh3_128(ns + '|1') = 177b6fc6979f... matches=True
 ```
 
-The third call, `Command(resume='A2')`, needed no id, because one question was left. `ask` ran a third time. It asked the model for its first question again and replayed `A1` from the list. Then it asked for its second question again and got `A2` from the command. [Figure](#fig-2-4) draws the three calls.
+第三次调用 `Command(resume='A2')` 不需要 id，因为只剩一个问题。`ask` 运行了第三次。它又一次向模型要它的第一个问题，并从列表里重放了 `A1`。然后它又要它的第二个问题，并从命令里拿到 `A2`。[图](#fig-2-4)画出这三次调用。
 
 ```figure
 id: fig-2-4
 kind: timeline
-title: three calls that answer three questions in two parallel nodes
-claim: Each call reran the waiting nodes and their model calls from the first line, replayed saved answers by index, and never ran the finished node other again.
-caption: Columns are the calls in order, and rows are the four nodes. Amber cells stop at an interrupt, with its id, teal cells finish, and the dashed cell reapplied saved writes. The list in each cell is the resume list the node saw on its first line. The bottom rows count model calls and name the checkpoints each call saved. From capture/lab/internals/04-interrupt/trace.txt.
+title: 三次调用回答两个并行节点里的三个问题
+claim: 每次调用都从第一行重新运行等待中的节点及其模型调用，按下标重放已保存的答案，并且从不再运行已完成的节点 other。
+caption: 列是按顺序排列的调用，行是四个节点。琥珀色单元格停在一个中断处，带着它的 id，青绿色单元格完成，虚线单元格重新应用了已保存的写入。每个单元格里的列表是该节点在第一行看到的恢复列表。底部几行统计模型调用，并写出每次调用保存的检查点。来源：capture/lab/internals/04-interrupt/trace.txt。
 ```
 
-## What the replay costs
+## 重放的代价 {#s-interrupt-and-resume-in-the-code-what-the-replay-costs}
 
-The graph has five model prompts: two in `ask`, one each in `approve`, `other`, and `after`. The three calls made 9 model calls:
+这张图有五个模型提示词：`ask` 里两个，`approve`、`other` 和 `after` 里各一个。三次调用做了 9 次模型调用：
 
 ```listing
-title: model calls per call of the graph
+title: 图的每次调用的模型调用数
 source: capture/lab/internals/04-interrupt/trace.txt
 lang: text
 ---
 ## model calls per invocation: {'run 1': 3, 'run 2a': 0, 'run 2b': 3, 'run 3': 3}
 ```
 
-The first question of `ask` went to the model three times, and its second question and the question of `approve` twice each. At temperature 0 the replayed questions came back word for word the same. A model that samples can write a different question on the replay. The answer still goes to the same index, so your user can answer one question and the node then sees another.
+`ask` 的第一个问题去了模型三次，它的第二个问题和 `approve` 的问题各去了两次。在 temperature 0 下，重放的问题逐字回来了。会采样的模型，在重放时可能写出不同的问题。答案仍然进入同一个下标，所以你的用户可能回答了一个问题，而节点接下来看到的是另一个。
 
-## No new checkpoint inside a superstep
+## 超步内部没有新检查点 {#s-interrupt-and-resume-in-the-code-no-new-checkpoint-inside-a-superstep}
 
-Three calls on the thread made four checkpoints, not six:
+线程上的三次调用生成了四个检查点，而不是六个：
 
 ```listing
-title: the checkpoint history after three calls
+title: 三次调用之后的检查点历史
 source: capture/lab/internals/04-interrupt/trace.txt
 lang: text
 ---
@@ -107,23 +107,23 @@ lang: text
   step=-1 source=input next=('__start__',) id=..88027e62558c
 ```
 
-Run 2b ended with `ask` still waiting, so the superstep of step 1 was not done. The answers and the new question were saved as writes on checkpoint `1ca1bd022200`, next to the writes of `other`. A checkpoint appears only when every task of the superstep has finished. So a time-travel tool that lists checkpoints shows no point between two answers to the same node.
+运行 2b 结束时 `ask` 仍在等待，所以步骤 1 的超步没有完成。答案和新问题作为写入保存在检查点 `1ca1bd022200` 上，挨着 `other` 的写入。只有超步的每个任务都完成之后，才会出现一个检查点。所以列出检查点的时间旅行工具，在对同一节点的两个答案之间不会显示任何点。
 
-## What to do
+## 该怎么做 {#s-interrupt-and-resume-in-the-code-what-to-do}
 
-Read the pending interrupts from `get_state(config).tasks`, and answer with `Command(resume={id: value})`. The loop reads a dict as a map when every key is an `xxh3` hex id, whatever the number of pending interrupts {{code libs/langgraph/langgraph/pregel/_loop.py:1045-1064}}. We did not run the map form with one interrupt. Use it always, so a second branch with a question does not break your server.
+从 `get_state(config).tasks` 读取待定的中断，并用 `Command(resume={id: value})` 回答。当每个键都是 `xxh3` 十六进制 id 时，循环把字典当作映射来读，不论待定中断有多少个 {{code libs/langgraph/langgraph/pregel/_loop.py:1045-1064}}。我们没有对只有一个中断的情况运行映射形式。始终使用它，这样第二个带问题的分支就不会弄坏你的服务器。
 
-Move each model call that writes a question into its own node, before the node that calls `interrupt()`. That node finishes, its writes are saved, and a resume does not run it again, as `other` shows. The question then stays the same on every replay, and you pay for it once.
+把每个写问题的模型调用移进它自己的节点，放在调用 `interrupt()` 的节点之前。那个节点完成后，它的写入被保存，恢复时不会再运行它，`other` 就是例子。这样问题在每次重放里保持不变，你也只为它付一次钱。
 
-Keep the `interrupt()` calls of a node in the same order on every run, and do not skip one on a condition that can change. The answer goes to an index, not to a question.
+让一个节点的 `interrupt()` 调用在每次运行里保持同样的顺序，不要因为一个可能变化的条件而跳过其中一个。答案进入的是下标，不是问题。
 
-The interrupt id is a stable name for a question. It depends only on the task namespace, and [section 2.3](#s-the-checkpoint-write-path-and-durability) measured that namespace across a crash and a new process. Use the id as the key of the question in your UI and your database.
+中断 id 是问题的稳定名字。它只取决于任务命名空间，而[第 2.3 节](#s-the-checkpoint-write-path-and-durability)在一次崩溃和一个新进程前后测量过这个命名空间。把 id 用作你的界面和数据库里该问题的键。
 
 ```takeaways
-- Resume with Command(resume={interrupt_id: value}), even for one question.
-- Put the model call that writes a question in a node before the node that interrupts.
-- Keep interrupt() calls in a fixed order, because answers are matched by index.
-- Store the interrupt id as the key of each question in your own database.
+- 即使只有一个问题，也用 Command(resume={interrupt_id: value}) 恢复。
+- 把写问题的模型调用放进一个节点，放在会中断的节点之前。
+- 让 interrupt() 调用保持固定顺序，因为答案是按下标匹配的。
+- 在你自己的数据库里，把中断 id 存为每个问题的键。
 ```
 
-Sources: capture/lab/internals/04-interrupt/trace.txt, capture/lab/internals/04-interrupt/run.py, capture/lab/internals/04-interrupt/run1.trace.jsonl, capture/lab/internals/04-interrupt/run2b.trace.jsonl, capture/lab/internals/common/real.py; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/pregel/_loop.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/_runner.py at langgraph 1.2.22; libs/checkpoint/langgraph/checkpoint/base/__init__.py at langgraph-checkpoint 4.3.2.
+来源： capture/lab/internals/04-interrupt/trace.txt, capture/lab/internals/04-interrupt/run.py, capture/lab/internals/04-interrupt/run1.trace.jsonl, capture/lab/internals/04-interrupt/run2b.trace.jsonl, capture/lab/internals/common/real.py; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/pregel/_loop.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/_runner.py at langgraph 1.2.22; libs/checkpoint/langgraph/checkpoint/base/__init__.py at langgraph-checkpoint 4.3.2.

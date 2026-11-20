@@ -1,26 +1,26 @@
-# Checkpoint size, DeltaChannel, and the cost of a superstep
+# 检查点大小、DeltaChannel 与超步的成本
 
-> The framework took under half a percent of a real agent's time, while its checkpoints grew to 10 MB in 100 tool calls, so spend your effort on bytes.
+> 框架只占一个真实 agent 耗时的不到百分之零点五，而它的检查点在 100 次工具调用里长到了 10 MB，所以把精力花在字节上。
 
-Your agent reads a long document page by page, 100 tool calls on one thread. The messages of the whole conversation are about 110 KB. The SQLite file holds 10.1 MB for that one thread. Nobody wrote 10 MB of anything. The saver wrote the conversation again on every superstep.
+你的 agent 一页一页地读一份长文档，在一个线程上做了 100 次工具调用。整段对话的消息约 110 KB。而 SQLite 文件里为这一个线程存了 10.1 MB。没有人写过 10 MB 的任何东西。是 saver 在每个超步里把对话又写了一遍。
 
-When you finish this section, you can predict the size of a thread from its step count and its saver. You can also choose between a plain message channel and `DeltaChannel`, and say what the loop itself costs next to the model.
+读完本节，你能根据步数和 saver 预测一个线程的大小。你还能在普通消息通道和 `DeltaChannel` 之间做选择，并说出循环本身相比模型要花多少。
 
-## Every checkpoint holds the whole list
+## 每个检查点都存着整个列表 {#s-checkpoint-growth-and-the-cost-of-a-superstep-every-checkpoint-holds-the-whole-list}
 
-`SqliteSaver.put` serializes the whole checkpoint, with every channel value, into one row {{code libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py:433-449}}. It receives `new_versions`, the list of channels that changed, and does not use it.
+`SqliteSaver.put` 把整个检查点连同每个通道的值，序列化到一行里 {{code libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py:433-449}}。它收到 `new_versions`，即发生变化的通道列表，但没有使用它。
 
-`InMemorySaver.put` does use it. It stores one blob per changed channel, keyed by the channel and its version {{code libs/checkpoint/langgraph/checkpoint/memory/__init__.py:455-457}}. That saves the channels that did not change. In an agent, `messages` changes on every superstep, so each new blob is the whole list again.
+`InMemorySaver.put` 确实用了它。它为每个变化的通道存一个 blob，以通道和它的版本为键 {{code libs/checkpoint/langgraph/checkpoint/memory/__init__.py:455-457}}。这样没有变化的通道就省下了。在 agent 里，`messages` 在每个超步都变化，所以每个新 blob 又是整个列表。
 
-A thread of n supersteps with one message each stores 1, 2, 3, up to n messages. That sum grows with n squared.
+一个有 n 个超步、每步一条消息的线程，存储的是 1、2、3，一直到 n 条消息。这个和随 n 的平方增长。
 
-**We measured** one `create_agent` run per saver on the x86 server guest with Qwen3 4B and a context of 16,384 tokens. The tool `read_page` returns a page that names the cursor of the next page, so the model must make one call per turn. Each run made 100 tool round trips, 101 model calls, and 203 supersteps, and ended with `DONE`. The model took almost all of the time in each run. We do not use the times, because each saver ran once on a loaded guest:
+**我们测得**每种 saver 一次 `create_agent` 运行，在 x86 服务器客户机上用 Qwen3 4B，上下文 16,384 个 token。工具 `read_page` 返回一页，其中写着下一页的游标，所以模型每轮必须调用一次。每次运行做了 100 次工具往返、101 次模型调用和 203 个超步，并以 `DONE` 结束。每次运行里，模型占了几乎全部时间。我们不使用这些耗时，因为每种 saver 只在负载较高的客户机上运行了一次：
 
 ```listing
-title: checkpoint size over 100 real tool round trips
+title: 100 次真实工具往返中的检查点大小
 source: capture/lab/internals/09-growth/trace.txt
 lang: text
-note: The SqliteSaver and InMemorySaver blocks, cut to the size lines.
+note: SqliteSaver 和 InMemorySaver 两个块，截取到大小行。
 ---
    checkpoint rows=203 total bytes=10132489; row bytes at #1, #50, #100, #150, #200: [689, 25072, 49512, 74045, 98637]; largest 99390; mean 49914
    writes rows=403 bytes=111623 (messages channel 98824); checkpoints + writes = 10244112 bytes; checkpoints / writes = 90.8
@@ -28,18 +28,18 @@ note: The SqliteSaver and InMemorySaver blocks, cut to the size lines.
    InMemorySaver: 203 checkpoints (118969 bytes without channel values); blobs 606 entries, 10002635 bytes, of which messages 9989570 bytes in 202 versions; messages blob at version #1, #50, #100: [861, 24630, 49074], last 98779; writes 111624 bytes
 ```
 
-The row grew from 689 bytes to 98,637 bytes. The 203 rows held 10,132,489 bytes, and the `writes` table, which holds each message once, held 111,623. So the checkpoints held 90.8 times the bytes of the writes. The blobs of `InMemorySaver` held 10,002,635 bytes, and the `messages` channel was 9,989,570 of them.
+行的大小从 689 字节增长到 98,637 字节。203 行共存了 10,132,489 字节，而每条消息只存一次的 `writes` 表存了 111,623 字节。所以检查点存的字节数是写入的 90.8 倍。`InMemorySaver` 的 blob 存了 10,002,635 字节，其中 `messages` 通道占 9,989,570。
 
-## DeltaChannel stores the writes
+## DeltaChannel 存储的是写入 {#s-checkpoint-growth-and-the-cost-of-a-superstep-deltachannel-stores-the-writes}
 
-**DeltaChannel:** a beta channel type that saves only the writes of each superstep, and a full snapshot after a set number of updates. [Section 5.5](#s-context-engineering-and-summarization) measures it over 5,000 steps.
+**DeltaChannel：** 一种 beta 通道类型，只保存每个超步的写入，并在一定次数的更新之后保存一份完整快照。[第 5.5 节](#s-context-engineering-and-summarization)在 5,000 步上测量它。
 
-A `DeltaChannel` checkpoint holds no value between snapshots {{code libs/langgraph/langgraph/channels/delta.py:193-202}}. A snapshot comes every `snapshot_frequency` updates, 100 by default {{code libs/langgraph/langgraph/channels/delta.py:74}}, or after 5,000 supersteps {{code libs/langgraph/langgraph/_internal/_config.py:45-47}}. A read rebuilds the list from the last snapshot and the writes after it {{code libs/langgraph/langgraph/pregel/_checkpoint.py:458-499}}.
+`DeltaChannel` 的检查点在两次快照之间不保存值 {{code libs/langgraph/langgraph/channels/delta.py:193-202}}。每隔 `snapshot_frequency` 次更新就有一份快照，默认 100 次 {{code libs/langgraph/langgraph/channels/delta.py:74}}，或者在 5,000 个超步之后 {{code libs/langgraph/langgraph/_internal/_config.py:45-47}}。读取时，从最后一份快照和它之后的写入重建列表 {{code libs/langgraph/langgraph/pregel/_checkpoint.py:458-499}}。
 
-`create_agent` keeps `messages` in a `BinaryOperatorAggregate`. Its `state_schema` argument takes a subclass of `AgentState`, and the third run used one that swaps the channel:
+`create_agent` 把 `messages` 放在一个 `BinaryOperatorAggregate` 里。它的 `state_schema` 参数接受 `AgentState` 的子类，第三次运行用了一个替换这个通道的子类：
 
 ```listing
-title: create_agent with a DeltaChannel message list
+title: 带 DeltaChannel 消息列表的 create_agent
 source: capture/lab/internals/09-growth/run.py
 lang: python
 ---
@@ -50,67 +50,67 @@ class DState(AgentState):
 ```
 
 ```listing
-title: the same 100 round trips with DeltaChannel
+title: 用 DeltaChannel 做同样的 100 次往返
 source: capture/lab/internals/09-growth/trace.txt
 lang: text
-note: The sqlite-delta block, cut to the size and read lines.
+note: sqlite-delta 块，截取到大小行和读取行。
 ---
    checkpoint rows=203 total bytes=286606; row bytes at #1, #50, #100, #150, #200: [470, 747, 49515, 750, 98638]; largest 98638; mean 1412
    writes rows=403 bytes=111777 (messages channel 98978); checkpoints + writes = 398383 bytes; checkpoints / writes = 2.6
    get_state at the end, 30 reads after 3 warmups: median 2.76 ms (p10 2.75, p90 2.8); 202 messages
 ```
 
-The run did the same work: 100 round trips, 101 model calls, and the same last answer. The thread held 398,383 bytes against 10,244,112, about one twenty-sixth. The rows stayed near 750 bytes, except the two snapshots at rows 100 and 200. We read the thread 30 times at the end of each run, and we do not use those times. [Figure](#fig-2-6) plots every row of both runs.
+这次运行做了同样的工作：100 次往返、101 次模型调用，最后的答案也相同。线程存了 398,383 字节，对比 10,244,112 字节，约为二十六分之一。行的大小保持在 750 字节左右，只有第 100 行和第 200 行的两份快照例外。我们在每次运行结束时把线程读了 30 次，不使用那些耗时。[图](#fig-2-6)画出两次运行的每一行。
 
 ```figure
 id: fig-2-6
 kind: chart
-title: bytes of each checkpoint row, plain messages against DeltaChannel
-claim: Plain rows hold the whole list and grow to 99 KB, and DeltaChannel rows stay near 750 bytes except one snapshot per 100 updates.
-caption: Each dot is one row of the checkpoints table of one create_agent run of 100 real tool round trips, in order, 203 rows per run. Teal is the plain channel, indigo is DeltaChannel, and the two rings are its snapshot rows. From capture/lab/internals/09-growth/growth.json.
+title: 每个检查点行的字节数，普通消息对比 DeltaChannel
+claim: 普通的行保存整个列表，增长到 99 KB，而 DeltaChannel 的行保持在 750 字节左右，只在每 100 次更新时有一份快照。
+caption: 每个点是一次含 100 次真实工具往返的 create_agent 运行里 checkpoints 表的一行，按顺序排列，每次运行 203 行。青绿色是普通通道，靛蓝色是 DeltaChannel，两个圆环是它的快照行。来源：capture/lab/internals/09-growth/growth.json。
 ```
 
-The reducer `_messages_delta_reducer` has a private name, and the channel is beta. Section 5.5 lists the rules for changing the channel of a thread that already exists.
+reducer `_messages_delta_reducer` 的名字是私有的，这个通道也是 beta。第 5.5 节列出了修改已有线程的通道时的规则。
 
-## What one superstep costs
+## 一个超步花多少 {#s-checkpoint-growth-and-the-cost-of-a-superstep-what-one-superstep-costs}
 
-**We measured** the time of each part of a run on the x86 server guest with Qwen3 4B. Each run was one `create_agent` run of 10 tool round trips, 22 supersteps, 30 runs per cell after 2 warmups. The framework time is the wall time minus the time inside the Ollama call and inside the tool function:
+**我们测得**一次运行里每个部分的耗时，在 x86 服务器客户机上用 Qwen3 4B。每次运行是一次含 10 次工具往返、22 个超步的 `create_agent` 运行，每个单元格 30 次运行，之前有 2 次预热。框架耗时是墙钟时间减去 Ollama 调用内部和工具函数内部的时间：
 
-| Saver and mode | share of wall |
+| saver 与模式 | 占墙钟时间的比例 |
 |---|---|
-| none, `async` | 0.144 % |
-| `InMemorySaver`, `async` | 0.197 % |
-| `InMemorySaver`, `sync` | 0.213 % |
-| `InMemorySaver`, `exit` | 0.153 % |
-| `SqliteSaver`, `async` | 0.245 % |
-| `SqliteSaver`, `sync` | 0.449 % |
-| `SqliteSaver`, `exit` | 0.190 % |
+| 无，`async` | 0.144 % |
+| `InMemorySaver`，`async` | 0.197 % |
+| `InMemorySaver`，`sync` | 0.213 % |
+| `InMemorySaver`，`exit` | 0.153 % |
+| `SqliteSaver`，`async` | 0.245 % |
+| `SqliteSaver`，`sync` | 0.449 % |
+| `SqliteSaver`，`exit` | 0.190 % |
 
-The guest was loaded, so read the share and the order of the rows, not the milliseconds.
+客户机负载较高，所以请看比例和各行的顺序，不要看毫秒数。
 
-The model filled more than 99.5 percent of each run. The loop functions themselves, planning, applying, and checkpointing, were a small part of the framework time. [Figure](#fig-2-6b) stacks the parts.
+模型占了每次运行的 99.5% 以上。循环函数本身，即规划、应用和检查点保存，只占框架耗时的一小部分。[图](#fig-2-6b)把各部分叠起来。
 
 ```figure
 id: fig-2-6b
 kind: chart
-title: framework time per superstep, by saver and durability mode
-claim: LangGraph and LangChain took 0.14 to 0.45 percent of the wall time, and a sync SqliteSaver cost the most.
-caption: Each bar is one saver and mode, in milliseconds per superstep, medians of 30 runs of 22 supersteps. Indigo is the loop functions, and grey is the rest of the framework time: node wrappers and saver waits on the loop. The right column is the share of the wall time. The guest was loaded, so read the share and the order of the bars, not the milliseconds. From capture/lab/internals/08-costs/breakdown.json.
+title: 每个超步的框架耗时，按 saver 和持久性模式
+claim: LangGraph 和 LangChain 占墙钟时间的 0.14% 到 0.45%，其中 sync 的 SqliteSaver 花得最多。
+caption: 每根柱是一种 saver 加一种模式，单位为每个超步的毫秒数，取 30 次运行的中位数，每次运行 22 个超步。靛蓝色是循环函数，灰色是框架耗时的其余部分：节点包装器以及循环上的 saver 等待。右列是占墙钟时间的比例。客户机负载较高，所以请看比例和柱子的顺序，不要看毫秒数。来源：capture/lab/internals/08-costs/breakdown.json。
 ```
 
-So the loop is not where an agent spends its time. The cost that grows is the checkpoint bytes, and on a database with many threads those bytes are storage, I/O, and backup.
+所以，循环不是 agent 花时间的地方。增长的成本是检查点的字节，而在有很多线程的数据库上，这些字节意味着存储、I/O 和备份。
 
-## What to do
+## 该怎么做 {#s-checkpoint-growth-and-the-cost-of-a-superstep-what-to-do}
 
-Estimate the bytes of a thread as the bytes of one message, times supersteps squared, divided by two. That gave 9.98 MB for the run above, against 10.13 MB measured. When that number passes what your database should hold per thread, trim or summarize the messages, as section 5.5 shows. Or pass `create_agent` a `state_schema` with a `DeltaChannel` message list, and accept a beta channel.
+把线程的字节数估算为一条消息的字节数，乘以超步数的平方，再除以二。上面那次运行这样算得 9.98 MB，实测是 10.13 MB。当这个数超过你的数据库应当为每个线程容纳的量时，就像第 5.5 节那样裁剪或摘要消息。或者给 `create_agent` 传一个带 `DeltaChannel` 消息列表的 `state_schema`，并接受它是 beta 通道。
 
-Do not tune the loop first. Pick `durability` for correctness, as [section 2.3](#s-the-checkpoint-write-path-and-durability) argues. The most costly setup in our runs, `sync` on SQLite, took 0.449 % of the wall time.
+不要先去调优循环。选 `durability` 要为了正确性，如[第 2.3 节](#s-the-checkpoint-write-path-and-durability)所论证的。我们的运行里成本最高的配置，即 SQLite 上的 `sync`，占墙钟时间的 0.449%。
 
 ```takeaways
-- Expect checkpoint bytes to grow with the square of thread length on SqliteSaver and InMemorySaver.
-- Watch the row size of the checkpoints table, and alert on it.
-- Pass create_agent a state_schema with a DeltaChannel message list for long threads, or trim them.
-- Choose durability for correctness, because the framework was under half a percent of the wall time.
+- 预期检查点字节数在 SqliteSaver 和 InMemorySaver 上随线程长度的平方增长。
+- 盯住 checkpoints 表的行大小，并为它设置告警。
+- 对长线程，给 create_agent 传一个带 DeltaChannel 消息列表的 state_schema，或者裁剪它们。
+- 选 durability 要为了正确性，因为框架占墙钟时间不到百分之零点五。
 ```
 
-Sources: capture/lab/internals/09-growth/trace.txt, capture/lab/internals/09-growth/growth.json, capture/lab/internals/09-growth/run.py, capture/lab/internals/08-costs/trace.txt, capture/lab/internals/08-costs/breakdown.json, capture/lab/internals/08-costs/runs.json, capture/lab/internals/08-costs/run.py, capture/lab/internals/common/real.py, capture/lab/internals/common/pager.py; libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py at langgraph-checkpoint-sqlite 3.1.3; libs/checkpoint/langgraph/checkpoint/memory/__init__.py at langgraph-checkpoint 4.3.2; libs/langgraph/langgraph/channels/delta.py, libs/langgraph/langgraph/_internal/_config.py, and libs/langgraph/langgraph/pregel/_checkpoint.py at langgraph 1.2.22; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0.
+来源： capture/lab/internals/09-growth/trace.txt, capture/lab/internals/09-growth/growth.json, capture/lab/internals/09-growth/run.py, capture/lab/internals/08-costs/trace.txt, capture/lab/internals/08-costs/breakdown.json, capture/lab/internals/08-costs/runs.json, capture/lab/internals/08-costs/run.py, capture/lab/internals/common/real.py, capture/lab/internals/common/pager.py; libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py at langgraph-checkpoint-sqlite 3.1.3; libs/checkpoint/langgraph/checkpoint/memory/__init__.py at langgraph-checkpoint 4.3.2; libs/langgraph/langgraph/channels/delta.py, libs/langgraph/langgraph/_internal/_config.py, and libs/langgraph/langgraph/pregel/_checkpoint.py at langgraph 1.2.22; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0.

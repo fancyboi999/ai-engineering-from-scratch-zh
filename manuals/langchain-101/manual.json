@@ -1,9 +1,9 @@
 {
   "id": "langchain-101",
   "title": "LangChain 101",
-  "subtitle": "Build, run, persist, and debug agents with LangChain 1.5, LangGraph 1.2, and Deep Agents 0.7, with a recorded answer for each decision",
-  "summary": "How the LangChain Python stack turns a model, tools, and a prompt into an agent, and when you need it at all. A task suite with state checkers sets the plain loop, create_agent, LangGraph, and Deep Agents side by side on local and Claude models. Traces of real runs show the runtime inside, and a FastAPI service with Postgres and approvals runs it in production. Every listing comes from a capture of a real run with langchain 1.5.0, langchain-core 1.8.0, langgraph 1.2.22, and deepagents 0.7.38. Every measured number comes from a recorded run on a real model.",
-  "audience": "You write Python and you have called a chat model API. You have read some LangChain code, maybe from the 0.x years. You want to know what the 1.x stack does before you build on it.",
+  "subtitle": "用 LangChain 1.5、LangGraph 1.2 和 Deep Agents 0.7 构建、运行、持久化并调试 agent，每项决策都有一份录制的实测答案",
+  "summary": "LangChain Python 技术栈如何把模型、工具和提示词变成 agent，以及你到底需不需要它。一套带状态检查器的任务集，把原生循环、create_agent、LangGraph 和 Deep Agents 放在本地模型与 Claude 模型上并排比较。真实运行的追踪展示运行时内部，一个带 Postgres 与审批的 FastAPI 服务把它跑进生产。每份代码清单都来自对 langchain 1.5.0、langchain-core 1.8.0、langgraph 1.2.22 和 deepagents 0.7.38 的一次真实运行录制，每个实测数字都来自在真实模型上的录制运行。",
+  "audience": "你会写 Python，调用过聊天模型 API，也读过一些 LangChain 代码，可能是 0.x 年代的。你想在基于 1.x 技术栈构建之前，先弄清它到底做了什么。",
   "edition": "2026.11",
   "status": "ready",
   "pin": {
@@ -15,93 +15,93 @@
     "verified": "2026-11-14"
   },
   "outcomes": [
-    "Decide if you need LangChain, LangGraph, or Deep Agents for an agent, from measured quality, time, and cost.",
-    "Install the stack from a lockfile on Python 3.11 or later, and say which package each import comes from.",
-    "Build an agent with create_agent, and predict each model call, tool call, superstep, and checkpoint of a run.",
-    "Choose a structured output method and a set of middleware for your provider, and predict the order in which their hooks run.",
-    "Stream a run in the mode you need, and keep a conversation across turns and restarts with a checkpointer.",
-    "Pause a run for human approval, resume it, and say which code runs again on the resume.",
-    "Count the attempts of each retry layer, and make a side effect safe when a crash replays it.",
-    "Connect MCP tools, a retriever, Deep Agents, and LangSmith tracing, and find the cause of a failure from its message.",
-    "Serve an agent from FastAPI with Postgres, approvals, spans, and evals, and size it from the model server."
+    "根据实测的质量、耗时和成本，判断你的 agent 需要 LangChain、LangGraph 还是 Deep Agents。",
+    "在 Python 3.11 或更高版本上依据锁文件安装整套技术栈，并说出每条 import 来自哪个包。",
+    "用 create_agent 构建 agent，并预测一次运行中的每次模型调用、工具调用、超步和检查点。",
+    "为你的模型提供方选择结构化输出方法和一组中间件，并预测它们的钩子按什么顺序运行。",
+    "按需要的流模式流式输出一次运行，并用 checkpointer 让对话跨轮次、跨重启延续。",
+    "暂停运行等待人工审批，恢复它，并说清恢复时哪些代码会再次运行。",
+    "数清每一层重试的尝试次数，并在崩溃重放时让副作用保持安全。",
+    "接入 MCP 工具、检索器、Deep Agents 和 LangSmith 追踪，并从报错信息找到故障原因。",
+    "用 FastAPI 加 Postgres 提供 agent 服务，带审批、span 和评估，并依据模型服务器估算容量。"
   ],
   "palette": [
     {
       "hue": "violet",
-      "meaning": "your code: the caller, its input, and its config"
+      "meaning": "你的代码：调用方、它的输入和它的配置"
     },
     {
       "hue": "blue",
-      "meaning": "LangChain: create_agent, middleware, messages, and tools as objects"
+      "meaning": "LangChain：create_agent、中间件、消息，以及作为对象的工具"
     },
     {
       "hue": "indigo",
-      "meaning": "LangGraph: the graph, its nodes, the Pregel loop, and its streams"
+      "meaning": "LangGraph：图、图的节点、Pregel 循环及其流"
     },
     {
       "hue": "plum",
-      "meaning": "the chat model and each model call"
+      "meaning": "聊天模型与每一次模型调用"
     },
     {
       "hue": "green",
-      "meaning": "tools and the results they return"
+      "meaning": "工具与它们返回的结果"
     },
     {
       "hue": "olive",
-      "meaning": "services outside the process: providers, LangSmith, Ollama"
+      "meaning": "进程之外的服务：模型提供方、LangSmith、Ollama"
     },
     {
       "hue": "amber",
-      "meaning": "lifecycle: steps, next nodes, interrupts, and resumes"
+      "meaning": "生命周期：步骤、下一个节点、中断与恢复"
     },
     {
       "hue": "teal",
-      "meaning": "durable state: checkpoints, stores, and their rows"
+      "meaning": "持久状态：检查点、store 及其数据行"
     },
     {
       "hue": "rose",
-      "meaning": "failure: exceptions, error messages, and repeated side effects"
+      "meaning": "失败：异常、错误信息和重复的副作用"
     },
     {
       "hue": "grey",
-      "meaning": "outside LangChain: Python, packages, the machine, and the operator"
+      "meaning": "LangChain 之外：Python、包、机器和运维人员"
     }
   ],
   "sources": [
     {
-      "name": "Source code at the release tags",
+      "name": "发布标签处的源码",
       "path": "langchain-ai/langchain at langchain==1.5.0 (c2f4036e), which also holds langchain-core 1.8.0; langchain-ai/langgraph at 1.2.22 (08a20169), with langgraph-checkpoint 4.3.2 and langgraph-prebuilt 1.1.2; langgraph-checkpoint-sqlite 3.1.3 (5bd231cb); langchain-ai/deepagents at deepagents==0.7.38 (c858b364); langchain-ai/langsmith-python at v0.14.17 (15dd2a78); langchain-openai 1.8.0, langchain-anthropic 1.7.10, and langchain-ollama 1.1.0 at their own tags",
-      "usedFor": "every class, function, parameter, default, and error text; cited as code, never quoted"
+      "usedFor": "每个类、函数、参数、默认值和错误文本；以 code 引用，从不原文照录"
     },
     {
-      "name": "The LangChain documentation",
+      "name": "LangChain 文档",
       "path": "docs.langchain.com, each page at https://docs.langchain.com/<path> as cited, built from langchain-ai/docs at commit 04d4d4a (2026-11-13), read 2026-11-14",
-      "usedFor": "the documented behaviour and the project's own framing, in our own words and checked against the code and our runs; cited as docs with the page path"
+      "usedFor": "文档描述的行为和项目自身的表述，用我们自己的话写出，并对照源码与我们的运行核验；以 docs 引用并附页面路径"
     },
     {
-      "name": "The changelog and release notes",
+      "name": "变更日志与发布说明",
       "path": "the Python changelog page of the docs at 04d4d4a, and the GitHub releases of each package at its tag",
-      "usedFor": "when each change came, and which package version holds it; cited as docs for the changelog page and as code for a release"
+      "usedFor": "每项变更出现的时间，以及它在哪个包的哪个版本；变更日志页以 docs 引用，某次发布以 code 引用"
     },
     {
-      "name": "The capture kit",
+      "name": "录制工具包",
       "path": "capture/run.py and capture/out/, with Qwen3 4B on Ollama where a scenario needs a model, no keys",
-      "usedFor": "every listing in the manual; cited by file"
+      "usedFor": "手册里的每份代码清单；按文件引用"
     },
     {
-      "name": "The lab recordings",
+      "name": "实验记录",
       "path": "capture/lab/, recorded on the Mac (Apple M1 Max, 10 cores, 64 GiB) and on an x86 server guest (32 vCPU, 48 GiB), with Qwen3 0.6B to 30B-A3B and gpt-oss 20B on Ollama, and Claude Haiku 5.5 and Claude Sonnet 5.5 through the Anthropic API in the bench, with Claude Haiku 5.5 also in the production service of Part 9, with the summaries in capture/lab/summary/, capture/lab/bench/summary-mac.json, and capture/lab/prodapp-mac/summary/",
-      "usedFor": "every number marked as measured; cited by file"
+      "usedFor": "所有标为实测的数字；按文件引用"
     },
     {
-      "name": "GitHub issues, pull requests, and advisories",
+      "name": "GitHub issue、拉取请求与安全公告",
       "path": "langchain-ai/langchain, langchain-ai/langgraph, and langchain-ai/deepagents, read 2026-11-14",
-      "usedFor": "known defects at the pin and the history of a behaviour; cited as issue with its number"
+      "usedFor": "锁定版本上的已知缺陷和某个行为的来龙去脉；以 issue 引用并附编号"
     },
     {
-      "name": "The LangChain product pages",
+      "name": "LangChain 产品页",
       "path": "www.langchain.com, read 2026-11-14, not under an open license",
-      "usedFor": "the headline claims that section 1.1 sets beside our results; paraphrased and cited as site"
+      "usedFor": "第 1.1 节拿来与我们的结果并排比较的主要宣称；转述后以 site 引用"
     }
   ],
   "quoteSources": {
@@ -125,15 +125,15 @@
   "front": "front.md",
   "plate": {
     "figure": "plate-langchain-run",
-    "title": "One invoke, two model calls, one tool call",
-    "caption": "One `invoke` of the kit's agent answers `What is 2 + 3?` with two model calls and one call of the `add` tool. `InMemorySaver` keeps five checkpoints, steps -1 to 3, and the last has no next node. With tracing on, LangSmith gets seven runs. On the Mac, with Qwen3 4B, `create_agent` spent 37.6 ms per run outside the model against 25.1 ms for a plain `openai` loop. From capture/out/00-versions.txt, capture/out/05-agent-graph.txt, capture/out/06-agent-run.txt, capture/out/28-checkpoint-memory.txt, capture/out/30-state-history-forks.txt, capture/out/42-langsmith.txt, and capture/lab/summary/overhead-mac-real.json."
+    "title": "一次 invoke，两次模型调用，一次工具调用",
+    "caption": "工具包的 agent 只 `invoke` 一次，就用两次模型调用和一次 `add` 工具调用回答了 `What is 2 + 3?`。`InMemorySaver` 保存五个检查点，步骤 -1 到 3，最后一个没有下一个节点。开启追踪后，LangSmith 收到七条运行记录。在 Mac 上用 Qwen3 4B，`create_agent` 在模型之外每次运行花 37.6 ms，原生 `openai` 循环为 25.1 ms。来源：capture/out/00-versions.txt、capture/out/05-agent-graph.txt、capture/out/06-agent-run.txt、capture/out/28-checkpoint-memory.txt、capture/out/30-state-history-forks.txt、capture/out/42-langsmith.txt 和 capture/lab/summary/overhead-mac-real.json。"
   },
   "parts": [
     {
       "number": 1,
-      "title": "The decision",
-      "thesis": "Three harnesses gave identical runs on 60 of 60 local tasks and Claude passed every task it ran, so choose a harness for persistence, streaming, and approvals.",
-      "summary": "What the four projects claim, beside our runs. Then a harness shoot-out on a task suite with five local models and two Claude models. Then one create_agent run from invoke to the last checkpoint.",
+      "title": "决策",
+      "thesis": "三种 harness 在 60 个本地任务上给出完全相同的运行结果，Claude 跑过的每个任务都通过了，所以选 harness 要看持久化、流式输出和审批。",
+      "summary": "四个项目各自的宣称，与我们的运行并排对照。然后是任务集上的 harness 对决，五个本地模型加两个 Claude 模型。最后跟踪一次 create_agent 运行，从 invoke 到最后一个检查点。",
       "accent": "blue",
       "sections": [
         {
@@ -152,9 +152,9 @@
     },
     {
       "number": 2,
-      "title": "Inside the runtime",
-      "thesis": "Every run is a loop of supersteps, and its traces show that a task that just returned ran again after a crash in 97 of 100 sync trials.",
-      "summary": "Supersteps and channel versions, colliding writes, and the checkpoint write path. Then interrupt and resume in the code, where each stream mode comes from, and checkpoint growth, all traced on real model runs.",
+      "title": "运行时内部",
+      "thesis": "每次运行都是一个超步循环，追踪显示：在 100 次同步模式试验中，有 97 次一个刚返回的任务在崩溃后重新运行了。",
+      "summary": "超步与通道版本、冲突写入、检查点写入路径。然后是代码里的中断与恢复、每种流模式的来源，以及检查点增长，全部在真实模型运行上追踪得出。",
       "accent": "indigo",
       "sections": [
         {
@@ -185,9 +185,9 @@
     },
     {
       "number": 3,
-      "title": "Models, messages, and tools",
-      "thesis": "The provider package decides much of what an agent can do, and in our runs ChatOllama dropped tool_choice, so test each package before you trust a default.",
-      "summary": "The package map and the install, init_chat_model and model profiles, messages and content blocks, tools with ToolRuntime and their errors, and the system prompt.",
+      "title": "模型、消息与工具",
+      "thesis": "模型提供方的包决定了 agent 能做的很多事，在我们的运行中 ChatOllama 丢掉了 tool_choice，所以信任默认值之前先测试每个包。",
+      "summary": "包地图与安装、init_chat_model 与模型档案、消息与内容块、带 ToolRuntime 的工具及其错误，以及系统提示词。",
       "accent": "green",
       "sections": [
         {
@@ -214,9 +214,9 @@
     },
     {
       "number": 4,
-      "title": "The agent, structured output, and middleware",
-      "thesis": "create_agent compiles a graph whose structured output strategy and middleware shape each request, and on Qwen3 4B ToolStrategy returned no object in 39 of 39 tasks.",
-      "summary": "The graph that create_agent builds, and which structured output strategy works on which provider. Then many tools and the tool selector, middleware hooks and their order, the built-in classes, retries, and guardrails. Last, a SQL agent with approved writes.",
+      "title": "agent、结构化输出与中间件",
+      "thesis": "create_agent 编译出一张图，结构化输出策略和中间件塑造每次请求；在 Qwen3 4B 上，ToolStrategy 在 39 个任务中有 39 个没有返回对象。",
+      "summary": "create_agent 构建的图，以及哪种结构化输出策略在哪个提供方上可用。然后是多工具与工具选择器、中间件钩子及其顺序、内置类、重试和护栏。最后是一个带已批准写操作的 SQL agent。",
       "accent": "blue",
       "sections": [
         {
@@ -259,9 +259,9 @@
     },
     {
       "number": 5,
-      "title": "State, memory, and durability",
-      "thesis": "A checkpointer keeps every step, and a key on the side effect stopped double charges: 331 of 560 killed trials charged twice with no key, 0 of 140 with one.",
-      "summary": "Stream modes and stream_events v3, checkpointers and threads, durability modes and crashes, stores, summarization and long threads, serialization, and an assistant that survives a restart.",
+      "title": "状态、记忆与持久性",
+      "thesis": "checkpointer 保存每一步，工具侧的幂等键则挡住了重复扣款：没有键时 560 次被杀试验中有 331 次扣了两次，有键时 140 次中为 0 次。",
+      "summary": "流模式与 stream_events v3、checkpointer 与线程、持久性模式与崩溃、store、摘要与长线程、序列化，以及一个能撑过重启的助手。",
       "accent": "teal",
       "sections": [
         {
@@ -296,9 +296,9 @@
     },
     {
       "number": 6,
-      "title": "LangGraph control flow",
-      "thesis": "You control a LangGraph run through its state, reducers, and steps, and a key that two nodes write with no reducer breaks every later read of the thread.",
-      "summary": "StateGraph and reducers, Send and Command, and the functional API. Then interrupts, human review, time travel, subgraphs, and the error handlers and limits of a node.",
+      "title": "LangGraph 控制流",
+      "thesis": "你通过状态、reducer 和步骤来控制一次 LangGraph 运行；两个节点写同一个没有 reducer 的键，会让该线程之后的每次读取都出错。",
+      "summary": "StateGraph 与 reducer、Send 与 Command，以及函数式 API。然后是中断、人工审核、时间旅行、子图，以及节点的错误处理器和上限。",
       "accent": "indigo",
       "sections": [
         {
@@ -337,9 +337,9 @@
     },
     {
       "number": 7,
-      "title": "Ecosystem",
-      "thesis": "Each integration has a cost you can measure, and a deep agent sent 3.6 to 4.3 times the prompt tokens of a plain loop for the same tasks.",
-      "summary": "Retrievers and vector stores, a retrieval agent, and MCP tools through langchain.mcp. Then Deep Agents 0.7 measured on the task suite, a deep agent with a subagent, LangSmith tracing, and evaluation.",
+      "title": "生态",
+      "thesis": "每项集成都有可测量的成本；同样的任务，一个 deep agent 发送的提示词 token 是原生循环的 3.6 到 4.3 倍。",
+      "summary": "检索器与向量存储、检索 agent，以及通过 langchain.mcp 接入的 MCP 工具。然后是在任务集上实测的 Deep Agents 0.7、带子 agent 的 deep agent、LangSmith 追踪和评估。",
       "accent": "olive",
       "sections": [
         {
@@ -374,9 +374,9 @@
     },
     {
       "number": 8,
-      "title": "Operate",
-      "thesis": "Running an agent for other people adds a server, a bill, attackers, old code, and failures at night, and each one has a recorded answer.",
-      "summary": "Agent Server under langgraph dev, up, and deploy, Agent Chat UI in front of it, and the cost of each layer. Then security, with the file rules of Deep Agents, migration from 0.x, a table of symptoms, a failure drill, and the limits of this edition.",
+      "title": "运维",
+      "thesis": "把 agent 交给别人使用，会带来服务器、账单、攻击者、旧代码和半夜的故障，每一项都有一份录制的答案。",
+      "summary": "`langgraph dev`、`up` 与 `deploy` 下的 Agent Server，它前面的 Agent Chat UI，以及每一层的成本。然后是安全（含 Deep Agents 的文件规则）、从 0.x 迁移、症状表、故障演练，以及本版的限制。",
       "accent": "grey",
       "sections": [
         {
@@ -415,9 +415,9 @@
     },
     {
       "number": 9,
-      "title": "Production",
-      "thesis": "The measured ceiling was the model server, real models failed in ways a scripted model hid, and only a key at the tool stopped a second refund after a crash.",
-      "summary": "One FastAPI service with create_agent, Postgres, and approvals, run on Qwen3 4B, Qwen3 14B, and Claude Haiku 5.5. The run endpoint and its stream, the owner check, and approvals with an idempotency key. Then OpenTelemetry spans with LangSmith off, faults and shutdown, evals that check state, and workers and cost.",
+      "title": "生产",
+      "thesis": "实测的上限是模型服务器；真实模型以脚本化模型掩盖掉的方式失败；崩溃后只有工具上的幂等键拦住了第二次退款。",
+      "summary": "一个带 create_agent、Postgres 和审批的 FastAPI 服务，在 Qwen3 4B、Qwen3 14B 和 Claude Haiku 5.5 上运行。运行端点及其流、所有者检查，以及带幂等键的审批。然后是关闭 LangSmith 后的 OpenTelemetry span、故障与关闭、检查状态的评估，以及 worker 与成本。",
       "accent": "violet",
       "sections": [
         {
@@ -452,9 +452,9 @@
     }
   ],
   "reference": {
-    "title": "Reference",
-    "thesis": "The parameters, hooks, stream events, persistence methods, variables, errors, terms, sources, and figures of this manual, in one place.",
-    "summary": "Lookup tables for create_agent, middleware, streams, persistence, environment variables, and errors. Then a glossary, the sources and conflicts, the figure index, how the manual was made, and the method of the task-suite bench.",
+    "title": "参考",
+    "thesis": "本手册的参数、钩子、流事件、持久化方法、环境变量、错误、术语、来源和图表，集中在一处。",
+    "summary": "create_agent、中间件、流、持久化、环境变量和错误的查找表。然后是术语表、来源与冲突、图表索引、本手册如何制作，以及任务集基准的方法。",
     "accent": "teal",
     "sections": [
       {
